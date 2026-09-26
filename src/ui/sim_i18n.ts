@@ -98,7 +98,7 @@ const baseEnTable = {
   'log.vaultUpgraded': 'You upgrade the Materials Vault.',
   // The Shardpike trial (src/sim/lance_trial.ts): the brace/thrust refusals and the
   // set/fumble/blind notices. Placeholder-free, so all register in the EXACT matcher.
-  'error.lanceNeedPike': "You need Skerrit's Shardpike in hand.",
+  'error.lanceNeedPike': 'You need a Shardpike in hand.',
   'error.lanceResting': 'The pike needs a moment to be re-set.',
   'error.lanceNeedGround': 'You need solid ground under you.',
   'error.lanceMounted': 'Not from the saddle.',
@@ -110,6 +110,12 @@ const baseEnTable = {
   'log.lanceBraced': 'You couch the Shardpike. Hold it true.',
   'log.lanceSet': 'The pike is set. STRIKE!',
   'log.lanceBlinded': 'Your thrust finds the Loomshard. The Barrowhide sloughs away!',
+  // The muster pike (src/sim/muster_pike.ts): the rack's refusal, the loan and its end,
+  // and the bank's refusal of lent gear (src/sim/bank.ts). Placeholder-free: EXACT matcher.
+  'error.musterPikeHeld': 'You already hold a Shardpike.',
+  'log.musterPikeTaken': 'You take a Shardpike from the muster rack.',
+  'log.musterPikeReclaimed': 'The muster reclaims its Shardpike.',
+  'error.bankBorrowedGear': 'You cannot store borrowed gear in the bank.',
   // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
   // item store. The error.* lines are the refusal toasts (too-far, quest-item,
   // and "Not enough money." reuse the existing rows above / the hud arm); the

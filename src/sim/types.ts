@@ -1106,6 +1106,13 @@ interface BaseItemDef {
    * the lance_trial verb), where a proficiency lockout would gate a mechanic, not power.
    */
   questTool?: true;
+  /**
+   * Gear LENT for one encounter (the muster pike: src/sim/muster_pike.ts). It is never
+   * the player's to keep: the bank refuses it, no save ever writes it (the lender takes
+   * it back and the displaced weapons return first), and it is always soulbound too, so
+   * trade, mail, market and vendor refuse it on the existing soulbound arms.
+   */
+  lentGear?: true;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
   questId?: string;
@@ -2301,6 +2308,12 @@ export interface MobTemplate {
   // seed stream, and driven by the ambient arm (mob/ambient.ts) whose wander
   // draws a private Rng sub-stream, not ctx.rng. See src/sim/mob/ambient.ts.
   ambient?: boolean;
+  // A soldier of the Mirefen muster (src/sim/mirefen_muster.ts): friendly set dressing
+  // that holds its post. Never hostile, never in combat, un-attackable (isHostileTo reads
+  // mob.hostile) and never on anyone's hate table, so it can neither hurt a boss nor feed
+  // his loot roster or HP scaling; only a collateral boss slam (mob/boss_collateral.ts)
+  // can kill it, and the muster module stands it back up. Spawned RNG-free by that module.
+  musterSoldier?: true;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
     min: number;

@@ -141,6 +141,7 @@ import {
 } from './content/ignivar_raid_lore';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
+import { MUSTER_MOBS } from './content/mirefen_muster';
 import { NECROMANCY_MOBS } from './content/necromancy';
 import {
   NIGHTBLOOM_CAMPS,
@@ -402,6 +403,7 @@ export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
+  ...MUSTER_MOBS,
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
   ...HEALING_TRAINING_MOBS,

@@ -299,7 +299,6 @@ import * as items from './items';
 import { applyKnockback as applyKnockbackImpl } from './knockback';
 import * as lanceGuidanceMod from './lance_guidance';
 import * as lanceTrialMod from './lance_trial';
-import { advanceLanceBrace, type LanceSession } from './lance_trial';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
@@ -359,6 +358,7 @@ import {
   unequipWornMechChroma,
   unlockMechChromaFromItem,
 } from './mech_chroma_ownership';
+import { freshMusterArmy, tickMusterArmy } from './mirefen_muster';
 import * as bossMechanics from './mob/boss_mechanics';
 import {
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
@@ -409,6 +409,7 @@ import {
   mountTrainBegin as mountTrainBeginImpl,
   tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
+import { savedGearFor } from './muster_pike';
 import * as nythraxisReadouts from './nythraxis_raid_readouts';
 import {
   grantDevotionFromBlock,
@@ -1368,7 +1369,7 @@ export interface PlayerMeta {
   // The active Shardpike brace, or absent. Session state, never persisted (a relog is a
   // dropped pike): src/sim/lance_trial.ts owns the rules, and the per-tick step runs in
   // the movement ladder, so there is no separate tick phase to keep in order.
-  lance?: LanceSession;
+  lance?: lanceTrialMod.LanceSession;
   // Sim-time the pike can next be braced (set by a fumble, a shove, or a thrust).
   lanceRestUntil?: number;
   /**
@@ -2207,6 +2208,7 @@ export class Sim {
   private worldBossRiseAtDawn: boolean[] = WORLD_BOSSES.map(() => false);
   // The day/night phase the previous scheduler pass observed, for the dawn edge.
   private worldBossClock: WorldBossClock = { lastPhase: null };
+  private readonly musterArmy = freshMusterArmy(); // the Balgath pass's army (mirefen_muster.ts)
   // One-shot gate for takeActionBarLayoutRestore (IWorldActionBar): mirrors
   // ClientWorld's null-out pattern so the offline arm honors the same
   // consumed-once contract instead of returning the 'noop' value forever.
@@ -2723,6 +2725,7 @@ export class Sim {
         entityIds: this.worldBossEntityIds,
         riseAtDawn: this.worldBossRiseAtDawn,
         clock: this.worldBossClock,
+        onMusterPass: (boss, dawn) => tickMusterArmy(this.ctx, this.musterArmy, boss, dawn),
       },
       (def) => this.spawnWorldBoss(def),
     );
@@ -4111,14 +4114,8 @@ export class Sim {
       resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
       // Unstuck Sickness persists across logout for the same reason.
       unstuckSickness: e.auras.find((a) => a.id === UNSTUCK_SICKNESS_ID)?.remaining ?? null,
-      equipment: { ...meta.equipment },
-      equipmentInstance: Object.fromEntries(
-        Object.entries(meta.equipmentInstance).map(([slot, inst]) => [
-          slot,
-          cloneItemInstancePayload(inst),
-        ]),
-      ),
-      inventory: meta.inventory.map(cloneInvSlot),
+      // A lent muster pike is folded back out of every save (muster_pike.ts).
+      ...savedGearFor(meta, this.musterArmy.lent.get(pid)),
       bags: [...meta.bags],
       bank: savedBankState(meta.bank),
       // Hand-enumerated clone: tsc forces a new REQUIRED MaterialsVaultState field
@@ -5398,6 +5395,9 @@ export class Sim {
       // read by the deeds proximity sweep through the seam.
       get worldBossEntityIds() {
         return sim.worldBossEntityIds;
+      },
+      get musterArmy() {
+        return sim.musterArmy;
       },
       get deedRuntime() {
         return sim.deedRuntime;
@@ -6805,7 +6805,7 @@ export class Sim {
     // strafe axis becomes the balance stick and locomotion is suppressed. A shove or a
     // fumble ends the session INSIDE the call and falls through, so the tick that breaks
     // the stance is the same tick ordinary motion (and the shove's velocities) resume.
-    if (advanceLanceBrace(this.ctx, p, meta.moveInput)) return;
+    if (lanceTrialMod.advanceLanceBrace(this.ctx, p, meta.moveInput)) return;
     // A ledge climb owns movement while it runs, and an airborne body that
     // gets its hands on a reachable ledge starts one. Sits after the leap arc
     // (a leap has its own landing contract) and before charge/follow/fear so

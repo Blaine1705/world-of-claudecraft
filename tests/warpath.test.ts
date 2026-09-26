@@ -8,6 +8,12 @@
 // was not the state machine but a single line that turned the body toward the player it
 // was swatting, which no unit test of a phase enum could ever have seen.
 import { beforeEach, describe, expect, it } from 'vitest';
+import {
+  MUSTER_CAMPS,
+  MUSTER_CIRCUIT,
+  MUSTER_RACK,
+  musterCamp,
+} from '../src/sim/content/mirefen_muster';
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { mobCombatProfile } from '../src/sim/mob/combat_profile';
 import {
@@ -19,7 +25,13 @@ import {
 } from '../src/sim/mob/warpath';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MobTemplate, WorldContent } from '../src/sim/types';
-import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
+import {
+  groundHeight,
+  isInWaterBody,
+  terrainHeight,
+  waterLevel,
+  waterLevelAt,
+} from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -99,101 +111,135 @@ describe('warpath circuit', () => {
     expect(seen.size).toBe(n);
   });
 
-  it('opens on the chapel and keeps the town on the circuit', () => {
-    // He wakes on the Starfall Crater's rim at the zone's east edge, and every straight
-    // line from there to Fenbridge runs through the Widow Thicket spider camps, so the
-    // pull opens with the long march to the chapel instead. The town is still a stop: the
-    // headline promise of the encounter is that he comes for the gate every lap.
-    expect(def().destinations[0].label).toContain('Chapel');
-    expect(def().destinations.some((d) => d.label.includes('Fenbridge'))).toBe(true);
+  it("walks the pickets of the Mirefen muster, in the muster's circuit order", () => {
+    // The whole point of the rework: he runs somewhere because there are soldiers there.
+    // Every stop is a picket of the muster, exactly, in MUSTER_CIRCUIT order, so the two
+    // tables can never drift apart and leave him slamming an empty field.
+    const stops = def().destinations;
+    expect(stops.map((d) => ({ x: d.x, z: d.z }))).toEqual(
+      MUSTER_CIRCUIT.map((id) => musterCamp(id).center),
+    );
+    for (const id of MUSTER_CIRCUIT) expect(musterCamp(id).onCircuit).toBe(true);
+    // The command camp (the weapon rack) is never a stop.
+    expect(MUSTER_CAMPS.filter((c) => !c.onCircuit).map((c) => c.id)).toEqual(['command']);
   });
 
-  it('opens with a march long enough to be an event, inside his own patience', () => {
-    // The first leg is the advertisement: the zone watches him cross the fen. It must be
-    // the longest leg he walks, and it must still fit the travel timeout with room, or a
-    // slow (a root, a stall) on the opening leg would have him give up on the chapel and
-    // wreck a patch of empty marsh instead.
+  it('opens with a march on the rim picket that fits inside his patience', () => {
+    // A short march now, but still a march, and it must fit the travel timeout with room or
+    // a slow on the opening leg would have him give up and wreck an empty patch of rim.
     const spawn = lair();
     const first = def().destinations[0];
+    expect(first.label).toContain('rim');
     const opening = Math.hypot(first.x - spawn.x, first.z - spawn.z);
-    expect(opening).toBeGreaterThan(120);
+    expect(opening).toBeGreaterThan(25);
     const travelSpeed = (MOBS[BALGATH]?.moveSpeed ?? 0) * def().travelSpeedMult;
     expect(opening / travelSpeed).toBeLessThan(def().travelTimeoutSeconds * 0.75);
   });
 
-  it('keeps the opening march clear of every spider camp', () => {
-    // The reason the chapel is first. A raid dragged through seven spiders on the way to
-    // the fight is not a chase for the level eights in it.
-    const spawn = lair();
-    const first = def().destinations[0];
-    for (const camp of BUILTIN_WORLD.camps) {
-      if (!camp.mobId.startsWith('mire_widow')) continue;
-      // Distance from the camp centre to the segment spawn -> first stop.
-      const dx = first.x - spawn.x;
-      const dz = first.z - spawn.z;
-      const t = Math.max(
-        0,
-        Math.min(
-          1,
-          ((camp.center.x - spawn.x) * dx + (camp.center.z - spawn.z) * dz) / (dx * dx + dz * dz),
-        ),
-      );
-      const cx = spawn.x + dx * t;
-      const cz = spawn.z + dz * t;
-      expect(
-        Math.hypot(camp.center.x - cx, camp.center.z - cz),
-        `the opening leg runs through the ${camp.mobId} camp at ${camp.center.x},${camp.center.z}`,
-      ).toBeGreaterThan(camp.radius);
-    }
-  });
-
-  it('never runs a leg through the water', () => {
-    // The placement rule every authored coordinate in this repo carries, in the form this
-    // particular fixture needs it. He walks the STRAIGHT LINE between stops, and although
-    // he now wades (MobTemplate.wadeDepth) the raid chasing him does not: a leg that clips
-    // the Mirefen lake turns the chase into a swim for everyone but him, and melee cannot
-    // follow at all. The first cut of this circuit did exactly that, and it took an
-    // in-engine capture to notice, because nothing in the sim or the content tables says a
-    // straight line between two dry points is itself dry.
+  it('keeps the circuit short: a lap of the crater, not a tour of the zone', () => {
+    // The owner's call: the old circuit crossed the whole marsh (a 175-yard opening leg,
+    // stops at the chapel, the mound, the town and the gravecallers). Every leg is now a
+    // short run between neighbouring pickets, and still long enough to be a chase.
     const stops = def().destinations;
-    // The opening leg starts from his SPAWN (the crater rim), which is not on the circuit.
-    const spawn = lair();
-    const legs = stops.map((a, i) => [a, stops[(i + 1) % stops.length]] as const);
-    for (const [a, b] of [[spawn, stops[0]] as const, ...legs]) {
-      const steps = Math.ceil(Math.hypot(a.x - b.x, a.z - b.z) / 2);
-      for (let i = 0; i <= steps; i++) {
-        const x = a.x + ((b.x - a.x) * i) / steps;
-        const z = a.z + ((b.z - a.z) * i) / steps;
-        const ground = groundHeight(x, z, WORLD_SEED);
-        const water = waterLevelAt(x, z, WORLD_SEED);
-        expect(
-          ground,
-          `the leg to ${(b as { label?: string }).label ?? 'the first stop'} is underwater at ${Math.round(x)},${Math.round(z)}`,
-        ).toBeGreaterThanOrEqual(water);
-      }
-    }
-  });
-
-  it('keeps the arrival slam off the town itself', () => {
-    // He is MEANT to hit the gate: that is the headline of the encounter. He is not meant
-    // to sweep the vendors and the level-8 questers behind it with a level-20 raid
-    // mechanic. Fenbridge fills a 34-unit hub at z 300 and its northernmost building sits
-    // at 325.5, so the blast edge has to stop north of that.
-    const town = def().destinations.find((d) => d.label.includes('Fenbridge'));
-    expect(town, 'the town is no longer on his circuit').toBeDefined();
-    const blastEdge = (town?.z ?? 0) - def().wreck.radius;
-    expect(blastEdge, 'the arrival slam reaches into Fenbridge itself').toBeGreaterThan(325.5);
-  });
-
-  it('authors legs long enough to be a chase', () => {
-    // A three-second trip is not a chase. Every consecutive leg has to be far enough that
-    // the raid must commit to following, and that the regen window has time to bite.
-    const stops = def().destinations;
+    let lap = 0;
     for (let i = 0; i < stops.length; i++) {
       const a = stops[i];
       const b = stops[(i + 1) % stops.length];
       const leg = Math.hypot(a.x - b.x, a.z - b.z);
-      expect(leg, `${a.label} to ${b.label} is barely a step`).toBeGreaterThan(40);
+      expect(leg, `${a.label} to ${b.label}`).toBeGreaterThan(25);
+      expect(leg, `${a.label} to ${b.label}`).toBeLessThan(60);
+      lap += leg;
+    }
+    expect(lap).toBeLessThan(220);
+  });
+});
+
+/** Every sample along a leg, and along two parallel lines 5 yards either side of it. */
+function legSamples(
+  a: { x: number; z: number },
+  b: { x: number; z: number },
+): { x: number; z: number }[] {
+  const len = Math.hypot(b.x - a.x, b.z - a.z);
+  const ux = (b.x - a.x) / len;
+  const uz = (b.z - a.z) / len;
+  const steps = Math.ceil(len);
+  const out: { x: number; z: number }[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    for (const off of [-5, -2.5, 0, 2.5, 5]) {
+      out.push({ x: a.x + (b.x - a.x) * t - uz * off, z: a.z + (b.z - a.z) * t + ux * off });
+    }
+  }
+  return out;
+}
+
+/** The opening leg from his bed, then every leg of the lap, wrapping. */
+function allLegs(): [
+  { x: number; z: number; label?: string },
+  { x: number; z: number; label?: string },
+][] {
+  const stops = def().destinations;
+  return [
+    [lair(), stops[0]],
+    ...stops.map((a, i) => [a, stops[(i + 1) % stops.length]] as [typeof a, typeof a]),
+  ];
+}
+
+describe('warpath circuit is dry and clear', () => {
+  it('never runs a leg through the water, not even the shallows', () => {
+    // The owner watched him cross a lake. He walks the STRAIGHT LINE between stops, and
+    // although he wades (MobTemplate.wadeDepth) the raid chasing him does not, and a leg
+    // that clips even the shallows turns the chase into a swim. So every leg, and the
+    // opening leg from his bed, is measured end to end at one-yard steps across a 10-yard
+    // corridor: never inside a declared water body's footprint, never open sea, and the
+    // ground (both the rendered terrain and the walkable floor) a full yard above the
+    // waterline everywhere, so no puddle of the zone's water plane can show through.
+    const wl = waterLevel();
+    for (const [a, b] of allLegs()) {
+      const name = b.label ?? 'the first stop';
+      for (const pt of legSamples(a, b)) {
+        const where = `${Math.round(pt.x)},${Math.round(pt.z)} on the leg to ${name}`;
+        expect(isInWaterBody(pt.x, pt.z), `inside a lake footprint at ${where}`).toBe(false);
+        expect(waterLevelAt(pt.x, pt.z, WORLD_SEED), `water at ${where}`).toBe(
+          Number.NEGATIVE_INFINITY,
+        );
+        const ground = Math.min(
+          terrainHeight(pt.x, pt.z, WORLD_SEED),
+          groundHeight(pt.x, pt.z, WORLD_SEED),
+        );
+        expect(ground - wl, `shallow ground at ${where}`).toBeGreaterThan(1);
+      }
+    }
+  });
+
+  it('keeps every leg clear of every wildlife camp', () => {
+    // The chase drags a raid of mixed levels behind him: no leg may pass within aggro reach
+    // (20 at most) of a camp's edge plus the raid's own spread around him.
+    for (const [a, b] of allLegs()) {
+      for (const camp of BUILTIN_WORLD.camps) {
+        let nearest = Number.POSITIVE_INFINITY;
+        for (const pt of legSamples(a, b)) {
+          nearest = Math.min(nearest, Math.hypot(camp.center.x - pt.x, camp.center.z - pt.z));
+        }
+        expect(
+          nearest - camp.radius,
+          `the leg to ${b.label ?? 'the first stop'} passes the ${camp.mobId} camp`,
+        ).toBeGreaterThan(22);
+      }
+    }
+  });
+
+  it("keeps his arrival slams and his travelling swipe off the command camp's rack", () => {
+    // The rack is where a level 6 walks up for a pike. It must never sit under a stop's
+    // Barrowfall ring or beside a leg he backhands his way along.
+    const rack = MUSTER_RACK;
+    for (const stop of def().destinations) {
+      expect(Math.hypot(stop.x - rack.x, stop.z - rack.z)).toBeGreaterThan(def().wreck.radius + 10);
+    }
+    for (const [a, b] of allLegs()) {
+      for (const pt of legSamples(a, b)) {
+        expect(Math.hypot(pt.x - rack.x, pt.z - rack.z)).toBeGreaterThan(def().swipe.radius + 10);
+      }
     }
   });
 });
@@ -254,7 +300,7 @@ describe('warpath in a live world', () => {
     expect(Math.hypot(boss.pos.x - stop.x, boss.pos.z - stop.z)).toBeLessThanOrEqual(
       def().arriveRadius,
     );
-    // He got there himself: the first stop is the chapel, 175 yards from the crater, and
+    // He got there himself: the first stop is the rim picket, 37 yards from his bed, and
     // he stops within arriveRadius of it, so anything near that gap is a real journey
     // rather than the shuffle he used to do.
     expect(Math.hypot(boss.pos.x - boss.spawnPos.x, boss.pos.z - boss.spawnPos.z)).toBeGreaterThan(
@@ -262,22 +308,22 @@ describe('warpath in a live world', () => {
     );
   });
 
-  it('is never yanked home mid-circuit by the leash', () => {
-    // The soft leash measures 45 yards from the SPAWN, so a leashed warpather evades on
-    // the way to his second landmark and heals to full. The two cannot both be true, and
-    // this is the pin that says which one won.
-    // Run to the THIRD landmark specifically, so the pin covers a full lap's worth of
-    // legs rather than the one opening march, and the arrival slam at the end of it.
+  it('walks a whole lap of the pickets without the leash ever yanking him home', () => {
+    // The soft leash measures 45 yards from where the pull was stamped, and his travel keeps
+    // re-stamping it (mob/warpath.ts). The circuit is a short lap of the crater now, so the
+    // pin is the whole lap: every picket reached and wrecked in order, back round to the
+    // first, with no evade and no dropped pull anywhere on the way.
     let evaded = false;
-    let peak = 0;
-    chase(220, () => {
+    const wrecked: number[] = [];
+    chase(260, () => {
       if (boss.aiState === 'evade') evaded = true;
-      peak = Math.max(peak, Math.hypot(boss.pos.x - boss.spawnPos.x, boss.pos.z - boss.spawnPos.z));
-      return evaded || (boss.warpathDestination === 2 && boss.warpathPhase === 'wreck');
+      const at = boss.warpathDestination ?? -1;
+      if (boss.warpathPhase === 'wreck' && wrecked[wrecked.length - 1] !== at) wrecked.push(at);
+      return evaded || wrecked.length > def().destinations.length;
     });
     expect(evaded, 'the leash pulled him off his own circuit').toBe(false);
-    expect(boss.aggroTargetId, 'he dropped the pull instead of finishing the leg').not.toBeNull();
-    expect(peak, 'he never crossed the leash radius, so this proved nothing').toBeGreaterThan(45);
+    expect(boss.aggroTargetId, 'he dropped the pull instead of finishing the lap').not.toBeNull();
+    expect(wrecked).toEqual([0, 1, 2, 3, 0]);
   });
 
   it('re-tethers around the landmark once he stops', () => {

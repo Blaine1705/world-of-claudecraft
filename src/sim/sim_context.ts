@@ -22,6 +22,7 @@ import type { GuildBankState } from './guild_bank';
 import type { InventoryGrantOptions } from './inventory_grant';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
+import type { MusterArmyState } from './mirefen_muster';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
@@ -374,6 +375,9 @@ export interface SimContextPrimitives {
   // VALUES in place; the deeds proximity sweep resolves the witness target
   // through this instead of scanning the whole entity map every second.
   readonly worldBossEntityIds: readonly (number | null)[];
+  // The Mirefen muster around Balgath's crater (src/sim/mirefen_muster.ts): its soldiers,
+  // weapon rack and live pike loans. Sim-owned holder mutated in place; nothing persists.
+  readonly musterArmy: MusterArmyState;
   // Book of Deeds session runtime (per-attempt encounter windows, per-match
   // Vale Cup memory, the Saul talk counter). Sim-owned holder mutated in
   // place; nothing in it persists.
@@ -1517,6 +1521,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get worldBossEntityIds() {
       return host.worldBossEntityIds;
+    },
+    get musterArmy() {
+      return host.musterArmy;
     },
     get deedRuntime() {
       return host.deedRuntime;

@@ -38,6 +38,24 @@ export const LANCE_FIXED_DAMAGE = 150;
 /** Yards of reach on the thrust. Generous: the target is thirteen yards of granite. */
 export const LANCE_THRUST_RANGE = 14;
 
+/** Skerrit's own pike: the quest tool (content/zone2.ts, q_socketwrights_due). */
+export const SKERRITS_SHARDPIKE_ID = 'skerrits_shardpike';
+/** The muster's lent copy from the command camp's weapon rack (src/sim/muster_pike.ts). */
+export const MUSTER_SHARDPIKE_ID = 'muster_shardpike';
+
+/**
+ * Whether an item is a Shardpike, i.e. whether wielding it opens the trial.
+ *
+ * Two items, one trial: Skerrit hands his own pike to whoever takes his quest, and the
+ * muster lends an identical one off its rack to anyone at all. Both drive the same brace,
+ * balance and thrust, so every gate (the sim's, the HUD's, the renderer's reticle) asks
+ * THIS rather than comparing against one id, and a third pike later is one line here.
+ * Lives in the pure core so the HUD and renderer can ask without importing the sim.
+ */
+export function isShardpikeItem(itemId: string | null | undefined): boolean {
+  return itemId === SKERRITS_SHARDPIKE_ID || itemId === MUSTER_SHARDPIKE_ID;
+}
+
 export const LANCE_TIP_ACCEL = 2.6;
 /** What a held lean is worth. Stronger than the tip at full displacement, so a
  *  correction always CAN win; the contest is reaction time, not arithmetic. */

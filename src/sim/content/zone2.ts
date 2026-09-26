@@ -21,8 +21,31 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { FERAL } from './items';
+import { MUSTER_CIRCUIT, type MusterCampId, musterCamp } from './mirefen_muster';
 
 export const DEEPFEN_SHALLOWS_LAKE = { x: -110, z: 310, radius: 35 };
+
+// What Balgath yells as he sets off for each picket of the muster (his warpath below).
+// English-only boss yells, the variable-routed-chat precedent (src/sim/mob/yells.ts).
+const BALGATH_PICKET_CALLS: Record<MusterCampId, { label: string; yell: string }> = {
+  rim: {
+    label: 'the rim picket',
+    yell: 'Pikes on MY rim? I will plant you in it like fence posts.',
+  },
+  west: {
+    label: 'the west picket',
+    yell: 'Run to the thicket, little soldiers. The spiders will not save you.',
+  },
+  south: {
+    label: 'the south picket',
+    yell: 'Tents. Banners. Fenwick sends me kindling and calls it an army.',
+  },
+  crater: {
+    label: 'the crater picket',
+    yell: 'You dug in beside my bed? Then you can sleep in it. FOREVER.',
+  },
+  command: { label: 'the command camp', yell: '' },
+};
 
 export const ZONE2_ZONE: ZoneDef = {
   id: 'mirefen_marsh',
@@ -378,67 +401,39 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // speed stays under it and keeps the walk. One boss, two gaits, neither of them
       // near the clip clamps that made him skate.
       travelSpeedMult: 1.25,
-      // The longest leg is the opening march from the crater to the chapel, about 175
-      // units, roughly 28s at travel speed (the longest leg inside the loop is 140). 45
-      // leaves room for a slow and still gives up on a landmark he cannot reach, so a
-      // wedged body can never leave him travelling (and healing) forever.
-      travelTimeoutSeconds: 45,
-      arriveRadius: 9,
+      // The legs are short now (the pickets ring the crater, 28 to 53 yards apart, and the
+      // opening march from his bed to the rim picket is 37), so a few seconds each at
+      // travel speed. 25 is two and a half times the longest with room for a slow, and
+      // still gives up on a picket he cannot reach, so a wedged body can never leave him
+      // travelling (and healing) forever.
+      travelTimeoutSeconds: 25,
+      // He plants ON the picket, not beside it: 3 yards from its centre puts every soldier
+      // of the inner ring (MUSTER_INNER_RADIUS 5.5) under the 16-yard Barrowfall with room
+      // to spare, while the two sentries posted 19+ yards out live to see the next lap.
+      arriveRadius: 3,
       // 1.4s of telegraph ring plus the follow-through, timed so his slam clip lands its
       // blow on the detonation rather than before it.
       wreckSeconds: 3.4,
-      // Walked IN ORDER, wrapping, starting at index 0. He wakes on the Starfall Crater's
-      // rim at the zone's east edge (world_boss.ts), so a pull opens with the long march
-      // west across the fen that the whole zone can watch, then the circuit brings him
-      // home to his own mound, to the town gate, and out to the gravecallers before it
-      // wraps back to the chapel; he never returns to the crater mid-fight (that is what
-      // dusk is for).
+      // Walked IN ORDER, wrapping, starting at index 0: the four pickets of the Mirefen
+      // muster (content/mirefen_muster.ts, MUSTER_CIRCUIT), which Warden Fenwick sent out
+      // to hold the crater. He wakes in his bed on the crater's south-west rim, marches on
+      // the rim picket first, then the west picket, the south picket, the crater picket,
+      // and round again. Every run has a reason now: he goes where the soldiers are and
+      // flattens them, and the raid chasing him arrives to a picket full of bodies.
       //
-      // ORDER IS CONSTRAINED, not chosen freely, and the constraint is water. He walks the
-      // straight line between stops, and although he now WADES (wadeDepth above) the raid
-      // chasing him does not: a leg that clips a Mirefen lake still turns the chase into a
-      // swim for everyone but him, and melee simply cannot follow. The first cut of this
-      // circuit did exactly that, caught in an in-engine capture with the player treading
-      // water and the boss half a lake away. Every consecutive pair below, and the opening
-      // leg from the crater, is dry end to end, measured rather than eyeballed, and
-      // tests/warpath.test.ts re-measures them against the real heightfield. The chapel
-      // is first rather than the town for the same reason in a different shape: every
-      // straight line from the crater to Fenbridge runs through the Widow Thicket spider
-      // camps, and a raid dragged through seven spiders on the way to the fight is not a
-      // chase, it is a wipe for the level eights in it.
-      //
-      // The town stop sits at z 345, and that number is a blast-radius decision. Fenbridge
-      // fills a 34-unit hub at z 300 with its wall near 334 and its northernmost building
-      // at 325.5; a 16-yard slam from 345 reaches 329, so it lands ON the north gate and
-      // the wall (which is the drama) and stops short of the buildings and the vendors
-      // behind them. Move him closer and a level-8 quester standing at the gate dies to a
-      // mechanic aimed at a raid.
-      destinations: [
-        {
-          x: 100,
-          z: 435,
-          label: 'the Drowned Chapel',
-          yell: 'The chapel bell woke me. Let it toll one last time.',
-        },
-        {
-          x: 0,
-          z: 390,
-          label: 'Barrowmound Reach',
-          yell: 'Back to the mound. Back to the digging. ALWAYS the digging.',
-        },
-        {
-          x: 0,
-          z: 345,
-          label: 'the Fenbridge gate',
-          yell: 'FENBRIDGE. I hauled the stone for that wall. I will have it back.',
-        },
-        {
-          x: 0,
-          z: 485,
-          label: 'the Gravecaller Encampment',
-          yell: 'The gravecallers sang my crew down into the mud. Their turn now.',
-        },
-      ],
+      // ORDER AND PLACEMENT ARE CONSTRAINED BY WATER. He walks the straight line between
+      // stops, and although he WADES (wadeDepth above) the raid chasing him does not: a leg
+      // that clips a lake, or even the shallows, turns the chase into a swim. The first
+      // circuit crossed the fen's lakes. Every leg below, and the opening leg from his bed,
+      // is dry END TO END with a corridor either side, and tests/warpath.test.ts re-measures
+      // that against the real heightfield and every water body: no lake footprint, no open
+      // sea, and ground well above the waterline all the way. The pickets also keep their
+      // distance from the Widow Thicket spider camps (content/mirefen_muster.ts), so the
+      // chase never drags a level eight through seven spiders.
+      destinations: MUSTER_CIRCUIT.map((id) => {
+        const camp = musterCamp(id);
+        return { x: camp.center.x, z: camp.center.z, ...BALGATH_PICKET_CALLS[id] };
+      }),
       // He is thirteen units tall and the whole zone should hear him coming.
       yellRange: 160,
       // 1.5% of his pool a second after three seconds unpunished. Against his world-boss
@@ -1065,10 +1060,10 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'socketwright_skerrit',
     name: 'Maben Skerrit',
     title: 'the Socketwright',
-    // West of the Fenbridge gate stop on Balgath's circuit, on measured dry ground
-    // (terrainHeight 0.15 vs water -4.3), 25 yards off the x=0 spine he marches along:
-    // close enough to watch his own handiwork stamp past, far enough that no slam,
-    // shockwave, or wreck telegraph ever reaches the man handing out the counter to them.
+    // West of the Fenbridge gate on measured dry ground (terrainHeight 0.15 vs water
+    // -4.3). Balgath's circuit once ran through the gate; it now rings the Starfall
+    // Crater's muster pickets 130 yards east, so no slam, shockwave, or wreck telegraph
+    // ever reaches the man handing out the counter to them.
     pos: { x: -22, z: 358 },
     facing: 1.71,
     color: 0x8a6d3b,
@@ -2020,6 +2015,30 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     noMarketList: true,
     noDiscard: true,
     questId: 'q_socketwrights_due',
+  },
+  // The muster's own issue of the same pike, lent from the weapon rack at the command camp
+  // below the Starfall Crater (src/sim/muster_pike.ts). Anyone, any level, no quest: the
+  // trial is the one thing a level 6 can do at a level 20 pull, so its door must not be a
+  // quest chain. LENT, never owned: it is reclaimed when the pull ends, when its bearer
+  // leaves the muster's reach, dies or logs out, and the weapons it displaced are put back
+  // in their hands. Soulbound + lentGear close every other exit (trade, mail, market,
+  // vendor, bank, guild bank), so it can never leave the fen with anyone.
+  muster_shardpike: {
+    id: 'muster_shardpike',
+    name: 'Muster Shardpike',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'uncommon',
+    weapon: { min: 1, max: 2, speed: 3.4 },
+    requiredLevel: 1,
+    questTool: true,
+    lentGear: true,
+    soulbound: true,
+    sellValue: 0,
+    noVendorSell: true,
+    noMarketList: true,
+    noDiscard: true,
   },
   fen_muster_order: {
     id: 'fen_muster_order',

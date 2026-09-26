@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
+import { freshMusterArmy } from '../src/sim/mirefen_muster';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -373,6 +374,7 @@ function makeFakeHost() {
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],
+    musterArmy: freshMusterArmy(),
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),

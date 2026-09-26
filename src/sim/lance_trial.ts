@@ -19,6 +19,7 @@ import type { LanceTrialView } from '../world_api/lance_trial';
 import { MOBS } from './data';
 import {
   freshLanceBalance,
+  isShardpikeItem,
   LANCE_FIXED_DAMAGE,
   LANCE_REST_SECONDS,
   LANCE_SET_SECONDS,
@@ -26,6 +27,7 @@ import {
   LANCE_WINDOW_SECONDS,
   type LanceBalance,
   lanceFumbled,
+  SKERRITS_SHARDPIKE_ID,
   shockLanceBalance,
   stepLanceBalance,
 } from './lance_balance_core';
@@ -34,8 +36,8 @@ import { onQuestEventForQuests } from './quests/quest_credit';
 import type { SimContext } from './sim_context';
 import { DT, dist2d, type Entity, type MoveInput } from './types';
 
-/** The one item whose wield unlocks the trial. */
-export const LANCE_ITEM_ID = 'skerrits_shardpike';
+/** Skerrit's quest pike. The muster's lent copy drives the same trial (isShardpikeItem). */
+export const LANCE_ITEM_ID = SKERRITS_SHARDPIKE_ID;
 /** Stable ability id for presentation (the thrust clip and its FCT line). */
 export const LANCE_THRUST_ABILITY = 'lance_thrust';
 /** How hard a slam shockwave kicks the beam at its centre (velocity impulse). */
@@ -92,8 +94,8 @@ export function lanceBrace(ctx: SimContext, pid: number): void {
     ctx.error(pid, "You can't do that while dead.");
     return;
   }
-  if (meta.equipment.mainhand !== LANCE_ITEM_ID) {
-    ctx.error(pid, "You need Skerrit's Shardpike in hand.");
+  if (!isShardpikeItem(meta.equipment.mainhand)) {
+    ctx.error(pid, 'You need a Shardpike in hand.');
     return;
   }
   if ((meta.lanceRestUntil ?? 0) > ctx.time) {
@@ -183,7 +185,7 @@ export function advanceLanceBrace(ctx: SimContext, p: Entity, mv: MoveInput): bo
   const meta = ctx.players.get(p.id);
   const session = meta?.lance;
   if (!meta || !session) return false;
-  if (p.dead || p.ghost || meta.equipment.mainhand !== LANCE_ITEM_ID) {
+  if (p.dead || p.ghost || !isShardpikeItem(meta.equipment.mainhand)) {
     endSession(meta, p);
     return false;
   }
@@ -205,7 +207,7 @@ export function advanceLanceBrace(ctx: SimContext, p: Entity, mv: MoveInput): bo
     endSession(meta, p);
     return false;
   }
-  const lean: -1 | 0 | 1 = mv.strafeRight ? 1 : mv.strafeLeft ? -1 : 0;
+  const lean = lanceLeanFromMove(mv);
   session.beam = stepLanceBalance(session.beam, lean, session.seed);
   if (lanceFumbled(session.beam)) {
     endSession(meta, p);
@@ -226,6 +228,23 @@ export function advanceLanceBrace(ctx: SimContext, p: Entity, mv: MoveInput): bo
     }
   }
   return true;
+}
+
+/**
+ * The balance stick: strafe OR turn, right positive.
+ *
+ * Strafe alone was the original stick, and it silently locked out every player who binds
+ * Q/E to the action bar: the keybind sweep unbinds strafe when a key moves to a slot, so
+ * the beam had no input at all and drifted into a fumble every time. A braced player cannot
+ * turn anyway (the brace owns movement, so the turn integration never runs), which makes
+ * the turn keys free to double as the stick. Right wins a tie, exactly as the strafe-only
+ * stick always resolved it, so the feel of the beam is unchanged. The online client
+ * also folds the turn keys and the on-screen lean buttons into the strafe bits while braced
+ * (src/game/lance_lean_intent.ts), because it streams turning as a heading, not as flags.
+ */
+export function lanceLeanFromMove(mv: MoveInput): -1 | 0 | 1 {
+  if (mv.strafeRight || mv.turnRight) return 1;
+  return mv.strafeLeft || mv.turnLeft ? -1 : 0;
 }
 
 /**

@@ -19,6 +19,7 @@
 // loot entries in array order). Quality follows all contributors' authored draws,
 // preserving this kill's ordinary selections before advancing the shared stream.
 
+import { MUSTER_BOSS_TEMPLATE_ID } from './content/mirefen_muster';
 import { MOBS } from './data';
 import { crossedDawn } from './day_night';
 import { rollEnemyLootQuality } from './loot/enemy_quality';
@@ -112,7 +113,17 @@ export interface WorldBossScheduleState {
    *  cadence (`worldBossAtBoot`), exactly as Thunzharr has always come back on a restart. */
   riseAtDawn: boolean[];
   clock: WorldBossClock;
+  /** Called once per pass with the Balgath slot's live boss (or null) and the dawn edge:
+   *  the Mirefen muster rides the scheduler this way (src/sim/mirefen_muster.ts). A hook
+   *  rather than an import, because this registry is read by world generation
+   *  (terrain_calm_anchors.ts) and must not drag the muster's gear systems into every
+   *  bundle that only wants the boss list. Optional so a bare scheduler fixture runs
+   *  without one. */
+  onMusterPass?: (scheduled: Entity | null, dawn: boolean) => void;
 }
+
+/** The WORLD_BOSSES slot whose boss the Mirefen muster is raised against. */
+const MUSTER_BOSS_SLOT = WORLD_BOSSES.findIndex((b) => b.templateId === MUSTER_BOSS_TEMPLATE_ID);
 
 /**
  * The per-tick scheduler pass. Per slot: when the live boss is gone, clear the slot (and
@@ -169,6 +180,13 @@ export function tickWorldBossSchedule(
       state.riseAtDawn[i] = false;
       state.entityIds[i] = spawn(def);
     }
+  }
+  // The muster rides the same pass: it needs the scheduler's own Balgath and the same
+  // sunrise edge (its fallen stand back up at dawn at the latest). Draws no rng, and
+  // raises nothing in a world that never sees him.
+  if (state.onMusterPass && MUSTER_BOSS_SLOT >= 0) {
+    const id = state.entityIds[MUSTER_BOSS_SLOT];
+    state.onMusterPass(id !== null ? (ctx.entities.get(id) ?? null) : null, dawn);
   }
 }
 

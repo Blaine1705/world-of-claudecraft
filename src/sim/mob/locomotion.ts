@@ -120,6 +120,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { holdMusterSoldier, isMusterSoldier } from './muster_soldier';
 import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
@@ -428,6 +429,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // safety net so the horses stay non-hostile.
   if (isAmbientMob(mob)) {
     updateAmbientMob(ctx, mob);
+    return;
+  }
+
+  // A muster soldier holds his post (mob/muster_soldier.ts): never hostile, never in
+  // combat, and returned before the leaked-mob safety net below re-hostiles him.
+  if (isMusterSoldier(mob)) {
+    holdMusterSoldier(ctx, mob);
     return;
   }
 

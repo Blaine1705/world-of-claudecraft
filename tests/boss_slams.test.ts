@@ -303,7 +303,10 @@ describe('the aimed slams in a live fight', () => {
     let hit = false;
     for (let i = 0; i < 20 * 3; i++) {
       for (const ev of tickAlive()) {
-        if (ev.type === 'damage' && ev.ability === slams().hammer.name) hit = true;
+        // On the PLAYER: his slams now also crush the muster soldiers dug in around his bed
+        // (src/sim/mirefen_muster.ts), and a soldier's death is not a hit on the player.
+        if (ev.type === 'damage' && ev.targetId === player.id && ev.ability === slams().hammer.name)
+          hit = true;
       }
       place(player, (ring?.x ?? 0) + (ring?.radius ?? 0) + 6, ring?.z ?? 0);
     }
@@ -332,7 +335,8 @@ describe('the aimed slams in a live fight', () => {
     for (let i = 0; i < 20 * 4 && !landed; i++) {
       hold();
       for (const ev of tickAlive()) {
-        if (ev.type === 'damage' && ev.ability === slams().cleave.name) hit = true;
+        if (ev.type === 'damage' && ev.targetId === player.id && ev.ability === slams().cleave.name)
+          hit = true;
         if (
           ev.type === 'spellfxAt' &&
           ev.fx === 'nova' &&

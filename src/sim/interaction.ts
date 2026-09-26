@@ -48,6 +48,7 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
+import { isMusterRack, useMusterRack } from './mirefen_muster';
 import { startCorpseHarvest } from './professions/corpse_harvest_session';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { corpseHasDecayed } from './respawn_policy';
@@ -476,6 +477,10 @@ export function interact(
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
         }
+        if (isMusterRack(target)) {
+          useMusterRack(ctx, ctx.musterArmy, p.id);
+          return;
+        }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
         pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
@@ -585,6 +590,10 @@ export function interact(
     }
     if (obj.templateId === 'mailbox') {
       ctx.emit({ type: 'mailbox', pid: p.id });
+      return;
+    }
+    if (isMusterRack(obj)) {
+      useMusterRack(ctx, ctx.musterArmy, p.id);
       return;
     }
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;

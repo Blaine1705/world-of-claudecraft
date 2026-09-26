@@ -168,6 +168,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   // weapon here reads as null, which is the mismatch tests/weapon_skins.test.ts catches. No
   // skin targets polearms, so this is classification only, never new cosmetic surface.
   skerrits_shardpike: 'polearm',
+  muster_shardpike: 'polearm',
 };
 
 /**

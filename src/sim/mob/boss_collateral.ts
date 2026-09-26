@@ -17,6 +17,10 @@ import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import type { Entity } from '../types';
 import { isAmbientMob } from './ambient';
+import { isMusterSoldier } from './muster_soldier';
+
+/** A crushed soldier takes this multiple of his whole pool, so armor cannot save him. */
+export const MUSTER_CRUSH_MULT = 4;
 
 const dist2d = (a: { x: number; z: number }, b: { x: number; z: number }): number =>
   Math.hypot(a.x - b.x, a.z - b.z);
@@ -67,8 +71,15 @@ export function splashNearbyMobs(
     if (e.aiState === 'evade') continue;
     if (dist2d(e.pos, center) > radius) continue;
     if (accept && !accept(e)) continue;
-    ctx.dealDamage(mob, e, amount, false, school, name, 'hit', true);
-    if (!e.dead) enrageAgainst(e, mob, amount);
+    // A muster soldier caught under a fist does not take a third of a raid slam, he is
+    // crushed (src/sim/mirefen_muster.ts): the whole reason the pickets exist is that the
+    // Foreman's arrival visibly flattens them. Overkill rather than a flag, so the one
+    // ordinary damage path still owns the death, its events and its corpse. He never
+    // turns on the boss either: the muster holds its post and feeds no hate table.
+    const soldier = isMusterSoldier(e);
+    const dealt = soldier ? Math.max(amount, e.maxHp * MUSTER_CRUSH_MULT) : amount;
+    ctx.dealDamage(mob, e, dealt, false, school, name, 'hit', true);
+    if (!e.dead && !soldier) enrageAgainst(e, mob, amount);
     hit++;
   }
   return hit;

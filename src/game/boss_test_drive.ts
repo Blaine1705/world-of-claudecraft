@@ -23,8 +23,8 @@ import type { EquipSlot, ItemDef, PlayerClass } from '../sim/types';
  *
  * The same spot the live scheduler spawns him on (WORLD_BOSSES in src/sim/world_boss.ts),
  * so the test drive shows the real opening: dry ground beside Brother Aldric's fallen
- * star, 45+ yards clear of the Widow Thicket camps, with the long march west to the
- * Drowned Chapel as his first leg. Kept as a literal rather than an import so this
+ * star, 45+ yards clear of the Widow Thicket camps, with the march on the muster's rim
+ * picket as his first leg. Kept as a literal rather than an import so this
  * dev-only module never pulls the world-boss registry into the client bundle; a test
  * welds the two.
  */
