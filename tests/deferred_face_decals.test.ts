@@ -10,6 +10,7 @@ import {
   attachFaceDecals,
   recolorMesh,
 } from '../src/render/characters/assets';
+import { SpiritVeilRig } from '../src/render/characters/ghost_veil';
 import { lookPiecesStats, resetLookPiecesForTest } from '../src/render/characters/look_pieces';
 import {
   ensureMakeupGeometry,
@@ -258,6 +259,9 @@ describe('CharacterVisual.attachDeferredDecals', () => {
       ghosted: false,
       ghostStyle: 'spirit',
       ghostMaterials: new Map(),
+      veilMaterials: new Map(),
+      spiritVeil: new SpiritVeilRig(),
+      weaponVfx: [],
       soulRend: false,
       moonkin: false,
       shadowform: false,

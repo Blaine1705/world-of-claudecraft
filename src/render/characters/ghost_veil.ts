@@ -1,0 +1,497 @@
+// The spirit veil: how a released spirit (a dead player, `e.ghost`) is drawn.
+//
+// Every rig material of the ghost is replaced by ONE unlit spectral material
+// (a MeshBasicMaterial carrying only the source map, with a constant program
+// key), drawn in a single blended pass for both faces, over a depth-only
+// pre-pass of the same rig so only the nearest ghost surface blends: no face
+// floating inside the head shell, no arm through the chest. Every ghost of
+// every class, look and tier lands on the small program family that
+// spirit_veil_family_core.ts pins and spirit_veil_prewarm.ts links at boot,
+// instead of a lit transparent twin per rig material and face side, so no
+// death links a program live.
+//
+// Per mesh SHAPE, never shared across shapes: three stores a material's
+// program parameters per material and re-derives them whenever the object it
+// draws differs in shape (skinning, morph count), and a re-derivation after
+// the light counts drifted mints a new program. The colour material is one per
+// (source material, shape), cached by the visual; the depth material one per
+// shape, here.
+//
+// The face decals (stubble, scalp hair, makeup) are transparent and write no
+// depth: they wear an alpha-preserving variant of the colour material that
+// keeps their mask, drawn after the veiled head, and get no depth sibling.
+
+import * as THREE from 'three';
+import { sharedUniforms } from '../gfx';
+import {
+  createSpiritVeilSortUnit,
+  createSpiritVeilTransparentSort,
+  SPIRIT_VEIL_FAMILY_KEYS,
+  SPIRIT_VEIL_PASS_KEY,
+  SPIRIT_VEIL_UNIT_KEY,
+  type SpiritVeilPass,
+  type SpiritVeilShape,
+  type SpiritVeilSortUnit,
+  spiritVeilKeysLinked,
+  spiritVeilShapeOf,
+  spiritVeilTupleKey,
+} from './spirit_veil_family_core';
+
+/** The look, in one place. Colours are sRGB hex (three converts them to the
+ *  working space), the rim strength goes past 1 so the rim blooms on the
+ *  composer tiers and saturates on the direct ones: the silhouette reads on
+ *  every tier. */
+export const SPIRIT_VEIL_LOOK = {
+  tint: 0x7cade1,
+  deep: 0x213055,
+  rim: 0x90c0ff,
+  rimStrength: 2.69,
+  opacity: 0.24,
+} as const;
+
+let motionAllowed: () => boolean = () => true;
+
+const veilUniforms = {
+  // The one world clock, frozen under reduced motion (the shimmer and the
+  // rising bands are the only motion the veil adds).
+  uVeilTime: {
+    get value(): number {
+      return motionAllowed() ? sharedUniforms.uTime.value : 0;
+    },
+  },
+  uVeilTint: { value: new THREE.Color(SPIRIT_VEIL_LOOK.tint) },
+  uVeilDeep: { value: new THREE.Color(SPIRIT_VEIL_LOOK.deep) },
+  uVeilRim: { value: new THREE.Color(SPIRIT_VEIL_LOOK.rim) },
+  uVeilRimStrength: { value: SPIRIT_VEIL_LOOK.rimStrength },
+  uVeilOpacity: { value: SPIRIT_VEIL_LOOK.opacity },
+};
+
+// Both passes replay the same shimmer so the colour pass lands on the depth
+// the pre-pass wrote.
+const VERT_SHIMMER = `
+  #if defined ( USE_ENVMAP ) || defined ( USE_SKINNING )
+    vec3 veilObjN = objectNormal;
+  #else
+    vec3 veilObjN = vec3( normal );
+  #endif
+  {
+    vec4 veilW0 = modelMatrix * vec4( transformed, 1.0 );
+    float veilS = max( length( modelMatrix[ 0 ].xyz ), 1e-4 );
+    transformed += veilObjN * ( 0.012 / veilS ) * sin( uVeilTime * 3.0 + veilW0.y * 7.0 );
+  }
+  #include <project_vertex>
+`;
+
+const COLOR_VERT_PARS = `
+  uniform float uVeilTime;
+  varying vec3 vVeilN;
+  varying vec3 vVeilV;
+  varying float vVeilWY;
+  varying float vVeilH;
+`;
+
+const COLOR_VERT_TAIL = `
+  #include <fog_vertex>
+  #if defined ( USE_ENVMAP ) || defined ( USE_SKINNING )
+    vVeilN = normalize( transformedNormal );
+  #else
+    vVeilN = normalize( normalMatrix * vec3( normal ) );
+  #endif
+  vVeilV = -mvPosition.xyz;
+  vVeilWY = ( modelMatrix * vec4( transformed, 1.0 ) ).y;
+  vVeilH = vVeilWY - modelMatrix[ 3 ].y;
+`;
+
+const COLOR_FRAG_PARS = `
+  uniform float uVeilTime;
+  uniform vec3 uVeilTint;
+  uniform vec3 uVeilDeep;
+  uniform vec3 uVeilRim;
+  uniform float uVeilRimStrength;
+  uniform float uVeilOpacity;
+  varying vec3 vVeilN;
+  varying vec3 vVeilV;
+  varying float vVeilWY;
+  varying float vVeilH;
+`;
+
+const COLOR_FRAG_BODY = `
+  {
+    vec3 veilN = normalize( vVeilN );
+    veilN = gl_FrontFacing ? veilN : -veilN;
+    float veilFres = pow( 1.0 - clamp( dot( veilN, normalize( vVeilV ) ), 0.0, 1.0 ), 2.0 );
+    float veilLum = dot( diffuseColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) );
+    float veilBand = 0.5 + 0.5 * sin( vVeilWY * 5.0 - uVeilTime * 2.2 );
+    float veilRise = smoothstep( 0.0, 1.1, vVeilH );
+    vec3 veilBody = mix( uVeilDeep, uVeilTint, clamp( 0.08 + veilLum * 1.9, 0.0, 1.0 ) );
+    veilBody *= ( 0.7 + 0.3 * veilBand ) * ( 0.35 + 0.65 * veilRise );
+    outgoingLight = veilBody + uVeilRim * uVeilRimStrength * veilFres;
+    float veilAlpha = clamp( uVeilOpacity + ( 1.0 - uVeilOpacity ) * veilFres, 0.0, 1.0 );
+    #ifdef SPIRIT_VEIL_DECAL
+      diffuseColor.a *= veilAlpha;
+    #else
+      diffuseColor.a = veilAlpha;
+    #endif
+  }
+  #include <opaque_fragment>
+`;
+
+// Hooks stay idempotent and keep nothing of the shader object: the dry
+// compile of the shader warm-up calls them once more on a throwaway one.
+function veilColorHook(shader: THREE.WebGLProgramParametersWithUniforms): void {
+  Object.assign(shader.uniforms, veilUniforms);
+  shader.vertexShader = `${COLOR_VERT_PARS}\n${shader.vertexShader}`
+    .replace('#include <project_vertex>', VERT_SHIMMER)
+    .replace('#include <fog_vertex>', COLOR_VERT_TAIL);
+  shader.fragmentShader = `${COLOR_FRAG_PARS}\n${shader.fragmentShader}`.replace(
+    '#include <opaque_fragment>',
+    COLOR_FRAG_BODY,
+  );
+}
+
+function veilDepthHook(shader: THREE.WebGLProgramParametersWithUniforms): void {
+  shader.uniforms.uVeilTime = veilUniforms.uVeilTime;
+  shader.vertexShader = `uniform float uVeilTime;\n${shader.vertexShader}`.replace(
+    '#include <project_vertex>',
+    VERT_SHIMMER,
+  );
+}
+
+const COLOR_PROGRAM_KEY = 'spirit-veil-color-v1';
+const DECAL_PROGRAM_KEY = 'spirit-veil-decal-v1';
+const DEPTH_PROGRAM_KEY = 'spirit-veil-depth-v1';
+const colorProgramKey = (): string => COLOR_PROGRAM_KEY;
+const decalProgramKey = (): string => DECAL_PROGRAM_KEY;
+const depthProgramKey = (): string => DEPTH_PROGRAM_KEY;
+
+type SourceMaterial = THREE.Material & {
+  map?: THREE.Texture | null;
+  color?: THREE.Color;
+};
+
+/** The pass a veil material draws, or null for any other material. */
+export function spiritVeilPassOf(material: THREE.Material): SpiritVeilPass | null {
+  return (material.userData[SPIRIT_VEIL_PASS_KEY] as SpiritVeilPass | undefined) ?? null;
+}
+
+/**
+ * The veil's colour material for one rig material. A transparent source (a
+ * face decal: its mask is its shape) takes the alpha-preserving decal variant,
+ * front faces only like the decals, keeping its polygon offset and its colour
+ * so the hair colour still reads in the stipple; every other source becomes the body veil, white
+ * over the source map so the tone comes from the texture. Shape-free: the
+ * caller caches one per (source, shape).
+ */
+export function createSpiritVeilMaterial(source: THREE.Material): THREE.MeshBasicMaterial {
+  const src = source as SourceMaterial;
+  const decal = source.transparent === true;
+  const mat = new THREE.MeshBasicMaterial({
+    map: src.map ?? null,
+    color: decal && src.color ? src.color.clone() : new THREE.Color(0xffffff),
+    side: decal ? THREE.FrontSide : THREE.DoubleSide,
+    transparent: true,
+    depthWrite: false,
+  });
+  mat.forceSinglePass = true;
+  mat.name = decal ? 'spirit_veil_decal' : 'spirit_veil';
+  if (decal) {
+    mat.defines = { SPIRIT_VEIL_DECAL: '' };
+    mat.polygonOffset = source.polygonOffset;
+    mat.polygonOffsetFactor = source.polygonOffsetFactor;
+    mat.polygonOffsetUnits = source.polygonOffsetUnits;
+  }
+  mat.onBeforeCompile = veilColorHook;
+  mat.customProgramCacheKey = decal ? decalProgramKey : colorProgramKey;
+  mat.userData[SPIRIT_VEIL_PASS_KEY] = decal ? 'decal' : 'color';
+  return mat;
+}
+
+const depthMaterials = new Map<string, THREE.MeshBasicMaterial>();
+
+/** The shared depth pre-pass material for one depth tuple key. Never
+ *  disposed: every ghost of that shape draws it, and the boot stand-in
+ *  holds its program. A small polygon offset keeps the colour pass's
+ *  LessEqual test robust across the two programs. */
+export function spiritVeilDepthMaterial(depthKey: string): THREE.MeshBasicMaterial {
+  let mat = depthMaterials.get(depthKey);
+  if (!mat) {
+    mat = new THREE.MeshBasicMaterial({
+      colorWrite: false,
+      depthWrite: true,
+      transparent: true,
+      side: THREE.DoubleSide,
+      fog: false,
+    });
+    mat.forceSinglePass = true;
+    mat.polygonOffset = true;
+    mat.polygonOffsetFactor = 1;
+    mat.polygonOffsetUnits = 4;
+    mat.name = `spirit_veil_depth_${depthKey}`;
+    mat.onBeforeCompile = veilDepthHook;
+    mat.customProgramCacheKey = depthProgramKey;
+    mat.userData[SPIRIT_VEIL_PASS_KEY] = 'depth';
+    depthMaterials.set(depthKey, mat);
+  }
+  return mat;
+}
+
+/** The shape key a visual caches its colour materials under. */
+export function spiritVeilShapeKey(mesh: THREE.Object3D): string {
+  return spiritVeilTupleKey('depth', spiritVeilShapeOf(mesh as THREE.Mesh), false);
+}
+
+/** The tuple keys a draw of `material` on `mesh` needs linked: the colour or
+ *  decal tuple, plus the depth tuple of the pre-pass for a body. Null for a
+ *  material that is not a veil colour material. */
+export function spiritVeilKeysFor(material: THREE.Material, mesh: THREE.Object3D): string[] | null {
+  const pass = spiritVeilPassOf(material);
+  if (pass !== 'color' && pass !== 'decal') return null;
+  const shape: SpiritVeilShape = spiritVeilShapeOf(mesh as THREE.Mesh);
+  const map = (material as SourceMaterial).map ?? null;
+  const keys = [spiritVeilTupleKey(pass, shape, map !== null, map?.channel ?? 0)];
+  if (pass === 'color') keys.push(spiritVeilTupleKey('depth', shape, false));
+  return keys;
+}
+
+// --- the ledger: which tuples are linked on the current renderer ------------
+//
+// A tuple stands for one program only while the renderer-global key inputs
+// hold still, and they do for a renderer's life: the light census is fixed
+// (the point-light pads, and no other light is ever added after boot), the
+// shadow state and the scene fog are set at construction, and the tier's
+// target arm (canvas or composer) changes only with a renderer rebuild,
+// which rebinds the ledger.
+
+const linkedTuples = new Set<string>();
+const reportedMisses = new Set<string>();
+type LateLink = (keys: readonly string[]) => void;
+let lateLink: LateLink | null = null;
+
+export function spiritVeilTuplesLinked(keys: readonly string[]): boolean {
+  return spiritVeilKeysLinked(keys, linkedTuples);
+}
+
+let ledgerOwner: object | null = null;
+
+/** Recorded by a RESIDENT stand-in's settle only (the boot family or a late
+ *  link): the stand-in keeps the program alive, so the entry stays true for
+ *  the renderer's life. A settle from a renderer the ledger no longer belongs
+ *  to (one retired by a graphics rebuild) records nothing. */
+export function noteSpiritVeilTupleLinked(key: string, owner: object | null = ledgerOwner): void {
+  if (owner !== ledgerOwner) return;
+  linkedTuples.add(key);
+}
+
+/** A new renderer (a graphics rebuild, a new context) starts with nothing
+ *  linked; the boot entry refills the ledger. */
+export function resetSpiritVeilLedger(): void {
+  linkedTuples.clear();
+  ledgerOwner = null;
+  lateLink = null;
+}
+
+/** Whether the ledger belongs to this renderer's program cache. */
+export function spiritVeilLedgerOwnedBy(owner: object): boolean {
+  return owner === ledgerOwner;
+}
+
+/** Tie the ledger to one renderer's program cache (its `properties`): binding
+ *  a different one empties it, rebinding the same one keeps it. */
+export function bindSpiritVeilLedger(owner: object): void {
+  if (owner === ledgerOwner) return;
+  resetSpiritVeilLedger();
+  ledgerOwner = owner;
+}
+
+export function spiritVeilLedgerSize(): number {
+  return linkedTuples.size;
+}
+
+/** Installed by the boot entry: links a stand-in of each tuple outside the
+ *  family in the background, so the next ghost of that shape commits at once. */
+export function setSpiritVeilLateLink(link: LateLink | null): void {
+  lateLink = link;
+}
+
+/** A veil staged behind the effect gate because some of its tuples are not
+ *  linked yet. Named once per tuple on the dev channel; a tuple outside the
+ *  pinned family is a census gap (tests/spirit_veil_census.test.ts). */
+export function noteSpiritVeilMiss(keys: readonly string[]): void {
+  const unlinked = keys.filter((key) => !linkedTuples.has(key));
+  const fresh = unlinked.filter((key) => !reportedMisses.has(key));
+  for (const key of fresh) reportedMisses.add(key);
+  if (fresh.length > 0) {
+    const outside = fresh.filter((key) => !SPIRIT_VEIL_FAMILY_KEYS.has(key));
+    console.warn(
+      `[spirit-veil] staged a ghost behind the compile gate: unlinked ${fresh.join(', ')}` +
+        (outside.length > 0 ? `; outside the pinned family: ${outside.join(', ')}` : ''),
+    );
+  }
+  if (unlinked.length > 0) lateLink?.(unlinked);
+}
+
+// --- the draw order and the clock --------------------------------------------
+
+/** Wire the veil into the world renderer: the per-rig transparent sort and
+ *  the reduced-motion switch the shimmer freezes under. */
+export function installSpiritVeil(
+  webgl: Pick<THREE.WebGLRenderer, 'info' | 'setTransparentSort'>,
+  reducedMotion: () => boolean,
+): void {
+  motionAllowed = () => !reducedMotion();
+  webgl.setTransparentSort(createSpiritVeilTransparentSort(() => webgl.info.render.frame));
+}
+
+// --- one rig ------------------------------------------------------------------
+
+const DEPTH_SIBLING_NAME = 'spirit_veil_depth';
+
+function buildDepthSibling(body: THREE.Mesh): THREE.Mesh {
+  const material = spiritVeilDepthMaterial(spiritVeilShapeKey(body));
+  const skinned = body as THREE.SkinnedMesh;
+  let sibling: THREE.Mesh;
+  if (skinned.isSkinnedMesh) {
+    const s = new THREE.SkinnedMesh(body.geometry, material);
+    s.bindMode = skinned.bindMode;
+    // The bind matrix is passed, so three never recomputes the inverses of
+    // the skeleton the body shares.
+    s.bind(skinned.skeleton, skinned.bindMatrix);
+    sibling = s;
+  } else {
+    sibling = new THREE.Mesh(body.geometry, material);
+  }
+  sibling.name = DEPTH_SIBLING_NAME;
+  sibling.castShadow = false;
+  sibling.receiveShadow = false;
+  sibling.raycast = () => {};
+  sibling.userData[SPIRIT_VEIL_PASS_KEY] = 'depth';
+  return sibling;
+}
+
+/** Keep a sibling on its body's cull and morph state: it is culled exactly
+ *  when the body is, and replays the body's live face and blink morphs. */
+function followBody(sibling: THREE.Mesh, body: THREE.Mesh): void {
+  sibling.frustumCulled = body.frustumCulled;
+  sibling.layers.mask = body.layers.mask;
+  const skinnedBody = body as THREE.SkinnedMesh;
+  if (skinnedBody.isSkinnedMesh) {
+    // three skins every vertex to compute a missing SkinnedMesh sphere, even
+    // unculled, just to sort it: the geometry's own sphere stands in.
+    let sphere: THREE.Sphere | null = skinnedBody.boundingSphere ?? null;
+    if (!sphere) {
+      if (!body.geometry.boundingSphere) body.geometry.computeBoundingSphere();
+      sphere = body.geometry.boundingSphere?.clone() ?? null;
+    }
+    if (sphere) (sibling as THREE.SkinnedMesh).boundingSphere = sphere;
+    else sibling.frustumCulled = false;
+  }
+  if (body.morphTargetInfluences) {
+    sibling.morphTargetInfluences = body.morphTargetInfluences;
+    sibling.morphTargetDictionary = body.morphTargetDictionary;
+  }
+}
+
+function meshPass(mesh: THREE.Mesh): SpiritVeilPass | null {
+  const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+  return mat ? spiritVeilPassOf(mat) : null;
+}
+
+/**
+ * One visual's veil state, mirrored from what its meshes actually MOUNT (a
+ * veil still linking behind the effect gate is not mounted, and the rig keeps
+ * its shadow and its halo until the swap lands). The depth siblings live as
+ * children of their bodies only while mounted, and come off (`detach`) around
+ * every sweep that walks the rig's graph for materials, so no tint, caster,
+ * far-bake or weapon-VFX walk ever meets one.
+ */
+export class SpiritVeilRig {
+  private readonly unit: SpiritVeilSortUnit = createSpiritVeilSortUnit();
+  private readonly siblings = new Map<THREE.Mesh, THREE.Mesh>();
+  private readonly tagged = new Set<THREE.Object3D>();
+  private readonly hidden = new Map<THREE.Object3D, boolean>();
+  private isMounted = false;
+
+  /** A veil is on this rig's meshes. */
+  get mounted(): boolean {
+    return this.isMounted;
+  }
+
+  /**
+   * Mirror the mounted veil: a depth sibling under every body wearing the veil
+   * colour, the sort unit on every veiled draw, and `hide` hidden (their prior
+   * visibility restored once the veil comes off). Returns whether the veil is
+   * mounted.
+   */
+  sync(meshes: Iterable<THREE.Mesh>, hide: readonly THREE.Object3D[]): boolean {
+    const current = new Set(meshes);
+    const bodies = new Set<THREE.Mesh>();
+    const kept = new Set<THREE.Object3D>();
+    for (const mesh of current) {
+      const pass = meshPass(mesh);
+      if (pass !== 'color' && pass !== 'decal') continue;
+      this.tag(mesh, pass);
+      kept.add(mesh);
+      if (pass !== 'color') continue;
+      bodies.add(mesh);
+      let sibling = this.siblings.get(mesh);
+      if (!sibling) {
+        sibling = buildDepthSibling(mesh);
+        this.siblings.set(mesh, sibling);
+      }
+      followBody(sibling, mesh);
+      if (sibling.parent !== mesh) mesh.add(sibling);
+      this.tag(sibling, 'depth');
+      kept.add(sibling);
+    }
+    for (const [mesh, sibling] of this.siblings) {
+      if (bodies.has(mesh)) continue;
+      sibling.removeFromParent();
+      if (!current.has(mesh)) this.siblings.delete(mesh);
+    }
+    for (const object of [...this.tagged]) if (!kept.has(object)) this.untag(object);
+    this.isMounted = kept.size > 0;
+    this.syncHidden(this.isMounted ? hide : []);
+    return this.isMounted;
+  }
+
+  /** Take every depth sibling off its body (they come back at the next
+   *  sync), for a sweep that walks the rig graph. */
+  detach(): void {
+    for (const sibling of this.siblings.values()) sibling.removeFromParent();
+  }
+
+  /** Everything back as it was: siblings off, tags off, hidden nodes shown. */
+  release(): void {
+    this.detach();
+    for (const object of [...this.tagged]) this.untag(object);
+    this.syncHidden([]);
+    this.siblings.clear();
+    this.isMounted = false;
+  }
+
+  private tag(object: THREE.Object3D, pass: SpiritVeilPass): void {
+    object.userData[SPIRIT_VEIL_UNIT_KEY] = this.unit;
+    object.userData[SPIRIT_VEIL_PASS_KEY] = pass;
+    this.tagged.add(object);
+  }
+
+  private untag(object: THREE.Object3D): void {
+    delete object.userData[SPIRIT_VEIL_UNIT_KEY];
+    delete object.userData[SPIRIT_VEIL_PASS_KEY];
+    this.tagged.delete(object);
+  }
+
+  private syncHidden(hide: readonly THREE.Object3D[]): void {
+    const wanted = new Set(hide);
+    for (const [object, visible] of this.hidden) {
+      if (wanted.has(object)) continue;
+      object.visible = visible;
+      this.hidden.delete(object);
+    }
+    for (const object of hide) {
+      if (this.hidden.has(object)) continue;
+      this.hidden.set(object, object.visible);
+      object.visible = false;
+    }
+  }
+}

@@ -25,10 +25,13 @@
 
 import * as THREE from 'three';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
+import { createSpiritVeilMaterial } from './ghost_veil';
 
-/** Translucent-rig flavor: 'spirit' is the thin ghost run (released spirits,
- *  ghost wolf, the graveyard angel); 'stealth' is the denser Duskveil fade. */
-export type GhostStyle = 'spirit' | 'stealth';
+/** Translucent-rig flavor: 'spirit' is the thin ghost run (ghost wolf, the
+ *  quest visions, the graveyard angel, the Veilbound March); 'stealth' is the
+ *  denser Duskveil fade; 'veil' is a released spirit, drawn by the shared
+ *  unlit family of ghost_veil.ts instead of a transparent clone. */
+export type GhostStyle = 'spirit' | 'stealth' | 'veil';
 
 /** Every overlay that flips `transparent` on a rig material. */
 type CharacterEffectStyle = GhostStyle | 'shadowform' | 'moonkin';
@@ -78,11 +81,12 @@ function cloneTransparent(source: THREE.Material, style: CharacterEffectStyle): 
   return clone;
 }
 
-/** The ghost run / stealth fade clone of `source`. */
+/** The ghost run / stealth fade clone of `source`, or its spirit veil. */
 export function createGhostEffectMaterial(
   source: THREE.Material,
   style: GhostStyle = 'spirit',
 ): THREE.Material {
+  if (style === 'veil') return createSpiritVeilMaterial(source);
   const clone = cloneTransparent(source, style);
   clone.opacity = ghostEffectOpacity(style);
   return clone;

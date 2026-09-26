@@ -35,6 +35,7 @@ import {
   farSourceMaterials,
   takeFarBakeBudget,
 } from '../src/render/characters/assets';
+import { SpiritVeilRig } from '../src/render/characters/ghost_veil';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
 import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual } from '../src/render/characters/visual';
@@ -403,6 +404,9 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
       ghosted: true,
       ghostStyle: 'spirit',
       ghostMaterials: new Map(),
+      veilMaterials: new Map(),
+      spiritVeil: new SpiritVeilRig(),
+      weaponVfx: [],
       soulRend: false,
       metamorph: false,
       moonkin: false,
@@ -533,6 +537,9 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
       ghosted: false,
       ghostStyle: 'spirit',
       ghostMaterials: new Map(),
+      veilMaterials: new Map(),
+      spiritVeil: new SpiritVeilRig(),
+      weaponVfx: [],
       soulRend: false,
       metamorph: false,
       moonkin: false,
