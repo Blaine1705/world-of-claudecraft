@@ -68,6 +68,12 @@ const EXCLUDED: Record<string, string> = {
     'scatter the Renderer constructor adds straight to the scene (renderer.ts), so the boot scene ' +
     'compile unit reaches the InstancedMeshes wearing it. A boot twin here would link a program ' +
     'the scene already carries.',
+  'goblin_rocket_sled_fx.ts':
+    'A mount look, not a cast: the shared plume pair is built with the Goblin Rocket Sled rig ' +
+    'in syncMountVisual (mount_lifecycle.ts), before gateMountSwapOnCompile lists the rig, so ' +
+    'the mount gate links it at the first sighting while the rig is still hidden, for owners and ' +
+    'observers alike. A boot twin, or a plume on the owned-mount prewarm rig ' +
+    '(mount_prewarm.ts), was declined: the gate only delays a cosmetic.',
   'frost_ice_fields.ts':
     'Zone scenery, not a cast: prepareFrostIceParts() fills the cache while buildFrostIceFields ' +
     'assembles the Frostveil spire group, which frost_sky.ts adds to the zone scene, so the zone ' +
@@ -243,11 +249,11 @@ describe('the lazy-material sweep', () => {
     // registered sources (four lazy spell-visual caches, the coach trail's
     // guidance set, the ground fire AoE anchor, five per-instance pool
     // stand-ins: Ring of Frost, Divine Ascension, Frostglobe, the mage and
-    // the warlock meteor rocks, plus the two rig-adornment stand-ins) plus the
-    // two excluded scenery bakes. The
+    // the warlock meteor rocks, plus the two rig-adornment stand-ins), the
+    // two excluded scenery bakes, and the rocket-sled plume pair. The
     // battleground caches are the remaining non-bundle hit.
-    expect(hits.length).toBeGreaterThanOrEqual(16);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(15);
+    expect(hits.length).toBeGreaterThanOrEqual(17);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(16);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {
