@@ -17487,4 +17487,139 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.town': 'Город',
   'hudChrome.playerTooltip.guild': '<{guild}>',
   'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'entities.itemSets.vanguard_warrior_arms.name': 'Авангард: Bladewake Battlegear',
+  'entities.itemSets.vanguard_warrior_arms.bonus2':
+    '2 предмета: Maiming Strike сокращает оставшееся время восстановления Onrush на 1 сек.',
+  'entities.itemSets.vanguard_warrior_arms.bonus4':
+    '4 предмета: Onrush также усиливает следующий Maiming Strike на 20%.',
+  'entities.itemSets.vanguard_warrior_fury.name': 'Авангард: Bloodmarch Ragegear',
+  'entities.itemSets.vanguard_warrior_fury.bonus2':
+    '2 предмета: время восстановления Vaulting Charge сокращается на 8 сек.',
+  'entities.itemSets.vanguard_warrior_fury.bonus4':
+    '4 предмета: приземление Vaulting Charge вызывает ярость.',
+  'entities.itemSets.vanguard_warrior_prot.name': 'Авангард: Ironmarch Bulwark',
+  'entities.itemSets.vanguard_warrior_prot.bonus2':
+    '2 предмета: время восстановления Faultline сокращается на 5 сек.',
+  'entities.itemSets.vanguard_warrior_prot.bonus4':
+    '4 предмета: Faultline также снижает получаемый урон на 10% на 6 сек.',
+  'entities.itemSets.vanguard_paladin_holy.name': 'Авангард: Sunvigil Regalia',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    '2 предмета: время восстановления Life Covenant сокращается на 30 сек.',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    '4 предмета: Life Covenant также накладывает на союзника щит на 8% его максимального здоровья на 6 сек.',
+  'entities.itemSets.vanguard_paladin_protection.name': 'Авангард: Shieldvow Bastion',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    '2 предмета: время восстановления Oath Chain сокращается на 2 сек.',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    '4 предмета: враги, притянутые Oath Chain, произносят заклинания на 30% медленнее 4 сек.; успешная связка может дать Solar Reprisal.',
+  'entities.itemSets.vanguard_paladin_retribution.name': 'Авангард: Lightbrand Warplate',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    '2 предмета: время восстановления Valkyr Calling сокращается на 15 сек.',
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    '4 предмета: Valkyr Calling сбрасывает Final Edict и повышает урон следующего Final Edict в течение 6 сек. после приземления на 15%.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Авангард: Packwarden Harness',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    '2 предмета: время восстановления Rattling Shot сокращается на 4 сек.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
+    '4 предмета: Rattling Shot сокращает оставшееся время восстановления Howling Rage на 1 сек.',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': 'Авангард: Farsight Harness',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    '2 предмета: время восстановления Trailbreak сокращается на 4 сек.',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    '4 предмета: Trailbreak делает следующий Long Draw в течение 6 сек. мгновенным. Не чаще раза в 15 сек.',
+  'entities.itemSets.vanguard_hunter_survival.name': 'Авангард: Snaretooth Harness',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    '2 предмета: время восстановления Bloodhook сокращается на 3 сек.',
+  'entities.itemSets.vanguard_hunter_survival.bonus4':
+    '4 предмета: Bloodhook дает 1 Hunting Momentum.',
+  'entities.itemSets.vanguard_rogue_assassination.name': 'Авангард: Nightcut Leathers',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2':
+    '2 предмета: Low Blow стоит на 10 энергии меньше.',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    '4 предмета: Low Blow делает следующую атаку в течение 6 сек. критической.',
+  'entities.itemSets.vanguard_rogue_combat.name': 'Авангард: Brawlmark Leathers',
+  'entities.itemSets.vanguard_rogue_combat.bonus2':
+    '2 предмета: время восстановления Swift Heels сокращается на 60 сек.',
+  'entities.itemSets.vanguard_rogue_combat.bonus4':
+    '4 предмета: пока действует Swift Heels, Wicked Slash и Haymaker дают на 1 прием серии больше.',
+  'entities.itemSets.vanguard_rogue_subtlety.name': 'Авангард: Shadewalk Leathers',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2':
+    '2 предмета: время восстановления Smokefade сокращается на 60 сек.',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
+    '4 предмета: Gut Punch из Smokefade дает на 2 приема серии больше.',
+  'entities.itemSets.vanguard_priest_discipline.name': 'Авангард: Veilpsalm Raiment',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    '2 предмета: время восстановления Terror Canticle сокращается на 3 сек.',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    '4 предмета: когда Psalm of Warding полностью поглощен, защищенный союзник получает +20% скорости на 3 сек. Не чаще раза в 8 сек.',
+  'entities.itemSets.vanguard_priest_holy.name': 'Авангард: Gracewing Raiment',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    '2 предмета: время восстановления Veilstep сокращается на 6 сек.',
+  'entities.itemSets.vanguard_priest_holy.bonus4':
+    '4 предмета: Veilstep также накладывает на вас щит на 8% максимального здоровья на 6 сек.',
+  'entities.itemSets.vanguard_priest_shadow.name': 'Авангард: Duskhymn Regalia',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    '2 предмета: Litany of Woe также замедляет цель на 30% во время поддержания.',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    '4 предмета: Call Tithefiend также накладывает на вас щит на 10% максимального здоровья на 8 сек.',
+  'entities.itemSets.vanguard_shaman_elemental.name': 'Авангард: Tempestwrit Battlemail',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    '2 предмета: время восстановления Unleash Weapon сокращается на 3 сек.',
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    '4 предмета: Unleash Weapon позволяет произносить заклинания на ходу и повышает скорость на 20% на 4 сек. Не чаще раза в 20 сек.',
+  'entities.itemSets.vanguard_shaman_enhancement.name': 'Авангард: Galeborn Warmail',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    '2 предмета: Ancestral Strike замедляет цель на 30% на 4 сек.',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    '4 предмета: Ancestral Strike сокращает оставшееся время восстановления Elemental Trance на 4 сек.',
+  'entities.itemSets.vanguard_shaman_restoration.name': 'Авангард: Brineward Chainmail',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    '2 предмета: Mending Waters применяется на 0,5 сек. быстрее к союзнику с менее чем 50% здоровья.',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    '4 предмета: Tidecall также накладывает на цель щит на 5% вашего максимального здоровья на 6 сек.',
+  'entities.itemSets.vanguard_mage_arcane.name': 'Авангард: Hourbinder Vestments',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    '2 предмета: время восстановления Temporal Barrier сокращается на 2 сек.',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    '4 предмета: Temporal Barrier также повышает скорость защищенной цели на 20% на 3 сек.',
+  'entities.itemSets.vanguard_mage_fire.name': 'Авангард: Emberlash Regalia',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    '2 предмета: Cinderfall перезаряжается на 3 сек. быстрее.',
+  'entities.itemSets.vanguard_mage_fire.bonus4':
+    '4 предмета: применение Cinderfall сокращает оставшееся время восстановления Blazing Barrier на 2 сек.',
+  'entities.itemSets.vanguard_mage_frost.name': 'Авангард: Rimewarden Garb',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    '2 предмета: время восстановления Icebind сокращается на 2 сек.',
+  'entities.itemSets.vanguard_mage_frost.bonus4':
+    '4 предмета: применение Icebind сокращает оставшееся время восстановления Flitstep на 5 сек.',
+  'entities.itemSets.vanguard_warlock_affliction.name': 'Авангард: Dreadquill Vestments',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    '2 предмета: время произнесения Harrow сокращается на 0,3 сек.',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    '4 предмета: Consume лечит на 30% больше и может поддерживаться на ходу.',
+  'entities.itemSets.vanguard_warlock_demonology.name': 'Авангард: Marrowbound Regalia',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    '2 предмета: время восстановления Bone Armor сокращается на 10 сек.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4':
+    '4 предмета: Reaping Command сокращает оставшееся время восстановления Bone Armor на 2 сек.',
+  'entities.itemSets.vanguard_warlock_destruction.name': 'Авангард: Slagcrown Vestments',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    '2 предмета: время восстановления Cinderhide сокращается на 30 сек.',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    '4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным.',
+  'entities.itemSets.vanguard_druid_feral.name': 'Шкура кровавой гривы',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    '2 предмета: время восстановления Bruin Rush сокращается на 3 сек.',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    '4 предмета: Bruin Rush накладывает щит на 6% максимального здоровья на 6 сек.',
+  'entities.itemSets.vanguard_druid_restoration.name': 'Облачение чертополоха',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    '2 предмета: время восстановления Fleetmend сокращается на 1 сек.',
+  'entities.itemSets.vanguard_druid_restoration.bonus4':
+    '4 предмета: Fleetmend также повышает вашу скорость передвижения на 30% на 3 сек.',
+  'entities.itemSets.vanguard_druid_balance.name': 'Облачение звездного стража',
+  'entities.itemSets.vanguard_druid_balance.bonus2':
+    'Время применения Хватких корней сокращается на 0,5 сек.',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
 };

@@ -6961,6 +6961,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.name': 'Salmo de Protección',
   'entities.abilities.power_word_shield.description':
     'Escuda a un objetivo aliado y absorbe {damage} de daño durante 30 s. Disciplina además vincula al objetivo con tu daño Sagrado durante 30 s.',
+  'entities.abilities.lunge.name': 'Embestida felina',
+  'entities.abilities.lunge.description':
+    'Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Colmillo salvaje, añade 1 Sangre antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma.',
   'entities.abilities.renew.name': 'Gracia Persistente',
   'entities.abilities.renew.description':
     'Sana al objetivo en {damage} durante 15 s, una vez cada 3 s. La sanación aumenta con el poder con hechizos.',

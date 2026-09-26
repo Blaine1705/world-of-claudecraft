@@ -17185,9 +17185,126 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.colSaleType': 'タイプ',
   'hudChrome.wocMarket.colSoldAt': '販売済み',
   'hudChrome.wocMarket.saleTypeBuyNow': '今すぐ購入',
+  'hudChrome.loot.rollWon': 'おめでとうございます！ {item} をロール {roll} で獲得しました',
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
   'hudChrome.playerTooltip.guild': '<{guild}>',
   'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'entities.itemSets.vanguard_warrior_arms.name': 'ヴァンガード：Bladewake Battlegear',
+  'entities.itemSets.vanguard_warrior_arms.bonus2':
+    '2点：Maiming StrikeでOnrushの残りクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_warrior_arms.bonus4': '4点：Onrushが次のMaiming Strikeを20%強化。',
+  'entities.itemSets.vanguard_warrior_fury.name': 'ヴァンガード：Bloodmarch Ragegear',
+  'entities.itemSets.vanguard_warrior_fury.bonus2': '2点：Vaulting Chargeのクールダウンが8秒短縮。',
+  'entities.itemSets.vanguard_warrior_fury.bonus4': '4点：Vaulting Chargeの着地で激怒する。',
+  'entities.itemSets.vanguard_warrior_prot.name': 'ヴァンガード：Ironmarch Bulwark',
+  'entities.itemSets.vanguard_warrior_prot.bonus2': '2点：Faultlineのクールダウンが5秒短縮。',
+  'entities.itemSets.vanguard_warrior_prot.bonus4':
+    '4点：Faultlineで受けるダメージが6秒間10%低下。',
+  'entities.itemSets.vanguard_paladin_holy.name': 'ヴァンガード：Sunvigil Regalia',
+  'entities.itemSets.vanguard_paladin_holy.bonus2': '2点：Life Covenantのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    '4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_paladin_protection.name': 'ヴァンガード：Shieldvow Bastion',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    '2点：Oath Chainのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    '4点：Oath Chainで引き寄せた敵は4秒間30%遅く詠唱し、条件を満たすとSolar Reprisalを得る。',
+  'entities.itemSets.vanguard_paladin_retribution.name': 'ヴァンガード：Lightbrand Warplate',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    '2点：Valkyr Callingのクールダウンが15秒短縮。',
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    '4点：Valkyr CallingがFinal Edictをリセットし、着地後6秒以内の次のFinal Edictのダメージを15%上げる。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': 'ヴァンガード：Packwarden Harness',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    '2点：Rattling Shotのクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
+    '4点：Rattling ShotでHowling Rageの残りクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': 'ヴァンガード：Farsight Harness',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    '2点：Trailbreakのクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    '4点：Trailbreakで6秒以内の次のLong Drawが即時発動。15秒に1回まで。',
+  'entities.itemSets.vanguard_hunter_survival.name': 'ヴァンガード：Snaretooth Harness',
+  'entities.itemSets.vanguard_hunter_survival.bonus2': '2点：Bloodhookのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_hunter_survival.bonus4': '4点：BloodhookでHunting Momentumを1得る。',
+  'entities.itemSets.vanguard_rogue_assassination.name': 'ヴァンガード：Nightcut Leathers',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2':
+    '2点：Low Blowの消費エネルギーが10減少。',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    '4点：Low Blowで6秒以内の次の攻撃がクリティカルになる。',
+  'entities.itemSets.vanguard_rogue_combat.name': 'ヴァンガード：Brawlmark Leathers',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが60秒短縮。',
+  'entities.itemSets.vanguard_rogue_combat.bonus4':
+    '4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。',
+  'entities.itemSets.vanguard_rogue_subtlety.name': 'ヴァンガード：Shadewalk Leathers',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2': '2点：Smokefadeのクールダウンが60秒短縮。',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
+    '4点：SmokefadeからのGut Punchがコンボポイントを追加で2得る。',
+  'entities.itemSets.vanguard_priest_discipline.name': 'ヴァンガード：Veilpsalm Raiment',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    '2点：Terror Canticleのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    '4点：Psalm of Warding消費時、守られた味方の移動速度が3秒間20%上昇。8秒に1回まで。',
+  'entities.itemSets.vanguard_priest_holy.name': 'ヴァンガード：Gracewing Raiment',
+  'entities.itemSets.vanguard_priest_holy.bonus2': '2点：Veilstepのクールダウンが6秒短縮。',
+  'entities.itemSets.vanguard_priest_holy.bonus4': '4点：Veilstepが最大体力8%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_priest_shadow.name': 'ヴァンガード：Duskhymn Regalia',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    '4点：Call Tithefiendが最大体力10%のシールドを8秒付与。',
+  'entities.itemSets.vanguard_shaman_elemental.name': 'ヴァンガード：Tempestwrit Battlemail',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    '2点：Unleash Weaponのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    '4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。',
+  'entities.itemSets.vanguard_shaman_enhancement.name': 'ヴァンガード：Galeborn Warmail',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    '2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    '4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_shaman_restoration.name': 'ヴァンガード：Brineward Chainmail',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    '4点：Tidecallが対象にあなたの最大体力5%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_mage_arcane.name': 'ヴァンガード：Hourbinder Vestments',
+  'entities.itemSets.vanguard_mage_arcane.bonus2': '2点：Temporal Barrierのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    '4点：Temporal Barrierが守った対象の移動速度を3秒間20%上昇。',
+  'entities.itemSets.vanguard_mage_fire.name': 'ヴァンガード：Emberlash Regalia',
+  'entities.itemSets.vanguard_mage_fire.bonus2': '2点：Cinderfallの再使用が3秒速くなる。',
+  'entities.itemSets.vanguard_mage_fire.bonus4':
+    '4点：Cinderfall詠唱でBlazing Barrierの残りクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.name': 'ヴァンガード：Rimewarden Garb',
+  'entities.itemSets.vanguard_mage_frost.bonus2': '2点：Icebindのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.bonus4':
+    '4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.name': 'ヴァンガード：Dreadquill Vestments',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2': '2点：Harrowの詠唱時間が0.3秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    '4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。',
+  'entities.itemSets.vanguard_warlock_demonology.name': 'ヴァンガード：Marrowbound Regalia',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    '2点：Bone Armorのクールダウンが10秒短縮。',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4':
+    '4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_warlock_destruction.name': 'ヴァンガード：Slagcrown Vestments',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    '2点：Cinderhideのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。',
+  'entities.itemSets.vanguard_druid_feral.name': '血たてがみの皮装',
+  'entities.itemSets.vanguard_druid_feral.bonus2': '2点：Bruin Rushのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    '4点：Bruin Rushが最大体力6%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_druid_restoration.name': 'アザミ花の祭服',
+  'entities.itemSets.vanguard_druid_restoration.bonus2': '2点：Fleetmendのクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_druid_restoration.bonus4': '4点：Fleetmendで移動速度が3秒間30%上昇。',
+  'entities.itemSets.vanguard_druid_balance.name': '星守りの装束',
+  'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
 };

@@ -1832,7 +1832,7 @@ export const hudChromeStrings = {
     autoRows: ' (Auto)',
     barsUnit: ' bars',
     includeShields: 'Count Absorbs as Healing',
-    includeShieldsDesc: 'Adds absorbed shield damage (Power Word: Shield, etc.) to Healing meter.',
+    includeShieldsDesc: 'Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.',
 
     // Tab 6: Presets
     groupPresets: 'One-Click Quick Themes',

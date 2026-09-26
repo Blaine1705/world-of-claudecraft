@@ -1609,7 +1609,7 @@ export const ru_RU: EnTranslations = {
       "autoRows": " (Auto)",
       "barsUnit": " bars",
       "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Power Word: Shield, etc.) to Healing meter.",
+      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
       "groupPresets": "One-Click Quick Themes",
       "applyPreset": "Apply Theme",
       "presetDetailsName": "Modern Glass",
@@ -22220,139 +22220,139 @@ export const ru_RU: EnTranslations = {
         "bonus3": "Скорость атаки и произнесения заклинаний повышается на 15%."
       },
       "vanguard_druid_balance": {
-        "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
-        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "Облачение звездного стража",
+        "bonus2": "Время применения Хватких корней сокращается на 0,5 сек.",
+        "bonus4": "После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек."
       },
       "vanguard_druid_feral": {
-        "name": "Bloodmane Hide",
-        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
-        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+        "name": "Шкура кровавой гривы",
+        "bonus2": "2 предмета: время восстановления Bruin Rush сокращается на 3 сек.",
+        "bonus4": "4 предмета: Bruin Rush накладывает щит на 6% максимального здоровья на 6 сек."
       },
       "vanguard_druid_restoration": {
-        "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
-        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+        "name": "Облачение чертополоха",
+        "bonus2": "2 предмета: время восстановления Fleetmend сокращается на 1 сек.",
+        "bonus4": "4 предмета: Fleetmend также повышает вашу скорость передвижения на 30% на 3 сек."
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "Packwarden Harness",
-        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
-        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+        "name": "Авангард: Packwarden Harness",
+        "bonus2": "2 предмета: время восстановления Rattling Shot сокращается на 4 сек.",
+        "bonus4": "4 предмета: Rattling Shot сокращает оставшееся время восстановления Howling Rage на 1 сек."
       },
       "vanguard_hunter_marksmanship": {
-        "name": "Farsight Harness",
-        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
-        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+        "name": "Авангард: Farsight Harness",
+        "bonus2": "2 предмета: время восстановления Trailbreak сокращается на 4 сек.",
+        "bonus4": "4 предмета: Trailbreak делает следующий Long Draw в течение 6 сек. мгновенным. Не чаще раза в 15 сек."
       },
       "vanguard_hunter_survival": {
-        "name": "Snaretooth Harness",
-        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
-        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+        "name": "Авангард: Snaretooth Harness",
+        "bonus2": "2 предмета: время восстановления Bloodhook сокращается на 3 сек.",
+        "bonus4": "4 предмета: Bloodhook дает 1 Hunting Momentum."
       },
       "vanguard_mage_arcane": {
-        "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
-        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+        "name": "Авангард: Hourbinder Vestments",
+        "bonus2": "2 предмета: время восстановления Temporal Barrier сокращается на 2 сек.",
+        "bonus4": "4 предмета: Temporal Barrier также повышает скорость защищенной цели на 20% на 3 сек."
       },
       "vanguard_mage_fire": {
-        "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall recharges 3 sec faster.",
-        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+        "name": "Авангард: Emberlash Regalia",
+        "bonus2": "2 предмета: Cinderfall перезаряжается на 3 сек. быстрее.",
+        "bonus4": "4 предмета: применение Cinderfall сокращает оставшееся время восстановления Blazing Barrier на 2 сек."
       },
       "vanguard_mage_frost": {
-        "name": "Rimewarden Garb",
-        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
-        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+        "name": "Авангард: Rimewarden Garb",
+        "bonus2": "2 предмета: время восстановления Icebind сокращается на 2 сек.",
+        "bonus4": "4 предмета: применение Icebind сокращает оставшееся время восстановления Flitstep на 5 сек."
       },
       "vanguard_paladin_holy": {
-        "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
-        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+        "name": "Авангард: Sunvigil Regalia",
+        "bonus2": "2 предмета: время восстановления Life Covenant сокращается на 30 сек.",
+        "bonus4": "4 предмета: Life Covenant также накладывает на союзника щит на 8% его максимального здоровья на 6 сек."
       },
       "vanguard_paladin_protection": {
-        "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
-        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
+        "name": "Авангард: Shieldvow Bastion",
+        "bonus2": "2 предмета: время восстановления Oath Chain сокращается на 2 сек.",
+        "bonus4": "4 предмета: враги, притянутые Oath Chain, произносят заклинания на 30% медленнее 4 сек.; успешная связка может дать Solar Reprisal."
       },
       "vanguard_paladin_retribution": {
-        "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
-        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+        "name": "Авангард: Lightbrand Warplate",
+        "bonus2": "2 предмета: время восстановления Valkyr Calling сокращается на 15 сек.",
+        "bonus4": "4 предмета: Valkyr Calling сбрасывает Final Edict и повышает урон следующего Final Edict в течение 6 сек. после приземления на 15%."
       },
       "vanguard_priest_discipline": {
-        "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
-        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
+        "name": "Авангард: Veilpsalm Raiment",
+        "bonus2": "2 предмета: время восстановления Terror Canticle сокращается на 3 сек.",
+        "bonus4": "4 предмета: когда Psalm of Warding полностью поглощен, защищенный союзник получает +20% скорости на 3 сек. Не чаще раза в 8 сек."
       },
       "vanguard_priest_holy": {
-        "name": "Gracewing Raiment",
-        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
-        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+        "name": "Авангард: Gracewing Raiment",
+        "bonus2": "2 предмета: время восстановления Veilstep сокращается на 6 сек.",
+        "bonus4": "4 предмета: Veilstep также накладывает на вас щит на 8% максимального здоровья на 6 сек."
       },
       "vanguard_priest_shadow": {
-        "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
-        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+        "name": "Авангард: Duskhymn Regalia",
+        "bonus2": "2 предмета: Litany of Woe также замедляет цель на 30% во время поддержания.",
+        "bonus4": "4 предмета: Call Tithefiend также накладывает на вас щит на 10% максимального здоровья на 8 сек."
       },
       "vanguard_rogue_assassination": {
-        "name": "Nightcut Leathers",
-        "bonus2": "Low Blow costs 10 less Energy.",
-        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+        "name": "Авангард: Nightcut Leathers",
+        "bonus2": "2 предмета: Low Blow стоит на 10 энергии меньше.",
+        "bonus4": "4 предмета: Low Blow делает следующую атаку в течение 6 сек. критической."
       },
       "vanguard_rogue_combat": {
-        "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
-        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+        "name": "Авангард: Brawlmark Leathers",
+        "bonus2": "2 предмета: время восстановления Swift Heels сокращается на 60 сек.",
+        "bonus4": "4 предмета: пока действует Swift Heels, Wicked Slash и Haymaker дают на 1 прием серии больше."
       },
       "vanguard_rogue_subtlety": {
-        "name": "Shadewalk Leathers",
-        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
-        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+        "name": "Авангард: Shadewalk Leathers",
+        "bonus2": "2 предмета: время восстановления Smokefade сокращается на 60 сек.",
+        "bonus4": "4 предмета: Gut Punch из Smokefade дает на 2 приема серии больше."
       },
       "vanguard_shaman_elemental": {
-        "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
-        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "Авангард: Tempestwrit Battlemail",
+        "bonus2": "2 предмета: время восстановления Unleash Weapon сокращается на 3 сек.",
+        "bonus4": "4 предмета: Unleash Weapon позволяет произносить заклинания на ходу и повышает скорость на 20% на 4 сек. Не чаще раза в 20 сек."
       },
       "vanguard_shaman_enhancement": {
-        "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
-        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+        "name": "Авангард: Galeborn Warmail",
+        "bonus2": "2 предмета: Ancestral Strike замедляет цель на 30% на 4 сек.",
+        "bonus4": "4 предмета: Ancestral Strike сокращает оставшееся время восстановления Elemental Trance на 4 сек."
       },
       "vanguard_shaman_restoration": {
-        "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
-        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+        "name": "Авангард: Brineward Chainmail",
+        "bonus2": "2 предмета: Mending Waters применяется на 0,5 сек. быстрее к союзнику с менее чем 50% здоровья.",
+        "bonus4": "4 предмета: Tidecall также накладывает на цель щит на 5% вашего максимального здоровья на 6 сек."
       },
       "vanguard_warlock_affliction": {
-        "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
-        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
+        "name": "Авангард: Dreadquill Vestments",
+        "bonus2": "2 предмета: время произнесения Harrow сокращается на 0,3 сек.",
+        "bonus4": "4 предмета: Consume лечит на 30% больше и может поддерживаться на ходу."
       },
       "vanguard_warlock_demonology": {
-        "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
-        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+        "name": "Авангард: Marrowbound Regalia",
+        "bonus2": "2 предмета: время восстановления Bone Armor сокращается на 10 сек.",
+        "bonus4": "4 предмета: Reaping Command сокращает оставшееся время восстановления Bone Armor на 2 сек."
       },
       "vanguard_warlock_destruction": {
-        "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
-        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+        "name": "Авангард: Slagcrown Vestments",
+        "bonus2": "2 предмета: время восстановления Cinderhide сокращается на 30 сек.",
+        "bonus4": "4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным."
       },
       "vanguard_warrior_arms": {
-        "name": "Bladewake Battlegear",
-        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
-        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+        "name": "Авангард: Bladewake Battlegear",
+        "bonus2": "2 предмета: Maiming Strike сокращает оставшееся время восстановления Onrush на 1 сек.",
+        "bonus4": "4 предмета: Onrush также усиливает следующий Maiming Strike на 20%."
       },
       "vanguard_warrior_fury": {
-        "name": "Bloodmarch Ragegear",
-        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
-        "bonus4": "Landing Vaulting Charge Enrages you."
+        "name": "Авангард: Bloodmarch Ragegear",
+        "bonus2": "2 предмета: время восстановления Vaulting Charge сокращается на 8 сек.",
+        "bonus4": "4 предмета: приземление Vaulting Charge вызывает ярость."
       },
       "vanguard_warrior_prot": {
-        "name": "Ironmarch Bulwark",
-        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
-        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
+        "name": "Авангард: Ironmarch Bulwark",
+        "bonus2": "2 предмета: время восстановления Faultline сокращается на 5 сек.",
+        "bonus4": "4 предмета: Faultline также снижает получаемый урон на 10% на 6 сек."
       },
       "vesperash": {
         "name": "Покров вечернего пепла",

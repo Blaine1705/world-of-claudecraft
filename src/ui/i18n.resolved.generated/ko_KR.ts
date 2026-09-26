@@ -1609,7 +1609,7 @@ export const ko_KR: EnTranslations = {
       "autoRows": " (Auto)",
       "barsUnit": " bars",
       "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Power Word: Shield, etc.) to Healing meter.",
+      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
       "groupPresets": "One-Click Quick Themes",
       "applyPreset": "Apply Theme",
       "presetDetailsName": "Modern Glass",
@@ -22220,139 +22220,139 @@ export const ko_KR: EnTranslations = {
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
       },
       "vanguard_druid_balance": {
-        "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
-        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "별수호자 예복",
+        "bonus2": "옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.",
+        "bonus4": "옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다."
       },
       "vanguard_druid_feral": {
-        "name": "Bloodmane Hide",
-        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
-        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+        "name": "피갈기 가죽",
+        "bonus2": "2세트: Bruin Rush의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "4세트: Bruin Rush가 최대 생명력 6%의 보호막을 6초 동안 부여합니다."
       },
       "vanguard_druid_restoration": {
-        "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
-        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+        "name": "엉겅꽃 의복",
+        "bonus2": "2세트: Fleetmend의 재사용 대기시간이 1초 감소합니다.",
+        "bonus4": "4세트: Fleetmend가 이동 속도를 3초 동안 30% 증가시킵니다."
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "Packwarden Harness",
-        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
-        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+        "name": "선봉대: Packwarden Harness",
+        "bonus2": "2세트: Rattling Shot의 재사용 대기시간이 4초 감소합니다.",
+        "bonus4": "4세트: Rattling Shot이 Howling Rage의 남은 재사용 대기시간을 1초 줄입니다."
       },
       "vanguard_hunter_marksmanship": {
-        "name": "Farsight Harness",
-        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
-        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+        "name": "선봉대: Farsight Harness",
+        "bonus2": "2세트: Trailbreak의 재사용 대기시간이 4초 감소합니다.",
+        "bonus4": "4세트: Trailbreak가 6초 안의 다음 Long Draw를 즉시 시전하게 합니다. 15초에 한 번만 발동합니다."
       },
       "vanguard_hunter_survival": {
-        "name": "Snaretooth Harness",
-        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
-        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+        "name": "선봉대: Snaretooth Harness",
+        "bonus2": "2세트: Bloodhook의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "4세트: Bloodhook이 Hunting Momentum 1을 부여합니다."
       },
       "vanguard_mage_arcane": {
-        "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
-        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+        "name": "선봉대: Hourbinder Vestments",
+        "bonus2": "2세트: Temporal Barrier의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "4세트: Temporal Barrier가 보호한 대상의 이동 속도를 3초 동안 20% 증가시킵니다."
       },
       "vanguard_mage_fire": {
-        "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall recharges 3 sec faster.",
-        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+        "name": "선봉대: Emberlash Regalia",
+        "bonus2": "2세트: Cinderfall이 3초 더 빠르게 충전됩니다.",
+        "bonus4": "4세트: Cinderfall 시전 시 Blazing Barrier의 남은 재사용 대기시간이 2초 감소합니다."
       },
       "vanguard_mage_frost": {
-        "name": "Rimewarden Garb",
-        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
-        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+        "name": "선봉대: Rimewarden Garb",
+        "bonus2": "2세트: Icebind의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "4세트: Icebind 시전 시 Flitstep의 남은 재사용 대기시간이 5초 감소합니다."
       },
       "vanguard_paladin_holy": {
-        "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
-        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+        "name": "선봉대: Sunvigil Regalia",
+        "bonus2": "2세트: Life Covenant의 재사용 대기시간이 30초 감소합니다.",
+        "bonus4": "4세트: Life Covenant가 대상에게 최대 생명력 8%의 보호막을 6초 동안 부여합니다."
       },
       "vanguard_paladin_protection": {
-        "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
-        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
+        "name": "선봉대: Shieldvow Bastion",
+        "bonus2": "2세트: Oath Chain의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "4세트: Oath Chain에 끌린 적의 주문 시전이 4초 동안 30% 느려지고 Solar Reprisal을 얻을 수 있습니다."
       },
       "vanguard_paladin_retribution": {
-        "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
-        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+        "name": "선봉대: Lightbrand Warplate",
+        "bonus2": "2세트: Valkyr Calling의 재사용 대기시간이 15초 감소합니다.",
+        "bonus4": "4세트: Valkyr Calling이 Final Edict을 초기화하고 착지 후 6초 안의 다음 Final Edict 피해를 15% 높입니다."
       },
       "vanguard_priest_discipline": {
-        "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
-        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
+        "name": "선봉대: Veilpsalm Raiment",
+        "bonus2": "2세트: Terror Canticle의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "4세트: Psalm of Warding이 완전히 소모되면 보호막을 받은 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다."
       },
       "vanguard_priest_holy": {
-        "name": "Gracewing Raiment",
-        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
-        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+        "name": "선봉대: Gracewing Raiment",
+        "bonus2": "2세트: Veilstep의 재사용 대기시간이 6초 감소합니다.",
+        "bonus4": "4세트: Veilstep이 최대 생명력 8%의 보호막을 6초 동안 부여합니다."
       },
       "vanguard_priest_shadow": {
-        "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
-        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+        "name": "선봉대: Duskhymn Regalia",
+        "bonus2": "2세트: Litany of Woe를 정신 집중하는 동안 대상의 이동 속도도 30% 감소합니다.",
+        "bonus4": "4세트: Call Tithefiend가 최대 생명력 10%의 보호막을 8초 동안 부여합니다."
       },
       "vanguard_rogue_assassination": {
-        "name": "Nightcut Leathers",
-        "bonus2": "Low Blow costs 10 less Energy.",
-        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+        "name": "선봉대: Nightcut Leathers",
+        "bonus2": "2세트: Low Blow의 에너지 비용이 10 감소합니다.",
+        "bonus4": "4세트: Low Blow가 6초 안의 다음 공격을 치명타로 만듭니다."
       },
       "vanguard_rogue_combat": {
-        "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
-        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+        "name": "선봉대: Brawlmark Leathers",
+        "bonus2": "2세트: Swift Heels의 재사용 대기시간이 60초 감소합니다.",
+        "bonus4": "4세트: Swift Heels 중 Wicked Slash와 Haymaker가 연계 점수 1을 추가로 부여합니다."
       },
       "vanguard_rogue_subtlety": {
-        "name": "Shadewalk Leathers",
-        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
-        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+        "name": "선봉대: Shadewalk Leathers",
+        "bonus2": "2세트: Smokefade의 재사용 대기시간이 60초 감소합니다.",
+        "bonus4": "4세트: Smokefade에서 사용한 Gut Punch가 연계 점수 2를 추가로 부여합니다."
       },
       "vanguard_shaman_elemental": {
-        "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
-        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "선봉대: Tempestwrit Battlemail",
+        "bonus2": "2세트: Unleash Weapon의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "4세트: Unleash Weapon으로 이동 중 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다."
       },
       "vanguard_shaman_enhancement": {
-        "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
-        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+        "name": "선봉대: Galeborn Warmail",
+        "bonus2": "2세트: Ancestral Strike가 대상의 이동 속도를 4초 동안 30% 감소시킵니다.",
+        "bonus4": "4세트: Ancestral Strike가 Elemental Trance의 남은 재사용 대기시간을 4초 줄입니다."
       },
       "vanguard_shaman_restoration": {
-        "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
-        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+        "name": "선봉대: Brineward Chainmail",
+        "bonus2": "2세트: 생명력 50% 미만의 아군에게 Mending Waters를 0.5초 더 빠르게 시전합니다.",
+        "bonus4": "4세트: Tidecall이 대상에게 자신의 최대 생명력 5%의 보호막을 6초 동안 부여합니다."
       },
       "vanguard_warlock_affliction": {
-        "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
-        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
+        "name": "선봉대: Dreadquill Vestments",
+        "bonus2": "2세트: Harrow의 시전 시간이 0.3초 감소합니다.",
+        "bonus4": "4세트: Consume의 치유량이 30% 증가하고 이동 중에도 정신 집중할 수 있습니다."
       },
       "vanguard_warlock_demonology": {
-        "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
-        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+        "name": "선봉대: Marrowbound Regalia",
+        "bonus2": "2세트: Bone Armor의 재사용 대기시간이 10초 감소합니다.",
+        "bonus4": "4세트: Reaping Command가 Bone Armor의 남은 재사용 대기시간을 2초 줄입니다."
       },
       "vanguard_warlock_destruction": {
-        "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
-        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+        "name": "선봉대: Slagcrown Vestments",
+        "bonus2": "2세트: Cinderhide의 재사용 대기시간이 30초 감소합니다.",
+        "bonus4": "4세트: 두 번째 Conflagrate마다 8초 안의 다음 Ruinbolt를 즉시 시전하게 합니다."
       },
       "vanguard_warrior_arms": {
-        "name": "Bladewake Battlegear",
-        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
-        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+        "name": "선봉대: Bladewake Battlegear",
+        "bonus2": "2세트: Maiming Strike가 Onrush의 남은 재사용 대기시간을 1초 줄입니다.",
+        "bonus4": "4세트: Onrush가 다음 Maiming Strike를 20% 강화합니다."
       },
       "vanguard_warrior_fury": {
-        "name": "Bloodmarch Ragegear",
-        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
-        "bonus4": "Landing Vaulting Charge Enrages you."
+        "name": "선봉대: Bloodmarch Ragegear",
+        "bonus2": "2세트: Vaulting Charge의 재사용 대기시간이 8초 감소합니다.",
+        "bonus4": "4세트: Vaulting Charge 착지 시 격노합니다."
       },
       "vanguard_warrior_prot": {
-        "name": "Ironmarch Bulwark",
-        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
-        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
+        "name": "선봉대: Ironmarch Bulwark",
+        "bonus2": "2세트: Faultline의 재사용 대기시간이 5초 감소합니다.",
+        "bonus4": "4세트: Faultline이 6초 동안 받는 피해를 10% 줄입니다."
       },
       "vesperash": {
         "name": "만과의 잿가루 장막",

@@ -16339,4 +16339,112 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.town': '鎮',
   'hudChrome.playerTooltip.guild': '<{guild}>',
   'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'entities.itemSets.vanguard_warrior_arms.name': '先鋒套裝：Bladewake Battlegear',
+  'entities.itemSets.vanguard_warrior_arms.bonus2': '2件：Maiming Strike使Onrush剩餘冷卻縮短1秒。',
+  'entities.itemSets.vanguard_warrior_arms.bonus4':
+    '4件：Onrush還會使下一次Maiming Strike提高20%。',
+  'entities.itemSets.vanguard_warrior_fury.name': '先鋒套裝：Bloodmarch Ragegear',
+  'entities.itemSets.vanguard_warrior_fury.bonus2': '2件：Vaulting Charge冷卻縮短8秒。',
+  'entities.itemSets.vanguard_warrior_fury.bonus4': '4件：Vaulting Charge落地時使你激怒。',
+  'entities.itemSets.vanguard_warrior_prot.name': '先鋒套裝：Ironmarch Bulwark',
+  'entities.itemSets.vanguard_warrior_prot.bonus2': '2件：Faultline冷卻縮短5秒。',
+  'entities.itemSets.vanguard_warrior_prot.bonus4':
+    '4件：Faultline還會使你受到的傷害降低10%，持續6秒。',
+  'entities.itemSets.vanguard_paladin_holy.name': '先鋒套裝：Sunvigil Regalia',
+  'entities.itemSets.vanguard_paladin_holy.bonus2': '2件：Life Covenant冷卻縮短30秒。',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    '4件：Life Covenant還會為盟友提供相當於最大生命值8%的護盾，持續6秒。',
+  'entities.itemSets.vanguard_paladin_protection.name': '先鋒套裝：Shieldvow Bastion',
+  'entities.itemSets.vanguard_paladin_protection.bonus2': '2件：Oath Chain冷卻縮短2秒。',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    '4件：被Oath Chain拉拽的敵人施法速度降低30%，持續4秒，並可賦予Solar Reprisal。',
+  'entities.itemSets.vanguard_paladin_retribution.name': '先鋒套裝：Lightbrand Warplate',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2': '2件：Valkyr Calling冷卻縮短15秒。',
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    '4件：Valkyr Calling重置Final Edict冷卻，並使落地後6秒內的下一次Final Edict傷害提高15%。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': '先鋒套裝：Packwarden Harness',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2': '2件：Rattling Shot冷卻縮短4秒。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
+    '4件：Rattling Shot使Howling Rage剩餘冷卻縮短1秒。',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': '先鋒套裝：Farsight Harness',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2': '2件：Trailbreak冷卻縮短4秒。',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    '4件：Trailbreak使6秒內下一次Long Draw瞬發。每15秒最多一次。',
+  'entities.itemSets.vanguard_hunter_survival.name': '先鋒套裝：Snaretooth Harness',
+  'entities.itemSets.vanguard_hunter_survival.bonus2': '2件：Bloodhook冷卻縮短3秒。',
+  'entities.itemSets.vanguard_hunter_survival.bonus4': '4件：Bloodhook獲得1點Hunting Momentum。',
+  'entities.itemSets.vanguard_rogue_assassination.name': '先鋒套裝：Nightcut Leathers',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2': '2件：Low Blow能量消耗降低10點。',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    '4件：Low Blow使6秒內下一次攻擊成為爆擊。',
+  'entities.itemSets.vanguard_rogue_combat.name': '先鋒套裝：Brawlmark Leathers',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2件：Swift Heels冷卻縮短60秒。',
+  'entities.itemSets.vanguard_rogue_combat.bonus4':
+    '4件：Swift Heels期間，Wicked Slash與Haymaker額外給予1個連擊點。',
+  'entities.itemSets.vanguard_rogue_subtlety.name': '先鋒套裝：Shadewalk Leathers',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2': '2件：Smokefade冷卻縮短60秒。',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
+    '4件：從Smokefade使用Gut Punch時額外給予2個連擊點。',
+  'entities.itemSets.vanguard_priest_discipline.name': '先鋒套裝：Veilpsalm Raiment',
+  'entities.itemSets.vanguard_priest_discipline.bonus2': '2件：Terror Canticle冷卻縮短3秒。',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    '4件：Psalm of Warding被完全消耗時，受護盾盟友移動速度提高20%，持續3秒。每8秒最多一次。',
+  'entities.itemSets.vanguard_priest_holy.name': '先鋒套裝：Gracewing Raiment',
+  'entities.itemSets.vanguard_priest_holy.bonus2': '2件：Veilstep冷卻縮短6秒。',
+  'entities.itemSets.vanguard_priest_holy.bonus4':
+    '4件：Veilstep還會為你提供相當於最大生命值8%的護盾，持續6秒。',
+  'entities.itemSets.vanguard_priest_shadow.name': '先鋒套裝：Duskhymn Regalia',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    '2件：Litany of Woe引導期間還會使目標移動速度降低30%。',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    '4件：Call Tithefiend還會為你提供相當於最大生命值10%的護盾，持續8秒。',
+  'entities.itemSets.vanguard_shaman_elemental.name': '先鋒套裝：Tempestwrit Battlemail',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2': '2件：Unleash Weapon冷卻縮短3秒。',
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    '4件：Unleash Weapon可移動施法並使移動速度提高20%，持續4秒。每20秒最多一次。',
+  'entities.itemSets.vanguard_shaman_enhancement.name': '先鋒套裝：Galeborn Warmail',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    '2件：Ancestral Strike使目標移動速度降低30%，持續4秒。',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    '4件：Ancestral Strike使Elemental Trance剩餘冷卻縮短4秒。',
+  'entities.itemSets.vanguard_shaman_restoration.name': '先鋒套裝：Brineward Chainmail',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    '2件：對生命值低於50%的盟友施放Mending Waters快0.5秒。',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    '4件：Tidecall還會提供相當於你最大生命值5%的護盾，持續6秒。',
+  'entities.itemSets.vanguard_mage_arcane.name': '先鋒套裝：Hourbinder Vestments',
+  'entities.itemSets.vanguard_mage_arcane.bonus2': '2件：Temporal Barrier冷卻縮短2秒。',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    '4件：Temporal Barrier還會使受護盾目標移動速度提高20%，持續3秒。',
+  'entities.itemSets.vanguard_mage_fire.name': '先鋒套裝：Emberlash Regalia',
+  'entities.itemSets.vanguard_mage_fire.bonus2': '2件：Cinderfall回復快3秒。',
+  'entities.itemSets.vanguard_mage_fire.bonus4':
+    '4件：施放Cinderfall使Blazing Barrier剩餘冷卻縮短2秒。',
+  'entities.itemSets.vanguard_mage_frost.name': '先鋒套裝：Rimewarden Garb',
+  'entities.itemSets.vanguard_mage_frost.bonus2': '2件：Icebind冷卻縮短2秒。',
+  'entities.itemSets.vanguard_mage_frost.bonus4': '4件：施放Icebind使Flitstep剩餘冷卻縮短5秒。',
+  'entities.itemSets.vanguard_warlock_affliction.name': '先鋒套裝：Dreadquill Vestments',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2': '2件：Harrow施法時間縮短0.3秒。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    '4件：Consume治療量提高30%，且可移動引導。',
+  'entities.itemSets.vanguard_warlock_demonology.name': '先鋒套裝：Marrowbound Regalia',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2': '2件：Bone Armor冷卻縮短10秒。',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4':
+    '4件：Reaping Command使Bone Armor剩餘冷卻縮短2秒。',
+  'entities.itemSets.vanguard_warlock_destruction.name': '先鋒套裝：Slagcrown Vestments',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2': '2件：Cinderhide冷卻縮短30秒。',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    '4件：每第二次Conflagrate使8秒內下一次Ruinbolt瞬發。',
+  'entities.itemSets.vanguard_druid_feral.name': '血鬃獸皮',
+  'entities.itemSets.vanguard_druid_feral.bonus2': '2件：Bruin Rush冷卻縮短3秒。',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    '4件：Bruin Rush提供相當於最大生命值6%的護盾，持續6秒。',
+  'entities.itemSets.vanguard_druid_restoration.name': '薊花法衣',
+  'entities.itemSets.vanguard_druid_restoration.bonus2': '2件：Fleetmend冷卻縮短1秒。',
+  'entities.itemSets.vanguard_druid_restoration.bonus4':
+    '4件：Fleetmend還會使移動速度提高30%，持續3秒。',
+  'entities.itemSets.vanguard_druid_balance.name': '星衛法衣',
+  'entities.itemSets.vanguard_druid_balance.bonus2': '纏縛根鬚的施法時間縮短0.5秒。',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    '施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。',
 };

@@ -17151,4 +17151,137 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.town': '도시',
   'hudChrome.playerTooltip.guild': '<{guild}>',
   'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'entities.itemSets.vanguard_warrior_arms.name': '선봉대: Bladewake Battlegear',
+  'entities.itemSets.vanguard_warrior_arms.bonus2':
+    '2세트: Maiming Strike가 Onrush의 남은 재사용 대기시간을 1초 줄입니다.',
+  'entities.itemSets.vanguard_warrior_arms.bonus4':
+    '4세트: Onrush가 다음 Maiming Strike를 20% 강화합니다.',
+  'entities.itemSets.vanguard_warrior_fury.name': '선봉대: Bloodmarch Ragegear',
+  'entities.itemSets.vanguard_warrior_fury.bonus2':
+    '2세트: Vaulting Charge의 재사용 대기시간이 8초 감소합니다.',
+  'entities.itemSets.vanguard_warrior_fury.bonus4': '4세트: Vaulting Charge 착지 시 격노합니다.',
+  'entities.itemSets.vanguard_warrior_prot.name': '선봉대: Ironmarch Bulwark',
+  'entities.itemSets.vanguard_warrior_prot.bonus2':
+    '2세트: Faultline의 재사용 대기시간이 5초 감소합니다.',
+  'entities.itemSets.vanguard_warrior_prot.bonus4':
+    '4세트: Faultline이 6초 동안 받는 피해를 10% 줄입니다.',
+  'entities.itemSets.vanguard_paladin_holy.name': '선봉대: Sunvigil Regalia',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    '2세트: Life Covenant의 재사용 대기시간이 30초 감소합니다.',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    '4세트: Life Covenant가 대상에게 최대 생명력 8%의 보호막을 6초 동안 부여합니다.',
+  'entities.itemSets.vanguard_paladin_protection.name': '선봉대: Shieldvow Bastion',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    '2세트: Oath Chain의 재사용 대기시간이 2초 감소합니다.',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    '4세트: Oath Chain에 끌린 적의 주문 시전이 4초 동안 30% 느려지고 Solar Reprisal을 얻을 수 있습니다.',
+  'entities.itemSets.vanguard_paladin_retribution.name': '선봉대: Lightbrand Warplate',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    '2세트: Valkyr Calling의 재사용 대기시간이 15초 감소합니다.',
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    '4세트: Valkyr Calling이 Final Edict을 초기화하고 착지 후 6초 안의 다음 Final Edict 피해를 15% 높입니다.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': '선봉대: Packwarden Harness',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    '2세트: Rattling Shot의 재사용 대기시간이 4초 감소합니다.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
+    '4세트: Rattling Shot이 Howling Rage의 남은 재사용 대기시간을 1초 줄입니다.',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': '선봉대: Farsight Harness',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    '2세트: Trailbreak의 재사용 대기시간이 4초 감소합니다.',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    '4세트: Trailbreak가 6초 안의 다음 Long Draw를 즉시 시전하게 합니다. 15초에 한 번만 발동합니다.',
+  'entities.itemSets.vanguard_hunter_survival.name': '선봉대: Snaretooth Harness',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    '2세트: Bloodhook의 재사용 대기시간이 3초 감소합니다.',
+  'entities.itemSets.vanguard_hunter_survival.bonus4':
+    '4세트: Bloodhook이 Hunting Momentum 1을 부여합니다.',
+  'entities.itemSets.vanguard_rogue_assassination.name': '선봉대: Nightcut Leathers',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2':
+    '2세트: Low Blow의 에너지 비용이 10 감소합니다.',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    '4세트: Low Blow가 6초 안의 다음 공격을 치명타로 만듭니다.',
+  'entities.itemSets.vanguard_rogue_combat.name': '선봉대: Brawlmark Leathers',
+  'entities.itemSets.vanguard_rogue_combat.bonus2':
+    '2세트: Swift Heels의 재사용 대기시간이 60초 감소합니다.',
+  'entities.itemSets.vanguard_rogue_combat.bonus4':
+    '4세트: Swift Heels 중 Wicked Slash와 Haymaker가 연계 점수 1을 추가로 부여합니다.',
+  'entities.itemSets.vanguard_rogue_subtlety.name': '선봉대: Shadewalk Leathers',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2':
+    '2세트: Smokefade의 재사용 대기시간이 60초 감소합니다.',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
+    '4세트: Smokefade에서 사용한 Gut Punch가 연계 점수 2를 추가로 부여합니다.',
+  'entities.itemSets.vanguard_priest_discipline.name': '선봉대: Veilpsalm Raiment',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    '2세트: Terror Canticle의 재사용 대기시간이 3초 감소합니다.',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    '4세트: Psalm of Warding이 완전히 소모되면 보호막을 받은 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다.',
+  'entities.itemSets.vanguard_priest_holy.name': '선봉대: Gracewing Raiment',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    '2세트: Veilstep의 재사용 대기시간이 6초 감소합니다.',
+  'entities.itemSets.vanguard_priest_holy.bonus4':
+    '4세트: Veilstep이 최대 생명력 8%의 보호막을 6초 동안 부여합니다.',
+  'entities.itemSets.vanguard_priest_shadow.name': '선봉대: Duskhymn Regalia',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    '2세트: Litany of Woe를 정신 집중하는 동안 대상의 이동 속도도 30% 감소합니다.',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    '4세트: Call Tithefiend가 최대 생명력 10%의 보호막을 8초 동안 부여합니다.',
+  'entities.itemSets.vanguard_shaman_elemental.name': '선봉대: Tempestwrit Battlemail',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    '2세트: Unleash Weapon의 재사용 대기시간이 3초 감소합니다.',
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    '4세트: Unleash Weapon으로 이동 중 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
+  'entities.itemSets.vanguard_shaman_enhancement.name': '선봉대: Galeborn Warmail',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    '2세트: Ancestral Strike가 대상의 이동 속도를 4초 동안 30% 감소시킵니다.',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    '4세트: Ancestral Strike가 Elemental Trance의 남은 재사용 대기시간을 4초 줄입니다.',
+  'entities.itemSets.vanguard_shaman_restoration.name': '선봉대: Brineward Chainmail',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    '2세트: 생명력 50% 미만의 아군에게 Mending Waters를 0.5초 더 빠르게 시전합니다.',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    '4세트: Tidecall이 대상에게 자신의 최대 생명력 5%의 보호막을 6초 동안 부여합니다.',
+  'entities.itemSets.vanguard_mage_arcane.name': '선봉대: Hourbinder Vestments',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    '2세트: Temporal Barrier의 재사용 대기시간이 2초 감소합니다.',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    '4세트: Temporal Barrier가 보호한 대상의 이동 속도를 3초 동안 20% 증가시킵니다.',
+  'entities.itemSets.vanguard_mage_fire.name': '선봉대: Emberlash Regalia',
+  'entities.itemSets.vanguard_mage_fire.bonus2': '2세트: Cinderfall이 3초 더 빠르게 충전됩니다.',
+  'entities.itemSets.vanguard_mage_fire.bonus4':
+    '4세트: Cinderfall 시전 시 Blazing Barrier의 남은 재사용 대기시간이 2초 감소합니다.',
+  'entities.itemSets.vanguard_mage_frost.name': '선봉대: Rimewarden Garb',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    '2세트: Icebind의 재사용 대기시간이 2초 감소합니다.',
+  'entities.itemSets.vanguard_mage_frost.bonus4':
+    '4세트: Icebind 시전 시 Flitstep의 남은 재사용 대기시간이 5초 감소합니다.',
+  'entities.itemSets.vanguard_warlock_affliction.name': '선봉대: Dreadquill Vestments',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    '2세트: Harrow의 시전 시간이 0.3초 감소합니다.',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    '4세트: Consume의 치유량이 30% 증가하고 이동 중에도 정신 집중할 수 있습니다.',
+  'entities.itemSets.vanguard_warlock_demonology.name': '선봉대: Marrowbound Regalia',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    '2세트: Bone Armor의 재사용 대기시간이 10초 감소합니다.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4':
+    '4세트: Reaping Command가 Bone Armor의 남은 재사용 대기시간을 2초 줄입니다.',
+  'entities.itemSets.vanguard_warlock_destruction.name': '선봉대: Slagcrown Vestments',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    '2세트: Cinderhide의 재사용 대기시간이 30초 감소합니다.',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    '4세트: 두 번째 Conflagrate마다 8초 안의 다음 Ruinbolt를 즉시 시전하게 합니다.',
+  'entities.itemSets.vanguard_druid_feral.name': '피갈기 가죽',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    '2세트: Bruin Rush의 재사용 대기시간이 3초 감소합니다.',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    '4세트: Bruin Rush가 최대 생명력 6%의 보호막을 6초 동안 부여합니다.',
+  'entities.itemSets.vanguard_druid_restoration.name': '엉겅꽃 의복',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    '2세트: Fleetmend의 재사용 대기시간이 1초 감소합니다.',
+  'entities.itemSets.vanguard_druid_restoration.bonus4':
+    '4세트: Fleetmend가 이동 속도를 3초 동안 30% 증가시킵니다.',
+  'entities.itemSets.vanguard_druid_balance.name': '별수호자 예복',
+  'entities.itemSets.vanguard_druid_balance.bonus2':
+    '옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    '옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
 };

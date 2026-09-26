@@ -1609,7 +1609,7 @@ export const ja_JP: EnTranslations = {
       "autoRows": " (Auto)",
       "barsUnit": " bars",
       "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Power Word: Shield, etc.) to Healing meter.",
+      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
       "groupPresets": "One-Click Quick Themes",
       "applyPreset": "Apply Theme",
       "presetDetailsName": "Modern Glass",
@@ -3767,7 +3767,7 @@ export const ja_JP: EnTranslations = {
       "resetErrInvalid": "このリセットリンクは無効か、有効期限が切れています。新しいリンクをリクエストしてください。"
     },
     "loot": {
-      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
+      "rollWon": "おめでとうございます！ {item} をロール {roll} で獲得しました",
       "chestTitle": "宝箱",
       "takeLootButton": "戦利品を取る",
       "takeLootTooltip": "お金とドロップしたアイテムを受け取ります。採取の機会は消費しません。",
@@ -22220,139 +22220,139 @@ export const ja_JP: EnTranslations = {
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
       },
       "vanguard_druid_balance": {
-        "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
-        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "星守りの装束",
+        "bonus2": "絡み根の詠唱時間が0.5秒短縮される。",
+        "bonus4": "絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。"
       },
       "vanguard_druid_feral": {
-        "name": "Bloodmane Hide",
-        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
-        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+        "name": "血たてがみの皮装",
+        "bonus2": "2点：Bruin Rushのクールダウンが3秒短縮。",
+        "bonus4": "4点：Bruin Rushが最大体力6%のシールドを6秒付与。"
       },
       "vanguard_druid_restoration": {
-        "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
-        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+        "name": "アザミ花の祭服",
+        "bonus2": "2点：Fleetmendのクールダウンが1秒短縮。",
+        "bonus4": "4点：Fleetmendで移動速度が3秒間30%上昇。"
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "Packwarden Harness",
-        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
-        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+        "name": "ヴァンガード：Packwarden Harness",
+        "bonus2": "2点：Rattling Shotのクールダウンが4秒短縮。",
+        "bonus4": "4点：Rattling ShotでHowling Rageの残りクールダウンが1秒短縮。"
       },
       "vanguard_hunter_marksmanship": {
-        "name": "Farsight Harness",
-        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
-        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+        "name": "ヴァンガード：Farsight Harness",
+        "bonus2": "2点：Trailbreakのクールダウンが4秒短縮。",
+        "bonus4": "4点：Trailbreakで6秒以内の次のLong Drawが即時発動。15秒に1回まで。"
       },
       "vanguard_hunter_survival": {
-        "name": "Snaretooth Harness",
-        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
-        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+        "name": "ヴァンガード：Snaretooth Harness",
+        "bonus2": "2点：Bloodhookのクールダウンが3秒短縮。",
+        "bonus4": "4点：BloodhookでHunting Momentumを1得る。"
       },
       "vanguard_mage_arcane": {
-        "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
-        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+        "name": "ヴァンガード：Hourbinder Vestments",
+        "bonus2": "2点：Temporal Barrierのクールダウンが2秒短縮。",
+        "bonus4": "4点：Temporal Barrierが守った対象の移動速度を3秒間20%上昇。"
       },
       "vanguard_mage_fire": {
-        "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall recharges 3 sec faster.",
-        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+        "name": "ヴァンガード：Emberlash Regalia",
+        "bonus2": "2点：Cinderfallの再使用が3秒速くなる。",
+        "bonus4": "4点：Cinderfall詠唱でBlazing Barrierの残りクールダウンが2秒短縮。"
       },
       "vanguard_mage_frost": {
-        "name": "Rimewarden Garb",
-        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
-        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+        "name": "ヴァンガード：Rimewarden Garb",
+        "bonus2": "2点：Icebindのクールダウンが2秒短縮。",
+        "bonus4": "4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。"
       },
       "vanguard_paladin_holy": {
-        "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
-        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+        "name": "ヴァンガード：Sunvigil Regalia",
+        "bonus2": "2点：Life Covenantのクールダウンが30秒短縮。",
+        "bonus4": "4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。"
       },
       "vanguard_paladin_protection": {
-        "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
-        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
+        "name": "ヴァンガード：Shieldvow Bastion",
+        "bonus2": "2点：Oath Chainのクールダウンが2秒短縮。",
+        "bonus4": "4点：Oath Chainで引き寄せた敵は4秒間30%遅く詠唱し、条件を満たすとSolar Reprisalを得る。"
       },
       "vanguard_paladin_retribution": {
-        "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
-        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+        "name": "ヴァンガード：Lightbrand Warplate",
+        "bonus2": "2点：Valkyr Callingのクールダウンが15秒短縮。",
+        "bonus4": "4点：Valkyr CallingがFinal Edictをリセットし、着地後6秒以内の次のFinal Edictのダメージを15%上げる。"
       },
       "vanguard_priest_discipline": {
-        "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
-        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
+        "name": "ヴァンガード：Veilpsalm Raiment",
+        "bonus2": "2点：Terror Canticleのクールダウンが3秒短縮。",
+        "bonus4": "4点：Psalm of Warding消費時、守られた味方の移動速度が3秒間20%上昇。8秒に1回まで。"
       },
       "vanguard_priest_holy": {
-        "name": "Gracewing Raiment",
-        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
-        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+        "name": "ヴァンガード：Gracewing Raiment",
+        "bonus2": "2点：Veilstepのクールダウンが6秒短縮。",
+        "bonus4": "4点：Veilstepが最大体力8%のシールドを6秒付与。"
       },
       "vanguard_priest_shadow": {
-        "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
-        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+        "name": "ヴァンガード：Duskhymn Regalia",
+        "bonus2": "2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。",
+        "bonus4": "4点：Call Tithefiendが最大体力10%のシールドを8秒付与。"
       },
       "vanguard_rogue_assassination": {
-        "name": "Nightcut Leathers",
-        "bonus2": "Low Blow costs 10 less Energy.",
-        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+        "name": "ヴァンガード：Nightcut Leathers",
+        "bonus2": "2点：Low Blowの消費エネルギーが10減少。",
+        "bonus4": "4点：Low Blowで6秒以内の次の攻撃がクリティカルになる。"
       },
       "vanguard_rogue_combat": {
-        "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
-        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+        "name": "ヴァンガード：Brawlmark Leathers",
+        "bonus2": "2点：Swift Heelsのクールダウンが60秒短縮。",
+        "bonus4": "4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。"
       },
       "vanguard_rogue_subtlety": {
-        "name": "Shadewalk Leathers",
-        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
-        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+        "name": "ヴァンガード：Shadewalk Leathers",
+        "bonus2": "2点：Smokefadeのクールダウンが60秒短縮。",
+        "bonus4": "4点：SmokefadeからのGut Punchがコンボポイントを追加で2得る。"
       },
       "vanguard_shaman_elemental": {
-        "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
-        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "ヴァンガード：Tempestwrit Battlemail",
+        "bonus2": "2点：Unleash Weaponのクールダウンが3秒短縮。",
+        "bonus4": "4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。"
       },
       "vanguard_shaman_enhancement": {
-        "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
-        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+        "name": "ヴァンガード：Galeborn Warmail",
+        "bonus2": "2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。",
+        "bonus4": "4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。"
       },
       "vanguard_shaman_restoration": {
-        "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
-        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+        "name": "ヴァンガード：Brineward Chainmail",
+        "bonus2": "2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。",
+        "bonus4": "4点：Tidecallが対象にあなたの最大体力5%のシールドを6秒付与。"
       },
       "vanguard_warlock_affliction": {
-        "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
-        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
+        "name": "ヴァンガード：Dreadquill Vestments",
+        "bonus2": "2点：Harrowの詠唱時間が0.3秒短縮。",
+        "bonus4": "4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。"
       },
       "vanguard_warlock_demonology": {
-        "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
-        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+        "name": "ヴァンガード：Marrowbound Regalia",
+        "bonus2": "2点：Bone Armorのクールダウンが10秒短縮。",
+        "bonus4": "4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。"
       },
       "vanguard_warlock_destruction": {
-        "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
-        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+        "name": "ヴァンガード：Slagcrown Vestments",
+        "bonus2": "2点：Cinderhideのクールダウンが30秒短縮。",
+        "bonus4": "4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。"
       },
       "vanguard_warrior_arms": {
-        "name": "Bladewake Battlegear",
-        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
-        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+        "name": "ヴァンガード：Bladewake Battlegear",
+        "bonus2": "2点：Maiming StrikeでOnrushの残りクールダウンが1秒短縮。",
+        "bonus4": "4点：Onrushが次のMaiming Strikeを20%強化。"
       },
       "vanguard_warrior_fury": {
-        "name": "Bloodmarch Ragegear",
-        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
-        "bonus4": "Landing Vaulting Charge Enrages you."
+        "name": "ヴァンガード：Bloodmarch Ragegear",
+        "bonus2": "2点：Vaulting Chargeのクールダウンが8秒短縮。",
+        "bonus4": "4点：Vaulting Chargeの着地で激怒する。"
       },
       "vanguard_warrior_prot": {
-        "name": "Ironmarch Bulwark",
-        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
-        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
+        "name": "ヴァンガード：Ironmarch Bulwark",
+        "bonus2": "2点：Faultlineのクールダウンが5秒短縮。",
+        "bonus4": "4点：Faultlineで受けるダメージが6秒間10%低下。"
       },
       "vesperash": {
         "name": "ヴェスパーアッシュの外套",

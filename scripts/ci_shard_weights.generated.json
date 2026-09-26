@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4149,
+    "files": 4161,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -329,6 +329,15 @@
           3
         ]
       },
+      "tests/chrome_profile_dir.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          10
+        ]
+      },
       "tests/class_health_table.test.ts": {
         "ms": 2280,
         "method": "local-median",
@@ -336,6 +345,24 @@
         "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
           2280
+        ]
+      },
+      "tests/click_claimed_focus.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          8
+        ]
+      },
+      "tests/client_api_origin.test.ts": {
+        "ms": 1229,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1229
         ]
       },
       "tests/clock_memo.test.ts": {
@@ -354,6 +381,15 @@
         "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
           5729
+        ]
+      },
+      "tests/controller_options_view.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          13
         ]
       },
       "tests/cooldown_manager_auras.test.ts": {
@@ -411,6 +447,15 @@
           1614
         ]
       },
+      "tests/craft_row_text.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          16
+        ]
+      },
       "tests/crest_prewarm.test.ts": {
         "ms": 116,
         "method": "local-median",
@@ -418,6 +463,24 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           116
+        ]
+      },
+      "tests/css_root_anchored_has.test.ts": {
+        "ms": 1153,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1153
+        ]
+      },
+      "tests/deck_floor.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          9
         ]
       },
       "tests/deeds_restore.test.ts": {
@@ -447,6 +510,15 @@
           7
         ]
       },
+      "tests/desktop_host_diag.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          13
+        ]
+      },
       "tests/dev_town_teleport.test.ts": {
         "ms": 429,
         "method": "local-median",
@@ -465,6 +537,24 @@
           6
         ]
       },
+      "tests/electron_host_diag.test.ts": {
+        "ms": 29,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          29
+        ]
+      },
+      "tests/entity_ground_sample_core.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          11
+        ]
+      },
       "tests/error_toast_controller.test.ts": {
         "ms": 44,
         "method": "local-median",
@@ -472,6 +562,15 @@
         "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
           44
+        ]
+      },
+      "tests/far_bake_group_key.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          8
         ]
       },
       "tests/far_bake_uv_pad.test.ts": {
@@ -490,6 +589,15 @@
         "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
         "runs": [
           15
+        ]
+      },
+      "tests/feast_named_slot_item.test.ts": {
+        "ms": 1410,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1410
         ]
       },
       "tests/focus_targets_controller.test.ts": {
@@ -2449,6 +2557,7 @@
   "tests/choice_rows_wave2.test.ts": 4549,
   "tests/chrome_focus_wiring.test.ts": 20,
   "tests/chrome_icons.test.ts": 21,
+  "tests/chrome_profile_dir.test.ts": 10,
   "tests/chronomancy.test.ts": 3950,
   "tests/chronomancy_balance_targets.test.ts": 8306,
   "tests/chronomancy_buffs.test.ts": 3104,
@@ -2485,8 +2594,10 @@
   "tests/claudium_purchase_bridge.test.ts": 11,
   "tests/claudium_view.test.ts": 14,
   "tests/claudium_window.test.ts": 42,
+  "tests/click_claimed_focus.test.ts": 8,
   "tests/click_marker.test.ts": 12,
   "tests/click_move.test.ts": 11,
+  "tests/client_api_origin.test.ts": 1229,
   "tests/client_challenge.test.ts": 2727,
   "tests/client_env.test.ts": 8,
   "tests/client_frame_allocations.test.ts": 118,
@@ -2566,6 +2677,7 @@
   "tests/continent_land_mask_core.test.ts": 18,
   "tests/continent_map_painter.test.ts": 226,
   "tests/continent_map_view.test.ts": 19,
+  "tests/controller_options_view.test.ts": 13,
   "tests/cooking_catch_hint_view.test.ts": 31,
   "tests/cooldown_manager_auras.test.ts": 20,
   "tests/cooldown_manager_catalog.test.ts": 2255,
@@ -2606,6 +2718,7 @@
   "tests/craft_denial_line_view.test.ts": 8,
   "tests/craft_from_vault.test.ts": 5496,
   "tests/craft_name_view.test.ts": 10,
+  "tests/craft_row_text.test.ts": 16,
   "tests/crafted_collection_effects.test.ts": 2971,
   "tests/crafted_item_tooltip_coverage.test.ts": 28,
   "tests/crafted_wearability.test.ts": 21,
@@ -2650,6 +2763,7 @@
   "tests/crucible_vendor_window.test.ts": 43,
   "tests/css_corpus.test.ts": 58,
   "tests/css_layer_containment.test.ts": 82,
+  "tests/css_root_anchored_has.test.ts": 1153,
   "tests/css_token_resolution.test.ts": 18,
   "tests/css_value_validity.test.ts": 20,
   "tests/ctx_menu_mobile_stacking.test.ts": 6,
@@ -2691,6 +2805,7 @@
   "tests/death_lesson.test.ts": 3358,
   "tests/death_recap_feedback.test.ts": 9,
   "tests/death_target_prevalidation.test.ts": 9,
+  "tests/deck_floor.test.ts": 9,
   "tests/deck_railings.test.ts": 256,
   "tests/decor_prop_colliders.test.ts": 48,
   "tests/decoration_dims.test.ts": 1580,
@@ -2771,6 +2886,7 @@
   "tests/desktop_gpu_pref_sync.test.ts": 18,
   "tests/desktop_gpu_report.test.ts": 9,
   "tests/desktop_gpu_status.test.ts": 2688,
+  "tests/desktop_host_diag.test.ts": 13,
   "tests/desktop_login_exit.test.ts": 12,
   "tests/desktop_next_launch_settings.test.ts": 14,
   "tests/desktop_notifications.test.ts": 11,
@@ -2972,6 +3088,7 @@
   "tests/electron_gpu_preference.test.ts": 48,
   "tests/electron_gpu_push.test.ts": 6,
   "tests/electron_gpu_status_events.test.ts": 8,
+  "tests/electron_host_diag.test.ts": 29,
   "tests/electron_ipc_channels.test.ts": 25,
   "tests/electron_launch_settings.test.ts": 12,
   "tests/electron_linux_url_handler.test.ts": 22,
@@ -3011,6 +3128,7 @@
   "tests/entity_display_core.test.ts": 19,
   "tests/entity_display_name.test.ts": 11,
   "tests/entity_gate_stand_in.test.ts": 288,
+  "tests/entity_ground_sample_core.test.ts": 11,
   "tests/entity_i18n.test.ts": 7,
   "tests/entity_i18n_guards.test.ts": 9,
   "tests/entity_labels_feast.test.ts": 6,
@@ -3058,6 +3176,7 @@
   "tests/facing_smooth.test.ts": 11,
   "tests/facing_stability.test.ts": 3271,
   "tests/falling_command.test.ts": 2743,
+  "tests/far_bake_group_key.test.ts": 8,
   "tests/far_bake_uv_pad.test.ts": 1589,
   "tests/far_lod_reveal_core.test.ts": 8,
   "tests/far_surface_core.test.ts": 4757,
@@ -3108,6 +3227,7 @@
   "tests/fear_wall_guard.test.ts": 2355,
   "tests/feast_interact.test.ts": 9,
   "tests/feast_lifecycle.test.ts": 1148,
+  "tests/feast_named_slot_item.test.ts": 1410,
   "tests/feast_object_lifecycle.test.ts": 608,
   "tests/feast_online.test.ts": 2085,
   "tests/feast_placement.test.ts": 2079,

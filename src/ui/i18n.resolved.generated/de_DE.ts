@@ -1609,7 +1609,7 @@ export const de_DE: EnTranslations = {
       "autoRows": " (Auto)",
       "barsUnit": " bars",
       "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Power Word: Shield, etc.) to Healing meter.",
+      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
       "groupPresets": "One-Click Quick Themes",
       "applyPreset": "Apply Theme",
       "presetDetailsName": "Modern Glass",

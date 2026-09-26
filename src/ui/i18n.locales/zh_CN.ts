@@ -16331,4 +16331,103 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.town': '镇',
   'hudChrome.playerTooltip.guild': '<{guild}>',
   'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'entities.itemSets.vanguard_warrior_arms.name': '先锋套装：刃潮战甲',
+  'entities.itemSets.vanguard_warrior_arms.bonus2': '残伤打击使猛冲的剩余冷却时间缩短1秒。',
+  'entities.itemSets.vanguard_warrior_arms.bonus4': '猛冲还会使你的下一次残伤打击提高20%。',
+  'entities.itemSets.vanguard_warrior_fury.name': '先锋套装：血行狂装',
+  'entities.itemSets.vanguard_warrior_fury.bonus2': '跃冲的冷却时间缩短8秒。',
+  'entities.itemSets.vanguard_warrior_fury.bonus4': '跃冲落地时使你激怒。',
+  'entities.itemSets.vanguard_warrior_prot.name': '先锋套装：铁行壁垒',
+  'entities.itemSets.vanguard_warrior_prot.bonus2': '断层的冷却时间缩短5秒。',
+  'entities.itemSets.vanguard_warrior_prot.bonus4': '断层还会使你受到的伤害降低10%，持续6秒。',
+  'entities.itemSets.vanguard_paladin_holy.name': '先锋套装：日誓圣衣',
+  'entities.itemSets.vanguard_paladin_holy.bonus2': '生命誓约的冷却时间缩短30秒。',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    '生命誓约还会为盟友提供相当于其最大生命值8%的护盾，持续6秒。',
+  'entities.itemSets.vanguard_paladin_protection.name': '先锋套装：盾誓堡垒',
+  'entities.itemSets.vanguard_paladin_protection.bonus2': '誓约链的冷却时间缩短2秒。',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    '被誓约链拉拽的敌人施法速度降低30%，持续4秒；若成功束缚可被拉拽的敌人，还会使你获得日耀反击。',
+  'entities.itemSets.vanguard_paladin_retribution.name': '先锋套装：光印战甲',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2': '女武神召唤的冷却时间缩短15秒。',
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    '女武神召唤会重置最终裁令的冷却时间，并使你落地后6秒内的下一次最终裁令伤害提高15%。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': '先锋套装：群卫背具',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2': '震响射击的冷却时间缩短4秒。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4': '震响射击使嚎怒的剩余冷却时间缩短1秒。',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': '先锋套装：远见背具',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2': '开路的冷却时间缩短4秒。',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    '开路使你6秒内的下一次长拉变为瞬发。每15秒最多触发一次。',
+  'entities.itemSets.vanguard_hunter_survival.name': '先锋套装：陷牙背具',
+  'entities.itemSets.vanguard_hunter_survival.bonus2': '血钩的冷却时间缩短3秒。',
+  'entities.itemSets.vanguard_hunter_survival.bonus4': '血钩获得1点狩猎动势。',
+  'entities.itemSets.vanguard_rogue_assassination.name': '先锋套装：夜切皮甲',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2': '低击消耗的能量减少10点。',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    '低击还会使你6秒内的下一次攻击必定爆击。',
+  'entities.itemSets.vanguard_rogue_combat.name': '先锋套装：斗痕皮甲',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '疾足的冷却时间缩短60秒。',
+  'entities.itemSets.vanguard_rogue_combat.bonus4': '疾足激活时，邪斩和重拳额外奖励1个连击点。',
+  'entities.itemSets.vanguard_rogue_subtlety.name': '先锋套装：影行皮甲',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2': '烟隐的冷却时间缩短60秒。',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4': '从烟隐中使用腹击时额外奖励2个连击点。',
+  'entities.itemSets.vanguard_priest_discipline.name': '先锋套装：帷咏法衣',
+  'entities.itemSets.vanguard_priest_discipline.bonus2': '恐惧圣歌的冷却时间缩短3秒。',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    '你的守护圣咏被完全消耗时，受护盾保护的盟友移动速度提高20%，持续3秒。每8秒最多触发一次。',
+  'entities.itemSets.vanguard_priest_holy.name': '先锋套装：恩翼法衣',
+  'entities.itemSets.vanguard_priest_holy.bonus2': '帷步的冷却时间缩短6秒。',
+  'entities.itemSets.vanguard_priest_holy.bonus4':
+    '帷步还会为你提供相当于最大生命值8%的护盾，持续6秒。',
+  'entities.itemSets.vanguard_priest_shadow.name': '先锋套装：暮咏礼服',
+  'entities.itemSets.vanguard_priest_shadow.bonus2': '悲歌还会在引导期间使目标移动速度降低30%。',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    '召唤什一魔还会为你提供相当于最大生命值10%的护盾，持续8秒。',
+  'entities.itemSets.vanguard_shaman_elemental.name': '先锋套装：风暴铭甲',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2': '释放武器的冷却时间缩短3秒。',
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    '释放武器使你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'entities.itemSets.vanguard_shaman_enhancement.name': '先锋套装：风裔战甲',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    '先祖打击使目标移动速度降低30%，持续4秒。',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    '先祖打击使元素恍惚的剩余冷却时间缩短4秒。',
+  'entities.itemSets.vanguard_shaman_restoration.name': '先锋套装：盐潮链甲',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    '对生命值低于50%的盟友施放愈合之水加快0.5秒。',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    '潮唤还会为目标提供相当于你最大生命值5%的护盾，持续6秒。',
+  'entities.itemSets.vanguard_mage_arcane.name': '先锋套装：缚时法衣',
+  'entities.itemSets.vanguard_mage_arcane.bonus2': '时光屏障的冷却时间缩短2秒。',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    '时光屏障还会使受护盾保护的目标移动速度提高20%，持续3秒。',
+  'entities.itemSets.vanguard_mage_fire.name': '先锋套装：烬鞭礼服',
+  'entities.itemSets.vanguard_mage_fire.bonus2': '余烬坠落恢复速度加快3秒。',
+  'entities.itemSets.vanguard_mage_fire.bonus4': '施放余烬坠落会使炽焰屏障的剩余冷却时间缩短2秒。',
+  'entities.itemSets.vanguard_mage_frost.name': '先锋套装：霜卫衣装',
+  'entities.itemSets.vanguard_mage_frost.bonus2': '冰缚的冷却时间缩短2秒。',
+  'entities.itemSets.vanguard_mage_frost.bonus4': '施放冰缚会使疾步的剩余冷却时间缩短5秒。',
+  'entities.itemSets.vanguard_warlock_affliction.name': '先锋套装：惧羽法衣',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2': '折磨的施法时间缩短0.3秒。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    '吞噬为你多治疗30%，并且可以在移动中引导。',
+  'entities.itemSets.vanguard_warlock_demonology.name': '先锋套装：骨缚礼服',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2': '骨甲的冷却时间缩短10秒。',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4': '收割指令使骨甲的剩余冷却时间缩短2秒。',
+  'entities.itemSets.vanguard_warlock_destruction.name': '先锋套装：渣冠法衣',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2': '烬皮的冷却时间缩短30秒。',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    '每第二次烧燃会使你8秒内的下一次毁灭箭变为瞬发。',
+  'entities.itemSets.vanguard_druid_feral.name': '血鬃兽皮',
+  'entities.itemSets.vanguard_druid_feral.bonus2': '熊冲的冷却时间缩短3秒。',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    '熊冲为你提供相当于最大生命值6%的护盾，持续6秒。',
+  'entities.itemSets.vanguard_druid_restoration.name': '蓟花法衣',
+  'entities.itemSets.vanguard_druid_restoration.bonus2': '迅愈的冷却时间缩短1秒。',
+  'entities.itemSets.vanguard_druid_restoration.bonus4': '迅愈还会使你的移动速度提高30%，持续3秒。',
+  'entities.itemSets.vanguard_druid_balance.name': '星卫法衣',
+  'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
 };

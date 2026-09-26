@@ -1609,7 +1609,7 @@ export const zh_CN: EnTranslations = {
       "autoRows": " (Auto)",
       "barsUnit": " bars",
       "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Power Word: Shield, etc.) to Healing meter.",
+      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
       "groupPresets": "One-Click Quick Themes",
       "applyPreset": "Apply Theme",
       "presetDetailsName": "Modern Glass",
@@ -22220,139 +22220,139 @@ export const zh_CN: EnTranslations = {
         "bonus3": "攻击速度和施法速度提高 15%。"
       },
       "vanguard_druid_balance": {
-        "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
-        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "星卫法衣",
+        "bonus2": "缠缚根须的施法时间缩短0.5秒。",
+        "bonus4": "施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。"
       },
       "vanguard_druid_feral": {
-        "name": "Bloodmane Hide",
-        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
-        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+        "name": "血鬃兽皮",
+        "bonus2": "熊冲的冷却时间缩短3秒。",
+        "bonus4": "熊冲为你提供相当于最大生命值6%的护盾，持续6秒。"
       },
       "vanguard_druid_restoration": {
-        "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
-        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+        "name": "蓟花法衣",
+        "bonus2": "迅愈的冷却时间缩短1秒。",
+        "bonus4": "迅愈还会使你的移动速度提高30%，持续3秒。"
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "Packwarden Harness",
-        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
-        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+        "name": "先锋套装：群卫背具",
+        "bonus2": "震响射击的冷却时间缩短4秒。",
+        "bonus4": "震响射击使嚎怒的剩余冷却时间缩短1秒。"
       },
       "vanguard_hunter_marksmanship": {
-        "name": "Farsight Harness",
-        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
-        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+        "name": "先锋套装：远见背具",
+        "bonus2": "开路的冷却时间缩短4秒。",
+        "bonus4": "开路使你6秒内的下一次长拉变为瞬发。每15秒最多触发一次。"
       },
       "vanguard_hunter_survival": {
-        "name": "Snaretooth Harness",
-        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
-        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+        "name": "先锋套装：陷牙背具",
+        "bonus2": "血钩的冷却时间缩短3秒。",
+        "bonus4": "血钩获得1点狩猎动势。"
       },
       "vanguard_mage_arcane": {
-        "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
-        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+        "name": "先锋套装：缚时法衣",
+        "bonus2": "时光屏障的冷却时间缩短2秒。",
+        "bonus4": "时光屏障还会使受护盾保护的目标移动速度提高20%，持续3秒。"
       },
       "vanguard_mage_fire": {
-        "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall recharges 3 sec faster.",
-        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+        "name": "先锋套装：烬鞭礼服",
+        "bonus2": "余烬坠落恢复速度加快3秒。",
+        "bonus4": "施放余烬坠落会使炽焰屏障的剩余冷却时间缩短2秒。"
       },
       "vanguard_mage_frost": {
-        "name": "Rimewarden Garb",
-        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
-        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+        "name": "先锋套装：霜卫衣装",
+        "bonus2": "冰缚的冷却时间缩短2秒。",
+        "bonus4": "施放冰缚会使疾步的剩余冷却时间缩短5秒。"
       },
       "vanguard_paladin_holy": {
-        "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
-        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+        "name": "先锋套装：日誓圣衣",
+        "bonus2": "生命誓约的冷却时间缩短30秒。",
+        "bonus4": "生命誓约还会为盟友提供相当于其最大生命值8%的护盾，持续6秒。"
       },
       "vanguard_paladin_protection": {
-        "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
-        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
+        "name": "先锋套装：盾誓堡垒",
+        "bonus2": "誓约链的冷却时间缩短2秒。",
+        "bonus4": "被誓约链拉拽的敌人施法速度降低30%，持续4秒；若成功束缚可被拉拽的敌人，还会使你获得日耀反击。"
       },
       "vanguard_paladin_retribution": {
-        "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
-        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+        "name": "先锋套装：光印战甲",
+        "bonus2": "女武神召唤的冷却时间缩短15秒。",
+        "bonus4": "女武神召唤会重置最终裁令的冷却时间，并使你落地后6秒内的下一次最终裁令伤害提高15%。"
       },
       "vanguard_priest_discipline": {
-        "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
-        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
+        "name": "先锋套装：帷咏法衣",
+        "bonus2": "恐惧圣歌的冷却时间缩短3秒。",
+        "bonus4": "你的守护圣咏被完全消耗时，受护盾保护的盟友移动速度提高20%，持续3秒。每8秒最多触发一次。"
       },
       "vanguard_priest_holy": {
-        "name": "Gracewing Raiment",
-        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
-        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+        "name": "先锋套装：恩翼法衣",
+        "bonus2": "帷步的冷却时间缩短6秒。",
+        "bonus4": "帷步还会为你提供相当于最大生命值8%的护盾，持续6秒。"
       },
       "vanguard_priest_shadow": {
-        "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
-        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+        "name": "先锋套装：暮咏礼服",
+        "bonus2": "悲歌还会在引导期间使目标移动速度降低30%。",
+        "bonus4": "召唤什一魔还会为你提供相当于最大生命值10%的护盾，持续8秒。"
       },
       "vanguard_rogue_assassination": {
-        "name": "Nightcut Leathers",
-        "bonus2": "Low Blow costs 10 less Energy.",
-        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+        "name": "先锋套装：夜切皮甲",
+        "bonus2": "低击消耗的能量减少10点。",
+        "bonus4": "低击还会使你6秒内的下一次攻击必定爆击。"
       },
       "vanguard_rogue_combat": {
-        "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
-        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+        "name": "先锋套装：斗痕皮甲",
+        "bonus2": "疾足的冷却时间缩短60秒。",
+        "bonus4": "疾足激活时，邪斩和重拳额外奖励1个连击点。"
       },
       "vanguard_rogue_subtlety": {
-        "name": "Shadewalk Leathers",
-        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
-        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+        "name": "先锋套装：影行皮甲",
+        "bonus2": "烟隐的冷却时间缩短60秒。",
+        "bonus4": "从烟隐中使用腹击时额外奖励2个连击点。"
       },
       "vanguard_shaman_elemental": {
-        "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
-        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "先锋套装：风暴铭甲",
+        "bonus2": "释放武器的冷却时间缩短3秒。",
+        "bonus4": "释放武器使你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。"
       },
       "vanguard_shaman_enhancement": {
-        "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
-        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+        "name": "先锋套装：风裔战甲",
+        "bonus2": "先祖打击使目标移动速度降低30%，持续4秒。",
+        "bonus4": "先祖打击使元素恍惚的剩余冷却时间缩短4秒。"
       },
       "vanguard_shaman_restoration": {
-        "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
-        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+        "name": "先锋套装：盐潮链甲",
+        "bonus2": "对生命值低于50%的盟友施放愈合之水加快0.5秒。",
+        "bonus4": "潮唤还会为目标提供相当于你最大生命值5%的护盾，持续6秒。"
       },
       "vanguard_warlock_affliction": {
-        "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
-        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
+        "name": "先锋套装：惧羽法衣",
+        "bonus2": "折磨的施法时间缩短0.3秒。",
+        "bonus4": "吞噬为你多治疗30%，并且可以在移动中引导。"
       },
       "vanguard_warlock_demonology": {
-        "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
-        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+        "name": "先锋套装：骨缚礼服",
+        "bonus2": "骨甲的冷却时间缩短10秒。",
+        "bonus4": "收割指令使骨甲的剩余冷却时间缩短2秒。"
       },
       "vanguard_warlock_destruction": {
-        "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
-        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+        "name": "先锋套装：渣冠法衣",
+        "bonus2": "烬皮的冷却时间缩短30秒。",
+        "bonus4": "每第二次烧燃会使你8秒内的下一次毁灭箭变为瞬发。"
       },
       "vanguard_warrior_arms": {
-        "name": "Bladewake Battlegear",
-        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
-        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+        "name": "先锋套装：刃潮战甲",
+        "bonus2": "残伤打击使猛冲的剩余冷却时间缩短1秒。",
+        "bonus4": "猛冲还会使你的下一次残伤打击提高20%。"
       },
       "vanguard_warrior_fury": {
-        "name": "Bloodmarch Ragegear",
-        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
-        "bonus4": "Landing Vaulting Charge Enrages you."
+        "name": "先锋套装：血行狂装",
+        "bonus2": "跃冲的冷却时间缩短8秒。",
+        "bonus4": "跃冲落地时使你激怒。"
       },
       "vanguard_warrior_prot": {
-        "name": "Ironmarch Bulwark",
-        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
-        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
+        "name": "先锋套装：铁行壁垒",
+        "bonus2": "断层的冷却时间缩短5秒。",
+        "bonus4": "断层还会使你受到的伤害降低10%，持续6秒。"
       },
       "vesperash": {
         "name": "晚祷烬灰罩袍",

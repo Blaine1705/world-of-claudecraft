@@ -1609,7 +1609,7 @@ export const en_XA: EnTranslations = {
       "autoRows": "[ (Áúţó)]",
       "barsUnit": "[ ƀáŕš]",
       "includeShields": "[Çóúñţ Áƀšóŕƀš áš Ĥéáļíñĝ]",
-      "includeShieldsDesc": "[Áððš áƀšóŕƀéð šĥíéļð ðáɱáĝé (Þóŵéŕ Ŵóŕð: Šĥíéļð, éţç.) ţó Ĥéáļíñĝ ɱéţéŕ.]",
+      "includeShieldsDesc": "[Áððš áƀšóŕƀéð šĥíéļð ðáɱáĝé (Þšáļɱ óƒ Ŵáŕðíñĝ, éţç.) ţó Ĥéáļíñĝ ɱéţéŕ.]",
       "groupPresets": "[Óñé-Çļíçķ Ɋúíçķ Ţĥéɱéš]",
       "applyPreset": "[Áþþļý Ţĥéɱé]",
       "presetDetailsName": "[Ɱóðéŕñ Ĝļášš]",

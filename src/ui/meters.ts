@@ -3077,7 +3077,7 @@ export class Meters {
   ) {
     this.settings = loadMetersSettings(deps?.storage);
     this.data = new MeterData(performance.now(), this.settings);
-    const practiceEl = document.getElementById('practice-tracker');
+    const practiceEl = document.getElementById('practice-body');
     this.practice = practiceEl
       ? new PracticeDpsController({
           element: practiceEl,
