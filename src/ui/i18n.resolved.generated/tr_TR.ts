@@ -11127,6 +11127,9 @@ export const tr_TR: EnTranslations = {
       "anyTarget": "Düşman veya dost hedef",
       "selfOnly": "Yalnızca kendine",
       "damageRange": "{min} ila {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} artı her kombo puanı için {perCombo}"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const tr_TR: EnTranslations = {
       },
       "final_edict": {
         "name": "Son Ferman",
-        "description": "Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Kutsal bir patlama salar."
+        "description": "Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Fiziksel hasar veren bir patlama salar."
       },
       "dawnfall": {
         "name": "Şafak Düşüşü",

@@ -52,6 +52,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.target': 'フォーカス {slot} を選択',
   'hudChrome.interfaceUnlock.frameNames.trackerGroup': '進行状況トラッカー',
   'hudChrome.interfaceUnlock.frameNames.auraGroup': 'オーラとターゲット効果',
+  'abilityUi.tooltip.edictDamage':
+    '武器ダメージの{weaponPercent}%に加え、{damage}の物理ダメージを与えます。武器ダメージには攻撃力による加算が含まれます。',
+  'abilityUi.tooltip.verdictDamage':
+    '最後の勅令で起爆すると{verdictSingleDamage}の聖なるダメージを与えます。暁落としで起爆すると半径{verdictAreaRadius}m内に{verdictAreaDamage}の聖なるダメージを与え、対象が{verdictAreaCap}体を超えるとダメージが減少します。どちらの起爆ダメージも呪文威力では増加しません。印を付けられる敵は一度に1体だけです。',
+  'abilityUi.tooltip.edictExplosion':
+    '神聖なる昇天の効果中、爆発は半径{radius}m内の敵に{damage}の物理ダメージを与えます。対象が{cap}体を超えるとダメージが減少します。このダメージは攻撃力に応じて増加します。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -14972,7 +14978,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）',
   'entities.abilities.fieldcraft_reentry.name': '再突入準備',
   'entities.abilities.final_edict.description':
-    '強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に神聖な爆発も放つ。',
+    '強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に物理ダメージの爆発も放つ。',
   'entities.abilities.final_edict.name': '最後の勅令',
   'entities.abilities.flurry_of_knives.description':
     '投げナイフで6ヤード以内のすべての敵を切り裂き、{damage}の物理ダメージを与え、コンボポイントを2獲得する。（ローグのタレント）',

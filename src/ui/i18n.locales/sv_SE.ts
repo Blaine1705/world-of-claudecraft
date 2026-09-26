@@ -13378,7 +13378,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'I 8 sek besvaras nästa fiendeträff mot dig: upp till {buff} skada nekas och återförs till angriparen som helig skada, och du får 1 hängivenhet. Endast ett slag besvaras. Upphöjelse höjer mängden den kan besvara med 50%.',
   'entities.abilities.final_edict.description':
-    'Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en helig explosion runt dig.',
+    'Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en explosion runt dig som gör fysisk skada.',
   'entities.abilities.grace_devotion.description':
     'Du och gruppmedlemmarna återfår 15 mana var 5:e sek och betalar 3% mindre mana i 30 min. Ersätter din egen Strålande eller Gryningens hängivenhet, men samexisterar med hängivenheter från andra paladiner.',
   'entities.abilities.guardian_covenant.description':

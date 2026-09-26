@@ -11127,6 +11127,9 @@ export const sv_SE: EnTranslations = {
       "anyTarget": "Fiende eller vänligt mål",
       "selfOnly": "Endast dig själv",
       "damageRange": "{min} till {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} plus {perCombo} per kombopoäng"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const sv_SE: EnTranslations = {
       },
       "final_edict": {
         "name": "Sista påbudet",
-        "description": "Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en helig explosion runt dig."
+        "description": "Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en explosion runt dig som gör fysisk skada."
       },
       "dawnfall": {
         "name": "Gryningsfall",

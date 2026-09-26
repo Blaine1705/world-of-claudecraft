@@ -51,6 +51,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.target': '주시 대상 {slot} 선택',
   'hudChrome.interfaceUnlock.frameNames.trackerGroup': '진행 상황 추적기',
   'hudChrome.interfaceUnlock.frameNames.auraGroup': '오라 및 대상 효과',
+  'abilityUi.tooltip.edictDamage':
+    '무기 피해의 {weaponPercent}%에 추가로 {damage}의 물리 피해를 줍니다. 무기 피해에는 전투력 보너스가 포함됩니다.',
+  'abilityUi.tooltip.verdictDamage':
+    '최후의 칙령으로 폭발시키면 {verdictSingleDamage}의 신성 피해를 줍니다. 여명 강하로 폭발시키면 반경 {verdictAreaRadius}m 내에 {verdictAreaDamage}의 신성 피해를 주며, 대상이 {verdictAreaCap}명을 초과하면 피해가 감소합니다. 두 폭발의 피해 모두 주문력에 따라 증가하지 않습니다. 동시에 한 명의 적에게만 표식을 남길 수 있습니다.',
+  'abilityUi.tooltip.edictExplosion':
+    '신성한 승천 중에는 폭발이 반경 {radius}m 내의 적에게 {damage}의 물리 피해를 줍니다. 대상이 {cap}명을 초과하면 피해가 감소합니다. 이 피해는 전투력에 따라 증가합니다.',
   'hudChrome.noticeboard.officerEntry': '{name}({rank})',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -14938,7 +14944,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지속 효과: 흔적 끊기가 사냥의 기세를 갱신하고 12초 안에 사용하는 다음 내장 가르기 또는 피갈고리를 강화합니다. 내장 가르기는 중첩당 15%의 추가 피해를 줍니다. 피갈고리는 18에서 24의 추가 물리 피해를 주고 중첩당 15% 증가하며 원거리 전투력에 따라 증가합니다. 3중첩에서는 두 공격 모두 사냥의 기세를 소모합니다. (야전술)',
   'entities.abilities.fieldcraft_reentry.name': '재진입 준비',
   'entities.abilities.final_edict.description':
-    '강력한 무기 공격을 가하고 피해를 주면 헌신을 1 생성합니다. 적중하면 여명 강하의 남은 재사용 대기시간이 2초 감소합니다. 자동 공격과 최후의 칙령이 적중하면 15% 확률로 8초 동안 여명의 격노를 얻습니다. 승천 중에는 주변에 신성한 폭발도 일으킵니다.',
+    '강력한 무기 공격을 가하고 피해를 주면 헌신을 1 생성합니다. 적중하면 여명 강하의 남은 재사용 대기시간이 2초 감소합니다. 자동 공격과 최후의 칙령이 적중하면 15% 확률로 8초 동안 여명의 격노를 얻습니다. 승천 중에는 주변에 물리 피해를 주는 폭발도 일으킵니다.',
   'entities.abilities.final_edict.name': '최후의 칙령',
   'entities.abilities.flurry_of_knives.description':
     '투척 단검으로 6야드 내 모든 적을 베어 {damage}의 물리 피해를 입히고 연계 점수 2점을 얻습니다. (도적 특성)',

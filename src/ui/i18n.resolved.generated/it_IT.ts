@@ -11127,6 +11127,9 @@ export const it_IT: EnTranslations = {
       "anyTarget": "Bersaglio nemico o amico",
       "selfOnly": "Solo su di sé",
       "damageRange": "{min} a {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} più {perCombo} per punto combo"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const it_IT: EnTranslations = {
       },
       "final_edict": {
         "name": "Editto Finale",
-        "description": "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione Sacra attorno a te."
+        "description": "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione attorno a te che infligge danni fisici."
       },
       "dawnfall": {
         "name": "Caduta dell'Alba",

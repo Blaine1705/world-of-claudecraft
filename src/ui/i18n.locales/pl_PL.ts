@@ -13480,7 +13480,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Przez 8 s następny cios wroga wymierzony w ciebie zostaje odpowiedziany: do {buff} obrażeń zostaje odrzucone i zwrócone napastnikowi jako obrażenia Święte, a ty zyskujesz 1 Oddanie. Odpowiedziany zostaje tylko jeden cios. Wzniesienie zwiększa odpowiadaną wartość o 50%.',
   'entities.abilities.final_edict.description':
-    'Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s. Wzniesienie uwalnia dodatkowo Świętą eksplozję wokół ciebie.',
+    'Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s. Wzniesienie uwalnia dodatkowo eksplozję wokół ciebie, która zadaje obrażenia Fizyczne.',
   'entities.abilities.grace_devotion.description':
     'Ty i członkowie drużyny odzyskujecie 15 many co 5 s i płacicie o 3% mniej many przez 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Świtu, ale współistnieje z Oddaniami innych paladynów.',
   'entities.abilities.guardian_covenant.description':

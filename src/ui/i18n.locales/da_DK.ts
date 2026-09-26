@@ -13198,7 +13198,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'I 8 sek. besvares det næste fjendtlige slag mod dig: op til {buff} skade nægtes og returneres til angriberen som hellig skade, og du får 1 Hengivenhed. Kun ét slag besvares. Ophøjelse hæver den mængde, den kan besvare, med 50%.',
   'entities.abilities.final_edict.description':
-    'Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek. Ophøjelse frigiver desuden en hellig eksplosion omkring dig.',
+    'Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek. Ophøjelse frigiver desuden en eksplosion omkring dig, der gør fysisk skade.',
   'entities.abilities.grace_devotion.description':
     'Du og gruppemedlemmerne genvinder 15 mana hvert 5. sek. og betaler 3% mindre mana i 30 min. Erstatter din egen Strålende eller Daggryets Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner.',
   'entities.abilities.guardian_covenant.description':

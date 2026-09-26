@@ -11127,6 +11127,9 @@ export const fr_FR: EnTranslations = {
       "anyTarget": "Cible ennemie ou amie",
       "selfOnly": "Sur soi uniquement",
       "damageRange": "{min} à {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} plus {perCombo} par point de combo"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const fr_FR: EnTranslations = {
       },
       "final_edict": {
         "name": "Édit final",
-        "description": "Assène une frappe d'arme dévastatrice et génère 1 Dévotion lorsqu'elle inflige des dégâts. Un coup réussi réduit de 2 s le temps de recharge restant de la Chute de l'aube. Les attaques automatiques réussies et les coups de l'Édit final ont 15% de chances d'octroyer le Courroux de l'aube pendant 8 s. L'Ascension libère en outre une explosion Sacrée autour de vous."
+        "description": "Assène une frappe d'arme dévastatrice et génère 1 Dévotion lorsqu'elle inflige des dégâts. Un coup réussi réduit de 2 s le temps de recharge restant de la Chute de l'aube. Les attaques automatiques réussies et les coups de l'Édit final ont 15% de chances d'octroyer le Courroux de l'aube pendant 8 s. L'Ascension libère en outre une explosion autour de vous qui inflige des dégâts physiques."
       },
       "dawnfall": {
         "name": "Chute de l'aube",

@@ -11127,6 +11127,9 @@ export const pt_BR: EnTranslations = {
       "anyTarget": "Alvo inimigo ou amigo",
       "selfOnly": "Apenas em si mesmo",
       "damageRange": "{min} a {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} mais {perCombo} por ponto de combo"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const pt_BR: EnTranslations = {
       },
       "final_edict": {
         "name": "Édito Final",
-        "description": "Desfere um golpe de arma esmagador e gera 1 de Devoção quando causa dano. Um acerto bem-sucedido reduz em 2 s a recarga restante da Queda da Alvorada. Ataques automáticos bem-sucedidos e acertos do Édito Final têm 15% de chance de conceder Ira da Alvorada por 8 s. A Ascensão também libera uma explosão Sagrada ao seu redor."
+        "description": "Desfere um golpe de arma esmagador e gera 1 de Devoção quando causa dano. Um acerto bem-sucedido reduz em 2 s a recarga restante da Queda da Alvorada. Ataques automáticos bem-sucedidos e acertos do Édito Final têm 15% de chance de conceder Ira da Alvorada por 8 s. A Ascensão também libera uma explosão ao seu redor que causa dano Físico."
       },
       "dawnfall": {
         "name": "Queda da Alvorada",

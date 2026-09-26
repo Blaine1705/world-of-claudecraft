@@ -11127,6 +11127,9 @@ export const pl_PL: EnTranslations = {
       "anyTarget": "Wróg lub przyjazny cel",
       "selfOnly": "Tylko na siebie",
       "damageRange": "{min} do {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} plus {perCombo} za punkt kombinacji"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const pl_PL: EnTranslations = {
       },
       "final_edict": {
         "name": "Ostatni Edykt",
-        "description": "Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s. Wzniesienie uwalnia dodatkowo Świętą eksplozję wokół ciebie."
+        "description": "Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s. Wzniesienie uwalnia dodatkowo eksplozję wokół ciebie, która zadaje obrażenia Fizyczne."
       },
       "dawnfall": {
         "name": "Upadek Świtu",

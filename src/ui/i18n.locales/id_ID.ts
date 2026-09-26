@@ -13508,7 +13508,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Selama 8 dtk, pukulan musuh berikutnya terhadapmu dijawab: hingga {buff} kerusakan ditolak dan dikembalikan kepada penyerang sebagai kerusakan Suci, dan kamu memperoleh 1 Pengabdian. Hanya satu pukulan yang dijawab. Kenaikan menaikkan jumlah yang dapat dijawab sebesar 50%.',
   'entities.abilities.final_edict.description':
-    'Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan Suci di sekitarmu.',
+    'Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan di sekitarmu yang memberi kerusakan Fisik.',
   'entities.abilities.grace_devotion.description':
     'Kamu dan anggota kelompok memulihkan 15 mana tiap 5 dtk dan membayar 3% lebih sedikit mana selama 30 mnt. Menggantikan Pengabdian Berseri atau Fajarmu sendiri, tetapi berdampingan dengan Pengabdian paladin lain.',
   'entities.abilities.guardian_covenant.description':

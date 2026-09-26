@@ -11127,6 +11127,9 @@ export const de_DE: EnTranslations = {
       "anyTarget": "Feindliches oder freundliches Ziel",
       "selfOnly": "Nur auf Euch selbst",
       "damageRange": "{min} bis {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} plus {perCombo} pro Combopunkt"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const de_DE: EnTranslations = {
       },
       "final_edict": {
         "name": "Letztes Edikt",
-        "description": "Führt einen zermalmenden Waffenschlag aus und erzeugt 1 Hingabe, wenn er Schaden verursacht. Ein erfolgreicher Treffer verringert die verbleibende Abklingzeit des Morgensturzes um 2 Sek. Erfolgreiche Autoangriffe und Treffer des Letzten Edikts haben eine Chance von 15%, 8 Sek. lang Zorn der Morgenröte zu gewähren. Der Aufstieg löst zusätzlich eine heilige Explosion um Euch aus."
+        "description": "Führt einen zermalmenden Waffenschlag aus und erzeugt 1 Hingabe, wenn er Schaden verursacht. Ein erfolgreicher Treffer verringert die verbleibende Abklingzeit des Morgensturzes um 2 Sek. Erfolgreiche Autoangriffe und Treffer des Letzten Edikts haben eine Chance von 15%, 8 Sek. lang Zorn der Morgenröte zu gewähren. Der Aufstieg löst zusätzlich eine Explosion um Euch aus, die physischen Schaden verursacht."
       },
       "dawnfall": {
         "name": "Morgensturz",

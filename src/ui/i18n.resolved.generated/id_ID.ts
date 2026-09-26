@@ -11127,6 +11127,9 @@ export const id_ID: EnTranslations = {
       "anyTarget": "Target musuh atau teman",
       "selfOnly": "Hanya diri sendiri",
       "damageRange": "{min} hingga {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} ditambah {perCombo} per poin kombo"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const id_ID: EnTranslations = {
       },
       "final_edict": {
         "name": "Titah Terakhir",
-        "description": "Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan Suci di sekitarmu."
+        "description": "Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan di sekitarmu yang memberi kerusakan Fisik."
       },
       "dawnfall": {
         "name": "Runtuhnya Fajar",

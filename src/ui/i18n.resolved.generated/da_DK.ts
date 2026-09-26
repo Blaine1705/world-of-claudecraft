@@ -11127,6 +11127,9 @@ export const da_DK: EnTranslations = {
       "anyTarget": "Fjende eller venligt mål",
       "selfOnly": "Kun på dig selv",
       "damageRange": "{min} til {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} plus {perCombo} per combopoint"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const da_DK: EnTranslations = {
       },
       "final_edict": {
         "name": "Sidste Påbud",
-        "description": "Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek. Ophøjelse frigiver desuden en hellig eksplosion omkring dig."
+        "description": "Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek. Ophøjelse frigiver desuden en eksplosion omkring dig, der gør fysisk skade."
       },
       "dawnfall": {
         "name": "Daggryfald",

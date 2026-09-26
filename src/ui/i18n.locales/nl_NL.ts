@@ -13382,7 +13382,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     '8 sec. lang wordt de volgende vijandelijke treffer tegen jou beantwoord: tot {buff} schade wordt geweigerd en als Heilige schade aan de aanvaller teruggegeven, en je krijgt 1 Toewijding. Slechts één slag wordt beantwoord. Verheffing verhoogt het bedrag dat beantwoord kan worden met 50%.',
   'entities.abilities.final_edict.description':
-    'Levert een verpletterende wapenslag en genereert 1 Toewijding wanneer die schade aanricht. Een geslaagde treffer vermindert de resterende afkoeling van Dageraadsval met 2 sec. Geslaagde auto-aanvallen en treffers van het Laatste Edict hebben 15% kans om 8 sec. lang Toorn van de Dageraad te verlenen. Verheffing ontketent bovendien een Heilige explosie om je heen.',
+    'Levert een verpletterende wapenslag en genereert 1 Toewijding wanneer die schade aanricht. Een geslaagde treffer vermindert de resterende afkoeling van Dageraadsval met 2 sec. Geslaagde auto-aanvallen en treffers van het Laatste Edict hebben 15% kans om 8 sec. lang Toorn van de Dageraad te verlenen. Verheffing ontketent bovendien een explosie om je heen die fysieke schade aanricht.',
   'entities.abilities.grace_devotion.description':
     'Jij en je groepsleden herstellen elke 5 sec. 15 mana en betalen 30 min. lang 3% minder mana. Vervangt je eigen Stralende Toewijding of Toewijding van de Dageraad, maar bestaat naast de Toewijdingen van andere paladijnen.',
   'entities.abilities.guardian_covenant.description':

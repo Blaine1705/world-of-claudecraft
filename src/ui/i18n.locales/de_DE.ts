@@ -12512,7 +12512,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     '8 Sek. lang wird der nächste gegnerische Treffer gegen Euch beantwortet: Bis zu {buff} Schaden wird verwehrt und dem Angreifer als Heiligschaden zurückgegeben, und Ihr erhaltet 1 Hingabe. Nur ein Schlag wird beantwortet. Der Aufstieg erhöht die beantwortbare Menge um 50%.',
   'entities.abilities.final_edict.description':
-    'Führt einen zermalmenden Waffenschlag aus und erzeugt 1 Hingabe, wenn er Schaden verursacht. Ein erfolgreicher Treffer verringert die verbleibende Abklingzeit des Morgensturzes um 2 Sek. Erfolgreiche Autoangriffe und Treffer des Letzten Edikts haben eine Chance von 15%, 8 Sek. lang Zorn der Morgenröte zu gewähren. Der Aufstieg löst zusätzlich eine heilige Explosion um Euch aus.',
+    'Führt einen zermalmenden Waffenschlag aus und erzeugt 1 Hingabe, wenn er Schaden verursacht. Ein erfolgreicher Treffer verringert die verbleibende Abklingzeit des Morgensturzes um 2 Sek. Erfolgreiche Autoangriffe und Treffer des Letzten Edikts haben eine Chance von 15%, 8 Sek. lang Zorn der Morgenröte zu gewähren. Der Aufstieg löst zusätzlich eine Explosion um Euch aus, die physischen Schaden verursacht.',
   'entities.abilities.grace_devotion.description':
     'Ihr und Eure Gruppenmitglieder stellt alle 5 Sek. 15 Mana wieder her und zahlt 30 Min. lang 3% weniger Mana. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Morgenröte, besteht aber neben den Hingaben anderer Paladine.',
   'entities.abilities.guardian_covenant.description':

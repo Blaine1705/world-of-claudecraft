@@ -13593,7 +13593,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Por 8 s, o próximo golpe inimigo contra você recebe resposta: até {buff} de dano é negado e devolvido ao atacante como dano Sagrado, e você ganha 1 de Devoção. Apenas um golpe recebe resposta. A Ascensão aumenta em 50% a quantidade que ela pode responder.',
   'entities.abilities.final_edict.description':
-    'Desfere um golpe de arma esmagador e gera 1 de Devoção quando causa dano. Um acerto bem-sucedido reduz em 2 s a recarga restante da Queda da Alvorada. Ataques automáticos bem-sucedidos e acertos do Édito Final têm 15% de chance de conceder Ira da Alvorada por 8 s. A Ascensão também libera uma explosão Sagrada ao seu redor.',
+    'Desfere um golpe de arma esmagador e gera 1 de Devoção quando causa dano. Um acerto bem-sucedido reduz em 2 s a recarga restante da Queda da Alvorada. Ataques automáticos bem-sucedidos e acertos do Édito Final têm 15% de chance de conceder Ira da Alvorada por 8 s. A Ascensão também libera uma explosão ao seu redor que causa dano Físico.',
   'entities.abilities.grace_devotion.description':
     'Você e os membros do grupo recuperam 15 de mana a cada 5 s e pagam 3% menos mana por 30 min. Substitui sua própria Devoção Radiante ou da Alvorada, mas coexiste com as Devoções de outros paladinos.',
   'entities.abilities.guardian_covenant.description':

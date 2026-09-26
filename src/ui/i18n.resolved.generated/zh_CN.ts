@@ -11127,6 +11127,9 @@ export const zh_CN: EnTranslations = {
       "anyTarget": "敌方或友方目标",
       "selfOnly": "仅对自己",
       "damageRange": "{min} 到 {max}",
+      "edictExplosion": "神圣升华期间，爆炸对{radius}米内的敌人造成{damage}点物理伤害，超过{cap}个目标时伤害降低。此伤害随攻击强度提高。",
+      "edictDamage": "造成{weaponPercent}%武器伤害，外加{damage}点物理伤害。武器伤害包含攻击强度加成。",
+      "verdictDamage": "终末敕令引爆时造成{verdictSingleDamage}点神圣伤害。黎明坠击引爆时对{verdictAreaRadius}米内的敌人造成{verdictAreaDamage}点神圣伤害，超过{verdictAreaCap}个目标时伤害降低。两种引爆伤害均不随法术强度提高。你的印记同时只能标记一个敌人。",
       "finisherDamage": "{base} 加每个连击点 {perCombo}"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const zh_CN: EnTranslations = {
       },
       "final_edict": {
         "name": "终末敕令",
-        "description": "发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放神圣爆炸。"
+        "description": "发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放造成物理伤害的爆炸。"
       },
       "dawnfall": {
         "name": "黎明坠击",

@@ -13672,7 +13672,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     "Per 8 s il prossimo colpo nemico contro di te riceve risposta: fino a {buff} danni vengono negati e restituiti all'attaccante come danni Sacri, e ottieni 1 Devozione. Viene risposto a un solo colpo. L'Ascensione aumenta del 50% la quantità a cui può rispondere.",
   'entities.abilities.final_edict.description':
-    "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione Sacra attorno a te.",
+    "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione attorno a te che infligge danni fisici.",
   'entities.abilities.grace_devotion.description':
     "Tu e i membri del gruppo recuperate 15 mana ogni 5 s e pagate il 3% di mana in meno per 30 min. Sostituisce la tua Devozione Radiante o dell'Alba, ma coesiste con le Devozioni di altri paladini.",
   'entities.abilities.guardian_covenant.description':

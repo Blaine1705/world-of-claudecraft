@@ -11127,6 +11127,9 @@ export const es_ES: EnTranslations = {
       "anyTarget": "Objetivo enemigo o amigo",
       "selfOnly": "Solo en ti mismo",
       "damageRange": "{min} a {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} más {perCombo} por punto de combo"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const es_ES: EnTranslations = {
       },
       "final_edict": {
         "name": "Edicto Final",
-        "description": "Asesta un golpe de arma demoledor y genera 1 de Devoción cuando inflige daño. Un impacto certero reduce en 2 s el tiempo de reutilización restante de Caída del Alba. Los ataques automáticos certeros y los impactos del Edicto Final tienen un 15% de probabilidad de otorgar Ira del Alba durante 8 s. La Ascensión libera además una explosión Sagrada a tu alrededor."
+        "description": "Asesta un golpe de arma demoledor y genera 1 de Devoción cuando inflige daño. Un impacto certero reduce en 2 s el tiempo de reutilización restante de Caída del Alba. Los ataques automáticos certeros y los impactos del Edicto Final tienen un 15% de probabilidad de otorgar Ira del Alba durante 8 s. La Ascensión libera además una explosión a tu alrededor que inflige daño físico."
       },
       "dawnfall": {
         "name": "Caída del Alba",

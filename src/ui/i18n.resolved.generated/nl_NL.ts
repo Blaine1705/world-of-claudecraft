@@ -11127,6 +11127,9 @@ export const nl_NL: EnTranslations = {
       "anyTarget": "Vijandelijk of vriendelijk doelwit",
       "selfOnly": "Alleen jezelf",
       "damageRange": "{min} tot {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} plus {perCombo} per combopunt"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const nl_NL: EnTranslations = {
       },
       "final_edict": {
         "name": "Laatste Edict",
-        "description": "Levert een verpletterende wapenslag en genereert 1 Toewijding wanneer die schade aanricht. Een geslaagde treffer vermindert de resterende afkoeling van Dageraadsval met 2 sec. Geslaagde auto-aanvallen en treffers van het Laatste Edict hebben 15% kans om 8 sec. lang Toorn van de Dageraad te verlenen. Verheffing ontketent bovendien een Heilige explosie om je heen."
+        "description": "Levert een verpletterende wapenslag en genereert 1 Toewijding wanneer die schade aanricht. Een geslaagde treffer vermindert de resterende afkoeling van Dageraadsval met 2 sec. Geslaagde auto-aanvallen en treffers van het Laatste Edict hebben 15% kans om 8 sec. lang Toorn van de Dageraad te verlenen. Verheffing ontketent bovendien een explosie om je heen die fysieke schade aanricht."
       },
       "dawnfall": {
         "name": "Dageraadsval",

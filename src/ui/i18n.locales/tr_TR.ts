@@ -13405,7 +13405,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     '8 sn boyunca sana gelen bir sonraki düşman vuruşu yanıtlanır: {buff} kadar hasar reddedilir ve saldırgana Kutsal hasar olarak döndürülür, sen de 1 Adanmışlık kazanırsın. Yalnızca tek bir darbe yanıtlanır. Yüceliş yanıtlayabildiği miktarı 50% artırır.',
   'entities.abilities.final_edict.description':
-    'Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Kutsal bir patlama salar.',
+    'Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Fiziksel hasar veren bir patlama salar.',
   'entities.abilities.grace_devotion.description':
     'Sen ve grup üyeleri her 5 sn 15 mana geri kazanır ve 30 dk boyunca 3% daha az mana harcarsınız. Kendi Işıyan veya Şafak Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur.',
   'entities.abilities.guardian_covenant.description':

@@ -13305,7 +13305,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Na 8 s je další nepřátelský zásah proti tobě zodpovězen: až {buff} poškození je odepřeno a vráceno útočníkovi jako Svaté poškození a ty získáš 1 Oddanost. Zodpovězen je pouze jeden úder. Vzestup zvýší množství, které dokáže zodpovědět, o 50%.',
   'entities.abilities.final_edict.description':
-    'Zasadí drtivý úder zbraní a získá 1 Oddanost, když způsobí poškození. Úspěšný zásah zkrátí zbývající obnovu Pádu úsvitu o 2 s. Úspěšné automatické útoky a zásahy Posledního ediktu mají 15% šanci udělit Hněv úsvitu na 8 s. Vzestup navíc uvolní Svatou explozi kolem tebe.',
+    'Zasadí drtivý úder zbraní a získá 1 Oddanost, když způsobí poškození. Úspěšný zásah zkrátí zbývající obnovu Pádu úsvitu o 2 s. Úspěšné automatické útoky a zásahy Posledního ediktu mají 15% šanci udělit Hněv úsvitu na 8 s. Vzestup navíc kolem tebe uvolní explozi způsobující fyzické poškození.',
   'entities.abilities.grace_devotion.description':
     'Ty a členové skupiny obnovujete 15 many každých 5 s a platíte o 3% méně many po dobu 30 min. Nahrazuje tvou vlastní Zářivou oddanost nebo Oddanost úsvitu, ale koexistuje s Oddanostmi jiných paladinů.',
   'entities.abilities.guardian_covenant.description':

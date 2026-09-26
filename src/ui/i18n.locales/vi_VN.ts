@@ -13414,7 +13414,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Trong 8 giây, đòn đánh tiếp theo của kẻ địch nhắm vào bạn sẽ được đáp trả: tối đa {buff} sát thương bị chặn và trả lại kẻ tấn công dưới dạng sát thương Thánh, và bạn nhận 1 Sùng Tín. Chỉ một đòn được đáp trả. Thăng Thiên nâng lượng có thể đáp trả thêm 50%.',
   'entities.abilities.final_edict.description':
-    'Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ Thánh quanh bạn.',
+    'Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ quanh bạn, gây sát thương Vật lý.',
   'entities.abilities.grace_devotion.description':
     'Bạn và các thành viên nhóm hồi 15 mana mỗi 5 giây và tốn ít hơn 3% mana trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Bình Minh của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác.',
   'entities.abilities.guardian_covenant.description':

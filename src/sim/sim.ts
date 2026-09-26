@@ -7362,16 +7362,7 @@ export class Sim {
     target: Entity,
     bonus: number,
     abilityName: string | null,
-    opts: {
-      cannotBeDodged?: boolean;
-      weaponMult?: number;
-      threatFlat?: number;
-      threatMult?: number;
-      forceCrit?: boolean;
-      critBonus?: number;
-      onDealt?: (amount: number) => void;
-      onEffectiveDamage?: (amount: number) => void;
-    },
+    opts: Parameters<typeof meleeSwingImpl>[5],
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);
   }

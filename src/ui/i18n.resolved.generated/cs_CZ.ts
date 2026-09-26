@@ -11127,6 +11127,9 @@ export const cs_CZ: EnTranslations = {
       "anyTarget": "Nepřítel nebo přátelský cíl",
       "selfOnly": "Pouze na sebe",
       "damageRange": "{min} až {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} plus {perCombo} za combo bod"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const cs_CZ: EnTranslations = {
       },
       "final_edict": {
         "name": "Poslední edikt",
-        "description": "Zasadí drtivý úder zbraní a získá 1 Oddanost, když způsobí poškození. Úspěšný zásah zkrátí zbývající obnovu Pádu úsvitu o 2 s. Úspěšné automatické útoky a zásahy Posledního ediktu mají 15% šanci udělit Hněv úsvitu na 8 s. Vzestup navíc uvolní Svatou explozi kolem tebe."
+        "description": "Zasadí drtivý úder zbraní a získá 1 Oddanost, když způsobí poškození. Úspěšný zásah zkrátí zbývající obnovu Pádu úsvitu o 2 s. Úspěšné automatické útoky a zásahy Posledního ediktu mají 15% šanci udělit Hněv úsvitu na 8 s. Vzestup navíc kolem tebe uvolní explozi způsobující fyzické poškození."
       },
       "dawnfall": {
         "name": "Pád úsvitu",

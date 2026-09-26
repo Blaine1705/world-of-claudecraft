@@ -51,6 +51,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.target': '選取焦點 {slot}',
   'hudChrome.interfaceUnlock.frameNames.trackerGroup': '任務追蹤器',
   'hudChrome.interfaceUnlock.frameNames.auraGroup': '光環與目標效果',
+  'abilityUi.tooltip.edictDamage':
+    '造成{weaponPercent}%武器傷害，外加{damage}點物理傷害。武器傷害包含攻擊強度加成。',
+  'abilityUi.tooltip.verdictDamage':
+    '終末敕令引爆時造成{verdictSingleDamage}點神聖傷害。黎明墜擊引爆時對{verdictAreaRadius}公尺內的敵人造成{verdictAreaDamage}點神聖傷害，超過{verdictAreaCap}個目標時傷害降低。兩種引爆傷害均不隨法術強度提高。你的印記同時只能標記一個敵人。',
+  'abilityUi.tooltip.edictExplosion':
+    '神聖昇華期間，爆炸對{radius}公尺內的敵人造成{damage}點物理傷害，超過{cap}個目標時傷害降低。此傷害隨攻擊強度提高。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '《{title}》',
   'guide.professions.endgameBodyRaidCollections':
@@ -14253,7 +14259,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '被動：斷跡會刷新狩獵動能，並使你在12秒內的下一次剖膛打擊或血鉤獲得再入強化。剖膛打擊每層造成15%額外傷害。血鉤造成18至24點額外物理傷害，每層再提高15%，並隨遠程攻擊強度提高。達到3層時，任一攻擊都會消耗狩獵動能。（野戰技藝）',
   'entities.abilities.fieldcraft_reentry.name': '蓄勢再入',
   'entities.abilities.final_edict.description':
-    '發動一次沉重的武器攻擊，並在造成傷害時產生 1 點虔誠。命中後使黎明墜擊的剩餘冷卻時間縮短 2 秒。成功的自動攻擊和終末敕令命中有 15% 機率獲得持續 8 秒的黎明之怒。昇華還會在你周圍釋放神聖爆炸。',
+    '發動一次沉重的武器攻擊，並在造成傷害時產生 1 點虔誠。命中後使黎明墜擊的剩餘冷卻時間縮短 2 秒。成功的自動攻擊和終末敕令命中有 15% 機率獲得持續 8 秒的黎明之怒。昇華還會在你周圍釋放造成物理傷害的爆炸。',
   'entities.abilities.final_edict.name': '終末敕令',
   'entities.abilities.flurry_of_knives.description':
     '擲出飛刀鞭笞6碼內的所有敵人，造成{damage}點物理傷害，並獲得2個連擊點。（潛行者天賦）',

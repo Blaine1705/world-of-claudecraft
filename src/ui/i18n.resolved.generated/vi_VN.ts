@@ -11127,6 +11127,9 @@ export const vi_VN: EnTranslations = {
       "anyTarget": "Mục tiêu của kẻ thù hoặc thân thiện",
       "selfOnly": "Chỉ bản thân",
       "damageRange": "{min} đến {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} cộng {perCombo} mỗi điểm combo"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const vi_VN: EnTranslations = {
       },
       "final_edict": {
         "name": "Sắc Lệnh Cuối",
-        "description": "Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ Thánh quanh bạn."
+        "description": "Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ quanh bạn, gây sát thương Vật lý."
       },
       "dawnfall": {
         "name": "Bình Minh Rơi",

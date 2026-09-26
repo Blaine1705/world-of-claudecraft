@@ -11127,6 +11127,9 @@ export const ja_JP: EnTranslations = {
       "anyTarget": "敵または味方の対象",
       "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
+      "edictExplosion": "神聖なる昇天の効果中、爆発は半径{radius}m内の敵に{damage}の物理ダメージを与えます。対象が{cap}体を超えるとダメージが減少します。このダメージは攻撃力に応じて増加します。",
+      "edictDamage": "武器ダメージの{weaponPercent}%に加え、{damage}の物理ダメージを与えます。武器ダメージには攻撃力による加算が含まれます。",
+      "verdictDamage": "最後の勅令で起爆すると{verdictSingleDamage}の聖なるダメージを与えます。暁落としで起爆すると半径{verdictAreaRadius}m内に{verdictAreaDamage}の聖なるダメージを与え、対象が{verdictAreaCap}体を超えるとダメージが減少します。どちらの起爆ダメージも呪文威力では増加しません。印を付けられる敵は一度に1体だけです。",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
     },
     "resources": {
@@ -12088,7 +12091,7 @@ export const ja_JP: EnTranslations = {
       },
       "final_edict": {
         "name": "最後の勅令",
-        "description": "強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に神聖な爆発も放つ。"
+        "description": "強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に物理ダメージの爆発も放つ。"
       },
       "dawnfall": {
         "name": "暁落とし",

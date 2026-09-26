@@ -13939,7 +13939,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Durante 8 s, el siguiente golpe enemigo contra ti recibe respuesta: se niega hasta {buff} de daño y se devuelve al atacante como daño Sagrado, y ganas 1 de Devoción. Solo se responde a un golpe. La Ascensión aumenta un 50% la cantidad que puede responder.',
   'entities.abilities.final_edict.description':
-    'Asesta un golpe de arma demoledor y genera 1 de Devoción cuando inflige daño. Un impacto certero reduce en 2 s el tiempo de reutilización restante de Caída del Alba. Los ataques automáticos certeros y los impactos del Edicto Final tienen un 15% de probabilidad de otorgar Ira del Alba durante 8 s. La Ascensión libera además una explosión Sagrada a tu alrededor.',
+    'Asesta un golpe de arma demoledor y genera 1 de Devoción cuando inflige daño. Un impacto certero reduce en 2 s el tiempo de reutilización restante de Caída del Alba. Los ataques automáticos certeros y los impactos del Edicto Final tienen un 15% de probabilidad de otorgar Ira del Alba durante 8 s. La Ascensión libera además una explosión a tu alrededor que inflige daño físico.',
   'entities.abilities.grace_devotion.description':
     'Tú y los miembros del grupo restauráis 15 de maná cada 5 s y pagáis un 3% menos de maná durante 30 min. Reemplaza tu propia Devoción Radiante o del Alba, pero coexiste con las Devociones de otros paladines.',
   'entities.abilities.guardian_covenant.description':

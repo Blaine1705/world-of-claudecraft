@@ -14004,7 +14004,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     "Pendant 8 s, le prochain coup ennemi porté contre vous reçoit une réponse : jusqu'à {buff} points de dégâts sont annulés et renvoyés à l'attaquant en dégâts Sacrés, et vous gagnez 1 Dévotion. Un seul coup reçoit une réponse. L'Ascension augmente de 50% le montant auquel elle peut répondre.",
   'entities.abilities.final_edict.description':
-    "Assène une frappe d'arme dévastatrice et génère 1 Dévotion lorsqu'elle inflige des dégâts. Un coup réussi réduit de 2 s le temps de recharge restant de la Chute de l'aube. Les attaques automatiques réussies et les coups de l'Édit final ont 15% de chances d'octroyer le Courroux de l'aube pendant 8 s. L'Ascension libère en outre une explosion Sacrée autour de vous.",
+    "Assène une frappe d'arme dévastatrice et génère 1 Dévotion lorsqu'elle inflige des dégâts. Un coup réussi réduit de 2 s le temps de recharge restant de la Chute de l'aube. Les attaques automatiques réussies et les coups de l'Édit final ont 15% de chances d'octroyer le Courroux de l'aube pendant 8 s. L'Ascension libère en outre une explosion autour de vous qui inflige des dégâts physiques.",
   'entities.abilities.grace_devotion.description':
     "Vous et les membres du groupe récupérez 15 mana toutes les 5 s et payez 3% de mana en moins pendant 30 min. Remplace votre propre Dévotion radiante ou de l'aube, mais coexiste avec les Dévotions des autres paladins.",
   'entities.abilities.guardian_covenant.description':

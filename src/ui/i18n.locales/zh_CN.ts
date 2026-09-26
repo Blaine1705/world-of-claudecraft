@@ -51,6 +51,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.target': '选中焦点 {slot}',
   'hudChrome.interfaceUnlock.frameNames.trackerGroup': '任务追踪器',
   'hudChrome.interfaceUnlock.frameNames.auraGroup': '光环与目标效果',
+  'abilityUi.tooltip.edictDamage':
+    '造成{weaponPercent}%武器伤害，外加{damage}点物理伤害。武器伤害包含攻击强度加成。',
+  'abilityUi.tooltip.verdictDamage':
+    '终末敕令引爆时造成{verdictSingleDamage}点神圣伤害。黎明坠击引爆时对{verdictAreaRadius}米内的敌人造成{verdictAreaDamage}点神圣伤害，超过{verdictAreaCap}个目标时伤害降低。两种引爆伤害均不随法术强度提高。你的印记同时只能标记一个敌人。',
+  'abilityUi.tooltip.edictExplosion':
+    '神圣升华期间，爆炸对{radius}米内的敌人造成{damage}点物理伤害，超过{cap}个目标时伤害降低。此伤害随攻击强度提高。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -14249,7 +14255,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）',
   'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
   'entities.abilities.final_edict.description':
-    '发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放神圣爆炸。',
+    '发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放造成物理伤害的爆炸。',
   'entities.abilities.final_edict.name': '终末敕令',
   'entities.abilities.flurry_of_knives.description':
     '掷出飞刀鞭笞6码内的所有敌人，造成{damage}点物理伤害，并获得2个连击点。（潜行者天赋）',
