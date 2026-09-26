@@ -11,7 +11,11 @@ import { summonMountItem } from '../src/sim/mounts';
 import { restorePet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
 import { deckToWorld, worldToDeck } from '../src/sim/transport_deck';
-import { carryPassengersAcrossClockJump, transportClock } from '../src/sim/transport_ferry';
+import {
+  carryPassengersAcrossClockJump,
+  ferryBoardingSpot,
+  transportClock,
+} from '../src/sim/transport_ferry';
 import {
   type TransportPose,
   transportCycleSeconds,
@@ -574,6 +578,30 @@ describe('sailing (the real Sim)', () => {
     expect(p.corpsePos).toBeTruthy();
     const corpse = p.corpsePos ?? { x: 0, z: 0 };
     expect(Math.hypot(corpse.x - FAR.landing.x, corpse.z - FAR.landing.z)).toBeLessThan(1);
+  });
+
+  it('a released spirit that boards under way leaves its corpse where it fell', () => {
+    // die far from any harbor, release, and reach the deck of a sailing ship as a spirit:
+    // only a body that sailed is carried to the far pier, never one left on land
+    const p = sim.player;
+    const far = sim.ctx.groundPos(20, 760); // Thornpeak
+    place(p, far.x, far.y, far.z);
+    p.hp = 0;
+    p.dead = true;
+    sim.tick();
+    sim.releaseSpirit(p.id);
+    expect(p.ghost).toBe(true);
+    const corpse = { ...(p.corpsePos ?? { x: 0, y: 0, z: 0 }) };
+    expect(Math.hypot(corpse.x - far.x, corpse.z - far.z)).toBeLessThan(1);
+    setClock(sim, DEPART_EAST + 40);
+    sim.tick();
+    const spot = ferryBoardingSpot(sim.ctx, 0);
+    if (!spot) throw new Error('no boarding spot under way');
+    place(p, spot.x, spot.y, spot.z);
+    for (let i = 0; i < 40; i++) {
+      sim.tick();
+      expect(p.corpsePos, `tick ${i}`).toEqual(corpse);
+    }
   });
 
   it('never drags a player standing on either pier through a cast-off or a mooring', () => {

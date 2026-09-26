@@ -32,7 +32,8 @@
 //    their pet returns (on the pier), and a voyage from the other harbor
 //    marks their Book of Deeds (the ferry deed takes both directions).
 //  - A passenger who releases their spirit leaves the ride; their corpse is
-//    carried to the destination pier.
+//    carried to the destination pier. A spirit that reaches a sailing deck
+//    rides like anyone, and moves no corpse that is not on that deck.
 //  - A save taken aboard (logout, autosave) records the destination pier, and
 //    a save taken on a docked deck records that berth's pier, so a later
 //    login never lands in the sea (`ferrySavePosition`). A linkdead
@@ -198,13 +199,19 @@ export function updateTransportFerries(ctx: SimContext): void {
       if (!p) continue;
       if (p.ferryPetParked) returnParkedPet(ctx, p);
       const ride = p.ferryRide?.route === route.id ? p.ferryRide : null;
-      if (ride && p.ghost) {
-        // released aboard: the spirit went to its graveyard, and the body is
-        // carried on to the destination pier with the ship
-        if (p.corpsePos) {
-          const to = route.berths[ride.to].landing;
-          p.corpsePos = ctx.groundPos(to.x, to.z);
-        }
+      const corpse = p.corpsePos;
+      if (
+        ride &&
+        p.ghost &&
+        corpse &&
+        aboardDeck(hull, posePrev, WATER_LEVEL, corpse.x, corpse.y, corpse.z)
+      ) {
+        // released aboard: the spirit went to its graveyard, and the body the
+        // ship carried is set down on the destination pier. Only a corpse on
+        // this deck: a spirit that boards under way just rides, and a body left
+        // on land stays where it fell.
+        const to = route.berths[ride.to].landing;
+        p.corpsePos = ctx.groundPos(to.x, to.z);
         endRide(ctx, p);
         continue;
       }
