@@ -241,6 +241,7 @@ import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
 import { DayNightDialPainter } from './day_night_dial_painter';
+import { DeathRecapDialog } from './death_recap_dialog';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
 import { deedBorderSlug } from './deed_border_view';
@@ -1609,6 +1610,8 @@ export class Hud {
   private partyFramesEl = $('#party-frames');
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
+  private deathRecapBtnEl = $('#death-recap-btn');
+  private deathRecapDialog!: DeathRecapDialog;
   private ghostPromptEl = $('#ghost-prompt');
   private resurrectionPromptEl: HTMLElement | null = null;
   private guildInvitePromptEl: HTMLElement | null = null;
@@ -2190,6 +2193,7 @@ export class Hud {
       uiScale: getUiScale,
       isMobileLayout: () => this.isMobileLayout(),
       storage: localStorage,
+      sendChat: (line) => this.sim.chat(line),
       // The meters' tab menu paints into the ONE shared #ctx-menu box through
       // the same seat/clamp/bind helpers every other HUD popup uses.
       openMenu: (items, x, y, onSelect) =>
@@ -2216,6 +2220,14 @@ export class Hud {
       tooltipVisibleFor: (el) =>
         this.tooltipOwner.current() === el && this.tooltipEl.style.display !== 'none',
       worldToScreen: (x, y, z) => this.renderer.worldToScreen(x, y, z),
+    });
+    this.deathRecapDialog = new DeathRecapDialog({
+      root: () => $('#death-recap-dialog'),
+      getLatestRecap: () => this.meters.getLatestDeathRecap(this.sim.playerId),
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      hideTooltip: () => this.hideTooltip(),
+      previewResolvedAbility: (id) => this.previewResolvedAbility(id),
+      abilityTooltip: (res) => this.abilityTooltip(res),
     });
     this.targetAurasWindow = new TargetAurasWindow({
       root: $('#target-auras-window'),
@@ -2661,6 +2673,9 @@ export class Hud {
       // Thornhollow Fields releases like the open world: the spirit rises in the keep
       // graveyard and waits for the wave (the sim routes the destination).
       this.sim.releaseSpirit();
+    });
+    bindTouchTap(this.deathRecapBtnEl, () => {
+      this.deathRecapDialog.toggle();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
     document.addEventListener('pointerdown', (ev) => {
@@ -3497,6 +3512,9 @@ export class Hud {
         // Route through closeTutorialGreeting so the focus trap is released
         // and the modal is removed (the profession-tutorial precedent).
         this.closeTutorialGreeting();
+        break;
+      case 'death-recap-dialog':
+        this.deathRecapDialog.close();
         break;
       case 'options-menu':
         this.closeOptions();
@@ -6762,6 +6780,7 @@ export class Hud {
     refreshHudFrameGroupLabels(document, HUD_FRAME_SPECS);
     this.doomMeter.relocalize();
     this.optionsWindow.relocalize();
+    this.meters.relocalize();
     // The Target dots frame's accessible name is written once in its painter's
     // constructor, so it is the one string in that frame a runtime language
     // switch would otherwise leave in the previous locale (the row text itself
@@ -9291,7 +9310,10 @@ export class Hud {
     // (the wave is the one way back, enforced server-side too).
     const ghostInBgMatch = !!this.sim.bgInfo?.match;
     if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
-    if (!p.dead) this.closeResurrectionPrompt();
+    if (!p.dead) {
+      this.closeResurrectionPrompt();
+      if (this.deathRecapDialog.isOpen()) this.deathRecapDialog.close();
+    }
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
     this.setDisplay(this.ghostHintEl, ghost && !ghostInBgMatch ? 'block' : 'none');

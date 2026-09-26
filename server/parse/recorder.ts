@@ -319,7 +319,8 @@ export class ParseRecorder {
     const enrichment: EventEnrichment | undefined =
       sourceOwnerId !== null ? { ownerId: sourceOwnerId } : undefined;
     fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
-    fight.noteHeal(tick, sourceOwnerId ?? ev.sourceId, ev.amount, 0);
+    const creditSource = sourceOwnerId ?? ev.sourceId;
+    fight.noteHeal(tick, creditSource, ev.amount, 0);
   }
 
   private routeAura(ev: SimEvent & { type: 'aura' }, tick: number): void {
