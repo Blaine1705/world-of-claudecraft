@@ -693,7 +693,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
   // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
   // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
-  '6378ea87a26d8bf12d9a51e5a15ebae03040cae83e6a3d6d981064e9b40ead52';
+  // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
+  '8fd095c3a6d6e895c097dfd9ea28d388c66e2a995831eb9b82617d4bc17aff86';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -2,160 +2,29 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4169,
+    "files": 4177,
     "harvestedFiles": 3948,
     "carried": {
-      "tests/ability_imbue_text.test.ts": {
-        "ms": 1954,
+      "tests/ability_vfx_cast_all_or_nothing.test.ts": {
+        "ms": 360,
         "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
         "runs": [
-          1954
+          364,
+          360,
+          356
         ]
       },
-      "tests/ability_line_of_sight.test.ts": {
-        "ms": 7,
+      "tests/ability_vfx_cast_requirements.test.ts": {
+        "ms": 4517,
         "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
         "runs": [
-          7
-        ]
-      },
-      "tests/ability_material_live_draw_parity.test.ts": {
-        "ms": 71,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          71
-        ]
-      },
-      "tests/ability_vfx_draped_pools.test.ts": {
-        "ms": 24,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          24
-        ]
-      },
-      "tests/ability_vfx_idle_visibility.test.ts": {
-        "ms": 9,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          9
-        ]
-      },
-      "tests/ability_vfx_instanced_pools.test.ts": {
-        "ms": 18,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          18
-        ]
-      },
-      "tests/absorb_credit.test.ts": {
-        "ms": 2821,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          2821
-        ]
-      },
-      "tests/absorb_overlay_gate.test.ts": {
-        "ms": 11,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          11
-        ]
-      },
-      "tests/account_ledger.test.ts": {
-        "ms": 14,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          14
-        ]
-      },
-      "tests/account_ledger_sim.test.ts": {
-        "ms": 3670,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          3670
-        ]
-      },
-      "tests/account_ledger_ui.test.ts": {
-        "ms": 14,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          14
-        ]
-      },
-      "tests/account_ledger_wire.test.ts": {
-        "ms": 3181,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          3181
-        ]
-      },
-      "tests/action_bar_bind_banner.test.ts": {
-        "ms": 178,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          178
-        ]
-      },
-      "tests/action_bar_bind_banner_placement.test.ts": {
-        "ms": 175,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          175
-        ]
-      },
-      "tests/action_bar_icon_bg.test.ts": {
-        "ms": 8,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          8
-        ]
-      },
-      "tests/action_bar_restore.test.ts": {
-        "ms": 30,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          30
-        ]
-      },
-      "tests/action_bar_secondary_requirements.test.ts": {
-        "ms": 1989,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          1989
+          4516,
+          4577,
+          4517
         ]
       },
       "tests/action_bar_spectate.test.ts": {
@@ -167,15 +36,6 @@
           14
         ]
       },
-      "tests/action_cam_core.test.ts": {
-        "ms": 14,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          14
-        ]
-      },
       "tests/active_kit_prewarm.test.ts": {
         "ms": 69,
         "method": "local-median",
@@ -183,150 +43,6 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           69
-        ]
-      },
-      "tests/ambient_quest_markers.test.ts": {
-        "ms": 25,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          25
-        ]
-      },
-      "tests/aura_bar_side.test.ts": {
-        "ms": 18,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          18
-        ]
-      },
-      "tests/aura_cue_catalog.test.ts": {
-        "ms": 12,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          12
-        ]
-      },
-      "tests/aura_ids.test.ts": {
-        "ms": 10,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          10
-        ]
-      },
-      "tests/aura_track_catalog.test.ts": {
-        "ms": 5403,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          5403
-        ]
-      },
-      "tests/aura_track_host.test.ts": {
-        "ms": 144,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          144
-        ]
-      },
-      "tests/aura_track_painter.test.ts": {
-        "ms": 86,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          86
-        ]
-      },
-      "tests/aura_track_view.test.ts": {
-        "ms": 12,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          12
-        ]
-      },
-      "tests/aura_watchlist_core.test.ts": {
-        "ms": 12,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          12
-        ]
-      },
-      "tests/awarded_loot_hold.test.ts": {
-        "ms": 18599,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          18599
-        ]
-      },
-      "tests/bag_item_action_menu_destroy.test.ts": {
-        "ms": 21,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          21
-        ]
-      },
-      "tests/bags_pool_honest_refusal.test.ts": {
-        "ms": 1800,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          1800
-        ]
-      },
-      "tests/bags_window_materials_only_cells.test.ts": {
-        "ms": 44,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          44
-        ]
-      },
-      "tests/bags_window_party_trade.test.ts": {
-        "ms": 31,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          31
-        ]
-      },
-      "tests/bags_window_touch_destroy_menu.test.ts": {
-        "ms": 48,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          48
-        ]
-      },
-      "tests/bags_window_trade_quantity.test.ts": {
-        "ms": 88,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local release v0.44 candidate measurement pending full CI harvest",
-        "runs": [
-          88
         ]
       },
       "tests/baked_pool_prewarm.test.ts": {
@@ -347,15 +63,6 @@
           23
         ]
       },
-      "tests/bug_report_error_text.test.ts": {
-        "ms": 5,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          5
-        ]
-      },
       "tests/camera_impact_core.test.ts": {
         "ms": 12,
         "method": "local-median",
@@ -365,49 +72,48 @@
           12
         ]
       },
-      "tests/camera_view_settings.test.ts": {
-        "ms": 14,
+      "tests/cast_admission_core.test.ts": {
+        "ms": 4,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
         "runs": [
-          14
+          3,
+          4,
+          4
         ]
       },
-      "tests/cat_form_energy.test.ts": {
-        "ms": 10179,
+      "tests/cast_vfx_engine_family.test.ts": {
+        "ms": 158,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
         "runs": [
-          10179
+          159,
+          157,
+          158
         ]
       },
-      "tests/chat_rate_limit.test.ts": {
-        "ms": 3,
+      "tests/cast_vfx_first_reads.test.ts": {
+        "ms": 22,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
         "runs": [
-          3
+          23,
+          22,
+          22
         ]
       },
-      "tests/chrome_profile_dir.test.ts": {
-        "ms": 10,
+      "tests/cast_vfx_spawn_gate.test.ts": {
+        "ms": 497,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
         "runs": [
-          10
-        ]
-      },
-      "tests/class_health_table.test.ts": {
-        "ms": 2280,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          2280
+          499,
+          493,
+          497
         ]
       },
       "tests/class_vfx_prewarm_homes.test.ts": {
@@ -417,51 +123,6 @@
         "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
           192
-        ]
-      },
-      "tests/click_claimed_focus.test.ts": {
-        "ms": 8,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          8
-        ]
-      },
-      "tests/client_api_origin.test.ts": {
-        "ms": 1229,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          1229
-        ]
-      },
-      "tests/clock_memo.test.ts": {
-        "ms": 55,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          55
-        ]
-      },
-      "tests/combat_res_released_ghost.test.ts": {
-        "ms": 5729,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          5729
-        ]
-      },
-      "tests/controller_options_view.test.ts": {
-        "ms": 13,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          13
         ]
       },
       "tests/cooldown_manager_auras.test.ts": {
@@ -519,15 +180,6 @@
           1614
         ]
       },
-      "tests/craft_row_text.test.ts": {
-        "ms": 16,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          16
-        ]
-      },
       "tests/crest_prewarm.test.ts": {
         "ms": 116,
         "method": "local-median",
@@ -535,33 +187,6 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           116
-        ]
-      },
-      "tests/css_root_anchored_has.test.ts": {
-        "ms": 1153,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          1153
-        ]
-      },
-      "tests/deck_floor.test.ts": {
-        "ms": 9,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          9
-        ]
-      },
-      "tests/deeds_restore.test.ts": {
-        "ms": 1806,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          1806
         ]
       },
       "tests/deferred_contact_bursts.test.ts": {
@@ -573,85 +198,15 @@
           9
         ]
       },
-      "tests/deposit_all_status_text.test.ts": {
-        "ms": 7,
+      "tests/draw_program_signature_core.test.ts": {
+        "ms": 9,
         "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
         "runs": [
-          7
-        ]
-      },
-      "tests/desktop_host_diag.test.ts": {
-        "ms": 13,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          13
-        ]
-      },
-      "tests/dev_town_teleport.test.ts": {
-        "ms": 429,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          429
-        ]
-      },
-      "tests/effective_stats.test.ts": {
-        "ms": 6,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          6
-        ]
-      },
-      "tests/electron_host_diag.test.ts": {
-        "ms": 29,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          29
-        ]
-      },
-      "tests/entity_ground_sample_core.test.ts": {
-        "ms": 11,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          11
-        ]
-      },
-      "tests/error_toast_controller.test.ts": {
-        "ms": 44,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          44
-        ]
-      },
-      "tests/far_bake_group_key.test.ts": {
-        "ms": 8,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          8
-        ]
-      },
-      "tests/far_bake_uv_pad.test.ts": {
-        "ms": 1589,
-        "method": "local-median",
-        "measured": "2026-09-21",
-        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
-        "runs": [
-          1589
+          8,
+          9,
+          9
         ]
       },
       "tests/fct_stage_core.test.ts": {
@@ -661,15 +216,6 @@
         "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
         "runs": [
           15
-        ]
-      },
-      "tests/feast_named_slot_item.test.ts": {
-        "ms": 1410,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          1410
         ]
       },
       "tests/focus_targets_controller.test.ts": {
@@ -717,15 +263,6 @@
           46
         ]
       },
-      "tests/frame_rate_cap_setting.test.ts": {
-        "ms": 10,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          10
-        ]
-      },
       "tests/fury_audio_integration.test.ts": {
         "ms": 359,
         "method": "local-median",
@@ -751,24 +288,6 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           37
-        ]
-      },
-      "tests/game_renderer.test.ts": {
-        "ms": 8,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          8
-        ]
-      },
-      "tests/gpu_timer_probe_core.test.ts": {
-        "ms": 24,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          24
         ]
       },
       "tests/harvest_choreography.test.ts": {
@@ -940,24 +459,6 @@
           86
         ]
       },
-      "tests/hunter_trailbreak_arc.test.ts": {
-        "ms": 10,
-        "method": "local-median",
-        "measured": "2026-09-21",
-        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
-        "runs": [
-          10
-        ]
-      },
-      "tests/hunter_trailbreak_terrain.test.ts": {
-        "ms": 2800,
-        "method": "local-median",
-        "measured": "2026-09-21",
-        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
-        "runs": [
-          2800
-        ]
-      },
       "tests/impact_contact.test.ts": {
         "ms": 7,
         "method": "local-median",
@@ -967,35 +468,6 @@
           7
         ]
       },
-      "tests/input_seq_fold.test.ts": {
-        "ms": 7,
-        "method": "local-median",
-        "measured": "2026-09-21",
-        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
-        "runs": [
-          7
-        ]
-      },
-      "tests/instanced_dither_fade.test.ts": {
-        "ms": 14,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          12,
-          14,
-          15
-        ]
-      },
-      "tests/interaction_input.test.ts": {
-        "ms": 16,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          16
-        ]
-      },
       "tests/ironguard_audio.test.ts": {
         "ms": 402,
         "method": "local-median",
@@ -1003,44 +475,6 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           402
-        ]
-      },
-      "tests/kill_participation.test.ts": {
-        "ms": 6,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          6
-        ]
-      },
-      "tests/occluder_dither_fade.test.ts": {
-        "ms": 7,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          6,
-          8,
-          7
-        ]
-      },
-      "tests/player_portrait_core.test.ts": {
-        "ms": 7,
-        "method": "local-median",
-        "measured": "2026-09-21",
-        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
-        "runs": [
-          7
-        ]
-      },
-      "tests/portrait_chip_composed_hydrate.test.ts": {
-        "ms": 51,
-        "method": "local-median",
-        "measured": "2026-09-21",
-        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
-        "runs": [
-          51
         ]
       },
       "tests/practice_dps_controller.test.ts": {
@@ -1076,13 +510,15 @@
           11
         ]
       },
-      "tests/raid_released_ghost_loot.test.ts": {
-        "ms": 1582,
+      "tests/renderer_ability_presentation.test.ts": {
+        "ms": 73,
         "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
         "runs": [
-          1582
+          71,
+          73,
+          75
         ]
       },
       "tests/ribbon_contact_admission.test.ts": {
@@ -1121,39 +557,6 @@
           16
         ]
       },
-      "tests/shader_ablation_transforms.test.ts": {
-        "ms": 9,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          8,
-          9,
-          9
-        ]
-      },
-      "tests/shader_harvest_corpus.test.ts": {
-        "ms": 7,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          7,
-          7,
-          7
-        ]
-      },
-      "tests/shader_link_bench_report.test.ts": {
-        "ms": 4,
-        "method": "local-median",
-        "measured": "2026-09-22",
-        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
-        "runs": [
-          4,
-          4,
-          5
-        ]
-      },
       "tests/shield_contact_outcomes.test.ts": {
         "ms": 69,
         "method": "local-median",
@@ -1190,42 +593,6 @@
           5
         ]
       },
-      "tests/target_echo_core.test.ts": {
-        "ms": 11,
-        "method": "local-median",
-        "measured": "2026-09-21",
-        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
-        "runs": [
-          11
-        ]
-      },
-      "tests/target_frame_descriptor.test.ts": {
-        "ms": 15,
-        "method": "local-median",
-        "measured": "2026-09-21",
-        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
-        "runs": [
-          15
-        ]
-      },
-      "tests/town_focus_pending.test.ts": {
-        "ms": 4276,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
-        "runs": [
-          4276
-        ]
-      },
-      "tests/tracker_collapse_settings.test.ts": {
-        "ms": 2,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
-        "runs": [
-          2
-        ]
-      },
       "tests/twinstrike_choreography.test.ts": {
         "ms": 18,
         "method": "local-median",
@@ -1251,15 +618,6 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           2509
-        ]
-      },
-      "tests/vault_search.test.ts": {
-        "ms": 44,
-        "method": "local-median",
-        "measured": "2026-09-23",
-        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
-        "runs": [
-          44
         ]
       },
       "tests/warfare_season2.test.ts": {
@@ -2034,6 +1392,736 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           7
+        ]
+      },
+      "tests/ability_imbue_text.test.ts": {
+        "ms": 1954,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1954
+        ]
+      },
+      "tests/ability_line_of_sight.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          7
+        ]
+      },
+      "tests/ability_material_live_draw_parity.test.ts": {
+        "ms": 71,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          71
+        ]
+      },
+      "tests/ability_vfx_draped_pools.test.ts": {
+        "ms": 24,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          24
+        ]
+      },
+      "tests/ability_vfx_idle_visibility.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          9
+        ]
+      },
+      "tests/ability_vfx_instanced_pools.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          18
+        ]
+      },
+      "tests/absorb_credit.test.ts": {
+        "ms": 2821,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          2821
+        ]
+      },
+      "tests/absorb_overlay_gate.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          11
+        ]
+      },
+      "tests/account_ledger.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          14
+        ]
+      },
+      "tests/account_ledger_sim.test.ts": {
+        "ms": 3670,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          3670
+        ]
+      },
+      "tests/account_ledger_ui.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          14
+        ]
+      },
+      "tests/account_ledger_wire.test.ts": {
+        "ms": 3181,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          3181
+        ]
+      },
+      "tests/action_bar_bind_banner.test.ts": {
+        "ms": 178,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          178
+        ]
+      },
+      "tests/action_bar_bind_banner_placement.test.ts": {
+        "ms": 175,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          175
+        ]
+      },
+      "tests/action_bar_icon_bg.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          8
+        ]
+      },
+      "tests/action_bar_restore.test.ts": {
+        "ms": 30,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          30
+        ]
+      },
+      "tests/action_bar_secondary_requirements.test.ts": {
+        "ms": 1989,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1989
+        ]
+      },
+      "tests/action_cam_core.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          14
+        ]
+      },
+      "tests/ambient_quest_markers.test.ts": {
+        "ms": 25,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          25
+        ]
+      },
+      "tests/aura_bar_side.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          18
+        ]
+      },
+      "tests/aura_cue_catalog.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          12
+        ]
+      },
+      "tests/aura_ids.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          10
+        ]
+      },
+      "tests/aura_track_catalog.test.ts": {
+        "ms": 5403,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          5403
+        ]
+      },
+      "tests/aura_track_host.test.ts": {
+        "ms": 144,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          144
+        ]
+      },
+      "tests/aura_track_painter.test.ts": {
+        "ms": 86,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          86
+        ]
+      },
+      "tests/aura_track_view.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          12
+        ]
+      },
+      "tests/aura_watchlist_core.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          12
+        ]
+      },
+      "tests/awarded_loot_hold.test.ts": {
+        "ms": 18599,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          18599
+        ]
+      },
+      "tests/bag_item_action_menu_destroy.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          21
+        ]
+      },
+      "tests/bags_pool_honest_refusal.test.ts": {
+        "ms": 1800,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          1800
+        ]
+      },
+      "tests/bags_window_materials_only_cells.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          44
+        ]
+      },
+      "tests/bags_window_party_trade.test.ts": {
+        "ms": 31,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          31
+        ]
+      },
+      "tests/bags_window_touch_destroy_menu.test.ts": {
+        "ms": 48,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          48
+        ]
+      },
+      "tests/bags_window_trade_quantity.test.ts": {
+        "ms": 88,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          88
+        ]
+      },
+      "tests/bug_report_error_text.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          5
+        ]
+      },
+      "tests/camera_view_settings.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          14
+        ]
+      },
+      "tests/cat_form_energy.test.ts": {
+        "ms": 10179,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          10179
+        ]
+      },
+      "tests/chat_rate_limit.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
+        "runs": [
+          3
+        ]
+      },
+      "tests/chrome_profile_dir.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          10
+        ]
+      },
+      "tests/class_health_table.test.ts": {
+        "ms": 2280,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          2280
+        ]
+      },
+      "tests/click_claimed_focus.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          8
+        ]
+      },
+      "tests/client_api_origin.test.ts": {
+        "ms": 1229,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1229
+        ]
+      },
+      "tests/clock_memo.test.ts": {
+        "ms": 55,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          55
+        ]
+      },
+      "tests/combat_res_released_ghost.test.ts": {
+        "ms": 5729,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          5729
+        ]
+      },
+      "tests/controller_options_view.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          13
+        ]
+      },
+      "tests/craft_row_text.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          16
+        ]
+      },
+      "tests/css_root_anchored_has.test.ts": {
+        "ms": 1153,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1153
+        ]
+      },
+      "tests/deck_floor.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          9
+        ]
+      },
+      "tests/deeds_restore.test.ts": {
+        "ms": 1806,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1806
+        ]
+      },
+      "tests/deposit_all_status_text.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          7
+        ]
+      },
+      "tests/desktop_host_diag.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          13
+        ]
+      },
+      "tests/dev_town_teleport.test.ts": {
+        "ms": 429,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          429
+        ]
+      },
+      "tests/effective_stats.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          6
+        ]
+      },
+      "tests/electron_host_diag.test.ts": {
+        "ms": 29,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          29
+        ]
+      },
+      "tests/entity_ground_sample_core.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          11
+        ]
+      },
+      "tests/error_toast_controller.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          44
+        ]
+      },
+      "tests/far_bake_group_key.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          8
+        ]
+      },
+      "tests/far_bake_uv_pad.test.ts": {
+        "ms": 1589,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          1589
+        ]
+      },
+      "tests/feast_named_slot_item.test.ts": {
+        "ms": 1410,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1410
+        ]
+      },
+      "tests/frame_rate_cap_setting.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          10
+        ]
+      },
+      "tests/game_renderer.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          8
+        ]
+      },
+      "tests/gpu_timer_probe_core.test.ts": {
+        "ms": 24,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          24
+        ]
+      },
+      "tests/hunter_trailbreak_arc.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          10
+        ]
+      },
+      "tests/hunter_trailbreak_terrain.test.ts": {
+        "ms": 2800,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          2800
+        ]
+      },
+      "tests/input_seq_fold.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          7
+        ]
+      },
+      "tests/instanced_dither_fade.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          12,
+          14,
+          15
+        ]
+      },
+      "tests/interaction_input.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          16
+        ]
+      },
+      "tests/kill_participation.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          6
+        ]
+      },
+      "tests/occluder_dither_fade.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          6,
+          8,
+          7
+        ]
+      },
+      "tests/player_portrait_core.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          7
+        ]
+      },
+      "tests/portrait_chip_composed_hydrate.test.ts": {
+        "ms": 51,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          51
+        ]
+      },
+      "tests/raid_released_ghost_loot.test.ts": {
+        "ms": 1582,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1582
+        ]
+      },
+      "tests/shader_ablation_transforms.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          8,
+          9,
+          9
+        ]
+      },
+      "tests/shader_harvest_corpus.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/shader_link_bench_report.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          4,
+          4,
+          5
+        ]
+      },
+      "tests/target_echo_core.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          11
+        ]
+      },
+      "tests/target_frame_descriptor.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          15
+        ]
+      },
+      "tests/town_focus_pending.test.ts": {
+        "ms": 4276,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
+        "runs": [
+          4276
+        ]
+      },
+      "tests/tracker_collapse_settings.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
+        "runs": [
+          2
+        ]
+      },
+      "tests/vault_search.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          44
         ]
       }
     },
@@ -6211,5 +6299,13 @@
   "tests/zone_streaming.test.ts": 11,
   "tests/zone_transition.test.ts": 5,
   "tests/zone_warm_tracker.test.ts": 26,
-  "tests/zones_command.test.ts": 2999
+  "tests/zones_command.test.ts": 2999,
+  "tests/ability_vfx_cast_all_or_nothing.test.ts": 360,
+  "tests/ability_vfx_cast_requirements.test.ts": 4517,
+  "tests/cast_admission_core.test.ts": 4,
+  "tests/cast_vfx_engine_family.test.ts": 158,
+  "tests/cast_vfx_first_reads.test.ts": 22,
+  "tests/cast_vfx_spawn_gate.test.ts": 497,
+  "tests/draw_program_signature_core.test.ts": 9,
+  "tests/renderer_ability_presentation.test.ts": 73
 }

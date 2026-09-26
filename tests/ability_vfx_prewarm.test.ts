@@ -11,11 +11,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as contactAssets from '../src/render/ability_vfx/contact_assets';
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
-  abilityVfxCompileMaterials,
+  abilityVfxGateMaterials,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
 import * as productionAssets from '../src/render/ability_vfx/production_assets';
+import { tagCastVfxEngine, tagCastVfxKit } from '../src/render/cast_vfx_family';
 
 // The canvas textures are procedurally drawn, so a plain Node run needs a 2D
 // context stub (same shape as the ability-VFX and vfx suites use).
@@ -55,7 +56,7 @@ function vfxMesh(name: string, material: THREE.Material | THREE.Material[]): THR
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
   mesh.name = name;
   mesh.visible = false;
-  mesh.userData.renderCategory = 'vfx';
+  tagCastVfxEngine(mesh);
   return mesh;
 }
 
@@ -141,15 +142,39 @@ describe('collectAbilityVfxCompileTargets', () => {
     scene.add(vfxMesh('opaque', new THREE.MeshBasicMaterial()));
     const cloud = new THREE.Points(new THREE.BufferGeometry(), proto.clone());
     cloud.name = 'cloud';
-    cloud.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(cloud);
     scene.add(cloud);
     const targets = collectAbilityVfxCompileTargets(scene);
     expect(targets.map((target) => target.object.name)).toEqual(['slot-0', 'opaque', 'cloud']);
-    const gated = abilityVfxCompileMaterials(scene);
+    const gated = abilityVfxGateMaterials(scene);
     // The gate asks about the SAME representatives the units compile.
     expect(gated).toEqual(
       targets.map((target) => (target.object as THREE.Mesh).material as THREE.Material),
     );
+  });
+
+  it('puts the engine family first, then the kit, and lets a gated draw represent a shared program', () => {
+    // The resume lane is serial in unit order, so the programs the cast gate
+    // waits on must not queue behind a class pool walked ahead of them.
+    const scene = new THREE.Scene();
+    const shared = new THREE.MeshBasicMaterial({ transparent: true });
+    const kitShared = new THREE.MeshBasicMaterial({ wireframe: true });
+    const bespokeTwin = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shared.clone());
+    bespokeTwin.name = 'bespoke-twin';
+    bespokeTwin.userData.renderCategory = 'vfx';
+    const kitTwin = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), kitShared.clone());
+    kitTwin.name = 'kit-twin';
+    kitTwin.userData.renderCategory = 'vfx';
+    const bespoke = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial());
+    bespoke.name = 'bespoke';
+    bespoke.userData.renderCategory = 'vfx';
+    const crest = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), kitShared);
+    crest.name = 'crest';
+    tagCastVfxKit(crest);
+    scene.add(bespokeTwin, kitTwin, bespoke, crest, vfxMesh('ring', shared));
+    const targets = collectAbilityVfxCompileTargets(scene);
+    expect(targets.map((target) => target.object.name)).toEqual(['ring', 'crest', 'bespoke']);
+    expect(abilityVfxGateMaterials(scene)).toEqual([shared, kitShared]);
   });
 
   it('ignores everything that is not a tagged VFX mesh', () => {
@@ -215,7 +240,7 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
     // The program links are the debt arm (cast_vfx_prewarm.ts): the lazy
     // stand-ins' stage + link, then one unit per pooled program.
     expect(entry.slice(programsStart)).toContain(
-      'resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],',
+      'resumeProgramUnits: () => [...castVfxUnits(), ...abilityMaterialSlot.resumeUnits()],',
     );
     expect(renderer).toContain(
       'castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);',

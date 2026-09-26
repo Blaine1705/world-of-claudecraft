@@ -28,10 +28,7 @@ import { closeSync, existsSync, openSync, readSync } from 'node:fs';
 import path from 'node:path';
 import * as THREE from 'three';
 import { afterAll, describe, expect, it, vi } from 'vitest';
-import {
-  abilityVfxCompileMaterials,
-  collectAbilityVfxCompileTargets,
-} from '../src/render/ability_vfx';
+import { collectAbilityVfxCompileTargets } from '../src/render/ability_vfx';
 import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
 import { characterWeaponAuraInto, characterWeaponAuraMode } from '../src/render/character_effects';
 import {
@@ -349,12 +346,23 @@ describe('weapon-aura stand-ins carry every live aura program', () => {
   it.each(['ultra', 'low'] as const)('%s: every aura program outlives teardowns', (tier) => {
     activateTier(tier);
     // The boot entry compiles one representative per signature
-    // (abilityVfxCompileMaterials over the scene the group joins at renderer
+    // (collectAbilityVfxCompileTargets over the scene the group joins at renderer
     // construction). Each compiled material holds its programs; three drops a
     // program when its last holder is disposed (WebGLPrograms.releaseProgram).
     const scene = new THREE.Scene();
     scene.add(buildCastVfxBasicStandIns());
-    const compiled = abilityVfxCompileMaterials(scene);
+    const compiled = [
+      ...new Set(
+        collectAbilityVfxCompileTargets(scene).flatMap((target) => {
+          const material = (target.object as THREE.Mesh).material as
+            | THREE.Material
+            | THREE.Material[]
+            | undefined;
+          if (!material) return [];
+          return Array.isArray(material) ? material : [material];
+        }),
+      ),
+    ];
     const holders = new Map<string, number>();
     const acquire = (material: THREE.Material, object: THREE.Object3D) => {
       const keys = threeProgramKeys(material, object).split('\n');

@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import { boundQuadSize, IMPACT_QUAD_MAX_SCREEN_FRACTION } from '../vfx_screen_bounds_core';
 import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
 import {
@@ -57,6 +63,8 @@ export function asFlipbookStyle(s: string): FlipbookStyle {
 }
 
 export class ImpactFlipbooks {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: FlipSlot[] = [];
   private next = 0;
   private readonly geometry: THREE.PlaneGeometry;
@@ -154,7 +162,7 @@ export class ImpactFlipbooks {
       // Vertical, additive, depth-tested: outside the floor ladder (the shock rings
       // sit on it), so this order only sets blend arithmetic among the pooled sheets.
       mesh.renderOrder = 8;
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxEngine(mesh);
       mesh.onBeforeRender = (renderer, _scene, _camera, _geometry, material) => {
         const target = renderer.getRenderTarget();
         (material as THREE.ShaderMaterial).uniforms.uLowRangeTarget.value =
@@ -192,7 +200,7 @@ export class ImpactFlipbooks {
     groundY = Number.NaN,
     worldFacing = Number.NaN,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const warrior = warriorFlashStyle(style);
     const contact = warrior || isContactSheet(style);
     const kit = warrior

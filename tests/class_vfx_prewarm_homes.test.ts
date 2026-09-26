@@ -1,7 +1,7 @@
 // The class VFX pools that live outside AbilityVfxFx still need a prewarm
-// home. The vfx.ability-primitives entry and the cast gate both walk the
-// scene through collectAbilityVfxCompileTargets / abilityVfxCompileMaterials,
-// which select on each object's OWN renderCategory tag. A module that tags
+// home. The vfx.ability-primitives entry walks the scene through
+// collectAbilityVfxCompileTargets, which selects on each object's OWN
+// renderCategory tag. A module that tags
 // only its (material-less, hidden) root group is invisible to that walk, so
 // its programs link live on the first cast. Each module below must hand the
 // walk every drawable it built.
@@ -10,9 +10,10 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import {
-  abilityVfxCompileMaterials,
+  abilityVfxGateMaterials,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
+import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
 import { DrainLifeVfx } from '../src/render/drain_life_vfx';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { NeedleOfFateVfx } from '../src/render/needle_of_fate_vfx';
@@ -50,50 +51,83 @@ function materialsOf(object: Drawable): THREE.Material[] {
   return Array.isArray(object.material) ? object.material : [object.material];
 }
 
+/** The engine ribbon's programs: a class pool that embeds an
+ *  AbilityVfxRibbons (Sentence's lash) draws the engine's own program, which
+ *  the fx's ribbons already hold in the gate, so it adds no gate entry. */
+function engineRibbonSignatures(): Set<string> {
+  const scene = new THREE.Scene();
+  new AbilityVfxRibbons(scene, () => null, TEST_TEXTURES);
+  return new Set(drawsUnder(scene).map((draw) => drawProgramSignature(draw.object, draw.material)));
+}
+
 /** Every draw under `root`, as three would key its program set, is linked by
- *  a compile unit and gated by the cast gate: one representative per
- *  program, since a clone sharing a linked program reuses it on its first
- *  draw. */
+ *  a compile unit: one representative per program, since a clone sharing a
+ *  linked program reuses it on its first draw. None of its own programs holds
+ *  the cast gate: the painter never draws these pools, so the gate waits on
+ *  the engine and kit families (tests/cast_vfx_engine_family.test.ts). */
 function expectEveryDrawableCollected(scene: THREE.Scene, root: THREE.Object3D): void {
   const drawables = drawablesUnder(root);
   expect(drawables.length).toBeGreaterThan(0);
-  const gatedSet = new Set(abilityVfxCompileMaterials(scene));
+  const engine = engineRibbonSignatures();
+  for (const material of abilityVfxGateMaterials(scene)) {
+    const draw = drawsUnder(scene).find((candidate) => candidate.material === material);
+    const signature = draw ? drawProgramSignature(draw.object, draw.material) : material.uuid;
+    expect(engine.has(signature), `${draw?.object.name ?? material.type} gated`).toBe(true);
+  }
   const linked = new Set<string>();
-  const gated = new Set<string>();
   for (const target of collectAbilityVfxCompileTargets(scene)) {
     for (const draw of drawsUnder(target.object)) {
-      const key = threeProgramKeys(draw.material, draw.object);
-      linked.add(key);
-      if (gatedSet.has(draw.material)) gated.add(key);
+      linked.add(threeProgramKeys(draw.material, draw.object));
     }
   }
   for (const drawable of drawables) {
     for (const material of materialsOf(drawable)) {
       const key = threeProgramKeys(material, drawable);
-      expect(gated.has(key), `${drawable.name || drawable.type} gated`).toBe(true);
       expect(linked.has(key), `${drawable.name || drawable.type} linked`).toBe(true);
     }
   }
 }
 
-/** One compile unit and one gate entry per distinct program signature, no
- *  signature ever covering two of three's programs (that would let the gate
- *  open on a program no unit linked), and no more units than three's
- *  programs split by draw kind, material type and wireframe, the axes the
- *  signature keeps apart where three can share one program (a
- *  LineBasicMaterial lash and a MeshBasicMaterial disc). Keyed by material
- *  instance, the same pools were 1 (Drain Life's clones already shared a
- *  source), 7, 217 / 105 and 184 / 104 units. */
-function expectOneUnitPerProgram(pool: string, scene: THREE.Scene): void {
+/** Compile units per pool (the whole scene the pool's constructor built),
+ *  keyed by program. Keyed by material instance, the same pools were 1
+ *  (Drain Life's 36 ShaderMaterial clones already shared a source), 7,
+ *  217 / 105 and 184 / 104 units. A count may sit a little above three's own
+ *  distinct program count, never below it: the signature keeps the object
+ *  kind and the material type apart where three can share one program (a
+ *  LineBasicMaterial lash and a MeshBasicMaterial disc), one idle-slot cache
+ *  hit each. A pool that grows past its pin carries a new program: re-pin it
+ *  on purpose. */
+const POOL_UNITS = {
+  drainLife: 1,
+  umbral: 4,
+  sentenceFull: 8,
+  sentenceLow: 4,
+  needleFull: 5,
+  needleLow: 3,
+} as const;
+
+/** Gate entries per pool: none of their own, and Sentence's lash, an embedded
+ *  engine AbilityVfxRibbons, the one engine program they draw (on both detail
+ *  levels, since the lash is not a detail cut). */
+const POOL_GATED = {
+  drainLife: 0,
+  umbral: 0,
+  sentenceFull: 1,
+  sentenceLow: 1,
+  needleFull: 0,
+  needleLow: 0,
+} as const;
+
+/** One compile unit per distinct program signature, and no signature ever
+ *  covering two of three's programs (that would leave a program no unit
+ *  linked). */
+function expectOneUnitPerProgram(pool: keyof typeof POOL_UNITS, scene: THREE.Scene): void {
   const keyOfSignature = new Map<string, string>();
   const programs = new Set<string>();
-  const bound = new Set<string>();
   for (const draw of drawsUnder(scene)) {
     if (draw.object.userData.renderCategory !== 'vfx') continue;
     const key = threeProgramKeys(draw.material, draw.object);
     programs.add(key);
-    const { wireframe } = draw.material as THREE.MeshBasicMaterial;
-    bound.add(`${key}|${draw.object.type}|${draw.material.type}|${wireframe}`);
     const signature = drawProgramSignature(draw.object, draw.material);
     const known = keyOfSignature.get(signature);
     if (known === undefined) keyOfSignature.set(signature, key);
@@ -101,8 +135,8 @@ function expectOneUnitPerProgram(pool: string, scene: THREE.Scene): void {
   }
   const units = collectAbilityVfxCompileTargets(scene).length;
   expect(units, `${pool} units`).toBe(keyOfSignature.size);
-  expect(abilityVfxCompileMaterials(scene), `${pool} gate entries`).toHaveLength(units);
-  expect(units, `${pool} units`).toBeLessThanOrEqual(bound.size);
+  expect(units, `${pool} units`).toBe(POOL_UNITS[pool]);
+  expect(abilityVfxGateMaterials(scene), `${pool} gated`).toHaveLength(POOL_GATED[pool]);
   expect(programs.size, `${pool} programs`).toBeLessThanOrEqual(units);
 }
 
@@ -116,7 +150,7 @@ describe('class VFX pools are reachable by the ability-VFX prewarm walk', () => 
       expect(slot.visible).toBe(false);
       expectEveryDrawableCollected(scene, slot);
     }
-    expectOneUnitPerProgram('Drain Life', scene);
+    expectOneUnitPerProgram('drainLife', scene);
   });
 
   it('Umbral Anchor: the sigil shader, the halo and shard meshes, and the wisp points', () => {
@@ -127,7 +161,7 @@ describe('class VFX pools are reachable by the ability-VFX prewarm walk', () => 
     const kinds = new Set(drawablesUnder(marker.group).map((object) => object.type));
     expect(kinds).toEqual(new Set(['Mesh', 'LineSegments', 'Points']));
     expectEveryDrawableCollected(scene, marker.group);
-    expectOneUnitPerProgram('Umbral Anchor', scene);
+    expectOneUnitPerProgram('umbral', scene);
   });
 
   for (const lowDetail of [false, true]) {
@@ -146,14 +180,14 @@ describe('class VFX pools are reachable by the ability-VFX prewarm walk', () => 
         expect(starburst, 'the full-detail starburst exists').toBeDefined();
       }
       expectEveryDrawableCollected(scene, vfx.group);
-      expectOneUnitPerProgram(`Sentence ${lowDetail ? 'low' : 'full'}`, scene);
+      expectOneUnitPerProgram(lowDetail ? 'sentenceLow' : 'sentenceFull', scene);
     });
 
     it(`Needle of Fate (${lowDetail ? 'low' : 'full'} detail): every windup, release, needle and impact`, () => {
       const scene = new THREE.Scene();
       const vfx = new NeedleOfFateVfx(scene, new THREE.PerspectiveCamera(), noAnchor, lowDetail);
       expectEveryDrawableCollected(scene, vfx.group);
-      expectOneUnitPerProgram(`Needle ${lowDetail ? 'low' : 'full'}`, scene);
+      expectOneUnitPerProgram(lowDetail ? 'needleLow' : 'needleFull', scene);
     });
   }
 });
@@ -164,6 +198,7 @@ const drawState = (root: THREE.Object3D): string[] =>
     ({ object, material }) =>
       `${object.uuid}|${object.userData.renderCategory}|${drawProgramSignature(object, material)}`,
   );
+
 /** Whether some draw under `root` is on screen: the play really spawned. */
 const shows = (root: THREE.Object3D): boolean =>
   drawsUnder(root).some(({ object }) => {
@@ -172,16 +207,19 @@ const shows = (root: THREE.Object3D): boolean =>
     }
     return true;
   });
+
 const at = (_id: number, _height: number, out: THREE.Vector3): boolean => {
   out.set(3, 0, 3);
   return true;
 };
+
 const anchored = {
   id: 1,
   auras: [
     { id: UMBRAL_ANCHOR_ID, kind: 'warlock_anchor', sourceId: 1, value: 0, value2: 0, value3: 0 },
   ],
 } as unknown as Entity;
+
 /** `update` takes the elapsed seconds; each frame is a thirtieth of one. */
 type Played = { root: THREE.Object3D; play: () => void; update: (time: number) => void };
 

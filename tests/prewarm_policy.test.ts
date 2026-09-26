@@ -1402,6 +1402,16 @@ describe('constrained skips that still resume in the background', () => {
     expect(prewarmEntryResumesAfterSkip('vfx.ability-primitives', constrained)).toBe(true);
   });
 
+  it('skips the cast first-reads entry at entry but resumes its links', () => {
+    // The hard-CC band, area ring and particle cloud are the programs a
+    // closed cast gate still draws: they resume as debt rather than linking
+    // cold on the first stun or area cast.
+    expect(prewarmEntryRuns('vfx.cast-first-reads', constrained)).toBe(false);
+    expect(prewarmEntryResumesAfterSkip('vfx.cast-first-reads', constrained)).toBe(true);
+    expect(prewarmEntryRuns('vfx.cast-first-reads', desktop)).toBe(true);
+    expect(prewarmEntryResumesAfterSkip('vfx.cast-first-reads', desktop)).toBe(false);
+  });
+
   it('never resumes an entry skipped for its GPU footprint', () => {
     for (const id of [
       'entities.mob-archetypes',

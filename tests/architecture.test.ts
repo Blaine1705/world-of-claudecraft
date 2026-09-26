@@ -734,6 +734,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
   'src/render/ambience_state_core.ts',
+  'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
   'src/render/ability_vfx/signature_core.ts',
   'src/render/ability_vfx/warrior_attention_core.ts',

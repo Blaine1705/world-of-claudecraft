@@ -63,6 +63,7 @@ import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { createAmbienceState, sampleAmbienceInto } from './ambience_state_core';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import { buildAoeRingMesh } from './aoe_ring_mesh';
 import { arrivalCoverActive, noteArrivalIfTeleported } from './arrival_cover';
 import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
@@ -115,6 +116,7 @@ import { CameraImpact, fiestaShakeX, fiestaShakeY } from './camera_impact_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import {
+  castVfxFirstReadsEntry,
   castVfxProgramUnits,
   castVfxStandInSlot,
   createSceneCastVfxReadiness,
@@ -1297,7 +1299,6 @@ export class Renderer {
   // A soft light pillar marking the local player's corpse during the ghost run.
   // Built lazily on first death, then just repositioned/toggled (no per-frame alloc).
   private corpseBeacon: CorpseBeacon | null = null;
-  private abilityMaterialStandIns: THREE.Material[] | null = null;
   private castVfxReadiness: CastVfxReadiness;
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
@@ -1882,6 +1883,7 @@ export class Renderer {
   // see src/render/ability_vfx/).
   private abilityVfx: AbilityVfx;
   private abilityVfxFx: AbilityVfxFx;
+  private abilityMaterialStandIns: THREE.Material[] = [];
   private needleOfFateVfx!: NeedleOfFateVfx;
   private sentenceVfx!: SentenceVfx;
   private lightPulses: LightPulses;
@@ -2888,17 +2890,9 @@ export class Renderer {
     );
     setRenderCategory(this.groundAimReticle.group, 'ui3d');
     for (let i = 0; i < CLICK_MARKER_POOL; i++) {
-      const mat = new THREE.MeshBasicMaterial({
-        transparent: true,
-        depthWrite: false,
-        depthTest: false,
-      });
-      const ring = new THREE.Mesh(aoeRingGeo, mat);
-      ring.visible = false;
-      ring.renderOrder = floorVfxRenderOrder('player', 9); // like the click marker
-      setRenderCategory(ring, 'ui3d');
+      const ring = buildAoeRingMesh(aoeRingGeo);
       this.scene.add(ring);
-      this.aoeRings.push({ ring, mat, radius: 1, elapsed: AOE_RING_LIFETIME });
+      this.aoeRings.push({ ring, mat: ring.material, radius: 1, elapsed: AOE_RING_LIFETIME });
     }
 
     // particle system: projectiles, impacts, heal glows, ambience
@@ -3023,8 +3017,7 @@ export class Renderer {
     this.scene.add(this.underwaterView.group);
     // Preserve release44 cast admission while the Warrior bindings own their detail.
     this.scene.add(buildCastVfxBasicStandIns());
-    const standIns = (): THREE.Material[] | null => this.abilityMaterialStandIns;
-    this.castVfxReadiness = createSceneCastVfxReadiness(this.scene, this.webgl, standIns);
+    this.castVfxReadiness = createSceneCastVfxReadiness(this.scene, this.webgl);
     const abilityPresentation = createRendererAbilityPresentation({
       scene: this.scene, camera: this.camera, vfx: this.vfx, anchor: vfxAnchor,
       world: () => this.sim, time: () => this.time, views: this.views,
@@ -3035,9 +3028,8 @@ export class Renderer {
       audio: () => this.audioSink, light: this.lightPulses,
       spiritBuild: (build) => this.queueSpiritPuppetBuild(build),
       compile: this.asyncCompileSupported ? (root) => this.compileGate(root) : null,
+      castGate: this.castVfxReadiness,
       painter: {
-        castVfxAdmit: () => this.castVfxReadiness.admit(),
-        castVfxReady: () => this.castVfxReadiness.ready(),
         spawnAoeRing: (x, z, r, school, color) => this.spawnAoeRing(x, z, r, school, color),
         triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
         lightPulse: (id, school, intensity, duration, range) => this.pulseAt(id, school, intensity, duration, range),
@@ -6407,15 +6399,20 @@ export class Renderer {
           ),
         texture: (texture) => this.prewarmTexture(texture),
       }),
+      castVfxFirstReadsEntry(
+        [this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],
+        this.compileArms,
+        this.webgl,
+      ),
       {
         // The cast VFX (cast_vfx_prewarm.ts): stage the lazy stand-ins, link
         // every cast program through the compile arms; the spawn only binds
         // textures for the walk (no frame draws it, so it links nothing:
         // measured 2026-08-28). Dropped by the 3 s budget on the OpenGL
         // desktops: the programs resume as debt right after the compile
-        // remainder, the textures stay cosmetic, and the painter draws no
-        // cast until every program is linked. resumeUnits never replays the
-        // spawn: live, it would pop a white burst at the player's feet.
+        // remainder, engine then kit first, the textures stay cosmetic, and the
+        // painter draws no cast until those two are linked. resumeUnits never
+        // replays the spawn: live, it would pop a white burst at the player's feet.
         id: 'vfx.ability-primitives',
         category: 'vfx',
         priority: 62,
@@ -6427,7 +6424,7 @@ export class Renderer {
               for (const texture of step.build()) this.prewarmTexture(texture);
             },
           })),
-        resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],
+        resumeProgramUnits: () => [...castVfxUnits(), ...abilityMaterialSlot.resumeUnits()],
         run: async () => {
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
           abilityMaterialSlot.run();
@@ -7086,10 +7083,10 @@ export class Renderer {
         }
         break;
       }
-      case 'castStop': {
+      case 'castStop':
         this.needleOfFateVfx.endCast(ev.entityId);
+        if (!ev.success) this.abilityVfx.castInterrupted(ev.entityId);
         break;
-      }
       case 'bgProposed':
         prebuildBattlegroundView(this.bgViews, this.battlegroundViewHost());
         break;
@@ -7543,7 +7540,7 @@ export class Renderer {
         break;
       }
       case 'heal2':
-        if (this.abilityVfxFx.warriorRecovery(ev, this.sim.entities.get(ev.targetId)?.maxHp ?? 0))
+        if (this.abilityVfx.warriorRecovery(ev, this.sim.entities.get(ev.targetId)?.maxHp ?? 0))
           break;
         // Throttle the particle bloom to one per target per 110ms so a burst of tiny
         // simultaneous heals (a Chronomancy group echo converting an AoE that hit

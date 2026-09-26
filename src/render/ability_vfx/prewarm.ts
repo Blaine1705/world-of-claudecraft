@@ -20,6 +20,12 @@
 // PrewarmResumeUnits (see prewarm_resume.ts).
 
 import type * as THREE from 'three';
+import {
+  CAST_VFX_FAMILIES,
+  type CastVfxFamilyId,
+  castVfxFamilyBitOf,
+  inCastVfxFamily,
+} from '../cast_vfx_family';
 import { drawProgramSignature } from '../draw_program_signature_core';
 import { abilityVfxTextures, FLIPBOOK_STYLES, flipbookSheet } from './fx_textures';
 
@@ -60,21 +66,26 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
 /** One pooled draw per distinct PROGRAM under `root`, in walk order: the
  *  object whose compile links it and the material that stands for every
  *  other material on it. That representative must live as long as its pool:
- *  disposing it would release the program the uncompiled clones rely on. Keyed by drawProgramSignature, never by material
+ *  disposing it would release the program the uncompiled clones rely on.
+ *  Keyed by drawProgramSignature, never by material
  *  instance: the verdict pools build one MeshBasicMaterial per part per slot,
  *  hundreds of instances over a handful of programs, and a clone sharing a
  *  linked program reuses it on its first draw (three's acquireProgram hands
  *  back the cached WebGLProgram, so no link). Only objects that carry the
  *  renderCategory tag themselves are pooled VFX; a spirit holder group has
- *  no material and so no program of its own. */
-function pooledPrograms(root: THREE.Object3D): Array<{
+ *  no material and so no program of its own. `accept` narrows the walk to
+ *  one family, and `seen` carries the programs an earlier walk already took. */
+function pooledPrograms(
+  root: THREE.Object3D,
+  accept: (object: THREE.Object3D) => boolean = () => true,
+  seen: Set<string> = new Set(),
+): Array<{
   object: THREE.Object3D;
   materials: THREE.Material[];
 }> {
-  const seen = new Set<string>();
   const found: Array<{ object: THREE.Object3D; materials: THREE.Material[] }> = [];
   root.traverse((child) => {
-    if (child.userData?.renderCategory !== 'vfx') return;
+    if (child.userData?.renderCategory !== 'vfx' || !accept(child)) return;
     const material = (child as THREE.Mesh).material;
     if (!material) return;
     const fresh: THREE.Material[] = [];
@@ -89,28 +100,51 @@ function pooledPrograms(root: THREE.Object3D): Array<{
   return found;
 }
 
-/** The representative material of each distinct pooled program, from the
- *  same walk as the compile targets: the cast readiness gate asks whether
+/** The representative material of each distinct program the cast gate
+ *  waits on, family by family (cast_vfx_family.ts, in CAST_VFX_FAMILIES
+ *  order), from the same walk as the compile targets: the gate asks whether
  *  each one's program is proved linked, and a proof of that program covers
- *  every clone that shares it. One material instance drawn by two objects of
- *  different shapes is two units but one entry here, since the gate reads
- *  one current program per material (the uuid key had the same limit); no
- *  pool does that today, which tests/class_vfx_prewarm_homes.test.ts pins
- *  per pool (one gate entry per unit). */
-export function abilityVfxCompileMaterials(root: THREE.Object3D): THREE.Material[] {
-  const materials: THREE.Material[] = [];
-  for (const entry of pooledPrograms(root)) {
-    for (const material of entry.materials) {
-      if (!materials.includes(material)) materials.push(material);
+ *  every clone that shares it. A program two families share is listed under
+ *  the first, which every cast needing the later one needs too. The other
+ *  pooled programs keep their compile units and never hold a cast. One
+ *  material instance drawn by two objects of different shapes is two units
+ *  but one entry here, since the gate reads one current program per
+ *  material; no gated pool does that, which
+ *  tests/cast_vfx_engine_family.test.ts pins. */
+export function abilityVfxFamilyMaterials(
+  root: THREE.Object3D,
+): Map<CastVfxFamilyId, THREE.Material[]> {
+  const seen = new Set<string>();
+  const byFamily = new Map<CastVfxFamilyId, THREE.Material[]>();
+  for (const { id } of CAST_VFX_FAMILIES) {
+    const materials: THREE.Material[] = [];
+    for (const entry of pooledPrograms(root, (object) => inCastVfxFamily(object, id), seen)) {
+      for (const material of entry.materials) {
+        if (!materials.includes(material)) materials.push(material);
+      }
     }
+    byFamily.set(id, materials);
   }
-  return materials;
+  return byFamily;
+}
+
+/** Every gated family's representatives, in family order. */
+export function abilityVfxGateMaterials(root: THREE.Object3D): THREE.Material[] {
+  return [...abilityVfxFamilyMaterials(root).values()].flat();
 }
 
 /** One compile target per distinct pooled program: the unit only needs SOME
- *  object drawing that program. */
+ *  object drawing that program. The gated families come first, in family
+ *  order, so the resume lane closes the gate's window before it links any
+ *  other pool, and a gated drawable represents a program it shares with any
+ *  other pool, so the unit and the gate entry name the same object. */
 export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVfxCompileTarget[] {
-  return pooledPrograms(root).map((entry, index) => ({
+  const seen = new Set<string>();
+  const gated = CAST_VFX_FAMILIES.flatMap(({ id }) =>
+    pooledPrograms(root, (object) => inCastVfxFamily(object, id), seen),
+  );
+  const rest = pooledPrograms(root, (object) => castVfxFamilyBitOf(object) === 0, seen);
+  return [...gated, ...rest].map((entry, index) => ({
     id: `${entry.object.name || entry.object.type}:${index}`,
     object: entry.object,
   }));

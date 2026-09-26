@@ -906,9 +906,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12771 -> 12765: the lazy cast stand-ins' boot slot moved into
     // castVfxStandInSlot (cast_vfx_prewarm.ts), whose resume link records the
     // settle the cast gate reads.
-    // Release integration composes both extraction sets below the prior pins.
+    // Lowered 12765 -> 12696: PR #4220's AoE ring slot builder and cast-gate
+    // predicate wiring landed with the candidate's release-line extractions.
     // Exact count, zero slack.
-    ceiling: 12733,
+    ceiling: 12696,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
