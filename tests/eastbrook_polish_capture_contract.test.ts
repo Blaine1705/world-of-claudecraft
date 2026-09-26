@@ -698,7 +698,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the spirit veil: the renderer leaf moved the ghost-style
   // decision to a core and gained the veil entry, prewarm_policy.ts its keep
   // row. No capture was retaken.
-  '7a15281efb8f0c967e4e1da18a8d9e75df80bfd955b0dd94c669bcff1382a307';
+  // Re-minted for the widened spirit veil: the renderer leaf lost the lit twin
+  // group, the self warm and the Soul Rend live arm, prewarm_policy.ts its keep
+  // note. No capture was retaken.
+  '1f5ea18637b08addea45e2c0bbd87c6c0d344edb1667c0f7363599d7f1ca409b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
