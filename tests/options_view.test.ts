@@ -840,6 +840,7 @@ const GENERAL_KEYS = [
   'note:hudChrome.options.confirmVendorSellMinQualityNote',
 ];
 const FRAMES_KEYS = [
+  'mouseoverCast',
   'partyFrameStyle',
   'showPetFrame',
   // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
@@ -952,6 +953,28 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       });
     }
     expect(BOOL_SETTINGS.showUtilityModes).toEqual({ def: true });
+  });
+
+  it('shows the live mouseover-cast switch in Interface > Frames', () => {
+    const controls = buildInterfaceControls(makeSource({}, { mouseoverCast: true }));
+    const frames = interfaceControlsForTab(controls, 'frames');
+    expect(find(frames, 'mouseoverCast')).toMatchObject({
+      control: 'boolToggle',
+      category: 'frames',
+      labelKey: 'hudChrome.options.mouseoverCast',
+      on: true,
+    });
+    expect(optionsControlKeys(frames)).toContain('mouseoverCast');
+    expect(
+      find(
+        interfaceControlsForTab(
+          buildInterfaceControls(makeSource({}, { mouseoverCast: false })),
+          'frames',
+        ),
+        'mouseoverCast',
+      ),
+    ).toMatchObject({ control: 'boolToggle', on: false });
+    expect(find(interfaceControlsForTab(controls, 'combat'), 'mouseoverCast')).toBeUndefined();
   });
 
   it('renders NO menu rows for the optional action bars (the on-bar toggle owns them)', () => {
@@ -1287,8 +1310,8 @@ describe('options_view: interface tab taxonomy', () => {
   });
 
   it('renders NO menu rows for the settings the Frames Settings dropdown owns', () => {
-    // combineActionBars / hideUnusedActionSlots / mouseoverCast /
-    // lockActionBars moved into the edit mode's Frames Settings dropdown
+    // combineActionBars / hideUnusedActionSlots / lockActionBars
+    // live in the edit mode's Frames Settings dropdown
     // (interface_unlock.ts settingToggles); a duplicate row here would drift
     // out of sync with it. The frame-scale sliders are likewise gone: Edit
     // Frames resizes each frame directly. The settings keys all remain.
@@ -1296,7 +1319,6 @@ describe('options_view: interface tab taxonomy', () => {
     for (const key of [
       'combineActionBars',
       'hideUnusedActionSlots',
-      'mouseoverCast',
       'lockActionBars',
       'playerFrameScale',
       'targetFrameScale',

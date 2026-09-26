@@ -1005,6 +1005,10 @@ export function buildInterfaceControls(
   return [
     ...tag('general', general),
     ...tag('frames', [
+      // Keep the cast-target override visible beside the frame options. A
+      // hovered party frame takes priority over the selected target, so hiding
+      // this switch inside Edit Frames made missed-target heals hard to explain.
+      boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
       // The player/target/party frame scale sliders deliberately have NO menu
       // rows: Edit Frames (the unlock mode) resizes each frame directly, and a
       // slider row beside it would fight that gesture. The settings keys stay
@@ -1082,10 +1086,9 @@ export function buildInterfaceControls(
       // plus/minus buttons on the primary action bar are the one control for
       // adding and removing the optional rows (the settings and the central
       // resolver in main.ts are unchanged; only the duplicate UI is gone).
-      // Likewise combineActionBars / hideUnusedActionSlots / mouseoverCast /
-      // lockActionBars: the edit mode's Frames Settings dropdown owns their
-      // rows now (interface_unlock.ts settingToggles), so a duplicate here
-      // would drift out of sync with it.
+      // Likewise combineActionBars / hideUnusedActionSlots / lockActionBars:
+      // the edit mode's Frames Settings dropdown owns their rows now
+      // (interface_unlock.ts settingToggles).
     ]),
   ];
 }

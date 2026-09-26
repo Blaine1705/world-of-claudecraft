@@ -1766,7 +1766,8 @@ export class OptionsWindow {
     // and must stay resettable, or a player who set one before the rows moved
     // would be stranded on it. General owns the retired UI Scale slider;
     // Frames owns the retired frame-scale sliders and the Frames Settings
-    // dropdown's toggles, and its reset also restores the whole stock LAYOUT
+    // dropdown's toggles (the visible mouseover switch is covered by the
+    // rendered controls), and its reset also restores the whole stock LAYOUT
     // (every movable frame, the chat box, the meter panels, the target-aura
     // panel): arranging frames is what that tab is about, and a reset that
     // left them strewn about read as a broken button.
