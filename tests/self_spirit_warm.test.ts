@@ -51,9 +51,11 @@ function rig(options: { blocked?: () => boolean; refuseWarmUnit?: boolean } = {}
   const visual = {
     root,
     ghosted: false,
-    setGhost(on: boolean) {
+    setGhost(on: boolean, style?: string) {
       this.ghosted = on;
-      events.push(on ? 'ghost:on' : 'ghost:off');
+      // The swap wears the stealth flavour: a released spirit draws the boot
+      // family's veil, so this warm keeps stealth and the forms immediate.
+      events.push(on ? `ghost:on:${style}` : 'ghost:off');
     },
   };
   const deps: SelfSpiritWarmDeps = {
@@ -103,13 +105,13 @@ describe('warmSelfSpiritPrograms', () => {
 
     expect(events).toEqual([
       `unit:${SELF_SPIRIT_WARM_LABEL}`,
-      'ghost:on',
+      'ghost:on:stealth',
       'ghost:off',
       `settled:${SELF_SPIRIT_WARM_LABEL}`,
       'hold',
       'held',
       `unit:${SELF_SPIRIT_LINK_LABEL}`,
-      'ghost:on',
+      'ghost:on:stealth',
       'link:self',
       'ghost:off',
       `settled:${SELF_SPIRIT_LINK_LABEL}`,
@@ -160,7 +162,10 @@ describe('warmSelfSpiritPrograms', () => {
 
     await expect(warmSelfSpiritPrograms(deps)).resolves.toBe(false);
 
-    expect(events.filter((event) => event.startsWith('ghost:'))).toEqual(['ghost:on', 'ghost:off']);
+    expect(events.filter((event) => event.startsWith('ghost:'))).toEqual([
+      'ghost:on:stealth',
+      'ghost:off',
+    ]);
     expect(events).not.toContain(`unit:${SELF_SPIRIT_LINK_LABEL}`);
     expect(events).not.toContain('link:self');
     expect(visual.ghosted).toBe(false);
@@ -179,7 +184,10 @@ describe('warmSelfSpiritPrograms', () => {
     await expect(warmSelfSpiritPrograms(deps)).resolves.toBe(false);
 
     expect(events).not.toContain('link:self');
-    expect(events.filter((event) => event.startsWith('ghost:'))).toEqual(['ghost:on', 'ghost:off']);
+    expect(events.filter((event) => event.startsWith('ghost:'))).toEqual([
+      'ghost:on:stealth',
+      'ghost:off',
+    ]);
   });
 
   it('links cold when the queue refuses the warm unit', async () => {
@@ -207,7 +215,10 @@ describe('warmSelfSpiritPrograms', () => {
 
     expect(events).toContain('hold');
     expect(events).not.toContain('link:self');
-    expect(events.filter((event) => event.startsWith('ghost:'))).toEqual(['ghost:on', 'ghost:off']);
+    expect(events.filter((event) => event.startsWith('ghost:'))).toEqual([
+      'ghost:on:stealth',
+      'ghost:off',
+    ]);
   });
 
   it('does nothing without a self visual', async () => {

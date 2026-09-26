@@ -1,8 +1,14 @@
-// The local player's own ghost (spirit) variants, warmed ahead of death, as
+// The local player's own transparent-effect variants, warmed ahead of use, as
 // two units on the GPU queue with the worker's hold BETWEEN them: the dry
 // assembly under the ghost swap (undone on the same frame), the hold, then
 // the colour arm's link under the swap again. The scheduler that decides
 // WHEN (self_spirit_prewarm.ts) calls this once per distinct local look.
+//
+// The swap wears the 'stealth' flavour: a released spirit draws the spirit
+// veil, whose family the boot manifest links, while stealth, Shadowform and
+// Moonkin share this one transparent program per rig material (the flavours
+// differ only in uniforms), so this warm is what keeps a local rogue's, priest's
+// or druid's first fade immediate.
 //
 // One unit for both would wait for the worker inside a released-tail unit:
 // the link's synchronous prologue would land after the unit's first await,
@@ -28,7 +34,7 @@ export const SELF_SPIRIT_LINK_LABEL = 'self-spirit';
 
 export interface SelfSpiritVisual {
   root: THREE.Object3D;
-  setGhost(on: boolean): void;
+  setGhost(on: boolean, style?: 'stealth'): void;
 }
 
 export interface SelfSpiritWarmDeps {
@@ -61,7 +67,7 @@ export async function warmSelfSpiritPrograms(deps: SelfSpiritWarmDeps): Promise<
     await deps.run(
       () => {
         if (deps.blocked()) return;
-        visual.setGhost(true);
+        visual.setGhost(true, 'stealth');
         try {
           request.warm = requestRootWarm(deps.arms, visual.root, GPU_WORK_PRIORITY.VISIBLE_PREWARM);
         } finally {
@@ -85,7 +91,7 @@ export async function warmSelfSpiritPrograms(deps: SelfSpiritWarmDeps): Promise<
       // The link's prologue runs before its first await, so the swap is
       // undone before the link is awaited: no frame draws the ghost.
       let link: Promise<void>;
-      visual.setGhost(true);
+      visual.setGhost(true, 'stealth');
       try {
         link = deps.link(visual.root);
       } finally {
