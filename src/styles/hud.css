@@ -1505,7 +1505,6 @@
     --uf-bar-height: var(--target-frame-height, 15px);
     position: absolute;
     width: calc(var(--unit-frame-w) * 0.74 * var(--target-frame-scale, 1));
-    zoom: 1;
     z-index: 21;
   }
   #totarget-frame.hud-frame-detached > :not(.mf-resize-grip, .tf-frame-label) {
