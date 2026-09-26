@@ -20,6 +20,13 @@ sibling modules below). Compression, manifest, and preload rules:
 - The Eastbrook noticeboard (`src/render/noticeboard.ts`) uses the same
   immutable-template and shared-atlas contract, with a two-material procedural
   fallback and tier-independent preload.
+- The Mirefen muster camp kit (`muster_*.glb`, Blender factory at
+  `scripts/assets/muster_camp/`, pinned by `tests/muster_camp_asset.test.ts`): rows of
+  `PROP_ASSET_DEFS` via `MUSTER_KIT_PROP_DEFS` (`src/render/muster_camps.ts`), placed by the
+  pure `src/render/muster_camps_core.ts` plan through the props decor walk
+  (`renderDecorProps`), render-only with no colliders. Clutter pieces are not drawn on the
+  low preset (`musterPlacementsForTier`); the torches light through `decor_torch_fx.ts`;
+  the weapon rack entity is a pick volume only (`src/render/pick_only_objects.ts`).
 - Standalone delve props (`src/render/delve_props.ts`): `STANDALONE_PROP_URL` lists
   the standalone GLBs; `buildStandaloneGlb()` clones the preloaded scene, normalizes
   it to the prop's original target height via a `Box3` measure/rescale (mirroring how

@@ -97,7 +97,9 @@ describe('mob portrait source manifest', () => {
     // 251: plus the Mirefen world boss (balgath_cyclops). Only the LIVE-mob
     // floor moves here; the two fixture-driven counts below build synthetic
     // rows and are unrelated.
-    expect(liveIds).toHaveLength(251);
+    // 255: plus the Mirefen muster's four soldier templates (muster_footman,
+    // muster_chaplain, muster_sergeant, muster_captain).
+    expect(liveIds).toHaveLength(255);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

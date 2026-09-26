@@ -316,6 +316,7 @@ describe('v0.36 placeholder-art completion evidence', () => {
       // Every weapon added after the campaign belongs on this list.
       'foremans_barrowmaul',
       'skerrits_shardpike',
+      'muster_shardpike',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

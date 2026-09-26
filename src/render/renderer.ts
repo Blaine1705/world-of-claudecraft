@@ -560,6 +560,7 @@ import {
   syncPaladinSunVerdictVisual,
 } from './paladin_sun_verdict_visual';
 import { projectionScalePixels } from './perceptual_lod_core';
+import { buildPickOnlyObjectBody, isPickOnlyObjectTemplate } from './pick_only_objects';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
@@ -642,7 +643,6 @@ import {
   syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
 import { isOwnedPetHostile } from './reaction';
-import { buildRealmBuilderMonumentPickBody } from './realm_builder_monument_fx';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
   RenderBudgetGovernor,
@@ -7971,9 +7971,9 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body;
-    } else if (e.kind === 'object' && e.templateId === 'realm_builder_monument') {
-      // Art lives in the town view: this entity is a pick volume only.
-      const built = buildRealmBuilderMonumentPickBody();
+    } else if (e.kind === 'object' && isPickOnlyObjectTemplate(e.templateId)) {
+      // Art lives in a scenery view (town, muster camp): a pick volume only.
+      const built = buildPickOnlyObjectBody(e.templateId ?? '');
       body = built.group;
       height = built.height;
       objectMesh = body;
@@ -11305,7 +11305,7 @@ export class Renderer {
       );
 
       const emoteId =
-        e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
+        e.kind !== 'object' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
       const emoteKey = emoteId ? `${emoteId}:${e.overheadEmoteSeq}` : null;
       if (emoteKey !== v.lastOverheadEmoteKey) {
         const canPlayEmote =

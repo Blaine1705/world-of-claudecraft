@@ -3698,6 +3698,62 @@ export const VISUALS: Record<string, VisualDef> = {
     show: ['Knight_Helmet', 'Knight_Cape'],
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
   },
+  // The Mirefen muster (src/sim/content/mirefen_muster.ts): Fenbridge's soldiers dug in
+  // around Balgath's crater. Shipped KayKit rigs and weapons only, dyed toward the muster's
+  // red by the entity tint. CombatIdle is `Block`, the looping guard both rigs ship: the
+  // stance they hold while he is on them (the sim points their aggroTargetId at him).
+  npc_muster_footman: {
+    url: `${PLAYERS}/knight.glb`,
+    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
+    height: HUMANOID_H,
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block' },
+    show: ['Knight_Helmet'],
+    attach: [
+      { url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  npc_muster_sergeant: {
+    url: `${PLAYERS}/knight.glb`,
+    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
+    height: HUMANOID_H,
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block' },
+    show: ['Knight_Helmet', 'Knight_Cape'],
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+    ],
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  npc_muster_chaplain: {
+    url: `${PLAYERS}/paladin.glb`,
+    animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
+    height: HUMANOID_H,
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block' },
+    show: ['Paladin_Helmet', 'Paladin_Cape'],
+    attach: [
+      { url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_badge.glb`, bone: 'handslot.l' },
+    ],
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  npc_muster_captain: {
+    url: `${PLAYERS}/knight.glb`,
+    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
+    height: HUMANOID_H,
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block' },
+    show: ['Knight_Cape'],
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_badge.glb`, bone: 'handslot.l' },
+    ],
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
   npc_mage: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
@@ -4162,6 +4218,11 @@ const MOB_KEYS: Record<string, string> = {
   // the "Spirit of X" adds reuse each character's crypt visual above. Without these
   // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
   // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
+  // The Mirefen muster around Balgath's crater (VISUALS npc_muster_* above).
+  muster_footman: 'npc_muster_footman',
+  muster_sergeant: 'npc_muster_sergeant',
+  muster_chaplain: 'npc_muster_chaplain',
+  muster_captain: 'npc_muster_captain',
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',

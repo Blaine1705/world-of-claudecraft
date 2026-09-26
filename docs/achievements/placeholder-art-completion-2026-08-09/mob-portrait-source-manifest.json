@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "e4ea17679acb46da256e103b1c3c6c31096c217bb6e5e2a1d0abac51fefcb6c1",
+  "rendererFingerprint": "0764e7d4c8ec1af40a9b5e35cb4f7b0ccd2c1ee80d1396adfc39892a3d2b5263",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "darwin",
-    "arch": "arm64",
+    "platform": "win32",
+    "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "152",
-    "browserVersion": "Chrome/152.0.7977.84",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "154",
+    "browserVersion": "Edg/154.0.4258.37",
     "requestedBackend": "swiftshader",
-    "fingerprint": "538069c40c2b7b61ee2b450a871b7bdaa6fa79a2a3a8c4eea900e335ef25949d"
+    "fingerprint": "04a5c1851d9e9c277dd6de4cae5e56afae22c5cc793b00f37e35af4536bdd2f4"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4565267,
-      "sha256": "db0f31ae5f2de9e44b9116cccfbb1072325d53a5a7f346024d3456cb0b06f08a",
+      "bytes": 4952796,
+      "sha256": "874bd1b1c61fb590c63eebf01ef2b95b8de80b99132aaa7ba17e7b26f8108379",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 251,
+  "portraitCount": 255,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -4448,6 +4448,252 @@
         "path": "public/ui/mobs/mushroom_pixie.webp",
         "bytes": 2462,
         "sha256": "84dcab7437ba5fe2a0185c34fc16a2e47381b6b792926dbcb30e35b700222483"
+      }
+    },
+    {
+      "id": "muster_captain",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "npc_muster_captain",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/knight.glb",
+          "path": "public/models/chars/players/knight.glb",
+          "bytes": 462916,
+          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Knight_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/sword_1handed.glb",
+              "path": "public/models/weapons/sword_1handed.glb",
+              "bytes": 30608,
+              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_badge.glb",
+              "path": "public/models/weapons/shield_badge.glb",
+              "bytes": 29948,
+              "sha256": "967e6b7548af1707f3f32d297e4937e3ea1ec97da4931fc40c57d9c9972fc8cb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9c4a2c",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "2bd89038e54416227cf46e01cea0143e17ebf41afa13fdfba7c8990ec57afd53",
+      "output": {
+        "path": "public/ui/mobs/muster_captain.webp",
+        "bytes": 2178,
+        "sha256": "a767f1d08e194ab4524ecfdbbceebd9a339c099e16c45235d3a1c438ca2e9cb4"
+      }
+    },
+    {
+      "id": "muster_chaplain",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "npc_muster_chaplain",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/paladin.glb",
+          "path": "public/models/chars/players/paladin.glb",
+          "bytes": 448820,
+          "sha256": "6481234c2f3c95087a6fbcd81b4308986142ded6e02cf42036801355f0bdfa4c"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Paladin_Helmet",
+          "Paladin_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/hammer_a.glb",
+              "path": "public/models/weapons/hammer_a.glb",
+              "bytes": 49056,
+              "sha256": "36f52bf60139e565fe9fafe68ae5302d492af46cdce065b83df1a140deab5ef8"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_badge.glb",
+              "path": "public/models/weapons/shield_badge.glb",
+              "bytes": 29948,
+              "sha256": "967e6b7548af1707f3f32d297e4937e3ea1ec97da4931fc40c57d9c9972fc8cb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d8cdb0",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "cb67c7d1840b0d3de40e4d58f896d3da4b3a706e071bf44ea05f3945b253219a",
+      "output": {
+        "path": "public/ui/mobs/muster_chaplain.webp",
+        "bytes": 2736,
+        "sha256": "49c36f3e75ddd7b6a66bf461aaeae363da7c23e6a1d27966d1264df136f84140"
+      }
+    },
+    {
+      "id": "muster_footman",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "npc_muster_footman",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/knight.glb",
+          "path": "public/models/chars/players/knight.glb",
+          "bytes": 462916,
+          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Knight_Helmet"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/spear_a.glb",
+              "path": "public/models/weapons/spear_a.glb",
+              "bytes": 78552,
+              "sha256": "27e7969ec3efdd8ba59f2530ceb2ffddefe9bfd247c462dc2e916f47292aa2af"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8a3b2e",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "84167b3afaeb709d2c7286eb90d4d4914960cdd94cf1e5ba0173c48c1ff31f2b",
+      "output": {
+        "path": "public/ui/mobs/muster_footman.webp",
+        "bytes": 1950,
+        "sha256": "c050de5384075697694f44527e25bfb59cbf960434f0fdbef06335329afbd731"
+      }
+    },
+    {
+      "id": "muster_sergeant",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "npc_muster_sergeant",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/knight.glb",
+          "path": "public/models/chars/players/knight.glb",
+          "bytes": 462916,
+          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Knight_Helmet",
+          "Knight_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/sword_1handed.glb",
+              "path": "public/models/weapons/sword_1handed.glb",
+              "bytes": 30608,
+              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_square.glb",
+              "path": "public/models/weapons/shield_square.glb",
+              "bytes": 29960,
+              "sha256": "72b44c7882482f161b6aee28605ad2714d49b6b8f2e40763feae9e42eaa4c15b"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7a2f25",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "c289a7d01b8196580fa71bfb32c39d7b86c40ed417b775b2ae2bb22d7565279c",
+      "output": {
+        "path": "public/ui/mobs/muster_sergeant.webp",
+        "bytes": 2106,
+        "sha256": "bc42a56ea46ba0ef68669ba6df93e03592c3b1252352763b80282435484c8a2c"
       }
     },
     {
