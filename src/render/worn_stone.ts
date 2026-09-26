@@ -631,6 +631,17 @@ export function riggedWornFamilyFor(materialName: string): WornFamilyPick | null
 }
 
 /**
+ * The worn layer a standard RIG material takes by its name: characters/assets.ts
+ * buildTintedClone applies it to every rig material, and the weapon-skin
+ * prewarm host (weapon_vfx.ts) applies it to its untextured part, so both key
+ * the same hook and the host links the program the worn weapon draws.
+ */
+export function applyRiggedWornDetail(mat: THREE.MeshStandardMaterial): void {
+  const worn = riggedWornFamilyFor(mat.name);
+  if (worn) applySurfaceDetail(mat, worn.family, { strength: worn.strength, objectSpace: true });
+}
+
+/**
  * Attach the triplanar surface-detail layer for a material family to a
  * standard material. Composes with any existing onBeforeCompile hook (runs it
  * first) and is additive over the material's own map/vertexColors path, so
