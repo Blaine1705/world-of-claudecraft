@@ -11,6 +11,8 @@ import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
 import { lanceLeanFromMove } from '../src/sim/lance_trial';
 import type { MusterArmyState } from '../src/sim/mirefen_muster';
 import { MUSTER_SHARDPIKE_ID } from '../src/sim/muster_pike';
+import { isDisenchantable } from '../src/sim/professions/enchanting';
+import { isSalvageable } from '../src/sim/professions/salvage';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MoveInput, PlayerClass, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -107,6 +109,12 @@ describe('the rack lends a Shardpike to anyone', () => {
     expect(def?.noDiscard).toBe(true);
     expect(def?.sellValue).toBe(0);
     expect(def?.requiredLevel).toBe(1);
+    // The rack re-issues it for free, so breaking it down would mint materials forever.
+    expect(isDisenchantable(def)).toBe(false);
+    expect(isSalvageable(def)).toBe(false);
+    // ...while an ordinary uncommon weapon still breaks down.
+    expect(isDisenchantable({ ...def, lentGear: undefined } as typeof def)).toBe(true);
+    expect(isSalvageable({ ...def, lentGear: undefined } as typeof def)).toBe(true);
   });
 });
 

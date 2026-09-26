@@ -11304,8 +11304,7 @@ export class Renderer {
         mountShown && !v.mountCompilePending && runCharacterPresentation ? this.vfx : null,
       );
 
-      const emoteId =
-        e.kind !== 'object' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
+      const emoteId = e.kind !== 'npc' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
       const emoteKey = emoteId ? `${emoteId}:${e.overheadEmoteSeq}` : null;
       if (emoteKey !== v.lastOverheadEmoteKey) {
         const canPlayEmote =

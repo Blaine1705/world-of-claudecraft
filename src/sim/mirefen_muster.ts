@@ -73,6 +73,8 @@ export interface MusterArmyState {
   respawnAt: number | null;
   /** Live muster pike loans (muster_pike.ts). */
   lent: LentPikes;
+  /** The entity roster version the last dev-spawn scan saw (resolveBoss). */
+  scannedRoster: number;
 }
 
 export function freshMusterArmy(): MusterArmyState {
@@ -86,6 +88,7 @@ export function freshMusterArmy(): MusterArmyState {
     bossDead: false,
     respawnAt: null,
     lent: new Map(),
+    scannedRoster: -1,
   };
 }
 
@@ -165,7 +168,11 @@ function resolveBoss(ctx: SimContext, army: MusterArmyState, scheduled: Entity |
   // No scheduled boss: a dev spawn (the boss test drive, /dev tooling) is still a Balgath
   // the muster should answer. A once-a-second scan is the whole cost, and only while no
   // boss is known; the live realm's scheduler hands him over directly.
+  // And only when the roster has changed since the last look: a world that never spawns
+  // him (the RL env, a long respawn gap on the live realm) pays nothing per second.
   if (ctx.tickCount % BOSS_SCAN_EVERY_TICKS !== 0) return null;
+  if (army.scannedRoster === ctx.entityRosterVersion) return null;
+  army.scannedRoster = ctx.entityRosterVersion;
   for (const e of ctx.entities.values()) {
     if (e.kind === 'mob' && e.templateId === MUSTER_BOSS_TEMPLATE_ID) {
       army.bossId = e.id;

@@ -89,7 +89,8 @@ export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): v
       ctx.error(pid, 'Your bags are full.');
       return;
     }
-    // movement: a loan is not an acquisition, so no Reliquary obtain count moves; the
+    // movement: a loan is not an acquisition, so no Reliquary obtain count moves (the
+    // item still counts as SEEN in the discovered-items ledger, like any item held); the
     // take line below is the caller-owned log for it.
     ctx.addItem(MUSTER_SHARDPIKE_ID, 1, pid, { silent: true, callerLogs: true, movement: true });
   }
@@ -133,6 +134,8 @@ export function reclaimMusterPike(
     reclaimed = true;
   }
   if (!reclaimed) return;
+  // A worn copy left without the bag path, so poke the quest-inventory recompute too.
+  ctx.onInventoryChangedForQuests(meta);
   if (meta.lance) {
     meta.lance = undefined;
     p.bracing = false;
