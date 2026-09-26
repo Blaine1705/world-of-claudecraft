@@ -1961,10 +1961,15 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         const samples: number[] = [];
         for (let pass = 0; pass < 4; pass++) {
           const next = structuredClone(sourceState);
+          const bankSlot = next.bank?.inventory[0];
+          const vaultSlot = next.vault?.special?.[0];
+          if (!bankSlot?.materialSources || !vaultSlot?.materialSources) {
+            throw new Error(`material source fixture is incomplete for ${shape}`);
+          }
           // First pass creates the opening; later passes change an existing
           // anchor. Every pass changes both bank and vault without changing stock.
-          for (const slots of [next.bank!.inventory, next.vault!.special!]) {
-            slots[0]!.materialSources = slots[0]!.materialSources!.map((entry, index) =>
+          for (const slot of [bankSlot, vaultSlot]) {
+            slot.materialSources = slot.materialSources.map((entry, index) =>
               index === 0
                 ? {
                     ...entry,
