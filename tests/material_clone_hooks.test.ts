@@ -492,7 +492,7 @@ describe('the character overlay caches and the arena walls clone through the hoo
     // owes the same hook-preserving clone.
     for (const [name, factory] of [
       ['ghostMaterial', 'createGhostEffectMaterial'],
-      ['shadowformMaterial', 'createShadowformEffectMaterial'],
+      ['shadowformMaterial', 'createShadowformTintMaterial'],
       ['moonkinMaterial', 'createMoonkinEffectMaterial'],
       ['soulRendMaterial', 'applySoulRendOverlay'],
     ] as const) {
@@ -500,7 +500,7 @@ describe('the character overlay caches and the arena walls clone through the hoo
       expect(body, `${name} lost its shared factory`).toContain(`${factory}(material`);
       expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
     }
-    for (const module of ['effect_materials', 'soul_rend_overlay']) {
+    for (const module of ['effect_materials', 'soul_rend_overlay', 'shadowform_tint']) {
       const factory = readFileSync(
         new URL(`../src/render/characters/${module}.ts`, import.meta.url),
         'utf8',

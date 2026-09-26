@@ -703,3 +703,43 @@ describe('Moonkin and Soul Rend wear the veil', () => {
     visual.dispose();
   });
 });
+
+describe('Shadowform is an opaque tint on the source programs, not a veil', () => {
+  it('tints every rig material on a program-preserving clone, never staged, keeping shadow, glow and a tinted halo', async () => {
+    const { visual, veil, gateCalls } = await makePriest(false);
+    const { SHADOWFORM_TINT, SHADOWFORM_EMISSIVE } = await import(
+      '../src/render/characters/shadowform_tint'
+    );
+    const body = named(visual, 'body');
+    const halo = named(visual, 'class_halo');
+    const living = new Map(rigMeshes(visual).map((mesh) => [mesh, single(mesh)]));
+    const { light, shell, update } = weaponSkinHandle(visual);
+    visual.setShadowform(true);
+    // nothing is linked in this harness, and nothing needs to be
+    expect(gateCalls).toHaveLength(0);
+    for (const [mesh, source] of living) {
+      const worn = single(mesh) as THREE.MeshStandardMaterial;
+      expect(worn, mesh.name).not.toBe(source);
+      expect(veil.spiritVeilPassOf(worn), mesh.name).toBeNull();
+      expect(worn.transparent, mesh.name).toBe(source.transparent);
+      expect(worn.customProgramCacheKey(), mesh.name).toBe(source.customProgramCacheKey());
+      expect(worn.color.getHex(), mesh.name).toBe(SHADOWFORM_TINT);
+      expect(worn.opacity, mesh.name).toBe(source.opacity);
+    }
+    const bodyWorn = single(body) as THREE.MeshStandardMaterial;
+    expect(bodyWorn.emissive.getHex()).toBe(SHADOWFORM_EMISSIVE);
+    expect(bodyWorn.emissiveIntensity).toBeGreaterThanOrEqual(0.4);
+    expect(halo.visible).toBe(true);
+    expect((single(halo) as THREE.MeshBasicMaterial).color.getHex()).toBe(SHADOWFORM_TINT);
+    expect(depthSiblings(visual)).toHaveLength(0);
+    expect(body.castShadow).toBe(true);
+    expect(shell.visible).toBe(true);
+    visual.updateWeaponVfx(FRAME);
+    expect(update).toHaveBeenCalled();
+    expect(light.intensity).toBe(1.37);
+    visual.setShadowform(false);
+    for (const [mesh, source] of living) expect(single(mesh)).toBe(source);
+    (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
+    visual.dispose();
+  });
+});

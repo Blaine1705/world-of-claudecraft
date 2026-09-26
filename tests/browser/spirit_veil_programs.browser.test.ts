@@ -887,7 +887,7 @@ describe('every veil trigger on a real CharacterVisual', () => {
     for (const offscreen of [false, true]) {
       const tier = standardMaterials ? 'standard (above Low)' : 'Lambert (Low)';
       const arm = offscreen ? 'render-target (composer tiers)' : 'canvas (direct tiers)';
-      it(`links nothing for any palette, Moonkin's kept shadow or Soul Rend once the family ran, ${tier}, ${arm}`, async () => {
+      it(`links nothing for any palette, Moonkin's kept shadow, Soul Rend or the Shadowform tint once the family ran, ${tier}, ${arm}`, async () => {
         const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials });
         try {
           const w = world(offscreen);
@@ -976,6 +976,14 @@ describe('every veil trigger on a real CharacterVisual', () => {
           visual.setSoulRend(false);
           w.draw();
           expect(w.programs()).toBe(before);
+          // Shadowform is no veil: an opaque tint on the rig's own programs
+          visual.setShadowform(true);
+          w.draw();
+          w.draw();
+          expect(worn()).toEqual(new Set([null]));
+          expect(casters().length).toBeGreaterThan(3);
+          expect(w.programs(), 'shadowform').toBe(before);
+          visual.setShadowform(false);
         } finally {
           restoreGfx();
         }

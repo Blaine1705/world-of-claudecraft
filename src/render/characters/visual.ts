@@ -67,11 +67,7 @@ import {
   tintedFarMaterials,
 } from './assets';
 import { deathGroundingOffset } from './death_grounding_core';
-import {
-  createGhostEffectMaterial,
-  createMoonkinEffectMaterial,
-  createShadowformEffectMaterial,
-} from './effect_materials';
+import { createGhostEffectMaterial, createMoonkinEffectMaterial } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import {
   createSpiritVeilMaterial,
@@ -105,6 +101,7 @@ import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
 import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
+import { createShadowformTintMaterial } from './shadowform_tint';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -3754,7 +3751,7 @@ export class CharacterVisual {
   private shadowformMaterial(material: THREE.Material): THREE.Material {
     const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
-    const marked = createShadowformEffectMaterial(material);
+    const marked = createShadowformTintMaterial(material);
     this.shadowformMaterials.set(material, marked);
     return marked;
   }

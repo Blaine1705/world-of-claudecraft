@@ -4,18 +4,21 @@ import type { AnimState } from '../src/render/characters/anim_state';
 import type { CharacterVisual } from '../src/render/characters/visual';
 import type { Entity } from '../src/sim/types';
 
-// A rig goes translucent (stealth, the spirit run, Shadowform, Moonkin) by
-// mounting a `transparent = true` clone of every one of its materials, and
-// three keys its program cache on that flip. Swapping those clones onto a
-// VISIBLE rig therefore links a brand new program on the next draw: the 4808 ms
-// `paladin_metallic` stall of the 2026-08-17 Eastbrook crowd capture, plus four
-// `mod_cloth` / `mod_jewel` rows at 115 to 130 ms on the same rig.
+// A rig goes translucent (a released spirit, Ghost Wolf, stealth, Moonkin,
+// Soul Rend) by mounting the spirit veil, a program family the boot manifest
+// links. Swapping programs that are NOT linked yet onto a VISIBLE rig links
+// them on the next draw: the 4808 ms `paladin_metallic` stall of the
+// 2026-08-17 Eastbrook crowd capture came from the lit transparent twins the
+// veil replaced. A veil whose tuples the family has not linked (a boot that
+// dropped the entry, a census gap) still meets that case, and so does the
+// surface response, a new program per rig material.
 //
-// These cases pin the hide-compile-reveal that closes it, and the shape of it
+// These cases pin the hide-compile-reveal that closes it, on a harness whose
+// veil ledger is empty (every veil here is such a miss), and the shape of it
 // that keeps it fair: the BODY IS NEVER HIDDEN. The rig keeps drawing its
-// current, already-linked materials while the clones compile on a hidden
+// current, already-linked materials while the new set compiles on a hidden
 // scratch mesh set, the swap commits on the per-frame update() path once the
-// gate settles, and every later toggle of that clone set is immediate.
+// gate settles, and every later toggle of that set is immediate.
 
 const FRAME = 1 / 60;
 
@@ -200,8 +203,8 @@ describe('a transparent character effect swaps in only once its programs are lin
     expect(rigIsTranslucent(visual)).toBe(true);
     expect(scratchOf(visual)).toBeNull();
 
-    // Once a clone set has linked, a later toggle is immediate: a ghost run or
-    // a death treatment that MUST show is never held back twice.
+    // Once a set has linked, a later toggle is immediate: a death that MUST
+    // show is never held back twice.
     visual.setGhost(false);
     expect(rigMaterials(visual)).toEqual(opaque);
     expect(gateCalls).toHaveLength(1);
@@ -247,6 +250,24 @@ describe('a transparent character effect swaps in only once its programs are lin
     visual.dispose();
   });
 
+  it('never stages the Shadowform tint: it keeps every source program', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const opaque = rigMaterials(visual);
+    visual.setShadowform(true);
+    expect(gateCalls).toHaveLength(0);
+    const tinted = rigMaterials(visual);
+    expect(tinted).not.toEqual(opaque);
+    tinted.forEach((material, i) => {
+      expect(material.transparent).toBe(opaque[i].transparent);
+      expect(material.customProgramCacheKey()).toBe(opaque[i].customProgramCacheKey());
+    });
+    visual.setShadowform(false);
+    expect(rigMaterials(visual)).toEqual(opaque);
+    visual.dispose();
+  });
+
   it('never defers the Soul Rend mark, which is actionable raid information', async () => {
     const visual = await makeVisual();
     const gateCalls: GateCall[] = [];
@@ -281,16 +302,16 @@ describe('a transparent character effect swaps in only once its programs are lin
 
     visual.setGhost(true);
     expect(gateCalls).toHaveLength(1);
-    // The ghost clones ARE linked, but a shapeshift supersedes the swap before
-    // update() commits it. Ghost outranks Shadowform, so what the visual wants
+    // The ghost's veil IS linked, but a shapeshift supersedes the swap before
+    // update() commits it. A ghost outranks Moonkin, so what the visual wants
     // is exactly the set that just linked: it must swap in at once instead of
     // re-staging and re-queueing a compile-lane slot for work already done.
     gateCalls[0].settle();
-    visual.setShadowform(true);
+    visual.setMoonkin(true);
     expect(gateCalls).toHaveLength(1);
     expect(rigIsTranslucent(visual)).toBe(true);
 
-    // A genuinely new clone set (Shadowform's) still gates once...
+    // A genuinely new set (Moonkin's palette) still gates once...
     visual.setGhost(false);
     expect(gateCalls).toHaveLength(2);
     // ...and the ghost set stays immediate for every later toggle.
@@ -312,7 +333,7 @@ describe('a transparent character effect swaps in only once its programs are lin
 
     // A newer effect state before the settle: the in-flight scratch is dropped
     // and the state the visual actually wants is staged instead.
-    visual.setShadowform(true);
+    visual.setMoonkin(true);
     expect(gateCalls).toHaveLength(2);
     expect(superseded.parent).toBeNull();
     expect(rigMaterials(visual)).toEqual(opaque);
