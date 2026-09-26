@@ -7,7 +7,8 @@
 // player indoors, the walls whose backs the camera would see and the roof over its sight
 // line fade to nothing (the dungeon shells' idiom); with the player outdoors, the whole shell
 // ghosts to 20% whenever it stands between the camera and the player (the props idiom). A
-// part cut away keeps drawing (transparent, opacity 0, depth writes off) so it keeps casting
+// part cut away keeps drawing (transparent at opacity 0, or under the dithered fade opaque
+// with every fragment dropped; depth writes off either way) so it keeps casting
 // its shadow: the room stays roofed in light whatever the camera does. Everything here is
 // camera state: gameplay-neutral, the same on every graphics tier.
 //
@@ -27,6 +28,7 @@ import {
 } from '../sim/content/wyrmwatch_harbor_house';
 import { WATER_LEVEL } from '../sim/world';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { ditherFadeUniform } from './occluder_dither_fade';
 import {
   applyOccluderFade,
   type OccluderFadeMat,
@@ -171,6 +173,9 @@ function stepPart(
   for (const m of r.mats) {
     m.mat.colorWrite = !cut;
     if (cut) m.mat.depthWrite = false;
+    // the dithered arm keeps the material opaque and never touches its depth writes
+    // (applyOccluderFade), so the cut's drop is undone here once the part draws again
+    else if (ditherFadeUniform(m.mat)) m.mat.depthWrite = m.depthWrite;
   }
 }
 

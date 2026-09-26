@@ -3,8 +3,9 @@ import path from 'node:path';
 import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
+import { ditherFadeUniform, setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   buildWyrmwatchHarbor,
@@ -89,7 +90,12 @@ beforeAll(async () => {
   gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
 });
 
+// The blend arm is what these cases pin; the dithered arm (the default below High since
+// release/v0.44.0) has its own case below.
+beforeEach(() => setDitherFadeEnabledForTest(false));
+
 afterEach(() => {
+  setDitherFadeEnabledForTest(null);
   activateGfxProfile(originalProfile);
 });
 
@@ -225,6 +231,36 @@ describe('wyrmwatch harbor painter', () => {
       const mat = m.material as THREE.Material;
       expect(mat.transparent).toBe(false);
       expect(mat.opacity).toBe(1);
+      expect(mat.depthWrite).toBe(true);
+      expect(mat.colorWrite).toBe(true);
+    }
+  });
+
+  it('under the dithered fade, a wall cut away writes depth again once it is back', () => {
+    setDitherFadeEnabledForTest(true);
+    withTier('high');
+    buildWyrmwatchHarbor(WORLD_SEED);
+    const floor = WATER_LEVEL + HARBOR_HOUSE_FLOOR_ABOVE_WATER;
+    const ex = (HARBOR_HOUSE_INTERIOR.x0 + HARBOR_HOUSE_INTERIOR.x1) / 2;
+    const ez = (HARBOR_HOUSE_INTERIOR.z0 + HARBOR_HOUSE_INTERIOR.z1) / 2;
+    const ey = floor + HOUSE_EYE_OVER_FEET;
+    updateHarborHouseShell(ex, ey + 3, ez + 11, ex, ey, ez, 1 / 60);
+    const south = harborHouseInternalsForTest.shell().find((r) => r.part === 'HouseWallSouth');
+    if (!south) throw new Error('south');
+    expect(south.alpha).toBe(0);
+    for (const m of south.meshes) {
+      const mat = m.material as THREE.Material;
+      // the dithered arm drops every fragment and never flips the material transparent
+      expect(ditherFadeUniform(mat)?.value).toBe(0);
+      expect(mat.transparent).toBe(false);
+      expect(mat.depthWrite).toBe(false);
+    }
+    for (let i = 0; i < 240; i++) updateHarborHouseShell(ex, ey + 0.5, ez + 2, ex, ey, ez, 1 / 60);
+    expect(south.alpha).toBe(1);
+    for (const m of south.meshes) {
+      const mat = m.material as THREE.Material;
+      expect(ditherFadeUniform(mat)?.value).toBe(1);
+      // an opaque wall left without depth writes would let the room behind draw over it
       expect(mat.depthWrite).toBe(true);
       expect(mat.colorWrite).toBe(true);
     }

@@ -3,7 +3,8 @@ import path from 'node:path';
 import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import type { ShipWake } from '../src/render/ship_wake';
 import { freezeStaticMatrices } from '../src/render/static_matrix';
@@ -79,6 +80,11 @@ beforeAll(async () => {
 afterAll(() => {
   internals.setLoadedGltfForTest(URL, null);
 });
+
+// The fade cases pin the blend arm (transparent at the ghost opacity); the dithered arm,
+// the default below High since release/v0.44.0, is the shared occluder fade's own contract.
+beforeEach(() => setDitherFadeEnabledForTest(false));
+afterEach(() => setDitherFadeEnabledForTest(null));
 
 describe('transport ship view', () => {
   it('knows exactly the ship keys the sim moors hulls for', () => {
