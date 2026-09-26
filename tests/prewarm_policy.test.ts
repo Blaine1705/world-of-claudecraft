@@ -109,7 +109,6 @@ const MANIFEST_IDS = [
   'objects.quest-archetypes',
   'props.material-variants',
   'props.ghost-fade-variants',
-  'entities.character-effect-variants',
   'entities.spirit-veil-family',
   'foliage.materials',
   'foliage.great-tree-materials',
@@ -373,7 +372,6 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'objects',
       'props',
       'ghost-fade-variants',
-      'character-effect-variants',
       'ability-materials',
       'foliage',
       'great-tree',
@@ -446,7 +444,6 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // must be added to one of the two, never land unclassified.
     const COSMETIC_RESUME_IDS = [
       'props.ghost-fade-variants',
-      'entities.character-effect-variants',
       'vfx.atlas',
       'vfx.weapon-skins',
       'vfx.ability-primitives',

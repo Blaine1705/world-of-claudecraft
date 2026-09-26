@@ -183,13 +183,15 @@ describe('the entities.spirit-veil-family entry', () => {
     }
   });
 
-  it('sits right after the character effect twins in the renderer manifest, spread from the factory', () => {
+  it('sits right after the ghost-fade variants in the renderer manifest, spread from the factory', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const twins = renderer.indexOf("id: 'entities.character-effect-variants',");
+    const fades = renderer.indexOf("id: 'props.ghost-fade-variants',");
     const veil = renderer.indexOf(`id: '${SPIRIT_VEIL_PREWARM_ENTRY_ID}',`);
     const next = renderer.indexOf("id: 'foliage.materials',");
-    expect(twins).toBeGreaterThan(-1);
-    expect(veil).toBeGreaterThan(twins);
+    expect(fades).toBeGreaterThan(-1);
+    expect(veil).toBeGreaterThan(fades);
+    // the lit twin group that used to sit between them is gone for good
+    expect(renderer).not.toContain('character-effect-variants');
     expect(next).toBeGreaterThan(veil);
     expect(renderer.slice(veil, next)).toContain('...spiritVeilFamilyPrewarmEntry(');
   });

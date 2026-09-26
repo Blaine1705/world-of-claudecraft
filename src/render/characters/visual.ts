@@ -67,7 +67,6 @@ import {
   tintedFarMaterials,
 } from './assets';
 import { deathGroundingOffset } from './death_grounding_core';
-import { createGhostEffectMaterial, createMoonkinEffectMaterial } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import {
   createSpiritVeilMaterial,
@@ -113,8 +112,6 @@ import {
 } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
 import { applySkinnedCullBounds } from './skinned_cull_bounds';
-import { applySoulRendOverlay } from './soul_rend_overlay';
-import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import {
   SPIRIT_VEIL_POLICY,
   type SpiritVeilPalette,
@@ -618,15 +615,14 @@ export class CharacterVisual {
    *  mesh + shadow proxy stay hidden (far_lod_reveal_core). */
   private farCompilePending = false;
   /** The compile gate the renderer installs. ONE injected gate serves both
-   *  uses: a fresh far bake (below) and the transparent effect-clone swap
-   *  (stageEffectSwap). Null (previews, tests, hosts without one) keeps the
+   *  uses: a fresh far bake (below) and an effect swap whose programs are not
+   *  linked yet (stageEffectSwap). Null (previews, tests, hosts without one) keeps the
    *  immediate behaviour both paths had before the gate. */
   private farBakeGate: FarBakeGate | null = null;
-  /** Effect clones (ghost / stealth / shadowform / moonkin) whose programs are
-   *  known linked: either a gate settle landed on them, or they were mounted
-   *  with no gate at all. A later toggle of an effect on the same source
-   *  materials swaps immediately, so a ghost run or a death treatment that
-   *  MUST show is never held back twice. */
+  /** Effect materials (a veil staged as a miss, a surface response) whose
+   *  programs are known linked: a gate settle landed on them. A later toggle
+   *  of an effect on the same source materials swaps immediately, so a death
+   *  treatment that MUST show is never held back twice. */
   private linkedEffectMaterials = new WeakSet<THREE.Material>();
   /** The hidden scratch group staging effect clones that are still linking.
    *  Never contains the rig's own meshes: the BODY IS NEVER HIDDEN, it keeps
@@ -665,14 +661,11 @@ export class CharacterVisual {
   private bastionSweepAction: THREE.AnimationAction | null = null;
   private templarsVerdictFx: PaladinTemplarsVerdictFx | null = null;
   private templarsVerdictAction: THREE.AnimationAction | null = null;
-  private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   /** The spirit veil's colour materials, per (palette, mesh shape) then per
    *  source (one material never draws two shapes: ghost_veil.ts). */
   private veilMaterials = new Map<string, Map<THREE.Material, THREE.Material>>();
   private readonly spiritVeil = new SpiritVeilRig();
-  private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
-  private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private ferocityMaterials = [
     new Map<THREE.Material, THREE.Material>(),
     new Map<THREE.Material, THREE.Material>(),
@@ -1042,7 +1035,7 @@ export class CharacterVisual {
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
-    // A transparent effect whose clones finished linking: swap them in HERE,
+    // An effect whose staged materials finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
     // A far crossing that lost the bake-budget race retries here until its
@@ -2298,28 +2291,6 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
-  /** The Soul Rend clones this body will need, built without flipping the mark
-   *  (no `soulRend` flag, no material application): the encounter prewarm only
-   *  wants the program linked. Selection lives in `soul_rend_prewarm_core`; the
-   *  disposed arm matters because the queue defers this past the frame that
-   *  built the view. */
-  prewarmSoulRendSlots(): Array<{
-    source: THREE.Mesh;
-    overlay: THREE.Material | THREE.Material[];
-  }> {
-    return soulRendPrewarmTargets<THREE.Mesh, THREE.Material>({
-      originalMaterials: this.originalMaterials,
-      farMesh: this.farMesh,
-      farMaterials: this.farMaterials,
-      disposed: this.disposed,
-    }).map(({ source, original }) => ({
-      source,
-      overlay: Array.isArray(original)
-        ? original.map((material) => this.soulRendMaterial(material))
-        : this.soulRendMaterial(original),
-    }));
-  }
-
   /** Scale only the drawn pose. The click proxy remains at its authoritative size. */
   setPresentationScale(scale: number): void {
     const next = Number.isFinite(scale) ? Math.min(1.2, Math.max(1, scale)) : 1;
@@ -2439,16 +2410,18 @@ export class CharacterVisual {
   }
 
   /**
-   * An overlay that flips `transparent` is a NEW program per rig material
-   * (three keys `opaque`), and swapping it onto a visible rig links it on the
-   * next draw: the 4808 ms `paladin_metallic` stall of the 2026-08-17 crowd
-   * capture. So the first time a given clone set is mounted, the rig keeps
-   * drawing its current materials and the clones compile hidden on a scratch
-   * mesh set, exactly the shape stageFarMaterials uses for a re-skin.
+   * An effect whose programs are not linked yet (a veil tuple the boot family
+   * has not linked, the surface response's own program) would link them on the
+   * next draw of a visible rig: the 4808 ms `paladin_metallic` stall of the
+   * 2026-08-17 crowd capture, from the lit transparent twins the veil replaced.
+   * So the first time such a set is mounted, the rig keeps drawing its current
+   * materials and the new set compiles hidden on a scratch mesh set, exactly
+   * the shape stageFarMaterials uses for a re-skin.
    *
    * The body is NEVER hidden by this: it is a deferred SWAP, not a gate on the
-   * entity. Stealth or a shapeshift tint reading a few frames late is the whole
-   * cost, and it is paid once per clone set: the second toggle is immediate.
+   * entity. A cosmetic look reading a few frames late is the whole cost, and it
+   * is paid once per set: the second toggle is immediate. The veil family is
+   * linked at boot, so a veil normally commits on its frame.
    */
   private applyVisualMaterials(): void {
     // A newer effect supersedes anything still linking (a stale settle must
@@ -3334,11 +3307,8 @@ export class CharacterVisual {
 
   private disposeWeaponSkinMaterials(): void {
     disposeOwnedWeaponSkinMaterials(this.model, this.originalMaterials, [
-      this.ghostMaterials,
       ...this.veilMaterials.values(),
-      this.soulRendMaterials,
       this.shadowformMaterials,
-      this.moonkinMaterials,
       this.runeTintMaterials,
       this.auraGlowMaterials,
       this.surfaceResponse.materials,
@@ -3350,11 +3320,8 @@ export class CharacterVisual {
     // dropped WITHOUT being recorded as linked (a disposed program is not one).
     this.dropPendingEffectSwap(false);
     const materials = new Set<THREE.Material>([
-      ...this.ghostMaterials.values(),
       ...[...this.veilMaterials.values()].flatMap((cache) => [...cache.values()]),
-      ...this.soulRendMaterials.values(),
       ...this.shadowformMaterials.values(),
-      ...this.moonkinMaterials.values(),
       ...this.ferocityMaterials.flatMap((cache) => [...cache.values()]),
       ...this.ascensionMaterials.values(),
       ...this.runeTintMaterials.values(),
@@ -3362,11 +3329,8 @@ export class CharacterVisual {
       ...this.surfaceResponse.materials.values(),
     ]);
     for (const material of materials) material.dispose();
-    this.ghostMaterials.clear();
     this.veilMaterials.clear();
-    this.soulRendMaterials.clear();
     this.shadowformMaterials.clear();
-    this.moonkinMaterials.clear();
     for (const cache of this.ferocityMaterials) cache.clear();
     this.ascensionMaterials.clear();
     this.runeTintMaterials.clear();
@@ -3634,13 +3598,16 @@ export class CharacterVisual {
     return this.effectSingleMaterial(material, mesh) as T;
   }
 
-  // Every overlay cache below clones the rig's live material. They all go
-  // through cloneMaterialWithHooks for the reason material_clone_hooks.ts
-  // spells out: a bare clone() drops onBeforeCompile, so it renders WITHOUT
-  // the rim glow, the worn detail layer and the player's armour dye (a dyed
-  // set reverting to its base colours the moment the character ghosts, goes
-  // shadowform, or shifts to moonkin), and it links a second program on its
-  // first draw because three keys its cache on customProgramCacheKey().
+  // Every tint cache below clones the rig's live material. They all go through
+  // cloneMaterialWithHooks for the reason material_clone_hooks.ts spells out:
+  // a bare clone() drops onBeforeCompile, so it renders WITHOUT the rim glow,
+  // the worn detail layer and the player's armour dye (a dyed set reverting to
+  // its base colours the moment the character goes shadowform), and it links a
+  // second program on its first draw because three keys its cache on
+  // customProgramCacheKey(). The veils mount their own unlit materials, and no
+  // effect here may flip a clone's `transparent` (the lit transparent twin is
+  // gone: tests/character_spirit_veil.test.ts and
+  // tests/character_effect_twin_guard.test.ts).
   private effectSingleMaterial(material: THREE.Material, mesh: THREE.Mesh): THREE.Material {
     // The veils (Soul Rend first, then a ghost look, then Moonkin) win over the
     // tints.
@@ -3710,14 +3677,6 @@ export class CharacterVisual {
     return marked;
   }
 
-  private ghostMaterial(material: THREE.Material): THREE.Material {
-    const cached = this.ghostMaterials.get(material);
-    if (cached) return cached;
-    const ghost = createGhostEffectMaterial(material, 'stealth');
-    this.ghostMaterials.set(material, ghost);
-    return ghost;
-  }
-
   /** The veil keeps the class halo's own material: the halo is hidden
    *  while veiled (syncSpiritVeil), so it needs no program of the family. */
   private veilMaterial(
@@ -3740,27 +3699,11 @@ export class CharacterVisual {
     return veil;
   }
 
-  private soulRendMaterial(material: THREE.Material): THREE.Material {
-    const cached = this.soulRendMaterials.get(material);
-    if (cached) return cached;
-    const marked = applySoulRendOverlay(material);
-    this.soulRendMaterials.set(material, marked);
-    return marked;
-  }
-
   private shadowformMaterial(material: THREE.Material): THREE.Material {
     const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
     const marked = createShadowformTintMaterial(material);
     this.shadowformMaterials.set(material, marked);
-    return marked;
-  }
-
-  private moonkinMaterial(material: THREE.Material): THREE.Material {
-    const cached = this.moonkinMaterials.get(material);
-    if (cached) return cached;
-    const marked = createMoonkinEffectMaterial(material);
-    this.moonkinMaterials.set(material, marked);
     return marked;
   }
 

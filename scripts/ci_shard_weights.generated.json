@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4091,
-    "harvestedFiles": 3946,
+    "files": 4088,
+    "harvestedFiles": 3943,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
         "ms": 14,
@@ -1832,7 +1832,6 @@
   "tests/character_death_grounding.test.ts": 333,
   "tests/character_death_grounding_core.test.ts": 4,
   "tests/character_effect_compile_gate.test.ts": 1189,
-  "tests/character_effect_prewarm.test.ts": 18,
   "tests/character_effects.test.ts": 14,
   "tests/character_effects_impaled.test.ts": 8,
   "tests/character_far_compile_gate.test.ts": 18,
@@ -4805,8 +4804,6 @@
   "tests/social_window.test.ts": 23,
   "tests/software_render_notice.test.ts": 9,
   "tests/software_renderer.test.ts": 11,
-  "tests/soul_rend_overlay.test.ts": 8,
-  "tests/soul_rend_prewarm_core.test.ts": 8,
   "tests/soulwell.test.ts": 4539,
   "tests/soulwell_visual.test.ts": 33,
   "tests/spatial.test.ts": 6090,

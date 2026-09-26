@@ -743,3 +743,72 @@ describe('Shadowform is an opaque tint on the source programs, not a veil', () =
     visual.dispose();
   });
 });
+
+describe('no effect state reaches a lit transparent twin', () => {
+  type Toggle = { name: string; on(v: CharacterVisual): void };
+  const TOGGLES: Toggle[] = [
+    ...(
+      ['spirit', 'wolf', 'march', 'stealth-rogue', 'stealth-other', 'moonkin', 'soul-rend'] as const
+    ).map((palette) => ({
+      name: `ghost:${palette}`,
+      on: (v: CharacterVisual) => v.setGhost(true, palette),
+    })),
+    { name: 'soul rend', on: (v) => v.setSoulRend(true) },
+    { name: 'moonkin', on: (v) => v.setMoonkin(true) },
+    { name: 'shadowform', on: (v) => v.setShadowform(true) },
+    { name: 'ferocity', on: (v) => v.setFerocityStage(3) },
+    { name: 'ascended', on: (v) => v.setAscended(true) },
+    { name: 'rune tint', on: (v) => v.setRuneTint(0xff2200) },
+    { name: 'aura glow', on: (v) => v.setAuraGlow(0xffffff, 0.6) },
+    { name: 'element response', on: (v) => v.respondToElement('fire') },
+  ];
+
+  function clear(v: CharacterVisual): void {
+    v.setGhost(false);
+    v.setSoulRend(false);
+    v.setMoonkin(false);
+    v.setShadowform(false);
+    v.setFerocityStage(0);
+    v.setAscended(false);
+    v.setRuneTint(null);
+    v.setAuraGlow(0xffffff, 0);
+    v.clearElementResponse();
+  }
+
+  it('mounts only a veil pass or a clone that keeps its source blend, for every state and pair of states', async () => {
+    const { visual, veil, gateCalls } = await makePriest(true);
+    const priv = visual as unknown as {
+      originalMaterials: Map<THREE.Mesh, THREE.Material | THREE.Material[]>;
+      farMesh: THREE.Mesh | null;
+      farMaterials: THREE.Material | THREE.Material[] | null;
+    };
+    const check = (label: string): number => {
+      let checked = 0;
+      const pairs: [THREE.Mesh, THREE.Material | THREE.Material[]][] = [...priv.originalMaterials];
+      if (priv.farMesh && priv.farMaterials) pairs.push([priv.farMesh, priv.farMaterials]);
+      for (const [mesh, original] of pairs) {
+        const sources = [original].flat();
+        const worn = [mesh.material].flat();
+        worn.forEach((material, i) => {
+          checked++;
+          if (veil.spiritVeilPassOf(material) !== null) return;
+          expect(material.transparent, `${label} ${mesh.name}`).toBe(sources[i].transparent);
+          expect(material.userData.wocCharacterEffect, `${label} ${mesh.name}`).toBeUndefined();
+        });
+      }
+      return checked;
+    };
+    for (const a of TOGGLES) {
+      for (const b of [null, ...TOGGLES]) {
+        clear(visual);
+        a.on(visual);
+        b?.on(visual);
+        // whatever staged behind the effect gate lands: what the state MOUNTS
+        for (const call of gateCalls.splice(0)) call.settle();
+        visual.update(FRAME, anim(), true);
+        expect(check(`${a.name}+${b?.name ?? '-'}`)).toBeGreaterThan(3);
+      }
+    }
+    visual.dispose();
+  });
+});

@@ -40,18 +40,23 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   spirit veil's colour pass splices the same GLSL (`ARMOR_DYE_GLSL_PARS`,
   `armorDyeRemapGlsl`) so a veil that keeps colours keeps the dye too.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/
-  ghost plumbing, one-shot triggers, death/revive edge logic. A transparent
-  effect (ghost run, stealth, Shadowform, Moonkin) is a new program per rig
-  material, so its clones link hidden behind the same compile gate before the
-  swap commits (`stageEffectSwap`, twinning each source mesh's KIND because
-  three keys `skinning` on `isSkinnedMesh`); the Soul Rend mark is exempt and
-  commits at once, being actionable raid information
-  (`tests/character_effect_compile_gate.test.ts`). A released spirit is the
-  exception to the twin: it wears the spirit veil (`ghost_veil.ts`), one
-  unlit material per (source, shape) over a depth pre-pass sibling, all on
-  the pinned program family of `spirit_veil_family_core.ts` that
-  `../spirit_veil_prewarm.ts` links at boot, so its swap commits at once;
-  a new part shape must join that family (`tests/spirit_veil_census.test.ts`).
+  ghost plumbing, one-shot triggers, death/revive edge logic. Every translucent
+  look is the spirit veil (`ghost_veil.ts`): one unlit material per (palette,
+  source, shape) over a depth pre-pass sibling, all on the pinned program
+  family of `spirit_veil_family_core.ts` that `../spirit_veil_prewarm.ts` links
+  at boot, so the swap commits at once; a new part shape must join that family
+  (`tests/spirit_veil_census.test.ts`). The users and their palettes are
+  `spirit_veil_palette_core.ts` (a released spirit, the Pale Keeper and the
+  quest visions; Ghost Wolf; the Veilbound March; stealth by source; Moonkin;
+  Soul Rend), picked by `../ghost_style_core.ts` and the visual's own Moonkin
+  and Soul Rend flags; the palette's policy says whether the rig keeps its
+  shadow and weapon-skin VFX. Shadowform is no veil: an opaque tint on the
+  source programs (`shadowform_tint.ts`). A veil tuple not linked yet stages
+  behind the effect gate with the body still drawing (`stageEffectSwap`),
+  except Soul Rend, actionable raid information, which commits at once
+  (`tests/character_effect_compile_gate.test.ts`). The lit transparent twin
+  of a rig material is gone and must not return
+  (`tests/character_effect_twin_guard.test.ts`).
 - `halo.ts`: the class halo (`buildHalo`, driven by `VisualDef.halo` +
   `haloUpOffset`/`haloRadius` overrides). Texture, per-color materials, and
   per-radius geometries are shared never-disposed caches, so radii MUST come

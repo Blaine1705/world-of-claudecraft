@@ -969,7 +969,10 @@ const MONOLITHS: MonolithRow[] = [
     // 12789 -> 12785: the per-entity ghost-style decision moved to
     // ghost_style_core.ts, paying for the spirit veil's manifest entry and
     // its install line. Exact count.
-    ceiling: 12785,
+    // 12785 -> 12715: every translucent character look moved onto the spirit
+    // veil, deleting the lit twin group's slot and manifest entry, the local
+    // self warm and the Nythraxis Soul Rend live arm. Exact count.
+    ceiling: 12715,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
