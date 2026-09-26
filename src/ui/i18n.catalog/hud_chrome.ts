@@ -9136,6 +9136,14 @@ export const hudChromeStrings = {
     listingStatusCancelled: 'Cancelled',
     listingStatusSuspended: 'Suspended',
     listingStatusUnsold: 'Unsold',
+    // The character-select read-only Exchange panel (docs/prd/woc/marketplace.md
+    // "Character-select browsing"): a browse/sales-history-only view reachable
+    // before any character enters the world, with no bid/buy/sell controls. It
+    // reuses every other wocMarket.* string above (title, tabs, columns,
+    // detail fields, empty/error/loading faces); these two are the only
+    // strings unique to that screen.
+    charselectWebLink: 'Bid, buy, or sell on the $WOC Exchange website',
+    charselectWebNote: 'Enter the game with a character to bid, buy, or sell.',
   },
   // Loot Explorer: a searchable, filterable catalog of every item the game
   // can hand a player and where to get it, grouped by encounter and

@@ -6099,7 +6099,9 @@ export const sv_SE: EnTranslations = {
       "listingStatusReturned": "Returnerad",
       "listingStatusCancelled": "Avbruten",
       "listingStatusSuspended": "Avstängd",
-      "listingStatusUnsold": "Osåld"
+      "listingStatusUnsold": "Osåld",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Bytesöversikt",

@@ -6099,7 +6099,9 @@ export const vi_VN: EnTranslations = {
       "listingStatusReturned": "Đã Trả Về",
       "listingStatusCancelled": "Đã Hủy",
       "listingStatusSuspended": "Đã Tạm Khóa",
-      "listingStatusUnsold": "Chưa Bán Được"
+      "listingStatusUnsold": "Chưa Bán Được",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Nhà thám hiểm chiến lợi phẩm",

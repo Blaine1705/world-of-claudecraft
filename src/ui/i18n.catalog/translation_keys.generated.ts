@@ -13249,6 +13249,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocMarket.buyNowNote'
   | 'hudChrome.wocMarket.cancelAria'
   | 'hudChrome.wocMarket.cancelButton'
+  | 'hudChrome.wocMarket.charselectWebLink'
+  | 'hudChrome.wocMarket.charselectWebNote'
   | 'hudChrome.wocMarket.claimCooldownRetry'
   | 'hudChrome.wocMarket.close'
   | 'hudChrome.wocMarket.colBuyNow'

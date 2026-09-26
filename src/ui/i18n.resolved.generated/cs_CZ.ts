@@ -6099,7 +6099,9 @@ export const cs_CZ: EnTranslations = {
       "listingStatusReturned": "Vráceno",
       "listingStatusCancelled": "Zrušeno",
       "listingStatusSuspended": "Pozastaveno",
-      "listingStatusUnsold": "Neprodáno"
+      "listingStatusUnsold": "Neprodáno",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Průzkumník kořisti",

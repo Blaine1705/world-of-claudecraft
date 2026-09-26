@@ -10028,6 +10028,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': '已取消',
   'hudChrome.wocMarket.listingStatusSuspended': '已冻结',
   'hudChrome.wocMarket.listingStatusUnsold': '未售出',
+  'hudChrome.wocMarket.charselectWebLink': '在 $WOC 交易所网站上出价、购买或出售',
+  'hudChrome.wocMarket.charselectWebNote': '进入游戏并选择角色后才能出价、购买或出售。',
   'hudChrome.wocMarket.bidBondPayItemAria': '为你对 {item} 的出价支付 {bond} 保证金',
   'hudChrome.wocMarket.strikesTip':
     '每当你未为已承诺的交易付款，就会记一次违约。首次之外，每次违约都会让你被交易所暂停更长时间：3 天，然后 14 天、90 天，再然后一年。',

@@ -6099,7 +6099,9 @@ export const ja_JP: EnTranslations = {
       "listingStatusReturned": "返却済み",
       "listingStatusCancelled": "取り下げ済み",
       "listingStatusSuspended": "停止中",
-      "listingStatusUnsold": "未売却"
+      "listingStatusUnsold": "未売却",
+      "charselectWebLink": "$WOC 取引所のウェブサイトで入札・購入・出品する",
+      "charselectWebNote": "入札、購入、出品するにはキャラクターでゲームに入ってください。"
     },
     "lootExplorer": {
       "title": "戦利品ブラウザ",

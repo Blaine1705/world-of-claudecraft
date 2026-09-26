@@ -6099,7 +6099,9 @@ export const fr_CA: EnTranslations = {
       "listingStatusReturned": "Retournée",
       "listingStatusCancelled": "Annulée",
       "listingStatusSuspended": "Suspendue",
-      "listingStatusUnsold": "Invendue"
+      "listingStatusUnsold": "Invendue",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Explorateur de butin",

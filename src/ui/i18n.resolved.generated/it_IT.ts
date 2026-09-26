@@ -6099,7 +6099,9 @@ export const it_IT: EnTranslations = {
       "listingStatusReturned": "Restituita",
       "listingStatusCancelled": "Annullata",
       "listingStatusSuspended": "Sospesa",
-      "listingStatusUnsold": "Invenduta"
+      "listingStatusUnsold": "Invenduta",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Esploratore del bottino",

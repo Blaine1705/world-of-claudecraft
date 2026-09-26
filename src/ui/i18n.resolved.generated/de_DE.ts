@@ -6099,7 +6099,9 @@ export const de_DE: EnTranslations = {
       "listingStatusReturned": "Zurückgegeben",
       "listingStatusCancelled": "Zurückgezogen",
       "listingStatusSuspended": "Ausgesetzt",
-      "listingStatusUnsold": "Nicht verkauft"
+      "listingStatusUnsold": "Nicht verkauft",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Beute-Explorer",

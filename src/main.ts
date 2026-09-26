@@ -42,6 +42,7 @@ import {
   wrapAngle,
 } from './game/camera_follow';
 import { applyCameraViewSetting, applyCameraViewSettings } from './game/camera_view_settings';
+import { initCharselectWocMarket } from './game/charselect_woc_market_wiring';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -339,6 +340,7 @@ import {
   CharacterPreview,
   npcLookFor,
   type PreviewAppearance,
+  previewAppearanceForRow,
   setModularLookProvider,
 } from './render/characters';
 import {
@@ -7009,11 +7011,14 @@ function showCharselectCharacter(c: CharacterSummary): void {
   if (!characterPreview) return;
   const look = charselectLook(c);
   if (!look) {
-    characterPreview.setAppearance(charselectAppearance(c));
+    // Same on-demand weapon-skin warmup the composed path below performs
+    // (mech lazy-load: iOS WebKit streams Armory skins after world entry).
+    ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
+    characterPreview.setAppearance(previewAppearanceForRow(c));
     return;
   }
-  // Same on-demand weapon-skin warmup the legacy path performs (see
-  // charselectAppearance): the composed turntable holds the skinned weapon too.
+  // Same on-demand weapon-skin warmup the plain-appearance arm above
+  // performs: the composed turntable holds the skinned weapon too.
   ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   characterPreview.setModular(
     look.app,
@@ -7046,24 +7051,15 @@ const redesignEditor = new CharselectRedesignEditor({
   errorText: userFacingApiError,
 });
 
-// The char-select roster row's real, in-world appearance for the 3D preview.
-function charselectAppearance(c: CharacterSummary): PreviewAppearance {
-  // Every iOS WebKit host streams the Armory weapon-skin GLBs after world
-  // entry instead of holding all of them at the launcher, so the preview of a
-  // character wearing one needs ITS skin fetched on demand (the mech lazy-load
-  // pattern). Memoized and a no-op when resident or on eager platforms; a
-  // preview built in the race window shows the base weapon and picks the skin
-  // up on the next selection change.
-  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
-  return {
-    cls: c.class,
-    skin: c.skin ?? 0,
-    skinCatalog: c.skinCatalog ?? 'class',
-    mainhandItemId: c.mainhandItemId ?? null,
-    offhandItemId: c.offhandItemId ?? null,
-    weaponSkinId: c.weaponSkinId ?? null,
-  };
-}
+// Char-select read-only $WOC Exchange: the whole composition lives in
+// charselect_woc_market_wiring.ts, independent of enterWorld's own attach.
+initCharselectWocMarket({
+  root: () => document.getElementById('charselect-woc-market'),
+  newsHost: () => document.getElementById('charselect-news'),
+  launcherButton: () => document.getElementById('btn-charselect-woc-market'),
+  closeRedesignIfOpen: () => (redesignEditor.isOpen ? redesignEditor.close(false) : undefined),
+  api,
+});
 
 function renderClassDetails(
   panelId: string,

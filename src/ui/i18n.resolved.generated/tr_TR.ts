@@ -6099,7 +6099,9 @@ export const tr_TR: EnTranslations = {
       "listingStatusReturned": "İade edildi",
       "listingStatusCancelled": "İptal edildi",
       "listingStatusSuspended": "Askıya alındı",
-      "listingStatusUnsold": "Satılmadı"
+      "listingStatusUnsold": "Satılmadı",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Ganimet Gezgini",

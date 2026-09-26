@@ -6099,7 +6099,9 @@ export const en_XA: EnTranslations = {
       "listingStatusReturned": "[Ŕéţúŕñéð]",
       "listingStatusCancelled": "[Çáñçéļļéð]",
       "listingStatusSuspended": "[Šúšþéñðéð]",
-      "listingStatusUnsold": "[Úñšóļð]"
+      "listingStatusUnsold": "[Úñšóļð]",
+      "charselectWebLink": "[Ɓíð, ƀúý, óŕ šéļļ óñ ţĥé $ŴÓÇ Éẋçĥáñĝé ŵéƀšíţé]",
+      "charselectWebNote": "[Éñţéŕ ţĥé ĝáɱé ŵíţĥ á çĥáŕáçţéŕ ţó ƀíð, ƀúý, óŕ šéļļ.]"
     },
     "lootExplorer": {
       "title": "[Ļóóţ Éẋþļóŕéŕ]",
