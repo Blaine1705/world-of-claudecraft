@@ -124,6 +124,7 @@ const IOS_ULTRA = resolveGfxProfile(
     characterDetail: 1,
     dynamicLights: 1,
     particleEffects: 1,
+    ghostFade: 1,
   },
   '?gfx=ultra',
 ).settings;
