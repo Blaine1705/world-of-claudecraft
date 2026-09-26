@@ -481,6 +481,10 @@
           <div class="panel-title">
             <span class="mt-title-label ui-cin" data-i18n="hud.meters.healing">Healing</span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
@@ -495,6 +499,10 @@
           <div class="panel-title">
             <span class="mt-title-label ui-cin" data-i18n="hud.meters.threat">Threat</span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
@@ -510,9 +518,15 @@
             <span class="mt-tabs ui-seg">
               <button type="button" class="mt-tab on ui-seg-tab is-on" data-tab="dmg" data-i18n="hud.meters.damageShort">Dmg</button>
               <button type="button" class="mt-tab ui-seg-tab" data-tab="heal" data-i18n="hud.meters.healingShort">Heal</button>
+              <button type="button" class="mt-tab ui-seg-tab" data-tab="dmgTaken" data-i18n="hud.meters.damageTakenShort">Taken</button>
+              <button type="button" class="mt-tab ui-seg-tab" data-tab="interrupts" data-i18n="hud.meters.interruptsShort">Int</button>
               <button type="button" class="mt-tab ui-seg-tab" data-tab="threat" data-i18n="hud.meters.threat">Threat</button>
             </span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hud.meters.close" data-i18n-aria="hud.meters.close" title="Close meters" aria-label="Close meters" data-icon="close"></button>
@@ -660,9 +674,13 @@
     <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <div class="death-panel ui-panel-strong">
         <h2 class="ui-cin" data-i18n="hud.core.deathTitle">You have died.</h2>
-        <button type="button" class="btn ui-btn ui-btn--red ui-btn--lg" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+        <div class="death-actions">
+          <button type="button" class="btn ui-btn ui-btn--red ui-btn--lg" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+          <button type="button" class="btn ui-btn ui-btn--lg" id="death-recap-btn" data-i18n="hud.core.deathRecap">Recap</button>
+        </div>
       </div>
     </div>
+    <div id="death-recap-dialog" class="window panel" role="dialog" aria-modal="true" aria-labelledby="death-recap-title" style="display: none"></div>
     <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
          only when in reach of the corpse. The Pale Keeper's raise has no button here:
          the ghost talks to the Keeper (world click or the interact key), and both
