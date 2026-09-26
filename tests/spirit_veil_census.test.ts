@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 // The spirit veil family against the shipped catalogue: every shape a released
 // spirit can draw maps to a tuple of the pinned family, and the family holds
 // nothing else. A new part whose morph count, attribute set, texture channel or
@@ -20,10 +21,21 @@
 // one mesh padded to the UNION of their morph target names. The looks are the
 // cross product of the factors that share a bucket (hair, brows, beard) and a
 // one-at-a-time sweep of every other style, per gender and per armour loadout.
+// Two halves hold that model to the real thing: a sample of looks is composed
+// through the real GLTFLoader scene and the real mergeSkinnedParts and must
+// reach exactly the model's keys, and the data facts the sweep leans on (armour and
+// underclothing carry no morph target, the body is drawn under every loadout)
+// are asserted, so a mixed loadout keys like the full sets that span it.
 
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { resolve } from 'node:path';
+import * as THREE from 'three';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { glbJsonChunk } from '../scripts/assets/lib/glb_texture_compression_core.mjs';
+import { createSpiritVeilMaterial, spiritVeilKeysFor } from '../src/render/characters/ghost_veil';
 import {
   ITEM_OFFHAND_MODELS,
   itemWeaponModelUrls,
@@ -33,6 +45,7 @@ import {
 } from '../src/render/characters/manifest';
 import {
   ARMOR_SETS,
+  ARMOR_SLOTS,
   type ArmorLoadout,
   BEARD_STYLES,
   BROW_STYLES,
@@ -42,6 +55,7 @@ import {
   EYE_STYLES,
   fullSet,
   HAIR_STYLES,
+  helmKind,
   MOUTH_STYLES,
   type ModularAppearance,
   modularPartNames,
@@ -51,6 +65,7 @@ import {
   MODULAR_HEAD_NODES,
   modularMergePartition,
 } from '../src/render/characters/modular_name_facts_core';
+import { mergeSkinnedParts } from '../src/render/characters/rig_merge';
 import {
   SPIRIT_VEIL_FAMILY_KEYS,
   type SpiritVeilPass,
@@ -85,11 +100,13 @@ interface Part {
 
 const MODULAR_URL = 'models/chars/modular/warrior_modular.glb';
 const jsonCache = new Map<string, GltfJson>();
+// happy-dom replaces the global URL, which node:fs does not read as a path.
+const publicPath = (url: string): string => resolve(process.cwd(), 'public', url);
 
 function gltf(url: string): GltfJson {
   let json = jsonCache.get(url);
   if (!json) {
-    json = glbJsonChunk(readFileSync(new URL(`../public/${url}`, import.meta.url))) as GltfJson;
+    json = glbJsonChunk(readFileSync(publicPath(url))) as GltfJson;
     jsonCache.set(url, json);
   }
   return json;
@@ -321,5 +338,138 @@ describe('the spirit veil family covers the catalogue', () => {
   it('pins nothing the catalogue cannot reach', () => {
     const dead = [...SPIRIT_VEIL_FAMILY_KEYS].filter((key) => !needed.has(key));
     expect(dead).toEqual([]);
+  });
+});
+
+/** The most morph targets any primitive of each part-library node carries. */
+function nodeTargets(): Map<string, number> {
+  const json = gltf(MODULAR_URL);
+  const out = new Map<string, number>();
+  (json.nodes ?? []).forEach((node, index) => {
+    const parts = nodeParts(MODULAR_URL, index);
+    if (node.name && parts.length > 0) {
+      out.set(node.name, Math.max(...parts.map((part) => part.targetNames.length)));
+    }
+  });
+  return out;
+}
+
+function nodeMaterialName(node: string): string | undefined {
+  const index = (gltf(MODULAR_URL).nodes ?? []).findIndex((n) => n.name === node);
+  const part = nodeParts(MODULAR_URL, index)[0];
+  return part ? materialOf(MODULAR_URL, part)?.name : undefined;
+}
+
+describe('the composed sweep stands for every loadout', () => {
+  const targets = nodeTargets();
+  const single: ArmorLoadout[] = ARMOR_SLOTS.flatMap((slot) =>
+    ARMOR_SETS.map((set): ArmorLoadout => ({ [slot]: set })),
+  );
+
+  it('armour and the underclothing it replaces carry no morph target', () => {
+    // So whatever a mixed loadout folds together adds no target name to any
+    // bucket: its armour and underclothing only ever key the 0-target tuples.
+    let armour = 0;
+    let replaced = 0;
+    for (const gender of ['male', 'female'] as const) {
+      const app = normalizeAppearance({ ...DEFAULT_APPEARANCE, gender });
+      const bare = new Set(modularPartNames(app, {}));
+      for (const worn of single) {
+        const picked = new Set(modularPartNames(app, worn));
+        for (const node of picked) {
+          if (bare.has(node)) continue;
+          armour++;
+          expect(targets.get(node), node).toBe(0);
+        }
+        // What a helm removes (hair, ears, beard, earrings) the full sets sweep
+        // per helm kind; what any other slot removes is underclothing.
+        if (helmKind(worn) !== 'none') continue;
+        for (const node of bare) {
+          if (picked.has(node)) continue;
+          replaced++;
+          expect(targets.get(node), node).toBe(0);
+        }
+      }
+    }
+    expect(armour).toBeGreaterThan(50);
+    expect(replaced).toBeGreaterThan(0);
+  });
+
+  it('draws the whole body, head and skin parts, under every loadout', () => {
+    // The skin parts merge into one 14-target draw: a slot that hid a limb
+    // would key a target count no full set reaches.
+    for (const gender of ['male', 'female'] as const) {
+      const app = normalizeAppearance({ ...DEFAULT_APPEARANCE, gender });
+      const body = modularPartNames(app, {}).filter(
+        (node) => nodeMaterialName(node) === 'mod_skin_detail' || MODULAR_HEAD_NODES.includes(node),
+      );
+      expect(body).toHaveLength(10);
+      for (const worn of [...single, ...ARMOR_SETS.map((set) => fullSet(set))]) {
+        const picked = new Set(modularPartNames(app, worn));
+        for (const node of body) expect(picked.has(node), `${gender} ${node}`).toBe(true);
+      }
+    }
+  });
+});
+
+describe('the census merge model against the real merge', () => {
+  let scene: THREE.Object3D;
+  beforeAll(async () => {
+    await MeshoptDecoder.ready;
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
+    // A program is keyed by the map's presence, not its texels.
+    loader.setKTX2Loader({
+      load(_url: string, onLoad: (texture: THREE.Texture) => void) {
+        onLoad(new THREE.DataTexture(new Uint8Array([200, 200, 200, 255]), 1, 1));
+      },
+    } as never);
+    const buffer = readFileSync(publicPath(MODULAR_URL));
+    const glb = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+    scene = (await loader.parseAsync(glb as ArrayBuffer, '')).scene;
+  }, 60_000);
+
+  /** The look as assets.ts modularVariant composes it, each mesh keyed the way
+   *  the veil keys the draw it mounts there. */
+  function realKeys(app: ModularAppearance, worn: ArmorLoadout): string[] {
+    const root = cloneSkinned(scene);
+    const keep = new Set(modularPartNames(app, worn));
+    const drop: THREE.Object3D[] = [];
+    root.traverse((object) => {
+      if (!(object as THREE.SkinnedMesh).isSkinnedMesh) return;
+      if (keep.has(object.name) || (object.parent && keep.has(object.parent.name))) return;
+      drop.push(object);
+    });
+    for (const object of drop) object.removeFromParent();
+    mergeSkinnedParts(root, undefined, {
+      partitionKey: (mesh) => modularMergePartition(mesh.name),
+    });
+    const keys: string[] = [];
+    root.traverse((object) => {
+      const mesh = object as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const veil = createSpiritVeilMaterial(mesh.material as THREE.Material);
+      keys.push(...(spiritVeilKeysFor(veil, mesh) ?? []));
+      veil.dispose();
+    });
+    return [...new Set(keys)].sort();
+  }
+
+  // The key SET is what the census reads. The model folds more of a set's
+  // zero-target armour pieces than the real merge (whose bind law refuses
+  // some), and those key alike either way.
+  const modelKeys = (app: ModularAppearance, worn: ArmorLoadout): string[] =>
+    [...new Set(composedParts(app, worn).flatMap((part) => partKeys(MODULAR_URL, part)))].sort();
+
+  it('keys a sample of looks, every loadout of both genders, exactly as the real merge does', () => {
+    const sample = looks().filter((_, i) => i % 331 === 0);
+    const loadouts = new Set(
+      sample.map(({ app, worn }) => `${app.gender}:${JSON.stringify(worn)}`),
+    );
+    expect(loadouts.size).toBe(2 * (ARMOR_SETS.length + 1));
+    expect(sample.length).toBeGreaterThan(50);
+    for (const { app, worn } of sample) {
+      expect(modelKeys(app, worn), JSON.stringify({ app, worn })).toEqual(realKeys(app, worn));
+    }
   });
 });
