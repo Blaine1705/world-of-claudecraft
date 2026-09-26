@@ -1371,6 +1371,48 @@ export const zh_CN: EnTranslations = {
       "since": "宣誓于{date}",
       "withdraw": "撤回宣誓"
     },
+    "guildRanks": {
+      "tab": "阶级",
+      "introEdit": "命名你的公会阶级，并选择每个阶级可以做什么。保存后，更改会应用到持有该阶级的所有成员。",
+      "introView": "每个阶级名称及其权限。只有公会会长可以更改它们。",
+      "colRank": "阶级",
+      "colTitle": "名称",
+      "colMembers": "成员",
+      "colActions": "顺序",
+      "numbered": "阶级 {n}",
+      "perm": {
+        "invite": "邀请",
+        "remove": "移除",
+        "promote": "晋升",
+        "bank": "公会银行",
+        "officerChat": "官员聊天",
+        "motd": "公告栏",
+        "events": "日历"
+      },
+      "permHint": {
+        "invite": "邀请玩家加入公会并处理他们的申请。",
+        "remove": "移除低于自己阶级的成员。",
+        "promote": "晋升和降级低于自己阶级的成员，最高只能升到比自己低一级。",
+        "bank": "在公会银行存入和取出铜币与物品。所有成员都可以查看。",
+        "officerChat": "阅读并使用官员聊天。",
+        "motd": "编辑公会公告栏。",
+        "events": "添加和移除公会日历事件。"
+      },
+      "titleLabel": "{rank} 的名称",
+      "permLabel": "{rank} 的{perm}",
+      "leaderLocked": "公会会长始终拥有所有权限。",
+      "add": "添加阶级",
+      "save": "保存阶级",
+      "moveUp": "上移 {rank}",
+      "moveDown": "下移 {rank}",
+      "remove": "移除 {rank}",
+      "full": "一个公会最多可有 {max} 个阶级。",
+      "invalidTitle": "阶级名称可使用字母、数字、空格、撇号和连字符，最多 {max} 个字符。",
+      "removeConfirm": "持有 {rank} 的成员会变为 {fallback}。要移除此阶级吗？",
+      "removeAccept": "移除阶级",
+      "promoteTo": "将 {name} 晋升为 {rank}",
+      "demoteTo": "将 {name} 降为 {rank}"
+    },
     "raidLockout": {
       "title": "团队副本锁定",
       "allReady": "所有团队副本就绪",
@@ -3626,6 +3668,10 @@ export const zh_CN: EnTranslations = {
       "elite": "精英",
       "boss": "首领"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "移动目标框",
       "lock": "锁定目标框"
@@ -3708,7 +3754,8 @@ export const zh_CN: EnTranslations = {
         "deedTracker": "功绩追踪器",
         "delveTracker": "探秘追踪器",
         "riftTracker": "裂隙追踪器",
-        "swingBarOffhand": "副手"
+        "swingBarOffhand": "副手",
+        "unitTooltip": "提示框"
       },
       "framesMenu": "框体设置",
       "framesMenuTitle": "显示或隐藏各个框体。取消勾选的框体会一直隐藏，直到你重新勾选或恢复默认设置。",

@@ -1371,6 +1371,48 @@ export const zh_TW: EnTranslations = {
       "since": "宣誓於{date}",
       "withdraw": "撤回宣誓"
     },
+    "guildRanks": {
+      "tab": "階級",
+      "introEdit": "命名你的公會階級，並選擇每個階級可以做什麼。儲存後，變更會套用到持有該階級的所有成員。",
+      "introView": "每個階級名稱及其權限。只有公會會長可以變更它們。",
+      "colRank": "階級",
+      "colTitle": "名稱",
+      "colMembers": "成員",
+      "colActions": "順序",
+      "numbered": "階級 {n}",
+      "perm": {
+        "invite": "邀請",
+        "remove": "移除",
+        "promote": "晉升",
+        "bank": "公會銀行",
+        "officerChat": "幹部聊天",
+        "motd": "公告欄",
+        "events": "行事曆"
+      },
+      "permHint": {
+        "invite": "邀請玩家加入公會並處理他們的申請。",
+        "remove": "移除低於自己階級的成員。",
+        "promote": "晉升和降級低於自己階級的成員，最高只能升到比自己低一級。",
+        "bank": "在公會銀行存入和取出銅幣與物品。所有成員都可以查看。",
+        "officerChat": "閱讀並使用幹部聊天。",
+        "motd": "編輯公會公告欄。",
+        "events": "新增和移除公會行事曆事件。"
+      },
+      "titleLabel": "{rank} 的名稱",
+      "permLabel": "{rank} 的{perm}",
+      "leaderLocked": "公會會長始終擁有所有權限。",
+      "add": "新增階級",
+      "save": "儲存階級",
+      "moveUp": "上移 {rank}",
+      "moveDown": "下移 {rank}",
+      "remove": "移除 {rank}",
+      "full": "一個公會最多可有 {max} 個階級。",
+      "invalidTitle": "階級名稱可使用字母、數字、空格、撇號和連字號，最多 {max} 個字元。",
+      "removeConfirm": "持有 {rank} 的成員會變為 {fallback}。要移除此階級嗎？",
+      "removeAccept": "移除階級",
+      "promoteTo": "將 {name} 晉升為 {rank}",
+      "demoteTo": "將 {name} 降為 {rank}"
+    },
     "raidLockout": {
       "title": "團隊副本鎖定",
       "allReady": "所有團隊副本就緒",
@@ -3626,6 +3668,10 @@ export const zh_TW: EnTranslations = {
       "elite": "精英",
       "boss": "首領"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "移動目標框",
       "lock": "鎖定目標框"
@@ -3708,7 +3754,8 @@ export const zh_TW: EnTranslations = {
         "deedTracker": "功績追蹤器",
         "delveTracker": "秘探追蹤器",
         "riftTracker": "裂隙追蹤器",
-        "swingBarOffhand": "副手"
+        "swingBarOffhand": "副手",
+        "unitTooltip": "提示框"
       },
       "framesMenu": "框體設定",
       "framesMenuTitle": "顯示或隱藏各個框體。取消勾選的框體會一直隱藏，直到你重新勾選或還原預設值。",

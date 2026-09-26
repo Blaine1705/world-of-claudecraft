@@ -1482,6 +1482,60 @@ export const hudChromeStrings = {
     since: 'Pledged {date}',
     withdraw: 'Withdraw pledge',
   },
+  // Guild-rank editor (social window): the ranks tab, editable/viewer intro,
+  // table headers, permission column labels and their hover help, row controls,
+  // validation notices, remove confirmation, and the roster's promote/demote
+  // hovers, which name the rank a click moves the member to. Wordy values (M16)
+  // ship their five non-Latin fills in the same change.
+  guildRanks: {
+    tab: 'Ranks',
+    introEdit:
+      'Name your guild ranks and choose what each one may do. Changes apply to everyone holding the rank once you save.',
+    introView: 'Each rank title and what it may do. Only the Guild Master can change them.',
+    colRank: 'Rank',
+    colTitle: 'Title',
+    colMembers: 'Members',
+    colActions: 'Order',
+    // An untitled custom rank reads as its ladder position (the Guild Master
+    // is rank 0), the way a guild ledger numbers its seats.
+    numbered: 'Rank {n}',
+    perm: {
+      invite: 'Invite',
+      remove: 'Remove',
+      promote: 'Promote',
+      bank: 'Guild Bank',
+      officerChat: 'Officer Chat',
+      motd: 'Billboard',
+      events: 'Calendar',
+    },
+    // Column-header hovers: what each permission lets a rank do.
+    permHint: {
+      invite: 'Invite players to the guild and answer their pledges.',
+      remove: 'Remove members who hold a lower rank.',
+      promote: 'Promote and demote members who hold a lower rank, up to one rank below their own.',
+      bank: 'Deposit and withdraw copper and items in the guild bank. Every member can view it.',
+      officerChat: 'Read and speak in officer chat.',
+      motd: 'Edit the guild billboard.',
+      events: 'Add and remove guild calendar events.',
+    },
+    // Accessible names for the per-row controls ({rank} is the row's label).
+    titleLabel: 'Title for {rank}',
+    permLabel: '{perm} for {rank}',
+    leaderLocked: 'The Guild Master always holds every permission.',
+    add: 'Add Rank',
+    save: 'Save Ranks',
+    moveUp: 'Move {rank} up',
+    moveDown: 'Move {rank} down',
+    remove: 'Remove {rank}',
+    full: 'A guild can have at most {max} ranks.',
+    invalidTitle:
+      'Rank titles use letters, numbers, spaces, apostrophes, and hyphens, up to {max} characters.',
+    removeConfirm: 'Members holding {rank} will become {fallback}. Remove this rank?',
+    removeAccept: 'Remove Rank',
+    // Roster row hovers for the promote / demote buttons.
+    promoteTo: 'Promote {name} to {rank}',
+    demoteTo: 'Demote {name} to {rank}',
+  },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
   // (digits run through formatNumber; the units reorder per locale).
@@ -4960,6 +5014,15 @@ export const hudChromeStrings = {
     elite: 'Elite',
     boss: 'Boss',
   },
+  // <Guild> line and the chosen specialization with its role, both slots
+  // resolved client-side (the spec from its talent name, the role from the
+  // shared talent role labels). Neither is wordy (no four-letter lowercase run
+  // outside the tokens), so no M16 fills are needed; a locale that brackets or
+  // orders them differently owns its punctuation in the overlay.
+  playerTooltip: {
+    guild: '<{guild}>',
+    specRole: '{spec} ({role})',
+  },
   // Movable target frame: the small corner toggle that unlocks the frame for
   // dragging and locks it back in place (target_frame_pos.ts + hud.ts wiring).
   // The one button swaps its accessible name with its pressed state; both values
@@ -5115,6 +5178,10 @@ export const hudChromeStrings = {
       delveTracker: 'Delve Tracker',
       riftTracker: 'Rift Tracker',
       swingBarOffhand: 'Off Hand',
+      // The mouseover unit tooltip's movable seat (#unit-tooltip-anchor), an
+      // invisible box in play, so its chip is what names the placeholder.
+      // Wordy (M16): the five non-Latin fills land in this same change.
+      unitTooltip: 'Tooltip',
     },
     // The frames settings dropdown beside the floating Lock Interface button:
     // a show/hide sub-menu plus the frame-behavior toggles that used to live

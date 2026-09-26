@@ -1371,6 +1371,48 @@ export const ko_KR: EnTranslations = {
       "since": "{date}에 서약",
       "withdraw": "서약 철회"
     },
+    "guildRanks": {
+      "tab": "등급",
+      "introEdit": "길드 등급의 이름을 정하고 각 등급이 무엇을 할 수 있는지 선택합니다. 저장하면 해당 등급을 가진 모든 구성원에게 변경 사항이 적용됩니다.",
+      "introView": "각 등급 이름과 권한입니다. 길드장만 변경할 수 있습니다.",
+      "colRank": "등급",
+      "colTitle": "이름",
+      "colMembers": "구성원",
+      "colActions": "순서",
+      "numbered": "등급 {n}",
+      "perm": {
+        "invite": "초대",
+        "remove": "제거",
+        "promote": "승급",
+        "bank": "길드 은행",
+        "officerChat": "간부 대화",
+        "motd": "게시판",
+        "events": "달력"
+      },
+      "permHint": {
+        "invite": "플레이어를 길드에 초대하고 가입 신청에 응답합니다.",
+        "remove": "자신보다 낮은 등급의 구성원을 제거합니다.",
+        "promote": "자신보다 낮은 등급의 구성원을 승급하거나 강등하되, 자신의 바로 아래 등급까지만 올릴 수 있습니다.",
+        "bank": "길드 은행에 동전과 아이템을 넣고 꺼냅니다. 모든 구성원이 볼 수 있습니다.",
+        "officerChat": "간부 대화를 읽고 말합니다.",
+        "motd": "길드 게시판을 편집합니다.",
+        "events": "길드 달력 일정을 추가하고 제거합니다."
+      },
+      "titleLabel": "{rank} 이름",
+      "permLabel": "{rank}의 {perm}",
+      "leaderLocked": "길드장은 항상 모든 권한을 가집니다.",
+      "add": "등급 추가",
+      "save": "등급 저장",
+      "moveUp": "{rank} 위로 이동",
+      "moveDown": "{rank} 아래로 이동",
+      "remove": "{rank} 제거",
+      "full": "길드는 최대 {max}개의 등급을 가질 수 있습니다.",
+      "invalidTitle": "등급 이름은 글자, 숫자, 공백, 아포스트로피, 하이픈을 사용할 수 있으며 최대 {max}자입니다.",
+      "removeConfirm": "{rank} 구성원은 {fallback} 등급이 됩니다. 이 등급을 제거할까요?",
+      "removeAccept": "등급 제거",
+      "promoteTo": "{name}님을 {rank}(으)로 승급",
+      "demoteTo": "{name}님을 {rank}(으)로 강등"
+    },
     "raidLockout": {
       "title": "공격대 잠금",
       "allReady": "모든 공격대 준비됨",
@@ -3626,6 +3668,10 @@ export const ko_KR: EnTranslations = {
       "elite": "정예",
       "boss": "우두머리"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "대상 프레임 이동",
       "lock": "대상 프레임 고정"
@@ -3708,7 +3754,8 @@ export const ko_KR: EnTranslations = {
         "deedTracker": "업적 추적기",
         "delveTracker": "탐굴 추적기",
         "riftTracker": "균열 추적기",
-        "swingBarOffhand": "보조 장비"
+        "swingBarOffhand": "보조 장비",
+        "unitTooltip": "툴팁"
       },
       "framesMenu": "프레임 설정",
       "framesMenuTitle": "각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.",

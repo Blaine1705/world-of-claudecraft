@@ -1371,6 +1371,48 @@ export const ja_JP: EnTranslations = {
       "since": "{date}に誓約",
       "withdraw": "誓約を取り下げる"
     },
+    "guildRanks": {
+      "tab": "ランク",
+      "introEdit": "ギルドランクに名前を付け、それぞれが何をできるか選びます。保存すると、そのランクの全員に変更が適用されます。",
+      "introView": "各ランクの名称と権限です。変更できるのはギルドマスターだけです。",
+      "colRank": "ランク",
+      "colTitle": "名称",
+      "colMembers": "メンバー",
+      "colActions": "順序",
+      "numbered": "ランク {n}",
+      "perm": {
+        "invite": "招待",
+        "remove": "除名",
+        "promote": "昇格",
+        "bank": "ギルド銀行",
+        "officerChat": "役員チャット",
+        "motd": "掲示板",
+        "events": "カレンダー"
+      },
+      "permHint": {
+        "invite": "プレイヤーをギルドに招待し、申請に応答できます。",
+        "remove": "自分より低いランクのメンバーを除名できます。",
+        "promote": "自分より低いランクのメンバーを昇格または降格できます。ただし自分の一つ下のランクまでです。",
+        "bank": "ギルド銀行に銅貨やアイテムを預け入れ、引き出せます。全メンバーが閲覧できます。",
+        "officerChat": "役員チャットを読み、発言できます。",
+        "motd": "ギルド掲示板を編集できます。",
+        "events": "ギルドカレンダーの予定を追加、削除できます。"
+      },
+      "titleLabel": "{rank} の名称",
+      "permLabel": "{rank} の{perm}",
+      "leaderLocked": "ギルドマスターは常にすべての権限を持ちます。",
+      "add": "ランクを追加",
+      "save": "ランクを保存",
+      "moveUp": "{rank} を上へ",
+      "moveDown": "{rank} を下へ",
+      "remove": "{rank} を削除",
+      "full": "ギルドのランクは最大 {max} 個です。",
+      "invalidTitle": "ランク名には文字、数字、空白、アポストロフィ、ハイフンを使用でき、最大 {max} 文字です。",
+      "removeConfirm": "{rank} のメンバーは {fallback} になります。このランクを削除しますか？",
+      "removeAccept": "ランクを削除",
+      "promoteTo": "{name} を {rank} に昇格",
+      "demoteTo": "{name} を {rank} に降格"
+    },
     "raidLockout": {
       "title": "レイドロックアウト",
       "allReady": "すべてのレイドが利用可能",
@@ -3626,6 +3668,10 @@ export const ja_JP: EnTranslations = {
       "elite": "エリート",
       "boss": "ボス"
     },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
+    },
     "targetFrame": {
       "unlock": "ターゲットフレームを移動",
       "lock": "ターゲットフレームを固定"
@@ -3708,7 +3754,8 @@ export const ja_JP: EnTranslations = {
         "deedTracker": "功績トラッカー",
         "delveTracker": "デルヴトラッカー",
         "riftTracker": "リフトトラッカー",
-        "swingBarOffhand": "オフハンド"
+        "swingBarOffhand": "オフハンド",
+        "unitTooltip": "ツールチップ"
       },
       "framesMenu": "フレーム設定",
       "framesMenuTitle": "各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。",
