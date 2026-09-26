@@ -277,6 +277,24 @@ export function waterContactFrameMode(
 }
 
 // ---------------------------------------------------------------------------
+// Held guard
+//
+// A rig whose battle stance is a RAISE that ends on the held guard (ClipMap
+// combatIdleHold: the KayKit `Block`) must not loop it, or the shield drops and
+// comes back up once a second for as long as the body is braced. The base
+// action plays once and clamps on its last frame instead, the same held-base
+// treatment a sit-down or a held jump gets.
+
+/** True when this base state's clip should play ONCE and clamp (the held guard)
+ *  rather than loop. Pure: visual.ts isOnce() asks it for the combatIdle action. */
+export function combatIdleClamps(
+  baseState: BaseState,
+  combatIdleHold: boolean | undefined,
+): boolean {
+  return baseState === 'combatIdle' && combatIdleHold === true;
+}
+
+// ---------------------------------------------------------------------------
 // Cast hold + cast-exit play-out
 //
 // A generic cast clip shorter than its cast used to REPLAY from the top on

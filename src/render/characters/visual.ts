@@ -34,6 +34,7 @@ import {
   advanceTreadBlend,
   type BaseState,
   castHoldStep,
+  combatIdleClamps,
   desiredBaseState,
   drivesPose,
   locomotionTimeScale,
@@ -3907,6 +3908,10 @@ export class CharacterVisual {
     // its fall action is not the jump action, and the flail loops as intended.
     if ((this.baseState === 'jump' || this.baseState === 'fall') && this.def.clips.land)
       return a === this.action(this.def.clips.jump);
+    // The held guard: a raise-into-guard stance clip (the muster's `Block`) comes up once
+    // and holds its raised last frame for as long as the body stays braced.
+    if (combatIdleClamps(this.baseState, this.def.clips.combatIdleHold))
+      return a === this.action(this.def.clips.combatIdle);
     return false;
   }
 

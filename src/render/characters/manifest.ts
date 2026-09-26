@@ -71,6 +71,13 @@ export interface ClipMap {
    *  Its pose should match what the rig's attack and hit one-shots open and
    *  close on, so those blend into and out of it without a snap. */
   combatIdle?: string;
+  /** The `combatIdle` clip is a RAISE that ends on the held guard (the KayKit `Block`:
+   *  the shield comes up in its first third and is held to the last frame), not a
+   *  seamless loop. Played once and clamped on that last frame for as long as the body
+   *  stays braced, so the guard goes up once and holds, instead of dropping and rising
+   *  again every loop; leaving the brace crossfades it down into the idle once.
+   *  Absent = combatIdle loops, as every battle stance authored as a loop wants. */
+  combatIdleHold?: boolean;
   /** Low stalking poses for a concealed quadruped. Absent = ordinary gait. */
   prowlIdle?: string;
   prowlWalk?: string;
@@ -3700,13 +3707,14 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // The Mirefen muster (src/sim/content/mirefen_muster.ts): Fenbridge's soldiers dug in
   // around Balgath's crater. Shipped KayKit rigs and weapons only, dyed toward the muster's
-  // red by the entity tint. CombatIdle is `Block`, the looping guard both rigs ship: the
-  // stance they hold while he is on them (the sim points their aggroTargetId at him).
+  // red by the entity tint. CombatIdle is `Block`, the shield raise both rigs ship, held
+  // on its raised last frame (combatIdleHold) rather than looped: the guard they raise
+  // once and hold while he is on them (the sim points their aggroTargetId at him).
   npc_muster_footman: {
     url: `${PLAYERS}/knight.glb`,
     animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
     height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block' },
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
     show: ['Knight_Helmet'],
     attach: [
       { url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' },
@@ -3719,7 +3727,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/knight.glb`,
     animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
     height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block' },
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
     show: ['Knight_Helmet', 'Knight_Cape'],
     attach: [
       { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
@@ -3732,7 +3740,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/paladin.glb`,
     animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
     height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block' },
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
     show: ['Paladin_Helmet', 'Paladin_Cape'],
     attach: [
       { url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' },
@@ -3745,7 +3753,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/knight.glb`,
     animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
     height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block' },
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
     show: ['Knight_Cape'],
     attach: [
       { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },

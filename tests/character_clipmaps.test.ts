@@ -193,6 +193,7 @@ const NON_CLIP_FIELDS = new Set<keyof ClipMap>([
   'attackTimeScaleByAbility',
   'castTimeScaleByAbility',
   'castHoldPointSeconds',
+  'combatIdleHold',
   'chargeGlowByAbility',
 ]);
 
@@ -253,6 +254,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'castByAbility',
   'castTimeScaleByAbility',
   'castHoldPointSeconds',
+  'combatIdleHold',
   'castPlayOut',
   'chargeGlowByAbility',
   'attackByHand',
