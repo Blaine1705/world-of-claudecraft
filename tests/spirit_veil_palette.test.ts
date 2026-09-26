@@ -85,6 +85,28 @@ describe('the veil palettes', () => {
         keepColor: 1,
         band: 0.22,
       },
+      'stealth-rogue': {
+        tint: 0x6b7690,
+        deep: 0x854686,
+        rim: 0x9f3e2d,
+        rimStrength: 2.55,
+        opacity: 0.08,
+        rise: 1.1,
+        shimmer: 0,
+        keepColor: 0.65,
+        band: 0,
+      },
+      'stealth-other': {
+        tint: 0x6b7690,
+        deep: 0x0d1018,
+        rim: 0x725d4f,
+        rimStrength: 0.21,
+        opacity: 0.31,
+        rise: 0.49,
+        shimmer: 0,
+        keepColor: 0.58,
+        band: 0.36,
+      },
     };
     expect(SPIRIT_VEIL_PALETTES).toEqual(expected);
     expect(SPIRIT_VEIL_LOOK).toBe(SPIRIT_VEIL_PALETTES.spirit);
@@ -95,6 +117,8 @@ describe('the veil palettes', () => {
       spirit: { castsShadow: false, weaponVfx: false },
       wolf: { castsShadow: false, weaponVfx: false },
       march: { castsShadow: false, weaponVfx: true },
+      'stealth-rogue': { castsShadow: false, weaponVfx: false },
+      'stealth-other': { castsShadow: false, weaponVfx: false },
     });
   });
 });

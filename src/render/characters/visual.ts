@@ -368,8 +368,8 @@ const FEROCITY_EMISSIVE = [0x2a0802, 0x4a0803, 0x6a0803] as const;
 const FEROCITY_EMISSIVE_STRENGTH = [0.08, 0.15, 0.23] as const;
 const ASCENSION_TINT = new THREE.Color(0xffe49a);
 
-/** What a ghosted visual wears: a spirit veil palette, or the stealth twin. */
-export type GhostLook = SpiritVeilPalette | 'stealth';
+/** What a ghosted visual wears: a spirit veil palette. */
+export type GhostLook = SpiritVeilPalette;
 
 /** The live mixer facts the pure watchdog decides on (see anim_state.ts). */
 function readActionWeight(a: THREE.AnimationAction, into?: AnimActionWeight): AnimActionWeight {
@@ -2408,7 +2408,7 @@ export class CharacterVisual {
    *  asks for none. */
   private activeVeilPalette(): SpiritVeilPalette | null {
     if (this.soulRend) return null;
-    if (this.ghosted && this.ghostLook !== 'stealth') return this.ghostLook;
+    if (this.ghosted) return this.ghostLook;
     return null;
   }
 

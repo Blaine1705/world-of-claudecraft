@@ -266,9 +266,9 @@ function heldModelUrls(): string[] {
 
 // The rigs the other veil users draw on top of the player rigs above (the
 // released-spirit palette's Pale Keeper and quest visions, the Ghost Wolf and
-// Veilbound March palettes). A palette is uniform values only, so each needs
-// nothing but its shapes inside the family.
-const VEILED_FORMS = ['form_ghost_wolf', 'form_sheep'] as const;
+// Veilbound March palettes, stealth on the druid's cat). A palette is uniform
+// values only, so each needs nothing but its shapes inside the family.
+const VEILED_FORMS = ['form_ghost_wolf', 'form_sheep', 'form_cat'] as const;
 const VISION_TEMPLATES = [
   'vision_aldren_warrior',
   'vision_malric_mage',

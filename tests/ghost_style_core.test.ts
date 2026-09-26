@@ -1,9 +1,15 @@
 // Which translucent look a character wears (src/render/ghost_style_core.ts):
-// every ethereal read is the spirit veil in its user's palette; a living
-// stealther keeps its transparent twin.
+// every ethereal read is the spirit veil in its user's palette, stealth in one
+// of two palettes by its source's aura id.
 
 import { describe, expect, it } from 'vitest';
-import { characterGhostLook } from '../src/render/ghost_style_core';
+import {
+  characterGhostLook,
+  ROGUE_STEALTH_AURA_IDS,
+  stealthVeilPalette,
+} from '../src/render/ghost_style_core';
+import { selfBuffAuraId } from '../src/sim/combat/aura_ids';
+import { ABILITIES } from '../src/sim/content/classes';
 import type { Entity } from '../src/sim/types';
 
 const VIEWER = 1;
@@ -19,7 +25,9 @@ function entity(over: Partial<Entity> = {}): Entity {
   } as unknown as Entity;
 }
 
-const stealth = { auras: [{ kind: 'stealth', id: 'stealth' }] } as unknown as Partial<Entity>;
+const stealthBy = (id: string): Partial<Entity> =>
+  ({ auras: [{ kind: 'stealth', id }] }) as unknown as Partial<Entity>;
+const stealth = stealthBy('stealth');
 
 describe('characterGhostLook', () => {
   it('veils a released spirit in the released-spirit palette, whatever else it carries', () => {
@@ -60,9 +68,49 @@ describe('characterGhostLook', () => {
     expect(characterGhostLook(VIEWER, entity(), false, 'march')).toBe('march');
   });
 
-  it('keeps the stealth twin for a living stealther', () => {
-    expect(characterGhostLook(VIEWER, entity(stealth), false, 'none')).toBe('stealth');
-    expect(characterGhostLook(VIEWER, entity(stealth), false, 'march')).toBe('stealth');
+  it("veils a living stealther in its source's palette", () => {
+    for (const id of ['stealth', 'vanish']) {
+      expect(characterGhostLook(VIEWER, entity(stealthBy(id)), false, 'none'), id).toBe(
+        'stealth-rogue',
+      );
+    }
+    for (const id of ['prowl', 'greater_invisibility']) {
+      expect(characterGhostLook(VIEWER, entity(stealthBy(id)), false, 'none'), id).toBe(
+        'stealth-other',
+      );
+    }
+    expect(characterGhostLook(VIEWER, entity(stealth), false, 'march')).toBe('stealth-rogue');
+    // a rogue aura wins wherever it sits among the stealth auras
+    expect(
+      stealthVeilPalette([
+        { kind: 'stealth', id: 'greater_invisibility' },
+        { kind: 'buff', id: 'stealth' },
+        { kind: 'stealth', id: 'vanish' },
+      ] as never),
+    ).toBe('stealth-rogue');
+    expect(stealthVeilPalette([{ kind: 'buff', id: 'stealth' }] as never)).toBe('stealth-other');
+  });
+
+  it('classifies every stealth source in the ability table, by the aura id it applies', () => {
+    // A new stealth source fails here until it is given a palette on purpose.
+    const sources = new Map<string, string>();
+    for (const ability of Object.values(ABILITIES)) {
+      for (const effect of ability.effects) {
+        if (effect.type === 'selfBuff' && effect.kind === 'stealth') {
+          sources.set(selfBuffAuraId(ability, effect), ability.class ?? '');
+        }
+        if (effect.type === 'greaterInvisibility') sources.set(ability.id, ability.class ?? '');
+      }
+    }
+    expect(Object.fromEntries(sources)).toEqual({
+      stealth: 'rogue',
+      vanish: 'rogue',
+      prowl: 'druid',
+      greater_invisibility: 'mage',
+    });
+    for (const [id, cls] of sources) {
+      expect(ROGUE_STEALTH_AURA_IDS.has(id), id).toBe(cls === 'rogue');
+    }
   });
 
   it('leaves everyone else opaque', () => {

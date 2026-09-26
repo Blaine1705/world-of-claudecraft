@@ -8,7 +8,7 @@
 //
 // Three-free and deterministic: tests drive it directly.
 
-export type SpiritVeilPalette = 'spirit' | 'wolf' | 'march';
+export type SpiritVeilPalette = 'spirit' | 'wolf' | 'march' | 'stealth-rogue' | 'stealth-other';
 
 export interface SpiritVeilPaletteValues {
   tint: number;
@@ -70,6 +70,30 @@ export const SPIRIT_VEIL_PALETTES: Readonly<
     keepColor: 1,
     band: 0.22,
   },
+  // The rogue's Duskveil and Smokefade.
+  'stealth-rogue': {
+    tint: 0x6b7690,
+    deep: 0x854686,
+    rim: 0x9f3e2d,
+    rimStrength: 2.55,
+    opacity: 0.08,
+    rise: 1.1,
+    shimmer: 0,
+    keepColor: 0.65,
+    band: 0,
+  },
+  // The druid cat's Stalk and the mage's Greater Invisibility.
+  'stealth-other': {
+    tint: 0x6b7690,
+    deep: 0x0d1018,
+    rim: 0x725d4f,
+    rimStrength: 0.21,
+    opacity: 0.31,
+    rise: 0.49,
+    shimmer: 0,
+    keepColor: 0.58,
+    band: 0.36,
+  },
 };
 
 /** What a veiled rig keeps. The class halo is hidden under every palette. */
@@ -84,4 +108,6 @@ export const SPIRIT_VEIL_POLICY: Readonly<Record<SpiritVeilPalette, Readonly<Spi
   spirit: { castsShadow: false, weaponVfx: false },
   wolf: { castsShadow: false, weaponVfx: false },
   march: { castsShadow: false, weaponVfx: true },
+  'stealth-rogue': { castsShadow: false, weaponVfx: false },
+  'stealth-other': { castsShadow: false, weaponVfx: false },
 };

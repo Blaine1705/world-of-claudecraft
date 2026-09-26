@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4093,
-    "harvestedFiles": 3948,
+    "files": 4091,
+    "harvestedFiles": 3946,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
         "ms": 14,
@@ -4410,8 +4410,6 @@
   "tests/self_prediction_core.test.ts": 9,
   "tests/self_render_position_core.test.ts": 2581,
   "tests/self_social_wire.test.ts": 640,
-  "tests/self_spirit_prewarm.test.ts": 29,
-  "tests/self_spirit_warm.test.ts": 13,
   "tests/self_wire_phase_breakdown.test.ts": 2670,
   "tests/send_backpressure.test.ts": 6,
   "tests/sentence_renderer.test.ts": 38,

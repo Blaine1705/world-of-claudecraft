@@ -1615,27 +1615,6 @@ describe('mandatory interaction-landmark prewarm', () => {
   });
 });
 
-describe('self-spirit prewarm queue wiring', () => {
-  it('preserves the idle delay and runs the warm and link units through the shared GPU queue', () => {
-    const renderer = readFileSync(
-      new URL('../src/render/renderer.ts', import.meta.url),
-      'utf8',
-    ).replace(/\r\n/g, '\n');
-    const start = renderer.indexOf('private selfSpirit = new SelfSpiritPrewarmer({');
-    const end = renderer.indexOf('\n  // Static terrain/water/features', start);
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const wiring = renderer.slice(start, end);
-    expect(wiring).toContain('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
-    // The units themselves (priority, labels, released tail, the hold
-    // between them) are pinned on the module, tests/self_spirit_warm.test.ts.
-    expect(wiring).toContain('warmSelfSpiritPrograms({');
-    expect(wiring).toContain('this.backgroundGpuWork.run(work, priority, label, options)');
-    expect(wiring).toContain('linkColorPrograms(this.compileArms, root, false)');
-    expect(wiring).toContain('!this.asyncCompileSupported || this.sim.player.ghost');
-  });
-});
-
 describe('constrained entry view creation ramp', () => {
   it('creates no optional view on the first live frame, then streams one at a time', () => {
     expect(constrainedEntryViewCreateBudget(true, 0, 8)).toBe(0);

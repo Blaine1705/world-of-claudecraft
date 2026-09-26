@@ -598,23 +598,25 @@ describe('the other veil users wear their own palette on the same programs', () 
   });
 });
 
-describe('stealth keeps its twin', () => {
-  it("wears today's transparent clone for the 'stealth' look, no veil anywhere", async () => {
+describe("stealth wears the veil in its source's palette", () => {
+  it('mounts the rogue or the other stealth palette at once, hides a weapon skin, casts no shadow', async () => {
     const { visual, veil, gateCalls } = await makePriest(true);
     const body = named(visual, 'body');
-    visual.setGhost(true, 'stealth');
-    // a transparent twin is still staged behind the gate like before
-    expect(gateCalls.length).toBeGreaterThan(0);
-    gateCalls.at(-1)?.settle();
-    visual.update(FRAME, anim(), true);
-    const worn = single(body);
-    expect(veil.spiritVeilPassOf(worn)).toBeNull();
-    expect(worn.transparent).toBe(true);
-    expect(worn.depthWrite).toBe(true);
-    expect(worn.opacity).toBe(0.45);
-    expect(depthSiblings(visual)).toHaveLength(0);
-    expect(named(visual, 'class_halo').visible).toBe(true);
+    const { light, shell } = weaponSkinHandle(visual);
+    for (const palette of ['stealth-rogue', 'stealth-other'] as const) {
+      visual.setGhost(true, palette);
+      expect(gateCalls).toHaveLength(0);
+      expect(veil.spiritVeilPaletteOf(single(body))).toBe(palette);
+      expect(body.children.filter((child) => child.name === 'spirit_veil_depth')).toHaveLength(1);
+      expect(body.castShadow).toBe(false);
+      expect(shell.visible).toBe(false);
+      expect(light.intensity).toBe(0);
+      expect(named(visual, 'class_halo').visible).toBe(false);
+    }
+    visual.setGhost(false);
     expect(body.castShadow).toBe(true);
+    expect(shell.visible).toBe(true);
+    (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.length = 0;
     visual.dispose();
   });
 });
