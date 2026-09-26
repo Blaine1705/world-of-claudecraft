@@ -1155,7 +1155,7 @@
       "tick": 980,
       "time": 49,
       "nextId": 1010,
-      "state": "181f1ee7",
+      "state": "3cd3ee5d",
       "events": "2bf14e81",
       "rng": {
         "draws": 8535,
@@ -1166,7 +1166,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 1010,
-      "state": "25565621",
+      "state": "3c84cebf",
       "events": "741638a5",
       "rng": {
         "draws": 8706,
@@ -1177,7 +1177,7 @@
       "tick": 1015,
       "time": 50.75,
       "nextId": 1010,
-      "state": "9d30e348",
+      "state": "55f91b1e",
       "events": "b591d21f",
       "rng": {
         "draws": 8834,
@@ -1657,6 +1657,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": 29,
+          "parkedEnergyDeficit": 5,
           "petMode": "defensive",
           "pos": {
             "x": -94,
@@ -1805,7 +1806,7 @@
       "tick": 1020,
       "time": 51,
       "nextId": 1010,
-      "state": "5db09ea9",
+      "state": "a9df243b",
       "events": "42df7d08",
       "rng": {
         "draws": 8872,

@@ -689,18 +689,13 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the Eastbrook ferry's Phase 2: the renderer leaf gained the at-sea passenger hide and moved two helpers out. No capture was retaken.
-  // Re-minted for the ferry's Phase 3: the renderer leaf draws passengers in the ship frame (deck_frame.ts), and the two fairway buoys in the cove moved west out of the ferry's swing (zone1.ts). No capture was retaken.
-  // Re-minted for the ferry's playtest fixes: the renderer leaf reads a deck passenger's animation off the drawn deck and holds full-rate shadows near a ship under way, and the ground-sample leaf stands passengers on the drawn deck. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4132) into feature/world-pvp-flag: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of feature/world-pvp-flag (the PR 4146 review round) into feature/king-of-the-hill: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 (PR 4200) into feature/vfx-floor-layering: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 into the Eastbrook ferry branch: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  '9a9eefdae8f9f231b25fde437b18cc6eecd4feb2f407e9fa8431694ee6fcf52f';
+  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
+  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
+  // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
+  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
+  // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
+  // Re-minted for the merge of release/v0.44.0 into the Eastbrook ferry branch (PR 4225). No capture was retaken.
+  'f9e044219a5f89ec5451d4f41fc2032946fe12355136d9241b9f06dbb173d4db';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

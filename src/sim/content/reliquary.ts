@@ -787,6 +787,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'forgefathers_warhammer',
     'anvilguard_blade',
     'springtouched_crozier',
+    'wand_of_quenched_sparks',
   ],
   varkhul_forgefather_of_the_last_flame: [
     'bulwark_of_the_inner_crucible',
@@ -795,6 +796,8 @@ export const RELIQUARY_HEROIC_GEAR = {
     'heart_of_the_end_greatblade',
     'forgefire_spire',
     'staff_of_the_last_spring',
+    'orb_of_the_last_spring',
+    'cinder_of_the_first_design',
   ],
 } as const;
 
@@ -952,12 +955,19 @@ function freezePageTable(pages: ReliquaryPageDef[]): readonly ReliquaryPageDef[]
 
 export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
   // ---- Five-man dungeons: normal chase uniques ----
+  // Clear meters on these pages read BOTH difficulties ('any'): every relic
+  // below also drops on the Heroic claim (HEROIC_BOSS_LOOT pays the base id or
+  // a heroic_<base> variant that folds back to it), so a Heroic run is a run
+  // at the page's spoils and counts. The heroic-only epic pages keep their
+  // 'heroic' filter, and the Crucible raid pages keep 'normal' because their
+  // Normal tables hold normalOnly rows Heroic never pays. Derived and pinned by
+  // tests/reliquary_content.test.ts ("count every difficulty that pays").
   {
     id: 'conquerors_hollow_crypt',
     shelf: 'conquerors',
     name: 'The Hollow Crypt',
     desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
-    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
     // Morthen is the only Crypt mob that drops any of these five.
     sourceDefault: fromBoss('morthen'),
     relics: items(
@@ -982,7 +992,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'The Sunken Bastion',
     desc: 'Rare and epic spoils from Olen and Vael the Fogbinder.',
-    clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'any' },
     // Two bosses, and every relic drops from exactly one of them, so the page
     // takes no default: each row names its own.
     relics: items(
@@ -1012,7 +1022,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'The Drowned Temple',
     desc: 'Rare spoils from Choirmother Selthe and Ysolei, Avatar of the Drowned Moon.',
-    clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'any' },
     relics: items(
       ['ysols_pearl_greaves', fromBoss('ysolei')],
       ['moonshroud_breastplate', fromBoss('ysolei')],
@@ -1035,7 +1045,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'Gravewyrm Sanctum',
     desc: 'Rare and epic spoils from the Sanctum bosses and Korzul the Gravewyrm.',
-    clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'any' },
     // FIVE live LOOT TABLES drop this page's relics (sanctum_boneguard and
     // sanctum_drakonid elite trash plus the three bosses), and all five are
     // authored here; recipes and quests add further non-loot routes.
@@ -1136,7 +1146,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'The Wildheart Basin',
     desc: 'Signature weapons from Zulgar and the Fanglord.',
-    clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'any' },
     relics: items(
       ['fanglords_beastspear', fromBoss('wildheart_beastmaster')],
       ['duskwhisper', fromBoss('wildheart_beastmaster')],
@@ -1160,7 +1170,11 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'Nythraxis Raid',
     desc: 'Epic and legendary spoils from Nythraxis, Scourge of Thornpeak.',
-    clearSource: { kind: 'dungeon', dungeonId: 'nythraxis_boss_arena', difficulty: 'normal' },
+    // 'any', like the five-mans above: both difficulties share the first
+    // Nythraxis pool (content/nythraxis_loot.ts), so a Heroic clear pays every
+    // relic on this page and counts on its meter. The Crucible raid pages keep
+    // 'normal' (Heroic replaces their slots with exclusives).
+    clearSource: { kind: 'dungeon', dungeonId: 'nythraxis_boss_arena', difficulty: 'any' },
     // The raid's one boss drops every relic on the page.
     sourceDefault: fromBoss('nythraxis_scourge_of_thornpeak'),
     relics: items(
@@ -1722,7 +1736,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     relics: items(
       'cinderfang_kris',
       'slagrender_cleaver',
-      'wand_of_quenched_sparks',
       'pendant_of_the_first_tempering',
       'ignivars_ember_choker',
       'locket_of_the_last_flame',
@@ -1759,8 +1772,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // its personal professions page because the quest craft is not boss loot.
     sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
     relics: items(
-      'orb_of_the_last_spring',
-      'cinder_of_the_first_design',
       'seal_of_the_forgewall',
       'band_of_marked_strikes',
       'circle_of_cinders',
@@ -1781,7 +1792,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_varkhul_heroic',
     shelf: 'conquerors',
     name: 'Heroic Inner Crucible',
-    desc: 'Heroic-only shields and weapons from Varkhul, Forgefather of the Last Flame.',
+    desc: 'Heroic-only shields, held offhands and weapons from Varkhul, Forgefather of the Last Flame.',
     clearSource: { kind: 'dungeon', dungeonId: 'ignivar_inner_crucible', difficulty: 'heroic' },
     sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
     relics: items(...RELIQUARY_HEROIC_GEAR.varkhul_forgefather_of_the_last_flame),

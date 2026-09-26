@@ -170,10 +170,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // realm roster answered by the `who` frame; the chat /who stays as it was).
 // Market Sweep composes on top of it with `market_sweep_quote` and
 // `market_sweep`, both client-sent and server-dispatched.
-// World PvP adds pvp_flag to both sets (sent by ClientWorld.setWorldPvpFlag,
-// dispatched beside bg_flag).
-const EXPECTED_SEND_COUNT = 226;
-const EXPECTED_DISPATCH_COUNT = 240;
+// Market buy orders add three commands; World PvP adds pvp_flag.
+// +1 send / +1 dispatch for guild custom ranks (`guild_set_ranks`: the Guild
+// Master replaces the guild's rank ladder; docs/prd/guild-custom-ranks.md).
+const EXPECTED_SEND_COUNT = 230;
+const EXPECTED_DISPATCH_COUNT = 244;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch
