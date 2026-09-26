@@ -136,6 +136,7 @@ import {
 import { extendOwnedDot } from './dot_mutation';
 import { applyDruidFormEntry, druidFormEntryOwed } from './druid_form_entry';
 import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
+import { resolveDualPurposeTarget } from './dual_purpose_target';
 import {
   consumeAuraKind,
   consumeFreeCostFor,
@@ -149,6 +150,7 @@ import {
   iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
+import { autoPicksFallenAlly, isFallenGroupMember, pickFallenAlly } from './fallen_ally_target';
 import { meleeReachActor } from './feral_reach';
 import {
   applyAutoUnshift,
@@ -968,9 +970,7 @@ function resolveDeadAllyTarget(
   const id = overrideId ?? p.targetId;
   if (id === null) return null;
   const t = ctx.entities.get(id);
-  if (!t?.dead || t.kind !== 'player') return null;
-  const party = ctx.partyOf(p.id);
-  return party?.members.includes(t.id) ? t : null;
+  return t && isFallenGroupMember(ctx, p, t) ? t : null;
 }
 
 function vanishedLowBlowFallbackTarget(
@@ -1425,10 +1425,19 @@ export function castAbility(
     }
   } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res: the target must be a DEAD group/raid member (no self-cast fallback),
-    // and their body must be within resurrection reach (range + line of sight).
-    const dead = resolveDeadAllyTarget(ctx, p, castTargetId);
+    // and their body must be within resurrection reach (range + line of sight). An
+    // out-of-combat rez whose press names no fallen ally picks one itself
+    // (fallen_ally_target.ts); the pick is locked in as the cast target below, so
+    // the mid-cast and finish gates re-check the same body.
+    const autoPick = autoPicksFallenAlly(ability);
+    const dead =
+      resolveDeadAllyTarget(ctx, p, castTargetId) ??
+      (autoPick ? pickFallenAlly(ctx, p, resurrectionCastRange(ability.range)) : null);
     if (!dead) {
-      ctx.error(p.id, 'You must target a dead ally in your group.');
+      if (!autoPick) ctx.error(p.id, 'You must target a dead ally in your group.');
+      // The group-rez wording: nothing to raise at all, or nothing within reach.
+      else if (hasDeadGroupMember(ctx, p)) ctx.error(p.id, 'Out of range.');
+      else ctx.error(p.id, 'There are no dead group members to resurrect.');
       return;
     }
     const reach = resurrectionReachError(ctx, p, dead, resurrectionCastRange(ability.range));
@@ -1494,13 +1503,15 @@ export function castAbility(
       }
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
-    // Auto-acquire (issue #2787): only when nothing is targeted at all, never
-    // overriding an existing (even stale/invalid) selection.
-    if (!target && p.targetId === null) {
-      target = nearestAttackingMob(ctx, p);
-      if (target) p.targetId = target.id;
-    }
+    // A heal's live friendly party-frame override first, then the current target,
+    // then the auto-acquire below, then self for a heal (dual_purpose_target.ts).
+    target = resolveDualPurposeTarget(ctx, p, castTargetId, ability, () => {
+      // Auto-acquire (issue #2787): only when nothing is targeted at all, never
+      // overriding an existing (even stale/invalid) selection.
+      const attacker = nearestAttackingMob(ctx, p);
+      if (attacker) p.targetId = attacker.id;
+      return attacker;
+    });
     if (
       !target ||
       target.dead ||
@@ -2036,7 +2047,20 @@ export function castAbility(
   coldsightReserveRead(ctx, p, ability.id);
   const benisonHealMult =
     consumedInstantAura?.id === BENISON_WHISPER_AURA_ID ? 1 + BENISON_4PC_WHISPER_HEAL_BONUS : 1;
-  applyAbility(ctx, p, meta, instantResolved, castTargetId, stormcastReservation, benisonHealMult);
+  // Hand the finish the unit this press resolved, never the raw override: a timed
+  // cast already finishes on the stored p.castTargetId, and the friendly arm
+  // re-resolves an override to the same unit, but the dual-purpose arm reads its
+  // id verbatim, so a stale party-frame override that fell back to the current
+  // target above would otherwise refuse there with "You have no target.".
+  applyAbility(
+    ctx,
+    p,
+    meta,
+    instantResolved,
+    target?.id ?? null,
+    stormcastReservation,
+    benisonHealMult,
+  );
   // instant ground-targeted cast: its effects have consumed the aim point. An
   // interleaved instant instead hands the aim back to the cast still running.
   p.castAim = blinkThrough ? heldCastAim : null;

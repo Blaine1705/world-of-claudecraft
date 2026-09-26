@@ -6260,9 +6260,9 @@ export class GameServer {
         break;
       case 'cast':
         if (typeof msg.ability === 'string') {
-          // Optional mouseover-cast override: an explicit friendly-target id.
-          // The sim validates it (friendly, alive, in range) and falls back to
-          // the classic current-target-else-self resolution when invalid.
+          // Optional mouseover-cast override: the hovered party member's id. The
+          // sim validates it (friendly, alive, in range) and falls back to the
+          // ability's current-target resolution when invalid.
           if (typeof msg.target === 'number') {
             sim.castAbilityOn(msg.ability, msg.target | 0, pid);
           } else {

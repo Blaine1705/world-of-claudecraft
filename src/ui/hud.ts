@@ -358,10 +358,10 @@ import {
 } from './hud/action_bar/action_bar_view';
 import type { ActionBarVisibility } from './hud/action_bar/action_bar_visibility_core';
 import {
-  abilityStartsAutoAttack,
   confirmPendingAutoAttackEngage,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
+  pressStartsAutoAttack,
 } from './hud/action_bar/attack_on_ability';
 import { BarEditorWindow } from './hud/action_bar/bar_editor';
 import {
@@ -7455,15 +7455,15 @@ export class Hud {
           }
           // Optional QoL: also engage auto-attack when the ability is an offensive
           // attack, so white swings start without a separate Attack press. Gated on
-          // the player setting; abilityStartsAutoAttack skips heals/buffs and CC the
-          // swing would shatter. hasAutoAttackTarget keeps requiresTarget:false AOEs
-          // from tripping "Invalid attack target" and covers PvP player targets that
-          // never carry the mob-only `hostile` flag.
+          // the player setting; pressStartsAutoAttack skips heals/buffs, CC the swing
+          // would shatter, and a party-frame redirect. hasAutoAttackTarget keeps
+          // requiresTarget:false AOEs from tripping "Invalid attack target" and covers
+          // PvP player targets that never carry the mob-only `hostile` flag.
           const tid = this.sim.player.targetId;
           const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
-            abilityStartsAutoAttack(resolved.effects) &&
+            pressStartsAutoAttack(resolved.effects, mouseoverPid !== null) &&
             hasAutoAttackTarget(target, isPvpHostileTargetId(this.sim, tid))
           ) {
             // A TIMED cast must not engage yet (the aggro-before-damage bug). The

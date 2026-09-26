@@ -8,11 +8,23 @@
 // entity is always safe, and a party/raid roster member is safe even when the
 // online client has dropped their entity from interest scope, which keeps combat
 // resurrections working on released ghosts at the graveyard.
+//
+// A dual-purpose heal (targetType 'any' with a heal effect: the paladin's Solar
+// Invocation, Scouring Mercy) redirects too. Leaving it off sent a raid-frame
+// mouseover heal to the current target, which with nothing selected answered "You
+// have no target."; the sim honors the override for it (src/sim/combat/
+// dual_purpose_target.ts, whose isDualPurposeHeal both sides read).
+//
+// Pure core: no DOM, no world type, both hosts drive it through the two callbacks
+// (the offline Sim knows every entity; ClientWorld knows the ones in scope).
 
-/** The two ability fields the redirect rule reads. */
+import { isDualPurposeHeal } from '../sim/combat/dual_purpose_target';
+
+/** The only ability fields the redirect decision reads. */
 export interface MouseoverCastAbility {
   requiresTarget?: boolean;
-  targetType?: 'enemy' | 'friendly' | 'any' | string;
+  targetType?: string;
+  effects?: readonly { readonly type: string }[];
 }
 
 export interface MouseoverCastInput {
@@ -26,24 +38,6 @@ export interface MouseoverCastInput {
   partyMemberPids?: () => readonly number[] | null;
 }
 
-/**
- * The entity a press should be redirected onto, or null to cast normally.
- *
- * Deliberately narrow: only a friendly ability that needs a target redirects,
- * so hovering a unit frame never steals an offensive press or an AOE from the
- * current target. 'any' abilities are not redirected either, since their
- * friendly reading is ambiguous.
- */
-export function mouseoverCastTarget(
-  hoveredId: number | null,
-  input: MouseoverCastInput,
-): number | null {
-  if (hoveredId === null || !input.enabled) return null;
-  if (!input.ability?.requiresTarget || input.ability.targetType !== 'friendly') return null;
-  if (input.exists(hoveredId)) return hoveredId;
-  return input.partyMemberPids?.()?.includes(hoveredId) ? hoveredId : null;
-}
-
 export interface MouseoverCastInputs {
   /** The Interface option (mouseoverCast, on by default). */
   enabled: boolean;
@@ -51,6 +45,26 @@ export interface MouseoverCastInputs {
   hasEntity: (pid: number) => boolean;
   /** The local player's party/raid roster. */
   partyMemberPids: () => readonly number[] | null;
+}
+
+/**
+ * The entity a press should be redirected onto, or null to leave the press on
+ * the classic current-target-else-self path.
+ *
+ * Only friendly targeted abilities and dual-purpose heals redirect (a hostile cast
+ * never rides a party frame), and only to a hovered unit this client can still
+ * vouch for: one it holds an entity for, or one the party wire still lists as a
+ * member.
+ */
+export function mouseoverCastTarget(
+  hoveredId: number | null,
+  input: MouseoverCastInput,
+): number | null {
+  if (hoveredId === null || !input.enabled) return null;
+  if (!input.ability?.requiresTarget) return null;
+  if (input.ability.targetType !== 'friendly' && !isDualPurposeHeal(input.ability)) return null;
+  if (input.exists(hoveredId)) return hoveredId;
+  return input.partyMemberPids?.()?.includes(hoveredId) ? hoveredId : null;
 }
 
 /** Compatibility wrapper for the focus-target controller's existing seam. */
