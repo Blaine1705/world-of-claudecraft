@@ -5730,6 +5730,46 @@ export const TARGETS = [
     },
   },
   {
+    key: 'fishing-koi-catch-log',
+    label: 'The chat log lines a landed Sunglint Koi prints, koi-specific wording',
+    when: ['professions/fishing'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      // Fed through the REAL event pipeline (hud.handleEvents), not a
+      // hand-built log() string: the 'log' case runs the emitted English
+      // through localizeSystemText/localizeSimText exactly like a live catch
+      // would, and 'fishingResult' composes the reel-in line from the real
+      // catalog key. Reproducing the koi's true drop odds offline would need
+      // many casts against its FISHING_TABLES_BY_BAND weight, so this drives
+      // the same two events completeFishing emits on a landed koi instead of
+      // waiting one out.
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const pid = sim?.playerId;
+        if (!game?.hud || pid === undefined) return;
+        game.hud.handleEvents([
+          {
+            type: 'log',
+            text: 'Something golden flashes beneath the surface!',
+            color: '#1eff00',
+            pid,
+          },
+          {
+            type: 'fishingResult',
+            pid,
+            itemId: 'glimmerfin_koi',
+            quality: 'uncommon',
+            zoneId: 'eastbrook_vale',
+            band: 0,
+          },
+        ]);
+      });
+      await wait(600);
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
     key: 'stack-size-tooltip',
     label: 'A single potion hovered in the bags, with the Max stack line',
     when: ['stack_size_tooltip'],
