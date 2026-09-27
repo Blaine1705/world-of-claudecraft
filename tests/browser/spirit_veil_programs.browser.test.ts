@@ -9,7 +9,9 @@
 // the decal variant are for: a ghost's inner surfaces never blend twice, a
 // ghost behind a camera-faded wall still shows through it, and a decal's clear
 // texels stay clear. The knob legs hold a released spirit to the shader before
-// its knobs became uniforms, pixel for pixel. Node halves:
+// its knobs became uniforms, pixel for pixel. The last leg holds a hit
+// surface response whose gate settled without a readiness proof: it links
+// nothing live until a proof arrives. Node halves:
 // tests/spirit_veil_census.test.ts (the family against the catalogue),
 // tests/spirit_veil_palette.test.ts (the palettes) and
 // tests/character_spirit_veil.test.ts (the visual).
@@ -52,7 +54,7 @@ import {
   type SpiritVeilPalette,
 } from '../../src/render/characters/spirit_veil_palette_core';
 import { buildStubbleDecal } from '../../src/render/characters/stubble';
-import { CharacterVisual } from '../../src/render/characters/visual';
+import { CharacterVisual, type FarBakeGate } from '../../src/render/characters/visual';
 import type { CompileArmHost } from '../../src/render/compile_arms';
 import { gfxInternalsForTest } from '../../src/render/gfx';
 import { spiritVeilFamilyPrewarmEntry } from '../../src/render/spirit_veil_prewarm';
@@ -1051,4 +1053,78 @@ describe('every veil trigger on a real CharacterVisual', () => {
       });
     }
   }
+});
+
+describe('an unproven effect swap on a real CharacterVisual', () => {
+  beforeAll(async () => {
+    await assetsReady();
+  }, 60_000);
+
+  it('links no surface response program live while its gate settles without a proof', async () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
+    try {
+      const w = world(false);
+      w.camera.position.set(0, 1, 4);
+      w.camera.lookAt(0, 1, 0);
+      const look = {
+        app: normalizeAppearance({ ...DEFAULT_APPEARANCE, gender: 'male' }),
+        worn: fullSet('warrior'),
+      };
+      const visual = new CharacterVisual(
+        'player_warrior_modular',
+        0xffffff,
+        0,
+        null,
+        null,
+        null,
+        look,
+      );
+      disposers.push(() => visual.dispose());
+      // The gate compiles nothing: every settle below is a gate that ran out
+      // of time with the response's programs still unlinked.
+      const settles: Parameters<FarBakeGate>[1][] = [];
+      visual.setFarBakeGate((_target, settle) => settles.push(settle));
+      visual.update(1 / 60, IDLE, true);
+      w.scene.add(visual.root);
+      const responding = (): number => {
+        let count = 0;
+        visual.root.traverse((object) => {
+          const mesh = object as THREE.Mesh;
+          if (!mesh.isMesh || !mesh.visible) return;
+          for (const m of [mesh.material].flat())
+            if (m.customProgramCacheKey().endsWith(':surface-response-v4')) count++;
+        });
+        return count;
+      };
+      w.draw();
+      w.draw();
+      const before = w.programs();
+      expect(before).toBeGreaterThan(0);
+
+      visual.respondToElement('fire', 0.9);
+      expect(settles).toHaveLength(1);
+      for (let pass = 0; pass < 3; pass++) {
+        settles[pass](() => false);
+        visual.update(1 / 60, IDLE, true);
+        w.draw();
+        w.draw();
+        expect(responding(), `pass ${pass}`).toBe(0);
+        expect(w.programs(), `pass ${pass}`).toBe(before);
+      }
+      expect(settles).toHaveLength(3);
+
+      // Not vacuous: the same response committed on a bare settle, as the
+      // swap did before it read the proof, links on the next draw.
+      visual.clearElementResponse();
+      visual.respondToElement('fire', 0.9);
+      expect(settles).toHaveLength(4);
+      settles[3](undefined);
+      visual.update(1 / 60, IDLE, true);
+      w.draw();
+      expect(responding()).toBeGreaterThan(0);
+      expect(w.programs()).toBeGreaterThan(before);
+    } finally {
+      restoreGfx();
+    }
+  });
 });

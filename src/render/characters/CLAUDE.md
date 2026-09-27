@@ -52,8 +52,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   and Soul Rend flags; the palette's policy says whether the rig keeps its
   shadow and weapon-skin VFX. Shadowform is no veil: an opaque tint on the
   source programs (`shadowform_tint.ts`). A veil tuple not linked yet stages
-  behind the effect gate with the body still drawing (`stageEffectSwap`),
-  except Soul Rend, actionable raid information, which commits at once
+  behind the effect gate with the body still drawing (`stageEffectSwap`)
+  and commits only on the gate's readiness proof, never on a bare settle;
+  Soul Rend, actionable raid information, is exempt and commits at once
   (`tests/character_effect_compile_gate.test.ts`). The lit transparent twin
   of a rig material is gone and must not return
   (`tests/character_effect_twin_guard.test.ts`).

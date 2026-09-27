@@ -140,9 +140,15 @@ export type { AnimState, BaseState } from './anim_state';
 
 /** The renderer's live compile gate for a far LOD minted (or re-skinned) after
  *  the view's own creation gate ran: compile `target` hidden, off-thread, and
- *  call `settle` (a lazy `ready` proof) once its programs are linked, or
- *  immediately when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
+ *  call `settle` (a lazy `ready` proof) once the gate settles, or immediately
+ *  and with no proof when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
 export type FarBakeGate = (target: THREE.Object3D, settle: (ready?: () => boolean) => void) => void;
+
+/** Gate passes an effect swap may take before it gives up until the next
+ *  effect change. Bounded because each pass holds a slot on the renderer's
+ *  serial far-bake lane, and a set that never proves (a lost context, a
+ *  program that failed to link) must not hold it forever. */
+const EFFECT_SWAP_GATE_PASSES = 3;
 
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
@@ -2532,7 +2538,7 @@ export class CharacterVisual {
 
   /** Compile the staged clones hidden, on meshes carrying the same geometry and
    *  skinning as the rig so three keys the same programs, and let update()
-   *  commit the swap once the gate settles. */
+   *  commit the swap once the gate proves them linked. */
   private stageEffectSwap(
     staged: readonly { source: THREE.Mesh; material: THREE.Material }[],
   ): void {
@@ -2577,10 +2583,22 @@ export class CharacterVisual {
     }
     this.effectSwapScratch = scratch;
     this.poseWrap.add(scratch);
+    this.armEffectSwap(gate, scratch, EFFECT_SWAP_GATE_PASSES);
+  }
+
+  /** One gate pass over a staged scratch set. A settle alone is no proof: a
+   *  piece that hit its deadline, failed, or recovered from a rejected queue
+   *  settles too, and committing then pays the rest of the link on the next
+   *  draw. So only a proof (or a host that has none to give) commits; an
+   *  unproven settle re-arms, since the driver keeps linking, and the last
+   *  one leaves the rig on its linked set for the next effect change. */
+  private armEffectSwap(gate: FarBakeGate, scratch: THREE.Group, passesLeft: number): void {
     try {
-      gate(scratch, () => {
+      gate(scratch, (ready) => {
         if (this.disposed || this.effectSwapScratch !== scratch) return;
-        this.effectSwapSettled = true;
+        if (ready?.() !== false) this.effectSwapSettled = true;
+        else if (passesLeft > 1) this.armEffectSwap(gate, scratch, passesLeft - 1);
+        else this.dropPendingEffectSwap();
       });
     } catch (err) {
       // A gate that rejects outright leaves the rig on its current, linked

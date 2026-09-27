@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { AnimState } from '../src/render/characters/anim_state';
-import type { CharacterVisual } from '../src/render/characters/visual';
+import type { CharacterVisual, FarBakeGate } from '../src/render/characters/visual';
 import type { Entity } from '../src/sim/types';
 
 // A rig goes translucent (a released spirit, Ghost Wolf, stealth, Moonkin,
@@ -136,7 +136,7 @@ function scratchOf(visual: CharacterVisual): THREE.Group | null {
   return (visual as unknown as { effectSwapScratch: THREE.Group | null }).effectSwapScratch;
 }
 
-type GateCall = { target: THREE.Object3D; settle: () => void };
+type GateCall = { target: THREE.Object3D; settle: Parameters<FarBakeGate>[1] };
 
 async function makeVisual(): Promise<CharacterVisual> {
   vi.resetModules();
@@ -380,6 +380,133 @@ describe('a transparent character effect swaps in only once its programs are lin
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
     visual.dispose();
+  });
+
+  it('holds the swap on an unproven settle and re-arms the same scratch set', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const opaque = rigMaterials(visual);
+
+    visual.setGhost(true);
+    const scratch = gateCalls[0].target;
+    // A settle whose proof reads false (a piece that hit its deadline with a
+    // variant still linking) commits nothing: the next draw would link live.
+    gateCalls[0].settle(() => false);
+    visual.update(FRAME, anim(), true);
+    expect(rigMaterials(visual)).toEqual(opaque);
+    // The driver keeps linking, so the same staged set takes another pass.
+    expect(gateCalls).toHaveLength(2);
+    expect(gateCalls[1].target).toBe(scratch);
+    expect(scratchOf(visual)).toBe(scratch);
+    expect(scratch.parent).not.toBeNull();
+
+    gateCalls[1].settle(() => true);
+    expect(rigMaterials(visual)).toEqual(opaque);
+    visual.update(FRAME, anim(), true);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    expect(scratchOf(visual)).toBeNull();
+    // A proved set is remembered as linked like any other.
+    visual.setGhost(false);
+    visual.setGhost(true);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    expect(gateCalls).toHaveLength(2);
+    visual.dispose();
+  });
+
+  it('gives up after its bounded passes and re-stages on the next effect change', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const opaque = rigMaterials(visual);
+
+    visual.setGhost(true);
+    const scratch = gateCalls[0].target;
+    gateCalls[0].settle(() => false);
+    gateCalls[1].settle(() => false);
+    expect(gateCalls).toHaveLength(3);
+    gateCalls[2].settle(() => false);
+    // Three passes, then the lane slot is released and the rig stays on its
+    // linked set.
+    expect(gateCalls).toHaveLength(3);
+    expect(scratchOf(visual)).toBeNull();
+    expect(scratch.parent).toBeNull();
+    visual.update(FRAME, anim(), true);
+    expect(rigMaterials(visual)).toEqual(opaque);
+
+    // An unproven set is NOT remembered as linked: the next change stages again.
+    visual.setGhost(false);
+    expect(gateCalls).toHaveLength(3);
+    visual.setGhost(true);
+    expect(gateCalls).toHaveLength(4);
+    expect(rigMaterials(visual)).toEqual(opaque);
+    gateCalls[3].settle(() => true);
+    visual.update(FRAME, anim(), true);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    visual.dispose();
+  });
+
+  it('commits on a settle that carries no proof (a host without parallel compile)', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    visual.setGhost(true);
+    gateCalls[0].settle(undefined);
+    visual.update(FRAME, anim(), true);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    expect(gateCalls).toHaveLength(1);
+    visual.dispose();
+  });
+
+  it('holds the hit surface response on an unproven settle', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const opaque = rigMaterials(visual);
+    const isResponse = (material: THREE.Material): boolean =>
+      material.customProgramCacheKey().endsWith(':surface-response-v4');
+
+    visual.respondToElement('fire');
+    expect(gateCalls).toHaveLength(1);
+    const staged = (gateCalls[0].target as THREE.Group).children as THREE.Mesh[];
+    expect(staged.length).toBeGreaterThan(0);
+    expect(staged.every((mesh) => isResponse(mesh.material as THREE.Material))).toBe(true);
+
+    gateCalls[0].settle(() => false);
+    visual.update(FRAME, anim(), true);
+    expect(rigMaterials(visual)).toEqual(opaque);
+    expect(gateCalls).toHaveLength(2);
+
+    gateCalls[1].settle(() => true);
+    visual.update(FRAME, anim(), true);
+    const mounted = rigMaterials(visual);
+    expect(mounted.length).toBe(opaque.length);
+    expect(mounted.every(isResponse)).toBe(true);
+    visual.dispose();
+  });
+
+  it('never reads the proof of, nor re-arms, a superseded or disposed swap', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const opaque = rigMaterials(visual);
+
+    visual.setGhost(true);
+    visual.setMoonkin(true);
+    expect(gateCalls).toHaveLength(2);
+    const staleProof = vi.fn(() => false);
+    gateCalls[0].settle(staleProof);
+    expect(staleProof).not.toHaveBeenCalled();
+    expect(gateCalls).toHaveLength(2);
+    expect(scratchOf(visual)).toBe(gateCalls[1].target);
+    visual.update(FRAME, anim(), true);
+    expect(rigMaterials(visual)).toEqual(opaque);
+
+    visual.dispose();
+    const lateProof = vi.fn(() => false);
+    expect(() => gateCalls[1].settle(lateProof)).not.toThrow();
+    expect(lateProof).not.toHaveBeenCalled();
+    expect(gateCalls).toHaveLength(2);
   });
 
   it('drops a swap still in flight on dispose without disposing the live clones', async () => {

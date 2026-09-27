@@ -230,7 +230,7 @@ import {
   compileMayStartBeforeInitialPaint,
   compilePriorityForTarget,
 } from './compile_priority_core';
-import { compileTargetPrepared } from './compile_target_readiness';
+import { compileProof } from './compile_target_readiness';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import { type CorpseBeacon, createCorpseBeacon } from './corpse_beacon';
@@ -4809,7 +4809,7 @@ export class Renderer {
   private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
     this.farBakeLane.enqueue(
       (settled) => this.gateSwapFlagOnCompile(target, settled),
-      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),
+      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl.properties, target)),
     );
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
