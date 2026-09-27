@@ -1373,7 +1373,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1382,21 +1381,29 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
-  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
-  // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
-  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
-  // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+  // branch: the town runtime leaf composes the stone vault hall and the
+  // authoritative layout gains the weeklyVault site. No capture was retaken.
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
+  // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
+  // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted for the spirit veil (renderer.ts and prewarm_policy.ts inputs). No
   // capture was retaken.
   // Re-minted for the widened spirit veil (renderer.ts and prewarm_policy.ts
   // inputs). No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 into feature/spirit-veil: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  '5c60e39c8721771399b1edf6c4b7d182fcbef672b7cfe39f65a627621085b9c7';
+  // Re-minted for the second merge of release/v0.44.0 into
+  // feature/spirit-veil: the merged renderer leaf matches neither parent. No
+  // capture was retaken.
+  '8d0692a13a935473c9d8e46b6c8f6811e84255605e262a949b834463877efee0';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1405,19 +1412,28 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for the fail-soft prewarm entry runner: runEntry's run, progress and partial remainder moved out of renderer.ts. No capture was retaken.
-  // Re-minted for the cast stand-in slot: the ability-material slot's construction moved out of renderer.ts into cast_vfx_prewarm.ts. No capture was retaken.
-  // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
-  // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
-  // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+  // branch: the town runtime leaf composes the stone vault hall and the
+  // authoritative layout gains the weeklyVault site. No capture was retaken.
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
+  // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
+  // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted for the spirit veil (renderer.ts and prewarm_policy.ts inputs). No
   // capture was retaken.
   // Re-minted for the widened spirit veil (renderer.ts and prewarm_policy.ts
   // inputs). No capture was retaken.
   // Re-minted for the merge of release/v0.44.0 into feature/spirit-veil: the
   // merged renderer leaf matches neither parent. No capture was retaken.
-  '1fd5fa93934d20f56bfc8979b324578419100532b884a018625592c707c78220';
+  // Re-minted for the second merge of release/v0.44.0 into
+  // feature/spirit-veil: the merged renderer leaf matches neither parent. No
+  // capture was retaken.
+  'beb2393912735cdc52684498012ddf36523f4b9b41c693799882a9456d7c2295';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2790,25 +2806,23 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // was retaken.
       // v0.42.2 hotfix line forward merge into release/v0.43.0: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-      // Frame Rate Limit: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // devalue audit floor: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // fail-soft prewarm entry runner: recomputed LAST again over the re-swept
-      // evidence. No capture was retaken.
-      // cast stand-in slot: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // PR #4199 shader prewarm merge: recomputed LAST again over the
-      // re-swept evidence. No capture was retaken.
-      // PR #4220 release integration: recomputed LAST again over the
-      // re-swept evidence. No capture was retaken.
+      // Third release/v0.43.0 merge into feature/world-quests: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+      // Weekly Vault (PR 4052) landing on the quests integration branch:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+      // Re-minted for the shipwreck salvage landing over the re-sealed
+      // provenance. No capture or measured value changed.
+      // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
+      // LAST again over the re-swept evidence. No capture was retaken.
       // spirit veil: recomputed LAST again over the re-swept evidence. No capture
       // was retaken.
       // widened spirit veil: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
       // release/v0.44.0 merge into feature/spirit-veil: recomputed LAST again over
       // the re-swept evidence. No capture was retaken.
-    ).toBe('8847613681496f5b328c4af37117d02cdda5c4b65079ed5161f90a3848ec1013');
+      // Second release/v0.44.0 merge into feature/spirit-veil: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('8e8be9a675195a4b746110f4549e0452438d33eb26ce4901aaecddfd0a93d451');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
