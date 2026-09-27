@@ -26,12 +26,12 @@ function shortName(mob: Entity): string {
 }
 
 /**
- * Narrate one warpath decision (`what`, a short English clause) to every player near him.
- * A no-op without dev commands.
+ * Narrate one warpath decision to every player near him. `what` builds the short English
+ * clause, and is only called with dev commands on, so production never even formats it.
  */
-export function traceWarpath(ctx: SimContext, mob: Entity, what: string): void {
+export function traceWarpath(ctx: SimContext, mob: Entity, what: () => string): void {
   if (!ctx.devCommands) return;
-  const text = `[dev] ${shortName(mob)}: ${what}`;
+  const text = `[dev] ${shortName(mob)}: ${what()}`;
   for (const [pid, meta] of ctx.players) {
     const p = ctx.entities.get(meta.entityId);
     if (!p || dist2d(p.pos, mob.pos) > WARPATH_DEV_TRACE_RANGE) continue;

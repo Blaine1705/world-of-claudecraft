@@ -131,7 +131,8 @@ export function nextWarpathPhase(
   return timer <= 0 ? 'focus' : 'wreck';
 }
 
-/** Seconds a phase runs for once entered. */
+/** Seconds a phase runs for once entered. For TRAVEL this is only the floor: beginPhase
+ *  sizes each leg's patience from its length (warpathTravelPatience). */
 export function warpathPhaseDuration(phase: WarpathPhase, def: WarpathDef): number {
   if (phase === 'focus') return def.focusSeconds;
   if (phase === 'travel') return def.travelTimeoutSeconds;
@@ -218,24 +219,26 @@ function leaveFocus(ctx: SimContext, mob: Entity, def: WarpathDef, dragged: bool
   const pick = nextWarpathDestination(from, count, (i) => warpathStopRazed(ctx, def, i));
   if (pick === null && !dragged) {
     mob.warpathTimer = def.focusSeconds;
-    traceWarpath(ctx, mob, 'every picket is razed, holding focus on the raid.');
+    traceWarpath(ctx, mob, () => 'every picket is razed, holding focus on the raid.');
     return 'focus';
   }
   const dest = pick ?? (nextWarpathDestination(from, count) as number);
   // Name every picket he passed over, so a skipped stop is never a mystery.
-  for (let step = 1; step < count; step++) {
+  for (let step = 1; ctx.devCommands && step < count; step++) {
     const i = (((from + step) % count) + count) % count;
     if (i === dest) break;
-    traceWarpath(ctx, mob, `skipping ${stopLabel(def, i)} (its squad is already down).`);
+    traceWarpath(ctx, mob, () => `skipping ${stopLabel(def, i)} (its squad is already down).`);
   }
   mob.warpathDestination = dest;
-  const why =
-    pick === null
-      ? ' (every picket is razed; regrouping, dragged to his leash)'
-      : dragged
-        ? ' (focus dragged to his leash)'
-        : '';
-  traceWarpath(ctx, mob, `marching to ${stopLabel(def, dest)}${why}.`);
+  traceWarpath(ctx, mob, () => {
+    const why =
+      pick === null
+        ? ' (every picket is razed; regrouping, dragged to his leash)'
+        : dragged
+          ? ' (focus dragged to his leash)'
+          : '';
+    return `marching to ${stopLabel(def, dest)}${why}.`;
+  });
   beginPhase(ctx, mob, def, 'travel');
   return 'travel';
 }
@@ -259,7 +262,7 @@ function beginPhase(ctx: SimContext, mob: Entity, def: WarpathDef, phase: Warpat
     return;
   }
   if (phase === 'focus') {
-    traceWarpath(ctx, mob, `fighting the raid (focus, ${def.focusSeconds}s).`);
+    traceWarpath(ctx, mob, () => `fighting the raid (focus, ${def.focusSeconds}s).`);
     return;
   }
   if (phase === 'wreck') {
@@ -323,12 +326,12 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
     const next = highestThreatTarget(ctx, mob);
     const mid = mob.warpathPhase === 'travel' || mob.warpathPhase === 'wreck';
     if (!next) {
-      if (mid) traceWarpath(ctx, mob, `${mob.warpathPhase} aborted (nobody left to fight).`);
+      if (mid) traceWarpath(ctx, mob, () => `${mob.warpathPhase} aborted (nobody left to fight).`);
       resetWarpath(mob);
       return 'fallthrough';
     }
     if (mid) {
-      traceWarpath(ctx, mob, `lost his target mid-${mob.warpathPhase}, now on ${next.name}.`);
+      traceWarpath(ctx, mob, () => `lost his target mid-${mob.warpathPhase}, now on ${next.name}.`);
     }
     mob.aggroTargetId = next.id;
     target = next;
@@ -359,7 +362,7 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
     def,
   );
   if (quit) {
-    traceWarpath(ctx, mob, `gives up (${quit}) and walks home.`);
+    traceWarpath(ctx, mob, () => `gives up (${quit}) and walks home.`);
     startEvadeHome(mob);
     resetWarpath(mob);
     return 'evaded';
@@ -369,29 +372,28 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
 
   const dest = destinationPos(def, mob.warpathDestination ?? 0);
   const phase = (mob.warpathPhase ?? 'focus') as WarpathPhase;
+  const draggedToLeash = phase === 'focus' && focusDraggedToLeash(mob);
   const next = nextWarpathPhase(
     phase,
     mob.warpathTimer ?? 0,
     dist2d(mob.pos, dest),
     def,
-    phase === 'focus' && focusDraggedToLeash(mob),
+    draggedToLeash,
   );
   if (next !== phase) {
     if (next === 'travel') {
       // Leaving FOCUS: he may find nothing left standing and hold the fight instead.
-      const entered = leaveFocus(ctx, mob, def, focusDraggedToLeash(mob));
+      const entered = leaveFocus(ctx, mob, def, draggedToLeash);
       return entered === 'focus' ? 'fallthrough' : 'handled';
     }
     if (next === 'wreck') {
-      const at = stopLabel(def, mob.warpathDestination ?? 0);
-      const off = dist2d(mob.pos, dest);
-      traceWarpath(
-        ctx,
-        mob,
-        off <= def.arriveRadius
+      traceWarpath(ctx, mob, () => {
+        const at = stopLabel(def, mob.warpathDestination ?? 0);
+        const off = dist2d(mob.pos, dest);
+        return off <= def.arriveRadius
           ? `wrecking ${at}.`
-          : `wrecking short of ${at} (travel timed out, ${off.toFixed(0)} yd off).`,
-      );
+          : `wrecking short of ${at} (travel timed out, ${off.toFixed(0)} yd off).`;
+      });
     }
     beginPhase(ctx, mob, def, next);
     return next === 'focus' ? 'fallthrough' : 'handled';
