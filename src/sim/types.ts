@@ -2126,9 +2126,16 @@ export interface MobTemplate {
      * When he drops the pull and walks home to his spawn (his bed) as an ordinary evade:
      * immune on the way, full health on arrival. `tetherRadius` is how far from the spawn
      * he may ever be, in any phase; `playerRange` is how close a living player must be;
-     * `unharriedSeconds` is how long he waits with nobody hurting him (mob/warpath.ts).
+     * `aloneGraceSeconds` is how long nobody may be inside that range before he gives up (a
+     * ranged raid swinging wide as he sets off must not reset him); `unharriedSeconds` is how
+     * long he waits with nobody hurting him (mob/warpath.ts).
      */
-    giveUp: { tetherRadius: number; playerRange: number; unharriedSeconds: number };
+    giveUp: {
+      tetherRadius: number;
+      playerRange: number;
+      aloneGraceSeconds: number;
+      unharriedSeconds: number;
+    };
     /** The travelling backhand: one random player inside `radius`, on a timer. */
     swipe: {
       every: number;
@@ -5833,6 +5840,8 @@ export interface Entity extends ClientMirroredEntityFields {
   warpathDestination?: number;
   /** Seconds since anything reduced his health. */
   warpathUnharried?: number;
+  /** Seconds with no living player inside his give-up range (mob/warpath.ts). */
+  warpathAlone?: number;
   /** Health observed last tick, so any damage source counts as harassment. */
   warpathLastHp?: number;
   warpathSwipeTimer?: number;

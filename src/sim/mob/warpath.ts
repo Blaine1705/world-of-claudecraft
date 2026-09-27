@@ -76,12 +76,12 @@ export const WARPATH_TETHER_MARCH_MARGIN = 5;
  */
 export function warpathGiveUp(
   distFromBed: number,
-  playerNear: boolean,
+  aloneSeconds: number,
   unharriedSeconds: number,
   def: WarpathDef,
 ): WarpathGiveUp | null {
   if (distFromBed > def.giveUp.tetherRadius) return 'tether';
-  if (!playerNear) return 'alone';
+  if (aloneSeconds >= def.giveUp.aloneGraceSeconds) return 'alone';
   if (unharriedSeconds >= def.giveUp.unharriedSeconds) return 'unharried';
   return null;
 }
@@ -229,18 +229,24 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
   if (mob.warpathPhase === undefined) {
     mob.warpathLastHp = mob.hp;
     mob.warpathUnharried = 0;
+    mob.warpathAlone = 0;
     mob.warpathSwipeTimer = def.swipe.every;
     beginPhase(ctx, mob, def, 'focus');
   }
 
   trackHarassment(mob);
+  // Nobody in range counts up in sim time; anyone back in range clears it, so a raid that
+  // swings wide for a moment as he sets off for the next stop does not reset him.
+  mob.warpathAlone = livingPlayerWithin(ctx, mob, def.giveUp.playerRange)
+    ? 0
+    : (mob.warpathAlone ?? 0) + DT;
 
   // The give-up check runs on every engaged tick, before any phase moves him, so no phase
   // (a chase, a leg, a wreck) can carry him past it. Measured from his spawn, which is his
   // bed for the live boss and where the evade walks him home to.
   const quit = warpathGiveUp(
     dist2d(mob.pos, mob.spawnPos),
-    livingPlayerWithin(ctx, mob, def.giveUp.playerRange),
+    mob.warpathAlone ?? 0,
     mob.warpathUnharried ?? 0,
     def,
   );
@@ -481,6 +487,7 @@ export function resetWarpath(mob: Entity): void {
   mob.warpathTimer = 0;
   mob.warpathDestination = undefined;
   mob.warpathUnharried = 0;
+  mob.warpathAlone = 0;
   mob.warpathSwipeTimer = 0;
   mob.warpathBlastAt = null;
 }

@@ -464,7 +464,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // it), and a focus fight dragged near the tether marches on rather than evading. Any
       // hit resets the 30 seconds, so a raid chasing and hitting him never trips it, and it
       // runs on the same clock as his Barrowmend regen above without touching it.
-      giveUp: { tetherRadius: 100, playerRange: 60, unharriedSeconds: 30 },
+      giveUp: { tetherRadius: 100, playerRange: 60, aloneGraceSeconds: 5, unharriedSeconds: 30 },
       // The travelling backhand, on one random player inside his reach. Between the
       // aoePulse (36 to 50) and the stomp (18 to 28) in weight: escorting him is meant to
       // cost, not to be a death sentence for whoever draws the short straw. Named for the

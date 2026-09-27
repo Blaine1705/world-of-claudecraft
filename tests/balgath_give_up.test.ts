@@ -109,18 +109,24 @@ function pulled(opts: { pike?: boolean } = {}) {
 
 describe('the give-up rule, as a pure function', () => {
   it('pins the owner-approved numbers', () => {
-    expect(def().giveUp).toEqual({ tetherRadius: 100, playerRange: 60, unharriedSeconds: 30 });
+    expect(def().giveUp).toEqual({
+      tetherRadius: 100,
+      playerRange: 60,
+      aloneGraceSeconds: 5,
+      unharriedSeconds: 30,
+    });
   });
 
   it('quits past the tether, with nobody near, or with nobody hurting him, and not otherwise', () => {
     const g = def().giveUp;
-    expect(warpathGiveUp(g.tetherRadius - 0.1, true, 0, def())).toBeNull();
-    expect(warpathGiveUp(g.tetherRadius + 0.1, true, 0, def())).toBe('tether');
+    expect(warpathGiveUp(g.tetherRadius - 0.1, 0, 0, def())).toBeNull();
+    expect(warpathGiveUp(g.tetherRadius + 0.1, 0, 0, def())).toBe('tether');
     // The tether is absolute: a raid on him and hitting him does not buy him past it.
-    expect(warpathGiveUp(g.tetherRadius + 0.1, true, 0, def())).toBe('tether');
-    expect(warpathGiveUp(10, false, 0, def())).toBe('alone');
-    expect(warpathGiveUp(10, true, g.unharriedSeconds - 0.05, def())).toBeNull();
-    expect(warpathGiveUp(10, true, g.unharriedSeconds, def())).toBe('unharried');
+    expect(warpathGiveUp(g.tetherRadius + 0.1, 0, 0, def())).toBe('tether');
+    expect(warpathGiveUp(10, g.aloneGraceSeconds - 0.05, 0, def())).toBeNull();
+    expect(warpathGiveUp(10, g.aloneGraceSeconds, 0, def())).toBe('alone');
+    expect(warpathGiveUp(10, 0, g.unharriedSeconds - 0.05, def())).toBeNull();
+    expect(warpathGiveUp(10, 0, g.unharriedSeconds, def())).toBe('unharried');
     // And the regen window stays strictly inside the give-up window: he heals first.
     expect(def().regen.unharriedSeconds).toBeLessThan(g.unharriedSeconds);
   });
@@ -218,7 +224,7 @@ describe('he can never be kited out of his area', () => {
 });
 
 describe('he never stays engaged with nobody fighting him', () => {
-  it('evades home at once when no living player is within range', () => {
+  it('evades home once no living player has been within range for the grace window', () => {
     const { sim, player, boss, chase, walkHome } = pulled();
     chase(5, () => false);
     expect(boss.inCombat).toBe(true);
@@ -227,10 +233,20 @@ describe('he never stays engaged with nobody fighting him', () => {
     place(sim, player, boss.pos.x + inside, boss.pos.z);
     sim.tick();
     expect(boss.aiState).not.toBe('evade');
-    // ...and the tick nobody is, he is gone.
+    // ...a brief swing out of range inside the grace does not reset him...
     const outside = def().giveUp.playerRange + 10;
-    place(sim, player, boss.pos.x + outside, boss.pos.z);
-    sim.tick();
+    const hold = (seconds: number, dx: number) => {
+      for (let t = 0; t < seconds; t += 0.05) {
+        place(sim, player, boss.pos.x + dx, boss.pos.z);
+        sim.tick();
+      }
+    };
+    hold(def().giveUp.aloneGraceSeconds - 1, outside);
+    expect(boss.aiState).not.toBe('evade');
+    hold(0.5, inside);
+    expect(boss.aiState).not.toBe('evade');
+    // ...but a whole grace window with nobody in range, and he is gone.
+    hold(def().giveUp.aloneGraceSeconds + 0.2, outside);
     expect(boss.aiState).toBe('evade');
     expect(walkHome()).toBeLessThan(60);
     expect(boss.hp).toBe(boss.maxHp);
@@ -296,9 +312,17 @@ describe('a pull he gave up is a real end for the muster', () => {
       const a = Math.atan2(124 - boss.pos.x, 256 - boss.pos.z);
       place(sim, player, boss.pos.x + Math.sin(a) * 70, boss.pos.z + Math.cos(a) * 70);
     };
-    if (quitBy === 'alone') away();
-    else chase(40, () => boss.aiState === 'evade', 8, false);
-    if (quitBy === 'alone') sim.tick();
+    if (quitBy === 'alone') {
+      // Kept out of range for the whole grace window, re-placed as he moves.
+      for (
+        let t = 0;
+        t < def().giveUp.aloneGraceSeconds + 0.2 && boss.aiState !== 'evade';
+        t += 0.05
+      ) {
+        away();
+        sim.tick();
+      }
+    } else chase(40, () => boss.aiState === 'evade', 8, false);
     expect(boss.aiState).toBe('evade');
     if (quitBy === 'unharried') away();
     expect(walkHome()).toBeLessThan(60);
