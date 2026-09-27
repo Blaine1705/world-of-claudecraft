@@ -450,5 +450,36 @@ describe('through the front door', () => {
     expect(interiorEntryCap(hall, 10, eyeY, 5, back, rise, 0, pad)).toBe(rise);
     // a boom that looks up from under the eye is left alone
     expect(interiorEntryCap(hall, 10, eyeY, 5, 0, -1, -back, pad)).toBe(-1);
+    // an eye well out to the side of the doorway (the rest of the front of the room) is never
+    // capped, whichever way its boom runs
+    expect(interiorEntryCap(hall, 18, eyeY, 5, 0, rise, -back, pad)).toBe(rise);
+    expect(interiorEntryCap(hall, 1, eyeY, 5, 0, rise, -back, pad)).toBe(rise);
+  });
+
+  it('lets an orbit near the door sweep the capped lens smoothly, a degree at a time', () => {
+    const hall = cameraInterior(
+      'hall',
+      [
+        [0, 20, 0, 12, 0, 40],
+        [8, 12, 0, 4, -1, 1.5],
+      ],
+      [{ box: 1, axis: 2, side: -1 }],
+    );
+    const dist = 18;
+    const pitch = 0.75;
+    let prev: number | null = null;
+    let most = 0;
+    for (let deg = 0; deg <= 360; deg += 1) {
+      const yaw = (deg * Math.PI) / 180;
+      const dx = Math.sin(yaw) * Math.cos(pitch) * dist;
+      const dz = -Math.cos(yaw) * Math.cos(pitch) * dist;
+      const dy = interiorEntryCap(hall, 10, 2, 6, dx, Math.sin(pitch) * dist, dz, 0.3);
+      if (prev !== null) most = Math.max(most, Math.abs(dy - prev));
+      prev = dy;
+    }
+    // a lens 18 yards out moves a quarter of a yard a degree round the orbit: the cap's band
+    // is wide and soft, so its rise changes by about as much, never a drop of yards (the
+    // driver walks the cap's weight in and out on top of that)
+    expect(most).toBeLessThan(0.6);
   });
 });

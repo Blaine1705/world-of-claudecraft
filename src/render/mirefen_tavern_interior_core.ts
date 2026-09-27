@@ -65,6 +65,12 @@ const racks = TAVERN_PROPS.filter((p) => p.kind === 'barrels');
 const RACK_X0 = Math.min(...racks.map((p) => p.x - (p.hw ?? 0))) - 0.1;
 const RACK_FRONT = Math.max(...racks.map((p) => p.z + (p.hd ?? 0))) + 0.1;
 const RACK_TOP = TAVERN_BAR_PLATFORM.lift + Math.max(...racks.map((p) => p.height)) + 0.2;
+// the gaps between the racks (the barkeep's spot at the kitchen hatch): open to the back wall
+const RACK_GAPS: readonly (readonly [number, number])[] = racks
+  .map((p) => [p.x - (p.hw ?? 0), p.x + (p.hw ?? 0)] as const)
+  .sort((a, b) => a[0] - b[0])
+  .flatMap((r, i, all) => (i + 1 < all.length ? [[r[1] + 0.1, all[i + 1][0] - 0.1] as const] : []))
+  .filter(([a, b]) => b - a > 1);
 
 // the arch's segmental head (tavern_shell.py hall_back): springing at 3.9, crowned at its
 // height; the second box is the head's chord half a yard under the crown
@@ -123,6 +129,10 @@ export const TAVERN_INTERIOR_LOCAL: readonly InteriorBox[] = [
     T.z - T.rIn,
     Math.min(T.z + T.rIn, H.z0),
   ],
+  // 10 on: between the barrel racks, down to the floor, to the back wall (the kitchen hatch)
+  ...RACK_GAPS.map(
+    ([x0, x1]) => [x0, x1, FLOOR_AIR, TAVERN_HALL_AIR_TOP, iz0, RACK_FRONT + REACH] as InteriorBox,
+  ),
 ];
 
 /** The front doorway's box and its outside face (local +z, out of the door). */

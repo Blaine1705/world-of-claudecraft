@@ -1,6 +1,6 @@
 // The indoor chase-camera clamp's pure decisions (the driver is interior_camera.ts). A walk-in
 // building registers its INTERIOR as the air a camera may occupy: a union of axis-aligned
-// boxes in world yards (its rooms, the doorways and arches between them, the stair shaft),
+// boxes in world yards (its rooms, the doorways and arches between them, a round tower),
 // each box authored against the inner wall faces, the floors and the ceilings. While the
 // player's eye stands in that air, the camera is kept in it: the chase ray from the look
 // point to the desired camera is walked through the union, and the camera is pulled IN to
@@ -30,7 +30,7 @@
 // (a face of a box the building marks as open onto the world, its front door), never
 // through a wall.
 //
-// A piece of air is a box, or a box cut round by a vertical cylinder (a stair tower's shaft:
+// A piece of air is a box, or a box cut round by a vertical cylinder (a round tower's shaft:
 // the cylinder's xz circle within the box's bounds), so a round room is exact, not stepped.
 //
 // Three-, DOM- and i18n-free, deterministic, allocation-free per call: slab and circle tests
@@ -473,9 +473,18 @@ export function interiorEntryWeight(vol: CameraInterior, x: number, y: number, z
   return t * t * (3 - 2 * t);
 }
 
-/** The nearest opening to an eye, written by interiorEntryCap and interiorEntryWeight: its
- *  box's top (world y) and the eye's depth past its threshold (0 on the threshold and out). */
-export const interiorNearestOpening = { top: Infinity, depth: Infinity, axis: 0, side: 1 };
+/** The nearest opening to an eye, written by interiorEntryCap, interiorEntryWeight and
+ *  interiorOpeningDepth: its box's top (world y), the eye's depth past its threshold (0 on the
+ *  threshold and out), that depth along the opening's own axis alone, and how far the eye
+ *  stands out to the side of the doorway (across the axis, the height aside). */
+export const interiorNearestOpening = {
+  top: Infinity,
+  depth: Infinity,
+  axial: Infinity,
+  lateral: Infinity,
+  axis: 0,
+  side: 1,
+};
 
 function nearestOpening(vol: CameraInterior, x: number, y: number, z: number): void {
   let nearest = Infinity;
@@ -483,18 +492,27 @@ function nearestOpening(vol: CameraInterior, x: number, y: number, z: number): v
   let sill = 0;
   let axisOut = 0;
   let sideOut = 1;
+  let axial = 0;
+  let lateral = 0;
   for (let i = 0; i < vol.openings.length; i++) {
     const o = vol.openings[i];
     const b = vol.boxes[o.box];
     let d2 = 0;
+    let along = 0;
+    let across2 = 0;
     for (let axis = 0; axis < 3; axis++) {
       const v = axis === 0 ? x : axis === 1 ? y : z;
       const lo = b[axis * 2];
       const hi = b[axis * 2 + 1];
       let d: number;
       // past the face, out in the world: no depth in at all
-      if (axis === o.axis) d = Math.max(0, o.side * ((o.side > 0 ? hi : lo) - v));
-      else d = v < lo ? lo - v : v > hi ? v - hi : 0;
+      if (axis === o.axis) {
+        d = Math.max(0, o.side * ((o.side > 0 ? hi : lo) - v));
+        along = d;
+      } else {
+        d = v < lo ? lo - v : v > hi ? v - hi : 0;
+        if (axis !== 1) across2 += d * d;
+      }
       d2 += d * d;
     }
     if (d2 < nearest) {
@@ -503,12 +521,24 @@ function nearestOpening(vol: CameraInterior, x: number, y: number, z: number): v
       sill = vol.thresholds[i] ?? 0;
       axisOut = o.axis;
       sideOut = o.side;
+      axial = along;
+      lateral = Math.sqrt(across2);
     }
   }
   interiorNearestOpening.top = top;
   interiorNearestOpening.depth = Math.max(0, Math.sqrt(nearest) - sill);
+  interiorNearestOpening.axial = Math.max(0, axial - sill);
+  interiorNearestOpening.lateral = lateral;
   interiorNearestOpening.axis = axisOut;
   interiorNearestOpening.side = sideOut;
+}
+
+/** How deep past its nearest opening's threshold a point stands (0 on the threshold and out;
+ *  Infinity in an interior with no openings). */
+export function interiorOpeningDepth(vol: CameraInterior, x: number, y: number, z: number) {
+  if (vol.openings.length === 0) return Infinity;
+  nearestOpening(vol, x, y, z);
+  return interiorNearestOpening.depth;
 }
 
 const smoothstep01 = (t: number): number => {
@@ -516,10 +546,15 @@ const smoothstep01 = (t: number): number => {
   return u * u * (3 - 2 * u);
 };
 
-/** The entry cap bites whole on a boom this many yards (along the door's outward axis) back
- *  toward the door from the eye, fading to nothing on one that runs across the room or
- *  deeper in. */
-export const INTERIOR_ENTRY_CAP_TOWARD = 2;
+/** The entry cap bites whole on a boom that runs back toward the door within this angle of
+ *  its axis (the cosine), fading to nothing by INTERIOR_ENTRY_CAP_ACROSS (a boom across the
+ *  room or deeper into it is never capped): a wide, soft band, so an orbit never drops the
+ *  lens in a frame. */
+export const INTERIOR_ENTRY_CAP_TOWARD = 0.9;
+export const INTERIOR_ENTRY_CAP_ACROSS = 0.45;
+/** An eye this far out to the side of the doorway (yards) is past the cap's reach: the cap is
+ *  for walking in through the door, not for the rest of the front of the room. */
+export const INTERIOR_ENTRY_CAP_ASIDE = 3.5;
 
 /**
  * The entry cap: how high over an eye at (x, y, z) the lens may stand along a requested boom
@@ -529,9 +564,11 @@ export const INTERIOR_ENTRY_CAP_TOWARD = 2;
  * so the sight line threads the doorway while the lens is still outside and the lens only
  * ever comes down on the way in (a smooth fall over INTERIOR_ENTRY_CAP_IN yards from nothing
  * on the threshold); once the requested lens has come in through the door the cap lets go
- * over INTERIOR_ENTRY_CAP_RELAX yards. A boom across the room or deeper into it is never
- * capped. Returns the capped rise (dy unchanged when nothing caps it, or when the boom looks
- * up).
+ * over INTERIOR_ENTRY_CAP_RELAX yards. A boom across the room or deeper into it, and an eye
+ * well out to the side of the doorway, are never capped. Returns the capped rise (dy
+ * unchanged when nothing caps it, or when the boom looks up), and leaves the cap's weight and
+ * the rise it caps to in `interiorEntryHold` (the driver walks the weight in and out, and
+ * holds it only for a player who walked in).
  */
 export function interiorEntryCap(
   vol: CameraInterior,
@@ -544,30 +581,65 @@ export function interiorEntryCap(
   pad: number,
 ): number {
   interiorEntryHold.value = 0;
+  interiorEntryHold.weight = 0;
+  interiorEntryHold.rise = Infinity;
   if (vol.openings.length === 0) return dy;
   nearestOpening(vol, x, y, z);
-  const { top, depth } = interiorNearestOpening;
+  const { top, axial, lateral } = interiorNearestOpening;
   const behind = Math.hypot(dx, dz);
   // the requested lens has come in through the door: the cap, and the through-door hold,
   // let go
-  const hold = 1 - smoothstep01((depth - behind - 1) / INTERIOR_ENTRY_CAP_RELAX);
+  const hold = 1 - smoothstep01((axial - behind - 1) / INTERIOR_ENTRY_CAP_RELAX);
   interiorEntryHold.value = hold;
-  if (dy <= 0) return dy;
   const rise = Math.max(0.2, top - pad - y);
-  if (dy <= rise) return dy;
+  interiorEntryHold.rise = rise;
   const o = interiorNearestOpening;
   const toward = o.side * (o.axis === 0 ? dx : o.axis === 1 ? dy : dz);
+  const cos = behind > 1e-9 ? toward / behind : 0;
   const e =
-    smoothstep01(toward / INTERIOR_ENTRY_CAP_TOWARD) *
-    smoothstep01(depth / INTERIOR_ENTRY_CAP_IN) *
+    smoothstep01(
+      (cos - INTERIOR_ENTRY_CAP_ACROSS) / (INTERIOR_ENTRY_CAP_TOWARD - INTERIOR_ENTRY_CAP_ACROSS),
+    ) *
+    smoothstep01(axial / INTERIOR_ENTRY_CAP_IN) *
+    (1 - smoothstep01(lateral / INTERIOR_ENTRY_CAP_ASIDE)) *
     hold;
+  interiorEntryHold.weight = e;
+  if (dy <= rise) return dy;
   return dy - e * (dy - rise);
 }
 
 /** The last interiorEntryCap's hold (1 while the requested lens may still be out beyond the
- *  door, easing to 0 once it has come in): the driver scales the through-door hold by it, so
- *  deep in a room a ray is never let out through the door. */
-export const interiorEntryHold = { value: 0 };
+ *  door, easing to 0 once it has come in: the driver scales the through-door hold by it, so
+ *  deep in a room a ray is never let out through the door), the cap's weight and the rise it
+ *  caps to. */
+export const interiorEntryHold = { value: 0, weight: 0, rise: Infinity };
+
+/** How fast (1/s) the driver walks the entry cap's weight toward its target. */
+export const INTERIOR_ENTRY_CAP_RATE = 8;
+/** Over this many yards past a threshold a lagged look point hands the boom's start back from
+ *  the eye to itself (a smooth hand-over, never a one-frame shift). */
+export const INTERIOR_LOOK_BLEND = 1.2;
+
+/** Whether the segment a to b touches the air anywhere (a body outside seen past the
+ *  building rather than across it). */
+export function interiorSegmentTouches(
+  vol: CameraInterior,
+  ax: number,
+  ay: number,
+  az: number,
+  bx: number,
+  by: number,
+  bz: number,
+): boolean {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const dz = bz - az;
+  for (let i = 0; i < vol.boxes.length; i++) {
+    if (!slabPiece(vol.boxes[i], vol.rounds[i], 0, ax, ay, az, dx, dy, dz)) continue;
+    if (slabEnter <= 1 && slabExit >= 0) return true;
+  }
+  return false;
+}
 
 /** How long (seconds) the lens may stay outside a door once the player has stopped just
  *  inside it, before it comes in to the room (the through-door hold eases out). */
@@ -586,14 +658,14 @@ export const INTERIOR_RELEASE_MAX_SEC = 1.5;
 // Framing a cramped spot: slide under a low ceiling, lift over a wall, or swing round it
 // ---------------------------------------------------------------------------
 
-/** A boom shorter than this (yards) is cramped (a player on the spiral stair against the
- *  tower's wall, backed into a guest room's corner): the drawn camera looks for a better
+/** A boom shorter than this (yards) is cramped (a player backed against a round tower's
+ *  wall, or into a small room's corner): the drawn camera looks for a better
  *  framing nearby, over or round what cramps it, rather than sitting in the player's head. */
 export const INTERIOR_COMFORT_BOOM = 3.5;
 /** The camera never lifts past this elevation: it looks down on the player, never straight
  *  down. */
 export const INTERIOR_LIFT_MAX_PITCH = 1.2;
-/** Under a low ceiling (a gallery, a guest room under its tie beams) the camera flattens its
+/** Under a low ceiling (a low room, the top of a hall's air) the camera flattens its
  *  elevation to keep its distance, never below this (it still looks a touch down). */
 export const INTERIOR_DROP_MIN_PITCH = 0.05;
 /** The flattenings tried under a ceiling, least first (radians of elevation taken off). */

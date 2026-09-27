@@ -229,13 +229,18 @@ export function tavernShelters(x: number, y: number, z: number): boolean {
 /** How far in from the side walls the hammer beams reach (tavern_shell.py hammerbeam_truss). */
 const HAMMER_REACH = 2.5;
 
+/** Along the side walls the braces under the hammer beams spring this far under them. */
+const HAMMER_BRACE = 1.1;
+
 /** The hall roof's underside over a local point (its rafters, purlins and the hammerbeam
- *  trusses: the hammer beams along the side walls, the lowest timber of it), or +Infinity
- *  off its footprint. */
+ *  trusses: along the side walls the hammer beams and the braces under them, the lowest
+ *  timber of it), or +Infinity off its footprint. */
 export function hallRoofUnderside(x: number, z: number): number {
   if (Math.abs(x) > H.x1 + H.eaveOut || z < H.z0 - 0.2 || z > H.z1 + H.vergeOut) return Infinity;
   const line = H.ridge - Math.abs(x) * HALL_PITCH - TAVERN_ROOF_UNDERSIDE;
-  return Math.abs(x) >= H.x1 - H.wall - HAMMER_REACH ? Math.min(line, H.truss) : line;
+  return Math.abs(x) >= H.x1 - H.wall - HAMMER_REACH
+    ? Math.min(line, H.truss - HAMMER_BRACE)
+    : line;
 }
 
 /** The wing roof's underside (its tie beams at the eaves), or +Infinity off its footprint. */

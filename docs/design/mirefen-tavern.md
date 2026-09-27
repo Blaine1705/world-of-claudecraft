@@ -22,15 +22,15 @@ mood and proportion only and never entered the build.
   corner opens onto the hall through an arch: a flagged nook with a stone rose, a bench round
   its wall, two small tables, a tapestry and a crown of candles high in its cone. The wing
   behind the hall's right half is the kitchen and cellar, closed; the hatch looks into its
-  kitchen (a range, a cook's table, pots and herbs). Upstairs is the keeper's and is never
-  walked. Outside: a front gable with a porch canopy, a giant wooden tankard hung from an iron
+  kitchen (a range, a cook's table, pots and herbs). The rooms the innkeeper lets upstairs
+  are never walked. Outside: a front gable with a porch canopy, a giant wooden tankard hung from an iron
   arm as the sign, a river-stone chimney on the side the road from Fenbridge sees, a dark green
   slate roof, the tower's slate hat over it.
 - **Scale.** Every number lives in the content module (`TAVERN_HALL`, `TAVERN_DOOR`,
   `TAVERN_TOWER`, `TAVERN_STAGE`, `TAVERN_HATCH`, `TAVERN_PROPS`) and is pinned against the
   player's height by `tests/mirefen_tavern.test.ts` "scaled for the player".
 - **Open to the roof.** No timber crosses the common room under `TAVERN_HALL.truss` (the hammer
-  beams' undersides): the old gallery, its joists, the aisle posts and the low nook beams are
+  beams' undersides; only the short braces under them dip lower, hugging the side walls): the old gallery, its joists, the aisle posts and the low nook beams are
   gone, and every hung thing (the hood, the chandelier, the lanterns, the tankards on the bar's
   beam) hangs over the camera's air. `tests/mirefen_tavern_asset.test.ts` "keeps the common room
   clear" scans the shipped model for any triangle there.
@@ -107,7 +107,7 @@ mood and proportion only and never entered the build.
   trim from medium, the clutter from high (`mirefenTavernParts`).
 - **Fires and lights.** The round hearth and the wall fireplace burn with the campfires' live
   flame (`MIREFEN_TAVERN_FLAMES`, built in `src/render/props.ts`), lit by the fire-light budget
-  with the chandelier, the two lit lanterns under the hammer beams, the stage's footlights, the
+  with the chandelier, the lit lanterns under the hammer beams, the stage's footlights, the
   bar's candles and the nook's crown (`mirefenTavernLights`).
 
 ## Rebuilding the model

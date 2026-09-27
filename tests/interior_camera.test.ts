@@ -460,9 +460,12 @@ describe('indoor nameplates', () => {
     frame(cam, new THREE.Vector3(5, 0, 0.5), [5, 4, -9]);
     expect(activeCameraInterior()?.id).toBe('room');
     expect(interiorLensInAir()).toBe(false);
-    // a troll behind the walls stays hidden; one on the road out of the door keeps its plate
-    expect(interiorHidesNameplate(cam, -10, 0, 5, 2.8)).toBe(true);
+    // a troll behind the room (the building between it and the lens) stays hidden; one on
+    // the road out of the door keeps its plate
+    expect(interiorHidesNameplate(cam, 5, 0, 22, 2.8)).toBe(true);
     expect(interiorHidesNameplate(cam, 5, 0, -12, 1.5)).toBe(false);
+    // one beside the door outside, seen by the lens past the building, keeps its plate
+    expect(interiorHidesNameplate(cam, 1, 0, -2, 1.5)).toBe(false);
   });
 
   it('hides nothing while the player is outdoors', () => {

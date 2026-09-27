@@ -22,11 +22,11 @@
 //  - the round tower behind the hall's back wall, open to the room through a wide arch: a
 //    flagged nook with a bench round its wall and two small tables, open up into its cone;
 //  - the wing behind the hall's right half, the kitchen and the cellar, closed: only the
-//    serving hatch looks into it. Upstairs is the keeper's, never walked.
+//    serving hatch looks into it. The rooms the innkeeper lets upstairs are never walked.
 //
 // Scale: the player stands 2.6 yd to the crown on a 0.5 yd body radius. The door clears
 // 4.6 by 5.2, the side walls stand 10 to the eaves under a ridge at 20, the lowest roof
-// timber over the room is at 10.2, table tops stand at 1.45 and seats at 0.85.
+// timber across the room is at 10.2, table tops stand at 1.45 and seats at 0.85.
 
 import type { NpcDef } from '../types';
 
@@ -53,9 +53,10 @@ export const TAVERN_HALL = {
   eave: 10.0,
   /** The ridge over the middle, running front to back (the front is a gable). */
   ridge: 20.0,
-  /** The lowest roof timber over the room: the hammer beams' undersides and the beam the
-   *  bar's pillar carries. Nothing crosses the room under it (the camera's air stops well
-   *  under it, render/mirefen_tavern_interior_core.ts). */
+  /** The hammer beams' undersides and the beam the bar's pillar carries: no timber crosses
+   *  the room under it (only the short braces under the hammer beams, hugging the side walls,
+   *  dip a yard below; the camera's air stops under them all,
+   *  render/mirefen_tavern_interior_core.ts). */
   truss: 10.2,
   /** The hammerbeam trusses' positions along the hall (local z). */
   trusses: [-10.0, -4.6, 0.0, 5.0, 10.0],

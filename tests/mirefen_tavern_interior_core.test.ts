@@ -171,6 +171,7 @@ describe('tavern interior boxes', () => {
     expect(at(0, 15.5)).toBe(false); // the porch
     expect(at(-20, 0)).toBe(false); // outside
     expect(at(10, -20)).toBe(false); // the closed kitchen behind the hatch
+    expect(at(9.5, -12.6, TAVERN_BAR_PLATFORM.lift)).toBe(true); // at the hatch, between the racks
     expect(eyeInTavernAir(0, 2, 13.6)).toBe(false);
     expect(eyeInTavernAir(0, 2, 12.8)).toBe(true);
     expect(TAVERN_INTERIOR_LOCAL[TAVERN_FRONT_DOOR_BOX][5]).toBe(TAVERN_HALL.z1);
@@ -189,7 +190,7 @@ const SPOTS: readonly [string, number, number, number][] = [
   ['on the stage', -13.5, TAVERN_STAGE.lift, -12.2],
   ['in the wall booth', -11.4, 0, -4.6],
   ['behind the bar', 9, 0.5, -8.8],
-  ['at the kitchen hatch', 9.5, 0.5, -11.2],
+  ['at the kitchen hatch', 9.5, 0.5, -12.6],
   ['in the hearth pit', 0, -0.45, 4.5],
   ["the hall's back corner", -14.4, 0, -7.6],
   ["the hall's front corner", 14.4, 0, 12.4],
@@ -440,6 +441,30 @@ describe('walking in and out through the front door', () => {
       expect(last.boom).toBeCloseTo(dist, 6);
     });
   }
+
+  it('keeps the rest of the hall uncapped: the door head holds only a camera walking in', () => {
+    // a player who walked in, then off to the side of the door deep in the room: the steep, far
+    // camera behind toward the front wall is flattened only by the room, never held down to
+    // the door's head
+    walkThroughDoor(24, 8, 0.75, 18);
+    const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
+    const self = world(-9, 0, -2);
+    let look = new THREE.Vector3();
+    for (let i = 0; i < 90; i++) {
+      look = new THREE.Vector3(self.x, self.y + 2, self.z);
+      cam.position.set(look.x + Math.cos(0.75) * 18, look.y + Math.sin(0.75) * 18, look.z);
+      clampChaseCameraToInterior(cam, look, self, 1 / 60, false);
+    }
+    expect(interiorCameraInternalsForTest.state().cap).toBeLessThan(1e-3);
+    // the same spot in the middle of the front of the hall, just past the door's reach
+    const mid = world(0, 0, -6);
+    for (let i = 0; i < 90; i++) {
+      look = new THREE.Vector3(mid.x, mid.y + 2, mid.z);
+      cam.position.set(look.x + Math.cos(0.75) * 18, look.y + Math.sin(0.75) * 18, look.z);
+      clampChaseCameraToInterior(cam, look, mid, 1 / 60, false);
+    }
+    expect(interiorCameraInternalsForTest.state().cap).toBeLessThan(1e-3);
+  });
 
   it('brings the lens in to the room when the player stops just inside the door', () => {
     const frames = walkThroughDoor(20, 11.5, 0.32, 12);

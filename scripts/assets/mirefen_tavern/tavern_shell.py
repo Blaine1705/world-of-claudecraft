@@ -108,20 +108,31 @@ def corbels(B, p, wall, u0, u1, v, t, every=3.2):
         wall.box(p, u - 0.16, u + 0.16, v - 0.2, v, t / 2, t / 2 + 0.5, B.PAL['beam_dark'], B.WOOD)
 
 
-def gable_timbers(B, p, wall, top, t, eave, mid_u, span):
-    """The gable's king post, collar and struts, both faces, and the jettied bressumer."""
+def gable_timbers(B, p, wall, top, t, eave, mid_u, span, breaks=()):
+    """The gable's king post, collar and struts, both faces, and the jettied bressumer; the
+    collar and the bressumer part at `breaks` (where the wall is split into shell parts)."""
     apex = top(mid_u)
     collar = eave + (apex - eave) * 0.42
+
+    def runs(a, b):
+        cut = [a] + sorted(u for u in breaks if a + 0.05 < u < b - 0.05) + [b]
+        return list(zip(cut, cut[1:]))
+
     for s in (1, -1):
         w = s * (t / 2 + 0.03)
         wall.beam(p, mid_u, eave + 0.2, mid_u, apex - 0.1, w, 0.36, 0.12, B.PAL['beam'])
         cu = (B.HALL['ridge'] - 0.1 - collar) / pitch(B)
-        wall.beam(p, mid_u - cu + 0.2, collar, mid_u + cu - 0.2, collar, w, 0.3, 0.12, B.PAL['beam'])
+        for (a, b) in runs(mid_u - cu + 0.2, mid_u + cu - 0.2):
+            wall.beam(p, a, collar, b, collar, w, 0.3, 0.12, B.PAL['beam'])
         for d in (-1, 1):
-            wall.beam(p, mid_u + d * span * 0.42, eave + 0.2, mid_u + d * 0.2, collar - 0.1, w, 0.26, 0.12,
-                      B.PAL['beam'])
+            ua, va, ub, vb = mid_u + d * span * 0.42, eave + 0.2, mid_u + d * 0.2, collar - 0.1
+            cut = [0.0] + sorted((u - ua) / (ub - ua) for u in breaks if min(ua, ub) < u < max(ua, ub)) + [1.0]
+            for (f0, f1) in zip(cut, cut[1:]):
+                wall.beam(p, ua + (ub - ua) * f0, va + (vb - va) * f0, ua + (ub - ua) * f1, va + (vb - va) * f1, w,
+                          0.26, 0.12, B.PAL['beam'])
     # the jettied bressumer beam across the eave line, on carved brackets
-    wall.box(p, 0.0, wall.length, eave - 0.1, eave + 0.45, t / 2 - 0.1, t / 2 + 0.4, B.PAL['beam_dark'], B.WOOD)
+    for (a, b) in runs(0.0, wall.length):
+        wall.box(p, a, b, eave - 0.1, eave + 0.45, t / 2 - 0.1, t / 2 + 0.4, B.PAL['beam_dark'], B.WOOD)
     corbels(B, p, wall, 0.6, wall.length - 0.6, eave - 0.1, t)
     return collar
 
@@ -207,10 +218,12 @@ def hall_front(B, p, porch_part):
 
     openings = [(d0, d1, 0.0, door['height']), (6.2, 7.8, 2.8, 5.0), (24.2, 25.8, 2.8, 5.0),
                 (9.4, 10.6, 6.6, 8.4), (21.4, 22.6, 6.6, 8.4)]
-    B.timber_wall(p, wall, t, top, openings, base_h=1.4, bays=3.6, seed=1)
+    # the wall parts either side of the door (build_tavern.py FRONT_SPLIT): nothing runs across
+    breaks = (mid - B.FRONT_SPLIT, mid + B.FRONT_SPLIT)
+    B.timber_wall(p, wall, t, top, openings, base_h=1.4, bays=3.6, seed=1, breaks=breaks)
     for (a, b, v0, v1) in openings[1:]:
         B.window(p, wall, a, b, v0, v1, t, shutters=v0 < 5)
-    gable_timbers(B, p, wall, top, t, H['eave'], mid, H['x1'] - H['x0'])
+    gable_timbers(B, p, wall, top, t, H['eave'], mid, H['x1'] - H['x0'], breaks=breaks)
     oculus(B, p, wall, mid, H['eave'] + (H['ridge'] - H['eave']) * 0.62, 1.0, t)
     # the doorway: heavy posts, a lintel with carved spandrel braces, a stone step
     col = B.PAL['beam_dark']

@@ -19,9 +19,9 @@
 // angle to the door, its ray cut by a jamb) blends in over the first yards past the door
 // (interiorEntryWeight). While the lens stands outside the air interiorLensInAir says so, and
 // the building treats the sight line as it does a camera outdoors (it threads the doorway,
-// so nothing is cut; at an angle only the piece of wall between lens and player ghosts). Where the ray is
-// cramped (a player against the stair tower's wall, backed into a room's corner), the camera
-// glides to the nearest comfortable framing, up over the obstruction or round it along the
+// so nothing is cut; at an angle only the piece of wall between lens and player ghosts).
+// Where the ray is cramped (a player backed against a wall or into a room's corner), the
+// camera glides to the nearest comfortable framing, up over the obstruction or round it along the
 // wall, rather than sitting in the player's head, and glides back as the view clears.
 // Walking out releases the last shortened boom over at most INTERIOR_RELEASE_MAX_SEC;
 // outdoors with no release pending nothing here touches the camera. The requested yaw,
@@ -50,6 +50,8 @@ import {
   type CameraInterior,
   chooseInteriorFraming,
   frameBoomInto,
+  INTERIOR_ENTRY_CAP_RATE,
+  INTERIOR_LOOK_BLEND,
   INTERIOR_RELEASE_MAX_SEC,
   INTERIOR_THROUGH_HOLD_SEC,
   INTERIOR_THROUGH_MAX_SEC,
@@ -63,8 +65,10 @@ import {
   interiorEntryWeight,
   interiorHoldsEye,
   interiorNearestOpening,
+  interiorOpeningDepth,
   interiorSeesOut,
   interiorSegmentFraction,
+  interiorSegmentTouches,
   stepInteriorBoom,
   stepInteriorFraming,
   stepInteriorLift,
@@ -128,6 +132,8 @@ const state = {
   through: 1,
   /** Seconds the avatar has stood still. */
   still: 0,
+  /** The entry cap's weight, walked toward its target (interiorEntryCap). */
+  cap: 0,
   /** The camera has cut to the player's eyes (a corner no framing escapes). */
   firstPerson: false,
   pad: 0.3,
@@ -242,21 +248,32 @@ export function clampChaseCameraToInterior(
   else if (state.still > STILL_SEC || state.inside > INTERIOR_THROUGH_MAX_SEC) {
     state.through = Math.max(0, state.through - Math.max(0, dt) / INTERIOR_THROUGH_HOLD_SEC);
   }
-  // the lagged (or shoulder-shifted, or led) look point must stand in a room's air on the
-  // eye's side of every wall (never only in a doorway's thickness, where the ray would leave
-  // by a jamb at once); otherwise the ray starts at the eye, the whole boom shifted with it
+  // the lagged (or shoulder-shifted, or led) look point must stand in the air on the eye's
+  // side of every wall; otherwise the ray starts at the eye, the whole boom shifted with it.
+  // Near a doorway's threshold (where a ray from the look point would leave by a jamb at
+  // once) the start hands over from the eye to the look point smoothly as it comes in
   let sx = look.x;
   let sy = look.y;
   let sz = look.z;
+  let k = 0;
   if (
-    !interiorHoldsEye(vol, sx, sy, sz) ||
+    !interiorContains(vol, sx, sy, sz) ||
     interiorSegmentFraction(vol, eyeX, eyeY, eyeZ, sx, sy, sz, 0) < 1
   ) {
-    pos.set(pos.x + eyeX - sx, pos.y + eyeY - sy, pos.z + eyeZ - sz);
-    look.set(eyeX, eyeY, eyeZ);
-    sx = eyeX;
-    sy = eyeY;
-    sz = eyeZ;
+    k = 1;
+  } else if (vol.openings.length > 0) {
+    const t = Math.min(1, interiorOpeningDepth(vol, sx, sy, sz) / INTERIOR_LOOK_BLEND);
+    k = 1 - t * t * (3 - 2 * t);
+  }
+  if (k > 0) {
+    const ox = (eyeX - sx) * k;
+    const oy = (eyeY - sy) * k;
+    const oz = (eyeZ - sz) * k;
+    pos.set(pos.x + ox, pos.y + oy, pos.z + oz);
+    look.set(sx + ox, sy + oy, sz + oz);
+    sx += ox;
+    sy += oy;
+    sz += oz;
   }
   state.startX = sx;
   state.startY = sy;
@@ -270,10 +287,17 @@ export function clampChaseCameraToInterior(
   const aimX = reqLen > 1e-9 ? -dx / reqLen : 0;
   const aimY = reqLen > 1e-9 ? -dy / reqLen : 0;
   const aimZ = reqLen > 1e-9 ? -dz / reqLen : 0;
-  // near the front door the lens comes down to thread the doorway, keeping its distance
-  dy = interiorEntryCap(vol, sx, sy, sz, dx, dy, dz, pad);
+  // near the front door, for a player who walked in, the lens comes down to thread the
+  // doorway, keeping its distance; the cap's weight walks in and out, never a jump
+  interiorEntryCap(vol, sx, sy, sz, dx, dy, dz, pad);
+  const capTarget = interiorEntryHold.weight * state.through;
+  if (!was || reducedMotion || teleported) state.cap = !was && !teleported ? 0 : capTarget;
+  else
+    state.cap +=
+      (capTarget - state.cap) * (1 - Math.exp(-INTERIOR_ENTRY_CAP_RATE * Math.max(0, dt)));
+  if (dy > interiorEntryHold.rise) dy -= state.cap * (dy - interiorEntryHold.rise);
   const len = Math.hypot(dx, dy, dz);
-  // cramped (a player against the tower's wall on the stair, backed into a corner): the
+  // cramped (a player backed against a wall or into a corner): the
   // least departure from the requested view that frames the player comfortably, a lift over
   // what cramps it or a swing along the wall, eased in and out
   // the threshold: the clamp (and any framing) blends in over the first yards past a door
@@ -399,6 +423,11 @@ export function interiorHidesNameplate(
   if (!vol) return false;
   if (interiorContains(vol, x, y + BODY_OVER_FEET, z)) return false;
   if (!state.lensInside) {
+    // the lens follows through the door from outside: a body it sees past the building (on
+    // the porch, beside the door) keeps its plate; one the building stands between is the
+    // eye's to see, out of the door or not at all
+    const c = camera.position;
+    if (!interiorSegmentTouches(vol, c.x, c.y, c.z, x, plateY, z)) return false;
     return !interiorSeesOut(vol, state.startX, state.startY, state.startZ, x, plateY, z);
   }
   const c = camera.position;
@@ -438,6 +467,7 @@ export const interiorCameraInternalsForTest = {
     state.inside = 0;
     state.through = 1;
     state.still = 0;
+    state.cap = 0;
     state.lastSelfX = Number.NaN;
     state.drawnSaved = false;
     state.firstPerson = false;

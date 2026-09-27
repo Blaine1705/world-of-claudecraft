@@ -16,6 +16,7 @@ import {
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import {
   TAVERN_CRITICAL_PARTS,
+  TAVERN_FRONT_SPLIT,
   TAVERN_OPTIONAL_PARTS,
   TAVERN_SHELL_PARTS,
   TAVERN_TRIM_PARTS,
@@ -38,16 +39,16 @@ import {
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
-const SHIPPED_SHA256 = 'f3bffa86be4d942f1da0ddbe05963b161183ffd7bd9dd6fa0be50135a41316cc';
-const SHIPPED_BYTES = 977344;
+const SHIPPED_SHA256 = '46b08756e814f3b47324c1245e08c7b95c0bf22e1dfcc277c369c3d2e3b36f1d';
+const SHIPPED_BYTES = 981696;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   TavernFrame: 10976,
   TavernFurnishings: 7836,
   TavernLights: 4680,
-  HallWallFront: 824,
-  HallWallFrontLeft: 1068,
-  HallWallFrontRight: 1068,
+  HallWallFront: 968,
+  HallWallFrontLeft: 1152,
+  HallWallFrontRight: 1152,
   HallWallBack: 2612,
   HallWallLeft: 2512,
   HallWallRight: 4212,
@@ -239,6 +240,40 @@ describe('mirefen tavern GLB', () => {
       }
     }
     expect(offenders.slice(0, 12)).toEqual([]);
+  });
+
+  it("draws each piece of the front where the camera's cutaway looks for it", () => {
+    // the front wall's three parts meet at TAVERN_FRONT_SPLIT either side of the door
+    // (mirefen_tavern_core.ts BOX_VOLUMES): no solid of one reaches into another's span, so the
+    // piece a sight line crosses is the piece that ghosts
+    const v = [0, 0, 0];
+    const xs = (name: string): number[] => {
+      const out: number[] = [];
+      const n = node(name);
+      const m = n.getWorldMatrix();
+      for (const prim of n.getMesh()?.listPrimitives() ?? []) {
+        const pos = prim.getAttribute('POSITION');
+        if (!pos) continue;
+        for (let k = 0; k < pos.getCount(); k++) {
+          pos.getElement(k, v);
+          out.push(m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12]);
+        }
+      }
+      return out;
+    };
+    const slack = 0.2;
+    for (const x of xs('HallWallFront')) {
+      expect(Math.abs(x), 'HallWallFront').toBeLessThanOrEqual(TAVERN_FRONT_SPLIT + slack);
+    }
+    for (const x of xs('HallWallFrontLeft')) {
+      expect(x, 'HallWallFrontLeft').toBeLessThanOrEqual(-TAVERN_DOOR.width / 2 + slack);
+    }
+    for (const x of xs('HallWallFrontRight')) {
+      expect(x, 'HallWallFrontRight').toBeGreaterThanOrEqual(TAVERN_DOOR.width / 2 - slack);
+    }
+    // ...and the side parts' walls start at the split, their door leaves inside it
+    const left = xs('HallWallFrontLeft');
+    expect(Math.max(...left)).toBeGreaterThan(-TAVERN_FRONT_SPLIT - 0.5);
   });
 
   it('stands on the ground floor at its origin, the base running down into the ground', () => {

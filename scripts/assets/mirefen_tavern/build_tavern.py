@@ -252,13 +252,15 @@ class Wall:
 
 
 def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y0=0.0, inner=True,
-                seed=0, braces=True, plaster=None, inner_plaster=None, frame_to=None):
+                seed=0, braces=True, plaster=None, inner_plaster=None, frame_to=None, breaks=()):
     """A timber-framed wall on a stone base course.
 
     top(u) gives the wall's top along it (the eaves, or a gable). `openings` are
     (u0, u1, v0, v1) holes. Below `base_h` (and up to `stone_to`, for a stone storey) the wall
     is coursed blue-grey stone; above, ochre plaster panels between honey posts, rails and
-    braces on both faces. The core sits a hand behind the timbers so they read proud."""
+    braces on both faces. The core sits a hand behind the timbers so they read proud.
+    `breaks` are places along the wall where the core and the rails part (where the wall is
+    split into separate shell parts), so no solid runs across them."""
     plaster = plaster or PAL['plaster']
     inner_plaster = inner_plaster or PAL['plaster_in']
     L = wall.length
@@ -268,6 +270,8 @@ def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y
     for (a, b, _, _) in openings:
         cuts.add(max(0.0, min(L, a)))
         cuts.add(max(0.0, min(L, b)))
+    for u in breaks:
+        cuts.add(max(0.0, min(L, u)))
     # posts: the ends, every opening's jambs, and bays between
     posts = [0.0, L]
     for (a, b, _, _) in openings:
@@ -365,8 +369,10 @@ def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y
             if L - u > 0.05:
                 runs.append((u, L))
             for (a, b) in runs:
-                if b - a > 0.3:
-                    wall.beam(p, a, rv, b, rv, w, 0.28, depth, col)
+                cut = [a] + sorted(u for u in breaks if a + 0.05 < u < b - 0.05) + [b]
+                for (ra, rb) in zip(cut, cut[1:]):
+                    if rb - ra > 0.3:
+                        wall.beam(p, ra, rv, rb, rv, w, 0.28, depth, col)
         # braces: one diagonal in each clear bay under the mid rail
         if braces and len(rails) >= 2:
             lo, hi = rails[0], rails[1]
