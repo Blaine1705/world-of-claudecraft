@@ -19907,6 +19907,11 @@ export const nl_NL: EnTranslations = {
         "title": "Beschermer van de Wyrmwatch Kades",
         "greeting": "Kom van de kade en warm je handen. Het schip aan onze aanlegsteiger vaart omhoog langs de lange oostkust naar Wickhaven en terug. Ver naar het westen vaart de andere veerboot tussen Oostbeek en de Nachtbloesem. De kaart aan de muur toont beide verbindingen. Rust bij het vuur voordat je naar Wyrmwatch klimt."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Schout Ottoline",
         "title": "Schout van Lantaarnmeer",

@@ -19907,6 +19907,11 @@ export const de_DE: EnTranslations = {
         "title": "Hüterin der Kais von Wyrmwatch",
         "greeting": "Komm rein von der Kaimauer und wärm dir die Hände. Das Schiff an unserem Pier segelt die lange Ostküste hinauf nach Wickharbor und wieder zurück. Weit im Westen verkehrt die andere Fähre zwischen Eastbrook und der Nachtblüte. Die Karte an der Wand zeigt beide Überfahrten. Ruh dich am Feuer aus vor dem Aufstieg nach Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Vogtin Ottoline",
         "title": "Vogtin von Lanternmere",

@@ -19907,6 +19907,11 @@ export const sv_SE: EnTranslations = {
         "title": "Väktare av Wyrmwatch kajer",
         "greeting": "Kom in från delen och värm dina händer. Skeppet vid vår pir seglar upp den långa östkusten till Wickharbor och tillbaka igen. Långt västerut kör den andra färjan mellan Eastbrook och Nightbloom. Kartan på väggen visar båda korsningarna. Vila vid elden innan klättringen till Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Fogden Ottoline",
         "title": "Fogde i Lyktsjön",

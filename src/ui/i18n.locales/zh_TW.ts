@@ -12660,6 +12660,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '從碼頭進來暖暖手吧。停在我們碼頭的船沿著漫長的東岸北上駛往燭港，再原路返回。在遙遠的西邊，另一艘渡船往返於東溪與夜綻花野之間。牆上的地圖畫著這兩條航線。攀登望龍哨之前，先在火邊歇一歇吧。',
   'entities.npcs.harbormaster_tamsin.name': '港務長塔姆辛',
   'entities.npcs.harbormaster_tamsin.title': '望龍哨碼頭看守',
+  'entities.npcs.innkeeper_maudie.greeting':
+    '快從濕氣裡進來吧，朋友，下到火邊時當心台階。水壺正燒著，長凳是暖的，樓上的房間也乾爽。從芬橋來的旅人都發誓說沼澤路白天很太平，可天黑以後沒人敢走。坐一會兒，歇歇腳吧。',
+  'entities.npcs.innkeeper_maudie.name': '莫迪·塔普賴特',
+  'entities.npcs.innkeeper_maudie.title': '旅店老闆',
   'entities.npcs.harbormaster_odile.greeting':
     '這座海灣裡的每條船，龍骨都欠老燈塔一份情。有話快說，潮水可不等人。',
   'entities.npcs.head_gardener_amaranth.name': '首席園丁艾瑪蘭',

@@ -19907,6 +19907,11 @@ export const it_IT: EnTranslations = {
         "title": "Custode delle Banchine di Wyrmwatch",
         "greeting": "Vieni via dalla banchina e scaldati le mani. La nave al nostro molo risale la lunga costa orientale fino a Wickharbor e ritorna. Molto più a ovest, l'altro traghetto fa la spola tra Eastbrook e Nightbloom. La mappa sulla parete mostra entrambe le traversate. Riposati vicino al fuoco prima della salita a Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Podestà Ottoline",
         "title": "Podestà di Lanternmere",

@@ -19907,6 +19907,11 @@ export const tr_TR: EnTranslations = {
         "title": "Wyrmwatch İskelelerinin Koruyucusu",
         "greeting": "İskeleden gel ve ellerini ısıt. Rıhtımızdaki gemi uzun doğu kıyısından Wickharbor'a kadar seyreder ve geri döner. Uzak batıda, diğer feribot Doğudere ile Nightbloom arasında sefer yapar. Duvardaki harita her iki geçişi gösterir. Wyrmwatch'e çıkmadan önce ateşin yanında dinlen."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Vali Ottoline",
         "title": "Lanternmere Valisi",

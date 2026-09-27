@@ -19907,6 +19907,11 @@ export const da_DK: EnTranslations = {
         "title": "Vogter af Wyrmwatch Kajerne",
         "greeting": "Kom ind fra kajen og varm dine hænder. Skibet ved vores kaj sejler op langs den lange østkyst til Wickharbor og tilbage igen. Langt mod vest sejler den anden færge mellem Østbæk og Nightbloom. Kortet på muren viser begge overfarter. Hvil dig ved ilden, før opstigningen til Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Foged Ottoline",
         "title": "Foged af Lygtesø",

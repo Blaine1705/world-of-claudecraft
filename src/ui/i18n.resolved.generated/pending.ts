@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "es_ES": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "fr_FR": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "fr_CA": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "de_DE": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "nl_NL": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "pl_PL": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "id_ID": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "tr_TR": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "sv_SE": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "vi_VN": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ],
+  "da_DK": [
+    "entities.npcs.innkeeper_maudie.greeting",
+    "entities.npcs.innkeeper_maudie.name",
+    "entities.npcs.innkeeper_maudie.title"
+  ]
 };

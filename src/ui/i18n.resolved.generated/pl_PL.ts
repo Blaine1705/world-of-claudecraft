@@ -19907,6 +19907,11 @@ export const pl_PL: EnTranslations = {
         "title": "Strażnik Przystani Wyrmwatch",
         "greeting": "Wejdź na molo i rozgrzej ręce. Statek w naszym porcie żegluje wzdłuż długiego wschodniego wybrzeża do Wickharbor i z powrotem. Daleko na zachodzie drugi prom kursuje między Eastbrook i Nightbloom. Mapa na ścianie pokazuje oba połączenia. Odpoczywaj przy ogniu przed wspinaczką na Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Zarządczyni Ottoline",
         "title": "Zarządczyni Lanternmere",

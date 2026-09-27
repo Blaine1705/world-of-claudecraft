@@ -19907,6 +19907,11 @@ export const pt_BR: EnTranslations = {
         "title": "Guardiã dos Cais de Wyrmwatch",
         "greeting": "Saia do cais e esquente as mãos. O navio do nosso ancoradouro navega pela longa costa leste até Wickharbor e depois volta. Bem a oeste, a outra balsa faz a travessia entre Eastbrook e Nightbloom. O mapa na parede mostra as duas travessias. Descanse junto ao fogo antes da subida até Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Prefeita Ottoline",
         "title": "Prefeita de Lanternmere",

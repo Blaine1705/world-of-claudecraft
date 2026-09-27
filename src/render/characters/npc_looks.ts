@@ -1865,6 +1865,27 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('mage', { hands: 'rogue' }),
     props: 'harbormaster',
   },
+  // Maudie Tapwright, innkeeper of the Mirefen tavern: round and rosy from the fire, a
+  // grey-streaked bun, laugh lines and a sleeves-rolled garnet dress under a long apron
+  // (the tavern's one textile colour); nothing in her hands but a welcome.
+  innkeeper_maudie: {
+    app: {
+      gender: 'female',
+      hair: 'highbun',
+      ...hair(24, 0.35, 0.5),
+      brows: 'arched',
+      eyeShape: 'round',
+      ...eyes(30, 0.45, 0.35),
+      ...skin(18, 0.5, 0.62),
+      mouth: 'smile',
+      blush: 'warm',
+      face: face({ cheeks: 0.35, chin: 0.1 }),
+      body: body({ chest: 0.2, shoulders: 0.1 }),
+      outfit: 'crimson',
+    },
+    worn: kit('mage'),
+    props: 'none',
+  },
   // Reeve Ottoline of Lanternmere: the harvest never ends; neither do ledgers.
   reeve_ottoline: {
     app: {

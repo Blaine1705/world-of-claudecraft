@@ -332,6 +332,7 @@ const NPC_IDS = [
   'quartermaster_sela',
   'scout_yerrin',
   'harbormaster_tamsin', // the Harbormaster's House at the Wyrmwatch cliff harbor
+  'innkeeper_maudie', // the Mirefen tavern on the Fenbridge road
   // Lanternmere, the Amberfall
   'reeve_ottoline',
   'waywatcher_sorrel',

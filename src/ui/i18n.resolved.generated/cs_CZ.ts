@@ -19907,6 +19907,11 @@ export const cs_CZ: EnTranslations = {
         "title": "Strážkyně mol Wyrmwatche",
         "greeting": "Pojď z mola dovnitř a zahřej si ruce. Loď u našeho přístaviště pluje podél dlouhého východního pobřeží do Wickharboru a zase zpátky. Daleko na západě jezdí druhý přívoz mezi Eastbrookem a Nočním květem. Mapa na zdi ukazuje obě trasy. Odpočiň si u ohně, než vyrazíš na výstup do Wyrmwatche."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Rychtářka Ottoline",
         "title": "Rychtářka Lucernojezera",

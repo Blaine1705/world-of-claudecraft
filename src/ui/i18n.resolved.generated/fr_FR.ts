@@ -19907,6 +19907,11 @@ export const fr_FR: EnTranslations = {
         "title": "Gardienne des quais de Wyrmwatch",
         "greeting": "Venez du quai vous réchauffer les mains. Le navire amarré à notre jetée remonte la longue côte est jusqu'à Wickharbor et en revient. Loin à l'ouest, l'autre bac relie Eastbrook et la Fleur de Nuit. La carte au mur montre les deux traversées. Reposez-vous près du feu avant l'ascension vers Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Prévôte Ottoline",
         "title": "Prévôte de Lanternmere",

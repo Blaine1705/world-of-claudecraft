@@ -19907,6 +19907,11 @@ export const vi_VN: EnTranslations = {
         "title": "Người Giữ Bến Tàu Wyrmwatch",
         "greeting": "Hãy bước vào từ bến tàu và sưởi ấm tay bạn. Chiếc tàu tại bến của chúng tôi đi lên bờ biển phía đông dài và quay trở lại. Phía tây xa, chiếc phà khác chạy giữa Eastbrook và Nightbloom. Bản đồ trên tường chỉ cả hai lộ trình. Hãy nghỉ ngơi bên lửa trước khi leo lên Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Xã Trưởng Ottoline",
         "title": "Xã Trưởng Của Lanternmere",

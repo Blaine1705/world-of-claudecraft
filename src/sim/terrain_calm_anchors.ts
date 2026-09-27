@@ -21,6 +21,7 @@
 // computes the same rings from the one shipped WORLD_SEED.
 
 import { FARSHORE_HULL_FRAGMENT_PLACEMENT } from './content/farshore_shipwreck_layout';
+import { TAVERN_KEEPER_NPC_ID } from './content/mirefen_tavern';
 import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
@@ -166,6 +167,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   for (const node of GATHER_NODES) pad('gatherNode', node.pos.x, node.pos.z, 5, 12, false);
   for (const id in NPCS) {
     if (Object.hasOwn(WORLD_QUEST_CALLIGRAPHY_NPCS, id)) continue;
+    // the Mirefen tavern's innkeeper stands on the tavern's own floor, never the terrain:
+    // her pad would only reshape the ground under the building (no terrain edit there)
+    if (id === TAVERN_KEEPER_NPC_ID) continue;
     const npc = NPCS[id];
     pad('npc', npc.pos.x, npc.pos.z, 6, 14, false);
   }

@@ -50,6 +50,7 @@ import * as vehicleMod from './vehicles';
 export type { CharacterState, PetState } from './character_state';
 
 import { type AccountEarner, type AccountLedger, freshAccountLedger } from './account_ledger';
+import { spawnBuiltWorldKeepers } from './built_world_keepers';
 import { campPrivateRng } from './camp_private_rng';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import * as clueMod from './clue_scrolls';
@@ -702,7 +703,6 @@ import {
   WORLD_BOSSES,
   type WorldBossDef,
 } from './world_boss';
-import { spawnHarborHouseKeeper } from './wyrmwatch_harbor_house';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -2576,7 +2576,7 @@ export class Sim {
     initEscortsImpl(this.ctx);
     spawnHubPractice(this.ctx, worldContent);
     spawnHealingTrainingGround(this.ctx, worldContent);
-    spawnHarborHouseKeeper(this.ctx, worldContent);
+    spawnBuiltWorldKeepers(this.ctx, worldContent);
   }
 
   private spawnHealerPracticeDummy(): void {

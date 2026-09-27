@@ -13324,6 +13324,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '波止場から中へどうぞ、手を温めていきなさい。うちの桟橋の船は長い東の海岸を北へ上ってウィックハーバーへ向かい、また戻ってきます。はるか西では、もう一隻の渡し船がイーストブルックとナイトブルームの間を行き来しています。壁の地図に二つの航路が描いてありますよ。ワームウォッチへ登る前に、火のそばでひと休みしていきなさい。',
   'entities.npcs.harbormaster_tamsin.name': '港務長タムシン',
   'entities.npcs.harbormaster_tamsin.title': 'ワームウォッチ波止場の番人',
+  'entities.npcs.innkeeper_maudie.greeting':
+    '湿気から逃れて中へどうぞ、旅の方。火のそばへ下りる段差に気をつけてね。やかんは火にかけてあるし、長椅子は温かいし、二階の部屋も乾いていますよ。フェンブリッジから来た旅人たちは、湿地の道は昼間なら静かだと口をそろえるけれど、日が暮れてから歩く人はいません。少し座って、足を休めていきなさい。',
+  'entities.npcs.innkeeper_maudie.name': 'モーディ・タップライト',
+  'entities.npcs.innkeeper_maudie.title': '宿屋の女将',
   'entities.npcs.head_gardener_amaranth.name': '庭園長アマランス',
   'entities.npcs.head_gardener_amaranth.title': 'エバーガーデンの庭園長',
   'entities.npcs.head_gardener_amaranth.greeting':

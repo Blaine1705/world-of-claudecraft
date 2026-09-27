@@ -19907,6 +19907,11 @@ export const id_ID: EnTranslations = {
         "title": "Penjaga Dermaga Wyrmwatch",
         "greeting": "Masuk dari dermaga dan hangatkan tanganmu. Kapal di dermaga kami berlayar ke atas pantai timur yang panjang ke Wickharbor dan kembali lagi. Jauh ke barat, feri lain berlayar antara Eastbrook dan Nightbloom. Peta di dinding menunjukkan kedua penyeberangan itu. Istirahat di perapian sebelum pendakian ke Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
       "reeve_ottoline": {
         "name": "Demang Ottoline",
         "title": "Reeve Lanternmere",
