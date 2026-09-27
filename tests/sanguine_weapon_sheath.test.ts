@@ -162,17 +162,21 @@ describe('compile target readiness proof', () => {
     const material = new THREE.MeshBasicMaterial();
     const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
     const records = new Map<object, unknown>();
-    const properties = { get: (object: object) => records.get(object) };
+    const webgl = { properties: { get: (object: object) => records.get(object) } };
     // That host's gate settles at once over programs it never linked: a proof
     // would read false forever and hold back a swap with nothing to wait for.
-    expect(compileProof(false, properties, target)).toBeUndefined();
-    const proof = compileProof(true, properties, target);
+    expect(compileProof(false, webgl, target)).toBeUndefined();
+    const proof = compileProof(true, webgl, target);
     expect(proof?.()).toBe(false);
     const program = { getUniforms() {}, getAttributes() {} };
     records.set(material, { programs: new Map([['only', program]]) });
     markProgramReady(program);
     // Lazy: read at settle time, not when the gate was armed.
     expect(proof?.()).toBe(true);
+    // A context restore gives the renderer new properties: the proof reads
+    // them, never the dead context's record of a linked program.
+    webgl.properties = { get: () => undefined };
+    expect(proof?.()).toBe(false);
     target.geometry.dispose();
     material.dispose();
   });

@@ -712,7 +712,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // capture was retaken.
   // Re-minted for the effect swap readiness proof (renderer.ts input). No
   // capture was retaken.
-  '6ecea2e0dda1d6de962f92a3893991e832eabb0a025b81e2eb955195e48cb655';
+  // Re-minted for the lazy properties read of the veil entry and the proof
+  // (renderer.ts input). No capture was retaken.
+  '5f45c2e7b85638cfec04c4cacad812ec22029e69196459c0359ad78c788a625e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

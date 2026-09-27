@@ -416,8 +416,9 @@ export function resetSpiritVeilLedger(): void {
   lateLink = null;
 }
 
-/** Whether the ledger belongs to this renderer's program cache. */
-export function spiritVeilLedgerOwnedBy(owner: object): boolean {
+/** Whether the ledger belongs to this renderer's program cache (null: to
+ *  none, after a reset). */
+export function spiritVeilLedgerOwnedBy(owner: object | null): boolean {
   return owner === ledgerOwner;
 }
 

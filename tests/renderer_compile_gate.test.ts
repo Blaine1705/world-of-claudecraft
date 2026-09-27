@@ -988,7 +988,7 @@ describe('the far-bake compile gate handed to character visuals', () => {
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
         '    this.farBakeLane.enqueue(\n' +
         '      (settled) => this.gateSwapFlagOnCompile(target, settled),\n' +
-        '      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl.properties, target)),\n' +
+        '      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl, target)),\n' +
         '    );',
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');

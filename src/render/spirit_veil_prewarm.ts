@@ -127,8 +127,9 @@ export interface SpiritVeilGpuQueue {
 export interface SpiritVeilPrewarmHost {
   arms: CompileArmHost;
   /** The renderer's per-material state, the settle record's source and the
-   *  ledger's owner. */
-  properties: { get(material: THREE.Material): unknown };
+   *  ledger's owner. Read at each use, never kept: a context restore gives the
+   *  renderer a new one, and the old one's programs died with the old context. */
+  readonly properties: { get(material: THREE.Material): unknown };
   queue: SpiritVeilGpuQueue;
   /** Test seam: the colour arm's link. */
   link?: (root: THREE.Object3D) => Promise<void>;
@@ -141,11 +142,26 @@ function touchStandIn(host: SpiritVeilPrewarmHost, root: THREE.Object3D): Promis
   }).catch(() => 0);
 }
 
+/** Record a linked stand-in under the program cache it linked on, and only
+ *  while the renderer still holds that cache: a restore mid-link swaps it. */
+function recordLinked(
+  host: SpiritVeilPrewarmHost,
+  key: string,
+  root: THREE.Object3D,
+  linkedUnder: SpiritVeilPrewarmHost['properties'],
+): boolean {
+  if (host.properties !== linkedUnder) return false;
+  markProgramsReadyUnder(linkedUnder, root);
+  noteSpiritVeilTupleLinked(key, linkedUnder);
+  return true;
+}
+
 /** One unit per tuple: link its stand-in, record the settle, mark the tuple,
  *  then start the touch of the linked program's tables, handed to `touches`
- *  when the caller will wait for them. */
+ *  when the caller will wait for them. `claimLedger` runs before each link. */
 export function spiritVeilProgramUnits(
   host: SpiritVeilPrewarmHost,
+  claimLedger: () => void,
   touches?: Promise<unknown>[],
 ): PrewarmResumeUnit[] {
   const link = host.link ?? ((root) => linkColorPrograms(host.arms, root, false));
@@ -155,12 +171,13 @@ export function spiritVeilProgramUnits(
     return {
       id: `spirit-veil:${key}`,
       roots: [root],
-      run: () =>
-        link(root).then(() => {
-          markProgramsReadyUnder(host.properties, root);
-          noteSpiritVeilTupleLinked(key, host.properties);
-          touches?.push(touchStandIn(host, root));
-        }),
+      run: () => {
+        claimLedger();
+        const linkedUnder = host.properties;
+        return link(root).then(() => {
+          if (recordLinked(host, key, root, linkedUnder)) touches?.push(touchStandIn(host, root));
+        });
+      },
     };
   });
 }
@@ -171,7 +188,8 @@ function installLateLink(host: SpiritVeilPrewarmHost): void {
   setSpiritVeilLateLink((keys) => {
     // A renderer the ledger no longer belongs to (retired by a rebuild) links
     // nothing more on its shut-down queue.
-    if (!spiritVeilLedgerOwnedBy(host.properties)) return;
+    const linkedUnder = host.properties;
+    if (!spiritVeilLedgerOwnedBy(linkedUnder)) return;
     for (const key of keys) {
       // The family's own tuples are the boot entry's (or its resume debt's).
       if (SPIRIT_VEIL_FAMILY_KEYS.has(key) || inFlight.has(key)) continue;
@@ -183,11 +201,9 @@ function installLateLink(host: SpiritVeilPrewarmHost): void {
         .run(() => link(root), GPU_WORK_PRIORITY.BACKGROUND, `spirit-veil-late:${key}`, {
           releaseTail: true,
         })
-        .then(() => {
-          markProgramsReadyUnder(host.properties, root);
-          noteSpiritVeilTupleLinked(key, host.properties);
-          return touchStandIn(host, root);
-        })
+        .then(() =>
+          recordLinked(host, key, root, linkedUnder) ? touchStandIn(host, root) : undefined,
+        )
         .catch(() => undefined)
         .finally(() => inFlight.delete(key));
     }
@@ -198,21 +214,42 @@ function installLateLink(host: SpiritVeilPrewarmHost): void {
  *  the manifest pins read it). Binds the ledger to this renderer. */
 export function spiritVeilFamilyPrewarmEntry(
   arms: CompileArmHost,
-  webgl: { properties: SpiritVeilPrewarmHost['properties'] },
+  webgl: { readonly properties: SpiritVeilPrewarmHost['properties'] },
   queue: SpiritVeilGpuQueue,
   link?: SpiritVeilPrewarmHost['link'],
 ): Omit<PrewarmManifestEntry, 'id'> {
-  const host: SpiritVeilPrewarmHost = { arms, properties: webgl.properties, queue, link };
-  bindSpiritVeilLedger(host.properties);
+  const host: SpiritVeilPrewarmHost = {
+    arms,
+    get properties() {
+      return webgl.properties;
+    },
+    queue,
+    link,
+  };
+  let bound: object = host.properties;
+  bindSpiritVeilLedger(bound);
   installLateLink(host);
+  // A run follows its own renderer onto new properties (a restored context),
+  // but never takes the ledger from another renderer: a graphics rebuild's
+  // successor owns it, and this retired one's settles must record nothing.
+  const claimLedger = (): void => {
+    const live = host.properties;
+    if (spiritVeilLedgerOwnedBy(live)) return;
+    if (!spiritVeilLedgerOwnedBy(bound) && !spiritVeilLedgerOwnedBy(null)) return;
+    bound = live;
+    bindSpiritVeilLedger(live);
+    installLateLink(host);
+  };
   return {
     category: 'entities',
     priority: 47,
     required: false,
-    resumeProgramUnits: () => spiritVeilProgramUnits(host, []),
+    resumeProgramUnits: () => spiritVeilProgramUnits(host, claimLedger, []),
     run: async () => {
       const touches: Promise<unknown>[] = [];
-      await Promise.all(spiritVeilProgramUnits(host, touches).map((unit) => unit.run()));
+      await Promise.all(
+        spiritVeilProgramUnits(host, claimLedger, touches).map((unit) => unit.run()),
+      );
       await Promise.all(touches);
     },
     detail: () => `tuples=${SPIRIT_VEIL_FAMILY.length};linked=${spiritVeilLedgerSize()}`,

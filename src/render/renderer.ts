@@ -4809,7 +4809,7 @@ export class Renderer {
   private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
     this.farBakeLane.enqueue(
       (settled) => this.gateSwapFlagOnCompile(target, settled),
-      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl.properties, target)),
+      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl, target)),
     );
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot

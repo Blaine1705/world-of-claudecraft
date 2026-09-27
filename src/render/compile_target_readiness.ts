@@ -44,11 +44,13 @@ export function compileTargetPrepared(
 
 /** The proof a live gate's settle hands its caller: none on a host without
  *  parallel compile, whose gate settles at once over programs it never linked,
- *  so the thunk would read false forever where the draw links them anyway. */
+ *  so the thunk would read false forever where the draw links them anyway.
+ *  The thunk reads `webgl.properties` when called: a context restore replaces
+ *  it, and the old one would prove programs of a dead context. */
 export function compileProof(
   asyncCompile: boolean,
-  properties: TexturePropertiesLike,
+  webgl: { readonly properties: TexturePropertiesLike },
   target: THREE.Object3D,
 ): (() => boolean) | undefined {
-  return asyncCompile ? () => compileTargetPrepared(properties, target) : undefined;
+  return asyncCompile ? () => compileTargetPrepared(webgl.properties, target) : undefined;
 }

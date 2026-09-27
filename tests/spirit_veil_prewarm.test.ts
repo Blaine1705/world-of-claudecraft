@@ -17,6 +17,8 @@ import {
   setSpiritVeilLateLink,
   spiritVeilDepthMaterial,
   spiritVeilKeysFor,
+  spiritVeilLedgerOwnedBy,
+  spiritVeilLedgerSize,
   spiritVeilPassOf,
   spiritVeilShapeKey,
   spiritVeilTuplesLinked,
@@ -32,6 +34,7 @@ import {
 import type { CompileArmHost } from '../src/render/compile_arms';
 import { sharedUniforms } from '../src/render/gfx';
 import { gpuPrepKindOfLabel } from '../src/render/gpu_prep_budget_core';
+import { isProgramKnownReady } from '../src/render/linked_program_readiness';
 import { LINKED_PROGRAM_TOUCH_LABEL } from '../src/render/linked_program_touch_lane';
 import {
   BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
@@ -408,5 +411,110 @@ describe('a tuple outside the family', () => {
     noteSpiritVeilMiss(['color:s:3']);
     expect(warn).toHaveBeenCalledTimes(1);
     expect(String(warn.mock.calls[0][0])).toContain('outside the pinned family: color:s:3');
+  });
+});
+
+describe('a context restore, which gives the renderer new properties', () => {
+  function programCache() {
+    const programs = new Map<
+      THREE.Material,
+      { getUniforms: ReturnType<typeof vi.fn>; getAttributes: ReturnType<typeof vi.fn> }
+    >();
+    const properties = {
+      get: (material: THREE.Material) => {
+        let program = programs.get(material);
+        if (!program) {
+          program = { getUniforms: vi.fn(), getAttributes: vi.fn() };
+          programs.set(material, program);
+        }
+        return { currentProgram: program, programs: new Map([['k', program]]) };
+      },
+    };
+    return { programs, properties };
+  }
+
+  const settle = async () => {
+    for (let i = 0; i < 5; i++) await new Promise((resolve) => setTimeout(resolve, 0));
+  };
+
+  it('runs, proves, touches and links late under the live properties, never the dead ones', async () => {
+    const h = host();
+    const dead = programCache();
+    const webgl = { properties: dead.properties };
+    const entry = spiritVeilFamilyPrewarmEntry(h.arms, webgl, h.queue, h.link);
+    await entry.run();
+    const all = [...SPIRIT_VEIL_FAMILY_KEYS];
+    expect(spiritVeilTuplesLinked(all)).toBe(true);
+    for (const program of dead.programs.values()) program.getUniforms.mockClear();
+    const live = programCache();
+    webgl.properties = live.properties;
+    await entry.run();
+    expect(spiritVeilLedgerOwnedBy(live.properties)).toBe(true);
+    expect(spiritVeilTuplesLinked(all)).toBe(true);
+    expect(live.programs.size).toBe(SPIRIT_VEIL_FAMILY.length);
+    for (const program of live.programs.values()) {
+      expect(isProgramKnownReady(program as never)).toBe(true);
+      expect(program.getUniforms).toHaveBeenCalledTimes(1);
+    }
+    for (const program of dead.programs.values())
+      expect(program.getUniforms).not.toHaveBeenCalled();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    h.queued.length = 0;
+    noteSpiritVeilMiss(['color:s:15']);
+    await settle();
+    expect(h.queued.map((call) => call.label)).toContain('spirit-veil-late:color:s:15');
+    expect(spiritVeilTuplesLinked(['color:s:15'])).toBe(true);
+  });
+
+  it('records nothing from a link that settles after the restore', async () => {
+    const h = host();
+    const dead = programCache();
+    const webgl = { properties: dead.properties };
+    let release = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    h.link.mockImplementation(() => held);
+    const entry = spiritVeilFamilyPrewarmEntry(h.arms, webgl, h.queue, h.link);
+    const run = entry.run();
+    webgl.properties = programCache().properties;
+    release();
+    await run;
+    expect(spiritVeilLedgerSize()).toBe(0);
+    expect(dead.programs.size).toBe(0);
+    expect(h.queued.filter((call) => call.label === LINKED_PROGRAM_TOUCH_LABEL)).toHaveLength(0);
+  });
+
+  it('never takes the ledger from the renderer that replaced this one', async () => {
+    const old = host();
+    const webgl = { properties: programCache().properties };
+    const entry = spiritVeilFamilyPrewarmEntry(old.arms, webgl, old.queue, old.link);
+    const next = host();
+    spiritVeilFamilyPrewarmEntry(next.arms, next, next.queue, next.link);
+    webgl.properties = programCache().properties;
+    await entry.run();
+    expect(spiritVeilLedgerOwnedBy(next.properties)).toBe(true);
+    expect(spiritVeilLedgerSize()).toBe(0);
+  });
+
+  it('rebinds the same properties on the run after a ledger reset', async () => {
+    const h = host();
+    const entry = spiritVeilFamilyPrewarmEntry(h.arms, h, h.queue, h.link);
+    resetSpiritVeilLedger();
+    await entry.run();
+    expect(spiritVeilLedgerOwnedBy(h.properties)).toBe(true);
+    expect(spiritVeilTuplesLinked([...SPIRIT_VEIL_FAMILY_KEYS])).toBe(true);
+  });
+
+  it('binds the live properties on the run after a ledger reset', async () => {
+    const h = host();
+    const webgl = { properties: programCache().properties };
+    const entry = spiritVeilFamilyPrewarmEntry(h.arms, webgl, h.queue, h.link);
+    resetSpiritVeilLedger();
+    const live = programCache();
+    webgl.properties = live.properties;
+    for (const unit of entry.resumeProgramUnits?.() ?? []) await unit.run();
+    expect(spiritVeilLedgerOwnedBy(live.properties)).toBe(true);
+    expect(spiritVeilTuplesLinked([...SPIRIT_VEIL_FAMILY_KEYS])).toBe(true);
   });
 });
