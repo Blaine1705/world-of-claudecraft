@@ -1402,7 +1402,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the second merge of release/v0.44.0 into
   // feature/spirit-veil: the merged renderer leaf matches neither parent. No
   // capture was retaken.
-  '8d0692a13a935473c9d8e46b6c8f6811e84255605e262a949b834463877efee0';
+  // Re-minted for the effect swap readiness proof (renderer.ts input). No
+  // capture was retaken.
+  'c6e450c54ae37f61491f9fc1c73a33b27c1a9afc7ac774886fce07f1c2a3a01e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1433,7 +1435,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the second merge of release/v0.44.0 into
   // feature/spirit-veil: the merged renderer leaf matches neither parent. No
   // capture was retaken.
-  'beb2393912735cdc52684498012ddf36523f4b9b41c693799882a9456d7c2295';
+  // Re-minted for the effect swap readiness proof (renderer.ts input). No
+  // capture was retaken.
+  '6ecea2e0dda1d6de962f92a3893991e832eabb0a025b81e2eb955195e48cb655';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2822,7 +2826,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // the re-swept evidence. No capture was retaken.
       // Second release/v0.44.0 merge into feature/spirit-veil: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('8e8be9a675195a4b746110f4549e0452438d33eb26ce4901aaecddfd0a93d451');
+      // Effect swap readiness proof: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+    ).toBe('7dad663903c8ceacf7df96a92d04ec0a87addc966a9a1f23afc0924cc0c72e1b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

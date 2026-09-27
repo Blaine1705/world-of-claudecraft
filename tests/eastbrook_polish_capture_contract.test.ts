@@ -710,7 +710,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the second merge of release/v0.44.0 into
   // feature/spirit-veil: the merged renderer leaf matches neither parent. No
   // capture was retaken.
-  'beb2393912735cdc52684498012ddf36523f4b9b41c693799882a9456d7c2295';
+  // Re-minted for the effect swap readiness proof (renderer.ts input). No
+  // capture was retaken.
+  '6ecea2e0dda1d6de962f92a3893991e832eabb0a025b81e2eb955195e48cb655';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
