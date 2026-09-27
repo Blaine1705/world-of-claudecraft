@@ -1064,7 +1064,7 @@ export class CharacterVisual {
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
     this.chargeGlow?.update(dt);
-    this.eyeGlow?.update(dt, reducedMotion, s.asleep === true);
+    this.eyeGlow?.update(dt, reducedMotion, s.asleep === true, s.dead);
     this.eyeWardMarker?.update(this.eyeWardPlan, dt, reducedMotion);
     this.updateMetamorphWings(dt, s, reducedMotion);
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
@@ -4105,7 +4105,9 @@ export class CharacterVisual {
     death.clampWhenFinished = true;
     death.timeScale = this.def.deathTimeScale ?? 1.15;
     if (!this.initialized) {
-      // created already-dead (corpse entering interest): snap to the end pose
+      // created already-dead (corpse entering interest): snap to the end pose, and the
+      // eye is simply out rather than guttering through a death nobody saw
+      this.eyeGlow?.snuff();
       if (prev && prev !== death) prev.stop();
       death.play();
       death.time = Math.max(0, death.getClip().duration - 1e-3);

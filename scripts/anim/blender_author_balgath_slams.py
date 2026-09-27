@@ -67,7 +67,7 @@ import os
 import sys
 
 import bpy
-from mathutils import Quaternion
+from mathutils import Matrix, Quaternion
 
 AXES = {"X": (1, 0, 0), "Y": (0, 1, 0), "Z": (0, 0, 1)}
 FPS = 30
@@ -171,6 +171,46 @@ def toss(fold, reach, spread, elbow, lean=0, shrug=0):
     ]
 
 
+def death(tilt, arch=0, arms=0, reach=0, elbow=0, knees=0, loll=0, legs=0, shins=0):
+    """The death topple. Unlike every clip above, the headline motion is a WHOLE-BODY one,
+    so it is not a local-axis dial at all:
+
+    `tilt` pitches the entire body about his HEELS in armature space (negative is
+    backward; the Hip's own local axes are skewed on this rig, so a Hip-local pitch drags
+    him sideways as it tips, which the measurement caught). Every beat is then GROUNDED:
+    the Hip drops (or rises) until the lowest point of the skinned mesh sits exactly on
+    the soles' idle height, so a standing beat keeps its feet on the fen and a lying beat
+    keeps its back on it rather than floating over it or sinking through it.
+
+    On top of that, local dials: `arch` bends the spine back (Waist/Spine +X, measured),
+    `arms` spreads both arms outward (L_Upperarm +Z, R_Upperarm -Z), `reach` swings them
+    forward and up (+X both), `elbow` flexes the forearms (+X both), `knees` buckles them
+    (Thigh +X swings the knee forward, Calf -X folds the shin back), `legs` and `shins`
+    swing the thighs and shins on their own (the lying beats use them to lay his legs
+    down on the fen instead of leaving them sticking out at hip height), and `loll` twists
+    the upper spine so the head rolls to one side on the ground."""
+    return [
+        ("Waist", "X", arch * 0.5),
+        ("Spine01", "X", arch * 0.3),
+        ("Spine02", "X", arch * 0.2),
+        ("L_Upperarm", "Z", arms),
+        ("R_Upperarm", "Z", -arms),
+        ("L_Upperarm", "X", reach),
+        ("R_Upperarm", "X", reach),
+        ("L_Forearm", "X", elbow),
+        ("R_Forearm", "X", elbow),
+        ("L_Thigh", "X", knees + legs),
+        ("R_Thigh", "X", knees + legs),
+        ("L_Calf", "X", -knees * 1.6 + shins),
+        ("R_Calf", "X", -knees * 1.6 + shins),
+        ("Spine02", "Y", loll),
+        (TILT, "Y", tilt),
+    ]
+
+
+# A pseudo-bone in a pose spec: the whole-body tilt about the heels (see `death`).
+TILT = "__tilt__"
+
 # Beat times are load-bearing: each clip's contact frame sits ON its template windup
 # (MobTemplate.slams, src/sim/content/zone2.ts), and both are wired at timeScale 1, so the
 # blow and the blast land together. Move a windup and these move with it.
@@ -254,6 +294,34 @@ CLIPS = {
             (2.20, toss(0, 0, 0, 0)),
         ],
     },
+    # His death. The Loomshard gutters (the renderer flickers the eye glow out over the
+    # first beat), he rocks back off it, staggers forward a half step, teeters with his
+    # arms thrown out for balance, and topples BACKWARD like a felled tower: slow past the
+    # tipping point, fast at the end, then a heavy rebound off the fen and the settle.
+    #
+    # IMPACT is authored at exactly 1.80s: the renderer's death dust, rock chips and camera
+    # shake fire at that time after the death edge (BALGATH_DEATH_IMPACT_SEC,
+    # src/render/balgath_fx_core.ts), and the clip is wired at deathTimeScale 1 so the two
+    # stay welded. The final beat is held by the renderer's clamped death state for the
+    # whole corpse window, so it is a real resting pose: flat on his back, arms flung wide,
+    # knees a little up, head rolled aside.
+    "Balgath_Death": {
+        "seconds": 3.00,
+        "beats": [
+            (0.00, death(0)),
+            (0.18, death(-4, arch=18, arms=20, reach=20, elbow=10)),  # the eye goes out
+            (0.45, death(3, arch=-10, arms=12, reach=10, knees=12)),  # staggers forward
+            (0.75, death(-8, arch=8, arms=55, reach=30, elbow=20, knees=22)),  # teeters
+            (1.05, death(-22, arch=10, arms=50, reach=80, elbow=25, knees=30)),  # tipping
+            (1.35, death(-48, arch=6, arms=55, reach=100, elbow=20, knees=28)),
+            (1.60, death(-74, arch=0, arms=62, reach=60, elbow=15, knees=18, legs=-10)),
+            (1.80, death(-104, arch=-4, arms=78, reach=20, elbow=5, legs=-30, shins=-50)),  # IMPACT
+            (1.95, death(-94, arch=-10, arms=70, reach=40, elbow=12, legs=-20, shins=-40)),  # rebound
+            (2.15, death(-101, arms=82, reach=8, elbow=-20, legs=-30, shins=-60)),
+            (2.50, death(-100, arms=84, reach=2, elbow=-30, legs=-30, shins=-60, loll=14)),
+            (3.00, death(-100, arms=86, elbow=-32, legs=-30, shins=-60, loll=16)),
+        ],
+    },
 }
 
 
@@ -298,6 +366,8 @@ def build(arm, clips):
             pb.location = loc
             pb.rotation_quaternion = rot.copy()
 
+    clear()
+    ground = measure_ground(arm)
     for name, spec in clips.items():
         old = bpy.data.actions.get(name)
         if old:
@@ -311,18 +381,76 @@ def build(arm, clips):
         if hasattr(act, "slots"):
             slot = act.slots[0] if len(act.slots) else act.slots.new(id_type="OBJECT", name="Legacy")
             arm.animation_data.action_slot = slot
+        previous = {}
         for secs, pose_spec in spec["beats"]:
             clear()
+            tilt = None
             for bone, axis, deg in pose_spec:
+                if bone == TILT:
+                    tilt = deg
+                    continue
                 pb = arm.pose.bones[bone]
                 pb.rotation_quaternion = pb.rotation_quaternion @ Quaternion(
                     AXES[axis], math.radians(deg)
                 )
+            if tilt is not None:
+                topple(arm, tilt, ground)
             frame = round(secs * FPS) + 1
             for bn in animated:
-                arm.pose.bones[bn].keyframe_insert("rotation_quaternion", frame=frame)
-                arm.pose.bones[bn].keyframe_insert("location", frame=frame)
+                pb = arm.pose.bones[bn]
+                # Keep each bone's quaternion on the same hemisphere as its previous key, or
+                # the interpolation between two beats takes the long way round (a matrix
+                # write past 90 degrees of tilt can hand back the negated quaternion).
+                q = pb.rotation_quaternion.copy()
+                if bn in previous and q.dot(previous[bn]) < 0:
+                    q.negate()
+                    pb.rotation_quaternion = q
+                previous[bn] = q
+                pb.keyframe_insert("rotation_quaternion", frame=frame)
+                pb.keyframe_insert("location", frame=frame)
     return animated, base
+
+
+def body_mesh():
+    """The skinned body (the importer can also add bone-shape helpers; the body is the
+    object with by far the most vertices)."""
+    meshes = [o for o in bpy.data.objects if o.type == "MESH"]
+    return max(meshes, key=lambda o: len(o.data.vertices))
+
+
+def lowest_point(arm):
+    """Armature-space height of the lowest vertex of the DEFORMED body right now."""
+    bpy.context.view_layer.update()
+    mesh = body_mesh()
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    evaluated = mesh.evaluated_get(depsgraph)
+    data = evaluated.to_mesh()
+    to_arm = arm.matrix_world.inverted() @ mesh.matrix_world
+    low = min((to_arm @ v.co).z for v in data.vertices)
+    evaluated.to_mesh_clear()
+    return low
+
+
+def measure_ground(arm):
+    """The idle pose's heel pivot and sole height, read off the rig rather than guessed."""
+    bpy.context.view_layer.update()
+    feet = [arm.pose.bones[n].head for n in ("L_Foot", "R_Foot")]
+    pivot_x = (feet[0].x + feet[1].x) / 2
+    return pivot_x, lowest_point(arm)
+
+
+def topple(arm, tilt, ground):
+    """Tip the whole body `tilt` degrees about the heels (armature Y, negative backward),
+    then drop or lift the Hip until the lowest deformed vertex rests on the sole height."""
+    pivot_x, sole_z = ground
+    bpy.context.view_layer.update()
+    hip = arm.pose.bones["Hip"]
+    pivot = Matrix.Translation((pivot_x, 0, sole_z))
+    spin = pivot @ Matrix.Rotation(math.radians(tilt), 4, "Y") @ pivot.inverted()
+    hip.matrix = spin @ hip.matrix
+    dz = sole_z - lowest_point(arm)
+    hip.matrix = Matrix.Translation((0, 0, dz)) @ hip.matrix
+    bpy.context.view_layer.update()
 
 
 def sample(arm, animated, base, name, frames):

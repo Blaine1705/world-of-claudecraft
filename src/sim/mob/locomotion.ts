@@ -100,6 +100,7 @@ import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
 import { splashNearbyMobs } from './boss_collateral';
+import { tickBossCorpseSink } from './boss_corpse_sink';
 import { resetBossRangedMechanics, tickBossRangedMechanics } from './boss_ranged_mechanics';
 import { launchFromSlam, resetBossSlams, tickBossSlams } from './boss_slams';
 import {
@@ -237,6 +238,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
     expireDecayedCorpseInteractions(ctx, mob);
+    // A giant's corpse sinks out of sight over the end of its window (boss_corpse_sink.ts).
+    tickBossCorpseSink(mob);
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;

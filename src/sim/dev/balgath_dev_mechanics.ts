@@ -22,6 +22,7 @@
 import { forceBossRangedMechanic } from '../mob/boss_ranged_mechanics';
 import { forceBossSlam } from '../mob/boss_slams';
 import { forceTelegraphedBossMechanic } from '../mob/locomotion';
+import { devSleepSlumber, devWakeSlumber } from '../mob/slumber';
 import { forceWarpathWreck } from '../mob/warpath';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
@@ -64,6 +65,7 @@ const DESCRIBE: Record<BalgathDevMechanic, string> = {
 export type BalgathDevCommand =
   | { kind: 'help' }
   | { kind: 'mechanic'; mechanic: BalgathDevMechanic }
+  | { kind: 'slumber'; action: 'wake' | 'sleep' }
   | { kind: 'unknown'; verb: string };
 
 export function isBalgathDevMechanic(verb: string): verb is BalgathDevMechanic {
@@ -80,12 +82,18 @@ export function parseBalgathDevCommand(raw: string): BalgathDevCommand | null {
   const verb = (m[1] ?? '').toLowerCase();
   if (verb === '' || verb === 'help') return { kind: 'help' };
   if (isBalgathDevMechanic(verb)) return { kind: 'mechanic', mechanic: verb };
+  if (verb === 'wake' || verb === 'sleep') return { kind: 'slumber', action: verb };
   return { kind: 'unknown', verb };
 }
 
 /** The help text: every verb with what it does. */
 export function balgathDevHelp(): string {
   const lines = BALGATH_DEV_MECHANICS.map((v) => `/dev balgath ${v}: ${DESCRIBE[v]}`);
+  lines.push(
+    '/dev balgath wake: wake him now, even at night (he stays up until the day comes)',
+    '/dev balgath sleep: send him to bed now if he is not fighting (he sleeps until the night comes)',
+    '/dev servertime day|night|dawn|dusk|<0..1>|auto: move the SERVER day/night clock (auto restores real time; match your sky with /daynight)',
+  );
   return `[dev] Balgath mechanics (nearest live Balgath within ${BALGATH_DEV_RANGE} yd, aimed at you): ${lines.join('; ')}.`;
 }
 
@@ -147,7 +155,7 @@ export function forceBalgathDevMechanic(
     return {
       ok: false,
       message:
-        'Balgath is asleep in his crater (neutral and unattackable). Dawn wakes him: come back at sunrise.',
+        'Balgath is asleep in his crater (neutral and unattackable). Dawn wakes him: /dev balgath wake, or /dev servertime dawn.',
     };
   }
   if ((boss.slumberRise ?? 0) > 0) {
@@ -161,6 +169,15 @@ export function forceBalgathDevMechanic(
       ok: false,
       message:
         'Balgath is walking home (he gave up the pull). Try again once he is back in his crater.',
+    };
+  }
+  // His cast bar only fills on his planted combat ticks, and a warpath leg or wreck owns
+  // the whole tick (mob/warpath.ts), so a bar forced there would sit frozen and block
+  // every other forced mechanic until he planted again.
+  if (mechanic === 'scry' && boss.warpathPhase !== undefined && boss.warpathPhase !== 'focus') {
+    return {
+      ok: false,
+      message: 'Balgath is marching or wrecking a picket. Force the scry once he plants to fight.',
     };
   }
   const busy = liveTelegraph(boss);
@@ -209,4 +226,43 @@ function startForced(
     case 'wreck':
       return forceWarpathWreck(ctx, boss);
   }
+}
+
+/**
+ * Wake the nearest Balgath now (`wake`), or put him to bed (`sleep`), through the slumber
+ * module's own dev entry points (mob/slumber.ts), so the rise, the yells and the realm
+ * notices are the real ones.
+ */
+export function balgathDevSlumber(
+  ctx: SimContext,
+  pid: number,
+  action: 'wake' | 'sleep',
+): BalgathDevResult {
+  const caller = ctx.entities.get(pid);
+  if (!caller) return { ok: false, message: 'No caller.' };
+  const boss = nearestBalgath(ctx, caller);
+  if (!boss) {
+    return {
+      ok: false,
+      message: `No live Balgath within ${BALGATH_DEV_RANGE} yd. He rises in the Starfall Crater, east Mirefen (/dev tp 147 310).`,
+    };
+  }
+  if (action === 'wake') {
+    if (!boss.asleep) return { ok: false, message: 'Balgath is already awake.' };
+    devWakeSlumber(ctx, boss);
+    return {
+      ok: true,
+      message:
+        'Balgath wakes and rises. He stays up until the day comes, then sleeps at the next dusk as usual.',
+    };
+  }
+  if (boss.asleep) return { ok: false, message: 'Balgath is already asleep.' };
+  if (!devSleepSlumber(ctx, boss)) {
+    return { ok: false, message: 'Balgath is fighting (or walking home). End the pull first.' };
+  }
+  return {
+    ok: true,
+    message:
+      'Balgath lies down in his crater. He sleeps until the night comes, then wakes at the next dawn as usual.',
+  };
 }

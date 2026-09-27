@@ -637,7 +637,12 @@ const BALGATH: ClipMap = {
     // packed on both fists from the dig. It burns down to the RELEASE frame (1.45s).
     mob_balgath_boulder: { hand: 'both', color: 0xb08a5a, rise: 0.4, seconds: 1.45, radius: 0.04 },
   },
-  death: 'Death',
+  // His authored topple (scripts/anim/blender_author_balgath_slams.py). NOT the rig's own
+  // retargeted `Death`: that preset never leaves the idle stance (its hips move about a
+  // centimetre over 8.5s), so the clamped last frame was a standing corpse, which is why
+  // he used to die on his feet. This one lands flat on his back at 1.80s and its last
+  // frame is a resting pose the renderer holds for the whole corpse window.
+  death: 'Balgath_Death',
   hit: ['Hit'],
   cast: 'Balgath_EyeFlare',
   jump: 'Jump',
@@ -3887,6 +3892,10 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true, // baked Tripo atlas: low-tier floor rides the map
     height: 3.2,
     clips: BALGATH,
+    // Played at its authored speed: the dust, rock chips and camera shake of his landing
+    // fire BALGATH_DEATH_IMPACT_SEC after the death edge (balgath_death_fx_core.ts), which
+    // is the clip's own impact frame only at 1x (the shared default is 1.15).
+    deathTimeScale: 1,
     // The Loomshard, always burning. Measured off the rig rather than guessed: the eye is
     // the front-most head vertex resolved into the Head bone's own frame at rest, which is
     // bone-local (0.013, 0.115, -0.085). A guessed offset puts a glowing ball behind his

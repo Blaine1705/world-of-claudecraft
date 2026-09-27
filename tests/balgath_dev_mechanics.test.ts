@@ -10,12 +10,14 @@ import { describe, expect, it, vi } from 'vitest';
 vi.setConfig({ testTimeout: 120_000 });
 
 import { MOBS } from '../src/sim/data';
+import { cyclePhase, phaseToCycleMs } from '../src/sim/day_night';
 import {
   BALGATH_DEV_MECHANICS,
   BALGATH_DEV_RANGE,
   type BalgathDevMechanic,
   parseBalgathDevCommand,
 } from '../src/sim/dev/balgath_dev_mechanics';
+import { parseServerTimeCommand } from '../src/sim/dev/day_night_override';
 import {
   BOULDER_ABILITY,
   BURDEN_ABILITY,
@@ -308,5 +310,135 @@ describe('a forced cast keeps the natural spacing rules', () => {
     force(sim, 'hammer');
     expect(boss.hammerTimer).toBe(slams.hammer.every);
     expect(boss.mechanicLockTimer ?? 0).toBeGreaterThanOrEqual(slams.hammer.windup);
+  });
+});
+
+describe('/dev balgath wake|sleep and /dev servertime', () => {
+  function clocked(devCommands = true, phase = 0) {
+    const clock = { ms: phaseToCycleMs(phase) };
+    const sim = new Sim({
+      seed: 5,
+      playerClass: 'warrior',
+      autoEquip: true,
+      devCommands,
+      dayNightNowMs: () => clock.ms,
+    });
+    const id = (sim as unknown as Internals).spawnDevBoss(BALGATH, LAIR.x, LAIR.z);
+    const boss = sim.entities.get(id) as Entity;
+    place(sim, boss, LAIR.x, LAIR.z);
+    place(sim, sim.player, LAIR.x + 40, LAIR.z);
+    (sim as unknown as Internals).setGm(sim.player.id, true);
+    sim.drainEvents();
+    return { sim, boss, clock };
+  }
+
+  it('parses the server time verbs', () => {
+    expect(parseServerTimeCommand('/dev servertime night')).toEqual({
+      kind: 'set',
+      phase: 0,
+      label: 'night',
+    });
+    expect(parseServerTimeCommand('/dev servertime DAWN')).toMatchObject({ phase: 0.25 });
+    expect(parseServerTimeCommand('/dev servertime 0.6')).toMatchObject({ phase: 0.6 });
+    expect(parseServerTimeCommand('/dev servertime auto')).toEqual({ kind: 'auto' });
+    expect(parseServerTimeCommand('/dev servertime')).toBe('usage');
+    expect(parseServerTimeCommand('/dev servertime 7')).toBe('usage');
+    expect(parseServerTimeCommand('/dev servertimex')).toBeNull();
+    expect(parseBalgathDevCommand('/dev balgath wake')).toEqual({
+      kind: 'slumber',
+      action: 'wake',
+    });
+    expect(parseBalgathDevCommand('/dev balgath sleep')).toEqual({
+      kind: 'slumber',
+      action: 'sleep',
+    });
+  });
+
+  it('moves the sim clock, keeps it running, and auto restores the real clock', () => {
+    const { sim, clock } = clocked(true, 0.5);
+    expect(sim.dayNightPhase()).toBeCloseTo(0.5, 6);
+    sim.chat('/dev servertime night', sim.player.id);
+    expect(sim.dayNightPhase()).toBeCloseTo(0, 4);
+    clock.ms += 60_000;
+    // One real minute later it has moved on by one minute of the 45-minute cycle.
+    expect(sim.dayNightPhase()).toBeCloseTo(1 / 45, 4);
+    sim.chat('/dev servertime 0.8', sim.player.id);
+    expect(sim.dayNightPhase()).toBeCloseTo(0.8, 4);
+    sim.chat('/dev servertime auto', sim.player.id);
+    expect(sim.dayNightPhase()).toBeCloseTo(cyclePhase(clock.ms), 6);
+  });
+
+  it('gives a clockless world a frozen clock and takes it away again', () => {
+    const { sim } = world();
+    expect(sim.dayNightPhase()).toBeNull();
+    sim.chat('/dev servertime dusk', sim.player.id);
+    expect(sim.dayNightPhase()).toBeCloseTo(0.75, 6);
+    sim.chat('/dev servertime auto', sim.player.id);
+    expect(sim.dayNightPhase()).toBeNull();
+  });
+
+  it('does nothing without dev commands', () => {
+    const { sim, boss } = clocked(false, 0.5);
+    sim.chat('/dev servertime night', sim.player.id);
+    expect(sim.dayNightPhase()).toBeCloseTo(0.5, 6);
+    sim.chat('/dev balgath sleep', sim.player.id);
+    expect(boss.asleep).toBeFalsy();
+  });
+
+  it('wake gets him up at night and he stays up until the day, then sleeps at the next dusk', () => {
+    const { sim, boss, clock } = clocked(true, 0);
+    run(sim, 1);
+    expect(boss.asleep).toBe(true);
+    const evs = force(sim, 'wake');
+    expect(errors(evs)).toEqual([]);
+    expect(boss.asleep).toBe(false);
+    expect(boss.hostile).toBe(true);
+    expect(boss.slumberRise ?? 0).toBeGreaterThan(0);
+    run(sim, 20);
+    expect(boss.asleep).toBe(false);
+    // Day comes: the hold lifts, and at the next night he goes to bed on his own.
+    clock.ms = phaseToCycleMs(0.5);
+    run(sim, 1);
+    expect(boss.slumberDevHold).toBeUndefined();
+    clock.ms = phaseToCycleMs(0.9);
+    run(sim, 2);
+    expect(boss.asleep).toBe(true);
+  });
+
+  it('sleep puts an idle Balgath to bed by day, and he wakes at the next dawn', () => {
+    const { sim, boss, clock } = clocked(true, 0.5);
+    run(sim, 1);
+    expect(boss.asleep).toBeFalsy();
+    const evs = force(sim, 'sleep');
+    expect(errors(evs)).toEqual([]);
+    expect(boss.asleep).toBe(true);
+    expect(boss.hostile).toBe(false);
+    run(sim, 10);
+    expect(boss.asleep).toBe(true);
+    clock.ms = phaseToCycleMs(0.1);
+    run(sim, 1);
+    expect(boss.slumberDevHold).toBeUndefined();
+    clock.ms = phaseToCycleMs(0.3);
+    run(sim, 1);
+    expect(boss.asleep).toBe(false);
+  });
+
+  it('sleep refuses a Balgath in a fight', () => {
+    const { sim, boss } = clocked(true, 0.5);
+    force(sim, 'hammer');
+    expect(boss.aiState).not.toBe('idle');
+    const evs = force(sim, 'sleep');
+    expect(errors(evs).join('\n')).toContain('fighting');
+    expect(boss.asleep).toBeFalsy();
+  });
+});
+
+describe('/dev balgath scry off his planted fight', () => {
+  it('refuses while he marches, since the bar would sit frozen', () => {
+    const { sim, boss } = world();
+    boss.warpathPhase = 'travel';
+    const evs = force(sim, 'scry');
+    expect(errors(evs).join('\n')).toContain('marching');
+    expect(boss.castingAbility).toBeNull();
   });
 });

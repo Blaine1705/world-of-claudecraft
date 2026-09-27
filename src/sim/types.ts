@@ -2044,6 +2044,14 @@ export interface MobTemplate {
    */
   wadeDepth?: number;
   /**
+   * The corpse sinks into the ground over the last `seconds` of its corpse window, by
+   * `depth` yards, so a body too big to vanish cleanly sinks out of sight instead of
+   * popping out of existence (mob/boss_corpse_sink.ts). It also keeps the body lying for
+   * the WHOLE window once its loot is emptied, rather than collapsing it on the fast arm
+   * trash takes, because the sink is how it leaves. Inert for every mob without it.
+   */
+  corpseSink?: { seconds: number; depth: number };
+  /**
    * Slumber: the mob sleeps through the night (mob/slumber.ts). At dusk, once out of
    * combat, he walks home to his spawn point and lies down; asleep he is neutral (not
    * attackable, never aggroes) and heals; at dawn he wakes, announces himself, and is
@@ -5889,6 +5897,10 @@ export interface Entity extends ClientMirroredEntityFields {
   asleep?: boolean;
   /** Seconds left in the dawn rise (mob/slumber.ts): the AI is held while it runs. */
   slumberRise?: number;
+  /** A /dev wake or sleep holding him against the clock until it agrees (mob/slumber.ts). */
+  slumberDevHold?: 'awake' | 'asleep';
+  /** Where the corpse lay before it began to sink (mob/boss_corpse_sink.ts). */
+  corpseSinkBaseY?: number;
   /** Index into the template's destination list. */
   warpathDestination?: number;
   /** Seconds since anything reduced his health. */

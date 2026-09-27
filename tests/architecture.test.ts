@@ -743,6 +743,7 @@ const RENDER_PURE_CORES = [
   'src/render/entity_gate_stand_in_core.ts',
   'src/render/entity_ground_sample_core.ts',
   'src/render/balgath_aura_core.ts',
+  'src/render/balgath_death_fx_core.ts',
   'src/render/balgath_debris_core.ts',
   'src/render/characters/charge_glow_core.ts',
   'src/render/characters/eye_glow_core.ts',

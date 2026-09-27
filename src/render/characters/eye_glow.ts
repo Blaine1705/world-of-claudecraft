@@ -10,7 +10,7 @@
 // frame of every clip for free. This file is the Three half only: the spec and the curve
 // live in the core beside it.
 import * as THREE from 'three';
-import { type EyeGlowSpec, eyeGlowIntensity } from './eye_glow_core';
+import { type EyeGlowSpec, eyeGlowDeathIntensity, eyeGlowIntensity } from './eye_glow_core';
 
 /**
  * The lit eye: a bright core inside a soft halo.
@@ -23,6 +23,8 @@ export class EyeGlow {
   private core: THREE.Mesh | null = null;
   private halo: THREE.Mesh | null = null;
   private clock = 0;
+  /** Seconds since the death edge, or null while alive. */
+  private deadFor: number | null = null;
 
   constructor(
     private spec: EyeGlowSpec,
@@ -42,16 +44,36 @@ export class EyeGlow {
     return this.core !== null;
   }
 
-  update(dt: number, reducedMotion = false, asleep = false): void {
+  update(dt: number, reducedMotion = false, asleep = false, dead = false): void {
     if (!this.core || !this.halo) return;
     this.clock += dt;
-    const k = eyeGlowIntensity(this.spec, this.clock, reducedMotion, asleep);
+    // Dead, the eye gutters out on its own curve (eye_glow_core.ts) and stays dark; the
+    // first dead frame is second zero, and a revive relights it.
+    this.deadFor = dead ? (this.deadFor === null ? 0 : this.deadFor + dt) : null;
+    const k =
+      this.deadFor === null
+        ? eyeGlowIntensity(this.spec, this.clock, reducedMotion, asleep)
+        : eyeGlowDeathIntensity(this.deadFor, reducedMotion);
+    // Out means NOT DRAWN, not drawn at zero opacity: two additive shells on a corpse that
+    // lies for fifteen minutes are two draws for nothing.
+    this.core.visible = k > 0;
+    this.halo.visible = k > 0;
     (this.core.material as THREE.MeshBasicMaterial).opacity = 0.72 * k;
     (this.halo.material as THREE.MeshBasicMaterial).opacity = 0.3 * k;
     // The halo breathes in SIZE as well as brightness; a glow that only changes opacity
     // reads as a light being dimmed rather than as something alive behind the socket.
     const s = 0.9 + 0.2 * k;
     this.halo.scale.setScalar(s);
+  }
+
+  /**
+   * Put the eye out at once, with no guttering: a corpse that enters view already dead
+   * (the rig was built after the kill) never shows a death it did not witness.
+   */
+  snuff(): void {
+    this.deadFor = Number.POSITIVE_INFINITY;
+    if (this.core) this.core.visible = false;
+    if (this.halo) this.halo.visible = false;
   }
 
   private build(radius: number, color: number, opacity: number): THREE.Mesh {

@@ -41,6 +41,7 @@ import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { dist2d, type Entity, IGNIVAR_BOSS_ID, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
+import { clearCorpseSink } from './boss_corpse_sink';
 import { resetBossRangedMechanics } from './boss_ranged_mechanics';
 import { resetBossSlams } from './boss_slams';
 import { resetMobCharge } from './charge';
@@ -71,6 +72,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.harvestClaimedBy = null;
   mob.ownerId = null;
   mob.hostile = true;
+  clearCorpseSink(mob);
   mob.pos = { ...mob.spawnPos };
   mob.pos.y = groundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed);
   mob.prevPos = { ...mob.pos };

@@ -374,6 +374,11 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // would still float him rather than drown him. The circuit below still avoids the
     // lakes for a different reason: HE can wade, the raid chasing him cannot.
     wadeDepth: 9,
+    // Felled, he lies on his back across the fen for his whole corpse window (looted or
+    // not), then sinks into it over the last five seconds rather than blinking out of
+    // existence (mob/boss_corpse_sink.ts). Twelve yards clears the highest point of his
+    // lying body (the raised knees and fists, about half his 13.4-yard standing height).
+    corpseSink: { seconds: 5, depth: 12 },
     // A daytime boss (mob/slumber.ts). At dusk, once whatever pull is running has ended,
     // he walks back into the crater he spawns in and lies down; asleep he is neutral,
     // unattackable and a landmark; at dawn he wakes with a yell the zone hears and the

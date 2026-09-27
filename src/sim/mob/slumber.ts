@@ -54,7 +54,14 @@ function slumberNight(ctx: SimContext): boolean {
 export function tickSlumber(ctx: SimContext, mob: Entity): SlumberTick {
   const def = MOBS[mob.templateId]?.slumber;
   if (!def) return 'awake';
-  const night = slumberNight(ctx);
+  const clockNight = slumberNight(ctx);
+  // A /dev hold (devWakeSlumber / devSleepSlumber below) outlasts the clock only until
+  // the clock agrees with it: woken at night he stays up until the day comes (and goes to
+  // bed at the NEXT dusk by the normal rule); put to bed by day he sleeps until the night
+  // comes (and wakes at the next dawn). Undefined for every mob no /dev ever touched.
+  if (mob.slumberDevHold === 'awake' && !clockNight) mob.slumberDevHold = undefined;
+  if (mob.slumberDevHold === 'asleep' && clockNight) mob.slumberDevHold = undefined;
+  const night = mob.slumberDevHold === undefined ? clockNight : mob.slumberDevHold === 'asleep';
   if (mob.asleep) {
     if (night) {
       holdAsleep(mob, def);
@@ -191,4 +198,34 @@ function slumberAura(mob: Entity, def: SlumberDef): Aura {
     sourceId: mob.id,
     school: 'physical',
   };
+}
+
+/**
+ * [dev] Wake a sleeper now, whatever the clock says (/dev balgath wake), with the same rise
+ * and the same yell as a dawn. He stays up until the day comes, then the normal rules
+ * put him to bed at the next dusk. False for a mob with no slumber or one already awake.
+ */
+export function devWakeSlumber(ctx: SimContext, mob: Entity): boolean {
+  const def = MOBS[mob.templateId]?.slumber;
+  if (!def || !mob.asleep || mob.dead) return false;
+  mob.slumberDevHold = 'awake';
+  wake(ctx, mob, def);
+  return true;
+}
+
+/**
+ * [dev] Put an idle sleeper to bed now (/dev balgath sleep): back onto his bed, then the
+ * same lie-down a dusk runs. He sleeps until the night comes, then the normal rules wake
+ * him at the next dawn. Refuses (false) a mob in a fight, dead, or already asleep.
+ */
+export function devSleepSlumber(ctx: SimContext, mob: Entity): boolean {
+  const def = MOBS[mob.templateId]?.slumber;
+  if (!def || mob.asleep || mob.dead) return false;
+  if (mob.inCombat || mob.threat.size > 0 || mob.aiState !== 'idle') return false;
+  mob.slumberDevHold = 'asleep';
+  mob.pos = ctx.groundPos(mob.spawnPos.x, mob.spawnPos.z);
+  mob.prevPos = { ...mob.pos };
+  ctx.rebucket(mob);
+  fallAsleep(ctx, mob, def);
+  return true;
 }

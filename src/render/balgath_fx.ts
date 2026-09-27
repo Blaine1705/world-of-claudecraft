@@ -24,6 +24,11 @@
 import * as THREE from 'three';
 import type { Surface } from './audio_sink';
 import { bossAuraPlan, moteBudget, readBossVfxState } from './balgath_aura_core';
+import {
+  BALGATH_DEATH_TRAUMA,
+  BalgathDeathTracker,
+  type DeathFxCue,
+} from './balgath_death_fx_core';
 import { BalgathDebris } from './balgath_debris';
 import {
   BALGATH_CLEAVE_ABILITY,
@@ -287,6 +292,9 @@ export class BalgathFx {
   /** Per-boss fractional mote budget, carried frame to frame so a low rate still emits. */
   private auraCarry = new Map<number, number>();
   private seenThisFrame = new Set<number>();
+  /** His death: the landing and the sink (balgath_death_fx_core.ts). */
+  private deaths = new BalgathDeathTracker();
+  private deathCues: DeathFxCue[] = [];
 
   private debris: BalgathDebris;
   /** The ranged-punish kit and the cleave's fan (balgath_ranged_fx.ts). */
@@ -501,6 +509,8 @@ export class BalgathFx {
   private syncBosses(bosses: Iterable<BalgathBody>, dt: number, reducedMotion: boolean): void {
     this.seenThisFrame.clear();
     this.ranged.beginFrame();
+    this.deaths.begin(dt);
+    this.deathCues.length = 0;
     for (const e of bosses) {
       const balgath = e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX) === true;
       // One walk feeds both layers: the ranged kit needs his body (hands, eye) and the
@@ -508,6 +518,7 @@ export class BalgathFx {
       this.ranged.note(e, balgath);
       if (!balgath) continue;
       this.seenThisFrame.add(e.id);
+      this.deaths.note(e, this.deathCues);
       // The eye's pool tracks the channel exactly: lit while the bar runs, out the
       // instant it stops. Re-armed every frame with a short lease rather than latched on
       // a start event, so an interrupted cast cannot leave the ground lit forever.
@@ -530,6 +541,8 @@ export class BalgathFx {
       last.left = !last.left;
       this.footfall(e.pos.x, e.pos.z, 1, e.pos.y);
     }
+    this.deaths.end();
+    for (const cue of this.deathCues) this.drawDeathCue(cue);
     // Forget bosses that despawned, so the stride table cannot grow without bound.
     for (const id of [...this.stride.keys()]) {
       if (!this.seenThisFrame.has(id)) this.stride.delete(id);
@@ -537,6 +550,38 @@ export class BalgathFx {
     for (const id of [...this.auraCarry.keys()]) {
       if (!this.seenThisFrame.has(id)) this.retireAura(id);
     }
+  }
+
+  /**
+   * One beat of his death on the ground (balgath_death_fx_core.ts decides when and where).
+   *
+   * The LANDING is the heaviest thing he ever does, and is drawn as his slams are, only
+   * bigger: a silt ring, a crater, the fen thrown up, and rock chips off his own granite
+   * hide, with the hardest camera jolt of the fight for whoever stands near. The SINK is
+   * dust: first a cloud as the ground starts to take him, then puffs while he goes under.
+   */
+  private drawDeathCue(cue: DeathFxCue): void {
+    if (cue.kind === 'impact') {
+      this.spawnRing(cue.x, cue.z, cue.radius, SILT, 1.1);
+      this.spawnCrater(cue.x, cue.z, cue.radius * 0.9);
+      this.throwGround(cue.x, cue.z, cue.radius, 1.8);
+      this.debris.burst(
+        cue.x,
+        this.groundHeightAt(cue.x, cue.z),
+        cue.z,
+        'stone',
+        1.2,
+        cue.radius * 0.6,
+      );
+      this.impactFelt(BALGATH_DEATH_TRAUMA, cue.x, cue.z);
+      return;
+    }
+    if (cue.kind === 'sinkStart') {
+      this.spawnRing(cue.x, cue.z, cue.radius * 1.1, SILT, 0.6);
+      this.throwGround(cue.x, cue.z, cue.radius, 1.2);
+      return;
+    }
+    this.throwGround(cue.x, cue.z, cue.radius * 0.8, 0.6);
   }
 
   /**
@@ -661,6 +706,7 @@ export class BalgathFx {
 
   clear(): void {
     this.ranged.clear();
+    this.deaths.clear();
     this.auraCarry.clear();
     this.stride.clear();
     this.debris.clear();

@@ -70,13 +70,19 @@
 //   and lifts, so none of those silhouettes exists to be sampled. The pose-blend versions
 //   the first two replace masked half the body out of a two-armed overhead chop, which is
 //   why the hammer read as a crouch and the sweep as a scoop.
+//   Balgath_Death    his death, also keyframed in Blender (same script): the eye gutters,
+//                    he rocks back, staggers, teeters and topples BACKWARD about his heels,
+//                    lands flat at 1.80s (the renderer's dust, chips and camera shake fire
+//                    on that frame) and settles into a held corpse pose. The retargeted
+//                    `Death` preset on his own rig never leaves the idle stance (its hips
+//                    move a centimetre), which is why he used to die standing up.
 //   Balgath_Barrowfall  the arrival slam that ends a chase: he plants over the landmark,
 //                    takes his full height with both fists overhead, holds, and drives them
 //                    down. Bigger and slower than the circle-smash on purpose, and its
 //                    impact frame is authored to land ON the telegraph fuse.
 //
 // Usage: node scripts/build_balgath_anims.mjs [--preview]
-// Output: public/models/creatures/balgath_ability_anims.glb (mesh-free, 13 clips)
+// Output: public/models/creatures/balgath_ability_anims.glb (mesh-free, 14 clips)
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -532,6 +538,7 @@ const slamKeysFor = (name) => [
 const hammer = blenderClip('Balgath_Hammer');
 const cleave = blenderClip('Balgath_Cleave');
 const toss = blenderClip('Balgath_Toss');
+const death = blenderClip('Balgath_Death');
 
 const CLIPS = [
   ['Balgath_Smash', smash],
@@ -550,6 +557,7 @@ const CLIPS = [
   ['Balgath_Hammer', hammer, slamKeysFor('Balgath_Hammer')],
   ['Balgath_Cleave', cleave, slamKeysFor('Balgath_Cleave')],
   ['Balgath_Toss', toss, slamKeysFor('Balgath_Toss')],
+  ['Balgath_Death', death, slamKeysFor('Balgath_Death')],
 ];
 
 const authored = [];

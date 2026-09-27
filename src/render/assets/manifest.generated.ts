@@ -361,7 +361,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/city/wall_tower.glb": "/media/models/city/wall_tower.f492b537c35f.glb",
   "models/creatures/alpaca.glb": "/media/models/creatures/alpaca.a0de882ed487.glb",
   "models/creatures/aurelhorn.glb": "/media/models/creatures/aurelhorn.a72e8eeee246.glb",
-  "models/creatures/balgath_ability_anims.glb": "/media/models/creatures/balgath_ability_anims.0ca4aed2176c.glb",
+  "models/creatures/balgath_ability_anims.glb": "/media/models/creatures/balgath_ability_anims.359b494dbe02.glb",
   "models/creatures/balgath_clip_donor.glb": "/media/models/creatures/balgath_clip_donor.fb98eb7d900e.glb",
   "models/creatures/balgath_cyclops.glb": "/media/models/creatures/balgath_cyclops.a8604ddd1e51.glb",
   "models/creatures/bear_ability_anims.glb": "/media/models/creatures/bear_ability_anims.3813019f7d8f.glb",

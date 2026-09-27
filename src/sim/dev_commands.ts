@@ -7,10 +7,16 @@ import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS } from './data';
 import {
   BALGATH_DEV_MECHANICS,
   balgathDevHelp,
+  balgathDevSlumber,
   forceBalgathDevMechanic,
   parseBalgathDevCommand,
 } from './dev/balgath_dev_mechanics';
 import { equipBestInSlotForDev } from './dev/bis_gear';
+import {
+  parseServerTimeCommand,
+  restoreServerTime,
+  setServerTimePhase,
+} from './dev/day_night_override';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
 import { applyDevKit } from './dev_kit';
@@ -1046,12 +1052,44 @@ export function handleDevChat(
     else if (balgath.kind === 'unknown') {
       ctx.error(
         pid,
-        `[dev] Unknown Balgath mechanic '${balgath.verb}'. Usage: /dev balgath <${BALGATH_DEV_MECHANICS.join('|')}|help>.`,
+        `[dev] Unknown Balgath mechanic '${balgath.verb}'. Usage: /dev balgath <${BALGATH_DEV_MECHANICS.join('|')}|wake|sleep|help>.`,
       );
     } else {
-      const result = forceBalgathDevMechanic(ctx, pid, balgath.mechanic);
+      const result =
+        balgath.kind === 'slumber'
+          ? balgathDevSlumber(ctx, pid, balgath.action)
+          : forceBalgathDevMechanic(ctx, pid, balgath.mechanic);
       if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
       else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    }
+    return null;
+  }
+
+  // [dev] Move the SERVER's day/night clock (src/sim/dev/day_night_override.ts).
+  const serverTime = parseServerTimeCommand(raw);
+  if (serverTime) {
+    if (serverTime === 'usage') {
+      ctx.error(pid, '[dev] Usage: /dev servertime day|night|dawn|dusk|<0..1>|auto.');
+    } else if (serverTime.kind === 'auto') {
+      const restored = restoreServerTime(ctx);
+      emitDevLog(
+        ctx,
+        pid,
+        restored
+          ? '[dev] Server day/night clock back on real time.'
+          : '[dev] The server day/night clock was already on real time.',
+      );
+    } else {
+      const mode = setServerTimePhase(ctx, serverTime.phase);
+      const flow =
+        mode === 'running'
+          ? 'it keeps running from there'
+          : 'this world had no clock, so it stays frozen there until the next /dev servertime';
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Server day/night clock set to ${serverTime.label} (phase ${serverTime.phase.toFixed(2)}); ${flow}. Your sky is drawn from your own clock: type /daynight ${serverTime.label} to match it. /dev servertime auto restores real time.`,
+      );
     }
     return null;
   }
@@ -1149,7 +1187,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|help>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|help>, /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

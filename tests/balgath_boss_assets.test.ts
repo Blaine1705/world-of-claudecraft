@@ -77,6 +77,7 @@ const AUTHORED = [
   'Balgath_Hammer', // whack-a-mole: ONE fist up, held, dropped on a snapshot
   'Balgath_Cleave', // the low arc, authored as a body twist at the root
   'Balgath_Toss', // the boulder toss: dig, heave overhead, hurl (release at 1.45s)
+  'Balgath_Death', // the backward topple, held as his corpse (tests/balgath_death.test.ts)
 ];
 
 /** The Toss's authored release frame (scripts/anim/blender_author_balgath_slams.py): the

@@ -37,11 +37,43 @@ export interface EyeGlowSpec {
  */
 export const EYE_GLOW_ASLEEP = 0.16;
 
+/** Seconds the dying eye gutters (stutters bright and dark) before its last ember fades. */
+export const EYE_GLOW_DEATH_FLICKER_SEC = 1.1;
+
+/** Seconds after the death edge by which the eye is fully out. */
+export const EYE_GLOW_DEATH_OUT_SEC = 1.6;
+
+/**
+ * Brightness of the eye `deadFor` seconds after the creature died.
+ *
+ * The one exception to the never-out contract below, and the reason it has a curve of its
+ * own: a Loomshard that simply switched off would read as a render pop, while one that
+ * GUTTERS (stutters between bright and nearly dark, dimmer each time) and then leaves a
+ * last ember to fade reads as the light going out of him. Deterministic in `deadFor`, so
+ * every viewer sees the same death. Reduced motion drops the stutter (a strobe is exactly
+ * what that setting exists to remove) and fades it evenly to dark on the same schedule.
+ */
+export function eyeGlowDeathIntensity(deadFor: number, reducedMotion = false): number {
+  if (!(deadFor < EYE_GLOW_DEATH_OUT_SEC)) return 0;
+  const t = Math.max(0, deadFor);
+  if (reducedMotion) return 0.8 * (1 - t / EYE_GLOW_DEATH_OUT_SEC);
+  if (t < EYE_GLOW_DEATH_FLICKER_SEC) {
+    const decay = 1 - 0.55 * (t / EYE_GLOW_DEATH_FLICKER_SEC);
+    const stutter = 0.5 + 0.5 * Math.sin(t * 47) * Math.sin(t * 13 + 1.3);
+    const dropout = Math.sin(t * 29) > 0.55 ? 0.12 : 1;
+    return decay * (0.35 + 0.65 * stutter) * dropout;
+  }
+  const f =
+    (t - EYE_GLOW_DEATH_FLICKER_SEC) / (EYE_GLOW_DEATH_OUT_SEC - EYE_GLOW_DEATH_FLICKER_SEC);
+  return 0.3 * (1 - f) * (1 - f);
+}
+
 /**
  * Brightness of the eye at `clock`.
  *
  * Never reaches zero, and that is the contract: this is what a creature IS, not something it
- * is doing, so there is no frame in which the eye is out. Reduced motion holds it steady
+ * is doing, so there is no frame in which the LIVING eye is out (death has its own curve,
+ * eyeGlowDeathIntensity above). Reduced motion holds it steady
  * rather than turning it off, for the same reason; sleep dims it to the ember above.
  */
 export function eyeGlowIntensity(

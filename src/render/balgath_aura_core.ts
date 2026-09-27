@@ -31,6 +31,12 @@ export interface BossVfxState {
   blinded: boolean;
   /** 0..1, for effects that should intensify as he is worn down. */
   wounded: number;
+  /**
+   * Slain. Outranks everything: the shell of motes stops being fed, so the aura dies away
+   * with him as the last motes run out, instead of a corpse smouldering for its whole
+   * corpse window as if he were still in the fight.
+   */
+  dead?: boolean;
 }
 
 /** The look for one frame: a ground aura plus what it is throwing off. */
@@ -71,6 +77,7 @@ export function readBossVfxState(e: {
   hp?: number;
   maxHp?: number;
   warpathUnharried?: number;
+  dead?: boolean;
 }): BossVfxState {
   const auras = e.auras ?? [];
   const hp = e.hp ?? 1;
@@ -88,6 +95,7 @@ export function readBossVfxState(e: {
     // its two timestamps into auras (src/sim/mob/eye_ward.ts) and this is the down one.
     blinded: auras.some((a) => a.id === 'eye_ward_blinded'),
     wounded: Math.min(1, Math.max(0, 1 - hp / Math.max(1, maxHp))),
+    dead: e.dead === true,
   };
 }
 
@@ -165,6 +173,10 @@ export function bossAuraPlan(state: BossVfxState): BossAuraPlan {
   }
   // Worn down, he smoulders harder whatever else is true.
   base.alpha = Math.min(0.55, base.alpha * (1 + 0.5 * state.wounded));
+  if (state.dead) {
+    base.alpha = 0;
+    base.moteRate = 0;
+  }
   return base;
 }
 
