@@ -169,8 +169,10 @@ selected by ability id only:
   the deferred preload lane: `ensureWarriorKitAssets` loads them once, on
   demand, when a local Warrior enters or the painter first sees a remote one
   (`requestClassKit`; a failed preparation asks again on the bounded
-  `ACTIVE_KIT_RETRY_DELAYS_MS` backoff, paying only its unpaid units), keeps a
-  mip chain on the WebP sheets, and DECLINES them
+  `ACTIVE_KIT_RETRY_DELAYS_MS` backoff, paying only its unpaid units), decodes
+  its image sheets off the main thread (`loadBitmapTexture`, texel for texel
+  what the image path uploads: `tests/browser/bitmap_texture_pixels.browser.test.ts`),
+  keeps a mip chain on the WebP sheets, and DECLINES them
   on constrained-memory devices, where the kit stays cold, the generic
   presentation runs, and the boot warm-up links none of the kit's programs
   (`warriorKitDeclinedByDevice` in `../cast_vfx_prewarm.ts`;

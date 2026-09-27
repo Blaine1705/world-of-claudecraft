@@ -11,6 +11,11 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GFX } from '../gfx';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
+import {
+  BITMAP_DECODE_OPTIONS,
+  browserDecodesImageBitmap,
+  fetchImageBlob,
+} from './image_bitmap_decode';
 import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
@@ -21,6 +26,7 @@ import { neutralizeGltfTransmission } from './transmission_neutralize';
 let gltfLoader: GLTFLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
 const texCache = new Map<string, Promise<THREE.Texture>>();
+const bitmapTexCache = new Map<string, Promise<THREE.Texture>>();
 const ktx2TexCache = new Map<string, Promise<THREE.CompressedTexture>>();
 
 interface AssetQueue {
@@ -287,6 +293,51 @@ export function loadTexture(
       },
     );
     texCache.set(key, p);
+  }
+  return p;
+}
+
+/** A plain image texture decoded off the main thread (image_bitmap_decode.ts),
+ *  for large sheets whose upload would otherwise pay the decode in a live
+ *  frame. Uploads the same texels as loadTexture, whose path it falls back to
+ *  where the browser cannot honour the decode options or refuses the decode.
+ *  The bitmap keeps its decoded pixels for the texture's life, since a rebuilt
+ *  renderer uploads from it again. */
+export function loadBitmapTexture(
+  url: string,
+  opts: { srgb?: boolean } = {},
+): Promise<THREE.Texture> {
+  if (!browserDecodesImageBitmap()) return loadTexture(url, opts);
+  const resolved = assetUrl(url);
+  const key = `${resolved}|${opts.srgb ? 's' : 'l'}`;
+  let p = bitmapTexCache.get(key);
+  if (!p) {
+    const startedAt = assetLoadStarted();
+    p = scheduleLoad(textureQueue, () => {
+      const seq = diagStart('bitmap', resolved);
+      return withRetry(() => fetchImageBlob(resolved))
+        .then((blob) => createImageBitmap(blob, BITMAP_DECODE_OPTIONS))
+        .then(
+          (bitmap) => {
+            diagSettle(seq, 'bitmap', resolved, true);
+            const texture = new THREE.Texture(bitmap);
+            texture.flipY = false;
+            if (opts.srgb) texture.colorSpace = THREE.SRGBColorSpace;
+            texture.needsUpdate = true;
+            recordAssetLoad('texture', resolved, startedAt);
+            return texture;
+          },
+          (err: unknown) => {
+            diagSettle(seq, 'bitmap', resolved, false);
+            throw err;
+          },
+        );
+    }).catch(() => loadTexture(url, opts));
+    const pending = p;
+    p.catch(() => {
+      if (bitmapTexCache.get(key) === pending) bitmapTexCache.delete(key);
+    });
+    bitmapTexCache.set(key, p);
   }
   return p;
 }

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { loadGltf, loadKtx2Texture, loadTexture, releaseGltf } from '../assets/loader';
+import { loadBitmapTexture, loadGltf, loadKtx2Texture, releaseGltf } from '../assets/loader';
 import { ensureContactSheets } from './contact_assets';
 
 export type BakedKind =
@@ -52,6 +52,9 @@ const geometry = new Map<FragmentKind, THREE.BufferGeometry>();
 // requested (a local Warrior at entry, or the first remote Warrior the painter
 // sees), and DECLINED outright on constrained-memory devices, where every
 // getter stays null, the kit stays cold and the generic presentation runs.
+// The image sheets decode off the main thread (loadBitmapTexture): through
+// the image path each one decoded inside its paced upload unit, 45 to 103 ms
+// of one frame per sheet on an Intel HD 530.
 export type WarriorKitAssetsState = 'idle' | 'declined' | 'loading' | 'ready' | 'failed';
 let assetsState: WarriorKitAssetsState = 'idle';
 let assetsTask: Promise<boolean> | null = null;
@@ -94,7 +97,7 @@ async function loadWarriorKitAssets(): Promise<void> {
       const texture = (
         await (compressed
           ? loadKtx2Texture(url, { large: true })
-          : loadTexture(url, { srgb: true }))
+          : loadBitmapTexture(url, { srgb: true }))
       ).clone();
       // The authored cells carry baked gutters, so a mip chain cannot bleed
       // between them, and it is what keeps a 2048px sheet cheap to sample once
@@ -109,19 +112,19 @@ async function loadWarriorKitAssets(): Promise<void> {
     }),
   ]);
   // Grain data map: sampled at a fixed screen scale, so no chain.
-  pressureTexture = (await loadTexture(PRESSURE_URL, { srgb: false })).clone();
+  pressureTexture = (await loadBitmapTexture(PRESSURE_URL, { srgb: false })).clone();
   pressureTexture.colorSpace = THREE.NoColorSpace;
   pressureTexture.generateMipmaps = false;
   pressureTexture.minFilter = pressureTexture.magFilter = THREE.LinearFilter;
-  bloodTexture = (await loadTexture(BLOOD_URL, { srgb: true })).clone();
+  bloodTexture = (await loadBitmapTexture(BLOOD_URL, { srgb: true })).clone();
   bloodTexture.generateMipmaps = true;
   bloodTexture.minFilter = THREE.LinearMipmapLinearFilter;
   bloodTexture.magFilter = THREE.LinearFilter;
-  steelTexture = (await loadTexture(STEEL_URL, { srgb: true })).clone();
+  steelTexture = (await loadBitmapTexture(STEEL_URL, { srgb: true })).clone();
   steelTexture.generateMipmaps = true;
   steelTexture.minFilter = THREE.LinearMipmapLinearFilter;
   steelTexture.magFilter = THREE.LinearFilter;
-  rockTexture = (await loadTexture(ROCK_URL, { srgb: true })).clone();
+  rockTexture = (await loadBitmapTexture(ROCK_URL, { srgb: true })).clone();
   rockTexture.generateMipmaps = true;
   rockTexture.minFilter = THREE.LinearMipmapLinearFilter;
   rockTexture.magFilter = THREE.LinearFilter;

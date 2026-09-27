@@ -14,6 +14,7 @@ vi.mock('../src/render/assets/loader', async () => {
   const THREE = await import('three');
   return {
     loadTexture: vi.fn(async () => new THREE.Texture()),
+    loadBitmapTexture: vi.fn(async () => new THREE.Texture()),
     loadKtx2Texture: vi.fn(async () => new THREE.Texture()),
     loadGltf: vi.fn(async () => {
       const mesh = new THREE.Mesh(new THREE.BufferGeometry());
@@ -58,12 +59,14 @@ import {
 import * as loader from '../src/render/assets/loader';
 
 const loadTexture = vi.mocked(loader.loadTexture);
+const loadBitmapTexture = vi.mocked(loader.loadBitmapTexture);
 const loadKtx2Texture = vi.mocked(loader.loadKtx2Texture);
 
 beforeEach(() => {
   productionAssetInternalsForTest.reset();
   contactAssetInternalsForTest.reset();
   loadTexture.mockClear();
+  loadBitmapTexture.mockClear();
   loadKtx2Texture.mockClear();
 });
 afterEach(() => vi.restoreAllMocks());
@@ -73,6 +76,7 @@ describe('ensureWarriorKitAssets', () => {
     await expect(ensureWarriorKitAssets(true)).resolves.toBe(false);
     expect(warriorKitAssetsState()).toBe('declined');
     expect(loadTexture).not.toHaveBeenCalled();
+    expect(loadBitmapTexture).not.toHaveBeenCalled();
     expect(loadKtx2Texture).not.toHaveBeenCalled();
     expect(bakedTexture('smoke')).toBeNull();
     expect(warriorSteelTexture()).toBeNull();
@@ -85,8 +89,10 @@ describe('ensureWarriorKitAssets', () => {
     expect(ensureWarriorKitAssets(false)).toBe(first);
     await expect(first).resolves.toBe(true);
     expect(warriorKitAssetsState()).toBe('ready');
-    // seven WebP baked sheets plus pressure, blood, steel and rock
-    expect(loadTexture).toHaveBeenCalledTimes(11);
+    // seven WebP baked sheets plus pressure, blood, steel and rock, every one
+    // decoded off the main thread (the image path decodes inside the upload)
+    expect(loadBitmapTexture).toHaveBeenCalledTimes(11);
+    expect(loadTexture).not.toHaveBeenCalled();
     // the KTX2 crush sheet plus the three contact sheets
     expect(loadKtx2Texture).toHaveBeenCalledTimes(4);
     for (const kind of [
@@ -105,7 +111,7 @@ describe('ensureWarriorKitAssets', () => {
     expect(contactTexture('contact_crush')).not.toBeNull();
     expect(contactTexture('contact_pierce')).not.toBeNull();
     await ensureWarriorKitAssets(false);
-    expect(loadTexture).toHaveBeenCalledTimes(11);
+    expect(loadBitmapTexture).toHaveBeenCalledTimes(11);
   });
 
   it('keeps a mip chain on the WebP sheets and leaves the KTX2 and data maps alone', async () => {
