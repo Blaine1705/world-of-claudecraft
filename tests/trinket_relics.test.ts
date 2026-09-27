@@ -238,7 +238,7 @@ describe('TrinketRelics painter', () => {
     }
     const w = { current: world(entities) };
     const burst = vi.fn();
-    const gate = { ready };
+    const gate = { ready, consults: 0 };
     const relics = new TrinketRelics({
       scene,
       world: () => w.current,
@@ -251,7 +251,10 @@ describe('TrinketRelics painter', () => {
       ground: (x) => x * 0.01,
       vfx: { burst },
       time: () => 1,
-      ready: () => gate.ready,
+      ready: () => {
+        gate.consults++;
+        return gate.ready;
+      },
     });
     return { scene, views, w, burst, relics, gate };
   }
@@ -312,6 +315,35 @@ describe('TrinketRelics painter', () => {
     h.w.current = world([entity(1, [])]);
     h.relics.update(0.2);
     expect(h.relics.activeCounts().orbs).toBe(0);
+  });
+
+  it('asks its ready bit only while a relic is tracked, so a session with no wearer starts no deadline', () => {
+    const h = setup([entity(1, [])], false);
+    for (let i = 0; i < 10; i++) h.relics.update(0.05);
+    expect(h.gate.consults).toBe(0);
+    h.w.current = world([entity(1, [aura(TRINKET_AURA.kindlingOrb, 6)])]);
+    for (let i = 0; i < 4; i++) h.relics.update(0.05);
+    expect(h.gate.consults).toBeGreaterThan(0);
+    h.relics.handleSpellfx(
+      {
+        sourceId: 1,
+        targetId: 1,
+        school: 'fire',
+        fx: 'selfCast',
+        ability: 'trinket_forgefathers_temper',
+      },
+      true,
+    );
+    h.w.current = world([entity(1, [])]);
+    h.relics.update(0.2);
+    const before = h.gate.consults;
+    // The hammer still swings once the orb is gone: the bit is still asked.
+    h.relics.update(0.05);
+    expect(h.gate.consults).toBe(before + 1);
+    for (let i = 0; i < 40; i++) h.relics.update(0.05);
+    const idle = h.gate.consults;
+    for (let i = 0; i < 10; i++) h.relics.update(0.05);
+    expect(h.gate.consults).toBe(idle);
   });
 
   it('holds the cosmetic orb behind a cold cast gate', () => {

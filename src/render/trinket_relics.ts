@@ -444,7 +444,6 @@ export class TrinketRelics {
 
   update(dt: number, reducedMotion = false): void {
     const step = Number.isFinite(dt) ? Math.max(0, Math.min(dt, 0.25)) : 0;
-    const ready = this.host.ready();
     this.scanClock += step;
     if (this.scanClock >= SCAN_INTERVAL_SEC) {
       this.scanClock = 0;
@@ -454,12 +453,23 @@ export class TrinketRelics {
       for (const orb of this.orbs) if (orb.ownerId !== -1) orb.remaining -= step;
       for (const lantern of this.lanterns) if (lantern.ownerId !== -1) lantern.remaining -= step;
     }
+    // Asked only while a relic is tracked: the family's deadline clock starts at
+    // its first consult, so a session with no wearer in view never runs it down.
+    const ready = this.tracking() && this.host.ready();
     const t = this.host.time();
     this.updateOrbs(step, t, ready, reducedMotion);
     this.updateLanterns(t, ready, reducedMotion);
     this.updateHammers(step, ready, reducedMotion);
     this.updateBolts(step);
     this.updateWisps(step, ready);
+  }
+
+  private tracking(): boolean {
+    if (this.wisps.size > 0) return true;
+    for (const orb of this.orbs) if (orb.ownerId !== -1) return true;
+    for (const lantern of this.lanterns) if (lantern.ownerId !== -1) return true;
+    for (const hammer of this.hammers) if (hammer.ownerId !== -1) return true;
+    return false;
   }
 
   /** One pass over the viewed entities: which relic states each one shows.
