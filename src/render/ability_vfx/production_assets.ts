@@ -10,8 +10,7 @@ export type BakedKind =
   | 'harvest_impact'
   | 'warrior_bite'
   | 'warrior_shear'
-  | 'warrior_crush'
-  | 'shockwave';
+  | 'warrior_crush';
 export type FragmentKind = 'ice_shard' | 'stone_chip' | 'metal_splinter';
 export const BAKED_URLS = {
   smoke: '/textures/vfx/production/smoke.webp',
@@ -22,7 +21,6 @@ export const BAKED_URLS = {
   warrior_bite: '/textures/vfx/production/warrior_bite.webp',
   warrior_shear: '/textures/vfx/production/warrior_shear.webp',
   warrior_crush: '/textures/vfx/production/warrior_crush.ktx2',
-  shockwave: '/textures/vfx/production/shockwave.webp',
 } as const;
 export const FRAGMENT_URL = '/models/vfx/production_fragments.glb';
 const textures = new Map<BakedKind, THREE.Texture>();

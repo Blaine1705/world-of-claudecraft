@@ -164,7 +164,7 @@ selected by ability id only:
   `warrior_attention*.ts`, `warrior_control*.ts`), and prewarm
   (`active_kit_prewarm.ts`, `crest_prewarm.ts`, `guard_prewarm.ts`,
   `baked_pool_prewarm.ts`) registered through the renderer's manifest entry.
-  The kit's textures (`production_assets.ts`, `contact_assets.ts`: nine baked
+  The kit's textures (`production_assets.ts`, `contact_assets.ts`: eight baked
   sheets, three contact sheets, the material maps, the fragment GLB) never ride
   the deferred preload lane: `ensureWarriorKitAssets` loads them once, on
   demand, when a local Warrior enters or the painter first sees a remote one
@@ -177,8 +177,8 @@ selected by ability id only:
   `tests/warrior_kit_assets.test.ts`, `tests/active_kit_prewarm.test.ts`). Every sheet a live cast draws is
   uploaded by its own unit of the kit recipe (`KIT_SHEETS` in
   `active_kit_prewarm.ts`), the contact sheets and the generic smoke and dust
-  layers included, since the kit is their only consumer (the loaded shockwave
-  sheet has no live consumer, only the boot-window `prewarmSpawn`); the boot
+  layers included, since the kit is their only consumer, and the kit loads no
+  sheet the recipe does not upload; the boot
   warm-up (`abilityVfxTexturePrewarmSteps`) reads none of them, so the recipe is
   their one upload home on every renderer, a recycled one included. A sheet is
   stored as soon as it decodes, so every drawer also waits for this renderer's
@@ -205,7 +205,7 @@ selected by ability id only:
   the actionable floor, and it waits out a loading cover: the kit is cosmetic
   and gated by its own readiness, and the floor once admitted all ten sheets
   into one frame (about 0.6 s on an Intel HD 530). Generic sheets (smoke, dust,
-  shockwave, the harvest splash) ship at 1024px; only signature sheets earn
+  the harvest splash) ship at 1024px; only signature sheets earn
   2048px, and a new sheet needs the same justification.
 - **Cost rules still apply.** The shared families it extends (`ribbons.ts`
   vertex budget, `flipbooks.ts` blending, `fx_textures.ts` overlay atlas) are

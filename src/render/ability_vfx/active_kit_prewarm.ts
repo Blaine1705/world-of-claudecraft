@@ -77,10 +77,9 @@ const preparations = new WeakMap<object, Preparation>();
  *  the signature sheets. They land with the kit's demand load, and this recipe
  *  is their only upload home on each renderer; every drawer waits for its
  *  sheet's upload (a contact binds a procedural sheet meanwhile, smoke and dust
- *  skip), so those five go first to shorten that window. The loaded
- *  `shockwave` sheet is left out on purpose: only the boot-window
- *  `prewarmSpawn` draws it, behind the curtain. A sheet that is absent fails
- *  its unit, so the kit stays cold rather than half-ready. */
+ *  skip), so those five go first to shorten that window. The kit loads no
+ *  sheet this list does not upload. A sheet that is absent fails its unit,
+ *  so the kit stays cold rather than half-ready. */
 const KIT_SHEETS: readonly (readonly [
   id: string,
   name: string,

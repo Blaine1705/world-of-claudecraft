@@ -1,4 +1,4 @@
-// The Warrior kit's textures (nine baked sheets, one 4096px, three contact
+// The Warrior kit's textures (eight baked sheets, one 4096px, three contact
 // sheets, three material maps, the fragment GLB) decode to well over 150 MB of
 // RGBA. They are loaded ON DEMAND, once per page, when the active kit is
 // requested (a local Warrior at entry, or the first remote Warrior the painter
@@ -85,8 +85,8 @@ describe('ensureWarriorKitAssets', () => {
     expect(ensureWarriorKitAssets(false)).toBe(first);
     await expect(first).resolves.toBe(true);
     expect(warriorKitAssetsState()).toBe('ready');
-    // eight WebP baked sheets plus pressure, blood, steel and rock
-    expect(loadTexture).toHaveBeenCalledTimes(12);
+    // seven WebP baked sheets plus pressure, blood, steel and rock
+    expect(loadTexture).toHaveBeenCalledTimes(11);
     // the KTX2 crush sheet plus the three contact sheets
     expect(loadKtx2Texture).toHaveBeenCalledTimes(4);
     for (const kind of [
@@ -98,7 +98,6 @@ describe('ensureWarriorKitAssets', () => {
       'warrior_bite',
       'warrior_shear',
       'warrior_crush',
-      'shockwave',
     ] as const) {
       expect(bakedTexture(kind), kind).not.toBeNull();
     }
@@ -106,7 +105,7 @@ describe('ensureWarriorKitAssets', () => {
     expect(contactTexture('contact_crush')).not.toBeNull();
     expect(contactTexture('contact_pierce')).not.toBeNull();
     await ensureWarriorKitAssets(false);
-    expect(loadTexture).toHaveBeenCalledTimes(12);
+    expect(loadTexture).toHaveBeenCalledTimes(11);
   });
 
   it('keeps a mip chain on the WebP sheets and leaves the KTX2 and data maps alone', async () => {
