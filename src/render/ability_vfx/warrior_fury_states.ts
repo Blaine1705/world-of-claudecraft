@@ -20,7 +20,11 @@ import { GuardPrewarm } from './guard_prewarm';
 import { warriorBloodTexture, warriorSteelTexture } from './production_assets';
 import { AbilityVfxRibbons, type RibbonAnchor } from './ribbons';
 import { warriorFuryStateShape } from './warrior_fury_state_shapes';
-import { type WarriorKitSurface, warriorKitSurface } from './warrior_kit_surface';
+import {
+  type WarriorKitSurface,
+  warriorKitSlotMap,
+  warriorKitSurface,
+} from './warrior_kit_surface';
 import { animateWarriorRage } from './warrior_rage_material';
 
 interface State {
@@ -94,7 +98,7 @@ export class WarriorFuryStates {
         warriorKitSurface(name, {
           color: 0xffffff,
           vertexColors: true,
-          map: k === 2 ? warriorSteelTexture() : warriorBloodTexture(),
+          map: (k === 2 ? warriorSteelTexture() : warriorBloodTexture()) ?? warriorKitSlotMap(),
           transparent: true,
           depthWrite: false,
           side: THREE.DoubleSide,
@@ -140,10 +144,7 @@ export class WarriorFuryStates {
                 const texture = k === 2 ? warriorSteelTexture() : warriorBloodTexture();
                 if (!texture) throw Error('Warrior Fury state texture is not prepared');
                 const material = this.meshes[k].material;
-                if (material.map !== texture) {
-                  material.map = texture;
-                  material.needsUpdate = true;
-                }
+                material.map = texture;
               },
             },
             ...prep.units(host).map((unit) => ({ ...unit, id: `fury-state-${k}:${unit.id}` })),

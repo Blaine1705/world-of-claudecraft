@@ -20,7 +20,11 @@ import { warriorBloodTexture, warriorRockTexture } from './production_assets';
 import type { AbilityVfxRibbons, RibbonAnchor } from './ribbons';
 import { warriorAvatarBracerShape } from './warrior_avatar_bracer';
 import { warriorAvatarChestShape } from './warrior_avatar_shape';
-import { type WarriorKitSurface, warriorKitSurface } from './warrior_kit_surface';
+import {
+  type WarriorKitSurface,
+  warriorKitSlotMap,
+  warriorKitSurface,
+} from './warrior_kit_surface';
 import { warriorPowerGeometry } from './warrior_power_geometry';
 import { animateWarriorRage } from './warrior_rage_material';
 
@@ -91,7 +95,7 @@ export class WarriorPowerForms {
         warriorKitSurface(name, {
           color: 0xffffff,
           vertexColors: true,
-          map: blood ? warriorBloodTexture() : warriorRockTexture(),
+          map: (blood ? warriorBloodTexture() : warriorRockTexture()) ?? warriorKitSlotMap(),
           roughness: blood ? 0.42 : 0.96,
           metalness: blood ? 0.08 : 0.025,
           emissive: 0xffffff,
@@ -137,10 +141,7 @@ export class WarriorPowerForms {
                 const texture = kind === 1 ? warriorBloodTexture() : warriorRockTexture();
                 if (!texture) throw Error('Warrior power texture is not prepared');
                 const material = this.meshes[kind].material;
-                if (material.map !== texture) {
-                  material.map = texture;
-                  material.needsUpdate = true;
-                }
+                material.map = texture;
               },
             },
             ...prep.units(host).map((unit) => ({ ...unit, id: `power-${kind}:${unit.id}` })),
