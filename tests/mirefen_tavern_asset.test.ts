@@ -38,11 +38,11 @@ import {
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
-const SHIPPED_SHA256 = '8f9163888d891431dbf03db6445d16a65fd4d519b61a62e02895e5079c34b2ab';
-const SHIPPED_BYTES = 885056;
+const SHIPPED_SHA256 = '3021a12d7dea25d0244b911a900df1e16f743c2d53e8db2dbe6ef02b503cb78a';
+const SHIPPED_BYTES = 887480;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  TavernFrame: 12260,
+  TavernFrame: 12440,
   TavernFurnishings: 2944,
   TavernLights: 3240,
   HallWallFront: 5156,

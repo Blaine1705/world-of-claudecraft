@@ -115,28 +115,76 @@ def hall_floor(B, p):
     n = int(round((x1 - x0) / width))
     step = (x1 - x0) / n
     thick = 0.14
+
+    def pit_half(x):
+        # the curb's outer circle's half chord at x (0 past its side)
+        dx = abs(x - pit['x'])
+        return math.sqrt(pit['rim'] ** 2 - dx * dx) if dx < pit['rim'] else 0.0
+
+    def strip_edges(xa, xb):
+        # a board end's strip edges: broken at the circle's side (a chord across it would cut
+        # the corner short of the curb), then the fewest strips whose chords keep within a few
+        # inches of the circle (a chord of it runs in under the curb's lip, never out past it)
+        sides = (pit['x'] - pit['rim'], pit['x'] + pit['rim'])
+        cuts = [xa] + [x for x in sides if xa < x < xb] + [xb]
+        edges = [xa]
+        for u, v in zip(cuts, cuts[1:]):
+            for m in (1, 2, 3, 4):
+                worst = 0.0
+                for k in range(m):
+                    sa, sb = u + (v - u) * k / m, u + (v - u) * (k + 1) / m
+                    mx, mz = (sa + sb) / 2 - pit['x'], (pit_half(sa) + pit_half(sb)) / 2
+                    if max(pit_half(sa), pit_half(sb)) > 0:
+                        worst = max(worst, pit['rim'] - math.hypot(mx, mz))
+                if worst < 0.07 or m == 4:
+                    edges += [u + (v - u) * (k + 1) / m for k in range(m)]
+                    break
+        return edges
+
+    def board(xa, xb, c, d, color, pit_end):
+        """One board from c to d: square-ended, or its end toward the pit (pit_end +1 its high
+        end, -1 its low end) cut along the curb's circle in strips, so the board runs in under
+        the curb's lip and no crescent opens between them."""
+        if not pit_end:
+            B.abox(p, xa, xb, -thick, 0.0, c, d, color, B.WOOD)
+            return
+        edges = strip_edges(xa, xb)
+        for sa, sb in zip(edges, edges[1:]):
+            if pit_end > 0:
+                ea, eb = pit['z'] - pit_half(sa), pit['z'] - pit_half(sb)
+                q = [(sa, c), (sb, c), (sb, eb), (sa, ea)]
+            else:
+                ea, eb = pit['z'] + pit_half(sa), pit['z'] + pit_half(sb)
+                q = [(sa, ea), (sb, eb), (sb, d), (sa, d)]
+            B.hexa(p, [(x, -thick, z) for (x, z) in q] + [(x, 0.0, z) for (x, z) in q], color, B.WOOD)
+
+    # the board columns: those under the bar platform start before it, except the one its
+    # left bevel starts in, which runs the whole room (on under the bevel, the platform and
+    # the barrel wall, all hidden) so it floors the strip between the platform and the tower
+    # arch's side
+    columns = []
     for i in range(n):
         xa, xb = x0 + step * i + 0.004, x0 + step * (i + 1) - 0.004
-        xm = (xa + xb) / 2
-        spans = []
-        za = z0
-        if xm >= plat['x0'] - plat['rim']:
-            za = plat['z1'] + plat['rim'] - 0.05
-        dx = abs(xm - pit['x'])
-        if dx < pit['rim']:
-            half = math.sqrt(pit['rim'] ** 2 - dx * dx) - 0.05
-            spans.append((za, pit['z'] - half))
-            spans.append((pit['z'] + half, z1))
+        under = (xa + xb) / 2 >= plat['x0'] - plat['rim'] and xa >= plat['x0'] - 0.01
+        columns.append((i, xa, xb, plat['z1'] + plat['rim'] - 0.05 if under else z0))
+    for (i, xa, xb, za) in columns:
+        # the circle's reach across this column (sampled across it)
+        hs = [pit_half(xa + (xb - xa) * s / 8) for s in range(9)]
+        if max(hs) > 0:
+            # broken round the pit: each run's end toward it follows the circle
+            runs = [(za, pit['z'] - max(hs), 1), (pit['z'] + max(hs), z1, -1)]
         else:
-            spans.append((za, z1))
-        for j, (a, b) in enumerate(spans):
+            runs = [(za, z1, 0)]
+        for j, (a, b, end) in enumerate(runs):
             # boards come in lengths: break each run once at a staggered joint
             if b - a < 0.1:
                 continue
             cut = a + (b - a) * (0.35 + 0.3 * ((i * 5) % 7) / 7)
             for k, (c, d) in enumerate(((a, cut - 0.004), (cut + 0.004, b))):
-                if d - c > 0.05:
-                    B.abox(p, xa, xb, -thick, 0.0, c, d, B.pick(B.PAL['board'], i * 3 + j + k), B.WOOD)
+                if d - c <= 0.05:
+                    continue
+                pit_end = end if (end > 0 and k == 1) or (end < 0 and k == 0) else 0
+                board(xa, xb, c, d, B.pick(B.PAL['board'], i * 3 + j + k), pit_end)
     # the thresholds: the front doorway and the stair arch, dressed stone
     door, arch = B.LAYOUT['door'], B.LAYOUT['arch']
     B.abox(p, door['x'] - door['width'] / 2, door['x'] + door['width'] / 2, -0.3, 0.02, z1, H['z1'],
@@ -368,6 +416,9 @@ def tower_floor_and_stair(B, p, trim):
         for j, (r0, r1) in enumerate(((rn, mid_r), (mid_r, ri + 0.4))):
             sector(B, p, cx, cz, r0 + 0.02, r1 - 0.02, a0 + 0.01, a1 - 0.01, -0.25, 0.0,
                    B.pick(B.PAL['flag'], i + j * 3), B.STONE, subdiv=2)
+    # a mortar bed under the flags: their joints show it, never the ground under the tower
+    sector(B, p, cx, cz, rn - 0.05, ri + 0.4, a_lo, a_hi, -0.4, -0.08, B.PAL['mortar'], B.STONE,
+           subdiv=3)
     # the flight
     steps = STAIR_STEPS
     du = S['climb'] / steps

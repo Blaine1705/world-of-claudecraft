@@ -53,7 +53,10 @@ classic inns were studied for mood and proportion only and never entered the bui
   `tavern_frame.py`, `tavern_shell.py` and `tavern_furnish.py` builds it; `build.mjs` validates,
   fingerprints and compresses it). Vertex-coloured, texture-free, five materials. The warm light
   of the fires and lanterns is baked into the inside's vertex colours (`bake_warm_light`),
-  because the runtime shares its few point lights with the whole world.
+  because the runtime shares its few point lights with the whole world. The floor is whole:
+  every spot a player may stand carries a drawn floor at the walk height, the boards' ends
+  follow the hearth pit's curb and the flagged tower landing lies on a mortar bed, so the ground
+  never shows through (`tests/mirefen_tavern_floor_coverage.test.ts`).
 - **Painter.** `src/render/mirefen_tavern.ts` over the pure core
   `src/render/mirefen_tavern_core.ts`: the walls, roofs, gallery and partitions are separate
   shell parts. Outdoors a part that hides the player ghosts and the chase camera never pulls in.
