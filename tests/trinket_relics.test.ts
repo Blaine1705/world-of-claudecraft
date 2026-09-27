@@ -81,7 +81,8 @@ describe('trinket relic GLB (Blender-authored, texture-free)', () => {
         p.getMaterial()?.getName() ?? '',
         (p.getIndices()?.getCount() ?? 0) / 3,
       ]);
-      for (const p of prims) expect(p.getAttribute('COLOR_0'), node.getName()).toBeTruthy();
+      // RGBA: the glow's program differs from the bolt's RGB one (the bolt's own material).
+      for (const p of prims) expect(p.getAttribute('COLOR_0')?.getElementSize()).toBe(4);
     }
     expect(tris).toEqual({
       KindlingOrb: [
@@ -287,6 +288,21 @@ describe('TrinketRelics painter', () => {
     let after = 0;
     h.scene.traverse(() => after++);
     expect(after).toBe(count);
+  });
+
+  it('draws the bolts with a material no other relic draws', () => {
+    const h = setup([]);
+    const bolts = new Set<THREE.Material>();
+    const others = new Set<THREE.Material>();
+    h.scene.traverse((o) => {
+      const material = (o as THREE.Mesh).material as THREE.Material | undefined;
+      if (material) (o.name === 'kindling-bolt' ? bolts : others).add(material);
+    });
+    expect(bolts.size).toBe(1);
+    for (const material of bolts) expect(others.has(material)).toBe(false);
+    const [bolt] = bolts;
+    const glow = [...others].find((m) => !m.transparent) as THREE.MeshBasicMaterial;
+    expect((bolt as THREE.MeshBasicMaterial).color.getHex()).toBe(glow.color.getHex());
   });
 
   it('shows the orb while the aura lives and takes it away when it goes', () => {

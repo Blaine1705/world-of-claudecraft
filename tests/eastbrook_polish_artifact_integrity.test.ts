@@ -1393,7 +1393,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '00201cf03ba0a8a0ca6c93ba817d42ffff94aa95ed2035cbfe361de800fc08ab';
+  // Re-minted for the trinket relics' readiness family: the renderer leaf moved.
+  // No capture was retaken.
+  'f08863198d894e23805d29f7d1eeeed9b2aa515817a8cf98803e7b7a4e7843c9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1415,7 +1417,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '5ddb792c3802ffe88ab74b1942985c015e2769083a5e20fa88dadb75229ac2cc';
+  // Re-minted for the trinket relics' readiness family: the renderer leaf moved.
+  // No capture was retaken.
+  'd68ceb6cf6bbaee45d10c59668eed7e27516b40db051af0eef0a26efcd465483';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2796,7 +2800,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // provenance. No capture or measured value changed.
       // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('b5008bdc6d79e6ee7754d02533b4e181505d32a60318a2bf4491af6c0cbd3da7');
+      // Re-minted for the trinket relics' readiness family: the renderer leaf
+      // moved. No capture was retaken.
+    ).toBe('2011570870034f3b3ff623c574780fa9a64ae11ac60aea30940b1f86ecfe3d6d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

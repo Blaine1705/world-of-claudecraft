@@ -15,13 +15,16 @@
 //
 // GPU preparation: every mesh this module will ever draw is built at
 // construction into fixed pools (orbs, lanterns, hammers, bolts) that sit
-// hidden in the scene, tagged renderCategory 'vfx'. That tag is the prewarm
-// home: the vfx.ability-primitives boot entry and its resume units link every
-// 'vfx' program in the scene (collectAbilityVfxCompileTargets), and the cast
-// readiness gate waits on those same materials. So nothing here links a
-// program in a live frame, and nothing is added to the scene after boot.
-// Cosmetic draws wait on that gate (`ready`); the lantern light draws on every
-// tier regardless, because it is information a healer acts on.
+// hidden in the scene, tagged renderCategory 'vfx' and cast-VFX family
+// 'relic'. That tag is the prewarm home: the vfx.ability-primitives boot entry
+// and its resume units link every 'vfx' program in the scene
+// (collectAbilityVfxCompileTargets), the relic family's right after the
+// engine's and the kit's, and the relic family's ready bit waits on those same
+// materials. So nothing here links a program in a live frame, and nothing is
+// added to the scene after boot. Cosmetic draws wait on that bit (`ready`); the
+// lantern light draws on every tier regardless, because it is information a
+// healer acts on, so its program is linked earlier, by vfx.cast-first-reads
+// (`lanternLightDrawable`).
 //
 // Particles ride the renderer's pooled Vfx cloud (burst), so embers add no
 // material, mesh or draw call.
@@ -31,6 +34,7 @@ import type { IWorld } from '../world_api';
 import type { AbilityVfxSpellfxEvent } from './ability_vfx/painter';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { tagCastVfxFamily } from './cast_vfx_family';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { surfaceMat } from './gfx';
 import {
@@ -112,7 +116,7 @@ export interface TrinketRelicsHost {
   ground(x: number, z: number): number;
   vfx: RelicParticles;
   time(): number;
-  /** The cast readiness gate: true once every 'vfx' program is linked. */
+  /** True once the relic family's programs are linked (cast_vfx_family.ts). */
   ready(): boolean;
 }
 
@@ -164,7 +168,7 @@ interface WispState {
 
 function tagVfx(root: THREE.Object3D): void {
   root.traverse((child) => {
-    child.userData.renderCategory = 'vfx';
+    tagCastVfxFamily(child, 'relic');
     child.frustumCulled = false;
   });
 }
@@ -227,6 +231,7 @@ export class TrinketRelics {
   private readonly root = new THREE.Group();
   private readonly bodyMat: THREE.Material;
   private readonly glowMat: THREE.MeshBasicMaterial;
+  private readonly boltMat: THREE.MeshBasicMaterial;
   private readonly orbs: OrbSlot[] = [];
   private readonly lanterns: LanternSlot[] = [];
   private readonly hammers: HammerSlot[] = [];
@@ -247,6 +252,9 @@ export class TrinketRelics {
     this.bodyMat = surfaceMat({ vertexColors: true, flatShading: true, roughness: 0.8 });
     this.glowMat = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xffffff });
     this.glowMat.color.multiplyScalar(1.35);
+    // Its own instance: the GLB glow carries vec4 colours and the bolt vec3, two
+    // programs, and the family's ready bit reads one program per material.
+    this.boltMat = this.glowMat.clone();
     const orbTemplate = this.template('KindlingOrb');
     const lanternTemplate = this.template('LastFlameLantern');
     const hammerTemplate = this.template('TemperHammer');
@@ -317,7 +325,7 @@ export class TrinketRelics {
       this.hammers.push({ ...this.pooledPivot(pivot), ownerId: -1, age: 0, struck: false });
     }
     for (let i = 0; i < BOLT_SLOTS; i++) {
-      const mesh = new THREE.Mesh(boltGeometry, this.glowMat);
+      const mesh = new THREE.Mesh(boltGeometry, this.boltMat);
       mesh.name = 'kindling-bolt';
       this.root.add(mesh);
       tagVfx(mesh);
@@ -382,6 +390,13 @@ export class TrinketRelics {
     tagVfx(pivot);
     pivot.visible = false;
     return { pivot };
+  }
+
+  /** The lantern light, drawn with no readiness check: the root the
+   *  vfx.cast-first-reads entry links before the curtain. Every slot shares
+   *  its program. */
+  lanternLightDrawable(): THREE.Object3D {
+    return this.lanterns[0].light;
   }
 
   setQuality(q: number): void {
