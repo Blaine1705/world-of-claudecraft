@@ -347,7 +347,10 @@ describe('the boot warm-up', () => {
 /** The pool each kit door draws into. The storm is fed through the engine's
  *  hold, whose crest is the kit piece. A kit pool the engine builds with no
  *  row here fails the coverage case, so it cannot ship past the refusal and
- *  readiness cases below without a door of its own. */
+ *  readiness cases below without a door of its own. The coverage case finds
+ *  a pool by the kit drawables it holds once constructed, which every kit
+ *  pool builds up front today; a pool that built its meshes only at its first
+ *  spawn would escape it. */
 const KIT_POOL_DOORS: Record<string, string> = {
   crests: 'crest',
   baked: 'baked layer',
@@ -388,16 +391,19 @@ describe('every kit pool checks its own readiness', () => {
 
   for (const [pool, name] of Object.entries(KIT_POOL_DOORS)) {
     it(`reaches the ${pool} pool through the ${name} door once everything is ready`, async () => {
-      const rig = await driveDoor(
-        name,
-        KIT_DOORS_WITH_STORM[name],
-        CAST_VFX_ENGINE | CAST_VFX_KIT,
-        true,
-      );
-      expect(kitDrawablesOf(rig.fx, pool).length).toBeGreaterThan(0);
-      expect((rig.drawing() & CAST_VFX_KIT) !== 0, `${name} draws a kit piece once ready`).toBe(
-        true,
-      );
+      // The positive control of the unprepared and revoked cases below: this
+      // door draws this pool's own drawables, not merely some kit piece.
+      const rig = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
+      await prepareSpawnGateKit(rig.fx);
+      const door = KIT_DOORS_WITH_STORM[name];
+      let drew = false;
+      door(rig.fx);
+      for (let frame = 0; frame < 4; frame++) {
+        if (HELD_DOORS.has(name)) door(rig.fx);
+        rig.fx.update(1 / 30);
+        drew ||= kitDrawablesOf(rig.fx, pool).some(wouldDraw);
+      }
+      expect(drew, `${name} draws the ${pool} pool`).toBe(true);
     });
   }
 
@@ -422,7 +428,11 @@ describe('every kit pool checks its own readiness', () => {
         const rig = engine(CAST_VFX_ENGINE | CAST_VFX_KIT);
         await prepareSpawnGateKit(rig.fx);
         const prepared = { ready: true };
-        prepareCastVfxKit(rig.fx, () => prepared.ready);
+        // The storm's crest is revoked for its own kind only, so a hold that
+        // asked another kind's preparation would keep drawing.
+        prepareCastVfxKit(rig.fx, (kind?: unknown) =>
+          name === 'storm' && kind !== 'steel_storm' ? true : prepared.ready,
+        );
         const door = KIT_DOORS_WITH_STORM[name];
         const drawing = () => kitDrawablesOf(rig.fx, pool).filter(wouldDraw).length;
         for (let frame = 0; frame < 3; frame++) {

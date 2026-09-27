@@ -707,6 +707,36 @@ it('gives up after its bounded retries with one final warning, and schedules not
   }
 });
 
+it('waits five, thirty, then a hundred and twenty seconds between attempts', () => {
+  expect(ACTIVE_KIT_RETRY_DELAYS_MS).toEqual([5_000, 30_000, 120_000]);
+});
+
+it('schedules one retry when two requests joined the attempt that failed', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValue(new Error('driver link failed'));
+    // A local Warrior's entry and a remote sighting both join one attempt.
+    resumeActiveAbilityKit(f.scene);
+    resumeActiveAbilityKit(f.scene, undefined, 'warrior');
+    await settle();
+    expect(vi.getTimerCount()).toBe(1);
+    for (const delay of ACTIVE_KIT_RETRY_DELAYS_MS) {
+      await vi.advanceTimersByTimeAsync(delay);
+      await settle();
+    }
+    expect(f.host.compile).toHaveBeenCalledTimes(1 + ACTIVE_KIT_RETRY_DELAYS_MS.length);
+    expect(warn.mock.calls.filter(([message]) => String(message).includes('gave up'))).toHaveLength(
+      1,
+    );
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
 it('keeps one pending retry however often the kit is asked for meanwhile', async () => {
   vi.useFakeTimers();
   const f = fixture();

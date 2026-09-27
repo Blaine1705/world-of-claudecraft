@@ -115,7 +115,10 @@ export function drawingFamilies(drawables: readonly THREE.Object3D[]): number {
 /** Stubs ready every kit preparation a pool checks before its solid pieces
  *  draw (headless, none of them ever reports ready on its own); `answer`
  *  lets a case take that readiness back. */
-export function prepareCastVfxKit(fx: AbilityVfxFx, answer: () => boolean = () => true): void {
+export function prepareCastVfxKit(
+  fx: AbilityVfxFx,
+  answer: (kind?: unknown) => boolean = () => true,
+): void {
   const pools = fx as unknown as Record<string, { preparation: unknown }>;
   const ready = { ready: answer, units: () => [], dispose: () => {} };
   pools.crests.preparation = ready;
