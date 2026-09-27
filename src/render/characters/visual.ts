@@ -141,7 +141,10 @@ export type { AnimState, BaseState } from './anim_state';
 /** The renderer's live compile gate for a far LOD minted (or re-skinned) after
  *  the view's own creation gate ran: compile `target` hidden, off-thread, and
  *  call `settle` (a lazy `ready` proof) once the gate settles, or immediately
- *  and with no proof when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
+ *  and with no proof when async compile is unsupported. Each consumer reads a
+ *  missing proof its own way: the effect swap commits (nothing to wait for),
+ *  the sanguine sheath, an optional upgrade, does not mount. Mirrors
+ *  `gateSwapFlagOnCompile`. */
 export type FarBakeGate = (target: THREE.Object3D, settle: (ready?: () => boolean) => void) => void;
 
 /** Gate passes an effect swap may take before it gives up until the next
@@ -2482,8 +2485,9 @@ export class CharacterVisual {
    * not known linked yet. Transparency and the marked surface-response shader
    * qualify. The other overlays (ferocity, ascension, rune tint, aura glow) keep the source's
    * program cache key through cloneMaterialWithHooks, so it costs no link and
-   * must not be delayed. Empty without a gate, which keeps previews, tests and
-   * hosts with no async compile on the immediate path.
+   * must not be delayed. Empty without a gate, which keeps previews and tests
+   * on the immediate path; a host with no async compile stages too, and its
+   * proofless settle commits at the next update().
    */
   private collectUnlinkedEffectMaterials(): {
     source: THREE.Mesh;

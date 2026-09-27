@@ -983,7 +983,7 @@ describe('the far-bake compile gate handed to character visuals', () => {
     // thunk instead of an eagerly computed boolean, so a crowd bake whose
     // settle callback ignores it never pays compileTargetPrepared's target
     // traverse; a host without parallel compile hands no proof at all
-    // (compileProof, pinned below).
+    // (compileProof, pinned in tests/sanguine_weapon_sheath.test.ts).
     expect(rendererSource).toContain(
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
         '    this.farBakeLane.enqueue(\n' +

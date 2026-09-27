@@ -440,7 +440,11 @@ describe('a transparent character effect swaps in only once its programs are lin
     visual.setGhost(true);
     expect(gateCalls).toHaveLength(4);
     expect(rigMaterials(visual)).toEqual(opaque);
-    gateCalls[3].settle(() => true);
+    // ...with a fresh pass budget of its own.
+    gateCalls[3].settle(() => false);
+    gateCalls[4].settle(() => false);
+    expect(gateCalls).toHaveLength(6);
+    gateCalls[5].settle(() => true);
     visual.update(FRAME, anim(), true);
     expect(rigIsTranslucent(visual)).toBe(true);
     visual.dispose();
@@ -502,11 +506,37 @@ describe('a transparent character effect swaps in only once its programs are lin
     visual.update(FRAME, anim(), true);
     expect(rigMaterials(visual)).toEqual(opaque);
 
+    // Superseded during a re-armed pass: the same rule holds.
+    gateCalls[1].settle(() => false);
+    expect(gateCalls).toHaveLength(3);
+    visual.setMoonkin(false);
+    expect(gateCalls).toHaveLength(4);
+    const rearmedProof = vi.fn(() => false);
+    gateCalls[2].settle(rearmedProof);
+    expect(rearmedProof).not.toHaveBeenCalled();
+    expect(gateCalls).toHaveLength(4);
+    expect(scratchOf(visual)).toBe(gateCalls[3].target);
+
     visual.dispose();
     const lateProof = vi.fn(() => false);
-    expect(() => gateCalls[1].settle(lateProof)).not.toThrow();
+    expect(() => gateCalls[3].settle(lateProof)).not.toThrow();
     expect(lateProof).not.toHaveBeenCalled();
-    expect(gateCalls).toHaveLength(2);
+    expect(gateCalls).toHaveLength(4);
+  });
+
+  it('never reads the proof of a swap staged after dispose', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    visual.dispose();
+    // A late effect toggle on a torn-down visual still stages, and its scratch
+    // is the current one, so only the disposed check keeps it off the lane.
+    visual.setGhost(true);
+    expect(gateCalls).toHaveLength(1);
+    const proof = vi.fn(() => false);
+    gateCalls[0].settle(proof);
+    expect(proof).not.toHaveBeenCalled();
+    expect(gateCalls).toHaveLength(1);
   });
 
   it('drops a swap still in flight on dispose without disposing the live clones', async () => {

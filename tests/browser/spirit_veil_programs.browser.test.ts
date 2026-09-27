@@ -55,8 +55,10 @@ import {
 } from '../../src/render/characters/spirit_veil_palette_core';
 import { buildStubbleDecal } from '../../src/render/characters/stubble';
 import { CharacterVisual, type FarBakeGate } from '../../src/render/characters/visual';
-import type { CompileArmHost } from '../../src/render/compile_arms';
+import { type CompileArmHost, linkColorPrograms } from '../../src/render/compile_arms';
+import { compileTargetPrepared } from '../../src/render/compile_target_readiness';
 import { gfxInternalsForTest } from '../../src/render/gfx';
+import { settleProgramVariants } from '../../src/render/program_variant_settle';
 import { spiritVeilFamilyPrewarmEntry } from '../../src/render/spirit_veil_prewarm';
 
 const SIZE = 96;
@@ -1068,7 +1070,7 @@ describe('an unproven effect swap on a real CharacterVisual', () => {
       w.camera.lookAt(0, 1, 0);
       const look = {
         app: normalizeAppearance({ ...DEFAULT_APPEARANCE, gender: 'male' }),
-        worn: fullSet('warrior'),
+        worn: fullSet('knight'),
       };
       const visual = new CharacterVisual(
         'player_warrior_modular',
@@ -1123,6 +1125,82 @@ describe('an unproven effect swap on a real CharacterVisual', () => {
       w.draw();
       expect(responding()).toBeGreaterThan(0);
       expect(w.programs()).toBeGreaterThan(before);
+    } finally {
+      restoreGfx();
+    }
+  });
+
+  it('reads the proof true once the scratch set really linked, and then commits with no live link', async () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
+    try {
+      const w = world(false);
+      w.camera.position.set(0, 1, 4);
+      w.camera.lookAt(0, 1, 0);
+      const look = {
+        app: normalizeAppearance({ ...DEFAULT_APPEARANCE, gender: 'male', beard: 'stubble' }),
+        worn: fullSet('knight'),
+      };
+      const visual = new CharacterVisual(
+        'player_warrior_modular',
+        0xffffff,
+        0,
+        null,
+        null,
+        null,
+        look,
+      );
+      disposers.push(() => visual.dispose());
+      const calls: { target: THREE.Object3D; settle: Parameters<FarBakeGate>[1] }[] = [];
+      visual.setFarBakeGate((target, settle) => calls.push({ target, settle }));
+      visual.update(1 / 60, IDLE, true);
+      w.scene.add(visual.root);
+      w.draw();
+      w.draw();
+      // The gate's own link primitives over the staged scratch set: the colour
+      // arm's compileAsync, then the variant settle that records each program
+      // the driver reports linked. What the proof then reads is what the real
+      // gate leaves behind.
+      const prepare = async (scratch: THREE.Object3D): Promise<boolean> => {
+        await linkColorPrograms(w.arms, scratch, false);
+        const materials: THREE.Material[] = [];
+        scratch.traverse((object) => {
+          const mesh = object as THREE.Mesh;
+          if (mesh.isMesh) materials.push(...[mesh.material].flat());
+        });
+        const settled = await settleProgramVariants(w.renderer.properties, materials, {
+          fired: false,
+        });
+        expect(settled.settled).toBe(true);
+        return compileTargetPrepared(w.renderer.properties, scratch);
+      };
+      // Two users of the swap: a veil miss (this leg never links the family,
+      // so every veil tuple is one) and the hit surface response.
+      for (const trigger of ['veil', 'surface'] as const) {
+        const index = calls.length;
+        if (trigger === 'veil') visual.setGhost(true, 'spirit');
+        else visual.respondToElement('fire', 0.9);
+        expect(calls, trigger).toHaveLength(index + 1);
+        const scratch = calls[index].target;
+        expect(scratch.children.length, trigger).toBeGreaterThan(0);
+        expect(compileTargetPrepared(w.renderer.properties, scratch), trigger).toBe(false);
+        expect(await prepare(scratch), trigger).toBe(true);
+        const linked = w.programs();
+        calls[index].settle(() => compileTargetPrepared(w.renderer.properties, scratch));
+        visual.update(1 / 60, IDLE, true);
+        expect(calls, trigger).toHaveLength(index + 1);
+        w.draw();
+        w.draw();
+        expect(w.programs(), trigger).toBe(linked);
+        if (trigger === 'veil') visual.setGhost(false);
+      }
+      let responding = 0;
+      visual.root.traverse((object) => {
+        const mesh = object as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.visible) return;
+        for (const m of [mesh.material].flat())
+          if (m.customProgramCacheKey().endsWith(':surface-response-v4')) responding++;
+      });
+      expect(responding).toBeGreaterThan(0);
     } finally {
       restoreGfx();
     }
