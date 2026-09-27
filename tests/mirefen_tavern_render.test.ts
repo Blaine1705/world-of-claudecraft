@@ -7,8 +7,10 @@ import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
 import {
+  activeCameraInterior,
   clampChaseCameraToInterior,
   interiorCameraInternalsForTest,
+  interiorLensInAir,
 } from '../src/render/interior_camera';
 import {
   buildMirefenTavern,
@@ -231,6 +233,57 @@ describe('mirefen tavern painter', () => {
       true,
     );
     step(eye(0, 12.8), at(0, 5, 18), 240);
+    expect(part('HallWallFront').alpha).toBe(1);
+  });
+
+  it('ghosts the front wall while the lens still follows through the doorway, then holds it', () => {
+    withTier('high');
+    buildMirefenTavern();
+    const cam = new PerspectiveCamera(70, 16 / 9, 0.2, 950);
+    // just over the sill walking in, the camera still out behind on the road: the eye is
+    // indoors, but the clamp blends in over the first strides, so the lens is not yet in
+    // the air and the shell cuts away on the sight line as it does for a camera outside
+    const sill = at(0, 0, 12.8);
+    const road = at(0, 5.8, 24);
+    cam.position.set(road.x, road.y, road.z);
+    clampChaseCameraToInterior(
+      cam,
+      new Vector3(sill.x, sill.y + 2, sill.z),
+      new Vector3(sill.x, sill.y, sill.z),
+      1 / 60,
+      false,
+    );
+    expect(activeCameraInterior()?.id).toBe('mirefen_tavern');
+    expect(interiorLensInAir()).toBe(false);
+    const lens = cam.position.clone();
+    step(eye(0, 12.8), lens, 240);
+    expect(part('HallWallFront').alpha).toBe(OCCLUDER_FADE_ALPHA);
+    // walked a few strides in (a walk, never a teleport), the lens has settled in the air:
+    // the outer shell holds again
+    let hall = sill;
+    for (let lz = 12.8; lz > 6; lz -= 0.12) {
+      hall = at(0, 0, lz);
+      cam.position.set(hall.x + 11.4, hall.y + 5.8, hall.z);
+      clampChaseCameraToInterior(
+        cam,
+        new Vector3(hall.x, hall.y + 2, hall.z),
+        new Vector3(hall.x, hall.y, hall.z),
+        1 / 60,
+        false,
+      );
+    }
+    for (let i = 0; i < 60; i++) {
+      cam.position.set(hall.x + 11.4, hall.y + 5.8, hall.z);
+      clampChaseCameraToInterior(
+        cam,
+        new Vector3(hall.x, hall.y + 2, hall.z),
+        new Vector3(hall.x, hall.y, hall.z),
+        1 / 60,
+        false,
+      );
+    }
+    expect(interiorLensInAir()).toBe(true);
+    step(eye(0, 6.08), cam.position.clone(), 240);
     expect(part('HallWallFront').alpha).toBe(1);
   });
 

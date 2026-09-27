@@ -48,6 +48,7 @@ import { GFX } from './gfx';
 import {
   activeCameraInterior,
   interiorCameraRunning,
+  interiorLensInAir,
   registerCameraInterior,
   unregisterCameraInterior,
 } from './interior_camera';
@@ -389,10 +390,11 @@ export function updateMirefenTavernShell(
   if (far) return;
   // warm the fade twins once the camera comes within reach of the tavern
   prefetchOccluderFadeWithin(allMats, ANCHOR.x, ANCHOR.z, camX, camZ);
-  // indoors is the camera clamp's verdict (the avatar's eye), so the shell never ghosts or
-  // holds apart from where the clamp keeps the camera
+  // indoors is the camera clamp's verdict (the avatar's eye, and the lens in the air), so the
+  // shell never ghosts or holds apart from where the clamp keeps the camera; a lens still
+  // following through the doorway (or gliding in past a wall) takes the outdoor cutaway
   const indoors = interiorCameraRunning()
-    ? activeCameraInterior()?.id === TAVERN_CAMERA_INTERIOR.id
+    ? activeCameraInterior()?.id === TAVERN_CAMERA_INTERIOR.id && interiorLensInAir()
     : undefined;
   tavernShellOcclusion(eyeX, eyeY, eyeZ, camX, camY, camZ, state, indoors);
   for (let i = 0; i < shell.length; i++) {

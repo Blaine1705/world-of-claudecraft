@@ -11,7 +11,9 @@
 // This is the ONE sanctioned exception to the pinned rule that scene geometry never changes
 // the chase camera's distance (tests/graphics_overhaul_integration.test.ts): outdoors nothing
 // here runs (no interior holds the eye), and the player's requested distance is never
-// written; only the drawn camera is pulled in, and it eases back out when the view clears.
+// written; only the drawn camera is pulled in, gliding both ways (stepInteriorBoom), and the
+// clamp blends in over the first yards past a front door (interiorEntryWeight), so walking in
+// the camera settles into the room rather than snapping in behind the head.
 //
 // The same walk answers the nameplate question for a player indoors: a plate outside the
 // interior shows only when the camera's sight line to it leaves the air through an OPENING
@@ -278,43 +280,179 @@ export function interiorCameraPadding(near: number, fovDeg: number, aspect: numb
   return Math.hypot(near, h, h * aspect) + 0.08;
 }
 
-/** The boom's release rate (1/s) when the view clears: about a third of a second. */
-export const INTERIOR_BOOM_RELEASE_RATE = 10;
+// ---------------------------------------------------------------------------
+// The boom's glide: both ways, never a snap
+// ---------------------------------------------------------------------------
+
+/** The drawn boom's length and its rate of change (yards, yards a second): the spring the
+ *  clamp glides the camera on, with the allowed boom it last glided toward and how far that
+ *  fell in the frame before (yards). */
+export interface InteriorBoomSpring {
+  dist: number;
+  vel: number;
+  target: number;
+  drop: number;
+}
+
+/** The smooth time (seconds) of a pull-in: quick, so a lens drawn past a wall is back in the
+ *  air within a few frames (the building's cutaway covers those frames, see
+ *  interior_camera.ts), and short enough that a boom shrinking at a walk's pace lags it by
+ *  less than the near-plane pad (the lens stays in the room), yet never a one-frame jump. */
+export const INTERIOR_BOOM_PULL_IN_SEC = 0.04;
+/** The smooth time (seconds) of a release: the camera drifts back out as the view clears. */
+export const INTERIOR_BOOM_RELEASE_SEC = 0.25;
+/** However far the allowed boom jumps in, the drawn one never lags more than this (yards)
+ *  past it: a camera swung hard into a wall comes most of the way at once and glides the
+ *  rest, so what shows beyond the wall is a sliver for a moment, not a view. */
+export const INTERIOR_BOOM_MAX_LAG = 1.0;
+/** A fall of the allowed boom this large (yards) in one frame, and three times the frame
+ *  before's, is a jump (the ray swung past a corner or a doorway's edge): only a jump lets
+ *  the glide lag past the near-plane pad. A boom that shrinks steadily, however fast (a turn
+ *  toward a wall, a walk backward), is followed within the pad: the lens stays in the room. */
+export const INTERIOR_BOOM_JUMP = 0.5;
+/** After a jump the lag past the allowed boom shrinks at least this fast (yards a second),
+ *  so the lens is back within the pad a few frames later (the shell's cutaway covers them). */
+export const INTERIOR_BOOM_LAG_DECAY = 15;
+/** The release's top speed (yards a second): a long clear view opens as a glide. */
+export const INTERIOR_BOOM_RELEASE_MAX_SPEED = 40;
 
 /**
- * The drawn boom length this frame: a pull-in is immediate (the lens never crosses a wall
- * for a frame), a release eases out at INTERIOR_BOOM_RELEASE_RATE, so turning away from a
- * wall glides back rather than jumps. `immediate` adopts the allowed length outright (a
- * teleport, reduced motion, the first frame indoors).
+ * Glide the drawn boom toward the `allowed` length this frame, critically damped (the
+ * classic smooth-damp: no overshoot of a still target, no velocity jump when it starts),
+ * with the quick pull-in time when the target lies inside the drawn boom and the gentle
+ * release time when it lies outside. A pull-in lags the allowed boom by at most `pad` (the
+ * lens stays in the room) unless the allowed boom jumped in (INTERIOR_BOOM_JUMP): then by at
+ * most INTERIOR_BOOM_MAX_LAG, the lag shrinking at INTERIOR_BOOM_LAG_DECAY or faster. `immediate` adopts the allowed length outright (a teleport,
+ * reduced motion). Writes the spring in place and returns the drawn length.
  */
 export function stepInteriorBoom(
-  previous: number,
+  s: InteriorBoomSpring,
   allowed: number,
   dt: number,
   immediate: boolean,
+  pad = 0,
 ): number {
-  if (immediate || allowed <= previous) return allowed;
-  return (
-    previous + (allowed - previous) * (1 - Math.exp(-INTERIOR_BOOM_RELEASE_RATE * Math.max(0, dt)))
-  );
+  const step = Math.max(0, dt);
+  const drop = s.target - allowed;
+  const jumped = drop > INTERIOR_BOOM_JUMP && drop > 3 * s.drop;
+  const lagBefore = s.dist - s.target;
+  s.target = allowed;
+  s.drop = Math.max(0, drop);
+  if (immediate || !Number.isFinite(s.dist)) {
+    s.dist = allowed;
+    s.vel = 0;
+    return allowed;
+  }
+  const pullIn = allowed < s.dist;
+  // a glide that turns about starts from rest: the pull-in's speed never carries into a
+  // release (a dip under the target), nor a release's into a pull-in
+  if (pullIn ? s.vel > 0 : s.vel < 0) s.vel = 0;
+  const smooth = pullIn ? INTERIOR_BOOM_PULL_IN_SEC : INTERIOR_BOOM_RELEASE_SEC;
+  const omega = 2 / smooth;
+  const x = omega * step;
+  const decay = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+  let change = s.dist - allowed;
+  if (!pullIn) {
+    // the release's top speed: the gap it may close is capped (a pull-in never is)
+    const cap = INTERIOR_BOOM_RELEASE_MAX_SPEED * smooth;
+    change = Math.max(-cap, Math.min(cap, change));
+  }
+  const target = s.dist - change;
+  const temp = (s.vel + omega * change) * step;
+  let vel = (s.vel - omega * temp) * decay;
+  let dist = target + (change + temp) * decay;
+  // never past a still target (the smooth-damp's own guard)
+  if (allowed - s.dist > 0 === dist > allowed) {
+    dist = allowed;
+    vel = 0;
+  }
+  // a pull-in lags the wall by at most the pad; a jump may lag up to the cap, the lag then
+  // only shrinking, at least at the decay rate, back within the pad
+  const cap = jumped
+    ? INTERIOR_BOOM_MAX_LAG
+    : Math.max(pad, Math.min(INTERIOR_BOOM_MAX_LAG, lagBefore) - INTERIOR_BOOM_LAG_DECAY * step);
+  if (dist > allowed + cap) {
+    dist = allowed + cap;
+    vel = Math.min(vel, 0);
+  }
+  s.dist = Math.max(0, dist);
+  s.vel = vel;
+  return s.dist;
+}
+
+// ---------------------------------------------------------------------------
+// The threshold: the clamp blends in over the first yards inside a door
+// ---------------------------------------------------------------------------
+
+/** Over this many yards in from an opening's outside face the clamp blends in, from none at
+ *  the door to whole: walking in, the camera follows through the doorway and settles into
+ *  the room over a few strides, never snapping in behind the head at the threshold. */
+export const INTERIOR_ENTRY_BLEND = 6;
+/** However slowly the player comes in (or if they stop on the threshold), the clamp is whole
+ *  this long (seconds) after the eye stepped inside: the lens never lingers outside. */
+export const INTERIOR_ENTRY_SETTLE_SEC = 0.8;
+
+/** The clamp's engagement from the time since the eye stepped inside: 0 at once, rising
+ *  smoothly (smoothstep) to 1 at INTERIOR_ENTRY_SETTLE_SEC. The driver takes the larger of
+ *  this and interiorEntryWeight. */
+export function interiorEntrySettle(sec: number): number {
+  const t = Math.min(1, Math.max(0, sec / INTERIOR_ENTRY_SETTLE_SEC));
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * How engaged the clamp is for an eye at (x, y, z): 0 on an opening's outside face, rising
+ * smoothly (smoothstep) to 1 at INTERIOR_ENTRY_BLEND yards from every opening's face
+ * rectangle; 1 in an interior with no openings.
+ */
+export function interiorEntryWeight(vol: CameraInterior, x: number, y: number, z: number) {
+  let nearest = Infinity;
+  for (const o of vol.openings) {
+    const b = vol.boxes[o.box];
+    let d2 = 0;
+    for (let axis = 0; axis < 3; axis++) {
+      const v = axis === 0 ? x : axis === 1 ? y : z;
+      const lo = b[axis * 2];
+      const hi = b[axis * 2 + 1];
+      let d: number;
+      if (axis === o.axis) d = v - (o.side > 0 ? hi : lo);
+      else d = v < lo ? lo - v : v > hi ? v - hi : 0;
+      d2 += d * d;
+    }
+    if (d2 < nearest) nearest = d2;
+  }
+  if (nearest === Infinity) return 1;
+  const t = Math.min(1, Math.sqrt(nearest) / INTERIOR_ENTRY_BLEND);
+  return t * t * (3 - 2 * t);
 }
 
 /** Longest a release after walking out may take (seconds): then the camera is free. */
-export const INTERIOR_RELEASE_MAX_SEC = 1;
+export const INTERIOR_RELEASE_MAX_SEC = 1.5;
 
 // ---------------------------------------------------------------------------
-// Framing a cramped spot: lift over it, or swing round it
+// Framing a cramped spot: slide under a low ceiling, lift over a wall, or swing round it
 // ---------------------------------------------------------------------------
 
 /** A boom shorter than this (yards) is cramped (a player on the spiral stair against the
  *  tower's wall, backed into a guest room's corner): the drawn camera looks for a better
- *  framing nearby rather than sitting in the player's head. */
-export const INTERIOR_COMFORT_BOOM = 2.8;
+ *  framing nearby, over or round what cramps it, rather than sitting in the player's head. */
+export const INTERIOR_COMFORT_BOOM = 3.5;
 /** The camera never lifts past this elevation: it looks down on the player, never straight
  *  down. */
 export const INTERIOR_LIFT_MAX_PITCH = 1.2;
+/** Under a low ceiling (a gallery, a guest room under its tie beams) the camera flattens its
+ *  elevation to keep its distance, never below this (it still looks a touch down). */
+export const INTERIOR_DROP_MIN_PITCH = 0.05;
+/** The flattenings tried under a ceiling, least first (radians of elevation taken off). */
+export const INTERIOR_DROPS: readonly number[] = [0.1, 0.2, 0.3, 0.45, 0.6];
+/** A flattening is taken only for a boom this much longer (yards), so a small gain never
+ *  turns the view. */
+const DROP_GAIN = 1;
 /** How fast a framing (lift and swing) glides in and settles back (1/s). */
 export const INTERIOR_LIFT_RATE = 5;
+/** However far a framing turns the camera, the lens sweeps no faster than this (yards a
+ *  second) round the look point: a long boom turns slowly, a short one quickly. */
+export const INTERIOR_FRAMING_MAX_SPEED = 10;
 
 /** A framing tried for a cramped boom: `lift` radians more elevation, `swing` radians of
  *  yaw round the look point (either side). */
@@ -323,23 +461,30 @@ export interface InteriorFraming {
   swing: number;
 }
 
-/** The framings tried, least departure from the requested view first: a lift alone (the
- *  camera rises over what cramps it, the heading kept), then a swing along the wall, then a
- *  swing with a lift. The first to give a comfortable boom wins, else the longest. */
+/** The framings tried for a cramped boom, least departure from the requested view first: a
+ *  lift or a flattening alone (the camera rises over what cramps it, or slides under it, the
+ *  heading kept), then a swing along the wall, alone or with either. The first to give a
+ *  comfortable boom wins, else the longest. A negative lift flattens. */
 export const INTERIOR_FRAMINGS: readonly InteriorFraming[] = [
   { lift: 0.3, swing: 0 },
+  { lift: -0.3, swing: 0 },
   { lift: 0.6, swing: 0 },
   { lift: 0.9, swing: 0 },
+  { lift: 1.2, swing: 0 },
   { lift: 0, swing: 0.5 },
   { lift: 0.3, swing: 0.5 },
+  { lift: -0.3, swing: 0.5 },
   { lift: 0, swing: 1.0 },
   { lift: 0.4, swing: 1.0 },
+  { lift: -0.3, swing: 1.0 },
   { lift: 0, swing: 1.5 },
   { lift: 0.4, swing: 1.5 },
+  { lift: -0.3, swing: 1.5 },
 ];
 
 /** The boom (dx, dy, dz) swung `swing` radians round the vertical, then turned `lift` radians
- *  further up toward the vertical (never past INTERIOR_LIFT_MAX_PITCH, never lowered), its
+ *  further up toward the vertical (never past INTERIOR_LIFT_MAX_PITCH), or for a negative
+ *  lift flattened toward the level (never under INTERIOR_DROP_MIN_PITCH, never raised), its
  *  length kept, written to `out`. */
 export function frameBoomInto<T extends { x: number; y: number; z: number }>(
   out: T,
@@ -359,8 +504,11 @@ export function frameBoomInto<T extends { x: number; y: number; z: number }>(
   const h = Math.hypot(dx, dz);
   const len = Math.hypot(h, dy);
   const e0 = Math.atan2(dy, h);
-  const e = Math.max(e0, Math.min(e0 + lift, INTERIOR_LIFT_MAX_PITCH));
-  if (lift <= 0 || len < 1e-9 || h < 1e-9 || e === e0) {
+  const e =
+    lift >= 0
+      ? Math.max(e0, Math.min(e0 + lift, INTERIOR_LIFT_MAX_PITCH))
+      : Math.min(e0, Math.max(e0 + lift, INTERIOR_DROP_MIN_PITCH));
+  if (lift === 0 || len < 1e-9 || h < 1e-9 || e === e0) {
     out.x = dx;
     out.y = dy;
     out.z = dz;
@@ -373,15 +521,20 @@ export function frameBoomInto<T extends { x: number; y: number; z: number }>(
   return out;
 }
 
-/** A framing value this frame, eased toward `target` (adopted outright when `immediate`). */
+/** A framing value this frame, eased toward `target` (adopted outright when `immediate`), its
+ *  turn capped so a lens `boom` yards out sweeps no faster than INTERIOR_FRAMING_MAX_SPEED. */
 export function stepInteriorFraming(
   previous: number,
   target: number,
   dt: number,
   immediate: boolean,
+  boom = 0,
 ): number {
   if (immediate) return target;
-  return previous + (target - previous) * (1 - Math.exp(-INTERIOR_LIFT_RATE * Math.max(0, dt)));
+  const step = Math.max(0, dt);
+  const eased = (target - previous) * (1 - Math.exp(-INTERIOR_LIFT_RATE * step));
+  const most = (INTERIOR_FRAMING_MAX_SPEED / Math.max(1, boom)) * step;
+  return previous + Math.max(-most, Math.min(most, eased));
 }
 
 const frameScratch = { x: 0, y: 0, z: 0 };
@@ -390,11 +543,14 @@ const frameScratch = { x: 0, y: 0, z: 0 };
 export const interiorFramingChoice = { lift: 0, swing: 0, boom: 0 };
 
 /**
- * Choose how to frame a boom from (sx, sy, sz) along (dx, dy, dz) inside `vol`: none when the
- * requested boom is comfortable (or shorter than comfort anyway), else the first framing of
- * INTERIOR_FRAMINGS that gives a comfortable boom, trying first the side the camera already
- * swings to (`side`, so it never flips about a corner), else the longest. Written to
- * interiorFramingChoice (lift, swing, and the boom it allows).
+ * Choose how to frame a boom from (sx, sy, sz) along (dx, dy, dz) inside `vol`. A boom cut
+ * short by a low ceiling first flattens (the least of INTERIOR_DROPS that gives the whole
+ * boom, else the longest, taken only for a real gain): the camera slides under the ceiling
+ * rather than pulling in. Then none when that boom is comfortable (or the requested one is
+ * shorter than comfort anyway), else the first framing of INTERIOR_FRAMINGS that gives a
+ * comfortable boom, trying first the side the camera already swings to (`side`, so it never
+ * flips about a corner), else the longest. Written to interiorFramingChoice (lift, swing, and
+ * the boom it allows).
  */
 export function chooseInteriorFraming(
   vol: CameraInterior,
@@ -412,6 +568,21 @@ export function chooseInteriorFraming(
   out.lift = 0;
   out.swing = 0;
   out.boom = len * interiorSegmentFraction(vol, sx, sy, sz, sx + dx, sy + dy, sz + dz, pad);
+  // under a low ceiling: flatten to keep the distance (the exit is the air's top face)
+  if (out.boom < len - 0.05 && interiorExit.axis === 1 && interiorExit.side === 1) {
+    const raw = out.boom;
+    for (const drop of INTERIOR_DROPS) {
+      const d = frameBoomInto(frameScratch, dx, dy, dz, -drop, 0);
+      if (d.x === dx && d.y === dy && d.z === dz) break; // already as flat as it goes
+      const boom =
+        len * interiorSegmentFraction(vol, sx, sy, sz, sx + d.x, sy + d.y, sz + d.z, pad);
+      if (boom > out.boom + 0.05 && boom >= raw + DROP_GAIN) {
+        out.lift = -drop;
+        out.boom = boom;
+      }
+      if (boom >= len - 0.05) break;
+    }
+  }
   if (out.boom >= INTERIOR_COMFORT_BOOM - 1e-9 || len <= INTERIOR_COMFORT_BOOM) return out;
   const first = side < 0 ? -1 : 1;
   let best = out.boom;

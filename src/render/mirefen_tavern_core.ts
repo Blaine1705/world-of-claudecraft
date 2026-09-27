@@ -395,5 +395,13 @@ export function tavernShellOcclusion(
   out.occluded[WING_ROOF] = wingRoof;
   out.occluded[TOWER_WALL] = towerWall;
   out.occluded[TOWER_ROOF] = towerRoof;
+  // the newel cuts on the same sampled sight line as indoors, so a lens that leaves the
+  // tower's air for a moment (the indoor clamp's glide) never flickers it back in
+  let newel = inNewel(bx, by, bz);
+  for (let s = 1; s < SAMPLES && !newel; s++) {
+    const t = s / SAMPLES;
+    newel = inNewel(ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t);
+  }
+  out.occluded[TOWER_NEWEL] = newel;
   return out;
 }

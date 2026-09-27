@@ -3,24 +3,31 @@
 //
 // A building registers its air when it is built (registerCameraInterior) and drops it when
 // torn down. Each frame, when the player's eye stands in a registered interior, the drawn
-// camera is pulled in along the chase ray to stay in that air (a pull-in lands the same
-// frame, a release eases out), and the look point is brought back to the eye when the
-// lagged pivot would sit across a wall. Where the ray is cramped (a player against the stair
-// tower's wall, backed into a room's corner), the camera glides to the nearest comfortable
-// framing, up over the obstruction or round it along the wall, rather than sitting in the
-// player's head, and glides back as the view clears. Walking out releases the last shortened boom over at
-// most INTERIOR_RELEASE_MAX_SEC; outdoors with no release pending nothing here touches the
-// camera. The requested yaw, pitch and distance stay owned by the camera stack: only the
-// drawn position moves (the pinned exception in tests/graphics_overhaul_integration.test.ts).
+// camera is pulled in along the chase ray to stay in that air, gliding both ways on a
+// critically damped spring (a quick pull-in that never lags a wall by more than
+// INTERIOR_BOOM_MAX_LAG, a gentle release), and the look point is brought back to the eye
+// when the lagged pivot would sit across a wall. Over the first yards past a front door the
+// clamp blends in (interiorEntryWeight): walking in, the camera follows through the doorway
+// and settles into the room over a few strides. While the lens stands outside the air (that
+// threshold, or a pull-in's last frames) interiorLensInAir says so, and the building cuts
+// its shell away on the sight line as it does for a camera outdoors. Where the ray is
+// cramped (a player against the stair tower's wall, backed into a room's corner), the camera
+// glides to the nearest comfortable framing, up over the obstruction or round it along the
+// wall, rather than sitting in the player's head, and glides back as the view clears.
+// Walking out releases the last shortened boom over at most INTERIOR_RELEASE_MAX_SEC;
+// outdoors with no release pending nothing here touches the camera. The requested yaw,
+// pitch and distance stay owned by the camera stack: only the drawn position moves (the
+// pinned exception in tests/graphics_overhaul_integration.test.ts).
 //
 // Draw-time shake (the Fiesta trauma jitter and the warrior's impact kick) is applied after
 // updateCamera, so the renderer re-checks the shaken pose just before the draw
 // (constrainInteriorCameraDraw) and puts the unclamped shaken pose back after it
 // (restoreInteriorCameraDraw), so the shake's own subtraction undoes exactly its offset.
 //
-// A corner no framing escapes (the camera within SELF_HIDE_BOOM of the eye) cuts to the
-// player's eyes, looking out the way the requested camera looks, and hides the player's own
-// body for the frame (hideSelfInCloseCamera), the classic MMO first-person cut.
+// A dead-end corner no framing escapes (the camera within SELF_HIDE_BOOM of the eye, a last
+// resort the comfortable framings make rare) cuts to the player's eyes, looking out the way
+// the requested camera looks, and hides the player's own body for the frame
+// (hideSelfInCloseCamera), the classic MMO first-person cut.
 //
 // Nameplates: while the player is indoors, a plate on a body outside the interior draws
 // only when the camera sees it through an opening (interiorHidesNameplate, the nameplate
@@ -35,8 +42,11 @@ import {
   chooseInteriorFraming,
   frameBoomInto,
   INTERIOR_RELEASE_MAX_SEC,
+  type InteriorBoomSpring,
   interiorCameraPadding,
   interiorContains,
+  interiorEntrySettle,
+  interiorEntryWeight,
   interiorHoldsEye,
   interiorSeesOut,
   interiorSegmentFraction,
@@ -51,8 +61,8 @@ const BODY_OVER_FEET = 1.0;
 /** Closer than this to the look point after every framing (a corner no framing escapes),
  *  the camera cuts to the player's eyes and the player's own body hides; it draws back out
  *  past SELF_SHOW_BOOM (hysteresis: no flicker at the edge). */
-export const SELF_HIDE_BOOM = 1.5;
-export const SELF_SHOW_BOOM = 1.8;
+export const SELF_HIDE_BOOM = 1.2;
+export const SELF_SHOW_BOOM = 1.6;
 /** In the cut to the eyes, the aim point stands this far ahead of the eye. */
 const FIRST_PERSON_AIM = 4;
 /** Farther than this from the pose updateCamera left, the drawn camera is not the chase
@@ -79,14 +89,19 @@ export function unregisterCameraInterior(id: string): void {
 const state = {
   /** The interior the player's eye stands in this frame. */
   active: null as CameraInterior | null,
-  /** The drawn boom length along the chase ray, from `start`. */
-  dist: 0,
+  /** The drawn boom along the chase ray from `start`: its length and its glide. */
+  boom: { dist: 0, vel: 0, target: 0, drop: 0 } as InteriorBoomSpring,
+  /** The drawn lens stands in the air (false while it follows through a doorway, or for a
+   *  pull-in's last frames past a wall: the building's cutaway covers those). */
+  lensInside: false,
   /** The eased framing of a cramped spot: the lift (radians over the requested elevation)
    *  and the swing (radians of yaw round the look point). */
   lift: 0,
   swing: 0,
   /** Seconds of release left after walking out (0: free). */
   release: 0,
+  /** Seconds since the eye stepped inside (the threshold blend's clock). */
+  inside: 0,
   /** The camera has cut to the player's eyes (a corner no framing escapes). */
   firstPerson: false,
   pad: 0.3,
@@ -140,18 +155,27 @@ export function clampChaseCameraToInterior(
   state.active = vol;
   if (!vol) {
     state.firstPerson = false;
+    state.lensInside = false;
     // walked out: ease the last shortened boom back to the requested one, briefly
     if (was) state.release = INTERIOR_RELEASE_MAX_SEC;
     if (reducedMotion || teleported) state.release = 0;
-    if (state.release <= 0) return;
+    state.inside = 0;
+    if (state.release <= 0) {
+      // free: no framing left over for the next walk in
+      state.lift = 0;
+      state.swing = 0;
+      return;
+    }
     state.release = Math.max(0, state.release - Math.max(0, dt));
     const len = pos.distanceTo(look);
-    state.dist = stepInteriorBoom(state.dist, len, dt, state.release === 0);
-    state.lift = stepInteriorFraming(state.lift, 0, dt, state.release === 0);
-    state.swing = stepInteriorFraming(state.swing, 0, dt, state.release === 0);
+    stepInteriorBoom(state.boom, len, dt, state.release === 0);
+    state.lift = stepInteriorFraming(state.lift, 0, dt, state.release === 0, state.boom.dist);
+    state.swing = stepInteriorFraming(state.swing, 0, dt, state.release === 0, state.boom.dist);
     if (
       len < 1e-9 ||
-      (len - state.dist < 1e-3 && Math.abs(state.lift) < 1e-3 && Math.abs(state.swing) < 1e-3)
+      (Math.abs(len - state.boom.dist) < 1e-3 &&
+        Math.abs(state.lift) < 1e-3 &&
+        Math.abs(state.swing) < 1e-3)
     ) {
       state.release = 0;
       state.lift = 0;
@@ -166,11 +190,15 @@ export function clampChaseCameraToInterior(
       state.lift,
       state.swing,
     );
-    const f = state.dist / len;
+    const f = Math.min(1, state.boom.dist / len);
     pos.set(look.x + d.x * f, look.y + d.y * f, look.z + d.z * f);
     return;
   }
+  // walked in from outdoors (no release still running): the boom starts where the free
+  // camera stands, so the clamp glides in rather than snapping
+  const fresh = !was && state.release <= 0;
   state.release = 0;
+  state.inside += Math.max(0, dt);
   state.pad = interiorCameraPadding(camera.near, camera.fov, camera.aspect);
   // the lagged (or shoulder-shifted) look point must stand in the air on the eye's side of
   // every wall; otherwise the ray starts at the eye, the whole boom shifted with it
@@ -202,20 +230,33 @@ export function clampChaseCameraToInterior(
   // cramped (a player against the tower's wall on the stair, backed into a corner): the
   // least departure from the requested view that frames the player comfortably, a lift over
   // what cramps it or a swing along the wall, eased in and out
+  // the threshold: the clamp (and any framing) blends in over the first yards past a door
+  const w = Math.max(interiorEntryWeight(vol, eyeX, eyeY, eyeZ), interiorEntrySettle(state.inside));
   const choice = chooseInteriorFraming(vol, sx, sy, sz, dx, dy, dz, pad, state.swing);
-  let allowed = choice.boom;
-  const immediate = reducedMotion || teleported || was !== vol;
-  state.lift = stepInteriorFraming(state.lift, choice.lift, dt, immediate);
-  state.swing = stepInteriorFraming(state.swing, choice.swing, dt, immediate);
+  let clamped = choice.boom;
+  const immediate = reducedMotion || teleported || (was !== null && was !== vol);
+  if (fresh && !immediate) {
+    state.boom.dist = len;
+    state.boom.vel = 0;
+    state.boom.target = len;
+    state.boom.drop = 0;
+    state.lift = 0;
+    state.swing = 0;
+  }
+  const drawn = state.boom.dist;
+  state.lift = stepInteriorFraming(state.lift, choice.lift * w, dt, immediate, drawn);
+  state.swing = stepInteriorFraming(state.swing, choice.swing * w, dt, immediate, drawn);
   if (Math.abs(state.lift) > 1e-4 || Math.abs(state.swing) > 1e-4) {
     frameBoomInto(scratch, dx, dy, dz, state.lift, state.swing);
     dx = scratch.x;
     dy = scratch.y;
     dz = scratch.z;
-    allowed = len * interiorSegmentFraction(vol, sx, sy, sz, sx + dx, sy + dy, sz + dz, pad);
+    clamped = len * interiorSegmentFraction(vol, sx, sy, sz, sx + dx, sy + dy, sz + dz, pad);
   }
-  state.dist = stepInteriorBoom(state.dist, allowed, dt, immediate);
-  const f = len > 1e-9 ? Math.min(1, state.dist / len) : 0;
+  const allowed = clamped + (len - clamped) * (1 - w);
+  // a steady shrink is followed within 90% of the pad: the lens stays in the room's air
+  stepInteriorBoom(state.boom, allowed, dt, immediate, pad * 0.9);
+  const f = len > 1e-9 ? Math.min(1, state.boom.dist / len) : 0;
   // a corner no framing escapes: the classic cut to the player's eyes, looking out the way
   // the requested camera looks (never a screen filled with the back of a head)
   const boom = f * len;
@@ -227,6 +268,7 @@ export function clampChaseCameraToInterior(
   } else {
     pos.set(sx + dx * f, sy + dy * f, sz + dz * f);
   }
+  state.lensInside = state.firstPerson || interiorContains(vol, pos.x, pos.y, pos.z);
   state.poseX = pos.x;
   state.poseY = pos.y;
   state.poseZ = pos.z;
@@ -248,12 +290,15 @@ export function hideSelfInCloseCamera(
 export function constrainInteriorCameraDraw(camera: THREE.PerspectiveCamera): void {
   state.drawnSaved = false;
   const vol = state.active;
-  if (!vol) return;
+  // a lens following through the doorway (or gliding in) is the shell cutaway's to cover
+  if (!vol || !state.lensInside) return;
   const pos = camera.position;
   const sx = pos.x - state.poseX;
   const sy = pos.y - state.poseY;
   const sz = pos.z - state.poseZ;
-  if (sx * sx + sy * sy + sz * sz > DRAW_SHIFT_MAX * DRAW_SHIFT_MAX) return;
+  const shift = sx * sx + sy * sy + sz * sz;
+  // no shake this frame: the pose is the clamp's own, drawn as it is
+  if (shift < 1e-12 || shift > DRAW_SHIFT_MAX * DRAW_SHIFT_MAX) return;
   const f = interiorSegmentFraction(
     vol,
     state.startX,
@@ -296,7 +341,8 @@ export function interiorHidesNameplate(
   plateY: number,
 ): boolean {
   const vol = state.active;
-  if (!vol) return false;
+  // outdoors, or the lens still outside the air (the threshold): the world is in view
+  if (!vol || !state.lensInside) return false;
   if (interiorContains(vol, x, y + BODY_OVER_FEET, z)) return false;
   const c = camera.position;
   return !interiorSeesOut(vol, c.x, c.y, c.z, x, plateY, z);
@@ -305,6 +351,13 @@ export function interiorHidesNameplate(
 /** The interior the player's eye stood in at the last camera update (null outdoors). */
 export function activeCameraInterior(): CameraInterior | null {
   return state.active;
+}
+
+/** Whether the drawn lens stands in the air of the interior the player is in (false outdoors,
+ *  and while the lens follows through a doorway or glides in past a wall: then a building
+ *  cuts its shell away on the sight line as it does for a camera outside). */
+export function interiorLensInAir(): boolean {
+  return state.active !== null && state.lensInside;
 }
 
 /** Whether the camera update has run (a building's own cutaway may follow the clamp's
@@ -317,10 +370,15 @@ export const interiorCameraInternalsForTest = {
   reset(): void {
     interiors.length = 0;
     state.active = null;
-    state.dist = 0;
+    state.boom.dist = 0;
+    state.boom.vel = 0;
+    state.boom.target = 0;
+    state.boom.drop = 0;
+    state.lensInside = false;
     state.lift = 0;
     state.swing = 0;
     state.release = 0;
+    state.inside = 0;
     state.lastSelfX = Number.NaN;
     state.drawnSaved = false;
     state.firstPerson = false;

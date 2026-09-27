@@ -3,11 +3,17 @@ import {
   cameraInterior,
   chooseInteriorFraming,
   frameBoomInto,
-  INTERIOR_BOOM_RELEASE_RATE,
+  INTERIOR_BOOM_MAX_LAG,
+  INTERIOR_BOOM_RELEASE_MAX_SPEED,
   INTERIOR_COMFORT_BOOM,
+  INTERIOR_DROP_MIN_PITCH,
+  INTERIOR_ENTRY_BLEND,
+  INTERIOR_ENTRY_SETTLE_SEC,
   INTERIOR_LIFT_MAX_PITCH,
   interiorCameraPadding,
   interiorContains,
+  interiorEntrySettle,
+  interiorEntryWeight,
   interiorExit,
   interiorHoldsEye,
   interiorSeesOut,
@@ -19,7 +25,8 @@ import {
 // The indoor chase-camera clamp's pure core (src/render/interior_camera_core.ts): the walk of a
 // segment through a union of air boxes (where it first leaves, the near-plane pad, the start in
 // a wall's clearance band), the eye rule (an opening's box alone does not hold the player), the
-// nameplate sight line out through an opening only, the pad and the boom's pull-in/release.
+// nameplate sight line out through an opening only, the pad, the boom's glide both ways, the
+// threshold blend and the framings (a lift, a flattening under a ceiling, a swing).
 
 // Two rooms joined by a doorway, and a front door out of room A onto the world:
 //   room A x 0..10, room B x 12..22 (both z 0..10, y 0..4), the doorway between them
@@ -175,6 +182,20 @@ describe('interior camera pad and boom', () => {
     expect(eased).toBeLessThan(0.5);
   });
 
+  it('flattens a boom toward the level, keeping its length and heading, never under the floor', () => {
+    const out = { x: 0, y: 0, z: 0 };
+    const e0 = Math.atan2(2, 5);
+    frameBoomInto(out, 3, 2, 4, -0.2);
+    expect(Math.hypot(out.x, out.y, out.z)).toBeCloseTo(Math.hypot(3, 2, 4), 9);
+    expect(out.x / out.z).toBeCloseTo(3 / 4, 9);
+    expect(Math.atan2(out.y, Math.hypot(out.x, out.z))).toBeCloseTo(e0 - 0.2, 9);
+    frameBoomInto(out, 3, 2, 4, -5);
+    expect(Math.atan2(out.y, Math.hypot(out.x, out.z))).toBeCloseTo(INTERIOR_DROP_MIN_PITCH, 9);
+    // already flatter than the floor (a camera looking up): never raised by a flattening
+    frameBoomInto(out, 3, -1, 4, -0.3);
+    expect([out.x, out.y, out.z]).toEqual([3, -1, 4]);
+  });
+
   it('swings a boom round the vertical, keeping its length and elevation', () => {
     const out = { x: 0, y: 0, z: 0 };
     frameBoomInto(out, 4, 1, 0, 0, Math.PI / 2);
@@ -201,6 +222,16 @@ describe('interior camera pad and boom', () => {
     // a comfortable boom is left as it is
     const open = chooseInteriorFraming(low, 6, 2, 6, -3, 0.5, 0, 0.3, 0);
     expect([open.lift, open.swing]).toEqual([0, 0]);
+    // under a low ceiling with the room open behind: it flattens to keep the whole distance,
+    // the heading kept (a slide under the ceiling, not a pull-in)
+    const gallery = cameraInterior('gallery', [[0, 40, 0, 3.4, 0, 40]]);
+    const under = chooseInteriorFraming(gallery, 20, 2, 20, 11.4, 3.8, 0, 0.3, 0);
+    expect(under.swing).toBe(0);
+    expect(under.lift).toBeLessThan(0);
+    expect(under.boom).toBeCloseTo(Math.hypot(11.4, 3.8), 6);
+    // a small gain never turns the view: a boom the ceiling barely trims stays as it is
+    const trimmed = chooseInteriorFraming(gallery, 20, 2, 20, 11.4, 1.15, 0, 0.3, 0);
+    expect(trimmed.lift).toBe(0);
     // in a tall shaft the lift alone does it, the heading kept
     const shaft = cameraInterior('shaft', [[0, 3, 0, 30, 0, 3]]);
     const up = chooseInteriorFraming(shaft, 1.5, 2, 1.5, 8, 1, 0, 0.3, 0);
@@ -208,12 +239,92 @@ describe('interior camera pad and boom', () => {
     expect(up.lift).toBeGreaterThan(0);
   });
 
-  it('pulls in at once and eases out at the release rate', () => {
-    expect(stepInteriorBoom(8, 3, 1 / 60, false)).toBe(3);
-    const out = stepInteriorBoom(3, 8, 1 / 60, false);
-    expect(out).toBeGreaterThan(3);
-    expect(out).toBeLessThan(8);
-    expect(out).toBeCloseTo(3 + 5 * (1 - Math.exp(-INTERIOR_BOOM_RELEASE_RATE / 60)), 9);
-    expect(stepInteriorBoom(3, 8, 1 / 60, true)).toBe(8);
+  it('glides a pull-in after a jump: lagging by at most the cap, only ever less, settled fast', () => {
+    // the ray swings past a corner: the allowed boom jumps from 8 in to 3
+    const s = { dist: 8, vel: 0, target: 8, drop: 0 };
+    let prev = s.dist;
+    let lag = Infinity;
+    let frames = 0;
+    for (let i = 0; i < 60; i++) {
+      const d = stepInteriorBoom(s, 3, 1 / 60, false, 0.25);
+      expect(d).toBeLessThanOrEqual(prev + 1e-12); // monotone: never back out past itself
+      expect(d).toBeGreaterThanOrEqual(3); // never past a still target
+      expect(d - 3).toBeLessThanOrEqual(INTERIOR_BOOM_MAX_LAG + 1e-12);
+      expect(d - 3).toBeLessThanOrEqual(lag + 1e-12); // the lag only shrinks
+      lag = d - 3;
+      if (d > 3 + 0.25) frames++;
+      prev = d;
+    }
+    // past the pad for a few frames only (the shell's cutaway covers them)
+    expect(frames).toBeGreaterThan(0);
+    expect(frames).toBeLessThanOrEqual(5);
+    expect(s.dist).toBeCloseTo(3, 3);
+    // a small step in is a glide too: the first frame moves, not the whole way
+    const first = { dist: 3.4, vel: 0, target: 3.4, drop: 0 };
+    const one = stepInteriorBoom(first, 3, 1 / 60, false, 0.25);
+    expect(one).toBeLessThan(3.4);
+    expect(one).toBeGreaterThan(3);
+  });
+
+  it('follows a steadily shrinking boom within the pad (the lens stays in the room)', () => {
+    // a turn toward a wall or a walk backward: the allowed boom falls 9 yards a second
+    const s = { dist: 12, vel: 0, target: 12, drop: 0 };
+    for (let i = 1; i <= 75; i++) {
+      const allowed = 12 - (9 * i) / 60;
+      const d = stepInteriorBoom(s, allowed, 1 / 60, false, 0.25);
+      expect(d - allowed, `frame ${i}`).toBeLessThanOrEqual(0.25 + 1e-12);
+      expect(d).toBeGreaterThanOrEqual(allowed - 1e-12);
+    }
+  });
+
+  it('glides a release: bounded speed, no overshoot, converging', () => {
+    const s = { dist: 3, vel: 0, target: 3, drop: 0 };
+    let prev = s.dist;
+    for (let i = 0; i < 120; i++) {
+      const d = stepInteriorBoom(s, 20, 1 / 60, false);
+      expect(d).toBeGreaterThanOrEqual(prev - 1e-12);
+      expect(d).toBeLessThanOrEqual(20);
+      expect((d - prev) * 60).toBeLessThanOrEqual(INTERIOR_BOOM_RELEASE_MAX_SPEED + 1e-6);
+      prev = d;
+    }
+    expect(s.dist).toBeCloseTo(20, 2);
+    // a long frame (a hitch) never overshoots either way
+    const hitch = { dist: 3, vel: 0, target: 3, drop: 0 };
+    expect(stepInteriorBoom(hitch, 8, 2, false)).toBeLessThanOrEqual(8);
+    const back = { dist: 8, vel: 0, target: 8, drop: 0 };
+    expect(stepInteriorBoom(back, 3, 2, false)).toBeGreaterThanOrEqual(3);
+    // a glide that turns about starts from rest: a pull-in's speed never dips a release
+    const turn = { dist: 2, vel: -50, target: 2, drop: 0 };
+    expect(stepInteriorBoom(turn, 10, 1 / 60, false)).toBeGreaterThanOrEqual(2);
+    // immediate adopts the target and stops the glide
+    const snap = { dist: 3, vel: 5, target: 3, drop: 0 };
+    expect(stepInteriorBoom(snap, 8, 1 / 60, true)).toBe(8);
+    expect(snap.vel).toBe(0);
+  });
+});
+
+describe('the threshold blend', () => {
+  it('is none on the door, whole a blend in, smooth and rising between', () => {
+    // the front door's outside face: z = -1, x 4..6, y 0..3
+    expect(interiorEntryWeight(vol, 5, 2, -1)).toBe(0);
+    expect(interiorEntryWeight(vol, 5, 2, -1 + INTERIOR_ENTRY_BLEND)).toBe(1);
+    expect(interiorEntryWeight(vol, 5, 2, 9.9)).toBe(1);
+    let prev = 0;
+    for (let z = -1; z <= -1 + INTERIOR_ENTRY_BLEND; z += 0.25) {
+      const w = interiorEntryWeight(vol, 5, 2, z);
+      expect(w).toBeGreaterThanOrEqual(prev);
+      expect(w - prev).toBeLessThan(0.12);
+      prev = w;
+    }
+    // away from the door along the front wall, the clamp is whole sooner
+    expect(interiorEntryWeight(vol, 1, 2, 1)).toBeGreaterThan(interiorEntryWeight(vol, 5, 2, 1));
+    // the clock: however slowly the player comes in, the clamp is whole a moment later
+    expect(interiorEntrySettle(0)).toBe(0);
+    expect(interiorEntrySettle(INTERIOR_ENTRY_SETTLE_SEC / 2)).toBeCloseTo(0.5, 9);
+    expect(interiorEntrySettle(INTERIOR_ENTRY_SETTLE_SEC)).toBe(1);
+    expect(interiorEntrySettle(60)).toBe(1);
+    // a room with no door onto the world: always whole
+    const closed = cameraInterior('closed', [[0, 4, 0, 4, 0, 4]]);
+    expect(interiorEntryWeight(closed, 2, 2, 0.1)).toBe(1);
   });
 });

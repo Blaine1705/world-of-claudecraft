@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  activeCameraInterior,
   clampChaseCameraToInterior,
   interiorCameraInternalsForTest,
+  interiorLensInAir,
   registerCameraInterior,
 } from '../src/render/interior_camera';
 import {
+  INTERIOR_ENTRY_BLEND,
   interiorContains,
   interiorHoldsEye,
   interiorSegmentFraction,
@@ -234,5 +237,111 @@ describe('the indoor camera at the tight spots', () => {
     cam.position.set(look.x, look.y + 12, look.z);
     clampChaseCameraToInterior(cam, look, self, 1 / 60, true);
     expect(cam.position.y - TAVERN_FLOOR_Y).toBeLessThan(TAVERN_WING.eave - 0.4);
+  });
+});
+
+/** The default chase camera (pitch 0.32, 12 yards) behind a player at local (lx, ly, lz),
+ *  turned `yaw` round the tavern's local frame (0: the camera out along local +z, toward the
+ *  front door), gliding for `frames` frames; returns the settled boom. */
+function settledBoom(lx: number, ly: number, lz: number, yaw: number, frames = 90): number {
+  const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
+  const self = world(lx, ly, lz);
+  const pitch = 0.32;
+  const dist = 12;
+  // local (sin yaw, cos yaw) to the world: local z runs along world +x, local x along -z
+  const wx = Math.cos(yaw) * Math.cos(pitch) * dist;
+  const wz = -Math.sin(yaw) * Math.cos(pitch) * dist;
+  let look = new THREE.Vector3();
+  for (let i = 0; i < frames; i++) {
+    look = new THREE.Vector3(self.x, self.y + 2, self.z);
+    cam.position.set(look.x + wx, look.y + Math.sin(pitch) * dist, look.z + wz);
+    clampChaseCameraToInterior(cam, look, self, 1 / 60, i === 0);
+  }
+  expect(interiorContains(vol, cam.position.x, cam.position.y, cam.position.z)).toBe(true);
+  return cam.position.distanceTo(look);
+}
+
+describe('the indoor camera in the open common room', () => {
+  it('keeps the full chase distance in the middle of the room, every way round', () => {
+    registerCameraInterior(vol);
+    for (let k = 0; k < 8; k++) {
+      const yaw = (k / 8) * Math.PI * 2;
+      expect(settledBoom(-4, 0, 0, yaw), `yaw ${k}`).toBeGreaterThan(11);
+      expect(settledBoom(0, 0, -2, yaw), `yaw ${k}`).toBeGreaterThan(11);
+    }
+  });
+
+  it('keeps a real third-person distance at the bar and the hearth pit', () => {
+    registerCameraInterior(vol);
+    for (let k = 0; k < 8; k++) {
+      const yaw = (k / 8) * Math.PI * 2;
+      expect(settledBoom(7, 0.5, -3.5, yaw), `bar ${k}`).toBeGreaterThan(6);
+      expect(settledBoom(0, -0.45, 4.5, yaw), `hearth ${k}`).toBeGreaterThan(9);
+    }
+  });
+
+  it('slides under the rafters over the gallery rather than pulling in', () => {
+    registerCameraInterior(vol);
+    // on the gallery, the camera out over the hall: the rafters are a yard over the eye, so
+    // the camera flattens and keeps its whole distance
+    expect(settledBoom(9, TAVERN_UPPER, -11.6, 0)).toBeGreaterThan(11.5);
+  });
+
+  it('walks in through the front door without a snap: never into the back of the head', () => {
+    registerCameraInterior(vol);
+    const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
+    const dt = 1 / 60;
+    const pitch = 0.32;
+    const dist = 12;
+    let prev: number | null = null;
+    let least = Infinity;
+    let indoorsFrames = 0;
+    // from the road to the middle of the room at a brisk 7 yards a second, facing in
+    for (let lz = 22; lz > -2; lz -= 7 * dt) {
+      const self = world(0, 0, lz);
+      const look = new THREE.Vector3(self.x, self.y + 2, self.z);
+      cam.position.set(look.x + Math.cos(pitch) * dist, look.y + Math.sin(pitch) * dist, look.z);
+      clampChaseCameraToInterior(cam, look, self, dt, false);
+      const boom = cam.position.distanceTo(look);
+      if (activeCameraInterior()) {
+        indoorsFrames++;
+        least = Math.min(least, boom);
+        if (prev !== null) expect(Math.abs(boom - prev), `at ${lz}`).toBeLessThan(0.6);
+        // a blend's depth past the door's outside face, the lens stands in the room's air
+        if (TAVERN_HALL.z1 - lz > INTERIOR_ENTRY_BLEND + 0.5) {
+          expect(interiorLensInAir(), `at ${lz}`).toBe(true);
+          const c = cam.position;
+          expect(interiorSegmentFraction(vol, look.x, look.y, look.z, c.x, c.y, c.z, 0)).toBe(1);
+        }
+      }
+      prev = boom;
+    }
+    expect(indoorsFrames).toBeGreaterThan(60);
+    expect(least).toBeGreaterThan(4.5);
+  });
+
+  it('settles the lens in the room when the player stops just inside the front door', () => {
+    registerCameraInterior(vol);
+    const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
+    const pitch = 0.32;
+    const dist = 12;
+    // walk up the porch and stop a stride over the sill, facing in
+    for (let lz = 18; lz > 12.4; lz -= 7 / 60) {
+      const self = world(0, 0, lz);
+      const look = new THREE.Vector3(self.x, self.y + 2, self.z);
+      cam.position.set(look.x + Math.cos(pitch) * dist, look.y + Math.sin(pitch) * dist, look.z);
+      clampChaseCameraToInterior(cam, look, self, 1 / 60, false);
+    }
+    const self = world(0, 0, 12.4);
+    for (let i = 0; i < 90; i++) {
+      const look = new THREE.Vector3(self.x, self.y + 2, self.z);
+      cam.position.set(look.x + Math.cos(pitch) * dist, look.y + Math.sin(pitch) * dist, look.z);
+      clampChaseCameraToInterior(cam, look, self, 1 / 60, false);
+    }
+    expect(activeCameraInterior()).not.toBe(null);
+    expect(interiorLensInAir()).toBe(true);
+    const c = cam.position;
+    const eye = new THREE.Vector3(self.x, self.y + 2, self.z);
+    expect(interiorSegmentFraction(vol, eye.x, eye.y, eye.z, c.x, c.y, c.z, 0)).toBe(1);
   });
 });

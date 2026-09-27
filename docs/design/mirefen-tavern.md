@@ -61,16 +61,26 @@ classic inns were studied for mood and proportion only and never entered the bui
   arch between them and the tower's shaft are registered as boxes
   (`src/render/mirefen_tavern_interior_core.ts`) with the generic indoor camera clamp
   (`src/render/interior_camera.ts` over `src/render/interior_camera_core.ts`), which pulls the
-  drawn camera in along its ray to just inside a wall, floor or ceiling (a near-plane pad clear)
-  and eases it back out when the view clears. It is the one authored-interior exception to the
+  drawn camera in along its ray to just inside a wall, floor or ceiling (a near-plane pad clear),
+  gliding both ways on a critically damped spring (a quick pull-in that follows a steadily
+  shrinking boom within the near-plane pad and lags a sudden jump by at most
+  `INTERIOR_BOOM_MAX_LAG` for a few frames, a gentle release). Walking in, the clamp blends in
+  over the first `INTERIOR_ENTRY_BLEND` yards past the front door (`interiorEntryWeight`), and is
+  whole `INTERIOR_ENTRY_SETTLE_SEC` after the eye stepped inside however slowly the player came:
+  the camera follows through the doorway and settles into the room, never snapping in behind the
+  head, and while its lens is still outside the room's air the shell cuts away on the sight line
+  as it does outdoors (`interiorLensInAir`). Under a ceiling that cuts the boom short (the
+  gallery, the guest rooms, a steep zoomed-out view under the hall's rafters) the camera
+  flattens to keep its distance before it pulls in. It is the one authored-interior exception to the
   pinned no-pull-in rule (`tests/graphics_overhaul_integration.test.ts`); the requested distance
   is never written. The outer shell therefore never opens onto the outside from inside; only the
   gallery's rail and barrel wall, the upstairs partitions and the stair tower's newel (its own
   part, `TowerNewel`, so the camera slides round it rather than fighting it) still cut away
   for the sight line. Where the boom is cramped (a player on the stair against the tower's
   wall, backed against the barrel wall), the camera glides to the nearest comfortable framing,
-  a lift over what cramps it or a swing along the wall; in a corner nothing escapes it cuts to
-  the player's eyes and hides the player's own body, the classic MMO first-person cut.
+  a lift over what cramps it or a swing along the wall; only in a dead-end corner nothing
+  escapes does it cut to the player's eyes and hide the player's own body, the classic MMO
+  first-person cut.
 - **Stair tower.** Coursed ashlar both faces over a mortar core (warm limestone inside,
   the base's blue-grey outside), arrow slits in dressed frames (a cool sky inside, kept out of
   the warm bake), dressed quoins where the ring meets the hall, voussoirs and a hood mould on
