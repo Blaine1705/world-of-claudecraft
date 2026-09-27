@@ -164,9 +164,10 @@ selected by ability id only:
   the deferred preload lane: `ensureWarriorKitAssets` loads them once, on
   demand, when a local Warrior enters or the painter first sees a remote one
   (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
-  on constrained-memory devices, where the kit stays cold and the generic
-  presentation runs (`tests/warrior_kit_assets.test.ts`,
-  `tests/active_kit_prewarm.test.ts`). Every sheet a live cast draws is
+  on constrained-memory devices, where the kit stays cold, the generic
+  presentation runs, and the boot warm-up links none of the kit's programs
+  (`warriorKitDeclinedByDevice` in `../cast_vfx_prewarm.ts`;
+  `tests/warrior_kit_assets.test.ts`, `tests/active_kit_prewarm.test.ts`). Every sheet a live cast draws is
   uploaded by its own unit of the kit recipe (`KIT_SHEETS` in
   `active_kit_prewarm.ts`), the contact sheets and the generic smoke and dust
   layers included, since the kit is their only consumer (the loaded shockwave
@@ -183,9 +184,15 @@ selected by ability id only:
   the load lands after it: it binds them in
   a unit of its own preparation recipe, ahead of its compile (the crests'
   `crest-bind-kit`, the guards' `guard-bind-steel`; `tests/crest_prewarm.test.ts`).
+  The boot warm-up links the kit's programs for every class, so a mapped
+  surface holds `warriorKitSlotMap()` (`warrior_kit_surface.ts`) from
+  construction and its bind swaps the texture only, never with `needsUpdate`:
+  the program linked at boot is the one the kit draws
+  (`tests/warrior_kit_boot_programs.test.ts`).
   A pool whose GEOMETRY comes from the kit builds its meshes in that recipe
   too, and spawns nothing until their upload unit ran (the solid fragments'
-  `fragment-build`; `tests/solid_impact_fragments_prewarm.test.ts`).
+  `fragment-build`; `tests/solid_impact_fragments_prewarm.test.ts`), while a
+  hidden stand-in with the same shader carries its program from construction.
   Its preparation rides
   `ACTIVE_KIT_PRIORITY` (the boot-debt lane) under the per-frame budget, never
   the actionable floor, and it waits out a loading cover: the kit is cosmetic
