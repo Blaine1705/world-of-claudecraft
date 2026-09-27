@@ -1,0 +1,161 @@
+// Every stop of Balgath's warpath is a wreck that kills the squad standing there.
+//
+// The owner's playtest: he ran to a picket, did "nothing" there, then ran on and flattened
+// the others. The cause was his ordinary FOCUS-phase slams (aoePulse, stomp, hammer,
+// cleave: mob/boss_collateral.ts): a pull that opened beside a picket crushed that squad
+// while he was still fighting at the start, so when the circuit later marched him onto it
+// the arrival slam landed on a camp of corpses. Now only the arrival slam is lethal to a
+// soldier, and a full lap is pinned from both ways the boss reaches the world: the live
+// scheduler raising him in his crater bed, and `/dev spawn` dropping a copy beside the
+// player on the crater's rim (the exact route the owner took when the boss seemed missing).
+import { describe, expect, it } from 'vitest';
+import { MUSTER_CIRCUIT, MUSTER_INNER_RADIUS, musterCamp } from '../src/sim/content/mirefen_muster';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
+import { spawnMobsForDev } from '../src/sim/dev_commands';
+import type { MusterArmyState } from '../src/sim/mirefen_muster';
+import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
+import type { Entity, WorldContent } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
+
+const BALGATH = 'balgath_cyclops';
+
+/** A camp-free world (the warpath suite's trick): only the bodies under test tick. */
+const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
+
+interface Internals {
+  ctx: SimContext;
+  musterArmy: MusterArmyState;
+  setGm(pid?: number, on?: boolean): void;
+}
+const inner = (sim: Sim) => sim as unknown as Internals;
+
+function newSim(scheduled: boolean): Sim {
+  const sim = new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: WORLD,
+    worldBossAtBoot: scheduled,
+    mirefenMuster: true,
+  });
+  sim.setPlayerLevel(20);
+  // Godded, or he kills the lone tester and the lap becomes an assertion about a corpse.
+  inner(sim).setGm(sim.playerId, true);
+  return sim;
+}
+
+function place(sim: Sim, e: Entity, x: number, z: number): void {
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = terrainHeight(x, z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
+}
+
+/** The live soldiers posted in a picket's inner ring (the squad an arrival slam takes). */
+function innerRingOf(sim: Sim, campId: string): number[] {
+  const camp = musterCamp(campId as (typeof MUSTER_CIRCUIT)[number]);
+  return inner(sim).musterArmy.soldierIds.filter((id) => {
+    const s = sim.entities.get(id);
+    if (!s) return false;
+    return (
+      Math.hypot(s.spawnPos.x - camp.center.x, s.spawnPos.z - camp.center.z) <= MUSTER_INNER_RADIUS
+    );
+  });
+}
+
+interface StopResult {
+  stop: number;
+  /** Yards from the picket's centre to where the fists came down. */
+  offCentre: number;
+  /** Inner-ring soldiers standing when the ring went down, and how many the slam killed. */
+  standingAtRing: number;
+  killed: number;
+}
+
+/**
+ * Run one lap with the player hanging `keep` yards off him (a ranged raider, not a tank
+ * glued to his shins: that is what lets the opening fight happen beside a picket), and
+ * record every arrival slam.
+ */
+function lap(sim: Sim, boss: Entity, keep: number): StopResult[] {
+  const player = sim.player;
+  const def = MOBS[BALGATH]?.warpath;
+  if (!def) throw new Error('no warpath');
+  const out: StopResult[] = [];
+  let ringStop: number | null = null;
+  let standing: number[] = [];
+  for (let i = 0; i < 20 * 240 && out.length < def.destinations.length; i++) {
+    const d = Math.hypot(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
+    if (d > keep) {
+      const a = Math.atan2(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
+      place(sim, player, player.pos.x + Math.sin(a) * 0.35, player.pos.z + Math.cos(a) * 0.35);
+    }
+    for (const ev of sim.tick()) {
+      if (ev.type !== 'spellfxAt' || ev.radius !== def.wreck.radius) continue;
+      if (ev.fx === 'runeCircle') {
+        ringStop = boss.warpathDestination ?? 0;
+        standing = innerRingOf(sim, MUSTER_CIRCUIT[ringStop]).filter(
+          (id) => !sim.entities.get(id)?.dead,
+        );
+      } else if (ev.fx === 'nova' && ringStop !== null) {
+        const c = musterCamp(MUSTER_CIRCUIT[ringStop]).center;
+        out.push({
+          stop: ringStop,
+          offCentre: Math.hypot(ev.x - c.x, ev.z - c.z),
+          standingAtRing: standing.length,
+          killed: standing.filter((id) => sim.entities.get(id)?.dead).length,
+        });
+        ringStop = null;
+      }
+    }
+    // Dragged to the edge of his tether he marches on; he never evades out of the lap.
+    expect(boss.aiState, 'he evaded out of his own lap').not.toBe('evade');
+  }
+  return out;
+}
+
+function expectEveryStopWrecked(results: StopResult[]): void {
+  const def = MOBS[BALGATH]?.warpath;
+  expect(results.map((r) => r.stop)).toEqual([0, 1, 2, 3]);
+  for (const r of results) {
+    const where = MUSTER_CIRCUIT[r.stop];
+    expect(r.offCentre, `he stopped short of ${where}`).toBeLessThanOrEqual(def?.arriveRadius ?? 0);
+    // The whole squad of the inner ring was still standing for him to flatten...
+    const posted = musterCamp(where).soldiers.filter(
+      (s) => Math.hypot(s.dx, s.dz) <= MUSTER_INNER_RADIUS,
+    ).length;
+    expect(posted).toBeGreaterThanOrEqual(5);
+    expect(r.standingAtRing, `the ${where} squad was already dead`).toBe(posted);
+    // ...and the arrival slam took all of it.
+    expect(r.killed, `the wreck at ${where} killed`).toBe(r.standingAtRing);
+  }
+}
+
+describe('every warpath stop is a wreck with kills', () => {
+  it('from his crater bed, with the pull opening beside the rim picket', () => {
+    const sim = newSim(true);
+    // A raider standing on the west rim, a few yards off the rim picket, pulls him out of
+    // the bowl: his whole opening focus phase is fought on top of that picket.
+    place(sim, sim.player, 128, 300);
+    sim.tick();
+    const bossId = inner(sim).musterArmy.bossId;
+    const boss = bossId !== null ? sim.entities.get(bossId) : undefined;
+    if (!boss) throw new Error('the scheduler raised no Balgath');
+    expect(boss.spawnPos.x).toBeCloseTo(147, 0);
+    expectEveryStopWrecked(lap(sim, boss, 12));
+  });
+
+  it('from a /dev spawn copy dropped beside the player on the crater rim', () => {
+    const sim = newSim(false);
+    place(sim, sim.player, 125, 300);
+    sim.tick();
+    const [id] = spawnMobsForDev(inner(sim).ctx, sim.playerId, BALGATH);
+    const boss = sim.entities.get(id);
+    if (!boss) throw new Error('/dev spawn raised no Balgath');
+    // The muster answers a dev copy on its once-a-second scan.
+    for (let i = 0; i < 25 && inner(sim).musterArmy.bossId !== id; i++) sim.tick();
+    expect(inner(sim).musterArmy.bossId).toBe(id);
+    expectEveryStopWrecked(lap(sim, boss, 20));
+  });
+});

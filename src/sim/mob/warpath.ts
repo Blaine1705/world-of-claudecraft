@@ -29,10 +29,10 @@
 // nothing else in the world changes shape and the golden parity trace is untouched. The
 // phase machine is a pure function (`nextWarpathPhase`) so its transitions can be tested
 // without a Sim; the tick below is the thin part that moves the body and spends damage.
-import { MOBS } from '../data';
+import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity, MobTemplate, Vec3 } from '../types';
-import { angleTo, DT, dist2d } from '../types';
+import { angleTo, DT, DUNGEON_LEASH_DISTANCE, dist2d, LEASH_DISTANCE } from '../types';
 import { splashNearbyMobs } from './boss_collateral';
 import { launchFromSlam } from './boss_slams';
 import { emitMobYell } from './yells';
@@ -190,10 +190,33 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
     beginPhase(ctx, mob, def, next);
     return next === 'focus' ? 'fallthrough' : 'handled';
   }
+  if (phase === 'focus' && focusDraggedToLeash(mob)) {
+    beginPhase(ctx, mob, def, 'travel');
+    return 'handled';
+  }
 
   if (phase === 'wreck') return tickWreck(ctx, mob, def, target);
   if (phase === 'travel') return tickTravel(ctx, mob, def, dest);
   return 'fallthrough';
+}
+
+/**
+ * Whether FOCUS has been dragged to the edge of his tether: the fight he is planted in has
+ * walked him (almost) as far from his landmark as the soft leash allows.
+ *
+ * At that point he marches on to his next stop instead of evading. An evade here was the
+ * owner's "he ran to a spot and did nothing": his own slams punt the player he is fighting
+ * a few yards at a time, he follows, and half a minute of that crosses the 45-yard leash,
+ * so he dropped the pull, walked home immune to wherever he was raised (for a /dev spawn
+ * copy, some random spot beside a camp) and stood there, and the next pull restarted the
+ * circuit on a picket he had already flattened. Marching on keeps the tether's real job,
+ * since a kiter still cannot drag him off across the zone: the circuit takes him back to
+ * the pickets. Checked one yard inside the leash, so the combat runner's own leash test
+ * (mob/combat_profile.ts, the same distance) never sees him past it in this phase.
+ */
+function focusDraggedToLeash(mob: Entity): boolean {
+  const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
+  return dist2d(mob.pos, mob.leashAnchor ?? mob.spawnPos) > leash - 1;
 }
 
 /**
@@ -354,6 +377,10 @@ function fireWreck(ctx: SimContext, mob: Entity, def: WarpathDef): void {
     def.wreck.max,
     school,
     def.wreck.name,
+    undefined,
+    // The one blast that flattens a picket: its squad dies HERE, under the ring the raid
+    // chased him to, never earlier to a stray focus-phase slam (mob/boss_collateral.ts).
+    true,
   );
   // The arrival slam throws them, like his other two: same shared rule, same opt-in.
   launchFromSlam(ctx, mob, mob.pos, def.wreck.radius);

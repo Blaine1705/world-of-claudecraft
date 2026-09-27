@@ -53,6 +53,14 @@ export function splashNearbyMobs(
    * radius-only splash gets visibly wrong.
    */
   accept?: (e: Entity) => boolean,
+  /**
+   * Whether this blast is the one that flattens a muster picket: his warpath ARRIVAL slam
+   * (mob/warpath.ts), and nothing else. Every other slam passes over the soldiers
+   * untouched. Without that a fight that opened beside a picket crushed its squad with
+   * the ordinary focus-phase slams, so when he later marched on it the arrival wreck
+   * landed on a camp of corpses and read as him running there to do nothing at all.
+   */
+  crushesMuster = false,
 ): number {
   const def = MOBS[mob.templateId]?.collateral;
   if (!def) return 0;
@@ -71,12 +79,13 @@ export function splashNearbyMobs(
     if (e.aiState === 'evade') continue;
     if (dist2d(e.pos, center) > radius) continue;
     if (accept && !accept(e)) continue;
-    // A muster soldier caught under a fist does not take a third of a raid slam, he is
-    // crushed (src/sim/mirefen_muster.ts): the whole reason the pickets exist is that the
-    // Foreman's arrival visibly flattens them. Overkill rather than a flag, so the one
+    const soldier = isMusterSoldier(e);
+    if (soldier && !crushesMuster) continue;
+    // A muster soldier caught under the arrival slam does not take a third of a raid
+    // slam, he is crushed (src/sim/mirefen_muster.ts): the whole reason the pickets exist
+    // is that the Foreman's arrival visibly flattens them. Overkill rather than a flag, so the one
     // ordinary damage path still owns the death, its events and its corpse. He never
     // turns on the boss either: the muster holds its post and feeds no hate table.
-    const soldier = isMusterSoldier(e);
     const dealt = soldier ? Math.max(amount, e.maxHp * MUSTER_CRUSH_MULT) : amount;
     ctx.dealDamage(mob, e, dealt, false, school, name, 'hit', true);
     if (!e.dead && !soldier) enrageAgainst(e, mob, amount);

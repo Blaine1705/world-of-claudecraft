@@ -174,7 +174,8 @@ export const MUSTER_COMMAND_KEEP_OUT: {
  * brace when he comes, cheer when his eye goes out, and die in heaps where his fists land.
  * `musterSoldier` puts them on their own arm of the mob AI (never hostile, never in combat,
  * never on a hate table), so the stats below only size the corpse a slam leaves: nobody can
- * attack them, and the boss's slams are lethal to them by rule (mob/boss_collateral.ts).
+ * attack them, and the boss's arrival slam is lethal to them by rule (his other slams pass
+ * over them: mob/boss_collateral.ts).
  * No loot and no experience, because nothing a player does can kill one.
  */
 function soldier(
