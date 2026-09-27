@@ -8,6 +8,7 @@ import {
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import type { CrestPrewarmHost } from './crest_prewarm';
 import { GuardPrewarm } from './guard_prewarm';
+import { type WarriorKitSurface, warriorKitSurface } from './warrior_kit_surface';
 import { warriorSpiritHammerShape } from './warrior_spirit_hammer_shape';
 
 const CAPACITY = 8;
@@ -17,7 +18,7 @@ const CAPACITY = 8;
 export class WarriorSpiritHammers {
   /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
   spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
-  readonly mesh: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
+  readonly mesh: THREE.InstancedMesh<THREE.BufferGeometry, WarriorKitSurface>;
   readonly preparation: GuardPrewarm;
   private readonly position = new THREE.Vector3();
   private readonly scale = new THREE.Vector3();
@@ -28,7 +29,7 @@ export class WarriorSpiritHammers {
 
   constructor(scene: THREE.Scene) {
     const material = modulateEmissiveByVertexColor(
-      new THREE.MeshStandardMaterial({
+      warriorKitSurface('warrior-spirit-hammers', {
         vertexColors: true,
         color: 0xffffff,
         roughness: 0.38,

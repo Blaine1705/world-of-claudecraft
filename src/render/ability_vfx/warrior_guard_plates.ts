@@ -12,6 +12,7 @@ import { GuardPrewarm } from './guard_prewarm';
 import { warriorSteelTexture } from './production_assets';
 import type { AbilityVfxRibbons, RibbonAnchor } from './ribbons';
 import { warriorGuardGeometry } from './warrior_guard_geometry';
+import { type WarriorKitSurface, warriorKitSurface } from './warrior_kit_surface';
 
 export type WarriorGuardKind = 0 | 1 | 2 | 3;
 export interface WarriorGuardAura {
@@ -55,7 +56,7 @@ const UP = new THREE.Vector3(0, 1, 0);
 export class WarriorGuardPlates {
   /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
   spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
-  readonly mesh: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
+  readonly mesh: THREE.InstancedMesh<THREE.BufferGeometry, WarriorKitSurface>;
   readonly preparation: GuardPrewarm;
   private readonly wearers = new Map<number, Wearer>();
   private readonly frameMatrix = new THREE.Matrix4();
@@ -76,7 +77,7 @@ export class WarriorGuardPlates {
     this.mesh = new THREE.InstancedMesh(
       warriorGuardGeometry(),
       modulateEmissiveByVertexColor(
-        new THREE.MeshStandardMaterial({
+        warriorKitSurface('warrior-held-guard-plates', {
           color: 0xffffff,
           vertexColors: true,
           roughness: 0.4,

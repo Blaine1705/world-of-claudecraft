@@ -20,6 +20,7 @@ import { GuardPrewarm } from './guard_prewarm';
 import { warriorBloodTexture, warriorSteelTexture } from './production_assets';
 import { AbilityVfxRibbons, type RibbonAnchor } from './ribbons';
 import { warriorFuryStateShape } from './warrior_fury_state_shapes';
+import { type WarriorKitSurface, warriorKitSurface } from './warrior_kit_surface';
 import { animateWarriorRage } from './warrior_rage_material';
 
 interface State {
@@ -37,12 +38,17 @@ interface Wearer {
 }
 const WEARERS = 32,
   COUNTS = [2, 1, 2] as const;
+const FURY_STATE_NAMES = [
+  'warrior-mayhem-weapon-fire',
+  'warrior-mending-stitches',
+  'warrior-echo-charges',
+] as const;
 
 /** Three bounded draws own weapon fire, defensive stitching and blade charges.
  * A separate instance of the already-prepared ribbon family supplies cold/missing
  * attachment silhouettes, so fallback can never consume attack-contact capacity. */
 export class WarriorFuryStates {
-  readonly meshes: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>[] = [];
+  readonly meshes: THREE.InstancedMesh<THREE.BufferGeometry, WarriorKitSurface>[] = [];
   readonly preparation: GuardPrewarm[] = [];
   private readonly wearers = new Map<number, Wearer>();
   private readonly fallback: AbilityVfxRibbons;
@@ -83,8 +89,9 @@ export class WarriorFuryStates {
     this.fallback = new AbilityVfxRibbons(scene, anchor, textures);
     for (let k = 0; k < 3; k++) {
       const kind = k as WarriorFuryStateKind;
+      const name = FURY_STATE_NAMES[k];
       const material = modulateEmissiveByVertexColor(
-        new THREE.MeshStandardMaterial({
+        warriorKitSurface(name, {
           color: 0xffffff,
           vertexColors: true,
           map: k === 2 ? warriorSteelTexture() : warriorBloodTexture(),
@@ -103,11 +110,7 @@ export class WarriorFuryStates {
         material,
         WEARERS * COUNTS[kind],
       );
-      mesh.name = [
-        'warrior-mayhem-weapon-fire',
-        'warrior-mending-stitches',
-        'warrior-echo-charges',
-      ][k];
+      mesh.name = name;
       tagCastVfxKit(mesh);
       mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
