@@ -126,7 +126,8 @@ interface ShipTemplate {
   prewarmParts: ShipPart[];
   /** The first built view's fading clones whose program differs from their
    *  source's (the dithered ghost hook, below High), one per source material
-   *  and attribute layout: null until a view is built. */
+   *  and attribute layout: null until a view is built. The ghost style is not
+   *  in the template key; a style change rebuilds through resetTransportShipCaches. */
   fadeParts: ShipPart[] | null;
   clip: THREE.AnimationClip | null;
   /** Each fading sail's box in the ship frame. */

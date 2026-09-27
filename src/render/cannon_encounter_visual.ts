@@ -72,6 +72,8 @@ export class CannonEncounterVisual {
     }
     this.portalsRoot.name = 'cannon-portals';
     this.portalsRoot.visible = false;
+    // The rift gate GLB is a boot preload, settled before the Renderer (and so
+    // this pool) is built: the arch fallback only covers a missing asset.
     this.portals = PORTAL_LANES.map(() => {
       const built = buildRiftGateBody(lowGfx, 'A') ?? buildDoorBody(true, undefined, lowGfx);
       built.body.name = 'cannon-rift-portal';

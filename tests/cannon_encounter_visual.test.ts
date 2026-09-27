@@ -1,9 +1,11 @@
 import * as THREE from 'three';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { describe, expect, it, vi } from 'vitest';
 import { CannonEncounterVisual } from '../src/render/cannon_encounter_visual';
+import { setRiftGateGltfForTest } from '../src/render/door_portal';
 import { LAST_KEEP_CANNON, NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
-import type { VehicleSession } from '../src/sim/types';
+import { RIFT_TIER_COLORS, type VehicleSession } from '../src/sim/types';
 
 vi.mock('../src/render/characters/assets', () => ({ charactersReady: async () => {} }));
 vi.mock('../src/render/assets/loader', () => ({
@@ -240,7 +242,45 @@ describe('private cannon scene', () => {
     }
     visual.dispose();
   });
-  it('draws the Low portal look on Low', async () => {
+  it('pools the rift gate model under the gated group, in the Low look on Low', async () => {
+    const gateMaterial = new THREE.MeshStandardMaterial();
+    const scene = new THREE.Group();
+    scene.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1.13, 0.3), gateMaterial));
+    setRiftGateGltfForTest({ scene } as unknown as GLTF);
+    try {
+      const membraneColors: Record<string, string> = {};
+      for (const lowGfx of [true, false]) {
+        const seen: { gateMeshes: number; membranes: THREE.MeshBasicMaterial[] } = {
+          gateMeshes: 0,
+          membranes: [],
+        };
+        const gate = vi.fn(async (target: THREE.Object3D) => {
+          target.traverse((o) => {
+            const mesh = o as THREE.Mesh;
+            if (!mesh.isMesh) return;
+            if (mesh.material === gateMaterial) seen.gateMeshes++;
+            if (mesh.name === 'cannon-rift-portal-membrane')
+              seen.membranes.push(mesh.material as THREE.MeshBasicMaterial);
+          });
+        });
+        const visual = new CannonEncounterVisual(new THREE.Scene(), () => 0, gate, lowGfx);
+        await visual.readyForEntry;
+        expect(seen.gateMeshes).toBe(3);
+        expect(seen.membranes).toHaveLength(3);
+        membraneColors[String(lowGfx)] = seen.membranes[0].color.getHexString();
+        if (lowGfx) {
+          expect(seen.membranes[0].color.getHex()).toBe(
+            new THREE.Color(RIFT_TIER_COLORS.A).getHex(),
+          );
+        }
+        visual.dispose();
+      }
+      expect(membraneColors.true).not.toBe(membraneColors.false);
+    } finally {
+      setRiftGateGltfForTest(null);
+    }
+  });
+  it('draws the Low portal look on Low (arch fallback)', async () => {
     const membraneOf = (lowGfx: boolean) => {
       const visual = new CannonEncounterVisual(new THREE.Scene(), () => 0, undefined, lowGfx);
       const membrane = visual.group.getObjectByName('cannon-rift-portal-membrane') as THREE.Mesh;

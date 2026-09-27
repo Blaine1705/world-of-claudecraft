@@ -334,6 +334,10 @@ describe('the props prewarm covers the fading clones (transport_ship.ts)', () =>
     expect(fadeTwins.length).toBeGreaterThan(0);
     expect(fadeTwins.length).toBeLessThan(worn.size);
     expect(new Set(fadeTwins.map((p) => p.material)).size).toBe(fadeTwins.length);
+    // the twins stage exactly the programs the fading clones draw, nothing else
+    expect(new Set(fadeTwins.map((p) => programOf(p.material, p.geometry)))).toEqual(
+      new Set(meshes.map(({ mesh }) => programOf(mesh.material as THREE.Material, mesh.geometry))),
+    );
     // later views add nothing: the first view's clones already cover them
     build();
     expect(transportShipPrewarmParts()).toHaveLength(parts.length);
