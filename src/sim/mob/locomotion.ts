@@ -100,6 +100,7 @@ import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
 import { splashNearbyMobs } from './boss_collateral';
+import { resetBossRangedMechanics, tickBossRangedMechanics } from './boss_ranged_mechanics';
 import { launchFromSlam, resetBossSlams, tickBossSlams } from './boss_slams';
 import {
   cancelMobChargeDash,
@@ -709,6 +710,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // resolve wherever the boss has since walked. Starting one is still melee-gated,
         // inside the module.
         tickBossSlams(ctx, mob);
+        // The ranged-punish kit, after the slams so a slam that claimed the spacing lock
+        // this tick blocks it (mob/boss_ranged_mechanics.ts).
+        tickBossRangedMechanics(ctx, mob);
       };
       // A boss walking a WARPATH owns the whole engaged tick while he travels to his next
       // landmark and while he wrecks it: threat does not steer him through either, so the
@@ -1668,6 +1672,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // ...and for a half-wound aimed slam, whose ring must not detonate on whoever
   // re-pulls him.
   resetBossSlams(mob);
+  resetBossRangedMechanics(ctx, mob);
   // A mid-flight inferno channel dies with the pull; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;

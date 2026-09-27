@@ -27,7 +27,6 @@ import { bossAuraPlan, moteBudget, readBossVfxState } from './balgath_aura_core'
 import { BalgathDebris } from './balgath_debris';
 import {
   BALGATH_CLEAVE_ABILITY,
-  BALGATH_CLEAVE_HALF_ARC,
   BALGATH_CLEAVE_TRAUMA,
   BALGATH_CRATER_FADE,
   BALGATH_CRATER_SECONDS,
@@ -47,6 +46,12 @@ import {
   EYE_POOL_LEASE_SECONDS,
   planBalgathRing,
 } from './balgath_fx_core';
+import { BalgathRangedFx } from './balgath_ranged_fx';
+import {
+  BALGATH_BOULDER_ABILITY,
+  BALGATH_BURDEN_ABILITY,
+  BALGATH_GLARE_ABILITY,
+} from './balgath_ranged_fx_core';
 
 // These deliberately do NOT go through gfx.ts `surfaceMat`. That factory DEDUPES by
 // (color|maps|flags) so hundreds of static surfaces can share one program, which is
@@ -140,7 +145,18 @@ export interface BalgathBody {
    *  mob carries none of it and simply gets no aura. */
   warpathPhase?: 'focus' | 'travel' | 'wreck';
   warpathUnharried?: number;
-  auras?: { kind?: string; id?: string }[];
+  auras?: {
+    kind?: string;
+    id?: string;
+    remaining?: number;
+    duration?: number;
+    stacks?: number;
+    sourceId?: number;
+  }[];
+  /** 'player' marks a possible Barrow Burden carrier (balgath_ranged_fx.ts). */
+  kind?: string;
+  dead?: boolean;
+  facing?: number;
   enraged?: boolean;
   hp?: number;
   maxHp?: number;
@@ -198,7 +214,11 @@ export function routeBalgathSpellfxAt(
   // The cleave's telegraph is the one RUNE CIRCLE this router takes: its damage is a
   // 120-degree wedge, so the generic full circle the renderer would draw promises four
   // times the area it will hit. Returning true suppresses that circle in favour of the arc.
-  const telegraph = ev.fx === 'runeCircle' && ev.ability === BALGATH_CLEAVE_ABILITY;
+  const telegraph =
+    ev.fx === 'runeCircle' &&
+    (ev.ability === BALGATH_CLEAVE_ABILITY ||
+      ev.ability === BALGATH_BOULDER_ABILITY ||
+      ev.ability === BALGATH_GLARE_ABILITY);
   if (!telegraph && (ev.fx !== 'nova' || !ev.radius || ev.sourceId === undefined)) return false;
   if (!ev.radius || ev.sourceId === undefined) return false;
   let found = false;
@@ -209,6 +229,26 @@ export function routeBalgathSpellfxAt(
   }
   if (!found) return false;
   const aim = Math.atan2(ev.dirX ?? 0, ev.dirZ ?? 1);
+  // The ranged kit's marks are drawn by the ranged layer at the sim's true size and shape
+  // (a circle per boulder, the glare's line), suppressing the generic rune circle exactly
+  // as the cleave's arc does. Its landings follow.
+  if (ev.ability === BALGATH_BOULDER_ABILITY) {
+    if (telegraph) fx.ranged.boulderTelegraph(ev.sourceId, ev.x, ev.z, ev.radius, ev.duration ?? 2);
+    else fx.boulderImpact(ev.x, ev.z, ev.radius);
+    return true;
+  }
+  if (ev.ability === BALGATH_GLARE_ABILITY) {
+    const dirX = ev.dirX ?? 0;
+    const dirZ = ev.dirZ ?? 1;
+    if (telegraph)
+      fx.ranged.glareTelegraph(ev.sourceId, ev.x, ev.z, dirX, dirZ, ev.radius, ev.duration ?? 2.5);
+    else fx.ranged.glareFired(ev.sourceId, ev.x, ev.z, dirX, dirZ, ev.radius);
+    return true;
+  }
+  if (ev.ability === BALGATH_BURDEN_ABILITY) {
+    fx.ranged.burdenLanded(ev.x, ev.z, ev.radius);
+    return true;
+  }
   if (telegraph) {
     fx.cleaveTelegraph(ev.x, ev.z, ev.radius, aim, ev.duration ?? 1.5);
     return true;
@@ -249,6 +289,8 @@ export class BalgathFx {
   private seenThisFrame = new Set<number>();
 
   private debris: BalgathDebris;
+  /** The ranged-punish kit and the cleave's fan (balgath_ranged_fx.ts). */
+  readonly ranged: BalgathRangedFx;
 
   constructor(
     private scene: THREE.Scene,
@@ -267,6 +309,12 @@ export class BalgathFx {
     private surfaceAt: (x: number, z: number, y: number) => Surface = () => 'dirt',
   ) {
     this.debris = new BalgathDebris(scene);
+    this.ranged = new BalgathRangedFx(scene, groundHeightAt, {
+      felt: (trauma, x, z) => this.impactFelt(trauma, x, z),
+      ground: (x, z, radius, power) => this.throwGround(x, z, radius, power),
+      ring: (x, z, radius, power) => this.spawnRing(x, z, radius, SILT, power),
+      crater: (x, z, radius) => this.spawnCrater(x, z, radius),
+    });
   }
 
   /**
@@ -286,6 +334,7 @@ export class BalgathFx {
   setQuality(level: number): void {
     this.quality = Math.min(1, Math.max(0, level));
     this.debris.setQuality(this.quality);
+    this.ranged.setQuality(this.quality);
   }
 
   /** The overhead smash landing. `radius` is the TRUE blast radius the telegraph drew. */
@@ -312,54 +361,31 @@ export class BalgathFx {
   }
 
   /**
-   * The cleave landing: material thrown along the ARC rather than out of a point.
-   *
-   * Seeding several small bursts across the sweep is what makes it read as an arm dragged
-   * through the ground instead of an explosion that happened to be arc-shaped, and it is
-   * the same trick the telegraph uses, so the promise and the payoff have the same shape.
+   * The cleave landing: the arm's wave of dust and rock chips runs ALONG the arc, in the
+   * direction the arm swept (balgath_ranged_fx.ts), so it reads as an arm dragged through
+   * the ground rather than an explosion that happened to be arc-shaped.
    */
   cleaveImpact(x: number, z: number, radius: number, aim: number): void {
-    const steps = 5;
-    for (let i = 0; i < steps; i++) {
-      const a = aim + BALGATH_CLEAVE_HALF_ARC * (-1 + (2 * i) / (steps - 1));
-      const r = radius * 0.72;
-      const px = x + Math.sin(a) * r;
-      const pz = z + Math.cos(a) * r;
-      this.spawnRing(px, pz, radius * 0.34, SILT_DEEP, 0.5);
-      this.throwGround(px, pz, radius * 0.22, 0.5);
-    }
+    this.ranged.cleaveLanded(x, z, radius, aim);
     this.impactFelt(BALGATH_CLEAVE_TRAUMA, x, z);
   }
 
   /**
-   * The ground telegraph for the cleave: an arc, not a circle.
-   *
-   * Drawn here rather than left to the renderer's generic rune circle because the damage
-   * is a 120-degree wedge and a full circle promises four times the area it will actually
-   * hit. A telegraph that overstates itself trains the raid to ignore it, which costs more
-   * than having no telegraph at all.
+   * The ground telegraph for the cleave: a fan, not a circle, that fills from him outward
+   * and reaches its rim on the landing, with "up" chevrons standing on it
+   * (balgath_ranged_fx.ts). A full circle would promise four times the area the wedge
+   * hits, and a telegraph that overstates itself trains the raid to ignore it.
    */
   cleaveTelegraph(x: number, z: number, radius: number, aim: number, seconds: number): void {
-    const geo = new THREE.RingGeometry(
-      radius * 0.12,
-      radius,
-      36,
-      1,
-      // three measures theta from +X counter-clockwise; the game's headings are from +Z
-      // clockwise, so the start angle is (PI/2 - aim) minus the half-width.
-      Math.PI / 2 - aim - BALGATH_CLEAVE_HALF_ARC,
-      BALGATH_CLEAVE_HALF_ARC * 2,
-    );
-    geo.rotateX(-Math.PI / 2);
-    const mat = fxMaterial(SILT, softDisc());
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(x, this.groundHeightAt(x, z) + 0.06, z);
-    mesh.renderOrder = 2;
-    this.scene.add(mesh);
-    // Reuse the crater list: it is already an age-and-fade pool with a cap, and a
-    // telegraph is a crater that lives for a second and a half.
-    this.makeCraterRoom();
-    this.craters.push({ mesh, mat, age: 0, life: Math.max(0.2, seconds) });
+    this.ranged.cleaveTelegraph(x, z, radius, aim, seconds);
+  }
+
+  /** A thrown boulder landing: the hammer's crater and dust, and the rock shatters. */
+  boulderImpact(x: number, z: number, radius: number): void {
+    this.spawnRing(x, z, radius, SILT, 0.85);
+    this.spawnCrater(x, z, radius);
+    this.throwGround(x, z, radius, 1.3);
+    this.ranged.boulderLanded(x, z, radius);
   }
 
   /**
@@ -474,8 +500,13 @@ export class BalgathFx {
    */
   private syncBosses(bosses: Iterable<BalgathBody>, dt: number, reducedMotion: boolean): void {
     this.seenThisFrame.clear();
+    this.ranged.beginFrame();
     for (const e of bosses) {
-      if (!e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX)) continue;
+      const balgath = e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX) === true;
+      // One walk feeds both layers: the ranged kit needs his body (hands, eye) and the
+      // players (burden carriers and who stands inside the soak).
+      this.ranged.note(e, balgath);
+      if (!balgath) continue;
       this.seenThisFrame.add(e.id);
       // The eye's pool tracks the channel exactly: lit while the bar runs, out the
       // instant it stops. Re-armed every frame with a short lease rather than latched on
@@ -568,6 +599,7 @@ export class BalgathFx {
   update(dt: number, reducedMotion = false, bosses: Iterable<BalgathBody> = []): void {
     this.clock += dt;
     this.syncBosses(bosses, dt, reducedMotion);
+    this.ranged.update(dt, reducedMotion);
     this.debris.update(dt);
 
     for (let i = this.rings.length - 1; i >= 0; i--) {
@@ -628,6 +660,7 @@ export class BalgathFx {
   }
 
   clear(): void {
+    this.ranged.clear();
     this.auraCarry.clear();
     this.stride.clear();
     this.debris.clear();
@@ -639,6 +672,7 @@ export class BalgathFx {
 
   dispose(): void {
     this.clear();
+    this.ranged.dispose();
     this.debris.dispose();
     if (this.eyePool) {
       this.scene.remove(this.eyePool);

@@ -76,7 +76,12 @@ const AUTHORED = [
   'Balgath_Barrowfall', // the warpath arrival slam, timed to its own telegraph fuse
   'Balgath_Hammer', // whack-a-mole: ONE fist up, held, dropped on a snapshot
   'Balgath_Cleave', // the low arc, authored as a body twist at the root
+  'Balgath_Toss', // the boulder toss: dig, heave overhead, hurl (release at 1.45s)
 ];
+
+/** The Toss's authored release frame (scripts/anim/blender_author_balgath_slams.py): the
+ *  renderer launches its boulder from his fists here, so it is a contract, not a detail. */
+const TOSS_RELEASE_SEC = 1.45;
 
 /** What the Tripo creature lane retargeted onto the rig. */
 const RETARGETED = ['Idle', 'Walk', 'Run', 'Attack', 'Hit', 'Death', 'Cast', 'Jump'];
@@ -359,7 +364,7 @@ describe('balgath world boss assets', () => {
     const data = JSON.parse(
       readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
     );
-    for (const clip of ['Balgath_Hammer', 'Balgath_Cleave']) {
+    for (const clip of ['Balgath_Hammer', 'Balgath_Cleave', 'Balgath_Toss']) {
       expect(Object.keys(data.clips), `${clip} is not authored`).toContain(clip);
       expect(data.clips[clip].times.length, `${clip} has no frames`).toBeGreaterThan(30);
     }
@@ -369,6 +374,7 @@ describe('balgath world boss assets', () => {
     expect(build).toContain('balgath_slam_clips.json');
     expect(build).toContain("blenderClip('Balgath_Hammer')");
     expect(build).toContain("blenderClip('Balgath_Cleave')");
+    expect(build).toContain("blenderClip('Balgath_Toss')");
   });
 
   it('never authors a track on the parentless root bone', () => {
@@ -537,5 +543,135 @@ describe('balgath world boss assets', () => {
     // Without this his AoEs fire instantly with no ring, and "walk out of the circle"
     // stops being something a player can do.
     expect(templateSource()).toMatch(/telegraphedMechanics: [\d.]+,/);
+  });
+
+  it('routes the ranged kit off the ability ids the sim actually emits', () => {
+    // Fourth weld of the same kind, for the three mechanics that reach the far players
+    // (src/sim/mob/boss_ranged_mechanics.ts). A disagreement leaves the telegraph on the
+    // ground while the boss plays his ordinary swing, which survives a playtest.
+    const map = clipMapSource();
+    const ranged = readFileSync(resolve(ROOT, 'src/sim/mob/boss_ranged_mechanics.ts'), 'utf8');
+    for (const [ability, clip] of [
+      ['mob_balgath_boulder', 'Balgath_Toss'],
+      ['mob_balgath_glare', 'Balgath_EyeFlare'],
+      ['mob_balgath_burden', 'Balgath_Roar'],
+    ]) {
+      expect(map, `${ability} has no pose`).toContain(`${ability}: '${clip}'`);
+      expect(ranged, `${ability} is never emitted`).toContain(`'${ability}'`);
+    }
+    // The toss is the one that lights his fists, earth-brown, for exactly its release.
+    expect(map).toContain(
+      `mob_balgath_boulder: { hand: 'both', color: 0xb08a5a, rise: 0.4, seconds: ${TOSS_RELEASE_SEC}, radius: 0.04 }`,
+    );
+  });
+
+  it('plays the toss unscaled, releasing inside the windup and standing again as it lands', async () => {
+    // The renderer launches the boulder from his fists on the authored release frame, so
+    // the clip must play at 1 (or that frame moves) and its release must come before the
+    // sim resolves the hit, with the recovery filling the rest of the windup.
+    const map = clipMapSource();
+    expect(map).toContain('mob_balgath_boulder: 1,');
+    const windup = Number(templateSource().match(/boulder: \{[\s\S]*?windup: ([\d.]+),/)?.[1]);
+    expect(windup, 'the boulder template has no windup').toBeGreaterThan(0);
+    const poser = await loadRigPoser(RIG, ABILITIES);
+    const dur = poser.duration('Balgath_Toss');
+    expect(TOSS_RELEASE_SEC).toBeLessThan(windup);
+    expect(dur).toBeGreaterThan(TOSS_RELEASE_SEC + 0.5);
+    expect(Math.abs(dur - windup), 'the recovery should end as the boulder lands').toBeLessThan(
+      0.1,
+    );
+  });
+
+  it('reads as a toss: fists in the ground ahead, overhead and apart, then thrown out ahead', async () => {
+    // The boulder is drawn by the renderer, so the arms carry an invisible object and the
+    // pose has to say where it is. Measured by forward kinematics on the shipped clip (the
+    // rig faces +X, up is +Y), at the three beats a raid reads: the dig, the overhead hold,
+    // and the release the boulder leaves from.
+    const poser = await loadRigPoser(RIG, ABILITIES);
+    const stand = poser.pose('Balgath_Toss', 0);
+    const sole = stand.at('R_Foot')[1];
+    const hands = (p: PosedSkeleton) => [p.at('R_Hand'), p.at('L_Hand')];
+
+    const dig = poser.pose('Balgath_Toss', 0.55);
+    for (const h of hands(dig)) {
+      expect(h[1] - sole, 'the fists never reach the ground to dig').toBeLessThan(0.2);
+      expect(h[0] - dig.at('R_Foot')[0], 'the dig is not ahead of his feet').toBeGreaterThan(0.2);
+    }
+
+    const overhead = poser.pose('Balgath_Toss', 1.1);
+    const [ro, lo] = hands(overhead);
+    for (const h of [ro, lo]) {
+      expect(
+        h[1] - overhead.at('Head')[1],
+        'the boulder never gets above his head',
+      ).toBeGreaterThan(0.12);
+    }
+    // a boulder's width apart, never clasped together behind his skull
+    expect(Math.hypot(ro[0] - lo[0], ro[1] - lo[1], ro[2] - lo[2])).toBeGreaterThan(0.25);
+
+    const release = poser.pose('Balgath_Toss', TOSS_RELEASE_SEC);
+    for (const h of hands(release)) {
+      expect(h[0] - release.at('Head')[0], 'the arms are not thrown out ahead').toBeGreaterThan(
+        0.1,
+      );
+      expect(h[1] - sole, 'the release is not at a throwing height').toBeGreaterThan(0.3);
+    }
+  });
+
+  it('bookends the toss on the same idle base every other authored clip starts from', () => {
+    // Rule 3 of the authoring script: a clip whose first or last frame is not the idle pose
+    // pops on the way in or out. The hammer is already pinned to open on that base, so the
+    // toss must match it channel for channel at both ends.
+    const data = JSON.parse(
+      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
+    );
+    const toss = data.clips.Balgath_Toss;
+    const hammer = data.clips.Balgath_Hammer;
+    const last = toss.times.length - 1;
+    // Numerically, to the samples' own 1e-5 rounding (a -0 and a 0 are the same pose).
+    const apart = (a: number[], b: number[]) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+    for (const bone of data.bones as string[]) {
+      expect(
+        apart(toss.rotation[bone][0], hammer.rotation[bone][0]),
+        `${bone} does not open on idle`,
+      ).toBeLessThan(2e-5);
+      expect(
+        apart(toss.rotation[bone][last], toss.rotation[bone][0]),
+        `${bone} does not close on idle`,
+      ).toBeLessThan(2e-5);
+    }
+    for (const bone of Object.keys(toss.translation ?? {})) {
+      expect(
+        apart(toss.translation[bone][last], toss.translation[bone][0]),
+        `${bone} drifts over the clip`,
+      ).toBeLessThan(2e-5);
+    }
+  });
+
+  it('holds the glare pose at full stretch as the beam fires', async () => {
+    // EyeFlare is shared with the generic cast slot, so the glare slows it instead of
+    // re-authoring it: the moment his raised hands peak (the scry hold) is divided by the
+    // wired timescale, and that has to land in the last beat before the 2.6s windup
+    // resolves, not a second early with the pose already settling.
+    const map = clipMapSource();
+    const scale = Number(map.match(/mob_balgath_glare: ([\d.]+),/)?.[1]);
+    expect(scale).toBeGreaterThan(0);
+    const windup = Number(templateSource().match(/glare: \{[\s\S]*?windup: ([\d.]+),/)?.[1]);
+    expect(windup, 'the glare template has no windup').toBeGreaterThan(0);
+    const poser = await loadRigPoser(RIG, ABILITIES);
+    const dur = poser.duration('Balgath_EyeFlare');
+    let peakT = 0;
+    let peakY = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i <= 52; i++) {
+      const t = (dur * i) / 52;
+      const y = poser.pose('Balgath_EyeFlare', t).at('R_Hand')[1];
+      if (y > peakY) {
+        peakY = y;
+        peakT = t;
+      }
+    }
+    const landed = peakT / scale;
+    expect(landed, 'the eye peaks after the beam has already fired').toBeLessThanOrEqual(windup);
+    expect(landed, 'the eye peaks long before the beam fires').toBeGreaterThan(windup - 0.4);
   });
 });

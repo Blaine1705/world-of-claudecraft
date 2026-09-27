@@ -1,17 +1,25 @@
-# Balgath's two AIMED slams, authored in Blender: the whack-a-mole hammer and the low cleave.
+# Balgath's Blender-authored clips: the whack-a-mole hammer, the low cleave, and the
+# boulder toss.
 #
 # This is the `blender-anim-pipeline` skill's TECHNIQUE 2, and the escalation test is met
-# twice over. The eight Tripo preset clips the creature lane retargets onto this rig carry
-# no horizontal swing at all and no one-armed gesture of any kind, so neither of these
-# silhouettes can be sampled out of donor poses. The pose-blend versions they replace were
-# honest approximations built by masking half the body out of a two-armed overhead chop;
-# they read as "something happened", not as a hammer and a sweep.
+# for each. The eight Tripo preset clips the creature lane retargets onto this rig carry
+# no horizontal swing at all, no one-armed gesture of any kind, and nothing that reaches
+# the ground in front of him and lifts, so none of these silhouettes can be sampled out
+# of donor poses. The pose-blend versions the first two replace were honest
+# approximations built by masking half the body out of a two-armed overhead chop; they
+# read as "something happened", not as a hammer and a sweep.
 #
 # Usage (headless, reproducible):
 #   /Applications/Blender.app/Contents/MacOS/Blender --background \
 #     --python scripts/anim/blender_author_balgath_slams.py -- \
 #     --rig tmp/balgath_for_blender.glb \
 #     --out scripts/anim_data/balgath_slam_clips.json
+#
+# `--clips Balgath_Toss` (comma separated) re-authors only the named clips and MERGES them
+# into the existing --out file, leaving every other clip's samples byte for byte as they
+# were. Use it when adding or retuning one clip: a full re-run on another machine moves
+# the last rounded digit of unrelated clips (a 1e-5 float drift), which is churn, not
+# change.
 #
 # The rig argument is a BASISU-STRIPPED copy of public/models/creatures/balgath_cyclops.glb
 # (Blender's importer refuses a file that declares KHR_texture_basisu, and every shipped
@@ -39,6 +47,11 @@
 #      Spine01     local  Y is the TWIST (the head sits on the axis and does not move,
 #                                         so a head landmark cannot see it at all)
 #                  local  X is the forward/back pitch, -X folds him forward
+#    and, measured the same way for the two-armed toss (from the idle base, +-45 deg):
+#      R_ and L_Upperarm  local +X swings the arm FORWARD and up (both sides, same sign)
+#      R_Upperarm -Z / L_Upperarm +Z  lift the arm outward (the sides MIRROR here)
+#      R_ and L_Forearm   local +X flexes the hand forward and up (both sides)
+#      Waist, Spine02     local -X fold him forward, like Spine01 (Waist folds the most)
 #
 # 3. NEVER author from the BIND pose. Every shipped clip bookends on IDLE, and this rig's
 #    idle is a deep knuckle-down hunch: the hands hang at z 0.01 against a bind pose that
@@ -132,6 +145,32 @@ def cleave(twist, sweep, raise_, bend=0, elbow=0):
     ]
 
 
+def toss(fold, reach, spread, elbow, lean=0, shrug=0):
+    """The two-armed boulder toss, both arms moving TOGETHER (the boulder is one object).
+
+    `fold` bends him forward at the waist (negative is forward, split across Waist,
+    Spine01 and Spine02 so the back curves instead of hinging), `lean` adds a spine-only
+    pitch on top (positive arches him back for the overhead wind), `reach` swings both
+    arms forward and up (0 hangs, about 90 points them ahead, about 170 is overhead),
+    `spread` lifts them outward so the fists stay a boulder's width apart and clear his
+    enormous head, `elbow` flexes the forearms, and `shrug` raises both shoulders into
+    the heave. Every sign here is the measured one from the header, mirrored where the
+    measurement found the sides mirror."""
+    return [
+        ("Waist", "X", fold * 0.55),
+        ("Spine01", "X", fold * 0.3 + lean),
+        ("Spine02", "X", fold * 0.15 + lean * 0.5),
+        ("R_Upperarm", "X", reach),
+        ("L_Upperarm", "X", reach),
+        ("R_Upperarm", "Z", -spread),
+        ("L_Upperarm", "Z", spread),
+        ("R_Forearm", "X", elbow),
+        ("L_Forearm", "X", elbow),
+        ("R_Clavicle", "Z", -shrug),
+        ("L_Clavicle", "Z", shrug),
+    ]
+
+
 # Beat times are load-bearing: each clip's contact frame sits ON its template windup
 # (MobTemplate.slams, src/sim/content/zone2.ts), and both are wired at timeScale 1, so the
 # blow and the blast land together. Move a windup and these move with it.
@@ -187,6 +226,34 @@ CLIPS = {
             (2.50, cleave(0, 0, 0, 0, 0)),
         ],
     },
+    # The boulder toss: he stoops, digs both fists into the fen in front of him, rips a
+    # boulder out, heaves it overhead and hurls it. The boulder itself is drawn by the
+    # renderer (public/models/vfx/balgath_boulder.glb), so the arms carry an invisible
+    # object and the pose has to SAY where it is: fists a boulder's width apart the whole
+    # time it is held, rising together, never crossing.
+    #
+    # RELEASE is authored at exactly 1.45s (arms thrown straight out ahead, fists at their
+    # most forward), and the clip is wired at timeScale 1, so the renderer launches the
+    # boulder from the fists on that frame. The mechanic's windup is 2.2s; the recovery
+    # after the release fills it, so the clip ends in idle as the boulder lands.
+    "Balgath_Toss": {
+        "seconds": 2.20,
+        "beats": [
+            # Fist positions in the comments are measured (armature space, x ahead of him,
+            # z up; his head sits at x 0.04 z 0.27, his soles at z -0.21).
+            (0.00, toss(0, 0, 0, 0)),
+            (0.22, toss(-34, 40, 10, 10)),  # stooping, arms swinging down and out ahead
+            (0.45, toss(-66, 80, 14, 10)),  # reaching: fists nearly down, ahead of his feet
+            (0.55, toss(-72, 88, 14, 4)),  # DIG: fists in the ground at x 0.32, ahead of his face
+            (0.72, toss(-50, 82, 22, 30, shrug=10)),  # the rip: it tears up out of the fen
+            (0.90, toss(-20, 104, 36, 52, shrug=18)),  # hauled up the chest, elbows bent
+            (1.10, toss(4, 120, 45, 20, lean=6, shrug=22)),  # OVERHEAD: fists at z 0.45, 0.36 apart
+            (1.26, toss(8, 135, 45, 30, lean=14, shrug=22)),  # the last inch of wind, arched back
+            (1.45, toss(-22, 108, 14, -18, lean=-6, shrug=6)),  # RELEASE: arms straight out, x 0.32
+            (1.66, toss(-34, 70, 10, 6)),  # follow-through, weight forward over it
+            (2.20, toss(0, 0, 0, 0)),
+        ],
+    },
 }
 
 
@@ -213,7 +280,7 @@ def idle_base(arm, frame=7):
     return base
 
 
-def build(arm):
+def build(arm, clips):
     bpy.context.view_layer.objects.active = arm
     if arm.mode != "POSE":
         bpy.ops.object.mode_set(mode="POSE")
@@ -231,7 +298,7 @@ def build(arm):
             pb.location = loc
             pb.rotation_quaternion = rot.copy()
 
-    for name, spec in CLIPS.items():
+    for name, spec in clips.items():
         old = bpy.data.actions.get(name)
         if old:
             bpy.data.actions.remove(old)
@@ -297,10 +364,30 @@ def main():
     args = script_args()
     rig = args.get("rig", "tmp/balgath_for_blender.glb")
     out = args.get("out", "scripts/anim_data/balgath_slam_clips.json")
+    only = [c for c in args.get("clips", "").split(",") if c]
+    unknown = [c for c in only if c not in CLIPS]
+    if unknown:
+        raise SystemExit(f"unknown clips {unknown}; authored clips are {list(CLIPS)}")
+    selected = {name: CLIPS[name] for name in (only or CLIPS)}
     arm = import_rig(os.path.abspath(rig))
-    animated, base = build(arm)
+    animated, base = build(arm, selected)
     if "Root" in animated:
         raise SystemExit("refusing to author a track on the parentless root bone")
+    sampled = {
+        name: sample(arm, animated, base, name, round(spec["seconds"] * FPS) + 1)
+        for name, spec in selected.items()
+    }
+    clips = sampled
+    if only:
+        # Merge into what is already on disk: the untouched clips keep their exact
+        # samples, and a clip list in CLIPS order keeps the file order stable.
+        with open(os.path.abspath(out)) as fh:
+            existing = json.load(fh)
+        if existing["bones"] != animated:
+            raise SystemExit("the rig's bone list changed; re-author every clip, not a subset")
+        merged = dict(existing["clips"])
+        merged.update(sampled)
+        clips = {name: merged[name] for name in CLIPS if name in merged}
     data = {
         "note": (
             "Authored in Blender against the shipped balgath_cyclops rig; per-frame "
@@ -310,10 +397,7 @@ def main():
         "fps": FPS,
         "rig": "public/models/creatures/balgath_cyclops.glb",
         "bones": animated,
-        "clips": {
-            name: sample(arm, animated, base, name, round(spec["seconds"] * FPS) + 1)
-            for name, spec in CLIPS.items()
-        },
+        "clips": clips,
     }
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     with open(os.path.abspath(out), "w") as fh:

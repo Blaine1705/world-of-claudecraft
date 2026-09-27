@@ -27,6 +27,7 @@
 // here is the one the live cast will draw with.
 
 import * as THREE from 'three';
+import { balgathRangedMaterials, buildBalgathRangedStandIn } from './balgath_ranged_fx';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
@@ -114,6 +115,16 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'ring_of_frost_visual.ts',
     materials: () => [...ringOfFrostStandInMaterials()],
     build: () => buildRingOfFrostStandIn().root,
+  },
+  {
+    // Balgath's ranged kit and cleave fan (Boulder Toss, Foreman's Glare, Barrow Burden):
+    // every live piece draws a clone of one of four bundle materials, and the burden's soak
+    // rings are the Shared Pyre marker's programs. The first boulder of a world-boss fight
+    // must not link its programs inside the combat frame it lands in.
+    id: 'balgath-ranged',
+    module: 'balgath_ranged_fx.ts',
+    materials: () => Object.values(balgathRangedMaterials()),
+    build: () => buildBalgathRangedStandIn(),
   },
   {
     // Not a spell: the Proving Shore coach's guidance (ribbon, ring, aura,

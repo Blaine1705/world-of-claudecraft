@@ -42,6 +42,10 @@ type SlamsDef = NonNullable<MobTemplate['slams']>;
 export const HAMMER_ABILITY = 'mob_balgath_hammer';
 export const CLEAVE_ABILITY = 'mob_balgath_cleave';
 
+/** The cleave's two sound cues, both existing recordings in the SFX manifest. */
+export const CLEAVE_WINDUP_SFX = 'melee_swing_heavy';
+export const CLEAVE_IMPACT_SFX = 'impact_warrior_quake';
+
 /**
  * Feet-above-ground a player must reach to clear the cleave.
  *
@@ -257,6 +261,9 @@ function startCleave(ctx: SimContext, mob: Entity, def: SlamsDef): void {
     // teaches the raid to dodge something that was never coming.
     dirX: mob.slamX,
     dirZ: mob.slamZ,
+    // The arm drawing back: a heavy swing the raid learns to hear as "jump soon". An
+    // existing licensed recording (the SFX manifest), so no new audio asset.
+    sfxKey: CLEAVE_WINDUP_SFX,
   });
   ctx.emit({
     type: 'spellfx',
@@ -335,6 +342,8 @@ function fireCleave(ctx: SimContext, mob: Entity, def: SlamsDef): void {
     ability: CLEAVE_ABILITY,
     dirX: Math.sin(aim),
     dirZ: Math.cos(aim),
+    // The arm ploughing through the fen, in place of the generic nova sound.
+    sfxKey: CLEAVE_IMPACT_SFX,
   });
   const struck = new Set<number>();
   for (const meta of ctx.players.values()) {

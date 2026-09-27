@@ -567,6 +567,13 @@ const BALGATH: ClipMap = {
     // the low arm dragged across the ground.
     mob_balgath_hammer: 'Balgath_Hammer',
     mob_balgath_cleave: 'Balgath_Cleave',
+    // His ranged kit. The boulder toss: stoop, rip a boulder out of the fen, heave it
+    // overhead and hurl it (the renderer draws the boulder and launches it from his fists
+    // on the clip's release frame). The glare is the scry pose aimed down a line, and the
+    // burden is the enrage bellow while the shared weight settles on the raid.
+    mob_balgath_boulder: 'Balgath_Toss',
+    mob_balgath_glare: 'Balgath_EyeFlare',
+    mob_balgath_burden: 'Balgath_Roar',
   },
   // Timed so each clip's IMPACT frame lands on the moment the mechanic actually resolves,
   // not before it. Left at the default 1.3x they all land early and the boss stands frozen
@@ -595,6 +602,17 @@ const BALGATH: ClipMap = {
     // (1.3s and 1.5s), so they play unscaled and the blow lands with the blast.
     mob_balgath_hammer: 1,
     mob_balgath_cleave: 1,
+    // The toss is authored with its RELEASE at 1.45s and recovers to idle at 2.2s, the
+    // mechanic's whole windup, so it plays unscaled: the boulder leaves his fists on the
+    // authored frame and he is standing again as it lands.
+    mob_balgath_boulder: 1,
+    // EyeFlare peaks at 1.30s of its 2.60s timeline (the cast's highest hold); slowed to
+    // 0.52 that peak arrives at 2.5s, a beat before the 2.6s glare resolves, so the eye is
+    // at full stretch when the beam fires rather than already settling.
+    mob_balgath_glare: 0.52,
+    // The 1.6s bellow over a 6s windup: it plays once at its own pace and he holds idle
+    // for the rest, which is what a raid-wide weight settling slowly should look like.
+    mob_balgath_burden: 1,
   },
   // Which fist lights up while a slam winds, and for how long.
   //
@@ -615,6 +633,9 @@ const BALGATH: ClipMap = {
     mob_balgath_cleave: { hand: 'r', color: 0x76e0d8, rise: 0.5, seconds: 1.5, radius: 0.042 },
     mob_pulse_windup: { hand: 'both', color: 0x76e0d8, rise: 0.5, seconds: 1.2, radius: 0.038 },
     mob_warpath_wreck: { hand: 'both', color: 0x9ff0e6, rise: 0.45, seconds: 1.4, radius: 0.046 },
+    // Earth-brown, not teal: this is not his eye's power but plain strength, fen soil
+    // packed on both fists from the dig. It burns down to the RELEASE frame (1.45s).
+    mob_balgath_boulder: { hand: 'both', color: 0xb08a5a, rise: 0.4, seconds: 1.45, radius: 0.04 },
   },
   death: 'Death',
   hit: ['Hit'],

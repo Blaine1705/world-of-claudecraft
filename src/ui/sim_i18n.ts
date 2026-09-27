@@ -1048,6 +1048,8 @@ const baseEnTable = {
   // Nature's Boon, the Wildfang autoattack window (combat/druid_natures_boon.ts).
   'aura.naturesBoon': "Nature's Boon",
   'aura.marrowbreak': 'Marrowbreak',
+  // Balgath's shared soak mark (mob/boss_ranged_mechanics.ts).
+  'aura.barrowBurden': 'Barrow Burden',
   'aura.pin': 'Pin',
   // Coldsight's banked Fevered Draw opportunity (combat/hunter_coldsight_read.ts).
   'aura.coldsightRead': 'Coldsight Read',
@@ -14027,6 +14029,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Nature's Boon": 'aura.naturesBoon',
   'Coldsight Read': 'aura.coldsightRead',
   Marrowbreak: 'aura.marrowbreak',
+  // Balgath's shared soak mark; byte-identical to the template's burden.name.
+  'Barrow Burden': 'aura.barrowBurden',
   // Pin, the Bruin Rush to Cat Form rider's slow (combat/druid_engines.ts).
   Pin: 'aura.pin',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in

@@ -41,6 +41,7 @@ import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { dist2d, type Entity, IGNIVAR_BOSS_ID, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
+import { resetBossRangedMechanics } from './boss_ranged_mechanics';
 import { resetBossSlams } from './boss_slams';
 import { resetMobCharge } from './charge';
 import { idleRng, wanderPause } from './idle_rng';
@@ -95,6 +96,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   // phase at the barrow, not mid-run to whichever landmark he was heading for.
   resetWarpath(mob);
   resetBossSlams(mob);
+  resetBossRangedMechanics(ctx, mob);
   // A slumbering template that ever respawned in place (none does today: the world boss is
   // scheduler-owned) must come back awake, or a daytime respawn would run the dawn wake
   // and broadcast the realm-wide call on every single respawn.

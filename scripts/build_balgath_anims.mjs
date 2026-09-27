@@ -57,21 +57,26 @@
 //   Balgath_Hammer   the whack-a-mole fist: ONE arm up, held while the ring burns down,
 //                    then driven into the ground.
 //   Balgath_Cleave   the low arc across his front, the fight's one jump check.
+//   Balgath_Toss     the boulder toss: he stoops and digs both fists into the fen, rips a
+//                    boulder out, heaves it overhead and hurls it. RELEASE at 1.45s, arms
+//                    thrown straight out ahead; the renderer launches its boulder
+//                    (public/models/vfx/balgath_boulder.glb) from the fists on that frame.
 //
-//   THOSE TWO ARE NOT POSE-BLENDED. They are keyframed in Blender against this same rig
+//   THOSE THREE ARE NOT POSE-BLENDED. They are keyframed in Blender against this same rig
 //   (scripts/anim/blender_author_balgath_slams.py, samples committed to
 //   scripts/anim_data/balgath_slam_clips.json) and this file only bakes the samples. They
 //   escalated because the technique's own test is met: the retargeted donor set carries no
-//   horizontal swing and no one-armed gesture at all, so neither silhouette exists to be
-//   sampled. The pose-blend versions they replace masked half the body out of a two-armed
-//   overhead chop, which is why the hammer read as a crouch and the sweep as a scoop.
+//   horizontal swing, no one-armed gesture and nothing that reaches the ground ahead of him
+//   and lifts, so none of those silhouettes exists to be sampled. The pose-blend versions
+//   the first two replace masked half the body out of a two-armed overhead chop, which is
+//   why the hammer read as a crouch and the sweep as a scoop.
 //   Balgath_Barrowfall  the arrival slam that ends a chase: he plants over the landmark,
 //                    takes his full height with both fists overhead, holds, and drives them
 //                    down. Bigger and slower than the circle-smash on purpose, and its
 //                    impact frame is authored to land ON the telegraph fuse.
 //
 // Usage: node scripts/build_balgath_anims.mjs [--preview]
-// Output: public/models/creatures/balgath_ability_anims.glb (mesh-free, 12 clips)
+// Output: public/models/creatures/balgath_ability_anims.glb (mesh-free, 13 clips)
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -480,7 +485,7 @@ ramp(barrowfall, 1.95, 2.35, 4, easeOutCubic, P_recover, P_settle); // heaving b
 ramp(barrowfall, 2.35, 2.8, 4, easeInOutQuad, P_settle, P_idle);
 
 /**
- * The two AIMED slams come from BLENDER, not from donor poses.
+ * The two AIMED slams and the boulder toss come from BLENDER, not from donor poses.
  *
  * `scripts/anim/blender_author_balgath_slams.py` keyframes them against this same rig and
  * writes per-frame node-local rotations to scripts/anim_data/balgath_slam_clips.json; this
@@ -526,6 +531,7 @@ const slamKeysFor = (name) => [
 
 const hammer = blenderClip('Balgath_Hammer');
 const cleave = blenderClip('Balgath_Cleave');
+const toss = blenderClip('Balgath_Toss');
 
 const CLIPS = [
   ['Balgath_Smash', smash],
@@ -538,11 +544,12 @@ const CLIPS = [
   ['Balgath_Swipe', swipe],
   ['Balgath_Barrowsweep', sweep],
   ['Balgath_Barrowfall', barrowfall],
-  // The Blender-authored pair carries its OWN channel list: it drives rotation only, so
+  // The Blender-authored clips carry their OWN channel list: it drives rotation only, so
   // handing it the full pose-blend key union would ask bakeClip for translation and scale
   // tracks the authored data does not have.
   ['Balgath_Hammer', hammer, slamKeysFor('Balgath_Hammer')],
   ['Balgath_Cleave', cleave, slamKeysFor('Balgath_Cleave')],
+  ['Balgath_Toss', toss, slamKeysFor('Balgath_Toss')],
 ];
 
 const authored = [];

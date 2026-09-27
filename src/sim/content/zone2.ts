@@ -525,6 +525,70 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
         school: 'physical',
       },
     },
+    // The ranged-punish kit (mob/boss_ranged_mechanics.ts). Everything above is centred on
+    // his feet or aimed inside his reach, so a caster parked thirty-five yards out used to
+    // watch the fight rather than play it. These three reach them, each dodged a different
+    // way (move, break line, stack), and all three ride the same spacing lock as the slams:
+    // one telegraph on the ground at a time, most-overdue first.
+    rangedMechanics: {
+      // He tears a boulder out of the fen for each of the two FARTHEST players standing
+      // 18 yards or more out (just past the cleave's 20-yard reach at his size, so a melee
+      // player hugging his shins is never the pick). The circle is five yards: three steps
+      // out of it, and it lands after 2.2 s, which is the punishment: a caster who stays
+      // to finish a cast wears it. Damage sits beside Foreman's Hammer (44 to 62), since
+      // it is the same "move or be hit" read at a longer reach.
+      boulder: {
+        every: 20,
+        windup: 2.2,
+        minRange: 18,
+        maxRange: 60,
+        count: 2,
+        radius: 5,
+        min: 46,
+        max: 64,
+        name: 'Boulder Toss',
+        school: 'physical',
+      },
+      // His eye burns a line along the ground from his feet through one far player, and a
+      // beam rakes it after 2.6 s. Five yards wide: one sidestep clears it. Or hide behind
+      // a muster barricade: any solid collider tall enough to cross the sight line stops
+      // it (a soldier does NOT, and the beam leaves the muster unharmed: it burns players
+      // only, so it never razes a picket out of his circuit). Between the hammer
+      // and his Loomshard Scry (70 to 90) in weight, because it reaches everyone in a line.
+      glare: {
+        every: 30,
+        windup: 2.6,
+        minRange: 18,
+        maxRange: 55,
+        halfWidth: 2.5,
+        overshoot: 12,
+        minLength: 30,
+        maxLength: 70,
+        min: 58,
+        max: 78,
+        name: 'Foreman\u2019s Glare',
+        school: 'arcane',
+      },
+      // The shared soak, priced the way Varkhul's Shared Pyre is (a fraction of each
+      // soaker's max health, split by the count; shared_soak.ts), because this zone mixes
+      // level 8s with level 20s and a flat number would one-shot the locals it is meant to
+      // gather. 110% alone is death without a defensive; four share it at 27.5% each and
+      // six at 18%. The more players his health scaled up for, the more there are to share
+      // it, which is how it keeps pace with his player-count scaling without a knob.
+      burden: {
+        every: 45,
+        windup: 6,
+        range: 45,
+        radius: 6,
+        totalFraction: 1.1,
+        recommended: 4,
+        name: 'Barrow Burden',
+        yell: 'Shoulder the barrow! One back breaks. Five backs bend.',
+      },
+      // The gap each holds after landing before the next telegraph may start: shorter than
+      // the 4.5 s after a slam, since these land on the far players rather than the melee.
+      spacing: 2,
+    },
     // Every heavy slam he lands PUNTS rather than shoves (mob/boss_slams.ts). He is
     // thirteen units of quarried granite and his whole identity is his fists; a victim who
     // slides two yards along the floor reads as having been pushed by a large man, and one

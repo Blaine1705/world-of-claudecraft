@@ -17,6 +17,7 @@
 //   - mortal_wound/cost_tax/critvuln/vulnerability/spellvuln/expose/buff_dodge:
 //     value is a 0..1 fraction shown as a percent.
 
+import { BURDEN_AURA_ID } from '../sim/boss_ranged_geometry';
 import {
   ECHO_CONVERT_AOE,
   ECHO_GROUP_CONVERT_AOE,
@@ -192,6 +193,16 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     return a.poolPct !== undefined
       ? { key: `${KEY}.mendingCurrentPercent`, nums: { pct: round(a.poolPct) } }
       : { key: `${KEY}.mendingCurrent`, nums: { value: round(a.value) } };
+  }
+  // Balgath's Barrow Burden: the same shared-soak split, so the same sentence, priced
+  // from the mark itself (value2 is the total fraction, stacks the players it asks for).
+  if (a.id === BURDEN_AURA_ID) {
+    const players = Math.max(1, Math.floor(a.stacks ?? 4));
+    const total = pctFromFrac(a.value2 ?? 0);
+    return {
+      key: `${KEY}.sharedPyre`,
+      nums: { total, players, perPlayer: round(total / players) },
+    };
   }
   if (a.id === 'ignivar_shared_pyre') {
     const total = pctFromFrac(IGNIVAR_SOAK_SHARED_MAX_HP);

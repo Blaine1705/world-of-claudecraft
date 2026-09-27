@@ -2188,6 +2188,59 @@ export interface MobTemplate {
     };
   };
   /**
+   * The ranged-punish kit (mob/boss_ranged_mechanics.ts): three telegraphed mechanics
+   * that reach the players who stand far from him, each on its own cadence and all three
+   * behind the same mechanic spacing lock as every other telegraph, so no two wind-ups
+   * ever share the ground. Inert for every mob without it.
+   */
+  rangedMechanics?: {
+    /** Boulders hurled at the `count` FARTHEST players standing at least `minRange` out. */
+    boulder: {
+      every: number;
+      windup: number;
+      minRange: number;
+      maxRange: number;
+      count: number;
+      radius: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+    /** A ground-hugging beam down a snapshot line from him through one far player. */
+    glare: {
+      every: number;
+      windup: number;
+      minRange: number;
+      maxRange: number;
+      /** Half the beam's width in yards. */
+      halfWidth: number;
+      /** How far past the target the line runs, and the floor/ceiling of its length. */
+      overshoot: number;
+      minLength: number;
+      maxLength: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+    /** A shared soak marked on one player: its damage is split by everyone inside. */
+    burden: {
+      every: number;
+      windup: number;
+      range: number;
+      radius: number;
+      /** Total damage as a fraction of EACH soaker's max health, split by the soaker count. */
+      totalFraction: number;
+      /** Soakers the marker asks for (its occupancy runes); the split itself has no cap. */
+      recommended: number;
+      name: string;
+      yell?: string;
+    };
+    /** Seconds of the shared spacing lock each one holds AFTER its wind-up. */
+    spacing: number;
+  };
+  /**
    * Punt, rather than shove, on every heavy slam this mob lands (mob/boss_slams.ts
    * `launchFromSlam`, called from the telegraphed detonations, the warpath arrival, and
    * both aimed slams above).
@@ -5858,6 +5911,21 @@ export interface Entity extends ClientMirroredEntityFields {
   slamZ?: number;
   hammerTimer?: number;
   cleaveTimer?: number;
+  // Ranged-punish state (mob/boss_ranged_mechanics.ts). Only ever defined on a mob whose
+  // template declares `rangedMechanics`, the same defined-vs-undefined discipline as the
+  // slam fields above. ONE windup slot for the three, for the same reason.
+  rangedKind?: 'boulder' | 'glare' | 'burden';
+  rangedWindup?: number;
+  /** Boulder: flat [x, z] impact points. Glare: [originX, originZ, dirX, dirZ, length]. */
+  rangedAim?: number[];
+  /** The player the burden was laid on. */
+  rangedTargetId?: number;
+  boulderTimer?: number;
+  glareTimer?: number;
+  burdenTimer?: number;
+  /** Seconds overdue of the oldest aimable due one, published each tick for the circle
+   *  smashes' oldest-due drain (mob/mechanic_spacing.ts); undefined when none is ready. */
+  rangedReadyOverdue?: number;
   /** Absolute sim time the arrival slam lands; null once it has, so it fires once. */
   warpathBlastAt?: number | null;
   // The telegraphed ring center each windup was drawn at: the detonation is
