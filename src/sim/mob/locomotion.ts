@@ -103,6 +103,7 @@ import { splashNearbyMobs } from './boss_collateral';
 import { tickBossCorpseSink } from './boss_corpse_sink';
 import { resetBossRangedMechanics, tickBossRangedMechanics } from './boss_ranged_mechanics';
 import { launchFromSlam, resetBossSlams, tickBossSlams } from './boss_slams';
+import { resetBossStarwake, tickBossStarwake } from './boss_starwake';
 import {
   cancelMobChargeDash,
   resetMobCharge,
@@ -713,6 +714,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // resolve wherever the boss has since walked. Starting one is still melee-gated,
         // inside the module.
         tickBossSlams(ctx, mob);
+        // Wake of the Fallen Star: its pools burn and a cast in flight resolves in every
+        // phase; it starts ahead of the ranged kit so the lock's next slot is its first
+        // (mob/boss_starwake.ts).
+        tickBossStarwake(ctx, mob);
         // The ranged-punish kit, after the slams so a slam that claimed the spacing lock
         // this tick blocks it (mob/boss_ranged_mechanics.ts).
         tickBossRangedMechanics(ctx, mob);
@@ -1155,25 +1160,19 @@ function startBigCast(
 /**
  * [dev] Start one of a telegraphed boss's own circle mechanics right now, for the
  * /dev balgath playtest command (dev/balgath_dev_mechanics.ts): 'pulse' is his aoePulse
- * (Barrow Smash), 'stomp' his stomp, 'bigCast' his hardcast bar. Each runs the exact start
- * a combat cast runs (the ring or bar, the wind-up cue, the landing), with the spacing
- * lock claimed afresh (overridden once) and the driver's cadence restarted so the natural
- * rotation carries on from here. Only a template-telegraphed mob with the spawn stamp
- * qualifies, and it refuses (false) while that same wind-up or any cast is in flight.
- * The hardcast bar fills only on the melee-contact ticks, exactly as in combat. No rng.
+ * (Barrow Smash), 'stomp' his stomp. Each runs the exact start a combat cast runs (the
+ * ring, the wind-up cue, the landing), with the spacing lock claimed afresh (overridden
+ * once) and the driver's cadence restarted so the natural rotation carries on from here.
+ * Only a template-telegraphed mob with the spawn stamp qualifies, and it refuses (false)
+ * while that same wind-up is in flight. No rng.
  */
 export function forceTelegraphedBossMechanic(
   ctx: SimContext,
   mob: Entity,
-  kind: 'pulse' | 'stomp' | 'bigCast',
+  kind: 'pulse' | 'stomp',
 ): boolean {
   const tpl = MOBS[mob.templateId];
   if (tpl?.telegraphedMechanics === undefined || (mob.riftMechanicSpacing ?? 0) <= 0) return false;
-  if (kind === 'bigCast') {
-    if (!tpl.bigCast || mob.castingAbility !== null) return false;
-    startBigCast(ctx, mob, tpl.bigCast);
-    return true;
-  }
   const def = kind === 'pulse' ? tpl.aoePulse : tpl.stomp;
   if (!def) return false;
   const live = kind === 'pulse' ? mob.pulseWindupRemaining : mob.stompWindupRemaining;
@@ -1719,6 +1718,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // re-pulls him.
   resetBossSlams(mob);
   resetBossRangedMechanics(ctx, mob);
+  resetBossStarwake(mob);
   // A mid-flight inferno channel dies with the pull; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;

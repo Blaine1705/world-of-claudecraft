@@ -57,6 +57,13 @@ import {
   BALGATH_BURDEN_ABILITY,
   BALGATH_GLARE_ABILITY,
 } from './balgath_ranged_fx_core';
+import { BalgathStarwakeFx } from './balgath_starwake_fx';
+import {
+  BALGATH_STARWAKE_CAST_ID,
+  BALGATH_STARWAKE_FISSURE_ABILITY,
+  BALGATH_STARWAKE_GEYSER_ABILITY,
+  BALGATH_STARWAKE_WAKE_ABILITY,
+} from './balgath_starwake_fx_core';
 
 // These deliberately do NOT go through gfx.ts `surfaceMat`. That factory DEDUPES by
 // (color|maps|flags) so hundreds of static surfaces can share one program, which is
@@ -223,8 +230,14 @@ export function routeBalgathSpellfxAt(
     ev.fx === 'runeCircle' &&
     (ev.ability === BALGATH_CLEAVE_ABILITY ||
       ev.ability === BALGATH_BOULDER_ABILITY ||
-      ev.ability === BALGATH_GLARE_ABILITY);
-  if (!telegraph && (ev.fx !== 'nova' || !ev.radius || ev.sourceId === undefined)) return false;
+      ev.ability === BALGATH_GLARE_ABILITY ||
+      ev.ability === BALGATH_STARWAKE_FISSURE_ABILITY ||
+      ev.ability === BALGATH_STARWAKE_GEYSER_ABILITY);
+  // The star waking is the one BURST this router takes (Wake of the Fallen Star).
+  const wake = ev.fx === 'burst' && ev.ability === BALGATH_STARWAKE_WAKE_ABILITY;
+  if (!telegraph && !wake && (ev.fx !== 'nova' || !ev.radius || ev.sourceId === undefined)) {
+    return false;
+  }
   if (!ev.radius || ev.sourceId === undefined) return false;
   let found = false;
   for (const e of entities()) {
@@ -234,6 +247,34 @@ export function routeBalgathSpellfxAt(
   }
   if (!found) return false;
   const aim = Math.atan2(ev.dirX ?? 0, ev.dirZ ?? 1);
+  // Wake of the Fallen Star (balgath_starwake_fx.ts): the star, the fissures and their
+  // eruption, the geysers and the pools they leave, all at the sim's true sizes.
+  if (wake) {
+    fx.starwake.wake(ev.sourceId, ev.x, ev.z, ev.duration ?? 7.5);
+    return true;
+  }
+  if (ev.ability === BALGATH_STARWAKE_FISSURE_ABILITY) {
+    const dirX = ev.dirX ?? 0;
+    const dirZ = ev.dirZ ?? 1;
+    if (telegraph) {
+      fx.starwake.fissureTelegraph(
+        ev.sourceId,
+        ev.x,
+        ev.z,
+        dirX,
+        dirZ,
+        ev.radius,
+        ev.duration ?? 5,
+      );
+    } else fx.starwake.fissureErupted(ev.sourceId, ev.x, ev.z, dirX, dirZ, ev.radius);
+    return true;
+  }
+  if (ev.ability === BALGATH_STARWAKE_GEYSER_ABILITY) {
+    if (telegraph)
+      fx.starwake.geyserTelegraph(ev.sourceId, ev.x, ev.z, ev.radius, ev.duration ?? 5);
+    else fx.starwake.geyserErupted(ev.sourceId, ev.x, ev.z, ev.radius, ev.duration ?? 0);
+    return true;
+  }
   // The ranged kit's marks are drawn by the ranged layer at the sim's true size and shape
   // (a circle per boulder, the glare's line), suppressing the generic rune circle exactly
   // as the cleave's arc does. Its landings follow.
@@ -299,6 +340,8 @@ export class BalgathFx {
   private debris: BalgathDebris;
   /** The ranged-punish kit and the cleave's fan (balgath_ranged_fx.ts). */
   readonly ranged: BalgathRangedFx;
+  /** Wake of the Fallen Star (balgath_starwake_fx.ts). */
+  readonly starwake: BalgathStarwakeFx;
 
   constructor(
     private scene: THREE.Scene,
@@ -323,6 +366,11 @@ export class BalgathFx {
       ring: (x, z, radius, power) => this.spawnRing(x, z, radius, SILT, power),
       crater: (x, z, radius) => this.spawnCrater(x, z, radius),
     });
+    this.starwake = new BalgathStarwakeFx(scene, groundHeightAt, {
+      felt: (trauma, x, z) => this.impactFelt(trauma, x, z),
+      ground: (x, z, radius, power) => this.throwGround(x, z, radius, power),
+      ring: (x, z, radius, power) => this.spawnRing(x, z, radius, SILT, power),
+    });
   }
 
   /**
@@ -343,6 +391,7 @@ export class BalgathFx {
     this.quality = Math.min(1, Math.max(0, level));
     this.debris.setQuality(this.quality);
     this.ranged.setQuality(this.quality);
+    this.starwake.setQuality(this.quality);
   }
 
   /** The overhead smash landing. `radius` is the TRUE blast radius the telegraph drew. */
@@ -509,6 +558,7 @@ export class BalgathFx {
   private syncBosses(bosses: Iterable<BalgathBody>, dt: number, reducedMotion: boolean): void {
     this.seenThisFrame.clear();
     this.ranged.beginFrame();
+    this.starwake.beginFrame();
     this.deaths.begin(dt);
     this.deathCues.length = 0;
     for (const e of bosses) {
@@ -517,12 +567,17 @@ export class BalgathFx {
       // players (burden carriers and who stands inside the soak).
       this.ranged.note(e, balgath);
       if (!balgath) continue;
+      this.starwake.note(e);
       this.seenThisFrame.add(e.id);
       this.deaths.note(e, this.deathCues);
       // The eye's pool tracks the channel exactly: lit while the bar runs, out the
       // instant it stops. Re-armed every frame with a short lease rather than latched on
       // a start event, so an interrupted cast cannot leave the ground lit forever.
-      if (e.castingAbility) this.eyeGlow(e.pos.x, e.pos.z, EYE_POOL_LEASE_SECONDS);
+      // Wake of the Fallen Star's bar is the fists in the ground, not the eye: the star
+      // is what lights up for it (balgath_starwake_fx.ts), so the teal pool stays out.
+      if (e.castingAbility && e.castingAbility !== BALGATH_STARWAKE_CAST_ID) {
+        this.eyeGlow(e.pos.x, e.pos.z, EYE_POOL_LEASE_SECONDS);
+      }
 
       this.syncAura(e, dt, reducedMotion);
 
@@ -645,6 +700,7 @@ export class BalgathFx {
     this.clock += dt;
     this.syncBosses(bosses, dt, reducedMotion);
     this.ranged.update(dt, reducedMotion);
+    this.starwake.update(dt, reducedMotion);
     this.debris.update(dt);
 
     for (let i = this.rings.length - 1; i >= 0; i--) {
@@ -706,6 +762,7 @@ export class BalgathFx {
 
   clear(): void {
     this.ranged.clear();
+    this.starwake.clear();
     this.deaths.clear();
     this.auraCarry.clear();
     this.stride.clear();
@@ -719,6 +776,7 @@ export class BalgathFx {
   dispose(): void {
     this.clear();
     this.ranged.dispose();
+    this.starwake.dispose();
     this.debris.dispose();
     if (this.eyePool) {
       this.scene.remove(this.eyePool);

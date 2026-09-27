@@ -25,6 +25,7 @@ import {
 import { artisanRowPreloadInternalsForTest } from '../src/render/artisan_row_props';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { balgathBoulderKitPreloadInternalsForTest } from '../src/render/balgath_boulder_kit';
+import { balgathStarwakeKitPreloadInternalsForTest } from '../src/render/balgath_starwake_kit';
 import { bankerChestPreloadInternalsForTest } from '../src/render/banker_chest';
 import { battlegroundRuneModelPreloadInternalsForTest } from '../src/render/battleground_rune_model';
 import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_dressing';
@@ -533,6 +534,10 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('Balgath boulder kit asset', () => {
     expectAssetExistsAndManifested(balgathBoulderKitPreloadInternalsForTest.url);
+  });
+
+  it('Balgath starwake kit asset', () => {
+    expectAssetExistsAndManifested(balgathStarwakeKitPreloadInternalsForTest.url);
   });
 
   it('banker chest asset', () => {

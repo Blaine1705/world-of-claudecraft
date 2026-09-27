@@ -1050,6 +1050,10 @@ const baseEnTable = {
   'aura.marrowbreak': 'Marrowbreak',
   // Balgath's shared soak mark (mob/boss_ranged_mechanics.ts).
   'aura.barrowBurden': 'Barrow Burden',
+  // Balgath's Wake of the Fallen Star: the cast bar and eruption, and the pools it leaves
+  // (mob/boss_starwake.ts).
+  'mechanic.balgathStarwake': 'Wake of the Fallen Star',
+  'mechanic.balgathMoltenFen': 'Molten Fen',
   'aura.pin': 'Pin',
   // Coldsight's banked Fevered Draw opportunity (combat/hunter_coldsight_read.ts).
   'aura.coldsightRead': 'Coldsight Read',
@@ -14031,6 +14035,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Marrowbreak: 'aura.marrowbreak',
   // Balgath's shared soak mark; byte-identical to the template's burden.name.
   'Barrow Burden': 'aura.barrowBurden',
+  // Balgath's Wake of the Fallen Star and its pools; byte-identical to the template's
+  // starwake.name and starwake.pool.name.
+  'Wake of the Fallen Star': 'mechanic.balgathStarwake',
+  'Molten Fen': 'mechanic.balgathMoltenFen',
   // Pin, the Bruin Rush to Cat Form rider's slow (combat/druid_engines.ts).
   Pin: 'aura.pin',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in

@@ -749,6 +749,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/eye_glow_core.ts',
   'src/render/balgath_fx_core.ts',
   'src/render/balgath_ranged_fx_core.ts',
+  'src/render/balgath_starwake_fx_core.ts',
   'src/render/shardpike_throw_core.ts',
   'src/render/boss_impostor_core.ts',
   'src/render/eye_ward_marker_core.ts',

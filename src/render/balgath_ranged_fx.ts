@@ -192,8 +192,8 @@ export function buildBalgathRangedStandIn(): THREE.Group {
 // line over a rise hugs the rise instead of vanishing into it. Band order is inner to
 // outer (or origin to far end), so `setDrawRange` reveals a fill from the centre outward.
 
-type GroundAt = (x: number, z: number) => number;
-const LIFT = 0.12;
+export type GroundAt = (x: number, z: number) => number;
+export const LIFT = 0.12;
 
 function finish(positions: number[]): THREE.BufferGeometry {
   const g = new THREE.BufferGeometry();
@@ -209,7 +209,7 @@ function finish(positions: number[]): THREE.BufferGeometry {
  * cell) is what keeps a boulder's two marks to a few hundred terrain samples in the frame
  * the event arrives, instead of fifteen thousand.
  */
-function drapedGrid(
+export function drapedGrid(
   rows: number,
   cols: number,
   point: (row: number, col: number) => [number, number],
@@ -243,7 +243,7 @@ function drapedGrid(
 }
 
 /** A draped annular sector, `bands` rings from rIn to rOut; full circle when half >= PI. */
-function drapedSector(
+export function drapedSector(
   ground: GroundAt,
   cx: number,
   cz: number,
@@ -269,7 +269,7 @@ function drapedSector(
 }
 
 /** A draped strip along (dirX, dirZ), `from` to `to` yards, between offsets A and B. */
-function drapedStrip(
+export function drapedStrip(
   ground: GroundAt,
   ox: number,
   oz: number,
@@ -1380,7 +1380,7 @@ export class BalgathRangedFx {
  * over ONLY the outermost revealed band, so the growing fill has a hard, bright frontier
  * that visibly races toward the rim. When it touches the rim, it lands.
  */
-function leadingEdge(
+export function leadingEdge(
   fill: THREE.Mesh,
   fillGeo: THREE.BufferGeometry,
   mat: THREE.Material,
@@ -1397,7 +1397,7 @@ function leadingEdge(
   return lead;
 }
 
-function withOrder(mesh: THREE.Mesh, order: number): THREE.Mesh {
+export function withOrder(mesh: THREE.Mesh, order: number): THREE.Mesh {
   mesh.renderOrder = order;
   return mesh;
 }

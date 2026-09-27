@@ -28,6 +28,7 @@
 
 import * as THREE from 'three';
 import { balgathRangedMaterials, buildBalgathRangedStandIn } from './balgath_ranged_fx';
+import { balgathStarwakeMaterials, buildBalgathStarwakeStandIn } from './balgath_starwake_fx';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
@@ -125,6 +126,16 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'balgath_ranged_fx.ts',
     materials: () => Object.values(balgathRangedMaterials()),
     build: () => buildBalgathRangedStandIn(),
+  },
+  {
+    // Balgath's Wake of the Fallen Star: the star's crystals and light, the fissure and
+    // geyser marks, the lava columns, the flung chunks and the molten pools all draw a
+    // clone of one of five bundle materials. The first eruption of a fight must not link
+    // its programs inside the frame the fen goes up in.
+    id: 'balgath-starwake',
+    module: 'balgath_starwake_fx.ts',
+    materials: () => Object.values(balgathStarwakeMaterials()),
+    build: () => buildBalgathStarwakeStandIn(),
   },
   {
     // Not a spell: the Proving Shore coach's guidance (ribbon, ring, aura,

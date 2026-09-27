@@ -87,6 +87,7 @@ const REGISTERED_MODULES = [
   'ignivar_fire_vfx.ts',
   'ring_of_frost_visual.ts',
   'balgath_ranged_fx.ts',
+  'balgath_starwake_fx.ts',
   'coach_trail_materials.ts',
 ];
 
@@ -234,12 +235,13 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count: the eight registered
+    // Vacuity floor, kept just under the real count: the nine registered
     // bundles (the coach trail's guidance set, the ground fire AoE anchor,
-    // the Ring of Frost stand-in and Balgath's ranged kit among the spell
-    // visuals), the two excluded scenery bakes, and the battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(11);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(10);
+    // the Ring of Frost stand-in, Balgath's ranged kit and his Wake of the
+    // Fallen Star among the spell visuals), the two excluded scenery bakes,
+    // and the battleground caches.
+    expect(hits.length).toBeGreaterThanOrEqual(12);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(11);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

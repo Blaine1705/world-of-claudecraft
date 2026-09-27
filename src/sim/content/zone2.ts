@@ -559,7 +559,8 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // a muster barricade: any solid collider tall enough to cross the sight line stops
       // it (a soldier does NOT, and the beam leaves the muster unharmed: it burns players
       // only, so it never razes a picket out of his circuit). Between the hammer
-      // and his Loomshard Scry (70 to 90) in weight, because it reaches everyone in a line.
+      // and his Wake of the Fallen Star fissures (62 to 82) in weight, because it reaches
+      // everyone in a line.
       glare: {
         every: 30,
         windup: 2.6,
@@ -681,18 +682,63 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       name: 'Shockwave Stomp',
       school: 'physical',
     },
-    // The scry: his one channelled ability, which is why `cast` in the shared BALGATH
-    // ClipMap is the eye rather than a generic cast. The bar and the pose are one event.
-    bigCast: {
-      castId: 'balgath_scry',
-      name: 'Loomshard Scry',
-      castTime: 3.5,
+    // Wake of the Fallen Star (mob/boss_starwake.ts), which replaced the Loomshard Scry: a
+    // cast bar and a 30-yard nova with nothing on the ground to read. He drives both fists
+    // into the fen and the star that woke him wakes again: it lights up in his crater, lava
+    // fissures crawl out behind a telegraph that fills, geysers burst along them and under
+    // a few players, and molten pools linger where the geysers burst.
+    //
+    // Timing: 2.5 s of warning (the bar), 2 s for the fissures to crawl to their tips, and
+    // 3 s with the whole pattern on the ground before it erupts, so everyone has five
+    // seconds from the moment the paths appear. The 40 s cadence is the Scry's, and the
+    // whole run plus 2 s holds the spacing lock, so nothing else is telegraphed meanwhile.
+    //
+    // Damage sits where the Scry sat (70 to 90), split by how you failed to move: a fissure
+    // (62 to 82) is the big read, a geyser (46 to 62) is Boulder Toss weight, and a pool
+    // burns 12 to 18 a second for eight seconds, which is a nudge to find new ground rather
+    // than a death sentence for the level 8s in the raid.
+    starwake: {
       every: 40,
-      radius: 30,
-      min: 70,
-      max: 90,
-      school: 'arcane',
-      yell: 'The shard sees you. All of you.',
+      warn: 2.5,
+      crawl: 2,
+      hold: 3,
+      spacing: 2,
+      // The crater centre (MIREFEN_IMPACT_CRATER in world.ts; tests/balgath_starwake.test.ts
+      // welds the two). Fighting 12 to 45 yards from it, the fissures fan out FROM the star
+      // toward him; anywhere else (his far pickets, or right on top of the star) they burst
+      // from under his own feet in an even ring (boss_starwake_geometry.ts starwakeMode).
+      star: { x: 149.5, z: 295 },
+      starMinReach: 12,
+      starMaxReach: 45,
+      fissures: {
+        // Four strips over 105 degrees toward him: 35-degree lanes, wide open at his range.
+        fanCount: 4,
+        fanDeg: 105,
+        reachPast: 25,
+        minLength: 32,
+        maxLength: 70,
+        // Five strips round his feet: 72-degree lanes, clear of both strips from five
+        // yards out, so the melee steps out a few yards into a lane rather than running.
+        ringCount: 5,
+        ringLength: 34,
+        jitterDeg: 5,
+        halfWidth: 2.5,
+        min: 62,
+        max: 82,
+      },
+      geysers: {
+        targets: 3,
+        range: 45,
+        radius: 4.5,
+        alongFraction: 0.6,
+        fissureRadius: 3.5,
+        min: 46,
+        max: 62,
+      },
+      pool: { seconds: 8, interval: 1, min: 12, max: 18, name: 'Molten Fen' },
+      name: 'Wake of the Fallen Star',
+      school: 'fire',
+      yell: 'The star woke me once. WAKE AGAIN, and burn them all!',
     },
     // The heavy mitigation the concept called for: what makes him want numbers rather
     // than gear, since a small group cannot out-damage the refresh.

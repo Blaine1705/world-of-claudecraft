@@ -645,6 +645,13 @@ const BALGATH: ClipMap = {
   death: 'Balgath_Death',
   hit: ['Hit'],
   cast: 'Balgath_EyeFlare',
+  // Wake of the Fallen Star (src/sim/mob/boss_starwake.ts): his bar is his two fists
+  // driven into the fen to wake the star, so it plays the arrival slam rather than the eye.
+  // The bar's id is the mechanic's name (the cast-bar label the client localizes).
+  castByAbility: { 'Wake of the Fallen Star': 'Balgath_Barrowfall' },
+  // Barrowfall lands its fists at 1.40 s of its 2.80 s; slowed to 0.56 they land at 2.5 s,
+  // on the end of the 2.5 s bar, which is the instant the fissures go down.
+  castTimeScaleByAbility: { 'Wake of the Fallen Star': 0.56 },
   jump: 'Jump',
   flourish: 'Balgath_Roar',
   // The night. He folds down into a mound of granite beside the fallen star and breathes

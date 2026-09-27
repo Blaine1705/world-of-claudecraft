@@ -1401,6 +1401,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/tools/wrench_a.glb": "/media/models/tools/wrench_a.93a1d95e8b61.glb",
   "models/tools/wrench_b.glb": "/media/models/tools/wrench_b.f34e38407797.glb",
   "models/vfx/balgath_boulder.glb": "/media/models/vfx/balgath_boulder.3c44805ae435.glb",
+  "models/vfx/balgath_starwake.glb": "/media/models/vfx/balgath_starwake.c31704c3486e.glb",
   "models/vfx/production_fragments.glb": "/media/models/vfx/production_fragments.5579a316be47.glb",
   "models/weapons/adv_axe_1handed.glb": "/media/models/weapons/adv_axe_1handed.35658e3e8b4b.glb",
   "models/weapons/adv_axe_2handed.glb": "/media/models/weapons/adv_axe_2handed.a03f87adaaf1.glb",

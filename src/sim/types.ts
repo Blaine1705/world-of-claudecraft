@@ -2249,6 +2249,67 @@ export interface MobTemplate {
     spacing: number;
   };
   /**
+   * Wake of the Fallen Star (mob/boss_starwake.ts): the fallen star in his crater wakes,
+   * lava fissures crawl across the fen behind a telegraph that fills, geysers burst along
+   * them and under a few players, and molten pools linger where the geysers burst. Holds
+   * the shared mechanic spacing lock for its whole wind-up, so it never shares the ground
+   * with another telegraph. Inert for every mob without it.
+   */
+  starwake?: {
+    /** Seconds between casts (ticked while planted and fighting, like his other kit). */
+    every: number;
+    /** The warning: the cast bar while the star wakes (fists in the ground, the yell). */
+    warn: number;
+    /** The fissure telegraphs crawl from their origin to their tips over this long. */
+    crawl: number;
+    /** Then they sit full on the ground this long before the eruption. */
+    hold: number;
+    /** Seconds of the spacing lock held after the eruption. */
+    spacing: number;
+    /** Where the fallen star sits (the crater centre), and the band of boss distances
+     *  inside which the fissures run FROM it rather than from under his feet. */
+    star: { x: number; z: number };
+    starMinReach: number;
+    starMaxReach: number;
+    fissures: {
+      fanCount: number;
+      fanDeg: number;
+      reachPast: number;
+      minLength: number;
+      maxLength: number;
+      ringCount: number;
+      ringLength: number;
+      jitterDeg: number;
+      /** Half the strip's width in yards. */
+      halfWidth: number;
+      min: number;
+      max: number;
+    };
+    geysers: {
+      /** Players a targeted geyser is laid under (at most), drawn from those in `range`. */
+      targets: number;
+      range: number;
+      /** A targeted geyser's radius (and its pool's). */
+      radius: number;
+      /** Each fissure's own geyser: how far down it, and its radius (and its pool's). */
+      alongFraction: number;
+      fissureRadius: number;
+      min: number;
+      max: number;
+    };
+    pool: {
+      seconds: number;
+      interval: number;
+      min: number;
+      max: number;
+      name: string;
+    };
+    /** The cast bar's name, the eruption's damage label and the mechanic's name. */
+    name: string;
+    school: string;
+    yell?: string;
+  };
+  /**
    * Punt, rather than shove, on every heavy slam this mob lands (mob/boss_slams.ts
    * `launchFromSlam`, called from the telegraphed detonations, the warpath arrival, and
    * both aimed slams above).
@@ -5938,6 +5999,17 @@ export interface Entity extends ClientMirroredEntityFields {
   /** Seconds overdue of the oldest aimable due one, published each tick for the circle
    *  smashes' oldest-due drain (mob/mechanic_spacing.ts); undefined when none is ready. */
   rangedReadyOverdue?: number;
+  // Wake of the Fallen Star state (mob/boss_starwake.ts). Only ever defined on a mob whose
+  // template declares `starwake`, the same defined-vs-undefined discipline as above.
+  starwakeTimer?: number;
+  /** Seconds since the current cast began; undefined while none is in flight. */
+  starwakeElapsed?: number;
+  /** The laid fissures, flat [originX, originZ, dirX, dirZ, length] per fissure. */
+  starwakeFissures?: number[];
+  /** The laid geyser circles, flat [x, z, radius] per geyser. */
+  starwakeGeysers?: number[];
+  /** Live molten pools, flat [x, z, radius, remaining, tickTimer] per pool. */
+  starwakePools?: number[];
   /** Absolute sim time the arrival slam lands; null once it has, so it fires once. */
   warpathBlastAt?: number | null;
   // The telegraphed ring center each windup was drawn at: the detonation is

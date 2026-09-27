@@ -25,6 +25,7 @@ import {
   GLARE_ABILITY,
 } from '../src/sim/mob/boss_ranged_mechanics';
 import { CLEAVE_ABILITY, HAMMER_ABILITY } from '../src/sim/mob/boss_slams';
+import { STARWAKE_FISSURE_ABILITY, STARWAKE_WAKE_ABILITY } from '../src/sim/mob/boss_starwake';
 import { WARPATH_WRECK_ABILITY } from '../src/sim/mob/warpath';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -122,7 +123,17 @@ describe('parseBalgathDevCommand', () => {
 
   it('lists exactly the nine mechanics the owner asked for', () => {
     expect([...BALGATH_DEV_MECHANICS].sort()).toEqual(
-      ['boulder', 'burden', 'cleave', 'glare', 'hammer', 'scry', 'smash', 'stomp', 'wreck'].sort(),
+      [
+        'boulder',
+        'burden',
+        'cleave',
+        'glare',
+        'hammer',
+        'smash',
+        'starwake',
+        'stomp',
+        'wreck',
+      ].sort(),
     );
   });
 });
@@ -241,11 +252,14 @@ const EXPECT: Record<
       expect(fxAt(evs, 'runeCircle').some((e) => e.radius === r)).toBe(true);
     },
   },
-  scry: {
-    telegraph: (_evs, _me, boss) => {
-      expect(boss.castingAbility).toBe('balgath_scry');
-      expect(boss.castRemaining).toBeCloseTo(MOBS[BALGATH]?.bigCast?.castTime ?? -1, 5);
+  starwake: {
+    telegraph: (evs, _me, boss) => {
+      const def = MOBS[BALGATH]?.starwake;
+      expect(boss.castingAbility).toBe(def?.name);
+      expect(boss.castRemaining).toBeCloseTo(def?.warn ?? -1, 5);
+      expect(fxAt(evs, 'burst', STARWAKE_WAKE_ABILITY)).toHaveLength(1);
     },
+    land: STARWAKE_FISSURE_ABILITY,
   },
   wreck: {
     telegraph: (evs, _me, boss) => {
@@ -266,13 +280,14 @@ describe('/dev balgath <mechanic> forces the real telegraph for a solo tester', 
       EXPECT[verb].telegraph(evs, me, boss);
       const ability = EXPECT[verb].land;
       if (ability) {
-        const later = run(sim, 7);
+        // Long enough for the slowest landing (Wake of the Fallen Star, 7.5 s).
+        const later = run(sim, 8);
         expect(fxAt(later, 'nova', ability).length).toBeGreaterThanOrEqual(1);
       }
     });
   }
 
-  it('the circle slams and the scry land too (positioned impact / the bar completes)', () => {
+  it('the circle slams and the starwake land too (positioned impact / the bar completes)', () => {
     for (const verb of ['smash', 'stomp'] as const) {
       const { sim, me } = world();
       force(sim, verb);
@@ -282,9 +297,10 @@ describe('/dev balgath <mechanic> forces the real telegraph for a solo tester', 
       expect(me.dead).toBe(false);
     }
     const { sim, boss } = world(true, 3);
-    force(sim, 'scry');
-    run(sim, (MOBS[BALGATH]?.bigCast?.castTime ?? 0) + 3);
-    expect(boss.castingAbility).not.toBe('balgath_scry');
+    force(sim, 'starwake');
+    run(sim, (MOBS[BALGATH]?.starwake?.warn ?? 0) + 0.5);
+    expect(boss.castingAbility).not.toBe(MOBS[BALGATH]?.starwake?.name);
+    expect(boss.starwakeFissures?.length ?? 0).toBeGreaterThan(0);
   });
 });
 
@@ -433,12 +449,20 @@ describe('/dev balgath wake|sleep and /dev servertime', () => {
   });
 });
 
-describe('/dev balgath scry off his planted fight', () => {
-  it('refuses while he marches, since the bar would sit frozen', () => {
+describe('/dev balgath starwake off his planted fight', () => {
+  it('runs while he marches too: the sequence resolves on every engaged tick', () => {
     const { sim, boss } = world();
     boss.warpathPhase = 'travel';
-    const evs = force(sim, 'scry');
-    expect(errors(evs).join('\n')).toContain('marching');
-    expect(boss.castingAbility).toBeNull();
+    const evs = force(sim, 'starwake');
+    expect(errors(evs)).toEqual([]);
+    expect(boss.starwakeElapsed).toBe(0);
+  });
+
+  it('refuses a second one while the first is still on the ground', () => {
+    const { sim } = world();
+    force(sim, 'starwake');
+    run(sim, (MOBS[BALGATH]?.starwake?.warn ?? 0) + 0.5);
+    const evs = force(sim, 'starwake');
+    expect(errors(evs).join('\n')).toContain('Wake of the Fallen Star is still on the ground');
   });
 });

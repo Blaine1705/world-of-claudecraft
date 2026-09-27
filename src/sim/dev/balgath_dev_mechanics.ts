@@ -21,6 +21,7 @@
 
 import { forceBossRangedMechanic } from '../mob/boss_ranged_mechanics';
 import { forceBossSlam } from '../mob/boss_slams';
+import { forceBossStarwake, starwakeActive } from '../mob/boss_starwake';
 import { forceTelegraphedBossMechanic } from '../mob/locomotion';
 import { devSleepSlumber, devWakeSlumber } from '../mob/slumber';
 import { forceWarpathWreck } from '../mob/warpath';
@@ -43,7 +44,7 @@ export const BALGATH_DEV_MECHANICS = [
   'hammer',
   'smash',
   'stomp',
-  'scry',
+  'starwake',
   'wreck',
 ] as const;
 
@@ -58,7 +59,8 @@ const DESCRIBE: Record<BalgathDevMechanic, string> = {
   hammer: "Foreman's Hammer: one fist on your spot (move)",
   smash: 'Barrow Smash: the 12 yd ring round his feet (walk out)',
   stomp: 'Shockwave Stomp: the 7 yd stun ring round his feet (walk out)',
-  scry: 'Loomshard Scry: the 30 yd cast bar (fills while he is in melee contact)',
+  starwake:
+    'Wake of the Fallen Star: the star wakes, lava fissures crawl out, geysers burst under you and along them, pools burn for 8 s (stand in a lane between the fissures, then step out of your geyser circle)',
   wreck: 'Barrowfall: the 16 yd arrival slam where he stands (walk out)',
 };
 
@@ -119,7 +121,8 @@ function liveTelegraph(mob: Entity): string | null {
   if ((mob.rangedWindup ?? 0) > 0) return mob.rangedKind ?? 'a ranged mechanic';
   if ((mob.pulseWindupRemaining ?? 0) > 0) return 'Barrow Smash';
   if ((mob.stompWindupRemaining ?? 0) > 0) return 'Shockwave Stomp';
-  if (mob.castingAbility !== null) return 'Loomshard Scry';
+  if (starwakeActive(mob)) return 'Wake of the Fallen Star';
+  if (mob.castingAbility !== null) return 'His cast bar';
   if (mob.warpathPhase === 'wreck') return 'Barrowfall';
   return null;
 }
@@ -171,15 +174,6 @@ export function forceBalgathDevMechanic(
         'Balgath is walking home (he gave up the pull). Try again once he is back in his crater.',
     };
   }
-  // His cast bar only fills on his planted combat ticks, and a warpath leg or wreck owns
-  // the whole tick (mob/warpath.ts), so a bar forced there would sit frozen and block
-  // every other forced mechanic until he planted again.
-  if (mechanic === 'scry' && boss.warpathPhase !== undefined && boss.warpathPhase !== 'focus') {
-    return {
-      ok: false,
-      message: 'Balgath is marching or wrecking a picket. Force the scry once he plants to fight.',
-    };
-  }
   const busy = liveTelegraph(boss);
   if (busy) {
     return {
@@ -221,8 +215,8 @@ function startForced(
       return forceTelegraphedBossMechanic(ctx, boss, 'pulse');
     case 'stomp':
       return forceTelegraphedBossMechanic(ctx, boss, 'stomp');
-    case 'scry':
-      return forceTelegraphedBossMechanic(ctx, boss, 'bigCast');
+    case 'starwake':
+      return forceBossStarwake(ctx, boss);
     case 'wreck':
       return forceWarpathWreck(ctx, boss);
   }

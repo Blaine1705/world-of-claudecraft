@@ -99,6 +99,9 @@ export function rangedMechanicBlocked(mob: Entity): boolean {
     (mob.rangedWindup ?? 0) > 0 ||
     (mob.stompWindupRemaining ?? 0) > 0 ||
     (mob.pulseWindupRemaining ?? 0) > 0 ||
+    // Wake of the Fallen Star in flight (mob/boss_starwake.ts): its bar ends before its
+    // marks go down, so the cast alone does not cover the whole run.
+    mob.starwakeElapsed !== undefined ||
     mob.castingAbility !== null
   );
 }

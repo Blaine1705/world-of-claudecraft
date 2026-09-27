@@ -44,6 +44,7 @@ import { groundHeight } from '../world';
 import { clearCorpseSink } from './boss_corpse_sink';
 import { resetBossRangedMechanics } from './boss_ranged_mechanics';
 import { resetBossSlams } from './boss_slams';
+import { resetBossStarwake } from './boss_starwake';
 import { resetMobCharge } from './charge';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
@@ -99,6 +100,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   resetWarpath(mob);
   resetBossSlams(mob);
   resetBossRangedMechanics(ctx, mob);
+  resetBossStarwake(mob);
   // A slumbering template that ever respawned in place (none does today: the world boss is
   // scheduler-owned) must come back awake, or a daytime respawn would run the dawn wake
   // and broadcast the realm-wide call on every single respawn.
