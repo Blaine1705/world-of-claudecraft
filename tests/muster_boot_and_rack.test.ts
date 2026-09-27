@@ -37,7 +37,9 @@ import {
 } from '../src/sim/content/mirefen_muster';
 import { MOBS } from '../src/sim/data';
 import { DAY_NIGHT_CYCLE_MS, NOON_PHASE } from '../src/sim/day_night';
+import { LANCE_FIXED_DAMAGE, LANCE_THRUST_RANGE } from '../src/sim/lance_balance_core';
 import type { MusterArmyState } from '../src/sim/mirefen_muster';
+import { eyeWardBlinded } from '../src/sim/mob/eye_ward';
 import { MUSTER_SHARDPIKE_ID } from '../src/sim/muster_pike';
 import { Sim } from '../src/sim/sim';
 import { inertVaultConsumptionAdmission } from '../src/sim/sim_context';
@@ -247,5 +249,97 @@ describe('the weapon rack lends a Shardpike through the real command path', () =
     expect(meta.equipment.mainhand).toBe(before);
     expect(j.frames.find((f) => f.t === 'commandOutcome' && f.rid === 13)?.ok).toBe(false);
     expect(army(sim).lent.has(j.session.pid)).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The lent pike, all the way to his eye, through the server's command switch
+// ---------------------------------------------------------------------------
+
+// The owner's playtest: braced with the rack's pike, the Loomshard Thrust did nothing. Both
+// thrust gates compared the main hand against Skerrit's quest pike by literal id, so the
+// lent copy (which the brace accepts through isShardpikeItem) had its session ended silently
+// at the thrust and its throw dropped at release. Driven here as a client does it: the rack
+// click, `lance_brace`, the beam held on the strafe keys through real ticks, `lance_thrust`.
+describe('the lent pike puts his eye out through the real command path', () => {
+  function holdBeamUntilSet(sim: Sim, pid: number): void {
+    const meta = metaOf(sim, pid);
+    for (let i = 0; i < 20 * 10 && meta.lance?.phase !== 'steadied'; i++) {
+      const beam = meta.lance?.beam;
+      if (!beam) throw new Error('the brace broke before the pike was set');
+      // Lean against the fall (a right lean pushes the beam negative).
+      const lean = beam.balance + beam.velocity * 0.4;
+      meta.moveInput.strafeRight = lean > 0.02;
+      meta.moveInput.strafeLeft = lean < -0.02;
+      sim.tick();
+    }
+    meta.moveInput.strafeRight = false;
+    meta.moveInput.strafeLeft = false;
+    expect(meta.lance?.phase, 'the pike never set').toBe('steadied');
+  }
+
+  function armAndThrust(server: GameServer, id: number, boss: Entity): Joined {
+    const sim = server.sim;
+    const rack = expectFullMuster(sim);
+    const j = join(server, id, 'mage');
+    stand(server, j.e, MUSTER_RACK.x, MUSTER_RACK.z + 2.5);
+    send(server, j, { cmd: 'pickup', id: rack.id, rid: 21 });
+    expect(metaOf(sim, j.session.pid).equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    // Ten yards off his middle (he fights from nine): plainly inside the thrust's reach.
+    stand(server, j.e, boss.pos.x, boss.pos.z - 10);
+    j.e.onGround = true;
+    // Hold every mob still: the stance breaks on any shove, and a slam is not under test.
+    sim.setDevMobsFrozen(true);
+    send(server, j, { cmd: 'lance_brace' });
+    expect(metaOf(sim, j.session.pid).lance?.phase).toBe('bracing');
+    holdBeamUntilSet(sim, j.session.pid);
+    const hp = boss.hp;
+    send(server, j, { cmd: 'lance_thrust' });
+    for (let i = 0; i < 40; i++) sim.tick();
+    expect(boss.hp, 'the thrust never landed').toBe(hp - LANCE_FIXED_DAMAGE);
+    expect(eyeWardBlinded(sim.ctx, boss), 'the eye was not put out').toBe(true);
+    expect(metaOf(sim, j.session.pid).lanceThrusts).toBe(1);
+    return j;
+  }
+
+  it('hits and blinds the scheduled Balgath, awake in his crater by day', () => {
+    // Solar noon of the UTC-anchored cycle on a 2026 day, so he is up whatever the date.
+    const day = Math.floor(Date.UTC(2026, 5, 1) / DAY_NIGHT_CYCLE_MS) * DAY_NIGHT_CYCLE_MS;
+    vi.spyOn(Date, 'now').mockReturnValue(day + Math.round(DAY_NIGHT_CYCLE_MS * NOON_PHASE));
+    try {
+      const server = new GameServer();
+      server.sim.tick();
+      const [boss] = balgaths(server.sim);
+      expect(boss, 'no scheduled Balgath').toBeDefined();
+      expect(boss.asleep).toBe(false);
+      armAndThrust(server, 31, boss);
+    } finally {
+      vi.restoreAllMocks();
+    }
+  });
+
+  it('hits and blinds a /dev spawn copy, even with the scheduled one asleep in his bed', () => {
+    const night = Math.floor(Date.UTC(2026, 5, 1) / DAY_NIGHT_CYCLE_MS) * DAY_NIGHT_CYCLE_MS;
+    vi.spyOn(Date, 'now').mockReturnValue(night);
+    try {
+      const server = new GameServer();
+      const sim = server.sim;
+      sim.tick();
+      const [sleeper] = balgaths(sim);
+      expect(sleeper?.asleep).toBe(true);
+      // The copy stands just north of the bed, so the pikeman (ten yards south of the copy)
+      // is standing NEARER the sleeper: the awake one must still be the one the pike finds.
+      const copyId = sim.spawnDevBoss('balgath_cyclops', sleeper.pos.x, sleeper.pos.z + 6);
+      const copy = sim.entities.get(copyId) as Entity;
+      const sleeperHp = sleeper.hp;
+      const j = armAndThrust(server, 32, copy);
+      const toSleeper = Math.hypot(j.e.pos.x - sleeper.pos.x, j.e.pos.z - sleeper.pos.z);
+      const toCopy = Math.hypot(j.e.pos.x - copy.pos.x, j.e.pos.z - copy.pos.z);
+      expect(toSleeper).toBeLessThan(toCopy);
+      expect(toSleeper).toBeLessThan(LANCE_THRUST_RANGE);
+      expect(sleeper.hp).toBe(sleeperHp);
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 });

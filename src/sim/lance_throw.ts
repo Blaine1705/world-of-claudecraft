@@ -1,3 +1,4 @@
+import { isShardpikeItem } from './lance_balance_core';
 import { LANCE_THROW_ABILITY, LANCE_THROW_RELEASE } from './lance_throw_timing';
 import { scheduleProjectile } from './projectile_travel';
 import type { SimContext } from './sim_context';
@@ -36,7 +37,9 @@ export function throwLance(
         liveSource.ghost ||
         !liveTarget ||
         liveTarget.dead ||
-        ctx.players.get(sourceId)?.equipment.mainhand !== 'skerrits_shardpike'
+        // Any Shardpike: Skerrit's quest pike OR the muster's lent copy off the rack. A
+        // literal id here once silently dropped every throw of the lent pike mid-flight.
+        !isShardpikeItem(ctx.players.get(sourceId)?.equipment.mainhand)
       )
         return;
       cue('projectile');

@@ -147,7 +147,7 @@ export function lanceThrust(ctx: SimContext, pid: number): void {
     ctx.error(pid, 'The pike is not set.');
     return;
   }
-  if (p.dead || p.ghost || meta.equipment.mainhand !== LANCE_ITEM_ID) {
+  if (p.dead || p.ghost || !isShardpikeItem(meta.equipment.mainhand)) {
     endSession(meta, p);
     return;
   }
@@ -292,7 +292,9 @@ function nearestEyeWardMob(ctx: SimContext, p: Entity): Entity | null {
   let best: Entity | null = null;
   let bestD = LANCE_THRUST_RANGE;
   for (const e of ctx.entities.values()) {
-    if (e.kind !== 'mob' || e.dead || !MOBS[e.templateId]?.eyeWard) continue;
+    // A sleeping Foreman is a landmark, not a target: a second, awake copy (a /dev spawn
+    // beside the scheduled one in his bed) must never lose the thrust to the sleeper.
+    if (e.kind !== 'mob' || e.dead || e.asleep || !MOBS[e.templateId]?.eyeWard) continue;
     const d = dist2d(e.pos, p.pos);
     if (d < bestD) {
       best = e;
