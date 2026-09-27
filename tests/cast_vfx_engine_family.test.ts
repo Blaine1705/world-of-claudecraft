@@ -7,11 +7,11 @@
 //
 // Every drawable the engine builds belongs to a named pool, and every pool is
 // named in exactly one table: ENGINE, KIT or NO_DRAWABLE. The kit joins the
-// gate because several of its pieces draw with no readiness check of their
-// own (the baked layers' non-strict kinds, the solid fragments, the crests
-// outside their authored kinds), so the gate is their only protection. A pool
-// added to the engine without a row fails the attribution case; a row whose
-// pool does not tag its drawables fails the membership case.
+// gate so a Warrior cast waits for the whole kit rather than showing part of
+// it; each kit pool's own readiness checks are pinned in
+// tests/cast_vfx_spawn_gate.test.ts. A pool added to the engine without a row
+// fails the attribution case; a row whose pool does not tag its drawables
+// fails the membership case.
 
 import * as THREE from 'three';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -48,6 +48,7 @@ import { UmbralAnchorMarker } from '../src/render/umbral_anchor_marker';
 import { Vfx } from '../src/render/vfx';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
 import { buildCastVfxBasicStandIns } from '../src/render/vfx_basic_materials';
+import { objectsHeldBy } from './helpers/cast_vfx_headless';
 import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 
 /** Engine pools (AbilityVfxFx fields) and the distinct programs each draws. */
@@ -123,38 +124,6 @@ function installCanvasStub(): void {
     removeEventListener: noop,
   });
   vi.stubGlobal('document', { createElement: canvas, createElementNS: canvas });
-}
-
-/** Every Object3D a pool instance reaches through its own fields (slots,
- *  arrays, nested records), stopping at the scene and the camera it was
- *  handed. The attribution a drawable gets is the pool that holds it. */
-function objectsHeldBy(pool: unknown): Set<THREE.Object3D> {
-  const held = new Set<THREE.Object3D>();
-  const visited = new Set<unknown>();
-  const visit = (value: unknown, depth: number): void => {
-    if (value === null || typeof value !== 'object' || visited.has(value)) return;
-    visited.add(value);
-    const object = value as THREE.Object3D & { isScene?: boolean; isCamera?: boolean };
-    if (object.isObject3D) {
-      if (object.isScene || object.isCamera) return;
-      object.traverse((child) => held.add(child));
-      return;
-    }
-    if (depth === 0 || ArrayBuffer.isView(value)) return;
-    const record = value as {
-      isMaterial?: boolean;
-      isTexture?: boolean;
-      isBufferGeometry?: boolean;
-    };
-    if (record.isMaterial || record.isTexture || record.isBufferGeometry) return;
-    const entries =
-      value instanceof Map || value instanceof Set
-        ? [...value.values()]
-        : Object.values(value as Record<string, unknown>);
-    for (const entry of entries) visit(entry, depth - 1);
-  };
-  visit(pool, 5);
-  return held;
 }
 
 function engineScene(options: { fragments?: boolean } = {}) {

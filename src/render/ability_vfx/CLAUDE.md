@@ -45,15 +45,20 @@ layers behind the `index.ts` barrel:
   gate keeps one ready bit per family (`../cast_vfx_family.ts`), one entry per
   program: the ENGINE (the pooled primitive families above except the spirits,
   plus the `../vfx.ts` particle cloud) and the KIT (the Warrior kit's pools
-  `fx.ts` builds with the engine, because several of their pieces draw with no
-  readiness check of their own). The painter admits each cast on its own mask
+  `fx.ts` builds with the engine, so a Warrior cast waits for the whole kit
+  rather than showing part of it). The painter admits each cast on its own mask
   (`cast_requirements.ts`) at its first entry point and latches a refusal for
   the rest of that cast (`cast_admission_core.ts`); spirits keep their own
   gate and sit in neither family. A new pool tags every drawable it builds with
   `tagCastVfxEngine` or `tagCastVfxKit`, carries the `spawnGate` `fx.ts` hands
   it and checks its family before every spawn, the units link engine, then
   kit, then every other pool, and `tests/cast_vfx_engine_family.test.ts` fails
-  a pool `fx.ts` builds that sits in none of its tables.
+  a pool `fx.ts` builds that sits in none of its tables. A kit pool also checks
+  its own preparation (its sheet upload, geometry or program proof) on every
+  spawn and on every frame of a held piece, never only when a slot is taken;
+  `tests/cast_vfx_spawn_gate.test.ts` fails a kit pool with no door there,
+  one that draws while its pieces are unprepared, and a held piece that keeps
+  drawing after its readiness is taken back.
   `AbilityVfxFx.prewarmSpawn` stays boot-window only,
   because it spawns VISIBLE primitives; these units are what the renderer's
   `vfx.ability-primitives` manifest entry retains when the entry deadline drops
