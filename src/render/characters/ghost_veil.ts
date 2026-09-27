@@ -212,7 +212,6 @@ const COLOR_FRAG_BODY = `
       diffuseColor.a = veilAlpha;
     #endif
   }
-  #include <opaque_fragment>
 `;
 
 // Hooks stay idempotent and keep nothing of the shader object: the dry
@@ -225,9 +224,11 @@ function veilColorHook(
   shader.vertexShader = `${COLOR_VERT_PARS}\n${shader.vertexShader}`
     .replace('#include <project_vertex>', VERT_SHIMMER)
     .replace('#include <fog_vertex>', COLOR_VERT_TAIL);
+  // The body lands right before the stock opaque write, which stays in place
+  // so the final colour keeps its NaN guard (final_color_nan_guard.ts).
   shader.fragmentShader = `${COLOR_FRAG_PARS}\n${shader.fragmentShader}`.replace(
-    '#include <opaque_fragment>',
-    COLOR_FRAG_BODY,
+    '#include <envmap_fragment>',
+    `#include <envmap_fragment>\n${COLOR_FRAG_BODY}`,
   );
 }
 

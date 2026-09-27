@@ -263,6 +263,26 @@ describe('a palette is uniform values on the shared programs', () => {
     expect(fragment).toContain('uniform int uDyeCount;');
   });
 
+  it('writes the veil right before the stock opaque write, which keeps the NaN guard', () => {
+    const body = new THREE.MeshStandardMaterial();
+    const decalSource = new THREE.MeshStandardMaterial({ transparent: true });
+    for (const material of [
+      createSpiritVeilMaterial(body),
+      createSpiritVeilMaterial(decalSource),
+    ]) {
+      const fragment = compiled(material).fragmentShader;
+      const write = '#include <opaque_fragment>';
+      expect(fragment.split(write)).toHaveLength(2);
+      const envmap = fragment.indexOf('#include <envmap_fragment>');
+      const veilStart = fragment.indexOf('vec3 veilN = normalize( vVeilN );');
+      const alpha = fragment.indexOf('diffuseColor.a');
+      expect(envmap).toBeGreaterThan(0);
+      expect(veilStart).toBeGreaterThan(envmap);
+      expect(alpha).toBeGreaterThan(veilStart);
+      expect(fragment.indexOf(write)).toBeGreaterThan(alpha);
+    }
+  });
+
   it("casts with the side three gives the source's own caster", () => {
     const cases: [THREE.Side, THREE.Side | null, THREE.Side][] = [
       [THREE.FrontSide, null, THREE.BackSide],
