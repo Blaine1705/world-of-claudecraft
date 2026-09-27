@@ -231,8 +231,23 @@ describe('the aimed slams in a live fight', () => {
   /** One tick with the subject kept alive: he is mortal (see the header) and standing
    *  inside the reach of a level-20 world boss, so his autos would end the run long
    *  before a 26-second cadence came around. Topping up hp leaves every damage EVENT
-   *  intact, which is what these tests actually read. */
+   *  intact, which is what these tests actually read. It also lands a chip hit a second,
+   *  as a raid on him would: a pull nobody hurts for 30 seconds is one he gives up
+   *  (mob/warpath.ts warpathGiveUp), which would end the run before a cleave came round. */
+  let ticked = 0;
   const tickAlive = () => {
+    if (ticked++ % 20 === 0 && boss.aiState !== 'evade') {
+      (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage(
+        player,
+        boss,
+        20,
+        false,
+        'physical',
+        'probe',
+        'hit',
+        true,
+      );
+    }
     const events = sim.tick();
     player.hp = player.maxHp;
     return events;

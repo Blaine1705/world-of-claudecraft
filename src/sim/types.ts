@@ -2122,6 +2122,13 @@ export interface MobTemplate {
      * labels the green number, so the raid can read WHY the bar is climbing.
      */
     regen: { unharriedSeconds: number; pctPerSecond: number; name: string };
+    /**
+     * When he drops the pull and walks home to his spawn (his bed) as an ordinary evade:
+     * immune on the way, full health on arrival. `tetherRadius` is how far from the spawn
+     * he may ever be, in any phase; `playerRange` is how close a living player must be;
+     * `unharriedSeconds` is how long he waits with nobody hurting him (mob/warpath.ts).
+     */
+    giveUp: { tetherRadius: number; playerRange: number; unharriedSeconds: number };
     /** The travelling backhand: one random player inside `radius`, on a timer. */
     swipe: {
       every: number;

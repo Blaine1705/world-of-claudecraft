@@ -718,7 +718,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // count down and detonate wherever he now is, or leaving focus mid-windup would
       // strand a ring on the ground that never resolves. Inert for every mob whose
       // template declares no warpath, which today is every mob but one.
-      if (tickWarpath(ctx, mob) === 'handled') {
+      // An 'evaded' tick is a pull he just gave up (mob/warpath.ts warpathGiveUp): he is
+      // walking home, so, like a leash break in the combat runner, nothing else runs.
+      const warpath = tickWarpath(ctx, mob);
+      if (warpath === 'evaded') break;
+      if (warpath === 'handled') {
         engagedPulse();
         break;
       }

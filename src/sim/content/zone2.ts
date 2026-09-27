@@ -456,6 +456,15 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // five players or forty are on him: a raid that stops attacking to run loses ground
       // at exactly the rate it stopped attacking.
       regen: { unharriedSeconds: 3, pctPerSecond: 0.015, name: 'Barrowmend' },
+      // He can never be kited out of his fen, and never stays "engaged" with nobody on him.
+      // Past 100 yards from his bed in ANY phase, with no living player inside 60 yards, or
+      // with nobody (players or pets) hurting him for 30 seconds, he drops the pull and
+      // walks home to his bed like any evade. The whole circuit sits inside the tether (the
+      // outermost picket, south, is 88 yards out: tests/balgath_give_up.test.ts measures
+      // it), and a focus fight dragged near the tether marches on rather than evading. Any
+      // hit resets the 30 seconds, so a raid chasing and hitting him never trips it, and it
+      // runs on the same clock as his Barrowmend regen above without touching it.
+      giveUp: { tetherRadius: 100, playerRange: 60, unharriedSeconds: 30 },
       // The travelling backhand, on one random player inside his reach. Between the
       // aoePulse (36 to 50) and the stomp (18 to 28) in weight: escorting him is meant to
       // cost, not to be a death sentence for whoever draws the short straw. Named for the

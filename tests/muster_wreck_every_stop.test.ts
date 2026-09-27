@@ -9,7 +9,12 @@
 // scheduler raising him in his crater bed, and `/dev spawn` dropping a copy beside the
 // player on the crater's rim (the exact route the owner took when the boss seemed missing).
 import { describe, expect, it } from 'vitest';
-import { MUSTER_CIRCUIT, MUSTER_INNER_RADIUS, musterCamp } from '../src/sim/content/mirefen_muster';
+import {
+  MUSTER_CIRCUIT,
+  MUSTER_COMMAND_KEEP_OUT,
+  MUSTER_INNER_RADIUS,
+  musterCamp,
+} from '../src/sim/content/mirefen_muster';
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { spawnMobsForDev } from '../src/sim/dev_commands';
 import type { MusterArmyState } from '../src/sim/mirefen_muster';
@@ -85,9 +90,18 @@ function lap(sim: Sim, boss: Entity, keep: number): StopResult[] {
   const out: StopResult[] = [];
   let ringStop: number | null = null;
   let standing: number[] = [];
+  const hurt = (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage;
   for (let i = 0; i < 20 * 240 && out.length < def.destinations.length; i++) {
+    // A chip hit a second, as a raid chasing him lands: a pull nobody hurts for 30 seconds
+    // is one he gives up on (mob/warpath.ts warpathGiveUp).
+    if (i % 20 === 0) hurt.call(sim, player, boss, 20, false, 'physical', 'probe', 'hit', true);
     const d = Math.hypot(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
-    if (d > keep) {
+    // A raider punted into the command camp walks back out toward him: he can never enter
+    // its circle (mob/keep_out.ts), so one left standing there is an unreachable target,
+    // and that is the stall evade rather than the lap this test is about.
+    const camp = MUSTER_COMMAND_KEEP_OUT;
+    const inCamp = Math.hypot(player.pos.x - camp.x, player.pos.z - camp.z) <= camp.radius + 2;
+    if (d > keep || inCamp) {
       const a = Math.atan2(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
       place(sim, player, player.pos.x + Math.sin(a) * 0.35, player.pos.z + Math.cos(a) * 0.35);
     }

@@ -35,6 +35,7 @@ import type { Aura, Entity, MobTemplate, Vec3 } from '../types';
 import { angleTo, DT, DUNGEON_LEASH_DISTANCE, dist2d, LEASH_DISTANCE } from '../types';
 import { splashNearbyMobs } from './boss_collateral';
 import { launchFromSlam } from './boss_slams';
+import { startEvadeHome } from './combat_profile';
 import { emitMobYell } from './yells';
 
 type WarpathDef = NonNullable<MobTemplate['warpath']>;
@@ -43,8 +44,57 @@ type WarpathDef = NonNullable<MobTemplate['warpath']>;
 export type WarpathTickResult =
   /** The warpath owned this tick: it moved the body and spent its own mechanics. */
   | 'handled'
+  /** He gave the pull up this tick and is walking home (warpathGiveUp): nothing else runs. */
+  | 'evaded'
   /** Not a warpather, no live target, or FOCUS: the ordinary combat runner takes it. */
   | 'fallthrough';
+
+/** Why a warpather drops his pull and walks home to his bed. */
+export type WarpathGiveUp =
+  /** He is past the hard tether: however he got there, he goes home. */
+  | 'tether'
+  /** No living player is anywhere near him: the raid left, died, or released. */
+  | 'alone'
+  /** Nobody has hurt him for the whole window: a pull nobody is fighting. */
+  | 'unharried';
+
+/**
+ * A FOCUS fight this close to the hard tether marches on to his next stop instead (see
+ * focusDraggedToLeash), so a raid actively fighting him at his outermost picket moves the
+ * fight along the circuit rather than resetting it on the tether.
+ */
+export const WARPATH_TETHER_MARCH_MARGIN = 5;
+
+/**
+ * Whether the pull is over, as a pure function of where he stands and who is on him.
+ *
+ * The rules are the owner's: he is never kitable out of his area, and never stays engaged
+ * with nobody fighting him. The tether is absolute (every phase, every cause); the other two
+ * are the "nobody is fighting" pair. The unharried clock is the one his Barrowmend regen
+ * already reads (any lost health resets it), so a raid that keeps hitting him while it
+ * chases never trips it, and the regen's own three-second rule is untouched.
+ */
+export function warpathGiveUp(
+  distFromBed: number,
+  playerNear: boolean,
+  unharriedSeconds: number,
+  def: WarpathDef,
+): WarpathGiveUp | null {
+  if (distFromBed > def.giveUp.tetherRadius) return 'tether';
+  if (!playerNear) return 'alone';
+  if (unharriedSeconds >= def.giveUp.unharriedSeconds) return 'unharried';
+  return null;
+}
+
+/** A living, non-ghost player within `range` of him. */
+function livingPlayerWithin(ctx: SimContext, mob: Entity, range: number): boolean {
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
+    if (!p || p.dead || p.ghost) continue;
+    if (dist2d(p.pos, mob.pos) <= range) return true;
+  }
+  return false;
+}
 
 export type WarpathPhase = 'focus' | 'travel' | 'wreck';
 
@@ -184,6 +234,22 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
   }
 
   trackHarassment(mob);
+
+  // The give-up check runs on every engaged tick, before any phase moves him, so no phase
+  // (a chase, a leg, a wreck) can carry him past it. Measured from his spawn, which is his
+  // bed for the live boss and where the evade walks him home to.
+  const quit = warpathGiveUp(
+    dist2d(mob.pos, mob.spawnPos),
+    livingPlayerWithin(ctx, mob, def.giveUp.playerRange),
+    mob.warpathUnharried ?? 0,
+    def,
+  );
+  if (quit) {
+    startEvadeHome(mob);
+    resetWarpath(mob);
+    return 'evaded';
+  }
+
   mob.warpathTimer = Math.max(0, (mob.warpathTimer ?? 0) - DT);
 
   const dest = destinationPos(def, mob.warpathDestination ?? 0);
@@ -218,10 +284,20 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
  * since a kiter still cannot drag him off across the zone: the circuit takes him back to
  * the pickets. Checked one yard inside the leash, so the combat runner's own leash test
  * (mob/combat_profile.ts, the same distance) never sees him past it in this phase.
+ *
+ * The same holds for the HARD tether round his bed (warpathGiveUp): a focus fight within
+ * WARPATH_TETHER_MARCH_MARGIN of it marches on too, so a raid fighting him at his outermost
+ * picket moves the fight along the circuit, and only a body displaced past the tether some
+ * other way ever evades on it. Every stop and leg sits inside the tether, so the march
+ * always carries him back in.
  */
 export function focusDraggedToLeash(mob: Entity): boolean {
   const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
-  return dist2d(mob.pos, mob.leashAnchor ?? mob.spawnPos) > leash - 1;
+  if (dist2d(mob.pos, mob.leashAnchor ?? mob.spawnPos) > leash - 1) return true;
+  const tether = MOBS[mob.templateId]?.warpath?.giveUp.tetherRadius;
+  return (
+    tether !== undefined && dist2d(mob.pos, mob.spawnPos) > tether - WARPATH_TETHER_MARCH_MARGIN
+  );
 }
 
 /**

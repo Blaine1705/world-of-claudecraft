@@ -74,6 +74,11 @@ function raise(sim: Sim): Entity {
   return boss;
 }
 
+/** A chip hit from the player, the way a raid keeps a pull alive (warpathGiveUp). */
+function harry(sim: Sim, boss: Entity): void {
+  inner(sim).dealDamage(sim.player, boss, 20, false, 'physical', 'probe', 'hit', true);
+}
+
 /** soldier entity id -> the camp that posted him (soldierIds follows MUSTER_CAMPS order). */
 function campOfSoldier(army: MusterArmyState): Map<number, string> {
   const out = new Map<number, string>();
@@ -250,6 +255,8 @@ describe('the muster in a live world', () => {
       [];
     let soldierDamage = 0;
     for (let i = 0; i < 20 * 260 && results.length < stops.length; i++) {
+      // A chip hit a second: a pull nobody hurts for 30 seconds is one he gives up on.
+      if (i % 20 === 0) harry(sim, boss);
       const d = Math.hypot(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
       if (d > 6) {
         const a = Math.atan2(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
@@ -347,8 +354,12 @@ describe('the muster in a live world', () => {
     expect(army.engaged).toBe(true);
     inner(sim).dealDamage(boss, victim, victim.maxHp * 10, false, 'physical', 'probe', 'hit', true);
     expect(victim.dead).toBe(true);
-    // Down for as long as the fight goes on: the ordinary respawn timer never fires.
-    for (let i = 0; i < 20 * 30; i++) sim.tick();
+    // Down for as long as the fight goes on: the ordinary respawn timer never fires. The
+    // raid keeps hitting him, or the fight would end on its own (he gives up an unhurt pull).
+    for (let i = 0; i < 20 * 30; i++) {
+      if (i % 20 === 0) harry(sim, boss);
+      sim.tick();
+    }
     expect(victim.dead).toBe(true);
     // The pull ends (he falls): after the short grace, the muster stands its dead up.
     boss.hp = 1;

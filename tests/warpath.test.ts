@@ -286,9 +286,18 @@ describe('warpath in a live world', () => {
     boss = e;
   });
 
-  /** Run until `done`, keeping the player glued to the boss the way a raid would. */
-  const chase = (seconds: number, done?: () => boolean): number => {
+  /**
+   * Run until `done`, keeping the player glued to the boss the way a raid would, and (unless
+   * `harry` is off) landing a chip hit every second the way a raid would too: a pull nobody
+   * hurts for 30 seconds is one he gives up on (warpathGiveUp), so a chase that never hits
+   * him would be measuring that rule instead of the circuit.
+   */
+  const chase = (seconds: number, done?: () => boolean, harry = true): number => {
+    const hurt = (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage;
     for (let i = 0; i < 20 * seconds; i++) {
+      if (harry && i % 20 === 0 && boss.aiState !== 'evade') {
+        hurt.call(sim, player, boss, 20, false, 'physical', 'probe', 'hit', true);
+      }
       const d = Math.hypot(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
       if (d > 6) {
         const a = Math.atan2(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
@@ -402,7 +411,7 @@ describe('warpath in a live world', () => {
 
     // Left alone while he runs, he claws health back.
     const before = boss.hp;
-    chase(6, () => false);
+    chase(6, () => false, false);
     expect(boss.hp).toBeGreaterThan(before);
 
     // Hit him every tick and the regen never arms: the unharried clock keeps resetting.
@@ -430,7 +439,10 @@ describe('warpath in a live world', () => {
     // itself would be an unavoidable hit dressed as a telegraph.
     let ringAt: number | null = null;
     let novaAt: number | null = null;
+    const hurt = (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage;
     for (let i = 0; i < 20 * 90 && novaAt === null; i++) {
+      // Chip hits, as chase() lands: an unhurt pull is one he gives up on.
+      if (i % 20 === 0) hurt.call(sim, player, boss, 20, false, 'physical', 'probe', 'hit', true);
       const d = Math.hypot(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
       if (d > 6) {
         const a = Math.atan2(boss.pos.x - player.pos.x, boss.pos.z - player.pos.z);
