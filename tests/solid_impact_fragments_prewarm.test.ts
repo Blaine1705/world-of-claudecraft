@@ -22,8 +22,10 @@ afterEach(() => {
   assets.productionAssetInternalsForTest.reset();
 });
 
+// The kind batches the kit geometry builds, not the pool's boot stand-in.
 function liveFragments(scene: THREE.Scene) {
-  return scene.children.filter((child) => child.name.startsWith('solidImpact:')) as THREE.Mesh<
+  const names = KINDS.map((kind) => `solidImpact:${kind}`);
+  return scene.children.filter((child) => names.includes(child.name)) as THREE.Mesh<
     THREE.InstancedBufferGeometry,
     THREE.ShaderMaterial
   >[];
