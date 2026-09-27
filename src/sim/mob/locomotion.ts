@@ -1129,6 +1129,59 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
   }
 }
 
+// Open a bigCast bar: reseed the cadence past the cast, arm the spacing lock for
+// the bar plus one window, and show the bar. Draws no rng.
+function startBigCast(
+  ctx: SimContext,
+  mob: Entity,
+  bigCast: NonNullable<MobTemplate['bigCast']>,
+): void {
+  mob.bigCastTimer = bigCast.every + bigCast.castTime;
+  claimMechanicSpacing(mob, bigCast.castTime);
+  // The bar is a telegraph: open the escape window to the authored cast
+  // time (a wall-clock deadline; a kite-frozen bar cannot pin it open).
+  openRiftEscapeWindow(ctx, mob, bigCast.castTime);
+  mob.castingAbility = bigCast.castId;
+  mob.castTotal = bigCast.castTime;
+  mob.castRemaining = bigCast.castTime;
+  mob.castTargetId = null;
+  mob.channeling = false;
+  if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
+}
+
+/**
+ * [dev] Start one of a telegraphed boss's own circle mechanics right now, for the
+ * /dev balgath playtest command (dev/balgath_dev_mechanics.ts): 'pulse' is his aoePulse
+ * (Barrow Smash), 'stomp' his stomp, 'bigCast' his hardcast bar. Each runs the exact start
+ * a combat cast runs (the ring or bar, the wind-up cue, the landing), with the spacing
+ * lock claimed afresh (overridden once) and the driver's cadence restarted so the natural
+ * rotation carries on from here. Only a template-telegraphed mob with the spawn stamp
+ * qualifies, and it refuses (false) while that same wind-up or any cast is in flight.
+ * The hardcast bar fills only on the melee-contact ticks, exactly as in combat. No rng.
+ */
+export function forceTelegraphedBossMechanic(
+  ctx: SimContext,
+  mob: Entity,
+  kind: 'pulse' | 'stomp' | 'bigCast',
+): boolean {
+  const tpl = MOBS[mob.templateId];
+  if (tpl?.telegraphedMechanics === undefined || (mob.riftMechanicSpacing ?? 0) <= 0) return false;
+  if (kind === 'bigCast') {
+    if (!tpl.bigCast || mob.castingAbility !== null) return false;
+    startBigCast(ctx, mob, tpl.bigCast);
+    return true;
+  }
+  const def = kind === 'pulse' ? tpl.aoePulse : tpl.stomp;
+  if (!def) return false;
+  const live = kind === 'pulse' ? mob.pulseWindupRemaining : mob.stompWindupRemaining;
+  if ((live ?? 0) > 0) return false;
+  const school = (def.school ?? (kind === 'pulse' ? 'shadow' : 'physical')) as Aura['school'];
+  if (!startRiftMechanicWindup(ctx, mob, kind, def.radius, school)) return false;
+  if (kind === 'pulse') mob.pulseTimer = def.every + RIFT_MECHANIC_WINDUP_SEC;
+  else mob.stompTimer = def.every + RIFT_MECHANIC_WINDUP_SEC;
+  return true;
+}
+
 function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // Every driver below consults riftMechanicSuppressed: a rift boss spawned at
   // a low rank runs only the head of its template's rankMechanics list (C=1 ..
@@ -1279,17 +1332,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.castingAbility === null &&
         !mechanicSlotHeld(mob, 'bigCast')
       ) {
-        mob.bigCastTimer = bigCast.every + bigCast.castTime;
-        claimMechanicSpacing(mob, bigCast.castTime);
-        // The bar is a telegraph: open the escape window to the authored cast
-        // time (a wall-clock deadline; a kite-frozen bar cannot pin it open).
-        openRiftEscapeWindow(ctx, mob, bigCast.castTime);
-        mob.castingAbility = bigCast.castId;
-        mob.castTotal = bigCast.castTime;
-        mob.castRemaining = bigCast.castTime;
-        mob.castTargetId = null;
-        mob.channeling = false;
-        if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
+        startBigCast(ctx, mob, bigCast);
       }
     }
   }

@@ -4,6 +4,12 @@ import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS } from './data';
+import {
+  BALGATH_DEV_MECHANICS,
+  balgathDevHelp,
+  forceBalgathDevMechanic,
+  parseBalgathDevCommand,
+} from './dev/balgath_dev_mechanics';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
@@ -1032,6 +1038,24 @@ export function handleDevChat(
     return null;
   }
 
+  // [dev] Force one of Balgath's mechanics on the nearest live Balgath, aimed at the
+  // caller (src/sim/dev/balgath_dev_mechanics.ts).
+  const balgath = parseBalgathDevCommand(raw);
+  if (balgath) {
+    if (balgath.kind === 'help') emitDevLog(ctx, pid, balgathDevHelp());
+    else if (balgath.kind === 'unknown') {
+      ctx.error(
+        pid,
+        `[dev] Unknown Balgath mechanic '${balgath.verb}'. Usage: /dev balgath <${BALGATH_DEV_MECHANICS.join('|')}|help>.`,
+      );
+    } else {
+      const result = forceBalgathDevMechanic(ctx, pid, balgath.mechanic);
+      if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+      else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    }
+    return null;
+  }
+
   const varkhulRaidMatch = raw.match(
     /^\/(?:dev\s+varkhulraid|devvarkhulraid)(?:\s+(normal|heroic))?\s*$/i,
   );
@@ -1125,7 +1149,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|help>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

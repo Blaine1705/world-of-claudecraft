@@ -405,6 +405,27 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
 }
 
 /**
+ * [dev] Land the arrival wreck where he stands right now, for the /dev balgath playtest
+ * command (dev/balgath_dev_mechanics.ts): the same WRECK phase a finished leg enters (the
+ * ring, the wind-up cue, the yell, the blast after the fuse), after which he returns to
+ * FOCUS and his circuit carries on (a leg the wreck cut short counts as walked). A pull
+ * that has not yet ticked its warpath is opened on it first, exactly as tickWarpath would.
+ * Refuses (false) mid-wreck, or for a mob without a warpath. Draws no rng.
+ */
+export function forceWarpathWreck(ctx: SimContext, mob: Entity): boolean {
+  const def = MOBS[mob.templateId]?.warpath;
+  if (!def || def.destinations.length === 0 || mob.warpathPhase === 'wreck') return false;
+  if (mob.warpathPhase === undefined) {
+    mob.warpathLastHp = mob.hp;
+    mob.warpathUnharried = 0;
+    mob.warpathAlone = 0;
+    mob.warpathSwipeTimer = def.swipe.every;
+  }
+  beginPhase(ctx, mob, def, 'wreck');
+  return true;
+}
+
+/**
  * Whether FOCUS has been dragged to the edge of his tether: the fight he is planted in has
  * walked him (almost) as far from his landmark as the soft leash allows.
  *

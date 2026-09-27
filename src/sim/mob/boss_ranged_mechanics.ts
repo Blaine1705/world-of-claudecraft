@@ -48,7 +48,7 @@ import { claimMechanicSpacing, governedOverdue, mechanicSpacingBlocked } from '.
 import { emitMobYell } from './yells';
 
 type RangedDef = NonNullable<MobTemplate['rangedMechanics']>;
-type RangedKind = 'boulder' | 'glare' | 'burden';
+export type RangedKind = 'boulder' | 'glare' | 'burden';
 
 /** Animation and render cue ids (the `ability` on every event this module emits). */
 export const BOULDER_ABILITY = 'mob_balgath_boulder';
@@ -175,6 +175,13 @@ function startBoulder(ctx: SimContext, mob: Entity, def: RangedDef): boolean {
   const b = def.boulder;
   const victims = farthestCandidates(livingPlayers(ctx), mob.pos, b.minRange, b.maxRange, b.count);
   if (victims.length === 0) return false;
+  beginBoulder(ctx, mob, def, victims);
+  return true;
+}
+
+/** The boulder wind-up itself, once the victims are chosen. Draws no rng. */
+function beginBoulder(ctx: SimContext, mob: Entity, def: RangedDef, victims: Entity[]): void {
+  const b = def.boulder;
   const school = (b.school ?? 'physical') as Aura['school'];
   mob.rangedKind = 'boulder';
   mob.rangedWindup = b.windup;
@@ -196,7 +203,6 @@ function startBoulder(ctx: SimContext, mob: Entity, def: RangedDef): boolean {
     });
   }
   emitWindupCue(ctx, mob, school, BOULDER_ABILITY);
-  return true;
 }
 
 /** The eye locks on one far player and the line goes down, snapshot, through them. */
@@ -207,6 +213,13 @@ function startGlare(ctx: SimContext, mob: Entity, def: RangedDef): boolean {
   // Uniform pick among the far players (not always the farthest: that one already has a
   // boulder coming). One rng draw, a pure function of how many stand far out.
   const victim = far[ctx.rng.int(0, far.length - 1)];
+  beginGlare(ctx, mob, def, victim);
+  return true;
+}
+
+/** The glare wind-up at a chosen victim: the line is snapshot through them. No rng. */
+function beginGlare(ctx: SimContext, mob: Entity, def: RangedDef, victim: Entity): void {
+  const g = def.glare;
   const d = Math.max(0.001, dist2d(victim.pos, mob.pos));
   const dirX = (victim.pos.x - mob.pos.x) / d;
   const dirZ = (victim.pos.z - mob.pos.z) / d;
@@ -234,7 +247,6 @@ function startGlare(ctx: SimContext, mob: Entity, def: RangedDef): boolean {
     dirZ,
   });
   emitWindupCue(ctx, mob, school, GLARE_ABILITY);
-  return true;
 }
 
 /** One player carries the barrow's weight; everyone who stands with them shares it. */
@@ -249,6 +261,13 @@ function startBurden(ctx: SimContext, mob: Entity, def: RangedDef): boolean {
   const others = inRange.filter((p) => p.id !== mob.aggroTargetId);
   const pool = others.length > 0 ? others : inRange;
   const victim = pool[ctx.rng.int(0, pool.length - 1)];
+  beginBurden(ctx, mob, def, victim);
+  return true;
+}
+
+/** Mark the chosen carrier and start the soak's wind-up. Draws no rng. */
+function beginBurden(ctx: SimContext, mob: Entity, def: RangedDef, victim: Entity): void {
+  const s = def.burden;
   mob.rangedKind = 'burden';
   mob.rangedWindup = s.windup;
   mob.rangedTargetId = victim.id;
@@ -270,6 +289,31 @@ function startBurden(ctx: SimContext, mob: Entity, def: RangedDef): boolean {
   });
   emitWindupCue(ctx, mob, 'physical', BURDEN_ABILITY);
   if (s.yell) emitMobYell(ctx, mob, s.yell, MOBS[mob.templateId]?.warpath?.yellRange);
+}
+
+/**
+ * [dev] Start `kind` right now, aimed at `victim`, for the /dev balgath playtest command
+ * (dev/balgath_dev_mechanics.ts). It plays the exact telegraph and landing a combat cast
+ * does, through the same begin* functions, and skips only the AIM rules: the victim need
+ * not stand past the 18-yard minimum, and a burden may mark a lone player (the soak then
+ * lands on whoever stands in it, which alone is lethal by design). The spacing lock is
+ * overridden once (the begin claims it afresh) and the mechanic's own cadence restarts,
+ * so the natural rotation picks up from here unchanged. Refuses (false) while a ranged
+ * wind-up is already in flight, which would strand its telegraph. Draws no rng.
+ */
+export function forceBossRangedMechanic(
+  ctx: SimContext,
+  mob: Entity,
+  kind: RangedKind,
+  victim: Entity,
+): boolean {
+  const def = MOBS[mob.templateId]?.rangedMechanics;
+  if (!def || (mob.rangedWindup ?? 0) > 0) return false;
+  if (kind === 'boulder') beginBoulder(ctx, mob, def, [victim]);
+  else if (kind === 'glare') beginGlare(ctx, mob, def, victim);
+  else beginBurden(ctx, mob, def, victim);
+  mob[TIMER_FIELD[kind]] = def[kind].every;
+  mob.rangedReadyOverdue = undefined;
   return true;
 }
 

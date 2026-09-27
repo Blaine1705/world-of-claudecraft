@@ -387,6 +387,34 @@ function fireCleave(ctx: SimContext, mob: Entity, def: SlamsDef): void {
   launchFromSlam(ctx, mob, mob.pos, def.cleave.range, struck);
 }
 
+/**
+ * [dev] Wind `kind` up right now, for the /dev balgath playtest command
+ * (dev/balgath_dev_mechanics.ts): the hammer drops on `victim`, and the cleave is aimed
+ * through them (he turns to face them first, since a solo tester is rarely in front of
+ * him). Same start functions a combat cast runs, so the ring, the wind-up cue and the
+ * landing are the real ones; the spacing lock is claimed afresh (overridden once) and the
+ * slam's cadence restarts, so the natural rotation carries on from here. Refuses (false)
+ * while a slam is already winding, which would strand its ring. Draws no rng.
+ */
+export function forceBossSlam(
+  ctx: SimContext,
+  mob: Entity,
+  kind: 'hammer' | 'cleave',
+  victim: Entity,
+): boolean {
+  const def = MOBS[mob.templateId]?.slams;
+  if (!def || (mob.slamWindup ?? 0) > 0) return false;
+  if (kind === 'hammer') {
+    mob.hammerTimer = def.hammer.every;
+    startHammer(ctx, mob, def, victim);
+    return true;
+  }
+  if (dist2d(mob.pos, victim.pos) > 0.05) mob.facing = angleTo(mob.pos, victim.pos);
+  mob.cleaveTimer = def.cleave.every;
+  startCleave(ctx, mob, def);
+  return true;
+}
+
 /** Drop any half-wound slam with the pull, so a fresh engage never inherits one. */
 export function resetBossSlams(mob: Entity): void {
   if (mob.slamWindup !== undefined) mob.slamWindup = 0;
