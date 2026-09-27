@@ -48,12 +48,15 @@ import {
   type AbilityVfxEntityState,
 } from '../src/render/ability_vfx/painter';
 import {
+  BAKED_URLS,
+  type BakedKind,
   bakedTexture,
   ensureWarriorKitAssets,
   productionAssetInternalsForTest,
   warriorBloodTexture,
   warriorKitAssetsState,
   warriorPressureTexture,
+  warriorRockTexture,
   warriorSteelTexture,
 } from '../src/render/ability_vfx/production_assets';
 import * as loader from '../src/render/assets/loader';
@@ -112,6 +115,36 @@ describe('ensureWarriorKitAssets', () => {
     expect(contactTexture('contact_pierce')).not.toBeNull();
     await ensureWarriorKitAssets(false);
     expect(loadBitmapTexture).toHaveBeenCalledTimes(11);
+  });
+
+  it('releases each image sheet once uploaded, and decodes them again for a rebuilt renderer', async () => {
+    const bitmaps: { width: number; height: number; close: () => void }[] = [];
+    loadBitmapTexture.mockImplementation(async () => {
+      const image = { width: 4, height: 4, close: vi.fn() };
+      bitmaps.push(image);
+      return new THREE.Texture(image as never);
+    });
+    await ensureWarriorKitAssets(false);
+    const sheets = [
+      ...Object.keys(BAKED_URLS).map((kind) => bakedTexture(kind as BakedKind)),
+      warriorPressureTexture(),
+      warriorBloodTexture(),
+      warriorSteelTexture(),
+      warriorRockTexture(),
+    ].filter((texture) => texture && bitmaps.includes(texture.image as never)) as THREE.Texture[];
+    expect(sheets).toHaveLength(11);
+    // The first renderer uploads every sheet: three calls onUpdate after each.
+    for (const texture of sheets) texture.onUpdate?.(texture);
+    for (const image of bitmaps) expect(image.close).toHaveBeenCalledTimes(1);
+    expect(sheets.every((texture) => bitmaps.includes(texture.image as never))).toBe(false);
+    // A rebuilt renderer's kit asks again before its recipe uploads anything.
+    await expect(ensureWarriorKitAssets(false)).resolves.toBe(true);
+    expect(loadBitmapTexture).toHaveBeenCalledTimes(22);
+    for (const texture of sheets) {
+      expect(bitmaps.slice(11)).toContain(texture.image);
+      expect(texture.source.dataReady).toBe(true);
+    }
+    loadBitmapTexture.mockImplementation(async () => new THREE.Texture());
   });
 
   it('keeps a mip chain on the WebP sheets and leaves the KTX2 and data maps alone', async () => {

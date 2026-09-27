@@ -172,8 +172,9 @@ selected by ability id only:
   `ACTIVE_KIT_RETRY_DELAYS_MS` backoff, paying only its unpaid units), decodes
   its image sheets off the main thread on Chromium (`loadBitmapTexture`, texel
   for texel what the image path uploads:
-  `tests/browser/bitmap_texture_pixels.browser.test.ts`; their decoded RGBA,
-  about 96 MB, stays pinned for the page),
+  `tests/browser/bitmap_texture_pixels.browser.test.ts`; each bitmap is closed
+  once uploaded, and a rebuilt renderer's request decodes the set again before
+  its recipe uploads it: `../assets/bitmap_sheet_release.ts`),
   keeps a mip chain on the WebP sheets, and DECLINES them
   on constrained-memory devices, where the kit stays cold, the generic
   presentation runs, and the boot warm-up links none of the kit's programs

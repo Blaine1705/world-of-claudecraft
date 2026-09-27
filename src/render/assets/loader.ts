@@ -300,10 +300,10 @@ export function loadTexture(
 /** A plain image texture decoded off the main thread (image_bitmap_decode.ts),
  *  for large sheets whose upload would otherwise pay the decode in a live
  *  frame. Uploads the same texels as loadTexture, whose path it falls back to
- *  outside Chromium or when the decode is refused. Memory: the ImageBitmap
- *  keeps its decoded RGBA pinned for the texture's life (the image path's
- *  decode sits in the browser's discardable cache instead), since a rebuilt
- *  renderer uploads from it again. */
+ *  outside Chromium or when the decode is refused. Each call past a settled
+ *  one fetches and decodes again. An ImageBitmap pins its decoded RGBA until
+ *  closed, so a caller that keeps the texture past its upload releases it
+ *  (bitmap_sheet_release.ts). */
 export function loadBitmapTexture(
   url: string,
   opts: { srgb?: boolean } = {},
@@ -337,10 +337,13 @@ export function loadBitmapTexture(
       if (loadDiagEnabled()) console.info(`[load-diag] bitmap decode declined: ${resolved}`);
       return loadTexture(url, opts);
     });
+    // Joins a load in flight only: a settled texture may have released its
+    // bitmap (bitmap_sheet_release.ts), so a later request decodes afresh.
     const pending = p;
-    p.catch(() => {
+    const settle = () => {
       if (bitmapTexCache.get(key) === pending) bitmapTexCache.delete(key);
-    });
+    };
+    p.then(settle, settle);
     bitmapTexCache.set(key, p);
   }
   return p;

@@ -42,6 +42,7 @@ import {
   warriorRockTexture,
   warriorSteelTexture,
 } from '../../src/render/ability_vfx/production_assets';
+import { bitmapSheetReleased } from '../../src/render/assets/bitmap_sheet_release';
 
 type Sheets = Map<string, THREE.Texture>;
 
@@ -136,5 +137,56 @@ describe('the Warrior kit sheets decoded off the main thread', () => {
         }
       }
     }
+  });
+
+  it('decodes the released sheets again for a rebuilt renderer, texel for texel', async () => {
+    renderer = new THREE.WebGLRenderer({ canvas: document.createElement('canvas') });
+    vi.stubGlobal('createImageBitmap', undefined);
+    const image = await loadKit();
+    vi.unstubAllGlobals();
+    const bitmap = await loadKit();
+    const first = new Map(
+      [...bitmap].map(([name, texture]) => [name, texture.image as ImageBitmap]),
+    );
+    for (const texture of bitmap.values()) readLevel(texture, 0);
+    for (const [name, texture] of bitmap) {
+      expect(bitmapSheetReleased(texture), `${name} released`).toBe(true);
+      expect((first.get(name) as ImageBitmap).width, `${name} bitmap closed`).toBe(0);
+    }
+    // The graphics rebuild: a new renderer, whose kit asks for the assets
+    // again before its recipe uploads a sheet.
+    renderer.dispose();
+    renderer = new THREE.WebGLRenderer({ canvas: document.createElement('canvas') });
+    await expect(ensureWarriorKitAssets(false)).resolves.toBe(true);
+    for (const [name, reference] of image) {
+      const decoded = bitmap.get(name) as THREE.Texture;
+      expect(decoded.image instanceof ImageBitmap, `${name} decoded again`).toBe(true);
+      expect(decoded.image).not.toBe(first.get(name));
+      for (const level of reference.generateMipmaps ? [0, 3] : [0]) {
+        const a = readLevel(reference, level);
+        const b = readLevel(decoded, level);
+        expect(firstDifference(a.bytes, b.bytes), `${name} level ${level}`).toBe(-1);
+      }
+    }
+  });
+
+  it('uploads a released sheet as empty storage with no GL error, then heals on its next use', async () => {
+    renderer = new THREE.WebGLRenderer({ canvas: document.createElement('canvas') });
+    vi.stubGlobal('createImageBitmap', undefined);
+    const image = await loadKit();
+    vi.unstubAllGlobals();
+    const bitmap = await loadKit();
+    for (const texture of bitmap.values()) readLevel(texture, 0);
+    // A restored context re-uploads every texture it draws, released or not.
+    renderer.dispose();
+    renderer = new THREE.WebGLRenderer({ canvas: document.createElement('canvas') });
+    const gl = renderer.getContext();
+    const [name, decoded] = [...bitmap][0];
+    readLevel(decoded, 0);
+    expect(gl.getError()).toBe(gl.NO_ERROR);
+    await vi.waitFor(() => expect(decoded.image instanceof ImageBitmap).toBe(true));
+    const a = readLevel(image.get(name) as THREE.Texture, 0);
+    const b = readLevel(decoded, 0);
+    expect(firstDifference(a.bytes, b.bytes), name).toBe(-1);
   });
 });

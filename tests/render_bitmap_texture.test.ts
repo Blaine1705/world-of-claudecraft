@@ -98,6 +98,15 @@ describe('loadBitmapTexture', () => {
     expect(texture.colorSpace).toBe(THREE.NoColorSpace);
   });
 
+  it('decodes again for a request after a settled load, never handing out a released texture', async () => {
+    const b = stubBrowser({});
+    const { loadBitmapTexture } = await import('../src/render/assets/loader');
+    const first = await loadBitmapTexture('/textures/vfx/production/smoke.webp', { srgb: true });
+    const second = await loadBitmapTexture('/textures/vfx/production/smoke.webp', { srgb: true });
+    expect(second).not.toBe(first);
+    expect(b.createImageBitmap).toHaveBeenCalledTimes(2);
+  });
+
   it('keys an sRGB and a linear request for one url apart', async () => {
     const b = stubBrowser({});
     const { loadBitmapTexture } = await import('../src/render/assets/loader');
