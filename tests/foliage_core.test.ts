@@ -53,7 +53,19 @@ describe('Eastbrook town grass exclusion', () => {
     // The 13 town guild boards (content/noticeboards.ts, one per hub
     // settlement) each add a footprint and a reading-spot exclusion: 26 more.
     // The glider sign adds its footprint and reading-spot exclusions too.
-    expect(exclusions).toHaveLength(125);
+    // The Mirefen tavern keeps grass off its floor: the hall, the wing, the tower and the
+    // porch with its steps (mirefenTavernGrassExclusions): 4 more.
+    expect(exclusions).toHaveLength(129);
+    for (const id of [
+      'mirefen_tavern:hall',
+      'mirefen_tavern:wing',
+      'mirefen_tavern:tower',
+      'mirefen_tavern:porch',
+    ]) {
+      expect(exclusions.some((item) => item.id === id)).toBe(true);
+    }
+    // the hearth in the middle of the hall has no grass
+    expect(insideEastbrookGrassExclusion(exclusions, -14.6, 408, PADDING)).toBe(true);
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,

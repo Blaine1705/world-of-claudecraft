@@ -27,7 +27,7 @@
 // floor is one height per point and nothing walks under anything.
 //
 // Scale: the player stands 2.6 yd to the crown on a 0.5 yd body radius. The door clears
-// 4.6 by 5.2, the side walls stand 9 to the eaves under a ridge at 20, the nook beams
+// 4.6 by 5.2, the side walls stand 10 to the eaves under a ridge at 20, the nook beams
 // hang at 5.5, the stair is 4.2 wide, table tops stand at 1.45 and seats at 0.85.
 
 import type { NpcDef } from '../types';
@@ -54,7 +54,7 @@ export const TAVERN_HALL = {
   z1: 14,
   wall: 0.8,
   /** The wall plate along both side walls (the eaves' line). */
-  eave: 9.0,
+  eave: 10.0,
   /** The ridge over the middle, running front to back (the front is a gable). */
   ridge: 20.0,
   /** The nave's tie beams, the high centre's ceiling line. */
@@ -83,6 +83,9 @@ export const TAVERN_PORCH = {
   parapet: 1.0,
 } as const;
 
+/** How far the porch steps may run before they are certainly under the ground. */
+export const TAVERN_STEPS_MAX_RUN = 8;
+
 /** The wing behind the hall's right half: the upper floor over the cellar. */
 export const TAVERN_WING = {
   x0: 4,
@@ -90,9 +93,9 @@ export const TAVERN_WING = {
   z0: -28,
   z1: -14,
   wall: 0.8,
-  eave: 10.5,
-  /** The wing's ridge runs front to back over its middle. */
-  ridge: 14.8,
+  eave: 9.4,
+  /** The wing's ridge runs front to back over its middle, under the hall's back gable. */
+  ridge: 13.3,
   eaveOut: 0.9,
   vergeOut: 0.6,
 } as const;
@@ -106,7 +109,8 @@ export const TAVERN_TOWER = {
   /** The central newel column the stair winds round. */
   newel: 1.8,
   wallTop: 11.2,
-  peak: 17.2,
+  /** The slate cone's point, over the hall's ridge: the tower's hat reads from the road. */
+  peak: 22.0,
   eaveOut: 0.8,
 } as const;
 
@@ -127,7 +131,7 @@ export const TAVERN_STAIR = {
 export const TAVERN_ARCH = { x0: -5.5, x1: 2.4, height: 5.4 } as const;
 
 /** The upper-floor passage from the tower's landing through the tower and wing walls. */
-export const TAVERN_TOWER_DOOR = { x0: 2.5, x1: 5.2, z0: -17.6, z1: -14.9, height: 4.2 } as const;
+export const TAVERN_TOWER_DOOR = { x0: 2.5, x1: 5.2, z0: -17.6, z1: -14.9, height: 3.6 } as const;
 
 /** The gallery over the bar's barrel wall, its rail, and its door into the wing. */
 export const TAVERN_GALLERY = {
@@ -389,6 +393,16 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     level: 'ground',
     standable: true,
   },
+  // the post on the gallery's edge carrying the right arcade plate over the bar
+  {
+    kind: 'post',
+    x: 9.2,
+    z: -10.35,
+    rot: 0,
+    r: 0.3,
+    height: TAVERN_HALL.tie - TAVERN_UPPER,
+    level: 'upper',
+  },
   // the bar: the stone pillar at the elbow, the long counter and the short one behind the
   // pillar, and the stools before it
   { kind: 'pillar', x: 4.3, z: -7.6, rot: 0, r: 1.1, height: TAVERN_HALL.tie, level: 'platform' },
@@ -544,7 +558,7 @@ export const TAVERN_LANTERNS: readonly { x: number; z: number; y: number; lit: b
   { x: 7.0, z: -6.9, y: 4.6, lit: true },
   { x: 11.2, z: -6.9, y: 4.6, lit: false },
 ];
-export const TAVERN_CHANDELIER = { x: 0, z: 10.0, y: 7.6, r: 2.1 } as const;
+export const TAVERN_CHANDELIER = { x: 0, z: 9.6, y: 7.6, r: 2.1 } as const;
 /** The copper hood over the round hearth: its rim's height and radius, its flue's top. */
 export const TAVERN_HOOD = { rimY: 5.0, rimR: 2.6, topY: 7.2, topR: 0.7, flueTop: 21.8 } as const;
 

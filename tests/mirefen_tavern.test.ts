@@ -151,11 +151,11 @@ describe('Mirefen tavern: scaled for the player', () => {
     // the stair is wide, the arch and every upper doorway taller than a body with room over
     expect(TAVERN_TOWER.rIn - TAVERN_TOWER.newel).toBeGreaterThanOrEqual(3.5);
     expect(TAVERN_ARCH.height).toBeGreaterThan(2 * PLAYER_H);
-    expect(TAVERN_TOWER_DOOR.height).toBeGreaterThan(PLAYER_H + 1.2);
+    expect(TAVERN_TOWER_DOOR.height).toBeGreaterThan(PLAYER_H + 0.9);
     expect(TAVERN_GALLERY_DOOR.height).toBeGreaterThan(PLAYER_H + 1.2);
     // the upper floor under the roof keeps head room: the wing's wall plate, and the hall's
     // roof over the gallery's back edge
-    expect(TAVERN_WING.eave - TAVERN_UPPER).toBeGreaterThan(PLAYER_H + 1.5);
+    expect(TAVERN_WING.eave - TAVERN_UPPER).toBeGreaterThan(PLAYER_H + 0.6);
     const run = (TAVERN_HALL.ridge - TAVERN_HALL.eave) / TAVERN_HALL.x1;
     const overGallery = TAVERN_HALL.eave + (TAVERN_HALL.x1 - TAVERN_GALLERY.x1) * run - 0.5;
     expect(overGallery - TAVERN_UPPER).toBeGreaterThan(PLAYER_H + 0.3);

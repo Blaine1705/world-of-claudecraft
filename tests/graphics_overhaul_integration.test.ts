@@ -80,6 +80,8 @@ describe('graphics-overhaul integration', () => {
       'src/render/battleground_placements.ts',
       // the Harbormaster's House walk-in cutaway (the shell's per-part fade)
       'src/render/wyrmwatch_harbor_house.ts',
+      // the Mirefen tavern's walk-in cutaway (the same per-part shell fade)
+      'src/render/mirefen_tavern.ts',
     ];
     for (const file of consumers) {
       const text = source(file);

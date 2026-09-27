@@ -572,6 +572,7 @@ import { type RankedPointLight, reconcileViewPointLights } from './point_light_b
 import { attachPointLightCarriers, NO_POINT_LIGHTS } from './point_light_carriers';
 import { markPointLightSource } from './point_light_carriers_core';
 import { buildComposer, type PostPipeline } from './post';
+import { precipBiomeAt } from './precip_shelter';
 import { withSceneHiddenForPresentationPrewarm } from './presentation_prewarm';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
@@ -11758,7 +11759,7 @@ export class Renderer {
         this.updateEnvBiome(dt);
       }
     }
-    // precipitation only falls outdoors; indoors/underwater pass null to clear.
+    // precipitation only falls outdoors and in the open (precip_shelter.ts); indoors pass null.
     // The sampler lets a neighbouring zone's weather fall inside the box while
     // the player stands outside it (weather_field_core.ts).
     // Precipitation is unlit, so it takes the grade explicitly or snow stays
@@ -11767,7 +11768,7 @@ export class Renderer {
     this.weather.update(
       this.camera.position,
       dt,
-      this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.x, p.pos.z) : null,
+      precipBiomeAt(this.fogState === 'outdoor', p.pos.x, p.pos.y, p.pos.z),
       zoneBiomeAt,
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'sky', worldStart);

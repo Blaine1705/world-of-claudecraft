@@ -39,6 +39,7 @@ import { gliderCourseVisualPreloadInternalsForTest } from '../src/render/glider_
 import { harborRouteMarkerInternalsForTest } from '../src/render/harbor_route_markers';
 import { ignivarEnvPropsInternalsForTest } from '../src/render/ignivar_env_props';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
+import { mirefenTavernInternalsForTest } from '../src/render/mirefen_tavern';
 import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
@@ -521,6 +522,10 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('wickharbor harbor asset', () => {
     expectAssetExistsAndManifested(wickharborHarborInternalsForTest.assetUrl);
+  });
+
+  it('mirefen tavern asset', () => {
+    expectAssetExistsAndManifested(mirefenTavernInternalsForTest.assetUrl);
   });
 
   it('gather node assets', () => {

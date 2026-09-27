@@ -30,6 +30,7 @@ import {
   TAVERN_PIT,
   TAVERN_PORCH,
   TAVERN_STAIR,
+  TAVERN_STEPS_MAX_RUN,
   TAVERN_TOWER,
   TAVERN_UPPER,
   TAVERN_WING,
@@ -37,8 +38,6 @@ import {
 import { isBuiltinWorldActive } from './data';
 
 const TAU = Math.PI * 2;
-/** How far the porch steps may run before they are certainly under the ground. */
-export const TAVERN_STEPS_MAX_RUN = 8;
 
 /** The footprint's world bounds (local z maps to world x, local x to world -z). */
 const BOUNDS = {
