@@ -30,12 +30,15 @@
 // phase machine is a pure function (`nextWarpathPhase`) so its transitions can be tested
 // without a Sim; the tick below is the thin part that moves the body and spends damage.
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import { musterPicketRazed } from '../muster_picket_razed';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity, MobTemplate, Vec3 } from '../types';
 import { angleTo, DT, DUNGEON_LEASH_DISTANCE, dist2d, LEASH_DISTANCE } from '../types';
 import { splashNearbyMobs } from './boss_collateral';
 import { launchFromSlam } from './boss_slams';
 import { startEvadeHome } from './combat_profile';
+import { highestThreatTarget } from './targeting';
+import { traceWarpath } from './warpath_dev_trace';
 import { emitMobYell } from './yells';
 
 type WarpathDef = NonNullable<MobTemplate['warpath']>;
@@ -146,9 +149,51 @@ export function warpathPhaseDuration(phase: WarpathPhase, def: WarpathDef): numb
  * stop, lets the pacing be designed rather than emerge, is learnable by a raid on the
  * second lap, and draws no rng, so it cannot move the shared stream.
  */
-export function nextWarpathDestination(current: number, count: number): number {
+export function nextWarpathDestination(
+  current: number,
+  count: number,
+  /** A stop to pass over (a razed picket: warpathStopRazed). Omitted, none is. */
+  skip?: (index: number) => boolean,
+): number | null {
   if (count <= 0) return 0;
-  return (current + 1) % count;
+  for (let step = 1; step <= count; step++) {
+    const i = (((current + step) % count) + count) % count;
+    if (!skip?.(i)) return i;
+  }
+  // Every stop is razed: there is nowhere left worth marching on.
+  return null;
+}
+
+/**
+ * Whether a stop is a RAZED muster picket: every soldier posted inside the reach of the
+ * arrival slam that would land there is already down (muster_picket_razed.ts).
+ *
+ * His ordinary slams crush muster soldiers too (mob/boss_collateral.ts), so a fight that
+ * opens beside a picket can flatten its squad long before the circuit reaches it. Marching
+ * on it anyway was the owner's "he ran there and did nothing": the arrival wreck landed on
+ * corpses. So the circuit passes a razed picket over and goes to the next one that still
+ * has soldiers standing. A stop nobody is posted at is never razed, so a warpather with no
+ * muster walks his list exactly as authored.
+ */
+export function warpathStopRazed(ctx: SimContext, def: WarpathDef, index: number): boolean {
+  const stop = def.destinations[index];
+  if (!stop) return false;
+  return musterPicketRazed(ctx, ctx.musterArmy, stop.x, stop.z, def.wreck.radius);
+}
+
+/**
+ * Seconds of patience for one leg: the authored cap, or twice the leg at his travel speed,
+ * whichever is longer.
+ *
+ * The flat cap alone fired the "gave up, wreck where you stand" arm on a legitimate leg: a
+ * focus fight dragged to the far side of the command camp starts a leg that has to walk
+ * round the camp's keep-out circle (mob/keep_out.ts) and needs more than 25 seconds, so he
+ * slammed an empty patch of fen short of the picket. Twice the straight line covers any
+ * rim detour; a body truly wedged still gives up, only later.
+ */
+export function warpathTravelPatience(def: WarpathDef, legYards: number, speed: number): number {
+  const walk = speed > 0 ? (2 * legYards) / speed : 0;
+  return Math.max(def.travelTimeoutSeconds, walk);
 }
 
 function destinationPos(def: WarpathDef, index: number): Vec3 {
@@ -156,17 +201,65 @@ function destinationPos(def: WarpathDef, index: number): Vec3 {
   return { x: d.x, y: 0, z: d.z };
 }
 
-/** Enter a phase, stamping its clock and firing whatever announces it. */
+/**
+ * Leave FOCUS for the next stop that still has a squad standing, or stay in FOCUS when
+ * every picket is razed. Returns the phase he is now in.
+ *
+ * The all-razed fallback is to keep fighting the raid where it stands (the focus clock
+ * simply starts over): there is nothing left to march on, and a march onto corpses is the
+ * exact thing this exists to stop. The one exception is a focus fight dragged to the edge
+ * of his leash or tether (focusDraggedToLeash), where holding would hand the pull to an
+ * evade: then he regroups onto the next stop of his circuit anyway, which is what keeps a
+ * kiter from dragging him off his fen.
+ */
+function leaveFocus(ctx: SimContext, mob: Entity, def: WarpathDef, dragged: boolean): WarpathPhase {
+  const from = mob.warpathDestination ?? -1;
+  const count = def.destinations.length;
+  const pick = nextWarpathDestination(from, count, (i) => warpathStopRazed(ctx, def, i));
+  if (pick === null && !dragged) {
+    mob.warpathTimer = def.focusSeconds;
+    traceWarpath(ctx, mob, 'every picket is razed, holding focus on the raid.');
+    return 'focus';
+  }
+  const dest = pick ?? (nextWarpathDestination(from, count) as number);
+  // Name every picket he passed over, so a skipped stop is never a mystery.
+  for (let step = 1; step < count; step++) {
+    const i = (((from + step) % count) + count) % count;
+    if (i === dest) break;
+    traceWarpath(ctx, mob, `skipping ${stopLabel(def, i)} (its squad is already down).`);
+  }
+  mob.warpathDestination = dest;
+  const why =
+    pick === null
+      ? ' (every picket is razed; regrouping, dragged to his leash)'
+      : dragged
+        ? ' (focus dragged to his leash)'
+        : '';
+  traceWarpath(ctx, mob, `marching to ${stopLabel(def, dest)}${why}.`);
+  beginPhase(ctx, mob, def, 'travel');
+  return 'travel';
+}
+
+function stopLabel(def: WarpathDef, index: number): string {
+  return def.destinations[index]?.label ?? `stop ${index}`;
+}
+
+/** Enter a phase, stamping its clock and firing whatever announces it. For TRAVEL the
+ *  destination is already chosen (leaveFocus). */
 function beginPhase(ctx: SimContext, mob: Entity, def: WarpathDef, phase: WarpathPhase): void {
   mob.warpathPhase = phase;
   mob.warpathTimer = warpathPhaseDuration(phase, def);
   if (phase === 'travel') {
-    mob.warpathDestination = nextWarpathDestination(
-      mob.warpathDestination ?? -1,
-      def.destinations.length,
-    );
-    const stop = def.destinations[mob.warpathDestination];
+    const stop = def.destinations[mob.warpathDestination ?? 0];
+    if (stop) {
+      const leg = Math.hypot(stop.x - mob.pos.x, stop.z - mob.pos.z);
+      mob.warpathTimer = warpathTravelPatience(def, leg, mob.moveSpeed * def.travelSpeedMult);
+    }
     if (stop?.yell) emitMobYell(ctx, mob, stop.yell, def.yellRange);
+    return;
+  }
+  if (phase === 'focus') {
+    traceWarpath(ctx, mob, `fighting the raid (focus, ${def.focusSeconds}s).`);
     return;
   }
   if (phase === 'wreck') {
@@ -218,12 +311,27 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
   const def = MOBS[mob.templateId]?.warpath;
   if (!def || def.destinations.length === 0) return 'fallthrough';
 
-  // No live target means the pull is over: hand the tick back so the ordinary runner can
-  // retarget or drop combat, and forget the circuit so the next pull opens on FOCUS.
-  const target = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : null;
+  // A lost target (the tank died, a pet fell, someone vanished or feigned) is NOT the end
+  // of the pull while anyone is left on his hate table: he turns to the next of them and
+  // carries on with whatever he was doing. This used to reset the circuit, which was the
+  // owner's "he ran toward a picket, then came straight back to fight me": the leg (or the
+  // wreck fuse) was thrown away mid-run and he re-opened on FOCUS, circuit back at the
+  // first stop. Only an empty table ends it: then the ordinary runner takes the tick and
+  // evades him home, and the circuit is forgotten so the next pull opens on FOCUS.
+  let target = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : null;
   if (!target || target.dead) {
-    resetWarpath(mob);
-    return 'fallthrough';
+    const next = highestThreatTarget(ctx, mob);
+    const mid = mob.warpathPhase === 'travel' || mob.warpathPhase === 'wreck';
+    if (!next) {
+      if (mid) traceWarpath(ctx, mob, `${mob.warpathPhase} aborted (nobody left to fight).`);
+      resetWarpath(mob);
+      return 'fallthrough';
+    }
+    if (mid) {
+      traceWarpath(ctx, mob, `lost his target mid-${mob.warpathPhase}, now on ${next.name}.`);
+    }
+    mob.aggroTargetId = next.id;
+    target = next;
   }
 
   if (mob.warpathPhase === undefined) {
@@ -251,6 +359,7 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
     def,
   );
   if (quit) {
+    traceWarpath(ctx, mob, `gives up (${quit}) and walks home.`);
     startEvadeHome(mob);
     resetWarpath(mob);
     return 'evaded';
@@ -268,6 +377,22 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
     phase === 'focus' && focusDraggedToLeash(mob),
   );
   if (next !== phase) {
+    if (next === 'travel') {
+      // Leaving FOCUS: he may find nothing left standing and hold the fight instead.
+      const entered = leaveFocus(ctx, mob, def, focusDraggedToLeash(mob));
+      return entered === 'focus' ? 'fallthrough' : 'handled';
+    }
+    if (next === 'wreck') {
+      const at = stopLabel(def, mob.warpathDestination ?? 0);
+      const off = dist2d(mob.pos, dest);
+      traceWarpath(
+        ctx,
+        mob,
+        off <= def.arriveRadius
+          ? `wrecking ${at}.`
+          : `wrecking short of ${at} (travel timed out, ${off.toFixed(0)} yd off).`,
+      );
+    }
     beginPhase(ctx, mob, def, next);
     return next === 'focus' ? 'fallthrough' : 'handled';
   }
@@ -464,10 +589,6 @@ function fireWreck(ctx: SimContext, mob: Entity, def: WarpathDef): void {
     def.wreck.max,
     school,
     def.wreck.name,
-    undefined,
-    // The one blast that flattens a picket: its squad dies HERE, under the ring the raid
-    // chased him to, never earlier to a stray focus-phase slam (mob/boss_collateral.ts).
-    true,
   );
   // The arrival slam throws them, like his other two: same shared rule, same opt-in.
   launchFromSlam(ctx, mob, mob.pos, def.wreck.radius);

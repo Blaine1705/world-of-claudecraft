@@ -108,6 +108,17 @@ describe('warpath circuit', () => {
     expect(nextWarpathDestination(3, 4)).toBe(0);
   });
 
+  it('passes over a razed stop to the next one still standing, and gives none when all are', () => {
+    // Stop 1 razed: from 0 he goes on to 2. Stops 1 and 2 razed: from 0 he goes to 3.
+    expect(nextWarpathDestination(0, 4, (i) => i === 1)).toBe(2);
+    expect(nextWarpathDestination(0, 4, (i) => i === 1 || i === 2)).toBe(3);
+    // It wraps past the end, and may land back on the stop he just left if it still stands.
+    expect(nextWarpathDestination(2, 4, (i) => i === 3)).toBe(0);
+    expect(nextWarpathDestination(0, 4, (i) => i !== 0)).toBe(0);
+    // Every stop razed: nowhere left worth marching on.
+    expect(nextWarpathDestination(0, 4, () => true)).toBeNull();
+  });
+
   it('visits every authored stop, which a furthest-first pick would not', () => {
     // The reason this is a circuit: with four landmarks, "always run to the furthest"
     // ping-pongs between the two extremes forever and the town in the middle is never
@@ -116,7 +127,7 @@ describe('warpath circuit', () => {
     const seen = new Set<number>();
     let at = -1;
     for (let i = 0; i < n; i++) {
-      at = nextWarpathDestination(at, n);
+      at = nextWarpathDestination(at, n) ?? -1;
       seen.add(at);
     }
     expect(seen.size).toBe(n);
@@ -184,7 +195,11 @@ function legSamples(
   return out;
 }
 
-/** The opening leg from his bed, then every leg of the lap, wrapping. */
+/**
+ * The opening leg from his bed, then EVERY stop-to-stop leg, not only the lap's neighbours:
+ * the circuit skips a razed picket (mob/warpath.ts warpathStopRazed), so any stop can follow
+ * any other.
+ */
 function allLegs(): [
   { x: number; z: number; label?: string },
   { x: number; z: number; label?: string },
@@ -192,7 +207,9 @@ function allLegs(): [
   const stops = def().destinations;
   return [
     [lair(), stops[0]],
-    ...stops.map((a, i) => [a, stops[(i + 1) % stops.length]] as [typeof a, typeof a]),
+    ...stops.flatMap((a) =>
+      stops.filter((b) => b !== a).map((b) => [a, b] as [typeof a, typeof a]),
+    ),
   ];
 }
 
@@ -331,8 +348,9 @@ describe('warpath in a live world', () => {
   it('walks a whole lap of the pickets without the leash ever yanking him home', () => {
     // The soft leash measures 45 yards from where the pull was stamped, and his travel keeps
     // re-stamping it (mob/warpath.ts). The circuit is a short lap of the crater now, so the
-    // pin is the whole lap: every picket reached and wrecked in order, back round to the
-    // first, with no evade and no dropped pull anywhere on the way.
+    // pin is the whole lap: every picket reached and wrecked in order, with no evade and no
+    // dropped pull anywhere on the way. After it every picket's squad is down (the dead stay
+    // down for the whole fight), so he holds the fight rather than marching on corpses.
     let evaded = false;
     const wrecked: number[] = [];
     chase(260, () => {
@@ -343,7 +361,12 @@ describe('warpath in a live world', () => {
     });
     expect(evaded, 'the leash pulled him off his own circuit').toBe(false);
     expect(boss.aggroTargetId, 'he dropped the pull instead of finishing the lap').not.toBeNull();
-    expect(wrecked).toEqual([0, 1, 2, 3, 0]);
+    expect(wrecked).toEqual([0, 1, 2, 3]);
+    // The last set piece plays out, then he holds the fight: nothing is left standing.
+    chase(10, () => boss.warpathPhase === 'focus');
+    chase(40);
+    expect(boss.aiState).not.toBe('evade');
+    expect(boss.warpathPhase, 'with every picket razed he holds focus').toBe('focus');
   });
 
   it('re-tethers around the landmark once he stops', () => {

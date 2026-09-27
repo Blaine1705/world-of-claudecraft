@@ -420,7 +420,9 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // opening march from his bed to the rim picket is 29), so a few seconds each at
       // travel speed. 25 is two and a half times the longest with room for a slow, and
       // still gives up on a picket he cannot reach, so a wedged body can never leave him
-      // travelling (and healing) forever.
+      // travelling (and healing) forever. A leg that is honestly longer (a skipped picket, a
+      // fight dragged far off) gets twice its walk instead (mob/warpath.ts
+      // warpathTravelPatience), so the cap never slams him down short of a reachable picket.
       travelTimeoutSeconds: 25,
       // He plants ON the picket, not beside it: 3 yards from its centre puts every soldier
       // of the inner ring (MUSTER_INNER_RADIUS 5.5) under the 16-yard Barrowfall with room
@@ -434,7 +436,9 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // to hold the crater. He wakes in his bed on the crater's scorched floor, marches on
       // the rim picket first, then the west picket, the south picket, the crater picket,
       // and round again. Every run has a reason now: he goes where the soldiers are and
-      // flattens them, and the raid chasing him arrives to a picket full of bodies.
+      // flattens them, and the raid chasing him arrives to a picket full of bodies. A picket
+      // whose squad his fists already flattened is RAZED and skipped (mob/warpath.ts
+      // warpathStopRazed); with every picket razed he holds the fight where it stands.
       //
       // ORDER AND PLACEMENT ARE CONSTRAINED BY WATER. He walks the straight line between
       // stops, and although he WADES (wadeDepth above) the raid chasing him does not: a leg

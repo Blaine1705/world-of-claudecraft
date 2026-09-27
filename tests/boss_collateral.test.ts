@@ -240,31 +240,33 @@ describe('wired into every one of his slams', () => {
   });
 });
 
-describe('a muster soldier dies only to the arrival slam', () => {
-  // The picket's squad has to still be standing when he marches on it, or his arrival
-  // wreck lands on a camp of corpses (tests/muster_wreck_every_stop.test.ts has the lap).
-  it('is passed over by every other blast and crushed by the one that opts in', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
-    const spawn = (t: string, x: number, z: number): Entity => {
-      const id = (
-        sim as unknown as { spawnDevBoss(t: string, x: number, z: number): number }
-      ).spawnDevBoss(t, x, z);
-      const e = sim.entities.get(id);
-      if (!e) throw new Error(`no ${t}`);
-      return e;
-    };
-    const boss = spawn(BALGATH, 0, 390);
-    const soldier = spawn('muster_footman', 3, 390);
-    const toad = spawn(BYSTANDER, -3, 390);
-    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
-    // An ordinary slam (a pulse, a stomp, the hammer, the cleave): the toad is hit, the
-    // soldier is not even counted.
-    expect(splashNearbyMobs(ctx, boss, boss.pos, 16, 62, 86, 'physical', 'Barrow Smash')).toBe(1);
-    expect(toad.hp).toBeLessThan(toad.maxHp);
-    expect(soldier.hp).toBe(soldier.maxHp);
-    expect(soldier.dead).toBe(false);
-    // The arrival slam: crushed outright, whatever his armor.
-    splashNearbyMobs(ctx, boss, boss.pos, 16, 62, 86, 'physical', 'Barrowfall', undefined, true);
-    expect(soldier.dead).toBe(true);
-  });
+describe('a muster soldier dies to every one of his blows', () => {
+  // The owner's call: his smash, stomp, hammer and cleave flatten the soldiers standing in
+  // them, not only the arrival slam. A picket a focus fight razed this way is skipped by his
+  // circuit (mob/warpath.ts warpathStopRazed), so no march ends on corpses.
+  it.each(['Barrow Smash', 'Shockwave Stomp', 'Foreman’s Hammer', 'Barrow Cleave', 'Barrowfall'])(
+    '%s crushes a soldier inside it and leaves one outside it standing',
+    (name) => {
+      const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+      const spawn = (t: string, x: number, z: number): Entity => {
+        const id = (
+          sim as unknown as { spawnDevBoss(t: string, x: number, z: number): number }
+        ).spawnDevBoss(t, x, z);
+        const e = sim.entities.get(id);
+        if (!e) throw new Error(`no ${t}`);
+        return e;
+      };
+      const boss = spawn(BALGATH, 0, 390);
+      const inside = spawn('muster_footman', 3, 390);
+      const outside = spawn('muster_footman', 0, 390 + 7.5);
+      const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+      // A 7-yard blast (the stomp's size): the soldier at 3 yards is in it, the one at 7.5 not.
+      expect(splashNearbyMobs(ctx, boss, boss.pos, 7, 18, 28, 'physical', name)).toBe(1);
+      // Crushed outright, whatever his armor...
+      expect(inside.dead).toBe(true);
+      // ...and only inside the ring.
+      expect(outside.dead).toBe(false);
+      expect(outside.hp).toBe(outside.maxHp);
+    },
+  );
 });

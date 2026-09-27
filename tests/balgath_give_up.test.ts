@@ -292,10 +292,17 @@ describe('he never stays engaged with nobody fighting him', () => {
       worst = Math.max(worst, fromBed(boss));
       const at = boss.warpathDestination ?? -1;
       if (boss.warpathPhase === 'wreck' && wrecked[wrecked.length - 1] !== at) wrecked.push(at);
-      return evaded || wrecked.length > def().destinations.length;
+      const lapDone = wrecked.length === def().destinations.length && boss.warpathPhase === 'focus';
+      return evaded || lapDone;
+    });
+    // ...and every picket razed after it, he keeps fighting the raid rather than giving up.
+    chase(40, () => {
+      if (boss.aiState === 'evade') evaded = true;
+      worst = Math.max(worst, fromBed(boss));
+      return evaded;
     });
     expect(evaded, 'he gave up a pull the raid was fighting').toBe(false);
-    expect(wrecked).toEqual([0, 1, 2, 3, 0]);
+    expect(wrecked).toEqual([0, 1, 2, 3]);
     expect(worst).toBeLessThan(def().giveUp.tetherRadius);
   });
 });

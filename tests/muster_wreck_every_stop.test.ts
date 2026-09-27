@@ -4,10 +4,14 @@
 // the others. The cause was his ordinary FOCUS-phase slams (aoePulse, stomp, hammer,
 // cleave: mob/boss_collateral.ts): a pull that opened beside a picket crushed that squad
 // while he was still fighting at the start, so when the circuit later marched him onto it
-// the arrival slam landed on a camp of corpses. Now only the arrival slam is lethal to a
-// soldier, and a full lap is pinned from both ways the boss reaches the world: the live
-// scheduler raising him in his crater bed, and `/dev spawn` dropping a copy beside the
-// player on the crater's rim (the exact route the owner took when the boss seemed missing).
+// the arrival slam landed on a camp of corpses. His slams still crush soldiers (the owner
+// wants every blow to), so instead the circuit SKIPS a razed picket (mob/warpath.ts
+// warpathStopRazed): every march ends on a squad with somebody standing, and the arrival
+// slam takes all of them. A full lap is pinned from both ways the boss reaches the world:
+// the live scheduler raising him in his crater bed, and `/dev spawn` dropping a copy beside
+// the player on the crater's rim (the exact route the owner took when the boss seemed
+// missing). In both the opening fight is beside the rim picket, so its squad dies to his
+// focus slams and the march skips it.
 import { describe, expect, it } from 'vitest';
 import {
   MUSTER_CIRCUIT,
@@ -18,6 +22,7 @@ import {
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { spawnMobsForDev } from '../src/sim/dev_commands';
 import type { MusterArmyState } from '../src/sim/mirefen_muster';
+import { musterPicketRazed } from '../src/sim/muster_picket_razed';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, WorldContent } from '../src/sim/types';
@@ -78,10 +83,19 @@ interface StopResult {
   killed: number;
 }
 
+/** Every picket of the circuit razed (the lap is over: nothing left to march on). */
+function allRazed(sim: Sim): boolean {
+  const def = MOBS[BALGATH]?.warpath;
+  if (!def) return false;
+  return def.destinations.every((d) =>
+    musterPicketRazed(inner(sim).ctx, inner(sim).musterArmy, d.x, d.z, def.wreck.radius),
+  );
+}
+
 /**
- * Run one lap with the player hanging `keep` yards off him (a ranged raider, not a tank
- * glued to his shins: that is what lets the opening fight happen beside a picket), and
- * record every arrival slam.
+ * Run until every picket is razed with the player hanging `keep` yards off him (a ranged
+ * raider, not a tank glued to his shins: that is what lets the opening fight happen beside
+ * a picket), and record every arrival slam.
  */
 function lap(sim: Sim, boss: Entity, keep: number): StopResult[] {
   const player = sim.player;
@@ -91,7 +105,7 @@ function lap(sim: Sim, boss: Entity, keep: number): StopResult[] {
   let ringStop: number | null = null;
   let standing: number[] = [];
   const hurt = (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage;
-  for (let i = 0; i < 20 * 240 && out.length < def.destinations.length; i++) {
+  for (let i = 0; i < 20 * 240 && !(allRazed(sim) && ringStop === null); i++) {
     // A chip hit a second, as a raid chasing him lands: a pull nobody hurts for 30 seconds
     // is one he gives up on (mob/warpath.ts warpathGiveUp).
     if (i % 20 === 0) hurt.call(sim, player, boss, 20, false, 'physical', 'probe', 'hit', true);
@@ -129,19 +143,19 @@ function lap(sim: Sim, boss: Entity, keep: number): StopResult[] {
   return out;
 }
 
-function expectEveryStopWrecked(results: StopResult[]): void {
+function expectEveryStopWrecked(sim: Sim, results: StopResult[]): void {
   const def = MOBS[BALGATH]?.warpath;
-  expect(results.map((r) => r.stop)).toEqual([0, 1, 2, 3]);
+  expect(allRazed(sim), 'the lap never razed every picket').toBe(true);
+  // The opening fight beside the rim picket crushed its squad: the march skipped it.
+  expect(results.map((r) => r.stop)).not.toContain(0);
+  // Each picket he marched on he marched on once, in circuit order.
+  expect(results.map((r) => r.stop)).toEqual([1, 2, 3]);
   for (const r of results) {
     const where = MUSTER_CIRCUIT[r.stop];
     expect(r.offCentre, `he stopped short of ${where}`).toBeLessThanOrEqual(def?.arriveRadius ?? 0);
-    // The whole squad of the inner ring was still standing for him to flatten...
-    const posted = musterCamp(where).soldiers.filter(
-      (s) => Math.hypot(s.dx, s.dz) <= MUSTER_INNER_RADIUS,
-    ).length;
-    expect(posted).toBeGreaterThanOrEqual(5);
-    expect(r.standingAtRing, `the ${where} squad was already dead`).toBe(posted);
-    // ...and the arrival slam took all of it.
+    // Somebody was still standing for him to flatten (never a camp of corpses)...
+    expect(r.standingAtRing, `the ${where} squad was already dead`).toBeGreaterThan(0);
+    // ...and the arrival slam took every one of them.
     expect(r.killed, `the wreck at ${where} killed`).toBe(r.standingAtRing);
   }
 }
@@ -157,7 +171,7 @@ describe('every warpath stop is a wreck with kills', () => {
     const boss = bossId !== null ? sim.entities.get(bossId) : undefined;
     if (!boss) throw new Error('the scheduler raised no Balgath');
     expect(boss.spawnPos.x).toBeCloseTo(147, 0);
-    expectEveryStopWrecked(lap(sim, boss, 12));
+    expectEveryStopWrecked(sim, lap(sim, boss, 12));
   });
 
   it('from a /dev spawn copy dropped beside the player on the crater rim', () => {
@@ -170,6 +184,6 @@ describe('every warpath stop is a wreck with kills', () => {
     // The muster answers a dev copy on its once-a-second scan.
     for (let i = 0; i < 25 && inner(sim).musterArmy.bossId !== id; i++) sim.tick();
     expect(inner(sim).musterArmy.bossId).toBe(id);
-    expectEveryStopWrecked(lap(sim, boss, 20));
+    expectEveryStopWrecked(sim, lap(sim, boss, 20));
   });
 });
