@@ -18,8 +18,17 @@ import {
   starwakeLayout,
   starwakeMode,
 } from '../src/sim/boss_starwake_geometry';
-import { MUSTER_CAMPS } from '../src/sim/content/mirefen_muster';
+import { MUSTER_CAMPS, MUSTER_COMMAND_KEEP_OUT } from '../src/sim/content/mirefen_muster';
 import { MOBS } from '../src/sim/data';
+import {
+  IGNIVAR_METEOR_COUNT_NORMAL,
+  IGNIVAR_METEOR_MAX_RANGE,
+  IGNIVAR_METEOR_MIN_SEPARATION,
+  IGNIVAR_METEOR_RADIUS,
+  IGNIVAR_METEOR_REVEAL_DELAY_SECONDS,
+  IGNIVAR_METEOR_TELEGRAPH_SECONDS,
+  ignivarMeteorWarningId,
+} from '../src/sim/ignivar_meteors';
 import { rangedMechanicBlocked } from '../src/sim/mob/boss_ranged_mechanics';
 import {
   forceBossStarwake,
@@ -35,6 +44,11 @@ import {
   starwakeTotal,
   tickBossStarwake,
 } from '../src/sim/mob/boss_starwake';
+import {
+  STARWAKE_METEOR_TELEGRAPH_SECONDS,
+  starwakeShowerActive,
+  starwakeWavePoints,
+} from '../src/sim/mob/boss_starwake_meteors';
 import { mechanicSpacingBlocked } from '../src/sim/mob/mechanic_spacing';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -180,6 +194,7 @@ describe('tuning', () => {
   it('names localize through the sim mechanic matcher, byte-identical', () => {
     expect(localizeSimAuraName(def().name)).toBe('Wake of the Fallen Star');
     expect(localizeSimAuraName(def().pool.name)).toBe('Molten Fen');
+    expect(localizeSimAuraName(def().meteors.name)).toBe('Star Debris');
   });
 });
 
@@ -445,6 +460,325 @@ describe('the eruption', () => {
     const soldier = soldierAt(a, at().x, at().z);
     tick(a, def().crawl + def().hold + DT);
     expect(soldier.dead).toBe(false);
+  });
+});
+
+/** Run a forced cast to the tick before the eruption. */
+function toEruptionEve(a: Arena): void {
+  toTelegraph(a);
+  tick(a, def().crawl + def().hold - DT);
+}
+
+/** Run a forced cast through the eruption tick; returns that tick's events. */
+function toEruption(a: Arena): SimEvent[] {
+  toEruptionEve(a);
+  return tick(a, DT);
+}
+
+const METEOR = () => def().meteors.name;
+
+/** Tick one at a time, recording each tick's meteor falls, until the shower is over. */
+function runShower(a: Arena, onTick?: (i: number) => void): { falls: FxAt[][]; all: SimEvent[] } {
+  const falls: FxAt[][] = [];
+  const all: SimEvent[] = [];
+  const limit = Math.round((def().meteors.seconds + STARWAKE_METEOR_TELEGRAPH_SECONDS + 2) / DT);
+  for (let i = 0; i < limit && starwakeShowerActive(a.boss); i++) {
+    onTick?.(i);
+    const evs = tick(a, DT);
+    all.push(...evs);
+    const f = fx(evs, METEOR(), 'meteorFall');
+    if (f.length > 0) falls.push(f);
+  }
+  return { falls, all };
+}
+
+describe("the meteor shower (Star Debris: Ignivar's Falling Cinders, reused)", () => {
+  it('rains for the pools life in waves of 2 to 3, every 0.5 to 0.7 s, a notch under a geyser', () => {
+    const d = def();
+    const m = d.meteors;
+    expect(STARWAKE_METEOR_TELEGRAPH_SECONDS).toBe(IGNIVAR_METEOR_TELEGRAPH_SECONDS);
+    expect(m.name).toBe('Star Debris');
+    expect(d.school).toBe('fire');
+    expect(m.seconds).toBe(d.pool.seconds);
+    expect([m.waveMin, m.waveMax]).toEqual([0.5, 0.7]);
+    expect([m.perWaveMin, m.perWaveMax]).toEqual([2, 3]);
+    // A wave is a cut of Ignivar's Normal pattern, so it can never ask for more.
+    expect(m.perWaveMax).toBeLessThanOrEqual(IGNIVAR_METEOR_COUNT_NORMAL);
+    expect(m.min).toBeLessThan(d.geysers.min);
+    expect(m.max).toBeLessThan(d.geysers.max);
+    expect(m.min).toBeGreaterThan(0);
+  });
+
+  it('nothing falls before the eruption; the first wave comes down on the eruption tick', () => {
+    const a = arena(0);
+    toTelegraph(a);
+    const early = tick(a, def().crawl + def().hold - DT);
+    expect(early.some((e) => e.type === 'spellfxAt' && e.fx === 'meteorFall')).toBe(false);
+    expect(starwakeShowerActive(a.boss)).toBe(false);
+    const evs = tick(a, DT);
+    expect(fx(evs, STARWAKE_FISSURE_ABILITY, 'nova').length).toBeGreaterThan(0);
+    const first = fx(evs, METEOR(), 'meteorFall');
+    expect(first.length).toBeGreaterThanOrEqual(def().meteors.perWaveMin);
+    expect(first.length).toBeLessThanOrEqual(def().meteors.perWaveMax);
+    expect(starwakeShowerActive(a.boss)).toBe(true);
+  });
+
+  it('many meteors, each exactly an Ignivar meteor, landing on its own warning id', () => {
+    for (const seed of [1, 7, 42]) {
+      const a = arena(4, seed);
+      a.players.forEach((p, i) => {
+        const ang = (i / a.players.length) * Math.PI * 2;
+        place(a.sim, p, a.boss.pos.x + Math.sin(ang) * 12, a.boss.pos.z + Math.cos(ang) * 12);
+        p.maxHp = 100_000;
+      });
+      topUp(a);
+      const first = toEruption(a);
+      const shower = a.boss.starwakeShower;
+      if (!shower) throw new Error('no shower');
+      const origin = { x: shower.originX, z: shower.originZ };
+      const key = shower.key;
+      const rest = runShower(a);
+      const waves = [fx(first, METEOR(), 'meteorFall'), ...rest.falls];
+      const falls = waves.flat();
+      // Some 25 to 35 over the eight seconds.
+      expect(falls.length).toBeGreaterThanOrEqual(25);
+      expect(falls.length).toBeLessThanOrEqual(38);
+      expect(waves.length).toBeGreaterThanOrEqual(12);
+      const ids = new Set<string>();
+      falls.forEach((e, serial) => {
+        expect(e.school).toBe('fire');
+        expect(e.radius).toBe(IGNIVAR_METEOR_RADIUS);
+        expect(e.duration).toBe(IGNIVAR_METEOR_TELEGRAPH_SECONDS);
+        expect(e.warningLead).toBe(IGNIVAR_METEOR_REVEAL_DELAY_SECONDS);
+        expect(e.persistentId).toBe(ignivarMeteorWarningId(a.boss.id, key, serial));
+        expect(e.sourceId).toBe(a.boss.id);
+        expect(Math.hypot(e.x - origin.x, e.z - origin.z)).toBeLessThanOrEqual(
+          IGNIVAR_METEOR_MAX_RANGE + 1e-6,
+        );
+        ids.add(e.persistentId ?? '');
+      });
+      expect(ids.size).toBe(falls.length);
+      // Never stacked in one wave: Ignivar's Normal minimum separation.
+      for (const w of waves) {
+        expect(w.length).toBeLessThanOrEqual(def().meteors.perWaveMax);
+        for (let i = 0; i < w.length; i++) {
+          for (let j = i + 1; j < w.length; j++) {
+            expect(Math.hypot(w[i].x - w[j].x, w[i].z - w[j].z)).toBeGreaterThanOrEqual(
+              IGNIVAR_METEOR_MIN_SEPARATION - 1e-6,
+            );
+          }
+        }
+      }
+      // Every meteor lands once, on the id its warning carried, and the shower ends.
+      const impacts = fx([...first, ...rest.all], METEOR(), 'meteorImpact');
+      expect(impacts.map((e) => e.persistentId).sort()).toEqual([...ids].sort());
+      expect(a.boss.starwakeShower).toBeUndefined();
+    }
+  });
+
+  it('spreads over the fight: on players, along the cracks, round the star', () => {
+    const a = arena(4);
+    a.players.forEach((p, i) => {
+      const ang = (i / a.players.length) * Math.PI * 2;
+      place(a.sim, p, a.boss.pos.x + Math.sin(ang) * 12, a.boss.pos.z + Math.cos(ang) * 12);
+      p.maxHp = 100_000;
+    });
+    topUp(a);
+    toEruptionEve(a);
+    const fissures = starwakeFissuresOf(a.boss);
+    const spots = a.players.map((p) => ({ x: p.pos.x, z: p.pos.z }));
+    const first = tick(a, DT);
+    // Freeze the raid in place so the player anchors stay put.
+    const falls = [...fx(first, METEOR(), 'meteorFall'), ...runShower(a).falls.flat()];
+    const onPlayer = falls.filter((e) =>
+      spots.some((s) => Math.hypot(e.x - s.x, e.z - s.z) < 1e-6),
+    );
+    const onCrack = falls.filter((e) => fissures.some((f) => insideFissure(f, 0.01, e.x, e.z)));
+    const byStar = falls.filter((e) => Math.hypot(e.x - def().star.x, e.z - def().star.z) <= 8);
+    expect(onPlayer.length).toBeGreaterThanOrEqual(3);
+    expect(onCrack.length).toBeGreaterThanOrEqual(2);
+    expect(byStar.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('pins the wave layout to Ignivar: a player anchor is his exact first candidate', () => {
+    const a = arena(0);
+    toEruptionEve(a);
+    const me = a.players[0];
+    const at = { x: me.pos.x, z: me.pos.z };
+    const evs = tick(a, DT);
+    const shower = a.boss.starwakeShower;
+    if (!shower) throw new Error('no shower');
+    const wave0 = fx(evs, METEOR(), 'meteorFall').map((e) => ({ x: e.x, z: e.z }));
+    expect(wave0).toEqual(
+      starwakeWavePoints(def(), shower, 0, [{ id: me.id, ...at }], a.boss.aggroTargetId),
+    );
+    expect(wave0[0]).toEqual(at);
+  });
+
+  it('never anchors a player outside the arena (no meteor dragged onto its rim)', () => {
+    const shower = { key: 12345, originX: 0, originZ: 0, lines: [] };
+    const far = { id: 1, x: IGNIVAR_METEOR_MAX_RANGE + 8, z: 0 };
+    for (let wave = 0; wave < 20; wave += 2) {
+      const pts = starwakeWavePoints(def(), shower, wave, [far], null);
+      const onRim = pts.filter(
+        (p) => Math.abs(Math.hypot(p.x, p.z) - IGNIVAR_METEOR_MAX_RANGE) < 1e-6 && p.z === 0,
+      );
+      expect(onRim).toHaveLength(0);
+    }
+    const near = { id: 2, x: 12, z: 3 };
+    expect(starwakeWavePoints(def(), shower, 0, [near], null)[0]).toEqual({ x: 12, z: 3 });
+  });
+
+  it('hits a player standing in a circle when it lands, never one outside', () => {
+    const a = arena(1);
+    const first = toEruption(a);
+    const wave0 = fx(first, METEOR(), 'meteorFall');
+    const [inCircle, outside] = a.players;
+    place(a.sim, inCircle, wave0[0].x, wave0[0].z);
+    place(a.sim, outside, a.boss.pos.x - 80, a.boss.pos.z);
+    inCircle.maxHp = 100_000;
+    topUp(a);
+    const before = tick(a, STARWAKE_METEOR_TELEGRAPH_SECONDS - DT);
+    expect(damageTo(before, inCircle.id, METEOR())).toHaveLength(0);
+    expect(fx(before, METEOR(), 'meteorImpact')).toHaveLength(0);
+    const evs = tick(a, DT);
+    const hits = damageTo(evs, inCircle.id, METEOR());
+    expect(hits).toHaveLength(1);
+    const mult = a.boss.mechanicDamageMult ?? 1;
+    const amount = (hits[0] as { amount: number }).amount;
+    expect(amount).toBeGreaterThanOrEqual(Math.round(def().meteors.min * mult) - 1);
+    expect(amount).toBeLessThanOrEqual(Math.round(def().meteors.max * mult) + 1);
+    expect(damageTo(evs, outside.id, METEOR())).toHaveLength(0);
+    expect(fx(evs, METEOR(), 'meteorImpact').map((e) => e.persistentId)).toEqual(
+      wave0.map((e) => e.persistentId),
+    );
+  });
+
+  it('a raider who keeps moving takes two at most; one who stands still takes many', () => {
+    for (const seed of [1, 7, 42, 99]) {
+      const a = arena(1, seed);
+      const [still, mover] = a.players;
+      for (const p of a.players) p.maxHp = 1_000_000;
+      topUp(a);
+      toEruptionEve(a);
+      const c = { x: a.boss.pos.x, z: a.boss.pos.z };
+      // Run speed round him, 15 yards out.
+      let ang = 0;
+      const step = () => {
+        ang += (7 / 15) * DT;
+        place(a.sim, mover, c.x + Math.sin(ang) * 15, c.z + Math.cos(ang) * 15);
+        still.hp = still.maxHp;
+        mover.hp = mover.maxHp;
+      };
+      step();
+      const evs = tick(a, DT);
+      evs.push(...runShower(a, step).all);
+      expect(damageTo(evs, mover.id, METEOR()).length).toBeLessThanOrEqual(2);
+      expect(damageTo(evs, still.id, METEOR()).length).toBeGreaterThan(2);
+    }
+  });
+
+  it('crushes a muster soldier in a circle in the fight round him, as the fissures do', () => {
+    const a = arena(0);
+    const first = toEruption(a);
+    const m = fx(first, METEOR(), 'meteorFall').find(
+      (p) => Math.hypot(p.x - a.boss.pos.x, p.z - a.boss.pos.z) <= STARWAKE_COLLATERAL_REACH - 1,
+    );
+    if (!m) throw new Error('no meteor inside the fight');
+    const id = (
+      a.sim as unknown as { spawnDevBoss(t: string, x: number, z: number): number }
+    ).spawnDevBoss('muster_footman', m.x, m.z);
+    const soldier = a.sim.entities.get(id);
+    if (!soldier) throw new Error('no soldier');
+    place(a.sim, soldier, m.x, m.z);
+    soldier.hp = soldier.maxHp;
+    tick(a, STARWAKE_METEOR_TELEGRAPH_SECONDS + DT);
+    expect(soldier.dead).toBe(true);
+  });
+
+  it('never lands in the command camp, and a player inside it is never an anchor', () => {
+    const k = MUSTER_COMMAND_KEEP_OUT;
+    for (const seed of [1, 7, 42]) {
+      // Beside the camp's edge, a raider standing at its centre inside it.
+      const a = arena(3, seed, { x: k.x + k.radius + 6, z: k.z });
+      place(a.sim, a.players[1], k.x, k.z);
+      for (const p of a.players) p.maxHp = 100_000;
+      topUp(a);
+      const first = toEruption(a);
+      const falls = [...fx(first, METEOR(), 'meteorFall'), ...runShower(a).falls.flat()];
+      expect(falls.length).toBeGreaterThan(10);
+      for (const m of falls) {
+        expect(Math.hypot(m.x - k.x, m.z - k.z)).toBeGreaterThanOrEqual(
+          k.radius + IGNIVAR_METEOR_RADIUS,
+        );
+      }
+    }
+  });
+
+  it('the pull reset drops the shower, and a felled Foreman lands none', () => {
+    const a = arena(0);
+    toEruption(a);
+    expect(starwakeShowerActive(a.boss)).toBe(true);
+    resetBossStarwake(a.boss);
+    expect(starwakeShowerActive(a.boss)).toBe(false);
+    const evs = tick(a, STARWAKE_METEOR_TELEGRAPH_SECONDS + DT);
+    expect(fx(evs, METEOR(), 'meteorImpact')).toHaveLength(0);
+    const b = arena(0);
+    toEruption(b);
+    b.boss.dead = true;
+    const after = tick(b, STARWAKE_METEOR_TELEGRAPH_SECONDS + DT);
+    expect(fx(after, METEOR(), 'meteorImpact')).toHaveLength(0);
+    expect(after.some((e) => e.type === 'damage')).toBe(false);
+  });
+
+  it('a new star waits for the last shower to finish', () => {
+    const a = arena(0);
+    toEruption(a);
+    expect(forceBossStarwake(a.ctx, a.boss)).toBe(false);
+    a.boss.starwakeTimer = DT;
+    a.boss.mechanicLockTimer = 0;
+    tick(a, DT);
+    expect(a.boss.starwakeElapsed).toBeUndefined();
+    // It holds at due right through the shower; then it may go.
+    place(a.sim, a.players[0], a.boss.pos.x - 90, a.boss.pos.z);
+    runShower(a);
+    expect(a.boss.starwakeElapsed).toBeDefined();
+    resetBossStarwake(a.boss);
+    toEruption(a);
+    runShower(a);
+    a.boss.starwakeTimer = 1000;
+    expect(starwakeShowerActive(a.boss)).toBe(false);
+    expect(forceBossStarwake(a.ctx, a.boss)).toBe(true);
+  });
+
+  it('places without rng: a shower that strikes nobody draws nothing', () => {
+    const a = arena(0);
+    toTelegraph(a);
+    // The lone tester walks far off, so nothing strikes anyone.
+    place(a.sim, a.players[0], a.boss.pos.x - 90, a.boss.pos.z);
+    tick(a, def().crawl + def().hold - DT);
+    let draws = 0;
+    const next = a.ctx.rng.next.bind(a.ctx.rng);
+    a.ctx.rng.next = () => {
+      draws++;
+      return next();
+    };
+    const evs = tick(a, DT);
+    evs.push(...runShower(a).all);
+    expect(fx(evs, METEOR(), 'meteorFall').length).toBeGreaterThan(20);
+    expect(draws).toBe(0);
+  });
+
+  it('lays the same shower for the same seed', () => {
+    const run = () => {
+      const a = arena(2, 13);
+      for (const p of a.players) p.maxHp = 100_000;
+      topUp(a);
+      const first = toEruption(a);
+      const falls = [...fx(first, METEOR(), 'meteorFall'), ...runShower(a).falls.flat()];
+      return falls.map((e) => [e.x, e.z, e.persistentId]);
+    };
+    expect(run()).toEqual(run());
   });
 });
 

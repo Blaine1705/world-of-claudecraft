@@ -22,6 +22,7 @@
 import { forceBossRangedMechanic } from '../mob/boss_ranged_mechanics';
 import { forceBossSlam } from '../mob/boss_slams';
 import { forceBossStarwake, starwakeActive } from '../mob/boss_starwake';
+import { starwakeShowerActive } from '../mob/boss_starwake_meteors';
 import { forceTelegraphedBossMechanic } from '../mob/locomotion';
 import { devSleepSlumber, devWakeSlumber } from '../mob/slumber';
 import { forceWarpathWreck } from '../mob/warpath';
@@ -60,7 +61,7 @@ const DESCRIBE: Record<BalgathDevMechanic, string> = {
   smash: 'Barrow Smash: the 12 yd ring round his feet (walk out)',
   stomp: 'Shockwave Stomp: the 7 yd stun ring round his feet (walk out)',
   starwake:
-    'Wake of the Fallen Star: the star wakes, lava fissures crawl out, geysers burst under you and along them, pools burn for 8 s (stand in a lane between the fissures, then step out of your geyser circle)',
+    'Wake of the Fallen Star: the star wakes, lava fissures crawl out, geysers burst under you and along them, pools burn for 8 s, and as it erupts a Star Debris meteor shower rains down for 8 s, each meteor landing 2.5 s after its red circle appears (stand in a lane between the fissures, step out of your geyser circle, then keep moving out of the red circles)',
   wreck: 'Barrowfall: the 16 yd arrival slam where he stands (walk out)',
 };
 
@@ -179,6 +180,12 @@ export function forceBalgathDevMechanic(
     return {
       ok: false,
       message: `${busy} is still on the ground. One telegraph at a time: try again when it lands.`,
+    };
+  }
+  if (mechanic === 'starwake' && starwakeShowerActive(boss)) {
+    return {
+      ok: false,
+      message: 'The Star Debris shower is still falling. Try again when the last meteor lands.',
     };
   }
   let engaged = '';

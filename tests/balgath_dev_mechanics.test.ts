@@ -302,6 +302,23 @@ describe('/dev balgath <mechanic> forces the real telegraph for a solo tester', 
     expect(boss.castingAbility).not.toBe(MOBS[BALGATH]?.starwake?.name);
     expect(boss.starwakeFissures?.length ?? 0).toBeGreaterThan(0);
   });
+
+  it('starwake also brings the whole Star Debris shower down for a solo tester', () => {
+    const { sim, boss } = world(true, 3);
+    force(sim, 'starwake');
+    const sw = MOBS[BALGATH]?.starwake;
+    if (!sw) throw new Error('no starwake');
+    const total = sw.warn + sw.crawl + sw.hold;
+    const evs = run(sim, total + 1);
+    expect(fxAt(evs, 'meteorFall', sw.meteors.name).length).toBeGreaterThanOrEqual(2);
+    // While it falls a second star is refused, with a reason.
+    expect(errors(force(sim, 'starwake')).join('\n')).toContain('Star Debris shower');
+    evs.push(...run(sim, sw.meteors.seconds + 3));
+    const falls = fxAt(evs, 'meteorFall', sw.meteors.name);
+    expect(falls.length).toBeGreaterThanOrEqual(25);
+    expect(fxAt(evs, 'meteorImpact', sw.meteors.name)).toHaveLength(falls.length);
+    expect(boss.starwakeShower).toBeUndefined();
+  });
 });
 
 describe('a forced cast keeps the natural spacing rules', () => {

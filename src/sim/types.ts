@@ -2304,6 +2304,27 @@ export interface MobTemplate {
       max: number;
       name: string;
     };
+    /**
+     * The meteor shower the eruption calls down (mob/boss_starwake_meteors.ts): waves of
+     * Ignivar's own Falling Cinders meteors (his placement, circle, telegraph and fall) for
+     * `seconds`, round the players within `range` of him, the star and the cracks, each
+     * with its own flat hit in place of the raid's max-HP share.
+     */
+    meteors: {
+      /** Players this far from him are the shower's player anchors. */
+      range: number;
+      /** Seconds of waves from the eruption (the last wave still falls its full telegraph). */
+      seconds: number;
+      /** Seconds between waves, drawn per wave in [waveMin, waveMax]. */
+      waveMin: number;
+      waveMax: number;
+      /** Meteors per wave, drawn per wave in [perWaveMin, perWaveMax]. */
+      perWaveMin: number;
+      perWaveMax: number;
+      min: number;
+      max: number;
+      name: string;
+    };
     /** The cast bar's name, the eruption's damage label and the mechanic's name. */
     name: string;
     school: string;
@@ -6010,6 +6031,9 @@ export interface Entity extends ClientMirroredEntityFields {
   starwakeGeysers?: number[];
   /** Live molten pools, flat [x, z, radius, remaining, tickTimer] per pool. */
   starwakePools?: number[];
+  /** The meteor shower since the eruption; undefined while none is calling or falling
+   *  (mob/boss_starwake_meteors.ts). */
+  starwakeShower?: StarwakeShowerState;
   /** Absolute sim time the arrival slam lands; null once it has, so it fires once. */
   warpathBlastAt?: number | null;
   // The telegraphed ring center each windup was drawn at: the detonation is
@@ -6297,6 +6321,30 @@ export interface NythraxisEncounterState {
   // roster used for raid-wipe recovery, so a remote group member cannot farm
   // cooldown resets without participating.
   attemptParticipantIds?: number[];
+}
+
+/**
+ * Balgath's Star Debris shower in flight (mob/boss_starwake_meteors.ts): the waves still
+ * to call and the meteors still falling. Plain numbers only, like the other starwake state.
+ */
+export interface StarwakeShowerState {
+  /** The shower's cast key: every wave's pattern and every warning id derive from it. */
+  key: number;
+  /** Where he stood at the eruption: the shower's arena origin, wherever he walks next. */
+  originX: number;
+  originZ: number;
+  /** Seconds since the eruption. */
+  elapsed: number;
+  /** Seconds until the next wave. */
+  nextWave: number;
+  /** Waves called so far. */
+  wave: number;
+  /** Meteors called so far (each meteor's warning id index). */
+  serial: number;
+  /** The eruption's fissures, flat [originX, originZ, dirX, dirZ, length] per fissure. */
+  lines: number[];
+  /** Falling meteors, flat [x, z, secondsLeft, serial] per meteor. */
+  falling: number[];
 }
 
 export interface IgnivarEncounterState {

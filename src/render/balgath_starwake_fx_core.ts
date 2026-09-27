@@ -20,6 +20,14 @@
 export const BALGATH_STARWAKE_WAKE_ABILITY = 'mob_balgath_starwake_wake';
 export const BALGATH_STARWAKE_FISSURE_ABILITY = 'mob_balgath_starwake_fissure';
 export const BALGATH_STARWAKE_GEYSER_ABILITY = 'mob_balgath_starwake_geyser';
+/** The eruption's meteor shower (mob/boss_starwake_meteors.ts): the template's
+ *  `starwake.meteors.name`, the `ability` on every Star Debris meteorFall / meteorImpact.
+ *  The meteors themselves are Ignivar's (mage_ground_fx.ts draws them unchanged); this
+ *  layer only rides them: the star spews while they are called, the ground jolts as they
+ *  land. */
+export const BALGATH_STARWAKE_METEOR_ABILITY = 'Star Debris';
+/** A Star Debris meteor's circle radius, yards: Ignivar's IGNIVAR_METEOR_RADIUS. */
+export const BALGATH_STARWAKE_METEOR_RADIUS = 2.4;
 /** His cast bar's id while the star wakes: the template's `starwake.name`. */
 export const BALGATH_STARWAKE_CAST_ID = 'Wake of the Fallen Star';
 
@@ -32,6 +40,12 @@ export const STARWAKE_FISSURE_HALF_WIDTH = 2.5;
 export const STARWAKE_WAKE_TRAUMA = 0.1;
 export const STARWAKE_FISSURE_TRAUMA = 0.2;
 export const STARWAKE_GEYSER_TRAUMA = 0.26;
+/** A Star Debris meteor landing: a third of a geyser's, since two or three land a wave. */
+export const STARWAKE_METEOR_TRAUMA = 0.09;
+/** Seconds the star keeps spewing after the last wave of the shower is called. */
+export const STARWAKE_SPEW_LINGER = 0.8;
+/** How fast the star's per-wave flare dies away, per second. */
+export const STARWAKE_FLARE_DECAY = 3.5;
 
 /** How long an eruption spout or a geyser column stands, seconds. */
 export const STARWAKE_SPOUT_SECONDS = 0.9;
@@ -81,10 +95,15 @@ export function fissureHeat(
  * the eruption nears, peaks on it, then dies away over the afterglow. `reducedMotion`
  * swaps the beat for its mean so the star still reads as lit.
  */
-export function starGlow(elapsed: number, total: number, reducedMotion: boolean): number {
+export function starGlow(elapsed: number, total: number, reducedMotion: boolean, spew = 0): number {
   if (elapsed < 0) return 0;
+  // The shower: the star stays blazing while the sky it opened is still coming down.
+  if (spew > 0 && elapsed > total && elapsed <= total + spew) {
+    if (reducedMotion) return 0.95;
+    return 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(elapsed * 17));
+  }
   if (elapsed > total) {
-    const t = clamp01((elapsed - total) / STARWAKE_STAR_AFTERGLOW);
+    const t = clamp01((elapsed - total - Math.max(0, spew)) / STARWAKE_STAR_AFTERGLOW);
     return (1 - t) * (1 - t);
   }
   const kindle = clamp01(elapsed / 0.6);

@@ -53,9 +53,12 @@ import {
   STARWAKE_CRAWL_SECONDS,
   STARWAKE_FISSURE_HALF_WIDTH,
   STARWAKE_FISSURE_TRAUMA,
+  STARWAKE_FLARE_DECAY,
   STARWAKE_GEYSER_TRAUMA,
+  STARWAKE_METEOR_TRAUMA,
   STARWAKE_POOL_FADE,
   STARWAKE_SCAR_SECONDS,
+  STARWAKE_SPEW_LINGER,
   STARWAKE_SPOUT_SECONDS,
   STARWAKE_STAR_AFTERGLOW,
   STARWAKE_WAKE_TRAUMA,
@@ -215,6 +218,10 @@ interface Star extends Owned {
   y: number;
   z: number;
   rumbled: number;
+  /** Seconds past the eruption the star keeps spewing for its meteor shower (0: none). */
+  spew: number;
+  /** The last wave's flare, 1 on the call and dying away (STARWAKE_FLARE_DECAY). */
+  flare: number;
 }
 
 interface Shockwave extends Owned {
@@ -415,8 +422,32 @@ export class BalgathStarwakeFx {
       y: sy,
       z: sz,
       rumbled: 0,
+      spew: 0,
+      flare: 0,
     });
     this.hooks.ground(sx, sz, 4, 0.9);
+  }
+
+  // ---- the meteor shower (Star Debris) --------------------------------------------------
+  // The meteors are Ignivar's and mage_ground_fx.ts draws them, circle, fall and landing,
+  // unchanged. These two riders tie them to the fight: the crater spews each wave up, and
+  // the ground jolts under each landing like the rest of his blows. Neither allocates a
+  // material: the flare rides the star's own, the dust and the jolt are the shared hooks.
+
+  /** A wave of the shower was called: the star keeps blazing and flares, the crater spits. */
+  meteorCalled(sourceId: number): void {
+    for (const s of this.stars) {
+      if (s.sourceId !== sourceId) continue;
+      s.spew = Math.max(s.spew, s.elapsed - s.total + STARWAKE_SPEW_LINGER);
+      if (s.flare < 0.5) this.hooks.ground(s.x, s.z, 3, 0.55 * this.quality);
+      s.flare = 1;
+    }
+  }
+
+  /** One Star Debris meteor landed: the jolt and the thrown ground of a heavy impact. */
+  meteorLanded(x: number, z: number, radius: number): void {
+    this.hooks.felt(STARWAKE_METEOR_TRAUMA, x, z);
+    this.hooks.ground(x, z, radius, 0.8);
   }
 
   private shockwave(x: number, y: number, z: number): void {
@@ -834,6 +865,11 @@ export class BalgathStarwakeFx {
     return this.pools.length;
   }
 
+  /** How many stars are lit right now (waking, spewing for a shower, or in afterglow). */
+  liveStars(): number {
+    return this.stars.length;
+  }
+
   /** How many fissure and geyser telegraphs are on the ground right now. */
   liveTelegraphs(): number {
     return this.fissures.length + this.geysers.length;
@@ -858,14 +894,16 @@ export class BalgathStarwakeFx {
       const s = this.stars[i];
       const prev = s.elapsed;
       s.elapsed += dt;
-      if (s.elapsed >= s.total + STARWAKE_STAR_AFTERGLOW || this.dead.has(s.sourceId)) {
+      if (s.elapsed >= s.total + s.spew + STARWAKE_STAR_AFTERGLOW || this.dead.has(s.sourceId)) {
         this.retire(this.stars, i);
         continue;
       }
-      const glow = starGlow(s.elapsed, s.total, reducedMotion);
+      s.flare = Math.max(0, s.flare - dt * STARWAKE_FLARE_DECAY);
+      const flare = reducedMotion ? 0 : s.flare;
+      const glow = starGlow(s.elapsed, s.total, reducedMotion, s.spew);
       // The crystals push up out of the crust over the first second and sink back with the
       // afterglow; their colour is the glow itself.
-      const rise = Math.min(1, s.elapsed / 1) * (s.elapsed > s.total ? glow : 1);
+      const rise = Math.min(1, s.elapsed / 1) * (s.elapsed > s.total + s.spew ? glow : 1);
       for (const c of s.crystals) {
         const size = Number(c.userData.size ?? 1.8);
         c.scale.set(size * rise, size * rise, size * rise);
@@ -875,11 +913,14 @@ export class BalgathStarwakeFx {
       // The light column: tall enough to see over the crater rim from any picket.
       const h = 46;
       s.column.position.set(s.x, s.y + h / 2, s.z);
-      s.column.scale.set(1.5 + 0.5 * glow, h, 1.5 + 0.5 * glow);
-      s.columnMat.opacity = 0.22 * glow;
+      // A wave's flare throws the column wider and brighter for a moment: the crater
+      // spitting the next handful of the sky back up.
+      const wide = 1.5 + 0.5 * glow + 1.6 * flare;
+      s.column.scale.set(wide, h, wide);
+      s.columnMat.opacity = Math.min(1, 0.22 * glow + 0.22 * flare);
       s.core.position.set(s.x, s.y + h / 2, s.z);
-      s.core.scale.set(0.45, h, 0.45);
-      s.coreMat.opacity = 0.5 * glow;
+      s.core.scale.set(0.45 + 0.5 * flare, h, 0.45 + 0.5 * flare);
+      s.coreMat.opacity = Math.min(1, 0.5 * glow + 0.35 * flare);
       s.poolMat.opacity = 0.55 * glow;
       if (!reducedMotion && starPulseDue(prev, s.elapsed, s.total)) this.shockwave(s.x, s.y, s.z);
       // A low rumble under the fight, once a second while it wakes.

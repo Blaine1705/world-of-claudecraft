@@ -17,6 +17,8 @@ import {
   BALGATH_STARWAKE_CAST_ID,
   BALGATH_STARWAKE_FISSURE_ABILITY,
   BALGATH_STARWAKE_GEYSER_ABILITY,
+  BALGATH_STARWAKE_METEOR_ABILITY,
+  BALGATH_STARWAKE_METEOR_RADIUS,
   BALGATH_STARWAKE_WAKE_ABILITY,
   chunkBudget,
   crackJag,
@@ -25,6 +27,10 @@ import {
   poolStrength,
   STARWAKE_CRAWL_SECONDS,
   STARWAKE_FISSURE_HALF_WIDTH,
+  STARWAKE_GEYSER_TRAUMA,
+  STARWAKE_METEOR_TRAUMA,
+  STARWAKE_SPEW_LINGER,
+  STARWAKE_STAR_AFTERGLOW,
   spoutBudget,
   spoutDelay,
   spoutDistances,
@@ -33,6 +39,7 @@ import {
   starPulseDue,
 } from '../src/render/balgath_starwake_fx_core';
 import { MOBS } from '../src/sim/data';
+import { IGNIVAR_METEOR_RADIUS } from '../src/sim/ignivar_meteors';
 import {
   STARWAKE_FISSURE_ABILITY,
   STARWAKE_GEYSER_ABILITY,
@@ -53,6 +60,8 @@ describe('agreed with the sim', () => {
     expect(STARWAKE_CRAWL_SECONDS).toBe(def().crawl);
     expect(STARWAKE_FISSURE_HALF_WIDTH).toBe(def().fissures.halfWidth);
     expect(BALGATH_STARWAKE_CAST_ID).toBe(def().name);
+    expect(BALGATH_STARWAKE_METEOR_ABILITY).toBe(def().meteors.name);
+    expect(BALGATH_STARWAKE_METEOR_RADIUS).toBe(IGNIVAR_METEOR_RADIUS);
   });
 });
 
@@ -104,6 +113,27 @@ describe('curves', () => {
     // Reduced motion: no beat, still lit.
     expect(starGlow(3, total, true)).toBeGreaterThan(0.4);
     expect(starGlow(3, total, true)).toBe(starGlow(3, total, true));
+  });
+
+  it('a shower keeps the star blazing, then the same afterglow; no shower is unchanged', () => {
+    const total = 7.5;
+    for (let t = 0; t <= total + 4; t += 0.05) {
+      expect(starGlow(t, total, false, 0)).toBe(starGlow(t, total, false));
+      expect(starGlow(t, total, true, 0)).toBe(starGlow(t, total, true));
+    }
+    const spew = 8.8;
+    for (let t = total + 0.05; t <= total + spew; t += 0.1) {
+      expect(starGlow(t, total, false, spew)).toBeGreaterThanOrEqual(0.8);
+      expect(starGlow(t, total, true, spew)).toBeGreaterThanOrEqual(0.8);
+    }
+    // The afterglow runs from the end of the shower exactly as it ran from the eruption.
+    for (const after of [0.3, 0.9, 1.5]) {
+      expect(starGlow(total + spew + after, total, false, spew)).toBeCloseTo(
+        starGlow(total + after, total, false),
+        12,
+      );
+    }
+    expect(starGlow(total + spew + STARWAKE_STAR_AFTERGLOW, total, false, spew)).toBe(0);
   });
 
   it('pulses the star faster as the eruption nears', () => {
@@ -210,6 +240,44 @@ describe('hazards are drawn on every preset', () => {
     expect(fx.liveTelegraphs()).toBe(0);
   });
 
+  it('rides the Star Debris shower: the star spews while waves are called, landings jolt', () => {
+    const { scene } = fakeScene();
+    const h = hooks();
+    const fx = new BalgathStarwakeFx(scene, () => 0, h.hooks);
+    const total = 7.5;
+    fx.wake(7, 149.5, 295, total);
+    // To the eruption, then a wave called every 0.6 s for eight seconds.
+    let t = 0;
+    const step = (to: number) => {
+      while (t < to - 1e-9) {
+        fx.beginFrame();
+        fx.update(0.05, false);
+        t += 0.05;
+      }
+    };
+    step(total);
+    for (let w = 0; w < 14; w++) {
+      fx.meteorCalled(7);
+      step(total + (w + 1) * 0.6);
+    }
+    // Still lit after the unridden star would long have gone out.
+    expect(t).toBeGreaterThan(total + STARWAKE_STAR_AFTERGLOW + 4);
+    expect(fx.liveStars()).toBe(1);
+    // Then it sleeps within the linger plus the afterglow.
+    step(t + STARWAKE_SPEW_LINGER + STARWAKE_STAR_AFTERGLOW + 0.1);
+    expect(fx.liveStars()).toBe(0);
+    // Another boss's wave never touches this star.
+    fx.wake(7, 149.5, 295, 1);
+    fx.meteorCalled(9);
+    step(t + 1 + STARWAKE_STAR_AFTERGLOW + 0.1);
+    expect(fx.liveStars()).toBe(0);
+    // Each landing jolts the camera, lighter than a geyser.
+    const before = h.felt.length;
+    fx.meteorLanded(3, 4, BALGATH_STARWAKE_METEOR_RADIUS);
+    expect(h.felt.slice(before)).toEqual([STARWAKE_METEOR_TRAUMA]);
+    expect(STARWAKE_METEOR_TRAUMA).toBeLessThan(STARWAKE_GEYSER_TRAUMA);
+  });
+
   it('shakes the camera on the eruptions', () => {
     const { scene } = fakeScene();
     const h = hooks();
@@ -263,6 +331,30 @@ describe('the router', () => {
       ),
     ).toBe(true);
     expect(calls).toEqual(['wake', 'fissure', 'fissureErupt', 'geyser', 'geyserErupt:8']);
+    // The Star Debris meteors are ridden, never consumed: the meteor layer still draws them.
+    calls.length = 0;
+    const meteor = { x: 3, z: 4, sourceId: 7, ability: BALGATH_STARWAKE_METEOR_ABILITY };
+    const riders = {
+      starwake: {
+        meteorCalled: (id: number) => calls.push(`called:${id}`),
+        meteorLanded: (x: number, z: number, r: number) => calls.push(`landed:${x},${z},${r}`),
+      },
+    } as unknown as BalgathFx;
+    expect(routeBalgathSpellfxAt({ ...meteor, fx: 'meteorFall', radius: 2.4 }, riders, at)).toBe(
+      false,
+    );
+    expect(routeBalgathSpellfxAt({ ...meteor, fx: 'meteorImpact' }, riders, at)).toBe(false);
+    expect(routeBalgathSpellfxAt({ ...meteor, fx: 'meteorImpact', sourceId: 9 }, riders, at)).toBe(
+      false,
+    );
+    expect(
+      routeBalgathSpellfxAt(
+        { ...meteor, fx: 'meteorFall', ability: 'Falling Cinders', radius: 2.4 },
+        riders,
+        at,
+      ),
+    ).toBe(false);
+    expect(calls).toEqual(['called:7', `landed:3,4,${BALGATH_STARWAKE_METEOR_RADIUS}`]);
     // Another boss's identical cue is never claimed.
     expect(
       routeBalgathSpellfxAt(

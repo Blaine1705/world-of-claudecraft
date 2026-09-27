@@ -62,6 +62,8 @@ import {
   BALGATH_STARWAKE_CAST_ID,
   BALGATH_STARWAKE_FISSURE_ABILITY,
   BALGATH_STARWAKE_GEYSER_ABILITY,
+  BALGATH_STARWAKE_METEOR_ABILITY,
+  BALGATH_STARWAKE_METEOR_RADIUS,
   BALGATH_STARWAKE_WAKE_ABILITY,
 } from './balgath_starwake_fx_core';
 
@@ -233,6 +235,27 @@ export function routeBalgathSpellfxAt(
       ev.ability === BALGATH_GLARE_ABILITY ||
       ev.ability === BALGATH_STARWAKE_FISSURE_ABILITY ||
       ev.ability === BALGATH_STARWAKE_GEYSER_ABILITY);
+  // The Star Debris shower's meteors are Ignivar's and are NEVER consumed here: the
+  // meteor layer (mage_ground_fx.ts) draws the red circle, the fall and the landing. This
+  // only rides them (the star spews each wave, the ground jolts under each landing) and
+  // returns false so the caller carries on to that layer.
+  if (
+    ev.ability === BALGATH_STARWAKE_METEOR_ABILITY &&
+    (ev.fx === 'meteorFall' || ev.fx === 'meteorImpact') &&
+    ev.sourceId !== undefined
+  ) {
+    let balgath = false;
+    for (const e of entities()) {
+      if (e.id !== ev.sourceId) continue;
+      balgath = e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX) === true;
+      break;
+    }
+    if (balgath) {
+      if (ev.fx === 'meteorFall') fx.starwake.meteorCalled(ev.sourceId);
+      else fx.starwake.meteorLanded(ev.x, ev.z, ev.radius ?? BALGATH_STARWAKE_METEOR_RADIUS);
+    }
+    return false;
+  }
   // The star waking is the one BURST this router takes (Wake of the Fallen Star).
   const wake = ev.fx === 'burst' && ev.ability === BALGATH_STARWAKE_WAKE_ABILITY;
   if (!telegraph && !wake && (ev.fx !== 'nova' || !ev.radius || ev.sourceId === undefined)) {

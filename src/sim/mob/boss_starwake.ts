@@ -18,6 +18,11 @@
 //   POOLS    Every geyser leaves a molten pool of its own radius for `pool.seconds`,
 //            burning whoever stands in it once a `pool.interval`, so the raid has to find
 //            new ground for a while.
+//   METEORS  The eruption also opens the sky: a shower of Star Debris, waves of
+//            Ignivar's Falling Cinders meteors (his pattern, red circles and fall) for
+//            `meteors.seconds` round the players, the star and the cracks
+//            (mob/boss_starwake_meteors.ts). Like the pools it is aftermath: it runs on
+//            after the spacing lock, wherever he walks.
 //
 // Where the fissures run (boss_starwake_geometry.ts `starwakeMode`): FROM THE STAR in a fan
 // toward him when he fights within reach of his crater, and from UNDER HIS FEET in an even
@@ -36,7 +41,8 @@
 //
 // Rng: one draw for the pattern's rotation, one per fissure for its wobble, one per
 // targeted geyser pick, then one per player struck (in `ctx.players` order) and per pool
-// tick per player burned. Inert (no draws, no fields) for every mob without `starwake`.
+// tick per player burned; the meteors place without rng (hash2 on the shower's key) and
+// draw one per player each landing strikes. Inert (no draws, no fields) for every mob without `starwake`.
 
 import {
   fissureGeyserCenters,
@@ -55,6 +61,12 @@ import type { Aura, Entity, MobTemplate } from '../types';
 import { CAST_COMPLETE_EPS, DT, dist2d } from '../types';
 import { splashNearbyMobs } from './boss_collateral';
 import { rangedMechanicBlocked } from './boss_ranged_mechanics';
+import {
+  resetStarwakeShower,
+  startStarwakeShower,
+  starwakeShowerActive,
+  tickStarwakeShower,
+} from './boss_starwake_meteors';
 import { claimMechanicSpacing } from './mechanic_spacing';
 import { emitMobYell } from './yells';
 
@@ -175,6 +187,9 @@ export function tickBossStarwake(ctx: SimContext, mob: Entity): void {
   // clears what he left).
   if (!def || mob.dead) return;
   tickPools(ctx, mob, def);
+  // Before the cast advances, so the shower an eruption opens this tick waits a full tick
+  // before its first meteors start counting down.
+  tickStarwakeShower(ctx, mob, def, STARWAKE_COLLATERAL_REACH);
   if (starwakeActive(mob)) {
     advance(ctx, mob, def);
     return;
@@ -188,6 +203,8 @@ export function tickBossStarwake(ctx: SimContext, mob: Entity): void {
   // Held at due (the timer keeps drifting negative) until everything below clears.
   if (!focusCanHold(mob, def)) return;
   if (rangedMechanicBlocked(mob)) return;
+  // Never a second star while the last one's shower is still coming down.
+  if (starwakeShowerActive(mob)) return;
   beginStarwake(ctx, mob, def);
 }
 
@@ -431,6 +448,7 @@ function erupt(ctx: SimContext, mob: Entity, def: StarwakeDef): void {
     pools.push(c.x, c.z, c.radius, def.pool.seconds, def.pool.interval);
   });
   mob.starwakePools = pools;
+  startStarwakeShower(ctx, mob, def, fissures);
   if (mob.castingAbility === def.name) endBar(mob);
   mob.starwakeElapsed = undefined;
   mob.starwakeFissures = undefined;
@@ -479,11 +497,12 @@ function tickPools(ctx: SimContext, mob: Entity, def: StarwakeDef): void {
  * [dev] Start the sequence right now, for the /dev balgath playtest command
  * (dev/balgath_dev_mechanics.ts): the same start a combat cast runs, skipping only the
  * cadence and the focus-phase fit, with the cadence restarted so the rotation resumes from
- * here. Refuses (false) while one is already in flight. Draws no rng.
+ * here. Refuses (false) while one is already in flight or its meteor shower is still
+ * falling. Draws no rng.
  */
 export function forceBossStarwake(ctx: SimContext, mob: Entity): boolean {
   const def = MOBS[mob.templateId]?.starwake;
-  if (!def || starwakeActive(mob)) return false;
+  if (!def || starwakeActive(mob) || starwakeShowerActive(mob)) return false;
   beginStarwake(ctx, mob, def);
   return true;
 }
@@ -501,5 +520,6 @@ export function resetBossStarwake(mob: Entity): void {
   mob.starwakeFissures = undefined;
   mob.starwakeGeysers = undefined;
   mob.starwakePools = undefined;
+  resetStarwakeShower(mob);
   mob.starwakeTimer = def.every;
 }

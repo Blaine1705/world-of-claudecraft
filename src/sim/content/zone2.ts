@@ -736,6 +736,23 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
         max: 62,
       },
       pool: { seconds: 8, interval: 1, min: 12, max: 18, name: 'Molten Fen' },
+      // The eruption also opens the sky: for eight seconds (the pools' life) a wave of two
+      // or three meteors comes down every 0.5 to 0.7 s, some 25 to 35 in all, round the
+      // players, the star and the cracks. Each is Ignivar's Falling Cinders exactly (his
+      // placement and spacing, the same red circle and the same 2.5 s fall), with a flat
+      // hit a notch under a geyser's, since there are so many, rather than the raid's
+      // share of max health. A player who keeps moving takes one or two at most.
+      meteors: {
+        range: 45,
+        seconds: 8,
+        waveMin: 0.5,
+        waveMax: 0.7,
+        perWaveMin: 2,
+        perWaveMax: 3,
+        min: 36,
+        max: 48,
+        name: 'Star Debris',
+      },
       name: 'Wake of the Fallen Star',
       school: 'fire',
       yell: 'The star woke me once. WAKE AGAIN, and burn them all!',
