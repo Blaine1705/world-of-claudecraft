@@ -240,6 +240,11 @@ describe('the Crucible trinket relics the presentation builds', () => {
     open.painter.update(0.2);
     expect(relics(open.scene).cosmetic()).toBe(2);
     // Their own family: no cast waits on the relics, and they wait on no cast family.
+    expect(CAST_VFX_FAMILIES.map((family) => [family.id, family.bit])).toEqual([
+      ['engine', 1],
+      ['kit', 2],
+      ['relic', 4],
+    ]);
     expect(bit).toBe(CAST_VFX_RELIC);
     expect(open.gate.ready).toContain(CAST_VFX_RELIC);
   });

@@ -24,7 +24,9 @@
 // added to the scene after boot. Cosmetic draws wait on that bit (`ready`); the
 // lantern light draws on every tier regardless, because it is information a
 // healer acts on, so its program is linked earlier, by vfx.cast-first-reads
-// (`lanternLightDrawable`).
+// (`lanternLightDrawable`): before the curtain, except on the minimal manifest,
+// where that entry resumes as program debt just after the reveal and a lantern
+// already standing in view then can still link its light live.
 //
 // Particles ride the renderer's pooled Vfx cloud (burst), so embers add no
 // material, mesh or draw call.
@@ -255,6 +257,7 @@ export class TrinketRelics {
     // Its own instance: the GLB glow carries vec4 colours and the bolt vec3, two
     // programs, and the family's ready bit reads one program per material.
     this.boltMat = this.glowMat.clone();
+    this.boltMat.name = 'trinket-relics:kindling-bolt';
     const orbTemplate = this.template('KindlingOrb');
     const lanternTemplate = this.template('LastFlameLantern');
     const hammerTemplate = this.template('TemperHammer');
