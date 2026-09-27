@@ -54,7 +54,9 @@ const geometry = new Map<FragmentKind, THREE.BufferGeometry>();
 // getter stays null, the kit stays cold and the generic presentation runs.
 // The image sheets decode off the main thread (loadBitmapTexture): through
 // the image path each one decoded inside its paced upload unit, 45 to 103 ms
-// of one frame per sheet on an Intel HD 530.
+// of one frame per sheet on an Intel HD 530. The price is residency: their
+// decoded RGBA (about 96 MB) stays pinned for the page instead of sitting in
+// the browser's discardable image cache.
 export type WarriorKitAssetsState = 'idle' | 'declined' | 'loading' | 'ready' | 'failed';
 let assetsState: WarriorKitAssetsState = 'idle';
 let assetsTask: Promise<boolean> | null = null;

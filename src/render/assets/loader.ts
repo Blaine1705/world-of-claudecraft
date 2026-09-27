@@ -300,8 +300,9 @@ export function loadTexture(
 /** A plain image texture decoded off the main thread (image_bitmap_decode.ts),
  *  for large sheets whose upload would otherwise pay the decode in a live
  *  frame. Uploads the same texels as loadTexture, whose path it falls back to
- *  where the browser cannot honour the decode options or refuses the decode.
- *  The bitmap keeps its decoded pixels for the texture's life, since a rebuilt
+ *  outside Chromium or when the decode is refused. Memory: the ImageBitmap
+ *  keeps its decoded RGBA pinned for the texture's life (the image path's
+ *  decode sits in the browser's discardable cache instead), since a rebuilt
  *  renderer uploads from it again. */
 export function loadBitmapTexture(
   url: string,
@@ -332,7 +333,10 @@ export function loadBitmapTexture(
             throw err;
           },
         );
-    }).catch(() => loadTexture(url, opts));
+    }).catch(() => {
+      if (loadDiagEnabled()) console.info(`[load-diag] bitmap decode declined: ${resolved}`);
+      return loadTexture(url, opts);
+    });
     const pending = p;
     p.catch(() => {
       if (bitmapTexCache.get(key) === pending) bitmapTexCache.delete(key);

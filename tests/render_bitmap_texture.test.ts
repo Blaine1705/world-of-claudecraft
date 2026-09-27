@@ -17,19 +17,27 @@ const SAFARI_17 =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15';
 const FIREFOX_97 = 'Mozilla/5.0 (X11; Linux x86_64; rv:97.0) Gecko/20100101 Firefox/97.0';
 const FIREFOX_130 = 'Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0';
+const EDGE =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0';
+const ELECTRON =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) worldofclaudecraft/0.44.0 Chrome/138.0.7204.0 Electron/37.0.0 Safari/537.36';
+const IOS_CHROME =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/140.0.0.0 Mobile/15E148 Safari/604.1';
 
 describe('imageBitmapDecodeSupported', () => {
-  it('trusts createImageBitmap options where three trusts them', () => {
+  it('decodes on Chromium, where the texel identity is proven', () => {
     expect(imageBitmapDecodeSupported(CHROME, true)).toBe(true);
-    expect(imageBitmapDecodeSupported(SAFARI_17, true)).toBe(true);
-    expect(imageBitmapDecodeSupported(FIREFOX_130, true)).toBe(true);
-    expect(imageBitmapDecodeSupported(undefined, true)).toBe(true);
+    expect(imageBitmapDecodeSupported(EDGE, true)).toBe(true);
+    expect(imageBitmapDecodeSupported(ELECTRON, true)).toBe(true);
+    expect(imageBitmapDecodeSupported(CHROME.replace('Chrome/', 'HeadlessChrome/'), true)).toBe(
+      true,
+    );
   });
 
-  it('refuses a browser without it, an old Safari and an old Firefox', () => {
+  it('keeps the image path on WebKit and Gecko, and without createImageBitmap', () => {
     expect(imageBitmapDecodeSupported(CHROME, false)).toBe(false);
-    expect(imageBitmapDecodeSupported(SAFARI_16, true)).toBe(false);
-    expect(imageBitmapDecodeSupported(FIREFOX_97, true)).toBe(false);
+    for (const agent of [SAFARI_16, SAFARI_17, IOS_CHROME, FIREFOX_97, FIREFOX_130, undefined])
+      expect(imageBitmapDecodeSupported(agent, true), agent).toBe(false);
   });
 });
 
@@ -90,6 +98,17 @@ describe('loadBitmapTexture', () => {
     expect(texture.colorSpace).toBe(THREE.NoColorSpace);
   });
 
+  it('keys an sRGB and a linear request for one url apart', async () => {
+    const b = stubBrowser({});
+    const { loadBitmapTexture } = await import('../src/render/assets/loader');
+    const srgb = await loadBitmapTexture('/textures/vfx/production/smoke.webp', { srgb: true });
+    const linear = await loadBitmapTexture('/textures/vfx/production/smoke.webp');
+    expect(srgb).not.toBe(linear);
+    expect(srgb.colorSpace).toBe(THREE.SRGBColorSpace);
+    expect(linear.colorSpace).toBe(THREE.NoColorSpace);
+    expect(b.createImageBitmap).toHaveBeenCalledTimes(2);
+  });
+
   it('fetches and decodes each url once, joining a second request', async () => {
     const b = stubBrowser({});
     const { loadBitmapTexture } = await import('../src/render/assets/loader');
@@ -102,8 +121,8 @@ describe('loadBitmapTexture', () => {
 
   for (const [arm, stub] of [
     ['a browser without createImageBitmap', { bitmap: false }],
-    ['a Safari before 17', { userAgent: SAFARI_16 }],
-    ['a Firefox before 98', { userAgent: FIREFOX_97 }],
+    ['Safari', { userAgent: SAFARI_17 }],
+    ['Firefox', { userAgent: FIREFOX_130 }],
   ] as const) {
     it(`takes the image element path on ${arm}`, async () => {
       const b = stubBrowser(stub);

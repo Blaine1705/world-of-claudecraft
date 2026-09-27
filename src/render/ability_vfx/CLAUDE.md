@@ -170,8 +170,10 @@ selected by ability id only:
   demand, when a local Warrior enters or the painter first sees a remote one
   (`requestClassKit`; a failed preparation asks again on the bounded
   `ACTIVE_KIT_RETRY_DELAYS_MS` backoff, paying only its unpaid units), decodes
-  its image sheets off the main thread (`loadBitmapTexture`, texel for texel
-  what the image path uploads: `tests/browser/bitmap_texture_pixels.browser.test.ts`),
+  its image sheets off the main thread on Chromium (`loadBitmapTexture`, texel
+  for texel what the image path uploads:
+  `tests/browser/bitmap_texture_pixels.browser.test.ts`; their decoded RGBA,
+  about 96 MB, stays pinned for the page),
   keeps a mip chain on the WebP sheets, and DECLINES them
   on constrained-memory devices, where the kit stays cold, the generic
   presentation runs, and the boot warm-up links none of the kit's programs

@@ -13,20 +13,16 @@ export const BITMAP_DECODE_OPTIONS: ImageBitmapOptions = {
   colorSpaceConversion: 'none',
 };
 
-/** Whether createImageBitmap honours those options here: three's own gate for
- *  its GLTFLoader (Safari before 17 and Firefox before 98 do not). */
+/** Whether this browser gets the decode path: Chromium only (Chrome, Edge,
+ *  the Electron shell), the one engine the texel identity is proven on
+ *  (tests/browser/bitmap_texture_pixels.browser.test.ts). A browser that
+ *  silently ignored an option would upload premultiplied or unflipped texels
+ *  with no error to fall back on, so WebKit and Gecko keep the image path. */
 export function imageBitmapDecodeSupported(
   userAgent: string | undefined,
   hasCreateImageBitmap: boolean,
 ): boolean {
-  if (!hasCreateImageBitmap) return false;
-  if (!userAgent) return true;
-  if (/^((?!chrome|android).)*safari/i.test(userAgent)) {
-    const version = userAgent.match(/Version\/(\d+)/);
-    return !!version && Number(version[1]) >= 17;
-  }
-  const firefox = userAgent.match(/Firefox\/(\d+)/);
-  return !firefox || Number(firefox[1]) >= 98;
+  return hasCreateImageBitmap && !!userAgent && /(Chrome|Chromium)\/\d+/.test(userAgent);
 }
 
 export function browserDecodesImageBitmap(): boolean {
