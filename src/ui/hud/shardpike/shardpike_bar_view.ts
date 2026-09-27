@@ -170,6 +170,9 @@ export function shardpikeBarState(input: ShardpikeBarInput): ShardpikeBarState {
     action: 'release',
     labelKey: 'hudChrome.shardpike.releaseLabel',
     tooltipKey: 'hudChrome.shardpike.releaseTooltip',
+    // Grounding the pike is the clean bail (src/sim/lance_trial.ts lanceRelease): it sets no
+    // rest timer; the card quotes the rest only to say which OTHER endings cost one.
+    // Enabled only while a brace is live, like jumping out.
     tooltipValues: { rest: String(LANCE_REST_SECONDS) },
     iconId: 'lance_release',
     enabled: alive && !!trial,

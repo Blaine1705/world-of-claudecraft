@@ -35,8 +35,15 @@ export const LANCE_REST_SECONDS = 5;
  */
 export const LANCE_FIXED_DAMAGE = 150;
 
-/** Yards of reach on the thrust. Generous: the target is thirteen yards of granite. */
-export const LANCE_THRUST_RANGE = 14;
+/**
+ * Yards of reach on the thrust, measured from the Foreman's centre. Generous on purpose: he
+ * is thirteen yards of granite, and at 14 the pikeman stood a step off the edge of his Barrow
+ * Smash (12) and deep inside the sweep of his cleave (20). At 22 the thrust lands from outside
+ * every area blow centred on him, which is where a player holding a balance beam for five
+ * seconds needs to be standing.
+ * The HUD prompt, the reticle and the tooltip all read this constant.
+ */
+export const LANCE_THRUST_RANGE = 22;
 
 /** Skerrit's own pike: the quest tool (content/zone2.ts, q_socketwrights_due). */
 export const SKERRITS_SHARDPIKE_ID = 'skerrits_shardpike';
@@ -102,7 +109,10 @@ export function stepLanceBalance(s: LanceBalance, lean: -1 | 0 | 1, seed: number
   // Value noise in [-1, 1], sampled along one axis so the wander is a smooth 1D signal.
   const wander = (noise2(t * LANCE_DRIFT_HZ, 0.5, seed) * 2 - 1) * LANCE_DRIFT_ACCEL * ramp;
   const tip = s.balance * LANCE_TIP_ACCEL;
-  const lean_ = -lean * LANCE_LEAN_ACCEL;
+  // The held key PUSHES the marker toward its own side: right moves it right, left moves it
+  // left, so a beam drifting right is caught with the left key. The first cut had the sign
+  // the other way (right pulled it left), which the owner found backwards at the beam.
+  const lean_ = lean * LANCE_LEAN_ACCEL;
   const velocity = (s.velocity + (wander + tip + lean_) * DT) * (1 - LANCE_DAMPING * DT);
   const balance = clamp(s.balance + velocity * DT, -1.2, 1.2);
   return { balance, velocity, t };

@@ -309,6 +309,9 @@ describe('the balance stick reads strafe OR turn', () => {
     expect(Math.sign(turnRight.balance - still.balance)).toBe(
       -Math.sign(turnLeft.balance - still.balance),
     );
+    // And the right key pushes the marker RIGHT (balance up), the left key left.
+    expect(strafeRight.balance).toBeGreaterThan(still.balance);
+    expect(turnLeft.balance).toBeLessThan(still.balance);
     // Planted: holding a turn key while braced does not rotate the body.
     expect(turnRight.turned).toBe(0);
     expect(turnLeft.turned).toBe(0);

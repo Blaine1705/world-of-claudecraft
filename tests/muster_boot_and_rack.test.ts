@@ -267,10 +267,11 @@ describe('the lent pike puts his eye out through the real command path', () => {
     for (let i = 0; i < 20 * 10 && meta.lance?.phase !== 'steadied'; i++) {
       const beam = meta.lance?.beam;
       if (!beam) throw new Error('the brace broke before the pike was set');
-      // Lean against the fall (a right lean pushes the beam negative).
+      // Lean against the fall: a key pushes the marker toward its own side, so a beam
+      // falling right (positive) is caught with the LEFT key.
       const lean = beam.balance + beam.velocity * 0.4;
-      meta.moveInput.strafeRight = lean > 0.02;
-      meta.moveInput.strafeLeft = lean < -0.02;
+      meta.moveInput.strafeLeft = lean > 0.02;
+      meta.moveInput.strafeRight = lean < -0.02;
       sim.tick();
     }
     meta.moveInput.strafeRight = false;

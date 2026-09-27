@@ -45,7 +45,8 @@ describe('real Shardpike entry and payoff', () => {
   it('preserves the approved fixed damage, rest and reach', () => {
     expect(LANCE_FIXED_DAMAGE).toBe(150);
     expect(LANCE_REST_SECONDS).toBe(5);
-    expect(LANCE_THRUST_RANGE).toBe(14);
+    // 22 (was 14): the thrust lands from outside his 12-yard Barrow Smash ring.
+    expect(LANCE_THRUST_RANGE).toBe(22);
   });
   it('draws the weapon, consumes one attempt, and defers fixed damage and blind credit until contact', () => {
     const h = setup();

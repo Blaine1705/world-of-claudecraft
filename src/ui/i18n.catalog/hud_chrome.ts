@@ -36,16 +36,17 @@ export const hudChromeStrings = {
     // The brace tooltip once the turn keys and the on-screen keycaps lean too (the strafe
     // keys alone left players who had bound Q/E to the action bar with no stick at all).
     braceTooltipLean:
-      'Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: it drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.',
+      'Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.',
     releaseLabel: 'Ground the Shardpike',
     releaseTooltip:
-      'Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.',
+      'Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.',
     // Why a greyed verb is greyed (src/ui/hud/shardpike/shardpike_tooltip.ts). Deliberately
     // clock-free: the hover card is resolved once when the pointer arrives and never
     // refreshed, so a number in here would freeze while the one on the icon kept ticking.
     // Each one names the fix rather than only the obstacle, since a player reading it is
     // mid-fight and looking for the next press.
-    whyResting: 'You just grounded the pike. Wait out the timer on the icon.',
+    whyResting:
+      'The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.',
     whyAlreadyCouched: 'The pike is already couched. Ground it before you re-set.',
     whyNotSet: 'The pike is not set. Couch it and hold it steady first.',
     whyNothingCouched: 'Nothing to ground: the pike is not couched.',

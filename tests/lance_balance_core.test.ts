@@ -27,10 +27,11 @@ function playSet(seed: number, seconds: number, shockAt?: number): number {
   let lean: -1 | 0 | 1 = 0;
   const history: number[] = [];
   for (let i = 0; i < seconds * TICKS; i++) {
-    // The controller sees the beam REACTION_TICKS ago and pushes against it.
+    // The controller sees the beam REACTION_TICKS ago and pushes against it: a key pushes
+    // the marker toward its own side, so a beam drifting right is caught with the LEFT key.
     history.push(s.balance + s.velocity * 0.25);
     const seen = history[Math.max(0, history.length - 1 - REACTION_TICKS)];
-    lean = seen > 0.05 ? 1 : seen < -0.05 ? -1 : 0;
+    lean = seen > 0.05 ? -1 : seen < -0.05 ? 1 : 0;
     if (shockAt !== undefined && i === Math.round(shockAt * TICKS)) {
       s = shockLanceBalance(s, 0.9);
     }
@@ -49,6 +50,23 @@ function idleSet(seed: number, seconds: number): number {
   }
   return seconds;
 }
+
+describe('the lean direction', () => {
+  it('a held key pushes the marker toward its own side', () => {
+    // The owner's call: the right key moves the marker right, the left key moves it left,
+    // so a beam drifting right is caught with the left key. Measured against the same beam
+    // with no hands on it, so the wander and the tip cancel out of the comparison.
+    const seed = 4242;
+    const run = (lean: -1 | 0 | 1) => {
+      let s = { balance: 0, velocity: 0, t: 0 };
+      for (let i = 0; i < 10; i++) s = stepLanceBalance(s, lean, seed);
+      return s.balance;
+    };
+    const idle = run(0);
+    expect(run(1)).toBeGreaterThan(idle + 0.01);
+    expect(run(-1)).toBeLessThan(idle - 0.01);
+  });
+});
 
 describe('the tuning contract', () => {
   const SEEDS = Array.from({ length: 40 }, (_, i) => 1000 + i * 977);
