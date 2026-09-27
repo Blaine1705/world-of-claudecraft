@@ -163,7 +163,9 @@ selected by ability id only:
   sheets, three contact sheets, the material maps, the fragment GLB) never ride
   the deferred preload lane: `ensureWarriorKitAssets` loads them once, on
   demand, when a local Warrior enters or the painter first sees a remote one
-  (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
+  (`requestClassKit`; a failed preparation asks again on the bounded
+  `ACTIVE_KIT_RETRY_DELAYS_MS` backoff, paying only its unpaid units), keeps a
+  mip chain on the WebP sheets, and DECLINES them
   on constrained-memory devices, where the kit stays cold, the generic
   presentation runs, and the boot warm-up links none of the kit's programs
   (`warriorKitDeclinedByDevice` in `../cast_vfx_prewarm.ts`;

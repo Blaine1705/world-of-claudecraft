@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import {
+  ACTIVE_KIT_RETRY_DELAYS_MS,
   ACTIVE_WARRIOR_CRESTS,
   activeKitPrewarmEntry,
   cancelActiveAbilityKit,
@@ -641,5 +642,133 @@ it('waits out a loading cover instead of freezing it, then paces its uploads', a
     setArrivalCover(false);
     await queue.shutdown();
     f.close();
+  }
+});
+
+async function settle(): Promise<void> {
+  for (let i = 0; i < 500; i++) await Promise.resolve();
+}
+
+it('asks again after a failed preparation for a remote Warrior sighting, paying only the unpaid work', async () => {
+  vi.useFakeTimers();
+  const f = fixture('mage');
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValueOnce(new Error('driver link failed'));
+    // The painter's first sighting of a remote Warrior, on a Mage's renderer.
+    resumeActiveAbilityKit(f.scene, undefined, 'warrior');
+    await settle();
+    expect(f.upload).toHaveBeenCalledTimes(15);
+    expect(f.prep.ready('blood_cut')).toBe(false);
+    await vi.advanceTimersByTimeAsync(ACTIVE_KIT_RETRY_DELAYS_MS[0] - 1);
+    await settle();
+    expect(f.prep.ready('blood_cut')).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await settle();
+    for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind), kind).toBe(true);
+    expect(f.upload).toHaveBeenCalledTimes(15);
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('asks again after a failed demand load of the kit assets', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const load = vi.fn<() => Promise<boolean>>();
+    load.mockRejectedValueOnce(new Error('offline')).mockResolvedValue(true);
+    activeKitPrewarmEntry(f.scene, 'warrior', {
+      queue: f.queue as unknown as Pick<
+        import('../src/render/background_gpu_queue').BackgroundGpuQueue,
+        'run'
+      >,
+      assets: load,
+      geometry: (kinds) => f.prep.units(f.host, kinds),
+      texture: f.upload,
+    });
+    resumeActiveAbilityKit(f.scene);
+    await settle();
+    expect(load).toHaveBeenCalledTimes(1);
+    expect(f.upload).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(ACTIVE_KIT_RETRY_DELAYS_MS[0]);
+    await settle();
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(f.upload).toHaveBeenCalledTimes(15);
+    expect(f.prep.ready('blood_cut')).toBe(true);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('gives up after its bounded retries with one final warning, and schedules nothing more', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValue(new Error('driver link failed'));
+    resumeActiveAbilityKit(f.scene);
+    await settle();
+    for (const delay of ACTIVE_KIT_RETRY_DELAYS_MS) {
+      expect(vi.getTimerCount()).toBe(1);
+      await vi.advanceTimersByTimeAsync(delay);
+      await settle();
+    }
+    expect(f.host.compile).toHaveBeenCalledTimes(1 + ACTIVE_KIT_RETRY_DELAYS_MS.length);
+    expect(vi.getTimerCount()).toBe(0);
+    const final = warn.mock.calls.filter(([message]) => String(message).includes('gave up'));
+    expect(final).toHaveLength(1);
+    expect(warn).toHaveBeenCalledTimes(1 + ACTIVE_KIT_RETRY_DELAYS_MS.length);
+    await vi.advanceTimersByTimeAsync(10 * Math.max(...ACTIVE_KIT_RETRY_DELAYS_MS));
+    await settle();
+    expect(f.host.compile).toHaveBeenCalledTimes(1 + ACTIVE_KIT_RETRY_DELAYS_MS.length);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('keeps one pending retry however often the kit is asked for meanwhile', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValue(new Error('driver link failed'));
+    resumeActiveAbilityKit(f.scene);
+    await settle();
+    expect(vi.getTimerCount()).toBe(1);
+    for (let i = 0; i < 3; i++) {
+      resumeActiveAbilityKit(f.scene);
+      await settle();
+    }
+    expect(vi.getTimerCount()).toBe(1);
+    expect(f.host.compile).toHaveBeenCalledTimes(1);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('drops a pending retry when the renderer retires the preparation', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValueOnce(new Error('driver link failed'));
+    resumeActiveAbilityKit(f.scene);
+    await settle();
+    expect(vi.getTimerCount()).toBe(1);
+    cancelActiveAbilityKit(f.scene);
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(10 * Math.max(...ACTIVE_KIT_RETRY_DELAYS_MS));
+    await settle();
+    expect(f.host.compile).toHaveBeenCalledTimes(1);
+  } finally {
+    f.close();
+    vi.useRealTimers();
   }
 });
