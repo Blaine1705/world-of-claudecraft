@@ -96,6 +96,10 @@ describe('tavern cutaway: indoors', () => {
     expect(
       decide(eye(7.3, -23, TAVERN_UPPER), cam(7.3, TAVERN_UPPER + 3.5, -17)).cut,
     ).not.toContain('RoomWalls');
+    // ...but a camera up behind the landing looks through the wall over the doorway
+    expect(decide(eye(7.3, -22, TAVERN_UPPER), cam(7.3, TAVERN_UPPER + 9.5, -18.5)).cut).toContain(
+      'RoomWalls',
+    );
     const d = decide(eye(7.3, -23, TAVERN_UPPER), cam(11, TAVERN_UPPER + 3.5, -17));
     expect(d.cut).toContain('RoomWalls');
   });

@@ -37,11 +37,11 @@ export function isResting(
   p: Entity,
   buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
   kitBuildings: readonly BuildingDef[] = KIT_BUILDINGS,
-  harborHouse: boolean = isBuiltinWorldActive(),
+  builtInRests: boolean = isBuiltinWorldActive(),
 ): boolean {
   if (p.inCombat) return false;
-  if (harborHouse && harborHouseRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
-  if (harborHouse && tavernRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
+  if (builtInRests && harborHouseRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
+  if (builtInRests && tavernRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
   for (const b of buildings) {
     if (b.kind !== 'inn') continue;
     if (buildingContainsRestPoint(b, p.pos.x, p.pos.z, buildingRestPadding(b))) return true;

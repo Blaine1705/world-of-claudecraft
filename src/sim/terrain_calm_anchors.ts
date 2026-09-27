@@ -21,9 +21,9 @@
 // computes the same rings from the one shipped WORLD_SEED.
 
 import { FARSHORE_HULL_FRAGMENT_PLACEMENT } from './content/farshore_shipwreck_layout';
-import { TAVERN_KEEPER_NPC_ID } from './content/mirefen_tavern';
 import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
+import { TAVERN_KEEPER_NPC_ID } from './content/mirefen_tavern';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import { TRANSPORT_ROUTES } from './content/transport_ships';
 import { TUNNELS } from './content/tunnels';

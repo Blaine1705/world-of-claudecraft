@@ -1177,6 +1177,11 @@ export const VOICE_ALIAS = {
   // Promote her to her own VOICE_PROMPTS entry, warmer and more weathered than
   // Odile's, once an ElevenLabs key is available to design and render it.
   harbormaster_tamsin: 'harbormaster_odile',
+  // Maudie Tapwright, innkeeper of the Mirefen tavern (src/sim/content/mirefen_tavern.ts):
+  // the same trade and warmth as Hearthkeeper Maeve's lodge in the north, so she borrows
+  // Maeve's designed voice as a ROLE match. Promote her to her own VOICE_PROMPTS entry, a
+  // rounder, merrier marsh-country alto, once an ElevenLabs key is available.
+  innkeeper_maudie: 'hearthkeeper_maeve',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

@@ -48,6 +48,7 @@ import {
   type TavernShellPart,
   tavernShellOcclusion,
 } from './mirefen_tavern_core';
+import { ditherFadeUniform } from './occluder_dither_fade';
 import {
   applyOccluderFade,
   type OccluderFadeMat,
@@ -111,6 +112,8 @@ let shell: ShellRecord[] = [];
 let shellGroup: THREE.Group | null = null;
 let allMats: OccluderFadeMat[] = [];
 const state = newTavernShellState();
+/** Shell parts inside the building: they cast no shadow (the outer shell shades the room). */
+const INNER_SHELL = new Set<TavernShellPart>(['Gallery', 'RoomWalls']);
 /** Where the tavern stands: the prefetch reach and the fog cull are measured from here. */
 const ANCHOR = tavernToWorld(0, -6);
 
@@ -176,7 +179,9 @@ function buildShell(parts: ReadonlyMap<TavernShellPart, readonly VertexColourPar
       }
       const mesh = new THREE.Mesh(p.geometry, mat);
       mesh.name = part;
-      mesh.castShadow = true;
+      // the outer walls and roofs roof the room in shade even when cut away; the gallery and
+      // the upstairs partitions stand inside it, so their shadow pass is spared
+      mesh.castShadow = !INNER_SHELL.has(part);
       mesh.receiveShadow = true;
       occluderFadeRecordFor(record.mats, mat, mesh);
       record.meshes.push(mesh);
@@ -190,6 +195,8 @@ function buildShell(parts: ReadonlyMap<TavernShellPart, readonly VertexColourPar
 
 /** The tavern, built once into the props root (built-in world only). */
 export function buildMirefenTavern(): THREE.Group {
+  // a second build (a world swap, an editor rebuild) disposes the last build's clones first
+  clearMirefenTavernShell();
   const group = new THREE.Group();
   group.name = 'mirefenTavern';
   if (!loaded) {
@@ -264,6 +271,11 @@ export const MIREFEN_TAVERN_FLAMES: readonly { x: number; y: number; z: number; 
     ];
   })();
 
+/** The live flames to build: none when the model never loaded (no fire without its hearth). */
+export function mirefenTavernFlameSpots(): typeof MIREFEN_TAVERN_FLAMES {
+  return loaded ? MIREFEN_TAVERN_FLAMES : [];
+}
+
 /** The tavern's point lights, world-positioned (props.ts adds them to the props root and the
  *  fire-light budget, like a campfire's). Empty until the model is loaded. */
 export function mirefenTavernLights(): THREE.PointLight[] {
@@ -320,6 +332,9 @@ function stepPart(
   for (const m of r.mats) {
     m.mat.colorWrite = !cut;
     if (cut) m.mat.depthWrite = false;
+    // the dithered arm keeps the material opaque and never touches its depth writes
+    // (applyOccluderFade), so the cut's drop is undone here once the part draws again
+    else if (ditherFadeUniform(m.mat)) m.mat.depthWrite = m.depthWrite;
   }
 }
 

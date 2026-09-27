@@ -51,7 +51,7 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import {
   buildMirefenTavern,
   clearMirefenTavernShell,
-  MIREFEN_TAVERN_FLAMES,
+  mirefenTavernFlameSpots,
   mirefenTavernLights,
   mirefenTavernPrewarmParts,
   mirefenTavernShellMeshes,
@@ -1727,12 +1727,17 @@ export function buildProps(
     group.add(buildWickharborHarbor());
   }
   // ...and the Mirefen tavern on the Fenbridge road (render/mirefen_tavern.ts): its walls,
-  // roofs, gallery and partitions kept out of the merge (they fade one by one for the
-  // camera), its fires, chandelier and lanterns lit like a campfire (root-level,
+  // roofs, gallery and partitions fade one by one for the camera, its fires, chandelier and lanterns lit like a campfire (root-level,
   // world-positioned, in the fire-light budget)
   if (builtInWorld) {
-    group.add(buildMirefenTavern());
-    for (const m of mirefenTavernShellMeshes()) keepFromMerge.add(m);
+    // the whole tavern stays out of the band merge: it is already one mesh per material (the
+    // shell parts one per part), so a re-bake would only hold a second copy of its geometry
+    // beside the one the prewarm and the live draw share
+    const tavern = buildMirefenTavern();
+    group.add(tavern);
+    tavern.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) keepFromMerge.add(o as THREE.Mesh);
+    });
     for (const light of mirefenTavernLights()) {
       group.add(light);
       fireLights.push(light);
@@ -1890,20 +1895,20 @@ export function buildProps(
     [0.001, 0.95],
   ].map(([r, y]) => new THREE.Vector2(r, y));
   const flameGeo = new THREE.LatheGeometry(flamePts, 7);
+  // the campfire's live flame material (the Mirefen tavern's fires below share it)
+  const campfireFlameMaterial = () =>
+    new THREE.MeshLambertMaterial({
+      color: 0xffaa33,
+      emissive: 0xff6600,
+      emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
+      transparent: true,
+      opacity: 0.92,
+    });
   for (const [x, z] of getActiveWorldContent().props.campfires) {
     const y = ground(x, z);
     const g = new THREE.Group();
     addParts(g, 'bonfire', { y: -0.05, rot: propRand(x, z, 1) * Math.PI * 2, scale: 4.3 });
-    const flame = new THREE.Mesh(
-      flameGeo,
-      new THREE.MeshLambertMaterial({
-        color: 0xffaa33,
-        emissive: 0xff6600,
-        emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
-        transparent: true,
-        opacity: 0.92,
-      }),
-    );
+    const flame = new THREE.Mesh(flameGeo, campfireFlameMaterial());
     flame.position.y = 0.16;
     flame.scale.setScalar(1.15);
     g.add(flame);
@@ -1924,17 +1929,8 @@ export function buildProps(
   }
   // the Mirefen tavern's round hearth and wall fire burn with the campfires' live flame, each
   // in a sized holder (the flicker writes the flame's own scale; render/mirefen_tavern.ts)
-  for (const spot of builtInWorld ? MIREFEN_TAVERN_FLAMES : []) {
-    const flame = new THREE.Mesh(
-      flameGeo,
-      new THREE.MeshLambertMaterial({
-        color: 0xffaa33,
-        emissive: 0xff6600,
-        emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
-        transparent: true,
-        opacity: 0.92,
-      }),
-    );
+  for (const spot of builtInWorld ? mirefenTavernFlameSpots() : []) {
+    const flame = new THREE.Mesh(flameGeo, campfireFlameMaterial());
     const holder = new THREE.Group();
     holder.position.set(spot.x, spot.y, spot.z);
     holder.scale.setScalar(spot.scale);

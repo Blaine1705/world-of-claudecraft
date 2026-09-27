@@ -29,6 +29,7 @@ import {
   TAVERN_ORIGIN,
   TAVERN_PORCH,
   TAVERN_PROPS,
+  TAVERN_ROOM_DOOR_HEIGHT,
   TAVERN_ROOM_WALLS,
   TAVERN_TOWER,
   TAVERN_TOWER_DOOR,
@@ -142,8 +143,33 @@ const BOX_VOLUMES: Partial<Record<TavernShellPart, readonly Vol[]>> = {
       TAVERN_GALLERY.z1 + 0.25,
     ],
   ],
-  RoomWalls: TAVERN_ROOM_WALLS.map(([x0, x1, z0, z1]) => [x0, x1, TAVERN_UPPER, W.ridge, z0, z1]),
+  // the partitions: each solid piece full height, and the long partition's whole run over its
+  // doorways (the wall stands on over them, up to the roof)
+  RoomWalls: [
+    ...TAVERN_ROOM_WALLS.map(
+      ([x0, x1, z0, z1]) => [x0, x1, TAVERN_UPPER, W.ridge, z0, z1] as const,
+    ),
+    [
+      W.x0 + W.wall,
+      W.x1 - W.wall,
+      TAVERN_UPPER + TAVERN_ROOM_DOOR_HEIGHT,
+      W.ridge,
+      TAVERN_ROOM_WALLS[0][2],
+      TAVERN_ROOM_WALLS[0][3],
+    ],
+  ],
 };
+
+/** Everything the shell draws (local): the hall and its porch, sign and chimney, the wing,
+ *  the tower's hat. */
+const TAVERN_BOUNDS: Vol = [
+  H.x0 - H.eaveOut - 0.5,
+  H.x1 + 2.5,
+  -4,
+  T.peak + 3,
+  W.z0 - W.vergeOut - 0.5,
+  H.z1 + 5.5,
+];
 
 /** World (x, y, z) to the tavern's local frame (the door faces world +x). */
 export function tavernLocal(x: number, y: number, z: number): { x: number; y: number; z: number } {
@@ -287,6 +313,11 @@ export function tavernShellOcclusion(
   const inside = eyeInTavern(ax, ay, az);
   out.inside = inside;
   out.floor = inside ? 0 : OCCLUDER_FADE_ALPHA;
+  // a sight line nowhere near the building (the whole road past it) decides in one test
+  if (!inside && !segmentHitsVol(ax, ay, az, bx, by, bz, TAVERN_BOUNDS)) {
+    for (let i = 0; i < out.occluded.length; i++) out.occluded[i] = false;
+    return out;
+  }
   for (let i = 0; i < TAVERN_SHELL_PARTS.length; i++) {
     const vols = BOX_VOLUMES[TAVERN_SHELL_PARTS[i]];
     let hit = false;

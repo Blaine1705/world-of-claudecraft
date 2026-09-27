@@ -22,7 +22,7 @@ import {
   TAVERN_SHELL_PARTS,
   TAVERN_TRIM_PARTS,
 } from '../src/render/mirefen_tavern_core';
-import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
+import { ditherFadeUniform, setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   TAVERN_FLOOR_Y,
@@ -209,6 +209,37 @@ describe('mirefen tavern painter', () => {
       expect(mat.transparent).toBe(false);
       expect(mat.depthWrite).toBe(true);
       expect(mat.colorWrite).toBe(true);
+    }
+  });
+
+  it('under the dithered fade, a wall cut away writes depth again once it is back', () => {
+    setDitherFadeEnabledForTest(true);
+    withTier('high');
+    buildMirefenTavern();
+    const e = eye(0, 8);
+    step(e, at(0, 5, 18));
+    const front = part('HallWallFront');
+    expect(front.alpha).toBe(0);
+    for (const m of front.meshes) {
+      const mat = m.material as THREE.Material;
+      expect(ditherFadeUniform(mat)?.value).toBe(0);
+      expect(mat.depthWrite).toBe(false);
+    }
+    step(e, at(0, 4, 11), 240);
+    expect(front.alpha).toBe(1);
+    for (const m of front.meshes) {
+      const mat = m.material as THREE.Material;
+      expect(ditherFadeUniform(mat)?.value).toBe(1);
+      expect(mat.depthWrite).toBe(true);
+      expect(mat.colorWrite).toBe(true);
+    }
+  });
+
+  it('spares the shadow pass for the parts inside the building', () => {
+    withTier('high');
+    buildMirefenTavern();
+    for (const m of mirefenTavernShellMeshes()) {
+      expect(m.castShadow, m.name).toBe(m.name !== 'Gallery' && m.name !== 'RoomWalls');
     }
   });
 

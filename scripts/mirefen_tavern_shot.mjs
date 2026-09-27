@@ -128,15 +128,15 @@ async function shot(name) {
 const want = (name) => !ONLY || ONLY.has(name);
 // name, stand (local x, z), look at (local x, z), pitch, camera distance
 const SHOTS = [
-  ['exterior_road', 8.0, 29.0, 0.0, 6.0, 0.22, 24],
+  ['exterior_road', 12.0, 30.0, 0.0, 2.0, 0.26, 30],
   ['exterior_north', 26.0, 10.0, 8.0, -6.0, 0.2, 20],
   ['doorway', 0.0, 12.9, 0.0, -10.0, 0.14, 5],
   ['hearth', 0.0, 8.3, 0.0, 2.4, 0.42, 9],
   ['bar', 7.35, -4.9, 9.0, -8.8, 0.18, 7],
   ['stair', -6.9, -18.8, 2.4, -16.4, 0.32, 6],
   ['gallery', 6.2, -11.4, 0.0, 3.0, 0.3, 6],
-  ['room', 7.3, -21.8, 7.3, -25.3, 0.35, 5],
-  ['scale_table', -10.0, 1.0, -14.0, 1.0, 0.12, 6],
+  ['room', 7.3, -22.0, 7.3, -25.3, 0.75, 8],
+  ['scale_table', -10.1, 2.2, -14.0, 0.2, 0.12, 6],
   ['scale_door', 0.0, 15.0, 0.0, 10.0, 0.05, 8],
 ];
 for (const [name, x, z, tx, tz, pitch, dist] of SHOTS) {
