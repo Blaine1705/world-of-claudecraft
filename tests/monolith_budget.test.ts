@@ -984,7 +984,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12696 -> 12684 at the merge of release/v0.44.0 into the
     // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
     // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12684,
+    // LOWERED 12684 -> 12679 by the indoor camera clamp (interior_camera.ts): its
+    // wiring (the clamp, the draw-time re-check and restore, the close-camera self
+    // hide, the chat-bubble gate) is paid for by moving the chase camera's floor
+    // (ground, rift tier, maze hedges) into chase_camera_floor_core.ts. Exact count.
+    ceiling: 12679,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

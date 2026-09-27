@@ -53,6 +53,7 @@ export const MIREFEN_TAVERN_ASSET = {
     'TowerRoof',
     'Gallery',
     'RoomWalls',
+    'TowerNewel',
     'TavernTrim',
     'TavernClutter',
   ],

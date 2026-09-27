@@ -1114,7 +1114,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/maze_hedge_arch.glb": "/media/models/props/maze_hedge_arch.188cfccfb729.glb",
   "models/props/maze_hedge_wall.glb": "/media/models/props/maze_hedge_wall.57a345d29120.glb",
   "models/props/mining_ore_cart.glb": "/media/models/props/mining_ore_cart.6ee51fe49a47.glb",
-  "models/props/mirefen_tavern.glb": "/media/models/props/mirefen_tavern.6bf57fff3575.glb",
+  "models/props/mirefen_tavern.glb": "/media/models/props/mirefen_tavern.8f9163888d89.glb",
   "models/props/mushroom_giant_purple.glb": "/media/models/props/mushroom_giant_purple.3a4b881f27cc.glb",
   "models/props/mushroom_glow_cluster.glb": "/media/models/props/mushroom_glow_cluster.2e1fb6831e3b.glb",
   "models/props/mushroom_red.glb": "/media/models/props/mushroom_red.19e8e69c9304.glb",

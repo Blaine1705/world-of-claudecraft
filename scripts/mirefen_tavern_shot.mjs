@@ -138,6 +138,20 @@ const SHOTS = [
   ['room', 8.6, -23.4, 5.2, -24.6, 0.55, 7],
   ['scale_table', -10.1, 2.2, -14.0, 0.2, 0.12, 6],
   ['scale_door', 0.0, 15.0, 0.0, 10.0, 0.05, 8],
+  // the camera's tight spots: the owner's spot at the tower stair's foot, the arch into the
+  // tower from the hall, the climb, a gallery corner, behind the bar, the hearth pit's edge
+  // and a guest room's far corner, each with the camera zoomed well out
+  ['stair_foot', -3.0, -14.0, -1.5, -20.0, 0.55, 14],
+  ['tower_arch', -1.5, -8.0, -1.5, -18.0, 0.25, 6],
+  ['stair_climb', 3.0, -20.0, 3.0, -26.0, 0.3, 7],
+  ['stair_climb_owner', 3.0, -20.0, 3.3, -17.1, 0.3, 7],
+  ['tower_inside', 0.5, -14.8, -4.0, -21.0, 0.35, 8],
+  ['stair_head', 2.2, -16.6, -4.0, -18.0, 0.5, 8],
+  ['stair_mid', -5.3, -19.0, -3.2, -23.0, 0.3, 8],
+  ['gallery_corner', 14.4, -12.5, 0.0, 4.0, 0.45, 14],
+  ['behind_bar', 9.0, -8.8, 9.0, 6.0, 0.35, 12],
+  ['hearth_pit', 0.0, 6.2, 0.0, -6.0, 0.6, 14],
+  ['room_corner', 5.6, -26.4, 8.0, -21.5, 0.4, 12],
 ];
 for (const [name, x, z, tx, tz, pitch, dist] of SHOTS) {
   if (!want(name)) continue;

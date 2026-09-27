@@ -28,7 +28,7 @@
 //
 // Scale: the player stands 2.6 yd to the crown on a 0.5 yd body radius. The door clears
 // 4.6 by 5.2, the side walls stand 10 to the eaves under a ridge at 20, the nook beams
-// hang at 5.5, the stair is 4.2 wide, table tops stand at 1.45 and seats at 0.85.
+// hang at 5.5, the stair is 4.4 wide, table tops stand at 1.45 and seats at 0.85.
 
 import type { NpcDef } from '../types';
 
@@ -106,8 +106,10 @@ export const TAVERN_TOWER = {
   z: -18,
   rIn: 6.0,
   rOut: 6.8,
-  /** The central newel column the stair winds round. */
-  newel: 1.8,
+  /** The central newel column the stair winds round (a banded stone shaft). No slimmer: a
+   *  body hugging it climbs the spiral's steepest line, which must stay under the climb gate
+   *  (tests/mirefen_tavern.test.ts). */
+  newel: 1.6,
   wallTop: 11.2,
   /** The slate cone's point, over the hall's ridge: the tower's hat reads from the road. */
   peak: 22.0,
@@ -559,6 +561,14 @@ export const TAVERN_LANTERNS: readonly { x: number; z: number; y: number; lit: b
   { x: 11.2, z: -6.9, y: 4.6, lit: false },
 ];
 export const TAVERN_CHANDELIER = { x: 0, z: 9.6, y: 7.6, r: 2.1 } as const;
+/** The iron sconces up the stair tower's wall, lit, so the climb reads from foot to head:
+ *  each at an angle round the tower (atan2(dx, dz), as TAVERN_STAIR) on the inner face,
+ *  its lantern this high over the ground floor (a head over the steps beneath it). */
+export const TAVERN_TOWER_SCONCES: readonly { angle: number; y: number }[] = [
+  { angle: -86 * DEG, y: 3.5 },
+  { angle: -170 * DEG, y: 5.9 },
+  { angle: -252 * DEG, y: 8.1 },
+];
 /** The copper hood over the round hearth: its rim's height and radius, its flue's top. */
 export const TAVERN_HOOD = { rimY: 5.0, rimR: 2.6, topY: 7.2, topR: 0.7, flueTop: 21.8 } as const;
 

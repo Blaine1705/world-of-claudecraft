@@ -802,6 +802,11 @@ const RENDER_PURE_CORES = [
   'src/render/wickharbor_harbor_core.ts',
   'src/render/wyrmwatch_harbor_house_core.ts',
   'src/render/mirefen_tavern_core.ts',
+  // the indoor chase-camera clamp's walk through a building's air, and the tavern's air
+  'src/render/interior_camera_core.ts',
+  'src/render/mirefen_tavern_interior_core.ts',
+  // the chase camera's floor (ground, rift tier, maze hedges), out of renderer.ts
+  'src/render/chase_camera_floor_core.ts',
   'src/render/ship_wake_core.ts',
   'src/render/water_approach_core.ts',
   'src/render/view_candidate_scan_core.ts',

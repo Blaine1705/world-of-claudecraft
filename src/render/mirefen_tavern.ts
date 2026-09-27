@@ -6,8 +6,9 @@
 //
 // Which parts a graphics tier keeps and which shell parts the camera cuts away are the pure
 // core's calls (mirefen_tavern_core.ts): the structure, furniture, shell and lights on every
-// tier, the trim from medium, the clutter from high; indoors the parts between the camera
-// and the player cut away (the dollhouse), outdoors they ghost. The tier is the static
+// tier, the trim from medium, the clutter from high; indoors the camera stays in the air
+// and only the parts inside it (the gallery, the partitions) cut away, outdoors the shell
+// ghosts. The tier is the static
 // effects tier (GFX.effectsTier), never the frame-rate governor, and a graphics-profile
 // change rebuilds the props (the resetter below, registered in assets/graphics_profile.ts).
 //
@@ -24,6 +25,8 @@
 // off), so the room stays roofed in light. The fires and lanterns are point lights for the
 // fire-light budget (props.ts pushes them with the campfires': they never change the visible
 // point-light count). The per-frame work is the cutaway's segment tests and the fade steps.
+// A build registers the tavern's air with the indoor camera clamp (interior_camera.ts), and
+// the teardown drops it, so a world without the tavern clamps nothing.
 
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -34,12 +37,20 @@ import {
   TAVERN_ORIGIN,
   TAVERN_PIT,
   TAVERN_PROPS,
+  TAVERN_TOWER,
+  TAVERN_TOWER_SCONCES,
   TAVERN_YAW,
   tavernToWorld,
 } from '../sim/content/mirefen_tavern';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import {
+  activeCameraInterior,
+  interiorCameraRunning,
+  registerCameraInterior,
+  unregisterCameraInterior,
+} from './interior_camera';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import {
   mirefenTavernParts,
@@ -48,6 +59,7 @@ import {
   type TavernShellPart,
   tavernShellOcclusion,
 } from './mirefen_tavern_core';
+import { mirefenTavernCameraInterior } from './mirefen_tavern_interior_core';
 import { ditherFadeUniform } from './occluder_dither_fade';
 import {
   applyOccluderFade,
@@ -113,7 +125,9 @@ let shellGroup: THREE.Group | null = null;
 let allMats: OccluderFadeMat[] = [];
 const state = newTavernShellState();
 /** Shell parts inside the building: they cast no shadow (the outer shell shades the room). */
-const INNER_SHELL = new Set<TavernShellPart>(['Gallery', 'RoomWalls']);
+const INNER_SHELL = new Set<TavernShellPart>(['Gallery', 'RoomWalls', 'TowerNewel']);
+/** The tavern's air for the indoor camera (registered while the tavern is built). */
+const TAVERN_CAMERA_INTERIOR = mirefenTavernCameraInterior();
 /** Where the tavern stands: the prefetch reach and the fog cull are measured from here. */
 const ANCHOR = tavernToWorld(0, -6);
 
@@ -224,17 +238,24 @@ export function buildMirefenTavern(): THREE.Group {
   model.rotation.y = TAVERN_YAW;
   model.userData.assetUrl = TAVERN_URL;
   group.add(model);
+  // the indoor camera keeps to the tavern's air while the player is inside it
+  registerCameraInterior(TAVERN_CAMERA_INTERIOR);
   return group;
 }
 
-/** The tavern's firelight: the round hearth's glow, the wall fire, the wheel chandelier and
- *  the lit lanterns (content TAVERN_LANTERNS, where the model hangs them). */
+/** The tavern's firelight: the round hearth's glow, the wall fire, the wheel chandelier,
+ *  the lit lanterns (content TAVERN_LANTERNS, where the model hangs them) and the sconces up
+ *  the stair tower (TAVERN_TOWER_SCONCES). */
 export const MIREFEN_TAVERN_LIGHTS = {
   hearth: { color: 0xffa458, intensity: 34, distance: 24, decay: 2 },
   wallFire: { color: 0xffa050, intensity: 14, distance: 13, decay: 2 },
   chandelier: { color: 0xffcc88, intensity: 16, distance: 18, decay: 2 },
   lantern: { color: 0xffcc88, intensity: 8, distance: 11, decay: 2 },
+  sconce: { color: 0xffb870, intensity: 9, distance: 10, decay: 2 },
 } as const;
+/** How far a tower sconce's lantern hangs off the wall's inner face (the Blender build's
+ *  arm, tavern_furnish.py). */
+export const TOWER_SCONCE_REACH = 0.55;
 
 function light(
   spec: (typeof MIREFEN_TAVERN_LIGHTS)[keyof typeof MIREFEN_TAVERN_LIGHTS],
@@ -288,6 +309,14 @@ export function mirefenTavernLights(): THREE.PointLight[] {
   out.push(light(L.chandelier, 'tavernChandelier', c.x, c.y - 0.4, c.z));
   for (const spot of TAVERN_LANTERNS) {
     if (spot.lit) out.push(light(L.lantern, 'tavernLantern', spot.x, spot.y - 0.2, spot.z));
+  }
+  // the sconces up the stair tower's wall, their lanterns an arm's reach off the stone
+  const T = TAVERN_TOWER;
+  for (const s of TAVERN_TOWER_SCONCES) {
+    const r = T.rIn - TOWER_SCONCE_REACH;
+    const lx = T.x + Math.sin(s.angle) * r;
+    const lz = T.z + Math.cos(s.angle) * r;
+    out.push(light(L.sconce, 'tavernTowerSconce', lx, s.y, lz));
   }
   return out;
 }
@@ -360,7 +389,12 @@ export function updateMirefenTavernShell(
   if (far) return;
   // warm the fade twins once the camera comes within reach of the tavern
   prefetchOccluderFadeWithin(allMats, ANCHOR.x, ANCHOR.z, camX, camZ);
-  tavernShellOcclusion(eyeX, eyeY, eyeZ, camX, camY, camZ, state);
+  // indoors is the camera clamp's verdict (the avatar's eye), so the shell never ghosts or
+  // holds apart from where the clamp keeps the camera
+  const indoors = interiorCameraRunning()
+    ? activeCameraInterior()?.id === TAVERN_CAMERA_INTERIOR.id
+    : undefined;
+  tavernShellOcclusion(eyeX, eyeY, eyeZ, camX, camY, camZ, state, indoors);
   for (let i = 0; i < shell.length; i++) {
     stepPart(shell[i], state.occluded[i], state.floor, dt, reducedMotion);
   }
@@ -380,6 +414,7 @@ export function clearMirefenTavernShell(): void {
   shell = [];
   allMats = [];
   shellGroup = null;
+  unregisterCameraInterior(TAVERN_CAMERA_INTERIOR.id);
 }
 
 /** Drop the prepared templates (graphics-profile rebuilds convert materials anew; the

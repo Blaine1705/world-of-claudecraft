@@ -56,8 +56,31 @@ classic inns were studied for mood and proportion only and never entered the bui
   because the runtime shares its few point lights with the whole world.
 - **Painter.** `src/render/mirefen_tavern.ts` over the pure core
   `src/render/mirefen_tavern_core.ts`: the walls, roofs, gallery and partitions are separate
-  shell parts. Indoors every part between the camera and the player is cut away (the Harbormaster's
-  House idiom, the chase camera never pulls in); outdoors a part that hides the player ghosts.
+  shell parts. Outdoors a part that hides the player ghosts and the chase camera never pulls in.
+- **Indoor camera.** Indoors the camera stays in the tavern's air: the rooms, the doorways and
+  arch between them and the tower's shaft are registered as boxes
+  (`src/render/mirefen_tavern_interior_core.ts`) with the generic indoor camera clamp
+  (`src/render/interior_camera.ts` over `src/render/interior_camera_core.ts`), which pulls the
+  drawn camera in along its ray to just inside a wall, floor or ceiling (a near-plane pad clear)
+  and eases it back out when the view clears. It is the one authored-interior exception to the
+  pinned no-pull-in rule (`tests/graphics_overhaul_integration.test.ts`); the requested distance
+  is never written. The outer shell therefore never opens onto the outside from inside; only the
+  gallery's rail and barrel wall, the upstairs partitions and the stair tower's newel (its own
+  part, `TowerNewel`, so the camera slides round it rather than fighting it) still cut away
+  for the sight line. Where the boom is cramped (a player on the stair against the tower's
+  wall, backed against the barrel wall), the camera glides to the nearest comfortable framing,
+  a lift over what cramps it or a swing along the wall; in a corner nothing escapes it cuts to
+  the player's eyes and hides the player's own body, the classic MMO first-person cut.
+- **Stair tower.** Coursed ashlar both faces over a mortar core (warm limestone inside,
+  the base's blue-grey outside), arrow slits in dressed frames (a cool sky inside, kept out of
+  the warm bake), dressed quoins where the ring meets the hall, voussoirs and a hood mould on
+  the arch in the same stone; 24 solid steps (a darker riser, a grey tread, a pale nosing), a
+  string course up the wall, a continuous oak handrail on iron brackets, a banded newel of
+  stone drums, and three lit iron sconces up the climb (`TAVERN_TOWER_SCONCES`, lit by
+  `mirefenTavernLights`).
+  While the player is inside, the plates of bodies outside draw only when the camera sees them
+  through the front door (the nameplate painter's `interiorHidesNameplate` gate); a selected
+  target keeps its unit frame.
 - **Tiers.** Everything walkable or solid, the whole shell and every light on every preset; the
   trim from medium, the clutter from high (`mirefenTavernParts`).
 - **Fires.** The round hearth and the wall fireplace burn with the campfires' live flame

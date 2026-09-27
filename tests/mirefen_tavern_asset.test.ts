@@ -38,13 +38,13 @@ import {
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
-const SHIPPED_SHA256 = '6bf57fff357513b6b0a3aec003bdd267d322ddc9a3a255de8527e9d18fc93068';
-const SHIPPED_BYTES = 844736;
+const SHIPPED_SHA256 = '8f9163888d891431dbf03db6445d16a65fd4d519b61a62e02895e5079c34b2ab';
+const SHIPPED_BYTES = 885056;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  TavernFrame: 12292,
+  TavernFrame: 12260,
   TavernFurnishings: 2944,
-  TavernLights: 3048,
+  TavernLights: 3240,
   HallWallFront: 5156,
   HallWallBack: 2220,
   HallWallLeft: 2320,
@@ -54,11 +54,12 @@ const TRIANGLES: Record<string, number> = {
   WingWallBack: 1476,
   WingWallWest: 696,
   WingRoof: 1272,
-  TowerWall: 3240,
+  TowerWall: 4000,
   TowerRoof: 1876,
   Gallery: 4000,
   RoomWalls: 888,
-  TavernTrim: 1252,
+  TowerNewel: 888,
+  TavernTrim: 1832,
   TavernClutter: 3538,
 };
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */

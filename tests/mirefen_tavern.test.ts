@@ -30,6 +30,7 @@ import {
   tavernHallWalls,
   tavernInsideLocal,
   tavernRestsAt,
+  tavernWingWalls,
 } from '../src/sim/mirefen_tavern';
 import {
   mirefenTavernCovers,
@@ -236,6 +237,25 @@ describe('Mirefen tavern: walls, openings and rails', () => {
     for (const c of colliders) {
       if (c.moveTopY === undefined) expect(c.standable).toBeUndefined();
     }
+  });
+
+  it("keeps the wing's walls out of the stair tower, so the stair's outer edge is clear", () => {
+    // the wing's west wall stops at the tower's outside face, where the model's wall stops:
+    // past it the tower's ring is the wall (a run inside the tower stood as an invisible
+    // wall on the stair's outer edge near its head)
+    const t = TAVERN_TOWER;
+    for (const [x0, x1, z0, z1] of tavernWingWalls()) {
+      for (let x = x0; x <= x1 + 1e-9; x += 0.1) {
+        for (let z = z0; z <= z1 + 1e-9; z += 0.1) {
+          expect(Math.hypot(x - t.x, z - t.z), `${x}, ${z}`).toBeGreaterThan(t.rIn);
+        }
+      }
+    }
+    // ...and still closes the wing's west side up to the ring, leaving no slit
+    const w = TAVERN_WING;
+    const run = tavernWingWalls().find((b) => b[1] === w.x0 + w.wall && b[2] === w.z0);
+    if (!run) throw new Error('west run');
+    expect(Math.hypot(w.x0 + w.wall - t.x, run[3] - t.z)).toBeLessThanOrEqual(t.rOut + 1e-9);
   });
 
   it('joins the live static grid', () => {

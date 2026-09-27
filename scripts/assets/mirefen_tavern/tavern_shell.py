@@ -19,7 +19,8 @@ partitions, which cut away the same way.
                   tie beams, ridge and bargeboards
   WingWall*       the wing's stone lower storey and timber-framed upper storey
   WingRoof        its slate roof
-  TowerWall       the round stair tower's wall, open to the hall under the arch
+  TowerWall       the round stair tower's wall, open to the hall under the arch: coursed
+                  ashlar both sides over a mortar core, arrow slits in dressed frames
   TowerRoof       its slate cone and finial
   Gallery         the gallery's deck, its rail and the barrel wall under it
   RoomWalls       the upstairs partitions and their doors
@@ -29,13 +30,13 @@ import math
 
 def build(B, parts):
     hall_front(B, parts['HallWallFront'])
-    hall_back(B, parts['HallWallBack'])
+    hall_back(B, parts['HallWallBack'], parts['TavernTrim'])
     hall_left(B, parts['HallWallLeft'])
     hall_right(B, parts['HallWallRight'])
     hall_roof(B, parts['HallRoof'])
     wing_walls(B, parts)
     wing_roof(B, parts['WingRoof'])
-    tower_wall(B, parts['TowerWall'])
+    tower_wall(B, parts['TowerWall'], parts['TavernTrim'])
     tower_roof(B, parts['TowerRoof'])
     gallery(B, parts['Gallery'])
     room_walls(B, parts['RoomWalls'])
@@ -279,7 +280,7 @@ def hall_front(B, p):
 # ---------------------------------------------------------------------------
 # The back gable: the stair arch, the gallery door, the bard's corner
 # ---------------------------------------------------------------------------
-def hall_back(B, p):
+def hall_back(B, p, trim):
     H, t = B.HALL, B.HALL['wall']
     zc = H['z0'] + t / 2
     wall = B.Wall(H['x0'], zc, H['x1'], zc, (0, -1))
@@ -319,8 +320,21 @@ def hall_back(B, p):
         for (rr, th) in ((R, ta), (R, tb), (R + big, tb), (R + big, ta)):
             pts.append((um + rr * math.sin(th), cy + rr * math.cos(th)))
         corners = [wall.pt(u, v, -t / 2 - 0.08) for (u, v) in pts] + [wall.pt(u, v, t / 2 + 0.08) for (u, v) in pts]
+        # the tower's dressed limestone, the keystone palest
+        tone = B.PAL['ashlar_hi'] if k == m // 2 else B.scale_color(B.pick(B.PAL['ashlar'], k * 2), 0.97)
         B.hexa(p, [corners[0], corners[1], corners[5], corners[4], corners[3], corners[2], corners[6], corners[7]],
-               B.pick(B.PAL['stone'], k), B.STONE)
+               tone, B.STONE)
+    # a hood mould over the voussoirs on both faces: the arch's frame (trim: medium and up)
+    rh0, rh1 = R + 0.9, R + 1.08
+    for k in range(m + 2):
+        ta = -th0 - 0.06 + (2 * th0 + 0.12) * k / (m + 2)
+        tb = -th0 - 0.06 + (2 * th0 + 0.12) * (k + 1) / (m + 2)
+        pts = [(um + rr * math.sin(th), cy + rr * math.cos(th)) for (rr, th) in
+               ((rh0, ta), (rh0, tb), (rh1, tb), (rh1, ta))]
+        for (w0, w1) in ((-t / 2 - 0.2, -t / 2 + 0.02), (t / 2 - 0.02, t / 2 + 0.2)):
+            corners = [wall.pt(u, v, w0) for (u, v) in pts] + [wall.pt(u, v, w1) for (u, v) in pts]
+            B.hexa(trim, [corners[0], corners[1], corners[5], corners[4], corners[3], corners[2], corners[6],
+                          corners[7]], B.PAL['ashlar_dark'], B.STONE)
     for s, ue in ((-1, a0), (1, a1)):
         v = 0.0
         k = 0
@@ -328,7 +342,7 @@ def hall_back(B, p):
             wide = 0.55 if k % 2 else 0.85
             ua, ub = (ue - wide, ue) if s < 0 else (ue, ue + wide)
             wall.box(p, ua, ub, v + 0.03, min(3.9, v + 0.62) - 0.03, -t / 2 - 0.08, t / 2 + 0.08,
-                     B.pick(B.PAL['stone'], k + 2), B.STONE)
+                     B.scale_color(B.pick(B.PAL['ashlar'], k + 2), 0.94 + 0.08 * (k % 2)), B.STONE)
             v += 0.62
             k += 1
     # the gallery doorway's frame, both faces
@@ -658,50 +672,159 @@ def ring_seg(B, p, cx, cz, r0, r1, a0, a1, y0, y1, color, mat):
                (pa[0], y1, pa[1]), (pb[0], y1, pb[1]), (pc[0], y1, pc[1]), (pd[0], y1, pd[1])], color, mat)
 
 
-def tower_wall(B, p):
+def _hash(*k):
+    """A stable value in [0, 1) from integers (the masonry's per-block variation)."""
+    v = math.sin(sum((i + 1) * 12.9898 * (j + 0.37) for i, j in enumerate(k)) + 7.13) * 43758.5453
+    return v - math.floor(v)
+
+
+def ring_face(p, cx, cz, r, a0, a1, y0, y1, color, mat, inward, tag=0):
+    """One flat quad on a ring (the chord from a0 to a1 at radius r), facing the centre when
+    `inward`, away from it otherwise."""
+    from shiplib import G as game
+
+    pa = (cx + math.sin(a0) * r, cz + math.cos(a0) * r)
+    pb = (cx + math.sin(a1) * r, cz + math.cos(a1) * r)
+    f = p.face([(pa[0], y0, pa[1]), (pb[0], y0, pb[1]), (pb[0], y1, pb[1]), (pa[0], y1, pa[1])], color,
+               mat, tag)
+    f.normal_update()
+    n = game(f.normal)
+    mx, mz = (pa[0] + pb[0]) / 2 - cx, (pa[1] + pb[1]) / 2 - cz
+    if (n.x * mx + n.z * mz > 0) == inward:
+        f.normal_flip()
+    return f
+
+
+def masonry(B, p, cx, cz, r, a_lo, a_hi, y_lo, y_hi, holes, palette, inward, seed, course=0.62,
+            block=1.15):
+    """Coursed ashlar on one face of the round wall: staggered blocks of varied length and tone,
+    each a quad standing a hand proud of the mortar core behind it, so the joints read dark
+    between them. `holes` are (a0, a1, y0, y1) runs the courses break round (the openings and
+    the slit windows' frames)."""
+    gap = 0.05
+    n = max(1, round((y_hi - y_lo) / course))
+    ch = (y_hi - y_lo) / n
+    for c in range(n):
+        y0, y1 = y_lo + c * ch, y_lo + (c + 1) * ch
+        # this course's free runs between the holes that cross it
+        cuts = sorted((h0, h1) for (h0, h1, v0, v1) in holes if v0 < y1 - 1e-6 and v1 > y0 + 1e-6)
+        runs, a = [], a_lo
+        for (h0, h1) in cuts:
+            if h0 > a:
+                runs.append((a, min(h0, a_hi)))
+            a = max(a, h1)
+        if a < a_hi:
+            runs.append((a, a_hi))
+        for (r0, r1) in runs:
+            k = 0
+            a = r0
+            # every other course starts on a half block, so the joints stagger
+            first = 0.5 if (c + seed) % 2 else 1.0
+            while r1 - a > 1e-6:
+                w = block * (0.7 + 0.6 * _hash(seed, c, k)) * (first if k == 0 else 1.0) / r
+                b = a + w
+                if r1 - b < 0.45 / r:
+                    b = r1
+                h = _hash(seed + 11, c, k)
+                color = B.scale_color(B.pick(palette, int(h * 97)), 0.9 + 0.18 * _hash(seed + 3, k, c))
+                ring_face(p, cx, cz, r, a + gap / 2 / r, b - gap / 2 / r, y0 + gap / 2, y1 - gap / 2,
+                          color, B.STONE, inward)
+                a = b
+                k += 1
+
+
+def slit_window(B, p, cx, cz, r, am, yb, inward):
+    """An arrow slit on one face of the round wall: a dressed frame of pale stone standing
+    proud (two jambs, a sill, a lintel), round a narrow pane: a cool glow of daylight inside
+    the tower, the amber of a lit room outside."""
+    sgn = -1 if inward else 1
+    hw, h = 0.16, 1.5
+    da = hw / r
+    jamb = 0.26 / r
+    hi = B.PAL['ashlar_hi']
+    # the pane, a hand behind the frame's face: inside, the cool daylight of the sky beyond
+    # (kept out of the warm bake), outside the amber of the lit stair
+    if inward:
+        f = ring_face(p, cx, cz, r - 0.005, am - da, am + da, yb, yb + h, B.PAL['slit_in'], B.STONE, True,
+                      tag=B.FLAT)
+        B.SKY_FACES.add(f)
+    else:
+        ring_face(p, cx, cz, r + 0.005, am - da, am + da, yb, yb + h, B.PAL['glass'], B.STONE, False,
+                  tag=B.FLAT)
+    out = r + sgn * 0.13
+    for (a0, a1, y0, y1) in ((am - da - jamb, am - da, yb - 0.02, yb + h + 0.02),
+                             (am + da, am + da + jamb, yb - 0.02, yb + h + 0.02),
+                             (am - da - jamb - 0.04 / r, am + da + jamb + 0.04 / r, yb - 0.28, yb),
+                             (am - da - jamb - 0.02 / r, am + da + jamb + 0.02 / r, yb + h, yb + h + 0.34)):
+        rr0, rr1 = sorted((out, r - sgn * 0.02))
+        ring_seg(B, p, cx, cz, rr0, rr1, a0, a1, y0, y1,
+                 B.scale_color(hi, 0.94 + 0.1 * _hash(int(am * 100), int(y0 * 10))), B.STONE)
+
+
+def tower_wall(B, p, trim):
+    """The round stair tower's wall: a mortar core faced both sides in coursed ashlar (warm
+    limestone inside, the base's blue-grey outside), a plastered, post-framed top band under
+    the cone, arrow slits up the climb in dressed frames, and the timber-framed passage onto
+    the wing's landing."""
     T, S, G = B.TOWER, B.STAIR, B.G
     cx, cz, ri, ro, top = T['x'], T['z'], T['rIn'], T['rOut'], T['wallTop']
     door = (math.radians(58), math.radians(88))
     stone_to = 8.4
     a_start, a_end = math.radians(48), math.radians(312)
+    # the slits: spaced round the climb, each a head over the steps beneath it
+    slits = []
+    for k in range(5):
+        u = S['climb'] * (k + 0.6) / 5.4
+        am = (S['bottom'] - u) % (2 * math.pi)
+        if a_start + 0.2 < am < a_end - 0.2 and not (door[0] - 0.2 < am < door[1] + 0.2):
+            slits.append((am, G * u / S['climb'] + 1.9))
+    # the core: mortar, full thickness, open at the passage
     n = 36
     for i in range(n):
         a0 = a_start + (a_end - a_start) * i / n
         a1 = a_start + (a_end - a_start) * (i + 1) / n
         am = (a0 + a1) / 2
         in_door = door[0] <= am <= door[1]
-        bands = [(0.0, 2.8), (2.8, 5.6), (5.6, stone_to)]
-        for j, (y0, y1) in enumerate(bands):
-            if in_door and y1 > G:
-                if y0 < G:
-                    ring_seg(B, p, cx, cz, ri, ro, a0, a1, y0, G, B.pick(B.PAL['stone'], i + j), B.STONE)
-                if y1 > G + 3.6:
-                    ring_seg(B, p, cx, cz, ri, ro, a0, a1, G + 3.6, y1, B.pick(B.PAL['stone'], i + j), B.STONE)
-                continue
-            ring_seg(B, p, cx, cz, ri, ro, a0, a1, y0, y1, B.pick(B.PAL['stone'], i * 2 + j), B.STONE)
-        # the plastered top band with its posts
+        for (y0, y1) in (((0.0, G), (G + 3.6, stone_to)) if in_door else ((0.0, stone_to),)):
+            ring_seg(B, p, cx, cz, ri + 0.035, ro - 0.06, a0, a1, y0, y1, B.PAL['mortar'], B.STONE)
+        # the plastered top band with its posts, its sill beam and wall plate
         ring_seg(B, p, cx, cz, ri + 0.04, ro - 0.04, a0, a1, stone_to, top - 0.3, B.pick(B.PAL['plaster'], i),
                  B.PLASTER)
         ring_seg(B, p, cx, cz, ri - 0.05, ro + 0.05, a0, a1, top - 0.3, top, B.PAL['beam_dark'], B.WOOD)
-        ring_seg(B, p, cx, cz, ri - 0.03, ro + 0.03, a0, a1, stone_to - 0.1, stone_to + 0.2, B.PAL['beam'], B.WOOD)
+        ring_seg(B, p, cx, cz, ri - 0.06, ro + 0.03, a0, a1, stone_to - 0.1, stone_to + 0.2, B.PAL['beam'],
+                 B.WOOD)
         if i % 2 == 0:
             for rr in (ro + 0.02, ri - 0.02):
                 x, z = cx + math.sin(a0) * rr, cz + math.cos(a0) * rr
                 B.post(p, x, z, stone_to + 0.2, top - 0.3, 0.28, B.PAL['beam'])
-        # slit windows up the stair, dark insets on both faces
-        u = (S['bottom'] - am) % (2 * math.pi)
-        if i % 5 == 2 and u < S['climb']:
-            ys = G * u / S['climb'] + 1.6
-            for rr, d in ((ro + 0.01, 0.06), (ri - 0.07, 0.06)):
-                ring_seg(B, p, cx, cz, rr, rr + d, am - 0.03, am + 0.03, ys, ys + 1.3, B.PAL['soot'], B.STONE)
-    # the door's frame at the landing
+    # the ashlar both sides, broken round the passage and the slits' frames
+    passage = [(door[0], door[1], G - 0.05, G + 4.0)]
+    for (r, palette, inward, seed, block) in ((ri, B.PAL['ashlar'], True, 3, 1.15),
+                                               (ro, B.PAL['stone'], False, 5, 1.3)):
+        frames = [(am - 0.46 / r, am + 0.46 / r, yb - 0.32, yb + 1.9) for (am, yb) in slits]
+        masonry(B, p, cx, cz, r, a_start, a_end, 0.0, stone_to - 0.1, passage + frames, palette, inward,
+                seed, block=block)
+    for (am, yb) in slits:
+        slit_window(B, p, cx, cz, ri, am, yb, True)
+        slit_window(B, p, cx, cz, ro, am, yb, False)
+    # the passage's timber frame on the landing
     for a in door:
         x, z = cx + math.sin(a) * (ri - 0.1), cz + math.cos(a) * (ri - 0.1)
         B.post(p, x, z, G, G + 3.9, 0.4, B.PAL['beam_dark'])
     for k in range(4):
         a0 = door[0] + (door[1] - door[0]) * k / 4
         a1 = door[0] + (door[1] - door[0]) * (k + 1) / 4
-        ring_seg(B, p, cx, cz, ri - 0.2, ri + 0.1, a0, a1, G + 3.6, G + 4.0, B.PAL['beam_dark'], B.WOOD)
+        ring_seg(B, p, cx, cz, ri - 0.2, ro + 0.1, a0, a1, G + 3.6, G + 4.0, B.PAL['beam_dark'], B.WOOD)
+    # the ring's two ends at the arch, dressed as quoins where they meet the hall's back wall
+    for a, s in ((a_start, 1), (a_end, -1)):
+        v, k = 0.0, 0
+        while v < stone_to - 0.2:
+            wide = 0.36 if k % 2 else 0.22
+            ring_seg(B, trim, cx, cz, ri - 0.04, ro + 0.04, a, a + s * wide / ri, v + 0.03,
+                     min(stone_to, v + 0.62) - 0.03,
+                     B.scale_color(B.PAL['ashlar_hi'], 0.95 + 0.08 * _hash(k, int(a * 10))), B.STONE)
+            v += 0.62
+            k += 1
 
 
 def tower_roof(B, p):

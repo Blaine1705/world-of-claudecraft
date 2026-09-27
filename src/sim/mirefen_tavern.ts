@@ -82,15 +82,20 @@ export function tavernHallWalls(): TavernBox[] {
 }
 
 /** The wing's wall boxes (its west wall broken by the passage from the tower's landing;
- *  its north side is the hall's back wall). */
+ *  its north side is the hall's back wall). The west wall's back run stops at the tower's
+ *  outside face, where the model's wall stops: past it the tower's ring is the wall, and the
+ *  run must not stand inside the tower on the stair's outer edge. */
 export function tavernWingWalls(): TavernBox[] {
   const w = TAVERN_WING;
   const t = w.wall;
   const door = TAVERN_TOWER_DOOR;
+  const tw = TAVERN_TOWER;
+  // (measured on the wall's inner face, so no slit opens between the run and the ring)
+  const towerFace = tw.z - Math.sqrt(tw.rOut * tw.rOut - (w.x0 + t - tw.x) ** 2);
   return [
     [w.x1 - t, w.x1, w.z0, w.z1],
     [w.x0, w.x1, w.z0, w.z0 + t],
-    [w.x0, w.x0 + t, w.z0, door.z0],
+    [w.x0, w.x0 + t, w.z0, towerFace],
     [w.x0, w.x0 + t, door.z1, w.z1],
   ];
 }

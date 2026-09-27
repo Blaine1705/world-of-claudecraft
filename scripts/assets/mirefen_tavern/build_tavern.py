@@ -26,9 +26,10 @@ for the camera when a player is indoors; the sim collides with what the low tier
     TavernFurnishings     tables, chairs, stools, benches, the settle, beds and chests
     TavernLights          the lanterns, the wheel chandelier, the bar candles, the hearth fire
     HallWallFront/Back/Left/Right, HallRoof, WingWallEast/Back/West, WingRoof, TowerWall,
-    TowerRoof, Gallery, RoomWalls
+    TowerRoof, Gallery, RoomWalls, TowerNewel
                           the shell: each fades or cuts away on its own (whatever hangs on a
-                          wall belongs to that wall's part, so it goes with it)
+                          wall belongs to that wall's part, so it goes with it); the gallery,
+                          the partitions and the stair tower's newel stand inside the rooms
     TavernTrim            medium tier and up: iron straps and bands, the bar's foot rail,
                           braces and stretchers
     TavernClutter         high tier and up: mugs, plates, bottles, dice, the bard's lute,
@@ -55,6 +56,9 @@ WOOD, METAL, STONE, PLASTER, GLOW = 0, 1, 2, 3, 4
 
 with open(os.path.join(HERE, 'layout.json'), encoding='utf8') as fh:
     LAYOUT = json.load(fh)
+
+# faces kept out of the warm bake (the sky in the stair tower's slits)
+SKY_FACES = set()
 
 HALL = LAYOUT['hall']
 WING = LAYOUT['wing']
@@ -98,6 +102,14 @@ PAL = dict(
     lamp=(1.0, 0.74, 0.4),
     parchment=(0.9, 0.82, 0.62),
     soot=(0.12, 0.1, 0.09),
+    # the stair tower's dressed limestone, its mortar, and the cool daylight in its slits
+    ashlar=[(0.68, 0.62, 0.53), (0.63, 0.58, 0.5), (0.72, 0.66, 0.56), (0.6, 0.55, 0.48),
+            (0.66, 0.61, 0.54), (0.7, 0.63, 0.52)],
+    ashlar_hi=(0.78, 0.72, 0.62),
+    ashlar_dark=(0.52, 0.47, 0.41),
+    mortar=(0.3, 0.27, 0.24),
+    slit_in=(0.66, 0.77, 0.88),
+    tread=[(0.6, 0.58, 0.55), (0.56, 0.55, 0.53), (0.63, 0.6, 0.56), (0.58, 0.56, 0.52)],
     bone=(0.9, 0.86, 0.74),
 )
 
@@ -462,7 +474,8 @@ import tavern_furnish as U  # noqa: E402
 import tavern_shell as S  # noqa: E402
 
 SHELL = ('HallWallFront', 'HallWallBack', 'HallWallLeft', 'HallWallRight', 'HallRoof', 'WingWallEast',
-         'WingWallBack', 'WingWallWest', 'WingRoof', 'TowerWall', 'TowerRoof', 'Gallery', 'RoomWalls')
+         'WingWallBack', 'WingWallWest', 'WingRoof', 'TowerWall', 'TowerRoof', 'Gallery', 'RoomWalls',
+         'TowerNewel')
 CRITICAL = ('TavernFrame', 'TavernFurnishings', 'TavernLights') + SHELL
 TRIM = ('TavernTrim',)
 OPTIONAL = ('TavernClutter',)
@@ -493,6 +506,11 @@ def _warm_sources():
            ((12.7, G + 1.6, -23.0), 0.4, 6.0)]
     for q in LAYOUT['lanterns']:
         src.append(((q['x'], q['y'], q['z']), 0.5, 8.0))
+    # the sconces up the stair tower: the climb's light
+    for q in LAYOUT['towerSconces']:
+        r = TOWER['rIn'] - 0.55
+        src.append(((TOWER['x'] + math.sin(q['angle']) * r, q['y'], TOWER['z'] + math.cos(q['angle']) * r),
+                    0.55, 8.5))
     return src
 
 
@@ -515,7 +533,7 @@ def bake_warm_light(parts):
         bm = piece.bm
         bm.normal_update()
         for f in bm.faces:
-            if f.material_index == GLOW:
+            if f.material_index == GLOW or f in SKY_FACES:
                 continue
             c = game(f.calc_center_median())
             if not _inside(c.x, c.y, c.z):

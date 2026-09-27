@@ -119,6 +119,16 @@ Everything else is a sibling module in one of these families:
   moves). All display-only, all gated by the reduced-motion switch; driven
   from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
+- `interior_camera.ts` over `interior_camera_core.ts`: the indoor camera clamp, the ONE
+  scoped exception to the pinned rule that scene geometry never shortens the chase boom
+  (`tests/graphics_overhaul_integration.test.ts`). A walk-in building registers its AIR
+  (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world) with
+  `registerCameraInterior` when it is built and drops it on teardown; while the player's eye
+  stands in it, the drawn camera stays in that air (pull-in at once, eased release, a lift or
+  swing over a cramped spot, a cut to the eyes in a corner nothing escapes), and bodies
+  outside lose their nameplates and chat bubbles unless seen through an opening. Outdoors it
+  touches nothing. Reference registrant: `mirefen_tavern_interior_core.ts`. The chase
+  camera's floor (ground, rift tier, maze hedges) is `chase_camera_floor_core.ts`.
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,

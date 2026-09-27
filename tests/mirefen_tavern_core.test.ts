@@ -19,12 +19,13 @@ import {
   tavernToWorld,
 } from '../src/sim/content/mirefen_tavern';
 
-// The Mirefen tavern camera cutaway and tiers (src/render/mirefen_tavern_core.ts). The chase
-// camera never changes its distance (tests/graphics_overhaul_integration.test.ts), so indoors
-// every shell part between the camera and the player is cut away and outdoors each part
-// that hides the player ghosts. Pins which parts go for the orbits a player really takes, in
-// the hall, on the stair, on the gallery and in a room, that a camera inside the room cuts
-// nothing, that the gallery never goes from under a player standing on it, and the tiers.
+// The Mirefen tavern camera cutaway and tiers (src/render/mirefen_tavern_core.ts). Indoors the
+// indoor camera clamp keeps the camera in the tavern's air (interior_camera.ts, the authored
+// interior exception to tests/graphics_overhaul_integration.test.ts), so the outer shell never
+// opens and only the parts inside the air (the gallery, the partitions) cut away; outdoors each
+// part that hides the player ghosts. Pins which parts go for the orbits a player really takes,
+// in the hall, on the stair, on the gallery and in a room, that the gallery never goes from
+// under a player standing on it, and the tiers.
 
 type P = { x: number; y: number; z: number };
 /** The eye over a player standing at local (lx, lz) with feet at local height ly (world). */
@@ -59,26 +60,35 @@ describe('tavern cutaway: indoors', () => {
     expect(inside(-20, 0)).toBe(false); // outside the left wall
   });
 
-  it('cuts only the wall the camera stands behind, and the roof over a high sight line', () => {
-    // by the fire, the camera out past the front door, low: the front wall only
+  it('never opens the outer shell indoors, wherever the camera would stand', () => {
+    // by the fire, a camera out past the front door, low: nothing (the clamp keeps it inside)
     let d = decide(eye(0, 8), cam(0, 5, 20));
     expect(d.inside).toBe(true);
     expect(d.floor).toBe(0);
-    expect(d.cut).toEqual(['HallWallFront']);
-    // the camera out past the left wall and high over the eaves: that wall and the roof
+    expect(d.cut).toEqual([]);
+    // a camera out past the left wall and high over the eaves: the wall and roof stay
     d = decide(eye(-8, 0), cam(-22, 16, 0));
-    expect(d.cut).toContain('HallWallLeft');
-    expect(d.cut).toContain('HallRoof');
-    expect(d.cut).not.toContain('HallWallRight');
+    expect(d.cut).toEqual([]);
+    // the owner's spot at the stair's foot, a camera high back over the hall: the back wall
+    // (whose far end fronts the outside) stays whole
+    d = decide(eye(-3, -14), cam(-3, 9, -2));
+    expect(d.inside).toBe(true);
+    expect(d.cut).toEqual([]);
     // a camera zoomed in inside the room, under the tie beams: nothing is cut
     d = decide(eye(0, 6), cam(0, 5, 10));
     expect(d.cut).toEqual([]);
   });
 
-  it('cuts the tower wall for a player on the stair with the camera outside the ring', () => {
+  it('takes the doorway threshold as outdoors (the camera clamps once a body is in the room)', () => {
+    expect(decide(eye(0, 13.6), cam(0, 5, 20)).inside).toBe(false);
+    expect(decide(eye(0, 12.8), cam(0, 5, 20)).inside).toBe(true);
+  });
+
+  it('keeps the tower wall whole for a player on the stair', () => {
     const T = TAVERN_TOWER;
     const d = decide(eye(T.x - 4, T.z - 1, 2.5), cam(T.x - 14, 7, T.z - 3));
-    expect(d.cut).toContain('TowerWall');
+    expect(d.inside).toBe(true);
+    expect(d.cut).not.toContain('TowerWall');
   });
 
   it('never takes the gallery from under a player standing on it', () => {
@@ -88,7 +98,7 @@ describe('tavern cutaway: indoors', () => {
     // at the bar under the gallery, the camera up behind the barrel wall: the gallery goes
     d = decide(eye(9, -6, 0.5), cam(9, 9, -16));
     expect(d.cut).toContain('Gallery');
-    expect(d.cut).toContain('HallWallBack');
+    expect(d.cut).not.toContain('HallWallBack');
   });
 
   it('cuts the partitions for a player in a room with the camera on the landing', () => {

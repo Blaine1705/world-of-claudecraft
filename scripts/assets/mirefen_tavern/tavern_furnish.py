@@ -246,13 +246,23 @@ def lights(B, p):
         y = pillar['base'] + 3.1
         p.box((x, y, z), (0.2, 0.3, 0.2), iron, B.METAL)
         candle(B, p, x + math.sin(a) * 0.15, y + 0.15, z + math.cos(a) * 0.15, h=0.3)
+    # the sconces up the stair tower's wall (lit: render/mirefen_tavern.ts lights each at its
+    # lantern): a backplate on the stone, a braced arm, the lantern hung from its tip
     T = B.TOWER
-    for a in (math.radians(70), math.radians(-100)):
-        x = T['x'] + math.sin(a) * (T['newel'] + 0.15)
-        z = T['z'] + math.cos(a) * (T['newel'] + 0.15)
-        y = (G if a > 0 else 3.4) + 2.2
-        p.box((x, y, z), (0.2, 0.3, 0.2), iron, B.METAL)
-        lantern(B, p, x + math.sin(a) * 0.3, y + 0.35, z + math.cos(a) * 0.3, 0.3)
+    for q in B.LAYOUT['towerSconces']:
+        a, y = q['angle'], q['y']
+        sa, ca = math.sin(a), math.cos(a)
+
+        def at(r, yy):
+            return (T['x'] + sa * r, yy, T['z'] + ca * r)
+
+        wall = T['rIn'] - 0.04
+        tip = T['rIn'] - 0.55
+        p.box(at(wall - 0.03, y + 0.55), (0.3, 0.62, 0.3), iron, B.METAL, yaw=a)
+        B.beam(p, at(wall - 0.05, y + 0.78), at(tip, y + 0.78), 0.07, 0.07, iron, B.METAL)
+        B.beam(p, at(wall - 0.05, y + 0.32), at(tip + 0.2, y + 0.72), 0.05, 0.05, iron, B.METAL)
+        p.box(at(tip, y + 0.62), (0.05, 0.3, 0.05), iron, B.METAL)
+        lantern(B, p, *at(tip, y), 0.38)
     # the hearth's bed of embers under the logs (the live flames over them are the game's
     # campfire flame, render/mirefen_tavern.ts MIREFEN_TAVERN_FLAMES)
     pit = B.LAYOUT['pit']

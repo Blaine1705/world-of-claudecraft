@@ -11,15 +11,20 @@
 // dice, lute, firewood and rugs below high. The tier is the STATIC effects tier
 // (GFX.effectsTier), never the frame-rate governor.
 //
-// The camera cutaway follows the Harbormaster's House (wyrmwatch_harbor_house_core.ts): the
-// chase camera never changes its distance for scene geometry (the pinned rule of
-// tests/graphics_overhaul_integration.test.ts), so obstruction is opacity only:
-//  - player INSIDE (the eye over the floor of the hall, the tower or the wing): every shell
-//    part the eye-to-camera sight line passes through is cut away outright (alpha 0), so the
-//    room reads like a dollhouse from any orbit and a camera inside cuts nothing. The gallery
-//    is only cut for a player below it, never under the feet of a player standing on it;
+// The camera and the shell:
+//  - player INSIDE (the eye in the tavern's air, mirefen_tavern_interior_core.ts): the
+//    indoor camera clamp (interior_camera.ts, the one authored-interior exception to the
+//    pinned no-pull-in rule of tests/graphics_overhaul_integration.test.ts) keeps the camera
+//    in that air, so the outer shell (the walls, the roofs, the tower) is never between the
+//    lens and the player and never opens: from inside the tavern the outside never shows.
+//    Only the parts that stand INSIDE the air cut away when the sight line crosses them (the
+//    gallery's rail and barrel wall, the upstairs partitions), and the gallery never goes
+//    from under the feet of a player standing on it;
 //  - player OUTSIDE: the sightline ghost. Each part the sight line passes through ghosts to
-//    the standard 20% (occluder_fade_core), so a player behind the tavern is never hidden.
+//    the standard 20% (occluder_fade_core), so a player behind the tavern is never hidden;
+//    outdoors the chase camera never pulls in.
+// The stair tower's newel is a shell part inside the air too: the camera never fights it,
+// the newel cuts away whenever it stands between the lens and the player (or round the lens).
 // The frame, the floors, the furniture and the lights never fade: only the shell does.
 
 import {
@@ -37,6 +42,7 @@ import {
   TAVERN_WING,
 } from '../sim/content/mirefen_tavern';
 import type { GfxTier } from './gfx';
+import { eyeInTavernAir } from './mirefen_tavern_interior_core';
 import { OCCLUDER_FADE_ALPHA } from './occluder_fade_core';
 
 /** The shell parts of the model, in the order the painter keeps them. */
@@ -54,6 +60,7 @@ export const TAVERN_SHELL_PARTS = [
   'TowerRoof',
   'Gallery',
   'RoomWalls',
+  'TowerNewel',
 ] as const;
 export type TavernShellPart = (typeof TAVERN_SHELL_PARTS)[number];
 
@@ -258,6 +265,15 @@ export function towerRoofUnderside(x: number, z: number): number {
 
 const ARCH_HALF = (48 * Math.PI) / 180;
 
+/** The newel's reach (its shaft, its bands and the base and capital round it). */
+const NEWEL_REACH = T.newel + 0.35;
+
+/** Whether a local point stands in the tower's newel (its base to its capital). */
+export function inNewel(x: number, y: number, z: number): boolean {
+  if (y < -0.3 || y > T.wallTop) return false;
+  return Math.hypot(x - T.x, z - T.z) < NEWEL_REACH;
+}
+
 /** Whether a local point stands in the tower's wall ring (open under the arch to the hall). */
 export function inTowerWall(x: number, y: number, z: number): boolean {
   if (y < 0 || y > T.wallTop) return false;
@@ -290,10 +306,18 @@ const WING_ROOF = TAVERN_SHELL_PARTS.indexOf('WingRoof');
 const TOWER_WALL = TAVERN_SHELL_PARTS.indexOf('TowerWall');
 const TOWER_ROOF = TAVERN_SHELL_PARTS.indexOf('TowerRoof');
 const GALLERY = TAVERN_SHELL_PARTS.indexOf('Gallery');
+const ROOM_WALLS = TAVERN_SHELL_PARTS.indexOf('RoomWalls');
+const TOWER_NEWEL = TAVERN_SHELL_PARTS.indexOf('TowerNewel');
+/** The shell parts that stand inside the air (they may still cut away for a player
+ *  indoors; the newel is shaped, sampled below). */
+const INNER_PARTS = [GALLERY, ROOM_WALLS] as const;
 
 /**
  * Decide the shell for one frame, writing into `out`. `eye` is the camera's look point over
- * the player, `cam` the camera, both in world coordinates.
+ * the player, `cam` the camera, both in world coordinates. `indoors`, when given, is the
+ * indoor camera clamp's own verdict this frame (interior_camera.ts, from the avatar's eye),
+ * so the shell and the clamp never disagree while the lagged look point crosses the doorway;
+ * without it the look point decides.
  */
 export function tavernShellOcclusion(
   eyeX: number,
@@ -303,6 +327,7 @@ export function tavernShellOcclusion(
   camY: number,
   camZ: number,
   out: TavernShellState,
+  indoors?: boolean,
 ): TavernShellState {
   const ax = TAVERN_ORIGIN.z - eyeZ;
   const ay = eyeY - TAVERN_FLOOR_Y;
@@ -310,12 +335,33 @@ export function tavernShellOcclusion(
   const bx = TAVERN_ORIGIN.z - camZ;
   const by = camY - TAVERN_FLOOR_Y;
   const bz = camX - TAVERN_ORIGIN.x;
-  const inside = eyeInTavern(ax, ay, az);
+  const inside = indoors ?? eyeInTavernAir(ax, ay, az);
   out.inside = inside;
   out.floor = inside ? 0 : OCCLUDER_FADE_ALPHA;
   // a sight line nowhere near the building (the whole road past it) decides in one test
   if (!inside && !segmentHitsVol(ax, ay, az, bx, by, bz, TAVERN_BOUNDS)) {
     for (let i = 0; i < out.occluded.length; i++) out.occluded[i] = false;
+    return out;
+  }
+  if (inside) {
+    // the camera stands in the air with the player: the outer shell stays whole, and only
+    // the parts inside the air cut away for the sight line
+    for (let i = 0; i < out.occluded.length; i++) out.occluded[i] = false;
+    for (const part of INNER_PARTS) {
+      const vols = BOX_VOLUMES[TAVERN_SHELL_PARTS[part]] ?? [];
+      for (let k = 0; k < vols.length && !out.occluded[part]; k++) {
+        out.occluded[part] = segmentHitsVol(ax, ay, az, bx, by, bz, vols[k]);
+      }
+    }
+    if (ay - TAVERN_EYE_OVER_FEET > TAVERN_UPPER - 0.5) out.occluded[GALLERY] = false;
+    // the stair tower's newel: the camera slides round it rather than fight it, so a newel
+    // between the lens and a player on the stair cuts away (and one round the lens, too)
+    let newel = inNewel(bx, by, bz);
+    for (let s = 1; s < SAMPLES && !newel; s++) {
+      const t = s / SAMPLES;
+      newel = inNewel(ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t);
+    }
+    out.occluded[TOWER_NEWEL] = newel;
     return out;
   }
   for (let i = 0; i < TAVERN_SHELL_PARTS.length; i++) {

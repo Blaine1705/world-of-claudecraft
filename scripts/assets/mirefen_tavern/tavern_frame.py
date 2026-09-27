@@ -3,7 +3,8 @@ the camera never cuts away. The stone base under every wall, every floor the sim
 hall's boards, the hearth pit and its step, the bar platform, the porch and its steps, the
 tower's ground landing, the stone spiral and the landing at its head, the wing's upper floor),
 the round hearth and its copper hood and flue, the posts, plates, tie beams and nook beams,
-and the bar's stone pillar and counters.
+and the bar's stone pillar and counters. The stair tower's newel is built here too, into its
+own part (TowerNewel), which the camera cuts away rather than fight.
 
 Every walking surface is laid at the height the sim's floor surface gives it
 (src/sim/mirefen_tavern_floor.ts): the spiral's treads each stand at the ramp's height at
@@ -22,6 +23,7 @@ def build(B, parts):
     bar_platform(B, p)
     porch(B, p)
     tower_floor_and_stair(B, p, trim)
+    newel(B, parts['TowerNewel'])
     upper_floor(B, p)
     posts_and_beams(B, p, trim)
     bar(B, p, trim)
@@ -341,65 +343,173 @@ def porch(B, p):
 # ---------------------------------------------------------------------------
 # The tower: its ground landing, the stone spiral, the landing at its head, the newel
 # ---------------------------------------------------------------------------
+# The flight's steps: 24 risers of a quarter yard up the three-quarter turn.
+STAIR_STEPS = 24
+
+
 def tower_floor_and_stair(B, p, trim):
+    """The tower's ground landing, the stone spiral and the landing at its head. Each step is
+    one dressed block: a solid body from the ground up (its leading face the riser, a darker
+    stone), a pale tread slab on top whose nosing overhangs the riser, all at the ramp's
+    height at the step's middle. A sloped string course runs up the wall behind the treads,
+    and a wooden handrail on iron brackets follows it from the foot to the landing's end."""
     T, S = B.TOWER, B.STAIR
     cx, cz = T['x'], T['z']
     G = B.G
     rn, ri = T['newel'], T['rIn']
-    # the ground landing (the sector open to the hall), flagged
+    # the ground landing (the sector open to the hall), flagged in two rings
     a_hi = S['bottom'] - S['landing'] + 2 * math.pi  # the landing's end, +50 degrees
     a_lo = S['bottom']                                # the stair's foot, -48 degrees
+    mid_r = (rn + ri) / 2
     n = 10
     for i in range(n):
         a0 = a_lo + (a_hi - a_lo) * i / n
         a1 = a_lo + (a_hi - a_lo) * (i + 1) / n
-        for (r0, r1) in ((rn, 3.9), (3.9, ri + 0.4)):
+        for j, (r0, r1) in enumerate(((rn, mid_r), (mid_r, ri + 0.4))):
             sector(B, p, cx, cz, r0 + 0.02, r1 - 0.02, a0 + 0.01, a1 - 0.01, -0.25, 0.0,
-                   B.pick(B.PAL['flag'], i + int(r0)), B.STONE, subdiv=2)
-    # the flight: 18 treads, each a solid masonry wedge from the ground up to the ramp's height
-    # at its middle, a darker nosing on its leading edge
-    treads = 18
-    du = S['climb'] / treads
-    for k in range(treads):
+                   B.pick(B.PAL['flag'], i + j * 3), B.STONE, subdiv=2)
+    # the flight
+    steps = STAIR_STEPS
+    du = S['climb'] / steps
+    nose = 0.07
+    for k in range(steps):
         u0, u1 = k * du, (k + 1) * du
         a0, a1 = S['bottom'] - u0, S['bottom'] - u1
-        y = G * (k + 0.5) / treads
-        sector(B, p, cx, cz, rn - 0.05, ri + 0.1, a1, a0, 0.0, y - 0.08, B.pick(B.PAL['stone'], k), B.STONE,
-               subdiv=2)
-        sector(B, p, cx, cz, rn - 0.05, ri + 0.1, a1, a0, y - 0.08, y, B.pick(B.PAL['flag'], k), B.STONE,
-               subdiv=2)
-        sector(B, p, cx, cz, rn, ri + 0.05, a0 - math.radians(1.2), a0 + 0.001, y - 0.1, y + 0.02,
-               B.PAL['stone_dark'], B.STONE, subdiv=2)
+        y = G * (k + 0.5) / steps
+        tone = B.scale_color(B.pick(B.PAL['ashlar'], k * 3 + 1), 0.72)
+        # the body, the riser its leading face
+        sector(B, p, cx, cz, rn - 0.05, ri + 0.1, a1, a0, 0.0, y - 0.11, tone, B.STONE)
+        # the tread, a worn grey flag, and its nosing, a pale dressed lip a hand over the riser
+        sector(B, p, cx, cz, rn - 0.02, ri + 0.05, a1, a0 - 0.16 / mid_r, y - 0.11, y,
+               B.scale_color(B.pick(B.PAL['tread'], k), 0.96 + 0.08 * (k % 2)), B.STONE)
+        sector(B, p, cx, cz, rn - 0.02, ri + 0.05, a0 - 0.16 / mid_r, a0 + nose / mid_r, y - 0.13, y + 0.005,
+               B.PAL['ashlar_hi'], B.STONE)
     # the landing at the head: level at the upper floor over a solid mass, its drop face toward
     # the ground landing dressed as a wall
     b0 = S['bottom'] - S['climb']
     b1 = S['bottom'] - S['landing']
-    sector(B, p, cx, cz, rn - 0.05, ri + 0.4, b1, b0, 0.0, G - 0.12, B.pick(B.PAL['stone'], 3), B.STONE,
-           subdiv=4)
+    sector(B, p, cx, cz, rn - 0.05, ri + 0.4, b1, b0, 0.0, G - 0.12, B.PAL['mortar'], B.STONE, subdiv=4)
     for i in range(3):
         c0 = b1 + (b0 - b1) * i / 3
         c1 = b1 + (b0 - b1) * (i + 1) / 3
-        sector(B, p, cx, cz, rn, ri + 0.4, c0 + 0.01, c1 - 0.01, G - 0.12, G, B.pick(B.PAL['flag'], i),
-               B.STONE, subdiv=2)
+        sector(B, p, cx, cz, rn, ri + 0.4, c0 + 0.01, c1 - 0.01, G - 0.12, G,
+               B.scale_color(B.pick(B.PAL['ashlar'], i + 2), 1.06), B.STONE, subdiv=2)
+    # the drop face's coping, a dressed lip over the ground landing, and the face itself coursed
+    # in ashlar like the tower's wall
+    sector(B, p, cx, cz, rn, ri + 0.05, b1 - 0.02, b1 + 0.035, G - 0.2, G + 0.05, B.PAL['ashlar_hi'],
+           B.STONE, subdiv=2)
+    radial_masonry(B, p, cx, cz, b1, rn - 0.05, ri, 0.0, G - 0.2, seed=9)
     # the passage through to the wing, flagged at the upper floor
     d = B.LAYOUT['towerDoor']
     B.abox(p, d['x0'] - 0.4, d['x1'] + 0.1, G - 0.25, G, d['z0'], d['z1'], B.pick(B.PAL['flag'], 2), B.STONE)
-    # the newel: a stone column banded every storey, a capital under the roof
-    top = T['wallTop']
-    p.cylinder((cx, 0.0, cz), (cx, top, cz), rn, B.pick(B.PAL['stone'], 2), B.STONE, sides=18)
-    for yb in (0.0, 3.0, G + 0.02, 9.0):
-        p.cylinder((cx, yb, cz), (cx, yb + 0.25, cz), rn + 0.08, B.PAL['stone_dark'], B.STONE, sides=18)
-    p.cylinder((cx, top - 0.4, cz), (cx, top, cz), rn + 0.3, B.PAL['stone_dark'], B.STONE, sides=18)
-    # a rope handrail on iron brackets along the outer wall (trim)
-    pts = []
-    for k in range(treads + 4):
-        u = min(S['landing'], k * du)
+
+    def ramp(u):
+        return G * min(1.0, max(0.0, u / S['climb']))
+
+    # the string course up the wall behind the treads: a sloped band of dressed stone
+    rows_lo, rows_hi = [], []
+    m = 44
+    for j in range(m + 1):
+        u = S['landing'] * j / m
         a = S['bottom'] - u
-        y = min(G, G * u / S['climb']) + 1.25
-        pts.append((cx + math.sin(a) * (ri - 0.12), y, cz + math.cos(a) * (ri - 0.12)))
-    trim.sweep(pts, 0.06, 0.06, B.PAL['beam'], sides=6, mat=B.WOOD)
-    for q in pts[::3]:
-        trim.box((q[0], q[1] - 0.12, q[2]), (0.08, 0.3, 0.08), B.PAL['iron'], B.METAL)
+        rr = ri - 0.07
+        pt = (cx + math.sin(a) * rr, cz + math.cos(a) * rr)
+        base = ramp(u)
+        rows_lo.append((pt[0], base - 0.3, pt[1]))
+        rows_hi.append((pt[0], base + 0.32, pt[1]))
+    p.surface([rows_lo, rows_hi], lambda i, j: B.PAL['ashlar_dark'], B.STONE,
+              outward=lambda c: (cx - c.x, 0.0, cz - c.z), soft=False)
+    # the handrail: turned oak on iron brackets, a hand off the wall, following the climb from
+    # a scroll at the foot to the landing's end
+    rail_r = ri - 0.3
+    pts = []
+    m = 48
+    for j in range(m + 1):
+        u = -0.12 + (S['landing'] + 0.1) * j / m
+        a = S['bottom'] - u
+        pts.append((cx + math.sin(a) * rail_r, ramp(u) + 1.1, cz + math.cos(a) * rail_r))
+    p.sweep(pts, 0.075, 0.075, B.PAL['beam'], sides=6, mat=B.WOOD)
+    foot = pts[0]
+    p.cylinder((foot[0], foot[1] - 0.12, foot[2]), (foot[0], foot[1] + 0.12, foot[2]), 0.14, B.PAL['beam_dark'],
+               B.WOOD, sides=8)
+    for j in range(0, m + 1, 5):
+        u = -0.12 + (S['landing'] + 0.1) * j / m
+        a = S['bottom'] - u
+        y = ramp(u) + 1.1
+        w0 = (cx + math.sin(a) * (ri - 0.02), cz + math.cos(a) * (ri - 0.02))
+        w1 = (cx + math.sin(a) * rail_r, cz + math.cos(a) * rail_r)
+        B.beam(trim, (w0[0], y - 0.16, w0[1]), (w1[0], y - 0.05, w1[1]), 0.06, 0.06, B.PAL['iron'], B.METAL)
+        trim.box((w0[0], y - 0.16, w0[1]), (0.16, 0.26, 0.16), B.PAL['iron'], B.METAL)
+
+
+def radial_masonry(B, p, cx, cz, a, r0, r1, y0, y1, seed, course=0.62, block=1.1):
+    """Coursed ashlar on a radial face of the tower (a plane through its axis at angle `a`,
+    facing the lower angles): staggered blocks a hand proud of the face, the joints between
+    them reading dark."""
+    from shiplib import G as game
+
+    nx, nz = -math.cos(a), math.sin(a)
+    gap = 0.05
+    n = max(1, round((y1 - y0) / course))
+    ch = (y1 - y0) / n
+
+    def at(r, y):
+        return (cx + math.sin(a) * r + nx * 0.02, y, cz + math.cos(a) * r + nz * 0.02)
+
+    for c in range(n):
+        ya, yb = y0 + c * ch + gap / 2, y0 + (c + 1) * ch - gap / 2
+        r, k = r0, 0
+        first = 0.5 if (c + seed) % 2 else 1.0
+        while r1 - r > 1e-6:
+            h = math.sin((seed + 1) * 12.9898 + c * 78.233 + k * 37.719) * 43758.5453
+            h -= math.floor(h)
+            w = block * (0.7 + 0.6 * h) * (first if k == 0 else 1.0)
+            rb = r1 if r1 - (r + w) < 0.4 else r + w
+            color = B.scale_color(B.pick(B.PAL['ashlar'], int(h * 97)), 0.9 + 0.16 * h)
+            f = p.face([at(r + gap / 2, ya), at(rb - gap / 2, ya), at(rb - gap / 2, yb), at(r + gap / 2, yb)],
+                       color, B.STONE)
+            f.normal_update()
+            nn = game(f.normal)
+            if nn.x * nx + nn.z * nz < 0:
+                f.normal_flip()
+            r = rb
+            k += 1
+
+
+def newel(B, p):
+    """The newel the stair winds round (its own part: the camera cuts it away rather than
+    fight it): a moulded base, a shaft of stone drums over a mortar core with the joints
+    between them showing, a carved band at each storey and a flared capital under the
+    tower's cone."""
+    T, G = B.TOWER, B.G
+    cx, cz, rn, top = T['x'], T['z'], T['newel'], T['wallTop']
+    sides = 16
+    # the base: a square-ish plinth and a torus-like roll
+    p.cylinder((cx, -0.25, cz), (cx, 0.32, cz), rn + 0.3, B.PAL['ashlar_dark'], B.STONE, sides=8,
+               phase=math.pi / 8)
+    p.cylinder((cx, 0.32, cz), (cx, 0.6, cz), rn + 0.2, B.PAL['ashlar_hi'], B.STONE, sides=sides,
+               r1=rn + 0.04)
+    # the core under the drums, and the drums
+    p.cylinder((cx, 0.6, cz), (cx, top - 1.0, cz), rn - 0.04, B.PAL['mortar'], B.STONE, sides=sides,
+               caps=False)
+    y, k = 0.6, 0
+    while y < top - 1.05:
+        h = min(1.02, top - 1.0 - y)
+        p.cylinder((cx, y + 0.025, cz), (cx, y + h - 0.025, cz), rn,
+                   B.scale_color(B.pick(B.PAL['ashlar'], k * 2 + 1), 0.96 + 0.08 * (k % 2)), B.STONE,
+                   sides=sides, caps=False)
+        y += h
+        k += 1
+    # the carved bands, one at each storey: a roll between two fillets
+    for yb in (3.0, G + 0.3):
+        p.cylinder((cx, yb - 0.1, cz), (cx, yb + 0.1, cz), rn + 0.12, B.PAL['ashlar_hi'], B.STONE, sides=sides)
+        p.cylinder((cx, yb - 0.2, cz), (cx, yb - 0.1, cz), rn + 0.06, B.PAL['ashlar_dark'], B.STONE, sides=sides)
+        p.cylinder((cx, yb + 0.1, cz), (cx, yb + 0.2, cz), rn + 0.06, B.PAL['ashlar_dark'], B.STONE, sides=sides)
+    # the capital: a flared bell and its abacus under the cone
+    p.cylinder((cx, top - 1.0, cz), (cx, top - 0.35, cz), rn, B.PAL['ashlar_hi'], B.STONE, sides=sides,
+               r1=rn + 0.3)
+    p.cylinder((cx, top - 0.35, cz), (cx, top, cz), rn + 0.38, B.PAL['ashlar_dark'], B.STONE, sides=8,
+               phase=math.pi / 8)
 
 
 # ---------------------------------------------------------------------------
