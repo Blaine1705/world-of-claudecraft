@@ -54,6 +54,13 @@ describe('lanceGuidanceFor', () => {
     expect(g?.targetDistance).toBeCloseTo(5, 1);
   });
 
+  it('never names a sleeping boss, which the thrust would never find either', () => {
+    boss.asleep = true;
+    expect(guide()?.targetPresent ?? false).toBe(false);
+    boss.asleep = false;
+    expect(guide()?.targetPresent).toBe(true);
+  });
+
   it('agrees with the thrust about what is in range', () => {
     // The decisive pairing. Just inside the reach the prompt says "brace" and the thrust
     // finds a target; just outside, both say no. Anything else and the prompt is lying.

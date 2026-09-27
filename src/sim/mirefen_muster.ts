@@ -22,8 +22,8 @@
 //     earshot cheers (the overhead emote channel players already use).
 //   - WRECKAGE: only his warpath ARRIVAL slam kills them (mob/boss_collateral.ts, lethal
 //     to a soldier by rule; his other slams pass over them, so every picket still has
-//     its squad standing when he marches on it). The dead stay down for the WHOLE fight, and never rise while he is engaged.
-//     They stand back up a few seconds after he FALLS, or once a reset pull has stayed
+//     its squad standing when he marches on it). The dead stay down for the WHOLE
+//     fight, and never rise while he is engaged. They stand back up a few seconds after he FALLS, or once a reset pull has stayed
 //     quiet for MUSTER_STAND_DOWN_SECONDS (a brief evade or leash blip mid-fight is not
 //     the end of the pull: re-engaging calls the stand-down off), or at the next dawn if
 //     he is not fighting, so the fen is never left without its muster for long.

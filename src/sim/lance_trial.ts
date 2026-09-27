@@ -16,7 +16,6 @@
 // NOTHING from the shared rng stream and replays identically on every host.
 
 import type { LanceTrialView } from '../world_api/lance_trial';
-import { MOBS } from './data';
 import {
   freshLanceBalance,
   isShardpikeItem,
@@ -31,6 +30,7 @@ import {
   shockLanceBalance,
   stepLanceBalance,
 } from './lance_balance_core';
+import { nearestEyeWardTarget } from './lance_guidance';
 import { throwLance } from './lance_throw';
 import { blindEyeWard } from './mob/eye_ward';
 import { onQuestEventForQuests } from './quests/quest_credit';
@@ -151,7 +151,8 @@ export function lanceThrust(ctx: SimContext, pid: number): void {
     endSession(meta, p);
     return;
   }
-  const target = nearestEyeWardMob(ctx, p);
+  // The same lookup the HUD prompt reads (lance_guidance.ts), at the thrust's own reach.
+  const target = nearestEyeWardTarget(ctx, p, LANCE_THRUST_RANGE)?.mob ?? null;
   if (!target) {
     ctx.error(pid, 'Nothing worth the point in reach.');
     return;
@@ -286,22 +287,6 @@ export function shockLanceBraces(ctx: SimContext, x: number, z: number, radius: 
 function endSession(meta: { lance?: LanceSession }, p: Entity | undefined | null): void {
   meta.lance = undefined;
   if (p) p.bracing = false;
-}
-
-function nearestEyeWardMob(ctx: SimContext, p: Entity): Entity | null {
-  let best: Entity | null = null;
-  let bestD = LANCE_THRUST_RANGE;
-  for (const e of ctx.entities.values()) {
-    // A sleeping Foreman is a landmark, not a target: a second, awake copy (a /dev spawn
-    // beside the scheduled one in his bed) must never lose the thrust to the sleeper.
-    if (e.kind !== 'mob' || e.dead || e.asleep || !MOBS[e.templateId]?.eyeWard) continue;
-    const d = dist2d(e.pos, p.pos);
-    if (d < bestD) {
-      best = e;
-      bestD = d;
-    }
-  }
-  return best;
 }
 
 /** Stable quest-event id for a landed blind (objective type 'event' matches on it). */

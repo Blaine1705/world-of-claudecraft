@@ -44,7 +44,10 @@ export function nearestEyeWardTarget(
   let best: Entity | null = null;
   let bestD = range;
   for (const e of ctx.entities.values()) {
-    if (e.kind !== 'mob' || e.dead || !MOBS[e.templateId]?.eyeWard) continue;
+    // A sleeping Foreman is a landmark, not a target: the thrust never lands on one, so the
+    // prompt must not promise it, and a second, awake copy (a /dev spawn beside the one in
+    // his bed) must never lose the pike to the sleeper.
+    if (e.kind !== 'mob' || e.dead || e.asleep || !MOBS[e.templateId]?.eyeWard) continue;
     const d = dist2d(e.pos, p.pos);
     if (d < bestD) {
       best = e;

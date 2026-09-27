@@ -63,8 +63,11 @@ export function nextWarpathPhase(
   timer: number,
   distToDestination: number,
   def: WarpathDef,
+  /** FOCUS has been dragged to the edge of his tether (focusDraggedToLeash below): he
+   *  marches on to his next stop rather than evading out of the fight. */
+  draggedToLeash = false,
 ): WarpathPhase {
-  if (phase === 'focus') return timer <= 0 ? 'travel' : 'focus';
+  if (phase === 'focus') return timer <= 0 || draggedToLeash ? 'travel' : 'focus';
   if (phase === 'travel') {
     if (distToDestination <= def.arriveRadius) return 'wreck';
     // The patience cap. Without it a landmark he cannot quite reach (a body wedged on
@@ -185,14 +188,16 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
 
   const dest = destinationPos(def, mob.warpathDestination ?? 0);
   const phase = (mob.warpathPhase ?? 'focus') as WarpathPhase;
-  const next = nextWarpathPhase(phase, mob.warpathTimer ?? 0, dist2d(mob.pos, dest), def);
+  const next = nextWarpathPhase(
+    phase,
+    mob.warpathTimer ?? 0,
+    dist2d(mob.pos, dest),
+    def,
+    phase === 'focus' && focusDraggedToLeash(mob),
+  );
   if (next !== phase) {
     beginPhase(ctx, mob, def, next);
     return next === 'focus' ? 'fallthrough' : 'handled';
-  }
-  if (phase === 'focus' && focusDraggedToLeash(mob)) {
-    beginPhase(ctx, mob, def, 'travel');
-    return 'handled';
   }
 
   if (phase === 'wreck') return tickWreck(ctx, mob, def, target);
@@ -214,7 +219,7 @@ export function tickWarpath(ctx: SimContext, mob: Entity): WarpathTickResult {
  * the pickets. Checked one yard inside the leash, so the combat runner's own leash test
  * (mob/combat_profile.ts, the same distance) never sees him past it in this phase.
  */
-function focusDraggedToLeash(mob: Entity): boolean {
+export function focusDraggedToLeash(mob: Entity): boolean {
   const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
   return dist2d(mob.pos, mob.leashAnchor ?? mob.spawnPos) > leash - 1;
 }

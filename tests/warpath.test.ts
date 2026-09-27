@@ -17,6 +17,7 @@ import {
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { mobCombatProfile } from '../src/sim/mob/combat_profile';
 import {
+  focusDraggedToLeash,
   nextWarpathDestination,
   nextWarpathPhase,
   resetWarpath,
@@ -24,7 +25,7 @@ import {
   warpathPhaseDuration,
 } from '../src/sim/mob/warpath';
 import { Sim } from '../src/sim/sim';
-import type { Entity, MobTemplate, WorldContent } from '../src/sim/types';
+import { type Entity, LEASH_DISTANCE, type MobTemplate, type WorldContent } from '../src/sim/types';
 import {
   groundHeight,
   isInWaterBody,
@@ -64,6 +65,16 @@ describe('warpath phase machine', () => {
   it('leaves focus only when its clock runs out', () => {
     expect(nextWarpathPhase('focus', 4, 999, def())).toBe('focus');
     expect(nextWarpathPhase('focus', 0, 999, def())).toBe('travel');
+  });
+
+  it('cuts focus short and marches on once the fight drags him to his tether', () => {
+    // Instead of evading home out of his own fight (the owner's "ran to a spot and did
+    // nothing"), a focus dragged to the leash edge sets off for the next stop.
+    expect(nextWarpathPhase('focus', 20, 999, def(), true)).toBe('travel');
+    expect(nextWarpathPhase('focus', 20, 999, def(), false)).toBe('focus');
+    // Only focus reads it: a run or a wreck in progress is never cut short by it.
+    expect(nextWarpathPhase('travel', 20, 999, def(), true)).toBe('travel');
+    expect(nextWarpathPhase('wreck', 1, 0, def(), true)).toBe('wreck');
   });
 
   it('ends a run on ARRIVAL, whatever the clock says', () => {
@@ -435,6 +446,54 @@ describe('warpath in a live world', () => {
     expect(ringAt).not.toBeNull();
     expect(novaAt).not.toBeNull();
     expect((novaAt ?? 0) - (ringAt ?? 0)).toBeGreaterThanOrEqual(WARPATH_WRECK_FUSE_SEC - 0.1);
+  });
+});
+
+describe('a focus fight dragged to the tether', () => {
+  const setup = (anchorOffset: number) => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: WARPATH_TEST_WORLD,
+    });
+    sim.setPlayerLevel(20);
+    (sim as unknown as { setGm(pid?: number, on?: boolean): void }).setGm(sim.playerId, true);
+    const spawn = lair();
+    const player = sim.player;
+    player.pos.x = spawn.x;
+    player.pos.z = spawn.z - 12;
+    player.pos.y = terrainHeight(player.pos.x, player.pos.z, sim.cfg.seed);
+    player.prevPos = { ...player.pos };
+    const id = (
+      sim as unknown as { spawnDevBoss(t: string, x: number, z: number): number }
+    ).spawnDevBoss(BALGATH, spawn.x, spawn.z);
+    const boss = sim.entities.get(id) as Entity;
+    for (let i = 0; i < 40 && boss.warpathPhase !== 'focus'; i++) sim.tick();
+    expect(boss.warpathPhase).toBe('focus');
+    // Plant his tether `anchorOffset` yards behind him, as half a minute of punted raiders
+    // dragging him off his landmark would.
+    boss.leashAnchor = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z + anchorOffset };
+    return { sim, boss };
+  };
+
+  it('marches on to the next stop instead of evading home', () => {
+    const { sim, boss } = setup(LEASH_DISTANCE - 0.5);
+    expect(focusDraggedToLeash(boss)).toBe(true);
+    const before = boss.warpathDestination ?? -1;
+    sim.tick();
+    expect(boss.aiState).not.toBe('evade');
+    expect(boss.warpathPhase).toBe('travel');
+    expect(boss.warpathDestination).toBe(nextWarpathDestination(before, def().destinations.length));
+    expect(boss.aggroTargetId).toBe(sim.playerId);
+  });
+
+  it('keeps fighting while the tether still has room', () => {
+    const { sim, boss } = setup(LEASH_DISTANCE - 2);
+    expect(focusDraggedToLeash(boss)).toBe(false);
+    sim.tick();
+    expect(boss.warpathPhase).toBe('focus');
+    expect(boss.aiState).not.toBe('evade');
   });
 });
 
