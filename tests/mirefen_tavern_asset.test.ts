@@ -20,12 +20,12 @@ import {
   TAVERN_SHELL_PARTS,
   TAVERN_TRIM_PARTS,
 } from '../src/render/mirefen_tavern_core';
+import { TAVERN_HALL_AIR_TOP } from '../src/render/mirefen_tavern_interior_core';
 import {
   TAVERN_DOOR,
   TAVERN_HALL,
   TAVERN_HOOD,
   TAVERN_TOWER,
-  TAVERN_UPPER,
 } from '../src/sim/content/mirefen_tavern';
 
 // The shipped Mirefen tavern GLB (public/models/props/mirefen_tavern.glb), built in Blender from
@@ -38,29 +38,30 @@ import {
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
-const SHIPPED_SHA256 = '3021a12d7dea25d0244b911a900df1e16f743c2d53e8db2dbe6ef02b503cb78a';
-const SHIPPED_BYTES = 887480;
+const SHIPPED_SHA256 = 'f3bffa86be4d942f1da0ddbe05963b161183ffd7bd9dd6fa0be50135a41316cc';
+const SHIPPED_BYTES = 977344;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  TavernFrame: 12440,
-  TavernFurnishings: 2944,
-  TavernLights: 3240,
-  HallWallFront: 5156,
-  HallWallBack: 2220,
-  HallWallLeft: 2320,
+  TavernFrame: 10976,
+  TavernFurnishings: 7836,
+  TavernLights: 4680,
+  HallWallFront: 824,
+  HallWallFrontLeft: 1068,
+  HallWallFrontRight: 1068,
+  HallWallBack: 2612,
+  HallWallLeft: 2512,
   HallWallRight: 4212,
-  HallRoof: 5640,
+  HallRoof: 7000,
   WingWallEast: 1344,
   WingWallBack: 1476,
   WingWallWest: 696,
-  WingRoof: 1272,
-  TowerWall: 4000,
-  TowerRoof: 1876,
-  Gallery: 4000,
-  RoomWalls: 888,
-  TowerNewel: 888,
-  TavernTrim: 1832,
-  TavernClutter: 3538,
+  WingRoof: 1224,
+  TowerWall: 4370,
+  TowerRoof: 2000,
+  HallPorch: 1980,
+  BarPillar: 784,
+  TavernTrim: 2900,
+  TavernClutter: 6478,
 };
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */
 const PLAYER_H = 2.6;
@@ -91,10 +92,9 @@ function trianglesUnder(n: GltfNode): number {
 interface TavernExtras {
   tiers: Record<string, string[]>;
   shell: string[];
-  upper: number;
-  hall: { eave: number; ridge: number; tie: number; aisleBeam: number };
+  hall: { eave: number; ridge: number; truss: number };
   door: number[];
-  stairWidth: number;
+  nookRadius: number;
 }
 
 function extras(): TavernExtras {
@@ -173,26 +173,72 @@ describe('mirefen tavern GLB', () => {
       total += count;
     }
     expect(trianglesUnder(node('MirefenTavern_ROOT'))).toBe(total);
-    // a whole two-storey inn with its furniture: under 60k in all, the low tier under 55k
-    expect(total).toBeLessThan(60000);
+    // a whole inn with its booths, stage, nook, kitchen and hammerbeam roof: under 68k in all,
+    // the low tier under 58k, the shipped file under a megabyte
+    expect(total).toBeLessThan(68000);
     const low = TAVERN_CRITICAL_PARTS.reduce((n, p) => n + TRIANGLES[p], 0);
-    expect(low).toBeLessThan(55000);
-    expect(readFileSync(GLB).length).toBeLessThan(900 * 1024);
+    expect(low).toBeLessThan(58000);
+    expect(readFileSync(GLB).length).toBeLessThan(1000 * 1024);
   });
 
   it("stamps the sim's numbers, all generous next to the player", () => {
     const e = extras();
-    expect(e.upper).toBe(TAVERN_UPPER);
     expect(e.hall).toEqual({
       eave: TAVERN_HALL.eave,
       ridge: TAVERN_HALL.ridge,
-      tie: TAVERN_HALL.tie,
-      aisleBeam: TAVERN_HALL.aisleBeam,
+      truss: TAVERN_HALL.truss,
     });
     expect(e.door).toEqual([TAVERN_DOOR.width, TAVERN_DOOR.height]);
-    expect(e.stairWidth).toBeCloseTo(TAVERN_TOWER.rIn - TAVERN_TOWER.newel, 4);
+    expect(e.nookRadius).toBe(TAVERN_TOWER.rIn);
     expect(e.door[1]).toBeGreaterThan(1.7 * PLAYER_H);
-    expect(e.hall.aisleBeam).toBeGreaterThan(2 * PLAYER_H);
+    // open to the roof: nothing crosses the room under the hammer beams, near four bodies up
+    expect(e.hall.truss).toBeGreaterThan(3.5 * PLAYER_H);
+  });
+
+  it('keeps the common room clear of timber between the tables and the top of the air', () => {
+    // no beam, brace, joist or hung thing crosses the room where the camera flies: over the
+    // floor's furniture (the settles' backs, the candles) and under the camera's air top
+    // (render/mirefen_tavern_interior_core.ts), inside the hall clear of its walls, only the bar
+    // (its pillar, which cuts away, the kegs and the racks behind it), the wall fire and the
+    // trophies an arm's length off the walls stand
+    const lo = 2.9;
+    const hi = TAVERN_HALL_AIR_TOP;
+    const offenders: string[] = [];
+    const v = [0, 0, 0];
+    for (const n of doc.getRoot().listNodes()) {
+      const mesh = n.getMesh();
+      if (!mesh) continue;
+      const m = n.getWorldMatrix();
+      for (const prim of mesh.listPrimitives()) {
+        const pos = prim.getAttribute('POSITION');
+        const idx = prim.getIndices();
+        if (!pos || !idx) continue;
+        const pt = (k: number): [number, number, number] => {
+          pos.getElement(k, v);
+          return [
+            m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12],
+            m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13],
+            m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14],
+          ];
+        };
+        for (let t = 0; t < idx.getCount(); t += 3) {
+          const a = pt(idx.getScalar(t));
+          const b = pt(idx.getScalar(t + 1));
+          const c = pt(idx.getScalar(t + 2));
+          const x = (a[0] + b[0] + c[0]) / 3;
+          const y = (a[1] + b[1] + c[1]) / 3;
+          const z = (a[2] + b[2] + c[2]) / 3;
+          if (y <= lo || y >= hi) continue;
+          if (Math.abs(x) > TAVERN_HALL.x1 - TAVERN_HALL.wall - 1.2) continue;
+          if (z < TAVERN_HALL.z0 + TAVERN_HALL.wall + 1.2) continue;
+          if (z > TAVERN_HALL.z1 - TAVERN_HALL.wall - 1.2) continue;
+          if (x > 2.0 && z < -4.0) continue; // the bar
+          if (x > 13.2 && Math.abs(z - 2.5) < 2.6) continue; // the wall fire and its jawbone
+          offenders.push(`${n.getName()} at ${x.toFixed(1)}, ${y.toFixed(1)}, ${z.toFixed(1)}`);
+        }
+      }
+    }
+    expect(offenders.slice(0, 12)).toEqual([]);
   });
 
   it('stands on the ground floor at its origin, the base running down into the ground', () => {

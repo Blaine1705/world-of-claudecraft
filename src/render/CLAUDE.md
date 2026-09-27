@@ -124,10 +124,12 @@ Everything else is a sibling module in one of these families:
   (`tests/graphics_overhaul_integration.test.ts`). A walk-in building registers its AIR
   (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world) with
   `registerCameraInterior` when it is built and drops it on teardown; while the player's eye
-  stands in it, the drawn camera stays in that air (pull-in at once, eased release, a lift or
-  swing over a cramped spot, a cut to the eyes in a corner nothing escapes), and bodies
-  outside lose their nameplates and chat bubbles unless seen through an opening. Outdoors it
-  touches nothing. Reference registrant: `mirefen_tavern_interior_core.ts`. The chase
+  stands in it, the drawn camera stays in that air (pull-in at once, eased release, the least
+  flattening under a lintel or a ceiling, a lift or swing over a cramped spot, a cut to the
+  eyes in a corner nothing escapes); walking in, the lens is held under the door's head and
+  follows through the doorway from outside (`interiorEntryCap`, a ray out through an opening
+  runs on past it), so nothing is cut away round the player; bodies outside lose their
+  nameplates and chat bubbles unless seen through an opening. Outdoors it touches nothing. Reference registrant: `mirefen_tavern_interior_core.ts`. The chase
   camera's floor (ground, rift tier, maze hedges) is `chase_camera_floor_core.ts`.
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD

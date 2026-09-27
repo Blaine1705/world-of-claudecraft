@@ -16,15 +16,16 @@ import {
 import {
   cameraInterior,
   INTERIOR_BOOM_MAX_LAG,
-  INTERIOR_ENTRY_BLEND,
   interiorContains,
+  interiorSegmentFraction,
 } from '../src/render/interior_camera_core';
 
 // The indoor chase-camera clamp's driver (src/render/interior_camera.ts): the registry, the
 // per-frame clamp (a glide both ways: a quick bounded pull-in and an eased release; the clamp
-// blended in over the threshold; outdoors untouched), the look point brought back to the eye
-// across a wall, the draw-time re-check of a shaken camera and its exact
-// restore, and the nameplate gate for bodies outside.
+// blended in over the threshold; walking in, the lens following through the door, threading
+// it, then coming in; outdoors untouched), the look point brought back to the eye across a
+// wall, the draw-time re-check of a shaken camera and its exact restore, and the nameplate
+// gate for bodies outside.
 
 // one room x 0..10, z 0..10, y 0..5, its front door out of the -z wall (x 4..6, z -1..1.5)
 const ROOM = cameraInterior(
@@ -205,17 +206,22 @@ describe('indoor camera clamp', () => {
       ),
     );
     const cam = camera();
+    // walked in from the road and stopped just over the sill
+    for (let z = -5; z < 0.8; z += 7 / 60)
+      frame(cam, new THREE.Vector3(10, 0, z), [10, 5, z - 9.8]);
     const self = new THREE.Vector3(10, 0, 0.8);
     frame(cam, self, [10, 5, -9]);
     let prev = cam.position.clone();
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 120; i++) {
       frame(cam, self, [10, 5, -9]);
       // a glide, never a snap (the lens sweeps round along the wall to a comfortable view)
       expect(cam.position.distanceTo(prev), `frame ${i}`).toBeLessThan(0.6);
       prev = cam.position.clone();
     }
-    // stopped just over the sill, the lens has settled in the room within the settle time
+    // stopped just over the sill, the lens that followed through the door has come in to the
+    // room a moment later (the through-door hold eases out once the player stands still)
     expect(interiorLensInAir()).toBe(true);
+    expect(interiorCameraInternalsForTest.state().through).toBe(0);
     expect(interiorCameraInternalsForTest.state().firstPerson).toBe(false);
   });
 
@@ -236,7 +242,7 @@ describe('indoor camera clamp', () => {
     expect(Math.abs(interiorCameraInternalsForTest.state().swing)).toBeLessThan(0.11);
   });
 
-  it('blends the clamp in over the threshold: walking in never snaps behind the head', () => {
+  it('follows through the door walking in: never a snap, never into the back of the head', () => {
     // a deep hall behind its front door (the door's outside face at z = -1)
     const hall = cameraInterior(
       'hall',
@@ -249,9 +255,10 @@ describe('indoor camera clamp', () => {
     registerCameraInterior(hall);
     const cam = camera();
     const dt = 1 / 60;
-    let prev: number | null = null;
+    let prev: THREE.Vector3 | null = null;
     let least = Infinity;
     let wasIndoors = false;
+    let lowestOutside = Infinity;
     // walk in at a brisk 7 yards a second, the camera 10 yards behind, out the door
     for (let z = -6; z < 16; z += 7 * dt) {
       const self = new THREE.Vector3(10, 0, z);
@@ -261,9 +268,18 @@ describe('indoor camera clamp', () => {
       if (indoors) {
         least = Math.min(least, boom);
         // no one-frame jump anywhere on the way in, not even stepping over the sill
-        if (prev !== null) expect(Math.abs(boom - prev)).toBeLessThan(0.6);
-        // past the blend the lens stands in the air
-        if (z + 1 > INTERIOR_ENTRY_BLEND + 0.5) expect(interiorLensInAir()).toBe(true);
+        if (prev !== null) expect(cam.position.distanceTo(prev), `at ${z}`).toBeLessThan(0.6);
+        if (!interiorLensInAir()) {
+          // following through the door: its sight line threads the doorway (never a wall),
+          // and the lens only ever comes down while it is still outside
+          const c = cam.position;
+          expect(
+            interiorSegmentFraction(hall, look.x, look.y, look.z, c.x, c.y, c.z, 0, 1),
+            `at ${z}`,
+          ).toBe(1);
+          expect(c.y, `at ${z}`).toBeLessThanOrEqual(lowestOutside + 1e-9);
+          lowestOutside = c.y;
+        }
       }
       if (indoors && !wasIndoors) {
         // the first frame indoors keeps the camera out behind, following through the door
@@ -271,10 +287,12 @@ describe('indoor camera clamp', () => {
         expect(interiorLensInAir()).toBe(false);
       }
       wasIndoors = indoors;
-      prev = boom;
+      prev = cam.position.clone();
     }
-    // never into the back of the head: a real third-person boom all the way in
-    expect(least).toBeGreaterThan(4);
+    // never into the back of the head: the whole distance all the way in
+    expect(least).toBeGreaterThan(9);
+    // and once the requested lens is in the hall, so is the drawn one
+    expect(interiorLensInAir()).toBe(true);
   });
 
   it('eases back out when the view clears, never overshooting', () => {
@@ -295,8 +313,10 @@ describe('indoor camera clamp', () => {
   it('releases smoothly after walking out, then leaves the camera alone', () => {
     registerCameraInterior(ROOM);
     const cam = camera();
-    // deep in the room, facing in, the camera wanted out through the front door: held in
+    // deep in the room (arrived there, not walked in), facing in, the camera wanted out
+    // through the front door: held in
     settle(cam, new THREE.Vector3(5, 0, 9), [5, 2, -12]);
+    expect(interiorCameraInternalsForTest.state().through).toBe(0);
     expect(cam.position.z).toBeGreaterThan(-1);
     // walk out through the door: the boom opens as the clamp blends out, then eases free
     for (let z = 9; z > -0.5; z -= 0.1) frame(cam, new THREE.Vector3(5, 0, z), [5, 2, z - 21]);
@@ -432,14 +452,17 @@ describe('indoor nameplates', () => {
     expect(interiorHidesNameplate(cam, 2, 0, 2, 2.8)).toBe(false);
   });
 
-  it('hides nothing while the lens still follows through the doorway', () => {
+  it('lets the eye decide while the lens still follows through the doorway', () => {
     registerCameraInterior(ROOM);
     const cam = camera();
-    // just over the sill, the camera still out behind on the road
+    // walked in over the sill, the camera still out behind on the road
+    frame(cam, new THREE.Vector3(5, 0, -4), [5, 4, -13]);
     frame(cam, new THREE.Vector3(5, 0, 0.5), [5, 4, -9]);
     expect(activeCameraInterior()?.id).toBe('room');
     expect(interiorLensInAir()).toBe(false);
-    expect(interiorHidesNameplate(cam, -10, 0, 5, 2.8)).toBe(false);
+    // a troll behind the walls stays hidden; one on the road out of the door keeps its plate
+    expect(interiorHidesNameplate(cam, -10, 0, 5, 2.8)).toBe(true);
+    expect(interiorHidesNameplate(cam, 5, 0, -12, 1.5)).toBe(false);
   });
 
   it('hides nothing while the player is outdoors', () => {

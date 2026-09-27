@@ -8,28 +8,36 @@ import {
   registerCameraInterior,
 } from '../src/render/interior_camera';
 import {
-  INTERIOR_ENTRY_BLEND,
   interiorContains,
   interiorHoldsEye,
   interiorSegmentFraction,
 } from '../src/render/interior_camera_core';
 import {
+  newTavernShellState,
+  TAVERN_SHELL_PARTS,
+  type TavernShellPart,
+  tavernShellOcclusion,
+} from '../src/render/mirefen_tavern_core';
+import {
   eyeInTavernAir,
   mirefenTavernCameraInterior,
   TAVERN_FRONT_DOOR_BOX,
+  TAVERN_HALL_AIR_TOP,
   TAVERN_INTERIOR_LOCAL,
+  TAVERN_TOWER_AIR_TOP,
   TAVERN_TOWER_SHAFT,
   tavernBoxToWorld,
 } from '../src/render/mirefen_tavern_interior_core';
 import {
+  TAVERN_BAR_PLATFORM,
+  TAVERN_CHANDELIER,
   TAVERN_FLOOR_Y,
-  TAVERN_GALLERY,
   TAVERN_HALL,
+  TAVERN_HOOD,
+  TAVERN_LANTERNS,
   TAVERN_PROPS,
-  TAVERN_ROOM_WALLS,
+  TAVERN_STAGE,
   TAVERN_TOWER,
-  TAVERN_UPPER,
-  TAVERN_WING,
   tavernToWorld,
 } from '../src/sim/content/mirefen_tavern';
 import {
@@ -37,15 +45,17 @@ import {
   tavernTowerWallSegments,
   tavernWingWalls,
 } from '../src/sim/mirefen_tavern';
-import { tavernStairHeight } from '../src/sim/mirefen_tavern_floor';
 
 // The Mirefen tavern's interior for the indoor camera (src/render/mirefen_tavern_interior_core.ts)
 // and the clamp over it (src/render/interior_camera.ts): the air never reaches into a wall, the
-// barrel wall under the gallery, the wall fireplace or the tower's ring; and at the owner's
-// spot (the tower stair's foot) and the other tight spots (the stair, a gallery corner, behind
-// the bar, the hearth pit, the rooms, the hall's corners), for every orbit a player can take,
-// the clamped camera stays in the air with its whole sight line to the player in it, so no
-// wall, roof or floor ever stands between them and the outside never shows.
+// barrel racks, the wall fireplace or the tower's ring, and nothing hangs down into it (the
+// hood, the chandelier, the lanterns and the hammer beams all stand over it: no timber crosses
+// the room where the camera flies); at the tight spots (the arch, the nook, the stage, behind
+// the bar, the hearth pit, the hall's corners, a booth), for every orbit a player can take, the
+// clamped camera stays in the air with its whole sight line to the player in it; and walking in
+// and out through the front door, at every camera a player uses, the lens follows through the
+// doorway without a snap, a dive into the head or a rise over its outdoor height, and the
+// building never opens as a cutaway round the player.
 
 const T = TAVERN_TOWER;
 const vol = mirefenTavernCameraInterior();
@@ -66,13 +76,14 @@ describe('tavern interior boxes', () => {
     expect(b).toEqual([lo.x, hi.x, TAVERN_FLOOR_Y, TAVERN_FLOOR_Y + 3, lo.z, hi.z]);
   });
 
-  it('never reaches into a wall, the barrel wall, the fireplace or the tower ring', {
+  it('never reaches into a wall, the barrel racks, the fireplace or the tower ring', {
     timeout: 60000,
   }, () => {
     const walls = [...tavernHallWalls(), ...tavernWingWalls()];
-    const g = TAVERN_GALLERY;
     const fire = TAVERN_PROPS.find((p) => p.kind === 'fireplace');
     if (!fire) throw new Error('fireplace');
+    const racks = TAVERN_PROPS.filter((p) => p.kind === 'barrels');
+    expect(racks.length).toBeGreaterThan(0);
     const ring = tavernTowerWallSegments();
     const inRing = (x: number, z: number): boolean =>
       ring.some((s) => {
@@ -87,7 +98,7 @@ describe('tavern interior boxes', () => {
       });
     const E = 0.02;
     for (let i = 0; i < TAVERN_INTERIOR_LOCAL.length; i++) {
-      const [x0, x1, y0, y1, z0, z1] = TAVERN_INTERIOR_LOCAL[i];
+      const [x0, x1, y0, , z0, z1] = TAVERN_INTERIOR_LOCAL[i];
       for (let x = x0 + E; x <= x1 - E; x += 0.4) {
         for (let z = z0 + E; z <= z1 - E; z += 0.4) {
           const shaft = TAVERN_TOWER_SHAFT;
@@ -97,15 +108,17 @@ describe('tavern interior boxes', () => {
             // the front door's box runs out through the wall's opening only
             expect(hit, `box ${i} in a wall at ${x.toFixed(2)}, ${z.toFixed(2)}`).toBe(false);
           }
-          if (y1 > TAVERN_UPPER) {
-            for (const [rx0, rx1, rz0, rz1] of TAVERN_ROOM_WALLS) {
-              const hit = x > rx0 + E && x < rx1 - E && z > rz0 + E && z < rz1 - E;
-              expect(hit, `box ${i} in a partition`).toBe(false);
-            }
-          }
-          if (y0 < TAVERN_UPPER - E) {
-            const barrel = x > g.x0 + E && x < g.x1 && z > g.z0 && z < g.z1 - E;
-            expect(barrel, `box ${i} in the barrel wall`).toBe(false);
+          for (const r of racks) {
+            const top = TAVERN_BAR_PLATFORM.lift + r.height;
+            const hit =
+              x > r.x - (r.hw ?? 0) + E &&
+              x < r.x + (r.hw ?? 0) - E &&
+              z > r.z - (r.hd ?? 0) + E &&
+              z < r.z + (r.hd ?? 0) - E &&
+              y0 < top;
+            expect(hit, `box ${i} in a barrel rack at ${x.toFixed(2)}, ${z.toFixed(2)}`).toBe(
+              false,
+            );
           }
           const breast =
             x > fire.x - (fire.hw ?? 0) + E &&
@@ -122,40 +135,63 @@ describe('tavern interior boxes', () => {
     }
   });
 
-  it('holds the eye in every room, never on the porch or in the doorway alone', () => {
+  it('keeps every hung thing and every roof timber over the air: nothing crosses the room', () => {
+    // the hammer beams (the lowest roof timber) a yard and more over the air's top
+    expect(TAVERN_HALL.truss - TAVERN_HALL_AIR_TOP).toBeGreaterThanOrEqual(1);
+    // the copper hood over the hearth, the wheel chandelier's hub under its ring, and each
+    // lantern's foot under its body, all over the air
+    expect(TAVERN_HOOD.rimY - 0.1).toBeGreaterThan(TAVERN_HALL_AIR_TOP);
+    expect(TAVERN_CHANDELIER.y - 0.35).toBeGreaterThan(TAVERN_HALL_AIR_TOP);
+    for (const l of TAVERN_LANTERNS) {
+      expect(l.y - 0.42 * 0.76 - 0.05, `lantern at ${l.x}, ${l.z}`).toBeGreaterThan(
+        TAVERN_HALL_AIR_TOP,
+      );
+    }
+    // the hall's boxes all stop at the air's top, the nook's under its crown of candles
+    for (let i = 0; i < TAVERN_INTERIOR_LOCAL.length; i++) {
+      const top = TAVERN_INTERIOR_LOCAL[i][3];
+      if (i === TAVERN_TOWER_SHAFT.box) expect(top).toBe(TAVERN_TOWER_AIR_TOP);
+      else expect(top, `box ${i}`).toBeLessThanOrEqual(TAVERN_HALL_AIR_TOP);
+    }
+    expect(TAVERN_TOWER_AIR_TOP).toBeLessThan(T.wallTop);
+  });
+
+  it('holds the eye in the hall and the nook, never on the porch or in the doorway alone', () => {
     const at = (lx: number, lz: number, feet = 0) => {
       const w = tavernToWorld(lx, lz);
       return interiorHoldsEye(vol, w.x, TAVERN_FLOOR_Y + feet + 2, w.z);
     };
     expect(at(0, 0)).toBe(true);
     expect(at(0, 4.5, -0.45)).toBe(true); // the hearth pit
-    expect(at(-3, -14)).toBe(true); // the arch at the stair's foot
-    expect(at(T.x + 4.5, T.z - 2, tavernStairHeight(4.5, -2))).toBe(true); // on the stair
-    expect(at(14.4, -12.5, TAVERN_UPPER)).toBe(true); // the gallery's far corner
-    expect(at(7, -24, TAVERN_UPPER)).toBe(true); // a guest room
+    expect(at(-3, -14)).toBe(true); // the arch
+    expect(at(T.x, T.z)).toBe(true); // the nook's rose
+    expect(at(T.x + 3.5, T.z - 2)).toBe(true); // in the nook by its bench
+    expect(at(-12, -11, TAVERN_STAGE.lift)).toBe(true); // on the stage
     expect(at(0, 13.6)).toBe(false); // in the doorway's thickness
     expect(at(0, 15.5)).toBe(false); // the porch
     expect(at(-20, 0)).toBe(false); // outside
+    expect(at(10, -20)).toBe(false); // the closed kitchen behind the hatch
     expect(eyeInTavernAir(0, 2, 13.6)).toBe(false);
     expect(eyeInTavernAir(0, 2, 12.8)).toBe(true);
     expect(TAVERN_INTERIOR_LOCAL[TAVERN_FRONT_DOOR_BOX][5]).toBe(TAVERN_HALL.z1);
+    // the doorway's threshold is the front wall's thickness
+    expect(vol.thresholds).toHaveLength(1);
+    expect(vol.thresholds[0]).toBeCloseTo(TAVERN_HALL.wall, 9);
   });
 });
 
 /** The tight spots: local feet (x, feetY, z). */
 const SPOTS: readonly [string, number, number, number][] = [
-  ["the owner's spot, the tower stair's foot", -3, 0, -14],
+  ['the arch into the nook', -3, 0, -14],
   ['the arch approach', -1.5, 0, -8],
-  ['on the stair', T.x + 4.5, tavernStairHeight(4.5, -2), T.z - 2],
-  ['half way up the stair, round the back', T.x - 4, tavernStairHeight(-4, -1), T.z - 1],
-  ['the landing at the stair head', T.x + 3.7, TAVERN_UPPER, T.z + 1.4],
-  ["the gallery's far corner", 14.4, TAVERN_UPPER, -12.5],
+  ["the nook's rose", T.x, 0, T.z],
+  ["the nook's bench, its back to the wall", T.x + 3.6, 0, T.z - 3.4],
+  ['on the stage', -13.5, TAVERN_STAGE.lift, -12.2],
+  ['in the wall booth', -11.4, 0, -4.6],
   ['behind the bar', 9, 0.5, -8.8],
+  ['at the kitchen hatch', 9.5, 0.5, -11.2],
   ['in the hearth pit', 0, -0.45, 4.5],
-  ['the west guest room corner', 5.6, TAVERN_UPPER, -26.4],
-  ['the east guest room corner', 14.6, TAVERN_UPPER, -26.6],
-  ['the landing by the gallery door', 8.5, TAVERN_UPPER, -15.2],
-  ["the hall's back corner", -14.4, 0, -12.4],
+  ["the hall's back corner", -14.4, 0, -7.6],
   ["the hall's front corner", 14.4, 0, 12.4],
 ];
 
@@ -195,12 +231,11 @@ describe('the indoor camera at the tight spots', () => {
     });
   }
 
-  it("keeps the owner's own orbit where he left it: it already stands in the hall's air", () => {
+  it('looks into the nook from the arch at the whole distance, sliding under the air', () => {
     registerCameraInterior(vol);
     const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
     const self = world(-3, 0, -14);
     const look = new THREE.Vector3(self.x, self.y + 2, self.z);
-    // the owner's orbit: looking into the tower from the hall, pitched well up, zoomed out
     const target = world(-1.5, 0, -20);
     const yaw = Math.atan2(target.x - self.x, target.z - self.z);
     const dist = 14;
@@ -210,44 +245,39 @@ describe('the indoor camera at the tight spots', () => {
       look.y + Math.sin(pitch) * dist,
       look.z - Math.cos(yaw) * Math.cos(pitch) * dist,
     );
-    // (the old cutaway opened the back wall onto the pond for this very orbit; now the shell
-    // holds, tests/mirefen_tavern_core.test.ts, and the camera needs no pull at all)
     clampChaseCameraToInterior(cam, look, self, 1 / 60, true);
     const c = cam.position;
     expect(interiorContains(vol, c.x, c.y, c.z)).toBe(true);
-    expect(c.y - TAVERN_FLOOR_Y).toBeLessThan(TAVERN_HALL.tie);
-    expect(c.distanceTo(look)).toBeCloseTo(dist, 6);
-    // zoomed further out, the same orbit is pulled in under the hall's rafters
-    cam.position.set(
-      look.x - Math.sin(yaw) * Math.cos(pitch) * 30,
-      look.y + Math.sin(pitch) * 30,
-      look.z - Math.cos(yaw) * Math.cos(pitch) * 30,
-    );
-    clampChaseCameraToInterior(cam, look, self, 1 / 60, true);
-    expect(interiorContains(vol, c.x, c.y, c.z)).toBe(true);
-    expect(c.distanceTo(look)).toBeGreaterThan(dist);
-    expect(c.distanceTo(look)).toBeLessThan(30);
+    expect(c.y - TAVERN_FLOOR_Y).toBeLessThan(TAVERN_HALL_AIR_TOP);
+    // the lens would stand over the air's top: it flattens and keeps the whole distance
+    expect(c.distanceTo(look)).toBeCloseTo(dist, 3);
   });
 
-  it('keeps the wing ceiling over a guest room', () => {
+  it("keeps the nook's crown and cone over a camera looking down into it", () => {
     registerCameraInterior(vol);
     const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
-    const self = world(7, TAVERN_UPPER, -24);
+    const self = world(T.x, 0, T.z);
     const look = new THREE.Vector3(self.x, self.y + 2, self.z);
-    cam.position.set(look.x, look.y + 12, look.z);
+    cam.position.set(look.x, look.y + 16, look.z);
     clampChaseCameraToInterior(cam, look, self, 1 / 60, true);
-    expect(cam.position.y - TAVERN_FLOOR_Y).toBeLessThan(TAVERN_WING.eave - 0.4);
+    expect(cam.position.y - TAVERN_FLOOR_Y).toBeLessThan(TAVERN_TOWER_AIR_TOP);
   });
 });
 
 /** The default chase camera (pitch 0.32, 12 yards) behind a player at local (lx, ly, lz),
  *  turned `yaw` round the tavern's local frame (0: the camera out along local +z, toward the
  *  front door), gliding for `frames` frames; returns the settled boom. */
-function settledBoom(lx: number, ly: number, lz: number, yaw: number, frames = 90): number {
+function settledBoom(
+  lx: number,
+  ly: number,
+  lz: number,
+  yaw: number,
+  frames = 90,
+  pitch = 0.32,
+  dist = 12,
+): number {
   const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
   const self = world(lx, ly, lz);
-  const pitch = 0.32;
-  const dist = 12;
   // local (sin yaw, cos yaw) to the world: local z runs along world +x, local x along -z
   const wx = Math.cos(yaw) * Math.cos(pitch) * dist;
   const wz = -Math.sin(yaw) * Math.cos(pitch) * dist;
@@ -280,65 +310,150 @@ describe('the indoor camera in the open common room', () => {
     }
   });
 
-  it('slides under the rafters over the gallery rather than pulling in', () => {
+  it('slides a steep, far camera under the air rather than pulling it in', () => {
     registerCameraInterior(vol);
-    // on the gallery, the camera out over the hall: the rafters are a yard over the eye, so
-    // the camera flattens and keeps its whole distance
-    expect(settledBoom(9, TAVERN_UPPER, -11.6, 0)).toBeGreaterThan(11.5);
+    // the owner's own camera, pitched well up and zoomed out, in the middle of the hall
+    for (let k = 0; k < 8; k++) {
+      const yaw = (k / 8) * Math.PI * 2;
+      const boom = settledBoom(0, 0, -1, yaw, 90, 0.75, 14);
+      if (k === 0 || k === 4) expect(boom, `yaw ${k}`).toBeGreaterThan(12.5);
+      else expect(boom, `yaw ${k}`).toBeGreaterThan(9);
+    }
   });
+});
 
-  it('walks in through the front door without a snap: never into the back of the head', () => {
-    registerCameraInterior(vol);
-    const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
-    const dt = 1 / 60;
-    const pitch = 0.32;
-    const dist = 12;
-    let prev: number | null = null;
-    let least = Infinity;
-    let indoorsFrames = 0;
-    // from the road to the middle of the room at a brisk 7 yards a second, facing in
-    for (let lz = 22; lz > -2; lz -= 7 * dt) {
-      const self = world(0, 0, lz);
-      const look = new THREE.Vector3(self.x, self.y + 2, self.z);
-      cam.position.set(look.x + Math.cos(pitch) * dist, look.y + Math.sin(pitch) * dist, look.z);
-      clampChaseCameraToInterior(cam, look, self, dt, false);
-      const boom = cam.position.distanceTo(look);
-      if (activeCameraInterior()) {
-        indoorsFrames++;
-        least = Math.min(least, boom);
-        if (prev !== null) expect(Math.abs(boom - prev), `at ${lz}`).toBeLessThan(0.6);
-        // a blend's depth past the door's outside face, the lens stands in the room's air
-        if (TAVERN_HALL.z1 - lz > INTERIOR_ENTRY_BLEND + 0.5) {
-          expect(interiorLensInAir(), `at ${lz}`).toBe(true);
-          const c = cam.position;
-          expect(interiorSegmentFraction(vol, look.x, look.y, look.z, c.x, c.y, c.z, 0)).toBe(1);
+/** The parts whose cut would open the building round the player as a cutaway. */
+const CUTAWAY: readonly TavernShellPart[] = [
+  'HallWallFront',
+  'HallWallFrontLeft',
+  'HallWallFrontRight',
+  'HallRoof',
+  'HallWallLeft',
+  'HallWallRight',
+];
+
+/** Walk the player at a brisk 7 yards a second along local x = `lx` from lz0 to lz1 (the eye
+ *  only: no collision), the camera `dist` yards behind at `pitch`, frame by frame; returns
+ *  what every frame drew. */
+function walkThroughDoor(lz0: number, lz1: number, pitch: number, dist: number, lx = 0) {
+  registerCameraInterior(vol);
+  const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
+  const shell = newTavernShellState();
+  const dt = 1 / 60;
+  const step = Math.sign(lz1 - lz0) * 7 * dt;
+  const frames: {
+    lz: number;
+    boom: number;
+    height: number;
+    lens: THREE.Vector3;
+    indoors: boolean;
+    lensIn: boolean;
+    cut: TavernShellPart[];
+  }[] = [];
+  for (let lz = lz0; (lz1 - lz) * Math.sign(step) > 0; lz += step) {
+    const self = world(lx, 0, lz);
+    const look = new THREE.Vector3(self.x, self.y + 2, self.z);
+    // the camera behind the player, the way it walks: out of the door walking in (local +z,
+    // world +x), into the room walking out
+    const back = Math.sign(step) < 0 ? 1 : -1;
+    cam.position.set(
+      look.x + back * Math.cos(pitch) * dist,
+      look.y + Math.sin(pitch) * dist,
+      look.z,
+    );
+    const eye = look.clone();
+    clampChaseCameraToInterior(cam, look, self, dt, false);
+    const c = cam.position.clone();
+    const indoors = activeCameraInterior() !== null;
+    const lensIn = interiorLensInAir();
+    tavernShellOcclusion(eye.x, eye.y, eye.z, c.x, c.y, c.z, shell, indoors ? lensIn : undefined);
+    frames.push({
+      lz,
+      boom: c.distanceTo(eye),
+      height: c.y - eye.y,
+      lens: c,
+      indoors,
+      lensIn,
+      cut: TAVERN_SHELL_PARTS.filter((_, i) => shell.occluded[i]),
+    });
+  }
+  return frames;
+}
+
+describe('walking in and out through the front door', () => {
+  // the default camera, the owner's (pitched up, zoomed out), a low close one
+  const CAMERAS: readonly [string, number, number][] = [
+    ['the default camera', 0.32, 12],
+    ['a steep, far camera', 0.75, 18],
+    ['a low, close camera', 0.12, 6],
+  ];
+  for (const [name, pitch, dist] of CAMERAS) {
+    it(`follows through the door walking in, no snap, dive or cutaway: ${name}`, () => {
+      const frames = walkThroughDoor(26, -12, pitch, dist);
+      const outdoorHeight = Math.sin(pitch) * dist;
+      let prev: (typeof frames)[number] | null = null;
+      let lowestOutside = Infinity;
+      let indoorsFrames = 0;
+      for (const f of frames) {
+        // never a pop: the lens moves a fraction of a yard a frame, the player 0.12
+        if (prev) expect(f.lens.distanceTo(prev.lens), `at ${f.lz.toFixed(2)}`).toBeLessThan(0.45);
+        // never over its outdoor height (no dollhouse view from above the roof)
+        expect(f.height, `at ${f.lz.toFixed(2)}`).toBeLessThanOrEqual(outdoorHeight + 1e-6);
+        // never a dive into the head: the camera keeps a real distance the whole way
+        expect(f.boom, `at ${f.lz.toFixed(2)}`).toBeGreaterThan(Math.min(dist, 9) * 0.6);
+        // the building never opens round the player as a cutaway
+        for (const part of CUTAWAY) {
+          expect(f.cut.includes(part), `${part} at ${f.lz.toFixed(2)}`).toBe(false);
         }
+        if (f.indoors) {
+          indoorsFrames++;
+          // while the lens follows through the door from outside it only comes down (and its
+          // sight line threads the doorway: no wall between it and the player)
+          if (!f.lensIn) {
+            expect(f.height, `at ${f.lz.toFixed(2)}`).toBeLessThanOrEqual(lowestOutside + 1e-6);
+            lowestOutside = f.height;
+          }
+        }
+        prev = f;
       }
-      prev = boom;
-    }
-    expect(indoorsFrames).toBeGreaterThan(60);
-    expect(least).toBeGreaterThan(4.5);
-  });
+      expect(indoorsFrames).toBeGreaterThan(60);
+      // deep in the hall the lens stands in its air
+      const last = frames[frames.length - 1];
+      expect(last.lensIn).toBe(true);
+    });
 
-  it('settles the lens in the room when the player stops just inside the front door', () => {
-    registerCameraInterior(vol);
+    it(`hands the camera back walking out, no snap or cutaway: ${name}`, () => {
+      const frames = walkThroughDoor(6, 30, pitch, dist);
+      let prev: (typeof frames)[number] | null = null;
+      for (const f of frames) {
+        if (prev) expect(f.lens.distanceTo(prev.lens), `at ${f.lz.toFixed(2)}`).toBeLessThan(0.45);
+        if (f.indoors) {
+          for (const part of CUTAWAY) {
+            expect(f.cut.includes(part), `${part} at ${f.lz.toFixed(2)}`).toBe(false);
+          }
+        }
+        prev = f;
+      }
+      // out on the road the camera is the requested one again, to the bit
+      const last = frames[frames.length - 1];
+      expect(last.indoors).toBe(false);
+      expect(last.boom).toBeCloseTo(dist, 6);
+    });
+  }
+
+  it('brings the lens in to the room when the player stops just inside the door', () => {
+    const frames = walkThroughDoor(20, 11.5, 0.32, 12);
+    expect(frames[frames.length - 1].indoors).toBe(true);
     const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
-    const pitch = 0.32;
-    const dist = 12;
-    // walk up the porch and stop a stride over the sill, facing in
-    for (let lz = 18; lz > 12.4; lz -= 7 / 60) {
-      const self = world(0, 0, lz);
+    const self = world(0, 0, 11.5);
+    let prev: THREE.Vector3 | null = null;
+    for (let i = 0; i < 150; i++) {
       const look = new THREE.Vector3(self.x, self.y + 2, self.z);
-      cam.position.set(look.x + Math.cos(pitch) * dist, look.y + Math.sin(pitch) * dist, look.z);
+      cam.position.set(look.x + Math.cos(0.32) * 12, look.y + Math.sin(0.32) * 12, look.z);
       clampChaseCameraToInterior(cam, look, self, 1 / 60, false);
+      if (prev) expect(cam.position.distanceTo(prev), `frame ${i}`).toBeLessThan(0.45);
+      prev = cam.position.clone();
     }
-    const self = world(0, 0, 12.4);
-    for (let i = 0; i < 90; i++) {
-      const look = new THREE.Vector3(self.x, self.y + 2, self.z);
-      cam.position.set(look.x + Math.cos(pitch) * dist, look.y + Math.sin(pitch) * dist, look.z);
-      clampChaseCameraToInterior(cam, look, self, 1 / 60, false);
-    }
-    expect(activeCameraInterior()).not.toBe(null);
     expect(interiorLensInAir()).toBe(true);
     const c = cam.position;
     const eye = new THREE.Vector3(self.x, self.y + 2, self.z);

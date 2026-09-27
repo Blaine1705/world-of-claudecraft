@@ -29,15 +29,15 @@ import {
   TAVERN_SHELL_PARTS,
   TAVERN_TRIM_PARTS,
 } from '../src/render/mirefen_tavern_core';
+import { TAVERN_HALL_AIR_TOP } from '../src/render/mirefen_tavern_interior_core';
 import { ditherFadeUniform, setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   TAVERN_FLOOR_Y,
   TAVERN_LANTERNS,
   TAVERN_ORIGIN,
+  TAVERN_STAGE,
   TAVERN_TOWER,
-  TAVERN_TOWER_SCONCES,
-  TAVERN_UPPER,
   TAVERN_YAW,
   tavernToWorld,
 } from '../src/sim/content/mirefen_tavern';
@@ -47,10 +47,10 @@ import { tavernInsideLocal } from '../src/sim/mirefen_tavern';
 // placed on the ground floor at the tavern's origin and turned to the road, what each
 // graphics tier really draws (the whole walkable building, its furniture and every light on
 // all of them), the prewarm parts the props warm-up links, the per-part shell materials,
-// the camera cutaway (indoors the outer shell holds and only the gallery and partitions cut,
-// outdoors the shell ghosts, eased back, culled past the fog), the indoor camera interior it
-// registers, and
-// the firelight handed to the fire-light budget.
+// the camera cutaway (indoors the outer shell holds and only the bar's pillar cuts, walking
+// in the front holds while the lens follows through the door, outdoors the shell ghosts,
+// eased back, culled past the fog), the indoor camera interior it registers, and the
+// firelight handed to the fire-light budget.
 
 const internals = mirefenTavernInternalsForTest;
 const GLB = path.join(__dirname, '..', 'public', internals.assetUrl.replace(/^\//, ''));
@@ -219,9 +219,9 @@ describe('mirefen tavern painter', () => {
       1 / 60,
       true,
     );
-    step(eye(0, 12.8), at(0, 5, 18), 240);
-    // outdoors: the front wall between the camera and the player ghosts (it would stay
-    // whole if the shell still took the look point for indoors)
+    step(eye(0, 10), at(0, 16, 20), 240);
+    // outdoors: the gable over the door, between the camera and the look point, ghosts (it
+    // would stay whole if the shell still took the look point for indoors)
     expect(part('HallWallFront').alpha).toBe(OCCLUDER_FADE_ALPHA);
     // back inside by the clamp's verdict: the outer shell holds
     const hall = at(0, 0, 8);
@@ -232,69 +232,48 @@ describe('mirefen tavern painter', () => {
       1 / 60,
       true,
     );
-    step(eye(0, 12.8), at(0, 5, 18), 240);
+    step(eye(0, 10), at(0, 16, 20), 240);
     expect(part('HallWallFront').alpha).toBe(1);
   });
 
-  it('ghosts the front wall while the lens still follows through the doorway, then holds it', () => {
+  it('holds the whole front while the lens follows a player in through the door', () => {
     withTier('high');
     buildMirefenTavern();
     const cam = new PerspectiveCamera(70, 16 / 9, 0.2, 950);
-    // just over the sill walking in, the camera still out behind on the road: the eye is
-    // indoors, but the clamp blends in over the first strides, so the lens is not yet in
-    // the air and the shell cuts away on the sight line as it does for a camera outside
-    const sill = at(0, 0, 12.8);
-    const road = at(0, 5.8, 24);
-    cam.position.set(road.x, road.y, road.z);
-    clampChaseCameraToInterior(
-      cam,
-      new Vector3(sill.x, sill.y + 2, sill.z),
-      new Vector3(sill.x, sill.y, sill.z),
-      1 / 60,
-      false,
-    );
-    expect(activeCameraInterior()?.id).toBe('mirefen_tavern');
-    expect(interiorLensInAir()).toBe(false);
-    const lens = cam.position.clone();
-    step(eye(0, 12.8), lens, 240);
-    expect(part('HallWallFront').alpha).toBe(OCCLUDER_FADE_ALPHA);
-    // walked a few strides in (a walk, never a teleport), the lens has settled in the air:
-    // the outer shell holds again
-    let hall = sill;
-    for (let lz = 12.8; lz > 6; lz -= 0.12) {
-      hall = at(0, 0, lz);
-      cam.position.set(hall.x + 11.4, hall.y + 5.8, hall.z);
-      clampChaseCameraToInterior(
-        cam,
-        new Vector3(hall.x, hall.y + 2, hall.z),
-        new Vector3(hall.x, hall.y, hall.z),
-        1 / 60,
-        false,
+    // walking in from the road at a run, the camera behind, pitched well up (the owner's): the
+    // lens comes down to thread the doorway and follows through it from outside, so no part of
+    // the front, nor the roof, ever ghosts round the player (the old dollhouse cutaway)
+    const pitch = 0.75;
+    const dist = 18;
+    let followed = 0;
+    for (let lz = 24; lz > -6; lz -= 7 / 60) {
+      const feet = at(0, 0, lz);
+      cam.position.set(
+        feet.x + Math.cos(pitch) * dist,
+        feet.y + 2 + Math.sin(pitch) * dist,
+        feet.z,
       );
+      const look = new Vector3(feet.x, feet.y + 2, feet.z);
+      clampChaseCameraToInterior(cam, look, new Vector3(feet.x, feet.y, feet.z), 1 / 60, false);
+      if (activeCameraInterior() && !interiorLensInAir()) followed++;
+      const c = cam.position;
+      updateMirefenTavernShell(c.x, c.y, c.z, feet.x, feet.y + 2, feet.z, 1 / 60);
+      for (const name of ['HallWallFront', 'HallWallFrontLeft', 'HallWallFrontRight', 'HallRoof']) {
+        expect(part(name).alpha, `${name} at ${lz.toFixed(2)}`).toBe(1);
+      }
     }
-    for (let i = 0; i < 60; i++) {
-      cam.position.set(hall.x + 11.4, hall.y + 5.8, hall.z);
-      clampChaseCameraToInterior(
-        cam,
-        new Vector3(hall.x, hall.y + 2, hall.z),
-        new Vector3(hall.x, hall.y, hall.z),
-        1 / 60,
-        false,
-      );
-    }
+    expect(followed).toBeGreaterThan(30);
     expect(interiorLensInAir()).toBe(true);
-    step(eye(0, 6.08), cam.position.clone(), 240);
-    expect(part('HallWallFront').alpha).toBe(1);
   });
 
-  it('cuts the gallery away for a player at the bar with the camera up over its deck', () => {
+  it("cuts the bar's pillar away for a player at the bar with the pillar between", () => {
     withTier('high');
     buildMirefenTavern();
-    const e = eye(9, -6, 0.5);
-    step(e, at(9, 9, -12));
-    const gallery = part('Gallery');
-    expect(gallery.alpha).toBe(0);
-    for (const m of gallery.meshes) {
+    const e = eye(7.5, -9, 0.5);
+    step(e, at(1.5, 6, -6.2));
+    const pillar = part('BarPillar');
+    expect(pillar.alpha).toBe(0);
+    for (const m of pillar.meshes) {
       const mat = m.material as THREE.Material;
       expect(mat.opacity).toBe(0);
       expect(mat.depthWrite).toBe(false);
@@ -303,10 +282,10 @@ describe('mirefen tavern painter', () => {
     for (const name of ['HallWallBack', 'HallWallLeft', 'HallWallRight', 'HallRoof']) {
       expect(part(name).alpha, name).toBe(1);
     }
-    // the camera comes back down into the room: the gallery eases back to its authored state
-    step(e, at(9, 4, 2), 240);
-    expect(gallery.alpha).toBe(1);
-    for (const m of gallery.meshes) {
+    // the camera swings round clear of it: the pillar eases back to its authored state
+    step(e, at(9, 5, 4), 240);
+    expect(pillar.alpha).toBe(1);
+    for (const m of pillar.meshes) {
       const mat = m.material as THREE.Material;
       expect(mat.transparent).toBe(false);
       expect(mat.depthWrite).toBe(true);
@@ -318,18 +297,18 @@ describe('mirefen tavern painter', () => {
     setDitherFadeEnabledForTest(true);
     withTier('high');
     buildMirefenTavern();
-    const e = eye(9, -6, 0.5);
-    step(e, at(9, 9, -12));
-    const gallery = part('Gallery');
-    expect(gallery.alpha).toBe(0);
-    for (const m of gallery.meshes) {
+    const e = eye(7.5, -9, 0.5);
+    step(e, at(1.5, 6, -6.2));
+    const pillar = part('BarPillar');
+    expect(pillar.alpha).toBe(0);
+    for (const m of pillar.meshes) {
       const mat = m.material as THREE.Material;
       expect(ditherFadeUniform(mat)?.value).toBe(0);
       expect(mat.depthWrite).toBe(false);
     }
-    step(e, at(9, 4, 2), 240);
-    expect(gallery.alpha).toBe(1);
-    for (const m of gallery.meshes) {
+    step(e, at(9, 5, 4), 240);
+    expect(pillar.alpha).toBe(1);
+    for (const m of pillar.meshes) {
       const mat = m.material as THREE.Material;
       expect(ditherFadeUniform(mat)?.value).toBe(1);
       expect(mat.depthWrite).toBe(true);
@@ -341,9 +320,7 @@ describe('mirefen tavern painter', () => {
     withTier('high');
     buildMirefenTavern();
     for (const m of mirefenTavernShellMeshes()) {
-      expect(m.castShadow, m.name).toBe(
-        m.name !== 'Gallery' && m.name !== 'RoomWalls' && m.name !== 'TowerNewel',
-      );
+      expect(m.castShadow, m.name).toBe(m.name !== 'BarPillar');
     }
   });
 
@@ -373,26 +350,32 @@ describe('mirefen tavern painter', () => {
     expect(shell.visible).toBe(true);
   });
 
-  it('lights the hearth, the wall fire, the chandelier, the lit lanterns and the tower sconces', () => {
+  it('lights the hearth, the wall fire, the chandelier, the lanterns, the stage, bar and nook', () => {
     withTier('high');
     buildMirefenTavern();
     const lights = mirefenTavernLights();
-    expect(lights).toHaveLength(
-      3 + TAVERN_LANTERNS.filter((l) => l.lit).length + TAVERN_TOWER_SCONCES.length,
-    );
-    // the climb is lit from foot to head: a sconce low, one mid-flight, one near the landing
-    const sconces = lights.filter((l) => l.name === 'tavernTowerSconce');
-    expect(sconces).toHaveLength(TAVERN_TOWER_SCONCES.length);
-    const heights = sconces.map((l) => l.position.y - TAVERN_FLOOR_Y).sort((a, b) => a - b);
-    expect(heights[0]).toBeLessThan(4);
-    expect(heights[heights.length - 1]).toBeGreaterThan(TAVERN_UPPER + 1.5);
-    for (const l of sconces) {
-      const lx = TAVERN_ORIGIN.z - l.position.z;
-      const lz = l.position.x - TAVERN_ORIGIN.x;
-      const r = Math.hypot(lx - TAVERN_TOWER.x, lz - TAVERN_TOWER.z);
-      expect(r).toBeLessThan(TAVERN_TOWER.rIn);
-      expect(r).toBeGreaterThan(TAVERN_TOWER.rIn - 1);
+    expect(lights).toHaveLength(6 + TAVERN_LANTERNS.filter((l) => l.lit).length);
+    const named = (n: string) => lights.filter((l) => l.name === n);
+    expect(named('tavernHearth')).toHaveLength(1);
+    expect(named('tavernWallFire')).toHaveLength(1);
+    expect(named('tavernChandelier')).toHaveLength(1);
+    expect(named('tavernStage')).toHaveLength(1);
+    expect(named('tavernBar')).toHaveLength(1);
+    // the lanterns hang high under the hammer beams, over the camera's air
+    for (const l of named('tavernLantern')) {
+      expect(l.position.y - TAVERN_FLOOR_Y).toBeGreaterThan(TAVERN_HALL_AIR_TOP);
     }
+    // the stage's footlights light its deck from before its lip
+    const stage = named('tavernStage')[0];
+    const sx = TAVERN_ORIGIN.z - stage.position.z;
+    expect(sx).toBeGreaterThan(TAVERN_STAGE.x0);
+    expect(sx).toBeLessThan(TAVERN_STAGE.x1);
+    // the nook's light stands in the tower's nook
+    const nook = named('tavernNook');
+    expect(nook).toHaveLength(1);
+    const nx = TAVERN_ORIGIN.z - nook[0].position.z;
+    const nz = nook[0].position.x - TAVERN_ORIGIN.x;
+    expect(Math.hypot(nx - TAVERN_TOWER.x, nz - TAVERN_TOWER.z)).toBeLessThan(TAVERN_TOWER.rIn - 1);
     expect(lights[0].intensity).toBe(MIREFEN_TAVERN_LIGHTS.hearth.intensity);
     for (const l of lights) {
       expect(l.isPointLight).toBe(true);

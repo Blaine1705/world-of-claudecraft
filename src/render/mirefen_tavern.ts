@@ -1,14 +1,14 @@
 // The Mirefen tavern on screen: the one Blender-authored model
 // (public/models/props/mirefen_tavern.glb, scripts/assets/mirefen_tavern/) placed on its
 // ground floor at the tavern's origin (sim/content/mirefen_tavern.ts), turned so its door
-// faces the road, its shell parts (walls, roofs, the gallery, the upstairs partitions) kept
-// apart so each can fade for the camera, and its fires and lanterns lit.
+// faces the road, its shell parts (walls, roofs, the porch, the bar's pillar) kept apart so
+// each can fade for the camera, and its fires, lanterns and candles lit.
 //
 // Which parts a graphics tier keeps and which shell parts the camera cuts away are the pure
 // core's calls (mirefen_tavern_core.ts): the structure, furniture, shell and lights on every
 // tier, the trim from medium, the clutter from high; indoors the camera stays in the air
-// and only the parts inside it (the gallery, the partitions) cut away, outdoors the shell
-// ghosts. The tier is the static
+// and only the bar's pillar, standing in it, cuts away, outdoors (or while the camera
+// follows the player in through the door) the shell ghosts. The tier is the static
 // effects tier (GFX.effectsTier), never the frame-rate governor, and a graphics-profile
 // change rebuilds the props (the resetter below, registered in assets/graphics_profile.ts).
 //
@@ -37,8 +37,8 @@ import {
   TAVERN_ORIGIN,
   TAVERN_PIT,
   TAVERN_PROPS,
+  TAVERN_STAGE,
   TAVERN_TOWER,
-  TAVERN_TOWER_SCONCES,
   TAVERN_YAW,
   tavernToWorld,
 } from '../sim/content/mirefen_tavern';
@@ -126,7 +126,7 @@ let shellGroup: THREE.Group | null = null;
 let allMats: OccluderFadeMat[] = [];
 const state = newTavernShellState();
 /** Shell parts inside the building: they cast no shadow (the outer shell shades the room). */
-const INNER_SHELL = new Set<TavernShellPart>(['Gallery', 'RoomWalls', 'TowerNewel']);
+const INNER_SHELL = new Set<TavernShellPart>(['BarPillar']);
 /** The tavern's air for the indoor camera (registered while the tavern is built). */
 const TAVERN_CAMERA_INTERIOR = mirefenTavernCameraInterior();
 /** Where the tavern stands: the prefetch reach and the fog cull are measured from here. */
@@ -194,8 +194,8 @@ function buildShell(parts: ReadonlyMap<TavernShellPart, readonly VertexColourPar
       }
       const mesh = new THREE.Mesh(p.geometry, mat);
       mesh.name = part;
-      // the outer walls and roofs roof the room in shade even when cut away; the gallery and
-      // the upstairs partitions stand inside it, so their shadow pass is spared
+      // the outer walls and roofs roof the room in shade even when cut away; the bar's pillar
+      // stands inside it, so its shadow pass is spared
       mesh.castShadow = !INNER_SHELL.has(part);
       mesh.receiveShadow = true;
       occluderFadeRecordFor(record.mats, mat, mesh);
@@ -244,19 +244,19 @@ export function buildMirefenTavern(): THREE.Group {
   return group;
 }
 
-/** The tavern's firelight: the round hearth's glow, the wall fire, the wheel chandelier,
- *  the lit lanterns (content TAVERN_LANTERNS, where the model hangs them) and the sconces up
- *  the stair tower (TAVERN_TOWER_SCONCES). */
+/** The tavern's firelight: the round hearth's glow, the wall fire, the wheel chandelier and
+ *  the lit lanterns high under the hammer beams (content TAVERN_LANTERNS, where the model hangs
+ *  them, so they throw their light down a long way), the stage's footlights, the candles
+ *  along the bar and the nook's crown of candles. */
 export const MIREFEN_TAVERN_LIGHTS = {
   hearth: { color: 0xffa458, intensity: 34, distance: 24, decay: 2 },
   wallFire: { color: 0xffa050, intensity: 14, distance: 13, decay: 2 },
-  chandelier: { color: 0xffcc88, intensity: 16, distance: 18, decay: 2 },
-  lantern: { color: 0xffcc88, intensity: 8, distance: 11, decay: 2 },
-  sconce: { color: 0xffb870, intensity: 9, distance: 10, decay: 2 },
+  chandelier: { color: 0xffcc88, intensity: 26, distance: 20, decay: 2 },
+  lantern: { color: 0xffc27a, intensity: 30, distance: 20, decay: 2 },
+  stage: { color: 0xffb466, intensity: 12, distance: 10, decay: 2 },
+  bar: { color: 0xffc070, intensity: 10, distance: 10, decay: 2 },
+  nook: { color: 0xffb870, intensity: 14, distance: 11, decay: 2 },
 } as const;
-/** How far a tower sconce's lantern hangs off the wall's inner face (the Blender build's
- *  arm, tavern_furnish.py). */
-export const TOWER_SCONCE_REACH = 0.55;
 
 function light(
   spec: (typeof MIREFEN_TAVERN_LIGHTS)[keyof typeof MIREFEN_TAVERN_LIGHTS],
@@ -309,16 +309,16 @@ export function mirefenTavernLights(): THREE.PointLight[] {
   const c = TAVERN_CHANDELIER;
   out.push(light(L.chandelier, 'tavernChandelier', c.x, c.y - 0.4, c.z));
   for (const spot of TAVERN_LANTERNS) {
-    if (spot.lit) out.push(light(L.lantern, 'tavernLantern', spot.x, spot.y - 0.2, spot.z));
+    if (spot.lit) out.push(light(L.lantern, 'tavernLantern', spot.x, spot.y - 0.3, spot.z));
   }
-  // the sconces up the stair tower's wall, their lanterns an arm's reach off the stone
-  const T = TAVERN_TOWER;
-  for (const s of TAVERN_TOWER_SCONCES) {
-    const r = T.rIn - TOWER_SCONCE_REACH;
-    const lx = T.x + Math.sin(s.angle) * r;
-    const lz = T.z + Math.cos(s.angle) * r;
-    out.push(light(L.sconce, 'tavernTowerSconce', lx, s.y, lz));
-  }
+  // the stage's footlights, a warm wash up the curtain
+  const st = TAVERN_STAGE;
+  out.push(light(L.stage, 'tavernStage', (st.x0 + st.x1) / 2, st.lift + 1.2, st.z1 - 0.2));
+  // the candles along the bar's long counter
+  const counter = TAVERN_PROPS.find((p) => p.kind === 'counter' && (p.hw ?? 0) > (p.hd ?? 0));
+  if (counter) out.push(light(L.bar, 'tavernBar', counter.x, 3.0, counter.z));
+  // the nook's crown of candles, its light pooled on the nook's tables
+  out.push(light(L.nook, 'tavernNook', TAVERN_TOWER.x, 4.0, TAVERN_TOWER.z));
   return out;
 }
 

@@ -15,6 +15,16 @@
 // clamp blends in over the first yards past a front door (interiorEntryWeight), so walking in
 // the camera settles into the room rather than snapping in behind the head.
 //
+// Walking in through a front door the camera follows through it: past the door's outside
+// face the lens is held no higher over the eye than the door's head allows
+// (interiorEntryCap), keeping its distance behind the player, so its sight line threads the
+// doorway while the lens is still outside; a ray that leaves the air through an OPENING may
+// run on past it (interiorSegmentFraction's `through`), so nothing between the lens and the
+// player has to be cut away. Where a ray would pass over a lintel or under a ceiling the
+// camera flattens by the least that clears it (chooseInteriorFraming, found by bisection, so
+// it changes smoothly with the walk) rather than pulling in: the lens never dives from high
+// outside the building down into the head, and its height only falls on the way in.
+//
 // The same walk answers the nameplate question for a player indoors: a plate outside the
 // interior shows only when the camera's sight line to it leaves the air through an OPENING
 // (a face of a box the building marks as open onto the world, its front door), never
@@ -47,8 +57,36 @@ export interface CameraInterior {
   /** Per box, the cylinder that rounds it (null: the plain box). */
   rounds: readonly (InteriorRound | null)[];
   openings: readonly InteriorOpening[];
+  /** Per opening, its threshold: how deep its box runs in from its outside face before the
+   *  rooms' air begins (a front door's wall thickness). The eye is on the threshold, not yet
+   *  indoors, until it is past it. */
+  thresholds: readonly number[];
   /** The union's bounds: a point outside them is outside every box. */
   bounds: InteriorBox;
+}
+
+/** An opening's threshold: from its outside face in to where the other boxes that share its
+ *  cross-section begin (none: the whole box). */
+function openingThreshold(boxes: readonly InteriorBox[], o: InteriorOpening): number {
+  const b = boxes[o.box];
+  const a = o.axis;
+  const face = o.side > 0 ? b[a * 2 + 1] : b[a * 2];
+  let reach = o.side > 0 ? b[a * 2] : b[a * 2 + 1];
+  for (let j = 0; j < boxes.length; j++) {
+    if (j === o.box) continue;
+    const c = boxes[j];
+    let overlaps = true;
+    for (let k = 0; k < 3; k++) {
+      if (k === a) continue;
+      if (c[k * 2] >= b[k * 2 + 1] || c[k * 2 + 1] <= b[k * 2]) overlaps = false;
+    }
+    if (!overlaps) continue;
+    reach =
+      o.side > 0
+        ? Math.max(reach, Math.min(c[a * 2 + 1], face))
+        : Math.min(reach, Math.max(c[a * 2], face));
+  }
+  return Math.abs(face - reach);
 }
 
 export function cameraInterior(
@@ -69,6 +107,7 @@ export function cameraInterior(
     boxes,
     rounds: boxes.map((_, i) => rounds.get(i) ?? null),
     openings,
+    thresholds: openings.map((o) => openingThreshold(boxes, o)),
     bounds: [b[0], b[1], b[2], b[3], b[4], b[5]],
   };
 }
@@ -110,8 +149,8 @@ export function interiorContains(
 
 /**
  * Whether a player's eye at this point is indoors: in a box of the air that is not an
- * opening's (a body in the front doorway's thickness is still on the threshold, so the
- * camera does not squeeze in behind it until it steps into the room).
+ * opening's (a body in the front doorway's thickness is still on the threshold: the camera
+ * is left exactly as it is, and every blend in starts from nothing past the threshold).
  */
 export function interiorHoldsEye(vol: CameraInterior, x: number, y: number, z: number): boolean {
   const u = vol.bounds;
@@ -195,16 +234,29 @@ function slabPiece(
 }
 
 /** Where the last walk left the air: the box (-1 when it never did, or never started in
- *  it) and that box's face. */
-export const interiorExit = { box: -1, axis: 0, side: 1 };
+ *  it) and that box's face; `open` when that face is an opening's onto the world. */
+export const interiorExit = { box: -1, axis: 0, side: 1, open: false };
 
 const EPS = 1e-6;
+
+/** Whether the exit left in `interiorExit` is an opening's face onto the world. */
+function exitIsOpening(vol: CameraInterior): boolean {
+  const exit = interiorExit;
+  if (exit.box < 0) return false;
+  for (const o of vol.openings) {
+    if (o.box === exit.box && o.axis === exit.axis && o.side === exit.side) return true;
+  }
+  return false;
+}
 
 /**
  * Walk the segment a to b through the air (every box shrunk by `pad`) and return the
  * fraction of it (0 to 1) at which it first leaves; 1 when it never does. A start inside a
  * box but within `pad` of its faces (a player's eye against a wall) may walk out of that
- * band into the box, never the other way. The exit is left in `interiorExit`.
+ * band into the box, never the other way. The exit is left in `interiorExit`. A segment that
+ * leaves through an opening's face onto the world runs on past it by `through` (0 to 1) of
+ * the rest: the whole of it at 1 (the camera may stand outside, seeing in through the
+ * doorway), none at 0.
  */
 export function interiorSegmentFraction(
   vol: CameraInterior,
@@ -215,11 +267,13 @@ export function interiorSegmentFraction(
   by: number,
   bz: number,
   pad: number,
+  through = 0,
 ): number {
   const dx = bx - ax;
   const dy = by - ay;
   const dz = bz - az;
   interiorExit.box = -1;
+  interiorExit.open = false;
   let t = 0;
   // each pass moves on to the farthest exit among the boxes the walk stands in, so it ends
   // within one pass per box
@@ -246,6 +300,11 @@ export function interiorSegmentFraction(
     interiorExit.axis = bestAxis;
     interiorExit.side = bestSide;
     if (best >= 1 - EPS) return 1;
+    if (exitIsOpening(vol)) {
+      // out through the front door: the world outside, as far as `through` lets it run
+      interiorExit.open = true;
+      return best + Math.max(0, Math.min(1, through)) * (1 - best);
+    }
     t = best;
   }
   return t;
@@ -265,12 +324,7 @@ export function interiorSeesOut(
   z: number,
 ): boolean {
   if (interiorSegmentFraction(vol, camX, camY, camZ, x, y, z, 0) >= 1) return true;
-  const exit = interiorExit;
-  if (exit.box < 0) return false;
-  for (const o of vol.openings) {
-    if (o.box === exit.box && o.axis === exit.axis && o.side === exit.side) return true;
-  }
-  return false;
+  return interiorExit.open;
 }
 
 /** The pad that keeps the whole near-plane rectangle clear of a face (not just its centre),
@@ -384,10 +438,17 @@ export function stepInteriorBoom(
 // The threshold: the clamp blends in over the first yards inside a door
 // ---------------------------------------------------------------------------
 
-/** Over this many yards in from an opening's outside face the clamp blends in, from none at
- *  the door to whole: walking in, the camera follows through the doorway and settles into
- *  the room over a few strides, never snapping in behind the head at the threshold. */
-export const INTERIOR_ENTRY_BLEND = 6;
+/** Over this many yards in past an opening's threshold a pull-in blends in, from none at the
+ *  door to whole: walking in at an angle (a sight line cut by a jamb, not threading the
+ *  door) the camera closes in over a few strides, never snapping in behind the head at the
+ *  threshold. A camera behind a player walking in threads the doorway (interiorEntryCap) and
+ *  needs no blend; a flattening under a lintel or a ceiling is never blended. */
+export const INTERIOR_ENTRY_BLEND = 4;
+/** Over this many yards in past an opening's threshold the entry cap comes in whole. */
+export const INTERIOR_ENTRY_CAP_IN = 5;
+/** Past the point where the requested lens has come in through the door (its horizontal
+ *  distance behind the eye, and a yard) the entry cap lets go over this many yards. */
+export const INTERIOR_ENTRY_CAP_RELAX = 4;
 /** However slowly the player comes in (or if they stop on the threshold), the clamp is whole
  *  this long (seconds) after the eye stepped inside: the lens never lingers outside. */
 export const INTERIOR_ENTRY_SETTLE_SEC = 0.8;
@@ -401,13 +462,29 @@ export function interiorEntrySettle(sec: number): number {
 }
 
 /**
- * How engaged the clamp is for an eye at (x, y, z): 0 on an opening's outside face, rising
- * smoothly (smoothstep) to 1 at INTERIOR_ENTRY_BLEND yards from every opening's face
- * rectangle; 1 in an interior with no openings.
+ * How engaged the clamp is for an eye at (x, y, z): 0 on an opening's threshold (its outside
+ * face, past the doorway's thickness), rising smoothly (smoothstep) to 1 INTERIOR_ENTRY_BLEND
+ * yards further in; 1 in an interior with no openings.
  */
 export function interiorEntryWeight(vol: CameraInterior, x: number, y: number, z: number) {
+  if (vol.openings.length === 0) return 1;
+  nearestOpening(vol, x, y, z);
+  const t = Math.min(1, interiorNearestOpening.depth / INTERIOR_ENTRY_BLEND);
+  return t * t * (3 - 2 * t);
+}
+
+/** The nearest opening to an eye, written by interiorEntryCap and interiorEntryWeight: its
+ *  box's top (world y) and the eye's depth past its threshold (0 on the threshold and out). */
+export const interiorNearestOpening = { top: Infinity, depth: Infinity, axis: 0, side: 1 };
+
+function nearestOpening(vol: CameraInterior, x: number, y: number, z: number): void {
   let nearest = Infinity;
-  for (const o of vol.openings) {
+  let top = Infinity;
+  let sill = 0;
+  let axisOut = 0;
+  let sideOut = 1;
+  for (let i = 0; i < vol.openings.length; i++) {
+    const o = vol.openings[i];
     const b = vol.boxes[o.box];
     let d2 = 0;
     for (let axis = 0; axis < 3; axis++) {
@@ -415,16 +492,92 @@ export function interiorEntryWeight(vol: CameraInterior, x: number, y: number, z
       const lo = b[axis * 2];
       const hi = b[axis * 2 + 1];
       let d: number;
-      if (axis === o.axis) d = v - (o.side > 0 ? hi : lo);
+      // past the face, out in the world: no depth in at all
+      if (axis === o.axis) d = Math.max(0, o.side * ((o.side > 0 ? hi : lo) - v));
       else d = v < lo ? lo - v : v > hi ? v - hi : 0;
       d2 += d * d;
     }
-    if (d2 < nearest) nearest = d2;
+    if (d2 < nearest) {
+      nearest = d2;
+      top = b[3];
+      sill = vol.thresholds[i] ?? 0;
+      axisOut = o.axis;
+      sideOut = o.side;
+    }
   }
-  if (nearest === Infinity) return 1;
-  const t = Math.min(1, Math.sqrt(nearest) / INTERIOR_ENTRY_BLEND);
-  return t * t * (3 - 2 * t);
+  interiorNearestOpening.top = top;
+  interiorNearestOpening.depth = Math.max(0, Math.sqrt(nearest) - sill);
+  interiorNearestOpening.axis = axisOut;
+  interiorNearestOpening.side = sideOut;
 }
+
+const smoothstep01 = (t: number): number => {
+  const u = Math.min(1, Math.max(0, t));
+  return u * u * (3 - 2 * u);
+};
+
+/** The entry cap bites whole on a boom this many yards (along the door's outward axis) back
+ *  toward the door from the eye, fading to nothing on one that runs across the room or
+ *  deeper in. */
+export const INTERIOR_ENTRY_CAP_TOWARD = 2;
+
+/**
+ * The entry cap: how high over an eye at (x, y, z) the lens may stand along a requested boom
+ * (dx, dy, dz), near a front door, when the boom runs back toward that door (the camera
+ * behind a player walking in). Past the door's threshold the lens is held no higher than the
+ * door's head (less the near-plane pad) over the eye, keeping its distance behind the player,
+ * so the sight line threads the doorway while the lens is still outside and the lens only
+ * ever comes down on the way in (a smooth fall over INTERIOR_ENTRY_CAP_IN yards from nothing
+ * on the threshold); once the requested lens has come in through the door the cap lets go
+ * over INTERIOR_ENTRY_CAP_RELAX yards. A boom across the room or deeper into it is never
+ * capped. Returns the capped rise (dy unchanged when nothing caps it, or when the boom looks
+ * up).
+ */
+export function interiorEntryCap(
+  vol: CameraInterior,
+  x: number,
+  y: number,
+  z: number,
+  dx: number,
+  dy: number,
+  dz: number,
+  pad: number,
+): number {
+  interiorEntryHold.value = 0;
+  if (vol.openings.length === 0) return dy;
+  nearestOpening(vol, x, y, z);
+  const { top, depth } = interiorNearestOpening;
+  const behind = Math.hypot(dx, dz);
+  // the requested lens has come in through the door: the cap, and the through-door hold,
+  // let go
+  const hold = 1 - smoothstep01((depth - behind - 1) / INTERIOR_ENTRY_CAP_RELAX);
+  interiorEntryHold.value = hold;
+  if (dy <= 0) return dy;
+  const rise = Math.max(0.2, top - pad - y);
+  if (dy <= rise) return dy;
+  const o = interiorNearestOpening;
+  const toward = o.side * (o.axis === 0 ? dx : o.axis === 1 ? dy : dz);
+  const e =
+    smoothstep01(toward / INTERIOR_ENTRY_CAP_TOWARD) *
+    smoothstep01(depth / INTERIOR_ENTRY_CAP_IN) *
+    hold;
+  return dy - e * (dy - rise);
+}
+
+/** The last interiorEntryCap's hold (1 while the requested lens may still be out beyond the
+ *  door, easing to 0 once it has come in): the driver scales the through-door hold by it, so
+ *  deep in a room a ray is never let out through the door. */
+export const interiorEntryHold = { value: 0 };
+
+/** How long (seconds) the lens may stay outside a door once the player has stopped just
+ *  inside it, before it comes in to the room (the through-door hold eases out). */
+export const INTERIOR_THROUGH_HOLD_SEC = 1.0;
+/** However the player walks, the lens has come in from outside this long (seconds) after the
+ *  eye stepped in (a slow walk in, a camera turned to the door from deep in the room). */
+export const INTERIOR_THROUGH_MAX_SEC = 4;
+/** An eye first held deeper than this past a threshold (yards) did not walk in through the
+ *  door (a teleport, a login inside): the lens is never held outside for it. */
+export const INTERIOR_THROUGH_WALK_IN_DEPTH = 1.5;
 
 /** Longest a release after walking out may take (seconds): then the camera is free. */
 export const INTERIOR_RELEASE_MAX_SEC = 1.5;
@@ -450,6 +603,15 @@ export const INTERIOR_DROPS: readonly number[] = [0.1, 0.2, 0.3, 0.45, 0.6];
 const DROP_GAIN = 1;
 /** How fast a framing (lift and swing) glides in and settles back (1/s). */
 export const INTERIOR_LIFT_RATE = 5;
+/** How fast (radians a second) the camera may flatten when the geometry asks for more: fast
+ *  enough that a walk in under a lintel never lags it (the lens never pulls in behind the
+ *  head for want of a flattening), never a one-frame jump. Giving the flattening back is the
+ *  gentle framing glide. */
+export const INTERIOR_FLATTEN_RATE = 6;
+/** However far the boom, a flattening sweeps the lens no faster than this (yards a second). */
+export const INTERIOR_FLATTEN_MAX_SPEED = 24;
+/** The bisection steps of the least flattening (radians: the elevation span / 2^steps). */
+const FLATTEN_STEPS = 12;
 /** However far a framing turns the camera, the lens sweeps no faster than this (yards a
  *  second) round the look point: a long boom turns slowly, a short one quickly. */
 export const INTERIOR_FRAMING_MAX_SPEED = 10;
@@ -539,18 +701,60 @@ export function stepInteriorFraming(
 
 const frameScratch = { x: 0, y: 0, z: 0 };
 
-/** The framing chosen for a cramped boom, written by chooseInteriorFraming. */
-export const interiorFramingChoice = { lift: 0, swing: 0, boom: 0 };
+/** A framing's lift this frame: a flattening that must grow (a negative target under the
+ *  current lift) follows at INTERIOR_FLATTEN_RATE, so the ray keeps clear of the lintel or
+ *  ceiling that asked for it; anything else (a lift over a cramped spot, a flattening given
+ *  back) takes the gentle framing glide (stepInteriorFraming). */
+export function stepInteriorLift(
+  previous: number,
+  target: number,
+  dt: number,
+  immediate: boolean,
+  boom = 0,
+): number {
+  if (immediate) return target;
+  if (target < previous && target < 0) {
+    const rate = Math.min(INTERIOR_FLATTEN_RATE, INTERIOR_FLATTEN_MAX_SPEED / Math.max(1, boom));
+    return Math.max(target, previous - rate * Math.max(0, dt));
+  }
+  return stepInteriorFraming(previous, target, dt, false, boom);
+}
+
+/** The framing chosen for a cramped boom, written by chooseInteriorFraming: its lift and
+ *  swing, the boom it allows, and whether it is a flattening the geometry asks for (a lintel,
+ *  a ceiling), which the driver applies whole, never blended by the threshold. */
+export const interiorFramingChoice = { lift: 0, swing: 0, boom: 0, flatten: false };
+
+/** The boom along a framing of (dx, dy, dz) from (sx, sy, sz) inside `vol`: the chooser's
+ *  probe. */
+function boomAlong(
+  vol: CameraInterior,
+  sx: number,
+  sy: number,
+  sz: number,
+  dx: number,
+  dy: number,
+  dz: number,
+  len: number,
+  pad: number,
+  through: number,
+  lift: number,
+  swing: number,
+): number {
+  const d = frameBoomInto(frameScratch, dx, dy, dz, lift, swing);
+  return len * interiorSegmentFraction(vol, sx, sy, sz, sx + d.x, sy + d.y, sz + d.z, pad, through);
+}
 
 /**
- * Choose how to frame a boom from (sx, sy, sz) along (dx, dy, dz) inside `vol`. A boom cut
- * short by a low ceiling first flattens (the least of INTERIOR_DROPS that gives the whole
- * boom, else the longest, taken only for a real gain): the camera slides under the ceiling
- * rather than pulling in. Then none when that boom is comfortable (or the requested one is
- * shorter than comfort anyway), else the first framing of INTERIOR_FRAMINGS that gives a
- * comfortable boom, trying first the side the camera already swings to (`side`, so it never
- * flips about a corner), else the longest. Written to interiorFramingChoice (lift, swing, and
- * the boom it allows).
+ * Choose how to frame a boom from (sx, sy, sz) along (dx, dy, dz) inside `vol` (a ray out
+ * through an opening runs on past it by `through`, interiorSegmentFraction's). A ray stopped
+ * by a wall, a lintel or a ceiling first tries the least flattening that clears it (bisected,
+ * so it follows the player's walk smoothly); failing that, under a low ceiling, the flattening
+ * of INTERIOR_DROPS that gives the longest boom, taken only for a real gain: the camera
+ * slides under rather than pulling in. Then none when that boom is comfortable (or the
+ * requested one is shorter than comfort anyway), else the first framing of INTERIOR_FRAMINGS
+ * that gives a comfortable boom, trying first the side the camera already swings to (`side`,
+ * so it never flips about a corner), else the longest. Written to interiorFramingChoice.
  */
 export function chooseInteriorFraming(
   vol: CameraInterior,
@@ -562,25 +766,47 @@ export function chooseInteriorFraming(
   dz: number,
   pad: number,
   side: number,
+  through = 0,
 ): typeof interiorFramingChoice {
   const out = interiorFramingChoice;
   const len = Math.hypot(dx, dy, dz);
   out.lift = 0;
   out.swing = 0;
-  out.boom = len * interiorSegmentFraction(vol, sx, sy, sz, sx + dx, sy + dy, sz + dz, pad);
-  // under a low ceiling: flatten to keep the distance (the exit is the air's top face)
-  if (out.boom < len - 0.05 && interiorExit.axis === 1 && interiorExit.side === 1) {
+  out.flatten = false;
+  const full = len - 1e-6;
+  out.boom = boomAlong(vol, sx, sy, sz, dx, dy, dz, len, pad, through, 0, 0);
+  if (out.boom < full) {
+    const ceiling = interiorExit.axis === 1 && interiorExit.side === 1;
     const raw = out.boom;
-    for (const drop of INTERIOR_DROPS) {
-      const d = frameBoomInto(frameScratch, dx, dy, dz, -drop, 0);
-      if (d.x === dx && d.y === dy && d.z === dz) break; // already as flat as it goes
-      const boom =
-        len * interiorSegmentFraction(vol, sx, sy, sz, sx + d.x, sy + d.y, sz + d.z, pad);
-      if (boom > out.boom + 0.05 && boom >= raw + DROP_GAIN) {
-        out.lift = -drop;
-        out.boom = boom;
+    const most = Math.atan2(dy, Math.hypot(dx, dz)) - INTERIOR_DROP_MIN_PITCH;
+    const flattest =
+      most > 1e-4 ? boomAlong(vol, sx, sy, sz, dx, dy, dz, len, pad, through, -most, 0) : 0;
+    if (most > 1e-4 && flattest >= full) {
+      // the least flattening that keeps the whole distance
+      let lo = 0;
+      let hi = most;
+      for (let k = 0; k < FLATTEN_STEPS; k++) {
+        const mid = (lo + hi) / 2;
+        if (boomAlong(vol, sx, sy, sz, dx, dy, dz, len, pad, through, -mid, 0) >= full) hi = mid;
+        else lo = mid;
       }
-      if (boom >= len - 0.05) break;
+      out.lift = -hi;
+      out.boom = boomAlong(vol, sx, sy, sz, dx, dy, dz, len, pad, through, -hi, 0);
+      out.flatten = true;
+    } else if (ceiling) {
+      for (const drop of INTERIOR_DROPS) {
+        const d = frameBoomInto(frameScratch, dx, dy, dz, -drop, 0);
+        if (d.x === dx && d.y === dy && d.z === dz) break; // already as flat as it goes
+        const boom = boomAlong(vol, sx, sy, sz, dx, dy, dz, len, pad, through, -drop, 0);
+        // a partial flattening is for a ceiling: never one that leaves through the door
+        if (interiorExit.open) continue;
+        if (boom > out.boom + 0.05 && boom >= raw + DROP_GAIN) {
+          out.lift = -drop;
+          out.boom = boom;
+          out.flatten = true;
+        }
+        if (boom >= len - 0.05) break;
+      }
     }
   }
   if (out.boom >= INTERIOR_COMFORT_BOOM - 1e-9 || len <= INTERIOR_COMFORT_BOOM) return out;
@@ -589,19 +815,32 @@ export function chooseInteriorFraming(
   for (const f of INTERIOR_FRAMINGS) {
     for (let k = 0; k < (f.swing === 0 ? 1 : 2); k++) {
       const sign = k === 0 ? first : -first;
-      const d = frameBoomInto(frameScratch, dx, dy, dz, f.lift, f.swing * sign);
-      const boom =
-        len * interiorSegmentFraction(vol, sx, sy, sz, sx + d.x, sy + d.y, sz + d.z, pad);
+      const boom = boomAlong(
+        vol,
+        sx,
+        sy,
+        sz,
+        dx,
+        dy,
+        dz,
+        len,
+        pad,
+        through,
+        f.lift,
+        f.swing * sign,
+      );
       if (boom > best + 0.05) {
         best = boom;
         out.lift = f.lift;
         out.swing = f.swing * sign;
         out.boom = boom;
+        out.flatten = false;
       }
       if (boom >= INTERIOR_COMFORT_BOOM) {
         out.lift = f.lift;
         out.swing = f.swing * sign;
         out.boom = boom;
+        out.flatten = false;
         return out;
       }
     }

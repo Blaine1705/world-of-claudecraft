@@ -1,38 +1,32 @@
 // The Mirefen tavern's interior for the indoor chase camera (interior_camera_core.ts): the
-// air of every room as boxes in the tavern's local frame (content/mirefen_tavern.ts), each
-// against the inner wall faces, the floors and the ceilings the model draws, joined by the
-// doorways and the arch between them, and turned into the world. Three-, DOM- and i18n-free.
+// air of the common room, its front doorway, the arch and the tower's nook as boxes in the
+// tavern's local frame (content/mirefen_tavern.ts), each against the inner wall faces, the
+// floors and the lowest roof timber, joined through the doorway and the arch, and turned
+// into the world. Three-, DOM- and i18n-free.
 //
-//  - the common room: its floor (a hand under it, for the hearth pit) to under the roof's
-//    rafters, the nave up to its tie beams; the barrel wall under the gallery is solid, so
-//    the ground floor's air steps round it and the gallery's air starts at its deck; the wall
-//    fireplace's breast is solid to the eaves, so no box reaches into it;
-//  - the front doorway (its outside face is the tavern's one opening onto the world: the
-//    plates of the road show through it), the arch onto the stair tower (its segmental head
-//    as two boxes), the gallery's door into the wing and the tower's passage onto the landing;
-//  - the stair tower: its round shaft, exact (a box rounded by the ring's inner face), behind
-//    the hall's back wall (the newel stands in it: the shell cuts it for the sight line);
-//  - upstairs in the wing: the landing and the two guest rooms behind their partition, each
-//    joined through its doorway.
+//  - the common room: its floor (a hand under it, for the hearth pit) to TAVERN_HALL_AIR_TOP,
+//    well under the hammer beams, the hood, the chandelier and the lanterns (nothing hangs
+//    into the air: tests/mirefen_tavern_interior_core.test.ts); the wall fireplace's breast
+//    is solid to the eaves and the barrel racks behind the bar are solid to their tops, so
+//    the air steps round both (the bar's pillar is not: it cuts away for the sight line,
+//    mirefen_tavern_core.ts);
+//  - the front doorway, its outside face the tavern's one opening onto the world (the camera
+//    may follow through it from outside, and the plates of the road show through it);
+//  - the arch onto the tower's nook (its segmental head as two boxes), and the nook's round
+//    shaft, exact (a box rounded by the ring's inner face), up into its cone.
 //
 // Every doorway box runs a yard and more into the rooms either side, so the union stays
 // joined when the camera shrinks each box by its near-plane pad.
 
 import {
   TAVERN_ARCH,
+  TAVERN_BAR_PLATFORM,
   TAVERN_DOOR,
   TAVERN_FLOOR_Y,
-  TAVERN_GALLERY,
-  TAVERN_GALLERY_DOOR,
   TAVERN_HALL,
   TAVERN_ORIGIN,
   TAVERN_PROPS,
-  TAVERN_ROOM_DOOR_HEIGHT,
-  TAVERN_ROOM_WALLS,
   TAVERN_TOWER,
-  TAVERN_TOWER_DOOR,
-  TAVERN_UPPER,
-  TAVERN_WING,
   tavernToWorld,
 } from '../sim/content/mirefen_tavern';
 import {
@@ -44,20 +38,12 @@ import {
 } from './interior_camera_core';
 
 const H = TAVERN_HALL;
-const W = TAVERN_WING;
 const T = TAVERN_TOWER;
-const G = TAVERN_GALLERY;
-const UP = TAVERN_UPPER;
 
-/** Under the rafters at the side walls (the roof's underside there, less a hand). */
-export const TAVERN_HALL_AIR_TOP = 9.4;
-/** Under the nave's tie beams. */
-export const TAVERN_NAVE_AIR_TOP = H.tie - 0.4;
-/** The nave's half width (the tie beams' span over the posts). */
-const NAVE_X = H.aisleX + 0.4;
-/** Under the wing's tie beams at its eaves. */
-export const TAVERN_WING_AIR_TOP = W.eave - 0.4;
-/** Under the tower's wall plate. */
+/** The common room's air stops here: a yard and more under the lowest roof timber (the
+ *  hammer beams, TAVERN_HALL.truss), the hood's rim, the chandelier and the lanterns. */
+export const TAVERN_HALL_AIR_TOP = 9.0;
+/** The nook's air: up into the tower's cone, under the crown of candles hung in it. */
 export const TAVERN_TOWER_AIR_TOP = T.wallTop - 0.2;
 /** A hand under the ground floor (the hearth pit's floor is 0.45 down). */
 const FLOOR_AIR = -0.6;
@@ -73,6 +59,13 @@ const fireX0 = (fire?.x ?? ix1) - (fire?.hw ?? 0) - 0.1;
 const fireZ0 = (fire?.z ?? 0) - (fire?.hd ?? 0) - 0.1;
 const fireZ1 = (fire?.z ?? 0) + (fire?.hd ?? 0) + 0.1;
 
+// the barrel racks behind the bar: solid from the back wall to a hand before their fronts,
+// up to a hand over their top shelves
+const racks = TAVERN_PROPS.filter((p) => p.kind === 'barrels');
+const RACK_X0 = Math.min(...racks.map((p) => p.x - (p.hw ?? 0))) - 0.1;
+const RACK_FRONT = Math.max(...racks.map((p) => p.z + (p.hd ?? 0))) + 0.1;
+const RACK_TOP = TAVERN_BAR_PLATFORM.lift + Math.max(...racks.map((p) => p.height)) + 0.2;
+
 // the arch's segmental head (tavern_shell.py hall_back): springing at 3.9, crowned at its
 // height; the second box is the head's chord half a yard under the crown
 const ARCH_SPRING = 3.9;
@@ -85,30 +78,23 @@ const archCrownHalf = Math.sqrt(
   Math.max(0, archR * archR - (archCrownY - (TAVERN_ARCH.height - archR)) ** 2),
 );
 
-// the tower's shaft: the ring's inner face (its chords sit a hand inside the circle), cut
-// off by the hall's back wall
+// the nook's shaft: the ring's inner face (its chords sit a hand inside the circle), cut off
+// by the hall's back wall
 const TOWER_AIR_R = T.rIn - 0.05;
-
-// the wing's rooms: the landing before the long partition, the two rooms behind it
-const partition = TAVERN_ROOM_WALLS[0];
-const ridgeWall = TAVERN_ROOM_WALLS[3];
-const wx0 = W.x0 + W.wall;
-const wx1 = W.x1 - W.wall;
-const wz0 = W.z0 + W.wall;
 
 /** The tavern's air in its local frame: [x0, x1, y0, y1, z0, z1]. */
 export const TAVERN_INTERIOR_LOCAL: readonly InteriorBox[] = [
-  // 0: the common room west of the gallery's barrel wall, floor to rafters
-  [ix0, G.x0, FLOOR_AIR, TAVERN_HALL_AIR_TOP, iz0, iz1],
-  // 1: the whole width in front of the barrel wall, clear of the wall fireplace's breast
-  [ix0, fireX0, FLOOR_AIR, TAVERN_HALL_AIR_TOP, G.z1, iz1],
+  // (the boxes overlap wide, so the union stays joined when each shrinks by the pad)
+  // 0: the common room west of the barrel racks, floor to the air's top, back wall to front
+  [ix0, RACK_X0, FLOOR_AIR, TAVERN_HALL_AIR_TOP, iz0, iz1],
+  // 1: before the racks, as far as the wall fireplace's breast
+  [ix0, fireX0, FLOOR_AIR, TAVERN_HALL_AIR_TOP, RACK_FRONT, iz1],
   // 2, 3: the whole width again, back and front of the breast
-  [ix0, ix1, FLOOR_AIR, TAVERN_HALL_AIR_TOP, G.z1, fireZ0],
+  [ix0, ix1, FLOOR_AIR, TAVERN_HALL_AIR_TOP, RACK_FRONT, fireZ0],
   [ix0, ix1, FLOOR_AIR, TAVERN_HALL_AIR_TOP, fireZ1, iz1],
-  // 4: over the gallery's deck to the rafters, reaching out over the room before it
-  [ix0, ix1, UP, TAVERN_HALL_AIR_TOP, iz0, G.z1 + REACH],
-  // 5: the nave's height between its posts, from the gallery's deck up to its tie beams
-  [-NAVE_X, NAVE_X, UP, TAVERN_NAVE_AIR_TOP, iz0, iz1],
+  // 4, 5: over the barrel racks' tops, either side of the breast's back edge
+  [ix0, fireX0, RACK_TOP, TAVERN_HALL_AIR_TOP, iz0, iz1],
+  [ix0, ix1, RACK_TOP, TAVERN_HALL_AIR_TOP, iz0, fireZ0],
   // 6: the front doorway, out to the wall's outside face (the opening onto the road)
   [
     TAVERN_DOOR.x - TAVERN_DOOR.width / 2,
@@ -118,7 +104,7 @@ export const TAVERN_INTERIOR_LOCAL: readonly InteriorBox[] = [
     iz1 - REACH,
     H.z1,
   ],
-  // 7, 8: the arch onto the tower, under its springing and under its head
+  // 7, 8: the arch onto the nook, under its springing and under its head
   [TAVERN_ARCH.x0, TAVERN_ARCH.x1, FLOOR_AIR, ARCH_SPRING, H.z0 - REACH, iz0 + REACH],
   [
     archMid - archCrownHalf,
@@ -128,7 +114,7 @@ export const TAVERN_INTERIOR_LOCAL: readonly InteriorBox[] = [
     H.z0 - REACH,
     iz0 + REACH,
   ],
-  // 9: the stair tower's shaft (rounded: TAVERN_TOWER_SHAFT)
+  // 9: the nook's shaft (rounded: TAVERN_TOWER_SHAFT)
   [
     T.x - T.rIn,
     T.x + T.rIn,
@@ -137,51 +123,11 @@ export const TAVERN_INTERIOR_LOCAL: readonly InteriorBox[] = [
     T.z - T.rIn,
     Math.min(T.z + T.rIn, H.z0),
   ],
-  // 10: the tower's passage onto the wing's landing
-  [
-    TAVERN_TOWER_DOOR.x0 - REACH,
-    TAVERN_TOWER_DOOR.x1 + REACH,
-    UP,
-    TAVERN_WING_AIR_TOP,
-    TAVERN_TOWER_DOOR.z0,
-    TAVERN_TOWER_DOOR.z1,
-  ],
-  // 11: the gallery's door through the back wall onto the landing
-  [
-    TAVERN_GALLERY_DOOR.x0,
-    TAVERN_GALLERY_DOOR.x1,
-    UP,
-    Math.min(UP + TAVERN_GALLERY_DOOR.height, TAVERN_WING_AIR_TOP),
-    H.z0 - REACH,
-    iz0 + REACH,
-  ],
-  // 12: the wing's landing, before the long partition, clear of the tower's bulge into it
-  [T.x + T.rOut + 0.1, wx1, UP, TAVERN_WING_AIR_TOP, partition[3], H.z0],
-  // 13, 14: the guest rooms either side of the ridge partition
-  [wx0, ridgeWall[0], UP, TAVERN_WING_AIR_TOP, wz0, partition[2]],
-  [ridgeWall[1], wx1, UP, TAVERN_WING_AIR_TOP, wz0, partition[2]],
-  // 15, 16: their doorways through the long partition
-  [
-    TAVERN_ROOM_WALLS[0][1],
-    TAVERN_ROOM_WALLS[1][0],
-    UP,
-    UP + TAVERN_ROOM_DOOR_HEIGHT,
-    partition[2] - REACH,
-    partition[3] + REACH,
-  ],
-  [
-    TAVERN_ROOM_WALLS[1][1],
-    TAVERN_ROOM_WALLS[2][0],
-    UP,
-    UP + TAVERN_ROOM_DOOR_HEIGHT,
-    partition[2] - REACH,
-    partition[3] + REACH,
-  ],
 ];
 
 /** The front doorway's box and its outside face (local +z, out of the door). */
 export const TAVERN_FRONT_DOOR_BOX = 6;
-/** The tower shaft's box, rounded by the ring's inner face (local x, z, r). */
+/** The nook's box, rounded by the ring's inner face (local x, z, r). */
 export const TAVERN_TOWER_SHAFT = { box: 9, x: T.x, z: T.z, r: TOWER_AIR_R } as const;
 
 /** Local box to world: local z runs along world +x, local x along world -z. */
@@ -207,8 +153,8 @@ export function mirefenTavernCameraInterior(): CameraInterior {
   );
 }
 
-/** Whether a player's eye at a local point is indoors (the shell's indoor test, the same
- *  rule the camera clamp holds the eye by: in the air, and not only in the front doorway). */
+/** Whether a player's eye at a local point is indoors (the shell's indoor test when the
+ *  camera clamp is not running: in the air, and not only in the front doorway). */
 export function eyeInTavernAir(x: number, y: number, z: number): boolean {
   const shaft = TAVERN_TOWER_SHAFT;
   for (let i = 0; i < TAVERN_INTERIOR_LOCAL.length; i++) {

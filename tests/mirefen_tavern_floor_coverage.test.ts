@@ -12,6 +12,7 @@ import {
   TAVERN_BAR_PLATFORM,
   TAVERN_HALL,
   TAVERN_PIT,
+  TAVERN_STAGE,
   TAVERN_TOWER,
   tavernToWorld,
 } from '../src/sim/content/mirefen_tavern';
@@ -28,7 +29,8 @@ import { mirefenTavernCovers, tavernLocalHeight } from '../src/sim/mirefen_taver
 // is rasterised onto a fine grid over the tavern's plan, and every cell a player can stand in
 // (inside the tavern, not inside a wall) must carry a drawn floor at the sim's walk height: no
 // slot where the ground outside shows through (the strip beside the bar platform left of the
-// innkeeper once did, and the boards' square ends left crescents round the hearth pit's curb).
+// innkeeper once did, and the boards' square ends left crescents round the hearth pit's curb;
+// the stage's deck and the tower's flagged nook are pinned the same way).
 // Seams narrower than JOINT (the boards' hairline joints) are not gaps; a flagged floor's
 // wider joints must show a mortar bed, never the ground. The sim's walk floor has a height
 // everywhere inside, and the grass and the scatter keep off the whole footprint.
@@ -41,10 +43,9 @@ const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
 const STEP = 0.1;
 const JOINT = 0.012;
 /** A drawn floor within this band of the sim's walk height counts: from a mortar bed a hand
- *  under a flag to a tread's nosing over the stair's ramp. */
+ *  under a flag to a nosing a hair over a deck. */
 const BELOW = 0.3;
-const ABOVE_FLAT = 0.12;
-const ABOVE_STAIR = 0.3;
+const ABOVE = 0.12;
 
 const X0 = TAVERN_HALL.x0;
 const X1 = TAVERN_HALL.x1;
@@ -61,12 +62,6 @@ function cellX(i: number): number {
 }
 function cellZ(j: number): number {
   return Z0 + (j + 0.5) * STEP;
-}
-
-function onStair(x: number, z: number): boolean {
-  return (
-    z < TAVERN_HALL.z0 && Math.hypot(x - TAVERN_TOWER.x, z - TAVERN_TOWER.z) < TAVERN_TOWER.rIn
-  );
 }
 
 /** Rasterise every up-facing triangle of the model onto the grid (1: a drawn floor there). */
@@ -139,8 +134,7 @@ function rasterise(): Uint8Array {
               const y = l1 * ay + l2 * by + l3 * cy;
               const h = tavernLocalHeight(px, pz);
               if (Number.isNaN(h)) continue;
-              const above = onStair(px, pz) ? ABOVE_STAIR : ABOVE_FLAT;
-              if (y >= h - BELOW && y <= h + above) {
+              if (y >= h - BELOW && y <= h + ABOVE) {
                 out[i * NZ + j] = 1;
                 break;
               }
@@ -161,12 +155,11 @@ const WALLS = [...tavernHallWalls(), ...tavernWingWalls()];
 const RING = tavernTowerWallSegments();
 
 /** Whether a local point stands where a player may: inside the tavern, clear of every wall
- *  and of the tower's ring and newel. */
+ *  and of the tower's ring. */
 function standable(x: number, z: number): boolean {
   if (!tavernInsideLocal(x, z)) return false;
   for (const b of WALLS) if (inBox(x, z, b)) return false;
   const r = Math.hypot(x - TAVERN_TOWER.x, z - TAVERN_TOWER.z);
-  if (r <= TAVERN_TOWER.newel + 0.05) return false;
   if (r >= TAVERN_TOWER.rIn - 0.05 && r <= TAVERN_TOWER.rOut + 0.05) {
     for (const s of RING) {
       const dx = x - s.x;
@@ -203,20 +196,27 @@ beforeAll(async () => {
 });
 
 describe('the Mirefen tavern floor is whole', () => {
-  it('draws a floor at the walk height under every standable cell, hall, tower and wing', () => {
+  it('draws a floor at the walk height under every standable cell, the hall and the nook', () => {
     const missing = gaps();
     expect(missing.length, `floor gaps at local ${missing.slice(0, 20).join(' ')}`).toBe(0);
   });
 
-  it('floors the strip left of the bar platform, the platform corner and the pit curb', () => {
-    // the named spots the owner and the audit found open onto the ground
+  it('floors the strip left of the bar platform, the corners, the pit curb and the nook', () => {
+    // the named spots the owner and the audit found open onto the ground, and the new
+    // stage's rounded corner, the arch's threshold and the nook's rose
     const plat = TAVERN_BAR_PLATFORM;
+    const st = TAVERN_STAGE;
     const spots: [number, number][] = [
       [plat.x0 - 0.25, -12.5],
       [plat.x0 - 0.25, -11],
       [plat.x0 - 0.45, plat.z1 + 0.35],
       [TAVERN_PIT.x - 5.5, TAVERN_PIT.z - 2.2],
       [TAVERN_PIT.x + 5.5, TAVERN_PIT.z + 2.2],
+      [st.x1 + 0.3, st.z1 + 0.3],
+      [(st.x0 + st.x1) / 2, (st.z0 + st.z1) / 2],
+      [-1.5, TAVERN_HALL.z0 + 0.2],
+      [TAVERN_TOWER.x, TAVERN_TOWER.z],
+      [TAVERN_TOWER.x + 4, TAVERN_TOWER.z - 3],
     ];
     for (const [x, z] of spots) {
       const i = Math.floor((x - X0) / STEP);

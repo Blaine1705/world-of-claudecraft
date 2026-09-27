@@ -1,35 +1,35 @@
 """The Mirefen tavern's shell (build_tavern.py calls build(B, parts) with itself as B): the walls
-and roofs the camera cuts away when a player is indoors, each its own part, and whatever
-hangs on a wall with it (windows, the door, the tankard sign, the notice board, trophies, the
-wall fireplace and its river-stone chimney), plus the gallery over the bar and the upstairs
-partitions, which cut away the same way.
+and roofs the camera cuts away when a player is outdoors behind them, each its own part, and
+whatever hangs on a wall with it (windows, the door, the notice board, trophies, the stage's
+curtain, the kitchen hatch, the wall fireplace and its river-stone chimney).
 
   HallWallFront   the front gable: the doorway and its open doors, two windows, two high
-                  lights, the round gable window, the porch canopy on its brackets, the door
-                  lanterns, the giant tankard hanging from its iron arm, the notice board
-  HallWallBack    the back gable: the stair arch with its voussoirs, the gallery's doorway into
-                  the wing, the bard's window, a garnet banner and a shield over the bard's
-                  corner
-  HallWallLeft    the long south side: three windows, two high lights, the antlered skull
-                  and the troll's club
+                  lights, the round gable window, the door lanterns
+  HallPorch       the porch canopy on its brackets and the giant tankard hanging from its
+                  iron arm: its own part, so a camera behind it ghosts it alone, never the
+                  whole front
+  HallWallBack    the back gable: the arch onto the tower's nook with its voussoirs, the
+                  kitchen's serving hatch with its sill and shutters, the stage's curtain
+                  under its pelmet, the garnet banner over it, a shield and crossed spears
+  HallWallLeft    the long south side: three windows, two high lights, the antlered skull,
+                  the troll's club and the notice board by the door
   HallWallRight   the long north side, the one travellers from Fenbridge see: three windows,
                   two high lights, the wall fireplace with its fire and the great jawbone over
                   its mantel, and the river-stone chimney outside
-  HallRoof        the dark green slate roof, its sarking, rafters, purlins, trusses over the
-                  tie beams, ridge and bargeboards
+  HallRoof        the dark green slate roof, its sarking, rafters, purlins and ridge, and the
+                  hammerbeam trusses: every timber of them over HALL['truss'], so none
+                  crosses the room where the camera flies
   WingWall*       the wing's stone lower storey and timber-framed upper storey
   WingRoof        its slate roof
-  TowerWall       the round stair tower's wall, open to the hall under the arch: coursed
-                  ashlar both sides over a mortar core, arrow slits in dressed frames
-  TowerRoof       its slate cone and finial
-  Gallery         the gallery's deck, its rail and the barrel wall under it
-  RoomWalls       the upstairs partitions and their doors
+  TowerWall       the round tower's wall, open to the hall under the arch: coursed ashlar
+                  both sides over a mortar core, arrow slits in dressed frames
+  TowerRoof       its slate cone, the rafters seen from the nook under it, and its finial
 """
 import math
 
 
 def build(B, parts):
-    hall_front(B, parts['HallWallFront'])
+    hall_front(B, parts['HallWallFront'], parts['HallPorch'])
     hall_back(B, parts['HallWallBack'], parts['TavernTrim'])
     hall_left(B, parts['HallWallLeft'])
     hall_right(B, parts['HallWallRight'])
@@ -38,8 +38,6 @@ def build(B, parts):
     wing_roof(B, parts['WingRoof'])
     tower_wall(B, parts['TowerWall'], parts['TavernTrim'])
     tower_roof(B, parts['TowerRoof'])
-    gallery(B, parts['Gallery'])
-    room_walls(B, parts['RoomWalls'])
 
 
 def pitch(B):
@@ -173,26 +171,30 @@ def tankard(B, p, x, y, z):
                     (0.3, dy + 0.3, 0.2), B.PAL['foam'], B.PLASTER, jitter=0.05, subdivisions=1)
 
 
-def notice_board(B, p, x0, x1, y0, y1, z):
-    """The notice board inside by the door: a framed board, papers pinned at angles."""
-    B.abox(p, x0, x1, y0, y1, z - 0.12, z, B.PAL['board'][2], B.WOOD)
-    for (a, b, c, d) in ((x0 - 0.1, x1 + 0.1, y1, y1 + 0.14), (x0 - 0.1, x1 + 0.1, y0 - 0.14, y0),
-                         (x0 - 0.1, x0, y0, y1), (x1, x1 + 0.1, y0, y1)):
-        B.abox(p, a, b, c, d, z - 0.18, z, B.PAL['beam_dark'], B.WOOD)
-    # a little roof over it
-    B.abox(p, x0 - 0.3, x1 + 0.3, y1 + 0.14, y1 + 0.3, z - 0.5, z, B.PAL['beam'], B.WOOD)
+def notice_board(B, p, wall, u0, u1, v0, v1, t):
+    """The notice board on a wall's inner face: a framed board under a little shingled hood,
+    papers pinned at angles, a garnet pin in each."""
+    f = -t / 2
+    wall.box(p, u0, u1, v0, v1, f - 0.12, f, B.PAL['board'][2], B.WOOD)
+    for (a, b, c, d) in ((u0 - 0.1, u1 + 0.1, v1, v1 + 0.14), (u0 - 0.1, u1 + 0.1, v0 - 0.14, v0),
+                         (u0 - 0.1, u0, v0, v1), (u1, u1 + 0.1, v0, v1)):
+        wall.box(p, a, b, c, d, f - 0.18, f, B.PAL['beam_dark'], B.WOOD)
+    wall.box(p, u0 - 0.3, u1 + 0.3, v1 + 0.14, v1 + 0.3, f - 0.5, f, B.PAL['beam'], B.WOOD)
     papers = ((0.2, 0.25, 0.7, 0.9, 0.08), (1.05, 0.15, 0.6, 0.75, -0.12), (1.8, 0.35, 0.8, 0.6, 0.05),
               (0.35, 1.2, 0.9, 0.6, -0.06), (1.35, 1.05, 0.55, 0.8, 0.14), (2.1, 1.15, 0.6, 0.55, -0.1))
     for i, (u, v, w, h, roll) in enumerate(papers):
-        cx, cy = x0 + u + w / 2, y0 + v + h / 2
-        if cx + w / 2 > x1 or cy + h / 2 > y1:
+        cu, cv = u0 + u + w / 2, v0 + v + h / 2
+        if cu + w / 2 > u1 or cv + h / 2 > v1:
             continue
-        p.box((cx, cy, z - 0.14), (w, h, 0.02), B.PAL['parchment'] if i % 3 else B.PAL['cream'], B.PLASTER,
+        x, y, z = wall.pt(cu, cv, f - 0.14)
+        yaw = math.atan2(-wall.nx, -wall.nz)
+        p.box((x, y, z), (w, h, 0.02), B.PAL['parchment'] if i % 3 else B.PAL['cream'], B.PLASTER, yaw=yaw,
               roll=roll)
-        p.box((cx, cy + h / 2 - 0.08, z - 0.16), (0.07, 0.07, 0.03), B.PAL['garnet'], B.METAL)
+        x, y, z = wall.pt(cu, cv + h / 2 - 0.08, f - 0.16)
+        p.box((x, y, z), (0.07, 0.07, 0.03), B.PAL['garnet'], B.METAL, yaw=yaw)
 
 
-def hall_front(B, p):
+def hall_front(B, p, porch_part):
     H, t = B.HALL, B.HALL['wall']
     zc = H['z1'] - t / 2
     wall = B.Wall(H['x0'], zc, H['x1'], zc, (0, 1))
@@ -233,7 +235,11 @@ def hall_front(B, p):
             B.abox(p, xa + 0.05, xb - 0.05, yy - 0.08, yy + 0.08, zi - 0.24, zi - 0.16, B.PAL['iron'], B.METAL)
         ring_x = xa + 0.35 if s > 0 else xb - 0.35
         p.ring((ring_x, 2.4, zi - 0.28), 0.16, 0.05, B.PAL['iron'], segments=8, axis=(0, 0, 1), mat=B.METAL)
-    # the porch canopy: a small slate gable on two great curved brackets
+    # the door lanterns either side of the canopy
+    for x in (-5.0, 5.0):
+        wall_lantern(B, p, wall, mid + x, 4.2)
+    # the porch canopy: a small slate gable on two great curved brackets (its own part)
+    p = porch_part
     q = B.LAYOUT['porch']
     ez, eave, ridge, hwc = q['z1'] + 0.6, 6.2, 8.4, 3.9
     front = ez
@@ -258,9 +264,6 @@ def hall_front(B, p):
     B.hexa(p, [(-hwc, eave, front - 0.1), (hwc, eave, front - 0.1), (hwc, eave, front), (-hwc, eave, front),
                (-0.05, ridge - 0.1, front - 0.1), (0.05, ridge - 0.1, front - 0.1), (0.05, ridge - 0.1, front),
                (-0.05, ridge - 0.1, front)], B.PAL['plaster'][0], B.PLASTER)
-    # the door lanterns either side of the canopy
-    for x in (-5.0, 5.0):
-        wall_lantern(B, p, wall, mid + x, 4.2)
     # the giant tankard on its iron arm, out over the porch's right side toward the road
     tx, tz, arm = 8.4, H['z1'] + 3.8, 12.0
     B.beam(p, (tx, arm, H['z1'] + 0.1), (tx, arm, tz + 0.7), 0.24, 0.24, B.PAL['iron'], B.METAL)
@@ -273,29 +276,28 @@ def hall_front(B, p):
     for dz in (-0.7, 0.7):
         B.chain(p, (tx, arm - 0.1, tz + dz * 0.5), (tx, top_y + 0.3, tz + dz), links=5)
     tankard(B, p, tx, top_y - 2.8 + 0.3, tz)
-    # the notice board inside, left of the door
-    notice_board(B, p, -8.6, -5.6, 1.7, 3.8, H['z1'] - t - 0.02)
 
 
 # ---------------------------------------------------------------------------
-# The back gable: the stair arch, the gallery door, the bard's corner
+# The back gable: the arch onto the nook, the kitchen hatch, the stage's backdrop
 # ---------------------------------------------------------------------------
 def hall_back(B, p, trim):
     H, t = B.HALL, B.HALL['wall']
     zc = H['z0'] + t / 2
     wall = B.Wall(H['x0'], zc, H['x1'], zc, (0, -1))
     mid = -H['x0']
-    arch, gd, G = B.LAYOUT['arch'], B.LAYOUT['galleryDoor'], B.G
+    arch, hatch = B.LAYOUT['arch'], B.LAYOUT['hatch']
     a0, a1 = mid + arch['x0'], mid + arch['x1']
+    h0, h1 = mid + hatch['x0'], mid + hatch['x1']
 
     def top(u):
         return hall_y(B, u - mid) - 0.1
 
-    openings = [(a0, a1, 0.0, arch['height']), (mid + gd['x0'], mid + gd['x1'], G, G + gd['height']),
-                (2.7, 4.3, 2.8, 5.0)]
+    openings = [(a0, a1, 0.0, arch['height']), (h0, h1, hatch['sill'], hatch['head'])]
     B.timber_wall(p, wall, t, top, openings, base_h=1.4, bays=3.6, seed=2)
-    B.window(p, wall, 2.7, 4.3, 2.8, 5.0, t)
     gable_timbers(B, p, wall, top, t, H['eave'], mid, H['x1'] - H['x0'])
+    kitchen_hatch(B, p, trim, wall, h0, h1, hatch['sill'], hatch['head'], t)
+    stage_backdrop(B, p, trim, wall, mid, t)
     # the arch: a segmental head in dressed voussoirs, spandrels filled over the opening's
     # corners, quoins down both jambs
     um, half = (a0 + a1) / 2, (a1 - a0) / 2
@@ -345,26 +347,22 @@ def hall_back(B, p, trim):
                      B.scale_color(B.pick(B.PAL['ashlar'], k + 2), 0.94 + 0.08 * (k % 2)), B.STONE)
             v += 0.62
             k += 1
-    # the gallery doorway's frame, both faces
-    for s in (1, -1):
-        w = s * (t / 2 + 0.04)
-        for ue in (mid + gd['x0'] - 0.2, mid + gd['x1'] + 0.2):
-            wall.beam(p, ue, G, ue, G + gd['height'] + 0.3, w, 0.4, 0.14, B.PAL['beam_dark'])
-        wall.beam(p, mid + gd['x0'] - 0.5, G + gd['height'] + 0.2, mid + gd['x1'] + 0.5, G + gd['height'] + 0.2, w,
-                  0.44, 0.16, B.PAL['beam_dark'])
-    # the bard's corner: a garnet banner with a golden tankard, a shield and crossed spears
+    # the garnet banner over the stage's curtain: a golden tankard on it
     zi = H['z0'] + t + 0.03
-    x0, x1, y0, y1 = -12.2, -9.2, 3.2, 8.4
+    x0, x1, y0, y1 = -13.8, -10.8, 6.3, 9.3
     B.abox(p, x0 - 0.3, x1 + 0.3, y1, y1 + 0.18, zi, zi + 0.12, B.PAL['beam_dark'], B.WOOD)
     B.abox(p, x0, x1, y0, y1, zi, zi + 0.06, B.PAL['garnet'], B.PLASTER)
     for (a, b, c, d) in ((x0, x1, y0, y0 + 0.2), (x0, x0 + 0.2, y0, y1), (x1 - 0.2, x1, y0, y1)):
         B.abox(p, a, b, c, d, zi + 0.02, zi + 0.08, B.PAL['gold'], B.PLASTER)
-    cx, cy2 = (x0 + x1) / 2, (y0 + y1) / 2 + 0.3
+    for k in range(5):
+        xt = x0 + 0.15 + (x1 - x0 - 0.3) * k / 4
+        p.box((xt, y0 - 0.14, zi + 0.05), (0.14, 0.26, 0.05), B.PAL['gold'], B.PLASTER, taper=0.3)
+    cx, cy2 = (x0 + x1) / 2, (y0 + y1) / 2 + 0.1
     B.abox(p, cx - 0.55, cx + 0.45, cy2 - 0.8, cy2 + 0.5, zi + 0.06, zi + 0.1, B.PAL['gold'], B.PLASTER)
     B.abox(p, cx + 0.45, cx + 0.8, cy2 - 0.45, cy2 + 0.2, zi + 0.06, zi + 0.1, B.PAL['gold'], B.PLASTER)
     B.abox(p, cx - 0.62, cx + 0.52, cy2 + 0.5, cy2 + 0.8, zi + 0.06, zi + 0.1, B.PAL['cream'], B.PLASTER)
-    # the shield and spears, right of the banner
-    sx, sy = -6.9, 6.2
+    # the shield and spears, between the stage and the arch
+    sx, sy = -7.3, 6.4
     for d in (-1, 1):
         B.beam(p, (sx - d * 1.4, sy - 1.5, zi + 0.12), (sx + d * 1.4, sy + 1.5, zi + 0.12), 0.08, 0.08,
                B.PAL['beam'], B.WOOD)
@@ -372,6 +370,75 @@ def hall_back(B, p, trim):
     p.cylinder((sx, sy, zi + 0.02), (sx, sy, zi + 0.2), 0.8, B.PAL['garnet_dark'], B.WOOD, sides=14)
     p.ring((sx, sy, zi + 0.2), 0.8, 0.12, B.PAL['iron'], segments=14, axis=(0, 0, 1), mat=B.METAL, depth=0.06)
     p.cylinder((sx, sy, zi + 0.2), (sx, sy, zi + 0.34), 0.22, B.PAL['iron_hi'], B.METAL, sides=8)
+
+
+def kitchen_hatch(B, p, trim, wall, u0, u1, v0, v1, t):
+    """The kitchen's serving hatch: an oak frame round the opening both faces, a deep sill
+    board the plates come across, a pair of garnet shutters folded back on the hall side on
+    iron strap hinges, and a brass bell on a bracket beside it."""
+    half = t / 2
+    col = B.PAL['beam_dark']
+    for s_ in (1, -1):
+        w = s_ * (half + 0.04)
+        wall.beam(p, u0 - 0.18, v0 - 0.2, u0 - 0.18, v1 + 0.28, w, 0.34, 0.16, col)
+        wall.beam(p, u1 + 0.18, v0 - 0.2, u1 + 0.18, v1 + 0.28, w, 0.34, 0.16, col)
+        wall.beam(p, u0 - 0.45, v1 + 0.2, u1 + 0.45, v1 + 0.2, w, 0.4, 0.18, col)
+    # the sill: a thick scrubbed board through the wall, out over both faces
+    wall.box(p, u0 - 0.3, u1 + 0.3, v0 - 0.16, v0, -half - 0.42, half + 0.3, B.PAL['honey'][2], B.WOOD)
+    wall.box(p, u0 - 0.3, u1 + 0.3, v0 - 0.34, v0 - 0.16, -half - 0.16, -half, B.PAL['beam'], B.WOOD)
+    # the reveals, planked
+    for (a, b) in ((u0 - 0.02, u0 + 0.06), (u1 - 0.06, u1 + 0.02)):
+        wall.box(p, a, b, v0, v1, -half, half, B.PAL['board'][1], B.WOOD)
+    wall.box(p, u0, u1, v1 - 0.06, v1 + 0.02, -half, half, B.PAL['board'][1], B.WOOD)
+    # the shutters, folded back flat against the hall's face
+    width = (u1 - u0) / 2
+    for side, ue in ((-1, u0), (1, u1)):
+        a, b = (ue - width - 0.2, ue - 0.2) if side < 0 else (ue + 0.2, ue + width + 0.2)
+        n = 3
+        for k in range(n):
+            wall.box(p, a + (b - a) * k / n + 0.01, a + (b - a) * (k + 1) / n - 0.01, v0 + 0.05, v1 - 0.05,
+                     -half - 0.16, -half - 0.08, B.pick([B.PAL['garnet'], B.PAL['garnet_dark']], k), B.WOOD)
+        for vv in (v0 + 0.3, v1 - 0.3):
+            wall.box(trim, a + 0.05, b - 0.05, vv - 0.05, vv + 0.05, -half - 0.2, -half - 0.16, B.PAL['iron'],
+                     B.METAL)
+    # the bell on its bracket, right of the hatch
+    ub = u1 + width + 0.55
+    bx, by, bz = wall.pt(ub, v1 + 0.1, -half - 0.45)
+    B.beam(trim, wall.pt(ub, v1 + 0.1, -half), (bx, by, bz), 0.06, 0.06, B.PAL['iron'], B.METAL)
+    B.beam(trim, wall.pt(ub, v1 - 0.35, -half), wall.pt(ub, v1 + 0.08, -half - 0.3), 0.04, 0.04, B.PAL['iron'],
+           B.METAL)
+    trim.cylinder((bx, by - 0.42, bz), (bx, by - 0.05, bz), 0.19, B.PAL['gold'], B.METAL, sides=10, r1=0.07)
+    trim.cylinder((bx, by - 0.46, bz), (bx, by - 0.42, bz), 0.21, B.PAL['copper_dark'], B.METAL, sides=10)
+
+
+def stage_backdrop(B, p, trim, wall, mid, t):
+    """The stage's backdrop on the back wall: a pleated garnet curtain from the deck to a
+    carved pelmet, a gold hem, drawn in at its two edges by gold cords."""
+    st = B.LAYOUT['stage']
+    face = -t / 2
+    ua, ub = mid - 14.3, mid - 10.3
+    v0, v1 = st['lift'] + 0.02, 5.35
+    n = 16
+    for k in range(n):
+        a = ua + (ub - ua) * k / n
+        b = ua + (ub - ua) * (k + 1) / n
+        deep = 0.22 if k % 2 else 0.1
+        col = B.PAL['garnet'] if k % 2 else B.PAL['garnet_dark']
+        # the pleats bow out a little more toward the curtain's middle
+        bow = 0.06 * math.sin(math.pi * (k + 0.5) / n)
+        wall.box(p, a, b, v0 + 0.2, v1, face - deep - bow, face, col, B.PLASTER)
+        wall.box(p, a, b, v0, v0 + 0.2, face - deep - bow - 0.02, face, B.PAL['gold'], B.PLASTER)
+    # the gathers at the edges, cords round them
+    for u in (ua + 0.25, ub - 0.25):
+        x, y, z = wall.pt(u, 2.4, face - 0.32)
+        p.cylinder((x, y - 1.2, z), (x, y + 1.6, z), 0.26, B.PAL['garnet_dark'], B.PLASTER, sides=8, r1=0.2)
+        trim.ring((x, y + 0.2, z), 0.28, 0.05, B.PAL['gold'], segments=8, axis=(0, 1, 0), mat=B.METAL)
+    # the pelmet: a carved oak board with a gold bead, over the curtain's head
+    wall.box(p, ua - 0.25, ub + 0.25, v1, v1 + 0.62, face - 0.42, face, B.PAL['beam_dark'], B.WOOD)
+    wall.box(trim, ua - 0.25, ub + 0.25, v1 + 0.08, v1 + 0.16, face - 0.46, face - 0.42, B.PAL['gold'], B.METAL)
+    for k in range(7):
+        u = ua + (ub - ua) * k / 6
+        wall.box(p, u - 0.12, u + 0.12, v1 - 0.18, v1, face - 0.4, face - 0.1, B.PAL['beam_dark'], B.WOOD)
 
 
 # ---------------------------------------------------------------------------
@@ -425,6 +492,9 @@ def hall_left(B, p):
     xi = H['x0'] + H['wall'] + 0.02
     elk_skull(B, p, xi, 3.8, 5.3, 1)
     troll_club(B, p, xi, 3.8, -4.5, 1)
+    # the notice board by the door
+    wall = B.Wall(H['x0'] + H['wall'] / 2, H['z0'], H['x0'] + H['wall'] / 2, H['z1'], (-1, 0))
+    notice_board(B, p, wall, 24.2, 26.8, 1.8, 3.9, H['wall'])
 
 
 def river_stones(B, p, face, u0, u1, v0, v1, seed):
@@ -551,18 +621,64 @@ def hall_roof(B, p):
     for zz in (zf + 0.1, zb - 0.1):
         B.post(p, 0, zz, H['ridge'] - 0.8, H['ridge'] + 1.1, 0.28, B.PAL['beam_dark'])
         p.box((0, H['ridge'] + 1.25, zz), (0.32, 0.32, 0.32), B.PAL['beam'], B.WOOD, taper=0.3)
-    # the trusses over the tie beams: principals, king post, collar and struts
-    ax, tie = H['aisleX'], H['tie'] + 0.65
-    apex = H['ridge'] - 0.9
-    for zt in (-9.6, -3.6, 1.0, 3.8, 9.6):
-        B.post(p, 0, zt, tie, apex, 0.36, B.PAL['beam'])
-        collar = tie + (apex - tie) * 0.55
-        for s in (1, -1):
-            B.beam(p, (s * ax, tie, zt), (s * 0.25, apex, zt), 0.3, 0.36, B.PAL['beam'])
-            cx = ax * (1 - (collar - tie) / (apex - tie))
-            B.beam(p, (0, tie + 1.2, zt), (s * cx * 0.8, collar - 0.4, zt), 0.2, 0.24, B.PAL['beam_dark'])
-        B.abox(p, -ax * (1 - (collar - tie) / (apex - tie)), ax * (1 - (collar - tie) / (apex - tie)), collar - 0.2,
-               collar + 0.2, zt - 0.14, zt + 0.14, B.PAL['beam_dark'], B.WOOD)
+    for zt in H['trusses']:
+        hammerbeam_truss(B, p, zt)
+
+
+# the hammerbeam trusses' collar line and the depth of a principal rafter under the slates
+TRUSS_COLLAR = 15.3
+PRINCIPAL = 0.42
+
+
+def hammerbeam_truss(B, p, zt):
+    """One hammerbeam truss across the hall at z = zt, every timber of it at or over the
+    hammer beams (HALL['truss']): a wall post flush on each side wall on a stone corbel, a
+    short curved brace under each hammer beam close to the wall, the hammer beam with a garnet
+    shield on its end, a hammer post up to the principal rafter, an arched brace springing
+    from it to the collar, the collar and a king post to the ridge beam."""
+    H = B.HALL
+    k = pitch(B)
+    xw = H['x1'] - H['wall']
+    tr = H['truss']
+    col, dark = B.PAL['beam'], B.PAL['beam_dark']
+
+    def under(x):
+        # the principal rafter's middle under the slates at |x|
+        return H['ridge'] - abs(x) * k - 0.16 - PRINCIPAL / 2
+
+    for s in (1, -1):
+        # the stone corbel and the wall post flush on the wall
+        B.abox(p, *sorted((s * (xw - 0.22), s * (xw + 0.05))), 5.9, 6.35, zt - 0.3, zt + 0.3,
+               B.PAL['ashlar_dark'], B.STONE)
+        B.abox(p, *sorted((s * (xw - 0.18), s * (xw + 0.05))), 6.35, tr, zt - 0.2, zt + 0.2, col, B.WOOD)
+        # the brace under the hammer beam, close to the wall
+        pts = [(s * (xw - 0.12), 9.3, zt), (s * (xw - 0.5), 9.78, zt), (s * (xw - 1.05), 10.08, zt),
+               (s * (xw - 1.7), tr + 0.08, zt)]
+        p.beam(pts, 0.26, 0.24, dark, B.WOOD)
+        # the hammer beam, its moulded end and the garnet shield on it
+        he = xw - 2.35
+        B.abox(p, *sorted((s * (xw + 0.15), s * he)), tr, tr + 0.52, zt - 0.2, zt + 0.2, dark, B.WOOD)
+        B.abox(p, *sorted((s * he, s * (he + 0.16))), tr - 0.12, tr + 0.64, zt - 0.25, zt + 0.25, col, B.WOOD)
+        p.box((s * (he - 0.04), tr + 0.26, zt), (0.08, 0.5, 0.4), B.PAL['garnet'], B.PLASTER, taper=0.6)
+        p.box((s * (he - 0.09), tr + 0.34, zt), (0.04, 0.14, 0.14), B.PAL['gold'], B.METAL)
+        # the hammer post up to the principal
+        xp = xw - 2.05
+        B.post(p, s * xp, zt, tr + 0.52, under(xp) - 0.1, 0.3, col)
+        # the principal rafter from the wall top to the ridge beam
+        B.beam(p, (s * (xw + 0.2), under(xw + 0.2), zt), (s * 0.3, under(0.3), zt), 0.3, PRINCIPAL, dark)
+        # the curved brace: from the hammer post's head up under the principal to the collar's
+        # end, sagging a little into an arch
+        xc = (H['ridge'] - 0.16 - PRINCIPAL - TRUSS_COLLAR) / k
+        ya, yb = under(xp) - 0.35, TRUSS_COLLAR - 0.1
+        arc = []
+        for j in range(5):
+            f = j / 4
+            arc.append((s * (xp - (xp - xc) * f), ya + (yb - ya) * f - 0.55 * math.sin(math.pi * f), zt))
+        p.beam(arc, 0.24, 0.3, col, B.WOOD)
+    # the collar between the principals, and the king post from it to the ridge beam
+    xc = (H['ridge'] - 0.16 - PRINCIPAL - TRUSS_COLLAR) / k
+    B.abox(p, -xc, xc, TRUSS_COLLAR - 0.22, TRUSS_COLLAR + 0.22, zt - 0.17, zt + 0.17, dark, B.WOOD)
+    B.post(p, 0, zt, TRUSS_COLLAR + 0.22, H['ridge'] - 1.1, 0.3, col)
 
 
 # ---------------------------------------------------------------------------
@@ -654,10 +770,6 @@ def wing_roof(B, p):
                B.PAL['beam_dark'])
     B.abox(p, xm - 0.25, xm + 0.25, W['ridge'] - 0.95, W['ridge'] - 0.35, zb + 0.2, zf, B.PAL['beam_dark'], B.WOOD)
     B.beam(p, (xm, W['ridge'] + 0.15, zb), (xm, W['ridge'] + 0.15, zf), 0.55, 0.28, B.PAL['slate_ridge'], B.STONE)
-    # tie beams across the upper floor at the eaves
-    for z in (-26.0, -22.4, -18.6, -15.4):
-        B.abox(p, W['x0'] + W['wall'], W['x1'] - W['wall'], W['eave'] - 0.35, W['eave'] + 0.1, z - 0.2, z + 0.2,
-               B.PAL['beam'], B.WOOD)
 
 
 # ---------------------------------------------------------------------------
@@ -762,31 +874,23 @@ def slit_window(B, p, cx, cz, r, am, yb, inward):
 
 
 def tower_wall(B, p, trim):
-    """The round stair tower's wall: a mortar core faced both sides in coursed ashlar (warm
-    limestone inside, the base's blue-grey outside), a plastered, post-framed top band under
-    the cone, arrow slits up the climb in dressed frames, and the timber-framed passage onto
-    the wing's landing."""
-    T, S, G = B.TOWER, B.STAIR, B.G
+    """The round tower's wall: a mortar core faced both sides in coursed ashlar (warm limestone
+    inside, the base's blue-grey outside), a plastered, post-framed top band under the cone,
+    arrow slits in dressed frames at two heights round the nook, dressed quoins where the ring
+    meets the hall's back wall."""
+    T = B.TOWER
     cx, cz, ri, ro, top = T['x'], T['z'], T['rIn'], T['rOut'], T['wallTop']
-    door = (math.radians(58), math.radians(88))
     stone_to = 8.4
     a_start, a_end = math.radians(48), math.radians(312)
-    # the slits: spaced round the climb, each a head over the steps beneath it
-    slits = []
-    for k in range(5):
-        u = S['climb'] * (k + 0.6) / 5.4
-        am = (S['bottom'] - u) % (2 * math.pi)
-        if a_start + 0.2 < am < a_end - 0.2 and not (door[0] - 0.2 < am < door[1] + 0.2):
-            slits.append((am, G * u / S['climb'] + 1.9))
-    # the core: mortar, full thickness, open at the passage
+    # the slits: a low row over the nook's bench, a high row between them
+    slits = [(math.radians(a), 2.9) for a in (98, 152, 208, 262)]
+    slits += [(math.radians(a), 6.5) for a in (125, 180, 235)]
+    # the core: mortar, full thickness
     n = 36
     for i in range(n):
         a0 = a_start + (a_end - a_start) * i / n
         a1 = a_start + (a_end - a_start) * (i + 1) / n
-        am = (a0 + a1) / 2
-        in_door = door[0] <= am <= door[1]
-        for (y0, y1) in (((0.0, G), (G + 3.6, stone_to)) if in_door else ((0.0, stone_to),)):
-            ring_seg(B, p, cx, cz, ri + 0.035, ro - 0.06, a0, a1, y0, y1, B.PAL['mortar'], B.STONE)
+        ring_seg(B, p, cx, cz, ri + 0.035, ro - 0.06, a0, a1, 0.0, stone_to, B.PAL['mortar'], B.STONE)
         # the plastered top band with its posts, its sill beam and wall plate
         ring_seg(B, p, cx, cz, ri + 0.04, ro - 0.04, a0, a1, stone_to, top - 0.3, B.pick(B.PAL['plaster'], i),
                  B.PLASTER)
@@ -797,24 +901,41 @@ def tower_wall(B, p, trim):
             for rr in (ro + 0.02, ri - 0.02):
                 x, z = cx + math.sin(a0) * rr, cz + math.cos(a0) * rr
                 B.post(p, x, z, stone_to + 0.2, top - 0.3, 0.28, B.PAL['beam'])
-    # the ashlar both sides, broken round the passage and the slits' frames
-    passage = [(door[0], door[1], G - 0.05, G + 4.0)]
+    # the ashlar both sides, broken round the slits' frames
     for (r, palette, inward, seed, block) in ((ri, B.PAL['ashlar'], True, 3, 1.15),
                                                (ro, B.PAL['stone'], False, 5, 1.3)):
         frames = [(am - 0.46 / r, am + 0.46 / r, yb - 0.32, yb + 1.9) for (am, yb) in slits]
-        masonry(B, p, cx, cz, r, a_start, a_end, 0.0, stone_to - 0.1, passage + frames, palette, inward,
-                seed, block=block)
+        masonry(B, p, cx, cz, r, a_start, a_end, 0.0, stone_to - 0.1, frames, palette, inward, seed, block=block)
     for (am, yb) in slits:
         slit_window(B, p, cx, cz, ri, am, yb, True)
         slit_window(B, p, cx, cz, ro, am, yb, False)
-    # the passage's timber frame on the landing
-    for a in door:
-        x, z = cx + math.sin(a) * (ri - 0.1), cz + math.cos(a) * (ri - 0.1)
-        B.post(p, x, z, G, G + 3.9, 0.4, B.PAL['beam_dark'])
-    for k in range(4):
-        a0 = door[0] + (door[1] - door[0]) * k / 4
-        a1 = door[0] + (door[1] - door[0]) * (k + 1) / 4
-        ring_seg(B, p, cx, cz, ri - 0.2, ro + 0.1, a0, a1, G + 3.6, G + 4.0, B.PAL['beam_dark'], B.WOOD)
+    # a tapestry on the nook's back wall over its bench, between the low slits: garnet, a
+    # gold border and a golden tankard, hung from an iron rod on two brackets
+    am, half = math.pi, math.radians(10)
+    r = ri - 0.06
+    y0, y1 = 1.9, 5.3
+    n = 6
+    for k in range(n):
+        a0 = am - half + 2 * half * k / n
+        a1 = am - half + 2 * half * (k + 1) / n
+        ring_seg(B, p, cx, cz, r - 0.05, r, a0, a1, y0, y1, B.PAL['garnet'] if k % 2 else B.PAL['garnet_dark'],
+                 B.PLASTER)
+        ring_seg(B, p, cx, cz, r - 0.07, r - 0.04, a0, a1, y0, y0 + 0.16, B.PAL['gold'], B.PLASTER)
+    for a0 in (am - half, am + half - 0.012):
+        ring_seg(B, p, cx, cz, r - 0.07, r - 0.04, a0, a0 + 0.012, y0, y1, B.PAL['gold'], B.PLASTER)
+    for k in range(5):
+        a0 = am - half + 2 * half * (k + 0.5) / 5
+        x, z = cx + math.sin(a0) * (r - 0.05), cz + math.cos(a0) * (r - 0.05)
+        p.box((x, y0 - 0.12, z), (0.12, 0.24, 0.06), B.PAL['gold'], B.PLASTER, yaw=a0, taper=0.3)
+    ring_seg(B, p, cx, cz, r - 0.09, r - 0.05, am - 0.05, am + 0.05, 3.1, 4.0, B.PAL['gold'], B.PLASTER)
+    ring_seg(B, p, cx, cz, r - 0.09, r - 0.05, am + 0.05, am + 0.08, 3.25, 3.75, B.PAL['gold'], B.PLASTER)
+    ring_seg(B, p, cx, cz, r - 0.09, r - 0.05, am - 0.06, am + 0.06, 4.0, 4.14, B.PAL['cream'], B.PLASTER)
+    rod = [(cx + math.sin(am + d) * (r - 0.18), y1 + 0.12, cz + math.cos(am + d) * (r - 0.18)) for d in
+           (-half - 0.03, half + 0.03)]
+    B.beam(trim, rod[0], rod[1], 0.05, 0.05, B.PAL['iron'], B.METAL)
+    for q in rod:
+        B.beam(trim, q, (cx + (q[0] - cx) * ri / (ri - 0.18), q[1], cz + (q[2] - cz) * ri / (ri - 0.18)), 0.04,
+               0.04, B.PAL['iron'], B.METAL)
     # the ring's two ends at the arch, dressed as quoins where they meet the hall's back wall
     for a, s in ((a_start, 1), (a_end, -1)):
         v, k = 0.0, 0
@@ -872,121 +993,19 @@ def tower_roof(B, p):
                (cx + math.sin(a0) * r0, y0 - 0.05, cz + math.cos(a0) * r0),
                (cx + math.sin(a1) * r0, y0 - 0.05, cz + math.cos(a1) * r0), (cx, peak - 0.1, cz), (cx, peak - 0.1, cz)]
         B.hexa(p, [clip(q) for q in pts], B.PAL['sarking'], B.WOOD)
+    # the rafters under the sarking, seen from the nook: radial oak from a ring beam on the wall
+    # top to a boss under the point
+    m = 12
+    for i in range(m):
+        a = 2 * math.pi * (i + 0.5) / m
+        foot = (cx + math.sin(a) * (T['rIn'] - 0.1), y0 + 0.15, cz + math.cos(a) * (T['rIn'] - 0.1))
+        head = (cx + math.sin(a) * 0.35, peak - 0.9, cz + math.cos(a) * 0.35)
+        if foot[2] > wall_z - 0.2:
+            continue
+        B.beam(p, foot, head, 0.2, 0.26, B.PAL['beam_dark'])
+    p.cylinder((cx, peak - 1.4, cz), (cx, peak - 0.6, cz), 0.42, B.PAL['beam_dark'], B.WOOD, sides=8)
     # the finial: an iron spike, a ball and a little pennant in garnet
     p.cylinder((cx, peak - 0.3, cz), (cx, peak + 2.2, cz), 0.07, B.PAL['iron'], B.METAL, sides=6)
     p.cylinder((cx, peak - 0.2, cz), (cx, peak + 0.35, cz), 0.3, B.PAL['slate_ridge'], B.STONE, sides=8, r1=0.08)
     p.box((cx, peak + 1.0, cz), (0.24, 0.24, 0.24), B.PAL['gold'], B.METAL, taper=0.6)
     p.box((cx + 0.55, peak + 1.8, cz), (1.0, 0.5, 0.04), B.PAL['garnet'], B.PLASTER, taper=0.3)
-
-
-# ---------------------------------------------------------------------------
-# The gallery over the bar
-# ---------------------------------------------------------------------------
-def gallery(B, p):
-    g, G = B.LAYOUT['gallery'], B.G
-    plat = B.LAYOUT['platform']
-    x0, x1, z0, z1 = g['x0'], g['x1'], g['z0'], g['z1']
-    base = plat['lift']
-    # the deck and its edge beam
-    n = int((z1 - z0) / 0.8)
-    for i in range(n):
-        za = z0 + (z1 - z0) * i / n + 0.004
-        zb = z0 + (z1 - z0) * (i + 1) / n - 0.004
-        B.abox(p, x0, x1, G - 0.3, G, za, zb, B.pick(B.PAL['board'], i + 3), B.WOOD)
-    B.abox(p, x0 - 0.1, x1, G - 0.75, G - 0.02, z1 - 0.3, z1 + 0.05, B.PAL['beam_dark'], B.WOOD)
-    B.abox(p, x0 - 0.12, x0 + 0.2, G - 0.75, G - 0.02, z0, z1, B.PAL['beam_dark'], B.WOOD)
-    # the barrel wall under it: a timber rack of great barrels lying end-on to the room, shelves
-    # of jugs above them, planked to the ground at its end by the arch. Its face stands a hand
-    # behind the gallery's edge, where the sim stops a body.
-    B.abox(p, x0, x1, 0.0, G - 0.75, z0, z1 - 0.3, B.PAL['beam_dark'], B.WOOD)
-    B.abox(p, x0 - 0.02, x0 + 0.1, 0.0, G - 0.75, z0, z1, B.pick(B.PAL['board'], 1), B.WOOD)
-    bays = 5
-    bw = (x1 - x0 - 0.3) / bays
-    rows = ((base + 0.95, 0.82), (base + 2.72, 0.78))
-    for b in range(bays + 1):
-        xp = x0 + 0.15 + b * bw
-        B.abox(p, xp - 0.16, xp + 0.16, base, G - 0.75, z1 - 0.33, z1, B.PAL['beam'], B.WOOD)
-    for yy in (base + 0.1, base + 1.85, base + 3.6):
-        B.abox(p, x0 + 0.1, x1 - 0.1, yy - 0.08, yy + 0.08, z1 - 0.33, z1, B.PAL['beam'], B.WOOD)
-    for b in range(bays):
-        xc = x0 + 0.15 + (b + 0.5) * bw
-        for (yc, r) in rows:
-            p.cylinder((xc, yc, z1 - 1.9), (xc, yc, z1 - 0.25), r, B.pick(B.PAL['honey'], b), B.WOOD, sides=12)
-            p.cylinder((xc, yc, z1 - 0.25), (xc, yc, z1 - 0.17), r * 0.93, B.PAL['honey'][2], B.WOOD, sides=12)
-            p.ring((xc, yc, z1 - 0.4), r + 0.02, 0.1, B.PAL['iron'], segments=12, axis=(0, 0, 1), mat=B.METAL,
-                   depth=0.05)
-            p.cylinder((xc, yc - r * 0.55, z1 - 0.18), (xc, yc - r * 0.55, z1 + 0.05), 0.07, B.PAL['gold'], B.METAL,
-                       sides=6)
-    # the shelves over the barrels: two boards of jugs and bottles
-    for yy in (base + 3.95, base + 4.75):
-        B.abox(p, x0 + 0.1, x1 - 0.1, yy - 0.05, yy, z1 - 0.55, z1 - 0.05, B.PAL['beam'], B.WOOD)
-        k = 0
-        xx = x0 + 0.5
-        while xx < x1 - 0.4:
-            col = (B.PAL['verdigris'], B.PAL['glass'], B.PAL['garnet_dark'], B.PAL['cream'])[k % 4]
-            hgt = 0.45 + (k % 3) * 0.08
-            p.cylinder((xx, yy, z1 - 0.3), (xx, yy + hgt, z1 - 0.3), 0.13 if k % 4 != 3 else 0.2, col,
-                       B.METAL if k % 4 != 3 else B.PLASTER, sides=6, r1=0.06 if k % 4 != 3 else 0.14)
-            xx += 0.42 + (k % 3) * 0.1
-            k += 1
-    # the rail: newels, turned balusters, a handrail, along the front and the arch end
-    top = G + g['rail']
-    runs = [((x0, z1), (x1, z1)), ((x0, z0), (x0, z1))]
-    for (a, b) in runs:
-        length = math.hypot(b[0] - a[0], b[1] - a[1])
-        n = max(1, int(length / 0.42))
-        for k in range(n + 1):
-            x = a[0] + (b[0] - a[0]) * k / n
-            z = a[1] + (b[1] - a[1]) * k / n
-            if k % 4 == 0:
-                B.post(p, x, z, G - 0.05, top + 0.15, 0.24, B.PAL['beam_dark'])
-            else:
-                p.cylinder((x, G, z), (x, top - 0.05, z), 0.07, B.PAL['honey'][0], B.WOOD, sides=6, r1=0.06)
-        B.beam(p, (a[0], top, a[1]), (b[0], top, b[1]), 0.22, 0.14, B.PAL['beam_dark'])
-        B.beam(p, (a[0], G + 0.12, a[1]), (b[0], G + 0.12, b[1]), 0.16, 0.12, B.PAL['beam'])
-    # a garnet runner cloth hung over the rail's middle, gold-edged
-    xm = (x0 + x1) / 2 + 1.5
-    B.abox(p, xm - 1.6, xm + 1.6, G - 1.35, top + 0.02, z1 + 0.12, z1 + 0.18, B.PAL['garnet'], B.PLASTER)
-    B.abox(p, xm - 1.6, xm + 1.6, G - 1.45, G - 1.3, z1 + 0.13, z1 + 0.2, B.PAL['gold'], B.PLASTER)
-    B.abox(p, xm - 1.6, xm + 1.6, top - 0.02, top + 0.06, z1 - 0.2, z1 + 0.18, B.PAL['garnet'], B.PLASTER)
-
-
-# ---------------------------------------------------------------------------
-# The upstairs partitions
-# ---------------------------------------------------------------------------
-def room_walls(B, p):
-    W, G = B.WING, B.G
-    t = 0.4
-    doors_h = B.LAYOUT['roomDoorHeight']
-    # the long partition across the wing, gable-topped under the roof, two doorways
-    x0, x1 = W['x0'] + W['wall'], W['x1'] - W['wall']
-    zc = -20.6
-    wall = B.Wall(x0, zc, x1, zc, (0, 1))
-
-    def top(u):
-        return wing_y(B, x0 + u) - 0.3
-
-    doors = [(6.2 - x0, 8.4 - x0), (11.6 - x0, 13.8 - x0)]
-    openings = [(a, b, G, G + doors_h) for (a, b) in doors]
-    B.timber_wall(p, wall, t, top, openings, base_h=G, y0=G, bays=2.6, seed=8, braces=False,
-                  plaster=B.PAL['plaster_in'])
-    for (a, b) in doors:
-        for s in (1, -1):
-            w = s * (t / 2 + 0.03)
-            wall.beam(p, a - 0.15, G, a - 0.15, G + doors_h + 0.2, w, 0.3, 0.1, B.PAL['beam_dark'])
-            wall.beam(p, b + 0.15, G, b + 0.15, G + doors_h + 0.2, w, 0.3, 0.1, B.PAL['beam_dark'])
-            wall.beam(p, a - 0.3, G + doors_h + 0.1, b + 0.3, G + doors_h + 0.1, w, 0.3, 0.12, B.PAL['beam_dark'])
-        # the door, open against the partition inside the room
-        u0 = b + 0.1
-        for k in range(4):
-            wall.box(p, u0 + k * (b - a) / 4, u0 + (k + 1) * (b - a) / 4 - 0.02, G + 0.05, G + doors_h - 0.1,
-                     -t / 2 - 0.18, -t / 2 - 0.04, B.pick(B.PAL['honey'], k), B.WOOD)
-    # the partition between the two rooms, along the ridge line
-    z0, z1 = W['z0'] + W['wall'], zc - 0.2
-    wall2 = B.Wall(10.0, z0, 10.0, z1, (1, 0))
-
-    def top2(u):
-        return W['ridge'] - 0.3
-
-    B.timber_wall(p, wall2, t, top2, [], base_h=G, y0=G, bays=2.4, seed=9, braces=False,
-                  plaster=B.PAL['plaster_in'])

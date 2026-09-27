@@ -1,44 +1,41 @@
 // The Mirefen tavern's pure decisions (the painter is mirefen_tavern.ts): which named parts
 // of the one Blender model a graphics tier keeps, and, every frame, which shell parts (the
-// walls, the roofs, the gallery and the upstairs partitions) stand between the camera and
-// the player and how far each one fades. Three-, DOM- and i18n-free.
+// walls, the roofs, the porch and the bar's pillar) stand between the camera and the player
+// and how far each one fades. Three-, DOM- and i18n-free.
 //
 // Fairness (docs/design/graphics-settings-fairness.md): everything a player walks on, bumps
-// into or steers by is kept on EVERY tier: the floors, the hearth, the bar, the stair, every
-// wall, roof and rail, every piece of furniture the sim collides with, and every light (the
+// into or steers by is kept on EVERY tier: the floors, the hearth, the bar, the stage, every
+// wall and roof, every piece of furniture the sim collides with, and every light (the
 // hearth, the lanterns, the chandelier, the candles: the landmarks). A lower preset sheds only
 // dressing nothing collides with: the iron and brass trim below medium, the tankards, plates,
 // dice, lute, firewood and rugs below high. The tier is the STATIC effects tier
 // (GFX.effectsTier), never the frame-rate governor.
 //
 // The camera and the shell:
-//  - player INSIDE (the eye in the tavern's air, mirefen_tavern_interior_core.ts): the
+//  - lens INSIDE (the camera in the tavern's air, mirefen_tavern_interior_core.ts): the
 //    indoor camera clamp (interior_camera.ts, the one authored-interior exception to the
 //    pinned no-pull-in rule of tests/graphics_overhaul_integration.test.ts) keeps the camera
 //    in that air, so the outer shell (the walls, the roofs, the tower) is never between the
 //    lens and the player and never opens: from inside the tavern the outside never shows.
-//    Only the parts that stand INSIDE the air cut away when the sight line crosses them (the
-//    gallery's rail and barrel wall, the upstairs partitions), and the gallery never goes
-//    from under the feet of a player standing on it;
-//  - player OUTSIDE: the sightline ghost. Each part the sight line passes through ghosts to
-//    the standard 20% (occluder_fade_core), so a player behind the tavern is never hidden;
-//    outdoors the chase camera never pulls in.
-// The stair tower's newel is a shell part inside the air too: the camera never fights it,
-// the newel cuts away whenever it stands between the lens and the player (or round the lens).
+//    Only the bar's pillar, which stands in the air, cuts away when the sight line crosses it;
+//  - lens OUTSIDE (a player outdoors, or the camera following a player in through the front
+//    door): the sightline ghost. Each part the sight line passes through ghosts to the
+//    standard 20% (occluder_fade_core); outdoors the chase camera never pulls in. The front
+//    wall is three parts (either side of the door and the gable over it) and the porch's
+//    canopy and sign a fourth, and the doorway itself is open, so a sight line in through the
+//    door ghosts nothing and one at an angle ghosts only the piece of wall it crosses: the
+//    building never opens as a cutaway.
 // The frame, the floors, the furniture and the lights never fade: only the shell does.
 
 import {
+  TAVERN_BAR_PLATFORM,
+  TAVERN_DOOR,
   TAVERN_FLOOR_Y,
-  TAVERN_GALLERY,
   TAVERN_HALL,
   TAVERN_ORIGIN,
   TAVERN_PORCH,
   TAVERN_PROPS,
-  TAVERN_ROOM_DOOR_HEIGHT,
-  TAVERN_ROOM_WALLS,
   TAVERN_TOWER,
-  TAVERN_TOWER_DOOR,
-  TAVERN_UPPER,
   TAVERN_WING,
 } from '../sim/content/mirefen_tavern';
 import type { GfxTier } from './gfx';
@@ -48,6 +45,8 @@ import { OCCLUDER_FADE_ALPHA } from './occluder_fade_core';
 /** The shell parts of the model, in the order the painter keeps them. */
 export const TAVERN_SHELL_PARTS = [
   'HallWallFront',
+  'HallWallFrontLeft',
+  'HallWallFrontRight',
   'HallWallBack',
   'HallWallLeft',
   'HallWallRight',
@@ -58,9 +57,8 @@ export const TAVERN_SHELL_PARTS = [
   'WingRoof',
   'TowerWall',
   'TowerRoof',
-  'Gallery',
-  'RoomWalls',
-  'TowerNewel',
+  'HallPorch',
+  'BarPillar',
 ] as const;
 export type TavernShellPart = (typeof TAVERN_SHELL_PARTS)[number];
 
@@ -119,13 +117,29 @@ const TOWER_EAVE_R = T.rOut + T.eaveOut;
 const fire = TAVERN_PROPS.find((p) => p.kind === 'fireplace');
 const FIRE_Z0 = (fire?.z ?? 0) - (fire?.hd ?? 0);
 const FIRE_Z1 = (fire?.z ?? 0) + (fire?.hd ?? 0);
+/** The front wall's three parts meet this far either side of the door's middle: the door's
+ *  posts go with the gable over it (build_tavern.py FRONT_SPLIT). */
+export const TAVERN_FRONT_SPLIT = 3.2;
+const D0 = TAVERN_DOOR.x - TAVERN_DOOR.width / 2;
+const D1 = TAVERN_DOOR.x + TAVERN_DOOR.width / 2;
+const FRONT = [H.z1 - H.wall - 0.1, H.z1 + 0.2] as const;
 
-/** Each box-shaped shell part's volumes (the roofs and the tower are shaped, below). */
+/** Each box-shaped shell part's volumes (the roofs, the tower and the pillar are shaped,
+ *  below). The doorway is open: a sight line through it crosses no part of the front. */
 const BOX_VOLUMES: Partial<Record<TavernShellPart, readonly Vol[]>> = {
-  // the front gable, the porch canopy and the tankard on its arm
+  // the gable over the door and the door's posts either side of it
   HallWallFront: [
-    [H.x0, H.x1, 0, H.ridge, H.z1 - H.wall, H.z1],
-    [TAVERN_PORCH.x0 - 0.3, TAVERN_PORCH.x1 + 0.3, 4.0, 8.8, H.z1, TAVERN_PORCH.z1 + 0.8],
+    [-TAVERN_FRONT_SPLIT, TAVERN_FRONT_SPLIT, TAVERN_DOOR.height, H.ridge, FRONT[0], FRONT[1]],
+    [-TAVERN_FRONT_SPLIT, D0, 0, TAVERN_DOOR.height, FRONT[0], FRONT[1]],
+    [D1, TAVERN_FRONT_SPLIT, 0, TAVERN_DOOR.height, FRONT[0], FRONT[1]],
+  ],
+  HallWallFrontLeft: [[H.x0, -TAVERN_FRONT_SPLIT, 0, H.ridge, FRONT[0], FRONT[1]]],
+  HallWallFrontRight: [[TAVERN_FRONT_SPLIT, H.x1, 0, H.ridge, FRONT[0], FRONT[1]]],
+  // the porch's canopy over the door, its two brackets, and the tankard on its arm
+  HallPorch: [
+    [TAVERN_PORCH.x0 - 0.3, TAVERN_PORCH.x1 + 0.3, 5.9, 8.8, H.z1, TAVERN_PORCH.z1 + 0.9],
+    [-3.55, -3.05, 3.8, 6.1, H.z1, H.z1 + 2.6],
+    [3.05, 3.55, 3.8, 6.1, H.z1, H.z1 + 2.6],
     [6.9, 10.6, 6.2, 12.4, H.z1, H.z1 + 5.0],
   ],
   HallWallBack: [[H.x0, H.x1, 0, H.ridge, H.z0, H.z0 + H.wall]],
@@ -138,33 +152,7 @@ const BOX_VOLUMES: Partial<Record<TavernShellPart, readonly Vol[]>> = {
   ],
   WingWallEast: [[W.x1 - W.wall, W.x1, 0, W.eave + 0.2, W.z0, W.z1]],
   WingWallBack: [[W.x0, W.x1, 0, W.ridge, W.z0, W.z0 + W.wall]],
-  WingWallWest: [[W.x0, W.x0 + W.wall, 0, W.eave + 0.2, W.z0, TAVERN_TOWER_DOOR.z0]],
-  // the gallery: its deck, rail and the barrel wall under it
-  Gallery: [
-    [
-      TAVERN_GALLERY.x0 - 0.2,
-      TAVERN_GALLERY.x1,
-      0,
-      TAVERN_UPPER + TAVERN_GALLERY.rail + 0.2,
-      TAVERN_GALLERY.z0,
-      TAVERN_GALLERY.z1 + 0.25,
-    ],
-  ],
-  // the partitions: each solid piece full height, and the long partition's whole run over its
-  // doorways (the wall stands on over them, up to the roof)
-  RoomWalls: [
-    ...TAVERN_ROOM_WALLS.map(
-      ([x0, x1, z0, z1]) => [x0, x1, TAVERN_UPPER, W.ridge, z0, z1] as const,
-    ),
-    [
-      W.x0 + W.wall,
-      W.x1 - W.wall,
-      TAVERN_UPPER + TAVERN_ROOM_DOOR_HEIGHT,
-      W.ridge,
-      TAVERN_ROOM_WALLS[0][2],
-      TAVERN_ROOM_WALLS[0][3],
-    ],
-  ],
+  WingWallWest: [[W.x0, W.x0 + W.wall, 0, W.eave + 0.2, W.z0, T.z - 2.2]],
 };
 
 /** Everything the shell draws (local): the hall and its porch, sign and chimney, the wing,
@@ -184,13 +172,12 @@ export function tavernLocal(x: number, y: number, z: number): { x: number; y: nu
 }
 
 /** Whether a player's eye (local) stands inside the tavern: over the floor of the hall (the
- *  doorway included), the tower or the wing, no lower than a body in the hearth pit, no
- *  higher than the roof. */
+ *  doorway included) or the tower's nook, no lower than a body in the hearth pit, no higher
+ *  than the roof. */
 export function eyeInTavern(ex: number, ey: number, ez: number): boolean {
   const feet = ey - TAVERN_EYE_OVER_FEET;
   if (feet < -1.0 || feet > H.ridge) return false;
   if (ex > H.x0 && ex < H.x1 && ez > H.z0 && ez < H.z1 + 0.3) return true;
-  if (ex > W.x0 && ex < W.x1 && ez > W.z0 && ez < W.z1) return true;
   return Math.hypot(ex - T.x, ez - T.z) < T.rOut;
 }
 
@@ -239,13 +226,16 @@ export function tavernShelters(x: number, y: number, z: number): boolean {
   );
 }
 
-/** The hall roof's underside over a local point (its rafters, purlins and the trusses over
- *  the tie beams), or +Infinity off its footprint. */
+/** How far in from the side walls the hammer beams reach (tavern_shell.py hammerbeam_truss). */
+const HAMMER_REACH = 2.5;
+
+/** The hall roof's underside over a local point (its rafters, purlins and the hammerbeam
+ *  trusses: the hammer beams along the side walls, the lowest timber of it), or +Infinity
+ *  off its footprint. */
 export function hallRoofUnderside(x: number, z: number): number {
   if (Math.abs(x) > H.x1 + H.eaveOut || z < H.z0 - 0.2 || z > H.z1 + H.vergeOut) return Infinity;
   const line = H.ridge - Math.abs(x) * HALL_PITCH - TAVERN_ROOF_UNDERSIDE;
-  // the trusses stand on the tie beams over the nave
-  return Math.abs(x) <= H.aisleX + 0.4 ? Math.min(line, H.tie + 0.65) : line;
+  return Math.abs(x) >= H.x1 - H.wall - HAMMER_REACH ? Math.min(line, H.truss) : line;
 }
 
 /** The wing roof's underside (its tie beams at the eaves), or +Infinity off its footprint. */
@@ -265,13 +255,21 @@ export function towerRoofUnderside(x: number, z: number): number {
 
 const ARCH_HALF = (48 * Math.PI) / 180;
 
-/** The newel's reach (its shaft, its bands and the base and capital round it). */
-const NEWEL_REACH = T.newel + 0.35;
+const pillar = TAVERN_PROPS.find((p) => p.kind === 'pillar');
+/** The bar's pillar: its axis, its reach (the shaft, its plinth and the capital round it),
+ *  its foot and its head (over the ground floor). */
+const PILLAR = {
+  x: pillar?.x ?? 0,
+  z: pillar?.z ?? 0,
+  reach: (pillar?.r ?? 0) + 0.45,
+  y0: TAVERN_BAR_PLATFORM.lift - 0.5,
+  y1: H.truss,
+};
 
-/** Whether a local point stands in the tower's newel (its base to its capital). */
-export function inNewel(x: number, y: number, z: number): boolean {
-  if (y < -0.3 || y > T.wallTop) return false;
-  return Math.hypot(x - T.x, z - T.z) < NEWEL_REACH;
+/** Whether a local point stands in the bar's pillar (its plinth to its capital). */
+export function inPillar(x: number, y: number, z: number): boolean {
+  if (!pillar || y < PILLAR.y0 || y > PILLAR.y1) return false;
+  return Math.hypot(x - PILLAR.x, z - PILLAR.z) < PILLAR.reach;
 }
 
 /** Whether a local point stands in the tower's wall ring (open under the arch to the hall). */
@@ -282,6 +280,35 @@ export function inTowerWall(x: number, y: number, z: number): boolean {
   const r = Math.hypot(dx, dz);
   if (r < T.rIn - 0.15 || r > T.rOut + 0.15) return false;
   return Math.abs(Math.atan2(dx, dz)) > ARCH_HALF;
+}
+
+/** How close (yards, past its reach) the lens may pass the bar's pillar before it cuts away:
+ *  a pillar filling the foreground beside the lens goes as one on the sight line does. */
+export const PILLAR_LENS_CLEARANCE = 1.4;
+
+/** Whether the sight line (a to b, local) crosses the bar's pillar, or the lens (b) stands
+ *  in it or hard by it. */
+function pillarOnSightLine(
+  ax: number,
+  ay: number,
+  az: number,
+  bx: number,
+  by: number,
+  bz: number,
+): boolean {
+  if (
+    pillar &&
+    by >= PILLAR.y0 &&
+    by <= PILLAR.y1 &&
+    Math.hypot(bx - PILLAR.x, bz - PILLAR.z) < PILLAR.reach + PILLAR_LENS_CLEARANCE
+  ) {
+    return true;
+  }
+  for (let s = 1; s < SAMPLES; s++) {
+    const t = s / SAMPLES;
+    if (inPillar(ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t)) return true;
+  }
+  return false;
 }
 
 /** This frame's decision: the mode, and per shell part (TAVERN_SHELL_PARTS order) whether it
@@ -305,12 +332,7 @@ const HALL_ROOF = TAVERN_SHELL_PARTS.indexOf('HallRoof');
 const WING_ROOF = TAVERN_SHELL_PARTS.indexOf('WingRoof');
 const TOWER_WALL = TAVERN_SHELL_PARTS.indexOf('TowerWall');
 const TOWER_ROOF = TAVERN_SHELL_PARTS.indexOf('TowerRoof');
-const GALLERY = TAVERN_SHELL_PARTS.indexOf('Gallery');
-const ROOM_WALLS = TAVERN_SHELL_PARTS.indexOf('RoomWalls');
-const TOWER_NEWEL = TAVERN_SHELL_PARTS.indexOf('TowerNewel');
-/** The shell parts that stand inside the air (they may still cut away for a player
- *  indoors; the newel is shaped, sampled below). */
-const INNER_PARTS = [GALLERY, ROOM_WALLS] as const;
+const BAR_PILLAR = TAVERN_SHELL_PARTS.indexOf('BarPillar');
 
 /**
  * Decide the shell for one frame, writing into `out`. `eye` is the camera's look point over
@@ -344,24 +366,10 @@ export function tavernShellOcclusion(
     return out;
   }
   if (inside) {
-    // the camera stands in the air with the player: the outer shell stays whole, and only
-    // the parts inside the air cut away for the sight line
+    // the camera stands in the air with the player: the outer shell stays whole, and only the
+    // bar's pillar, standing in the air, cuts away for the sight line (or round the lens)
     for (let i = 0; i < out.occluded.length; i++) out.occluded[i] = false;
-    for (const part of INNER_PARTS) {
-      const vols = BOX_VOLUMES[TAVERN_SHELL_PARTS[part]] ?? [];
-      for (let k = 0; k < vols.length && !out.occluded[part]; k++) {
-        out.occluded[part] = segmentHitsVol(ax, ay, az, bx, by, bz, vols[k]);
-      }
-    }
-    if (ay - TAVERN_EYE_OVER_FEET > TAVERN_UPPER - 0.5) out.occluded[GALLERY] = false;
-    // the stair tower's newel: the camera slides round it rather than fight it, so a newel
-    // between the lens and a player on the stair cuts away (and one round the lens, too)
-    let newel = inNewel(bx, by, bz);
-    for (let s = 1; s < SAMPLES && !newel; s++) {
-      const t = s / SAMPLES;
-      newel = inNewel(ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t);
-    }
-    out.occluded[TOWER_NEWEL] = newel;
+    out.occluded[BAR_PILLAR] = pillarOnSightLine(ax, ay, az, bx, by, bz);
     return out;
   }
   for (let i = 0; i < TAVERN_SHELL_PARTS.length; i++) {
@@ -374,8 +382,6 @@ export function tavernShellOcclusion(
     }
     out.occluded[i] = hit;
   }
-  // the gallery never goes from under the feet of a player standing on it
-  if (ay - TAVERN_EYE_OVER_FEET > TAVERN_UPPER - 0.5) out.occluded[GALLERY] = false;
   // the shaped parts: sampled along the sight line
   let hallRoof = false;
   let wingRoof = false;
@@ -395,13 +401,6 @@ export function tavernShellOcclusion(
   out.occluded[WING_ROOF] = wingRoof;
   out.occluded[TOWER_WALL] = towerWall;
   out.occluded[TOWER_ROOF] = towerRoof;
-  // the newel cuts on the same sampled sight line as indoors, so a lens that leaves the
-  // tower's air for a moment (the indoor clamp's glide) never flickers it back in
-  let newel = inNewel(bx, by, bz);
-  for (let s = 1; s < SAMPLES && !newel; s++) {
-    const t = s / SAMPLES;
-    newel = inNewel(ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t);
-  }
-  out.occluded[TOWER_NEWEL] = newel;
+  out.occluded[BAR_PILLAR] = pillarOnSightLine(ax, ay, az, bx, by, bz);
   return out;
 }

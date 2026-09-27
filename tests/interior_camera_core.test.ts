@@ -8,10 +8,14 @@ import {
   INTERIOR_COMFORT_BOOM,
   INTERIOR_DROP_MIN_PITCH,
   INTERIOR_ENTRY_BLEND,
+  INTERIOR_ENTRY_CAP_IN,
+  INTERIOR_ENTRY_CAP_RELAX,
   INTERIOR_ENTRY_SETTLE_SEC,
+  INTERIOR_FLATTEN_RATE,
   INTERIOR_LIFT_MAX_PITCH,
   interiorCameraPadding,
   interiorContains,
+  interiorEntryCap,
   interiorEntrySettle,
   interiorEntryWeight,
   interiorExit,
@@ -20,13 +24,16 @@ import {
   interiorSegmentFraction,
   stepInteriorBoom,
   stepInteriorFraming,
+  stepInteriorLift,
 } from '../src/render/interior_camera_core';
 
 // The indoor chase-camera clamp's pure core (src/render/interior_camera_core.ts): the walk of a
 // segment through a union of air boxes (where it first leaves, the near-plane pad, the start in
 // a wall's clearance band), the eye rule (an opening's box alone does not hold the player), the
 // nameplate sight line out through an opening only, the pad, the boom's glide both ways, the
-// threshold blend and the framings (a lift, a flattening under a ceiling, a swing).
+// threshold blend and the framings (a lift, a flattening under a ceiling, a swing), the walk on
+// out through an opening, the least flattening under a lintel and the entry cap that keeps the
+// lens threading a front door on the way in.
 
 // Two rooms joined by a doorway, and a front door out of room A onto the world:
 //   room A x 0..10, room B x 12..22 (both z 0..10, y 0..4), the doorway between them
@@ -229,9 +236,12 @@ describe('interior camera pad and boom', () => {
     expect(under.swing).toBe(0);
     expect(under.lift).toBeLessThan(0);
     expect(under.boom).toBeCloseTo(Math.hypot(11.4, 3.8), 6);
-    // a small gain never turns the view: a boom the ceiling barely trims stays as it is
+    // a boom the ceiling barely trims flattens barely: the least that clears it, so the view
+    // never jumps as a ceiling comes and goes over the lens
     const trimmed = chooseInteriorFraming(gallery, 20, 2, 20, 11.4, 1.15, 0, 0.3, 0);
-    expect(trimmed.lift).toBe(0);
+    expect(trimmed.lift).toBeLessThan(0);
+    expect(trimmed.lift).toBeGreaterThan(-0.02);
+    expect(trimmed.boom).toBeCloseTo(Math.hypot(11.4, 1.15), 6);
     // in a tall shaft the lift alone does it, the heading kept
     const shaft = cameraInterior('shaft', [[0, 3, 0, 30, 0, 3]]);
     const up = chooseInteriorFraming(shaft, 1.5, 2, 1.5, 8, 1, 0, 0.3, 0);
@@ -304,13 +314,16 @@ describe('interior camera pad and boom', () => {
 });
 
 describe('the threshold blend', () => {
-  it('is none on the door, whole a blend in, smooth and rising between', () => {
-    // the front door's outside face: z = -1, x 4..6, y 0..3
+  it('is none on the threshold, whole a blend in, smooth and rising between', () => {
+    // the front door's outside face: z = -1, x 4..6, y 0..3; its threshold (the wall's
+    // thickness) runs in to room A's air at z = 0
+    expect(vol.thresholds).toEqual([1]);
     expect(interiorEntryWeight(vol, 5, 2, -1)).toBe(0);
-    expect(interiorEntryWeight(vol, 5, 2, -1 + INTERIOR_ENTRY_BLEND)).toBe(1);
+    expect(interiorEntryWeight(vol, 5, 2, 0)).toBe(0);
+    expect(interiorEntryWeight(vol, 5, 2, INTERIOR_ENTRY_BLEND)).toBe(1);
     expect(interiorEntryWeight(vol, 5, 2, 9.9)).toBe(1);
     let prev = 0;
-    for (let z = -1; z <= -1 + INTERIOR_ENTRY_BLEND; z += 0.25) {
+    for (let z = 0; z <= INTERIOR_ENTRY_BLEND; z += 0.25) {
       const w = interiorEntryWeight(vol, 5, 2, z);
       expect(w).toBeGreaterThanOrEqual(prev);
       expect(w - prev).toBeLessThan(0.12);
@@ -326,5 +339,116 @@ describe('the threshold blend', () => {
     // a room with no door onto the world: always whole
     const closed = cameraInterior('closed', [[0, 4, 0, 4, 0, 4]]);
     expect(interiorEntryWeight(closed, 2, 2, 0.1)).toBe(1);
+  });
+});
+
+describe('through the front door', () => {
+  it('runs a ray out through an opening on past it, as far as `through` lets it', () => {
+    // from room A out through the front door (x 4..6, y 0..3, its face at z = -1) to z = -11
+    const full = interiorSegmentFraction(vol, 5, 1.5, 5, 5, 1.5, -11, 0.3, 1);
+    expect(full).toBe(1);
+    expect(interiorExit.open).toBe(true);
+    const none = interiorSegmentFraction(vol, 5, 1.5, 5, 5, 1.5, -11, 0.3, 0);
+    expect(none).toBeCloseTo((5 - (-1 + 0.3)) / 16, 9);
+    expect(interiorExit.open).toBe(true);
+    const half = interiorSegmentFraction(vol, 5, 1.5, 5, 5, 1.5, -11, 0.3, 0.5);
+    expect(half).toBeCloseTo(none + 0.5 * (1 - none), 9);
+    // a ray through a wall is never let on, whatever `through` says
+    const wall = interiorSegmentFraction(vol, 5, 1.5, 5, -8, 1.5, 5, 0.3, 1);
+    expect(wall).toBeLessThan(1);
+    expect(interiorExit.open).toBe(false);
+    // over the door's head: stopped by the wall above it
+    const over = interiorSegmentFraction(vol, 5, 1.5, 5, 5, 6, -11, 0.3, 1);
+    expect(over).toBeLessThan(1);
+    expect(interiorExit.open).toBe(false);
+  });
+
+  it('flattens by the least that threads a lintel, and smoothly as the player walks in', () => {
+    // the camera behind a player walking in, 12 yards out and pitched 0.32: once its ray would
+    // pass over the door's head it flattens just enough to run under it, keeping its length
+    const pitch = 0.32;
+    const len = 12;
+    let prev: number | null = null;
+    let flattened = 0;
+    for (let z = 0.5; z < 9.5; z += 0.05) {
+      const pick = chooseInteriorFraming(
+        vol,
+        5,
+        2,
+        z,
+        0,
+        Math.sin(pitch) * len,
+        -Math.cos(pitch) * len,
+        0.3,
+        0,
+        1,
+      );
+      expect(pick.boom, `at ${z}`).toBeCloseTo(len, 6);
+      expect(pick.swing).toBe(0);
+      if (pick.lift < 0) {
+        flattened++;
+        expect(pick.flatten).toBe(true);
+      }
+      // the lens height changes smoothly with the walk: a hundredth of a radian a step at most
+      if (prev !== null) expect(Math.abs(pick.lift - prev), `at ${z}`).toBeLessThan(0.01);
+      prev = pick.lift;
+    }
+    expect(flattened).toBeGreaterThan(20);
+    // the glide takes a flattening that must grow at once (fast, never a one-frame jump) and
+    // gives it back gently
+    expect(stepInteriorLift(0, -0.05, 1 / 60, false)).toBe(-0.05);
+    expect(stepInteriorLift(0, -0.5, 1 / 60, false)).toBeCloseTo(-INTERIOR_FLATTEN_RATE / 60, 9);
+    const back = stepInteriorLift(-0.3, 0, 1 / 60, false, 12);
+    expect(back).toBeGreaterThan(-0.3);
+    expect(back).toBeLessThan(-0.25);
+  });
+
+  it('caps the lens at the door head on the way in: it only ever comes down, then lets go', () => {
+    // a deep hall behind a front door 4 high (its outside face at z = -1, its threshold to
+    // z = 0): the camera 18 yards behind a player walking in, pitched well up (the lens 9.7
+    // over the eye outdoors)
+    const hall = cameraInterior(
+      'hall',
+      [
+        [0, 20, 0, 12, 0, 40],
+        [8, 12, 0, 4, -1, 1.5],
+      ],
+      [{ box: 1, axis: 2, side: -1 }],
+    );
+    const pad = 0.3;
+    const eyeY = 2;
+    const dist = 18;
+    const pitch = 0.75;
+    const back = Math.cos(pitch) * dist;
+    const rise = Math.sin(pitch) * dist;
+    const doorHead = 4 - pad - eyeY;
+    // outside and on the threshold: nothing capped
+    expect(interiorEntryCap(hall, 10, eyeY, -3, 0, rise, -back, pad)).toBe(rise);
+    expect(interiorEntryCap(hall, 10, eyeY, 0, 0, rise, -back, pad)).toBe(rise);
+    let prev = rise;
+    for (let z = 0; z < back; z += 0.1) {
+      const dy = interiorEntryCap(hall, 10, eyeY, z, 0, rise, -back, pad);
+      // it only ever comes down while the requested lens is still outside the door
+      expect(dy, `at ${z}`).toBeLessThanOrEqual(prev + 1e-9);
+      // never a jump: the whole fall spread over INTERIOR_ENTRY_CAP_IN yards of walk
+      expect(prev - dy, `at ${z}`).toBeLessThan(0.6);
+      if (z >= INTERIOR_ENTRY_CAP_IN) expect(dy, `at ${z}`).toBeCloseTo(doorHead, 9);
+      // the capped sight line threads the doorway: under its head where it crosses the face
+      // (once the cap is whole, while the requested lens is still out beyond it; before that
+      // the least flattening threads it, chooseInteriorFraming)
+      if (z + 1 < back && z >= INTERIOR_ENTRY_CAP_IN) {
+        const atFace = eyeY + dy * ((z + 1) / back);
+        expect(atFace, `at ${z}`).toBeLessThanOrEqual(4 - pad + 1e-9);
+      }
+      prev = dy;
+    }
+    // once the requested lens has come in through the door, the cap lets go
+    const deep = back + 1 + INTERIOR_ENTRY_CAP_RELAX + 0.5;
+    expect(interiorEntryCap(hall, 10, eyeY, deep, 0, rise, -back, pad)).toBe(rise);
+    // a camera across the room or looking back into it is never capped
+    expect(interiorEntryCap(hall, 10, eyeY, 5, 0, rise, back, pad)).toBe(rise);
+    expect(interiorEntryCap(hall, 10, eyeY, 5, back, rise, 0, pad)).toBe(rise);
+    // a boom that looks up from under the eye is left alone
+    expect(interiorEntryCap(hall, 10, eyeY, 5, 0, -1, -back, pad)).toBe(-1);
   });
 });

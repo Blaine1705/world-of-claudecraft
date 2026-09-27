@@ -1,6 +1,6 @@
-// The Mirefen tavern: the walk-in, two-storey inn on the Fenbridge road in Mirefen Marsh,
-// north of the Gravecaller ground and east of the fen trolls. Data-as-code; the floor
-// surface is ../mirefen_tavern_floor.ts, the colliders, rest area and keeper spawn are
+// The Mirefen tavern: the walk-in inn on the Fenbridge road in Mirefen Marsh, north of the
+// Gravecaller ground and east of the fen trolls. Data-as-code; the floor surface is
+// ../mirefen_tavern_floor.ts, the colliders, rest area and keeper spawn are
 // ../mirefen_tavern.ts, and the one Blender model (scripts/assets/mirefen_tavern/) reads
 // THESE numbers through its layout.json, so what the player walks is what the model draws.
 //
@@ -10,25 +10,23 @@
 // local point (lx, lz) stands at world (TAVERN_ORIGIN.x + lz, TAVERN_ORIGIN.z - lx):
 // tavernToWorld below is the one conversion.
 //
-// The plan, an L with a round tower in its inner corner:
-//  - the common room (the hall), 30.4 wide and 26.4 deep inside: the front door in the
-//    middle of its gable, a round hearth one step down in the middle of the floor, table
-//    nooks under low beams down both sides, the bar on a raised platform in the back
-//    right corner wrapped around a stone pillar, and over the bar's barrel wall a railed
-//    gallery that overlooks the fire;
-//  - the round stair tower behind the hall's back wall, open to the room through a wide
-//    arch: a stone spiral climbing three quarters of a turn round a central newel to a
-//    landing at the upper floor;
-//  - the wing behind the hall's right half: the upper floor (a landing and two guest
-//    rooms), reached from the tower's landing and from the gallery. Its ground storey
-//    is the cellar and kitchen, closed.
-// Every upper floor stands over solid ground in the floor surface (the gallery over the
-// barrel wall, the wing over its cellar, the landing over the stair's head), so the
-// floor is one height per point and nothing walks under anything.
+// One storey for players, open to the roof: an L with a round tower in its inner corner.
+//  - the common room (the hall), 30.4 wide and 26.4 deep inside, open to its hammerbeam
+//    roof (no timber crosses the room under TAVERN_HALL.truss): the front door in the
+//    middle of its gable, a round hearth one step down in the middle of the floor, a
+//    window booth either side of the door, a booth and the long table down the left wall
+//    and the dice table by the door, the bard's stage in the back left corner, the wall
+//    fireplace and its settle on the right, the bar on a raised platform in the back right
+//    corner wrapped round a stone pillar, barrel racks behind it either side of the
+//    kitchen's serving hatch;
+//  - the round tower behind the hall's back wall, open to the room through a wide arch: a
+//    flagged nook with a bench round its wall and two small tables, open up into its cone;
+//  - the wing behind the hall's right half, the kitchen and the cellar, closed: only the
+//    serving hatch looks into it. Upstairs is the keeper's, never walked.
 //
 // Scale: the player stands 2.6 yd to the crown on a 0.5 yd body radius. The door clears
-// 4.6 by 5.2, the side walls stand 10 to the eaves under a ridge at 20, the nook beams
-// hang at 5.5, the stair is 4.4 wide, table tops stand at 1.45 and seats at 0.85.
+// 4.6 by 5.2, the side walls stand 10 to the eaves under a ridge at 20, the lowest roof
+// timber over the room is at 10.2, table tops stand at 1.45 and seats at 0.85.
 
 import type { NpcDef } from '../types';
 
@@ -36,8 +34,6 @@ import type { NpcDef } from '../types';
 export const TAVERN_ORIGIN = { x: -17, z: 408 } as const;
 /** The ground floor's absolute height: 0.4 over the highest ground under the footprint. */
 export const TAVERN_FLOOR_Y = 0.5;
-/** The upper floor (the gallery, the tower landing and the wing), over the ground floor. */
-export const TAVERN_UPPER = 6.0;
 
 /** Local (lx, lz) to world (x, z): the door faces world +x. */
 export function tavernToWorld(lx: number, lz: number): { x: number; z: number } {
@@ -57,11 +53,12 @@ export const TAVERN_HALL = {
   eave: 10.0,
   /** The ridge over the middle, running front to back (the front is a gable). */
   ridge: 20.0,
-  /** The nave's tie beams, the high centre's ceiling line. */
-  tie: 11.0,
-  /** The side aisles: the low beams over the table nooks, and the posts carrying them. */
-  aisleBeam: 5.5,
-  aisleX: 9.2,
+  /** The lowest roof timber over the room: the hammer beams' undersides and the beam the
+   *  bar's pillar carries. Nothing crosses the room under it (the camera's air stops well
+   *  under it, render/mirefen_tavern_interior_core.ts). */
+  truss: 10.2,
+  /** The hammerbeam trusses' positions along the hall (local z). */
+  trusses: [-10.0, -4.6, 0.0, 5.0, 10.0],
   /** The roof overhangs the side walls at the eaves and the gables at the verges. */
   eaveOut: 1.0,
   vergeOut: 0.8,
@@ -86,7 +83,8 @@ export const TAVERN_PORCH = {
 /** How far the porch steps may run before they are certainly under the ground. */
 export const TAVERN_STEPS_MAX_RUN = 8;
 
-/** The wing behind the hall's right half: the upper floor over the cellar. */
+/** The wing behind the hall's right half: the kitchen and cellar under the keeper's floor,
+ *  closed (the serving hatch looks into its kitchen). */
 export const TAVERN_WING = {
   x0: 4,
   x1: 16,
@@ -94,86 +92,63 @@ export const TAVERN_WING = {
   z1: -14,
   wall: 0.8,
   eave: 9.4,
+  /** The keeper's floor over the kitchen (the band on its walls, outside). */
+  floor: 6.0,
   /** The wing's ridge runs front to back over its middle, under the hall's back gable. */
   ridge: 13.3,
   eaveOut: 0.9,
   vergeOut: 0.6,
 } as const;
 
-/** The round stair tower in the L's inner corner. */
+/** The round tower in the L's inner corner: a nook on the ground floor, open up into its
+ *  slate cone. */
 export const TAVERN_TOWER = {
   x: -1.5,
   z: -18,
   rIn: 6.0,
   rOut: 6.8,
-  /** The central newel column the stair winds round (a banded stone shaft). No slimmer: a
-   *  body hugging it climbs the spiral's steepest line, which must stay under the climb gate
-   *  (tests/mirefen_tavern.test.ts). */
-  newel: 1.6,
   wallTop: 11.2,
   /** The slate cone's point, over the hall's ridge: the tower's hat reads from the road. */
   peak: 22.0,
   eaveOut: 0.8,
 } as const;
 
-const DEG = Math.PI / 180;
-/** The spiral, as angles round the tower (atan2(dx, dz): 0 toward the hall, +90 toward
- *  the wing). It leaves the ground landing at `bottom` and climbs clockwise seen from
- *  above (toward -90, then round the back) to the upper floor at `top`, then runs on
- *  level to `landingEnd`, where the landing stops at a railed drop over the ground
- *  landing. The ground landing is the rest of the circle, open to the hall. */
-export const TAVERN_STAIR = {
-  bottom: -48 * DEG,
-  /** Unwrapped climb from the bottom to the top (the flight), and on to the landing end. */
-  climb: 222 * DEG,
-  landing: 262 * DEG,
-} as const;
-
-/** The arch in the hall's back wall that opens the room onto the stair tower. */
+/** The arch in the hall's back wall that opens the room onto the tower's nook. */
 export const TAVERN_ARCH = { x0: -5.5, x1: 2.4, height: 5.4 } as const;
 
-/** The upper-floor passage from the tower's landing through the tower and wing walls. */
-export const TAVERN_TOWER_DOOR = { x0: 2.5, x1: 5.2, z0: -17.6, z1: -14.9, height: 3.6 } as const;
-
-/** The gallery over the bar's barrel wall, its rail, and its door into the wing. */
-export const TAVERN_GALLERY = {
-  x0: 2.4,
-  x1: 15.2,
-  z0: -13.2,
-  z1: -10.0,
-  /** The rail's top over the gallery floor. */
-  rail: 1.2,
-} as const;
-export const TAVERN_GALLERY_DOOR = { x0: 7.0, x1: 10.0, height: 4.2 } as const;
+/** The kitchen's serving hatch through the hall's back wall behind the bar: its span, its
+ *  sill and its head over the ground floor. A body never passes it (the wall's collider
+ *  runs on over it); the kitchen behind it is set dressing. */
+export const TAVERN_HATCH = { x0: 8.2, x1: 10.8, sill: 1.9, head: 3.5 } as const;
 
 /** The hearth pit: one step down round the round hearth, a ramped edge to walk it. */
 export const TAVERN_PIT = { x: 0, z: 2.4, r: 5.4, rim: 5.85, depth: 0.45 } as const;
 
 /** The bar's raised platform (the barkeep's aisle and the drinkers' side), its ramped
- *  front and left edges. It runs back to the barrel wall under the gallery. */
+ *  front and left edges. It runs back to the hall's back wall. */
 export const TAVERN_BAR_PLATFORM = {
   x0: 2.4,
   x1: 15.2,
-  z0: -10.0,
+  z0: -13.2,
   z1: -4.2,
   lift: 0.5,
   rim: 0.5,
 } as const;
 
-/** The wing's upper-floor rooms: two guest rooms at the back behind a partition with a
- *  doorway each, the landing before them. Partition boxes as [x0, x1, z0, z1]. */
-export const TAVERN_ROOM_WALLS: readonly (readonly [number, number, number, number])[] = [
-  [4.8, 6.2, -20.8, -20.4],
-  [8.4, 11.6, -20.8, -20.4],
-  [13.8, 15.2, -20.8, -20.4],
-  [9.8, 10.2, -27.2, -20.8],
-];
-/** The rooms' doorways' clear height over the upper floor. */
-export const TAVERN_ROOM_DOOR_HEIGHT = 4.0;
+/** The bard's stage in the back left corner: a raised deck, its ramped front and right
+ *  edges (the mirror of the bar platform's). */
+export const TAVERN_STAGE = {
+  x0: -15.2,
+  x1: -9.4,
+  z0: -13.2,
+  z1: -8.4,
+  lift: 0.45,
+  rim: 0.5,
+} as const;
 
 /** A solid thing in the tavern: what the sim collides with and the model draws there.
- *  `level` is the floor it stands on: the ground floor, the bar platform, the hearth pit
- *  or the upper floor; heights are over that floor. */
+ *  `level` is the floor it stands on: the ground floor, the bar platform, the stage or the
+ *  hearth pit; heights are over that floor. */
 export type TavernPropKind =
   | 'hearth'
   | 'bench'
@@ -183,13 +158,11 @@ export type TavernPropKind =
   | 'stool'
   | 'counter'
   | 'pillar'
-  | 'post'
   | 'settle'
   | 'fireplace'
-  | 'bed'
   | 'chest'
-  | 'newel';
-export type TavernLevel = 'ground' | 'pit' | 'platform' | 'upper';
+  | 'barrels';
+export type TavernLevel = 'ground' | 'pit' | 'platform' | 'stage';
 
 export interface TavernProp {
   kind: TavernPropKind;
@@ -202,10 +175,12 @@ export interface TavernProp {
   hd?: number;
   height: number;
   level: TavernLevel;
-  /** Furniture can be stood on (the harbor house idiom); the hearth, the fireplace and the
-   *  structure (pillar, posts, newel) block at full height. */
+  /** Furniture can be stood on (the harbor house idiom); the hearth, the wall fireplace,
+   *  the barrel racks and the bar's pillar block at full height. */
   standable?: boolean;
 }
+
+const DEG = Math.PI / 180;
 
 function benchRing(): TavernProp[] {
   // five curved benches round the fire, the gaps facing the door and the four quarters
@@ -228,17 +203,89 @@ function benchRing(): TavernProp[] {
   return out;
 }
 
+/** The nook's bench round the tower's wall: five straight runs, their backs to the stone,
+ *  from one side of the arch round the back to the other (angles as atan2(dx, dz) round
+ *  the tower, 0 toward the hall). */
+export const TAVERN_NOOK_BENCH_ANGLES: readonly number[] = [90, 135, 180, 225, 270].map(
+  (a) => a * DEG,
+);
+/** The nook bench's radius (its middle) and the small tables' radius and angles. */
+export const TAVERN_NOOK = { benchR: 5.25, tableR: 3.3, tableAngles: [145 * DEG, 215 * DEG] };
+
+function nook(): TavernProp[] {
+  const t = TAVERN_TOWER;
+  const out: TavernProp[] = TAVERN_NOOK_BENCH_ANGLES.map((a) => ({
+    kind: 'bench' as const,
+    x: t.x + Math.sin(a) * TAVERN_NOOK.benchR,
+    z: t.z + Math.cos(a) * TAVERN_NOOK.benchR,
+    rot: a,
+    hw: 1.85,
+    hd: 0.38,
+    height: 0.85,
+    level: 'ground' as const,
+    standable: true,
+  }));
+  for (const a of TAVERN_NOOK.tableAngles) {
+    out.push({
+      kind: 'roundTable',
+      x: t.x + Math.sin(a) * TAVERN_NOOK.tableR,
+      z: t.z + Math.cos(a) * TAVERN_NOOK.tableR,
+      rot: 0,
+      r: 0.8,
+      height: 1.45,
+      level: 'ground',
+      standable: true,
+    });
+  }
+  return out;
+}
+
+/** A booth: two high-backed settles facing each other across a table. `across` is the
+ *  settles' spacing and `rot` the first settle's yaw (its back away from the table). */
+function booth(
+  x: number,
+  z: number,
+  rot: number,
+  settleHw: number,
+  tableHw: number,
+  tableHd: number,
+): TavernProp[] {
+  // the settles stand 1.7 either side of the table along the booth's axis (local z)
+  const dx = Math.sin(rot) * 1.7;
+  const dz = Math.cos(rot) * 1.7;
+  const settle = (sx: number, sz: number, r: number): TavernProp => ({
+    kind: 'settle',
+    x: sx,
+    z: sz,
+    rot: r,
+    hw: settleHw,
+    hd: 0.45,
+    height: 0.85,
+    level: 'ground',
+    standable: true,
+  });
+  return [
+    settle(x - dx, z - dz, rot),
+    {
+      kind: 'table',
+      x,
+      z,
+      rot: 0,
+      hw: tableHw,
+      hd: tableHd,
+      height: 1.45,
+      level: 'ground',
+      standable: true,
+    },
+    settle(x + dx, z + dz, rot + Math.PI),
+  ];
+}
+
 export const TAVERN_PROPS: readonly TavernProp[] = [
   // the round hearth in the pit: a knee-high stone ring a spell sees over
   { kind: 'hearth', x: TAVERN_PIT.x, z: TAVERN_PIT.z, rot: 0, r: 1.7, height: 1.0, level: 'pit' },
   ...benchRing(),
-  // the aisle posts carrying the nook beams (the right side's rearmost is the bar pillar)
-  { kind: 'post', x: -9.2, z: -8, rot: 0, r: 0.4, height: TAVERN_HALL.tie, level: 'ground' },
-  { kind: 'post', x: -9.2, z: 0, rot: 0, r: 0.4, height: TAVERN_HALL.tie, level: 'ground' },
-  { kind: 'post', x: -9.2, z: 8, rot: 0, r: 0.4, height: TAVERN_HALL.tie, level: 'ground' },
-  { kind: 'post', x: 9.2, z: 0, rot: 0, r: 0.4, height: TAVERN_HALL.tie, level: 'ground' },
-  { kind: 'post', x: 9.2, z: 8, rot: 0, r: 0.4, height: TAVERN_HALL.tie, level: 'ground' },
-  // the left nooks: the dice table by the door, the long table, the bard's stool
+  // the left side: the dice table by the door, the long table, the booth by the stage
   {
     kind: 'roundTable',
     x: -12.2,
@@ -312,17 +359,34 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     level: 'ground',
     standable: true,
   },
+  // the wall booth by the stage: the settles' backs to the stage and to the long table
+  ...booth(-13.6, -4.6, 0, 1.5, 1.2, 0.6),
+  // the window booths either side of the door, their backs across the room
+  ...booth(-9.0, 11.75, Math.PI / 2, 1.25, 0.6, 1.05),
+  ...booth(9.0, 11.75, Math.PI / 2, 1.25, 0.6, 1.05),
+  // the bard's stage: the bard's stool and the costume chest in the corner
   {
     kind: 'stool',
-    x: -12.6,
-    z: -9.6,
+    x: -12.3,
+    z: -11.0,
     rot: 0,
     r: 0.42,
     height: 0.9,
-    level: 'ground',
+    level: 'stage',
     standable: true,
   },
-  // the right nooks: the square table by the door, the wall fireplace and its settle
+  {
+    kind: 'chest',
+    x: -14.3,
+    z: -12.5,
+    rot: 0.35,
+    hw: 0.7,
+    hd: 0.42,
+    height: 0.9,
+    level: 'stage',
+    standable: true,
+  },
+  // the right side: the square table by the door, the wall fireplace and its settle
   {
     kind: 'table',
     x: 12.2,
@@ -395,19 +459,18 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     level: 'ground',
     standable: true,
   },
-  // the post on the gallery's edge carrying the right arcade plate over the bar
+  // the bar: the stone pillar at the elbow (up to the beam over the bar), the long counter
+  // and the short one behind the pillar, the stools before it, the barrel racks against the
+  // back wall either side of the kitchen hatch
   {
-    kind: 'post',
-    x: 9.2,
-    z: -10.35,
+    kind: 'pillar',
+    x: 4.3,
+    z: -7.6,
     rot: 0,
-    r: 0.3,
-    height: TAVERN_HALL.tie - TAVERN_UPPER,
-    level: 'upper',
+    r: 1.1,
+    height: TAVERN_HALL.truss - TAVERN_BAR_PLATFORM.lift,
+    level: 'platform',
   },
-  // the bar: the stone pillar at the elbow, the long counter and the short one behind the
-  // pillar, and the stools before it
-  { kind: 'pillar', x: 4.3, z: -7.6, rot: 0, r: 1.1, height: TAVERN_HALL.tie, level: 'platform' },
   {
     kind: 'counter',
     x: 9.1,
@@ -470,117 +533,87 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     level: 'platform',
     standable: true,
   },
-  // the tower's newel column
   {
-    kind: 'newel',
-    x: TAVERN_TOWER.x,
-    z: TAVERN_TOWER.z,
+    kind: 'barrels',
+    x: 5.25,
+    z: -12.4,
     rot: 0,
-    r: TAVERN_TOWER.newel,
-    height: TAVERN_TOWER.wallTop,
-    level: 'ground',
-  },
-  // upstairs: a bench on the gallery, a chest on the landing, a bed and a chest a room
-  {
-    kind: 'bench',
-    x: 12.8,
-    z: -12.75,
-    rot: 0,
-    hw: 1.4,
-    hd: 0.35,
-    height: 0.85,
-    level: 'upper',
-    standable: true,
+    hw: 2.65,
+    hd: 0.8,
+    height: 3.6,
+    level: 'platform',
   },
   {
-    kind: 'chest',
-    x: 14.3,
-    z: -15.0,
+    kind: 'barrels',
+    x: 13.05,
+    z: -12.4,
     rot: 0,
-    hw: 0.7,
-    hd: 0.4,
-    height: 0.9,
-    level: 'upper',
-    standable: true,
+    hw: 1.95,
+    hd: 0.8,
+    height: 3.6,
+    level: 'platform',
   },
-  {
-    kind: 'bed',
-    x: 7.3,
-    z: -25.3,
-    rot: 0,
-    hw: 1.2,
-    hd: 1.75,
-    height: 1.05,
-    level: 'upper',
-    standable: true,
-  },
-  {
-    kind: 'chest',
-    x: 5.7,
-    z: -21.7,
-    rot: 0,
-    hw: 0.7,
-    hd: 0.4,
-    height: 0.9,
-    level: 'upper',
-    standable: true,
-  },
-  {
-    kind: 'bed',
-    x: 12.7,
-    z: -25.3,
-    rot: 0,
-    hw: 1.2,
-    hd: 1.75,
-    height: 1.05,
-    level: 'upper',
-    standable: true,
-  },
-  {
-    kind: 'chest',
-    x: 14.3,
-    z: -21.7,
-    rot: 0,
-    hw: 0.7,
-    hd: 0.4,
-    height: 0.9,
-    level: 'upper',
-    standable: true,
-  },
+  // the tower's nook
+  ...nook(),
 ];
 
-/** The warm lights: the lanterns hung on chains over the tables and the bar, and the wheel
- *  chandelier over the entry. (x, z, and the lantern's height over the floor under it.)
- *  The lit ones also light the room (render/mirefen_tavern.ts); the hearth, the wall
- *  fireplace and the bar candles light it too. */
+/** The lanterns hung under the hammer beams' ends, high over the booths and tables, and
+ *  the wheel chandelier over the entry: every one clear over the camera's air. (x, z, and
+ *  the lantern's height over the floor.) The lit ones also light the room
+ *  (render/mirefen_tavern.ts); the hearth, the wall fire, the stage's footlights, the bar's
+ *  candles and the nook light it too. */
 export const TAVERN_LANTERNS: readonly { x: number; z: number; y: number; lit: boolean }[] = [
-  { x: -12.3, z: 1.0, y: 4.3, lit: true },
-  { x: -12.2, z: 9.0, y: 4.3, lit: false },
-  { x: 12.2, z: 9.0, y: 4.3, lit: true },
-  { x: 7.0, z: -6.9, y: 4.6, lit: true },
-  { x: 11.2, z: -6.9, y: 4.6, lit: false },
+  { x: -13.2, z: -10.0, y: 9.7, lit: false },
+  { x: -13.2, z: 0.0, y: 9.7, lit: true },
+  { x: -13.2, z: 10.0, y: 9.7, lit: false },
+  { x: 13.2, z: -4.6, y: 9.7, lit: false },
+  { x: 13.2, z: 5.0, y: 9.7, lit: true },
+  { x: 13.2, z: 10.0, y: 9.7, lit: false },
 ];
-export const TAVERN_CHANDELIER = { x: 0, z: 9.6, y: 7.6, r: 2.1 } as const;
-/** The iron sconces up the stair tower's wall, lit, so the climb reads from foot to head:
- *  each at an angle round the tower (atan2(dx, dz), as TAVERN_STAIR) on the inner face,
- *  its lantern this high over the ground floor (a head over the steps beneath it). */
-export const TAVERN_TOWER_SCONCES: readonly { angle: number; y: number }[] = [
-  { angle: -86 * DEG, y: 3.5 },
-  { angle: -170 * DEG, y: 5.9 },
-  { angle: -252 * DEG, y: 8.1 },
-];
-/** The copper hood over the round hearth: its rim's height and radius, its flue's top. */
-export const TAVERN_HOOD = { rimY: 5.0, rimR: 2.6, topY: 7.2, topR: 0.7, flueTop: 21.8 } as const;
+export const TAVERN_CHANDELIER = { x: 0, z: 9.6, y: 9.8, r: 2.1 } as const;
+/** The iron candle sconces on the walls, each at its wall's inner face (x, z), its candle
+ *  this high over the floor, `nx`/`nz` the way it faces into the room: two flanking the
+ *  stage, two in the tower's nook, one either side of the right wall's fire. */
+export const TAVERN_SCONCES: readonly {
+  x: number;
+  z: number;
+  y: number;
+  nx: number;
+  nz: number;
+}[] = (() => {
+  const t = TAVERN_TOWER;
+  const ih = TAVERN_HALL.x1 - TAVERN_HALL.wall;
+  const back = TAVERN_HALL.z0 + TAVERN_HALL.wall;
+  const inNook = (a: number) => ({
+    x: t.x + Math.sin(a * DEG) * t.rIn,
+    z: t.z + Math.cos(a * DEG) * t.rIn,
+    y: 3.6,
+    nx: -Math.sin(a * DEG),
+    nz: -Math.cos(a * DEG),
+  });
+  return [
+    { x: -14.7, z: back, y: 3.8, nx: 0, nz: 1 },
+    { x: -9.9, z: back, y: 3.8, nx: 0, nz: 1 },
+    inNook(118),
+    inNook(242),
+    { x: ih, z: -1.4, y: 3.4, nx: -1, nz: 0 },
+    { x: ih, z: 6.4, y: 3.4, nx: -1, nz: 0 },
+  ];
+})();
+/** The copper hood high over the round hearth, clear over the camera's air: its rim's
+ *  height and radius, its crown, its flue's top. */
+export const TAVERN_HOOD = { rimY: 9.4, rimR: 3.0, topY: 12.2, topR: 0.8, flueTop: 21.8 } as const;
 
-/** The rest area: the whole inside, ground floor and upper floor alike. A body counts as
- *  resting when its feet stand no further under the ground floor than this. */
+/** The rest area: the whole inside. A body counts as resting when its feet stand no further
+ *  under the ground floor than this. */
 export const TAVERN_REST_SINK = 0.6;
 
 /** The innkeeper's reserved entity id (the singleton NPCs' 1_000_000_x namespace, types.ts
  *  STATIC_WORLD_SERVICE_ENTITY_ID_MIN's note; 000 to 006 and 010 to 014 are taken): she is
  *  spawned under it, outside the sequential allocator, so no other entity's id moves. */
 export const TAVERN_KEEPER_ENTITY_ID = 1_000_000_020;
-/** Where the innkeeper stands (local): behind the long counter, turned to the room. */
+/** Where the innkeeper stands (local): behind the long counter, before the kitchen hatch,
+ *  turned to the room. */
 export const TAVERN_KEEPER_LOCAL = { x: 9.0, z: -8.8 } as const;
 const KEEPER_WORLD = tavernToWorld(TAVERN_KEEPER_LOCAL.x, TAVERN_KEEPER_LOCAL.z);
 

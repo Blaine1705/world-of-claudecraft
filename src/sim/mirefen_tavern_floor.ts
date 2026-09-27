@@ -3,18 +3,14 @@
 // Forgefather stair ramps, so the terrain the renderer draws (terrainHeight) is untouched
 // and the floor the feet walk is what the model draws.
 //
-// The surface, over the ground floor (TAVERN_FLOOR_Y):
+// The surface, over the ground floor (TAVERN_FLOOR_Y): one storey, no upper floor anywhere.
 //  - the hall: level, but one step down (ramped over half a yard) in the hearth pit, half a
-//    yard up on the bar platform (ramped at its open edges), and at the upper floor over
-//    the barrel wall under the gallery (a sheer face: the gallery is its top);
-//  - the tower: the ground landing open to the hall, the spiral climbing at an even rate
-//    round the newel to the upper floor, and the landing at its head (a sheer drop, railed,
-//    back to the ground landing);
-//  - the wing: the upper floor over its closed cellar;
+//    yard up on the bar platform and on the bard's stage (each ramped at its open edges);
+//  - the tower's nook, level, open to the hall through its arch;
+//  - the wing (the closed kitchen and cellar), level;
 //  - the porch at the ground floor, and the steps falling from it toward the road until
 //    they meet the ground (the fold is a max, so the terrain takes over where they end).
-// Every upper floor stands over solid ground here: one height per point, nothing to walk
-// under. Sheer faces are walls to the climb gate and carry colliders too (mirefen_tavern.ts).
+// No face in it is sheer: every change of height is a ramp the climb gate walks.
 //
 // Pure leaf (content and the active-world flag only, no world.ts: world.ts reaches this
 // through walk_lifts.ts), built-in world only,
@@ -24,20 +20,16 @@
 import {
   TAVERN_BAR_PLATFORM,
   TAVERN_FLOOR_Y,
-  TAVERN_GALLERY,
   TAVERN_HALL,
   TAVERN_ORIGIN,
   TAVERN_PIT,
   TAVERN_PORCH,
-  TAVERN_STAIR,
+  TAVERN_STAGE,
   TAVERN_STEPS_MAX_RUN,
   TAVERN_TOWER,
-  TAVERN_UPPER,
   TAVERN_WING,
 } from './content/mirefen_tavern';
 import { isBuiltinWorldActive } from './data';
-
-const TAU = Math.PI * 2;
 
 /** The footprint's world bounds (local z maps to world x, local x to world -z). */
 const BOUNDS = {
@@ -47,23 +39,8 @@ const BOUNDS = {
   z1: TAVERN_ORIGIN.z - TAVERN_HALL.x0,
 } as const;
 
-/** The stair's height over the ground floor at a point of the tower (local dx, dz from the
- *  tower's centre): the ground landing, the flight, or the landing at its head. */
-export function tavernStairHeight(dx: number, dz: number): number {
-  const phi = Math.atan2(dx, dz);
-  // unwrapped climb from the stair's foot, clockwise seen from above (decreasing angle)
-  let u = (TAVERN_STAIR.bottom - phi) % TAU;
-  if (u < 0) u += TAU;
-  if (u <= TAVERN_STAIR.climb) return (TAVERN_UPPER * u) / TAVERN_STAIR.climb;
-  if (u <= TAVERN_STAIR.landing) return TAVERN_UPPER;
-  return 0;
-}
-
 /** The hall's floor over the ground floor at a local point inside its outer walls. */
 export function tavernHallHeight(lx: number, lz: number): number {
-  const g = TAVERN_GALLERY;
-  // the barrel wall under the gallery (the doorway through the back wall included)
-  if (lx >= g.x0 && lz <= g.z1) return TAVERN_UPPER;
   const pit = TAVERN_PIT;
   const d = Math.hypot(lx - pit.x, lz - pit.z);
   if (d < pit.rim)
@@ -76,6 +53,15 @@ export function tavernHallHeight(lx: number, lz: number): number {
     const e = Math.hypot(ox, oz);
     if (e < b.rim) return b.lift * (1 - e / b.rim);
   }
+  // the stage, the bar platform's mirror: ramped at its front and right edges
+  const s = TAVERN_STAGE;
+  if (lz >= s.z0) {
+    const ox = Math.max(0, lx - s.x1);
+    const oz = Math.max(0, lz - s.z1);
+    if (ox === 0 && oz === 0) return s.lift;
+    const e = Math.hypot(ox, oz);
+    if (e < s.rim) return s.lift * (1 - e / s.rim);
+  }
   return 0;
 }
 
@@ -86,11 +72,10 @@ export function tavernLocalHeight(lx: number, lz: number): number {
   const t = TAVERN_TOWER;
   const dx = lx - t.x;
   const dz = lz - t.z;
-  if (dx * dx + dz * dz <= t.rOut * t.rOut) {
-    return dx * dx + dz * dz < t.newel * t.newel ? TAVERN_UPPER : tavernStairHeight(dx, dz);
-  }
+  // the tower's nook and the closed wing: level with the hall
+  if (dx * dx + dz * dz <= t.rOut * t.rOut) return 0;
   const w = TAVERN_WING;
-  if (lx >= w.x0 && lx <= w.x1 && lz >= w.z0 && lz <= w.z1) return TAVERN_UPPER;
+  if (lx >= w.x0 && lx <= w.x1 && lz >= w.z0 && lz <= w.z1) return 0;
   const p = TAVERN_PORCH;
   if (lx >= p.x0 && lx <= p.x1 && lz >= p.z0 && lz <= p.z1) return 0;
   if (Math.abs(lx) <= p.stepHalfWidth && lz > p.z1 && lz <= p.z1 + TAVERN_STEPS_MAX_RUN) {

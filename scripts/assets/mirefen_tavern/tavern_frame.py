@@ -1,15 +1,16 @@
 """The Mirefen tavern's frame (build_tavern.py calls build(B, parts) with itself as B): the parts
 the camera never cuts away. The stone base under every wall, every floor the sim walks (the
-hall's boards, the hearth pit and its step, the bar platform, the porch and its steps, the
-tower's ground landing, the stone spiral and the landing at its head, the wing's upper floor),
-the round hearth and its copper hood and flue, the posts, plates, tie beams and nook beams,
-and the bar's stone pillar and counters. The stair tower's newel is built here too, into its
-own part (TowerNewel), which the camera cuts away rather than fight.
+hall's boards, the hearth pit and its step, the bar platform, the bard's stage, the porch and
+its steps, the tower's flagged nook with its rose), the round hearth and its copper hood and
+flue hung high over it, the bar's counters and the beam over the bar, and the kitchen behind
+the serving hatch. The bar's stone pillar is built here too, into its own part (BarPillar),
+which the camera cuts away rather than fight.
 
 Every walking surface is laid at the height the sim's floor surface gives it
-(src/sim/mirefen_tavern_floor.ts): the spiral's treads each stand at the ramp's height at
-their middle, the ramped edges of the pit and the platform are drawn as bevelled curbs, the
-porch steps stop on the ground."""
+(src/sim/mirefen_tavern_floor.ts): the ramped edges of the pit, the platform and the stage are
+drawn as bevelled curbs, the porch steps stop on the ground. Nothing here crosses the common
+room between its floor and the hammer beams (HALL['truss']): the hood, its rods and the beam
+over the bar all hang over the camera's air."""
 import math
 
 
@@ -21,12 +22,11 @@ def build(B, parts):
     pit_and_hearth(B, p, trim)
     hood(B, p, trim)
     bar_platform(B, p)
+    stage(B, p, trim)
     porch(B, p)
-    tower_floor_and_stair(B, p, trim)
-    newel(B, parts['TowerNewel'])
-    upper_floor(B, p)
-    posts_and_beams(B, p, trim)
-    bar(B, p, trim)
+    nook_floor(B, p)
+    bar(B, p, parts['BarPillar'], trim)
+    kitchen(B, p, trim)
 
 
 # ---------------------------------------------------------------------------
@@ -108,7 +108,7 @@ def plinth(B, p):
 # The hall's floor: honey boards, broken round the hearth pit and under the bar
 # ---------------------------------------------------------------------------
 def hall_floor(B, p):
-    H, pit, plat = B.HALL, B.LAYOUT['pit'], B.LAYOUT['platform']
+    H, pit, plat, st = B.HALL, B.LAYOUT['pit'], B.LAYOUT['platform'], B.LAYOUT['stage']
     x0, x1 = H['x0'] + H['wall'], H['x1'] - H['wall']
     z0, z1 = H['z0'] + H['wall'], H['z1'] - H['wall']
     width = 0.95
@@ -158,15 +158,20 @@ def hall_floor(B, p):
                 q = [(sa, ea), (sb, eb), (sb, d), (sa, d)]
             B.hexa(p, [(x, -thick, z) for (x, z) in q] + [(x, 0.0, z) for (x, z) in q], color, B.WOOD)
 
-    # the board columns: those under the bar platform start before it, except the one its
-    # left bevel starts in, which runs the whole room (on under the bevel, the platform and
-    # the barrel wall, all hidden) so it floors the strip between the platform and the tower
-    # arch's side
+    # the board columns: those under the bar platform or the stage start before it, except
+    # the one each bevel starts in, which runs the whole room (on under the bevel and the
+    # deck, hidden) so it floors the strip between the deck and the next column
     columns = []
     for i in range(n):
         xa, xb = x0 + step * i + 0.004, x0 + step * (i + 1) - 0.004
         under = (xa + xb) / 2 >= plat['x0'] - plat['rim'] and xa >= plat['x0'] - 0.01
-        columns.append((i, xa, xb, plat['z1'] + plat['rim'] - 0.05 if under else z0))
+        on_stage = (xa + xb) / 2 <= st['x1'] + st['rim'] and xb <= st['x1'] + 0.01
+        za = z0
+        if under:
+            za = plat['z1'] + plat['rim'] - 0.05
+        elif on_stage:
+            za = st['z1'] + st['rim'] - 0.05
+        columns.append((i, xa, xb, za))
     for (i, xa, xb, za) in columns:
         # the circle's reach across this column (sampled across it)
         hs = [pit_half(xa + (xb - xa) * s / 8) for s in range(9)]
@@ -305,11 +310,12 @@ def hood(B, p, trim):
     for s in (1, -1):
         B.abox(p, cx + s * 0.35 - 0.05, cx + s * 0.35 + 0.05, top - 0.1, top + 0.4, cz - 0.05, cz + 0.05,
                B.PAL['iron'], B.METAL)
-    # four iron rods from the rim up to the paired tie beams over the hearth
+    # four iron rods from the rim up to the ridge beam: the hood hangs over the camera's air
+    ridge = B.HALL['ridge'] - 1.1
     for s in (1, -1):
-        for zt in (1.0, 3.8):
-            rim = (cx + s * h['rimR'] * 0.72, h['rimY'] + 0.1, cz + (zt - cz) * 0.72 / 0.9 * 0.9)
-            B.beam(p, rim, (cx + s * 1.6, B.HALL['tie'], zt), 0.07, 0.07, B.PAL['iron'], B.METAL)
+        for dz in (-1, 1):
+            rim = (cx + s * h['rimR'] * 0.7, h['rimY'] + 0.3, cz + dz * h['rimR'] * 0.7)
+            B.beam(p, rim, (cx + s * 0.28, ridge, cz + dz * 1.4), 0.08, 0.08, B.PAL['iron'], B.METAL)
     # rivets round the rim (trim)
     for i in range(20):
         a = 2 * math.pi * (i + 0.5) / 20
@@ -389,268 +395,135 @@ def porch(B, p):
 
 
 # ---------------------------------------------------------------------------
-# The tower: its ground landing, the stone spiral, the landing at its head, the newel
+# The bard's stage: a raised deck in the back left corner, its front and right edges bevelled
+# like the bar platform's (the sim ramps them), a darker nosing along the deck's lip
 # ---------------------------------------------------------------------------
-# The flight's steps: 24 risers of a quarter yard up the three-quarter turn.
-STAIR_STEPS = 24
-
-
-def tower_floor_and_stair(B, p, trim):
-    """The tower's ground landing, the stone spiral and the landing at its head. Each step is
-    one dressed block: a solid body from the ground up (its leading face the riser, a darker
-    stone), a pale tread slab on top whose nosing overhangs the riser, all at the ramp's
-    height at the step's middle. A sloped string course runs up the wall behind the treads,
-    and a wooden handrail on iron brackets follows it from the foot to the landing's end."""
-    T, S = B.TOWER, B.STAIR
-    cx, cz = T['x'], T['z']
-    G = B.G
-    rn, ri = T['newel'], T['rIn']
-    # the ground landing (the sector open to the hall), flagged in two rings
-    a_hi = S['bottom'] - S['landing'] + 2 * math.pi  # the landing's end, +50 degrees
-    a_lo = S['bottom']                                # the stair's foot, -48 degrees
-    mid_r = (rn + ri) / 2
-    n = 10
+def stage(B, p, trim):
+    q = B.LAYOUT['stage']
+    lift, rim = q['lift'], q['rim']
+    x0, x1, z0, z1 = q['x0'], q['x1'], q['z0'], q['z1']
+    # the deck: boards running across the stage, each its own tone, a hairline between them
+    n = int(round((z1 - z0) / 0.62))
     for i in range(n):
-        a0 = a_lo + (a_hi - a_lo) * i / n
-        a1 = a_lo + (a_hi - a_lo) * (i + 1) / n
-        for j, (r0, r1) in enumerate(((rn, mid_r), (mid_r, ri + 0.4))):
-            sector(B, p, cx, cz, r0 + 0.02, r1 - 0.02, a0 + 0.01, a1 - 0.01, -0.25, 0.0,
-                   B.pick(B.PAL['flag'], i + j * 3), B.STONE, subdiv=2)
-    # a mortar bed under the flags: their joints show it, never the ground under the tower
-    sector(B, p, cx, cz, rn - 0.05, ri + 0.4, a_lo, a_hi, -0.4, -0.08, B.PAL['mortar'], B.STONE,
-           subdiv=3)
-    # the flight
-    steps = STAIR_STEPS
-    du = S['climb'] / steps
-    nose = 0.07
-    for k in range(steps):
-        u0, u1 = k * du, (k + 1) * du
-        a0, a1 = S['bottom'] - u0, S['bottom'] - u1
-        y = G * (k + 0.5) / steps
-        tone = B.scale_color(B.pick(B.PAL['ashlar'], k * 3 + 1), 0.72)
-        # the body, the riser its leading face
-        sector(B, p, cx, cz, rn - 0.05, ri + 0.1, a1, a0, 0.0, y - 0.11, tone, B.STONE)
-        # the tread, a worn grey flag, and its nosing, a pale dressed lip a hand over the riser
-        sector(B, p, cx, cz, rn - 0.02, ri + 0.05, a1, a0 - 0.16 / mid_r, y - 0.11, y,
-               B.scale_color(B.pick(B.PAL['tread'], k), 0.96 + 0.08 * (k % 2)), B.STONE)
-        sector(B, p, cx, cz, rn - 0.02, ri + 0.05, a0 - 0.16 / mid_r, a0 + nose / mid_r, y - 0.13, y + 0.005,
-               B.PAL['ashlar_hi'], B.STONE)
-    # the landing at the head: level at the upper floor over a solid mass, its drop face toward
-    # the ground landing dressed as a wall
-    b0 = S['bottom'] - S['climb']
-    b1 = S['bottom'] - S['landing']
-    sector(B, p, cx, cz, rn - 0.05, ri + 0.4, b1, b0, 0.0, G - 0.12, B.PAL['mortar'], B.STONE, subdiv=4)
-    for i in range(3):
-        c0 = b1 + (b0 - b1) * i / 3
-        c1 = b1 + (b0 - b1) * (i + 1) / 3
-        sector(B, p, cx, cz, rn, ri + 0.4, c0 + 0.01, c1 - 0.01, G - 0.12, G,
-               B.scale_color(B.pick(B.PAL['ashlar'], i + 2), 1.06), B.STONE, subdiv=2)
-    # the drop face's coping, a dressed lip over the ground landing, and the face itself coursed
-    # in ashlar like the tower's wall
-    sector(B, p, cx, cz, rn, ri + 0.05, b1 - 0.02, b1 + 0.035, G - 0.2, G + 0.05, B.PAL['ashlar_hi'],
-           B.STONE, subdiv=2)
-    radial_masonry(B, p, cx, cz, b1, rn - 0.05, ri, 0.0, G - 0.2, seed=9)
-    # the passage through to the wing, flagged at the upper floor
-    d = B.LAYOUT['towerDoor']
-    B.abox(p, d['x0'] - 0.4, d['x1'] + 0.1, G - 0.25, G, d['z0'], d['z1'], B.pick(B.PAL['flag'], 2), B.STONE)
-
-    def ramp(u):
-        return G * min(1.0, max(0.0, u / S['climb']))
-
-    # the string course up the wall behind the treads: a sloped band of dressed stone
-    rows_lo, rows_hi = [], []
-    m = 44
-    for j in range(m + 1):
-        u = S['landing'] * j / m
-        a = S['bottom'] - u
-        rr = ri - 0.07
-        pt = (cx + math.sin(a) * rr, cz + math.cos(a) * rr)
-        base = ramp(u)
-        rows_lo.append((pt[0], base - 0.3, pt[1]))
-        rows_hi.append((pt[0], base + 0.32, pt[1]))
-    p.surface([rows_lo, rows_hi], lambda i, j: B.PAL['ashlar_dark'], B.STONE,
-              outward=lambda c: (cx - c.x, 0.0, cz - c.z), soft=False)
-    # the handrail: turned oak on iron brackets, a hand off the wall, following the climb from
-    # a scroll at the foot to the landing's end
-    rail_r = ri - 0.3
-    pts = []
-    m = 48
-    for j in range(m + 1):
-        u = -0.12 + (S['landing'] + 0.1) * j / m
-        a = S['bottom'] - u
-        pts.append((cx + math.sin(a) * rail_r, ramp(u) + 1.1, cz + math.cos(a) * rail_r))
-    p.sweep(pts, 0.075, 0.075, B.PAL['beam'], sides=6, mat=B.WOOD)
-    foot = pts[0]
-    p.cylinder((foot[0], foot[1] - 0.12, foot[2]), (foot[0], foot[1] + 0.12, foot[2]), 0.14, B.PAL['beam_dark'],
-               B.WOOD, sides=8)
-    for j in range(0, m + 1, 5):
-        u = -0.12 + (S['landing'] + 0.1) * j / m
-        a = S['bottom'] - u
-        y = ramp(u) + 1.1
-        w0 = (cx + math.sin(a) * (ri - 0.02), cz + math.cos(a) * (ri - 0.02))
-        w1 = (cx + math.sin(a) * rail_r, cz + math.cos(a) * rail_r)
-        B.beam(trim, (w0[0], y - 0.16, w0[1]), (w1[0], y - 0.05, w1[1]), 0.06, 0.06, B.PAL['iron'], B.METAL)
-        trim.box((w0[0], y - 0.16, w0[1]), (0.16, 0.26, 0.16), B.PAL['iron'], B.METAL)
-
-
-def radial_masonry(B, p, cx, cz, a, r0, r1, y0, y1, seed, course=0.62, block=1.1):
-    """Coursed ashlar on a radial face of the tower (a plane through its axis at angle `a`,
-    facing the lower angles): staggered blocks a hand proud of the face, the joints between
-    them reading dark."""
-    from shiplib import G as game
-
-    nx, nz = -math.cos(a), math.sin(a)
-    gap = 0.05
-    n = max(1, round((y1 - y0) / course))
-    ch = (y1 - y0) / n
-
-    def at(r, y):
-        return (cx + math.sin(a) * r + nx * 0.02, y, cz + math.cos(a) * r + nz * 0.02)
-
-    for c in range(n):
-        ya, yb = y0 + c * ch + gap / 2, y0 + (c + 1) * ch - gap / 2
-        r, k = r0, 0
-        first = 0.5 if (c + seed) % 2 else 1.0
-        while r1 - r > 1e-6:
-            h = math.sin((seed + 1) * 12.9898 + c * 78.233 + k * 37.719) * 43758.5453
-            h -= math.floor(h)
-            w = block * (0.7 + 0.6 * h) * (first if k == 0 else 1.0)
-            rb = r1 if r1 - (r + w) < 0.4 else r + w
-            color = B.scale_color(B.pick(B.PAL['ashlar'], int(h * 97)), 0.9 + 0.16 * h)
-            f = p.face([at(r + gap / 2, ya), at(rb - gap / 2, ya), at(rb - gap / 2, yb), at(r + gap / 2, yb)],
-                       color, B.STONE)
-            f.normal_update()
-            nn = game(f.normal)
-            if nn.x * nx + nn.z * nz < 0:
-                f.normal_flip()
-            r = rb
-            k += 1
-
-
-def newel(B, p):
-    """The newel the stair winds round (its own part: the camera cuts it away rather than
-    fight it): a moulded base, a shaft of stone drums over a mortar core with the joints
-    between them showing, a carved band at each storey and a flared capital under the
-    tower's cone."""
-    T, G = B.TOWER, B.G
-    cx, cz, rn, top = T['x'], T['z'], T['newel'], T['wallTop']
-    sides = 16
-    # the base: a square-ish plinth and a torus-like roll
-    p.cylinder((cx, -0.25, cz), (cx, 0.32, cz), rn + 0.3, B.PAL['ashlar_dark'], B.STONE, sides=8,
-               phase=math.pi / 8)
-    p.cylinder((cx, 0.32, cz), (cx, 0.6, cz), rn + 0.2, B.PAL['ashlar_hi'], B.STONE, sides=sides,
-               r1=rn + 0.04)
-    # the core under the drums, and the drums
-    p.cylinder((cx, 0.6, cz), (cx, top - 1.0, cz), rn - 0.04, B.PAL['mortar'], B.STONE, sides=sides,
-               caps=False)
-    y, k = 0.6, 0
-    while y < top - 1.05:
-        h = min(1.02, top - 1.0 - y)
-        p.cylinder((cx, y + 0.025, cz), (cx, y + h - 0.025, cz), rn,
-                   B.scale_color(B.pick(B.PAL['ashlar'], k * 2 + 1), 0.96 + 0.08 * (k % 2)), B.STONE,
-                   sides=sides, caps=False)
-        y += h
-        k += 1
-    # the carved bands, one at each storey: a roll between two fillets
-    for yb in (3.0, G + 0.3):
-        p.cylinder((cx, yb - 0.1, cz), (cx, yb + 0.1, cz), rn + 0.12, B.PAL['ashlar_hi'], B.STONE, sides=sides)
-        p.cylinder((cx, yb - 0.2, cz), (cx, yb - 0.1, cz), rn + 0.06, B.PAL['ashlar_dark'], B.STONE, sides=sides)
-        p.cylinder((cx, yb + 0.1, cz), (cx, yb + 0.2, cz), rn + 0.06, B.PAL['ashlar_dark'], B.STONE, sides=sides)
-    # the capital: a flared bell and its abacus under the cone
-    p.cylinder((cx, top - 1.0, cz), (cx, top - 0.35, cz), rn, B.PAL['ashlar_hi'], B.STONE, sides=sides,
-               r1=rn + 0.3)
-    p.cylinder((cx, top - 0.35, cz), (cx, top, cz), rn + 0.38, B.PAL['ashlar_dark'], B.STONE, sides=8,
-               phase=math.pi / 8)
+        za = z0 + (z1 - z0) * i / n + 0.006
+        zb = z0 + (z1 - z0) * (i + 1) / n - 0.006
+        # boards come in two lengths, butted at a staggered joint
+        cut = x0 + (x1 - x0) * (0.38 + 0.24 * ((i * 5) % 7) / 7)
+        for k, (a, b) in enumerate(((x0, cut - 0.006), (cut + 0.006, x1))):
+            B.abox(p, a, b, 0.0, lift, za, zb, B.pick(B.PAL['board'], i * 2 + k + 1), B.WOOD)
+    # the bevelled front and right edges, and the rounded corner between them
+    B.hexa(p, [(x0, 0, z1), (x1, 0, z1), (x1, 0, z1 + rim), (x0, 0, z1 + rim),
+               (x0, lift, z1), (x1, lift, z1), (x1, 0.02, z1 + rim), (x0, 0.02, z1 + rim)],
+           B.PAL['beam'], B.WOOD)
+    B.hexa(p, [(x1, 0, z0), (x1 + rim, 0, z0), (x1 + rim, 0, z1), (x1, 0, z1),
+               (x1, lift, z0), (x1 + rim, 0.02, z0), (x1 + rim, 0.02, z1), (x1, lift, z1)],
+           B.PAL['beam'], B.WOOD)
+    for k in range(4):
+        a0 = math.pi / 2 * k / 4
+        a1 = math.pi / 2 * (k + 1) / 4
+        c0 = (x1 + math.sin(a0) * rim, z1 + math.cos(a0) * rim)
+        c1 = (x1 + math.sin(a1) * rim, z1 + math.cos(a1) * rim)
+        B.hexa(p, [(x1, 0, z1), (x1, 0, z1), (c1[0], 0, c1[1]), (c0[0], 0, c0[1]),
+                   (x1, lift, z1), (x1, lift, z1), (c1[0], 0.02, c1[1]), (c0[0], 0.02, c0[1])],
+               B.PAL['beam'], B.WOOD)
+    # the dark oak nosing along the deck's lip, flush with it, and brass corner plates (trim)
+    B.abox(p, x0, x1 - 0.02, lift - 0.07, lift + 0.004, z1 - 0.14, z1, B.PAL['beam_dark'], B.WOOD)
+    B.abox(p, x1 - 0.14, x1, lift - 0.07, lift + 0.004, z0, z1 - 0.02, B.PAL['beam_dark'], B.WOOD)
+    B.abox(trim, x1 - 0.2, x1 + 0.01, lift - 0.05, lift + 0.006, z1 - 0.2, z1 + 0.01, B.PAL['gold'], B.METAL)
 
 
 # ---------------------------------------------------------------------------
-# The wing's upper floor
+# The tower's nook: flagged in rings round a two-tone stone rose, on a mortar bed, its hall
+# side stopping under the arch's threshold
 # ---------------------------------------------------------------------------
-def upper_floor(B, p):
-    W, G = B.WING, B.G
-    x0, x1 = W['x0'] + W['wall'], W['x1'] - W['wall']
-    z0, z1 = W['z0'] + W['wall'], W['z1']
-    n = int((x1 - x0) / 0.9)
+def nook_floor(B, p):
+    T, H = B.TOWER, B.HALL
+    cx, cz, ri = T['x'], T['z'], T['rIn']
+    wall_z = H['z0']
+
+    def piece(r0, r1, a0, a1, y0, y1, color, mat):
+        pts = []
+        for (r, a) in ((r0, a0), (r1, a0), (r1, a1), (r0, a1)):
+            x, z = ring_pt(cx, cz, r, a)
+            pts.append((x, min(z, wall_z)))
+        B.hexa(p, [(x, y0, z) for (x, z) in pts] + [(x, y1, z) for (x, z) in pts], color, mat)
+
+    # the mortar bed under the whole nook (the joints show it, never the ground)
+    n = 24
     for i in range(n):
-        xa = x0 + (x1 - x0) * i / n + 0.004
-        xb = x0 + (x1 - x0) * (i + 1) / n - 0.004
-        B.abox(p, xa, xb, G - 0.3, G, z0, z1, B.pick(B.PAL['board'], i + 1), B.WOOD)
-    # the gallery's doorway threshold through the hall's back wall
-    gd = B.LAYOUT['galleryDoor']
-    B.abox(p, gd['x0'], gd['x1'], G - 0.3, G + 0.02, B.HALL['z0'], B.HALL['z0'] + B.HALL['wall'],
-           B.PAL['beam_dark'], B.WOOD)
+        a0, a1 = 2 * math.pi * i / n, 2 * math.pi * (i + 1) / n
+        piece(0.0, ri + 0.45, a0, a1, -0.42, -0.1, B.PAL['mortar'], B.STONE)
+    # the rose: sixteen wedges in two tones, a dark ring round it
+    n = 16
+    for i in range(n):
+        a0, a1 = 2 * math.pi * i / n + 0.004, 2 * math.pi * (i + 1) / n - 0.004
+        tone = B.PAL['ashlar_hi'] if i % 2 else B.scale_color(B.PAL['stone_dark'], 1.08)
+        piece(0.0, 1.45, a0, a1, -0.22, 0.0, tone, B.STONE)
+    for i in range(n):
+        a0, a1 = 2 * math.pi * i / n + 0.006, 2 * math.pi * (i + 1) / n - 0.006
+        piece(1.5, 1.85, a0, a1, -0.22, 0.0, B.PAL['stone_dark'], B.STONE)
+    # the flags, three rings, each staggered on the last
+    rings = [(1.9, 3.2, 14), (3.25, 4.65, 20), (4.7, ri + 0.45, 26)]
+    for ri_, (r0, r1, m) in enumerate(rings):
+        for i in range(m):
+            a0 = 2 * math.pi * i / m + ri_ * 0.19 + 0.008
+            a1 = 2 * math.pi * (i + 1) / m + ri_ * 0.19 - 0.008
+            am = (a0 + a1) / 2
+            # the sector the arch opens on past the back wall's line is the hall's floor
+            if cz + math.cos(am) * r0 > wall_z + 0.05:
+                continue
+            piece(r0 + 0.02, r1 - 0.02, a0, a1, -0.22, 0.0,
+                  B.scale_color(B.pick(B.PAL['ashlar'], i * 3 + ri_), 0.92 + 0.12 * ((i * 7 + ri_) % 3) / 2),
+                  B.STONE)
 
 
 # ---------------------------------------------------------------------------
-# Posts, plates, tie beams and the low nook beams
+# The bar: the stone pillar at the elbow (its own part, cut away for the camera), the beam it
+# carries to the right wall over the camera's air, and the two counters
 # ---------------------------------------------------------------------------
-def posts_and_beams(B, p, trim):
-    H, G = B.HALL, B.G
-    tie, low = H['tie'], H['aisleBeam']
-    ax = H['aisleX']
-    zi0, zi1 = H['z0'] + H['wall'], H['z1'] - H['wall']
-    col, dark = B.PAL['beam'], B.PAL['beam_dark']
-    for q in B.LAYOUT['props']:
-        if q['kind'] != 'post':
-            continue
-        x, z, y0 = q['x'], q['z'], q['base']
-        y1 = y0 + q['height']
-        w = q['r'] * 1.5
-        if y0 == 0:
-            B.abox(p, x - w * 0.8, x + w * 0.8, 0.0, 0.3, z - w * 0.8, z + w * 0.8, B.PAL['stone_dark'], B.STONE)
-        B.post(p, x, z, y0, y1, w, col)
-        B.abox(p, x - w * 0.7, x + w * 0.7, y1 - 0.35, y1, z - w * 0.7, z + w * 0.7, dark, B.WOOD)
-        # iron bands (trim)
-        for yb in (y0 + 1.2, y0 + 2.6):
-            B.abox(trim, x - w / 2 - 0.02, x + w / 2 + 0.02, yb, yb + 0.1, z - w / 2 - 0.02, z + w / 2 + 0.02,
-                   B.PAL['iron'], B.METAL)
-    # the arcade plates on the posts at the tie line, front wall to back wall
-    for s in (1, -1):
-        B.abox(p, s * ax - 0.3, s * ax + 0.3, tie, tie + 0.6, zi0, zi1, dark, B.WOOD)
-    # the tie beams across the nave (a pair over the hearth frames the flue)
-    for z in (-9.6, -3.6, 1.0, 3.8, 9.6):
-        B.abox(p, -ax, ax, tie + 0.05, tie + 0.65, z - 0.3, z + 0.3, col, B.WOOD)
-        for s in (1, -1):
-            B.beam(p, (s * ax, tie - 1.6, z), (s * (ax - 1.6), tie + 0.1, z), 0.26, 0.3, dark)
-    # the nook plates and joists at the low beam line, wall to post
-    for s, za in ((-1, zi0), (1, -3.8)):
-        B.abox(p, s * ax - 0.28, s * ax + 0.28, low, low + 0.5, za, zi1, dark, B.WOOD)
-        z = za + 0.9
-        fire = next(q for q in B.LAYOUT['props'] if q['kind'] == 'fireplace')
-        while z < zi1 - 0.5:
-            xw = s * (H['x1'] - H['wall'])
-            if s > 0 and fire['z'] - fire['hd'] - 0.3 < z < fire['z'] + fire['hd'] + 0.3:
-                xw = fire['x'] - fire['hw'] - 0.05
-            a, b = sorted((s * ax, xw))
-            B.abox(p, a, b, low + 0.05, low + 0.45, z - 0.17, z + 0.17, col, B.WOOD)
-            z += 1.8
-    # knee braces from the posts to the nook plates (trim)
-    for q in B.LAYOUT['props']:
-        if q['kind'] != 'post' or q['base'] != 0:
-            continue
-        for dz in (1.3, -1.3):
-            B.beam(trim, (q['x'], low - 1.3, q['z']), (q['x'], low, q['z'] + dz), 0.2, 0.22, dark)
-
-
-# ---------------------------------------------------------------------------
-# The bar: the stone pillar at the elbow and the two counters
-# ---------------------------------------------------------------------------
-def bar(B, p, trim):
-    tie = B.HALL['tie']
+def bar(B, p, pillar_part, trim):
+    H = B.HALL
+    truss = H['truss']
     for q in B.LAYOUT['props']:
         k = q['kind']
         base = q['base']
         if k == 'pillar':
             x, z, r = q['x'], q['z'], q['r']
-            p.cylinder((x, base - 0.5, z), (x, base + 0.5, z), r + 0.2, B.PAL['stone_dark'], B.STONE, sides=16)
-            p.cylinder((x, base + 0.5, z), (x, tie, z), r, B.pick(B.PAL['stone'], 1), B.STONE, sides=16)
-            y = base + 1.8
-            j = 0
-            while y < tie - 1:
-                p.cylinder((x, y, z), (x, y + 0.08, z), r + 0.03, B.pick(B.PAL['stone'], j + 2), B.STONE, sides=16)
-                y += 1.4
+            pp = pillar_part
+            # an octagonal plinth, a moulded roll, the drum shaft with its bands, a flared
+            # capital and its square abacus under the beam
+            # warm dressed limestone, the tower's: an octagonal plinth, a moulded roll, drums of
+            # varied tone with their joints dark between them, a carved band at head height, a
+            # flared capital and its square abacus under the beam
+            pp.cylinder((x, base - 0.5, z), (x, base + 0.45, z), r + 0.26, B.PAL['ashlar_dark'], B.STONE, sides=8,
+                        phase=math.pi / 8)
+            pp.cylinder((x, base + 0.45, z), (x, base + 0.72, z), r + 0.16, B.PAL['ashlar_hi'], B.STONE, sides=16,
+                        r1=r + 0.02)
+            top = truss - 1.15
+            pp.cylinder((x, base + 0.72, z), (x, top, z), r - 0.035, B.PAL['mortar'], B.STONE, sides=16, caps=False)
+            y, j = base + 0.72, 0
+            while y < top - 0.05:
+                h = min(0.78, top - y)
+                pp.cylinder((x, y + 0.025, z), (x, y + h - 0.025, z), r,
+                            B.scale_color(B.pick(B.PAL['ashlar'], j * 5 + 2), 0.9 + 0.12 * ((j * 3) % 4) / 3), B.STONE,
+                            sides=16, caps=False, phase=0.2 * j)
+                y += h
                 j += 1
-            p.cylinder((x, tie - 0.5, z), (x, tie + 0.6, z), r + 0.35, B.PAL['stone_dark'], B.STONE, sides=16)
+            for yb in (base + 3.1, top - 0.1):
+                pp.cylinder((x, yb - 0.1, z), (x, yb + 0.1, z), r + 0.1, B.PAL['ashlar_hi'], B.STONE, sides=16)
+                pp.cylinder((x, yb + 0.1, z), (x, yb + 0.18, z), r + 0.04, B.PAL['ashlar_dark'], B.STONE, sides=16)
+            pp.cylinder((x, top, z), (x, truss - 0.4, z), r, B.PAL['ashlar_hi'], B.STONE, sides=16, r1=r + 0.32)
+            pp.box((x, truss - 0.2, z), (2 * r + 0.8, 0.4, 2 * r + 0.8), B.PAL['ashlar_dark'], B.STONE, bevel=0.05)
+            # the beam from the capital to the right wall, a carved bracket under its wall end
+            xw = H['x1'] - H['wall']
+            B.abox(p, x, xw + 0.2, truss, truss + 0.62, z - 0.28, z + 0.28, B.PAL['beam_dark'], B.WOOD, bevel=0.03)
+            B.beam(p, (xw - 0.05, truss - 0.95, z), (xw - 1.05, truss + 0.02, z), 0.3, 0.26, B.PAL['beam'])
+            B.abox(p, xw - 0.22, xw, truss - 1.3, truss, z - 0.2, z + 0.2, B.PAL['beam'], B.WOOD)
+            # iron hooks along its underside for the hung tankards (clutter hangs them)
+            for i in range(6):
+                hx = x + 2.0 + i * 1.5
+                B.abox(trim, hx - 0.025, hx + 0.025, truss - 0.28, truss, z - 0.025, z + 0.025, B.PAL['iron'],
+                       B.METAL)
         elif k == 'counter':
             x, z, hw, hd = q['x'], q['z'], q['hw'], q['hd']
             top = base + q['height']
@@ -658,13 +531,20 @@ def bar(B, p, trim):
             B.abox(p, x - hw + 0.08, x + hw - 0.08, base, top - 0.15, z - hd + 0.1, z + hd - 0.08,
                    B.PAL['beam_dark'], B.WOOD)
             B.abox(p, x - hw - 0.1, x + hw + 0.1, top - 0.15, top, z - hd - 0.05, z + hd + 0.15,
-                   B.PAL['honey'][2], B.WOOD)
+                   B.PAL['honey'][2], B.WOOD, bevel=0.03)
             B.abox(p, x - hw, x + hw, base, base + 0.18, z - hd, z + hd, B.PAL['beam'], B.WOOD)
             n = max(1, int(hw * 2 / 1.2))
             for i in range(n + 1):
                 xp = x - hw + 0.08 + (hw * 2 - 0.16) * i / n
                 B.abox(p, xp - 0.07, xp + 0.07, base, top - 0.15, z - hd + 0.02, z + hd + 0.01, B.PAL['honey'][0],
                        B.WOOD)
+            # a raised field in each bay on the drinkers' side, bevelled so it catches the light
+            if hw > hd:
+                for i in range(n):
+                    xa = x - hw + 0.08 + (hw * 2 - 0.16) * i / n + 0.16
+                    xb = x - hw + 0.08 + (hw * 2 - 0.16) * (i + 1) / n - 0.16
+                    B.abox(p, xa, xb, base + 0.34, top - 0.34, z + hd - 0.08, z + hd + 0.02,
+                           B.scale_color(B.PAL['beam'], 1.05), B.WOOD, bevel=0.03)
             # the brass foot rail on the drinkers' side (trim)
             if hw > hd:
                 trim.cylinder((x - hw, base + 0.35, z + hd + 0.3), (x + hw, base + 0.35, z + hd + 0.3), 0.05,
@@ -673,3 +553,53 @@ def bar(B, p, trim):
                     xp = x - hw + 0.3 + (hw * 2 - 0.6) * i / 3
                     B.abox(trim, xp - 0.03, xp + 0.03, base + 0.3, base + 0.4, z + hd, z + hd + 0.3,
                            B.PAL['gold'], B.METAL)
+
+
+# ---------------------------------------------------------------------------
+# The kitchen behind the serving hatch: a flagged floor, plastered partitions and a boarded
+# ceiling closing a small room in the wing, the stone range with its firebox and chimney
+# breast on the far wall, a cook's table (seen only through the hatch)
+# ---------------------------------------------------------------------------
+KITCHEN = dict(x0=5.6, x1=13.4, z0=-18.2, z1=-14.0, ceil=5.8)
+
+
+def kitchen(B, p, trim):
+    k = KITCHEN
+    x0, x1, z0, z1, ceil = k['x0'], k['x1'], k['z0'], k['z1'], k['ceil']
+    # the floor: big worn flags on a bed
+    B.abox(p, x0, x1, -0.4, -0.2, z0, z1, B.PAL['mortar'], B.STONE)
+    i = 0
+    for xa in (x0, x0 + 2.0, x0 + 3.9, x0 + 5.9):
+        xb = min(x1, xa + 1.95)
+        for (za, zb) in ((z0, z0 + 1.4), (z0 + 1.45, z0 + 2.8), (z0 + 2.85, z1)):
+            B.abox(p, xa + 0.03, xb - 0.03, -0.2, 0.0, za + 0.03, zb - 0.03, B.pick(B.PAL['flag'], i), B.STONE)
+            i += 1
+    # the partitions: plaster over a sill, oak posts on their faces
+    B.abox(p, x0 - 0.2, x1 + 0.2, 0.0, ceil, z0 - 0.2, z0, B.PAL['plaster_in'][1], B.PLASTER)
+    for xa in (x0 - 0.2, x1):
+        B.abox(p, xa, xa + 0.2, 0.0, ceil, z0 - 0.2, z1, B.PAL['plaster_in'][0], B.PLASTER)
+    for xp in (x0 + 0.1, x0 + 2.4, x1 - 2.4, x1 - 0.1):
+        B.abox(p, xp - 0.14, xp + 0.14, 0.0, ceil, z0, z0 + 0.1, B.PAL['beam'], B.WOOD)
+    B.abox(p, x0, x1, 0.0, 0.3, z0, z0 + 0.08, B.PAL['beam_dark'], B.WOOD)
+    # the ceiling: boards over three joists
+    B.abox(p, x0 - 0.2, x1 + 0.2, ceil, ceil + 0.2, z0 - 0.2, z1, B.PAL['sarking'], B.WOOD)
+    for xj in (x0 + 1.6, (x0 + x1) / 2, x1 - 1.6):
+        B.abox(p, xj - 0.16, xj + 0.16, ceil - 0.36, ceil, z0, z1, B.PAL['beam_dark'], B.WOOD)
+    # the range: a stone body, an iron top, the arched firebox glowing, the breast and flue
+    xm = (x0 + x1) / 2
+    B.abox(p, xm - 1.5, xm + 1.5, 0.0, 1.25, z0, z0 + 1.05, B.pick(B.PAL['stone'], 2), B.STONE, bevel=0.03)
+    B.abox(p, xm - 1.6, xm + 1.6, 1.25, 1.36, z0, z0 + 1.12, B.PAL['iron'], B.METAL)
+    B.abox(p, xm - 0.6, xm + 0.6, 0.22, 0.85, z0 + 0.95, z0 + 1.07, B.PAL['soot'], B.STONE)
+    B.abox(p, xm - 0.5, xm + 0.5, 0.26, 0.5, z0 + 1.0, z0 + 1.08, B.PAL['ember'], B.GLOW)
+    for s in (-1, 1):
+        B.abox(trim, xm + s * 0.62 - 0.04, xm + s * 0.62 + 0.04, 0.2, 0.9, z0 + 1.05, z0 + 1.1, B.PAL['iron'],
+               B.METAL)
+    B.abox(p, xm - 1.2, xm + 1.2, 1.36, ceil, z0, z0 + 0.7, B.pick(B.PAL['stone'], 1), B.STONE)
+    B.abox(p, xm - 1.35, xm + 1.35, 2.2, 2.38, z0, z0 + 0.86, B.PAL['beam_dark'], B.WOOD)
+    # the cook's table in the middle, scrubbed pale
+    tx, tz = xm, z0 + 2.55
+    B.abox(p, tx - 1.0, tx + 1.0, 1.28, 1.42, tz - 0.55, tz + 0.55, B.PAL['honey'][2], B.WOOD, bevel=0.02)
+    for sx in (-0.85, 0.85):
+        for sz in (-0.42, 0.42):
+            B.post(p, tx + sx, tz + sz, 0.0, 1.28, 0.14, B.PAL['beam'])
+    B.abox(trim, tx - 0.85, tx + 0.85, 0.3, 0.38, tz - 0.04, tz + 0.04, B.PAL['beam_dark'], B.WOOD)

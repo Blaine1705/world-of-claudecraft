@@ -2,15 +2,24 @@
 // clamp the renderer's updateCamera calls once (the decisions are interior_camera_core.ts).
 //
 // A building registers its air when it is built (registerCameraInterior) and drops it when
-// torn down. Each frame, when the player's eye stands in a registered interior, the drawn
-// camera is pulled in along the chase ray to stay in that air, gliding both ways on a
-// critically damped spring (a quick pull-in that never lags a wall by more than
-// INTERIOR_BOOM_MAX_LAG, a gentle release), and the look point is brought back to the eye
-// when the lagged pivot would sit across a wall. Over the first yards past a front door the
-// clamp blends in (interiorEntryWeight): walking in, the camera follows through the doorway
-// and settles into the room over a few strides. While the lens stands outside the air (that
-// threshold, or a pull-in's last frames) interiorLensInAir says so, and the building cuts
-// its shell away on the sight line as it does for a camera outdoors. Where the ray is
+// torn down. Each frame, when the player's eye stands in a registered interior (past its
+// front door's threshold), the drawn camera is pulled in along the chase ray to stay in that air,
+// gliding both ways on a critically damped spring (a quick pull-in that never lags a wall by
+// more than INTERIOR_BOOM_MAX_LAG, a gentle release), and the look point is brought back to
+// the eye when the lagged pivot would sit across a wall.
+//
+// Walking in, the camera follows through the door: past its threshold the lens comes
+// down, keeping its distance behind the player, until it is no higher over the eye than
+// the door's head allows (interiorEntryCap), so its sight line threads the doorway while it
+// is still outside; a ray out through the door runs on past it (the `through` hold), so the
+// lens keeps its distance and nothing between it and the player needs cutting away; a ray
+// over a lintel or under a ceiling flattens by the least that clears it, at once, never
+// lagging into a pull-in. Once the player stops just inside (or a few seconds on) the hold
+// eases out and the lens comes in to the room. A pull-in that a wall asks for (a camera at an
+// angle to the door, its ray cut by a jamb) blends in over the first yards past the door
+// (interiorEntryWeight). While the lens stands outside the air interiorLensInAir says so, and
+// the building treats the sight line as it does a camera outdoors (it threads the doorway,
+// so nothing is cut; at an angle only the piece of wall between lens and player ghosts). Where the ray is
 // cramped (a player against the stair tower's wall, backed into a room's corner), the camera
 // glides to the nearest comfortable framing, up over the obstruction or round it along the
 // wall, rather than sitting in the player's head, and glides back as the view clears.
@@ -42,16 +51,23 @@ import {
   chooseInteriorFraming,
   frameBoomInto,
   INTERIOR_RELEASE_MAX_SEC,
+  INTERIOR_THROUGH_HOLD_SEC,
+  INTERIOR_THROUGH_MAX_SEC,
+  INTERIOR_THROUGH_WALK_IN_DEPTH,
   type InteriorBoomSpring,
   interiorCameraPadding,
   interiorContains,
+  interiorEntryCap,
+  interiorEntryHold,
   interiorEntrySettle,
   interiorEntryWeight,
   interiorHoldsEye,
+  interiorNearestOpening,
   interiorSeesOut,
   interiorSegmentFraction,
   stepInteriorBoom,
   stepInteriorFraming,
+  stepInteriorLift,
 } from './interior_camera_core';
 
 /** The eye (the look point) stands this high over the feet (renderer.ts eyeY). */
@@ -68,6 +84,11 @@ const FIRST_PERSON_AIM = 4;
 /** Farther than this from the pose updateCamera left, the drawn camera is not the chase
  *  camera (the editor's free camera): the draw-time re-check leaves it alone. */
 const DRAW_SHIFT_MAX = 2.5;
+/** The avatar moving slower than this (yards a second) is standing still: the lens held
+ *  outside a door starts to come in. */
+const STILL_SPEED = 0.6;
+/** Standing still this long (seconds) starts the through-door hold's ease out. */
+const STILL_SEC = 0.25;
 
 const interiors: CameraInterior[] = [];
 /** Scratch for a lifted boom (no allocation per frame). */
@@ -102,6 +123,11 @@ const state = {
   release: 0,
   /** Seconds since the eye stepped inside (the threshold blend's clock). */
   inside: 0,
+  /** How far a ray out through the front door may run on past it (1 whole, 0 none): set on
+   *  walking in, eased out once the player stands still or a few seconds on. */
+  through: 1,
+  /** Seconds the avatar has stood still. */
+  still: 0,
   /** The camera has cut to the player's eyes (a corner no framing escapes). */
   firstPerson: false,
   pad: 0.3,
@@ -140,10 +166,10 @@ export function clampChaseCameraToInterior(
   reducedMotion: boolean,
 ): void {
   const pos = camera.position;
-  const teleported =
-    Number.isNaN(state.lastSelfX) ||
-    Math.hypot(self.x - state.lastSelfX, self.y - state.lastSelfY, self.z - state.lastSelfZ) >
-      BOOM_SNAP_DIST;
+  const moved = Number.isNaN(state.lastSelfX)
+    ? Infinity
+    : Math.hypot(self.x - state.lastSelfX, self.y - state.lastSelfY, self.z - state.lastSelfZ);
+  const teleported = moved > BOOM_SNAP_DIST;
   state.lastSelfX = self.x;
   state.lastSelfY = self.y;
   state.lastSelfZ = self.z;
@@ -156,6 +182,8 @@ export function clampChaseCameraToInterior(
   if (!vol) {
     state.firstPerson = false;
     state.lensInside = false;
+    state.through = 1;
+    state.still = 0;
     // walked out: ease the last shortened boom back to the requested one, briefly
     if (was) state.release = INTERIOR_RELEASE_MAX_SEC;
     if (reducedMotion || teleported) state.release = 0;
@@ -200,13 +228,28 @@ export function clampChaseCameraToInterior(
   state.release = 0;
   state.inside += Math.max(0, dt);
   state.pad = interiorCameraPadding(camera.near, camera.fov, camera.aspect);
-  // the lagged (or shoulder-shifted) look point must stand in the air on the eye's side of
-  // every wall; otherwise the ray starts at the eye, the whole boom shifted with it
+  // the through-door hold: whole on walking in over the threshold (never on a teleport or a
+  // login inside), easing out once the player stands still (or a few seconds on), never back
+  // up until the next walk in
+  if (!was) {
+    const w0 = interiorEntryWeight(vol, eyeX, eyeY, eyeZ);
+    const walkedIn = !teleported && interiorNearestOpening.depth <= INTERIOR_THROUGH_WALK_IN_DEPTH;
+    state.through = walkedIn && w0 < 1 ? 1 : 0;
+  }
+  const speed = dt > 1e-6 && Number.isFinite(moved) ? moved / dt : 0;
+  state.still = speed < STILL_SPEED ? state.still + Math.max(0, dt) : 0;
+  if (reducedMotion) state.through = 0;
+  else if (state.still > STILL_SEC || state.inside > INTERIOR_THROUGH_MAX_SEC) {
+    state.through = Math.max(0, state.through - Math.max(0, dt) / INTERIOR_THROUGH_HOLD_SEC);
+  }
+  // the lagged (or shoulder-shifted, or led) look point must stand in a room's air on the
+  // eye's side of every wall (never only in a doorway's thickness, where the ray would leave
+  // by a jamb at once); otherwise the ray starts at the eye, the whole boom shifted with it
   let sx = look.x;
   let sy = look.y;
   let sz = look.z;
   if (
-    !interiorContains(vol, sx, sy, sz) ||
+    !interiorHoldsEye(vol, sx, sy, sz) ||
     interiorSegmentFraction(vol, eyeX, eyeY, eyeZ, sx, sy, sz, 0) < 1
   ) {
     pos.set(pos.x + eyeX - sx, pos.y + eyeY - sy, pos.z + eyeZ - sz);
@@ -221,18 +264,23 @@ export function clampChaseCameraToInterior(
   let dx = pos.x - sx;
   let dy = pos.y - sy;
   let dz = pos.z - sz;
-  const len = Math.hypot(dx, dy, dz);
-  // the requested view's direction (the cut to the eyes looks out along it)
-  const aimX = len > 1e-9 ? -dx / len : 0;
-  const aimY = len > 1e-9 ? -dy / len : 0;
-  const aimZ = len > 1e-9 ? -dz / len : 0;
   const pad = state.pad;
+  // the requested view's direction (the cut to the eyes looks out along it)
+  const reqLen = Math.hypot(dx, dy, dz);
+  const aimX = reqLen > 1e-9 ? -dx / reqLen : 0;
+  const aimY = reqLen > 1e-9 ? -dy / reqLen : 0;
+  const aimZ = reqLen > 1e-9 ? -dz / reqLen : 0;
+  // near the front door the lens comes down to thread the doorway, keeping its distance
+  dy = interiorEntryCap(vol, sx, sy, sz, dx, dy, dz, pad);
+  const len = Math.hypot(dx, dy, dz);
   // cramped (a player against the tower's wall on the stair, backed into a corner): the
   // least departure from the requested view that frames the player comfortably, a lift over
   // what cramps it or a swing along the wall, eased in and out
   // the threshold: the clamp (and any framing) blends in over the first yards past a door
   const w = Math.max(interiorEntryWeight(vol, eyeX, eyeY, eyeZ), interiorEntrySettle(state.inside));
-  const choice = chooseInteriorFraming(vol, sx, sy, sz, dx, dy, dz, pad, state.swing);
+  // the through-door hold lets go once the requested lens has come in through the door
+  const through = state.through * interiorEntryHold.value;
+  const choice = chooseInteriorFraming(vol, sx, sy, sz, dx, dy, dz, pad, state.swing, through);
   let clamped = choice.boom;
   const immediate = reducedMotion || teleported || (was !== null && was !== vol);
   if (fresh && !immediate) {
@@ -244,14 +292,18 @@ export function clampChaseCameraToInterior(
     state.swing = 0;
   }
   const drawn = state.boom.dist;
-  state.lift = stepInteriorFraming(state.lift, choice.lift * w, dt, immediate, drawn);
+  // a flattening under a lintel or a ceiling is taken whole and at once (never blended in, so
+  // the ray never lags into a pull-in); a framing of a cramped spot blends in with the clamp
+  const liftTarget = choice.flatten ? choice.lift : choice.lift * w;
+  state.lift = stepInteriorLift(state.lift, liftTarget, dt, immediate, drawn);
   state.swing = stepInteriorFraming(state.swing, choice.swing * w, dt, immediate, drawn);
   if (Math.abs(state.lift) > 1e-4 || Math.abs(state.swing) > 1e-4) {
     frameBoomInto(scratch, dx, dy, dz, state.lift, state.swing);
     dx = scratch.x;
     dy = scratch.y;
     dz = scratch.z;
-    clamped = len * interiorSegmentFraction(vol, sx, sy, sz, sx + dx, sy + dy, sz + dz, pad);
+    clamped =
+      len * interiorSegmentFraction(vol, sx, sy, sz, sx + dx, sy + dy, sz + dz, pad, through);
   }
   const allowed = clamped + (len - clamped) * (1 - w);
   // a steady shrink is followed within 90% of the pad: the lens stays in the room's air
@@ -331,7 +383,9 @@ export function restoreInteriorCameraDraw(camera: THREE.PerspectiveCamera): void
 /**
  * Whether the plate of a body whose feet stand at (x, y, z), its plate at `plateY`, hides
  * this frame: the player is indoors, the body is not, and the camera does not see it
- * through an opening onto the world.
+ * through an opening onto the world. While the lens follows through the door from outside,
+ * the player's eye decides instead: a body it sees out of the door keeps its plate, one
+ * behind the walls does not.
  */
 export function interiorHidesNameplate(
   camera: THREE.PerspectiveCamera,
@@ -341,9 +395,12 @@ export function interiorHidesNameplate(
   plateY: number,
 ): boolean {
   const vol = state.active;
-  // outdoors, or the lens still outside the air (the threshold): the world is in view
-  if (!vol || !state.lensInside) return false;
+  // outdoors, or on the threshold (in the doorway's thickness): the world is in view
+  if (!vol) return false;
   if (interiorContains(vol, x, y + BODY_OVER_FEET, z)) return false;
+  if (!state.lensInside) {
+    return !interiorSeesOut(vol, state.startX, state.startY, state.startZ, x, plateY, z);
+  }
   const c = camera.position;
   return !interiorSeesOut(vol, c.x, c.y, c.z, x, plateY, z);
 }
@@ -379,6 +436,8 @@ export const interiorCameraInternalsForTest = {
     state.swing = 0;
     state.release = 0;
     state.inside = 0;
+    state.through = 1;
+    state.still = 0;
     state.lastSelfX = Number.NaN;
     state.drawnSaved = false;
     state.firstPerson = false;

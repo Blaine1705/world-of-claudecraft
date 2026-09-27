@@ -1,4 +1,4 @@
-"""The Mirefen tavern: the walk-in, two-storey inn on the Fenbridge road in Mirefen Marsh.
+"""The Mirefen tavern: the walk-in inn on the Fenbridge road in Mirefen Marsh.
 
   npx tsx scripts/assets/mirefen_tavern/layout.ts          (refresh layout.json from the sim)
   blender --background --python scripts/assets/mirefen_tavern/build_tavern.py -- \
@@ -19,21 +19,28 @@ for the camera when a player is indoors; the sim collides with what the low tier
 
   MirefenTavern_ROOT      root, placed on the ground floor at the tavern's origin
     TavernFrame           never cut: the stone base, every floor (the hearth pit, the bar
-                          platform, the porch and its steps, the upper floor), the stone
-                          spiral and its newel, the posts, plates, tie beams and nook beams,
-                          the round hearth and its copper hood and flue, the bar's pillar
-                          and counters, the landing's drop wall
-    TavernFurnishings     tables, chairs, stools, benches, the settle, beds and chests
-    TavernLights          the lanterns, the wheel chandelier, the bar candles, the hearth fire
-    HallWallFront/Back/Left/Right, HallRoof, WingWallEast/Back/West, WingRoof, TowerWall,
-    TowerRoof, Gallery, RoomWalls, TowerNewel
+                          platform, the bard's stage, the porch and its steps, the tower's
+                          flagged nook), the round hearth and its copper hood and flue, the
+                          bar's counters and the beam over it, the kitchen behind the hatch
+    TavernFurnishings     tables, chairs, stools, benches, the settles and booths, the barrel
+                          racks, the stage's chest
+    TavernLights          the lanterns, the wheel chandelier, the wall sconces, the table and
+                          bar candles, the stage's footlights, the nook's crown, the fires
+    HallWallFront/FrontLeft/FrontRight/Back/Left/Right, HallPorch, HallRoof,
+    WingWallEast/Back/West, WingRoof, TowerWall, TowerRoof, BarPillar
                           the shell: each fades or cuts away on its own (whatever hangs on a
-                          wall belongs to that wall's part, so it goes with it); the gallery,
-                          the partitions and the stair tower's newel stand inside the rooms
+                          wall belongs to that wall's part, so it goes with it); the front
+                          wall is three parts (the gable over the door with the door's posts,
+                          and either side of them) and the porch's canopy and the tankard sign
+                          a fourth, so a camera behind any one ghosts it alone, never the whole
+                          front; the bar's pillar stands inside the room
     TavernTrim            medium tier and up: iron straps and bands, the bar's foot rail,
                           braces and stretchers
-    TavernClutter         high tier and up: mugs, plates, bottles, dice, the bard's lute,
-                          firewood, sacks, rugs, books (nothing here is solid)
+    TavernClutter         high tier and up: mugs, plates, bottles, dice, the bard's lute and
+                          drum, firewood, sacks, rugs, the kitchen's pots (nothing is solid)
+
+There is no upper floor for players and no timber crosses the common room under the
+hammer beams (HALL['truss']): the camera's air stays well under every roof timber.
 
 Original procedural work for this project. The palette is the tavern's own: honey wood,
 ochre plaster, blue-grey stone at the base and the hearth, a dark green slate roof, river
@@ -63,8 +70,8 @@ SKY_FACES = set()
 HALL = LAYOUT['hall']
 WING = LAYOUT['wing']
 TOWER = LAYOUT['tower']
-STAIR = LAYOUT['stair']
-G = LAYOUT['upper']
+# the wing's upper floor (the keeper's, never walked): the band on its walls outside
+G = WING['floor']
 PLAYER_H = 2.6
 
 # ---------------------------------------------------------------------------
@@ -473,9 +480,12 @@ import tavern_frame as F  # noqa: E402
 import tavern_furnish as U  # noqa: E402
 import tavern_shell as S  # noqa: E402
 
-SHELL = ('HallWallFront', 'HallWallBack', 'HallWallLeft', 'HallWallRight', 'HallRoof', 'WingWallEast',
-         'WingWallBack', 'WingWallWest', 'WingRoof', 'TowerWall', 'TowerRoof', 'Gallery', 'RoomWalls',
-         'TowerNewel')
+SHELL = ('HallWallFront', 'HallWallFrontLeft', 'HallWallFrontRight', 'HallWallBack', 'HallWallLeft',
+         'HallWallRight', 'HallRoof', 'WingWallEast', 'WingWallBack', 'WingWallWest', 'WingRoof', 'TowerWall',
+         'TowerRoof', 'HallPorch', 'BarPillar')
+# the front wall's three parts meet this far either side of the door's middle
+# (src/render/mirefen_tavern_core.ts TAVERN_FRONT_SPLIT)
+FRONT_SPLIT = 3.2
 CRITICAL = ('TavernFrame', 'TavernFurnishings', 'TavernLights') + SHELL
 TRIM = ('TavernTrim',)
 OPTIONAL = ('TavernClutter',)
@@ -492,33 +502,42 @@ PART_SHADING.update({'HallRoof': (0.05, 0.03), 'WingRoof': (0.05, 0.03), 'TowerR
 # budget shares six point lights with the whole world: the vertex colours carry the glow)
 # ---------------------------------------------------------------------------
 def _warm_sources():
+    """The warm lights the bake reads: ((x, y, z), strength, reach). The hearth is the room's
+    heart, the wall fire and the stage's footlights warm their corners, the candles pool on
+    each table, the lanterns and the chandelier glow high, the kitchen's range fills the hatch."""
     pit, c = LAYOUT['pit'], LAYOUT['chandelier']
     fire = next(q for q in LAYOUT['props'] if q['kind'] == 'fireplace')
     counter = next(q for q in LAYOUT['props'] if q['kind'] == 'counter' and q['hw'] > q['hd'])
+    st, hatch = LAYOUT['stage'], LAYOUT['hatch']
     src = [((pit['x'], 1.6, pit['z']), 1.25, 17.0),
-           ((fire['x'] - 1.4, 1.2, fire['z']), 0.8, 10.0),
-           ((c['x'], c['y'] - 0.3, c['z']), 0.7, 13.0),
-           ((counter['x'], counter['base'] + counter['height'] + 0.4, counter['z']), 0.55, 7.0),
-           ((TOWER['x'] + 2.3, G + 2.6, TOWER['z'] + 1.0), 0.55, 8.0),
-           ((TOWER['x'] - 2.2, 5.9, TOWER['z']), 0.5, 7.0),
-           ((9.0, G + 3.2, -17.4), 0.65, 10.0),
-           ((7.3, G + 1.6, -23.0), 0.4, 6.0),
-           ((12.7, G + 1.6, -23.0), 0.4, 6.0)]
+           ((fire['x'] - 1.4, 1.2, fire['z']), 0.85, 10.0),
+           ((c['x'], c['y'] - 0.3, c['z']), 0.55, 12.0),
+           ((counter['x'], counter['base'] + counter['height'] + 0.4, counter['z']), 0.6, 7.5),
+           # the stage's footlights, a warm wash up the curtain
+           (((st['x0'] + st['x1']) / 2, st['lift'] + 0.6, st['z1'] - 0.4), 0.75, 7.5),
+           # the kitchen's range behind the hatch
+           (((hatch['x0'] + hatch['x1']) / 2, 1.0, -17.0), 1.1, 6.5),
+           (((hatch['x0'] + hatch['x1']) / 2 + 1.4, 3.8, -16.0), 0.8, 6.0),
+           # the nook's crown and its sconces' glow
+           ((TOWER['x'], 5.5, TOWER['z']), 0.55, 9.0)]
     for q in LAYOUT['lanterns']:
-        src.append(((q['x'], q['y'], q['z']), 0.5, 8.0))
-    # the sconces up the stair tower: the climb's light
-    for q in LAYOUT['towerSconces']:
-        r = TOWER['rIn'] - 0.55
-        src.append(((TOWER['x'] + math.sin(q['angle']) * r, q['y'], TOWER['z'] + math.cos(q['angle']) * r),
-                    0.55, 8.5))
+        src.append(((q['x'], q['y'], q['z']), 0.5 if q['lit'] else 0.3, 9.0))
+    for q in LAYOUT['sconces']:
+        src.append(((q['x'] + q['nx'] * 0.45, q['y'] + 0.3, q['z'] + q['nz'] * 0.45), 0.4, 4.5))
+    # a candle on every table: a small warm pool on its top and the seats round it
+    for q in LAYOUT['props']:
+        if q['kind'] in ('table', 'roundTable'):
+            src.append(((q['x'], q['base'] + q['height'] + 0.5, q['z']), 0.32, 3.6))
     return src
 
 
 def _inside(x, y, z):
-    H, W, T = HALL, WING, TOWER
-    if abs(x) <= H['x1'] - H['wall'] + 0.06 and H['z0'] + H['wall'] - 0.06 <= z <= H['z1'] - H['wall'] + 0.06             and -1.0 <= y <= H['ridge']:
+    H, T = HALL, TOWER
+    if abs(x) <= H['x1'] - H['wall'] + 0.06 and H['z0'] + H['wall'] - 0.06 <= z <= H['z1'] - H['wall'] + 0.06 \
+            and -1.0 <= y <= H['ridge']:
         return True
-    if W['x0'] + W['wall'] - 0.06 <= x <= W['x1'] - W['wall'] + 0.06 and W['z0'] + W['wall'] - 0.06 <= z <= W['z1']             and G - 0.5 <= y <= W['ridge']:
+    # the kitchen behind the hatch
+    if 5.4 <= x <= 13.6 and -18.4 <= z <= H['z0'] and -0.5 <= y <= 6.0:
         return True
     return math.hypot(x - T['x'], z - T['z']) <= T['rIn'] + 0.06 and -0.5 <= y <= T['peak']
 
@@ -555,6 +574,66 @@ def bake_warm_light(parts):
                 loop[piece.col] = (min(1.0, r * mult[0]), min(1.0, g * mult[1]), min(1.0, b * mult[2]), a)
 
 
+def split_part(parts, src_name, rules):
+    """Move each connected solid of one part into another part by where it stands: `rules` is
+    a list of (part name, test on the solid's centre in the game frame), the first match
+    wins, a solid no rule takes stays. A solid moves whole (a beam never loses its end)."""
+    import bmesh
+    from shiplib import G as game
+
+    src = parts[src_name]
+    bm = src.bm
+    bm.verts.ensure_lookup_table()
+    closed = set(src.closed)
+    seen = set()
+    groups = []
+    for f in bm.faces:
+        if f in seen:
+            continue
+        stack, group = [f], []
+        seen.add(f)
+        while stack:
+            g = stack.pop()
+            group.append(g)
+            for v in g.verts:
+                for h in v.link_faces:
+                    if h not in seen:
+                        seen.add(h)
+                        stack.append(h)
+        groups.append(group)
+    moved = []
+    for group in groups:
+        verts = {v for f in group for v in f.verts}
+        acc = None
+        for v in verts:
+            acc = v.co.copy() if acc is None else acc + v.co
+        c = game(acc / len(verts))
+        target = next((name for (name, test) in rules if test(c)), None)
+        if target is None:
+            continue
+        dst = parts[target]
+        vmap = {}
+        for f in group:
+            vs = []
+            for v in f.verts:
+                nv = vmap.get(v)
+                if nv is None:
+                    nv = dst.bm.verts.new(v.co)
+                    vmap[v] = nv
+                vs.append(nv)
+            nf = dst.bm.faces.new(vs)
+            nf.material_index = f.material_index
+            nf[dst.tag] = f[src.tag]
+            nf[dst.soft] = f[src.soft]
+            for la, lb in zip(f.loops, nf.loops):
+                lb[dst.col] = la[src.col]
+            if f in closed:
+                dst.closed.append(nf)
+        moved.extend(group)
+    bmesh.ops.delete(bm, geom=moved, context='FACES')
+    src.closed = [f for f in src.closed if f.is_valid]
+
+
 def encode_for_export(parts):
     """Hand the exporter the palette once linearized. shiplib's finish() linearizes every
     corner colour (**2.2) and the glTF exporter linearizes the colour attribute again, so
@@ -576,6 +655,10 @@ def build_scene():
     F.build(this, parts)
     S.build(this, parts)
     U.build(this, parts)
+    # the front wall's two sides are their own parts: a camera at an angle to the door ghosts
+    # only the side between it and the player
+    split_part(parts, 'HallWallFront', [('HallWallFrontLeft', lambda c: c.x < -FRONT_SPLIT),
+                                         ('HallWallFrontRight', lambda c: c.x > FRONT_SPLIT)])
     bake_warm_light(parts)
     encode_for_export(parts)
     pieces = {}
@@ -587,11 +670,9 @@ def build_scene():
         'layoutVersion': LAYOUT['version'],
         'tiers': {'low': list(CRITICAL), 'medium': list(TRIM), 'high': list(OPTIONAL)},
         'shell': list(SHELL),
-        'upper': G,
-        'hall': {'eave': HALL['eave'], 'ridge': HALL['ridge'], 'tie': HALL['tie'],
-                 'aisleBeam': HALL['aisleBeam']},
+        'hall': {'eave': HALL['eave'], 'ridge': HALL['ridge'], 'truss': HALL['truss']},
         'door': [LAYOUT['door']['width'], LAYOUT['door']['height']],
-        'stairWidth': round(TOWER['rIn'] - TOWER['newel'], 4),
+        'nookRadius': TOWER['rIn'],
     }
     return dict(root=root, pieces=pieces, mats=mats)
 

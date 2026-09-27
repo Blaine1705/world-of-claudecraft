@@ -1,6 +1,6 @@
 """Review staging for the Mirefen tavern: the game's own terrain round the building, the road
 past its door, player-scale figures outside and in (the doorway, by a table, by the fire, at
-the bar, on the stair, on the gallery, in a room), a roof-off cutaway copy of the building
+the bar, on the stage, in the tower's nook, in a booth), a roof-off cutaway copy of the building
 beside it with the same figures, warm lights inside, a sun, and cameras.
 
 Nothing here is exported: build_tavern.py exports the MirefenTavern_ROOT hierarchy before
@@ -23,8 +23,8 @@ from shiplib import P
 
 PLAYER_H = 2.6  # the player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts)
 CUTAWAY_OFFSET = (0.0, 0.0, 70.0)  # the roof-off copy, across the road in front of the door
-CUT_KEEP = ('TavernFrame', 'TavernFurnishings', 'TavernLights', 'TavernTrim', 'TavernClutter', 'Gallery',
-            'RoomWalls', 'HallWallBack', 'HallWallLeft', 'WingWallBack', 'WingWallWest')
+CUT_KEEP = ('TavernFrame', 'TavernFurnishings', 'TavernLights', 'TavernTrim', 'TavernClutter', 'BarPillar',
+            'HallWallBack', 'HallWallLeft', 'WingWallBack', 'WingWallWest')
 
 
 def _mat(name, color, rough=0.8, emit=0.0, vertex=False):
@@ -120,9 +120,9 @@ SPOTS = {
     'Table': (-10.4, 0.0, 3.4),
     'Hearth': (0.0, -0.45, 5.4),
     'Bar': (8.0, 0.5, -5.2),
-    'Stair': None,
-    'Gallery': (6.0, 6.0, -11.6),
-    'Room': (7.3, 6.0, -22.2),
+    'Stage': (-11.4, 0.45, -10.4),
+    'Nook': (-1.5, 0.0, -16.0),
+    'Booth': (-11.4, 0.0, -4.6),
 }
 
 
@@ -137,11 +137,8 @@ def stage(objs, context_path):
     body = _mat('FigureBody', (0.78, 0.18, 0.14), 0.7)
     head = _mat('FigureHead', (0.93, 0.74, 0.58), 0.6)
     ref = _collection('Player reference (2.6 yd = the game player)')
-    T, S = layout['tower'], layout['stair']
-    a = S['bottom'] - S['climb'] * 0.5
-    stair_y = layout['upper'] * 0.5
+    T = layout['tower']
     spots = dict(SPOTS)
-    spots['Stair'] = (T['x'] + math.sin(a) * 3.9, stair_y, T['z'] + math.cos(a) * 3.9)
     spots['Road'] = (3.0, B.ground(3.0, 22.0), 22.0)
     for name, (fx, fy, fz) in spots.items():
         figure(f'PlayerReference_{name}', fx, fy, fz, ref, body, head)
@@ -170,8 +167,10 @@ def stage(objs, context_path):
         point_light('Chandelier', c['x'] + ox, c['y'] - 0.3, c['z'] + oz, (1.0, 0.75, 0.45), 3500, 1.0, lit)
         for q in layout['lanterns']:
             point_light('Lantern', q['x'] + ox, q['y'] - 0.2, q['z'] + oz, (1.0, 0.72, 0.42), 1500, 0.4, lit)
-        point_light('Stair', T['x'] + 3 + ox, 5.0, T['z'] + oz, (1.0, 0.72, 0.42), 1500, 0.5, lit)
-        point_light('Upstairs', 9.5 + ox, 9.0, -20.0 + oz, (1.0, 0.72, 0.42), 2500, 0.6, lit)
+        point_light('Nook', T['x'] + ox, 4.0, T['z'] + oz, (1.0, 0.72, 0.42), 1800, 0.5, lit)
+        st = layout['stage']
+        point_light('Stage', (st['x0'] + st['x1']) / 2 + ox, 1.2, st['z1'] + oz, (1.0, 0.7, 0.4), 1600, 0.4, lit)
+        point_light('Kitchen', 9.5 + ox, 1.4, -17.0 + oz, (1.0, 0.55, 0.25), 900, 0.4, lit)
     # sun and sky: a warm marsh afternoon
     sun = bpy.data.lights.new('Sun', 'SUN')
     sun.energy = 3.4
@@ -193,8 +192,9 @@ def stage(objs, context_path):
         'doorway': ((0.0, 4.6, 16.5), (0.0, 3.2, -8.0), 26),
         'hearth': ((-6.5, 6.0, 12.0), (0.0, 0.2, 1.5), 28),
         'bar': ((-1.0, 5.2, 4.5), (9.0, 2.6, -8.5), 28),
-        'gallery_down': ((12.5, 8.8, -12.6), (-1.0, 0.0, 5.0), 24),
-        'room': ((7.3, 9.4, -17.2), (7.6, 6.2, -25.8), 20),
+        'stage': ((-4.0, 5.0, -1.0), (-12.3, 1.8, -11.5), 26),
+        'nook': ((-1.5, 4.8, -9.0), (-1.5, 1.2, -20.0), 22),
+        'roof': ((0.0, 3.0, 11.0), (0.0, 13.0, -6.0), 20),
         'scale_table': ((-4.5, 3.8, 9.0), (-11.5, 1.8, 2.0), 30),
         'scale_door': ((6.0, 3.2, 24.0), (0.0, 3.0, 13.0), 32),
     }

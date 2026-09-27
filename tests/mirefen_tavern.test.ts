@@ -6,19 +6,16 @@ import {
   TAVERN_BAR_PLATFORM,
   TAVERN_DOOR,
   TAVERN_FLOOR_Y,
-  TAVERN_GALLERY,
-  TAVERN_GALLERY_DOOR,
   TAVERN_HALL,
+  TAVERN_HATCH,
   TAVERN_KEEPER_ENTITY_ID,
   TAVERN_KEEPER_LOCAL,
   TAVERN_ORIGIN,
   TAVERN_PIT,
   TAVERN_PORCH,
   TAVERN_PROPS,
-  TAVERN_STAIR,
+  TAVERN_STAGE,
   TAVERN_TOWER,
-  TAVERN_TOWER_DOOR,
-  TAVERN_UPPER,
   TAVERN_WING,
   TAVERN_YAW,
   tavernToWorld,
@@ -27,6 +24,7 @@ import { BUILTIN_WORLD, GATHER_NODES, NPCS } from '../src/sim/data';
 import { isExcludedDecoration } from '../src/sim/decoration_exclusions';
 import {
   mirefenTavernColliders,
+  TAVERN_TOWER_WALL_RUNS,
   tavernHallWalls,
   tavernInsideLocal,
   tavernRestsAt,
@@ -46,12 +44,13 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 import { worldEntityText } from '../src/ui/world_entity_i18n';
 
 // The Mirefen tavern (src/sim/content/mirefen_tavern.ts, src/sim/mirefen_tavern_floor.ts,
-// src/sim/mirefen_tavern.ts): the walk-in, two-storey inn on the Fenbridge road. Pins its
-// site (clear of the road, the camps, the nodes and the scatter; the floor over the ground
-// everywhere, no terrain edit), its generous scale against the 2.6 yd player, its floor
-// (the hearth step, the bar platform, the stair, one height per point), its walls minus the
-// openings, the rest area, the innkeeper, and walks the whole building with the real
-// movement kernel: road, door, hearth ring, bar, stair, landing, rooms, gallery, and out.
+// src/sim/mirefen_tavern.ts): the walk-in inn on the Fenbridge road, one storey for players.
+// Pins its site (clear of the road, the camps, the nodes and the scatter; the floor over the
+// ground everywhere, no terrain edit), its generous scale against the 2.6 yd player, its
+// floor (the hearth step, the bar platform, the stage, and no upper floor anywhere), its walls
+// minus the door and the arch (the kitchen hatch no way through), the rest area, the
+// innkeeper, and walks the whole building with the real movement kernel: road, door, hearth
+// ring, bar, stage, booth, the tower's nook, and out.
 
 const S = WORLD_SEED;
 const PLAYER_H = 2.6;
@@ -138,28 +137,25 @@ describe('Mirefen tavern: the site', () => {
 });
 
 describe('Mirefen tavern: scaled for the player', () => {
-  it('is a big room, a big door and big stairs next to a 2.6 yd player', () => {
+  it('is a big room, a big door, a big nook and a high roof next to a 2.6 yd player', () => {
     const inside = TAVERN_HALL.x1 - TAVERN_HALL.x0 - 2 * TAVERN_HALL.wall;
     expect(inside).toBeGreaterThanOrEqual(28);
     expect(inside).toBeLessThanOrEqual(34);
     expect(TAVERN_DOOR.height).toBeGreaterThanOrEqual(4.5);
     expect(TAVERN_DOOR.height).toBeLessThanOrEqual(5.5);
     expect(TAVERN_DOOR.width).toBeGreaterThan(PLAYER_H + 1.5);
-    // the high centre and the low nook beams
-    expect(TAVERN_HALL.tie).toBeGreaterThanOrEqual(9);
-    expect(TAVERN_HALL.tie).toBeLessThanOrEqual(11.5);
-    expect(TAVERN_HALL.aisleBeam).toBeGreaterThanOrEqual(5);
-    // the stair is wide, the arch and every upper doorway taller than a body with room over
-    expect(TAVERN_TOWER.rIn - TAVERN_TOWER.newel).toBeGreaterThanOrEqual(3.5);
+    // open to the roof: the lowest timber over the room (the hammer beams) is near four
+    // bodies up, well over any camera the room holds
+    expect(TAVERN_HALL.truss).toBeGreaterThan(3.5 * PLAYER_H);
+    expect(TAVERN_HALL.truss).toBeLessThan(TAVERN_HALL.eave + 0.5);
+    // the arch into the tower's nook is taller than two bodies, the nook a room of its own
     expect(TAVERN_ARCH.height).toBeGreaterThan(2 * PLAYER_H);
-    expect(TAVERN_TOWER_DOOR.height).toBeGreaterThan(PLAYER_H + 0.9);
-    expect(TAVERN_GALLERY_DOOR.height).toBeGreaterThan(PLAYER_H + 1.2);
-    // the upper floor under the roof keeps head room: the wing's wall plate, and the hall's
-    // roof over the gallery's back edge
-    expect(TAVERN_WING.eave - TAVERN_UPPER).toBeGreaterThan(PLAYER_H + 0.6);
-    const run = (TAVERN_HALL.ridge - TAVERN_HALL.eave) / TAVERN_HALL.x1;
-    const overGallery = TAVERN_HALL.eave + (TAVERN_HALL.x1 - TAVERN_GALLERY.x1) * run - 0.5;
-    expect(overGallery - TAVERN_UPPER).toBeGreaterThan(PLAYER_H + 0.3);
+    expect(2 * TAVERN_TOWER.rIn).toBeGreaterThan(4 * PLAYER_H);
+    // the stage and the bar stand half a yard up; the kitchen hatch is over the counter's
+    // height and wide enough to pass a tray, never a body
+    expect(TAVERN_STAGE.lift).toBeLessThan(0.25 * PLAYER_H);
+    expect(TAVERN_HATCH.sill).toBeGreaterThan(TAVERN_BAR_PLATFORM.lift + 0.5 * PLAYER_H);
+    expect(TAVERN_HATCH.x1 - TAVERN_HATCH.x0).toBeLessThan(TAVERN_DOOR.width);
   });
 
   it('sizes the furniture to the player: tables at the waist, seats a body sits in', () => {
@@ -193,34 +189,53 @@ describe('Mirefen tavern: the floor', () => {
     }
   });
 
-  it('climbs the spiral evenly from the ground landing to the upper floor, never dropping', () => {
-    const t = TAVERN_TOWER;
-    let prev = -1;
-    for (let u = 0; u <= TAVERN_STAIR.climb + 1e-9; u += Math.PI / 90) {
-      const a = TAVERN_STAIR.bottom - u;
-      for (const r of [t.newel + 0.5, (t.newel + t.rIn) / 2, t.rIn - 0.5]) {
-        const h = tavernLocalHeight(t.x + Math.sin(a) * r, t.z + Math.cos(a) * r);
-        expect(h).toBeGreaterThanOrEqual(prev - 1e-9);
-        // even at the newel, the climb stays well under the climb gate
-        expect(TAVERN_UPPER / (r * TAVERN_STAIR.climb)).toBeLessThan(0.75);
-      }
-      prev = tavernLocalHeight(t.x + Math.sin(a) * 3.9, t.z + Math.cos(a) * 3.9);
+  it("raises the bard's stage half a yard in the back left corner, its edges walkable ramps", () => {
+    const st = TAVERN_STAGE;
+    expect(floorAt((st.x0 + st.x1) / 2, (st.z0 + st.z1) / 2)).toBeCloseTo(st.lift, 9);
+    expect(floorAt(st.x1 + st.rim + 0.1, (st.z0 + st.z1) / 2)).toBeCloseTo(0, 9);
+    expect(floorAt((st.x0 + st.x1) / 2, st.z1 + st.rim + 0.1)).toBeCloseTo(0, 9);
+    for (let d = 0; d < 1; d += 0.05) {
+      const a = floorAt(-12, st.z1 + d);
+      const b = floorAt(-12, st.z1 + d + 0.05);
+      expect(Math.abs(b - a) / 0.05).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
+      const c = floorAt(st.x1 + d, -11);
+      const e = floorAt(st.x1 + d + 0.05, -11);
+      expect(Math.abs(e - c) / 0.05).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
     }
-    expect(prev).toBeCloseTo(TAVERN_UPPER, 6);
   });
 
-  it('puts every upper floor over solid ground: the gallery, the landing and the wing', () => {
-    expect(floorAt(9, -12)).toBe(TAVERN_UPPER);
-    expect(floorAt(10, -20)).toBe(TAVERN_UPPER);
-    expect(floorAt((TAVERN_TOWER_DOOR.x0 + TAVERN_TOWER_DOOR.x1) / 2, -16.2)).toBe(TAVERN_UPPER);
-    // the ground landing inside the arch stays at the ground floor
+  it('has no upper floor: nothing over the footprint walks higher than the bar platform', () => {
+    // the old gallery, the stair tower's spiral and landing, and the wing's rooms are gone:
+    // the tower is a flagged nook and the wing a closed kitchen, both on the ground floor
+    const top = Math.max(TAVERN_BAR_PLATFORM.lift, TAVERN_STAGE.lift);
+    let sampled = 0;
+    for (let lx = -16; lx <= 16; lx += 0.25) {
+      for (let lz = -28; lz <= TAVERN_PORCH.z1; lz += 0.25) {
+        const h = tavernLocalHeight(lx, lz);
+        if (Number.isNaN(h)) continue;
+        sampled++;
+        expect(h, `(${lx}, ${lz})`).toBeLessThanOrEqual(top + 1e-9);
+      }
+    }
+    expect(sampled).toBeGreaterThan(10000);
+    // the nook and the closed wing lie level with the hall
+    const t = TAVERN_TOWER;
+    for (const [dx, dz] of [
+      [0, 0],
+      [3, -3],
+      [-4.5, 1],
+      [0, -5.5],
+    ]) {
+      expect(floorAt(t.x + dx, t.z + dz), `nook (${dx}, ${dz})`).toBe(0);
+    }
+    expect(floorAt(10, -20)).toBe(0);
     expect(floorAt(-1.5, -13.5)).toBe(0);
   });
 });
 
 describe('Mirefen tavern: walls, openings and rails', () => {
   const colliders = mirefenTavernColliders(S);
-  it('leaves the front doorway and the stair arch open and closes the rest of the front and back', () => {
+  it('leaves the front doorway and the nook arch open and closes the rest, the hatch too', () => {
     const walls = tavernHallWalls();
     const inWall = (x: number, z: number) =>
       walls.some(
@@ -230,19 +245,27 @@ describe('Mirefen tavern: walls, openings and rails', () => {
       const door = Math.abs(x - TAVERN_DOOR.x) < TAVERN_DOOR.width / 2 - 1e-6;
       expect(inWall(x, TAVERN_HALL.z1 - 0.4), `front ${x}`).toBe(!door);
       const arch = x > TAVERN_ARCH.x0 + 1e-6 && x < TAVERN_ARCH.x1 - 1e-6;
-      const up = x > TAVERN_GALLERY_DOOR.x0 + 1e-6 && x < TAVERN_GALLERY_DOOR.x1 - 1e-6;
-      expect(inWall(x, TAVERN_HALL.z0 + 0.4), `back ${x}`).toBe(!arch && !up);
+      // the kitchen hatch is no way through: the back wall runs on over it
+      expect(inWall(x, TAVERN_HALL.z0 + 0.4), `back ${x}`).toBe(!arch);
     }
-    // walls block at any height; rails block a body under their top and are never stood on
+    expect(inWall((TAVERN_HATCH.x0 + TAVERN_HATCH.x1) / 2, TAVERN_HALL.z0 + 0.4)).toBe(true);
+    // walls block at any height; the porch parapets block a body under their top and are
+    // never stood on
     for (const c of colliders) {
       if (c.moveTopY === undefined) expect(c.standable).toBeUndefined();
     }
+    // the tower's ring is whole but for the arch: no passage out of the nook
+    expect(TAVERN_TOWER_WALL_RUNS).toHaveLength(1);
+    expect(TAVERN_TOWER_WALL_RUNS[0][1] - TAVERN_TOWER_WALL_RUNS[0][0]).toBeCloseTo(
+      2 * Math.PI - (96 * Math.PI) / 180,
+      9,
+    );
   });
 
-  it("keeps the wing's walls out of the stair tower, so the stair's outer edge is clear", () => {
+  it("keeps the wing's walls out of the tower's nook, closing up to its ring", () => {
     // the wing's west wall stops at the tower's outside face, where the model's wall stops:
-    // past it the tower's ring is the wall (a run inside the tower stood as an invisible
-    // wall on the stair's outer edge near its head)
+    // past it the tower's ring is the wall (a run inside the tower would stand as an
+    // invisible wall in the nook)
     const t = TAVERN_TOWER;
     for (const [x0, x1, z0, z1] of tavernWingWalls()) {
       for (let x = x0; x <= x1 + 1e-9; x += 0.1) {
@@ -266,7 +289,7 @@ describe('Mirefen tavern: walls, openings and rails', () => {
     }
   });
 
-  it('stops a spell at the walls but lets it cross the room and reach the gallery', () => {
+  it('stops a spell at the walls but lets it cross the room', () => {
     const a = w(-10, 5);
     const outside = w(-22, 5);
     expect(lineOfSightClear(S, a, outside)).toBe(false);
@@ -284,7 +307,7 @@ describe('Mirefen tavern: the rest area (the inn rule)', () => {
     } as unknown as Entity;
   };
 
-  it('covers both floors inside the walls and nothing outside', () => {
+  it('covers the hall and the nook inside the walls and nothing outside', () => {
     for (let lx = -15; lx <= 15; lx += 1) {
       for (let lz = -27; lz <= 13; lz += 1) {
         if (!tavernInsideLocal(lx, lz)) continue;
@@ -389,14 +412,11 @@ describe('Mirefen tavern: walking it (the real movement kernel)', () => {
   });
 
   const T = TAVERN_TOWER;
-  const spiral = (deg: number, r = 3.9): [number, number] => [
-    T.x + Math.sin((deg * Math.PI) / 180) * r,
-    T.z + Math.cos((deg * Math.PI) / 180) * r,
-  ];
-  // road, steps, porch, door, entry, into the hearth ring through the door-side gap, out
-  // by the next gap, up onto the bar platform between the stools, across to the arch, the
-  // ground landing, the whole spiral, the landing, the passage, the wing's landing, both
-  // rooms, the gallery door and the gallery's far end
+  const st = TAVERN_STAGE;
+  // road, steps, porch, door, entry, into the hearth ring through the door-side gap, out by
+  // the next gap, up onto the bar platform between the stools, across the room onto the
+  // bard's stage, into the booth beside it, through the arch into the tower's nook and round
+  // to its rose
   const ROUTE: readonly (readonly [number, number, number])[] = [
     [0, 22, Number.NaN],
     [0, 18.5, Number.NaN],
@@ -410,29 +430,18 @@ describe('Mirefen tavern: walking it (the real movement kernel)', () => {
     [7.35, -5.9, TAVERN_BAR_PLATFORM.lift],
     [7.35, -3.2, 0],
     [1.0, -4.4, 0],
+    [-8.0, -7.2, 0],
+    [-11.0, -10.2, st.lift],
+    [-8.0, -7.2, 0],
+    [-11.3, -4.6, 0],
+    [-7.0, -5.0, 0],
     [-1.5, -10.5, 0],
-    [-1.5, -13.5, 0],
-    [...spiral(-30), 0],
-    [...spiral(-60), Number.NaN],
-    [...spiral(-100), Number.NaN],
-    [...spiral(-140), Number.NaN],
-    [...spiral(-180), Number.NaN],
-    [...spiral(-220), Number.NaN],
-    [...spiral(-260), Number.NaN],
-    [...spiral(75, 4.4), TAVERN_UPPER],
-    [4.0, -16.2, TAVERN_UPPER],
-    [7.3, -17.0, TAVERN_UPPER],
-    [7.3, -22.4, TAVERN_UPPER],
-    [7.3, -18.5, TAVERN_UPPER],
-    [12.7, -18.5, TAVERN_UPPER],
-    [12.7, -22.4, TAVERN_UPPER],
-    [12.7, -18.5, TAVERN_UPPER],
-    [8.5, -16.0, TAVERN_UPPER],
-    [8.5, -11.8, TAVERN_UPPER],
-    [4.0, -11.6, TAVERN_UPPER],
+    [-1.5, -14.5, 0],
+    [T.x, T.z, 0],
+    [T.x + 1.5, T.z - 1.5, 0],
   ];
 
-  it('walks from the road to the fire, the bar, up the stair to the rooms and the gallery, and back out', () => {
+  it('walks from the road to the fire, the bar, the stage, a booth and the nook, and back out', () => {
     place(ROUTE[0][0], ROUTE[0][1]);
     const legs = [...ROUTE.slice(1), ...[...ROUTE].reverse().slice(1)];
     for (const [lx, lz, y] of legs) {
@@ -448,7 +457,7 @@ describe('Mirefen tavern: walking it (the real movement kernel)', () => {
     }
   }, 180_000);
 
-  it('never gets stuck in the doorway or on the stair: straight through, both ways', () => {
+  it('never gets stuck in the doorway or the arch: straight through, both ways', () => {
     for (const dx of [-1.4, 0, 1.4]) {
       place(dx, 16);
       let end = walk(dx, 10);
@@ -456,36 +465,31 @@ describe('Mirefen tavern: walking it (the real movement kernel)', () => {
       end = walk(dx, 16);
       expect(Math.hypot(end.lx - dx, end.lz - 16), `out at ${dx}`).toBeLessThan(0.45);
     }
-    // down the spiral from the landing in one go along its outer and inner lines
-    for (const r of [T.newel + 0.8, T.rIn - 0.8]) {
-      const [sx, sz] = spiral(75, 4.4);
-      place(sx, sz);
-      // down the flight: the climb angle falls from the top (222 degrees) to the foot
-      for (let u = 210; u >= 15; u -= 15) {
-        const [x, z] = spiral(-48 - u, r);
-        walk(x, z, false, 120);
-      }
-      const [ex, ez] = spiral(-20, r);
-      const end = walk(ex, ez);
-      expect(Math.hypot(end.lx - ex, end.lz - ez), `down at r ${r}`).toBeLessThan(0.45);
-      expect(end.y).toBeCloseTo(0, 2);
+    for (const dx of [-4.0, -1.5, 1.0]) {
+      place(dx, -9);
+      let end = walk(dx, -16);
+      expect(Math.hypot(end.lx - dx, end.lz + 16), `into the nook at ${dx}`).toBeLessThan(0.45);
+      end = walk(dx, -9);
+      expect(Math.hypot(end.lx - dx, end.lz + 9), `out of the nook at ${dx}`).toBeLessThan(0.45);
     }
   }, 120_000);
 
-  it('the walls, rails and drops hold: walking or jumping at them keeps the player in', () => {
+  it('the walls and the hatch hold: walking or jumping at them keeps the player in', () => {
     // [start, push toward, the floor the player must stay on]
-    const [lx0, lz0] = spiral(70, 4.2);
-    const [lx1, lz1] = spiral(20, 4.2);
+    const ring = (deg: number, r: number): [number, number] => [
+      T.x + Math.sin((deg * Math.PI) / 180) * r,
+      T.z + Math.cos((deg * Math.PI) / 180) * r,
+    ];
+    const [nx0, nz0] = ring(60, 3);
+    const [nx1, nz1] = ring(60, 12);
     const pushes: [number, number, number, number, number][] = [
       [-12, 5, -25, 5, 0], // the left wall
       [12, 12, 12, 25, 0], // the front wall beside the door
-      [-10, -11, -10, -25, 0], // the back wall beside the arch
+      [-7, -11, -7, -25, 0], // the back wall between the stage and the arch
       [13.5, 5.5, 25, 5.5, 0], // the right wall
-      [10, -12, 10, -2, TAVERN_UPPER], // off the gallery's edge
-      [3.5, -11.6, -3, -11.6, TAVERN_UPPER], // off the gallery's end
-      [lx0, lz0, lx1, lz1, TAVERN_UPPER], // off the landing's drop
-      [14.6, -24, 14.6, -35, TAVERN_UPPER], // the wing's back wall, past the bed
-      [14, -17, 25, -17, TAVERN_UPPER], // the wing's side wall
+      [9.5, -10.5, 9.5, -25, TAVERN_BAR_PLATFORM.lift], // the kitchen hatch behind the bar
+      [nx0, nz0, nx1, nz1, 0], // the nook's wall toward the wing
+      [T.x, T.z, T.x - 12, T.z - 4, 0], // the nook's back, over its bench
     ];
     for (const jump of [false, true]) {
       for (const [x, z, tx, tz, y] of pushes) {
@@ -495,7 +499,12 @@ describe('Mirefen tavern: walking it (the real movement kernel)', () => {
           tavernInsideLocal(end.lx, end.lz),
           `${jump ? 'jump' : 'walk'} from (${x}, ${z})`,
         ).toBe(true);
-        expect(end.y, `${jump ? 'jump' : 'walk'} from (${x}, ${z})`).toBeCloseTo(y, 1);
+        // over the nook's bench a body may end up stood on its seat, never higher
+        const onBench = Math.abs(end.y - 0.85) < 0.1 && Math.hypot(end.lx - T.x, end.lz - T.z) > 4;
+        expect(
+          Math.abs(end.y - y) < 0.1 || onBench,
+          `${jump ? 'jump' : 'walk'} from (${x}, ${z}) at ${end.y}`,
+        ).toBe(true);
       }
     }
   }, 120_000);
