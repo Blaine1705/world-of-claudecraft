@@ -136,7 +136,7 @@ export function tickBossRangedMechanics(ctx: SimContext, mob: Entity): void {
   // the moment someone gives it a target it is the oldest thing waiting and goes next.
   const players = livingPlayers(ctx);
   const ready = ORDER.filter(
-    (k) => (mob[TIMER_FIELD[k]] ?? 0) <= 0 && aimable(mob, def, k, players),
+    (k) => (mob[TIMER_FIELD[k]] ?? 0) <= 0 && aimable(ctx, mob, def, k, players),
   ).sort((a, b) => (mob[TIMER_FIELD[a]] ?? 0) - (mob[TIMER_FIELD[b]] ?? 0));
   if (ready.length === 0) return;
   const oldest = -(mob[TIMER_FIELD[ready[0]]] ?? 0);
@@ -153,15 +153,32 @@ export function tickBossRangedMechanics(ctx: SimContext, mob: Entity): void {
   }
 }
 
+/**
+ * The players the two AIMED ranged casts may pick: everyone alive except a player whose
+ * Shardpike is braced or steadied (lance_trial.ts, a live `meta.lance` session is exactly
+ * those two phases). The ranged kit exists to punish a caster parked far out, not the
+ * pike bearer holding still at range because the fight asks them to; with nobody else
+ * far enough, the cast has no one to aim at and does not fire. Draws no rng.
+ */
+function aimablePlayers(ctx: SimContext, players: Entity[]): Entity[] {
+  return players.filter((p) => !ctx.players.get(p.id)?.lance);
+}
+
 /** Whether `kind` has anyone to aim at right now. Draws no rng. */
-function aimable(mob: Entity, def: RangedDef, kind: RangedKind, players: Entity[]): boolean {
+function aimable(
+  ctx: SimContext,
+  mob: Entity,
+  def: RangedDef,
+  kind: RangedKind,
+  players: Entity[],
+): boolean {
   if (kind === 'boulder') {
     const b = def.boulder;
-    return farCandidates(players, mob.pos, b.minRange, b.maxRange).length > 0;
+    return farCandidates(aimablePlayers(ctx, players), mob.pos, b.minRange, b.maxRange).length > 0;
   }
   if (kind === 'glare') {
     const g = def.glare;
-    return farCandidates(players, mob.pos, g.minRange, g.maxRange).length > 0;
+    return farCandidates(aimablePlayers(ctx, players), mob.pos, g.minRange, g.maxRange).length > 0;
   }
   let near = 0;
   for (const p of players) if (dist2d(p.pos, mob.pos) <= def.burden.range) near++;
@@ -177,7 +194,13 @@ function tryStart(ctx: SimContext, mob: Entity, def: RangedDef, kind: RangedKind
 /** He tears up a boulder for each of the farthest players. Their ground marks go down now. */
 function startBoulder(ctx: SimContext, mob: Entity, def: RangedDef): boolean {
   const b = def.boulder;
-  const victims = farthestCandidates(livingPlayers(ctx), mob.pos, b.minRange, b.maxRange, b.count);
+  const victims = farthestCandidates(
+    aimablePlayers(ctx, livingPlayers(ctx)),
+    mob.pos,
+    b.minRange,
+    b.maxRange,
+    b.count,
+  );
   if (victims.length === 0) return false;
   beginBoulder(ctx, mob, def, victims);
   return true;
@@ -212,7 +235,12 @@ function beginBoulder(ctx: SimContext, mob: Entity, def: RangedDef, victims: Ent
 /** The eye locks on one far player and the line goes down, snapshot, through them. */
 function startGlare(ctx: SimContext, mob: Entity, def: RangedDef): boolean {
   const g = def.glare;
-  const far = farCandidates(livingPlayers(ctx), mob.pos, g.minRange, g.maxRange);
+  const far = farCandidates(
+    aimablePlayers(ctx, livingPlayers(ctx)),
+    mob.pos,
+    g.minRange,
+    g.maxRange,
+  );
   if (far.length === 0) return false;
   // Uniform pick among the far players (not always the farthest: that one already has a
   // boulder coming). One rng draw, a pure function of how many stand far out.
