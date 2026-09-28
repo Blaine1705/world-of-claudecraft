@@ -46,11 +46,28 @@ const browser = await puppeteer.launch({
   defaultViewport: { width: WIDTH, height: HEIGHT },
 });
 const page = await browser.newPage();
+// MOBILE=1 emulates a landscape touch phone (the pr_screenshots.mjs mobile metrics) so the
+// mobile HUD draws; pass WIDTH=844 HEIGHT=390 with it.
+const MOBILE = process.env.MOBILE === '1';
+if (MOBILE) {
+  await page.emulate({
+    viewport: {
+      width: WIDTH,
+      height: HEIGHT,
+      isMobile: true,
+      hasTouch: true,
+      deviceScaleFactor: 1,
+    },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+  });
+}
 page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 await page.evaluateOnNewDocument(`
   try { localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: ${PRESET}, graphicsDefaultApplied: true })); } catch {}
 `);
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 180000 });
+if (MOBILE) await page.evaluate(() => document.body.classList.add('mobile-touch'));
 const booted = await enterOfflineGame(page, {
   charClass: 'warrior',
   charName: 'Wanderer',
@@ -167,6 +184,8 @@ const SHOTS = [
   ['hall_from_stage', -12.0, -10.5, 6.0, 8.0, 0.35, 12],
   ['hall_from_bar', 9.0, -5.0, -8.0, 6.0, 0.4, 14],
   ['hall_high', 0.0, -2.0, 0.0, 10.0, 0.75, 18],
+  // the lit wall fireplace on the right wall, from beside its settle
+  ['wall_fireplace', 11.2, 0.6, 14.6, 3.2, 0.6, 6.5],
   // the grounds and the front (the jettied storey, the terrace, the stable, the dog, the smoke)
   ['fachada_camino', 0.0, 32.0, 0.0, 10.0, 0.16, 16],
   ['fachada_camino_angulo', 12.0, 30.0, 0.0, 2.0, 0.26, 30],
