@@ -43,6 +43,39 @@ mood and proportion only and never entered the build.
   beam) hangs over the camera's air. `tests/mirefen_tavern_asset.test.ts` "keeps the common room
   clear" scans the shipped model for any triangle there.
 
+## Outside: the front and the grounds
+
+- **The jettied front.** From `TAVERN_JETTY.y` up to the gable the front stands `TAVERN_JETTY.out`
+  further toward the road than the ground floor (`tavern_jetty.py`): joists whose ends show under a
+  moulded bressumer, a carved bracket and a turned drop under each post (none over the door: the
+  porch canopy's brackets carry that span), a hand-hewn frame with St Andrew's crosses, four leaded
+  windows with shutters and boxes, two small gable windows and the round window. Purely outside:
+  the hall's inner wall runs on straight to the roof (the old upper windows keep their inside), no
+  upper floor, nothing below the door's head. The front's three shell parts carry it
+  (`mirefen_tavern_core.ts` `BOX_VOLUMES` reach out over the jetty), so it ghosts like the wall.
+- **Windows, roof, weather.** Every window is leaded in diamond panes with a mullion, a transom and
+  planked shutters on strap hinges (`build_tavern.py` `window`); the roof is irregular mossy
+  shingles with a bellcast flare, deep eaves and verge (`TAVERN_HALL.eaveOut`, `vergeOut`), ridge
+  cappers and four dormers glowing at night (`tavern_roofing.py`); damp tide lines, fallen plaster
+  showing brick and moss on the plinth are thin decals on their own wall's part (`tavern_weather.py`).
+- **The grounds** (`src/sim/content/mirefen_tavern_grounds.ts`, `tavern_grounds.py`): the cobbled
+  forecourt (drawn over the terrain, never a walk surface: `groundHeight` is untouched), the terrace
+  (three trestle tables, benches that seat two each facing their table, lantern strings on posts,
+  flower tubs and a pictures-only chalkboard menu by the door), casks and crates at the right corner,
+  the open stable west of the hall (its walls, partition and posts collide:
+  `src/sim/mirefen_tavern_grounds.ts`), its trough, hay and a parked cart, a woodpile under a lean-to
+  by the chimney, and a dog asleep on the porch. Every piece stands on the terrain (`baseY`, pinned by
+  `tests/mirefen_tavern_grounds.test.ts`) and collides; the scatter and the grass keep off the grounds
+  (`mirefenTavernGroundsCovers`, `tavernGroundsRects`), which removes the odd scatter tree or rock
+  that stood where the terrace and the stable now are.
+- **Life.** The dog is its own part (`TavernDog`) and breathes round where it lies
+  (`src/render/mirefen_tavern_dog_core.ts`); the chimney and the hearth's flue smoke from medium
+  effects up (`src/render/mirefen_tavern_smoke.ts` over `mirefen_tavern_smoke_core.ts`: Lambert
+  billboards lit by the sun and sky, built at world build, their program in the props prewarm);
+  two terrace lights join the fire-light budget (`TAVERN_TERRACE_LIGHTS`); and a muffled room bed of
+  talk and a little music spills out of the door (`src/game/tavern_ambience_core.ts`,
+  `amb_tavern`), clear inside, fading over 30 yards outside.
+
 ## How it works
 
 - **Floor.** `src/sim/mirefen_tavern_floor.ts` answers ONE absolute walk height per point over
