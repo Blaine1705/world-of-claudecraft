@@ -225,12 +225,15 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       // crest until their commissioned art lands.
       'cmb_balgath',
       'cmb_balgath_ten',
+      // The muster's pike drill deed, on the same combat crest.
+      'cmb_point_taken',
     ]);
     // RE-PINNED at the Mirefen world-boss forward-port onto release/v0.44.0:
     // 302 live (counted directly off the resolved src/sim/content/deeds.ts
     // DEEDS table, matching the same pin in tests/deed_icons.test.ts and
-    // tests/deed_i18n.test.ts) - 13 explicitly pending = 289 painted.
-    expect(DEED_ORDER).toHaveLength(302);
+    // tests/deed_i18n.test.ts) - 13 explicitly pending = 289 painted. The muster's
+    // pike drill deed (cmb_point_taken) adds one live and one pending: 303 - 14 = 289.
+    expect(DEED_ORDER).toHaveLength(303);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

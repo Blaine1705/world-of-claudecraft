@@ -93,9 +93,10 @@ describe('deed_i18n English resolution', () => {
     // boss pair (cmb_balgath, cmb_balgath_ten); both author a desc and
     // neither carries a title reward, so the desc count moves to 283 and the
     // title count stays at 46. MEASURED on the merged catalog.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(302);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(283);
-    expect(manifest.length).toBe(631);
+    // 303 with the muster's pike drill deed (cmb_point_taken): one name, one desc, no title.
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(303);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(284);
+    expect(manifest.length).toBe(633);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(46);
     expect(manifest.filter((row) => row.id === 'cmb_balgath')).toEqual([
       { id: 'cmb_balgath', field: 'name', source: 'Foreman No More' },
