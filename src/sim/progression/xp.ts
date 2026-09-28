@@ -32,7 +32,7 @@ const RESTED_CAP_LEVELS = 1.5; // pool clamps to 1.5 levels of XP, the classic-e
 // kit collider's own OBB, so it takes the collider-correct point test. The
 // Harbormaster's House at the Wyrmwatch cliff harbor rests a body on its floor
 // the same way (wyrmwatch_harbor_house.ts), and so does the whole inside of the
-// Mirefen tavern, both floors (mirefen_tavern.ts), on the built-in world only.
+// Mirefen tavern (mirefen_tavern.ts), on the built-in world only.
 export function isResting(
   p: Entity,
   buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
