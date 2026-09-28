@@ -131,7 +131,10 @@ export const MUSTER_DRILL_POST: {
   const x = MUSTER_EFFIGY_POST.x + along.x * 3.5 + across.x * 4;
   const z = MUSTER_EFFIGY_POST.z + along.z * 3.5 + across.z * 4;
   const r3 = (v: number): number => Math.round(v * 1000) / 1000;
-  return Object.freeze({ x: r3(x), z: r3(z), facing: r3(Math.atan2(-across.x, -across.z)) });
+  // turned to face the trainee's mark: the mallet lands between them, the effigy well
+  // off to his side
+  const facing = Math.atan2(along.x * 3.5 - across.x * 4, along.z * 3.5 - across.z * 4);
+  return Object.freeze({ x: r3(x), z: r3(z), facing: r3(facing) });
 })();
 /**
  * The drill yard: the ground the camp layout keeps bare of every piece (tents, clutter,

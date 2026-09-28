@@ -3936,13 +3936,21 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.25,
   },
   // The drill yard's mallet man (content/mirefen_muster.ts muster_drillmaster): the footman's
-  // knight with the camp's big stake mallet instead of spear and shield, swinging it with the
-  // two-handed chop (his sim cue is a mob windup, muster_drill.ts, which plays the attack).
+  // knight with the camp's big stake mallet instead of spear and shield. Between blows he
+  // leans on the planted mallet (Drill_Rest); while someone is braced on the lane his sim
+  // cue, a mob windup (muster_drill.ts), plays Drill_Pound at its authored speed, so the
+  // head meets the ground on the sim's strike frame (scripts/build_drillmaster_anims.mjs).
   npc_muster_drillmaster: {
     url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
+    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`, `${PLAYERS}/drillmaster_anims.glb`],
     height: HUMANOID_H,
-    clips: { ...kaykit(['2H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop'], 'Drill_Rest'),
+      attackByAbility: { muster_mallet_pound: 'Drill_Pound' },
+      attackTimeScaleByAbility: { muster_mallet_pound: 1 },
+      combatIdle: 'Block',
+      combatIdleHold: true,
+    },
     show: ['Knight_Helmet'],
     attach: [{ url: `${WEAPONS}/muster_mallet.glb`, bone: 'handslot.r' }],
     tint: 'entity',

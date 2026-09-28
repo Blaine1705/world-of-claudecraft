@@ -314,11 +314,19 @@ export function lanceLeanFromMove(mv: MoveInput): -1 | 0 | 1 {
  * player's facing the blast came from, because the beam is the player's own left-right
  * axis: a blast on your left shoves you right. Draws no rng.
  */
-export function shockLanceBraces(ctx: SimContext, x: number, z: number, radius: number): void {
+export function shockLanceBraces(
+  ctx: SimContext,
+  x: number,
+  z: number,
+  radius: number,
+  /** Only these players feel it (the drill yard's mallet kicks its trainees alone). */
+  only?: (pid: number) => boolean,
+): void {
   const reach = radius * LANCE_SHOCK_REACH;
   for (const meta of ctx.players.values()) {
     const session = meta.lance;
     if (!session) continue;
+    if (only && !only(meta.entityId)) continue;
     const p = ctx.entities.get(meta.entityId);
     if (!p || p.dead) continue;
     const dx = x - p.pos.x;

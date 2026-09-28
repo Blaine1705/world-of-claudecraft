@@ -334,6 +334,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/players/barbarian_hit_variety_anims.glb": "/media/models/chars/players/barbarian_hit_variety_anims.7321b010ff5e.glb",
   "models/chars/players/bow_anims.glb": "/media/models/chars/players/bow_anims.11f1982870b3.glb",
   "models/chars/players/bow_hold_anim.glb": "/media/models/chars/players/bow_hold_anim.55a03fd920b3.glb",
+  "models/chars/players/drillmaster_anims.glb": "/media/models/chars/players/drillmaster_anims.2262412ca519.glb",
   "models/chars/players/druid.glb": "/media/models/chars/players/druid.b1156d55834d.glb",
   "models/chars/players/druid_ability_anims.glb": "/media/models/chars/players/druid_ability_anims.dc813ac0b1ff.glb",
   "models/chars/players/druid_hit_variety_anims.glb": "/media/models/chars/players/druid_hit_variety_anims.33927356a569.glb",

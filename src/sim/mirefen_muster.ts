@@ -110,8 +110,11 @@ export interface MusterArmyState {
   effigyId: number | null;
   /** The drill yard's mallet man (muster_drill.ts), once raised. */
   drillmasterId: number | null;
-  /** Sim time his next mallet blow is due (muster_drill.ts). */
+  /** Sim time his next mallet blow is due, or his next look round while at ease
+   *  (muster_drill.ts). */
   drillNextPoundAt: number;
+  /** A set is under way: someone is couched in the yard and he is on the beat. */
+  drillTraining: boolean;
   /** Each player's open window on the effigy: player id -> sim time it closes. */
   effigyWindows: Map<number, number>;
 }
@@ -132,6 +135,7 @@ export function freshMusterArmy(): MusterArmyState {
     effigyId: null,
     drillmasterId: null,
     drillNextPoundAt: 0,
+    drillTraining: false,
     effigyWindows: new Map(),
   };
 }

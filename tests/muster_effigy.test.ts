@@ -44,7 +44,10 @@ import {
 import { musterFootprintDistance } from '../src/sim/muster_camp_layout';
 import { musterCampPlan } from '../src/sim/muster_camp_plan';
 import {
+  isMusterDrillTrainee,
+  MUSTER_DRILL_FIRST_BLOW,
   MUSTER_DRILL_POUND_EVERY,
+  MUSTER_DRILL_WATCH_RANGE,
   musterDrillStake,
   poundMusterDrill,
 } from '../src/sim/muster_drill';
@@ -399,20 +402,85 @@ describe("the drillmaster's mallet", () => {
     expect(Math.sign(kick)).toBe(Math.sin(bearing - h.sim.player.facing) >= 0 ? 1 : -1);
   });
 
-  it('pounds on a beat only while someone trains with a pike', () => {
+  it('stands at ease until a trainee couches a pike, pounds on the beat, and settles when the brace ends', () => {
     const h = drillYard();
-    const windups = () =>
-      h.sim.tick().filter((ev) => ev.type === 'spellfx' && ev.ability === 'muster_mallet_pound')
-        .length;
-    let idle = 0;
-    for (let i = 0; i < 200; i++) idle += windups();
-    expect(idle).toBe(0);
+    const m = h.meta();
+    /** Ticks, holding any live beam steady so the brace lasts; counts his windups. */
+    const run = (seconds: number) => {
+      let n = 0;
+      for (let i = 0; i < Math.round(seconds / DT); i++) {
+        if (m.lance) {
+          m.lance.beam.balance = 0;
+          m.lance.beam.velocity = 0;
+        }
+        n += h.sim
+          .tick()
+          .filter((ev) => ev.type === 'spellfx' && ev.ability === 'muster_mallet_pound').length;
+      }
+      return n;
+    };
+    // nobody in the yard: at ease
+    expect(run(10)).toBe(0);
+    expect(h.army.drillTraining).toBe(false);
+    // a pike in hand on the lane is not training yet: only a couched pike is
     h.takePike();
-    let busy = 0;
-    const ticks = Math.round((MUSTER_DRILL_POUND_EVERY * 3) / DT);
-    for (let i = 0; i < ticks; i++) busy += windups();
-    expect(busy).toBeGreaterThanOrEqual(2);
+    expect(run(10)).toBe(0);
+    expect(h.army.drillTraining).toBe(false);
+    // couched: a breath to find the balance, then a blow on every beat
+    h.sim.lanceBrace();
+    expect(m.lance).toBeDefined();
+    expect(run(MUSTER_DRILL_FIRST_BLOW - 0.2)).toBe(0);
+    expect(h.army.drillTraining).toBe(true);
+    const busy = run(MUSTER_DRILL_POUND_EVERY * 3);
+    expect(busy).toBeGreaterThanOrEqual(3);
     expect(busy).toBeLessThanOrEqual(4);
+    // the brace ends (lifting the pike): he settles back, facing the lane, and stays at ease
+    m.lance = undefined;
+    h.sim.player.bracing = false;
+    run(1);
+    expect(h.army.drillTraining).toBe(false);
+    const dm = h.sim.entities.get(h.army.drillmasterId ?? -1) as Entity;
+    expect(dm.facing).toBeCloseTo(MUSTER_DRILL_POST.facing, 6);
+    expect(run(10)).toBe(0);
+  });
+
+  it('a braced player outside the drill yard neither starts the drill nor feels its blows', () => {
+    const h = drillYard();
+    h.takePike();
+    // far from the effigy (well outside the yard), couched
+    place(
+      h.sim,
+      h.sim.player,
+      MUSTER_EFFIGY_POST.x + MUSTER_DRILL_WATCH_RANGE + 6,
+      MUSTER_EFFIGY_POST.z,
+    );
+    h.sim.lanceBrace();
+    const m = h.meta();
+    if (!m.lance) throw new Error('brace failed');
+    expect(isMusterDrillTrainee(h.ctx, h.sim.playerId)).toBe(false);
+    const v0 = m.lance.beam.velocity;
+    poundMusterDrill(h.ctx, h.army);
+    h.step(20);
+    expect(m.lance?.beam.velocity ?? v0).toBe(v0);
+  });
+
+  it('lands the mallet on the ground in front of him, never on the effigy', () => {
+    const stake = musterDrillStake();
+    const f = MUSTER_DRILL_POST.facing;
+    const dx = stake.x - MUSTER_DRILL_POST.x;
+    const dz = stake.z - MUSTER_DRILL_POST.z;
+    // ahead of him, a stride out
+    expect(dx * Math.sin(f) + dz * Math.cos(f)).toBeGreaterThan(0.8);
+    // he faces the trainee's mark, not the effigy
+    const toMark = Math.atan2(
+      MUSTER_DRILL_LANE.x - MUSTER_DRILL_POST.x,
+      MUSTER_DRILL_LANE.z - MUSTER_DRILL_POST.z,
+    );
+    expect(Math.abs(normAngle(f - toMark))).toBeLessThan(0.01);
+    // the blow lands well clear of the effigy's body
+    expect(
+      Math.hypot(stake.x - MUSTER_EFFIGY_POST.x, stake.z - MUSTER_EFFIGY_POST.z),
+    ).toBeGreaterThan(MUSTER_EFFIGY_COLLIDER_RADIUS + 2);
   });
 });
 
