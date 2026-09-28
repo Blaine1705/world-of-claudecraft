@@ -53,7 +53,7 @@ import {
   nameplateDotsInto,
 } from './nameplate_dots_core';
 import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
-import { nameplateHeraldryLift } from './nameplate_heraldry_core';
+import { nameplateHeraldryLift, nameplateSubRowsLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
 import {
@@ -358,7 +358,8 @@ export class NameplatePainter {
       // crowd overlapped without being nudged apart.
       const extraLift =
         nameplateHeraldryLift(state.border) +
-        nameplateDotRowHeight(state.dots.count, state.dots.scale);
+        nameplateDotRowHeight(state.dots.count, state.dots.scale) +
+        nameplateSubRowsLift(!!state.guild, state.currentTarget, !!state.title);
       if (anchor) {
         anchor.id = id;
         anchor.sx = screenX;
