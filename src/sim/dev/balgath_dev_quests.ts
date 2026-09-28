@@ -5,7 +5,7 @@
 // verbs cut each wait out for one tester, and nothing else:
 //   quests          reset the chain for you (Warden Fenwick offers the first one again)
 //   quests weekly   skip to the weekly (the first two marked done, the weekly lock cleared)
-//   trophy          hand you the Barrowhide Slab, as if torn off his corpse (weekly active)
+//   trophy          credit the weekly's Balgath kill, as if you fought in it (weekly active)
 //   weekly          clear this week's lock, so the Commander offers the weekly again
 //   drill           stand you on the drill lane, facing the Straw Foreman
 //   pound           make the drillmaster swing his mallet now
@@ -15,7 +15,6 @@
 
 import { MUSTER_DRILL_LANE, MUSTER_DRILL_LANE_REACH } from '../content/mirefen_muster';
 import {
-  BARROWHIDE_SLAB_ITEM_ID,
   MUSTER_PIKE_DRILL_QUEST_ID,
   MUSTER_QUEST_ORDER,
   MUSTER_SUMMONS_QUEST_ID,
@@ -23,6 +22,7 @@ import {
 } from '../content/mirefen_muster_quests';
 import { poundMusterDrill } from '../muster_drill';
 import { closeEffigyWindow } from '../muster_effigy';
+import { creditMusterTrophyKillFor } from '../muster_trophy';
 import { weeklyQuestLockoutId } from '../quests/weekly_quest_lock';
 import type { SimContext } from '../sim_context';
 import { displacePlayerForDev } from './dev_displace';
@@ -51,7 +51,7 @@ const VERBS: readonly BalgathQuestDevVerb[] = [
 export const BALGATH_QUEST_DEV_HELP: readonly string[] = [
   '/dev balgath quests: reset the muster quest chain for you (Warden Fenwick in Fenbridge offers the first again)',
   '/dev balgath quests weekly: skip to the weekly (first two quests marked done, the weekly lock cleared; talk to the Muster Commander)',
-  '/dev balgath trophy: get the Barrowhide Slab as if looted from his corpse (the weekly must be in your log)',
+  '/dev balgath trophy: count Balgath as slain for your weekly, as if you fought in the kill (the weekly must be in your log)',
   "/dev balgath weekly: clear this week's lock so the Commander offers the weekly again",
   '/dev balgath drill: stand on the drill lane facing the Straw Foreman (take a pike from the rack first)',
   '/dev balgath pound: make the drillmaster swing his mallet now',
@@ -87,8 +87,6 @@ export function runBalgathQuestDev(
         meta.questsDone.delete(questId);
       }
       meta.raidLockouts.delete(weeklyQuestLockoutId(MUSTER_TROPHY_QUEST_ID));
-      const slabs = ctx.countItem(BARROWHIDE_SLAB_ITEM_ID, pid);
-      if (slabs > 0) ctx.removeItem(BARROWHIDE_SLAB_ITEM_ID, slabs, pid);
       closeEffigyWindow(ctx, army, pid);
       if (verb === 'quests weekly') {
         meta.questsDone.add(MUSTER_SUMMONS_QUEST_ID);
@@ -112,14 +110,12 @@ export function runBalgathQuestDev(
             'Take "A Chip Off the Foreman" from the Muster Commander first (/dev balgath quests weekly to skip there).',
         };
       }
-      if (ctx.countItem(BARROWHIDE_SLAB_ITEM_ID, pid) > 0)
-        return { ok: false, message: 'You already carry a Barrowhide Slab.' };
-      if (!ctx.canAddItem(BARROWHIDE_SLAB_ITEM_ID, 1, pid))
-        return { ok: false, message: 'Your bags are full.' };
-      ctx.addItem(BARROWHIDE_SLAB_ITEM_ID, 1, pid);
+      if (qp.state !== 'active')
+        return { ok: false, message: 'Balgath already counts as slain. Report to the Commander.' };
+      creditMusterTrophyKillFor(ctx, meta);
       return {
         ok: true,
-        message: 'You tear a Barrowhide Slab off the Foreman. Take it to the Commander.',
+        message: 'Balgath slain, as if you fought in the kill. Report to the Commander.',
       };
     }
     case 'weekly': {

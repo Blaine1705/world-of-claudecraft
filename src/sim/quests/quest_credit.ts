@@ -59,9 +59,11 @@ function creditDiscreteQuestObjectives(
   ctx: SimContext,
   meta: PlayerMeta,
   matches: (objective: QuestObjective) => boolean,
+  onlyQuestId?: string,
 ): void {
   for (const qp of meta.questLog.values()) {
     if (qp.state !== 'active') continue;
+    if (onlyQuestId !== undefined && qp.questId !== onlyQuestId) continue;
     const quest = QUESTS[qp.questId];
     let changed = false;
     quest.objectives.forEach((objective, objectiveIndex) => {
@@ -81,6 +83,27 @@ export function onMobKilledForQuests(ctx: SimContext, mob: Entity, meta: PlayerM
     ctx,
     meta,
     (objective) => objective.type === 'kill' && objective.targetMobId === mob.templateId,
+  );
+}
+
+/**
+ * Credit ONE quest's kill objectives for this mob, and nothing else in the log. For a
+ * system that widens who a kill counts for on a single quest (the muster's weekly credits
+ * every world-boss contributor, src/sim/muster_trophy.ts) without widening every other
+ * kill objective that names the same mob. Capped like every credit: a player the ordinary
+ * kill path already credited is not counted twice.
+ */
+export function onMobKilledForQuest(
+  ctx: SimContext,
+  mobTemplateId: string,
+  meta: PlayerMeta,
+  questId: string,
+): void {
+  creditDiscreteQuestObjectives(
+    ctx,
+    meta,
+    (objective) => objective.type === 'kill' && objective.targetMobId === mobTemplateId,
+    questId,
   );
 }
 

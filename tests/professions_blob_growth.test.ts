@@ -2368,8 +2368,6 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Mirefen muster rework's lent pike: `"muster_shardpike",` (19 bytes) in
       // itemsDiscovered only, no firstFind row (a loan is not a relic).
       'muster_shardpike',
-      // The muster quests' weekly trophy (`"barrowhide_slab",`), itemsDiscovered only.
-      'barrowhide_slab',
       // Balgath's loot: five trinkets and the Craterglass Stave, each with an
       // itemsDiscovered id and a Reliquary firstFind row (115 + 295 bytes).
       'knucklebone_of_balgath',
@@ -2417,15 +2415,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         fieldBytes(withoutDevMountRelease, key) - fieldBytes(withoutBalgath, key),
       ]),
     );
-    // The muster quest chain adds MEASURED: questsDone +59 (its three quest ids), deeds
-    // +31 (cmb_point_taken), deedStats +18 (`"barrowhide_slab",`); the fixture's weekly
-    // lock is not armed, so raidLockouts is unchanged.
+    // The muster quest chain adds MEASURED: questsDone +59 (its three quest ids) and deeds
+    // +31 (cmb_point_taken); its weekly is a kill credit that owns no item, so deedStats
+    // gains nothing from it, and the fixture's weekly lock is not armed, so raidLockouts
+    // is unchanged.
     expect(balgathDelta).toEqual({
       questsDone: 81,
       raidLockouts: 42,
       deeds: 89,
-      // deedStats 218 -> 333 and reliquary 369 -> 664 with Balgath's loot (six ids).
-      deedStats: 333,
+      // deedStats 200 -> 315 and reliquary 369 -> 664 with Balgath's loot (six ids).
+      deedStats: 315,
       reliquary: 664,
     });
     // The five keys above are the WHOLE delta: the whole-state diff matches
@@ -2433,8 +2432,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8') -
         Buffer.byteLength(JSON.stringify(withoutBalgath), 'utf8'),
-    ).toBe(1209);
-    expect(Object.values(balgathDelta).reduce((sum, value) => sum + value, 0)).toBe(1209);
+    ).toBe(1191);
+    expect(Object.values(balgathDelta).reduce((sum, value) => sum + value, 0)).toBe(1191);
     const preReleaseCounterfactual = withoutBramblehideContent(withoutBalgath);
     // The Bramblehide/Nythgap release content, attributed exactly against
     // f73615a511 (the last test-ledger commit, where the settled ceiling
@@ -2526,8 +2525,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Plus 154 at the fourth release/v0.44.0 base merge (the ferry deed and
         // its four visit marks, attributed above).
         154 +
-        // Plus 1,209 for the Mirefen world-boss branch (balgathDelta above).
-        1209,
+        // Plus 1,191 for the Mirefen world-boss branch (balgathDelta above).
+        1191,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2638,7 +2637,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 227,857 -> 228,656 with the Mirefen world-boss branch merged over the
       // release (+799, the balgathDelta above).
       // 228,656 -> 229,066 with Balgath's loot (+410, inside the same balgathDelta).
-    ).toBe(229066);
+      // 229,066 -> 229,048 when the muster weekly became a kill credit and its
+      // Barrowhide Slab item was cut (-18, its itemsDiscovered id).
+    ).toBe(229048);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [

@@ -18907,7 +18907,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.effigyLanternOut':
     'あなたにとって藁の監督のランタンは消えている：あなたとペットの攻撃は板の皮を無視し、全力で通る',
   'character.lockoutWeeklyQuests': '週間クエスト',
-  'entities.items.barrowhide_slab.name': '塚山の皮板',
   'entities.mobs.muster_drillmaster.name': '召集兵団の教練係',
   'entities.mobs.muster_effigy.name': '藁の監督',
   'entities.npcs.muster_commander.title': 'フェンブリッジ召集兵団',
@@ -18930,10 +18929,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_pike_drill.objectives.2.label': '板が落ちている間に当てた打撃',
   'entities.quests.q_muster_trophy.title': '監督のかけら',
   'entities.quests.q_muster_trophy.text':
-    '奴は毎週立ち上がり、我々は毎週また叩き伏せる。フェンブリッジは証拠を欲しがり、鍛冶屋は石を欲しがっている。バルガスが倒れたら、死骸から皮を一枚引き剥がして持って来い、{playerName}。召集兵団は一枚ごとに払う。',
+    '奴は毎週立ち上がり、我々は毎週また叩き伏せる。それには討伐隊が要るが、召集兵団だけでは揃えられない。次にバルガスへ挑む討伐隊を見つけて、奴を倒す手助けをしろ、{playerName}。奴を斬るもよし、斬る者を守るもよし、癒すもよし。奴と戦った者の手はすべて数に入る。奴が倒れたら、戻って私に報告しろ。召集兵団は討ち取るたびに払う。',
   'entities.quests.q_muster_trophy.completion':
-    'まだ温かいな。見た目より重い。こんな辺境では財布も薄いが、これはお前のものだ。奴がまた立ち上がったら戻って来い。',
-  'entities.quests.q_muster_trophy.objectives.0.label': '塚山の皮板',
+    '再び倒したか。しかもお前はその戦いにいた。今夜のうちにフェンブリッジへ報告を送る。こんな辺境では財布も薄いが、これはお前のものだ。奴がまた立ち上がったら戻って来い。',
+  'entities.quests.q_muster_trophy.objectives.0.label': 'バルガスを討伐',
   'entities.items.bastion_sigil.name': '砦の印章',
   'entities.items.mooring_stone.name': '係留石',
   'entities.items.menders_hourglass.name': '癒し手の砂時計',

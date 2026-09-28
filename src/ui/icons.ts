@@ -5254,8 +5254,6 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'cult_cipher',
   'drowned_offering',
   'fen_muster_order',
-  // The muster's weekly trophy off Balgath (derived art, mapping.json).
-  'barrowhide_slab',
   'ghostly_essence',
   'glowing_wax',
   'grave_high_priest_malric',

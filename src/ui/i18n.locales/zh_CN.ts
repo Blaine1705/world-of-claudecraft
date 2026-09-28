@@ -17970,7 +17970,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.effigyLanternOut':
     '对你而言，稻草工头的灯笼已经熄灭：你和你宠物的攻击无视其木板之皮，全额命中',
   'character.lockoutWeeklyQuests': '每周任务',
-  'entities.items.barrowhide_slab.name': '古冢皮板',
   'entities.mobs.muster_drillmaster.name': '征召操练官',
   'entities.mobs.muster_effigy.name': '稻草工头',
   'entities.npcs.muster_commander.title': '芬桥征召军',
@@ -17992,10 +17991,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_pike_drill.objectives.2.label': '木板脱落时命中的攻击',
   'entities.quests.q_muster_trophy.title': '工头的碎块',
   'entities.quests.q_muster_trophy.text':
-    '他每周都会重新站起来，我们每周都会再把他打倒。芬桥要证据，铁匠们要石头。巴尔加斯倒下时，从尸体上撕下一块皮给我带来，{playerName}。征召军每一块都付钱。',
+    '他每周都会重新站起来，我们每周都会再把他打倒。这需要一支团队，而征召军单凭自己凑不齐。去找下一支讨伐巴尔加斯的团队，帮忙把他打倒，{playerName}。砍他也好，保护砍他的人也好，治疗他们也好：每一双与他作战的手都算数。等他倒下，回来向我报告。征召军每击倒他一次都付钱。',
   'entities.quests.q_muster_trophy.completion':
-    '还是温的，比看上去更沉。离家这么远，钱袋很薄，但这是你的。等他再站起来就回来。',
-  'entities.quests.q_muster_trophy.objectives.0.label': '古冢皮板',
+    '又倒下了，而且你就在那场战斗里。今晚芬桥就会收到我的报告。离家这么远，钱袋很薄，但这是你的。等他再站起来就回来。',
+  'entities.quests.q_muster_trophy.objectives.0.label': '击败巴尔加斯',
   'entities.items.bastion_sigil.name': '堡垒徽印',
   'entities.items.mooring_stone.name': '系泊之石',
   'entities.items.menders_hourglass.name': '愈者沙漏',

@@ -2560,7 +2560,6 @@ export type TranslationKeyFlat =
   | 'entities.items.barksong_handguards.name'
   | 'entities.items.barrow_grave_offering.name'
   | 'entities.items.barrowhide_pauldrons.name'
-  | 'entities.items.barrowhide_slab.name'
   | 'entities.items.barrowshade_mantle.name'
   | 'entities.items.barrowstone_heart.name'
   | 'entities.items.basin_stalkers_tunic.name'

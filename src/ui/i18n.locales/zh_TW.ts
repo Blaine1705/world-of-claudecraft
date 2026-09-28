@@ -17979,7 +17979,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.effigyLanternOut':
     '對你而言，稻草工頭的燈籠已經熄滅：你和你寵物的攻擊無視其木板之皮，全額命中',
   'character.lockoutWeeklyQuests': '每週任務',
-  'entities.items.barrowhide_slab.name': '古塚皮板',
   'entities.mobs.muster_drillmaster.name': '徵召操練官',
   'entities.mobs.muster_effigy.name': '稻草工頭',
   'entities.npcs.muster_commander.title': '芬橋徵召軍',
@@ -18001,10 +18000,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_pike_drill.objectives.2.label': '木板脫落時命中的攻擊',
   'entities.quests.q_muster_trophy.title': '工頭的碎塊',
   'entities.quests.q_muster_trophy.text':
-    '他每週都會重新站起來，我們每週都會再把他打倒。芬橋要證據，鐵匠們要石頭。巴爾加斯倒下時，從屍體上撕下一塊皮給我帶來，{playerName}。徵召軍每一塊都付錢。',
+    '他每週都會重新站起來，我們每週都會再把他打倒。這需要一支團隊，而徵召軍單憑自己湊不齊。去找下一支討伐巴爾加斯的團隊，幫忙把他打倒，{playerName}。砍他也好，保護砍他的人也好，治療他們也好：每一雙與他作戰的手都算數。等他倒下，回來向我報告。徵召軍每擊倒他一次都付錢。',
   'entities.quests.q_muster_trophy.completion':
-    '還是溫的，比看上去更沉。離家這麼遠，錢袋很薄，但這是你的。等他再站起來就回來。',
-  'entities.quests.q_muster_trophy.objectives.0.label': '古塚皮板',
+    '又倒下了，而且你就在那場戰鬥裡。今晚芬橋就會收到我的報告。離家這麼遠，錢袋很薄，但這是你的。等他再站起來就回來。',
+  'entities.quests.q_muster_trophy.objectives.0.label': '擊敗巴爾加斯',
   'entities.items.bastion_sigil.name': '堡壘徽印',
   'entities.items.mooring_stone.name': '繫泊之石',
   'entities.items.menders_hourglass.name': '癒者沙漏',

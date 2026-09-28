@@ -18874,7 +18874,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.effigyLanternOut':
     '당신에게는 짚 감독관의 등불이 꺼져 있다: 당신과 소환수의 공격이 판자 가죽을 무시하고 온전히 들어간다',
   'character.lockoutWeeklyQuests': '주간 퀘스트',
-  'entities.items.barrowhide_slab.name': '봉분 가죽 조각',
   'entities.mobs.muster_drillmaster.name': '소집대 교관',
   'entities.mobs.muster_effigy.name': '짚 감독관',
   'entities.npcs.muster_commander.title': '펜브리지 소집대',
@@ -18896,10 +18895,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_pike_drill.objectives.2.label': '판자가 떨어진 동안 적중한 타격',
   'entities.quests.q_muster_trophy.title': '감독관의 부스러기',
   'entities.quests.q_muster_trophy.text':
-    '놈은 매주 다시 일어서고, 우리는 매주 다시 쓰러뜨린다. 펜브리지는 증거를 원하고, 대장장이들은 돌을 원한다. 발가스가 쓰러지면 시체에서 가죽 한 조각을 뜯어 내게 가져와라, {playerName}. 소집대는 한 조각마다 값을 치른다.',
+    '놈은 매주 다시 일어서고, 우리는 매주 다시 쓰러뜨린다. 그러려면 공격대가 필요한데, 소집대만으로는 꾸릴 수 없다. 발가스를 치러 가는 다음 공격대를 찾아 놈을 쓰러뜨리는 걸 도와라, {playerName}. 놈을 베든, 베는 자들을 지키든, 치료하든 좋다. 놈과 싸운 손은 모두 인정된다. 놈이 쓰러지면 돌아와서 내게 보고해라. 소집대는 처치할 때마다 값을 치른다.',
   'entities.quests.q_muster_trophy.completion':
-    '아직 따뜻하군. 보기보다 무겁다. 이렇게 멀리 나와 있으니 주머니가 얇지만, 이건 네 몫이다. 놈이 다시 일어서면 돌아와라.',
-  'entities.quests.q_muster_trophy.objectives.0.label': '봉분 가죽 조각',
+    '또 쓰러뜨렸군. 그리고 너도 그 싸움에 있었지. 오늘 밤 안에 펜브리지로 보고를 보내겠다. 이렇게 멀리 나와 있으니 주머니가 얇지만, 이건 네 몫이다. 놈이 다시 일어서면 돌아와라.',
+  'entities.quests.q_muster_trophy.objectives.0.label': '발가스 처치',
   'entities.items.bastion_sigil.name': '보루의 인장',
   'entities.items.mooring_stone.name': '정박석',
   'entities.items.menders_hourglass.name': '치유사의 모래시계',

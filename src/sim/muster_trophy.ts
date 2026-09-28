@@ -1,33 +1,32 @@
-// The muster's weekly trophy: a slab of Balgath's hide, torn off his corpse.
+// The muster's weekly: every hand in the fight that brings Balgath down gets the credit.
 //
-// "A Chip Off the Foreman" (content/mirefen_muster_quests.ts) asks for proof of the kill.
-// The proof is a quest item that appears in the corpse's loot for every contributor who
-// carries the quest, and nobody else: a personal slot, like the rest of a world boss's
-// loot, so a bag that is full at the kill can still take it any time the body lies in
-// state. Deterministic and draw-free (a chance of 1 needs no roll), and appended after
-// every roll, so the world-boss rng stream is untouched.
+// "A Chip Off the Foreman" (content/mirefen_muster_quests.ts) is a kill objective on
+// Balgath. The ordinary kill path (combat/damage.ts) only credits the tagging party, and a
+// world boss is fought by a raid of strangers: the healer in another group, the pike
+// carrier who blinded him and died, the late arrival. So when he falls, the weekly's kill
+// counts for EVERY contributor (worldBossLootContributors, the same hate-table snapshot
+// his personal loot is rolled from) who has the weekly active, and for that one quest
+// only. Capped, so the tagging party is never counted twice. Draws no rng.
 
 import { MUSTER_BOSS_TEMPLATE_ID } from './content/mirefen_muster';
-import { BARROWHIDE_SLAB_ITEM_ID, MUSTER_TROPHY_QUEST_ID } from './content/mirefen_muster_quests';
+import { MUSTER_TROPHY_QUEST_ID } from './content/mirefen_muster_quests';
+import { onMobKilledForQuest } from './quests/quest_credit';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { Entity, LootSlot } from './types';
+import type { Entity } from './types';
 
-/**
- * The trophy slot for this kill, or null: one personal slot naming every contributor with
- * the weekly active and no slab already in their bags.
- */
-export function musterTrophySlot(
+/** Balgath fell: credit the weekly's kill to every contributor carrying it. */
+export function creditMusterTrophyKill(
   ctx: SimContext,
   mob: Entity,
   contributors: readonly PlayerMeta[],
-): LootSlot | null {
-  if (mob.templateId !== MUSTER_BOSS_TEMPLATE_ID) return null;
-  const owed: number[] = [];
-  for (const meta of contributors) {
-    if (meta.questLog.get(MUSTER_TROPHY_QUEST_ID)?.state !== 'active') continue;
-    if (ctx.countItem(BARROWHIDE_SLAB_ITEM_ID, meta.entityId) > 0) continue;
-    owed.push(meta.entityId);
-  }
-  return owed.length > 0 ? { itemId: BARROWHIDE_SLAB_ITEM_ID, count: 1, personalFor: owed } : null;
+): void {
+  if (mob.templateId !== MUSTER_BOSS_TEMPLATE_ID) return;
+  for (const meta of contributors) creditMusterTrophyKillFor(ctx, meta);
+}
+
+/** One player's share of that credit (also `/dev balgath trophy`). A no-op unless the
+ *  weekly is active and its kill is still owed. */
+export function creditMusterTrophyKillFor(ctx: SimContext, meta: PlayerMeta): void {
+  onMobKilledForQuest(ctx, MUSTER_BOSS_TEMPLATE_ID, meta, MUSTER_TROPHY_QUEST_ID);
 }

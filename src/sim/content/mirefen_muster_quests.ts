@@ -12,8 +12,10 @@
 //      Foreman (the training effigy) while the drillmaster's mallet shakes the ground the
 //      way a real slam does, put the lantern in its eye out, then feel the plank hide come
 //      off under your own weapon. src/sim/muster_effigy.ts runs every part of it.
-//   3. A Chip Off the Foreman: the weekly. After a kill, a slab of his hide for the
-//      Commander, once per weekly reset (QuestDef.weeklyReset).
+//   3. A Chip Off the Foreman: the weekly. Help a raid bring Balgath down, then report
+//      to the Commander, once per weekly reset (QuestDef.weeklyReset). The kill counts
+//      for every contributor with the weekly in their log, not just the tagging party
+//      (src/sim/muster_trophy.ts).
 //
 // Skerrit's "The Socketwright's Due" is untouched and stays the chain's natural sequel:
 // the drill teaches the trick on straw, Skerrit pays for doing it to the real eye.
@@ -24,8 +26,8 @@
 // same boss already pays (q_socketwrights_due, 900) with the zone's boss-quest purse
 // (q_deacon, 1000c).
 
-import type { ItemDef, QuestDef } from '../types';
-import { MUSTER_COMMANDER_NPC_ID } from './mirefen_muster';
+import type { QuestDef } from '../types';
+import { MUSTER_BOSS_TEMPLATE_ID, MUSTER_COMMANDER_NPC_ID } from './mirefen_muster';
 
 /** Quest-event ids the drill's three moments credit (quests/quest_credit.ts 'event'). */
 export const MUSTER_PIKE_DRAWN_EVENT = 'muster_pike_drawn';
@@ -35,9 +37,6 @@ export const MUSTER_EFFIGY_WINDOW_HIT_EVENT = 'muster_effigy_window_hit';
 export const MUSTER_SUMMONS_QUEST_ID = 'q_muster_summons';
 export const MUSTER_PIKE_DRILL_QUEST_ID = 'q_muster_pike_drill';
 export const MUSTER_TROPHY_QUEST_ID = 'q_muster_trophy';
-
-/** The weekly's trophy: torn off his corpse after a kill (src/sim/world_boss.ts). */
-export const BARROWHIDE_SLAB_ITEM_ID = 'barrowhide_slab';
 
 /** Blows the drill asks for while the effigy's plank hide is down. */
 export const MUSTER_DRILL_WINDOW_HITS = 5;
@@ -103,15 +102,15 @@ export const MUSTER_QUESTS: Record<string, QuestDef> = {
     name: 'A Chip Off the Foreman',
     giverNpcId: MUSTER_COMMANDER_NPC_ID,
     turnInNpcId: MUSTER_COMMANDER_NPC_ID,
-    text: 'Every week he stands back up, and every week we knock him down again. Fenbridge wants proof, and the smiths want the stone. When Balgath falls, tear a slab of his hide off the carcass and bring it to me, $N. The muster pays for every one.',
+    text: 'Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, $N. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.',
     completionText:
-      'Still warm, and heavier than it looks. The purse is thin this far out, but it is yours. Come back when he is up again.',
+      'Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.',
     objectives: [
       {
-        type: 'collect',
-        itemId: BARROWHIDE_SLAB_ITEM_ID,
+        type: 'kill',
+        targetMobId: MUSTER_BOSS_TEMPLATE_ID,
         count: 1,
-        label: 'Barrowhide Slab',
+        label: 'Balgath slain',
       },
     ],
     xpReward: 900,
@@ -131,13 +130,3 @@ export const MUSTER_QUEST_ORDER: readonly string[] = [
   MUSTER_PIKE_DRILL_QUEST_ID,
   MUSTER_TROPHY_QUEST_ID,
 ];
-
-export const MUSTER_QUEST_ITEMS: Record<string, ItemDef> = {
-  [BARROWHIDE_SLAB_ITEM_ID]: {
-    id: BARROWHIDE_SLAB_ITEM_ID,
-    name: 'Barrowhide Slab',
-    kind: 'quest',
-    sellValue: 0,
-    questId: MUSTER_TROPHY_QUEST_ID,
-  },
-};

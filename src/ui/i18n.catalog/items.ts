@@ -3264,8 +3264,6 @@ const ITEM_ENTITY_IDS = [
   'vanguard_warstaff',
   // The Mirefen muster's lent Shardpike (src/sim/muster_pike.ts).
   'muster_shardpike',
-  // The muster's weekly trophy off Balgath's corpse (src/sim/muster_trophy.ts).
-  'barrowhide_slab',
   // Balgath's trinkets (src/sim/content/trinkets.ts) and his caster staff.
   'knucklebone_of_balgath',
   'muster_standard',
@@ -4099,7 +4097,6 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_fang_dagger: "Vanguard's Fang",
   vanguard_warstaff: "Vanguard's Warstaff",
   muster_shardpike: 'Muster Shardpike',
-  barrowhide_slab: 'Barrowhide Slab',
   knucklebone_of_balgath: 'Knucklebone of Balgath',
   muster_standard: 'Muster Standard',
   guttered_eye: 'The Guttered Eye',

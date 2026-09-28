@@ -149,13 +149,14 @@ const build = await buildItemArtAudit({
     // Mirefen muster rework: one more disjoint item definition, the lent
     // muster_shardpike, with its own shipping WebP (the
     // muster-shardpike-icon-2026-09-26 batch): 1291 + 1 = 1292, 1309 + 1 = 1310.
-    // The muster quests' weekly trophy barrowhide_slab (barrowhide-slab-icon-2026-09-27):
-    // 1292 + 1 = 1293, 1310 + 1 = 1311. Over release/v0.44.0 the ten records push one
-    // more group past a page boundary: 33 contact-sheet pages.
+    // Over release/v0.44.0 the records push one more group past a page boundary: 33
+    // contact-sheet pages.
     // Balgath's loot: five trinkets and the Craterglass Stave, each with its own
-    // shipping WebP (balgath-loot-icons-2026-09-28): 1355 + 6 = 1361, 1373 + 6 = 1379.
-    catalogCount: 1361,
-    liveItemCount: 1379,
+    // shipping WebP (balgath-loot-icons-2026-09-28): 1354 + 6 = 1360, 1372 + 6 = 1378.
+    // (The muster weekly's Barrowhide Slab was cut before it shipped: the weekly is a
+    // kill credit now, so it owns no item and no art.)
+    catalogCount: 1360,
+    liveItemCount: 1378,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

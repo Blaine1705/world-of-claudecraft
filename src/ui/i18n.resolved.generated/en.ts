@@ -17896,9 +17896,6 @@ export const en: EnTranslations = {
       "muster_shardpike": {
         "name": "Muster Shardpike"
       },
-      "barrowhide_slab": {
-        "name": "Barrowhide Slab"
-      },
       "knucklebone_of_balgath": {
         "name": "Knucklebone of Balgath"
       },
@@ -20591,11 +20588,11 @@ export const en: EnTranslations = {
       },
       "q_muster_trophy": {
         "title": "A Chip Off the Foreman",
-        "text": "Every week he stands back up, and every week we knock him down again. Fenbridge wants proof, and the smiths want the stone. When Balgath falls, tear a slab of his hide off the carcass and bring it to me, {playerName}. The muster pays for every one.",
-        "completion": "Still warm, and heavier than it looks. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
         "objectives": {
           "0": {
-            "label": "Barrowhide Slab"
+            "label": "Balgath slain"
           }
         }
       },

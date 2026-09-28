@@ -18857,7 +18857,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.effigyLanternOut':
     'Для вас фонарь Соломенного Десятника погас: ваши удары и удары питомца пробивают Дощатую шкуру и проходят в полную силу',
   'character.lockoutWeeklyQuests': 'Еженедельные задания',
-  'entities.items.barrowhide_slab.name': 'Пласт курганной шкуры',
   'entities.mobs.muster_drillmaster.name': 'Муштровщик ополчения',
   'entities.mobs.muster_effigy.name': 'Соломенный Десятник',
   'entities.npcs.muster_commander.title': 'Ополчение Фенбриджа',
@@ -18880,10 +18879,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_pike_drill.objectives.2.label': 'Удары, пока доски сняты',
   'entities.quests.q_muster_trophy.title': 'Кусок Десятника',
   'entities.quests.q_muster_trophy.text':
-    'Каждую неделю он встаёт, и каждую неделю мы снова его валим. Фенбриджу нужны доказательства, а кузнецам камень. Когда Балгат падёт, оторви с туши пласт его шкуры и принеси мне, {playerName}. Ополчение платит за каждый.',
+    'Каждую неделю он встаёт, и каждую неделю мы снова его валим. Для этого нужен рейд, а ополчению одному его не собрать. Найди следующий рейд, что пойдёт на Балгата, и помоги его свалить, {playerName}. Руби его, прикрывай тех, кто рубит, или лечи их: в счёт идёт каждая рука, что с ним билась. Когда он падёт, возвращайся и доложи мне. Ополчение платит за каждое убийство.',
   'entities.quests.q_muster_trophy.completion':
-    'Ещё тёплый и тяжелее, чем кажется. Кошель так далеко от дома тонкий, но это твоё. Возвращайся, когда он снова встанет.',
-  'entities.quests.q_muster_trophy.objectives.0.label': 'Пласт курганной шкуры',
+    'Опять повален, и ты был в том бою. Сегодня же ночью Фенбридж получит мой доклад. Кошель так далеко от дома тонкий, но это твоё. Возвращайся, когда он снова встанет.',
+  'entities.quests.q_muster_trophy.objectives.0.label': 'Балгат: убито',
   'hudChrome.vehicle.title': 'Пушка Северного Дозора',
   'hudChrome.vehicle.objective': 'Защитите Северный Дозор',
   'hudChrome.vehicle.lastKeepTitle': 'Пушка Последнего оплота',

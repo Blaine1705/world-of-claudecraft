@@ -824,8 +824,9 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    // Plus the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab): 1,355.
-    expect(currentOwnerIds).toHaveLength(1355);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the Wage rares): 1,354.
+    // Plus Balgath's loot (balgath-loot-icons-2026-09-28, six items): 1,360.
+    expect(currentOwnerIds).toHaveLength(1360);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -886,13 +887,14 @@ describe('Masterwrought art completion evidence', () => {
     expect(musterBatches).toHaveLength(1);
     const musterIds = new Set(musterBatches[0].itemIds);
     expect([...musterIds]).toEqual(['muster_shardpike']);
-    // ...and the muster quests' weekly trophy, one more additive batch by exact id.
-    const slabBatches = mapping.generatedBatches.filter(
-      ({ batchId: id }) => id === 'barrowhide-slab-icon-2026-09-27',
+    // ...and Balgath's own loot (five trinkets and the Craterglass Stave), one more
+    // additive batch, stripped by its exact ids the same way.
+    const balgathLootBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) => id === 'balgath-loot-icons-2026-09-28',
     );
-    expect(slabBatches).toHaveLength(1);
-    expect(slabBatches[0].itemIds).toEqual(['barrowhide_slab']);
-    musterIds.add('barrowhide_slab');
+    expect(balgathLootBatches).toHaveLength(1);
+    expect(balgathLootBatches[0].itemIds).toHaveLength(6);
+    for (const id of balgathLootBatches[0].itemIds) musterIds.add(id);
     expect(datedIds.filter((id) => musterIds.has(id))).toEqual([]);
 
     // These 25 ids are a later additive wave that never appears in the dated file's own

@@ -9,7 +9,8 @@
 //   - the plank hide turns away Barrowhide's share, and a window lets the owner's blows
 //     through in full, then closes after Balgath's own blind length;
 //   - the drillmaster's mallet kicks a couched beam through the slam shockwave path;
-//   - the weekly locks until the weekly reset, and the trophy drops only for its carriers.
+//   - the weekly is a Balgath kill credited to every contributor carrying it (never a
+//     corpse item), and locks until the weekly reset.
 import { describe, expect, it } from 'vitest';
 import {
   MUSTER_CAMPS,
@@ -24,13 +25,12 @@ import {
   MUSTER_RACK,
 } from '../src/sim/content/mirefen_muster';
 import {
-  BARROWHIDE_SLAB_ITEM_ID,
   MUSTER_DRILL_WINDOW_HITS,
   MUSTER_PIKE_DRILL_QUEST_ID,
   MUSTER_SUMMONS_QUEST_ID,
   MUSTER_TROPHY_QUEST_ID,
 } from '../src/sim/content/mirefen_muster_quests';
-import { BUILTIN_WORLD, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { runBalgathQuestDev } from '../src/sim/dev/balgath_dev_quests';
 import { drainDelayedEvents } from '../src/sim/entity_roster';
 import { LANCE_FIXED_DAMAGE } from '../src/sim/lance_balance_core';
@@ -417,30 +417,99 @@ describe("the drillmaster's mallet", () => {
 });
 
 describe('the weekly trophy', () => {
-  it('locks until the weekly reset and drops only for the players carrying it', () => {
+  /** A drill yard with the weekly taken by the player (and anyone else in `takers`). */
+  function weekly(extraTakers = 0) {
+    const h = drillYard();
+    const takers = [h.sim.playerId];
+    for (let i = 0; i < extraTakers; i++) {
+      const pid = h.sim.addPlayer('warrior', `Taker${i}`);
+      h.sim.setPlayerLevel(10, pid);
+      takers.push(pid);
+    }
+    const commander = h.sim.entities.get(h.army.commanderId ?? -1) as Entity;
+    for (const pid of takers) {
+      const m = h.meta(pid);
+      m.questsDone.add(MUSTER_SUMMONS_QUEST_ID);
+      m.questsDone.add(MUSTER_PIKE_DRILL_QUEST_ID);
+      place(h.sim, h.sim.entities.get(pid) as Entity, commander.pos.x + 1, commander.pos.z);
+      expect(h.sim.questState(MUSTER_TROPHY_QUEST_ID, pid)).toBe('available');
+      h.sim.acceptQuest(MUSTER_TROPHY_QUEST_ID, pid);
+      expect(h.sim.questState(MUSTER_TROPHY_QUEST_ID, pid)).toBe('active');
+    }
+    const boss = [...h.sim.entities.values()].find((e) => e.templateId === BALGATH) as Entity;
+    return { ...h, takers, boss };
+  }
+
+  it('asks for the kill itself: one Balgath objective, and no trophy item anywhere', () => {
+    const quest = QUESTS[MUSTER_TROPHY_QUEST_ID];
+    expect(quest.objectives).toEqual([
+      { type: 'kill', targetMobId: BALGATH, count: 1, label: 'Balgath slain' },
+    ]);
+    expect(ITEMS.barrowhide_slab).toBeUndefined();
+    expect(Object.values(ITEMS).some((item) => item.questId === MUSTER_TROPHY_QUEST_ID)).toBe(
+      false,
+    );
+  });
+
+  it('credits every contributor carrying it, not just the tagger, and nobody else', () => {
+    const h = weekly(1);
+    const [tagger, raider] = h.takers;
+    const bystander = h.sim.addPlayer('warrior', 'Bystander');
+    const untaken = h.sim.addPlayer('warrior', 'Untaken');
+    // the raider and the untaken player fought in a different group; the bystander never did
+    for (const pid of [tagger, raider, untaken]) h.boss.bossDamagers.add(pid);
+    h.boss.hp = 1;
+    h.sim.dealDamage(h.sim.player, h.boss, 10, false, 'physical', 'Strike', 'hit');
+    expect(h.boss.dead).toBe(true);
+    for (const pid of [tagger, raider]) {
+      expect(h.sim.questState(MUSTER_TROPHY_QUEST_ID, pid)).toBe('ready');
+      // capped: the tagger's ordinary kill credit and the contributor credit never stack
+      expect(h.meta(pid).questLog.get(MUSTER_TROPHY_QUEST_ID)?.counts).toEqual([1]);
+    }
+    for (const pid of [bystander, untaken]) {
+      expect(h.meta(pid).questLog.has(MUSTER_TROPHY_QUEST_ID)).toBe(false);
+    }
+    // no quest trophy rides the corpse any more
+    expect(h.boss.loot?.items.some((slot) => ITEMS[slot.itemId]?.kind === 'quest') ?? false).toBe(
+      false,
+    );
+  });
+
+  it('counts only while the weekly is active: a kill before accepting it does not', () => {
     const h = drillYard();
     const m = h.meta();
     m.questsDone.add(MUSTER_SUMMONS_QUEST_ID);
     m.questsDone.add(MUSTER_PIKE_DRILL_QUEST_ID);
-    expect(h.sim.questState(MUSTER_TROPHY_QUEST_ID)).toBe('available');
+    const boss = [...h.sim.entities.values()].find((e) => e.templateId === BALGATH) as Entity;
+    boss.bossDamagers.add(h.sim.playerId);
+    boss.hp = 1;
+    h.sim.dealDamage(h.sim.player, boss, 10, false, 'physical', 'Strike', 'hit');
+    expect(boss.dead).toBe(true);
     const commander = h.sim.entities.get(h.army.commanderId ?? -1) as Entity;
     place(h.sim, h.sim.player, commander.pos.x + 1, commander.pos.z);
     h.sim.acceptQuest(MUSTER_TROPHY_QUEST_ID);
     expect(h.sim.questState(MUSTER_TROPHY_QUEST_ID)).toBe('active');
-    // A Balgath kill leaves a slab for the carrier only.
-    const boss = [...h.sim.entities.values()].find((e) => e.templateId === BALGATH) as Entity;
-    const other = h.sim.addPlayer('warrior', 'Second');
-    boss.bossDamagers.add(h.sim.playerId);
-    boss.bossDamagers.add(other);
-    boss.hp = 1;
-    h.sim.dealDamage(h.sim.player, boss, 10, false, 'physical', 'Strike', 'hit');
-    expect(boss.dead).toBe(true);
-    const slab = boss.loot?.items.find((s) => s.itemId === BARROWHIDE_SLAB_ITEM_ID);
-    expect(slab?.personalFor).toEqual([h.sim.playerId]);
-    h.sim.addItem(BARROWHIDE_SLAB_ITEM_ID, 1);
+    expect(m.questLog.get(MUSTER_TROPHY_QUEST_ID)?.counts).toEqual([0]);
+  });
+
+  it('/dev balgath trophy grants the kill credit, and only with the weekly in the log', () => {
+    const h = drillYard();
+    expect(runBalgathQuestDev(h.ctx, h.sim.playerId, 'trophy').ok).toBe(false);
+    const w = weekly();
+    const r = runBalgathQuestDev(w.ctx, w.sim.playerId, 'trophy');
+    expect(r.ok).toBe(true);
+    expect(w.sim.questState(MUSTER_TROPHY_QUEST_ID)).toBe('ready');
+    expect(runBalgathQuestDev(w.ctx, w.sim.playerId, 'trophy').ok).toBe(false);
+  });
+
+  it('locks until the weekly reset once turned in', () => {
+    const h = weekly();
+    const m = h.meta();
+    h.boss.bossDamagers.add(h.sim.playerId);
+    h.boss.hp = 1;
+    h.sim.dealDamage(h.sim.player, h.boss, 10, false, 'physical', 'Strike', 'hit');
     expect(h.sim.questState(MUSTER_TROPHY_QUEST_ID)).toBe('ready');
     h.sim.turnInQuest(MUSTER_TROPHY_QUEST_ID);
-    expect(h.sim.countItem(BARROWHIDE_SLAB_ITEM_ID)).toBe(0);
     // Done for the week: unavailable until the weekly reset instant.
     const until = m.raidLockouts.get(weeklyQuestLockoutId(MUSTER_TROPHY_QUEST_ID));
     expect(until).toBeGreaterThan(h.ctx.lockoutNowMs());

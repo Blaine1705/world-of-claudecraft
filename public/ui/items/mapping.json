@@ -7025,21 +7025,6 @@
       ]
     },
     {
-      "batchId": "barrowhide-slab-icon-2026-09-27",
-      "source": "Derived in-repo from public/ui/items/chunk_of_ore.webp by re-grading it with sharp (hue turned from the ore's orange veins to the Loomshard's teal, saturation lowered toward Balgath's grey granite, a soft moss wash from the top-left key light); no new generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "The Chunk of Ore painting it derives from, re-coloured to read as a slab torn off Balgath's moss-grown granite hide with the teal of his eye in its seams.",
-      "commonPrompt": "Derived variant: the Chunk of Ore painting as grey-green granite hide with teal Loomshard seams and a moss wash.",
-      "itemIds": [
-        "barrowhide_slab"
-      ]
-    },
-    {
       "batchId": "balgath-loot-icons-2026-09-28",
       "source": "Tripo text-to-image (openapi.tripo3d.ai v3 /generation/text-to-image), text-prompt calls per item (two to four candidates each, best one kept); the staff uses the same prompt with long-weapon corner-to-corner diagonal framing; square crop to about 72 percent subject fill (78 percent for the tall standard, 84 percent for the diagonal staff, soft blurred-ground padding where the crop ran past the frame), 512px sRGB master, 128px opaque WebP (sharp, q82) reviewed locally",
       "owner": "World of ClaudeCraft",

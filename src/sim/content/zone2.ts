@@ -27,7 +27,7 @@ import {
   type MusterCampId,
   musterCamp,
 } from './mirefen_muster';
-import { MUSTER_QUEST_ITEMS, MUSTER_QUEST_ORDER, MUSTER_QUESTS } from './mirefen_muster_quests';
+import { MUSTER_QUEST_ORDER, MUSTER_QUESTS } from './mirefen_muster_quests';
 
 export const DEEPFEN_SHALLOWS_LAKE = { x: -110, z: 310, radius: 35 };
 
@@ -2061,7 +2061,6 @@ const CASTER_WEAPON_CLASSES: PlayerClass[] = [
 ];
 
 export const ZONE2_ITEMS: Record<string, ItemDef> = {
-  ...MUSTER_QUEST_ITEMS,
   // ---- Balgath, the Mirefen world boss: his own spoils --------------------
   //
   // A world boss needs loot that is HIS. Sharing another boss's tier looks like a

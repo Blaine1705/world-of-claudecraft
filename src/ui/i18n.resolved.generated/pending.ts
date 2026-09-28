@@ -11,7 +11,6 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -107,7 +106,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -203,7 +201,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -299,7 +296,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -396,7 +392,6 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -492,7 +487,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -612,7 +606,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -714,7 +707,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -810,7 +802,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -906,7 +897,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -1002,7 +992,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -1098,7 +1087,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -1194,7 +1182,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -1290,7 +1277,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",
@@ -1386,7 +1372,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "character.lockoutWeeklyQuests",
-    "entities.items.barrowhide_slab.name",
     "entities.items.barrowstone_heart.name",
     "entities.items.craterglass_stave.name",
     "entities.items.guttered_eye.name",

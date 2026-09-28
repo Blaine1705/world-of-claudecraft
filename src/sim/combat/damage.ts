@@ -41,6 +41,7 @@ import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
 import { effigyHideBypassed, noteEffigyBlow } from '../muster_effigy';
 import { EFFIGY_WARD_AURA_ID } from '../muster_effigy_core';
+import { creditMusterTrophyKill } from '../muster_trophy';
 import {
   NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
   nythraxisBoneSpikeWardHit,
@@ -1911,6 +1912,8 @@ export function handleDeath(
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
       onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
+      // The muster's weekly counts his kill for every contributor carrying it.
+      creditMusterTrophyKill(ctx, e, worldBossContribs);
     }
     // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
     // check for the same participation snapshot. Deliberately BELOW every loot
