@@ -34,6 +34,7 @@ import { ditherFadeUniform, setDitherFadeEnabledForTest } from '../src/render/oc
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   TAVERN_FLOOR_Y,
+  TAVERN_HALL,
   TAVERN_LANTERNS,
   TAVERN_ORIGIN,
   TAVERN_STAGE,
@@ -41,6 +42,7 @@ import {
   TAVERN_YAW,
   tavernToWorld,
 } from '../src/sim/content/mirefen_tavern';
+import { TAVERN_DOG, TAVERN_TERRACE_LIGHTS } from '../src/sim/content/mirefen_tavern_grounds';
 import { tavernInsideLocal } from '../src/sim/mirefen_tavern';
 
 // The Mirefen tavern painter (src/render/mirefen_tavern.ts) over the shipped GLB: the model
@@ -67,7 +69,8 @@ function triangles(root: THREE.Object3D): number {
   let n = 0;
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh) return;
+    // (the chimney smoke's billboards are the painter's own, not the model's)
+    if (!mesh.isMesh || mesh.name === 'mirefenTavernSmoke') return;
     const g = mesh.geometry;
     n += (g.index ? g.index.count : g.getAttribute('position').count) / 3;
   });
@@ -149,7 +152,10 @@ describe('mirefen tavern painter', () => {
       ['ultra', low + trim + clutter],
     ] as const) {
       withTier(tier);
-      expect(triangles(buildMirefenTavern()), tier).toBe(want);
+      const built = buildMirefenTavern();
+      expect(triangles(built), tier).toBe(want);
+      // the chimney smoke is cosmetic: none on low, from medium up
+      expect(!!built.getObjectByName('mirefenTavernSmoke'), tier).toBe(tier !== 'low');
     }
     // every shell part, the frame, the furniture and the lights on every tier
     for (const name of [
@@ -160,6 +166,30 @@ describe('mirefen tavern painter', () => {
     ]) {
       expect(mirefenTavernParts('low')).toContain(name);
     }
+  });
+
+  it('lays the dog on the porch and makes it breathe, cosmetic and near the camera only', () => {
+    withTier('low');
+    buildMirefenTavern();
+    const dog = internals.dog();
+    expect(dog).not.toBeNull();
+    if (!dog) return;
+    // it lies where the content says, turned into the world with the model
+    dog.updateWorldMatrix(true, false);
+    const at = new Vector3().setFromMatrixPosition(dog.matrixWorld);
+    const want = tavernToWorld(TAVERN_DOG.x, TAVERN_DOG.z);
+    expect(Math.hypot(at.x - want.x, at.z - want.z)).toBeLessThan(0.1);
+    expect(dog.children.length).toBeGreaterThan(0);
+    // a camera nearby: its flank rises within a breath
+    const ys = new Set<number>();
+    for (let i = 0; i < 120; i++) {
+      updateMirefenTavernShell(want.x + 6, 5, want.z, want.x, 2, want.z, 1 / 30);
+      ys.add(Math.round(dog.scale.y * 1e4));
+    }
+    expect(ys.size).toBeGreaterThan(5);
+    // reduced motion: it lies still
+    updateMirefenTavernShell(want.x + 6, 5, want.z, want.x, 2, want.z, 1 / 30, true);
+    expect(dog.scale.y).toBe(1);
   });
 
   it('hands the props prewarm every program it draws', () => {
@@ -354,7 +384,9 @@ describe('mirefen tavern painter', () => {
     withTier('high');
     buildMirefenTavern();
     const lights = mirefenTavernLights();
-    expect(lights).toHaveLength(6 + TAVERN_LANTERNS.filter((l) => l.lit).length);
+    expect(lights).toHaveLength(
+      6 + TAVERN_LANTERNS.filter((l) => l.lit).length + TAVERN_TERRACE_LIGHTS.length,
+    );
     const named = (n: string) => lights.filter((l) => l.name === n);
     expect(named('tavernHearth')).toHaveLength(1);
     expect(named('tavernWallFire')).toHaveLength(1);
@@ -377,7 +409,16 @@ describe('mirefen tavern painter', () => {
     const nz = nook[0].position.x - TAVERN_ORIGIN.x;
     expect(Math.hypot(nx - TAVERN_TOWER.x, nz - TAVERN_TOWER.z)).toBeLessThan(TAVERN_TOWER.rIn - 1);
     expect(lights[0].intensity).toBe(MIREFEN_TAVERN_LIGHTS.hearth.intensity);
+    // the terrace's two warm pools, over the forecourt's cobbles before the front
+    const terrace = named('tavernTerrace');
+    expect(terrace).toHaveLength(TAVERN_TERRACE_LIGHTS.length);
+    for (const l of terrace) {
+      const lz = l.position.x - TAVERN_ORIGIN.x;
+      expect(lz).toBeGreaterThan(TAVERN_HALL.z1);
+      expect(l.userData.baseIntensity).toBe(l.intensity);
+    }
     for (const l of lights) {
+      if (l.name === 'tavernTerrace') continue;
       expect(l.isPointLight).toBe(true);
       expect(l.userData.baseIntensity).toBe(l.intensity);
       // every light inside the walls, over the floor, under the roof

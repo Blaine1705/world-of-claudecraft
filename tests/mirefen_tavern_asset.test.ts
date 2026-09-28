@@ -45,30 +45,32 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
-const SHIPPED_SHA256 = 'aad9bd6c659f64b4785a428bba55268b160aaff5d1395288b148ad1273cd5701';
-const SHIPPED_BYTES = 1060580;
+const SHIPPED_SHA256 = '15526efc703938728afbf563eb434fdac76627c862600cf7b433ae18dd56af78';
+const SHIPPED_BYTES = 1589444;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   TavernFrame: 10976,
-  TavernFurnishings: 8096,
+  TavernFurnishings: 8264,
   TavernLights: 4680,
-  HallWallFront: 968,
-  HallWallFrontLeft: 1300,
-  HallWallFrontRight: 1300,
+  TavernGrounds: 11438,
+  TavernDog: 374,
+  HallWallFront: 1272,
+  HallWallFrontLeft: 4565,
+  HallWallFrontRight: 4547,
   HallWallBack: 2612,
-  HallWallLeft: 2512,
-  HallWallRight: 4212,
-  HallRoof: 7000,
-  WingWallEast: 1344,
-  WingWallBack: 1476,
-  WingWallWest: 696,
-  WingRoof: 1224,
+  HallWallLeft: 4105,
+  HallWallRight: 5795,
+  HallRoof: 12864,
+  WingWallEast: 2064,
+  WingWallBack: 2036,
+  WingWallWest: 976,
+  WingRoof: 1812,
   TowerWall: 4370,
   TowerRoof: 2000,
-  HallPorch: 2396,
+  HallPorch: 2228,
   BarPillar: 784,
-  TavernTrim: 5334,
-  TavernClutter: 8134,
+  TavernTrim: 8804,
+  TavernClutter: 12350,
 };
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */
 const PLAYER_H = 2.6;
@@ -180,18 +182,21 @@ describe('mirefen tavern GLB', () => {
       total += count;
     }
     expect(trianglesUnder(node('MirefenTavern_ROOT'))).toBe(total);
-    // a whole inn with its booths, stage, nook, kitchen and hammerbeam roof: under 72.5k in
-    // all, the low tier under 58k, the shipped file under 1100 KiB. The total and the file
-    // were raised from 68k and 1000 KiB (by 4.5k triangles and 100 KiB) for the dressed front
-    // the road sees: window boxes under all four front windows and hoods over the lower two,
-    // the ivy's leaf clusters, the hanging baskets, the tubs' greens and flowers, the carved
-    // bargeboards, the doormat, the weathering and the casks' hoops, all medium or high tier;
-    // the low tier keeps its 58k (the porch's bench and casks, the steps' flower tubs, the
-    // door lanterns and the sign's ironwork and board fit inside it)
-    expect(total).toBeLessThan(72500);
+    // a whole inn with its booths, stage, nook, kitchen and hammerbeam roof, and since the
+    // exterior pass its grounds: under 112k in all, the low tier under 90k, the shipped file
+    // under 1600 KiB. Raised from 72.5k, 58k and 1100 KiB for the exterior the road sees: the
+    // jettied upper storey with its bressumer, joists and carved brackets (the front's parts),
+    // leaded diamond panes on every window, four dormers, a roof of irregular mossy shingles
+    // with deep eaves (HallRoof, about 6k over the old slates), the weathering decals, and the
+    // grounds (TavernGrounds, about 11k: the forecourt's bed, the terrace's tables, benches,
+    // posts and lantern strings, the open stable, the trough, the hay, the cart and the
+    // woodpile), all of it outside, merged per material (the draw calls do not grow: one mesh
+    // per material and one per shell part, as before). The cobbles (trim), straw, sacks and
+    // moss cushions (clutter) are shed below medium and high.
+    expect(total).toBeLessThan(112000);
     const low = TAVERN_CRITICAL_PARTS.reduce((n, p) => n + TRIANGLES[p], 0);
-    expect(low).toBeLessThan(58000);
-    expect(readFileSync(GLB).length).toBeLessThan(1100 * 1024);
+    expect(low).toBeLessThan(90000);
+    expect(readFileSync(GLB).length).toBeLessThan(1600 * 1024);
   });
 
   it("stamps the sim's numbers, all generous next to the player", () => {
@@ -288,23 +293,25 @@ describe('mirefen tavern GLB', () => {
     expect(Math.max(...left)).toBeGreaterThan(-TAVERN_FRONT_SPLIT - 0.5);
   });
 
-  it('stands the flower tubs at the foot of the steps on the terrain, colliding there', () => {
-    // a piece outside on the terrain carries the ground's height under its middle (baseY):
-    // the model seats it there and the sim's collider tops it there, never at the porch's floor
-    const tubs = TAVERN_PROPS.filter((p) => p.baseY !== undefined);
-    expect(tubs.map((p) => p.kind)).toEqual(['planter', 'planter']);
+  it('stands every piece outside on the terrain, colliding there', () => {
+    // a piece outside on the terrain (the steps' and the terrace's flower tubs, and everything
+    // on the grounds but the dog on the porch) carries the ground's height under its middle
+    // (baseY): the model seats it there and the sim's collider tops it there
+    const outside = TAVERN_PROPS.filter((p) => p.baseY !== undefined);
+    expect(outside.filter((p) => p.kind === 'planter')).toHaveLength(4);
+    expect(outside.length).toBeGreaterThan(20);
     const layout = mirefenTavernLayout().props;
-    for (const p of tubs) {
+    for (const p of outside) {
       const w = tavernToWorld(p.x, p.z);
       const ground = terrainHeight(w.x, w.z, WORLD_SEED) - TAVERN_FLOOR_Y;
-      expect(Math.abs((p.baseY ?? 0) - ground), `${p.x}`).toBeLessThan(0.02);
+      expect(Math.abs((p.baseY ?? 0) - ground), `${p.kind} ${p.x}`).toBeLessThan(0.02);
       expect(tavernPropBaseY(p)).toBe(p.baseY);
       const c = tavernPropCollider(p);
-      expect(c.moveTopY).toBeCloseTo(TAVERN_FLOOR_Y + ground + p.height, 1);
-      expect(c.standable).toBe(true);
-      expect(layout.some((q) => q.kind === 'planter' && q.x === p.x && q.base === p.baseY)).toBe(
-        true,
-      );
+      if (p.standable) {
+        expect(c.moveTopY).toBeCloseTo(TAVERN_FLOOR_Y + ground + p.height, 1);
+        expect(c.standable).toBe(true);
+      }
+      expect(layout.some((q) => q.kind === p.kind && q.x === p.x && q.base === p.baseY)).toBe(true);
     }
   });
 

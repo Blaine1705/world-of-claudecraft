@@ -10,8 +10,8 @@ into the shell parts; build_tavern.py calls build(B, parts) for the rest.
   HallPorch       the tankard sign's carved mounting board and the wrought scrollwork under its
                   arm, and a small painted board hung under the tankard on two chains: a
                   crescent moon and a star on garnet, a picture only (no lettering)
-  TavernTrim      medium and up: slate hoods over the two ground-floor windows, window boxes
-                  and their greenery under all four front windows, the carved drops under the
+  TavernTrim      medium and up: window boxes and their greenery under the two ground-floor
+                  windows and the jettied storey's four, the carved drops under the
                   front bargeboards and the pendant at their apex, the painted roundel on the
                   porch canopy's gable, a worn doormat, weathering at the feet of the front's
                   posts
@@ -48,12 +48,14 @@ def build(B, parts):
     H = B.HALL
     mid = -H['x0']
     face = H['z1']
+    import tavern_jetty as JET
+
+    # the ground floor's windows shelter under the jettied storey (their old slate hoods went
+    # with it); the upper storey's leaded windows carry their own boxes on its face
     for (u0, u1, v0, v1) in S.FRONT_WINDOWS:
-        x0, x1 = u0 - mid, u1 - mid
-        window_hood(B, trim, x0, x1, v1, face)
-        window_box(B, trim, clutter, x0, x1, v0, face)
-    for (u0, u1, v0, v1) in S.FRONT_UPPER_WINDOWS:
-        window_box(B, trim, clutter, u0 - mid, u1 - mid, v0, face, scale=0.72)
+        window_box(B, trim, clutter, u0 - mid, u1 - mid, v0, face)
+    for (x, w) in JET.UPPER_WINDOWS:
+        window_box(B, trim, clutter, x - w / 2, x + w / 2, JET.UPPER_SILL, JET.face_z(B), scale=0.8)
     bargeboard_carving(B, trim)
     canopy_roundel(B, trim)
     creeper(B, clutter, face)
@@ -219,22 +221,6 @@ def sign_board(B, p, tx, base, tz):
 # ---------------------------------------------------------------------------
 # The windows
 # ---------------------------------------------------------------------------
-def window_hood(B, p, x0, x1, v1, face):
-    """A little slate hood over a ground-floor window and its open shutters, under the mid
-    rail, on two carved brackets, a drip board along its edge."""
-    xa, xb = x0 - 1.0, x1 + 1.0
-    back_y, front_y, depth = 5.55, 5.02, 0.86
-    lu = math.hypot(depth, back_y - front_y)
-    up = (0.0, (back_y - front_y) / lu, -depth / lu)
-    B.slate_plane(p, (xa, front_y, face + depth), (1, 0, 0), up, xb - xa, lu + 0.04, seed=21, step=0.4, seg=1.4,
-                  thick=0.07)
-    B.abox(p, xa, xb, front_y - 0.2, front_y + 0.03, face + depth - 0.03, face + depth + 0.07, B.PAL['beam_dark'],
-           B.WOOD)
-    for x in (xa + 0.25, xb - 0.25):
-        pts = [(x, v1 - 0.25, face + 0.02), (x, front_y - 0.2, face + 0.3), (x, front_y - 0.1, face + depth - 0.04)]
-        p.beam(pts, 0.12, 0.16, B.PAL['beam_dark'], B.WOOD, up=(1, 0, 0))
-
-
 def window_box(B, trim, clutter, x0, x1, v0, face, scale=1.0):
     """A garnet window box under a front window on two iron brackets: dark oak rims, green
     clumps spilling over its lip (trim) and red, cream and gold flowers in them (clutter).
@@ -377,8 +363,13 @@ def creeper(B, p, face):
     zf = face + 0.12
     front = ((1, 0, 0), (0, 1, 0), (0, 0, 1))
     side = ((0, 0, 1), (0, 1, 0), (-1, 0, 0))
+    import tavern_jetty as JET
+
+    # up the ground floor's corner post, round the jetty's bressumer and on up the upper storey
+    zj = JET.face_z(B) + 0.12
     stem = [(x + 0.05, g, zf), (x + 0.12, 0.2, zf), (x + 0.02, 1.6, zf), (x + 0.1, 3.0, zf), (x - 0.02, 4.4, zf),
-            (x + 0.08, 5.8, zf), (x + 0.02, 7.1, zf), (x + 0.2, 8.3, zf)]
+            (x + 0.06, 5.35, zf), (x + 0.1, 5.75, zf + 0.5), (x + 0.12, 6.35, zj), (x + 0.02, 7.4, zj),
+            (x + 0.2, 8.5, zj)]
     runner = [(x + 0.1, 1.5, zf), (x + 1.0, 1.62, zf), (x + 2.0, 1.52, zf), (x + 3.0, 1.62, zf),
               (x + 3.7, 1.56, zf)]
     brace = [(x + 0.08, 2.4, zf), (x + 0.7, 3.1, zf), (x + 1.3, 3.8, zf), (x + 1.8, 4.5, zf)]
@@ -404,7 +395,8 @@ def creeper(B, p, face):
     y = g + 0.3
     while y < top:
         t = (y - g) / (top - g)
-        pt = next(((a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]), y, zf)
+        pt = next(((a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]), y,
+                    a[2] + (b[2] - a[2]) * (y - a[1]) / (b[1] - a[1]))
                    for (a, b) in zip(stem, stem[1:]) if a[1] <= y <= b[1]), stem[-1])
         place(pt, front, 0.32 - 0.12 * t, 1.0 - 0.8 * t)
         if t < 0.6:

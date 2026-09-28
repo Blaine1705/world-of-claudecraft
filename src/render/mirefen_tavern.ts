@@ -27,6 +27,12 @@
 // point-light count). The per-frame work is the cutaway's segment tests and the fade steps.
 // A build registers the tavern's air with the indoor camera clamp (interior_camera.ts), and
 // the teardown drops it, so a world without the tavern clamps nothing.
+//
+// Life round it: the dog asleep on the porch is its own mesh (TAVERN_DOG_PART), breathing round
+// the spot where it lies (mirefen_tavern_dog_core.ts: a scale, no program change); the chimney
+// smoke (mirefen_tavern_smoke.ts) is built with the tavern at world build from medium effects up
+// (cosmetic), its program in the same props prewarm; the terrace's lantern strings throw two
+// warm lights into the fire-light budget like the rest (content TAVERN_TERRACE_LIGHTS).
 
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -42,6 +48,7 @@ import {
   TAVERN_YAW,
   tavernToWorld,
 } from '../sim/content/mirefen_tavern';
+import { TAVERN_TERRACE_LIGHTS } from '../sim/content/mirefen_tavern_grounds';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
@@ -56,11 +63,18 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import {
   mirefenTavernParts,
   newTavernShellState,
+  TAVERN_DOG_PART,
   TAVERN_SHELL_PARTS,
   type TavernShellPart,
   tavernShellOcclusion,
 } from './mirefen_tavern_core';
+import { DOG_BREATH_RANGE, type DogBreath, dogBreathInto } from './mirefen_tavern_dog_core';
 import { mirefenTavernCameraInterior } from './mirefen_tavern_interior_core';
+import {
+  buildMirefenTavernSmoke,
+  mirefenTavernSmokePrewarmPart,
+  type TavernSmokeView,
+} from './mirefen_tavern_smoke';
 import { ditherFadeUniform } from './occluder_dither_fade';
 import {
   applyOccluderFade,
@@ -106,6 +120,9 @@ interface TavernTemplate {
   parts: VertexColourPart[];
   /** Each shell part merged per material on its own, in the model's frame. */
   shell: Map<TavernShellPart, VertexColourPart[]>;
+  /** The dog, merged per material round its own origin (`dogAt`, in the model's frame). */
+  dog: VertexColourPart[];
+  dogAt: THREE.Vector3;
 }
 
 /** Templates by `effectsTier|standard`: a preset change converts anew. */
@@ -123,6 +140,13 @@ interface ShellRecord {
 
 let shell: ShellRecord[] = [];
 let shellGroup: THREE.Group | null = null;
+/** The dog's breathing group and the chimney smoke (null when not built). */
+let dogGroup: THREE.Group | null = null;
+let smoke: TavernSmokeView | null = null;
+let lifeClock = 0;
+const breath: DogBreath = { y: 1, xz: 1 };
+/** Where the dog lies (world), for its breathing range. */
+let dogWorld = { x: 0, z: 0 };
 let allMats: OccluderFadeMat[] = [];
 const state = newTavernShellState();
 /** Shell parts inside the building: they cast no shadow (the outer shell shades the room). */
@@ -140,6 +164,8 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): TavernTemplate {
   const buckets = new Map<THREE.Material, THREE.BufferGeometry[]>();
   const shellBuckets = new Map<TavernShellPart, Map<THREE.Material, THREE.BufferGeometry[]>>();
   const shellNames = new Set<string>(TAVERN_SHELL_PARTS);
+  const dogBucket = new Map<THREE.Material, THREE.BufferGeometry[]>();
+  const dogAt = new THREE.Vector3();
   for (const name of keep) {
     const part = root.getObjectByName(name);
     if (!part) continue;
@@ -147,6 +173,9 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): TavernTemplate {
     if (shellNames.has(name)) {
       into = new Map();
       shellBuckets.set(name as TavernShellPart, into);
+    } else if (name === TAVERN_DOG_PART) {
+      into = dogBucket;
+      dogAt.setFromMatrixPosition(new THREE.Matrix4().multiplyMatrices(inverse, part.matrixWorld));
     }
     part.traverse((node) => {
       const mesh = node as THREE.Mesh;
@@ -161,7 +190,10 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): TavernTemplate {
   }
   const shellParts = new Map<TavernShellPart, VertexColourPart[]>();
   for (const [name, b] of shellBuckets) shellParts.set(name, mergeVertexColourBuckets(b));
-  return { parts: mergeVertexColourBuckets(buckets), shell: shellParts };
+  // the dog round its own origin, so its breathing scales it where it lies
+  const dog = mergeVertexColourBuckets(dogBucket);
+  for (const d of dog) d.geometry.translate(-dogAt.x, -dogAt.y, -dogAt.z);
+  return { parts: mergeVertexColourBuckets(buckets), shell: shellParts, dog, dogAt };
 }
 
 function templateFor(): TavernTemplate {
@@ -229,12 +261,31 @@ export function buildMirefenTavern(): THREE.Group {
     model.add(mesh);
   }
   model.add(buildShell(template.shell));
+  // the dog asleep on the porch, breathing round where it lies
+  dogGroup = new THREE.Group();
+  dogGroup.name = 'mirefenTavernDog';
+  dogGroup.position.copy(template.dogAt);
+  for (const part of template.dog) {
+    const mesh = new THREE.Mesh(part.geometry, part.material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    dogGroup.add(mesh);
+  }
+  model.add(dogGroup);
+  dogWorld = tavernToWorld(template.dogAt.x, template.dogAt.z);
   lastParts = [
     ...template.parts,
+    ...template.dog,
     ...shell.flatMap((r) =>
       r.meshes.map((m) => ({ geometry: m.geometry, material: m.material as THREE.Material })),
     ),
   ];
+  // the chimney smoke: cosmetic, from medium effects up
+  smoke = GFX.effectsTier === 'low' ? null : buildMirefenTavernSmoke();
+  if (smoke) {
+    group.add(smoke.mesh);
+    lastParts.push(mirefenTavernSmokePrewarmPart());
+  }
   model.position.set(TAVERN_ORIGIN.x, TAVERN_FLOOR_Y, TAVERN_ORIGIN.z);
   model.rotation.y = TAVERN_YAW;
   model.userData.assetUrl = TAVERN_URL;
@@ -256,6 +307,7 @@ export const MIREFEN_TAVERN_LIGHTS = {
   stage: { color: 0xffb466, intensity: 12, distance: 10, decay: 2 },
   bar: { color: 0xffc070, intensity: 10, distance: 10, decay: 2 },
   nook: { color: 0xffb870, intensity: 14, distance: 11, decay: 2 },
+  terrace: { color: 0xffbe72, intensity: 16, distance: 12, decay: 2 },
 } as const;
 
 function light(
@@ -319,6 +371,9 @@ export function mirefenTavernLights(): THREE.PointLight[] {
   if (counter) out.push(light(L.bar, 'tavernBar', counter.x, 3.0, counter.z));
   // the nook's crown of candles, its light pooled on the nook's tables
   out.push(light(L.nook, 'tavernNook', TAVERN_TOWER.x, 4.0, TAVERN_TOWER.z));
+  // the terrace's lantern strings, a warm pool over each side's tables
+  for (const [x, y, z] of TAVERN_TERRACE_LIGHTS)
+    out.push(light(L.terrace, 'tavernTerrace', x, y, z));
   return out;
 }
 
@@ -384,6 +439,7 @@ export function updateMirefenTavernShell(
   fogFar = Number.POSITIVE_INFINITY,
 ): void {
   if (shell.length === 0) return;
+  updateMirefenTavernLife(camX, camZ, dt, reducedMotion);
   const reach = fogFar + MIREFEN_TAVERN_SHELL_CULL_SLACK;
   const far = (camX - ANCHOR.x) ** 2 + (camZ - ANCHOR.z) ** 2 > reach * reach;
   if (shellGroup && shellGroup.visible === far) shellGroup.visible = !far;
@@ -402,6 +458,22 @@ export function updateMirefenTavernShell(
   }
 }
 
+/** The life round the tavern this frame: the dog's breath and the chimney smoke. */
+function updateMirefenTavernLife(
+  camX: number,
+  camZ: number,
+  dt: number,
+  reducedMotion: boolean,
+): void {
+  lifeClock += dt;
+  smoke?.update(camX, camZ, dt);
+  if (!dogGroup) return;
+  const near =
+    (camX - dogWorld.x) ** 2 + (camZ - dogWorld.z) ** 2 < DOG_BREATH_RANGE * DOG_BREATH_RANGE;
+  dogBreathInto(lifeClock, reducedMotion || !near, breath);
+  if (dogGroup.scale.y !== breath.y) dogGroup.scale.set(breath.xz, breath.y, breath.xz);
+}
+
 /** Drop the shell records and dispose their material clones (a graphics-profile rebuild
  *  tears the old props down; a world without the tavern builds none). */
 export function clearMirefenTavernShell(): void {
@@ -416,6 +488,8 @@ export function clearMirefenTavernShell(): void {
   shell = [];
   allMats = [];
   shellGroup = null;
+  dogGroup = null;
+  smoke = null;
   unregisterCameraInterior(TAVERN_CAMERA_INTERIOR.id);
 }
 
@@ -432,6 +506,8 @@ export const mirefenTavernInternalsForTest = {
   assetUrl: TAVERN_URL,
   shell: (): readonly ShellRecord[] => shell,
   state: () => state,
+  dog: (): THREE.Group | null => dogGroup,
+  smoke: (): TavernSmokeView | null => smoke,
   /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
   setLoadedGltfForTest(gltf: GLTF | null): void {
     loaded = gltf;

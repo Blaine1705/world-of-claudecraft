@@ -8,6 +8,7 @@ import {
 } from '../src/render/foliage_core';
 import { BUILTIN_WORLD, PROPS } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import { tavernGroundsRects } from '../src/sim/mirefen_tavern_grounds';
 import {
   EASTBROOK_NOTICEBOARD_ASSET_ID,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
@@ -54,8 +55,11 @@ describe('Eastbrook town grass exclusion', () => {
     // settlement) each add a footprint and a reading-spot exclusion: 26 more.
     // The glider sign adds its footprint and reading-spot exclusions too.
     // The Mirefen tavern keeps grass off its floor: the hall, the wing, the tower and the
-    // porch with its steps (mirefenTavernGrassExclusions): 4 more.
-    expect(exclusions).toHaveLength(129);
+    // porch with its steps (mirefenTavernGrassExclusions): 4 more, and one per rectangle of
+    // its grounds (sim/mirefen_tavern_grounds.ts tavernGroundsRects: the forecourt, the stable
+    // and each piece outside).
+    expect(exclusions).toHaveLength(129 + tavernGroundsRects().length);
+    expect(tavernGroundsRects().length).toBe(27);
     for (const id of [
       'mirefen_tavern:hall',
       'mirefen_tavern:wing',

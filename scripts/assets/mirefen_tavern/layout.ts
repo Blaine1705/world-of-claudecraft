@@ -24,6 +24,7 @@ import {
   TAVERN_HALL,
   TAVERN_HATCH,
   TAVERN_HOOD,
+  TAVERN_JETTY,
   TAVERN_KEEPER_LOCAL,
   TAVERN_LANTERNS,
   TAVERN_NOOK,
@@ -40,6 +41,14 @@ import {
   tavernToWorld,
 } from '../../../src/sim/content/mirefen_tavern';
 import {
+  TAVERN_CHALKBOARD,
+  TAVERN_DOG,
+  TAVERN_FORECOURT,
+  TAVERN_LANTERN_STRINGS,
+  TAVERN_STABLE,
+  TAVERN_TERRACE_LIGHTS,
+} from '../../../src/sim/content/mirefen_tavern_grounds';
+import {
   TAVERN_TOWER_WALL_RUNS,
   tavernHallWalls,
   tavernPropBaseY,
@@ -51,8 +60,9 @@ import { WORLD_SEED } from '../../../src/sim/world_seed';
 const r4 = (v: number): number => Math.round(v * 1e4) / 1e4;
 const r3 = (v: number): number => Math.round(v * 1e3) / 1e3;
 
-/** The terrain grid under and round the building (local yards), at this spacing. */
-export const TERRAIN_GRID = { x0: -20, x1: 20, z0: -32, z1: 26, step: 1 } as const;
+/** The terrain grid under and round the building and its grounds (local yards: west far
+ *  enough for the stable and the cart), at this spacing. */
+export const TERRAIN_GRID = { x0: -32, x1: 20, z0: -32, z1: 26, step: 1 } as const;
 
 /** Terrain heights over the ground floor on a local grid (row-major, x fastest). */
 function grid(x0: number, x1: number, z0: number, z1: number, step: number) {
@@ -70,10 +80,11 @@ function grid(x0: number, x1: number, z0: number, z1: number, step: number) {
 
 export function mirefenTavernLayout() {
   return {
-    version: 2,
+    version: 3,
     origin: { ...TAVERN_ORIGIN, y: TAVERN_FLOOR_Y, yaw: r4(TAVERN_YAW) },
     hall: TAVERN_HALL,
     door: TAVERN_DOOR,
+    jetty: TAVERN_JETTY,
     porch: TAVERN_PORCH,
     wing: TAVERN_WING,
     tower: TAVERN_TOWER,
@@ -111,6 +122,14 @@ export function mirefenTavernLayout() {
     chandelier: TAVERN_CHANDELIER,
     hood: TAVERN_HOOD,
     keeper: TAVERN_KEEPER_LOCAL,
+    grounds: {
+      forecourt: TAVERN_FORECOURT,
+      stable: TAVERN_STABLE,
+      strings: TAVERN_LANTERN_STRINGS,
+      terraceLights: TAVERN_TERRACE_LIGHTS,
+      chalkboard: TAVERN_CHALKBOARD,
+      dog: TAVERN_DOG,
+    },
     terrain: grid(
       TERRAIN_GRID.x0,
       TERRAIN_GRID.x1,

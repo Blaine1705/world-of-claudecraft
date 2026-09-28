@@ -58,6 +58,7 @@ sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
 from shiplib import EDGE, FLAT, P, PLAIN, Piece, empty, scale_color, triangles  # noqa: E402
+from shiplib import G as game_of  # noqa: E402
 
 WOOD, METAL, STONE, PLASTER, GLOW = 0, 1, 2, 3, 4
 
@@ -157,6 +158,13 @@ def ground_min(points):
     return min(ground(x, z) for x, z in points)
 
 
+def hashf(*k):
+    """A stable pseudo-random number in [0, 1) from a few coordinates (no rng: every build of
+    the same source is identical)."""
+    v = math.sin(sum(x * (12.9898 + 7.233 * i) for i, x in enumerate(k)) + 0.5) * 43758.5453
+    return v - math.floor(v)
+
+
 # ---------------------------------------------------------------------------
 # Geometry helpers (game frame = the tavern's local frame)
 # ---------------------------------------------------------------------------
@@ -245,8 +253,22 @@ class Wall:
                self.pt(u0, v1, w0), self.pt(u1, top1, w0), self.pt(u1, top1, w1), self.pt(u0, v1, w1)]
         return hexa(p, pts, color, mat, tag)
 
-    def beam(self, p, u0, v0, u1, v1, w, width, depth, color, mat=WOOD):
-        """A timber on a face: from (u0, v0) to (u1, v1), its centre `w` out, `depth` across."""
+    def beam(self, p, u0, v0, u1, v1, w, width, depth, color, mat=WOOD, hewn=0.0):
+        """A timber on a face: from (u0, v0) to (u1, v1), its centre `w` out, `depth` across.
+        `hewn` makes it hand-hewn: each end wanders up to that far across the timber's line,
+        its width, depth and tone vary a little, all from a stable hash of where it stands
+        (no rng: the build stays deterministic)."""
+        if hewn > 0:
+            du, dv = u1 - u0, v1 - v0
+            n = math.hypot(du, dv) or 1.0
+            pu, pv = -dv / n, du / n
+            ka = (hashf(u0, v0, w, 1) - 0.5) * 2 * hewn
+            kb = (hashf(u1, v1, w, 2) - 0.5) * 2 * hewn
+            u0, v0 = u0 + pu * ka, v0 + pv * ka
+            u1, v1 = u1 + pu * kb, v1 + pv * kb
+            width *= 1 + (hashf(u0, v1, 3) - 0.5) * 0.22
+            depth *= 1 + (hashf(v0, u1, 4) - 0.5) * 0.3
+            color = scale_color(color, 0.9 + 0.16 * hashf(u0 + u1, v0 + v1, 5))
         ax, ay, az = self.pt(u0, v0, w)
         bx, by, bz = self.pt(u1, v1, w)
         # the beam's width lies in the wall's plane, its depth across it
@@ -254,7 +276,8 @@ class Wall:
 
 
 def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y0=0.0, inner=True,
-                seed=0, braces=True, plaster=None, inner_plaster=None, frame_to=None, breaks=()):
+                seed=0, braces=True, plaster=None, inner_plaster=None, frame_to=None, breaks=(), outer_to=None,
+                hewn=0.035):
     """A timber-framed wall on a stone base course.
 
     top(u) gives the wall's top along it (the eaves, or a gable). `openings` are
@@ -262,7 +285,9 @@ def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y
     is coursed blue-grey stone; above, ochre plaster panels between honey posts, rails and
     braces on both faces. The core sits a hand behind the timbers so they read proud.
     `breaks` are places along the wall where the core and the rails part (where the wall is
-    split into separate shell parts), so no solid runs across them."""
+    split into separate shell parts), so no solid runs across them. `outer_to` stops the outer
+    face's timbers at that height (the front under its jettied upper storey, whose own frame
+    stands a yard further out); `hewn` makes every timber of the frame hand-hewn (Wall.beam)."""
     plaster = plaster or PAL['plaster']
     inner_plaster = inner_plaster or PAL['plaster_in']
     L = wall.length
@@ -341,24 +366,31 @@ def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y
                     wall.box(p, a, b, v - 0.03, v + 0.03, half + 0.05, half + 0.075, PAL['stone_dark'], STONE)
             v += 0.62
     faces = [1] + ([-1] if inner else [])
-    frame_top = top if frame_to is None else (lambda u: min(top(u), frame_to))
+    base = max(stone_top, y0)
     for s in faces:
+        cap = frame_to
+        if s > 0 and outer_to is not None:
+            cap = outer_to if cap is None else min(cap, outer_to)
+        frame_top = top if cap is None else (lambda u, c=cap: min(top(u), c))
         w = s * (half + 0.03)
         depth = 0.12
         col = PAL['beam'] if s > 0 else PAL['honey'][1]
+        hw = hewn if s > 0 else hewn * 0.4
         # posts
         for u in posts:
             v1 = frame_top(u)
-            if v1 - stone_top < 0.3:
+            if v1 - base < 0.3:
                 continue
-            if any(a < u < b and v0 < stone_top + 0.1 < v1b for (a, b, v0, v1b) in openings):
+            if any(a < u < b and v0 < base + 0.1 < v1b for (a, b, v0, v1b) in openings):
                 continue
-            wall.beam(p, u, stone_top, u, v1, w, 0.34, depth, col)
+            wall.beam(p, u, base, u, v1, w, 0.34, depth, col, hewn=hw)
         # the sill beam on the stone, the mid rail and the top plate, broken at openings
-        rails = [stone_top + 0.15]
+        rails = [base + 0.15]
         eave_line = min(top(0.0), top(L))
-        if eave_line - stone_top > 3.0:
-            rails.append(stone_top + (eave_line - stone_top) * 0.5)
+        if cap is not None:
+            eave_line = min(eave_line, cap)
+        if eave_line - base > 3.0:
+            rails.append(base + (eave_line - base) * 0.5)
         rails.append(eave_line - 0.15)
         for rv in rails:
             u = 0.0
@@ -374,7 +406,7 @@ def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y
                 cut = [a] + sorted(u for u in breaks if a + 0.05 < u < b - 0.05) + [b]
                 for (ra, rb) in zip(cut, cut[1:]):
                     if rb - ra > 0.3:
-                        wall.beam(p, ra, rv, rb, rv, w, 0.28, depth, col)
+                        wall.beam(p, ra, rv, rb, rv, w, 0.28, depth, col, hewn=hw)
         # braces: one diagonal in each clear bay under the mid rail
         if braces and len(rails) >= 2:
             lo, hi = rails[0], rails[1]
@@ -384,44 +416,132 @@ def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y
                     continue
                 if any(oa < b and ob > a and v0 < hi for (oa, ob, v0, _) in openings):
                     continue
+                # never across a break (the wall's shell parts part there)
+                if any(a < u < b for u in breaks):
+                    continue
                 if (i + seed) % 2 == 0:
-                    wall.beam(p, a + 0.1, lo + 0.1, b - 0.1, hi - 0.1, w, 0.24, depth, col)
+                    wall.beam(p, a + 0.1, lo + 0.1, b - 0.1, hi - 0.1, w, 0.24, depth, col, hewn=hw)
                 else:
-                    wall.beam(p, a + 0.1, hi - 0.1, b - 0.1, lo + 0.1, w, 0.24, depth, col)
+                    wall.beam(p, a + 0.1, hi - 0.1, b - 0.1, lo + 0.1, w, 0.24, depth, col, hewn=hw)
     return posts
 
 
-def window(p, wall, u0, u1, v0, v1, t, shutters=True, bars=2, lit=False):
-    """A small window through a wall: a timber frame round the hole, a mullion and a transom,
-    leaded amber panes, a stone sill and a pair of garnet shutters folded back outside. A `lit`
-    window's panes are the lanterns' glowing glass (TavernGlow: the hall behind is lit)."""
+def flat_face(p, pts, color, mat, facing, tag=FLAT):
+    """A single flat polygon (game-frame corners) turned to face `facing` (a game-frame
+    direction): a decal on a surface, a leaded came on a pane, a chalk line on a board."""
+    from shiplib import P as _P
+    f = p.face(pts, color, mat, tag)
+    f.normal_update()
+    if f.normal.dot(_P(*facing)) < 0:
+        f.normal_flip()
+    return f
+
+
+def leaded(p, wall, u0, u1, v0, v1, w, facing, step=0.3, came=0.024):
+    """Diamond leading over one light of a window (u0..u1, v0..v1 in wall space) on the face
+    `w` out: two families of lead cames at 45 degrees, `step` apart across, clipped to the
+    light, each a thin flat strip."""
+    lead = (0.19, 0.19, 0.21)
+    for sgn in (1, -1):
+        # lines u - sgn*v = c across the light
+        cs = [u0 - sgn * v0, u1 - sgn * v0, u0 - sgn * v1, u1 - sgn * v1]
+        c0, c1 = min(cs), max(cs)
+        d = step * math.sqrt(2)
+        c = c0 + d * 0.5
+        while c < c1:
+            pts = []
+            # intersections with the four edges
+            for vv in (v0, v1):
+                uu = c + sgn * vv
+                if u0 - 1e-6 <= uu <= u1 + 1e-6:
+                    pts.append((uu, vv))
+            for uu in (u0, u1):
+                vv = (uu - c) * sgn
+                if v0 - 1e-6 <= vv <= v1 + 1e-6:
+                    pts.append((uu, vv))
+            pts = sorted(set((round(a, 5), round(b, 5)) for a, b in pts))
+            if len(pts) >= 2:
+                (au, av), (bu, bv) = pts[0], pts[-1]
+                ln = math.hypot(bu - au, bv - av)
+                if ln > 0.05:
+                    nu, nv = -(bv - av) / ln * came / 2, (bu - au) / ln * came / 2
+                    quad = [wall.pt(au + nu, av + nv, w), wall.pt(bu + nu, bv + nv, w),
+                            wall.pt(bu - nu, bv - nv, w), wall.pt(au - nu, av - nv, w)]
+                    flat_face(p, quad, lead, METAL, facing)
+            c += d
+    # the lead round the light's edge
+    for (a, b, c_, d_) in ((u0, u1, v0, v0 + came), (u0, u1, v1 - came, v1), (u0, u0 + came, v0, v1),
+                           (u1 - came, u1, v0, v1)):
+        flat_face(p, [wall.pt(a, c_, w), wall.pt(b, c_, w), wall.pt(b, d_, w), wall.pt(a, d_, w)], lead, METAL,
+                  facing)
+
+
+def window(p, wall, u0, u1, v0, v1, t, shutters=True, bars=1, lit=False, outer=True, inner=True, glass_w=0.0,
+           box_out=None):
+    """A leaded window through (or set in) a wall: a timber frame round the opening, a mullion
+    and `bars` transoms dividing it into lights, each light glazed in small diamond panes held
+    in lead, a stone sill with a drip, and a pair of planked shutters folded back outside on
+    iron strap hinges. A `lit` window's panes are the lanterns' glowing glass (TavernGlow: the
+    hall behind is lit). `outer`/`inner` pick the faces dressed (a window hidden behind a
+    jettied storey keeps only its inside; a decorative one only its outside); `glass_w` sets
+    the panes' plane across the wall."""
     half = t / 2
     col = PAL['beam_dark']
-    for s in (1, -1):
+    faces = ([1] if outer else []) + ([-1] if inner else [])
+    for s in faces:
         w = s * (half + 0.02)
-        wall.beam(p, u0 - 0.1, v0 - 0.08, u0 - 0.1, v1 + 0.08, w, 0.2, 0.14, col)
-        wall.beam(p, u1 + 0.1, v0 - 0.08, u1 + 0.1, v1 + 0.08, w, 0.2, 0.14, col)
-        wall.beam(p, u0 - 0.2, v1 + 0.1, u1 + 0.2, v1 + 0.1, w, 0.22, 0.16, col)
-    # panes in the wall's middle plane, and the lead cames
+        wall.beam(p, u0 - 0.1, v0 - 0.08, u0 - 0.1, v1 + 0.08, w, 0.2, 0.14, col, hewn=0.012)
+        wall.beam(p, u1 + 0.1, v0 - 0.08, u1 + 0.1, v1 + 0.08, w, 0.2, 0.14, col, hewn=0.012)
+        wall.beam(p, u0 - 0.2, v1 + 0.1, u1 + 0.2, v1 + 0.1, w, 0.22, 0.16, col, hewn=0.012)
+    # the panes in the wall's middle plane (or `glass_w` out)
+    gw = glass_w
     if lit:
-        wall.box(p, u0, u1, v0, v1, -0.03, 0.03, PAL['glass_lit'], GLOW, tag=FLAT)
+        wall.box(p, u0, u1, v0, v1, gw - 0.03, gw + 0.03, PAL['glass_lit'], GLOW, tag=FLAT)
     else:
-        wall.box(p, u0, u1, v0, v1, -0.03, 0.03, PAL['glass'], STONE, tag=FLAT)
+        wall.box(p, u0, u1, v0, v1, gw - 0.03, gw + 0.03, PAL['glass'], STONE, tag=FLAT)
     um = (u0 + u1) / 2
-    wall.box(p, um - 0.05, um + 0.05, v0, v1, -0.07, 0.07, col, WOOD)
-    for k in range(1, bars + 1):
-        vv = v0 + (v1 - v0) * k / (bars + 1)
-        wall.box(p, u0, u1, vv - 0.04, vv + 0.04, -0.06, 0.06, col, WOOD)
-    # sill
-    wall.box(p, u0 - 0.25, u1 + 0.25, v0 - 0.18, v0, -half - 0.02, half + 0.2, PAL['stone_dark'], STONE)
+    wall.box(p, um - 0.06, um + 0.06, v0, v1, gw - 0.08, gw + 0.08, col, WOOD)
+    rails = [v0 + (v1 - v0) * k / (bars + 1) for k in range(1, bars + 1)]
+    for vv in rails:
+        wall.box(p, u0, u1, vv - 0.05, vv + 0.05, gw - 0.07, gw + 0.07, col, WOOD)
+    # the diamond leading over every light, on each dressed face
+    edges_v = [v0] + [x for vv in rails for x in (vv - 0.05, vv + 0.05)] + [v1]
+    lights_v = list(zip(edges_v[0::2], edges_v[1::2]))
+    for s in faces:
+        facing = (wall.nx * s, 0.0, wall.nz * s)
+        for (la, lb) in ((u0, um - 0.06), (um + 0.06, u1)):
+            for (va, vb) in lights_v:
+                leaded(p, wall, la, lb, va, vb, gw + s * 0.034, facing)
+    if not outer:
+        return
+    # the sill: dressed stone, a drip under its lip
+    sw = box_out if box_out is not None else half + 0.2
+    wall.box(p, u0 - 0.25, u1 + 0.25, v0 - 0.18, v0, -half - 0.02, sw, PAL['stone_dark'], STONE)
+    wall.box(p, u0 - 0.22, u1 + 0.22, v0 - 0.24, v0 - 0.18, sw - 0.1, sw, PAL['stone_dark'], STONE)
     if shutters:
         width = (u1 - u0) / 2
         for side, ue in ((-1, u0), (1, u1)):
-            a, b = (ue - width - 0.12, ue - 0.12) if side < 0 else (ue + 0.12, ue + width + 0.12)
-            wall.box(p, a, b, v0, v1, half + 0.06, half + 0.14, PAL['garnet_dark'], WOOD)
-            for vv in (v0 + (v1 - v0) * 0.25, v0 + (v1 - v0) * 0.75):
-                wall.box(p, a + 0.05, b - 0.05, vv - 0.05, vv + 0.05, half + 0.14, half + 0.17, PAL['beam'],
+            a, b = (ue - width - 0.14, ue - 0.14) if side < 0 else (ue + 0.14, ue + width + 0.14)
+            # three planks with a hairline between, a little uneven at the top
+            n = 3
+            for k in range(n):
+                pa = a + (b - a) * k / n + 0.008
+                pb = a + (b - a) * (k + 1) / n - 0.008
+                tone = scale_color(PAL['garnet_dark'], 0.92 + 0.14 * hashf(pa, v0, 7))
+                wall.box(p, pa, pb, v0, v1 - 0.03 * (k % 2), half + 0.06, half + 0.14, tone, WOOD)
+            # the ledges and the brace between them (a Z), in dark oak
+            ya, yb = v0 + (v1 - v0) * 0.18, v0 + (v1 - v0) * 0.82
+            for vv in (ya, yb):
+                wall.box(p, a + 0.04, b - 0.04, vv - 0.06, vv + 0.06, half + 0.14, half + 0.18, PAL['beam_dark'],
                          WOOD)
+            if side < 0:
+                wall.beam(p, a + 0.1, ya + 0.06, b - 0.1, yb - 0.06, half + 0.16, 0.08, 0.04, PAL['beam_dark'])
+            else:
+                wall.beam(p, b - 0.1, ya + 0.06, a + 0.1, yb - 0.06, half + 0.16, 0.08, 0.04, PAL['beam_dark'])
+            # the iron strap hinges running in from the jamb, and the hooks that hold it open
+            for vv in (ya, yb):
+                ua, ub = (b - width * 0.7, b + 0.02) if side < 0 else (a - 0.02, a + width * 0.7)
+                wall.box(p, ua, ub, vv - 0.025, vv + 0.025, half + 0.18, half + 0.2, PAL['iron'], METAL)
 
 
 def slate_plane(p, e0, along, up, la, lu, seed=0, step=0.72, seg=4.6, thick=0.09, clip=None):
@@ -488,10 +608,13 @@ def make_materials():
 # ---------------------------------------------------------------------------
 # Scene
 # ---------------------------------------------------------------------------
+import tavern_dog as DOG  # noqa: E402
 import tavern_facade as FA  # noqa: E402
+import tavern_grounds as GR  # noqa: E402
 import tavern_frame as F  # noqa: E402
 import tavern_furnish as U  # noqa: E402
 import tavern_shell as S  # noqa: E402
+import tavern_weather as WX  # noqa: E402
 
 SHELL = ('HallWallFront', 'HallWallFrontLeft', 'HallWallFrontRight', 'HallWallBack', 'HallWallLeft',
          'HallWallRight', 'HallRoof', 'WingWallEast', 'WingWallBack', 'WingWallWest', 'WingRoof', 'TowerWall',
@@ -499,7 +622,9 @@ SHELL = ('HallWallFront', 'HallWallFrontLeft', 'HallWallFrontRight', 'HallWallBa
 # the front wall's three parts meet this far either side of the door's middle
 # (src/render/mirefen_tavern_core.ts TAVERN_FRONT_SPLIT)
 FRONT_SPLIT = 3.2
-CRITICAL = ('TavernFrame', 'TavernFurnishings', 'TavernLights') + SHELL
+# the grounds outside (the forecourt, the terrace, the stable, the cart, the woodpile) and the dog
+# asleep on the porch, its own part so the runtime can make it breathe
+CRITICAL = ('TavernFrame', 'TavernFurnishings', 'TavernLights', 'TavernGrounds', 'TavernDog') + SHELL
 TRIM = ('TavernTrim',)
 OPTIONAL = ('TavernClutter',)
 
@@ -669,6 +794,9 @@ def build_scene():
     S.build(this, parts)
     U.build(this, parts)
     FA.build(this, parts)
+    WX.build(this, parts)
+    GR.build(this, parts)
+    DOG.build(this, parts)
     # the front wall's two sides are their own parts: a camera at an angle to the door ghosts
     # only the side between it and the player
     split_part(parts, 'HallWallFront', [('HallWallFrontLeft', lambda c: c.x < -FRONT_SPLIT),
@@ -679,7 +807,10 @@ def build_scene():
     for name in CRITICAL + TRIM + OPTIONAL:
         if not parts[name].bm.faces:
             raise RuntimeError(f'part {name} is empty')
-        pieces[name] = parts[name].finish(mats, root)
+        # the dog's origin is where it lies, so the runtime breathes it round its own middle
+        dog = LAYOUT['grounds']['dog']
+        at = (dog['x'], 0.0, dog['z']) if name == 'TavernDog' else (0.0, 0.0, 0.0)
+        pieces[name] = parts[name].finish(mats, root, location=at)
     root['mirefenTavern'] = {
         'layoutVersion': LAYOUT['version'],
         'tiers': {'low': list(CRITICAL), 'medium': list(TRIM), 'high': list(OPTIONAL)},

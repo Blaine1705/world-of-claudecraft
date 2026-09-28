@@ -75,7 +75,7 @@ async function chat(line) {
   }, line);
 }
 await chat(process.env.DAYNIGHT ?? '/daynight day');
-await sleep(4000);
+await sleep(Number(process.env.DAYNIGHT_WAIT ?? 4000));
 console.log(
   'graphics',
   await run(
@@ -154,6 +154,17 @@ const SHOTS = [
   ['hall_from_stage', -12.0, -10.5, 6.0, 8.0, 0.35, 12],
   ['hall_from_bar', 9.0, -5.0, -8.0, 6.0, 0.4, 14],
   ['hall_high', 0.0, -2.0, 0.0, 10.0, 0.75, 18],
+  // the grounds and the front (the jettied storey, the terrace, the stable, the dog, the smoke)
+  ['fachada_camino', 0.0, 32.0, 0.0, 10.0, 0.16, 16],
+  ['fachada_camino_angulo', 12.0, 30.0, 0.0, 2.0, 0.26, 30],
+  ['voladizo_cerca', -9.0, 17.2, -9.0, 13.0, 0.02, 6],
+  ['ventanas_cerca', 9.0, 22.0, 9.0, 13.0, 0.1, 5],
+  ['terraza', -3.0, 24.0, -11.0, 17.5, 0.35, 11],
+  ['establo_carro', -17.5, 8.0, -23.5, 1.5, 0.3, 10],
+  ['perro', -1.6, 17.8, -3.4, 15.9, 0.35, 4.5],
+  ['chimenea_humo', 26.0, 18.0, 16.0, 2.0, 0.15, 26],
+  ['lenera', 24.0, 10.0, 17.0, 6.0, 0.2, 9],
+  ['humo_cerca', 36.0, 8.0, 16.0, 2.5, -0.15, 9],
 ];
 const WALKS = process.env.WALKS === '1' || process.env.WALKS_ONLY === '1';
 if (process.env.WALKS_ONLY !== '1') {

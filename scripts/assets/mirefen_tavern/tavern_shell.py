@@ -30,6 +30,8 @@ curtain, the kitchen hatch, the wall fireplace and its river-stone chimney).
 import math
 
 import tavern_facade as FA
+import tavern_jetty as JET
+import tavern_roofing as RF
 
 # the two ground-floor windows in the front gable, either side of the door (u along the
 # wall from its left end, v up): the window booths inside look out of them
@@ -45,7 +47,7 @@ def build(B, parts):
     hall_back(B, parts['HallWallBack'], parts['TavernTrim'])
     hall_left(B, parts['HallWallLeft'])
     hall_right(B, parts['HallWallRight'])
-    hall_roof(B, parts['HallRoof'])
+    hall_roof(B, parts['HallRoof'], parts['TavernClutter'])
     wing_walls(B, parts)
     wing_roof(B, parts['WingRoof'])
     tower_wall(B, parts['TowerWall'], parts['TavernTrim'])
@@ -86,11 +88,11 @@ def lantern(B, p, x, y, z, s=0.34):
     p.box((x, y + s * 1.12, z), (0.06, 0.16, 0.06), iron, B.METAL)
 
 
-def oculus(B, p, wall, u, v, r, t, lit=False):
+def oculus(B, p, wall, u, v, r, t, lit=False, outer=True, inner=True):
     """A round window: a timber ring round warm glass (glowing when `lit`), a cross of
-    glazing bars."""
+    glazing bars; `outer`/`inner` pick the faces its ring dresses."""
     half = t / 2
-    for s in (1, -1):
+    for s in ([1] if outer else []) + ([-1] if inner else []):
         c = wall.pt(u, v, s * (half + 0.05))
         p.ring(c, r, 0.2, B.PAL['beam_dark'], segments=14, axis=(wall.nx, 0, wall.nz), mat=B.WOOD, depth=0.14)
     c = wall.pt(u, v, 0)
@@ -110,9 +112,10 @@ def corbels(B, p, wall, u0, u1, v, t, every=3.2):
         wall.box(p, u - 0.16, u + 0.16, v - 0.2, v, t / 2, t / 2 + 0.5, B.PAL['beam_dark'], B.WOOD)
 
 
-def gable_timbers(B, p, wall, top, t, eave, mid_u, span, breaks=()):
-    """The gable's king post, collar and struts, both faces, and the jettied bressumer; the
-    collar and the bressumer part at `breaks` (where the wall is split into shell parts)."""
+def gable_timbers(B, p, wall, top, t, eave, mid_u, span, breaks=(), faces=(1, -1), bressumer=True):
+    """The gable's king post, collar and struts on `faces` (1 outside, -1 inside), and the
+    jettied bressumer on its brackets; the collar and the bressumer part at `breaks` (where the
+    wall is split into shell parts)."""
     apex = top(mid_u)
     collar = eave + (apex - eave) * 0.42
 
@@ -120,9 +123,9 @@ def gable_timbers(B, p, wall, top, t, eave, mid_u, span, breaks=()):
         cut = [a] + sorted(u for u in breaks if a + 0.05 < u < b - 0.05) + [b]
         return list(zip(cut, cut[1:]))
 
-    for s in (1, -1):
+    for s in faces:
         w = s * (t / 2 + 0.03)
-        wall.beam(p, mid_u, eave + 0.2, mid_u, apex - 0.1, w, 0.36, 0.12, B.PAL['beam'])
+        wall.beam(p, mid_u, eave + 0.2, mid_u, apex - 0.1, w, 0.36, 0.12, B.PAL['beam'], hewn=0.02)
         cu = (B.HALL['ridge'] - 0.1 - collar) / pitch(B)
         for (a, b) in runs(mid_u - cu + 0.2, mid_u + cu - 0.2):
             wall.beam(p, a, collar, b, collar, w, 0.3, 0.12, B.PAL['beam'])
@@ -132,6 +135,8 @@ def gable_timbers(B, p, wall, top, t, eave, mid_u, span, breaks=()):
             for (f0, f1) in zip(cut, cut[1:]):
                 wall.beam(p, ua + (ub - ua) * f0, va + (vb - va) * f0, ua + (ub - ua) * f1, va + (vb - va) * f1, w,
                           0.26, 0.12, B.PAL['beam'])
+    if not bressumer:
+        return collar
     # the jettied bressumer beam across the eave line, on carved brackets
     for (a, b) in runs(0.0, wall.length):
         wall.box(p, a, b, eave - 0.1, eave + 0.45, t / 2 - 0.1, t / 2 + 0.4, B.PAL['beam_dark'], B.WOOD)
@@ -221,14 +226,23 @@ def hall_front(B, p, porch_part):
     openings = [(d0, d1, 0.0, door['height']), *FRONT_WINDOWS, *FRONT_UPPER_WINDOWS]
     # the wall parts either side of the door (build_tavern.py FRONT_SPLIT): nothing runs across
     breaks = (mid - B.FRONT_SPLIT, mid + B.FRONT_SPLIT)
-    # the posts' local x, for the weathering at their feet (tavern_facade.py)
+    jy = B.LAYOUT['jetty']['y']
+    # the posts' local x, for the weathering at their feet (tavern_facade.py); outside, the
+    # ground floor's frame stops under the jettied upper storey, whose own frame stands a yard
+    # further out (tavern_jetty.py)
     FRONT_POSTS[:] = [u - mid for u in B.timber_wall(p, wall, t, top, openings, base_h=1.4, bays=3.6, seed=1,
-                                                      breaks=breaks)]
-    # the front's windows glow like the lanterns: the lit hall behind them, seen from the road
+                                                      breaks=breaks, outer_to=jy)]
+    # the front's windows glow like the lanterns: the lit hall behind them, seen from the road;
+    # the upper ones and the round gable window keep only their inside (the jettied storey
+    # stands in front of them outside, with its own windows)
     for (a, b, v0, v1) in openings[1:]:
-        B.window(p, wall, a, b, v0, v1, t, shutters=v0 < 5, lit=True)
-    gable_timbers(B, p, wall, top, t, H['eave'], mid, H['x1'] - H['x0'], breaks=breaks)
-    oculus(B, p, wall, mid, H['eave'] + (H['ridge'] - H['eave']) * 0.62, 1.0, t, lit=True)
+        low = v0 < 5
+        B.window(p, wall, a, b, v0, v1, t, shutters=low, lit=True, outer=low)
+    gable_timbers(B, p, wall, top, t, H['eave'], mid, H['x1'] - H['x0'], breaks=breaks, faces=(-1,),
+                  bressumer=False)
+    oculus(B, p, wall, mid, H['eave'] + (H['ridge'] - H['eave']) * 0.62, 1.0, t, lit=True, outer=False)
+    # the jettied upper storey over it all, a yard toward the road
+    JET.skin(B, p)
     # the doorway: heavy posts, a lintel with carved spandrel braces, a stone step
     col = B.PAL['beam_dark']
     for s in (1, -1):
@@ -255,9 +269,11 @@ def hall_front(B, p, porch_part):
     # the door lanterns either side of the canopy
     for x in (-5.0, 5.0):
         FA.door_lantern(B, p, x, 4.2, H['z1'])
-    # the porch canopy: a small slate gable on two great curved brackets (its own part)
+    # the porch canopy: a small slate gable on two great curved brackets (its own part), its
+    # back against the jettied storey's face
     p = porch_part
     q = B.LAYOUT['porch']
+    zj = JET.face_z(B)
     ez, eave, ridge, hwc = q['z1'] + 0.6, 6.2, 8.4, 3.9
     front = ez
     for s in (1, -1):
@@ -266,15 +282,15 @@ def hall_front(B, p, porch_part):
         p.beam(pts, 0.34, 0.4, col, B.WOOD, up=(1, 0, 0))
         B.abox(p, x - 0.2, x + 0.2, 3.8, 4.6, H['z1'], H['z1'] + 0.35, B.PAL['stone_dark'], B.STONE)
     B.abox(p, -hwc, hwc, eave - 0.2, eave + 0.1, front - 0.25, front, col, B.WOOD)
-    L = front - H['z1']
+    L = front - zj
     lu = math.hypot(hwc, ridge - eave)
     for s in (1, -1):
         up = (-s * hwc / lu, (ridge - eave) / lu, 0.0)
-        B.slate_plane(p, (s * (hwc + 0.1), eave + 0.1, H['z1']), (0, 0, 1), up, L + 0.3, lu, seed=5 + s, step=0.5,
-                      seg=1.6)
-        B.hexa(p, [(s * (hwc + 0.1), eave - 0.05, H['z1']), (0, ridge - 0.05, H['z1']), (0, ridge - 0.05, front + 0.3),
-                   (s * (hwc + 0.1), eave - 0.05, front + 0.3), (s * (hwc + 0.1), eave + 0.1, H['z1']),
-                   (0, ridge + 0.1, H['z1']), (0, ridge + 0.1, front + 0.3), (s * (hwc + 0.1), eave + 0.1, front + 0.3)],
+        RF.shingle_plane(B, p, (s * (hwc + 0.1), eave + 0.1, zj), (0, 0, 1), up, L + 0.3, lu, seed=5 + s,
+                         step=0.42, size=0.62, moss=0.35)
+        B.hexa(p, [(s * (hwc + 0.1), eave - 0.05, zj), (0, ridge - 0.05, zj), (0, ridge - 0.05, front + 0.3),
+                   (s * (hwc + 0.1), eave - 0.05, front + 0.3), (s * (hwc + 0.1), eave + 0.1, zj),
+                   (0, ridge + 0.1, zj), (0, ridge + 0.1, front + 0.3), (s * (hwc + 0.1), eave + 0.1, front + 0.3)],
                B.PAL['sarking'], B.WOOD)
         B.beam(p, (s * (hwc + 0.2), eave - 0.1, front + 0.35), (0, ridge + 0.05, front + 0.35), 0.14, 0.4, col)
     # the canopy's little gable face over the door
@@ -282,11 +298,12 @@ def hall_front(B, p, porch_part):
                (-0.05, ridge - 0.1, front - 0.1), (0.05, ridge - 0.1, front - 0.1), (0.05, ridge - 0.1, front),
                (-0.05, ridge - 0.1, front)], B.PAL['plaster'][0], B.PLASTER)
     # the giant tankard on its iron arm, out over the porch's right side toward the road
+    # (the tankard hangs where it always has; its arm now springs from the jettied storey)
     tx, tz, arm = 8.4, H['z1'] + 3.8, 12.0
-    B.beam(p, (tx, arm, H['z1'] + 0.1), (tx, arm, tz + 0.7), 0.24, 0.24, B.PAL['iron'], B.METAL)
+    B.beam(p, (tx, arm, zj + 0.1), (tx, arm, tz + 0.7), 0.24, 0.24, B.PAL['iron'], B.METAL)
     p.box((tx, arm + 0.2, tz + 0.75), (0.3, 0.3, 0.3), B.PAL['iron'], B.METAL, taper=0.2)
     # the arm's carved mounting board and the wrought scrollwork under it
-    FA.sign_ironwork(B, p, tx, arm, H['z1'], tz)
+    FA.sign_ironwork(B, p, tx, arm, zj, tz)
     top_y = arm - 1.6
     for dz in (-0.7, 0.7):
         B.chain(p, (tx, arm - 0.1, tz + dz * 0.5), (tx, top_y + 0.3, tz + dz), links=5)
@@ -602,7 +619,7 @@ def hall_right(B, p):
 # ---------------------------------------------------------------------------
 # The hall roof
 # ---------------------------------------------------------------------------
-def hall_roof(B, p):
+def hall_roof(B, p, clutter):
     H = B.HALL
     k = pitch(B)
     over = H['eaveOut']
@@ -612,7 +629,12 @@ def hall_roof(B, p):
     lu = math.hypot(xe, H['ridge'] - ye)
     for s in (1, -1):
         up = (-s * xe / lu, (H['ridge'] - ye) / lu, 0.0)
-        B.slate_plane(p, (s * xe, ye + 0.03, zb), (0, 0, 1), up, zf - zb, lu, seed=11 + s)
+        # irregular mossy shingles, a course of battens over the sarking (the roof reads thick
+        # at its edges), flaring out a little at the eaves; the north slope, in the shade,
+        # carries more moss
+        RF.shingle_plane(B, p, (s * xe, ye + 0.17, zb), (0, 0, 1), up, zf - zb + 0.1, lu, seed=11 + s,
+                         step=0.66, size=1.1, moss=0.75 if s > 0 else 0.5, bell=1.8)
+        RF.moss_clumps(B, clutter, (s * xe, ye + 0.17, zb), (0, 0, 1), up, zf - zb, lu, seed=13 + s, count=34)
         # the sarking under the slates (the room's ceiling between the rafters)
         B.hexa(p, [(s * xe, ye - 0.16, zb), (0, H['ridge'] - 0.16, zb), (0, H['ridge'] - 0.16, zf),
                    (s * xe, ye - 0.16, zf), (s * xe, ye + 0.03, zb), (0, H['ridge'] + 0.03, zb),
@@ -628,19 +650,29 @@ def hall_roof(B, p):
                    B.PAL['beam_dark'], B.WOOD)
         xa, xb = sorted((s * H['x1'], s * xe))
         B.abox(p, xa, xb, ye - 0.3, ye - 0.16, zb, zf, B.PAL['beam'], B.WOOD)
-        B.abox(p, s * xe - 0.08 if s > 0 else s * xe - 0.08, s * xe + 0.08, ye - 0.5, ye + 0.15, zb, zf,
-               B.PAL['beam_dark'], B.WOOD)
-        # the bargeboards at both gables
+        # a deep fascia board along the eave, the roof's thickness showing over it
+        B.abox(p, s * xe - 0.1, s * xe + 0.1, ye - 0.62, ye + 0.3, zb, zf, B.PAL['beam_dark'], B.WOOD)
+        # the rafters' feet under the deep eave, their ends showing
+        z = zb + 0.6
+        while z < zf - 0.3:
+            B.abox(p, min(s * H['x1'], s * (xe - 0.1)), max(s * H['x1'], s * (xe - 0.1)), ye - 0.3 + (0.0 if s > 0 else 0.0),
+                   ye - 0.16, z - 0.09, z + 0.09, B.PAL['beam_dark'], B.WOOD)
+            z += 1.9
+        # the bargeboards at both gables: deep, the thick edge of the roof over the verge
         for zz in (zf + 0.1, zb - 0.1):
-            B.beam(p, (s * (xe + 0.1), ye - 0.2, zz), (0.0, H['ridge'] + 0.12, zz), 0.16, 0.62, B.PAL['beam_dark'])
+            B.beam(p, (s * (xe + 0.1), ye - 0.3, zz), (0.0, H['ridge'] + 0.2, zz), 0.2, 0.9, B.PAL['beam_dark'])
     # the ridge beam under the ridge, the ridge cap over it, the finials at the gables
     B.abox(p, -0.3, 0.3, H['ridge'] - 1.1, H['ridge'] - 0.4, zb + 0.2, zf - 0.8, B.PAL['beam_dark'], B.WOOD)
-    B.beam(p, (0, H['ridge'] + 0.16, zb), (0, H['ridge'] + 0.16, zf), 0.62, 0.3, B.PAL['slate_ridge'], B.STONE)
+    B.beam(p, (0, H['ridge'] + 0.2, zb), (0, H['ridge'] + 0.2, zf), 0.62, 0.3, B.PAL['slate_ridge'], B.STONE)
+    RF.ridge_cappers(B, p, (0, H['ridge'] + 0.36, zb - 0.1), (0, H['ridge'] + 0.36, zf + 0.1), seed=3)
     for zz in (zf + 0.1, zb - 0.1):
         B.post(p, 0, zz, H['ridge'] - 0.8, H['ridge'] + 1.1, 0.28, B.PAL['beam_dark'])
         p.box((0, H['ridge'] + 1.25, zz), (0.32, 0.32, 0.32), B.PAL['beam'], B.WOOD, taper=0.3)
     for zt in H['trusses']:
         hammerbeam_truss(B, p, zt)
+    # the dormers: two on the south slope, two on the north clear of the chimney
+    for side, zc in ((-1, -6.5), (-1, 6.5), (1, -7.0), (1, 8.0)):
+        RF.dormer(B, p, side, zc, 10.4)
 
 
 # the hammerbeam trusses' collar line and the depth of a principal rafter under the slates
@@ -764,7 +796,8 @@ def wing_roof(B, p):
         up = (-s * half / lu, (W['ridge'] - ye) / lu, 0.0)
         runs = [(zb, zf)] if s > 0 else [(zb, tower_cut)]
         for (za, zc) in runs:
-            B.slate_plane(p, (xm + s * half, ye + 0.03, za), (0, 0, 1), up, zc - za, lu, seed=21 + s)
+            RF.shingle_plane(B, p, (xm + s * half, ye + 0.17, za), (0, 0, 1), up, zc - za, lu, seed=21 + s,
+                             moss=0.6 if s > 0 else 0.4, bell=1.2)
             B.hexa(p, [(xm + s * half, ye - 0.16, za), (xm, W['ridge'] - 0.16, za), (xm, W['ridge'] - 0.16, zc),
                        (xm + s * half, ye - 0.16, zc), (xm + s * half, ye + 0.03, za), (xm, W['ridge'] + 0.03, za),
                        (xm, W['ridge'] + 0.03, zc), (xm + s * half, ye + 0.03, zc)], B.PAL['sarking'], B.WOOD)
@@ -775,7 +808,8 @@ def wing_roof(B, p):
             ys = W['ridge'] - hl * k
             lu2 = math.hypot(hl, W['ridge'] - ys)
             up2 = (hl / lu2, (W['ridge'] - ys) / lu2, 0.0)
-            B.slate_plane(p, (xs, ys + 0.03, tower_cut), (0, 0, 1), up2, zf - tower_cut, lu2, seed=25)
+            RF.shingle_plane(B, p, (xs, ys + 0.17, tower_cut), (0, 0, 1), up2, zf - tower_cut, lu2, seed=25,
+                             moss=0.4)
             B.hexa(p, [(xs, ys - 0.16, tower_cut), (xm, W['ridge'] - 0.16, tower_cut), (xm, W['ridge'] - 0.16, zf),
                        (xs, ys - 0.16, zf), (xs, ys + 0.03, tower_cut), (xm, W['ridge'] + 0.03, tower_cut),
                        (xm, W['ridge'] + 0.03, zf), (xs, ys + 0.03, zf)], B.PAL['sarking'], B.WOOD)

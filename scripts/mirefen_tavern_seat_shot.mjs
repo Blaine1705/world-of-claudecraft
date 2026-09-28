@@ -155,6 +155,7 @@ const SEATED = [
   ['sit_longbench', 'tavern_longbench_1_1', 0.6, 0.18, 5.5],
   ['sit_stage', 'tavern_stool_3', 0.4, 0.14, 5.5],
   ['sit_porch', 'tavern_porch_0_0', 0.6, 0.16, 6],
+  ['sit_terrace', 'tavern_terrace_0_1', 0.5, 0.22, 7],
 ];
 for (const [name, id, around, pitch, dist] of SEATED) {
   if (!want(name)) continue;

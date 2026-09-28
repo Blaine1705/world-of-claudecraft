@@ -32,6 +32,7 @@ import {
   TAVERN_DOOR,
   TAVERN_FLOOR_Y,
   TAVERN_HALL,
+  TAVERN_JETTY,
   TAVERN_ORIGIN,
   TAVERN_PORCH,
   TAVERN_PROPS,
@@ -62,16 +63,27 @@ export const TAVERN_SHELL_PARTS = [
 ] as const;
 export type TavernShellPart = (typeof TAVERN_SHELL_PARTS)[number];
 
-/** Walkable structure, solids, the shell and the landmarks: never shed. */
+/** The dog asleep on the porch: its own mesh round its own origin, so the painter can make it
+ *  breathe (mirefen_tavern_dog_core.ts). */
+export const TAVERN_DOG_PART = 'TavernDog';
+
+/** Walkable structure, solids, the shell and the landmarks: never shed. The grounds (the
+ *  forecourt's bed, the terrace's tables and benches, the lantern posts and strings, the stable,
+ *  the trough, the hay, the cart, the woodpile) collide or light the way on every tier, and the
+ *  dog has a collider, so it stays too. */
 export const TAVERN_CRITICAL_PARTS = [
   'TavernFrame',
   'TavernFurnishings',
   'TavernLights',
+  'TavernGrounds',
+  TAVERN_DOG_PART,
   ...TAVERN_SHELL_PARTS,
 ] as const;
-/** Medium and up: iron bands, the brass foot rail, braces, stretchers, rivets. */
+/** Medium and up: iron bands, the brass foot rail, braces, stretchers, rivets, the forecourt's
+ *  cobbles, the chalkboard menu. */
 export const TAVERN_TRIM_PARTS = ['TavernTrim'] as const;
-/** High and up: tankards, plates, dice, the lute, firewood, rugs, the cat. */
+/** High and up: tankards, plates, dice, the lute, firewood, rugs, the cat, the moss cushions
+ *  on the roof and the plinth, straw, sacks, the stable's tack. */
 export const TAVERN_OPTIONAL_PARTS = ['TavernClutter'] as const;
 
 const TIER_RANK: Readonly<Record<GfxTier, number>> = {
@@ -123,6 +135,10 @@ export const TAVERN_FRONT_SPLIT = 3.2;
 const D0 = TAVERN_DOOR.x - TAVERN_DOOR.width / 2;
 const D1 = TAVERN_DOOR.x + TAVERN_DOOR.width / 2;
 const FRONT = [H.z1 - H.wall - 0.1, H.z1 + 0.2] as const;
+/** The jettied upper storey stands this far out over the ground floor, from under its
+ *  bressumer (build: tavern_jetty.py) up to the gable. */
+const JETTY_Y = TAVERN_JETTY.y - 0.4;
+const JETTY_Z = H.z1 + TAVERN_JETTY.out + 0.35;
 
 /** Each box-shaped shell part's volumes (the roofs, the tower and the pillar are shaped,
  *  below). The doorway is open: a sight line through it crosses no part of the front. */
@@ -130,11 +146,18 @@ const BOX_VOLUMES: Partial<Record<TavernShellPart, readonly Vol[]>> = {
   // the gable over the door and the door's posts either side of it
   HallWallFront: [
     [-TAVERN_FRONT_SPLIT, TAVERN_FRONT_SPLIT, TAVERN_DOOR.height, H.ridge, FRONT[0], FRONT[1]],
+    [-TAVERN_FRONT_SPLIT, TAVERN_FRONT_SPLIT, JETTY_Y, H.ridge, FRONT[0], JETTY_Z],
     [-TAVERN_FRONT_SPLIT, D0, 0, TAVERN_DOOR.height, FRONT[0], FRONT[1]],
     [D1, TAVERN_FRONT_SPLIT, 0, TAVERN_DOOR.height, FRONT[0], FRONT[1]],
   ],
-  HallWallFrontLeft: [[H.x0, -TAVERN_FRONT_SPLIT, 0, H.ridge, FRONT[0], FRONT[1]]],
-  HallWallFrontRight: [[TAVERN_FRONT_SPLIT, H.x1, 0, H.ridge, FRONT[0], FRONT[1]]],
+  HallWallFrontLeft: [
+    [H.x0, -TAVERN_FRONT_SPLIT, 0, H.ridge, FRONT[0], FRONT[1]],
+    [H.x0, -TAVERN_FRONT_SPLIT, JETTY_Y, H.ridge, FRONT[0], JETTY_Z],
+  ],
+  HallWallFrontRight: [
+    [TAVERN_FRONT_SPLIT, H.x1, 0, H.ridge, FRONT[0], FRONT[1]],
+    [TAVERN_FRONT_SPLIT, H.x1, JETTY_Y, H.ridge, FRONT[0], JETTY_Z],
+  ],
   // the porch's canopy over the door, its two brackets, and the tankard on its arm
   HallPorch: [
     [TAVERN_PORCH.x0 - 0.3, TAVERN_PORCH.x1 + 0.3, 5.9, 8.8, H.z1, TAVERN_PORCH.z1 + 0.9],
