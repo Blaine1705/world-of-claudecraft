@@ -1395,10 +1395,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the integrated WebGL context restore plus spirit-veil merge:
-  // the merged renderer and view-priority leaves match neither parent. No
-  // capture was retaken.
-  '367f1804e5b2669e757dc236b3d62e04f077e37cb38d103172fcb6608c7e4dd5';
+  // Re-minted for the integrated WebGL context restore, spirit-veil, and
+  // trinket relics merge: the merged renderer and view-priority leaves match
+  // no parent. No capture was retaken.
+  '359b6b3a0304018565d196cc8baf541d7f1c91a88a4541706af6acd0b22992a1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1421,10 +1421,10 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the integrated WebGL context restore plus spirit-veil merge:
-  // the merged renderer and view-priority leaves match neither parent. No
-  // capture was retaken.
-  '780c6ed48492e140e0911641d9146eea99ae1e3d6558f86420182fe236c92e48';
+  // Re-minted for the integrated WebGL context restore, spirit-veil, and
+  // trinket relics merge: the merged renderer and view-priority leaves match
+  // no parent. No capture was retaken.
+  '06bf229a5d46c21b22e0509d0a75fb40e6bb2f44169eace9b321865ccfb53c55';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2807,9 +2807,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-      // Integrated WebGL context restore plus spirit-veil merge: recomputed
-      // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('48e8e70f11dc5dfa70df9f04a33ed46451135c4ea4c70efd27292d0ba20336db');
+      // Integrated WebGL context restore, spirit-veil, and trinket relics merge:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+    ).toBe('12ce2a5ff4f67b2b597aab6913fc277f2f66bb0afdf46f41195ba734f6b9b157');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

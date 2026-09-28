@@ -3321,7 +3321,7 @@ export class Renderer {
   }
 
   private castVfxFirstReadRoots(): (THREE.Object3D | undefined)[] {
-    return [this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()];
+    return [...this.abilityVfx.firstReadDrawables(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()];
   }
 
   /** What an in-place context restore reads (context_restore.ts). */
