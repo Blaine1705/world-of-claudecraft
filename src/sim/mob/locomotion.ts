@@ -119,6 +119,7 @@ import { tickEyeWard } from './eye_ward';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
 import { immobileEvadeSnapsHome } from './immobile_evade';
+import { levelScaledMechanicDamage } from './mechanic_level_scale';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -946,6 +947,7 @@ function fireAoePulse(
       // Heroic scaling multiplies AFTER the draw so the rng stream is
       // identical across difficulties (mechanicDamageMult, difficulty.ts).
       let dmg = Math.round(ctx.rng.range(pulse.min, pulse.max) * (mob.mechanicDamageMult ?? 1));
+      dmg = levelScaledMechanicDamage(mob, pe, dmg);
       if (capPulse) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
       ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
     }
@@ -982,6 +984,7 @@ function fireWarStomp(
     if (!pe || pe.dead || dist2d(pe.pos, center) > stomp.radius) continue;
     if (stomp.min !== undefined && stomp.max !== undefined) {
       let dmg = Math.round(ctx.rng.range(stomp.min, stomp.max) * (mob.mechanicDamageMult ?? 1));
+      dmg = levelScaledMechanicDamage(mob, pe, dmg);
       if (capStomp) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
       ctx.dealDamage(mob, pe, dmg, false, school, stomp.name, 'hit', true);
     }

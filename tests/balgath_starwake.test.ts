@@ -49,6 +49,7 @@ import {
   starwakeShowerActive,
   starwakeWavePoints,
 } from '../src/sim/mob/boss_starwake_meteors';
+import { mechanicLevelMult } from '../src/sim/mob/mechanic_level_scale';
 import { mechanicSpacingBlocked } from '../src/sim/mob/mechanic_spacing';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -57,6 +58,9 @@ import { DT } from '../src/sim/types';
 import { groundHeight, MIREFEN_IMPACT_CRATER } from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
+
+// Every player here is level 20: his mechanics land at their level-20 size.
+const LEVEL_20_MULT = mechanicLevelMult(MOBS.balgath_cyclops.mechanicLevelScale, 20);
 
 const BALGATH = 'balgath_cyclops';
 
@@ -412,8 +416,9 @@ describe('the eruption', () => {
     if (!inLaneMarked) expect(damageTo(evs, inLane.id, d.name)).toHaveLength(0);
     expect(damageTo(evs, bystander.id, d.name)).toHaveLength(0);
     if (victimInMark) expect(damageTo(evs, victim.id, d.name).length).toBeGreaterThanOrEqual(1);
-    // Every hit is inside the classic-era band (times his mechanic multiplier).
-    const mult = a.boss.mechanicDamageMult ?? 1;
+    // Every hit is inside the classic-era band (times his mechanic multiplier and the level-20
+    // size of his mechanics, mob/mechanic_level_scale.ts).
+    const mult = (a.boss.mechanicDamageMult ?? 1) * LEVEL_20_MULT;
     for (const e of damageTo(evs, inStrip.id, d.name)) {
       const amount = (e as { amount: number }).amount;
       expect(amount).toBeLessThanOrEqual(Math.round(d.fissures.max * mult) + d.geysers.max * mult);
@@ -644,7 +649,7 @@ describe("the meteor shower (Star Debris: Ignivar's Falling Cinders, reused)", (
     const evs = tick(a, DT);
     const hits = damageTo(evs, inCircle.id, METEOR());
     expect(hits).toHaveLength(1);
-    const mult = a.boss.mechanicDamageMult ?? 1;
+    const mult = (a.boss.mechanicDamageMult ?? 1) * LEVEL_20_MULT;
     const amount = (hits[0] as { amount: number }).amount;
     expect(amount).toBeGreaterThanOrEqual(Math.round(def().meteors.min * mult) - 1);
     expect(amount).toBeLessThanOrEqual(Math.round(def().meteors.max * mult) + 1);
@@ -808,7 +813,7 @@ describe('the pools', () => {
     expect(ticks).toHaveLength(Math.round(d.pool.seconds / d.pool.interval));
     for (const t of ticks) {
       const amount = (t as { amount: number }).amount;
-      const mult = a.boss.mechanicDamageMult ?? 1;
+      const mult = (a.boss.mechanicDamageMult ?? 1) * LEVEL_20_MULT;
       expect(amount).toBeGreaterThanOrEqual(Math.round(d.pool.min * mult) - 1);
       expect(amount).toBeLessThanOrEqual(Math.round(d.pool.max * mult) + 1);
     }

@@ -37,6 +37,7 @@ import { angleTo, DT, DUNGEON_LEASH_DISTANCE, dist2d, LEASH_DISTANCE } from '../
 import { splashNearbyMobs } from './boss_collateral';
 import { launchFromSlam } from './boss_slams';
 import { startEvadeHome } from './combat_profile';
+import { levelScaledMechanicDamage } from './mechanic_level_scale';
 import { highestThreatTarget } from './targeting';
 import { traceWarpath } from './warpath_dev_trace';
 import { emitMobYell } from './yells';
@@ -575,7 +576,16 @@ function fireSwipe(ctx: SimContext, mob: Entity, def: WarpathDef): void {
   const dmg = Math.round(
     ctx.rng.range(def.swipe.min, def.swipe.max) * (mob.mechanicDamageMult ?? 1),
   );
-  ctx.dealDamage(mob, picked, dmg, false, school, def.swipe.name, 'hit', true);
+  ctx.dealDamage(
+    mob,
+    picked,
+    levelScaledMechanicDamage(mob, picked, dmg),
+    false,
+    school,
+    def.swipe.name,
+    'hit',
+    true,
+  );
 }
 
 /** The arrival slam: everyone still inside the ring he showed them. */
@@ -599,7 +609,16 @@ function fireWreck(ctx: SimContext, mob: Entity, def: WarpathDef): void {
     const dmg = Math.round(
       ctx.rng.range(def.wreck.min, def.wreck.max) * (mob.mechanicDamageMult ?? 1),
     );
-    ctx.dealDamage(mob, p, dmg, false, school, def.wreck.name, 'hit', true);
+    ctx.dealDamage(
+      mob,
+      p,
+      levelScaledMechanicDamage(mob, p, dmg),
+      false,
+      school,
+      def.wreck.name,
+      'hit',
+      true,
+    );
   }
   // The landmark he came to wreck is usually surrounded by whatever lives there. This is the
   // slam where that matters most: it is the one that craters the town.

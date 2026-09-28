@@ -67,6 +67,7 @@ import {
   starwakeShowerActive,
   tickStarwakeShower,
 } from './boss_starwake_meteors';
+import { levelScaledMechanicDamage } from './mechanic_level_scale';
 import { claimMechanicSpacing } from './mechanic_spacing';
 import { emitMobYell } from './yells';
 
@@ -404,7 +405,16 @@ function erupt(ctx: SimContext, mob: Entity, def: StarwakeDef): void {
   for (const p of players) {
     if (!fissures.some((line) => insideFissure(line, f.halfWidth, p.pos.x, p.pos.z))) continue;
     const dmg = Math.round(ctx.rng.range(f.min, f.max) * mult);
-    ctx.dealDamage(mob, p, dmg, false, school, def.name, 'hit', true);
+    ctx.dealDamage(
+      mob,
+      p,
+      levelScaledMechanicDamage(mob, p, dmg),
+      false,
+      school,
+      def.name,
+      'hit',
+      true,
+    );
   }
   for (const line of fissures) {
     const half = line.length / 2;
@@ -440,7 +450,16 @@ function erupt(ctx: SimContext, mob: Entity, def: StarwakeDef): void {
       // The list is taken once; skip anyone an earlier blast of this eruption just killed.
       if (p.dead || !insideCircle(c, p.pos.x, p.pos.z)) continue;
       const dmg = Math.round(ctx.rng.range(g.min, g.max) * mult);
-      ctx.dealDamage(mob, p, dmg, false, school, def.name, 'hit', true);
+      ctx.dealDamage(
+        mob,
+        p,
+        levelScaledMechanicDamage(mob, p, dmg),
+        false,
+        school,
+        def.name,
+        'hit',
+        true,
+      );
     }
     splashNearbyMobs(ctx, mob, c, c.radius, g.min, g.max, school, def.name, (e) =>
       nearFight(mob, e),
@@ -474,7 +493,16 @@ function tickPools(ctx: SimContext, mob: Entity, def: StarwakeDef): void {
       for (const p of livingPlayers(ctx)) {
         if (!insideCircle(pool, p.pos.x, p.pos.z)) continue;
         const dmg = Math.round(ctx.rng.range(def.pool.min, def.pool.max) * mult);
-        ctx.dealDamage(mob, p, dmg, false, school, def.pool.name, 'hit', true);
+        ctx.dealDamage(
+          mob,
+          p,
+          levelScaledMechanicDamage(mob, p, dmg),
+          false,
+          school,
+          def.pool.name,
+          'hit',
+          true,
+        );
       }
       splashNearbyMobs(
         ctx,

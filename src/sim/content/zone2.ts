@@ -407,6 +407,15 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // on: what you were shown is what you have to leave. 4.5s also spaces the mechanics
     // so two never land together.
     telegraphedMechanics: 4.5,
+    // Every mechanic range below is what a LEVEL 6 takes; the hit grows with the level of
+    // the player it lands on, straight-line to three times that at level 20
+    // (mob/mechanic_level_scale.ts). The Mirefen mixes level 6s with level 20s, and one flat
+    // range either one-shots the locals or lets a geared level 20 ignore the telegraphs. At
+    // x3 each mechanic costs a geared level 20 roughly a tenth to a quarter of their pool
+    // (the heavy reads, Barrow Cleave and Barrowfall, the most). His melee swing and the
+    // Barrow Burden soak (already a share of max health) are not scaled, and neither is
+    // anything he does to the muster's soldiers or the wildlife.
+    mechanicLevelScale: { fromLevel: 6, toLevel: 20, toMult: 3 },
     // The circuit, and the reason this fight is an event rather than a health bar. He
     // holds ground and trades for a while, then sets off for the next landmark and RUNS
     // there while the raid chases, then brings both fists down on whatever he arrived at.

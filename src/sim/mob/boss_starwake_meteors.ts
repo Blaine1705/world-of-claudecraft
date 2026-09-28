@@ -48,6 +48,7 @@ import type { SimContext } from '../sim_context';
 import type { Aura, Entity, MobTemplate, StarwakeShowerState } from '../types';
 import { CAST_COMPLETE_EPS, DT, dist2d } from '../types';
 import { splashNearbyMobs } from './boss_collateral';
+import { levelScaledMechanicDamage } from './mechanic_level_scale';
 
 type StarwakeDef = NonNullable<MobTemplate['starwake']>;
 
@@ -332,7 +333,16 @@ function land(
   for (const p of livingPlayers(ctx)) {
     if (!meteors.some((meteor) => pointInIgnivarMeteor(meteor, p.pos))) continue;
     const dmg = Math.round(ctx.rng.range(m.min, m.max) * mult);
-    ctx.dealDamage(mob, p, dmg, false, school, m.name, 'hit', true);
+    ctx.dealDamage(
+      mob,
+      p,
+      levelScaledMechanicDamage(mob, p, dmg),
+      false,
+      school,
+      m.name,
+      'hit',
+      true,
+    );
   }
   for (const meteor of meteors) {
     splashNearbyMobs(

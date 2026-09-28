@@ -44,6 +44,7 @@ import type { Aura, Entity, MobTemplate, Vec3 } from '../types';
 import { DT, dist2d } from '../types';
 import { splashNearbyMobs } from './boss_collateral';
 import { launchFromSlam } from './boss_slams';
+import { levelScaledMechanicDamage } from './mechanic_level_scale';
 import { claimMechanicSpacing, governedOverdue, mechanicSpacingBlocked } from './mechanic_spacing';
 import { emitMobYell } from './yells';
 
@@ -380,7 +381,16 @@ function fireBoulders(ctx: SimContext, mob: Entity, def: RangedDef): void {
     for (const p of livingPlayers(ctx)) {
       if (dist2d(p.pos, center) > b.radius) continue;
       const dmg = Math.round(ctx.rng.range(b.min, b.max) * (mob.mechanicDamageMult ?? 1));
-      ctx.dealDamage(mob, p, dmg, false, school, b.name, 'hit', true);
+      ctx.dealDamage(
+        mob,
+        p,
+        levelScaledMechanicDamage(mob, p, dmg),
+        false,
+        school,
+        b.name,
+        'hit',
+        true,
+      );
     }
     // A muster soldier caught under it is crushed like under any of his blows.
     splashNearbyMobs(ctx, mob, center, b.radius, b.min, b.max, school, b.name);
@@ -445,7 +455,16 @@ function fireGlare(ctx: SimContext, mob: Entity, def: RangedDef): void {
   for (const p of livingPlayers(ctx)) {
     if (!struck(p.pos)) continue;
     const dmg = Math.round(ctx.rng.range(g.min, g.max) * (mob.mechanicDamageMult ?? 1));
-    ctx.dealDamage(mob, p, dmg, false, school, g.name, 'hit', true);
+    ctx.dealDamage(
+      mob,
+      p,
+      levelScaledMechanicDamage(mob, p, dmg),
+      false,
+      school,
+      g.name,
+      'hit',
+      true,
+    );
   }
   // No collateral: the eye burns what it LOOKS at, and it only ever looks at a player.
   // A beam that razed whichever picket its line happened to cross would skip that stop

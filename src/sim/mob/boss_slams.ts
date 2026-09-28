@@ -30,6 +30,7 @@ import type { Aura, Entity, MobTemplate, Vec3 } from '../types';
 import { angleTo, DT, dist2d, normAngle } from '../types';
 import { groundHeight } from '../world';
 import { splashNearbyMobs } from './boss_collateral';
+import { levelScaledMechanicDamage } from './mechanic_level_scale';
 import { claimMechanicSpacing, mechanicSpacingBlocked } from './mechanic_spacing';
 
 type SlamsDef = NonNullable<MobTemplate['slams']>;
@@ -305,7 +306,16 @@ function fireHammer(ctx: SimContext, mob: Entity, def: SlamsDef): void {
     const dmg = Math.round(
       ctx.rng.range(def.hammer.min, def.hammer.max) * (mob.mechanicDamageMult ?? 1),
     );
-    ctx.dealDamage(mob, p, dmg, false, school, def.hammer.name, 'hit', true);
+    ctx.dealDamage(
+      mob,
+      p,
+      levelScaledMechanicDamage(mob, p, dmg),
+      false,
+      school,
+      def.hammer.name,
+      'hit',
+      true,
+    );
   }
   splashNearbyMobs(
     ctx,
@@ -367,7 +377,16 @@ function fireCleave(ctx: SimContext, mob: Entity, def: SlamsDef): void {
     const dmg = Math.round(
       ctx.rng.range(def.cleave.min, def.cleave.max) * (mob.mechanicDamageMult ?? 1),
     );
-    ctx.dealDamage(mob, p, dmg, false, school, def.cleave.name, 'hit', true);
+    ctx.dealDamage(
+      mob,
+      p,
+      levelScaledMechanicDamage(mob, p, dmg),
+      false,
+      school,
+      def.cleave.name,
+      'hit',
+      true,
+    );
   }
   // Bystanders get the same arc test the players got, minus the jump: a boar cannot read a
   // telegraph, so anything inside the swept wedge wears it.

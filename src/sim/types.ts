@@ -2521,6 +2521,10 @@ export interface MobTemplate {
   // his loot roster or HP scaling; only a collateral boss slam (mob/boss_collateral.ts)
   // can kill it, and the muster module stands it back up. Spawned RNG-free by that module.
   musterSoldier?: true;
+  // Boss mechanics sized by the RECEIVING player's level (mob/mechanic_level_scale.ts):
+  // the authored ranges at `fromLevel` and below, `toMult` times them at `toLevel`, a
+  // straight line between. Players only; the boss's melee swing is never scaled.
+  mechanicLevelScale?: { fromLevel: number; toLevel: number; toMult: number };
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
     min: number;
