@@ -815,14 +815,17 @@ describe('Masterwrought art completion evidence', () => {
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
     // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners;
     // these do not alter the dated completion/approval universe below.
-    // The LIVE owner count, which grows with the catalog: 1283 plus the eight items this
-    // PR mints for the Mirefen world boss (the maul, the Shardpike, the Loomshard Eye, the
-    // three Foreman's Wage pieces and the two barrow pieces). The 1209 completion union
-    // below is the FROZEN historical figure and is deliberately left alone: keeping the two
-    // apart is the whole point of this test.
-    // 1292 with the Mirefen muster rework's lent muster_shardpike owner, 1293 with the
-    // muster quests' barrowhide_slab.
-    expect(currentOwnerIds).toHaveLength(1293);
+    // The world-quest branch adds its two batches (four quest-object icons) at
+    // the release/v0.43.0 merge: 1,287.
+    // The wq-reputation merge adds the 15 faction quartermaster icons
+    // (faction-vendor-icons-2026-09-16): 1,302. 1303 with the weekly emissary's
+    // cache chest (feature/weekly-quests). The Clue Scroll items add their two
+    // (clue-scroll-icons-2026-09-17): 1,305. The faction ladder rework adds its
+    // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
+    // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
+    // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
+    // Plus the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab): 1,355.
+    expect(currentOwnerIds).toHaveLength(1355);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -908,12 +911,77 @@ describe('Masterwrought art completion evidence', () => {
     expect(completionDatedIds).toHaveLength(1209);
 
     const ossBrainMountIds = new Set(['reins_goblin_rocket_sled', 'reins_rallycart_rxt']);
+    // The world-quest branch's two quest-object batches (release/v0.43.0 merge).
+    const worldQuestObjectIds = new Set([
+      'confection_game_box',
+      'leyline_cache',
+      'eastbrook_freight_crate',
+      'eastbrook_freight_wagon',
+    ]);
+    expect(datedIds.filter((id) => worldQuestObjectIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => worldQuestObjectIds.has(id))).toHaveLength(4);
+    // The wq-reputation merge's faction quartermaster stock, one SVG batch
+    // (faction-vendor-icons-2026-09-16): 15 ids, additive the same way.
+    const factionVendorIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(factionVendorIds.size).toBe(15);
+    expect(datedIds.filter((id) => factionVendorIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => factionVendorIds.has(id))).toHaveLength(15);
+    // The faction ladder rework's periphery rows and formulas, one SVG batch
+    // (faction-ladder-icons-2026-09-23): 17 ids, additive the same way.
+    const factionLadderIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'faction-ladder-icons-2026-09-23')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(factionLadderIds.size).toBe(17);
+    expect(datedIds.filter((id) => factionLadderIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => factionLadderIds.has(id))).toHaveLength(17);
+    // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17): 2
+    // ids, additive the same way.
+    const clueScrollIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(clueScrollIds.size).toBe(2);
+    expect(datedIds.filter((id) => clueScrollIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => clueScrollIds.has(id))).toHaveLength(2);
+    // The trinket slot's icons, one batch (trinket-slot-icons-2026-09-23, PR
+    // 4173): 18 ids, additive the same way.
+    const trinketIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'trinket-slot-icons-2026-09-23')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(trinketIds.size).toBe(18);
+    expect(datedIds.filter((id) => trinketIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => trinketIds.has(id))).toHaveLength(18);
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
+    // The Viridian Valestrider's reins is additive the same way, and postdates
+    // the dated verdict too.
+    expect(datedIds).not.toContain('reins_avian_strider');
+    expect(currentOwnerIds).toContain('reins_avian_strider');
+
+    // The Warfare Season 2 painted weapons are additive the same way.
+    const season2WeaponIds = new Set([
+      'vanguard_verdict_greatsword',
+      'vanguard_oath_blade',
+      'vanguard_fang_dagger',
+      'vanguard_warstaff',
+    ]);
+    expect(datedIds.filter((id) => season2WeaponIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => season2WeaponIds.has(id))).toHaveLength(4);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
-    // the OSSBrain mount reins, and the Mirefen world boss's three icon batches)
+    // the OSSBrain mount reins, the Valestrider's reins and the Mirefen world boss's
+    // icon batches)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -925,6 +993,16 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
         !ossBrainMountIds.has(id) &&
+        !worldQuestObjectIds.has(id) &&
+        !factionVendorIds.has(id) &&
+        !factionLadderIds.has(id) &&
+        !clueScrollIds.has(id) &&
+        !trinketIds.has(id) &&
+        // The weekly emissary's cache chest (feature/weekly-quests) is additive
+        // beyond the dated completion union, like the Field Kit.
+        id !== 'emissary_cache' &&
+        id !== 'reins_avian_strider' &&
+        !season2WeaponIds.has(id) &&
         !balgathIds.has(id) &&
         !musterIds.has(id),
     );

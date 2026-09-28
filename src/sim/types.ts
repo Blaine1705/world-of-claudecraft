@@ -9,6 +9,8 @@ import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
+import type { WispMazeState } from './minigames/wisp_maze';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
 import type {
@@ -23,6 +25,7 @@ import type {
 } from './varkhul_assembly';
 import type { VarkhulEngageState } from './varkhul_engage';
 import type { VarkhulForgeBeamWindow } from './varkhul_forge_intermission';
+import type { WorldQuestMedal } from './world_quest_scoreboards';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -120,7 +123,16 @@ export type HonorReason =
   | 'battleground_first_win'
   | 'battleground_complete'
   | 'battleground_kill'
-  | 'battleground_assist';
+  | 'battleground_assist'
+  // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the killing blow's share
+  // of the kill pool, and everyone else's who damaged the victim or healed a
+  // damager inside the assist window. Two reasons so the float and the chat
+  // line can name which one just paid, like the battleground drip above.
+  | 'world_kill'
+  | 'world_assist'
+  // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
+  // standing inside the circle.
+  | 'hill_hold';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -496,6 +508,8 @@ export type AuraKind =
   // Vespers Priest: source-owned self resource built by Mindfracture and
   // Effigy-bound Dirge ticks, consumed whole by Call Tithefiend.
   | 'gloomtithe'
+  // Benison Dawnweave: up to three direct-prayer stacks, consumed by Choirmend.
+  | 'benison_prayers'
   // Destruction warlock secondary-resource and cast-shaping state.
   | 'destruction_ruin'
   | 'desolation'
@@ -640,6 +654,10 @@ export type AuraKind =
   // carry: applied at the pickup, removed by clearCarrierAuras on every path the
   // flag leaves the carrier.
   | 'flag_carried'
+  // Eastbrook freight World Quest: an inert, public marker worn exactly while
+  // the player carries a crate. The movement kernel applies its value as the
+  // cargo speed multiplier; no combat or stat-recalc path consumes it.
+  | 'world_quest_cargo'
   // Chronomancy Temporal Echo mark (docs/prd/mage-chronomancy.md section 13): a
   // per-caster (sourceId) buff on ONE ally; while it rides, a fraction of the
   // mage's Arcane damage heals the marked ally. Value is unused (1); the
@@ -837,6 +855,11 @@ export interface Stats {
   // player-vs-player damage only; PvE never reads them.
   pvpOffense: number;
   pvpDefense: number;
+  // WARFARE Vitality: the maximum-health fraction honor gear grants outside PvE
+  // instances (pvp/power.ts pvpVitalityFromRating). Unlike the two above it is
+  // not scoped to hostile hits; pvp/vitality.ts switches it off in dungeons,
+  // raids, delves and rift floors.
+  pvpVitality: number;
 }
 
 // The six class/item attributes authored in content. WARFARE fractions are
@@ -865,7 +888,8 @@ export type EquipSlot =
   | 'gloves'
   | 'feet'
   | 'ring1'
-  | 'ring2';
+  | 'ring2'
+  | 'trinket';
 
 // Every live equipment key, including the redesigned Warrior's additive
 // offhand. THE equipment surface: stat derivation, command validators, and
@@ -888,6 +912,7 @@ export const ALL_EQUIP_SLOTS: readonly EquipSlot[] = [
   'feet',
   'ring1',
   'ring2',
+  'trinket',
 ];
 
 /** Narrow an untrusted slot string (a wire field, a DOM dataset value, a
@@ -959,6 +984,12 @@ export type ItemUse =
   // player meets their first death somewhere nothing is hunting them.
   // Consumed on use and refused unless the lesson is active.
   | { type: 'passingStone' }
+  // A Clue Scroll (src/sim/clue_scrolls.ts): with no hunt active, consumed to
+  // start one; on a dig step, used on the spot to advance it (not consumed);
+  // refused otherwise.
+  | { type: 'clueScroll' }
+  // A Treasure Casket (src/sim/clue_casket.ts): consumed to pay the hunt's reward.
+  | { type: 'clueCasket' }
   // Starts the one-time hammer quest; the Ember is consumed by crafting.
   | { type: 'forgebreakerEmber' }
   | { type: 'mechChroma'; chromaId: string }
@@ -992,7 +1023,10 @@ export type ItemUse =
   // narrowest named craft-id type the professions content has (there is no
   // craft-id union today; CRAFT_RING types its ids as string), so this
   // documents the domain without changing the checked type.
-  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] };
+  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] }
+  // A container: using it hands the owner its contents and consumes one unit
+  // (src/sim/emissary_cache.ts owns the one container shipped so far).
+  | { type: 'container'; container: 'emissary_cache' };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -1160,6 +1194,10 @@ interface BaseItemDef {
   // `kind` (weapon/armor/bag/tool: 1, everything else: 20); see stackSizeOf.
   stackSize?: number;
   requiredClass?: PlayerClass[];
+  // Class-locked gear (Warfare Season 2 spec sets): only the requiredClass list
+  // may equip it. Without the flag, armor follows the armor-type rank alone and
+  // requiredClass is advisory (canEquipItem in equipment_rules.ts).
+  classLocked?: boolean;
   // Minimum character level needed to equip this piece. When omitted, the level
   // is DERIVED from `quality` (see src/sim/item_level_req.ts); set this only to
   // override the per-quality default for a specific item.
@@ -1275,7 +1313,7 @@ export interface ItemSet {
 
 export interface ArmorItemDef extends BaseItemDef {
   kind: 'armor';
-  slot: Exclude<EquipSlot, 'mainhand' | 'neck' | 'ring1' | 'ring2'>;
+  slot: Exclude<EquipSlot, 'mainhand' | 'neck' | 'ring1' | 'ring2' | 'trinket'>;
   armorType: ArmorType;
   weapon?: never;
   // A shield stays inside v0.26's established armor item kind, avoiding a new
@@ -1285,13 +1323,13 @@ export interface ArmorItemDef extends BaseItemDef {
   blockValue?: number;
 }
 
-// Jewelry: neck and ring pieces. kind 'armor' so the equip/budget/tooltip paths
+// Jewelry: neck, ring, and trinket pieces. kind 'armor' so the equip/budget/tooltip paths
 // treat it as gear, but it carries NO armor class: equipment_rules falls through
 // the armorType gate, so any class can wear jewelry (requiredClass still applies
 // when set). Rings declare slot 'ring'; see resolveEquipSlot.
 export interface JewelryItemDef extends BaseItemDef {
   kind: 'armor';
-  slot: 'neck' | 'ring';
+  slot: 'neck' | 'ring' | 'trinket';
   armorType?: never;
   weapon?: never;
 }
@@ -1985,8 +2023,6 @@ export interface MobTemplate {
   /** Optional mandatory encounter threshold. Damage cannot move the mob below
    * this max-HP fraction until encounter logic clears its runtime floor. */
   damageFloorPct?: number;
-  /** Optional resting HP fraction for friendly practice targets that should stay healable. */
-  restHpFraction?: number;
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
@@ -2427,6 +2463,8 @@ export interface MobTemplate {
   // (mob/practice_dummies.ts) so a healer always has something real to heal and
   // the target resets itself for the next player.
   friendlyPracticeTarget?: boolean;
+  // Custom resting health fraction for friendly practice targets (default: 0.35).
+  restHpFraction?: number;
   // Take PASSIVE idle draws off the shared world stream (Entity.offStreamRng).
   // CampDef.offStream covers a wholly new camp; this covers a template that
   // REPLACED shipped content in an existing camp slot, where the spawn draws
@@ -4292,6 +4330,9 @@ export interface NpcDef {
   // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
   // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
   heroicVendor?: boolean;
+  // The World Quest taskmaster: talking to this NPC offers the world-quest
+  // board (the map's world-quest rail, where the daily reroll lives).
+  worldQuestBoard?: boolean;
   // A WARFARE quartermaster: talking to this NPC opens the set-divided honor
   // shop instead of the flat vendor grid. A FLAG rather than a hard-keyed NPC id
   // deliberately, so a second placement needs no constant widened: the Heroic
@@ -4320,6 +4361,9 @@ export interface NpcDef {
   // widened. Vending stays emergent from vendorItems; the watch fee is a
   // plant-time bag payment and never gates on this flag (D9).
   farmer?: true;
+  // The weekly emissary: talking to this NPC opens the weekly-quest window
+  // (src/sim/weekly_quests.ts) instead of the gossip menu.
+  weeklyEmissary?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -4354,10 +4398,24 @@ export interface CampDef {
 }
 
 // Ground interactables (sparkle objects)
+export const STABLE_GROUND_OBJECT_ENTITY_ID_MIN = 2_147_000_000;
+
+export interface GroundObjectPosition {
+  x: number;
+  z: number;
+  /** Exact world height when authored; omitted positions sit on the terrain. */
+  y?: number;
+  /** Authored yaw in radians. */
+  facing?: number;
+  scale?: number;
+}
+
 export interface GroundObjectDef {
   itemId: string;
   name: string;
-  positions: { x: number; z: number }[];
+  positions: GroundObjectPosition[];
+  /** Optional ids in the reserved high range, used without shifting the legacy roster. */
+  entityIds?: readonly number[];
 }
 
 // Gatherable world nodes (ore/wood/herb). Permanent, unowned fixtures: this
@@ -4464,7 +4522,10 @@ export interface DungeonDef {
   index: number; // x-band for instance origins; must be unique
   doorPos: { x: number; z: number }; // overworld entrance portal
   /** where leaving drops the player, relative to doorPos (default 0,-4);
-   *  doors flush against a building face need a FORWARD drop instead */
+   *  doors flush against a building face need a FORWARD drop instead. Also the
+   *  predefined exit facing: leaveDungeon points the player away from the door
+   *  along this vector, instead of leaving them facing whatever way they were
+   *  walking inside the instance. */
   leaveOffset?: { x: number; z: number };
   /** render the entrance membrane still (no swirl spin): for doors that
    *  read as a building's own doorway rather than a magic portal */
@@ -4565,6 +4626,15 @@ export interface ZoneDef {
   westPassZ?: number;
   zMax: number;
   levelRange: [number, number];
+  /**
+   * World PvP policy of the ground (src/sim/pvp/world_pvp_zones.ts). 'sanctuary':
+   * no world PvP at all, flagged or not. 'ffa': free-for-all, everyone standing
+   * here is fair game with no flag. Absent: contested, the mutual-flag rule.
+   * Owner tuning: the tutorial island and the starter zone are sanctuaries, the
+   * three highest-level zones are free-for-all (tests/world_pvp_zones.test.ts
+   * pins the set; flip one word here to move a zone).
+   */
+  worldPvp?: 'sanctuary' | 'ffa';
   biome: BiomeId;
   hub: { x: number; z: number; radius: number; name: string };
   graveyard: { x: number; z: number };
@@ -4769,6 +4839,8 @@ export interface ZonePropsDef {
   // keep r and h matched to the SCALED footprint by hand.
   decorProps?: {
     key: string;
+    /** Small dressing seated on verified existing ground may opt out of terrain flattening. */
+    terrainCalm?: false;
     x: number;
     z: number;
     rot?: number;
@@ -4789,7 +4861,8 @@ export interface ZonePropsDef {
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;
     /** A standable top (crate/rock family, see `colliders.ts`): this many yd
-     * above ground, a mover may land and stand on it instead of the piece
+     * above the rendered base, ground for ordinary props and the waterline
+     * draft for floating props. A mover may land and stand on it instead of the piece
      * colliding as a full-height wall. Requires `r` (or `hw`/`hd`) for the
      * footprint; omit for ordinary full-height or walk-through decor. */
     standableTop?: number;
@@ -4868,19 +4941,19 @@ export interface EscortAmbushDef {
   atWaypoint: number;
   mobId: string;
   count: number;
+  // Optional authored level for scaled public-event waves. Ordinary quest
+  // escorts omit it and keep using the template's minimum level.
+  level?: number;
   // Spawn scatter ring around the escortee (world yards).
   radius?: number;
 }
 
-export interface EscortDef {
+interface EscortDefBase {
   id: string;
   // MobTemplate of the escortee: a non-hostile mob with moveSpeed 0 (the run
   // drives all movement) and aggroRadius 0. Players cannot attack it; mobs
   // damage it through seeded ambush threat; players may heal it while live.
   npcMobId: string;
-  // The quest carrying this escort's { type: 'escort' } objective. Interacting
-  // with the idle escortee while this quest is active starts the run.
-  questId: string;
   start: { x: number; z: number };
   waypoints: { x: number; z: number }[];
   moveSpeed: number;
@@ -4896,7 +4969,29 @@ export interface EscortDef {
   startText: string;
   successText: string;
   failText: string;
+  // Optional checkpoint story, spoken only between ambushes. Each line becomes
+  // eligible after arriving at its waypoint, then waits for reading space.
+  story?: {
+    speaker: string;
+    lineSpacingSeconds: number;
+    ambushText: string;
+    lines: { atWaypoint: number; text: string }[];
+  };
 }
+
+export type EscortDef = EscortDefBase &
+  (
+    | {
+        // The ordinary quest carrying this escort objective.
+        questId: string;
+        worldQuestId?: never;
+      }
+    | {
+        // The public world quest carrying this escort objective.
+        worldQuestId: string;
+        questId?: never;
+      }
+  );
 
 // Live per-def escort state (src/sim/escort.ts; the backing map stays on Sim).
 // Exactly one of three phases: idle (npcId set, run null), live (npcId set,
@@ -4910,6 +5005,7 @@ export interface EscortRunState {
     startedAt: number;
     ambushIds: number[];
     fired: boolean[];
+    story?: { nextLine: number; nextSpeechAt: number; finaleAt?: number };
     // Stuck-advance bookkeeping: a walker pinned against a collider for a few
     // seconds counts its current waypoint as reached (escort.ts).
     lastX: number;
@@ -5037,6 +5133,261 @@ export interface QuestProgress {
   rev?: number;
 }
 
+/** A level-scaled copper purse: `base + perLevel * level`. */
+export interface WorldQuestCopperSchedule {
+  base: number;
+  perLevel: number;
+}
+
+/** Per-quest overrides of what a world quest pays. Every world quest pays XP,
+ *  copper and faction standing (src/sim/world_quests.ts awardWorldQuest); a def
+ *  only names what differs from the shared schedule. The day's item rewards are
+ *  never authored here: three zone slots per cycle carry one, chosen per cycle
+ *  and per class (src/sim/world_quest_item_slots.ts). */
+export interface WorldQuestReward {
+  /** XP as a share of xpForLevel(level); WORLD_QUEST_XP_RATE when omitted. */
+  xpRate?: number;
+  /** Copper purse override; WORLD_QUEST_COPPER when omitted. */
+  copper?: WorldQuestCopperSchedule;
+  /** A fixed extra item on top of the bundle (the two rift essence quests),
+   *  never equipment: gear comes only from the day's item slots. */
+  extraItem?: { itemId: string; count: number };
+}
+
+export type WorldQuestBeamSide = 'north' | 'east' | 'south' | 'west';
+
+export interface WorldQuestBeamPuzzleDef {
+  columns: number;
+  rows: number;
+  source: { tileIndex: number; side: WorldQuestBeamSide };
+  target: { tileIndex: number; side: WorldQuestBeamSide };
+  tiles: readonly {
+    kind: 'straight' | 'corner';
+    initialRotation: number;
+  }[];
+}
+
+export type WorldQuestMatch3Candy = 0 | 1 | 2 | 3 | 4;
+
+export interface WorldQuestMatch3LevelDef {
+  columns: number;
+  rows: number;
+  board: readonly WorldQuestMatch3Candy[];
+  refill: readonly WorldQuestMatch3Candy[];
+  target: number;
+  maxMoves: number;
+}
+
+export interface WorldQuestTraceDef {
+  kind:
+    | 'triangle'
+    | 'square'
+    | 'star'
+    | 'hourglass'
+    | 'lightning'
+    | 'spiral'
+    | 'double-triangle'
+    | 'diamond'
+    | 'pentagon'
+    | 'arrow'
+    | 'zigzag'
+    | 'cross';
+  /** Closed outline, with the first vertex repeated at the end. */
+  points: readonly { x: number; z: number }[];
+}
+
+export interface WorldQuestTraceRoundScore {
+  precision: number;
+  efficiency: number;
+  time: number;
+}
+
+export interface WorldQuestTraceResult extends WorldQuestTraceRoundScore {
+  score: number;
+  rating: 'bronze' | 'silver' | 'gold';
+}
+
+export interface WorldQuestTraceMetrics {
+  startedAt: number;
+  distance: number;
+  deviationDistance: number;
+}
+
+export interface WorldQuestTraceState {
+  questId: string;
+  shapeIndex: number;
+  phase: 'preview' | 'drawing' | 'failed' | 'success';
+  previewUntil: number;
+  expiresAt: number;
+  /** Authoritative bounded trail, never supplied by a client or persisted. */
+  trail: { x: number; z: number }[];
+  lastPosition: { x: number; z: number };
+  segment: number;
+  direction: -1 | 0 | 1;
+  started: boolean;
+  /** Private scoring accumulation, never a client authority or persistence field. */
+  metrics?: WorldQuestTraceMetrics;
+  reason?: 'off-path' | 'movement' | 'timeout' | 'combat';
+}
+
+export type ForgeStationId = 'fuel' | 'metal' | 'water' | 'tools';
+
+export interface WorldQuestForgeResult {
+  elapsed: number;
+  mistakes: number;
+  adjustedTime: number;
+  rating: 'bronze' | 'silver' | 'gold';
+}
+
+export interface WorldQuestForgeState {
+  phase: 'countdown' | 'working' | 'success' | 'failed';
+  /** Last authoritative clock sample, published at bounded cadence for both hosts. */
+  observedAt: number;
+  /** Isolated stream for the band centres (minigames/forge_workshop.ts). */
+  seed: number;
+  readyAt: number;
+  startedAt: number;
+  /** Good strikes landed so far (FORGE_STRIKES finishes the piece). */
+  strikes: number;
+  /** The strike band: centre and half-width on the 0..1 bar. */
+  band: number;
+  bandHalf: number;
+  /** Heat sample (0..100) and the clock it was taken at; decays lazily from there. */
+  heat: number;
+  heatAt: number;
+  stokeReadyAt: number;
+  lockUntil: number;
+  mistakes: number;
+  feedback: 'ready' | 'hit' | 'miss' | 'cold' | 'stoked';
+  result?: WorldQuestForgeResult;
+}
+
+export type WorldQuestObjective =
+  | { type: 'glider'; instructorNpcId: string; courseId: string }
+  | { type: 'investigation'; targetMobId: string }
+  | { type: 'shadow'; instructorNpcId: string }
+  | { type: 'forging'; instructorNpcId: string }
+  | { type: 'wisp_maze'; instructorNpcId: string }
+  | { type: 'vehicle'; stationId: string }
+  | {
+      type: 'tracing';
+      instructorNpcId: string;
+      shapes: readonly WorldQuestTraceDef[];
+      advancedShapes?: readonly WorldQuestTraceDef[];
+    }
+  | { type: 'kill'; targetMobId: string }
+  | { type: 'escort'; escortId: string }
+  | { type: 'interact'; targetObjectItemId: string }
+  | {
+      type: 'salvage';
+      objectItemId: string;
+      /** Stable ground-object entity ids, one eight-piece arrangement per week. */
+      layouts: readonly (readonly number[])[];
+    }
+  | { type: 'gather'; nodeType: GatherNodeType }
+  | {
+      type: 'delivery';
+      pickupObjectItemId: string;
+      deliveryObjectItemId: string;
+    }
+  | {
+      type: 'puzzle';
+      activationObjectItemId: string;
+      puzzles: readonly WorldQuestBeamPuzzleDef[];
+    }
+  | {
+      type: 'match3';
+      activationObjectItemId: string;
+      levels: readonly WorldQuestMatch3LevelDef[];
+    };
+
+/** A repeatable open-world objective. World quests have no giver or turn-in:
+ *  entering the authored area starts them and completing the objective pays
+ *  the reward immediately. */
+export interface WorldQuestDef {
+  id: string;
+  zoneId: string;
+  faction?: 'rift_watch' | 'church_order' | 'automatons';
+  minLevel: number;
+  area: { x: number; z: number; radius: number };
+  objective: WorldQuestObjective;
+  count: number;
+  /** Overrides of the shared reward schedule; omitted means XP, copper and
+   *  standing at the defaults. */
+  reward?: WorldQuestReward;
+}
+
+/** Per-character state for the current host-provided UTC cycle. Available
+ *  quests are absent; only started and completed entries are persisted. */
+export interface WorldQuestInvestigationState {
+  heard: number;
+  clues: number;
+  cleared: number;
+  mobId?: number;
+}
+
+export interface WorldQuestShadowState {
+  /** Internal fixed-tick guard, never wired. */
+  lastTick?: number;
+  phase: 'cloaked' | 'caught';
+  suspicion: number;
+  cooldown: number;
+  stealing?: { targetId: number; remaining: number; x: number; z: number };
+}
+
+/** The one weekly charge a character holds (src/sim/weekly_quests.ts). */
+export interface WeeklyQuestProgress {
+  questId: string;
+  /** The week the pick belongs to; a different current week means it is over. */
+  week: string;
+  count: number;
+  state: 'active' | 'completed';
+  /** The faction id that took the week's commendation (standing), once the
+   *  finished charge's one choice is made; absent until then. */
+  commended?: string;
+}
+
+export interface WorldQuestProgress {
+  /** Reward-free replay cursor. Session only; saved as the earned completion. */
+  practiceOnly?: boolean;
+  /** Completed lesson scores retained while a session-only replay is in progress. */
+  practiceTraceScores?: WorldQuestTraceRoundScore[];
+  /** Personal borrowed cloak and channel, omitted from saves. */
+  shadow?: WorldQuestShadowState;
+  /** Personal investigation clues and live summon reference, omitted from saves. */
+  investigation?: WorldQuestInvestigationState;
+  questId: string;
+  count: number;
+  state: 'active' | 'completed';
+  /** Private maze actors and collection, session only. */
+  wispMaze?: WispMazeState & { paused?: boolean };
+  forging?: WorldQuestForgeState;
+  /** Best completed workshop result for this rotation. */
+  forgeResult?: WorldQuestForgeResult;
+  /** Personal glider flight, omitted from saves. */
+  glider?: GliderFlightState;
+  gliderResult?: GliderFlightResult;
+  /** Session-only tracing readout. Omitted from character saves. */
+  tracing?: WorldQuestTraceState;
+  /** Stable advanced figure id and earned scores survive interruption and save/load. */
+  traceVariant?: string;
+  traceScores?: WorldQuestTraceRoundScore[];
+  traceResult?: WorldQuestTraceResult;
+  creditedObjects?: string[];
+  puzzleVariant?: number;
+  /** Ley bonus boards past the daily solve (sim/world_quest_ley_bonus.ts): the
+   *  charged level (1 or 2) and how many this offer already paid. Persisted. */
+  puzzleBonusLevel?: number;
+  puzzleBonusClaimed?: number;
+  /** Deterministic daily generation marker; absent on authored legacy/dev attempts. */
+  puzzleDay?: number;
+  puzzleRotations?: number[];
+  puzzleExpiresAt?: number;
+  match3Board?: WorldQuestMatch3Candy[];
+  match3Moves?: number;
+  match3RefillIndex?: number;
+}
+
 export function questObjectiveRequired(
   quest: QuestDef,
   progress: QuestProgress | undefined,
@@ -5090,6 +5441,31 @@ export type Consuming = FoodConsuming | DrinkConsuming;
 
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {
   return e.eating !== null || e.drinking !== null;
+}
+
+/** A ferry passenger's voyage (src/sim/transport_ferry.ts): which route,
+ *  and the berths it sails from and to (the ferry deed and a save taken
+ *  aboard read them). Where they stand is their ordinary position: the
+ *  moving deck carries it (src/sim/transport_deck.ts). */
+export interface FerryRide {
+  /** route id (content/transport_ships.ts TRANSPORT_ROUTES) */
+  route: string;
+  /** departure and destination berth indexes */
+  from: number;
+  to: number;
+  /** the ship's pose this tick (the frame the wire's deck spot is taken in) */
+  ship: { x: number; z: number; rot: number };
+}
+
+/** An online entity's spot on a sailing ship's deck, as the snapshot sends it
+ *  (src/net/transport_wire.ts): the route index, the spot in the hull's frame
+ *  (x port, y above the waterline, z bow) and the heading off the bow. */
+export interface FerryDeckMirror {
+  route: number;
+  x: number;
+  y: number;
+  z: number;
+  f: number;
 }
 
 /**
@@ -5185,6 +5561,13 @@ export interface ClientMirroredEntityFields {
   climbProgress?: number;
   /** Mirror of an in-flight Vaulting Charge: a bare server-owned movement bit. */
   leaping?: boolean;
+  /** Mirror of a ferry ride (`ferryRide`): aboard a sailing ship, with the
+   *  deck spot of the newest snapshot and the one being interpolated from, so
+   *  the renderer draws deck-bound bodies in the ship's frame (no slide
+   *  against the deck while it moves). */
+  ferryRiding?: boolean;
+  ferryDeck?: FerryDeckMirror | null;
+  ferryDeckPrev?: FerryDeckMirror | null;
 }
 
 export interface Entity extends ClientMirroredEntityFields {
@@ -5272,8 +5655,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // from the guild's (or pledged guild's) collective lifetime XP. 0 for the
   // base look and for the unguilded. Server-set display only.
   guildTier: number;
-  // Book of Deeds display title: a deed id (never display text), null/absent
-  // for untitled players and every mob/npc. Written by the sim title setter
+  // Display title: a title-deed id or a developer-badge rung title id
+  // ('dev:<rung>', not a deed), never display text; null/absent for untitled
+  // players and every mob/npc. Written by the sim title setter
   // (src/sim/deeds.ts setActiveTitle) and player spawn from persisted state;
   // rides the identity wire only when non-null.
   title?: string | null;
@@ -5282,6 +5666,13 @@ export interface Entity extends ClientMirroredEntityFields {
   // the sim border setter (src/sim/deeds.ts setActiveBorder) and player spawn
   // from persisted state; rides the identity wire only when non-null.
   border?: string | null;
+  // The chosen talent specialization (a spec id such as 'holy', never display
+  // text), null for a character with no spec yet and for every mob/npc.
+  // Render-only mirror of PlayerMeta.talentMods.spec, stamped by
+  // recalcPlayerStats beside the other worn-state mirrors so every spec,
+  // respec, loadout, level, and load path refreshes it. The sim never reads
+  // it; it rides the identity wire for the mouseover tooltip's spec line.
+  specId?: string | null;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
@@ -5579,8 +5970,18 @@ export interface Entity extends ClientMirroredEntityFields {
   // Authoritative ledge-climb pull-up. Like `leap`, it owns movement while it
   // runs; see `src/sim/climb.ts`.
   climb?: LedgeClimb | null;
+  // A scheduled ferry passenger (src/sim/transport_ferry.ts): aboard while the
+  // ship sails, carried by its moving deck. Session-only and absent until a
+  // first voyage; the wire carries the deck spot (`fry`, see ferryDeck).
+  ferryRide?: FerryRide | null;
+  // The ferry parked this player's pet for a crossing (the delve pet stash);
+  // it comes back once the owner is off the ship and alive.
+  ferryPetParked?: boolean;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
+  // Druid Cat Form: how far the parked energy pool sits below full while out of
+  // the form (0 or absent = full). See combat/cat_form_energy.ts.
+  parkedEnergyDeficit?: number;
   sitting: boolean;
   eating: Consuming | null;
   drinking: Consuming | null;
@@ -5822,6 +6223,20 @@ export interface Entity extends ClientMirroredEntityFields {
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
   jailed?: boolean;
+  /** World PvP flag (/pvp, src/sim/pvp/world_pvp.ts): two flagged players who
+   *  share no party or raid (a guild is no shield) are mutually hostile in the
+   *  open world (isHostileTo's world arm). The DISPLAY mirror of the
+   *  authoritative PlayerMeta.worldPvp state, written only by that module
+   *  (the away.ts meta<->entity precedent), and it rides the entity wire
+   *  (`pvp`) so every nearby client colours the nameplate. Absent/false is
+   *  unflagged, so an unflagged character samples and serializes exactly as
+   *  before the flag existed. */
+  pvpFlag?: boolean;
+  /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
+   *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
+   *  gear's health bonus never reaches raid content. Absent means the open
+   *  world, where it applies; battlegrounds and arenas apply it too. */
+  pvpVitalityActive?: boolean;
   /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
    *  via setCheaterMark at join restore and when an operator applies or lifts a
    *  mark; never true offline, never user-settable. Cosmetic: nothing reads it
@@ -6304,6 +6719,9 @@ export interface NythraxisEncounterState {
     ascensionStacks: number;
   } | null;
   majorGapTimer?: number;
+  // Seconds left before Bone Storm may begin after a Soul Rend detonation
+  // (nythraxis_soul_rend.ts); 0 when no detonation is settling.
+  soulRendSettleTimer?: number;
   // The Crown Endures: seconds since the first encounter tick (the clock runs
   // through the transition) and the enrage stack the boss carries once it has
   // run out (nythraxis_enrage_clock.ts).
@@ -6318,7 +6736,6 @@ export interface NythraxisEncounterState {
     chargeIndex: number;
     chargeTargetId: number | null;
     slammed: boolean;
-    openingSlamSpent: boolean;
     whirlTickTimer: number;
     chargedIds: number[];
   } | null;
@@ -6930,6 +7347,20 @@ export type SimEvent = { pid?: number } & (
       expiresAt: number;
       candidates: { pid: number; name: string }[];
     }
+  // A party loot roll GRANTED its item: fired once per roll, at resolution
+  // (a need/greed win or a direct master-loot assignment), pid-scoped to the
+  // winner. Distinct from the `lootRoll` PROMPT above, which fans one copy out
+  // per candidate before anyone has rolled and so never names a recipient; a
+  // consumer that wants "who received the drop" (the Discord rare-drop card)
+  // reads this event, never the prompt. Never fired when everyone passes or
+  // the winner is gone (the item returns to the corpse instead).
+  | {
+      type: 'lootRollAwarded';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+    }
   | {
       type: 'error';
       text: string;
@@ -6953,6 +7384,64 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
+  /** The Gambler's Die landed (src/sim/combat/trinkets.ts): the client names the
+   *  fortune it rolled. */
+  | { type: 'trinketGamble'; fortune: 'keenEdge' | 'luckyHeal' | 'gildedGuard' | 'snakeEyes' }
+  | { type: 'worldQuestStarted'; questId: string }
+  // The weekly emissary (src/sim/weekly_quests.ts): open the window, the pick,
+  // progress, and the paid completion. All personal (pid); the client owns
+  // every visible string.
+  | { type: 'worldQuestWeeklyOpen' }
+  | { type: 'worldQuestWeeklyChosen'; questId: string }
+  | { type: 'worldQuestWeeklyProgress'; questId: string; count: number; required: number }
+  | { type: 'worldQuestWeeklyDone'; questId: string }
+  /** A big on-screen line for a shared world-quest moment (the client owns the
+   *  wording under questUi.worldQuest.banner.<banner>). */
+  | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
+  | ({ type: 'cannonResult' } & CannonResult)
+  /** One finished scoreboard attempt (src/sim/world_quest_scoreboards.ts); the
+   *  server keeps the character's best row per board. */
+  | {
+      type: 'worldQuestScore';
+      board: string;
+      medal: WorldQuestMedal | null;
+      metric: number;
+      resetDay?: string;
+    }
+  | {
+      type: 'worldQuestProgress';
+      questId: string;
+      count: number;
+      required: number;
+    }
+  | { type: 'worldQuestPuzzleOpened'; questId: string }
+  | { type: 'worldQuestPuzzleClosed'; questId: string }
+  | {
+      type: 'worldQuestPuzzleUpdated';
+      questId: string;
+      tileIndex: number;
+      rotation: number;
+    }
+  | { type: 'worldQuestPuzzleFailed'; questId: string }
+  | { type: 'worldQuestMatch3Updated'; questId: string }
+  | {
+      type: 'worldQuestDone';
+      questId: string;
+      traceResult?: Pick<WorldQuestTraceResult, 'score' | 'rating'>;
+    }
+  // Clue Scrolls (src/sim/clue_scrolls.ts, src/sim/clue_casket.ts): ids and
+  // indices only, the client resolves every clue and line (clues.<huntId>.<step>).
+  /** The day's slate paid a scroll and it landed in the bags. */
+  | { type: 'clueScrollEarned' }
+  /** The slate paid a scroll but the stack or the bags could not hold it: lost for the day. */
+  | { type: 'clueScrollLost' }
+  | { type: 'clueHuntStarted'; huntId: string; total: number }
+  /** `step` is the index of the step that just completed; `total` is steps.length. */
+  | { type: 'clueHuntStep'; huntId: string; step: number; total: number }
+  | { type: 'clueHuntDone'; huntId: string }
+  | { type: 'clueHuntAbandoned'; huntId: string }
+  /** One id per grant (the Heroic Marks stack appears once) plus the copper paid. */
+  | { type: 'clueCasketOpened'; itemIds: string[]; copper: number }
   | {
       type: 'varkhulCallout';
       sourceId: number;
@@ -7056,7 +7545,7 @@ export type SimEvent = { pid?: number } & (
   // Asks the client to open the bank window (the interact path at a banker NPC).
   // Structured data only (pid supplied by the union intersection); the client
   // builds every visible string, the mailbox precedent.
-  | { type: 'bank' }
+  | { type: 'bank' | 'weekly_rewards' }
   // Asks the client to open the Rift Forge window (the interact path at a
   // riftForge NPC). Structured only, the bank precedent above.
   | { type: 'riftForge' }
@@ -7081,6 +7570,7 @@ export type SimEvent = { pid?: number } & (
       current: RealmBuilderHonour;
       past: readonly RealmBuilderHonour[];
     }
+  | { type: 'worldQuestInvestigationDialogue'; targetId: number }
   // `boardId` is the authored NoticeboardDef id (every board shares one
   // templateId), so the client can tell the Proving Shore's recruits' signpost
   // from a town board and open the guild board on its default view.
@@ -7418,6 +7908,19 @@ export type SimEvent = { pid?: number } & (
       // clamped heal2 emit site; a tick whose heal fully overheals without
       // draining a heal-absorb shield still emits nothing.
       overheal?: number;
+    }
+  // One absorb shield soaking part of one hit. Emitted per shield drained
+  // (combat/absorb_credit.ts) so the Healing meter and the parse recorder can
+  // credit the SHIELDER: the damage event's aggregate `absorbed` total names
+  // nobody. `sourceId` is the shield aura's caster, `ability` its display
+  // name, `abilityId` its aura id. Never emitted for a zero soak.
+  | {
+      type: 'absorb';
+      sourceId: number;
+      targetId: number;
+      amount: number;
+      ability: string;
+      abilityId: string;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
@@ -7962,6 +8465,30 @@ export type SimEvent = { pid?: number } & (
   // `crafter` repeats as payload). Ids only, text-free on purpose (like
   // craftResult above): the client renders its own localized copy.
   | { type: 'masterwork'; recipeId: string; itemId: string; crafter: number }
+  // Chance-based craft outcome audit record (craft_roll_events): one per
+  // resolved roll that decides a crafting outcome, carrying the draw the sim
+  // actually made, the chance it was measured against, and the verdict, so
+  // the real success rate of a system can be read back from the database
+  // after the fact. `kind` names the roll: 'masterwork' is the single
+  // output-side proc draw of a player craft whose output could ever proc
+  // (chance is the EFFECTIVE chance, 0 when an archetype ceiling or a worse
+  // Jack variance gated the effect off); 'perfecting' is the Perfecting
+  // attempt's success roll (professions/perfecting.ts), with the rank walked
+  // from and to (rank PERFECTING_RANKS meaning Perfected). Personal (pid =
+  // the crafter's entity id), SERVER-SIDE EVIDENCE ONLY: never routed to a
+  // client (server/event_frame.ts filterRoutableEvents), text-free, and emits
+  // no draw of its own (the roll it reports is the one the system drew).
+  | {
+      type: 'craftRoll';
+      kind: 'masterwork' | 'perfecting';
+      recipeId: string | null;
+      itemId: string;
+      roll: number;
+      chance: number;
+      success: boolean;
+      rankBefore?: number;
+      rankAfter?: number;
+    }
   // Masterwork zone broadcast (Professions 2.0): the soft zone-wide
   // copy of a masterwork proc, one per overworld player currently in the
   // crafter's zone INCLUDING the crafter, `pid` being the RECIPIENT (the
@@ -8560,6 +9087,9 @@ export interface MoveInput {
    *  key binding, a bot, and any client that never sends it all read as 1
    *  (`swimSteerRate`), which is exactly the old on/off behaviour. */
   swimSteer?: number;
+  /** Signed flight pitch intent, -1 dive to +1 climb. Absent uses keyboard
+   * controls; zero explicitly requests a neutral glide. */
+  gliderPitch?: number;
 }
 
 // A bounded height edit (the sculpt brush stamp), applied inside terrainHeight()
@@ -8665,8 +9195,9 @@ export const EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS = Object.freeze({
 export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
 // and reserved 1_000_000_x singleton ids (the Vale Cup groundskeeper, FURY in
-// Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, and
-// authored practice dummies). A singleton NPC takes a reserved id AND
+// Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, the
+// Wyrmwatch harbormaster, the Eastbrook vault keeper, practice dummies; each id
+// is taken ONCE, tests/reserved_singleton_entity_ids.test.ts pins the band). A singleton NPC takes a reserved id AND
 // `dynamic: true` so the generic world-init loop skips it: that loop allocates
 // ids by iterating the merged NPC table in insertion order, so a plain
 // insertion would shift the id of every NPC, camp mob and object created after
@@ -8880,6 +9411,7 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
   // Host wall clock the day/night cycle is anchored to (src/sim/day_night.ts): the
   // server's Date.now, the offline client's Date.now (or its /daynight override), so
@@ -8973,6 +9505,7 @@ export interface SimConfig {
 
 export function emptyMoveInput(): MoveInput {
   return {
+    gliderPitch: undefined,
     forward: false,
     back: false,
     turnLeft: false,
@@ -9271,7 +9804,16 @@ export type DeedMeterId =
   | 'poorItemsDiscoveredCount'
   // Career Honor earned, never spent: PlayerMeta.lifetimeHonor is monotonic, so
   // spending at the WARFARE quartermaster can never cost a rank title.
-  | 'lifetimeHonor';
+  | 'lifetimeHonor'
+  // Faction standing (PlayerMeta.factions, src/sim/factions.ts): one meter
+  // per allied faction. awardFactionReputation only ever adds, so a standing
+  // tier once reached is never lost.
+  | 'standingRiftWatch'
+  | 'standingChurchOrder'
+  | 'standingAutomatons'
+  // Clue Scrolls: lifetime Treasure Caskets opened (PlayerMeta.clueCasketsOpened,
+  // src/sim/clue_casket.ts). Only ever climbs.
+  | 'clueCasketsOpened';
 
 // Boolean predicates over already-persisted state (see the flag table in
 // deeds.ts). Like meters, they retro-grant on load.
@@ -9960,4 +10502,132 @@ export interface DelveRestlessPending {
   x: number;
   z: number;
   mobId: string;
+}
+
+/** Vehicle encounters are private runtime actors, never shared combat entities. */
+export type CannonActionId = 'cannonball' | 'grapeshot' | 'incendiary';
+export type CannonEnemyKind = 'infantry' | 'runner' | 'armored' | 'commander' | 'sapper';
+export interface CannonPoint {
+  x: number;
+  z: number;
+}
+export interface CannonField {
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
+}
+export interface CannonActionDef {
+  damage: number;
+  radius: number;
+  cooldownTicks: number;
+  flightTicks: number;
+  slowTicks: number;
+  slowMultiplier: number;
+  burnTicks: number;
+  burnDamage: number;
+}
+export interface CannonEnemyDef {
+  hp: number;
+  speed: number;
+  breachDamage: number;
+}
+export interface CannonSpawnDef {
+  atTick: number;
+  lane: number;
+  kind: CannonEnemyKind;
+}
+export interface CannonEnemy extends CannonPoint {
+  id: number;
+  kind: CannonEnemyKind;
+  hp: number;
+  slowUntilTick: number;
+  armorBroken?: boolean;
+}
+export interface CannonBarrel extends CannonPoint {
+  id: number;
+  active: boolean;
+}
+export interface CannonFeedback extends CannonPoint {
+  id: number;
+  tick: number;
+  kind: 'shot' | 'impact' | 'barrel' | 'armor' | 'charge' | 'death';
+  enemyId?: number;
+}
+export const WORLD_QUEST_BANNER_IDS = [
+  'riftOpens',
+  'captainSteps',
+  'riftRouted',
+  'championRises',
+  'championFallen',
+  'endlessBegins',
+] as const;
+export type WorldQuestBannerId = (typeof WORLD_QUEST_BANNER_IDS)[number];
+
+export interface CannonResult {
+  medal: 'bronze' | 'silver' | 'gold' | null;
+  integrity: number;
+  shotsFired: number;
+  shotsHit: number;
+  /** Waves held in total, endless rounds included (absent on pre-endless payloads). */
+  wavesCleared?: number;
+}
+export interface CannonShot extends CannonPoint {
+  id: number;
+  action: CannonActionId;
+  firedTick: number;
+  impactTick: number;
+}
+export interface CannonFirePatch extends CannonPoint {
+  id: number;
+  nextPulseTick: number;
+  expiresTick: number;
+  hitCredited?: boolean;
+}
+/** Caller owns this state. Tick/action functions have no hidden world state. */
+export interface CannonEncounterState {
+  tick: number;
+  phase: 'countdown' | 'wave' | 'intermission' | 'won' | 'failed';
+  phaseUntilTick: number;
+  wave: number;
+  waveStartTick: number;
+  spawnCursor: number;
+  integrity: number;
+  killed: number;
+  breached: number;
+  commanderKilled: boolean;
+  nextId: number;
+  recoveryUntilTick: number;
+  readyAt: Record<CannonActionId, number>;
+  enemies: CannonEnemy[];
+  shots: CannonShot[];
+  fires: CannonFirePatch[];
+  barrels: CannonBarrel[];
+  feedback: CannonFeedback[];
+  shotsFired: number;
+  shotsHit: number;
+  commanderCharging: boolean;
+  /** Endless play past the authored victory (minigames/cannon_endless.ts): the
+   *  medal latched at the victory, and the running count of waves held. */
+  endless?: boolean;
+  wavesCleared?: number;
+  victoryMedal?: CannonResult['medal'];
+}
+
+export interface VehicleStationDef {
+  id: string;
+  entityId: number;
+  questId: string;
+  x: number;
+  z: number;
+  field: CannonField;
+}
+
+/** Transient personal vehicle session. Never included in character saves. */
+export interface VehicleSession {
+  kind: 'cannon';
+  stationId: string;
+  cycle: string;
+  origin: Vec3;
+  encounter: CannonEncounterState;
 }

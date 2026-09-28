@@ -188,14 +188,17 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // (tsx, no full compile), since these additions could in principle
     // collide on a relic id. Re-confirm with
     // `npx vitest run tests/profile_page.test.ts` once the tree compiles.
-    //
-    // RE-PINNED at the merge of feature/mirefen-world-boss into
-    // release/v0.44.0: the Mirefen world boss page adds seven item relics
-    // (the Foreman's arms plus the three Foreman's Wage rares), and its reins
-    // already held a horizons_mounts slot, so the character-scoped total
-    // moves by exactly seven to 418. MEASURED with the same standalone probe
-    // against the merged src/sim/content/reliquary.ts.
-    expect(catalogTotal).toBe(418);
+    // 412 at the release/v0.43.0 merge into feature/world-quests: the Arcane
+    // Calligraphy gold title's slot on the Horizons titles page.
+    // 415 at the faction standing deeds: the three Champion titles
+    // (Riftwarden, Dawnkeeper, Forgemaster) take their slots on the same page.
+    // 416 at the Clue Scroll casket deeds: the Treasure Hunter title's slot.
+    // 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) on the Horizons mounts page.
+    // 434 with the trinket slot's seventeen character-scoped relics (PR 4173).
+    // 441 with the Mirefen world boss page's seven character-scoped item relics.
+    expect(catalogTotal).toBe(441);
+    // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
+    // completion, so it moves nothing here.
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

@@ -94,14 +94,11 @@ describe('mob portrait source manifest', () => {
     // (hub_training_dummy, hub_healing_dummy).
     // 250: plus the five Eastbrook healing-training role dummies, each with
     // its own rendered portrait.
-    // 251: plus the Mirefen world boss (balgath_cyclops). Only the LIVE-mob
-    // floor moves here; the two fixture-driven counts below build synthetic
-    // rows and are unrelated.
-    // 255: plus the Mirefen muster's four soldier templates (muster_footman,
-    // muster_chaplain, muster_sergeant, muster_captain).
-    // 256: the captain became the Muster Commander NPC (the muster quests), and the
-    // drill yard added its drillmaster and the Straw Foreman effigy.
-    expect(liveIds).toHaveLength(256);
+    // 254: plus the world quest branch's Fenbridge infiltrator and its three
+    // regional freight caravans (Eastbrook, Willowfen, Frostveil).
+    // 260: plus the Mirefen world-boss branch's six (balgath_cyclops, muster_footman,
+    // muster_chaplain, muster_sergeant, muster_drillmaster, muster_effigy).
+    expect(liveIds).toHaveLength(260);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

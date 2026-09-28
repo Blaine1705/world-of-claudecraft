@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
+      "nextId": 1011,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1011,
-      "state": "fd2b6be1",
-      "events": "f110ada9",
+      "nextId": 1015,
+      "state": "f9383408",
+      "events": "08be3e77",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,9 +40,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1011,
-      "state": "dce15090",
-      "events": "b33c5aea",
+      "nextId": 1015,
+      "state": "b4e57fcd",
+      "events": "14dc52c1",
       "rng": {
         "draws": 66,
         "digest": "383a5306"
@@ -51,9 +51,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1011,
-      "state": "014fc53e",
-      "events": "960363ee",
+      "nextId": 1015,
+      "state": "ec04057f",
+      "events": "f3c46c01",
       "rng": {
         "draws": 247,
         "digest": "6b3f31b5"
@@ -62,9 +62,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1011,
-      "state": "f06d6889",
-      "events": "e9030cc2",
+      "nextId": 1015,
+      "state": "e02ce3f8",
+      "events": "1b9b3d0d",
       "rng": {
         "draws": 485,
         "digest": "b0986e30"
@@ -73,9 +73,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1011,
-      "state": "8a776e42",
-      "events": "fe792f1a",
+      "nextId": 1015,
+      "state": "c105bb93",
+      "events": "f71b8be8",
       "rng": {
         "draws": 756,
         "digest": "b0eecf8d"
@@ -84,8 +84,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 1011,
-      "state": "b83ca179",
+      "nextId": 1015,
+      "state": "32117e1c",
       "events": "741638a5",
       "rng": {
         "draws": 1041,
@@ -95,9 +95,9 @@
     {
       "tick": 163,
       "time": 8.15,
-      "nextId": 1011,
-      "state": "78a0eb1b",
-      "events": "57ceb170",
+      "nextId": 1015,
+      "state": "08077320",
+      "events": "f5e07b12",
       "rng": {
         "draws": 1178,
         "digest": "c7cc1a3a"
@@ -145,13 +145,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -159,6 +160,7 @@
             }
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -193,6 +195,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -232,12 +235,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -245,6 +249,7 @@
             }
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -281,6 +286,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -321,13 +327,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaAugments": [
             "aug_fleetfoot"
           ],
@@ -338,6 +345,7 @@
             }
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -370,6 +378,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -408,12 +417,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1014,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -421,6 +431,7 @@
             }
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -453,6 +464,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -468,7 +480,7 @@
               "name": "Battle Stance",
               "remaining": 3591.9,
               "school": "physical",
-              "sourceId": 1007
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -481,7 +493,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 5,
           "hp": 822,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -530,7 +542,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 41,
           "hp": 665,
-          "id": 1008,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -581,7 +593,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 6,
           "hp": 700,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -639,7 +651,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 16,
           "hp": 783,
-          "id": 1010,
+          "id": 1014,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

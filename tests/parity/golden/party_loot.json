@@ -13,7 +13,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1007,
+      "nextId": 1011,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,9 +27,9 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 1010,
-      "state": "abdd244b",
-      "events": "49cd4635",
+      "nextId": 1014,
+      "state": "d141eca2",
+      "events": "54c1ac8e",
       "rng": {
         "draws": 2,
         "digest": "6f587c5e"
@@ -81,14 +81,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -114,6 +116,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -162,13 +165,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -209,6 +214,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -224,7 +230,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 1007
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -238,7 +244,7 @@
           "fiveSecondRule": 99.15,
           "healPower": 5,
           "hp": 100,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -290,7 +296,7 @@
           "fiveSecondRule": 99.15,
           "healPower": 13,
           "hp": 54,
-          "id": 1008,
+          "id": 1012,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -342,7 +348,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 1009,
+          "id": 1013,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -367,7 +373,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 1007,
+          "tappedById": 1011,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

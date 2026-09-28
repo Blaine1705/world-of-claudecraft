@@ -226,6 +226,9 @@ describe('kit construction', () => {
     // The ids are pinned as literals rather than recomputed from roleItemScore, so a
     // retune of the role weights has to be admitted here instead of quietly moving
     // what every preset wears.
+    // The faction quartermasters' standing ladder (content/faction_vendors.ts)
+    // is excluded by isFreshTwentyItem outright: a fresh 20 holds no standing,
+    // so its rare Recognized necks and Trusted rings are never candidates.
     const FRESH_TWENTY_JEWELRY = [
       'burnished_thorium_amulet',
       'coiled_copper_torc',
@@ -267,6 +270,9 @@ describe('kit construction', () => {
     // intellect on it, so a caster that scored the amulet's agility at zero
     // (1.2) now has something to wear: 5.6 against 1.2 is not a tie being
     // broken, it is the caster neck slot finally having a candidate.
+    // The faction quartermasters' standing ladder (content/faction_vendors.ts) is out of
+    // the fresh-20 pool by construction (no standing on day one), so standing stock can
+    // never displace the picks here.
     const PHYSICAL_NECK = 'burnished_thorium_amulet';
     const CASTER_NECK = 'mirelight_locket';
     // Strength roles: the rung-50 str ring, then the Wage band. ring2 moved

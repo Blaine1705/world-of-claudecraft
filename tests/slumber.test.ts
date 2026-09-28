@@ -557,7 +557,7 @@ describe('the scheduler keeps his hours', () => {
     const boss = bossOf(sim) as Entity;
     const internals = sim as unknown as {
       worldBossNextAt: number[];
-      worldBossRiseAtDawn: boolean[];
+      worldBossDawn: { riseAtDawn: boolean[] };
       time: number;
     };
     // Kill him (an outside-the-fight kill is fine here: only the scheduler is under test).
@@ -566,7 +566,7 @@ describe('the scheduler keeps his hours', () => {
     boss.corpseTimer = 0;
     sim.tick();
     expect(bossOf(sim)).toBeUndefined();
-    expect(internals.worldBossRiseAtDawn[balgathSlot]).toBe(true);
+    expect(internals.worldBossDawn.riseAtDawn[balgathSlot]).toBe(true);
     // The hourly interval comes due: NOT enough for a sleeper.
     internals.worldBossNextAt[balgathSlot] = internals.time;
     sim.tick();
@@ -583,7 +583,7 @@ describe('the scheduler keeps his hours', () => {
     const risen = bossOf(sim);
     expect(risen).toBeDefined();
     expect(risen?.asleep).toBe(false);
-    expect(internals.worldBossRiseAtDawn[balgathSlot]).toBe(false);
+    expect(internals.worldBossDawn.riseAtDawn[balgathSlot]).toBe(false);
     const texts = events.flatMap((e) => (e.type === 'log' ? [(e as { text: string }).text] : []));
     expect(texts.some((t) => t.startsWith(`${risen?.name} rises over`))).toBe(true);
   });
@@ -601,14 +601,14 @@ describe('the scheduler keeps his hours', () => {
     const boss = bossOf(sim) as Entity;
     const internals = sim as unknown as {
       worldBossNextAt: number[];
-      worldBossRiseAtDawn: boolean[];
+      worldBossDawn: { riseAtDawn: boolean[] };
       time: number;
     };
     boss.hp = 0;
     boss.dead = true;
     boss.corpseTimer = 0;
     sim.tick();
-    expect(internals.worldBossRiseAtDawn[balgathSlot]).toBe(false);
+    expect(internals.worldBossDawn.riseAtDawn[balgathSlot]).toBe(false);
     internals.worldBossNextAt[balgathSlot] = internals.time;
     sim.tick();
     expect(bossOf(sim)).toBeDefined();

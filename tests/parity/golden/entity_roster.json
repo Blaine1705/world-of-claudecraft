@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1008,
-      "state": "5d3d878d",
+      "nextId": 1012,
+      "state": "efa091b2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,14 +62,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -94,6 +96,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -109,7 +112,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1000
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -123,7 +126,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1000,
+          "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -167,9 +170,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1010,
-      "state": "2ffc63ac",
-      "events": "72518360",
+      "nextId": 1014,
+      "state": "caebcf7b",
+      "events": "02e6c9c0",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -178,8 +181,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1010,
-      "state": "f6886575",
+      "nextId": 1014,
+      "state": "590b2020",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -189,8 +192,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1010,
-      "state": "08b15ec1",
+      "nextId": 1014,
+      "state": "40ab67bc",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -250,14 +253,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -284,6 +289,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -299,7 +305,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 1000
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -313,7 +319,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 5,
           "hp": 50000,
-          "id": 1000,
+          "id": 1004,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -357,8 +363,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1010,
-      "state": "81fb4e59",
+      "nextId": 1014,
+      "state": "d2134820",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -418,14 +424,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -452,6 +460,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -477,7 +486,7 @@
           "ghost": true,
           "healPower": 5,
           "hp": 442,
-          "id": 1000,
+          "id": 1004,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -521,9 +530,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1010,
-      "state": "e6e3a584",
-      "events": "b389ea61",
+      "nextId": 1014,
+      "state": "e76c4cb2",
+      "events": "557f26d5",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -582,14 +591,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -616,6 +627,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -631,7 +643,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 1000,
+              "sourceId": 1004,
               "undispellable": true,
               "value": -0.75
             }
@@ -643,11 +655,12 @@
           "critChance": 0.0535,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0535,
+          "facing": 1.570796,
           "fallStartY": -2,
           "fiveSecondRule": 99.25,
           "healPower": 2,
           "hp": 44,
-          "id": 1000,
+          "id": 1004,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -691,9 +704,9 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1010,
-      "state": "b2a54e18",
-      "events": "d0914475",
+      "nextId": 1014,
+      "state": "81335f16",
+      "events": "0eaaa8ed",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -702,8 +715,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 1010,
-      "state": "d8a408df",
+      "nextId": 1014,
+      "state": "be583269",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -763,14 +776,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -797,6 +812,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -812,7 +828,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 1000,
+              "sourceId": 1004,
               "undispellable": true,
               "value": -0.75
             },
@@ -823,7 +839,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 1000
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -833,11 +849,12 @@
           "critChance": 0.0535,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0535,
+          "facing": 1.570796,
           "fallStartY": -0.850337,
           "fiveSecondRule": 99.35,
           "healPower": 2,
           "hp": 44,
-          "id": 1000,
+          "id": 1004,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",

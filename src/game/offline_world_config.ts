@@ -1,5 +1,6 @@
 // Browser offline-world policy. The host supplies randomness before constructing
 // the deterministic Sim; saved character identity takes precedence on reload.
+import { nextRaidResetMs, nextWeeklyRaidResetMs } from '../reset_calendar';
 import { PLAYER_INTEREST_DROP_RADIUS, type PlayerClass, type SimConfig } from '../sim/types';
 import { WORLD_SEED } from '../sim/world_seed';
 import { offlineDayNightNowMs } from './daynight_dev_command';
@@ -13,6 +14,9 @@ export function offlineWorldConfig(options: {
   readonly devCommands: boolean;
 }): SimConfig {
   return {
+    lockoutNowMs: Date.now,
+    raidResetMs: nextRaidResetMs,
+    weeklyRaidResetMs: nextWeeklyRaidResetMs,
     seed: options.seedOverride ?? WORLD_SEED,
     playerClass: options.playerClass,
     playerName: options.name,

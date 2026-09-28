@@ -868,17 +868,19 @@ describe('real catalog integration', () => {
     // Recomputed directly against the merged live catalog
     // (src/sim/content/deeds.ts) with a standalone probe calling
     // buildDeedsView + countsTowardCompletion directly (tsx, no full
-    // compile), since the tree does not compile yet. The merge of
-    // feature/mirefen-world-boss appends the world boss pair (cmb_balgath,
-    // cmb_balgath_ten), neither feat-flagged nor hidden, so both subtrahends
-    // are unchanged and the identity moves with the total alone:
-    // 302 deeds - 22 feats - 10 hidden = 270 visible to a fresh character. The muster's
-    // pike drill deed (cmb_point_taken, neither feat nor hidden) makes it 271.
-    expect(view.summary.visibleTotal).toBe(271);
+    // compile), since the tree does not compile yet:
+    // 300 deeds - 22 feats - 10 hidden = 268 visible to a fresh character.
+    // 276 with the eight world-quest deeds, 283 with the seven faction
+    // standing deeds, 285 with the two Clue Scroll casket deeds (all visible,
+    // none feat or hidden).
+    // 286 with the release's ferry round trip (exp_harbor_to_harbor).
+    // 289 with the Mirefen world-boss branch's three combat deeds (none feat or hidden).
+    expect(view.summary.visibleTotal).toBe(289);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
-    // from visibleTotal): 271 + 22 = 293.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(293);
+    // from visibleTotal): 268 + 22 = 290, then 298, 305, 307 and 308 by the same
+    // four appends, and 311 with the world-boss branch's three.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(311);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

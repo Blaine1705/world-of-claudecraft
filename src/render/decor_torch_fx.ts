@@ -15,6 +15,7 @@
 import * as THREE from 'three';
 import { getActiveWorldContent, zoneAt } from '../sim/data';
 import { terrainHeight } from '../sim/world';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { EMISSIVE_LIGHT, GFX } from './gfx';
 import { buildDrapedGlowGeometry, type GlowPatchSite } from './ground_glow_patch';
 import { MUSTER_TORCH_FLAME_HEIGHT, renderDecorProps } from './muster_camps';
@@ -177,7 +178,7 @@ export function buildDecorTorchFx(seed = 0): DecorTorchFxView {
         poolMat,
       );
       pools.geometry.computeBoundingSphere();
-      pools.renderOrder = 1; // over the ground it drapes on
+      pools.renderOrder = floorVfxRenderOrder('ground', 0); // over the ground it drapes on
       pools.visible = false; // no pool until dark
       poolMeshes.push(pools);
       zoneGroup.add(pools);

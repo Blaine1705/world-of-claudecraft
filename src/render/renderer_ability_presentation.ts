@@ -6,12 +6,15 @@ import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
+import { CAST_VFX_ENGINE } from './cast_vfx_family';
+import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
 import { ShardpikeThrowFx } from './shardpike_throw_fx';
+import { TrinketRelics } from './trinket_relics';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
 import { sampleWarriorPowerBone } from './warrior_power_anchor';
@@ -35,16 +38,10 @@ interface PresentationHost {
   spiritBuild: Parameters<AbilityVfxFx['setSpiritBuildScheduler']>[0];
   compile: Parameters<AbilityVfxFx['setSpiritCompileGate']>[0];
   light: LightPulses;
+  castGate: Pick<CastVfxReadiness, 'admit' | 'ready' | 'spawnAllowed'>;
   painter: Pick<
     AbilityVfxDeps,
-    | 'castVfxAdmit'
-    | 'castVfxReady'
-    | 'spawnAoeRing'
-    | 'triggerAttack'
-    | 'lightPulse'
-    | 'addShake'
-    | 'screenFlash'
-    | 'screenImpact'
+    'spawnAoeRing' | 'triggerAttack' | 'lightPulse' | 'addShake' | 'screenFlash' | 'screenImpact'
   >;
 }
 
@@ -86,18 +83,37 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     h.world,
     visual,
     fx,
-    () => h.painter.castVfxReady?.() ?? true,
+    // The throw draws engine-family pools (bodyGlow, impact), so it waits on that family.
+    () => h.castGate.ready(CAST_VFX_ENGINE),
     h.camera,
   );
   fx.setSpiritBuildScheduler(h.spiritBuild);
   fx.setSpiritCompileGate(h.compile);
+  fx.setCastVfxSpawnGate((bit) => h.castGate.spawnAllowed(bit));
   fx.onRushArrival = createOnrushArrivalHandler(() => h.world().entities, h.views, h.visual);
   fx.setWorldLightDelegate((at, school, intensity, duration, range) =>
     h.light.pulse(at, school, intensity, duration, range),
   );
+  // The raid trinket relics' pooled scene objects, built hidden here so the
+  // cast-VFX prewarm links them with the rest of the 'vfx' programs.
+  const trinketRelics = new TrinketRelics({
+    scene: h.scene,
+    world: () => h.world(),
+    views: h.views,
+    anchor: h.anchor,
+    ground: (x, z) => h.ground(x, z),
+    vfx: h.vfx,
+    time: () => h.time(),
+    // The relics are engine-family programs: ready once the cast gate has
+    // linked that family (the release's per-family cast admission).
+    ready: () => h.castGate.ready(CAST_VFX_ENGINE),
+  });
   const painter = new AbilityVfx(
     {
       ...h.painter,
+      trinketRelics,
+      castVfxAdmit: (mask) => h.castGate.admit(mask),
+      castVfxReady: (mask) => h.castGate.ready(mask),
       vfx: h.vfx,
       fx,
       anchor: h.anchor,

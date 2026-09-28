@@ -225,9 +225,17 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     // the three is honor stock. The amendment's load-bearing claim is the
     // one-row band below, and it still holds.
     const jewelry = pool((d) => d.kind === 'armor' && (d.slot === 'neck' || d.slot === 'ring'));
-    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(37);
+    // 34 to 40 and 24 to 30 at the wq-reputation merge: the six faction
+    // quartermaster necks and rings (content/faction_vendors.ts) all sell above
+    // 600 and none sits inside the band, so the one-row amendment holds.
+    // 40 to 47 and 30 to 37 at the faction ladder rework: thirteen faction
+    // jewels now (a neck and a ring per lower tier, the Champion gap jewels),
+    // every one selling above 600 and none inside the band, same amendment.
+    // 50 and 40 with the Mirefen world-boss branch's three jewels, all selling above
+    // 600 and none inside the band.
+    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(50);
     expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(9);
-    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(27);
+    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(40);
     // Exactly one row sits here, and the amended record names it.
     expect(
       jewelry.filter((d) => inBand(d, 25, 460)).map((d) => d.id),

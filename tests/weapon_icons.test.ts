@@ -58,17 +58,14 @@ describe('painted weapon inventory icons', () => {
     // `npx vitest run tests/weapon_icons.test.ts` run on the merged tree:
     // this assertion, and the 19-heroic-copy count in the next test, both
     // pass as-is.
-    //
-    // 140 at the Mirefen world-boss forward-port: the boss's signature maul
-    // (foremans_barrowmaul, balgath-boss-icons-2026-08-18) and Skerrit's
-    // Shardpike (shardpike-mechanic-icons-2026-08-20) are both disjoint
-    // additions to the registry, so 138 + 2 = 140. Re-counted directly off
-    // the merged src/ui/weapon_variants.ts.
-    //
-    // 141 with the Mirefen muster rework: the lent muster_shardpike
-    // (muster-shardpike-icon-2026-09-26) shares the Shardpike's held model and
-    // carries its own painted icon.
-    expect(baseWeapons).toHaveLength(141);
+    // 141 with the three faction quartermaster epics (riftwarden_voidblade,
+    // dawnkeeper_consecrated_mace, forgemaster_crag_cleaver; batch
+    // faction-vendor-icons-2026-09-16), landed by the wq-reputation merge.
+    // 141 -> 145: the four Warfare Season 2 honor weapons, painted in
+    // warfare-season2-weapons-2026-09-25 (second release/v0.44.0 base merge).
+    // 148 with the Mirefen world-boss branch's foremans_barrowmaul, skerrits_shardpike
+    // and muster_shardpike.
+    expect(baseWeapons).toHaveLength(148);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -109,13 +106,11 @@ describe('painted weapon inventory icons', () => {
     // this release-branch merge, the Nythraxis gap-fill one-handers
     // (nythraxis-gap-weapon-renders-2026-09-04, asserted below as
     // `gapBatch`).
-    // Nine at the Mirefen world-boss forward-port: the boss batch
-    // (balgath-boss-icons-2026-08-18), whose maul is a weapon-registry item,
-    // and the Shardpike mechanic batch (shardpike-mechanic-icons-2026-08-20),
-    // whose pike is another. Re-counted off the merged
-    // public/ui/items/mapping.json. Ten with the Mirefen muster rework's lent-pike
-    // batch (muster-shardpike-icon-2026-09-26, asserted below as `musterWeaponIds`).
-    expect(weaponBatches).toHaveLength(10);
+    // Eight with the faction quartermaster epics' batch
+    // (faction-vendor-icons-2026-09-16, asserted below as `factionBatch`), nine
+    // with the Warfare Season 2 weapons (warfare-season2-weapons-2026-09-25).
+    // Twelve with the Mirefen world-boss branch's boss, Shardpike and muster-pike batches.
+    expect(weaponBatches).toHaveLength(12);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -222,6 +217,35 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(gapWeaponIds).toEqual(['courtiers_bonefang', 'gravecourt_hewer', 'thornpeak_wardblade']);
+    // The faction quartermaster epics ship deterministic SVG compositions
+    // (scripts/generate_faction_vendor_icons.mjs) in their own batch.
+    const factionBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16',
+    );
+    expect(factionBatch).toBeDefined();
+    const factionWeaponIds = (factionBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(factionWeaponIds).toEqual([
+      'dawnkeeper_consecrated_mace',
+      'forgemaster_crag_cleaver',
+      'riftwarden_voidblade',
+    ]);
+    // The Warfare Season 2 honor weapons ship paintings in their own batch
+    // (warfare-season2-weapons-2026-09-25).
+    const season2Batch = weaponBatches.find(
+      ({ batchId }) => batchId === 'warfare-season2-weapons-2026-09-25',
+    );
+    expect(season2Batch).toBeDefined();
+    const season2WeaponIds = (season2Batch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(season2WeaponIds).toEqual([
+      'vanguard_fang_dagger',
+      'vanguard_oath_blade',
+      'vanguard_verdict_greatsword',
+      'vanguard_warstaff',
+    ]);
     // The Mirefen world boss's maul ships in its own batch
     // (balgath-boss-icons-2026-08-18): a batch that lands after the
     // historical one OWNS its ids, so the historical batch's frozen scope
@@ -263,6 +287,8 @@ describe('painted weapon inventory icons', () => {
           !crucibleWeaponIds.includes(id) &&
           !varkhulWeaponIds.includes(id) &&
           !gapWeaponIds.includes(id) &&
+          !factionWeaponIds.includes(id) &&
+          !season2WeaponIds.includes(id) &&
           !bossWeaponIds.includes(id) &&
           !shardpikeWeaponIds.includes(id) &&
           !musterWeaponIds.includes(id),
@@ -319,6 +345,8 @@ describe('painted weapon inventory icons', () => {
         !crucibleWeaponIds.includes(id) &&
         !varkhulWeaponIds.includes(id) &&
         !gapWeaponIds.includes(id) &&
+        !factionWeaponIds.includes(id) &&
+        !season2WeaponIds.includes(id) &&
         !bossWeaponIds.includes(id) &&
         !shardpikeWeaponIds.includes(id) &&
         !musterWeaponIds.includes(id),

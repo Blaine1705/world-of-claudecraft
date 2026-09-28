@@ -25,6 +25,13 @@ export function cyclePhase(nowMs: number): number {
   );
 }
 
+/** The phase off an optional host clock, or null when the host supplies none: no clock
+ *  means no night, so every nocturnal rule (a slumbering world boss, his dawn respawn)
+ *  sees permanent day and the pre-cycle world (Sim.dayNightPhase). */
+export function dayNightPhaseOf(clock: (() => number) | undefined): number | null {
+  return clock ? cyclePhase(clock()) : null;
+}
+
 /** Phase of sunrise, solar noon and sunset (midnight is 0). The sun is exactly on the
  *  horizon at DAWN and DUSK (day_night_core.sunDirection), so "daylight" below is the
  *  half of the cycle the sun is up. NOON is what a clock with no live cycle reports. */

@@ -736,6 +736,9 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS level_up_events');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS ftue_events');
     expect(applied).toContain('CREATE UNIQUE INDEX IF NOT EXISTS ftue_events_first_touch');
+    // CRAFT_ROLL_EVENTS_SCHEMA (server/craft_roll_events_db.ts): the
+    // chance-based crafting outcome audit, same defined-but-unwired hazard.
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS craft_roll_events');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS account_attribution');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS ad_spend');
   });

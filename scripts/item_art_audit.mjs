@@ -124,8 +124,19 @@ const build = await buildItemArtAudit({
     // 1071 / 1089 (its two disjoint reins items, reins_goblin_rocket_sled and
     // reins_rallycart_rxt, on the shared 1069 / 1087 base); both deltas are
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
-    // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
+    // 1087 + 212 + 2 = 1301, plus the Viridian Valestrider's reins on both
+    // sides = 1284 / 1302. Verified with `node scripts/item_art_audit.mjs
     // --verify-only` against the merged tree.
+    // + the World Quests branch merge (release/v0.43.0 sync): its two painted
+    // puzzle activators and two Eastbrook freight icons join both counts.
+    // + the 15 faction quartermaster items (faction-vendor-icons-2026-09-16),
+    // which landed without moving this block (1302 / 1320), + the weekly
+    // emissary's cache chest (feature/weekly-quests: 1303 / 1321), + the two
+    // Clue Scroll items (clue_scroll, treasure_casket; clue-scroll-icons-2026-09-17):
+    // 1305 / 1323 on the quests integration branch, measured with
+    // `node scripts/item_art_audit.mjs --verify-only`. + the faction ladder
+    // rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 / 1340. + the Viridian Valestrider's reins (release/v0.44.0 base merge): 1323 / 1341. + the trinket slot's 18 trinkets (PR 4173) landed on the integration branch: 1341 / 1359.
+    // + the Mirefen world-boss branch (merged over release/v0.44.0): +10 on both terms.
     // Mirefen world-boss forward-port: the boss branch adds eight disjoint
     // item definitions, each with its own shipping WebP (the balgath-boss,
     // shardpike-mechanic and foremans-wage batches in
@@ -139,15 +150,16 @@ const build = await buildItemArtAudit({
     // muster_shardpike, with its own shipping WebP (the
     // muster-shardpike-icon-2026-09-26 batch): 1291 + 1 = 1292, 1309 + 1 = 1310.
     // The muster quests' weekly trophy barrowhide_slab (barrowhide-slab-icon-2026-09-27):
-    // 1292 + 1 = 1293, 1310 + 1 = 1311.
-    catalogCount: 1293,
-    liveItemCount: 1311,
-    pendingArtCount: 0,
+    // 1292 + 1 = 1293, 1310 + 1 = 1311. Over release/v0.44.0 the ten records push one
+    // more group past a page boundary: 33 contact-sheet pages.
+    catalogCount: 1355,
+    liveItemCount: 1373,
+    pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 32,
-    groupCount: 25,
+    sheetPageCount: 33,
+    groupCount: 26,
   },
 });
 assertItemArtAuditPass(build);

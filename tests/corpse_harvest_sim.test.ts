@@ -2535,17 +2535,13 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // Bone Spike above: they are struck or healed, never harvested, so they grow MOBS
     // without touching `tagged` either. Plus the five Eastbrook healing-training
     // role dummies (src/sim/content/healing_training.ts), which are friendly
-    // practice targets, not corpses to butcher: 196. Plus the Mirefen world boss
-    // balgath_cyclops (src/sim/content/zone2.ts): an elemental-family body of carved
-    // stone, untagged for the same reason the other 27 boss templates are (only
-    // mirefen_broodmother carries a tag, its spider silk), so he grows MOBS without
-    // touching `tagged`: 197. The sibling census in tests/gathering.test.ts
-    // ('answers for every shipped template') carries the same 197 and the same reason.
-    // Plus the four Mirefen muster soldiers (src/sim/content/mirefen_muster.ts): friendly
-    // set dressing nobody can kill, never a corpse to butcher, so untagged: 201. The
-    // muster's captain became an NPC and its drill yard added the drillmaster and the
-    // Straw Foreman effigy (a practice dummy), all untagged: 202.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(202);
+    // practice targets, not corpses to butcher: 196.
+    // 200, not 196: the world-quest infiltrator and the three regional freight
+    // caravans ship untagged the same way (a disguised NPC and three wagons).
+    // 206 with the Mirefen world-boss branch: balgath_cyclops, three muster soldiers, the
+    // drillmaster and the Straw Foreman effigy, all untagged (the branch note in
+    // tests/gathering.test.ts carries the same six).
+    expect(Object.keys(MOBS).length - tagged.length).toBe(206);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(
@@ -2861,7 +2857,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
     expect(fixtures).toEqual({ spent: 10, refused: 6 });
-  });
+    // The sweep builds a fresh Sim per harvest (about 280 of them): roughly 15 s
+    // alone, so a loaded CI shard pushed it past the 20 s default.
+  }, 60_000);
 
   // The ten mapped families and their item ids, spelled out. Deriving them
   // from HARVEST_COMPONENT_ITEMS would compare the table with itself and pass

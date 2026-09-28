@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1008,
-      "state": "5d3d878d",
+      "nextId": 1012,
+      "state": "efa091b2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -63,14 +63,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -95,6 +97,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -110,7 +113,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1000
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -124,7 +127,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1000,
+          "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -168,9 +171,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1009,
-      "state": "20111b70",
-      "events": "782cb9b7",
+      "nextId": 1013,
+      "state": "ac72657d",
+      "events": "a8d2efa1",
       "rng": {
         "draws": 7,
         "digest": "4f9a2cfb"
@@ -179,8 +182,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1009,
-      "state": "14c8c2c8",
+      "nextId": 1013,
+      "state": "8a280199",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -190,9 +193,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1009,
-      "state": "e3d14cb8",
-      "events": "a746e31b",
+      "nextId": 1013,
+      "state": "2c327313",
+      "events": "b5f5131d",
       "rng": {
         "draws": 174,
         "digest": "847684f0"
@@ -201,9 +204,9 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 1009,
-      "state": "210a8bb4",
-      "events": "a1092b84",
+      "nextId": 1013,
+      "state": "493a3c31",
+      "events": "963839dc",
       "rng": {
         "draws": 263,
         "digest": "d3f0124f"
@@ -272,14 +275,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -306,6 +311,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -321,7 +327,7 @@
               "name": "Battle Stance",
               "remaining": 3596.4,
               "school": "physical",
-              "sourceId": 1000
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -335,7 +341,7 @@
           "fiveSecondRule": 102.6,
           "healPower": 5,
           "hp": 49995,
-          "id": 1000,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -370,7 +376,7 @@
             "str": 41
           },
           "swingTimer": 0.45,
-          "targetId": 1008,
+          "targetId": 1012,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -385,7 +391,7 @@
           "corpseHarvestState": {
             "priorityEndsAt": 13.6,
             "priorityMemberKeys": [
-              "entity:1000"
+              "entity:1004"
             ],
             "token": {}
           },
@@ -398,7 +404,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -418,7 +424,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            1000
+            1004
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -442,8 +448,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 1000,
-          "targetId": 1000,
+          "tappedById": 1004,
+          "targetId": 1004,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -456,9 +462,9 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 1009,
-      "state": "3a16bc8e",
-      "events": "e428405f",
+      "nextId": 1013,
+      "state": "1f549b41",
+      "events": "8264f6f3",
       "rng": {
         "draws": 309,
         "digest": "f78161ea"
@@ -531,14 +537,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -565,6 +573,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -580,7 +589,7 @@
               "name": "Battle Stance",
               "remaining": 3596.2,
               "school": "physical",
-              "sourceId": 1000
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -595,7 +604,7 @@
           "fiveSecondRule": 102.8,
           "healPower": 5,
           "hp": 49995,
-          "id": 1000,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -630,7 +639,7 @@
             "str": 41
           },
           "swingTimer": 0.25,
-          "targetId": 1008,
+          "targetId": 1012,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -645,7 +654,7 @@
           "corpseHarvestState": {
             "priorityEndsAt": 13.6,
             "priorityMemberKeys": [
-              "entity:1000"
+              "entity:1004"
             ],
             "token": {}
           },
@@ -658,7 +667,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -678,7 +687,7 @@
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [
-            1000
+            1004
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -702,8 +711,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 1000,
-          "targetId": 1000,
+          "tappedById": 1004,
+          "targetId": 1004,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

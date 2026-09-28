@@ -89,15 +89,25 @@ describe('deed_i18n English resolution', () => {
     // set collection (col_set_bramblehide, no title reward; the release's own
     // chain read 282 * 2 + 43), so the title count stays at 46.
     // Retired Vale Cup and Fiesta deeds keep names but drop 19 descriptions.
-    // 302 since the merge of feature/mirefen-world-boss brought in the world
-    // boss pair (cmb_balgath, cmb_balgath_ten); both author a desc and
-    // neither carries a title reward, so the desc count moves to 283 and the
-    // title count stays at 46. MEASURED on the merged catalog.
-    // 303 with the muster's pike drill deed (cmb_point_taken): one name, one desc, no title.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(303);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(284);
-    expect(manifest.length).toBe(633);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(46);
+    // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
+    // 315 with the seven faction standing deeds (Trusted and Champion per
+    // allied faction plus the all-factions meta), each with a name and desc.
+    // 317 with the two Clue Scroll casket deeds, each with a name and desc;
+    // the tenth carries the Treasure Hunter title.
+    // 318 with the release's Eastbrook ferry round trip (exp_harbor_to_harbor: a
+    // name and a desc, no title) at the fourth release/v0.44.0 base merge.
+    // 321 with the Mirefen world-boss branch's three combat deeds (cmb_balgath,
+    // cmb_balgath_ten, cmb_point_taken), each a name and a desc, no title: 302 descs, 674 rows.
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(321);
+    // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
+    // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
+    // casket deeds.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(302);
+    // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
+    // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
+    // Clue Scroll Treasure Hunter title).
+    expect(manifest.length).toBe(674);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(51);
     expect(manifest.filter((row) => row.id === 'cmb_balgath')).toEqual([
       { id: 'cmb_balgath', field: 'name', source: 'Foreman No More' },
       {

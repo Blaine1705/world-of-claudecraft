@@ -164,8 +164,10 @@ describe('mob aura icon art', () => {
     // (Barrowhide, src/sim/content/zone2.ts), the eighth carrier of that family.
     expect(LIVE_MOB_AURA_FAMILIES).toHaveLength(44);
     expect(census.populatedFamilyCount).toBe(44);
-    expect(census.carrierCount).toBe(109);
-    expect(census.identities.size).toBe(90);
+    // The Fenbridge infiltrator reuses the drowned dead's existing aura art: 110 carriers
+    // once both Balgath's Barrowhide and the infiltrator are counted.
+    expect(census.carrierCount).toBe(110);
+    expect(census.identities.size).toBe(91);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

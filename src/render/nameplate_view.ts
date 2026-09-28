@@ -20,6 +20,7 @@
 
 import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { isFeastTemplateId } from '../sim/professions/feast';
+import { isMobileStationTemplateId } from '../sim/professions/mobile_station_object';
 import type { Entity } from '../sim/types';
 import { INTERACT_RANGE } from '../sim/types';
 import { comboPipsFor } from './nameplate_combo';
@@ -145,8 +146,11 @@ export function nameplatePlanInto(
   // frame, farmDenied 'feast_expired', since masterwrought Phase 18), so the
   // title is already up as a player walks into eating range and never
   // flickers at the exact boundary.
+  // A placed mobile station shares the pad: its title names the owner and
+  // the tool, which is what a player walking up to it wants to read.
   const feastNear =
-    isFeastTemplateId(e.templateId) && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+    (isFeastTemplateId(e.templateId) || isMobileStationTemplateId(e.templateId)) &&
+    d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
   // The muster's weapon rack (its art is the camp's, its entity a pick volume) labels
   // the same way, so the one thing to click at the command camp names itself up close.
   const rackNear =

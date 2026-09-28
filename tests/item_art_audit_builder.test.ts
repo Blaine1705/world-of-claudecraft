@@ -846,39 +846,47 @@ describe('item-art audit builder', () => {
     // from `node scripts/item_art_audit.mjs --verify-only` run on the merged
     // tree, not invented or derived from either parent.
     // PR3941: measured again after retiring the five premium reins.
-    // Mirefen world-boss forward-port: measured AGAIN on the merged tree
-    // with `node scripts/item_art_audit.mjs --verify-only`. The boss's eight
-    // disjoint spoils take the catalog to 1291 / 1309 and push one group past
-    // an 80-id page boundary (31 to 32 pages, 248 to 256 sheets); the renderer
-    // fingerprint is unchanged because the audit lib was not touched.
-    // Mirefen muster rework: measured again the same way after the lent
-    // muster_shardpike joined (1292 / 1310, same groups and pages), and again after the
-    // muster quests' barrowhide_slab (1293 / 1311).
+    // Clue Scrolls (2026-09-17): measured again on the tree carrying the 15
+    // faction quartermaster items (which landed without moving this block)
+    // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
+    // the sha/bytes straight from `--verify-only` on this tree.
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
+    // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306 on the release.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '9ba82b4da2bac2851b4894a0c2115b2b30d316cd81905a6a9f9367f8a172620a',
-      catalogBytes: 705124,
+      // Re-minted on the quests integration branch: the catalog carries the 15
+      // faction quartermaster owners, the Emissary's Cache chest and the two
+      // Clue Scroll items (1305 / 1323). Re-minted again with the faction
+      // ladder rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 /
+      // 1340, sha and bytes straight from `--verify-only` on this tree; 1323 / 1341
+      // with the Viridian Valestrider's reins (release/v0.44.0 base merge), re-measured the same way. 1341 / 1359 with the trinket slot's 18 trinkets (PR 4173) landed on the integration branch (a 26th group and a 32nd sheet page), sha and bytes re-measured with `--verify-only` on the merged tree.
+      // 1345 / 1498 with Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four
+      // painted weapons, re-measured with `--verify-only` on the merged tree.
+      // 1355 / 1373 with the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab),
+      // re-measured with `--verify-only` on the merged tree (33 pages).
+      catalogSha256: '8c628354cb3f4ed8f2209ec4d0ba065245b2865b618c8223147ab083ddba566d',
+      catalogBytes: 738552,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1293,
-      liveItemCount: 1311,
+      catalogCount: 1355,
+      liveItemCount: 1373,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
-      groupCount: 25,
-      sheetPageCount: 32,
-      sheetCount: 256,
+      groupCount: 26,
+      sheetPageCount: 33,
+      sheetCount: 264,
       sheetModeCounts: {
-        '128-color': 32,
-        '40-color': 32,
-        '28-color': 32,
-        '22-color': 32,
-        '28-grayscale': 32,
-        '64-circle': 32,
-        'small-multiview': 32,
-        identity: 32,
+        '128-color': 33,
+        '40-color': 33,
+        '28-color': 33,
+        '22-color': 33,
+        '28-grayscale': 33,
+        '64-circle': 33,
+        'small-multiview': 33,
+        identity: 33,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'ce8b7707968ede8c9edab722ccef97cbd39b3c2b9acff21690b599ff83d974f9',
+      shippingCatalogSha256: '9c03ae2565fced9cb9d3f264fc83750ae18b3d62a8f112bb3aef4ab90b822cc8',
       machineChecksPassed: true,
       verdict: null,
     });

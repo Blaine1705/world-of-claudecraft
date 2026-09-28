@@ -138,15 +138,18 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // MEASURED on the merged tree, which is the value that wins per this
     // file's own convention: the id COUNT stays 300 (a pure append), only the
     // Renown SUM moves.
-    //
-    // THIS merge of feature/mirefen-world-boss appends the world boss's two
-    // combat deeds (cmb_balgath and cmb_balgath_ten, renown 10 each): a pure
-    // append on both sides, so 302 / 3330. MEASURED on the merged table.
-    //
-    // The muster's pike drill appends its one routine combat deed (cmb_point_taken,
-    // renown 5): a pure append, 303 / 3335.
-    expect(DEED_ORDER.length).toBe(303);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3335);
+    // 308 / 3355 at the release/v0.43.0 merge into feature/world-quests: the
+    // release's 300 plus the branch's eight world-quest exploration deeds.
+    // 315 / 3495 with the seven faction standing deeds (three Trusted at 5,
+    // three Champion at 25, and the all-factions meta at 50: +140).
+    // 317 / 3530 with the two Clue Scroll casket deeds (the first casket at
+    // 10 and the tenth at 25: +35).
+    // 318 / 3535 with the release's Eastbrook ferry round trip
+    // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
+    // 321 / 3560 with the Mirefen world-boss branch's three appended combat deeds
+    // (cmb_balgath and cmb_balgath_ten at 10, cmb_point_taken at 5: +25).
+    expect(DEED_ORDER.length).toBe(321);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3560);
   });
 
   it('ships the audited per-category counts', () => {
@@ -162,10 +165,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 Phase 11k's cross-packet prog_field_to_feast, then
       // +1 the Proving Shore graduation (prog_ready_for_an_adventure) at the
       // release/v0.41.0 merge (the release's own chain read 58), then
-      // +1 the Phase 13 promotion capstone prog_legendmaker.
-      progression: 68,
-      // +2 the Mirefen world boss pair (cmb_balgath, cmb_balgath_ten), +1 the muster's
-      // pike drill (cmb_point_taken).
+      // +1 the Phase 13 promotion capstone prog_legendmaker, then
+      // +7 the faction standing ladder (a Trusted and a Champion deed per
+      // allied faction plus the all-factions meta).
+      progression: 75,
+      // +2 the Mirefen world boss pair, +1 the muster's pike drill.
       combat: 13,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
@@ -183,7 +187,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
-      exploration: 11,
+      // +2 the Clue Scroll casket pair (exp_clue_first_casket and
+      // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
+      // +1 the release's ferry round trip (exp_harbor_to_harbor).
+      exploration: 22,
       feat: 3,
       hidden: 10,
     });
@@ -378,7 +385,31 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // first here rather than appending it behind the branch's tail).
       'col_set_bramblehide',
       'hid_forgebreaker',
-      // Mirefen world boss (appends last).
+      'exp_arcane_calligraphy',
+      'exp_arcane_calligraphy_gold',
+      'exp_forge_helper',
+      'exp_last_barricade',
+      'exp_borrowed_face',
+      'exp_windrider_slalom',
+      'exp_duskweave_dispatches',
+      'exp_wisp_maze',
+      // The faction standing ladder: Trusted and Champion per allied faction
+      // (the standing* meters) plus the all-factions meta, appended last.
+      'prog_rift_watch_trusted',
+      'prog_church_order_trusted',
+      'prog_automatons_trusted',
+      'prog_rift_watch_champion',
+      'prog_church_order_champion',
+      'prog_automatons_champion',
+      'prog_faction_champion_all',
+      // The Clue Scroll casket pair: two meter deeds on clueCasketsOpened
+      // (the first casket and the tenth, which grants Treasure Hunter).
+      'exp_clue_first_casket',
+      'exp_clue_ten_caskets',
+      // The release's Eastbrook ferry round trip, appended last at the fourth
+      // release/v0.44.0 base merge.
+      'exp_harbor_to_harbor',
+      // The Mirefen world-boss branch, appended last over release/v0.44.0.
       'cmb_balgath',
       'cmb_balgath_ten',
       'cmb_point_taken',
@@ -775,12 +806,15 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (phase 06) the tenth, closing the family across the whole ring,
     // prog_farming_100's Harvestmaster (the absorbed packet's D13 title
     // mandate), and the Crucible raid's flawless title (dgn_varkhul_flawless,
-    // the 2026-08-30 release/v0.41.0 sync merge) one more.
-    expect(titles.length).toBe(46);
+    // the 2026-08-30 release/v0.41.0 sync merge) one more, and the three
+    // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
+    // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
+    // one more.
+    expect(titles.length).toBe(51);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(46);
+    expect(new Set(titleTexts).size).toBe(51);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -991,17 +1025,27 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduces a prior hash); the frozen literal below is MEASURED directly
   // off the merged DEED_ORDER/DEEDS table instead. No shipped TRIGGER changed
   // on either side; only those eighteen renown values moved.
-  //
-  // Re-baselined at the merge of feature/mirefen-world-boss for the world
-  // boss pair (cmb_balgath and cmb_balgath_ten, renown 10 each, on the new
-  // balgathKills stat), which appends last. Re-minted THE AUDITABLE WAY:
-  // the merged canonical rows minus those two ids (feat_book_complete's live
-  // deedIds filtered back to exclude them) reproduce the release's
-  // 931a0593... EXACTLY, so the boss side is a pure append. No shipped
-  // trigger or renown value was touched.
-  // Re-baselined for the muster's pike drill: one appended combat deed (cmb_point_taken);
-  // no shipped trigger or renown changed (the append proof below reproduces 15857c4c...).
-  const FROZEN_CATALOG_SHA256 = '1ac4cf51f20e7da50808a5a32f2dd7b2e232405f8dc983e4b9fbad7c63c9bc10';
+  // Re-baselined for the seven appended faction standing deeds (a Trusted and
+  // a Champion meter deed per allied faction on the new standing* meters,
+  // plus the prog_faction_champion_all meta), re-minted THE AUDITABLE WAY:
+  // the afe535f4... literal rotated down into PRE_APPEND_CATALOG_SHA256 and
+  // the proof below reproduces it exactly. No shipped trigger or renown
+  // value was touched.
+  // Re-baselined for the two appended Clue Scroll casket deeds (the
+  // exp_clue_first_casket / exp_clue_ten_caskets meter pair on the new
+  // clueCasketsOpened meter), re-minted THE AUDITABLE WAY: the 2b8d9d03...
+  // literal rotated down into PRE_APPEND_CATALOG_SHA256 and the proof below
+  // reproduces it exactly. No shipped trigger or renown value was touched.
+  // Re-baselined for the release's appended Eastbrook ferry round trip
+  // (exp_harbor_to_harbor, a visits deed on the four ferry crossings) at the
+  // fourth release/v0.44.0 base merge into integration/world-quests-v0440,
+  // re-minted THE AUDITABLE WAY: the 0d91bc68... literal rotated down into
+  // PRE_APPEND_CATALOG_SHA256 and the proof below reproduces it exactly. No
+  // shipped trigger or renown value was touched.
+  // Re-baselined for the Mirefen world-boss branch merged over release/v0.44.0: its three
+  // appended combat deeds, re-minted THE AUDITABLE WAY (the 8749b988... literal rotated down
+  // into PRE_APPEND_CATALOG_SHA256 and the proof below reproduces it exactly).
+  const FROZEN_CATALOG_SHA256 = 'c8238e45acc73657c1487b352f17e5e83626c4702961e1941769c12861300a5b';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1050,29 +1094,42 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // retune into the new checkpoint; every append AFTER this merge is once
   // again provable the auditable way against it.
   //
-  // The merge of feature/mirefen-world-boss is the first such append, and it
-  // IS provable that way: the previous mint (the release tip's own frozen
-  // 931a0593... literal) rotates down here, and stripping only the world
-  // boss pair (feat_book_complete's live deedIds filtered back) reproduces it
-  // exactly, so the boss side retro-edited nothing.
+  // At the release/v0.43.0 merge into feature/world-quests the previous mint is
+  // the release's own 931a0593... literal and the append set is the branch's
+  // eight world-quest deeds, seated after hid_forgebreaker: stripping them
+  // must reproduce the release catalogue exactly.
   //
-  // The muster's pike drill is the next append: the world boss pair's frozen 15857c4c...
-  // literal rotates down here, and stripping only cmb_point_taken reproduces it.
+  // The faction standing ladder appends seven deeds after exp_wisp_maze; the
+  // previous mint is that merge's afe535f4... literal, and stripping the
+  // seven reproduced it exactly.
+  //
+  // The Clue Scroll casket pair appends two deeds after
+  // prog_faction_champion_all; the previous mint is the faction ladder's
+  // 2b8d9d03... literal (rotated down here), and stripping the two must
+  // reproduce it exactly.
+  //
+  // The release's Eastbrook ferry round trip appends exp_harbor_to_harbor
+  // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
+  // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
+  // and stripping the one id must reproduce it exactly.
+  //
+  // The Mirefen world-boss branch appends cmb_balgath, cmb_balgath_ten and cmb_point_taken
+  // after exp_harbor_to_harbor; the previous mint is the ferry's 8749b988... literal.
   const PRE_APPEND_CATALOG_SHA256 =
-    '15857c4cde20a1ef9bddc9fd0773a1411e9225605f1599fc30a7167a770c38d0';
-  const APPENDED_SINCE: readonly string[] = ['cmb_point_taken'];
+    '8749b988a2135b7b3c0dee2065b54e6491660e86ce51bf7880924ff763ae1a25';
+  const APPENDED_SINCE: readonly string[] = ['cmb_balgath', 'cmb_balgath_ten', 'cmb_point_taken'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The world boss pair sits at the true tail after the quest celebration.
-    // Pin its two predecessors too: this is an append into a known seat,
-    // never a scattered insert or a retro-edit (the digest below proves it).
+    // The Mirefen world-boss deeds sit at the true tail after the ferry round trip
+    // and the Clue Scroll tenth casket. Pin the two predecessors too: an append into a
+    // known seat, never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'cmb_balgath',
-      'cmb_balgath_ten',
+      'exp_clue_ten_caskets',
+      'exp_harbor_to_harbor',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1290,8 +1347,10 @@ describe('table shape', () => {
     // final entry). The Roots' Bramblehide set collection appends behind the
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
-    // and the Mirefen world boss pair closes the merged tail (cmb_balgath,
-    // then cmb_balgath_ten), and the muster's pike drill deed follows them.
+    // then the world-quest block, then the faction standing ladder, then the
+    // Clue Scroll casket pair, then the release's ferry round trip, then the
+    // Mirefen world-boss branch's three combat deeds as the final entries.
+    expect(DEED_ORDER[DEED_ORDER.length - 4]).toBe('exp_harbor_to_harbor');
     expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('cmb_balgath_ten');
     expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('cmb_point_taken');
   });
@@ -1651,6 +1710,11 @@ describe('trigger references resolve against the real content tables', () => {
     ).toEqual([
       'col_deepest_cast:Clockreel Fishing Rod',
       'col_glimmerfin:Sunglint Koi',
+      // Reviewed at the Clue Scroll casket deeds: the first-casket desc names
+      // the Treasure Casket, and the casket-opening site that bumps the
+      // clueCasketsOpened meter consumes exactly that item
+      // (TREASURE_CASKET_ITEM_ID), so the desc names the RIGHT one.
+      'exp_clue_first_casket:Treasure Casket',
       'feat_brightwood_relic:Bramblehide Jerkin',
       "feat_brightwood_relic:Monarch's Crown",
       'hid_codfather:The Codfather',

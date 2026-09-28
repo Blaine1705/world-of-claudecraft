@@ -110,6 +110,11 @@ export interface WorldBossClock {
   /** The day/night phase the previous pass observed (null until a clocked host ticks). */
   lastPhase: number | null;
 }
+/** The slumbering bosses' half of the scheduler state (riseAtDawn + clock below),
+ *  fresh per Sim: nobody waits for a sunrise and no phase has been observed yet. */
+export function freshWorldBossDawnState(): Pick<WorldBossScheduleState, 'riseAtDawn' | 'clock'> {
+  return { riseAtDawn: WORLD_BOSSES.map(() => false), clock: { lastPhase: null } };
+}
 export interface WorldBossScheduleState {
   /** Sim time each slot's interval next comes due. */
   nextAt: number[];

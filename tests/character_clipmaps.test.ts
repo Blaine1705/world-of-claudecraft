@@ -240,6 +240,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'swimIdle',
   'wade',
   'jump',
+  'jumpMoving',
   'fall',
   'land',
   'walkBack',

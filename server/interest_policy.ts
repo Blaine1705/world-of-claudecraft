@@ -58,6 +58,21 @@ export function landmarkInterestSq(e: Entity): number | null {
   return range ? range * range : null;
 }
 
+/**
+ * The shared-query cutoff a session re-applies to one candidate: a landmark keeps its own,
+ * far wider reach (the shared query did not find it by radius, it was appended, so the
+ * query cutoff must not be what drops it); everyone else takes the battleground band or
+ * the ordinary query limit by where the viewer stands.
+ */
+export function queryCutoffSq(
+  e: Entity,
+  viewerX: number,
+  bgQueryLimitSq: number,
+  queryLimitSq: number,
+): number {
+  return landmarkInterestSq(e) ?? (isBgPos(viewerX) ? bgQueryLimitSq : queryLimitSq);
+}
+
 // npcs stay visible to the legacy radius (see the constants above);
 // everything else enters at INTEREST_RADIUS and known entities persist to
 // the drop radius: hysteresis against churn at the boundary

@@ -16,6 +16,7 @@
 // NOTHING from the shared rng stream and replays identically on every host.
 
 import type { LanceTrialView } from '../world_api/lance_trial';
+import { gliderActionsLocked } from './glider_action_lock';
 import {
   freshLanceBalance,
   isShardpikeItem,
@@ -62,6 +63,22 @@ export interface LanceSession {
   /** Where the brace was planted; drifting off it (a shove) breaks the stance. */
   anchorX: number;
   anchorZ: number;
+}
+
+/** The Shardpike fields a PlayerMeta carries (PlayerMeta extends this). */
+export interface LancePlayerState {
+  // The active brace, or absent. Session state, never persisted (a relog is a dropped
+  // pike): this module owns the rules, and the per-tick step runs in the movement
+  // ladder (player_movement_modes.ts), so there is no separate tick phase to order.
+  lance?: LanceSession;
+  // Sim-time the pike can next be braced (set by a fumble, a shove, or a thrust).
+  lanceRestUntil?: number;
+  /**
+   * Thrusts this character has landed this session: the number telling a level 6 that the
+   * windows the raid spent were theirs. Session-only today (no save path writes it), so a
+   * relog starts the tally again.
+   */
+  lanceThrusts?: number;
 }
 
 /** The live session, or null. */
@@ -113,6 +130,10 @@ export function lanceBrace(ctx: SimContext, pid: number): void {
     ctx.error(pid, 'Not from the saddle.');
     return;
   }
+  // A body some other mode owns (a vehicle seat, a ferry deck under way, the glider run)
+  // never reaches the brace step in the movement ladder (player_movement_modes.ts), so a
+  // brace opened there would never tick: refuse it silently, like items and mounts do.
+  if (meta.vehicle || p.ferryRide || gliderActionsLocked(meta.worldQuestLog)) return;
   p.sitting = false;
   drawWeapon(p);
   meta.lance = {

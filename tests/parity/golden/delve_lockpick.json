@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1008,
-      "state": "008f0b06",
+      "nextId": 1012,
+      "state": "8b7257cb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,14 +61,16 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -93,6 +95,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -110,7 +113,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 1000,
+          "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -162,9 +165,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1018,
-      "state": "f9b2ae2a",
-      "events": "d35e839c",
+      "nextId": 1022,
+      "state": "41e98e5d",
+      "events": "951ce5cc",
       "rng": {
         "draws": 5,
         "digest": "110f9090"
@@ -173,9 +176,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1018,
-      "state": "3cb23a2d",
-      "events": "eb794834",
+      "nextId": 1022,
+      "state": "329c5b54",
+      "events": "def3f5b8",
       "rng": {
         "draws": 5,
         "digest": "110f9090"
@@ -184,9 +187,9 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1018,
-      "state": "a4cb9a3a",
-      "events": "78d5c825",
+      "nextId": 1022,
+      "state": "92d89e55",
+      "events": "83630d79",
       "rng": {
         "draws": 8,
         "digest": "b2debc02"
@@ -195,9 +198,9 @@
     {
       "tick": 38,
       "time": 1.9,
-      "nextId": 1020,
-      "state": "11edd4cb",
-      "events": "ead80226",
+      "nextId": 1024,
+      "state": "29149745",
+      "events": "05ddead9",
       "rng": {
         "draws": 11,
         "digest": "6ae3afff"
@@ -286,14 +289,16 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 3,
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -320,6 +325,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 898
         }
@@ -337,7 +343,7 @@
           "fiveSecondRule": 100.9,
           "healPower": 6,
           "hp": 50000,
-          "id": 1000,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -376,7 +382,7 @@
             "sta": 29,
             "str": 23
           },
-          "targetId": 1014,
+          "targetId": 1018,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -395,7 +401,7 @@
           "facing": -1.570796,
           "fiveSecondRule": 99,
           "hp": 103,
-          "id": 1013,
+          "id": 1017,
           "kind": "mob",
           "level": 4,
           "lootFfaTimer": "Infinity",
@@ -403,7 +409,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 1000,
+          "ownerId": 1004,
           "petMode": "defensive",
           "pos": {
             "x": 104200,
@@ -433,7 +439,7 @@
           "corpseHarvestState": {
             "priorityEndsAt": 11.5,
             "priorityMemberKeys": [
-              "entity:1000"
+              "entity:1004"
             ],
             "token": {}
           },
@@ -445,7 +451,7 @@
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1014,
+          "id": 1018,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -458,7 +464,7 @@
           },
           "lootFfaTimer": 59.6,
           "lootRecipientIds": [
-            1000
+            1004
           ],
           "lootable": true,
           "maxHp": 635,
@@ -481,7 +487,7 @@
           },
           "stompTimer": 10.5,
           "swingTimer": 0.75,
-          "tappedById": 1000,
+          "tappedById": 1004,
           "templateId": "deacon_varric",
           "weapon": {
             "max": 51,
@@ -499,7 +505,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1018,
+          "id": 1022,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -532,8 +538,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1020,
-      "state": "3571945d",
+      "nextId": 1024,
+      "state": "61a2dc93",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -543,8 +549,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1020,
-      "state": "3571945d",
+      "nextId": 1024,
+      "state": "61a2dc93",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -634,14 +640,16 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 3,
-          "entityId": 1000,
+          "entityId": 1004,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -668,6 +676,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 898
         }
@@ -685,7 +694,7 @@
           "fiveSecondRule": 101,
           "healPower": 6,
           "hp": 50000,
-          "id": 1000,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -724,7 +733,7 @@
             "sta": 29,
             "str": 23
           },
-          "targetId": 1014,
+          "targetId": 1018,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -743,7 +752,7 @@
           "facing": -1.570796,
           "fiveSecondRule": 99,
           "hp": 103,
-          "id": 1013,
+          "id": 1017,
           "kind": "mob",
           "level": 4,
           "lootFfaTimer": "Infinity",
@@ -751,7 +760,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 1000,
+          "ownerId": 1004,
           "petMode": "defensive",
           "pos": {
             "x": 104200,
@@ -781,7 +790,7 @@
           "corpseHarvestState": {
             "priorityEndsAt": 11.5,
             "priorityMemberKeys": [
-              "entity:1000"
+              "entity:1004"
             ],
             "token": {}
           },
@@ -793,7 +802,7 @@
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1014,
+          "id": 1018,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -806,7 +815,7 @@
           },
           "lootFfaTimer": 59.5,
           "lootRecipientIds": [
-            1000
+            1004
           ],
           "lootable": true,
           "maxHp": 635,
@@ -829,7 +838,7 @@
           },
           "stompTimer": 10.5,
           "swingTimer": 0.75,
-          "tappedById": 1000,
+          "tappedById": 1004,
           "templateId": "deacon_varric",
           "weapon": {
             "max": 51,
@@ -847,7 +856,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1018,
+          "id": 1022,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

@@ -6,6 +6,7 @@ import {
   VARKHUL_SHARED_PYRE_RADIUS,
   VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
 } from '../sim/varkhul_shared_pyre';
+import { applyFloorVfxLayer, floorVfxRenderOrder } from './floor_vfx_layer';
 
 export const IGNIVAR_SOAK_VISUAL_NAME = 'ignivarSoakCircle';
 export const IGNIVAR_SOAK_FILL_NAME = 'ignivarSoakFill';
@@ -205,7 +206,7 @@ function callInFlame(): THREE.InstancedMesh {
     flame.setMatrixAt(index, dummy.matrix);
   }
   flame.instanceMatrix.needsUpdate = true;
-  flame.renderOrder = 8;
+  flame.renderOrder = floorVfxRenderOrder('encounter', 7);
   return flame;
 }
 
@@ -226,7 +227,6 @@ function callInBeacon(): THREE.Group {
   crown.name = IGNIVAR_SOAK_BEACON_CROWN_NAME;
   crown.position.y = 6.55;
   crown.rotation.x = Math.PI / 2;
-  crown.renderOrder = 10;
   const emberCount = 22;
   const emberPositions = new Float32Array(emberCount * 3);
   for (let index = 0; index < emberCount; index++) {
@@ -256,7 +256,9 @@ function callInBeacon(): THREE.Group {
   beacon.userData.core = core;
   beacon.userData.embers = embers;
   beacon.userData.crown = crown;
-  beacon.renderOrder = 9;
+  // Leaves carry the rung: a Group renderOrder becomes groupOrder and outranks the ladder.
+  applyFloorVfxLayer(beacon, 'encounter', 8);
+  crown.renderOrder = floorVfxRenderOrder('encounter', 9);
   return beacon;
 }
 
@@ -315,19 +317,19 @@ export function buildIgnivarSoakTelegraph(
     material(style.fill, style.fillOpacity),
   );
   fill.name = IGNIVAR_SOAK_FILL_NAME;
-  fill.renderOrder = 2;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 1);
   const rim = new THREE.Mesh(
     radialBandGeometry(radius - 0.22, radius, 64, 0.064),
     material(style.rim, 0.94),
   );
   rim.name = IGNIVAR_SOAK_RIM_NAME;
-  rim.renderOrder = 5;
+  rim.renderOrder = floorVfxRenderOrder('encounter', 4);
   const swirl = new THREE.Mesh(swirlGeometry(radius), material(style.swirl, 0.44));
   swirl.name = IGNIVAR_SOAK_SWIRL_NAME;
-  swirl.renderOrder = 3;
+  swirl.renderOrder = floorVfxRenderOrder('encounter', 2);
   const arrows = new THREE.Mesh(arrowsGeometry(radius), material(style.arrows, 0.86));
   arrows.name = IGNIVAR_SOAK_ARROWS_NAME;
-  arrows.renderOrder = 4;
+  arrows.renderOrder = floorVfxRenderOrder('encounter', 3);
   const occupancyMaterial = material(0xffffff, 0.96);
   occupancyMaterial.vertexColors = true;
   const occupancy = new THREE.Mesh(
@@ -335,20 +337,20 @@ export function buildIgnivarSoakTelegraph(
     occupancyMaterial,
   );
   occupancy.name = IGNIVAR_SOAK_OCCUPANCY_NAME;
-  occupancy.renderOrder = 6;
+  occupancy.renderOrder = floorVfxRenderOrder('encounter', 5);
   const timer = new THREE.Mesh(
     radialBandGeometry(radius - 0.48, radius - 0.32, 64, 0.082),
     material(style.timer, 0.74),
   );
   timer.name = IGNIVAR_SOAK_TIMER_NAME;
-  timer.renderOrder = 6;
+  timer.renderOrder = floorVfxRenderOrder('encounter', 5);
   timer.userData.fullIndexCount = timer.geometry.index?.count ?? 0;
   const ready = new THREE.Mesh(
     radialBandGeometry(0.4, 0.82, 32, 0.112),
     material(style.ready, 0.98),
   );
   ready.name = IGNIVAR_SOAK_READY_NAME;
-  ready.renderOrder = 7;
+  ready.renderOrder = floorVfxRenderOrder('encounter', 6);
   ready.visible = false;
 
   root.add(fill, swirl, arrows, rim, timer, occupancy);

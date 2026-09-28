@@ -369,10 +369,10 @@ describe('isHarvestableCorpse', () => {
     // world boss balgath_cyclops: carved stone, so he carries no componentTags
     // and is not skinnable, the same reason every other boss sits here: 197.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    // Plus the four Mirefen muster soldiers (content/mirefen_muster.ts), untagged
-    // friendly set dressing no player can kill: 201. The captain became an NPC and the
-    // drill yard added its drillmaster and the Straw Foreman effigy: 202.
-    expect(untagged).toHaveLength(202);
+    // The Mirefen world-boss branch adds six untagged templates (the boss, three muster
+    // soldiers, the drillmaster and the Straw Foreman effigy): 206.
+    // Three caravan enemies and the undead Fenbridge infiltrator add no components.
+    expect(untagged).toHaveLength(206);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

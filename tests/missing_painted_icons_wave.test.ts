@@ -686,11 +686,13 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 300 at THIS release/v0.42.0 merge: the Roots' Bramblehide set collection
     // (col_set_bramblehide, 281 to 282 on the release's own arm) joins the
     // same pending side.
-    // 302 at the Mirefen world-boss forward-port: the boss's own two combat
-    // deeds (cmb_balgath, cmb_balgath_ten) append at the DEED_ORDER tail and
-    // join the same pending side on the deed_cat_combat crest.
-    // 303: the muster's pike drill deed (cmb_point_taken) joins the same combat crest.
-    expect(DEED_ORDER).toHaveLength(303);
+    // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
+    // 315 with the seven faction standing deeds, 317 with the two Clue Scroll
+    // casket deeds; all nine sit on the pending side on category crests.
+    // 318 with the release's ferry round trip (exp_harbor_to_harbor), also on
+    // the pending side on the exploration crest.
+    // 321 with the Mirefen world-boss branch's three combat deeds, all pending.
+    expect(DEED_ORDER).toHaveLength(321);
     expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);
