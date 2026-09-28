@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "f5d8da42",
+      "state": "3e645ded",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -68,6 +68,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -99,6 +100,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -161,7 +163,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1012,
-      "state": "cf4acd5e",
+      "state": "1055af87",
       "events": "a2e98a03",
       "rng": {
         "draws": 0,
@@ -172,7 +174,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1012,
-      "state": "7ad0beee",
+      "state": "2535db37",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -183,7 +185,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1012,
-      "state": "68464db9",
+      "state": "9203a838",
       "events": "741638a5",
       "rng": {
         "draws": 146,
@@ -194,7 +196,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1012,
-      "state": "401696f8",
+      "state": "ac448055",
       "events": "741638a5",
       "rng": {
         "draws": 335,
@@ -205,7 +207,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1013,
-      "state": "a50a27a2",
+      "state": "35baba03",
       "events": "390938f3",
       "rng": {
         "draws": 487,
@@ -216,7 +218,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1014,
-      "state": "060d609c",
+      "state": "40dd3401",
       "events": "01d44e9a",
       "rng": {
         "draws": 677,
@@ -227,7 +229,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1014,
-      "state": "2a2eee3b",
+      "state": "26edd726",
       "events": "77be473a",
       "rng": {
         "draws": 902,
@@ -238,7 +240,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1014,
-      "state": "9efffea2",
+      "state": "68d32903",
       "events": "722d58c1",
       "rng": {
         "draws": 1147,
@@ -249,7 +251,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1014,
-      "state": "f7dfed45",
+      "state": "2708702c",
       "events": "289d9672",
       "rng": {
         "draws": 1423,
@@ -260,7 +262,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1014,
-      "state": "2bd64745",
+      "state": "b182da2c",
       "events": "185d02a8",
       "rng": {
         "draws": 1691,
@@ -271,7 +273,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1014,
-      "state": "8cb7789e",
+      "state": "523fccc7",
       "events": "a2ed18b1",
       "rng": {
         "draws": 1849,
@@ -282,7 +284,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1014,
-      "state": "1fb501e9",
+      "state": "9fffa7c8",
       "events": "741638a5",
       "rng": {
         "draws": 1849,
@@ -355,6 +357,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -388,6 +391,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -567,7 +571,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 1014,
-      "state": "17629368",
+      "state": "416937a5",
       "events": "8878d968",
       "rng": {
         "draws": 1885,
@@ -640,6 +644,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -673,6 +678,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

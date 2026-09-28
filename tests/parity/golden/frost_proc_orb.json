@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "ac9ad390",
+      "state": "02b36e7f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -68,6 +68,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -99,6 +100,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -161,7 +163,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "3dd341cf",
+      "state": "2625c2ba",
       "events": "2e58cdfb",
       "rng": {
         "draws": 1,
@@ -172,7 +174,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "a5af9914",
+      "state": "20cb2019",
       "events": "74bccb9b",
       "rng": {
         "draws": 2,
@@ -183,7 +185,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1013,
-      "state": "454df983",
+      "state": "72603776",
       "events": "eb94ef71",
       "rng": {
         "draws": 150,
@@ -194,7 +196,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1013,
-      "state": "50d91b27",
+      "state": "5f7af532",
       "events": "849c9d6d",
       "rng": {
         "draws": 316,
@@ -205,7 +207,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 1013,
-      "state": "b4826dca",
+      "state": "1e3e1f63",
       "events": "8606ddc2",
       "rng": {
         "draws": 356,
@@ -294,6 +296,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -328,6 +331,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -482,7 +486,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 1013,
-      "state": "b4826dca",
+      "state": "1e3e1f63",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -571,6 +575,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -605,6 +610,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

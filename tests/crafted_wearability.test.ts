@@ -193,10 +193,11 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // Re-pinned 533 -> 672 by Warfare Season 2 (release/v0.44.0): 139 honor items
     // (27 five-piece spec sets plus four weapons) sourced at level 29, every one
     // deriving the same level-20 gate; no existing shelf row moved.
-    // Plus the Mirefen world boss's four level-20 drops (the branch's 515 -> 519): 676.
-    // 676 -> 682 with Balgath's loot (five trinkets and the Craterglass Stave), each
-    // sourced at the level-20 boss; no existing shelf row moved.
-    expect(shelf.length).toBe(682);
+    // Re-pinned 672 -> 768 at the release/v0.44.0 merge into feature/buried-hoards (2026-09-28): the 96 Buried Hoard boss
+    // loot pieces (content/hoard_loot.ts) join on the same level-20 gate.
+    // 778 with the Mirefen world boss's four level-20 drops plus Balgath's loot (five
+    // trinkets and the Craterglass Stave), at the release/v0.45.0 merge.
+    expect(shelf.length).toBe(778);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

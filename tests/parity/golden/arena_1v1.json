@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1013,
-      "state": "2ea3f519",
+      "state": "351ff4ad",
       "events": "7198efe6",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1013,
-      "state": "cb66b12a",
+      "state": "1e19e0fe",
       "events": "213df85c",
       "rng": {
         "draws": 70,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1013,
-      "state": "7ae8fa10",
+      "state": "bf510a9c",
       "events": "edbd9ff6",
       "rng": {
         "draws": 292,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1013,
-      "state": "56b310ab",
+      "state": "dccdf1cf",
       "events": "bea5f2c8",
       "rng": {
         "draws": 530,
@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1013,
-      "state": "d599b8ce",
+      "state": "5b92869e",
       "events": "d4e598c3",
       "rng": {
         "draws": 781,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1013,
-      "state": "bf7be0f5",
+      "state": "1b3caf4d",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -165,6 +165,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -203,6 +204,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "weeklyRewards": {
             "bossUnlocks": {},
             "pvp": 1,
@@ -295,6 +297,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -337,6 +340,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

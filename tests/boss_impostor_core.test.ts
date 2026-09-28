@@ -125,13 +125,13 @@ describe('the rig-shown input is the RANGE band, nothing else', () => {
   // The renderer feeds bossImpostorShows from this one predicate over its EntityView, so
   // which of the view's hide reasons count is pinned here rather than in the renderer.
   it('reads range-hidden as the rig not drawn (the sprite takes over)', () => {
-    expect(rigShownFromView({ rangeHidden: true, compilePending: false })).toBe(false);
+    expect(rigShownFromView({ inDrawRange: false, compilePending: false })).toBe(false);
   });
   it('ignores the compile gate and the cull: a hidden-but-in-range rig is still the rig', () => {
     // A boss spawning thirty yards away must not flash as a flat sprite while his shader
     // programs link, so those hide reasons are invisible to the impostor.
-    expect(rigShownFromView({ rangeHidden: false, compilePending: true })).toBe(true);
-    expect(rigShownFromView({ rangeHidden: false, compilePending: false })).toBe(true);
+    expect(rigShownFromView({ inDrawRange: true, compilePending: true })).toBe(true);
+    expect(rigShownFromView({ inDrawRange: true, compilePending: false })).toBe(true);
   });
   it('treats no view at all as no rig (the server-side landmark with nothing built yet)', () => {
     expect(rigShownFromView(undefined)).toBe(false);

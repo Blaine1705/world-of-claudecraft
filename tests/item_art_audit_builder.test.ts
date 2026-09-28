@@ -862,33 +862,33 @@ describe('item-art audit builder', () => {
       // with the Viridian Valestrider's reins (release/v0.44.0 base merge), re-measured the same way. 1341 / 1359 with the trinket slot's 18 trinkets (PR 4173) landed on the integration branch (a 26th group and a 32nd sheet page), sha and bytes re-measured with `--verify-only` on the merged tree.
       // 1345 / 1498 with Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four
       // painted weapons, re-measured with `--verify-only` on the merged tree.
-      // 1355 / 1373 with the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab),
-      // re-measured with `--verify-only` on the merged tree (33 pages).
-      // 1361 / 1379 with Balgath's loot (five trinkets and the Craterglass Stave,
-      // balgath-loot-icons-2026-09-28), re-measured with `--verify-only`.
-      catalogSha256: 'c063835c8b744b381bb0192447d18089d249afd050d12285419128c95bb9b701',
-      catalogBytes: 741706,
+      // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+      // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
+      // 1479 / 1497 with the Mirefen world-boss branch (fifteen items) at its
+      // release/v0.45.0 merge, re-measured with `--verify-only` on the merged tree.
+      catalogSha256: '01bb2ab7b303f44077dc1d17f134656b4f8f76d8b6ae91155fe9feabd1696430',
+      catalogBytes: 809163,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1361,
-      liveItemCount: 1379,
+      catalogCount: 1479,
+      liveItemCount: 1497,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
       groupCount: 26,
-      sheetPageCount: 33,
-      sheetCount: 264,
+      sheetPageCount: 36,
+      sheetCount: 288,
       sheetModeCounts: {
-        '128-color': 33,
-        '40-color': 33,
-        '28-color': 33,
-        '22-color': 33,
-        '28-grayscale': 33,
-        '64-circle': 33,
-        'small-multiview': 33,
-        identity: 33,
+        '128-color': 36,
+        '40-color': 36,
+        '28-color': 36,
+        '22-color': 36,
+        '28-grayscale': 36,
+        '64-circle': 36,
+        'small-multiview': 36,
+        identity: 36,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '53169d24c45ae8bd875715dec0fe7980ec57ae2f49e874921b87ab6e3facf09f',
+      shippingCatalogSha256: 'f0c9a15a58df47fc236f34d2515514bc1ceead75c862e4176c25c444a9f19ce2',
       machineChecksPassed: true,
       verdict: null,
     });

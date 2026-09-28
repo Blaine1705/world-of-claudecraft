@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1013,
-      "state": "141233df",
+      "state": "74548df1",
       "events": "8650d7d6",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1013,
-      "state": "44eb52a8",
+      "state": "db00ccca",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1013,
-      "state": "52b932fe",
+      "state": "ba45d7c8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "b171fe7f",
+      "state": "8b781a91",
       "events": "3f5a7a0c",
       "rng": {
         "draws": 0,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1013,
-      "state": "5b75f248",
+      "state": "7c1a7192",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1013,
-      "state": "0d0e1fc9",
+      "state": "e0560bab",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1013,
-      "state": "7ee35961",
+      "state": "225bbdc3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "3d489adc",
+      "state": "0f5ff3b6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 1013,
-      "state": "f403062d",
+      "state": "a8e9669f",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -172,6 +172,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -199,6 +200,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
@@ -248,6 +250,7 @@
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -279,6 +282,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

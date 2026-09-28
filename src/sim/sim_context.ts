@@ -112,7 +112,10 @@ export type RuntimeSimConfig = Required<
     | 'dayNightNowMs'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'>;
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'> & {
+    vaultOpenNeedsSave?: boolean;
+    vaultRewardNeedsSave?: boolean;
+  };
 
 export interface DamageResolution {
   landedHpLoss: number;

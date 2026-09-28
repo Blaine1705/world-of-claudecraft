@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
 import { ITEM_ART_AUDIT_RENDERER_FINGERPRINT } from '../scripts/lib/item_art_audit.mjs';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
+import { HOARD_ITEMS } from '../src/sim/content/hoard_loot';
 import { ITEMS } from '../src/sim/data';
 import { ITEM_ART_PENDING } from '../src/ui/icons';
 
@@ -852,9 +853,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the Wage rares): 1,507.
-    // Plus Balgath's loot (five trinkets and the Craterglass Stave): 1,513.
-    expect(Object.keys(ITEMS)).toHaveLength(1513);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
+    // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave), at the
+    // release/v0.45.0 merge: +15.
+    expect(Object.keys(ITEMS)).toHaveLength(1632);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1009,19 +1011,21 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
     // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283. The
-    // world-quest branch's two batches (four quest-object icons) join at the
-    // release/v0.43.0 merge: 1,287.
+    // release's Viridian Valestrider reins (reins_avian_strider) adds one: 1,284.
+    // The world-quest branch's two batches (four quest-object icons) join at the
+    // release/v0.43.0 merge: 1,288.
     // The faction quartermaster icons (faction-vendor-icons-2026-09-16, 15
     // SVG compositions) join at the wq-reputation merge: 1,302.
     // The Emissary's Cache chest (feature/weekly-quests): 1,303. The Clue
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
-    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the Wage rares): 1,354 owners.
-    // Plus Balgath's loot (balgath-loot-icons-2026-09-28, six items): 1,360.
-    expect(new Set(currentOwnerIds).size).toBe(1360);
-    expect(shippingIds).toHaveLength(1360);
-    expect(Object.keys(ITEMS)).toHaveLength(1513);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
+    // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave), at the
+    // release/v0.45.0 merge: +15.
+    expect(new Set(currentOwnerIds).size).toBe(1479);
+    expect(shippingIds).toHaveLength(1479);
+    expect(Object.keys(ITEMS)).toHaveLength(1632);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1114,6 +1118,50 @@ describe('item-art consistency accepted-art provenance', () => {
       .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
       .flatMap(({ itemIds }) => itemIds);
     expect(sorted(clueScrollBatchIds)).toEqual(['clue_scroll', 'treasure_casket']);
+    // The faction reward items, one SVG batch (faction-rewards-icons-2026-09-17),
+    // additive beyond the chain the same way.
+    const factionRewardBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'faction-rewards-icons-2026-09-17')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(factionRewardBatchIds)).toEqual([
+      'allied_hearthstone',
+      'allied_vanguard_duffel',
+      'clockwork_shock_bomb',
+      'clockwork_target_dummy',
+      'dawn_battle_standard',
+      'dense_sharpening_stone',
+      'elixir_of_mana_regeneration',
+      'formula_enchant_feet_shadowstride',
+      'formula_enchant_gloves_forged_might',
+      'formula_enchant_offhand_spirit',
+      'pattern_reinforced_armor_kit',
+      'plans_dense_sharpening_stone',
+      'potion_of_invisibility',
+      'recipe_elixir_of_mana_regeneration',
+      'recipe_potion_of_invisibility',
+      'reinforced_armor_kit',
+      'rift_feather_glider',
+      'schematic_clockwork_shock_bomb',
+    ]);
+    // The treasure maps and Cartographer's Ink (buried-hoard-treasure-maps-2026-09-19).
+    const treasureMapBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'buried-hoard-treasure-maps-2026-09-19')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(treasureMapBatchIds)).toEqual([
+      'cartographers_ink',
+      'treasure_map_common',
+      'treasure_map_epic',
+      'treasure_map_legendary',
+      'treasure_map_rare',
+    ]);
+    // The Buried Hoard boss loot (hoard-boss-loot-icons-2026-09-20): one icon per
+    // generated item id, 32 pieces at three tiers, pinned against the live table
+    // rather than as 96 literals.
+    const hoardLootBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'hoard-boss-loot-icons-2026-09-20')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(hoardLootBatchIds).toHaveLength(96);
+    expect(sorted(hoardLootBatchIds)).toEqual(sorted(Object.keys(HOARD_ITEMS)));
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
     // this whole historical chain too, the same way the Field Kit is, and so
     // are the Mirefen world boss's eight spoils: their three batches
@@ -1127,6 +1175,9 @@ describe('item-art consistency accepted-art provenance', () => {
         ...factionVendorBatchIds,
         ...factionLadderBatchIds,
         ...clueScrollBatchIds,
+        ...factionRewardBatchIds,
+        ...treasureMapBatchIds,
+        ...hoardLootBatchIds,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
@@ -1324,10 +1375,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // its batch (faction-ladder-icons-2026-09-23) = 36. The trinket slot's icon batch
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
     // batch (warfare-season2-weapons-2026-09-25) = 38.
-    // The Mirefen world-boss branch's four batches (balgath-boss, shardpike-mechanic,
-    // foremans-wage, muster-shardpike) = 42. Balgath's loot batch
-    // (balgath-loot-icons-2026-09-28) = 43.
-    expect(mapping.generatedBatches).toHaveLength(43);
+    // Plus the Mirefen world-boss branch's five batches (balgath-boss, shardpike-mechanic,
+    // foremans-wage, muster-shardpike, balgath-loot) at the release/v0.45.0 merge = 46.
+    expect(mapping.generatedBatches).toHaveLength(46);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1394,17 +1444,20 @@ describe('item-art consistency accepted-art provenance', () => {
     // wq-reputation merge: 774. The Clue Scroll batch adds 2: 776. The faction
     // ladder batch (faction-ladder-icons-2026-09-23) adds 17: 793. The
     // trinket-slot-icons-2026-09-23 batch adds its 18 trinkets: 811. Warfare
-    // Season 2's weapon batch adds 4: 815.
-    // Plus the Mirefen world-boss branch's nine batch ids: 824. Plus Balgath's loot: 830.
-    expect(priorGeneratedIds).toHaveLength(830);
+    // Season 2's weapon batch adds 4: 815. The Buried Hoards branch's three
+    // batches (18 faction reward paintings, 5 treasure-map family, 96 hoard boss
+    // loot) add 119 at the 2026-09-28 release merge: 934.
+    // Plus the Mirefen world-boss branch's 15 batch ids: 949.
+    expect(priorGeneratedIds).toHaveLength(949);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the Wage rares): 1,354.
-    // Plus Balgath's loot (six items): 1,360.
-    expect(allCurrentOwnerIds).toHaveLength(1360);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1360);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
+    // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave), at the
+    // release/v0.45.0 merge: +15.
+    expect(allCurrentOwnerIds).toHaveLength(1479);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1479);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1412,17 +1465,14 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      // 44 -> 45 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0
-      // base merge), an entries row beside the Emissary's Cache chest.
+      // 45 entries (the release's mapping entries; the hoard batches own no entries).
       entries: 45,
-      // 755 + the world-quest branch's four batch ids (release/v0.43.0 merge)
-      // + the 15 faction quartermaster ids (wq-reputation merge) = 774
       // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
-      // + the Mirefen world-boss branch's 9 = 824.
-      // + Balgath's loot (balgath-loot-icons-2026-09-28) 6 = 830.
-      priorGenerated: 830,
+      // + the Buried Hoards branch's 119 paintings (three batches) = 934.
+      // + the Mirefen world-boss branch's 15 = 949.
+      priorGenerated: 949,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1501,6 +1551,9 @@ describe('item-art consistency accepted-art provenance', () => {
                 'faction-ladder-icons-2026-09-23',
                 // The Clue Scroll items.
                 'clue-scroll-icons-2026-09-17',
+                'faction-rewards-icons-2026-09-17',
+                'buried-hoard-treasure-maps-2026-09-19',
+                'hoard-boss-loot-icons-2026-09-20',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1668,12 +1721,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1355.
-    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the Wage rares) = 1354.
-    // Plus Balgath's loot (five trinkets and the Craterglass Stave) = 1360.
-    if (ownerIds.length !== 1360)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1360`);
-    if (fileIds.length !== 1360) violations.push(`shipping WebP count: ${fileIds.length} != 1360`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464.
+    // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1479.
+    if (ownerIds.length !== 1479)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1479`);
+    if (fileIds.length !== 1479) violations.push(`shipping WebP count: ${fileIds.length} != 1479`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

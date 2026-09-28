@@ -126,16 +126,17 @@ describe('ability icons', () => {
     const ids = abilityRecipeIds();
     expect(ids).toEqual([...new Set(ids)].sort((left, right) => left.localeCompare(right)));
     // 464: 450 plus the fourteen Nythraxis Raid Boss Guide mechanic recipes;
-    // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite);
-    // 472: plus the Mirefen world boss's Shardpike bar verbs (lance_brace,
-    // lance_thrust, lance_release), merged over release/v0.44.0.
-    // 475 on the merged tree (the release's own three additions plus the Shardpike verbs).
-    expect(ids).toHaveLength(475);
+    // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
+    // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
+    // release/v0.44.0 merge into feature/buried-hoards).
+    // 476: plus the Mirefen world boss's Shardpike bar verbs (lance_brace,
+    // lance_thrust, lance_release), at the release/v0.45.0 merge.
+    expect(ids).toHaveLength(476);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    // Re-minted over the merged ABILITY_RECIPES literal.
-    expect(hash).toBe('e15405135f0647405d0433e73218acf185abf70604eee74153240088c4d9cec0');
+    // Re-minted over the merged ABILITY_RECIPES literal (release/v0.45.0 merge).
+    expect(hash).toBe('94c1895e54a18a8c965c92e499d148476185ade4dbd5b140e31af16b3f2ff202');
   });
 });

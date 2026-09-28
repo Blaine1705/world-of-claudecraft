@@ -139,13 +139,14 @@ export function bossImpostorShows(input: BossImpostorShowInput): boolean {
  * but nothing is built yet) is no rig, which is exactly when the sprite should stand in.
  */
 export interface BossImpostorRigView {
-  readonly rangeHidden: boolean;
+  /** The renderer's per-frame range-band latch (EntityView.inDrawRange). */
+  readonly inDrawRange: boolean;
   /** Present on the renderer's view and deliberately IGNORED here (see above). */
   readonly compilePending?: boolean;
 }
 
 export function rigShownFromView(view: BossImpostorRigView | undefined): boolean {
-  return !(view?.rangeHidden ?? true);
+  return view?.inDrawRange ?? false;
 }
 
 /** Fog strength the sprite actually applies, given what the scene wants. */

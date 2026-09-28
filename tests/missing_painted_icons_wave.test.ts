@@ -691,8 +691,10 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // casket deeds; all nine sit on the pending side on category crests.
     // 318 with the release's ferry round trip (exp_harbor_to_harbor), also on
     // the pending side on the exploration crest.
-    // 321 with the Mirefen world-boss branch's three combat deeds, all pending.
-    expect(DEED_ORDER).toHaveLength(321);
+    // 319 at the 2026-09-28 release/v0.44.0 merge into Buried Hoards: the
+    // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
+    // 322 with the Mirefen world-boss branch's three combat deeds, all pending.
+    expect(DEED_ORDER).toHaveLength(322);
     expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);

@@ -23,7 +23,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -37,9 +37,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "12cbf7e3",
-      "events": "819bd1f2",
+      "nextId": 1011,
+      "state": "4933b3d1",
+      "events": "fd232d0d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -85,13 +85,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -129,6 +130,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -145,7 +147,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -159,7 +161,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -203,8 +205,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "2a68789c",
+      "nextId": 1011,
+      "state": "eb787076",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -266,13 +268,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -310,6 +313,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -326,7 +330,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -340,7 +344,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -384,8 +388,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "2e5cc853",
+      "nextId": 1011,
+      "state": "6c0156e7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -447,13 +451,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -481,6 +486,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -497,7 +503,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -511,7 +517,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -555,8 +561,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "5ffe6990",
+      "nextId": 1011,
+      "state": "ef2c2522",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -618,13 +624,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -662,6 +669,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -678,7 +686,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -692,7 +700,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -736,8 +744,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "82908d41",
+      "nextId": 1011,
+      "state": "bd9964a7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -787,13 +795,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -831,6 +840,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -847,7 +857,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -861,7 +871,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -905,9 +915,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "d9faabc7",
-      "events": "cb1eb15f",
+      "nextId": 1011,
+      "state": "ce10c699",
+      "events": "b878ffa4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -957,13 +967,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -1001,6 +1012,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1017,7 +1029,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1031,7 +1043,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1075,9 +1087,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "ed50f542",
-      "events": "4f136e42",
+      "nextId": 1011,
+      "state": "add05a00",
+      "events": "c49bf97c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1129,13 +1141,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -1193,6 +1206,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1209,7 +1223,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1223,7 +1237,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1267,9 +1281,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "18374e7a",
-      "events": "e4edfad5",
+      "nextId": 1011,
+      "state": "db22350c",
+      "events": "94fe3c4e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1321,13 +1335,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -1386,6 +1401,7 @@
             "stock": {},
             "upgrades": 1
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1402,7 +1418,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1416,7 +1432,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1460,8 +1476,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "24b1ef4e",
+      "nextId": 1011,
+      "state": "4722e200",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1514,13 +1530,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -1581,6 +1598,7 @@
             },
             "upgrades": 1
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1597,7 +1615,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1611,7 +1629,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1655,8 +1673,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "eca38b0a",
+      "nextId": 1011,
+      "state": "b1b316e0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1709,13 +1727,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -1767,6 +1786,7 @@
             },
             "upgrades": 1
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1783,7 +1803,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1797,7 +1817,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1841,8 +1861,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "206fbcf4",
+      "nextId": 1011,
+      "state": "edcaafde",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1895,13 +1915,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -1953,6 +1974,7 @@
             },
             "upgrades": 1
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1969,7 +1991,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1983,7 +2005,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2027,9 +2049,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "2c0a97a2",
-      "events": "7f19bbfd",
+      "nextId": 1011,
+      "state": "945dfe32",
+      "events": "7fd8ddf4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2081,13 +2103,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -2139,6 +2162,7 @@
             },
             "upgrades": 2
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2155,7 +2179,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -2169,7 +2193,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2213,9 +2237,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "afcccc5a",
-      "events": "b9187f1b",
+      "nextId": 1011,
+      "state": "782977e6",
+      "events": "1a7cb6f4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2268,13 +2292,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -2311,6 +2336,7 @@
             },
             "upgrades": 2
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2327,7 +2353,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -2341,7 +2367,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2385,9 +2411,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1012,
-      "state": "4b7f79d0",
-      "events": "53a1c8d5",
+      "nextId": 1011,
+      "state": "f1ce9138",
+      "events": "3718b7b1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2450,13 +2476,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -2494,6 +2521,7 @@
             },
             "upgrades": 2
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2510,7 +2538,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 1011
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -2524,7 +2552,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 5,
           "hp": 100,
-          "id": 1011,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

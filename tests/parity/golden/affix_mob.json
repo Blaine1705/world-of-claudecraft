@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "efa091b2",
+      "state": "793701e3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -69,6 +69,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -96,6 +97,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -171,7 +173,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1014,
-      "state": "e324fbc0",
+      "state": "f6758c4b",
       "events": "aee9f872",
       "rng": {
         "draws": 15,
@@ -182,7 +184,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "2d2d9d73",
+      "state": "b4cb5aec",
       "events": "9e9deb9d",
       "rng": {
         "draws": 29,
@@ -193,7 +195,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1014,
-      "state": "36845ecd",
+      "state": "4b888e5a",
       "events": "6f0e91c9",
       "rng": {
         "draws": 104,
@@ -268,6 +270,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -297,6 +300,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -514,7 +518,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 1014,
-      "state": "de76dd78",
+      "state": "5e7b15a3",
       "events": "741638a5",
       "rng": {
         "draws": 134,
@@ -589,6 +593,7 @@
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -618,6 +623,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

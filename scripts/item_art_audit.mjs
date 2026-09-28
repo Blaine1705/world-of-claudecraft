@@ -130,38 +130,33 @@ const build = await buildItemArtAudit({
     // + the World Quests branch merge (release/v0.43.0 sync): its two painted
     // puzzle activators and two Eastbrook freight icons join both counts.
     // + the 15 faction quartermaster items (faction-vendor-icons-2026-09-16),
-    // which landed without moving this block (1302 / 1320), + the weekly
-    // emissary's cache chest (feature/weekly-quests: 1303 / 1321), + the two
-    // Clue Scroll items (clue_scroll, treasure_casket; clue-scroll-icons-2026-09-17):
-    // 1305 / 1323 on the quests integration branch, measured with
-    // `node scripts/item_art_audit.mjs --verify-only`. + the faction ladder
-    // rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 / 1340. + the Viridian Valestrider's reins (release/v0.44.0 base merge): 1323 / 1341. + the trinket slot's 18 trinkets (PR 4173) landed on the integration branch: 1341 / 1359.
-    // + the Mirefen world-boss branch (merged over release/v0.44.0): +10 on both terms.
-    // Mirefen world-boss forward-port: the boss branch adds eight disjoint
+    // which landed without moving this block (1302 / 1320), + the two Clue
+    // Scroll items (clue_scroll, treasure_casket; clue-scroll-icons-2026-09-17):
+    // 1304 / 1322, measured with `node scripts/item_art_audit.mjs --verify-only`.
+    // + the 18 faction reward paintings and the five Buried Hoard map-family
+    // paintings: 1327 catalog records and 1345 live definitions, measured with
+    // the same verifier run.
+    // + the 96 Buried Hoard boss loot paintings (hoard-boss-loot-icons-2026-09-20)
+    // and, at the release/v0.44.0 merge into feature/buried-hoards, the
+    // release's Viridian Valestrider reins (1284 / 1302 on its own arm):
+    // 1424 catalog records and 1442 live definitions on 34 sheet pages,
+    // measured with the same verifier run on the merged tree.
+    // Re-measured at the 2026-09-28 release/v0.44.0 merge into
+    // feature/buried-hoards: the release's faction ladder, trinket slot and
+    // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
+    // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
+    // The Mirefen world-boss branch at its release/v0.45.0 merge: fifteen disjoint
     // item definitions, each with its own shipping WebP (the balgath-boss,
-    // shardpike-mechanic and foremans-wage batches in
-    // public/ui/items/mapping.json), so both terms move by exactly eight:
-    // 1283 + 8 = 1291 and 1301 + 8 = 1309. The boss spoils land in the
-    // existing weapon and armor groups, so the group count is unchanged; the
-    // eight extra records push one group past an 80-id page boundary, so the
-    // contact-sheet page count moves 31 to 32. Both re-measured with
-    // `node scripts/item_art_audit.mjs --verify-only` on the merged tree.
-    // Mirefen muster rework: one more disjoint item definition, the lent
-    // muster_shardpike, with its own shipping WebP (the
-    // muster-shardpike-icon-2026-09-26 batch): 1291 + 1 = 1292, 1309 + 1 = 1310.
-    // Over release/v0.44.0 the records push one more group past a page boundary: 33
-    // contact-sheet pages.
-    // Balgath's loot: five trinkets and the Craterglass Stave, each with its own
-    // shipping WebP (balgath-loot-icons-2026-09-28): 1354 + 6 = 1360, 1372 + 6 = 1378.
-    // (The muster weekly's Barrowhide Slab was cut before it shipped: the weekly is a
-    // kill credit now, so it owns no item and no art.)
-    catalogCount: 1360,
-    liveItemCount: 1378,
+    // shardpike-mechanic, foremans-wage, muster-shardpike and balgath-loot batches in
+    // public/ui/items/mapping.json): 1464 + 15 = 1479, 1482 + 15 = 1497, re-measured
+    // with `node scripts/item_art_audit.mjs --verify-only` on the merged tree.
+    catalogCount: 1479,
+    liveItemCount: 1497,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 33,
+    sheetPageCount: 36,
     groupCount: 26,
   },
 });

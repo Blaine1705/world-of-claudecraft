@@ -71,10 +71,11 @@ import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { CRAFT_RING, STATION_RADIUS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
+import { TREASURE_SITES } from '../src/sim/content/treasure_maps';
 import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS, WORLD_QUESTS } from '../src/sim/data';
 import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
-import { createMob } from '../src/sim/entity';
+import { createGroundObject, createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
@@ -140,6 +141,7 @@ const DELTA_KEYS = [
   'wqexp',
   'wqlog',
   'fac',
+  'facCur',
   'wqrr',
   'wqrep',
   'cluh',
@@ -168,6 +170,50 @@ function eventTexts(sent: any[]): string[] {
 function feedEventFrame(client: ClientWorld, frame: unknown): void {
   (client as any).onMessage(JSON.stringify(frame));
 }
+
+describe('buried hoard rarity identity wire', () => {
+  it.each(['common', 'rare', 'epic', 'legendary'] as const)('round-trips %s', (rarity) => {
+    const entrance = createGroundObject(90_003, '', 'Buried Hoard', { x: 2, y: 0, z: 3 });
+    entrance.templateId = 'hoard_entrance';
+    entrance.vaultRarity = rarity;
+    const client = bareClient(-1);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(entrance)] });
+    expect(client.entities.get(entrance.id)?.vaultRarity).toBe(rarity);
+  });
+
+  it('ignores an unknown quality from a newer server', () => {
+    const entrance = createGroundObject(90_004, '', 'Buried Hoard', { x: 2, y: 0, z: 3 });
+    const client = bareClient(-1);
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...wireEntity(entrance), vr: 'future' }] });
+    expect(client.entities.get(entrance.id)?.vaultRarity).toBeUndefined();
+  });
+
+  it('round-trips vr, preserves it across a lite record, and clears it on a later full record', () => {
+    const entrance = createGroundObject(90_001, '', 'Buried Hoard', { x: 2, y: 0, z: 3 });
+    entrance.templateId = 'hoard_entrance';
+    entrance.vaultRarity = 'legendary';
+
+    const full = wireEntity(entrance);
+    expect(full.vr).toBe('legendary');
+
+    const client = bareClient(-1);
+    (client as any).applySnapshot({ t: 'snap', ents: [full] });
+    expect(client.entities.get(entrance.id)?.vaultRarity).toBe('legendary');
+
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ id: entrance.id, x: 2.5, y: 0, z: 3, f: 0, hp: 1, mhp: 1 }],
+    });
+    expect(client.entities.get(entrance.id)?.vaultRarity).toBe('legendary');
+
+    entrance.vaultRarity = undefined;
+    const cleared = wireEntity(entrance);
+    expect(cleared.k).toBe('object');
+    expect(cleared).not.toHaveProperty('vr');
+    (client as any).applySnapshot({ t: 'snap', ents: [cleared] });
+    expect(client.entities.get(entrance.id)?.vaultRarity).toBeUndefined();
+  });
+});
 
 describe('self in-combat bit (cbt) wire round-trip', () => {
   it('ships the sim flag on the self record and ClientWorld mirrors it, then elides until it flips', () => {
@@ -5683,6 +5729,7 @@ const ALL_DELTA_KEYS = [
   'ench',
   'equip',
   'fac',
+  'facCur',
   'fplot',
   'ggoal',
   'gprof',
@@ -5734,6 +5781,7 @@ const ALL_DELTA_KEYS = [
   'tal',
   'tfocus',
   'tfpend',
+  'tmap',
   'trade',
   'tslot',
   'vault',
@@ -5822,6 +5870,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ench: 'lastEnchantResult',
   equip: 'equipment',
   fac: 'factions',
+  facCur: 'factionCurrencies',
   fplot: 'myFarmPlots',
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
@@ -5865,6 +5914,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   sp: 'spellPower',
   tfocus: 'townFocus',
   tfpend: 'townFocusPending',
+  tmap: 'treasureMap',
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
   vehicle: 'vehicleSession',
@@ -6013,6 +6063,8 @@ function dirtyEveryDeltaField(): {
   // `cluh`: an active clue hunt on a shipped hunt id (the client decoder
   // drops an id the pool does not know, so a made-up one would mirror null).
   meta.clueHunt = { huntId: CLUE_HUNTS[0].id, step: 1 };
+  meta.factionCurrencies = { rift_watch: 17, church_order: 29, automatons: 41 };
+  meta.treasureMap = { rarity: 'epic', siteId: TREASURE_SITES[0].id, seed: 78123 };
   server.sim.worldQuestExpiresAtMs = FAR_FUTURE_MS;
   meta.worldQuestLog.set('wq_eastbrook_bandits', {
     questId: 'wq_eastbrook_bandits',
@@ -6482,6 +6534,10 @@ describe('full self-state snapshot delta fixture', () => {
     broadcast(server);
     const client = bareClient(leader.pid);
     (client as any).applySnapshot(lastSnap(fc.sent));
+
+    expect(client.factionCurrencies).toEqual({ rift_watch: 17, church_order: 29, automatons: 41 });
+    expect(client.treasureMap).toEqual({ rarity: 'epic', siteId: TREASURE_SITES[0].id });
+    expect(lastSnap(fc.sent).self.tmap).not.toHaveProperty('seed');
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
@@ -7111,8 +7167,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 114 unique keys in sorted order', () => {
-    // 111 from the release, plus the Shardpike trial's lance, lrest and lguide.
+  it('ALL_DELTA_KEYS contains exactly 116 unique keys in sorted order', () => {
+    // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
+    // plus the Shardpike trial's lance, lrest and lguide (116).
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -7170,9 +7227,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
-    // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 114.
-    expect(ALL_DELTA_KEYS).toHaveLength(114);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(114);
+    // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 116.
+    expect(ALL_DELTA_KEYS).toHaveLength(116);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(116);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7342,8 +7399,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    // The Shardpike trial's lance, lrest and lguide self emits make 114.
-    expect(scraped.size).toBe(114);
+    // The Shardpike trial's lance, lrest and lguide self emits make 116.
+    expect(scraped.size).toBe(116);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

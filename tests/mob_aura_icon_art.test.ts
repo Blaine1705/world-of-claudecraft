@@ -164,9 +164,13 @@ describe('mob aura icon art', () => {
     // (Barrowhide, src/sim/content/zone2.ts), the eighth carrier of that family.
     expect(LIVE_MOB_AURA_FAMILIES).toHaveLength(44);
     expect(census.populatedFamilyCount).toBe(44);
-    // The Fenbridge infiltrator reuses the drowned dead's existing aura art: 110 carriers
-    // once both Balgath's Barrowhide and the infiltrator are counted.
-    expect(census.carrierCount).toBe(110);
+    // The Fenbridge infiltrator reuses the drowned dead's existing aura art.
+    // 110 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards:
+    // the Buried Hoard Marrow Golem (rift_marrow_golem) carries frenzyOnHit,
+    // whose shared blood_frenzy runtime id already resolves to painted art, so
+    // the identity count holds. 111 carriers and 91 identities with Balgath's
+    // Barrowhide (the Mirefen world-boss branch, release/v0.45.0 merge).
+    expect(census.carrierCount).toBe(111);
     expect(census.identities.size).toBe(91);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);

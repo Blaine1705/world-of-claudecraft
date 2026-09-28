@@ -231,11 +231,15 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     // 40 to 47 and 30 to 37 at the faction ladder rework: thirteen faction
     // jewels now (a neck and a ring per lower tier, the Champion gap jewels),
     // every one selling above 600 and none inside the band, same amendment.
-    // 50 and 40 with the Mirefen world-boss branch's three jewels, all selling above
+    // 47 to 62 and 37 to 52 at the 2026-09-28 release/v0.44.0 merge into
+    // feature/buried-hoards: the fifteen Buried Hoard jewels (content/hoard_loot.ts,
+    // five neck and ring bases at the rare, epic and legendary tiers) all sell
+    // above 600 (4950, 11000, 15400) and none sits inside the band, same amendment.
+    // 65 and 55 with the Mirefen world-boss branch's three jewels, all selling above
     // 600 and none inside the band.
-    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(50);
+    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(65);
     expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(9);
-    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(40);
+    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(55);
     // Exactly one row sits here, and the amended record names it.
     expect(
       jewelry.filter((d) => inBand(d, 25, 460)).map((d) => d.id),

@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "8b7257cb",
+      "state": "337f2016",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -67,6 +67,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -94,6 +95,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -165,7 +167,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "02c67ae1",
+      "state": "826047a8",
       "events": "039bdf96",
       "rng": {
         "draws": 12,
@@ -176,7 +178,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "93390002",
+      "state": "4bfe02d3",
       "events": "78b1cd2d",
       "rng": {
         "draws": 19,
@@ -187,7 +189,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1013,
-      "state": "648ccbf7",
+      "state": "1e01a9c2",
       "events": "a7d0e1d7",
       "rng": {
         "draws": 162,
@@ -198,7 +200,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 1013,
-      "state": "f903d07b",
+      "state": "6cebe05e",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -273,6 +275,7 @@
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -302,6 +305,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

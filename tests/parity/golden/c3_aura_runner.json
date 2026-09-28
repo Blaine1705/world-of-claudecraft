@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "c95c7bdf",
+      "nextId": 1011,
+      "state": "9def235c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -64,13 +64,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1003,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -102,6 +103,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -121,7 +123,7 @@
           "fiveSecondRule": 99,
           "healPower": 7,
           "hp": 105,
-          "id": 1004,
+          "id": 1003,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -167,9 +169,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1013,
-      "state": "6d193c0e",
-      "events": "a05e57d6",
+      "nextId": 1012,
+      "state": "f05b680a",
+      "events": "ae132613",
       "rng": {
         "draws": 2,
         "digest": "b6b6e0e7"
@@ -245,13 +247,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1003,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -286,6 +289,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -305,7 +309,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 16,
           "hp": 50000,
-          "id": 1004,
+          "id": 1003,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -365,7 +369,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1012,
+          "id": 1011,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -407,8 +411,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1013,
-      "state": "45d3bfeb",
+      "nextId": 1012,
+      "state": "f63c8550",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -418,8 +422,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1013,
-      "state": "92bdc19a",
+      "nextId": 1012,
+      "state": "84e6ea1f",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -429,8 +433,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 1013,
-      "state": "ff2b69d0",
+      "nextId": 1012,
+      "state": "0f853523",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -440,9 +444,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "21ffaf3c",
-      "events": "def3f5b8",
+      "nextId": 1012,
+      "state": "09463b7b",
+      "events": "6cb80331",
       "rng": {
         "draws": 2,
         "digest": "b6b6e0e7"
@@ -451,8 +455,8 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1013,
-      "state": "e8373fef",
+      "nextId": 1012,
+      "state": "af2845ea",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -462,8 +466,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1013,
-      "state": "a20f7c1a",
+      "nextId": 1012,
+      "state": "ba455f59",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -473,9 +477,9 @@
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 1013,
-      "state": "72676029",
-      "events": "d5b0ec64",
+      "nextId": 1012,
+      "state": "1dfe2c73",
+      "events": "88cb9b31",
       "rng": {
         "draws": 2,
         "digest": "b6b6e0e7"
@@ -484,9 +488,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "282b9c08",
-      "events": "d5c7d94b",
+      "nextId": 1012,
+      "state": "e827660a",
+      "events": "bf493602",
       "rng": {
         "draws": 2,
         "digest": "b6b6e0e7"
@@ -495,8 +499,8 @@
     {
       "tick": 45,
       "time": 2.25,
-      "nextId": 1013,
-      "state": "e2319e5f",
+      "nextId": 1012,
+      "state": "123b817d",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -506,8 +510,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1013,
-      "state": "667240df",
+      "nextId": 1012,
+      "state": "dc526bdd",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -517,8 +521,8 @@
     {
       "tick": 55,
       "time": 2.75,
-      "nextId": 1013,
-      "state": "b3de9912",
+      "nextId": 1012,
+      "state": "e054b368",
       "events": "741638a5",
       "rng": {
         "draws": 118,
@@ -528,8 +532,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "446b437f",
+      "nextId": 1012,
+      "state": "cc8f691d",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -539,8 +543,8 @@
     {
       "tick": 62,
       "time": 3.1,
-      "nextId": 1013,
-      "state": "14259da0",
+      "nextId": 1012,
+      "state": "52634f4e",
       "events": "741638a5",
       "rng": {
         "draws": 165,
@@ -620,13 +624,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1003,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -661,6 +666,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -694,7 +700,7 @@
           "fiveSecondRule": 102,
           "healPower": 16,
           "hp": 524,
-          "id": 1004,
+          "id": 1003,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -754,7 +760,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1012,
+          "id": 1011,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -796,9 +802,9 @@
     {
       "tick": 65,
       "time": 3.25,
-      "nextId": 1015,
-      "state": "4308757e",
-      "events": "737b8ec4",
+      "nextId": 1014,
+      "state": "75a5de52",
+      "events": "35ef1827",
       "rng": {
         "draws": 192,
         "digest": "73aae3f5"
@@ -807,8 +813,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1015,
-      "state": "5a5463e2",
+      "nextId": 1014,
+      "state": "6bee9774",
       "events": "741638a5",
       "rng": {
         "draws": 234,
@@ -818,8 +824,8 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1015,
-      "state": "cd315fd1",
+      "nextId": 1014,
+      "state": "c2ef1b31",
       "events": "741638a5",
       "rng": {
         "draws": 270,
@@ -829,9 +835,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1015,
-      "state": "8756227e",
-      "events": "d5c7d94b",
+      "nextId": 1014,
+      "state": "4ce830a0",
+      "events": "bf493602",
       "rng": {
         "draws": 294,
         "digest": "a5f8da8a"
@@ -840,9 +846,9 @@
     {
       "tick": 85,
       "time": 4.25,
-      "nextId": 1015,
-      "state": "488f028d",
-      "events": "b1f34db8",
+      "nextId": 1014,
+      "state": "06aeac35",
+      "events": "b8a7c961",
       "rng": {
         "draws": 341,
         "digest": "acc89171"
@@ -851,8 +857,8 @@
     {
       "tick": 90,
       "time": 4.5,
-      "nextId": 1015,
-      "state": "1af47e88",
+      "nextId": 1014,
+      "state": "e74ff69e",
       "events": "741638a5",
       "rng": {
         "draws": 391,
@@ -862,8 +868,8 @@
     {
       "tick": 95,
       "time": 4.75,
-      "nextId": 1015,
-      "state": "09a8a030",
+      "nextId": 1014,
+      "state": "f76c1e4c",
       "events": "741638a5",
       "rng": {
         "draws": 465,
@@ -873,8 +879,8 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1015,
-      "state": "3cbe15e4",
+      "nextId": 1014,
+      "state": "16a771fa",
       "events": "741638a5",
       "rng": {
         "draws": 506,
@@ -884,9 +890,9 @@
     {
       "tick": 105,
       "time": 5.25,
-      "nextId": 1015,
-      "state": "163f71aa",
-      "events": "5fec0a35",
+      "nextId": 1014,
+      "state": "6409c762",
+      "events": "589fc736",
       "rng": {
         "draws": 555,
         "digest": "e7cd78d0"
@@ -895,8 +901,8 @@
     {
       "tick": 110,
       "time": 5.5,
-      "nextId": 1015,
-      "state": "f963d1e8",
+      "nextId": 1014,
+      "state": "8175d17e",
       "events": "741638a5",
       "rng": {
         "draws": 600,
@@ -906,8 +912,8 @@
     {
       "tick": 115,
       "time": 5.75,
-      "nextId": 1015,
-      "state": "8cbedc8f",
+      "nextId": 1014,
+      "state": "3aef7d23",
       "events": "741638a5",
       "rng": {
         "draws": 659,
@@ -917,8 +923,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1015,
-      "state": "81a9afa1",
+      "nextId": 1014,
+      "state": "67d1f613",
       "events": "741638a5",
       "rng": {
         "draws": 727,
@@ -928,9 +934,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1015,
-      "state": "befdf069",
-      "events": "61e4b831",
+      "nextId": 1014,
+      "state": "26fc9ced",
+      "events": "9d7736cc",
       "rng": {
         "draws": 795,
         "digest": "5fbfcd69"
@@ -939,8 +945,8 @@
     {
       "tick": 130,
       "time": 6.5,
-      "nextId": 1015,
-      "state": "8667297f",
+      "nextId": 1014,
+      "state": "007fb331",
       "events": "741638a5",
       "rng": {
         "draws": 848,
@@ -950,8 +956,8 @@
     {
       "tick": 135,
       "time": 6.75,
-      "nextId": 1015,
-      "state": "e8780e10",
+      "nextId": 1014,
+      "state": "811580e8",
       "events": "741638a5",
       "rng": {
         "draws": 908,
@@ -961,8 +967,8 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 1015,
-      "state": "7dd16d6a",
+      "nextId": 1014,
+      "state": "b28d94c4",
       "events": "741638a5",
       "rng": {
         "draws": 954,
@@ -972,9 +978,9 @@
     {
       "tick": 145,
       "time": 7.25,
-      "nextId": 1015,
-      "state": "83156645",
-      "events": "9ec50e1b",
+      "nextId": 1014,
+      "state": "05031599",
+      "events": "50b3f174",
       "rng": {
         "draws": 1003,
         "digest": "26b99d5f"
@@ -983,8 +989,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 1015,
-      "state": "e9184ffb",
+      "nextId": 1014,
+      "state": "3dca23f5",
       "events": "741638a5",
       "rng": {
         "draws": 1062,
@@ -994,8 +1000,8 @@
     {
       "tick": 155,
       "time": 7.75,
-      "nextId": 1015,
-      "state": "efe9ae52",
+      "nextId": 1014,
+      "state": "4492e60a",
       "events": "741638a5",
       "rng": {
         "draws": 1128,
@@ -1005,8 +1011,8 @@
     {
       "tick": 160,
       "time": 8,
-      "nextId": 1015,
-      "state": "e2e4f538",
+      "nextId": 1014,
+      "state": "a76f5366",
       "events": "741638a5",
       "rng": {
         "draws": 1181,
@@ -1016,9 +1022,9 @@
     {
       "tick": 165,
       "time": 8.25,
-      "nextId": 1015,
-      "state": "fa116259",
-      "events": "788a1981",
+      "nextId": 1014,
+      "state": "0eb082e1",
+      "events": "0aeb8488",
       "rng": {
         "draws": 1248,
         "digest": "8f37d8ab"
@@ -1027,8 +1033,8 @@
     {
       "tick": 170,
       "time": 8.5,
-      "nextId": 1015,
-      "state": "c45a7449",
+      "nextId": 1014,
+      "state": "bc5a7c57",
       "events": "741638a5",
       "rng": {
         "draws": 1317,
@@ -1038,8 +1044,8 @@
     {
       "tick": 175,
       "time": 8.75,
-      "nextId": 1015,
-      "state": "590cf706",
+      "nextId": 1014,
+      "state": "120c9c0a",
       "events": "741638a5",
       "rng": {
         "draws": 1380,
@@ -1049,8 +1055,8 @@
     {
       "tick": 180,
       "time": 9,
-      "nextId": 1015,
-      "state": "6907c7aa",
+      "nextId": 1014,
+      "state": "9fb89588",
       "events": "741638a5",
       "rng": {
         "draws": 1456,
@@ -1060,9 +1066,9 @@
     {
       "tick": 182,
       "time": 9.1,
-      "nextId": 1015,
-      "state": "48ac1bed",
-      "events": "b49c2dc3",
+      "nextId": 1014,
+      "state": "c8bdb9f3",
+      "events": "02c2dbc2",
       "rng": {
         "draws": 1479,
         "digest": "0ad4e25d"
@@ -1146,13 +1152,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1003,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -1187,6 +1194,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -1212,7 +1220,7 @@
           "fiveSecondRule": 6,
           "healPower": 16,
           "hp": 598,
-          "id": 1004,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1273,7 +1281,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1012,
+          "id": 1011,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1311,7 +1319,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1003,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 0.05,
@@ -1324,7 +1332,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 39807,
-          "id": 1013,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1354,11 +1362,11 @@
             "armor": 40
           },
           "swingTimer": 0.05,
-          "tappedById": 1004,
+          "tappedById": 1003,
           "templateId": "forest_wolf",
           "threat": [
             [
-              1004,
+              1003,
               879.15
             ]
           ],
@@ -1369,7 +1377,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1003,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 0.05,
@@ -1382,7 +1390,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 39808,
-          "id": 1014,
+          "id": 1013,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1412,11 +1420,11 @@
             "armor": 40
           },
           "swingTimer": 0.05,
-          "tappedById": 1004,
+          "tappedById": 1003,
           "templateId": "forest_wolf",
           "threat": [
             [
-              1004,
+              1003,
               874.6
             ]
           ],

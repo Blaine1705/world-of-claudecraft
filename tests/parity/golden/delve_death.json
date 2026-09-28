@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "8b7257cb",
+      "nextId": 1011,
+      "state": "51e80822",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,13 +60,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -94,6 +95,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -112,7 +114,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 1004,
+          "id": 1003,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -164,9 +166,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1022,
-      "state": "4de27147",
-      "events": "2e63e810",
+      "nextId": 1021,
+      "state": "178bf524",
+      "events": "8aa5ba29",
       "rng": {
         "draws": 1,
         "digest": "368503ad"
@@ -210,13 +212,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -245,6 +248,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -262,7 +266,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 123,
-          "id": 1004,
+          "id": 1003,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -313,9 +317,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1022,
-      "state": "214aea9d",
-      "events": "a21d1176",
+      "nextId": 1021,
+      "state": "074e1e3e",
+      "events": "1e724cea",
       "rng": {
         "draws": 1,
         "digest": "368503ad"
@@ -369,13 +373,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -405,6 +410,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -423,7 +429,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 6,
           "hp": 245,
-          "id": 1004,
+          "id": 1003,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -475,8 +481,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1022,
-      "state": "214aea9d",
+      "nextId": 1021,
+      "state": "074e1e3e",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -531,13 +537,14 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1004,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
@@ -567,6 +574,7 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -585,7 +593,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 6,
           "hp": 245,
-          "id": 1004,
+          "id": 1003,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",

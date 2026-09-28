@@ -2728,8 +2728,9 @@ describe('Reliquary catalog index memo', () => {
     // = 42; flagged base 2 + ours' delta +1 + theirs' delta +0 = 3).
     // The Warfare Season 2 Vanguard Gallery, appended after the reconciliation
     // above, is flagged personal, so the scoring set stays at 39.
-    // The Mirefen world boss page is an ordinary conquerors page, so it scores: 40.
-    expect(first?.length).toBe(40);
+    // The Buried Hoards page (2026-09-28 merge) scores: 40. The Mirefen world boss
+    // page is an ordinary conquerors page, so it scores too: 41.
+    expect(first?.length).toBe(41);
     expect(first?.some((p) => p.excludeFromCompletion !== undefined)).toBe(false);
 
     // An UNFLAGGED synthetic table answers the caller's own array by identity:

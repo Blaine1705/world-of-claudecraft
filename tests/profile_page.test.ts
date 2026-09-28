@@ -195,9 +195,11 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 416 at the Clue Scroll casket deeds: the Treasure Hunter title's slot.
     // 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) on the Horizons mounts page.
     // 434 with the trinket slot's seventeen character-scoped relics (PR 4173).
-    // 441 with the Mirefen world boss page's seven character-scoped item relics, 447
-    // with his Craterglass Stave and five trinkets.
-    expect(catalogTotal).toBe(447);
+    // 466 at the release/v0.44.0 merge into feature/buried-hoards (2026-09-28): the 32 Buried Hoard pieces
+    // (character-scoped items), the same +32 as reliquary_content.test.ts's pair.
+    // 479 with the Mirefen world boss page's seven character-scoped item relics, his
+    // Craterglass Stave and five trinkets (+13).
+    expect(catalogTotal).toBe(479);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });

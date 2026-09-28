@@ -1373,7 +1373,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  // Re-minted for the release/v0.44.0 base merge into PR 3847 (World Quests follow-ups). No capture was retaken.
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1394,11 +1394,11 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted at the Mirefen world-boss branch's merge of release/v0.44.0
+  // Re-minted at the Mirefen world-boss branch's release/v0.45.0 merge
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '4c70c965cbb3e3c12fae027ff118bb5b3e7b10fc1c36081f4297eff8615ca1b1';
+  '735fc3a63c1458f9b4776e1de7a6d42a97c16deb7beecd74cafdfe775f0e2f96';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  // Re-minted for the release/v0.44.0 base merge into PR 3847 (World Quests follow-ups). No capture was retaken.
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1419,9 +1419,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted at the Mirefen world-boss branch's merge of release/v0.44.0
+  // Re-minted at the Mirefen world-boss branch's release/v0.45.0 merge
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '0607768824e78cc76d0932ddba6453d8601f2ad4d44a7e49fa20ab066a0d39a8';
+  '1e3517a7b12c450078a9ced4c9ed766cf63d6e166300cb4be0c283ea7eeda1d3';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2802,9 +2802,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // provenance. No capture or measured value changed.
       // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-      // release/v0.44.0 base merge into PR 3847: recomputed LAST again over the
+      // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('e46189053a00720978931a7231f1022b597ffd291af5a4ca4d9bd4d124b5f99c');
+      // Mirefen world-boss branch's release/v0.45.0 merge: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+    ).toBe('cab476e8bc7321aa0766df05380837a3bc54f47b7ab38f169adf0ba20251eb3a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
