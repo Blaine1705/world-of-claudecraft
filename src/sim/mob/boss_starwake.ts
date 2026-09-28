@@ -1,6 +1,6 @@
 // Wake of the Fallen Star: Balgath wakes the star that woke him.
 //
-// It replaces the Loomshard Scry, which was a cast bar and a 30-yard nova with nothing on
+// It replaces the Barrowglass Scry, which was a cast bar and a 30-yard nova with nothing on
 // the ground to read. This one is a whole sequence, and every hazard in it is shown before
 // it hurts:
 //

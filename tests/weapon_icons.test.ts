@@ -64,8 +64,8 @@ describe('painted weapon inventory icons', () => {
     // 141 -> 145: the four Warfare Season 2 honor weapons, painted in
     // warfare-season2-weapons-2026-09-25 (second release/v0.44.0 base merge).
     // 148 with the Mirefen world-boss branch's foremans_barrowmaul, skerrits_shardpike
-    // and muster_shardpike.
-    expect(baseWeapons).toHaveLength(148);
+    // and muster_shardpike. 149 with Balgath's caster spoil, craterglass_stave.
+    expect(baseWeapons).toHaveLength(149);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -110,7 +110,8 @@ describe('painted weapon inventory icons', () => {
     // (faction-vendor-icons-2026-09-16, asserted below as `factionBatch`), nine
     // with the Warfare Season 2 weapons (warfare-season2-weapons-2026-09-25).
     // Twelve with the Mirefen world-boss branch's boss, Shardpike and muster-pike batches.
-    expect(weaponBatches).toHaveLength(12);
+    // Thirteen with Balgath's loot batch (balgath-loot-icons-2026-09-28, the staff).
+    expect(weaponBatches).toHaveLength(13);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -278,6 +279,15 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(musterWeaponIds).toEqual(['muster_shardpike']);
+    // And for Balgath's loot (balgath-loot-icons-2026-09-28), whose one weapon is the staff.
+    const lootBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'balgath-loot-icons-2026-09-28',
+    );
+    expect(lootBatch).toBeDefined();
+    const lootWeaponIds = (lootBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(lootWeaponIds).toEqual(['craterglass_stave']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
         (id) =>
@@ -291,7 +301,8 @@ describe('painted weapon inventory icons', () => {
           !season2WeaponIds.includes(id) &&
           !bossWeaponIds.includes(id) &&
           !shardpikeWeaponIds.includes(id) &&
-          !musterWeaponIds.includes(id),
+          !musterWeaponIds.includes(id) &&
+          !lootWeaponIds.includes(id),
       ),
     );
     expect(
@@ -349,7 +360,8 @@ describe('painted weapon inventory icons', () => {
         !season2WeaponIds.includes(id) &&
         !bossWeaponIds.includes(id) &&
         !shardpikeWeaponIds.includes(id) &&
-        !musterWeaponIds.includes(id),
+        !musterWeaponIds.includes(id) &&
+        !lootWeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

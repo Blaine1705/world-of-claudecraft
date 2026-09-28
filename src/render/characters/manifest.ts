@@ -102,6 +102,10 @@ export interface ClipMap {
   chargeGlowByAbility?: Record<string, ChargeGlowSpec>;
   /** Optional weapon-style override for plain auto attacks. */
   attackByHand?: { twohand?: string; dualwield?: string };
+  /** One-shots for an ABILITY swing with no per-ability override (round-robin), so a
+   *  body can answer a special with a heavier blow than its auto-attack. Absent = the
+   *  `attack` list serves both, as it always has. */
+  abilityAttack?: string[];
   death: string;
   /** hit-react one-shots (optional — spider/raptor rigs have none) */
   hit?: string[];
@@ -675,7 +679,7 @@ const BALGATH: ClipMap = {
   //
   // Every duration matches its mechanic's windup exactly, so the light going out IS the
   // impact frame (charge_glow_core.ts holds near full and then drops off a cliff).
-  // Loomshard teal rather than fire, because it is the same power his eye burns with.
+  // Barrowglass teal rather than fire, because it is the same power his eye burns with.
   // `radius` is in BONE-LOCAL units, and the rig multiplies it twice on the way out: once
   // by the visual's normScale (3.84 here) and again by the entity's own scale (4.2). A
   // fist-sized glow is therefore about 0.04, not 0.4, and the first cut at 0.11 rendered a
@@ -1436,6 +1440,7 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
  *  ITEM_OFFHAND_MODELS values). */
 export const AUTHORED_HELD_MODELS: ReadonlySet<string> = new Set([
   'balgath_barrowmaul_hammer', // Foreman's Barrowmaul (Balgath world-boss drop)
+  'craterglass_stave', // Craterglass Stave (Balgath world-boss drop)
   'hammer_varkhul', // Varkhul Forgebreaker (Ignivar raid legendary)
   'shardpike_spear', // Skerrit's Shardpike (Balgath quest tool)
   'varkhul_emberward', // Varkhul Emberward (Ignivar raid legendary)
@@ -2346,6 +2351,50 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
     },
+  },
+  // The Knucklebone of Balgath's Shape of the Foreman (combat/balgath_trinkets.ts): the
+  // Mirefen world boss's own body, decimated (scripts/assets/balgath_form/), at a head
+  // above a player rather than raid-boss sized, since twenty of them can stand in one
+  // pull. Same 41-joint rig, so it wears his clips straight off the two donor files:
+  // backhand swipes for the auto-attack, the hammer, stomp and smash for abilities, and
+  // the eye-flare for a spell cast. The eye burns like his (the same measured spec).
+  form_foreman: {
+    url: `${FORMS}/balgath_form.glb`,
+    animUrls: [`${CREATURES}/balgath_clip_donor.glb`, `${CREATURES}/balgath_ability_anims.glb`],
+    authoredAtlas: true,
+    height: 3.0,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 1.35,
+    // Gait refs MEASURED on this body carrying the donor clips (node
+    // scripts/anim/measure_gait.mjs public/models/chars/forms/balgath_form.glb --height 3.0
+    // --scale 1.1): his clips are a giant's lumber, so at a player's 7 u/s the run plays
+    // near 3.7x to keep the feet planted; the clamps are lifted to let it.
+    walkRef: 0.99,
+    runRef: 1.9,
+    walkTimeScaleMax: 3.2,
+    runTimeScaleMax: 3.9,
+    eyeGlow: {
+      bone: 'Head',
+      offset: [0.013, 0.115, -0.085],
+      color: 0x5fe8d2,
+      // Measured on screen, not copied from the boss: this rig's head bone carries a larger
+      // world scale than his at a player's size, so his 0.019 (and a first 0.034) swallowed
+      // the whole face in a halo. At 0.008 the halo sits in the socket like his does.
+      radius: 0.008,
+      pulseHz: 0.45,
+    },
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Balgath_Swipe', 'Balgath_Barrowsweep'],
+      abilityAttack: ['Balgath_Hammer', 'Balgath_Stomp', 'Balgath_Smash'],
+      cast: 'Balgath_EyeFlare',
+      hit: ['Hit'],
+      death: 'Death',
+      jump: 'Jump',
+    },
+    lazyPreload: true,
   },
   form_cat: {
     url: `${CREATURES}/druid_cat_form.glb`,
@@ -4042,7 +4091,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // fire BALGATH_DEATH_IMPACT_SEC after the death edge (balgath_death_fx_core.ts), which
     // is the clip's own impact frame only at 1x (the shared default is 1.15).
     deathTimeScale: 1,
-    // The Loomshard, always burning. Measured off the rig rather than guessed: the eye is
+    // The Barrowglass, always burning. Measured off the rig rather than guessed: the eye is
     // the front-most head vertex resolved into the Head bone's own frame at rest, which is
     // bone-local (0.013, 0.115, -0.085). A guessed offset puts a glowing ball behind his
     // skull or floating off his face, and neither is obvious from the angle you happen to
@@ -4335,6 +4384,10 @@ const MOB_KEYS: Record<string, string> = {
   guardian_stampede_0: 'greyjaw',
   guardian_stampede_1: 'mob_boar',
   guardian_stampede_2: 'mob_raptor',
+  // The Muster Standard's soldiers (combat/balgath_trinkets.ts), dressed exactly like the
+  // camp's: the footman's spear and round shield, the sergeant's sword and square shield.
+  guardian_muster_standard_spear: 'npc_muster_footman',
+  guardian_muster_standard_sword: 'npc_muster_sergeant',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',

@@ -55,7 +55,7 @@ export interface EyeWardMarkerPlan {
   radiusScale: number;
 }
 
-const OPEN = 0x76e0d8; // the Loomshard's own teal: this is its socket
+const OPEN = 0x76e0d8; // the Barrowglass's own teal: this is its socket
 const SHUT = 0x8b8378; // dead stone
 const BLINDED = 0x7fd06a; // the same green the mend/window cues use
 

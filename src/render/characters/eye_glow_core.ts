@@ -1,6 +1,6 @@
 // A creature's eye, permanently lit: the SPEC and the curve.
 //
-// Balgath's whole identity is the Loomshard burning in his socket: it is what the fight is
+// Balgath's whole identity is the Barrowglass burning in his socket: it is what the fight is
 // named for, what his scry channel is, and the colour every one of his telegraphs borrows.
 // A boss whose one eye only lights up while he happens to be casting reads as a statue
 // between mechanics, and at raid distance the eye is the ONLY part of a grey stone
@@ -47,7 +47,7 @@ export const EYE_GLOW_DEATH_OUT_SEC = 1.6;
  * Brightness of the eye `deadFor` seconds after the creature died.
  *
  * The one exception to the never-out contract below, and the reason it has a curve of its
- * own: a Loomshard that simply switched off would read as a render pop, while one that
+ * own: a Barrowglass that simply switched off would read as a render pop, while one that
  * GUTTERS (stutters between bright and nearly dark, dimmer each time) and then leaves a
  * last ember to fade reads as the light going out of him. Deterministic in `deadFor`, so
  * every viewer sees the same death. Reduced motion drops the stutter (a strobe is exactly

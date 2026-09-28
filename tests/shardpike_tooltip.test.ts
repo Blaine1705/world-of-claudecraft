@@ -3,7 +3,7 @@
 // The defect this pins is a whole class, not a typo: the bar's view computed a `tooltipKey`
 // and a resolved `tooltipValues` bag per verb from the day it shipped, and the painter
 // rendered neither. It set the native `title` to the verb's own NAME instead, so hovering
-// "Loomshard Thrust" said "Loomshard Thrust" and the paragraph explaining the only
+// "Barrowglass Thrust" said "Barrowglass Thrust" and the paragraph explaining the only
 // level-agnostic damage source in the fight was unreachable. Nothing about that state is
 // visible from either side alone: the view's tests all passed, the painter's counts were in
 // budget, and a screenshot of the bar looks finished. Only the wiring assertion at the

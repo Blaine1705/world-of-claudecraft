@@ -40,7 +40,7 @@ export interface LanceGuidanceView {
   blindRemaining: number;
   /** Seconds until the refractory seal lifts (0 when it already has). */
   sealRemaining: number;
-  /** Loomshard Thrusts this character has landed, ever. The bar's tally. */
+  /** Barrowglass Thrusts this character has landed, ever. The bar's tally. */
   thrusts: number;
   /**
    * The target is the muster's training effigy, the Straw Foreman (src/sim/muster_effigy.ts),
@@ -59,7 +59,7 @@ export interface IWorldLanceTrial {
   lanceGuidance: LanceGuidanceView | null;
   /** Couch the pike and start balancing. The sim emits the refusal on a closed gate. */
   lanceBrace(): void;
-  /** Land the Loomshard Thrust off a SET pike. */
+  /** Land the Barrowglass Thrust off a SET pike. */
   lanceThrust(): void;
   /** Put the pike up deliberately (no penalty). */
   lanceRelease(): void;

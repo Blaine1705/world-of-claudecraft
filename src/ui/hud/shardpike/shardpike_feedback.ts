@@ -1,6 +1,6 @@
 // The success moment, in one place.
 //
-// A landed Loomshard Thrust is the whole point of the trial and it used to produce a single
+// A landed Barrowglass Thrust is the whole point of the trial and it used to produce a single
 // chat line. Three feedbacks replace it, and each answers a DIFFERENT question, which is why
 // none of them is redundant with the others: the banner says it worked, the float says how
 // many you have landed (the only number telling a low-level player their part mattered), and

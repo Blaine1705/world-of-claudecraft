@@ -516,7 +516,7 @@ export const vi_VN: EnTranslations = {
     "shardpike": {
       "braceLabel": "Couch the Shardpike",
       "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
-      "thrustLabel": "Loomshard Thrust",
+      "thrustLabel": "Barrowglass Thrust",
       "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
       "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
       "releaseLabel": "Ground the Shardpike",
@@ -3116,8 +3116,10 @@ export const vi_VN: EnTranslations = {
         "storm": "Mỗi phép thuật bạn thi triển sẽ thêm một sạc, tối đa {max}. Sạc kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được sạc.",
         "heat": "Các cú đánh vũ khí cận chiến và tầm xa của bạn mỗi cái sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng.",
         "ignite": "Các cú đánh tấn công quan trọng vũ khí cận chiến và tầm xa của bạn làm mục tiêu bốc cháy, gây {tick} sát thương Lửa mỗi {every} giây trong {duration} giây. Một cú đánh tấn công quan trọng mới làm mới nó. Sát thương tăng theo Sức Mạnh Tấn Công hoặc Sức Mạnh Tấn Công Tầm Xa, cái nào cao hơn.",
-        "guardHeat": "Mỗi lần bạn chặn, né tránh hoặc khóa một cuộc tấn công sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng."
+        "guardHeat": "Mỗi lần bạn chặn, né tránh hoặc khóa một cuộc tấn công sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Trong {duration} giây, kẻ thù tấn công bạn trực tiếp nhận sát thương Vật Lý bằng {pct}% sức khỏe mà tấn công đó cướp từ bạn. Sát thương Định Kỳ không kích hoạt nó.",
         "anchor": "Trong {duration} giây, nhận {reduction}% ít sát thương hơn nhưng di chuyển ở tốc độ {speed}%. Loại bỏ bất kỳ sự sửng sốt, bị cột, chậm, sợ hãi, biến hóa, im lặng, mù, bị nguyền rủa, bị tước vũ khí và những tác động gây tê liệt trên bạn, và bạn bỏ qua những cái mới và lực đẩy trong khi nó tồn tại.",
@@ -3136,7 +3138,11 @@ export const vi_VN: EnTranslations = {
         "kindlingOrb": "Triệu hồi một quả cầu tro than bên cạnh bạn trong {duration} giây. Mỗi phép thuật bạn thi triển ở kẻ thù làm nó bắn một tia ở kẻ thù đó {damage} sát thương Lửa. Sát thương tăng theo Sức Mạnh Phép Thuật.",
         "pierce": "Trong {duration} giây, các tấn công tự động, bắn và khả năng vật lý của bạn (không chảy máu) cũng tấn công kẻ thù gần mục tiêu nhất của bạn trong {reach} thước {share}% sát thương gây ra.",
         "lantern": "Đặt một chiếc lụp ở chân bạn trong {duration} giây. Một chữa lành trực tiếp từ bất kỳ ai trên bạn hoặc thành viên nhóm trong {radius} thước của nó cũng chữa lành thành viên nhóm khác bị thương nhất khác trong ánh sáng của nó {share}% chữa lành.",
-        "heartNova": "Dùng hết tất cả chồng nhiệt trên một nova lửa gây {perHeat} sát thương Lửa mỗi chồng ({max} tại {maxHeat} chồng) cho mỗi kẻ thù trong {radius} thước và chế áp mọi sinh vật nó đánh trúng. Sát thương tăng theo Sức Mạnh Tấn Công. Yêu cầu một chồng nhiệt."
+        "heartNova": "Dùng hết tất cả chồng nhiệt trên một nova lửa gây {perHeat} sát thương Lửa mỗi chồng ({max} tại {maxHeat} chồng) cho mỗi kẻ thù trong {radius} thước và chế áp mọi sinh vật nó đánh trúng. Sát thương tăng theo Sức Mạnh Tấn Công. Yêu cầu một chồng nhiệt.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers run to your target and fight it in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, each has {hpPct}% of your maximum health, and they leave when the standard falls, when you die, or if you move more than {leash} yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken."
       }
     },
     "questShare": {
@@ -4042,6 +4048,10 @@ export const vi_VN: EnTranslations = {
         "moltenIgnite": "Gây {damage} sát thương Lửa mỗi {every} giây. Một cú chí mạng vũ khí khác làm tươi nó.",
         "pierce": "Các cú tấn công tự động, bắn và khả năng Vật Lý của bạn (không chứng chảy máu) cũng tấn công kẻ thù gần mục tiêu của bạn nhất trong vòng {reach} thước với {pct}% sát thương gây ra.",
         "lantern": "Một chữa lành trực tiếp từ bất kỳ ai trên bạn hoặc thành viên nhóm trong vòng {radius} thước của chiếc đèn cũng chữa lành cho thành viên nhóm khác bị thương nhất khác trong ánh sáng của nó {pct}% chữa lành.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Nhiệt: {stacks}/{max}. Sử dụng Trái Tim Lò Luyện để tiêu tệm tất cả trên một vụ nổ lửa gây {damage} sát thương Lửa với mỗi kẻ thù trong vòng {radius} thước và người điều khiển tất cả sinh vật nó trúng.",
         "crucibleHeatOther": "Nhiệt: {stacks}/{max}. Trái Tim Lò Luyện tiêu tệm tất cả trên một vụ nổ lửa trong vòng {radius} thước gây sát thương Lửa nhiều hơn với mỗi chồng và người điều khiển tất cả sinh vật nó trúng."
       },
@@ -15601,7 +15611,7 @@ export const vi_VN: EnTranslations = {
         "name": "Giáo Mảnh của Skerrit"
       },
       "loomshard_eye": {
-        "name": "Mắt Mảnh Khung Cửi"
+        "name": "The Barrowglass Eye"
       },
       "barrowhide_pauldrons": {
         "name": "Giáp Vai Gò Mộ"
@@ -17888,6 +17898,24 @@ export const vi_VN: EnTranslations = {
       },
       "barrowhide_slab": {
         "name": "Barrowhide Slab"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -20538,7 +20566,7 @@ export const vi_VN: EnTranslations = {
       "q_muster_summons": {
         "title": "The Muster's Summons",
         "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
-        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Loomshard blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
         "objectives": {
           "0": {
             "label": "Report to the Muster Commander"
@@ -20573,7 +20601,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_socketwrights_due": {
         "title": "The Socketwright's Due",
-        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
         "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
         "objectives": {
           "0": {

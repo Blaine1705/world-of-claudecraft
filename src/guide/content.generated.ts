@@ -6690,7 +6690,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
-        "name": "The Loomshard Eye"
+        "name": "The Barrowglass Eye"
       },
       {
         "kind": "item",
@@ -6703,6 +6703,30 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Fenwright Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Craterglass Stave"
+      },
+      {
+        "kind": "item",
+        "name": "Knucklebone of Balgath"
+      },
+      {
+        "kind": "item",
+        "name": "Muster Standard"
+      },
+      {
+        "kind": "item",
+        "name": "The Guttered Eye"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowstone Heart"
+      },
+      {
+        "kind": "item",
+        "name": "Muster Grapnel"
       }
     ]
   },

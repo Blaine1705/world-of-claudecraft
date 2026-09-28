@@ -220,9 +220,11 @@ export function routeBalgathSpellfxAt(
     dirX?: number;
     dirZ?: number;
   },
-  fx: BalgathFx,
+  fx: BalgathFx | undefined,
   entities: () => Iterable<{ id: number; templateId?: string }>,
 ): boolean {
+  // No world-boss layer yet (a renderer harness built without one): nothing to route.
+  if (!fx) return false;
   // The drill yard's mallet (src/sim/muster_drill.ts): its own ability id, no entity walk.
   if (ev.fx === 'nova' && ev.ability === MUSTER_MALLET_POUND_ABILITY) {
     fx.malletPound(ev.x, ev.z, ev.radius ?? 1.6);

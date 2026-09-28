@@ -483,6 +483,11 @@ export type AuraKind =
   // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
   // its damage/haste bonuses ride separate buff auras).
   | 'form_metamorph'
+  // The Knucklebone of Balgath's Shape of the Foreman (combat/balgath_trinkets.ts): the
+  // wearer takes the cyclops's body. value = percent more armor (folded in entity.ts,
+  // with the body's scale); knockbacks are refused in knockback.ts. NOT a class form
+  // (never in FORM_AURA_KINDS): abilities, casts and the action bar work as normal.
+  | 'form_foreman'
   // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
   | 'buff_energyregen'
   | 'stealth'
@@ -5543,6 +5548,25 @@ export interface GuardianState {
   requiredTargetAuraId?: string;
   /** Fire-and-forget guardians may dismiss when their target contract is exhausted. */
   dismissWhenUntargeted?: boolean;
+  /** Opt-in walking melee mode (combat/guardians.ts). Absent: the classic stationary
+   *  guardian that fires at range, unchanged. */
+  melee?: GuardianMelee;
+}
+
+/**
+ * A walking melee guardian (the Muster Standard's soldiers): it fights ONLY its owner's
+ * current hostile target, runs to it at `moveSpeed`, swings from `reach`, and walks back
+ * to its post (`postX`/`postZ`) while the owner has no target. It never picks a fight of
+ * its own. It is dismissed with its post: when the owner strays more than `leash` yd from
+ * it, and then the owner's aura `postAuraId` (the planted standard) is taken down too.
+ */
+export interface GuardianMelee {
+  moveSpeed: number;
+  reach: number;
+  postX: number;
+  postZ: number;
+  leash: number;
+  postAuraId?: string;
 }
 
 /**
@@ -7272,7 +7296,7 @@ export type SimEvent = { pid?: number } & (
   // membership authority), the server persists the row and fans the entry out
   // to the account's other live sessions. `retro` marks the on-join seed pass.
   | { type: 'relicRecorded'; key: string; retro?: boolean }
-  // A Loomshard Thrust broke the world boss's ward (src/sim/lance_trial.ts). Personal
+  // A Barrowglass Thrust broke the world boss's ward (src/sim/lance_trial.ts). Personal
   // (carries pid): the wielder is the one owed the feedback, and `count` is their running
   // tally so the client can float `+N` without holding its own counter, which would drift
   // from the character's persisted number across a relog. Id-only, no English.

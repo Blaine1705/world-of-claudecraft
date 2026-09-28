@@ -33,6 +33,9 @@ import {
   SPELL_POWER_PER_INT,
 } from './types';
 
+/** The Shape of the Foreman's body scale (a little taller than a player). */
+export const FOREMAN_SHAPE_SCALE = 1.1;
+
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
     id,
@@ -470,6 +473,12 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Metamorphosis: a temporary demon transform that also makes the caster larger.
     else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
+    // The Shape of the Foreman (combat/balgath_trinkets.ts): the cyclops's body, a head
+    // taller than a player rather than raid-boss sized, and value percent more armor.
+    else if (a.kind === 'form_foreman') {
+      scaleMul *= FOREMAN_SHAPE_SCALE;
+      buffArmorPct += a.value / 100;
+    }
     // Percent raid buffs store integer percent POINTS (5 = +5%) so they survive the
     // integer-rounding talent value multiplier; converted to a fraction here.
     else if (a.kind === 'buff_stats_pct') allStatsPct += a.value / 100;

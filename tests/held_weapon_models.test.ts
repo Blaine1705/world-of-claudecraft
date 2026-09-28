@@ -363,6 +363,9 @@ describe('held weapon models', () => {
       'fang',
       'knife',
       'staff',
+      // The staff family's older spelling, on a bespoke model: craterglass_stave
+      // (VAR_STAFF in assets.ts).
+      'stave',
       'hammer',
       'axe',
       'mace',

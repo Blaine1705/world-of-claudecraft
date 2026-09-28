@@ -161,7 +161,7 @@ function toTelegraph(a: Arena): SimEvent[] {
 }
 
 describe('tuning', () => {
-  it('replaces the Loomshard Scry: no bigCast left on him', () => {
+  it('replaces the Barrowglass Scry: no bigCast left on him', () => {
     expect(MOBS[BALGATH]?.bigCast).toBeUndefined();
   });
 

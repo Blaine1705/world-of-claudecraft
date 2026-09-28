@@ -6262,7 +6262,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Moeraschaduw-Knuppel',
   'entities.items.skerrits_shardpike.name': 'Skerrits Splinterpiek',
   'entities.items.foremans_barrowmaul.name': 'Grafheuvelhamer van de Opzichter',
-  'entities.items.loomshard_eye.name': 'Het Weefsplinter-Oog',
   'entities.items.barrowhide_pauldrons.name': 'Grafheuvelschouderstukken',
   'entities.items.mirestone_stride.name': 'Moersteentred',
   'entities.items.foremans_wage_band.name': 'Loonring van de Voorman',

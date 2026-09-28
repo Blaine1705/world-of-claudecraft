@@ -14979,7 +14979,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Mazo sombra del pantano',
   'entities.items.skerrits_shardpike.name': 'Pica de Fragmentos de Skerrit',
   'entities.items.foremans_barrowmaul.name': 'Mazo Tumular del Capataz',
-  'entities.items.loomshard_eye.name': 'El Ojo de Esquirla del Telar',
   'entities.items.barrowhide_pauldrons.name': 'Hombreras Tumulares',
   'entities.items.mirestone_stride.name': 'Zancada de Piedracieno',
   'entities.items.foremans_wage_band.name': 'Anillo de paga del Capataz',

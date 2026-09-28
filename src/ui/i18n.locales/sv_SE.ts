@@ -7946,7 +7946,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Kärrskuggans stridsklubba',
   'entities.items.skerrits_shardpike.name': 'Skerrits Skärvpik',
   'entities.items.foremans_barrowmaul.name': 'Förmannens Gravhögshammare',
-  'entities.items.loomshard_eye.name': 'Vävsplitteröga',
   'entities.items.barrowhide_pauldrons.name': 'Gravhögsaxelskydd',
   'entities.items.mirestone_stride.name': 'Myrstenssteg',
   'entities.items.foremans_wage_band.name': 'Förmannens Lönering',

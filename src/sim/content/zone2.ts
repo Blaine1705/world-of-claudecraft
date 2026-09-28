@@ -683,7 +683,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       name: 'Shockwave Stomp',
       school: 'physical',
     },
-    // Wake of the Fallen Star (mob/boss_starwake.ts), which replaced the Loomshard Scry: a
+    // Wake of the Fallen Star (mob/boss_starwake.ts), which replaced the Barrowglass Scry: a
     // cast bar and a 30-yard nova with nothing on the ground to read. He drives both fists
     // into the fen and the star that woke him wakes again: it lights up in his crater, lava
     // fissures crawl out behind a telegraph that fills, geysers burst along them and under
@@ -794,16 +794,33 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // the retail world-boss mount rate (Sha of Anger's serpent, the Galleon), and against
     // a daily lockout it is a mount most of the realm will see on someone before they see
     // it in their own bags, which is what makes a horizon out of it.
+    //
+    // THE SPOILS (`balgath_spoils`) and THE TRINKETS (`balgath_trinkets`): the level-20
+    // share, built on Thunzharr's table (content/zone3.ts), the one world boss the realm
+    // already calibrates against. Spoils first: five pieces at 8% each, a 40% roll for
+    // one piece, exactly his main group. The trinkets roll second, five at 6% each (30%),
+    // and the one-gear-item cap in rollWorldBossLoot keeps a trinket only when the spoils
+    // missed: an EFFECTIVE 18% (0.60 x 0.30), against the 19% his belt group pays, and
+    // about 3.6% for any one named trinket. Together a level twenty walks away with a
+    // piece about 58% of kills (Thunzharr: 59%), never two, and the trinkets stay the
+    // rarer half because their effects are the bigger prize. Every row stays personal
+    // loot behind the world-boss lockout.
     loot: [
       { copper: 2500, chance: 1 },
       { itemId: 'bogiron_nugget', chance: 1 },
       { itemId: 'foremans_wage_band', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
       { itemId: 'mirelight_locket', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
       { itemId: 'fenwright_grips', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
-      { itemId: 'foremans_barrowmaul', chance: 0.1, rollGroup: 'balgath_spoils' },
-      { itemId: 'barrowhide_pauldrons', chance: 0.1, rollGroup: 'balgath_spoils' },
-      { itemId: 'mirestone_stride', chance: 0.1, rollGroup: 'balgath_spoils' },
+      { itemId: 'foremans_barrowmaul', chance: 0.08, rollGroup: 'balgath_spoils' },
+      { itemId: 'barrowhide_pauldrons', chance: 0.08, rollGroup: 'balgath_spoils' },
+      { itemId: 'mirestone_stride', chance: 0.08, rollGroup: 'balgath_spoils' },
       { itemId: 'loomshard_eye', chance: 0.08, rollGroup: 'balgath_spoils' },
+      { itemId: 'craterglass_stave', chance: 0.08, rollGroup: 'balgath_spoils' },
+      { itemId: 'knucklebone_of_balgath', chance: 0.06, rollGroup: 'balgath_trinkets' },
+      { itemId: 'muster_standard', chance: 0.06, rollGroup: 'balgath_trinkets' },
+      { itemId: 'guttered_eye', chance: 0.06, rollGroup: 'balgath_trinkets' },
+      { itemId: 'barrowstone_heart', chance: 0.06, rollGroup: 'balgath_trinkets' },
+      { itemId: 'muster_grapnel', chance: 0.06, rollGroup: 'balgath_trinkets' },
       { itemId: 'reins_drakemaw_raptor', chance: 0.01 },
     ],
     yells: {
@@ -1413,7 +1430,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: "The Socketwright's Due",
     giverNpcId: 'socketwright_skerrit',
     turnInNpcId: 'socketwright_skerrit',
-    text: 'I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, $N: blind him, and every blade in the mire will finally bite.',
+    text: 'I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, $N: blind him, and every blade in the mire will finally bite.',
     completionText:
       'You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.',
     objectives: [
@@ -2075,14 +2092,32 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     sellValue: 9200,
     requiredClass: WAR,
   },
+  // Display name The Barrowglass Eye since the originality audit: the old coined token
+  // (Loom-shard) belongs to another game (tests/originality_renames.test.ts). Id frozen.
   loomshard_eye: {
     id: 'loomshard_eye',
-    name: 'The Loomshard Eye',
+    name: 'The Barrowglass Eye',
     kind: 'armor',
     slot: 'neck',
     quality: 'epic',
     stats: { int: 7, spi: 5, sta: 4 },
     sellValue: 8400,
+  },
+  // The caster's spoil: a staff at his item level, on the ilvl-26 epic two-hander line
+  // the Wildheart Hexwood Staff carries (int + spi on the line, the stamina baseline on
+  // top, the same 40 to 60 at 3.0). No flat Spell Power: that is priced per tier
+  // (item_budget.ts casterLaneSpTotal), and none of his other spoils carries a free affix.
+  craterglass_stave: {
+    id: 'craterglass_stave',
+    name: 'Craterglass Stave',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    hand: 'twohand',
+    weapon: { min: 40, max: 60, speed: 3.0 },
+    stats: { int: 14, spi: 9, sta: 8 },
+    sellValue: 9000,
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   barrowhide_pauldrons: {
     id: 'barrowhide_pauldrons',

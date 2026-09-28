@@ -241,6 +241,7 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   ...KAYKIT_SHIELD_ACCESSORIES,
   balgath_barrowmaul_hammer: 'VAR_HAMMER',
   shardpike_spear: 'VAR_POLEARM',
+  craterglass_stave: 'VAR_STAFF', // Craterglass Stave (Balgath world-boss drop)
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach

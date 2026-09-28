@@ -2370,6 +2370,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'muster_shardpike',
       // The muster quests' weekly trophy (`"barrowhide_slab",`), itemsDiscovered only.
       'barrowhide_slab',
+      // Balgath's loot: five trinkets and the Craterglass Stave, each with an
+      // itemsDiscovered id and a Reliquary firstFind row (115 + 295 bytes).
+      'knucklebone_of_balgath',
+      'muster_standard',
+      'guttered_eye',
+      'barrowstone_heart',
+      'muster_grapnel',
+      'craterglass_stave',
     ] as const;
     // The muster quest chain (content/mirefen_muster_quests.ts) and its drill deed.
     const MUSTER_QUEST_IDS = ['q_muster_summons', 'q_muster_pike_drill', 'q_muster_trophy'];
@@ -2416,16 +2424,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       questsDone: 81,
       raidLockouts: 42,
       deeds: 89,
-      deedStats: 218,
-      reliquary: 369,
+      // deedStats 218 -> 333 and reliquary 369 -> 664 with Balgath's loot (six ids).
+      deedStats: 333,
+      reliquary: 664,
     });
     // The five keys above are the WHOLE delta: the whole-state diff matches
     // their sum, so no other field moved with this feature.
     expect(
       Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8') -
         Buffer.byteLength(JSON.stringify(withoutBalgath), 'utf8'),
-    ).toBe(799);
-    expect(Object.values(balgathDelta).reduce((sum, value) => sum + value, 0)).toBe(799);
+    ).toBe(1209);
+    expect(Object.values(balgathDelta).reduce((sum, value) => sum + value, 0)).toBe(1209);
     const preReleaseCounterfactual = withoutBramblehideContent(withoutBalgath);
     // The Bramblehide/Nythgap release content, attributed exactly against
     // f73615a511 (the last test-ledger commit, where the settled ceiling
@@ -2478,8 +2487,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Plus 13,496 for the Warfare Season 2 honor stock (139 item ids across the
     // maximal fixture's discovered-item and reliquary fields). MEASURED on the
     // release: the settled blob grew by exactly this much when the stock landed.
-    // Plus 799 for the Mirefen world-boss branch merged over release/v0.44.0: the
-    // five-key balgathDelta measured and summed above.
+    // Plus 1,209 for the Mirefen world-boss branch merged over release/v0.44.0 (799,
+    // then +410 with Balgath's loot): the five-key balgathDelta measured and summed above.
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
@@ -2517,8 +2526,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Plus 154 at the fourth release/v0.44.0 base merge (the ferry deed and
         // its four visit marks, attributed above).
         154 +
-        // Plus 799 for the Mirefen world-boss branch (balgathDelta above).
-        799,
+        // Plus 1,209 for the Mirefen world-boss branch (balgathDelta above).
+        1209,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2628,7 +2637,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 228,656 with the Mirefen world-boss branch merged over the
       // release (+799, the balgathDelta above).
-    ).toBe(228656);
+      // 228,656 -> 229,066 with Balgath's loot (+410, inside the same balgathDelta).
+    ).toBe(229066);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2726,8 +2736,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // RE-BASED for the Mirefen world-boss branch merged over release/v0.44.0: +799,
     // the balgathDelta attributed above; no container or ceiling changed shape.
     // Floor at measurement minus 380, edge at measurement plus one: 228288..228669.
-    expect(bytes, reMint).toBeGreaterThan(228288);
-    expect(bytes, reMint).toBeLessThan(228669);
+    // RE-BASED with Balgath's loot: 229,078 bytes, up 410 from 228,668: the six new
+    // item ids in deedStats.itemsDiscovered (+115) and their Reliquary firstFind rows
+    // (+295), inside the balgathDelta above; no container or ceiling changed shape.
+    // Floor at measurement minus 380, edge at measurement plus one: 228698..229079.
+    expect(bytes, reMint).toBeGreaterThan(228698);
+    expect(bytes, reMint).toBeLessThan(229079);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

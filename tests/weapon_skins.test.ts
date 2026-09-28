@@ -129,6 +129,7 @@ describe('weapon type classification', () => {
       // like the dagger skins above; assets.ts tags this one VAR_HAMMER, which is the
       // render-side family authority.
       if (/^balgath_barrowmaul_hammer$/.test(variant)) return 'mace';
+      if (/^craterglass_stave$/.test(variant)) return 'staff';
       if (/^hammer/.test(variant)) return 'mace';
       if (/^(adv_)?axe/.test(variant)) return 'axe';
       if (/^(adv_)?wand/.test(variant)) return 'wand';

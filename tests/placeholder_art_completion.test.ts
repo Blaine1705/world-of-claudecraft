@@ -326,6 +326,8 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'foremans_barrowmaul',
       'skerrits_shardpike',
       'muster_shardpike',
+      // Balgath's caster spoil (balgath-loot-icons-2026-09-28).
+      'craterglass_stave',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

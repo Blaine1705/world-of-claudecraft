@@ -7406,7 +7406,7 @@ export class Renderer {
         this.views.get(ev.targetId)?.visual?.strikeEyeWardMarker();
         break;
       case 'spellfxAt': {
-        if (routeBalgathSpellfxAt(ev, this.worldBoss.fx, () => this.sim.entities.values())) break;
+        if (routeBalgathSpellfxAt(ev, this.worldBoss?.fx, () => this.sim.entities.values())) break;
         if (ev.fx === 'soulTravel') {
           if (ev.targetId !== undefined) {
             const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);

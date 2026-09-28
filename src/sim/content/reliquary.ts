@@ -1308,6 +1308,13 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'foremans_wage_band',
       'mirelight_locket',
       'fenwright_grips',
+      // His caster's staff and his five trinkets, his own and nowhere else's.
+      'craterglass_stave',
+      'knucklebone_of_balgath',
+      'muster_standard',
+      'guttered_eye',
+      'barrowstone_heart',
+      'muster_grapnel',
     ),
   },
   // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----

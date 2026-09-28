@@ -471,8 +471,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
-    // The seven Mirefen world boss relics (conquerors_balgath): 470.
-    expect(full).toEqual({ owned: 470, total: 470 });
+    // The seven Mirefen world boss relics (conquerors_balgath): 470. Plus his
+    // Craterglass Stave and five trinkets on the same page: 476.
+    expect(full).toEqual({ owned: 476, total: 476 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -505,8 +506,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    // 441 with the seven Mirefen world boss relics.
-    expect(character).toEqual({ owned: 441, total: 441 });
+    // 441 with the seven Mirefen world boss relics, 447 with his staff and five trinkets.
+    expect(character).toEqual({ owned: 447, total: 447 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -567,8 +568,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
-      // +7 the Mirefen world boss page: 657.
-    ).toBe(657);
+      // +7 the Mirefen world boss page: 657. +6 his staff and five trinkets: 663.
+    ).toBe(663);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -804,8 +805,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the five Crucible raid trinkets (each on its boss's Normal and
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
-    // Plus the seven Mirefen world boss items: 496.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(496);
+    // Plus the seven Mirefen world boss items: 496, and his staff and five trinkets: 502.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(502);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }

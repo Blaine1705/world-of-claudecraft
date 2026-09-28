@@ -888,7 +888,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.shardpike.braceLabel': '架起碎晶長矛',
   'hudChrome.shardpike.braceTooltip':
     '將矛尾插入地面，矛尖朝上。你的橫移鍵就是平衡桿：光束會自行漂移，他每次砸地都會把它踢偏。讓它離開兩端軌道並保持 {set} 秒即可架穩長矛。需要堅實的地面，且不能在坐騎上。',
-  'hudChrome.shardpike.thrustLabel': '織影核心突刺',
+  'hudChrome.shardpike.thrustLabel': '塚琉璃突刺',
   'hudChrome.shardpike.thrustTooltip':
     '將架穩的長矛刺入眼中，造成 {damage} 點傷害。沒有任何東西能加成它：等級、攻擊強度、長矛本身都不行。它會使工頭失明並剝離石塚之皮，讓泥沼中其他所有武器終於能咬進去。只有架穩的長矛才能送出這一擊，射程 {reach} 碼，窗口持續 {seconds} 秒。',
   'hudChrome.shardpike.releaseLabel': '放下碎晶長矛',
@@ -13110,12 +13110,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '四十年前我磨好那顆眼珠，把它嵌進他的眼窩，一天工錢都沒拿到。你想讓工頭吃點苦頭，{className}？那就衝著我的手藝去。',
   'entities.quests.q_socketwrights_due.title': '鑲嵌匠的欠帳',
   'entities.quests.q_socketwrights_due.text':
-    '織影核心是我親手嵌進那眼窩的：磨好透鏡，安放到位，楔緊對齊。塚主們一個銅板都沒付過我，如今我的手藝卻在泥沼裡四處踏平一切。拿走我的碎晶長矛。矛尾插地，穩住矛尖，需要多久就撐多久，等你手臂篤定了，就把它送進那隻眼睛。他披的那層皮與那塊晶石相連，{playerName}：戳瞎他，泥沼裡的每一把刀刃終於都能咬進去。',
+    '塚琉璃是我親手嵌進那眼窩的：磨好透鏡，安放到位，楔緊對齊。塚主們一個銅板都沒付過我，如今我的手藝卻在泥沼裡四處踏平一切。拿走我的碎晶長矛。矛尾插地，穩住矛尖，需要多久就撐多久，等你手臂篤定了，就把它送進那隻眼睛。他披的那層皮與那塊晶石相連，{playerName}：戳瞎他，泥沼裡的每一把刀刃終於都能咬進去。',
   'entities.quests.q_socketwrights_due.completion':
     '你感覺到它鬆了，是吧？四十年的利息，從那眼窩裡付清了。長矛歸你了，朋友。他會復原的，他總是會，所以你什麼時候想再來收帳都行。',
   'entities.quests.q_socketwrights_due.objectives.0.label': '戳瞎工頭的眼睛',
   'entities.items.foremans_barrowmaul.name': '工頭的塚錘',
-  'entities.items.loomshard_eye.name': '織機碎片之眼',
+  'entities.items.loomshard_eye.name': '塚琉璃之眼',
   'entities.items.barrowhide_pauldrons.name': '古塚護肩',
   'entities.items.mirestone_stride.name': '沼石步履',
   'entities.items.foremans_wage_band.name': '工頭的工錢指環',
@@ -17989,7 +17989,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_summons.text':
     '我能抽出的每一桿長矛都在星隕坑周圍紮了營，{playerName}，就為了圍住從坑裡走出來的那東西。徵召指揮官守在俯瞰火山坑的南坡營地，在這裡的東南方。去向指揮官報到。你會聽到我們怎麼對付他，好好聽著，因為沒聽的人都躺在蘆葦裡了。',
   'entities.quests.q_muster_summons.completion':
-    '芬威克派來的？很好。聽著，這話我只說一遍，而他一句都不會說。巴爾加斯沿著我們的哨站巡行：坑沿、西邊的平地、南坡、西南坑沿上的缺口，然後再繞一圈，他停下的每一個哨站都會被夷平。鋼鐵傷不了他。他的皮會把刀刃彈開，只會砍他的團隊最後只會累死。他唯一的弱點是眼睛。一桿撐穩的長矛刺穿織影核心就能讓他失明，而他失明時皮會剝落：那時全團一起打他，狠狠地打。之後皮會重新合上，我們等下一次機會。先長矛，{playerName}，再所有人。',
+    '芬威克派來的？很好。聽著，這話我只說一遍，而他一句都不會說。巴爾加斯沿著我們的哨站巡行：坑沿、西邊的平地、南坡、西南坑沿上的缺口，然後再繞一圈，他停下的每一個哨站都會被夷平。鋼鐵傷不了他。他的皮會把刀刃彈開，只會砍他的團隊最後只會累死。他唯一的弱點是眼睛。一桿撐穩的長矛刺穿塚琉璃就能讓他失明，而他失明時皮會剝落：那時全團一起打他，狠狠地打。之後皮會重新合上，我們等下一次機會。先長矛，{playerName}，再所有人。',
   'entities.quests.q_muster_summons.objectives.0.label': '向徵召指揮官報到',
   'entities.quests.q_muster_pike_drill.title': '長矛先行',
   'entities.quests.q_muster_pike_drill.text':
@@ -18361,4 +18361,26 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '纏縛根鬚的施法時間縮短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。',
+  'entities.items.knucklebone_of_balgath.name': '巴爾加斯的指節骨',
+  'entities.items.muster_standard.name': '徵召軍旗',
+  'entities.items.guttered_eye.name': '殘燼之眼',
+  'entities.items.barrowstone_heart.name': '塚石之心',
+  'entities.items.muster_grapnel.name': '徵召鉤索',
+  'entities.items.craterglass_stave.name': '隕坑琉璃法杖',
+  'hudChrome.trinkets.equip.stoneHeart':
+    '受到致命一擊時，你改為化作石像{statue}秒：不受傷害，無法移動或行動，隨後以{restore}點生命值（最大生命值的{restorePct}%）恢復。每{icd}只能觸發一次。決鬥和競技場比賽中不會觸發，這些戰鬥在致命一擊時結束。',
+  'hudChrome.trinkets.use.foremanShape':
+    '化身工頭之形，持續{duration}秒：你變成獨眼巨人，以拳頭作戰，保留所有技能及其傷害。護甲提高{armorPct}%，且無法被擊退。會使你解除坐騎。',
+  'hudChrome.trinkets.use.musterStandard':
+    '在腳下插下徵召軍旗。{duration}秒內，{soldiers}名徵召士兵衝向你的目標進行近戰，每人每{every}秒造成{damage}點物理傷害。他們只攻擊你的目標，每人擁有你最大生命值的{hpPct}%；軍旗倒下、你死亡或你離開軍旗超過{leash}碼時，他們會離開。傷害隨攻擊強度或遠程攻擊強度中較高者提高，在插旗時確定。',
+  'hudChrome.trinkets.use.gutteredGlare':
+    '引導{duration}秒：一道{length}碼長的光束從你面朝的方向射出，每{every}秒對路徑上最多{max}個敵人造成{tick}點秘法傷害（整個引導期間對每個敵人共{total}點）。轉身即可橫掃光束；移動或施法會使其結束。傷害隨法術強度提高。',
+  'hudChrome.trinkets.use.grapnel':
+    '用鉤索鉤住{range}碼內你能看見的一名小隊或團隊成員，將其從空中拉到你身邊。無法拉動敵人，也無法拉動在載具中、在船上、化作石像或被無法打破的效果控制的盟友。',
+  'hudChrome.auraEffect.trinket.foremanShape': '你就是工頭：護甲提高{armorPct}%，免疫擊退。',
+  'hudChrome.auraEffect.trinket.musterStandard': '你的徵召軍旗已插下。士兵們正與你的目標作戰。',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    '光束每{every}秒對路徑上的敵人造成{tick}點秘法傷害。移動或施法會使其結束。',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    '已化作石像：免疫傷害且無法行動。你將以最大生命值的{pct}%恢復。',
 };

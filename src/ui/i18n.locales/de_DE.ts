@@ -6303,7 +6303,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Moorschatten-Streitkolben',
   'entities.items.skerrits_shardpike.name': 'Skerrits Splitterpike',
   'entities.items.foremans_barrowmaul.name': 'Hügelgrabhammer des Vorarbeiters',
-  'entities.items.loomshard_eye.name': 'Das Websplitter-Auge',
   'entities.items.barrowhide_pauldrons.name': 'Hügelgrab-Schulterstücke',
   'entities.items.mirestone_stride.name': 'Moorsteinschritt',
   'entities.items.foremans_wage_band.name': 'Lohnring des Vorarbeiters',

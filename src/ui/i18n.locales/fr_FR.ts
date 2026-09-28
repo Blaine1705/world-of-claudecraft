@@ -15300,7 +15300,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Marteau des ombres des marais',
   'entities.items.skerrits_shardpike.name': 'Pique-éclat de Skerrit',
   'entities.items.foremans_barrowmaul.name': 'Maillet Tumulaire du Contremaître',
-  'entities.items.loomshard_eye.name': "L'Oeil en Éclat du Métier",
   'entities.items.barrowhide_pauldrons.name': 'Spallières Tumulaires',
   'entities.items.mirestone_stride.name': 'Foulée de Pierrebourbe',
   'entities.items.foremans_wage_band.name': 'Anneau de paie du Contremaître',

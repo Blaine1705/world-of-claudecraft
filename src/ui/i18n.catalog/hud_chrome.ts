@@ -87,7 +87,7 @@ export const hudChromeStrings = {
     braceLabel: 'Couch the Shardpike',
     braceTooltip:
       'Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.',
-    thrustLabel: 'Loomshard Thrust',
+    thrustLabel: 'Barrowglass Thrust',
     thrustTooltip:
       'Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.',
     // The brace tooltip once the turn keys and the on-screen keycaps lean too (the strafe
@@ -3886,7 +3886,13 @@ export const hudChromeStrings = {
         'Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
       guardHeat:
         'Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.',
+      // Barrowstone Heart (Balgath, combat/balgath_trinkets.ts); {icd} is a formatted
+      // cooldown ("3 min").
+      stoneHeart:
+        'When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow.',
     },
+    // A damage range; `scaled` above appends what the viewer's power adds.
+    range: '{min} to {max}',
     use: {
       retaliate:
         'For {duration} sec, an enemy that hits you directly takes Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.',
@@ -3922,6 +3928,15 @@ export const hudChromeStrings = {
         'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
       heartNova:
         'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
+      // Balgath's trinkets (combat/balgath_trinkets.ts).
+      foremanShape:
+        'Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.',
+      musterStandard:
+        'Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers run to your target and fight it in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, each has {hpPct}% of your maximum health, and they leave when the standard falls, when you die, or if you move more than {leash} yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.',
+      gutteredGlare:
+        'Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.',
+      grapnel:
+        'Hook a party or raid member within {range} yd that you can see and haul them through the air to your side. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken.',
     },
   },
   // Quest-link sharing: the chat-link affordance and its sim-emitted notices
@@ -5357,6 +5372,13 @@ export const hudChromeStrings = {
         'Your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {pct}% of the damage dealt.',
       lantern:
         'A direct heal from anyone on you or a party member within {radius} yd of the lantern also heals the most wounded other party member in its light for {pct}% of the heal.',
+      // Balgath's trinkets (combat/balgath_trinkets.ts).
+      foremanShape: 'You are the Foreman: {armorPct}% more armor and immune to knockbacks.',
+      musterStandard: 'Your Muster Standard is planted. Its soldiers fight your target.',
+      gutteredGlare:
+        'The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.',
+      stoneStatue:
+        'Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.',
       crucibleHeat:
         'Heat: {stacks}/{max}. Use Heart of the Crucible to spend it all on a fire nova that deals {damage} Fire damage to each enemy within {radius} yd and taunts every creature it hits.',
       crucibleHeatOther:

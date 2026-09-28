@@ -125,7 +125,7 @@ const baseEnTable = {
   'error.lanceWindowOver': 'The moment passes.',
   'log.lanceBraced': 'You couch the Shardpike. Hold it true.',
   'log.lanceSet': 'The pike is set. STRIKE!',
-  'log.lanceBlinded': 'Your thrust finds the Loomshard. The Barrowhide sloughs away!',
+  'log.lanceBlinded': 'Your thrust finds the Barrowglass. The Barrowhide sloughs away!',
   // The muster pike (src/sim/muster_pike.ts): the rack's refusal, the loan and its end,
   // and the bank's refusal of lent gear (src/sim/bank.ts). Placeholder-free: EXACT matcher.
   'error.musterPikeHeld': 'You already hold a Shardpike.',
@@ -1238,6 +1238,17 @@ const baseEnTable = {
   'aura.trinketMoltenIgnite': 'Molten Ignite',
   'aura.trinketCrucibleHeat': 'Crucible Heat',
   'error.trinketNoHeat': 'Your heart holds no heat.',
+  // Balgath's trinkets (src/sim/combat/balgath_trinkets.ts): their auras, the
+  // Muster Standard's two soldiers (owned mobs name through this aura map), the
+  // passive-only Heart's refusal, the Grapnel's refusal and the Heart's notice.
+  'aura.trinketShapeOfTheForeman': 'Shape of the Foreman',
+  'aura.trinketGutteredGlare': 'Guttered Glare',
+  'aura.trinketStoneStatue': 'Stone Statue',
+  'aura.trinketMusterFootman': 'Muster Footman',
+  'aura.trinketMusterSergeant': 'Muster Sergeant',
+  'error.trinketPassiveOnly': 'It works on its own.',
+  'error.trinketCannotMove': "They can't be moved right now.",
+  'log.trinketBarrowstone': 'Your Barrowstone Heart turns you to stone!',
 } as const;
 
 const petEnTable = {
@@ -15691,6 +15702,11 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Forge Heat': 'aura.trinketForgeHeat',
   'Molten Ignite': 'aura.trinketMoltenIgnite',
   'Crucible Heat': 'aura.trinketCrucibleHeat',
+  'Shape of the Foreman': 'aura.trinketShapeOfTheForeman',
+  'Guttered Glare': 'aura.trinketGutteredGlare',
+  'Stone Statue': 'aura.trinketStoneStatue',
+  'Muster Footman': 'aura.trinketMusterFootman',
+  'Muster Sergeant': 'aura.trinketMusterSergeant',
   'Crafted Momentum': 'aura.craftedMomentum',
   'Crafted Shelter': 'aura.craftedShelter',
   'Crafted Preservation': 'aura.craftedPreservation',
@@ -16120,6 +16136,7 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   'Molten Fletching': 'molten_fletching',
   'Last Flame Lantern': 'last_flame_lantern',
   'Heart of the Crucible': 'heart_of_the_crucible',
+  'Muster Standard': 'muster_standard',
 };
 
 export function localizeSimAuraName(name: string): string | null {

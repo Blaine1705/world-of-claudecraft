@@ -829,6 +829,11 @@ export class CharacterVisual {
   private metamorphPulse = 0;
   private metamorphWasVisible = false;
   private runeTint: number | null = null;
+  // The Barrowstone Heart's statue (setPetrified): the rig turns to grey stone and holds
+  // its pose; one program-preserving clone per source material.
+  private abilityAttackIdx = 0;
+  private petrified = false;
+  private petrifiedMaterials = new Map<THREE.Material, THREE.Material>();
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -1890,6 +1895,17 @@ export class CharacterVisual {
       this.currentOneShotIsAttack = true;
       return;
     }
+    // An ability with no override of its own takes the rig's heavier ability blow, when it
+    // authors one (the Shape of the Foreman's hammer and stomp against its swipes).
+    const abilityClips = abilityId && !skinAttack ? this.def.clips.abilityAttack : undefined;
+    if (abilityClips && abilityClips.length > 0) {
+      const name = abilityClips[this.abilityAttackIdx++ % abilityClips.length];
+      if (this.action(name)) {
+        this.playOneShot(name, this.def.attackTimeScale ?? 1.3);
+        this.currentOneShotIsAttack = true;
+        return;
+      }
+    }
     const clips = skinAttack?.clips ?? this.def.clips.attack;
     if (clips.length === 0) return;
     const name = clips[this.attackIdx++ % clips.length];
@@ -2446,6 +2462,55 @@ export class CharacterVisual {
     if (on === this.ascended) return;
     this.ascended = on;
     this.applyVisualMaterials();
+  }
+
+  /**
+   * Turn the rig to stone (the Barrowstone Heart's statue): every material leans hard to
+   * weathered grey granite and the pose freezes where it stood. Cosmetic only; the sim's
+   * stasis aura is what holds the body. Clones keep their source's program (no link).
+   */
+  setPetrified(on: boolean): void {
+    if (on === this.petrified) return;
+    this.petrified = on;
+    this.applyVisualMaterials();
+  }
+
+  /** The manifest key this rig was built from (a shared form slot compares it). */
+  get assetKey(): string {
+    return this.key;
+  }
+
+  get isPetrified(): boolean {
+    return this.petrified;
+  }
+
+  private petrifiedMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.petrifiedMaterials.get(material);
+    if (cached) return cached;
+    const stone = cloneMaterialWithHooks(material);
+    const m = stone as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+      roughness?: number;
+      metalness?: number;
+    };
+    // Take the hue away without a new shader program: the lit term is dimmed to a grey
+    // multiplier (a painted texture keeps only its value pattern, so the statue still
+    // reads as THIS body) and a flat granite grey rides the emissive term on top, which
+    // washes out whatever hue the texture still carries. A touch of green lichen.
+    if (m.color) {
+      const lum = m.color.r * 0.3 + m.color.g * 0.55 + m.color.b * 0.15;
+      m.color.setRGB(0.32 + lum * 0.1, 0.33 + lum * 0.1, 0.31 + lum * 0.08);
+    }
+    if (m.emissive) {
+      m.emissive.setRGB(0.1, 0.105, 0.095);
+      m.emissiveIntensity = 1;
+    }
+    if (m.roughness !== undefined) m.roughness = 1;
+    if (m.metalness !== undefined) m.metalness = 0;
+    this.petrifiedMaterials.set(material, stone);
+    return stone;
   }
 
   /** Slight whole-body color lean while a Thornhollow Fields rune buff rides (null = off). */
@@ -3330,6 +3395,7 @@ export class CharacterVisual {
       this.shadowformMaterials,
       this.moonkinMaterials,
       this.runeTintMaterials,
+      this.petrifiedMaterials,
       this.auraGlowMaterials,
       this.surfaceResponse.materials,
     ]);
@@ -3347,6 +3413,7 @@ export class CharacterVisual {
       ...this.ferocityMaterials.flatMap((cache) => [...cache.values()]),
       ...this.ascensionMaterials.values(),
       ...this.runeTintMaterials.values(),
+      ...this.petrifiedMaterials.values(),
       ...this.auraGlowMaterials.values(),
       ...this.surfaceResponse.materials.values(),
     ]);
@@ -3358,6 +3425,7 @@ export class CharacterVisual {
     for (const cache of this.ferocityMaterials) cache.clear();
     this.ascensionMaterials.clear();
     this.runeTintMaterials.clear();
+    this.petrifiedMaterials.clear();
     this.auraGlowMaterials.clear();
     this.surfaceResponse.materials.clear();
   }
@@ -3599,7 +3667,8 @@ export class CharacterVisual {
   }
 
   private updateMixer(dt: number): void {
-    this.mixer.update(dt);
+    // A statue holds the pose it was struck in.
+    this.mixer.update(this.petrified ? 0 : dt);
     this.skeletonUpdates.markPoseChanged();
   }
 
@@ -3659,6 +3728,8 @@ export class CharacterVisual {
     // Death treatments (soul rend, ghost run) win over the shapeshift tints.
     if (this.soulRend) return this.soulRendMaterial(material);
     if (this.ghosted) return this.ghostMaterial(material);
+    // A statue is stone whatever else it was wearing.
+    if (this.petrified) return this.petrifiedMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
@@ -4271,6 +4342,7 @@ export function clipNamesOf(def: VisualDef): string[] {
     c.death,
     ...(c.attack ?? []),
     ...Object.values(c.attackByAbility ?? {}),
+    ...(c.abilityAttack ?? []),
     ...Object.values(c.castByAbility ?? {}),
     ...Object.values(c.attackByHand ?? {}),
     ...(c.hit ?? []),

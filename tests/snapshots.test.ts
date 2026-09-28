@@ -98,6 +98,7 @@ import {
 } from '../src/sim/varkhul_shared_pyre';
 import { terrainHeight } from '../src/sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
+import { spawnWorldBoss } from '../src/sim/world_boss_spawn';
 import { onMobKilledForWorldQuests, worldQuestCycleForResetDay } from '../src/sim/world_quests';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -6289,7 +6290,8 @@ function dirtyEveryDeltaField(): {
   // Realm-wide world-boss liveness (`wba`), intentionally separate from the
   // viewer's personal loot lockout. Spawn through the real Sim primitive while
   // leaving the scheduler clocks alone so the rest of this codec fixture stays still.
-  (sim as any).worldBossEntityIds[0] = (sim as any).spawnWorldBoss(WORLD_BOSSES[0]);
+  // (the primitive lives in src/sim/world_boss_spawn.ts behind the SimContext seam).
+  (sim as any).worldBossEntityIds[0] = spawnWorldBoss((sim as any).ctx, WORLD_BOSSES[0]);
 
   return { server, fc, leader, memberPid: mp };
 }
@@ -6316,7 +6318,9 @@ describe('world-boss realm liveness snapshot', () => {
     fc.sent.length = 0;
     broadcast(server);
     snap = lastSnap(fc.sent);
-    expect(snap.self.wba).toEqual([bossId]);
+    // The Mirefen boss (Balgath) keeps his own dawn clock and may be up in the same
+    // tick, so the pin is on THIS boss's membership, not the whole list.
+    expect(snap.self.wba).toContain(bossId);
     (client as any).applySnapshot(snap);
     expect(client.worldBossActive(bossId)).toBe(true);
     expect(client.raidLockouts().map((lockout) => lockout.id)).toContain(
@@ -6329,7 +6333,7 @@ describe('world-boss realm liveness snapshot', () => {
     fc.sent.length = 0;
     broadcast(server);
     snap = lastSnap(fc.sent);
-    expect(snap.self.wba).toEqual([]);
+    expect(snap.self.wba).not.toContain(bossId);
     (client as any).applySnapshot(snap);
     expect(client.worldBossActive(bossId)).toBe(false);
   });

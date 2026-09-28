@@ -6235,7 +6235,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Obuch Bagiennego Cienia',
   'entities.items.skerrits_shardpike.name': 'Odłamkowa Pika Skerrita',
   'entities.items.foremans_barrowmaul.name': 'Kurhanowy Młot Sztygara',
-  'entities.items.loomshard_eye.name': 'Oko Odłamka Krosna',
   'entities.items.barrowhide_pauldrons.name': 'Kurhanowe Naramienniki',
   'entities.items.mirestone_stride.name': 'Krok Bagiennego Kamienia',
   'entities.items.foremans_wage_band.name': 'Pierścień zapłaty Brygadzisty',

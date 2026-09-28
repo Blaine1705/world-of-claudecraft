@@ -10,7 +10,7 @@
 //     aura that turns away the same share of every blow Barrowhide does on the real one
 //     (both numbers are read off Balgath's own eyeWard, so a retune of the boss retunes
 //     the lesson with it).
-//   - THE LANTERN in its eye is the target. A Loomshard Thrust that finds no living boss in
+//   - THE LANTERN in its eye is the target. A Barrowglass Thrust that finds no living boss in
 //     reach finds the effigy instead (lance_trial.ts, one lookup shared with the HUD's
 //     prompt, lance_guidance.ts). It puts the lantern out FOR THAT PLAYER ONLY and opens
 //     THEIR window for Balgath's own blindSeconds: while it is open the plank hide ignores

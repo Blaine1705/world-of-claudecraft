@@ -516,7 +516,7 @@ export const tr_TR: EnTranslations = {
     "shardpike": {
       "braceLabel": "Couch the Shardpike",
       "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
-      "thrustLabel": "Loomshard Thrust",
+      "thrustLabel": "Barrowglass Thrust",
       "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
       "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
       "releaseLabel": "Ground the Shardpike",
@@ -3116,8 +3116,10 @@ export const tr_TR: EnTranslations = {
         "storm": "Attığın her büyü en fazla {max} kadar bir yük ekler. Yükler {duration} saniye sürer, bir yük aldığında yenilenir.",
         "heat": "Yakın dövüş ve uzak saldırı vuruşların her biri en fazla {max} kadar bir ısı yığını ekler. Isı {duration} saniye sürer, bir yığın aldığında yenilenir.",
         "ignite": "Yakın dövüş ve uzak saldırı kritik vuruşları hedefi tutuşturur, {duration} saniye boyunca her {every} saniyede {tick} Ateş hasarı verirler. Yeni bir kritik vuruş bunu yeniler. Hasar Attack Power veya Ranged Attack Power, hangisi daha yüksekse artar.",
-        "guardHeat": "Bloke ettiğin, engellediğin veya tura aldığın her saldırı en fazla {max} kadar bir ısı yığını ekler. Isı {duration} saniye sürer, bir yığın aldığında yenilenir."
+        "guardHeat": "Bloke ettiğin, engellediğin veya tura aldığın her saldırı en fazla {max} kadar bir ısı yığını ekler. Isı {duration} saniye sürer, bir yığın aldığında yenilenir.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "{duration} saniye boyunca, seni doğrudan vuran bir düşman, sana vuruştan aldığın sağlığın %{pct} ye eşit Fiziksel hasara maruz kalır. Periyodik hasar bunu tetiklemez.",
         "anchor": "{duration} saniye boyunca, {reduction}% daha az hasar al ama {speed}% hızında hareket et. Seni etkileyen bayıltmaları, kökleri, yavaşlamalar, korkuları, morfu, sessizlikleri, körlemeleri, cinnahlı, silahsız bırakma ve iş hareket ettirici etkileri kaldırır ve yeni olanları ve geri tepmelerini yok sayarsın.",
@@ -3136,7 +3138,11 @@ export const tr_TR: EnTranslations = {
         "kindlingOrb": "{duration} saniye boyunca yanında bir ember küre çağır. Bir düşmana attığın her büyü ona o düşmana {damage} Ateş hasarı için bir cıvata ateşlettirir. Hasara Spell Power artar.",
         "pierce": "{duration} saniye boyunca, otomatik saldırıların, atışlarının ve fiziksel yeteneklerinin (kanama hariç) de hedefinin {reach} yd içinde en yakın düşmanı, verilen hasarın %{share} sini vur.",
         "lantern": "{duration} saniye boyunca ayaklarının dibine bir fener koy. Sen veya {radius} yd içinde bir lonca üyesine senden doğrudan bir iyileştirme de ışığı içinde en yaralı diğer lonca üyesini kalkanı açısından %{share} iyileştir.",
-        "heartNova": "Tüm ısı yığınlarını, {radius} yd içinde her düşmana {perHeat} Ateş hasarı ({maxHeat} yığınlarda {max}) ve her türleyen varlığa aşırı lütuf yapan ateş nova'sı harcayabilir. Hasara Attack Power artar. Bir ısı yığını gerektirir."
+        "heartNova": "Tüm ısı yığınlarını, {radius} yd içinde her düşmana {perHeat} Ateş hasarı ({maxHeat} yığınlarda {max}) ve her türleyen varlığa aşırı lütuf yapan ateş nova'sı harcayabilir. Hasara Attack Power artar. Bir ısı yığını gerektirir.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers run to your target and fight it in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, each has {hpPct}% of your maximum health, and they leave when the standard falls, when you die, or if you move more than {leash} yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken."
       }
     },
     "questShare": {
@@ -4042,6 +4048,10 @@ export const tr_TR: EnTranslations = {
         "moltenIgnite": "Her {every} saniyede {damage} Ateş hasarı verir. Başka bir silah kritik isabeti bunu yeniler.",
         "pierce": "Otomatik saldırılar, atışlar ve fiziksel yetenekler (kanamalar değil) ayrıca hedefine en yakın düşmana {reach} metre içinde vurur ve verilen hasarın {pct}% kadarı kadar hasar verir.",
         "lantern": "Senin veya fener ışığında {radius} metre içindeki bir taraf üyesinde kimse tarafından verilen doğrudan şifa, aynı zamanda fener ışığında en yaralı diğer taraf üyesini şifanın {pct}% kadarıyla iyileştiriyor.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Isı: {stacks}/{max}. Crucible Yüreğini kullan, tümünü hedefin üzerine bir ateş nova'sı için harca, {radius} metre içindeki her düşmana {damage} Ateş hasarı verir ve çarptığı her yaratığı korkutur.",
         "crucibleHeatOther": "Isı: {stacks}/{max}. Crucible Yüreği tümünü {radius} metre içinde bir ateş nova'sı için harcıyor, her yığın için daha fazla Ateş hasarı verir ve çarptığı her yaratığı korkutur."
       },
@@ -15601,7 +15611,7 @@ export const tr_TR: EnTranslations = {
         "name": "Skerrit’in Kıymık Kargısı"
       },
       "loomshard_eye": {
-        "name": "Tezgah Kırığı Gözü"
+        "name": "The Barrowglass Eye"
       },
       "barrowhide_pauldrons": {
         "name": "Höyük Omuzlukları"
@@ -17888,6 +17898,24 @@ export const tr_TR: EnTranslations = {
       },
       "barrowhide_slab": {
         "name": "Barrowhide Slab"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
@@ -20538,7 +20566,7 @@ export const tr_TR: EnTranslations = {
       "q_muster_summons": {
         "title": "The Muster's Summons",
         "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
-        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Loomshard blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
         "objectives": {
           "0": {
             "label": "Report to the Muster Commander"
@@ -20573,7 +20601,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_socketwrights_due": {
         "title": "The Socketwright's Due",
-        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
         "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
         "objectives": {
           "0": {

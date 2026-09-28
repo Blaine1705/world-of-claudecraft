@@ -516,7 +516,7 @@ export const da_DK: EnTranslations = {
     "shardpike": {
       "braceLabel": "Couch the Shardpike",
       "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
-      "thrustLabel": "Loomshard Thrust",
+      "thrustLabel": "Barrowglass Thrust",
       "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
       "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
       "releaseLabel": "Ground the Shardpike",
@@ -3116,8 +3116,10 @@ export const da_DK: EnTranslations = {
         "storm": "Hver stavekraft du kaster tilføjer en ladning, op til {max}. Ladninger varer {duration} sek, opdateret når du får en.",
         "heat": "Dine våben-slag hver tilføjer en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak.",
         "ignite": "Dine våben-kritiske slag tænder målet, hvilket giver {tick} Ildskade hvert {every} sek i {duration} sek. Et nyt kritisk slag opdaterer det. Skaden stiger med Angrebskraft eller Fjernkampskraft, hvilken som helst er højere.",
-        "guardHeat": "Hver gang du blokerer, undviger eller parerer et angreb, tilføjes en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak."
+        "guardHeat": "Hver gang du blokerer, undviger eller parerer et angreb, tilføjes en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "I {duration} sek tager en fjende der rammer dig direkte Fysisk skade lig med {pct}% af det helbred der ramte tog fra dig. Periodisk skade udløser det ikke.",
         "anchor": "I {duration} sek modtager du {reduction}% mindre skade men bevæger dig med {speed}% hastighed. Fjerner ødelæggelser, rødder, øjeblikkelsesantal, frygt, polymorfer, stilhed, blindhed, hekse, afvæbninger og incapacitating effekter på dig, og du ignorerer nye og knockbacks mens det varer.",
@@ -3136,7 +3138,11 @@ export const da_DK: EnTranslations = {
         "kindlingOrb": "Sammenkald en glødelsekulensibryd ved siden af dig i {duration} sek. Hver stavekraft du kaster på en fjende får det til at affyre en bolt på denne fjende for {damage} Ildskade. Skaden stiger med Stavekraft.",
         "pierce": "I {duration} sek rammer dine auto-angreb, skud og fysiske evner (ikke blødninger) også den fjende tættest på dit mål inden for {reach} yd for {share}% af skaden håndteret.",
         "lantern": "Indstil en lygte ved dine fødder for {duration} sek. En direkte heling fra nogen på dig eller et fælles partiet medlem inden for {radius} yd af det helbreder også det mest såret andet fælles partiet medlem i dets lys for {share}% af helbredelsen.",
-        "heartNova": "Forbrug alle varme-stakke på en ildnovastjerne der giver {perHeat} Ildskade pr. stak ({max} ved {maxHeat} stakke) til hver fjende inden for {radius} yd og forledes hver kreatur det rammer. Skaden stiger med Angrebskraft. Kræver en varme-stak."
+        "heartNova": "Forbrug alle varme-stakke på en ildnovastjerne der giver {perHeat} Ildskade pr. stak ({max} ved {maxHeat} stakke) til hver fjende inden for {radius} yd og forledes hver kreatur det rammer. Skaden stiger med Angrebskraft. Kræver en varme-stak.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers run to your target and fight it in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, each has {hpPct}% of your maximum health, and they leave when the standard falls, when you die, or if you move more than {leash} yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken."
       }
     },
     "questShare": {
@@ -4042,6 +4048,10 @@ export const da_DK: EnTranslations = {
         "moltenIgnite": "Handler {damage} ildskade hver {every} sek. Et andet våbenkritisk slag genopfrisker varigheden.",
         "pierce": "Dine auto-angreb, skud og fysiske evner (ikke blødninger) rammer også fjenden nærmest dit mål inden for {reach} yd for {pct}% af den handled skade.",
         "lantern": "En direkte helbredelse fra hvem som helst på dig eller et flokmedlem inden for {radius} yd af lanternen healer alle inden for 5 yd for {pct}% mere.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Varme: {stacks}/{max}. Brug Cruciblehjertets kraft for at bruge det hele på en ildnova inden for {radius} m for {damage} skade.",
         "crucibleHeatOther": "Varme: {stacks}/{max}. Cruciblehjertets kraft bruger det hele på en ildnova inden for {radius} yd, der handler mere ildskade for hver stak og taunts hver kreatur, den rammer."
       },
@@ -15601,7 +15611,7 @@ export const da_DK: EnTranslations = {
         "name": "Skerrits Skårspyd"
       },
       "loomshard_eye": {
-        "name": "Væverskår-Øjet"
+        "name": "The Barrowglass Eye"
       },
       "barrowhide_pauldrons": {
         "name": "Gravhøjsskulderværn"
@@ -17888,6 +17898,24 @@ export const da_DK: EnTranslations = {
       },
       "barrowhide_slab": {
         "name": "Barrowhide Slab"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
@@ -20538,7 +20566,7 @@ export const da_DK: EnTranslations = {
       "q_muster_summons": {
         "title": "The Muster's Summons",
         "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
-        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Loomshard blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
         "objectives": {
           "0": {
             "label": "Report to the Muster Commander"
@@ -20573,7 +20601,7 @@ export const da_DK: EnTranslations = {
       },
       "q_socketwrights_due": {
         "title": "The Socketwright's Due",
-        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
         "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
         "objectives": {
           "0": {

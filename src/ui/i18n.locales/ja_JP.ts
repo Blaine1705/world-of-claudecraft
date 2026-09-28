@@ -928,7 +928,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.shardpike.braceLabel': 'シャードパイクを構える',
   'hudChrome.shardpike.braceTooltip':
     '石突きを地面に突き立て、穂先を上げる。横移動キーがバランス棒だ：ビームは自然に流れ、彼が地面を叩くたびに弾かれる。両端に触れさせず {set} 秒保てば穂先が定まる。固い地面が必要で、騎乗中は不可。',
-  'hudChrome.shardpike.thrustLabel': 'ルームシャード・スラスト',
+  'hudChrome.shardpike.thrustLabel': 'バロウグラス・スラスト',
   'hudChrome.shardpike.thrustTooltip':
     '定まった穂先を眼に突き入れ、{damage} のダメージを与える。レベルも攻撃力もパイク自体も、何一つこの値を伸ばさない。番人を盲目にしバロウハイドを剥ぎ取るので、湿地の他のあらゆる武器がようやく通るようになる。定まったパイクだけが放てる一撃で、射程 {reach} ヤード、猶予は {seconds} 秒。',
   'hudChrome.shardpike.releaseLabel': 'シャードパイクを下ろす',
@@ -13788,12 +13788,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あの眼を研いで彼の眼窩に据えてから四十年、一日分の払いももらっていない。番人に痛い目を見せたいのか、{className}？なら俺の仕事を狙え。',
   'entities.quests.q_socketwrights_due.title': '嵌め込み職人の未払い',
   'entities.quests.q_socketwrights_due.text':
-    'あの眼窩にルームシャードを据えたのは俺だ。レンズを研ぎ、座らせ、楔で正しく固めた。塚の主たちは銅貨一枚も払わず、いま俺の仕事が湿地を踏み均して歩き回っている。俺のシャードパイクを持って行け。石突きを突き立て、穂先を据えて、どれだけかかろうと保て。腕が定まったら、それを眼に通せ。彼のまとう皮はあの欠片に縛られている、{playerName}：盲目にすれば、湿地のあらゆる刃がようやく通る。',
+    'あの眼窩にバロウグラスを据えたのは俺だ。レンズを研ぎ、座らせ、楔で正しく固めた。塚の主たちは銅貨一枚も払わず、いま俺の仕事が湿地を踏み均して歩き回っている。俺のシャードパイクを持って行け。石突きを突き立て、穂先を据えて、どれだけかかろうと保て。腕が定まったら、それを眼に通せ。彼のまとう皮はあの欠片に縛られている、{playerName}：盲目にすれば、湿地のあらゆる刃がようやく通る。',
   'entities.quests.q_socketwrights_due.completion':
     '手応えがあっただろう？四十年分の利息、眼窩を通して払わせた。パイクはあんたのものだ。彼は治る、いつもそうだ。だから気が向いたらまた取り立てに行けばいい。',
   'entities.quests.q_socketwrights_due.objectives.0.label': '番人の眼を潰す',
   'entities.items.foremans_barrowmaul.name': '監督の塚砕き',
-  'entities.items.loomshard_eye.name': '織機片の眼',
+  'entities.items.loomshard_eye.name': 'バロウグラスの眼',
   'entities.items.barrowhide_pauldrons.name': '塚山の肩当て',
   'entities.items.mirestone_stride.name': '泥石の歩み',
   'entities.items.foremans_wage_band.name': '職長の賃金の指輪',
@@ -18917,7 +18917,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_summons.text':
     '割ける槍はすべて星墜の火口の周りに陣を敷かせた、{playerName}。そこから歩き出てくる奴を囲むためだ。召集兵団の指揮官は火口を見下ろす南の高台で陣を守っている。ここから南東だ。指揮官に報告しろ。奴との戦い方を教わるだろう。よく聞け。聞かなかった者たちは葦の中に沈んでいる。',
   'entities.quests.q_muster_summons.completion':
-    'フェンウィックの使いか？よし。一度しか言わん、奴は一言も言わんからな。バルガスは我々の哨所を巡る：火口の縁、西の平地、南の高台、南西の縁の切れ目、そしてまた一周だ。立ち止まった哨所はすべて踏み潰される。鋼は奴に通らん。皮がはじき返し、奴を斬りつけるだけのレイドは疲れ果てて死ぬ。唯一の弱点は目だ。構えた槍をルームシャードに突き通せば奴は盲目になり、盲目の間は皮が剥がれ落ちる。その時こそレイド全員で叩き込め、全力でな。やがて皮は閉じ、次の好機を待つ。まず槍、それから全員だ、{playerName}。',
+    'フェンウィックの使いか？よし。一度しか言わん、奴は一言も言わんからな。バルガスは我々の哨所を巡る：火口の縁、西の平地、南の高台、南西の縁の切れ目、そしてまた一周だ。立ち止まった哨所はすべて踏み潰される。鋼は奴に通らん。皮がはじき返し、奴を斬りつけるだけのレイドは疲れ果てて死ぬ。唯一の弱点は目だ。構えた槍をバロウグラスに突き通せば奴は盲目になり、盲目の間は皮が剥がれ落ちる。その時こそレイド全員で叩き込め、全力でな。やがて皮は閉じ、次の好機を待つ。まず槍、それから全員だ、{playerName}。',
   'entities.quests.q_muster_summons.objectives.0.label': '召集兵団の指揮官に報告する',
   'entities.quests.q_muster_pike_drill.title': 'まず槍を',
   'entities.quests.q_muster_pike_drill.text':
@@ -19311,4 +19311,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  'entities.items.knucklebone_of_balgath.name': 'バルガスの拳骨',
+  'entities.items.muster_standard.name': '召集兵団の軍旗',
+  'entities.items.guttered_eye.name': '燃え尽きた眼',
+  'entities.items.barrowstone_heart.name': '塚石の心臓',
+  'entities.items.muster_grapnel.name': '召集兵団の鉤縄',
+  'entities.items.craterglass_stave.name': '隕坑硝子の杖',
+  'hudChrome.trinkets.equip.stoneHeart':
+    '致命的な攻撃を受けると、代わりに{statue}秒間石になる：ダメージを受けず、移動も行動もできない。その後、体力{restore}（最大体力の{restorePct}%）で復帰する。{icd}に1回しか発生しない。決闘とアリーナの試合では発動せず、とどめの一撃で決着がつく。',
+  'hudChrome.trinkets.use.foremanShape':
+    '{duration}秒間、監督の姿をとる：単眼の巨人となって拳で戦い、すべてのアビリティとそのダメージを保持する。防具が{armorPct}%増加し、ノックバックされなくなる。騎乗は解除される。',
+  'hudChrome.trinkets.use.musterStandard':
+    '足元に召集兵団の軍旗を立てる。{duration}秒間、{soldiers}人の召集兵があなたの対象に駆け寄って近接戦闘を行い、それぞれ{every}秒ごとに{damage}の物理ダメージを与える。兵はあなたの対象だけを攻撃し、それぞれあなたの最大体力の{hpPct}%を持つ。軍旗が倒れたとき、あなたが死んだとき、または軍旗から{leash}ヤード以上離れたときに去る。ダメージは攻撃力または遠隔攻撃力の高いほうで増加し、設置時に決まる。',
+  'hudChrome.trinkets.use.gutteredGlare':
+    '{duration}秒間の集中：長さ{length}ヤードの光線が向いている方向へ放たれ、進路上の最大{max}体の敵に{every}秒ごとに{tick}の秘術ダメージを与える（集中全体で各敵に{total}）。向きを変えると光線が薙ぎ払う。移動または詠唱で終了する。ダメージは呪文力で増加する。',
+  'hudChrome.trinkets.use.grapnel':
+    '{range}ヤード以内の見えているパーティまたはレイドメンバーに鉤を掛け、空中を引き寄せてあなたの傍らへ運ぶ。敵や、乗り物・船に乗っている味方、石化している味方、解除できない効果で拘束されている味方は引き寄せられない。',
+  'hudChrome.auraEffect.trinket.foremanShape':
+    'あなたは監督だ：防具が{armorPct}%増加し、ノックバックを受けない。',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    '召集兵団の軍旗が立っている。兵たちがあなたの対象と戦う。',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    '光線が進路上の敵に{every}秒ごとに{tick}の秘術ダメージを与える。移動または詠唱で終了する。',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    '石になっている：ダメージを受けず、行動できない。最大体力の{pct}%で復帰する。',
 };

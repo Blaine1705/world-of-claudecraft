@@ -5,7 +5,7 @@
 // gives a player one job gear cannot do for them: BRACE the pike (a movement-owning mode,
 // same family as the ledge climb and the charge), hold an inverted-pendulum balance beam
 // against drift and the boss's own shockwaves using the strafe axis as the balance stick,
-// and, once the pike is SET, land the Loomshard Thrust: fixed damage no level scales, plus
+// and, once the pike is SET, land the Barrowglass Thrust: fixed damage no level scales, plus
 // the blind that drops Barrowhide for everyone else (mob/eye_ward.ts).
 //
 // Session state lives on PlayerMeta (session-only, never serialized: a relog is a dropped
@@ -157,7 +157,7 @@ export function lanceRelease(ctx: SimContext, pid: number): void {
 }
 
 /**
- * The Loomshard Thrust. Only a SET pike can deliver it; the payoff is the fixed hit plus,
+ * The Barrowglass Thrust. Only a SET pike can deliver it; the payoff is the fixed hit plus,
  * when the ward is vulnerable, the blind that opens everyone else's window.
  */
 export function lanceThrust(ctx: SimContext, pid: number): void {
@@ -192,7 +192,7 @@ export function lanceThrust(ctx: SimContext, pid: number): void {
         LANCE_FIXED_DAMAGE,
         false,
         'physical',
-        'Loomshard Thrust',
+        'Barrowglass Thrust',
         'hit',
         true,
         undefined,
@@ -216,7 +216,7 @@ export function lanceThrust(ctx: SimContext, pid: number): void {
       LANCE_FIXED_DAMAGE,
       false,
       'physical',
-      'Loomshard Thrust',
+      'Barrowglass Thrust',
       'hit',
       true,
       undefined,
@@ -227,7 +227,7 @@ export function lanceThrust(ctx: SimContext, pid: number): void {
       LANCE_THRUST_ABILITY,
     );
     if (blinded) {
-      ctx.notice(pid, 'Your thrust finds the Loomshard. The Barrowhide sloughs away!');
+      ctx.notice(pid, 'Your thrust finds the Barrowglass. The Barrowhide sloughs away!');
       noteLanceBlind(ctx, pid, victim);
     }
   });

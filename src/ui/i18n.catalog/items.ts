@@ -3266,6 +3266,13 @@ const ITEM_ENTITY_IDS = [
   'muster_shardpike',
   // The muster's weekly trophy off Balgath's corpse (src/sim/muster_trophy.ts).
   'barrowhide_slab',
+  // Balgath's trinkets (src/sim/content/trinkets.ts) and his caster staff.
+  'knucklebone_of_balgath',
+  'muster_standard',
+  'guttered_eye',
+  'barrowstone_heart',
+  'muster_grapnel',
+  'craterglass_stave',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3279,7 +3286,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   foremans_barrowmaul: "Foreman's Barrowmaul",
   // The quest tool the world boss's level-spread mechanic runs on, not a spoil.
   skerrits_shardpike: "Skerrit's Shardpike",
-  loomshard_eye: 'The Loomshard Eye',
+  loomshard_eye: 'The Barrowglass Eye',
   barrowhide_pauldrons: 'Barrowhide Pauldrons',
   mirestone_stride: 'Mirestone Stride',
   // The Foreman's Wage (level-gated personal drops for the locals).
@@ -4093,6 +4100,12 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_warstaff: "Vanguard's Warstaff",
   muster_shardpike: 'Muster Shardpike',
   barrowhide_slab: 'Barrowhide Slab',
+  knucklebone_of_balgath: 'Knucklebone of Balgath',
+  muster_standard: 'Muster Standard',
+  guttered_eye: 'The Guttered Eye',
+  barrowstone_heart: 'Barrowstone Heart',
+  muster_grapnel: 'Muster Grapnel',
+  craterglass_stave: 'Craterglass Stave',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

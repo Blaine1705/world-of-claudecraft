@@ -7942,7 +7942,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Kærskygge-Hammer',
   'entities.items.skerrits_shardpike.name': 'Skerrits Skårspyd',
   'entities.items.foremans_barrowmaul.name': 'Formandens Gravhøjshammer',
-  'entities.items.loomshard_eye.name': 'Væverskår-Øjet',
   'entities.items.barrowhide_pauldrons.name': 'Gravhøjsskulderværn',
   'entities.items.mirestone_stride.name': 'Mosestensskridt',
   'entities.items.foremans_wage_band.name': 'Formandens Lønring',

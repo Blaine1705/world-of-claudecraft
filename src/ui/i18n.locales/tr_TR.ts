@@ -14605,7 +14605,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Bataklık Gölgesi Balyozu',
   'entities.items.skerrits_shardpike.name': 'Skerrit’in Kıymık Kargısı',
   'entities.items.foremans_barrowmaul.name': 'Ustabaşının Höyük Balyozu',
-  'entities.items.loomshard_eye.name': 'Tezgah Kırığı Gözü',
   'entities.items.barrowhide_pauldrons.name': 'Höyük Omuzlukları',
   'entities.items.mirestone_stride.name': 'Bataklıktaşı Adımı',
   'entities.items.foremans_wage_band.name': 'Ustabaşının Ücret Yüzüğü',

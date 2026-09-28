@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a743144dd25c63fe21855e28874be604d9d6c8ea6bbb10a6c1f519636250291f",
+  "rendererFingerprint": "7b0852dab182693af5b2c3b041b1cfc5d2aca9d4791944acc6c71ca31d554c92",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
     "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "153",
-    "browserVersion": "Edg/153.0.4234.32",
+    "browserMajor": "154",
+    "browserVersion": "Edg/154.0.4258.37",
     "requestedBackend": "swiftshader",
-    "fingerprint": "1e20b2b6d2d59cc8f4b804141fdbe6a011e07e40a953c202402d3b2e19cd108d"
+    "fingerprint": "04a5c1851d9e9c277dd6de4cae5e56afae22c5cc793b00f37e35af4536bdd2f4"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4955840,
-      "sha256": "9e2c3461bda09731ca8420b7a0c48dafe157d5a3a3aad3f36f5a50b274cc20c5",
+      "bytes": 5246451,
+      "sha256": "2f75b5b71e6747d82a30a576620138aa1c6cf88073a0280627f00c87e69b3efd",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -4689,7 +4689,7 @@
               "url": "models/weapons/muster_mallet.glb",
               "path": "public/models/weapons/muster_mallet.glb",
               "bytes": 15344,
-              "sha256": "b2e01313eb21ff3fb2a78eda181f4c0a2b3ce9a511a50561689cee23049cf27d"
+              "sha256": "9e1865d69d587893596410a4d7c9d2c04b7364fadd315f065c08dfbd5ee09433"
             },
             "bone": "handslot.r",
             "position": null,
@@ -4706,7 +4706,7 @@
         "resolved": "#7f3a28",
         "strength": 0.3
       },
-      "sourceFingerprint": "c3e981af0fef573ed49b520e380681b7aeebbc1cb6400d957947650ef6315a82",
+      "sourceFingerprint": "b94e19b2db931dd63bb359c1245f47a01a4012941e81ac0194e467972ddd55d9",
       "output": {
         "path": "public/ui/mobs/muster_drillmaster.webp",
         "bytes": 2242,
@@ -4723,7 +4723,7 @@
           "url": "models/creatures/muster_effigy.glb",
           "path": "public/models/creatures/muster_effigy.glb",
           "bytes": 182308,
-          "sha256": "1e24cc9b9e443d1a5b4eb4ca2bf729ab1209766776cd6d672c3bd8890a900d4a"
+          "sha256": "c6047f569725d37bd3b0b61bc537903ff02975d1ff3acd088425ad9f074a9844"
         },
         "idle": "Idle",
         "height": 6.7,
@@ -4740,7 +4740,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f26a120215470e95d1ca8c099c1d937cdec2c693f9ca894b924c8271b93bd515",
+      "sourceFingerprint": "0d93eb5e5f78b2213ee3b476715358ff89ad1ed70afa0d6e40fa499a941dbb8f",
       "output": {
         "path": "public/ui/mobs/muster_effigy.webp",
         "bytes": 3816,

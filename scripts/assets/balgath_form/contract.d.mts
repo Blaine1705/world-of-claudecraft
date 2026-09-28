@@ -1,0 +1,10 @@
+export const BALGATH_FORM_FILE: string;
+export const BALGATH_FORM_SOURCE_FILE: string;
+export const BALGATH_FORM_MESH: string;
+export const BALGATH_FORM_MAX_TRIANGLES: number;
+export const BALGATH_FORM_TARGET_TRIANGLES: number;
+export const BALGATH_FORM_MAX_INFLUENCES: number;
+export const BALGATH_FORM_JOINT_COUNT: number;
+export const BALGATH_FORM_BLENDER_VERSION: string;
+export const BALGATH_FORM_MAX_BYTES: number;
+export const BALGATH_FORM_EYE: Readonly<{ bone: string; offset: readonly number[] }>;

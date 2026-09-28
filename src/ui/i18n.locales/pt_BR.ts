@@ -14820,7 +14820,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Martelo da Sombra do Brejo',
   'entities.items.skerrits_shardpike.name': 'Pique de Estilhaços de Skerrit',
   'entities.items.foremans_barrowmaul.name': 'Malho Tumular do Capataz',
-  'entities.items.loomshard_eye.name': 'O Olho de Estilhaço do Tear',
   'entities.items.barrowhide_pauldrons.name': 'Ombreiras Tumulares',
   'entities.items.mirestone_stride.name': 'Passada de Pedralodo',
   'entities.items.foremans_wage_band.name': 'Anel do Salário do Capataz',

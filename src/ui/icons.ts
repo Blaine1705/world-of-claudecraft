@@ -2531,7 +2531,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // ability FALLBACK would normally paint them, and it derived three visually identical
   // tiles from ids that differ only in their last word: a bar whose entire job is "which
   // of these three do I press" showed the same glyph three times. Authored here instead,
-  // in the frost/ice pair the Loomshard's own teal reads as.
+  // in the frost/ice pair the Barrowglass's own teal reads as.
   //
   // The pike is `staff` (the closest primitive to a shaft) in all three, so the family
   // reads as one item, and the SECOND mark is the verb: a hand gripping it to brace, the

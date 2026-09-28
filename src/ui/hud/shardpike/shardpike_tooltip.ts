@@ -3,7 +3,7 @@
 // The bar's view has computed a `tooltipKey` and a `tooltipValues` bag per verb since the
 // bar shipped, resolved from the sim's own constants so the numbers cannot drift from the
 // mechanic. Nothing ever rendered them: the painter set `btn.title` to the bare LABEL, so
-// hovering "Loomshard Thrust" told you it was called Loomshard Thrust. Every sentence
+// hovering "Barrowglass Thrust" told you it was called Barrowglass Thrust. Every sentence
 // explaining what the verb does, how long its window lasts and what it strips off the boss
 // was live data thrown away on the way to the DOM. So this is mostly a wiring fix.
 //

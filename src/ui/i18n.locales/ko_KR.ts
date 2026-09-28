@@ -922,7 +922,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.shardpike.braceLabel': '조각창 자세 잡기',
   'hudChrome.shardpike.braceTooltip':
     '창 밑동을 땅에 박고 창끝을 세운다. 좌우 이동 키가 균형 막대다: 빔은 저절로 흐르고, 그가 땅을 내리칠 때마다 튕긴다. 양쪽 끝에 닿지 않게 {set}초간 버티면 창이 고정된다. 단단한 땅이 필요하고, 탈것에 탄 채로는 불가능하다.',
-  'hudChrome.shardpike.thrustLabel': '룸샤드 찌르기',
+  'hudChrome.shardpike.thrustLabel': '배로글라스 찌르기',
   'hudChrome.shardpike.thrustTooltip':
     '고정된 창을 눈에 찔러 넣어 {damage}의 피해를 입힌다. 레벨도, 공격력도, 창 자체도 이 값을 키우지 못한다. 감독관을 실명시키고 무덤가죽을 벗겨내므로, 늪의 다른 모든 무기가 마침내 먹히기 시작한다. 고정된 창만이 이 일격을 낼 수 있고, 사거리는 {reach}야드, 기회는 {seconds}초 동안 열린다.',
   'hudChrome.shardpike.releaseLabel': '조각창 내리기',
@@ -13752,12 +13752,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '그 눈을 갈아 그의 눈구멍에 박아 넣은 지 사십 년, 하루치 값도 못 받았다. 감독관에게 아픔을 주고 싶나, {className}? 그렇다면 내 작품을 노려라.',
   'entities.quests.q_socketwrights_due.title': '박음 장인의 미수금',
   'entities.quests.q_socketwrights_due.text':
-    '그 눈구멍에 룸샤드를 박은 건 나였다. 렌즈를 갈고, 앉히고, 쐐기로 곧게 고정했지. 봉분의 주인들은 동화 한 푼 주지 않았고, 이제 내 작품이 늪을 짓밟으며 돌아다닌다. 내 조각창을 가져가라. 밑동을 박고, 창끝을 세워 얼마가 걸리든 버텨라. 팔이 확실해지면 그것을 눈에 꽂아라. 그가 걸친 가죽은 그 조각에 묶여 있다, {playerName}. 그를 실명시켜라. 그러면 늪의 모든 칼날이 마침내 먹힌다.',
+    '그 눈구멍에 배로글라스를 박은 건 나였다. 렌즈를 갈고, 앉히고, 쐐기로 곧게 고정했지. 봉분의 주인들은 동화 한 푼 주지 않았고, 이제 내 작품이 늪을 짓밟으며 돌아다닌다. 내 조각창을 가져가라. 밑동을 박고, 창끝을 세워 얼마가 걸리든 버텨라. 팔이 확실해지면 그것을 눈에 꽂아라. 그가 걸친 가죽은 그 조각에 묶여 있다, {playerName}. 그를 실명시켜라. 그러면 늪의 모든 칼날이 마침내 먹힌다.',
   'entities.quests.q_socketwrights_due.completion':
     '뚫리는 느낌이 들었지? 사십 년치 이자를 눈구멍으로 받아냈다. 창은 네 것이다, 친구. 그는 낫는다, 늘 그러니까. 그러니 마음이 동할 때 또 받으러 가면 된다.',
   'entities.quests.q_socketwrights_due.objectives.0.label': '감독관의 눈을 찌르기',
   'entities.items.foremans_barrowmaul.name': '감독관의 봉분망치',
-  'entities.items.loomshard_eye.name': '베틀조각의 눈',
+  'entities.items.loomshard_eye.name': '배로글라스의 눈',
   'entities.items.barrowhide_pauldrons.name': '봉분 어깨보호구',
   'entities.items.mirestone_stride.name': '진흙돌 발걸음',
   'entities.items.foremans_wage_band.name': '감독관의 임금 반지',
@@ -18884,7 +18884,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_summons.text':
     '내줄 수 있는 창은 모두 낙성 분화구 주위에 진을 쳤다, {playerName}. 거기서 걸어 나오는 놈을 둘러싸기 위해서다. 소집대 지휘관은 분화구를 내려다보는 남쪽 둔덕의 진영을 지키고 있다. 여기서 남동쪽이다. 지휘관에게 보고해라. 놈과 싸우는 법을 듣게 될 거다. 잘 들어라. 듣지 않은 자들은 갈대밭에 누워 있다.',
   'entities.quests.q_muster_summons.completion':
-    '펜윅의 전령인가? 좋다. 한 번만 말하겠다, 놈은 아예 말해 주지 않으니까. 발가스는 우리 초소들을 돈다: 분화구 가장자리, 서쪽 평지, 남쪽 둔덕, 남서쪽 가장자리의 틈, 그리고 다시 한 바퀴. 멈춰 선 초소는 모두 짓밟힌다. 강철은 놈에게 먹히지 않는다. 가죽이 튕겨 내고, 놈을 베기만 하는 공격대는 지쳐서 죽는다. 유일한 약점은 눈이다. 버틴 창을 룸샤드에 꿰뚫으면 놈은 눈이 멀고, 눈이 먼 동안 가죽이 벗겨진다. 그때가 공격대 전원이 세게 칠 때다. 그러고 나면 가죽이 다시 닫히고 우리는 다음 기회를 기다린다. 먼저 창, 그다음이 모두다, {playerName}.',
+    '펜윅의 전령인가? 좋다. 한 번만 말하겠다, 놈은 아예 말해 주지 않으니까. 발가스는 우리 초소들을 돈다: 분화구 가장자리, 서쪽 평지, 남쪽 둔덕, 남서쪽 가장자리의 틈, 그리고 다시 한 바퀴. 멈춰 선 초소는 모두 짓밟힌다. 강철은 놈에게 먹히지 않는다. 가죽이 튕겨 내고, 놈을 베기만 하는 공격대는 지쳐서 죽는다. 유일한 약점은 눈이다. 버틴 창을 배로글라스에 꿰뚫으면 놈은 눈이 멀고, 눈이 먼 동안 가죽이 벗겨진다. 그때가 공격대 전원이 세게 칠 때다. 그러고 나면 가죽이 다시 닫히고 우리는 다음 기회를 기다린다. 먼저 창, 그다음이 모두다, {playerName}.',
   'entities.quests.q_muster_summons.objectives.0.label': '소집대 지휘관에게 보고',
   'entities.quests.q_muster_pike_drill.title': '먼저 창',
   'entities.quests.q_muster_pike_drill.text':
@@ -19294,4 +19294,28 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
+  'entities.items.knucklebone_of_balgath.name': '발가스의 손마디뼈',
+  'entities.items.muster_standard.name': '소집대 군기',
+  'entities.items.guttered_eye.name': '꺼져가는 눈',
+  'entities.items.barrowstone_heart.name': '봉분석 심장',
+  'entities.items.muster_grapnel.name': '소집대 갈고리',
+  'entities.items.craterglass_stave.name': '운석유리 지팡이',
+  'hudChrome.trinkets.equip.stoneHeart':
+    '공격에 죽게 되면 대신 {statue}초 동안 돌로 변합니다. 피해를 받지 않고 이동하거나 행동할 수 없으며, 이후 생명력 {restore}(최대 생명력의 {restorePct}%)으로 돌아옵니다. {icd}마다 한 번만 발생합니다. 결투와 투기장 경기에서는 발동하지 않으며, 결정타에서 끝납니다.',
+  'hudChrome.trinkets.use.foremanShape':
+    '{duration}초 동안 감독관의 모습을 취합니다. 외눈 거인이 되어 주먹으로 싸우며, 모든 능력과 그 피해량을 유지합니다. 방어도가 {armorPct}% 증가하고 밀려나지 않습니다. 탈것에서 내립니다.',
+  'hudChrome.trinkets.use.musterStandard':
+    '발밑에 소집대 군기를 세웁니다. {duration}초 동안 소집병 {soldiers}명이 대상에게 달려가 근접전을 벌이며, 각각 {every}초마다 {damage}의 물리 피해를 줍니다. 병사들은 당신의 대상만 공격하고 각각 당신 최대 생명력의 {hpPct}%를 가지며, 군기가 쓰러질 때, 당신이 죽을 때, 또는 군기에서 {leash}미터 넘게 벗어날 때 떠납니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 따라 증가하며, 세울 때 정해집니다.',
+  'hudChrome.trinkets.use.gutteredGlare':
+    '{duration}초 동안 정신을 집중합니다. 길이 {length}미터의 광선이 바라보는 방향으로 뻗어 나가 경로에 있는 적 최대 {max}명에게 {every}초마다 {tick}의 비전 피해를 줍니다(전체 집중 동안 각 적에게 {total}). 몸을 돌리면 광선이 휩쓸고, 이동하거나 시전하면 끝납니다. 피해량은 주문력에 따라 증가합니다.',
+  'hudChrome.trinkets.use.grapnel':
+    '{range}미터 이내에 보이는 파티원 또는 공격대원에게 갈고리를 걸어 공중으로 끌어당겨 곁으로 데려옵니다. 적이나, 탈것이나 배에 탄 아군, 돌로 변한 아군, 해제할 수 없는 효과에 붙잡힌 아군은 끌어당길 수 없습니다.',
+  'hudChrome.auraEffect.trinket.foremanShape':
+    '당신은 감독관입니다. 방어도가 {armorPct}% 증가하고 밀려나지 않습니다.',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    '소집대 군기가 세워졌습니다. 병사들이 당신의 대상과 싸웁니다.',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    '광선이 경로에 있는 적에게 {every}초마다 {tick}의 비전 피해를 줍니다. 이동하거나 시전하면 끝납니다.',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    '돌로 변했습니다. 피해를 받지 않고 행동할 수 없습니다. 최대 생명력의 {pct}%로 돌아옵니다.',
 };

@@ -14677,7 +14677,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenshadow_maul.name': 'Búa Bóng Đầm Lầy',
   'entities.items.skerrits_shardpike.name': 'Giáo Mảnh của Skerrit',
   'entities.items.foremans_barrowmaul.name': 'Búa Gò Mộ của Đốc Công',
-  'entities.items.loomshard_eye.name': 'Mắt Mảnh Khung Cửi',
   'entities.items.barrowhide_pauldrons.name': 'Giáp Vai Gò Mộ',
   'entities.items.mirestone_stride.name': 'Bước Đá Đầm Lầy',
   'entities.items.foremans_wage_band.name': 'Nhẫn Tiền Công của Đốc Công',

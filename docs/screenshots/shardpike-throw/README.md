@@ -55,7 +55,7 @@ Restart Vite after source changes if the checkout's file watcher serves a stale 
 
 For a normal gameplay check, acquire and equip Skerrit's Shardpike from the
 Socketwright quest, approach Balgath within 14 yards, brace, balance the pike
-until ready, and use Loomshard Thrust. Repeat with another class and with a nearby
+until ready, and use Barrowglass Thrust. Repeat with another class and with a nearby
 non-party observer. The item must remain equipped after every throw.
 
 ## Validation scope

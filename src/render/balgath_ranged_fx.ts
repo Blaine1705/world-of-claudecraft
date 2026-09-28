@@ -73,7 +73,7 @@ import {
 const BOULDER_BASE = 0x24150a;
 const BOULDER_FILL = 0xff9a3c;
 const BOULDER_RIM = 0xffcf7a;
-// Glare: the Loomshard teal his eye burns with.
+// Glare: the Barrowglass teal his eye burns with.
 const GLARE_BASE = 0x04241c;
 const GLARE_FILL = 0x3fd6ae;
 const GLARE_EDGE = 0xb8fff0;

@@ -853,7 +853,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
     // Plus the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab): 1,508.
-    expect(Object.keys(ITEMS)).toHaveLength(1508);
+    // Plus Balgath's loot (five trinkets and the Craterglass Stave): 1,514.
+    expect(Object.keys(ITEMS)).toHaveLength(1514);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1017,9 +1018,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
     // Plus the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab): 1,355 owners.
-    expect(new Set(currentOwnerIds).size).toBe(1355);
-    expect(shippingIds).toHaveLength(1355);
-    expect(Object.keys(ITEMS)).toHaveLength(1508);
+    // Plus Balgath's loot (balgath-loot-icons-2026-09-28, six items): 1,361.
+    expect(new Set(currentOwnerIds).size).toBe(1361);
+    expect(shippingIds).toHaveLength(1361);
+    expect(Object.keys(ITEMS)).toHaveLength(1514);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1149,6 +1151,13 @@ describe('item-art consistency accepted-art provenance', () => {
         'muster_shardpike',
         // The muster quests' weekly trophy (barrowhide-slab-icon-2026-09-27).
         'barrowhide_slab',
+        // Balgath's loot (balgath-loot-icons-2026-09-28).
+        'knucklebone_of_balgath',
+        'muster_standard',
+        'guttered_eye',
+        'barrowstone_heart',
+        'muster_grapnel',
+        'craterglass_stave',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1318,8 +1327,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
     // batch (warfare-season2-weapons-2026-09-25) = 38.
     // The Mirefen world-boss branch's five batches (balgath-boss, shardpike-mechanic,
-    // foremans-wage, muster-shardpike, barrowhide-slab) = 43.
-    expect(mapping.generatedBatches).toHaveLength(43);
+    // foremans-wage, muster-shardpike, barrowhide-slab) = 43. Balgath's loot batch
+    // (balgath-loot-icons-2026-09-28) = 44.
+    expect(mapping.generatedBatches).toHaveLength(44);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1387,15 +1397,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // ladder batch (faction-ladder-icons-2026-09-23) adds 17: 793. The
     // trinket-slot-icons-2026-09-23 batch adds its 18 trinkets: 811. Warfare
     // Season 2's weapon batch adds 4: 815.
-    // Plus the Mirefen world-boss branch's ten batch ids: 825.
-    expect(priorGeneratedIds).toHaveLength(825);
+    // Plus the Mirefen world-boss branch's ten batch ids: 825. Plus Balgath's loot: 831.
+    expect(priorGeneratedIds).toHaveLength(831);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab): 1,355.
-    expect(allCurrentOwnerIds).toHaveLength(1355);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1355);
+    // Plus Balgath's loot (six items): 1,361.
+    expect(allCurrentOwnerIds).toHaveLength(1361);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1361);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1412,7 +1423,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
       // + the Mirefen world-boss branch's 10 = 825.
-      priorGenerated: 825,
+      // + Balgath's loot (balgath-loot-icons-2026-09-28) 6 = 831.
+      priorGenerated: 831,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1519,6 +1531,13 @@ describe('item-art consistency accepted-art provenance', () => {
         'fenwright_grips',
         'muster_shardpike',
         'barrowhide_slab',
+        // Balgath's loot (balgath-loot-icons-2026-09-28).
+        'knucklebone_of_balgath',
+        'muster_standard',
+        'guttered_eye',
+        'barrowstone_heart',
+        'muster_grapnel',
+        'craterglass_stave',
       ]),
       'the dated catalog plus the release batches, the Field Kit, the OSSBrain reins icons, and the Mirefen world-boss spoils is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
@@ -1654,9 +1673,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1355.
     // Plus the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab) = 1355.
-    if (ownerIds.length !== 1355)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1355`);
-    if (fileIds.length !== 1355) violations.push(`shipping WebP count: ${fileIds.length} != 1355`);
+    // Plus Balgath's loot (five trinkets and the Craterglass Stave) = 1361.
+    if (ownerIds.length !== 1361)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1361`);
+    if (fileIds.length !== 1361) violations.push(`shipping WebP count: ${fileIds.length} != 1361`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

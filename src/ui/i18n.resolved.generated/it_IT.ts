@@ -516,7 +516,7 @@ export const it_IT: EnTranslations = {
     "shardpike": {
       "braceLabel": "Couch the Shardpike",
       "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
-      "thrustLabel": "Loomshard Thrust",
+      "thrustLabel": "Barrowglass Thrust",
       "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
       "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
       "releaseLabel": "Ground the Shardpike",
@@ -3116,8 +3116,10 @@ export const it_IT: EnTranslations = {
         "storm": "Ogni incantesimo che lanci aggiunge una carica, fino a {max}. Le cariche durano {duration} sec, e si rinnovano ogni volta che ne ottieni una.",
         "heat": "Ogni tuo colpo con arma da mischia o a distanza aggiunge un accumulo di calore, fino a {max}. Il calore dura {duration} sec, e si rinnova ogni volta che ottieni un accumulo.",
         "ignite": "I tuoi colpi critici con armi da mischia o a distanza incendiano il bersaglio, infliggendo {tick} danni da Fuoco ogni {every} sec per {duration} sec. Un nuovo colpo critico lo rinnova. Il danno aumenta con la potenza d'attacco o con la potenza d'attacco a distanza, a seconda di quale sia maggiore.",
-        "guardHeat": "Ogni attacco che paravi, schivi o blocchi aggiunge un accumulo di calore, fino a {max}. Il calore dura {duration} sec, e si rinnova ogni volta che ottieni un accumulo."
+        "guardHeat": "Ogni attacco che paravi, schivi o blocchi aggiunge un accumulo di calore, fino a {max}. Il calore dura {duration} sec, e si rinnova ogni volta che ottieni un accumulo.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Per {duration} sec, un nemico che ti colpisce direttamente subisce danni Fisici pari al {pct}% della salute che quel colpo ti ha tolto. Il danno periodico non lo attiva.",
         "anchor": "Per {duration} sec, subisci il {reduction}% di danno in meno ma ti muovi al {speed}% della velocità. Rimuove storditori, radicamenti, rallentamenti, paure, trasformazioni, silenzi, accecamenti, maledizioni, disarmi ed effetti incapacitanti su di te, e ne ignori di nuovi e i respingimenti finché dura.",
@@ -3136,7 +3138,11 @@ export const it_IT: EnTranslations = {
         "kindlingOrb": "Evoca una sfera di braci accanto a te per {duration} sec. Ogni incantesimo che lanci contro un nemico la fa scagliare un dardo contro quel nemico per {damage} danni da Fuoco. Il danno aumenta con il Potere Magico.",
         "pierce": "Per {duration} sec, i tuoi attacchi automatici, colpi a distanza e abilità fisiche (non i sanguinamenti) colpiscono anche il nemico più vicino al tuo bersaglio entro {reach} m per il {share}% del danno inflitto.",
         "lantern": "Posiziona una lanterna ai tuoi piedi per {duration} sec. Una cura diretta ricevuta da te o da un membro del gruppo entro {radius} m da essa cura anche il membro del gruppo più ferito nella sua luce per il {share}% della cura.",
-        "heartNova": "Spendi tutti gli accumuli di calore in una nova di fuoco che infligge {perHeat} danni da Fuoco per accumulo ({max} a {maxHeat} accumuli) a ogni nemico entro {radius} m e provoca ogni creatura che colpisce. Il danno aumenta con la potenza d'attacco. Richiede un accumulo di calore."
+        "heartNova": "Spendi tutti gli accumuli di calore in una nova di fuoco che infligge {perHeat} danni da Fuoco per accumulo ({max} a {maxHeat} accumuli) a ogni nemico entro {radius} m e provoca ogni creatura che colpisce. Il danno aumenta con la potenza d'attacco. Richiede un accumulo di calore.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers run to your target and fight it in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, each has {hpPct}% of your maximum health, and they leave when the standard falls, when you die, or if you move more than {leash} yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken."
       }
     },
     "questShare": {
@@ -4042,6 +4048,10 @@ export const it_IT: EnTranslations = {
         "moltenIgnite": "Infligge {damage} danni da Fuoco ogni {every} sec. Un altro colpo critico con l'arma lo rinnova.",
         "pierce": "I tuoi attacchi automatici, colpi a distanza e abilità fisiche (non i sanguinamenti) colpiscono anche il nemico più vicino al tuo bersaglio entro {reach} m per il {pct}% del danno inflitto.",
         "lantern": "Una cura diretta ricevuta da te o da un membro del gruppo entro {radius} m dalla lanterna cura anche il membro del gruppo più ferito nella sua luce per il {pct}% della cura.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Calore: {stacks}/{max}. Usa Cuore del Crogiolo per spenderlo tutto in una nova di fuoco che infligge {damage} danni da Fuoco a ogni nemico entro {radius} m e provoca ogni creatura che colpisce.",
         "crucibleHeatOther": "Calore: {stacks}/{max}. Cuore del Crogiolo lo spende tutto in una nova di fuoco entro {radius} m che infligge più danni da Fuoco per ogni accumulo e provoca ogni creatura che colpisce."
       },
@@ -15601,7 +15611,7 @@ export const it_IT: EnTranslations = {
         "name": "Picca di Schegge di Skerrit"
       },
       "loomshard_eye": {
-        "name": "L'Occhio di Scheggia del Telaio"
+        "name": "The Barrowglass Eye"
       },
       "barrowhide_pauldrons": {
         "name": "Spallacci Tumulari"
@@ -17888,6 +17898,24 @@ export const it_IT: EnTranslations = {
       },
       "barrowhide_slab": {
         "name": "Barrowhide Slab"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
@@ -20538,7 +20566,7 @@ export const it_IT: EnTranslations = {
       "q_muster_summons": {
         "title": "The Muster's Summons",
         "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
-        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Loomshard blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
         "objectives": {
           "0": {
             "label": "Report to the Muster Commander"
@@ -20573,7 +20601,7 @@ export const it_IT: EnTranslations = {
       },
       "q_socketwrights_due": {
         "title": "The Socketwright's Due",
-        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
         "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
         "objectives": {
           "0": {

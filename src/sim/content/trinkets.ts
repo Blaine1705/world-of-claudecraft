@@ -92,7 +92,50 @@ export type TrinketUse =
   /** Heart of the Crucible: spend every heat stack on a fire nova within
    *  `radius`, `flat` (+ `coef` of Attack Power) fire damage per stack, that
    *  taunts every creature it hits. */
-  | { kind: 'heartNova'; radius: number; flat: number; coef: number };
+  | { kind: 'heartNova'; radius: number; flat: number; coef: number }
+  // ---- Balgath, the One-Eyed Foreman (combat/balgath_trinkets.ts) ----
+  /** Knucklebone of Balgath: take the Shape of the Foreman for `duration`: the
+   *  cyclops's body (its own abilities, same buttons, same damage), `armorPct`%
+   *  more armor and immunity to knockbacks. */
+  | { kind: 'foremanShape'; duration: number; armorPct: number }
+  /** Muster Standard: plant a standard; `soldiers` muster soldiers rally from it
+   *  for `duration`, run to your target and fight it in melee, swinging every
+   *  `attackInterval` sec for `min` to `max` (+ `coef` of Attack Power, the
+   *  higher of melee and ranged, snapshotted when planted) Physical damage. Each
+   *  has `hpShare` of your maximum health. They leave with the standard, on your
+   *  death, or when you go more than `leash` yd from it. */
+  | {
+      kind: 'musterStandard';
+      duration: number;
+      soldiers: number;
+      attackInterval: number;
+      min: number;
+      max: number;
+      coef: number;
+      hpShare: number;
+      leash: number;
+      moveSpeed: number;
+    }
+  /** The Guttered Eye: channel a beam `length` yd straight ahead for `duration`;
+   *  every `every` sec it deals `flat` (+ `coef` of Spell Power) Arcane damage to
+   *  up to `maxTargets` enemies in the line (`halfWidth` yd either side). You may
+   *  turn to sweep it; moving ends it. */
+  | {
+      kind: 'gutteredGlare';
+      duration: number;
+      every: number;
+      length: number;
+      halfWidth: number;
+      flat: number;
+      coef: number;
+      maxTargets: number;
+    }
+  /** Muster Grapnel: hook a party or raid member within `range` yd (in line of
+   *  sight) and haul them through the air to your side in `flight` sec. */
+  | { kind: 'grapnel'; range: number; flight: number; apex: number }
+  /** A passive-only trinket (the Barrowstone Heart): nothing to use; the action
+   *  bar refuses the press and the tooltip prints no Use line. */
+  | { kind: 'passiveOnly' };
 
 /** What a trinket does on its own while worn. */
 export type TrinketPassive =
@@ -119,10 +162,15 @@ export type TrinketPassive =
   | { kind: 'ignite'; ticks: number; flat: number; coef: number }
   /** Heart of the Crucible: each parry, dodge or block you make adds a heat
    *  stack, up to `max`, kept for `duration`. */
-  | { kind: 'guardHeat'; max: number; duration: number };
+  | { kind: 'guardHeat'; max: number; duration: number }
+  /** Barrowstone Heart: a hit that would kill you turns you into a stone statue
+   *  for `statue` sec instead (immune to damage, unable to move or act), after
+   *  which you return at `restore` of your maximum health. Its internal cooldown
+   *  is the spec's `cooldown`. */
+  | { kind: 'stoneHeart'; statue: number; restore: number };
 
 export interface TrinketSpec {
-  /** Seconds between uses. */
+  /** Seconds between uses (for a passive-only trinket: its internal cooldown). */
   cooldown: number;
   use: TrinketUse;
   passive?: TrinketPassive;
@@ -155,6 +203,10 @@ export const TRINKET_AURA = Object.freeze({
   pierce: 'trinket_pierce',
   lantern: 'trinket_lantern',
   guardHeat: 'trinket_crucible_heat',
+  foremanShape: 'trinket_foreman_shape',
+  musterStandard: 'trinket_muster_standard',
+  gutteredGlare: 'trinket_guttered_glare',
+  stoneStatue: 'trinket_barrowstone_statue',
 });
 
 /** The Mooring Stone's self-slow rides its own aura id beside the anchor
@@ -192,6 +244,10 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.pierce]: 'molten_fletching',
   [TRINKET_AURA.lantern]: 'last_flame_lantern',
   [TRINKET_AURA.guardHeat]: 'heart_of_the_crucible',
+  [TRINKET_AURA.foremanShape]: 'knucklebone_of_balgath',
+  [TRINKET_AURA.musterStandard]: 'muster_standard',
+  [TRINKET_AURA.gutteredGlare]: 'guttered_eye',
+  [TRINKET_AURA.stoneStatue]: 'barrowstone_heart',
 });
 
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
@@ -263,7 +319,26 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   molten_fletching: trinket('molten_fletching', 'Molten Fletching', { agi: 15 }),
   last_flame_lantern: trinket('last_flame_lantern', 'Last Flame Lantern', { spi: 15 }),
   heart_of_the_crucible: trinket('heart_of_the_crucible', 'Heart of the Crucible', { sta: 15 }),
+  // Balgath, the One-Eyed Foreman (the Mirefen world boss, content/zone2.ts): five
+  // personal-loot trinkets at his item level 26 (a level-20 world boss epic), whose
+  // trinket line is 11 points on one attribute (tests/item_level.test.ts).
+  knucklebone_of_balgath: trinket('knucklebone_of_balgath', 'Knucklebone of Balgath', {
+    str: 11,
+  }),
+  muster_standard: trinket('muster_standard', 'Muster Standard', { sta: 11 }),
+  guttered_eye: trinket('guttered_eye', 'The Guttered Eye', { int: 11 }),
+  barrowstone_heart: trinket('barrowstone_heart', 'Barrowstone Heart', { sta: 11 }),
+  muster_grapnel: trinket('muster_grapnel', 'Muster Grapnel', { spi: 11 }),
 };
+
+/** Balgath's five trinkets, in the order they sit in his loot table. */
+export const BALGATH_TRINKET_ITEM_IDS: readonly string[] = [
+  'knucklebone_of_balgath',
+  'muster_standard',
+  'guttered_eye',
+  'barrowstone_heart',
+  'muster_grapnel',
+];
 
 // The Crucible of the Last Spring raid trinkets, in the order they sit in their
 // bosses' loot. They drop on BOTH difficulties: in each boss's Normal-only
@@ -367,6 +442,52 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
     cooldown: 60,
     use: { kind: 'heartNova', radius: 10, flat: 8, coef: 0.05 },
     passive: { kind: 'guardHeat', max: 10, duration: 30 },
+  },
+  // Balgath's five (combat/balgath_trinkets.ts). The numbers sit beside the
+  // shipped trinkets and class kit they compete with: the soldiers' swing is the
+  // hunter Stampede's shape (a flat range plus a small power share, snapshotted)
+  // on a longer cooldown and fewer bodies; the glare's per-tick hit is the
+  // Stormjar's per-charge scale spread over a 3 sec aimed channel.
+  knucklebone_of_balgath: {
+    cooldown: 120,
+    use: { kind: 'foremanShape', duration: 15, armorPct: 50 },
+  },
+  muster_standard: {
+    cooldown: 120,
+    use: {
+      kind: 'musterStandard',
+      duration: 15,
+      soldiers: 2,
+      attackInterval: 2,
+      min: 15,
+      max: 21,
+      coef: 0.07,
+      hpShare: 0.35,
+      leash: 40,
+      moveSpeed: 7.5,
+    },
+  },
+  guttered_eye: {
+    cooldown: 120,
+    use: {
+      kind: 'gutteredGlare',
+      duration: 3,
+      every: 0.5,
+      length: 30,
+      halfWidth: 1.25,
+      flat: 18,
+      coef: 0.08,
+      maxTargets: 8,
+    },
+  },
+  barrowstone_heart: {
+    cooldown: 180,
+    use: { kind: 'passiveOnly' },
+    passive: { kind: 'stoneHeart', statue: 3, restore: 0.2 },
+  },
+  muster_grapnel: {
+    cooldown: 90,
+    use: { kind: 'grapnel', range: 30, flight: 0.6, apex: 2.4 },
   },
 });
 

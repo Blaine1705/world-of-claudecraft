@@ -152,8 +152,10 @@ const build = await buildItemArtAudit({
     // The muster quests' weekly trophy barrowhide_slab (barrowhide-slab-icon-2026-09-27):
     // 1292 + 1 = 1293, 1310 + 1 = 1311. Over release/v0.44.0 the ten records push one
     // more group past a page boundary: 33 contact-sheet pages.
-    catalogCount: 1355,
-    liveItemCount: 1373,
+    // Balgath's loot: five trinkets and the Craterglass Stave, each with its own
+    // shipping WebP (balgath-loot-icons-2026-09-28): 1355 + 6 = 1361, 1373 + 6 = 1379.
+    catalogCount: 1361,
+    liveItemCount: 1379,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

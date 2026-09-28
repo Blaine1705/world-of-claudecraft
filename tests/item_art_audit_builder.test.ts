@@ -864,11 +864,13 @@ describe('item-art audit builder', () => {
       // painted weapons, re-measured with `--verify-only` on the merged tree.
       // 1355 / 1373 with the Mirefen world-boss branch (ten items: the boss spoils, both Shardpikes, the Wage rares and the barrowhide slab),
       // re-measured with `--verify-only` on the merged tree (33 pages).
-      catalogSha256: '8c628354cb3f4ed8f2209ec4d0ba065245b2865b618c8223147ab083ddba566d',
-      catalogBytes: 738552,
+      // 1361 / 1379 with Balgath's loot (five trinkets and the Craterglass Stave,
+      // balgath-loot-icons-2026-09-28), re-measured with `--verify-only`.
+      catalogSha256: 'c063835c8b744b381bb0192447d18089d249afd050d12285419128c95bb9b701',
+      catalogBytes: 741706,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1355,
-      liveItemCount: 1373,
+      catalogCount: 1361,
+      liveItemCount: 1379,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -886,7 +888,7 @@ describe('item-art audit builder', () => {
         identity: 33,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '9c03ae2565fced9cb9d3f264fc83750ae18b3d62a8f112bb3aef4ab90b822cc8',
+      shippingCatalogSha256: '53169d24c45ae8bd875715dec0fe7980ec57ae2f49e874921b87ab6e3facf09f',
       machineChecksPassed: true,
       verdict: null,
     });

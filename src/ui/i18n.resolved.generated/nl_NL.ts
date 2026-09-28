@@ -516,7 +516,7 @@ export const nl_NL: EnTranslations = {
     "shardpike": {
       "braceLabel": "Couch the Shardpike",
       "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
-      "thrustLabel": "Loomshard Thrust",
+      "thrustLabel": "Barrowglass Thrust",
       "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
       "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
       "releaseLabel": "Ground the Shardpike",
@@ -3116,8 +3116,10 @@ export const nl_NL: EnTranslations = {
         "storm": "Elke spreuk die je cast voegt een lading toe, tot {max}. Ladingen duren {duration} sec, vernieuwd wanneer je er een krijgt.",
         "heat": "Je melee en ranged wapen hits voegen elk een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt.",
         "ignite": "Je melee en ranged wapen kritieke treffen steken het doelwit in lichtelaaie, voor {tick} Vuur schade elke {every} sec voor {duration} sec. Een nieuwe kritieke treffer vernieuwt het. Schade neemt toe met Attack Power of Ranged Attack Power, wat het hoogste is.",
-        "guardHeat": "Elke aanval die je pareerd, ontwijkt of blokkeert, voegt een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt."
+        "guardHeat": "Elke aanval die je pareerd, ontwijkt of blokkeert, voegt een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Voor {duration} sec, een vijand die je rechtstreeks raakt, neemt Physical schade gelijk aan {pct}% van de gezondheid die die klap van je afnam. Periodieke schade triggert het niet.",
         "anchor": "Voor {duration} sec, neem {reduction}% minder schade maar beweeg op {speed}% snelheid. Verwijdert stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms en incapacitating effects op jou, en je negeert nieuwe en knockbacks terwijl het duurt.",
@@ -3136,7 +3138,11 @@ export const nl_NL: EnTranslations = {
         "kindlingOrb": "Roep een asmborb naast je op voor {duration} sec. Elke spreuk die je op een vijand cast laat hem een pijl op die vijand afvuren voor {damage} Vuur schade. Schade neemt toe met Spell Power.",
         "pierce": "Voor {duration} sec, je auto-attacks, shots en fysieke vaardigheden (geen bloeds) slaan ook de vijand dichtst bij je doelwit binnen {reach} yd voor {share}% van de toegebrachte schade.",
         "lantern": "Zet een lantaarn aan je voeten voor {duration} sec. Een directe genezing van iemand op je of een partylidmaatje binnen {radius} yd ervan geneest ook het meest gewonde andere partylidmaatje in het licht voor {share}% van de genezing.",
-        "heartNova": "Breng alle hittestapels uit op een vuurvuur die {perHeat} Vuur schade per stapel ({max} op {maxHeat} stapels) aan elke vijand binnen {radius} yd doet en elke vijand die het raakt daagt uit. Schade neemt toe met Attack Power. Vereist een hittestapel."
+        "heartNova": "Breng alle hittestapels uit op een vuurvuur die {perHeat} Vuur schade per stapel ({max} op {maxHeat} stapels) aan elke vijand binnen {radius} yd doet en elke vijand die het raakt daagt uit. Schade neemt toe met Attack Power. Vereist een hittestapel.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers run to your target and fight it in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, each has {hpPct}% of your maximum health, and they leave when the standard falls, when you die, or if you move more than {leash} yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken."
       }
     },
     "questShare": {
@@ -4042,6 +4048,10 @@ export const nl_NL: EnTranslations = {
         "moltenIgnite": "Toebrengen {damage} Vuurschade elke {every} sec. Een ander wapenkritiek raakt het.",
         "pierce": "Je automatische slagen, schoten en fysieke vaardigheden (geen bloedingen) slaan ook de vijand het dichtst bij je doelwit in {reach} yard voor {pct}% van de toegebrachte schade.",
         "lantern": "Een directe genezing van iedereen op jou of een partijlid in {radius} yard van de lantaarn genest ook het meest verwonde andere partijlid in het licht voor {pct}% van de genezing.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Hitte: {stacks}/{max}. Gebruik Hart van de Smeltkroes om alles te besteden aan een vuurnovaan die {damage} Vuurschade toebrengt aan elke vijand in {radius} yard en intimideer alle wezens die het raakt.",
         "crucibleHeatOther": "Hitte: {stacks}/{max}. Hart van de Smeltkroes besteedt alles aan een vuurnovaan in {radius} yard die meer Vuurschade toebrengt per stapel en intimideer alle wezens die het raakt."
       },
@@ -15601,7 +15611,7 @@ export const nl_NL: EnTranslations = {
         "name": "Skerrits Splinterpiek"
       },
       "loomshard_eye": {
-        "name": "Het Weefsplinter-Oog"
+        "name": "The Barrowglass Eye"
       },
       "barrowhide_pauldrons": {
         "name": "Grafheuvelschouderstukken"
@@ -17888,6 +17898,24 @@ export const nl_NL: EnTranslations = {
       },
       "barrowhide_slab": {
         "name": "Barrowhide Slab"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -20538,7 +20566,7 @@ export const nl_NL: EnTranslations = {
       "q_muster_summons": {
         "title": "The Muster's Summons",
         "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
-        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Loomshard blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
         "objectives": {
           "0": {
             "label": "Report to the Muster Commander"
@@ -20573,7 +20601,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_socketwrights_due": {
         "title": "The Socketwright's Due",
-        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
         "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
         "objectives": {
           "0": {

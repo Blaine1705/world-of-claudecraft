@@ -95,6 +95,7 @@ import {
   mitigateVicariousSuffering,
   onAfflictionDamage,
 } from './affliction';
+import { barrowstoneSave } from './balgath_trinkets';
 import { isUnbreakableControlAura } from './cc';
 import { stopChannelVisual } from './channel_visuals';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
@@ -973,6 +974,15 @@ export function dealDamage(
         });
       }
     }
+  }
+
+  // The Barrowstone Heart (combat/balgath_trinkets.ts): the last save asked, so every
+  // class and talent save above gets its turn first. A lethal hit turns the wearer to
+  // stone at 1 health instead. A guardian ward that already caught this blow has saved
+  // the wearer, so the Heart is not spent on it.
+  if (guardianWardRestore === 0) {
+    const stoned = barrowstoneSave(ctx, target, amount);
+    if (stoned !== null) amount = stoned;
   }
 
   // A Protect Yumi cat: the yumi module owns the clamp, the sudden-death

@@ -4,6 +4,7 @@ import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
+import { isBalgathDevLootCommand, runBalgathDevLoot } from './dev/balgath_dev_loot';
 import {
   BALGATH_DEV_MECHANICS,
   balgathDevHelp,
@@ -1272,6 +1273,14 @@ export function handleDevChat(
     return null;
   }
 
+  // [dev] Balgath's spoils in your bags (src/sim/dev/balgath_dev_loot.ts).
+  if (isBalgathDevLootCommand(raw)) {
+    const result = runBalgathDevLoot(ctx, pid);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    return null;
+  }
+
   // [dev] The muster's quest chain, solo (src/sim/dev/balgath_dev_quests.ts).
   const balgathQuests = parseBalgathQuestDevCommand(raw);
   if (balgathQuests) {
@@ -1289,7 +1298,7 @@ export function handleDevChat(
     else if (balgath.kind === 'unknown') {
       ctx.error(
         pid,
-        `[dev] Unknown Balgath mechanic '${balgath.verb}'. Usage: /dev balgath <${BALGATH_DEV_MECHANICS.join('|')}|wake|sleep|quests|trophy|weekly|drill|pound|help>.`,
+        `[dev] Unknown Balgath mechanic '${balgath.verb}'. Usage: /dev balgath <${BALGATH_DEV_MECHANICS.join('|')}|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>.`,
       );
     } else {
       const result =
@@ -1424,7 +1433,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|help>, /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

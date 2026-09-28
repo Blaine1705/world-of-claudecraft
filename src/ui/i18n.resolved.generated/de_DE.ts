@@ -516,7 +516,7 @@ export const de_DE: EnTranslations = {
     "shardpike": {
       "braceLabel": "Couch the Shardpike",
       "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
-      "thrustLabel": "Loomshard Thrust",
+      "thrustLabel": "Barrowglass Thrust",
       "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
       "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
       "releaseLabel": "Ground the Shardpike",
@@ -3116,8 +3116,10 @@ export const de_DE: EnTranslations = {
         "storm": "Jeder Zauber, den du wirkst, fügt eine Ladung hinzu, bis zu {max}. Ladungen halten {duration} Sek. an und werden erneuert, sooft du eine erhältst.",
         "heat": "Jeder deiner Nah- und Fernkampf-Waffentreffer fügt einen Hitzestapel hinzu, bis zu {max}. Hitze hält {duration} Sek. an und wird erneuert, sooft du einen Stapel erhältst.",
         "ignite": "Deine kritischen Nah- und Fernkampf-Waffentreffer setzen das Ziel in Brand und verursachen alle {every} Sek. {tick} Feuerschaden für {duration} Sek. Ein neuer kritischer Treffer erneuert den Effekt. Der Schaden steigt mit Angriffskraft oder Fernkampf-Angriffskraft, je nachdem, welcher Wert höher ist.",
-        "guardHeat": "Jeder Angriff, den du parierst, ausweichst oder blockst, fügt einen Hitzestapel hinzu, bis zu {max}. Hitze hält {duration} Sek. an und wird erneuert, sooft du einen Stapel erhältst."
+        "guardHeat": "Jeder Angriff, den du parierst, ausweichst oder blockst, fügt einen Hitzestapel hinzu, bis zu {max}. Hitze hält {duration} Sek. an und wird erneuert, sooft du einen Stapel erhältst.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "{duration} Sek. lang erleidet ein Feind, der dich direkt trifft, physischen Schaden in Höhe von {pct}% der Gesundheit, die dieser Treffer dir genommen hat. Regelmäßiger Schaden löst dies nicht aus.",
         "anchor": "{duration} Sek. lang erleidest du {reduction}% weniger Schaden, bewegst dich aber mit {speed}% Tempo. Entfernt Betäubungen, Wurzeln, Verlangsamungen, Furchteffekte, Verwandlungen, Stummschaltungen, Blendungen, Verhexungen, Entwaffnungen und handlungsunfähig machende Effekte von dir, und du ignorierst neue davon sowie Rückstöße, solange der Effekt anhält.",
@@ -3136,7 +3138,11 @@ export const de_DE: EnTranslations = {
         "kindlingOrb": "Beschwöre {duration} Sek. lang eine Glutkugel neben dir. Jeder Zauber, den du auf einen Feind wirkst, lässt sie einen Blitz auf dieses Ziel abfeuern, der {damage} Feuerschaden verursacht. Der Schaden steigt mit der Zaubermacht.",
         "pierce": "{duration} Sek. lang treffen deine automatischen Angriffe, Schüsse und physischen Fähigkeiten (keine Blutungen) zusätzlich den Feind, der deinem Ziel am nächsten ist, im Umkreis von {reach} yd, für {share}% des verursachten Schadens.",
         "lantern": "Stelle {duration} Sek. lang eine Laterne zu deinen Füßen ab. Eine direkte Heilung von irgendjemandem auf dich oder ein Gruppenmitglied im Umkreis von {radius} yd davon heilt zusätzlich das am schwersten verwundete andere Gruppenmitglied in ihrem Licht um {share}% der Heilung.",
-        "heartNova": "Gib alle Hitzestapel für eine Feuernova aus, die jedem Feind im Umkreis von {radius} yd {perHeat} Feuerschaden pro Stapel zufügt ({max} bei {maxHeat} Stapeln) und jede getroffene Kreatur bedroht. Der Schaden steigt mit der Angriffskraft. Erfordert einen Hitzestapel."
+        "heartNova": "Gib alle Hitzestapel für eine Feuernova aus, die jedem Feind im Umkreis von {radius} yd {perHeat} Feuerschaden pro Stapel zufügt ({max} bei {maxHeat} Stapeln) und jede getroffene Kreatur bedroht. Der Schaden steigt mit der Angriffskraft. Erfordert einen Hitzestapel.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers run to your target and fight it in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, each has {hpPct}% of your maximum health, and they leave when the standard falls, when you die, or if you move more than {leash} yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken."
       }
     },
     "questShare": {
@@ -4042,6 +4048,10 @@ export const de_DE: EnTranslations = {
         "moltenIgnite": "Verursacht alle {every} Sek. {damage} Feuerschaden. Ein weiterer kritischer Waffentreffer erneuert ihn.",
         "pierce": "Deine automatischen Angriffe, Schüsse und physischen Fähigkeiten (keine Blutungen) treffen zusätzlich den Feind, der deinem Ziel am nächsten ist, im Umkreis von {reach} yd, für {pct}% des verursachten Schadens.",
         "lantern": "Eine direkte Heilung von irgendjemandem auf dich oder ein Gruppenmitglied im Umkreis von {radius} yd der Laterne heilt zusätzlich das am schwersten verwundete andere Gruppenmitglied in ihrem Licht um {pct}% der Heilung.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Hitze: {stacks}/{max}. Setze Herz des Schmelztiegels ein, um sie vollständig für eine Feuernova auszugeben, die jedem Feind im Umkreis von {radius} yd {damage} Feuerschaden zufügt und jede getroffene Kreatur bedroht.",
         "crucibleHeatOther": "Hitze: {stacks}/{max}. Herz des Schmelztiegels gibt sie vollständig für eine Feuernova im Umkreis von {radius} yd aus, die für jeden Stapel mehr Feuerschaden verursacht und jede getroffene Kreatur bedroht."
       },
@@ -15601,7 +15611,7 @@ export const de_DE: EnTranslations = {
         "name": "Skerrits Splitterpike"
       },
       "loomshard_eye": {
-        "name": "Das Websplitter-Auge"
+        "name": "The Barrowglass Eye"
       },
       "barrowhide_pauldrons": {
         "name": "Hügelgrab-Schulterstücke"
@@ -17888,6 +17898,24 @@ export const de_DE: EnTranslations = {
       },
       "barrowhide_slab": {
         "name": "Barrowhide Slab"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
@@ -20538,7 +20566,7 @@ export const de_DE: EnTranslations = {
       "q_muster_summons": {
         "title": "The Muster's Summons",
         "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
-        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Loomshard blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, {playerName}, then everyone.",
         "objectives": {
           "0": {
             "label": "Report to the Muster Commander"
@@ -20573,7 +20601,7 @@ export const de_DE: EnTranslations = {
       },
       "q_socketwrights_due": {
         "title": "The Socketwright's Due",
-        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
         "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
         "objectives": {
           "0": {

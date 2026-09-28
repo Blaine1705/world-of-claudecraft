@@ -113,9 +113,8 @@ export class BossImpostorField {
   constructor(private scene: THREE.Scene) {
     this.group.name = 'bossImpostors';
     // He is a solid body on the horizon, not a glow: he must occlude and be occluded by the
-    // terrain in front of him like anything else, so this stays in the default render order
-    // with depth writes on.
-    this.group.renderOrder = 0;
+    // terrain in front of him like anything else, so this group keeps the default render
+    // order (never a Group order: tests/floor_vfx_layer.test.ts) with depth writes on.
     scene.add(this.group);
   }
 

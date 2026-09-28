@@ -194,7 +194,9 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // (27 five-piece spec sets plus four weapons) sourced at level 29, every one
     // deriving the same level-20 gate; no existing shelf row moved.
     // Plus the Mirefen world boss's four level-20 drops (the branch's 515 -> 519): 676.
-    expect(shelf.length).toBe(676);
+    // 676 -> 682 with Balgath's loot (five trinkets and the Craterglass Stave), each
+    // sourced at the level-20 boss; no existing shelf row moved.
+    expect(shelf.length).toBe(682);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

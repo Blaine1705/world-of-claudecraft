@@ -37,6 +37,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
+import { TRINKET_AURA } from '../content/trinkets';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
@@ -46,6 +47,7 @@ import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
+import { releaseStoneStatue, tickGutteredGlare } from './balgath_trinkets';
 import { regenParkedCatEnergy } from './cat_form_energy';
 import { isStunned } from './cc';
 import {
@@ -331,6 +333,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
           tickSacrilegiousMarch(ctx, e, a);
+        } else if (a.id === TRINKET_AURA.gutteredGlare) {
+          tickGutteredGlare(ctx, e, a);
+        } else if (a.id === TRINKET_AURA.stoneStatue) {
+          releaseStoneStatue(ctx, e, a);
         } else if (
           (a.kind === 'dot' || a.kind === 'affliction_eye' || a.kind === 'affliction_violence') &&
           !periodicHarmStands(ctx, ctx.entities.get(a.sourceId) ?? null, e)

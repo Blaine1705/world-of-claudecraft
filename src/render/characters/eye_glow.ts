@@ -1,6 +1,6 @@
 // A creature's eye, permanently lit.
 //
-// Balgath's whole identity is the Loomshard burning in his socket: it is what the fight is
+// Balgath's whole identity is the Barrowglass burning in his socket: it is what the fight is
 // named for, what his scry channel is, and the colour every one of his telegraphs borrows.
 // A boss whose one eye only lights up while he happens to be casting reads as a statue
 // between mechanics, and at raid distance the eye is the ONLY part of a grey stone

@@ -259,7 +259,7 @@ describe('the weapon rack lends a Shardpike through the real command path', () =
 // The lent pike, all the way to his eye, through the server's command switch
 // ---------------------------------------------------------------------------
 
-// The owner's playtest: braced with the rack's pike, the Loomshard Thrust did nothing. Both
+// The owner's playtest: braced with the rack's pike, the Barrowglass Thrust did nothing. Both
 // thrust gates compared the main hand against Skerrit's quest pike by literal id, so the
 // lent copy (which the brace accepts through isShardpikeItem) had its session ended silently
 // at the thrust and its throw dropped at release. Driven here as a client does it: the rack
