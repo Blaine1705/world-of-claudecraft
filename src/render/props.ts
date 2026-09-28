@@ -1933,7 +1933,7 @@ export function buildProps(
     const flame = new THREE.Mesh(flameGeo, campfireFlameMaterial());
     const holder = new THREE.Group();
     holder.position.set(spot.x, spot.y, spot.z);
-    holder.scale.setScalar(spot.scale);
+    holder.scale.set(spot.scale, spot.scale, spot.scale * (spot.depthZ ?? 1));
     holder.add(flame);
     group.add(holder);
     flames.push(flame);

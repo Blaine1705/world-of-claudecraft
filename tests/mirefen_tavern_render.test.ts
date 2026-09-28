@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
-import { PerspectiveCamera, Vector3 } from 'three';
+import { PerspectiveCamera, Raycaster, Vector3 } from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
@@ -14,6 +14,7 @@ import {
 } from '../src/render/interior_camera';
 import {
   buildMirefenTavern,
+  MIREFEN_TAVERN_FLAMES,
   MIREFEN_TAVERN_LIGHTS,
   mirefenTavernInternalsForTest,
   mirefenTavernLights,
@@ -37,6 +38,7 @@ import {
   TAVERN_HALL,
   TAVERN_LANTERNS,
   TAVERN_ORIGIN,
+  TAVERN_PROPS,
   TAVERN_STAGE,
   TAVERN_TOWER,
   TAVERN_YAW,
@@ -69,8 +71,9 @@ function triangles(root: THREE.Object3D): number {
   let n = 0;
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
-    // (the chimney smoke's billboards are the painter's own, not the model's)
+    // (the chimney smoke's billboards and the wall fire are the painter's own, not the model's)
     if (!mesh.isMesh || mesh.name === 'mirefenTavernSmoke') return;
+    if (mesh.name.startsWith('mirefenTavernWallFire')) return;
     const g = mesh.geometry;
     n += (g.index ? g.index.count : g.getAttribute('position').count) / 3;
   });
@@ -428,5 +431,72 @@ describe('mirefen tavern painter', () => {
       expect(l.position.y).toBeGreaterThan(TAVERN_FLOOR_Y);
       expect(l.position.y).toBeLessThan(TAVERN_FLOOR_Y + 11);
     }
+  });
+
+  // The model's firebox is only a shallow soot panel in the breast's face: a flame set back
+  // inside the breast burned hidden in the stone (an empty black firebox, stray embers). The
+  // wall fire's flames must stand in the mouth, in view from the room, on every tier.
+  it('burns the wall fire in the fireplace mouth, in view from the room', () => {
+    const fire = TAVERN_PROPS.find((p) => p.kind === 'fireplace');
+    if (!fire) throw new Error('fireplace');
+    const wall = MIREFEN_TAVERN_FLAMES.filter((f) => {
+      const lx = TAVERN_ORIGIN.z - f.z;
+      const lz = f.x - TAVERN_ORIGIN.x;
+      return Math.abs(lx - fire.x) < 3 && Math.abs(lz - fire.z) < (fire.hd ?? 0) + 1;
+    });
+    expect(wall.length).toBeGreaterThan(0);
+    for (const tier of ['low', 'high'] as const) {
+      withTier(tier);
+      const tavern = buildMirefenTavern();
+      tavern.updateMatrixWorld(true);
+      const blockers: THREE.Mesh[] = [];
+      tavern.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (mesh.isMesh && !mesh.name.startsWith('mirefenTavernWallFire')) blockers.push(mesh);
+      });
+      const ray = new Raycaster();
+      for (const f of wall) {
+        // the middle of the flame, seen from a stride before the hearth (over the settle)
+        const target = new Vector3(f.x, f.y + 0.45 * f.scale, f.z);
+        const lz = f.x - TAVERN_ORIGIN.x;
+        const from = at(fire.x - (fire.hw ?? 0) - 1.0, target.y - TAVERN_FLOOR_Y + 0.4, lz);
+        const origin = new Vector3(from.x, from.y, from.z);
+        const dir = target.clone().sub(origin);
+        const dist = dir.length();
+        ray.set(origin, dir.normalize());
+        ray.far = dist;
+        const hit = ray.intersectObjects(blockers, false)[0];
+        expect(
+          hit,
+          `${tier}: the flame at ${f.x.toFixed(2)}, ${f.z.toFixed(2)} is hidden`,
+        ).toBeUndefined();
+      }
+      // the logs, the embers and the glow are built with the tavern
+      expect(tavern.getObjectByName('mirefenTavernWallFireLogs'), tier).toBeDefined();
+      expect(tavern.getObjectByName('mirefenTavernWallFireEmbers'), tier).toBeDefined();
+    }
+  });
+
+  it('flickers the firelight on the soot and the hearth, still under reduced motion', () => {
+    withTier('medium');
+    const tavern = buildMirefenTavern();
+    const glows: THREE.MeshBasicMaterial[] = [];
+    tavern.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (mesh.isMesh && mesh.name === 'mirefenTavernWallFireGlow') {
+        glows.push(mesh.material as THREE.MeshBasicMaterial);
+      }
+    });
+    expect(glows).toHaveLength(2);
+    const seen = new Set<number>();
+    for (let i = 0; i < 30; i++) {
+      updateMirefenTavernShell(0, 5, 0, 0, 2, 0, 1 / 20);
+      seen.add(Math.round(glows[0].opacity * 1e4));
+    }
+    expect(seen.size).toBeGreaterThan(5);
+    updateMirefenTavernShell(0, 5, 0, 0, 2, 0, 1 / 20, true);
+    const still = glows[0].opacity;
+    updateMirefenTavernShell(0, 5, 0, 0, 2, 0, 1 / 20, true);
+    expect(glows[0].opacity).toBe(still);
   });
 });

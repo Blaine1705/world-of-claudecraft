@@ -175,7 +175,12 @@ mood and proportion only and never entered the build.
 - **Fires and lights.** The round hearth and the wall fireplace burn with the campfires' live
   flame (`MIREFEN_TAVERN_FLAMES`, built in `src/render/props.ts`), lit by the fire-light budget
   with the chandelier, the lit lanterns under the hammer beams, the stage's footlights, the
-  bar's candles and the nook's crown (`mirefenTavernLights`).
+  bar's candles and the nook's crown (`mirefenTavernLights`). The model's firebox is only a
+  shallow soot panel in the breast's face, so the wall fire stands in the mouth: its flames,
+  logs, bed of embers and a flickering glow on the soot and the hearthstone
+  (`src/render/mirefen_tavern_wall_fire_core.ts` lays them out in front of the panel,
+  `mirefen_tavern_wall_fire.ts` draws them in the model's own materials; the render test checks
+  the flames are in view from the room).
 
 - **Sitting.** A right-click (or a left-click) on a seat the camera can see walks the body to
   its stand spot and sits it (`src/game/seat_interact.ts`, the ornate chair cursor on hover).

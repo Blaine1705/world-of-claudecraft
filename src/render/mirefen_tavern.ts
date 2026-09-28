@@ -75,6 +75,8 @@ import {
   mirefenTavernSmokePrewarmPart,
   type TavernSmokeView,
 } from './mirefen_tavern_smoke';
+import { buildMirefenTavernWallFire, type TavernWallFireView } from './mirefen_tavern_wall_fire';
+import { TAVERN_WALL_FIRE_FLAMES, TAVERN_WALL_FIRE_LIGHT } from './mirefen_tavern_wall_fire_core';
 import { ditherFadeUniform } from './occluder_dither_fade';
 import {
   applyOccluderFade,
@@ -140,9 +142,10 @@ interface ShellRecord {
 
 let shell: ShellRecord[] = [];
 let shellGroup: THREE.Group | null = null;
-/** The dog's breathing group and the chimney smoke (null when not built). */
+/** The dog's breathing group, the chimney smoke and the wall fire (null when not built). */
 let dogGroup: THREE.Group | null = null;
 let smoke: TavernSmokeView | null = null;
+let wallFire: TavernWallFireView | null = null;
 let lifeClock = 0;
 const breath: DogBreath = { y: 1, xz: 1 };
 /** Where the dog lies (world), for its breathing range. */
@@ -240,6 +243,18 @@ function buildShell(parts: ReadonlyMap<TavernShellPart, readonly VertexColourPar
   return group;
 }
 
+/** The wall fire over the model's own materials: its plain vertex-coloured one for the logs
+ *  and its glow for the embers (none when the model carries no glow). */
+function buildTavernWallFire(parts: readonly VertexColourPart[]): TavernWallFireView | null {
+  const glows = (p: VertexColourPart) =>
+    ((p.material as THREE.MeshLambertMaterial).emissive?.getHex() ?? 0) !== 0;
+  const wood = parts.find((p) => !glows(p));
+  const glow = parts.find(glows);
+  if (!wood || !glow) return null;
+  const colour = wood.geometry.getAttribute('color');
+  return buildMirefenTavernWallFire(wood.material, glow.material, colour?.itemSize ?? 3);
+}
+
 /** The tavern, built once into the props root (built-in world only). */
 export function buildMirefenTavern(): THREE.Group {
   // a second build (a world swap, an editor rebuild) disposes the last build's clones first
@@ -273,6 +288,10 @@ export function buildMirefenTavern(): THREE.Group {
   }
   model.add(dogGroup);
   dogWorld = tavernToWorld(template.dogAt.x, template.dogAt.z);
+  // the wall fire's logs, embers and glow in the fireplace's mouth, in the model's own
+  // vertex-coloured and glow materials (mirefen_tavern_wall_fire.ts)
+  wallFire = buildTavernWallFire(template.parts);
+  if (wallFire) model.add(wallFire.group);
   lastParts = [
     ...template.parts,
     ...template.dog,
@@ -280,6 +299,7 @@ export function buildMirefenTavern(): THREE.Group {
       r.meshes.map((m) => ({ geometry: m.geometry, material: m.material as THREE.Material })),
     ),
   ];
+  if (wallFire) lastParts.push(...wallFire.parts);
   // the chimney smoke: cosmetic, from medium effects up
   smoke = GFX.effectsTier === 'low' ? null : buildMirefenTavernSmoke();
   if (smoke) {
@@ -326,24 +346,33 @@ function light(
   return l;
 }
 
-/** Where the live flames burn (world yards, the base of each flame, its size): three tongues
- *  over the round hearth's logs and one in the wall fireplace (props.ts builds them with the
+/** One live flame (world yards): the base of the flame, its size, and an optional squash of
+ *  its depth along world z (the wall fire's tongues hug the fireplace's back). */
+export interface TavernFlameSpot {
+  x: number;
+  y: number;
+  z: number;
+  scale: number;
+  depthZ?: number;
+}
+
+/** Where the live flames burn: three tongues over the round hearth's logs and three in the
+ *  wall fireplace's mouth (mirefen_tavern_wall_fire_core.ts; props.ts builds them with the
  *  campfires' flame, so they flicker and throw embers like any campfire). */
-export const MIREFEN_TAVERN_FLAMES: readonly { x: number; y: number; z: number; scale: number }[] =
-  (() => {
-    const at = (lx: number, ly: number, lz: number, scale: number) => {
-      const w = tavernToWorld(lx, lz);
-      return { x: w.x, y: TAVERN_FLOOR_Y + ly, z: w.z, scale };
-    };
-    const base = -TAVERN_PIT.depth + 0.5;
-    const fire = TAVERN_PROPS.find((p) => p.kind === 'fireplace');
-    return [
-      at(TAVERN_PIT.x, base, TAVERN_PIT.z, 2.1),
-      at(TAVERN_PIT.x + 0.45, base, TAVERN_PIT.z + 0.25, 1.4),
-      at(TAVERN_PIT.x - 0.4, base, TAVERN_PIT.z - 0.3, 1.5),
-      ...(fire ? [at(fire.x - (fire.hw ?? 0) + 0.4, 0.25, fire.z, 1.25)] : []),
-    ];
-  })();
+export const MIREFEN_TAVERN_FLAMES: readonly TavernFlameSpot[] = (() => {
+  const at = (lx: number, ly: number, lz: number, scale: number, depthZ?: number) => {
+    const w = tavernToWorld(lx, lz);
+    return { x: w.x, y: TAVERN_FLOOR_Y + ly, z: w.z, scale, ...(depthZ ? { depthZ } : {}) };
+  };
+  const base = -TAVERN_PIT.depth + 0.5;
+  return [
+    at(TAVERN_PIT.x, base, TAVERN_PIT.z, 2.1),
+    at(TAVERN_PIT.x + 0.45, base, TAVERN_PIT.z + 0.25, 1.4),
+    at(TAVERN_PIT.x - 0.4, base, TAVERN_PIT.z - 0.3, 1.5),
+    // the local x axis (across the mouth's depth) is the world z axis (TAVERN_YAW)
+    ...TAVERN_WALL_FIRE_FLAMES.map((f) => at(f.x, f.y, f.z, f.scale, f.depth)),
+  ];
+})();
 
 /** The live flames to build: none when the model never loaded (no fire without its hearth). */
 export function mirefenTavernFlameSpots(): typeof MIREFEN_TAVERN_FLAMES {
@@ -356,8 +385,8 @@ export function mirefenTavernLights(): THREE.PointLight[] {
   if (!loaded) return [];
   const L = MIREFEN_TAVERN_LIGHTS;
   const out = [light(L.hearth, 'tavernHearth', TAVERN_PIT.x, 1.4, TAVERN_PIT.z)];
-  const fire = TAVERN_PROPS.find((p) => p.kind === 'fireplace');
-  if (fire) out.push(light(L.wallFire, 'tavernWallFire', fire.x - 1.6, 1.1, fire.z));
+  const wf = TAVERN_WALL_FIRE_LIGHT;
+  out.push(light(L.wallFire, 'tavernWallFire', wf.x, wf.y, wf.z));
   const c = TAVERN_CHANDELIER;
   out.push(light(L.chandelier, 'tavernChandelier', c.x, c.y - 0.4, c.z));
   for (const spot of TAVERN_LANTERNS) {
@@ -467,6 +496,7 @@ function updateMirefenTavernLife(
 ): void {
   lifeClock += dt;
   smoke?.update(camX, camZ, dt);
+  wallFire?.update(lifeClock, reducedMotion);
   if (!dogGroup) return;
   const near =
     (camX - dogWorld.x) ** 2 + (camZ - dogWorld.z) ** 2 < DOG_BREATH_RANGE * DOG_BREATH_RANGE;
@@ -490,6 +520,8 @@ export function clearMirefenTavernShell(): void {
   shellGroup = null;
   dogGroup = null;
   smoke = null;
+  wallFire?.dispose();
+  wallFire = null;
   unregisterCameraInterior(TAVERN_CAMERA_INTERIOR.id);
 }
 

@@ -811,6 +811,8 @@ const RENDER_PURE_CORES = [
   // the tavern's dog breathing on its porch and its chimney smoke
   'src/render/mirefen_tavern_dog_core.ts',
   'src/render/mirefen_tavern_smoke_core.ts',
+  // the tavern's wall fire laid out in its fireplace's mouth
+  'src/render/mirefen_tavern_wall_fire_core.ts',
   // the chase camera's floor (ground, rift tier, maze hedges), out of renderer.ts
   'src/render/chase_camera_floor_core.ts',
   'src/render/ship_wake_core.ts',
