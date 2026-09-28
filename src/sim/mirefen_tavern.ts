@@ -152,9 +152,15 @@ function boxCollider(b: TavernBox, extra: Partial<Collider>): Collider {
   );
 }
 
-/** One furnishing's collider, seated on its level's floor. */
+/** The floor a furnishing stands on, over the ground floor: its level's, or the terrain's
+ *  under it for a piece outside (`baseY`). */
+export function tavernPropBaseY(prop: TavernProp): number {
+  return prop.baseY ?? tavernLevelY(prop.level);
+}
+
+/** One furnishing's collider, seated on its floor. */
 export function tavernPropCollider(prop: TavernProp): Collider {
-  const top = TAVERN_FLOOR_Y + tavernLevelY(prop.level) + prop.height;
+  const top = TAVERN_FLOOR_Y + tavernPropBaseY(prop) + prop.height;
   const move = prop.standable ? { moveTopY: top, standable: true as const } : {};
   if (prop.r !== undefined) {
     const w = tavernToWorld(prop.x, prop.z);

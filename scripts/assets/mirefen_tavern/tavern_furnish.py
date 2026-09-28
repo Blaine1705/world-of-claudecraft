@@ -4,7 +4,8 @@ build(B, parts) with itself as B).
   TavernFurnishings  every piece of furniture the sim collides with, drawn at its collider:
                      the benches round the fire and round the nook, the tables, chairs and
                      stools, the high-backed settles of the booths and the fire, the barrel
-                     racks behind the bar, the stage's chest, the kegs on the short counter
+                     racks behind the bar, the stage's chest, the kegs on the short counter,
+                     the porch's bench and casks, the flower tubs at the steps' foot
   TavernLights       the lanterns hung under the hammer beams, the wheel chandelier over the
                      entry, the iron sconces, a candle on every table, the bar's candles, the
                      stage's footlights, the nook's crown, the hearth's fire (every tier)
@@ -275,9 +276,48 @@ def barrels(B, p, trim, q):
                           B.pick(B.PAL['honey'], i * 2 + j))
 
 
+def cask(B, p, trim, q):
+    """A barrel stood on its end (the porch's): bellied staves in two alternating tones; from
+    medium up a darker head in its chime, two iron hoops and the bung on its belly turned by
+    the prop's yaw, so no two in a row read alike."""
+    base, top = q['base'], q['base'] + q['height']
+    x, z, r, a = q['x'], q['z'], q['r'], q['rot']
+    tone = B.pick(B.PAL['honey'], int(round(a * 5)))
+    p.sweep([(x, base, z), (x, (base + top) / 2, z), (x, top, z)], r, r, tone, sides=10,
+            radii=[r * 0.85, r, r * 0.85], phase=a,
+            color_fn=lambda i, k: B.scale_color(tone, 0.9 + 0.16 * (k % 2)))
+    trim.cylinder((x, top - 0.02, z), (x, top + 0.01, z), r * 0.74, B.scale_color(tone, 0.72), B.WOOD, sides=10,
+                  phase=a)
+    for f in (0.16, 0.84):
+        rr = r * (0.85 + 0.15 * math.sin(math.pi * f)) + 0.012
+        trim.ring((x, base + (top - base) * f, z), rr, 0.07, B.PAL['iron'], segments=10, axis=(0, 1, 0),
+                  mat=B.METAL, depth=0.035)
+    bx, bz = x + math.sin(a) * r, z + math.cos(a) * r
+    trim.box((bx, (base + top) / 2, bz), (0.1, 0.1, 0.1), B.PAL['beam_dark'], B.WOOD, yaw=a)
+
+
+def planter(B, p, trim, q):
+    """A dressed-stone flower tub on the terrain at the foot of the porch steps: an eight-
+    sided bowl flaring to its lip, sunk into the ground (every tier); a darker lip, the soil
+    and a mound of greens from medium up (the flowers are clutter, tavern_facade.py)."""
+    base, top = q['base'], q['base'] + q['height']
+    x, z, r, a = q['x'], q['z'], q['r'], q['rot']
+    stone = B.pick(B.PAL['ashlar'], int(round(a * 5)))
+    p.cylinder((x, base - 0.35, z), (x, top, z), r * 0.72, stone, B.STONE, sides=8, r1=r, phase=a)
+    trim.cylinder((x, top - 0.12, z), (x, top + 0.02, z), r + 0.05, B.PAL['ashlar_dark'], B.STONE, sides=8,
+                  phase=a)
+    trim.cylinder((x, top + 0.02, z), (x, top + 0.05, z), r - 0.06, (0.24, 0.17, 0.11), B.PLASTER, sides=8,
+                  phase=a)
+    greens = [(0.25, 0.4, 0.2), (0.31, 0.47, 0.23), (0.21, 0.35, 0.19)]
+    for k in range(3):
+        b = a + k * 2.1
+        trim.rock_blob((x + math.sin(b) * r * 0.35, top + 0.2, z + math.cos(b) * r * 0.35), (0.5, 0.42, 0.5),
+                       greens[k], B.PLASTER, jitter=0.2, subdivisions=0)
+
+
 FURNITURE = {
     'bench': bench, 'table': table, 'roundTable': round_table, 'chair': chair, 'stool': stool,
-    'settle': settle, 'chest': chest, 'barrels': barrels,
+    'settle': settle, 'chest': chest, 'barrels': barrels, 'cask': cask, 'planter': planter,
 }
 
 
@@ -680,15 +720,8 @@ def clutter(B, p):
     p.cylinder((-5.0, 0.0, 12.75), (-5.0, 0.5, 12.75), 0.24, B.PAL['beam'], B.WOOD, sides=8, r1=0.28)
     for k_, (x, z) in enumerate(((14.4, -3.4), (14.7, -2.7))):
         p.rock_blob((x, 0.45, z), (0.7, 0.9, 0.6), (0.72, 0.62, 0.44), B.PLASTER, jitter=0.08)
-    # outside by the porch: barrels and a crate against the stone base
-    for (x, z, r) in ((5.3, 14.7, 0.55), (6.4, 14.6, 0.5), (5.8, 15.6, 0.5)):
-        g = B.ground(x, z)
-        p.sweep([(x, g, z), (x, g + 0.75, z), (x, g + 1.5, z)], r, r, B.PAL['honey'][1], sides=10,
-                radii=[r * 0.86, r, r * 0.86])
-        p.cylinder((x, g + 1.48, z), (x, g + 1.52, z), r * 0.84, B.PAL['beam'], B.WOOD, sides=10)
-        for yy in (0.25, 1.25):
-            p.ring((x, g + yy, z), r * 0.93, 0.07, B.PAL['iron'], segments=10, axis=(0, 1, 0), mat=B.METAL,
-                   depth=0.04)
+    # outside by the porch: a crate against the stone base (the casks stand on the porch,
+    # the sim's TAVERN_PROPS)
     g = B.ground(-5.8, 14.9)
     p.box((-5.8, g + 0.55, 14.9), (1.1, 1.1, 1.1), B.PAL['honey'][2], B.WOOD, yaw=0.3)
     p.box((-5.6, g + 1.45, 14.8), (0.7, 0.7, 0.7), B.PAL['honey'][0], B.WOOD, yaw=-0.2)

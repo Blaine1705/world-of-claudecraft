@@ -101,6 +101,8 @@ PAL = dict(
     iron=(0.28, 0.28, 0.3),
     iron_hi=(0.42, 0.42, 0.44),
     glass=(0.58, 0.42, 0.2),
+    # a lit window's glass: the lanterns' warm glow, a little deeper than their panes
+    glass_lit=(0.86, 0.56, 0.26),
     cream=(0.94, 0.9, 0.78),
     foam=(0.98, 0.95, 0.86),
     fire=(1.0, 0.56, 0.18),
@@ -389,9 +391,10 @@ def timber_wall(p, wall, t, top, openings, base_h=1.4, stone_to=0.0, bays=3.2, y
     return posts
 
 
-def window(p, wall, u0, u1, v0, v1, t, shutters=True, bars=2):
+def window(p, wall, u0, u1, v0, v1, t, shutters=True, bars=2, lit=False):
     """A small window through a wall: a timber frame round the hole, a mullion and a transom,
-    leaded amber panes, a stone sill and a pair of garnet shutters folded back outside."""
+    leaded amber panes, a stone sill and a pair of garnet shutters folded back outside. A `lit`
+    window's panes are the lanterns' glowing glass (TavernGlow: the hall behind is lit)."""
     half = t / 2
     col = PAL['beam_dark']
     for s in (1, -1):
@@ -400,7 +403,10 @@ def window(p, wall, u0, u1, v0, v1, t, shutters=True, bars=2):
         wall.beam(p, u1 + 0.1, v0 - 0.08, u1 + 0.1, v1 + 0.08, w, 0.2, 0.14, col)
         wall.beam(p, u0 - 0.2, v1 + 0.1, u1 + 0.2, v1 + 0.1, w, 0.22, 0.16, col)
     # panes in the wall's middle plane, and the lead cames
-    wall.box(p, u0, u1, v0, v1, -0.03, 0.03, PAL['glass'], STONE, tag=FLAT)
+    if lit:
+        wall.box(p, u0, u1, v0, v1, -0.03, 0.03, PAL['glass_lit'], GLOW, tag=FLAT)
+    else:
+        wall.box(p, u0, u1, v0, v1, -0.03, 0.03, PAL['glass'], STONE, tag=FLAT)
     um = (u0 + u1) / 2
     wall.box(p, um - 0.05, um + 0.05, v0, v1, -0.07, 0.07, col, WOOD)
     for k in range(1, bars + 1):
@@ -482,6 +488,7 @@ def make_materials():
 # ---------------------------------------------------------------------------
 # Scene
 # ---------------------------------------------------------------------------
+import tavern_facade as FA  # noqa: E402
 import tavern_frame as F  # noqa: E402
 import tavern_furnish as U  # noqa: E402
 import tavern_shell as S  # noqa: E402
@@ -661,6 +668,7 @@ def build_scene():
     F.build(this, parts)
     S.build(this, parts)
     U.build(this, parts)
+    FA.build(this, parts)
     # the front wall's two sides are their own parts: a camera at an angle to the door ghosts
     # only the side between it and the player
     split_part(parts, 'HallWallFront', [('HallWallFrontLeft', lambda c: c.x < -FRONT_SPLIT),

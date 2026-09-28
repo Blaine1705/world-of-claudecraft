@@ -24,10 +24,16 @@ import {
 import { TAVERN_HALL_AIR_TOP } from '../src/render/mirefen_tavern_interior_core';
 import {
   TAVERN_DOOR,
+  TAVERN_FLOOR_Y,
   TAVERN_HALL,
   TAVERN_HOOD,
+  TAVERN_PROPS,
   TAVERN_TOWER,
+  tavernToWorld,
 } from '../src/sim/content/mirefen_tavern';
+import { tavernPropBaseY, tavernPropCollider } from '../src/sim/mirefen_tavern';
+import { terrainHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The shipped Mirefen tavern GLB (public/models/props/mirefen_tavern.glb), built in Blender from
 // the sim's own layout (scripts/assets/mirefen_tavern/layout.json, exported from
@@ -39,16 +45,16 @@ import {
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
-const SHIPPED_SHA256 = '46b08756e814f3b47324c1245e08c7b95c0bf22e1dfcc277c369c3d2e3b36f1d';
-const SHIPPED_BYTES = 981696;
+const SHIPPED_SHA256 = 'aad9bd6c659f64b4785a428bba55268b160aaff5d1395288b148ad1273cd5701';
+const SHIPPED_BYTES = 1060580;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   TavernFrame: 10976,
-  TavernFurnishings: 7836,
+  TavernFurnishings: 8096,
   TavernLights: 4680,
   HallWallFront: 968,
-  HallWallFrontLeft: 1152,
-  HallWallFrontRight: 1152,
+  HallWallFrontLeft: 1300,
+  HallWallFrontRight: 1300,
   HallWallBack: 2612,
   HallWallLeft: 2512,
   HallWallRight: 4212,
@@ -59,10 +65,10 @@ const TRIANGLES: Record<string, number> = {
   WingRoof: 1224,
   TowerWall: 4370,
   TowerRoof: 2000,
-  HallPorch: 1980,
+  HallPorch: 2396,
   BarPillar: 784,
-  TavernTrim: 2900,
-  TavernClutter: 6478,
+  TavernTrim: 5334,
+  TavernClutter: 8134,
 };
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */
 const PLAYER_H = 2.6;
@@ -174,12 +180,18 @@ describe('mirefen tavern GLB', () => {
       total += count;
     }
     expect(trianglesUnder(node('MirefenTavern_ROOT'))).toBe(total);
-    // a whole inn with its booths, stage, nook, kitchen and hammerbeam roof: under 68k in all,
-    // the low tier under 58k, the shipped file under a megabyte
-    expect(total).toBeLessThan(68000);
+    // a whole inn with its booths, stage, nook, kitchen and hammerbeam roof: under 72.5k in
+    // all, the low tier under 58k, the shipped file under 1100 KiB. The total and the file
+    // were raised from 68k and 1000 KiB (by 4.5k triangles and 100 KiB) for the dressed front
+    // the road sees: window boxes under all four front windows and hoods over the lower two,
+    // the ivy's leaf clusters, the hanging baskets, the tubs' greens and flowers, the carved
+    // bargeboards, the doormat, the weathering and the casks' hoops, all medium or high tier;
+    // the low tier keeps its 58k (the porch's bench and casks, the steps' flower tubs, the
+    // door lanterns and the sign's ironwork and board fit inside it)
+    expect(total).toBeLessThan(72500);
     const low = TAVERN_CRITICAL_PARTS.reduce((n, p) => n + TRIANGLES[p], 0);
     expect(low).toBeLessThan(58000);
-    expect(readFileSync(GLB).length).toBeLessThan(1000 * 1024);
+    expect(readFileSync(GLB).length).toBeLessThan(1100 * 1024);
   });
 
   it("stamps the sim's numbers, all generous next to the player", () => {
@@ -274,6 +286,26 @@ describe('mirefen tavern GLB', () => {
     // ...and the side parts' walls start at the split, their door leaves inside it
     const left = xs('HallWallFrontLeft');
     expect(Math.max(...left)).toBeGreaterThan(-TAVERN_FRONT_SPLIT - 0.5);
+  });
+
+  it('stands the flower tubs at the foot of the steps on the terrain, colliding there', () => {
+    // a piece outside on the terrain carries the ground's height under its middle (baseY):
+    // the model seats it there and the sim's collider tops it there, never at the porch's floor
+    const tubs = TAVERN_PROPS.filter((p) => p.baseY !== undefined);
+    expect(tubs.map((p) => p.kind)).toEqual(['planter', 'planter']);
+    const layout = mirefenTavernLayout().props;
+    for (const p of tubs) {
+      const w = tavernToWorld(p.x, p.z);
+      const ground = terrainHeight(w.x, w.z, WORLD_SEED) - TAVERN_FLOOR_Y;
+      expect(Math.abs((p.baseY ?? 0) - ground), `${p.x}`).toBeLessThan(0.02);
+      expect(tavernPropBaseY(p)).toBe(p.baseY);
+      const c = tavernPropCollider(p);
+      expect(c.moveTopY).toBeCloseTo(TAVERN_FLOOR_Y + ground + p.height, 1);
+      expect(c.standable).toBe(true);
+      expect(layout.some((q) => q.kind === 'planter' && q.x === p.x && q.base === p.baseY)).toBe(
+        true,
+      );
+    }
   });
 
   it('stands on the ground floor at its origin, the base running down into the ground', () => {

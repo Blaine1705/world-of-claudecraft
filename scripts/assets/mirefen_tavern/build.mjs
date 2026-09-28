@@ -30,6 +30,7 @@ export const MIREFEN_TAVERN_ASSET = {
     'scripts/assets/mirefen_tavern/tavern_frame.py',
     'scripts/assets/mirefen_tavern/tavern_shell.py',
     'scripts/assets/mirefen_tavern/tavern_furnish.py',
+    'scripts/assets/mirefen_tavern/tavern_facade.py',
     'scripts/assets/mirefen_tavern/layout.json',
     'scripts/assets/eastbrook_ferry/shiplib.py',
     'scripts/assets/mirefen_tavern/build.mjs',

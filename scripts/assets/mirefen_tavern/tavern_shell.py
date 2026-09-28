@@ -4,10 +4,12 @@ whatever hangs on a wall with it (windows, the door, the notice board, trophies,
 curtain, the kitchen hatch, the wall fireplace and its river-stone chimney).
 
   HallWallFront   the front gable: the doorway and its open doors, two windows, two high
-                  lights, the round gable window, the door lanterns
+                  lights and the round gable window (their glass glowing like the lanterns':
+                  the lit hall behind), the door lanterns (tavern_facade.py)
   HallPorch       the porch canopy on its brackets and the giant tankard hanging from its
-                  iron arm: its own part, so a camera behind it ghosts it alone, never the
-                  whole front
+                  iron arm, the arm's carved board and scrollwork and the painted board under
+                  the tankard (tavern_facade.py): its own part, so a camera behind it ghosts
+                  it alone, never the whole front
   HallWallBack    the back gable: the arch onto the tower's nook with its voussoirs, the
                   kitchen's serving hatch with its sill and shutters, the stage's curtain
                   under its pelmet, the garnet banner over it, a shield and crossed spears
@@ -26,6 +28,16 @@ curtain, the kitchen hatch, the wall fireplace and its river-stone chimney).
   TowerRoof       its slate cone, the rafters seen from the nook under it, and its finial
 """
 import math
+
+import tavern_facade as FA
+
+# the two ground-floor windows in the front gable, either side of the door (u along the
+# wall from its left end, v up): the window booths inside look out of them
+FRONT_WINDOWS = ((6.2, 7.8, 2.8, 5.0), (24.2, 25.8, 2.8, 5.0))
+# the two upper windows (high lights) either side of the porch canopy
+FRONT_UPPER_WINDOWS = ((9.4, 10.6, 6.6, 8.4), (21.4, 22.6, 6.6, 8.4))
+# the front wall's posts (local x), filled by hall_front
+FRONT_POSTS = []
 
 
 def build(B, parts):
@@ -63,17 +75,6 @@ def wing_y(B, x):
 # ---------------------------------------------------------------------------
 # Small wall furniture
 # ---------------------------------------------------------------------------
-def wall_lantern(B, p, wall, u, v, out=0.7):
-    """A lantern on an iron arm out from a wall's outer face."""
-    t = B.HALL['wall']
-    x0, y0, z0 = wall.pt(u, v + 0.6, t / 2)
-    x1, y1, z1 = wall.pt(u, v + 0.6, t / 2 + out)
-    B.beam(p, (x0, y0, z0), (x1, y1, z1), 0.07, 0.07, B.PAL['iron'], B.METAL)
-    B.beam(p, wall.pt(u, v, t / 2), (x1 * 0.5 + x0 * 0.5, y0, z1 * 0.5 + z0 * 0.5), 0.05, 0.05, B.PAL['iron'],
-           B.METAL)
-    lantern(B, p, x1, v + 0.1, z1, 0.34)
-
-
 def lantern(B, p, x, y, z, s=0.34):
     """An iron lantern with warm panes (the harbor's lantern, the tavern's glow)."""
     iron = B.PAL['iron']
@@ -85,15 +86,16 @@ def lantern(B, p, x, y, z, s=0.34):
     p.box((x, y + s * 1.12, z), (0.06, 0.16, 0.06), iron, B.METAL)
 
 
-def oculus(B, p, wall, u, v, r, t):
-    """A round window: a timber ring round warm glass, a cross of glazing bars."""
+def oculus(B, p, wall, u, v, r, t, lit=False):
+    """A round window: a timber ring round warm glass (glowing when `lit`), a cross of
+    glazing bars."""
     half = t / 2
     for s in (1, -1):
         c = wall.pt(u, v, s * (half + 0.05))
         p.ring(c, r, 0.2, B.PAL['beam_dark'], segments=14, axis=(wall.nx, 0, wall.nz), mat=B.WOOD, depth=0.14)
     c = wall.pt(u, v, 0)
-    p.cylinder(wall.pt(u, v, -half - 0.04), wall.pt(u, v, half + 0.04), r - 0.05, B.PAL['glass'], B.STONE,
-               sides=14)
+    p.cylinder(wall.pt(u, v, -half - 0.04), wall.pt(u, v, half + 0.04), r - 0.05,
+               B.PAL['glass_lit'] if lit else B.PAL['glass'], B.GLOW if lit else B.STONE, sides=14)
     wall.box(p, u - r, u + r, v - 0.05, v + 0.05, -half - 0.08, half + 0.08, B.PAL['beam_dark'], B.WOOD)
     wall.box(p, u - 0.05, u + 0.05, v - r, v + r, -half - 0.08, half + 0.08, B.PAL['beam_dark'], B.WOOD)
     return c
@@ -216,15 +218,17 @@ def hall_front(B, p, porch_part):
     def top(u):
         return hall_y(B, u - mid) - 0.1
 
-    openings = [(d0, d1, 0.0, door['height']), (6.2, 7.8, 2.8, 5.0), (24.2, 25.8, 2.8, 5.0),
-                (9.4, 10.6, 6.6, 8.4), (21.4, 22.6, 6.6, 8.4)]
+    openings = [(d0, d1, 0.0, door['height']), *FRONT_WINDOWS, *FRONT_UPPER_WINDOWS]
     # the wall parts either side of the door (build_tavern.py FRONT_SPLIT): nothing runs across
     breaks = (mid - B.FRONT_SPLIT, mid + B.FRONT_SPLIT)
-    B.timber_wall(p, wall, t, top, openings, base_h=1.4, bays=3.6, seed=1, breaks=breaks)
+    # the posts' local x, for the weathering at their feet (tavern_facade.py)
+    FRONT_POSTS[:] = [u - mid for u in B.timber_wall(p, wall, t, top, openings, base_h=1.4, bays=3.6, seed=1,
+                                                      breaks=breaks)]
+    # the front's windows glow like the lanterns: the lit hall behind them, seen from the road
     for (a, b, v0, v1) in openings[1:]:
-        B.window(p, wall, a, b, v0, v1, t, shutters=v0 < 5)
+        B.window(p, wall, a, b, v0, v1, t, shutters=v0 < 5, lit=True)
     gable_timbers(B, p, wall, top, t, H['eave'], mid, H['x1'] - H['x0'], breaks=breaks)
-    oculus(B, p, wall, mid, H['eave'] + (H['ridge'] - H['eave']) * 0.62, 1.0, t)
+    oculus(B, p, wall, mid, H['eave'] + (H['ridge'] - H['eave']) * 0.62, 1.0, t, lit=True)
     # the doorway: heavy posts, a lintel with carved spandrel braces, a stone step
     col = B.PAL['beam_dark']
     for s in (1, -1):
@@ -250,7 +254,7 @@ def hall_front(B, p, porch_part):
         p.ring((ring_x, 2.4, zi - 0.28), 0.16, 0.05, B.PAL['iron'], segments=8, axis=(0, 0, 1), mat=B.METAL)
     # the door lanterns either side of the canopy
     for x in (-5.0, 5.0):
-        wall_lantern(B, p, wall, mid + x, 4.2)
+        FA.door_lantern(B, p, x, 4.2, H['z1'])
     # the porch canopy: a small slate gable on two great curved brackets (its own part)
     p = porch_part
     q = B.LAYOUT['porch']
@@ -280,15 +284,16 @@ def hall_front(B, p, porch_part):
     # the giant tankard on its iron arm, out over the porch's right side toward the road
     tx, tz, arm = 8.4, H['z1'] + 3.8, 12.0
     B.beam(p, (tx, arm, H['z1'] + 0.1), (tx, arm, tz + 0.7), 0.24, 0.24, B.PAL['iron'], B.METAL)
-    B.beam(p, (tx, arm - 2.4, H['z1'] + 0.1), (tx, arm - 0.1, tz - 0.9), 0.14, 0.14, B.PAL['iron'], B.METAL)
-    for k in range(3):
-        p.ring((tx, arm - 0.9 - k * 0.5, H['z1'] + 1.1 + k * 0.7), 0.22, 0.05, B.PAL['iron'], segments=8,
-               axis=(1, 0, 0), mat=B.METAL)
     p.box((tx, arm + 0.2, tz + 0.75), (0.3, 0.3, 0.3), B.PAL['iron'], B.METAL, taper=0.2)
+    # the arm's carved mounting board and the wrought scrollwork under it
+    FA.sign_ironwork(B, p, tx, arm, H['z1'], tz)
     top_y = arm - 1.6
     for dz in (-0.7, 0.7):
         B.chain(p, (tx, arm - 0.1, tz + dz * 0.5), (tx, top_y + 0.3, tz + dz), links=5)
-    tankard(B, p, tx, top_y - 2.8 + 0.3, tz)
+    base = top_y - 2.8 + 0.3
+    tankard(B, p, tx, base, tz)
+    # the painted board hung under the tankard: a picture, no lettering
+    FA.sign_board(B, p, tx, base, tz)
 
 
 # ---------------------------------------------------------------------------

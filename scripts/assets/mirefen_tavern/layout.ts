@@ -42,7 +42,7 @@ import {
 import {
   TAVERN_TOWER_WALL_RUNS,
   tavernHallWalls,
-  tavernLevelY,
+  tavernPropBaseY,
   tavernWingWalls,
 } from '../../../src/sim/mirefen_tavern';
 import { terrainHeight } from '../../../src/sim/world';
@@ -98,7 +98,7 @@ export function mirefenTavernLayout() {
       rot: r4(p.rot),
       ...(p.r !== undefined ? { r: p.r } : { hw: p.hw ?? 0.5, hd: p.hd ?? 0.5 }),
       height: p.height,
-      base: tavernLevelY(p.level),
+      base: tavernPropBaseY(p),
     })),
     lanterns: TAVERN_LANTERNS,
     sconces: TAVERN_SCONCES.map((s) => ({

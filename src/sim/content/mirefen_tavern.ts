@@ -26,7 +26,8 @@
 //
 // Scale: the player stands 2.6 yd to the crown on a 0.5 yd body radius. The door clears
 // 4.6 by 5.2, the side walls stand 10 to the eaves under a ridge at 20, the lowest roof
-// timber across the room is at 10.2, table tops stand at 1.45 and seats at 0.85.
+// timber across the room is at 10.2, table tops stand at 1.45, plain wooden seats (chairs,
+// stools, the long table's and the porch's benches) at 0.9 and cushioned ones at 0.85.
 
 import type { NpcDef } from '../types';
 
@@ -162,7 +163,9 @@ export type TavernPropKind =
   | 'settle'
   | 'fireplace'
   | 'chest'
-  | 'barrels';
+  | 'barrels'
+  | 'cask'
+  | 'planter';
 export type TavernLevel = 'ground' | 'pit' | 'platform' | 'stage';
 
 export interface TavernProp {
@@ -176,8 +179,13 @@ export interface TavernProp {
   hd?: number;
   height: number;
   level: TavernLevel;
+  /** For a piece outside on the terrain (the flower tubs at the foot of the porch steps):
+   *  the ground's height under its middle, over the ground floor, in place of its level's
+   *  floor. Everything else stands on its level. */
+  baseY?: number;
   /** Furniture can be stood on (the harbor house idiom); the hearth, the wall fireplace,
-   *  the barrel racks and the bar's pillar block at full height. */
+   *  the barrel racks and the bar's pillar block at full height. A `cask` is one barrel
+   *  standing on its end (the porch's), a `planter` a stone flower tub, both round. */
   standable?: boolean;
 }
 
@@ -345,7 +353,7 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     rot: 0,
     hw: 0.35,
     hd: 2.0,
-    height: 0.85,
+    height: 0.9,
     level: 'ground',
     standable: true,
   },
@@ -356,7 +364,7 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     rot: 0,
     hw: 0.35,
     hd: 2.0,
-    height: 0.85,
+    height: 0.9,
     level: 'ground',
     standable: true,
   },
@@ -556,6 +564,78 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
   },
   // the tower's nook
   ...nook(),
+  // outside on the porch, clear of the doorway (x -2.3 to 2.3) and its posts: the porch
+  // bench against the front wall left of the door, facing the road, a plain board seat at
+  // the chairs' 0.9
+  {
+    kind: 'bench',
+    x: -3.2,
+    z: 14.5,
+    rot: 0,
+    hw: 0.6,
+    hd: 0.35,
+    height: 0.9,
+    level: 'ground',
+    standable: true,
+  },
+  // the porch casks right of the door, stood on end in a row against the wall and the
+  // parapet, stepping down toward the steps
+  {
+    kind: 'cask',
+    x: 3.3,
+    z: 14.55,
+    rot: 0,
+    r: 0.42,
+    height: 1.3,
+    level: 'ground',
+    standable: true,
+  },
+  // the porch's second cask
+  {
+    kind: 'cask',
+    x: 3.32,
+    z: 15.39,
+    rot: 0.6,
+    r: 0.4,
+    height: 1.15,
+    level: 'ground',
+    standable: true,
+  },
+  // the porch's small keg by the top step
+  {
+    kind: 'cask',
+    x: 3.38,
+    z: 16.07,
+    rot: 1.1,
+    r: 0.3,
+    height: 0.8,
+    level: 'ground',
+    standable: true,
+  },
+  // the flower tub left of the foot of the porch steps, on the terrain beside the last step
+  {
+    kind: 'planter',
+    x: -4.45,
+    z: 20.75,
+    rot: 0,
+    r: 0.5,
+    height: 0.95,
+    level: 'ground',
+    baseY: -2.69,
+    standable: true,
+  },
+  // the flower tub right of the foot of the porch steps
+  {
+    kind: 'planter',
+    x: 4.45,
+    z: 20.75,
+    rot: 0.4,
+    r: 0.5,
+    height: 0.95,
+    level: 'ground',
+    baseY: -2.24,
+    standable: true,
+  },
 ];
 
 /** The lanterns hung under the hammer beams' ends, high over the booths and tables, and
@@ -618,9 +698,12 @@ export const TAVERN_KEEPER_ENTITY_ID = 1_000_000_020;
 export const TAVERN_KEEPER_LOCAL = { x: 9.0, z: -8.8 } as const;
 const KEEPER_WORLD = tavernToWorld(TAVERN_KEEPER_LOCAL.x, TAVERN_KEEPER_LOCAL.z);
 
-/** The innkeeper: gossip only (no quests, no stock). `dynamic`, so the world-init NPC loop
- *  skips her; ../mirefen_tavern.ts spawns her under her reserved id. She faces local +z
- *  (the room and the door), which is world +x. */
+/** The innkeeper: a classic inn's victualler (no quests). She sells bread and water for the
+ *  road and the marsh's own fare at Fenbridge's prices (the Mirefen band's food and drink,
+ *  the same records Provisioner Hale stocks). `dynamic`, so the world-init NPC loop skips
+ *  her; ../mirefen_tavern.ts spawns her under her reserved id. She faces local +z (the
+ *  room and the door), which is world +x. There is no hearthstone or bind point in this
+ *  game, so an innkeeper has no binding service to offer. */
 export const MIREFEN_TAVERN_NPCS: Record<string, NpcDef> = {
   innkeeper_maudie: {
     id: 'innkeeper_maudie',
@@ -630,7 +713,16 @@ export const MIREFEN_TAVERN_NPCS: Record<string, NpcDef> = {
     facing: TAVERN_YAW,
     color: 0x8a2a2a,
     questIds: [],
+    vendorItems: [
+      'baked_bread',
+      'spring_water',
+      'fenbridge_rye',
+      'marsh_mint_tea',
+      'smoked_eel',
+      'silvermist_cordial',
+    ],
     dynamic: true,
+    innkeeper: true,
     greeting:
       'Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet.',
   },
