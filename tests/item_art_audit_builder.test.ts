@@ -852,14 +852,15 @@ describe('item-art audit builder', () => {
     // an 80-id page boundary (31 to 32 pages, 248 to 256 sheets); the renderer
     // fingerprint is unchanged because the audit lib was not touched.
     // Mirefen muster rework: measured again the same way after the lent
-    // muster_shardpike joined (1292 / 1310, same groups and pages).
+    // muster_shardpike joined (1292 / 1310, same groups and pages), and again after the
+    // muster quests' barrowhide_slab (1293 / 1311).
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: 'b88b3890f8227c45f313dea669e3d35891ac3d5409243838e207390e5f3f6672',
-      catalogBytes: 704617,
+      catalogSha256: '9ba82b4da2bac2851b4894a0c2115b2b30d316cd81905a6a9f9367f8a172620a',
+      catalogBytes: 705124,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1292,
-      liveItemCount: 1310,
+      catalogCount: 1293,
+      liveItemCount: 1311,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -877,7 +878,7 @@ describe('item-art audit builder', () => {
         identity: 32,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '36cb32cf67f8ae90e10d0ca93dce5e0f844e54367d143466153b0c0717031b15',
+      shippingCatalogSha256: 'ce8b7707968ede8c9edab722ccef97cbd39b3c2b9acff21690b599ff83d974f9',
       machineChecksPassed: true,
       verdict: null,
     });

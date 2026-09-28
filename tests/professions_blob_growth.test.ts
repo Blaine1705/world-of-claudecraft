@@ -2330,13 +2330,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Mirefen muster rework's lent pike: `"muster_shardpike",` (19 bytes) in
       // itemsDiscovered only, no firstFind row (a loan is not a relic).
       'muster_shardpike',
+      // The muster quests' weekly trophy (`"barrowhide_slab",`), itemsDiscovered only.
+      'barrowhide_slab',
     ] as const;
+    // The muster quest chain (content/mirefen_muster_quests.ts) and its drill deed.
+    const MUSTER_QUEST_IDS = ['q_muster_summons', 'q_muster_pike_drill', 'q_muster_trophy'];
     function withoutBalgathContent(state: CharacterState): CharacterState {
       const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
       const itemIds = new Set<string>(BALGATH_ITEM_IDS);
       if (copy.deeds) {
         delete copy.deeds['cmb_balgath'];
         delete copy.deeds['cmb_balgath_ten'];
+        delete copy.deeds['cmb_point_taken'];
       }
       if (copy.deedStats?.counters) delete copy.deedStats.counters['balgathKills'];
       if (copy.deedStats?.itemsDiscovered)
@@ -2344,8 +2349,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
           (id) => !itemIds.has(id),
         );
       if (copy.questsDone)
-        copy.questsDone = copy.questsDone.filter((id) => id !== 'q_socketwrights_due');
-      if (copy.raidLockouts) delete copy.raidLockouts['worldboss:balgath_cyclops'];
+        copy.questsDone = copy.questsDone.filter(
+          (id) => id !== 'q_socketwrights_due' && !MUSTER_QUEST_IDS.includes(id),
+        );
+      if (copy.raidLockouts) {
+        delete copy.raidLockouts['worldboss:balgath_cyclops'];
+        delete copy.raidLockouts['weeklyquest:q_muster_trophy'];
+      }
       if (copy.reliquary) {
         for (const id of BALGATH_ITEM_IDS) delete copy.reliquary.firstFind?.[id];
         copy.reliquary.illuminatedPages = copy.reliquary.illuminatedPages?.filter(
@@ -2361,11 +2371,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         fieldBytes(withoutDevMountRelease, key) - fieldBytes(withoutBalgath, key),
       ]),
     );
+    // The muster quest chain adds MEASURED: questsDone +59 (its three quest ids), deeds
+    // +31 (cmb_point_taken), deedStats +18 (`"barrowhide_slab",`); the fixture's weekly
+    // lock is not armed, so raidLockouts is unchanged.
     expect(balgathDelta).toEqual({
-      questsDone: 22,
+      questsDone: 81,
       raidLockouts: 42,
-      deeds: 58,
-      deedStats: 200,
+      deeds: 89,
+      deedStats: 218,
       reliquary: 369,
     });
     // The five keys above are the WHOLE delta: the whole-state diff matches
@@ -2373,8 +2386,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8') -
         Buffer.byteLength(JSON.stringify(withoutBalgath), 'utf8'),
-    ).toBe(691);
-    expect(Object.values(balgathDelta).reduce((sum, value) => sum + value, 0)).toBe(691);
+    ).toBe(799);
+    expect(Object.values(balgathDelta).reduce((sum, value) => sum + value, 0)).toBe(799);
     const preReleaseCounterfactual = withoutBramblehideContent(withoutBalgath);
     // The Bramblehide/Nythgap release content, attributed exactly against
     // f73615a511 (the last test-ledger commit, where the settled ceiling
@@ -2401,14 +2414,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 21 characters as `"<id>",` in the sorted array (26 + 24 bytes). MEASURED,
     // not inferred, same as every other row this equation names.
     // Plus 691 for the Mirefen world-boss content, the five-key balgathDelta
-    // measured and summed above (672, plus 19 for the muster rework's lent pike).
+    // measured and summed above (672, plus 19 for the muster rework's lent pike),
+    // plus 108 for the muster quest chain: 799.
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
         1548 +
         50 +
         49 +
-        691,
+        799,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2459,8 +2473,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount+Balgath baseline',
-      // 212,061 = 212,042 + 19 for the muster rework's lent pike (balgathDelta above).
-    ).toBe(212061);
+      // 212,061 = 212,042 + 19 for the muster rework's lent pike (balgathDelta above),
+      // and 212,169 = 212,061 + 108 for the muster quest chain (balgathDelta above).
+    ).toBe(212169);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2522,8 +2537,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // RE-BASED for the Mirefen muster rework: 212,073 bytes, +19 over 212,054,
     // all of it the lent muster_shardpike id in itemsDiscovered (balgathDelta
     // deedStats 181 -> 200). Re-based per the standing rule: 211,693..212,074.
-    expect(bytes, reMint).toBeGreaterThan(211693);
-    expect(bytes, reMint).toBeLessThan(212074);
+    //
+    // RE-BASED for the Mirefen muster quest chain: 212,181 bytes, +108 over 212,073, all
+    // of it the balgathDelta terms above (questsDone +59 for the three quest ids, deeds
+    // +31 for cmb_point_taken, deedStats +18 for barrowhide_slab). Re-based per the
+    // standing rule: 211,801..212,182.
+    expect(bytes, reMint).toBeGreaterThan(211801);
+    expect(bytes, reMint).toBeLessThan(212182);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

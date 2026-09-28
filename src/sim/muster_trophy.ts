@@ -25,8 +25,7 @@ export function musterTrophySlot(
   if (mob.templateId !== MUSTER_BOSS_TEMPLATE_ID) return null;
   const owed: number[] = [];
   for (const meta of contributors) {
-    const qp = meta.questLog.get(MUSTER_TROPHY_QUEST_ID);
-    if (!qp || qp.state !== 'active') continue;
+    if (meta.questLog.get(MUSTER_TROPHY_QUEST_ID)?.state !== 'active') continue;
     if (ctx.countItem(BARROWHIDE_SLAB_ITEM_ID, meta.entityId) > 0) continue;
     owed.push(meta.entityId);
   }

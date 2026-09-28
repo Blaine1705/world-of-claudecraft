@@ -557,6 +557,11 @@ describe('Fenbridge content projection and preservation', () => {
   it('preserves quest order and non-muster ground objects while moving exactly two orders', () => {
     expect(ZONE2_QUEST_ORDER).toEqual([
       'q_fenbridge_muster',
+      // The Mirefen muster's chain (content/mirefen_muster_quests.ts): Fenwick's summons,
+      // the Commander's pike drill and his weekly, ahead of Skerrit's own pike quest.
+      'q_muster_summons',
+      'q_muster_pike_drill',
+      'q_muster_trophy',
       // The world boss's level-spread mechanic: Skerrit lends the Shardpike, and the quest
       // sits second because he stands on the approach, before the prowler work in the fen.
       'q_socketwrights_due',
@@ -754,6 +759,12 @@ describe('Fenbridge content projection and preservation', () => {
           vendorItems: [...items.slice(0, idx), ...items.slice(idx + 1)],
         };
       }
+      // ...and the one questIds row the muster chain added (Fenwick's summons).
+      const fenwick = payload.warden_fenwick;
+      payload.warden_fenwick = {
+        ...fenwick,
+        questIds: fenwick.questIds.filter((q) => q !== 'q_muster_summons'),
+      };
       return payload;
     }
     expect(
@@ -764,7 +775,7 @@ describe('Fenbridge content projection and preservation', () => {
     // working tree; the counterfactual above already proves the only content
     // difference from the pre-PR3 payload is those two rows.
     expect(createHash('sha256').update(JSON.stringify(stableNpcPayload())).digest('hex')).toBe(
-      'bb6cc41ee66b3ec4cafeda81e9dec7f8609ed517e7fdf94fc29b604d44af6632',
+      '4a758d33ed83f0dfa452f58719c05e2034007fd75fae5c4a2c0df0a5b5be3883',
     );
     for (const placement of FENBRIDGE_LAYOUT.services.npcs) {
       expect(FENBRIDGE_NPC_PLACEMENTS_BY_ID[placement.id]).toBe(placement);

@@ -2542,8 +2542,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // touching `tagged`: 197. The sibling census in tests/gathering.test.ts
     // ('answers for every shipped template') carries the same 197 and the same reason.
     // Plus the four Mirefen muster soldiers (src/sim/content/mirefen_muster.ts): friendly
-    // set dressing nobody can kill, never a corpse to butcher, so untagged: 201.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(201);
+    // set dressing nobody can kill, never a corpse to butcher, so untagged: 201. The
+    // muster's captain became an NPC and its drill yard added the drillmaster and the
+    // Straw Foreman effigy (a practice dummy), all untagged: 202.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(202);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

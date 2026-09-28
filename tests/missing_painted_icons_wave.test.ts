@@ -689,7 +689,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 302 at the Mirefen world-boss forward-port: the boss's own two combat
     // deeds (cmb_balgath, cmb_balgath_ten) append at the DEED_ORDER tail and
     // join the same pending side on the deed_cat_combat crest.
-    expect(DEED_ORDER).toHaveLength(302);
+    // 303: the muster's pike drill deed (cmb_point_taken) joins the same combat crest.
+    expect(DEED_ORDER).toHaveLength(303);
+    expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_balgath_ten')).toBe(true);

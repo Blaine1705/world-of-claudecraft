@@ -820,8 +820,9 @@ describe('Masterwrought art completion evidence', () => {
     // three Foreman's Wage pieces and the two barrow pieces). The 1209 completion union
     // below is the FROZEN historical figure and is deliberately left alone: keeping the two
     // apart is the whole point of this test.
-    // 1292 with the Mirefen muster rework's lent muster_shardpike owner.
-    expect(currentOwnerIds).toHaveLength(1292);
+    // 1292 with the Mirefen muster rework's lent muster_shardpike owner, 1293 with the
+    // muster quests' barrowhide_slab.
+    expect(currentOwnerIds).toHaveLength(1293);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -882,6 +883,13 @@ describe('Masterwrought art completion evidence', () => {
     expect(musterBatches).toHaveLength(1);
     const musterIds = new Set(musterBatches[0].itemIds);
     expect([...musterIds]).toEqual(['muster_shardpike']);
+    // ...and the muster quests' weekly trophy, one more additive batch by exact id.
+    const slabBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) => id === 'barrowhide-slab-icon-2026-09-27',
+    );
+    expect(slabBatches).toHaveLength(1);
+    expect(slabBatches[0].itemIds).toEqual(['barrowhide_slab']);
+    musterIds.add('barrowhide_slab');
     expect(datedIds.filter((id) => musterIds.has(id))).toEqual([]);
 
     // These 25 ids are a later additive wave that never appears in the dated file's own
