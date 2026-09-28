@@ -15,7 +15,9 @@
 //  - the four bar stools on the platform: the high pose, facing the counter;
 //  - the nook's bench round the tower wall: two places on each of its five runs, facing
 //    the middle of the tower;
-//  - a bench on the porch: facing the road.
+//  - a bench on the porch: facing the road;
+//  - the terrace's benches outside on the cobbles (content/mirefen_tavern_grounds.ts): two
+//    places each, facing their trestle table, on the terrain under them (`baseY`).
 //
 // A seat's STAND spot (where the body stands while seated, see seat_anchor.ts) is chosen by
 // a deterministic search over candidate points round the seat (for a backless bench in
@@ -43,6 +45,7 @@ import {
   type TavernProp,
   tavernToWorld,
 } from './mirefen_tavern';
+import { TAVERN_FORECOURT } from './mirefen_tavern_grounds';
 
 /** How much a cushion raises a seat over its board (tavern_furnish.py): the hearth's and
  *  the nook's benches wear a 0.1 cushion, the settles a 0.13 one. */
@@ -76,6 +79,12 @@ function levelY(level: TavernLevel): number {
   return level === 'platform' ? TAVERN_BAR_PLATFORM.lift : 0;
 }
 
+/** The floor a piece stands on: its level's, or the terrain under it for a piece outside
+ *  (mirefen_tavern.ts tavernPropBaseY). */
+function floorOf(prop: TavernProp): number {
+  return prop.baseY ?? levelY(prop.level);
+}
+
 interface V2 {
   x: number;
   z: number;
@@ -107,7 +116,8 @@ function worldFacing(d: V2): number {
 }
 
 /** The tavern's walkable air for a standing body: the hall inside its walls, the nook
- *  inside the tower, the porch between its parapets. */
+ *  inside the tower, the porch between its parapets, the forecourt's cobbles before the
+ *  front's stone base. */
 function insideWalkable(p: V2): boolean {
   const c = STAND_CLEARANCE;
   const h = TAVERN_HALL;
@@ -122,7 +132,14 @@ function insideWalkable(p: V2): boolean {
   const t = TAVERN_TOWER;
   if (Math.hypot(p.x - t.x, p.z - t.z) < t.rIn - c && p.z < h.z0) return true;
   const po = TAVERN_PORCH;
-  return p.x > po.x0 + 0.2 + c && p.x < po.x1 - 0.2 - c && p.z > po.z0 + c && p.z < po.z1 - 0.1;
+  if (p.x > po.x0 + 0.2 + c && p.x < po.x1 - 0.2 - c && p.z > po.z0 + c && p.z < po.z1 - 0.1) {
+    return true;
+  }
+  // the forecourt, clear of the stone base and the porch's parapets and steps
+  if (p.z > h.z1 + c && Math.abs(p.x) > po.x1 + 0.2 + c) {
+    return TAVERN_FORECOURT.some((r) => p.x > r[0] && p.x < r[1] && p.z > r[2] && p.z < r[3]);
+  }
+  return false;
 }
 
 /** How far a point stands outside a prop's footprint (0 inside it). */
@@ -185,7 +202,7 @@ function isNookBench(prop: TavernProp): boolean {
 function seatTop(prop: TavernProp): number {
   const cushioned = prop.kind === 'bench' && (prop.level === 'pit' || isNookBench(prop));
   const cushion = cushioned ? BENCH_CUSHION : prop.kind === 'settle' ? SETTLE_CUSHION : 0;
-  return levelY(prop.level) + prop.height + cushion;
+  return floorOf(prop) + prop.height + cushion;
 }
 
 /** A bench or settle's `n` places along its long axis, `spacing` apart, facing `forward`
@@ -208,7 +225,7 @@ function lineSeats(
   const long = alongX ? ax : az;
   const half = Math.max(prop.hw ?? 0.5, prop.hd ?? 0.5);
   const depth = Math.min(prop.hw ?? 0.5, prop.hd ?? 0.5);
-  const floorY = levelY(prop.level);
+  const floorY = floorOf(prop);
   const top = seatTop(prop);
   const out: LocalSeat[] = [];
   for (let i = 0; i < n; i++) {
@@ -256,7 +273,7 @@ function oneSeat(
   pose: SeatPose,
 ): LocalSeat {
   const r = prop.r ?? 0.45;
-  const floorY = levelY(prop.level);
+  const floorY = floorOf(prop);
   const top = seatTop(prop);
   const centre = { x: prop.x, z: prop.z };
   // a chair's seat is square to its facing, a stool's round: both reach r in front
@@ -321,7 +338,9 @@ function localSeats(): LocalSeat[] {
   const out: LocalSeat[] = [];
   const pitCentre = { x: TAVERN_PIT.x, z: TAVERN_PIT.z };
   const towerCentre = { x: TAVERN_TOWER.x, z: TAVERN_TOWER.z };
-  const tables = TAVERN_PROPS.filter((p) => p.kind === 'table' || p.kind === 'roundTable');
+  const tables = TAVERN_PROPS.filter(
+    (p) => p.kind === 'table' || p.kind === 'roundTable' || p.kind === 'terraceTable',
+  );
   const nearestTable = (p: V2): TavernProp =>
     tables.reduce((best, t) =>
       Math.hypot(t.x - p.x, t.z - p.z) < Math.hypot(best.x - p.x, best.z - p.z) ? t : best,
@@ -342,6 +361,15 @@ function localSeats(): LocalSeat[] {
       const f = toward(at, towerCentre);
       const d = depthOf(prop);
       out.push(...lineSeats(prop, next('nook'), 2, 1.7, f, 'bench', 'upright', d, ['front']));
+    } else if (prop.kind === 'terraceBench') {
+      // the terrace's benches, facing their trestle table across the cobbles; the table
+      // leaves no room in front, so the body stands behind the bench and steps over it
+      const table = nearestTable(at);
+      const f = { x: 0, z: Math.sign(table.z - prop.z) || 1 };
+      const d = depthOf(prop);
+      out.push(
+        ...lineSeats(prop, next('terrace'), 2, 1.3, f, 'bench', 'upright', d, ['back', 'front']),
+      );
     } else if (prop.kind === 'bench' && prop.z > TAVERN_HALL.z1) {
       // the porch's bench, its back to the front wall, facing the road
       const places = Math.max(prop.hw ?? 0.5, prop.hd ?? 0.5) >= 1.1 ? 2 : 1;

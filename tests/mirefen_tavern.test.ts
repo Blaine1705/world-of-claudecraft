@@ -119,12 +119,13 @@ describe('Mirefen tavern: the site', () => {
   it('clears the scatter off its footprint, and nothing but its own colliders stands in it', () => {
     const mine = new Set(mirefenTavernColliders(S));
     const near: Collider[] = [];
+    // (the grounds reach further west than the building: the stable and the cart beside it)
     queryOpenWorldColliders(
       S,
       TAVERN_ORIGIN.x - 30,
       TAVERN_ORIGIN.z - 18,
       TAVERN_ORIGIN.x + 25,
-      TAVERN_ORIGIN.z + 18,
+      TAVERN_ORIGIN.z + 32,
       near,
     );
     const ours = near.filter((c) => [...mine].some((m) => m.x === c.x && m.z === c.z));

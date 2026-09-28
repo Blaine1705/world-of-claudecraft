@@ -9,6 +9,7 @@ import {
 } from '../sim/content/mirefen_tavern';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
+import { tavernGroundsRects } from '../sim/mirefen_tavern_grounds';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 
 export type EastbrookGrassExclusion =
@@ -255,8 +256,10 @@ export function eastbrookGrassExclusions(
 }
 
 /** The Mirefen tavern's floor keeps its grass out (sim/content/mirefen_tavern.ts): the hall,
- *  the wing, the round tower, the porch and the run of its steps. The tavern's local axes run
- *  along the world's (its door faces +x), so each rectangle is a plain one. */
+ *  the wing, the round tower, the porch and the run of its steps, and its grounds
+ *  (sim/mirefen_tavern_grounds.ts: the cobbled forecourt, the stable's floor and the pieces on
+ *  the terrain). The tavern's local axes run along the world's (its door faces +x), so each
+ *  rectangle is a plain one. */
 export function mirefenTavernGrassExclusions(): EastbrookGrassExclusion[] {
   const rect = (id: string, x0: number, x1: number, z0: number, z1: number) => {
     const a = tavernToWorld(x0, z0);
@@ -286,6 +289,9 @@ export function mirefenTavernGrassExclusions(): EastbrookGrassExclusion[] {
       radius: TAVERN_TOWER.rOut,
     },
     rect('mirefen_tavern:porch', P.x0, P.x1, P.z0, P.z1 + TAVERN_STEPS_MAX_RUN),
+    ...tavernGroundsRects().map((r, i) =>
+      rect(`mirefen_tavern:grounds:${i}`, r[0], r[1], r[2], r[3]),
+    ),
   ];
 }
 

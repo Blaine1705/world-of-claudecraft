@@ -1,5 +1,6 @@
 import { isBuiltinWorldActive } from './data';
 import { mirefenTavernCovers } from './mirefen_tavern_floor';
+import { mirefenTavernGroundsCovers } from './mirefen_tavern_grounds';
 
 /** Authored clearings remove only named scatter, never terrain anchors or heights.
  * Both collision and rendering consume this same deterministic placement gate. */
@@ -36,9 +37,17 @@ const EXCLUSIONS = [
 /** Scatter keeps this far off the Mirefen tavern's walls (a trunk, a canopy or a rock
  *  beside the building would stand through its eaves). */
 const TAVERN_SCATTER_PAD = 3;
+/** ...and this far off its grounds (the forecourt, the stable, the pieces outside). */
+const TAVERN_GROUNDS_SCATTER_PAD = 1.5;
 
 export function isExcludedDecoration(x: number, z: number): boolean {
-  if (mirefenTavernCovers(x, z, TAVERN_SCATTER_PAD) && isBuiltinWorldActive()) return true;
+  if (
+    (mirefenTavernCovers(x, z, TAVERN_SCATTER_PAD) ||
+      mirefenTavernGroundsCovers(x, z, TAVERN_GROUNDS_SCATTER_PAD)) &&
+    isBuiltinWorldActive()
+  ) {
+    return true;
+  }
   return EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 1.2);
 }
 

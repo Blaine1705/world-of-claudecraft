@@ -7,7 +7,11 @@
 //    tower's wall is a ring of short boxes;
 //  - the porch parapets, which block a body whose feet are under their tops;
 //  - the furniture (standable, the harbor house idiom) and what stands in the room at full
-//    height (the hearth, the wall fireplace, the barrel racks and the bar's pillar).
+//    height (the hearth, the wall fireplace, the barrel racks and the bar's pillar);
+//  - the grounds outside (mirefen_tavern_grounds.ts): the stable's walls, partition and front
+//    posts at full height, and the pieces on the terrain (the terrace's tables and benches, the
+//    trough, the hay, the cart, the woodpile, the casks and crates, standable; the lantern
+//    posts and the dog, not) through the same furniture colliders, each on its `baseY`.
 // There is no upper floor: every change of height in the floor surface is a ramp.
 //
 // The rest area reuses the inn rule (progression/xp.ts isResting): standing anywhere inside,
@@ -40,7 +44,9 @@ import {
   type TavernProp,
   tavernToWorld,
 } from './content/mirefen_tavern';
+import { TAVERN_STABLE } from './content/mirefen_tavern_grounds';
 import { createNpc } from './entity';
+import { tavernStablePosts, tavernStableWalls } from './mirefen_tavern_grounds';
 import type { SimContext } from './sim_context';
 import type { WorldContent } from './types';
 
@@ -172,8 +178,8 @@ export function tavernPropCollider(prop: TavernProp): Collider {
   });
 }
 
-/** Every collider of the tavern: the walls, the tower ring, the porch parapets, then the
- *  furnishings. (seed kept for the collider-set signature: the floor is absolute, so
+/** Every collider of the tavern: the walls, the tower ring, the porch parapets, the stable,
+ *  then the furnishings inside and out. (seed kept for the collider-set signature: the floor is absolute, so
  *  nothing here reads the ground.) */
 export function mirefenTavernColliders(_seed: number): Collider[] {
   const f = TAVERN_FLOOR_Y;
@@ -191,6 +197,15 @@ export function mirefenTavernColliders(_seed: number): Collider[] {
         cameraTopY: f + p.parapet,
       }),
     );
+  }
+  // the stable on the grounds: its walls and partition, then its front posts, full height
+  const st = f + TAVERN_STABLE.baseY;
+  for (const b of tavernStableWalls()) {
+    out.push(boxCollider(b, { cameraTopY: st + TAVERN_STABLE.eave }));
+  }
+  for (const p of tavernStablePosts()) {
+    const w = tavernToWorld(p.x, p.z);
+    out.push({ type: 'circle', x: w.x, z: w.z, r: p.r, cameraTopY: st + TAVERN_STABLE.eave });
   }
   for (const prop of TAVERN_PROPS) out.push(tavernPropCollider(prop));
   return out;

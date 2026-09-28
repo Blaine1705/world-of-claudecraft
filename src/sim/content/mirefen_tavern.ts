@@ -30,6 +30,7 @@
 // stools, the long table's and the porch's benches) at 0.9 and cushioned ones at 0.85.
 
 import type { NpcDef } from '../types';
+import { TAVERN_GROUNDS_PROPS } from './mirefen_tavern_grounds';
 
 /** Where the tavern stands: the world point under its local origin (the hall's middle). */
 export const TAVERN_ORIGIN = { x: -17, z: 408 } as const;
@@ -61,10 +62,17 @@ export const TAVERN_HALL = {
   truss: 10.2,
   /** The hammerbeam trusses' positions along the hall (local z). */
   trusses: [-10.0, -4.6, 0.0, 5.0, 10.0],
-  /** The roof overhangs the side walls at the eaves and the gables at the verges. */
-  eaveOut: 1.0,
-  vergeOut: 0.8,
+  /** The roof overhangs the side walls at the eaves and the gables at the verges: deep eaves,
+   *  and at the front a verge that reaches on over the jettied upper storey (TAVERN_JETTY). */
+  eaveOut: 1.6,
+  vergeOut: 2.0,
 } as const;
+
+/** The front's jettied upper storey: from `y` over the ground floor up to the gable the front
+ *  wall stands `out` further toward the road than the ground floor's face, on joists and carved
+ *  brackets. Purely outside: the hall's inner wall face runs on straight up to the roof, there
+ *  is no upper floor, and nothing of it stands where a body walks (well over any head). */
+export const TAVERN_JETTY = { y: 5.9, out: 1.0 } as const;
 
 /** The front doorway in the middle of the front gable. */
 export const TAVERN_DOOR = { x: 0, width: 4.6, height: 5.2 } as const;
@@ -165,7 +173,16 @@ export type TavernPropKind =
   | 'chest'
   | 'barrels'
   | 'cask'
-  | 'planter';
+  | 'planter'
+  | 'terraceTable'
+  | 'terraceBench'
+  | 'post'
+  | 'crate'
+  | 'trough'
+  | 'hay'
+  | 'cart'
+  | 'woodpile'
+  | 'dog';
 export type TavernLevel = 'ground' | 'pit' | 'platform' | 'stage';
 
 export interface TavernProp {
@@ -179,9 +196,10 @@ export interface TavernProp {
   hd?: number;
   height: number;
   level: TavernLevel;
-  /** For a piece outside on the terrain (the flower tubs at the foot of the porch steps):
-   *  the ground's height under its middle, over the ground floor, in place of its level's
-   *  floor. Everything else stands on its level. */
+  /** For a piece outside on the terrain (the flower tubs at the foot of the porch steps and
+   *  everything on the grounds, ./mirefen_tavern_grounds.ts): the ground's height under its
+   *  middle, over the ground floor, in place of its level's floor. Everything else stands on
+   *  its level. */
   baseY?: number;
   /** Furniture can be stood on (the harbor house idiom); the hearth, the wall fireplace,
    *  the barrel racks and the bar's pillar block at full height. A `cask` is one barrel
@@ -636,6 +654,9 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     baseY: -2.24,
     standable: true,
   },
+  // the grounds outside: the terrace, the stable's trough, hay and cart, the woodpile, the
+  // casks and crates at the corner, the lantern posts and the dog on the porch
+  ...TAVERN_GROUNDS_PROPS,
 ];
 
 /** The lanterns hung under the hammer beams' ends, high over the booths and tables, and
