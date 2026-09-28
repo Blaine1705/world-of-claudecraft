@@ -679,6 +679,7 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -699,9 +700,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the trinket relics' readiness family: the renderer leaf moved.
-  // No capture was retaken.
-  'd68ceb6cf6bbaee45d10c59668eed7e27516b40db051af0eef0a26efcd465483';
+  // Re-minted for the release/v0.44.0 sync merge into PR 4232 (trinket
+  // relics): the merged renderer leaf matches neither parent. No capture
+  // was retaken.
+  '95bd5726c51e5559321f79772b1b51dddff1e944b1cf726ccab312c4e7664cec';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
