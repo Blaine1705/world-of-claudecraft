@@ -1114,6 +1114,9 @@ export const VOICE_ALIAS = {
   calligraphy_apprentice_2: 'trader_wilkes',
   // A working forgemistress.
   forge_instructor: 'forgemistress_darva',
+  // The Mirefen muster's leader (content/mirefen_muster.ts) gives clipped soldier's
+  // orders, so he borrows the Marshal's weathered parade register until he is designed.
+  muster_commander: 'marshal_redbrook',
   // Keep suspects vocally distinct without making any voice signal guilt.
   infiltrator_captain: 'warden_fenwick',
   infiltrator_nella: 'scout_maren',
