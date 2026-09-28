@@ -53,6 +53,9 @@ export interface InteriorOpening {
 /** A registered interior: its air and its openings onto the world. */
 export interface CameraInterior {
   id: string;
+  /** Preserve the player's angle in enclosed rooms; adaptive interiors may seek a new
+   *  framing. Door entry may still flatten briefly to thread an opening. */
+  framing?: 'adaptive' | 'preserve-angle';
   boxes: readonly InteriorBox[];
   /** Per box, the cylinder that rounds it (null: the plain box). */
   rounds: readonly (InteriorRound | null)[];
@@ -94,6 +97,7 @@ export function cameraInterior(
   boxes: readonly InteriorBox[],
   openings: readonly InteriorOpening[] = [],
   rounds: ReadonlyMap<number, InteriorRound> = new Map(),
+  framing: CameraInterior['framing'] = 'adaptive',
 ): CameraInterior {
   const b = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
   for (const box of boxes) {
@@ -104,6 +108,7 @@ export function cameraInterior(
   }
   return {
     id,
+    framing,
     boxes,
     rounds: boxes.map((_, i) => rounds.get(i) ?? null),
     openings,
@@ -847,6 +852,9 @@ export function chooseInteriorFraming(
   out.flatten = false;
   const full = len - 1e-6;
   out.boom = boomAlong(vol, sx, sy, sz, dx, dy, dz, len, pad, through, 0, 0);
+  // A stable room changes distance, not the player's chosen heading/elevation. The
+  // temporary through-door hold may flatten to clear the lintel while walking in.
+  if (vol.framing === 'preserve-angle' && through <= 0) return out;
   if (out.boom < full) {
     const ceiling = interiorExit.axis === 1 && interiorExit.side === 1;
     const raw = out.boom;
@@ -881,7 +889,12 @@ export function chooseInteriorFraming(
       }
     }
   }
-  if (out.boom >= INTERIOR_COMFORT_BOOM - 1e-9 || len <= INTERIOR_COMFORT_BOOM) return out;
+  if (
+    vol.framing === 'preserve-angle' ||
+    out.boom >= INTERIOR_COMFORT_BOOM - 1e-9 ||
+    len <= INTERIOR_COMFORT_BOOM
+  )
+    return out;
   const first = side < 0 ? -1 : 1;
   let best = out.boom;
   for (const f of INTERIOR_FRAMINGS) {

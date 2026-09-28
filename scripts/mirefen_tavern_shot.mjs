@@ -119,6 +119,19 @@ async function settle(ms) {
 }
 
 async function shot(name) {
+  if (process.env.CAMERA_DEBUG === '1') {
+    console.log(
+      name,
+      await run(`
+      const { interiorCameraInternalsForTest } = await import('/src/render/interior_camera.ts');
+      const s = interiorCameraInternalsForTest.state();
+      const g = window.__game;
+      return { framing: s.active?.framing, lift: s.lift, swing: s.swing, cap: s.cap,
+        position: g.renderer.camera.position.toArray(), pitch: g.renderer.camPitch,
+        player: g.sim.player.pos, start: [s.startX, s.startY, s.startZ] };
+    `),
+    );
+  }
   await run(
     `for (const id of ['#error-msg']) { const el = document.querySelector(id); if (el) el.style.visibility = 'hidden'; }`,
   );

@@ -23,6 +23,8 @@
 // Where the ray is cramped (a player backed against a wall or into a room's corner), the
 // camera glides to the nearest comfortable framing, up over the obstruction or round it along the
 // wall, rather than sitting in the player's head, and glides back as the view clears.
+// Interiors opting into preserve-angle instead keep the requested ray once inside, shorten
+// only its distance, and hide a close body without jumping the lens to the eyes.
 // Walking out releases the last shortened boom over at most INTERIOR_RELEASE_MAX_SEC;
 // outdoors with no release pending nothing here touches the camera. The requested yaw,
 // pitch and distance stay owned by the camera stack: only the drawn position moves (the
@@ -93,6 +95,9 @@ const DRAW_SHIFT_MAX = 2.5;
 const STILL_SPEED = 0.6;
 /** Standing still this long (seconds) starts the through-door hold's ease out. */
 const STILL_SEC = 0.25;
+/** Restore the entrance height gently when distance, rather than a new angle, must
+ *  clear the ceiling. A fast height release and boom pull-in otherwise compound. */
+const STABLE_ENTRY_RELEASE_RATE = 2;
 
 const interiors: CameraInterior[] = [];
 /** Scratch for a lifted boom (no allocation per frame). */
@@ -291,10 +296,12 @@ export function clampChaseCameraToInterior(
   // doorway, keeping its distance; the cap's weight walks in and out, never a jump
   interiorEntryCap(vol, sx, sy, sz, dx, dy, dz, pad);
   const capTarget = interiorEntryHold.weight * state.through;
+  const capRate =
+    vol.framing === 'preserve-angle' && capTarget < state.cap
+      ? STABLE_ENTRY_RELEASE_RATE
+      : INTERIOR_ENTRY_CAP_RATE;
   if (!was || reducedMotion || teleported) state.cap = !was && !teleported ? 0 : capTarget;
-  else
-    state.cap +=
-      (capTarget - state.cap) * (1 - Math.exp(-INTERIOR_ENTRY_CAP_RATE * Math.max(0, dt)));
+  else state.cap += (capTarget - state.cap) * (1 - Math.exp(-capRate * Math.max(0, dt)));
   if (dy > interiorEntryHold.rise) dy -= state.cap * (dy - interiorEntryHold.rise);
   const len = Math.hypot(dx, dy, dz);
   // cramped (a player backed against a wall or into a corner): the
@@ -338,9 +345,18 @@ export function clampChaseCameraToInterior(
   const boom = f * len;
   state.firstPerson = state.firstPerson ? boom < SELF_SHOW_BOOM : boom < SELF_HIDE_BOOM;
   if (state.firstPerson && len > 1e-9) {
-    pos.set(sx, sy, sz);
+    // A stable view hides the close body without jumping the lens to the eyes. Keep
+    // following the collision spring right through the hide/show hysteresis band.
     const k = FIRST_PERSON_AIM;
-    look.set(sx + aimX * k, sy + aimY * k, sz + aimZ * k);
+    if (vol.framing === 'preserve-angle') {
+      pos.set(sx + dx * f, sy + dy * f, sz + dz * f);
+      // Keep any temporary doorway flattening too: hiding the body must not
+      // suddenly restore pitch while the entrance is still settling.
+      look.set(pos.x - (dx / len) * k, pos.y - (dy / len) * k, pos.z - (dz / len) * k);
+    } else {
+      pos.set(sx, sy, sz);
+      look.set(pos.x + aimX * k, pos.y + aimY * k, pos.z + aimZ * k);
+    }
   } else {
     pos.set(sx + dx * f, sy + dy * f, sz + dz * f);
   }

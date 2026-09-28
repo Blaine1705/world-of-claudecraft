@@ -160,6 +160,7 @@ export function mirefenTavernCameraInterior(): CameraInterior {
     TAVERN_INTERIOR_LOCAL.map(tavernBoxToWorld),
     openings,
     rounds,
+    'preserve-angle',
   );
 }
 

@@ -149,14 +149,16 @@ mood and proportion only and never entered the build.
   and the fireplace's breast), the doorway, the arch and the nook's round shaft are registered
   as boxes (`src/render/mirefen_tavern_interior_core.ts`) with the generic indoor camera clamp
   (`src/render/interior_camera.ts` over `src/render/interior_camera_core.ts`). It pulls the drawn
-  camera in along its ray to just inside a wall (a near-plane pad clear), or, under the air's top
-  or a lintel, flattens it by the least that clears it and keeps its distance, gliding both ways.
+  camera in along its ray to just inside a wall or ceiling (a near-plane pad clear), gliding
+  both ways. The tavern opts into `preserve-angle`: inside the room, collisions shorten the
+  distance without choosing a different yaw or pitch. Other interiors retain adaptive framing.
   Walking in, the camera follows through the door: past the doorway's threshold the lens comes
   down, keeping its distance behind the player, until it is no higher over the eye than the
   door's head allows (`interiorEntryCap`), so its sight line threads the doorway while it is
   still outside; a ray out through the door runs on past it, so the lens keeps its whole
   distance and nothing between it and the player is cut; once the requested lens has come in
-  through the door the cap lets go. If the player stops just inside, the lens comes in to the
+  through the door the cap lets go gently, avoiding a simultaneous height/zoom jerk against
+  the ceiling. If the player stops just inside, the lens comes in to the
   room a moment later. The lens only ever comes down on the way in (never the old high
   dollhouse view, never a dive into the head: `tests/mirefen_tavern_interior_core.test.ts`
   "walking in and out through the front door", at the default, a steep far and a low close
@@ -164,8 +166,9 @@ mood and proportion only and never entered the build.
   (`tests/graphics_overhaul_integration.test.ts`: a player on the porch or in the doorway's
   thickness keeps the camera to the bit); the requested distance is never written. The bar's
   pillar stands in the air, so it cuts away when it stands between the lens and the player or
-  hard by the lens. Where the boom is cramped the camera glides to the nearest comfortable
-  framing, a lift or a swing along the wall; only in a dead-end corner does it cut to the eyes.
+  hard by the lens. Where the boom is cramped, it stays on the requested ray. The close avatar
+  hides with hysteresis without jumping the lens to the eyes. Regression coverage lives in
+  `tests/mirefen_tavern_camera_stability.test.ts`, including 30/60/144 FPS wall approaches.
   While the player is inside, the plates of bodies outside draw only when seen through the front
   door (the nameplate painter's `interiorHidesNameplate` gate: the camera's sight line, or the
   player's eye while the lens still follows through the door); a selected target keeps its unit

@@ -232,7 +232,7 @@ describe('the indoor camera at the tight spots', () => {
     });
   }
 
-  it('looks into the nook from the arch at the whole distance, sliding under the air', () => {
+  it('looks into the nook from the arch without changing the requested pitch', () => {
     registerCameraInterior(vol);
     const cam = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
     const self = world(-3, 0, -14);
@@ -250,8 +250,10 @@ describe('the indoor camera at the tight spots', () => {
     const c = cam.position;
     expect(interiorContains(vol, c.x, c.y, c.z)).toBe(true);
     expect(c.y - TAVERN_FLOOR_Y).toBeLessThan(TAVERN_HALL_AIR_TOP);
-    // the lens would stand over the air's top: it flattens and keeps the whole distance
-    expect(c.distanceTo(look)).toBeCloseTo(dist, 3);
+    // The ceiling shortens the boom, not the player's viewing angle.
+    expect(c.distanceTo(look)).toBeLessThan(dist);
+    expect(c.distanceTo(look)).toBeGreaterThan(12);
+    expect(Math.asin((c.y - look.y) / c.distanceTo(look))).toBeCloseTo(pitch, 6);
   });
 
   it("keeps the nook's crown and cone over a camera looking down into it", () => {
@@ -311,14 +313,14 @@ describe('the indoor camera in the open common room', () => {
     }
   });
 
-  it('slides a steep, far camera under the air rather than pulling it in', () => {
+  it('shortens a steep camera consistently under the hall ceiling', () => {
     registerCameraInterior(vol);
     // the owner's own camera, pitched well up and zoomed out, in the middle of the hall
     for (let k = 0; k < 8; k++) {
       const yaw = (k / 8) * Math.PI * 2;
       const boom = settledBoom(0, 0, -1, yaw, 90, 0.75, 14);
-      if (k === 0 || k === 4) expect(boom, `yaw ${k}`).toBeGreaterThan(12.5);
-      else expect(boom, `yaw ${k}`).toBeGreaterThan(9);
+      expect(boom, `yaw ${k}`).toBeGreaterThan(9);
+      expect(boom, `yaw ${k}`).toBeLessThan(10);
     }
   });
 });
