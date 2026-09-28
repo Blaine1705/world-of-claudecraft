@@ -388,6 +388,11 @@ function throwGrapnel(
     abilityName: 'Grapnel Pull',
     abilityId: 'trinket_muster_grapnel',
     school: 'physical',
+    landingHeal: {
+      sourceId: p.id,
+      amount: Math.max(1, Math.round(use.heal + use.coef * p.healPower)),
+      name: 'Muster Grapnel',
+    },
   };
   ctx.emit({
     type: 'spellfx',

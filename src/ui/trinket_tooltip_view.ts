@@ -354,7 +354,10 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
       });
     }
     case 'grapnel':
-      return t('hudChrome.trinkets.use.grapnel', { range: n(u.range) });
+      return t('hudChrome.trinkets.use.grapnel', {
+        range: n(u.range),
+        heal: scaled(u.heal, u.coef * viewer.healPower),
+      });
     case 'passiveOnly':
       return '';
     case 'heartNova': {

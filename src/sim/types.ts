@@ -5501,6 +5501,9 @@ export interface HeroicLeapFlight {
   abilityName: string;
   abilityId: string;
   school: AbilityDef['school'];
+  // A heal the body takes the moment it lands (the Muster Grapnel's haul,
+  // combat/balgath_trinkets.ts), snapshotted at the throw from the thrower's power.
+  landingHeal?: { sourceId: number; amount: number; name: string };
 }
 
 export interface ValkyrsCallingFlight {

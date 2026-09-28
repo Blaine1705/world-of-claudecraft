@@ -85,7 +85,7 @@ describe("Balgath's trinkets in the catalog", () => {
       muster_standard: 'sta',
       guttered_eye: 'int',
       barrowstone_heart: 'sta',
-      muster_grapnel: 'spi',
+      muster_grapnel: 'int',
     };
     for (const id of BALGATH_TRINKET_ITEM_IDS) {
       const item = ITEMS[id];
@@ -756,6 +756,46 @@ describe('Balgath trinket tooltips print the damage and healing that land', () =
     };
     // Same seed, same swings: the shape changes the body, never the numbers.
     expect(swings(true)).toEqual(swings(false));
+  });
+
+  it('Muster Grapnel: the ally lands healed for exactly the printed amount', () => {
+    for (const healPower of [0, 90, 240]) {
+      const sim = new Sim({ seed: 31, playerClass: 'priest', autoEquip: true, noPlayer: true });
+      const healer = sim.addPlayer('priest', 'Healer');
+      const ally = sim.addPlayer('warrior', 'Tank');
+      for (const pid of [healer, ally]) sim.setPlayerLevel(20, pid);
+      sim.partyInvite(ally, healer);
+      sim.partyAccept(ally);
+      sim.addItem('muster_grapnel', 1, healer);
+      sim.equipItem('muster_grapnel', healer);
+      const h = sim.entities.get(healer) as Entity;
+      const a = sim.entities.get(ally) as Entity;
+      h.cooldowns.delete(trinketCooldownKey('muster_grapnel'));
+      h.healPower = healPower;
+      a.pos = { ...h.pos, x: h.pos.x + 20 };
+      a.hp = Math.round(a.maxHp / 2);
+      const text = trinketTooltipLineTexts('muster_grapnel', {
+        attackPower: h.attackPower,
+        rangedPower: h.rangedPower,
+        spellPower: h.spellPower,
+        healPower: h.healPower,
+        maxHp: h.maxHp,
+      })
+        .map((line) => line.text)
+        .join(' ');
+      const m = /healing them for (\d+)(?: \(\+(\d+)\))? when they land/.exec(text);
+      expect(m, text).not.toBeNull();
+      const printed = resolved(m?.[1] ?? '0', m?.[2]);
+      sim.targetEntity(a.id, h.id);
+      const before = a.hp;
+      sim.useItem('muster_grapnel', h.id);
+      run(sim, 1);
+      // Landed at the healer's side, healed by exactly the printed amount (the heal
+      // never crits, and no other healing runs in this second).
+      expect(Math.hypot(a.pos.x - h.pos.x, a.pos.z - h.pos.z)).toBeLessThan(3);
+      expect(a.hp - before, `healPower ${healPower}`).toBe(printed);
+      expect(printed).toBe(Math.round(120 + 0.4 * healPower));
+    }
   });
 
   it('Barrowstone Heart: the health you return with is the health it prints', () => {

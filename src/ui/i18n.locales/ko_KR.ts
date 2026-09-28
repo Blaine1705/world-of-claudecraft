@@ -19308,7 +19308,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.gutteredGlare':
     '{duration}초 동안 정신을 집중합니다. 길이 {length}미터의 광선이 바라보는 방향으로 뻗어 나가 경로에 있는 적 최대 {max}명에게 {every}초마다 {tick}의 비전 피해를 줍니다(전체 집중 동안 각 적에게 {total}). 몸을 돌리면 광선이 휩쓸고, 이동하거나 시전하면 끝납니다. 피해량은 주문력에 따라 증가합니다.',
   'hudChrome.trinkets.use.grapnel':
-    '{range}미터 이내에 보이는 파티원 또는 공격대원에게 갈고리를 걸어 공중으로 끌어당겨 곁으로 데려옵니다. 적이나, 탈것이나 배에 탄 아군, 돌로 변한 아군, 해제할 수 없는 효과에 붙잡힌 아군은 끌어당길 수 없습니다.',
+    '{range}미터 이내에 보이는 파티원 또는 공격대원에게 갈고리를 걸어 공중으로 끌어당겨 곁으로 데려오며, 착지할 때 생명력을 {heal} 회복시킵니다. 적이나, 탈것이나 배에 탄 아군, 돌로 변한 아군, 해제할 수 없는 효과에 붙잡힌 아군은 끌어당길 수 없습니다. 치유량은 치유력에 따라 증가합니다.',
   'hudChrome.auraEffect.trinket.foremanShape':
     '당신은 감독관입니다. 방어도가 {armorPct}% 증가하고 밀려나지 않습니다.',
   'hudChrome.auraEffect.trinket.musterStandard':

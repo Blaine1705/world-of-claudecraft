@@ -18375,7 +18375,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.gutteredGlare':
     '引導{duration}秒：一道{length}碼長的光束從你面朝的方向射出，每{every}秒對路徑上最多{max}個敵人造成{tick}點秘法傷害（整個引導期間對每個敵人共{total}點）。轉身即可橫掃光束；移動或施法會使其結束。傷害隨法術強度提高。',
   'hudChrome.trinkets.use.grapnel':
-    '用鉤索鉤住{range}碼內你能看見的一名小隊或團隊成員，將其從空中拉到你身邊。無法拉動敵人，也無法拉動在載具中、在船上、化作石像或被無法打破的效果控制的盟友。',
+    '用鉤索鉤住{range}碼內你能看見的一名小隊或團隊成員，將其從空中拉到你身邊，並在其落地時為其恢復{heal}點生命值。無法拉動敵人，也無法拉動在載具中、在船上、化作石像或被無法打破的效果控制的盟友。治療量隨治療強度提高。',
   'hudChrome.auraEffect.trinket.foremanShape': '你就是工頭：護甲提高{armorPct}%，免疫擊退。',
   'hudChrome.auraEffect.trinket.musterStandard': '你的徵召軍旗已插下。士兵們正與你的目標作戰。',
   'hudChrome.auraEffect.trinket.gutteredGlare':

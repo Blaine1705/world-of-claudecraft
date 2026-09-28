@@ -132,7 +132,7 @@ export type TrinketUse =
     }
   /** Muster Grapnel: hook a party or raid member within `range` yd (in line of
    *  sight) and haul them through the air to your side in `flight` sec. */
-  | { kind: 'grapnel'; range: number; flight: number; apex: number }
+  | { kind: 'grapnel'; range: number; flight: number; apex: number; heal: number; coef: number }
   /** A passive-only trinket (the Barrowstone Heart): nothing to use; the action
    *  bar refuses the press and the tooltip prints no Use line. */
   | { kind: 'passiveOnly' };
@@ -328,7 +328,7 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   muster_standard: trinket('muster_standard', 'Muster Standard', { sta: 11 }),
   guttered_eye: trinket('guttered_eye', 'The Guttered Eye', { int: 11 }),
   barrowstone_heart: trinket('barrowstone_heart', 'Barrowstone Heart', { sta: 11 }),
-  muster_grapnel: trinket('muster_grapnel', 'Muster Grapnel', { spi: 11 }),
+  muster_grapnel: trinket('muster_grapnel', 'Muster Grapnel', { int: 11 }),
 };
 
 /** Balgath's five trinkets, in the order they sit in his loot table. */
@@ -487,7 +487,9 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
   },
   muster_grapnel: {
     cooldown: 90,
-    use: { kind: 'grapnel', range: 30, flight: 0.6, apex: 2.4 },
+    // The haul lands with a heal: 120 plus 40% of Healing Power (about a classic rank-4
+    // Flash Heal's weight, the 1.5 / 3.5 direct-heal coefficient), on a 90 sec cooldown.
+    use: { kind: 'grapnel', range: 30, flight: 0.6, apex: 2.4, heal: 120, coef: 0.4 },
   },
 });
 

@@ -125,7 +125,7 @@ const EXPECTED: Record<string, { equip?: string; use?: string }> = {
     equip: `Equip: When a hit would kill you, you turn to stone for 3 sec instead: you take no damage and cannot move or act, then return with ${n(1000)} health (20% of your maximum health). Can occur once every 3 min. Never in duels or arena matches, which end at the killing blow.`,
   },
   muster_grapnel: {
-    use: 'Use: Hook a party or raid member within 30 yd that you can see and haul them through the air to your side. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. (90 sec cooldown)',
+    use: 'Use: Hook a party or raid member within 30 yd that you can see and haul them through the air to your side, healing them for 120 (+160) when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power. (90 sec cooldown)',
   },
 };
 

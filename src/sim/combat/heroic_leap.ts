@@ -255,6 +255,19 @@ export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
       ctx.dealDamage(entity, target, damage, false, flight.school, flight.abilityName, 'hit');
     }
   }
+  // The Muster Grapnel's haul lands with a heal from whoever threw it (never crits, so
+  // the tooltip's number is the number healed; draws no rng).
+  if (flight.landingHeal) {
+    const healer = ctx.entities.get(flight.landingHeal.sourceId) ?? entity;
+    ctx.applyHeal(
+      healer,
+      entity,
+      flight.landingHeal.amount,
+      flight.landingHeal.name,
+      flight.abilityId,
+      false,
+    );
+  }
   enrageOnVaultingLanding(ctx, entity, flight.abilityId);
   return true;
 }

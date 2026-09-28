@@ -19325,7 +19325,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.gutteredGlare':
     '{duration}秒間の集中：長さ{length}ヤードの光線が向いている方向へ放たれ、進路上の最大{max}体の敵に{every}秒ごとに{tick}の秘術ダメージを与える（集中全体で各敵に{total}）。向きを変えると光線が薙ぎ払う。移動または詠唱で終了する。ダメージは呪文力で増加する。',
   'hudChrome.trinkets.use.grapnel':
-    '{range}ヤード以内の見えているパーティまたはレイドメンバーに鉤を掛け、空中を引き寄せてあなたの傍らへ運ぶ。敵や、乗り物・船に乗っている味方、石化している味方、解除できない効果で拘束されている味方は引き寄せられない。',
+    '{range}ヤード以内の見えているパーティまたはレイドメンバーに鉤を掛け、空中を引き寄せてあなたの傍らへ運び、着地時に{heal}回復させる。敵や、乗り物・船に乗っている味方、石化している味方、解除できない効果で拘束されている味方は引き寄せられない。回復量は治癒力で増加する。',
   'hudChrome.auraEffect.trinket.foremanShape':
     'あなたは監督だ：防具が{armorPct}%増加し、ノックバックを受けない。',
   'hudChrome.auraEffect.trinket.musterStandard':
