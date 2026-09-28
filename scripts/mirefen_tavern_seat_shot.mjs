@@ -263,7 +263,9 @@ if (want('rested')) {
   const s = await seatOf('tavern_longbench_1_1');
   await standAt(s.standX, s.standZ, s.facing, s.facing + Math.PI + 0.5, 0.25, 7);
   await settle(2500);
-  await run(`document.querySelector('#pf-rest')?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));`);
+  await run(
+    `document.querySelector('#pf-rest')?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));`,
+  );
   await sleep(800);
   await shot('rested_indicator');
 }
