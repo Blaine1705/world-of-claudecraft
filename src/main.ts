@@ -503,6 +503,7 @@ import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
 } from './ui/gather_node_tooltip_controller';
+import { installGraphicsRestoreNote } from './ui/graphics_restore_note_controller';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -1463,6 +1464,7 @@ async function startGame(
       stuckMessage: t('loading.rendererContextLost'),
     }),
   );
+  installGraphicsRestoreNote(document.getElementById('ui') ?? document.body);
   // The probe was armed before the locale/asset awaits above; mark that the await
   // window ended and the synchronous scene build is what runs next.
   entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());

@@ -257,9 +257,12 @@ describe('the restore is wired where the game runs it', () => {
     expect(renderer).toContain('contextRestored: this.contextRestore?.snapshot().restores ?? 0,');
   });
 
-  it('main.ts feeds the restore hold into worldDrawHeld', () => {
+  it('main.ts feeds the restore hold into worldDrawHeld and mounts the note', () => {
     const main = source('src/main.ts');
     expect(main).toContain('newPresentationGateInput(DESKTOP_APP, contextRestoreDrawHeld)');
+    expect(main).toContain(
+      "installGraphicsRestoreNote(document.getElementById('ui') ?? document.body);",
+    );
   });
 
   it('the admission paces the cover while the restore hold stands', () => {
