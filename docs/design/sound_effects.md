@@ -347,7 +347,7 @@ as footstep variant choice, not gameplay-affecting).
 | `amb_dungeon` | ✓ | global | a dark stone dungeon interior, dripping water echoes and a low ominous drone |
 | `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
 | `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
-| `amb_tavern` | ✓ | global, gated | a tavern room: overlapping talk and laughter, mugs, the hearth and a little lute music (project-synthesized, `scripts/gen_tavern_ambience_sfx.mjs`) |
+| `amb_tavern` | yes | global, gated | a tavern room: overlapping talk and laughter, mugs, the hearth and a little lute music (project-synthesized, `scripts/gen_tavern_ambience_sfx.mjs`) |
 
 Point ambience (`amb_campfire`/`amb_forge`) shares the same falloff every
 other positional sound uses by default, but `amb_forge` gets its own,
