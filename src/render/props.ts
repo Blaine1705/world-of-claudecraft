@@ -54,7 +54,6 @@ import {
   mirefenTavernFlameSpots,
   mirefenTavernLights,
   mirefenTavernPrewarmParts,
-  mirefenTavernShellMeshes,
   updateMirefenTavernShell,
 } from './mirefen_tavern';
 import {
