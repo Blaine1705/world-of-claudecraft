@@ -699,7 +699,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '5ddb792c3802ffe88ab74b1942985c015e2769083a5e20fa88dadb75229ac2cc';
+  // Re-minted for the Mirefen tavern's seats: renderer.ts's animation fill calls
+  // seated_pose.ts applySeatAnim. No capture was retaken.
+  '72f401c4780f8a17a6dba017eeb3a4abfee7cccac789bf4ea95e2c53575e3ca9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

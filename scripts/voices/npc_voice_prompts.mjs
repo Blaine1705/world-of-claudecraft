@@ -1182,6 +1182,14 @@ export const VOICE_ALIAS = {
   // Maeve's designed voice as a ROLE match. Promote her to her own VOICE_PROMPTS entry, a
   // rounder, merrier marsh-country alto, once an ElevenLabs key is available.
   innkeeper_maudie: 'hearthkeeper_maeve',
+  // The tavern's seated regulars (src/sim/content/mirefen_tavern_patrons.ts), ROLE matches
+  // until each gets a voice of their own: the old eel fisher borrows Fisherman Brandt's
+  // salt-cured rasp, the peat cutter Mother Sedge's marsh-country voice, the drover the
+  // Fenbridge provisioner's working baritone, and the mapmaker a chronicler's measured one.
+  patron_amos_eelby: 'fisherman_brandt',
+  patron_grissel_sedgeworth: 'mother_sedge',
+  patron_ned_oxley: 'provisioner_hale',
+  patron_hester_quillby: 'chronicler_edda_hartwell',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

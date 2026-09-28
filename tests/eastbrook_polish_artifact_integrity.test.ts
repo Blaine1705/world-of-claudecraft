@@ -1393,7 +1393,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '00201cf03ba0a8a0ca6c93ba817d42ffff94aa95ed2035cbfe361de800fc08ab';
+  'bf6b557361777073e5c6e5db6d28035129a1a54dcfbbb935df6fd2bd759bd402';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1415,7 +1415,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '5ddb792c3802ffe88ab74b1942985c015e2769083a5e20fa88dadb75229ac2cc';
+  '72f401c4780f8a17a6dba017eeb3a4abfee7cccac789bf4ea95e2c53575e3ca9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2796,7 +2796,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // provenance. No capture or measured value changed.
       // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('b5008bdc6d79e6ee7754d02533b4e181505d32a60318a2bf4491af6c0cbd3da7');
+    ).toBe('eb020bd4028755be686f0e709925c55b261d568334a4a5fedc76b2174008154b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

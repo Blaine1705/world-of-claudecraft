@@ -834,6 +834,9 @@ describe('stock rows: the phase 11n pulls', () => {
       npc_rift_watch_quartermaster: 11,
       npc_church_order_quartermaster: 12,
       npc_automaton_quartermaster: 10,
+      // The Mirefen tavern's innkeeper (feature/walkable-tavern-aaa): bread and water
+      // for the road and the marsh's own fare, six existing food and drink rows.
+      innkeeper_maudie: 6,
     });
   });
 });

@@ -218,5 +218,8 @@ export function spawnTavernKeeper(ctx: SimContext, world: WorldContent): void {
   const def = world.npcs[TAVERN_KEEPER_NPC_ID];
   if (!def?.dynamic) return;
   if (ctx.entities.has(TAVERN_KEEPER_ENTITY_ID)) return;
-  ctx.addEntity(createNpc(TAVERN_KEEPER_ENTITY_ID, def, ctx.groundPos(def.pos.x, def.pos.z)));
+  // on the bar platform's floor, read from the tavern itself rather than the walk surface, so
+  // she stands at the same height whichever world is active (the floor fold is built-in only)
+  const y = TAVERN_FLOOR_Y + TAVERN_BAR_PLATFORM.lift;
+  ctx.addEntity(createNpc(TAVERN_KEEPER_ENTITY_ID, def, { x: def.pos.x, y, z: def.pos.z }));
 }
