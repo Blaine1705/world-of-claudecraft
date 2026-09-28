@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "072ebc3445756789afdbfd85e47abde6e6b4b22c6524cfae22c5775e5db2020c",
-  "catalogHash": "ae64cc45b5bcf6a01eb9a5f57a9e3095bbc1666b41bf2f1d53a5d3b71d4fa66b",
+  "bundleId": "952a1d2cd5b5eafdbb8b85affc68f606d85c5ba6158305361b637db6a258b45e",
+  "catalogHash": "80c931114eb36491af099000800d712da876bc1732275906903c85e0f2d38f71",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -842,6 +842,78 @@
         }
       ],
       "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "hoard_entrance_hum": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_entrance_hum.mp3?v=2ccf53e3d2f1",
+          "bytes": 193768,
+          "sha256": "2ccf53e3d2f1edf709b79256cb444026754d61e33b26c1fcbff74fc98c3847b4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_entrance_open": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_entrance_open.mp3?v=7824ebb0d227",
+          "bytes": 41422,
+          "sha256": "7824ebb0d227b96f200fd3f5a2c13c30a56bca0ca72fa1cb35c88973c386c5ec"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_tide_build": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_tide_build.mp3?v=3198ef898ea9",
+          "bytes": 58976,
+          "sha256": "3198ef898ea9627135fb395e6878bce11776d878d26f035096a09beb20153e2e"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_tide_crash": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_tide_crash.mp3?v=3b489f1ae220",
+          "bytes": 63991,
+          "sha256": "3b489f1ae2207326fd270995f9daa6dc82149fee1aa0621706959049be005299"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_tide_hit": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_tide_hit.mp3?v=d9a76311c5a6",
+          "bytes": 20733,
+          "sha256": "d9a76311c5a6abd1226bde87f15893c2c59621301a447d116fc5119de2a12c32"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_tide_rush": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_tide_rush.mp3?v=f09720616fa7",
+          "bytes": 94711,
+          "sha256": "f09720616fa7b6ac9235b09e400ff07da777a852ae505333c2686b7e7cd4a35c"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "ice_block": {

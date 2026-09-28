@@ -1373,6 +1373,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1393,8 +1394,11 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  'bf6b557361777073e5c6e5db6d28035129a1a54dcfbbb935df6fd2bd759bd402';
+  // Re-minted at the release/v0.45.0 merge into feature/mirefen-tavern (the tavern's
+  // renderer.ts seat and interior-camera wiring). No capture was retaken.
+  '3b5d42f776f9033c78902a7826c5535bb5815008aa7b3d9056ea264d8cfe3116';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1415,7 +1419,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '72f401c4780f8a17a6dba017eeb3a4abfee7cccac789bf4ea95e2c53575e3ca9';
+  // Re-minted at the release/v0.45.0 merge into feature/mirefen-tavern (the tavern's
+  // renderer.ts seat and interior-camera wiring). No capture was retaken.
+  '114a39474c7fa9b4ad04f1959d4cb1c7ac76c43d9bb48bfbb92691de1be6805a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2796,7 +2802,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // provenance. No capture or measured value changed.
       // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('eb020bd4028755be686f0e709925c55b261d568334a4a5fedc76b2174008154b');
+      // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // release/v0.45.0 merge into feature/mirefen-tavern: recomputed LAST again.
+    ).toBe('f8e83d1a494b1142faac49c5d60865cfca37c5d860b349ac576bf0b7024bb2b5');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

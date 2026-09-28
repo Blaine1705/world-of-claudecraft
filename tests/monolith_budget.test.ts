@@ -533,10 +533,14 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    // LOWERED 18081 -> 18077 by the tavern's seats (feature/walkable-tavern-aaa): the rest
-    // badge's input now comes from rest_indicator.ts restStateOf (which also carries the inn's
-    // rest-area read), shrinking the call site. Exact count.
-    ceiling: 18077,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 18081 and the
+    // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
+    // wc -l on the merged tree. Exact count.
+    ceiling: 18089,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -987,14 +991,18 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12696 -> 12684 at the merge of release/v0.44.0 into the
     // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
     // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
-    // LOWERED 12684 -> 12679 by the indoor camera clamp (interior_camera.ts): its
-    // wiring (the clamp, the draw-time re-check and restore, the close-camera self
-    // hide, the chat-bubble gate) is paid for by moving the chase camera's floor
-    // (ground, rift tier, maze hedges) into chase_camera_floor_core.ts. Exact count.
-    // LOWERED 12679 -> 12678 by the tavern's seats: the sit rule of the animation fill moved
-    // into seated_pose.ts applySeatAnim (one call, which also carries the seat's clips and
-    // lift). Exact count.
-    ceiling: 12678,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 12684 and the
+    // branch 12782; the two sides' additions compose to 12687 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
+    // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
+    // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
+    // LOWERED 12688 -> 12686 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
+    // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
+    // merged tree. Exact count.
+    ceiling: 12686,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1687,9 +1695,14 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    // LOWERED 9827 -> 9822 by the tavern's seats: mobZonePhase moved to tick_perf_log.ts
-    // beside its buckets (re-exported), paying for the sit_seat dispatch arm. Exact count.
-    ceiling: 9822,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 9827 and the
+    // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
+    // on the merged tree. Exact count.
+    ceiling: 9835,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1864,9 +1877,14 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    // LOWERED 5354 -> 5353 by the tavern's seats: the input-facing helpers moved to
-    // input_signature.ts, paying for sitOnSeat and the derived resting read. Exact count.
-    ceiling: 5353,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 5354 and the
+    // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    // LOWERED 5356 -> 5355 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's input_signature.ts extraction pays for the tavern's wiring. wc -l on the
+    // merged tree. Exact count.
+    ceiling: 5355,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
