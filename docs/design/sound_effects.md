@@ -363,7 +363,9 @@ The Mirefen tavern's room bed (`amb_tavern`, point kind `tavern`) is the one poi
 source that does not pan: `src/render/world_audio.ts` anchors it at the hall's middle
 (built-in world only), and `src/game/sfx.ts` plays it as a stereo bed through a
 lowpass (`setLoopLowpass`) whose level and cutoff come from the pure
-`src/game/tavern_ambience_core.ts` for the listener's position: full and clear inside
+`src/game/tavern_ambience_core.ts` for where the player stands (the avatar's eye the
+renderer passes to `ambience()`, never the camera, which trails the player and sits in
+the doorway while they stand in the hall): full and clear inside
 the hall and the nook, muffled and quieter outside (loudest before the open door,
 fading over `TAVERN_AMBIENCE_RADIUS` yards from it, a low murmur through the walls
 close round the rest), blended over a couple of yards across the doorway so walking

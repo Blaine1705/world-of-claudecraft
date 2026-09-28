@@ -226,6 +226,15 @@ interface PendingLoop {
 // (e.g. a Professions 2.0 station bed: kitchens/apothecary/tannery/loom/
 // toolworks, see issue #2208) is a new 'kind' plus its own named constant,
 // same pattern, no changes needed to the override mechanism itself.
+/** The avatar's eye (where the player stands), which a room bed is decided from: the camera
+ *  trails the player and can sit in the doorway (or over the roof) while the player is in the
+ *  hall. Mirrors src/render/audio_sink.ts. */
+interface AmbienceEye {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
 interface AmbientPointSource {
   readonly id: string;
   readonly kind: 'campfire' | 'forge' | 'tavern' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
@@ -1735,12 +1744,13 @@ class Sfx {
     else this.unloop(key, 0.7);
   }
 
-  private pointAmbient(source: AmbientPointSource): void {
+  private pointAmbient(source: AmbientPointSource, eye: AmbienceEye | undefined): void {
     // The forge's own, narrower cull distance so it stops (unloops) exactly
     // where its own falloff (below) would already have gone silent, instead
     // of lingering as a silent loop out to the shared MAX_DISTANCE.
     if (source.kind === 'tavern') {
-      this.tavernAmbient(source.id);
+      if (eye) this.tavernAmbient(source.id, eye.x, eye.y, eye.z);
+      else this.tavernAmbient(source.id, this.lx, this.ly, this.lz);
       return;
     }
     const maxDistance = source.kind === 'forge' ? FORGE_MAX_DISTANCE : undefined;
@@ -1778,22 +1788,24 @@ class Sfx {
   }
 
   /** The Mirefen tavern's room bed: a non-positional stereo loop whose level and lowpass
-   *  follow the listener (src/game/tavern_ambience_core.ts): muffled through the walls,
-   *  clear inside, silent beyond its radius from the door. */
-  private tavernAmbient(id: string): void {
-    const mix = tavernAmbienceMix(this.lx, this.ly, this.lz, this.tavernMix);
+   *  follow where the player stands (src/game/tavern_ambience_core.ts): muffled through the
+   *  walls, clear inside, silent beyond its radius from the door. */
+  private tavernAmbient(id: string, x: number, y: number, z: number): void {
+    const mix = tavernAmbienceMix(x, y, z, this.tavernMix);
     if (mix.gain <= TAVERN_AMBIENCE_SILENT) {
       if (this.loops.has(id) || this.pendingLoops.has(id)) this.unloop(id, 0.7);
       return;
     }
-    // quantized so a camera drifting by a hand does not re-arm the ramps every frame
+    // quantized so a step or two does not re-arm the ramps every frame
     this.loop(id, 'amb_tavern', Math.round(mix.gain * 400) / 400);
     this.setLoopLowpass(id, mix.cutoffHz);
   }
 
   /** Cross-fade the global ambience loops to match the player's surroundings.
    *  These are continuous background beds, kept well under the foreground
-   *  footstep/jump/combat one-shots so movement always reads clearly over them. */
+   *  footstep/jump/combat one-shots so movement always reads clearly over them.
+   *  `eye` is the avatar's eye, which the room beds follow (the camera listener when
+   *  omitted). */
   ambience(
     biome: BiomeId,
     inDungeon: boolean,
@@ -1801,6 +1813,7 @@ class Sfx {
     nearWater: boolean,
     crowd = 0,
     points: readonly AmbientPointSource[] = [],
+    eye?: AmbienceEye,
   ): void {
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
     // Sowfield crowd murmur (procedural bed): quiet chatter on the grounds,
@@ -1858,7 +1871,7 @@ class Sfx {
     const activeIds = new Set<string>();
     for (let i = 0; i < points.length; i++) {
       activeIds.add(points[i].id);
-      this.pointAmbient(points[i]);
+      this.pointAmbient(points[i], eye);
     }
     // Unlike the static campfire/forge set (the same fixed sources every frame,
     // culled only by distance), a rift portal/roller/gliding-player source can

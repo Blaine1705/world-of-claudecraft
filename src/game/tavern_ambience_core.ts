@@ -1,8 +1,10 @@
 // The Mirefen tavern's ambience bed (amb_tavern: talk, mugs, the hearth and a little music),
-// decided from where the listener (the camera) stands: clear and full inside the common room
-// and the tower's nook, muffled outside: loudest in front of the open door and fading out over
-// TAVERN_AMBIENCE_RADIUS yards from it, a low murmur through the walls close round the rest. src/game/sfx.ts plays the bed as
-// a non-positional stereo loop through a lowpass and hands this core the listener each frame.
+// decided from where the player stands (the avatar's eye, never the camera, which trails the
+// player and can sit in the doorway while they stand in the hall): clear and full inside the
+// common room and the tower's nook, muffled outside: loudest in front of the open door and
+// fading out over TAVERN_AMBIENCE_RADIUS yards from it, a low murmur through the walls close
+// round the rest. src/game/sfx.ts plays the bed as a non-positional stereo loop through a
+// lowpass and hands this core that eye each frame.
 //
 // Pure and allocation-free: the caller owns the result object. The geometry is the tavern's
 // own (src/sim/content/mirefen_tavern.ts, local frame: local (lx, lz) is world

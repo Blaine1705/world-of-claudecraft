@@ -1475,4 +1475,43 @@ describe('amb_tavern: the tavern bed follows the listener through its lowpass', 
     listen(0, 80);
     expect(slot()).toBeUndefined();
   });
+
+  // The camera trails the player: walking in through the door leaves it clamped in the
+  // doorway behind them (outside the rooms by the core's plan), so a bed decided from the
+  // camera stayed the muffled door spill the whole time the player stood in the hall. Like
+  // the biome beds, the room bed follows where the player stands (the avatar's eye).
+  it('follows the avatar, not the camera trailing it in the doorway', () => {
+    const cam = tavernToWorld(0, 13.6);
+    const hall = tavernToWorld(0, 4);
+    const eye = { x: hall.x, y: TAVERN_FLOOR_Y + 2, z: hall.z };
+    const frame = () => {
+      sfx.setListener(cam.x, TAVERN_FLOOR_Y + 5, cam.z, -1, 0, 0);
+      sfx.ambience('marsh', false, null, false, 0, [TAVERN], eye);
+    };
+    frame();
+    frame();
+    const gain = SFX_CLIPS.amb_tavern.gain;
+    expect(slot()?.target).toBeCloseTo(
+      (Math.round(TAVERN_AMBIENCE_INSIDE_GAIN * 400) / 400) * gain,
+      6,
+    );
+    expect(slot()?.filter?.frequency.value).toBeCloseTo(TAVERN_AMBIENCE_CLEAR_HZ, 0);
+    // and the other way round: the player outside down the road with the camera swung
+    // over the roof into the hall hears the road, not the room
+    const road = tavernToWorld(0, 80);
+    sfx.setListener(hall.x, TAVERN_FLOOR_Y + 5, hall.z, 1, 0, 0);
+    sfx.ambience('marsh', false, null, false, 0, [TAVERN], {
+      x: road.x,
+      y: TAVERN_FLOOR_Y + 2,
+      z: road.z,
+    });
+    expect(slot()).toBeUndefined();
+  });
+
+  it('the renderer hands the ambience the avatar eye it samples the biome beds at', () => {
+    const src = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(src).toMatch(
+      /sink\.ambience\(\s*amb\.biome,\s*amb\.inDungeon,\s*amb\.precip,\s*amb\.nearWater,\s*0,\s*points,\s*eye,?\s*\)/,
+    );
+  });
 });
