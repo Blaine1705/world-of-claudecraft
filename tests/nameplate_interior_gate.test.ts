@@ -17,8 +17,8 @@ import type { IWorld } from '../src/world_api';
 // The production nameplate painter with a walk-in interior registered (interior_camera.ts):
 // while the player stands inside, the plates of bodies outside draw only when the camera
 // sees them through an opening onto the world (here a door in the back wall), never
-// through a wall; bodies inside keep theirs; outdoors nothing is gated. A gated plate leaves
-// no pick anchor behind.
+// through a wall; bodies inside keep theirs; outdoors, a body inside keeps its plate only
+// where the camera sees it through the door. A gated plate leaves no pick anchor behind.
 
 const VIEWPORT = { width: 1280, height: 720 };
 const VIEWER_ID = 1;
@@ -168,8 +168,16 @@ describe('nameplates while the player is indoors', () => {
     expect(plateIds(painter)).toEqual([2, 3]);
   });
 
-  it('gates nothing while the player stands outside', () => {
+  it('outside, keeps the plates outside and drops those the walls hide inside', () => {
+    // the camera out in front of the room's closed front wall: the body inside is walled off
     const painter = harness([mob(2, 0, -4), mob(3, 0, -20), mob(4, 6, -20)], 30);
+    painter.update(true);
+    expect(plateIds(painter)).toEqual([3, 4]);
+  });
+
+  it('outside, keeps the plate of a body inside that the camera sees through the door', () => {
+    // the camera out behind the room, looking in through its back door
+    const painter = harness([mob(2, 0, -4), mob(3, 0, -20), mob(4, 6, -20)], -30);
     painter.update(true);
     expect(plateIds(painter)).toEqual([2, 3, 4]);
   });

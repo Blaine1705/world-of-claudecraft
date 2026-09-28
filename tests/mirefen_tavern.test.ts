@@ -20,7 +20,8 @@ import {
   TAVERN_YAW,
   tavernToWorld,
 } from '../src/sim/content/mirefen_tavern';
-import { BUILTIN_WORLD, GATHER_NODES, NPCS } from '../src/sim/data';
+import { TAVERN_PATRON_NPC_IDS } from '../src/sim/content/mirefen_tavern_patrons';
+import { BUILTIN_WORLD, GATHER_NODES, ITEMS, NPCS } from '../src/sim/data';
 import { isExcludedDecoration } from '../src/sim/decoration_exclusions';
 import {
   mirefenTavernColliders,
@@ -92,7 +93,8 @@ describe('Mirefen tavern: the site', () => {
       }
     }
     for (const npc of Object.values(NPCS)) {
-      if (npc.id === 'innkeeper_maudie') continue;
+      // the tavern's own people stand (or sit) inside it
+      if (npc.id === 'innkeeper_maudie' || TAVERN_PATRON_NPC_IDS.includes(npc.id)) continue;
       expect(mirefenTavernCovers(npc.pos.x, npc.pos.z, 4), npc.id).toBe(false);
     }
   });
@@ -331,7 +333,26 @@ describe('Mirefen tavern: the innkeeper', () => {
     expect(TAVERN_KEEPER_ENTITY_ID).toBeGreaterThanOrEqual(1_000_000_000);
     expect(TAVERN_KEEPER_ENTITY_ID).toBeLessThan(STATIC_WORLD_SERVICE_ENTITY_ID_MIN);
     expect(npc.questIds).toEqual([]);
-    expect(npc.vendorItems).toBeUndefined();
+    // a classic inn's victualler: bread and water for the road and the marsh's own fare,
+    // every one an existing record some other Mirefen or starter vendor already stocks
+    expect(npc.vendorItems).toEqual([
+      'baked_bread',
+      'spring_water',
+      'fenbridge_rye',
+      'marsh_mint_tea',
+      'smoked_eel',
+      'silvermist_cordial',
+    ]);
+    for (const id of npc.vendorItems ?? []) {
+      const item = ITEMS[id];
+      expect(item, id).toBeDefined();
+      expect(['food', 'drink']).toContain(item.kind);
+      expect(item.buyValue, id).toBeGreaterThan(0);
+      const stockedElsewhere = Object.values(NPCS).some(
+        (other) => other.id !== npc.id && other.vendorItems?.includes(id),
+      );
+      expect(stockedElsewhere, id).toBe(true);
+    }
     expect(npc.title).toBe('Innkeeper');
     const npcs = worldEntityText.en.entities.npcs as Record<string, Record<string, string>>;
     expect(npcs.innkeeper_maudie).toEqual({

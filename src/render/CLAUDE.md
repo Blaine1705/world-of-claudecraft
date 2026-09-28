@@ -131,6 +131,16 @@ Everything else is a sibling module in one of these families:
   runs on past it), so nothing is cut away round the player; bodies outside lose their
   nameplates and chat bubbles unless seen through an opening. Outdoors it touches nothing. Reference registrant: `mirefen_tavern_interior_core.ts`. The chase
   camera's floor (ground, rift tier, maze hedges) is `chase_camera_floor_core.ts`.
+- **Sitting on furniture** (the seats are `src/sim/seat_anchor.ts`): the sim keeps a seated
+  body on its seat's STAND spot; `seated_pose.ts` over the pure `seated_pose_core.ts` draws it
+  in the seat (the root at the seat anchor, turned to the seat, the rig ROOT lifted onto the
+  seat surface so the group's step smoothing never eases over a seat) and walks it in and out.
+  Two hooks and nothing else: `entityRenderPose` (`deck_frame.ts`) calls `applySeatedPose`,
+  the animation fill calls `applySeatAnim`. The chair clips (`sit_anims.glb`, wired by
+  `manifest.ts` `seats()` onto every Rig_Medium body, chosen by `characters/seat_clips.ts`)
+  are authored in the seat's anchor space, so the visual SNAPS (never crossfades) into and
+  out of the seated states. The pointer's seat pick is `seat_pick.ts` over
+  `seat_pick_core.ts`, driven by `src/game/seat_interact.ts`.
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,

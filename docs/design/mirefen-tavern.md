@@ -25,7 +25,15 @@ mood and proportion only and never entered the build.
   kitchen (a range, a cook's table, pots and herbs). The rooms the innkeeper lets upstairs
   are never walked. Outside: a front gable with a porch canopy, a giant wooden tankard hung from an iron
   arm as the sign, a river-stone chimney on the side the road from Fenbridge sees, a dark green
-  slate roof, the tower's slate hat over it.
+  slate roof, the tower's slate hat over it. The front the road sees is dressed
+  (`tavern_facade.py`): the sign arm's carved board and scrollwork and a painted board under the
+  tankard (a moon and a star, a picture, never words), a caged lantern either side of the door
+  (they glow, they cast no light: the point lights stay indoors), the front's five windows
+  glazed in the same glowing glass (the lit hall behind them), flowering window boxes under all
+  four front windows and slate hoods over the lower two, an ivy up the left corner, hanging
+  baskets from the canopy's brackets, carved drops under the bargeboards, and solid
+  (`TAVERN_PROPS`): a bench left of the door and three casks right of it on the porch, and a
+  stone flower tub either side of the steps' foot on the terrain (`baseY`).
 - **Scale.** Every number lives in the content module (`TAVERN_HALL`, `TAVERN_DOOR`,
   `TAVERN_TOWER`, `TAVERN_STAGE`, `TAVERN_HATCH`, `TAVERN_PROPS`) and is pinned against the
   player's height by `tests/mirefen_tavern.test.ts` "scaled for the player".
@@ -52,11 +60,37 @@ mood and proportion only and never entered the build.
   (standable) and what stands at full height (the hearth, the wall fireplace, the barrel racks,
   the bar's pillar).
 - **Rest area.** The inn rule (`src/sim/progression/xp.ts` `isResting`) through
-  `tavernRestsAt`: anywhere inside (the hall and the nook), out of combat.
-- **Innkeeper.** `MIREFEN_TAVERN_NPCS`, a gossip NPC spawned under the reserved
-  `TAVERN_KEEPER_ENTITY_ID` by `src/sim/built_world_keepers.ts` (no sequential id moves), her
-  calm pad skipped (`src/sim/terrain_calm_anchors.ts`) because she stands on the tavern's floor.
-  She stands behind the long counter, before the kitchen hatch.
+  `tavernRestsAt`: anywhere inside (the hall and the nook), out of combat. Both worlds read it
+  as `IWorld.resting` (derived from the player's own position and combat flag, no wire field),
+  and the player portrait's zZz says so (`src/ui/rest_indicator.ts`, `hudChrome.rest.restArea`).
+- **Innkeeper.** `MIREFEN_TAVERN_NPCS`, spawned under the reserved `TAVERN_KEEPER_ENTITY_ID` by
+  `src/sim/built_world_keepers.ts` (no sequential id moves), her calm pad skipped
+  (`src/sim/terrain_calm_anchors.ts`) because she stands on the tavern's floor. She stands
+  behind the long counter, before the kitchen hatch, and sells bread and water for the road and
+  the marsh's own fare (existing records Fenbridge's provisioner and the starter vendors stock;
+  pinned by `tests/mirefen_tavern.test.ts` "the innkeeper"). There is no hearthstone in this
+  game, so an innkeeper has no bind service.
+- **Seats.** Every place a body can sit is a `SeatAnchor` (`src/sim/seat_anchor.ts`) derived
+  from the furniture in `src/sim/content/mirefen_tavern_seats.ts`: the hearth's and the nook's
+  benches, the long table's benches, the booths' settles and the fire's settle, the chairs,
+  the stools, the bar stools and the porch bench. Each names its anchor on the seat surface,
+  the seat's height and floor, its facing (the hearth, the tower's middle, its table, the
+  counter, the road), a collision-free STAND spot where the seated body stands, an optional
+  `via` point the drawn body walks in through (a booth's inner place), and a click box. The sit
+  command (`src/sim/seating.ts`, `IWorld.sitOnSeat`, wire `sit_seat`) re-checks everything on
+  the server; occupancy is derived from who sits on a stand spot, so two bodies never share a
+  seat and every stand-up path frees it. Plain wooden seats stand at `SEAT_CHAIR_HEIGHT` over
+  their floor (a cushion gives under the body to it), the bar stools at `SEAT_HIGH_HEIGHT`, the
+  heights the chair clips were authored for (`tests/seating.test.ts`).
+- **Patrons.** `src/sim/content/mirefen_tavern_patrons.ts`: the regulars, spawned seated under
+  reserved ids (`src/sim/mirefen_tavern_patrons.ts`), each holding its seat like a player
+  would: two chatting side by side on the hearth's far bench, a drover at the bar, a mapmaker
+  in the window booth. Friendly, a short word each, no quests or stock. Their names are
+  original and were checked against the major game wikis and this repo before shipping
+  (exact-phrase and surname-token searches): Amos Eelby, Grissel Sedgeworth, Ned Oxley and
+  Hester Quillby are clear; the rejected candidates collided with an NPC already in this
+  game (Tobin, Wick, Nell, Cobb, Petra) or with another game ("Brackwater" is a Guild Wars 2
+  village and a World of Warcraft gear prefix).
 - **Scatter and grass** keep off the footprint (`src/sim/decoration_exclusions.ts`,
   `src/render/foliage_core.ts` `mirefenTavernGrassExclusions`); rain stops falling on a player
   inside (`src/render/precip_shelter.ts`).
@@ -65,7 +99,7 @@ mood and proportion only and never entered the build.
 
 - **Model.** One Blender-built GLB, `public/models/props/mirefen_tavern.glb`, from the sim's own
   layout (`scripts/assets/mirefen_tavern/layout.ts` writes `layout.json`; `build_tavern.py` with
-  `tavern_frame.py`, `tavern_shell.py` and `tavern_furnish.py` builds it; `build.mjs` validates,
+  `tavern_frame.py`, `tavern_shell.py`, `tavern_furnish.py` and `tavern_facade.py` builds it; `build.mjs` validates,
   fingerprints and compresses it). Vertex-coloured, texture-free, five materials. The warm light
   of the fires, lanterns, sconces and table candles is baked into the inside's vertex colours
   (`bake_warm_light`), because the runtime shares its few point lights with the whole world. The
@@ -109,6 +143,14 @@ mood and proportion only and never entered the build.
   flame (`MIREFEN_TAVERN_FLAMES`, built in `src/render/props.ts`), lit by the fire-light budget
   with the chandelier, the lit lanterns under the hammer beams, the stage's footlights, the
   bar's candles and the nook's crown (`mirefenTavernLights`).
+
+- **Sitting.** A right-click (or a left-click) on a seat the camera can see walks the body to
+  its stand spot and sits it (`src/game/seat_interact.ts`, the ornate chair cursor on hover).
+  The drawn body walks in (through the `via` point), turns and sits with the authored chair
+  clips (`sit_anims.glb`: sit-down, idle, stand-up, a relaxed lean against a high back, a
+  conversation, a drink, and the bar stool's own three), eats and drinks in the chair, and gets
+  up again at the seat (`src/render/seated_pose.ts`, `src/render/CLAUDE.md` "Sitting on
+  furniture").
 
 ## Rebuilding the model
 

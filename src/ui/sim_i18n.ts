@@ -328,6 +328,9 @@ const baseEnTable = {
   'error.clueNothingToDig': 'There is nothing to dig here.',
   'error.clueMissingItems': 'You do not have what the clue asks for.',
   'error.cantWhileDead': "You can't do that while dead.",
+  // The sit-on-furniture refusal (src/sim/seating.ts): the seat is held by someone else.
+  // Its other refusals reuse existing rows (dead, in combat, "Can't move!", busy, too far).
+  'error.seatTaken': 'Someone is already sitting there.',
   'error.cantWhileSwimming': "You can't do that while swimming.",
   'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',
   'error.tithefiendNeedsDirge': 'Your Tithefiend needs an enemy affected by Dirge of Decay.',
@@ -7228,6 +7231,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.usage': 'Verwendung: /pvp, /pvp on oder /pvp off.',
   },
   zh_CN: {
+    'error.seatTaken': '已经有人坐在那里了。',
     'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
     'aura.craftedMomentum': '匠造势能',
     'aura.craftedShelter': '匠造庇护',
@@ -8052,6 +8056,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.usage': '用法：/pvp、/pvp on 或 /pvp off。',
   },
   zh_TW: {
+    'error.seatTaken': '已經有人坐在那裡了。',
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
     'aura.craftedMomentum': '匠造勢能',
     'aura.craftedShelter': '匠造庇護',
@@ -8876,6 +8881,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.usage': '用法：/pvp、/pvp on 或 /pvp off。',
   },
   ko_KR: {
+    'error.seatTaken': '이미 누군가 앉아 있습니다.',
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
     'aura.craftedMomentum': '장인의 기세',
     'aura.craftedShelter': '장인의 피난처',
@@ -9740,6 +9746,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.usage': '사용법: /pvp, /pvp on, 또는 /pvp off.',
   },
   ja_JP: {
+    'error.seatTaken': 'そこにはもう誰かが座っています。',
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
     'aura.craftedMomentum': '匠の勢い',
     'aura.craftedShelter': '匠の庇護',
@@ -11527,6 +11534,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.usage': 'Uso: /pvp, /pvp on, ou /pvp off.',
   },
   ru_RU: {
+    'error.seatTaken': 'Там уже кто-то сидит.',
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
     'aura.craftedMomentum': 'Импульс мастера',
     'aura.craftedShelter': 'Укрытие мастера',

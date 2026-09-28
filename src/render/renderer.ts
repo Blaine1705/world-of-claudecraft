@@ -718,6 +718,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
+import { applySeatAnim } from './seated_pose';
 import { drapeRingLocalY } from './selection_ring';
 import {
   createSelfRenderPositionState,
@@ -10812,9 +10813,7 @@ export class Renderer {
       // A mounted rider holds the seated pose (the sit loop reads as riding);
       // swim/cast still outrank it in desiredBaseState, so mounted casting
       // and swimming animate normally.
-      st.sitting =
-        e.kind === 'player' &&
-        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
+      applySeatAnim(st, v, e, riderMounted, active.root); // a seat's clips + lift, or the sit
       // Facts about the ENTITY that override what its displayed motion implies
       // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
       applyEntityAnimOverrides(st, e, visuallyDead, characterEffects, hasStealth);

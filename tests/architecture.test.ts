@@ -783,6 +783,9 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
+  // where a body sitting on a seat is drawn, and which seat a screen ray points at
+  'src/render/seated_pose_core.ts',
+  'src/render/seat_pick_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',

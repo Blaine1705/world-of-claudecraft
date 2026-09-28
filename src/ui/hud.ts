@@ -835,7 +835,7 @@ import {
 } from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { closeReportWindow, openReportWindow } from './report_window';
-import { restView } from './rest_indicator';
+import { type RestLabelKey, restStateOf, restView } from './rest_indicator';
 import { paintRestIndicator } from './rest_indicator_painter';
 import {
   CALENDAR_RESULT_FALLBACK_KEY,
@@ -1981,7 +1981,7 @@ export class Hud {
   // loops for casters that left interest mid-channel (no castStop/death arrives).
   private castLoopIds = new Set<number>();
   private lastNythraxisCombatEventAt = 0;
-  private lastResting: boolean | null = false;
+  private lastResting: RestLabelKey | null = '';
   private lastZoneId = '';
   private mapZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
@@ -9435,15 +9435,11 @@ export class Hud {
       // Routed through the cached ref + the elided toggleClass writer: a counted,
       // change-only write replacing a per-frame raw re-querying classList.toggle.
       this.toggleClass(this.playerFrameEl, 'combat', inCombat);
-      // classic "resting" zZz on the player portrait while seated / recovering.
-      // Reads the seated booleans IWorld exposes; works offline + online alike.
-      const rest = restView({
-        sitting: !!p.sitting,
-        eating: !!p.eating,
-        drinking: !!p.drinking,
-      });
-      if (rest.resting !== this.lastResting) {
-        this.lastResting = rest.resting;
+      // classic "resting" zZz on the player portrait while seated / recovering, or in an
+      // inn's rest area (IWorld.resting); works offline + online alike.
+      const rest = restView(restStateOf(p, this.sim.resting));
+      if (rest.labelKey !== this.lastResting) {
+        this.lastResting = rest.labelKey;
         paintRestIndicator($('#pf-rest'), rest, this.writerFacet);
       }
 

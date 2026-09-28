@@ -533,7 +533,10 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 18081,
+    // LOWERED 18081 -> 18077 by the tavern's seats (feature/walkable-tavern-aaa): the rest
+    // badge's input now comes from rest_indicator.ts restStateOf (which also carries the inn's
+    // rest-area read), shrinking the call site. Exact count.
+    ceiling: 18077,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -988,7 +991,10 @@ const MONOLITHS: MonolithRow[] = [
     // wiring (the clamp, the draw-time re-check and restore, the close-camera self
     // hide, the chat-bubble gate) is paid for by moving the chase camera's floor
     // (ground, rift tier, maze hedges) into chase_camera_floor_core.ts. Exact count.
-    ceiling: 12679,
+    // LOWERED 12679 -> 12678 by the tavern's seats: the sit rule of the animation fill moved
+    // into seated_pose.ts applySeatAnim (one call, which also carries the seat's clips and
+    // lift). Exact count.
+    ceiling: 12678,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1200,7 +1206,10 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
+    // (bound straight into the context and the motion deps), paying for the sitOnSeat and
+    // resting delegates. Exact count.
+    ceiling: 11639,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1678,7 +1687,9 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 9827,
+    // LOWERED 9827 -> 9822 by the tavern's seats: mobZonePhase moved to tick_perf_log.ts
+    // beside its buckets (re-exported), paying for the sit_seat dispatch arm. Exact count.
+    ceiling: 9822,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1853,7 +1864,9 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 5354,
+    // LOWERED 5354 -> 5353 by the tavern's seats: the input-facing helpers moved to
+    // input_signature.ts, paying for sitOnSeat and the derived resting read. Exact count.
+    ceiling: 5353,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

@@ -350,6 +350,7 @@ import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
 import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { MIREFEN_TAVERN_NPCS } from './content/mirefen_tavern';
+import { MIREFEN_TAVERN_PATRON_NPCS } from './content/mirefen_tavern_patrons';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
@@ -520,6 +521,8 @@ export const NPCS: Record<string, NpcDef> = {
   // The Mirefen tavern's innkeeper (content/mirefen_tavern.ts), a dynamic singleton under a
   // reserved id, appended last for the same reason.
   ...MIREFEN_TAVERN_NPCS,
+  // Its seated patrons (content/mirefen_tavern_patrons.ts), dynamic singletons too.
+  ...MIREFEN_TAVERN_PATRON_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the

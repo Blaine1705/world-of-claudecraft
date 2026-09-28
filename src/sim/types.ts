@@ -3925,6 +3925,9 @@ export interface NpcDef {
   // A banker: talking to this NPC opens the player's bank (deposit box). The bank
   // deposit/withdraw/buy-slots commands gate on standing near one of these.
   banker?: true;
+  // An innkeeper (the Mirefen tavern's): the nameplate's role line reads Innkeeper whatever
+  // food and drink she also sells (src/sim/npc_role.ts).
+  innkeeper?: true;
   // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
   // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
   heroicVendor?: boolean;

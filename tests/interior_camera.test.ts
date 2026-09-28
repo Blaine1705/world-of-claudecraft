@@ -468,11 +468,16 @@ describe('indoor nameplates', () => {
     expect(interiorHidesNameplate(cam, 1, 0, -2, 1.5)).toBe(false);
   });
 
-  it('hides nothing while the player is outdoors', () => {
+  it('outdoors, hides only a body inside that the walls hide from the camera', () => {
     registerCameraInterior(ROOM);
     const cam = camera();
+    // high over the door: the sight line to the body inside clears the door's head, so the
+    // wall over it hides the body; a body outside is never gated
     frame(cam, new THREE.Vector3(5, 0, -20), [5, 6, -30]);
-    expect(interiorHidesNameplate(cam, 5, 0, 5, 2.8)).toBe(false);
+    expect(interiorHidesNameplate(cam, 5, 0, 5, 2.8)).toBe(true);
     expect(interiorHidesNameplate(cam, -10, 0, 5, 2.8)).toBe(false);
+    // low, looking in through the doorway: the body inside keeps its plate
+    frame(cam, new THREE.Vector3(5, 0, -20), [5, 2, -30]);
+    expect(interiorHidesNameplate(cam, 5, 0, 5, 2.8)).toBe(false);
   });
 });

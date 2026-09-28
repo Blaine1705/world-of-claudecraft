@@ -627,7 +627,7 @@ import {
   switchTalentLoadout,
   talentPointBudget,
 } from './progression/talents';
-import { prestige as prestigeImpl, updateRested } from './progression/xp';
+import { isResting, prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
 import * as hillMod from './pvp/hill';
@@ -661,6 +661,7 @@ import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
+import * as seatingMod from './seating';
 import { persistedResource } from './serialize_resource';
 import { computeCharacterModifiers } from './set_bonus_mods';
 import {
@@ -863,7 +864,6 @@ import {
   type InvSlot,
   type ItemInstancePayload,
   type ItemUseResult,
-  isConsuming,
   isDungeonDifficulty,
   isEquipSlot,
   isNonSpellCast,
@@ -2254,7 +2254,7 @@ export class Sim {
       resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
       platform: (p) => ferryMod.ferryDeckPlatform(this.ctx, p), // a sailing ship's deck
       cancelCast: (p) => this.cancelCast(p),
-      standUp: (p) => this.standUp(p),
+      standUp: (p) => seatingMod.standUp(this.ctx, p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
         const wasAlive = !target.dead;
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
@@ -4545,6 +4545,9 @@ export class Sim {
   get restedXp(): number {
     return this.primary.restedXp;
   }
+  get resting(): boolean {
+    return isResting(this.player);
+  }
   // IWorldProgressionXp.playtimeSeconds: the running lifetime played total
   // (persisted baseline + this session's elapsed sim time), the same figure
   // /playtime reports and serializeCharacter folds at save. Sim-clock derived,
@@ -5591,7 +5594,7 @@ export class Sim {
       lineOfSightBlocked: sim.lineOfSightBlocked.bind(sim),
       stopFollow: sim.stopFollow.bind(sim),
       tameError: sim.tameError.bind(sim),
-      standUp: sim.standUp.bind(sim),
+      standUp: (p) => seatingMod.standUp(sim.ctx, p),
       breakGhostWolf: sim.breakGhostWolf.bind(sim),
       forceDismount: sim.forceDismountPlayer.bind(sim),
       startAutoAttack: sim.startAutoAttack.bind(sim),
@@ -6478,7 +6481,7 @@ export class Sim {
     };
     if (!target || target.dead || p.chargeTimeLeft <= 0 || isRooted(p)) return done(false);
     if (dist2d(p.pos, target.pos) <= CHARGE_ARRIVE_RANGE) return done(true);
-    if (p.sitting) this.standUp(p);
+    if (p.sitting) seatingMod.standUp(this.ctx, p);
     // re-route when the target has run well away from where the path ends
     const pathEnd = p.chargePath[p.chargePath.length - 1];
     if (!pathEnd || dist2d(pathEnd, target.pos) > 4) p.chargePath = this.findChargePath(p, target);
@@ -6618,15 +6621,6 @@ export class Sim {
     // (moveSpeedMult, resolveMove, cancelCast/standUp/dealDamage), preserving rng order.
     stepPlayerMotion(this.playerMotionDeps, p, meta.moveInput);
     unstuckMod.noteBattlegroundWallPressure(this.ctx, meta, p);
-  }
-
-  private standUp(p: Entity): void {
-    p.sitting = false;
-    if (isConsuming(p)) {
-      p.eating = null;
-      p.drinking = null;
-      this.emit({ type: 'log', text: 'You stand up.', color: '#999', pid: p.id });
-    }
   }
 
   // -------------------------------------------------------------------------
@@ -7430,6 +7424,9 @@ export class Sim {
   // abilities untouched — strictly cosmetic, zero power change (FR-6.1/6.3).
   prestige(pid?: number): boolean {
     return prestigeImpl(this.ctx, pid);
+  }
+  sitOnSeat(seatId: string, pid?: number): void {
+    seatingMod.sitOnSeat(this.ctx, seatId, pid);
   }
 
   // L1 loot distribution (party-loot strategy, rollLoot, copper split, need-greed

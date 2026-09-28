@@ -419,8 +419,18 @@ export function interiorHidesNameplate(
   plateY: number,
 ): boolean {
   const vol = state.active;
-  // outdoors, or on the threshold (in the doorway's thickness): the world is in view
-  if (!vol) return false;
+  // outdoors (or on the threshold, in the doorway's thickness): the world is in view, but a
+  // body inside a building keeps its plate only where the camera sees it through an opening
+  // (the door), so the people inside never print their names across a closed wall
+  if (!vol) {
+    const c = camera.position;
+    for (const inner of interiors) {
+      if (!interiorContains(inner, x, y + BODY_OVER_FEET, z)) continue;
+      if (interiorContains(inner, c.x, c.y, c.z)) return false;
+      return !interiorSeesOut(inner, x, plateY, z, c.x, c.y, c.z);
+    }
+    return false;
+  }
   if (interiorContains(vol, x, y + BODY_OVER_FEET, z)) return false;
   if (!state.lensInside) {
     // the lens follows through the door from outside: a body it sees past the building (on

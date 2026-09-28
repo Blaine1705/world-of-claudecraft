@@ -73,6 +73,7 @@ import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
 import type { IWorldReliquary } from '../src/world_api/reliquary';
+import type { IWorldSeating } from '../src/world_api/seating';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
@@ -588,6 +589,10 @@ export const IWORLD_MEMBERS = [
   { name: 'worldPvpInfo', kind: 'data' },
   { name: 'setWorldPvpFlag', kind: 'method' },
   { name: 'hillInfo', kind: 'data' },
+  // The classic inn "Resting" state (IWorldProgressionXp): derived in both worlds.
+  { name: 'resting', kind: 'data' },
+  // IWorldSeating (seating.ts): sit on a piece of furniture by its seat id.
+  { name: 'sitOnSeat', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -934,9 +939,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(421);
-    expect(DATA_MEMBERS.length).toBe(124);
-    expect(METHOD_MEMBERS.length).toBe(297);
+    // Plus the tavern's inn state (resting, data) and the seating facet's
+    // sitOnSeat (method) on feature/walkable-tavern-aaa: 423/125/298.
+    expect(IWORLD_MEMBERS.length).toBe(423);
+    expect(DATA_MEMBERS.length).toBe(125);
+    expect(METHOD_MEMBERS.length).toBe(298);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1263,6 +1270,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'respec',
       'respondToResurrection',
       'restedXp',
+      'resting',
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
@@ -1298,6 +1306,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setTownFocus',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sitOnSeat',
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
@@ -1469,6 +1478,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryRecent',
       'renown',
       'restedXp',
+      'resting',
       'riftCollisionToken',
       'riftFloor',
       'socialInfo',
@@ -1755,6 +1765,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setTownFocus',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sitOnSeat',
       'slotToolEffect',
       'socketRiftGem',
       'sortInventory',
@@ -2053,6 +2064,7 @@ const FACET_PROGRESSION_XP = [
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
+  'resting',
   'playtimeSeconds',
   'craftSkills',
   'gatheringProficiency',
@@ -2474,6 +2486,9 @@ type _ExhaustWorldPvp = AssertNever<
   Exclude<keyof IWorldWorldPvp, (typeof FACET_WORLD_PVP)[number]>
 >;
 
+const FACET_SEATING = ['sitOnSeat'] as const satisfies readonly (keyof IWorldSeating)[];
+type _ExhaustSeating = AssertNever<Exclude<keyof IWorldSeating, (typeof FACET_SEATING)[number]>>;
+
 // The facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
@@ -2512,6 +2527,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   farming: FACET_FARMING,
   transport: FACET_TRANSPORT,
   worldPvp: FACET_WORLD_PVP,
+  seating: FACET_SEATING,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
@@ -2528,7 +2544,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // vehicles facet.
     // 35 at the second release/v0.44.0 base merge: plus the release's world_pvp.ts.
     // 36 at the fourth release/v0.44.0 base merge: plus the release's transport.ts.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(36);
+    // 37 on feature/walkable-tavern-aaa: plus seating.ts (sit on furniture).
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(37);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2609,8 +2626,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(421);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(421);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(423);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(423);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
