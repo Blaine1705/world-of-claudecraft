@@ -87,26 +87,63 @@ function picket(sentryA: [number, number], sentryB: [number, number]): MusterSol
 }
 
 // ---------------------------------------------------------------------------
-// The drill yard (the command camp's west end)
+// The drill yard (the command camp's back west corner)
 // ---------------------------------------------------------------------------
 
 /**
  * The Straw Foreman: the training effigy the soldiers built of him, about half his height,
- * with a lantern for an eye (src/sim/muster_effigy.ts runs the drill). It stands at the
- * command camp's quiet west end, its face toward the rack, so a player who takes a pike
- * turns round and has the target in front of them. Measured, like every post here: dry
- * ground, clear of every camp piece (the camp layout keeps MUSTER_EFFIGY_CLEAR_RADIUS
- * bare round it) and deep inside the command camp's keep-out circle, so the real Foreman
- * never walks through the lesson (tests/muster_effigy.test.ts).
+ * with a lantern for an eye (src/sim/muster_effigy.ts runs the drill). It stands in the
+ * command camp's back west corner, its own yard away from the Commander and the rack, its
+ * face turned toward the middle of the camp: a player who walks over from the rack has the
+ * target in front of them, and behind it is only the palisade and the trees (never the
+ * south picket's squad, whose nameplates would crowd the lesson). Measured, like every post
+ * here: dry ground, clear of every camp piece (the camp layout keeps MUSTER_DRILL_YARD bare)
+ * and deep inside the command camp's keep-out circle, so the real Foreman never walks
+ * through the lesson (tests/muster_effigy.test.ts).
  */
-export const MUSTER_EFFIGY_POST = { x: 141.2, z: 206.8, facing: Math.PI / 2 } as const;
+export const MUSTER_EFFIGY_POST = { x: 140.1, z: 199.5, facing: 0.95 } as const;
 /** Ground the camp layout leaves bare round the effigy (its legs, props and fallen planks). */
 export const MUSTER_EFFIGY_CLEAR_RADIUS = 2.2;
+/** Yards from the effigy's face to the trainee's mark on the drill lane. */
+export const MUSTER_DRILL_LANE_REACH = 7;
+/** The trainee's mark: straight out from the effigy's face, MUSTER_DRILL_LANE_REACH away. */
+export const MUSTER_DRILL_LANE = Object.freeze({
+  x: MUSTER_EFFIGY_POST.x + Math.sin(MUSTER_EFFIGY_POST.facing) * MUSTER_DRILL_LANE_REACH,
+  z: MUSTER_EFFIGY_POST.z + Math.cos(MUSTER_EFFIGY_POST.facing) * MUSTER_DRILL_LANE_REACH,
+  /** A trainee on the mark faces the effigy. */
+  facing: MUSTER_EFFIGY_POST.facing + Math.PI,
+});
 /**
- * The drillmaster's post: beside the effigy, on a trainee's flank, turned toward the
- * stake he drives (src/sim/muster_effigy.ts lands his mallet a stride in front of him).
+ * The drillmaster's post: off the lane's back flank (the side away from the Commander),
+ * about halfway down it, turned to face the lane. His mallet lands on the ground a stride
+ * in front of him (src/sim/muster_drill.ts), between him and the trainee and well clear of
+ * the effigy, so a blow reads as a stake driven into the yard, never as a swing at the dummy.
  */
-export const MUSTER_DRILL_POST = { x: 144.2, z: 203.6, facing: -0.72 } as const;
+export const MUSTER_DRILL_POST: {
+  readonly x: number;
+  readonly z: number;
+  readonly facing: number;
+} = (() => {
+  const f = MUSTER_EFFIGY_POST.facing;
+  // along the lane (out from the effigy's face) and across it (its back flank)
+  const along = { x: Math.sin(f), z: Math.cos(f) };
+  const across = { x: Math.cos(f), z: -Math.sin(f) };
+  const x = MUSTER_EFFIGY_POST.x + along.x * 3.5 + across.x * 4;
+  const z = MUSTER_EFFIGY_POST.z + along.z * 3.5 + across.z * 4;
+  const r3 = (v: number): number => Math.round(v * 1000) / 1000;
+  return Object.freeze({ x: r3(x), z: r3(z), facing: r3(Math.atan2(-across.x, -across.z)) });
+})();
+/**
+ * The drill yard: the ground the camp layout keeps bare of every piece (tents, clutter,
+ * walls), so the effigy, the lane and the drillmaster stand in their own open square and
+ * their nameplates and the balance meter read cleanly. Centred between the effigy and the
+ * trainee's mark, wide enough to take in both and the drillmaster's stake.
+ */
+export const MUSTER_DRILL_YARD = Object.freeze({
+  x: (MUSTER_EFFIGY_POST.x + MUSTER_DRILL_LANE.x) / 2,
+  z: (MUSTER_EFFIGY_POST.z + MUSTER_DRILL_LANE.z) / 2,
+  r: 5.6,
+});
 
 export const MUSTER_CAMPS: readonly MusterCampDef[] = [
   {
@@ -126,12 +163,14 @@ export const MUSTER_CAMPS: readonly MusterCampDef[] = [
     soldiers: picket([-17, -10], [6, -19]),
   },
   {
-    // At the foot of the southern rise, below the command camp.
+    // At the foot of the southern rise, below the command camp. Its east sentry is posted
+    // out toward the crater road, not up against the command camp's palisade, so the two
+    // camps' soldiers never crowd one view.
     id: 'south',
     center: { x: 122, z: 226 },
     facing: 0.17,
     onCircuit: true,
-    soldiers: picket([-19.5, -4], [19.5, -5]),
+    soldiers: picket([-19.5, -4], [18, 7.5]),
   },
   {
     // On the crater's south-west rim, 40 yards south of his bed in the bowl, in the one gap
@@ -144,20 +183,23 @@ export const MUSTER_CAMPS: readonly MusterCampDef[] = [
   },
   {
     // The command camp on the southern rise, with the weapon rack. Never a warpath stop.
+    // Kept sparse on purpose: the Commander by the rack, the drillmaster in his yard, and
+    // three soldiers with a job (the gate guard, the watch at the tower's foot, the
+    // chaplain by the tents), so every nameplate here reads on its own.
     id: 'command',
     center: { x: 149, z: 206 },
     facing: -0.36,
     onCircuit: false,
     soldiers: [
       { templateId: MUSTER_COMMANDER_NPC_ID, dx: 0.5, dz: 2.5 },
-      { templateId: 'muster_sergeant', dx: 5.0, dz: 4.0 },
-      { templateId: 'muster_footman', dx: -6.5, dz: 6.0 },
-      { templateId: 'muster_footman', dx: 7.5, dz: 7.0 },
-      { templateId: 'muster_footman', dx: -11.2, dz: 3.8 },
-      { templateId: 'muster_footman', dx: 9.5, dz: -1.5 },
-      { templateId: 'muster_chaplain', dx: 0.5, dz: -4.5 },
-      { templateId: 'muster_chaplain', dx: -4.0, dz: -6.0 },
-      // The drill yard's mallet man, beside the effigy.
+      // Inside the gate, on its west post.
+      { templateId: 'muster_footman', dx: -1.1, dz: 12.5 },
+      // At the foot of the watchtower on the front east corner (muster_camp_layout.ts), on
+      // its gate side.
+      { templateId: 'muster_sergeant', dx: 5.8, dz: 7.2 },
+      // Among the tents at the back of the camp.
+      { templateId: 'muster_chaplain', dx: 4.2, dz: -6.8 },
+      // The drill yard's mallet man, off the lane's flank.
       {
         templateId: 'muster_drillmaster',
         dx: MUSTER_DRILL_POST.x - 149,
@@ -165,7 +207,10 @@ export const MUSTER_CAMPS: readonly MusterCampDef[] = [
         facing: MUSTER_DRILL_POST.facing,
       },
     ],
-    reserved: [{ x: MUSTER_EFFIGY_POST.x, z: MUSTER_EFFIGY_POST.z, r: MUSTER_EFFIGY_CLEAR_RADIUS }],
+    reserved: [
+      { x: MUSTER_EFFIGY_POST.x, z: MUSTER_EFFIGY_POST.z, r: MUSTER_EFFIGY_CLEAR_RADIUS },
+      MUSTER_DRILL_YARD,
+    ],
   },
 ];
 

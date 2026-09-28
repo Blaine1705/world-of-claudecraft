@@ -15,7 +15,10 @@ import {
   MUSTER_CAMPS,
   MUSTER_COMMAND_KEEP_OUT,
   MUSTER_COMMANDER_NPC_ID,
+  MUSTER_DRILL_LANE,
+  MUSTER_DRILL_LANE_REACH,
   MUSTER_DRILL_POST,
+  MUSTER_DRILL_YARD,
   MUSTER_EFFIGY_CLEAR_RADIUS,
   MUSTER_EFFIGY_POST,
   MUSTER_RACK,
@@ -28,6 +31,7 @@ import {
   MUSTER_TROPHY_QUEST_ID,
 } from '../src/sim/content/mirefen_muster_quests';
 import { BUILTIN_WORLD, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import { runBalgathQuestDev } from '../src/sim/dev/balgath_dev_quests';
 import { drainDelayedEvents } from '../src/sim/entity_roster';
 import { LANCE_FIXED_DAMAGE } from '../src/sim/lance_balance_core';
 import { LANCE_SHOCK_KICK } from '../src/sim/lance_trial';
@@ -55,7 +59,14 @@ import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { weeklyQuestLockoutId } from '../src/sim/quests/weekly_quest_lock';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { DT, dist2d, type Entity, MELEE_RANGE, type WorldContent } from '../src/sim/types';
+import {
+  DT,
+  dist2d,
+  type Entity,
+  MELEE_RANGE,
+  normAngle,
+  type WorldContent,
+} from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -96,9 +107,16 @@ function drillYard() {
   const ctx = inner(sim).ctx;
   const effigy = sim.entities.get(army.effigyId ?? -1);
   if (!effigy) throw new Error('no effigy raised');
+  // The trainee's mark (content/mirefen_muster.ts), `side` yards across the lane.
   const lane = (e: Entity, side = 0) => {
-    place(sim, e, MUSTER_EFFIGY_POST.x + 7, MUSTER_EFFIGY_POST.z + side);
-    e.facing = -Math.PI / 2;
+    const f = MUSTER_DRILL_LANE.facing;
+    place(
+      sim,
+      e,
+      MUSTER_DRILL_LANE.x + Math.cos(f) * side,
+      MUSTER_DRILL_LANE.z - Math.sin(f) * side,
+    );
+    e.facing = f;
   };
   lane(sim.player);
   const meta = (pid = sim.playerId) => {
@@ -162,6 +180,81 @@ describe('the drill yard is placed with care', () => {
         { ...MUSTER_EFFIGY_POST, y: 0 },
       ),
     ).toBeLessThan(6);
+  });
+});
+
+describe('the drill yard has its own ground', () => {
+  const command = MUSTER_CAMPS.find((c) => c.id === 'command') as (typeof MUSTER_CAMPS)[number];
+  const posts = command.soldiers.map((s) => ({
+    id: s.templateId,
+    x: command.center.x + s.dx,
+    z: command.center.z + s.dz,
+  }));
+
+  it('keeps the whole yard bare: no camp piece reaches into it', () => {
+    expect(command.reserved).toContainEqual(MUSTER_DRILL_YARD);
+    // it takes in the effigy, the trainee's mark and the drillmaster's stake
+    for (const p of [MUSTER_EFFIGY_POST, MUSTER_DRILL_LANE, musterDrillStake()]) {
+      expect(Math.hypot(p.x - MUSTER_DRILL_YARD.x, p.z - MUSTER_DRILL_YARD.z)).toBeLessThan(
+        MUSTER_DRILL_YARD.r,
+      );
+    }
+    for (const p of musterCampPlan(WORLD_SEED)) {
+      if (p.campId !== 'command') continue;
+      const d = musterFootprintDistance(
+        p.key,
+        p.x,
+        p.z,
+        p.rot,
+        MUSTER_DRILL_YARD.x,
+        MUSTER_DRILL_YARD.z,
+      );
+      expect(d, p.key).toBeGreaterThanOrEqual(MUSTER_DRILL_YARD.r);
+    }
+  });
+
+  it('stands only the drillmaster in the yard, well apart from the Commander and the rack', () => {
+    for (const p of posts) {
+      const inYard =
+        Math.hypot(p.x - MUSTER_DRILL_YARD.x, p.z - MUSTER_DRILL_YARD.z) < MUSTER_DRILL_YARD.r;
+      expect(inYard, p.id).toBe(p.id === 'muster_drillmaster');
+    }
+    const commander = posts.find((p) => p.id === MUSTER_COMMANDER_NPC_ID);
+    if (!commander) throw new Error('no commander post');
+    // the trainee's mark is nobody's post: the Commander and the rack stand a clear walk off
+    expect(
+      Math.hypot(commander.x - MUSTER_DRILL_LANE.x, commander.z - MUSTER_DRILL_LANE.z),
+    ).toBeGreaterThan(5);
+    expect(
+      Math.hypot(MUSTER_RACK.x - MUSTER_DRILL_LANE.x, MUSTER_RACK.z - MUSTER_DRILL_LANE.z),
+    ).toBeGreaterThan(5);
+  });
+
+  it('keeps the command camp sparse: the Commander, the drillmaster and three posted soldiers', () => {
+    expect(posts.filter((p) => p.id === MUSTER_COMMANDER_NPC_ID)).toHaveLength(1);
+    expect(posts.filter((p) => p.id === 'muster_drillmaster')).toHaveLength(1);
+    expect(posts).toHaveLength(5);
+    // no two posts close enough for their nameplates to stack from a normal camera
+    for (let i = 0; i < posts.length; i++) {
+      for (let j = i + 1; j < posts.length; j++) {
+        const a = posts[i];
+        const b = posts[j];
+        expect(Math.hypot(a.x - b.x, a.z - b.z), `${a.id}/${b.id}`).toBeGreaterThan(5);
+      }
+    }
+  });
+
+  it('/dev balgath drill stands you on the mark, facing the effigy', () => {
+    const h = drillYard();
+    place(h.sim, h.sim.player, MUSTER_RACK.x, MUSTER_RACK.z + 3);
+    const r = runBalgathQuestDev(h.ctx, h.sim.playerId, 'drill');
+    expect(r.ok).toBe(true);
+    const p = h.sim.player;
+    expect(p.pos.x).toBeCloseTo(MUSTER_DRILL_LANE.x, 3);
+    expect(p.pos.z).toBeCloseTo(MUSTER_DRILL_LANE.z, 3);
+    const toEffigy = Math.atan2(MUSTER_EFFIGY_POST.x - p.pos.x, MUSTER_EFFIGY_POST.z - p.pos.z);
+    expect(Math.abs(normAngle(p.facing - toEffigy))).toBeLessThan(1e-6);
+    expect(dist2d(p.pos, h.effigy.pos)).toBeCloseTo(MUSTER_DRILL_LANE_REACH, 1);
   });
 });
 

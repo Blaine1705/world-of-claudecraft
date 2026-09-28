@@ -484,6 +484,7 @@ function wallArc(
   openings: readonly number[],
   radiusMin: number,
   radiusMax: number,
+  gaps: readonly { bearing: number; half: number }[] = [],
 ): void {
   const { camp, campIndex } = site;
   const mid = (radiusMin + radiusMax) / 2;
@@ -492,6 +493,7 @@ function wallArc(
   let slot = 0;
   for (let b = from; b <= to + 1e-9; b += step, slot++) {
     if (openings.some((o) => angleGap(b, o) < MUSTER_OPENING_HALF_ANGLE + halfSpan)) continue;
+    if (gaps.some((g) => angleGap(b, g.bearing) < g.half)) continue;
     const r = radiusMin + (radiusMax - radiusMin) * jitter(campIndex, slot, 1);
     const key: MusterKitKey =
       jitter(campIndex, slot, 2) < 0.34 ? 'musterBarricade' : 'musterPalisade';
@@ -630,6 +632,26 @@ function fan(base: number, radii: readonly number[], steps = 12, step = 0.26): [
 
 /** The command camp's wall radius: wider than a picket's, it holds tents and a tower. */
 export const MUSTER_COMMAND_WALL_RADIUS = 15.8;
+/** The watchtower's spot at the command camp: this far round from the gate (toward the
+ *  camp's high east bank), this far out from the centre. */
+export const MUSTER_TOWER_BEARING = 0.82;
+export const MUSTER_TOWER_RADIUS = 13.2;
+/** Clear walking room kept between the watchtower and the nearest wall section, yd. */
+export const MUSTER_TOWER_WALKWAY = 2.6;
+
+/**
+ * Half-angle (from the camp centre) of the wall gap round the watchtower: a wall section
+ * whose centre bearing falls inside it is left out. The tower's own half-width, the
+ * walkway, and a section's half-span, all taken at the wall's radius.
+ */
+export function towerGapHalfAngle(wallRadius: number): number {
+  const s = MUSTER_PIECE_SPECS;
+  return (
+    Math.asin(s.musterWatchtower.halfWidth / wallRadius) +
+    MUSTER_TOWER_WALKWAY / wallRadius +
+    Math.asin(s.musterPalisade.halfWidth / wallRadius)
+  );
+}
 
 function planCommand(site: Site, input: MusterLayoutInput): void {
   const { camp } = site;
@@ -661,8 +683,11 @@ function planCommand(site: Site, input: MusterLayoutInput): void {
   place(site, input, gates);
   const gate = site.placed.find((p) => p.key === 'musterGate');
   const gateBearing = gate ? bearingTo(camp.center.x, camp.center.z, gate.x, gate.z) : f;
-  // The watchtower beside the gate, watching the approach (a rear corner if the ground
-  // there will not take it), its ladder facing into the camp.
+  // The watchtower on the front east corner, up on the high bank where it looks down the
+  // approach to the crater and over the whole camp, its ladder facing in. Standing off on
+  // its own (a wide berth from the gate, the rack and the drill yard) it reads as a
+  // landmark rather than one more thing piled by the gate; a steeper patch tries the next
+  // corner spot, and the back corners are the last resort.
   place(
     site,
     input,
@@ -670,24 +695,37 @@ function planCommand(site: Site, input: MusterLayoutInput): void {
       camp,
       'musterWatchtower',
       [
-        [gateBearing + 0.62, 12.6],
-        [gateBearing - 0.62, 12.6],
-        [gateBearing + 0.8, 12.2],
-        [gateBearing - 0.8, 12.2],
+        [gateBearing + MUSTER_TOWER_BEARING, MUSTER_TOWER_RADIUS],
+        [gateBearing + MUSTER_TOWER_BEARING - 0.1, MUSTER_TOWER_RADIUS],
+        [gateBearing + MUSTER_TOWER_BEARING + 0.1, MUSTER_TOWER_RADIUS],
+        [gateBearing + MUSTER_TOWER_BEARING, MUSTER_TOWER_RADIUS - 0.8],
         ...fan(rear, [12.6, 11.8], 8),
       ],
       INWARD,
     ),
   );
-  // Tents: two large and two small, rear first, wherever the hillside lets them sit.
+  const tower = site.placed.find((p) => p.key === 'musterWatchtower');
+  // Tents: the quarters stay at the back of the camp, behind the Commander (two large,
+  // and the small ones only where the back has room), never out front by the gate or in
+  // the drill yard. A tent the back cannot take is left out rather than sent round.
   const tentRadii = [12.2, 11.4, 12.8];
-  place(site, input, around(camp, 'musterTentLarge', fan(rear + 0.3, tentRadii), INWARD));
-  place(site, input, around(camp, 'musterTentLarge', fan(rear - 0.9, tentRadii), INWARD));
-  place(site, input, around(camp, 'musterTentSmall', fan(rear + 1.3, tentRadii), INWARD));
-  place(site, input, around(camp, 'musterTentSmall', fan(rear - 1.9, tentRadii), INWARD));
-  // The wall round everything but the gate.
+  place(site, input, around(camp, 'musterTentLarge', fan(rear + 0.3, tentRadii, 4), INWARD));
+  place(site, input, around(camp, 'musterTentLarge', fan(rear - 0.9, tentRadii, 4), INWARD));
+  place(site, input, around(camp, 'musterTentSmall', fan(rear - 0.35, tentRadii, 3), INWARD));
+  place(site, input, around(camp, 'musterTentSmall', fan(rear + 1.0, tentRadii, 2), INWARD));
+  // The wall round everything but the gate, and open either side of the tower: the tower
+  // stands in the wall line as its corner post, with a walkway past each flank instead
+  // of a stack of barricades hemming it in.
   const gateHalf = Math.asin(MUSTER_PIECE_SPECS.musterGate.halfWidth / wallR);
   const wallHalf = Math.asin(MUSTER_PIECE_SPECS.musterPalisade.halfWidth / wallR);
+  const towerGaps = tower
+    ? [
+        {
+          bearing: bearingTo(camp.center.x, camp.center.z, tower.x, tower.z),
+          half: towerGapHalfAngle(wallR),
+        },
+      ]
+    : [];
   wallArc(
     site,
     input,
@@ -696,6 +734,7 @@ function planCommand(site: Site, input: MusterLayoutInput): void {
     [],
     wallR - 0.5,
     wallR + 0.5,
+    towerGaps,
   );
   // Gate torches out front, lighting the one way in: structure.
   if (gate) {

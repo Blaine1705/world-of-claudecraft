@@ -32,6 +32,7 @@ import {
   MUSTER_PICKET_CLEAR_RADIUS,
   MUSTER_RACK_CLEARANCE,
   MUSTER_SLOT_CLEARANCE,
+  MUSTER_TOWER_WALKWAY,
   type MusterKitKey,
   type MusterPlacement,
   musterCampOpenings,
@@ -62,6 +63,20 @@ const WALLS: ReadonlySet<MusterKitKey> = new Set(['musterPalisade', 'musterBarri
 
 function of(campId: string): MusterPlacement[] {
   return plan.filter((p) => p.campId === campId);
+}
+
+/** Points along a placement's footprint outline, ten to an edge. */
+function footprintEdge(p: MusterPlacement): [number, number][] {
+  const c = musterFootprintCorners(p.key, p.x, p.z, p.rot);
+  const out: [number, number][] = [];
+  for (let i = 0; i < 4; i++) {
+    const a = c[i];
+    const b = c[(i + 1) % 4];
+    for (let k = 0; k < 10; k++) {
+      out.push([a[0] + ((b[0] - a[0]) * k) / 10, a[1] + ((b[1] - a[1]) * k) / 10]);
+    }
+  }
+  return out;
 }
 
 /** Points spread over a placement's footprint (corners, edge midpoints, centre). */
@@ -215,6 +230,26 @@ describe('muster camps: the command camp', () => {
     const gate = here.find((p) => p.key === 'musterGate') as MusterPlacement;
     const b = bearingTo(command.center.x, command.center.z, gate.x, gate.z);
     expect(angleGap(b, command.facing)).toBeLessThan(0.8);
+  });
+
+  it('stands the watchtower on a front corner in the open, a walkway past each flank', () => {
+    const tower = here.find((p) => p.key === 'musterWatchtower') as MusterPlacement;
+    const gate = here.find((p) => p.key === 'musterGate') as MusterPlacement;
+    const at = (p: MusterPlacement) => bearingTo(command.center.x, command.center.z, p.x, p.z);
+    // on the front (toward the crater), off to the side of the gate, not beside it
+    expect(angleGap(at(tower), command.facing)).toBeLessThan(Math.PI / 2);
+    expect(angleGap(at(tower), at(gate))).toBeGreaterThan(0.6);
+    expect(Math.hypot(tower.x - MUSTER_RACK.x, tower.z - MUSTER_RACK.z)).toBeGreaterThan(10);
+    // every other piece keeps at least the walkway off the tower's footprint
+    for (const p of here) {
+      if (p === tower) continue;
+      const gap = Math.min(
+        ...footprintEdge(tower).map(([x, z]) =>
+          musterFootprintDistance(p.key, p.x, p.z, p.rot, x, z),
+        ),
+      );
+      expect(gap, `${p.key} crowds the tower`).toBeGreaterThanOrEqual(MUSTER_TOWER_WALKWAY);
+    }
   });
 
   it('stands nothing on a soldier or on the rack (the rack alone is forced)', () => {

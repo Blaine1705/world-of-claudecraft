@@ -13,7 +13,7 @@
 // Reached only through handleDevChat behind ctx.devCommands (ALLOW_DEV_COMMANDS), so it
 // does not exist in production. Replies are dev-channel English. Draws no rng.
 
-import { MUSTER_EFFIGY_POST } from '../content/mirefen_muster';
+import { MUSTER_DRILL_LANE, MUSTER_DRILL_LANE_REACH } from '../content/mirefen_muster';
 import {
   BARROWHIDE_SLAB_ITEM_ID,
   MUSTER_PIKE_DRILL_QUEST_ID,
@@ -28,7 +28,7 @@ import type { SimContext } from '../sim_context';
 import { displacePlayerForDev } from './dev_displace';
 
 /** Where `drill` stands you: on the lane, this far in front of the effigy's face. */
-export const BALGATH_DEV_DRILL_LANE = 7;
+export const BALGATH_DEV_DRILL_LANE = MUSTER_DRILL_LANE_REACH;
 
 export type BalgathQuestDevVerb =
   | 'quests'
@@ -133,15 +133,14 @@ export function runBalgathQuestDev(
       };
     }
     case 'drill': {
-      const f = MUSTER_EFFIGY_POST.facing;
-      const x = MUSTER_EFFIGY_POST.x + Math.sin(f) * BALGATH_DEV_DRILL_LANE;
-      const z = MUSTER_EFFIGY_POST.z + Math.cos(f) * BALGATH_DEV_DRILL_LANE;
+      // The trainee's mark (content/mirefen_muster.ts), facing the effigy.
+      const { x, z, facing } = MUSTER_DRILL_LANE;
       displacePlayerForDev(ctx, p, x, z);
-      p.facing = f + Math.PI;
-      p.prevFacing = p.facing;
+      p.facing = facing;
+      p.prevFacing = facing;
       return {
         ok: true,
-        message: `On the drill lane, facing the Straw Foreman (${x.toFixed(1)}, ${z.toFixed(1)}). The rack is on your right.`,
+        message: `On the drill lane, facing the Straw Foreman (${x.toFixed(1)}, ${z.toFixed(1)}). The rack is behind you, by the Commander.`,
       };
     }
     case 'pound': {
