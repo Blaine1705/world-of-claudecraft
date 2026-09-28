@@ -17,6 +17,7 @@
 import type { LanceGuidanceView } from '../world_api/lance_trial';
 import { MOBS } from './data';
 import { eyeWardBlinded, eyeWardVulnerable } from './mob/eye_ward';
+import { effigyInReach, effigyWindowRemaining } from './muster_effigy';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity } from './types';
 
@@ -57,6 +58,26 @@ export function nearestEyeWardTarget(
   return best ? { mob: best, distance: bestD } : null;
 }
 
+/** What a pike is pointed at: the Foreman himself, or the drill yard's Straw Foreman. */
+export interface LanceTarget {
+  kind: 'boss' | 'effigy';
+  mob: Entity;
+  distance: number;
+}
+
+/**
+ * The thing a thrust from here would find inside `range`: a living warded boss first (the
+ * real fight always wins), else the drill yard's effigy (muster_effigy.ts). The thrust
+ * passes its own reach; the guidance asks at that reach first and then at its wider band,
+ * so the prompt and the verb can never disagree about what is in reach.
+ */
+export function lanceTargetInReach(ctx: SimContext, p: Entity, range: number): LanceTarget | null {
+  const boss = nearestEyeWardTarget(ctx, p, range);
+  if (boss) return { kind: 'boss', ...boss };
+  const effigy = effigyInReach(ctx, ctx.musterArmy, p, range);
+  return effigy ? { kind: 'effigy', ...effigy } : null;
+}
+
 /** Seconds until a blinded ward re-forms, or 0. */
 function blindRemaining(ctx: SimContext, mob: Entity): number {
   return Math.max(0, (mob.eyeWardDownUntil ?? 0) - ctx.time);
@@ -82,7 +103,8 @@ export function lanceGuidanceFor(
   const meta = ctx.players.get(pid);
   const p = ctx.entities.get(pid);
   if (!meta || !p) return null;
-  const found = nearestEyeWardTarget(ctx, p, LANCE_GUIDANCE_RANGE);
+  const found =
+    lanceTargetInReach(ctx, p, thrustRange) ?? lanceTargetInReach(ctx, p, LANCE_GUIDANCE_RANGE);
   if (!found) {
     return {
       targetPresent: false,
@@ -96,6 +118,22 @@ export function lanceGuidanceFor(
     };
   }
   const { mob, distance } = found;
+  if (found.kind === 'effigy') {
+    // The drill yard: the "ward" is this player's own lantern (muster_effigy.ts), never
+    // sealed beyond the window itself, and never anyone else's.
+    const open = effigyWindowRemaining(ctx, ctx.musterArmy, pid);
+    return {
+      targetPresent: true,
+      targetDistance: distance,
+      inRange: distance <= thrustRange,
+      vulnerable: open <= 0,
+      blinded: open > 0,
+      blindRemaining: open,
+      sealRemaining: 0,
+      thrusts: meta.lanceThrusts ?? 0,
+      effigy: true,
+    };
+  }
   return {
     targetPresent: true,
     targetDistance: distance,

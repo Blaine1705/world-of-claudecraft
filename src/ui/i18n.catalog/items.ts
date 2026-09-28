@@ -3053,6 +3053,8 @@ const ITEM_ENTITY_IDS = [
   'stormhymn_chain_treads',
   // The Mirefen muster's lent Shardpike (src/sim/muster_pike.ts).
   'muster_shardpike',
+  // The muster's weekly trophy off Balgath's corpse (src/sim/muster_trophy.ts).
+  'barrowhide_slab',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3733,6 +3735,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   stormhymn_chain_grips: 'Stormhymn Chain Grips',
   stormhymn_chain_treads: 'Stormhymn Chain Treads',
   muster_shardpike: 'Muster Shardpike',
+  barrowhide_slab: 'Barrowhide Slab',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -23,6 +23,7 @@ import { MUSTER_BOSS_TEMPLATE_ID } from './content/mirefen_muster';
 import { MOBS } from './data';
 import { crossedDawn } from './day_night';
 import { rollEnemyLootQuality } from './loot/enemy_quality';
+import { musterTrophySlot } from './muster_trophy';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity, LootEntry, LootSlot } from './types';
@@ -380,6 +381,11 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
     }
   }
   const selected = [...(mob.loot?.items ?? []), ...rollEnemyLootQuality(ctx.rng, mob, items)];
+  // Quest trophies after every roll (no draws): a slab of Balgath's hide for each
+  // contributor on the muster's weekly (muster_trophy.ts). The world-boss table itself
+  // stays questId-free, as the header above requires.
+  const trophy = musterTrophySlot(ctx, mob, contributors);
+  if (trophy) selected.push(trophy);
   if (copper > 0 || selected.length > 0) {
     mob.loot = { copper, items: selected };
     mob.lootable = true;

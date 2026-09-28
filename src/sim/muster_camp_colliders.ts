@@ -28,7 +28,7 @@
 // command camp is kept from him by his keep-out circle instead (mob/keep_out.ts).
 
 import type { CircleCollider, Collider, ObbCollider } from './colliders';
-import { MUSTER_CAMPS, type MusterCampDef } from './content/mirefen_muster';
+import { MUSTER_CAMPS, MUSTER_EFFIGY_POST, type MusterCampDef } from './content/mirefen_muster';
 import type { MusterKitKey, MusterPlacement } from './muster_camp_layout';
 import { musterCampPlan } from './muster_camp_plan';
 import { groundHeight } from './world';
@@ -137,7 +137,26 @@ export function musterCampColliders(seed: number): Collider[] {
   for (const p of musterCampPlan(seed)) {
     for (const c of musterPlacementColliders(p, seed)) out.push(c);
   }
+  out.push(musterEffigyCollider(seed));
   return out;
+}
+
+/** The Straw Foreman's legs and frame (the drill yard's effigy): one post a player stops at,
+ *  set a little forward of its footprint centre where the legs stand, so nobody walks
+ *  through a six-yard figure to swing at it (and melee reach from its edge still lands). */
+export const MUSTER_EFFIGY_COLLIDER_RADIUS = 1.3;
+
+export function musterEffigyCollider(seed: number): CircleCollider {
+  const f = MUSTER_EFFIGY_POST.facing;
+  const x = MUSTER_EFFIGY_POST.x + Math.sin(f) * 0.45;
+  const z = MUSTER_EFFIGY_POST.z + Math.cos(f) * 0.45;
+  return {
+    type: 'circle',
+    x,
+    z,
+    r: MUSTER_EFFIGY_COLLIDER_RADIUS,
+    cameraTopY: groundHeight(x, z, seed) + 6.7,
+  };
 }
 
 /** How far out from a camp's centre the pocket flood runs (clear of its outermost piece). */

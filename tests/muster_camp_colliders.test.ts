@@ -115,7 +115,8 @@ describe('muster camp colliders (the plan, as solids)', () => {
       expect(parts.length).toBeGreaterThan(0);
       expected += parts.length;
     }
-    expect(all.length).toBe(expected);
+    // ...plus the drill yard's effigy post (musterEffigyCollider), the one non-plan solid.
+    expect(all.length).toBe(expected + 1);
     // No clutter key ever has a row that could make it solid by default.
     for (const key of MUSTER_CLUTTER_KEYS) {
       if (key !== 'musterTorch') expect(MUSTER_PIECE_COLLISION[key]).toBeUndefined();

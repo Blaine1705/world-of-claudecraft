@@ -6790,6 +6790,21 @@
       "itemIds": [
         "muster_shardpike"
       ]
+    },
+    {
+      "batchId": "barrowhide-slab-icon-2026-09-27",
+      "source": "Derived in-repo from public/ui/items/chunk_of_ore.webp by re-grading it with sharp (hue turned from the ore's orange veins to the Loomshard's teal, saturation lowered toward Balgath's grey granite, a soft moss wash from the top-left key light); no new generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "The Chunk of Ore painting it derives from, re-coloured to read as a slab torn off Balgath's moss-grown granite hide with the teal of his eye in its seams.",
+      "commonPrompt": "Derived variant: the Chunk of Ore painting as grey-green granite hide with teal Loomshard seams and a moss wash.",
+      "itemIds": [
+        "barrowhide_slab"
+      ]
     }
   ]
 }

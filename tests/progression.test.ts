@@ -33,7 +33,9 @@ import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
+// barrowhide_slab: the muster's weekly trophy, a personal corpse slot on Balgath for its
+// carriers (src/sim/muster_trophy.ts), pinned by tests/muster_effigy.test.ts.
+const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather', 'barrowhide_slab']);
 
 // The complete set of ways a collect-objective item can legitimately enter a
 // player's bags. The mob-loot / ground-object / scripted trio is the original

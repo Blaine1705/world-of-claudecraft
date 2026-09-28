@@ -4326,6 +4326,9 @@ export interface NpcDef {
   // mid-fight). Keeping the def in NPCS lets the online client reconstruct its
   // questIds and treat it as a turn-in NPC.
   dynamic?: boolean;
+  // A `dynamic` NPC whose owning system always raises it at `pos` (the Muster Commander,
+  // raised with the Mirefen muster): the map may mark it from the def like a placed NPC.
+  fixedPost?: boolean;
 }
 
 export interface CampDef {
@@ -4968,6 +4971,10 @@ export interface QuestDef {
   // use professions/cadence.ts WORK_ORDER_CADENCE_TICKS). Only meaningful with
   // `repeatable`; absent means no cooldown (available again immediately).
   repeatCadenceTicks?: number;
+  // Repeatable once per WEEKLY reset (the raid rooms' boundary, ctx.weeklyRaidResetMs):
+  // the turn-in writes a `weeklyquest:<id>` lockout (quests/weekly_quest_lock.ts) that
+  // keeps the quest unavailable until the reset. Only meaningful with `repeatable`.
+  weeklyReset?: boolean;
   // Typed, server-authoritative profession transition applied only by the
   // validated turn-in path. The selected target is persisted on QuestProgress.
   // `pairId` (Professions 2.0): a per-pair attune quest pins its ONE
@@ -6852,7 +6859,7 @@ export type SimEvent = { pid?: number } & (
   // (carries pid): the wielder is the one owed the feedback, and `count` is their running
   // tally so the client can float `+N` without holding its own counter, which would drift
   // from the character's persisted number across a relog. Id-only, no English.
-  | { type: 'lanceBlind'; pid: number; count: number; targetId: number }
+  | { type: 'lanceBlind'; pid: number; count: number; targetId: number; effigy?: true }
   // Reliquary first fill (always personal: emitted with pid). Id-only: exactly
   // one of itemId / markId is set for a catalogued relic or authored mark.
   // pageIds list pages that list the relic; illuminatedPageId is set when a

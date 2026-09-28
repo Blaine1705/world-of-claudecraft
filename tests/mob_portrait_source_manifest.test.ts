@@ -99,7 +99,9 @@ describe('mob portrait source manifest', () => {
     // rows and are unrelated.
     // 255: plus the Mirefen muster's four soldier templates (muster_footman,
     // muster_chaplain, muster_sergeant, muster_captain).
-    expect(liveIds).toHaveLength(255);
+    // 256: the captain became the Muster Commander NPC (the muster quests), and the
+    // drill yard added its drillmaster and the Straw Foreman effigy.
+    expect(liveIds).toHaveLength(256);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

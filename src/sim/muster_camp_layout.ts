@@ -16,8 +16,9 @@
 //   - the palisade FRAMES a picket but leaves wide openings toward his approach and his
 //     exit (the previous and next stops on MUSTER_CIRCUIT, plus his lair for the
 //     opening leg), so he visibly walks in through a gap and out through another;
-//   - no footprint covers a sentry slot (or any soldier slot at the command camp), and
-//     nothing but the rack itself stands on the weapon rack's pick volume;
+//   - no footprint covers a sentry slot (or any soldier slot at the command camp), nor
+//     a camp's reserved ground (the drill yard's effigy), and nothing but the rack
+//     itself stands on the weapon rack's pick volume;
 //   - the tier rule is graphics-neutral: STRUCTURE (walls, gate, tower, tents, rack,
 //     the lantern by the rack, the gate torches) draws on every preset; CLUTTER
 //     (crates, barrels, sacks, the cart wheel, the extra torches) is shed on the low
@@ -416,6 +417,8 @@ function place(site: Site, input: MusterLayoutInput, candidates: Candidate[]): b
       musterFootprintDistance(c.key, c.x, c.z, c.rot, px, pz);
     if (camp.onCircuit && dist(camp.center.x, camp.center.z) < MUSTER_PICKET_CLEAR_RADIUS) continue;
     if (site.slots.some((slot) => dist(slot.x, slot.z) < MUSTER_SLOT_CLEARANCE)) continue;
+    // ...and never on ground the camp keeps bare (the drill yard round the effigy).
+    if (camp.reserved?.some((r) => dist(r.x, r.z) < r.r)) continue;
     if (!camp.onCircuit && dist(input.rack.x, input.rack.z) < MUSTER_RACK_CLEARANCE) continue;
     if (input.obstacles.some((o) => dist(o.x, o.z) < o.r)) continue;
     if (inOpeningCone(site, c)) continue;

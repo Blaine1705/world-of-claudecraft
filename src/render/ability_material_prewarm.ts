@@ -29,6 +29,7 @@
 import * as THREE from 'three';
 import { balgathRangedMaterials, buildBalgathRangedStandIn } from './balgath_ranged_fx';
 import { balgathStarwakeMaterials, buildBalgathStarwakeStandIn } from './balgath_starwake_fx';
+import { buildEffigyRigStandIn, effigyRigMaterials } from './characters/effigy_rig';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
@@ -136,6 +137,15 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'balgath_starwake_fx.ts',
     materials: () => Object.values(balgathStarwakeMaterials()),
     build: () => buildBalgathStarwakeStandIn(),
+  },
+  {
+    // The muster's training effigy (characters/effigy_rig.ts): the lantern's flame, the
+    // smoke a snuffed lantern gives off and the dust its falling planks raise. The first
+    // lantern put out in a session must not link its programs in the frame it goes out.
+    id: 'muster-effigy',
+    module: 'effigy_rig.ts',
+    materials: () => Object.values(effigyRigMaterials()),
+    build: () => buildEffigyRigStandIn(),
   },
   {
     // Not a spell: the Proving Shore coach's guidance (ribbon, ring, aura,

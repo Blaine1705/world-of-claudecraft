@@ -5869,6 +5869,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "combat",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "cmb_point_taken",
+    "name": "Point Taken",
+    "category": "combat",
+    "renown": 5,
+    "feat": false
   }
 ];
 

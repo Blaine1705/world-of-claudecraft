@@ -123,6 +123,9 @@ const DEFAULT_TINT_STRENGTH = 0.4;
 export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   axe_1handed: '1H_Axe',
   axe_2handed: '2H_Axe',
+  // The muster drillmaster's stake mallet (scripts/assets/muster_effigy/): authored on the
+  // two-handed axe's grip box, so it rides the axe's grip.
+  muster_mallet: '2H_Axe',
   crossbow_1handed: '1H_Crossbow',
   crossbow_2handed: '2H_Crossbow',
   sword_1handed: '1H_Sword',

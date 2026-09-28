@@ -379,7 +379,11 @@ export const zh_TW: EnTranslations = {
       "leanRightKey": "向右傾斜（{key}）",
       "promptTally": "{count} put out",
       "promptLabel": "碎晶長矛指示",
-      "blindBanner": "BARROWHIDE BROKEN"
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "已致盲！現在全團一起狠狠地打",
+      "promptStrikeLantern": "現在刺燈籠，{seconds} 秒",
+      "promptLanternOut": "燈籠滅了，還有 {seconds} 秒：用你自己的武器打它",
+      "promptCloserEffigy": "靠近稻草工頭，還差 {yards} 碼"
     },
     "warlock": {
       "doomLabel": "譴罪",
@@ -3223,6 +3227,8 @@ export const zh_TW: EnTranslations = {
       "cooldownCap": "此時間窗已使用 {used}/{cap} 秒冷卻縮減",
       "bruinRushWindow": "狼形態無需法力，並釘制你的巨熊衝鋒目標，使其減速 {pct}%，持續 {sec} 秒",
       "funeralHarvestLock": "葬禮收割暫時無法再次產生靈魂碎片",
+      "effigyPlankHide": "擋掉每次攻擊的 {pct}%，直到碎晶長矛的突刺熄滅它眼中的燈籠",
+      "effigyLanternOut": "對你而言，稻草工頭的燈籠已經熄滅：你和你寵物的攻擊無視其木板之皮，全額命中",
       "leadenHexLock": "鉛沉妖術暫時無法再次定身此目標",
       "forbiddenReflectionReady": "下一個符合條件的術士冷卻技能可再次施放",
       "forbiddenReflectionLock": "禁忌映像暫時無法再次準備",
@@ -10019,6 +10025,7 @@ export const zh_TW: EnTranslations = {
     "lockoutRaids": "團隊副本",
     "lockoutDungeons": "地城",
     "lockoutWorldBosses": "世界首領",
+    "lockoutWeeklyQuests": "每週任務",
     "takeOverConfirm": "這會使該角色從另一個工作階段中斷並切換到此處。是否繼續？",
     "renameRequired": "需要更名",
     "delete": "刪除",
@@ -15977,6 +15984,9 @@ export const zh_TW: EnTranslations = {
       "muster_shardpike": {
         "name": "徵召碎晶長矛"
       },
+      "barrowhide_slab": {
+        "name": "古塚皮板"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -17095,8 +17105,11 @@ export const zh_TW: EnTranslations = {
       "muster_sergeant": {
         "name": "徵召軍士"
       },
-      "muster_captain": {
-        "name": "徵召指揮官"
+      "muster_drillmaster": {
+        "name": "徵召操練官"
+      },
+      "muster_effigy": {
+        "name": "稻草工頭"
       },
       "stable_horse": {
         "name": "廄馬"
@@ -17592,6 +17605,11 @@ export const zh_TW: EnTranslations = {
         "name": "馬本·斯克里特",
         "title": "鑲嵌匠",
         "greeting": "四十年前我磨好那顆眼珠，把它嵌進他的眼窩，一天工錢都沒拿到。你想讓工頭吃點苦頭，{className}？那就衝著我的手藝去。"
+      },
+      "muster_commander": {
+        "name": "徵召指揮官",
+        "title": "芬橋徵召軍",
+        "greeting": "先長矛，{className}，再所有人。這就是全部，也是這座營地活到現在的原因。"
       },
       "brother_aldric_fen": {
         "name": "奧德里克修士",
@@ -18301,6 +18319,42 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "芬橋集結令"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "徵召令",
+        "text": "我能抽出的每一桿長矛都在星隕坑周圍紮了營，{playerName}，就為了圍住從坑裡走出來的那東西。徵召指揮官守在俯瞰火山坑的南坡營地，在這裡的東南方。去向指揮官報到。你會聽到我們怎麼對付他，好好聽著，因為沒聽的人都躺在蘆葦裡了。",
+        "completion": "芬威克派來的？很好。聽著，這話我只說一遍，而他一句都不會說。巴爾加斯沿著我們的哨站巡行：坑沿、西邊的平地、南坡、西南坑沿上的缺口，然後再繞一圈，他停下的每一個哨站都會被夷平。鋼鐵傷不了他。他的皮會把刀刃彈開，只會砍他的團隊最後只會累死。他唯一的弱點是眼睛。一桿撐穩的長矛刺穿織影核心就能讓他失明，而他失明時皮會剝落：那時全團一起打他，狠狠地打。之後皮會重新合上，我們等下一次機會。先長矛，{playerName}，再所有人。",
+        "objectives": {
+          "0": {
+            "label": "向徵召指揮官報到"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "長矛先行",
+        "text": "說話不值錢，長矛可值錢。從我旁邊的兵器架上拿一桿碎晶長矛，然後去營地西頭找稻草工頭：小伙子們用木板和稻草紮的，只有真傢伙一半大，眼睛的位置放著一盞燈籠。架起長矛，操練官砸地的時候也要穩住矛尖，因為真傢伙晃得更厲害。等你手臂篤定了，就把矛尖刺進燈籠。他的木板會掉下來：然後用你自己的武器打他，{playerName}，感受一下差別。",
+        "completion": "感覺到打進去了吧？在真傢伙身上，那是全團揮砍的十四口氣，然後他的皮又會合上。記住這一課。工頭會來考你的。",
+        "objectives": {
+          "0": {
+            "label": "從徵召兵器架上取下碎晶長矛"
+          },
+          "1": {
+            "label": "熄滅稻草工頭的燈籠"
+          },
+          "2": {
+            "label": "木板脫落時命中的攻擊"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "工頭的碎塊",
+        "text": "他每週都會重新站起來，我們每週都會再把他打倒。芬橋要證據，鐵匠們要石頭。巴爾加斯倒下時，從屍體上撕下一塊皮給我帶來，{playerName}。徵召軍每一塊都付錢。",
+        "completion": "還是溫的，比看上去更沉。離家這麼遠，錢袋很薄，但這是你的。等他再站起來就回來。",
+        "objectives": {
+          "0": {
+            "label": "古塚皮板"
           }
         }
       },

@@ -172,6 +172,7 @@ describe('combatIdleClamps', () => {
       'npc_muster_sergeant',
       'npc_muster_chaplain',
       'npc_muster_captain',
+      'npc_muster_drillmaster',
     ]) {
       expect(VISUALS[key]?.clips.combatIdle, key).toBe('Block');
       expect(VISUALS[key]?.clips.combatIdleHold, key).toBe(true);
@@ -184,6 +185,7 @@ describe('combatIdleClamps', () => {
     expect(holders).toEqual([
       'npc_muster_captain',
       'npc_muster_chaplain',
+      'npc_muster_drillmaster',
       'npc_muster_footman',
       'npc_muster_sergeant',
     ]);

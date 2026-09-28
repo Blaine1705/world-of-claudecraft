@@ -379,7 +379,11 @@ export const ko_KR: EnTranslations = {
       "leanRightKey": "오른쪽으로 기울이기 ({key})",
       "promptTally": "{count} put out",
       "promptLabel": "조각창 지시",
-      "blindBanner": "BARROWHIDE BROKEN"
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "실명시켰다! 이제 공격대 전원이 세게 친다",
+      "promptStrikeLantern": "지금 등불을 찔러라, {seconds}초",
+      "promptLanternOut": "등불이 꺼졌다, {seconds}초 남았다: 자신의 무기로 쳐라",
+      "promptCloserEffigy": "짚 감독관에게 접근하라, {yards}야드 남았다"
     },
     "warlock": {
       "doomLabel": "단죄",
@@ -3223,6 +3227,8 @@ export const ko_KR: EnTranslations = {
       "cooldownCap": "이 구간에서 재사용 대기시간 감소 {used}/{cap}초를 사용했습니다",
       "bruinRushWindow": "늑대 변신이 마나를 소모하지 않으며 큰곰 돌진 대상을 고정하여 {sec}초 동안 이동 속도를 {pct}% 감소시킵니다",
       "funeralHarvestLock": "장례 수확이 아직 다음 영혼 조각을 생성할 수 없습니다",
+      "effigyPlankHide": "모든 타격의 {pct}%를 막아낸다. 조각창 찌르기로 눈의 등불을 끌 때까지 유지된다",
+      "effigyLanternOut": "당신에게는 짚 감독관의 등불이 꺼져 있다: 당신과 소환수의 공격이 판자 가죽을 무시하고 온전히 들어간다",
       "leadenHexLock": "납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다",
       "forbiddenReflectionReady": "다음 적용 가능한 흑마법사 재사용 기술을 다시 사용할 수 있습니다",
       "forbiddenReflectionLock": "금지된 반영을 아직 다시 준비할 수 없습니다",
@@ -10019,6 +10025,7 @@ export const ko_KR: EnTranslations = {
     "lockoutRaids": "공격대",
     "lockoutDungeons": "던전",
     "lockoutWorldBosses": "월드 보스",
+    "lockoutWeeklyQuests": "주간 퀘스트",
     "takeOverConfirm": "이 캐릭터를 다른 세션에서 연결 해제하고 여기로 가져옵니다. 계속하시겠습니까?",
     "renameRequired": "이름 변경 필요",
     "delete": "삭제",
@@ -15977,6 +15984,9 @@ export const ko_KR: EnTranslations = {
       "muster_shardpike": {
         "name": "소집대 조각창"
       },
+      "barrowhide_slab": {
+        "name": "봉분 가죽 조각"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -17095,8 +17105,11 @@ export const ko_KR: EnTranslations = {
       "muster_sergeant": {
         "name": "소집대 부사관"
       },
-      "muster_captain": {
-        "name": "소집대 지휘관"
+      "muster_drillmaster": {
+        "name": "소집대 교관"
+      },
+      "muster_effigy": {
+        "name": "짚 감독관"
       },
       "stable_horse": {
         "name": "마구간 말"
@@ -17592,6 +17605,11 @@ export const ko_KR: EnTranslations = {
         "name": "마벤 스케릿",
         "title": "박음 장인",
         "greeting": "그 눈을 갈아 그의 눈구멍에 박아 넣은 지 사십 년, 하루치 값도 못 받았다. 감독관에게 아픔을 주고 싶나, {className}? 그렇다면 내 작품을 노려라."
+      },
+      "muster_commander": {
+        "name": "소집대 지휘관",
+        "title": "펜브리지 소집대",
+        "greeting": "먼저 창, 그다음이 모두다, {className}. 그게 전부고, 그게 이 진영을 살려 왔다."
       },
       "brother_aldric_fen": {
         "name": "알드릭 수사",
@@ -18301,6 +18319,42 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "펜브리지 소집 명령서"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "소집대의 부름",
+        "text": "내줄 수 있는 창은 모두 낙성 분화구 주위에 진을 쳤다, {playerName}. 거기서 걸어 나오는 놈을 둘러싸기 위해서다. 소집대 지휘관은 분화구를 내려다보는 남쪽 둔덕의 진영을 지키고 있다. 여기서 남동쪽이다. 지휘관에게 보고해라. 놈과 싸우는 법을 듣게 될 거다. 잘 들어라. 듣지 않은 자들은 갈대밭에 누워 있다.",
+        "completion": "펜윅의 전령인가? 좋다. 한 번만 말하겠다, 놈은 아예 말해 주지 않으니까. 발가스는 우리 초소들을 돈다: 분화구 가장자리, 서쪽 평지, 남쪽 둔덕, 남서쪽 가장자리의 틈, 그리고 다시 한 바퀴. 멈춰 선 초소는 모두 짓밟힌다. 강철은 놈에게 먹히지 않는다. 가죽이 튕겨 내고, 놈을 베기만 하는 공격대는 지쳐서 죽는다. 유일한 약점은 눈이다. 버틴 창을 룸샤드에 꿰뚫으면 놈은 눈이 멀고, 눈이 먼 동안 가죽이 벗겨진다. 그때가 공격대 전원이 세게 칠 때다. 그러고 나면 가죽이 다시 닫히고 우리는 다음 기회를 기다린다. 먼저 창, 그다음이 모두다, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "소집대 지휘관에게 보고"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "먼저 창",
+        "text": "말은 싸지만 창은 싸지 않다. 내 옆 거치대에서 조각창을 가져가라. 그다음 진영 서쪽 끝의 짚 감독관에게 가라. 녀석들이 판자와 짚으로 진짜의 절반 크기로 만든 것인데, 눈 자리에 등불이 들어 있다. 창을 세우고, 교관이 땅을 내리치는 동안에도 창끝을 곧게 유지해라. 진짜는 더 세게 흔들어 대니까. 팔이 확실해지면 창끝을 등불에 꽂아라. 판자가 떨어져 나간다: 그러면 자신의 무기로 쳐 봐라, {playerName}. 차이를 느낄 거다.",
+        "completion": "먹히는 게 느껴졌지? 진짜라면 공격대 전원이 휘두르는 열네 번의 숨이다. 그리고 가죽이 다시 닫힌다. 이 교훈을 잊지 마라. 감독관이 시험할 거다.",
+        "objectives": {
+          "0": {
+            "label": "소집대 거치대에서 조각창을 가져감"
+          },
+          "1": {
+            "label": "짚 감독관의 등불을 끔"
+          },
+          "2": {
+            "label": "판자가 떨어진 동안 적중한 타격"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "감독관의 부스러기",
+        "text": "놈은 매주 다시 일어서고, 우리는 매주 다시 쓰러뜨린다. 펜브리지는 증거를 원하고, 대장장이들은 돌을 원한다. 발가스가 쓰러지면 시체에서 가죽 한 조각을 뜯어 내게 가져와라, {playerName}. 소집대는 한 조각마다 값을 치른다.",
+        "completion": "아직 따뜻하군. 보기보다 무겁다. 이렇게 멀리 나와 있으니 주머니가 얇지만, 이건 네 몫이다. 놈이 다시 일어서면 돌아와라.",
+        "objectives": {
+          "0": {
+            "label": "봉분 가죽 조각"
           }
         }
       },

@@ -38,6 +38,8 @@ import { isImmuneInPlace } from '../instances/instance_combat_hold';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import { effigyHideBypassed, noteEffigyBlow } from '../muster_effigy';
+import { EFFIGY_WARD_AURA_ID } from '../muster_effigy_core';
 import {
   NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
   nythraxisBoneSpikeWardHit,
@@ -458,6 +460,9 @@ export function dealDamage(
     let reduction = protectionConsecrationDamageReduction(ctx.groundAoEs, target);
     for (const aura of target.auras) {
       if (aura.kind === 'buff_dr') {
+        // The drill yard's plank hide lets through the blows of whoever put its lantern out
+        // (muster_effigy.ts): a per-player window on one shared effigy.
+        if (aura.id === EFFIGY_WARD_AURA_ID && effigyHideBypassed(ctx, source)) continue;
         reduction += masteredPaladinAuraValue(target, aura.id, aura.value);
       } else if (aura.kind === 'die_by_sword') reduction += aura.value;
     }
@@ -1160,6 +1165,9 @@ export function dealDamage(
   // The hub dummy lesson (tutorial/dummy_drill.ts): one credit per blow that
   // actually lands on a training dummy. Zero rng.
   if (source && amount > 0) creditDummyDrill(ctx, source, target);
+  // The muster's pike drill (muster_effigy.ts): a blow on the Straw Foreman while its
+  // lantern is out for this player. Zero rng.
+  noteEffigyBlow(ctx, source, target, amount, abilityId);
 
   // Thornhollow Fields assists: remember who softened a player before the blow
   // that finishes them. Only real damage on a live player counts, and the

@@ -42,6 +42,8 @@ export const BALGATH_CLEAVE_HALF_ARC = (60 * Math.PI) / 180;
 
 /** Camera trauma for the aimed slams: the hammer is a jolt, the cleave a long shove. */
 export const BALGATH_HAMMER_TRAUMA = 0.3;
+/** The drill yard's mallet on its stake (muster_drill.ts): felt, not a slam. */
+export const MALLET_POUND_TRAUMA = 0.05;
 export const BALGATH_CLEAVE_TRAUMA = 0.38;
 
 /**

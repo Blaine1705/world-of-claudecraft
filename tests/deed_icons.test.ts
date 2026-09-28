@@ -376,10 +376,12 @@ describe('Book of Deeds webp icons', () => {
     // pending ledger grows to 13 while the painted count stays at 289.
     // Re-counted off the merged src/sim/content/deeds.ts DEEDS table and
     // src/ui/deed_image_ids.ts.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(302);
+    // 303: the muster's pike drill deed (cmb_point_taken) appends behind them and rides
+    // the same combat crest, so the pending ledger grows to 14.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(303);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(13);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('cmb_balgath_ten');
+    expect(DEED_ART_PENDING_IDS).toHaveLength(14);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('cmb_point_taken');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

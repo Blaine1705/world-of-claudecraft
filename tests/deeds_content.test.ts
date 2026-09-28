@@ -142,8 +142,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // THIS merge of feature/mirefen-world-boss appends the world boss's two
     // combat deeds (cmb_balgath and cmb_balgath_ten, renown 10 each): a pure
     // append on both sides, so 302 / 3330. MEASURED on the merged table.
-    expect(DEED_ORDER.length).toBe(302);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3330);
+    //
+    // The muster's pike drill appends its one routine combat deed (cmb_point_taken,
+    // renown 5): a pure append, 303 / 3335.
+    expect(DEED_ORDER.length).toBe(303);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3335);
   });
 
   it('ships the audited per-category counts', () => {
@@ -161,8 +164,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release/v0.41.0 merge (the release's own chain read 58), then
       // +1 the Phase 13 promotion capstone prog_legendmaker.
       progression: 68,
-      // +2 the Mirefen world boss pair (cmb_balgath, cmb_balgath_ten).
-      combat: 12,
+      // +2 the Mirefen world boss pair (cmb_balgath, cmb_balgath_ten), +1 the muster's
+      // pike drill (cmb_point_taken).
+      combat: 13,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
       dungeon: 36,
@@ -377,6 +381,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // Mirefen world boss (appends last).
       'cmb_balgath',
       'cmb_balgath_ten',
+      'cmb_point_taken',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -994,7 +999,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // deedIds filtered back to exclude them) reproduce the release's
   // 931a0593... EXACTLY, so the boss side is a pure append. No shipped
   // trigger or renown value was touched.
-  const FROZEN_CATALOG_SHA256 = '15857c4cde20a1ef9bddc9fd0773a1411e9225605f1599fc30a7167a770c38d0';
+  // Re-baselined for the muster's pike drill: one appended combat deed (cmb_point_taken);
+  // no shipped trigger or renown changed (the append proof below reproduces 15857c4c...).
+  const FROZEN_CATALOG_SHA256 = '1ac4cf51f20e7da50808a5a32f2dd7b2e232405f8dc983e4b9fbad7c63c9bc10';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1048,9 +1055,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // 931a0593... literal) rotates down here, and stripping only the world
   // boss pair (feat_book_complete's live deedIds filtered back) reproduces it
   // exactly, so the boss side retro-edited nothing.
+  //
+  // The muster's pike drill is the next append: the world boss pair's frozen 15857c4c...
+  // literal rotates down here, and stripping only cmb_point_taken reproduces it.
   const PRE_APPEND_CATALOG_SHA256 =
-    '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
-  const APPENDED_SINCE: readonly string[] = ['cmb_balgath', 'cmb_balgath_ten'];
+    '15857c4cde20a1ef9bddc9fd0773a1411e9225605f1599fc30a7167a770c38d0';
+  const APPENDED_SINCE: readonly string[] = ['cmb_point_taken'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1061,8 +1071,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // Pin its two predecessors too: this is an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'col_set_bramblehide',
-      'hid_forgebreaker',
+      'cmb_balgath',
+      'cmb_balgath_ten',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1281,9 +1291,9 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // and the Mirefen world boss pair closes the merged tail (cmb_balgath,
-    // then cmb_balgath_ten).
-    expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('cmb_balgath');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('cmb_balgath_ten');
+    // then cmb_balgath_ten), and the muster's pike drill deed follows them.
+    expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('cmb_point_taken');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

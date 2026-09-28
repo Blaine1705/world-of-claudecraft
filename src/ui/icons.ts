@@ -5242,6 +5242,8 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'cult_cipher',
   'drowned_offering',
   'fen_muster_order',
+  // The muster's weekly trophy off Balgath (derived art, mapping.json).
+  'barrowhide_slab',
   'ghostly_essence',
   'glowing_wax',
   'grave_high_priest_malric',
@@ -5572,6 +5574,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // deed_cat_combat crest until their commissioned art lands.
   'cmb_balgath',
   'cmb_balgath_ten',
+  // The muster's pike drill (content/mirefen_muster_quests.ts), also a 'combat' crest.
+  'cmb_point_taken',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

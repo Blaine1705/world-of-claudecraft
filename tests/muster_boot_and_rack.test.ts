@@ -49,7 +49,11 @@ import { WORLD_BOSSES } from '../src/sim/world_boss';
 
 afterEach(() => vi.unstubAllGlobals());
 
-const TOTAL = MUSTER_CAMPS.reduce((n, c) => n + c.soldiers.length, 0);
+// Every post but the commander's: he is an NPC (the muster quests), raised beside them.
+const TOTAL = MUSTER_CAMPS.reduce(
+  (n, c) => n + c.soldiers.filter((s) => s.templateId !== 'muster_commander').length,
+  0,
+);
 const army = (sim: Sim) => (sim as unknown as { musterArmy: MusterArmyState }).musterArmy;
 const balgaths = (sim: Sim) =>
   [...sim.entities.values()].filter((e) => e.templateId === 'balgath_cyclops');
@@ -63,10 +67,9 @@ function expectFullMuster(sim: Sim): Entity {
     expect(s?.dead).toBe(false);
     expect(s?.hostile).toBe(false);
   }
-  const commander = a.soldierIds
-    .map((id) => sim.entities.get(id))
-    .find((e) => e?.templateId === 'muster_captain');
-  expect(commander, 'the Muster Commander stands at the command camp').toBeDefined();
+  const commander = a.commanderId !== null ? sim.entities.get(a.commanderId) : undefined;
+  expect(commander?.kind, 'the Muster Commander stands at the command camp').toBe('npc');
+  expect(commander?.templateId).toBe('muster_commander');
   const rack = a.rackId !== null ? sim.entities.get(a.rackId) : undefined;
   expect(rack?.templateId).toBe(MUSTER_RACK_TEMPLATE_ID);
   expect(rack?.lootable).toBe(true);

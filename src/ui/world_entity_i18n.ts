@@ -135,7 +135,9 @@ const MOB_IDS = [
   'muster_footman',
   'muster_chaplain',
   'muster_sergeant',
-  'muster_captain',
+  // The command camp's drill yard: the mallet man and the training effigy.
+  'muster_drillmaster',
+  'muster_effigy',
   // Ambient Highwatch Stables horse (zone 3)
   'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless
@@ -267,6 +269,8 @@ const NPC_IDS = [
   'warden_fenwick',
   // The Mirefen world boss's level-spread mechanic: he lends the Shardpike.
   'socketwright_skerrit',
+  // The muster's leader at the command camp (raised with the army; the muster quests).
+  'muster_commander',
   'brother_aldric_fen',
   'provisioner_hale',
   'herbalist_yara',
@@ -403,6 +407,10 @@ const QUEST_IDS = [
   'q_bandits',
   'q_ringleader',
   'q_fenbridge_muster',
+  // The Mirefen muster's chain (src/sim/content/mirefen_muster_quests.ts).
+  'q_muster_summons',
+  'q_muster_pike_drill',
+  'q_muster_trophy',
   'q_socketwrights_due',
   'q_prowlers',
   'q_prowler_pelts',

@@ -76,6 +76,7 @@ import {
   type GhostStyle,
   ghostEffectOpacity,
 } from './effect_materials';
+import { EffigyRig } from './effigy_rig';
 import { EyeGlow } from './eye_glow';
 import { EyeWardMarker } from './eye_ward_marker';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
@@ -701,6 +702,8 @@ export class CharacterVisual {
    * shares its measured offset: the ring and the thing it rings must never drift apart.
    */
   private eyeWardMarker: EyeWardMarker | null = null;
+  /** The drill yard effigy's plank hide and lantern (VisualDef.effigy), or null. */
+  private effigyRig: EffigyRig | null = null;
   /**
    * This frame's reticle plan, or null to hide it. Pushed in by the renderer rather than
    * derived here: the plan needs the LOCAL player's held item and distance, which is
@@ -912,6 +915,9 @@ export class CharacterVisual {
         this.eyeGlow = new EyeGlow(spec, bone);
         this.eyeWardMarker = new EyeWardMarker(spec, bone);
       }
+      // The training effigy's planks and lantern: same reasons, same spot (it re-grades a
+      // clone of the lantern glass, so it must run before the originalMaterials snapshot).
+      if (this.def.effigy) this.effigyRig = new EffigyRig(this.model);
       // Class halo (the priest's Light): a glowing ring behind the head bone.
       // Added AFTER applyMaterials (its additive material must not be re-mapped)
       // and BEFORE the originalMaterials snapshot, so ghost/stealth material
@@ -1064,7 +1070,14 @@ export class CharacterVisual {
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
     this.chargeGlow?.update(dt);
-    this.eyeGlow?.update(dt, reducedMotion, s.asleep === true, s.dead);
+    this.effigyRig?.update(this.eyeWardPlan?.state === 'blinded', dt, reducedMotion);
+    // A snuffed effigy lantern gutters out on the same curve as a dying eye.
+    this.eyeGlow?.update(
+      dt,
+      reducedMotion,
+      s.asleep === true,
+      s.dead || this.effigyRig?.lanternOut() === true,
+    );
     this.eyeWardMarker?.update(this.eyeWardPlan, dt, reducedMotion);
     this.updateMetamorphWings(dt, s, reducedMotion);
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
@@ -3454,6 +3467,8 @@ export class CharacterVisual {
     this.eyeGlow = null;
     this.eyeWardMarker?.dispose();
     this.eyeWardMarker = null;
+    this.effigyRig?.dispose();
+    this.effigyRig = null;
     this.bastionSweepFx?.dispose();
     this.bastionSweepFx = null;
     this.bastionSweepAction = null;

@@ -843,7 +843,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // (four boss drops, Skerrit's Shardpike, three Foreman's Wage rares):
     // 1,309. Re-measured with `node scripts/item_art_audit.mjs --verify-only`
     // on the merged tree. The Mirefen muster rework's lent muster_shardpike: 1,310.
-    expect(Object.keys(ITEMS)).toHaveLength(1310);
+    // The muster quests' weekly trophy barrowhide_slab: 1,311.
+    expect(Object.keys(ITEMS)).toHaveLength(1311);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1000,10 +1001,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
     // The Mirefen world-boss forward-port's three batches add eight more
     // owners, each with its own shipping WebP: 1,291. The Mirefen muster rework's
-    // muster-shardpike-icon-2026-09-26 batch adds one more: 1,292.
-    expect(new Set(currentOwnerIds).size).toBe(1292);
-    expect(shippingIds).toHaveLength(1292);
-    expect(Object.keys(ITEMS)).toHaveLength(1310);
+    // muster-shardpike-icon-2026-09-26 batch adds one more: 1,292, and the muster
+    // quests' barrowhide-slab-icon-2026-09-27 batch one more again: 1,293.
+    expect(new Set(currentOwnerIds).size).toBe(1293);
+    expect(shippingIds).toHaveLength(1293);
+    expect(Object.keys(ITEMS)).toHaveLength(1311);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1048,6 +1050,8 @@ describe('item-art consistency accepted-art provenance', () => {
         'fenwright_grips',
         // The Mirefen muster rework's lent pike (muster-shardpike-icon-2026-09-26).
         'muster_shardpike',
+        // The muster quests' weekly trophy (barrowhide-slab-icon-2026-09-27).
+        'barrowhide_slab',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1209,8 +1213,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Mirefen world-boss forward-port appends its own 3 disjoint batches
     // (balgath-boss-icons-2026-08-18, shardpike-mechanic-icons-2026-08-20,
     // foremans-wage-icons-2026-08-25) = 34. The Mirefen muster rework appends
-    // muster-shardpike-icon-2026-09-26 = 35.
-    expect(mapping.generatedBatches).toHaveLength(35);
+    // muster-shardpike-icon-2026-09-26 = 35, and the muster quests append
+    // barrowhide-slab-icon-2026-09-27 = 36.
+    expect(mapping.generatedBatches).toHaveLength(36);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1275,15 +1280,17 @@ describe('item-art consistency accepted-art provenance', () => {
     // world-boss forward-port adds its three disjoint batches (four boss
     // spoils, the Shardpike, the three Foreman's Wage spoils): 755 + 8 = 763.
     // The Mirefen muster rework's lent muster_shardpike batch: 763 + 1 = 764.
-    expect(priorGeneratedIds).toHaveLength(764);
+    // The muster quests' barrowhide_slab batch: 764 + 1 = 765.
+    expect(priorGeneratedIds).toHaveLength(765);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // 1283 + the Mirefen world-boss forward-port's eight disjoint spoils = 1291,
-    // + the Mirefen muster rework's lent muster_shardpike = 1292.
-    expect(allCurrentOwnerIds).toHaveLength(1292);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1292);
+    // + the Mirefen muster rework's lent muster_shardpike = 1292, + the muster
+    // quests' barrowhide_slab = 1293.
+    expect(allCurrentOwnerIds).toHaveLength(1293);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1293);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1292,7 +1299,7 @@ describe('item-art consistency accepted-art provenance', () => {
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
       entries: 43,
-      priorGenerated: 764,
+      priorGenerated: 765,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1372,6 +1379,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'mirelight_locket',
         'fenwright_grips',
         'muster_shardpike',
+        'barrowhide_slab',
       ]),
       'the dated catalog plus the release batches, the Field Kit, the OSSBrain reins icons, and the Mirefen world-boss spoils is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
@@ -1502,10 +1510,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Matches the mapping-owner sum above: 43 entries + 763 prior-generated
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
     // batch ids + 46 Crucible-professions batch ids = 1291, + the Mirefen muster
-    // rework's lent muster_shardpike = 1292.
-    if (ownerIds.length !== 1292)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1292`);
-    if (fileIds.length !== 1292) violations.push(`shipping WebP count: ${fileIds.length} != 1292`);
+    // rework's lent muster_shardpike = 1292, + the muster quests' barrowhide_slab = 1293.
+    if (ownerIds.length !== 1293)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1293`);
+    if (fileIds.length !== 1293) violations.push(`shipping WebP count: ${fileIds.length} != 1293`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

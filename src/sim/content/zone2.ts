@@ -27,6 +27,7 @@ import {
   type MusterCampId,
   musterCamp,
 } from './mirefen_muster';
+import { MUSTER_QUEST_ITEMS, MUSTER_QUEST_ORDER, MUSTER_QUESTS } from './mirefen_muster_quests';
 
 export const DEEPFEN_SHALLOWS_LAKE = { x: -110, z: 310, radius: 35 };
 
@@ -1208,6 +1209,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     color: 0x7e5109,
     questIds: [
       'q_fenbridge_muster',
+      'q_muster_summons',
       'q_prowlers',
       'q_deepfen',
       'q_deepfen_purge',
@@ -1388,6 +1390,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE2_QUESTS: Record<string, QuestDef> = {
+  // The Mirefen muster's chain (Fenwick's summons, the pike drill, the weekly trophy).
+  ...MUSTER_QUESTS,
   q_fenbridge_muster: {
     id: 'q_fenbridge_muster',
     name: 'Muster at Fenbridge',
@@ -1889,6 +1893,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
 
 export const ZONE2_QUEST_ORDER = [
   'q_fenbridge_muster',
+  ...MUSTER_QUEST_ORDER,
   'q_socketwrights_due',
   'q_prowlers',
   'q_prowler_pelts',
@@ -2039,6 +2044,7 @@ const CASTER_WEAPON_CLASSES: PlayerClass[] = [
 ];
 
 export const ZONE2_ITEMS: Record<string, ItemDef> = {
+  ...MUSTER_QUEST_ITEMS,
   // ---- Balgath, the Mirefen world boss: his own spoils --------------------
   //
   // A world boss needs loot that is HIS. Sharing another boss's tier looks like a

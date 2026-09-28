@@ -313,6 +313,9 @@ export interface VisualDef {
    *  state; CharacterVisual's enterDeath/revive flip it. Node names as
    *  authored in the GLB. */
   corpseMeshSwap?: { hide: string; show: string };
+  /** The muster's training effigy (src/sim/muster_effigy.ts): the model carries the
+   *  plank hide and lantern the effigy rig drives per viewer (effigy_rig.ts). */
+  effigy?: boolean;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -520,6 +523,11 @@ export const BALGATH_SCALE = 4.2;
 // always, at 5.0/4.14 = 1.21x the clip's natural rate: deliberate, ground-covering, and
 // planted. The run reference is kept honest anyway, because a speed buff or a future
 // enrage could push him over and the clip must not over-drive when it does.
+/**
+ * The Straw Foreman's height, the shipped GLB's measured bbox (npx gltf-transform inspect):
+ * about half of Balgath's 3.2 x 4.2. MUST match the file (prepareVisual normalizes by it).
+ */
+export const MUSTER_EFFIGY_HEIGHT = 6.7;
 const BALGATH_WALK_REF = 4.14;
 const BALGATH_RUN_REF = 8.38;
 
@@ -3782,6 +3790,19 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
+  // The drill yard's mallet man (content/mirefen_muster.ts muster_drillmaster): the footman's
+  // knight with the camp's big stake mallet instead of spear and shield, swinging it with the
+  // two-handed chop (his sim cue is a mob windup, muster_drill.ts, which plays the attack).
+  npc_muster_drillmaster: {
+    url: `${PLAYERS}/knight.glb`,
+    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
+    height: HUMANOID_H,
+    clips: { ...kaykit(['2H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
+    show: ['Knight_Helmet'],
+    attach: [{ url: `${WEAPONS}/muster_mallet.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
   npc_muster_captain: {
     url: `${PLAYERS}/knight.glb`,
     animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
@@ -3893,6 +3914,28 @@ export const VISUALS: Record<string, VisualDef> = {
   // mediocre and mutually indistinguishable; the two rigs share 41 identically named
   // joints, so the foreman's authored poses bind here directly and are strictly
   // better. See the BALGATH ClipMap comment for the binding proof.
+  // The Straw Foreman (content/mirefen_muster.ts muster_effigy): the muster's training
+  // effigy of Balgath, half his height, built of planks, straw and rope with a lantern for
+  // an eye (Blender factory scripts/assets/muster_effigy/, pinned by
+  // tests/muster_effigy_asset.test.ts). A clipless prop mob (STATIC_PROP, CLIPLESS_RIGS):
+  // everything that moves is the effigy rig (effigy_rig.ts): the plank hide falling and
+  // being hammered back per viewer, the flame, the smoke. The lantern's glow is the same
+  // lit-eye pair Balgath wears, hung on the model's LanternFlame anchor.
+  mob_muster_effigy: {
+    url: `${CREATURES}/muster_effigy.glb`,
+    height: MUSTER_EFFIGY_HEIGHT,
+    clips: STATIC_PROP,
+    effigy: true,
+    eyeGlow: {
+      bone: 'LanternFlame',
+      offset: [0, 0, 0],
+      color: 0xffa94d,
+      radius: 0.13,
+      pulseHz: 0.9,
+    },
+    clickRadius: 1.8,
+    lazyPreload: true,
+  },
   mob_balgath_cyclops: {
     url: `${CREATURES}/balgath_cyclops.glb`,
     animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
@@ -4267,7 +4310,8 @@ const MOB_KEYS: Record<string, string> = {
   muster_footman: 'npc_muster_footman',
   muster_sergeant: 'npc_muster_sergeant',
   muster_chaplain: 'npc_muster_chaplain',
-  muster_captain: 'npc_muster_captain',
+  muster_drillmaster: 'npc_muster_drillmaster',
+  muster_effigy: 'mob_muster_effigy',
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
@@ -4365,6 +4409,8 @@ const FAMILY_KEYS: Record<string, string> = {
 
 const NPC_KEYS: Record<string, string> = {
   bursar_fernando: 'npc_fernando',
+  // The Mirefen muster's leader (an NPC since he gives the muster's quests).
+  muster_commander: 'npc_muster_captain',
   card_master: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',

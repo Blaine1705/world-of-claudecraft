@@ -3413,6 +3413,16 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'stat', stat: 'balgathKills', count: 10 },
   },
+  // The muster's pike drill (content/mirefen_muster_quests.ts): the lesson that makes a
+  // level 6 useful at the Foreman's pull. Routine Renown, earned by finishing the drill.
+  cmb_point_taken: {
+    id: 'cmb_point_taken',
+    name: 'Point Taken',
+    desc: "Put out the Straw Foreman's lantern at the muster's drill yard and make its planks count.",
+    category: 'combat',
+    renown: 5,
+    trigger: { kind: 'quest', questId: 'q_muster_pike_drill' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

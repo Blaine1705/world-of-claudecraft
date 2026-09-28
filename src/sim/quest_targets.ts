@@ -487,7 +487,8 @@ export interface QuestGiverNpcMarker {
  * so (like questObjectiveAreas above) it is never interest-radius limited: a
  * quest giver far across an online zone still surfaces its glyph. Dynamic
  * NPCs (spawned on demand by their owning system, e.g. mid-encounter or
- * per-graveyard) are skipped: they carry no fixed placement to resolve here.
+ * per-graveyard) are skipped: they carry no fixed placement to resolve here,
+ * unless the def says `fixedPost` (always raised at `pos`, the Muster Commander).
  *
  * Classification is the shared quest_marker_kind rule; `questsDone` and the
  * optional cadence-blocked set are the same inputs both worlds hand it
@@ -502,7 +503,7 @@ export function questGiverNpcMarkers(
 ): QuestGiverNpcMarker[] {
   const out: QuestGiverNpcMarker[] = [];
   for (const npc of Object.values(NPCS)) {
-    if (npc.dynamic) continue;
+    if (npc.dynamic && !npc.fixedPost) continue;
     const refs: QuestGiverNpcQuestRef[] = [];
     for (const questId of npc.questIds) {
       const quest = QUESTS[questId];

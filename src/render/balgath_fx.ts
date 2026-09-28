@@ -22,6 +22,7 @@
 // information, and the gameplay-neutral-graphics invariant forbids hiding it.
 
 import * as THREE from 'three';
+import { MUSTER_MALLET_POUND_ABILITY } from '../sim/muster_effigy_core';
 import type { Surface } from './audio_sink';
 import { bossAuraPlan, moteBudget, readBossVfxState } from './balgath_aura_core';
 import {
@@ -49,6 +50,7 @@ import {
   balgathRingRadius,
   debrisPowerForBlast,
   EYE_POOL_LEASE_SECONDS,
+  MALLET_POUND_TRAUMA,
   planBalgathRing,
 } from './balgath_fx_core';
 import { BalgathRangedFx } from './balgath_ranged_fx';
@@ -221,6 +223,11 @@ export function routeBalgathSpellfxAt(
   fx: BalgathFx,
   entities: () => Iterable<{ id: number; templateId?: string }>,
 ): boolean {
+  // The drill yard's mallet (src/sim/muster_drill.ts): its own ability id, no entity walk.
+  if (ev.fx === 'nova' && ev.ability === MUSTER_MALLET_POUND_ABILITY) {
+    fx.malletPound(ev.x, ev.z, ev.radius ?? 1.6);
+    return true;
+  }
   // Cheap guards BEFORE the entity walk, and `entities` is a thunk so the walk is not
   // even reached for the overwhelming majority of effect events that are not a boss slam.
   // This sits at the top of a per-event hot path, and it also means a caller whose world
@@ -430,6 +437,17 @@ export class BalgathFx {
   stompRing(x: number, z: number, radius: number): void {
     this.spawnRing(x, z, radius, SILT_DEEP, 0.72);
     this.throwGround(x, z, radius, 1.1);
+  }
+
+  /**
+   * The drill yard's mallet meeting its stake (src/sim/muster_drill.ts): a small ring of dust
+   * and a kick of soil, a stake-driver's thump rather than a giant's fist. A whisper of
+   * camera trauma so a trainee on the lane feels the ground jump under the couched pike.
+   */
+  malletPound(x: number, z: number, radius: number): void {
+    this.spawnRing(x, z, radius, SILT, 0.45);
+    this.throwGround(x, z, radius * 0.6, 0.5);
+    this.impactFelt(MALLET_POUND_TRAUMA, x, z);
   }
 
   /** One fist, dropped on a spot: a tight ring, a deep hole, and a column of soil. */

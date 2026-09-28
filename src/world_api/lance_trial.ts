@@ -42,6 +42,12 @@ export interface LanceGuidanceView {
   sealRemaining: number;
   /** Loomshard Thrusts this character has landed, ever. The bar's tally. */
   thrusts: number;
+  /**
+   * The target is the muster's training effigy, the Straw Foreman (src/sim/muster_effigy.ts),
+   * not the Foreman: `vulnerable`/`blinded`/`blindRemaining` then describe THIS player's own
+   * lantern and window on it. Absent for the real fight.
+   */
+  effigy?: boolean;
 }
 
 export interface IWorldLanceTrial {

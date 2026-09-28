@@ -29,6 +29,7 @@ import { forceWarpathWreck } from '../mob/warpath';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { dist2d } from '../types';
+import { BALGATH_QUEST_DEV_HELP } from './balgath_dev_quests';
 
 /** The template the command drives. */
 export const BALGATH_TEMPLATE_ID = 'balgath_cyclops';
@@ -96,6 +97,7 @@ export function balgathDevHelp(): string {
     '/dev balgath wake: wake him now, even at night (he stays up until the day comes)',
     '/dev balgath sleep: send him to bed now if he is not fighting (he sleeps until the night comes)',
     '/dev servertime day|night|dawn|dusk|<0..1>|auto: move the SERVER day/night clock (auto restores real time; match your sky with /daynight)',
+    ...BALGATH_QUEST_DEV_HELP,
   );
   return `[dev] Balgath mechanics (nearest live Balgath within ${BALGATH_DEV_RANGE} yd, aimed at you): ${lines.join('; ')}.`;
 }

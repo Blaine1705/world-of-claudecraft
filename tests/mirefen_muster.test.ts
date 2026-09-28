@@ -84,7 +84,8 @@ function campOfSoldier(army: MusterArmyState): Map<number, string> {
   const out = new Map<number, string>();
   let i = 0;
   for (const camp of MUSTER_CAMPS)
-    for (const _ of camp.soldiers) out.set(army.soldierIds[i++], camp.id);
+    for (const post of camp.soldiers)
+      if (post.templateId !== 'muster_commander') out.set(army.soldierIds[i++], camp.id);
   return out;
 }
 
@@ -174,8 +175,13 @@ describe('the muster in a live world', () => {
     expect(inner(sim).musterArmy.soldierIds).toEqual([]);
     raise(sim);
     const army = inner(sim).musterArmy;
-    const total = MUSTER_CAMPS.reduce((n, c) => n + c.soldiers.length, 0);
+    // Every post but the commander's: he is an NPC (the muster quests), raised beside them.
+    const total = MUSTER_CAMPS.reduce(
+      (n, c) => n + c.soldiers.filter((s) => s.templateId !== 'muster_commander').length,
+      0,
+    );
     expect(army.soldierIds.length).toBe(total);
+    expect(sim.entities.get(army.commanderId ?? -1)?.kind).toBe('npc');
     expect(total).toBeGreaterThanOrEqual(30);
     for (const id of army.soldierIds) {
       const s = sim.entities.get(id);

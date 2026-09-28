@@ -40,14 +40,21 @@
 import {
   MUSTER_BOSS_TEMPLATE_ID,
   MUSTER_CAMPS,
+  MUSTER_COMMANDER_NPC,
+  MUSTER_COMMANDER_NPC_ID,
   MUSTER_RACK,
   MUSTER_RACK_NAME,
   MUSTER_RACK_TEMPLATE_ID,
 } from './content/mirefen_muster';
+import { MUSTER_PIKE_DRAWN_EVENT } from './content/mirefen_muster_quests';
 import { MOBS } from './data';
-import { createGroundObject, createMob } from './entity';
+import { createGroundObject, createMob, createNpc } from './entity';
+import { isShardpikeItem } from './lance_balance_core';
 import { eyeWardBlinded } from './mob/eye_ward';
+import { tickMusterDrill } from './muster_drill';
+import { raiseMusterEffigy, tickMusterEffigy } from './muster_effigy';
 import { type LentPikes, takeMusterPike, tickLentPikes } from './muster_pike';
+import { onQuestEventForQuests } from './quests/quest_credit';
 import type { SimContext } from './sim_context';
 import { angleTo, dist2d, type Entity, normAngle } from './types';
 
@@ -97,6 +104,16 @@ export interface MusterArmyState {
   lent: LentPikes;
   /** The entity roster version the last dev-spawn scan saw (resolveBoss). */
   scannedRoster: number;
+  /** The Muster Commander (the quest NPC at the command camp), once raised. */
+  commanderId: number | null;
+  /** The drill yard's effigy, the Straw Foreman (muster_effigy.ts), once raised. */
+  effigyId: number | null;
+  /** The drill yard's mallet man (muster_drill.ts), once raised. */
+  drillmasterId: number | null;
+  /** Sim time his next mallet blow is due (muster_drill.ts). */
+  drillNextPoundAt: number;
+  /** Each player's open window on the effigy: player id -> sim time it closes. */
+  effigyWindows: Map<number, number>;
 }
 
 export function freshMusterArmy(): MusterArmyState {
@@ -111,6 +128,11 @@ export function freshMusterArmy(): MusterArmyState {
     respawnAt: null,
     lent: new Map(),
     scannedRoster: -1,
+    commanderId: null,
+    effigyId: null,
+    drillmasterId: null,
+    drillNextPoundAt: 0,
+    effigyWindows: new Map(),
   };
 }
 
@@ -169,12 +191,23 @@ export function tickMusterArmy(
   // The pull is over when he falls, or when the stand-down clock says so (a reset that has
   // stayed quiet, or a free dawn): the same moment the fallen rise, never on a blip.
   tickLentPikes(ctx, army.lent, fell || standUp);
+  // The drill yard: the effigy's plank hide and every player's window on it, then the
+  // drillmaster's mallet.
+  tickMusterEffigy(ctx, army);
+  tickMusterDrill(ctx, army);
 }
 
 /** The rack was used: lend a pike (interaction.ts routes both the interact key and the
  *  rack click here). True when a pike went into the player's hands. */
 export function useMusterRack(ctx: SimContext, army: MusterArmyState, pid: number): boolean {
-  return takeMusterPike(ctx, army.lent, pid);
+  const took = takeMusterPike(ctx, army.lent, pid);
+  // The pike drill's first step (content/mirefen_muster_quests.ts): a player who leaves the
+  // rack with a Shardpike in hand has done it, including one already carrying Skerrit's.
+  const meta = ctx.players.get(pid);
+  if (meta && isShardpikeItem(meta.equipment.mainhand)) {
+    onQuestEventForQuests(ctx, meta, MUSTER_PIKE_DRAWN_EVENT);
+  }
+  return took;
 }
 
 /** Is this entity the muster's weapon rack? */
@@ -212,19 +245,31 @@ function resolveBoss(ctx: SimContext, army: MusterArmyState, scheduled: Entity |
 function raiseMuster(ctx: SimContext, army: MusterArmyState): void {
   for (const camp of MUSTER_CAMPS) {
     for (const slot of camp.soldiers) {
+      const pos = ctx.groundPos(camp.center.x + slot.dx, camp.center.z + slot.dz);
+      const facing = slot.facing ?? camp.facing;
+      if (slot.templateId === MUSTER_COMMANDER_NPC_ID) {
+        // The commander is an NPC (the muster's quests), raised at his post with his men.
+        const npc = createNpc(ctx.nextId++, MUSTER_COMMANDER_NPC, pos);
+        npc.facing = facing;
+        npc.prevFacing = facing;
+        ctx.addEntity(npc);
+        army.commanderId = npc.id;
+        continue;
+      }
       const template = MOBS[slot.templateId];
       if (!template) continue;
-      const pos = ctx.groundPos(camp.center.x + slot.dx, camp.center.z + slot.dz);
       const mob = createMob(ctx.nextId++, template, template.maxLevel, pos);
       mob.hostile = false;
-      mob.facing = camp.facing;
-      mob.prevFacing = camp.facing;
+      mob.facing = facing;
+      mob.prevFacing = facing;
       mob.idleStationary = true;
       ctx.addEntity(mob);
       army.soldierIds.push(mob.id);
-      army.homeFacing.push(camp.facing);
+      army.homeFacing.push(facing);
+      if (slot.templateId === 'muster_drillmaster') army.drillmasterId = mob.id;
     }
   }
+  raiseMusterEffigy(ctx, army);
   const rack = createGroundObject(
     ctx.nextId++,
     '',

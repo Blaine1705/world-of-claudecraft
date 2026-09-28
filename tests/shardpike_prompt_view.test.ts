@@ -408,3 +408,33 @@ describe('a window is not a cooldown', () => {
     expect(b?.windowFrac).toBeNull();
   });
 });
+
+describe('the drill yard effigy (src/sim/muster_effigy.ts) swaps the target, not the ladder', () => {
+  const effigy = (over: Partial<LanceGuidanceView> = {}) => guide({ effigy: true, ...over });
+  it('names the lantern at the strike, the walk and the open window', () => {
+    expect(
+      state({ guidance: effigy(), trial: trial({ phase: 'steadied', windowRemaining: 3 }) })
+        .bodyKey,
+    ).toBe('hudChrome.shardpike.promptStrikeLantern');
+    expect(state({ guidance: effigy({ inRange: false, targetDistance: 30 }) }).bodyKey).toBe(
+      'hudChrome.shardpike.promptCloserEffigy',
+    );
+    expect(state({ guidance: effigy({ blinded: true, blindRemaining: 12 }) }).bodyKey).toBe(
+      'hudChrome.shardpike.promptLanternOut',
+    );
+  });
+
+  it('keeps telling the player to swing their own weapon after the pike goes back', () => {
+    const s = state({
+      mainhandItemId: 'iron_sword',
+      guidance: effigy({ blinded: true, blindRemaining: 7.4 }),
+    });
+    expect(s.visible).toBe(true);
+    expect(s.bodyKey).toBe('hudChrome.shardpike.promptLanternOut');
+    expect(s.values.seconds).toBe('8');
+    // The real eye never shows this without a pike: no stray instruction for the raid.
+    expect(
+      state({ mainhandItemId: 'iron_sword', guidance: guide({ blinded: true }) }).visible,
+    ).toBe(false);
+  });
+});

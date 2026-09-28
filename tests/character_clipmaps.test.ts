@@ -287,6 +287,9 @@ const CLIPLESS_RIGS = new Set([
   'mob_dragon_egg',
   // the Nythraxis Bone Spike: a stationary Tripo prop mob, no rig, no clips
   'mob_nythraxis_bone_spike',
+  // the Straw Foreman, the muster's training effigy: a clipless prop whose plank hide and
+  // lantern are driven by the effigy rig (characters/effigy_rig.ts)
+  'mob_muster_effigy',
 ]);
 
 /** mob_yumi_cat is a single-clip objective prop: its ClipMap names the one real

@@ -6434,7 +6434,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': '喚雷者腰甲',
   'entities.mobs.thunzharr_waking_peak.name': '桑扎爾，覺醒之峰',
   'entities.mobs.balgath_cyclops.name': '巴爾加斯，獨眼工頭',
-  'entities.mobs.muster_captain.name': '徵召指揮官',
+  'entities.npcs.muster_commander.name': '徵召指揮官',
   'entities.mobs.muster_sergeant.name': '徵召軍士',
   'entities.mobs.muster_chaplain.name': '徵召隨軍牧師',
   'entities.mobs.muster_footman.name': '徵召步兵',
@@ -16398,4 +16398,40 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字傳送到城鎮中心。',
   'devCommand.actions.town.label': '城鎮中心',
   'devCommand.fields.town': '鎮',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': '已致盲！現在全團一起狠狠地打',
+  'hudChrome.shardpike.promptStrikeLantern': '現在刺燈籠，{seconds} 秒',
+  'hudChrome.shardpike.promptLanternOut': '燈籠滅了，還有 {seconds} 秒：用你自己的武器打它',
+  'hudChrome.shardpike.promptCloserEffigy': '靠近稻草工頭，還差 {yards} 碼',
+  'hudChrome.auraEffect.effigyPlankHide':
+    '擋掉每次攻擊的 {pct}%，直到碎晶長矛的突刺熄滅它眼中的燈籠',
+  'hudChrome.auraEffect.effigyLanternOut':
+    '對你而言，稻草工頭的燈籠已經熄滅：你和你寵物的攻擊無視其木板之皮，全額命中',
+  'character.lockoutWeeklyQuests': '每週任務',
+  'entities.items.barrowhide_slab.name': '古塚皮板',
+  'entities.mobs.muster_drillmaster.name': '徵召操練官',
+  'entities.mobs.muster_effigy.name': '稻草工頭',
+  'entities.npcs.muster_commander.title': '芬橋徵召軍',
+  'entities.npcs.muster_commander.greeting':
+    '先長矛，{className}，再所有人。這就是全部，也是這座營地活到現在的原因。',
+  'entities.quests.q_muster_summons.title': '徵召令',
+  'entities.quests.q_muster_summons.text':
+    '我能抽出的每一桿長矛都在星隕坑周圍紮了營，{playerName}，就為了圍住從坑裡走出來的那東西。徵召指揮官守在俯瞰火山坑的南坡營地，在這裡的東南方。去向指揮官報到。你會聽到我們怎麼對付他，好好聽著，因為沒聽的人都躺在蘆葦裡了。',
+  'entities.quests.q_muster_summons.completion':
+    '芬威克派來的？很好。聽著，這話我只說一遍，而他一句都不會說。巴爾加斯沿著我們的哨站巡行：坑沿、西邊的平地、南坡、西南坑沿上的缺口，然後再繞一圈，他停下的每一個哨站都會被夷平。鋼鐵傷不了他。他的皮會把刀刃彈開，只會砍他的團隊最後只會累死。他唯一的弱點是眼睛。一桿撐穩的長矛刺穿織影核心就能讓他失明，而他失明時皮會剝落：那時全團一起打他，狠狠地打。之後皮會重新合上，我們等下一次機會。先長矛，{playerName}，再所有人。',
+  'entities.quests.q_muster_summons.objectives.0.label': '向徵召指揮官報到',
+  'entities.quests.q_muster_pike_drill.title': '長矛先行',
+  'entities.quests.q_muster_pike_drill.text':
+    '說話不值錢，長矛可值錢。從我旁邊的兵器架上拿一桿碎晶長矛，然後去營地西頭找稻草工頭：小伙子們用木板和稻草紮的，只有真傢伙一半大，眼睛的位置放著一盞燈籠。架起長矛，操練官砸地的時候也要穩住矛尖，因為真傢伙晃得更厲害。等你手臂篤定了，就把矛尖刺進燈籠。他的木板會掉下來：然後用你自己的武器打他，{playerName}，感受一下差別。',
+  'entities.quests.q_muster_pike_drill.completion':
+    '感覺到打進去了吧？在真傢伙身上，那是全團揮砍的十四口氣，然後他的皮又會合上。記住這一課。工頭會來考你的。',
+  'entities.quests.q_muster_pike_drill.objectives.0.label': '從徵召兵器架上取下碎晶長矛',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': '熄滅稻草工頭的燈籠',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': '木板脫落時命中的攻擊',
+  'entities.quests.q_muster_trophy.title': '工頭的碎塊',
+  'entities.quests.q_muster_trophy.text':
+    '他每週都會重新站起來，我們每週都會再把他打倒。芬橋要證據，鐵匠們要石頭。巴爾加斯倒下時，從屍體上撕下一塊皮給我帶來，{playerName}。徵召軍每一塊都付錢。',
+  'entities.quests.q_muster_trophy.completion':
+    '還是溫的，比看上去更沉。離家這麼遠，錢袋很薄，但這是你的。等他再站起來就回來。',
+  'entities.quests.q_muster_trophy.objectives.0.label': '古塚皮板',
 };

@@ -97,6 +97,18 @@ const secs = (v: number): string => String(Math.max(1, Math.ceil(v)));
  */
 export function shardpikePromptState(input: ShardpikePromptInput): ShardpikePromptState {
   if (!isShardpikeItem(input.mainhandItemId)) {
+    // The drill yard (src/sim/muster_effigy.ts): the lantern is out and the rack has the
+    // pike back, so the one thing left to do is the lesson's second half.
+    const drill = input.guidance;
+    if (drill?.effigy && drill.blinded && !input.dead) {
+      return {
+        visible: true,
+        tone: 'success',
+        bodyKey: 'hudChrome.shardpike.promptLanternOut',
+        values: { seconds: secs(drill.blindRemaining) },
+        thrusts: null,
+      };
+    }
     // Rung 0, the only one without a pike: standing at the muster's rack empty-handed, the
     // one thing to do is take one, and a rack that looks like scenery never says so itself.
     if (!input.rackInReach || input.dead) return HIDDEN;
@@ -117,10 +129,14 @@ export function shardpikePromptState(input: ShardpikePromptInput): ShardpikeProm
   if (input.dead) return { ...HIDDEN, thrusts };
 
   const trial = input.trial;
+  // The drill yard's effigy swaps the target's name into three rungs; the ladder is the same.
+  const effigy = g?.effigy === true;
   if (trial?.phase === 'steadied') {
-    return show('urgent', 'hudChrome.shardpike.promptStrike', {
-      seconds: secs(trial.windowRemaining),
-    });
+    return show(
+      'urgent',
+      effigy ? 'hudChrome.shardpike.promptStrikeLantern' : 'hudChrome.shardpike.promptStrike',
+      { seconds: secs(trial.windowRemaining) },
+    );
   }
   if (trial) {
     const drifting = Math.abs(trial.balance) >= SHARDPIKE_DANGER_BALANCE;
@@ -137,9 +153,11 @@ export function shardpikePromptState(input: ShardpikePromptInput): ShardpikeProm
     return show('active', 'hudChrome.shardpike.promptHoldSteady');
   }
   if (g?.blinded) {
-    return show('success', 'hudChrome.shardpike.promptEyeOut', {
-      seconds: secs(g.blindRemaining),
-    });
+    return show(
+      'success',
+      effigy ? 'hudChrome.shardpike.promptLanternOut' : 'hudChrome.shardpike.promptEyeOut',
+      { seconds: secs(g.blindRemaining) },
+    );
   }
   if (g?.targetPresent && g.sealRemaining > 0) {
     return show('idle', 'hudChrome.shardpike.promptSealed', { seconds: secs(g.sealRemaining) });
@@ -150,9 +168,11 @@ export function shardpikePromptState(input: ShardpikePromptInput): ShardpikeProm
     });
   }
   if (g?.targetPresent && !g.inRange) {
-    return show('directive', 'hudChrome.shardpike.promptCloser', {
-      yards: String(Math.max(1, Math.round(g.targetDistance ?? 0))),
-    });
+    return show(
+      'directive',
+      effigy ? 'hudChrome.shardpike.promptCloserEffigy' : 'hudChrome.shardpike.promptCloser',
+      { yards: String(Math.max(1, Math.round(g.targetDistance ?? 0))) },
+    );
   }
   if (g?.targetPresent) return show('directive', 'hudChrome.shardpike.promptBrace');
   return show(

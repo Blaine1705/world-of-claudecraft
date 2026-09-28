@@ -30,9 +30,10 @@ import {
   shockLanceBalance,
   stepLanceBalance,
 } from './lance_balance_core';
-import { nearestEyeWardTarget } from './lance_guidance';
+import { lanceTargetInReach } from './lance_guidance';
 import { throwLance } from './lance_throw';
 import { blindEyeWard } from './mob/eye_ward';
+import { blindMusterEffigy } from './muster_effigy';
 import { onQuestEventForQuests } from './quests/quest_credit';
 import type { SimContext } from './sim_context';
 import { DT, dist2d, type Entity, type MoveInput } from './types';
@@ -151,10 +152,37 @@ export function lanceThrust(ctx: SimContext, pid: number): void {
     endSession(meta, p);
     return;
   }
-  // The same lookup the HUD prompt reads (lance_guidance.ts), at the thrust's own reach.
-  const target = nearestEyeWardTarget(ctx, p, LANCE_THRUST_RANGE)?.mob ?? null;
-  if (!target) {
+  // The same lookup the HUD prompt reads (lance_guidance.ts), at the thrust's own reach:
+  // the Foreman if he is in reach, else the drill yard's Straw Foreman (muster_effigy.ts).
+  const found = lanceTargetInReach(ctx, p, LANCE_THRUST_RANGE);
+  if (!found) {
     ctx.error(pid, 'Nothing worth the point in reach.');
+    return;
+  }
+  const target = found.mob;
+  if (found.kind === 'effigy') {
+    // The lesson: the same throw, the same fixed poke, and the lantern goes out for this
+    // player alone. Put out BEFORE the poke lands, exactly as the real eye is.
+    throwLance(ctx, p, target, (caster, victim) => {
+      blindMusterEffigy(ctx, pid, victim);
+      ctx.dealDamage(
+        caster,
+        victim,
+        LANCE_FIXED_DAMAGE,
+        false,
+        'physical',
+        'Loomshard Thrust',
+        'hit',
+        true,
+        undefined,
+        true,
+        true,
+        true,
+        LANCE_THRUST_ABILITY,
+      );
+    });
+    endSession(meta, p);
+    meta.lanceRestUntil = ctx.time + LANCE_REST_SECONDS;
     return;
   }
   // Blind BEFORE the damage lands, so the poke that opens the window is never itself

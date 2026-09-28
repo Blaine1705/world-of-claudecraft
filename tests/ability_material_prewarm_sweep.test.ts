@@ -89,6 +89,7 @@ const REGISTERED_MODULES = [
   'balgath_ranged_fx.ts',
   'balgath_starwake_fx.ts',
   'coach_trail_materials.ts',
+  'effigy_rig.ts',
 ];
 
 /** A module-scope lazy cache, however the formatter wrapped it. The type
@@ -238,10 +239,10 @@ describe('the lazy-material sweep', () => {
     // Vacuity floor, kept just under the real count: the nine registered
     // bundles (the coach trail's guidance set, the ground fire AoE anchor,
     // the Ring of Frost stand-in, Balgath's ranged kit and his Wake of the
-    // Fallen Star among the spell visuals), the two excluded scenery bakes,
-    // and the battleground caches.
+    // Fallen Star among the spell visuals, and the muster effigy's rig), the two
+    // excluded scenery bakes, and the battleground caches.
     expect(hits.length).toBeGreaterThanOrEqual(12);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(11);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(12);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

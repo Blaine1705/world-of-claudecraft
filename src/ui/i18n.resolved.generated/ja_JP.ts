@@ -379,7 +379,11 @@ export const ja_JP: EnTranslations = {
       "leanRightKey": "右に傾ける（{key}）",
       "promptTally": "{count} put out",
       "promptLabel": "シャードパイクの指示",
-      "blindBanner": "BARROWHIDE BROKEN"
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "盲目にした！今こそレイド全員で叩き込め",
+      "promptStrikeLantern": "今だ、ランタンを突け、残り {seconds} 秒",
+      "promptLanternOut": "ランタンが消えた、残り {seconds} 秒：自分の武器で叩け",
+      "promptCloserEffigy": "藁の監督に近づけ、あと {yards} ヤード"
     },
     "warlock": {
       "doomLabel": "断罪",
@@ -3223,6 +3227,8 @@ export const ja_JP: EnTranslations = {
       "cooldownCap": "この時間枠でクールダウン短縮を{used}/{cap}秒使用済み",
       "bruinRushWindow": "ウルフフォームのマナ消費がなくなり、ブルーインラッシュの対象を押さえ込んで{sec}秒間移動速度を{pct}%低下させる",
       "funeralHarvestLock": "フューネラル・ハーベストはまだ次の魂の欠片を生成できない",
+      "effigyPlankHide": "あらゆる打撃の {pct}% を受け流す。シャードパイクの突きで目のランタンを消すまで続く",
+      "effigyLanternOut": "あなたにとって藁の監督のランタンは消えている：あなたとペットの攻撃は板の皮を無視し、全力で通る",
       "leadenHexLock": "レドン・ヘックスはまだこの対象を再び移動不能にできない",
       "forbiddenReflectionReady": "次の対象となるウォーロックのクールダウンを再使用できる",
       "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
@@ -10019,6 +10025,7 @@ export const ja_JP: EnTranslations = {
     "lockoutRaids": "レイド",
     "lockoutDungeons": "ダンジョン",
     "lockoutWorldBosses": "ワールドボス",
+    "lockoutWeeklyQuests": "週間クエスト",
     "takeOverConfirm": "このキャラクターを別のセッションから切断し、こちらに移します。続けますか？",
     "renameRequired": "名前変更が必要",
     "delete": "削除",
@@ -15977,6 +15984,9 @@ export const ja_JP: EnTranslations = {
       "muster_shardpike": {
         "name": "召集兵団のシャードパイク"
       },
+      "barrowhide_slab": {
+        "name": "塚山の皮板"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -17095,8 +17105,11 @@ export const ja_JP: EnTranslations = {
       "muster_sergeant": {
         "name": "召集兵団の軍曹"
       },
-      "muster_captain": {
-        "name": "召集兵団の指揮官"
+      "muster_drillmaster": {
+        "name": "召集兵団の教練係"
+      },
+      "muster_effigy": {
+        "name": "藁の監督"
       },
       "stable_horse": {
         "name": "厩舎の馬"
@@ -17592,6 +17605,11 @@ export const ja_JP: EnTranslations = {
         "name": "マベン・スケリット",
         "title": "嵌め込み職人",
         "greeting": "あの眼を研いで彼の眼窩に据えてから四十年、一日分の払いももらっていない。番人に痛い目を見せたいのか、{className}？なら俺の仕事を狙え。"
+      },
+      "muster_commander": {
+        "name": "召集兵団の指揮官",
+        "title": "フェンブリッジ召集兵団",
+        "greeting": "まず槍、それから全員だ、{className}。それがすべてで、それがこの陣を生かしてきた。"
       },
       "brother_aldric_fen": {
         "name": "アルドリック修道士",
@@ -18301,6 +18319,42 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フェンブリッジ召集令"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "召集兵団の呼び出し",
+        "text": "割ける槍はすべて星墜の火口の周りに陣を敷かせた、{playerName}。そこから歩き出てくる奴を囲むためだ。召集兵団の指揮官は火口を見下ろす南の高台で陣を守っている。ここから南東だ。指揮官に報告しろ。奴との戦い方を教わるだろう。よく聞け。聞かなかった者たちは葦の中に沈んでいる。",
+        "completion": "フェンウィックの使いか？よし。一度しか言わん、奴は一言も言わんからな。バルガスは我々の哨所を巡る：火口の縁、西の平地、南の高台、南西の縁の切れ目、そしてまた一周だ。立ち止まった哨所はすべて踏み潰される。鋼は奴に通らん。皮がはじき返し、奴を斬りつけるだけのレイドは疲れ果てて死ぬ。唯一の弱点は目だ。構えた槍をルームシャードに突き通せば奴は盲目になり、盲目の間は皮が剥がれ落ちる。その時こそレイド全員で叩き込め、全力でな。やがて皮は閉じ、次の好機を待つ。まず槍、それから全員だ、{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "召集兵団の指揮官に報告する"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "まず槍を",
+        "text": "口で言うのは安いが、槍は安くない。俺の隣の武器棚からシャードパイクを取れ。それから陣の西端にいる藁の監督のところへ行け。若い連中が板と藁で作った、本物の半分の大きさの人形で、目のところにランタンが入っている。槍を構え、教練係が地面を叩いている間も穂先をまっすぐ保て。本物はもっと激しく揺らすからな。腕が定まったら、穂先をランタンに通せ。板が剥がれ落ちる：そうしたら自分の武器で叩いてみろ、{playerName}。違いが分かるはずだ。",
+        "completion": "通る手応えがあっただろう？本物なら、レイド全員が振るう十四呼吸の間だ。そしてまた皮が閉じる。この教えを忘れるな。監督が必ず試してくる。",
+        "objectives": {
+          "0": {
+            "label": "召集兵団の武器棚からシャードパイクを取った"
+          },
+          "1": {
+            "label": "藁の監督のランタンを消した"
+          },
+          "2": {
+            "label": "板が落ちている間に当てた打撃"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "監督のかけら",
+        "text": "奴は毎週立ち上がり、我々は毎週また叩き伏せる。フェンブリッジは証拠を欲しがり、鍛冶屋は石を欲しがっている。バルガスが倒れたら、死骸から皮を一枚引き剥がして持って来い、{playerName}。召集兵団は一枚ごとに払う。",
+        "completion": "まだ温かいな。見た目より重い。こんな辺境では財布も薄いが、これはお前のものだ。奴がまた立ち上がったら戻って来い。",
+        "objectives": {
+          "0": {
+            "label": "塚山の皮板"
           }
         }
       },

@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "0764e7d4c8ec1af40a9b5e35cb4f7b0ccd2c1ee80d1396adfc39892a3d2b5263",
+  "rendererFingerprint": "69e87f073b75b4b0f16c136b37372e4dfb8cb5050835a8691c0fa6f00a0c3b27",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4952796,
-      "sha256": "874bd1b1c61fb590c63eebf01ef2b95b8de80b99132aaa7ba17e7b26f8108379",
+      "bytes": 4969421,
+      "sha256": "ec4271f6d4f1ffb57c903ce19562c8563a6f9d9364f350319ae2ab04f47aa446",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 255,
+  "portraitCount": 256,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -4451,67 +4451,6 @@
       }
     },
     {
-      "id": "muster_captain",
-      "family": "humanoid",
-      "finderEncounter": false,
-      "visualKey": "npc_muster_captain",
-      "renderSpec": {
-        "model": {
-          "url": "models/chars/players/knight.glb",
-          "path": "public/models/chars/players/knight.glb",
-          "bytes": 462916,
-          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
-        },
-        "idle": "Idle",
-        "height": 2.6,
-        "yaw": null,
-        "hover": null,
-        "show": [
-          "Knight_Cape"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/sword_1handed.glb",
-              "path": "public/models/weapons/sword_1handed.glb",
-              "bytes": 30608,
-              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          },
-          {
-            "asset": {
-              "url": "models/weapons/shield_badge.glb",
-              "path": "public/models/weapons/shield_badge.glb",
-              "bytes": 29948,
-              "sha256": "967e6b7548af1707f3f32d297e4937e3ea1ec97da4931fc40c57d9c9972fc8cb"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9c4a2c",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "2bd89038e54416227cf46e01cea0143e17ebf41afa13fdfba7c8990ec57afd53",
-      "output": {
-        "path": "public/ui/mobs/muster_captain.webp",
-        "bytes": 2178,
-        "sha256": "a767f1d08e194ab4524ecfdbbceebd9a339c099e16c45235d3a1c438ca2e9cb4"
-      }
-    },
-    {
       "id": "muster_chaplain",
       "family": "humanoid",
       "finderEncounter": false,
@@ -4571,6 +4510,89 @@
         "path": "public/ui/mobs/muster_chaplain.webp",
         "bytes": 2736,
         "sha256": "49c36f3e75ddd7b6a66bf461aaeae363da7c23e6a1d27966d1264df136f84140"
+      }
+    },
+    {
+      "id": "muster_drillmaster",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "npc_muster_drillmaster",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/knight.glb",
+          "path": "public/models/chars/players/knight.glb",
+          "bytes": 462916,
+          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Knight_Helmet"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/muster_mallet.glb",
+              "path": "public/models/weapons/muster_mallet.glb",
+              "bytes": 15344,
+              "sha256": "b2e01313eb21ff3fb2a78eda181f4c0a2b3ce9a511a50561689cee23049cf27d"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7f3a28",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "c3e981af0fef573ed49b520e380681b7aeebbc1cb6400d957947650ef6315a82",
+      "output": {
+        "path": "public/ui/mobs/muster_drillmaster.webp",
+        "bytes": 2242,
+        "sha256": "79dbde70fb7bdaf318c93069250a984429430b3c319ab1b279e29ceb480b3d39"
+      }
+    },
+    {
+      "id": "muster_effigy",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_muster_effigy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/muster_effigy.glb",
+          "path": "public/models/creatures/muster_effigy.glb",
+          "bytes": 182308,
+          "sha256": "1e24cc9b9e443d1a5b4eb4ca2bf729ab1209766776cd6d672c3bd8890a900d4a"
+        },
+        "idle": "Idle",
+        "height": 6.7,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f26a120215470e95d1ca8c099c1d937cdec2c693f9ca894b924c8271b93bd515",
+      "output": {
+        "path": "public/ui/mobs/muster_effigy.webp",
+        "bytes": 3816,
+        "sha256": "f6e2389f82f237b37580aa69c7df258b2321ac0a8b03da11fde20f05039467ba"
       }
     },
     {

@@ -11573,7 +11573,7 @@ export class Hud {
           break;
         }
         case 'lanceBlind':
-          shardpikeBlindFeedback(this, ev.count);
+          shardpikeBlindFeedback(this, ev);
           break;
         case 'reliquaryUnlock': {
           reliquaryUnlocks.push(ev);

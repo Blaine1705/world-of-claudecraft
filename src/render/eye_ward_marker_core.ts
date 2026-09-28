@@ -14,6 +14,8 @@
 // Three/DOM/i18n-free and deterministic, so a Vitest drives it and the RENDER_PURE_CORES
 // purity sweep in tests/architecture.test.ts covers it.
 
+import { EFFIGY_WARD_AURA_ID } from '../sim/muster_effigy_core';
+
 /** Aura ids the ward mirrors itself through (src/sim/mob/eye_ward.ts). */
 export const EYE_WARD_AURA_ID = 'eye_ward';
 export const EYE_WARD_BLINDED_AURA_ID = 'eye_ward_blinded';
@@ -70,9 +72,16 @@ export function eyeWardStateOf(
   let warded = false;
   for (const a of auras) {
     if (a.id === EYE_WARD_BLINDED_AURA_ID) return 'down';
-    if (a.id === EYE_WARD_AURA_ID) warded = true;
+    // The drill yard's effigy wears its plank hide the same way (src/sim/muster_effigy.ts);
+    // whether it is down is the VIEWER's own window, read by the caller.
+    if (a.id === EYE_WARD_AURA_ID || a.id === EFFIGY_WARD_AURA_ID) warded = true;
   }
   return warded ? 'up' : null;
+}
+
+/** Does this aura list carry the drill yard effigy's plank hide? */
+export function isEffigyWardAuras(auras: readonly { id?: string }[] | undefined): boolean {
+  return !!auras && auras.some((a) => a.id === EFFIGY_WARD_AURA_ID);
 }
 
 /**

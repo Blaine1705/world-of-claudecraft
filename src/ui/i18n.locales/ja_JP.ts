@@ -6671,7 +6671,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': '嵐呼びの腰当て',
   'entities.mobs.thunzharr_waking_peak.name': 'サンザール、目覚めし峰',
   'entities.mobs.balgath_cyclops.name': 'バルガス、単眼の監督',
-  'entities.mobs.muster_captain.name': '召集兵団の指揮官',
+  'entities.npcs.muster_commander.name': '召集兵団の指揮官',
   'entities.mobs.muster_sergeant.name': '召集兵団の軍曹',
   'entities.mobs.muster_chaplain.name': '召集兵団の従軍司祭',
   'entities.mobs.muster_footman.name': '召集兵団の歩兵',
@@ -17249,4 +17249,41 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': '盲目にした！今こそレイド全員で叩き込め',
+  'hudChrome.shardpike.promptStrikeLantern': '今だ、ランタンを突け、残り {seconds} 秒',
+  'hudChrome.shardpike.promptLanternOut': 'ランタンが消えた、残り {seconds} 秒：自分の武器で叩け',
+  'hudChrome.shardpike.promptCloserEffigy': '藁の監督に近づけ、あと {yards} ヤード',
+  'hudChrome.auraEffect.effigyPlankHide':
+    'あらゆる打撃の {pct}% を受け流す。シャードパイクの突きで目のランタンを消すまで続く',
+  'hudChrome.auraEffect.effigyLanternOut':
+    'あなたにとって藁の監督のランタンは消えている：あなたとペットの攻撃は板の皮を無視し、全力で通る',
+  'character.lockoutWeeklyQuests': '週間クエスト',
+  'entities.items.barrowhide_slab.name': '塚山の皮板',
+  'entities.mobs.muster_drillmaster.name': '召集兵団の教練係',
+  'entities.mobs.muster_effigy.name': '藁の監督',
+  'entities.npcs.muster_commander.title': 'フェンブリッジ召集兵団',
+  'entities.npcs.muster_commander.greeting':
+    'まず槍、それから全員だ、{className}。それがすべてで、それがこの陣を生かしてきた。',
+  'entities.quests.q_muster_summons.title': '召集兵団の呼び出し',
+  'entities.quests.q_muster_summons.text':
+    '割ける槍はすべて星墜の火口の周りに陣を敷かせた、{playerName}。そこから歩き出てくる奴を囲むためだ。召集兵団の指揮官は火口を見下ろす南の高台で陣を守っている。ここから南東だ。指揮官に報告しろ。奴との戦い方を教わるだろう。よく聞け。聞かなかった者たちは葦の中に沈んでいる。',
+  'entities.quests.q_muster_summons.completion':
+    'フェンウィックの使いか？よし。一度しか言わん、奴は一言も言わんからな。バルガスは我々の哨所を巡る：火口の縁、西の平地、南の高台、南西の縁の切れ目、そしてまた一周だ。立ち止まった哨所はすべて踏み潰される。鋼は奴に通らん。皮がはじき返し、奴を斬りつけるだけのレイドは疲れ果てて死ぬ。唯一の弱点は目だ。構えた槍をルームシャードに突き通せば奴は盲目になり、盲目の間は皮が剥がれ落ちる。その時こそレイド全員で叩き込め、全力でな。やがて皮は閉じ、次の好機を待つ。まず槍、それから全員だ、{playerName}。',
+  'entities.quests.q_muster_summons.objectives.0.label': '召集兵団の指揮官に報告する',
+  'entities.quests.q_muster_pike_drill.title': 'まず槍を',
+  'entities.quests.q_muster_pike_drill.text':
+    '口で言うのは安いが、槍は安くない。俺の隣の武器棚からシャードパイクを取れ。それから陣の西端にいる藁の監督のところへ行け。若い連中が板と藁で作った、本物の半分の大きさの人形で、目のところにランタンが入っている。槍を構え、教練係が地面を叩いている間も穂先をまっすぐ保て。本物はもっと激しく揺らすからな。腕が定まったら、穂先をランタンに通せ。板が剥がれ落ちる：そうしたら自分の武器で叩いてみろ、{playerName}。違いが分かるはずだ。',
+  'entities.quests.q_muster_pike_drill.completion':
+    '通る手応えがあっただろう？本物なら、レイド全員が振るう十四呼吸の間だ。そしてまた皮が閉じる。この教えを忘れるな。監督が必ず試してくる。',
+  'entities.quests.q_muster_pike_drill.objectives.0.label':
+    '召集兵団の武器棚からシャードパイクを取った',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': '藁の監督のランタンを消した',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': '板が落ちている間に当てた打撃',
+  'entities.quests.q_muster_trophy.title': '監督のかけら',
+  'entities.quests.q_muster_trophy.text':
+    '奴は毎週立ち上がり、我々は毎週また叩き伏せる。フェンブリッジは証拠を欲しがり、鍛冶屋は石を欲しがっている。バルガスが倒れたら、死骸から皮を一枚引き剥がして持って来い、{playerName}。召集兵団は一枚ごとに払う。',
+  'entities.quests.q_muster_trophy.completion':
+    'まだ温かいな。見た目より重い。こんな辺境では財布も薄いが、これはお前のものだ。奴がまた立ち上がったら戻って来い。',
+  'entities.quests.q_muster_trophy.objectives.0.label': '塚山の皮板',
 };

@@ -52,8 +52,10 @@ export interface LentPikeRecord {
 /** Every live loan, keyed by the borrower's player id. */
 export type LentPikes = Map<number, LentPikeRecord>;
 
-/** The reasons a loan ends. Only the log line cares, and only whether to speak at all. */
-export type PikeReclaimReason = 'pullEnded' | 'leash' | 'death';
+/** The reasons a loan ends. Only the log line cares. `drill`: a thrust put the Straw
+ *  Foreman's lantern out (muster_effigy.ts), and the pike goes back so the player's own
+ *  weapon can finish the lesson. */
+export type PikeReclaimReason = 'pullEnded' | 'leash' | 'death' | 'drill';
 
 /** Is this item one the muster only ever lends? */
 export function isLentGear(itemId: string | null | undefined): boolean {
@@ -117,7 +119,7 @@ export function reclaimMusterPike(
   ctx: SimContext,
   lent: LentPikes,
   pid: number,
-  _reason: PikeReclaimReason,
+  reason: PikeReclaimReason,
 ): void {
   const record = lent.get(pid);
   lent.delete(pid);
@@ -152,9 +154,11 @@ export function reclaimMusterPike(
     if (record.offhand && !meta.equipment.offhand && ctx.countItem(record.offhand, pid) > 0)
       equipItem(ctx, record.offhand, pid, 'offhand');
   }
-  // One line for every way a loan ends (`reason` is for the callers and the tests): what
-  // ended it is obvious from what just happened, and one row localizes once.
-  ctx.notice(pid, 'The muster reclaims its Shardpike.');
+  // One line for every way a loan ends in the fight (what ended it is obvious from what
+  // just happened, and one row localizes once), and its own for the drill yard, where the
+  // hand-back IS the next instruction.
+  if (reason === 'drill') ctx.notice(pid, 'The drillmaster takes the pike back to the rack.');
+  else ctx.notice(pid, 'The muster reclaims its Shardpike.');
 }
 
 /**

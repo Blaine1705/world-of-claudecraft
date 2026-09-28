@@ -9,7 +9,13 @@
 // sim leaves and must never reach for a sim system module (src/CLAUDE.md).
 
 import { isShardpikeItem, LANCE_THRUST_RANGE } from '../sim/lance_balance_core';
-import { type EyeWardMarkerPlan, eyeWardMarkerPlan, eyeWardStateOf } from './eye_ward_marker_core';
+import { hasEffigyWindow } from '../sim/muster_effigy_core';
+import {
+  type EyeWardMarkerPlan,
+  eyeWardMarkerPlan,
+  eyeWardStateOf,
+  isEffigyWardAuras,
+} from './eye_ward_marker_core';
 
 /** The shape this driver needs off an entity; a structural subset of the wire entity. */
 export interface EyeWardCandidate {
@@ -28,6 +34,8 @@ export interface EyeWardCandidate {
 export interface EyeWardWorld {
   equipment: { mainhand?: string | null };
   lanceGuidance: { sealRemaining: number } | null;
+  /** The viewer's own entity: its auras carry their window on the drill yard's effigy. */
+  player?: { auras?: readonly { id?: string }[] } | null;
 }
 
 /**
@@ -51,8 +59,13 @@ export function eyeWardPlanFor(
   // A sleeping boss cannot be attacked at all (Sim.isHostileTo), so a badge saying "his
   // ward is open, your damage lands" over him would be a lie the whole raid can see.
   if (candidate.asleep) return null;
-  const ward = eyeWardStateOf(candidate.auras);
+  let ward = eyeWardStateOf(candidate.auras);
   if (!ward) return null;
+  // The drill yard's effigy (src/sim/muster_effigy.ts) is one shared body whose lantern is
+  // out for each player separately: its "down" is the VIEWER's own window, read off their
+  // own timer aura, so a player drilling beside you never puts your lantern out.
+  if (ward === 'up' && isEffigyWardAuras(candidate.auras) && hasEffigyWindow(world.player?.auras))
+    ward = 'down';
   const wielding = isShardpikeItem(world.equipment.mainhand);
   // The seal is read from the wielder's guidance view, which only a wielder has. A viewer
   // without one cannot tell sealed from pryable, and that is fine: to them both mean

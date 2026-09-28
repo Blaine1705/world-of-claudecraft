@@ -64,6 +64,7 @@ import {
   VARKHUL_MAKERS_BRAND_PER_STACK,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
 } from '../sim/encounters/varkhul';
+import { EFFIGY_OPENED_AURA_ID, EFFIGY_WARD_AURA_ID } from '../sim/muster_effigy_core';
 import {
   NYTHRAXIS_ASCENSION_AURA_ID,
   NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
@@ -345,6 +346,14 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   // generic "reduces damage by 0%" line.
   if (a.id === 'slumber' && a.kind === 'buff_dr') {
     return { key: `${KEY}.slumber`, nums: {} };
+  }
+  // The drill yard's effigy (src/sim/muster_effigy.ts): its plank hide, and a player's own
+  // open window on it (an inert timer; the window's truth lives on the muster army).
+  if (a.id === EFFIGY_WARD_AURA_ID && a.kind === 'buff_dr') {
+    return { key: `${KEY}.effigyPlankHide`, nums: { pct: pctFromFrac(a.value) } };
+  }
+  if (a.id === EFFIGY_OPENED_AURA_ID && a.kind === 'internal_cd') {
+    return { key: `${KEY}.effigyLanternOut`, nums: {} };
   }
   if (a.id === 'heating_up' && a.kind === 'internal_cd') {
     return { key: `${KEY}.heatingUp`, nums: {} };

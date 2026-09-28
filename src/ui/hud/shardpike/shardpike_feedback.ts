@@ -19,8 +19,20 @@ export interface ShardpikeFeedbackHost {
   showSelfNote(text: string): void;
 }
 
-/** Fire the full success moment for a thrust that broke the ward. */
-export function shardpikeBlindFeedback(host: ShardpikeFeedbackHost, count: number): void {
+/**
+ * Fire the full success moment for a thrust that broke the ward.
+ *
+ * On the drill yard's effigy (`effigy`, src/sim/muster_effigy.ts) the banner is the lesson
+ * itself, and there is no tally: a lantern on straw is practice, not an eye put out.
+ */
+export function shardpikeBlindFeedback(
+  host: ShardpikeFeedbackHost,
+  ev: { count: number; effigy?: boolean },
+): void {
+  if (ev.effigy) {
+    host.showBanner(t('hudChrome.shardpike.effigyBanner'));
+    return;
+  }
   host.showBanner(t('hudChrome.shardpike.blindBanner'));
-  host.showSelfNote(t('hudChrome.shardpike.promptTally', { count: String(count) }));
+  host.showSelfNote(t('hudChrome.shardpike.promptTally', { count: String(ev.count) }));
 }

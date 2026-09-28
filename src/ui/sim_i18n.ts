@@ -115,6 +115,11 @@ const baseEnTable = {
   'error.musterPikeHeld': 'You already hold a Shardpike.',
   'log.musterPikeTaken': 'You take a Shardpike from the muster rack.',
   'log.musterPikeReclaimed': 'The muster reclaims its Shardpike.',
+  // The drill yard (src/sim/muster_effigy.ts, src/sim/muster_pike.ts): the lantern going
+  // out on the Straw Foreman, and the lent pike going back to the rack after it.
+  'log.effigyLanternOut':
+    'The lantern gutters out and the planks fall away! Hit it with your own weapon: every blow lands in full.',
+  'log.musterPikeDrillReturn': 'The drillmaster takes the pike back to the rack.',
   'error.bankBorrowedGear': 'You cannot store borrowed gear in the bank.',
   // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
   // item store. The error.* lines are the refusal toasts (too-far, quest-item,
@@ -1056,6 +1061,10 @@ const baseEnTable = {
   'mechanic.balgathMoltenFen': 'Molten Fen',
   // The meteor volley the eruption calls down (mob/boss_starwake_meteors.ts).
   'mechanic.balgathStarDebris': 'Star Debris',
+  // The drill yard's effigy: its plank hide, and a player's own open window on it
+  // (src/sim/muster_effigy.ts EFFIGY_WARD_NAME / EFFIGY_OPENED_NAME).
+  'aura.effigyPlankHide': 'Plank Hide',
+  'aura.effigyLanternOut': 'Lantern Out',
   'aura.pin': 'Pin',
   // Coldsight's banked Fevered Draw opportunity (combat/hunter_coldsight_read.ts).
   'aura.coldsightRead': 'Coldsight Read',
@@ -14042,6 +14051,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Wake of the Fallen Star': 'mechanic.balgathStarwake',
   'Molten Fen': 'mechanic.balgathMoltenFen',
   'Star Debris': 'mechanic.balgathStarDebris',
+  // The Straw Foreman's plank hide and a player's window on it (muster_effigy.ts);
+  // byte-identical to EFFIGY_WARD_NAME and EFFIGY_OPENED_NAME.
+  'Plank Hide': 'aura.effigyPlankHide',
+  'Lantern Out': 'aura.effigyLanternOut',
   // Pin, the Bruin Rush to Cat Form rider's slow (combat/druid_engines.ts).
   Pin: 'aura.pin',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in

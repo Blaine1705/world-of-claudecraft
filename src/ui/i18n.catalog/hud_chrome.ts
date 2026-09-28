@@ -82,6 +82,13 @@ export const hudChromeStrings = {
     promptTally: '{count} put out',
     promptLabel: 'Shardpike instruction',
     blindBanner: 'BARROWHIDE BROKEN',
+    // The drill yard's effigy, the Straw Foreman (src/sim/muster_effigy.ts): the same
+    // ladder with the lantern in its eye as the target, and the banner a landed thrust
+    // raises there (the lesson the whole yard exists to teach).
+    effigyBanner: 'BLINDED! NOW THE WHOLE RAID HITS HARD',
+    promptStrikeLantern: 'STRIKE THE LANTERN now, {seconds}s',
+    promptLanternOut: 'The lantern is out, {seconds}s: hit it with your own weapon',
+    promptCloserEffigy: 'Get within reach of the Straw Foreman, {yards} yards out',
   },
   warlock: {
     doomLabel: 'Condemnation',
@@ -4434,6 +4441,12 @@ export const hudChromeStrings = {
     bruinRushWindow:
       'Cat Form costs no mana and Pins your Bruin Rush target, slowing it by {pct}% for {sec} sec',
     funeralHarvestLock: 'Funeral Harvest cannot create another Soul Fragment yet',
+    // The drill yard's effigy (src/sim/muster_effigy.ts): its plank hide, and a player's
+    // own window on it once a Shardpike thrust has put its lantern out.
+    effigyPlankHide:
+      'Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye',
+    effigyLanternOut:
+      "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
     leadenHexLock: 'Leaden Hex cannot root this target again yet',
     forbiddenReflectionReady: 'Your next eligible Warlock cooldown can be cast again',
     forbiddenReflectionLock: 'Forbidden Reflection cannot be prepared again yet',

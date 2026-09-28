@@ -6431,7 +6431,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': '唤雷者腰甲',
   'entities.mobs.thunzharr_waking_peak.name': '桑扎尔，觉醒之峰',
   'entities.mobs.balgath_cyclops.name': '巴尔加斯，独眼工头',
-  'entities.mobs.muster_captain.name': '征召指挥官',
+  'entities.npcs.muster_commander.name': '征召指挥官',
   'entities.mobs.muster_sergeant.name': '征召军士',
   'entities.mobs.muster_chaplain.name': '征召随军牧师',
   'entities.mobs.muster_footman.name': '征召步兵',
@@ -16390,4 +16390,40 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字传送到城镇中心。',
   'devCommand.actions.town.label': '城镇中心',
   'devCommand.fields.town': '镇',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': '已致盲！现在全团一起狠狠地打',
+  'hudChrome.shardpike.promptStrikeLantern': '现在刺灯笼，{seconds} 秒',
+  'hudChrome.shardpike.promptLanternOut': '灯笼灭了，还有 {seconds} 秒：用你自己的武器打它',
+  'hudChrome.shardpike.promptCloserEffigy': '靠近稻草工头，还差 {yards} 码',
+  'hudChrome.auraEffect.effigyPlankHide':
+    '挡掉每次攻击的 {pct}%，直到碎晶长矛的突刺熄灭它眼中的灯笼',
+  'hudChrome.auraEffect.effigyLanternOut':
+    '对你而言，稻草工头的灯笼已经熄灭：你和你宠物的攻击无视其木板之皮，全额命中',
+  'character.lockoutWeeklyQuests': '每周任务',
+  'entities.items.barrowhide_slab.name': '古冢皮板',
+  'entities.mobs.muster_drillmaster.name': '征召操练官',
+  'entities.mobs.muster_effigy.name': '稻草工头',
+  'entities.npcs.muster_commander.title': '芬桥征召军',
+  'entities.npcs.muster_commander.greeting':
+    '先长矛，{className}，再所有人。这就是全部，也是这座营地活到现在的原因。',
+  'entities.quests.q_muster_summons.title': '征召令',
+  'entities.quests.q_muster_summons.text':
+    '我能抽出的每一杆长矛都在星陨坑周围扎了营，{playerName}，就为了围住从坑里走出来的那东西。征召指挥官守在俯瞰火山坑的南坡营地，在这里的东南方。去向指挥官报到。你会听到我们怎么对付他，好好听着，因为没听的人都躺在芦苇里了。',
+  'entities.quests.q_muster_summons.completion':
+    '芬威克派来的？很好。听着，这话我只说一遍，而他一句都不会说。巴尔加斯沿着我们的哨站巡行：坑沿、西边的平地、南坡、西南坑沿上的缺口，然后再绕一圈，他停下的每一个哨站都会被夷平。钢铁伤不了他。他的皮会把刀刃弹开，只会砍他的团队最后只会累死。他唯一的弱点是眼睛。一杆撑稳的长矛刺穿织影核心就能让他失明，而他失明时皮会剥落：那时全团一起打他，狠狠地打。之后皮会重新合上，我们等下一次机会。先长矛，{playerName}，再所有人。',
+  'entities.quests.q_muster_summons.objectives.0.label': '向征召指挥官报到',
+  'entities.quests.q_muster_pike_drill.title': '长矛先行',
+  'entities.quests.q_muster_pike_drill.text':
+    '说话不值钱，长矛可值钱。从我旁边的兵器架上拿一杆碎晶长矛，然后去营地西头找稻草工头：小伙子们用木板和稻草扎的，只有真家伙一半大，眼睛的位置放着一盏灯笼。架起长矛，操练官砸地的时候也要稳住矛尖，因为真家伙晃得更厉害。等你手臂笃定了，就把矛尖刺进灯笼。他的木板会掉下来：然后用你自己的武器打他，{playerName}，感受一下差别。',
+  'entities.quests.q_muster_pike_drill.completion':
+    '感觉到打进去了吧？在真家伙身上，那是全团挥砍的十四口气，然后他的皮又会合上。记住这一课。工头会来考你的。',
+  'entities.quests.q_muster_pike_drill.objectives.0.label': '从征召兵器架上取下碎晶长矛',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': '熄灭稻草工头的灯笼',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': '木板脱落时命中的攻击',
+  'entities.quests.q_muster_trophy.title': '工头的碎块',
+  'entities.quests.q_muster_trophy.text':
+    '他每周都会重新站起来，我们每周都会再把他打倒。芬桥要证据，铁匠们要石头。巴尔加斯倒下时，从尸体上撕下一块皮给我带来，{playerName}。征召军每一块都付钱。',
+  'entities.quests.q_muster_trophy.completion':
+    '还是温的，比看上去更沉。离家这么远，钱袋很薄，但这是你的。等他再站起来就回来。',
+  'entities.quests.q_muster_trophy.objectives.0.label': '古冢皮板',
 };

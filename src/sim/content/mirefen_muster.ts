@@ -22,7 +22,7 @@
 // The COMMAND camp is deliberately OFF the circuit: it holds the weapon rack, so it has
 // to be the one place a player can walk up to without standing in an arrival slam.
 
-import type { MobTemplate } from '../types';
+import type { MobTemplate, NpcDef } from '../types';
 
 /** The boss the muster exists to contain (world_boss.ts WORLD_BOSSES, content/zone2.ts). */
 export const MUSTER_BOSS_TEMPLATE_ID = 'balgath_cyclops';
@@ -33,13 +33,24 @@ export type MusterSoldierTemplateId =
   | 'muster_footman'
   | 'muster_chaplain'
   | 'muster_sergeant'
-  | 'muster_captain';
+  | 'muster_drillmaster';
+
+/** The command camp's leader: an NPC (he gives the muster's quests), not a soldier mob. */
+export const MUSTER_COMMANDER_NPC_ID = 'muster_commander';
+/** Template id of the Straw Foreman, the drill yard's training effigy (below). */
+export const MUSTER_EFFIGY_TEMPLATE_ID = 'muster_effigy';
+
+/** Who holds a post: a soldier (a mob template) or the commander (an NPC). */
+export type MusterPostId = MusterSoldierTemplateId | typeof MUSTER_COMMANDER_NPC_ID;
 
 export interface MusterSoldierSlot {
-  templateId: MusterSoldierTemplateId;
+  templateId: MusterPostId;
   /** World-space offset from the camp centre, in yards. */
   dx: number;
   dz: number;
+  /** This post's own resting heading, when it is not the camp's (the drillmaster faces
+   *  the stake he pounds, not the gate). */
+  facing?: number;
 }
 
 export interface MusterCampDef {
@@ -54,6 +65,9 @@ export interface MusterCampDef {
   /** Who stands here. The inner ring (within 5.5 yd of the centre) is what an arrival
    *  slam lands on; the two sentries stand 19+ yd out and live to see the next lap. */
   soldiers: readonly MusterSoldierSlot[];
+  /** Ground the camp layout must leave bare (the command camp's drill yard, round the
+   *  effigy). Circles in world XZ. */
+  reserved?: readonly { x: number; z: number; r: number }[];
 }
 
 /** Inside this of a picket's centre stands the squad an arrival slam takes. */
@@ -71,6 +85,28 @@ function picket(sentryA: [number, number], sentryB: [number, number]): MusterSol
     { templateId: 'muster_footman', dx: sentryB[0], dz: sentryB[1] },
   ];
 }
+
+// ---------------------------------------------------------------------------
+// The drill yard (the command camp's west end)
+// ---------------------------------------------------------------------------
+
+/**
+ * The Straw Foreman: the training effigy the soldiers built of him, about half his height,
+ * with a lantern for an eye (src/sim/muster_effigy.ts runs the drill). It stands at the
+ * command camp's quiet west end, its face toward the rack, so a player who takes a pike
+ * turns round and has the target in front of them. Measured, like every post here: dry
+ * ground, clear of every camp piece (the camp layout keeps MUSTER_EFFIGY_CLEAR_RADIUS
+ * bare round it) and deep inside the command camp's keep-out circle, so the real Foreman
+ * never walks through the lesson (tests/muster_effigy.test.ts).
+ */
+export const MUSTER_EFFIGY_POST = { x: 141.2, z: 206.8, facing: Math.PI / 2 } as const;
+/** Ground the camp layout leaves bare round the effigy (its legs, props and fallen planks). */
+export const MUSTER_EFFIGY_CLEAR_RADIUS = 2.2;
+/**
+ * The drillmaster's post: beside the effigy, on a trainee's flank, turned toward the
+ * stake he drives (src/sim/muster_effigy.ts lands his mallet a stride in front of him).
+ */
+export const MUSTER_DRILL_POST = { x: 144.2, z: 203.6, facing: -0.72 } as const;
 
 export const MUSTER_CAMPS: readonly MusterCampDef[] = [
   {
@@ -113,15 +149,23 @@ export const MUSTER_CAMPS: readonly MusterCampDef[] = [
     facing: -0.36,
     onCircuit: false,
     soldiers: [
-      { templateId: 'muster_captain', dx: 0.5, dz: 2.5 },
+      { templateId: MUSTER_COMMANDER_NPC_ID, dx: 0.5, dz: 2.5 },
       { templateId: 'muster_sergeant', dx: 5.0, dz: 4.0 },
       { templateId: 'muster_footman', dx: -6.5, dz: 6.0 },
       { templateId: 'muster_footman', dx: 7.5, dz: 7.0 },
-      { templateId: 'muster_footman', dx: -9.0, dz: -2.0 },
+      { templateId: 'muster_footman', dx: -11.2, dz: 3.8 },
       { templateId: 'muster_footman', dx: 9.5, dz: -1.5 },
       { templateId: 'muster_chaplain', dx: 0.5, dz: -4.5 },
       { templateId: 'muster_chaplain', dx: -4.0, dz: -6.0 },
+      // The drill yard's mallet man, beside the effigy.
+      {
+        templateId: 'muster_drillmaster',
+        dx: MUSTER_DRILL_POST.x - 149,
+        dz: MUSTER_DRILL_POST.z - 206,
+        facing: MUSTER_DRILL_POST.facing,
+      },
     ],
+    reserved: [{ x: MUSTER_EFFIGY_POST.x, z: MUSTER_EFFIGY_POST.z, r: MUSTER_EFFIGY_CLEAR_RADIUS }],
   },
 ];
 
@@ -207,14 +251,78 @@ function soldier(
   };
 }
 
-export const MUSTER_MOBS: Record<MusterSoldierTemplateId, MobTemplate> = {
+export const MUSTER_MOBS: Record<MusterSoldierTemplateId | 'muster_effigy', MobTemplate> = {
   muster_footman: soldier('muster_footman', 'Muster Footman', 12, 0x8a3b2e),
   muster_chaplain: soldier('muster_chaplain', 'Muster Chaplain', 12, 0xd8cdb0),
   muster_sergeant: soldier('muster_sergeant', 'Muster Sergeant', 13, 0x7a2f25),
-  // "Commander", not "Captain": Muster Captain is a named unit in another game (Kings of
-  // War's Halflings), and the originality rule forbids reusing a full name in the same role.
-  muster_captain: soldier('muster_captain', 'Muster Commander', 15, 0x9c4a2c),
+  // The drill yard's mallet man: he drives a stake beside the effigy, and every blow
+  // shakes the ground under a couched pike the way a real slam does (muster_effigy.ts).
+  muster_drillmaster: soldier('muster_drillmaster', 'Muster Drillmaster', 13, 0x7f3a28),
+  // The Straw Foreman (below). Not a soldier: a practice target.
+  muster_effigy: effigy(),
 };
+
+/**
+ * The Muster Commander: the camp's leader, and the NPC the muster's three quests hang on
+ * (content/mirefen_muster_quests.ts). Dynamic: the muster raises him with the rest of the
+ * army (src/sim/mirefen_muster.ts) at his post in the command camp, so the world-init
+ * entity order (and every golden pinned to it) never moves; `fixedPost` tells the map he
+ * is always found at `pos` all the same.
+ * "Commander", not "Captain": Muster Captain is a named unit in another game (Kings of
+ * War's Halflings), and the originality rule forbids reusing a full name in the same role.
+ */
+export const MUSTER_COMMANDER_NPC: NpcDef = {
+  id: MUSTER_COMMANDER_NPC_ID,
+  name: 'Muster Commander',
+  title: 'Fenbridge Muster',
+  pos: { x: 149.5, z: 208.5 },
+  facing: -0.36,
+  color: 0x9c4a2c,
+  questIds: ['q_muster_summons', 'q_muster_pike_drill', 'q_muster_trophy'],
+  greeting:
+    'Pikes first, $C, then everyone. That is the whole of it, and it has kept this camp alive.',
+  dynamic: true,
+  fixedPost: true,
+};
+
+// ---------------------------------------------------------------------------
+// The training effigy
+// ---------------------------------------------------------------------------
+
+/**
+ * The Straw Foreman. A practice target (`dummy`: never moves, aggros or swings, heals back
+ * to full after a quiet spell, and its damage feeds the meters) wearing a plank "hide"
+ * that turns away most of every blow, exactly as Barrowhide does on the real one, until a
+ * pike puts its lantern out. Everything past that (the plank hide, the per-player window,
+ * the drillmaster's pounding) is src/sim/muster_effigy.ts. The pool is the practice row's
+ * 999,999: never felled for real.
+ */
+function effigy(): MobTemplate {
+  return {
+    id: MUSTER_EFFIGY_TEMPLATE_ID,
+    name: 'Straw Foreman',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'humanoid',
+    dummy: true,
+    idleStationary: true,
+    hpBase: 999999,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2.0,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    xpMult: 0,
+    loot: [],
+    scale: 1.0,
+    respawnSeconds: 10,
+    ccImmune: true,
+    slowImmune: true,
+    color: 0xb08a4e,
+  };
+}
 
 /** Ground-object template id of the command camp's weapon rack. */
 export const MUSTER_RACK_TEMPLATE_ID = 'muster_weapon_rack';

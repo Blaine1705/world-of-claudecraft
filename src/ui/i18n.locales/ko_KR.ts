@@ -6649,7 +6649,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': '폭풍소환사의 허리보호구',
   'entities.mobs.thunzharr_waking_peak.name': '천자르, 깨어나는 봉우리',
   'entities.mobs.balgath_cyclops.name': '발가스, 외눈의 감독관',
-  'entities.mobs.muster_captain.name': '소집대 지휘관',
+  'entities.npcs.muster_commander.name': '소집대 지휘관',
   'entities.mobs.muster_sergeant.name': '소집대 부사관',
   'entities.mobs.muster_chaplain.name': '소집대 군목',
   'entities.mobs.muster_footman.name': '소집대 보병',
@@ -17211,4 +17211,40 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '이름을 사용하여 타운 허브로 순간이동합니다.',
   'devCommand.actions.town.label': '타운 허브',
   'devCommand.fields.town': '도시',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': '실명시켰다! 이제 공격대 전원이 세게 친다',
+  'hudChrome.shardpike.promptStrikeLantern': '지금 등불을 찔러라, {seconds}초',
+  'hudChrome.shardpike.promptLanternOut': '등불이 꺼졌다, {seconds}초 남았다: 자신의 무기로 쳐라',
+  'hudChrome.shardpike.promptCloserEffigy': '짚 감독관에게 접근하라, {yards}야드 남았다',
+  'hudChrome.auraEffect.effigyPlankHide':
+    '모든 타격의 {pct}%를 막아낸다. 조각창 찌르기로 눈의 등불을 끌 때까지 유지된다',
+  'hudChrome.auraEffect.effigyLanternOut':
+    '당신에게는 짚 감독관의 등불이 꺼져 있다: 당신과 소환수의 공격이 판자 가죽을 무시하고 온전히 들어간다',
+  'character.lockoutWeeklyQuests': '주간 퀘스트',
+  'entities.items.barrowhide_slab.name': '봉분 가죽 조각',
+  'entities.mobs.muster_drillmaster.name': '소집대 교관',
+  'entities.mobs.muster_effigy.name': '짚 감독관',
+  'entities.npcs.muster_commander.title': '펜브리지 소집대',
+  'entities.npcs.muster_commander.greeting':
+    '먼저 창, 그다음이 모두다, {className}. 그게 전부고, 그게 이 진영을 살려 왔다.',
+  'entities.quests.q_muster_summons.title': '소집대의 부름',
+  'entities.quests.q_muster_summons.text':
+    '내줄 수 있는 창은 모두 낙성 분화구 주위에 진을 쳤다, {playerName}. 거기서 걸어 나오는 놈을 둘러싸기 위해서다. 소집대 지휘관은 분화구를 내려다보는 남쪽 둔덕의 진영을 지키고 있다. 여기서 남동쪽이다. 지휘관에게 보고해라. 놈과 싸우는 법을 듣게 될 거다. 잘 들어라. 듣지 않은 자들은 갈대밭에 누워 있다.',
+  'entities.quests.q_muster_summons.completion':
+    '펜윅의 전령인가? 좋다. 한 번만 말하겠다, 놈은 아예 말해 주지 않으니까. 발가스는 우리 초소들을 돈다: 분화구 가장자리, 서쪽 평지, 남쪽 둔덕, 남서쪽 가장자리의 틈, 그리고 다시 한 바퀴. 멈춰 선 초소는 모두 짓밟힌다. 강철은 놈에게 먹히지 않는다. 가죽이 튕겨 내고, 놈을 베기만 하는 공격대는 지쳐서 죽는다. 유일한 약점은 눈이다. 버틴 창을 룸샤드에 꿰뚫으면 놈은 눈이 멀고, 눈이 먼 동안 가죽이 벗겨진다. 그때가 공격대 전원이 세게 칠 때다. 그러고 나면 가죽이 다시 닫히고 우리는 다음 기회를 기다린다. 먼저 창, 그다음이 모두다, {playerName}.',
+  'entities.quests.q_muster_summons.objectives.0.label': '소집대 지휘관에게 보고',
+  'entities.quests.q_muster_pike_drill.title': '먼저 창',
+  'entities.quests.q_muster_pike_drill.text':
+    '말은 싸지만 창은 싸지 않다. 내 옆 거치대에서 조각창을 가져가라. 그다음 진영 서쪽 끝의 짚 감독관에게 가라. 녀석들이 판자와 짚으로 진짜의 절반 크기로 만든 것인데, 눈 자리에 등불이 들어 있다. 창을 세우고, 교관이 땅을 내리치는 동안에도 창끝을 곧게 유지해라. 진짜는 더 세게 흔들어 대니까. 팔이 확실해지면 창끝을 등불에 꽂아라. 판자가 떨어져 나간다: 그러면 자신의 무기로 쳐 봐라, {playerName}. 차이를 느낄 거다.',
+  'entities.quests.q_muster_pike_drill.completion':
+    '먹히는 게 느껴졌지? 진짜라면 공격대 전원이 휘두르는 열네 번의 숨이다. 그리고 가죽이 다시 닫힌다. 이 교훈을 잊지 마라. 감독관이 시험할 거다.',
+  'entities.quests.q_muster_pike_drill.objectives.0.label': '소집대 거치대에서 조각창을 가져감',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': '짚 감독관의 등불을 끔',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': '판자가 떨어진 동안 적중한 타격',
+  'entities.quests.q_muster_trophy.title': '감독관의 부스러기',
+  'entities.quests.q_muster_trophy.text':
+    '놈은 매주 다시 일어서고, 우리는 매주 다시 쓰러뜨린다. 펜브리지는 증거를 원하고, 대장장이들은 돌을 원한다. 발가스가 쓰러지면 시체에서 가죽 한 조각을 뜯어 내게 가져와라, {playerName}. 소집대는 한 조각마다 값을 치른다.',
+  'entities.quests.q_muster_trophy.completion':
+    '아직 따뜻하군. 보기보다 무겁다. 이렇게 멀리 나와 있으니 주머니가 얇지만, 이건 네 몫이다. 놈이 다시 일어서면 돌아와라.',
+  'entities.quests.q_muster_trophy.objectives.0.label': '봉분 가죽 조각',
 };
