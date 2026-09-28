@@ -24,6 +24,7 @@ import { applyKnockback } from '../src/sim/knockback';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { DT, type Entity, type PlayerClass, type SimEvent } from '../src/sim/types';
+import { trinketTooltipLineTexts } from '../src/ui/trinket_tooltip_view';
 
 type Use<K extends string> = Extract<(typeof TRINKET_SPECS)[string]['use'], { kind: K }>;
 
@@ -656,5 +657,115 @@ describe("Balgath's table pays the new spoils within the world-boss conventions"
     expect(spoilDrops / draws).toBeLessThan(0.46);
     expect(trinketDrops / draws).toBeGreaterThan(0.14);
     expect(trinketDrops / draws).toBeLessThan(0.22);
+  });
+});
+
+// ---- the tooltip is the number dealt ------------------------------------------------------
+// A clean character (no god mode, no dev multiplier) against the level-20 Training Dummy
+// (no armor, never fights back): every number the Use or Equip line prints is what lands.
+
+function dummy(sim: Sim, ahead: number): Entity {
+  const p = sim.player;
+  const mob = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+    x: p.pos.x + Math.sin(p.facing) * ahead,
+    y: p.pos.y,
+    z: p.pos.z + Math.cos(p.facing) * ahead,
+  });
+  sim.addEntity(mob);
+  return mob;
+}
+
+function tooltipOf(sim: Sim, itemId: string): string {
+  const p = sim.player;
+  return trinketTooltipLineTexts(itemId, {
+    attackPower: p.attackPower,
+    rangedPower: p.rangedPower,
+    spellPower: p.spellPower,
+    healPower: 0,
+    maxHp: p.maxHp,
+  })
+    .map((line) => line.text)
+    .join(' ');
+}
+
+/** "18" or "18 (+4)" as the number it resolves to. */
+const resolved = (base: string, bonus?: string) => Number(base) + Number(bonus ?? 0);
+
+describe('Balgath trinket tooltips print the damage and healing that land', () => {
+  it('The Guttered Eye: every non-critical tick is the tooltip tick, and six of them', () => {
+    for (const sp of [0, 50, 137]) {
+      const sim = wearing('guttered_eye', 'mage');
+      sim.player.spellPower = sp;
+      expect(sim.player.devGod ?? false).toBe(false);
+      const target = dummy(sim, 8);
+      const text = tooltipOf(sim, 'guttered_eye');
+      const m = /deals (\d+)(?: \(\+(\d+)\))? Arcane damage every/.exec(text);
+      expect(m, text).not.toBeNull();
+      const tick = resolved(m?.[1] ?? '0', m?.[2]);
+      sim.useItem('guttered_eye');
+      const hits = run(sim, 3.2).filter(
+        (e): e is Extract<SimEvent, { type: 'damage' }> =>
+          e.type === 'damage' && e.targetId === target.id && e.ability === 'Guttered Glare',
+      );
+      expect(hits).toHaveLength(6);
+      for (const h of hits)
+        expect(h.amount, `SP ${sp}`).toBe(h.crit ? Math.round(tick * 1.5) : tick);
+      expect(tick).toBeLessThan(40);
+    }
+  });
+
+  it('Muster Standard: every soldier hit falls inside the printed range', () => {
+    const sim = wearing('muster_standard');
+    const target = dummy(sim, 2);
+    sim.targetEntity(target.id);
+    // The owner opens the fight (the soldiers never do).
+    sim.startAutoAttack();
+    run(sim, 2.5);
+    const text = tooltipOf(sim, 'muster_standard');
+    const m = /for (\d+) to (\d+)(?: \(\+(\d+)\))? Physical damage/.exec(text);
+    expect(m, text).not.toBeNull();
+    const lo = resolved(m?.[1] ?? '0', m?.[3]);
+    const hi = resolved(m?.[2] ?? '0', m?.[3]);
+    sim.useItem('muster_standard');
+    const hits = run(sim, 12).filter(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.targetId === target.id && e.sourceOwnerId === sim.playerId,
+    );
+    expect(hits.length).toBeGreaterThan(6);
+    for (const h of hits) {
+      if (h.crit || h.kind !== 'hit') continue;
+      expect(h.amount).toBeGreaterThanOrEqual(lo);
+      expect(h.amount).toBeLessThanOrEqual(hi);
+    }
+    expect(hi).toBeLessThan(60);
+  });
+
+  it('Knucklebone of Balgath: the fists hit exactly as hard as the weapon they replace', () => {
+    const swings = (shaped: boolean) => {
+      const sim = wearing('knucklebone_of_balgath', 'warrior', 41);
+      const target = dummy(sim, 2);
+      sim.targetEntity(target.id);
+      if (shaped) sim.useItem('knucklebone_of_balgath');
+      sim.startAutoAttack();
+      return run(sim, 10)
+        .filter(
+          (e): e is Extract<SimEvent, { type: 'damage' }> =>
+            e.type === 'damage' && e.sourceId === sim.playerId && !e.ability && e.kind === 'hit',
+        )
+        .map((e) => e.amount);
+    };
+    // Same seed, same swings: the shape changes the body, never the numbers.
+    expect(swings(true)).toEqual(swings(false));
+  });
+
+  it('Barrowstone Heart: the health you return with is the health it prints', () => {
+    const sim = wearing('barrowstone_heart');
+    const wolf = foe(sim, 0, 3);
+    const p = sim.player;
+    const m = /return with (\d+) health/.exec(tooltipOf(sim, 'barrowstone_heart'));
+    expect(m).not.toBeNull();
+    ctxOf(sim).dealDamage(wolf, p, p.hp + 500, false, 'physical', null, 'hit');
+    run(sim, 3.05);
+    expect(p.hp).toBe(Number(m?.[1]));
   });
 });
