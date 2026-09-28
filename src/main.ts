@@ -378,6 +378,7 @@ import {
 import { attachContextRecoveryHandlers } from './render/context_loss_recovery';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
+import { contextRestoreDrawHeld } from './render/context_restore_hold';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
@@ -4193,7 +4194,7 @@ async function startGame(
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
-  const gateInput = newPresentationGateInput(DESKTOP_APP);
+  const gateInput = newPresentationGateInput(DESKTOP_APP, contextRestoreDrawHeld);
   function frame(now: number): void {
     if (armFrameAndSkip(frame, now, gateInput)) return;
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is

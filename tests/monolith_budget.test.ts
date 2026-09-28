@@ -984,7 +984,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12696 -> 12684 at the merge of release/v0.44.0 into the
     // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
     // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12684,
+    // LOWERED 12684 -> 12680 with the WebGL context restore: the texture
+    // residency ledger moved to src/render/texture_residency_ledger.ts and the
+    // loss/restore listeners to src/render/context_restore.ts, which paid for
+    // the restore host's surface. Exact count, zero slack.
+    ceiling: 12680,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

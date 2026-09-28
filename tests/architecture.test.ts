@@ -875,6 +875,9 @@ const RENDER_PURE_CORES = [
   'src/render/shader_warmup_gl_core.ts',
   'src/render/realm_builder_monument_fx_core.ts',
   'src/render/reveal_gate_core.ts',
+  // The WebGL context-restore registry and pass sequencing (context_restore.ts
+  // is its host).
+  'src/render/context_restore_core.ts',
   'src/render/stride_audio_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',
