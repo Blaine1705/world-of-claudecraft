@@ -1373,6 +1373,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1393,21 +1394,12 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the spirit veil (renderer.ts and prewarm_policy.ts inputs). No
-  // capture was retaken.
-  // Re-minted for the widened spirit veil (renderer.ts and prewarm_policy.ts
-  // inputs). No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 into feature/spirit-veil: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the second merge of release/v0.44.0 into
+  // Re-minted for the third merge of release/v0.44.0 into
   // feature/spirit-veil: the merged renderer leaf matches neither parent. No
   // capture was retaken.
-  // Re-minted for the effect swap readiness proof (renderer.ts input). No
-  // capture was retaken.
-  // Re-minted for the lazy properties read of the veil entry and the proof
-  // (renderer.ts input). No capture was retaken.
-  '96861b63aaa9a1b181e3c855954b9fff9a3019e872a4375e0c823cf39bf16969';
+  '7e2e99334f5bcd47e5a358fb89ac6445b8b2273fb07d1b99318e2419fc71b1ae';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1428,20 +1420,10 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the spirit veil (renderer.ts and prewarm_policy.ts inputs). No
-  // capture was retaken.
-  // Re-minted for the widened spirit veil (renderer.ts and prewarm_policy.ts
-  // inputs). No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 into feature/spirit-veil: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the second merge of release/v0.44.0 into
+  // Re-minted for the third merge of release/v0.44.0 into
   // feature/spirit-veil: the merged renderer leaf matches neither parent. No
   // capture was retaken.
-  // Re-minted for the effect swap readiness proof (renderer.ts input). No
-  // capture was retaken.
-  // Re-minted for the lazy properties read of the veil entry and the proof
-  // (renderer.ts input). No capture was retaken.
-  '5f45c2e7b85638cfec04c4cacad812ec22029e69196459c0359ad78c788a625e';
+  '7766a9f79105f52bcae4f1309c1e02a6f6486ba4c387cce0455cbb499c252c66';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2822,19 +2804,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // provenance. No capture or measured value changed.
       // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-      // spirit veil: recomputed LAST again over the re-swept evidence. No capture
-      // was retaken.
-      // widened spirit veil: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // release/v0.44.0 merge into feature/spirit-veil: recomputed LAST again over
-      // the re-swept evidence. No capture was retaken.
-      // Second release/v0.44.0 merge into feature/spirit-veil: recomputed LAST
+      // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // Third release/v0.44.0 merge into feature/spirit-veil: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-      // Effect swap readiness proof: recomputed LAST again over the re-swept
-      // evidence. No capture was retaken.
-      // Lazy properties read of the veil entry and the proof: recomputed LAST
-      // again over the re-swept evidence. No capture was retaken.
-    ).toBe('88ff48ae779ce169c891f7653fd561b1a6da3d1fcef78ed97e2ed380492af9c4');
+    ).toBe('2ea0967fc8c1c40a3692d5ead31f9c6f18d3b3f2fb37965d289b16b3eefdfe5c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

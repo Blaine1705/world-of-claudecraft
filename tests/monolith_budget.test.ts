@@ -533,7 +533,11 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 18081,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 18081 and the
+    // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    ceiling: 18093,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -984,11 +988,22 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12696 -> 12684 at the merge of release/v0.44.0 into the
     // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
     // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
-    // 12684 -> 12606: every translucent character look moved onto the spirit
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 12684 and the
+    // branch 12782; the two sides' additions compose to 12687 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
+    // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
+    // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
+    // On the veil branch, 12684 -> 12606: every translucent look moved onto the spirit
     // veil (the per-entity ghost-look decision into ghost_style_core.ts),
     // deleting the lit twin group's slot and manifest entry, the local self
     // warm and the Nythraxis Soul Rend live arm. Exact count, zero slack.
-    ceiling: 12606,
+    // LOWERED 12688 -> 12614 at the third release/v0.44.0 merge into
+    // feature/spirit-veil: the veil's deletions over the release's Buried
+    // Hoards and World Quests wiring, wc -l on the merged tree. Exact count,
+    // zero slack.
+    ceiling: 12614,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1678,7 +1693,11 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 9827,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 9827 and the
+    // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    ceiling: 9840,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1853,7 +1872,11 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 5354,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 5354 and the
+    // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    ceiling: 5356,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

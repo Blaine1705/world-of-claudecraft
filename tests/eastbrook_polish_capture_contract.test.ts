@@ -679,6 +679,7 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -699,22 +700,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the spirit veil: the renderer leaf moved the ghost-style
-  // decision to a core and gained the veil entry, prewarm_policy.ts its keep
-  // row. No capture was retaken.
-  // Re-minted for the widened spirit veil: the renderer leaf lost the lit twin
-  // group, the self warm and the Soul Rend live arm, prewarm_policy.ts its keep
-  // note. No capture was retaken.
-  // Re-minted for the merge of release/v0.44.0 into feature/spirit-veil: the
-  // merged renderer leaf matches neither parent. No capture was retaken.
-  // Re-minted for the second merge of release/v0.44.0 into
+  // Re-minted for the third merge of release/v0.44.0 into
   // feature/spirit-veil: the merged renderer leaf matches neither parent. No
   // capture was retaken.
-  // Re-minted for the effect swap readiness proof (renderer.ts input). No
-  // capture was retaken.
-  // Re-minted for the lazy properties read of the veil entry and the proof
-  // (renderer.ts input). No capture was retaken.
-  '5f45c2e7b85638cfec04c4cacad812ec22029e69196459c0359ad78c788a625e';
+  '7766a9f79105f52bcae4f1309c1e02a6f6486ba4c387cce0455cbb499c252c66';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
