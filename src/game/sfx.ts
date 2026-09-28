@@ -31,6 +31,11 @@ import {
   type SfxEntry,
 } from './sfx_manifest.generated';
 import { loadRuntimeSfxPack } from './sfx_runtime_pack';
+import {
+  newTavernAmbienceMix,
+  TAVERN_AMBIENCE_SILENT,
+  tavernAmbienceMix,
+} from './tavern_ambience_core';
 import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
@@ -190,6 +195,8 @@ interface LoopSlot {
   src: AudioBufferSourceNode;
   gain: GainNode;
   panner: PannerNode | null;
+  /** An optional lowpass between the source and the gain (setLoopLowpass: the tavern bed). */
+  filter?: BiquadFilterNode;
   target: number; // last commanded gain; skip re-arming the ramp when unchanged
   x?: number;
   y?: number;
@@ -221,7 +228,7 @@ interface PendingLoop {
 // same pattern, no changes needed to the override mechanism itself.
 interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
+  readonly kind: 'campfire' | 'forge' | 'tavern' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
   readonly x: number;
   readonly y: number;
   readonly z: number;
@@ -280,7 +287,10 @@ class Sfx {
   private mountMovementKeyCache = new Map<string, string | null>();
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
+  private ly = 0;
   private lz = 0; // cached listener position
+  /** The tavern bed's mix, refilled each frame (allocation-free). */
+  private readonly tavernMix = newTavernAmbienceMix();
   // per-ability synth layer state (see the abilityAudio section)
   private synthNoise: AudioBuffer | null = null;
   private abilityVoiceEnds = new Float64Array(ABILITY_VOICES);
@@ -498,6 +508,7 @@ class Sfx {
     const ctx = this.ctx;
     if (!ctx) return;
     this.lx = x;
+    this.ly = y;
     this.lz = z;
     const l = ctx.listener;
     if (l.positionX) {
@@ -998,6 +1009,7 @@ class Sfx {
         /* already stopped */
       }
       slot.src.disconnect();
+      slot.filter?.disconnect();
       slot.gain.disconnect();
       slot.panner?.disconnect();
       return;
@@ -1012,11 +1024,33 @@ class Sfx {
           /* already stopped */
         }
         src.disconnect();
+        slot.filter?.disconnect();
         slot.gain.disconnect();
         slot.panner?.disconnect();
       },
       fade * 1000 + 200,
     );
+  }
+
+  /** Run a live loop through a lowpass at `hz` (inserted between its source and its gain on
+   *  first use, then ramped). A loop still loading is a no-op; the next call catches it. */
+  setLoopLowpass(id: string, hz: number): void {
+    const ctx = this.ctx;
+    const slot = this.loops.get(id);
+    if (!ctx || !slot) return;
+    if (!slot.filter) {
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.Q.value = 0.5;
+      filter.frequency.value = hz;
+      slot.src.disconnect();
+      slot.src.connect(filter).connect(slot.gain);
+      slot.filter = filter;
+      return;
+    }
+    if (Math.abs(slot.filter.frequency.value - hz) > hz * 0.02) {
+      slot.filter.frequency.setTargetAtTime(hz, ctx.currentTime, 0.25);
+    }
   }
 
   hasLoop(id: string): boolean {
@@ -1705,6 +1739,10 @@ class Sfx {
     // The forge's own, narrower cull distance so it stops (unloops) exactly
     // where its own falloff (below) would already have gone silent, instead
     // of lingering as a silent loop out to the shared MAX_DISTANCE.
+    if (source.kind === 'tavern') {
+      this.tavernAmbient(source.id);
+      return;
+    }
     const maxDistance = source.kind === 'forge' ? FORGE_MAX_DISTANCE : undefined;
     if (this.tooFar(source.x, source.z, maxDistance)) {
       if (this.loops.has(source.id) || this.pendingLoops.has(source.id)) {
@@ -1737,6 +1775,20 @@ class Sfx {
         break;
     }
     this.loop(source.id, key, gain, source.x, source.y, source.z, maxDistance);
+  }
+
+  /** The Mirefen tavern's room bed: a non-positional stereo loop whose level and lowpass
+   *  follow the listener (src/game/tavern_ambience_core.ts): muffled through the walls,
+   *  clear inside, silent beyond its radius from the door. */
+  private tavernAmbient(id: string): void {
+    const mix = tavernAmbienceMix(this.lx, this.ly, this.lz, this.tavernMix);
+    if (mix.gain <= TAVERN_AMBIENCE_SILENT) {
+      if (this.loops.has(id) || this.pendingLoops.has(id)) this.unloop(id, 0.7);
+      return;
+    }
+    // quantized so a camera drifting by a hand does not re-arm the ramps every frame
+    this.loop(id, 'amb_tavern', Math.round(mix.gain * 400) / 400);
+    this.setLoopLowpass(id, mix.cutoffHz);
   }
 
   /** Cross-fade the global ambience loops to match the player's surroundings.

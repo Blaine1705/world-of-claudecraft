@@ -20,8 +20,10 @@ export interface AmbientPointSource {
   readonly id: string;
   // 'rift_portal'/'rift_roller'/'rift_ice_glide' are dynamic (spawn/move/
   // despawn during play, or track a gliding player), unlike the static
-  // world-built campfire/forge set; see src/render/rift_ambience.ts.
-  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
+  // world-built campfire/forge set; see src/render/rift_ambience.ts. 'tavern' is the
+  // Mirefen tavern's room bed (src/game/tavern_ambience_core.ts decides its level and tone
+  // from the listener; it plays non-positional, the point only anchors it).
+  readonly kind: 'campfire' | 'forge' | 'tavern' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
   readonly x: number;
   readonly y: number;
   readonly z: number;

@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps release mount/UI cues and Warrior recordings in one 387-key inventory', () => {
+  it('keeps release mount/UI cues and Warrior recordings in one 388-key inventory', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
     // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
@@ -176,8 +176,10 @@ describe('buildManifest', () => {
     // 387 adds the Viridian Valestrider's six mount cues on top of that 381:
     // its gait pool, summon call, takeoff, touchdown, and the squawk/flap pair
     // it calls at the apex of a jump. Mount cues 34 -> 40; UI is unchanged.
+    // 388 adds the Mirefen tavern's room bed, amb_tavern (asserted below).
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(387);
+    expect(keys.size).toBe(388);
+    expect(keys.has('amb_tavern')).toBe(true);
     expect([...keys].filter((key) => key.includes('_warrior_'))).toHaveLength(60);
     expect([...keys].filter((key) => key.includes('_masterwork_'))).toEqual([
       'impact_masterwork_execution',
@@ -279,7 +281,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(387);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(388);
     expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });
@@ -475,6 +477,8 @@ describe('mob subfamily scanning', () => {
     expect(spatialForSfx('amb_campfire')).toBe(true);
     expect(spatialForSfx('amb_forge')).toBe(true);
     expect(spatialForSfx('amb_water')).toBe(false);
+    // the tavern's room bed plays non-positional through its own lowpass (sfx.ts)
+    expect(spatialForSfx('amb_tavern')).toBe(false);
   });
 });
 

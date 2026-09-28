@@ -2,6 +2,13 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
+import {
+  newTavernAmbienceMix,
+  TAVERN_AMBIENCE_CLEAR_HZ,
+  TAVERN_AMBIENCE_INSIDE_GAIN,
+  tavernAmbienceMix,
+} from '../src/game/tavern_ambience_core';
+import { TAVERN_FLOOR_Y, TAVERN_ORIGIN, tavernToWorld } from '../src/sim/content/mirefen_tavern';
 import { MOUNT_SKIN_IDS, RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
@@ -122,6 +129,22 @@ function installAudioStub(): void {
     createGain() {
       return {
         gain: param(),
+        connect(n: unknown) {
+          return n;
+        },
+        disconnect() {},
+      };
+    }
+    createBiquadFilter() {
+      return {
+        type: '',
+        Q: { value: 1 },
+        frequency: {
+          value: 350,
+          setTargetAtTime(value: number) {
+            this.value = value;
+          },
+        },
         connect(n: unknown) {
           return n;
         },
@@ -1399,5 +1422,57 @@ describe('mount idle hum + mount-aware jump/land (the Mech Bird take set)', () =
 
     sfx.movement('land', 0, 0, 0, false, 'valorsteed');
     expect(lastSource().buffer).toBe(GENERIC_LAND_BUF);
+  });
+});
+
+describe('amb_tavern: the tavern bed follows the listener through its lowpass', () => {
+  const TAVERN = {
+    id: 'world:tavern:mirefen',
+    kind: 'tavern' as const,
+    x: TAVERN_ORIGIN.x,
+    y: TAVERN_FLOOR_Y + 2,
+    z: TAVERN_ORIGIN.z,
+  };
+  interface TavernSlot {
+    panner: unknown;
+    target: number;
+    filter?: { type: string; frequency: { value: number } };
+  }
+  const slot = () => (sfx as unknown as { loops: Map<string, TavernSlot> }).loops.get(TAVERN.id);
+  const listen = (lx: number, lz: number) => {
+    const w = tavernToWorld(lx, lz);
+    sfx.setListener(w.x, TAVERN_FLOOR_Y + 3, w.z, 0, 0, 1);
+    sfx.ambience('marsh', false, null, false, 0, [TAVERN]);
+  };
+
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('amb_tavern', { duration: 43.6 });
+    sfx.unloop(TAVERN.id, 0);
+  });
+
+  it('plays inside non-positional at the core gain, then clear through a lowpass', () => {
+    listen(0, 0);
+    expect(slot()?.panner).toBeNull();
+    const gain = SFX_CLIPS.amb_tavern.gain;
+    expect(slot()?.target).toBeCloseTo(
+      (Math.round(TAVERN_AMBIENCE_INSIDE_GAIN * 400) / 400) * gain,
+      6,
+    );
+    // the next frame runs it through the lowpass, at the core's clear cutoff
+    listen(0, 0);
+    expect(slot()?.filter?.type).toBe('lowpass');
+    expect(slot()?.filter?.frequency.value).toBeCloseTo(TAVERN_AMBIENCE_CLEAR_HZ, 0);
+  });
+
+  it('muffles it outside by the door and stops it far down the road', () => {
+    listen(0, 0);
+    listen(0, 16);
+    const w = tavernToWorld(0, 16);
+    const mix = tavernAmbienceMix(w.x, TAVERN_FLOOR_Y + 3, w.z, newTavernAmbienceMix());
+    expect(slot()?.filter?.frequency.value).toBeCloseTo(mix.cutoffHz, 0);
+    expect(mix.cutoffHz).toBeLessThan(TAVERN_AMBIENCE_CLEAR_HZ / 4);
+    listen(0, 80);
+    expect(slot()).toBeUndefined();
   });
 });
