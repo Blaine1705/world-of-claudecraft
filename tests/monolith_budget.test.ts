@@ -533,7 +533,11 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 18081,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 18081 and the
+    // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    ceiling: 18093,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -984,11 +988,18 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12696 -> 12684 at the merge of release/v0.44.0 into the
     // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
     // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
-    // LOWERED 12684 -> 12680 with the WebGL context restore: the texture
-    // residency ledger moved to src/render/texture_residency_ledger.ts and the
-    // loss/restore listeners to src/render/context_restore.ts, which paid for
-    // the restore host's surface. Exact count, zero slack.
-    ceiling: 12680,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 12684 and the
+    // branch 12782; the two sides' additions compose to 12687 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
+    // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
+    // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
+    // Held at 12688 by the WebGL context restore merge: the restore's host
+    // surface is paid for by the texture residency ledger and the loss/restore
+    // listeners moving to their own modules, so the branch adds no net line;
+    // wc -l on the merged tree. Exact count, zero slack.
+    ceiling: 12688,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1678,7 +1689,11 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 9827,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 9827 and the
+    // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    ceiling: 9840,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1853,7 +1868,11 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 5354,
+    // RE-PINNED at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
+    // (Reuben's call): both parent pins for the record, the release 5354 and the
+    // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
+    // tree (after biome). Exact count, zero slack.
+    ceiling: 5356,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

@@ -45,6 +45,9 @@ const INVENTORY: Record<string, Answer> = {
   },
   'src/render/renderer.ts:shutdownStarted': { exempt: 'renderer lifetime, not GPU state' },
   'src/render/texture_residency_ledger.ts:ready': { reset: 'texture-residency' },
+  'src/render/hoard_entrance.ts:alreadyOpen': {
+    exempt: 'the hatch pose read from the sim (a rift floor exists), not a GPU proof',
+  },
   'src/render/vfx.ts:cloudWarmed': { reset: 'vfx-cloud' },
   'src/render/ability_vfx/overlay_sprites.ts:warmed': { reset: 'overlay-sprites' },
   'src/render/ability_vfx/ribbons.ts:warmed': { reset: 'ribbons' },

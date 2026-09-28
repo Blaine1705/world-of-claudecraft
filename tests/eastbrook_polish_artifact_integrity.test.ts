@@ -1373,6 +1373,8 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the release/v0.44.0 merge into the WebGL context restore. No capture was retaken.
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1393,10 +1395,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the WebGL context restore (renderer.ts wiring of the restore host
-  // and the texture residency ledger); no capture was retaken.
-  '6152604dafb084059f0ba444325d98debef998cbe170d2550dc2550faa066cdf';
+  'd07495b53a1207b5887dddcf5cdfe5ae297bc49660a43ca460a0ddad28b8e3f1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1417,9 +1418,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the WebGL context restore (renderer.ts wiring of the restore host
-  // and the texture residency ledger); no capture was retaken.
-  'bad546b78bbfb09df552e9c5ae7bfb76329c3db6fd175d0c7f43cbdc67a0ec01';
+  // Re-minted at the release/v0.44.0 merge into the WebGL context restore (no capture was retaken).
+  '898ea98a4e8b33cabcd4bb8a877aa548b0f52c9668a51ffa544eb5d9215dee0d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2800,9 +2800,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // provenance. No capture or measured value changed.
       // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-      // Re-minted for the WebGL context restore: recomputed LAST over the re-swept
-      // evidence. No capture was retaken.
-    ).toBe('30a8b11aa1f0d950598043f510141f1db3f04e6687631bd24c9bc875dc02ca36');
+      // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // release/v0.44.0 merge into the WebGL context restore: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('8af1d8dad973dafe8aea1fba32d89b124752c34a7ed24371f130a43f00ad969a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -679,6 +679,7 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -699,9 +700,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the WebGL context restore (renderer.ts wiring of the restore host
-  // and the texture residency ledger); no capture was retaken.
-  'bad546b78bbfb09df552e9c5ae7bfb76329c3db6fd175d0c7f43cbdc67a0ec01';
+  // Re-minted at the release/v0.44.0 merge into the WebGL context restore
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '898ea98a4e8b33cabcd4bb8a877aa548b0f52c9668a51ffa544eb5d9215dee0d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
