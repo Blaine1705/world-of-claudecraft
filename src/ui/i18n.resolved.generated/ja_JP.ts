@@ -3132,6 +3132,7 @@ export const ja_JP: EnTranslations = {
         "kindlingOrb": "{duration}秒間、残り火のオーブを自分のそばに呼び出す。敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。ダメージは呪文力で増加する。",
         "pierce": "{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。",
         "lantern": "{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。",
+        "shackle": "{range}ヤード以内の対象を{duration}秒間その場に鎖で縛る。ボスなど行動阻害に耐性のあるクリーチャーは、代わりに移動速度が{slow}%低下する（減速にも耐性がある場合は無効）。",
         "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。"
       }
     },
@@ -4028,6 +4029,8 @@ export const ja_JP: EnTranslations = {
         "riftGuard": "受けるダメージが{pct}%減少する。",
         "sprint": "移動速度が{pct}%増加する。他の移動速度上昇効果とは重複しない。",
         "brand": "受ける回復量が{pct}%減少する。",
+        "shackle": "鎖で縛られている：移動できない。",
+        "shackleSlow": "鎖につながれている：移動速度が{pct}%低下。",
         "forgeHeat": "熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。",
         "tempered": "近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。",
         "temperedOther": "近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
@@ -12249,7 +12252,18 @@ export const ja_JP: EnTranslations = {
       "crypt_grave_cleave": "墓所の薙ぎ払い",
       "crypt_bonechill_breath": "寒骨の吐息",
       "crypt_tail_lash": "尾の一撃",
-      "crypt_wing_gust": "翼の突風"
+      "crypt_wing_gust": "翼の突風",
+      "bastion_brine_mend": "塩水の癒し",
+      "bastion_fog_ward": "霧の守り",
+      "bastion_halberd_sweep": "ハルバード薙ぎ",
+      "bastion_piercing_bolt": "貫通の矢",
+      "bastion_claw_sweep": "爪の薙ぎ払い",
+      "bastion_shell_slam": "甲羅叩きつけ",
+      "bastion_oathbound_charge": "誓約の突進",
+      "bastion_gaol_hook": "牢獄の鉤",
+      "bastion_gaolers_cudgel": "牢番の棍棒",
+      "bastion_mist_surge": "霧の奔流",
+      "bastion_drowning_hymn": "溺れの聖歌"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const ja_JP: EnTranslations = {
       "rimesilk_hood": {
         "name": "霜絹のフード"
       },
+      "knight_commanders_longsword": {
+        "name": "騎士団長の長剣"
+      },
+      "gaolers_chain_girdle": {
+        "name": "牢番の鎖帯"
+      },
+      "rusted_shackle_grips": {
+        "name": "錆びた枷の手袋"
+      },
+      "drowned_wardens_mantle": {
+        "name": "溺れた看守の肩衣"
+      },
+      "gaolyard_cudgel": {
+        "name": "牢獄庭の棍棒"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "溺れた指揮官の胸当て"
+      },
+      "gaolyard_striders": {
+        "name": "牢獄庭の長靴"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19359,6 +19394,9 @@ export const ja_JP: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "るつぼの心臓"
       },
+      "gaolers_iron_key": {
+        "name": "牢番の鉄鍵"
+      },
       "rift_watchers_band": {
         "name": "裂け目の監視者の指輪"
       },
@@ -19684,6 +19722,39 @@ export const ja_JP: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "フォグバインダーのヴァエル"
+      },
+      "drowned_watchman": {
+        "name": "溺れた見張り番"
+      },
+      "fogbound_arbalest": {
+        "name": "霧縛りの弩兵"
+      },
+      "barnacle_crawler": {
+        "name": "フジツボガニ"
+      },
+      "bastion_warhound": {
+        "name": "砦の軍用犬"
+      },
+      "mistweaver": {
+        "name": "霧の詠唱者"
+      },
+      "drowned_sergeant": {
+        "name": "溺れた軍曹"
+      },
+      "shackled_prisoner": {
+        "name": "枷の囚人"
+      },
+      "gaol_turnkey": {
+        "name": "牢の鍵番"
+      },
+      "turretback_hermit": {
+        "name": "塔背負いのヤドカリ"
+      },
+      "vael_fog_shade": {
+        "name": "フォグバインダーのヴァエル"
+      },
+      "gaoler_ossick": {
+        "name": "牢番オシック"
       },
       "sanctum_boneguard": {
         "name": "聖所の骨衛兵"

@@ -3132,6 +3132,7 @@ export const en_XA: EnTranslations = {
         "kindlingOrb": "[Šúɱɱóñ áñ éɱƀéŕ óŕƀ ƀéšíðé ýóú ƒóŕ {duration} šéç. Éáçĥ šþéļļ ýóú çášţ áţ áñ éñéɱý ɱáķéš íţ ƒíŕé á ƀóļţ áţ ţĥáţ éñéɱý ƒóŕ {damage} Ƒíŕé ðáɱáĝé. Ðáɱáĝé íñçŕéášéš ŵíţĥ Šþéļļ Þóŵéŕ.]",
         "pierce": "[Ƒóŕ {duration} šéç, ýóúŕ áúţó-áţţáçķš, šĥóţš áñð þĥýšíçáļ áƀíļíţíéš (ñóţ ƀļééðš) áļšó šţŕíķé ţĥé éñéɱý ñéáŕéšţ ýóúŕ ţáŕĝéţ ŵíţĥíñ {reach} ýð ƒóŕ {share}% óƒ ţĥé ðáɱáĝé ðéáļţ.]",
         "lantern": "[Šéţ á ļáñţéŕñ áţ ýóúŕ ƒééţ ƒóŕ {duration} šéç. Á ðíŕéçţ ĥéáļ ƒŕóɱ áñýóñé óñ ýóú óŕ á þáŕţý ɱéɱƀéŕ ŵíţĥíñ {radius} ýð óƒ íţ áļšó ĥéáļš ţĥé ɱóšţ ŵóúñðéð óţĥéŕ þáŕţý ɱéɱƀéŕ íñ íţš ļíĝĥţ ƒóŕ {share}% óƒ ţĥé ĥéáļ.]",
+        "shackle": "[Çĥáíñ ýóúŕ ţáŕĝéţ ŵíţĥíñ {range} ýð íñ þļáçé ƒóŕ {duration} šéç. Á çŕéáţúŕé íɱɱúñé ţó çóñţŕóļ, šúçĥ áš á ƀóšš, íš šļóŵéð ƀý {slow}% íñšţéáð, úñļéšš íţ íš áļšó íɱɱúñé ţó šļóŵš.]",
         "heartNova": "[Šþéñð áļļ ĥéáţ šţáçķš óñ á ƒíŕé ñóʋá ţĥáţ ðéáļš {perHeat} Ƒíŕé ðáɱáĝé þéŕ šţáçķ ({max} áţ {maxHeat} šţáçķš) ţó éáçĥ éñéɱý ŵíţĥíñ {radius} ýð áñð ţáúñţš éʋéŕý çŕéáţúŕé íţ ĥíţš. Ðáɱáĝé íñçŕéášéš ŵíţĥ Áţţáçķ Þóŵéŕ. Ŕéɋúíŕéš á ĥéáţ šţáçķ.]"
       }
     },
@@ -4028,6 +4029,8 @@ export const en_XA: EnTranslations = {
         "riftGuard": "[Ýóú ţáķé {pct}% ļéšš ðáɱáĝé.]",
         "sprint": "[Ɱóʋéɱéñţ šþééð íñçŕéášéð ƀý {pct}%. Ðóéš ñóţ šţáçķ ŵíţĥ óţĥéŕ šþééð íñçŕéášéš.]",
         "brand": "[Ĥéáļíñĝ ŕéçéíʋéð íš ŕéðúçéð ƀý {pct}%.]",
+        "shackle": "[Çĥáíñéð íñ þļáçé: çáññóţ ɱóʋé.]",
+        "shackleSlow": "[Çĥáíñéð: ɱóʋéɱéñţ šþééð ŕéðúçéð ƀý {pct}%.]",
         "forgeHeat": "[Ĥéáţ: {stacks}/{max}. Úšíñĝ Ƒóŕĝéƒáţĥéŕ'š Ţéɱþéŕ šþéñðš íţ áļļ, áñð íţš ŵéáþóñ ƒíŕé ðéáļš {pct}% ɱóŕé ðáɱáĝé.]",
         "tempered": "[Ýóúŕ ɱéļéé áñð ŕáñĝéð ŵéáþóñ ĥíţš ðéáļ {damage} éẋţŕá Ƒíŕé ðáɱáĝé ({pct}% ɱóŕé ƒŕóɱ ţĥé ĥéáţ šþéñţ). Éáçĥ ķíļļíñĝ ƀļóŵ áððš {killExtend} šéç, úþ ţó {maxDuration} šéç íñ ţóţáļ.]",
         "temperedOther": "[Ɱéļéé áñð ŕáñĝéð ŵéáþóñ ĥíţš ðéáļ éẋţŕá Ƒíŕé ðáɱáĝé, {pct}% ɱóŕé ƒŕóɱ ţĥé ĥéáţ šþéñţ. Ðáɱáĝé íñçŕéášéš ŵíţĥ Áţţáçķ Þóŵéŕ óŕ Ŕáñĝéð Áţţáçķ Þóŵéŕ, ŵĥíçĥéʋéŕ íš ĥíĝĥéŕ.]",
@@ -12249,7 +12252,18 @@ export const en_XA: EnTranslations = {
       "crypt_grave_cleave": "[Ĝŕáʋé Çļéáʋé]",
       "crypt_bonechill_breath": "[Ɓóñéçĥíļļ Ɓŕéáţĥ]",
       "crypt_tail_lash": "[Ţáíļ Ļášĥ]",
-      "crypt_wing_gust": "[Ŵíñĝ Ĝúšţ]"
+      "crypt_wing_gust": "[Ŵíñĝ Ĝúšţ]",
+      "bastion_brine_mend": "[Ɓŕíñé Ɱéñð]",
+      "bastion_fog_ward": "[Ƒóĝ Ŵáŕð]",
+      "bastion_halberd_sweep": "[Ĥáļƀéŕð Šŵééþ]",
+      "bastion_piercing_bolt": "[Þíéŕçíñĝ Ɓóļţ]",
+      "bastion_claw_sweep": "[Çļáŵ Šŵééþ]",
+      "bastion_shell_slam": "[Šĥéļļ Šļáɱ]",
+      "bastion_oathbound_charge": "[Óáţĥƀóúñð Çĥáŕĝé]",
+      "bastion_gaol_hook": "[Ĝáóļ Ĥóóķ]",
+      "bastion_gaolers_cudgel": "[Ĝáóļéŕ'š Çúðĝéļ]",
+      "bastion_mist_surge": "[Ɱíšţ Šúŕĝé]",
+      "bastion_drowning_hymn": "[Ðŕóŵñíñĝ Ĥýɱñ]"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const en_XA: EnTranslations = {
       "rimesilk_hood": {
         "name": "[Ŕíɱéšíļķ Ĥóóð]"
       },
+      "knight_commanders_longsword": {
+        "name": "[Ķñíĝĥţ-Çóɱɱáñðéŕ'š Ļóñĝšŵóŕð]"
+      },
+      "gaolers_chain_girdle": {
+        "name": "[Ĝáóļéŕ'š Çĥáíñ Ĝíŕðļé]"
+      },
+      "rusted_shackle_grips": {
+        "name": "[Ŕúšţéð Šĥáçķļé Ĝŕíþš]"
+      },
+      "drowned_wardens_mantle": {
+        "name": "[Ðŕóŵñéð Ŵáŕðéñ'š Ɱáñţļé]"
+      },
+      "gaolyard_cudgel": {
+        "name": "[Ĝáóļýáŕð Çúðĝéļ]"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "[Ðŕóŵñéð Çóɱɱáñðéŕ'š Ɓŕéášţþļáţé]"
+      },
+      "gaolyard_striders": {
+        "name": "[Ĝáóļýáŕð Šţŕíðéŕš]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },
@@ -19359,6 +19394,9 @@ export const en_XA: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "[Ĥéáŕţ óƒ ţĥé Çŕúçíƀļé]"
       },
+      "gaolers_iron_key": {
+        "name": "[Ĝáóļéŕ'š Íŕóñ Ķéý]"
+      },
       "rift_watchers_band": {
         "name": "[Ŕíƒţ Ŵáţçĥéŕ'š Ɓáñð]"
       },
@@ -19684,6 +19722,39 @@ export const en_XA: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "[Ʋáéļ ţĥé Ƒóĝƀíñðéŕ]"
+      },
+      "drowned_watchman": {
+        "name": "[Ðŕóŵñéð Ŵáţçĥɱáñ]"
+      },
+      "fogbound_arbalest": {
+        "name": "[Ƒóĝƀóúñð Áŕƀáļéšţ]"
+      },
+      "barnacle_crawler": {
+        "name": "[Ɓáŕñáçļé Çŕáŵļéŕ]"
+      },
+      "bastion_warhound": {
+        "name": "[Ɓášţíóñ Ŵáŕĥóúñð]"
+      },
+      "mistweaver": {
+        "name": "[Ɱíšţ Çĥáñţéŕ]"
+      },
+      "drowned_sergeant": {
+        "name": "[Ðŕóŵñéð Šéŕĝéáñţ]"
+      },
+      "shackled_prisoner": {
+        "name": "[Šĥáçķļéð Þŕíšóñéŕ]"
+      },
+      "gaol_turnkey": {
+        "name": "[Ĝáóļ Ţúŕñķéý]"
+      },
+      "turretback_hermit": {
+        "name": "[Ţĥé Ţúŕŕéţƀáçķ Ĥéŕɱíţ]"
+      },
+      "vael_fog_shade": {
+        "name": "[Ʋáéļ ţĥé Ƒóĝƀíñðéŕ]"
+      },
+      "gaoler_ossick": {
+        "name": "[Ĝáóļéŕ Óššíçķ]"
       },
       "sanctum_boneguard": {
         "name": "[Šáñçţúɱ Ɓóñéĝúáŕð]"

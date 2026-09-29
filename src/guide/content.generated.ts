@@ -2506,7 +2506,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "sunken_bastion",
     "isRaid": false,
     "suggestedPlayers": 5,
-    "min": 12,
+    "min": 11,
     "max": 13,
     "name": "The Sunken Bastion"
   },
@@ -6004,6 +6004,34 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "dgn_olen_buttress",
+    "name": "Hold the Wall",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ossick_moored",
+    "name": "Safe Harbor",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_vael_beacon",
+    "name": "By the Beacon's Light",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_turretback",
+    "name": "Eviction Notice",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -6110,6 +6138,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Fogbinder's Duffel"
+      },
+      {
+        "kind": "item",
+        "name": "Knight-Commander's Longsword"
+      },
+      {
+        "kind": "item",
+        "name": "Gaolyard Cudgel"
       }
     ]
   },
@@ -6149,6 +6185,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormjar"
+      },
+      {
+        "kind": "item",
+        "name": "Drowned Commander's Breastplate"
+      },
+      {
+        "kind": "item",
+        "name": "Gaolyard Striders"
+      },
+      {
+        "kind": "item",
+        "name": "Gaoler's Iron Key"
       }
     ]
   },

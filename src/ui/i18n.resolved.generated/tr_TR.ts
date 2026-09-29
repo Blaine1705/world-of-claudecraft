@@ -3132,6 +3132,7 @@ export const tr_TR: EnTranslations = {
         "kindlingOrb": "{duration} saniye boyunca yanında bir ember küre çağır. Bir düşmana attığın her büyü ona o düşmana {damage} Ateş hasarı için bir cıvata ateşlettirir. Hasara Spell Power artar.",
         "pierce": "{duration} saniye boyunca, otomatik saldırıların, atışlarının ve fiziksel yeteneklerinin (kanama hariç) de hedefinin {reach} yd içinde en yakın düşmanı, verilen hasarın %{share} sini vur.",
         "lantern": "{duration} saniye boyunca ayaklarının dibine bir fener koy. Sen veya {radius} yd içinde bir lonca üyesine senden doğrudan bir iyileştirme de ışığı içinde en yaralı diğer lonca üyesini kalkanı açısından %{share} iyileştir.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Tüm ısı yığınlarını, {radius} yd içinde her düşmana {perHeat} Ateş hasarı ({maxHeat} yığınlarda {max}) ve her türleyen varlığa aşırı lütuf yapan ateş nova'sı harcayabilir. Hasara Attack Power artar. Bir ısı yığını gerektirir."
       }
     },
@@ -4028,6 +4029,8 @@ export const tr_TR: EnTranslations = {
         "riftGuard": "{pct}% daha az hasar alıyor.",
         "sprint": "Hareket hızı {pct}% arttırılıyor. Diğer hız artışlarıyla yığınlanmıyor.",
         "brand": "Alınan şifa {pct}% azalıyor.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Isı: {stacks}/{max}. Forgefather's Temper kullanmak tümünü harcıyor ve silah ateşi {pct}% daha fazla hasar veriyor.",
         "tempered": "Yakın dövüş ve menzilli silah isabetleri {damage} ekstra Ateş hasarı verir (harcanan ısıdan {pct}% daha fazla). Her ölüm darbesi {killExtend} saniye ekler, toplamda {maxDuration} saniyeye kadar.",
         "temperedOther": "Yakın dövüş ve menzilli silah isabetleri ekstra Ateş hasarı verir, harcanan ısıdan {pct}% daha fazla. Hasar Saldırı Gücü veya Menzilli Saldırı Gücü (hangisi yüksekse) ile artar.",
@@ -12249,7 +12252,18 @@ export const tr_TR: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const tr_TR: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -19359,6 +19394,9 @@ export const tr_TR: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Potanın Yüreği"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Yarık İzleyicisinin Halkası"
       },
@@ -19684,6 +19722,39 @@ export const tr_TR: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Fogbinder Vael"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Mabet Kemik Muhafızı"

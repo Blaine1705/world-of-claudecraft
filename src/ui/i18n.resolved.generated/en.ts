@@ -3132,6 +3132,7 @@ export const en: EnTranslations = {
         "kindlingOrb": "Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.",
         "pierce": "For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.",
         "lantern": "Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack."
       }
     },
@@ -4028,6 +4029,8 @@ export const en: EnTranslations = {
         "riftGuard": "You take {pct}% less damage.",
         "sprint": "Movement speed increased by {pct}%. Does not stack with other speed increases.",
         "brand": "Healing received is reduced by {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
         "tempered": "Your melee and ranged weapon hits deal {damage} extra Fire damage ({pct}% more from the heat spent). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total.",
         "temperedOther": "Melee and ranged weapon hits deal extra Fire damage, {pct}% more from the heat spent. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
@@ -12249,7 +12252,18 @@ export const en: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const en: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },
@@ -19359,6 +19394,9 @@ export const en: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Heart of the Crucible"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Rift Watcher's Band"
       },
@@ -19684,6 +19722,39 @@ export const en: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael the Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Sanctum Boneguard"

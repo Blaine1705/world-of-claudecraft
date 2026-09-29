@@ -3132,6 +3132,7 @@ export const sv_SE: EnTranslations = {
         "kindlingOrb": "Framkalla en glödorb bredvid dig i {duration} sek. Varje besvärjelse du kastar på en fiende får den att skjuta en bult på fienden för {damage} Eldskada. Skadan ökar med Besvärjelsekraft.",
         "pierce": "I {duration} sek träffar dina auto-attacker, skott och fysiska förmågor (inte blödningar) också fienden närmast ditt mål inom {reach} yd för {share}% av skadan tilldelad.",
         "lantern": "Sätt en lykta vid dina fötter i {duration} sek. En direktläkning från någon på dig eller en lagspelare inom {radius} yd från den läkar också den mest sårade andra lagspelaren i sitt ljus för {share}% av läkningen.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Använd all värmestapel på en eldnova som orsakar {perHeat} Eldskada per stapel ({max} på {maxHeat} staplar) till varje fiende inom {radius} yd och förnarrar varje varelse den träffar. Skadan ökar med Attackkraft. Kräver en värmestapel."
       }
     },
@@ -4028,6 +4029,8 @@ export const sv_SE: EnTranslations = {
         "riftGuard": "Du tar {pct}% mindre skada.",
         "sprint": "Förflyttningshastigheten ökas med {pct}%. Staplas inte med andra hastighetshöjningar.",
         "brand": "Läkning mottagen är reducerad med {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Värme: {stacks}/{max}. Användning av Smärtagets temperament spendera det, och dess vapenbrand orsakar {pct}% mer skada.",
         "tempered": "Dina närstrid- och distansvapensträffar orsakar {damage} extra eldskada ({pct}% mer från den spenderade värmen). Effekten varar tills denna buff försvinner eller i {maxDuration} sekunder, och kan förlängas genom att döda, längsta {killExtend} sekunder.",
         "temperedOther": "Närstrid- och distansvapensträffar orsakar extra eldskada, {pct}% mer från den spenderade värmen. Skadan ökar med vapenskada.",
@@ -12249,7 +12252,18 @@ export const sv_SE: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const sv_SE: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
@@ -19359,6 +19394,9 @@ export const sv_SE: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Smältugnarnas hjärta"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Spaltvaktarens ring"
       },
@@ -19684,6 +19722,39 @@ export const sv_SE: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael Fogbindern"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Helgedomsbenvakt"

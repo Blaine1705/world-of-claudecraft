@@ -3132,6 +3132,7 @@ export const vi_VN: EnTranslations = {
         "kindlingOrb": "Triệu hồi một quả cầu tro than bên cạnh bạn trong {duration} giây. Mỗi phép thuật bạn thi triển ở kẻ thù làm nó bắn một tia ở kẻ thù đó {damage} sát thương Lửa. Sát thương tăng theo Sức Mạnh Phép Thuật.",
         "pierce": "Trong {duration} giây, các tấn công tự động, bắn và khả năng vật lý của bạn (không chảy máu) cũng tấn công kẻ thù gần mục tiêu nhất của bạn trong {reach} thước {share}% sát thương gây ra.",
         "lantern": "Đặt một chiếc lụp ở chân bạn trong {duration} giây. Một chữa lành trực tiếp từ bất kỳ ai trên bạn hoặc thành viên nhóm trong {radius} thước của nó cũng chữa lành thành viên nhóm khác bị thương nhất khác trong ánh sáng của nó {share}% chữa lành.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Dùng hết tất cả chồng nhiệt trên một nova lửa gây {perHeat} sát thương Lửa mỗi chồng ({max} tại {maxHeat} chồng) cho mỗi kẻ thù trong {radius} thước và chế áp mọi sinh vật nó đánh trúng. Sát thương tăng theo Sức Mạnh Tấn Công. Yêu cầu một chồng nhiệt."
       }
     },
@@ -4028,6 +4029,8 @@ export const vi_VN: EnTranslations = {
         "riftGuard": "Bạn chịu {pct}% ít sát thương hơn.",
         "sprint": "Tốc độ di chuyển tăng {pct}%. Không chồng với các tăng tốc độ khác.",
         "brand": "Chữa lành nhận được giảm {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Nhiệt: {stacks}/{max}. Sử dụng Tính Khí Cha Lò Rèn tiêu tệm tất cả, và lửa vũ khí của nó gây sát thương thêm {pct}%.",
         "tempered": "Các cú đánh vũ khí cận chiến và tầm xa của bạn gây thêm {damage} sát thương Lửa ({pct}% nhiều hơn từ nhiệt tiêu tệm). Mỗi cú giết thêm {killExtend} giây, tối đa {maxDuration} giây tính tổng cộng.",
         "temperedOther": "Các cú đánh vũ khí cận chiến và tầm xa gây thêm sát thương Lửa, {pct}% nhiều hơn từ nhiệt tiêu tệm. Sát thương tăng theo Sức Mạnh Tấn Công hoặc Sức Mạnh Tấn Công Tầm Xa, tùy theo cái nào cao hơn.",
@@ -12249,7 +12252,18 @@ export const vi_VN: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const vi_VN: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -19359,6 +19394,9 @@ export const vi_VN: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Trái Tim Của Lò Thiêu"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Vòng Tay Người Canh Vực"
       },
@@ -19684,6 +19722,39 @@ export const vi_VN: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Vệ Xương Thánh Đường"

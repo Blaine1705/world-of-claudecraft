@@ -3132,6 +3132,7 @@ export const da_DK: EnTranslations = {
         "kindlingOrb": "Sammenkald en glødelsekulensibryd ved siden af dig i {duration} sek. Hver stavekraft du kaster på en fjende får det til at affyre en bolt på denne fjende for {damage} Ildskade. Skaden stiger med Stavekraft.",
         "pierce": "I {duration} sek rammer dine auto-angreb, skud og fysiske evner (ikke blødninger) også den fjende tættest på dit mål inden for {reach} yd for {share}% af skaden håndteret.",
         "lantern": "Indstil en lygte ved dine fødder for {duration} sek. En direkte heling fra nogen på dig eller et fælles partiet medlem inden for {radius} yd af det helbreder også det mest såret andet fælles partiet medlem i dets lys for {share}% af helbredelsen.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Forbrug alle varme-stakke på en ildnovastjerne der giver {perHeat} Ildskade pr. stak ({max} ved {maxHeat} stakke) til hver fjende inden for {radius} yd og forledes hver kreatur det rammer. Skaden stiger med Angrebskraft. Kræver en varme-stak."
       }
     },
@@ -4028,6 +4029,8 @@ export const da_DK: EnTranslations = {
         "riftGuard": "Du tager {pct}% mindre skade.",
         "sprint": "Bevægelseshastighed øget med {pct}%. Stakker ikke med andre hastighedsforøgelser.",
         "brand": "Modtaget helbredelse reduceres med {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Varme: {stacks}/{max}. Brug af Smedefatters temperament bruger det hele, og dets våbenskade multipliceres med {pct}%.",
         "tempered": "Dine nærkamps- og afstandsvåbenhit handler {damage} ekstra ildskade ({pct}% mere fra varme-stavebind). Forsvinder efter {maxDuration} sek inaktivitet eller efter {killExtend} sek efter at dræbe.",
         "temperedOther": "Nærkamps- og afstandsvåbenhit handler ekstra ildskade, {pct}% mere fra varme-stavebind.",
@@ -12249,7 +12252,18 @@ export const da_DK: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const da_DK: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -19359,6 +19394,9 @@ export const da_DK: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Digelens Hjerte"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Revnevogterens Ring"
       },
@@ -19684,6 +19722,39 @@ export const da_DK: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael Fogbinderen"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Helligdoms-Benvogter"

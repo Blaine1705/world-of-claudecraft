@@ -3132,6 +3132,7 @@ export const pt_BR: EnTranslations = {
         "kindlingOrb": "Invoca um orbe de brasas ao seu lado por {duration} s. Cada feitiço que você conjura contra um inimigo faz o orbe disparar um raio contra esse inimigo causando {damage} de dano de Fogo. O dano aumenta com o poder de feitiço.",
         "pierce": "Por {duration} s, seus ataques automáticos, tiros e habilidades físicas (exceto sangramentos) também atingem o inimigo mais próximo do seu alvo num raio de {reach} jardas por {share}% do dano causado.",
         "lantern": "Coloca uma lanterna aos seus pés por {duration} s. Uma cura direta de qualquer pessoa em você ou em um membro do grupo num raio de {radius} jardas dela também cura o outro membro do grupo mais ferido dentro de sua luz em {share}% do valor curado.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Gaste todas as cargas de calor numa nova de fogo que causa {perHeat} de dano de Fogo por carga ({max} em {maxHeat} cargas) a cada inimigo num raio de {radius} jardas e provoca toda criatura atingida. O dano aumenta com o poder de ataque. Requer uma carga de calor."
       }
     },
@@ -4028,6 +4029,8 @@ export const pt_BR: EnTranslations = {
         "riftGuard": "Você sofre {pct}% menos dano.",
         "sprint": "Velocidade de movimento aumentada em {pct}%. Não se acumula com outros aumentos de velocidade.",
         "brand": "A cura recebida é reduzida em {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Calor: {stacks}/{max}. Usar a Têmpera do Pai da Forja gasta tudo, e seu fogo de arma causa {pct}% mais dano.",
         "tempered": "Seus acertos de arma corpo a corpo e à distância causam {damage} de dano de Fogo extra ({pct}% mais pelo calor gasto). Cada golpe fatal adiciona {killExtend} s, até um total de {maxDuration} s.",
         "temperedOther": "Acertos de arma corpo a corpo e à distância causam dano de Fogo extra, {pct}% mais pelo calor gasto. O dano aumenta com o poder de ataque ou o poder de ataque à distância, o que for maior.",
@@ -12249,7 +12252,18 @@ export const pt_BR: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const pt_BR: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
       },
@@ -19359,6 +19394,9 @@ export const pt_BR: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Coração do Crisol"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Anel do Vigia das Fendas"
       },
@@ -19684,6 +19722,39 @@ export const pt_BR: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael, o Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Guarda-osso do Santuário"

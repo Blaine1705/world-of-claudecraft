@@ -3390,6 +3390,14 @@ const ITEM_ENTITY_IDS = [
   'unquiet_stalkers_hood',
   'sextons_burial_spade',
   'rimesilk_hood',
+  // The Sunken Bastion rework's loot (sim/content/sunken_bastion_items.ts).
+  'knight_commanders_longsword',
+  'gaolers_chain_girdle',
+  'rusted_shackle_grips',
+  'drowned_wardens_mantle',
+  'gaolyard_cudgel',
+  'drowned_commanders_breastplate',
+  'gaolyard_striders',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4341,6 +4349,14 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   unquiet_stalkers_hood: "Unquiet Stalker's Hood",
   sextons_burial_spade: "Sexton's Burial Spade",
   rimesilk_hood: 'Rimesilk Hood',
+  // The Sunken Bastion rework's loot.
+  knight_commanders_longsword: "Knight-Commander's Longsword",
+  gaolers_chain_girdle: "Gaoler's Chain Girdle",
+  rusted_shackle_grips: 'Rusted Shackle Grips',
+  drowned_wardens_mantle: "Drowned Warden's Mantle",
+  gaolyard_cudgel: 'Gaolyard Cudgel',
+  drowned_commanders_breastplate: "Drowned Commander's Breastplate",
+  gaolyard_striders: 'Gaolyard Striders',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -77,6 +77,18 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.crypt_bonechill_breath': true,
   'abilityUi.cast.crypt_tail_lash': true,
   'abilityUi.cast.crypt_wing_gust': true,
+  // The Sunken Bastion trash kit and boss casts.
+  'abilityUi.cast.bastion_brine_mend': true,
+  'abilityUi.cast.bastion_fog_ward': true,
+  'abilityUi.cast.bastion_halberd_sweep': true,
+  'abilityUi.cast.bastion_piercing_bolt': true,
+  'abilityUi.cast.bastion_claw_sweep': true,
+  'abilityUi.cast.bastion_shell_slam': true,
+  'abilityUi.cast.bastion_oathbound_charge': true,
+  'abilityUi.cast.bastion_gaol_hook': true,
+  'abilityUi.cast.bastion_gaolers_cudgel': true,
+  'abilityUi.cast.bastion_mist_surge': true,
+  'abilityUi.cast.bastion_drowning_hymn': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

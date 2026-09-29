@@ -3132,6 +3132,7 @@ export const id_ID: EnTranslations = {
         "kindlingOrb": "Panggil bola ember di sebelahmu selama {duration} detik. Setiap mantra yang kamu baca pada musuh membuatnya menembakkan baut pada musuh itu untuk {damage} kerusakan Api. Kerusakan meningkat dengan Kekuatan Mantra.",
         "pierce": "Selama {duration} detik, serangan otomatis, tembakan dan kemampuan fisik kamu (bukan pendarahan) juga menyerang musuh terdekat target kamu dalam jarak {reach} yard untuk {share}% dari kerusakan yang diberikan.",
         "lantern": "Letakkan lentera di kakimu selama {duration} detik. Penyembuh langsung dari siapa pun padamu atau anggota kelompok dalam jarak {radius} yard darinya juga menyembuhkan anggota kelompok lain yang paling terluka dalam cahayanya untuk {share}% dari penyembuhan.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Habiskan semua tumpukan panas pada ledakan api yang memberikan {perHeat} kerusakan Api per tumpukan ({max} di {maxHeat} tumpukan) ke setiap musuh dalam jarak {radius} yard dan mengejek setiap makhluk yang terkena. Kerusakan meningkat dengan Kekuatan Serangan. Memerlukan tumpukan panas."
       }
     },
@@ -4028,6 +4029,8 @@ export const id_ID: EnTranslations = {
         "riftGuard": "Anda menerima {pct}% kerusakan lebih sedikit.",
         "sprint": "Kecepatan gerak meningkat {pct}%. Tidak menumpuk dengan peningkatan kecepatan lain.",
         "brand": "Penyembuhan yang diterima berkurang {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Panas: {stacks}/{max}. Menggunakan Badani Pandai Besi menghabiskan semuanya, dan api senjatanya menimbulkan {pct}% kerusakan lebih banyak.",
         "tempered": "Pukulan senjata jarak dekat dan jarak jauh Anda menimbulkan {damage} kerusakan Api tambahan ({pct}% lebih banyak dari panas yang dihabiskan). Setiap pukulan pembunuh menambah {killExtend} detik, hingga {maxDuration} detik total.",
         "temperedOther": "Pukulan senjata jarak dekat dan jarak jauh menimbulkan kerusakan Api tambahan, {pct}% lebih banyak dari panas yang dihabiskan. Kerusakan meningkat dengan Kekuatan Serangan atau Kekuatan Serangan Jarak Jauh, mana pun yang lebih tinggi.",
@@ -12249,7 +12252,18 @@ export const id_ID: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const id_ID: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -19359,6 +19394,9 @@ export const id_ID: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Jantung Perapian"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Sabuk Penjaga Retak"
       },
@@ -19684,6 +19722,39 @@ export const id_ID: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael sang Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Pengawal Tulang Sanktum"

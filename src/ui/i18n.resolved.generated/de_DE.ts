@@ -3132,6 +3132,7 @@ export const de_DE: EnTranslations = {
         "kindlingOrb": "Beschwöre {duration} Sek. lang eine Glutkugel neben dir. Jeder Zauber, den du auf einen Feind wirkst, lässt sie einen Blitz auf dieses Ziel abfeuern, der {damage} Feuerschaden verursacht. Der Schaden steigt mit der Zaubermacht.",
         "pierce": "{duration} Sek. lang treffen deine automatischen Angriffe, Schüsse und physischen Fähigkeiten (keine Blutungen) zusätzlich den Feind, der deinem Ziel am nächsten ist, im Umkreis von {reach} yd, für {share}% des verursachten Schadens.",
         "lantern": "Stelle {duration} Sek. lang eine Laterne zu deinen Füßen ab. Eine direkte Heilung von irgendjemandem auf dich oder ein Gruppenmitglied im Umkreis von {radius} yd davon heilt zusätzlich das am schwersten verwundete andere Gruppenmitglied in ihrem Licht um {share}% der Heilung.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Gib alle Hitzestapel für eine Feuernova aus, die jedem Feind im Umkreis von {radius} yd {perHeat} Feuerschaden pro Stapel zufügt ({max} bei {maxHeat} Stapeln) und jede getroffene Kreatur bedroht. Der Schaden steigt mit der Angriffskraft. Erfordert einen Hitzestapel."
       }
     },
@@ -4028,6 +4029,8 @@ export const de_DE: EnTranslations = {
         "riftGuard": "Du erleidest {pct}% weniger Schaden.",
         "sprint": "Bewegungstempo um {pct}% erhöht. Stapelt sich nicht mit anderen Tempoerhöhungen.",
         "brand": "Erhaltene Heilung wird um {pct}% verringert.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Hitze: {stacks}/{max}. Der Einsatz von Härtung des Schmiedevaters verbraucht sie vollständig, und ihr Waffenfeuer verursacht {pct}% mehr Schaden.",
         "tempered": "Deine Nah- und Fernkampf-Waffentreffer verursachen {damage} zusätzlichen Feuerschaden ({pct}% mehr durch die verbrauchte Hitze). Jeder tödliche Treffer fügt {killExtend} Sek. hinzu, insgesamt bis zu {maxDuration} Sek.",
         "temperedOther": "Nah- und Fernkampf-Waffentreffer verursachen zusätzlichen Feuerschaden, {pct}% mehr durch die verbrauchte Hitze. Der Schaden steigt mit Angriffskraft oder Fernkampf-Angriffskraft, je nachdem, welcher Wert höher ist.",
@@ -12249,7 +12252,18 @@ export const de_DE: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const de_DE: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
@@ -19359,6 +19394,9 @@ export const de_DE: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Herz des Schmelztiegels"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Reif des Rissbeobachters"
       },
@@ -19684,6 +19722,39 @@ export const de_DE: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael der Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Heiligtums-Knochenwache"

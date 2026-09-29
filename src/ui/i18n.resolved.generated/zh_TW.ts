@@ -3132,6 +3132,7 @@ export const zh_TW: EnTranslations = {
         "kindlingOrb": "在你身旁召喚一顆餘燼寶珠，持續 {duration} 秒。你每對敵人施放一個法術，它便向該敵人射出一道火焰彈，造成 {damage} 點火焰傷害。傷害隨法術強度提高。",
         "pierce": "在 {duration} 秒內，你的自動攻擊、射擊和物理技能（流血除外）命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {share}%。",
         "lantern": "在你腳下放置一盞提燈，持續 {duration} 秒。任何人對提燈 {radius} 碼內的你或隊伍成員施放的直接治療，還會以該治療量的 {share}% 治療燈光中受傷最重的另一名隊伍成員。",
+        "shackle": "用鎖鏈將 {range} 碼內的目標束縛在原地，持續 {duration} 秒。免疫控制的生物（例如首領）改為移動速度降低 {slow}%，除非它也免疫緩速。",
         "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。"
       }
     },
@@ -4028,6 +4029,8 @@ export const zh_TW: EnTranslations = {
         "riftGuard": "你受到的傷害降低 {pct}%。",
         "sprint": "移動速度提高 {pct}%。不與其他速度提高效果疊加。",
         "brand": "受到的治療效果降低 {pct}%。",
+        "shackle": "被鎖鏈束縛：無法移動。",
+        "shackleSlow": "鎖鏈纏身：移動速度降低 {pct}%。",
         "forgeHeat": "熱量：{stacks}/{max}。使用熔鑄之父的淬火會消耗所有熱量，使其武器火焰傷害提高 {pct}%。",
         "tempered": "你的近戰和遠程武器命中額外造成 {damage} 點火焰傷害（消耗的熱量使其提高 {pct}%）。每次致命一擊延長 {killExtend} 秒，總計最多 {maxDuration} 秒。",
         "temperedOther": "近戰和遠程武器命中額外造成火焰傷害，消耗的熱量使其提高 {pct}%。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
@@ -12249,7 +12252,18 @@ export const zh_TW: EnTranslations = {
       "crypt_grave_cleave": "墓穴橫掃",
       "crypt_bonechill_breath": "寒骨吐息",
       "crypt_tail_lash": "尾鞭",
-      "crypt_wing_gust": "翼風"
+      "crypt_wing_gust": "翼風",
+      "bastion_brine_mend": "鹽水癒合",
+      "bastion_fog_ward": "霧之護佑",
+      "bastion_halberd_sweep": "戟之橫掃",
+      "bastion_piercing_bolt": "穿刺弩矢",
+      "bastion_claw_sweep": "巨鉗橫掃",
+      "bastion_shell_slam": "殼塔重擊",
+      "bastion_oathbound_charge": "誓約衝鋒",
+      "bastion_gaol_hook": "牢獄鉤索",
+      "bastion_gaolers_cudgel": "獄卒短棍",
+      "bastion_mist_surge": "迷霧湧流",
+      "bastion_drowning_hymn": "溺亡聖詠"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const zh_TW: EnTranslations = {
       "rimesilk_hood": {
         "name": "霜絲兜帽"
       },
+      "knight_commanders_longsword": {
+        "name": "騎士指揮官長劍"
+      },
+      "gaolers_chain_girdle": {
+        "name": "獄卒鎖鏈腰帶"
+      },
+      "rusted_shackle_grips": {
+        "name": "鏽蝕鐐銬護手"
+      },
+      "drowned_wardens_mantle": {
+        "name": "溺亡看守披肩"
+      },
+      "gaolyard_cudgel": {
+        "name": "獄庭短棍"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "溺亡指揮官胸甲"
+      },
+      "gaolyard_striders": {
+        "name": "獄庭長靴"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19359,6 +19394,9 @@ export const zh_TW: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "熔爐之心"
       },
+      "gaolers_iron_key": {
+        "name": "獄卒鐵鑰匙"
+      },
       "rift_watchers_band": {
         "name": "裂隙守望者指環"
       },
@@ -19684,6 +19722,39 @@ export const zh_TW: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "縛霧者維爾"
+      },
+      "drowned_watchman": {
+        "name": "溺亡守望者"
+      },
+      "fogbound_arbalest": {
+        "name": "縛霧弩手"
+      },
+      "barnacle_crawler": {
+        "name": "藤壺爬蟹"
+      },
+      "bastion_warhound": {
+        "name": "堡壘戰犬"
+      },
+      "mistweaver": {
+        "name": "霧之吟唱者"
+      },
+      "drowned_sergeant": {
+        "name": "溺亡軍士"
+      },
+      "shackled_prisoner": {
+        "name": "戴鐐囚徒"
+      },
+      "gaol_turnkey": {
+        "name": "牢獄鑰匙官"
+      },
+      "turretback_hermit": {
+        "name": "背塔寄居蟹"
+      },
+      "vael_fog_shade": {
+        "name": "縛霧者維爾"
+      },
+      "gaoler_ossick": {
+        "name": "獄卒奧西克"
       },
       "sanctum_boneguard": {
         "name": "聖所骨衛"

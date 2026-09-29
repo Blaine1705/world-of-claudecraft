@@ -3891,6 +3891,8 @@ export const hudChromeStrings = {
         'For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.',
       lantern:
         'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
+      shackle:
+        'Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.',
       heartNova:
         'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
     },
@@ -5306,6 +5308,8 @@ export const hudChromeStrings = {
       riftGuard: 'You take {pct}% less damage.',
       sprint: 'Movement speed increased by {pct}%. Does not stack with other speed increases.',
       brand: 'Healing received is reduced by {pct}%.',
+      shackle: 'Chained in place: cannot move.',
+      shackleSlow: 'Chained: movement speed reduced by {pct}%.',
       forgeHeat:
         "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
       tempered:

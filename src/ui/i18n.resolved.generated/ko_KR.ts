@@ -3132,6 +3132,7 @@ export const ko_KR: EnTranslations = {
         "kindlingOrb": "{duration}초 동안 곁에 잉걸불 구슬을 소환합니다. 적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 피해량은 주문력으로 증가합니다.",
         "pierce": "{duration}초 동안 자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.",
         "lantern": "{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.",
+        "shackle": "{range}미터 이내의 대상을 {duration}초 동안 사슬로 묶어 제자리에 고정합니다. 우두머리처럼 제어 효과에 면역인 생물은 대신 이동 속도가 {slow}% 감소하며, 감속에도 면역이면 효과가 없습니다.",
         "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다."
       }
     },
@@ -4028,6 +4029,8 @@ export const ko_KR: EnTranslations = {
         "riftGuard": "받는 피해가 {pct}% 감소합니다.",
         "sprint": "이동 속도가 {pct}% 증가합니다. 다른 이동 속도 증가 효과와 중첩되지 않습니다.",
         "brand": "받는 치유량이 {pct}% 감소합니다.",
+        "shackle": "사슬에 묶임: 이동할 수 없습니다.",
+        "shackleSlow": "사슬에 묶임: 이동 속도가 {pct}% 감소합니다.",
         "forgeHeat": "열기: {stacks}/{max}. 대장장이 아버지의 담금질을 사용하면 열기를 모두 소모하며, 그 무기 화염 피해가 {pct}% 증가합니다.",
         "tempered": "근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입힙니다(소모한 열기로 {pct}% 증가). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다.",
         "temperedOther": "근접 및 원거리 무기가 적중하면 화염 피해를 추가로 입히며, 소모한 열기로 {pct}% 증가합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
@@ -12249,7 +12252,18 @@ export const ko_KR: EnTranslations = {
       "crypt_grave_cleave": "무덤 가르기",
       "crypt_bonechill_breath": "한골 숨결",
       "crypt_tail_lash": "꼬리 채찍",
-      "crypt_wing_gust": "날개 돌풍"
+      "crypt_wing_gust": "날개 돌풍",
+      "bastion_brine_mend": "소금물 치유",
+      "bastion_fog_ward": "안개 보호막",
+      "bastion_halberd_sweep": "미늘창 휩쓸기",
+      "bastion_piercing_bolt": "관통 화살",
+      "bastion_claw_sweep": "집게 휩쓸기",
+      "bastion_shell_slam": "껍질 내려찍기",
+      "bastion_oathbound_charge": "맹세의 돌진",
+      "bastion_gaol_hook": "감옥 갈고리",
+      "bastion_gaolers_cudgel": "간수의 곤봉",
+      "bastion_mist_surge": "안개 해일",
+      "bastion_drowning_hymn": "익사의 성가"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const ko_KR: EnTranslations = {
       "rimesilk_hood": {
         "name": "서리비단 두건"
       },
+      "knight_commanders_longsword": {
+        "name": "기사단장의 장검"
+      },
+      "gaolers_chain_girdle": {
+        "name": "간수의 사슬 허리띠"
+      },
+      "rusted_shackle_grips": {
+        "name": "녹슨 족쇄 장갑"
+      },
+      "drowned_wardens_mantle": {
+        "name": "익사한 감시자의 망토"
+      },
+      "gaolyard_cudgel": {
+        "name": "감옥 뜰의 곤봉"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "익사한 지휘관의 흉갑"
+      },
+      "gaolyard_striders": {
+        "name": "감옥 뜰의 장화"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -19359,6 +19394,9 @@ export const ko_KR: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "도가니의 심장"
       },
+      "gaolers_iron_key": {
+        "name": "간수의 쇠열쇠"
+      },
       "rift_watchers_band": {
         "name": "균열 감시자의 반지"
       },
@@ -19684,6 +19722,39 @@ export const ko_KR: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "안개엮는자 바엘"
+      },
+      "drowned_watchman": {
+        "name": "익사한 파수꾼"
+      },
+      "fogbound_arbalest": {
+        "name": "안개에 묶인 쇠뇌병"
+      },
+      "barnacle_crawler": {
+        "name": "따개비 게"
+      },
+      "bastion_warhound": {
+        "name": "요새 전투견"
+      },
+      "mistweaver": {
+        "name": "안개 영창자"
+      },
+      "drowned_sergeant": {
+        "name": "익사한 부사관"
+      },
+      "shackled_prisoner": {
+        "name": "족쇄 찬 죄수"
+      },
+      "gaol_turnkey": {
+        "name": "감옥 열쇠지기"
+      },
+      "turretback_hermit": {
+        "name": "탑을 진 소라게"
+      },
+      "vael_fog_shade": {
+        "name": "안개엮는자 바엘"
+      },
+      "gaoler_ossick": {
+        "name": "간수 오시크"
       },
       "sanctum_boneguard": {
         "name": "성소 뼈수호자"

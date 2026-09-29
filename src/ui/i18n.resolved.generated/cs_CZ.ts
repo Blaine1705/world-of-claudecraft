@@ -3132,6 +3132,7 @@ export const cs_CZ: EnTranslations = {
         "kindlingOrb": "Přivoláš vedle sebe žhavou kouli na {duration} s. Každé kouzlo, které sešleš na nepřítele, ji přiměje vystřelit na něj šíp za {damage} ohnivého poškození. Poškození roste se silou kouzel.",
         "pierce": "Po dobu {duration} s tvé automatické útoky, výstřely a fyzické schopnosti (kromě krvácení) zasáhnou navíc i nejbližšího nepřítele k tvému cíli v okruhu {reach} yardů za {share} % způsobeného poškození.",
         "lantern": "Umístíš si k nohám lucernu na {duration} s. Přímé léčení od kohokoli na tebe nebo na člena skupiny v okruhu {radius} yardů od ní také vyléčí nejzraněnějšího jiného člena skupiny v jejím světle za {share} % léčení.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
         "heartNova": "Utratíš všechna nabití žáru na ohnivou novu, která způsobí {perHeat} ohnivého poškození za nabití ({max} při {maxHeat} nabitích) každému nepříteli v okruhu {radius} yardů a vyprovokuje každého tvora, kterého zasáhne. Poškození roste se silou útoku. Vyžaduje nabití žáru."
       }
     },
@@ -4028,6 +4029,8 @@ export const cs_CZ: EnTranslations = {
         "riftGuard": "Utrpíš o {pct} % méně poškození.",
         "sprint": "Rychlost pohybu zvýšena o {pct} %. Nesčítá se s jinými zvýšeními rychlosti.",
         "brand": "Přijaté léčení je sníženo o {pct} %.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
         "forgeHeat": "Žár: {stacks}/{max}. Použití Kovářského kaliče spotřebuje všechen žár a jeho ohnivý úder zbraní způsobí o {pct} % více poškození.",
         "tempered": "Tvé údery zbraní na blízko a na dálku způsobí {damage} ohnivého poškození navíc (o {pct} % více z vydaného žáru). Každý smrtící úder přidá {killExtend} s, až do celkových {maxDuration} s.",
         "temperedOther": "Údery zbraní na blízko a na dálku způsobí ohnivé poškození navíc, o {pct} % více z vydaného žáru. Poškození roste se silou útoku nebo útočnou silou na dálku, podle toho, která je vyšší.",
@@ -12249,7 +12252,18 @@ export const cs_CZ: EnTranslations = {
       "crypt_grave_cleave": "Grave Cleave",
       "crypt_bonechill_breath": "Bonechill Breath",
       "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust"
+      "crypt_wing_gust": "Wing Gust",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaol_hook": "Gaol Hook",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn"
     }
   },
   "questUi": {
@@ -18504,6 +18518,27 @@ export const cs_CZ: EnTranslations = {
       "rimesilk_hood": {
         "name": "Rimesilk Hood"
       },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -19359,6 +19394,9 @@ export const cs_CZ: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Srdce tavicího kelímku"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
       "rift_watchers_band": {
         "name": "Trhlinohlídačova obroučka"
       },
@@ -19684,6 +19722,39 @@ export const cs_CZ: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael Mlhovazač"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
       },
       "sanctum_boneguard": {
         "name": "Kostěná stráž svatyně"
