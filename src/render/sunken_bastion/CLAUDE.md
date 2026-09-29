@@ -18,6 +18,8 @@ from them. Shape copied from `../hollow_crypt/` (the pilot's package).
 | `bastion_water.ts` | Standing water: the moat, the Drowning Yard's flood, tide pools (water surface order 0). |
 | `bastion_lights.ts` | Flames, halos, floor pools (`ground` rung), budgeted point lights through the fire-light sink. |
 | `bastion_gates.ts` | Portcullises, the drawbridge and the fog walls, driven by the shared gate memory (`../hollow_crypt/crypt_gate_state_core.ts`). |
+| `bastion_fx_core.ts` / `bastion_fx.ts` | PURE plan plus painter for the floor telegraphs (trash cones, rings, lanes, kick glyphs, Brine Burst); boss casts register through `registerBastionTelegraph`. Hosted by `rift_death_zone.ts`. |
+| `bastion_boss_fx_core.ts` / `bastion_boss_fx.ts` | PURE plan plus painter for the boss visuals (buttress states and crashes, the lit posts, the hook chain and its guide, the Undertow Wake, the beam pool, the reveal, the Hymn flood, the Hermit dome). Owned by `BastionFx` under its compile gate; reads only IWorld entity state. |
 
 Rules:
 - Cosmetic only: nothing here decides or hides an outcome. Density sheds with the
