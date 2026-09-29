@@ -106,7 +106,9 @@ describe('mob portrait source manifest', () => {
     // two new bosses (Rimeweb, Cantor Ilvane) and its eight new trash bodies.
     // 290: the Hollow Crypt trash kit's ten bodies (warrior, adept, cutthroat,
     // necromancer, bone minion and brute, gargoyle, crow caller, crow, drake).
-    expect(liveIds).toHaveLength(290);
+    // 301: the Sunken Bastion rework's eleven new bodies (nine trash, the fog
+    // shade and Gaoler Ossick).
+    expect(liveIds).toHaveLength(301);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

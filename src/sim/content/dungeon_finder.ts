@@ -118,7 +118,9 @@ const HOLLOW_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
 ];
 
 const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [
+  // The rework's route (sunken_bastion.md): the bastion, the gaol, the crown.
   { mobId: 'knight_commander_olen', mechanics: ['reaping_arc'] },
+  { mobId: 'gaoler_ossick', mechanics: ['summons_adds'] },
   { mobId: 'vael_the_mistcaller', final: true, mechanics: ['mist_surge', 'summons_adds'] },
 ];
 
