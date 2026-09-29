@@ -26,7 +26,7 @@ export const SHOTS = [
   { id: 'grupo_c1_gargola', kind: 'pack', pack: 'c1', pitch: 0.2, dist: 16, yaw: 0.5 },
   { id: 'grupo_c3_arcada', kind: 'pack', pack: 'c3', pitch: 0.28, dist: 18, yaw: -0.7 },
   { id: 'grupo_c4_reja', kind: 'pack', pack: 'c4', pitch: 0.25, dist: 18, yaw: 0 },
-  { id: 'dragon_en_vuelo', kind: 'sky', pitch: -0.32, dist: 9, yaw: 0, wait: 2500 },
+  { id: 'dragon_en_vuelo', kind: 'sky', pitch: -0.12, dist: 6, yaw: 0, wait: 6000 },
   { id: 'grupo_w1_cuervos', kind: 'pack', pack: 'w1', pitch: 0.25, dist: 14, yaw: 0.4 },
   { id: 'bandada_patrulla', kind: 'pack', pack: 'w2', pitch: 0.12, dist: 18, yaw: 0, wait: 2500 },
   { id: 'grupo_q1_coro', kind: 'pack', pack: 'q1', pitch: 0.25, dist: 16, yaw: 0 },
@@ -55,8 +55,24 @@ export const SHOTS = [
     pitch: 0.5,
     dist: 20,
   },
-  { id: 'gargola_picado', kind: 'spawn', mob: 'gargoyle', seconds: 0.5, pitch: 0.2, dist: 16 },
-  { id: 'dragon_aterriza', kind: 'spawn', mob: 'drake', seconds: 1.0, pitch: 0.1, dist: 26 },
+  {
+    id: 'gargola_picado',
+    kind: 'spawn',
+    mob: 'gargoyle',
+    seconds: 0.4,
+    pitch: 0.05,
+    dist: 12,
+    yaw: 2.6,
+  },
+  {
+    id: 'dragon_aterriza',
+    kind: 'spawn',
+    mob: 'drake',
+    seconds: 0.8,
+    pitch: -0.1,
+    dist: 20,
+    yaw: 2.6,
+  },
   {
     id: 'dragon_aliento',
     kind: 'spawn',
@@ -66,7 +82,7 @@ export const SHOTS = [
     dist: 26,
   },
   {
-    id: 'dragon_coletazo',
+    id: 'dragon_rafaga_alas',
     kind: 'spawn',
     mob: 'drake',
     cast: 'crypt_tail_lash',
@@ -82,9 +98,33 @@ export const SHOTS = [
     dist: 14,
   },
   { id: 'esbirro_estallido', kind: 'burst', pitch: 0.5, dist: 14 },
-  { id: 'retrato_gargola', kind: 'spawn', mob: 'gargoyle', seconds: 2.5, pitch: 0.08, dist: 7 },
-  { id: 'retrato_cuervo', kind: 'spawn', mob: 'crow', seconds: 2.5, pitch: 0.05, dist: 5 },
-  { id: 'retrato_dragon', kind: 'spawn', mob: 'drake', seconds: 4, pitch: 0.12, dist: 18 },
+  {
+    id: 'retrato_gargola',
+    kind: 'spawn',
+    mob: 'gargoyle',
+    seconds: 2.5,
+    pitch: 0.1,
+    dist: 7,
+    yaw: 2.5,
+  },
+  {
+    id: 'retrato_cuervo',
+    kind: 'spawn',
+    mob: 'crow',
+    seconds: 2.5,
+    pitch: 0.05,
+    dist: 4.5,
+    yaw: 2.5,
+  },
+  {
+    id: 'retrato_dragon',
+    kind: 'spawn',
+    mob: 'drake',
+    seconds: 4,
+    pitch: 0.14,
+    dist: 17,
+    yaw: 2.3,
+  },
 ];
 
 async function main() {
@@ -146,7 +186,7 @@ async function main() {
     };
     for (const shot of SHOTS) {
       if (ONLY.length && !ONLY.includes(shot.id)) continue;
-      await setNoAggro(shot.kind === 'pack');
+      await setNoAggro(shot.kind === 'pack' || shot.kind === 'sky');
       if (shot.kind === 'pack') {
         await chat(`/dev crypt pack ${shot.pack}`);
         // Face the pack.
@@ -168,8 +208,8 @@ async function main() {
         await frame(shot);
         await sleep(shot.wait ?? 2200);
       } else if (shot.kind === 'sky') {
-        // Under the Processional, looking up at the drake on the wing.
-        await chat('/dev crypt tp processional');
+        // From the Grille, looking up the Processional at the drake on the wing.
+        await chat('/dev crypt tp grille');
         await sleep(shot.wait ?? 2000);
         await page.evaluate(() => {
           const w = window.__game.world;
@@ -219,6 +259,9 @@ async function main() {
           await sleep((shot.seconds ?? 1) * 1000);
         }
       }
+      // Re-aim just before the shot (combat turns the camera behind the player).
+      await frame(shot);
+      await sleep(150);
       const file = path.join(OUT, `pasada2_${shot.id}.png`);
       await page.screenshot({ path: file });
       console.log('SHOT', file);
