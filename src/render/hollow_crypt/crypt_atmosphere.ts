@@ -14,7 +14,6 @@ import { HOLLOW_CRYPT_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import { HOLLOW_CRYPT_MOON_DIRECTION } from '../interior_light_rig';
 import {
-  HOLLOW_CRYPT_MOON_SHAFTS,
   HOLLOW_CRYPT_WISP_RIVERS,
   planBackdropSpires,
   RITE_RING,
@@ -507,66 +506,6 @@ function buildDust(opts: CryptAtmosphereOptions): THREE.Points {
   return points;
 }
 
-// ---- moonbeams ------------------------------------------------------------------------
-
-function buildMoonShafts(ground: (x: number, z: number) => number): THREE.Group {
-  const group = new THREE.Group();
-  group.name = 'hollowCryptMoonShafts';
-  const material = new THREE.ShaderMaterial({
-    name: 'hollowCryptMoonShaft',
-    vertexShader: /* glsl */ `
-      varying vec2 vUv;
-      varying vec3 vWorld;
-      void main() {
-        vUv = uv;
-        vec4 w = modelMatrix * vec4(position, 1.0);
-        vWorld = w.xyz;
-        gl_Position = projectionMatrix * viewMatrix * w;
-      }
-    `,
-    fragmentShader: /* glsl */ `
-      precision highp float;
-      varying vec2 vUv;
-      varying vec3 vWorld;
-      uniform float uTime;
-      void main() {
-        float side = pow(sin(vUv.x * 3.14159), 1.6);
-        float fall = smoothstep(0.0, 0.25, vUv.y) * (1.0 - smoothstep(0.7, 1.0, vUv.y));
-        float motes = 0.8 + 0.2 * sin(vWorld.y * 0.7 + uTime * 0.8 + vWorld.x);
-        float a = side * fall * motes * 0.16;
-        gl_FragColor = vec4(vec3(0.62, 0.7, 1.0) * a, a);
-        #include <colorspace_fragment>
-      }
-    `,
-    uniforms: { uTime: sharedUniforms.uTime },
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    side: THREE.DoubleSide,
-    fog: false,
-  });
-  const moon = HOLLOW_CRYPT_MOON_DIRECTION;
-  for (const shaft of HOLLOW_CRYPT_MOON_SHAFTS) {
-    const geo = new THREE.PlaneGeometry(shaft.width, shaft.height, 1, 1);
-    geo.translate(0, shaft.height / 2, 0);
-    for (let k = 0; k < 2; k++) {
-      const mesh = new THREE.Mesh(geo, material);
-      mesh.position.set(shaft.x, ground(shaft.x, shaft.z), shaft.z);
-      // Tilt the beam up toward the moon, crossed pair for volume.
-      const target = new THREE.Vector3(shaft.x, ground(shaft.x, shaft.z), shaft.z).addScaledVector(
-        moon,
-        10,
-      );
-      mesh.lookAt(target);
-      mesh.rotateX(Math.PI / 2);
-      mesh.rotateY(k * (Math.PI / 2));
-      mesh.renderOrder = 12;
-      group.add(mesh);
-    }
-  }
-  return group;
-}
-
 // ---- the crag ring -------------------------------------------------------------------
 
 function buildBackdrop(opts: CryptAtmosphereOptions): THREE.Mesh {
@@ -607,8 +546,8 @@ function buildBackdrop(opts: CryptAtmosphereOptions): THREE.Mesh {
         positions.push(px, y + (t > 0.9 ? Math.sin(a * 4 + seed) * radius * 0.2 : 0), pz);
         // A cold rim where the face turns toward the moon.
         const rim = Math.max(0, Math.cos(a) * moon.x + Math.sin(a) * moon.z) ** 3;
-        const shade = 0.03 + t * 0.03 + rim * 0.05 * t;
-        colors.push(shade, shade * 1.08, shade * 1.5);
+        const shade = 0.07 + t * 0.04 + rim * 0.05 * t;
+        colors.push(shade, shade * 0.98, shade * 1.08);
       }
     }
     for (let r = 0; r < rings; r++) {
@@ -639,9 +578,16 @@ function buildBackdrop(opts: CryptAtmosphereOptions): THREE.Mesh {
   geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geo.setIndex(indices);
   geo.computeVertexNormals();
+  // Lit and faceted: the moon rakes the crags, the fog grades them into the
+  // night by distance (aerial perspective), so they read as rock, not card.
   const mesh = new THREE.Mesh(
     geo,
-    new THREE.MeshBasicMaterial({ vertexColors: true, fog: true, name: 'hollowCryptCrags' }),
+    new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      flatShading: true,
+      roughness: 0.95,
+      name: 'hollowCryptCrags',
+    }),
   );
   mesh.name = 'hollowCryptCragRing';
   mesh.frustumCulled = false;
@@ -660,9 +606,7 @@ export function buildCryptAtmosphere(
   group.add(buildMist(opts));
   group.add(buildColumn(opts));
   group.add(buildWisps(opts));
-  if (!opts.lowGfx) {
-    group.add(buildDust(opts));
-    group.add(buildMoonShafts(ground));
-  }
+  if (!opts.lowGfx) group.add(buildDust(opts));
+  void ground;
   return group;
 }

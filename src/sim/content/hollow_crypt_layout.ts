@@ -71,7 +71,16 @@ export const HOLLOW_CRYPT_RING = { x: 0, z: 205, r: 28, h: 24 } as const;
 
 const SURFACES: FieldSurface[] = [
   // --- Lychgate Landing and the Chapel Stair -------------------------------
-  { kind: 'circle', id: 'landing', x: 0, z: -128, r: 17, h: 20, edge: 'balustrade' },
+  {
+    kind: 'circle',
+    id: 'landing',
+    x: 0,
+    z: -128,
+    r: 17,
+    h: 20,
+    edge: 'balustrade',
+    ground: 'flagstone',
+  },
   {
     kind: 'path',
     id: 'chapel_stair',

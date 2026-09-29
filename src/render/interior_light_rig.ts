@@ -93,7 +93,7 @@ const WILDHEART_HEMI_GROUND_COLOR = 0x5b4a2d;
 // moon key from behind the crag, with a violet sky bounce and an umber floor
 // bounce so the tallow lanterns carry the only warm tones.
 const HOLLOW_CRYPT_SUN_INTENSITY = 2.5;
-const HOLLOW_CRYPT_HEMI_INTENSITY = 1.15;
+const HOLLOW_CRYPT_HEMI_INTENSITY = 0.95;
 const HOLLOW_CRYPT_ENV_INTENSITY = 0.42;
 const HOLLOW_CRYPT_RIM_BOOST = 2.1;
 const HOLLOW_CRYPT_SUN_COLOR = 0xbfd0ff;

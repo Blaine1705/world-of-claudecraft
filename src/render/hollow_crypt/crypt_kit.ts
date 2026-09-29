@@ -141,8 +141,9 @@ function slotMaterial(slot: Slot): THREE.Material {
   }
   silkMat ??= new THREE.MeshBasicMaterial({
     vertexColors: true,
+    color: 0x8a96a8,
     transparent: true,
-    opacity: 0.55,
+    opacity: 0.5,
     depthWrite: false,
     side: THREE.DoubleSide,
     name: 'HollowCryptKitSilk',

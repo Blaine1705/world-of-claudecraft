@@ -11,6 +11,9 @@
 //
 // Pure data, Three-free.
 
+import { HOLLOW_CRYPT_FIELD } from '../../sim/content/hollow_crypt_layout';
+import { authoredFieldSurfaceAt } from '../../sim/instances/authored_field';
+
 export interface KitPlacement {
   piece: string;
   x: number;
@@ -71,7 +74,36 @@ function graveClutter(): KitPlacement[] {
   return out;
 }
 
+function hash(a: number, b: number): number {
+  const v = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
+  return v - Math.floor(v);
+}
+
+/** Dead grass tufts over the grave-earth grounds (knee-high, walk-through). */
+function deadGrass(): KitPlacement[] {
+  const out: KitPlacement[] = [];
+  for (let z = -140; z <= 246; z += 3.5) {
+    for (let x = -114; x <= 114; x += 3.5) {
+      const jx = x + (hash(x, z) - 0.5) * 3;
+      const jz = z + (hash(z, x) - 0.5) * 3;
+      const s = authoredFieldSurfaceAt(HOLLOW_CRYPT_FIELD, jx, jz);
+      if (!s || (s.ground !== 'grave' && s.ground !== 'earth')) continue;
+      if (hash(jx * 1.3, jz * 0.7) < 0.45) continue;
+      out.push({
+        piece: 'Kit_DeadGrass',
+        x: jx,
+        z: jz,
+        rot: hash(jx, jz) * 6.28,
+        scale: 0.7 + hash(jz, jx) * 0.6,
+        cosmetic: true,
+      });
+    }
+  }
+  return out;
+}
+
 export const HOLLOW_CRYPT_SET_DRESSING: readonly KitPlacement[] = [
+  ...deadGrass(),
   // The broken parish chapel the party climbs out of, on its own crag behind
   // the landing, and the rock pillar under it.
   P('Kit_ChapelRuin', 0, -158, 0, 1, { y: 20 }),

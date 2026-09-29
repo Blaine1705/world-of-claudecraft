@@ -143,6 +143,26 @@ async function main() {
         return o;
       }, shot);
       await sleep(2500);
+      const perf = await page.evaluate(
+        () =>
+          new Promise((resolve) => {
+            const info = window.__game.renderer.webgl.info.render;
+            let frames = 0;
+            const t0 = performance.now();
+            const tick = () => {
+              frames++;
+              if (performance.now() - t0 < 2000) requestAnimationFrame(tick);
+              else
+                resolve({
+                  fps: Math.round((frames * 1000) / (performance.now() - t0)),
+                  calls: info.calls,
+                  tris: info.triangles,
+                });
+            };
+            requestAnimationFrame(tick);
+          }),
+      );
+      console.log('PERF', shot.id, JSON.stringify(perf));
       const file = path.join(OUT, `hollow_crypt_${shot.id}.png`);
       await page.screenshot({ path: file });
       console.log('SHOT', file);

@@ -10,9 +10,11 @@ import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
 import { GFX, gfxTierAtLeast } from '../gfx';
 import type { FireLightSink } from '../point_light_budget';
 import { buildCryptAtmosphere } from './crypt_atmosphere';
+import { buildCryptFloorMarks } from './crypt_floor_marks';
 import { buildCryptGates } from './crypt_gates';
 import { buildCryptKit, ensureCryptKit } from './crypt_kit';
 import { buildColumnPool, buildCryptLights } from './crypt_lights';
+import { buildChasmMist, buildCryptParticles } from './crypt_particles';
 import { RITE_RING } from './crypt_plan_core';
 
 export interface HollowCryptInteriorDeps {
@@ -37,8 +39,11 @@ export async function buildHollowCryptInterior(
   group.add(buildAuthoredFieldTerrain(HOLLOW_CRYPT_FIELD, { lowGfx: deps.lowGfx }));
   group.add(buildCryptKit(ground, deps.lowGfx));
   group.add(buildCryptGates(ox, oz, ground));
+  group.add(buildCryptFloorMarks(ground));
   buildCryptLights(group, deps, ground);
   group.add(buildColumnPool(RITE_RING.x, RITE_RING.h, RITE_RING.z));
   group.add(buildCryptAtmosphere({ lowGfx: deps.lowGfx, density }, ground));
+  group.add(buildCryptParticles(ground, density));
+  if (!deps.lowGfx) group.add(buildChasmMist(density));
   return group;
 }

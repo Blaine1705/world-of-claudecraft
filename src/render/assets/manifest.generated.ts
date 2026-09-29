@@ -1112,7 +1112,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/hoard_storm_kit.glb": "/media/models/props/hoard_storm_kit.deab50fd1f8e.glb",
   "models/props/hoard_void_kit.glb": "/media/models/props/hoard_void_kit.656d670e53c0.glb",
   "models/props/hoard_warcamp_kit.glb": "/media/models/props/hoard_warcamp_kit.4dd3ae7eb685.glb",
-  "models/props/hollow_crypt_kit.glb": "/media/models/props/hollow_crypt_kit.adb1704ec18d.glb",
+  "models/props/hollow_crypt_kit.glb": "/media/models/props/hollow_crypt_kit.760e36c8cb38.glb",
   "models/props/hollow_gate_crystal.glb": "/media/models/props/hollow_gate_crystal.d6303ad81ae4.glb",
   "models/props/hollow_gate_tree.glb": "/media/models/props/hollow_gate_tree.157f24608613.glb",
   "models/props/house_1.glb": "/media/models/props/house_1.87c8306f95e3.glb",

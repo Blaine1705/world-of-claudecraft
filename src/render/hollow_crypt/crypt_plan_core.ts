@@ -196,24 +196,70 @@ export const CRYPT_LIGHT_STYLE: Readonly<
   soul: { color: 0x6fd6a8, flame: 0xb8ffe0, intensity: 40, range: 48 },
 };
 
-// ---- moon shafts ----------------------------------------------------------------------
+// ---- particle emitters --------------------------------------------------------------
 
-export interface MoonShaft {
+export type CryptEmitterKind = 'ember' | 'soul' | 'frost' | 'boneDust' | 'violet' | 'graveDust';
+
+export interface CryptEmitter {
+  kind: CryptEmitterKind;
   x: number;
   z: number;
-  width: number;
-  height: number;
+  /** Base height above the ground under (x, z). */
+  lift: number;
+  radius: number;
+  /** Particles at the full tier. */
+  count: number;
 }
 
-/** Tall additive moonbeams falling through the broken vaults and arches. */
-export const HOLLOW_CRYPT_MOON_SHAFTS: readonly MoonShaft[] = [
-  { x: -18, z: -50, width: 7, height: 40 },
-  { x: 16, z: -8, width: 5, height: 34 },
-  { x: -6, z: 70, width: 6, height: 36 },
-  { x: -80, z: 60, width: 8, height: 42 },
-  { x: 74, z: 50, width: 6, height: 40 },
-  { x: 10, z: 140, width: 6, height: 38 },
+const E = (
+  kind: CryptEmitterKind,
+  x: number,
+  z: number,
+  lift: number,
+  radius: number,
+  count: number,
+): CryptEmitter => ({
+  kind,
+  x,
+  z,
+  lift,
+  radius,
+  count,
+});
+
+/** The living air of each space, and the presence of each boss's arena. */
+export const HOLLOW_CRYPT_EMITTERS: readonly CryptEmitter[] = [
+  // Brazier embers at the landing and the tallow lanterns' sparks.
+  E('ember', -9, -118, 2.2, 0.6, 26),
+  E('ember', 9, -118, 2.2, 0.6, 26),
+  // The ossuary monument's candles breathe a little soul-light.
+  E('soul', 0, -30, 6, 4, 30),
+  // Bone dust drifting across the Sexton's Yard, grave dust whirling in the
+  // Bell Yard around Sexton Marrow.
+  E('boneDust', -82, 50, 1, 26, 70),
+  E('graveDust', -82, 116, 0.5, 15, 60),
+  // Frost glitter in the gallery ravine and over the Great Web.
+  E('frost', 76, 50, 0.5, 22, 90),
+  E('frost', 80, 116, 1, 16, 70),
+  // Violet notes rising from the Bone Organ over Cantor Ilvane's loft.
+  E('violet', 0, 168, 4, 8, 60),
+  // The soul spiral round Morthen's altar, feeding the column.
+  E('soul', 0, 205, 1, 7, 110),
 ];
+
+export const CRYPT_EMITTER_STYLE: Readonly<
+  Record<
+    CryptEmitterKind,
+    { color: number; rise: number; life: number; size: number; swirl: number }
+  >
+> = {
+  ember: { color: 0xffa040, rise: 4.5, life: 2.2, size: 0.9, swirl: 0.4 },
+  soul: { color: 0x7ff2c2, rise: 16, life: 6, size: 1.6, swirl: 1.4 },
+  frost: { color: 0xd8f0ff, rise: 1.2, life: 5, size: 0.8, swirl: 0.3 },
+  boneDust: { color: 0xd9d0bc, rise: 2, life: 9, size: 1.1, swirl: 0.6 },
+  violet: { color: 0xb88cff, rise: 9, life: 4.5, size: 1.4, swirl: 0.8 },
+  graveDust: { color: 0xa89878, rise: 3, life: 6, size: 1.3, swirl: 1.8 },
+};
 
 // ---- the distant crag ring -------------------------------------------------------------
 
@@ -235,14 +281,14 @@ export function planBackdropSpires(count = 34): BackdropSpire[] {
   const out: BackdropSpire[] = [];
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2 + hash(i, 1) * 0.12;
-    const dist = 300 + hash(i, 2) * 170;
+    const dist = 360 + hash(i, 2) * 200;
     // Leave the moon's quarter (north-north-west) lower so it rises clear.
     const moonward = Math.cos(a - Math.atan2(-0.32, 0.83));
-    const height = (70 + hash(i, 3) * 120) * (moonward > 0.85 ? 0.55 : 1);
+    const height = (60 + hash(i, 3) * 110) * (moonward > 0.85 ? 0.5 : 1);
     out.push({
       x: cx + Math.sin(a) * dist,
       z: cz + Math.cos(a) * dist,
-      radius: 26 + hash(i, 4) * 40,
+      radius: 34 + hash(i, 4) * 46,
       height,
       base: -90,
       seed: i,

@@ -103,6 +103,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Hollow Crypt's torch pools and the soul column's floor pool: the world's
   // own light on the ring floor, under every telegraph Morthen will paint.
   { file: 'src/render/hollow_crypt/crypt_lights.ts', layer: 'ground', strict: true },
+  // The engraved rite circle and cloister rosette: dim world marks on the floor.
+  { file: 'src/render/hollow_crypt/crypt_floor_marks.ts', layer: 'ground', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },

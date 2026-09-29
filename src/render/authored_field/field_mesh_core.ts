@@ -27,12 +27,12 @@ export type Rgb = readonly [number, number, number];
 
 /** Linear-ish colours per ground kind (the painter's vertex paint). */
 export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
-  flagstone: [0.46, 0.44, 0.42],
-  earth: [0.3, 0.25, 0.2],
-  grave: [0.27, 0.23, 0.19],
-  frost: [0.56, 0.62, 0.68],
-  bone: [0.62, 0.58, 0.5],
-  ritual: [0.3, 0.3, 0.34],
+  flagstone: [0.3, 0.29, 0.29],
+  earth: [0.2, 0.16, 0.13],
+  grave: [0.13, 0.11, 0.08],
+  frost: [0.38, 0.43, 0.5],
+  bone: [0.42, 0.39, 0.33],
+  ritual: [0.2, 0.2, 0.24],
 };
 
 /** Which texture family a ground kind draws with. */
@@ -216,15 +216,17 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   const base = FIELD_GROUND_COLORS[ground];
   const broad = fieldNoise(x * 0.045, z * 0.045, 3);
   const grit = hash2(Math.floor(x * 1.7), Math.floor(z * 1.7));
-  let k = 0.72 + broad * 0.5 + (grit - 0.5) * 0.08;
-  if (onPath) k *= 1.08;
-  // A cold moss/lichen bloom on the stone, deeper in the damp hollows.
-  const moss = ground === 'flagstone' || ground === 'bone' ? Math.max(0, broad - 0.62) * 1.4 : 0;
-  return [
-    base[0] * k * (1 - moss * 0.3),
-    base[1] * k * (1 - moss * 0.1),
-    base[2] * k * (1 - moss * 0.35),
-  ];
+  let k = 0.62 + broad * 0.7 + (grit - 0.5) * 0.1;
+  if (onPath) k *= 1.1;
+  // Patches: cold moss on the stone in the damp hollows, grave dirt and
+  // bone dust drifted across it, so no two stretches read alike.
+  const patch = fieldNoise(x * 0.11 + 13, z * 0.11 - 7, 2);
+  const moss = ground === 'flagstone' || ground === 'bone' ? Math.max(0, patch - 0.58) * 1.8 : 0;
+  const dirt = Math.max(0, fieldNoise(x * 0.07 - 3, z * 0.07 + 5, 2) - 0.6) * 1.6;
+  const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
+  const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
+  const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
+  return [r, g, b];
 }
 
 function pushVertex(

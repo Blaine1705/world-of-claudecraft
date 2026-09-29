@@ -459,6 +459,18 @@ def grave_mound():
     return p
 
 
+def dead_grass():
+    """A tuft of pale dead grass (instanced by the hundred over the graves)."""
+    p = P('DeadGrass', weather=0.2, lichen=0.0)
+    for i in range(11):
+        a = p.rng.random() * math.tau
+        r = p.rng.random() * 0.35
+        h = 0.35 + p.rng.random() * 0.5
+        lean = (math.cos(a) * 0.25, math.sin(a) * 0.25)
+        p.spike((math.cos(a) * r, math.sin(a) * r, 0), 0.05, h, p.vary((0.55, 0.52, 0.4), 0.2), sides=3, lean=lean)
+    return p
+
+
 def grave_fence():
     p = P('GraveFence')
     for i in range(9):
@@ -716,11 +728,13 @@ def bone_crown():
         foot = Vector((math.cos(a) * 31, math.sin(a) * 31, -2.0))
         knee = Vector((math.cos(a) * 27, math.sin(a) * 27, 22))
         top = Vector((math.cos(a) * 7.5, math.sin(a) * 7.5, 38))
-        pts = p.bezier(foot, knee, top, 14)
-        p.sweep(pts, 1.5, 0.6, p.vary(BONE, 0.05), sides=8)
-        for k in range(2, len(pts) - 1, 3):
+        pts = p.bezier(foot, knee, top, 18)
+        color = p.vary(BONE, 0.04)
+        p.sweep(pts, 1.6, 0.55, color, sides=10)
+        # Vertebra-like knuckles, same bone, so the rib reads as one piece.
+        for k in range(3, len(pts) - 1, 4):
             q = Vector(pts[k])
-            p.rock(q, (1.8, 1.8, 1.4), BONE_OLD, jitter=0.1, subdivisions=1)
+            p.rock(q, (2.1, 2.1, 1.2), color, jitter=0.08, subdivisions=1)
         p.spike((foot.x, foot.y, 0.0), 2.2, 4.0, BONE_OLD, sides=6)
     ring = []
     for i in range(25):
@@ -752,7 +766,7 @@ BUILDERS = (
     lambda: arcade_arch(False), lambda: arcade_arch(True),
     ossuary_monument, sarcophagus, shrine_pillar, wing_arch, banner,
     lambda: headstone('A'), lambda: headstone('B'), lambda: headstone('C'), lambda: headstone('D'),
-    lantern_post, dead_tree, bell_tower, open_grave, grave_mound, grave_fence,
+    lantern_post, dead_tree, bell_tower, open_grave, grave_mound, grave_fence, dead_grass,
     web_column, egg_cluster, great_web, silk_sheet, hanging_cocoon,
     choir_pillar, bone_organ, pew, nave_column, tracery_window, candelabrum,
     remembrance_candle, rite_altar, sarcophagus_alcove, ring_stone, bone_crown, distant_spire,

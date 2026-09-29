@@ -33,6 +33,7 @@ export const HOLLOW_CRYPT_KIT_PIECES = [
   'CoffinStack',
   'CurtainWall',
   'CurtainWallBroken',
+  'DeadGrass',
   'DeadTree',
   'DistantSpire',
   'EggCluster',
