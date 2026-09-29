@@ -416,7 +416,7 @@ export const HOLLOW_CRYPT_SPAWNS: DungeonSpawn[] = [
   { mobId: 'bound_soul', x: 38, z: 157, packId: 'p9', patrol: { points: P9_LOOP, offset: 3 } },
   { mobId: 'bound_soul', x: 35, z: 157, packId: 'p9', patrol: { points: P9_LOOP, offset: 0 } },
   // Boss 4: Morthen at the altar of the Rite Ring, facing the stair.
-  { mobId: 'morthen', x: 0, z: 210, facing: FACE_NORTH, idleStationary: true },
+  { mobId: 'morthen', x: 0, z: 212, facing: FACE_NORTH, idleStationary: true },
 ];
 
 /** The nine mandatory trash pulls, in route order (dev helpers, tests). */
