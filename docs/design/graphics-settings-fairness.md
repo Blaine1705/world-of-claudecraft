@@ -219,21 +219,24 @@ COSMETIC (may be tiered down on lower presets):
 
 - The Spell Effects option (Graphics, Display card; `src/render/spell_effects_switch.ts`). A
   player preference rather than a tier knob, held to the same rule. Off drops the cosmetic
-  spell and ability visuals: the ability painter's cast, travel, impact and linger
-  compositions and its per-entity holds (windup orbs, buff orbits, shells, ground discs), the
-  pooled spell particles (projectiles, beams, novas, cast sparkles, form and aura motes),
-  the class spell visuals outside both, and the spell light pulses. It does so by refusing
-  every cast at the painter's cast gate, which routes the painter onto the SAME
-  telegraph-only arm the readiness gate already takes while a cast's programs are linking
-  (`src/render/cast_vfx_readiness_core.ts` owns that argument), so what survives is exactly
-  what survives there: the terrain-draped area telegraph ring, the hard-crowd-control band
-  over a stunned, feared or rooted body, and the rig's windup clip. Cast bars, nameplates,
-  floating combat text and every HUD read never consult the switch. The shared pooled
-  emitters that also carry non-spell reads (a delve shrine's sequence pulse, a lit
-  wardstone, a minigame power-up) stay ungated; spell call sites use gated twins
-  (`Vfx.spellNova` and siblings). Persistent ground zones (desecration, blizzard, the frozen
-  orb, boss mechanic visuals, ground-warned meteors) are area reads and stay on, as does
-  world ambience that is not a spell. Pinned by `tests/spell_effects_switch.test.ts`.
+  spell visuals whose CASTER is on the player side (a player, or a pet with an `ownerId`),
+  the viewer's own included: the ability painter's cast, travel, impact and linger
+  compositions, the per-entity holds those casters caused (windup orbs, buff orbits,
+  shells, ground discs, a player's DoT marks on a mob), the pooled spell particles, the
+  class spell visuals outside both, and the spell light pulses. Everything a mob, boss or
+  other creature casts keeps drawing on every setting, because an enemy effect is often
+  the in-world read of a mechanic (a bomber's fuse flash, the beam showing which add heals
+  the boss, a death-throes warning nova, a breath cone). An effect is attributed to the
+  event that caused it, not the body it lands on (`enterSpellEvent` in the renderer's
+  event dispatch), and an effect with no attributable caster always draws, so a gap can
+  only show too much. For a muted caster the painter takes its refused-cast arm
+  (`refusedTelegraphs`, `areaTelegraph`), so the terrain-draped area ring and the rig's
+  windup clip survive, and the hard-crowd-control band is held over every body whoever
+  cast it. Cast bars, nameplates, floating combat text and every HUD read never consult
+  the option. The shared pooled emitters that also carry non-spell reads (a delve shrine's
+  sequence pulse via `src/render/world_cue_fx.ts`, a lit wardstone, a minigame power-up,
+  melee hit sparks) never consult it either; spell call sites use gated twins
+  (`Vfx.spellNova` and siblings). Pinned by `tests/spell_effects_switch.test.ts`.
 
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.

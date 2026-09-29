@@ -764,6 +764,7 @@ import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
+import { enterSpellEvent, leaveSpellEvent } from './spell_effects_switch';
 import { SpiritGrade } from './spirit_grade';
 import {
   freezeStaticMatrices,
@@ -852,6 +853,7 @@ import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
+import { playWorldCueFx } from './world_cue_fx';
 import { WorldGuidance } from './world_guidance';
 import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
@@ -7065,6 +7067,17 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
+    // Every effect this event draws is judged by the event's caster for the
+    // Spell Effects option, not by the body it lands on.
+    const scope = enterSpellEvent(ev);
+    try {
+      this.dispatchEvent(ev);
+    } finally {
+      leaveSpellEvent(scope);
+    }
+  }
+
+  private dispatchEvent(ev: SimEvent): void {
     this.riftDeathZoneVisuals?.handleEvent(ev);
     switch (ev.type) {
       case 'castStart': {
@@ -7596,15 +7609,11 @@ export class Renderer {
         this.fishingBobbers.bite(ev.pid);
         break;
       }
-      case 'worldObjectBurning': {
-        // A torched murloc hut (q_deepfen_purge) bursts into flame. First-pass
-        // fire cue: a strong low burst plus a taller follow-up so it reads as
-        // catching, not a single puff. The lingering blaze is iterated in playtest.
-        const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
-        this.vfx.burst(new THREE.Vector3(ev.x, gy + 0.6, ev.z), 'fire', 48, 2.2);
-        this.vfx.burst(new THREE.Vector3(ev.x, gy + 1.4, ev.z), 'fire', 30, 1.6);
+      case 'worldObjectBurning':
+      case 'delveRitePulse':
+      case 'delveRiteFeedback':
+        playWorldCueFx(this.vfx, ev, this.sim.cfg.seed);
         break;
-      }
       case 'yumiTeleport': {
         // Arcane burst at both ends of the cat's blink (the event is personal
         // per participant; ignore copies addressed to other local pids so an
@@ -7619,27 +7628,6 @@ export class Renderer {
         for (const view of this.yumiMazeViews.values()) view.noteTeleport(ev.catId, ev.toX, ev.toZ);
         break;
       }
-      case 'delveRitePulse': {
-        // The Drowned Reliquary Rite plays its sequence by pulsing each shrine
-        // in turn; a school-coloured nova on the shrine entity shows which one
-        // (colour matches the shrine's accent so the sequence is readable).
-        const school =
-          ev.shrineKind === 'rite_shrine_candle'
-            ? 'fire'
-            : ev.shrineKind === 'rite_shrine_reed'
-              ? 'nature'
-              : ev.shrineKind === 'rite_shrine_skull'
-                ? 'shadow'
-                : 'holy';
-        this.vfx.nova(ev.entityId, school);
-        break;
-      }
-      case 'delveRiteFeedback':
-        // A correct touch answers with a green up-glow; a wrong one with a dark
-        // shadow burst on the shrine the player pressed.
-        if (ev.correct) this.vfx.healGlow(ev.shrineId);
-        else this.vfx.nova(ev.shrineId, 'shadow');
-        break;
       case 'fiestaPowerup':
         // Big celebratory pop on grab, plus a lingering coloured glow.
         this.vfx.levelUpPillar(ev.entityId);
@@ -11225,7 +11213,7 @@ export class Renderer {
         if (hasRecklessness) {
           this.vfx.recklessFlame(e.id, dt);
           if (spawnRecklessnessSkulls) {
-            this.recklessSkulls.spawn(v.riderAnchor, active.height * e.scale);
+            this.recklessSkulls.spawn(v.riderAnchor, active.height * e.scale, e.id);
           }
         }
         // Shapeshift-form particle auras riding the tints above: metamorph fire,

@@ -16087,7 +16087,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '世界在淡出之前能向远处绘制多远。每个预设都会替你设好，直到你自己动它为止。',
   'guide.settingsPage.rowWaterQuality': '湖泊、河流和外海如何着色，从平坦省性能一直到完全反射。',
   'guide.settingsPage.rowSpellEffects':
-    '法术与技能的光芒、火花、飞行弹道和命中爆发。关闭后画面更清爽，大战中也能多挤出几帧；无论开关，提示你离开区域的范围圈、被昏迷、恐惧或定身目标头顶的标记，以及所有施法条都会保留。',
+    '玩家及其宠物施放的法术光芒、火花、飞行弹道和命中爆发，也包括你自己的。关闭后画面更清爽，大型团队战斗中也能多挤出几帧。敌人施放的一切仍会显示，提示你离开区域的范围圈、被昏迷、恐惧或定身目标头顶的标记，以及所有施法条也都会保留。',
   'guide.settingsPage.rowWaterRipples':
     '游泳时在你身后荡开的尾迹与涟漪。默认关闭，也是唯一一项真会吃帧数的水效；无论开关，水花和气泡都不受影响。',
   'guide.settingsPage.valueUltraOrInsane': '“超高”，想要全都要就选“极致”',

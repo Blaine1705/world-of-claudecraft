@@ -1,67 +1,113 @@
-// The Spell Effects option: whether spell and ability visual effects draw in
-// the 3D world. On by default; off is a player preference for a calmer or
-// cheaper screen.
+// The Spell Effects option: whether the spell and ability visual effects that
+// PLAYERS cast draw in the 3D world. On by default; off is a player preference
+// for a calmer or cheaper screen in busy group fights.
 //
 // It lives here rather than as a renderer field for the nameplate_dot_scale.ts
 // reason: renderer.ts sits at its monolith ceiling, and the value is only ever
 // handed through to the systems that draw spell effects. main.ts pushes it on
-// boot and on every change (render never reads the settings store), and the
-// state survives a renderer rebuild because it is module state, not renderer
-// state.
+// boot and on every change (render never reads the settings store); it is
+// module state, so it survives a renderer rebuild.
 //
-// What OFF removes and what it keeps is the same split the cast-VFX readiness
-// gate already makes while a cast's programs are still linking
-// (cast_vfx_readiness_core.ts owns the fairness argument for it): the ability
-// painter treats every cast as refused, so it draws none of the cast, release,
-// travel, impact or linger composition and sleeps the per-entity cosmetic
-// holds (windup orbs, buff orbits, shells, ground discs), while the reads a
-// player acts on still draw: the terrain-draped area telegraph ring, the
-// hard-crowd-control band over a stunned, feared or rooted body, and the
-// rig's windup animation. The generic pooled spell particles (vfx.ts) that the
-// renderer spawns for abilities with no authored spec, plus the per-frame cast
-// sparkle and form auras, check `spellEffectsEnabled()` at their own entry
-// points. Cast bars, nameplates, floating combat text and every HUD read are
-// outside the 3D effects entirely and never consult this switch. World
-// ambience that is not a spell (weather, water splashes, campfire embers,
-// mount exhaust, landing dust, fireworks, the level-up pillar) is not a spell
-// effect and keeps drawing.
+// Who is muted: effects whose SOURCE is on the player side, a player or a
+// player's pet (`kind === 'player' || ownerId !== null`, the sim's own
+// player-side test). Anything a mob, boss or other creature casts keeps
+// drawing, because an enemy effect is often how a mechanic reads (a bomber's
+// fuse flash, the beam that shows which add is healing the boss). That keeps
+// the option on the right side of the graphics-fairness rule by construction
+// (docs/design/graphics-settings-fairness.md), and it is also where the
+// clutter is: a raid of players casting at once.
+//
+// Attribution: an effect is judged by the entity that CAST it, not the one it
+// lands on. While the renderer handles a sim event it opens an event scope
+// (`enterSpellEvent`), and every check inside that scope answers for the
+// event's source, so a detonation drawn on a mob still reads as the player's.
+// Outside an event (the per-frame entity sync) a check answers for the id it
+// is handed, which is always the wearer or caster there.
+//
+// What a muted source still shows is what the ability painter shows for a
+// refused cast (ability_vfx/painter.ts, `refusedTelegraphs` and
+// `areaTelegraph`, argued in cast_vfx_readiness_core.ts): the terrain-draped
+// area ring and the rig's windup clip. The hard-crowd-control band over a
+// stunned, feared or rooted body is held whoever wears it. Cast bars,
+// nameplates, floating combat text and every HUD read never consult this
+// module, and world ambience that is not a spell (weather, water splashes,
+// campfire embers, mount exhaust, landing dust, fireworks, delve shrine cues)
+// keeps drawing.
 //
 // Three/DOM-free, so a test drives it directly.
 
+/** The two fields the player-side test reads off an entity. */
+export interface SpellSource {
+  kind: string;
+  ownerId?: number | null;
+}
+
+type SourceLookup = (id: number) => SpellSource | undefined;
+
+/** The scope `enterSpellEvent` replaced, handed back to `leaveSpellEvent`. */
+export interface SpellEventScope {
+  inEvent: boolean;
+  sourceId: number | undefined;
+}
+
 let enabled = true;
+let lookup: SourceLookup = () => undefined;
+let inEvent = false;
+let eventSourceId: number | undefined;
 
 /** Apply the stored setting. */
 export function setSpellEffectsEnabled(on: boolean): void {
   enabled = on;
 }
 
-/** Whether spell and ability visual effects draw. */
+/** Whether the option is on (every source draws). */
 export function spellEffectsEnabled(): boolean {
   return enabled;
 }
 
-/** The two cast-gate reads the ability painter consults. */
-export interface SpellEffectsCastGate {
-  /** Counted: one refusal per refused cast (readiness telemetry). */
-  admit(mask: number): boolean;
-  /** Uncounted: the per-frame answer. */
-  ready(mask: number): boolean;
+/** Point the switch at the live world's entities. The renderer's ability
+ *  presentation binds it at construction, so a rebuild rebinds it. */
+export function bindSpellEffectsWorld(next: SourceLookup): void {
+  lookup = next;
+}
+
+/** A player or a player's pet: the side the option mutes. */
+export function isPlayerSideSource(source: SpellSource | undefined): boolean {
+  return !!source && (source.kind === 'player' || (source.ownerId ?? null) !== null);
+}
+
+/** The id an event names as its caster, if it names one. */
+export function spellEventSourceId(ev: object): number | undefined {
+  const e = ev as { sourceId?: unknown; entityId?: unknown };
+  if (typeof e.sourceId === 'number') return e.sourceId;
+  if (typeof e.entityId === 'number') return e.entityId;
+  return undefined;
+}
+
+/** Open the scope of one sim event; returns the scope to restore after it. */
+export function enterSpellEvent(ev: object): SpellEventScope {
+  const previous = { inEvent, sourceId: eventSourceId };
+  inEvent = true;
+  eventSourceId = spellEventSourceId(ev);
+  return previous;
+}
+
+/** Close an event scope opened by `enterSpellEvent`. */
+export function leaveSpellEvent(previous: SpellEventScope): void {
+  inEvent = previous.inEvent;
+  eventSourceId = previous.sourceId;
 }
 
 /**
- * Wrap the cast-VFX readiness gate so a closed Spell Effects switch refuses
- * every cast and every per-frame hold, which routes the painter onto its
- * existing telegraph-only arm. The inner gate is never consulted while the
- * switch is off, so readiness refusal counts stay a measure of program
- * linking, not of a player preference. `isOn` is read on every call, so a
- * flip takes effect on the next cast and the next frame without a rebuild.
+ * Whether a spell effect should be skipped. Inside an event scope the event's
+ * source decides (falling back to `id` when the event names none); outside
+ * one, `id` decides. An id that resolves to nothing draws: an unattributable
+ * effect is never muted, so a gap here can only show too much, never hide a
+ * read.
  */
-export function gateCastsBySpellEffects(
-  inner: SpellEffectsCastGate,
-  isOn: () => boolean = spellEffectsEnabled,
-): SpellEffectsCastGate {
-  return {
-    admit: (mask) => isOn() && inner.admit(mask),
-    ready: (mask) => isOn() && inner.ready(mask),
-  };
+export function spellEffectsMuted(id?: number): boolean {
+  if (enabled) return false;
+  const source = inEvent && eventSourceId !== undefined ? eventSourceId : id;
+  if (source === undefined) return false;
+  return isPlayerSideSource(lookup(source));
 }

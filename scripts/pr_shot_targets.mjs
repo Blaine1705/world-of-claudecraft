@@ -4567,9 +4567,10 @@ export const TARGETS = [
     ],
     async capture(page) {
       await dismissArrivalGreeting(page);
-      // One identical event stream on both variants: projectiles, a beam and a
-      // nova from the generic arm, a spec'd Fireball through the ability
-      // painter, and an aimed blast whose area ring must survive the switch.
+      // One identical event stream on both variants, all cast by the player:
+      // projectiles, a beam and a nova from the generic arm, a spec'd Fireball
+      // through the ability painter, and an aimed blast whose area ring must
+      // survive the option.
       // Refired on a short interval so a slow software rasterizer still
       // catches the volley mid-flight when the runner shoots.
       await page.evaluate(() => {
@@ -4615,7 +4616,7 @@ export const TARGETS = [
           });
           r.handleEvent({
             type: 'spellfx',
-            sourceId: tid,
+            sourceId: pid,
             targetId: tid,
             school: 'frost',
             fx: 'nova',
@@ -4629,6 +4630,7 @@ export const TARGETS = [
           });
           r.handleEvent({
             type: 'spellfxAt',
+            sourceId: pid,
             x: me.pos.x + 3,
             z: me.pos.z + 3,
             school: 'fire',

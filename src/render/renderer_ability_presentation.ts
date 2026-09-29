@@ -13,7 +13,7 @@ import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
-import { gateCastsBySpellEffects } from './spell_effects_switch';
+import { bindSpellEffectsWorld, spellEffectsEnabled } from './spell_effects_switch';
 import { TrinketRelics } from './trinket_relics';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
@@ -48,11 +48,9 @@ interface PresentationHost {
 /** Existing painter wiring and Warrior equipment/contact reads share one owner.
  * World lookup stays live across world replacement; simulation is never mutated. */
 export function createRendererAbilityPresentation(h: PresentationHost) {
-  // The painter's cast verdicts pass through the Spell Effects switch: off
-  // refuses every cast, which is the painter's telegraph-only arm. The fx
-  // spawn gate below stays on the raw readiness: it answers "is this program
-  // linked", and the reads that survive a refusal still draw through it.
-  const castGate = gateCastsBySpellEffects(h.castGate);
+  // The Spell Effects option judges each effect by its caster, looked up in
+  // the live world (a world replacement is picked up on the next lookup).
+  bindSpellEffectsWorld((id) => h.world().entities.get(id));
   const visual = (id: number) => {
     const view = h.views.get(id);
     return view ? h.visual(view) : null;
@@ -102,14 +100,16 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     time: () => h.time(),
     // The relics are engine-family programs: ready once the cast gate has
     // linked that family (the release's per-family cast admission).
-    ready: () => castGate.ready(CAST_VFX_ENGINE),
+    // Every relic belongs to a player's trinket, so a closed Spell Effects
+    // option holds them all.
+    ready: () => spellEffectsEnabled() && h.castGate.ready(CAST_VFX_ENGINE),
   });
   const painter = new AbilityVfx(
     {
       ...h.painter,
       trinketRelics,
-      castVfxAdmit: (mask) => castGate.admit(mask),
-      castVfxReady: (mask) => castGate.ready(mask),
+      castVfxAdmit: (mask) => h.castGate.admit(mask),
+      castVfxReady: (mask) => h.castGate.ready(mask),
       vfx: h.vfx,
       fx,
       anchor: h.anchor,

@@ -7314,7 +7314,7 @@ export const tr_TR: EnTranslations = {
       "rowCameraSpeed": "Fareyle etrafa bakıldığında kameranın ne kadar hızlı döndüğü.",
       "rowTouchLookSpeed": "Kaydırarak bakma için de aynı şey geçerlidir; yalnızca dokunmatik bir ekrandaysanız görünür.",
       "rowFullscreen": "Oyunu tüm ekranı kaplayacak şekilde gösterir.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells and abilities. Switch it off for a calmer screen or a few extra frames in big fights; the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar stay either way.",
+      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
       "rowWaterRipples": "Yüzerken arkanızda yayılan iz ve dalgacıklar. Varsayılan olarak kapalıdır ve gerçek kareye mal olan tek su efektidir; sıçramalar ve kabarcıklar her iki durumda da etkilenmez.",
       "rowOverflowXp": "Maksimum seviyedeyken çubuğunuzun taşan deneyimle dolmaya devam edip etmeyeceği, ya da bunun yerine klasik, sabit maksimum seviye metnini gösterip göstermeyeceği.",
       "rowInterfaceMode": "Masaüstü arayüzünü mü yoksa ekran üstü dokunmatik denetimleri mi kullanacağınız. Otomatik, cihazınızı okur; ikisinden birini de zorlayabilirsiniz: klavyeli bir tablet masaüstü düzenini alabilir, dokunmatik ekranlı bir dizüstü bilgisayar da dokunmatik denetimleri alabilir.",

@@ -728,9 +728,10 @@ export function buildGraphicsSections(
       ? choice(s, 'displayMode', 'hud.options.displayMode', displayModeOptions)
       : toggle(s, 'fullscreen', 'hud.options.fullscreen'),
     toggle(s, 'weather', 'game.settings.weather'),
-    // Spell and ability visual effects (default on). Off keeps every read a
-    // player acts on (area rings, crowd-control bands, cast bars); it sits
-    // beside Weather as the other "calm the screen" switch.
+    // Spell effects cast by players and their pets (default on). Off keeps
+    // every enemy effect and every read a player acts on (area rings,
+    // crowd-control bands, cast bars); it sits beside Weather as the other
+    // "calm the screen" switch.
     boolToggle(s, 'spellEffects', 'hudChrome.options.spellEffects'),
     // Opt-in wake/ripple simulation on water (default off): the one water effect
     // that runs extra GPU passes; bubbles and splashes are unaffected. It sits
