@@ -101,9 +101,10 @@ function markMaterial(canvas: HTMLCanvasElement, glow: number): THREE.ShaderMate
         float line = texture2D(uMap, vUv).a;
         float r = length(vUv - 0.5) * 2.0;
         float breath = 0.55 + 0.45 * sin(uTime * 0.8 - r * 6.0);
-        // Engraved: the groove darkens the stone, a faint soul-green in it.
-        vec3 col = mix(vec3(0.0), vec3(0.3, 0.9, 0.65) * uGlow * breath, 0.6);
-        gl_FragColor = vec4(col, line * 0.55);
+        // Engraved: the groove darkens the stone and a soul-green ember
+        // breathes in it (dim, well under any telegraph's brightness).
+        vec3 col = vec3(0.25, 0.85, 0.6) * uGlow * (0.45 + 0.55 * breath);
+        gl_FragColor = vec4(col, line * 0.8);
         #include <fog_fragment>
         #include <colorspace_fragment>
       }
@@ -128,7 +129,7 @@ export function buildCryptFloorMarks(ground: (x: number, z: number) => number): 
   group.name = 'hollowCryptFloorMarks';
   const rite = new THREE.Mesh(
     new THREE.PlaneGeometry(RITE_RING.r * 1.9, RITE_RING.r * 1.9).rotateX(-Math.PI / 2),
-    markMaterial(glyphCanvas(1024, [0.16, 0.22, 0.46, 0.56, 0.86, 0.96], 7), 0.7),
+    markMaterial(glyphCanvas(1024, [0.16, 0.22, 0.46, 0.56, 0.86, 0.96], 7), 0.42),
   );
   // Above the terrain's layer lift (every later surface floats a hair higher).
   rite.position.set(RITE_RING.x, RITE_RING.h + 0.2, RITE_RING.z);

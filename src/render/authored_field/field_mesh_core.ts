@@ -306,9 +306,11 @@ export function cliffColor(run: FieldCliffRun, x: number, y: number, z: number, 
   const depth = Math.max(0, top - y);
   const strata = 0.5 + 0.5 * Math.sin(y * 1.9 + fieldNoise(x * 0.1, z * 0.1, 2) * 6);
   const n = fieldNoise(x * 0.3 + y * 0.2, z * 0.3 - y * 0.15, 3);
-  const dark = Math.max(0.35, 1 - depth / 55);
+  // Dark basalt under a bright moon: the faces must stay well below the lit
+  // terraces so the walkable tops read first, and sink fast into the mist.
+  const dark = Math.max(0.25, 1 - depth / 40);
   const masonry = run.style === 'masonry' || run.style === 'balustrade';
-  const base: Rgb = masonry && depth < 3.2 ? [0.44, 0.41, 0.38] : [0.3, 0.29, 0.31];
+  const base: Rgb = masonry && depth < 3.2 ? [0.34, 0.32, 0.3] : [0.19, 0.18, 0.2];
   const k = (0.7 + strata * 0.18 + n * 0.3) * dark;
   return [base[0] * k, base[1] * k, base[2] * k * 1.05];
 }

@@ -407,12 +407,14 @@ def bell_tower():
     mark = p.mark()
     for side in range(4):
         m2 = p.mark()
-        p.masonry(-4.5, 4.5, 0, 26.0 if side != 1 else 21.0, 1.6, 1.5, STONE_MID, ruin=0.18 if side == 1 else 0.05, bevel=False)
+        # A tight tone spread: at hero scale a wide one reads as a checkerboard.
+        p.masonry(-4.5, 4.5, 0, 26.0 if side != 1 else 21.0, 1.6, 1.5, STONE_MID, ruin=0.18 if side == 1 else 0.05,
+                  bevel=False, spread=0.05)
         p.turn(m2, Matrix.Rotation(side * math.pi / 2, 4, 'Z') @ Matrix.Translation((0, -4.5, 0)))
     for side in range(4):
         a = side * math.pi / 2 + math.pi / 4
         m3 = p.mark()
-        p.masonry(-0.9, 0.9, 0, 16.0, 1.6, 1.4, STONE_DARK, bevel=False)
+        p.masonry(-0.9, 0.9, 0, 16.0, 1.6, 1.4, STONE_DARK, bevel=False, spread=0.05)
         p.turn(m3, Matrix.Translation((math.cos(a) * 6.2, math.sin(a) * 6.2, 0)) @ Matrix.Rotation(a, 4, 'Z'))
     for side in range(4):
         m4 = p.mark()
@@ -750,9 +752,11 @@ def bone_crown():
 def distant_spire():
     """A far ruined spire on a rock spike: silhouette only (scaled up at runtime)."""
     p = P('DistantSpire', weather=0.3, lichen=0.0)
-    for i in range(5):
-        p.rock((0, 0, i * 5), (9 - i, 8 - i, 7), STONE_DARK, jitter=0.3, subdivisions=1)
-    p.prism((0, 0, 24), 6, 3.0, 2.4, 14, STONE_DARK)
+    # Overlapping spike rocks up into the spire foot: no gap may open between
+    # them at runtime scale (a gap reads as a block floating in the sky).
+    for i in range(6):
+        p.rock((0, 0, i * 4.2), (9 - i, 8 - i, 8), STONE_DARK, jitter=0.15, subdivisions=1)
+    p.prism((0, 0, 19), 6, 3.4, 2.4, 19, STONE_DARK)
     p.prism((0, 0, 38), 6, 2.6, 0.2, 8, STONE_DARK)
     p.box((2.5, 0, 30), (1.0, 1.0, 5), STONE_DARK, roll=0.3)
     return p

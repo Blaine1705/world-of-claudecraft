@@ -261,7 +261,8 @@ class Piece:
             self.box((cx + mx, cy, cz + spring + mz), (length, depth * (1.12 if key else 1.0), thickness * (1.25 if key else 1.0)),
                      self.vary(color, 0.1), bevel=min(0.08, thickness * 0.1), roll=-ang)
 
-    def masonry(self, x0, x1, z0, z1, depth, course, color, y=0.0, ruin=0.0, jitter=0.03, mortar=0.04, bevel=True):
+    def masonry(self, x0, x1, z0, z1, depth, course, color, y=0.0, ruin=0.0, jitter=0.03, mortar=0.04, bevel=True,
+                spread=0.14):
         """A wall of individual blocks in courses between x0..x1 and z0..z1 (face toward -Y)."""
         z = z0
         row = 0
@@ -278,7 +279,7 @@ class Piece:
                     if ruin > 0 and top_frac > 1 - ruin and self.rng.random() < (top_frac - (1 - ruin)) / ruin * 1.2:
                         x += w
                         continue
-                    c = self.vary(color, 0.14)
+                    c = self.vary(color, spread)
                     off = (self.rng.random() - 0.5) * jitter
                     self.box(((a + b) / 2, y + off, z + h / 2), (b - a - mortar, depth, h - mortar), c,
                              bevel=min(0.06, h * 0.12) if bevel else 0.0)

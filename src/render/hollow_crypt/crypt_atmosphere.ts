@@ -264,14 +264,16 @@ void main() {
   vec3 view = normalize(cameraPosition - vWorld);
   float facing = abs(dot(normalize(vNormalW), view));
   float body = pow(facing, uPower);
-  float ang = atan(vNormalW.z, vNormalW.x);
-  float flow = noise(vec2(ang * 3.0, vWorld.y * 0.05 - uTime * 0.6)) * 0.6
-    + noise(vec2(ang * 7.0, vWorld.y * 0.13 - uTime * 1.3)) * 0.4;
+  // Long vertical soul streaks climbing the beam (angle round the AXIS, so
+  // the pattern never bands horizontally on the near face).
+  float ang = atan(vWorld.z - vAxis.y, vWorld.x - vAxis.x);
+  float flow = noise(vec2(ang * 5.0, vWorld.y * 0.012 - uTime * 0.35)) * 0.6
+    + noise(vec2(ang * 11.0 + 3.0, vWorld.y * 0.03 - uTime * 0.8)) * 0.4;
   float fadeTop = 1.0 - smoothstep(0.55, 1.0, vH);
   float fadeBase = smoothstep(0.0, 0.03, vH);
   // Dimmer up close: a beacon from afar, never a bloom wash over the fight.
   float axisDist = length(cameraPosition.xz - vAxis);
-  float near = mix(0.28, 1.0, smoothstep(24.0, 110.0, axisDist));
+  float near = mix(0.12, 1.0, smoothstep(20.0, 120.0, axisDist));
   float i = body * (0.55 + 0.75 * flow) * fadeTop * fadeBase * 0.6 * near;
   vec3 col = mix(uEdge, uCore, body);
   gl_FragColor = vec4(col * i, i);
@@ -546,7 +548,8 @@ function buildBackdrop(opts: CryptAtmosphereOptions): THREE.Mesh {
         positions.push(px, y + (t > 0.9 ? Math.sin(a * 4 + seed) * radius * 0.2 : 0), pz);
         // A cold rim where the face turns toward the moon.
         const rim = Math.max(0, Math.cos(a) * moon.x + Math.sin(a) * moon.z) ** 3;
-        const shade = 0.07 + t * 0.04 + rim * 0.05 * t;
+        // Near-black basalt: the moon rim is the only thing that reads.
+        const shade = 0.035 + t * 0.025 + rim * 0.05 * t;
         colors.push(shade, shade * 0.98, shade * 1.08);
       }
     }
