@@ -33,19 +33,39 @@ export const SHOTS = [
   { id: 'puerta_del_mar', at: [0, -160], face: 0, pitch: 0.18, dist: 16 },
   { id: 'patio_bajo_capilla', at: [-40, -70], face: 2.3, pitch: 0.2, dist: 15 },
   { id: 'ermitano_torreviejo', at: [36, -88], face: -Math.PI / 2, pitch: 0.18, dist: 18 },
-  { id: 'patio_cisterna', at: [44, -118], face: -0.2, pitch: 0.3, dist: 16 },
+  { id: 'patio_cisterna', at: [40, -96], face: 0, yaw: Math.PI, pitch: 0.32, dist: 16 },
   { id: 'puente_levadizo', at: [57, -60], face: 0, pitch: 0.22, dist: 14 },
   { id: 'muralla', at: [57, 14], face: 0, pitch: 0.22, dist: 14 },
   { id: 'muralla_vista_mar', at: [60, 50], face: 1.4, pitch: 0.12, dist: 12 },
-  { id: 'jefe1_olen_bastion', at: [57, 110], face: 0, pitch: 0.3, dist: 18 },
+  { id: 'jefe1_olen_bastion', at: [57, 110], face: 0, pitch: 0.3, dist: 18, wait: 6000 },
   { id: 'poterna', at: [30, 126], face: -1.8, pitch: 0.3, dist: 14 },
   { id: 'carcel_hundida', at: [4, 100], face: Math.PI, pitch: 0.3, dist: 18 },
-  { id: 'jefe2_ossick_patio', at: [-2, 46], face: Math.PI, pitch: 0.34, dist: 18 },
+  { id: 'jefe2_ossick_patio', at: [-2, 46], face: Math.PI, pitch: 0.34, dist: 18, wait: 6000 },
   { id: 'escalera_torreon', at: [-62, 40], face: 0, pitch: 0.3, dist: 16 },
   { id: 'balcon_vista', at: [-58, 86], face: 1.8, pitch: 0.26, dist: 14 },
   { id: 'patio_torreon', at: [-40, 140], face: -0.6, pitch: 0.24, dist: 16 },
-  { id: 'jefe3_vael_corona', at: [-16, 190], face: 0.5, pitch: 0.3, dist: 20 },
+  { id: 'jefe3_vael_corona', at: [-16, 190], face: 0.5, pitch: 0.3, dist: 20, wait: 6000 },
   { id: 'faro_desde_abajo', at: [-12, 184], face: 0.3, pitch: -0.05, dist: 10 },
+  // Each boss up close, idle at its post.
+  { id: 'jefe1_olen_cerca', at: [57, 117], face: 0, yaw: 0, pitch: 0.15, dist: 9, wait: 3000 },
+  {
+    id: 'jefe2_ossick_cerca',
+    at: [-2, 23],
+    face: 0,
+    yaw: Math.PI,
+    pitch: 0.15,
+    dist: 10,
+    wait: 3000,
+  },
+  {
+    id: 'jefe3_vael_cerca',
+    at: [-4, 235],
+    face: 0,
+    yaw: Math.PI,
+    pitch: 0.15,
+    dist: 10,
+    wait: 3000,
+  },
   // The boss mechanics, live: pull the boss onto the player, fire the mechanic.
   {
     id: 'mecanica_olen_carga',
@@ -288,7 +308,15 @@ async function main() {
           const out = [];
           for (const e of sim.entities.values()) {
             if (e.templateId !== id) continue;
-            out.push({ ai: e.aiState, cast: e.castingAbility, dead: e.dead, x: Math.round(e.pos.x - me.pos.x), z: Math.round(e.pos.z - me.pos.z), aggro: e.aggroTargetId, fight: e.bastionFight?.kind });
+            out.push({
+              ai: e.aiState,
+              cast: e.castingAbility,
+              dead: e.dead,
+              x: Math.round(e.pos.x - me.pos.x),
+              z: Math.round(e.pos.z - me.pos.z),
+              aggro: e.aggroTargetId,
+              fight: e.bastionFight?.kind,
+            });
           }
           return JSON.stringify({ me: me.id, out });
         }, shot.js);

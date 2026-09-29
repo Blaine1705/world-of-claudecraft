@@ -3752,7 +3752,7 @@ export const VISUALS: Record<string, VisualDef> = {
   bastion_skel_watchman: {
     url: `${ENEMIES}/skeleton_warrior.glb`,
     animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
-    height: 2.5,
+    height: 3.7,
     clips: {
       ...skeletonClips(['2H_Melee_Attack_Chop']),
       castByAbility: { [BASTION_HALBERD_SWEEP]: '2H_Melee_Attack_Chop' },
@@ -3765,7 +3765,7 @@ export const VISUALS: Record<string, VisualDef> = {
   bastion_skel_arbalest: {
     url: `${ENEMIES}/skeleton_rogue.glb`,
     animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
-    height: 2.5,
+    height: 3.5,
     clips: {
       ...skeletonClips(['1H_Melee_Attack_Chop']),
       castByAbility: { [BASTION_PIERCING_BOLT]: 'Spellcast_Shoot' },
@@ -3778,7 +3778,7 @@ export const VISUALS: Record<string, VisualDef> = {
   bastion_skel_sergeant: {
     url: `${ENEMIES}/skeleton_warrior.glb`,
     animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
-    height: 2.5,
+    height: 4.2,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal'], 'Taunt'),
     attach: [{ url: `${WEAPONS}/skeleton_shield_large_a.glb`, bone: 'handslot.l' }],
     tint: 'entity',
@@ -3787,7 +3787,7 @@ export const VISUALS: Record<string, VisualDef> = {
   bastion_mistweaver: {
     url: `${ENEMIES}/necromancer.glb`,
     animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
-    height: 2.5,
+    height: 3.6,
     clips: {
       ...skeletonClips(['2H_Melee_Attack_Chop']),
       castByAbility: { [BASTION_FOG_WARD]: 'Spellcast_Raise' },
@@ -3799,7 +3799,7 @@ export const VISUALS: Record<string, VisualDef> = {
   bastion_acolyte: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
-    height: HUMANOID_H,
+    height: HUMANOID_H * 1.35,
     clips: {
       ...kaykit(['2H_Melee_Attack_Chop']),
       castByAbility: { [BASTION_BRINE_MEND]: 'Spellcast_Raise' },
@@ -3816,7 +3816,7 @@ export const VISUALS: Record<string, VisualDef> = {
   bastion_olen: {
     url: `${ENEMIES}/skeleton_warrior.glb`,
     animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
-    height: 3.4,
+    height: 5.4,
     clips: {
       ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal'], 'Taunt'),
       castByAbility: { [OLEN_OATHBOUND_CHARGE]: 'Taunt' },
@@ -3833,7 +3833,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // one-hand throw and bringing the cudgel down in his great slam.
   bastion_ossick: {
     url: `${ENEMIES}/skeleton_golem.glb`,
-    height: 3.9,
+    height: 6.2,
     clips: {
       ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
       attack: ['Golem_Slam'],
@@ -3849,7 +3849,7 @@ export const VISUALS: Record<string, VisualDef> = {
   bastion_vael: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
-    height: HUMANOID_H * 1.2,
+    height: HUMANOID_H * 1.8,
     clips: {
       ...kaykit(['2H_Melee_Attack_Chop']),
       castByAbility: { [VAEL_MIST_SURGE]: 'Spellcast_Raise' },
@@ -3860,6 +3860,46 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.55,
   },
 
+  // The Bastion's beasts and gaol bodies, scaled well past the player (the
+  // shared crab, wolf, minion and bruiser keys keep their size elsewhere).
+  bastion_crawler: {
+    url: `${CREATURES}/crabenemy.glb`,
+    height: 3.0,
+    clips: CRAB_ENEMY_BITE,
+    animUrls: [
+      `${CREATURES}/crabenemy_hit_variety_anims.glb`,
+      `${CREATURES}/crab_ability_anims.glb`,
+    ],
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  bastion_warhound: {
+    url: `${CREATURES}/wolf_basic.glb`,
+    authoredAtlas: true,
+    height: 3.0,
+    clips: WOLF_BAKED,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  bastion_prisoner: {
+    url: `${ENEMIES}/skeleton_minion.glb`,
+    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
+    height: 3.2,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  bastion_turnkey: {
+    url: `${PLAYERS}/barbarian.glb`,
+    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`],
+    height: HUMANOID_H * 1.55,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    show: ['Barbarian_BearHat'],
+    attach: [{ url: `${WEAPONS}/axe_2handed.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+
   // The Turretback Hermit, the Bastion's showpiece (scripts/assets/
   // sunken_bastion_creatures/build_creature.py): a colossal hermit crab
   // wearing a fallen watchtower turret, the tower swaying on its back. Its
@@ -3867,7 +3907,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // its front (Claw Sweep), and the rear-and-slam of the tower (Shell Slam).
   mob_turretback: {
     url: `${CREATURES}/turretback_hermit.glb`,
-    height: 11,
+    height: 15,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4930,12 +4970,12 @@ const MOB_KEYS: Record<string, string> = {
   // The Sunken Bastion trash (sim/content/sunken_bastion.ts).
   drowned_watchman: 'bastion_skel_watchman',
   fogbound_arbalest: 'bastion_skel_arbalest',
-  barnacle_crawler: 'mob_crab',
-  bastion_warhound: 'mob_wolf',
+  barnacle_crawler: 'bastion_crawler',
+  bastion_warhound: 'bastion_warhound',
   mistweaver: 'bastion_mistweaver',
   drowned_sergeant: 'bastion_skel_sergeant',
-  shackled_prisoner: 'skel_minion',
-  gaol_turnkey: 'mob_bruiser',
+  shackled_prisoner: 'bastion_prisoner',
+  gaol_turnkey: 'bastion_turnkey',
   turretback_hermit: 'mob_turretback',
   gaoler_ossick: 'bastion_ossick',
   // delve enemies
