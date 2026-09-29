@@ -14,7 +14,7 @@ Burst's own delay (sunken_bastion.ts deathThroes).
 import math
 
 from sea_kit import (
-    ALGAE, BARNACLE, BRINE, GLOW, KELP, KELP_D, MOUTH, TOOTH, SeaBody, author_clip, expand_bones, loop, merge,
+    ALGAE, BARNACLE, KELP, KELP_D, MOUTH, TOOTH, SeaBody, author_clip, expand_bones, loop, merge,
 )
 
 SHELL = (0.3, 0.6, 0.6)
@@ -25,7 +25,7 @@ CORAL_D = (0.62, 0.3, 0.22)
 BELLY = (0.93, 0.74, 0.6)
 AMBER = (1.0, 0.66, 0.12)
 TIP = (0.16, 0.1, 0.09)
-SAC = (0.08, 0.4, 0.33)
+SAC = (0.3, 0.92, 0.78)
 VEIN = (0.07, 0.25, 0.22)
 
 BONES = expand_bones([
@@ -106,7 +106,8 @@ def body():
 
     def sac(bone, c, r):
         p.on(bone)
-        p.blob(c, (r, r, r * 0.85), SAC, mat=GLOW)
+        # Lit, not emissive: an exported emissive part glows flat white.
+        p.blob(c, (r, r, r * 0.85), SAC)
         # Veins over the glowing skin and a collar of barnacles at its root.
         for k in range(5):
             a = k / 5 * math.tau

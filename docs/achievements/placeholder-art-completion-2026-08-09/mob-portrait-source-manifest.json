@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "be213b5126a48e809d27abf9bd5dcd626bbfe501af8eb37f7b6bcec6ea168394",
+  "rendererFingerprint": "818197a140fa6247ec99687d0ae22025a6c9cd34ed978855cbcc0da0c277fe3a",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5322709,
-      "sha256": "c507b170ad625e3e7094f4eaefbf59a662a60f0cf67a96329645f27141b3e89c",
+      "bytes": 5323720,
+      "sha256": "5b7ae39a2d180f795dc77ea525eb9107d01c29d2cb4daa8331565dae498a10b7",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -296,8 +296,8 @@
         "model": {
           "url": "models/creatures/bastion_crawler.glb",
           "path": "public/models/creatures/bastion_crawler.glb",
-          "bytes": 1303816,
-          "sha256": "5d65f78d49d8994aa8c62cee84e18253319e5de20722b026830b22d6642117b6"
+          "bytes": 1306300,
+          "sha256": "71754edf882852906eeb8db892fef92b91483b8c4486ed3f8f07564e3aa01fe6"
         },
         "idle": "Idle",
         "height": 3.2,
@@ -314,11 +314,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ceebd588131e60bfdff54e30b6cbcf10f61e541b26c81cd0c683574324681c14",
+      "sourceFingerprint": "8222264224bbe76c66aba91652e87dc72cc669aff0a9fa78fb44735982e5ef82",
       "output": {
         "path": "public/ui/mobs/barnacle_crawler.webp",
-        "bytes": 2398,
-        "sha256": "57586d0c002f97730a06c9f4f4ace612e59eec4d9cfb13411549f7d2fc739ec8"
+        "bytes": 2396,
+        "sha256": "c9bb9856731060987679497fdd0fb7d572446096d0f4d624bcce920ff92d7801"
       }
     },
     {
