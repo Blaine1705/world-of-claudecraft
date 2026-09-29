@@ -9356,17 +9356,17 @@
      equal-specificity lane rules above never pull a crit off centre stage. */
   .fct.fct-vivid.crit {
     font-size: calc(30px * var(--fct-scale, 1));
-    text-shadow: var(--fct-crit-shadow);
+    text-shadow: var(--glow-fct-crit);
     animation-name: fct-vivid-crit;
     animation-duration: 1.25s;
   }
   .fct.fct-big {
     font-size: calc(23px * var(--fct-scale, 1));
-    text-shadow: var(--fct-big-shadow);
+    text-shadow: var(--glow-fct-big);
   }
   .fct.fct-big.crit {
     font-size: calc(35px * var(--fct-scale, 1));
-    text-shadow: var(--fct-big-crit-shadow);
+    text-shadow: var(--glow-fct-big-crit);
   }
   /* Incoming damage keeps its straight rise over the player, but with the same
      hold-then-fade, so the hit you just took does not wash out before you read it. */
