@@ -276,7 +276,6 @@ def gatehouse_arch():
     p.box((0, 0, 11.1), (13.4, 2.6, 0.25), p.vary(LIME_PALE), bevel=0.05)
     for x in (-5.0, -2.5, 0.0, 2.5, 5.0):
         p.masonry(x - 0.5, x + 0.5, 11.2, 12.3, 0.6, 0.55, LIME, y=-1.0, spread=0.05)
-    p.box((0, -1.2, 7.6), (1.2, 0.3, 1.2), BARNACLE)
     return p
 
 
