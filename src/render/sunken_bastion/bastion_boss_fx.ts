@@ -94,7 +94,7 @@ const LANTERN_Y = 2.75;
 const DOME_R = 7;
 
 const GOLD = 0xffc862;
-const IRON = new THREE.Color(0.16, 0.17, 0.18);
+const IRON = new THREE.Color(0.035, 0.036, 0.04);
 const HOT = new THREE.Color(1.0, 0.36, 0.12);
 
 let glowTex: THREE.Texture | null = null;
@@ -174,10 +174,10 @@ void main() {
     + noise(p * 6.0 + uTime * 0.8) * 0.15;
   float r = length(vUv - 0.5) * 2.0;
   float rimFoam = smoothstep(0.86, 0.98, r) * (0.5 + 0.5 * n);
-  vec3 col = mix(vec3(0.05, 0.14, 0.1), vec3(0.2, 0.42, 0.3), n);
-  col += vec3(0.55, 0.9, 0.7) * smoothstep(0.62, 0.8, n) * 0.35;
-  col = mix(col, vec3(0.75, 0.95, 0.85), rimFoam);
-  gl_FragColor = vec4(col, (0.66 + 0.22 * n + 0.3 * rimFoam) * uAlpha);
+  vec3 col = mix(vec3(0.03, 0.08, 0.065), vec3(0.11, 0.26, 0.19), n);
+  col += vec3(0.45, 0.8, 0.62) * smoothstep(0.66, 0.82, n) * 0.22;
+  col = mix(col, vec3(0.5, 0.72, 0.62), rimFoam * 0.6);
+  gl_FragColor = vec4(col, (0.62 + 0.22 * n + 0.12 * rimFoam) * uAlpha);
   #include <colorspace_fragment>
 }
 `;
@@ -361,6 +361,7 @@ export class BastionBossFx {
   private lampSampleAge = 0;
   private beamSlot: { x: number; z: number } | null = null;
   private floodLevel = 0;
+  private floodTop = -Infinity;
   private scan = 0;
   private clock = 0;
   private readonly tmpPts = new Float32Array(LINKS * 3);
@@ -555,8 +556,8 @@ export class BastionBossFx {
           peak: 0.6,
         });
       }
-      const chunk = this.geo(new THREE.DodecahedronGeometry(0.42, 0));
-      const chunkMat = new THREE.MeshStandardMaterial({ color: 0x8a8e86, roughness: 0.95 });
+      const chunk = this.geo(new THREE.DodecahedronGeometry(0.3, 0));
+      const chunkMat = new THREE.MeshStandardMaterial({ color: 0x4d524c, roughness: 0.95 });
       this.materials.push(chunkMat);
       this.debrisMesh = new THREE.InstancedMesh(chunk, chunkMat, DEBRIS);
       this.debrisMesh.count = 0;
@@ -956,6 +957,8 @@ export class BastionBossFx {
       const wy = this.groundY(wx, wz) + WINCH_TOP;
       const py = p.pos.y + 1.2;
       const span = Math.hypot(p.pos.x - wx, p.pos.z - wz);
+      // A player displaced out of the yard (a dev jump) drops the chain.
+      if (span > 48) continue;
       chainPoints(wx, wy, wz, p.pos.x, py, p.pos.z, chainSag(span), LINKS, this.tmpPts);
       const hook = auraOf(p, OSSICK_HOOKED);
       const heat = hook ? hookHeat(hook.remaining, hook.duration) : 1;
@@ -1030,32 +1033,6 @@ export class BastionBossFx {
     const vael = this.vaelId >= 0 ? world.entities.get(this.vaelId) : undefined;
     const lamp = this.lampId >= 0 ? world.entities.get(this.lampId) : undefined;
     const veiled = !!vael && !vael.dead && hasAura(vael, VAEL_FOG_VEIL) && !!lamp;
-    if (veiled && lamp) {
-      if (Math.abs(lamp.facing - this.lampSample) > 1e-4 || this.lampSampleAge > 1) {
-        this.lampSample = lamp.facing;
-        this.lampSampleAge = 0;
-      }
-      const yaw = predictBeamYaw(this.lampSample, this.lampSampleAge);
-      const o = bastionSlotOrigin(lamp.pos.x, lamp.pos.z);
-      this.beamSlot = { x: o.x, z: o.z };
-      setBeaconYaw(o.x, o.z, yaw);
-      const cx = o.x + CROWN_DEF.x;
-      const cz = o.z + CROWN_DEF.z;
-      const floor = this.groundY(cx + CROWN_DEF.r * 0.6, cz);
-      this.beamPool.visible = true;
-      this.beamPool.position.set(cx, floor + LIFT + 0.05, cz);
-      this.beamPool.rotation.y = yaw;
-      this.beamPoolMat.opacity = 0.34 + 0.08 * Math.sin(this.clock * 9);
-      this.updateReveals(world, yaw, o, dt);
-    } else {
-      if (this.beamSlot) setBeaconYaw(this.beamSlot.x, this.beamSlot.z, null);
-      this.beamSlot = null;
-      this.beamPool.visible = false;
-      for (const r of this.reveals) {
-        r.entityId = -1;
-        r.flare.visible = r.shimmer.visible = r.shadow.visible = false;
-      }
-    }
     // The Hymn floods the crown while the shades sing.
     let hymn: EntityView | undefined;
     for (const id of this.veilIds) {
@@ -1069,13 +1046,41 @@ export class BastionBossFx {
     this.floodLevel += (target - this.floodLevel) * Math.min(1, dt * (hymn ? 3 : 0.8));
     const anchor = hymn ?? vael;
     this.flood.visible = this.floodLevel > 0.01 && !!anchor;
+    this.floodTop = -Infinity;
     if (this.flood.visible && anchor) {
       const o = bastionSlotOrigin(anchor.pos.x, anchor.pos.z);
       const cx = o.x + CROWN_DEF.x;
       const cz = o.z + CROWN_DEF.z;
       const floor = this.groundY(cx + CROWN_DEF.r * 0.6, cz);
-      this.flood.position.set(cx, floor + 0.05 + this.floodLevel * HYMN_FLOOD_DEPTH, cz);
+      this.floodTop = floor + 0.05 + this.floodLevel * HYMN_FLOOD_DEPTH;
+      this.flood.position.set(cx, this.floodTop, cz);
       this.floodMat.uniforms.uAlpha.value = Math.min(1, this.floodLevel * 3);
+    }
+    if (veiled && lamp) {
+      if (Math.abs(lamp.facing - this.lampSample) > 1e-4 || this.lampSampleAge > 1) {
+        this.lampSample = lamp.facing;
+        this.lampSampleAge = 0;
+      }
+      const yaw = predictBeamYaw(this.lampSample, this.lampSampleAge);
+      const o = bastionSlotOrigin(lamp.pos.x, lamp.pos.z);
+      this.beamSlot = { x: o.x, z: o.z };
+      setBeaconYaw(o.x, o.z, yaw);
+      const cx = o.x + CROWN_DEF.x;
+      const cz = o.z + CROWN_DEF.z;
+      const floor = this.groundY(cx + CROWN_DEF.r * 0.6, cz);
+      this.beamPool.visible = true;
+      this.beamPool.position.set(cx, Math.max(floor + LIFT + 0.05, this.floodTop + 0.04), cz);
+      this.beamPool.rotation.y = yaw;
+      this.beamPoolMat.opacity = 0.34 + 0.08 * Math.sin(this.clock * 9);
+      this.updateReveals(world, yaw, o, dt);
+    } else {
+      if (this.beamSlot) setBeaconYaw(this.beamSlot.x, this.beamSlot.z, null);
+      this.beamSlot = null;
+      this.beamPool.visible = false;
+      for (const r of this.reveals) {
+        r.entityId = -1;
+        r.flare.visible = r.shimmer.visible = r.shadow.visible = false;
+      }
     }
   }
 
@@ -1113,9 +1118,13 @@ export class BastionBossFx {
         (r.flare.material as THREE.SpriteMaterial).opacity = r.k * pulse;
         r.flare.position.set(e.pos.x, e.pos.y + 2.3 * e.scale, e.pos.z);
         const away = Math.atan2(e.pos.x - bx, e.pos.z - bz);
-        r.shadow.position.set(e.pos.x, floor + LIFT + 0.01, e.pos.z);
+        r.shadow.position.set(
+          e.pos.x,
+          Math.max(floor + LIFT + 0.01, this.floodTop + 0.02),
+          e.pos.z,
+        );
         r.shadow.rotation.y = away;
-        r.shadow.scale.set(1, 1, 9);
+        r.shadow.scale.set(1, 1, 5.5);
         r.shadowMat.uniforms.uAlpha.value = 0.72 * r.k;
       } else {
         (r.shimmer.material as THREE.SpriteMaterial).opacity =

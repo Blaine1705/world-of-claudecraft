@@ -46,7 +46,112 @@ export const SHOTS = [
   { id: 'patio_torreon', at: [-40, 140], face: -0.6, pitch: 0.24, dist: 16 },
   { id: 'jefe3_vael_corona', at: [-16, 190], face: 0.5, pitch: 0.3, dist: 20 },
   { id: 'faro_desde_abajo', at: [-12, 184], face: 0.3, pitch: -0.05, dist: 10 },
+  // The boss mechanics, live: pull the boss onto the player, fire the mechanic.
+  {
+    id: 'mecanica_olen_carga',
+    at: [67, 128],
+    face: 0,
+    yaw: -0.5,
+    pitch: 0.5,
+    dist: 22,
+    js: 'pull:knight_commander_olen',
+    bossAt: [49, 128],
+    stepWait: 150,
+    cmds: ['/dev bastion trigger charge'],
+    wait: 0,
+  },
+  {
+    id: 'mecanica_olen_choque',
+    at: [67, 128],
+    face: 0,
+    yaw: -0.5,
+    pitch: 0.5,
+    dist: 22,
+    js: 'pull:knight_commander_olen',
+    bossAt: [49, 128],
+    stepWait: 150,
+    cmds: ['/dev bastion trigger charge'],
+    wait: 1750,
+  },
+  {
+    id: 'mecanica_ossick_gancho',
+    at: [10, 16],
+    face: 0,
+    yaw: -2.2,
+    pitch: 0.5,
+    dist: 22,
+    js: 'pull:gaoler_ossick',
+    bossAt: [-6, 30],
+    stepWait: 150,
+    cmds: ['/dev bastion trigger hook'],
+    wait: 1400,
+  },
+  {
+    id: 'mecanica_vael_velo',
+    at: [-4, 184],
+    face: 0,
+    yaw: 0,
+    pitch: 0.55,
+    dist: 26,
+    js: 'pull:vael_the_mistcaller',
+    bossAt: [-4, 196],
+    stepWait: 150,
+    cmds: ['/dev bastion trigger veil'],
+    wait: 6000,
+  },
+  {
+    id: 'mecanica_vael_revelado',
+    at: [-4, 184],
+    face: 0,
+    yaw: 0,
+    pitch: 0.55,
+    dist: 26,
+    js: 'pull:vael_the_mistcaller',
+    stepWait: 150,
+    reveal: true,
+    wait: 200,
+  },
+  {
+    id: 'mecanica_ermitano_repliegue',
+    at: [36, -78],
+    face: 0,
+    yaw: Math.PI,
+    pitch: 0.35,
+    dist: 24,
+    js: 'withdraw:turretback_hermit',
+    bossAt: [36, -96],
+    wait: 1600,
+  },
 ];
+
+/** In-page helpers for a shot's js step: pull a boss onto the player (offline
+ *  Sim only), or pull the Hermit and knock it under its withdraw line. */
+function pageStep([step, origin, bossAt]) {
+  const sim = window.__game.world;
+  const me = sim.player;
+  const [verb, id] = step.split(':');
+  let best = null;
+  let bestD = Infinity;
+  for (const e of sim.entities.values()) {
+    if (e.kind !== 'mob' || e.dead || e.templateId !== id) continue;
+    const d = Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z);
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
+  }
+  if (!best) return 'none';
+  me.hp = me.maxHp;
+  me.devNoAggro = false;
+  if (bossAt) {
+    best.pos.x = origin.x + bossAt[0];
+    best.pos.z = origin.z + bossAt[1];
+    best.prevPos = { ...best.pos };
+  }
+  sim.aggroMob(best, me, false);
+  if (verb === 'withdraw') best.hp = Math.floor(best.maxHp * 0.2);
+  return best.id;
+}
 
 async function main() {
   const gpu = process.env.SHOT_GPU !== '0';
@@ -130,6 +235,14 @@ async function main() {
         `/dev tp ${origin.x + lx} ${origin.z + lz}`,
       );
       await sleep(700);
+      if (shot.js) {
+        console.log(
+          'STEP',
+          shot.id,
+          await page.evaluate(pageStep, [shot.js, origin, shot.bossAt ?? null]),
+        );
+        await sleep(shot.stepWait ?? 900);
+      }
       for (const c of shot.cmds ?? []) {
         await page.evaluate((cmd) => window.__game.world.chat(cmd), c);
         await sleep(1300);
@@ -144,6 +257,46 @@ async function main() {
         input.camDist = s.dist;
       }, shot);
       await sleep(shot.wait ?? 2800);
+      if (shot.reveal) {
+        // Wait for the Fogbeacon's beam to find the REAL Vael.
+        await page
+          .waitForFunction(
+            () => {
+              const sim = window.__game.world;
+              let vael = null;
+              let lamp = null;
+              for (const e of sim.entities.values()) {
+                if (e.templateId === 'vael_the_mistcaller' && !e.dead) vael = e;
+                if (e.templateId === 'bastion_beacon_lamp') lamp = e;
+              }
+              if (!vael || !lamp) return false;
+              const a = Math.atan2(vael.pos.x - lamp.pos.x, vael.pos.z - lamp.pos.z);
+              let d = a - lamp.facing;
+              while (d > Math.PI) d -= Math.PI * 2;
+              while (d < -Math.PI) d += Math.PI * 2;
+              return d > -0.05 && d < 0.02;
+            },
+            { timeout: 15000, polling: 30 },
+          )
+          .catch(() => console.log('reveal wait timed out'));
+      }
+      if (shot.js) {
+        const probe = await page.evaluate((step) => {
+          const sim = window.__game.world;
+          const id = step.split(':')[1];
+          const me = sim.player;
+          const out = [];
+          for (const e of sim.entities.values()) {
+            if (e.templateId !== id) continue;
+            out.push({ ai: e.aiState, cast: e.castingAbility, dead: e.dead, x: Math.round(e.pos.x - me.pos.x), z: Math.round(e.pos.z - me.pos.z), aggro: e.aggroTargetId, fight: e.bastionFight?.kind });
+          }
+          return JSON.stringify({ me: me.id, out });
+        }, shot.js);
+        console.log('PROBE', shot.id, probe);
+      }
+      const file = path.join(OUT, `${PREFIX}${shot.id}.png`);
+      await page.screenshot({ path: file });
+      console.log('SHOT', file);
       const perf = await page.evaluate(
         () =>
           new Promise((resolve) => {
@@ -164,9 +317,6 @@ async function main() {
           }),
       );
       console.log('PERF', shot.id, JSON.stringify(perf));
-      const file = path.join(OUT, `${PREFIX}${shot.id}.png`);
-      await page.screenshot({ path: file });
-      console.log('SHOT', file);
     }
   } finally {
     await browser.close();

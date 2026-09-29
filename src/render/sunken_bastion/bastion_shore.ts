@@ -41,7 +41,8 @@ export function buildHeadlandRock(lowGfx: boolean): THREE.Mesh {
         heights[Math.min(rows - 1, j + 1) * cols + i] - heights[Math.max(0, j - 1) * cols + i];
       const slope = Math.hypot(hx, hz) / (2 * step);
       const grass =
-        Math.max(0, 1 - slope * 1.6) * Math.min(1, Math.max(0, (above - 3) / 3)) *
+        Math.max(0, 1 - slope * 1.6) *
+        Math.min(1, Math.max(0, (above - 3) / 3)) *
         (0.6 + 0.4 * rockNoise(x * 0.6 + 40, z * 0.6));
       const lichen = Math.max(0, rockNoise(x * 1.7, z * 1.7) - 0.55) * Math.min(1, above / 10);
       // Dark wet basalt, warmer higher up: the terraces must read first.
@@ -119,8 +120,11 @@ void main() {
   p.y += (4.0 + aSeed.z * 7.0) * life - 11.0 * life * life + 0.3;
   vec4 mv = viewMatrix * modelMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mv;
-  gl_PointSize = min(90.0, (5.0 + aSeed.z * 9.0) * (1.0 + life * 1.5) * (300.0 / max(1.0, -mv.z)));
-  vAlpha = burst * (1.0 - life * 0.6) * step(uSea - 0.5, p.y);
+  gl_PointSize = min(44.0, (3.0 + aSeed.z * 5.0) * (1.0 + life * 1.2) * (300.0 / max(1.0, -mv.z)));
+  // Spray right under the camera (a yard on the water) thins out instead of
+  // filling the view with bright discs.
+  float nearFade = smoothstep(12.0, 45.0, -mv.z);
+  vAlpha = burst * (1.0 - life * 0.6) * step(uSea - 0.5, p.y) * nearFade;
 }
 `;
 
@@ -129,7 +133,7 @@ precision highp float;
 varying float vAlpha;
 void main() {
   float d = length(gl_PointCoord - 0.5) * 2.0;
-  float a = pow(max(0.0, 1.0 - d), 1.8) * vAlpha * 0.55;
+  float a = pow(max(0.0, 1.0 - d), 2.6) * vAlpha * 0.28;
   gl_FragColor = vec4(vec3(0.92, 0.95, 0.94), a);
   #include <colorspace_fragment>
 }
