@@ -8,6 +8,12 @@
 // inside meleeSwing (druidEngineOnLandedStrike keyed on the ability id), so a
 // feral banks 1 per landed hit up to the 3-stage cap with nothing extra here.
 //
+// The sweep also SPOTS stealthers: every hostile it reaches that is hidden
+// (any stealth aura, Vanish included) is pulled out of stealth through the
+// single ctx.breakStealth funnel BEFORE the swings roll, so a missed or
+// dodged swing still reveals. The sweep goes off with nobody in reach too
+// (requiresTarget false), which is what makes it a stealth check. No rng.
+//
 // Determinism: targets are collected first (hostilesInRadius order, then the
 // line-of-sight gate, which draws no rng), then each swing draws its own hit
 // table in that order, exactly as a single weaponStrike would per target. A
@@ -49,6 +55,9 @@ export function resolveWeaponSweep(
   opts: WeaponSweepOpts,
 ): number {
   const targets = weaponSweepTargets(ctx, p, radius);
+  for (const target of targets) {
+    if (target.auras.some((aura) => aura.kind === 'stealth')) ctx.breakStealth(target);
+  }
   ctx.emit({
     type: 'spellfx',
     sourceId: p.id,

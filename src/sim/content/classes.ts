@@ -6718,9 +6718,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'druid',
     // The Cat Form sweep builder: Rendclaw's damage profile (the same flat
     // bonus per rank, the same Wildfang baseline row in spec_baselines.ts) and
-    // Rendclaw's price, but every enemy within Sweeping Claws' 5 yd takes its
-    // own swing (combat/druid_scratch.ts), each landed hit paying a combo point.
-    learnLevel: 10,
+    // Rendclaw's price and learn level (baseline for every druid), but every
+    // enemy within 6 yd takes its own swing (combat/druid_scratch.ts), each
+    // landed hit paying a combo point. Usable with nobody in reach: the sweep
+    // still goes off and spots any stealthed enemy inside it.
+    learnLevel: 5,
     cost: 45,
     castTime: 0,
     cooldown: 0,
@@ -6729,17 +6731,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     awardsCombo: 1,
     requiresForm: 'cat',
-    effects: [{ type: 'weaponStrike', bonus: 25, sweepRadius: 5 }],
+    effects: [{ type: 'weaponStrike', bonus: 25, sweepRadius: 6 }],
     ranks: [
       {
         rank: 2,
         level: 18,
         cost: 45,
-        effects: [{ type: 'weaponStrike', bonus: 55, sweepRadius: 5 }],
+        effects: [{ type: 'weaponStrike', bonus: 55, sweepRadius: 6 }],
       },
     ],
     description:
-      'Scratch through nearby targets for weapon damage plus $d. Awards 1 combo point per target hit. Cat Form only.',
+      'Scratch through nearby targets within 6 yd for weapon damage plus $d. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
     specNotes: {
       feral: 'Each hit that lands adds 1 Old Blood (max 3).',
     },

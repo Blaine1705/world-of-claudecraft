@@ -126,13 +126,18 @@ describe('2. Scratch', () => {
     expect(def.class).toBe('druid');
     expect(def.requiresForm).toBe('cat');
     expect(def.awardsCombo).toBe(1);
+    // Baseline like Rendclaw: every druid, same learn level, no spec gate,
+    // castable with no target, and it lives in the spellbook (the class kit).
+    expect(def.learnLevel).toBe(claw.learnLevel);
+    expect(def.specs).toBeUndefined();
+    expect(def.requiresTarget).toBe(false);
     expect(CLASSES.druid.abilities).toContain('scratch');
     // Same cost and the same flat bonus at every rank, plus the sweep.
     expect(def.cost).toBe(claw.cost);
     const bonus = (effects: readonly AbilityEffect[]): (number | null)[] =>
       effects.map((eff) => (eff.type === 'weaponStrike' ? eff.bonus : null));
     expect(bonus(def.effects)).toEqual(bonus(claw.effects));
-    expect(def.effects).toEqual([{ type: 'weaponStrike', bonus: 25, sweepRadius: 5 }]);
+    expect(def.effects).toEqual([{ type: 'weaponStrike', bonus: 25, sweepRadius: 6 }]);
     expect(def.ranks?.map((r) => [r.level, r.cost, bonus(r.effects)])).toEqual(
       claw.ranks?.map((r) => [r.level, r.cost, bonus(r.effects)]),
     );
@@ -145,12 +150,12 @@ describe('2. Scratch', () => {
     expect(row('scratch')).toEqual({ ...row('claw'), ability: 'scratch' });
   });
 
-  it('collects only live hostiles inside the sweep radius', () => {
+  it('collects only live hostiles inside the 6 yd sweep', () => {
     const { sim, player } = rig('feral');
     const near = spawnMob(sim, 2, 0);
-    const edge = spawnMob(sim, 0, 7);
-    const far = spawnMob(sim, 0, 20);
-    const hit = weaponSweepTargets(rawCtx(sim), player, 8).map((entity) => entity.id);
+    const edge = spawnMob(sim, 0, 5.5);
+    const far = spawnMob(sim, 0, 7.5);
+    const hit = weaponSweepTargets(rawCtx(sim), player, 6).map((entity) => entity.id);
     expect(hit).toContain(near.id);
     expect(hit).toContain(edge.id);
     expect(hit).not.toContain(far.id);
@@ -201,6 +206,62 @@ describe('2. Scratch', () => {
     });
     expect(player.comboPoints).toBe(2);
     expect(player.auras.some((aura) => aura.id === OLD_BLOOD_ID)).toBe(false);
+  });
+
+  it('goes off with nobody in reach: energy spent, no combo, no auto-attack', () => {
+    const { sim, player } = rig('feral');
+    shiftIntoCat(sim);
+    const before = player.resource;
+    const events = (() => {
+      sim.castAbility('scratch');
+      return sim.tick();
+    })();
+    expect(player.resource).toBeLessThan(before);
+    expect(player.comboPoints).toBe(0);
+    expect(events.some((e) => e.type === 'error')).toBe(false);
+    expect(player.autoAttack).toBe(false);
+  });
+
+  it('never turns on auto-attack, even when it lands', () => {
+    const { sim, player } = rig('feral');
+    shiftIntoCat(sim);
+    spawnMob(sim, 2, 0);
+    alwaysLand(sim, () => {
+      sim.castAbility('scratch');
+      sim.tick();
+    });
+    expect(player.comboPoints).toBe(1);
+    expect(player.autoAttack).toBe(false);
+  });
+
+  it('spots a stealthed enemy in the sweep even when the swing misses', () => {
+    const { sim, player } = rig('feral');
+    shiftIntoCat(sim);
+    const lurker = spawnMob(sim, 2, 0);
+    lurker.auras.push(testAura(lurker, 'stealth', 'stealth'));
+    lurker.stealthed = true;
+    const outside = spawnMob(sim, 0, 12);
+    outside.auras.push(testAura(outside, 'stealth', 'stealth'));
+    outside.stealthed = true;
+
+    // A roll of 0 lands every swing on the bottom of the hit table: a miss.
+    // biome-ignore lint/suspicious/noExplicitAny: reaching the Rng behind SimContext.
+    const rng = rawCtx(sim).rng as any;
+    const realRoll = rng.next.bind(rng);
+    rng.next = () => 0;
+    try {
+      sim.castAbility('scratch');
+      sim.tick();
+    } finally {
+      rng.next = realRoll;
+    }
+
+    expect(lurker.hp).toBe(lurker.maxHp);
+    expect(lurker.auras.some((aura) => aura.kind === 'stealth')).toBe(false);
+    expect(lurker.stealthed).toBe(false);
+    // Outside the 6 yd sweep nothing is spotted.
+    expect(outside.auras.some((aura) => aura.kind === 'stealth')).toBe(true);
+    expect(outside.stealthed).toBe(true);
   });
 
   it('refuses outside Cat Form and bills nothing', () => {
