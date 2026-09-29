@@ -33,14 +33,27 @@ export function buildHeadlandRock(lowGfx: boolean): THREE.Mesh {
       const above = y - sea;
       const wet = Math.max(0, 1 - Math.abs(above) / 2.2);
       const weed = Math.max(0, 1 - Math.abs(above - 2.6) / 2.2);
+      // Slope from the grid: flat ledges grow a mat of salt grass and sea pink,
+      // steep faces stay bare wet rock.
+      const hx =
+        heights[j * cols + Math.min(cols - 1, i + 1)] - heights[j * cols + Math.max(0, i - 1)];
+      const hz =
+        heights[Math.min(rows - 1, j + 1) * cols + i] - heights[Math.max(0, j - 1) * cols + i];
+      const slope = Math.hypot(hx, hz) / (2 * step);
+      const grass =
+        Math.max(0, 1 - slope * 1.6) * Math.min(1, Math.max(0, (above - 3) / 3)) *
+        (0.6 + 0.4 * rockNoise(x * 0.6 + 40, z * 0.6));
       const lichen = Math.max(0, rockNoise(x * 1.7, z * 1.7) - 0.55) * Math.min(1, above / 10);
-      // Dark wet basalt-grey, warmer higher up; the terraces must read first.
-      const tone = 0.13 + rockNoise(x, z) * 0.07 + Math.min(0.05, above * 0.0025);
+      // Dark wet basalt, warmer higher up: the terraces must read first.
+      const tone = 0.075 + rockNoise(x, z) * 0.05 + Math.min(0.03, above * 0.0015);
+      const r = tone * 1.08 * (1 - wet * 0.5) + weed * 0.01 + lichen * 0.03;
+      const g = tone * (1 - wet * 0.45) + weed * 0.03 + lichen * 0.035;
+      const b = tone * 0.88 * (1 - wet * 0.4) + weed * 0.006 + lichen * 0.018;
       colors.set(
         [
-          tone * 1.05 * (1 - wet * 0.55) + weed * 0.012 + lichen * 0.05,
-          tone * (1 - wet * 0.5) + weed * 0.04 + lichen * 0.06,
-          tone * 0.9 * (1 - wet * 0.45) + weed * 0.01 + lichen * 0.03,
+          r * (1 - grass) + 0.07 * grass,
+          g * (1 - grass) + 0.09 * grass,
+          b * (1 - grass) + 0.045 * grass,
         ],
         k * 3,
       );

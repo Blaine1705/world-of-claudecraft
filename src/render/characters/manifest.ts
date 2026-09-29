@@ -22,9 +22,11 @@ import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_minibos
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import {
   BASTION_BRINE_MEND,
+  BASTION_CLAW_SWEEP,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
   BASTION_PIERCING_BOLT,
+  BASTION_SHELL_SLAM,
 } from '../../sim/mob/trash_kit/bastion_cast_ids';
 import {
   CRYPT_BONECHILL_BREATH,
@@ -3802,6 +3804,28 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.55,
   },
 
+  // The Turretback Hermit, the Bastion's showpiece (scripts/assets/
+  // sunken_bastion_creatures/build_creature.py): a colossal hermit crab
+  // wearing a fallen watchtower turret, the tower swaying on its back. Its
+  // casts play their own clips: the great claw drawn back and raked across
+  // its front (Claw Sweep), and the rear-and-slam of the tower (Shell Slam).
+  mob_turretback: {
+    url: `${CREATURES}/turretback_hermit.glb`,
+    height: 11,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [BASTION_CLAW_SWEEP]: 'ClawSweep', [BASTION_SHELL_SLAM]: 'ShellSlam' },
+      castTimeScaleByAbility: { [BASTION_CLAW_SWEEP]: 1, [BASTION_SHELL_SLAM]: 1 },
+    },
+    selfIllumination: 0.12,
+  },
+
   // -- humanoid mobs (KayKit adventurers) ------------------------------------
   mob_bandit: {
     url: `${PLAYERS}/rogue_hooded.glb`,
@@ -4855,7 +4879,7 @@ const MOB_KEYS: Record<string, string> = {
   drowned_sergeant: 'bastion_skel_sergeant',
   shackled_prisoner: 'skel_minion',
   gaol_turnkey: 'mob_bruiser',
-  turretback_hermit: 'mob_crab',
+  turretback_hermit: 'mob_turretback',
   gaoler_ossick: 'skel_golem',
   // delve enemies
   reliquary_ledger_wraith: 'delve_skel_wraith',
