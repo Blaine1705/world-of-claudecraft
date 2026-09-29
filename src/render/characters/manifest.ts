@@ -20,6 +20,15 @@ import {
 } from '../../sim/ignivar_raid_ids';
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
+import {
+  CRYPT_BONECHILL_BREATH,
+  CRYPT_GRAVE_BOLT,
+  CRYPT_GRAVE_CLEAVE,
+  CRYPT_MURDER_CALL,
+  CRYPT_RAISE_BONES,
+  CRYPT_TAIL_LASH,
+  CRYPT_WING_GUST,
+} from '../../sim/mob/trash_kit/cast_ids';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
 import {
   HOARD_CAST_BAT_DIVE,
@@ -3607,6 +3616,121 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.25,
   },
 
+  // -- the Hollow Crypt trash (sim/content/hollow_crypt_trash.ts) ----------------
+  // The KayKit skeletons with the trash kit's casts on their own gestures: the
+  // Grave Cleave winds up the two-hand chop over its bar, the Raise Bones
+  // channel lifts both arms, the Grave Bolt is the shooting cast.
+  crypt_skel_warrior: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
+    height: 2.5,
+    clips: {
+      ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      castByAbility: { [CRYPT_GRAVE_CLEAVE]: '2H_Melee_Attack_Chop' },
+      castTimeScaleByAbility: { [CRYPT_GRAVE_CLEAVE]: 0.7 },
+    },
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_adept: {
+    url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
+    height: 2.5,
+    clips: {
+      ...skeletonClips(['2H_Melee_Attack_Chop']),
+      castByAbility: { [CRYPT_GRAVE_BOLT]: 'Spellcast_Shoot' },
+      castTimeScaleByAbility: { [CRYPT_GRAVE_BOLT]: 0.6 },
+    },
+    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  crypt_skel_necromancer: {
+    url: `${ENEMIES}/necromancer.glb`,
+    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    height: 2.5,
+    clips: {
+      ...skeletonClips(['2H_Melee_Attack_Chop']),
+      castByAbility: { [CRYPT_RAISE_BONES]: 'Spellcast_Raise' },
+    },
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  // A hooded cultist of the Gravecallers with a crooked staff: calls the crows.
+  mob_crypt_crow_caller: {
+    url: `${PLAYERS}/rogue_hooded.glb`,
+    animUrls: [`${PLAYERS}/rogue_hooded_hit_variety_anims.glb`],
+    height: HUMANOID_H,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      castByAbility: { [CRYPT_MURDER_CALL]: 'Spellcast_Raise' },
+    },
+    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.6,
+  },
+  // Blender-built creatures (scripts/assets/hollow_crypt_creatures/, rigid-skinned,
+  // vertex-coloured, facing +Z): the Chapel Gargoyle crouches still as a statue on
+  // its perch (Idle), lopes (Walk), flies (Run) and rears to shriek (Cast).
+  mob_crypt_gargoyle: {
+    url: `${CREATURES}/crypt_gargoyle.glb`,
+    height: 2.6,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    // Weathered pale stone under a night moon reads as a black cut-out without it.
+    selfIllumination: 0.3,
+  },
+  // The Carrion Crow is always on the wing: `hover` lifts it and its Death clip
+  // drops the body onto the floor.
+  mob_crypt_crow: {
+    url: `${CREATURES}/crypt_crow.glb`,
+    height: 0.9,
+    hover: 1.4,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    selfIllumination: 0.15,
+  },
+  // The Ossuary Drake: it flaps whenever it moves (it flies its patrol and runs
+  // on the wing), stands to fight, and has a clip for each of its strikes.
+  mob_crypt_drake: {
+    url: `${CREATURES}/crypt_drake.glb`,
+    height: 6.5,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [CRYPT_BONECHILL_BREATH]: 'Breath',
+        [CRYPT_TAIL_LASH]: 'TailLash',
+        [CRYPT_WING_GUST]: 'WingGust',
+      },
+      castTimeScaleByAbility: {
+        [CRYPT_BONECHILL_BREATH]: 1,
+        [CRYPT_TAIL_LASH]: 1.25,
+        [CRYPT_WING_GUST]: 0.95,
+      },
+    },
+    selfIllumination: 0.1,
+  },
+
   // -- humanoid mobs (KayKit adventurers) ------------------------------------
   mob_bandit: {
     url: `${PLAYERS}/rogue_hooded.glb`,
@@ -4639,6 +4763,17 @@ const MOB_KEYS: Record<string, string> = {
   sexton_marrow: 'skel_mage',
   morthen: 'skel_boss',
   crypt_shambler: 'skel_rogue',
+  // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
+  crypt_ossuary_warrior: 'crypt_skel_warrior',
+  crypt_gravecaller_adept: 'crypt_skel_adept',
+  crypt_ossuary_cutthroat: 'skel_rogue',
+  crypt_gravecaller_necromancer: 'crypt_skel_necromancer',
+  crypt_bone_minion: 'skel_minion',
+  crypt_bone_brute: 'skel_golem',
+  crypt_chapel_gargoyle: 'mob_crypt_gargoyle',
+  crypt_crow_caller: 'mob_crypt_crow_caller',
+  crypt_carrion_crow: 'mob_crypt_crow',
+  crypt_ossuary_drake: 'mob_crypt_drake',
   // delve enemies
   reliquary_ledger_wraith: 'delve_skel_wraith',
   reliquary_funeral_ringer: 'delve_skel_ringer',

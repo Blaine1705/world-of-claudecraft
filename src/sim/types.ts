@@ -6055,6 +6055,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  perch, held while it waits (mob/trash_kit). Sim authority; the height is
    *  mirrored through pos.y. */
   perchY?: number;
+  /** The height a perched or flying dungeon mob was up at on its last idle
+   *  tick (mob/trash_kit): its pull descends from here, since the mob AI of
+   *  the pull tick has already stood it on the floor. Sim authority only. */
+  airY?: number;
   /** Per-pull state of a dungeon trash kit (MobTemplate.trashKit, mob/trash_kit).
    *  Sim authority only; cleared whenever the mob leaves combat. */
   trashKit?: TrashKitState;

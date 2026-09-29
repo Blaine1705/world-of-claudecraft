@@ -335,6 +335,31 @@ describe('trash kit: Ossuary Drake', () => {
     expect(drake.pos.y).toBeCloseTo(loop.flightY ?? 0, 3);
   });
 
+  it('glides down from its flight when a player below pulls it (full sim ticks)', () => {
+    const r = room();
+    const idx = HOLLOW_CRYPT_SPAWNS.findIndex((s) => s.mobId === 'crypt_ossuary_drake');
+    const drake = r.sim.ctx.entities.get(r.inst.mobIds[idx]) as Entity;
+    for (let i = 0; i < 20; i++) r.sim.tick();
+    const flightY = drake.dungeonPatrol?.flightY ?? 0;
+    expect(drake.pos.y).toBeCloseTo(flightY, 3);
+    // Stand right under it: the pass overhead is the pull.
+    r.me.pos = r.sim.ctx.groundPos(drake.pos.x, drake.pos.z);
+    r.me.prevPos = { ...r.me.pos };
+    r.sim.rebucket(r.me);
+    const land = MOBS.crypt_ossuary_drake.trashKit?.land?.seconds ?? 1;
+    let midAir = false;
+    for (let t = 0; t < land + 0.5; t += DT) {
+      r.sim.tick();
+      const floor = authoredFieldHeight(HOLLOW_CRYPT_FIELD, drake.pos.x - r.ox, drake.pos.z - r.oz);
+      if (drake.pos.y > floor + 2 && drake.pos.y < flightY - 2) midAir = true;
+    }
+    expect(drake.aiState === 'chase' || drake.aiState === 'attack').toBe(true);
+    // It came down through the air, not in one snap.
+    expect(midAir).toBe(true);
+    const floor = authoredFieldHeight(HOLLOW_CRYPT_FIELD, drake.pos.x - r.ox, drake.pos.z - r.oz);
+    expect(drake.pos.y).toBeCloseTo(floor, 3);
+  });
+
   it('lands when pulled, then lashes whoever stands behind it', () => {
     const r = room();
     const drake = engage(r, 'crypt_ossuary_drake', 0, 6);

@@ -85,12 +85,17 @@ export function startTrashKit(ctx: SimContext, mob: Entity, kit: TrashKitDef): T
   }
   if (kit.leap) timers.leap = kit.leap.first;
   const st: TrashKitState = { timers, cast: null, leap: null, descent: null, engaged: 0, casts: 0 };
-  // Pulled off a perch or out of the sky: come down first.
+  // Pulled off a perch or out of the sky: come down first. The mob AI has
+  // already stood it on the floor this tick, so the height it was up at is the
+  // one its last idle tick recorded.
   const floor = groundY(ctx, mob);
-  if (mob.pos.y > floor + AIRBORNE) {
+  const upAt = Math.max(mob.pos.y, mob.airY ?? -Infinity);
+  mob.airY = undefined;
+  if (upAt > floor + AIRBORNE) {
     const dive = mob.perchY !== undefined;
+    mob.pos.y = upAt;
     st.descent = {
-      fromY: mob.pos.y,
+      fromY: upAt,
       t: 0,
       seconds: dive ? (kit.perch?.diveSeconds ?? 1) : (kit.land?.seconds ?? 1.5),
       dive,
@@ -533,6 +538,8 @@ function stepMob(
   if (!engaged || !kit) {
     if (mob.trashKit) endTrashKit(mob);
     holdPerch(mob);
+    // Remember how high it waits (a perch, a flight loop) for its pull.
+    mob.airY = mob.pos.y > groundY(ctx, mob) + AIRBORNE ? mob.pos.y : undefined;
     return;
   }
   const st = mob.trashKit ?? startTrashKit(ctx, mob, kit);

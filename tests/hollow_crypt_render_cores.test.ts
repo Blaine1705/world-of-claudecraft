@@ -23,8 +23,24 @@ import {
   riverPointAt,
 } from '../src/render/hollow_crypt/crypt_plan_core';
 import { HOLLOW_CRYPT_SET_DRESSING } from '../src/render/hollow_crypt/crypt_set_dressing_core';
+import {
+  boneBurstPhase,
+  boneBurstSpec,
+  coneFan,
+  cryptTelegraphSpecs,
+  telegraphFill,
+  telegraphYaw,
+} from '../src/render/hollow_crypt/crypt_trash_fx_core';
 import { HOLLOW_CRYPT_FIELD } from '../src/sim/content/hollow_crypt_layout';
+import { MOBS } from '../src/sim/data';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
+import {
+  CRYPT_BONECHILL_BREATH,
+  CRYPT_GRAVE_CLEAVE,
+  CRYPT_STONE_SHRIEK,
+  CRYPT_TAIL_LASH,
+  CRYPT_WING_GUST,
+} from '../src/sim/mob/trash_kit';
 
 describe('authored field terrain plan', () => {
   it('ear-clips a concave polygon into triangles covering its exact area', () => {
@@ -158,5 +174,51 @@ describe('gate reveal memory', () => {
       prev = o;
     }
     expect(gateOpenness(0, 1, GATE_REVEAL_SECONDS)).toBe(1);
+  });
+});
+
+describe('crypt trash telegraphs', () => {
+  it('draws every dodge-able trash cast at the size the sim resolves it at', () => {
+    const specs = cryptTelegraphSpecs();
+    const warrior = MOBS.crypt_ossuary_warrior.breathCone;
+    expect(specs[CRYPT_GRAVE_CLEAVE]).toMatchObject({
+      shape: 'cone',
+      range: warrior?.range,
+      arcDeg: warrior?.arcDeg,
+    });
+    const drake = MOBS.crypt_ossuary_drake;
+    expect(specs[CRYPT_BONECHILL_BREATH].range).toBe(drake.breathCone?.range);
+    expect(specs[CRYPT_TAIL_LASH]).toMatchObject({
+      shape: 'rearCone',
+      range: drake.trashKit?.tailLash?.range,
+    });
+    expect(specs[CRYPT_WING_GUST].range).toBe(drake.trashKit?.wingGust?.radius);
+    expect(specs[CRYPT_STONE_SHRIEK].range).toBe(
+      MOBS.crypt_chapel_gargoyle.trashKit?.screech?.radius,
+    );
+    // The tail lash points behind the drake.
+    expect(telegraphYaw('rearCone', 0.3)).toBeCloseTo(0.3 + Math.PI, 9);
+    expect(telegraphYaw('cone', 0.3)).toBe(0.3);
+  });
+
+  it('fills as the bar runs and lays a cone fan about +z', () => {
+    expect(telegraphFill(2, 2)).toBe(0);
+    expect(telegraphFill(0.5, 2)).toBeCloseTo(0.75, 9);
+    expect(telegraphFill(0, 2)).toBe(1);
+    const fan = coneFan(8, 90, 4);
+    expect(fan[0]).toEqual([0, 0]);
+    expect(fan).toHaveLength(6);
+    for (const [x, z] of fan.slice(1)) expect(Math.hypot(x, z)).toBeCloseTo(8, 9);
+    expect(fan[3][0]).toBeCloseTo(0, 9);
+    expect(fan[3][1]).toBeCloseTo(8, 9);
+  });
+
+  it('warns for the whole Bone Burst fuse, then flashes once', () => {
+    const { radius, delay } = boneBurstSpec();
+    expect(radius).toBe(MOBS.crypt_bone_minion.deathThroes?.radius);
+    expect(boneBurstPhase(0, delay)).toEqual({ stage: 'fuse', fill: 0 });
+    expect(boneBurstPhase(delay / 2, delay).fill).toBeCloseTo(0.5, 9);
+    expect(boneBurstPhase(delay + 0.1, delay).stage).toBe('flash');
+    expect(boneBurstPhase(delay + 5, delay).stage).toBe('done');
   });
 });

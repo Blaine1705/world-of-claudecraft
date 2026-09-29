@@ -36,6 +36,7 @@ import { HoardOrbitalLightning } from './hoard_orbital_lightning';
 import { HoardPulsarFx } from './hoard_pulsars';
 import { HoardSpellFx } from './hoard_spell_fx';
 import { HoardTentaclesFx } from './hoard_tentacles';
+import { CryptTrashFx } from './hollow_crypt/crypt_trash_fx';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -91,6 +92,8 @@ export class RiftDeathZoneVisuals {
   private readonly hoardCocoon: HoardCocoonFx;
   private readonly hoardGoblinCoins: HoardGoblinCoinsFx;
   private readonly hoardMimicCoins: HoardMimicCoinsFx;
+  // Dungeon trash telegraphs (the Hollow Crypt's cleaves, breaths, rings, bursts).
+  private readonly cryptTrash: CryptTrashFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -135,6 +138,7 @@ export class RiftDeathZoneVisuals {
     );
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
+    this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
     this.hoardGoblinCoins = new HoardGoblinCoinsFx(
       scene,
       groundY,
@@ -205,6 +209,7 @@ export class RiftDeathZoneVisuals {
     this.hoardCocoon.update(dt);
     this.hoardGoblinCoins.update(dt);
     this.hoardMimicCoins.update(dt);
+    this.cryptTrash.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -235,11 +240,13 @@ export class RiftDeathZoneVisuals {
     this.hoardCocoon.dispose();
     this.hoardGoblinCoins.dispose();
     this.hoardMimicCoins.dispose();
+    this.cryptTrash.dispose();
     this.hoardPresentation.dispose();
   }
 
   handleEvent(event: SimEvent): void {
     this.hoardPresentation.handleEvent(event);
+    this.cryptTrash.handleEvent(event);
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

@@ -102,6 +102,7 @@ function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: 
   if (template.trashKit?.perch) mob.perchY = mob.pos.y + lift;
   mob.pos.y += lift;
   mob.prevPos.y = mob.pos.y;
+  if (lift > 0) mob.airY = mob.pos.y;
   ctx.addEntity(mob);
   inst.mobIds.push(mob.id);
   ctx.aggroMob(mob, me, false);

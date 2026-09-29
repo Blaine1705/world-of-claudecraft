@@ -798,6 +798,7 @@ const RENDER_PURE_CORES = [
   'src/render/authored_field/field_mesh_core.ts',
   'src/render/hollow_crypt/crypt_plan_core.ts',
   'src/render/hollow_crypt/crypt_kit_plan_core.ts',
+  'src/render/hollow_crypt/crypt_trash_fx_core.ts',
   'src/render/hollow_crypt/crypt_set_dressing_core.ts',
   'src/render/hollow_crypt/crypt_gate_state_core.ts',
   'src/render/ambience_state_core.ts',
