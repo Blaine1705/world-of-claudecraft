@@ -271,6 +271,34 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   // (= healthMultiplier), so the hexcaller's Ancestral Sap heals 72-100 and
   // Thickhide Ward absorbs 140, both keeping pace with the doubled pools.
   // Pinned by tests/wildheart_normal_tuning.test.ts.
+  // The Sunken Bastion rework (docs/design/dungeon-rework/sunken_bastion.md):
+  // a health-only record. The bosses' pools come from target fight length x
+  // planning party DPS at levels 12 to 13 (about 75): Olen 80 s (about 6,000),
+  // Ossick 85 s (about 6,800), Vael 150 s (about 12,000), and the Turretback
+  // Hermit 60 s (about 4,500). Everything else keeps its raw template, so the
+  // mechanics land at their authored normal numbers.
+  sunken_bastion: {
+    id: 'sunken_bastion',
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    healthMultiplierByMob: {
+      knight_commander_olen: 6.42,
+      gaoler_ossick: 6.84,
+      vael_the_mistcaller: 8.05,
+      turretback_hermit: 3.66,
+    },
+    // The crawler and the prisoner carry a heroic-priced base swing (see
+    // their templates); normal damps it back to the fodder line.
+    damageMultiplierByMob: {
+      barnacle_crawler: 0.345,
+      shackled_prisoner: 0.345,
+    },
+    // ...but the damp is melee only: Brine Burst keeps its authored number.
+    mechanicDamageMultiplierByMob: {
+      barnacle_crawler: 1,
+      shackled_prisoner: 1,
+    },
+  },
   wildheart_basin: {
     id: 'wildheart_basin',
     difficulty: 'normal',
@@ -391,6 +419,35 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // 150); a tanked triple wave stacked on the boss was still overwhelming
     // healers after the 2026-07 retune.
     addDamageMultiplier: 9.75,
+    // The rework (docs/design/dungeon-rework/sunken_bastion.md): the bosses'
+    // pools set per boss from target fight length x heroic party DPS (about
+    // 230): Olen 80 s, Ossick 85 s, Vael 150 s; the Turretback Hermit 60 s.
+    healthMultiplierByMob: {
+      knight_commander_olen: 12,
+      gaoler_ossick: 12.75,
+      vael_the_mistcaller: 15.7,
+      turretback_hermit: 7.3,
+    },
+    // The light trash (the warhound, the ranged arbalest and the ward-casting
+    // mistweaver) carry softer templates; lift them to the 500 heroic floor.
+    damageMultiplierByMob: {
+      bastion_warhound: 19.6,
+      fogbound_arbalest: 21.6,
+      mistweaver: 21.6,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
+    // heroic), a fumbled boss core is lethal, an unavoidable pulse 15 percent.
+    mechanicDamageMultiplierByMob: {
+      drowned_watchman: 8,
+      fogbound_arbalest: 8,
+      barnacle_crawler: 8,
+      bastion_warhound: 8,
+      turretback_hermit: 8,
+      knight_commander_olen: 6,
+      gaoler_ossick: 6,
+      vael_the_mistcaller: 6,
+    },
     armorMultiplier: 1.3,
     finalBossId: 'vael_the_mistcaller',
     marksPerParticipant: 1,

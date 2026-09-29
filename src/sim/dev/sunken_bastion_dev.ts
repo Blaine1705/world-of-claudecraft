@@ -21,6 +21,7 @@
 
 import { SUNKEN_BASTION_ANCHORS } from '../content/sunken_bastion_layout';
 import { DUNGEONS, instanceOrigin, MOBS } from '../data';
+import { bastionDevTrigger } from '../encounters/sunken_bastion';
 import { createMob } from '../entity';
 import {
   applyDungeonMobTuning,
@@ -81,18 +82,6 @@ export const SUNKEN_BASTION_DEV_MOBS: Readonly<Record<string, string>> = {
   turnkey: 'gaol_turnkey',
   hermit: 'turretback_hermit',
 };
-
-/** A boss mechanic trigger: fires the named mechanic of an engaged boss now.
- *  Bound by the encounter modules (encounters/sunken_bastion) so this dev
- *  file stays free of their internals. */
-export type BastionDevTrigger = (ctx: SimContext, inst: InstanceSlot, what: string) => string;
-
-let trigger: BastionDevTrigger | null = null;
-
-/** The encounter barrel registers its trigger here at import. */
-export function registerBastionDevTrigger(fn: BastionDevTrigger): void {
-  trigger = fn;
-}
 
 const HELP =
   '[dev] /dev bastion enter [normal|heroic] | tp <landing|flats|seagate|bailey|chapelyard|cisternyard|drawbridge|rampart|towerone|towertwo|bastion|postern|gaol|yard|balconyone|balconytwo|court|crown> | gates | kill <f1|f2|fa|f3|b1|b2|hermit|r1|r2|rc|g1|g2|g3|gd|k1|k2|k3|olen|ossick|vael|all> | pack <id> | spawn <revenant|acolyte|watchman|arbalest|crawler|warhound|mistweaver|sergeant|prisoner|turnkey|hermit> | trigger <charge|hook|veil|surge> | reset';
@@ -215,11 +204,11 @@ export function handleSunkenBastionDevChat(ctx: SimContext, raw: string, pid: nu
   }
   if (verb === 'trigger') {
     const inst = claimFor(ctx, pid);
-    if (!inst || !trigger) {
+    if (!inst) {
       ctx.error(pid, HELP);
       return true;
     }
-    log(ctx, pid, `[dev] ${trigger(ctx, inst, arg)}`);
+    log(ctx, pid, `[dev] ${bastionDevTrigger(ctx, inst, arg)}`);
     return true;
   }
   if (verb === 'pack') {

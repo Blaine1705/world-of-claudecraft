@@ -41,6 +41,7 @@ import {
 import { NYTHRAXIS_EQUIPMENT_LOOT } from './nythraxis_loot';
 import {
   BRINE_MEND_KIT,
+  SUNKEN_BASTION_ENCOUNTER_OBJECTS,
   SUNKEN_BASTION_GATE_OBJECTS,
   SUNKEN_BASTION_GATES,
   SUNKEN_BASTION_SPAWNS,
@@ -688,8 +689,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   knight_commander_olen: {
     id: 'knight_commander_olen',
     name: 'Knight-Commander Olen',
-    minLevel: 13,
-    maxLevel: 13,
+    // Level 12 in the rework, so the dungeon ramps 12, 13, 13 (about 6,000
+    // health through the Bastion's normal tuning row).
+    minLevel: 12,
+    maxLevel: 12,
     family: 'undead',
     elite: true,
     // Named mid-boss: CC- and snare-immune on both difficulties (see morthen).
@@ -703,14 +706,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 7,
     aggroRadius: 14,
-    charge: {
-      minRange: 5,
-      maxRange: 30,
-      cooldown: 12,
-      stunDuration: 0.5,
-      name: 'Onrush',
-      school: 'physical',
-    },
+    // The Oathbound Charge (encounters/sunken_bastion/olen.ts) replaces his
+    // Onrush; the Reaping Arc cleave stays below.
     loot: [
       { copper: 800, chance: 1 },
       {
@@ -753,7 +750,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 26,
     moveSpeed: 7,
     aggroRadius: 16,
-    aoePulse: { min: 16, max: 24, radius: 12, every: 10, name: 'Mist Surge' },
+    // Mist Surge, the Fog Veil and the Drowning Hymn are his encounter module
+    // (encounters/sunken_bastion/vael.ts); the thralls stay template-driven.
     summonAdds: { mobId: 'drowned_thrall', count: 2, atHpPct: [0.6, 0.3] },
     loot: [
       { copper: 5000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
@@ -1582,7 +1580,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     // door: a second exit opens beside the Fogbeacon on his death.
     bossExitPortal: { x: 10, z: 192 },
     spawns: SUNKEN_BASTION_SPAWNS,
-    objects: SUNKEN_BASTION_GATE_OBJECTS,
+    objects: [...SUNKEN_BASTION_GATE_OBJECTS, ...SUNKEN_BASTION_ENCOUNTER_OBJECTS],
     gates: SUNKEN_BASTION_GATES,
     // No skipping: every pack is gated, and pulling Vael early still wakes
     // anything left alive (instances/boss_chain_pull.ts).

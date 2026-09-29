@@ -41,7 +41,13 @@ import type {
   MobTemplate,
   TrashKitDef,
 } from '../types';
-import { BAILEY_CHAPEL, DROWNING_YARD } from './sunken_bastion_layout';
+import {
+  BAILEY_CHAPEL,
+  BASTION_BUTTRESSES,
+  DROWNING_YARD,
+  FOGBEACON,
+  MOORING_POSTS,
+} from './sunken_bastion_layout';
 
 const BONE_LOOT = [
   { copper: 150, chance: 1 },
@@ -150,8 +156,12 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     family: 'beast',
     hpBase: 40,
     hpPerLevel: 10,
-    dmgBase: 5,
-    dmgPerLevel: 1.4,
+    // Priced so ONE template serves both roles on heroic: a pack crawler at the
+    // 18x trash line clears the 500 floor, the Hermit's summoned crawler at the
+    // 9.75x add line stays between the 150 add floor and 500. Normal damps it
+    // back to its fodder swing (dungeon_difficulty.ts, the normal row).
+    dmgBase: 14.5,
+    dmgPerLevel: 4.06,
     attackSpeed: 2,
     armorPerLevel: 16,
     moveSpeed: 7.5,
@@ -285,8 +295,10 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     family: 'undead',
     hpBase: 30,
     hpPerLevel: 9,
-    dmgBase: 4,
-    dmgPerLevel: 1.3,
+    // Same two-role pricing as the Barnacle Crawler (pack prisoner and the
+    // Turnkey's released prisoners share the template).
+    dmgBase: 11.6,
+    dmgPerLevel: 3.77,
     attackSpeed: 2.2,
     armorPerLevel: 6,
     moveSpeed: 6,
@@ -333,8 +345,10 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     ccImmune: true,
     slowImmune: true,
     untameable: true,
-    hpBase: 300,
-    hpPerLevel: 138,
+    // About 4,500 health on normal and 13,800 on heroic through the Bastion's
+    // tuning rows (dungeon_difficulty.ts healthMultiplierByMob).
+    hpBase: 150,
+    hpPerLevel: 32,
     dmgBase: 12,
     dmgPerLevel: 2.8,
     attackSpeed: 2.8,
@@ -380,6 +394,32 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     scale: 1.0,
     color: 0xb8a078,
   },
+  // Vael's Fog Shades (encounters/sunken_bastion/vael.ts): during a Fog Veil
+  // three of them stand on the rim with the real Vael, wearing his name, his
+  // health and his look. They never fight back; one hit bursts a shade.
+  vael_fog_shade: {
+    id: 'vael_fog_shade',
+    name: 'Vael the Fogbinder',
+    minLevel: 13,
+    maxLevel: 13,
+    family: 'humanoid',
+    elite: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 240,
+    hpPerLevel: 34,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 26,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    xpMult: 0,
+    idleStationary: true,
+    loot: [],
+    scale: 1.35,
+    color: 0x48c9b0,
+  },
   // Boss 2: Gaoler Ossick in the Drowning Yard (encounter module:
   // src/sim/encounters/sunken_bastion/ossick.ts).
   gaoler_ossick: {
@@ -391,8 +431,9 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     elite: true,
     ccImmune: true,
     slowImmune: true,
-    hpBase: 437,
-    hpPerLevel: 210,
+    // About 6,800 health on normal through the Bastion's tuning row.
+    hpBase: 120,
+    hpPerLevel: 26,
     dmgBase: 11,
     dmgPerLevel: 2.6,
     attackSpeed: 2.4,
@@ -711,3 +752,41 @@ export const SUNKEN_BASTION_GATE_OBJECTS: DungeonObjectSpawn[] = SUNKEN_BASTION_
   dungeonId: 'sunken_bastion',
   lootable: false,
 }));
+
+/** The encounter objects (encounters/sunken_bastion): Olen's four buttresses,
+ *  Ossick's four mooring posts and the Fogbeacon's lamp. Their template ids
+ *  carry their state (intact, cracked or broken; lit or dark), so the online
+ *  client mirrors each with the entity. */
+export const SUNKEN_BASTION_ENCOUNTER_OBJECTS: DungeonObjectSpawn[] = [
+  ...BASTION_BUTTRESSES.map(
+    (b): DungeonObjectSpawn => ({
+      itemId: '',
+      name: 'Buttress',
+      x: b.x,
+      z: b.z,
+      templateId: 'bastion_buttress_intact',
+      dungeonId: 'sunken_bastion',
+      lootable: false,
+    }),
+  ),
+  ...MOORING_POSTS.map(
+    (p): DungeonObjectSpawn => ({
+      itemId: '',
+      name: 'Lit Mooring Post',
+      x: p.x,
+      z: p.z,
+      templateId: 'bastion_post_lit',
+      dungeonId: 'sunken_bastion',
+      lootable: false,
+    }),
+  ),
+  {
+    itemId: '',
+    name: 'Fogbeacon',
+    x: FOGBEACON.x,
+    z: FOGBEACON.z,
+    templateId: 'bastion_beacon_lamp',
+    dungeonId: 'sunken_bastion',
+    lootable: false,
+  },
+];

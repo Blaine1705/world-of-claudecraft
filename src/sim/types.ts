@@ -4212,6 +4212,95 @@ export interface TrashKitState {
   withdrawn?: boolean;
 }
 
+/** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion),
+ *  on the boss entity; cleared when the fight ends (a kill, an evade, a wipe). */
+export interface OlenFightState {
+  kind: 'olen';
+  /** Seconds until the next Oathbound Charge is marked. */
+  chargeTimer: number;
+  /** The marked lane while the bar runs: its start, locked yaw, length, and the
+   *  buttress it ends in (null: the open rim). */
+  lane: { x: number; z: number; yaw: number; length: number; buttress: string | null } | null;
+  /** The charge in flight: where it set off and how far along it is. */
+  dash: {
+    x: number;
+    z: number;
+    yaw: number;
+    length: number;
+    buttress: string | null;
+    t: number;
+  } | null;
+  /** Unbroken Oath stacks gained this fight (the deed reads `everOath`). */
+  oath: number;
+  everOath: boolean;
+  /** Heroic Undertow Wake: flooded lanes still standing (their object ids). */
+  wakes: {
+    x: number;
+    z: number;
+    yaw: number;
+    length: number;
+    remaining: number;
+    tick: number;
+    objectId: number;
+  }[];
+}
+
+export interface OssickFightState {
+  kind: 'ossick';
+  hookTimer: number;
+  cudgelTimer: number;
+  /** Hooked players and the seconds left before the winch hauls. */
+  hooks: { playerId: number; remaining: number }[];
+  /** Sim time each mooring post is dark until (by post id). */
+  postDarkUntil: Record<string, number>;
+  /** Open the Cells thresholds already fired. */
+  cellsFired: number;
+  /** Anyone keelhauled this fight (the deed reads it). */
+  keelhauled: boolean;
+  /** Hook casts started (the deterministic victim hash salt). */
+  casts: number;
+  /** The players the running Gaol Hook bar will hook when it lands. */
+  pending: number[];
+}
+
+export interface VaelFightState {
+  kind: 'vael';
+  surgeTimer: number;
+  /** Fog Veils started this fight (thresholds fired). */
+  veils: number;
+  /** The veil in flight: its clock, the health the real Vael had when it
+   *  fell, which rim slot is real, the shades' ids by slot, and the beam. */
+  veil: {
+    elapsed: number;
+    hpAt: number;
+    realSlot: number;
+    shadeIds: number[];
+    phase: number;
+    beamStart: number;
+    tick: number;
+    drift: number;
+    /** Where Vael stood when the fog took him (he steps back out there). */
+    home: { x: number; z: number };
+    /** The health every shade was last set to (a drop below it is a hit). */
+    shadeHp: number;
+  } | null;
+  /** A Fog Shade burst this fight (the deed reads it). */
+  burst: boolean;
+}
+
+/** The Turretback Hermit's pull, watched for the Eviction Notice deed. */
+export interface HermitFightState {
+  kind: 'hermit';
+  /** It pulled into its tower this pull. */
+  withdrew: boolean;
+}
+
+export type BastionFightState =
+  | OlenFightState
+  | OssickFightState
+  | VaelFightState
+  | HermitFightState;
+
 /** What an in-dungeon gate looks like (render-only pick; collision is one box). */
 export type DungeonGateKind =
   | 'portcullis'
@@ -4276,7 +4365,12 @@ export interface DungeonObjectSpawn {
     // the template id so the online client mirrors it with the entity.
     | 'dungeon_gate_closed'
     | 'dungeon_gate_open'
-    | 'dungeon_gate_sealed';
+    | 'dungeon_gate_sealed'
+    // The Sunken Bastion's encounter objects (encounters/sunken_bastion): the
+    // state rides the template id so the online client mirrors it.
+    | 'bastion_buttress_intact'
+    | 'bastion_post_lit'
+    | 'bastion_beacon_lamp';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -6089,6 +6183,10 @@ export interface Entity extends ClientMirroredEntityFields {
   /** Per-pull state of a dungeon trash kit (MobTemplate.trashKit, mob/trash_kit).
    *  Sim authority only; cleared whenever the mob leaves combat. */
   trashKit?: TrashKitState;
+  /** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion). Sim
+   *  authority only; the client reads the fight from casts, auras and the
+   *  encounter objects. */
+  bastionFight?: BastionFightState;
   // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;

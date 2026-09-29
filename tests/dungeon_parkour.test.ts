@@ -195,27 +195,22 @@ describe('dungeon furniture is standable per its real dressing', () => {
     expect(onLid).toBe(true);
   });
 
-  it('a jumping player climbs the Sunken Bastion cargo staircase to its top crate', () => {
-    const o = instanceOrigin(DUNGEONS.sunken_bastion.index, 0);
-    const t = CRYPT_LAYOUT.tombs[0];
-    const roll = tombSlotRoll(t.x, t.z);
-    const crates = roll < 0.5;
-    const tierTop = crates ? TOMB_CARGO_STACK_TIER : TOMB_CARGO_BOX_TIER;
-    const stackTop = crates ? TOMB_CARGO_STACK_TOP : TOMB_CARGO_BOX_TOP;
-    // The stack is a natural staircase: vault the broad lower tier, then
-    // stride (or hop) onto the top crate. Approach along -z from the aisle.
-    const sim = simWithPlayerAt(o.x + t.x, o.z + t.z - 1.0 - 1.0 - 1.6, 0);
-    const p = sim.player;
-    let onTier = false;
-    let onTop = false;
-    for (let i = 0; i < 160 && !onTop; i++) {
-      hold(sim, { forward: true, jump: true }, 1);
-      const rel = p.pos.y - DUNGEON_FLOOR_Y;
-      if (p.onGround && Math.abs(rel - tierTop) < 0.05) onTier = true;
-      if (p.onGround && Math.abs(rel - stackTop) < 0.05) onTop = true;
+  it('the cargo tomb dressing still builds its standable two-tier staircase', () => {
+    // The Sunken Bastion shipped this dressing until its open-air rework moved
+    // it onto an authored field; the dressing stays a supported TombDressing,
+    // so pin its collider shape directly: every slot gets a standable lower
+    // tier and a standable top at the heights the renderer stacks.
+    const cols = layoutColliders(CRYPT_LAYOUT, 'cargo', DUNGEON_FLOOR_Y);
+    for (const t of CRYPT_LAYOUT.tombs) {
+      const crates = tombSlotRoll(t.x, t.z) < 0.5;
+      const tierTop = crates ? TOMB_CARGO_STACK_TIER : TOMB_CARGO_BOX_TIER;
+      const stackTop = crates ? TOMB_CARGO_STACK_TOP : TOMB_CARGO_BOX_TOP;
+      const tops = cols
+        .filter((c) => c.type === 'obb' && Math.abs(c.x - t.x) < 2 && Math.abs(c.z - t.z) < 3)
+        .map((c) => (c.type === 'obb' && c.standable ? (c.moveTopY ?? 0) - DUNGEON_FLOOR_Y : -1));
+      expect(tops.some((y) => Math.abs(y - tierTop) < 1e-6)).toBe(true);
+      expect(tops.some((y) => Math.abs(y - stackTop) < 1e-6)).toBe(true);
     }
-    expect(onTier).toBe(true);
-    expect(onTop).toBe(true);
   });
 
   it('support queries stay inert in the delve band', () => {

@@ -2107,8 +2107,10 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     // alone, "Nythraxis" on the heroic page) are not pinnable against MOBS
     // and stay curated prose.
     const DESC_BOSSES: Record<string, string[]> = {
-      conquerors_sunken_bastion: ['vael_the_mistcaller'],
-      conquerors_sunken_bastion_heroic: ['vael_the_mistcaller'],
+      // The Bastion rework's fog shades wear Vael's own name (the veil hides
+      // him among them), so a desc naming him names them too.
+      conquerors_sunken_bastion: ['vael_the_mistcaller', 'vael_fog_shade'],
+      conquerors_sunken_bastion_heroic: ['vael_the_mistcaller', 'vael_fog_shade'],
       conquerors_gravewyrm_sanctum: ['korzul_the_gravewyrm'],
       conquerors_gravewyrm_sanctum_heroic: ['korzul_the_gravewyrm'],
       conquerors_wildheart_basin_heroic: ['wildheart_high_priest'],

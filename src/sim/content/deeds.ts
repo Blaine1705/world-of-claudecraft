@@ -3597,6 +3597,43 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  // The Sunken Bastion rework (docs/design/dungeon-rework/sunken_bastion.md,
+  // "Deeds"): one per boss core and one for the showpiece, granted by the
+  // encounter modules (src/sim/encounters/sunken_bastion) to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract.
+  dgn_olen_buttress: {
+    id: 'dgn_olen_buttress',
+    name: 'Hold the Wall',
+    desc: 'Defeat Knight-Commander Olen without him ever gaining Unbroken Oath.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_ossick_moored: {
+    id: 'dgn_ossick_moored',
+    name: 'Safe Harbor',
+    desc: 'Defeat Gaoler Ossick without anyone being keelhauled.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_vael_beacon: {
+    id: 'dgn_vael_beacon',
+    name: "By the Beacon's Light",
+    desc: 'Defeat Vael the Fogbinder without bursting a single Fog Shade.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_turretback: {
+    id: 'dgn_turretback',
+    name: 'Eviction Notice',
+    desc: 'Defeat the Turretback Hermit before it withdraws into its shell.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -162,7 +162,9 @@ describe('heroic five-man doubled health', () => {
     expect(maxHpAt('crypt_shambler', 'hollow_crypt', 'heroic')).toBe(4108); // was 2054
     expect(maxHpAt('morthen', 'hollow_crypt', 'heroic')).toBe(7883); // was 3942
     expect(maxHpAt('bastion_revenant', 'sunken_bastion', 'heroic')).toBe(4554); // was 2277
-    expect(maxHpAt('vael_the_mistcaller', 'sunken_bastion', 'heroic')).toBe(8777); // was 4388
+    // The Sunken Bastion rework prices Vael's pool per boss (150 s at heroic
+    // party DPS, dungeon_difficulty.ts healthMultiplierByMob), off the doubling.
+    expect(maxHpAt('vael_the_mistcaller', 'sunken_bastion', 'heroic')).toBe(34449);
     expect(maxHpAt('drowned_templeguard', 'drowned_temple', 'heroic')).toBe(6219); // was 3110
     expect(maxHpAt('ysolei', 'drowned_temple', 'heroic')).toBe(13132); // was 6566
     expect(maxHpAt('moonspawn', 'drowned_temple', 'heroic', { summonedAdd: true })).toBe(1867); // was 933

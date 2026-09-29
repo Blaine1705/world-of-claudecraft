@@ -30,6 +30,7 @@ import {
   NPCS,
 } from '../data';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
+import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
 import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
@@ -1494,6 +1495,8 @@ export function updateInstances(ctx: SimContext): void {
   tickDungeonGates(ctx);
   // Dungeon trash kits (bolts, raises, leaps, dives, landings), after the mob AI.
   tickTrashKits(ctx);
+  // The Sunken Bastion's boss fights (encounters/sunken_bastion), same slot.
+  tickBastionEncounters(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

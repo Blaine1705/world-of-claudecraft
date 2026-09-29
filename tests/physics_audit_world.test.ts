@@ -479,34 +479,9 @@ describe('dungeon deep sweep', () => {
     }
   });
 
-  it('cargo slots: both stack kinds climb, both casks vault, gap walkable', () => {
-    const sim = makeSim();
-    const o = instanceOrigin(DUNGEONS.sunken_bastion.index, 0);
-    // Find one r<0.5 slot (crates+barrel) and one r>=0.5 (box+keg).
-    const slots = CRYPT_LAYOUT.tombs.map((t) => ({ t, r: tombSlotRoll(t.x, t.z) }));
-    const crateSlot = slots.find((s) => s.r < 0.5);
-    const boxSlot = slots.find((s) => s.r >= 0.5);
-    expect(crateSlot && boxSlot).toBeTruthy();
-    if (!crateSlot || !boxSlot) return;
-    for (const { t, r } of [crateSlot, boxSlot]) {
-      // Two tiers: vault the broad lower tier; the crates variant then
-      // strides to its wide top crate. (The box variant's top box is a tiny
-      // finial you can bump but not sanely stand on: the tier is the stand.)
-      const standTop = r < 0.5 ? 2.14 : 1.2;
-      teleport(sim, o.x + t.x, o.z + t.z - 1.0 - 1.0 - 1.5, 0);
-      const p = sim.player;
-      let onStack = false;
-      for (let i = 0; i < 160 && !onStack; i++) {
-        hold(sim, { forward: true, jump: true }, 1);
-        if (p.onGround && Math.abs(p.pos.y - standTop) < 0.05) onStack = true;
-      }
-      expect(onStack).toBe(true);
-      // Walk the gap between stack and cask at floor level.
-      teleport(sim, o.x + t.x - 2.5, o.z + t.z + 0.2, Math.PI / 2);
-      hold(sim, { forward: true }, 30);
-      expect(p.pos.y).toBeLessThan(0.1);
-    }
-  });
+  // The cargo slots walk-test retired with the Sunken Bastion's open-air
+  // rework (no live dungeon ships the cargo dressing now); its collider
+  // shape stays pinned in tests/dungeon_parkour.test.ts.
 
   it('temple altars and sanctum stubs stay walls', () => {
     const sim = makeSim();
@@ -600,9 +575,10 @@ describe('programmatic collider sanity sweeps', () => {
   });
 
   it('interior sets: standable tops sane, colliderTopAt within [eave, ridge]', () => {
-    // Room-plan interiors with furniture (the Hollow Crypt's open-air field
-    // carries no standable tops: its obstacles are cliffs, walls and props).
-    for (const id of ['sunken_bastion', 'nythraxis_crypt']) {
+    // Room-plan interiors with furniture (the Hollow Crypt's and the Sunken
+    // Bastion's open-air fields carry no standable tops: their obstacles are
+    // cliffs, walls and props).
+    for (const id of ['nythraxis_crypt']) {
       const o = instanceOrigin(DUNGEONS[id].index, 0);
       const frame = interiorColliderFrame(o.x, o.z + 40);
       expect(frame).not.toBeNull();

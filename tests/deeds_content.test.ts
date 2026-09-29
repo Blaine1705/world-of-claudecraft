@@ -146,8 +146,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 10 and the tenth at 25: +35).
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
-    expect(DEED_ORDER.length).toBe(319);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3545);
+    expect(DEED_ORDER.length).toBe(323);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3585);
   });
 
   it('ships the audited per-category counts', () => {
@@ -171,7 +171,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       combat: 11,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
-      dungeon: 36,
+      dungeon: 40,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -409,6 +409,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The release's Eastbrook ferry round trip, appended last at the fourth
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
+      // The Sunken Bastion rework's four encounter deeds (manual grants).
+      'dgn_olen_buttress',
+      'dgn_ossick_moored',
+      'dgn_vael_beacon',
+      'dgn_turretback',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1040,7 +1045,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  // Re-baselined for the Sunken Bastion rework's four appended encounter deeds
+  // (dgn_olen_buttress, dgn_ossick_moored, dgn_vael_beacon, dgn_turretback),
+  // re-minted THE AUDITABLE WAY: the 765c2ea1... literal rotated down into
+  // PRE_APPEND_CATALOG_SHA256 and the proof below reproduces it exactly.
+  const FROZEN_CATALOG_SHA256 = '299661d47c6cbbc127e2197df0a73bc3b35db0d12b92b03daa6b9ed50f11a13a';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1107,9 +1116,18 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
   // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
   // and stripping the one id must reproduce it exactly.
+  //
+  // The Sunken Bastion rework appends its four encounter deeds after
+  // exp_harbor_to_harbor; the previous mint is the 765c2ea1... literal
+  // (rotated down here), and stripping the four must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
-  const APPENDED_SINCE: readonly string[] = ['cmb_coinsack_caught', 'exp_harbor_to_harbor'];
+    '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  const APPENDED_SINCE: readonly string[] = [
+    'dgn_olen_buttress',
+    'dgn_ossick_moored',
+    'dgn_vael_beacon',
+    'dgn_turretback',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1121,8 +1139,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'exp_clue_first_casket',
-      'exp_clue_ten_caskets',
+      'cmb_coinsack_caught',
+      'exp_harbor_to_harbor',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1342,8 +1360,9 @@ describe('table shape', () => {
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
     // Clue Scroll casket pair, then the release's ferry round trip as the
-    // final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
+    // entry, then the Sunken Bastion's four encounter deeds, the Turretback
+    // Hermit's last.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_turretback');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
