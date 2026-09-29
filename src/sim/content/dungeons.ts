@@ -39,6 +39,13 @@ import {
   IGNIVAR_RECORD_IDS,
 } from './ignivar_raid_lore';
 import { NYTHRAXIS_EQUIPMENT_LOOT } from './nythraxis_loot';
+import {
+  BRINE_MEND_KIT,
+  SUNKEN_BASTION_GATE_OBJECTS,
+  SUNKEN_BASTION_GATES,
+  SUNKEN_BASTION_SPAWNS,
+} from './sunken_bastion';
+import { SUNKEN_BASTION_ANCHORS } from './sunken_bastion_layout';
 
 // Keepsake ground-object items owned by the walk-in castle interiors below
 // (their zone item modules are other workstreams' files), merged into ITEMS
@@ -646,7 +653,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'linen_scrap', chance: 0.5 },
       { itemId: 'mistveil_grips', chance: 0.06, rollGroup: 'acolyte_bonus' },
     ],
-    desperateHeal: { belowHpPct: 0.3, healPct: 0.25 },
+    // Brine Mend (the Bastion rework): an interruptible heal on a hurt ally,
+    // replacing the silent desperate heal. Kick it.
+    trashKit: BRINE_MEND_KIT,
     scale: 1.0,
     color: 0x1f618d,
   },
@@ -1365,21 +1374,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
 
 // Sunken Bastion: same 13-spawn pacing as the crypt — packs of 2 elites,
 // the Knight-Commander as miniboss, then Vael on the dais with two guards.
-const BASTION_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'bastion_revenant', x: -3, z: 18 },
-  { mobId: 'bastion_revenant', x: 3, z: 19 },
-  { mobId: 'bastion_revenant', x: -9, z: 38 },
-  { mobId: 'tidebound_acolyte', x: -5, z: 39 },
-  { mobId: 'tidebound_acolyte', x: 9, z: 54 },
-  { mobId: 'bastion_revenant', x: 5, z: 55 },
-  { mobId: 'bastion_revenant', x: -5, z: 68 },
-  { mobId: 'tidebound_acolyte', x: -1, z: 70 },
-  { mobId: 'knight_commander_olen', x: -4, z: 82 },
-  { mobId: 'bastion_revenant', x: 1, z: 83 },
-  { mobId: 'vael_the_mistcaller', x: 0, z: 98 },
-  { mobId: 'tidebound_acolyte', x: -4, z: 96 },
-  { mobId: 'bastion_revenant', x: 4, z: 96 },
-];
+// The Sunken Bastion's spawns, packs and gates live in sunken_bastion.ts (the
+// open-air sea fortress rework).
 
 // Gravewyrm Sanctum: three chambers — the Boneworks (z<60), the Ritual Vault
 // (75-115) and the Wyrm's Hollow (115+) — with Korgath holding the first
@@ -1577,11 +1573,21 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'The Sunken Bastion',
     index: 1,
     doorPos: { x: 45, z: 515 }, // drowned keep south of the Gravecaller camp
-    entry: { x: 0, z: -2 }, // clear-of-aggro arrival (see dungeon_entry_clearance test)
-    exitOffset: { x: 0, z: -6 },
-    spawns: BASTION_SPAWN_LIST,
-    interior: 'crypt',
-    tombDressing: 'cargo',
+    // The open-air sea fortress rework (content/sunken_bastion*.ts): arrival on
+    // the Sea-Gate Landing, 50 yd above and behind the first pack, so no mob
+    // can pull the moment you zone in. See dungeon_entry_clearance test.
+    entry: { x: SUNKEN_BASTION_ANCHORS.entry.x, z: SUNKEN_BASTION_ANCHORS.entry.z },
+    exitOffset: { x: SUNKEN_BASTION_ANCHORS.exit.x, z: SUNKEN_BASTION_ANCHORS.exit.z },
+    // Vael's roof sits at the top of the headland, 440 yd of climbing from the
+    // door: a second exit opens beside the Fogbeacon on his death.
+    bossExitPortal: { x: 10, z: 192 },
+    spawns: SUNKEN_BASTION_SPAWNS,
+    objects: SUNKEN_BASTION_GATE_OBJECTS,
+    gates: SUNKEN_BASTION_GATES,
+    // No skipping: every pack is gated, and pulling Vael early still wakes
+    // anything left alive (instances/boss_chain_pull.ts).
+    bossChainPull: true,
+    interior: 'sunken_bastion',
     suggestedPlayers: 5,
     enterText: 'You wade down into the Sunken Bastion...',
     leaveText: 'You climb out of the drowning dark.',

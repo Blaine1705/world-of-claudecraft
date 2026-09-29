@@ -4160,7 +4160,10 @@ export interface TrashKitDef {
     maxRange: number;
     seconds: number;
     fixate: number;
-    bleed: { perTick: number; interval: number; duration: number };
+    /** A bleed opened on landing (the crypt's Rending Leap). */
+    bleed?: { perTick: number; interval: number; duration: number };
+    /** A stun on landing, in seconds (the Bastion Warhound's Lunge). */
+    stun?: number;
   };
   /** An add that stays alive this long in combat turns into `into`. */
   grow?: { after: number; into: string; name: string };
@@ -4172,6 +4175,21 @@ export interface TrashKitDef {
   wingGust?: TrashKitCast & { radius: number; knockback: number; min: number; max: number };
   /** A flier lands this long after its pull, from its altitude to the floor. */
   land?: { seconds: number };
+  /** An interruptible heal on the most injured living ally in reach, for a
+   *  share of that ally's maximum health (the Tidebound Acolyte's Brine Mend).
+   *  Only starts while an ally is under `below` of its health. */
+  mend?: TrashKitCast & { range: number; healPct: number; below: number };
+  /** An interruptible absorb shield on the most injured unshielded ally in
+   *  reach, worth a share of its maximum health (the Mistweaver's Fog Ward). */
+  ward?: TrashKitCast & { range: number; shieldPct: number; duration: number };
+  /** A telegraphed shot down a lane toward one player: the lane locks when the
+   *  bar starts, and everyone standing in it when the bar ends is hit (the
+   *  Fogbound Arbalest's Piercing Bolt). Physical: dodge it, never kick it. */
+  line?: TrashKitCast & { length: number; halfWidth: number; min: number; max: number };
+  /** Once per pull, below a share of its health: it shelters for `seconds`
+   *  (no attacks, no casts) taking `reduction` less damage (the Turretback
+   *  Hermit's Withdraw). A breather, then the burn. */
+  withdraw?: { belowHpPct: number; seconds: number; reduction: number; name: string };
 }
 
 /** Per-pull runtime state of a trash kit (Entity.trashKit). */
@@ -4188,6 +4206,10 @@ export interface TrashKitState {
   engaged: number;
   /** Casts started this pull (the deterministic target hash salt). */
   casts: number;
+  /** A line shot's locked aim (sim yaw) while its bar runs. */
+  aim?: number;
+  /** The once-per-pull withdraw already fired. */
+  withdrawn?: boolean;
 }
 
 /** What an in-dungeon gate looks like (render-only pick; collision is one box). */
@@ -4197,7 +4219,11 @@ export type DungeonGateKind =
   | 'web_curtain'
   | 'warded_arch'
   | 'bone_bridge'
-  | 'rite_ward';
+  | 'rite_ward'
+  // The Sunken Bastion: a drawbridge that lowers over the moat ditch, and a
+  // wall of Vael's fog that parts.
+  | 'drawbridge'
+  | 'fog_wall';
 
 /**
  * An in-dungeon gate or encounter seal (instances/dungeon_gates.ts): one
@@ -4304,6 +4330,7 @@ export interface DungeonDef {
     | 'ignivar_depths'
     | 'wildheart'
     | 'hollow_crypt'
+    | 'sunken_bastion'
     | 'lastkeep'
     | 'dawnhold';
   /**

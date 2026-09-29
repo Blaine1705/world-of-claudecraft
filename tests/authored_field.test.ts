@@ -131,8 +131,11 @@ describe('the Hollow Crypt field', () => {
     ]) {
       expect(groundHeight(o.x + x, o.z + z, 3)).toBe(wildheartFieldHeight(x, z));
     }
-    // The Sunken Bastion keeps the shared crypt nave (a flat floor here).
-    expect(DUNGEONS.sunken_bastion.interior).toBe('crypt');
+    // The shared crypt nave lives on in the Abandoned Crypt (a flat floor);
+    // the Sunken Bastion moved to its own open-air field in its rework.
+    expect(DUNGEONS.nythraxis_crypt.interior).toBe('crypt');
     expect(instancedFieldHeight('crypt')).toBeNull();
+    expect(DUNGEONS.sunken_bastion.interior).toBe('sunken_bastion');
+    expect(instancedFieldHeight('sunken_bastion')).not.toBeNull();
   });
 });

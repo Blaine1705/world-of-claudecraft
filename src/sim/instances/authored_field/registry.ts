@@ -8,20 +8,26 @@
 // byte-identical to before this seam existed.
 
 import { HOLLOW_CRYPT_FIELD } from '../../content/hollow_crypt_layout';
+import { SUNKEN_BASTION_FIELD } from '../../content/sunken_bastion_layout';
 import { wildheartFieldHeight } from '../../wildheart_field';
 import { authoredFieldHeight } from './height';
 import type { AuthoredFieldDef } from './types';
 
 const AUTHORED_FIELDS: Readonly<Record<string, AuthoredFieldDef>> = {
   hollow_crypt: HOLLOW_CRYPT_FIELD,
+  sunken_bastion: SUNKEN_BASTION_FIELD,
 };
 
 const hollowCryptHeight = (x: number, z: number): number =>
   authoredFieldHeight(HOLLOW_CRYPT_FIELD, x, z);
 
+const sunkenBastionHeight = (x: number, z: number): number =>
+  authoredFieldHeight(SUNKEN_BASTION_FIELD, x, z);
+
 const FIELD_HEIGHTS: Readonly<Record<string, (lx: number, lz: number) => number>> = {
   wildheart: wildheartFieldHeight,
   hollow_crypt: hollowCryptHeight,
+  sunken_bastion: sunkenBastionHeight,
 };
 
 /** The authored field record for an interior key, or null. */

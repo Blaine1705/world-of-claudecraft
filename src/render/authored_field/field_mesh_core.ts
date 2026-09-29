@@ -33,11 +33,16 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   frost: [0.38, 0.43, 0.5],
   bone: [0.42, 0.39, 0.33],
   ritual: [0.2, 0.2, 0.24],
+  mud: [0.16, 0.15, 0.12],
+  wetstone: [0.23, 0.26, 0.26],
+  quay: [0.3, 0.3, 0.28],
 };
 
 /** Which texture family a ground kind draws with. */
 export function fieldGroundFamily(ground: FieldGround): 'stone' | 'soil' {
-  return ground === 'earth' || ground === 'grave' || ground === 'frost' ? 'soil' : 'stone';
+  return ground === 'earth' || ground === 'grave' || ground === 'frost' || ground === 'mud'
+    ? 'soil'
+    : 'stone';
 }
 
 // ---- deterministic noise ----------------------------------------------------
@@ -221,7 +226,12 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   // Patches: cold moss on the stone in the damp hollows, grave dirt and
   // bone dust drifted across it, so no two stretches read alike.
   const patch = fieldNoise(x * 0.11 + 13, z * 0.11 - 7, 2);
-  const moss = ground === 'flagstone' || ground === 'bone' ? Math.max(0, patch - 0.58) * 1.8 : 0;
+  // Sea-worn stone carries more algae, and it creeps further.
+  const damp = ground === 'wetstone' || ground === 'quay';
+  const moss =
+    ground === 'flagstone' || ground === 'bone' || damp
+      ? Math.max(0, patch - (damp ? 0.5 : 0.58)) * (damp ? 2.2 : 1.8)
+      : 0;
   const dirt = Math.max(0, fieldNoise(x * 0.07 - 3, z * 0.07 + 5, 2) - 0.6) * 1.6;
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;

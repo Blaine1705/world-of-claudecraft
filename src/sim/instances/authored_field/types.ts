@@ -10,7 +10,17 @@
 export type FieldEdgeStyle = 'masonry' | 'rock' | 'balustrade' | 'bone';
 
 /** What a flat surface is paved with (render-only material pick). */
-export type FieldGround = 'flagstone' | 'earth' | 'grave' | 'frost' | 'bone' | 'ritual';
+export type FieldGround =
+  | 'flagstone'
+  | 'earth'
+  | 'grave'
+  | 'frost'
+  | 'bone'
+  | 'ritual'
+  // The Sunken Bastion: tidal mud, sea-worn wet stone and a barnacled quay.
+  | 'mud'
+  | 'wetstone'
+  | 'quay';
 
 interface FieldSurfaceBase {
   id: string;

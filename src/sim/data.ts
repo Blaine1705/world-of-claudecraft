@@ -228,6 +228,7 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
+import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -457,6 +458,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...WILDHEART_MOBS,
   ...HOLLOW_CRYPT_MOBS,
   ...HOLLOW_CRYPT_TRASH_MOBS,
+  ...SUNKEN_BASTION_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,

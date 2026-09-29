@@ -32,11 +32,40 @@ import {
   type TrashKitState,
 } from '../../types';
 import { spawnKitAdd } from './spawn';
+import {
+  holdLineAim,
+  landSupportCast,
+  lockLineAim,
+  type SupportKey,
+  stepWithdraw,
+  supportCastReady,
+} from './support';
 import { inCone, livingInReach, pickHashedTarget, pickLeapTarget } from './targets';
 
-/** Kit casts in priority order: a summon before a control before a bolt. */
-const CAST_KEYS = ['raise', 'call', 'screech', 'wingGust', 'tailLash', 'bolt'] as const;
+/** Kit casts in priority order: a summon before a heal or shield, a control
+ *  before a strike, a bolt last. */
+const CAST_KEYS = [
+  'raise',
+  'call',
+  'mend',
+  'ward',
+  'screech',
+  'wingGust',
+  'tailLash',
+  'line',
+  'bolt',
+] as const;
 type CastKey = (typeof CAST_KEYS)[number];
+
+/** Physical kit casts: a silence never breaks them and no school lockout
+ *  stops them (dodge these, never kick them). */
+function isPhysicalKey(key: CastKey): boolean {
+  return key === 'tailLash' || key === 'wingGust' || key === 'line';
+}
+
+function isSupportKey(key: CastKey): key is SupportKey {
+  return key === 'mend' || key === 'ward' || key === 'line';
+}
 
 /** A caster's own swings (and a petSpell caster's bolts) hold while a bar runs. */
 const SWING_HOLD_SECONDS = 0.6;
@@ -159,6 +188,7 @@ function mechanicDamage(ctx: SimContext, mob: Entity, min: number, max: number):
 /** Can the kit start `key` now? Returns the cast's victim for a bolt. */
 function castReady(
   ctx: SimContext,
+  inst: InstanceSlot,
   mob: Entity,
   kit: TrashKitDef,
   key: CastKey,
@@ -166,6 +196,7 @@ function castReady(
   players: readonly Entity[],
 ): { ok: boolean; target: Entity | null } {
   const no = { ok: false, target: null };
+  if (isSupportKey(key)) return supportCastReady(ctx, inst, mob, kit, key, st, players);
   switch (key) {
     case 'bolt': {
       const def = kit.bolt;
@@ -215,7 +246,12 @@ function landCast(
   key: CastKey,
   targetId: number | null,
   players: readonly Entity[],
+  st: TrashKitState,
 ): void {
+  if (isSupportKey(key)) {
+    landSupportCast(ctx, mob, kit, key, targetId, st, players);
+    return;
+  }
   switch (key) {
     case 'bolt': {
       const def = kit.bolt;
@@ -360,7 +396,7 @@ function stepCast(
     !def ||
     mob.castingAbility !== cast.castId ||
     ctx.isStunned(mob) ||
-    (key !== 'tailLash' && key !== 'wingGust' && isSilenced(mob));
+    (!isPhysicalKey(key) && isSilenced(mob));
   if (broken) {
     clearCast(mob, cast.castId);
     st.cast = null;
@@ -369,17 +405,20 @@ function stepCast(
   mob.castRemaining = Math.max(0, mob.castRemaining - DT);
   mob.swingTimer = Math.max(mob.swingTimer, SWING_HOLD_SECONDS);
   const target = cast.targetId !== null ? ctx.entities.get(cast.targetId) : undefined;
-  if (target && !target.dead) mob.facing = angleTo(mob.pos, target.pos);
+  // A lane holds the aim it locked at the start; everything else tracks.
+  if (key === 'line') holdLineAim(mob, st);
+  else if (target && !target.dead) mob.facing = angleTo(mob.pos, target.pos);
   if (mob.castRemaining > 0) return true;
   clearCast(mob, cast.castId);
   st.cast = null;
-  landCast(ctx, inst, mob, kit, key, cast.targetId, players);
+  landCast(ctx, inst, mob, kit, key, cast.targetId, players, st);
   return false;
 }
 
 /** Tick the cooldowns and start the first ready cast. */
 function tryStartCast(
   ctx: SimContext,
+  inst: InstanceSlot,
   mob: Entity,
   kit: TrashKitDef,
   st: TrashKitState,
@@ -393,9 +432,9 @@ function tryStartCast(
   for (const key of CAST_KEYS) {
     const def = castDef(kit, key);
     if (!def || (st.timers[key] ?? 0) > 0) continue;
-    const physical = key === 'tailLash' || key === 'wingGust';
+    const physical = isPhysicalKey(key);
     if (!physical && (isSilenced(mob) || isLockedOut(mob, def.school as Aura['school']))) continue;
-    const { ok, target } = castReady(ctx, mob, kit, key, st, players);
+    const { ok, target } = castReady(ctx, inst, mob, kit, key, st, players);
     if (!ok) continue;
     st.timers[key] = def.every;
     st.casts++;
@@ -405,7 +444,8 @@ function tryStartCast(
     mob.castRemaining = def.castTime;
     mob.castTargetId = target?.id ?? null;
     mob.channeling = key === 'raise';
-    if (target) mob.facing = angleTo(mob.pos, target.pos);
+    if (key === 'line') lockLineAim(mob, st, target);
+    else if (target) mob.facing = angleTo(mob.pos, target.pos);
     return;
   }
 }
@@ -458,18 +498,32 @@ function stepLeap(
   if (k < 1) return true;
   mob.pos.y = floor;
   st.leap = null;
-  ctx.applyAura(target, {
-    id: 'crypt_rending_leap',
-    name: def.name,
-    kind: 'dot',
-    remaining: def.bleed.duration,
-    duration: def.bleed.duration,
-    value: Math.max(1, Math.round(def.bleed.perTick * (mob.mechanicDamageMult ?? 1))),
-    tickInterval: def.bleed.interval,
-    tickTimer: def.bleed.interval,
-    sourceId: mob.id,
-    school: 'physical',
-  });
+  if (def.bleed) {
+    ctx.applyAura(target, {
+      id: 'crypt_rending_leap',
+      name: def.name,
+      kind: 'dot',
+      remaining: def.bleed.duration,
+      duration: def.bleed.duration,
+      value: Math.max(1, Math.round(def.bleed.perTick * (mob.mechanicDamageMult ?? 1))),
+      tickInterval: def.bleed.interval,
+      tickTimer: def.bleed.interval,
+      sourceId: mob.id,
+      school: 'physical',
+    });
+  }
+  if (def.stun) {
+    ctx.applyAura(target, {
+      id: 'trash_kit_leap_stun',
+      name: def.name,
+      kind: 'stun',
+      remaining: def.stun,
+      duration: def.stun,
+      value: 0,
+      sourceId: mob.id,
+      school: 'physical',
+    });
+  }
   // It fixates on the one it leapt at for a few seconds (a taunt still wins).
   mob.forcedTargetId = target.id;
   mob.forcedTargetTimer = def.fixate;
@@ -550,10 +604,11 @@ function stepMob(
     return;
   }
   stepDescent(ctx, mob, st);
+  if (stepWithdraw(ctx, mob, kit, st)) return;
   const list = players();
   if (stepCast(ctx, inst, mob, kit, st, list)) return;
   if (stepLeap(ctx, mob, kit, st, list)) return;
-  tryStartCast(ctx, mob, kit, st, list);
+  tryStartCast(ctx, inst, mob, kit, st, list);
 }
 
 /** One tick of every trash kit in every claimed dungeon. */
