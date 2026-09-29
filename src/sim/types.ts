@@ -2176,6 +2176,9 @@ export interface MobTemplate {
   // player inside `range` yards AND the `arcDeg` cone about the mob's facing
   // at cast completion, not a radius. Sidestepping the cone is the intended
   // counterplay. Optionally sets the `burn` fire DoT on everyone caught.
+  // Dungeon trash kit (mob/trash_kit): interruptible bolts, raises, calls
+  // and screeches, leaps, growth, perched dives and the drake's strikes.
+  trashKit?: TrashKitDef;
   breathCone?: {
     castId: string;
     name: string;
@@ -4104,6 +4107,9 @@ export interface DungeonSpawn {
    * walked while idle, zero rng. `offset` (yards along the loop) spaces the
    * members of one patrolling pack. */
   patrol?: DungeonSpawnPatrol;
+  /** A perched placement (a gargoyle on an arch): the instance-local height of
+   *  the perch the mob waits on until its pack is pulled (mob/trash_kit). */
+  perch?: { y: number };
 }
 
 export interface DungeonSpawnPatrol {
@@ -4111,6 +4117,77 @@ export interface DungeonSpawnPatrol {
   offset?: number;
   /** Walk speed as a fraction of the mob's run speed (default 0.4). */
   pace?: number;
+  /** A FLYING patrol: the loop is flown this many yards over the instance
+   *  floor, in straight lines over walls and gaps (the drake, a crow flock).
+   *  Once pulled the flier lands (MobTemplate.trashKit.land). */
+  altitude?: number;
+}
+
+/** A dungeon trash kit cast: a real cast bar on the mob (castId), `first`
+ *  seconds into the pull, then every `every` seconds. */
+export interface TrashKitCast {
+  castId: string;
+  name: string;
+  castTime: number;
+  every: number;
+  first: number;
+  school: Aura['school'];
+}
+
+/**
+ * The dungeon trash kit (mob/trash_kit): simple, readable pack mechanics in
+ * the style of classic five-man trash. Every cast is a real cast bar; the ones
+ * registered in the trash kit's cast table are interruptible (a kick cancels
+ * them), the drake's strikes are not. Zero rng: targets are picked by a
+ * deterministic hash over the living players in reach.
+ */
+export interface TrashKitDef {
+  /** An interruptible hardcast at a living player in reach, landing as a bolt. */
+  bolt?: TrashKitCast & { range: number; min: number; max: number };
+  /** An interruptible channel that raises one add beside the caster. */
+  raise?: TrashKitCast & { summon: string; maxAlive: number };
+  /** An interruptible cast that summons a flock round the caster. */
+  call?: TrashKitCast & { summon: string; count: number; maxAlive: number };
+  /** An interruptible cast that stuns every player near the caster. */
+  screech?: TrashKitCast & { radius: number; stun: number; min: number; max: number };
+  /** A leap onto the farthest mana user in reach (else the farthest player),
+   *  opening a bleed and fixating on the victim for a few seconds. */
+  leap?: {
+    name: string;
+    every: number;
+    first: number;
+    minRange: number;
+    maxRange: number;
+    seconds: number;
+    fixate: number;
+    bleed: { perTick: number; interval: number; duration: number };
+  };
+  /** An add that stays alive this long in combat turns into `into`. */
+  grow?: { after: number; into: string; name: string };
+  /** A perched statue: holds its perch until its pack is pulled, then dives. */
+  perch?: { diveSeconds: number; name: string };
+  /** A frontal-cone breath's rear twin: a short-bar lash of everything behind. */
+  tailLash?: TrashKitCast & { range: number; arcDeg: number; min: number; max: number };
+  /** A wing blast round the mob: damage and a knockback. */
+  wingGust?: TrashKitCast & { radius: number; knockback: number; min: number; max: number };
+  /** A flier lands this long after its pull, from its altitude to the floor. */
+  land?: { seconds: number };
+}
+
+/** Per-pull runtime state of a trash kit (Entity.trashKit). */
+export interface TrashKitState {
+  /** Seconds until each kit ability may start again, by ability key. */
+  timers: Record<string, number>;
+  /** The cast in flight, if any. */
+  cast: { key: string; castId: string; targetId: number | null } | null;
+  /** A leap in flight: from where, onto whom, and how far along. */
+  leap: { fromX: number; fromZ: number; fromY: number; targetId: number; t: number } | null;
+  /** A descent in flight (a perch dive or a landing): from which height. */
+  descent: { fromY: number; t: number; seconds: number; dive: boolean } | null;
+  /** Seconds this mob has been in combat this pull. */
+  engaged: number;
+  /** Casts started this pull (the deterministic target hash salt). */
+  casts: number;
 }
 
 /** What an in-dungeon gate looks like (render-only pick; collision is one box). */
@@ -5966,7 +6043,21 @@ export interface Entity extends ClientMirroredEntityFields {
   dungeonPackId?: string;
   /** World-space idle patrol loop (mob/patrol.ts), stamped at claim time from
    * DungeonSpawn.patrol. Sim authority only (the walk itself is mirrored). */
-  dungeonPatrol?: { points: { x: number; z: number }[]; offset: number; pace: number };
+  dungeonPatrol?: {
+    points: { x: number; z: number }[];
+    offset: number;
+    pace: number;
+    /** A flying patrol (DungeonSpawnPatrol.altitude): the absolute height it
+     *  flies the loop at, straight over walls and gaps. */
+    flightY?: number;
+  };
+  /** A perched dungeon mob (DungeonSpawn.perch): the absolute height of its
+   *  perch, held while it waits (mob/trash_kit). Sim authority; the height is
+   *  mirrored through pos.y. */
+  perchY?: number;
+  /** Per-pull state of a dungeon trash kit (MobTemplate.trashKit, mob/trash_kit).
+   *  Sim authority only; cleared whenever the mob leaves combat. */
+  trashKit?: TrashKitState;
   // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;

@@ -9,8 +9,9 @@
 // patrol still notices players the way any idle mob does, and its pack pulls
 // together through the ordinary packId social pull.
 
+import { DUNGEON_FLOOR_Y } from '../data';
 import type { SimContext } from '../sim_context';
-import type { DungeonSpawnPatrol, Entity } from '../types';
+import { DT, type DungeonSpawnPatrol, type Entity } from '../types';
 
 /** A loop's default pace: a stroll at 40 percent of the mob's run speed. */
 export const PATROL_DEFAULT_PACE = 0.4;
@@ -28,6 +29,7 @@ export function stampDungeonPatrol(
     points: patrol.points.map((p) => ({ x: ox + p.x, z: oz + p.z })),
     offset: patrol.offset ?? 0,
     pace: patrol.pace ?? PATROL_DEFAULT_PACE,
+    ...(patrol.altitude !== undefined ? { flightY: DUNGEON_FLOOR_Y + patrol.altitude } : {}),
   };
 }
 
@@ -78,9 +80,47 @@ export function updateMobPatrol(ctx: SimContext, mob: Entity): boolean {
   if (!patrol || patrol.points.length === 0 || mob.moveSpeed <= 0) return false;
   const speed = mob.moveSpeed * patrol.pace;
   const target = patrolPointAt(patrol.points, ctx.time * speed + patrol.offset);
+  if (patrol.flightY !== undefined) {
+    flyPatrol(mob, patrol.flightY, target, speed);
+    return true;
+  }
   const dest = ctx.groundPos(target.x, target.z);
   const behind = Math.hypot(dest.x - mob.pos.x, dest.z - mob.pos.z);
   const step = behind > CATCH_UP_DISTANCE ? speed * CATCH_UP_MULT : speed;
   if (ctx.moveToward(mob, dest, step)) mob.facing = target.facing;
   return true;
+}
+
+/** How fast a flier climbs back to its loop after a landing (yards/second). */
+export const FLIGHT_CLIMB_RATE = 6;
+
+/**
+ * A FLYING patrol (DungeonSpawnPatrol.altitude): the flier holds its loop
+ * point in straight lines at its altitude, over walls and gaps, and climbs
+ * back up at FLIGHT_CLIMB_RATE after a landing. Zero rng, pure of time.
+ */
+function flyPatrol(
+  mob: Entity,
+  flightY: number,
+  target: { x: number; z: number; facing: number },
+  speed: number,
+): void {
+  const dx = target.x - mob.pos.x;
+  const dz = target.z - mob.pos.z;
+  const d = Math.hypot(dx, dz);
+  const step = (d > CATCH_UP_DISTANCE ? speed * CATCH_UP_MULT * 1.5 : speed) * DT;
+  if (d <= step || d < 1e-6) {
+    mob.pos.x = target.x;
+    mob.pos.z = target.z;
+    mob.facing = target.facing;
+  } else {
+    mob.pos.x += (dx / d) * step;
+    mob.pos.z += (dz / d) * step;
+    mob.facing = Math.atan2(dx, dz);
+  }
+  const climb = FLIGHT_CLIMB_RATE * DT;
+  mob.pos.y =
+    Math.abs(flightY - mob.pos.y) <= climb
+      ? flightY
+      : mob.pos.y + Math.sign(flightY - mob.pos.y) * climb;
 }

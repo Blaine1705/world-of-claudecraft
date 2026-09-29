@@ -12241,7 +12241,15 @@ export const ru_RU: EnTranslations = {
       "hoard_cast_screech": "Оглушительный визг",
       "hoard_cast_mimic_bite": "Ненасытный укус",
       "hoard_cast_mimic_leap": "Сокрушающий прыжок",
-      "hoard_cast_coin_spit": "Проклятые монеты"
+      "hoard_cast_coin_spit": "Проклятые монеты",
+      "crypt_grave_bolt": "Могильная стрела",
+      "crypt_raise_bones": "Подъём костей",
+      "crypt_murder_call": "Зов стаи",
+      "crypt_stone_shriek": "Каменный вопль",
+      "crypt_grave_cleave": "Могильный размах",
+      "crypt_bonechill_breath": "Костеледенящее дыхание",
+      "crypt_tail_lash": "Удар хвостом",
+      "crypt_wing_gust": "Порыв крыльев"
     }
   },
   "questUi": {
@@ -19631,6 +19639,36 @@ export const ru_RU: EnTranslations = {
       },
       "cantor_ilvane": {
         "name": "Кантор Ильвейн"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "Воин оссуария"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "Адепт Могильного Зова"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "Головорез оссуария"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "Некромант Могильного Зова"
+      },
+      "crypt_bone_minion": {
+        "name": "Костяной прислужник"
+      },
+      "crypt_bone_brute": {
+        "name": "Костяной громила"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "Часовенная горгулья"
+      },
+      "crypt_crow_caller": {
+        "name": "Зовущий воронов"
+      },
+      "crypt_carrion_crow": {
+        "name": "Ворон-падальщик"
+      },
+      "crypt_ossuary_drake": {
+        "name": "Костяной дракон оссуария"
       },
       "bastion_revenant": {
         "name": "Ревенант бастиона"

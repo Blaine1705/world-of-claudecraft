@@ -12241,7 +12241,15 @@ export const ja_JP: EnTranslations = {
       "hoard_cast_screech": "耳をつんざく叫び",
       "hoard_cast_mimic_bite": "貪欲な噛みつき",
       "hoard_cast_mimic_leap": "押し潰す跳躍",
-      "hoard_cast_coin_spit": "呪われた金貨"
+      "hoard_cast_coin_spit": "呪われた金貨",
+      "crypt_grave_bolt": "墓所の矢",
+      "crypt_raise_bones": "骨の蘇生",
+      "crypt_murder_call": "鴉群の呼び声",
+      "crypt_stone_shriek": "石の絶叫",
+      "crypt_grave_cleave": "墓所の薙ぎ払い",
+      "crypt_bonechill_breath": "寒骨の吐息",
+      "crypt_tail_lash": "尾の一撃",
+      "crypt_wing_gust": "翼の突風"
     }
   },
   "questUi": {
@@ -19631,6 +19639,36 @@ export const ja_JP: EnTranslations = {
       },
       "cantor_ilvane": {
         "name": "聖歌隊長イルヴェイン"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "納骨堂の戦士"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "墓呼びの徒弟"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "納骨堂の喉裂き"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "墓呼びの死霊術師"
+      },
+      "crypt_bone_minion": {
+        "name": "骨の下僕"
+      },
+      "crypt_bone_brute": {
+        "name": "骨の巨兵"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "礼拝堂のガーゴイル"
+      },
+      "crypt_crow_caller": {
+        "name": "鴉呼び"
+      },
+      "crypt_carrion_crow": {
+        "name": "腐肉喰らいの鴉"
+      },
+      "crypt_ossuary_drake": {
+        "name": "納骨堂の骨竜"
       },
       "bastion_revenant": {
         "name": "砦の亡霊"

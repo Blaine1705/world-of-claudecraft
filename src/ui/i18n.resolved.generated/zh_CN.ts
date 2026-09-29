@@ -12241,7 +12241,15 @@ export const zh_CN: EnTranslations = {
       "hoard_cast_screech": "震耳尖啸",
       "hoard_cast_mimic_bite": "贪婪撕咬",
       "hoard_cast_mimic_leap": "碾压跳跃",
-      "hoard_cast_coin_spit": "诅咒金币"
+      "hoard_cast_coin_spit": "诅咒金币",
+      "crypt_grave_bolt": "墓穴之箭",
+      "crypt_raise_bones": "唤起骸骨",
+      "crypt_murder_call": "鸦群召唤",
+      "crypt_stone_shriek": "石之尖啸",
+      "crypt_grave_cleave": "墓穴横扫",
+      "crypt_bonechill_breath": "寒骨吐息",
+      "crypt_tail_lash": "尾鞭",
+      "crypt_wing_gust": "翼风"
     }
   },
   "questUi": {
@@ -19631,6 +19639,36 @@ export const zh_CN: EnTranslations = {
       },
       "cantor_ilvane": {
         "name": "领唱者伊尔凡"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "骨堂战士"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "唤墓者学徒"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "骨堂割喉者"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "唤墓者死灵法师"
+      },
+      "crypt_bone_minion": {
+        "name": "骸骨仆从"
+      },
+      "crypt_bone_brute": {
+        "name": "骸骨蛮兵"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "礼拜堂石像鬼"
+      },
+      "crypt_crow_caller": {
+        "name": "唤鸦者"
+      },
+      "crypt_carrion_crow": {
+        "name": "食腐乌鸦"
+      },
+      "crypt_ossuary_drake": {
+        "name": "骨堂骨龙"
       },
       "bastion_revenant": {
         "name": "堡垒亡魂"

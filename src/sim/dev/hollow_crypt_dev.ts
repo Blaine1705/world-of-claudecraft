@@ -6,8 +6,14 @@
 //   /dev crypt enter [normal|heroic]   claim a fresh run and step in
 //   /dev crypt tp <area>               jump inside the run (enters first)
 //   /dev crypt gates                   open every gate and seal for this run
-//   /dev crypt kill <pack|boss|all>    kill p1..p9, marrow, rimeweb, ilvane,
-//                                      morthen, or everything, as if slain
+//   /dev crypt kill <pack|boss|all>    kill a pack (c1..c4, p1, drake, p2,
+//                                      w1..w4, e1..e3, q1, q2, s1), marrow,
+//                                      rimeweb, ilvane, morthen, or everything
+//   /dev crypt pack <pack>             jump to where a pack stands (or flies)
+//   /dev crypt spawn <type>            raise one trash mob 10 yd ahead, pulled:
+//                                      warrior, adept, cutthroat, necromancer,
+//                                      minion, brute, gargoyle (on a perch),
+//                                      caller, crow, drake (lands from the sky)
 //   /dev crypt reset                   free the run and claim a fresh one
 //
 // Areas: landing, cloister, grille, processional, yard, bellyard (marrow),
@@ -15,7 +21,13 @@
 // (morthen).
 
 import { HOLLOW_CRYPT_ANCHORS } from '../content/hollow_crypt_layout';
-import { DUNGEONS, instanceOrigin } from '../data';
+import { DUNGEONS, instanceOrigin, MOBS } from '../data';
+import { createMob } from '../entity';
+import {
+  applyDungeonMobTuning,
+  mobLevelForDungeonDifficulty,
+  mobTemplateForDungeonDifficulty,
+} from '../instances/difficulty';
 import { setDungeonGatesDevOpen } from '../instances/dungeon_gates';
 import { claimedInstanceAt, enterDungeon, freeInstance, leaveDungeon } from '../instances/dungeons';
 import type { InstanceSlot } from '../sim';
@@ -52,8 +64,49 @@ const BOSS_ALIASES: Readonly<Record<string, string>> = {
   morthen: 'morthen',
 };
 
+/** `/dev crypt spawn` names for each trash template. */
+export const HOLLOW_CRYPT_DEV_MOBS: Readonly<Record<string, string>> = {
+  warrior: 'crypt_ossuary_warrior',
+  adept: 'crypt_gravecaller_adept',
+  cutthroat: 'crypt_ossuary_cutthroat',
+  necromancer: 'crypt_gravecaller_necromancer',
+  minion: 'crypt_bone_minion',
+  brute: 'crypt_bone_brute',
+  gargoyle: 'crypt_chapel_gargoyle',
+  caller: 'crypt_crow_caller',
+  crow: 'crypt_carrion_crow',
+  drake: 'crypt_ossuary_drake',
+};
+
 const HELP =
-  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <p1..p9|marrow|rimeweb|ilvane|morthen|all> | reset';
+  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake> | reset';
+
+/** Raise one trash mob ahead of the player, pulled at once (a gargoyle starts
+ *  on a perch and a drake high in the sky, so both show their descent). */
+function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {
+  const me = ctx.entities.get(pid);
+  const template = MOBS[templateId];
+  if (!me || !template) return false;
+  const x = me.pos.x + Math.sin(me.facing) * 10;
+  const z = me.pos.z + Math.cos(me.facing) * 10;
+  const mob = createMob(
+    ctx.nextId++,
+    mobTemplateForDungeonDifficulty(template, DUNGEON_ID, inst.difficulty),
+    mobLevelForDungeonDifficulty(DUNGEON_ID, inst.difficulty, template.minLevel),
+    ctx.groundPos(x, z),
+  );
+  applyDungeonMobTuning(mob, DUNGEON_ID, inst.difficulty);
+  mob.facing = me.facing + Math.PI;
+  mob.prevFacing = mob.facing;
+  const lift = template.trashKit?.perch ? 12 : template.trashKit?.land ? 20 : 0;
+  if (template.trashKit?.perch) mob.perchY = mob.pos.y + lift;
+  mob.pos.y += lift;
+  mob.prevPos.y = mob.pos.y;
+  ctx.addEntity(mob);
+  inst.mobIds.push(mob.id);
+  ctx.aggroMob(mob, me, false);
+  return true;
+}
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });
@@ -132,6 +185,42 @@ export function handleHollowCryptDevChat(ctx: SimContext, raw: string, pid: numb
     if (!inst) return true;
     const n = killMatching(ctx, pid, inst, arg || 'all');
     log(ctx, pid, `[dev] Killed ${n} Hollow Crypt mob${n === 1 ? '' : 's'} (${arg || 'all'}).`);
+    return true;
+  }
+  if (verb === 'spawn') {
+    const templateId = HOLLOW_CRYPT_DEV_MOBS[arg];
+    const inst = templateId ? ensureInside(ctx, pid) : null;
+    if (!templateId || !inst) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    if (devSpawn(ctx, pid, inst, templateId))
+      log(ctx, pid, `[dev] Spawned ${MOBS[templateId].name}.`);
+    return true;
+  }
+  if (verb === 'pack') {
+    const spawn = DUNGEONS[DUNGEON_ID].spawns.find((s) => s.packId === arg);
+    const inst = spawn ? ensureInside(ctx, pid) : null;
+    const e = ctx.entities.get(pid);
+    if (!spawn || !inst || !e) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    // Stand a little off the pack on the floor (south first, toward the entrance).
+    const o = instanceOrigin(DUNGEONS[DUNGEON_ID].index, inst.slot);
+    const spots: [number, number][] = [
+      [0, -16],
+      [0, 16],
+      [-16, 0],
+      [16, 0],
+      [0, -8],
+      [0, 0],
+    ];
+    const spot =
+      spots.find(([dx, dz]) => ctx.groundPos(o.x + spawn.x + dx, o.z + spawn.z + dz).y > -30) ??
+      spots[spots.length - 1];
+    displacePlayerForDev(ctx, e, o.x + spawn.x + spot[0], o.z + spawn.z + spot[1]);
+    log(ctx, pid, `[dev] Hollow Crypt: pack ${arg}.`);
     return true;
   }
   if (verb === 'reset') {

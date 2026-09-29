@@ -12241,7 +12241,15 @@ export const ko_KR: EnTranslations = {
       "hoard_cast_screech": "귀를 찢는 비명",
       "hoard_cast_mimic_bite": "탐욕스러운 물기",
       "hoard_cast_mimic_leap": "짓누르는 도약",
-      "hoard_cast_coin_spit": "저주받은 금화"
+      "hoard_cast_coin_spit": "저주받은 금화",
+      "crypt_grave_bolt": "무덤 화살",
+      "crypt_raise_bones": "뼈 일으키기",
+      "crypt_murder_call": "까마귀떼 부름",
+      "crypt_stone_shriek": "돌의 비명",
+      "crypt_grave_cleave": "무덤 가르기",
+      "crypt_bonechill_breath": "한골 숨결",
+      "crypt_tail_lash": "꼬리 채찍",
+      "crypt_wing_gust": "날개 돌풍"
     }
   },
   "questUi": {
@@ -19631,6 +19639,36 @@ export const ko_KR: EnTranslations = {
       },
       "cantor_ilvane": {
         "name": "성가대장 일베인"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "납골당 전사"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "무덤부름 수련생"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "납골당 멱따개"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "무덤부름 강령술사"
+      },
+      "crypt_bone_minion": {
+        "name": "뼈 하수인"
+      },
+      "crypt_bone_brute": {
+        "name": "뼈 야수병"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "예배당 가고일"
+      },
+      "crypt_crow_caller": {
+        "name": "까마귀 부르미"
+      },
+      "crypt_carrion_crow": {
+        "name": "썩은고기 까마귀"
+      },
+      "crypt_ossuary_drake": {
+        "name": "납골당 뼈드레이크"
       },
       "bastion_revenant": {
         "name": "요새 망령"

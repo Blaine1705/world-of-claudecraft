@@ -12,7 +12,13 @@
 //
 // Three-free, DOM-free, deterministic.
 
-import { HOLLOW_CRYPT_FIELD } from '../../sim/content/hollow_crypt_layout';
+import {
+  ARCADE_BAY,
+  type ArcadeBayVariant,
+  HOLLOW_CRYPT_FIELD,
+  hollowCryptArcadeBays,
+  isBrokenCloisterColumn,
+} from '../../sim/content/hollow_crypt_layout';
 import type { FieldProp } from '../../sim/instances/authored_field';
 import { type EdgeDressing, HOLLOW_CRYPT_LIGHTS, planEdgeDressing } from './crypt_plan_core';
 import { HOLLOW_CRYPT_SET_DRESSING, type KitPlacement } from './crypt_set_dressing_core';
@@ -22,10 +28,7 @@ function hash(a: number, b: number): number {
   return v - Math.floor(v);
 }
 
-/** A cloister column the ruin has broken (a deterministic pick by position). */
-export function isBrokenCloisterColumn(p: Pick<FieldProp, 'x' | 'z'>): boolean {
-  return hash(p.x, p.z) < 0.3;
-}
+export { isBrokenCloisterColumn };
 
 /** The kit node a sim prop kind draws (variants picked by position). */
 export function kitPieceForProp(p: FieldProp): string {
@@ -92,57 +95,29 @@ export const EDGE_PIECES: Readonly<Record<EdgeDressing['kind'], string>> = {
   rubble: 'Kit_Rubble',
 };
 
-/** The span of one arcade bay (Kit_ArcadeArch springs from capitals 10 apart). */
-export const ARCADE_BAY = 10;
+const ARCADE_PIECES: Readonly<Record<ArcadeBayVariant, string>> = {
+  whole: 'Kit_ArcadeArch',
+  broken: 'Kit_ArcadeArchBroken',
+  springer: 'Kit_ArcadeArchSpringer',
+  fallen: 'Kit_ArcadeArchFallen',
+};
 
 /**
- * The cloister arcade, derived from its columns: one arch over every pair of
- * columns exactly one bay apart. A bay whose two columns stand gets a whole
- * arch (or a broken one that keeps both springers); a bay with one fallen
- * column keeps only the springer on the standing capital and its voussoirs lie
- * in the grass; a bay with both columns down is only fallen stone. An arch
- * never hangs over a missing column.
+ * The cloister arcade (bays from the sim layout's hollowCryptArcadeBays): an
+ * arch never hangs over a missing column. A springer is built on the piece's
+ * local -X foot, so it turns to put that foot on the column still standing.
  */
 export function planArcade(): KitPlacement[] {
-  const cols = HOLLOW_CRYPT_FIELD.props.filter((p) => p.kind === 'hc_cloister_column');
-  const out: KitPlacement[] = [];
-  for (let i = 0; i < cols.length; i++) {
-    for (let j = i + 1; j < cols.length; j++) {
-      const a = cols[i];
-      const b = cols[j];
-      const dx = b.x - a.x;
-      const dz = b.z - a.z;
-      const aligned = Math.abs(dx) < 1e-6 || Math.abs(dz) < 1e-6;
-      if (!aligned || Math.abs(Math.hypot(dx, dz) - ARCADE_BAY) > 1e-6) continue;
-      const x = (a.x + b.x) / 2;
-      const z = (a.z + b.z) / 2;
-      // Local +X runs from a to b: three.js yaw maps local X to (cos, -sin).
-      const rot = Math.atan2(-dz, dx);
-      const aDown = isBrokenCloisterColumn(a);
-      const bDown = isBrokenCloisterColumn(b);
-      if (!aDown && !bDown) {
-        const piece = hash(x * 0.37, z * 0.91) < 0.35 ? 'Kit_ArcadeArchBroken' : 'Kit_ArcadeArch';
-        out.push({ piece, x, z, rot, scale: 1 });
-      } else if (aDown && bDown) {
-        out.push({ piece: 'Kit_ArcadeArchFallen', x, z, rot, scale: 1 });
-      } else {
-        // The springer is built on the piece's local -X foot: turn it so that
-        // foot stands on the column still standing.
-        const standing = aDown ? b : a;
-        const ux = (standing.x - x) / (ARCADE_BAY / 2);
-        const uz = (standing.z - z) / (ARCADE_BAY / 2);
-        // local -X in world is (-cos, sin): solve for the yaw that points it at `standing`.
-        out.push({
-          piece: 'Kit_ArcadeArchSpringer',
-          x,
-          z,
-          rot: Math.atan2(uz, -ux),
-          scale: 1,
-        });
-      }
+  return hollowCryptArcadeBays().map((bay) => {
+    let rot = bay.rot;
+    if (bay.variant === 'springer' && bay.standing) {
+      const ux = (bay.standing.x - bay.x) / (ARCADE_BAY / 2);
+      const uz = (bay.standing.z - bay.z) / (ARCADE_BAY / 2);
+      // local -X in world is (-cos, sin): the yaw that points it at the column.
+      rot = Math.atan2(uz, -ux);
     }
-  }
-  return out;
+    return { piece: ARCADE_PIECES[bay.variant], x: bay.x, z: bay.z, rot, scale: 1 };
+  });
 }
 
 /** The holders the light plan stands for its own flames (braziers, posts). */

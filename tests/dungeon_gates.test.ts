@@ -81,13 +81,13 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
     );
   });
 
-  it('the Grille opens once P1, P2 and P3 are all dead, and says so', () => {
+  it('the Grille opens once every cloister pack is dead, and says so', () => {
     const { sim, pid, inst } = setup();
-    kill(sim, inst, ['p1', 'p2']);
+    kill(sim, inst, ['c1', 'c2', 'c3']);
     sim.tick();
     expect(dungeonGateState(sim.ctx, inst, gate('grille'))).toBe('closed');
     expect(blockedAt(sim, inst, 'grille')).toBe(true);
-    kill(sim, inst, ['p3']);
+    kill(sim, inst, ['c4']);
     const events = sim.tick() as { type: string; text?: string; pid?: number }[];
     expect(dungeonGateState(sim.ctx, inst, gate('grille'))).toBe('open');
     expect(dungeonGateEntity(sim.ctx, inst, gate('grille'))?.templateId).toBe('dungeon_gate_open');
@@ -104,7 +104,7 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
 
   it('an arena seals while its boss is engaged and reopens when it resets', () => {
     const { sim, inst } = setup();
-    kill(sim, inst, ['p1', 'p2', 'p3', 'p4', 'p5']);
+    kill(sim, inst, ['c1', 'c2', 'c3', 'c4', 'w1', 'w2', 'w3', 'w4']);
     sim.tick();
     expect(dungeonGateState(sim.ctx, inst, gate('yard_barrier'))).toBe('open');
     const marrow = mob(sim, inst, 'sexton_marrow');
@@ -126,7 +126,7 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
 
   it('the bone bridge opens on Sexton Marrow death, not before', () => {
     const { sim, inst } = setup();
-    kill(sim, inst, ['p1', 'p2', 'p3', 'p4', 'p5']);
+    kill(sim, inst, ['c1', 'c2', 'c3', 'c4', 'w1', 'w2', 'w3', 'w4']);
     sim.tick();
     expect(blockedAt(sim, inst, 'yard_bridge')).toBe(true);
     kill(sim, inst, ['sexton_marrow']);
@@ -135,9 +135,27 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
     expect(blockedAt(sim, inst, 'yard_barrier')).toBe(false);
   });
 
-  it('the Twin Seals need both wing bosses and P8', () => {
+  it('the Twin Seals need both wing bosses, the Processional packs and the drake', () => {
     const { sim, inst } = setup();
-    kill(sim, inst, ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'sexton_marrow']);
+    kill(sim, inst, [
+      ...['c1', 'c2', 'c3', 'c4', 'w1', 'w2', 'w3', 'w4', 'e1', 'e2', 'e3'],
+      ...['p1', 'p2', 'sexton_marrow', 'rimeweb'],
+    ]);
+    sim.tick();
+    // The drake still flies: the seals hold.
+    expect(dungeonGateState(sim.ctx, inst, gate('twin_seals'))).toBe('closed');
+    kill(sim, inst, ['drake']);
+    sim.tick();
+    expect(dungeonGateState(sim.ctx, inst, gate('twin_seals'))).toBe('open');
+    expect(blockedAt(sim, inst, 'twin_seals')).toBe(false);
+  });
+
+  it('the Twin Seals need both wing bosses', () => {
+    const { sim, inst } = setup();
+    kill(sim, inst, [
+      ...['c1', 'c2', 'c3', 'c4', 'w1', 'w2', 'w3', 'w4', 'e1', 'e2', 'e3'],
+      ...['p1', 'drake', 'p2', 'sexton_marrow'],
+    ]);
     sim.tick();
     expect(dungeonGateState(sim.ctx, inst, gate('twin_seals'))).toBe('closed');
     kill(sim, inst, ['rimeweb']);
@@ -148,7 +166,7 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
 
   it('a reset re-closes every gate for the fresh claim', () => {
     const { sim, pid, inst } = setup();
-    kill(sim, inst, ['p1', 'p2', 'p3']);
+    kill(sim, inst, ['c1', 'c2', 'c3', 'c4']);
     sim.tick();
     expect(blockedAt(sim, inst, 'grille')).toBe(false);
     // Leave, free the claim, and claim again from the door.
@@ -182,7 +200,7 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
   it('is deterministic: two worlds from one seed derive identical gate states', () => {
     const run = (): string[] => {
       const { sim, inst } = setup(21);
-      kill(sim, inst, ['p1', 'p2', 'p3', 'p6']);
+      kill(sim, inst, ['c1', 'c2', 'c3', 'c4', 'e1']);
       for (let i = 0; i < 5; i++) sim.tick();
       return HOLLOW_CRYPT_GATES.map((g) => dungeonGateState(sim.ctx, inst, g));
     };

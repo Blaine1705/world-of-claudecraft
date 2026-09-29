@@ -242,8 +242,14 @@ describe('heroic tuning data contract', () => {
       grand_necromancer_velkhar: 19,
       korzul_the_gravewyrm: 19,
     });
-    // The rework's non-elite P9 walkers ride the 500 mob floor on their own.
-    expect(HEROIC_DUNGEON_TUNING.hollow_crypt.damageMultiplierByMob).toEqual({ bound_soul: 56 });
+    // The rework's lighter casters, cutthroat and non-elite crows ride the 500 floor.
+    expect(HEROIC_DUNGEON_TUNING.hollow_crypt.damageMultiplierByMob).toEqual({
+      crypt_gravecaller_adept: 24,
+      crypt_gravecaller_necromancer: 24,
+      crypt_crow_caller: 24,
+      crypt_ossuary_cutthroat: 23,
+      crypt_carrion_crow: 66,
+    });
     expect(HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplierByMob).toEqual({
       nythraxis_scourge_of_thornpeak: 1.488,
       nythraxis_skeleton_warrior: 3.75,

@@ -100,54 +100,69 @@ const BOSSES = ['sexton_marrow', 'rimeweb', 'cantor_ilvane', 'morthen'];
 describe('Hollow Crypt route contract: every pack is mandatory', () => {
   beforeEach(() => clearDungeonGateStateForTest());
 
-  it('with nothing dead, only the Undercroft packs are reachable', () => {
+  const CLOISTER = ['c1', 'c2', 'c3', 'c4'];
+  const WEST = ['w1', 'w2', 'w3', 'w4'];
+  const EAST = ['e1', 'e2', 'e3'];
+  const PROCESSIONAL = ['p1', 'drake', 'p2'];
+  const CHOIR = ['q1', 'q2'];
+
+  it('with nothing dead, only the cloister packs are reachable', () => {
     const seen = reachable(openGates(new Set()));
-    expect(reachedPacks(seen)).toEqual(['p1', 'p2', 'p3']);
+    expect(reachedPacks(seen)).toEqual(CLOISTER);
   });
 
   it('the Grille opens both wings and the Processional, but no boss arena', () => {
-    const seen = reachable(openGates(new Set(['p1', 'p2', 'p3'])));
+    const seen = reachable(openGates(new Set(CLOISTER)));
     const packs = reachedPacks(seen);
-    expect(packs).toEqual(expect.arrayContaining(['p4', 'p5', 'p6', 'p7', 'p8']));
+    expect(packs).toEqual(expect.arrayContaining([...WEST, ...EAST, ...PROCESSIONAL]));
     for (const boss of BOSSES) expect(packs).not.toContain(boss);
-    expect(packs).not.toContain('p9');
-    expect(packs).not.toContain('ilvane');
+    for (const pack of [...CHOIR, 's1', 'ilvane']) expect(packs).not.toContain(pack);
   });
 
-  it('each wing boss is reachable only after its own wing packs die', () => {
-    const base = ['p1', 'p2', 'p3'];
-    const west = reachedPacks(reachable(openGates(new Set([...base, 'p4', 'p5']))));
+  it('each wing boss is reachable only after every pack of its own wing dies', () => {
+    const west = reachedPacks(reachable(openGates(new Set([...CLOISTER, ...WEST]))));
     expect(west).toContain('sexton_marrow');
     expect(west).not.toContain('rimeweb');
-    const westOnlyP4 = reachedPacks(reachable(openGates(new Set([...base, 'p4']))));
-    expect(westOnlyP4).not.toContain('sexton_marrow');
-    const east = reachedPacks(reachable(openGates(new Set([...base, 'p6', 'p7']))));
+    for (const missing of WEST) {
+      const partial = new Set([...CLOISTER, ...WEST.filter((p) => p !== missing)]);
+      expect(reachedPacks(reachable(openGates(partial))), missing).not.toContain('sexton_marrow');
+    }
+    const east = reachedPacks(reachable(openGates(new Set([...CLOISTER, ...EAST]))));
     expect(east).toContain('rimeweb');
     expect(east).not.toContain('sexton_marrow');
-    const eastOnlyP6 = reachedPacks(reachable(openGates(new Set([...base, 'p6']))));
-    expect(eastOnlyP6).not.toContain('rimeweb');
+    for (const missing of EAST) {
+      const partial = new Set([...CLOISTER, ...EAST.filter((p) => p !== missing)]);
+      expect(reachedPacks(reachable(openGates(partial))), missing).not.toContain('rimeweb');
+    }
   });
 
-  it('the Twin Seals need BOTH wing bosses and the choir approach pack', () => {
-    const wings = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
+  it('the Twin Seals need BOTH wing bosses, the Processional packs and the drake', () => {
+    const wings = [...CLOISTER, ...WEST, ...EAST, ...PROCESSIONAL];
     const oneBoss = reachedPacks(reachable(openGates(new Set([...wings, 'sexton_marrow']))));
     expect(oneBoss).not.toContain('ilvane');
-    const noP8 = new Set([...wings.filter((p) => p !== 'p8'), 'sexton_marrow', 'rimeweb']);
-    expect(reachedPacks(reachable(openGates(noP8)))).not.toContain('ilvane');
+    for (const missing of PROCESSIONAL) {
+      const dead = new Set([...wings.filter((p) => p !== missing), 'sexton_marrow', 'rimeweb']);
+      expect(reachedPacks(reachable(openGates(dead))), missing).not.toContain('ilvane');
+    }
     const both = reachedPacks(
       reachable(openGates(new Set([...wings, 'sexton_marrow', 'rimeweb']))),
     );
     expect(both).toContain('ilvane');
-    expect(both).not.toContain('p9');
+    expect(both).toEqual(expect.arrayContaining(CHOIR));
+    expect(both).not.toContain('s1');
     expect(both).not.toContain('morthen');
   });
 
-  it('Morthen is reachable only after Ilvane and the procession die', () => {
-    const upTo = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'sexton_marrow', 'rimeweb'];
-    const afterIlvane = reachedPacks(reachable(openGates(new Set([...upTo, 'cantor_ilvane']))));
-    expect(afterIlvane).toContain('p9');
+  it('Morthen is reachable only after Ilvane, the choir packs and the stair guard die', () => {
+    const upTo = [...CLOISTER, ...WEST, ...EAST, ...PROCESSIONAL, 'sexton_marrow', 'rimeweb'];
+    const noChoir = reachedPacks(reachable(openGates(new Set([...upTo, 'cantor_ilvane']))));
+    expect(noChoir).not.toContain('s1');
+    const afterIlvane = reachedPacks(
+      reachable(openGates(new Set([...upTo, ...CHOIR, 'cantor_ilvane']))),
+    );
+    expect(afterIlvane).toContain('s1');
     expect(afterIlvane).not.toContain('morthen');
-    const all = new Set([...upTo, 'cantor_ilvane', 'p9']);
+    const all = new Set([...upTo, ...CHOIR, 'cantor_ilvane', 's1']);
     expect(reachedPacks(reachable(openGates(all)))).toContain('morthen');
   });
 

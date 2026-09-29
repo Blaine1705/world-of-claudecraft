@@ -576,6 +576,16 @@ const mergeStringsEn = {
       hoard_cast_mimic_bite: 'Voracious Bite',
       hoard_cast_mimic_leap: 'Crushing Leap',
       hoard_cast_coin_spit: 'Cursed Coins',
+      // The Hollow Crypt trash kit (src/sim/mob/trash_kit/cast_ids.ts). The bolt,
+      // the raise, the call and the shriek can be kicked; the rest are dodged.
+      crypt_grave_bolt: 'Grave Bolt',
+      crypt_raise_bones: 'Raise Bones',
+      crypt_murder_call: 'Murder Call',
+      crypt_stone_shriek: 'Stone Shriek',
+      crypt_grave_cleave: 'Grave Cleave',
+      crypt_bonechill_breath: 'Bonechill Breath',
+      crypt_tail_lash: 'Tail Lash',
+      crypt_wing_gust: 'Wing Gust',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

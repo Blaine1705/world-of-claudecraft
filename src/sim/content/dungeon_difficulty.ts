@@ -366,9 +366,16 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // Call): lifted onto the shared 150 summoned-add floor with the other
     // heroics (tests/heroic_difficulty_floors.test.ts).
     addDamageMultiplier: 9.5,
-    // The P9 procession's Bound Souls are NON-elite spawn-list walkers (no
-    // 1.5x elite swing): lifted onto the 500 heroic mob floor on their own.
-    damageMultiplierByMob: { bound_soul: 56 },
+    // Spawn-list trash below the 500 heroic mob floor on the shared factor is
+    // lifted onto it on its own: the lighter-swinging casters and cutthroat,
+    // and the NON-elite Carrion Crows (no 1.5x elite swing) of the flocks.
+    damageMultiplierByMob: {
+      crypt_gravecaller_adept: 24,
+      crypt_gravecaller_necromancer: 24,
+      crypt_crow_caller: 24,
+      crypt_ossuary_cutthroat: 23,
+      crypt_carrion_crow: 66,
+    },
     armorMultiplier: 1.3,
     finalBossId: 'morthen',
     marksPerParticipant: 1,

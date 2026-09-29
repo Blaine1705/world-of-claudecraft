@@ -18,6 +18,7 @@
 import { supportHeightAt } from '../colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
+  DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
@@ -43,6 +44,7 @@ import {
 } from '../ignivar_raid_ids';
 import { updateIgnivarRaidProgression } from '../ignivar_raid_progression';
 import { stampDungeonPatrol } from '../mob/patrol';
+import { tickTrashKits } from '../mob/trash_kit';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
@@ -990,6 +992,18 @@ function claimInstance(
     mob.prevFacing = mob.facing;
     if (spawn.idleStationary) mob.idleStationary = true; // hand-placed pack holds formation
     if (spawn.patrol) mob.dungeonPatrol = stampDungeonPatrol(spawn.patrol, origin.x, origin.z);
+    // A perched placement waits on its perch (mob/trash_kit): on it from the start.
+    if (spawn.perch) {
+      const perchY = DUNGEON_FLOOR_Y + spawn.perch.y;
+      mob.perchY = perchY;
+      mob.pos.y = perchY;
+      mob.prevPos.y = perchY;
+    }
+    // A flying patrol starts on the wing.
+    if (mob.dungeonPatrol?.flightY !== undefined) {
+      mob.pos.y = mob.dungeonPatrol.flightY;
+      mob.prevPos.y = mob.dungeonPatrol.flightY;
+    }
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);
   }
@@ -1478,6 +1492,8 @@ export function awardHeroicMarks(
 export function updateInstances(ctx: SimContext): void {
   // In-dungeon gates and seals follow their packs and bosses every tick.
   tickDungeonGates(ctx);
+  // Dungeon trash kits (bolts, raises, leaps, dives, landings), after the mob AI.
+  tickTrashKits(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

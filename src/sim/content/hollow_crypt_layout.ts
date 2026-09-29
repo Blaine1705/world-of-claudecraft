@@ -496,3 +496,69 @@ export const HOLLOW_CRYPT_FIELD: AuthoredFieldDef = {
     { id: 'rite', x: 0, z: 205, r: 50, key: 0x9ad8c0, accent: 0x6fd6a8, fog: 0x1d3330 },
   ],
 };
+
+// ---- the cloister arcade ---------------------------------------------------------
+
+function hash(a: number, b: number): number {
+  const v = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
+  return v - Math.floor(v);
+}
+
+/** A cloister column the ruin has broken (a deterministic pick by position). */
+export function isBrokenCloisterColumn(p: { x: number; z: number }): boolean {
+  return hash(p.x, p.z) < 0.3;
+}
+
+/** One arcade bay spans this far between its two column centres. */
+export const ARCADE_BAY = 10;
+/** Height of the flat cap on a whole arcade arch (the Kit_ArcadeArch top). */
+export const ARCADE_TOP_Y = 15.2;
+
+export type ArcadeBayVariant = 'whole' | 'broken' | 'springer' | 'fallen';
+
+export interface ArcadeBay {
+  x: number;
+  z: number;
+  /** Yaw so the arch's local +X runs from column `a` to column `b`. */
+  rot: number;
+  variant: ArcadeBayVariant;
+  /** The standing column a springer rises from (springer bays only). */
+  standing?: { x: number; z: number };
+}
+
+/**
+ * The cloister arcade, derived from its columns: one bay over every pair of
+ * columns exactly one bay apart. Both columns standing: a whole arch (or a
+ * broken one that keeps both springers). One fallen: only the springer on the
+ * standing capital. Both fallen: stones in the grass. Shared by the renderer
+ * (which arch piece each bay draws) and the sim (a gargoyle perches only on a
+ * whole arch's cap).
+ */
+export function hollowCryptArcadeBays(): ArcadeBay[] {
+  const cols = PROPS.filter((p) => p.kind === 'hc_cloister_column');
+  const out: ArcadeBay[] = [];
+  for (let i = 0; i < cols.length; i++) {
+    for (let j = i + 1; j < cols.length; j++) {
+      const a = cols[i];
+      const b = cols[j];
+      const dx = b.x - a.x;
+      const dz = b.z - a.z;
+      const aligned = Math.abs(dx) < 1e-6 || Math.abs(dz) < 1e-6;
+      if (!aligned || Math.abs(Math.hypot(dx, dz) - ARCADE_BAY) > 1e-6) continue;
+      const x = (a.x + b.x) / 2;
+      const z = (a.z + b.z) / 2;
+      const rot = Math.atan2(-dz, dx);
+      const aDown = isBrokenCloisterColumn(a);
+      const bDown = isBrokenCloisterColumn(b);
+      if (!aDown && !bDown) {
+        out.push({ x, z, rot, variant: hash(x * 0.37, z * 0.91) < 0.35 ? 'broken' : 'whole' });
+      } else if (aDown && bDown) {
+        out.push({ x, z, rot, variant: 'fallen' });
+      } else {
+        const s = aDown ? b : a;
+        out.push({ x, z, rot, variant: 'springer', standing: { x: s.x, z: s.z } });
+      }
+    }
+  }
+  return out;
+}

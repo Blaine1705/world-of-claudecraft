@@ -149,6 +149,7 @@ import { HEALING_TRAINING_MOBS } from './content/healing_training';
 import { HOARD_ITEMS } from './content/hoard_loot';
 import { HOLLOW_CRYPT_MOBS } from './content/hollow_crypt';
 import { HOLLOW_CRYPT_ITEMS } from './content/hollow_crypt_items';
+import { HOLLOW_CRYPT_TRASH_MOBS } from './content/hollow_crypt_trash';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -455,6 +456,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...DRAKELANDS_MOBS,
   ...WILDHEART_MOBS,
   ...HOLLOW_CRYPT_MOBS,
+  ...HOLLOW_CRYPT_TRASH_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,

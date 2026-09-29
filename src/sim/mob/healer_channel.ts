@@ -6,6 +6,7 @@ import {
 import type { Aura } from '../types';
 import { VARKHUL_CINDER_REPAIR_CAST_ID } from '../varkhul_cinder_artificer';
 import { IGNIVAR_CINDER_LANCE_CAST_ID } from './ignivar_trash_automata';
+import { TRASH_KIT_CAST_SCHOOLS } from './trash_kit/cast_ids';
 
 // The scripted cast id updateHealerHold puts on a channelHeal mob (Malric, the
 // Nythraxis spirit healer) so its heal renders a real, interruptible cast bar.
@@ -27,4 +28,6 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   ...HOARD_CONTROL_CAST_SCHOOLS,
   ...HOARD_LIGHTNING_STRIKE_CAST_SCHOOL,
   ...HOARD_ADD_CAST_SCHOOLS,
+  // The dungeon trash kit's bolts, raises, calls and shrieks (mob/trash_kit).
+  ...TRASH_KIT_CAST_SCHOOLS,
 };

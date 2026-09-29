@@ -66,7 +66,7 @@ describe('/dev crypt', () => {
   it('kills a named pack, then a boss, which opens exactly their gates', () => {
     const { sim, pid, me } = setup();
     sim.chat('/dev crypt enter', pid);
-    for (const pack of ['p1', 'p2', 'p3']) sim.chat(`/dev crypt kill ${pack}`, pid);
+    for (const pack of ['c1', 'c2', 'c3', 'c4']) sim.chat(`/dev crypt kill ${pack}`, pid);
     sim.tick();
     const inst = claimedInstanceAt(sim.ctx, me().pos);
     if (!inst) throw new Error('no claim');

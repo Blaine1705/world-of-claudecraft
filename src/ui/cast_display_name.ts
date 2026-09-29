@@ -68,6 +68,15 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.hoard_cast_mimic_bite': true,
   'abilityUi.cast.hoard_cast_mimic_leap': true,
   'abilityUi.cast.hoard_cast_coin_spit': true,
+  // The Hollow Crypt trash kit (src/sim/mob/trash_kit/cast_ids.ts).
+  'abilityUi.cast.crypt_grave_bolt': true,
+  'abilityUi.cast.crypt_raise_bones': true,
+  'abilityUi.cast.crypt_murder_call': true,
+  'abilityUi.cast.crypt_stone_shriek': true,
+  'abilityUi.cast.crypt_grave_cleave': true,
+  'abilityUi.cast.crypt_bonechill_breath': true,
+  'abilityUi.cast.crypt_tail_lash': true,
+  'abilityUi.cast.crypt_wing_gust': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

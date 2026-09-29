@@ -12241,7 +12241,15 @@ export const da_DK: EnTranslations = {
       "hoard_cast_screech": "Øredøvende skrigen",
       "hoard_cast_mimic_bite": "Hæslig bid",
       "hoard_cast_mimic_leap": "Knusende spring",
-      "hoard_cast_coin_spit": "Forbandede mønter"
+      "hoard_cast_coin_spit": "Forbandede mønter",
+      "crypt_grave_bolt": "Grave Bolt",
+      "crypt_raise_bones": "Raise Bones",
+      "crypt_murder_call": "Murder Call",
+      "crypt_stone_shriek": "Stone Shriek",
+      "crypt_grave_cleave": "Grave Cleave",
+      "crypt_bonechill_breath": "Bonechill Breath",
+      "crypt_tail_lash": "Tail Lash",
+      "crypt_wing_gust": "Wing Gust"
     }
   },
   "questUi": {
@@ -19631,6 +19639,36 @@ export const da_DK: EnTranslations = {
       },
       "cantor_ilvane": {
         "name": "Cantor Ilvane"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "Ossuary Warrior"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "Gravecaller Adept"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "Ossuary Cutthroat"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "Gravecaller Necromancer"
+      },
+      "crypt_bone_minion": {
+        "name": "Bone Minion"
+      },
+      "crypt_bone_brute": {
+        "name": "Bone Brute"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "Chapel Gargoyle"
+      },
+      "crypt_crow_caller": {
+        "name": "Crow Caller"
+      },
+      "crypt_carrion_crow": {
+        "name": "Carrion Crow"
+      },
+      "crypt_ossuary_drake": {
+        "name": "Ossuary Drake"
       },
       "bastion_revenant": {
         "name": "Bastionens Genganger"

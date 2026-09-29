@@ -12241,7 +12241,15 @@ export const en_XA: EnTranslations = {
       "hoard_cast_screech": "[Ðéáƒéñíñĝ Šçŕééçĥ]",
       "hoard_cast_mimic_bite": "[Ʋóŕáçíóúš Ɓíţé]",
       "hoard_cast_mimic_leap": "[Çŕúšĥíñĝ Ļéáþ]",
-      "hoard_cast_coin_spit": "[Çúŕšéð Çóíñš]"
+      "hoard_cast_coin_spit": "[Çúŕšéð Çóíñš]",
+      "crypt_grave_bolt": "[Ĝŕáʋé Ɓóļţ]",
+      "crypt_raise_bones": "[Ŕáíšé Ɓóñéš]",
+      "crypt_murder_call": "[Ɱúŕðéŕ Çáļļ]",
+      "crypt_stone_shriek": "[Šţóñé Šĥŕíéķ]",
+      "crypt_grave_cleave": "[Ĝŕáʋé Çļéáʋé]",
+      "crypt_bonechill_breath": "[Ɓóñéçĥíļļ Ɓŕéáţĥ]",
+      "crypt_tail_lash": "[Ţáíļ Ļášĥ]",
+      "crypt_wing_gust": "[Ŵíñĝ Ĝúšţ]"
     }
   },
   "questUi": {
@@ -19631,6 +19639,36 @@ export const en_XA: EnTranslations = {
       },
       "cantor_ilvane": {
         "name": "[Çáñţóŕ Íļʋáñé]"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "[Óššúáŕý Ŵáŕŕíóŕ]"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "[Ĝŕáʋéçáļļéŕ Áðéþţ]"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "[Óššúáŕý Çúţţĥŕóáţ]"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "[Ĝŕáʋéçáļļéŕ Ñéçŕóɱáñçéŕ]"
+      },
+      "crypt_bone_minion": {
+        "name": "[Ɓóñé Ɱíñíóñ]"
+      },
+      "crypt_bone_brute": {
+        "name": "[Ɓóñé Ɓŕúţé]"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "[Çĥáþéļ Ĝáŕĝóýļé]"
+      },
+      "crypt_crow_caller": {
+        "name": "[Çŕóŵ Çáļļéŕ]"
+      },
+      "crypt_carrion_crow": {
+        "name": "[Çáŕŕíóñ Çŕóŵ]"
+      },
+      "crypt_ossuary_drake": {
+        "name": "[Óššúáŕý Ðŕáķé]"
       },
       "bastion_revenant": {
         "name": "[Ɓášţíóñ Ŕéʋéñáñţ]"

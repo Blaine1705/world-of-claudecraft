@@ -1,5 +1,5 @@
 // Dungeon patrols (src/sim/mob/patrol.ts): the loop math, the walk through a
-// real Hollow Crypt claim (the P2 acolytes circle the ossuary monument), the
+// real Hollow Crypt claim (the c2 skeleton squad circles the ossuary monument), the
 // pull from a patrol, and determinism.
 
 import { describe, expect, it } from 'vitest';
@@ -50,11 +50,11 @@ function claim(seed: number): { sim: Sim; pid: number; inst: InstanceSlot } {
 
 function p2(sim: Sim, inst: InstanceSlot): Entity[] {
   return DUNGEONS.hollow_crypt.spawns
-    .map((s, i) => (s.packId === 'p2' ? (sim.ctx.entities.get(inst.mobIds[i]) as Entity) : null))
+    .map((s, i) => (s.packId === 'c2' ? (sim.ctx.entities.get(inst.mobIds[i]) as Entity) : null))
     .filter((e): e is Entity => e !== null);
 }
 
-describe('the P2 patrol in a live claim', () => {
+describe('the monument patrol (c2) in a live claim', () => {
   it('walks the monument loop while idle and stays on it', () => {
     const { sim, inst } = claim(5);
     const [lead] = p2(sim, inst);

@@ -11,6 +11,7 @@
 // harness through NormalDungeonTuning.healthMultiplierByMob.
 
 import type { DungeonGateDef, DungeonObjectSpawn, DungeonSpawn, MobTemplate } from '../types';
+import { ARCADE_TOP_Y } from './hollow_crypt_layout';
 
 // ---- Templates ------------------------------------------------------------
 
@@ -328,57 +329,197 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
 const FACE_SOUTH = Math.PI; // toward the entrance
 const FACE_NORTH = 0;
 
-// P2 walks a loop around the ossuary monument; P9's acolyte leads three bound
-// souls around the stair landing. Offsets space the walkers in file.
-const P2_LOOP = [
+// Pack ids read as <area><n>: c cloister, p processional, w west wing, e east
+// wing, q choir, s stair. Four patrols: the skeleton squad round the ossuary
+// monument (c2), the crow flock circling the Sexton's Yard (w2), the Ossuary
+// Drake flying the length of the Processional (drake) and the choir watch
+// pacing the nave aisle (q2).
+
+/** The skeleton squad's loop round the ossuary monument. */
+const C2_LOOP = [
   { x: -16, z: -46 },
   { x: 16, z: -46 },
   { x: 16, z: -14 },
   { x: -16, z: -14 },
 ];
-const P9_LOOP = [
-  { x: 35, z: 157 },
-  { x: 51, z: 157 },
-  { x: 51, z: 165 },
-  { x: 35, z: 165 },
+/** The crow flock's circle over the Sexton's Yard (flown over the headstones). */
+const W2_LOOP = [
+  { x: -96, z: 34 },
+  { x: -70, z: 30 },
+  { x: -64, z: 56 },
+  { x: -80, z: 74 },
+  { x: -100, z: 62 },
+];
+/** The Ossuary Drake's flight over the Processional and the choir approach. */
+const DRAKE_LOOP = [
+  { x: -14, z: 28 },
+  { x: 14, z: 28 },
+  { x: 14, z: 104 },
+  { x: -14, z: 104 },
+];
+/** The choir watch pacing the nave aisle between the pews. */
+const Q2_LOOP = [
+  { x: -6, z: 116 },
+  { x: 6, z: 116 },
+  { x: 6, z: 144 },
+  { x: -6, z: 144 },
 ];
 
+/** A gargoyle perched on the cap of a whole cloister arch (see the layout's
+ *  hollowCryptArcadeBays; tests/hollow_crypt_trash_layout.test.ts pins it). */
+function gargoyle(x: number, z: number, packId: string, facing = FACE_SOUTH): DungeonSpawn {
+  return {
+    mobId: 'crypt_chapel_gargoyle',
+    x,
+    z,
+    facing,
+    packId,
+    idleStationary: true,
+    perch: { y: ARCADE_TOP_Y },
+  };
+}
+
+/** A pack member holding formation until pulled. */
+function held(
+  mobId: string,
+  x: number,
+  z: number,
+  packId: string,
+  facing = FACE_SOUTH,
+): DungeonSpawn {
+  return { mobId, x, z, facing, packId, idleStationary: true };
+}
+
 export const HOLLOW_CRYPT_SPAWNS: DungeonSpawn[] = [
-  // P1: Undercroft vestibule, two shamblers at the foot of the Chapel Stair.
-  { mobId: 'crypt_shambler', x: -4, z: -60, facing: FACE_SOUTH, packId: 'p1' },
-  { mobId: 'crypt_shambler', x: 4, z: -60, facing: FACE_SOUTH, packId: 'p1' },
-  // P2: two acolytes patrolling the monument loop.
-  { mobId: 'hollow_acolyte', x: -16, z: -46, packId: 'p2', patrol: { points: P2_LOOP, offset: 4 } },
-  { mobId: 'hollow_acolyte', x: -13, z: -46, packId: 'p2', patrol: { points: P2_LOOP, offset: 0 } },
-  // P3: the Grille's guard, a sentinel flanked by two shamblers.
-  { mobId: 'ossuary_sentinel', x: 0, z: 8, facing: FACE_SOUTH, packId: 'p3', idleStationary: true },
-  { mobId: 'crypt_shambler', x: -5, z: 4, facing: FACE_SOUTH, packId: 'p3', idleStationary: true },
-  { mobId: 'crypt_shambler', x: 5, z: 4, facing: FACE_SOUTH, packId: 'p3', idleStationary: true },
-  // P4: the yard trench, two gravediggers.
-  { mobId: 'hollow_gravedigger', x: -84, z: 30, packId: 'p4' },
-  { mobId: 'hollow_gravedigger', x: -78, z: 34, packId: 'p4' },
-  // P5: the bell pit below the Bell Yard ramp.
-  { mobId: 'hollow_gravedigger', x: -86, z: 66, packId: 'p5', idleStationary: true },
-  { mobId: 'crypt_shambler', x: -80, z: 62, packId: 'p5', idleStationary: true },
-  { mobId: 'crypt_shambler', x: -92, z: 62, packId: 'p5', idleStationary: true },
+  // ---- The Ossuary Cloister --------------------------------------------------
+  // c1: the stair foot. Two warriors and an adept, and a gargoyle watching
+  // from the south arcade that dives in on the pull.
+  held('crypt_ossuary_warrior', -5, -60, 'c1'),
+  held('crypt_ossuary_warrior', 5, -60, 'c1'),
+  held('crypt_gravecaller_adept', 0, -54, 'c1'),
+  gargoyle(33, -70, 'c1'),
+  // c2: the skeleton squad walking the monument loop.
+  {
+    mobId: 'crypt_ossuary_warrior',
+    x: -16,
+    z: -46,
+    packId: 'c2',
+    patrol: { points: C2_LOOP, offset: 6 },
+  },
+  {
+    mobId: 'crypt_ossuary_warrior',
+    x: -13,
+    z: -46,
+    packId: 'c2',
+    patrol: { points: C2_LOOP, offset: 3 },
+  },
+  {
+    mobId: 'crypt_ossuary_cutthroat',
+    x: -10,
+    z: -46,
+    packId: 'c2',
+    patrol: { points: C2_LOOP, offset: 0 },
+  },
+  // c3: the east arcade, two gargoyles on the arches over an adept and a warrior.
+  held('crypt_gravecaller_adept', 30, -44, 'c3', -Math.PI / 2),
+  held('crypt_ossuary_warrior', 30, -36, 'c3', -Math.PI / 2),
+  gargoyle(38, -45, 'c3', -Math.PI / 2),
+  gargoyle(38, -35, 'c3', -Math.PI / 2),
+  // c4: the Undercroft Grille's guard, a necromancer between two warriors,
+  // with a gargoyle on each north corner arch.
+  held('crypt_gravecaller_necromancer', 0, 10, 'c4'),
+  held('crypt_ossuary_warrior', -5, 5, 'c4'),
+  held('crypt_ossuary_warrior', 5, 5, 'c4'),
+  gargoyle(-38, 5, 'c4', Math.PI / 2),
+  gargoyle(38, 5, 'c4', -Math.PI / 2),
+  // ---- The Processional -----------------------------------------------------
+  // p1: past the Grille, two adepts behind a warrior and a cutthroat.
+  held('crypt_ossuary_warrior', 0, 31, 'p1'),
+  held('crypt_ossuary_cutthroat', 0, 36, 'p1'),
+  held('crypt_gravecaller_adept', -6, 38, 'p1'),
+  held('crypt_gravecaller_adept', 6, 38, 'p1'),
+  // The Ossuary Drake flies the Processional; a pass overhead is a pull.
+  {
+    mobId: 'crypt_ossuary_drake',
+    x: -14,
+    z: 28,
+    packId: 'drake',
+    patrol: { points: DRAKE_LOOP, offset: 0, pace: 0.8, altitude: 22 },
+  },
+  // p2: the choir approach before the Twin Seals.
+  held('crypt_gravecaller_necromancer', 0, 98, 'p2'),
+  held('crypt_ossuary_warrior', -5, 93, 'p2'),
+  held('crypt_ossuary_warrior', 5, 93, 'p2'),
+  held('crypt_gravecaller_adept', 0, 102, 'p2'),
+  // ---- West wing: the Sexton's Yard -------------------------------------------
+  // w1: a Crow Caller and its flock on the graves by the causeway.
+  held('crypt_crow_caller', -70, 36, 'w1', -Math.PI / 2),
+  held('crypt_carrion_crow', -67, 32, 'w1', -Math.PI / 2),
+  held('crypt_carrion_crow', -73, 31, 'w1', -Math.PI / 2),
+  held('crypt_carrion_crow', -66, 40, 'w1', -Math.PI / 2),
+  held('crypt_carrion_crow', -73, 41, 'w1', -Math.PI / 2),
+  // w2: a flock circling over the yard.
+  ...[0, 3, 6, 9, 12].map(
+    (offset): DungeonSpawn => ({
+      mobId: 'crypt_carrion_crow',
+      x: -96,
+      z: 34,
+      packId: 'w2',
+      patrol: { points: W2_LOOP, offset, pace: 0.45, altitude: 9 },
+    }),
+  ),
+  // w3: the yard trench, a necromancer with a warrior and a cutthroat.
+  held('crypt_gravecaller_necromancer', -88, 44, 'w3', -Math.PI / 2),
+  held('crypt_ossuary_warrior', -84, 49, 'w3', -Math.PI / 2),
+  held('crypt_ossuary_cutthroat', -92, 49, 'w3', -Math.PI / 2),
+  // w4: the bell pit below the Bell Yard ramp, a second caller with a warrior.
+  held('crypt_crow_caller', -86, 64, 'w4'),
+  held('crypt_ossuary_warrior', -80, 61, 'w4'),
+  held('crypt_carrion_crow', -90, 60, 'w4'),
+  held('crypt_carrion_crow', -78, 57, 'w4'),
+  held('crypt_carrion_crow', -84, 57, 'w4'),
   // Boss 1: Sexton Marrow in the Bell Yard.
   { mobId: 'sexton_marrow', x: -82, z: 122, facing: FACE_SOUTH, idleStationary: true },
-  // P6: the gallery nest, two widows and four rime egg sacs along the walls.
-  { mobId: 'bonechill_widow', x: 70, z: 44, packId: 'p6' },
-  { mobId: 'bonechill_widow', x: 78, z: 48, packId: 'p6' },
+  // ---- East wing: the Widow's Gallery ---------------------------------------
+  // e1: the gallery nest, two widows and an adept over four rime egg sacs.
+  { mobId: 'bonechill_widow', x: 70, z: 44, packId: 'e1' },
+  { mobId: 'bonechill_widow', x: 78, z: 48, packId: 'e1' },
+  held('crypt_gravecaller_adept', 74, 54, 'e1'),
   { mobId: 'rime_egg_sac', x: 58, z: 32 },
   { mobId: 'rime_egg_sac', x: 58, z: 50 },
   { mobId: 'rime_egg_sac', x: 93, z: 48 },
   { mobId: 'rime_egg_sac', x: 92, z: 62 },
-  // P7: the rim walk, a spinner and a widow above the Great Web.
-  { mobId: 'rimeweb_spinner', x: 105, z: 70, packId: 'p7', idleStationary: true },
-  { mobId: 'bonechill_widow', x: 104, z: 78, packId: 'p7', idleStationary: true },
+  // e2: the rim walk, three skeletons above the ravine.
+  held('crypt_ossuary_warrior', 104, 66, 'e2'),
+  held('crypt_ossuary_cutthroat', 106, 72, 'e2'),
+  held('crypt_gravecaller_adept', 104, 80, 'e2'),
+  // e3: the web neck, a necromancer and a warrior before the Great Web.
+  held('crypt_gravecaller_necromancer', 80, 72, 'e3'),
+  held('crypt_ossuary_warrior', 76, 68, 'e3'),
+  held('crypt_ossuary_warrior', 84, 68, 'e3'),
   // Boss 2: Rimeweb before her web.
   { mobId: 'rimeweb', x: 80, z: 116, facing: FACE_SOUTH, idleStationary: true },
-  // P8: the choir approach, two candlewrights and a chorister.
-  { mobId: 'candlewright_acolyte', x: -4, z: 94, facing: FACE_SOUTH, packId: 'p8' },
-  { mobId: 'candlewright_acolyte', x: 4, z: 94, facing: FACE_SOUTH, packId: 'p8' },
-  { mobId: 'hollow_chorister', x: 0, z: 98, facing: FACE_SOUTH, packId: 'p8' },
+  // ---- The Choir Ruin ---------------------------------------------------------
+  // q1: the nave, a necromancer and an adept behind two warriors.
+  held('crypt_ossuary_warrior', -4, 124, 'q1'),
+  held('crypt_ossuary_warrior', 4, 124, 'q1'),
+  held('crypt_gravecaller_necromancer', 0, 130, 'q1'),
+  held('crypt_gravecaller_adept', 0, 135, 'q1'),
+  // q2: the choir watch pacing the aisle.
+  {
+    mobId: 'crypt_ossuary_warrior',
+    x: -6,
+    z: 116,
+    packId: 'q2',
+    patrol: { points: Q2_LOOP, offset: 3 },
+  },
+  {
+    mobId: 'crypt_ossuary_cutthroat',
+    x: -3,
+    z: 116,
+    packId: 'q2',
+    patrol: { points: Q2_LOOP, offset: 0 },
+  },
   // Boss 3: Cantor Ilvane on the loft with her two choristers at the rail.
   {
     mobId: 'cantor_ilvane',
@@ -404,23 +545,39 @@ export const HOLLOW_CRYPT_SPAWNS: DungeonSpawn[] = [
     packId: 'ilvane',
     idleStationary: true,
   },
-  // P9: the procession on the stair landing.
-  {
-    mobId: 'candlewright_acolyte',
-    x: 44,
-    z: 157,
-    packId: 'p9',
-    patrol: { points: P9_LOOP, offset: 9 },
-  },
-  { mobId: 'bound_soul', x: 41, z: 157, packId: 'p9', patrol: { points: P9_LOOP, offset: 6 } },
-  { mobId: 'bound_soul', x: 38, z: 157, packId: 'p9', patrol: { points: P9_LOOP, offset: 3 } },
-  { mobId: 'bound_soul', x: 35, z: 157, packId: 'p9', patrol: { points: P9_LOOP, offset: 0 } },
+  // ---- The Stair Landing ----------------------------------------------------
+  // s1: the last guard before the Bone Stair.
+  held('crypt_gravecaller_necromancer', 46, 161, 's1', -Math.PI / 2),
+  held('crypt_ossuary_warrior', 41, 158, 's1', -Math.PI / 2),
+  held('crypt_ossuary_warrior', 41, 164, 's1', -Math.PI / 2),
+  held('crypt_ossuary_cutthroat', 49, 165, 's1', -Math.PI / 2),
   // Boss 4: Morthen at the altar of the Rite Ring, facing the stair.
   { mobId: 'morthen', x: 0, z: 212, facing: FACE_NORTH, idleStationary: true },
 ];
 
-/** The nine mandatory trash pulls, in route order (dev helpers, tests). */
-export const HOLLOW_CRYPT_PACKS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9'] as const;
+/** Every mandatory trash pull, patrols included, in route order (dev helpers, tests). */
+export const HOLLOW_CRYPT_PACKS = [
+  'c1',
+  'c2',
+  'c3',
+  'c4',
+  'p1',
+  'drake',
+  'p2',
+  'w1',
+  'w2',
+  'w3',
+  'w4',
+  'e1',
+  'e2',
+  'e3',
+  'q1',
+  'q2',
+  's1',
+] as const;
+
+/** The four patrols (dev helpers, tests). */
+export const HOLLOW_CRYPT_PATROLS = ['c2', 'w2', 'drake', 'q2'] as const;
 
 // ---- Gates and seals --------------------------------------------------------
 
@@ -438,7 +595,7 @@ export const HOLLOW_CRYPT_GATES: DungeonGateDef[] = [
     z: 21,
     hw: 7,
     rot: 0,
-    packs: ['p1', 'p2', 'p3'],
+    packs: ['c1', 'c2', 'c3', 'c4'],
     openText: 'The Undercroft Grille grinds open.',
   },
   {
@@ -449,7 +606,7 @@ export const HOLLOW_CRYPT_GATES: DungeonGateDef[] = [
     z: 93,
     hw: 7,
     rot: 0,
-    packs: ['p4', 'p5'],
+    packs: ['w1', 'w2', 'w3', 'w4'],
     sealWhileEngaged: 'sexton_marrow',
     openText: 'The bone barrier before the Bell Yard crumbles.',
   },
@@ -472,7 +629,7 @@ export const HOLLOW_CRYPT_GATES: DungeonGateDef[] = [
     z: 88,
     hw: 7,
     rot: 0,
-    packs: ['p6', 'p7'],
+    packs: ['e1', 'e2', 'e3'],
     sealWhileEngaged: 'rimeweb',
     openText: 'The frost-web curtain tears apart.',
   },
@@ -495,7 +652,7 @@ export const HOLLOW_CRYPT_GATES: DungeonGateDef[] = [
     z: 113,
     hw: 7,
     rot: 0,
-    packs: ['p8'],
+    packs: ['p1', 'drake', 'p2'],
     bosses: ['sexton_marrow', 'rimeweb'],
     sealWhileEngaged: 'cantor_ilvane',
     openText: 'Both sigils gutter out. The Twin Seals open.',
@@ -508,6 +665,7 @@ export const HOLLOW_CRYPT_GATES: DungeonGateDef[] = [
     z: 161,
     hw: 7,
     rot: across(1, 0),
+    packs: ['q1', 'q2'],
     bosses: ['cantor_ilvane'],
     openText: 'The choir door opens onto the Bone Stair.',
   },
@@ -519,7 +677,7 @@ export const HOLLOW_CRYPT_GATES: DungeonGateDef[] = [
     z: 161,
     hw: 6,
     rot: across(1, 0),
-    packs: ['p9'],
+    packs: ['s1'],
     openText: 'The gate at the foot of the Bone Stair collapses.',
   },
   {
