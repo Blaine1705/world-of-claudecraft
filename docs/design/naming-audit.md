@@ -724,11 +724,11 @@ Exact-phrase and coined-token searches against the major game wikis.
 ### The Sunken Bastion rework (web-verified 2026-09-29)
 
 Exact-phrase and coined-token searches against the major game wikis, at authoring. The
-design-time verdicts live in  section 10.
+design-time verdicts live in `docs/design/dungeon-rework/sunken_bastion.md` section 10.
 
 | Name | Where | Verdict |
 |---|---|---|
-| Mistweaver | REJECTED before shipping | The Mistweaver is a World of Warcraft Monk specialization. The trash mob keeps its id (, never shown); its display name is Mist Chanter. |
+| Mistweaver | REJECTED before shipping | The Mistweaver is a World of Warcraft Monk specialization. The trash mob keeps its id (`mistweaver`, never shown); its display name is Mist Chanter. |
 | Mist Chanter | the fog-warding trash caster | KEEP. No match; plain English. |
 | Oathwarden | REJECTED before shipping | Kyril Oathwarden is a Guild Wars boss: a coined surname. Olen's rare is the Knight-Commander's Longsword and his heroic epic the Drowned Commander's Breastplate. |
 | Keelhauler | REJECTED before shipping | Keelhauler Legplates (World of Warcraft item) and the Keelhauler pistol (Starfield). Ossick's weapon and striders take Gaolyard instead. |
