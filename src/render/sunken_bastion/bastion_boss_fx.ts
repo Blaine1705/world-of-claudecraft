@@ -91,7 +91,7 @@ const DEBRIS = 18;
 const LIFT = 0.08;
 const WINCH_TOP = 4.2;
 const LANTERN_Y = 2.75;
-const DOME_R = 7;
+const DOME_R = 9.5;
 
 const GOLD = 0xffc862;
 const IRON = new THREE.Color(0.035, 0.036, 0.04);

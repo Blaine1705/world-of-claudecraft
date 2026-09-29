@@ -59,11 +59,11 @@ export const SHOTS = [
   },
   {
     id: 'jefe3_vael_cerca',
-    at: [-4, 235],
+    at: [4, 219],
     face: 0,
-    yaw: Math.PI,
+    yaw: -0.85,
     pitch: 0.15,
-    dist: 10,
+    dist: 7,
     wait: 3000,
   },
   // The boss mechanics, live: pull the boss onto the player, fire the mechanic.
@@ -321,6 +321,36 @@ async function main() {
           return JSON.stringify({ me: me.id, out });
         }, shot.js);
         console.log('PROBE', shot.id, probe);
+      }
+      if (process.env.SHOT_RAY) {
+        // Debug: name what sits under a screen point (NDC "x,y").
+        const hits = await page.evaluate((ndc) => {
+          const r = window.__game.renderer;
+          const cam = r.camera;
+          const [x, y] = ndc.split(',').map(Number);
+          const Vec = r.scene.position.constructor;
+          const origin = new Vec().setFromMatrixPosition(cam.matrixWorld);
+          const dir = new Vec(x, y, 0.5).unproject(cam).sub(origin).normalize();
+          const out = [];
+          r.scene.traverse((o) => {
+            if ((!o.isMesh && !o.isSprite && !o.isPoints) || !o.geometry) return;
+            let vis = true;
+            for (let q = o; q; q = q.parent) if (!q.visible) vis = false;
+            if (!vis) return;
+            if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+            const s = o.geometry.boundingSphere.clone().applyMatrix4(o.matrixWorld);
+            const toC = s.center.clone().sub(origin);
+            const t = toC.dot(dir);
+            if (t < 0) return;
+            const d = toC.sub(dir.clone().multiplyScalar(t)).length();
+            if (d > s.radius || s.radius > 40) return;
+            out.push(
+              `${t.toFixed(1)} ${o.type} ${o.name || '-'} < ${o.parent?.name || '-'} < ${o.parent?.parent?.name || '-'} r=${s.radius.toFixed(1)} mat=${o.material?.name || o.material?.type}`,
+            );
+          });
+          return out.sort((a, b) => Number.parseFloat(a) - Number.parseFloat(b)).slice(0, 25);
+        }, process.env.SHOT_RAY);
+        console.log(`RAY\n${hits.join('\n')}`);
       }
       const file = path.join(OUT, `${PREFIX}${shot.id}.png`);
       await page.screenshot({ path: file });
