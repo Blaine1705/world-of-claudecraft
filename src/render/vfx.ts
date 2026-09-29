@@ -22,6 +22,7 @@ import {
   LEGENDARY_REGALIA_RATE_PER_SEC,
 } from './legendary_regalia_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
+import { spellEffectsEnabled } from './spell_effects_switch';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import { bubbleBeamMaterialOptions } from './vfx_basic_materials';
 import {
@@ -320,6 +321,9 @@ interface Projectile {
   // trail and impact flash; mechanics and speed are untouched.
   scale?: number;
   onImpact?: (position: THREE.Vector3) => void;
+  // Spell Effects was off at launch: the flight keeps its timing so onImpact
+  // fires when it would have, but nothing is drawn along the way or at impact.
+  hidden?: boolean;
 }
 
 interface BubbleBeam {
@@ -925,6 +929,10 @@ export class Vfx {
     color?: number,
   ): void {
     if (this.disposed) return;
+    // Spell Effects off: a flight nothing waits on is skipped outright; one
+    // with an impact callback (the soul-consume sound) still flies, unseen.
+    const hidden = !spellEffectsEnabled();
+    if (hidden && !onImpact) return;
     const colors = projectileSchoolColors(school, color);
     const sprites = projectileSprites(school);
     this.projectiles.push({
@@ -939,12 +947,14 @@ export class Vfx {
       trailSprite: sprites.trail,
       scale,
       onImpact,
+      hidden,
     });
   }
 
   deathBolt(leftHand: THREE.Vector3, rightHand: THREE.Vector3, targetId: number): void {
     this.projectileFrom(leftHand, targetId, 'shadow', 1.28, 31);
     this.projectileFrom(rightHand, targetId, 'shadow', 1.28, 31);
+    if (!spellEffectsEnabled()) return;
     for (const hand of [leftHand, rightHand]) {
       for (let i = 0; i < this.scaledCount(7); i++) {
         const angle = (i / 7) * Math.PI * 2;
@@ -973,6 +983,7 @@ export class Vfx {
     onImpact?: (position: THREE.Vector3) => void,
   ): void {
     this.projectileFrom(new THREE.Vector3(x, y, z), targetId, 'shadow', 1.2, 14, onImpact);
+    if (!spellEffectsEnabled()) return;
     for (let i = 0; i < this.scaledCount(14); i++) {
       const angle = (i / 14) * Math.PI * 2;
       this.spawn(
@@ -992,6 +1003,7 @@ export class Vfx {
   }
 
   lichTransform(entityId: number): void {
+    if (!spellEffectsEnabled()) return;
     const feet = this.anchor(entityId, 0.08);
     const center = this.anchor(entityId, 0.48);
     if (!feet || !center) return;
@@ -1018,6 +1030,7 @@ export class Vfx {
   }
 
   beam(sourceId: number, targetId: number, school: string, colorOverride?: number): void {
+    if (!spellEffectsEnabled()) return;
     const from = this.anchor(sourceId, 0.62);
     const to = this.anchor(targetId, 0.55);
     if (!from || !to) return;
@@ -1044,6 +1057,9 @@ export class Vfx {
    * ring-shaped bubbles that rise as they travel between both moving anchors. */
   bubbleBeam(sourceId: number, targetId: number, duration: number): void {
     if (this.disposed) return;
+    // Spell Effects off: every start reads as a stop, which also ends a
+    // stream already running when the switch was flipped.
+    if (!spellEffectsEnabled()) duration = 0;
     const existing = this.bubbleBeams.find((b) => b.sourceId === sourceId);
     if (duration <= 0) {
       if (existing) {
@@ -1089,24 +1105,25 @@ export class Vfx {
    * from the victim back toward the caster. */
   drainBeam(sourceId: number, targetId: number, duration: number): void {
     if (this.disposed) return;
-    this.drainLifeVfx.drain(sourceId, targetId, duration);
+    this.drainLifeVfx.drain(sourceId, targetId, spellEffectsEnabled() ? duration : 0);
   }
 
   /** Possessed companion contribution to Drain Life, from the Eye beside the
    * caster to the same victim as the caster's ordinary tether. */
   demonicDrainBeam(casterId: number, targetId: number, duration: number): void {
     if (this.disposed) return;
-    this.drainLifeVfx.demonicDrain(casterId, targetId, duration);
+    this.drainLifeVfx.demonicDrain(casterId, targetId, spellEffectsEnabled() ? duration : 0);
   }
 
   /** The Affliction companion's own attack: a very brief sickly-green ray
    * wrapped in violet shadow, fired from the Eye rather than the caster. */
   evilEyeGaze(casterId: number, targetId: number, duration = 0.28): void {
-    if (this.disposed) return;
+    if (this.disposed || !spellEffectsEnabled()) return;
     this.drainLifeVfx.evilEyeGaze(casterId, targetId, duration);
   }
 
   drainLifeTick(casterId: number): void {
+    if (!spellEffectsEnabled()) return;
     if (this.disposed) return;
     this.drainLifeVfx.tick(casterId);
   }
@@ -1117,6 +1134,7 @@ export class Vfx {
   // chain emits one; the per-target heal glow (healGlow, on the heal2 event) lands
   // the burst at each ally, so this method only draws the connecting cord.
   chainHealArc(sourceId: number, targetId: number): void {
+    if (!spellEffectsEnabled()) return;
     const from = this.anchor(sourceId, 0.62);
     const to = this.anchor(targetId, 0.55);
     if (!from || !to) return;
@@ -1177,6 +1195,7 @@ export class Vfx {
   // blue-white electric streak instead of a round glowing comet (the shape is
   // drawn in the projectile update loop). Original procedural effect (no assets).
   lightningProjectile(sourceId: number, targetId: number, color?: number): void {
+    if (!spellEffectsEnabled()) return;
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     // A color override tints the bolt per ability: the head stays pushed toward
@@ -1203,6 +1222,7 @@ export class Vfx {
   // the caster with a star flash at the chest. Reads as "your next cast is
   // charged" without covering the character. Original procedural effect.
   procSurge(entityId: number, school: string): void {
+    if (!spellEffectsEnabled()) return;
     const at = this.anchor(entityId, 0.5);
     if (!at) return;
     const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(2.6));
@@ -1236,6 +1256,7 @@ export class Vfx {
   // slow rain of glints along its shell. Used for absorb procs and the
   // cheat-death save. Original procedural effect.
   wardBloom(entityId: number, school: string): void {
+    if (!spellEffectsEnabled()) return;
     const at = this.anchor(entityId, 0.55);
     if (!at) return;
     const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffdf80).multiplyScalar(hdr(2.2));
@@ -1284,6 +1305,7 @@ export class Vfx {
     targetId: number,
     impact: 'healing' | 'defensive' | 'offensive' | 'area' = 'offensive',
   ): void {
+    if (!spellEffectsEnabled()) return;
     const anchorId = impact === 'area' ? sourceId : targetId;
 
     if (impact === 'healing') {
@@ -1326,10 +1348,12 @@ export class Vfx {
   }
 
   paladinHolyShock(sourceId: number, targetId: number, mode: 'heal' | 'damage'): void {
+    if (!spellEffectsEnabled()) return;
     this.paladinSpellFx.holyShock({ mode, sourceId, targetId });
   }
 
   paladinSunwardDisc(sourceId: number, targetId: number, hopIndex: number, totalHits = 3): void {
+    if (!spellEffectsEnabled()) return;
     this.paladinSpellFx.sunwardDisc({
       sourceId,
       targetId,
@@ -1345,10 +1369,12 @@ export class Vfx {
     hopIndex: number,
     totalHits = 3,
   ): void {
+    if (!spellEffectsEnabled()) return;
     this.paladinSpellFx.sunwardDiscImpact(sourceId, targetId, hopIndex, totalHits);
   }
 
   paladinBastionSweep(sourceId: number, radius: number, arcDegrees: number, facing: number): void {
+    if (!spellEffectsEnabled()) return;
     this.paladinSpellFx.bastionSweep({
       sourceId,
       radius,
@@ -1358,12 +1384,14 @@ export class Vfx {
   }
 
   paladinBastionSweepImpact(targetId: number): void {
+    if (!spellEffectsEnabled()) return;
     this.paladinSpellFx.bastionSweepTarget(targetId);
   }
 
   // Dawnfall uses a timed dawn rune, circular slash, six short-lived radiant
   // blades, and a shockwave clamped to the supplied gameplay radius.
   paladinDawnfall(sourceId: number, radius: number): void {
+    if (!spellEffectsEnabled()) return;
     this.paladinSpellFx.dawnfall({
       casterId: sourceId,
       radius,
@@ -1372,12 +1400,14 @@ export class Vfx {
   }
 
   paladinDawnfallImpact(targetId: number): void {
+    if (!spellEffectsEnabled()) return;
     this.paladinSpellFx.dawnfallTarget(targetId);
   }
 
   // Final Edict is deliberately tighter than Dawnfall: one descending blade,
   // a compact seal under the victim, and a dense vertical impact shower.
   paladinFinalEdict(sourceId: number, targetId: number): void {
+    if (!spellEffectsEnabled()) return;
     const target = this.anchor(targetId, 0.08);
     if (!target) return;
     const source = this.anchor(sourceId, 0.45);
@@ -1454,6 +1484,7 @@ export class Vfx {
   // A stored heal-echo firing: a fountain of life-green motes bursting upward
   // from the saved ally, collapsing back like a heartbeat. Original effect.
   echoBurst(entityId: number, school: string): void {
+    if (!spellEffectsEnabled()) return;
     const at = this.anchor(entityId, 0.4);
     if (!at) return;
     const green = new THREE.Color(0x9cf58e).multiplyScalar(hdr(2.4));
@@ -1483,6 +1514,7 @@ export class Vfx {
   // A DoT detonation (Earthen Jolt eating Cinder Jolt): a fast ground-level
   // shockwave ring plus an ember shower in the DoT's school color. Original.
   detonate(entityId: number, school: string): void {
+    if (!spellEffectsEnabled()) return;
     const at = this.anchor(entityId, 0.15);
     if (!at) return;
     const hot = new THREE.Color(SCHOOL_COLORS[school] ?? 0xff8844).multiplyScalar(hdr(2.8));
@@ -1736,6 +1768,7 @@ export class Vfx {
   }
 
   tick(targetId: number, school: string, color?: number): void {
+    if (!spellEffectsEnabled()) return;
     const at = this.anchor(targetId, 0.55);
     if (at) this.burst(at, school, 7, 0.6, color);
   }
@@ -1767,6 +1800,7 @@ export class Vfx {
   }
 
   shoutwave(centerId: number, colorHex: number): void {
+    if (!spellEffectsEnabled()) return;
     const at = this.anchor(centerId, 0.12);
     if (!at) return;
     const bright = new THREE.Color(colorHex).multiplyScalar(hdr(1.7));
@@ -1796,6 +1830,7 @@ export class Vfx {
   }
 
   recklessFlame(entityId: number, dt: number): void {
+    if (!spellEffectsEnabled()) return;
     if (!this.emitChance(26, dt)) return;
     const at = this.anchor(entityId, 0.25);
     if (!at) return;
@@ -1866,6 +1901,7 @@ export class Vfx {
   }
 
   meleeSpark(targetId: number, crit: boolean): void {
+    if (!spellEffectsEnabled()) return;
     const at = this.anchor(targetId, 0.55);
     if (!at) return;
     // a single slash arc reads as the hit itself...
@@ -1995,6 +2031,31 @@ export class Vfx {
   }
 
   // continuous emitters (called per frame)
+  // Spell-sourced twins of the shared emitters. nova, burst, healGlow,
+  // buffSwirl and castSparkle also carry reads that are not spell effects (a
+  // delve shrine's sequence pulse, a lit wardstone, a minigame power-up), so
+  // they stay ungated; a SPELL call site uses the twin, which the Spell
+  // Effects switch (spell_effects_switch.ts) silences.
+  spellNova(centerId: number, school: string, color?: number): void {
+    if (spellEffectsEnabled()) this.nova(centerId, school, color);
+  }
+
+  spellBurst(at: THREE.Vector3, school: string, count?: number, power?: number): void {
+    if (spellEffectsEnabled()) this.burst(at, school, count, power);
+  }
+
+  spellHealGlow(targetId: number): void {
+    if (spellEffectsEnabled()) this.healGlow(targetId);
+  }
+
+  spellBuffSwirl(targetId: number, color?: number): void {
+    if (spellEffectsEnabled()) this.buffSwirl(targetId, color);
+  }
+
+  spellCastSparkle(entityId: number, school: string, dt: number, color?: number): void {
+    if (spellEffectsEnabled()) this.castSparkle(entityId, school, dt, color);
+  }
+
   castSparkle(entityId: number, school: string, dt: number, color?: number): void {
     if (!this.emitChance(30, dt)) return;
     const at = this.anchor(entityId, 0.66);
@@ -2021,6 +2082,7 @@ export class Vfx {
   // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
   // smoke curls.
   formAura(entityId: number, form: 'metamorph' | 'moonkin' | 'shadowform', dt: number): void {
+    if (!spellEffectsEnabled()) return;
     if (form === 'metamorph') {
       const n = this.emitCount(48, dt);
       if (!n) return;
@@ -2512,6 +2574,7 @@ export class Vfx {
   }
 
   lichAura(entityId: number, dt: number, soulFragments: number): void {
+    if (!spellEffectsEnabled()) return;
     const full = soulFragments >= 5;
     const count = this.emitCount(full ? 42 : 26, dt);
     if (!count) return;
@@ -2666,6 +2729,11 @@ export class Vfx {
       const dist = dir.length();
       const step = pr.speed * dt;
       if (dist <= Math.max(0.7, step)) {
+        if (pr.hidden) {
+          this.projectiles.splice(i, 1);
+          pr.onImpact?.(target);
+          continue;
+        }
         // impact: school-tinted cross-flash + burst that survives a 30fps frame
         this.tmpColor.copy(pr.color).multiplyScalar(hdr(1.6));
         const sc = pr.scale ?? 1;
@@ -2713,6 +2781,7 @@ export class Vfx {
       const uz = dir.z / dist;
       dir.multiplyScalar(step / dist);
       pr.pos.add(dir);
+      if (pr.hidden) continue;
       if (pr.lightning) {
         // The flying head is a short jagged electric streak trailing back along
         // the travel direction: a few segments, each kicked perpendicular for the

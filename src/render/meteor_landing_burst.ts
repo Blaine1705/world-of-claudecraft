@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { groundHeight } from '../sim/world';
 import type { AbilityVfxSpellfxAtEvent } from './ability_vfx/painter';
 import type { MeteorFallSpawn } from './mage_ground_fx';
+import { spellEffectsEnabled } from './spell_effects_switch';
 
 export interface MeteorLandingSpecPainter {
   handleSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean;
@@ -49,6 +50,9 @@ export function meteorLandingBurst(
   ) {
     return 'spec';
   }
+  // The fallback arm is pure spell garnish: the ground warning that preceded
+  // the landing is its own module, so the Spell Effects switch drops only this.
+  if (!spellEffectsEnabled()) return 'burst';
   const gy = groundHeight(x, z, seed);
   vfx.burst(
     new THREE.Vector3(x, gy + LANDING_BURST_LIFT, z),

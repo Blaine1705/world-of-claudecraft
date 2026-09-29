@@ -7,6 +7,7 @@ import {
 } from '../sim/combat/glacial_front';
 import type { Entity } from '../sim/types';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
+import { spellEffectsEnabled } from './spell_effects_switch';
 
 const BURST_LIFETIME = 0.68;
 const BURST_POOL_SIZE = 5;
@@ -278,6 +279,9 @@ export class GlacialFrontVisual {
     angle = GLACIAL_FRONT_ANGLE_DEG,
     fx: 'frostCone' | 'fireCone' = 'frostCone',
   ): void {
+    // The released cone is spell garnish; the charge preview above is the
+    // caster's aiming read and ignores the Spell Effects switch.
+    if (!spellEffectsEnabled()) return;
     const slot = this.bursts[this.nextBurst];
     this.nextBurst = (this.nextBurst + 1) % this.bursts.length;
     slot.elapsed = 0;

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { spellEffectsEnabled } from './spell_effects_switch';
 
 const RECKLESS_SKULL_LIFETIME = 1;
 
@@ -49,6 +50,7 @@ export class RecklessSkullPainter {
   private readonly live: { sprite: THREE.Sprite; parent: THREE.Group; elapsed: number }[] = [];
 
   spawn(parent: THREE.Group, height: number): void {
+    if (!spellEffectsEnabled()) return;
     const sprite = new THREE.Sprite(
       new THREE.SpriteMaterial({
         map: recklessSkullTexture(),

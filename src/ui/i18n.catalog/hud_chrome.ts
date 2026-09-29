@@ -2721,6 +2721,10 @@ export const hudChromeStrings = {
     // off it. It sits in the Display card beside Weather because it costs
     // GPU passes, not because it is a comfort toggle.
     waterRipples: 'Water Ripples (Wakes)',
+    // Graphics-panel switch (default on) for spell and ability visual effects
+    // in the 3D world. Off keeps area telegraph rings, crowd-control bands and
+    // cast bars; only the cosmetic spell visuals go.
+    spellEffects: 'Spell Effects',
     // Camera card opt-in (default off): the over-the-shoulder Action Cam, plus
     // the shoulder slider (full left .. center .. full right) that only shows
     // while it is on. The slider readout: {pct} is a formatted percent.

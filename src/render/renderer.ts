@@ -7356,10 +7356,10 @@ export class Renderer {
         } else if (ev.fx === 'temporalClock') {
           // Audio-only cue. The authoritative Rewind nova is emitted separately.
         } else if (ev.fx === 'temporalRewindNova') {
-          this.vfx.nova(ev.targetId, ev.school);
+          this.vfx.spellNova(ev.targetId, ev.school);
         } else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
-        else this.vfx.nova(ev.targetId, ev.school);
+        else this.vfx.spellNova(ev.targetId, ev.school);
         // A mob that hurls an instant bolt with NO windup (the warlock
         // demon's bolt) has no cast state for the looping cast channel, and
         // the damage event that animates melee fires on ARRIVAL and only for
@@ -7476,7 +7476,7 @@ export class Renderer {
         // reads, not just its center.
         const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
         const at = new THREE.Vector3(ev.x, gy + 0.4, ev.z);
-        this.vfx.burst(at, ev.school, ev.fx === 'nova' ? 34 : 22, ev.fx === 'nova' ? 1.4 : 1);
+        this.vfx.spellBurst(at, ev.school, ev.fx === 'nova' ? 34 : 22, ev.fx === 'nova' ? 1.4 : 1);
         if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
         if (
           ev.ability === 'corpse_explosion' &&
@@ -7543,7 +7543,7 @@ export class Renderer {
           const nowMs = performance.now();
           if (nowMs - (this.healGlowAt.get(ev.targetId) ?? 0) >= 110) {
             this.healGlowAt.set(ev.targetId, nowMs);
-            this.vfx.healGlow(ev.targetId);
+            this.vfx.spellHealGlow(ev.targetId);
           }
         }
         break;
@@ -7556,9 +7556,9 @@ export class Renderer {
         // NOT player-gated). Everything else keeps the generic player swirl.
         const procColor = SET_PROC_FX_BY_NAME.get(ev.name);
         if (ev.gained && procColor !== undefined && tgt) {
-          this.vfx.buffSwirl(ev.targetId, procColor);
+          this.vfx.spellBuffSwirl(ev.targetId, procColor);
         } else if (ev.gained && tgt?.kind === 'player') {
-          this.vfx.buffSwirl(ev.targetId);
+          this.vfx.spellBuffSwirl(ev.targetId);
         }
         break;
       }
@@ -11196,7 +11196,7 @@ export class Renderer {
       }
       if (runCharacterPresentation) {
         if (shouldDrawLegacyCastSparkle(st.casting, e.castingAbility)) {
-          this.vfx.castSparkle(
+          this.vfx.spellCastSparkle(
             e.id,
             waterJetVisualChannel
               ? 'frost'
@@ -11209,18 +11209,18 @@ export class Renderer {
           );
         }
         if (hasSoulRend) {
-          this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
+          this.vfx.spellCastSparkle(e.id, 'shadow', dt * 3.2);
         }
-        if (veilboundState !== 'none') this.vfx.castSparkle(e.id, 'holy', dt * 2.4);
+        if (veilboundState !== 'none') this.vfx.spellCastSparkle(e.id, 'holy', dt * 2.4);
         if (!e.dead && (ferocityStage > 0 || petFrenzy)) {
-          this.vfx.castSparkle(
+          this.vfx.spellCastSparkle(
             e.id,
             'fire',
             dt * (0.45 + ferocityStage * 0.35 + (petFrenzy ? 1 : 0)),
           );
         }
         if (tithefiendEmpoweredActive(e)) {
-          this.vfx.castSparkle(e.id, 'shadow', dt * 2.4);
+          this.vfx.spellCastSparkle(e.id, 'shadow', dt * 2.4);
         }
         if (hasRecklessness) {
           this.vfx.recklessFlame(e.id, dt);

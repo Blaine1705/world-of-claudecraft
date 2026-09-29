@@ -217,6 +217,24 @@ COSMETIC (may be tiered down on lower presets):
   device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
   governor, so it cannot vary between two players standing in the same spot.
 
+- The Spell Effects option (Graphics, Display card; `src/render/spell_effects_switch.ts`). A
+  player preference rather than a tier knob, held to the same rule. Off drops the cosmetic
+  spell and ability visuals: the ability painter's cast, travel, impact and linger
+  compositions and its per-entity holds (windup orbs, buff orbits, shells, ground discs), the
+  pooled spell particles (projectiles, beams, novas, cast sparkles, form and aura motes),
+  the class spell visuals outside both, and the spell light pulses. It does so by refusing
+  every cast at the painter's cast gate, which routes the painter onto the SAME
+  telegraph-only arm the readiness gate already takes while a cast's programs are linking
+  (`src/render/cast_vfx_readiness_core.ts` owns that argument), so what survives is exactly
+  what survives there: the terrain-draped area telegraph ring, the hard-crowd-control band
+  over a stunned, feared or rooted body, and the rig's windup clip. Cast bars, nameplates,
+  floating combat text and every HUD read never consult the switch. The shared pooled
+  emitters that also carry non-spell reads (a delve shrine's sequence pulse, a lit
+  wardstone, a minigame power-up) stay ungated; spell call sites use gated twins
+  (`Vfx.spellNova` and siblings). Persistent ground zones (desecration, blizzard, the frozen
+  orb, boss mechanic visuals, ground-warned meteors) are area reads and stay on, as does
+  world ambience that is not a spell. Pinned by `tests/spell_effects_switch.test.ts`.
+
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
 

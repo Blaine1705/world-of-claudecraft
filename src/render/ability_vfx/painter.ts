@@ -62,6 +62,7 @@ import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { CAST_VFX_ENGINE } from '../cast_vfx_family';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
+import { spellEffectsEnabled } from '../spell_effects_switch';
 import { trinketCueReadsAsSelfCast } from '../trinket_vfx_specs';
 import { CastAdmission } from './cast_admission_core';
 import { castVfxRequirement, WARRIOR_KIT_REQUIREMENT } from './cast_requirements';
@@ -714,7 +715,9 @@ export class AbilityVfx {
     // Physical Warrior ticks are wounds. The wire's tick companion has no
     // ability label, so preserve its recipient cue without an ivory magic puff.
     if (ev.fx === 'tick' && ev.school === 'physical' && this.deps.isWarrior?.(ev.sourceId)) {
-      const at = this.deps.anchor(ev.targetId, 0.63);
+      // Claimed ahead of the cast gate (no ability id to admit on), so the
+      // Spell Effects switch is read here directly.
+      const at = spellEffectsEnabled() ? this.deps.anchor(ev.targetId, 0.63) : null;
       if (at && this.budget.admitAccent(this.now()))
         this.deps.fx.burstAt(at.x, at.y, at.z, 0xa9152d, 9, 0.65, 'blood', 0.23);
       return true;
