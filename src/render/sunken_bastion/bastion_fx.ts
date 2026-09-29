@@ -23,6 +23,7 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
+import { BASTION_BOSS_TELEGRAPHS, BastionBossFx } from './bastion_boss_fx';
 import {
   BASTION_TELEGRAPH_COLORS,
   type BastionTelegraphSpec,
@@ -236,6 +237,7 @@ export class BastionFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly seenDead = new Set<number>();
+  private readonly boss: BastionBossFx;
   private scan = 0;
   private clock = 0;
   private disposed = false;
@@ -265,6 +267,27 @@ export class BastionFx {
       this.bursts.push({ ...this.fanShape(16), corpseId: -1, since: 0 });
     if (this.flashesOn)
       for (let i = 0; i < FLASH_SLOTS; i++) this.flashes.push({ ...this.fanShape(24), age: -1 });
+    // The boss visuals ride this root (one compile gate); their casts paint
+    // through the same lane and ring pools.
+    this.boss = new BastionBossFx(this.root, groundY, world, this.flashesOn);
+    const B = BASTION_BOSS_TELEGRAPHS;
+    registerBastionTelegraph(
+      B.charge,
+      {
+        shape: 'lane',
+        range: 44,
+        arcDeg: 0,
+        halfWidth: B.laneHalf,
+        color: BASTION_TELEGRAPH_COLORS.physical,
+      },
+      (caster) => this.boss.laneLength(caster),
+    );
+    registerBastionTelegraph(B.surge, {
+      shape: 'ring',
+      range: B.surgeRadius,
+      arcDeg: 360,
+      color: BASTION_TELEGRAPH_COLORS.frost,
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -436,6 +459,7 @@ export class BastionFx {
     const world = this.world;
     if (!world || this.disposed) return;
     this.clock += dt;
+    this.boss.update(dt);
     this.scan -= dt;
     if (this.scan <= 0) {
       this.scan = SCAN_SEC;
@@ -564,6 +588,7 @@ export class BastionFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.boss.dispose();
     this.root.removeFromParent();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();

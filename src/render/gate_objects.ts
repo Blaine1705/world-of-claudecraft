@@ -1,7 +1,8 @@
 // Object views for gate entities: the Ignivar raid's herald and lift gates
-// (ignivar_raid_gate.ts) and the in-dungeon gates and seals of an authored
-// field (sim/instances/dungeon_gates.ts). One plan, one builder, one call site
-// in the renderer's view pipeline.
+// (ignivar_raid_gate.ts), the in-dungeon gates and seals of an authored
+// field (sim/instances/dungeon_gates.ts), and the encounter objects a
+// dungeon draws itself (render/sunken_bastion/bastion_boss_fx.ts). One plan,
+// one builder, one call site in the renderer's view pipeline.
 //
 // An in-dungeon gate's STRUCTURE (the portcullis, the bone bridge, the ward)
 // is part of the interior and animates there; its entity view is an empty
@@ -11,6 +12,7 @@
 
 import * as THREE from 'three';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../sim/data';
+import { BASTION_OBJECT_TEMPLATES } from '../sim/encounters/sunken_bastion/ids';
 import { dungeonGateAt, dungeonGateStateOf } from '../sim/instances/dungeon_gates';
 import { sharedUniforms } from './gfx';
 import { gateMemoryKey, observeGate } from './hollow_crypt/crypt_gate_state_core';
@@ -27,7 +29,15 @@ export interface DungeonGateAnchorPlan {
   height: number;
 }
 
-export type GateObjectPlan = IgnivarRaidGatePlan | DungeonGateAnchorPlan;
+/** An encounter object the dungeon's own visuals draw from the world (the
+ *  Sunken Bastion's buttresses, mooring posts, beacon lamp and wakes): its
+ *  view is an empty anchor, so no default object mesh stands in for it. */
+export interface EncounterAnchorPlan {
+  encounterAnchor: true;
+  height: number;
+}
+
+export type GateObjectPlan = IgnivarRaidGatePlan | DungeonGateAnchorPlan | EncounterAnchorPlan;
 
 interface GateEntityLike {
   templateId: string;
@@ -39,6 +49,7 @@ interface GateEntityLike {
 export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
   const raid = ignivarRaidGatePlan(e.templateId, e.dungeonId);
   if (raid) return raid;
+  if (BASTION_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 4 };
   if (dungeonGateStateOf(e.templateId) === null || !e.dungeonId) return null;
   const def = DUNGEONS[e.dungeonId];
   if (!def) return null;
@@ -55,6 +66,11 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
 
 /** Build the view body for a gate plan. */
 export function buildGateObject(plan: GateObjectPlan): THREE.Group {
+  if ('encounterAnchor' in plan) {
+    const anchor = new THREE.Group();
+    anchor.name = 'encounterObjectAnchor';
+    return anchor;
+  }
   if ('dungeonGate' in plan) {
     observeGate(plan.key, plan.templateId, sharedUniforms.uTime.value);
     const anchor = new THREE.Group();

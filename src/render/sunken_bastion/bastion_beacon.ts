@@ -10,6 +10,7 @@
 // so it draws on every graphics tier; the fog streams are cosmetic and shed.
 
 import * as THREE from 'three';
+import { BEACON_CROWN } from '../../sim/content/sunken_bastion_layout';
 import { sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
 import {
@@ -22,6 +23,11 @@ import {
 /** Length of the beam from the lamp (yards) and its radius at the far end. */
 export const BEACON_BEAM_LENGTH = 150;
 export const BEACON_BEAM_FAR_RADIUS = 13;
+
+/** The beam's dip (radians below level): a touch while idle; during the
+ *  Fog Veil it aims at the crown's rim, where the sim stands the figures. */
+const IDLE_PITCH = 0.06;
+const VEIL_PITCH = Math.atan2(BEACON_LAMP[1] - BEACON_CROWN.h, BEACON_CROWN.r - 5);
 
 // Per interior (slot origin key) override of the beam's yaw; null = idle sweep.
 const yawOverride = new Map<string, number>();
@@ -39,6 +45,7 @@ export function setBeaconYaw(ox: number, oz: number, yaw: number | null): void {
 
 const BEAM_VERT = /* glsl */ `
 uniform float uYaw;
+uniform float uPitch;
 uniform float uLength;
 varying vec3 vLocal;
 varying vec3 vWorld;
@@ -47,13 +54,17 @@ varying vec3 vOriginW;
 void main() {
   vLocal = position;
   // Turn the beam about the tower's vertical axis (sim yaw: sin x, cos z).
+  // Dip it first (down toward the roof), then turn it.
+  float cp = cos(uPitch);
+  float sp = sin(uPitch);
+  vec3 d = vec3(position.x, position.y * cp - position.z * sp, position.y * sp + position.z * cp);
   float c = cos(uYaw);
   float s = sin(uYaw);
-  vec3 p = vec3(position.x * c + position.z * s, position.y, -position.x * s + position.z * c);
+  vec3 p = vec3(d.x * c + d.z * s, d.y, -d.x * s + d.z * c);
   vec4 world = modelMatrix * vec4(p, 1.0);
   vWorld = world.xyz;
   vOriginW = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-  vAxisW = normalize(mat3(modelMatrix) * vec3(s, 0.0, c));
+  vAxisW = normalize(mat3(modelMatrix) * vec3(s * cp, -sp, c * cp));
   gl_Position = projectionMatrix * viewMatrix * world;
 }
 `;
@@ -108,6 +119,7 @@ function buildBeam(ox: number, oz: number): THREE.Mesh {
   const uniforms = {
     uTime: sharedUniforms.uTime,
     uYaw: { value: 0 },
+    uPitch: { value: IDLE_PITCH },
     uLength: { value: BEACON_BEAM_LENGTH },
     uFar: { value: BEACON_BEAM_FAR_RADIUS },
     uColor: { value: new THREE.Color(0xffe9b8) },
@@ -127,14 +139,20 @@ function buildBeam(ox: number, oz: number): THREE.Mesh {
   mesh.name = 'sunkenBastionBeaconBeam';
   // The beam tilts a little down toward the roof and the fen below it.
   mesh.position.set(BEACON_LAMP[0], BEACON_LAMP[1], BEACON_LAMP[2]);
-  mesh.rotation.x = 0.06;
   mesh.frustumCulled = false;
   mesh.renderOrder = 22;
   const key = slotKey(ox, oz);
+  let lastT = sharedUniforms.uTime.value;
   mesh.onBeforeRender = () => {
     const forced = yawOverride.get(key);
-    uniforms.uYaw.value =
-      forced ?? ((sharedUniforms.uTime.value / BEACON_IDLE_PERIOD) * Math.PI * 2) % (Math.PI * 2);
+    const now = sharedUniforms.uTime.value;
+    const dt = Math.min(0.1, Math.max(0, now - lastT));
+    lastT = now;
+    uniforms.uYaw.value = forced ?? ((now / BEACON_IDLE_PERIOD) * Math.PI * 2) % (Math.PI * 2);
+    // During the Fog Veil the beam swings down onto the crown's rim, where
+    // the veiled figures stand; it eases back up after.
+    const want = forced === undefined ? IDLE_PITCH : VEIL_PITCH;
+    uniforms.uPitch.value += (want - uniforms.uPitch.value) * Math.min(1, dt * 2.5);
   };
   return mesh;
 }

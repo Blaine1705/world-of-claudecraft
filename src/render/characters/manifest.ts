@@ -7,6 +7,12 @@ import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
 import {
+  OLEN_OATHBOUND_CHARGE,
+  OSSICK_CUDGEL,
+  OSSICK_GAOL_HOOK,
+  VAEL_MIST_SURGE,
+} from '../../sim/encounters/sunken_bastion/ids';
+import {
   VARKHUL_ANVILS_DECREE_CAST_ID,
   VARKHUL_BOSS_ID,
   VARKHUL_FORGE_HAMMER_ABILITY_ID,
@@ -3804,6 +3810,56 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.55,
   },
 
+  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion). Knight-
+  // Commander Olen: a towering drowned knight behind a great shield, planting
+  // himself and roaring his oath over the Oathbound Charge's bar.
+  bastion_olen: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
+    height: 3.4,
+    clips: {
+      ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal'], 'Taunt'),
+      castByAbility: { [OLEN_OATHBOUND_CHARGE]: 'Taunt' },
+      castTimeScaleByAbility: { [OLEN_OATHBOUND_CHARGE]: 1 },
+    },
+    attach: [
+      { url: `${WEAPONS}/skeleton_blade.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/skeleton_shield_large_a.glb`, bone: 'handslot.l' },
+    ],
+    tint: 0x6f8a86,
+    tintStrength: 0.35,
+  },
+  // Gaoler Ossick: the gaol's hulking warden, flinging the Gaol Hook with a
+  // one-hand throw and bringing the cudgel down in his great slam.
+  bastion_ossick: {
+    url: `${ENEMIES}/skeleton_golem.glb`,
+    height: 3.9,
+    clips: {
+      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+      attack: ['Golem_Slam'],
+      castByAbility: { [OSSICK_GAOL_HOOK]: '1H_Melee_Attack_Chop', [OSSICK_CUDGEL]: 'Golem_Slam' },
+    },
+    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
+    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
+    tint: 0x5b6a64,
+    tintStrength: 0.35,
+  },
+  // Vael the Fogbinder and his fog shades wear ONE look (the veil hides him
+  // among them; only the Fogbeacon's beam tells them apart).
+  bastion_vael: {
+    url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
+    height: HUMANOID_H * 1.2,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      castByAbility: { [VAEL_MIST_SURGE]: 'Spellcast_Raise' },
+    },
+    show: ['Mage_Hat'],
+    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    tint: 0x4f8f78,
+    tintStrength: 0.55,
+  },
+
   // The Turretback Hermit, the Bastion's showpiece (scripts/assets/
   // sunken_bastion_creatures/build_creature.py): a colossal hermit crab
   // wearing a fallen watchtower turret, the tower swaying on its back. Its
@@ -4833,7 +4889,8 @@ const MOB_KEYS: Record<string, string> = {
   sister_nhalia_drowned_canticle: 'mob_dark_caster',
   deacon_voss: 'mob_dark_caster',
   wyrmcult_necromancer: 'mob_dark_caster',
-  vael_the_mistcaller: 'mob_dark_caster',
+  vael_the_mistcaller: 'bastion_vael',
+  vael_fog_shade: 'bastion_vael',
   grand_necromancer_velkhar: 'mob_dark_caster',
   gorrak: 'mob_bruiser',
   mogger: 'mob_bruiser',
@@ -4842,7 +4899,7 @@ const MOB_KEYS: Record<string, string> = {
   marrowlord_varkas: 'skel_warrior',
   bastion_revenant: 'skel_warrior',
   tidebound_acolyte: 'bastion_acolyte',
-  knight_commander_olen: 'skel_warrior',
+  knight_commander_olen: 'bastion_olen',
   sanctum_boneguard: 'skel_warrior',
   nythraxis_scourge_of_thornpeak: 'skel_golem',
   nythraxis_skeleton_warrior: 'skel_warrior',
@@ -4880,7 +4937,7 @@ const MOB_KEYS: Record<string, string> = {
   shackled_prisoner: 'skel_minion',
   gaol_turnkey: 'mob_bruiser',
   turretback_hermit: 'mob_turretback',
-  gaoler_ossick: 'skel_golem',
+  gaoler_ossick: 'bastion_ossick',
   // delve enemies
   reliquary_ledger_wraith: 'delve_skel_wraith',
   reliquary_funeral_ringer: 'delve_skel_ringer',

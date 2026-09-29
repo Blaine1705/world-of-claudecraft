@@ -104,6 +104,11 @@ export function ensureBastionKit(): Promise<void> {
   return Promise.race([startKitLoad(), new Promise<void>((r) => setTimeout(r, 8000))]);
 }
 
+/** Has the real kit landed (not the stand-in boxes)? */
+export function bastionKitReady(): boolean {
+  return loaded && baked.size > 0;
+}
+
 /** A baked kit piece (for the encounter visuals that instance their own). */
 export function bastionKitPiece(piece: string): BakedPiece {
   return pieceGeometry(piece);
