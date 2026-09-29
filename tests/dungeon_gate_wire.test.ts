@@ -68,7 +68,7 @@ describe('client dungeon gate mirror', () => {
     const inst = sim.ctx.instances.find((i) => i.dungeonId === 'hollow_crypt' && i.partyKey);
     if (!inst) throw new Error('no claim');
     DUNGEONS.hollow_crypt.spawns.forEach((s, i) => {
-      if (!['p1', 'p2', 'p3'].includes(s.packId ?? '')) return;
+      if (!['c1', 'c2', 'c3', 'c4'].includes(s.packId ?? '')) return;
       const mob = sim.ctx.entities.get(inst.mobIds[i]) as Entity;
       mob.dead = true;
       mob.hp = 0;

@@ -525,7 +525,10 @@ describe('dungeon deep sweep', () => {
     for (const e of sim.entities.values()) {
       if (e.kind !== 'mob' || e.dead) continue;
       if (e.pos.x < 600) continue; // instance mobs only
-      const g = groundHeight(e.pos.x, e.pos.z, SEED);
+      // A perched gargoyle waits on its arch, a flying patrol on the wing
+      // (mob/trash_kit): each at its own authored height, not the floor.
+      const up = e.perchY ?? e.dungeonPatrol?.flightY;
+      const g = up ?? groundHeight(e.pos.x, e.pos.z, SEED);
       expect(Math.abs(e.pos.y - g)).toBeLessThan(0.01);
       checked++;
     }

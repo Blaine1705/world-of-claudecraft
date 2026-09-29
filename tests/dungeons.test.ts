@@ -324,7 +324,7 @@ describe('dungeons: door-trigger entry/exit', () => {
     const inst = claimedHollow(sim);
 
     // Pull the first pack mob: real threat + aggro + a taunt-style forced lock.
-    const mob = mobInInstance(sim, inst, 'crypt_shambler');
+    const mob = mobInInstance(sim, inst, 'crypt_ossuary_warrior');
     teleport(sim, p, mob.pos.x + 3, mob.pos.z);
     p.maxHp = p.hp = 1_000_000;
     sim.dealDamage(p, mob, 25, false, 'physical', 'Strike', 'hit', true);
@@ -353,7 +353,7 @@ describe('dungeons: door-trigger entry/exit', () => {
     enterDungeon(sim.ctx, 'hollow_crypt', b);
     const inst = claimedHollow(sim);
 
-    const mob = mobInInstance(sim, inst, 'crypt_shambler');
+    const mob = mobInInstance(sim, inst, 'crypt_ossuary_warrior');
     teleport(sim, ea, mob.pos.x + 3, mob.pos.z);
     teleport(sim, eb, mob.pos.x - 3, mob.pos.z);
     ea.maxHp = ea.hp = 1_000_000;
@@ -386,7 +386,7 @@ describe('dungeons: door-trigger entry/exit', () => {
       enterDungeon(sim.ctx, 'hollow_crypt', pid);
       const inst = claimedHollow(sim);
 
-      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      const mob = mobInInstance(sim, inst, 'crypt_ossuary_warrior');
       teleport(sim, p, mob.pos.x + 3, mob.pos.z);
       p.maxHp = p.hp = 1_000_000;
       sim.dealDamage(p, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
@@ -427,7 +427,7 @@ describe('dungeons: door-trigger entry/exit', () => {
       enterDungeon(sim.ctx, 'hollow_crypt', b);
       const inst = claimedHollow(sim);
 
-      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      const mob = mobInInstance(sim, inst, 'crypt_ossuary_warrior');
       teleport(sim, ea, mob.pos.x + 3, mob.pos.z);
       teleport(sim, eb, mob.pos.x - 3, mob.pos.z);
       ea.maxHp = ea.hp = 1_000_000;
@@ -461,7 +461,7 @@ describe('dungeons: door-trigger entry/exit', () => {
       enterDungeon(sim.ctx, 'hollow_crypt', a);
       const inst = claimedHollow(sim);
 
-      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      const mob = mobInInstance(sim, inst, 'crypt_ossuary_warrior');
       teleport(sim, ea, mob.pos.x + 3, mob.pos.z);
       ea.maxHp = ea.hp = 1_000_000;
       sim.dealDamage(ea, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
