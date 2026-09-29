@@ -26,6 +26,9 @@ export interface KitPlacement {
   lift?: number;
   /** Stretch along the piece's local x (edge segments fit their run). */
   stretch?: number;
+  /** Rise per yard along the piece's local x: a sheared (never tilted) piece
+   *  follows a ramp with its posts plumb. */
+  shear?: number;
   /** Sheds on the low graphics tier. */
   cosmetic?: boolean;
 }
@@ -38,22 +41,6 @@ const P = (
   scale = 1,
   extra: Partial<KitPlacement> = {},
 ): KitPlacement => ({ piece, x, z, rot, scale, ...extra });
-
-function arcadeArches(): KitPlacement[] {
-  const out: KitPlacement[] = [];
-  // Between the cloister's perimeter columns (x = +-38, z = -70 .. 10 by 10).
-  for (let z = -65; z <= 5; z += 10) {
-    for (const x of [-38, 38]) {
-      const broken = Math.abs(Math.sin(x * 3.1 + z * 1.7)) > 0.7;
-      out.push(P(broken ? 'Kit_ArcadeArchBroken' : 'Kit_ArcadeArch', x, z, Math.PI / 2, 1));
-    }
-  }
-  // Across the south walk, between the columns flanking the stair foot.
-  for (const x of [-21, 21, -35, 35]) {
-    out.push(P('Kit_ArcadeArch', x, -72, 0, 1, { stretch: x * x > 900 ? 0.8 : 1.4 }));
-  }
-  return out;
-}
 
 function graveClutter(): KitPlacement[] {
   const out: KitPlacement[] = [];
@@ -88,6 +75,14 @@ function deadGrass(): KitPlacement[] {
       const jz = z + (hash(z, x) - 0.5) * 3;
       const s = authoredFieldSurfaceAt(HOLLOW_CRYPT_FIELD, jx, jz);
       if (!s || (s.ground !== 'grave' && s.ground !== 'earth')) continue;
+      // The whole tuft stands on the same ground (never half over a lip).
+      const edge = [
+        [0.7, 0],
+        [-0.7, 0],
+        [0, 0.7],
+        [0, -0.7],
+      ].some(([dx, dz]) => authoredFieldSurfaceAt(HOLLOW_CRYPT_FIELD, jx + dx, jz + dz) !== s);
+      if (edge) continue;
       if (hash(jx * 1.3, jz * 0.7) < 0.45) continue;
       out.push({
         piece: 'Kit_DeadGrass',
@@ -106,23 +101,24 @@ export const HOLLOW_CRYPT_SET_DRESSING: readonly KitPlacement[] = [
   ...deadGrass(),
   // The broken parish chapel the party climbs out of, on its own crag behind
   // the landing, and the rock pillar under it.
-  P('Kit_ChapelRuin', 0, -158, 0, 1, { y: 20 }),
-  P('Kit_RockPillar', 0, -156, 0.4, 1.4, { y: 20 }),
+  // The chapel stands on the pillar's levelled cap, which meets the landing's
+  // lip (a hair under the landing's 20 so the two stone tops never fight).
+  P('Kit_ChapelRuin', 0, -158, 0, 1, { y: 19.96 }),
+  P('Kit_RockPillar', 0, -157, 0, 1.2, { y: 19.96 }),
   // Candle clusters and skulls on the landing lip.
   P('Kit_CandleCluster', -13, -132, 0.4, 1, { cosmetic: true }),
   P('Kit_CandleCluster', 13, -134, -0.6, 1, { cosmetic: true }),
   P('Kit_SkullPile', -6, -142, 0.2, 0.8, { cosmetic: true }),
-  // The cloister arcade overhead and its corner ossuary niches.
-  ...arcadeArches(),
+  // The cloister's corner ossuary niches (its arcade is derived from the
+  // columns in crypt_kit_plan_core.ts).
   P('Kit_CoffinStack', -43, -77, 0.8, 1),
   P('Kit_CoffinStack', 43, 17, -2.2, 1),
   P('Kit_SkullPile', 42, -77, 1.1, 1, { cosmetic: true }),
   P('Kit_SkullPile', -42, 16, 2.6, 1, { cosmetic: true }),
-  // The Processional: tattered banners on the shrine pillars.
+  // The Processional: tattered banners on the middle shrine pillars (the
+  // others burn candles in their niches).
   P('Kit_Banner', -22, 62, Math.PI / 2, 1, { cosmetic: true }),
   P('Kit_Banner', 22, 62, -Math.PI / 2, 1, { cosmetic: true }),
-  P('Kit_Banner', -22, 30, Math.PI / 2, 1, { cosmetic: true }),
-  P('Kit_Banner', 22, 30, -Math.PI / 2, 1, { cosmetic: true }),
   P('Kit_CoffinStack', 23, 108, 3.4, 1),
   P('Kit_CandleCluster', -23, 106, 0.9, 1, { cosmetic: true }),
   // The Sexton's Yard: mounds, fences, and the bell tower's plinth.
@@ -131,32 +127,23 @@ export const HOLLOW_CRYPT_SET_DRESSING: readonly KitPlacement[] = [
   P('Kit_OpenGrave', -90, 52, -0.7, 1),
   P('Kit_OpenGrave', -70, 128, 1.1, 1),
   P('Kit_OpenGrave', -94, 124, 2.8, 1),
-  // Widow's Gallery: silk sheets and cocoons in the wall band, icicles.
-  P('Kit_SilkSheet', 56, 30, Math.PI / 2, 1.2),
-  P('Kit_SilkSheet', 95, 36, -Math.PI / 2, 1),
-  P('Kit_SilkSheet', 56, 70, Math.PI / 2, 1.1),
-  P('Kit_HangingCocoon', 62, 26, 0, 1, { lift: 7 }),
-  P('Kit_HangingCocoon', 90, 32, 1, 0.8, { lift: 8 }),
-  P('Kit_HangingCocoon', 66, 128, 0.4, 1.2, { lift: 10 }),
-  P('Kit_HangingCocoon', 94, 126, 2, 1, { lift: 11 }),
-  P('Kit_EggCluster', 97, 110, 2.6, 0.9, { cosmetic: true }),
-  // The Choir Ruin: the great tracery window behind the organ, framing the
-  // crag and the column, and candelabra down the nave.
-  P('Kit_TraceryWindow', 0, 173.5, Math.PI, 1, { y: 5 }),
+  // Widow's Gallery: a third egg clutch by the rim walk (the webbed columns
+  // carry their own silk drapes and cocoons).
+  P('Kit_EggCluster', 92, 106, 2.6, 0.9, { cosmetic: true }),
+  // The Choir Ruin: candelabra down the nave (the great tracery window is a
+  // sim prop on the loft's back lip).
   P('Kit_Candelabrum', -28, 124, 0, 1),
   P('Kit_Candelabrum', 28, 124, 0, 1),
-  P('Kit_Candelabrum', -28, 142, 0, 1),
-  P('Kit_Candelabrum', 28, 142, 0, 1),
-  // The Rite Ring: the bone crown arching over the altar (its feet stand on
-  // the rim lip, outside the ring), and standing stones round the rim.
+  // Clear of the loft ramps' outer rails.
+  P('Kit_Candelabrum', -29.1, 142, 0, 1),
+  P('Kit_Candelabrum', 29.1, 142, 0, 1),
+  // The Rite Ring: the bone crown, four colossal ribs rising out of the chasm
+  // round the ring's rim and arching over the altar (its standing stones are
+  // sim props inside the rim).
   P('Kit_BoneCrown', 0, 205, 0, 1, { y: 24 }),
-  ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => {
-    const a = ((i + 0.5) / 12) * Math.PI * 2;
-    return P('Kit_RingStone', Math.sin(a) * 29.6, 205 + Math.cos(a) * 29.6, a, 1, { y: 24 });
-  }),
   // Far ruins on the crag ring (silhouettes that sell the scale).
   P('Kit_DistantSpire', -210, 20, 0.3, 3.2, { y: -10, cosmetic: true }),
   P('Kit_DistantSpire', 230, 140, 2.1, 3.8, { y: -10, cosmetic: true }),
-  P('Kit_DistantSpire', -160, 300, 1.2, 4.4, { y: -10, cosmetic: true }),
-  P('Kit_DistantSpire', 150, -120, 0.7, 2.8, { y: -10, cosmetic: true }),
+  P('Kit_DistantSpire', -180, 330, 1.2, 4.4, { y: -10, cosmetic: true }),
+  P('Kit_DistantSpire', 200, -150, 0.7, 2.8, { y: -10, cosmetic: true }),
 ];

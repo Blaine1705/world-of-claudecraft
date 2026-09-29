@@ -8,14 +8,12 @@
 // the dungeon: every piece has a plain procedural stand-in.
 
 import * as THREE from 'three';
-import { HOLLOW_CRYPT_FIELD } from '../../sim/content/hollow_crypt_layout';
-import type { FieldProp } from '../../sim/instances/authored_field';
 import { loadGltf, releaseGltf } from '../assets/loader';
 import { registerDeferredPreload } from '../assets/preload';
 import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
-import { type EdgeDressing, planEdgeDressing } from './crypt_plan_core';
-import { HOLLOW_CRYPT_SET_DRESSING, type KitPlacement } from './crypt_set_dressing_core';
+import { planCryptKitPlacements } from './crypt_kit_plan_core';
+import type { KitPlacement } from './crypt_set_dressing_core';
 
 export const HOLLOW_CRYPT_KIT_URL = '/models/props/hollow_crypt_kit.glb';
 
@@ -119,12 +117,12 @@ function slotMaterial(slot: Slot): THREE.Material {
           vertexColors: true,
           roughness: 0.88,
           metalness: 0.02,
-          flatShading: true,
+          // Normals come from the kit: hard on cut stone, smooth on turned
+          // shafts (flat shading faceted every drum into a checkerboard).
           name: 'HollowCryptKitStone',
         })
       : new THREE.MeshLambertMaterial({
           vertexColors: true,
-          flatShading: true,
           name: 'HollowCryptKitStone',
         });
     markSharedMaterial(stoneMat);
@@ -151,71 +149,6 @@ function slotMaterial(slot: Slot): THREE.Material {
   markSharedMaterial(silkMat);
   return silkMat;
 }
-
-// ---- which piece a placement draws ------------------------------------------------------
-
-function hash(a: number, b: number): number {
-  const v = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
-  return v - Math.floor(v);
-}
-
-/** The kit node a sim prop kind draws (variants picked by position). */
-export function kitPieceForProp(p: FieldProp): string {
-  const h = hash(p.x, p.z);
-  switch (p.kind) {
-    case 'hc_lychgate':
-      return 'Kit_Lychgate';
-    case 'hc_mourner_statue':
-      return 'Kit_MournerStatue';
-    case 'hc_cloister_column':
-      return h < 0.3 ? 'Kit_CloisterColumnBroken' : 'Kit_CloisterColumn';
-    case 'hc_ossuary_monument':
-      return 'Kit_OssuaryMonument';
-    case 'hc_sarcophagus':
-      return 'Kit_Sarcophagus';
-    case 'hc_processional_pillar':
-      return 'Kit_ShrinePillar';
-    case 'hc_wing_arch':
-      return 'Kit_WingArch';
-    case 'hc_headstone':
-      return `Kit_Headstone${'ABCD'[Math.floor(h * 4)]}`;
-    case 'hc_lantern_post':
-      return 'Kit_LanternPost';
-    case 'hc_dead_tree':
-      return 'Kit_DeadTree';
-    case 'hc_bell_tower':
-      return 'Kit_BellTower';
-    case 'hc_web_column':
-      return 'Kit_WebColumn';
-    case 'hc_egg_cluster':
-      return 'Kit_EggCluster';
-    case 'hc_great_web':
-      return 'Kit_GreatWeb';
-    case 'hc_choir_pillar':
-      return 'Kit_ChoirPillar';
-    case 'hc_bone_organ':
-      return 'Kit_BoneOrgan';
-    case 'hc_pew':
-      return 'Kit_Pew';
-    case 'hc_nave_column':
-      return 'Kit_NaveColumn';
-    case 'hc_remembrance_candle':
-      return 'Kit_RemembranceCandle';
-    case 'hc_rite_altar':
-      return 'Kit_RiteAltar';
-    case 'hc_sarcophagus_alcove':
-      return 'Kit_SarcophagusAlcove';
-    default:
-      return 'Kit_Rubble';
-  }
-}
-
-const EDGE_PIECES: Record<EdgeDressing['kind'], string> = {
-  balustrade: 'Kit_Balustrade',
-  merlon: 'Kit_Parapet',
-  boneRail: 'Kit_BoneRail',
-  rubble: 'Kit_Rubble',
-};
 
 // ---- procedural stand-ins ----------------------------------------------------------------
 
@@ -254,45 +187,6 @@ function pieceGeometry(piece: string): BakedPiece {
   return fb;
 }
 
-// ---- placement ------------------------------------------------------------------------
-
-function propPlacements(): KitPlacement[] {
-  const out: KitPlacement[] = [];
-  for (const p of HOLLOW_CRYPT_FIELD.props) {
-    out.push({ piece: kitPieceForProp(p), x: p.x, z: p.z, rot: p.rot, scale: p.scale ?? 1 });
-  }
-  for (const e of planEdgeDressing()) {
-    out.push({
-      piece: EDGE_PIECES[e.kind],
-      x: e.x,
-      z: e.z,
-      rot: e.rot,
-      scale: 1,
-      y: e.y,
-      stretch: e.length / 4,
-    });
-  }
-  // Curtain walls: the authored wall boxes tiled with wall segments.
-  for (const w of HOLLOW_CRYPT_FIELD.walls) {
-    const n = Math.max(1, Math.round((w.hw * 2) / 6));
-    const cos = Math.cos(w.rot);
-    const sin = Math.sin(w.rot);
-    for (let i = 0; i < n; i++) {
-      const along = -w.hw + (w.hw * 2 * (i + 0.5)) / n;
-      out.push({
-        piece: hash(w.x + i, w.z) < 0.35 ? 'Kit_CurtainWallBroken' : 'Kit_CurtainWall',
-        x: w.x + along * cos,
-        z: w.z - along * sin,
-        rot: w.rot,
-        scale: 1,
-        stretch: (w.hw * 2) / n / 6,
-      });
-    }
-  }
-  out.push(...HOLLOW_CRYPT_SET_DRESSING);
-  return out;
-}
-
 /** Instance the whole kit over the layout (instance-local frame). A kit still
  *  loading when this runs is swapped in the moment it lands (same materials, so
  *  the swap links nothing new). */
@@ -320,13 +214,16 @@ function buildKitGroup(ground: (x: number, z: number) => number, lowGfx: boolean
   const group = new THREE.Group();
   group.name = 'hollowCryptKit';
   const byPiece = new Map<string, KitPlacement[]>();
-  for (const p of propPlacements()) {
+  for (const p of planCryptKitPlacements()) {
     if (lowGfx && p.cosmetic) continue;
     const list = byPiece.get(p.piece) ?? [];
     list.push(p);
     byPiece.set(p.piece, list);
   }
   const m = new THREE.Matrix4();
+  const shearM = new THREE.Matrix4();
+  const scaleM = new THREE.Matrix4();
+  const one = new THREE.Vector3(1, 1, 1);
   const q = new THREE.Quaternion();
   const up = new THREE.Vector3(0, 1, 0);
   const pos = new THREE.Vector3();
@@ -342,7 +239,15 @@ function buildKitGroup(ground: (x: number, z: number) => number, lowGfx: boolean
         q.setFromAxisAngle(up, p.rot);
         pos.set(p.x, p.y ?? ground(p.x, p.z) + (p.lift ?? 0), p.z);
         scl.set(p.scale * (p.stretch ?? 1), p.scale, p.scale);
-        m.compose(pos, q, scl);
+        if (p.shear) {
+          // T * R * Shear * S: the shear acts on the stretched local yards
+          // (y' = y + shear * x), so a rail follows its ramp with every post plumb.
+          m.compose(pos, q, one);
+          shearM.set(1, 0, 0, 0, p.shear, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+          m.multiply(shearM).multiply(scaleM.makeScale(scl.x, scl.y, scl.z));
+        } else {
+          m.compose(pos, q, scl);
+        }
         mesh.setMatrixAt(i, m);
       });
       mesh.instanceMatrix.needsUpdate = true;

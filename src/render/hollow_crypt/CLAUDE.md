@@ -10,6 +10,7 @@ from them.
 | `crypt_interior.ts` | Composes the interior group (terrain, kit, gates, lights, sky). Called by `dungeon.ts` `buildInterior` for interior `hollow_crypt`, attached through the compile gate. |
 | `crypt_plan_core.ts` | PURE: wisp rivers, light spots and styles, moon shafts, the crag ring, cliff-edge dressing, the gate reveal curve. In `RENDER_PURE_CORES`. |
 | `crypt_set_dressing_core.ts` | PURE: render-only set dressing placements (no colliders). In `RENDER_PURE_CORES`. |
+| `crypt_kit_plan_core.ts` | PURE: every kit placement (sim props, the arcade derived from its columns, cliff-edge rails, curtain walls, light holders, set dressing) and each piece's support rule. In `RENDER_PURE_CORES`; audited by `tests/hollow_crypt_kit_support.test.ts`. |
 | `crypt_gate_state_core.ts` | PURE: the gate memory (state, reveal clock) fed by `../gate_objects.ts`. In `RENDER_PURE_CORES`. |
 | `crypt_atmosphere.ts` | Sky dome with the moon and clouds, mist sea, soul column, wisps, dust, moonbeams, crag ring. All motion on `sharedUniforms.uTime`. |
 | `crypt_lights.ts` | Flames, halos, floor pools (floor ladder, `ground` band), budgeted point lights through the fire-light sink. |
@@ -23,3 +24,7 @@ Rules:
 - No new directional or hemisphere light: the moon is the `hollowCrypt` state of
   `interior_light_rig.ts`; point lights go through the fire-light sink only.
 - Tall render-only dressing never stands on walkable ground without a sim collider.
+- Nothing floats: every piece stands on the floor under its own footprint, rests on the
+  top of what carries it, hangs from a piece, or rises from the chasm floor, and every
+  flame burns in a placed holder. Rails on ramps are SHEARED (posts plumb), never tilted.
+  `tests/hollow_crypt_kit_support.test.ts` checks the shipped GLB against the real floor.

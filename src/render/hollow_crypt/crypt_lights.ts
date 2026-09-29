@@ -5,12 +5,19 @@
 // renderer's shared flame list. No light is added outside that seam.
 
 import * as THREE from 'three';
+import { HOLLOW_CRYPT_VOID_HEIGHT } from '../../sim/content/hollow_crypt_layout';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import type { FireLightSink } from '../point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { radialGlowTexture } from '../textures';
-import { CRYPT_LIGHT_STYLE, type CryptLightKind, HOLLOW_CRYPT_LIGHTS } from './crypt_plan_core';
+import {
+  CRYPT_FLAME_KINDS,
+  CRYPT_LIGHT_STYLE,
+  type CryptLightKind,
+  HOLLOW_CRYPT_LIGHTS,
+  lightFlamePosition,
+} from './crypt_plan_core';
 
 export interface CryptLightDeps {
   lowGfx: boolean;
@@ -88,20 +95,33 @@ export function buildCryptLights(
   markSharedGeometry(glowGeometry);
   for (const spot of HOLLOW_CRYPT_LIGHTS) {
     const style = CRYPT_LIGHT_STYLE[spot.kind];
-    const gy = ground(spot.x, spot.z);
-    const y = gy + spot.lift;
-    if (spot.kind !== 'soul') {
+    // The flame burns in its holder's socket (a lantern cage, a brazier bowl,
+    // a pillar niche), never in mid-air.
+    const [fx, y, fz] = lightFlamePosition(spot, ground);
+    const gy = ground(fx, fz);
+    if (CRYPT_FLAME_KINDS.has(spot.kind)) {
       const flame = new THREE.Mesh(flameGeometry, flameMaterial(spot.kind));
-      flame.position.set(spot.x, y, spot.z);
-      const s = spot.kind === 'brazier' ? 2.2 : spot.kind === 'candle' ? 0.8 : 1;
+      // A lantern's flame sits inside its cage; a bowl or wick flame rises off it.
+      flame.position.set(fx, y + (spot.kind === 'lantern' ? 0 : 0.3), fz);
+      const s =
+        spot.kind === 'brazier' || spot.kind === 'violet'
+          ? 2.2
+          : spot.kind === 'candle'
+            ? 0.8
+            : 0.55;
       flame.scale.setScalar(s);
       group.add(flame);
       deps.flames.push(flame);
     }
     if (spot.kind !== 'soul') {
       const halo = new THREE.Sprite(haloMaterial(spot.kind));
-      halo.position.set(spot.x, y + 0.2, spot.z);
-      const hs = spot.kind === 'brazier' ? 4.5 : 2.2;
+      halo.position.set(fx, y + 0.35, fz);
+      const hs =
+        spot.kind === 'brazier' || spot.kind === 'violet'
+          ? 4.5
+          : spot.kind === 'frost' || spot.kind === 'organ'
+            ? 3.4
+            : 2.2;
       halo.scale.set(hs, hs, 1);
       group.add(halo);
     }
@@ -112,12 +132,13 @@ export function buildCryptLights(
       2,
     );
     if (!deps.lowGfx) light.userData.baseIntensity = style.intensity * 1.8;
-    light.position.set(spot.x, y + 1, spot.z);
+    light.position.set(fx, y + 1, fz);
     group.add(light);
     deps.fireLights.push(light);
-    if (!deps.lowGfx) {
+    // No floor pool for a glow hung over the chasm (the Great Web's heart).
+    if (!deps.lowGfx && gy > HOLLOW_CRYPT_VOID_HEIGHT + 1) {
       const glow = new THREE.Mesh(glowGeometry, glowMaterial(spot.kind));
-      glow.position.set(spot.x, gy + 0.06, spot.z);
+      glow.position.set(fx, gy + 0.06, fz);
       glow.scale.setScalar(style.range * 0.32);
       // A torch pool on the world's own floor rung: every encounter telegraph
       // paints over it (docs/design/vfx-floor-layering.md).

@@ -95,7 +95,9 @@ const SURFACES: FieldSurface[] = [
     edge: 'balustrade',
   },
   // --- The Ossuary Cloister (P1, P2 patrol, P3) ------------------------------
-  rect('cloister', -46, -80, 46, 20, 0, { edge: 'masonry', ground: 'flagstone' }),
+  // Its north lip runs a little past the Undercroft Grille's curtain wall so
+  // the wall's footing stands on stone, not over the drop.
+  rect('cloister', -46, -80, 46, 22.7, 0, { edge: 'masonry', ground: 'flagstone' }),
   // --- The Processional (fork and rejoin, P8) --------------------------------
   rect('processional', -26, 20, 26, 112, 0, { edge: 'masonry', ground: 'flagstone' }),
   // --- West wing: the Sexton's Yard -------------------------------------------
@@ -229,8 +231,10 @@ const SURFACES: FieldSurface[] = [
     ground: 'bone',
   },
   // --- The Choir Ruin and its loft (Cantor Ilvane) --------------------------
-  rect('choir', -30, 112, 30, 150, 0, { edge: 'masonry', ground: 'flagstone' }),
-  rect('choir_loft', -30, 150, 30, 172, 5, { edge: 'balustrade', ground: 'bone' }),
+  // The choir floor reaches under the Twin Seals' wall (its footing), and the
+  // loft runs back far enough to carry the great tracery window on its lip.
+  rect('choir', -30, 110.5, 30, 150, 0, { edge: 'masonry', ground: 'flagstone' }),
+  rect('choir_loft', -30, 150, 30, 175.5, 5, { edge: 'balustrade', ground: 'bone' }),
   ...[-24, 24].map(
     (x): FieldSurface => ({
       kind: 'path',
@@ -289,14 +293,15 @@ function columns(
   return pts.map(([x, z], i) => ({ kind, x, z, rot: (i * 1.7) % (Math.PI * 2), r, h }));
 }
 
-// The cloister arcade: a ring of columns inside the perimeter, some broken.
+// The cloister arcade: columns one arcade bay (10 yd) apart down both sides
+// and along the south walk, where the Chapel Stair lands between the two
+// central columns. Some are broken; the renderer derives every arch from these
+// columns (an arch only ever springs from a standing capital).
 const CLOISTER_COLUMNS: (readonly [number, number])[] = [];
 for (let z = -70; z <= 10; z += 10) {
   CLOISTER_COLUMNS.push([-38, z], [38, z]);
 }
-for (let x = -28; x <= 28; x += 14) {
-  if (Math.abs(x) > 8) CLOISTER_COLUMNS.push([x, -72]);
-}
+for (const x of [-28, -18, -8, 8, 18, 28]) CLOISTER_COLUMNS.push([x, -70]);
 
 const PROPS: FieldProp[] = [
   // Landing: the lychgate the party steps through, and two mourning statues.
@@ -311,21 +316,28 @@ const PROPS: FieldProp[] = [
   { kind: 'hc_sarcophagus', x: -24, z: -4, rot: 0, hw: 1.2, hd: 2.6, h: 1.6 },
   { kind: 'hc_sarcophagus', x: 24, z: -4, rot: 0, hw: 1.2, hd: 2.6, h: 1.6 },
   // Processional: candle-lit shrines along the flanks, the wing arches.
-  ...columns(
-    'hc_processional_pillar',
-    [
-      [-22, 30],
-      [22, 30],
-      [-22, 62],
-      [22, 62],
-      [-22, 84],
-      [22, 84],
-    ],
-    1.3,
-    12,
+  // Their candle niches face the aisle.
+  ...[30, 62, 84].flatMap((z) =>
+    [-22, 22].map(
+      (x): FieldProp => ({
+        kind: 'hc_processional_pillar',
+        x,
+        z,
+        rot: x < 0 ? Math.PI / 2 : -Math.PI / 2,
+        r: 1.3,
+        h: 12,
+      }),
+    ),
   ),
-  { kind: 'hc_wing_arch', x: -26, z: 42, rot: Math.PI / 2 },
-  { kind: 'hc_wing_arch', x: 26, z: 42, rot: -Math.PI / 2 },
+  // The wing gateways stand just inside the Processional's lip, their two
+  // piers solid (collider-only props under the kit's piers).
+  { kind: 'hc_wing_arch', x: -24.6, z: 42, rot: Math.PI / 2 },
+  { kind: 'hc_wing_arch', x: 24.6, z: 42, rot: -Math.PI / 2 },
+  ...[-24.6, 24.6].flatMap((x) =>
+    [34.8, 49.2].map(
+      (z): FieldProp => ({ kind: 'hc_pier', x, z, rot: 0, hw: 1.2, hd: 1.2, h: 12 }),
+    ),
+  ),
   // Sexton's Yard: crooked headstones (walled off the pull lanes), lanterns,
   // dead trees, and the colossal collapsed bell tower beside the Bell Yard.
   ...[
@@ -353,11 +365,11 @@ const PROPS: FieldProp[] = [
   { kind: 'hc_lantern_post', x: -72, z: 70, rot: 0, r: 0.4, h: 4 },
   { kind: 'hc_lantern_post', x: -92, z: 20, rot: 0, r: 0.4, h: 4 },
   { kind: 'hc_dead_tree', x: -106, z: 44, rot: 0.4, r: 1, h: 10 },
-  { kind: 'hc_dead_tree', x: -60, z: 10, rot: 2.1, r: 1, h: 10 },
+  { kind: 'hc_dead_tree', x: -62, z: 17, rot: 2.1, r: 1, h: 10 },
   // The bell beam (the piece's local +X) reaches toward the Bell Yard's centre.
   { kind: 'hc_bell_tower', x: -108, z: 128, rot: 0.43 },
   { kind: 'hc_headstone', x: -96, z: 104, rot: 0.3, r: 0.8, h: 2 },
-  { kind: 'hc_headstone', x: -66, z: 130, rot: 1.2, r: 0.8, h: 2 },
+  { kind: 'hc_headstone', x: -70, z: 124, rot: 1.2, r: 0.8, h: 2 },
   { kind: 'hc_lantern_post', x: -70, z: 100, rot: 0, r: 0.4, h: 4 },
   { kind: 'hc_lantern_post', x: -94, z: 100, rot: 0, r: 0.4, h: 4 },
   // Widow's Gallery: frosted broken columns, egg clusters, the Great Web.
@@ -374,16 +386,9 @@ const PROPS: FieldProp[] = [
   ),
   { kind: 'hc_egg_cluster', x: 58, z: 40, rot: 0.5 },
   { kind: 'hc_egg_cluster', x: 92, z: 54, rot: 2.2 },
-  { kind: 'hc_great_web', x: 80, z: 131, rot: Math.PI },
-  ...columns(
-    'hc_web_column',
-    [
-      [66, 128],
-      [94, 128],
-    ],
-    1.6,
-    16,
-  ),
+  // The Great Web hangs over the arena's north lip between two rime pillars
+  // that rise out of the chasm (both part of the piece, over the void).
+  { kind: 'hc_great_web', x: 80, z: 133, rot: Math.PI },
   // Choir Ruin: the six loft pillars (line-of-sight cover), the Bone Organ.
   ...columns(
     'hc_choir_pillar',
@@ -399,6 +404,8 @@ const PROPS: FieldProp[] = [
     14,
   ),
   { kind: 'hc_bone_organ', x: 0, z: 170, rot: Math.PI, hw: 9, hd: 1.4, h: 12 },
+  // The great broken tracery window on the loft's back lip, framing the crag.
+  { kind: 'hc_tracery_window', x: 0, z: 173.5, rot: Math.PI, hw: 9.8, hd: 1.1, h: 20 },
   // The choir's broken pews: two blocks off the centre aisle (P8 and the
   // loft ramps keep their lanes).
   ...[-16, -9.5, 9.5, 16].flatMap((x) =>
@@ -438,6 +445,19 @@ const PROPS: FieldProp[] = [
     4,
   ),
   { kind: 'hc_rite_altar', x: 0, z: 207, rot: 0, r: 2.6, h: 2 },
+  // Standing stones inside the ring's rim, between the candles and the
+  // alcoves, clear of the Bone Stair's mouth (north-north-east).
+  ...[75, 105, 165, 195, 255, 285, 345].map((deg): FieldProp => {
+    const a = (deg * Math.PI) / 180;
+    return {
+      kind: 'hc_ring_stone',
+      x: Math.sin(a) * 26.4,
+      z: HOLLOW_CRYPT_RING.z + Math.cos(a) * 26.4,
+      rot: a,
+      r: 1,
+      h: 5,
+    };
+  }),
   ...[0, 1, 2, 3].map(
     (i): FieldProp => ({
       kind: 'hc_sarcophagus_alcove',
@@ -462,8 +482,8 @@ export const HOLLOW_CRYPT_FIELD: AuthoredFieldDef = {
     { id: 'grille_west', x: -26.5, z: 21, hw: 19.5, hd: 1.2, rot: 0, height: 10 },
     { id: 'grille_east', x: 26.5, z: 21, hw: 19.5, hd: 1.2, rot: 0, height: 10 },
     // The Twin Seals' warded wall between the Processional and the Choir.
-    { id: 'seals_west', x: -18.5, z: 113, hw: 11.5, hd: 1.2, rot: 0, height: 12 },
-    { id: 'seals_east', x: 18.5, z: 113, hw: 11.5, hd: 1.2, rot: 0, height: 12 },
+    { id: 'seals_west', x: -18.4, z: 113, hw: 11.3, hd: 1.2, rot: 0, height: 12 },
+    { id: 'seals_east', x: 18.4, z: 113, hw: 11.3, hd: 1.2, rot: 0, height: 12 },
   ],
   props: PROPS,
   lightZones: [

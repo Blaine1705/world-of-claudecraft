@@ -8,7 +8,11 @@
 // Three-free, DOM-free, deterministic (hash-seeded, never Math.random).
 
 import { HOLLOW_CRYPT_FIELD, HOLLOW_CRYPT_RING } from '../../sim/content/hollow_crypt_layout';
-import { authoredFieldCliffRuns, authoredFieldHeight } from '../../sim/instances/authored_field';
+import {
+  authoredFieldCliffRuns,
+  authoredFieldHeight,
+  type FieldCliffRun,
+} from '../../sim/instances/authored_field';
 
 export type Vec3 = readonly [number, number, number];
 
@@ -127,63 +131,131 @@ export function resampleRiver(r: WispRiver, n: number): Vec3[] {
 
 // ---- lights -------------------------------------------------------------------------
 
-export type CryptLightKind = 'lantern' | 'brazier' | 'frost' | 'violet' | 'soul' | 'candle';
+export type CryptLightKind =
+  | 'lantern'
+  | 'brazier'
+  | 'frost'
+  | 'violet'
+  | 'organ'
+  | 'soul'
+  | 'candle';
+
+/** The kit pieces that carry a flame or a glow, and where it burns in the
+ *  piece's own frame (x, y, z: glTF axes, front +Z). Taken from the Blender
+ *  builders (docs/design/dungeon-rework/kit/build_hollow_crypt_kit.py). */
+export const KIT_FLAME_SOCKETS: Readonly<Record<string, readonly [number, number, number]>> = {
+  // The lantern cage hangs off the arm, 0.9 in front of the post.
+  Kit_LanternPost: [0, 3.05, 0.9],
+  // The coal bowl of the standing brazier.
+  Kit_Brazier: [0, 1.42, 0],
+  // The candle niche on the shrine pillar's front face.
+  Kit_ShrinePillar: [0, 4.05, 1.0],
+  // The ring of tallow candles on the ossuary monument's lowest step.
+  Kit_OssuaryMonument: [0, 1.55, -4.0],
+  // The wick of a Remembrance Candle.
+  Kit_RemembranceCandle: [0, 4.4, 0],
+  // The glowing clutch inside an egg cluster, and the Great Web's frost heart.
+  Kit_EggCluster: [0, 0.7, 0],
+  Kit_GreatWeb: [0, 11, 0],
+  // The violet throat of the Bone Organ.
+  Kit_BoneOrgan: [0, 6.4, 0],
+};
 
 export interface CryptLightSpot {
   kind: CryptLightKind;
+  /** The kit piece that carries this light (see KIT_FLAME_SOCKETS); `null`
+   *  only for the soul column, whose light has no drawn source. */
+  holder: string | null;
+  /** Where the holder stands and its yaw (instance-local). */
   x: number;
   z: number;
-  /** Height of the flame above the ground. */
-  lift: number;
+  rot: number;
+  /** The holder is placed by the light plan itself (a brazier or a lantern
+   *  post that exists for this light); else it is already a sim prop or set
+   *  dressing at exactly (x, z, rot). */
+  places: boolean;
+  /** For a holderless light: its height above the ground. */
+  lift?: number;
 }
 
-const L = (kind: CryptLightKind, x: number, z: number, lift: number): CryptLightSpot => ({
-  kind,
-  x,
-  z,
-  lift,
-});
+const H = (
+  kind: CryptLightKind,
+  holder: string,
+  x: number,
+  z: number,
+  rot = 0,
+  places = true,
+): CryptLightSpot => ({ kind, holder, x, z, rot, places });
 
 /** Warm tallow lights are the "living" light; violet, frost and soul-green
- *  belong to the enemy's magic. At most eight per light zone. */
+ *  belong to the enemy's magic. At most eight per light zone. Every flame burns
+ *  in a holder that stands on the floor (never a flame in mid-air). */
 export const HOLLOW_CRYPT_LIGHTS: readonly CryptLightSpot[] = [
-  // Lychgate Landing: two braziers flank the first vista.
-  L('brazier', -9, -118, 1.6),
-  L('brazier', 9, -118, 1.6),
-  // Chapel Stair foot and the cloister arcade lanterns.
-  L('lantern', -10, -76, 3.2),
-  L('lantern', 10, -76, 3.2),
-  L('lantern', -38, -40, 3.4),
-  L('lantern', 38, -40, 3.4),
-  L('candle', 0, -24, 5.2),
-  L('lantern', -12, 16, 3.2),
-  L('lantern', 12, 16, 3.2),
-  // The Processional shrines.
-  L('candle', -22, 36, 1.4),
-  L('candle', 22, 36, 1.4),
-  L('candle', -22, 90, 1.4),
-  L('candle', 22, 90, 1.4),
-  // Sexton's Yard lanterns (their posts are kit props).
-  L('lantern', -58, 34, 3.6),
-  L('lantern', -72, 70, 3.6),
-  L('lantern', -92, 20, 3.6),
-  L('lantern', -70, 100, 3.6),
-  L('lantern', -94, 100, 3.6),
-  // Widow's Gallery: cold frost glows in the webs.
-  L('frost', 60, 30, 6),
-  L('frost', 92, 60, 6),
-  L('frost', 80, 128, 9),
-  // Choir Ruin: violet braziers on the loft.
-  L('violet', -26, 166, 1.6),
-  L('violet', 26, 166, 1.6),
-  L('violet', 0, 176, 6),
+  // Lychgate Landing: two standing braziers flank the first vista.
+  H('brazier', 'Kit_Brazier', -9, -118),
+  H('brazier', 'Kit_Brazier', 9, -118),
+  // Chapel Stair foot and the cloister arcade lantern posts.
+  H('lantern', 'Kit_LanternPost', -11, -77),
+  H('lantern', 'Kit_LanternPost', 11, -77),
+  H('lantern', 'Kit_LanternPost', -33, -40, Math.PI / 2),
+  H('lantern', 'Kit_LanternPost', 33, -40, -Math.PI / 2),
+  // The candles on the ossuary monument's step, on the side facing the stair.
+  H('candle', 'Kit_OssuaryMonument', 0, -30, 0, false),
+  H('lantern', 'Kit_LanternPost', -12, 15, Math.PI),
+  H('lantern', 'Kit_LanternPost', 12, 15, Math.PI),
+  // The Processional: the candle niches of the shrine pillars (sim props,
+  // turned to face the aisle).
+  H('candle', 'Kit_ShrinePillar', -22, 30, Math.PI / 2, false),
+  H('candle', 'Kit_ShrinePillar', 22, 30, -Math.PI / 2, false),
+  H('candle', 'Kit_ShrinePillar', -22, 84, Math.PI / 2, false),
+  H('candle', 'Kit_ShrinePillar', 22, 84, -Math.PI / 2, false),
+  // Sexton's Yard lanterns (their posts are sim props).
+  H('lantern', 'Kit_LanternPost', -58, 34, 0, false),
+  H('lantern', 'Kit_LanternPost', -72, 70, 0, false),
+  H('lantern', 'Kit_LanternPost', -92, 20, 0, false),
+  H('lantern', 'Kit_LanternPost', -70, 100, 0, false),
+  H('lantern', 'Kit_LanternPost', -94, 100, 0, false),
+  // Widow's Gallery: the glowing egg clutches and the Great Web's frost heart.
+  H('frost', 'Kit_EggCluster', 58, 40, 0.5, false),
+  H('frost', 'Kit_EggCluster', 92, 54, 2.2, false),
+  H('frost', 'Kit_GreatWeb', 80, 133, Math.PI, false),
+  // Choir Ruin: violet braziers on the loft and the organ's violet throat.
+  H('violet', 'Kit_Brazier', -26, 166),
+  H('violet', 'Kit_Brazier', 26, 166),
+  H('organ', 'Kit_BoneOrgan', 0, 170, Math.PI, false),
   // The Rite Ring: the soul column and the four Remembrance Candles.
-  L('soul', 0, 205, 8),
-  L('candle', 0, 225, 4.4),
-  L('candle', 20, 205, 4.4),
-  L('candle', 0, 185, 4.4),
-  L('candle', -20, 205, 4.4),
+  { kind: 'soul', holder: null, x: 0, z: 205, rot: 0, places: false, lift: 8 },
+  H('candle', 'Kit_RemembranceCandle', 0, 225, 0, false),
+  H('candle', 'Kit_RemembranceCandle', 20, 205, 0, false),
+  H('candle', 'Kit_RemembranceCandle', 0, 185, 0, false),
+  H('candle', 'Kit_RemembranceCandle', -20, 205, 0, false),
 ];
+
+/** Kinds that draw a flame cone (the rest glow as a halo in their holder). */
+export const CRYPT_FLAME_KINDS: ReadonlySet<CryptLightKind> = new Set([
+  'lantern',
+  'brazier',
+  'candle',
+  'violet',
+]);
+
+/**
+ * Where a light burns (instance-local): its holder's socket turned by the
+ * holder's yaw, over the floor under the holder. Holderless lights (the soul
+ * column) hang `lift` over the floor.
+ */
+export function lightFlamePosition(
+  spot: CryptLightSpot,
+  floor: (x: number, z: number) => number = ground,
+): Vec3 {
+  const base = floor(spot.x, spot.z);
+  if (!spot.holder) return [spot.x, base + (spot.lift ?? 0), spot.z];
+  const [sx, sy, sz] = KIT_FLAME_SOCKETS[spot.holder];
+  const c = Math.cos(spot.rot);
+  const s = Math.sin(spot.rot);
+  // three.js yaw: x' = x cos + z sin, z' = -x sin + z cos.
+  return [spot.x + sx * c + sz * s, base + sy, spot.z - sx * s + sz * c];
+}
 
 export const CRYPT_LIGHT_STYLE: Readonly<
   Record<CryptLightKind, { color: number; flame: number; intensity: number; range: number }>
@@ -193,6 +265,7 @@ export const CRYPT_LIGHT_STYLE: Readonly<
   candle: { color: 0xffb561, flame: 0xffd28a, intensity: 8, range: 14 },
   frost: { color: 0x9fd4ff, flame: 0xcfe9ff, intensity: 16, range: 26 },
   violet: { color: 0xa66bff, flame: 0xd2a8ff, intensity: 18, range: 24 },
+  organ: { color: 0xa66bff, flame: 0xd2a8ff, intensity: 18, range: 24 },
   soul: { color: 0x6fd6a8, flame: 0xb8ffe0, intensity: 40, range: 48 },
 };
 
@@ -303,10 +376,51 @@ export interface EdgeDressing {
   kind: 'balustrade' | 'merlon' | 'boneRail' | 'rubble';
   x: number;
   z: number;
+  /** Ground height under the piece's centre, on the high side of the lip. */
   y: number;
   /** Yaw so the piece runs along the edge (three.js rotation.y). */
   rot: number;
   length: number;
+  /** Stretch along local X so the piece's full extent spans exactly `length`. */
+  stretch: number;
+  /**
+   * Rise per yard along the piece's local +X: on a ramp or stair the rail is
+   * SHEARED (never tilted) so its plinth follows the incline while every post
+   * and baluster stays plumb. Zero on a flat terrace.
+   */
+  shear: number;
+}
+
+/** How far inside the lip each kind stands: its half depth, so the outer face
+ *  is flush with the lip and nothing overhangs the chasm (the cliff collider is
+ *  0.45 thick). Loose rubble sits well back from the drop. */
+const EDGE_INSET: Readonly<Record<EdgeDressing['kind'], number>> = {
+  balustrade: 0.4,
+  merlon: 0.42,
+  boneRail: 0.2,
+  rubble: 0.9,
+};
+/** Half the piece's length along its local X at stretch 1 (the Kit_* extents),
+ *  so a run's end piece ends AT the run's end, never past a corner. */
+const EDGE_HALF_LENGTH: Readonly<Record<EdgeDressing['kind'], number>> = {
+  balustrade: 2.28,
+  merlon: 2.0,
+  boneRail: 2.11,
+  rubble: 1.9,
+};
+/** The floor under a piece is read this far further in, clear of the lip itself. */
+const EDGE_PROBE = 0.35;
+
+/** Rise per yard from the floor at a piece's centre and its two ends. An end
+ *  that falls off the run (past a corner, into the chasm) is ignored, so a
+ *  corner piece takes its slope from the end still on its own surface. */
+export function edgeShear(y: number, yMinus: number, yPlus: number, half: number): number {
+  const okMinus = Math.abs(yMinus - y) <= half * 1.2;
+  const okPlus = Math.abs(yPlus - y) <= half * 1.2;
+  if (okMinus && okPlus) return (yPlus - yMinus) / (2 * half);
+  if (okPlus) return (yPlus - y) / half;
+  if (okMinus) return (y - yMinus) / half;
+  return 0;
 }
 
 /**
@@ -314,6 +428,11 @@ export interface EdgeDressing {
  * or bone rails where a surface asks for them, crenellations on masonry, and
  * loose rubble on raw rock. Placed on the high side, just inside the wall
  * collider, so they read as the lip of the terrace.
+ *
+ * Every piece reads the REAL floor under its own two ends (a ramp's run is one
+ * straight edge whose height changes along it), so on a stair or a sloped
+ * bridge each segment sits on the incline instead of floating off its low end
+ * or sinking into its high end.
  */
 export function planEdgeDressing(segment = 4): EdgeDressing[] {
   const out: EdgeDressing[] = [];
@@ -324,10 +443,6 @@ export function planEdgeDressing(segment = 4): EdgeDressing[] {
     if (len < 1.5 || hidden.has(run.surface)) continue;
     const pieces = Math.max(1, Math.round(len / segment));
     const step = len / pieces;
-    const ux = (run.bx - run.ax) / len;
-    const uz = (run.bz - run.az) / len;
-    // The piece's outer (chasm) face is its local +Z: turn it toward the drop.
-    const rot = Math.atan2(run.nx, run.nz);
     const kind: EdgeDressing['kind'] =
       run.style === 'balustrade'
         ? 'balustrade'
@@ -339,15 +454,132 @@ export function planEdgeDressing(segment = 4): EdgeDressing[] {
     for (let i = 0; i < pieces; i++) {
       k++;
       if (kind === 'rubble' && hash(k, 7) < 0.55) continue;
-      const along = step * (i + 0.5);
-      // Just inside the lip (the cliff collider is 0.45 yd thick).
-      const inset = 0.35;
-      const x = run.ax + ux * along - run.nx * inset;
-      const z = run.az + uz * along - run.nz * inset;
-      out.push({ kind, x, z, y: run.high, rot, length: step });
+      fitEdgePieces(run, kind, step * i, step * (i + 1), 0, out);
     }
   }
   return out;
+}
+
+/** Half the piece's depth across the lip (the Kit_* extents on local Z). */
+const EDGE_HALF_DEPTH: Readonly<Record<EdgeDressing['kind'], number>> = {
+  balustrade: 0.45,
+  merlon: 0.46,
+  boneRail: 0.18,
+  rubble: 0.77,
+};
+
+/** How far a plinth may miss the floor under it before the piece is refitted. */
+const EDGE_FIT = 0.2;
+
+/** The piece covering [s0, s1] of a run (yards along it), or null. */
+function edgePiece(
+  run: FieldCliffRun,
+  kind: EdgeDressing['kind'],
+  s0: number,
+  s1: number,
+): EdgeDressing {
+  const len = Math.hypot(run.bx - run.ax, run.bz - run.az);
+  const ux = (run.bx - run.ax) / len;
+  const uz = (run.bz - run.az) / len;
+  const inset = EDGE_INSET[kind];
+  const mid = (s0 + s1) / 2;
+  const x = run.ax + ux * mid - run.nx * inset;
+  const z = run.az + uz * mid - run.nz * inset;
+  // The piece's outer (chasm) face is its local +Z: turn it toward the drop.
+  const rot = Math.atan2(run.nx, run.nz);
+  // Local +X in world after that yaw (three.js: x' = x cos, z' = -x sin).
+  const lx = Math.cos(rot);
+  const lz = -Math.sin(rot);
+  const length = s1 - s0;
+  // The floor under the piece, read just inside it at its centre and near its
+  // two ends along its own local X.
+  const px = x - run.nx * EDGE_PROBE;
+  const pz = z - run.nz * EDGE_PROBE;
+  const y = ground(px, pz);
+  const half = Math.max(0.4, length / 2 - 0.3);
+  const shear = edgeShear(
+    y,
+    ground(px - lx * half, pz - lz * half),
+    ground(px + lx * half, pz + lz * half),
+    half,
+  );
+  return {
+    kind,
+    x,
+    z,
+    y,
+    rot,
+    length,
+    stretch: length / (2 * EDGE_HALF_LENGTH[kind]),
+    shear: Math.abs(shear) < 1e-9 ? 0 : shear,
+  };
+}
+
+/** Which ends of a piece miss the floor: bit 1 the run-start end, bit 2 the
+ *  run-end end (0 when the whole footprint sits on its sheared plinth). */
+function edgeMisfit(run: FieldCliffRun, e: EdgeDressing, s0: number, s1: number): number {
+  const len = Math.hypot(run.bx - run.ax, run.bz - run.az);
+  const ux = (run.bx - run.ax) / len;
+  const uz = (run.bz - run.az) / len;
+  const lx = Math.cos(e.rot);
+  const lz = -Math.sin(e.rot);
+  const inset = EDGE_INSET[e.kind];
+  const depth = EDGE_HALF_DEPTH[e.kind];
+  let bad = 0;
+  const ends: [number, number][] = [
+    [s0 + 0.12, 1],
+    [(s0 + s1) / 2, 3],
+    [s1 - 0.12, 2],
+  ];
+  for (const [s, bit] of ends) {
+    // Just inside the outer face and just inside the inner face.
+    for (const back of [Math.max(0.05, inset - depth) + 0.1, inset + depth - 0.1]) {
+      const wx = run.ax + ux * s - run.nx * back;
+      const wz = run.az + uz * s - run.nz * back;
+      const f = ground(wx, wz);
+      const along = (wx - e.x) * lx + (wz - e.z) * lz;
+      if (
+        f <= HOLLOW_CRYPT_FIELD.voidHeight + 1e-6 ||
+        Math.abs(f - (e.y + e.shear * along)) > EDGE_FIT
+      )
+        bad |= bit;
+    }
+  }
+  return bad;
+}
+
+/**
+ * Fit pieces over [s0, s1] of a run: a piece whose footprint leaves its floor
+ * (past a corner, over a kink where a ramp meets a terrace) is trimmed from the
+ * failing end, then split in two, so no rail overhangs a drop or floats off a
+ * ramp. Pieces shorter than a yard are dropped.
+ */
+function fitEdgePieces(
+  run: FieldCliffRun,
+  kind: EdgeDressing['kind'],
+  s0: number,
+  s1: number,
+  depth: number,
+  out: EdgeDressing[],
+): void {
+  let a = s0;
+  let b = s1;
+  while (b - a >= 1.2) {
+    const e = edgePiece(run, kind, a, b);
+    const bad = edgeMisfit(run, e, a, b);
+    if (bad === 0) {
+      out.push(e);
+      return;
+    }
+    if (bad === 3 || (bad & 1 && bad & 2)) break;
+    if (bad & 1) a += 0.25;
+    if (bad & 2) b -= 0.25;
+  }
+  if (depth < 2 && s1 - s0 >= 2.4) {
+    const m = (s0 + s1) / 2;
+    fitEdgePieces(run, kind, s0, m, depth + 1, out);
+    fitEdgePieces(run, kind, m, s1, depth + 1, out);
+  }
 }
 
 // ---- gate reveal curve -------------------------------------------------------------------

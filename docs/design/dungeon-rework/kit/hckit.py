@@ -116,8 +116,9 @@ class Piece:
         self._paint(faces, color, mat)
         return faces
 
-    def lathe(self, center, profile, sides, color, mat=STONE, phase=0.0):
-        """A turned solid from a (radius, z) profile, bottom to top: balusters, capitals, candles."""
+    def lathe(self, center, profile, sides, color, mat=STONE, phase=0.0, smooth=True):
+        """A turned solid from a (radius, z) profile, bottom to top: balusters, capitals, candles.
+        Its turned flanks shade smooth (a faceted drum under the moon reads as stripes)."""
         before = set(self.bm.faces)
         rings = []
         for r, z in profile:
@@ -126,7 +127,8 @@ class Piece:
                 math.sin(phase + math.tau * i / sides) * r, z))) for i in range(sides)])
         for a, b in zip(rings, rings[1:]):
             for i in range(sides):
-                self.bm.faces.new((a[i], a[(i + 1) % sides], b[(i + 1) % sides], b[i]))
+                f = self.bm.faces.new((a[i], a[(i + 1) % sides], b[(i + 1) % sides], b[i]))
+                f.smooth = smooth
         self.bm.faces.new(list(reversed(rings[0])))
         if profile[-1][0] > 1e-4:
             self.bm.faces.new(rings[-1])
@@ -227,7 +229,7 @@ class Piece:
             self.prism((x, y, z + height), 6, radius * 0.35, 0.0001, radius * 1.6 + 0.15, AMBER, mat=GLOW)
 
     def voussoir_arch(self, span, spring, rise, thickness, depth, color, pointed=True, blocks=13, broken=0.0,
-                      center=(0, 0, 0), keystone=True):
+                      center=(0, 0, 0), keystone=True, keep=None):
         """An arch of individual voussoir blocks in the XZ plane (local), springing at +-span/2."""
         cx, cy, cz = center
         half = span / 2
@@ -252,6 +254,8 @@ class Piece:
         drop = int(n * broken)
         for i in range(n):
             if broken > 0 and i >= n - drop:
+                continue
+            if keep is not None and i not in keep:
                 continue
             (x0, z0), (x1, z1) = pts[i], pts[i + 1]
             mx, mz = (x0 + x1) / 2, (z0 + z1) / 2
@@ -297,11 +301,16 @@ class Piece:
         top = z + height - (radius * 1.4 if capital else 0)
         shaft_h = (top - cur) * (1 - broken)
         drums = max(2, int(shaft_h / (radius * 2.2)))
+        # Drums share one facet phase and a near-identical tone: a per-drum
+        # twist or a wide tone step reads as a checkerboard up the shaft. The
+        # joint reads from the chamfer at each drum's top edge.
+        sides = max(sides, 16)
         for i in range(drums):
             h = shaft_h / drums
             entasis = 1.0 + 0.05 * math.sin(math.pi * (i + 0.5) / drums)
-            self.lathe((x, y, cur + i * h), [(radius * entasis, 0), (radius * entasis * 0.99, h - 0.03), (radius * entasis * 0.97, h)], sides,
-                       self.vary(color, 0.06), phase=self.rng.random() * 0.2)
+            self.lathe((x, y, cur + i * h), [(radius * entasis * 0.975, 0), (radius * entasis, 0.05),
+                                             (radius * entasis * 0.995, h - 0.06), (radius * entasis * 0.97, h)], sides,
+                       self.vary(color, 0.02))
         if broken > 0:
             tip = cur + shaft_h
             for i in range(4):
@@ -329,6 +338,11 @@ class Piece:
 
     # ------------------------------------------------------------- finish
     def finish(self, materials, parent):
+        """Weathered stone: albedo times a SMOOTH weathering field sampled per
+        vertex (never a per-face random, which reads as a checkerboard on turned
+        shafts): low-frequency tone drift, rain streaks running down, grime
+        toward the ground, damp in the underside, lichen creeping over the
+        upward faces. Turned solids (shafts, drums, balusters) shade smooth."""
         bm = self.bm
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
         floor = min(v.co.z for v in bm.verts) if bm.verts else 0.0
@@ -340,20 +354,21 @@ class Piece:
                     r, g, b, _ = loop[self.col]
                     loop[self.col] = (*srgb_to_linear((r, g, b)), 1.0)
                 continue
-            c = face.calc_center_median()
             n = face.normal
-            height = c.z - floor
-            # Grime and damp near the ground, a touch darker on down-facing faces.
-            ground = 0.74 + 0.26 * min(1.0, height / 2.2)
-            under = 0.82 if n.z < -0.3 else 1.0
-            # Hash noise per face for stone-to-stone variation and streaking.
-            h = math.sin(c.x * 12.9898 + c.y * 78.233 + c.z * 37.719) * 43758.5453
-            h -= math.floor(h)
-            streak = 0.9 + 0.1 * math.sin(c.x * 3.1 + c.y * 2.3) * math.sin(c.z * 1.7)
-            k = ground * under * (0.9 + 0.2 * h) * streak
-            k = 1 - (1 - k) * self.weather
-            lichen = max(0.0, n.z) * self.lichen * (0.4 + 0.6 * h) * min(1.0, (c.z - floor) / span + 0.3)
+            under = 0.84 if n.z < -0.3 else 1.0
             for loop in face.loops:
+                p = loop.vert.co
+                height = p.z - floor
+                # Grime and damp gathered in the bottom yard and a half.
+                ground = 0.72 + 0.28 * min(1.0, height / 1.6)
+                # Broad tone drift across the stone (about two-yard features).
+                tone = 0.9 + 0.2 * _fbm(p.x * 0.55, p.y * 0.55, p.z * 0.55)
+                # Rain streaks: stretched noise, long in Z, thin in XY.
+                streak = 0.93 + 0.1 * _fbm(p.x * 2.4 + 7.1, p.y * 2.4 - 3.3, p.z * 0.22)
+                k = ground * under * tone * streak
+                k = 1 - (1 - k) * self.weather
+                patch = _fbm(p.x * 0.9 + 11.0, p.y * 0.9 - 5.0, p.z * 0.9)
+                lichen = max(0.0, n.z) * self.lichen * max(0.0, patch * 1.6 - 0.45)                     * min(1.0, height / span + 0.3)
                 r, g, b, _ = loop[self.col]
                 r, g, b = r * k, g * k, b * k
                 r = r * (1 - lichen) + MOSS[0] * lichen
@@ -365,14 +380,38 @@ class Piece:
         bm.free()
         for mat in materials:
             mesh.materials.append(mat)
-        for poly in mesh.polygons:
-            poly.use_smooth = False
         mesh.color_attributes.active_color = mesh.color_attributes[0]
         mesh.color_attributes.render_color_index = 0
         obj = bpy.data.objects.new(self.name, mesh)
         bpy.context.scene.collection.objects.link(obj)
         obj.parent = parent
         return obj
+
+
+def _hash3(x, y, z):
+    h = math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453
+    return h - math.floor(h)
+
+
+def _vnoise(x, y, z):
+    xi, yi, zi = math.floor(x), math.floor(y), math.floor(z)
+    xf, yf, zf = x - xi, y - yi, z - zi
+    u, v, w = xf * xf * (3 - 2 * xf), yf * yf * (3 - 2 * yf), zf * zf * (3 - 2 * zf)
+
+    def lerp(a, b, t):
+        return a + (b - a) * t
+
+    c = [[[_hash3(xi + i, yi + j, zi + k) for k in (0, 1)] for j in (0, 1)] for i in (0, 1)]
+    x00 = lerp(c[0][0][0], c[1][0][0], u)
+    x10 = lerp(c[0][1][0], c[1][1][0], u)
+    x01 = lerp(c[0][0][1], c[1][0][1], u)
+    x11 = lerp(c[0][1][1], c[1][1][1], u)
+    return lerp(lerp(x00, x10, v), lerp(x01, x11, v), w)
+
+
+def _fbm(x, y, z):
+    """Two octaves of smooth value noise in [0, 1)."""
+    return (_vnoise(x, y, z) * 2 + _vnoise(x * 2.07 + 17.0, y * 2.07, z * 2.07)) / 3
 
 
 def build_kit(root_name, builders):

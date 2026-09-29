@@ -173,23 +173,25 @@ def chapel_ruin():
         mark = p.mark()
         p.masonry(0.0, 12.0, 0.0, 7.5 if side < 0 else 5.0, 1.2, 1.0, STONE_MID, ruin=0.55, bevel=False)
         p.turn(mark, Matrix.Translation((side * 7.4, 0.6, 0)) @ Matrix.Rotation(-math.pi / 2, 4, 'Z'))
-    p.rock((5, 6, 0.8), (4, 3, 1.8), STONE_DARK)
-    p.rock((-4, 9, 0.6), (3, 2.4, 1.3), STONE_DARK)
+    p.rock((5, 6, 0.15), (4, 3, 1.8), STONE_DARK, flat_bottom=True)
+    p.rock((-4, 9, 0.1), (3, 2.4, 1.3), STONE_DARK, flat_bottom=True)
     p.box((-3.2, 3.2, 0.9), (2.2, 1.6, 1.8), p.vary(STONE_MID), bevel=0.1, yaw=0.5, roll=0.4)
     return p
 
 
 def rock_pillar():
-    """A rock column dropping into the mist (under a hero piece on its own crag)."""
+    """A rock column dropping into the mist, its top levelled into a flat cap
+    (radius 11.5) that carries the chapel ruin; origin at the cap's surface."""
     p = P('RockPillar', weather=0.5, lichen=0.2)
-    z = 0.0
-    r = 7.0
+    p.prism((0, 0, -2.4), 12, 12.0, 11.5, 2.4, p.vary(STONE_DARK, 0.05), phase=0.13)
+    z = -1.5
+    r = 11.6
     for i in range(10):
         h = 7.0
-        p.rock((p.rng.uniform(-0.8, 0.8), p.rng.uniform(-0.8, 0.8), z - h / 2),
-               (r * 2.1, r * 1.9, h * 1.3), p.vary(STONE_DARK, 0.1), jitter=0.28, subdivisions=2)
+        p.rock((p.rng.uniform(-0.5, 0.5), p.rng.uniform(-0.5, 0.5), z - h / 2),
+               (r * 2.0, r * 1.9, h * 1.3), p.vary(STONE_DARK, 0.1), jitter=0.12, subdivisions=2)
         z -= h * 0.95
-        r *= 0.9
+        r *= 0.88
     return p
 
 
@@ -201,6 +203,32 @@ def candle_cluster():
         rr = p.rng.random() * 0.45
         p.candle((math.cos(a) * rr, math.sin(a) * rr * 0.7, 0.3), 0.25 + p.rng.random() * 0.55, 0.07 + p.rng.random() * 0.04)
     p.skull((0.45, -0.1, 0.3), 0.22, yaw=0.3)
+    return p
+
+
+def brazier():
+    """A standing iron brazier: three splayed legs, a riveted bowl of coals
+    (glow) at 1.3 yd; the runtime lights its flame in the bowl."""
+    p = P('Brazier', lichen=0.0)
+    p.prism((0, 0, 0), 8, 0.62, 0.55, 0.12, p.vary(STONE_DARK), phase=0.2)
+    for i in range(3):
+        a = math.tau * i / 3 + 0.3
+        foot = (math.cos(a) * 0.55, math.sin(a) * 0.55, 0.1)
+        knee = (math.cos(a) * 0.32, math.sin(a) * 0.32, 0.75)
+        top = (math.cos(a) * 0.42, math.sin(a) * 0.42, 1.12)
+        p.sweep(p.bezier(foot, knee, top, 6), 0.05, 0.045, IRON, sides=5)
+        p.box(foot, (0.16, 0.16, 0.08), IRON)
+    p.prism((0, 0, 0.62), 8, 0.1, 0.1, 0.5, IRON)
+    p.lathe((0, 0, 1.05), [(0.18, 0), (0.5, 0.12), (0.62, 0.3), (0.64, 0.36), (0.58, 0.36)], 12, IRON)
+    for i in range(8):
+        a = math.tau * i / 8
+        p.box((math.cos(a) * 0.62, math.sin(a) * 0.62, 1.28), (0.07, 0.07, 0.07), (0.35, 0.33, 0.32))
+    for i in range(9):
+        a = p.rng.random() * math.tau
+        r = p.rng.random() * 0.4
+        p.rock((math.cos(a) * r, math.sin(a) * r, 1.32), (0.26, 0.26, 0.16), AMBER, mat=GLOW, jitter=0.2,
+               subdivisions=1)
+    p.rock((0, 0, 1.3), (0.9, 0.9, 0.12), (0.1, 0.08, 0.07), jitter=0.1, subdivisions=1)
     return p
 
 
@@ -240,15 +268,56 @@ def cloister_column(broken=False):
     return p
 
 
-def arcade_arch(broken=False):
-    """An arcade bay between two cloister columns (spans 10 along X, springs at 9)."""
-    p = P('ArcadeArchBroken' if broken else 'ArcadeArch', seed=5 if broken else 0, lichen=0.5)
-    p.voussoir_arch(10.2, 9.4, 4.4, 0.75, 1.3, STONE_PALE, blocks=15, broken=0.45 if broken else 0.0)
-    if not broken:
+ARCADE_SPAN = 10.2
+ARCADE_SPRING = 9.05  # the lowest voussoir face sits exactly on the 9 yd capitals
+ARCADE_BLOCKS = 15
+
+
+def fallen_voussoirs(p, x0, x1, count):
+    """Voussoirs and chips lying in the grass under a broken bay (ground level)."""
+    for i in range(count):
+        t = (i + 0.5) / count
+        x = x0 + (x1 - x0) * t + p.rng.uniform(-0.5, 0.5)
+        y = p.rng.uniform(-1.4, 1.4)
+        yaw = p.rng.uniform(-0.9, 0.9)
+        on_edge = p.rng.random() < 0.3
+        h = 1.25 if on_edge else 0.75
+        p.box((x, y, h / 2 - 0.05), (1.25, 0.75 if on_edge else 1.3, h), p.vary(STONE_PALE, 0.08), bevel=0.06,
+              yaw=yaw, roll=p.rng.uniform(-0.08, 0.08))
+    for i in range(count + 2):
+        s_ = 0.25 + p.rng.random() * 0.35
+        p.box((x0 + (x1 - x0) * p.rng.random(), p.rng.uniform(-1.8, 1.8), s_ * 0.3 - 0.02), (s_, s_ * 0.8, s_ * 0.6),
+              p.vary(STONE_MID, 0.12), bevel=0.04, yaw=p.rng.random() * 3)
+
+
+def arcade_arch(variant='whole'):
+    """An arcade bay between two cloister columns 10 yd apart (feet at +-5.1 on
+    their capitals at 9). `broken` keeps both springers and drops the crown in
+    the grass; `springer` keeps only the -X springer (its column stands, the
+    other fell); `fallen` is only the stones on the ground."""
+    name = {'whole': 'ArcadeArch', 'broken': 'ArcadeArchBroken', 'springer': 'ArcadeArchSpringer',
+            'fallen': 'ArcadeArchFallen'}[variant]
+    p = P(name, seed={'whole': 0, 'broken': 5, 'springer': 9, 'fallen': 13}[variant], lichen=0.5)
+    n = ARCADE_BLOCKS - 1
+    keep = {
+        'whole': None,
+        'broken': set(range(0, 4)) | set(range(n - 4, n)),
+        'springer': set(range(0, 4)),
+        'fallen': set(),
+    }[variant]
+    if keep is None or keep:
+        p.voussoir_arch(ARCADE_SPAN, ARCADE_SPRING, 4.4, 0.75, 1.3, STONE_PALE, blocks=ARCADE_BLOCKS, keep=keep)
+    if variant == 'whole':
         p.masonry(-5.1, 5.1, 14.0, 15.0, 1.2, 0.5, STONE_MID)
         p.box((0, 0, 15.1), (10.4, 1.5, 0.22), p.vary(STONE_PALE), bevel=0.04)
         for x in (-3.8, 3.8):
             p.masonry(x - 1.1, x + 1.1, 9.8, 14.0, 1.1, 0.5, STONE_MID, ruin=0.3)
+    elif variant == 'broken':
+        fallen_voussoirs(p, -2.4, 2.4, 6)
+    elif variant == 'springer':
+        fallen_voussoirs(p, -1.5, 4.2, 9)
+    else:
+        fallen_voussoirs(p, -4.0, 4.0, 12)
     return p
 
 
@@ -487,19 +556,39 @@ def grave_fence():
 
 # =============================================================== the widow's gallery
 def web_column():
+    """A broken rime-crusted column swathed in frost silk: guy strands from its
+    broken top to the ground, two silk drapes slung from the top to the floor,
+    and a drained body hung from the broken capital on a short strand."""
     p = P('WebColumn', lichen=0.0)
     p.column((0, 0, 0), 12.0, 0.7, STONE_BLUE, sides=10, broken=0.35)
+    top = 7.4
     for i in range(6):
-        z0 = 1.5 + i * 1.2
-        p.sweep([(math.cos(a) * 0.95, math.sin(a) * 0.95, z0 + a * 0.3) for a in [j * 0.6 for j in range(11)]], 0.06, 0.06, RIME, mat=SILK, sides=4)
+        z0 = 1.5 + i * 1.0
+        p.sweep([(math.cos(a) * 0.78, math.sin(a) * 0.78, z0 + a * 0.25) for a in [j * 0.6 for j in range(11)]],
+                0.05, 0.05, RIME, mat=SILK, sides=4)
     for i in range(9):
         a = i * 0.7
-        top = (math.cos(a) * 0.8, math.sin(a) * 0.8, 7.2 - (i % 3) * 0.6)
+        t = (math.cos(a) * 0.6, math.sin(a) * 0.6, top - (i % 3) * 0.5)
         foot = (math.cos(a) * 3.4, math.sin(a) * 3.4, 0.05)
-        p.sweep(p.bezier(top, ((top[0] + foot[0]) / 2, (top[1] + foot[1]) / 2, 2.4), foot, 6), 0.03, 0.02, RIME, mat=SILK, sides=3)
+        p.sweep(p.bezier(t, ((t[0] + foot[0]) / 2, (t[1] + foot[1]) / 2, 2.6), foot, 6), 0.03, 0.02, RIME,
+                mat=SILK, sides=3)
+    # Two drapes: a fan of strands from the top down to a line on the ground.
+    for a0 in (0.4, 3.3):
+        for k in range(14):
+            a = a0 + k * 0.07
+            t = (math.cos(a) * 0.6, math.sin(a) * 0.6, top - 0.2 - (k % 4) * 0.12)
+            foot = (math.cos(a) * 3.1 + math.cos(a + 1.57) * (k - 7) * 0.18,
+                    math.sin(a) * 3.1 + math.sin(a + 1.57) * (k - 7) * 0.18, 0.04)
+            mid = ((t[0] + foot[0]) / 2 * 1.1, (t[1] + foot[1]) / 2 * 1.1, 3.4 - (k % 3) * 0.3)
+            p.sweep(p.bezier(t, mid, foot, 7), 0.022, 0.02, RIME, mat=SILK, sides=3)
+    # The hung cocoon: a strand from the broken lip, the body clear of the floor.
+    cx, cy = 1.15, -0.2
+    p.sweep([(0.55, -0.1, top - 0.1), (0.9, -0.15, top - 0.5), (cx, cy, top - 1.2)], 0.035, 0.03, RIME,
+            mat=SILK, sides=3)
+    p.rock((cx, cy, top - 2.4), (0.8, 0.7, 2.0), (0.82, 0.88, 0.92), mat=SILK, jitter=0.1, subdivisions=2)
     for i in range(8):
         a = p.rng.random() * math.tau
-        p.spike((math.cos(a) * 0.72, math.sin(a) * 0.72, 7.6), 0.12, -(0.4 + p.rng.random() * 0.8), RIME, sides=4)
+        p.spike((math.cos(a) * 0.6, math.sin(a) * 0.6, top + 0.2), 0.1, -(0.4 + p.rng.random() * 0.7), RIME, sides=4)
     return p
 
 
@@ -516,51 +605,54 @@ def egg_cluster():
 
 
 def great_web():
-    """HERO: the Great Web strung between the two broken columns at +-14 X."""
+    """HERO: the Great Web strung between two colossal rime pillars that rise
+    out of the chasm (their feet on the chasm floor 34 yd below the arena) on
+    either side of the arena's north lip. Origin on the arena floor, web in the
+    XZ plane; every strand is anchored on a pillar."""
     p = P('GreatWeb', lichen=0.0)
-    cx, cz = 0.0, 11.0
-    anchors = [(-14, 0, 15), (14, 0, 14.5), (-13.5, 0, 2.0), (13.8, 0, 1.5), (-14, 0, 8.5), (14, 0, 8.0), (-6, 0, 21), (7, 0, 20.5)]
-    for ax, ay, az in anchors:
-        p.sweep(p.bezier((cx, 0, cz), ((cx + ax) / 2, 0.4, (cz + az) / 2 - 0.4), (ax, ay, az), 6), 0.07, 0.05, RIME, mat=SILK, sides=4)
+    px = 16.0
+    for x in (-px, px):
+        z = -34.0
+        r = 3.4
+        while z < 14.0:
+            h = 6.0
+            p.rock((x + p.rng.uniform(-0.3, 0.3), p.rng.uniform(-0.3, 0.3), z + h / 2), (r * 2, r * 1.8, h * 1.25),
+                   p.vary(STONE_BLUE, 0.08), jitter=0.12, subdivisions=2)
+            z += h * 0.85
+            r = max(1.7, r * 0.93)
+        p.rock((x, 0, 16.0), (3.6, 3.2, 4.6), RIME, jitter=0.18, subdivisions=2)
+        for i in range(7):
+            a = p.rng.random() * math.tau
+            p.spike((x + math.cos(a) * 1.0, math.sin(a) * 1.0, 17.5), 0.45, 1.6 + p.rng.random() * 2.2, RIME, sides=4,
+                    lean=(math.cos(a) * 0.5, math.sin(a) * 0.5))
+    cx, cz = 0.0, 9.5
+    ax = px - 1.4
+    anchors = [(-ax, 0, 15.2), (ax, 0, 14.6), (-ax, 0, 1.6), (ax, 0, 1.3), (-ax, 0, 8.5), (ax, 0, 8.0),
+               (-ax, 0, 4.8), (ax, 0, 11.6)]
+    for x_, y_, z_ in anchors:
+        p.sweep(p.bezier((cx, 0, cz), ((cx + x_) / 2, 0.4, (cz + z_) / 2 - 0.4), (x_, y_, z_), 6), 0.07, 0.05, RIME,
+                mat=SILK, sides=4)
     spokes = 18
     for i in range(spokes):
         a = math.tau * i / spokes
-        p.sweep([(cx + math.cos(a) * 0.4, 0, cz + math.sin(a) * 0.4), (cx + math.cos(a) * 10.5, 0.05, cz + math.sin(a) * 9.0)], 0.05, 0.035, RIME, mat=SILK, sides=4)
+        p.sweep([(cx + math.cos(a) * 0.4, 0, cz + math.sin(a) * 0.4),
+                 (cx + math.cos(a) * 9.6, 0.05, cz + math.sin(a) * 7.8)], 0.05, 0.035, RIME, mat=SILK, sides=4)
     r = 1.0
-    while r < 10.0:
+    while r < 9.2:
         pts = []
         for i in range(spokes + 1):
             a = math.tau * i / spokes
             sag = 0.25 * math.sin(i * 1.3 + r)
-            pts.append((cx + math.cos(a) * r * (1.0 - 0.04 * sag), 0.05, cz + math.sin(a) * r * 0.86 - sag * 0.2))
+            pts.append((cx + math.cos(a) * r * (1.0 - 0.04 * sag), 0.05, cz + math.sin(a) * r * 0.81 - sag * 0.2))
         p.sweep(pts, 0.03, 0.03, RIME, mat=SILK, sides=3, cap=False)
         r += 0.55 + r * 0.06
-    # The drained prey: cocoons hung in the web, frost glinting.
-    for (x, z, s) in ((-5, 13, 1.0), (4.5, 7.5, 1.2), (6.5, 14.5, 0.8), (-3.5, 6.0, 0.9)):
-        p.rock((x, -0.2, z), (0.9 * s, 0.8 * s, 2.0 * s), (0.82, 0.88, 0.92), mat=SILK, jitter=0.12, subdivisions=2)
+    for (x, z, s_) in ((-5, 12, 1.0), (4.5, 6.5, 1.2), (6.0, 13.0, 0.8), (-3.5, 5.0, 0.9)):
+        p.rock((x, -0.2, z), (0.9 * s_, 0.8 * s_, 2.0 * s_), (0.82, 0.88, 0.92), mat=SILK, jitter=0.12, subdivisions=2)
     for i in range(30):
         a = p.rng.random() * math.tau
-        rr = p.rng.random() * 9
-        p.rock((cx + math.cos(a) * rr, -0.1, cz + math.sin(a) * rr * 0.86), (0.12, 0.12, 0.12), (0.7, 0.9, 1.0), mat=GLOW, subdivisions=1)
-    return p
-
-
-def silk_sheet():
-    p = P('SilkSheet', lichen=0.0)
-    for i in range(26):
-        x = -2 + p.rng.random() * 4.5
-        p.sweep([(x, 0.2, 7.3), (x + 0.1, 0.3, 4.5), (x - 0.1, 0.25, 1.0)], 0.02, 0.02, RIME, mat=SILK, sides=3)
-    return p
-
-
-def hanging_cocoon():
-    """A silk-wrapped body hanging on a strand (origin at its lowest point)."""
-    p = P('HangingCocoon', lichen=0.0)
-    p.rock((0, 0, 1.1), (0.9, 0.8, 2.2), (0.8, 0.86, 0.9), mat=SILK, jitter=0.1, subdivisions=2)
-    p.sweep([(0, 0, 2.1), (0.05, 0, 4.0), (0, 0, 8.0)], 0.03, 0.03, RIME, mat=SILK, sides=3)
-    for i in range(6):
-        a = i * 1.1
-        p.sweep([(math.cos(a) * 0.46, math.sin(a) * 0.42, 0.4 + i * 0.3), (math.cos(a + 1.5) * 0.46, math.sin(a + 1.5) * 0.42, 0.7 + i * 0.3)], 0.03, 0.03, RIME, mat=SILK, sides=3)
+        rr = p.rng.random() * 8.5
+        p.rock((cx + math.cos(a) * rr, -0.1, cz + math.sin(a) * rr * 0.81), (0.12, 0.12, 0.12), (0.7, 0.9, 1.0),
+               mat=GLOW, subdivisions=1)
     return p
 
 
@@ -639,7 +731,8 @@ def tracery_window():
     p.voussoir_arch(13.4, 11.0, 9.0, 1.1, 1.9, STONE_PALE, blocks=21, broken=0.0)
     # Mullions and tracery rings; two lancets fallen.
     for x in (-3.4, 0.0, 3.4):
-        p.box((x, 0, 6.5), (0.4, 0.5, 13.0 if x else 15.5), p.vary(STONE_PALE), bevel=0.04)
+        h = 13.0 if x else 15.5
+        p.box((x, 0, h / 2), (0.4, 0.5, h), p.vary(STONE_PALE), bevel=0.04)
     for (cx, cz, r) in ((-1.7, 14.2, 1.5), (1.7, 14.2, 1.5), (0, 17.6, 1.9)):
         for i in range(14):
             a = math.tau * i / 14
@@ -721,23 +814,28 @@ def ring_stone():
 
 
 def bone_crown():
-    """HERO: six colossal ribs rising from the ring's rim (radius 30) and arching
+    """HERO: four colossal ribs rising out of the chasm beside the ring's rim and arching
     inward to a bone halo 38 yd over the altar; the soul column rises through it."""
     p = P('BoneCrown', lichen=0.0)
-    ribs = 6
+    # Four ribs on the diagonals, behind the four sarcophagus alcoves: clear of
+    # the choir loft to the south and the Bone Stair's mouth to the north.
+    ribs = 4
     for i in range(ribs):
         a = math.tau * (i + 0.5) / ribs
+        # The rib rises out of the chasm floor (64 yd under the ring) beside
+        # the rim, then arches in over the altar.
+        root = Vector((math.cos(a) * 33, math.sin(a) * 33, -64.0))
         foot = Vector((math.cos(a) * 31, math.sin(a) * 31, -2.0))
         knee = Vector((math.cos(a) * 27, math.sin(a) * 27, 22))
         top = Vector((math.cos(a) * 7.5, math.sin(a) * 7.5, 38))
-        pts = p.bezier(foot, knee, top, 18)
+        shaft = [root.lerp(foot, t / 8) for t in range(8)]
+        pts = shaft + p.bezier(foot, knee, top, 18)
         color = p.vary(BONE, 0.04)
-        p.sweep(pts, 1.6, 0.55, color, sides=10)
+        p.sweep(pts, 2.1, 0.55, color, sides=10)
         # Vertebra-like knuckles, same bone, so the rib reads as one piece.
         for k in range(3, len(pts) - 1, 4):
             q = Vector(pts[k])
             p.rock(q, (2.1, 2.1, 1.2), color, jitter=0.08, subdivisions=1)
-        p.spike((foot.x, foot.y, 0.0), 2.2, 4.0, BONE_OLD, sides=6)
     ring = []
     for i in range(25):
         a = math.tau * i / 24
@@ -765,13 +863,14 @@ def distant_spire():
 BUILDERS = (
     balustrade, parapet, bone_rail, rubble,
     lambda: curtain_wall(False), lambda: curtain_wall(True),
-    lychgate, mourner_statue, chapel_ruin, rock_pillar, candle_cluster, skull_pile, coffin_stack,
+    lychgate, mourner_statue, chapel_ruin, rock_pillar, candle_cluster, brazier, skull_pile, coffin_stack,
     lambda: cloister_column(False), lambda: cloister_column(True),
-    lambda: arcade_arch(False), lambda: arcade_arch(True),
+    lambda: arcade_arch('whole'), lambda: arcade_arch('broken'), lambda: arcade_arch('springer'),
+    lambda: arcade_arch('fallen'),
     ossuary_monument, sarcophagus, shrine_pillar, wing_arch, banner,
     lambda: headstone('A'), lambda: headstone('B'), lambda: headstone('C'), lambda: headstone('D'),
     lantern_post, dead_tree, bell_tower, open_grave, grave_mound, grave_fence, dead_grass,
-    web_column, egg_cluster, great_web, silk_sheet, hanging_cocoon,
+    web_column, egg_cluster, great_web,
     choir_pillar, bone_organ, pew, nave_column, tracery_window, candelabrum,
     remembrance_candle, rite_altar, sarcophagus_alcove, ring_stone, bone_crown, distant_spire,
 )

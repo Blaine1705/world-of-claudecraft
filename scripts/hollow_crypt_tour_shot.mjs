@@ -39,6 +39,45 @@ export const SHOTS = [
   { id: 'jefe3_ilvane_balcon', area: 'loft', at: [0, 152], face: 0, pitch: 0.3, dist: 16 },
   { id: 'escalera_hueso', area: 'bonestair', at: [64, 186], face: 0, pitch: 0.3, dist: 18 },
   { id: 'jefe4_morthen_anillo', area: 'ring', at: [4, 228], face: Math.PI, pitch: 0.3, dist: 20 },
+  // Floating-geometry pass: the spots the owner reported, and every fixed piece.
+  { id: 'fix_rampa_capilla', area: 'landing', at: [5, -92], face: Math.PI, pitch: 0.18, dist: 11 },
+  { id: 'fix_arcada_sur', area: 'cloister', at: [16, -58], face: Math.PI, pitch: 0.12, dist: 12 },
+  {
+    id: 'fix_arcada_oeste',
+    area: 'cloister',
+    at: [-26, -30],
+    face: -Math.PI / 2,
+    pitch: 0.12,
+    dist: 12,
+  },
+  {
+    id: 'fix_columna_textura',
+    area: 'cloister',
+    at: [-33, -12],
+    face: -Math.PI / 2,
+    pitch: 0.05,
+    dist: 5,
+  },
+  { id: 'fix_escalera_hueso', area: 'bonestair', at: [61, 168], face: 0.25, pitch: 0.28, dist: 12 },
+  {
+    id: 'fix_puente_este',
+    area: 'processional',
+    at: [30, 101],
+    face: Math.PI / 2,
+    pitch: 0.22,
+    dist: 12,
+  },
+  { id: 'fix_telarana', area: 'web', at: [80, 104], face: 0, pitch: 0.12, dist: 16 },
+  { id: 'fix_corona_anillo', area: 'ring', at: [0, 188], face: 0, pitch: 0.1, dist: 22 },
+  {
+    id: 'fix_capilla_entrada',
+    area: 'landing',
+    at: [0, -124],
+    face: Math.PI,
+    pitch: 0.12,
+    dist: 14,
+  },
+  { id: 'fix_ventanal_coro', area: 'loft', at: [0, 160], face: 0, pitch: 0.15, dist: 14 },
 ];
 
 async function main() {
