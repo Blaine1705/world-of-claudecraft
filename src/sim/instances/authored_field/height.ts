@@ -106,13 +106,41 @@ export function pathOutline(s: FieldPathSurface): [number, number][] {
   return ring;
 }
 
-/** Height a path gives (x, z), or NaN when the point is outside its band.
- *  Inside the band the height blends along the nearest centreline segment. */
-export function pathHeightAt(s: FieldPathSurface, x: number, z: number): number {
-  if (!pointInPolygon(pathOutline(s), x, z)) return Number.NaN;
-  let bestD2 = Infinity;
-  let bestH = Number.NaN;
+/** Unit tangent of a path's cross-section at vertex i: the same direction
+ *  pathOutline mitres the band with (next minus previous vertex), so each
+ *  cross-section is the straight line through left[i], the vertex, right[i]. */
+function crossTangent(
+  pts: readonly (readonly [number, number, number])[],
+  i: number,
+): [number, number] {
+  const prev = pts[Math.max(0, i - 1)];
+  const next = pts[Math.min(pts.length - 1, i + 1)];
+  const dx = next[0] - prev[0];
+  const dz = next[1] - prev[1];
+  const len = Math.hypot(dx, dz) || 1;
+  return [dx / len, dz / len];
+}
+
+/**
+ * Height a path gives (x, z) whether or not the point is inside its band (the
+ * renderer reads it at the band's own outline vertices, where containment is
+ * ambiguous).
+ *
+ * The band is the chain of quads between the mitred cross-sections; inside
+ * the quad of segment i the height blends from vertex i's height on its
+ * cross-section to vertex i + 1's on the next, by the point's share of the
+ * way between those two lines. Every cross-section carries exactly its
+ * vertex's height from both sides, so a turning stair has no seam at its
+ * bends (the old nearest-segment blend jumped by up to half a yard across the
+ * inside of a rising bend), and a straight path is the plain linear ramp.
+ */
+export function pathHeightUnbounded(s: FieldPathSurface, x: number, z: number): number {
   const pts = s.points;
+  let best = -1;
+  let bestD2 = Infinity;
+  let bestU = 0;
+  let fallbackD2 = Infinity;
+  let fallbackH = pts[0][2];
   for (let i = 0; i + 1 < pts.length; i++) {
     const ax = pts[i][0];
     const az = pts[i][1];
@@ -124,12 +152,33 @@ export function pathHeightAt(s: FieldPathSurface, x: number, z: number): number 
     const px = ax + dx * t - x;
     const pz = az + dz * t - z;
     const d2 = px * px + pz * pz;
+    if (d2 < fallbackD2) {
+      fallbackD2 = d2;
+      fallbackH = pts[i][2] + (pts[i + 1][2] - pts[i][2]) * t;
+    }
+    // Which side of each bounding cross-section the point lies on.
+    const t0 = crossTangent(pts, i);
+    const t1 = crossTangent(pts, i + 1);
+    const d0 = (x - ax) * t0[0] + (z - az) * t0[1];
+    const d1 = (pts[i + 1][0] - x) * t1[0] + (pts[i + 1][1] - z) * t1[1];
+    if (d0 < -1e-9 || d1 < -1e-9) continue;
     if (d2 < bestD2) {
       bestD2 = d2;
-      bestH = pts[i][2] + (pts[i + 1][2] - pts[i][2]) * t;
+      best = i;
+      bestU = d0 + d1 > 0 ? d0 / (d0 + d1) : 0;
     }
   }
-  return bestH;
+  if (best < 0) {
+    // Past an end cross-section (the flat end caps): the nearest segment.
+    return fallbackH;
+  }
+  return pts[best][2] + (pts[best + 1][2] - pts[best][2]) * bestU;
+}
+
+/** Height a path gives (x, z), or NaN when the point is outside its band. */
+export function pathHeightAt(s: FieldPathSurface, x: number, z: number): number {
+  if (!pointInPolygon(pathOutline(s), x, z)) return Number.NaN;
+  return pathHeightUnbounded(s, x, z);
 }
 
 /** Height one surface gives (x, z), or NaN when it does not contain it. */

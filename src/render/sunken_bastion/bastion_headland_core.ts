@@ -90,6 +90,11 @@ export interface HeadlandGrid {
   under: Uint8Array;
 }
 
+/** How far under its terrace's floor a hidden rock vertex is tucked. */
+const UNDER_DEPTH = 3;
+/** How far under the lowest floor it shares a cell with a void vertex stays. */
+const LIP_CLEARANCE = 0.15;
+
 /** Beyond this far from every terrace no rock is laid (open sea). */
 const REACH = 46;
 /** Rock this far under the waves is not drawn at all. */
@@ -138,12 +143,62 @@ export function planHeadlandRock(step = 3): HeadlandGrid {
       const k = j * cols + i;
       if (g > FIELD.voidHeight + 0.5) {
         // Under a terrace: tucked below its floor, never poking through.
-        heights[k] = g - 3;
+        heights[k] = g - UNDER_DEPTH;
         under[k] = 1;
       } else {
         heights[k] = headlandRockHeight(x, z, rings);
       }
     }
   }
-  return { minX, minZ, step, cols, rows, heights, under };
+  // A vertex shares its cells with every floor in its 3 by 3 neighbourhood,
+  // and the cell's triangles blend across the lip, so the rock there is kept
+  // a hand under the lowest floor it touches (a crag lump beside a rock-edged
+  // terrace, or a higher stair's tucked rock beside a lower yard, used to
+  // rise through the walkable edge).
+  const capped = heights.slice();
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i < cols; i++) {
+      const k = j * cols + i;
+      let cap = Infinity;
+      for (let dj = -1; dj <= 1; dj++) {
+        for (let di = -1; di <= 1; di++) {
+          const ii = i + di;
+          const jj = j + dj;
+          if (ii < 0 || jj < 0 || ii >= cols || jj >= rows) continue;
+          const n = jj * cols + ii;
+          if (under[n]) cap = Math.min(cap, heights[n] + UNDER_DEPTH - LIP_CLEARANCE);
+        }
+      }
+      if (heights[k] > cap) capped[k] = cap;
+    }
+  }
+  return { minX, minZ, step, cols, rows, heights: capped, under };
+}
+
+/**
+ * The drawn rock height at (x, z), reading the grid through the SAME two
+ * triangles per cell bastion_shore.ts builds (a, c, b and b, c, d), or NaN
+ * where the cell is skipped (hidden under a terrace or drowned). The floor
+ * sweep holds it under every walkable floor.
+ */
+export function headlandMeshHeightAt(grid: HeadlandGrid, x: number, z: number): number {
+  const { minX, minZ, step, cols, rows, heights, under } = grid;
+  const fx = (x - minX) / step;
+  const fz = (z - minZ) / step;
+  const i = Math.floor(fx);
+  const j = Math.floor(fz);
+  if (i < 0 || j < 0 || i + 1 >= cols || j + 1 >= rows) return Number.NaN;
+  const a = j * cols + i;
+  const b = a + 1;
+  const c = a + cols;
+  const d = c + 1;
+  if (under[a] && under[b] && under[c] && under[d]) return Number.NaN;
+  const drowned = (k: number): boolean => heights[k] <= HEADLAND_DROWNED + 0.01;
+  if (drowned(a) && drowned(b) && drowned(c) && drowned(d)) return Number.NaN;
+  const u = fx - i;
+  const v = fz - j;
+  if (u + v <= 1) {
+    return heights[a] + (heights[b] - heights[a]) * u + (heights[c] - heights[a]) * v;
+  }
+  return heights[d] + (heights[c] - heights[d]) * (1 - u) + (heights[b] - heights[d]) * (1 - v);
 }

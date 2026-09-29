@@ -129,7 +129,9 @@ function drawbridge(gate: DungeonGateDef): GateRig {
   deck.add(wooden, metal);
   // The hinge sits at the gatehouse lip (14 yd north of the gate point).
   const hinge = new THREE.Group();
-  hinge.position.set(0, 0.2, 14);
+  // Planks are 0.35 thick round the deck origin: their tops lie a hair over
+  // the walked bridge height once lowered, so feet stand ON the timber.
+  hinge.position.set(0, -0.12, 14);
   hinge.add(deck);
   const root = new THREE.Group();
   root.add(hinge);

@@ -126,7 +126,9 @@ export const BEACON_CROWN = { x: -4, z: 208, r: 26, h: 30 } as const;
 export const FOGBEACON = { x: -4, z: 208, r: 6.5, height: 44 } as const;
 
 /** The Lower Bailey's Drowned Chapel on its island, ringed by the moat. */
-export const BAILEY_CHAPEL = { x: 0, z: -88, island: 19, moat: 30 } as const;
+/** moatFloor: the flooded ring sits a kerb under the bailey (2), never deeper than
+ *  a body can stride (MAX_STEP_HEIGHT 0.9). */
+export const BAILEY_CHAPEL = { x: 0, z: -88, island: 19, moat: 30, moatFloor: 1.3 } as const;
 
 const SURFACES: FieldSurface[] = [
   // --- The Sea-Gate Landing and its stair onto the flats -----------------
@@ -192,15 +194,16 @@ const SURFACES: FieldSurface[] = [
     edge: 'masonry',
     ground: 'wetstone',
   },
-  // The moat ring round the chapel island: a flooded channel a yard down
-  // (a step, never a cliff), and the island inside it.
+  // The moat ring round the chapel island: a flooded channel sunk a kerb
+  // below the bailey (under MAX_STEP_HEIGHT, so a body strides in and out of
+  // it rather than being trapped), and the island inside it.
   {
     kind: 'circle',
     id: 'moat',
     x: BAILEY_CHAPEL.x,
     z: BAILEY_CHAPEL.z,
     r: BAILEY_CHAPEL.moat,
-    h: 1,
+    h: BAILEY_CHAPEL.moatFloor,
     edge: 'masonry',
     ground: 'mud',
   },

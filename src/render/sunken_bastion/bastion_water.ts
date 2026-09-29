@@ -99,14 +99,15 @@ function waterMaterial(alpha: number, softEdge: boolean, tint = 0x243632): THREE
 export function buildBastionWater(ground: (x: number, z: number) => number): THREE.Group {
   const group = new THREE.Group();
   group.name = 'sunkenBastionWater';
-  // The moat ring round the chapel island, brim-full a hand under the island.
+  // The moat ring round the chapel island: shin-deep over its floor, a hand
+  // under the bailey and the island.
   const moat = new THREE.Mesh(
     new THREE.RingGeometry(BAILEY_CHAPEL.island - 0.2, BAILEY_CHAPEL.moat + 0.1, 72, 1).rotateX(
       -Math.PI / 2,
     ),
     waterMaterial(0.82, false),
   );
-  moat.position.set(BAILEY_CHAPEL.x, 1.55, BAILEY_CHAPEL.z);
+  moat.position.set(BAILEY_CHAPEL.x, BAILEY_CHAPEL.moatFloor + 0.25, BAILEY_CHAPEL.z);
   moat.renderOrder = 0;
   group.add(moat);
   // The Drowning Yard: ankle-deep over the whole floor (the cage pit keeps its own).

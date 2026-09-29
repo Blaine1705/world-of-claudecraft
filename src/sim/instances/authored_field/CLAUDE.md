@@ -7,7 +7,9 @@ render-only light zones. Everything else is DERIVED from that record:
 
 - `height.ts`: the ground height. The last surface containing a point wins;
   the void between surfaces takes `voidHeight`. One height per point, always:
-  upper levels are terraces beside lower ones, never above them.
+  upper levels are terraces beside lower ones, never above them. A path blends
+  between its mitred cross-sections (`pathHeightUnbounded`), so a turning stair
+  has no seam at its bends.
 - `cliffs.ts`: every outline edge where the ground drops by more than
   `cliffStep` becomes a cliff run (merged per edge, deduped spatially). The
   renderer dresses the same runs (retaining walls, rock faces, balustrades).
@@ -25,5 +27,10 @@ Rules:
   few long edges over many short ones.
 - Pure, deterministic, no `SimContext`, no rng, no DOM or Three imports; the
   renderer imports these modules directly for its terrain and dressing.
+- The renderer draws each surface only where it OWNS the ground (clipped by every
+  later surface, `src/render/authored_field/field_clip_core.ts`), so a later, lower
+  surface cut into an earlier, higher one (a moat, a ramp) is drawn where it is
+  walked. `tests/authored_field_floor_sweep.test.ts` sweeps every field and fails
+  on any drawn-versus-walked mismatch; run it after any layout edit.
 - Tests: `tests/authored_field.test.ts` (height, cliffs, colliders) and the
   dungeon route contract `tests/hollow_crypt_route.test.ts`.

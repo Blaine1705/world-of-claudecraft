@@ -796,6 +796,7 @@ const RENDER_PURE_CORES = [
   // The authored open-air field's terrain plan and the Hollow Crypt's dressing,
   // set-dressing and gate-memory cores (docs/design/dungeon-rework).
   'src/render/authored_field/field_mesh_core.ts',
+  'src/render/authored_field/field_clip_core.ts',
   'src/render/hollow_crypt/crypt_plan_core.ts',
   'src/render/hollow_crypt/crypt_kit_plan_core.ts',
   'src/render/hollow_crypt/crypt_trash_fx_core.ts',

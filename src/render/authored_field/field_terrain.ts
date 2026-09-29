@@ -40,7 +40,7 @@ export function buildAuthoredFieldTerrain(
   group.name = `authoredField:${def.key}`;
   const tops = planFieldTops(def, {
     maxEdge: opts.maxEdge ?? (opts.lowGfx ? 6 : 3),
-    layerLift: 0.004,
+    layerLift: 0,
   });
   const stone = flagstoneDetail();
   const soil = soilDetail();
