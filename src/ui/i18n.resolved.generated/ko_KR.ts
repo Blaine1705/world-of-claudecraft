@@ -18451,6 +18451,51 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
+      "gravedirt_treads": {
+        "name": "무덤흙 장화"
+      },
+      "bellrope_girdle": {
+        "name": "종줄 허리띠"
+      },
+      "sextons_spadehaft": {
+        "name": "성구지기의 삽자루"
+      },
+      "rimesilk_mantle": {
+        "name": "서리비단 어깨망토"
+      },
+      "bonechill_carapace_vest": {
+        "name": "뼈서리 갑각 조끼"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "서리거미줄 사냥꾼 다리보호구"
+      },
+      "rimeweb_fang": {
+        "name": "서리거미줄 송곳니"
+      },
+      "cantors_cassock": {
+        "name": "성가대장의 사제복"
+      },
+      "choirward_leggings": {
+        "name": "성가수호 다리보호구"
+      },
+      "choristers_gloves": {
+        "name": "성가대원의 장갑"
+      },
+      "cantors_hymnal": {
+        "name": "성가대장의 찬송가집"
+      },
+      "gravecallers_vestments": {
+        "name": "무덤부름의 제의"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "불안한 추적자의 두건"
+      },
+      "sextons_burial_spade": {
+        "name": "성구지기의 매장삽"
+      },
+      "rimesilk_hood": {
+        "name": "서리비단 두건"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -19558,34 +19603,34 @@ export const ko_KR: EnTranslations = {
         "name": "무덤부름 모르덴"
       },
       "ossuary_sentinel": {
-        "name": "Ossuary Sentinel"
+        "name": "납골당 파수병"
       },
       "hollow_gravedigger": {
-        "name": "Hollow Gravedigger"
+        "name": "공허의 무덤파기꾼"
       },
       "rime_egg_sac": {
-        "name": "Rime Egg Sac"
+        "name": "서리 알주머니"
       },
       "rimeweb_hatchling": {
-        "name": "Rimeweb Hatchling"
+        "name": "서리거미줄 새끼거미"
       },
       "rimeweb_spinner": {
-        "name": "Rimeweb Spinner"
+        "name": "서리거미줄 실잣는거미"
       },
       "candlewright_acolyte": {
-        "name": "Candlewright Acolyte"
+        "name": "초장이 수행사제"
       },
       "hollow_chorister": {
-        "name": "Hollow Chorister"
+        "name": "공허의 성가대원"
       },
       "bound_soul": {
-        "name": "Bound Soul"
+        "name": "속박된 영혼"
       },
       "rimeweb": {
-        "name": "Rimeweb"
+        "name": "림웹"
       },
       "cantor_ilvane": {
-        "name": "Cantor Ilvane"
+        "name": "성가대장 일베인"
       },
       "bastion_revenant": {
         "name": "요새 망령"

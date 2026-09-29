@@ -6032,6 +6032,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Gravewoven Bag"
+      },
+      {
+        "kind": "item",
+        "name": "Sexton's Spadehaft"
+      },
+      {
+        "kind": "item",
+        "name": "Rimeweb Fang"
+      },
+      {
+        "kind": "item",
+        "name": "Cantor's Hymnal"
       }
     ]
   },
@@ -6071,6 +6083,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Bastion Sigil"
+      },
+      {
+        "kind": "item",
+        "name": "Sexton's Burial Spade"
+      },
+      {
+        "kind": "item",
+        "name": "Rimesilk Hood"
       }
     ]
   },

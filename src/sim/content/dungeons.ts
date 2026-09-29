@@ -516,10 +516,26 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     },
     summonAdds: { mobId: 'restless_bones', count: 2, atHpPct: [0.66, 0.33] },
     yells: { summon: 'The bell tolls, and the graves give up their dead!' },
+    // The rework's per-boss table (hollow_crypt.md 8.1): one guaranteed piece,
+    // one armor archetype each, plus the Spadehaft chase row. Heroic rides
+    // HEROIC_BOSS_LOOT.sexton_marrow.
     loot: [
-      { copper: 400, chance: 1 },
-      { itemId: 'quilted_trousers', chance: 0.4, normalOnly: true },
-      { itemId: 'oiled_boots', chance: 0.4, normalOnly: true },
+      { copper: 800, chance: 1 },
+      {
+        itemId: 'quilted_trousers',
+        chance: 0.25,
+        rollGroup: 'marrow_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'oiled_boots', chance: 0.25, rollGroup: 'marrow_guaranteed', normalOnly: true },
+      {
+        itemId: 'gravedirt_treads',
+        chance: 0.25,
+        rollGroup: 'marrow_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'bellrope_girdle', chance: 0.25, rollGroup: 'marrow_guaranteed', normalOnly: true },
+      { itemId: 'sextons_spadehaft', chance: 0.1, normalOnly: true },
     ],
     scale: 1.2,
     color: 0x839192,
@@ -554,14 +570,16 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'morthen_guaranteed_uncommon',
         normalOnly: true,
       },
+      // Quilted Trousers and Oiled Leather Boots moved to Sexton Marrow in the
+      // rework (hollow_crypt.md 8.1); the Gravecaller's own pieces replace them.
       {
-        itemId: 'quilted_trousers',
+        itemId: 'gravecallers_vestments',
         chance: 0.33,
         rollGroup: 'morthen_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'oiled_boots',
+        itemId: 'unquiet_stalkers_hood',
         chance: 0.33,
         rollGroup: 'morthen_guaranteed_uncommon',
         normalOnly: true,

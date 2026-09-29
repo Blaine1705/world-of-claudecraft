@@ -471,7 +471,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
-    expect(full).toEqual({ owned: 495, total: 495 });
+    // The Hollow Crypt rework's three new rares (normal page) and two new
+    // heroic epics (heroic page): 500.
+    expect(full).toEqual({ owned: 500, total: 500 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -504,7 +506,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    expect(character).toEqual({ owned: 466, total: 466 });
+    // 471 with the Hollow Crypt rework's three rares and two heroic epics.
+    expect(character).toEqual({ owned: 471, total: 471 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -568,7 +571,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
-    ).toBe(682);
+      // +5 for the Hollow Crypt rework's new boss loot (three rares, two epics): 687.
+    ).toBe(687);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -803,7 +807,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the five Crucible raid trinkets (each on its boss's Normal and
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(521);
+    // +5: the Hollow Crypt rework's three rares and two heroic epics: 526.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(526);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1061,6 +1066,10 @@ describe('Reliquary clear sources map to live content', () => {
 
 describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
   const HEROIC_PAGE_BY_BOSS: Record<string, string> = {
+    // The Hollow Crypt rework: four bosses, one shared heroic page.
+    sexton_marrow: 'conquerors_hollow_crypt_heroic',
+    rimeweb: 'conquerors_hollow_crypt_heroic',
+    cantor_ilvane: 'conquerors_hollow_crypt_heroic',
     morthen: 'conquerors_hollow_crypt_heroic',
     vael_the_mistcaller: 'conquerors_sunken_bastion_heroic',
     ysolei: 'conquerors_drowned_temple_heroic',
@@ -1208,14 +1217,23 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     }
   });
 
-  it('each heroic page relics exactly match RELIQUARY_HEROIC_GEAR for its boss', () => {
+  it('each heroic page relics exactly match RELIQUARY_HEROIC_GEAR for its bosses', () => {
+    // A page may serve several bosses of one dungeon (the Hollow Crypt's four):
+    // it lists exactly the union of their heroic gear.
+    const byPage = new Map<string, string[]>();
     for (const [bossId, pageId] of Object.entries(HEROIC_PAGE_BY_BOSS)) {
+      byPage.set(pageId, [...(byPage.get(pageId) ?? []), bossId]);
+    }
+    for (const [pageId, bosses] of byPage) {
       const page = RELIQUARY_PAGES_BY_ID[pageId];
       expect(page, pageId).toBeDefined();
-      const gear = RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR];
-      expect(gear, bossId).toBeDefined();
-      if (!page || !gear) continue;
-      expect(itemRelicIds(page).sort()).toEqual([...gear].slice().sort());
+      const gear = bosses.flatMap((bossId) => {
+        const list = RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR];
+        expect(list, bossId).toBeDefined();
+        return [...(list ?? [])];
+      });
+      if (!page) continue;
+      expect(itemRelicIds(page).sort()).toEqual([...new Set(gear)].sort());
     }
   });
 
@@ -3137,8 +3155,9 @@ function slotKey(pageId: string, slotId: string): string {
  *  even while every surviving hint still validates. Update deliberately with
  *  the authoring, the same regime as the totals pins above. */
 const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
-  conquerors_hollow_crypt: 1,
-  conquerors_hollow_crypt_heroic: 1,
+  // The Hollow Crypt rework: four bosses pay each page.
+  conquerors_hollow_crypt: 4,
+  conquerors_hollow_crypt_heroic: 4,
   conquerors_sunken_bastion: 2,
   conquerors_sunken_bastion_heroic: 1,
   conquerors_drowned_temple: 2,
@@ -3229,7 +3248,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
  *  default could never be right for them. Named literally (not derived from the
  *  authoring) so under-authoring one of them cannot quietly pass. */
 const KNOWN_MULTI_SOURCE_PAGES = [
-  // The four dungeons whose relics span two or more of their own bosses.
+  // The dungeons whose relics span two or more of their own bosses.
+  'conquerors_hollow_crypt',
+  'conquerors_hollow_crypt_heroic',
   'conquerors_sunken_bastion',
   'conquerors_drowned_temple',
   'conquerors_gravewyrm_sanctum',
@@ -4730,11 +4751,12 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All fifteen defaults are live today (nine boss pages, the storefront
+    // All thirteen defaults are live today (seven boss pages, the storefront
     // on the skins page, the four Crucible raid pages, and Forgebreaker's
     // one Weaponcrafting door); update
     // deliberately with the authoring.
-    expect(defaults).toBe(15);
+    // The Hollow Crypt pair dropped theirs with the rework's four bosses: 13.
+    expect(defaults).toBe(13);
   });
 });
 
@@ -4752,8 +4774,11 @@ describe('reliquaryRelicSource precedence', () => {
       { sourceKind: 'boss', sourceId: 'korzul_the_gravewyrm' },
     ]);
     // A relic hint WINS over a page default that disagrees.
-    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt;
-    expect(defaulted.sourceDefault).toEqual({ sourceKind: 'boss', sourceId: 'morthen' });
+    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_thunzharr;
+    expect(defaulted.sourceDefault).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'thunzharr_waking_peak',
+    });
     expect(
       reliquaryRelicSource(defaulted, {
         kind: 'item',
@@ -4781,8 +4806,11 @@ describe('reliquaryRelicSource precedence', () => {
     // The precedence rule multi-hint made possible to get wrong: a resolver
     // that concatenated instead of replacing would quietly append a door the
     // authoring left out, and every count pin in this file would still pass.
-    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt;
-    expect(defaulted.sourceDefault).toEqual({ sourceKind: 'boss', sourceId: 'morthen' });
+    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_thunzharr;
+    expect(defaulted.sourceDefault).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'thunzharr_waking_peak',
+    });
     const answered = reliquaryRelicSource(defaulted, {
       kind: 'item',
       itemId: 'cryptbone_helm',
@@ -4795,13 +4823,13 @@ describe('reliquaryRelicSource precedence', () => {
       { sourceKind: 'boss', sourceId: 'ysolei' },
       { sourceKind: 'vendor', sourceId: 'brother_halven' },
     ]);
-    expect(answered.some((h) => h.sourceId === 'morthen')).toBe(false);
+    expect(answered.some((h) => h.sourceId === 'thunzharr_waking_peak')).toBe(false);
   });
 
   it('falls back to the page default as a one-element list, then to the empty list', () => {
     const bare: ReliquaryRelicDef = { kind: 'item', itemId: 'cryptbone_helm' };
-    expect(reliquaryRelicSource(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt, bare)).toEqual([
-      { sourceKind: 'boss', sourceId: 'morthen' },
+    expect(reliquaryRelicSource(RELIQUARY_PAGES_BY_ID.conquerors_thunzharr, bare)).toEqual([
+      { sourceKind: 'boss', sourceId: 'thunzharr_waking_peak' },
     ]);
     // A page with no default answers the empty list for an un-hinted relic.
     // That IS the answer ("content names no source"), not a missing value.
@@ -4822,7 +4850,7 @@ describe('reliquaryRelicSource precedence', () => {
     // page reusing a live catalog id must answer with its OWN default; an
     // id-keyed lookup would silently hand back the live row's boss instead.
     const shadow: ReliquaryPageDef = {
-      id: 'conquerors_hollow_crypt',
+      id: 'conquerors_thunzharr',
       shelf: 'conquerors',
       name: 'Synthetic shadow of a live page id',
       sourceDefault: { sourceKind: 'zone', sourceId: 'synthetic_zone' },
@@ -4832,7 +4860,7 @@ describe('reliquaryRelicSource precedence', () => {
     // source, so this test cannot pass by the two happening to agree.
     expect(RELIQUARY_PAGES_BY_ID[shadow.id].sourceDefault).toEqual({
       sourceKind: 'boss',
-      sourceId: 'morthen',
+      sourceId: 'thunzharr_waking_peak',
     });
     expect(reliquaryRelicSource(shadow, shadow.relics[0])).toEqual([
       { sourceKind: 'zone', sourceId: 'synthetic_zone' },

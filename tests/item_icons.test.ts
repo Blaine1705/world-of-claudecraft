@@ -384,10 +384,27 @@ describe('item webp icons', () => {
     // follow-up art pass.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(season2Armor).toHaveLength(135);
+    // Open wave: the Hollow Crypt rework's per-boss loot (content/hollow_crypt_items.ts),
+    // its non-weapon pieces plus the generated Heroic Hymnal, painted in its art pass.
+    const hollowCrypt = [
+      'bellrope_girdle',
+      'bonechill_carapace_vest',
+      'cantors_cassock',
+      'cantors_hymnal',
+      'choirward_leggings',
+      'choristers_gloves',
+      'gravecallers_vestments',
+      'gravedirt_treads',
+      'heroic_cantors_hymnal',
+      'rimesilk_hood',
+      'rimesilk_mantle',
+      'rimeweb_hunters_leggings',
+      'unquiet_stalkers_hood',
+    ];
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual([...season2Armor].sort());
+    ).toEqual([...season2Armor, ...hollowCrypt].sort());
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

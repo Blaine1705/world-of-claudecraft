@@ -18451,6 +18451,51 @@ export const en_XA: EnTranslations = {
       "vanguard_warstaff": {
         "name": "[Ʋáñĝúáŕð'š Ŵáŕšţáƒƒ]"
       },
+      "gravedirt_treads": {
+        "name": "[Ĝŕáʋéðíŕţ Ţŕéáðš]"
+      },
+      "bellrope_girdle": {
+        "name": "[Ɓéļļŕóþé Ĝíŕðļé]"
+      },
+      "sextons_spadehaft": {
+        "name": "[Šéẋţóñ'š Šþáðéĥáƒţ]"
+      },
+      "rimesilk_mantle": {
+        "name": "[Ŕíɱéšíļķ Ɱáñţļé]"
+      },
+      "bonechill_carapace_vest": {
+        "name": "[Ɓóñéçĥíļļ Çáŕáþáçé Ʋéšţ]"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "[Ŕíɱéŵéƀ Ĥúñţéŕ'š Ļéĝĝíñĝš]"
+      },
+      "rimeweb_fang": {
+        "name": "[Ŕíɱéŵéƀ Ƒáñĝ]"
+      },
+      "cantors_cassock": {
+        "name": "[Çáñţóŕ'š Çáššóçķ]"
+      },
+      "choirward_leggings": {
+        "name": "[Çĥóíŕŵáŕð Ļéĝĝíñĝš]"
+      },
+      "choristers_gloves": {
+        "name": "[Çĥóŕíšţéŕ'š Ĝļóʋéš]"
+      },
+      "cantors_hymnal": {
+        "name": "[Çáñţóŕ'š Ĥýɱñáļ]"
+      },
+      "gravecallers_vestments": {
+        "name": "[Ĝŕáʋéçáļļéŕ'š Ʋéšţɱéñţš]"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "[Úñɋúíéţ Šţáļķéŕ'š Ĥóóð]"
+      },
+      "sextons_burial_spade": {
+        "name": "[Šéẋţóñ'š Ɓúŕíáļ Šþáðé]"
+      },
+      "rimesilk_hood": {
+        "name": "[Ŕíɱéšíļķ Ĥóóð]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

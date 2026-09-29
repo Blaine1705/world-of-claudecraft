@@ -18451,6 +18451,51 @@ export const zh_CN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先锋之战杖"
       },
+      "gravedirt_treads": {
+        "name": "墓土踏靴"
+      },
+      "bellrope_girdle": {
+        "name": "钟绳腰带"
+      },
+      "sextons_spadehaft": {
+        "name": "司事的锹柄"
+      },
+      "rimesilk_mantle": {
+        "name": "霜丝肩衣"
+      },
+      "bonechill_carapace_vest": {
+        "name": "寒骨甲壳背心"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "霜网猎手护腿"
+      },
+      "rimeweb_fang": {
+        "name": "霜网之牙"
+      },
+      "cantors_cassock": {
+        "name": "领唱者的法衣"
+      },
+      "choirward_leggings": {
+        "name": "圣咏守卫护腿"
+      },
+      "choristers_gloves": {
+        "name": "唱诗者的手套"
+      },
+      "cantors_hymnal": {
+        "name": "领唱者的圣咏集"
+      },
+      "gravecallers_vestments": {
+        "name": "唤墓者的祭袍"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "不安潜行者兜帽"
+      },
+      "sextons_burial_spade": {
+        "name": "司事的葬铲"
+      },
+      "rimesilk_hood": {
+        "name": "霜丝兜帽"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19558,34 +19603,34 @@ export const zh_CN: EnTranslations = {
         "name": "唤墓者莫森"
       },
       "ossuary_sentinel": {
-        "name": "Ossuary Sentinel"
+        "name": "骨堂哨兵"
       },
       "hollow_gravedigger": {
-        "name": "Hollow Gravedigger"
+        "name": "空洞掘墓人"
       },
       "rime_egg_sac": {
-        "name": "Rime Egg Sac"
+        "name": "霜卵囊"
       },
       "rimeweb_hatchling": {
-        "name": "Rimeweb Hatchling"
+        "name": "霜网幼蛛"
       },
       "rimeweb_spinner": {
-        "name": "Rimeweb Spinner"
+        "name": "霜网织丝蛛"
       },
       "candlewright_acolyte": {
-        "name": "Candlewright Acolyte"
+        "name": "烛匠侍僧"
       },
       "hollow_chorister": {
-        "name": "Hollow Chorister"
+        "name": "空洞唱诗者"
       },
       "bound_soul": {
-        "name": "Bound Soul"
+        "name": "缚魂"
       },
       "rimeweb": {
-        "name": "Rimeweb"
+        "name": "霜网"
       },
       "cantor_ilvane": {
-        "name": "Cantor Ilvane"
+        "name": "领唱者伊尔凡"
       },
       "bastion_revenant": {
         "name": "堡垒亡魂"

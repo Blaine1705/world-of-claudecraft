@@ -748,14 +748,15 @@ function setMembers(
 // Tests pin these lists against the live table so a new heroic gear row fails
 // until it is deliberately added here.
 export const RELIQUARY_HEROIC_GEAR = {
+  // The Hollow Crypt rework spread Morthen's heroic epics over the four bosses
+  // (hollow_crypt.md 8.2); they share the one shipped heroic page.
+  sexton_marrow: ['sextons_burial_spade', 'cryptplate_helm'],
+  rimeweb: ['rimesilk_hood', 'bonechill_striders', 'bonechill_cord'],
+  cantor_ilvane: ['shadowpulse_handwraps'],
   morthen: [
     'morthens_cryptforged_hauberk',
-    'shadowpulse_handwraps',
-    'bonechill_striders',
     'lunarward_cinch',
-    'cryptplate_helm',
     'shadowpulse_slippers',
-    'bonechill_cord',
     'bastion_sigil',
   ],
   vael_the_mistcaller: [
@@ -1013,14 +1014,17 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'The Hollow Crypt',
     desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
     clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
-    // Morthen is the only Crypt mob that drops any of these five.
-    sourceDefault: fromBoss('morthen'),
+    // Four bosses pay this page since the rework, so every relic names its own.
     relics: items(
-      'cryptbone_greaves',
-      'cryptbone_helm',
-      'cryptbone_pauldrons',
-      'greyjaw_hide_boots',
-      'gravewoven_bag',
+      ['cryptbone_greaves', fromBoss('morthen')],
+      ['cryptbone_helm', fromBoss('morthen')],
+      ['cryptbone_pauldrons', fromBoss('morthen')],
+      ['greyjaw_hide_boots', fromBoss('morthen')],
+      ['gravewoven_bag', fromBoss('morthen')],
+      // Appended with the rework: each new boss's rare chase row.
+      ['sextons_spadehaft', fromBoss('sexton_marrow')],
+      ['rimeweb_fang', fromBoss('rimeweb')],
+      ['cantors_hymnal', fromBoss('cantor_ilvane')],
     ),
   },
   {
@@ -1029,8 +1033,20 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Heroic Hollow Crypt',
     desc: 'Heroic-only epics from Morthen the Gravecaller.',
     clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'heroic' },
-    sourceDefault: fromBoss('morthen'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.morthen),
+    // The shipped eight keep their slots and order; the rework moved four of
+    // them to the new bosses (hinted per boss) and appended two new epics.
+    relics: items(
+      ['morthens_cryptforged_hauberk', fromBoss('morthen')],
+      ['shadowpulse_handwraps', fromBoss('cantor_ilvane')],
+      ['bonechill_striders', fromBoss('rimeweb')],
+      ['lunarward_cinch', fromBoss('morthen')],
+      ['cryptplate_helm', fromBoss('sexton_marrow')],
+      ['shadowpulse_slippers', fromBoss('morthen')],
+      ['bonechill_cord', fromBoss('rimeweb')],
+      ['bastion_sigil', fromBoss('morthen')],
+      ['sextons_burial_spade', fromBoss('sexton_marrow')],
+      ['rimesilk_hood', fromBoss('rimeweb')],
+    ),
   },
   {
     id: 'conquerors_sunken_bastion',

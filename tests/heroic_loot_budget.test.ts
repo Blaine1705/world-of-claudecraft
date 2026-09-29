@@ -30,30 +30,45 @@ import { Sim } from '../src/sim/sim';
 // re-minted; the digest over their PRE-trinket ids was verified unchanged, so no
 // existing def moved.
 const BASELINE = {
+  // Re-minted for the Hollow Crypt rework (docs/design/dungeon-rework/hollow_crypt.md
+  // 8.1 and 8.2): every boss now carries its own table. Four shipped heroic epics
+  // moved off Morthen (Cryptplate Helm to Sexton Marrow, the Bonechill Striders and
+  // Cord to Rimeweb, the Shadowpulse Handwraps to Cantor Ilvane), none left the
+  // game; their item defs are unchanged, only the boss that pays them moved.
   sexton_marrow: {
-    gearIds: ['oiled_boots', 'quilted_trousers'],
-    normalDigest: '030977d6324caf60a1c4e5b122d48af316ff8633d3cb627179c8130ba27f8776',
-    gearDigest: 'ea8a1aac274c2a7449d98c148162069acc5b62b3a13278cce82f2d861cd1f7f0',
+    gearIds: [
+      'cryptplate_helm',
+      'heroic_sextons_spadehaft',
+      'oiled_boots',
+      'quilted_trousers',
+      'sextons_burial_spade',
+    ],
+    normalDigest: '11d8282deb5224aadac6530505d43e0fdec9185eaad8d2f1a01e090237c86e58',
+    gearDigest: 'd43b2dd0dc70e836e057eac12d9261cb2a9b128cce285bb5a257103531e1292e',
+  },
+  rimeweb: {
+    gearIds: ['bonechill_cord', 'bonechill_striders', 'heroic_rimeweb_fang', 'rimesilk_hood'],
+    normalDigest: 'b60373d913e7a9fa3895b4655692c488558e777b581d3f93b6e804eafe64fc52',
+    gearDigest: '69f6da008eb9031d0708899be8f19596782d7da573638760f70e58a9b51acfd9',
+  },
+  cantor_ilvane: {
+    gearIds: ['choirward_leggings', 'heroic_cantors_hymnal', 'shadowpulse_handwraps'],
+    normalDigest: 'af27a1c32fb9337349abd0d1cf4ac2ef6f1b30533e6130811196b54d648a0df9',
+    gearDigest: '2d4840b388cabfa2ee56aed3f873e07d473df2d9fab5d3598c6f1e25e6f584b9',
   },
   morthen: {
     gearIds: [
       'bastion_sigil',
-      'bonechill_cord',
-      'bonechill_striders',
       'cryptbone_greaves',
       'cryptbone_helm',
       'cryptbone_pauldrons',
-      'cryptplate_helm',
       'greyjaw_hide_boots',
       'lunarward_cinch',
       'morthens_cryptforged_hauberk',
-      'oiled_boots',
-      'quilted_trousers',
-      'shadowpulse_handwraps',
       'shadowpulse_slippers',
     ],
-    normalDigest: '608ad38c9ea77cb6a20f75c9aac2fc5bf6787ccf9ac41a8a50ae9b9cd7ddef13',
-    gearDigest: '15bfce8c44bf22ca36d68b5315fd10e2ae00662c4f9c0e258487fe598a3c8edb',
+    normalDigest: '719dd461e2a992ad6684cf3e8c3e6307603013c7ff34f017bbf54299c0c1912e',
+    gearDigest: '9cfa6a2e95c3d3f03b50edb557843f495ed739336e12e1486bcac7a37dfb18e8',
   },
   knight_commander_olen: {
     gearIds: [

@@ -18451,6 +18451,51 @@ export const ru_RU: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Боевой посох Авангарда"
       },
+      "gravedirt_treads": {
+        "name": "Сапоги могильной земли"
+      },
+      "bellrope_girdle": {
+        "name": "Пояс из колокольной верёвки"
+      },
+      "sextons_spadehaft": {
+        "name": "Черенок лопаты пономаря"
+      },
+      "rimesilk_mantle": {
+        "name": "Наплечье из инейного шёлка"
+      },
+      "bonechill_carapace_vest": {
+        "name": "Жилет из ледяного хитина"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "Поножи охотника Инеистой Паутины"
+      },
+      "rimeweb_fang": {
+        "name": "Клык Инеистой Паутины"
+      },
+      "cantors_cassock": {
+        "name": "Ряса кантора"
+      },
+      "choirward_leggings": {
+        "name": "Поножи хорового стража"
+      },
+      "choristers_gloves": {
+        "name": "Перчатки хориста"
+      },
+      "cantors_hymnal": {
+        "name": "Псалтырь кантора"
+      },
+      "gravecallers_vestments": {
+        "name": "Облачение Могильного Зова"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "Капюшон неупокоенного следопыта"
+      },
+      "sextons_burial_spade": {
+        "name": "Погребальная лопата пономаря"
+      },
+      "rimesilk_hood": {
+        "name": "Капюшон из инейного шёлка"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
@@ -19558,34 +19603,34 @@ export const ru_RU: EnTranslations = {
         "name": "Мортен Могильный Зов"
       },
       "ossuary_sentinel": {
-        "name": "Ossuary Sentinel"
+        "name": "Страж оссуария"
       },
       "hollow_gravedigger": {
-        "name": "Hollow Gravedigger"
+        "name": "Могильщик Пустоты"
       },
       "rime_egg_sac": {
-        "name": "Rime Egg Sac"
+        "name": "Инеистый кокон с яйцами"
       },
       "rimeweb_hatchling": {
-        "name": "Rimeweb Hatchling"
+        "name": "Паучок Инеистой Паутины"
       },
       "rimeweb_spinner": {
-        "name": "Rimeweb Spinner"
+        "name": "Прядильщица Инеистой Паутины"
       },
       "candlewright_acolyte": {
-        "name": "Candlewright Acolyte"
+        "name": "Послушник-свечник"
       },
       "hollow_chorister": {
-        "name": "Hollow Chorister"
+        "name": "Хорист Пустоты"
       },
       "bound_soul": {
-        "name": "Bound Soul"
+        "name": "Связанная душа"
       },
       "rimeweb": {
-        "name": "Rimeweb"
+        "name": "Инеистая Паутина"
       },
       "cantor_ilvane": {
-        "name": "Cantor Ilvane"
+        "name": "Кантор Ильвейн"
       },
       "bastion_revenant": {
         "name": "Ревенант бастиона"

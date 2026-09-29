@@ -18451,6 +18451,51 @@ export const da_DK: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Fortropsens Krigsdragt"
       },
+      "gravedirt_treads": {
+        "name": "Gravedirt Treads"
+      },
+      "bellrope_girdle": {
+        "name": "Bellrope Girdle"
+      },
+      "sextons_spadehaft": {
+        "name": "Sexton's Spadehaft"
+      },
+      "rimesilk_mantle": {
+        "name": "Rimesilk Mantle"
+      },
+      "bonechill_carapace_vest": {
+        "name": "Bonechill Carapace Vest"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "Rimeweb Hunter's Leggings"
+      },
+      "rimeweb_fang": {
+        "name": "Rimeweb Fang"
+      },
+      "cantors_cassock": {
+        "name": "Cantor's Cassock"
+      },
+      "choirward_leggings": {
+        "name": "Choirward Leggings"
+      },
+      "choristers_gloves": {
+        "name": "Chorister's Gloves"
+      },
+      "cantors_hymnal": {
+        "name": "Cantor's Hymnal"
+      },
+      "gravecallers_vestments": {
+        "name": "Gravecaller's Vestments"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "Unquiet Stalker's Hood"
+      },
+      "sextons_burial_spade": {
+        "name": "Sexton's Burial Spade"
+      },
+      "rimesilk_hood": {
+        "name": "Rimesilk Hood"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },

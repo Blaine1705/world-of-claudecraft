@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { HOLLOW_CRYPT_ART_PENDING_ITEM_IDS } from '../sim/content/hollow_crypt_items';
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
@@ -5547,6 +5548,8 @@ export const ITEM_ART_PENDING = new Set<string>([
   // procedural icon stands in until then. The season weapons never park here:
   // an unpainted weapon already draws its procedural icon.
   ...SEASON2_SETS.flatMap((set) => set.itemIds),
+  // The Hollow Crypt rework's per-boss loot: painted icons owned by the art pass.
+  ...HOLLOW_CRYPT_ART_PENDING_ITEM_IDS,
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

@@ -705,6 +705,9 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'fenmist_robe',
   'greyjaw_hide_boots',
   'heroic_boneguard_breastplate',
+  'heroic_cantors_hymnal',
+  'heroic_rimeweb_fang',
+  'heroic_sextons_spadehaft',
   'heroic_boundstone_girdle',
   'heroic_boundstone_helm',
   'heroic_deathlord_legguards',
@@ -749,6 +752,7 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'heroic_wyrmshadow_talongrips',
   'heroic_wyrmshadow_treads',
   'heroic_ysols_pearl_greaves',
+  'choirward_leggings',
   'marshstrider_boots',
   'mistveil_cord',
   'mistveil_grips',
@@ -768,10 +772,34 @@ const preserveBaseLootSource = (entry: LootEntry): LootEntry =>
     : entry;
 
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
+  // The Hollow Crypt rework (hollow_crypt.md 8.2): one equipment item per boss
+  // kill; four shipped epics moved off Morthen onto the new wing and choir bosses.
   sexton_marrow: [
     ...weightedLootGroup('sexton_marrow_heroic', [
-      ['quilted_trousers', 0.4],
-      ['oiled_boots', 0.4],
+      ['sextons_burial_spade', 0.3],
+      ['cryptplate_helm', 0.3],
+      ['quilted_trousers', 0.15],
+      ['oiled_boots', 0.15],
+      ['heroic_sextons_spadehaft', 0.1],
+    ]).map(preserveBaseLootSource),
+  ],
+  rimeweb: [
+    ...weightedLootGroup('rimeweb_heroic', [
+      ['rimesilk_hood', 0.35],
+      ['bonechill_striders', 0.25],
+      ['bonechill_cord', 0.25],
+      ['heroic_rimeweb_fang', 0.15],
+    ]).map(preserveBaseLootSource),
+  ],
+  // The design's Vigil Taper trinket (a new trinket effect) is deferred to the
+  // encounter pass; its share is spread over the other pieces meanwhile. The
+  // base rare chase rows are normalOnly, so each boss's Heroic partition carries
+  // the rare's Heroic variant (Spadehaft, Fang, Hymnal) inside its one slot.
+  cantor_ilvane: [
+    ...weightedLootGroup('cantor_ilvane_heroic', [
+      ['shadowpulse_handwraps', 0.5],
+      ['choirward_leggings', 0.35],
+      ['heroic_cantors_hymnal', 0.15],
     ]).map(preserveBaseLootSource),
   ],
   knight_commander_olen: [
@@ -824,22 +852,17 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   ],
   morthen: [
     ...weightedLootGroup('morthen_heroic', [
-      ['cryptbone_greaves', 0.34],
-      ['quilted_trousers', 0.33],
-      ['oiled_boots', 0.33],
-      ['greyjaw_hide_boots', 0.25],
-      ['cryptbone_helm', 0.18],
-      ['cryptbone_pauldrons', 0.18],
-      ['morthens_cryptforged_hauberk', 0.25],
-      ['shadowpulse_handwraps', 0.25],
-      ['bonechill_striders', 0.25],
-      ['lunarward_cinch', 0.25],
-      ['cryptplate_helm', 0.34],
-      ['shadowpulse_slippers', 0.33],
-      ['bonechill_cord', 0.33],
+      ['morthens_cryptforged_hauberk', 0.18],
+      ['shadowpulse_slippers', 0.18],
+      ['lunarward_cinch', 0.18],
       // Trinkets (content/trinkets.ts): one per heroic final boss, each in a
       // different dungeon, inside the one guaranteed equipment slot.
-      ['bastion_sigil', 0.25],
+      ['bastion_sigil', 0.18],
+      // The Crypt brand pieces the shipped Reliquary page counts on Heroic too.
+      ['cryptbone_greaves', 0.07],
+      ['greyjaw_hide_boots', 0.07],
+      ['cryptbone_helm', 0.07],
+      ['cryptbone_pauldrons', 0.07],
     ]).map(preserveBaseLootSource),
     { itemId: 'gravewoven_bag', chance: 0.2, preserveSourceTier: true },
     { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },

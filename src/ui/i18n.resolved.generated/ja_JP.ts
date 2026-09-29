@@ -18451,6 +18451,51 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
+      "gravedirt_treads": {
+        "name": "墓土のトレッド"
+      },
+      "bellrope_girdle": {
+        "name": "鐘縄の帯"
+      },
+      "sextons_spadehaft": {
+        "name": "墓守の鋤柄"
+      },
+      "rimesilk_mantle": {
+        "name": "霜絹のマントル"
+      },
+      "bonechill_carapace_vest": {
+        "name": "骨冷えの甲殻ベスト"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "霜網の狩人のレギンス"
+      },
+      "rimeweb_fang": {
+        "name": "霜網の牙"
+      },
+      "cantors_cassock": {
+        "name": "聖歌隊長の法衣"
+      },
+      "choirward_leggings": {
+        "name": "聖歌守りのレギンス"
+      },
+      "choristers_gloves": {
+        "name": "聖歌隊員の手袋"
+      },
+      "cantors_hymnal": {
+        "name": "聖歌隊長の賛美歌集"
+      },
+      "gravecallers_vestments": {
+        "name": "墓呼びの祭服"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "安らがぬ追跡者のフード"
+      },
+      "sextons_burial_spade": {
+        "name": "墓守の埋葬鋤"
+      },
+      "rimesilk_hood": {
+        "name": "霜絹のフード"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19558,34 +19603,34 @@ export const ja_JP: EnTranslations = {
         "name": "墓呼びのモーセン"
       },
       "ossuary_sentinel": {
-        "name": "Ossuary Sentinel"
+        "name": "納骨堂の番兵"
       },
       "hollow_gravedigger": {
-        "name": "Hollow Gravedigger"
+        "name": "虚ろの墓掘り"
       },
       "rime_egg_sac": {
-        "name": "Rime Egg Sac"
+        "name": "霜の卵嚢"
       },
       "rimeweb_hatchling": {
-        "name": "Rimeweb Hatchling"
+        "name": "霜網の子蜘蛛"
       },
       "rimeweb_spinner": {
-        "name": "Rimeweb Spinner"
+        "name": "霜網の紡ぎ手"
       },
       "candlewright_acolyte": {
-        "name": "Candlewright Acolyte"
+        "name": "蝋燭職人の侍祭"
       },
       "hollow_chorister": {
-        "name": "Hollow Chorister"
+        "name": "虚ろの聖歌隊員"
       },
       "bound_soul": {
-        "name": "Bound Soul"
+        "name": "縛られし魂"
       },
       "rimeweb": {
-        "name": "Rimeweb"
+        "name": "リムウェブ"
       },
       "cantor_ilvane": {
-        "name": "Cantor Ilvane"
+        "name": "聖歌隊長イルヴェイン"
       },
       "bastion_revenant": {
         "name": "砦の亡霊"

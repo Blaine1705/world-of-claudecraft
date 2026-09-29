@@ -3374,6 +3374,22 @@ const ITEM_ENTITY_IDS = [
   'vanguard_oath_blade',
   'vanguard_fang_dagger',
   'vanguard_warstaff',
+  // The Hollow Crypt rework's per-boss loot (sim/content/hollow_crypt_items.ts).
+  'gravedirt_treads',
+  'bellrope_girdle',
+  'sextons_spadehaft',
+  'rimesilk_mantle',
+  'bonechill_carapace_vest',
+  'rimeweb_hunters_leggings',
+  'rimeweb_fang',
+  'cantors_cassock',
+  'choirward_leggings',
+  'choristers_gloves',
+  'cantors_hymnal',
+  'gravecallers_vestments',
+  'unquiet_stalkers_hood',
+  'sextons_burial_spade',
+  'rimesilk_hood',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4309,6 +4325,22 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_oath_blade: "Vanguard's Oath",
   vanguard_fang_dagger: "Vanguard's Fang",
   vanguard_warstaff: "Vanguard's Warstaff",
+  // The Hollow Crypt rework's per-boss loot.
+  gravedirt_treads: 'Gravedirt Treads',
+  bellrope_girdle: 'Bellrope Girdle',
+  sextons_spadehaft: "Sexton's Spadehaft",
+  rimesilk_mantle: 'Rimesilk Mantle',
+  bonechill_carapace_vest: 'Bonechill Carapace Vest',
+  rimeweb_hunters_leggings: "Rimeweb Hunter's Leggings",
+  rimeweb_fang: 'Rimeweb Fang',
+  cantors_cassock: "Cantor's Cassock",
+  choirward_leggings: 'Choirward Leggings',
+  choristers_gloves: "Chorister's Gloves",
+  cantors_hymnal: "Cantor's Hymnal",
+  gravecallers_vestments: "Gravecaller's Vestments",
+  unquiet_stalkers_hood: "Unquiet Stalker's Hood",
+  sextons_burial_spade: "Sexton's Burial Spade",
+  rimesilk_hood: 'Rimesilk Hood',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
