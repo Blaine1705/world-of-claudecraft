@@ -104,7 +104,9 @@ describe('mob portrait source manifest', () => {
     // Bloated Cap. 270: the other three cave bosses (Deeprake, the Colossal Bat,
     // the Voracious Chest) and the bat's swarm. 280: the Hollow Crypt rework's
     // two new bosses (Rimeweb, Cantor Ilvane) and its eight new trash bodies.
-    expect(liveIds).toHaveLength(280);
+    // 290: the Hollow Crypt trash kit's ten bodies (warrior, adept, cutthroat,
+    // necromancer, bone minion and brute, gargoyle, crow caller, crow, drake).
+    expect(liveIds).toHaveLength(290);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

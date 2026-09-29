@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a289924dd5f0aa4cb00d1b6ec0045fea895f4c5d3ca82193dcf1e5fbe8e59825",
+  "rendererFingerprint": "ef76f817bb98512aaea3127ed41385dd41b50fa36b8184667fce28d35be70e21",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5265878,
-      "sha256": "167d7d6026247f1fb896c3c01873de4b74c069df9eb07b07fdfae090651ff864",
+      "bytes": 5280578,
+      "sha256": "0802c822df67e0a91be120addddb1caac7bdf93f06dbd574d165bfc9e080598d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 280,
+  "portraitCount": 290,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -1058,6 +1058,377 @@
         "path": "public/ui/mobs/corrupted_sporeling.webp",
         "bytes": 1500,
         "sha256": "ecd06eedf4439331bcb4f3e4499af9ba6df02bfa316fec3e31fd11c7a6ae0af5"
+      }
+    },
+    {
+      "id": "crypt_bone_brute",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_golem",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_golem.glb",
+          "path": "public/models/chars/enemies/skeleton_golem.glb",
+          "bytes": 292776,
+          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+        },
+        "idle": "Idle",
+        "height": 3.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": [
+          {
+            "node": "Skeleton_Golem_Axe",
+            "rotY": 3.141592653589793
+          }
+        ],
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d9d0bc",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "cc717c97dad2cd0ebfa671071c330c952a1da7b21aa1fd18afa82252762a476c",
+      "output": {
+        "path": "public/ui/mobs/crypt_bone_brute.webp",
+        "bytes": 2918,
+        "sha256": "5d86f87844f1d238b14f611a3725953e8891df220765efdd2e23514b3c409c10"
+      }
+    },
+    {
+      "id": "crypt_bone_minion",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#e8e0c8",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "3cb5784cee05db2374d8f74dc1e5ebadd407633db93155d139c3d68555c5c4f2",
+      "output": {
+        "path": "public/ui/mobs/crypt_bone_minion.webp",
+        "bytes": 2842,
+        "sha256": "26f7faa6fc68312c6308974e23e313bb5158f5de392e90dfe43c510a5328417c"
+      }
+    },
+    {
+      "id": "crypt_carrion_crow",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_crow",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_crow.glb",
+          "path": "public/models/creatures/crypt_crow.glb",
+          "bytes": 87216,
+          "sha256": "448da36c47023500383b02fc77815211fe1681da10b6a0796960f540a7e460eb"
+        },
+        "idle": "Idle",
+        "height": 0.9,
+        "yaw": null,
+        "hover": 1.4,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "71fc7541a3c85c7e866bbb4dbeda352df6252d298a7e82d851746b1047a76c3b",
+      "output": {
+        "path": "public/ui/mobs/crypt_carrion_crow.webp",
+        "bytes": 1528,
+        "sha256": "c848089b7f1b6118969bbfa2e5256d0a63806acceb0e0fc0b3cc8c47a2589b82"
+      }
+    },
+    {
+      "id": "crypt_chapel_gargoyle",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_gargoyle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_gargoyle.glb",
+          "path": "public/models/creatures/crypt_gargoyle.glb",
+          "bytes": 293520,
+          "sha256": "adafea80c9373e09863563ea60fc523f88629d2959cf97166e2655c93de6f996"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "7cd5eab0d9756f6b79f6b717c92685fdab90626f48af9f52afbc996a84d6027d",
+      "output": {
+        "path": "public/ui/mobs/crypt_chapel_gargoyle.webp",
+        "bytes": 2262,
+        "sha256": "ce170f9ba0f25ac0a90e35e1deaba752d9a37db2619f3be6eecd45a8ec358a09"
+      }
+    },
+    {
+      "id": "crypt_crow_caller",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_crow_caller",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue_hooded.glb",
+          "path": "public/models/chars/players/rogue_hooded.glb",
+          "bytes": 448736,
+          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.6
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#3a3440",
+        "strength": 0.6
+      },
+      "sourceFingerprint": "1270f76ee44d62ec009ec95b8b327afda07d56be92a76e6d2afd7f0eff81f0b5",
+      "output": {
+        "path": "public/ui/mobs/crypt_crow_caller.webp",
+        "bytes": 1858,
+        "sha256": "784e51e9b150989ab2ddec45d1a6e092de2e0c2a5cf9e524061f78b02b855c3b"
+      }
+    },
+    {
+      "id": "crypt_gravecaller_adept",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_adept",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_mage.glb",
+          "path": "public/models/chars/enemies/skeleton_mage.glb",
+          "bytes": 802628,
+          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/skeleton_staff.glb",
+              "path": "public/models/weapons/skeleton_staff.glb",
+              "bytes": 51660,
+              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8f6cc4",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "381ec1f561536bd906a5d9a4118703168dc7f751eeca555a9dcfbe90876f0567",
+      "output": {
+        "path": "public/ui/mobs/crypt_gravecaller_adept.webp",
+        "bytes": 2182,
+        "sha256": "659490df96bd5418808af5bd8c058f041e0fd7a7ff53c59163d56a15d1f8371f"
+      }
+    },
+    {
+      "id": "crypt_gravecaller_necromancer",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_necromancer",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/necromancer.glb",
+          "path": "public/models/chars/enemies/necromancer.glb",
+          "bytes": 528152,
+          "sha256": "9f1e4ea763337369a1b455afd9d07888d409d1f4efe12cf2880340937c0b16fc"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6fd6a8",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "3afc38c874310609b64b3c127db34183bd1b880fcbf4d2a0634ef4bf02c39179",
+      "output": {
+        "path": "public/ui/mobs/crypt_gravecaller_necromancer.webp",
+        "bytes": 2676,
+        "sha256": "3fe533bb521ca8885ed8ebb323f74eb3d65417945516a24c5ef08325d6140906"
+      }
+    },
+    {
+      "id": "crypt_ossuary_cutthroat",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_rogue",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_rogue.glb",
+          "path": "public/models/chars/enemies/skeleton_rogue.glb",
+          "bytes": 505020,
+          "sha256": "e6cc7ba50e84a3c2e9c800e22197c6e6621c1747dca9eb48e867c8b4529aef65"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#a8b0b0",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "888bb186f0f33cce7fb656d54b5a00fad556795028ce03175ebea9dc4752ebdb",
+      "output": {
+        "path": "public/ui/mobs/crypt_ossuary_cutthroat.webp",
+        "bytes": 2532,
+        "sha256": "8c0a15b541e1a1131a51be6d6659b941947a0748703b7e6516067dabece963bf"
+      }
+    },
+    {
+      "id": "crypt_ossuary_drake",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_drake",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_drake.glb",
+          "path": "public/models/creatures/crypt_drake.glb",
+          "bytes": 631044,
+          "sha256": "d0d0f83dfd1c2d418bdad740d6c749ebe4cc07e7d355670782e0f7dbdc2bb11c"
+        },
+        "idle": "Idle",
+        "height": 6.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "bc1db88a93cd776df5a35cdde59e292e27fc7a18374ea5ddfef67ec0b07988c8",
+      "output": {
+        "path": "public/ui/mobs/crypt_ossuary_drake.webp",
+        "bytes": 2550,
+        "sha256": "39bc26c6411b5b20e05ca964bc4b5a5117efcd119e354f997a742ddee0ecdbdf"
+      }
+    },
+    {
+      "id": "crypt_ossuary_warrior",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_warrior",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_warrior.glb",
+          "path": "public/models/chars/enemies/skeleton_warrior.glb",
+          "bytes": 523236,
+          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d8cfb8",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "ecbbff796e12fd51f3a65aa6665f48a3e0bb109fd16e9155e93fef93008dcd94",
+      "output": {
+        "path": "public/ui/mobs/crypt_ossuary_warrior.webp",
+        "bytes": 2314,
+        "sha256": "aa6343297951a3fdf7601a61650b5253bc923d9a94cdc7d11e3a762d90f285a2"
       }
     },
     {
