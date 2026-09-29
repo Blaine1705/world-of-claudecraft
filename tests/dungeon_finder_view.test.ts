@@ -176,7 +176,8 @@ describe('dungeon finder view core', () => {
     // kill actually pays; a non-finale encounter keeps its normal copper.
     expect(boss?.copper).toBe(100000);
     const sexton = view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
-    expect(sexton?.copper).toBe(400);
+    // The rework raised Marrow's purse with his level (hollow_crypt.md 8.1).
+    expect(sexton?.copper).toBe(800);
     expect(sexton?.heroicGroups).toHaveLength(1);
     expect(sexton?.heroicGroups[0].guaranteed).toBe(true);
 
@@ -213,8 +214,11 @@ describe('dungeon finder view core', () => {
       {
         guaranteed: true,
         items: [
-          { itemId: 'quilted_trousers', chance: 0.5 },
-          { itemId: 'oiled_boots', chance: 0.5 },
+          { itemId: 'sextons_burial_spade', chance: 0.3 },
+          { itemId: 'cryptplate_helm', chance: 0.3 },
+          { itemId: 'quilted_trousers', chance: 0.15 },
+          { itemId: 'oiled_boots', chance: 0.15 },
+          { itemId: 'heroic_sextons_spadehaft', chance: expect.closeTo(0.1, 9) },
         ],
       },
     ]);

@@ -110,7 +110,10 @@ const FIVE_MAN: FinderComposition = { tank: 1, healer: 1, dps: 3 };
 const TEN_RAID: FinderComposition = { tank: 2, healer: 2, dps: 6 };
 
 const HOLLOW_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'sexton_marrow', mechanics: [] },
+  // The rework's route (hollow_crypt.md): two wing bosses, the choir, the ring.
+  { mobId: 'sexton_marrow', mechanics: ['summons_adds'] },
+  { mobId: 'rimeweb', mechanics: ['summons_adds'] },
+  { mobId: 'cantor_ilvane', mechanics: [] },
   { mobId: 'morthen', final: true, mechanics: ['shadow_pulse'] },
 ];
 

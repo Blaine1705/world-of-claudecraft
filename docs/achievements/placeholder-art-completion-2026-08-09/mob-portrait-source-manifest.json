@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "1c3e30093abd51f886f97051e73f0f155c2f851016a45fbf484916c6f0af2ee2",
+  "rendererFingerprint": "a289924dd5f0aa4cb00d1b6ec0045fea895f4c5d3ca82193dcf1e5fbe8e59825",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "darwin",
-    "arch": "arm64",
+    "platform": "win32",
+    "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "153",
-    "browserVersion": "Chrome/153.0.8010.53",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "154",
+    "browserVersion": "Edg/154.0.4258.37",
     "requestedBackend": "swiftshader",
-    "fingerprint": "0a3b64b4bd845e00754f67090cf5f9d89309cc7c18d44ad56c12b92ae55548ce"
+    "fingerprint": "04a5c1851d9e9c277dd6de4cae5e56afae22c5cc793b00f37e35af4536bdd2f4"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5232363,
-      "sha256": "abd95b6cdeee7fab9b5524a27c46100f056479ed40e6c156ff5604aee37e874f",
+      "bytes": 5265878,
+      "sha256": "167d7d6026247f1fb896c3c01873de4b74c069df9eb07b07fdfae090651ff864",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 270,
+  "portraitCount": 280,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -560,6 +560,40 @@
       }
     },
     {
+      "id": "bound_soul",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6fd6a8",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "1d93a3b986d0fd4e39d5c69b286e4a146e26b89fe5d6df84224150bab2f64fae",
+      "output": {
+        "path": "public/ui/mobs/bound_soul.webp",
+        "bytes": 2746,
+        "sha256": "64180fe2add5dd918cd853a0586237a579c19161f385ad7cbac8a1e1ed0dabc2"
+      }
+    },
+    {
       "id": "brakka_wallbreaker",
       "family": "ogre",
       "finderEncounter": false,
@@ -662,6 +696,40 @@
       }
     },
     {
+      "id": "candlewright_acolyte",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#e8a64a",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "67a457e51353192a94657a29c43a7bcbfcc29e1775d8490eb88899cd41eae398",
+      "output": {
+        "path": "public/ui/mobs/candlewright_acolyte.webp",
+        "bytes": 2858,
+        "sha256": "5cd95e3ee8741d235fd2fe1467811f708db25b639fb8f2dcafe5e2e4089eac50"
+      }
+    },
+    {
       "id": "canopy_weaver",
       "family": "spider",
       "finderEncounter": false,
@@ -693,6 +761,40 @@
         "path": "public/ui/mobs/canopy_weaver.webp",
         "bytes": 1712,
         "sha256": "12a7d0db9336a50b576f8e77b27a1f0d2a1fc0b5847f6219375ed62b2e8ac0f2"
+      }
+    },
+    {
+      "id": "cantor_ilvane",
+      "family": "undead",
+      "finderEncounter": true,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9d6cd0",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "abd40ae57d09606e6cb1976e145ca09f84cdc6842e2be402d7ea119b7ab9e332",
+      "output": {
+        "path": "public/ui/mobs/cantor_ilvane.webp",
+        "bytes": 2788,
+        "sha256": "3c6acb79778ce16391680ef53d696acceb27d70f21abf3acbeb2bcad1303f96a"
       }
     },
     {
@@ -3933,6 +4035,74 @@
       }
     },
     {
+      "id": "hollow_chorister",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7b4fa0",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "47e90548b3e67f1607447ddc67e2546cab0c63a3d154f21d9f9b70336bcaf227",
+      "output": {
+        "path": "public/ui/mobs/hollow_chorister.webp",
+        "bytes": 2774,
+        "sha256": "70475d46f201a6483098d9227f1512d043de0feb1ee49d349f2436239e78f3f8"
+      }
+    },
+    {
+      "id": "hollow_gravedigger",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8a7a64",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "fcda45c3d97b73d612701453f998a091e7388ec95ebddfa8253dc141947e27fb",
+      "output": {
+        "path": "public/ui/mobs/hollow_gravedigger.webp",
+        "bytes": 2762,
+        "sha256": "73571073b9015a87518442e5e4d9c9fd8dbec9a0f208ce7f7a6d538e3c503de5"
+      }
+    },
+    {
       "id": "hub_healing_dummy",
       "family": "humanoid",
       "finderEncounter": false,
@@ -5700,6 +5870,40 @@
       }
     },
     {
+      "id": "ossuary_sentinel",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#cfc6b0",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "fd3b1d3c56f65eee8933945bbef1d7c69ec86a5df7c1378d0ae568729c6544e6",
+      "output": {
+        "path": "public/ui/mobs/ossuary_sentinel.webp",
+        "bytes": 2818,
+        "sha256": "b1355486f18f62f957d1c7f52bc3c7b59b12fdb7b3492b396d098eea15a46b9a"
+      }
+    },
+    {
       "id": "pale_choir_acolyte",
       "family": "humanoid",
       "finderEncounter": false,
@@ -7307,6 +7511,40 @@
       }
     },
     {
+      "id": "rime_egg_sac",
+      "family": "spider",
+      "finderEncounter": false,
+      "visualKey": "mob_spider",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/spider.glb",
+          "path": "public/models/creatures/spider.glb",
+          "bytes": 130436,
+          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+        },
+        "idle": "Spider_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#cfe3f0",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "707a31fb8e4fba4ba73865807c324f791b9271ede1a1a0a01fcd4306dea1ab5b",
+      "output": {
+        "path": "public/ui/mobs/rime_egg_sac.webp",
+        "bytes": 1806,
+        "sha256": "9e652555d84de4b5a940e2baf84f38e826a90c53d1f7b81985bf72bf25cce6b1"
+      }
+    },
+    {
       "id": "rime_elemental",
       "family": "elemental",
       "finderEncounter": false,
@@ -7338,6 +7576,108 @@
         "path": "public/ui/mobs/rime_elemental.webp",
         "bytes": 1964,
         "sha256": "b35ec16bcbf47d668a926c7d143450a7e3c8d14f63063df2145b78d64aa8ce58"
+      }
+    },
+    {
+      "id": "rimeweb",
+      "family": "spider",
+      "finderEncounter": true,
+      "visualKey": "mob_spider",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/spider.glb",
+          "path": "public/models/creatures/spider.glb",
+          "bytes": 130436,
+          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+        },
+        "idle": "Spider_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#e8f4ff",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "8aa894385af54cd0fb06b56c950c826ca5bd967116932d0f052e61496af9f196",
+      "output": {
+        "path": "public/ui/mobs/rimeweb.webp",
+        "bytes": 1792,
+        "sha256": "7a9972761989831d63044ef074b1a9cb85508f681e108632ee63269bc4081e6a"
+      }
+    },
+    {
+      "id": "rimeweb_hatchling",
+      "family": "spider",
+      "finderEncounter": false,
+      "visualKey": "mob_spider",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/spider.glb",
+          "path": "public/models/creatures/spider.glb",
+          "bytes": 130436,
+          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+        },
+        "idle": "Spider_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d6eaf8",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "5157d4a1cf7d753e8a11c086625daa40acc5311928ed30db0480a1c6e0970a44",
+      "output": {
+        "path": "public/ui/mobs/rimeweb_hatchling.webp",
+        "bytes": 1760,
+        "sha256": "63510898c18f42cb81346aa2c8d5f1e58f50941a76119028e8f354bdda4b11df"
+      }
+    },
+    {
+      "id": "rimeweb_spinner",
+      "family": "spider",
+      "finderEncounter": false,
+      "visualKey": "mob_spider",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/spider.glb",
+          "path": "public/models/creatures/spider.glb",
+          "bytes": 130436,
+          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+        },
+        "idle": "Spider_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#e4f0fa",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "a8713eb6046a805c178d1c1ef35f8e347795943d349ccd4bbedf727fe92f172e",
+      "output": {
+        "path": "public/ui/mobs/rimeweb_spinner.webp",
+        "bytes": 1812,
+        "sha256": "e45b808e429b20016af93271198a658992f18ed3b49f1dbbdb6f843f7e5dfde3"
       }
     },
     {
