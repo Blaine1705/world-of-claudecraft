@@ -319,6 +319,10 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'vanguard_oath_blade',
       'vanguard_fang_dagger',
       'vanguard_warstaff',
+      // The Sunken Bastion rework's boss weapons (their art ships with the
+      // dungeon: scripts/generate_sunken_bastion_item_icons.mjs).
+      'knight_commanders_longsword',
+      'gaolyard_cudgel',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

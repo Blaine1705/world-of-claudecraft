@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "241aff4a8b854297d72f38d41f51257d903397b4939462ac0a383b66c4ae7605",
+  "rendererFingerprint": "be213b5126a48e809d27abf9bd5dcd626bbfe501af8eb37f7b6bcec6ea168394",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5321747,
-      "sha256": "36b7ade4375c0ce5b5d51192006b64c10493b6ebe083deaaf71efc7d050a1c2d",
+      "bytes": 5322709,
+      "sha256": "c507b170ad625e3e7094f4eaefbf59a662a60f0cf67a96329645f27141b3e89c",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -294,31 +294,31 @@
       "visualKey": "bastion_crawler",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/crabenemy.glb",
-          "path": "public/models/creatures/crabenemy.glb",
-          "bytes": 62156,
-          "sha256": "8d3c9c7a231c9835a1ee618c18e27d4285c0d369bfac10a2ff9680400bd7b06b"
+          "url": "models/creatures/bastion_crawler.glb",
+          "path": "public/models/creatures/bastion_crawler.glb",
+          "bytes": 1303816,
+          "sha256": "5d65f78d49d8994aa8c62cee84e18253319e5de20722b026830b22d6642117b6"
         },
         "idle": "Idle",
-        "height": 3,
+        "height": 3.2,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#cfc6b0",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "13391e056fc607eb3945d737b1ff503f5335c44dc83a5ea39c41172e9847ed57",
+      "sourceFingerprint": "ceebd588131e60bfdff54e30b6cbcf10f61e541b26c81cd0c683574324681c14",
       "output": {
         "path": "public/ui/mobs/barnacle_crawler.webp",
-        "bytes": 2254,
-        "sha256": "9b7047b8e7617088d5b8e766b814e56016e3a02a92a0b2ee9afbfeb3283e39c6"
+        "bytes": 2398,
+        "sha256": "57586d0c002f97730a06c9f4f4ace612e59eec4d9cfb13411549f7d2fc739ec8"
       }
     },
     {
@@ -393,34 +393,34 @@
       "id": "bastion_revenant",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_warrior",
+      "visualKey": "bastion_drowned_revenant",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/drowned_revenant.glb",
+          "path": "public/models/creatures/drowned_revenant.glb",
+          "bytes": 692224,
+          "sha256": "7f9380789a2bd879d57cc21032d80e9a6efc26ed1087ff9dbbebadd45699f2db"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 3.6,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7fa8a0",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "ca1c5b72eceff5cfb63731012d755711fd5a0ecbc793e4b6193b10ab10016421",
+      "sourceFingerprint": "7d5170729ba93038438b0f8bd6e0484f56ba695d4f58108ea0ec3ac9a140bb55",
       "output": {
         "path": "public/ui/mobs/bastion_revenant.webp",
-        "bytes": 2284,
-        "sha256": "05c3fdef7b904cb544ee03ee65dba16298e664f3f4ca7d57a0c4d89e77049def"
+        "bytes": 2786,
+        "sha256": "1907a885e1d313d4ac963e88449dae88f71c465909afe2421c9ff1435edc428c"
       }
     },
     {
@@ -430,10 +430,10 @@
       "visualKey": "bastion_warhound",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wolf_basic.glb",
-          "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "url": "models/creatures/bastion_warhound.glb",
+          "path": "public/models/creatures/bastion_warhound.glb",
+          "bytes": 695176,
+          "sha256": "a61c11879aa128ab0918797a39e72f55de9b3d25a7ab6e8b7807dee344b3b76b"
         },
         "idle": "Idle",
         "height": 3,
@@ -442,19 +442,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#5e6f6a",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "92f0d659f2abffd99cc32756833ba07387b43ceda5c45af3799b077697bc981f",
+      "sourceFingerprint": "f9148f88ff9b37c0b484ef20e1eac33f31d87f434ec031e93e870932dcece6f2",
       "output": {
         "path": "public/ui/mobs/bastion_warhound.webp",
-        "bytes": 1832,
-        "sha256": "52f6d7cf3b0ca1c3ec1f5e537ea6c85cbed7847091951e2ffde48b366708c0cb"
+        "bytes": 2004,
+        "sha256": "0e726b76533a16a00c8776fdce829f95331da325032cff7e1835defb9ee2fdd2"
       }
     },
     {
@@ -2093,44 +2093,31 @@
       "visualKey": "bastion_skel_sergeant",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/drowned_sergeant.glb",
+          "path": "public/models/creatures/drowned_sergeant.glb",
+          "bytes": 703176,
+          "sha256": "e228e0202ff9d55f25a14f4daa20a46f8c7c41ddb1b196aeee439fe6e503dd5d"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 4.2,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_shield_large_a.glb",
-              "path": "public/models/weapons/skeleton_shield_large_a.glb",
-              "bytes": 41460,
-              "sha256": "879d7e1757d3aa7971ab524fbd67acf5a126ec421b51653c651f99ac5429ada8"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7d8f8a",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "a406a5da0ef918ff97c27641358a2375e73fdbbd886df00125ffdde0a1768608",
+      "sourceFingerprint": "50f3ef8ae38b9421e941eb10c069b59841e9e71a27d1d3cac83adebdce16ebf9",
       "output": {
         "path": "public/ui/mobs/drowned_sergeant.webp",
-        "bytes": 2332,
-        "sha256": "ec5ea475b4da92d5887845fd5ebb4928947b5ea7dcaa80c13161b81136aa15bb"
+        "bytes": 2702,
+        "sha256": "52a6fc19f74f39bf8b56dd7a94d00c4d73820436225be229a78fb0a3089d86d0"
       }
     },
     {
@@ -2276,44 +2263,31 @@
       "visualKey": "bastion_skel_watchman",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/drowned_watchman.glb",
+          "path": "public/models/creatures/drowned_watchman.glb",
+          "bytes": 687144,
+          "sha256": "cbab13d2dd53e55c36df3fc56321686d259fee0c1f32d80087ed10d9fa6b4566"
         },
-        "idle": "Idle_Combat",
-        "height": 3.7,
+        "idle": "Idle",
+        "height": 3.8,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/halberd.glb",
-              "path": "public/models/weapons/halberd.glb",
-              "bytes": 89928,
-              "sha256": "e2f64e2d031fa8588256819b78dae5385d317ba95ef3f3349d12f86c788fccf0"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9fb3ae",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "90fab52b6ce24929d5eac1a562600cc73e28c9d011ef4e28d2f24c5a9b44f29a",
+      "sourceFingerprint": "28cc2cb9b41acee1c167dce571e55ffb61c794d69855a772fd98e2e7f368b0f4",
       "output": {
         "path": "public/ui/mobs/drowned_watchman.webp",
-        "bytes": 2308,
-        "sha256": "d236c9e0be7f798fc17b497112da1e4490263ede2be7250b4da759f899e8562c"
+        "bytes": 2466,
+        "sha256": "aa1ba7ae3dbfd062d0ee1e51de21fd43dfcc6c8e0630c49949e6d8c7cce9df86"
       }
     },
     {
@@ -2769,44 +2743,31 @@
       "visualKey": "bastion_skel_arbalest",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_rogue.glb",
-          "path": "public/models/chars/enemies/skeleton_rogue.glb",
-          "bytes": 505020,
-          "sha256": "e6cc7ba50e84a3c2e9c800e22197c6e6621c1747dca9eb48e867c8b4529aef65"
+          "url": "models/creatures/drowned_arbalest.glb",
+          "path": "public/models/creatures/drowned_arbalest.glb",
+          "bytes": 691048,
+          "sha256": "89476f9a13e17a5c9d15be4a59c1bbc5ea63b8002e8d59babfbac9f6922fdd46"
         },
-        "idle": "Idle_Combat",
-        "height": 3.5,
+        "idle": "Idle",
+        "height": 3.6,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_crossbow.glb",
-              "path": "public/models/weapons/skeleton_crossbow.glb",
-              "bytes": 39892,
-              "sha256": "b3cd96dbff30d25311644585add3f63cee446d7c9aa5451d828913e8fd6f1161"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#8fa39a",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "ed91b9ac8a2c88561039b20aa09bdcbdcfa2ff478d21f3afa6a48ab0cfebe91a",
+      "sourceFingerprint": "ede688f0e3a1ebf62bd544b86578884bc3f3866313c601cd98dcd912ff1e85cd",
       "output": {
         "path": "public/ui/mobs/fogbound_arbalest.webp",
-        "bytes": 2568,
-        "sha256": "8ae8e2327ce26fca773fa599d6513beb59a2e1f6a3e5750f1b347a1a7b1eec48"
+        "bytes": 2412,
+        "sha256": "7eaf23aa0c9e73ab9dfb9a1378bd7ce7d80fd8f7d8f032143b86e0de464fad52"
       }
     },
     {
@@ -5623,31 +5584,31 @@
       "visualKey": "bastion_mistweaver",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/necromancer.glb",
-          "path": "public/models/chars/enemies/necromancer.glb",
-          "bytes": 528152,
-          "sha256": "9f1e4ea763337369a1b455afd9d07888d409d1f4efe12cf2880340937c0b16fc"
+          "url": "models/creatures/mist_chanter.glb",
+          "path": "public/models/creatures/mist_chanter.glb",
+          "bytes": 718832,
+          "sha256": "52292a56aff636442aa9b6d73038c152298ac4cbec61809b68387cc1059310e8"
         },
-        "idle": "Idle_Combat",
-        "height": 3.6,
+        "idle": "Idle",
+        "height": 3.5,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.45
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9fe0b0",
-        "strength": 0.45
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "71615fa20f5ba5c73c9f60449a56c0a813e4b674fa764a28ea0020c8ef28e6f3",
+      "sourceFingerprint": "175f30975b1d1d8359dffe61450766fe74b14b9d6bb66c4f11d85a0135209f8b",
       "output": {
         "path": "public/ui/mobs/mistweaver.webp",
-        "bytes": 2634,
-        "sha256": "7d6d36fea0224f252707165b43570b8481dab2111158a723bb5de6cb35e0d992"
+        "bytes": 1962,
+        "sha256": "93db969508cb2aa88c6b35d96874fbf729540dddc025dbbe7fbdbbe5f7572633"
       }
     },
     {
@@ -8563,31 +8524,31 @@
       "visualKey": "bastion_prisoner",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/drowned_prisoner.glb",
+          "path": "public/models/creatures/drowned_prisoner.glb",
+          "bytes": 507900,
+          "sha256": "b6b4e18af680c1b8f9bdfabbbc5ad561810e960b2e535c6322ea4105666d96ff"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 3.2,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9a9480",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "1956fdde3cfaeb9b7359ceeda62217dba9ca37843e9b318a5234b2bd6048721c",
+      "sourceFingerprint": "281277c63ce6a4765745013c14e6233758dbbebf662d5ceadc78e8be598a43c3",
       "output": {
         "path": "public/ui/mobs/shackled_prisoner.webp",
-        "bytes": 2822,
-        "sha256": "f590e65f7229e5f9652c61f5064148d3312f131d21577855bd63e4af98a9f89a"
+        "bytes": 2172,
+        "sha256": "7b8f9644a60d059fc39f1ea840d3b823f628389113c36c7dbb53247e2e3402a1"
       }
     },
     {

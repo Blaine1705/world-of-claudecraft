@@ -3,6 +3,14 @@
   blender -b --factory-startup --python build_creature.py -- turretback <out.glb> [--preview out.png] [--blend out.blend]
 
 The creatures (src/render/characters/manifest.ts VISUALS rows):
+  crawler     The Barnacle Crawler (crawler.py): a barnacled rock crab with a face.
+  hound       The Bastion Warhound (hound.py): a shark-headed sea hound.
+  hag         The Mist Chanter (hag.py): a hunched sea hag with a lure staff.
+  drowned_<revenant|watchman|arbalest|sergeant|prisoner>
+              The drowned garrison (drowned.py): one rig, five gear sets.
+The sea creatures are smooth-bodied (sea_kit.py); ship each to
+public/models/creatures/ (bastion_crawler, bastion_warhound, mist_chanter,
+drowned_<variant>.glb), then `node scripts/build_media_manifest.mjs generate`.
   turretback  The Turretback Hermit: a colossal hermit crab that took a fallen
               watchtower turret for its shell, the tower (crenels, a broken
               banner, barnacles, a gull's nest) swaying on its back; one huge
@@ -282,10 +290,32 @@ CREATURES = {
     'turretback': (TURRETBACK_BONES, turretback_body, turretback_clips, 4.0, 22.0),
 }
 
+
+def sea_creature(which):
+    """The smooth-bodied sea creatures live in their own modules (sea_kit.py)."""
+    sys.path.insert(0, HERE)
+    import importlib
+    module, _, variant = SEA_MODULES[which].partition(':')
+    mod = importlib.import_module(module)
+    return mod.VARIANTS[variant] if variant else mod.CREATURE
+
+
+# name -> module: each module exports CREATURE = (bones, body, clips, focus, dist).
+SEA_MODULES = {
+    'crawler': 'crawler',
+    'hound': 'hound',
+    'hag': 'hag',
+    'drowned_revenant': 'drowned:revenant',
+    'drowned_watchman': 'drowned:watchman',
+    'drowned_arbalest': 'drowned:arbalest',
+    'drowned_sergeant': 'drowned:sergeant',
+    'drowned_prisoner': 'drowned:prisoner',
+}
+
 if __name__ == '__main__':
     argv = sys.argv[sys.argv.index('--') + 1:]
     which, out = argv[0], argv[1]
-    bones, body_fn, clips_fn, focus, dist = CREATURES[which]
+    bones, body_fn, clips_fn, focus, dist = CREATURES[which] if which in CREATURES else sea_creature(which)
     mats = new_scene()
     body = body_fn()
     obj, names = finish_body(body, mats)

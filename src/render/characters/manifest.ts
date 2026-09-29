@@ -3746,54 +3746,87 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 
   // -- the Sunken Bastion trash (sim/content/sunken_bastion.ts) ------------------
-  // Drowned KayKit skeletons of the Bastion's garrison, each with the gesture of
-  // its one job: the watchman's halberd sweep, the arbalest's lane shot, the
-  // Mistweaver raising its fog ward, the acolyte's brine mend.
-  bastion_skel_watchman: {
-    url: `${ENEMIES}/skeleton_warrior.glb`,
-    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
-    height: 3.7,
-    clips: {
-      ...skeletonClips(['2H_Melee_Attack_Chop']),
-      castByAbility: { [BASTION_HALBERD_SWEEP]: '2H_Melee_Attack_Chop' },
-      castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 0.8 },
-    },
-    attach: [{ url: `${WEAPONS}/halberd.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  bastion_skel_arbalest: {
-    url: `${ENEMIES}/skeleton_rogue.glb`,
-    animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
-    height: 3.5,
-    clips: {
-      ...skeletonClips(['1H_Melee_Attack_Chop']),
-      castByAbility: { [BASTION_PIERCING_BOLT]: 'Spellcast_Shoot' },
-      castTimeScaleByAbility: { [BASTION_PIERCING_BOLT]: 0.55 },
-    },
-    attach: [{ url: `${WEAPONS}/skeleton_crossbow.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  bastion_skel_sergeant: {
-    url: `${ENEMIES}/skeleton_warrior.glb`,
-    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
-    height: 4.2,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal'], 'Taunt'),
-    attach: [{ url: `${WEAPONS}/skeleton_shield_large_a.glb`, bone: 'handslot.l' }],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  bastion_mistweaver: {
-    url: `${ENEMIES}/necromancer.glb`,
-    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+  // The Bastion's drowned garrison and its sea beasts, each its own Blender
+  // body (scripts/assets/sunken_bastion_creatures/: drowned.py, hag.py,
+  // crawler.py, hound.py), all well past the player's size, each with the
+  // clips of its one job: the watchman's halberd sweep, the arbalest's aimed
+  // lane shot, the sergeant's rallying roar, the sea hag's lure and ward.
+  bastion_drowned_revenant: {
+    url: `${CREATURES}/drowned_revenant.glb`,
     height: 3.6,
     clips: {
-      ...skeletonClips(['2H_Melee_Attack_Chop']),
-      castByAbility: { [BASTION_FOG_WARD]: 'Spellcast_Raise' },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
     },
-    tint: 'entity',
-    tintStrength: 0.45,
+  },
+  bastion_skel_watchman: {
+    url: `${CREATURES}/drowned_watchman.glb`,
+    height: 3.8,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      // The pole is drawn back through the bar and sweeps as it ends.
+      castByAbility: { [BASTION_HALBERD_SWEEP]: 'HalberdSweep' },
+      castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 1.05 },
+    },
+  },
+  bastion_skel_arbalest: {
+    url: `${CREATURES}/drowned_arbalest.glb`,
+    height: 3.6,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      // Its swing is the Rusted Bolt: a snap to the shoulder and a loose.
+      attack: ['Shoot'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [BASTION_PIERCING_BOLT]: 'Aim' },
+      castTimeScaleByAbility: { [BASTION_PIERCING_BOLT]: 0.85 },
+    },
+  },
+  bastion_skel_sergeant: {
+    url: `${CREATURES}/drowned_sergeant.glb`,
+    height: 4.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      // Rally the Watch: the cutlass thrust high and the roar.
+      flourish: 'Rally',
+    },
+  },
+  // The Mist Chanter: a hunched sea hag with an anglerfish-lure staff.
+  bastion_mistweaver: {
+    url: `${CREATURES}/mist_chanter.glb`,
+    height: 3.5,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      // Chilling Mist: the lure thrust out; Fog Ward: the staff raised high.
+      cast: 'Cast',
+      castByAbility: { [BASTION_FOG_WARD]: 'Ward' },
+    },
+    selfIllumination: 0.08,
   },
   // The Tidebound Acolyte: a living cultist of Vael's hymn in sea-green robes.
   bastion_acolyte: {
@@ -3860,34 +3893,55 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.55,
   },
 
-  // The Bastion's beasts and gaol bodies, scaled well past the player (the
-  // shared crab, wolf, minion and bruiser keys keep their size elsewhere).
+  // The Bastion's beasts and gaol bodies, scaled well past the player.
+  // The Barnacle Crawler: a barnacled rock crab with a face (stalked amber
+  // eyes, hooked mandibles round a toothed maw) and three brine sacs in its
+  // crust. Its Death swells the sacs and BURSTS them at 1.5 s, on the Brine
+  // Burst's own fuse; Attack2 is its lunge bite.
   bastion_crawler: {
-    url: `${CREATURES}/crabenemy.glb`,
-    height: 3.0,
-    clips: CRAB_ENEMY_BITE,
-    animUrls: [
-      `${CREATURES}/crabenemy_hit_variety_anims.glb`,
-      `${CREATURES}/crab_ability_anims.glb`,
-    ],
-    tint: 'entity',
-    tintStrength: 0.35,
+    url: `${CREATURES}/bastion_crawler.glb`,
+    height: 3.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    selfIllumination: 0.06,
   },
+  // The Bastion Warhound: a shark-headed sea hound in the garrison's spiked
+  // war-collar. Its Lunge flies in the Leap pose and lands on Land.
   bastion_warhound: {
-    url: `${CREATURES}/wolf_basic.glb`,
-    authoredAtlas: true,
+    url: `${CREATURES}/bastion_warhound.glb`,
     height: 3.0,
-    clips: WOLF_BAKED,
-    tint: 'entity',
-    tintStrength: 0.35,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Leap',
+      land: 'Land',
+    },
+    selfIllumination: 0.06,
   },
   bastion_prisoner: {
-    url: `${ENEMIES}/skeleton_minion.glb`,
-    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
+    url: `${CREATURES}/drowned_prisoner.glb`,
     height: 3.2,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    tint: 'entity',
-    tintStrength: 0.25,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
   },
   bastion_turnkey: {
     url: `${PLAYERS}/barbarian.glb`,
@@ -4937,7 +4991,7 @@ const MOB_KEYS: Record<string, string> = {
   // undead variants by role
   boneclad_revenant: 'skel_warrior',
   marrowlord_varkas: 'skel_warrior',
-  bastion_revenant: 'skel_warrior',
+  bastion_revenant: 'bastion_drowned_revenant',
   tidebound_acolyte: 'bastion_acolyte',
   knight_commander_olen: 'bastion_olen',
   sanctum_boneguard: 'skel_warrior',
