@@ -697,6 +697,21 @@ describe('event_frame pure assembly', () => {
     expect(filterRoutableEvents(events)).toEqual([loot]);
   });
 
+  it('filterRoutableEvents drops the server-only worldPvpKill (its consumer is the Discord kill feed)', () => {
+    const kill: SimEvent = {
+      type: 'worldPvpKill',
+      killerName: 'Kargath',
+      victimName: 'Annthar',
+      killerLevel: 60,
+      victimLevel: 58,
+      zoneId: 'drakelands',
+      assists: 0,
+      copper: 0,
+    };
+    const log = { type: 'log', text: 'You have slain Annthar.', pid: 7 } as unknown as SimEvent;
+    expect(filterRoutableEvents([kill, log])).toEqual([log]);
+  });
+
   it('serializeEventFragments stringifies each event once, index-aligned', () => {
     const events = [
       { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },

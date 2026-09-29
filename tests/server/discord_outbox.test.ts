@@ -4,8 +4,8 @@
 // Consolidating four bot polls into one means one response now carries what four
 // used to, and every stream feeding it is bounded for exactly that reason. This
 // file drives the endpoint at the worst case those bounds admit (relay 50,
-// activity 100, link changes OUTBOX_LINK_CHANGE_PAGE, one reward day with a full
-// ten-payout table) and asserts the serialized payload stays under a stated byte
+// activity 100, link changes OUTBOX_LINK_CHANGE_PAGE, PvP kills 100, one reward
+// day with a full ten-payout table) and asserts the serialized payload stays under a stated byte
 // bound. A page or cap raised without checking what it does to the response size
 // fails here. Note the link-change bound is the PAGE, not the feed's cap: what a
 // backlog past the page costs is another poll, not a bigger response, which is
@@ -74,6 +74,11 @@ import {
   enqueueLinkChange,
   LINK_CHANGE_MAX_QUEUE,
 } from '../../server/discord_link_changes';
+import {
+  drainPvpKills,
+  enqueuePvpKill,
+  PVP_KILL_FEED_MAX_QUEUE,
+} from '../../server/discord_pvp_feed';
 import type { QueuedRelay } from '../../server/discord_relay';
 import { drainRelay, RELAY_MAX_QUEUE } from '../../server/discord_relay';
 import { compose } from '../../server/http/compose';
@@ -96,7 +101,8 @@ const ACTIVITY_CAP = ACTIVITY_MAX_QUEUE;
 
 /**
  * The bound on the serialized `data` payload, in bytes. The worst-case fixture
- * below measured 287,100 bytes (0.2 ms of JSON.stringify; 290,671 before the
+ * below measured 306,445 bytes once the PvP kill feed joined it at its 100-item
+ * cap (287,100 before that; 0.2 ms of JSON.stringify; 290,671 before the
  * #2791 narrowing dropped the unused winner-row fields, 279,891 before the
  * activity fixture moved to the wider deed item shape) when the drain moved to
  * a 1000-item link-change page and a one-day winners ask; the bound is roughly
@@ -209,6 +215,7 @@ const ORIGINAL_DISCORD_SECRET = process.env.DISCORD_BOT_SECRET;
 beforeEach(() => {
   vi.resetAllMocks();
   drainLinkChanges();
+  drainPvpKills();
   process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
 });
 
@@ -216,6 +223,7 @@ afterEach(() => {
   if (ORIGINAL_DISCORD_SECRET === undefined) delete process.env.DISCORD_BOT_SECRET;
   else process.env.DISCORD_BOT_SECRET = ORIGINAL_DISCORD_SECRET;
   drainLinkChanges();
+  drainPvpKills();
   vi.restoreAllMocks();
 });
 
@@ -236,6 +244,21 @@ describe('discord/outbox payload size at the full-cap drain', () => {
     // the rest stays queued and pages out on the next poll (pinned below).
     for (let i = 1; i <= LINK_CHANGE_MAX_QUEUE; i++) {
       enqueueLinkChange({ accountId: i, kinds: ['flex', 'points'] }, 1000);
+    }
+
+    // The PvP kill feed at its cap (the REAL queue), every field at a wide but
+    // legal width: long names, a zone name, a large stake.
+    for (let i = 0; i < PVP_KILL_FEED_MAX_QUEUE; i++) {
+      enqueuePvpKill({
+        killerName: `Adventurer${i}Longname`,
+        victimName: `Wanderer${i}Longername`,
+        killerLevel: 60,
+        victimLevel: 60,
+        zoneName: 'The Frostveil Reach',
+        assists: 24,
+        copper: 99_999_999,
+        realm: 'Claudemoon',
+      });
     }
 
     // Every account any stream mentions resolves to a link row, so every item is
@@ -272,8 +295,10 @@ describe('discord/outbox payload size at the full-cap drain', () => {
       activity: { items: unknown[] };
       winners: { days: unknown[] };
       linkChanges: { items: unknown[] };
+      pvpKills: { items: unknown[] };
     };
     expect(payload.relay.items).toHaveLength(RELAY_CAP);
+    expect(payload.pvpKills.items).toHaveLength(PVP_KILL_FEED_MAX_QUEUE);
     expect(payload.activity.items).toHaveLength(ACTIVITY_CAP);
     expect(payload.linkChanges.items).toHaveLength(OUTBOX_LINK_CHANGE_PAGE);
     expect(payload.winners.days).toHaveLength(1);
@@ -351,5 +376,6 @@ describe('outbox contract literals', () => {
     expect(OUTBOX_LINK_CHANGE_PAGE).toBe(1000);
     expect(RELAY_MAX_QUEUE).toBe(50);
     expect(ACTIVITY_MAX_QUEUE).toBe(100);
+    expect(PVP_KILL_FEED_MAX_QUEUE).toBe(100);
   });
 });

@@ -6,11 +6,13 @@ import {
   buildDailyRewardWinnersMessage,
   buildLevelNick,
   buildLinkContent,
+  buildPvpKillFeedMessage,
   buildQueuePopMessage,
   buildRelayMessage,
   buildWelcomeMessage,
   buildWhoamiContent,
   chunk,
+  chunkPvpKills,
   clearDepartedFlair,
   clearedMemberMeta,
   computeRoleSync,
@@ -27,6 +29,11 @@ import {
   MEMBERS_META_BATCH,
   memberRolesFromPayload,
   NICK_MAX,
+  PVP_FEED_LINES_PER_POST,
+  PVP_FEED_NAME_MAX,
+  type PvpKillItem,
+  pvpFeedName,
+  pvpKillLine,
   type QueuePopItem,
   type RelayItem,
   reconcileMemberRolesFromUpdate,
@@ -1021,5 +1028,105 @@ describe('daily rewards winner cards', () => {
       { name: 'Prize Pool', value: '$150.00', inline: true },
       { name: 'Next task', value: 'Win an arena match', inline: false },
     ]);
+  });
+});
+
+// ── World PvP kill feed (digest posts, names only) ───────────────────────────
+describe('PvP kill feed builders', () => {
+  const kill = (over: Partial<PvpKillItem> = {}): PvpKillItem => ({
+    killerName: 'Kargath',
+    victimName: 'Annthar',
+    killerLevel: 60,
+    victimLevel: 58,
+    zoneName: 'Drakelands',
+    assists: 0,
+    copper: 0,
+    realm: 'Claudemoon',
+    ...over,
+  });
+
+  it('writes the bare line with no assists and no stake', () => {
+    expect(pvpKillLine(kill())).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands',
+    );
+  });
+
+  it('adds singular and plural assists and the stake taken, through formatMoney', () => {
+    expect(pvpKillLine(kill({ assists: 1, copper: 12_005 }))).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands, with 1 assist, taking 1g 20s 5c',
+    );
+    expect(pvpKillLine(kill({ assists: 3 }))).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands, with 3 assists',
+    );
+  });
+
+  it('omits the zone clause off the zone table', () => {
+    expect(pvpKillLine(kill({ zoneName: null }))).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58)',
+    );
+  });
+
+  it('treats malformed wire numbers as zero rather than rendering NaN or negatives', () => {
+    const line = pvpKillLine(
+      kill({ assists: -2, copper: Number.NaN, killerLevel: Number.POSITIVE_INFINITY }),
+    );
+    expect(line).toBe(':crossed_swords: **Kargath** (0) slew **Annthar** (58) in Drakelands');
+  });
+
+  it('escapes Discord markdown in names and bounds their length', () => {
+    expect(pvpFeedName('*bold*_under_~x~`c`|s|')).toBe(
+      String.raw`\*bold\*\_under\_\~x\~` + '\\`c\\`' + String.raw`\|s\|`,
+    );
+    expect(pvpFeedName('A'.repeat(PVP_FEED_NAME_MAX + 10))).toBe('A'.repeat(PVP_FEED_NAME_MAX));
+    expect(pvpFeedName('')).toBe('Someone');
+  });
+
+  it('chunks a drain into PVP_FEED_LINES_PER_POST batches, FIFO, remainder kept', () => {
+    const items = Array.from({ length: PVP_FEED_LINES_PER_POST * 2 + 3 }, (_, i) =>
+      kill({ killerName: `K${i}` }),
+    );
+    const batches = chunkPvpKills(items);
+    expect(batches.map((b) => b.length)).toEqual([
+      PVP_FEED_LINES_PER_POST,
+      PVP_FEED_LINES_PER_POST,
+      3,
+    ]);
+    expect(batches.flat().map((k) => k.killerName)).toEqual(items.map((_, i) => `K${i}`));
+    expect(chunkPvpKills([])).toEqual([]);
+  });
+
+  it('builds ONE embed per batch, one line per kill, and pings nobody', () => {
+    const payload = buildPvpKillFeedMessage([
+      kill(),
+      kill({ killerName: 'Borin', victimName: 'Kargath', assists: 2 }),
+    ]);
+    expect(payload).toEqual({
+      embeds: [
+        {
+          color: 0xb22222,
+          author: { name: 'World PvP' },
+          description:
+            ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands\n' +
+            ':crossed_swords: **Borin** (60) slew **Kargath** (58) in Drakelands, with 2 assists',
+          footer: { text: 'World of ClaudeCraft (Claudemoon)' },
+        },
+      ],
+      allowed_mentions: { parse: [] },
+    });
+  });
+
+  it('keeps a full batch of worst-case lines inside the 4096-character description limit', () => {
+    const worst = kill({
+      killerName: 'W'.repeat(PVP_FEED_NAME_MAX),
+      victimName: '*'.repeat(PVP_FEED_NAME_MAX),
+      zoneName: 'Z'.repeat(PVP_FEED_NAME_MAX),
+      killerLevel: 999,
+      victimLevel: 999,
+      assists: 999,
+      copper: 999_999_999,
+    });
+    const payload = buildPvpKillFeedMessage(Array(PVP_FEED_LINES_PER_POST).fill(worst));
+    const description = (payload.embeds as { description: string }[])[0].description;
+    expect(description.length).toBeLessThanOrEqual(4096);
   });
 });

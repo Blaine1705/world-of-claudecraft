@@ -78,7 +78,10 @@ ratings.
   (stake + honor pool, integer copper and integer honor, zero rng, paid exactly
   once per death; gold is staked by a FLAGGED victim and taken by FLAGGED
   contributors only; two players mid-duel with each other are the duel's
-  business, never the world's), the IWorld readout
+  business, never the world's), the server-only `worldPvpKill` record each paid
+  death fires for the Discord kill feed (both resolution arms, a no-earner kill
+  included; no pid, no text, no rng; `server/event_frame.ts` strips it from
+  client frames), the IWorld readout
   (`worldPvpInfoFor`, whole-second countdown so the self wire elides it), the
   `/pvp` chat arms' entry points, and the persisted record (`savedWorldPvpFields`
   / `loadWorldPvpState`, the countdown stored as remaining seconds and

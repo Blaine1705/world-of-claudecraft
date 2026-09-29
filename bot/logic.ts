@@ -5,6 +5,7 @@
 // is the same pure/IO split the server uses (wallet_link.ts vs wallet.ts).
 import { specialRoleByKey, specialRoleByName } from '../src/sim/discord_roles';
 import { DISCORD_STATUS_DEFS, discordStatusByIndex } from '../src/sim/discord_tier';
+import { formatMoney } from '../src/sim/format_money';
 
 // ── Gateway ──────────────────────────────────────────────────────────────────
 // Intents we need: guild metadata, members (privileged), voice states (who is in
@@ -875,6 +876,93 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
     payload.allowed_mentions = { parse: [] };
   }
   return payload;
+}
+
+// ── World PvP kill feed ───────────────────────────────────────────────────────
+// One kill as the outbox's `pvpKills` stream ships it (server/discord_pvp_feed.ts
+// QueuedPvpKill). Names only, no Discord ids: the feed never pings anyone.
+export interface PvpKillItem {
+  killerName: string;
+  victimName: string;
+  killerLevel: number;
+  victimLevel: number;
+  zoneName: string | null;
+  assists: number;
+  copper: number;
+  realm: string;
+}
+
+/**
+ * Lines per digest post. One drain becomes ceil(n / this) posts, so a burst of
+ * kills costs a handful of createMessage calls rather than one each, and the
+ * server's queue cap (PVP_KILL_FEED_MAX_QUEUE, 100) bounds a drain at seven.
+ * Sized against the WORST line, not a typical one: two PVP_FEED_NAME_MAX names
+ * of pure markdown metacharacters escape to double length, and the measured
+ * worst line is about 217 characters, so fifteen stay inside the 4096-character
+ * embed description limit (pinned in tests/discord_bot.test.ts).
+ */
+export const PVP_FEED_LINES_PER_POST = 15;
+/** Character names are short in game; this only bounds a malformed wire value. */
+export const PVP_FEED_NAME_MAX = 32;
+
+/**
+ * A character name as plain embed text. The wire is unchecked JSON across two
+ * processes, so Discord markdown metacharacters are escaped (a name can never
+ * bold, strike or spoiler the rest of the line) and the length is bounded.
+ */
+export function pvpFeedName(raw: string): string {
+  const bounded = (raw || '').replace(/\s+/g, ' ').trim().slice(0, PVP_FEED_NAME_MAX);
+  return bounded.replace(/[\\*_~`|>[\]()#-]/g, (ch) => `\\${ch}`) || 'Someone';
+}
+
+/** Whole non-negative integer from an unchecked wire number, else 0. */
+function wireCount(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+}
+
+/** Split one drain into digest-sized batches, FIFO order kept. */
+export function chunkPvpKills(items: readonly PvpKillItem[]): PvpKillItem[][] {
+  const batches: PvpKillItem[][] = [];
+  for (let i = 0; i < items.length; i += PVP_FEED_LINES_PER_POST) {
+    batches.push(items.slice(i, i + PVP_FEED_LINES_PER_POST));
+  }
+  return batches;
+}
+
+/**
+ * One kill line, e.g. "**Annthar** (60) slew **Borin** (58) in Drakelands,
+ * with 2 assists, taking 1g 20s". Assists and the stake are omitted at zero.
+ */
+export function pvpKillLine(item: PvpKillItem): string {
+  const assists = wireCount(item.assists);
+  const copper = wireCount(item.copper);
+  let line =
+    `:crossed_swords: **${pvpFeedName(item.killerName)}** (${wireCount(item.killerLevel)}) slew ` +
+    `**${pvpFeedName(item.victimName)}** (${wireCount(item.victimLevel)})`;
+  if (item.zoneName) line += ` in ${pvpFeedName(item.zoneName)}`;
+  if (assists > 0) line += `, with ${assists} ${assists === 1 ? 'assist' : 'assists'}`;
+  if (copper > 0) line += `, taking ${formatMoney(copper)}`;
+  return line;
+}
+
+/**
+ * One digest post for a batch from chunkPvpKills. `allowed_mentions` is empty
+ * on purpose: nothing in a kill line may ping, even if a name happens to look
+ * like a mention.
+ */
+export function buildPvpKillFeedMessage(items: readonly PvpKillItem[]): Record<string, unknown> {
+  const realm = items[0]?.realm || 'the realm';
+  return {
+    embeds: [
+      {
+        color: 0xb22222,
+        author: { name: 'World PvP' },
+        description: items.map(pvpKillLine).join('\n'),
+        footer: { text: `World of ClaudeCraft (${realm})` },
+      },
+    ],
+    allowed_mentions: { parse: [] },
+  };
 }
 
 // ── Daily rewards winners feed ────────────────────────────────────────────────
