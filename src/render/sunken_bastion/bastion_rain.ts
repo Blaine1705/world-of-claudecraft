@@ -15,6 +15,7 @@
 
 import * as THREE from 'three';
 import { SUNKEN_BASTION_SEA_LEVEL } from '../../sim/content/sunken_bastion_layout';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import {
   bastionRainTier,
@@ -321,7 +322,8 @@ function buildSplashes(count: number): THREE.Mesh {
   const mesh = new THREE.Mesh(geo, material);
   mesh.name = 'sunkenBastionRainSplashes';
   mesh.frustumCulled = false;
-  mesh.renderOrder = 17;
+  // On the floor, under every telegraph a player must read.
+  mesh.renderOrder = floorVfxRenderOrder('ground', 1);
   return mesh;
 }
 

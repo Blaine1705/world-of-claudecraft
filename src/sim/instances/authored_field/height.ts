@@ -3,8 +3,8 @@
 //
 // A point takes the height of the LAST surface that contains it (the list is
 // ordered), or the field's void height when none does. Flat surfaces are
-// single-valued by construction; a path blends linearly along its nearest
-// segment. The limit the design notes holds: one height per point, so an upper
+// single-valued by construction; a path blends between the mitred
+// cross-sections of the segment it stands on (pathHeightUnbounded). The limit the design notes holds: one height per point, so an upper
 // level is a terrace beside a lower one, never above it.
 //
 // Pure and allocation-free on the hot path: each surface is compiled once
@@ -106,19 +106,28 @@ export function pathOutline(s: FieldPathSurface): [number, number][] {
   return ring;
 }
 
-/** Unit tangent of a path's cross-section at vertex i: the same direction
- *  pathOutline mitres the band with (next minus previous vertex), so each
- *  cross-section is the straight line through left[i], the vertex, right[i]. */
-function crossTangent(
-  pts: readonly (readonly [number, number, number])[],
-  i: number,
-): [number, number] {
-  const prev = pts[Math.max(0, i - 1)];
-  const next = pts[Math.min(pts.length - 1, i + 1)];
-  const dx = next[0] - prev[0];
-  const dz = next[1] - prev[1];
-  const len = Math.hypot(dx, dz) || 1;
-  return [dx / len, dz / len];
+const crossTangents = new WeakMap<FieldPathSurface, Float64Array>();
+
+/** Unit tangents (x, z per vertex) of a path's cross-sections: the same
+ *  direction pathOutline mitres the band with (next minus previous vertex),
+ *  so each cross-section is the straight line through left[i], the vertex,
+ *  right[i]. Compiled once per path (the height query allocates nothing). */
+function crossTangentsOf(s: FieldPathSurface): Float64Array {
+  let out = crossTangents.get(s);
+  if (out) return out;
+  const pts = s.points;
+  out = new Float64Array(pts.length * 2);
+  for (let i = 0; i < pts.length; i++) {
+    const prev = pts[Math.max(0, i - 1)];
+    const next = pts[Math.min(pts.length - 1, i + 1)];
+    const dx = next[0] - prev[0];
+    const dz = next[1] - prev[1];
+    const len = Math.hypot(dx, dz) || 1;
+    out[i * 2] = dx / len;
+    out[i * 2 + 1] = dz / len;
+  }
+  crossTangents.set(s, out);
+  return out;
 }
 
 /**
@@ -136,6 +145,7 @@ function crossTangent(
  */
 export function pathHeightUnbounded(s: FieldPathSurface, x: number, z: number): number {
   const pts = s.points;
+  const tan = crossTangentsOf(s);
   let best = -1;
   let bestD2 = Infinity;
   let bestU = 0;
@@ -157,10 +167,8 @@ export function pathHeightUnbounded(s: FieldPathSurface, x: number, z: number): 
       fallbackH = pts[i][2] + (pts[i + 1][2] - pts[i][2]) * t;
     }
     // Which side of each bounding cross-section the point lies on.
-    const t0 = crossTangent(pts, i);
-    const t1 = crossTangent(pts, i + 1);
-    const d0 = (x - ax) * t0[0] + (z - az) * t0[1];
-    const d1 = (pts[i + 1][0] - x) * t1[0] + (pts[i + 1][1] - z) * t1[1];
+    const d0 = (x - ax) * tan[i * 2] + (z - az) * tan[i * 2 + 1];
+    const d1 = (pts[i + 1][0] - x) * tan[i * 2 + 2] + (pts[i + 1][1] - z) * tan[i * 2 + 3];
     if (d0 < -1e-9 || d1 < -1e-9) continue;
     if (d2 < bestD2) {
       bestD2 = d2;

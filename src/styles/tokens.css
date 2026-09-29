@@ -487,6 +487,7 @@
     --color-field-map-seal: #7fe0d0;
     --color-field-map-beacon: #ffe39a;
     --color-field-map-vignette: rgba(0, 0, 0, 0.55);
+    --color-field-map-vignette-clear: rgba(0, 0, 0, 0);
 
     /* overworld world-map window (resolved by map_window_painter.ts via
        getComputedStyle: a 2D canvas context cannot read a CSS var directly).

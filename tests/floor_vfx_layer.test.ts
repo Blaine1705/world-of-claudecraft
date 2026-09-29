@@ -107,6 +107,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/hollow_crypt/crypt_floor_marks.ts', layer: 'ground', strict: true },
   // The Sunken Bastion's lantern and brazier pools on its floors.
   { file: 'src/render/sunken_bastion/bastion_lights.ts', layer: 'ground', strict: true },
+  // The Bastion's storm rain: its splash rings lie on the floor under every
+  // telegraph (ground band); the falling streaks and far sheets keep their own
+  // orders (weather standing up from the ground, off the ladder).
+  { file: 'src/render/sunken_bastion/bastion_rain.ts', layer: 'ground', strict: false },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },

@@ -13,6 +13,7 @@ import {
   authoredFieldHeight,
   instancedFieldHeight,
 } from '../src/sim/instances/authored_field';
+import { pathHeightAt, pathHeightUnbounded } from '../src/sim/instances/authored_field/height';
 import { wildheartFieldHeight } from '../src/sim/wildheart_field';
 import { groundHeight } from '../src/sim/world';
 
@@ -137,5 +138,67 @@ describe('the Hollow Crypt field', () => {
     expect(instancedFieldHeight('crypt')).toBeNull();
     expect(DUNGEONS.sunken_bastion.interior).toBe('sunken_bastion');
     expect(instancedFieldHeight('sunken_bastion')).not.toBeNull();
+  });
+});
+
+describe('path height across a turning stair', () => {
+  // A stair rising round a bend: straight up the first leg, turning 30 degrees,
+  // rising on up the second.
+  const stair = {
+    kind: 'path' as const,
+    id: 'bend',
+    points: [
+      [0, 0, 0],
+      [0, 4, 0],
+      [0, 14, 5],
+      [5, 22.66, 10],
+      [7, 26.12, 10],
+    ] as [number, number, number][],
+    halfWidth: 3,
+  };
+
+  it('is the plain linear ramp along a straight path', () => {
+    const ramp = {
+      ...stair,
+      points: [
+        [0, 0, 0],
+        [0, 4, 0],
+        [0, 14, 5],
+        [0, 18, 5],
+      ] as [number, number, number][],
+    };
+    for (let z = 4; z <= 14; z += 0.5) {
+      expect(pathHeightUnbounded(ramp, 0, z)).toBeCloseTo(((z - 4) / 10) * 5, 9);
+      expect(pathHeightUnbounded(ramp, 2.5, z)).toBeCloseTo(((z - 4) / 10) * 5, 9);
+    }
+  });
+
+  it('carries each vertex height on its whole cross-section, from both sides', () => {
+    expect(pathHeightUnbounded(stair, 0, 14)).toBeCloseTo(5, 9);
+    for (const t of [-2.8, -1.5, 0, 1.5, 2.8]) {
+      // The cross-section at the bend runs across the band through the vertex.
+      const nx = Math.cos(Math.PI / 12);
+      const nz = -Math.sin(Math.PI / 12);
+      expect(pathHeightAt(stair, nx * t, 14 + nz * t)).toBeCloseTo(5, 4);
+    }
+  });
+
+  it('has no seam anywhere across the band (the old blend jumped at the inside of the bend)', () => {
+    let worst = 0;
+    for (let s = -2.9; s <= 2.9; s += 0.25) {
+      let prev = Number.NaN;
+      for (let z = 8; z <= 20; z += 0.05) {
+        const x = s + Math.max(0, z - 14) * 0.58;
+        const h = pathHeightAt(stair, x, z);
+        if (Number.isNaN(h)) {
+          prev = Number.NaN;
+          continue;
+        }
+        if (!Number.isNaN(prev)) worst = Math.max(worst, Math.abs(h - prev));
+        prev = h;
+      }
+    }
+    // A 0.05 yd stride on a rise of 0.5 yd per yard climbs at most about 0.03.
+    expect(worst).toBeLessThan(0.06);
   });
 });

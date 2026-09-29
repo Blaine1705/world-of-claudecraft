@@ -19,8 +19,11 @@ import type { IWorld } from '../src/world_api';
 describe('the painted field map plan', () => {
   it('draws every surface in the sim order, framed by the field bounds', () => {
     const plan = fieldMapPlan(SUNKEN_BASTION_FIELD);
-    expect(plan.surfaces).toHaveLength(SUNKEN_BASTION_FIELD.surfaces.length);
-    SUNKEN_BASTION_FIELD.surfaces.forEach((s, i) => {
+    // A hidden surface (the raised drawbridge) is not promised as ground.
+    const shown = SUNKEN_BASTION_FIELD.surfaces.filter((s) => !s.hidden);
+    expect(shown.length).toBeLessThan(SUNKEN_BASTION_FIELD.surfaces.length);
+    expect(plan.surfaces).toHaveLength(shown.length);
+    shown.forEach((s, i) => {
       expect(plan.surfaces[i].path).toBe(s.kind === 'path');
     });
     const b = SUNKEN_BASTION_FIELD.bounds;

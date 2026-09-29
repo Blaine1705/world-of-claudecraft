@@ -43,6 +43,7 @@ const FIELD_MAP_TOKENS = {
   seal: '--color-field-map-seal',
   beacon: '--color-field-map-beacon',
   vignette: '--color-field-map-vignette',
+  vignetteClear: '--color-field-map-vignette-clear',
 } as const;
 
 type FieldMapColors = Record<keyof typeof FIELD_MAP_TOKENS, string>;
@@ -290,16 +291,16 @@ export class FieldMapPlateArt {
     // ---- landmarks -------------------------------------------------------------------
     for (const m of plan.landmarks) this.landmark(ctx, m.kind, px(m.x), py(m.z), c);
 
-    // ---- gates and seals ---------------------------------------------------------------
+    // ---- gateways: a threshold mark across each passage (a SHUT gate is the
+    // live marker the dungeon map draws on top; the plate is static) ---------
     for (const g of plan.gates) {
-      ctx.strokeStyle = c.ink;
-      ctx.lineWidth = 6;
-      line(g);
       ctx.strokeStyle = g.seal ? c.seal : c.gate;
-      ctx.lineWidth = 3;
-      if (g.seal) ctx.setLineDash([4, 3]);
+      ctx.globalAlpha = 0.55;
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([3, 3]);
       line(g);
       ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
     }
 
     // ---- vignette ------------------------------------------------------------------------
@@ -312,7 +313,7 @@ export class FieldMapPlateArt {
     ] as const) {
       const g = ctx.createLinearGradient(x0, y0, x1, y1);
       g.addColorStop(0, c.vignette);
-      g.addColorStop(1, 'transparent');
+      g.addColorStop(1, c.vignetteClear);
       ctx.fillStyle = g;
       ctx.fillRect(rx, ry, rw, rh);
     }

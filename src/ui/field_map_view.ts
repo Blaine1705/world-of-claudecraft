@@ -73,7 +73,8 @@ export interface FieldMapPlan {
   walls: [number, number][][];
   props: FieldMapProp[];
   landmarks: { kind: FieldMapLandmark; x: number; z: number }[];
-  /** The dungeon's gates and seals, as a bar across each passage. */
+  /** The dungeon's gates and seals: WHERE each passage is (a gate that is
+   *  still shut is the live `gate` marker, never this static mark). */
   gates: (FieldMapSegment & { seal: boolean })[];
 }
 
@@ -157,6 +158,8 @@ export function fieldMapPlan(def: AuthoredFieldDef): FieldMapPlan {
   const surfaces: FieldMapSurface[] = [];
   const treads: FieldMapSegment[] = [];
   for (const s of def.surfaces) {
+    // A hidden surface (a raised drawbridge) is not ground the map can promise.
+    if (s.hidden) continue;
     const h =
       s.kind === 'path' ? s.points.reduce((sum, p) => sum + p[2], 0) / s.points.length : s.h;
     heightMin = Math.min(heightMin, h);

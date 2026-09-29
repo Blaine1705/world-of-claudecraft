@@ -7,7 +7,7 @@
 //   /dev bastion tp <area>               jump inside the run (enters first)
 //   /dev bastion gates                   open every gate and seal for this run
 //   /dev bastion kill <pack|boss|all>    kill a pack (f1 f2 fa fb f3 b1 b2 hermit bc
-//                                        r1 r2 rc g1 g2 g3 gd k1 k2 k3), a boss
+//                                        r1 r2 rc g1 g2 g3 gd k1 k2 k3 kc), a boss
 //                                        (olen, ossick, vael) or everything
 //   /dev bastion pack <pack>             jump to where a pack stands (or walks)
 //   /dev bastion spawn <type>            raise one trash mob 10 yd ahead, pulled

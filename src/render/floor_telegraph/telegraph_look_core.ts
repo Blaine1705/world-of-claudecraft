@@ -64,23 +64,28 @@ export interface TelegraphLook {
 }
 
 /**
- * Layer intensities at `fill` of the bar, `clock` seconds in. The rim and the
- * fill front never drop below a readable floor on any tier; the warning pulse
- * speeds up as the bar ends, and `detail` gates only the cosmetic layers.
+ * Layer intensities at `fill` of the bar, `clock` seconds in, written into
+ * `out` (a painter passes one reused object: no per-frame allocation). The
+ * rim and the fill front never drop below a readable floor on any tier; the
+ * warning pulse speeds up as the bar ends, and `detail` gates only the
+ * cosmetic layers.
  */
-export function telegraphLook(fill: number, clock: number, detailOn: boolean): TelegraphLook {
+export function telegraphLook(
+  fill: number,
+  clock: number,
+  detailOn: boolean,
+  out: TelegraphLook = { base: 0, filled: 0, front: 0, rim: 0, warn: 0, detail: 0 },
+): TelegraphLook {
   const f = Math.min(1, Math.max(0, fill));
   const late = Math.max(0, (f - TELEGRAPH_WARN_FROM) / (1 - TELEGRAPH_WARN_FROM));
   const rate = 10 + late * 16;
-  const warn = late > 0 ? late * (0.5 + 0.5 * Math.sin(clock * rate)) : 0;
-  return {
-    base: 0.13 + 0.05 * f,
-    filled: 0.2 + 0.12 * f,
-    front: f > 0 && f < 1 ? 0.75 : 0,
-    rim: 0.9,
-    warn,
-    detail: detailOn ? 1 : 0,
-  };
+  out.base = 0.13 + 0.05 * f;
+  out.filled = 0.2 + 0.12 * f;
+  out.front = f > 0 && f < 1 ? 0.75 : 0;
+  out.rim = 0.9;
+  out.warn = late > 0 ? late * (0.5 + 0.5 * Math.sin(clock * rate)) : 0;
+  out.detail = detailOn ? 1 : 0;
+  return out;
 }
 
 /** Height of the glowing curtain standing on a telegraph's edge (yards). */

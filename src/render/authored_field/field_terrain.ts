@@ -53,7 +53,7 @@ export function buildAuthoredFieldTerrain(
       map: stone.map,
       normalMap: opts.lowGfx ? undefined : stone.normalMap,
       vertexColors: true,
-      roughness: opts.wet ? 0.5 : 0.93,
+      roughness: opts.wet ? 0.62 : 0.93,
     }),
     soil: surfaceMat({
       map: soil.map,

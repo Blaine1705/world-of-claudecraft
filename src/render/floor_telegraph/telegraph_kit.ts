@@ -161,6 +161,15 @@ function applyLook(m: TelegraphFloorMaterial, look: TelegraphLook, p: TelegraphP
 export class TelegraphKit {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
+  /** One reused look (paintFan and paintLane allocate nothing per frame). */
+  private readonly look: TelegraphLook = {
+    base: 0,
+    filled: 0,
+    front: 0,
+    rim: 0,
+    warn: 0,
+    detail: 0,
+  };
 
   /** `detail`: the cosmetic layers (off on the low tier). */
   constructor(
@@ -333,7 +342,7 @@ export class TelegraphKit {
 
   /** Paint a fan's layers for this frame. */
   paintFan(f: TelegraphFan, p: TelegraphPaint): void {
-    const look = telegraphLook(p.fill, p.clock, this.detail);
+    const look = telegraphLook(p.fill, p.clock, this.detail, this.look);
     applyLook(f.floorMat, look, p);
     f.floorMat.uniforms.uRange.value = p.range;
     if (f.curtainMat) {
@@ -405,7 +414,7 @@ export class TelegraphKit {
 
   /** Paint a lane's layers for this frame. */
   paintLane(l: TelegraphLane, p: TelegraphPaint): void {
-    const look = telegraphLook(p.fill, p.clock, this.detail);
+    const look = telegraphLook(p.fill, p.clock, this.detail, this.look);
     applyLook(l.floorMat, look, p);
     if (l.curtainMat) {
       const cu = l.curtainMat.uniforms;
