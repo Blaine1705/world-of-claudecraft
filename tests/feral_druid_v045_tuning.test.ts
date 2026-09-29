@@ -1,7 +1,7 @@
 // The v0.45 Wildfang tuning pass, one suite per change:
 //   1. Slinkstrike reaches 0 to 25 yd
 //   2. Scratch: a Cat Form sweep, 1 combo point and 1 Old Blood per landed hit
-//   3. fall damage no longer takes a cat out of Stalk
+//   3. fall damage no longer breaks Stalk or the rogue stealths
 //   4. Nature's Boon's Wildbloom arm is 50% stronger (Oakhide stays 25%)
 //   5. Lynxblood and Red Haze are off the global cooldown
 import { describe, expect, it } from 'vitest';
@@ -15,10 +15,11 @@ import {
 } from '../src/sim/combat/druid_natures_boon';
 import { weaponSweepTargets } from '../src/sim/combat/druid_scratch';
 import {
+  FALL_SAFE_STEALTH_AURA_IDS,
   FALLING_DAMAGE_LABEL,
-  fallDamageKeepsStalk,
+  fallDamageKeepsStealth,
   STALK_AURA_ID,
-} from '../src/sim/combat/stalk_fall';
+} from '../src/sim/combat/stealth_fall';
 import { SPEC_BASELINES } from '../src/sim/content/spec_baselines';
 import { ABILITIES, CLASSES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -276,17 +277,48 @@ describe('2. Scratch', () => {
   });
 });
 
-describe('3. A fall keeps Stalk', () => {
+describe('3. A fall keeps Stalk and the rogue stealths', () => {
   it('only a null-source Falling hit on a Stalk aura keeps the stealth', () => {
     const { player } = rig('feral');
     player.auras.push(testAura(player, STALK_AURA_ID, 'stealth'));
-    expect(fallDamageKeepsStalk(null, player, FALLING_DAMAGE_LABEL)).toBe(true);
+    expect(fallDamageKeepsStealth(null, player, FALLING_DAMAGE_LABEL)).toBe(true);
     // Any other label, or a real attacker, still breaks it.
-    expect(fallDamageKeepsStalk(null, player, 'Fatigue')).toBe(false);
-    expect(fallDamageKeepsStalk(player, player, FALLING_DAMAGE_LABEL)).toBe(false);
-    // Another class's stealth (a rogue's Duskveil) keeps the old rule.
-    const other = { ...player, auras: [testAura(player, 'stealth', 'stealth')] };
-    expect(fallDamageKeepsStalk(null, other, FALLING_DAMAGE_LABEL)).toBe(false);
+    expect(fallDamageKeepsStealth(null, player, 'Fatigue')).toBe(false);
+    expect(fallDamageKeepsStealth(player, player, FALLING_DAMAGE_LABEL)).toBe(false);
+  });
+
+  it('covers exactly Stalk, Duskveil, and Smokefade', () => {
+    const { player } = rig('feral');
+    expect([...FALL_SAFE_STEALTH_AURA_IDS].sort()).toEqual(['prowl', 'stealth', 'vanish']);
+    // The ids are the real stealth abilities' own ids (the bare selfBuff id).
+    expect(ABILITIES.stealth.name).toBe('Duskveil');
+    expect(ABILITIES.vanish.name).toBe('Smokefade');
+    for (const id of ['stealth', 'vanish']) {
+      const rogue = { ...player, auras: [testAura(player, id, 'stealth')] };
+      expect(fallDamageKeepsStealth(null, rogue, FALLING_DAMAGE_LABEL), id).toBe(true);
+    }
+    // Every other stealth-kind aura keeps the old rule and breaks on a fall.
+    for (const id of ['greater_invisibility', 'invisibility']) {
+      const other = { ...player, auras: [testAura(player, id, 'stealth')] };
+      expect(fallDamageKeepsStealth(null, other, FALLING_DAMAGE_LABEL), id).toBe(false);
+    }
+  });
+
+  it("a real rogue's Duskveil survives fall damage through the damage funnel", () => {
+    const sim = new Sim({ seed: 45, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const rogue = sim.player;
+    sim.castAbility('stealth');
+    for (let tick = 0; tick < 5; tick++) sim.tick();
+    expect(rogue.auras.find((aura) => aura.kind === 'stealth')?.id).toBe('stealth');
+
+    rawCtx(sim).dealDamage(null, rogue, 50, false, 'physical', FALLING_DAMAGE_LABEL, 'hit', true);
+    expect(rogue.hp).toBeLessThan(rogue.maxHp);
+    expect(rogue.stealthed).toBe(true);
+
+    const mob = spawnMob(sim, 2, 0);
+    rawCtx(sim).dealDamage(mob, rogue, 50, false, 'physical', 'Bite', 'hit', true);
+    expect(rogue.stealthed).toBe(false);
   });
 
   it('a real Stalk survives fall damage through the damage funnel', () => {
