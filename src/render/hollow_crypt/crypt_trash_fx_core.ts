@@ -15,6 +15,7 @@ import {
   CRYPT_TAIL_LASH,
   CRYPT_WING_GUST,
 } from '../../sim/mob/trash_kit/cast_ids';
+import { TELEGRAPH_ACCENTS, TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 
 export type CryptTelegraphShape = 'cone' | 'rearCone' | 'ring' | 'sigil';
 
@@ -24,19 +25,23 @@ export interface CryptTelegraphSpec {
   range: number;
   /** Degrees of the cone's arc (360 for a ring). */
   arcDeg: number;
-  /** The edge colour; the fill is the same hue, dimmer. */
+  /** The threat colour (floor_telegraph TELEGRAPH_THREAT_COLORS). */
   color: number;
+  /** The element accent of the motes and the fill front. */
+  accent?: number;
   /** A sigil sits this far ahead of the caster (the Raise Bones grave). */
   ahead?: number;
 }
 
-/** Danger colours: brighter than any crypt dressing (the floor ladder rule). */
+/** The crypt's telegraphs in the shared threat palette: the colour says what
+ *  standing in it costs (damage, a stun, a kick call), the accent carries the
+ *  element. */
 export const CRYPT_TELEGRAPH_COLORS = {
-  physical: 0xff5a2e,
-  frost: 0x6fd8ff,
-  stun: 0xc38bff,
-  shadow: 0x7dffb0,
-  bone: 0xf2e6c4,
+  physical: TELEGRAPH_THREAT_COLORS.danger,
+  frost: TELEGRAPH_THREAT_COLORS.danger,
+  stun: TELEGRAPH_THREAT_COLORS.control,
+  shadow: TELEGRAPH_THREAT_COLORS.interrupt,
+  bone: TELEGRAPH_THREAT_COLORS.danger,
 } as const;
 
 function breath(templateId: string) {
@@ -58,6 +63,7 @@ export function cryptTelegraphSpecs(): Readonly<Record<string, CryptTelegraphSpe
       shape: 'cone',
       ...breath('crypt_ossuary_drake'),
       color: CRYPT_TELEGRAPH_COLORS.frost,
+      accent: TELEGRAPH_ACCENTS.frost,
     },
     [CRYPT_TAIL_LASH]: {
       shape: 'rearCone',
@@ -82,13 +88,15 @@ export function cryptTelegraphSpecs(): Readonly<Record<string, CryptTelegraphSpe
       range: 1.6,
       arcDeg: 360,
       color: CRYPT_TELEGRAPH_COLORS.shadow,
+      accent: TELEGRAPH_ACCENTS.shadow,
       ahead: 2.5,
     },
     [CRYPT_MURDER_CALL]: {
       shape: 'sigil',
       range: 2.6,
       arcDeg: 360,
-      color: 0x9a8cff,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TELEGRAPH_ACCENTS.shadow,
     },
   };
 }

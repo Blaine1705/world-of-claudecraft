@@ -136,9 +136,12 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/renderer.ts', layer: 'player', strict: false },
   // boss and encounter mechanics
   { file: 'src/render/ignivar_encounter.ts', layer: 'encounter', strict: true },
-  // The Sunken Bastion's trash and boss telegraphs (cones, rings, lanes, glyphs).
-  { file: 'src/render/sunken_bastion/bastion_fx.ts', layer: 'encounter', strict: true },
+  // The Sunken Bastion's boss visuals (its trash and boss telegraphs lay their
+  // cones, rings, lanes and glyphs through the shared kit below).
   { file: 'src/render/sunken_bastion/bastion_boss_fx.ts', layer: 'encounter', strict: true },
+  // The shared dungeon floor telegraph (the crypt's and the Bastion's cones,
+  // rings, lanes and kick glyphs, and their edge curtains).
+  { file: 'src/render/floor_telegraph/telegraph_kit.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_forge_wave.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_frontal_telegraph.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_soak_telegraph.ts', layer: 'encounter', strict: true },

@@ -2,22 +2,26 @@
 //  - a floor telegraph under every trash cast you dodge, filling as its bar
 //    runs: the Ossuary Warrior's Grave Cleave cone, the drake's Bonechill
 //    Breath cone and Tail Lash behind it, the Wing Gust and Stone Shriek rings,
-//    and a sigil on the grave a Raise Bones is opening (and round a Murder Call);
+//    and a kick glyph on the grave a Raise Bones is opening (and round a
+//    Murder Call);
 //  - the Bone Minion's burst ring, filling over its fuse where it fell;
 //  - a flash when a strike lands.
+// Every shape is the shared floor telegraph (../floor_telegraph): the same
+// layered look, threat colours and edge glow as every other dungeon.
 //
 // Rules (src/render/CLAUDE.md): every geometry and material is pooled and
 // built once, attached through the compile gate; no per-frame allocation. The
-// telegraphs are ACTIONABLE, so they draw on every graphics tier (fairness:
-// docs/design/graphics-settings-fairness.md); only the landing flashes are
-// cosmetic and shed on the low tier. Everything is derived from IWorld entity
-// state (cast fields, the dead flag), so offline and online look the same.
+// telegraphs are ACTIONABLE, so their footprint draws on every graphics tier
+// (fairness: docs/design/graphics-settings-fairness.md); the edge curtains,
+// flowing bands and motes and the landing flashes are cosmetic and shed on the
+// low tier. Everything is derived from IWorld entity state (cast fields, the
+// dead flag), so offline and online look the same.
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
-import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { TELEGRAPH_ACCENTS, type TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
@@ -26,7 +30,6 @@ import {
   boneBurstSpec,
   CRYPT_TELEGRAPH_COLORS,
   type CryptTelegraphSpec,
-  coneFan,
   cryptTelegraphSpecs,
   telegraphFill,
   telegraphYaw,
@@ -35,123 +38,25 @@ import {
 const TELEGRAPH_SLOTS = 10;
 const BURST_SLOTS = 8;
 const FLASH_SLOTS = 6;
-const SEGMENTS = 40;
 const SCAN_SEC = 0.1;
-const LIFT = 0.07;
 const FLASH_SEC = 0.5;
 const BONE_MINION = 'crypt_bone_minion';
 
-interface Shape {
-  group: THREE.Group;
-  base: THREE.Mesh;
-  fill: THREE.Mesh;
-  rim: THREE.Mesh;
-  baseMat: THREE.MeshBasicMaterial;
-  fillMat: THREE.MeshBasicMaterial;
-  rimMat: THREE.MeshBasicMaterial;
-  /** The spec the geometry was last laid out for. */
-  laid: CryptTelegraphSpec | null;
-  /** Unit-radius (x, z) of the fan and rim vertices, kept to drape each frame. */
-  unitFan: Float32Array;
-  unitRim: Float32Array;
-}
-
-interface TelegraphSlot extends Shape {
+interface TelegraphSlot extends TelegraphFan {
   casterId: number;
   castId: string;
 }
 
-interface BurstSlot extends Shape {
+interface BurstSlot extends TelegraphFan {
   corpseId: number;
   since: number;
 }
 
-interface FlashSlot extends Shape {
+interface FlashSlot extends TelegraphFan {
   age: number;
-}
-
-function fanGeometry(): THREE.BufferGeometry {
-  const g = new THREE.BufferGeometry();
-  g.setAttribute(
-    'position',
-    new THREE.BufferAttribute(new Float32Array((SEGMENTS + 2) * 3), 3).setUsage(
-      THREE.DynamicDrawUsage,
-    ),
-  );
-  const index: number[] = [];
-  for (let i = 0; i < SEGMENTS; i++) index.push(0, i + 1, i + 2);
-  g.setIndex(index);
-  return g;
-}
-
-function rimGeometry(): THREE.BufferGeometry {
-  const g = new THREE.BufferGeometry();
-  // Two stations per arc point (inner, outer) plus the two straight edges.
-  g.setAttribute(
-    'position',
-    new THREE.BufferAttribute(new Float32Array((SEGMENTS + 1) * 2 * 3 + 12 * 3), 3).setUsage(
-      THREE.DynamicDrawUsage,
-    ),
-  );
-  const index: number[] = [];
-  for (let i = 0; i < SEGMENTS; i++) {
-    const b = i * 2;
-    index.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
-  }
-  const e = (SEGMENTS + 1) * 2;
-  for (let side = 0; side < 2; side++) {
-    const b = e + side * 4;
-    index.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
-  }
-  g.setIndex(index);
-  return g;
-}
-
-function layOut(shape: Shape, spec: CryptTelegraphSpec): void {
-  if (shape.laid === spec) return;
-  shape.laid = spec;
-  const fan = coneFan(1, spec.arcDeg, SEGMENTS);
-  for (let i = 0; i < fan.length; i++) {
-    shape.unitFan[i * 2] = fan[i][0];
-    shape.unitFan[i * 2 + 1] = fan[i][1];
-  }
-  for (const mesh of [shape.base, shape.fill]) {
-    const pos = mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
-    for (let i = 0; i < fan.length; i++) pos.setXYZ(i, fan[i][0], 0, fan[i][1]);
-    pos.needsUpdate = true;
-    mesh.geometry.computeBoundingSphere();
-  }
-  // The rim: a band 0.3 yd wide inside the arc, and the cone's two sides.
-  const rim = shape.rim.geometry.getAttribute('position') as THREE.BufferAttribute;
-  const width = Math.min(0.35, spec.range * 0.08) / spec.range;
-  for (let i = 0; i <= SEGMENTS; i++) {
-    const [x, z] = fan[i + 1];
-    rim.setXYZ(i * 2, x * (1 - width), 0, z * (1 - width));
-    rim.setXYZ(i * 2 + 1, x, 0, z);
-  }
-  const e = (SEGMENTS + 1) * 2;
-  const cone = spec.arcDeg < 360;
-  for (let side = 0; side < 2; side++) {
-    const [x, z] = fan[side === 0 ? 1 : SEGMENTS + 1];
-    const len = Math.hypot(x, z) || 1;
-    const nx = (-z / len) * width * (side === 0 ? -1 : 1);
-    const nz = (x / len) * width * (side === 0 ? -1 : 1);
-    const b = e + side * 4;
-    const k = cone ? 1 : 0;
-    rim.setXYZ(b, 0, 0, 0);
-    rim.setXYZ(b + 1, nx * k, 0, nz * k);
-    rim.setXYZ(b + 2, x * k, 0, z * k);
-    rim.setXYZ(b + 3, (x + nx) * k, 0, (z + nz) * k);
-  }
-  for (let i = 0; i < rim.count; i++) {
-    shape.unitRim[i * 2] = rim.getX(i);
-    shape.unitRim[i * 2 + 1] = rim.getZ(i);
-  }
-  rim.needsUpdate = true;
-  shape.rim.geometry.computeBoundingSphere();
-  shape.baseMat.color.setHex(spec.color);
-  shape.fillMat.color.setHex(spec.color);
-  shape.rimMat.color.setHex(spec.color);
+  radius: number;
+  x: number;
+  z: number;
 }
 
 export class CryptTrashFx {
@@ -159,14 +64,11 @@ export class CryptTrashFx {
   private readonly root = new THREE.Group();
   private readonly specs = cryptTelegraphSpecs();
   private readonly burst = boneBurstSpec();
-  private readonly burstSpec: CryptTelegraphSpec;
-  private readonly flashSpec: CryptTelegraphSpec;
   private readonly telegraphs: TelegraphSlot[] = [];
   private readonly bursts: BurstSlot[] = [];
   private readonly flashes: FlashSlot[] = [];
   private readonly flashesOn: boolean;
-  private readonly geometries: THREE.BufferGeometry[] = [];
-  private readonly materials: THREE.Material[] = [];
+  private readonly kit: TelegraphKit;
   private readonly seenDead = new Set<number>();
   private scan = 0;
   private clock = 0;
@@ -183,70 +85,26 @@ export class CryptTrashFx {
     this.flashesOn =
       resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
         .tier !== 'low';
-    this.burstSpec = {
-      shape: 'ring',
-      range: this.burst.radius,
-      arcDeg: 360,
-      color: CRYPT_TELEGRAPH_COLORS.bone,
-    };
-    this.flashSpec = { shape: 'ring', range: 1, arcDeg: 360, color: 0xffffff };
+    this.kit = new TelegraphKit(this.root, this.flashesOn);
     for (let i = 0; i < TELEGRAPH_SLOTS; i++)
-      this.telegraphs.push({ ...this.shape(18), casterId: -1, castId: '' });
+      this.telegraphs.push({ ...this.kit.fan(18), casterId: -1, castId: '' });
     for (let i = 0; i < BURST_SLOTS; i++)
-      this.bursts.push({ ...this.shape(16), corpseId: -1, since: 0 });
-    if (this.flashesOn)
-      for (let i = 0; i < FLASH_SLOTS; i++) this.flashes.push({ ...this.shape(24), age: -1 });
+      this.bursts.push({ ...this.kit.fan(15), corpseId: -1, since: 0 });
+    if (this.flashesOn) {
+      for (let i = 0; i < FLASH_SLOTS; i++)
+        this.flashes.push({ ...this.kit.fan(21), age: -1, radius: 1, x: 0, z: 0 });
+    }
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
   }
 
-  private shape(order: number): Shape {
-    const mat = (opacity: number) => {
-      const m = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        opacity,
-        transparent: true,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-        toneMapped: false,
-      });
-      this.materials.push(m);
-      return m;
-    };
-    const baseMat = mat(0.16);
-    const fillMat = mat(0.42);
-    const rimMat = mat(0.95);
-    const fan = () => {
-      const g = fanGeometry();
-      this.geometries.push(g);
-      return g;
-    };
-    const rimGeo = rimGeometry();
-    this.geometries.push(rimGeo);
-    const base = new THREE.Mesh(fan(), baseMat);
-    const fill = new THREE.Mesh(fan(), fillMat);
-    const rim = new THREE.Mesh(rimGeo, rimMat);
-    base.renderOrder = floorVfxRenderOrder('encounter', order);
-    fill.renderOrder = floorVfxRenderOrder('encounter', order + 1);
-    rim.renderOrder = floorVfxRenderOrder('encounter', order + 2);
-    for (const m of [base, fill, rim]) m.frustumCulled = false;
-    const group = new THREE.Group();
-    group.visible = false;
-    group.add(base, fill, rim);
-    this.root.add(group);
-    return {
-      group,
-      base,
-      fill,
-      rim,
-      baseMat,
-      fillMat,
-      rimMat,
-      laid: null,
-      unitFan: new Float32Array((SEGMENTS + 2) * 2),
-      unitRim: new Float32Array(((SEGMENTS + 1) * 2 + 12) * 2),
-    };
+  private layOut(slot: TelegraphFan, spec: CryptTelegraphSpec): void {
+    this.kit.layOutFan(slot, spec.arcDeg, {
+      color: spec.color,
+      accent: spec.accent,
+      sigil: spec.shape === 'sigil',
+    });
   }
 
   /** A landing strike's flash (cosmetic; the damage already has its number). */
@@ -258,7 +116,7 @@ export class CryptTrashFx {
     const at = this.world.entities.get(ev.targetId);
     if (!at) return;
     const slot = this.flashes.find((f) => f.age < 0) ?? this.flashes[0];
-    const radius =
+    slot.radius =
       spec?.shape === 'ring'
         ? spec.range
         : spec?.shape === 'sigil'
@@ -266,46 +124,14 @@ export class CryptTrashFx {
           : spec
             ? spec.range * 0.6
             : 3;
-    layOut(slot, this.flashSpec);
-    slot.baseMat.color.setHex(spec?.color ?? CRYPT_TELEGRAPH_COLORS.shadow);
-    slot.fillMat.color.setHex(spec?.color ?? CRYPT_TELEGRAPH_COLORS.shadow);
-    slot.rimMat.color.setHex(0xffffff);
+    this.kit.layOutFan(slot, 360, {
+      color: spec?.color ?? CRYPT_TELEGRAPH_COLORS.shadow,
+      accent: 0xffffff,
+    });
     slot.age = 0;
-    slot.group.userData.radius = radius;
-    slot.group.position.set(at.pos.x, this.groundY(at.pos.x, at.pos.z) + LIFT, at.pos.z);
+    slot.x = at.pos.x;
+    slot.z = at.pos.z;
     slot.group.visible = true;
-  }
-
-  /**
-   * Lay a shape on the real floor: every vertex takes the ground height under
-   * its own world spot (a cone down a stair or across a ramp stays on the
-   * steps instead of vanishing under them). The group sits at (x, y, z) with
-   * yaw `yaw` and horizontal scale `range`; the fill is scaled by `fill`.
-   */
-  private drape(
-    s: Shape,
-    x: number,
-    y: number,
-    z: number,
-    yaw: number,
-    range: number,
-    fill: number,
-  ): void {
-    const c = Math.cos(yaw);
-    const sn = Math.sin(yaw);
-    const put = (attr: THREE.BufferAttribute, unit: Float32Array, k: number): void => {
-      for (let i = 0; i < attr.count; i++) {
-        const lx = unit[i * 2] * range * k;
-        const lz = unit[i * 2 + 1] * range * k;
-        const wx = x + lx * c + lz * sn;
-        const wz = z - lx * sn + lz * c;
-        attr.setY(i, this.groundY(wx, wz) - y);
-      }
-      attr.needsUpdate = true;
-    };
-    put(s.base.geometry.getAttribute('position') as THREE.BufferAttribute, s.unitFan, 1);
-    put(s.fill.geometry.getAttribute('position') as THREE.BufferAttribute, s.unitFan, fill);
-    put(s.rim.geometry.getAttribute('position') as THREE.BufferAttribute, s.unitRim, 1);
   }
 
   update(dt: number): void {
@@ -336,13 +162,8 @@ export class CryptTrashFx {
       const floor = this.groundY(x, z);
       let yaw = telegraphYaw(spec.shape, caster.facing);
       if (spec.shape === 'sigil') yaw += this.clock * 1.4;
-      slot.group.position.set(x, floor + LIFT, z);
-      slot.group.rotation.y = yaw;
-      slot.group.scale.set(spec.range, 1, spec.range);
-      slot.fill.scale.set(fill, 1, fill);
-      this.drape(slot, x, floor, z, yaw, spec.range, fill);
-      // The last quarter of the bar pulses: it is about to land.
-      slot.rimMat.opacity = fill > 0.75 ? 0.7 + 0.3 * Math.sin(this.clock * 30) : 0.95;
+      this.kit.drapeFan(slot, this.groundY, x, floor, z, yaw, spec.range);
+      this.kit.paintFan(slot, { fill, clock: this.clock, range: spec.range });
     }
     for (const slot of this.bursts) {
       if (slot.corpseId < 0) continue;
@@ -354,14 +175,15 @@ export class CryptTrashFx {
         continue;
       }
       const floor = this.groundY(corpse.pos.x, corpse.pos.z);
-      const radius = this.burst.radius * (phase.stage === 'flash' ? 1 + phase.fill * 0.3 : 1);
-      const bf = phase.stage === 'fuse' ? phase.fill : 1;
-      slot.group.position.set(corpse.pos.x, floor + LIFT, corpse.pos.z);
-      slot.group.scale.set(radius, 1, radius);
-      slot.fill.scale.set(bf, 1, bf);
-      this.drape(slot, corpse.pos.x, floor, corpse.pos.z, 0, radius, bf);
-      slot.fillMat.opacity = phase.stage === 'flash' ? 0.6 * (1 - phase.fill) : 0.42;
-      slot.rimMat.opacity = phase.stage === 'flash' ? 1 - phase.fill : 0.95;
+      const flashing = phase.stage === 'flash';
+      const radius = this.burst.radius * (flashing ? 1 + phase.fill * 0.3 : 1);
+      this.kit.drapeFan(slot, this.groundY, corpse.pos.x, floor, corpse.pos.z, 0, radius);
+      this.kit.paintFan(slot, {
+        fill: flashing ? 1 : phase.fill,
+        clock: this.clock,
+        range: radius,
+        fade: flashing ? 1 - phase.fill : 1,
+      });
     }
     for (const slot of this.flashes) {
       if (slot.age < 0) continue;
@@ -372,12 +194,10 @@ export class CryptTrashFx {
         slot.group.visible = false;
         continue;
       }
-      const r = (slot.group.userData.radius as number) * (0.4 + 0.8 * k);
-      slot.group.scale.set(r, 1, r);
-      slot.fill.scale.set(1, 1, 1);
-      slot.fillMat.opacity = 0.5 * (1 - k);
-      slot.baseMat.opacity = 0.2 * (1 - k);
-      slot.rimMat.opacity = 1 - k;
+      const r = slot.radius * (0.4 + 0.8 * k);
+      const floor = this.groundY(slot.x, slot.z);
+      this.kit.drapeFan(slot, this.groundY, slot.x, floor, slot.z, 0, r);
+      this.kit.paintFan(slot, { fill: 1, clock: this.clock, range: r, fade: 1 - k, front: 0 });
     }
   }
 
@@ -389,7 +209,10 @@ export class CryptTrashFx {
           this.seenDead.add(e.id);
           const slot = this.bursts.find((b) => b.corpseId < 0);
           if (slot) {
-            layOut(slot, this.burstSpec);
+            this.kit.layOutFan(slot, 360, {
+              color: CRYPT_TELEGRAPH_COLORS.bone,
+              accent: TELEGRAPH_ACCENTS.bone,
+            });
             slot.corpseId = e.id;
             slot.since = this.clock;
             slot.group.visible = true;
@@ -402,7 +225,7 @@ export class CryptTrashFx {
       if (this.telegraphs.some((t) => t.casterId === e.id)) continue;
       const slot = this.telegraphs.find((t) => t.casterId < 0);
       if (!slot) continue;
-      layOut(slot, this.specs[castId]);
+      this.layOut(slot, this.specs[castId]);
       slot.casterId = e.id;
       slot.castId = castId;
       slot.group.visible = true;
@@ -417,7 +240,6 @@ export class CryptTrashFx {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
-    for (const g of this.geometries) g.dispose();
-    for (const m of this.materials) m.dispose();
+    this.kit.dispose();
   }
 }

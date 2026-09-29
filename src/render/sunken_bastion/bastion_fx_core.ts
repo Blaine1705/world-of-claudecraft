@@ -14,6 +14,7 @@ import {
   BASTION_PIERCING_BOLT,
   BASTION_SHELL_SLAM,
 } from '../../sim/mob/trash_kit/bastion_cast_ids';
+import { TELEGRAPH_ACCENTS, TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 
 export type BastionTelegraphShape = 'cone' | 'ring' | 'lane' | 'sigil';
 
@@ -25,18 +26,25 @@ export interface BastionTelegraphSpec {
   arcDeg: number;
   /** A lane's half width (yards). */
   halfWidth?: number;
-  /** The edge colour; the fill is the same hue, dimmer. */
+  /** The threat colour (floor_telegraph TELEGRAPH_THREAT_COLORS). */
   color: number;
+  /** The element accent of the motes and the fill front. */
+  accent?: number;
 }
 
-/** Danger colours: brighter than any Bastion dressing (the floor ladder rule). */
+/** The Bastion's telegraphs in the shared threat palette: the colour says
+ *  what standing in it costs, the accent carries the element. `frost` stays
+ *  the Mist Surge flood's own element hue for the boss dressing. */
 export const BASTION_TELEGRAPH_COLORS = {
-  physical: 0xff5a2e,
+  physical: TELEGRAPH_THREAT_COLORS.danger,
+  lethal: TELEGRAPH_THREAT_COLORS.lethal,
   frost: 0x6fd8ff,
-  brine: 0x7fffd8,
-  heal: 0x7dff9a,
-  ward: 0xb8fff0,
+  brine: TELEGRAPH_THREAT_COLORS.danger,
+  heal: TELEGRAPH_THREAT_COLORS.interrupt,
+  ward: TELEGRAPH_THREAT_COLORS.interrupt,
 } as const;
+
+export { TELEGRAPH_ACCENTS, TELEGRAPH_THREAT_COLORS };
 
 function cone(templateId: string): { range: number; arcDeg: number } {
   const b = MOBS[templateId]?.breathCone;
@@ -62,7 +70,8 @@ export function bastionTelegraphSpecs(): Readonly<Record<string, BastionTelegrap
       shape: 'ring',
       range: slam?.radius ?? 0,
       arcDeg: 360,
-      color: BASTION_TELEGRAPH_COLORS.physical,
+      color: BASTION_TELEGRAPH_COLORS.lethal,
+      accent: TELEGRAPH_ACCENTS.physical,
     },
     [BASTION_PIERCING_BOLT]: {
       shape: 'lane',
@@ -77,12 +86,14 @@ export function bastionTelegraphSpecs(): Readonly<Record<string, BastionTelegrap
       range: 1.8,
       arcDeg: 360,
       color: BASTION_TELEGRAPH_COLORS.heal,
+      accent: TELEGRAPH_ACCENTS.brine,
     },
     [BASTION_FOG_WARD]: {
       shape: 'sigil',
       range: 1.8,
       arcDeg: 360,
       color: BASTION_TELEGRAPH_COLORS.ward,
+      accent: TELEGRAPH_ACCENTS.frost,
     },
   };
 }

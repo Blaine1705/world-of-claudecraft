@@ -808,6 +808,8 @@ const RENDER_PURE_CORES = [
   'src/render/sunken_bastion/bastion_headland_core.ts',
   'src/render/sunken_bastion/bastion_fx_core.ts',
   'src/render/sunken_bastion/bastion_boss_fx_core.ts',
+  // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
+  'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
