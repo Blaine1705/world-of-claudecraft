@@ -1,0 +1,86 @@
+// Dungeon patrols (G8): an idle mob stamped with a patrol loop walks it
+// instead of wandering. The mob chases a point that travels the loop at the
+// patrol pace, placed by the sim clock: s(t) = (time * pace + offset) mod L.
+// So the walk is a pure function of time (zero rng, no per-mob state beyond
+// the stamp), the members of one patrolling pack keep their spacing through
+// their offsets, and a mob returning from an evade simply rejoins its point.
+//
+// Routed by the idle arm of mob/locomotion.ts after the aggro scan, so a
+// patrol still notices players the way any idle mob does, and its pack pulls
+// together through the ordinary packId social pull.
+
+import type { SimContext } from '../sim_context';
+import type { DungeonSpawnPatrol, Entity } from '../types';
+
+/** A loop's default pace: a stroll at 40 percent of the mob's run speed. */
+export const PATROL_DEFAULT_PACE = 0.4;
+/** A mob this far behind its patrol point hurries to rejoin it. */
+const CATCH_UP_DISTANCE = 1.5;
+const CATCH_UP_MULT = 1.6;
+
+/** World-space patrol stamp for a spawn placed at instance origin (ox, oz). */
+export function stampDungeonPatrol(
+  patrol: DungeonSpawnPatrol,
+  ox: number,
+  oz: number,
+): NonNullable<Entity['dungeonPatrol']> {
+  return {
+    points: patrol.points.map((p) => ({ x: ox + p.x, z: oz + p.z })),
+    offset: patrol.offset ?? 0,
+    pace: patrol.pace ?? PATROL_DEFAULT_PACE,
+  };
+}
+
+/** Total length of a closed loop. */
+export function patrolLoopLength(points: readonly { x: number; z: number }[]): number {
+  let len = 0;
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % points.length];
+    len += Math.hypot(b.x - a.x, b.z - a.z);
+  }
+  return len;
+}
+
+/** The point `s` yards along the closed loop (wrapping), plus its heading. */
+export function patrolPointAt(
+  points: readonly { x: number; z: number }[],
+  s: number,
+): { x: number; z: number; facing: number } {
+  const len = patrolLoopLength(points);
+  if (points.length === 0) return { x: 0, z: 0, facing: 0 };
+  if (len <= 0 || points.length === 1) return { x: points[0].x, z: points[0].z, facing: 0 };
+  let d = ((s % len) + len) % len;
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % points.length];
+    const seg = Math.hypot(b.x - a.x, b.z - a.z);
+    if (d <= seg || i === points.length - 1) {
+      const t = seg > 0 ? Math.min(1, d / seg) : 0;
+      // Sim facing convention: 0 = +z, atan2(dx, dz).
+      return {
+        x: a.x + (b.x - a.x) * t,
+        z: a.z + (b.z - a.z) * t,
+        facing: Math.atan2(b.x - a.x, b.z - a.z),
+      };
+    }
+    d -= seg;
+  }
+  return { x: points[0].x, z: points[0].z, facing: 0 };
+}
+
+/**
+ * Walk an idle patrolling mob one tick along its loop. Returns true when the
+ * mob patrols (the caller then skips the wander step), false otherwise.
+ */
+export function updateMobPatrol(ctx: SimContext, mob: Entity): boolean {
+  const patrol = mob.dungeonPatrol;
+  if (!patrol || patrol.points.length === 0 || mob.moveSpeed <= 0) return false;
+  const speed = mob.moveSpeed * patrol.pace;
+  const target = patrolPointAt(patrol.points, ctx.time * speed + patrol.offset);
+  const dest = ctx.groundPos(target.x, target.z);
+  const behind = Math.hypot(dest.x - mob.pos.x, dest.z - mob.pos.z);
+  const step = behind > CATCH_UP_DISTANCE ? speed * CATCH_UP_MULT : speed;
+  if (ctx.moveToward(mob, dest, step)) mob.facing = target.facing;
+  return true;
+}

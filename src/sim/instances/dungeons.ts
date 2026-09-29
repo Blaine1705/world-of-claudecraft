@@ -42,6 +42,7 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { updateIgnivarRaidProgression } from '../ignivar_raid_progression';
+import { stampDungeonPatrol } from '../mob/patrol';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
@@ -66,6 +67,7 @@ import {
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
+import { tickDungeonGates } from './dungeon_gates';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
@@ -987,6 +989,7 @@ function claimInstance(
     mob.facing = spawn.facing ?? Math.PI; // most packs face the entrance; authored set-pieces may override
     mob.prevFacing = mob.facing;
     if (spawn.idleStationary) mob.idleStationary = true; // hand-placed pack holds formation
+    if (spawn.patrol) mob.dungeonPatrol = stampDungeonPatrol(spawn.patrol, origin.x, origin.z);
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);
   }
@@ -1473,6 +1476,8 @@ export function awardHeroicMarks(
 // player's entity outside the claim footprint on purpose. Covered end to end
 // by tests/dungeon_instance_disconnect_reset.test.ts.
 export function updateInstances(ctx: SimContext): void {
+  // In-dungeon gates and seals follow their packs and bosses every tick.
+  tickDungeonGates(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

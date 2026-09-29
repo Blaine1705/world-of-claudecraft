@@ -2181,7 +2181,10 @@ const MONOLITHS: MonolithRow[] = [
     // 2486 to 2513 into the row's slack: the berth gate bookkeeping (setColliderGateOpen,
     // gridIndex-ordered reopen, lazy wishes) needs the grid's private state, net of the
     // decoration collider builder moving out to decoration_collider.ts. wc -l. Exact count.
-    ceiling: 2513,
+    // LOWERED 2513 -> 2486 with the Hollow Crypt rework: the static interior
+    // collider table and interiorCollidersFor moved into interior_collider_sets.ts
+    // (which now also applies the per-slot dungeon gate view). wc -l. Exact count.
+    ceiling: 2486,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

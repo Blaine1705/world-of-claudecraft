@@ -147,6 +147,7 @@ import {
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { HEALING_TRAINING_MOBS } from './content/healing_training';
 import { HOARD_ITEMS } from './content/hoard_loot';
+import { HOLLOW_CRYPT_MOBS } from './content/hollow_crypt';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -451,6 +452,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...WILDHEART_MOBS,
+  ...HOLLOW_CRYPT_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,

@@ -30,6 +30,8 @@ import type {
 } from '../types';
 import { CRUCIBLE_PROFESSION_PATTERN_LOOT } from './crucible_collections';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
+import { HOLLOW_CRYPT_GATE_OBJECTS, HOLLOW_CRYPT_GATES, HOLLOW_CRYPT_SPAWNS } from './hollow_crypt';
+import { HOLLOW_CRYPT_ANCHORS } from './hollow_crypt_layout';
 import {
   IGNIVAR_LORE_OBJECTS,
   IGNIVAR_MAELIN_NPC_ID,
@@ -486,8 +488,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   sexton_marrow: {
     id: 'sexton_marrow',
     name: 'Sexton Marrow',
-    minLevel: 9,
-    maxLevel: 9,
+    // Level 8 in the rework (boss 1 of 4); the Burial Toll waves below are the
+    // placeholder for his graves-and-bell encounter module.
+    minLevel: 8,
+    maxLevel: 8,
     family: 'undead',
     elite: true,
     // Named mid-boss: the boss CC/snare immunity rule applies on both
@@ -510,8 +514,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       name: 'Onrush',
       school: 'physical',
     },
+    summonAdds: { mobId: 'restless_bones', count: 2, atHpPct: [0.66, 0.33] },
+    yells: { summon: 'The bell tolls, and the graves give up their dead!' },
     loot: [
-      { copper: 400, chance: 1 },
+      { copper: 800, chance: 1 },
       { itemId: 'quilted_trousers', chance: 0.4, normalOnly: true },
       { itemId: 'oiled_boots', chance: 0.4, normalOnly: true },
     ],
@@ -1339,24 +1345,6 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   },
 };
 
-// Trash packs of 2 elites (spaced beyond social-aggro range so groups can
-// pull them one pack at a time), a miniboss pair, then Morthen with guards.
-const CRYPT_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'crypt_shambler', x: -3, z: 18 },
-  { mobId: 'crypt_shambler', x: 3, z: 19 },
-  { mobId: 'crypt_shambler', x: -9, z: 38 },
-  { mobId: 'hollow_acolyte', x: -5, z: 39 },
-  { mobId: 'crypt_shambler', x: 9, z: 54 },
-  { mobId: 'hollow_acolyte', x: 5, z: 55 },
-  { mobId: 'bonechill_widow', x: -5, z: 68 },
-  { mobId: 'bonechill_widow', x: -1, z: 70 },
-  { mobId: 'sexton_marrow', x: -4, z: 82 },
-  { mobId: 'hollow_acolyte', x: 1, z: 83 },
-  { mobId: 'morthen', x: 0, z: 98 },
-  { mobId: 'crypt_shambler', x: -4, z: 96 },
-  { mobId: 'crypt_shambler', x: 4, z: 96 },
-];
-
 // Sunken Bastion: same 13-spawn pacing as the crypt — packs of 2 elites,
 // the Knight-Commander as miniboss, then Vael on the dais with two guards.
 const BASTION_SPAWN_LIST: DungeonSpawn[] = [
@@ -1547,13 +1535,21 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'The Hollow Crypt',
     index: 0,
     doorPos: { x: 80, z: 90 }, // entrance portal at the chapel ruin
-    // Arrive back near the exit portal so the first pack (z 18+) is outside aggro
-    // range on entry: no mob can pull the moment you zone in. See dungeon_entry_clearance test.
-    entry: { x: 0, z: -2 },
-    exitOffset: { x: 0, z: -6 },
-    spawns: CRYPT_SPAWN_LIST,
-    interior: 'crypt',
-    tombDressing: 'coffins',
+    // The open-air necropolis rework (content/hollow_crypt*.ts): arrival on
+    // the Lychgate Landing, 70 yd above and behind the first pack, so no mob
+    // can pull the moment you zone in. See dungeon_entry_clearance test.
+    entry: { x: HOLLOW_CRYPT_ANCHORS.entry.x, z: HOLLOW_CRYPT_ANCHORS.entry.z },
+    exitOffset: { x: HOLLOW_CRYPT_ANCHORS.exit.x, z: HOLLOW_CRYPT_ANCHORS.exit.z },
+    // Morthen's ring sits on the crag ~340 yd from the door: a second exit
+    // opens beside the altar on his death.
+    bossExitPortal: { x: -12, z: 190 },
+    spawns: HOLLOW_CRYPT_SPAWNS,
+    objects: HOLLOW_CRYPT_GATE_OBJECTS,
+    gates: HOLLOW_CRYPT_GATES,
+    // No skipping: every pack is gated, and pulling Morthen early still wakes
+    // anything left alive (instances/boss_chain_pull.ts).
+    bossChainPull: true,
+    interior: 'hollow_crypt',
     suggestedPlayers: 5,
     enterText: 'You descend into the Hollow Crypt...',
     leaveText: 'You climb back into daylight.',

@@ -27,7 +27,6 @@ import {
   BG_SLOT_COUNT,
   BUILTIN_WORLD,
   battlegroundOrigin,
-  DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
   defaultDelveModules,
@@ -71,9 +70,7 @@ import { dungeonInstanceAt, INTERIOR_LAYOUTS } from './dungeon_floor';
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
-  DAWNHOLD_LAYOUT,
   DROWNED_COURT_LAYOUT,
-  LASTKEEP_LAYOUT,
   layoutColliders,
 } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
@@ -81,7 +78,7 @@ import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
 import { harborStructureColliders } from './harbor_structures';
-import { derivedInteriorColliders } from './interior_collider_sets';
+import { interiorCollidersFor } from './interior_collider_sets';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,
@@ -118,7 +115,6 @@ import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetl
 import { townPropPlacements } from './town_props';
 import { transportBerthColliders, transportGatesClosedAtBuild } from './transport_gates';
 import type { WorldContent } from './types';
-import { WILDHEART_COLLIDERS } from './wildheart_field';
 import {
   crossesSealedBorder,
   farshorePalmSpots,
@@ -1352,38 +1348,12 @@ function bandSlotColliders(): Collider[] {
   return out;
 }
 
-// The Last Keep: an authored room-graph interior, so its walls (minus
-// doorways) and decor footprints all derive from the one shared layout,
-// exactly like the rift citadel floors (layoutColliders routes through
-// authoredColliders). Seated on DUNGEON_FLOOR_Y like every derived interior
-// set below, so its standable tops read in the same frame.
-const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT, undefined, DUNGEON_FLOOR_Y);
-// Dawnhold Castle: the Evergarden garden palace, same authored room-graph
-// derivation as The Last Keep (walls minus doorways plus decor footprints).
-const DAWNHOLD_COLLIDERS: Collider[] = layoutColliders(DAWNHOLD_LAYOUT, undefined, DUNGEON_FLOOR_Y);
-
 // Arena slots host fixed maps by slot parity (EVEN = Coliseum, ODD = Drowned
 // Court; see ARENA_MAPS in dungeon_layout.ts). Both sets are built once at
 // module load, so per-slot collision stays fully static. Exported for the
 // per-slot layout pin tests.
 export function arenaCollidersForSlot(slot: number): Collider[] {
   return ((slot % 2) + 2) % 2 === 1 ? DROWNED_COURT_COLLIDERS : ARENA_COLLIDERS;
-}
-
-// Interiors whose collision is NOT derived from an INTERIOR_LAYOUTS room plan:
-// Wildheart is an open field (walls plus prop specs) and the Last Keep is an
-// authored room graph. Both are static, so they short-circuit the per-dungeon
-// derivation below rather than falling back to the crypt plan.
-const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
-  wildheart: WILDHEART_COLLIDERS,
-  lastkeep: LASTKEEP_COLLIDERS,
-  dawnhold: DAWNHOLD_COLLIDERS,
-};
-
-// Per-dungeon interior sets: assembly extracted to interior_collider_sets.ts
-// (which also appends the Ignivar authored dressing-prop colliders).
-function interiorCollidersFor(dungeonId: string | null, interior: string): Collider[] {
-  return derivedInteriorColliders(dungeonId, interior, STATIC_INTERIOR_COLLIDERS);
 }
 
 // ---------------------------------------------------------------------------
@@ -1895,7 +1865,7 @@ export function resolvePosition(
   }
   if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
-    const colliders = interiorCollidersFor(dungeonId, interior);
+    const colliders = interiorCollidersFor(dungeonId, interior, ox, oz);
     // `mover` rides through so a jumping body passes over (and lands on) the
     // standable furniture tops, exactly as it does in the open world.
     const local = resolveAgainst(colliders, x - ox, z - oz, r, ignoreFences, mover);
@@ -2012,7 +1982,8 @@ export function supportHeightAt(
     // (The battleground band falls through to the grid read below: its
     // rampart and stair decks are ordinary standable colliders there.)
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
-    return bestStandableTop(interiorCollidersFor(dungeonId, interior), x - ox, z - oz, r, maxY);
+    const list = interiorCollidersFor(dungeonId, interior, ox, oz);
+    return bestStandableTop(list, x - ox, z - oz, r, maxY);
   }
   const grid = gridFor(seed);
   // A single-cell read is complete BY CONSTRUCTION: gridFor registers every
@@ -2073,7 +2044,7 @@ export function slopeGlueHeight(
   if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x)) return -Infinity;
   if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
     const inst = instanceLocal(x, z);
-    list = interiorCollidersFor(inst.dungeonId, inst.interior);
+    list = interiorCollidersFor(inst.dungeonId, inst.interior, inst.ox, inst.oz);
     ox = inst.ox;
     oz = inst.oz;
   } else {
@@ -2132,7 +2103,7 @@ export function interiorColliderFrame(
   if (x <= DUNGEON_X_THRESHOLD) return null;
   if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || isBgPos(x)) return null;
   const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
-  return { list: interiorCollidersFor(dungeonId, interior), ox, oz };
+  return { list: interiorCollidersFor(dungeonId, interior, ox, oz), ox, oz };
 }
 
 /** The highest standable `moveTopY` at or below `maxY` under (x, z) in a
@@ -2446,7 +2417,8 @@ function sightBlockedAt(
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
-    return overlapsAny(interiorCollidersFor(dungeonId, interior), x - ox, z - oz, r, sightY, false);
+    const list = interiorCollidersFor(dungeonId, interior, ox, oz);
+    return overlapsAny(list, x - ox, z - oz, r, sightY, false);
   }
   const grid = gridFor(seed);
   const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));

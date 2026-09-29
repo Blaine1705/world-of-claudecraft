@@ -4100,6 +4100,51 @@ export interface DungeonSpawn {
   /** Per-placement promotion for a recurring trash template. The base template
    * remains unchanged for ordinary encounter waves that reuse the same mob. */
   miniboss?: DungeonSpawnMinibossTuning;
+  /** Idle patrol (mob/patrol.ts): a closed loop of instance-local waypoints
+   * walked while idle, zero rng. `offset` (yards along the loop) spaces the
+   * members of one patrolling pack. */
+  patrol?: DungeonSpawnPatrol;
+}
+
+export interface DungeonSpawnPatrol {
+  points: readonly { x: number; z: number }[];
+  offset?: number;
+  /** Walk speed as a fraction of the mob's run speed (default 0.4). */
+  pace?: number;
+}
+
+/** What an in-dungeon gate looks like (render-only pick; collision is one box). */
+export type DungeonGateKind =
+  | 'portcullis'
+  | 'bone_barrier'
+  | 'web_curtain'
+  | 'warded_arch'
+  | 'bone_bridge'
+  | 'rite_ward';
+
+/**
+ * An in-dungeon gate or encounter seal (instances/dungeon_gates.ts): one
+ * collider box across a passage, closed until its packs and bosses are dead,
+ * and optionally re-sealed while a named boss is engaged. Instance-local.
+ */
+export interface DungeonGateDef {
+  id: string;
+  /** English display name of the gate object (entity label). */
+  name: string;
+  kind: DungeonGateKind;
+  x: number;
+  z: number;
+  /** Half width across the passage and yaw (three.js convention). */
+  hw: number;
+  rot: number;
+  /** Placement packIds (DungeonSpawn.packId) that must all be dead. */
+  packs?: readonly string[];
+  /** Mob template ids (bosses) that must all be dead. */
+  bosses?: readonly string[];
+  /** Closed while this boss (template id) is alive and engaged. */
+  sealWhileEngaged?: string;
+  /** English log line when the gate first opens (sim_i18n EXACT map). */
+  openText?: string;
 }
 
 export interface DungeonNpcSpawn {
@@ -4123,7 +4168,12 @@ export interface DungeonObjectSpawn {
     | 'ignivar_lift_gate_locked'
     | 'ignivar_water_conduit_ready'
     | 'ignivar_water_conduit_active'
-    | 'ignivar_water_conduit_cooldown';
+    | 'ignivar_water_conduit_cooldown'
+    // In-dungeon gates and seals (instances/dungeon_gates.ts): the state rides
+    // the template id so the online client mirrors it with the entity.
+    | 'dungeon_gate_closed'
+    | 'dungeon_gate_open'
+    | 'dungeon_gate_sealed';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -4176,6 +4226,7 @@ export interface DungeonDef {
     | 'ignivar_lift'
     | 'ignivar_depths'
     | 'wildheart'
+    | 'hollow_crypt'
     | 'lastkeep'
     | 'dawnhold';
   /**
@@ -4195,6 +4246,8 @@ export interface DungeonDef {
    * trash from a shortcut into a wipe, which is a per-dungeon design choice.
    */
   bossChainPull?: boolean;
+  /** In-dungeon gates and encounter seals (instances/dungeon_gates.ts). */
+  gates?: readonly DungeonGateDef[];
   suggestedPlayers: number;
   enterText: string;
   leaveText: string;
@@ -5911,6 +5964,9 @@ export interface Entity extends ClientMirroredEntityFields {
   /** Claim-local identity for authored dungeon packs. Sim authority only; the
    * server resolves the pull and clients need no extra wire state. */
   dungeonPackId?: string;
+  /** World-space idle patrol loop (mob/patrol.ts), stamped at claim time from
+   * DungeonSpawn.patrol. Sim authority only (the walk itself is mirrored). */
+  dungeonPatrol?: { points: { x: number; z: number }[]; offset: number; pace: number };
   // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;

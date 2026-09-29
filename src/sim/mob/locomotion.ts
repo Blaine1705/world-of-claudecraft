@@ -122,6 +122,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { updateMobPatrol } from './patrol';
 import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
@@ -614,6 +615,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // A synthetic mob whose templateId does not resolve (perf-capture rigs)
       // has no template flag; tolerate that like the hardLeashRadius read does.
       if (template?.idleStationary || mob.idleStationary) break;
+      // A dungeon patrol walks its loop instead of wandering (mob/patrol.ts).
+      if (updateMobPatrol(ctx, mob)) break;
       mob.wanderTimer -= DT;
       // ONE idle sub-stream for the whole wander step, threaded through all three
       // draw sites below (the ambient stable horses do the same, mob/ambient.ts).
