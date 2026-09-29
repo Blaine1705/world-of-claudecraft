@@ -21,6 +21,7 @@ import {
 } from '../src/ui/fct_core';
 import type { FctSpawnSource } from '../src/ui/fct_event';
 import { FCT_POOL_CAP, FctPainter, type FctProject } from '../src/ui/fct_painter';
+import { classicCombatTextOn } from '../src/ui/fct_style_mode';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 
 // ---------------------------------------------------------------------------
@@ -678,8 +679,49 @@ describe('FctPainter.stagedShape: the damage spawn seam', () => {
   it('stamps nothing on any other damage, so the shape is returned unchanged', () => {
     const painter = shapePainter();
     const shape = painter.stagedShape({ sourceId: 4, abilityId: 'mortal_strike' }, 10, hit());
-    expect(shape).toEqual({ kind: 'damage-done-ability', isSelf: false, crit: false });
+    // An outgoing hit carries its flavor (a physical strike: no school); no delay rides it.
+    expect(shape).toEqual({
+      kind: 'damage-done-ability',
+      isSelf: false,
+      crit: false,
+      school: null,
+    });
     expect(shape?.delaySec).toBeUndefined();
+  });
+
+  it('gives a pet / guardian hit its school colour but no amount (it never feeds the big-hit baseline)', () => {
+    const painter = shapePainter();
+    const fire = { sourceId: 9, abilityId: null, school: 'fire', amount: 30 };
+    const petHit = hit({ isPlayerSource: false, isPlayerOwnedSource: true, ability: false });
+    expect(painter.stagedShape(fire, 10, petHit)).toEqual({
+      kind: 'damage-done-auto',
+      isSelf: false,
+      crit: false,
+      school: 'fire',
+    });
+  });
+
+  it('carries the strike school + amount onto an OUTGOING hit only', () => {
+    const painter = shapePainter();
+    const fire = { sourceId: 4, abilityId: 'fireball', school: 'fire', amount: 412 };
+    expect(painter.stagedShape(fire, 10, hit())).toEqual({
+      kind: 'damage-done-ability',
+      isSelf: false,
+      crit: false,
+      school: 'fire',
+      amount: 412,
+    });
+    // Incoming damage keeps its one hostile red: no school, no amount.
+    const taken = painter.stagedShape(
+      fire,
+      10,
+      hit({ isPlayerSource: false, isPlayerTarget: true }),
+    );
+    expect(taken).toEqual({ kind: 'damage-taken', isSelf: true, crit: false });
+    expect(taken && 'school' in taken).toBe(false);
+    // An avoidance word carries no flavor either.
+    const missed = painter.stagedShape(fire, 10, hit({ damageKind: 'miss' }));
+    expect(missed && 'school' in missed).toBe(false);
   });
 
   it('consumes the beat even when nothing floats, so the next blade keeps its slot', () => {
@@ -849,6 +891,281 @@ describe('FctPainter: static-preset tiering', () => {
 
 // The per-kind colours now read semantic tokens from tokens.css. Pin both ends of that
 // indirection so the component sheet stays literal-free without changing a shipped hue.
+// The vivid combat-text look (the default) versus Classic Combat Text: which classes a
+// spawn toggles, the alternating fan-out lane, the big-hit flag, and that a held
+// (beat-staged) floater keeps its school and amount through release.
+describe('FctPainter: vivid look and the Classic Combat Text opt-out', () => {
+  function vividPainter(classic = false) {
+    const facet = recordingFacet();
+    const mount = fakeEl('div');
+    const painter = new FctPainter(
+      facet.writers,
+      mount as unknown as HTMLElement,
+      () => ({ x: 0, y: 0, behind: false }),
+      () => 1,
+      { cap: 16, doc: fakeDoc, random: () => 0.5, isClassic: () => classic },
+    );
+    // The final on/off state of each class on a node (the last toggle wins).
+    const classesOf = (node: unknown): Map<string, boolean> => {
+      const state = new Map<string, boolean>();
+      for (const c of facet.calls)
+        if (c.m === 'toggleClass' && c.el === node)
+          state.set(c.args[0] as string, c.args[1] as boolean);
+      return state;
+    };
+    const on = (node: unknown) =>
+      [...classesOf(node)]
+        .filter(([, v]) => v)
+        .map(([k]) => k)
+        .sort();
+    return { painter, mount, on };
+  }
+
+  const out = (over: Partial<FctEvent> = {}): FctEvent => ({
+    ...evt({ kind: 'damage-done-ability', text: '100' }),
+    amount: 100,
+    ...over,
+  });
+
+  it('deals consecutive outgoing hits into the four lanes, exactly one lane each', () => {
+    const { painter, mount, on } = vividPainter();
+    for (let i = 0; i < 5; i++) painter.spawn(out(), 0);
+    const lanes = mount.childNodes.map((n) => on(n).filter((c) => c.startsWith('fct-out-')));
+    expect(lanes).toEqual([
+      ['fct-out-l'],
+      ['fct-out-r'],
+      ['fct-out-ll'],
+      ['fct-out-rr'],
+      ['fct-out-l'],
+    ]);
+    expect(on(mount.childNodes[0])).toEqual(['fct-damage-done-ability', 'fct-out-l', 'fct-vivid']);
+  });
+
+  it('keeps incoming damage in the straight rise (vivid outline, no fan-out lane)', () => {
+    const { painter, mount, on } = vividPainter();
+    painter.spawn(evt({ kind: 'damage-taken', text: '-40', isSelf: true }), 0);
+    expect(on(mount.childNodes[0])).toEqual(['fct-damage-taken', 'fct-vivid']);
+  });
+
+  it('colours an outgoing spell by school', () => {
+    const { painter, mount, on } = vividPainter();
+    painter.spawn(out({ school: 'frost' }), 0);
+    expect(on(mount.childNodes[0])).toContain('fct-damage-done-frost');
+    expect(on(mount.childNodes[0])).not.toContain('fct-damage-done-ability');
+  });
+
+  it('flags a hit well above the running average as big, and not the routine ones', () => {
+    const { painter, mount, on } = vividPainter();
+    for (let i = 0; i < 6; i++) painter.spawn(out({ amount: 100 }), 0);
+    painter.spawn(out({ amount: 400, text: '400' }), 0);
+    const nodes = mount.childNodes;
+    for (const n of nodes.slice(0, 6)) expect(on(n)).not.toContain('fct-big');
+    expect(on(nodes[6])).toContain('fct-big');
+  });
+
+  it('never weighs a non-outgoing number into the baseline or flags it big', () => {
+    const { painter, mount, on } = vividPainter();
+    for (let i = 0; i < 6; i++) painter.spawn(out({ amount: 100 }), 0);
+    // A huge incoming number and heal carry an amount but are not outgoing hits.
+    painter.spawn({ ...evt({ kind: 'damage-taken', text: '-900' }), amount: 900 }, 0);
+    painter.spawn({ ...evt({ kind: 'heal', text: '+900' }), amount: 900 }, 0);
+    expect(on(mount.childNodes[6])).not.toContain('fct-big');
+    expect(on(mount.childNodes[7])).not.toContain('fct-big');
+    // The baseline stayed at 100, so a 200 outgoing hit is still big.
+    painter.spawn(out({ amount: 200 }), 0);
+    expect(on(mount.childNodes[8])).toContain('fct-big');
+  });
+
+  it('Classic Combat Text: no vivid class, no lane, no big flag, and the shipped colour token', () => {
+    const { painter, mount, on } = vividPainter(true);
+    for (let i = 0; i < 6; i++) painter.spawn(out({ amount: 100, school: 'fire' }), 0);
+    painter.spawn(out({ amount: 900, school: 'fire', crit: true }), 0);
+    for (const n of mount.childNodes) {
+      const classes = on(n);
+      expect(classes).not.toContain('fct-vivid');
+      expect(classes.filter((c) => c.startsWith('fct-out-'))).toEqual([]);
+      expect(classes).not.toContain('fct-big');
+      expect(classes).not.toContain('fct-damage-done-fire');
+      expect(classes).toContain('fct-damage-done-ability');
+    }
+  });
+
+  it('a recycled node drops the vivid classes when the player switches to classic', () => {
+    let classic = false;
+    const facet = recordingFacet();
+    const mount = fakeEl('div');
+    const painter = new FctPainter(
+      facet.writers,
+      mount as unknown as HTMLElement,
+      () => ({ x: 0, y: 0, behind: false }),
+      () => 1,
+      { cap: 1, doc: fakeDoc, random: () => 0.5, isClassic: () => classic },
+    );
+    painter.spawn(out(), 0);
+    const node = mount.childNodes[0];
+    painter.step(FCT_TTL_MS);
+    classic = true;
+    painter.spawn(out(), FCT_TTL_MS);
+    const last = (cls: string) =>
+      facet.calls.filter((c) => c.m === 'toggleClass' && c.el === node && c.args[0] === cls).at(-1)
+        ?.args[1];
+    expect(last('fct-vivid')).toBe(false);
+    for (const lane of ['l', 'r', 'll', 'rr']) expect(last(`fct-out-${lane}`)).toBe(false);
+  });
+
+  it('a beat-staged (held) outgoing hit keeps its school and amount through release', () => {
+    const { painter, mount, on } = vividPainter();
+    for (let i = 0; i < 6; i++) painter.spawn(out({ amount: 100 }), 0);
+    painter.spawn(out({ amount: 500, school: 'shadow', delaySec: 0.2 }), 0);
+    expect(painter.heldCount()).toBe(1);
+    painter.step(200);
+    const released = mount.childNodes[6];
+    expect(on(released)).toContain('fct-damage-done-shadow');
+    expect(on(released)).toContain('fct-big');
+  });
+
+  it('defaults to the vivid look when the document has no body (a Node host)', () => {
+    const facet = recordingFacet();
+    const mount = fakeEl('div');
+    const painter = new FctPainter(
+      facet.writers,
+      mount as unknown as HTMLElement,
+      () => ({ x: 0, y: 0, behind: false }),
+      () => 1,
+      { cap: 2, doc: fakeDoc, random: () => 0.5 },
+    );
+    painter.spawn(out(), 0);
+    expect(
+      facet.calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'fct-vivid' && c.args[1]),
+    ).toBe(true);
+  });
+});
+
+describe('classicCombatTextOn: reads the Classic Combat Text body class', () => {
+  const docWith = (classes: string[]) => ({
+    body: { classList: { contains: (c: string) => classes.includes(c) } },
+  });
+
+  it('is on only when the body carries classic-combat-text', () => {
+    expect(classicCombatTextOn(docWith(['classic-combat-text']))).toBe(true);
+    expect(classicCombatTextOn(docWith(['compact-chat']))).toBe(false);
+    expect(classicCombatTextOn({})).toBe(false);
+    expect(classicCombatTextOn({ body: null })).toBe(false);
+  });
+});
+
+describe('vivid combat text CSS contract', () => {
+  const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+  const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
+  const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+  // One @keyframes block, up to the next @keyframes / @media / top-level rule.
+  const keyframes = (sheet: string, name: string): string => {
+    const start = sheet.indexOf(`@keyframes ${name} {`);
+    expect(start, `@keyframes ${name}`).toBeGreaterThanOrEqual(0);
+    const rest = sheet.slice(start + 1);
+    const next = rest.search(/@keyframes|@media|\n {2}[.:a-z]/);
+    return next >= 0 ? rest.slice(0, next) : rest;
+  };
+
+  it('gives every school its own class and declared token', () => {
+    for (const school of ['fire', 'frost', 'nature', 'shadow', 'arcane', 'holy']) {
+      const cls = `.fct-damage-done-${school}`;
+      const at = css.indexOf(`${cls} {`);
+      expect(at, `${cls} in hud.css`).toBeGreaterThanOrEqual(0);
+      expect(css.slice(at, css.indexOf('}', at))).toContain(
+        `color: var(--color-fct-damage-done-${school})`,
+      );
+      expect(tokensCss).toMatch(new RegExp(`--color-fct-damage-done-${school}:\\s*#[0-9a-f]{6};`));
+    }
+  });
+
+  const LANES = ['l', 'r', 'll', 'rr'];
+
+  it('drives each fan-out lane from its own STATIC keyframes (no var() inside, compositor-safe)', () => {
+    for (const lane of LANES) {
+      expect(keyframes(css, `fct-out-${lane}`)).not.toContain('var(');
+      expect(keyframes(mobileCss, `fct-out-${lane}-mobile`)).not.toContain('var(');
+      expect(css).toMatch(
+        new RegExp(`\\.fct\\.fct-out-${lane} \\{\\s*animation-name: fct-out-${lane};`),
+      );
+    }
+    expect(keyframes(css, 'fct-vivid-crit')).not.toContain('var(');
+  });
+
+  it('holds full opacity past the midpoint before fading (the grey wash fix)', () => {
+    for (const lane of LANES)
+      expect(keyframes(css, `fct-out-${lane}`)).toMatch(/60% \{\s*opacity: 1;/);
+    expect(keyframes(css, 'fct-vivid-rise')).toMatch(/60% \{\s*opacity: 1;/);
+    expect(keyframes(css, 'fct-vivid-crit')).toMatch(/65% \{\s*opacity: 1;/);
+    expect(keyframes(mobileCss, 'fct-vivid-rise-mobile')).toMatch(/60% \{\s*opacity: 1;/);
+    expect(keyframes(mobileCss, 'fct-vivid-crit-mobile')).toMatch(/65% \{\s*opacity: 1;/);
+  });
+
+  it('keeps every new vivid keyframe static (no var() inside, compositor-safe)', () => {
+    expect(keyframes(css, 'fct-vivid-rise')).not.toContain('var(');
+    expect(keyframes(mobileCss, 'fct-vivid-rise-mobile')).not.toContain('var(');
+    expect(keyframes(mobileCss, 'fct-vivid-crit-mobile')).not.toContain('var(');
+  });
+
+  it('fits the low-tier vivid animations to the low floater life, so the fade is seen', () => {
+    // The painter recycles a low-tier floater at FCT_TTL_MS * FCT_TTL_SCALE_LOW; the vivid
+    // animations hold full opacity to 60%, so at full length they would be removed opaque.
+    const at = css.indexOf(':root[data-fx-level="low"]\n    .fct.fct-vivid:is(');
+    expect(at).toBeGreaterThan(0);
+    const block = css.slice(at, css.indexOf('}', at));
+    for (const cls of [
+      'fct-out-l',
+      'fct-out-r',
+      'fct-out-ll',
+      'fct-out-rr',
+      'crit',
+      'fct-damage-taken',
+      'fct-damage-taken-block',
+    ])
+      expect(block).toContain(`.${cls}`);
+    const seconds = Number(/animation-duration: ([\d.]+)s;/.exec(block)?.[1]);
+    expect(seconds * 1000).toBe(FCT_TTL_MS * FCT_TTL_SCALE_LOW);
+  });
+
+  it('never lets a vivid crit or incoming hit fall back to the fade-from-frame-one rise', () => {
+    // Low tier sheds only the pop: the vivid crit rides the hold-then-fade rise, and this
+    // rule must outrank the shipped `:root[data-fx-level="low"] .fct.crit` shed.
+    expect(css).toMatch(
+      /:root\[data-fx-level="low"\] \.fct\.fct-vivid\.crit \{\s*animation-name: fct-vivid-rise;/,
+    );
+    expect(mobileCss).toMatch(
+      /:root\[data-fx-level="low"\] body\.mobile-touch \.fct\.fct-vivid\.crit \{\s*animation-name: fct-vivid-rise-mobile;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.fct\.fct-vivid\.crit \{\s*animation-name: fct-vivid-crit-mobile;/,
+    );
+    // Incoming non-crit damage holds too; the :not(.crit) keeps an incoming crit's pop.
+    expect(css).toMatch(
+      /\.fct\.fct-vivid\.fct-damage-taken:not\(\.crit\),\s*\.fct\.fct-vivid\.fct-damage-taken-block:not\(\.crit\) \{\s*animation-name: fct-vivid-rise;/,
+    );
+  });
+
+  it('pops a crit in the centre: the crit rule is declared AFTER every lane rule it ties with', () => {
+    const critAt = css.indexOf('.fct.fct-vivid.crit {');
+    expect(critAt).toBeGreaterThan(0);
+    expect(css.slice(critAt, css.indexOf('}', critAt))).toContain(
+      'animation-name: fct-vivid-crit;',
+    );
+    for (const lane of LANES) expect(css.indexOf(`.fct.fct-out-${lane} {`)).toBeLessThan(critAt);
+    // The shipped low-tier shed (plain rise, no pop) still outranks the vivid crit.
+    expect(css).toMatch(/:root\[data-fx-level="low"\] \.fct\.crit \{\s*animation-name: fct-rise;/);
+  });
+
+  it('restates the fan-out on touch, where the mobile layer outranks hud.css', () => {
+    for (const lane of LANES)
+      expect(mobileCss).toMatch(
+        new RegExp(
+          `body\\.mobile-touch \\.fct\\.fct-out-${lane}:not\\(\\.crit\\) \\{[^}]*animation-name: fct-out-${lane}-mobile;`,
+        ),
+      );
+  });
+});
+
 describe('FCT colour tokens: each kind reads its byte-faithful semantic token', () => {
   const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
   const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');

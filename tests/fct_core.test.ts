@@ -22,6 +22,7 @@ import {
   type FctColorToken,
   type FctEvent,
   type FctKind,
+  fctSchoolOf,
   isDamageFctKind,
 } from '../src/ui/fct_core';
 
@@ -52,6 +53,7 @@ describe('describeFct: determinism (same input -> same output)', () => {
       anchor: { x: 10, y: 2 + FCT_ANCHOR_HEAD_OFFSET, z: -3 },
       jitterOffset: 0.37 * FCT_JITTER_RANGE - FCT_JITTER_RANGE / 2,
       ttlMs: FCT_TTL_MS,
+      outgoing: false,
     });
   });
 
@@ -257,5 +259,74 @@ describe('blockFctAmountText: the shield-block floater keeps the incoming/outgoi
   it('leaves an outgoing block unsigned, matching the damage-done floater convention', () => {
     expect(blockFctAmountText(12, false, false)).toBe('12');
     expect(blockFctAmountText(12, true, false)).toBe('12!');
+  });
+});
+
+describe('describeFct: vivid school colour, the Classic Combat Text override, outgoing flag', () => {
+  const SCHOOLS = ['fire', 'frost', 'nature', 'shadow', 'arcane', 'holy'] as const;
+
+  it('colours an outgoing spell hit by its school, for abilities and wand autos alike', () => {
+    for (const school of SCHOOLS) {
+      for (const kind of ['damage-done-ability', 'damage-done-auto'] as const) {
+        expect(describeFct(makeEvent({ kind, school }), 0.5).colorToken).toBe(
+          `damage-done-${school}`,
+        );
+      }
+    }
+  });
+
+  it('keeps physical (null school) on the shipped auto / ability tokens', () => {
+    for (const kind of ['damage-done-ability', 'damage-done-auto'] as const) {
+      expect(describeFct(makeEvent({ kind, school: null }), 0.5).colorToken).toBe(kind);
+      expect(describeFct(makeEvent({ kind }), 0.5).colorToken).toBe(kind);
+    }
+  });
+
+  it('drops the school colour under Classic Combat Text, leaving the rest of the descriptor alone', () => {
+    const event = makeEvent({ kind: 'damage-done-ability', school: 'fire' });
+    const classic = describeFct(event, 0.5, true);
+    expect(classic.colorToken).toBe('damage-done-ability');
+    expect({ ...classic, colorToken: null }).toEqual({
+      ...describeFct(event, 0.5),
+      colorToken: null,
+    });
+  });
+
+  it('never school-colours a non-outgoing kind (incoming damage stays hostile red)', () => {
+    for (const kind of ['damage-taken', 'damage-done-block', 'heal', 'absorb'] as const) {
+      expect(describeFct(makeEvent({ kind, school: 'frost' }), 0.5).colorToken).toBe(kind);
+    }
+  });
+
+  it('flags exactly the outgoing damage kinds as outgoing', () => {
+    const outgoing: FctKind[] = ['damage-done-ability', 'damage-done-auto', 'damage-done-block'];
+    const all: FctKind[] = [
+      ...outgoing,
+      'miss',
+      'dodge',
+      'resist',
+      'evade',
+      'damage-taken',
+      'damage-taken-block',
+      'absorb',
+      'heal',
+      'xp',
+      'rested-xp',
+      'honor',
+      'self-note',
+    ];
+    for (const kind of all) {
+      expect(describeFct(makeEvent({ kind }), 0.5).outgoing).toBe(outgoing.includes(kind));
+    }
+  });
+
+  it('fctSchoolOf narrows the six magic schools and rejects physical / unknown / empty', () => {
+    for (const school of SCHOOLS) expect(fctSchoolOf(school)).toBe(school);
+    expect(fctSchoolOf('physical')).toBeNull();
+    expect(fctSchoolOf('chaos')).toBeNull();
+    expect(fctSchoolOf('')).toBeNull();
+    expect(fctSchoolOf(null)).toBeNull();
+    expect(fctSchoolOf(undefined)).toBeNull();
+    expect(fctSchoolOf('toString')).toBeNull();
   });
 });
