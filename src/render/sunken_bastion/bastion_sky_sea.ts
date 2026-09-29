@@ -2,7 +2,7 @@
 // sinking behind torn fog cloud, lightning walking the far horizon over the
 // fen, rain curtains hanging under the storm), the fen-sea itself (a rolling
 // storm swell that foams white against every cliff foot and along the flats),
-// the fog lying on the water, rain in gusts around the camera, gulls wheeling
+// the fog lying on the water (the storm rain is bastion_rain.ts), gulls wheeling
 // over the headland, and the sea stacks and far coast that close the vista.
 //
 // All motion is shader-side on the shared clock (sharedUniforms.uTime): no
@@ -544,86 +544,6 @@ function buildWaterMist(opts: BastionAtmosphereOptions): THREE.Group {
   return group;
 }
 
-// ---- rain ------------------------------------------------------------------------------
-
-const RAIN_VERT = /* glsl */ `
-attribute vec3 aSeed;
-attribute float aEnd;
-uniform float uTime;
-uniform vec3 uBox;
-uniform vec2 uWind;
-varying float vAlpha;
-void main() {
-  // Each streak falls through a box that follows the camera.
-  float speed = 26.0 + aSeed.y * 10.0;
-  vec3 p = vec3(aSeed.x * uBox.x, 0.0, aSeed.z * uBox.z);
-  float fall = mod(aSeed.y * 97.0 - uTime * speed, uBox.y);
-  p.y = fall;
-  p.xz += uWind * (uBox.y - fall) * 0.25;
-  vec3 rel = mod(p - cameraPosition + uBox * 0.5, uBox) - uBox * 0.5;
-  vec3 world = cameraPosition + rel;
-  // The streak's tail trails up-wind of its head.
-  world += aEnd * vec3(-uWind.x * 0.06, 1.1, -uWind.y * 0.06);
-  // Gusts: the rain thickens and thins over the minute.
-  float gust = 0.35 + 0.65 * smoothstep(0.2, 0.9, sin(uTime * 0.11 + aSeed.x * 0.6) * 0.5 + 0.5);
-  float edge = 1.0 - smoothstep(0.3, 0.5, max(abs(rel.x) / uBox.x, abs(rel.z) / uBox.z));
-  vAlpha = edge * gust * step(aSeed.x * 0.9 + 0.1, gust + 0.2);
-  gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
-}
-`;
-
-const RAIN_FRAG = /* glsl */ `
-precision highp float;
-varying float vAlpha;
-void main() {
-  gl_FragColor = vec4(0.78, 0.84, 0.86, 0.32 * vAlpha);
-  #include <colorspace_fragment>
-}
-`;
-
-function buildRain(opts: BastionAtmosphereOptions): THREE.LineSegments {
-  const count = Math.round((opts.lowGfx ? 500 : 2200) * opts.density);
-  const pos = new Float32Array(count * 2 * 3);
-  const seeds = new Float32Array(count * 2 * 3);
-  const ends = new Float32Array(count * 2);
-  let s = 5;
-  const rnd = () => {
-    s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
-    return s / 0x100000000;
-  };
-  for (let i = 0; i < count; i++) {
-    const a = rnd();
-    const b = rnd();
-    const c = rnd();
-    for (let k = 0; k < 2; k++) {
-      seeds.set([a, b, c], (i * 2 + k) * 3);
-      ends[i * 2 + k] = k;
-    }
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 3));
-  geo.setAttribute('aEnd', new THREE.BufferAttribute(ends, 1));
-  const material = new THREE.ShaderMaterial({
-    name: 'sunkenBastionRain',
-    vertexShader: RAIN_VERT,
-    fragmentShader: RAIN_FRAG,
-    uniforms: {
-      uTime: sharedUniforms.uTime,
-      uBox: { value: new THREE.Vector3(70, 40, 70) },
-      uWind: { value: new THREE.Vector2(6, 3) },
-    },
-    transparent: true,
-    depthWrite: false,
-    fog: false,
-  });
-  const lines = new THREE.LineSegments(geo, material);
-  lines.name = 'sunkenBastionRain';
-  lines.frustumCulled = false;
-  lines.renderOrder = 18;
-  return lines;
-}
-
 // ---- gulls -----------------------------------------------------------------------------
 
 const GULL_VERT = /* glsl */ `
@@ -786,6 +706,5 @@ export function buildBastionSkySea(opts: BastionAtmosphereOptions): THREE.Group 
   group.add(buildWaterMist(opts));
   group.add(buildFogBanks(opts));
   group.add(buildGulls(opts));
-  if (!opts.lowGfx || opts.density > 0.3) group.add(buildRain(opts));
   return group;
 }

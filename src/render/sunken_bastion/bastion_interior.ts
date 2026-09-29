@@ -1,7 +1,7 @@
 // The Sunken Bastion's open-air interior: terrain from the authored field,
 // the headland rock under it, the Blender kit over its props, the gates and
-// seals, the lights, the standing water, the storm sky and the sea, and the
-// Fogbeacon. Built once per claimed slot the player approaches, attached
+// seals, the lights, the standing water, the storm sky and the sea, the storm
+// rain, and the Fogbeacon. Built once per claimed slot the player approaches, attached
 // through the renderer's compile gate (dungeon.ts), never removed.
 
 import * as THREE from 'three';
@@ -14,6 +14,7 @@ import { buildBastionBeacon } from './bastion_beacon';
 import { buildBastionGates } from './bastion_gates';
 import { buildBastionKit, ensureBastionKit } from './bastion_kit';
 import { buildBastionLights } from './bastion_lights';
+import { buildBastionRain } from './bastion_rain';
 import { buildHeadlandRock, buildSurfSpray } from './bastion_shore';
 import { buildBastionSkySea } from './bastion_sky_sea';
 import { buildBastionWater } from './bastion_water';
@@ -71,7 +72,9 @@ export async function buildSunkenBastionInterior(
   // Cosmetic density sheds with the effects tier (never a telegraph or the beam).
   const density = deps.lowGfx ? 0.35 : gfxTierAtLeast(GFX.effectsTier, 'high') ? 1 : 0.6;
   group.add(
-    tintBastionTerrain(buildAuthoredFieldTerrain(SUNKEN_BASTION_FIELD, { lowGfx: deps.lowGfx })),
+    tintBastionTerrain(
+      buildAuthoredFieldTerrain(SUNKEN_BASTION_FIELD, { lowGfx: deps.lowGfx, wet: true }),
+    ),
   );
   group.add(buildHeadlandRock(deps.lowGfx));
   group.add(buildBastionKit(ground, deps.lowGfx));
@@ -79,6 +82,7 @@ export async function buildSunkenBastionInterior(
   group.add(buildBastionWater(ground));
   buildBastionLights(group, deps, ground);
   group.add(buildBastionSkySea({ lowGfx: deps.lowGfx, density }));
+  group.add(buildBastionRain({ lowGfx: deps.lowGfx, density }));
   group.add(buildBastionBeacon(ox, oz, { lowGfx: deps.lowGfx, density }));
   if (!deps.lowGfx) group.add(buildSurfSpray(density));
   return group;

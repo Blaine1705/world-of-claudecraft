@@ -29,6 +29,9 @@ export interface FieldTerrainOptions {
   lowGfx: boolean;
   /** Longest top triangle edge; the low tier coarsens it. */
   maxEdge?: number;
+  /** Rain-soaked ground: the stone and soil tops take a wet sheen (lower
+   *  roughness), so the storm's light glints off the flags. */
+  wet?: boolean;
 }
 
 /** Build the ground of a field: tops (stone, soil) and cliffs, one mesh each. */
@@ -50,13 +53,13 @@ export function buildAuthoredFieldTerrain(
       map: stone.map,
       normalMap: opts.lowGfx ? undefined : stone.normalMap,
       vertexColors: true,
-      roughness: 0.93,
+      roughness: opts.wet ? 0.5 : 0.93,
     }),
     soil: surfaceMat({
       map: soil.map,
       normalMap: opts.lowGfx ? undefined : soil.normalMap,
       vertexColors: true,
-      roughness: 0.98,
+      roughness: opts.wet ? 0.72 : 0.98,
     }),
   };
   for (const family of ['stone', 'soil'] as const) {
