@@ -23,6 +23,7 @@ import { esc } from './esc';
 import { MASTERWORK_SEAL_IMAGE_URL } from './hud/professions/profession_art';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { itemCopyOwnName } from './item_copy_name_core';
 import { ITEM_QUALITY_LABEL_KEYS } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
 import { lootQualityTooltipLine } from './loot_quality_view';
@@ -150,11 +151,14 @@ export function instanceTitleHtml(
   defName: string,
 ): string {
   const color = itemNameColor({ kind: def.kind, quality: tooltipEffectiveQuality(def, instance) });
-  if (instance?.name === undefined) {
+  // A copy named for something its def cannot know (the World PvP trophy
+  // skull's "<name>'s Skull", item_copy_name_core.ts) titles like a named one.
+  const ownName = instance?.name ?? itemCopyOwnName(def, instance) ?? undefined;
+  if (ownName === undefined) {
     return `<div class="tt-title" style="color:${color}">${esc(defName)}</div>`;
   }
   return (
-    `<div class="tt-title" style="color:${color}">${esc(instance.name)}</div>` +
+    `<div class="tt-title" style="color:${color}">${esc(ownName)}</div>` +
     `<div class="tt-sub">${esc(defName)}</div>`
   );
 }
@@ -478,6 +482,9 @@ export function itemRequiredLevelLine(item: ItemDef, playerLevel: number): strin
  *  decided from the kind alone. */
 export function instanceMakersMarkLine(instance?: ItemInstancePayload, def?: ItemDef): string {
   if (!instance?.signer) return '';
+  // A trophy skull's signer is its victim, already named in the title: no
+  // "Crafted by" line (item_copy_name_core.ts).
+  if (def && itemCopyOwnName(def, instance) !== null) return '';
   if (isGatheredProvenance(def)) {
     return `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
       t('hudChrome.crafting.gatheredBy', { name: instance.signer }),

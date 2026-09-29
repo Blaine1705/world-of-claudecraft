@@ -3395,6 +3395,11 @@ export const hudChromeStrings = {
       'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
     aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
     stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
+    spoilsLine:
+      "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+    // One looted trophy skull (src/sim/pvp/world_pvp_spoils.ts): {name} is the
+    // defeated player's name, carried on the copy.
+    skullName: "{name}'s Skull",
     noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
     noTakeLine:
       'An unflagged fighter takes no gold either: it only moves between two flagged players.',

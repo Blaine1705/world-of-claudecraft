@@ -667,7 +667,7 @@ import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
 import { lootQualityReceiptBody } from './loot_quality_receipt';
-import { lootQualityAriaName } from './loot_quality_view';
+import { lootCopyAriaName } from './loot_quality_view';
 import { lootRollWinBanner } from './loot_roll_win_view';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
@@ -14029,7 +14029,7 @@ export class Hud {
     const link = document.createElement('span');
     link.className = 'chat-item-link';
     link.style.color = itemNameColor(item);
-    link.textContent = `[${lootQualityAriaName(itemDisplayName(item), instance)}]`;
+    link.textContent = `[${lootCopyAriaName(item, instance)}]`;
     link.tabIndex = 0;
     this.attachTooltip(link, () => this.itemTooltip(item, true, instance));
     parent.append(link);

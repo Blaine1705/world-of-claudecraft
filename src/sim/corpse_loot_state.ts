@@ -25,6 +25,14 @@ import { isHarvestableCorpse } from './professions/gathering';
 import { corpseHasDecayed } from './respawn_policy';
 import type { CorpseLoot, Entity } from './types';
 
+/** A dead body that holds loot someone may open: a mob corpse, or a player's
+ *  body holding World PvP spoils (src/sim/pvp/world_pvp_spoils.ts). The click
+ *  routes (src/game/interactions.ts) and the pick priority
+ *  (src/render/pick_resolution.ts) share this one answer. */
+export function isLootableBody(e: Pick<Entity, 'kind' | 'dead' | 'lootable'>): boolean {
+  return (e.kind === 'mob' || e.kind === 'player') && e.dead && e.lootable;
+}
+
 /** What the corpse indicator shows this viewer: ordinary loot they may take,
  *  else an open harvest, else nothing. Ordinary loot always wins the glyph. */
 export type CorpseIndicator = 'loot' | 'harvest' | 'none';

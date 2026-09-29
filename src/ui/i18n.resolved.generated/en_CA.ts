@@ -2802,6 +2802,8 @@ export const en_CA: EnTranslations = {
       "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
       "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
       "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
       "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
       "honorLine": "{honor} Honor per kill, split between everyone who helped.",
@@ -18933,6 +18935,9 @@ export const en_CA: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Emissary's Cache"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
       },
       "clue_scroll": {
         "name": "Clue Scroll"

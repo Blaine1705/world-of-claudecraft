@@ -2802,6 +2802,8 @@ export const nl_NL: EnTranslations = {
       "markLine": "Een ongvlagde speler aanvallen daar verhoogt je eigen vlag; een gevlagde aanvallen doet dat nooit.",
       "aidLine": "Het genezen, beschermen of sterken van een gevlagde speler in een wereldgevecht verhoogt je vlag.",
       "stakeLine": "De verliezer betaalt {cap} of {percent} van hun beurs, welke het minst is.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Een ongvlagde speler gedood op vrij-voor-iedereen grond verliest geen goud.",
       "noTakeLine": "Een ongvlagde vechter neemt ook geen goud: het beweegt alleen tussen twee gevlagde spelers.",
       "honorLine": "{honor} Eer per kill, verdeeld onder iedereen die hielp.",
@@ -18933,6 +18935,9 @@ export const nl_NL: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Voorraad van de Gezant"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
       },
       "clue_scroll": {
         "name": "Aanwijzingsrol"

@@ -2802,6 +2802,8 @@ export const id_ID: EnTranslations = {
       "markLine": "Menyerang pemain yang tidak naikkan bendera di sana akan menaikkan bendera mu sendiri; menyerang pemain yang sudah naikkan bendera hanya menahan mereka.",
       "aidLine": "Menyembuhkan, melindungi, atau memberi buff pada pemain yang sudah naikkan bendera di pertempuran dunia akan menaikkan bendera mu.",
       "stakeLine": "Yang kalah membayar {cap} atau {percent} dari kantong mereka, mana pun yang lebih kecil.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Pemain yang tidak naikkan bendera yang terbunuh di tanah bebas untuk semua tidak kehilangan emas.",
       "noTakeLine": "Pejuang yang tidak naikkan bendera juga tidak kehilangan emas: hanya bergerak antara dua pemain yang sudah naikkan bendera.",
       "honorLine": "{honor} Kehormatan per pembunuhan, dibagi antara semua orang yang membantu.",
@@ -18933,6 +18935,9 @@ export const id_ID: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Simpanan Utusan"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
       },
       "clue_scroll": {
         "name": "Gulir Petunjuk"

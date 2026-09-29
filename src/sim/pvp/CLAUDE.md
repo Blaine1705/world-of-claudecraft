@@ -54,6 +54,19 @@ ratings.
   dungeon, delve, arena or battleground floor. Pure and host-agnostic: the sim's
   hostility arm, the nameplate colour and the target frame read the same verdict
   for the same coordinates.
+- `world_pvp_spoils.ts` owns the World PvP DROP: when the victim and the
+  killing blow are both flagged, the kill resolution in `world_pvp.ts` hands the
+  blow's gold share to `placeWorldPvpSpoils`, which puts it on the victim's body
+  beside a `pvp_trophy_skull` copy signed with the victim's name (the client
+  reads it as "<name>'s Skull" through `src/ui/item_copy_name_core.ts`), tapped
+  to the killer so the ordinary corpse loot path takes it. `settleWorldPvpSpoils`
+  pays anything unlooted to the killer (or refunds the gold to the victim when
+  the killer is gone) the moment the body stops being one: `spirit.ts` calls it
+  on release and on every revive, and the zone pass sweeps any other exit
+  (`sweepWorldPvpSpoils`). The books row is `WorldPvpBooks.spoils` (victim pid
+  -> killer pid), bounded by the flagged players lying dead with spoils. It must
+  not import `bags.ts` (that module loads the material tables at import time,
+  before the content they derive from); the room check is `ctx.canAddItem`.
 - `world_pvp.ts` owns the World PvP SYSTEM behind the `SimContext` seam: the
   flag state (`PlayerMeta.worldPvp`, absent until first raised; `Entity.pvpFlag`
   is its display mirror and the ONLY writer is this module, the away.ts

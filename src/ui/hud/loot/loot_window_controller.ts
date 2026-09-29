@@ -6,10 +6,10 @@ import type { ItemInstancePayload } from '../../../sim/types';
 import { dist2d, type Entity, type ItemDef } from '../../../sim/types';
 import type { CorpseHarvestInfo, IWorld, WorldInteractionOutcome } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
-import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
+import { itemCopyDisplayName } from '../../item_copy_name_core';
 import { knownItemDef } from '../../known_item';
 import { lootQualityBadgeHtml } from '../../loot_quality_view';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -777,7 +777,7 @@ export class LootWindowController {
         ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
         : '';
     const qualityClass = item?.kind === 'quest' ? 'q-quest' : `q-${item?.quality ?? 'common'}`;
-    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}${lootQualityBadgeHtml(stack.instance, { labelled: true })}<span class="loot-item-name ${qualityClass}">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
+    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}${lootQualityBadgeHtml(stack.instance, { labelled: true })}<span class="loot-item-name ${qualityClass}">${esc(item ? itemCopyDisplayName(item, stack.instance) : stack.itemId)}${count}</span></div>`;
   }
 
   private attachItemTooltips(items: readonly LootWindowItemStack[]): void {

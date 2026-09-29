@@ -148,6 +148,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "pvp_trophy_skull",
+      "name": "Trophy Skull",
+      "sourcePack": "project-authored",
+      "sourceFile": "public/ui/items/restless_skull.webp (project-owned painted art), mirrored and re-lit with a crimson vignette by scripts/generate_pvp_trophy_skull_icon.mjs; deterministic Sharp composition, no image model",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "game_meat",
       "name": "Game Meat",
       "sourcePack": "woc_professions_art",

@@ -2802,6 +2802,8 @@ export const cs_CZ: EnTranslations = {
       "markLine": "Napadení hráče bez vlajky tam zvedne tvou vlastní vlajku; napadení hráče se zvednutou vlajkou ji nezvedne nikdy.",
       "aidLine": "Léčení, štítování nebo posilování hráče se zvednutou vlajkou ve světovém boji zvedne i tvou vlajku.",
       "stakeLine": "Poražený zaplatí {cap} nebo {percent} svého měšce, podle toho, co je méně.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "Hráč bez vlajky zabitý na volném území neztrácí žádné zlato.",
       "noTakeLine": "Bojovník bez vlajky také nezískává žádné zlato: to se přesouvá jen mezi dvěma hráči se zvednutou vlajkou.",
       "honorLine": "{honor} cti za zabití, rozděleno mezi všechny, kdo pomohli.",
@@ -18933,6 +18935,9 @@ export const cs_CZ: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Vyslancova skrýš"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
       },
       "clue_scroll": {
         "name": "Hádankový svitek"

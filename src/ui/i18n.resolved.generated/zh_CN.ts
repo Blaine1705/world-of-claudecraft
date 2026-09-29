@@ -2802,6 +2802,8 @@ export const zh_CN: EnTranslations = {
       "markLine": "在那里攻击未开启旗帜的玩家会升起你自己的旗帜；攻击已开启旗帜的玩家则永远不会。",
       "aidLine": "在世界战斗中为一名已开启旗帜的玩家治疗、上护盾或增益，会升起你自己的旗帜。",
       "stakeLine": "败者支付 {cap} 或其钱袋 {percent} 中较少的一项。",
+      "spoilsLine": "双方都开启 PvP 时，致命一击者的金币会与败者的头骨一同掉落在尸体上。",
+      "skullName": "{name}的头骨",
       "noStakeLine": "在自由混战地带被击杀的未开启旗帜玩家不会损失金币。",
       "noTakeLine": "未开启旗帜的战斗者同样不会获得金币：金币只在两名已开启旗帜的玩家之间转移。",
       "honorLine": "每次击杀获得 {honor} 点荣誉，由所有出力者平分。",
@@ -18933,6 +18935,9 @@ export const zh_CN: EnTranslations = {
       },
       "emissary_cache": {
         "name": "使者的宝箱"
+      },
+      "pvp_trophy_skull": {
+        "name": "战利品头骨"
       },
       "clue_scroll": {
         "name": "线索卷轴"
