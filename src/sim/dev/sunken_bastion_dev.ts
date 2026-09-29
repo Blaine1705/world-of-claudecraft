@@ -6,7 +6,7 @@
 //   /dev bastion enter [normal|heroic]   claim a fresh run and step in
 //   /dev bastion tp <area>               jump inside the run (enters first)
 //   /dev bastion gates                   open every gate and seal for this run
-//   /dev bastion kill <pack|boss|all>    kill a pack (f1 f2 fa f3 b1 b2 hermit
+//   /dev bastion kill <pack|boss|all>    kill a pack (f1 f2 fa fb f3 b1 b2 hermit bc
 //                                        r1 r2 rc g1 g2 g3 gd k1 k2 k3), a boss
 //                                        (olen, ossick, vael) or everything
 //   /dev bastion pack <pack>             jump to where a pack stands (or walks)
@@ -84,7 +84,7 @@ export const SUNKEN_BASTION_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev bastion enter [normal|heroic] | tp <landing|flats|seagate|bailey|chapelyard|cisternyard|drawbridge|rampart|towerone|towertwo|bastion|postern|gaol|yard|balconyone|balconytwo|court|crown> | gates | kill <f1|f2|fa|f3|b1|b2|hermit|r1|r2|rc|g1|g2|g3|gd|k1|k2|k3|olen|ossick|vael|all> | pack <id> | spawn <revenant|acolyte|watchman|arbalest|crawler|warhound|mistweaver|sergeant|prisoner|turnkey|hermit> | trigger <charge|hook|veil|surge> | reset';
+  '[dev] /dev bastion enter [normal|heroic] | tp <landing|flats|seagate|bailey|chapelyard|cisternyard|drawbridge|rampart|towerone|towertwo|bastion|postern|gaol|yard|balconyone|balconytwo|court|crown> | gates | kill <f1|f2|fa|fb|f3|b1|b2|hermit|bc|r1|r2|rc|g1|g2|g3|gd|k1|k2|k3|kc|olen|ossick|vael|all> | pack <id> | spawn <revenant|acolyte|watchman|arbalest|crawler|warhound|mistweaver|sergeant|prisoner|turnkey|hermit> | trigger <charge|hook|veil|surge> | reset';
 
 /** Raise one trash mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {

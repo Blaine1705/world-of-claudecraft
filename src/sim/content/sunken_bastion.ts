@@ -504,9 +504,10 @@ function patrolling(
 }
 
 // Pack ids read as <area><n>: f the flats, b the bailey, r the ramparts, g
-// the gaol, k the keep. Four patrols: fa the watch on the flats, hermit the
-// Turretback round the moat, rc the arbalests on the wall-walk, gd the turnkey
-// in the gaol yard.
+// the gaol, k the keep. Seven patrols: fa the watch on the flats, fb the
+// tideline hunters, hermit the Turretback round the moat, bc the bailey watch,
+// rc the arbalests on the wall-walk, gd the turnkey in the gaol yard, kc the
+// court hounds.
 
 /** Patrol A: three watchmen walking between the wrecks. */
 const FLATS_LOOP = [
@@ -521,19 +522,42 @@ const MOAT_LOOP = Array.from({ length: 12 }, (_, i) => {
   const r = (BAILEY_CHAPEL.island + BAILEY_CHAPEL.moat) / 2;
   return { x: BAILEY_CHAPEL.x + Math.sin(a) * r, z: BAILEY_CHAPEL.z + Math.cos(a) * r };
 });
-/** Patrol C: the wall-walk between the towers, on the walk's inner side. */
+/** Patrol C: a round of the wall-walk between the two towers, passing close
+ *  under both tower packs (it used to walk straight through them). */
 const RAMPART_LOOP = [
-  { x: 52, z: 16 },
-  { x: 54, z: 16 },
-  { x: 54, z: 92 },
-  { x: 52, z: 92 },
+  { x: 51, z: 51 },
+  { x: 51, z: 58 },
+  { x: 63, z: 58 },
+  { x: 63, z: 51 },
+];
+/** Patrol E: two crawlers and a warhound working the western flats, between
+ *  the wreck and the Sea Gate: in the way of the f1 pull and of the f3 pull. */
+const TIDELINE_LOOP = [
+  { x: -80, z: -146 },
+  { x: -40, z: -140 },
+  { x: -40, z: -150 },
+  { x: -78, z: -154 },
+];
+/** Patrol F: a watch of three walking the bailey's north lip, from the Chapel
+ *  Yard to the drawbridge ditch, passing over the Hermit's moat walk. */
+const BAILEY_WATCH = [
+  { x: -62, z: -52 },
+  { x: 40, z: -52 },
 ];
 /** Patrol D: the turnkey's round of the gaol yard. */
 const GAOL_LOOP = [
-  { x: -16, z: 74 },
-  { x: 16, z: 74 },
+  { x: -16, z: 76 },
+  { x: 16, z: 76 },
   { x: 16, z: 96 },
   { x: -16, z: 96 },
+];
+/** Patrol G: two warhounds circling the Keep Court's west half, beside the
+ *  court's last guard (k3). */
+const COURT_LOOP = [
+  { x: -72, z: 142 },
+  { x: -72, z: 168 },
+  { x: -62, z: 168 },
+  { x: -62, z: 142 },
 ];
 
 export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
@@ -552,6 +576,10 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
   patrolling('drowned_watchman', FLATS_LOOP, 'fa', 0),
   patrolling('drowned_watchman', FLATS_LOOP, 'fa', 3),
   patrolling('drowned_watchman', FLATS_LOOP, 'fa', 6),
+  // Patrol E: the tideline hunters, two crawlers and a warhound.
+  patrolling('barnacle_crawler', TIDELINE_LOOP, 'fb', 0),
+  patrolling('barnacle_crawler', TIDELINE_LOOP, 'fb', 2.5),
+  patrolling('bastion_warhound', TIDELINE_LOOP, 'fb', 5),
   // f3: before the Sea Gate. A sergeant and two revenants.
   held('drowned_sergeant', 0, -146, 'f3'),
   held('bastion_revenant', -5, -150, 'f3'),
@@ -570,6 +598,10 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
   held('bastion_warhound', 52, -96, 'b2', FACE_WEST),
   // Patrol B: the Turretback Hermit, round the moat.
   patrolling('turretback_hermit', MOAT_LOOP, 'hermit', 0, 0.35),
+  // Patrol F: the bailey watch, a watchman, an arbalest and a revenant.
+  patrolling('drowned_watchman', BAILEY_WATCH, 'bc', 0),
+  patrolling('fogbound_arbalest', BAILEY_WATCH, 'bc', 2.5),
+  patrolling('bastion_revenant', BAILEY_WATCH, 'bc', 5),
   // ---- The Rampart Walk ---------------------------------------------------------
   // r1: the first tower. Three arbalests at the crenels and their sergeant.
   held('drowned_sergeant', 61, 32, 'r1'),
@@ -640,6 +672,9 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
   held('drowned_watchman', -52, 167, 'k3', FACE_WEST),
   held('mistweaver', -42, 158, 'k3', FACE_WEST),
   held('tidebound_acolyte', -42, 166, 'k3', FACE_WEST),
+  // Patrol G: two warhounds circling the court.
+  patrolling('bastion_warhound', COURT_LOOP, 'kc', 0),
+  patrolling('bastion_warhound', COURT_LOOP, 'kc', 4),
   // Boss 3: Vael the Fogbinder on the Beacon Crown, north of the Fogbeacon.
   { mobId: 'vael_the_mistcaller', x: -4, z: 226, facing: FACE_SOUTH, idleStationary: true },
 ];
@@ -649,10 +684,12 @@ export const SUNKEN_BASTION_PACKS = [
   'f1',
   'f2',
   'fa',
+  'fb',
   'f3',
   'b1',
   'b2',
   'hermit',
+  'bc',
   'r1',
   'r2',
   'rc',
@@ -663,10 +700,11 @@ export const SUNKEN_BASTION_PACKS = [
   'k1',
   'k2',
   'k3',
+  'kc',
 ] as const;
 
-/** The four patrols (dev helpers, tests). */
-export const SUNKEN_BASTION_PATROLS = ['fa', 'hermit', 'rc', 'gd'] as const;
+/** The seven patrols (dev helpers, tests). */
+export const SUNKEN_BASTION_PATROLS = ['fa', 'fb', 'hermit', 'bc', 'rc', 'gd', 'kc'] as const;
 
 /** The three bosses, in route order. */
 export const SUNKEN_BASTION_BOSSES = [
@@ -691,7 +729,7 @@ export const SUNKEN_BASTION_GATES: DungeonGateDef[] = [
     z: -130,
     hw: 7.6,
     rot: 0,
-    packs: ['f1', 'f2', 'fa', 'f3'],
+    packs: ['f1', 'f2', 'fa', 'fb', 'f3'],
     openText: 'Chains shriek in the fog. The Sea Gate grinds open.',
   },
   {
@@ -702,7 +740,7 @@ export const SUNKEN_BASTION_GATES: DungeonGateDef[] = [
     z: -44,
     hw: 6,
     rot: 0,
-    packs: ['b1', 'b2', 'hermit'],
+    packs: ['b1', 'b2', 'hermit', 'bc'],
     openText: 'The drawbridge crashes down over the ditch.',
   },
   {
@@ -759,7 +797,7 @@ export const SUNKEN_BASTION_GATES: DungeonGateDef[] = [
     z: 180,
     hw: 6,
     rot: across(9, 12),
-    packs: ['k1', 'k2', 'k3'],
+    packs: ['k1', 'k2', 'k3', 'kc'],
     sealWhileEngaged: 'vael_the_mistcaller',
     openText: 'The fog on the beacon stair thins to nothing.',
   },

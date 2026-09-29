@@ -108,11 +108,11 @@ function openGates(dead: Set<string>): string[] {
 const OLEN = 'knight_commander_olen';
 const OSSICK = 'gaoler_ossick';
 const VAEL = 'vael_the_mistcaller';
-const FLATS = ['f1', 'f2', 'f3', 'fa'];
-const BAILEY = ['b1', 'b2', 'hermit'];
+const FLATS = ['f1', 'f2', 'f3', 'fa', 'fb'];
+const BAILEY = ['b1', 'b2', 'hermit', 'bc'];
 const RAMPART = ['r1', 'r2', 'rc'];
 const GAOL = ['g1', 'g2', 'g3', 'gd'];
-const KEEP = ['k1', 'k2', 'k3'];
+const KEEP = ['k1', 'k2', 'k3', 'kc'];
 
 /** Everything dead up to and including a stage. */
 function upTo(...stages: string[][]): Set<string> {
@@ -122,9 +122,11 @@ function upTo(...stages: string[][]): Set<string> {
 describe('Sunken Bastion route contract: every pack is mandatory', () => {
   beforeEach(() => clearDungeonGateStateForTest());
 
-  it('lists 13 groups plus 4 patrols, each a real pack of the spawn list', () => {
-    expect(SUNKEN_BASTION_PACKS).toHaveLength(17);
-    expect(SUNKEN_BASTION_PATROLS).toHaveLength(4);
+  it('lists 13 groups plus 7 patrols, each a real pack of the spawn list', () => {
+    expect(SUNKEN_BASTION_PACKS).toHaveLength(20);
+    expect(SUNKEN_BASTION_PATROLS).toHaveLength(7);
+    for (const p of SUNKEN_BASTION_PATROLS)
+      expect(SUNKEN_BASTION_PACKS as readonly string[]).toContain(p);
     const packs = new Set(SUNKEN_BASTION_SPAWNS.map((s) => s.packId));
     for (const p of SUNKEN_BASTION_PACKS) expect(packs.has(p), p).toBe(true);
     for (const p of SUNKEN_BASTION_PATROLS) {
@@ -132,11 +134,13 @@ describe('Sunken Bastion route contract: every pack is mandatory', () => {
       expect(members.length, p).toBeGreaterThan(0);
       for (const m of members) expect(m.patrol, `${p} ${m.mobId}`).toBeDefined();
     }
-    // Every group is three to five mobs (the showpiece patrols alone).
+    // Every group is three to five mobs, a patrol two or three (the
+    // showpiece Hermit patrols alone).
+    const patrols = new Set<string>(SUNKEN_BASTION_PATROLS);
     for (const p of SUNKEN_BASTION_PACKS) {
       const n = SUNKEN_BASTION_SPAWNS.filter((s) => s.packId === p).length;
       if (p === 'hermit') expect(n).toBe(1);
-      else expect(n, p).toBeGreaterThanOrEqual(3);
+      else expect(n, p).toBeGreaterThanOrEqual(patrols.has(p) ? 2 : 3);
       expect(n, p).toBeLessThanOrEqual(5);
     }
     // Every placed mob resolves.
@@ -159,7 +163,7 @@ describe('Sunken Bastion route contract: every pack is mandatory', () => {
     for (const p of [...RAMPART, OLEN]) expect(packs).not.toContain(p);
   });
 
-  it('the drawbridge needs both yards and the Turretback Hermit', () => {
+  it('the drawbridge needs both yards, the Turretback Hermit and the bailey watch', () => {
     for (const missing of BAILEY) {
       const dead = upTo(
         FLATS,
@@ -247,6 +251,48 @@ describe('Sunken Bastion route contract: every pack is mandatory', () => {
       }
     }
     expect(voidCells).toBe(0);
+  });
+
+  it('spreads the patrols across the route: at least one per open-air stage', () => {
+    const byStage: [string, string[]][] = [
+      ['flats', FLATS],
+      ['bailey', BAILEY],
+      ['rampart', RAMPART],
+      ['gaol', GAOL],
+      ['keep', KEEP],
+    ];
+    for (const [stage, packs] of byStage) {
+      const patrols = packs.filter((p) =>
+        (SUNKEN_BASTION_PATROLS as readonly string[]).includes(p),
+      );
+      expect(patrols.length, stage).toBeGreaterThanOrEqual(1);
+    }
+    // The flats and the bailey, the long open walks, carry two each.
+    for (const packs of [FLATS, BAILEY]) {
+      expect(
+        packs.filter((p) => (SUNKEN_BASTION_PATROLS as readonly string[]).includes(p)).length,
+      ).toBe(2);
+    }
+  });
+
+  it('keeps each patrol walk clear of the held packs (it passes them, never through them)', () => {
+    const held = SUNKEN_BASTION_SPAWNS.filter((s) => !s.patrol && s.packId);
+    for (const s of SUNKEN_BASTION_SPAWNS) {
+      if (!s.patrol) continue;
+      const pts = s.patrol.points;
+      let nearest = Infinity;
+      for (let i = 0; i < pts.length; i++) {
+        const a = pts[i];
+        const b = pts[(i + 1) % pts.length];
+        const steps = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.z - a.z)));
+        for (let k = 0; k <= steps; k++) {
+          const x = a.x + ((b.x - a.x) * k) / steps;
+          const z = a.z + ((b.z - a.z) * k) / steps;
+          for (const h of held) nearest = Math.min(nearest, Math.hypot(h.x - x, h.z - z));
+        }
+      }
+      expect(nearest, `${s.packId} ${s.mobId}`).toBeGreaterThanOrEqual(8);
+    }
   });
 
   it('every patrol loop stays on walkable ground, clear of props', () => {
