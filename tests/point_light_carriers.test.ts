@@ -502,6 +502,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/night_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/point_light_carriers.ts': 'the carriers themselves, the only lights three gathers',
+  'render/hollow_crypt/crypt_lights.ts':
+    'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
   'render/props.ts':
     'campfire and prop fire lights, the seed of the fireLights registry, mass hidden in the constructor',
   'render/quest_objects.ts':

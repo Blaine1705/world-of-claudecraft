@@ -136,6 +136,9 @@ const SURFACES: FieldSurface[] = [
   {
     kind: 'path',
     id: 'west_postern',
+    // The Bridge of Bone: walkable only once its gate opens, drawn by the
+    // gate visuals (it knits itself out of the mist on Sexton Marrow's death).
+    hidden: true,
     points: [
       [-66, 104, 8],
       [-60, 102, 8],

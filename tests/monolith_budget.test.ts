@@ -995,7 +995,10 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12687 with the Hollow Crypt rework: the gate object
+    // views (the Ignivar gates plus the in-dungeon gates) route through one
+    // plan and builder in src/render/gate_objects.ts. wc -l. Exact count.
+    ceiling: 12687,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -14,6 +14,9 @@ export type FieldGround = 'flagstone' | 'earth' | 'grave' | 'frost' | 'bone' | '
 
 interface FieldSurfaceBase {
   id: string;
+  /** Walkable, but drawn by its dungeon's own visuals (a bridge that only
+   *  exists once its gate opens), so the generic terrain skips it. */
+  hidden?: boolean;
   /** Dressing along the cliffs this surface stands ABOVE (default 'rock'). */
   edge?: FieldEdgeStyle;
   ground?: FieldGround;

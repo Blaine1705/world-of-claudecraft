@@ -26,6 +26,8 @@ export interface FieldCliffRun {
   nx: number;
   nz: number;
   style: FieldEdgeStyle;
+  /** The surface whose outline produced this run. */
+  surface: string;
 }
 
 const SAMPLE_STEP = 1;
@@ -97,6 +99,7 @@ export function authoredFieldCliffRuns(def: AuthoredFieldDef): FieldCliffRun[] {
           nx: nx * runSign,
           nz: nz * runSign,
           style: s.edge ?? 'rock',
+          surface: s.id,
         });
         runStart = -1;
       };

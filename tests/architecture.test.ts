@@ -793,6 +793,12 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
+  // The authored open-air field's terrain plan and the Hollow Crypt's dressing,
+  // set-dressing and gate-memory cores (docs/design/dungeon-rework).
+  'src/render/authored_field/field_mesh_core.ts',
+  'src/render/hollow_crypt/crypt_plan_core.ts',
+  'src/render/hollow_crypt/crypt_set_dressing_core.ts',
+  'src/render/hollow_crypt/crypt_gate_state_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',

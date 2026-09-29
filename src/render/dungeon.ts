@@ -90,6 +90,7 @@ import {
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
+import { buildHollowCryptInterior } from './hollow_crypt';
 import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
 import { buildIgnivarLavaMoat, ensureIgnivarLavaMoatAssets } from './ignivar_lava_moat';
 import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
@@ -652,12 +653,13 @@ export class DungeonInteriors {
     await ensureDungeonAssets();
     await ensureIgnivarRaidDressingAssets(interior);
     await ensureIgnivarTileAssets(interior, loadModuleAsset);
-    if (interior === 'wildheart') {
-      const group = buildWildheartFieldInterior({
-        lowGfx: this.lowGfx,
-        flames: this.flames,
-        fireLights: this.fireLights,
-      });
+    if (interior === 'wildheart' || interior === 'hollow_crypt') {
+      // Open-air fields: their own builders, same deps and compile gate.
+      const deps = { lowGfx: this.lowGfx, flames: this.flames, fireLights: this.fireLights };
+      const group =
+        interior === 'wildheart'
+          ? buildWildheartFieldInterior(deps)
+          : await buildHollowCryptInterior(deps, ox, oz);
       group.position.set(ox, 0, oz);
       group.userData.renderCategory = 'dungeon';
       await attachSceneGroupGated(this.scene, group, this.compileGate);

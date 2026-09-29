@@ -451,7 +451,8 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(returns).toBeGreaterThanOrEqual(3);
     expect(bareAdds).toBe(0);
     expect(gated).toBe(returns);
-    const wildheart = body.indexOf("if (interior === 'wildheart')");
+    // The open-air fields (Wildheart and the Hollow Crypt) share one arm.
+    const wildheart = body.indexOf("if (interior === 'wildheart' || interior === 'hollow_crypt')");
     expect(wildheart).toBeGreaterThan(-1);
     const wildheartArm = body.slice(wildheart, body.indexOf('return group;', wildheart));
     expect(wildheartArm).toContain(

@@ -30,6 +30,7 @@ export type FogSceneState =
   | 'rift'
   | 'practice'
   | 'wildheartField'
+  | 'hollowCrypt'
   | 'lastkeep'
   | 'dawnhold';
 
@@ -86,6 +87,21 @@ const WILDHEART_RIM_BOOST = 1.5;
 const WILDHEART_SUN_COLOR = 0xffd48c;
 const WILDHEART_HEMI_SKY_COLOR = 0xd8ebca;
 const WILDHEART_HEMI_GROUND_COLOR = 0x5b4a2d;
+// The Hollow Crypt: an OPEN-AIR necropolis under a vast moon. It hides the
+// world's day-night dome (its own moonlit sky rides the interior group, so the
+// look never depends on the realm's clock) and grades the one sun into a cold
+// moon key from behind the crag, with a violet sky bounce and an umber floor
+// bounce so the tallow lanterns carry the only warm tones.
+const HOLLOW_CRYPT_SUN_INTENSITY = 1.55;
+const HOLLOW_CRYPT_HEMI_INTENSITY = 1.05;
+const HOLLOW_CRYPT_ENV_INTENSITY = 0.16;
+const HOLLOW_CRYPT_RIM_BOOST = 2.1;
+const HOLLOW_CRYPT_SUN_COLOR = 0xa8bfff;
+const HOLLOW_CRYPT_HEMI_SKY_COLOR = 0x5a64a0;
+const HOLLOW_CRYPT_HEMI_GROUND_COLOR = 0x2e2533;
+/** Where the moon hangs (from the ground toward it): north-north-west over
+ *  the crag, low enough to throw long shadows toward the entrance. */
+export const HOLLOW_CRYPT_MOON_DIRECTION = new THREE.Vector3(-0.32, 0.46, 0.83).normalize();
 // The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
 // ambient floor (over the candle-orange torch lights the interior itself
 // carries) so its halls read golden and inhabited while staying indoors-dim.
@@ -132,6 +148,10 @@ export interface OutdoorLightLegs {
 /** Copy the state's own key-light direction into `out` when it has one; the
  *  outdoor sun and moon keep theirs otherwise. Returns whether it did. */
 export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vector3): boolean {
+  if (state === 'hollowCrypt') {
+    out.copy(HOLLOW_CRYPT_MOON_DIRECTION);
+    return true;
+  }
   if (state !== 'wildheartField') return false;
   out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
   return true;
@@ -150,6 +170,7 @@ export function applyInteriorLightRig(
 ): void {
   const mazeNight = state === 'yumiMaze';
   const wildheartSun = state === 'wildheartField';
+  const cryptMoon = state === 'hollowCrypt';
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
   const ignivarForge = state === 'ignivarApproach' || state === 'ignivar' || state === 'varkhul';
@@ -161,48 +182,56 @@ export function applyInteriorLightRig(
     state === 'delve';
   targets.sun.intensity = mazeNight
     ? YUMI_MAZE_SUN_INTENSITY
-    : wildheartSun
-      ? WILDHEART_SUN_INTENSITY
-      : keepHearth
-        ? LASTKEEP_SUN_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_SUN_INTENSITY
-          : underground
-            ? DUNGEON_SUN_INTENSITY
-            : outdoor.sunIntensity;
+    : cryptMoon
+      ? HOLLOW_CRYPT_SUN_INTENSITY
+      : wildheartSun
+        ? WILDHEART_SUN_INTENSITY
+        : keepHearth
+          ? LASTKEEP_SUN_INTENSITY
+          : dawnholdDay
+            ? DAWNHOLD_SUN_INTENSITY
+            : underground
+              ? DUNGEON_SUN_INTENSITY
+              : outdoor.sunIntensity;
   targets.hemi.intensity = mazeNight
     ? YUMI_MAZE_HEMI_INTENSITY
-    : wildheartSun
-      ? WILDHEART_HEMI_INTENSITY
-      : keepHearth
-        ? LASTKEEP_HEMI_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_HEMI_INTENSITY
-          : underground
-            ? DUNGEON_HEMI_INTENSITY
-            : outdoor.hemiIntensity;
+    : cryptMoon
+      ? HOLLOW_CRYPT_HEMI_INTENSITY
+      : wildheartSun
+        ? WILDHEART_HEMI_INTENSITY
+        : keepHearth
+          ? LASTKEEP_HEMI_INTENSITY
+          : dawnholdDay
+            ? DAWNHOLD_HEMI_INTENSITY
+            : underground
+              ? DUNGEON_HEMI_INTENSITY
+              : outdoor.hemiIntensity;
   targets.scene.environmentIntensity = mazeNight
     ? YUMI_MAZE_ENV_INTENSITY
-    : wildheartSun
-      ? WILDHEART_ENV_INTENSITY
-      : keepHearth
-        ? LASTKEEP_ENV_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_ENV_INTENSITY
-          : underground
-            ? DUNGEON_ENV_INTENSITY
-            : outdoor.envIntensity;
+    : cryptMoon
+      ? HOLLOW_CRYPT_ENV_INTENSITY
+      : wildheartSun
+        ? WILDHEART_ENV_INTENSITY
+        : keepHearth
+          ? LASTKEEP_ENV_INTENSITY
+          : dawnholdDay
+            ? DAWNHOLD_ENV_INTENSITY
+            : underground
+              ? DUNGEON_ENV_INTENSITY
+              : outdoor.envIntensity;
   targets.rim.value = mazeNight
     ? YUMI_MAZE_RIM_BOOST
-    : wildheartSun
-      ? WILDHEART_RIM_BOOST
-      : keepHearth
-        ? LASTKEEP_RIM_BOOST
-        : dawnholdDay
-          ? DAWNHOLD_RIM_BOOST
-          : underground
-            ? DUNGEON_RIM_BOOST
-            : 1;
+    : cryptMoon
+      ? HOLLOW_CRYPT_RIM_BOOST
+      : wildheartSun
+        ? WILDHEART_RIM_BOOST
+        : keepHearth
+          ? LASTKEEP_RIM_BOOST
+          : dawnholdDay
+            ? DAWNHOLD_RIM_BOOST
+            : underground
+              ? DUNGEON_RIM_BOOST
+              : 1;
   // The rim tint defaults cool everywhere; the forge applier below re-grades
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
@@ -211,7 +240,11 @@ export function applyInteriorLightRig(
   // crucible have other hands dressing them); zeroed by every other settle
   // (same restore pattern as the rim tint).
   sharedUniforms.uRoofDarkStrength.value = state === 'ignivarApproach' ? 1 : 0;
-  if (wildheartSun) {
+  if (cryptMoon) {
+    targets.sun.color.setHex(HOLLOW_CRYPT_SUN_COLOR);
+    targets.hemi.color.setHex(HOLLOW_CRYPT_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(HOLLOW_CRYPT_HEMI_GROUND_COLOR);
+  } else if (wildheartSun) {
     targets.sun.color.setHex(WILDHEART_SUN_COLOR);
     targets.hemi.color.setHex(WILDHEART_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(WILDHEART_HEMI_GROUND_COLOR);

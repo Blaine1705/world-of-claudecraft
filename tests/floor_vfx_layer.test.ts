@@ -100,6 +100,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // A Buried Hoard boss room's additive floor light under its kit props, kept on
   // the order it shipped with (2, the ground band's second rung).
   { file: 'src/render/hoard_room_kit.ts', layer: 'ground', strict: true },
+  // The Hollow Crypt's torch pools and the soul column's floor pool: the world's
+  // own light on the ring floor, under every telegraph Morthen will paint.
+  { file: 'src/render/hollow_crypt/crypt_lights.ts', layer: 'ground', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },
@@ -241,6 +244,10 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/weather.ts',
   'src/render/wildheart_props.ts',
   'src/render/wildheart_terrain.ts',
+  // The Hollow Crypt's sky and air: the mist sea far below every terrace, the
+  // vertical soul column, wisps, dust and moonbeams (no floor mark; its floor
+  // pool lives in crypt_lights.ts on the ground rung).
+  'src/render/hollow_crypt/crypt_atmosphere.ts',
   // battleground objective marks and world markers far from any raid floor
   'src/render/battleground.ts',
   'src/render/battleground_fx.ts',

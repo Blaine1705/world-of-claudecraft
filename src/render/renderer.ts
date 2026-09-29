@@ -377,6 +377,7 @@ import { FrozenOrbFx, handleFrozenOrbSpellfxEvent } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
+import { buildGateObject, gateObjectPlan } from './gate_objects';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
 import {
@@ -424,7 +425,6 @@ import {
 } from './ignivar_conduit';
 import { ignivarBossFacingLocked } from './ignivar_encounter_core';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
-import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
 import { damageContact } from './impact_contact';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
@@ -7799,10 +7799,9 @@ export class Renderer {
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
     // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
     // bodies (handled in the next branch).
-    const raidGatePlan =
-      e.kind === 'object' ? ignivarRaidGatePlan(e.templateId, e.dungeonId) : null;
+    const raidGatePlan = e.kind === 'object' ? gateObjectPlan(e) : null;
     if (raidGatePlan) {
-      body = buildIgnivarRaidGate(raidGatePlan);
+      body = buildGateObject(raidGatePlan);
       height = raidGatePlan.height;
       objectMesh = body;
     } else if (

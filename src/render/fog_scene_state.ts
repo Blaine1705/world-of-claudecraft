@@ -14,6 +14,9 @@ import { waterLevelAt } from '../sim/world';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import type { FogSceneState } from './interior_light_rig';
 
+/** The Hollow Crypt's night fog colour (its sky dome fades to it at the horizon). */
+export const HOLLOW_CRYPT_FOG_COLOR = 0x1c2238;
+
 export interface FogSceneResolution {
   /** The named dungeon interior the player stands in (null/undefined in the
    *  open world, a delve, the maze, a battleground, or the arena). */
@@ -49,6 +52,9 @@ export function resolveFogScene(
   // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
   // sky dome and the daylight rig and only swaps in its own field haze.
   const inWildheartField = interior === 'wildheart';
+  // The Hollow Crypt is open-air too, but at night under its OWN sky: the
+  // world dome hides and the interior group carries the moonlit sky.
+  const inHollowCrypt = interior === 'hollow_crypt';
   const inLastKeep = interior === 'lastkeep';
   const inDawnhold = interior === 'dawnhold';
   const desired: FogSceneState = inDelve
@@ -65,15 +71,17 @@ export function resolveFogScene(
               ? ignivarRaidFogState
               : inWildheartField
                 ? 'wildheartField'
-                : inLastKeep
-                  ? 'lastkeep'
-                  : inDawnhold
-                    ? 'dawnhold'
-                    : inside
-                      ? 'dungeon'
-                      : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                        ? 'underwater'
-                        : 'outdoor';
+                : inHollowCrypt
+                  ? 'hollowCrypt'
+                  : inLastKeep
+                    ? 'lastkeep'
+                    : inDawnhold
+                      ? 'dawnhold'
+                      : inside
+                        ? 'dungeon'
+                        : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                          ? 'underwater'
+                          : 'outdoor';
   return { interior, desired };
 }
 
@@ -115,6 +123,13 @@ export function applyFogScenePreset(
     fog.color.setHex(0x8ca786);
     fog.near = 105;
     fog.far = 430;
+  } else if (desired === 'hollowCrypt') {
+    // Night air over the grave-mist: a deep blue-violet veil pushed far back
+    // so the whole necropolis and the ritual column read from the landing,
+    // while the far crag settles into silhouette against the sky.
+    fog.color.setHex(HOLLOW_CRYPT_FOG_COLOR);
+    fog.near = 70;
+    fog.far = 460;
   } else if (desired === 'lastkeep') {
     // The Last Keep: a warm hearth-lit haze pushed well back, so its
     // grand three-story halls read golden and inhabited instead of
