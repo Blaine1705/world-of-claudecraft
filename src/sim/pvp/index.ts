@@ -159,7 +159,9 @@ export {
 export {
   isWorldPvpSkullCopy,
   placeWorldPvpSpoils,
+  settleAllWorldPvpSpoils,
   settleWorldPvpSpoils,
+  settleWorldPvpSpoilsOnLeave,
   sweepWorldPvpSpoils,
   WORLD_PVP_SKULL_ITEM_ID,
   worldPvpSkullInstance,

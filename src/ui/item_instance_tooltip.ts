@@ -17,6 +17,7 @@ import type { MaterialComposition } from '../sim/material_sources';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
 import { LEGENDARY_PROMOTION_COST, PERFECTING_RANKS } from '../sim/professions/perfecting';
+import { isWorldPvpSkullCopy } from '../sim/pvp/world_pvp_spoils';
 import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
 import { durationText } from './duration_text';
 import { esc } from './esc';
@@ -153,7 +154,7 @@ export function instanceTitleHtml(
   const color = itemNameColor({ kind: def.kind, quality: tooltipEffectiveQuality(def, instance) });
   // A copy named for something its def cannot know (the World PvP trophy
   // skull's "<name>'s Skull", item_copy_name_core.ts) titles like a named one.
-  const ownName = instance?.name ?? itemCopyOwnName(def, instance) ?? undefined;
+  const ownName = itemCopyOwnName(def, instance) ?? undefined;
   if (ownName === undefined) {
     return `<div class="tt-title" style="color:${color}">${esc(defName)}</div>`;
   }
@@ -484,7 +485,7 @@ export function instanceMakersMarkLine(instance?: ItemInstancePayload, def?: Ite
   if (!instance?.signer) return '';
   // A trophy skull's signer is its victim, already named in the title: no
   // "Crafted by" line (item_copy_name_core.ts).
-  if (def && itemCopyOwnName(def, instance) !== null) return '';
+  if (def && isWorldPvpSkullCopy(def.id, instance)) return '';
   if (isGatheredProvenance(def)) {
     return `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
       t('hudChrome.crafting.gatheredBy', { name: instance.signer }),

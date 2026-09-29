@@ -13,8 +13,8 @@
 // deliberately NOT built here: the painter asks its PainterHost `itemIcon`
 // dep with the quality this returns, so the icon seam stays injected.
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
-import { itemDisplayName } from './entity_i18n';
 import { QUALITY_COLOR } from './icons';
+import { itemCopyDisplayName } from './item_copy_name_core';
 import { tooltipEffectiveQuality } from './item_instance_tooltip';
 import { lootQualityAriaName, lootQualityBadgeHtml } from './loot_quality_view';
 
@@ -46,10 +46,13 @@ export function wornItemCellParts(
 ): WornItemCellParts {
   const quality = tooltipEffectiveQuality(item, instance ?? undefined);
   return {
-    name: instance?.name ?? itemDisplayName(item),
+    name: itemCopyDisplayName(item, instance ?? undefined),
     qualityBadge: lootQualityBadgeHtml(instance ?? undefined),
     qualityBadgeLabelled: lootQualityBadgeHtml(instance ?? undefined, { labelled: true }),
-    ariaName: lootQualityAriaName(instance?.name ?? itemDisplayName(item), instance ?? undefined),
+    ariaName: lootQualityAriaName(
+      itemCopyDisplayName(item, instance ?? undefined),
+      instance ?? undefined,
+    ),
     quality,
     color: QUALITY_COLOR[quality ?? 'common'] ?? QUALITY_COLOR.common,
   };

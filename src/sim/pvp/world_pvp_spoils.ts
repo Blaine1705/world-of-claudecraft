@@ -101,9 +101,11 @@ function clearSpoils(victim: Entity): void {
 
 /**
  * Settle a body's spoils: whatever the killer has not looted yet goes to them
- * now (the gold with the ordinary loot line, the skull when it fits their
- * bags), or, with the killer gone from the world, the gold returns to the
- * victim. A no-op for a player with no spoils row. Idempotent.
+ * now (the gold with the ordinary loot line and the same looted-gold tally a
+ * corpse take books, the skull when it fits their bags; a skull that does not
+ * fit is left behind, as full bags leave any corpse loot behind), or, with the
+ * killer gone or leaving the world, the gold returns to the victim. A no-op for
+ * a player with no spoils row. Idempotent.
  */
 export function settleWorldPvpSpoils(ctx: SimContext, victimId: number): void {
   const books = ctx.worldPvpBooks;
@@ -116,13 +118,15 @@ export function settleWorldPvpSpoils(ctx: SimContext, victimId: number): void {
   clearSpoils(victim);
   if (!loot) return;
   const killerMeta = ctx.players.get(killerId);
-  if (!killerMeta || !ctx.entities.has(killerId)) {
+  if (!killerMeta || killerMeta.leaving || !ctx.entities.has(killerId)) {
     const victimMeta = ctx.players.get(victimId);
     if (victimMeta && loot.copper > 0) victimMeta.copper += loot.copper;
     return;
   }
   if (loot.copper > 0) {
     killerMeta.copper += loot.copper;
+    killerMeta.counters.lootCopper += loot.copper;
+    ctx.bumpDeedStat(killerMeta, 'lootCopper', loot.copper);
     ctx.emit({ type: 'loot', text: `You loot ${formatMoney(loot.copper)}.`, pid: killerId });
   }
   let bagsFull = false;
@@ -141,9 +145,34 @@ export function settleWorldPvpSpoils(ctx: SimContext, victimId: number): void {
   if (bagsFull) ctx.error(killerId, 'Your bags are full.');
 }
 
+/**
+ * A player is leaving the world (Sim.preparePlayerLeave, before the leave
+ * snapshot, and Sim.removePlayer for hosts without that hook): settle their
+ * own body if it holds spoils (the killer is paid while the victim's save
+ * still has to be written), and every body holding THEIR spoils (paid into
+ * their purse now, so the leave snapshot carries it). Without this a victim
+ * who logs out dead turns the stake into a gold sink. Bounded by the bodies
+ * holding spoils.
+ */
+export function settleWorldPvpSpoilsOnLeave(ctx: SimContext, pid: number): void {
+  const books = ctx.worldPvpBooks;
+  if (books.spoils.size === 0) return;
+  settleWorldPvpSpoils(ctx, pid);
+  for (const [victimId, killerId] of [...books.spoils]) {
+    if (killerId === pid) settleWorldPvpSpoils(ctx, victimId);
+  }
+}
+
+/** Settle every body holding spoils (the realm's graceful shutdown, before its
+ *  final save: spoils live only in memory, so an unsettled body would take its
+ *  gold down with the process). */
+export function settleAllWorldPvpSpoils(ctx: SimContext): void {
+  for (const victimId of [...ctx.worldPvpBooks.spoils.keys()]) settleWorldPvpSpoils(ctx, victimId);
+}
+
 /** The zone-pass safety net: settle every body that stopped being one by a
- *  route that did not settle it itself (a revive path outside spirit.ts, a
- *  body removed from the world). Bounded by the bodies holding spoils. */
+ *  route that did not settle it itself (a revive path outside spirit.ts).
+ *  Bounded by the bodies holding spoils. */
 export function sweepWorldPvpSpoils(ctx: SimContext): void {
   const books = ctx.worldPvpBooks;
   if (books.spoils.size === 0) return;

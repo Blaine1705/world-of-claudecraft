@@ -7,9 +7,11 @@
 // or destroyed (release, revive, the zone-pass sweep, a departed killer, full
 // bags, a second death before the sweep).
 import { describe, expect, it } from 'vitest';
+import { corpseIndicatorFor } from '../src/sim/corpse_loot_state';
 import { BUILTIN_WORLD, ITEMS, ZONES } from '../src/sim/data';
 import {
   isWorldPvpSkullCopy,
+  settleAllWorldPvpSpoils,
   WORLD_PVP_SKULL_ITEM_ID,
   WORLD_PVP_STAKE_CAP_COPPER,
   worldPvpSpoilsLine,
@@ -342,14 +344,23 @@ describe('who may take it', () => {
     expect(sim.worldPvpBooks.spoils.get(b)).toBe(c);
   });
 
-  it('a killer who left the world forfeits: the gold returns to the victim, no gold is destroyed', () => {
+  it('a killer removed from the world is paid on the way out; a killer already gone refunds the victim', () => {
     const { sim, a, b } = duel();
     slay(sim, a, b);
     expect(sim.meta(b)!.copper).toBe(18_000);
+    const killer = sim.meta(a)!;
     sim.removePlayer(a);
-    sim.releaseSpirit(b);
-    expect(sim.meta(b)!.copper).toBe(20_000);
+    expect(killer.copper).toBe(2_000); // settled into the leaving purse
     expect(ent(sim, b).loot).toBeNull();
+    sim.releaseSpirit(b);
+    expect(sim.meta(b)!.copper).toBe(18_000);
+    // A killer missing at settle time (no leave hook ran): the gold goes home.
+    const { sim: s2, a: k, b: v } = duel();
+    slay(s2, k, v);
+    s2.players.delete(k);
+    s2.releaseSpirit(v);
+    expect(s2.meta(v)!.copper).toBe(20_000);
+    expect(ent(s2, v).loot).toBeNull();
   });
 
   it('full bags on settle keep the gold flowing and say so for the skull', () => {
@@ -394,6 +405,102 @@ describe('who may take it', () => {
       ['Bet', 2],
       ['Gimel', 1],
     ]);
+  });
+});
+
+describe('review hardening: rights, leave, shutdown, the interact key, the icon', () => {
+  it("the killer's party mate can open neither the gold nor the skull, and sees no loot icon", () => {
+    const { sim, a, b } = duel();
+    const mate = fighter(sim, 'Hey', 1005, 1);
+    sim.partyInvite(mate, a);
+    sim.partyAccept(mate);
+    expect(sim.partyOf(a)?.members).toContain(mate);
+    slay(sim, a, b);
+    expect(sim.lootCorpse(b, mate)).toBe(false);
+    expect(sim.meta(mate)!.copper).toBe(0);
+    expect(ent(sim, b).loot?.copper).toBe(2_000);
+    const party = sim.partyOf(a)!.members;
+    expect(corpseIndicatorFor(ent(sim, b), mate, party)).toBe('none');
+    expect(corpseIndicatorFor(ent(sim, b), a, party)).toBe('loot');
+    expect(corpseIndicatorFor(ent(sim, b), 9_999, null)).toBe('none');
+    // A plain dead player (no spoils) never shows the icon.
+    sim.lootCorpse(b, a);
+    expect(corpseIndicatorFor(ent(sim, b), a, party)).toBe('none');
+  });
+
+  it('the interact key loots a targeted body, like a corpse', () => {
+    const { sim, a, b } = duel();
+    slay(sim, a, b);
+    sim.targetEntity(b, a);
+    sim.interact(a);
+    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(skullsOf(sim, a)).toHaveLength(1);
+  });
+
+  it('a standing player is never lootable, even with a stale spoils row', () => {
+    const { sim, a, b } = duel();
+    slay(sim, a, b);
+    const body = ent(sim, b);
+    body.dead = false; // stood up by a route that did not settle, before the sweep
+    expect(sim.lootCorpse(b, a)).toBe(false);
+    expect(sim.meta(a)!.copper).toBe(0);
+    tickSeconds(sim, 1);
+    expect(sim.meta(a)!.copper).toBe(2_000);
+  });
+
+  it('a victim who logs out dead pays the killer before leaving (no gold sink)', () => {
+    const { sim, a, b } = duel();
+    slay(sim, a, b);
+    sim.preparePlayerLeave(b);
+    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(skullsOf(sim, a)).toHaveLength(1);
+    sim.removePlayer(b);
+    tickSeconds(sim, 1);
+    expect(sim.meta(a)!.copper).toBe(2_000);
+    // A host without the prepare hook (offline, headless) settles on removal.
+    const { sim: s2, a: k, b: v } = duel();
+    slay(s2, k, v);
+    s2.removePlayer(v);
+    expect(s2.meta(k)!.copper).toBe(2_000);
+  });
+
+  it('a killer who logs out is paid into the purse their leave snapshot saves', () => {
+    const { sim, a, b } = duel();
+    slay(sim, a, b);
+    sim.preparePlayerLeave(a);
+    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(ent(sim, b).loot).toBeNull();
+    // A settle that lands while the killer is already leaving refunds the victim.
+    const { sim: s2, a: k, b: v } = duel();
+    slay(s2, k, v);
+    s2.meta(k)!.leaving = true;
+    s2.releaseSpirit(v);
+    expect(s2.meta(k)!.copper).toBe(0);
+    expect(s2.meta(v)!.copper).toBe(20_000);
+  });
+
+  it('a graceful shutdown settles every body before the final save', () => {
+    const { sim, a, b } = duel();
+    const c = fighter(sim, 'Gimel', 1003, 4);
+    flag(sim, c);
+    sim.meta(c)!.copper = 20_000;
+    slay(sim, a, b);
+    hit(sim, a, c);
+    slay(sim, a, c);
+    settleAllWorldPvpSpoils(sim.ctx);
+    expect(sim.meta(a)!.copper).toBe(4_000);
+    expect(sim.worldPvpBooks.spoils.size).toBe(0);
+  });
+
+  it('gold settled off the body books the same looted-gold tally as a corpse take', () => {
+    const looted = duel();
+    slay(looted.sim, looted.a, looted.b);
+    looted.sim.lootCorpse(looted.b, looted.a);
+    const settled = duel();
+    slay(settled.sim, settled.a, settled.b);
+    settled.sim.releaseSpirit(settled.b);
+    expect(settled.sim.meta(settled.a)!.counters.lootCopper).toBe(2_000);
+    expect(looted.sim.meta(looted.a)!.counters.lootCopper).toBe(2_000);
   });
 });
 

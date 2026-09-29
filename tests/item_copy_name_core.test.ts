@@ -7,12 +7,14 @@ import { ITEMS } from '../src/sim/data';
 import { emitInventoryReceipt } from '../src/sim/inventory_receipt';
 import { WORLD_PVP_SKULL_ITEM_ID, worldPvpSkullInstance } from '../src/sim/pvp';
 import type { ItemInstancePayload, SimEvent } from '../src/sim/types';
+import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { t } from '../src/ui/i18n';
 import { itemCopyDisplayName, itemCopyOwnName } from '../src/ui/item_copy_name_core';
 import { instanceMakersMarkLine, instanceTitleHtml } from '../src/ui/item_instance_tooltip';
 import { lootQualityReceiptBody, lootQualityReceiptText } from '../src/ui/loot_quality_receipt';
 import { lootCopyAriaName } from '../src/ui/loot_quality_view';
+import { wornItemCellParts } from '../src/ui/worn_item_cell_view';
 
 const skull = ITEMS[WORLD_PVP_SKULL_ITEM_ID];
 const betsSkull = worldPvpSkullInstance('Bet');
@@ -90,5 +92,25 @@ describe('the trophy skull copy name', () => {
     );
     expect(Array.isArray(body)).toBe(true);
     expect(appended).toEqual([{ id: WORLD_PVP_SKULL_ITEM_ID, instance: { signer: 'Bet' } }]);
+  });
+});
+
+describe('the skull across the item-cell family', () => {
+  it('a chosen legendary name still wins over the def name', () => {
+    const crafted = Object.values(ITEMS).find((def) => def.kind === 'armor')!;
+    expect(itemCopyOwnName(crafted, { name: 'Oathkeeper' })).toBe('Oathkeeper');
+    expect(itemCopyDisplayName(crafted, { name: 'Oathkeeper' })).toBe('Oathkeeper');
+  });
+
+  it('bags, banks, mail, trade and market cells name the copy', () => {
+    expect(wornItemCellParts(skull, betsSkull).name).toBe("Bet's Skull");
+    expect(wornItemCellParts(skull, betsSkull).ariaName).toBe("Bet's Skull");
+    expect(wornItemCellParts(skull, null).name).toBe('Trophy Skull');
+  });
+
+  it("the skull wears no maker's mark; a crafted signature still does", () => {
+    expect(bagInstanceGlyphKind(betsSkull, WORLD_PVP_SKULL_ITEM_ID)).toBe('generic');
+    expect(bagInstanceGlyphKind({ signer: 'Bet' }, 'stag_antler')).toBe('signed');
+    expect(bagInstanceGlyphKind({ signer: 'Bet' })).toBe('signed');
   });
 });

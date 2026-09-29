@@ -1090,7 +1090,7 @@ export class BagsWindow {
       // masterwork > quest seal > fine seal > enchanted / signed / bound >
       // generic wedge. The fine rim/wash is independent of which seal wins the
       // corner (a masterwork fine stack keeps its rim).
-      const glyphKind = bagInstanceGlyphKind(s.instance);
+      const glyphKind = bagInstanceGlyphKind(s.instance, s.itemId);
       const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
       const locked = isItemLocked(s.instance);
       row.style.setProperty('--bag-slot-quality', qColor);
@@ -1500,7 +1500,7 @@ export class BagsWindow {
     // tooltip is mouse-only, and the two channels must agree (the glyph
     // aria-key rule above). The def-free glyph kind rides the same aria keys
     // the known cell uses, with the unknown label as the item token.
-    const glyphKind = bagInstanceGlyphKind(s.instance);
+    const glyphKind = bagInstanceGlyphKind(s.instance, s.itemId);
     row.setAttribute(
       'aria-label',
       glyphKind
