@@ -228,11 +228,19 @@ COSMETIC (may be tiered down on lower presets):
   the in-world read of a mechanic (a bomber's fuse flash, the beam showing which add heals
   the boss, a death-throes warning nova, a breath cone). An effect is attributed to the
   event that caused it, not the body it lands on (`enterSpellEvent` in the renderer's
-  event dispatch), and an effect with no attributable caster always draws, so a gap can
-  only show too much. For a muted caster the painter takes its refused-cast arm
-  (`refusedTelegraphs`, `areaTelegraph`), so the terrain-draped area ring and the rig's
-  windup clip survive, and the hard-crowd-control band is held over every body whoever
-  cast it. Cast bars, nameplates, floating combat text and every HUD read never consult
+  event dispatch). An effect with no attributable caster always draws, so a gap can only
+  show too much: that covers events that name no caster and spell cues whose ability no
+  player class owns (an encounter mechanic that names the player it resolves on, such as
+  the hoard boss's soul catch, is not that player's spell). Per-frame holds are attributed
+  by their own caster (`spellEffectsMutedBy`, an aura's `sourceId`), so a boss's mark on a
+  raider (the Soul Rend sparkle) and an enemy's debuff on a player keep drawing. For a
+  muted caster the painter takes its refused-cast arm (`refusedTelegraphs`,
+  `areaTelegraph`), so the terrain-draped area ring and the rig's windup clip survive,
+  including the ring on every pulse of a lingering zone, which is the footprint a player
+  chooses to stand in or leave once its particles are gone; the hard-crowd-control band
+  and the taunt attention mark are held over every body whoever cast them. A muted
+  player's own proc, ward and queued-swing cues go too; the HUD buff icons and action bar
+  carry the same state. Cast bars, nameplates, floating combat text and every HUD read never consult
   the option. The shared pooled emitters that also carry non-spell reads (a delve shrine's
   sequence pulse via `src/render/world_cue_fx.ts`, a lit wardstone, a minigame power-up,
   melee hit sparks) never consult it either; spell call sites use gated twins

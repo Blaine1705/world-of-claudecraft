@@ -11197,7 +11197,7 @@ export class Renderer {
           );
         }
         if (hasSoulRend) {
-          this.vfx.spellCastSparkle(e.id, 'shadow', dt * 3.2);
+          this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
         }
         if (veilboundState !== 'none') this.vfx.spellCastSparkle(e.id, 'holy', dt * 2.4);
         if (!e.dead && (ferocityStage > 0 || petFrenzy)) {

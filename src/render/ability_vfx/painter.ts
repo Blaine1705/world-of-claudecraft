@@ -62,7 +62,7 @@ import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { CAST_VFX_ENGINE } from '../cast_vfx_family';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
-import { spellEffectsMuted } from '../spell_effects_switch';
+import { spellEffectsMuted, spellEffectsMutedBy } from '../spell_effects_switch';
 import { trinketCueReadsAsSelfCast } from '../trinket_vfx_specs';
 import { CastAdmission } from './cast_admission_core';
 import { castVfxRequirement, WARRIOR_KIT_REQUIREMENT } from './cast_requirements';
@@ -1232,11 +1232,11 @@ export class AbilityVfx {
       // AREA the player steps out of): its pool is linked at boot and never
       // waits on the cast programs, so it draws even while the rest is held.
       // With the plan's colour, or the same cast would read one colour on a
-      // held gate and another on an open one. A muted caster's zone pulse
-      // (spell_effects_switch.ts) draws what an admitted pulse draws: no
-      // ring, since a pulse is follow-through and its cast moment had one.
-      if (ev.fx !== 'tick' || !spellEffectsMuted(ev.sourceId))
-        this.areaTelegraph(ev, planCast(spec, this.quality, REFUSED_CAST_TIER).color);
+      // held gate and another on an open one. A zone pulse from a caster the
+      // Spell Effects option mutes keeps its ring too: with the pulse
+      // particles gone, the ring is the zone's footprint (a friendly heal
+      // circle is somewhere a player chooses to stand).
+      this.areaTelegraph(ev, planCast(spec, this.quality, REFUSED_CAST_TIER).color);
       return true;
     }
     const casterId = ev.sourceId ?? -1;
@@ -1828,7 +1828,7 @@ export class AbilityVfx {
     // by who caused it: a player body's own windup, queued glint and
     // self-cast auras go, while an enemy's debuff on that body still draws
     // and the hard-CC band is held whoever wears it.
-    const bodyMuted = spellEffectsMuted(e.id);
+    const bodyMuted = spellEffectsMutedBy(e.id);
     const fx = this.deps.fx;
     if (e.kind === 'player' && e.templateId === 'warrior' && !this.kitsRequested.has('warrior')) {
       this.kitsRequested.add('warrior');
@@ -1902,7 +1902,6 @@ export class AbilityVfx {
     if (
       attentionSource !== null &&
       this.deps.isLivingWarrior?.(attentionSource) &&
-      !spellEffectsMuted(attentionSource) &&
       this.kitHoldsOpen()
     )
       fx.holdWarriorAttention?.(
@@ -1984,7 +1983,7 @@ export class AbilityVfx {
       const aura = e.auras[i];
       // Caused by a muted caster (a player's buff on themselves, a player's
       // DoT on a mob). An aura that names no caster falls to its wearer.
-      if (spellEffectsMuted(aura.sourceId ?? e.id)) continue;
+      if (spellEffectsMutedBy(aura.sourceId ?? e.id)) continue;
       const auraWasHeld = held.auraStamps.has(aura.id);
       const readiness = this.deps.isLivingWarrior?.(e.id) ? warriorReadinessBit(aura) : 0;
       if (readiness) {

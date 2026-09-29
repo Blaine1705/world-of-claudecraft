@@ -35,12 +35,14 @@ import { SentenceVfx } from '../src/render/sentence_vfx';
 import {
   bindSpellEffectsWorld,
   enterSpellEvent,
+  isPlayerAbilityId,
   isPlayerSideSource,
   leaveSpellEvent,
   type SpellSource,
   setSpellEffectsEnabled,
   spellEffectsEnabled,
   spellEffectsMuted,
+  spellEffectsMutedBy,
   spellEventSourceId,
 } from '../src/render/spell_effects_switch';
 import { Vfx } from '../src/render/vfx';
@@ -132,9 +134,20 @@ describe('the switch', () => {
     expect(inEventFrom(MOB, () => spellEffectsMuted(PLAYER))).toBe(false);
     expect(inEventFrom(MOB, () => spellEffectsMuted())).toBe(false);
     expect(inEventFrom(PET, () => spellEffectsMuted())).toBe(true);
-    // An event that names no caster falls back to the id.
-    expect(inEventFrom(undefined, () => spellEffectsMuted(PLAYER))).toBe(true);
+    // An event that names no caster is unattributed and draws, whatever id
+    // the effect is anchored on (a boss debuff's gain swirl on a player).
+    expect(inEventFrom(undefined, () => spellEffectsMuted(PLAYER))).toBe(false);
     expect(inEventFrom(undefined, () => spellEffectsMuted(MOB))).toBe(false);
+  });
+
+  it('answers per-frame holds by their own id, whatever event scope is open', () => {
+    setSpellEffectsEnabled(false);
+    expect(inEventFrom(MOB, () => spellEffectsMutedBy(PLAYER))).toBe(true);
+    expect(inEventFrom(PLAYER, () => spellEffectsMutedBy(MOB))).toBe(false);
+    expect(spellEffectsMutedBy(PET)).toBe(true);
+    expect(spellEffectsMutedBy(undefined)).toBe(false);
+    setSpellEffectsEnabled(true);
+    expect(spellEffectsMutedBy(PLAYER)).toBe(false);
   });
 
   it('restores the outer scope when an event closes, nested or not', () => {
@@ -154,6 +167,29 @@ describe('the switch', () => {
     expect(spellEventSourceId({ type: 'spellfx', sourceId: 5, targetId: 6 })).toBe(5);
     expect(spellEventSourceId({ type: 'castStart', entityId: 7 })).toBe(7);
     expect(spellEventSourceId({ type: 'levelup' })).toBeUndefined();
+  });
+
+  it('leaves a spell cue unattributed when no player class owns its ability', () => {
+    // A player class ability and a player's trinket cue name their caster.
+    expect(isPlayerAbilityId('frostbolt')).toBe(true);
+    expect(isPlayerAbilityId('trinket_sundered_prism')).toBe(true);
+    const cue = (type: string, ability: string) => ({ type, ability, sourceId: PLAYER });
+    expect(spellEventSourceId(cue('spellfx', 'frostbolt'))).toBe(PLAYER);
+    expect(spellEventSourceId(cue('spellfxAt', 'frostbolt'))).toBe(PLAYER);
+    // An encounter mechanic that names the player it resolves on (the hoard
+    // boss's soul catch) is not that player's spell.
+    expect(isPlayerAbilityId('Soul Harvest')).toBe(false);
+    expect(spellEventSourceId(cue('spellfxAt', 'Soul Harvest'))).toBeUndefined();
+    expect(spellEventSourceId(cue('spellfx', 'Soul Harvest'))).toBeUndefined();
+    // A damage event's ability is a display name, never an id: its source stands.
+    expect(spellEventSourceId(cue('damage', 'Frostbolt'))).toBe(PLAYER);
+    setSpellEffectsEnabled(false);
+    const scope = enterSpellEvent(cue('spellfxAt', 'Soul Harvest'));
+    try {
+      expect(spellEffectsMuted()).toBe(false);
+    } finally {
+      leaveSpellEvent(scope);
+    }
   });
 });
 
@@ -249,16 +285,17 @@ describe('the ability painter', () => {
     expect(on.drewAny()).toBe(true);
   });
 
-  it("keeps a player's aimed blast ring while off, and drops the pulse rings of its zone", () => {
+  it("keeps a player's aimed blast ring and its zone's pulse rings while off", () => {
     const { painter: p, spawnAoeRing } = painter();
     setSpellEffectsEnabled(false);
     const blast = { x: 4, z: 5, school: 'frost', radius: 8, sourceId: PLAYER, ability: 'blizzard' };
     expect(p.handleSpellfxAt({ ...blast, fx: 'nova' })).toBe(true);
     expect(spawnAoeRing).toHaveBeenCalledTimes(1);
     expect(spawnAoeRing.mock.calls[0].slice(0, 4)).toEqual([4, 5, 8, 'frost']);
-    // A pulse is follow-through: an admitted one draws no ring, nor does this.
+    // With the pulse particles gone the ring is the zone's footprint, which
+    // a player may choose to stand in (a friendly heal circle).
     expect(p.handleSpellfxAt({ ...blast, fx: 'tick' })).toBe(true);
-    expect(spawnAoeRing).toHaveBeenCalledTimes(1);
+    expect(spawnAoeRing).toHaveBeenCalledTimes(2);
   });
 
   it("keeps a player's shout ring and drops only its shockwave", () => {
@@ -885,6 +922,20 @@ describe("the renderer's event dispatch", () => {
     expect(spellEffectsMuted()).toBe(false);
   });
 
+  it('draws an encounter cue that names a player as unattributed', () => {
+    setSpellEffectsEnabled(false);
+    const { renderer, seen } = harness();
+    renderer.handleEvent({
+      type: 'spellfx',
+      sourceId: PLAYER,
+      targetId: PLAYER,
+      school: 'holy',
+      fx: 'nova',
+      ability: 'Soul Harvest',
+    } as SimEvent);
+    expect(seen).toEqual([{ name: 'spellNova', muted: false }]);
+  });
+
   it("draws a player's aura swirl through the gated twin", () => {
     const { renderer, seen } = harness();
     renderer.handleEvent({
@@ -911,9 +962,9 @@ describe("the renderer's event dispatch", () => {
 
   it('uses the gated twins at every per-frame spell sparkle, and the shared emitter elsewhere', () => {
     // The per-frame entity loop is too deep to drive headless, so pin the
-    // call sites in source (comments stripped): five spell or aura sparkles
-    // ride the twin; the lit wardstone, the two rift objects and the Spirit
-    // Healer shimmer keep the shared emitter. The same pin covers the
+    // call sites in source (comments stripped): four spell or aura sparkles
+    // ride the twin; the Soul Rend mark, the lit wardstone, the two rift
+    // objects and the Spirit Healer shimmer keep the shared emitter. The same pin covers the
     // aimed-blast fallback burst.
     const src = readFileSync(
       fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
@@ -922,8 +973,10 @@ describe("the renderer's event dispatch", () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
     const count = (needle: string) => src.split(needle).length - 1;
-    expect(count('this.vfx.spellCastSparkle(')).toBe(5);
-    expect(count('this.vfx.castSparkle(')).toBe(4);
+    expect(count('this.vfx.spellCastSparkle(')).toBe(4);
+    expect(count('this.vfx.castSparkle(')).toBe(5);
+    // The Nythraxis Soul Rend mark is a boss debuff on a raider: shared emitter.
+    expect(count("if (hasSoulRend) {\n          this.vfx.castSparkle(e.id, 'shadow'")).toBe(1);
     expect(count('this.vfx.spellBurst(at, ev.school,')).toBe(1);
     expect(count('this.vfx.spellHealGlow(')).toBe(1);
   });

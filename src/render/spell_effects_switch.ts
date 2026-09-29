@@ -21,8 +21,12 @@
 // lands on. While the renderer handles a sim event it opens an event scope
 // (`enterSpellEvent`), and every check inside that scope answers for the
 // event's source, so a detonation drawn on a mob still reads as the player's.
-// Outside an event (the per-frame entity sync) a check answers for the id it
-// is handed, which is always the wearer or caster there.
+// An event that names no caster, or a spell cue whose ability is not a player
+// class ability (an encounter mechanic such as a boss's soul catch that names
+// the catching player), is unattributed and always draws. Outside an event
+// (the per-frame entity sync) a check answers for the id it is handed, which
+// is always the wearer or caster there; `spellEffectsMutedBy` is that
+// id-only answer for per-frame holds, whatever scope is open.
 //
 // What a muted source still shows is what the ability painter shows for a
 // refused cast (ability_vfx/painter.ts, `refusedTelegraphs` and
@@ -35,6 +39,8 @@
 // keeps drawing.
 //
 // Three/DOM-free, so a test drives it directly.
+
+import { ABILITIES } from '../sim/data';
 
 /** The two fields the player-side test reads off an entity. */
 export interface SpellSource {
@@ -76,9 +82,21 @@ export function isPlayerSideSource(source: SpellSource | undefined): boolean {
   return !!source && (source.kind === 'player' || (source.ownerId ?? null) !== null);
 }
 
-/** The id an event names as its caster, if it names one. */
+/** A player class ability, or a player's trinket cue. */
+export function isPlayerAbilityId(id: string): boolean {
+  return Object.hasOwn(ABILITIES, id) || id.startsWith('trinket_');
+}
+
+/** The id an event names as its caster, if it names one. A spell cue for an
+ *  ability no player class owns is an encounter mechanic: unattributed. */
 export function spellEventSourceId(ev: object): number | undefined {
-  const e = ev as { sourceId?: unknown; entityId?: unknown };
+  const e = ev as { type?: unknown; ability?: unknown; sourceId?: unknown; entityId?: unknown };
+  if (
+    (e.type === 'spellfx' || e.type === 'spellfxAt') &&
+    typeof e.ability === 'string' &&
+    !isPlayerAbilityId(e.ability)
+  )
+    return undefined;
   if (typeof e.sourceId === 'number') return e.sourceId;
   if (typeof e.entityId === 'number') return e.entityId;
   return undefined;
@@ -100,14 +118,22 @@ export function leaveSpellEvent(previous: SpellEventScope): void {
 
 /**
  * Whether a spell effect should be skipped. Inside an event scope the event's
- * source decides (falling back to `id` when the event names none); outside
- * one, `id` decides. An id that resolves to nothing draws: an unattributable
- * effect is never muted, so a gap here can only show too much, never hide a
- * read.
+ * source decides, and an unattributed event draws; outside one, `id`
+ * decides. An id that resolves to nothing draws too: an unattributable effect
+ * is never muted, so a gap here can only show too much, never hide a read.
  */
 export function spellEffectsMuted(id?: number): boolean {
   if (enabled) return false;
-  const source = inEvent && eventSourceId !== undefined ? eventSourceId : id;
-  if (source === undefined) return false;
-  return isPlayerSideSource(lookup(source));
+  return mutedSource(inEvent ? eventSourceId : id);
+}
+
+/** The id-only answer, ignoring any open event scope: for per-frame holds
+ *  that name their own caster (a body, an aura's source). */
+export function spellEffectsMutedBy(id: number | undefined): boolean {
+  if (enabled) return false;
+  return mutedSource(id);
+}
+
+function mutedSource(id: number | undefined): boolean {
+  return id !== undefined && isPlayerSideSource(lookup(id));
 }
