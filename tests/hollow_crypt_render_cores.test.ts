@@ -57,8 +57,25 @@ describe('authored field terrain plan', () => {
         // to a neighbour, so only points well inside their surface count).
         const s = authoredFieldSurfaceAt(HOLLOW_CRYPT_FIELD, x, z);
         if (!s || s.kind === 'path') continue;
-        const inside = authoredFieldSurfaceAt(HOLLOW_CRYPT_FIELD, x + 0.8, z + 0.8) === s;
+        const inside = [
+          [0.8, 0.8],
+          [-0.8, 0.8],
+          [0.8, -0.8],
+          [-0.8, -0.8],
+        ].every(([dx, dz]) => authoredFieldSurfaceAt(HOLLOW_CRYPT_FIELD, x + dx, z + dz) === s);
         if (inside) expect(y).toBeCloseTo(authoredFieldHeight(HOLLOW_CRYPT_FIELD, x, z), 5);
+      }
+    }
+  });
+
+  it('winds every walkable top to face up (front faces seen from above)', () => {
+    const tops = planFieldTops(HOLLOW_CRYPT_FIELD, { maxEdge: 6, layerLift: 0 });
+    for (const family of ['stone', 'soil'] as const) {
+      const p = tops[family].positions;
+      for (let i = 0; i < p.length; i += 9) {
+        const ny =
+          (p[i + 5] - p[i + 2]) * (p[i + 6] - p[i]) - (p[i + 3] - p[i]) * (p[i + 8] - p[i + 2]);
+        expect(ny).toBeGreaterThanOrEqual(0);
       }
     }
   });

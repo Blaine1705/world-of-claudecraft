@@ -10,7 +10,13 @@
 // becomes one thin OBB. A spatial dedupe keeps two surfaces sharing an edge
 // from emitting the same wall twice.
 
-import { authoredFieldHeight, pathHeightAt, pathOutline, pointInPolygon } from './height';
+import {
+  authoredFieldHeight,
+  authoredFieldSurfaceAt,
+  pathHeightAt,
+  pathOutline,
+  pointInPolygon,
+} from './height';
 import type { AuthoredFieldDef, FieldEdgeStyle, FieldSurface } from './types';
 
 /** One straight stretch of cliff: world-local endpoints and the two heights. */
@@ -89,6 +95,12 @@ export function authoredFieldCliffRuns(def: AuthoredFieldDef): FieldCliffRun[] {
         if (runStart < 0) return;
         const t0 = runStart / samples;
         const t1 = (endIdx + 1) / samples;
+        // The run is dressed and owned by its HIGH side: this surface when it
+        // stands above the drop, else whatever surface the outside belongs to.
+        const mx2 = ax + (bx - ax) * ((t0 + t1) / 2);
+        const mz2 = az + (bz - az) * ((t0 + t1) / 2);
+        const high =
+          runSign > 0 ? s : (authoredFieldSurfaceAt(def, mx2 + nx * PROBE, mz2 + nz * PROBE) ?? s);
         runs.push({
           ax: ax + (bx - ax) * t0,
           az: az + (bz - az) * t0,
@@ -98,8 +110,8 @@ export function authoredFieldCliffRuns(def: AuthoredFieldDef): FieldCliffRun[] {
           low: runLow,
           nx: nx * runSign,
           nz: nz * runSign,
-          style: s.edge ?? 'rock',
-          surface: s.id,
+          style: high.edge ?? 'rock',
+          surface: high.id,
         });
         runStart = -1;
       };

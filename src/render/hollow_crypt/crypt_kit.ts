@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import { HOLLOW_CRYPT_FIELD } from '../../sim/content/hollow_crypt_layout';
 import type { FieldProp } from '../../sim/instances/authored_field';
 import { loadGltf, releaseGltf } from '../assets/loader';
+import { registerDeferredPreload } from '../assets/preload';
 import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { type EdgeDressing, planEdgeDressing } from './crypt_plan_core';
@@ -78,9 +79,7 @@ function mergeNonIndexed(list: THREE.BufferGeometry[]): THREE.BufferGeometry {
   return out;
 }
 
-/** Fetch and bake the kit once. Never rejects; resolves within the wait cap. */
-export function ensureCryptKit(): Promise<void> {
-  if (loaded || typeof window === 'undefined') return Promise.resolve();
+function startKitLoad(): Promise<void> {
   loading ??= loadGltf(HOLLOW_CRYPT_KIT_URL)
     .then((gltf) => {
       gltf.scene.traverse((node) => {
@@ -93,7 +92,18 @@ export function ensureCryptKit(): Promise<void> {
     .then(() => {
       loaded = true;
     });
-  return Promise.race([loading, new Promise<void>((r) => setTimeout(r, 8000))]);
+  return loading;
+}
+
+// World content: fetched on the deferred lane once the game starts, so the
+// first approach to the crypt usually finds the kit already baked.
+if (typeof window !== 'undefined') registerDeferredPreload(() => startKitLoad());
+
+/** Fetch and bake the kit once. Never rejects; resolves within the wait cap
+ *  (a later arrival upgrades the stand-ins in place, see buildCryptKit). */
+export function ensureCryptKit(): Promise<void> {
+  if (loaded || typeof window === 'undefined') return Promise.resolve();
+  return Promise.race([startKitLoad(), new Promise<void>((r) => setTimeout(r, 8000))]);
 }
 
 // ---- materials --------------------------------------------------------------------
@@ -184,6 +194,8 @@ export function kitPieceForProp(p: FieldProp): string {
       return 'Kit_ChoirPillar';
     case 'hc_bone_organ':
       return 'Kit_BoneOrgan';
+    case 'hc_pew':
+      return 'Kit_Pew';
     case 'hc_nave_column':
       return 'Kit_NaveColumn';
     case 'hc_remembrance_candle':
@@ -280,11 +292,30 @@ function propPlacements(): KitPlacement[] {
   return out;
 }
 
-/** Instance the whole kit over the layout (instance-local frame). */
+/** Instance the whole kit over the layout (instance-local frame). A kit still
+ *  loading when this runs is swapped in the moment it lands (same materials, so
+ *  the swap links nothing new). */
 export function buildCryptKit(
   ground: (x: number, z: number) => number,
   lowGfx: boolean,
 ): THREE.Group {
+  const group = buildKitGroup(ground, lowGfx);
+  if (!loaded && loading) {
+    void loading.then(() => {
+      const parent = group.parent;
+      if (!parent || baked.size === 0) return;
+      const fresh = buildKitGroup(ground, lowGfx);
+      parent.add(fresh);
+      group.removeFromParent();
+      group.traverse((o) => {
+        if (o instanceof THREE.InstancedMesh) o.dispose();
+      });
+    });
+  }
+  return group;
+}
+
+function buildKitGroup(ground: (x: number, z: number) => number, lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
   group.name = 'hollowCryptKit';
   const byPiece = new Map<string, KitPlacement[]>();

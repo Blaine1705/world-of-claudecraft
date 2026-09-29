@@ -92,16 +92,16 @@ const WILDHEART_HEMI_GROUND_COLOR = 0x5b4a2d;
 // look never depends on the realm's clock) and grades the one sun into a cold
 // moon key from behind the crag, with a violet sky bounce and an umber floor
 // bounce so the tallow lanterns carry the only warm tones.
-const HOLLOW_CRYPT_SUN_INTENSITY = 1.55;
-const HOLLOW_CRYPT_HEMI_INTENSITY = 1.05;
-const HOLLOW_CRYPT_ENV_INTENSITY = 0.16;
+const HOLLOW_CRYPT_SUN_INTENSITY = 2.5;
+const HOLLOW_CRYPT_HEMI_INTENSITY = 1.15;
+const HOLLOW_CRYPT_ENV_INTENSITY = 0.42;
 const HOLLOW_CRYPT_RIM_BOOST = 2.1;
-const HOLLOW_CRYPT_SUN_COLOR = 0xa8bfff;
+const HOLLOW_CRYPT_SUN_COLOR = 0xbfd0ff;
 const HOLLOW_CRYPT_HEMI_SKY_COLOR = 0x5a64a0;
-const HOLLOW_CRYPT_HEMI_GROUND_COLOR = 0x2e2533;
+const HOLLOW_CRYPT_HEMI_GROUND_COLOR = 0x4a3d45;
 /** Where the moon hangs (from the ground toward it): north-north-west over
  *  the crag, low enough to throw long shadows toward the entrance. */
-export const HOLLOW_CRYPT_MOON_DIRECTION = new THREE.Vector3(-0.32, 0.46, 0.83).normalize();
+export const HOLLOW_CRYPT_MOON_DIRECTION = new THREE.Vector3(-0.3, 0.3, 0.9).normalize();
 // The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
 // ambient floor (over the candle-orange torch lights the interior itself
 // carries) so its halls read golden and inhabited while staying indoors-dim.

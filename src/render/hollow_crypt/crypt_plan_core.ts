@@ -272,14 +272,16 @@ export interface EdgeDressing {
 export function planEdgeDressing(segment = 4): EdgeDressing[] {
   const out: EdgeDressing[] = [];
   let k = 0;
+  const hidden = new Set(HOLLOW_CRYPT_FIELD.surfaces.filter((s) => s.hidden).map((s) => s.id));
   for (const run of authoredFieldCliffRuns(HOLLOW_CRYPT_FIELD)) {
     const len = Math.hypot(run.bx - run.ax, run.bz - run.az);
-    if (len < 1.5) continue;
+    if (len < 1.5 || hidden.has(run.surface)) continue;
     const pieces = Math.max(1, Math.round(len / segment));
     const step = len / pieces;
     const ux = (run.bx - run.ax) / len;
     const uz = (run.bz - run.az) / len;
-    const rot = Math.atan2(-uz, ux);
+    // The piece's outer (chasm) face is its local +Z: turn it toward the drop.
+    const rot = Math.atan2(run.nx, run.nz);
     const kind: EdgeDressing['kind'] =
       run.style === 'balustrade'
         ? 'balustrade'

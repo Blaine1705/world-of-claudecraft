@@ -98,11 +98,13 @@ export function buildCryptLights(
       group.add(flame);
       deps.flames.push(flame);
     }
-    const halo = new THREE.Sprite(haloMaterial(spot.kind));
-    halo.position.set(spot.x, y + 0.2, spot.z);
-    const hs = spot.kind === 'soul' ? 16 : spot.kind === 'brazier' ? 5 : 2.6;
-    halo.scale.set(hs, hs, 1);
-    group.add(halo);
+    if (spot.kind !== 'soul') {
+      const halo = new THREE.Sprite(haloMaterial(spot.kind));
+      halo.position.set(spot.x, y + 0.2, spot.z);
+      const hs = spot.kind === 'brazier' ? 4.5 : 2.2;
+      halo.scale.set(hs, hs, 1);
+      group.add(halo);
+    }
     const light = new THREE.PointLight(
       style.color,
       deps.lowGfx ? style.intensity * 0.6 : style.intensity,

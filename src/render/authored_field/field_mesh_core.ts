@@ -9,7 +9,7 @@
 
 import {
   type AuthoredFieldDef,
-  authoredFieldCliffRuns,
+  authoredFieldHeight,
   type FieldCliffRun,
   type FieldGround,
   type FieldSurface,
@@ -276,7 +276,8 @@ export function planFieldTops(
     const lift = layer * opts.layerLift;
     const onPath = s.kind === 'path';
     for (const t of fine) {
-      for (const p of [t.a, t.b, t.c]) {
+      // Wound to face up (+Y) seen from above.
+      for (const p of [t.a, t.c, t.b]) {
         const y = surfaceTopHeight(s, p[0], p[1]) + lift;
         const idx = pushVertex(batch, p[0], y, p[1], topColor(ground, p[0], p[1], onPath), 0.25);
         batch.indices.push(idx);
@@ -310,55 +311,87 @@ export function cliffColor(run: FieldCliffRun, x: number, y: number, z: number, 
   return [base[0] * k, base[1] * k, base[2] * k * 1.05];
 }
 
+/** Densify a closed ring so no edge is longer than `step`. */
+function densify(ring: [number, number][], step: number): [number, number][] {
+  const out: [number, number][] = [];
+  for (let i = 0; i < ring.length; i++) {
+    const [ax, az] = ring[i];
+    const [bx, bz] = ring[(i + 1) % ring.length];
+    const n = Math.max(1, Math.ceil(Math.hypot(bx - ax, bz - az) / step));
+    for (let k = 0; k < n; k++) out.push([ax + ((bx - ax) * k) / n, az + ((bz - az) * k) / n]);
+  }
+  return out;
+}
+
 /**
- * Every cliff run as a displaced face from the walkable edge down to the
- * lower ground (or deep into the chasm), its top row pinned to the exact
- * edge so the wall you collide with is the wall you see.
+ * The rock under every surface: its outline dropped as one closed skirt, pinned
+ * at the walkable edge (the wall you collide with is the wall you see), straight
+ * where it steps down onto a lower terrace, and flaring into a jagged massif
+ * where it falls into the chasm, so each terrace reads as the top of a crag.
  */
 export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions): FieldMeshData {
   const out: FieldMeshData = { positions: [], colors: [], uvs: [], indices: [] };
-  const hidden = new Set(def.surfaces.filter((s) => s.hidden).map((s) => s.id));
-  for (const run of authoredFieldCliffRuns(def)) {
-    const len = Math.hypot(run.bx - run.ax, run.bz - run.az);
-    if (len < 0.2 || hidden.has(run.surface)) continue;
-    const intoVoid = run.low <= def.voidHeight + 0.5;
-    const bottom = intoVoid ? opts.voidFloor : run.low - 0.4;
-    const cols = Math.max(1, Math.ceil(len / opts.columnStep));
-    const rows = Math.max(1, Math.ceil((run.high - bottom) / opts.rowStep));
+  for (const s of def.surfaces) {
+    if (s.hidden) continue;
+    let ring = densify(surfaceOutline(s), opts.columnStep);
+    if (signedArea(ring) < 0) ring = ring.reverse();
+    const n = ring.length;
+    const tops: number[] = [];
+    const bottoms: number[] = [];
+    const normals: [number, number][] = [];
+    for (let i = 0; i < n; i++) {
+      const [px, pz] = ring[(i + n - 1) % n];
+      const [x, z] = ring[i];
+      const [qx, qz] = ring[(i + 1) % n];
+      // Outward normal of a counter-clockwise ring (shoelace-positive in x, z).
+      let nx = qz - z + (z - pz);
+      let nz = -(qx - x) - (x - px);
+      const len = Math.hypot(nx, nz) || 1;
+      nx /= len;
+      nz /= len;
+      normals.push([nx, nz]);
+      const top = surfaceTopHeight(s, x, z);
+      tops.push(top);
+      const outside = authoredFieldHeight(def, x + nx * 0.8, z + nz * 0.8);
+      bottoms.push(outside <= def.voidHeight + 0.5 ? opts.voidFloor : Math.min(top, outside) - 0.4);
+    }
+    const drop = Math.max(...tops.map((t, i) => t - bottoms[i]));
+    if (drop < 0.3) continue;
+    const rows = Math.max(1, Math.ceil(drop / opts.rowStep));
     const base = out.positions.length / 3;
+    const style = s.edge ?? 'rock';
+    const masonry = style === 'masonry' || style === 'balustrade';
     for (let r = 0; r <= rows; r++) {
       const t = r / rows;
-      const y = run.high + (bottom - run.high) * t;
-      const depth = run.high - y;
-      for (let c = 0; c <= cols; c++) {
-        const u = c / cols;
-        const ex = run.ax + (run.bx - run.ax) * u;
-        const ez = run.az + (run.bz - run.az) * u;
-        // Pinned top row; below it the rock bulges out and jags (the terrace
-        // sits on a massif that widens into the mist). Masonry keeps a
-        // straight retaining course for its first few yards.
-        const masonry = (run.style === 'masonry' || run.style === 'balustrade') && depth < 3.2;
-        const jag =
-          r === 0 || masonry
-            ? 0
-            : (fieldNoise(ex * 0.35 + y * 0.21, ez * 0.35 - y * 0.17, 3) - 0.3) * 2.4;
-        const push = r === 0 ? 0 : Math.max(0, (intoVoid ? depth * opts.flare : 0) + jag);
-        const x = ex + run.nx * push;
-        const z = ez + run.nz * push;
-        const color = cliffColor(run, ex, y, ez, run.high);
+      for (let i = 0; i <= n; i++) {
+        const k = i % n;
+        const [ex, ez] = ring[k];
+        const top = tops[k];
+        const y = top + (bottoms[k] - top) * t;
+        const depth = top - y;
+        const intoVoid = bottoms[k] <= opts.voidFloor + 0.01;
+        const straight = r === 0 || !intoVoid || (masonry && depth < 3.2);
+        const jag = straight
+          ? 0
+          : (fieldNoise(ex * 0.35 + y * 0.21, ez * 0.35 - y * 0.17, 3) - 0.3) * 2.6;
+        const push = straight ? 0 : Math.max(0, depth * opts.flare + jag);
+        const x = ex + normals[k][0] * push;
+        const z = ez + normals[k][1] * push;
+        const run = { style } as FieldCliffRun;
+        const c = cliffColor(run, ex, y, ez, top);
         out.positions.push(x, y, z);
-        out.colors.push(color[0], color[1], color[2]);
-        out.uvs.push((ex + ez) * 0.25, y * 0.25);
+        out.colors.push(c[0], c[1], c[2]);
+        out.uvs.push(i * opts.columnStep * 0.12, y * 0.12);
       }
     }
-    const stride = cols + 1;
+    const stride = n + 1;
     for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const i0 = base + r * stride + c;
+      for (let i = 0; i < n; i++) {
+        const i0 = base + r * stride + i;
         const i1 = i0 + 1;
         const i2 = i0 + stride;
         const i3 = i2 + 1;
-        out.indices.push(i0, i2, i1, i1, i2, i3);
+        out.indices.push(i0, i1, i2, i1, i3, i2);
       }
     }
   }

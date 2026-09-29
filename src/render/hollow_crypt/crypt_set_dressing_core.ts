@@ -95,7 +95,6 @@ export const HOLLOW_CRYPT_SET_DRESSING: readonly KitPlacement[] = [
   P('Kit_CandleCluster', -23, 106, 0.9, 1, { cosmetic: true }),
   // The Sexton's Yard: mounds, fences, and the bell tower's plinth.
   ...graveClutter(),
-  P('Kit_RockPillar', -110, 130, 1.2, 2.2, { y: 8 }),
   P('Kit_OpenGrave', -74, 44, 0.4, 1),
   P('Kit_OpenGrave', -90, 52, -0.7, 1),
   P('Kit_OpenGrave', -70, 128, 1.1, 1),
@@ -111,7 +110,7 @@ export const HOLLOW_CRYPT_SET_DRESSING: readonly KitPlacement[] = [
   P('Kit_EggCluster', 97, 110, 2.6, 0.9, { cosmetic: true }),
   // The Choir Ruin: the great tracery window behind the organ, framing the
   // crag and the column, and candelabra down the nave.
-  P('Kit_TraceryWindow', 0, 173.5, 0, 1, { y: 5 }),
+  P('Kit_TraceryWindow', 0, 173.5, Math.PI, 1, { y: 5 }),
   P('Kit_Candelabrum', -28, 124, 0, 1),
   P('Kit_Candelabrum', 28, 124, 0, 1),
   P('Kit_Candelabrum', -28, 142, 0, 1),

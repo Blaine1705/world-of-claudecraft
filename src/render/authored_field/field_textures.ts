@@ -142,16 +142,33 @@ const paintSoil: Painter = (h, size, rnd) => {
   }
 };
 
-/** Cliff rock: fractured strata and pitting. */
+/** Cliff rock: fractured faces (tileable Worley cells with dark cracks) and pitting. */
 const paintRock: Painter = (h, size, rnd) => {
-  const a = noiseField(size, rnd, 5);
+  const pts: [number, number, number][] = [];
+  for (let i = 0; i < 46; i++) pts.push([rnd() * size, rnd() * size, 0.55 + rnd() * 0.45]);
   const b = noiseField(size, rnd, 17);
   const c = noiseField(size, rnd, 48);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
+      let d1 = Infinity;
+      let d2 = Infinity;
+      let tone = 0.7;
+      for (const [px, py, t] of pts) {
+        let dx = Math.abs(x - px);
+        let dy = Math.abs(y - py);
+        dx = Math.min(dx, size - dx);
+        dy = Math.min(dy, size - dy);
+        // Stretched cells: the rock fractures in slabs.
+        const d = Math.hypot(dx * 0.7, dy * 1.25);
+        if (d < d1) {
+          d2 = d1;
+          d1 = d;
+          tone = t;
+        } else if (d < d2) d2 = d;
+      }
+      const crack = Math.min(1, (d2 - d1) / 3.5);
       const i = y * size + x;
-      const strata = Math.abs(Math.sin((y / size) * Math.PI * 7 + a[i] * 4));
-      h[i] = 0.3 + strata * 0.25 + b[i] * 0.3 + c[i] * 0.18;
+      h[i] = (0.25 + tone * 0.45 + b[i] * 0.2 + c[i] * 0.12) * (0.25 + 0.75 * crack) + d1 * 0.002;
     }
   }
 };

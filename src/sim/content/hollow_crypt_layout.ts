@@ -345,7 +345,8 @@ const PROPS: FieldProp[] = [
   { kind: 'hc_lantern_post', x: -92, z: 20, rot: 0, r: 0.4, h: 4 },
   { kind: 'hc_dead_tree', x: -106, z: 44, rot: 0.4, r: 1, h: 10 },
   { kind: 'hc_dead_tree', x: -60, z: 10, rot: 2.1, r: 1, h: 10 },
-  { kind: 'hc_bell_tower', x: -108, z: 128, rot: 0.35 },
+  // The bell beam (the piece's local +X) reaches toward the Bell Yard's centre.
+  { kind: 'hc_bell_tower', x: -108, z: 128, rot: 0.43 },
   { kind: 'hc_headstone', x: -96, z: 104, rot: 0.3, r: 0.8, h: 2 },
   { kind: 'hc_headstone', x: -66, z: 130, rot: 1.2, r: 0.8, h: 2 },
   { kind: 'hc_lantern_post', x: -70, z: 100, rot: 0, r: 0.4, h: 4 },
@@ -364,7 +365,7 @@ const PROPS: FieldProp[] = [
   ),
   { kind: 'hc_egg_cluster', x: 58, z: 40, rot: 0.5 },
   { kind: 'hc_egg_cluster', x: 92, z: 54, rot: 2.2 },
-  { kind: 'hc_great_web', x: 80, z: 131, rot: 0 },
+  { kind: 'hc_great_web', x: 80, z: 131, rot: Math.PI },
   ...columns(
     'hc_web_column',
     [
@@ -388,7 +389,22 @@ const PROPS: FieldProp[] = [
     1.4,
     14,
   ),
-  { kind: 'hc_bone_organ', x: 0, z: 170, rot: 0, hw: 9, hd: 1.4, h: 12 },
+  { kind: 'hc_bone_organ', x: 0, z: 170, rot: Math.PI, hw: 9, hd: 1.4, h: 12 },
+  // The choir's broken pews: two blocks off the centre aisle (P8 and the
+  // loft ramps keep their lanes).
+  ...[-16, -9.5, 9.5, 16].flatMap((x) =>
+    [120, 126, 132, 138].map(
+      (z, i): FieldProp => ({
+        kind: 'hc_pew',
+        x,
+        z,
+        rot: ((i + (x > 0 ? 1 : 0)) % 3) * 0.06 - 0.06,
+        hw: 1.5,
+        hd: 0.45,
+        h: 1.2,
+      }),
+    ),
+  ),
   ...columns(
     'hc_nave_column',
     [

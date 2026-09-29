@@ -81,12 +81,12 @@ void main() {
   col += vec3(0.02, 0.07, 0.05) * pow(north, 6.0) * (1.0 - smoothstep(0.0, 0.35, up));
 
   // Stars: a jittered grid on the sphere, twinkling, thinning toward the horizon.
-  vec3 cell = floor(d * 170.0);
+  vec3 cell = floor(d * 420.0);
   float h = hash3(cell);
   vec3 jitter = vec3(hash3(cell + 1.3), hash3(cell + 2.7), hash3(cell + 4.1)) - 0.5;
-  vec3 starDir = normalize((cell + 0.5 + jitter * 0.8) / 170.0);
-  float starD = length(d - starDir) * 170.0;
-  float star = smoothstep(0.55, 0.0, starD) * step(0.93, h);
+  vec3 starDir = normalize((cell + 0.5 + jitter * 0.8) / 420.0);
+  float starD = length(d - starDir) * 420.0;
+  float star = smoothstep(0.38, 0.0, starD) * step(0.982, h) * (0.3 + 0.7 * pow(hash3(cell + 9.1), 3.0));
   float twinkle = 0.6 + 0.4 * sin(uTime * (1.5 + h * 3.0) + h * 40.0);
   float milky = fbm(vec2(atan(d.z, d.x) * 2.0, d.y * 3.0) + 7.0);
   star *= smoothstep(0.02, 0.3, up) * twinkle * (0.7 + milky);
@@ -96,7 +96,7 @@ void main() {
   // The colossal moon: a cratered disc, limb-darkened, wrapped in a wide halo.
   float cosA = dot(d, uMoonDir);
   float ang = acos(clamp(cosA, -1.0, 1.0));
-  float radius = 0.105;
+  float radius = 0.13;
   float disc = smoothstep(radius, radius - 0.004, ang);
   vec3 tangentU = normalize(cross(uMoonDir, vec3(0.0, 1.0, 0.0)));
   vec3 tangentV = cross(tangentU, uMoonDir);
@@ -233,8 +233,10 @@ const COLUMN_VERT = /* glsl */ `
 varying vec3 vNormalW;
 varying vec3 vWorld;
 varying float vH;
+varying vec2 vAxis;
 uniform float uHeight;
 void main() {
+  vAxis = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xz;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
   vNormalW = normalize(mat3(modelMatrix) * normal);
@@ -252,6 +254,7 @@ uniform float uTime;
 uniform vec3 uCore;
 uniform vec3 uEdge;
 uniform float uPower;
+varying vec2 vAxis;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
   vec2 i = floor(p); vec2 f = fract(p);
@@ -267,7 +270,10 @@ void main() {
     + noise(vec2(ang * 7.0, vWorld.y * 0.13 - uTime * 1.3)) * 0.4;
   float fadeTop = 1.0 - smoothstep(0.55, 1.0, vH);
   float fadeBase = smoothstep(0.0, 0.03, vH);
-  float i = body * (0.55 + 0.75 * flow) * fadeTop * fadeBase;
+  // Dimmer up close: a beacon from afar, never a bloom wash over the fight.
+  float axisDist = length(cameraPosition.xz - vAxis);
+  float near = mix(0.28, 1.0, smoothstep(24.0, 110.0, axisDist));
+  float i = body * (0.55 + 0.75 * flow) * fadeTop * fadeBase * 0.6 * near;
   vec3 col = mix(uEdge, uCore, body);
   gl_FragColor = vec4(col * i, i);
   #include <colorspace_fragment>
@@ -351,8 +357,10 @@ void main() {
   p += vec3(sin(wobble) * aJitter.z, sin(wobble * 1.3) * 0.8, cos(wobble * 0.9) * aJitter.z) * 2.2;
   vec4 mv = viewMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mv;
-  gl_PointSize = uSize * (0.6 + aJitter.y) * (300.0 / max(1.0, -mv.z));
-  vAlpha = smoothstep(0.0, 0.06, s) * (1.0 - smoothstep(0.9, 1.0, s)) * (0.55 + 0.45 * sin(wobble * 2.0));
+  gl_PointSize = min(14.0, uSize * (0.6 + aJitter.y) * (300.0 / max(1.0, -mv.z)));
+  // Fade a wisp that drifts into the camera: a mote, never a screen wash.
+  float nearFade = smoothstep(6.0, 22.0, -mv.z);
+  vAlpha = nearFade * smoothstep(0.0, 0.06, s) * (1.0 - smoothstep(0.9, 1.0, s)) * (0.55 + 0.45 * sin(wobble * 2.0));
   vHue = aJitter.x;
 }
 `;
@@ -439,7 +447,7 @@ void main() {
   vec3 world = cameraPosition + rel;
   vec4 mv = viewMatrix * vec4(world, 1.0);
   gl_Position = projectionMatrix * mv;
-  gl_PointSize = uSize * (0.5 + aSeed.z) * (120.0 / max(1.0, -mv.z));
+  gl_PointSize = min(3.0, uSize * (0.5 + aSeed.z) * (40.0 / max(1.0, -mv.z)));
   float edge = 1.0 - smoothstep(0.35, 0.5, max(abs(rel.x) / uBox.x, abs(rel.z) / uBox.z));
   vAlpha = edge * (0.35 + 0.65 * fract(aSeed.x * 13.0 + uTime * 0.1));
 }
@@ -451,7 +459,7 @@ varying float vAlpha;
 uniform vec3 uColor;
 void main() {
   float d = length(gl_PointCoord - 0.5) * 2.0;
-  float a = smoothstep(1.0, 0.2, d) * vAlpha * 0.55;
+  float a = smoothstep(1.0, 0.2, d) * vAlpha * 0.22;
   gl_FragColor = vec4(uColor, a);
   #include <colorspace_fragment>
 }
@@ -566,30 +574,64 @@ function buildBackdrop(opts: CryptAtmosphereOptions): THREE.Mesh {
   const positions: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];
-  const sides = opts.lowGfx ? 7 : 11;
-  const rings = opts.lowGfx ? 4 : 7;
-  for (const s of spires) {
-    const base = positions.length / 3;
+  const sides = opts.lowGfx ? 9 : 16;
+  const rings = opts.lowGfx ? 8 : 18;
+  const moon = HOLLOW_CRYPT_MOON_DIRECTION;
+  const noise = (a: number, t: number, seed: number) =>
+    Math.sin(a * 2 + seed) * 0.5 +
+    Math.sin(a * 5.3 + t * 7 + seed * 1.3) * 0.3 +
+    Math.sin(a * 11.1 - t * 13 + seed * 2.1) * 0.2;
+  const lobe = (
+    cx: number,
+    cz: number,
+    radius: number,
+    height: number,
+    base: number,
+    seed: number,
+  ) => {
+    const first = positions.length / 3;
+    const lean = Math.sin(seed * 2.3) * 0.1;
     for (let r = 0; r <= rings; r++) {
       const t = r / rings;
-      const y = s.base + (s.height - s.base) * t;
-      const rad = s.radius * (1 - t * 0.92) * (0.85 + 0.3 * Math.sin(t * 9 + s.seed));
+      const y = base + (height - base) * t;
+      // Weathered taper with ledges; the last rings break into a jagged crown.
+      const ledge = 1 - Math.floor(t * 6) * 0.1 - (t * 6 - Math.floor(t * 6)) * 0.07;
+      const rad = radius * Math.max(0.05, (1 - t) ** 0.65 * ledge);
+      const ox = cx + lean * (y - base);
       for (let k = 0; k < sides; k++) {
-        const a = (k / sides) * Math.PI * 2 + s.seed;
-        const jag = 0.75 + 0.5 * Math.abs(Math.sin(a * 3.1 + s.seed * 1.7 + r));
-        positions.push(s.x + Math.cos(a) * rad * jag, y, s.z + Math.sin(a) * rad * jag);
-        const shade = 0.045 + t * 0.03;
-        colors.push(shade, shade * 1.05, shade * 1.4);
+        const a = (k / sides) * Math.PI * 2;
+        const jag = 0.7 + 0.3 * noise(a, t, seed);
+        const crown = t > 0.9 ? (Math.sin(a * 3 + seed) > 0.2 ? 1 : 0.55) : 1;
+        const px = ox + Math.cos(a) * rad * jag * crown;
+        const pz = cz + Math.sin(a) * rad * jag * crown;
+        positions.push(px, y + (t > 0.9 ? Math.sin(a * 4 + seed) * radius * 0.2 : 0), pz);
+        // A cold rim where the face turns toward the moon.
+        const rim = Math.max(0, Math.cos(a) * moon.x + Math.sin(a) * moon.z) ** 3;
+        const shade = 0.03 + t * 0.03 + rim * 0.05 * t;
+        colors.push(shade, shade * 1.08, shade * 1.5);
       }
     }
     for (let r = 0; r < rings; r++) {
       for (let k = 0; k < sides; k++) {
-        const a = base + r * sides + k;
-        const b = base + r * sides + ((k + 1) % sides);
-        const c = a + sides;
-        const d = b + sides;
-        indices.push(a, c, b, b, c, d);
+        const i0 = first + r * sides + k;
+        const i1 = first + r * sides + ((k + 1) % sides);
+        indices.push(i0, i0 + sides, i1, i1, i0 + sides, i1 + sides);
       }
+    }
+  };
+  for (const s of spires) {
+    lobe(s.x, s.z, s.radius, s.height, s.base, s.seed);
+    const extra = s.seed % 3;
+    for (let e = 0; e < extra; e++) {
+      const a = s.seed * 1.7 + e * 2.1;
+      lobe(
+        s.x + Math.cos(a) * s.radius * 0.7,
+        s.z + Math.sin(a) * s.radius * 0.7,
+        s.radius * (0.45 + 0.1 * e),
+        s.base + (s.height - s.base) * (0.55 + 0.15 * e),
+        s.base,
+        s.seed + 10 + e,
+      );
     }
   }
   const geo = new THREE.BufferGeometry();
