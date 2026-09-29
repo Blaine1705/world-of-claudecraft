@@ -115,6 +115,7 @@ export function dungeonGateState(
   gate: DungeonGateDef,
 ): DungeonGateState {
   if (inst.partyKey === null) return 'closed';
+  if (inst.exitId !== null && devOpen.get(inst) === inst.exitId) return 'open';
   const dungeon = DUNGEONS[inst.dungeonId];
   if (!dungeon) return 'closed';
   const index = indexFor(dungeon);
@@ -150,6 +151,17 @@ export function dungeonGateEntity(
 // world that opened it and never by a short-lived world that never did.
 const writtenBy = new WeakMap<InstanceSlot, true>();
 
+// Dev-only override (/dev crypt gates): every gate of the claim reads open.
+// Keyed by the slot record of ONE world and bound to the claim's identity
+// (its exit entity id), so a freed and re-claimed slot starts closed again.
+const devOpen = new WeakMap<InstanceSlot, number>();
+
+/** Open (or restore) every gate of a live claim for a dev playtest walk. */
+export function setDungeonGatesDevOpen(inst: InstanceSlot, open: boolean): void {
+  if (open && inst.partyKey !== null && inst.exitId !== null) devOpen.set(inst, inst.exitId);
+  else devOpen.delete(inst);
+}
+
 function announce(ctx: SimContext, inst: InstanceSlot, text: string): void {
   const o = instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
   for (const meta of ctx.players.values()) {
@@ -170,6 +182,7 @@ export function tickDungeonGates(ctx: SimContext): void {
     if (!gates || gates.length === 0) continue;
     const o = instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
     if (inst.partyKey === null) {
+      devOpen.delete(inst);
       if (writtenBy.has(inst)) {
         setOpenDungeonGates(o.x, o.z, []);
         writtenBy.delete(inst);
