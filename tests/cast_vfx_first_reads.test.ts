@@ -318,7 +318,8 @@ describe('the renderer wiring (source pin)', () => {
     // The roots are one helper, shared with the context restore's cast relink.
     expect(renderer).toContain(
       '  private castVfxFirstReadRoots(): (THREE.Object3D | undefined)[] {\n' +
-        '    return [...this.abilityVfx.firstReadDrawables(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()];\n' +
+        '    const rings = this.aoeRings;\n' +
+        '    return [...this.abilityVfx.firstReadDrawables(), rings[0]?.ring, this.vfx.cloudDrawable()];\n' +
         '  }',
     );
   });

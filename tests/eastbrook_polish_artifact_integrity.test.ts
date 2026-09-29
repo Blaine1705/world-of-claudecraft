@@ -1398,7 +1398,11 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the integrated WebGL context restore, spirit-veil, and
   // trinket relics merge: the merged renderer and view-priority leaves match
   // no parent. No capture was retaken.
-  '359b6b3a0304018565d196cc8baf541d7f1c91a88a4541706af6acd0b22992a1';
+  // Re-minted after formatting the merged renderer helper: same content path,
+  // new renderer bytes. No capture was retaken.
+  // Re-minted after compressing that helper for the monolith ratchet: same
+  // content path, new renderer bytes. No capture was retaken.
+  '1bbf9d4f6bf59516fb18c2f11f8b54333c5dfb0d815ff58be272f0098767a15a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1424,7 +1428,11 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the integrated WebGL context restore, spirit-veil, and
   // trinket relics merge: the merged renderer and view-priority leaves match
   // no parent. No capture was retaken.
-  '06bf229a5d46c21b22e0509d0a75fb40e6bb2f44169eace9b321865ccfb53c55';
+  // Re-minted after formatting the merged renderer helper: same content path,
+  // new renderer bytes. No capture was retaken.
+  // Re-minted after compressing that helper for the monolith ratchet: same
+  // content path, new renderer bytes. No capture was retaken.
+  'b5c425b62836e23621fbfa8ed1baa0405eac3b3d5879b947d8e60e3d6ca1af6d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2809,7 +2817,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Integrated WebGL context restore, spirit-veil, and trinket relics merge:
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('12ce2a5ff4f67b2b597aab6913fc277f2f66bb0afdf46f41195ba734f6b9b157');
+      // Formatter-only renderer helper wrap after the integrated merge:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+      // Helper compression for the monolith ratchet: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+    ).toBe('e626051cead35abfd80d072d6407e16037072c6e779702ee4a032164215ec56d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

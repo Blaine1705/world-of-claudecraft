@@ -27,7 +27,10 @@ vi.mock('../src/render/assets/loader', async () => {
           new T.BoxGeometry(1, 2, 1),
           new T.MeshStandardMaterial({ name: 'Wood' }),
         );
-        mesh.name = 'parsed-source-mesh';
+        mesh.name =
+          url === '/models/props/barrel.glb'
+            ? 'parsed-barrel-source-mesh'
+            : `parsed-source-mesh:${url}`;
         const scene = new T.Group();
         scene.add(mesh);
         const list = loader.parses.get(url) ?? [];
@@ -56,11 +59,12 @@ vi.mock('../src/render/characters', () => ({
 }));
 
 const BARREL_URL = '/models/props/barrel.glb';
+const BARREL_MESH_NAME = 'parsed-barrel-source-mesh';
 
 function cannonBarrelMeshes(visual: CannonEncounterVisual): THREE.Mesh[] {
   const meshes: THREE.Mesh[] = [];
   visual.group.traverse((o) => {
-    if (o.name === 'parsed-source-mesh') meshes.push(o as THREE.Mesh);
+    if (o.name === BARREL_MESH_NAME) meshes.push(o as THREE.Mesh);
   });
   return meshes;
 }

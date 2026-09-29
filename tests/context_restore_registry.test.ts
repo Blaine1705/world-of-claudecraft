@@ -60,15 +60,16 @@ const INVENTORY: Record<string, Answer> = {
     exempt: 'CPU: the spirit GLB loads a first sighting starts, not a GPU proof',
   },
   'src/render/characters/visual.ts:linkedEffectMaterials': { reset: 'character-visual' },
+  'src/render/characters/ghost_veil.ts:linkedTuples': {
+    reset: 'spirit-veil-ledger',
+    site: 'src/render/spirit_veil_prewarm.ts',
+  },
   'src/render/characters/form_adornments.ts:moonwingLinked': { reset: 'form-adornments' },
   'src/render/characters/form_adornments.ts:veilLinked': { reset: 'form-adornments' },
   'src/render/post_shed.ts:twinReady': { reset: 'post-shed' },
   'src/render/interior_encounter_prewarm_pass.ts:startedByHost': {
     exempt:
       'the claimed SET survives (its bodies are built); the restore relinks the kept-alive roots instead (interior-encounter-prewarm)',
-  },
-  'src/render/interior_encounter_prewarm_pass.ts:liveWarmedByVisual': {
-    reset: 'interior-encounter-prewarm',
   },
   'src/render/linked_program_readiness.ts:knownReady': {
     exempt:

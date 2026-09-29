@@ -27,6 +27,7 @@ export const CONTEXT_RESTORE_RESET_IDS = [
   'overlay-sprites',
   'ribbons',
   'spirit-apparitions',
+  'spirit-veil-ledger',
   'character-visual',
   'form-adornments',
   'self-spirit',

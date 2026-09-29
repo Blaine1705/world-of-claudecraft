@@ -31,6 +31,7 @@ import {
   bindSpiritVeilLedger,
   createSpiritVeilMaterial,
   noteSpiritVeilTupleLinked,
+  resetSpiritVeilLedger,
   setSpiritVeilLateLink,
   spiritVeilDepthMaterial,
   spiritVeilLedgerOwnedBy,
@@ -44,6 +45,7 @@ import {
   spiritVeilTupleOfKey,
 } from './characters/spirit_veil_family_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
+import { registerContextRestoreReset } from './context_restore_registry';
 import { markProgramsReadyUnder } from './linked_program_readiness';
 import { runLinkedProgramTouchLane } from './linked_program_touch_lane';
 import type { PrewarmManifestEntry } from './prewarm_entry';
@@ -228,6 +230,7 @@ export function spiritVeilFamilyPrewarmEntry(
   };
   let bound: object = host.properties;
   bindSpiritVeilLedger(bound);
+  registerContextRestoreReset('spirit-veil-ledger', host, resetSpiritVeilLedger);
   installLateLink(host);
   // A run follows its own renderer onto new properties (a restored context),
   // but never takes the ledger from another renderer: a graphics rebuild's

@@ -37,6 +37,10 @@ import { createBackgroundGpuQueue } from '../src/render/background_gpu_queue';
 import { CAST_VFX_ENGINE, tagCastVfxEngine } from '../src/render/cast_vfx_family';
 import { castVfxRestoreUnits, createSceneCastVfxReadiness } from '../src/render/cast_vfx_prewarm';
 import { FormAdornments } from '../src/render/characters/form_adornments';
+import {
+  noteSpiritVeilTupleLinked,
+  spiritVeilLedgerSize,
+} from '../src/render/characters/ghost_veil';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
 import { disposeRendererContextGeneration } from '../src/render/context_generation';
 import { ContextRestoreHost, type ContextRestoreSurface } from '../src/render/context_restore';
@@ -63,6 +67,7 @@ import {
 import { PostShed } from '../src/render/post_shed';
 import { createRevealGate } from '../src/render/reveal_gate';
 import { OpaqueSceneCapture } from '../src/render/scene_sampling';
+import { spiritVeilFamilyPrewarmEntry } from '../src/render/spirit_veil_prewarm';
 import { TextureResidencyLedger } from '../src/render/texture_residency_ledger';
 import { Vfx } from '../src/render/vfx';
 
@@ -373,6 +378,18 @@ const RESET_FIXTURES: Record<ContextRestoreResetId, Fixture> = {
     resetFor('spirit-apparitions');
     expect(puppet.compiled).toBe(false);
     expect(probe.compileQueue).toContain(puppet);
+  },
+  'spirit-veil-ledger': () => {
+    const properties = { get: () => ({}) };
+    spiritVeilFamilyPrewarmEntry(
+      {} as Parameters<typeof spiritVeilFamilyPrewarmEntry>[0],
+      { properties },
+      createBackgroundGpuQueue(),
+    );
+    noteSpiritVeilTupleLinked('color:s:0', properties);
+    expect(spiritVeilLedgerSize()).toBe(1);
+    resetFor('spirit-veil-ledger');
+    expect(spiritVeilLedgerSize()).toBe(0);
   },
   'character-visual': () => {
     // A real rig needs the character asset pipeline; the reset reads only

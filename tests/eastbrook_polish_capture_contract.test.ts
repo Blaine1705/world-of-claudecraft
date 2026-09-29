@@ -703,7 +703,11 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the integrated WebGL context restore, spirit-veil, and
   // trinket relics merge: the merged renderer and view-priority leaves match
   // no parent. No capture was retaken.
-  '06bf229a5d46c21b22e0509d0a75fb40e6bb2f44169eace9b321865ccfb53c55';
+  // Re-minted after formatting the merged renderer helper: same content path,
+  // new renderer bytes. No capture was retaken.
+  // Re-minted after compressing that helper for the monolith ratchet: same
+  // content path, new renderer bytes. No capture was retaken.
+  'b5c425b62836e23621fbfa8ed1baa0405eac3b3d5879b947d8e60e3d6ca1af6d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -733,6 +733,8 @@ import {
   noteSelfIdentity,
   type SelfRenderPrediction,
 } from './self_render_position_core';
+import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
+import { warmSelfSpiritPrograms } from './self_spirit_warm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
 import { SET_PROC_FX_BY_NAME } from './set_proc_fx';
@@ -1810,6 +1812,20 @@ export class Renderer {
   // when a class is first sighted, so the builds queue behind one another and
   // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
+  private selfSpirit = new SelfSpiritPrewarmer({
+    // Two queue units with the warm worker's hold between them
+    // (self_spirit_warm.ts); the player's state is re-read at every step.
+    warm: () =>
+      warmSelfSpiritPrograms({
+        blocked: () => !this.asyncCompileSupported || this.sim.player.ghost,
+        visual: () => this.views.get(this.sim.player.id)?.visual ?? null,
+        arms: this.compileArms,
+        run: (work, priority, label, options) =>
+          this.backgroundGpuWork.run(work, priority, label, options),
+        link: (root) => linkColorPrograms(this.compileArms, root, false),
+      }),
+    idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+  });
   // Static terrain/water/features just beyond the current zone are built in a
   // single background lane when their rectangles enter the relaxed fog
   // horizon, so a walked boundary crossing lands on already-resident ground.
@@ -3321,7 +3337,8 @@ export class Renderer {
   }
 
   private castVfxFirstReadRoots(): (THREE.Object3D | undefined)[] {
-    return [...this.abilityVfx.firstReadDrawables(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()];
+    const rings = this.aoeRings;
+    return [...this.abilityVfx.firstReadDrawables(), rings[0]?.ring, this.vfx.cloudDrawable()];
   }
 
   /** What an in-place context restore reads (context_restore.ts). */
@@ -10456,6 +10473,17 @@ export class Renderer {
       );
       if (!e.templateId.startsWith('vision_')) {
         active.clickProxy.userData.entityId = e.id;
+      }
+      // Warm the local player's own spirit variants once per distinct look, so
+      // a death spirit-release never links them inline on the ungated self view.
+      if (e.id === this.sim.player.id) {
+        this.selfSpirit.observe(
+          v.visual,
+          e.skin,
+          e.mainhandItemId,
+          e.offhandItemId,
+          e.weaponSkinId,
+        );
       }
       if (v.clickTarget !== active.clickProxy) {
         const clickIndex = this.clickTargets.indexOf(v.clickTarget);

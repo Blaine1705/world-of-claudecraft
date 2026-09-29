@@ -1002,7 +1002,18 @@ const MONOLITHS: MonolithRow[] = [
     // HELD at 12614 by the integrated WebGL context restore plus spirit-veil
     // merge: the restore lifecycle composes with the veil deletions, measured
     // with wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12614,
+    // RE-PINNED 12614 -> 12615 in the v0.45.0 release batch: trinket relics
+    // share the cast-VFX first-read roots with context-restore relink, while
+    // the spirit-veil branch's renderer deletion and the restore branch's
+    // lifecycle wiring still compose in one file. The helper was compressed
+    // after formatting; wc -l on the resolved tree measures 12615. Exact
+    // count, zero slack.
+    // RE-PINNED 12615 -> 12642 in the v0.45.0 release batch after restoring
+    // PR #4241's self-spirit prewarm wiring that the first conflict pass left
+    // half-applied (context-restore kept the hook but the renderer had lost the
+    // prewarmer field/observe call). The helper modules and tests are extracted;
+    // these are the renderer's remaining call sites. Exact count, zero slack.
+    ceiling: 12642,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
