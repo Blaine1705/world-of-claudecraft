@@ -1195,6 +1195,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/streetlamp_veiled_crystal.glb": "/media/models/props/streetlamp_veiled_crystal.e54add53c527.glb",
   "models/props/streetlamp_willowfen_reed.glb": "/media/models/props/streetlamp_willowfen_reed.2ade5a401884.glb",
   "models/props/streetlamp_wraithwood_ghost.glb": "/media/models/props/streetlamp_wraithwood_ghost.d6cf06f1a113.glb",
+  "models/props/sunken_bastion_kit.glb": "/media/models/props/sunken_bastion_kit.8b25af34ce00.glb",
   "models/props/tailoring_loom.glb": "/media/models/props/tailoring_loom.23644069cd29.glb",
   "models/props/tent_open.glb": "/media/models/props/tent_open.92b3477806c6.glb",
   "models/props/tent_small.glb": "/media/models/props/tent_small.af9378727756.glb",

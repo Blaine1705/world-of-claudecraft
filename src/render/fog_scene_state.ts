@@ -16,6 +16,8 @@ import type { FogSceneState } from './interior_light_rig';
 
 /** The Hollow Crypt's night fog colour (its sky dome fades to it at the horizon). */
 export const HOLLOW_CRYPT_FOG_COLOR = 0x1c2238;
+/** The Sunken Bastion's storm-tide sea fog (its sky dome fades to it at the horizon). */
+export const SUNKEN_BASTION_FOG_COLOR = 0x4d5a57;
 
 export interface FogSceneResolution {
   /** The named dungeon interior the player stands in (null/undefined in the
@@ -55,6 +57,8 @@ export function resolveFogScene(
   // The Hollow Crypt is open-air too, but at night under its OWN sky: the
   // world dome hides and the interior group carries the moonlit sky.
   const inHollowCrypt = interior === 'hollow_crypt';
+  // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
+  const inSunkenBastion = interior === 'sunken_bastion';
   const inLastKeep = interior === 'lastkeep';
   const inDawnhold = interior === 'dawnhold';
   const desired: FogSceneState = inDelve
@@ -73,15 +77,17 @@ export function resolveFogScene(
                 ? 'wildheartField'
                 : inHollowCrypt
                   ? 'hollowCrypt'
-                  : inLastKeep
-                    ? 'lastkeep'
-                    : inDawnhold
-                      ? 'dawnhold'
-                      : inside
-                        ? 'dungeon'
-                        : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                          ? 'underwater'
-                          : 'outdoor';
+                  : inSunkenBastion
+                    ? 'sunkenBastion'
+                    : inLastKeep
+                      ? 'lastkeep'
+                      : inDawnhold
+                        ? 'dawnhold'
+                        : inside
+                          ? 'dungeon'
+                          : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                            ? 'underwater'
+                            : 'outdoor';
   return { interior, desired };
 }
 
@@ -130,6 +136,13 @@ export function applyFogScenePreset(
     fog.color.setHex(HOLLOW_CRYPT_FOG_COLOR);
     fog.near = 70;
     fog.far = 460;
+  } else if (desired === 'sunkenBastion') {
+    // Storm-tide sea fog: grey-green and heavy low over the water, pushed back
+    // far enough that the whole headland climbs out of it from the landing and
+    // the Fogbeacon reads at the top, while the far coast drowns in it.
+    fog.color.setHex(SUNKEN_BASTION_FOG_COLOR);
+    fog.near = 70;
+    fog.far = 640;
   } else if (desired === 'lastkeep') {
     // The Last Keep: a warm hearth-lit haze pushed well back, so its
     // grand three-story halls read golden and inhabited instead of

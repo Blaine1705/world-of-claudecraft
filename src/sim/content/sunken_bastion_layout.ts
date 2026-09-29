@@ -11,8 +11,8 @@
 //   the ditch -> the Rampart Stair -> the Rampart Walk (14) along the east
 //   cliff, two towers (G6 G7, patrol C) -> the Rampart Door -> the Breach
 //   Bastion (16, Knight-Commander Olen) -> the Postern Fog Wall -> the Postern
-//   Stair DOWN into the Sunken Gaol cleft (-6; G8 G9 G10, patrol D) -> the Gaol
-//   Grate -> the Drowning Yard (-6, Gaoler Ossick) -> the Keep Stair Chain ->
+//   Stair DOWN into the Sunken Gaol cleft (1; G8 G9 G10, patrol D) -> the Gaol
+//   Grate -> the Drowning Yard (1, Gaoler Ossick) -> the Keep Stair Chain ->
 //   the Keep Stair switchbacks up the west cliff (G11 G12 on its balconies) ->
 //   the Keep Court (24; G13) -> the Beacon Ward -> the Beacon Crown (30, Vael
 //   the Fogbinder) round the Fogbeacon.
@@ -24,8 +24,9 @@ import type { AuthoredFieldDef, FieldProp, FieldSurface } from '../instances/aut
 
 /** Height of the sea bed under the terraces (the void). */
 export const SUNKEN_BASTION_VOID_HEIGHT = -30;
-/** The sea's surface (render only): below every walkable terrace. */
-export const SUNKEN_BASTION_SEA_LEVEL = -8.5;
+/** The sea's surface (render only): below every walkable terrace, lapping at
+ *  the tidal flats a couple of yards under their mud. */
+export const SUNKEN_BASTION_SEA_LEVEL = -2.5;
 
 function rect(
   id: string,
@@ -108,7 +109,7 @@ export const BASTION_BUTTRESSES: readonly BastionButtress[] = (
 }));
 
 /** The Drowning Yard, Ossick's arena: centre, radius and height. */
-export const DROWNING_YARD = { x: -2, z: 24, r: 22, h: -6 } as const;
+export const DROWNING_YARD = { x: -2, z: 24, r: 22, h: 1 } as const;
 /** The Drowning Winch over its cage pit, in the yard's centre. */
 export const DROWNING_WINCH = { x: -2, z: 24, r: 4.2 } as const;
 /** The four Mooring Posts, one per quarter of the yard. */
@@ -242,11 +243,11 @@ const SURFACES: FieldSurface[] = [
       [49, 98],
       [49, 56],
     ],
-    h: -6,
+    h: 1,
     edge: 'rock',
     ground: 'mud',
   },
-  rect('gaol_neck', -10, 44, 6, 58, -6, { edge: 'rock', ground: 'wetstone' }),
+  rect('gaol_neck', -10, 44, 6, 58, 1, { edge: 'rock', ground: 'wetstone' }),
   {
     kind: 'circle',
     id: 'drowning_yard',
@@ -306,11 +307,11 @@ const SURFACES: FieldSurface[] = [
     points: [
       [40, 126, 16],
       [36, 126, 16],
-      [26, 126, 12],
-      [14, 122, 6],
-      [6, 114, 0],
-      [2, 106, -6],
-      [2, 102, -6],
+      [26, 126, 13],
+      [14, 122, 8.5],
+      [6, 114, 4],
+      [2, 106, 1],
+      [2, 102, 1],
     ],
     halfWidth: 4.5,
     stairs: true,
@@ -322,23 +323,23 @@ const SURFACES: FieldSurface[] = [
     kind: 'path',
     id: 'keep_stair_one',
     points: [
-      [-20, 20, -6],
-      [-26, 20, -6],
-      [-50, 20, 3],
-      [-56, 20, 3],
+      [-20, 20, 1],
+      [-26, 20, 1],
+      [-50, 20, 5],
+      [-56, 20, 5],
     ],
     halfWidth: 4.5,
     stairs: true,
     edge: 'rock',
     ground: 'wetstone',
   },
-  { kind: 'circle', id: 'balcony_one', x: -62, z: 24, r: 9, h: 3, edge: 'balustrade' },
+  { kind: 'circle', id: 'balcony_one', x: -62, z: 24, r: 9, h: 5, edge: 'balustrade' },
   {
     kind: 'path',
     id: 'keep_stair_two',
     points: [
-      [-62, 28, 3],
-      [-62, 34, 3],
+      [-62, 28, 5],
+      [-62, 34, 5],
       [-62, 70, 14],
       [-62, 76, 14],
     ],
@@ -424,6 +425,13 @@ const PROPS: FieldProp[] = [
   { kind: 'sb_tide_rocks', x: -84, z: -160, rot: 0.2, r: 4, h: 3 },
   { kind: 'sb_tide_rocks', x: 74, z: -186, rot: 1.9, r: 3.5, h: 3 },
   { kind: 'sb_tide_rocks', x: -48, z: -204, rot: 4.1, r: 3, h: 2.5 },
+  // The Sea Gate's two drum towers either side of the portcullis (solid).
+  { kind: 'sb_gate_tower', x: -12.4, z: -130, rot: 0, r: 4.3, h: 18 },
+  { kind: 'sb_gate_tower', x: 12.4, z: -130, rot: Math.PI, r: 4.3, h: 18 },
+  // The drawbridge gatehouse on the far side of the ditch: its two piers are
+  // solid (collider-only props under the kit's arch).
+  { kind: 'sb_pier', x: 50.3, z: -26, rot: 0, hw: 1.3, hd: 1.3, h: 12 },
+  { kind: 'sb_pier', x: 63.7, z: -26, rot: 0, hw: 1.3, hd: 1.3, h: 12 },
   // The Lower Bailey: the Drowned Chapel on its island, the east cistern and
   // the west graveyard of the drowned garrison.
   { kind: 'sb_drowned_chapel', x: 0, z: -88, rot: 0, hw: 8, hd: 12, h: 16 },

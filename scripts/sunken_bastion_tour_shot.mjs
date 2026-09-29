@@ -1,0 +1,178 @@
+// Screenshot tour of the reworked Sunken Bastion (open-air sea fortress): boots
+// an offline world on an already-running dev server, enters the Bastion through
+// /dev bastion, and captures each area, the showpiece and each boss arena from
+// a framed camera. Evidence tooling, not a repo test.
+//
+//   node scripts/sunken_bastion_tour_shot.mjs [outDir] [shotId ...]
+//
+// Env: SHOT_URL (http://127.0.0.1:5199/), BROWSER_PATH, SHOT_PRESET (4),
+// SHOT_W / SHOT_H (1600x900), SHOT_GPU=0 to force SwiftShader, SHOT_PREFIX
+// (file prefix, default "bastion_"), SHOT_KEEP_MOBS=1 to leave the packs alive.
+import fs from 'node:fs';
+import path from 'node:path';
+import puppeteer from 'puppeteer-core';
+import { BROWSER_PATH } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
+
+const URL = process.env.SHOT_URL ?? 'http://127.0.0.1:5199/';
+const OUT = process.argv[2] ?? path.join('tmp', 'sunken_bastion_tour');
+const ONLY = process.argv.slice(3);
+const W = Number(process.env.SHOT_W ?? 1600);
+const H = Number(process.env.SHOT_H ?? 900);
+const PRESET = Number(process.env.SHOT_PRESET ?? 4);
+const PREFIX = process.env.SHOT_PREFIX ?? 'bastion_';
+fs.mkdirSync(OUT, { recursive: true });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// at: instance-local spot the player stands on; face: sim radians (0 = +z);
+// the camera orbits at yaw/pitch/dist (input.camYaw is relative to facing).
+// `cmds` run after the teleport (a boss mechanic trigger, a spawn, a pull).
+export const SHOTS = [
+  { id: 'entrada_vista', at: [-10, -222], face: 0.1, pitch: 0.12, dist: 12 },
+  { id: 'marismas', at: [-30, -196], face: 0.35, pitch: 0.22, dist: 16 },
+  { id: 'puerta_del_mar', at: [0, -160], face: 0, pitch: 0.18, dist: 16 },
+  { id: 'patio_bajo_capilla', at: [-50, -124], face: 0.55, pitch: 0.3, dist: 18 },
+  { id: 'patio_cisterna', at: [44, -118], face: -0.2, pitch: 0.3, dist: 16 },
+  { id: 'puente_levadizo', at: [57, -60], face: 0, pitch: 0.22, dist: 14 },
+  { id: 'muralla', at: [57, 14], face: 0, pitch: 0.22, dist: 14 },
+  { id: 'muralla_vista_mar', at: [60, 50], face: 1.4, pitch: 0.12, dist: 12 },
+  { id: 'jefe1_olen_bastion', at: [57, 110], face: 0, pitch: 0.3, dist: 18 },
+  { id: 'poterna', at: [30, 126], face: -1.8, pitch: 0.3, dist: 14 },
+  { id: 'carcel_hundida', at: [4, 100], face: Math.PI, pitch: 0.3, dist: 18 },
+  { id: 'jefe2_ossick_patio', at: [-2, 46], face: Math.PI, pitch: 0.34, dist: 18 },
+  { id: 'escalera_torreon', at: [-62, 40], face: 0, pitch: 0.3, dist: 16 },
+  { id: 'balcon_vista', at: [-58, 86], face: 1.8, pitch: 0.26, dist: 14 },
+  { id: 'patio_torreon', at: [-40, 140], face: -0.6, pitch: 0.24, dist: 16 },
+  { id: 'jefe3_vael_corona', at: [-16, 190], face: 0.5, pitch: 0.3, dist: 20 },
+  { id: 'faro_desde_abajo', at: [-12, 184], face: 0.3, pitch: -0.05, dist: 10 },
+];
+
+async function main() {
+  const gpu = process.env.SHOT_GPU !== '0';
+  const browser = await puppeteer.launch({
+    executablePath: BROWSER_PATH,
+    headless: 'new',
+    args: [
+      `--window-size=${W},${H}`,
+      ...(gpu
+        ? ['--use-angle=d3d11', '--ignore-gpu-blocklist', '--enable-gpu-rasterization']
+        : ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']),
+    ],
+    defaultViewport: { width: W, height: H },
+    protocolTimeout: 240000,
+  });
+  try {
+    const page = await browser.newPage();
+    page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error') console.log('CONSOLE:', m.text().slice(0, 300));
+    });
+    await page.evaluateOnNewDocument((preset) => {
+      try {
+        localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: preset }));
+      } catch {
+        /* ignore */
+      }
+    }, PRESET);
+    await page.goto(URL, { waitUntil: 'networkidle0', timeout: 180000 });
+    const booted = await enterOfflineGame(page, {
+      charClass: 'warrior',
+      charName: 'Tidewalker',
+      gameBootTimeoutMs: 180000,
+      selectorTimeoutMs: 90000,
+      settleMs: 4000,
+    });
+    if (!booted) throw new Error('offline world did not boot');
+    const cmds = [
+      '/dev level 20',
+      '/dev god',
+      '/dev noaggro',
+      '/dev bastion enter',
+      '/dev bastion gates',
+    ];
+    for (const cmd of cmds) {
+      await page.evaluate((c) => window.__game.world.chat(c), cmd);
+      await sleep(1300);
+    }
+    await page.waitForFunction(
+      () => {
+        let found = false;
+        window.__game.renderer.scene.traverse((o) => {
+          if (o.name === 'sunkenBastionField') found = true;
+        });
+        return found;
+      },
+      { timeout: 180000, polling: 1000 },
+    );
+    await sleep(5000);
+    if (process.env.SHOT_HIDE) {
+      await page.evaluate((names) => {
+        window.__game.renderer.scene.traverse((o) => {
+          if (names.includes(o.name)) o.visible = false;
+        });
+      }, process.env.SHOT_HIDE.split(','));
+    }
+    await page.addStyleTag({ content: '#ui, #nameplates { display: none !important; }' });
+    await page.evaluate(() => window.__game.world.chat('/dev bastion tp landing'));
+    await sleep(900);
+    // The landing arrival is instance-local (-10, -230): recover the slot origin.
+    const origin = await page.evaluate(() => {
+      const p = window.__game.world.player;
+      return { x: p.pos.x + 10, z: p.pos.z + 230 };
+    });
+    for (const shot of SHOTS) {
+      if (ONLY.length && !ONLY.includes(shot.id)) continue;
+      await sleep(1600);
+      const [lx, lz] = shot.at;
+      await page.evaluate(
+        (c) => window.__game.world.chat(c),
+        `/dev tp ${origin.x + lx} ${origin.z + lz}`,
+      );
+      await sleep(700);
+      for (const c of shot.cmds ?? []) {
+        await page.evaluate((cmd) => window.__game.world.chat(cmd), c);
+        await sleep(1300);
+      }
+      await page.evaluate((s) => {
+        const p = window.__game.world.player;
+        p.facing = s.face;
+        p.prevFacing = s.face;
+        const input = window.__game.input;
+        input.camYaw = s.yaw ?? 0;
+        input.camPitch = s.pitch;
+        input.camDist = s.dist;
+      }, shot);
+      await sleep(shot.wait ?? 2800);
+      const perf = await page.evaluate(
+        () =>
+          new Promise((resolve) => {
+            const info = window.__game.renderer.webgl.info.render;
+            let frames = 0;
+            const t0 = performance.now();
+            const tick = () => {
+              frames++;
+              if (performance.now() - t0 < 1500) requestAnimationFrame(tick);
+              else
+                resolve({
+                  fps: Math.round((frames * 1000) / (performance.now() - t0)),
+                  calls: info.calls,
+                  tris: info.triangles,
+                });
+            };
+            requestAnimationFrame(tick);
+          }),
+      );
+      console.log('PERF', shot.id, JSON.stringify(perf));
+      const file = path.join(OUT, `${PREFIX}${shot.id}.png`);
+      await page.screenshot({ path: file });
+      console.log('SHOT', file);
+    }
+  } finally {
+    await browser.close();
+  }
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

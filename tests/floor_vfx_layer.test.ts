@@ -105,6 +105,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/hollow_crypt/crypt_lights.ts', layer: 'ground', strict: true },
   // The engraved rite circle and cloister rosette: dim world marks on the floor.
   { file: 'src/render/hollow_crypt/crypt_floor_marks.ts', layer: 'ground', strict: true },
+  // The Sunken Bastion's lantern and brazier pools on its floors.
+  { file: 'src/render/sunken_bastion/bastion_lights.ts', layer: 'ground', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },
@@ -250,6 +252,15 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   // vertical soul column, wisps, dust and moonbeams (no floor mark; its floor
   // pool lives in crypt_lights.ts on the ground rung).
   'src/render/hollow_crypt/crypt_atmosphere.ts',
+  // The Sunken Bastion's sky, sea, fog banks, rain and gulls; the Fogbeacon's
+  // beam and fog streams; the surf off the cliff feet; the standing water (on
+  // the water surface order 0, under the whole ladder); and the gates' fog
+  // walls, which stand up across a passage. None is a floor mark.
+  'src/render/sunken_bastion/bastion_sky_sea.ts',
+  'src/render/sunken_bastion/bastion_beacon.ts',
+  'src/render/sunken_bastion/bastion_shore.ts',
+  'src/render/sunken_bastion/bastion_water.ts',
+  'src/render/sunken_bastion/bastion_gates.ts',
   // battleground objective marks and world markers far from any raid floor
   'src/render/battleground.ts',
   'src/render/battleground_fx.ts',

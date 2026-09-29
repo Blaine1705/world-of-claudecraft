@@ -31,6 +31,7 @@ export type FogSceneState =
   | 'practice'
   | 'wildheartField'
   | 'hollowCrypt'
+  | 'sunkenBastion'
   | 'lastkeep'
   | 'dawnhold';
 
@@ -102,6 +103,23 @@ const HOLLOW_CRYPT_HEMI_GROUND_COLOR = 0x4a3d45;
 /** Where the moon hangs (from the ground toward it): north-north-west over
  *  the crag, low enough to throw long shadows toward the entrance. */
 export const HOLLOW_CRYPT_MOON_DIRECTION = new THREE.Vector3(-0.3, 0.3, 0.9).normalize();
+// The Sunken Bastion: an OPEN-AIR sea fortress at storm tide, at dusk. Its own
+// sky rides the interior group (the realm clock never changes the look); the
+// one sun is a low, pale disc sinking behind the fog banks in the south-west,
+// raking the fortress from the side as the party looks up the headland, with
+// a grey-green sea-fog bounce and a cold slate floor bounce. The beacon's beam
+// and the lanterns carry the only warm light.
+const SUNKEN_BASTION_SUN_INTENSITY = 2.25;
+const SUNKEN_BASTION_HEMI_INTENSITY = 0.74;
+const SUNKEN_BASTION_ENV_INTENSITY = 0.32;
+const SUNKEN_BASTION_RIM_BOOST = 1.9;
+const SUNKEN_BASTION_SUN_COLOR = 0xffd9a8;
+const SUNKEN_BASTION_HEMI_SKY_COLOR = 0x86968c;
+const SUNKEN_BASTION_HEMI_GROUND_COLOR = 0x3b362c;
+/** Where the storm sun hangs (from the ground toward it): low in the west,
+ *  a little north, behind the fog banks over the fen-sea, so it rakes the
+ *  headland from the side as the party climbs it (long shadows, lit edges). */
+export const SUNKEN_BASTION_SUN_DIRECTION = new THREE.Vector3(-0.86, 0.3, 0.3).normalize();
 // The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
 // ambient floor (over the candle-orange torch lights the interior itself
 // carries) so its halls read golden and inhabited while staying indoors-dim.
@@ -152,6 +170,10 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
     out.copy(HOLLOW_CRYPT_MOON_DIRECTION);
     return true;
   }
+  if (state === 'sunkenBastion') {
+    out.copy(SUNKEN_BASTION_SUN_DIRECTION);
+    return true;
+  }
   if (state !== 'wildheartField') return false;
   out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
   return true;
@@ -171,6 +193,7 @@ export function applyInteriorLightRig(
   const mazeNight = state === 'yumiMaze';
   const wildheartSun = state === 'wildheartField';
   const cryptMoon = state === 'hollowCrypt';
+  const bastionDusk = state === 'sunkenBastion';
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
   const ignivarForge = state === 'ignivarApproach' || state === 'ignivar' || state === 'varkhul';
@@ -184,54 +207,62 @@ export function applyInteriorLightRig(
     ? YUMI_MAZE_SUN_INTENSITY
     : cryptMoon
       ? HOLLOW_CRYPT_SUN_INTENSITY
-      : wildheartSun
-        ? WILDHEART_SUN_INTENSITY
-        : keepHearth
-          ? LASTKEEP_SUN_INTENSITY
-          : dawnholdDay
-            ? DAWNHOLD_SUN_INTENSITY
-            : underground
-              ? DUNGEON_SUN_INTENSITY
-              : outdoor.sunIntensity;
+      : bastionDusk
+        ? SUNKEN_BASTION_SUN_INTENSITY
+        : wildheartSun
+          ? WILDHEART_SUN_INTENSITY
+          : keepHearth
+            ? LASTKEEP_SUN_INTENSITY
+            : dawnholdDay
+              ? DAWNHOLD_SUN_INTENSITY
+              : underground
+                ? DUNGEON_SUN_INTENSITY
+                : outdoor.sunIntensity;
   targets.hemi.intensity = mazeNight
     ? YUMI_MAZE_HEMI_INTENSITY
     : cryptMoon
       ? HOLLOW_CRYPT_HEMI_INTENSITY
-      : wildheartSun
-        ? WILDHEART_HEMI_INTENSITY
-        : keepHearth
-          ? LASTKEEP_HEMI_INTENSITY
-          : dawnholdDay
-            ? DAWNHOLD_HEMI_INTENSITY
-            : underground
-              ? DUNGEON_HEMI_INTENSITY
-              : outdoor.hemiIntensity;
+      : bastionDusk
+        ? SUNKEN_BASTION_HEMI_INTENSITY
+        : wildheartSun
+          ? WILDHEART_HEMI_INTENSITY
+          : keepHearth
+            ? LASTKEEP_HEMI_INTENSITY
+            : dawnholdDay
+              ? DAWNHOLD_HEMI_INTENSITY
+              : underground
+                ? DUNGEON_HEMI_INTENSITY
+                : outdoor.hemiIntensity;
   targets.scene.environmentIntensity = mazeNight
     ? YUMI_MAZE_ENV_INTENSITY
     : cryptMoon
       ? HOLLOW_CRYPT_ENV_INTENSITY
-      : wildheartSun
-        ? WILDHEART_ENV_INTENSITY
-        : keepHearth
-          ? LASTKEEP_ENV_INTENSITY
-          : dawnholdDay
-            ? DAWNHOLD_ENV_INTENSITY
-            : underground
-              ? DUNGEON_ENV_INTENSITY
-              : outdoor.envIntensity;
+      : bastionDusk
+        ? SUNKEN_BASTION_ENV_INTENSITY
+        : wildheartSun
+          ? WILDHEART_ENV_INTENSITY
+          : keepHearth
+            ? LASTKEEP_ENV_INTENSITY
+            : dawnholdDay
+              ? DAWNHOLD_ENV_INTENSITY
+              : underground
+                ? DUNGEON_ENV_INTENSITY
+                : outdoor.envIntensity;
   targets.rim.value = mazeNight
     ? YUMI_MAZE_RIM_BOOST
     : cryptMoon
       ? HOLLOW_CRYPT_RIM_BOOST
-      : wildheartSun
-        ? WILDHEART_RIM_BOOST
-        : keepHearth
-          ? LASTKEEP_RIM_BOOST
-          : dawnholdDay
-            ? DAWNHOLD_RIM_BOOST
-            : underground
-              ? DUNGEON_RIM_BOOST
-              : 1;
+      : bastionDusk
+        ? SUNKEN_BASTION_RIM_BOOST
+        : wildheartSun
+          ? WILDHEART_RIM_BOOST
+          : keepHearth
+            ? LASTKEEP_RIM_BOOST
+            : dawnholdDay
+              ? DAWNHOLD_RIM_BOOST
+              : underground
+                ? DUNGEON_RIM_BOOST
+                : 1;
   // The rim tint defaults cool everywhere; the forge applier below re-grades
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
@@ -244,6 +275,10 @@ export function applyInteriorLightRig(
     targets.sun.color.setHex(HOLLOW_CRYPT_SUN_COLOR);
     targets.hemi.color.setHex(HOLLOW_CRYPT_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(HOLLOW_CRYPT_HEMI_GROUND_COLOR);
+  } else if (bastionDusk) {
+    targets.sun.color.setHex(SUNKEN_BASTION_SUN_COLOR);
+    targets.hemi.color.setHex(SUNKEN_BASTION_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(SUNKEN_BASTION_HEMI_GROUND_COLOR);
   } else if (wildheartSun) {
     targets.sun.color.setHex(WILDHEART_SUN_COLOR);
     targets.hemi.color.setHex(WILDHEART_HEMI_SKY_COLOR);

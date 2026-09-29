@@ -504,6 +504,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/point_light_carriers.ts': 'the carriers themselves, the only lights three gathers',
   'render/hollow_crypt/crypt_lights.ts':
     'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
+  'render/sunken_bastion/bastion_lights.ts':
+    'the Sunken Bastion lanterns, braziers, fog-fire and the Fogbeacon lamp, pushed through the fireLights adopter sink the interiors are handed',
   'render/props.ts':
     'campfire and prop fire lights, the seed of the fireLights registry, mass hidden in the constructor',
   'render/quest_objects.ts':
@@ -613,6 +615,9 @@ describe('every point-light producer is a carrier source', () => {
       'render/jail_scene.ts: swirl',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
+      // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
+      // the idle sweep or to Vael's lamp yaw, never a scene.
+      'render/sunken_bastion/bastion_beacon.ts: mesh',
     ]);
 
     expect(sourceOf('render/light_pulses.ts')).toContain('markPointLightSource(light);');

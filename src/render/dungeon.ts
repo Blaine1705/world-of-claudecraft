@@ -115,6 +115,7 @@ import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { riftPlatformSlabs } from './rift_platform_core';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
+import { buildSunkenBastionInterior } from './sunken_bastion';
 import { radialGlowTexture } from './textures';
 import { addTorchGlowDecal } from './torch_glow_decal';
 import { buildWildheartFieldInterior } from './wildheart_props';
@@ -653,13 +654,15 @@ export class DungeonInteriors {
     await ensureDungeonAssets();
     await ensureIgnivarRaidDressingAssets(interior);
     await ensureIgnivarTileAssets(interior, loadModuleAsset);
-    if (interior === 'wildheart' || interior === 'hollow_crypt') {
+    if (interior === 'wildheart' || interior === 'hollow_crypt' || interior === 'sunken_bastion') {
       // Open-air fields: their own builders, same deps and compile gate.
       const deps = { lowGfx: this.lowGfx, flames: this.flames, fireLights: this.fireLights };
       const group =
         interior === 'wildheart'
           ? buildWildheartFieldInterior(deps)
-          : await buildHollowCryptInterior(deps, ox, oz);
+          : interior === 'hollow_crypt'
+            ? await buildHollowCryptInterior(deps, ox, oz)
+            : await buildSunkenBastionInterior(deps, ox, oz);
       group.position.set(ox, 0, oz);
       group.userData.renderCategory = 'dungeon';
       await attachSceneGroupGated(this.scene, group, this.compileGate);
