@@ -31,6 +31,7 @@ import {
   NICK_MAX,
   PVP_FEED_LINES_PER_POST,
   PVP_FEED_NAME_MAX,
+  PVP_FEED_NUMBER_MAX,
   type PvpKillItem,
   pvpFeedName,
   pvpKillLine,
@@ -1116,17 +1117,24 @@ describe('PvP kill feed builders', () => {
   });
 
   it('keeps a full batch of worst-case lines inside the 4096-character description limit', () => {
+    // Every escaped field full of metacharacters (each escapes to double
+    // length) and every number past the clamp, so this is the true worst line.
+    const meta = '*'.repeat(PVP_FEED_NAME_MAX);
     const worst = kill({
-      killerName: 'W'.repeat(PVP_FEED_NAME_MAX),
-      victimName: '*'.repeat(PVP_FEED_NAME_MAX),
-      zoneName: 'Z'.repeat(PVP_FEED_NAME_MAX),
-      killerLevel: 999,
-      victimLevel: 999,
-      assists: 999,
-      copper: 999_999_999,
+      killerName: meta,
+      victimName: meta,
+      zoneName: meta,
+      killerLevel: 1e300,
+      victimLevel: 1e300,
+      assists: 1e300,
+      copper: 1e300,
     });
+    const line = pvpKillLine(worst);
+    expect(line).not.toContain('e+');
+    expect(line).toContain(`(${PVP_FEED_NUMBER_MAX})`);
     const payload = buildPvpKillFeedMessage(Array(PVP_FEED_LINES_PER_POST).fill(worst));
     const description = (payload.embeds as { description: string }[])[0].description;
+    expect(description).toBe(Array(PVP_FEED_LINES_PER_POST).fill(line).join('\n'));
     expect(description.length).toBeLessThanOrEqual(4096);
   });
 });

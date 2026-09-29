@@ -895,13 +895,14 @@ export interface PvpKillItem {
 /**
  * Lines per digest post. One drain becomes ceil(n / this) posts, so a burst of
  * kills costs a handful of createMessage calls rather than one each, and the
- * server's queue cap (PVP_KILL_FEED_MAX_QUEUE, 100) bounds a drain at seven.
- * Sized against the WORST line, not a typical one: two PVP_FEED_NAME_MAX names
- * of pure markdown metacharacters escape to double length, and the measured
- * worst line is about 217 characters, so fifteen stay inside the 4096-character
- * embed description limit (pinned in tests/discord_bot.test.ts).
+ * server's queue cap (PVP_KILL_FEED_MAX_QUEUE) bounds how many posts a drain
+ * can take. Sized against the WORST line, not a typical one: all three escaped
+ * fields (killer, victim, zone) at PVP_FEED_NAME_MAX of pure markdown
+ * metacharacters escape to double length, and every number sits at
+ * PVP_FEED_NUMBER_MAX. A full batch of that line must stay inside the
+ * 4096-character embed description limit; tests/discord_bot.test.ts pins it.
  */
-export const PVP_FEED_LINES_PER_POST = 15;
+export const PVP_FEED_LINES_PER_POST = 13;
 /** Character names are short in game; this only bounds a malformed wire value. */
 export const PVP_FEED_NAME_MAX = 32;
 
@@ -915,9 +916,17 @@ export function pvpFeedName(raw: string): string {
   return bounded.replace(/[\\*_~`|>[\]()#-]/g, (ch) => `\\${ch}`) || 'Someone';
 }
 
-/** Whole non-negative integer from an unchecked wire number, else 0. */
+/**
+ * Ceiling for every number a kill line renders. Far above any real level,
+ * assist count or stake (the stake is capped in copper well below it), it only
+ * bounds a malformed wire value so a line can never render `1e+300`.
+ */
+export const PVP_FEED_NUMBER_MAX = 999_999_999;
+
+/** Whole integer in [0, PVP_FEED_NUMBER_MAX] from an unchecked wire number, else 0. */
 function wireCount(value: unknown): number {
-  return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
+  return Math.min(PVP_FEED_NUMBER_MAX, Math.max(0, Math.floor(value)));
 }
 
 /** Split one drain into digest-sized batches, FIFO order kept. */

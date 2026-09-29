@@ -4,7 +4,7 @@
 // paid-death guard, so no dedupe key is needed here); the activity-detect chain
 // shapes it with `pvpKillFeedItem` and enqueues it; the bot drains it through
 // the consolidated GET /internal/discord/outbox poll (the `pvpKills` stream)
-// and batches each drain into digest posts (bot/logic.ts buildPvpKillFeedMessages).
+// and batches each drain into digest posts (bot/logic.ts buildPvpKillFeedMessage).
 //
 // Deliberately NOT an activity kind. The activity feed posts one card per
 // moment, tags linked players, and drops any item with no linked participant;
@@ -55,7 +55,7 @@ const QUEUE: QueuedPvpKill[] = [];
  * Backstop so a stalled/absent bot (or an unset channel) can never grow this
  * unbounded; oldest kills drop first. Exported so the outbox payload-bound
  * fixture builds its worst case from the REAL cap, not a mirror. A drain at the
- * cap is at most seven digest posts on the bot side (PVP_FEED_LINES_PER_POST).
+ * cap costs ceil(cap / bot/logic.ts PVP_FEED_LINES_PER_POST) digest posts.
  */
 export const PVP_KILL_FEED_MAX_QUEUE = 100;
 

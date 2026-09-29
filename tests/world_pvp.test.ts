@@ -857,6 +857,21 @@ describe('the Discord kill feed record (the server-only worldPvpKill event)', ()
   });
 
   it("reads the victim's zone, not the killer's", () => {
+    // Different zones on purpose: a record read off the killer's position
+    // would say CONTESTED_ZONE here. Both flagged, so the pair is hostile.
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    flag(sim, a);
+    flag(sim, b);
+    placeIn(sim, a, CONTESTED_ZONE);
+    placeIn(sim, b, FFA_ZONE);
+    sim.events = [];
+    slay(sim, a, b);
+    expect(kills(sim).map((k) => k.zoneId)).toEqual([FFA_ZONE]);
+  });
+
+  it('an UNFLAGGED kill on free-for-all ground still fires (world PvP, not only /pvp)', () => {
     const sim = world();
     const a = addFighter(sim, 'Aleph', 20, 1);
     const b = addFighter(sim, 'Bet', 20, 2);
@@ -864,7 +879,40 @@ describe('the Discord kill feed record (the server-only worldPvpKill event)', ()
     placeIn(sim, b, FFA_ZONE, 2);
     sim.events = [];
     slay(sim, a, b);
-    expect(kills(sim).map((k) => k.zoneId)).toEqual([FFA_ZONE]);
+    expect(kills(sim).map((k) => [k.killerName, k.victimName, k.zoneId])).toEqual([
+      ['Aleph', 'Bet', FFA_ZONE],
+    ]);
+  });
+
+  it("a pet's killing blow names its OWNER as the killer", () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const victim = addFighter(sim, 'Victim', 18, 2);
+    standTogether(sim, [a, victim]);
+    flag(sim, a);
+    flag(sim, victim);
+    const pet = { kind: 'mob', id: 999_999, ownerId: a, name: 'Wolf', level: 60 } as Entity;
+    sim.events = [];
+    worldPvpOnPlayerDeath(sim.ctx, ent(sim, victim), pet);
+    expect(kills(sim).map((k) => [k.killerName, k.killerLevel, k.victimName])).toEqual([
+      ['Aleph', 20, 'Victim'],
+    ]);
+  });
+
+  it("two flagged players mid-duel with each other are the duel's business: no record", () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    standTogether(sim, [a, b]);
+    flag(sim, a);
+    flag(sim, b);
+    // The state the duel arm of isWorldPvpHostile reads (inActiveDuelTogether).
+    const duel = { a, b, state: 'active' } as never;
+    sim.ctx.duels.set(a, duel);
+    sim.ctx.duels.set(b, duel);
+    sim.events = [];
+    worldPvpOnPlayerDeath(sim.ctx, ent(sim, b), ent(sim, a));
+    expect(kills(sim)).toEqual([]);
   });
 });
 

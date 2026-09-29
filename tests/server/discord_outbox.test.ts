@@ -100,14 +100,16 @@ const RELAY_CAP = RELAY_MAX_QUEUE;
 const ACTIVITY_CAP = ACTIVITY_MAX_QUEUE;
 
 /**
- * The bound on the serialized `data` payload, in bytes. The worst-case fixture
- * below measured 306,445 bytes once the PvP kill feed joined it at its 100-item
- * cap (287,100 before that; 0.2 ms of JSON.stringify; 290,671 before the
- * #2791 narrowing dropped the unused winner-row fields, 279,891 before the
- * activity fixture moved to the wider deed item shape) when the drain moved to
- * a 1000-item link-change page and a one-day winners ask; the bound is roughly
- * 1.5x that, rounded to a clean number, so ordinary drift in the fixtures does
- * not red it while a page raise or a new per-item field does. The test logs its
+ * The bound on the serialized `data` payload, in bytes. The bound was set at
+ * roughly 1.5x the 287,100 bytes the worst-case fixture below measured (0.2 ms
+ * of JSON.stringify; 290,671 before the #2791 narrowing dropped the unused
+ * winner-row fields, 279,891 before the activity fixture moved to the wider
+ * deed item shape) when the drain moved to a 1000-item link-change page and a
+ * one-day winners ask, rounded to a clean number, so ordinary drift in the
+ * fixtures does not red it while a page raise or a new per-item field does.
+ * The PvP kill feed joining at its 100-item cap raised the measurement to
+ * 306,445 bytes, leaving about 1.37x headroom: the next stream should re-derive
+ * the bound rather than assume the old slack. The test logs its
  * own measurement, so re-deriving the headroom never means guessing at the size.
  *
  * The earlier figure was 979,051 bytes, at a whole-cap 5,000-item drain and five
