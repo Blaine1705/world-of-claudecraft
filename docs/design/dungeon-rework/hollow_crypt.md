@@ -50,60 +50,55 @@ interior key, so no world-map, portal or quest change is needed.
 
 ## 3. Route map
 
-Instance-local coordinates (yards), z forward, floor heights in parentheses.
-About 180 by 260 yd, inside one instance slot.
+**Open air (owner direction, 2026-09-29).** The Crypt is not an enclosed
+dungeon: it is a ruined abbey and necropolis on a crag at dusk, every nave
+roofless, every terrace an authored surface of the open field
+(`src/sim/content/hollow_crypt_layout.ts`, `HOLLOW_CRYPT_FIELD`; engine in
+`src/sim/instances/authored_field/`). Terraces end in crags that drop into a
+misted void; the edges are the walls. The precedent is Wildheart Basin and the
+Buried Hoard valley. Instance-local yards, z forward, floor heights in
+parentheses; about 230 by 390 yd.
 
 ```
- z 250 +------------------------------------------------------+
-       |              THE RITE NAVE  (-14)   Boss 4: Morthen  |
-       |    candle N        alcoves        candle E           |
-       |              [ dais + altar + Ledger ]               |
-       |    candle W                       candle S           |
- z 195 +---------------------[ Gate C ]---------------------- +
-                           THE BONE STAIR  spiral ramp
-                           (-6 down to -14)   P9 procession
- z 165 +------------------------------------------------------+
-       |  THE CHOIR LOFT  lower floor (-6), loft terrace (-2)  |
-       |  side ramps, 6 loft pillars, Bone Organ  Boss 3: Ilvane|
- z 128 +-------------------[ Twin Seals ]---------------------+
-                     REJOIN PLAZA (-4)  P8 choir approach
-   +--------------------+                   +--------------------+
-   | THE SEXTON'S YARD  |                   | THE WIDOW'S GALLERY|
-   | cavern (-2 to -4)  |                   | lower floor (-4)   |
-   | P4 trench          |                   | balcony (0), ramp  |
-   | P5 bell pit        |                   | P6 nest, P7 balcony|
-   | Boss 1: Marrow     |                   | Boss 2: Rimeweb    |
-   +-----[Yard Gate]----+                   +--[Gallery Gate]----+
- z 75  +------------------------[ Gate A ]---------------------+
-       |  THE UNDERCROFT (0)  columned ossuary hall, 60 x 60     |
-       |  P1 vestibule   P2 patrol loop   P3 gate guards        |
- z 5   +------------------------------------------------------+
-       |  THE CHAPEL STAIR  entry landing (+6), overlook         |
- z -15 +------------------------------------------------------+
+ z 233  ( ring 24 )  THE RITE RING: roofless ritual circle, r 28, four candle
+          |          pillars, altar, the soul column.   Boss 4: Morthen
+          |          [Unquiet Ward: seals while Morthen is engaged]
+ z 168  THE BONE STAIR: spiral path up the crag (5 to 24), P9 patrol
+          |          [Bone Stair Gate: P9]
+ z 150  CHOIR LOFT (5), balcony, Bone Organ.   Boss 3: Cantor Ilvane
+ z 112  CHOIR RUIN (0), roofless nave with pews
+          |          [Twin Seals: P8 + Marrow + Rimeweb; seal during Ilvane]
+ z 20   PROCESSIONAL (0), candle pillars, P8
+   west                                                  east
+   SEXTON'S YARD (2) graveyard, P4                      WIDOW'S GALLERY (-6) frost
+   ramp up to the BELL YARD (8), P5                     ravine, P6; RIM WALK (0) P7
+   [Bone Barrier: P4 + P5; seals during Marrow]         [Frost-Web Curtain: P6 + P7;
+   Boss 1: Marrow under the fallen bell tower            seals during Rimeweb]
+   [Bridge of Bone: assembles on Marrow's death]        GREAT WEB (-6) Boss 2: Rimeweb
+   back to the choir                                    [Webbed Causeway: Rimeweb]
+          |          [Undercroft Grille: P1 + P2 + P3]
+ z -80  CLOISTER (0), ossuary monument, P1, P2 patrol loop, P3 at the grille
+ z -116 THE CHAPEL STAIR down from the entry landing (20): the first vista
 ```
 
-The order is: Undercroft, then BOTH wings in either order (west: Yard and Marrow,
-east: Gallery and Rimeweb), rejoin, Choir Loft and Ilvane, Bone Stair, Rite Nave
-and Morthen.
+The order is: Cloister, then BOTH wings in either order (west: Yard, Bell Yard
+and Marrow, back over the Bridge of Bone; east: Gallery, Rim Walk, Great Web and
+Rimeweb, back over the Webbed Causeway), the Processional, the Choir and Ilvane,
+the Bone Stair, the Rite Ring and Morthen.
 
-**Landmarks and sight lines.** From the entry landing the group looks down over
-the whole Undercroft, with the far Gate A and the two wing arches beyond it. The
-Burial Bell hangs in its shaft above the Yard, visible through the west arch; the
-rime-white Great Web glows through the east arch. From the Choir Loft's rear
-window the group looks down into the Rite Nave and the violet-green soul light
-rising from Morthen's altar: the finale is seen long before it is reached.
+**Landmarks and sight lines.** From the entry landing the whole necropolis lies
+below: the cloister, the processional, the leaning bell tower against the moon
+on the west, the frost ravine glittering on the east, and at the far end the
+soul column rising from the Rite Ring, visible from every terrace. The finale is
+seen from the first step.
 
-**Gates and seals (no skipping, G7):**
-- Gate A (the Undercroft Grille) opens when packs P1, P2 and P3 are dead.
-- The Yard Gate and the Gallery Gate open with Gate A. Inside each wing, the boss
-  arena seals (encounter seal) until that wing's packs are dead: Marrow's yard
-  after P4 and P5, Rimeweb's web after P6 and P7.
-- The Twin Seals (two sigil discs on the Choir Loft doors) open only when BOTH
-  Marrow and Rimeweb are dead: each boss death extinguishes one sigil.
-- Gate C at the foot of the Bone Stair opens when Ilvane and pack P9 are dead.
-- Every boss arena also seals WHILE its boss is engaged and reopens on kill or
-  wipe (anti-kite, anti-leave-reset). Opened gates stay open for the instance's
-  life, so a corpse run always has a clear path. `bossChainPull` stays on.
+**Gates and seals (no skipping, G7).** Gate state is derived every tick from the
+claim roster (`src/sim/instances/dungeon_gates.ts`): a gate is closed until its
+packs and bosses are dead, sealed while its `sealWhileEngaged` boss is alive and
+engaged, open otherwise. A wipe clears the seal and never re-closes a cleared
+gate, so a corpse run always has a path. `bossChainPull` stays on. Kinds:
+portcullis, bone barrier, bone bridge (the path itself assembles), frost-web
+curtain, warded arch, rite ward.
 
 ## 4. Trash with a purpose
 
@@ -316,42 +311,47 @@ then break the rite with the room's candles (Morthen). No core repeats.
 
 ## 7. Environment art direction
 
-- **Palette:** bone ivory (#D9D0BC) and grave-earth umber (#4A3B2C) for the
-  stone; tallow amber (#E8A64A) is the "living" light (candles, lanterns, the only
-  warm tones); Gravecaller violet (#7B4FA0) and soul green (#6FD6A8) belong to the
-  enemy's magic and to the finale's column. Rime white-blue (#CFE3F0) only in the
-  Gallery. Telegraph colors stay brighter than any of these.
+Open air at dusk turning to night. The render lives in `src/render/hollow_crypt/`
+(its `CLAUDE.md` owns the performance and prewarm contract).
+
+- **Sky and light.** Own sky dome (a huge low moon, moving cloud bands, stars),
+  fog state `hollowCrypt` (cold blue, far), the moon as the key light, warm
+  tallow point lights only at candles and lanterns (carrier budget), violet and
+  soul green reserved for the enemy's magic and the finale.
+- **Palette:** bone ivory and grave-earth umber stone, tallow amber for the only
+  warm light, Gravecaller violet and soul green for the enemy, rime white-blue
+  only in the east wing. Telegraph colors stay brighter than any of these.
 - **Per space:**
-  - Chapel Stair: broken chapel floor above, a single daylight shaft (the last
-    daylight), worn wide steps, the overlook balustrade.
-  - Undercroft: columned ossuary hall, skull-lined burial niches, stacked coffins,
-    low groin vaults, tallow candle clusters on the niches.
-  - Sexton's Yard: earth floor, crooked headstones, roots through the ceiling,
-    lantern posts, the Burial Bell in its shaft.
-  - Widow's Gallery: collapsed catacomb in cold fill light, frosted silk sheets and
-    hanging strands, egg sacs, the Great Web between broken columns.
-  - Choir Loft: vaulted chapel, loft balustrade, six bone-clad pillars, the Bone
-    Organ, a bone-tracery window onto the Nave, violet candlelight.
-  - Bone Stair: a spiral ramp around the soul-light shaft, niches all the way down.
-  - Rite Nave: the circular nave, dais, altar and Ledger lectern, the four
-    Remembrance Candles (unlit and lit states), sarcophagus alcoves, the rose
-    window and the soul-light column.
-- **Blender kit list.** Reuse from the Buried Hoard crypt room kit
-  (`docs/design/boss-rooms/crypt/build_crypt_kit.py`, `hoard_crypt_kit.glb`):
-  OssuaryAltar, Tombstones, Sarcophagus, BoneCandelabrum, BrokenColumn,
-  FallenColumn, SkullPile, CryptArch, HangingCenser. New pieces: OssuaryNicheWall
-  module, CoffinStack, GroinVault ceiling module, Headstone set (4 variants),
-  OpenGrave decal and mound, LanternPost, RootCurtain, BurialBell plus chain and
-  frame (hero), CaveRockWall set, SilkSheet (3 variants), GreatWeb (hero), EggSac
-  cluster, LoftBalustrade module, ChoirPillar, BoneOrgan (hero), SpiralStair module,
-  RemembranceCandle (unlit and lit), LedgerLectern (hero), BoneRoseWindow (hero),
-  UndercroftGrille gate (animated), TwinSeal door (two sigil discs).
-- **Lighting:** one light zone per space (G9). Warm tallow key in the Undercroft,
-  cold moon-blue fill in the Gallery, violet in the Loft, soul-green column in the
-  Nave. Candles are emissive cards; at most 8 point lights per zone.
-- **Readability:** arena floors stay dark and flat; the headstones, webs, organ
-  and candles stand in the wall band; no floor mark in the Yard looks like a grave
-  ring, none in the Nave like the Reap wedge.
+  - Entry landing and Chapel Stair: a broken chapel on the crag top, the first
+    vista over the whole necropolis.
+  - Cloister: roofless arcades, the ossuary monument, a worn rosette cut in the
+    floor, sarcophagi, candle clusters.
+  - Sexton's Yard and Bell Yard: crooked headstones, open graves, dead trees,
+    lanterns, the collapsed bell tower as the west skyline hero, bone dust.
+  - Widow's Gallery, Rim Walk, Great Web: a frost ravine, silk sheets, web
+    columns, egg clusters, the Great Web hanging over the chasm, frost glitter.
+  - Choir ruin and Loft: roofless nave, pews, choir pillars, the Bone Organ,
+    a tracery window framing the Rite Ring beyond.
+  - Bone Stair: a spiral path up the crag, wisp rivers flowing up it.
+  - Rite Ring: the roofless ritual circle, engraved glyph rings, four
+    Remembrance Candles on pillars, altar, the soul column visible from afar.
+- **Signature moments.** First vista; bell tower against the moon; the light
+  column seen from every terrace; layered ground mist and chasm mist; soul-wisp
+  rivers flowing toward the ring; gate reveals (a barrier crumbles, a bridge
+  assembles bone by bone, a web curtain parts, a ward fades) over
+  `GATE_REVEAL_SECONDS`.
+- **Blender kit.** `docs/design/dungeon-rework/kit/build_hollow_crypt_kit.py`
+  (shared helpers `hckit.py`) bakes about fifty `Kit_*` pieces into
+  `public/models/props/hollow_crypt_kit.glb` via
+  `scripts/assets/hollow_crypt_kit/build.mjs` (meshopt, vertex colors, three
+  material slots: lit stone, emissive glow, translucent silk).
+- **Performance and fairness.** Every producer is built once per slot and
+  attached through the compile gate; particles are one draw, mist puffs one
+  instanced draw; density sheds with the effects tier (cosmetic only, never a
+  telegraph, a cast bar or a mob).
+- **Readability:** arena floors stay dark and flat; the rite glyphs sit on the
+  floor ladder's `ground` rung under every telegraph; no floor mark reads as a
+  grave ring or the Reap wedge.
 
 ## 8. Loot
 
@@ -394,10 +394,10 @@ finale ladder of `docs/design/dungeon-gold.md` (2500c normal, 100000c heroic).
 
 | Boss | Partition (weights) |
 |---|---|
-| Marrow | Sexton's Burial Spade (`sextons_burial_spade`, new epic two-hand, Heavy, ilvl 31: str 17, sta 11 (28), 50 to 75 at speed 3.4 (18.4 DPS), 50 hit rating, the five-man heroic weapon rating) 0.30; Cryptplate Helm (`cryptplate_helm`, shipped, moved from Morthen) 0.30; Heroic Sexton's Spadehaft (generated `heroic_sextons_spadehaft`) 0.20; Quilted Trousers 0.10; Oiled Leather Boots 0.10 |
-| Rimeweb | Rimesilk Hood (`rimesilk_hood`, new epic cloth helmet, Caster, ilvl 31: int 9, spi 5, sta 4 (18), 40 hit rating) 0.30; Bonechill Striders (shipped, moved) 0.25; Bonechill Cord (shipped, moved) 0.25; Heroic Rimeweb Fang (generated) 0.20 |
-| Ilvane | Vigil Taper (`vigil_taper`, new trinket, spi 13) 0.25; Shadowpulse Handwraps (shipped, moved) 0.30; Heroic Cantor's Hymnal (generated) 0.25; Choirward Leggings 0.20 |
-| Morthen | Morthen's Cryptforged Hauberk 0.20; Shadowpulse Slippers 0.20; Lunarward Cinch 0.20; Bastion Sigil (trinket) 0.20; Cryptbone Greaves 0.10; Greyjaw Hide Boots 0.10. Unchanged outside the partition: Gravewoven Bag 0.20, the Stormfeather Griffin reins chance, the heroic farm pattern rows, heroic finale gold, Heroic Marks |
+| Marrow | Sexton's Burial Spade (`sextons_burial_spade`, new epic two-hand, Heavy, ilvl 31: str 17, sta 12, 50 to 75 at speed 3.4, the five-man heroic weapon rating) 0.30; Cryptplate Helm (shipped, moved from Morthen) 0.30; Quilted Trousers 0.15; Oiled Leather Boots 0.15; Heroic Sexton's Spadehaft (generated) 0.10 |
+| Rimeweb | Rimesilk Hood (`rimesilk_hood`, new epic cloth helmet, Caster, ilvl 31: int 12, spi 7, sta 5, the five-man armor rating) 0.35; Bonechill Striders (shipped, moved) 0.25; Bonechill Cord (shipped, moved) 0.25; Heroic Rimeweb Fang (generated) 0.15 |
+| Ilvane | Shadowpulse Handwraps (shipped, moved) 0.50; Choirward Leggings 0.35; Heroic Cantor's Hymnal (generated) 0.15. Vigil Taper deferred to the encounter pass (it needs a new trinket effect kind) |
+| Morthen | Morthen's Cryptforged Hauberk, Shadowpulse Slippers, Lunarward Cinch, Bastion Sigil 0.18 each; Cryptbone Greaves, Greyjaw Hide Boots, Cryptbone Helm, Cryptbone Pauldrons 0.07 each (the shipped Reliquary page keeps paying on Heroic). Unchanged outside the partition: Gravewoven Bag 0.20, the Stormfeather Griffin reins chance, the heroic farm pattern rows, heroic finale gold, Heroic Marks |
 
 **Vigil Taper (trinket, new effect kind `vigil`).** Spirit 13 (the five-man heroic
 trinket budget, as Bastion Sigil's 13 stamina). Use (2 min cooldown): light the
