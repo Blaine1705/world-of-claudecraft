@@ -45,6 +45,7 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
+import { BastionFx } from './sunken_bastion/bastion_fx';
 
 const SEGMENTS = 64;
 const BASE_COLOR = 0xff2200;
@@ -94,6 +95,8 @@ export class RiftDeathZoneVisuals {
   private readonly hoardMimicCoins: HoardMimicCoinsFx;
   // Dungeon trash telegraphs (the Hollow Crypt's cleaves, breaths, rings, bursts).
   private readonly cryptTrash: CryptTrashFx;
+  // The Sunken Bastion's trash and boss floor telegraphs.
+  private readonly bastionFx: BastionFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -139,6 +142,7 @@ export class RiftDeathZoneVisuals {
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
     this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
+    this.bastionFx = new BastionFx(scene, groundY, world, compileGate);
     this.hoardGoblinCoins = new HoardGoblinCoinsFx(
       scene,
       groundY,
@@ -210,6 +214,7 @@ export class RiftDeathZoneVisuals {
     this.hoardGoblinCoins.update(dt);
     this.hoardMimicCoins.update(dt);
     this.cryptTrash.update(dt);
+    this.bastionFx.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -241,12 +246,14 @@ export class RiftDeathZoneVisuals {
     this.hoardGoblinCoins.dispose();
     this.hoardMimicCoins.dispose();
     this.cryptTrash.dispose();
+    this.bastionFx.dispose();
     this.hoardPresentation.dispose();
   }
 
   handleEvent(event: SimEvent): void {
     this.hoardPresentation.handleEvent(event);
     this.cryptTrash.handleEvent(event);
+    this.bastionFx.handleEvent(event);
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

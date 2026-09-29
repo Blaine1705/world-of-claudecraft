@@ -805,6 +805,7 @@ const RENDER_PURE_CORES = [
   'src/render/sunken_bastion/bastion_plan_core.ts',
   'src/render/sunken_bastion/bastion_kit_plan_core.ts',
   'src/render/sunken_bastion/bastion_headland_core.ts',
+  'src/render/sunken_bastion/bastion_fx_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',

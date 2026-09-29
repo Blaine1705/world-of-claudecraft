@@ -21,6 +21,12 @@ import {
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import {
+  BASTION_BRINE_MEND,
+  BASTION_FOG_WARD,
+  BASTION_HALBERD_SWEEP,
+  BASTION_PIERCING_BOLT,
+} from '../../sim/mob/trash_kit/bastion_cast_ids';
+import {
   CRYPT_BONECHILL_BREATH,
   CRYPT_GRAVE_BOLT,
   CRYPT_GRAVE_CLEAVE,
@@ -3731,6 +3737,71 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.1,
   },
 
+  // -- the Sunken Bastion trash (sim/content/sunken_bastion.ts) ------------------
+  // Drowned KayKit skeletons of the Bastion's garrison, each with the gesture of
+  // its one job: the watchman's halberd sweep, the arbalest's lane shot, the
+  // Mistweaver raising its fog ward, the acolyte's brine mend.
+  bastion_skel_watchman: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
+    height: 2.5,
+    clips: {
+      ...skeletonClips(['2H_Melee_Attack_Chop']),
+      castByAbility: { [BASTION_HALBERD_SWEEP]: '2H_Melee_Attack_Chop' },
+      castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 0.8 },
+    },
+    attach: [{ url: `${WEAPONS}/halberd.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  bastion_skel_arbalest: {
+    url: `${ENEMIES}/skeleton_rogue.glb`,
+    animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
+    height: 2.5,
+    clips: {
+      ...skeletonClips(['1H_Melee_Attack_Chop']),
+      castByAbility: { [BASTION_PIERCING_BOLT]: 'Spellcast_Shoot' },
+      castTimeScaleByAbility: { [BASTION_PIERCING_BOLT]: 0.55 },
+    },
+    attach: [{ url: `${WEAPONS}/skeleton_crossbow.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  bastion_skel_sergeant: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
+    height: 2.5,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal'], 'Taunt'),
+    attach: [{ url: `${WEAPONS}/skeleton_shield_large_a.glb`, bone: 'handslot.l' }],
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  bastion_mistweaver: {
+    url: `${ENEMIES}/necromancer.glb`,
+    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    height: 2.5,
+    clips: {
+      ...skeletonClips(['2H_Melee_Attack_Chop']),
+      castByAbility: { [BASTION_FOG_WARD]: 'Spellcast_Raise' },
+    },
+    tint: 'entity',
+    tintStrength: 0.45,
+  },
+  // The Tidebound Acolyte: a living cultist of Vael's hymn in sea-green robes.
+  bastion_acolyte: {
+    url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
+    height: HUMANOID_H,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      castByAbility: { [BASTION_BRINE_MEND]: 'Spellcast_Raise' },
+    },
+    show: ['Mage_Hat'],
+    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
+
   // -- humanoid mobs (KayKit adventurers) ------------------------------------
   mob_bandit: {
     url: `${PLAYERS}/rogue_hooded.glb`,
@@ -4746,6 +4817,7 @@ const MOB_KEYS: Record<string, string> = {
   boneclad_revenant: 'skel_warrior',
   marrowlord_varkas: 'skel_warrior',
   bastion_revenant: 'skel_warrior',
+  tidebound_acolyte: 'bastion_acolyte',
   knight_commander_olen: 'skel_warrior',
   sanctum_boneguard: 'skel_warrior',
   nythraxis_scourge_of_thornpeak: 'skel_golem',
@@ -4774,6 +4846,17 @@ const MOB_KEYS: Record<string, string> = {
   crypt_crow_caller: 'mob_crypt_crow_caller',
   crypt_carrion_crow: 'mob_crypt_crow',
   crypt_ossuary_drake: 'mob_crypt_drake',
+  // The Sunken Bastion trash (sim/content/sunken_bastion.ts).
+  drowned_watchman: 'bastion_skel_watchman',
+  fogbound_arbalest: 'bastion_skel_arbalest',
+  barnacle_crawler: 'mob_crab',
+  bastion_warhound: 'mob_wolf',
+  mistweaver: 'bastion_mistweaver',
+  drowned_sergeant: 'bastion_skel_sergeant',
+  shackled_prisoner: 'skel_minion',
+  gaol_turnkey: 'mob_bruiser',
+  turretback_hermit: 'mob_crab',
+  gaoler_ossick: 'skel_golem',
   // delve enemies
   reliquary_ledger_wraith: 'delve_skel_wraith',
   reliquary_funeral_ringer: 'delve_skel_ringer',
