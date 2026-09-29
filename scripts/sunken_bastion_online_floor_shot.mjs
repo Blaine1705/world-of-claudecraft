@@ -134,10 +134,16 @@ async function main() {
       const p = window.__game.world.player;
       return { x: p.pos.x + 10, z: p.pos.z + 230 };
     });
+    // A first short press wakes the movement wire (the first walk after
+    // entering the world otherwise goes nowhere in a headless session).
+    await page.keyboard.down('KeyW');
+    await sleep(700);
+    await page.keyboard.up('KeyW');
+    await sleep(800);
     const spots = [
       // [name, instance-local start, facing (sim radians), walk ms]
-      ['foso', [-10, -124], 0, 3800],
       ['rampa', [0, -150], 0, 3200],
+      ['foso', [-10, -124], 0, 3800],
     ];
     for (const [name, [lx, lz], facing, walk] of spots) {
       await chat(`/dev tp ${origin.x + lx} ${origin.z + lz}`, 2500);
@@ -148,7 +154,7 @@ async function main() {
         input.camDist = 11;
         window.__game.world.player.facing = f;
       }, facing);
-      await sleep(800);
+      await sleep(2000);
       // Walk with the real movement key, sampling the shown height as we go.
       await page.keyboard.down('KeyW');
       const samples = [];
@@ -163,6 +169,19 @@ async function main() {
         await sleep(250);
       }
       await page.keyboard.up('KeyW');
+      console.log(
+        'STATE',
+        name,
+        await page.evaluate(() => {
+          const p = window.__game.world.player;
+          return JSON.stringify({
+            active: document.activeElement?.tagName + '#' + (document.activeElement?.id ?? ''),
+            auras: (p.auras ?? []).map((a) => a.id),
+            dead: p.dead,
+            casting: p.castingAbility,
+          });
+        }),
+      );
       await sleep(600);
       await dismiss();
       await sleep(300);

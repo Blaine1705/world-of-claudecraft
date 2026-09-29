@@ -50,6 +50,18 @@ export const SHOTS = [
   // drawn moat floor, the bailey kerb and the chapel island's lip beside them.
   { id: 'foso_jugador', at: [-6, -113], face: 0.4, yaw: 2.4, pitch: 0.28, dist: 9 },
   { id: 'rampa_puerta_mar', at: [0, -129], face: Math.PI, yaw: 2.0, pitch: 0.3, dist: 10 },
+  // The new patrols on their rounds (the tideline hunters, the bailey watch,
+  // the court hounds).
+  { id: 'patrulla_marismas', at: [-60, -176], face: 0, pitch: 0.3, dist: 14, wait: 5000 },
+  { id: 'patrulla_patio_norte', at: [-45, -72], face: 0, pitch: 0.3, dist: 14, wait: 5000 },
+  {
+    id: 'patrulla_patio_torreon',
+    at: [-45, 150],
+    face: -Math.PI / 2,
+    pitch: 0.3,
+    dist: 14,
+    wait: 5000,
+  },
   // Each boss up close, idle at its post.
   { id: 'jefe1_olen_cerca', at: [57, 117], face: 0, yaw: 0, pitch: 0.15, dist: 9, wait: 3000 },
   {
