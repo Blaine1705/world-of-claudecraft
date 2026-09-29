@@ -31,7 +31,7 @@ import {
   BAG_SOCKETS,
   bagCapacity,
   bagPools,
-  canAddItem,
+  canGrantCopies,
   instancedCountCap,
   migrationBagsFor,
 } from './bags';
@@ -8207,11 +8207,11 @@ export class Sim {
   // True when `count` copies of the item fit the player's pooled bag budget
   // (existing stacks top up first). The capacity gate every blocking command
   // path (buy, loot, pickup, fish, conjure, collect, trade, turn-in) pre-checks.
-  canAddItem(itemId: string, count: number, pid?: number): boolean {
+  canAddItem(itemId: string, count: number, pid?: number, copy?: InvSlot['instance']): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
     const { meta } = r;
-    return canAddItem(meta.inventory, bagPools(meta.bags), itemId, count);
+    return canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, count, copy);
   }
 
   equipBag(

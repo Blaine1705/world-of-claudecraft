@@ -66,7 +66,8 @@ ratings.
   (`sweepWorldPvpSpoils`). The books row is `WorldPvpBooks.spoils` (victim pid
   -> killer pid), bounded by the flagged players lying dead with spoils. It must
   not import `bags.ts` (that module loads the material tables at import time,
-  before the content they derive from); the room check is `ctx.canAddItem`.
+  before the content they derive from); the room check is `ctx.canAddItem`
+  with the skull's instance payload, so capacity matches signed-stack merging.
 - `world_pvp.ts` owns the World PvP SYSTEM behind the `SimContext` seam: the
   flag state (`PlayerMeta.worldPvp`, absent until first raised; `Entity.pvpFlag`
   is its display mirror and the ONLY writer is this module, the away.ts

@@ -132,11 +132,11 @@ export function settleWorldPvpSpoils(ctx: SimContext, victimId: number): void {
   let bagsFull = false;
   for (const slot of loot.items) {
     if (slot.count <= 0 || (slot.personalFor && !slot.personalFor.includes(killerId))) continue;
-    // The plain room check: a trophy copy never merges into a plain stack, so
-    // free slots are what it needs. (bags.ts itself is not imported here: it
-    // would load the material tables before the content they derive from.)
+    // Match the granted payload: same-victim skulls can share a stack, while
+    // unsigned or differently signed skulls cannot. Keep bags.ts behind ctx
+    // to avoid loading material tables before the content they derive from.
     const instance = slot.instance ?? {};
-    if (!ctx.canAddItem(slot.itemId, slot.count, killerId)) {
+    if (!ctx.canAddItem(slot.itemId, slot.count, killerId, instance)) {
       bagsFull = true;
       continue;
     }

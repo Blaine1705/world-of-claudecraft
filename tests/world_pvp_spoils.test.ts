@@ -259,6 +259,57 @@ describe('the drop', () => {
 });
 
 describe('who may take it', () => {
+  it.each(['release', 'revive', 'logout', 'shutdown'] as const)(
+    '%s stacks a same-victim skull when every bag slot is occupied',
+    (settlement) => {
+      const { sim, a, b } = duel();
+      sim.ctx.addItemInstance(WORLD_PVP_SKULL_ITEM_ID, { signer: 'Bet' }, a, 1);
+      const meta = sim.meta(a)!;
+      while (sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, a))
+        meta.inventory.push({ itemId: 'stag_antler', count: 1 });
+      const slots = meta.inventory.length;
+      slay(sim, a, b);
+      sim.events = [];
+      if (settlement === 'release') sim.releaseSpirit(b);
+      else if (settlement === 'revive') sim.revivePlayerAt(b, { ...ent(sim, b).pos });
+      else if (settlement === 'logout') sim.preparePlayerLeave(a);
+      else settleAllWorldPvpSpoils(sim.ctx);
+      expect(skullsOf(sim, a)).toEqual([
+        { itemId: WORLD_PVP_SKULL_ITEM_ID, count: 2, instance: { signer: 'Bet' } },
+      ]);
+      expect(meta.inventory).toHaveLength(slots);
+      expect(meta.copper).toBe(2_000);
+      expect(sim.worldPvpBooks.spoils.size).toBe(0);
+      expect(sim.events.some((ev) => ev.type === 'error')).toBe(false);
+    },
+  );
+
+  it.each([
+    { instance: { signer: 'Gimel' }, count: 1 },
+    { instance: { signer: 'Bet' }, count: 20 },
+    { instance: undefined, count: 1 },
+  ])('settlement refuses an incompatible or full skull stack: %j', ({ instance, count }) => {
+    const { sim, a, b } = duel();
+    const meta = sim.meta(a)!;
+    // Fill before inserting the skull so an unsigned stack cannot mask full slots.
+    while (sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, a))
+      meta.inventory.push({ itemId: 'stag_antler', count: 1 });
+    meta.inventory[0] = {
+      itemId: WORLD_PVP_SKULL_ITEM_ID,
+      count,
+      ...(instance ? { instance } : {}),
+    };
+    const before = structuredClone(meta.inventory);
+    slay(sim, a, b);
+    sim.events = [];
+    sim.releaseSpirit(b);
+    expect(meta.inventory).toEqual(before);
+    expect(meta.copper).toBe(2_000);
+    expect(sim.events.some((ev) => ev.type === 'error' && ev.text === 'Your bags are full.')).toBe(
+      true,
+    );
+  });
+
   it('a stranger cannot loot the body; the killer can', () => {
     const { sim, a, b } = duel();
     const stranger = fighter(sim, 'Zayin', 1009, 1);
