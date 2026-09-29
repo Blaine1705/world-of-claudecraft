@@ -63,21 +63,22 @@ parentheses; about 230 by 390 yd.
  z 233  ( ring 24 )  THE RITE RING: roofless ritual circle, r 28, four candle
           |          pillars, altar, the soul column.   Boss 4: Morthen
           |          [Unquiet Ward: seals while Morthen is engaged]
- z 168  THE BONE STAIR: spiral path up the crag (5 to 24), P9 patrol
-          |          [Bone Stair Gate: P9]
+ z 168  THE BONE STAIR: spiral path up the crag (5 to 24)
+          |          [Bone Stair Gate: s1 on the Stair Landing]
  z 150  CHOIR LOFT (5), balcony, Bone Organ.   Boss 3: Cantor Ilvane
  z 112  CHOIR RUIN (0), roofless nave with pews
-          |          [Twin Seals: P8 + Marrow + Rimeweb; seal during Ilvane]
- z 20   PROCESSIONAL (0), candle pillars, P8
+          |          [Choir Door: q1 + q2 + Ilvane]
+          |          [Twin Seals: p1 + drake + p2 + Marrow + Rimeweb; seal during Ilvane]
+ z 20   PROCESSIONAL (0), candle pillars, p1, p2, the Ossuary Drake flying overhead
    west                                                  east
-   SEXTON'S YARD (2) graveyard, P4                      WIDOW'S GALLERY (-6) frost
-   ramp up to the BELL YARD (8), P5                     ravine, P6; RIM WALK (0) P7
-   [Bone Barrier: P4 + P5; seals during Marrow]         [Frost-Web Curtain: P6 + P7;
+   SEXTON'S YARD (2) graveyard, w1 w3 w4, w2 flock   WIDOW'S GALLERY (-6) frost
+   ramp up to the BELL YARD (8)                         ravine, e1 e3; RIM WALK (0) e2
+   [Bone Barrier: w1 to w4; seals during Marrow]        [Frost-Web Curtain: e1 to e3;
    Boss 1: Marrow under the fallen bell tower            seals during Rimeweb]
    [Bridge of Bone: assembles on Marrow's death]        GREAT WEB (-6) Boss 2: Rimeweb
    back to the choir                                    [Webbed Causeway: Rimeweb]
-          |          [Undercroft Grille: P1 + P2 + P3]
- z -80  CLOISTER (0), ossuary monument, P1, P2 patrol loop, P3 at the grille
+          |          [Undercroft Grille: c1 + c2 + c3 + c4]
+ z -80  CLOISTER (0), ossuary monument, c1, c2 patrol loop, c3 east arcade, c4 grille
  z -116 THE CHAPEL STAIR down from the entry landing (20): the first vista
 ```
 
@@ -100,25 +101,66 @@ gate, so a corpse run always has a path. `bossChainPull` stays on. Kinds:
 portcullis, bone barrier, bone bridge (the path itself assembles), frost-web
 curtain, warded arch, rite ward.
 
-## 4. Trash with a purpose
+## 4. Trash (owner direction, 2026-09-29)
 
-Nine pulls, each placed in space so the group sees it before it pulls it. Every
-pull teaches the boss that follows it.
+The trash does NOT teach the next boss. It is simple, readable pack play in the
+style of classic five-man trash: an add summon you must stop, interruptible
+casts, a frontal cone, a leap, an on-death burst. Engine:
+`src/sim/mob/trash_kit/` (`MobTemplate.trashKit`, cast bars, zero-rng targets);
+templates: `src/sim/content/hollow_crypt_trash.ts`; floor telegraphs:
+`src/render/hollow_crypt/crypt_trash_fx.ts` (every graphics tier).
 
-| Pull | Where | Mobs (level) | Teaches |
+| Mob (level) | Look | Mechanic (normal numbers) | Answer |
 |---|---|---|---|
-| P1 | Undercroft vestibule | 2 Crypt Shambler (7) | Basics; Onrush charge (kept) |
-| P2 | Undercroft patrol loop | 2 Hollow Acolyte (7 to 8) walking a loop between the columns (G8) | Watch patrols; the Acolyte gains an interruptible 2 s Dark Mending channel (`healer_channel`); interrupts are optional here |
-| P3 | Before Gate A | Ossuary Sentinel (8, new, large skeleton) plus 2 Crypt Shambler | Tank positioning; the Sentinel's slow Bone Rattle stomp (`stomp`, 8 yd, telegraphed) |
-| P4 | Yard trench | 2 Hollow Gravedigger (8, new) | On death each leaves an Open Grave that raises a Restless Bones 6 s later: graves become the dead (Marrow's core) |
-| P5 | Yard bell pit | 1 Hollow Gravedigger plus 2 Crypt Shambler | Same lesson under pressure; the bell swings on pull as a foreshadow |
-| P6 | Gallery nest (lower floor) | 2 Bonechill Widow (8) plus 4 rime egg sacs (`broodEgg`, 4 yd proximity hatch into Rimeweb Hatchlings) | Keep off the walls; hatchlings pounce the healer (`broodWhelp`) |
-| P7 | Gallery balcony (up the ramp) | Rimeweb Spinner (9, new caster spider) plus 1 Bonechill Widow | Silk Wrap: a small cocoon roots a random player until the group breaks it (Rimeweb's core); one silk line on the floor |
-| P8 | Rejoin plaza | 2 Candlewright Acolyte (9, new) plus 1 Hollow Chorister (8, new) | Interrupt the Tallow Bolt and Dark Mending casts; kill the Chorister first (its Harmony shields an ally): Ilvane's core |
-| P9 | Bone Stair landing | Candlewright Acolyte (9) leading 3 Bound Souls in procession | Souls walk to the Acolyte; each arrival empowers him (+20 percent damage, stacking): intercept walkers, Morthen's phase 1 |
+| Ossuary Warrior (8 to 9, elite) | KayKit skeleton warrior | Grave Cleave: 1.6 s bar, then 16 to 24 physical in a 110 degree, 8 yd frontal cone, every 10 s | Only the tank stands in front |
+| Gravecaller Adept (8, elite) | KayKit skeleton mage | Casts from range; Grave Bolt: 2.5 s interruptible shadow bar at a hashed random player, 26 to 34, every 9 s | Kick it |
+| Ossuary Cutthroat (8, elite) | KayKit skeleton rogue | Rending Leap: every 14 s leaps onto the farthest mana user 8 to 30 yd away, 5 bleed every 2 s for 8 s, fixates 4 s | Peel it off the healer, taunt it back |
+| Gravecaller Necromancer (9, elite) | KayKit necromancer | Raise Bones: 3 s interruptible channel raising a Bone Minion (two alive at most), every 15 s | Kick it, or kill the minion fast |
+| Bone Minion (8) | KayKit minion | Left alive 8 s it grows into an elite Bone Brute; on death a Bone Burst: 1.8 s ring fuse, 12 to 18 within 3.5 yd | Burn it, then step out of its ring |
+| Bone Brute (9, elite) | KayKit skeleton golem | A heavy hitter | Do not let minions grow |
+| Chapel Gargoyle (9, elite) | New stone gargoyle | Waits as a statue on a whole arcade arch, dives in when its pack is pulled; Stone Shriek: 2 s interruptible bar, 2.5 s stun within 10 yd, every 16 s | Kick it or step out of the ring |
+| Crow Caller (8, elite) | Hooded Gravecaller | Casts from range; Murder Call: 3 s interruptible bar summoning 4 Carrion Crows (a whole flock must fit under 6 alive), every 18 s | Kick it |
+| Carrion Crow (7) | New crow | Weak fast fliers in flocks | Area damage |
+| Ossuary Drake (10, elite) | New skeletal drake | Flies the Processional at 22 yd and lands when pulled; Bonechill Breath (2 s bar, 70 degree 14 yd cone, 26 to 34 frost), Tail Lash (1 s bar, 120 degree 10 yd cone behind it), Wing Gust (1.5 s bar, 10 yd ring, 8 yd knockback) | Tank faces it away, nobody behind, spread from the gust |
 
-Mob count: 23 trash plus hatchlings and raised dead. Pull pacing: about 55 s per
-pull including walk and recovery.
+Heroic scales every landing through the dungeon's mechanic multiplier; the
+lighter casters, the cutthroat and the non-elite crows ride their own factor to
+the 500 heroic swing floor (`HEROIC_DUNGEON_TUNING.hollow_crypt`).
+
+**Layout (13 held packs, 4 patrols, every one gated):**
+
+| Pack | Where | Members |
+|---|---|---|
+| c1 | Chapel Stair foot | 2 Warriors, 1 Adept, 1 Gargoyle on the south arcade |
+| c2 (patrol) | Monument loop | 2 Warriors, 1 Cutthroat |
+| c3 | East arcade | 1 Adept, 1 Warrior, 2 Gargoyles on the arches |
+| c4 | Undercroft Grille | 1 Necromancer, 2 Warriors, 2 Gargoyles on the corner arches |
+| p1 | Processional south | 1 Warrior, 1 Cutthroat, 2 Adepts |
+| drake (patrol) | Flying the Processional | the Ossuary Drake |
+| p2 | Choir approach | 1 Necromancer, 2 Warriors, 1 Adept |
+| w1 | Yard, by the causeway | 1 Crow Caller, 4 Crows |
+| w2 (patrol) | Circling over the yard | 5 Crows |
+| w3 | Yard trench | 1 Necromancer, 1 Warrior, 1 Cutthroat |
+| w4 | Bell pit | 1 Crow Caller, 1 Warrior, 3 Crows |
+| e1 | Gallery nest | 2 Bonechill Widows, 1 Adept (and the 4 rime egg sacs) |
+| e2 | Rim walk | 1 Warrior, 1 Cutthroat, 1 Adept |
+| e3 | Web neck | 1 Necromancer, 2 Warriors |
+| q1 | Choir nave | 2 Warriors, 1 Necromancer, 1 Adept |
+| q2 (patrol) | Nave aisle | 1 Warrior, 1 Cutthroat |
+| s1 | Stair Landing | 1 Necromancer, 2 Warriors, 1 Cutthroat |
+
+Count: 62 trash (50 elite, the drake among them) plus summons. Gates: the Grille waits on c1 to c4,
+the Bone Barrier on w1 to w4, the Frost-Web Curtain on e1 to e3, the Twin Seals
+on p1, the drake and p2 (and both wing bosses), the Choir Door on q1 and q2 (and
+Ilvane), the Bone Stair Gate on s1 (`tests/hollow_crypt_route.test.ts`).
+
+**Why this count fits 15 minutes.** About 24,000 trash health at level 8 to 9
+(49 elites at about 370 to 600, the drake about 1,040, 12 crows at about 60). At
+the planning party DPS of 45 that is about 8.9 minutes single target; the
+cleave and area damage a group brings on packs of 3 to 5 (and crows dying to
+it in seconds) take it to about 6.5. The four bosses are about 6.3 minutes (70,
+80, 80 and 150 s), walking about 2: about 15 minutes. To be measured with the
+meters harness before shipping, like the boss health.
 
 ## 5. Bosses
 
@@ -302,12 +344,13 @@ then break the rite with the room's candles (Morthen). No core repeats.
 
 | Segment | Content | Time |
 |---|---|---|
-| Undercroft | P1, P2, P3 | 3 min |
-| West wing | P4, P5, Marrow (70 s) | 3 min |
-| East wing | P6, P7, Rimeweb (80 s) | 3 min |
-| Rejoin and Loft | P8, Ilvane (80 s) | 2 min |
-| Stair and Nave | P9, Morthen (150 s) | 3.5 min |
-| Total | 9 pulls, 4 bosses | about 14.5 min |
+| Cloister | c1, c2, c3, c4 | 3 min |
+| Processional | p1, the drake, p2 | 2 min |
+| West wing | w1 to w4, Marrow (70 s) | 3 min |
+| East wing | e1 to e3, Rimeweb (80 s) | 3 min |
+| Choir and Loft | q1, q2, Ilvane (80 s) | 2 min |
+| Stair and Ring | s1, Morthen (150 s) | 3 min |
+| Total | 17 pulls, 4 bosses | about 15 min |
 
 ## 7. Environment art direction
 
@@ -458,6 +501,9 @@ epics in each partition, the trinket on Ilvane, Bastion Sigil on Morthen).
 | Rite of Unmaking | exact phrase | REJECTED as too close to FFXIV's "The Unmaking" trial; the phase is "Rite of the Unquiet" |
 | Hollow Chorister, Hollow Gravedigger, Ossuary Sentinel, Bound Soul, Unmade Sentinel, Cantor's Cassock, Chorister's Gloves, Remembrance Candle, Reap the Unquiet, Grasp of the Grave, Name the Dead, Silk Shroud, Silk Lines, Harmony, Encore, Crescendo, Unbroken Verse, Twin Shroud, Earthbound, Unquiet Earth, Gravecall, the deed names | generic English | Shared vocabulary, no coined token |
 | Sexton Marrow, Morthen, Grave Chill, Bonechill, Gravecaller, Restless Bones | shipped | Already in the game |
+| Ossuary Drake, Chapel Gargoyle, Ossuary Cutthroat, Gravecaller Adept | exact phrases, plus game wikis | Clear (Wynncraft's "Ossuary Dragonkin" is a different name) |
+| Bonechill Breath, Stone Shriek, Murder Call | exact phrases, plus Wowhead | Clear |
+| Ossuary Warrior, Gravecaller Necromancer, Bone Minion, Bone Brute, Crow Caller, Carrion Crow, Grave Cleave, Grave Bolt, Raise Bones, Bone Burst, Rending Leap, Tail Lash, Wing Gust | generic English | Shared vocabulary, no coined token. "Wing Buffet" avoided (a signature dragon ability name elsewhere) |
 
 ## 11. Optional quest follow-ups (not required)
 

@@ -1,5 +1,5 @@
 // The Hollow Crypt rework (docs/design/dungeon-rework/hollow_crypt.md): the
-// new trash and boss templates, the nine packs placed on the open-air layout
+// boss templates, the trash packs (hollow_crypt_trash.ts) placed on the open-air layout
 // (hollow_crypt_layout.ts), the patrols, and the gates and encounter seals
 // that make every pack mandatory. Merged by data.ts (mobs) and dungeons.ts
 // (spawns, gates, gate objects).
