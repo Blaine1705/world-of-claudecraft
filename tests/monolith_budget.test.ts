@@ -1868,7 +1868,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // LOWERED 5356 -> 5355 with the Hollow Crypt rework: the snapshot-head
+    // syncs (telegraphs, ferry gates, and the new dungeon gate mirror) moved
+    // into src/net/snapshot_head_syncs.ts. wc -l. Exact count.
+    ceiling: 5355,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
