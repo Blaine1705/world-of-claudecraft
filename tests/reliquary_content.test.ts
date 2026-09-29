@@ -46,6 +46,7 @@ import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
   RELIQUARY_ACTIVITY_SOURCE_IDS,
+  RELIQUARY_ART_PENDING_HEROIC,
   RELIQUARY_HEROIC_GEAR,
   RELIQUARY_HORIZON_MOUNTS,
   RELIQUARY_HORIZON_TITLES,
@@ -471,9 +472,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
-    // The Hollow Crypt rework's three new rares (normal page) and two new
-    // heroic epics (heroic page): 500.
-    expect(full).toEqual({ owned: 500, total: 500 });
+    expect(full).toEqual({ owned: 495, total: 495 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -506,8 +505,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    // 471 with the Hollow Crypt rework's three rares and two heroic epics.
-    expect(character).toEqual({ owned: 471, total: 471 });
+    expect(character).toEqual({ owned: 466, total: 466 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -571,8 +569,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
-      // +5 for the Hollow Crypt rework's new boss loot (three rares, two epics): 687.
-    ).toBe(687);
+    ).toBe(682);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -807,8 +804,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the five Crucible raid trinkets (each on its boss's Normal and
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
-    // +5: the Hollow Crypt rework's three rares and two heroic epics: 526.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(526);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(521);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1207,7 +1203,10 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     // dead data without this pin.
     expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(AUTHORED_BOSSES);
     for (const bossId of AUTHORED_BOSSES) {
-      const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]);
+      // New epics waiting for their art are carved out until the art pass.
+      const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]).filter(
+        (id) => !RELIQUARY_ART_PENDING_HEROIC.includes(id),
+      );
       const authored = [
         ...(RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR] ?? []),
       ]
@@ -2157,7 +2156,14 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const derived = dungeonRarePlusLootIds('hollow_crypt');
     // Literal: update when catalog content lands (snug vacuity floor).
     expect(derived.length).toBeGreaterThanOrEqual(1);
-    expect(pageIds.filter((id) => isRarePlus(id)).sort()).toEqual(derived);
+    // The rework's three new rare chase rows join the page with their painted
+    // art (a relic cell needs committed dark-card art); until then they are
+    // the only derived rare+ ids the page leaves out.
+    const ART_PENDING_RARES = ['cantors_hymnal', 'rimeweb_fang', 'sextons_spadehaft'];
+    for (const id of ART_PENDING_RARES) expect(derived, id).toContain(id);
+    expect(pageIds.filter((id) => isRarePlus(id)).sort()).toEqual(
+      derived.filter((id) => !ART_PENDING_RARES.includes(id)),
+    );
     const CURATED_UNCOMMON = [
       'cryptbone_greaves',
       'cryptbone_helm',
@@ -3155,8 +3161,8 @@ function slotKey(pageId: string, slotId: string): string {
  *  even while every surviving hint still validates. Update deliberately with
  *  the authoring, the same regime as the totals pins above. */
 const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
-  // The Hollow Crypt rework: four bosses pay each page.
-  conquerors_hollow_crypt: 4,
+  conquerors_hollow_crypt: 1,
+  // The Hollow Crypt rework: four bosses pay the heroic page.
   conquerors_hollow_crypt_heroic: 4,
   conquerors_sunken_bastion: 2,
   conquerors_sunken_bastion_heroic: 1,
@@ -3249,7 +3255,6 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
  *  authoring) so under-authoring one of them cannot quietly pass. */
 const KNOWN_MULTI_SOURCE_PAGES = [
   // The dungeons whose relics span two or more of their own bosses.
-  'conquerors_hollow_crypt',
   'conquerors_hollow_crypt_heroic',
   'conquerors_sunken_bastion',
   'conquerors_drowned_temple',
@@ -4755,8 +4760,9 @@ describe('Reliquary source hint coverage', () => {
     // on the skins page, the four Crucible raid pages, and Forgebreaker's
     // one Weaponcrafting door); update
     // deliberately with the authoring.
-    // The Hollow Crypt pair dropped theirs with the rework's four bosses: 13.
-    expect(defaults).toBe(13);
+    // The Hollow Crypt heroic page dropped its default with the rework's four
+    // bosses: 14.
+    expect(defaults).toBe(14);
   });
 });
 

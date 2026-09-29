@@ -747,11 +747,19 @@ function setMembers(
 // HEROIC_BOSS_LOOT gear only (mount reins excluded; Horizons owns mounts).
 // Tests pin these lists against the live table so a new heroic gear row fails
 // until it is deliberately added here.
+/** New heroic epics whose Reliquary slot waits for their painted icon art
+ *  (a relic cell needs committed dark-card art; weapons cannot park on the
+ *  art-pending list). Each joins its heroic page in the art pass. */
+export const RELIQUARY_ART_PENDING_HEROIC: readonly string[] = [
+  'sextons_burial_spade',
+  'rimesilk_hood',
+];
+
 export const RELIQUARY_HEROIC_GEAR = {
   // The Hollow Crypt rework spread Morthen's heroic epics over the four bosses
   // (hollow_crypt.md 8.2); they share the one shipped heroic page.
-  sexton_marrow: ['sextons_burial_spade', 'cryptplate_helm'],
-  rimeweb: ['rimesilk_hood', 'bonechill_striders', 'bonechill_cord'],
+  sexton_marrow: ['cryptplate_helm'],
+  rimeweb: ['bonechill_striders', 'bonechill_cord'],
   cantor_ilvane: ['shadowpulse_handwraps'],
   morthen: [
     'morthens_cryptforged_hauberk',
@@ -1014,17 +1022,16 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'The Hollow Crypt',
     desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
     clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
-    // Four bosses pay this page since the rework, so every relic names its own.
+    // Morthen is the only Crypt mob that drops any of these five. The rework's
+    // three new rare chase rows (Spadehaft, Fang, Hymnal) join this page with
+    // their painted art (the dark-card rule), not before.
+    sourceDefault: fromBoss('morthen'),
     relics: items(
-      ['cryptbone_greaves', fromBoss('morthen')],
-      ['cryptbone_helm', fromBoss('morthen')],
-      ['cryptbone_pauldrons', fromBoss('morthen')],
-      ['greyjaw_hide_boots', fromBoss('morthen')],
-      ['gravewoven_bag', fromBoss('morthen')],
-      // Appended with the rework: each new boss's rare chase row.
-      ['sextons_spadehaft', fromBoss('sexton_marrow')],
-      ['rimeweb_fang', fromBoss('rimeweb')],
-      ['cantors_hymnal', fromBoss('cantor_ilvane')],
+      'cryptbone_greaves',
+      'cryptbone_helm',
+      'cryptbone_pauldrons',
+      'greyjaw_hide_boots',
+      'gravewoven_bag',
     ),
   },
   {
@@ -1034,7 +1041,8 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     desc: 'Heroic-only epics from Morthen the Gravecaller.',
     clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'heroic' },
     // The shipped eight keep their slots and order; the rework moved four of
-    // them to the new bosses (hinted per boss) and appended two new epics.
+    // them to the new bosses (hinted per boss). Its two new epics join with
+    // their painted art (RELIQUARY_ART_PENDING_HEROIC).
     relics: items(
       ['morthens_cryptforged_hauberk', fromBoss('morthen')],
       ['shadowpulse_handwraps', fromBoss('cantor_ilvane')],
@@ -1044,8 +1052,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['shadowpulse_slippers', fromBoss('morthen')],
       ['bonechill_cord', fromBoss('rimeweb')],
       ['bastion_sigil', fromBoss('morthen')],
-      ['sextons_burial_spade', fromBoss('sexton_marrow')],
-      ['rimesilk_hood', fromBoss('rimeweb')],
     ),
   },
   {
