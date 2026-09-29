@@ -767,12 +767,17 @@ export const RELIQUARY_HEROIC_GEAR = {
     'shadowpulse_slippers',
     'bastion_sigil',
   ],
+  // The Sunken Bastion rework moved three of Vael's heroic epics onto Olen and
+  // the new Gaoler Ossick (sunken_bastion.md 8.2); they share the one heroic page.
+  knight_commander_olen: [
+    'drowned_commanders_breastplate',
+    'mistforged_pauldrons',
+    'tideguard_faceguard',
+  ],
+  gaoler_ossick: ['gaolyard_striders', 'sash_of_the_sunken_court', 'gaolers_iron_key'],
   vael_the_mistcaller: [
     'mistcallers_fang',
     'tidebound_spaulders',
-    'sash_of_the_sunken_court',
-    'mistforged_pauldrons',
-    'tideguard_faceguard',
     'sunken_court_mantle',
     'dreamroot_boots',
     'stormjar',
@@ -1058,10 +1063,11 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_sunken_bastion',
     shelf: 'conquerors',
     name: 'The Sunken Bastion',
-    desc: 'Rare and epic spoils from Olen and Vael the Fogbinder.',
+    desc: 'Rare and epic spoils from Olen, Gaoler Ossick and Vael the Fogbinder.',
     clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'any' },
-    // Two bosses, and every relic drops from exactly one of them, so the page
-    // takes no default: each row names its own.
+    // Three bosses, and every relic drops from exactly one of them, so the page
+    // takes no default: each row names its own. The rework's two rare chase
+    // weapons append after the shipped slots.
     relics: items(
       ['tideguard_greaves', fromBoss('knight_commander_olen')],
       ['tideguard_sabatons', fromBoss('knight_commander_olen')],
@@ -1071,18 +1077,32 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['drowned_prayer_sandals', fromBoss('vael_the_mistcaller')],
       ['eelscale_treads', fromBoss('vael_the_mistcaller')],
       ['mistcallers_duffel', fromBoss('vael_the_mistcaller')],
+      ['knight_commanders_longsword', fromBoss('knight_commander_olen')],
+      ['gaolyard_cudgel', fromBoss('gaoler_ossick')],
     ),
   },
   {
     id: 'conquerors_sunken_bastion_heroic',
     shelf: 'conquerors',
     name: 'Heroic Sunken Bastion',
-    desc: 'Heroic-only epics from Vael the Fogbinder.',
+    desc: 'Heroic-only epics from Olen, Gaoler Ossick and Vael the Fogbinder.',
     clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'heroic' },
-    // Every heroic page defaults to the boss its RELIQUARY_HEROIC_GEAR list is
-    // keyed by: that key IS the HEROIC_BOSS_LOOT mob id awarding the gear.
-    sourceDefault: fromBoss('vael_the_mistcaller'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.vael_the_mistcaller),
+    // The shipped eight keep their slots and order; the rework moved three of
+    // them to Olen and Ossick and appends its new epics. Three bosses pay the
+    // page, so every row names its own.
+    relics: items(
+      ['mistcallers_fang', fromBoss('vael_the_mistcaller')],
+      ['tidebound_spaulders', fromBoss('vael_the_mistcaller')],
+      ['sash_of_the_sunken_court', fromBoss('gaoler_ossick')],
+      ['mistforged_pauldrons', fromBoss('knight_commander_olen')],
+      ['tideguard_faceguard', fromBoss('knight_commander_olen')],
+      ['sunken_court_mantle', fromBoss('vael_the_mistcaller')],
+      ['dreamroot_boots', fromBoss('vael_the_mistcaller')],
+      ['stormjar', fromBoss('vael_the_mistcaller')],
+      ['drowned_commanders_breastplate', fromBoss('knight_commander_olen')],
+      ['gaolyard_striders', fromBoss('gaoler_ossick')],
+      ['gaolers_iron_key', fromBoss('gaoler_ossick')],
+    ),
   },
   {
     id: 'conquerors_drowned_temple',

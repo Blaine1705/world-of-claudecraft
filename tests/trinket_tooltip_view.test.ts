@@ -1,5 +1,5 @@
 // The trinkets' item-tooltip lines (src/ui/trinket_tooltip_view.ts): every one
-// of the eighteen trinkets renders a Use line with its exact resolved numbers
+// of the nineteen trinkets renders a Use line with its exact resolved numbers
 // and cooldown, the ones with a passive render an Equip line first, the
 // power-scaled numbers move with the viewer's power exactly as combat does, and
 // the fortune notice names each Gambler's Die roll. The combat proofs drive a
@@ -111,6 +111,9 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
       'Equip: Each attack you parry, dodge or block adds a heat stack, up to 10. Heat lasts 30 sec, refreshed whenever you gain a stack.',
     use: 'Use: Spend all heat stacks on a fire nova that deals 8 (+25) Fire damage per stack (330 at 10 stacks) to each enemy within 10 yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack. (1 min cooldown)',
   },
+  gaolers_iron_key: {
+    use: 'Use: Chain your target within 30 yd in place for 6 sec. A creature immune to control, such as a boss, is slowed by 30% instead, unless it is also immune to slows. (2 min cooldown)',
+  },
 };
 
 function wearing(itemId: string, seed = 11): Sim {
@@ -141,7 +144,7 @@ function shownTotal(text: string, before: string, after: string): number {
 }
 
 describe('trinket tooltip lines', () => {
-  it('covers exactly the eighteen trinkets', () => {
+  it('covers exactly the nineteen trinkets', () => {
     expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
     expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
   });

@@ -70,17 +70,35 @@ const BASELINE = {
     normalDigest: '719dd461e2a992ad6684cf3e8c3e6307603013c7ff34f017bbf54299c0c1912e',
     gearDigest: '9cfa6a2e95c3d3f03b50edb557843f495ed739336e12e1486bcac7a37dfb18e8',
   },
+  // Re-minted for the Sunken Bastion rework (docs/design/dungeon-rework/
+  // sunken_bastion.md 8.1 and 8.2): Olen's normal table gains the Longsword row
+  // and folds the Fenmist Robe into its guaranteed group; the new Gaoler Ossick
+  // carries his own table. Three shipped heroic epics moved off Vael (the
+  // Tideguard Faceguard and Fogforged Pauldrons to Olen, the Sash of the Sunken
+  // Court to Ossick) and Olen's heroic uncommons stay on Vael's partition, so
+  // none left the game; their item defs are unchanged, only the payer moved.
   knight_commander_olen: {
     gearIds: [
-      'fenmist_robe',
+      'drowned_commanders_breastplate',
       'heroic_eelscale_leggings',
+      'heroic_knight_commanders_longsword',
       'heroic_tideguard_greaves',
       'heroic_tideguard_sabatons',
-      'marshstrider_boots',
-      'trollhide_leggings',
+      'mistforged_pauldrons',
+      'tideguard_faceguard',
     ],
-    normalDigest: '9165d82e66547ae3ab98bcab284ee171842737273727a4701d140fd7c2922016',
-    gearDigest: '0b7bcbadd3c806ae4c788945cccb7cb71b6297372784fff8f4890bdf652153eb',
+    normalDigest: 'f4a817a203a48100e5894c239006310be2a16dd6511de26b2d6bd745b4b5f7cf',
+    gearDigest: 'aa8117eb9473f2fcf78ff3fde25dff6604ec031e2bc112003f12d866e6aa3b40',
+  },
+  gaoler_ossick: {
+    gearIds: [
+      'gaolers_iron_key',
+      'gaolyard_striders',
+      'heroic_gaolyard_cudgel',
+      'sash_of_the_sunken_court',
+    ],
+    normalDigest: '658479d6bc60321d48873be81744e5be8d3f37f76d4842bf92b9032959840cb0',
+    gearDigest: '15e439856b2accb50c45b0d5c217695d3cdbfef47aecc4c4398bd51736a6a2cb',
   },
   vael_the_mistcaller: {
     gearIds: [
@@ -93,18 +111,15 @@ const BASELINE = {
       'heroic_tidescale_vest',
       'marshstrider_boots',
       'mistcallers_fang',
-      'mistforged_pauldrons',
       'mistveil_cord',
       'mistveil_grips',
-      'sash_of_the_sunken_court',
       'stormjar',
       'sunken_court_mantle',
       'tidebound_spaulders',
-      'tideguard_faceguard',
       'trollhide_leggings',
     ],
     normalDigest: '213a53c89b1da7a01abf0c4ea3849f9390368a6163a358f3fdad2f2007f0bcb1',
-    gearDigest: '22c9fd554829d688bd6cbc8bb79d99c89c30b250e40ee297452a98197fbb6942',
+    gearDigest: '7a9d9d364d3d682f2db571c3f92be9c471a53fbb431c90661df5d453cb706005',
   },
   choirmother_selthe: {
     gearIds: ['heroic_selthes_seastriders'],

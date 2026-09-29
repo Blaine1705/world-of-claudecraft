@@ -323,8 +323,9 @@ describe('item webp icons', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04) to 136. This merge unions both waves
     // plus the three faction vendor weapons (riftwarden_voidblade,
     // dawnkeeper_consecrated_mace, forgemaster_crag_cleaver): 138 -> 141, plus the four Warfare Season 2 honor weapons
-    // (warfare-season2-weapons-2026-09-25): 145.
-    expect(WEAPON_IMAGE_IDS.size).toBe(145);
+    // (warfare-season2-weapons-2026-09-25): 145, plus the Sunken Bastion rework's
+    // two (knight_commanders_longsword, gaolyard_cudgel): 147.
+    expect(WEAPON_IMAGE_IDS.size).toBe(147);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

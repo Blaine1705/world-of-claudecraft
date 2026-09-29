@@ -708,6 +708,8 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'heroic_cantors_hymnal',
   'heroic_rimeweb_fang',
   'heroic_sextons_spadehaft',
+  'heroic_knight_commanders_longsword',
+  'heroic_gaolyard_cudgel',
   'heroic_boundstone_girdle',
   'heroic_boundstone_helm',
   'heroic_deathlord_legguards',
@@ -802,14 +804,25 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['heroic_cantors_hymnal', 0.15],
     ]).map(preserveBaseLootSource),
   ],
+  // The Sunken Bastion rework (sunken_bastion.md 8.2): one equipment item per
+  // boss kill; three shipped epics moved off Vael onto Olen and Ossick.
   knight_commander_olen: [
     ...weightedLootGroup('knight_commander_olen_heroic', [
-      ['trollhide_leggings', 0.5],
-      ['marshstrider_boots', 0.5],
-      ['fenmist_robe', 0.25],
-      ['heroic_tideguard_greaves', 0.1],
-      ['heroic_tideguard_sabatons', 0.1],
-      ['heroic_eelscale_leggings', 0.1],
+      ['drowned_commanders_breastplate', 0.3],
+      ['tideguard_faceguard', 0.2],
+      ['mistforged_pauldrons', 0.2],
+      ['heroic_knight_commanders_longsword', 0.15],
+      ['heroic_tideguard_greaves', 0.05],
+      ['heroic_tideguard_sabatons', 0.05],
+      ['heroic_eelscale_leggings', 0.05],
+    ]).map(preserveBaseLootSource),
+  ],
+  gaoler_ossick: [
+    ...weightedLootGroup('gaoler_ossick_heroic', [
+      ['gaolyard_striders', 0.3],
+      ['gaolers_iron_key', 0.25],
+      ['sash_of_the_sunken_court', 0.25],
+      ['heroic_gaolyard_cudgel', 0.2],
     ]).map(preserveBaseLootSource),
   ],
   choirmother_selthe: [
@@ -882,9 +895,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['mistveil_grips', 0.12],
       ['mistcallers_fang', 0.34],
       ['tidebound_spaulders', 0.33],
-      ['sash_of_the_sunken_court', 0.33],
-      ['mistforged_pauldrons', 0.25],
-      ['tideguard_faceguard', 0.25],
       ['sunken_court_mantle', 0.25],
       ['dreamroot_boots', 0.25],
       ['stormjar', 0.25],

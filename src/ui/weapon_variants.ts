@@ -163,6 +163,10 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   ironbark_boar_spear: 'spear_a', // crafted 2H spear
   fanglords_beastspear: 'spear_a', // RARE: the basin Beastmaster's boar spear
 
+  // ---- The Sunken Bastion rework (sunken_bastion_items.ts) ------------------
+  knight_commanders_longsword: 'sword_d',
+  gaolyard_cudgel: 'hammer_b', // an iron-banded club reads as the plain mace
+
   // ---- Crucible of the Last Spring raid weapons (ignivar_loot.ts) -------------
   // Held models reuse shipped GLBs.
   forgefathers_warhammer: 'hammer_c',

@@ -229,6 +229,7 @@ import {
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
 import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
+import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -424,6 +425,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
   HOLLOW_CRYPT_ITEMS,
+  SUNKEN_BASTION_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,

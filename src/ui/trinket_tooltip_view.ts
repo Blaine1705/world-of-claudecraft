@@ -303,6 +303,12 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
         radius: n(u.radius),
         share: pct(u.share),
       });
+    case 'shackle':
+      return t('hudChrome.trinkets.use.shackle', {
+        range: n(u.range),
+        duration: n(u.duration),
+        slow: pct(1 - u.slow),
+      });
     case 'heartNova': {
       const perHeat = u.flat + u.coef * viewer.attackPower;
       const maxHeat = passiveMax(spec);

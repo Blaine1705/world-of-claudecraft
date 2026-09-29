@@ -205,6 +205,10 @@ export function trinketAuraEffectDescriptor(
       return { key: `${KEY}.sprint`, nums: { pct: pct(a.value - 1) } };
     case TRINKET_AURA.brand:
       return { key: `${KEY}.brand`, nums: { pct: pct(a.value) } };
+    case TRINKET_AURA.shackle:
+      // Rooted, or (on a creature immune to control) slowed.
+      if (a.kind === 'slow') return { key: `${KEY}.shackleSlow`, nums: { pct: pct(1 - a.value) } };
+      return { key: `${KEY}.shackle`, nums: {} };
     case TRINKET_AURA.heat: {
       const use = useOf('forgefathers_temper', 'temper');
       const max = passiveOf('forgefathers_temper', 'heat')?.max ?? 0;

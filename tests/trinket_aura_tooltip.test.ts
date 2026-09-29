@@ -101,6 +101,7 @@ describe('trinket aura icons', () => {
       trinket_pierce: 'molten_fletching',
       trinket_lantern: 'last_flame_lantern',
       trinket_crucible_heat: 'heart_of_the_crucible',
+      trinket_shackle: 'gaolers_iron_key',
     });
     // Every trinket with a use or passive aura owns at least one of them; the
     // Medallion of Defiance applies none (it only breaks control).
@@ -259,6 +260,16 @@ describe('trinket aura tooltips (English)', () => {
       "Wayfarer's Stride",
       own({ id: TRINKET_AURA.sprint, kind: 'buff_speed', value: 1.6 }),
       'Movement speed increased by 60%. Does not stack with other speed increases.',
+    ],
+    [
+      "Gaoler's Iron Key (rooted)",
+      foreign({ id: TRINKET_AURA.shackle, kind: 'root', value: 0 }),
+      'Chained in place: cannot move.',
+    ],
+    [
+      "Gaoler's Iron Key (slowed)",
+      foreign({ id: TRINKET_AURA.shackle, kind: 'slow', value: 0.7 }),
+      'Chained: movement speed reduced by 30%.',
     ],
     [
       "Duelist's Brand",

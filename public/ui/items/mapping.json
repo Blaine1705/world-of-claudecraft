@@ -7120,6 +7120,29 @@
         "tempest_strike_grips",
         "venom_etched_waistcord"
       ]
+    },
+    {
+      "batchId": "sunken-bastion-icons-2026-09-29",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_sunken_bastion_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_sunken_bastion_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+      "itemIds": [
+        "knight_commanders_longsword",
+        "gaolers_chain_girdle",
+        "rusted_shackle_grips",
+        "drowned_wardens_mantle",
+        "gaolyard_cudgel",
+        "drowned_commanders_breastplate",
+        "gaolyard_striders",
+        "gaolers_iron_key"
+      ]
     }
   ]
 }

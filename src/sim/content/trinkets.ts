@@ -92,7 +92,11 @@ export type TrinketUse =
   /** Heart of the Crucible: spend every heat stack on a fire nova within
    *  `radius`, `flat` (+ `coef` of Attack Power) fire damage per stack, that
    *  taunts every creature it hits. */
-  | { kind: 'heartNova'; radius: number; flat: number; coef: number };
+  | { kind: 'heartNova'; radius: number; flat: number; coef: number }
+  /** Gaoler's Iron Key: chain an enemy within `range` in place for `duration`;
+   *  one immune to control is slowed to `slow` of its speed instead (a target
+   *  immune to slows as well shrugs it off). */
+  | { kind: 'shackle'; range: number; duration: number; slow: number };
 
 /** What a trinket does on its own while worn. */
 export type TrinketPassive =
@@ -155,6 +159,7 @@ export const TRINKET_AURA = Object.freeze({
   pierce: 'trinket_pierce',
   lantern: 'trinket_lantern',
   guardHeat: 'trinket_crucible_heat',
+  shackle: 'trinket_shackle',
 });
 
 /** The Mooring Stone's self-slow rides its own aura id beside the anchor
@@ -192,6 +197,7 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.pierce]: 'molten_fletching',
   [TRINKET_AURA.lantern]: 'last_flame_lantern',
   [TRINKET_AURA.guardHeat]: 'heart_of_the_crucible',
+  [TRINKET_AURA.shackle]: 'gaolers_iron_key',
 });
 
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
@@ -263,6 +269,9 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   molten_fletching: trinket('molten_fletching', 'Molten Fletching', { agi: 15 }),
   last_flame_lantern: trinket('last_flame_lantern', 'Last Flame Lantern', { spi: 15 }),
   heart_of_the_crucible: trinket('heart_of_the_crucible', 'Heart of the Crucible', { sta: 15 }),
+  // The Sunken Bastion's heroic Gaoler Ossick (the five-man heroic trinket
+  // line of the Bastion Sigil).
+  gaolers_iron_key: trinket('gaolers_iron_key', "Gaoler's Iron Key", { sta: 13 }),
 };
 
 // The Crucible of the Last Spring raid trinkets, in the order they sit in their
@@ -367,6 +376,10 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
     cooldown: 60,
     use: { kind: 'heartNova', radius: 10, flat: 8, coef: 0.05 },
     passive: { kind: 'guardHeat', max: 10, duration: 30 },
+  },
+  gaolers_iron_key: {
+    cooldown: 120,
+    use: { kind: 'shackle', range: 30, duration: 6, slow: 0.7 },
   },
 });
 

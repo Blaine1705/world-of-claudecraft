@@ -51,9 +51,10 @@ const damageBy = (events: SimEvent[], ability: string) =>
   events.filter((ev) => ev.type === 'damage' && ev.ability === ability);
 
 describe('the trinket catalog', () => {
-  it('ships eighteen trinkets, each with one attribute and a use', () => {
+  it('ships nineteen trinkets, each with one attribute and a use', () => {
     const ids = Object.keys(TRINKET_ITEMS);
-    expect(ids).toHaveLength(18);
+    // The Sunken Bastion rework's Gaoler's Iron Key is the nineteenth.
+    expect(ids).toHaveLength(19);
     for (const id of ids) {
       const item = TRINKET_ITEMS[id];
       expect(item.slot).toBe('trinket');
@@ -186,6 +187,34 @@ describe('the tank trinkets', () => {
     expect(p.auras.some((a) => a.kind === 'stun' || a.kind === 'root')).toBe(false);
     expect(sim.ctx.applyKnockback(mob, p, 10)).toBe(0);
     expect(aura(p, TRINKET_AURA.anchorGuard)?.kind).toBe('shield_wall');
+  });
+
+  it("Gaoler's Iron Key: roots the target, slows a control-immune one, needs a target in range", () => {
+    const sim = wearing('gaolers_iron_key');
+    const mob = foe(sim, 10);
+    sim.useItem('gaolers_iron_key');
+    const root = aura(mob, TRINKET_AURA.shackle);
+    expect(root?.kind).toBe('root');
+    expect(root?.remaining).toBe(6);
+    expect(sim.player.cooldowns.get(trinketCooldownKey('gaolers_iron_key'))).toBe(
+      TRINKET_SPECS.gaolers_iron_key.cooldown,
+    );
+
+    // A creature immune to control is slowed instead of rooted.
+    const sim2 = wearing('gaolers_iron_key');
+    const boss = foe(sim2, 10);
+    boss.ccImmune = true;
+    sim2.useItem('gaolers_iron_key');
+    const slow = aura(boss, TRINKET_AURA.shackle);
+    expect(slow?.kind).toBe('slow');
+    expect(slow?.value).toBe(0.7);
+
+    // Out of range: nothing lands and the cooldown is not spent.
+    const sim3 = wearing('gaolers_iron_key');
+    const far = foe(sim3, 40);
+    sim3.useItem('gaolers_iron_key');
+    expect(aura(far, TRINKET_AURA.shackle)).toBeUndefined();
+    expect(sim3.player.cooldowns.get(trinketCooldownKey('gaolers_iron_key')) ?? 0).toBe(0);
   });
 });
 

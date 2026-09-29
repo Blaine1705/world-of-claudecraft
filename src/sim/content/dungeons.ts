@@ -710,19 +710,28 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // Onrush; the Reaping Arc cleave stays below.
     loot: [
       { copper: 800, chance: 1 },
+      // The rework (sunken_bastion.md 8.1): the Fenmist Robe joins the
+      // guaranteed group so every archetype has a piece, plus the Longsword
+      // chase row. Heroic rides HEROIC_BOSS_LOOT.knight_commander_olen.
       {
         itemId: 'trollhide_leggings',
-        chance: 0.5,
+        chance: 0.34,
         rollGroup: 'olen_guaranteed_uncommon',
         normalOnly: true,
       },
       {
         itemId: 'marshstrider_boots',
-        chance: 0.5,
+        chance: 0.33,
         rollGroup: 'olen_guaranteed_uncommon',
         normalOnly: true,
       },
-      { itemId: 'fenmist_robe', chance: 0.25, rollGroup: 'olen_bonus', normalOnly: true },
+      {
+        itemId: 'fenmist_robe',
+        chance: 0.33,
+        rollGroup: 'olen_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      { itemId: 'knight_commanders_longsword', chance: 0.1, normalOnly: true },
       { itemId: 'tideguard_greaves', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
       { itemId: 'tideguard_sabatons', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
       { itemId: 'eelscale_leggings', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },

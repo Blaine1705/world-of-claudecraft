@@ -215,7 +215,7 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
   },
   mistweaver: {
     id: 'mistweaver',
-    name: 'Mistweaver',
+    name: 'Mist Chanter',
     minLevel: 13,
     maxLevel: 13,
     family: 'humanoid',
@@ -440,7 +440,30 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 7,
     aggroRadius: 14,
-    loot: [{ copper: 1000, chance: 1 }],
+    // One guaranteed piece per archetype group, plus the Cudgel chase row.
+    // Heroic rides HEROIC_BOSS_LOOT.gaoler_ossick.
+    loot: [
+      { copper: 1000, chance: 1 },
+      {
+        itemId: 'gaolers_chain_girdle',
+        chance: 0.34,
+        rollGroup: 'ossick_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'rusted_shackle_grips',
+        chance: 0.33,
+        rollGroup: 'ossick_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'drowned_wardens_mantle',
+        chance: 0.33,
+        rollGroup: 'ossick_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'gaolyard_cudgel', chance: 0.1, normalOnly: true },
+    ],
     scale: 1.4,
     color: 0x6f6252,
   },

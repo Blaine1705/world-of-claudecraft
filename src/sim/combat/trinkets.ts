@@ -28,7 +28,7 @@ import {
   trinketCooldownKey,
   trinketSpec,
 } from '../content/trinkets';
-import { ITEMS } from '../data';
+import { ITEMS, MOBS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
@@ -475,6 +475,28 @@ export function useWornTrinket(
     }
     case 'lantern': {
       placeLantern(ctx, p, use);
+      break;
+    }
+    case 'shackle': {
+      const target = hostileTarget(ctx, p, use.range);
+      if (!target) {
+        ctx.error(meta.entityId, 'You have no target.');
+        return false;
+      }
+      // A creature immune to control (every boss) is slowed instead of rooted.
+      const immune =
+        target.kind === 'mob' && (MOBS[target.templateId]?.ccImmune || target.ccImmune);
+      ctx.applyAura(target, {
+        id: TRINKET_AURA.shackle,
+        name: "Gaoler's Iron Key",
+        kind: immune ? 'slow' : 'root',
+        remaining: use.duration,
+        duration: use.duration,
+        value: immune ? use.slow : 0,
+        sourceId: p.id,
+        school: 'physical',
+      });
+      fxOn(ctx, p, target, 'physical', 'trinket_gaolers_iron_key');
       break;
     }
     case 'heartNova': {

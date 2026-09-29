@@ -433,6 +433,34 @@ const TRINKET_VFX: Readonly<Record<string, TrinketVfx>> = {
       },
     },
   },
+  // Gaoler's Iron Key: a gaol chain lashes from the key to the target and
+  // snaps taut round it: an iron link, the chain motif and grit at its feet.
+  trinket_gaolers_iron_key: {
+    spec: { c: '#9aa4a8', p: 'physical', pw: 1, sp: 12, li: 1, lg: 2, a: 'burst' },
+    full: {
+      archetype: 'burst',
+      palette: 'physical',
+      power: 1,
+      burst: { style: 'link' },
+      motifs: ['chains'],
+      motifAt: 'target',
+      windupStyle: 'none',
+      decal: 'scorch',
+      linger: 2,
+      rim: '#c8d2d6',
+      accent: '#e4ecef',
+      impact: {
+        flipbook: false,
+        ring: false,
+        vRing: false,
+        sparks: 10,
+        debris: false,
+        smoke: true,
+        light: 0.6,
+        focused: true,
+      },
+    },
+  },
   // ---- The Crucible of the Last Spring raid trinkets ----------------------
   // Their bespoke scene objects (the spectral hammer, the floating Kindling
   // Orb and its bolts, the Last Flame Lantern and its light) are painted by
