@@ -19557,6 +19557,36 @@ export const en_XA: EnTranslations = {
       "morthen": {
         "name": "[Ɱóŕţĥéñ ţĥé Ĝŕáʋéçáļļéŕ]"
       },
+      "ossuary_sentinel": {
+        "name": "[Óššúáŕý Šéñţíñéļ]"
+      },
+      "hollow_gravedigger": {
+        "name": "[Ĥóļļóŵ Ĝŕáʋéðíĝĝéŕ]"
+      },
+      "rime_egg_sac": {
+        "name": "[Ŕíɱé Éĝĝ Šáç]"
+      },
+      "rimeweb_hatchling": {
+        "name": "[Ŕíɱéŵéƀ Ĥáţçĥļíñĝ]"
+      },
+      "rimeweb_spinner": {
+        "name": "[Ŕíɱéŵéƀ Šþíññéŕ]"
+      },
+      "candlewright_acolyte": {
+        "name": "[Çáñðļéŵŕíĝĥţ Áçóļýţé]"
+      },
+      "hollow_chorister": {
+        "name": "[Ĥóļļóŵ Çĥóŕíšţéŕ]"
+      },
+      "bound_soul": {
+        "name": "[Ɓóúñð Šóúļ]"
+      },
+      "rimeweb": {
+        "name": "[Ŕíɱéŵéƀ]"
+      },
+      "cantor_ilvane": {
+        "name": "[Çáñţóŕ Íļʋáñé]"
+      },
       "bastion_revenant": {
         "name": "[Ɓášţíóñ Ŕéʋéñáñţ]"
       },

@@ -120,6 +120,8 @@ describe('heroic five-man floors', () => {
   it('every spawn-list mob swings for at least 500 on the reference warrior', () => {
     for (const dungeonId of FIVE_MANS) {
       for (const mobId of spawnListMobIds(dungeonId)) {
+        // An egg sac (broodEgg) never swings: it only hatches the real add.
+        if (MOBS[mobId]?.broodEgg) continue;
         expect(
           minSwing(mobId, dungeonId, 'heroic'),
           `${dungeonId}/${mobId}`,
@@ -222,7 +224,8 @@ describe('heroic tuning data contract', () => {
         ]),
       ),
     ).toEqual({
-      hollow_crypt: [3.8, 20, 6],
+      // 6 -> 9.5: the rework's wing bosses summon adds (the 150 add floor).
+      hollow_crypt: [3.8, 20, 9.5],
       sunken_bastion: [4.0, 18, 9.75],
       drowned_temple: [5.2, 16.5, 9.15],
       gravewyrm_sanctum: [4.0, 15.5, 8.55],
@@ -239,6 +242,8 @@ describe('heroic tuning data contract', () => {
       grand_necromancer_velkhar: 19,
       korzul_the_gravewyrm: 19,
     });
+    // The rework's non-elite P9 walkers ride the 500 mob floor on their own.
+    expect(HEROIC_DUNGEON_TUNING.hollow_crypt.damageMultiplierByMob).toEqual({ bound_soul: 56 });
     expect(HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplierByMob).toEqual({
       nythraxis_scourge_of_thornpeak: 1.488,
       nythraxis_skeleton_warrior: 3.75,

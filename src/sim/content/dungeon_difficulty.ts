@@ -361,9 +361,14 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     level: 22,
     healthMultiplier: 3.8,
     damageMultiplier: 20,
-    // No hollow_crypt boss summons adds; inert, but rides the v0.30 40% add
-    // nerf with the other heroics so a future summoner starts on-model.
-    addDamageMultiplier: 6,
+    // The rework's wing bosses summon non-elite adds (Sexton Marrow's
+    // restless_bones at his Burial Toll, Rimeweb's hatchlings at her Brood
+    // Call): lifted onto the shared 150 summoned-add floor with the other
+    // heroics (tests/heroic_difficulty_floors.test.ts).
+    addDamageMultiplier: 9.5,
+    // The P9 procession's Bound Souls are NON-elite spawn-list walkers (no
+    // 1.5x elite swing): lifted onto the 500 heroic mob floor on their own.
+    damageMultiplierByMob: { bound_soul: 56 },
     armorMultiplier: 1.3,
     finalBossId: 'morthen',
     marksPerParticipant: 1,

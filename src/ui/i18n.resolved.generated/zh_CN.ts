@@ -19557,6 +19557,36 @@ export const zh_CN: EnTranslations = {
       "morthen": {
         "name": "唤墓者莫森"
       },
+      "ossuary_sentinel": {
+        "name": "Ossuary Sentinel"
+      },
+      "hollow_gravedigger": {
+        "name": "Hollow Gravedigger"
+      },
+      "rime_egg_sac": {
+        "name": "Rime Egg Sac"
+      },
+      "rimeweb_hatchling": {
+        "name": "Rimeweb Hatchling"
+      },
+      "rimeweb_spinner": {
+        "name": "Rimeweb Spinner"
+      },
+      "candlewright_acolyte": {
+        "name": "Candlewright Acolyte"
+      },
+      "hollow_chorister": {
+        "name": "Hollow Chorister"
+      },
+      "bound_soul": {
+        "name": "Bound Soul"
+      },
+      "rimeweb": {
+        "name": "Rimeweb"
+      },
+      "cantor_ilvane": {
+        "name": "Cantor Ilvane"
+      },
       "bastion_revenant": {
         "name": "堡垒亡魂"
       },

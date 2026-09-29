@@ -445,9 +445,11 @@ describe('abilities x collision', () => {
     expect(p.pos.y - groundHeight(p.pos.x, p.pos.z, SEED)).toBeLessThan(0.15);
   });
 
+  // The shared crypt nave (CRYPT_LAYOUT) lives on in the Abandoned Crypt; the
+  // Hollow Crypt moved to its own open-air field in the rework.
   it('Vaulting Charge onto the crypt dais lands at the lifted floor', () => {
     const sim = makeSim();
-    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    const o = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const d = CRYPT_LAYOUT.dais;
     teleport(sim, o.x + d.x, o.z + d.z - d.r - 4, 0);
     const p = sim.player;
@@ -460,7 +462,7 @@ describe('abilities x collision', () => {
 describe('dungeon deep sweep', () => {
   it('dais rim walk-up from 8 directions', () => {
     const sim = makeSim();
-    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    const o = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const d = CRYPT_LAYOUT.dais;
     for (let k = 0; k < 8; k++) {
       const ang = (k / 8) * Math.PI * 2;
@@ -595,7 +597,9 @@ describe('programmatic collider sanity sweeps', () => {
   });
 
   it('interior sets: standable tops sane, colliderTopAt within [eave, ridge]', () => {
-    for (const id of ['hollow_crypt', 'sunken_bastion', 'nythraxis_crypt']) {
+    // Room-plan interiors with furniture (the Hollow Crypt's open-air field
+    // carries no standable tops: its obstacles are cliffs, walls and props).
+    for (const id of ['sunken_bastion', 'nythraxis_crypt']) {
       const o = instanceOrigin(DUNGEONS[id].index, 0);
       const frame = interiorColliderFrame(o.x, o.z + 40);
       expect(frame).not.toBeNull();

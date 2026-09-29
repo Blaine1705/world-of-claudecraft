@@ -19557,6 +19557,36 @@ export const it_IT: EnTranslations = {
       "morthen": {
         "name": "Morthen il Gravecaller"
       },
+      "ossuary_sentinel": {
+        "name": "Ossuary Sentinel"
+      },
+      "hollow_gravedigger": {
+        "name": "Hollow Gravedigger"
+      },
+      "rime_egg_sac": {
+        "name": "Rime Egg Sac"
+      },
+      "rimeweb_hatchling": {
+        "name": "Rimeweb Hatchling"
+      },
+      "rimeweb_spinner": {
+        "name": "Rimeweb Spinner"
+      },
+      "candlewright_acolyte": {
+        "name": "Candlewright Acolyte"
+      },
+      "hollow_chorister": {
+        "name": "Hollow Chorister"
+      },
+      "bound_soul": {
+        "name": "Bound Soul"
+      },
+      "rimeweb": {
+        "name": "Rimeweb"
+      },
+      "cantor_ilvane": {
+        "name": "Cantor Ilvane"
+      },
       "bastion_revenant": {
         "name": "Revenant del Bastione"
       },

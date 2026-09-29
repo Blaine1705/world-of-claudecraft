@@ -125,15 +125,17 @@ describe('the boss dais is real elevation', () => {
     expect(groundCueY(ground, cx + 2.5, cz, 3)).toBeCloseTo(DUNGEON_FLOOR_Y, 6);
   });
 
+  // The shared crypt nave (CRYPT_LAYOUT, coffins) now lives on in the Abandoned
+  // Crypt: the Hollow Crypt moved to its own open-air field in the rework.
   it('groundHeight stands everything on the stage, in world coordinates', () => {
-    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    const o = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const d = CRYPT_LAYOUT.dais;
     expect(groundHeight(o.x + d.x, o.z + d.z, SEED)).toBeCloseTo(DUNGEON_FLOOR_Y + DAIS_HEIGHT, 6);
     expect(groundHeight(o.x, o.z + 40, SEED)).toBeCloseTo(DUNGEON_FLOOR_Y, 6);
   });
 
   it('a player WALKS up the dais rim, no jump, and walks back off', () => {
-    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    const o = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const d = CRYPT_LAYOUT.dais;
     const sim = simWithPlayerAt(o.x + d.x, o.z + d.z - d.r - 2, 0); // south of the rim, facing +z
     const p = sim.player;
@@ -155,7 +157,7 @@ describe('the boss dais is real elevation', () => {
   });
 
   it('a jump arcs onto the dais instead of bouncing off its rim', () => {
-    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    const o = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const d = CRYPT_LAYOUT.dais;
     const sim = simWithPlayerAt(o.x + d.x, o.z + d.z - d.r - 1.2, 0);
     const p = sim.player;
@@ -172,8 +174,8 @@ describe('dungeon furniture is standable per its real dressing', () => {
     for (const t of tombs) expect(t.moveTopY).toBeUndefined();
   });
 
-  it('a jumping player mantles onto a Hollow Crypt coffin lid hump', () => {
-    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+  it('a jumping player mantles onto a crypt nave coffin lid hump', () => {
+    const o = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const t = CRYPT_LAYOUT.tombs[0]; // (-19, 16), against the west wall
     const roll = tombSlotRoll(t.x, t.z);
     const plain = roll < 0.55;

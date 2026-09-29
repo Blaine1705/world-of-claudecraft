@@ -19,6 +19,7 @@ import { enterDungeon, freeInstance } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
+import { localizeSimText } from '../src/ui/sim_i18n';
 
 const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 
@@ -162,6 +163,13 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
     sim.tick();
     expect(dungeonGateState(sim.ctx, fresh, gate('grille'))).toBe('closed');
     expect(blockedAt(sim, fresh, 'grille')).toBe(true);
+  });
+
+  it('every gate announcement is a known client line (i18n EXACT matcher)', () => {
+    for (const g of HOLLOW_CRYPT_GATES) {
+      if (!g.openText) continue;
+      expect(localizeSimText(g.openText), g.id).not.toBeNull();
+    }
   });
 
   it('gate template ids round-trip through the wire decoder', () => {

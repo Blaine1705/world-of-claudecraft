@@ -1154,6 +1154,16 @@ const baseEnTable = {
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
   'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
   'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
+  // The Hollow Crypt's gates and seals (sim/content/hollow_crypt.ts openText,
+  // announced by instances/dungeon_gates.ts). Placeholder-free: EXACT matcher.
+  'log.hollowCryptGrilleOpen': 'The Undercroft Grille grinds open.',
+  'log.hollowCryptYardBarrierOpen': 'The bone barrier before the Bell Yard crumbles.',
+  'log.hollowCryptYardBridgeOpen': 'A bridge of bone knits itself across the mist.',
+  'log.hollowCryptWebCurtainOpen': 'The frost-web curtain tears apart.',
+  'log.hollowCryptWebBridgeOpen': 'The webs over the eastern causeway fall away.',
+  'log.hollowCryptTwinSealsOpen': 'Both sigils gutter out. The Twin Seals open.',
+  'log.hollowCryptChoirDoorOpen': 'The choir door opens onto the Bone Stair.',
+  'log.hollowCryptStairGateOpen': 'The gate at the foot of the Bone Stair collapses.',
   // The Proving Shore (tutorial island): the compulsory greeting's ferry ride,
   // the two clicked ferry bells (sim/tutorial/greeting.ts +
   // interactions/ferry_bell.ts), and the

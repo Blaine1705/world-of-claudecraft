@@ -517,7 +517,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     summonAdds: { mobId: 'restless_bones', count: 2, atHpPct: [0.66, 0.33] },
     yells: { summon: 'The bell tolls, and the graves give up their dead!' },
     loot: [
-      { copper: 800, chance: 1 },
+      { copper: 400, chance: 1 },
       { itemId: 'quilted_trousers', chance: 0.4, normalOnly: true },
       { itemId: 'oiled_boots', chance: 0.4, normalOnly: true },
     ],
