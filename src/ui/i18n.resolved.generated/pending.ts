@@ -9,25 +9,105 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "es_ES": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "fr_FR": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "fr_CA": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "de_DE": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "zh_CN": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "zh_TW": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "ko_KR": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "ja_JP": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "pt_BR": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "ru_RU": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "cs_CZ": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "nl_NL": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "pl_PL": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "id_ID": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "tr_TR": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "sv_SE": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "vi_VN": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ],
+  "da_DK": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral"
+  ]
 };

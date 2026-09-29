@@ -3252,6 +3252,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),
   rake: r('nature', 'leafGreen', ['claw_slash'], ['drips']),
   claw: r('nature', 'leafGreen', ['claw_slash'], ['motion']),
+  scratch: r('nature', 'leafGreen', ['claw_slash', { p: 'paw', ...BR }], ['arcs']),
   ferocious_bite: r('blood', 'blood', ['fang'], ['drips']),
   swipe: r('earth', 'earthBrown', ['claw_slash'], ['arcs']),
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),

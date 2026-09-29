@@ -13984,6 +13984,11 @@ export const zh_CN: EnTranslations = {
         "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限豹形态。",
         "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets for weapon damage plus {damage}. Awards 1 combo point per target hit. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "血噬",
         "description": "终结技，造成 {damage}。仅限豹形态。",

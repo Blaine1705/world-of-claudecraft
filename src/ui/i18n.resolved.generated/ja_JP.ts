@@ -13984,6 +13984,11 @@ export const ja_JP: EnTranslations = {
         "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。キャットフォーム専用。",
         "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets for weapon damage plus {damage}. Awards 1 combo point per target hit. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "血噛み",
         "description": "{damage}を与えるフィニッシュムーブです。キャットフォーム専用。",

@@ -13984,6 +13984,11 @@ export const zh_TW: EnTranslations = {
         "description": "用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。僅限貓形態。",
         "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets for weapon damage plus {damage}. Awards 1 combo point per target hit. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "血噬",
         "description": "終結技，造成 {damage}。僅限貓形態。",

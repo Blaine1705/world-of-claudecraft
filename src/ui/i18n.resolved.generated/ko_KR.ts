@@ -13984,6 +13984,11 @@ export const ko_KR: EnTranslations = {
         "description": "적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 표범 변신 전용.",
         "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets for weapon damage plus {damage}. Awards 1 combo point per target hit. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "유혈 물어뜯기",
         "description": "결정타로 {damage}의 피해를 입힙니다. 표범 변신 전용.",

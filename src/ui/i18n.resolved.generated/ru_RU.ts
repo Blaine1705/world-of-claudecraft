@@ -13984,6 +13984,11 @@ export const ru_RU: EnTranslations = {
         "description": "Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике кота.",
         "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets for weapon damage plus {damage}. Awards 1 combo point per target hit. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "Кровавый укус",
         "description": "Завершающий прием, наносящий {damage}. Только в облике кота.",
