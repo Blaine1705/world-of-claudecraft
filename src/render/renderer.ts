@@ -7067,11 +7067,11 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
-    // Every effect this event draws is judged by the event's caster for the
-    // Spell Effects option, not by the body it lands on.
+    // Spell Effects judges each effect by this event's caster; dispatched via
+    // the prototype so a host that borrows handleEvent reaches the switch too.
     const scope = enterSpellEvent(ev);
     try {
-      this.dispatchEvent(ev);
+      Renderer.prototype.dispatchEvent.call(this, ev);
     } finally {
       leaveSpellEvent(scope);
     }
