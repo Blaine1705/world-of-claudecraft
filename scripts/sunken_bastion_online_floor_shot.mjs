@@ -157,11 +157,7 @@ async function main() {
         samples.push(
           await page.evaluate(() => {
             const p = window.__game.world.player;
-            return [
-              +p.pos.x.toFixed(2),
-              +p.pos.y.toFixed(3),
-              +p.pos.z.toFixed(2),
-            ];
+            return [+p.pos.x.toFixed(2), +p.pos.y.toFixed(3), +p.pos.z.toFixed(2)];
           }),
         );
         await sleep(250);
@@ -173,7 +169,9 @@ async function main() {
       console.log(
         'SAMPLES',
         name,
-        JSON.stringify(samples.map(([x, y, z]) => [+(x - origin.x).toFixed(1), y, +(z - origin.z).toFixed(1)])),
+        JSON.stringify(
+          samples.map(([x, y, z]) => [+(x - origin.x).toFixed(1), y, +(z - origin.z).toFixed(1)]),
+        ),
       );
       const file = path.join(OUT, `${PREFIX}${name}.png`);
       await page.screenshot({ path: file });
