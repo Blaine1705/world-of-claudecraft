@@ -6718,8 +6718,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'druid',
     // The Cat Form sweep builder: Rendclaw's damage profile (the same flat
     // bonus per rank, the same Wildfang baseline row in spec_baselines.ts) and
-    // Rendclaw's price, but every nearby enemy takes its own swing
-    // (combat/druid_scratch.ts), each landed hit paying a combo point.
+    // Rendclaw's price, but every enemy within Sweeping Claws' 5 yd takes its
+    // own swing (combat/druid_scratch.ts), each landed hit paying a combo point.
     learnLevel: 10,
     cost: 45,
     castTime: 0,
@@ -6729,13 +6729,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     awardsCombo: 1,
     requiresForm: 'cat',
-    effects: [{ type: 'weaponStrike', bonus: 25, sweepRadius: 8 }],
+    effects: [{ type: 'weaponStrike', bonus: 25, sweepRadius: 5 }],
     ranks: [
       {
         rank: 2,
         level: 18,
         cost: 45,
-        effects: [{ type: 'weaponStrike', bonus: 55, sweepRadius: 8 }],
+        effects: [{ type: 'weaponStrike', bonus: 55, sweepRadius: 5 }],
       },
     ],
     description:

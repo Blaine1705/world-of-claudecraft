@@ -663,8 +663,10 @@ export function runEffects(
             threatMult: res.threatMult,
             critBonus: mods.abilities[ability.id]?.critPct ?? 0,
             comboPerHit: ability.awardsCombo ? ability.awardsCombo + setComboBonus : 0,
+            forceCrit: sureCrit,
           });
           if (landed > 0 && ability.awardsCombo) comboAwarded = true;
+          if (landed > 0 && sureCrit) sureCritRolled = true;
           break;
         }
         if (!target) break;

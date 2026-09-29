@@ -23,7 +23,7 @@ import { SPEC_BASELINES } from '../src/sim/content/spec_baselines';
 import { ABILITIES, CLASSES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import type { AbilityDef, AbilityEffect, Aura, Entity } from '../src/sim/types';
 
 type Spec = 'balance' | 'feral' | 'restoration';
 
@@ -119,8 +119,8 @@ describe('1. Slinkstrike reaches 0 to 25 yd', () => {
 
 describe('2. Scratch', () => {
   it('is a Cat Form builder every druid learns, with the Rendclaw damage profile and price', () => {
-    const def = ABILITIES.scratch;
-    const claw = ABILITIES.claw;
+    const def: AbilityDef = ABILITIES.scratch;
+    const claw: AbilityDef = ABILITIES.claw;
     expect(def).toBeDefined();
     expect(def.name).toBe('Scratch');
     expect(def.class).toBe('druid');
@@ -129,10 +129,10 @@ describe('2. Scratch', () => {
     expect(CLASSES.druid.abilities).toContain('scratch');
     // Same cost and the same flat bonus at every rank, plus the sweep.
     expect(def.cost).toBe(claw.cost);
-    const bonus = (effects: typeof def.effects) =>
+    const bonus = (effects: readonly AbilityEffect[]): (number | null)[] =>
       effects.map((eff) => (eff.type === 'weaponStrike' ? eff.bonus : null));
     expect(bonus(def.effects)).toEqual(bonus(claw.effects));
-    expect(def.effects).toEqual([{ type: 'weaponStrike', bonus: 25, sweepRadius: 8 }]);
+    expect(def.effects).toEqual([{ type: 'weaponStrike', bonus: 25, sweepRadius: 5 }]);
     expect(def.ranks?.map((r) => [r.level, r.cost, bonus(r.effects)])).toEqual(
       claw.ranks?.map((r) => [r.level, r.cost, bonus(r.effects)]),
     );

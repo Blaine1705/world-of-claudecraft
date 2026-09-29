@@ -22,6 +22,9 @@ export interface WeaponSweepOpts {
   critBonus: number;
   /** Combo points per landed hit (the ability's awardsCombo plus any bend). */
   comboPerHit: number;
+  /** A sure-crit aura forces every swing of the sweep to crit, exactly as it
+   *  forces a single weaponStrike; the caller spends the charge once. */
+  forceCrit: boolean;
 }
 
 /** The hostiles a sweep of `radius` around the caster would strike, in the
@@ -62,6 +65,7 @@ export function resolveWeaponSweep(
       threatFlat: opts.threatFlat,
       threatMult: opts.threatMult,
       critBonus: opts.critBonus,
+      forceCrit: opts.forceCrit,
       abilityId: ability.id,
     });
     if (!hit) continue;
