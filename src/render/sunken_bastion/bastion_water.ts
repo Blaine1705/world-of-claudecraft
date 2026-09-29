@@ -50,11 +50,17 @@ float rings(vec2 p) {
     for (int dz = -1; dz <= 1; dz++) {
       vec2 c = cell + vec2(float(dx), float(dz));
       float h = hash(c);
-      vec2 center = c + vec2(hash(c + 3.1), hash(c + 7.7));
-      float t = fract(uTime * (0.6 + h * 0.5) + h);
+      // Each cycle a new random spot in the cell, and only some cells fire:
+      // scattered drops, never a regular grid of rings.
+      float beat = uTime * (0.6 + h * 0.5) + h;
+      float cyc = floor(beat);
+      float t = fract(beat);
+      vec2 center = c + vec2(hash(c + 3.1 + cyc), hash(c + 7.7 - cyc));
+      float live = step(0.62, hash(c + cyc * 1.37));
       float d = length(p - center);
-      float ring = smoothstep(0.05, 0.0, abs(d - t * 0.9)) * (1.0 - t);
-      r += ring;
+      float grow = 1.0 - (1.0 - t) * (1.0 - t);
+      float ring = smoothstep(0.035, 0.0, abs(d - grow * 0.8)) * (1.0 - t) * (1.0 - t);
+      r += ring * live;
     }
   }
   return r;

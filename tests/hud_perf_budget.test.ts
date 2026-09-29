@@ -847,6 +847,9 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   // caller's clock; like minimap it caches its one --color-daynight-* resolve
   { file: 'day_night_dial_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'dungeon_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  // the painted plate of an authored open-air field (the Sunken Bastion, the Hollow
+  // Crypt): rasterised once per field, caching its one --color-field-map-* resolve
+  { file: 'field_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },

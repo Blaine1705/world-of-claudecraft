@@ -46,6 +46,10 @@ export const SHOTS = [
   { id: 'patio_torreon', at: [-40, 140], face: -0.6, pitch: 0.24, dist: 16 },
   { id: 'jefe3_vael_corona', at: [-16, 190], face: 0.5, pitch: 0.3, dist: 20, wait: 6000 },
   { id: 'faro_desde_abajo', at: [-12, 184], face: 0.3, pitch: -0.05, dist: 10 },
+  // The player standing IN the moat ring (the floor-height fix): feet on the
+  // drawn moat floor, the bailey kerb and the chapel island's lip beside them.
+  { id: 'foso_jugador', at: [-6, -113], face: 0.4, yaw: 2.4, pitch: 0.28, dist: 9 },
+  { id: 'rampa_puerta_mar', at: [0, -129], face: Math.PI, yaw: 2.0, pitch: 0.3, dist: 10 },
   // Each boss up close, idle at its post.
   { id: 'jefe1_olen_cerca', at: [57, 117], face: 0, yaw: 0, pitch: 0.15, dist: 9, wait: 3000 },
   {

@@ -609,6 +609,7 @@ const UI_PURE_CORES = [
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
   'src/ui/dungeon_map_view.ts',
+  'src/ui/field_map_view.ts',
   'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',

@@ -205,7 +205,7 @@ const SURFACES: FieldSurface[] = [
     r: BAILEY_CHAPEL.moat,
     h: BAILEY_CHAPEL.moatFloor,
     edge: 'masonry',
-    ground: 'mud',
+    ground: 'shallows',
   },
   {
     kind: 'circle',
@@ -277,8 +277,26 @@ const SURFACES: FieldSurface[] = [
     ground: 'wetstone',
   },
   rect('rampart_walk', 49, 8, 65, 98, 14, { edge: 'masonry', ground: 'wetstone' }),
-  { kind: 'circle', id: 'tower_one', x: 57, z: 36, r: 10.5, h: 14, edge: 'masonry' },
-  { kind: 'circle', id: 'tower_two', x: 57, z: 72, r: 10.5, h: 14, edge: 'masonry' },
+  {
+    kind: 'circle',
+    id: 'tower_one',
+    x: 57,
+    z: 36,
+    r: 10.5,
+    h: 14,
+    edge: 'masonry',
+    ground: 'flagstone',
+  },
+  {
+    kind: 'circle',
+    id: 'tower_two',
+    x: 57,
+    z: 72,
+    r: 10.5,
+    h: 14,
+    edge: 'masonry',
+    ground: 'flagstone',
+  },
   // --- The Breach Bastion (Knight-Commander Olen) -----------------------------
   {
     kind: 'path',
@@ -336,7 +354,16 @@ const SURFACES: FieldSurface[] = [
     edge: 'rock',
     ground: 'wetstone',
   },
-  { kind: 'circle', id: 'balcony_one', x: -62, z: 24, r: 9, h: 5, edge: 'balustrade' },
+  {
+    kind: 'circle',
+    id: 'balcony_one',
+    x: -62,
+    z: 24,
+    r: 9,
+    h: 5,
+    edge: 'balustrade',
+    ground: 'wetstone',
+  },
   {
     kind: 'path',
     id: 'keep_stair_two',
@@ -351,7 +378,16 @@ const SURFACES: FieldSurface[] = [
     edge: 'rock',
     ground: 'wetstone',
   },
-  { kind: 'circle', id: 'balcony_two', x: -62, z: 86, r: 11, h: 14, edge: 'balustrade' },
+  {
+    kind: 'circle',
+    id: 'balcony_two',
+    x: -62,
+    z: 86,
+    r: 11,
+    h: 14,
+    edge: 'balustrade',
+    ground: 'wetstone',
+  },
   {
     kind: 'path',
     id: 'keep_stair_three',
@@ -498,6 +534,7 @@ export const SUNKEN_BASTION_FIELD: AuthoredFieldDef = {
   bounds: { minX: -104, maxX: 90, minZ: -242, maxZ: 238 },
   voidHeight: SUNKEN_BASTION_VOID_HEIGHT,
   cliffStep: 1.1,
+  mapVoid: 'sea',
   surfaces: SURFACES,
   walls: [
     // The curtain wall across the headland, either side of the Sea Gate.

@@ -20,7 +20,10 @@ export type FieldGround =
   // The Sunken Bastion: tidal mud, sea-worn wet stone and a barnacled quay.
   | 'mud'
   | 'wetstone'
-  | 'quay';
+  | 'quay'
+  // A flooded channel's bed under standing water (the Bastion's moat ring):
+  // drawn as mud by the terrain, as water on the painted map.
+  | 'shallows';
 
 interface FieldSurfaceBase {
   id: string;
@@ -122,4 +125,8 @@ export interface AuthoredFieldDef {
   walls: readonly FieldWall[];
   props: readonly FieldProp[];
   lightZones: readonly FieldLightZone[];
+  /** What the painted dungeon map shows in the void round the terraces (the
+   *  sea round a coastal fortress, or the mist of a chasm; default mist).
+   *  Render and UI only. */
+  mapVoid?: 'sea' | 'mist';
 }

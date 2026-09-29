@@ -50,11 +50,16 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   mud: [0.16, 0.15, 0.12],
   wetstone: [0.23, 0.26, 0.26],
   quay: [0.3, 0.3, 0.28],
+  shallows: [0.14, 0.14, 0.11],
 };
 
 /** Which texture family a ground kind draws with. */
 export function fieldGroundFamily(ground: FieldGround): 'stone' | 'soil' {
-  return ground === 'earth' || ground === 'grave' || ground === 'frost' || ground === 'mud'
+  return ground === 'earth' ||
+    ground === 'grave' ||
+    ground === 'frost' ||
+    ground === 'mud' ||
+    ground === 'shallows'
     ? 'soil'
     : 'stone';
 }
