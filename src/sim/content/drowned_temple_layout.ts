@@ -87,11 +87,16 @@ export const GREAT_CONCH = { x: 0, z: 40 } as const;
 
 /** The Hydra Pool: its rim, and the moon pool the heads rise from. */
 export const HYDRA_POOL = { x: 0, z: 92, r: 28, h: 6, poolR: 13, poolFloor: 5.3 } as const;
-/** Where each of the Mere Hydra's three heads rises in the pool. */
+/** The Mere Hydra's body under the pool (render: where its one model stands,
+ *  facing the entrance, and how big). */
+export const HYDRA_BODY = { x: HYDRA_POOL.x, z: HYDRA_POOL.z + 5, scale: 1.15 } as const;
+/** Where each of the Mere Hydra's three heads rises in the pool: under the
+ *  model's own heads (its left head is the one on its left, the east as it
+ *  faces the entrance), so a head's click and its drawn neck agree. */
 export const HYDRA_HEADS: readonly { id: 'left' | 'center' | 'right'; x: number; z: number }[] = [
-  { id: 'left', x: HYDRA_POOL.x - 7, z: HYDRA_POOL.z + 3 },
-  { id: 'center', x: HYDRA_POOL.x, z: HYDRA_POOL.z + 7 },
-  { id: 'right', x: HYDRA_POOL.x + 7, z: HYDRA_POOL.z + 3 },
+  { id: 'left', x: HYDRA_BODY.x + 5.1, z: HYDRA_BODY.z - 0.5 },
+  { id: 'center', x: HYDRA_BODY.x, z: HYDRA_BODY.z - 0.1 },
+  { id: 'right', x: HYDRA_BODY.x - 5.3, z: HYDRA_BODY.z - 0.2 },
 ];
 
 /** The Prism Terrace, the Tideglass Colossus's round terrace. */

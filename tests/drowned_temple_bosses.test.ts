@@ -369,7 +369,7 @@ describe('the Tideglass Colossus: kill each other’s reflections', () => {
     const out: Entity[] = [];
     for (const id of f.inst.mobIds) {
       const e = f.sim.ctx.entities.get(id);
-      if (e && !e.dead && e.templateId === REFLECTION_ID) out.push(e);
+      if (e && !e.dead && e.templateId.startsWith(REFLECTION_ID)) out.push(e);
     }
     return out;
   }

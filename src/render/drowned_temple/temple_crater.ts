@@ -206,22 +206,26 @@ float noise(vec2 p) {
 void main() {
   float u = vFall.x;
   float t = vFall.y;
-  // Streaks rushing down, faster as the water falls.
+  // Several ropes of water side by side (never one flat sheet), each wavering,
+  // fraying and thinning as it falls, white where it breaks.
+  float wav = noise(vec2(u * 3.0 + uSeed, t * 1.5 - uTime * 0.3)) * 0.18;
+  float ropes = smoothstep(0.25, 0.62, noise(vec2((u + wav) * 7.0 + uSeed * 3.1, t * 0.35)));
   float speed = 0.9 + t * 1.6;
-  vec2 q = vec2(u * 26.0 + uSeed * 9.0, t * uLength * 0.35 - uTime * speed * 6.0);
+  vec2 q = vec2((u + wav) * 30.0 + uSeed * 9.0, t * uLength * 0.35 - uTime * speed * 6.0);
   float streak = noise(vec2(q.x, q.y * 0.08)) * 0.6 + noise(vec2(q.x * 2.3, q.y * 0.2)) * 0.4;
-  float sheet = smoothstep(0.25, 0.7, streak);
-  // The edges fray, the sheet breaks up lower down, white water at the lip.
-  float edge = smoothstep(0.0, 0.14, u) * smoothstep(1.0, 0.86, u);
-  float fray = mix(1.0, smoothstep(0.25, 0.6, noise(vec2(u * 8.0 + uSeed, t * 3.0 - uTime * 2.0))), smoothstep(0.3, 1.0, t) * 0.6);
-  float white = smoothstep(0.55, 0.95, streak) + smoothstep(0.12, 0.0, t) * 0.6 + smoothstep(0.85, 1.0, t) * 0.5;
-  vec3 deep = vec3(0.34, 0.46, 0.62);
-  vec3 foam = vec3(0.9, 0.94, 1.0);
+  float sheet = smoothstep(0.2, 0.75, streak);
+  // Ragged sides that narrow at the lip and spread into spray at the foot.
+  float halfW = 0.36 + 0.14 * t + (noise(vec2(t * 6.0 + uSeed, uTime * 0.5)) - 0.5) * 0.12;
+  float edge = 1.0 - smoothstep(halfW - 0.12, halfW, abs(u - 0.5));
+  float white = smoothstep(0.6, 0.95, streak) + smoothstep(0.1, 0.0, t) * 0.5 + smoothstep(0.82, 1.0, t) * 0.7;
+  vec3 deep = vec3(0.3, 0.42, 0.58);
+  vec3 foam = vec3(0.86, 0.92, 1.0);
   vec3 col = mix(deep, foam, clamp(white, 0.0, 1.0));
-  // Moonlight catching the sheet.
-  col += vec3(0.25, 0.3, 0.45) * smoothstep(0.7, 1.0, streak);
-  float a = edge * fray * (0.62 + 0.33 * sheet) + smoothstep(0.88, 1.0, t) * 0.25;
-  gl_FragColor = vec4(col, clamp(a, 0.0, 0.92));
+  col += vec3(0.2, 0.26, 0.4) * smoothstep(0.7, 1.0, streak);
+  float body = mix(0.35, 1.0, ropes) * (0.45 + 0.45 * sheet);
+  float mist = smoothstep(0.75, 1.0, t) * 0.35;
+  float a = edge * body + mist * edge;
+  gl_FragColor = vec4(col * 0.9, clamp(a, 0.0, 0.88));
   #include <fog_fragment>
   #include <colorspace_fragment>
 }

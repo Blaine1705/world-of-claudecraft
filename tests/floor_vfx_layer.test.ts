@@ -272,6 +272,17 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/sunken_bastion/bastion_shore.ts',
   'src/render/sunken_bastion/bastion_water.ts',
   'src/render/sunken_bastion/bastion_gates.ts',
+  // The Drowned Temple's sky, lagoon, mist and light-fish; the crater and its
+  // falls; the gates (a water veil, wards, a rising stair, the Moonbridge);
+  // the Moon Altar's column, the pool water and the prism beam; the Mere
+  // Hydra's body and breath; and the Reflections' tethers in the air. Its
+  // floor marks are the shared telegraph kit's (the ladder's own rungs).
+  'src/render/drowned_temple/temple_sky_lagoon.ts',
+  'src/render/drowned_temple/temple_crater.ts',
+  'src/render/drowned_temple/temple_gates.ts',
+  'src/render/drowned_temple/temple_landmarks.ts',
+  'src/render/drowned_temple/temple_hydra.ts',
+  'src/render/drowned_temple/temple_fx.ts',
   // battleground objective marks and world markers far from any raid floor
   'src/render/battleground.ts',
   'src/render/battleground_fx.ts',

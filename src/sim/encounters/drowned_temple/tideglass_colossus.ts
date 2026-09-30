@@ -18,6 +18,8 @@
 // Zero rng in every pick (the lance's victim is hashed); the only draws are
 // the damage rolls.
 
+import { reflectionTemplateFor } from '../../content/drowned_temple';
+import { MOBS } from '../../data';
 import { applyKnockback } from '../../knockback';
 import { inLane } from '../../mob/trash_kit/lane';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
@@ -82,11 +84,12 @@ export function raiseReflections(
   for (const p of terracePlayers(ctx, inst)) {
     // It stands out of its owner's shadow, on the side away from the Colossus.
     const away = angleTo(boss.pos, p.pos);
+    const own = reflectionTemplateFor(p.templateId);
     const r = spawnKitAdd(
       ctx,
       inst,
       boss,
-      REFLECTION_ID,
+      MOBS[own] ? own : REFLECTION_ID,
       p.pos.x + Math.sin(away) * 3,
       p.pos.z + Math.cos(away) * 3,
       p,

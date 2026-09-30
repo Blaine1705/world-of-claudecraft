@@ -1,0 +1,172 @@
+"""The Lagoon Eel: a great moray of the temple lagoon, reared up out of its
+own coils like a cobra, as tall as a watchtower door.
+
+A thick coil of dark teal eel laid on the flags, its length rising in an S out
+of the coil to a long needle-toothed head; a pale belly, a ragged dorsal fin
+crackling with blue light, rows of cyan photophores down both flanks that
+brighten as it charges, small blind glowing eyes and trailing barbels.
+
+Clips: Idle (the column swaying over its coil), Walk and Run (the coil
+sliding, the column rippling), Attack (rear and strike), Attack2 (a sideways
+lash), Hit, Death (the column falls and uncoils along the ground), Cast and
+Coil (Static Coil: the coils clench, the head thrown up, jaws wide, shuddering).
+"""
+import math
+
+from sea_kit import GLOW, SeaBody, author_clip, expand_bones, loop, merge
+from temple_palette import CYAN, DEEP, EYE_GLOW, MOUTH, TEAL, TEAL_D, TOOTH
+
+BELLY = (0.78, 0.82, 0.74)
+FIN = (0.26, 0.5, 0.62)
+
+CHAIN = [(0, 0.35, 0.8), (0, 0.25, 1.9), (0, 0.0, 3.0), (0, -0.25, 4.0), (0, -0.4, 4.9), (0, -0.6, 5.7)]
+
+BONES = expand_bones([
+    ('Root', None, (0, 0, 0), (0, 0, 0.4)),
+    ('Coil', 'Root', (0, 0.2, 0.3), (0, 0.2, 0.8)),
+    ('S1', 'Coil', CHAIN[0], CHAIN[1]),
+    ('S2', 'S1', CHAIN[1], CHAIN[2]),
+    ('S3', 'S2', CHAIN[2], CHAIN[3]),
+    ('S4', 'S3', CHAIN[3], CHAIN[4]),
+    ('S5', 'S4', CHAIN[4], CHAIN[5]),
+    ('Head', 'S5', (0, -0.6, 5.7), (0, -2.1, 5.95)),
+    ('Jaw', 'Head', (0, -0.85, 5.55), (0, -2.0, 5.3)),
+    ('Fin.L', 'S4', (0.42, -0.35, 4.6), (1.25, -0.15, 4.25)),
+])
+
+RADII = [0.62, 0.6, 0.56, 0.52, 0.48, 0.44]
+
+
+def body():
+    p = SeaBody('LagoonEel', lichen=0.0, weather=0.2)
+    # ---- the coil on the flags ---------------------------------------------------
+    p.on('Coil')
+    pts = []
+    for i in range(34):
+        t = i / 33
+        a = t * math.tau * 1.55 + 0.6
+        r = 1.9 - t * 0.55
+        pts.append((math.sin(a) * r, 0.2 + math.cos(a) * r, 0.45 + t * 0.35))
+    p.tube(pts, [0.42 + 0.2 * (i / 33) for i in range(34)], TEAL_D, sides=12)
+    for i in range(0, 34, 2):
+        x, y, z = pts[i]
+        for side in (-1, 1):
+            p.blob((x * (1 + side * 0.18), y * (1 + side * 0.18), z + 0.08), (0.06, 0.06, 0.06), CYAN, mat=GLOW)
+    # The tail tip trailing out behind.
+    p.tube([(1.2, 1.8, 0.35), (1.8, 2.8, 0.25), (1.6, 3.8, 0.18)], [0.36, 0.22, 0.04], TEAL_D, sides=10)
+    p.tube([(1.2, 1.8, 0.62), (1.8, 2.8, 0.5), (1.6, 3.8, 0.34)], [0.12, 0.08, 0.02], FIN, sides=4, squash=0.3)
+    # ---- the rising column ------------------------------------------------------------
+    for k in range(5):
+        p.on(f'S{k + 1}')
+        a, b = CHAIN[k], CHAIN[k + 1]
+        mid = [(a[j] + b[j]) / 2 for j in range(3)]
+        p.tube([a, mid, b], [RADII[k], (RADII[k] + RADII[k + 1]) / 2, RADII[k + 1]], TEAL, sides=14)
+        # The pale belly on the front of the column.
+        p.tube([(a[0], a[1] - RADII[k] * 0.55, a[2]), (b[0], b[1] - RADII[k + 1] * 0.55, b[2])],
+               [RADII[k] * 0.62, RADII[k + 1] * 0.62], BELLY, sides=10)
+        # The dorsal fin down the back, lit blue.
+        p.tube([(a[0], a[1] + RADII[k] * 0.9, a[2]), (b[0], b[1] + RADII[k + 1] * 0.9 + 0.1, b[2])],
+               [0.18, 0.16], FIN, sides=4, squash=0.25)
+        p.blob((mid[0], mid[1] + RADII[k] * 1.05, mid[2]), (0.03, 0.06, 0.3), CYAN, mat=GLOW)
+        # Photophores in rows on both flanks.
+        for s in (-1, 1):
+            for j in range(3):
+                t = (j + 0.5) / 3
+                z = a[2] + (b[2] - a[2]) * t
+                y = a[1] + (b[1] - a[1]) * t
+                p.blob((s * RADII[k] * 0.95, y, z), (0.07, 0.07, 0.07), CYAN, mat=GLOW)
+    # ---- the head ---------------------------------------------------------------------
+    p.on('Head')
+    p.blob((0, -1.25, 5.95), (0.5, 1.15, 0.42), TEAL, bulge=0.1)
+    p.blob((0, -1.4, 5.78), (0.44, 0.95, 0.2), BELLY)
+    p.blob((0, -2.2, 5.9), (0.28, 0.35, 0.24), TEAL_D)
+    for s in (-1, 1):
+        p.eye((s * 0.36, -1.7, 6.15), 0.11, look=(s * 0.6, -0.8, 0.1), color=EYE_GLOW, glow=True)
+        # Barbels trailing from the snout.
+        p.tube([(s * 0.18, -2.3, 5.78), (s * 0.35, -2.4, 5.4), (s * 0.5, -2.2, 4.95)], [0.05, 0.03, 0.01], DEEP,
+               sides=4)
+        # The gill slit glowing.
+        p.blob((s * 0.46, -0.75, 5.85), (0.04, 0.22, 0.18), CYAN, mat=GLOW)
+    # Upper needle teeth.
+    for k in range(9):
+        t = k / 8
+        for s in (-1, 1):
+            p.cone((s * (0.3 - t * 0.12), -0.95 - t * 1.25, 5.72), (s * (0.28 - t * 0.12), -0.95 - t * 1.25, 5.46),
+                   0.04, TOOTH, sides=4)
+    p.on('Jaw')
+    p.blob((0, -1.35, 5.48), (0.4, 1.0, 0.18), BELLY)
+    p.blob((0, -1.25, 5.58), (0.3, 0.8, 0.07), MOUTH)
+    for k in range(8):
+        t = k / 7
+        for s in (-1, 1):
+            p.cone((s * (0.26 - t * 0.1), -1.0 - t * 1.1, 5.5), (s * (0.24 - t * 0.1), -1.0 - t * 1.1, 5.74),
+                   0.035, TOOTH, sides=4)
+
+    def fin(s, t):
+        p.on('Fin' + t)
+        p.tube([(s * 0.42, -0.35, 4.6), (s * 0.9, -0.3, 4.45), (s * 1.3, -0.15, 4.2)], [0.3, 0.22, 0.05], FIN,
+               sides=4, squash=0.2)
+        p.blob((s * 0.9, -0.28, 4.45), (0.2, 0.05, 0.12), CYAN, mat=GLOW)
+
+    fin(1, '.L')
+    fin(-1, '.R')
+    return p
+
+
+def clips(arm):
+    stand = {'S1': [('x', -2)], 'Head': [('x', 4)]}
+
+    def sway(ph, amp=1.0):
+        return merge(stand, {
+            'S1': [('y', 4 * math.sin(ph) * amp)],
+            'S2': [('y', -5 * math.sin(ph + 0.8) * amp)],
+            'S3': [('y', 6 * math.sin(ph + 1.6) * amp)],
+            'S4': [('y', -5 * math.sin(ph + 2.4) * amp)],
+            'S5': [('y', 4 * math.sin(ph + 3.2) * amp), ('x', 3 * math.cos(ph))],
+            'Head': [('y', -6 * math.sin(ph + 3.8) * amp)],
+            'Jaw': [('x', 6 + 5 * math.sin(ph * 2))],
+            'Fin.L': [('z', 10 * math.sin(ph * 2))],
+        })
+
+    author_clip(arm, 'Idle', loop(72, [sway(i / 6 * math.tau) for i in range(6)]))
+
+    def slither(ph, amp=1.0):
+        return merge(sway(ph * 2, 1.6 * amp), {
+            'Coil': [('z', 8 * math.sin(ph) * amp), ('loc', (0.12 * math.sin(ph) * amp, 0, 0))],
+            'Root': [('loc', (0, 0, 0.05 * abs(math.sin(ph))))],
+        })
+
+    author_clip(arm, 'Walk', loop(32, [slither(i / 4 * math.tau) for i in range(4)]))
+    author_clip(arm, 'Run', loop(20, [slither(i / 4 * math.tau, 1.4) for i in range(4)]))
+    rear = merge(stand, {'S3': [('x', -14)], 'S4': [('x', -16)], 'S5': [('x', -14)], 'Head': [('x', -18)],
+                         'Jaw': [('x', 25)]})
+    strike = merge(stand, {'S2': [('x', 14)], 'S3': [('x', 20)], 'S4': [('x', 24)], 'S5': [('x', 18)],
+                           'Head': [('x', 12)], 'Jaw': [('x', 38)]})
+    author_clip(arm, 'Attack', [(1, stand), (9, rear), (13, strike), (17, merge(strike, {'Jaw': [('x', -30)]})),
+                                (28, stand)], loop=False)
+    wind = merge(stand, {'S3': [('y', 28)], 'S4': [('y', 18)], 'Head': [('y', 20)], 'Jaw': [('x', 20)]})
+    lash = merge(stand, {'S3': [('y', -32)], 'S4': [('y', -22)], 'Head': [('y', -25)], 'Jaw': [('x', 30)]})
+    author_clip(arm, 'Attack2', [(1, stand), (8, wind), (13, lash), (26, stand)], loop=False)
+    hit = merge(stand, {'S3': [('x', -12)], 'S4': [('x', -10)], 'Head': [('x', -22), ('y', 10)], 'Jaw': [('x', 30)]})
+    author_clip(arm, 'Hit', [(1, stand), (4, hit), (14, stand)], loop=False)
+    fall = merge(stand, {'S1': [('x', 55)], 'S2': [('x', 22)], 'S3': [('x', 14)], 'S4': [('x', 8), ('y', 15)],
+                         'S5': [('y', 20)], 'Head': [('y', 25)], 'Jaw': [('x', 40)]})
+    flat = merge(stand, {'S1': [('x', 82)], 'S2': [('x', 6), ('y', 25)], 'S3': [('y', -30)], 'S4': [('y', 25)],
+                         'S5': [('y', -20)], 'Head': [('x', -8), ('y', 15)], 'Jaw': [('x', 30)],
+                         'Coil': [('scale', 0.96)], 'Fin.L': [('z', -30)]})
+    author_clip(arm, 'Death', [(1, stand), (8, hit), (20, fall), (34, flat), (44, flat)], loop=False)
+    # Static Coil: the coils clench, the column draws tight, the head thrown up
+    # with the jaws wide, the whole body shuddering as the charge builds.
+    clench = merge(stand, {'Coil': [('scale', 0.93)], 'S1': [('x', -6)], 'S2': [('x', 8)], 'S3': [('x', -8)],
+                           'S4': [('x', 6)], 'S5': [('x', -10)], 'Head': [('x', -28)], 'Jaw': [('x', 48)],
+                           'Fin.L': [('z', 35)]})
+    shake_a = merge(clench, {'S3': [('y', 3)], 'S5': [('y', -3)], 'Head': [('y', 4)]})
+    shake_b = merge(clench, {'S3': [('y', -3)], 'S5': [('y', 3)], 'Head': [('y', -4)]})
+    author_clip(arm, 'Cast', loop(8, [shake_a, shake_b]))
+    author_clip(arm, 'Coil', [(1, stand), (8, clench), (11, shake_a), (14, shake_b), (17, shake_a), (20, shake_b),
+                              (23, shake_a), (26, shake_b), (29, shake_a), (32, shake_b), (36, clench),
+                              (44, strike), (52, stand)], loop=False)
+    return ['Idle', 'Walk', 'Run', 'Attack', 'Attack2', 'Hit', 'Death', 'Cast', 'Coil']
+
+
+CREATURE = (BONES, body, clips, 3.5, 13.0)

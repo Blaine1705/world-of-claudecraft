@@ -63,7 +63,6 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
-import { buildDrownedTempleInterior } from './drowned_temple';
 import {
   type PendingArenaWall,
   type PendingArenaWalls,
@@ -91,7 +90,6 @@ import {
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
-import { buildHollowCryptInterior } from './hollow_crypt';
 import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
 import { buildIgnivarLavaMoat, ensureIgnivarLavaMoatAssets } from './ignivar_lava_moat';
 import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
@@ -112,14 +110,13 @@ import {
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { OPEN_AIR_FIELDS } from './open_air_fields';
 import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { riftPlatformSlabs } from './rift_platform_core';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
-import { buildSunkenBastionInterior } from './sunken_bastion';
 import { radialGlowTexture } from './textures';
 import { addTorchGlowDecal } from './torch_glow_decal';
-import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
 
 const FLAME_EMISSIVE_HIGH = EMISSIVE_LIGHT;
@@ -655,22 +652,11 @@ export class DungeonInteriors {
     await ensureDungeonAssets();
     await ensureIgnivarRaidDressingAssets(interior);
     await ensureIgnivarTileAssets(interior, loadModuleAsset);
-    if (
-      interior === 'wildheart' ||
-      interior === 'hollow_crypt' ||
-      interior === 'sunken_bastion' ||
-      interior === 'drowned_temple'
-    ) {
+    const field = OPEN_AIR_FIELDS[interior];
+    if (field) {
       // Open-air fields: their own builders, same deps and compile gate.
       const deps = { lowGfx: this.lowGfx, flames: this.flames, fireLights: this.fireLights };
-      const group =
-        interior === 'wildheart'
-          ? buildWildheartFieldInterior(deps)
-          : interior === 'hollow_crypt'
-            ? await buildHollowCryptInterior(deps, ox, oz)
-            : interior === 'sunken_bastion'
-              ? await buildSunkenBastionInterior(deps, ox, oz)
-              : await buildDrownedTempleInterior(deps, ox, oz);
+      const group = await field(deps, ox, oz);
       group.position.set(ox, 0, oz);
       group.userData.renderCategory = 'dungeon';
       await attachSceneGroupGated(this.scene, group, this.compileGate);

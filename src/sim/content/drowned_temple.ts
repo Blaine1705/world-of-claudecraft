@@ -30,7 +30,13 @@ import {
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
 } from '../mob/trash_kit/temple_cast_ids';
-import type { DungeonGateDef, DungeonObjectSpawn, DungeonSpawn, MobTemplate } from '../types';
+import {
+  ALL_CLASSES,
+  type DungeonGateDef,
+  type DungeonObjectSpawn,
+  type DungeonSpawn,
+  type MobTemplate,
+} from '../types';
 import { ALTAR_STONE, HYDRA_HEADS, MOON_ALTAR, PRISM_PLINTH } from './drowned_temple_layout';
 
 /** The Mere Hydra's three head templates, left to right. */
@@ -72,6 +78,13 @@ function hydraHead(id: string, name: string, color: number): MobTemplate {
     scale: 2,
     color,
   };
+}
+
+/** The Colossus's Reflections wear their owner's class look: one template per
+ *  class (`tideglass_reflection_<class>`), the same numbers, so the renderer
+ *  draws a glass copy of that class with no wire change. */
+export function reflectionTemplateFor(playerClass: string): string {
+  return `tideglass_reflection_${playerClass}`;
 }
 
 export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
@@ -327,6 +340,11 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
     color: 0xdde8f5,
   },
 };
+
+for (const cls of ALL_CLASSES) {
+  const id = reflectionTemplateFor(cls);
+  DROWNED_TEMPLE_MOBS[id] = { ...DROWNED_TEMPLE_MOBS.tideglass_reflection, id };
+}
 
 // ---- Spawns ---------------------------------------------------------------
 

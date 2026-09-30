@@ -504,6 +504,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/point_light_carriers.ts': 'the carriers themselves, the only lights three gathers',
   'render/hollow_crypt/crypt_lights.ts':
     'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
+  'render/drowned_temple/temple_lights.ts':
+    'the Drowned Temple braziers, moon orbs, tidepools, the conch, the prism and the altar, pushed through the fireLights adopter sink the interiors are handed',
   'render/sunken_bastion/bastion_lights.ts':
     'the Sunken Bastion lanterns, braziers, fog-fire and the Fogbeacon lamp, pushed through the fireLights adopter sink the interiors are handed',
   'render/props.ts':
@@ -601,6 +603,9 @@ describe('every point-light producer is a carrier source', () => {
       'render/ability_vfx/ground_auras.ts: slot.mesh',
       'render/ability_vfx/rings.ts: mesh',
       'render/ability_vfx/rings.ts: slot.mesh',
+      // The Drowned Temple's Hydra Pool water: a mesh hook reading the drain
+      // (the Prism Stair gate's openness), never a scene.
+      'render/drowned_temple/temple_landmarks.ts: water',
       'render/gather_nodes.ts: target',
       'render/goblin_rocket_sled_fx.ts: inner',
       'render/goblin_rocket_sled_fx.ts: outer',

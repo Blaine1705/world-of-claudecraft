@@ -2233,7 +2233,9 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after the dais foundation-block stacking (and its
     // per-position hash) moved to src/render/dais_blocks_core.ts for the
     // Nythraxis flanking platforms (v0.42.2). Exact count, zero slack.
-    ceiling: 2420,
+    // Lowered 2420 -> 2411: the open-air field builders moved to
+    // src/render/open_air_fields.ts (the Drowned Temple joined that table).
+    ceiling: 2411,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

@@ -7,6 +7,15 @@ import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
 import {
+  COLOSSUS_MOONLIGHT_LANCE,
+  COLOSSUS_PRISM_FLARE,
+  COLOSSUS_RESONANT_SLAM,
+  SELTHE_SEA_SONG,
+  SELTHE_TIDAL_SLAP,
+  YSOLEI_LUNAR_TIDE,
+  YSOLEI_UNDERTOW,
+} from '../../sim/encounters/drowned_temple/ids';
+import {
   OLEN_OATHBOUND_CHARGE,
   OSSICK_CUDGEL,
   OSSICK_GAOL_HOOK,
@@ -46,6 +55,13 @@ import {
   CRYPT_TAIL_LASH,
   CRYPT_WING_GUST,
 } from '../../sim/mob/trash_kit/cast_ids';
+import {
+  TEMPLE_CALL_THE_TIDE,
+  TEMPLE_LULLABY,
+  TEMPLE_SNAP,
+  TEMPLE_STATIC_COIL,
+  TEMPLE_TRIDENT_SWEEP,
+} from '../../sim/mob/trash_kit/temple_cast_ids';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
 import {
   HOARD_CAST_BAT_DIVE,
@@ -295,6 +311,10 @@ export interface VisualDef {
    *  (the Nythraxis Bone Spike, which shares its footprint with the raider
    *  it pins). Presentation-side targeting help only: the sim never reads it. */
   clickRadius?: number;
+  /** Draw no body for this entity (its click capsule, nameplate and bars
+   *  stay): a part of a larger creature drawn once by its dungeon's own
+   *  visuals (the Mere Hydra's heads). */
+  bodyless?: boolean;
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -926,6 +946,17 @@ const KOBOLD_DIGGER: ClipMap = {
 };
 
 // floating/flying rigs (goleling/dragon) — hover instead of walking
+/** The clip set every Drowned Temple creature authors (scripts/assets/drowned_temple_creatures). */
+const TEMPLE_CLIPS = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack', 'Attack2'],
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Cast',
+};
+
 const FLOATING: ClipMap = {
   idle: 'Flying_Idle',
   walk: 'Fast_Flying',
@@ -4120,6 +4151,150 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.12,
   },
 
+  // -- the Drowned Temple (sim/content/drowned_temple.ts, temple.ts) ----------
+  // The lagoon temple's own roster, each its own Blender body (scripts/assets/
+  // drowned_temple_creatures/), all well past the player's size, each with
+  // the clips of its jobs. Heights allow for the templates' own scale, so the
+  // drawn sizes land at about 2x the player for the trash, 3x for the bosses'
+  // kin and far more for the Colossus and Ysolei. Presentation only.
+  temple_templeguard: {
+    url: `${CREATURES}/temple_templeguard.glb`,
+    height: 4.6,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_TRIDENT_SWEEP]: 'TridentSweep' },
+      castTimeScaleByAbility: { [TEMPLE_TRIDENT_SWEEP]: 1.3 },
+    },
+    selfIllumination: 0.14,
+  },
+  temple_pilgrim: {
+    url: `${CREATURES}/temple_pilgrim.glb`,
+    height: 4.4,
+    clips: TEMPLE_CLIPS,
+    selfIllumination: 0.16,
+  },
+  temple_acolyte: {
+    url: `${CREATURES}/temple_acolyte.glb`,
+    height: 4.4,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_LULLABY]: 'Lullaby' },
+    },
+    selfIllumination: 0.05,
+  },
+  temple_siren: {
+    url: `${CREATURES}/temple_siren.glb`,
+    height: 5.4,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_CALL_THE_TIDE]: 'Sing' },
+    },
+    selfIllumination: 0.06,
+  },
+  temple_eel: {
+    url: `${CREATURES}/temple_eel.glb`,
+    height: 6.2,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_STATIC_COIL]: 'Coil' },
+      castTimeScaleByAbility: { [TEMPLE_STATIC_COIL]: 1 },
+    },
+    selfIllumination: 0.22,
+  },
+  temple_snapper: {
+    url: `${CREATURES}/temple_snapper.glb`,
+    height: 3.4,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_SNAP]: 'Snap' },
+      castTimeScaleByAbility: { [TEMPLE_SNAP]: 1.3 },
+    },
+    selfIllumination: 0.22,
+  },
+  temple_sentinel: {
+    url: `${CREATURES}/temple_sentinel.glb`,
+    height: 5.6,
+    clips: TEMPLE_CLIPS,
+    selfIllumination: 0.14,
+  },
+  // The Glimmerscale Lurker's Pounce flies in the Leap pose and lands on Land.
+  temple_lurker: {
+    url: `${CREATURES}/temple_lurker.glb`,
+    height: 2.4,
+    clips: { ...TEMPLE_CLIPS, jump: 'Leap', land: 'Land' },
+    selfIllumination: 0.18,
+  },
+  // The bosses. Choirmother Selthe sings her court's rhythm: the Sea-Song on
+  // the golden conch, the Tidal Slap backhand (the marks play from
+  // drowned_temple/temple_boss_fx.ts).
+  temple_selthe: {
+    url: `${CREATURES}/temple_selthe.glb`,
+    height: 6.5,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [SELTHE_SEA_SONG]: 'SeaSong', [SELTHE_TIDAL_SLAP]: 'Slap' },
+      castTimeScaleByAbility: { [SELTHE_TIDAL_SLAP]: 1.5 },
+    },
+    selfIllumination: 0.08,
+  },
+  // The Tideglass Colossus: stone blocks round a blazing prism.
+  temple_colossus: {
+    url: `${CREATURES}/temple_colossus.glb`,
+    height: 15,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: {
+        [COLOSSUS_PRISM_FLARE]: 'Flare',
+        [COLOSSUS_MOONLIGHT_LANCE]: 'Lance',
+        [COLOSSUS_RESONANT_SLAM]: 'Slam',
+      },
+      castTimeScaleByAbility: {
+        [COLOSSUS_PRISM_FLARE]: 1.1,
+        [COLOSSUS_MOONLIGHT_LANCE]: 1.1,
+        [COLOSSUS_RESONANT_SLAM]: 1.6,
+      },
+    },
+    selfIllumination: 0.06,
+  },
+  // Ysolei, the Drowned Moon: a lunar serpent-dragon over her coils.
+  temple_ysolei: {
+    url: `${CREATURES}/temple_ysolei.glb`,
+    height: 10,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [YSOLEI_LUNAR_TIDE]: 'LunarTide', [YSOLEI_UNDERTOW]: 'Undertow' },
+      castTimeScaleByAbility: { [YSOLEI_LUNAR_TIDE]: 1.3 },
+    },
+    selfIllumination: 0.1,
+  },
+  // The Mere Hydra's three heads: bodyless targets (the click capsule stays),
+  // the one Hydra model drawn at the pool by drowned_temple/temple_hydra.ts.
+  temple_hydra_head: {
+    url: `${CREATURES}/mere_hydra.glb`,
+    height: 14,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Snap'],
+      hit: ['Hit'],
+      death: 'Death',
+    },
+    bodyless: true,
+    clickRadius: 2.6,
+  },
+  // A Tidewisp: a glimmerwisp of living lagoon water.
+  temple_tidewisp: {
+    url: `${CREATURES}/glimmerwisp.glb`,
+    height: 1.8,
+    hover: 0.5,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
+    tint: 0x6fe3e0,
+    tintStrength: 0.6,
+    selfIllumination: 0.3,
+  },
+
   // -- humanoid mobs (KayKit adventurers) ------------------------------------
   mob_bandit: {
     url: `${PLAYERS}/rogue_hooded.glb`,
@@ -4939,6 +5114,22 @@ for (const cls of ALL_CLASSES) {
   };
 }
 
+// The Tideglass Colossus's Reflections (sim/content/drowned_temple.ts): one
+// glass copy of each class's own body, silvered and lit from within, a head
+// taller than the player it mirrors (the owner's look rides the template id,
+// `tideglass_reflection_<class>`, so no wire field is needed).
+for (const cls of ALL_CLASSES) {
+  const base = VISUALS[`player_${cls}`];
+  VISUALS[`temple_reflection_${cls}`] = {
+    ...base,
+    height: base.height * 1.15,
+    tint: 0xcfe2ff,
+    tintStrength: 0.72,
+    selfIllumination: 0.45,
+    envMapIntensity: 2.2,
+  };
+}
+
 /** The composed-body variant of a class visual (every class has one). */
 export function modularVisualKey(cls: PlayerClass): string {
   return `player_${cls}_modular`;
@@ -5179,6 +5370,26 @@ const MOB_KEYS: Record<string, string> = {
   gaol_turnkey: 'bastion_turnkey',
   turretback_hermit: 'mob_turretback',
   gaoler_ossick: 'bastion_ossick',
+  // The Drowned Temple (sim/content/drowned_temple.ts, temple.ts).
+  drowned_templeguard: 'temple_templeguard',
+  drowned_pilgrim: 'temple_pilgrim',
+  pale_choir_acolyte: 'temple_acolyte',
+  moonlit_siren: 'temple_siren',
+  lagoon_eel: 'temple_eel',
+  lagoon_snapper: 'temple_snapper',
+  pearlguard_sentinel: 'temple_sentinel',
+  glimmerscale_lurker: 'temple_lurker',
+  tidewisp: 'temple_tidewisp',
+  choirmother_selthe: 'temple_selthe',
+  tideglass_colossus: 'temple_colossus',
+  ysolei: 'temple_ysolei',
+  mere_hydra_head_left: 'temple_hydra_head',
+  mere_hydra_head_center: 'temple_hydra_head',
+  mere_hydra_head_right: 'temple_hydra_head',
+  tideglass_reflection: 'temple_reflection_warrior',
+  ...Object.fromEntries(
+    ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
+  ),
   // delve enemies
   reliquary_ledger_wraith: 'delve_skel_wraith',
   reliquary_funeral_ringer: 'delve_skel_ringer',

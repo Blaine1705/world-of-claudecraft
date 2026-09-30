@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dungeons';
+import { TempleFx } from './drowned_temple/temple_fx';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { HoardBoneReaperFx } from './hoard_bone_reaper';
 import { HoardBossDressing } from './hoard_boss_dressing';
@@ -98,6 +99,8 @@ export class RiftDeathZoneVisuals {
   private readonly cryptTrash: CryptTrashFx;
   // The Sunken Bastion's trash and boss floor telegraphs.
   private readonly bastionFx: BastionFx;
+  // The Drowned Temple's trash and boss telegraphs, and the Mere Hydra's body.
+  private readonly templeFx: TempleFx;
   private readonly cryptCreatures: CryptCreatureFx;
 
   constructor(
@@ -145,6 +148,7 @@ export class RiftDeathZoneVisuals {
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
     this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
     this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
+    this.templeFx = new TempleFx(scene, groundY, world, compileGate);
     this.cryptCreatures = new CryptCreatureFx(
       scene,
       groundY,
@@ -225,6 +229,7 @@ export class RiftDeathZoneVisuals {
     this.hoardMimicCoins.update(dt);
     this.cryptTrash.update(dt);
     this.bastionFx.update(dt);
+    this.templeFx.update(dt);
     this.cryptCreatures.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
@@ -258,6 +263,7 @@ export class RiftDeathZoneVisuals {
     this.hoardMimicCoins.dispose();
     this.cryptTrash.dispose();
     this.bastionFx.dispose();
+    this.templeFx.dispose();
     this.cryptCreatures.dispose();
     this.hoardPresentation.dispose();
   }
@@ -268,6 +274,7 @@ export class RiftDeathZoneVisuals {
     this.hoardPresentation.handleEvent(event);
     this.cryptTrash.handleEvent(event);
     this.cryptCreatures.handleEvent(event);
+    this.templeFx.handleEvent(event);
     return this.bastionFx.handleEvent(event);
   }
 

@@ -945,7 +945,7 @@ export class CharacterVisual {
       // lazily (buildComposedFar), because most of a crowd stands close enough
       // that the mesh would never be drawn.
       const idleGeo = prep.idleGeo;
-      if (idleGeo && !this.look) {
+      if (idleGeo && !this.look && !prep.def.bodyless) {
         timeBuildSpan('view-part:far-bake', () =>
           this.buildFarMeshes(
             idleGeo,
@@ -971,6 +971,9 @@ export class CharacterVisual {
       this.clickProxy.scale.set(r * 2, this.height, r * 2);
       this.clickProxy.visible = false;
       this.root.add(this.clickProxy);
+      // A bodyless part (the Mere Hydra's heads): the dungeon's own visuals
+      // draw the creature; this view keeps only its capsule, bars and plate.
+      if (prep.def.bodyless) this.model.visible = false;
 
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);

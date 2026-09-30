@@ -1,0 +1,29 @@
+// The open-air field interiors and their builders: every dungeon authored as
+// an open field under its own sky (sim/instances/authored_field) builds its
+// whole interior group here, and dungeon.ts buildInterior attaches it through
+// the compile gate in one shared arm.
+
+import type * as THREE from 'three';
+import { buildDrownedTempleInterior } from './drowned_temple';
+import { buildHollowCryptInterior } from './hollow_crypt';
+import type { FireLightSink } from './point_light_budget';
+import { buildSunkenBastionInterior } from './sunken_bastion';
+import { buildWildheartFieldInterior } from './wildheart_props';
+
+export interface OpenAirFieldDeps {
+  lowGfx: boolean;
+  flames: THREE.Mesh[];
+  fireLights: FireLightSink;
+}
+
+export const OPEN_AIR_FIELDS: Readonly<
+  Record<
+    string,
+    (deps: OpenAirFieldDeps, ox: number, oz: number) => THREE.Group | Promise<THREE.Group>
+  >
+> = {
+  wildheart: (deps) => buildWildheartFieldInterior(deps),
+  hollow_crypt: buildHollowCryptInterior,
+  sunken_bastion: buildSunkenBastionInterior,
+  drowned_temple: buildDrownedTempleInterior,
+};
