@@ -1017,7 +1017,10 @@ const MONOLITHS: MonolithRow[] = [
     // batch: the Drakelands kit lane adds the approach prefetch while moving
     // the visible-zone recheck cadence into zone_streaming.ts. Exact count,
     // zero slack.
-    ceiling: 12637,
+    // LOWERED 12637 -> 12625 by PR #4279 on top of the v0.45 candidate:
+    // Spell Effects keeps the event-scope wrapper while extracting world cue
+    // arms from renderer.ts. Exact count, zero slack.
+    ceiling: 12625,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

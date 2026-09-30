@@ -715,7 +715,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
   // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
   // was retaken.
-  'a26ef61e4135d156457b0e05281358556040d5ce264f10d105ec8ae32faa06e7';
+  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
+  // moves the renderer leaf and extracts world cue spell gating. No capture
+  // was retaken.
+  'b09ccd97e1a54a132fa38c506d3aa83c4facee43cc524c89c2ef65b761e4dd70';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

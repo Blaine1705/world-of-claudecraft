@@ -1410,7 +1410,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
   // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
   // was retaken.
-  'e5f28128dbd11d4d65dd1b335395ec46ee557b166da86f943394c38541a73072';
+  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
+  // moves the renderer leaf and extracts world cue spell gating. No capture
+  // was retaken.
+  'c9c7be75ae59489ae09ec0238368c771cfab950dea0a26090c76a818d4d6af57';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1448,7 +1451,10 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
   // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
   // was retaken.
-  'a26ef61e4135d156457b0e05281358556040d5ce264f10d105ec8ae32faa06e7';
+  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
+  // moves the renderer leaf and extracts world cue spell gating. No capture
+  // was retaken.
+  'b09ccd97e1a54a132fa38c506d3aa83c4facee43cc524c89c2ef65b761e4dd70';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2844,7 +2850,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // PR #4282 Drakelands kit lane on top of that integrated v0.45 batch:
       // recomputed LAST again over the re-swept evidence. No capture was
       // retaken.
-    ).toBe('673b896d574ee49a891b65d06dffdd037fad153751b53c0a552ab33e68d9783f');
+      // PR #4279 Spell Effects option on top of the v0.45 candidate:
+      // recomputed LAST again over the re-swept evidence. No capture was
+      // retaken.
+    ).toBe('67011cd9e1f53b0895764a5c0233272e1cd12015a277407765a8f42d633bbbe2');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
