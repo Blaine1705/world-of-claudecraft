@@ -3730,6 +3730,7 @@ export async function startServer(): Promise<http.Server> {
   await game.loadGuildBanks();
   await game.loadRifts();
   await game.loadChatFilter();
+  await game.realmMotd.load();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
