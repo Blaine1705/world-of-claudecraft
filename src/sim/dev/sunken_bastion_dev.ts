@@ -17,8 +17,8 @@
 //   /dev bastion reset                   free the run and claim a fresh one
 //
 // Areas: landing, flats, seagate, bailey, chapelyard, cisternyard, drawbridge,
-// rampart, towerone, towertwo, bastion (olen), postern, gaol, turnkey, yard (ossick),
-// balconyone, balconytwo, court, crown (vael).
+// rampart, towerone, towertwo, bastion (or olen), postern, gaol, turnkey (the
+// Gaol Turnkey), yard (or ossick), balconyone, balconytwo, court, crown (or vael).
 
 import { SUNKEN_BASTION_ANCHORS } from '../content/sunken_bastion_layout';
 import { DUNGEONS, instanceOrigin, MOBS } from '../data';
@@ -86,7 +86,7 @@ export const SUNKEN_BASTION_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev bastion enter [normal|heroic] | tp <landing|flats|seagate|bailey|chapelyard|cisternyard|drawbridge|rampart|towerone|towertwo|bastion|postern|gaol|turnkey|yard|balconyone|balconytwo|court|crown> | gates | kill <f1|f2|fa|fb|f3|b1|b2|hermit|bc|r1|r2|rc|turnkey|g1|g2|g3|gd|k1|k2|k3|kc|olen|ossick|vael|all> | pack <id> | spawn <revenant|acolyte|watchman|arbalest|crawler|warhound|mistweaver|sergeant|prisoner|turnkey|hermit> | trigger <charge|cage|anchor|shackle|veil|reap|surge> | reset';
+  '[dev] /dev bastion enter [normal|heroic] | tp <landing|flats|seagate|bailey|chapelyard|cisternyard|drawbridge|rampart|towerone|towertwo|bastion|olen|postern|gaol|turnkey|yard|ossick|balconyone|balconytwo|court|crown|vael> | gates | kill <f1|f2|fa|fb|f3|b1|b2|hermit|bc|r1|r2|rc|turnkey|g1|g2|g3|gd|k1|k2|k3|kc|olen|ossick|vael|all> | pack <id> | spawn <revenant|acolyte|watchman|arbalest|crawler|warhound|mistweaver|sergeant|prisoner|turnkey|hermit> | trigger <charge|cage|anchor|shackle|veil|reap|surge> | reset';
 
 /** Raise one trash mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {
