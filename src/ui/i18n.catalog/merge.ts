@@ -625,12 +625,21 @@ const mergeStringsEn = {
       temple_trident_sweep: 'Trident Sweep',
       temple_sea_song: 'Sea-Song',
       temple_tidal_slap: 'Tidal Slap',
-      temple_tide_breath: 'Tide Breath',
+      temple_tide_breath: 'Freezing Breath',
       temple_moonlight_lance: 'Moonlight Lance',
       temple_prism_flare: 'Prism Flare',
       temple_resonant_slam: 'Resonant Slam',
       temple_undertow: 'Undertow',
       temple_lunar_tide: 'Lunar Tide',
+      // The Temple's sixth pass: the trash's second jobs (the Mending and the
+      // Venom can be kicked) and the Mere Hydra's water and wave.
+      temple_skewering_trident: 'Skewering Trident',
+      temple_pale_mending: 'Pale Mending',
+      temple_glimmer_venom: 'Glimmer Venom',
+      temple_pearl_slam: 'Pearl Slam',
+      temple_lightning_spit: 'Lightning Spit',
+      temple_crushing_torrent: 'Crushing Torrent',
+      temple_hydra_tsunami: 'Tsunami',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

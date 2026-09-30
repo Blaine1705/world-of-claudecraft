@@ -12310,12 +12310,19 @@ export const ja_JP: EnTranslations = {
       "temple_trident_sweep": "三叉槍の薙ぎ払い",
       "temple_sea_song": "海の歌",
       "temple_tidal_slap": "潮の平手打ち",
-      "temple_tide_breath": "潮のブレス",
+      "temple_tide_breath": "凍てつく吐息",
       "temple_moonlight_lance": "月光の槍",
       "temple_prism_flare": "プリズムの閃光",
       "temple_resonant_slam": "共鳴の叩きつけ",
       "temple_undertow": "引き潮",
-      "temple_lunar_tide": "月の潮"
+      "temple_lunar_tide": "月の潮",
+      "temple_skewering_trident": "串刺しの三叉槍",
+      "temple_pale_mending": "蒼白の癒し",
+      "temple_glimmer_venom": "煌めく毒",
+      "temple_pearl_slam": "真珠の叩きつけ",
+      "temple_lightning_spit": "稲妻の吐きかけ",
+      "temple_crushing_torrent": "押し潰す奔流",
+      "temple_hydra_tsunami": "津波"
     }
   },
   "questUi": {

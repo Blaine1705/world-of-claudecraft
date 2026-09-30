@@ -12310,12 +12310,19 @@ export const ru_RU: EnTranslations = {
       "temple_trident_sweep": "Взмах трезубца",
       "temple_sea_song": "Песнь моря",
       "temple_tidal_slap": "Приливная пощёчина",
-      "temple_tide_breath": "Приливное дыхание",
+      "temple_tide_breath": "Леденящее дыхание",
       "temple_moonlight_lance": "Копьё лунного света",
       "temple_prism_flare": "Вспышка призмы",
       "temple_resonant_slam": "Резонирующий удар",
       "temple_undertow": "Отбойное течение",
-      "temple_lunar_tide": "Лунный прилив"
+      "temple_lunar_tide": "Лунный прилив",
+      "temple_skewering_trident": "Пронзающий трезубец",
+      "temple_pale_mending": "Бледное исцеление",
+      "temple_glimmer_venom": "Мерцающий яд",
+      "temple_pearl_slam": "Жемчужный удар",
+      "temple_lightning_spit": "Молниевый плевок",
+      "temple_crushing_torrent": "Сокрушительный поток",
+      "temple_hydra_tsunami": "Цунами"
     }
   },
   "questUi": {

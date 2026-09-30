@@ -12310,12 +12310,19 @@ export const en_XA: EnTranslations = {
       "temple_trident_sweep": "[Ţŕíðéñţ Šŵééþ]",
       "temple_sea_song": "[Šéá-Šóñĝ]",
       "temple_tidal_slap": "[Ţíðáļ Šļáþ]",
-      "temple_tide_breath": "[Ţíðé Ɓŕéáţĥ]",
+      "temple_tide_breath": "[Ƒŕééžíñĝ Ɓŕéáţĥ]",
       "temple_moonlight_lance": "[Ɱóóñļíĝĥţ Ļáñçé]",
       "temple_prism_flare": "[Þŕíšɱ Ƒļáŕé]",
       "temple_resonant_slam": "[Ŕéšóñáñţ Šļáɱ]",
       "temple_undertow": "[Úñðéŕţóŵ]",
-      "temple_lunar_tide": "[Ļúñáŕ Ţíðé]"
+      "temple_lunar_tide": "[Ļúñáŕ Ţíðé]",
+      "temple_skewering_trident": "[Šķéŵéŕíñĝ Ţŕíðéñţ]",
+      "temple_pale_mending": "[Þáļé Ɱéñðíñĝ]",
+      "temple_glimmer_venom": "[Ĝļíɱɱéŕ Ʋéñóɱ]",
+      "temple_pearl_slam": "[Þéáŕļ Šļáɱ]",
+      "temple_lightning_spit": "[Ļíĝĥţñíñĝ Šþíţ]",
+      "temple_crushing_torrent": "[Çŕúšĥíñĝ Ţóŕŕéñţ]",
+      "temple_hydra_tsunami": "[Ţšúñáɱí]"
     }
   },
   "questUi": {

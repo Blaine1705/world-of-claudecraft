@@ -12310,12 +12310,19 @@ export const zh_TW: EnTranslations = {
       "temple_trident_sweep": "三叉戟橫掃",
       "temple_sea_song": "海之歌",
       "temple_tidal_slap": "潮汐掌擊",
-      "temple_tide_breath": "潮汐吐息",
+      "temple_tide_breath": "冰凍吐息",
       "temple_moonlight_lance": "月光長槍",
       "temple_prism_flare": "稜鏡閃耀",
       "temple_resonant_slam": "共鳴猛擊",
       "temple_undertow": "暗流",
-      "temple_lunar_tide": "月潮"
+      "temple_lunar_tide": "月潮",
+      "temple_skewering_trident": "穿刺三叉戟",
+      "temple_pale_mending": "蒼白癒合",
+      "temple_glimmer_venom": "微光毒液",
+      "temple_pearl_slam": "珍珠猛擊",
+      "temple_lightning_spit": "閃電噴吐",
+      "temple_crushing_torrent": "碾壓激流",
+      "temple_hydra_tsunami": "海嘯"
     }
   },
   "questUi": {

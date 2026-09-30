@@ -116,6 +116,13 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_resonant_slam': true,
   'abilityUi.cast.temple_undertow': true,
   'abilityUi.cast.temple_lunar_tide': true,
+  'abilityUi.cast.temple_skewering_trident': true,
+  'abilityUi.cast.temple_pale_mending': true,
+  'abilityUi.cast.temple_glimmer_venom': true,
+  'abilityUi.cast.temple_pearl_slam': true,
+  'abilityUi.cast.temple_lightning_spit': true,
+  'abilityUi.cast.temple_crushing_torrent': true,
+  'abilityUi.cast.temple_hydra_tsunami': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

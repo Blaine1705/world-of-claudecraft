@@ -12310,12 +12310,19 @@ export const ko_KR: EnTranslations = {
       "temple_trident_sweep": "삼지창 휩쓸기",
       "temple_sea_song": "바다의 노래",
       "temple_tidal_slap": "조수 후려치기",
-      "temple_tide_breath": "조수 숨결",
+      "temple_tide_breath": "얼어붙는 숨결",
       "temple_moonlight_lance": "달빛 창",
       "temple_prism_flare": "프리즘 섬광",
       "temple_resonant_slam": "공명의 강타",
       "temple_undertow": "역류",
-      "temple_lunar_tide": "달의 조수"
+      "temple_lunar_tide": "달의 조수",
+      "temple_skewering_trident": "꿰뚫는 삼지창",
+      "temple_pale_mending": "창백한 치유",
+      "temple_glimmer_venom": "반짝이는 독",
+      "temple_pearl_slam": "진주 강타",
+      "temple_lightning_spit": "번개 침",
+      "temple_crushing_torrent": "짓누르는 급류",
+      "temple_hydra_tsunami": "해일"
     }
   },
   "questUi": {
