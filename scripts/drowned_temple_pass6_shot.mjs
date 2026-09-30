@@ -156,6 +156,37 @@ const SHOTS = [
     cmdWait: 200,
     wait: 3900,
   },
+  // The breaking wave (temple_tsunami_fx.ts): the lip curling over, the crash on the
+  // middle line, the foam it leaves, and its profile from the north rim.
+  ...[
+    ['hidra_tsunami_crece', 1600],
+    ['hidra_tsunami_rizo', 4300],
+    ['hidra_tsunami_choque', 4900],
+    ['hidra_tsunami_espuma', 7200],
+  ].map(([id, wait]) => ({
+    id,
+    at: [-14, 80],
+    face: Math.PI / 2,
+    yaw: 0.4,
+    pitch: 0.3,
+    dist: 26,
+    js: 'pull:mere_hydra_head_center',
+    cmds: ['/dev temple trigger tsunami'],
+    cmdWait: 200,
+    wait,
+  })),
+  {
+    id: 'hidra_tsunami_perfil',
+    at: [0, 102],
+    face: Math.PI,
+    yaw: 0.0,
+    pitch: 0.22,
+    dist: 20,
+    js: 'pull:mere_hydra_head_center',
+    cmds: ['/dev temple trigger tsunami'],
+    cmdWait: 200,
+    wait: 4300,
+  },
   {
     id: 'hidra_cabeza_rebrota',
     at: [0, 76],

@@ -111,6 +111,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // telegraph (ground band); the falling streaks and far sheets keep their own
   // orders (weather standing up from the ground, off the ladder).
   { file: 'src/render/sunken_bastion/bastion_rain.ts', layer: 'ground', strict: false },
+  // The Mere Hydra's Tsunami: its lingering foam lies on the swept half's floor
+  // and water, and the wave wall and its spray ride the same band, so the
+  // encounter-band telegraph of the swept half always paints over all of it.
+  { file: 'src/render/drowned_temple/temple_tsunami_fx.ts', layer: 'ground', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },

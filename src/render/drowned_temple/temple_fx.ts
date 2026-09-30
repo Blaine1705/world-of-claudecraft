@@ -149,7 +149,7 @@ export class TempleFx {
     const hydraRoot = new THREE.Group();
     hydraRoot.name = 'drowned-temple-hydra';
     this.root.add(hydraRoot);
-    this.hydra = new TempleHydra(hydraRoot, world, this.flashesOn);
+    this.hydra = new TempleHydra(hydraRoot, world, this.flashesOn, groundY);
     this.ysolei = new TempleYsoleiFx(this.root, scene, world, groundY, this.flashesOn);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})

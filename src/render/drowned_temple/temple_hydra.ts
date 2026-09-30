@@ -39,6 +39,7 @@ import type { IWorld } from '../../world_api';
 import { loadGltf } from '../assets/loader';
 import { registerDeferredPreload } from '../assets/preload';
 import { TempleHydraFx, tintHydraNecks } from './temple_hydra_fx';
+import { tsunamiWarnProgress } from './temple_tsunami_core';
 
 export const MERE_HYDRA_URL = '/models/creatures/mere_hydra.glb';
 
@@ -174,10 +175,11 @@ export class TempleHydra {
     private readonly root: THREE.Group,
     private readonly world: IWorld | undefined,
     private readonly detail: boolean,
+    groundY?: (x: number, z: number) => number,
   ) {
     void startLoad();
     for (let i = 0; i < 3; i++) this.breaths.push(this.makeBreath());
-    this.fx = new TempleHydraFx(root, detail);
+    this.fx = new TempleHydraFx(root, detail, groundY);
   }
 
   private readonly fx: TempleHydraFx;
@@ -448,6 +450,7 @@ export class TempleHydra {
             z: waveEntity.pos.z,
             facing: waveEntity.facing,
             rolling: waveEntity.templateId === TSUNAMI_TEMPLATES.surge,
+            build: this.tsunamiBuild(),
           }
         : null;
     this.fx.update(dt, clock, {
@@ -455,6 +458,17 @@ export class TempleHydra {
       wielders: hydraElementOwners(deadFlags),
       wave,
     });
+  }
+
+  /** How far the Tsunami's wall has built, off a submerged head's bar (the
+   *  sim keeps every head's bar on the wave's own clock), or null. */
+  private tsunamiBuild(): number | null {
+    for (let i = 0; i < 3; i++) {
+      const h = this.head(i);
+      if (h && !h.dead && h.castingAbility === HYDRA_TSUNAMI)
+        return tsunamiWarnProgress(h.castRemaining, h.castTotal);
+    }
+    return null;
   }
 
   private updateBreaths(dt: number, clock: number): void {
