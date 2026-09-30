@@ -3,7 +3,8 @@
 // sourceId names the cage), it turns the cage's health into the escape
 // progress (the same number the sim resolves: sim/encounters/sunken_bastion
 // cageEscapeProgress), and picks the prompt line: the interact key's label on
-// a keyboard, a tap line on touch, a keyless line when interact is unbound.
+// a keyboard, a tap line on touch, and a click line when interact is unbound
+// (the whole panel is a button, so clicking it is the escape control then).
 // The painter (cage_escape_painter.ts) only paints; every decision is here.
 
 import { cageEscapeProgress, TURNKEY_CAGED } from '../../../sim/encounters/sunken_bastion/ids';
@@ -54,7 +55,7 @@ export function buildCageEscapeView(input: CageEscapeInput): CageEscapeView {
     ? t('hudChrome.bastionCage.promptTap')
     : key
       ? t('hudChrome.bastionCage.promptKey', { key })
-      : t('hudChrome.bastionCage.promptNoKey');
+      : t('hudChrome.bastionCage.promptClick');
   return {
     visible: true,
     progress,

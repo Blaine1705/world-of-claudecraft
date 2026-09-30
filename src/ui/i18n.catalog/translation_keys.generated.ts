@@ -9802,6 +9802,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.barEditor.title'
   | 'hudChrome.bastionCage.buttonAria'
   | 'hudChrome.bastionCage.progressAria'
+  | 'hudChrome.bastionCage.promptClick'
   | 'hudChrome.bastionCage.promptKey'
   | 'hudChrome.bastionCage.promptNoKey'
   | 'hudChrome.bastionCage.promptTap'

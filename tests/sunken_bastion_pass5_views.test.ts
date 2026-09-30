@@ -29,6 +29,7 @@ import {
   VAEL_TUNING,
 } from '../src/sim/encounters/sunken_bastion/ids';
 import { buildCageEscapeView } from '../src/ui/hud/dungeon/cage_escape_view';
+import { t } from '../src/ui/i18n';
 
 describe('the Iron Cage escape prompt view', () => {
   const cage =
@@ -88,6 +89,33 @@ describe('the Iron Cage escape prompt view', () => {
     expect(unbound.key).toBe('');
     expect(unbound.prompt).not.toBe(keyed.prompt);
     expect(unbound.prompt).not.toBe(tapped.prompt);
+  });
+
+  it('tells each player the one control they actually have', () => {
+    const view = (interactKey: string, touch: boolean) => {
+      const v = buildCageEscapeView({
+        auras: [{ id: TURNKEY_CAGED, sourceId: 1 }],
+        cage: cage(16),
+        interactKey,
+        touch,
+      });
+      if (!v.visible) throw new Error('hidden');
+      return v;
+    };
+    // A bound key on desktop: press that key.
+    const keyed = view('E', false);
+    expect(keyed.prompt).toBe(t('hudChrome.bastionCage.promptKey', { key: 'E' }));
+    expect(keyed.prompt).toBe('Press E again and again to break free');
+    // No interact key on desktop: there is nothing to press, so click the panel.
+    const unbound = view('', false);
+    expect(unbound.prompt).toBe(t('hudChrome.bastionCage.promptClick'));
+    expect(unbound.prompt).toBe('Click here again and again to break free');
+    expect(unbound.prompt).not.toContain('interact key');
+    // Touch: tap the panel, whatever key a keyboard would have named.
+    const tapped = view('E', true);
+    expect(tapped.prompt).toBe(t('hudChrome.bastionCage.promptTap'));
+    expect(tapped.prompt).toBe('Tap here again and again to break free');
+    expect(view('', true).prompt).toBe(tapped.prompt);
   });
 
   it('a cage already gone reads as locked, never as free', () => {

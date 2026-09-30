@@ -6019,6 +6019,7 @@ export const ja_JP: EnTranslations = {
       "title": "鉄の檻に閉じ込められた！",
       "promptKey": "{key} を連打して脱出",
       "promptNoKey": "インタラクトキーを連打して脱出",
+      "promptClick": "ここをクリック連打して脱出",
       "promptTap": "ここを連打して脱出",
       "buttonAria": "鉄の檻から脱出する",
       "progressAria": "脱出の進行度：{pct}"

@@ -6019,6 +6019,7 @@ export const ko_KR: EnTranslations = {
       "title": "강철 우리에 갇혔습니다!",
       "promptKey": "{key} 키를 연타해 탈출하세요",
       "promptNoKey": "상호작용 키를 연타해 탈출하세요",
+      "promptClick": "여기를 연속 클릭해 탈출하세요",
       "promptTap": "여기를 연타해 탈출하세요",
       "buttonAria": "강철 우리에서 탈출하기",
       "progressAria": "탈출 진행도: {pct}"

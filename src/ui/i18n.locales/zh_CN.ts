@@ -18805,6 +18805,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.title': '你被关进了铁笼！',
   'hudChrome.bastionCage.promptKey': '连按 {key} 挣脱',
   'hudChrome.bastionCage.promptNoKey': '连按交互键挣脱',
+  'hudChrome.bastionCage.promptClick': '连续单击这里挣脱',
   'hudChrome.bastionCage.promptTap': '连续点击这里挣脱',
   'hudChrome.bastionCage.buttonAria': '从铁笼中挣脱',
   'hudChrome.bastionCage.progressAria': '挣脱进度：{pct}',

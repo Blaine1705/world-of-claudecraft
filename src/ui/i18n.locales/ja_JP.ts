@@ -19780,6 +19780,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.title': '鉄の檻に閉じ込められた！',
   'hudChrome.bastionCage.promptKey': '{key} を連打して脱出',
   'hudChrome.bastionCage.promptNoKey': 'インタラクトキーを連打して脱出',
+  'hudChrome.bastionCage.promptClick': 'ここをクリック連打して脱出',
   'hudChrome.bastionCage.promptTap': 'ここを連打して脱出',
   'hudChrome.bastionCage.buttonAria': '鉄の檻から脱出する',
   'hudChrome.bastionCage.progressAria': '脱出の進行度：{pct}',

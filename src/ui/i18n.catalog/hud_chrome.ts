@@ -8773,7 +8773,10 @@ export const hudChromeStrings = {
   bastionCage: {
     title: 'Locked in the Iron Cage!',
     promptKey: 'Press {key} again and again to break free',
+    // Retired: the unbound desktop case names the click (promptClick) now, since a
+    // player with no interact key has nothing to press but the panel itself.
     promptNoKey: 'Press your interact key again and again to break free',
+    promptClick: 'Click here again and again to break free',
     promptTap: 'Tap here again and again to break free',
     buttonAria: 'Break free from the Iron Cage',
     progressAria: 'Escape progress: {pct}',

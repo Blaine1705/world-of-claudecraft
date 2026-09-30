@@ -19766,6 +19766,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.title': '강철 우리에 갇혔습니다!',
   'hudChrome.bastionCage.promptKey': '{key} 키를 연타해 탈출하세요',
   'hudChrome.bastionCage.promptNoKey': '상호작용 키를 연타해 탈출하세요',
+  'hudChrome.bastionCage.promptClick': '여기를 연속 클릭해 탈출하세요',
   'hudChrome.bastionCage.promptTap': '여기를 연타해 탈출하세요',
   'hudChrome.bastionCage.buttonAria': '강철 우리에서 탈출하기',
   'hudChrome.bastionCage.progressAria': '탈출 진행도: {pct}',

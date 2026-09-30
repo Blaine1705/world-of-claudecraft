@@ -6019,6 +6019,7 @@ export const zh_CN: EnTranslations = {
       "title": "你被关进了铁笼！",
       "promptKey": "连按 {key} 挣脱",
       "promptNoKey": "连按交互键挣脱",
+      "promptClick": "连续单击这里挣脱",
       "promptTap": "连续点击这里挣脱",
       "buttonAria": "从铁笼中挣脱",
       "progressAria": "挣脱进度：{pct}"

@@ -20148,6 +20148,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.promptKey': 'Жмите {key} снова и снова, чтобы вырваться',
   'hudChrome.bastionCage.promptNoKey':
     'Жмите клавишу взаимодействия снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptClick': 'Щёлкайте здесь снова и снова, чтобы вырваться',
   'hudChrome.bastionCage.promptTap': 'Нажимайте сюда снова и снова, чтобы вырваться',
   'hudChrome.bastionCage.buttonAria': 'Вырваться из железной клетки',
   'hudChrome.bastionCage.progressAria': 'Прогресс побега: {pct}',
