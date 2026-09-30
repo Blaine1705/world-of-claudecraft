@@ -186,11 +186,24 @@ function stepDescent(ctx: SimContext, mob: Entity, st: TrashKitState): void {
   }
 }
 
+/** A summon template plus every form its kit grows into (a Bone Minion and the
+ *  Bone Brute it swells into), read off the content: a grown add is still the
+ *  summoner's, so it still counts toward the summon cap. */
+function summonFamily(templateId: string): ReadonlySet<string> {
+  const ids = new Set<string>();
+  for (let id: string | undefined = templateId; id && !ids.has(id); ) {
+    ids.add(id);
+    id = MOBS[id]?.trashKit?.grow?.into;
+  }
+  return ids;
+}
+
 function livingSummons(ctx: SimContext, owner: Entity, templateId: string): number {
+  const family = summonFamily(templateId);
   let n = 0;
   for (const id of owner.summonedIds) {
     const e = ctx.entities.get(id);
-    if (e && !e.dead && e.templateId === templateId) n++;
+    if (e && !e.dead && family.has(e.templateId)) n++;
   }
   return n;
 }

@@ -208,6 +208,32 @@ describe('trash kit: Gravecaller Necromancer and the Bone Minion', () => {
     if (kit) kit.grow = saved;
   });
 
+  it('a grown Bone Brute still counts toward the cap: two minutes raise at most two', () => {
+    // The endless-skeleton bug: a minion that grew into a Brute left the
+    // necromancer's count, so a living necromancer raised forever.
+    const r = room();
+    const mob = engage(r, 'crypt_gravecaller_necromancer');
+    const family = new Set(['crypt_bone_minion', 'crypt_bone_brute']);
+    const livingRaised = () =>
+      [...r.sim.ctx.entities.values()].filter(
+        (e) => e.kind === 'mob' && !e.dead && !!e.summonedAdd && family.has(e.templateId),
+      );
+    let peak = 0;
+    for (let s = 0; s < 120; s++) {
+      run(r, 1, [mob]);
+      peak = Math.max(peak, livingRaised().length);
+    }
+    expect(livingRaised().some((e) => e.templateId === 'crypt_bone_brute')).toBe(true);
+    expect(peak).toBeLessThanOrEqual(raise.maxAlive);
+    expect(livingRaised()).toHaveLength(raise.maxAlive);
+    // Killing a grown Brute frees a slot: the necromancer raises again.
+    const brute = livingRaised().find((e) => e.templateId === 'crypt_bone_brute') as Entity;
+    brute.hp = 0;
+    brute.dead = true;
+    run(r, raise.every + raise.castTime + 1, [mob]);
+    expect(livingRaised().filter((e) => e.id !== brute.id)).toHaveLength(raise.maxAlive);
+  });
+
   it('an interrupted Raise Bones raises nothing', () => {
     const r = room();
     const mob = engage(r, 'crypt_gravecaller_necromancer');
