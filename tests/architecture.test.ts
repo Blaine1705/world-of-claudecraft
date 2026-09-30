@@ -1113,6 +1113,7 @@ const RENDER_PURE_CORES = [
   'src/render/ghost_style_core.ts',
   'src/render/characters/modular_name_facts_core.ts',
   'src/render/characters/morph_union_core.ts',
+  'src/render/characters/rift_body_stream_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
   'src/render/characters/decal_texture_size_core.ts',
