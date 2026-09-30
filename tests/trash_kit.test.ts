@@ -15,7 +15,7 @@ import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import { patrolPointAt } from '../src/sim/mob/patrol';
 import {
-  CRYPT_BONECHILL_BREATH,
+  CRYPT_BARROWFLAME_BREATH,
   CRYPT_GRAVE_BOLT,
   CRYPT_GRAVE_CLEAVE,
   CRYPT_MURDER_CALL,
@@ -106,7 +106,12 @@ describe('trash kit: the cast table', () => {
     expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[CRYPT_RAISE_BONES]?.school).toBe('shadow');
     expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[CRYPT_MURDER_CALL]?.school).toBe('nature');
     expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[CRYPT_STONE_SHRIEK]?.school).toBe('nature');
-    for (const id of [CRYPT_GRAVE_CLEAVE, CRYPT_BONECHILL_BREATH, CRYPT_TAIL_LASH, CRYPT_WING_GUST])
+    for (const id of [
+      CRYPT_GRAVE_CLEAVE,
+      CRYPT_BARROWFLAME_BREATH,
+      CRYPT_TAIL_LASH,
+      CRYPT_WING_GUST,
+    ])
       expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[id], id).toBeUndefined();
   });
 

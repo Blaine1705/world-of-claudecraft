@@ -35,7 +35,7 @@ import { HOLLOW_CRYPT_FIELD } from '../src/sim/content/hollow_crypt_layout';
 import { MOBS } from '../src/sim/data';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 import {
-  CRYPT_BONECHILL_BREATH,
+  CRYPT_BARROWFLAME_BREATH,
   CRYPT_GRAVE_CLEAVE,
   CRYPT_STONE_SHRIEK,
   CRYPT_TAIL_LASH,
@@ -187,7 +187,7 @@ describe('crypt trash telegraphs', () => {
       arcDeg: warrior?.arcDeg,
     });
     const drake = MOBS.crypt_ossuary_drake;
-    expect(specs[CRYPT_BONECHILL_BREATH].range).toBe(drake.breathCone?.range);
+    expect(specs[CRYPT_BARROWFLAME_BREATH].range).toBe(drake.breathCone?.range);
     expect(specs[CRYPT_TAIL_LASH]).toMatchObject({
       shape: 'rearCone',
       range: drake.trashKit?.tailLash?.range,

@@ -19632,7 +19632,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_murder_call': '까마귀떼 부름',
   'abilityUi.cast.crypt_stone_shriek': '돌의 비명',
   'abilityUi.cast.crypt_grave_cleave': '무덤 가르기',
-  'abilityUi.cast.crypt_bonechill_breath': '한골 숨결',
+  'abilityUi.cast.crypt_barrowflame_breath': '무덤불꽃 숨결',
   'abilityUi.cast.crypt_tail_lash': '꼬리 채찍',
   'abilityUi.cast.crypt_wing_gust': '날개 돌풍',
   'entities.mobs.crypt_ossuary_warrior.name': '납골당 전사',

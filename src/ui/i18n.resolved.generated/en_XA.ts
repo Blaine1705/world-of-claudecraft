@@ -12247,7 +12247,7 @@ export const en_XA: EnTranslations = {
       "crypt_murder_call": "[Ɱúŕðéŕ Çáļļ]",
       "crypt_stone_shriek": "[Šţóñé Šĥŕíéķ]",
       "crypt_grave_cleave": "[Ĝŕáʋé Çļéáʋé]",
-      "crypt_bonechill_breath": "[Ɓóñéçĥíļļ Ɓŕéáţĥ]",
+      "crypt_barrowflame_breath": "[Ɓáŕŕóŵƒļáɱé Ɓŕéáţĥ]",
       "crypt_tail_lash": "[Ţáíļ Ļášĥ]",
       "crypt_wing_gust": "[Ŵíñĝ Ĝúšţ]"
     }

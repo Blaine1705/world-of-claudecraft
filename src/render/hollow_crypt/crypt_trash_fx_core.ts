@@ -7,7 +7,7 @@
 
 import { MOBS } from '../../sim/data';
 import {
-  CRYPT_BONECHILL_BREATH,
+  CRYPT_BARROWFLAME_BREATH,
   CRYPT_GRAVE_CLEAVE,
   CRYPT_MURDER_CALL,
   CRYPT_RAISE_BONES,
@@ -33,7 +33,8 @@ export interface CryptTelegraphSpec {
 /** Danger colours: brighter than any crypt dressing (the floor ladder rule). */
 export const CRYPT_TELEGRAPH_COLORS = {
   physical: 0xff5a2e,
-  frost: 0x6fd8ff,
+  /** The drake's spectral Barrowflame: a ghost-fire cyan no dressing uses. */
+  ghostfire: 0x3dffe0,
   stun: 0xc38bff,
   shadow: 0x7dffb0,
   bone: 0xf2e6c4,
@@ -54,10 +55,10 @@ export function cryptTelegraphSpecs(): Readonly<Record<string, CryptTelegraphSpe
       ...breath('crypt_ossuary_warrior'),
       color: CRYPT_TELEGRAPH_COLORS.physical,
     },
-    [CRYPT_BONECHILL_BREATH]: {
+    [CRYPT_BARROWFLAME_BREATH]: {
       shape: 'cone',
       ...breath('crypt_ossuary_drake'),
-      color: CRYPT_TELEGRAPH_COLORS.frost,
+      color: CRYPT_TELEGRAPH_COLORS.ghostfire,
     },
     [CRYPT_TAIL_LASH]: {
       shape: 'rearCone',

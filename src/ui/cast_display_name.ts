@@ -74,7 +74,7 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.crypt_murder_call': true,
   'abilityUi.cast.crypt_stone_shriek': true,
   'abilityUi.cast.crypt_grave_cleave': true,
-  'abilityUi.cast.crypt_bonechill_breath': true,
+  'abilityUi.cast.crypt_barrowflame_breath': true,
   'abilityUi.cast.crypt_tail_lash': true,
   'abilityUi.cast.crypt_wing_gust': true,
 };

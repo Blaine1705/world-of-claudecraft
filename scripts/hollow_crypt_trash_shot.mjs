@@ -1,6 +1,6 @@
 // Screenshots of the Hollow Crypt trash in a live offline world: each pack in
 // place, the gargoyles perched, the drake in flight, and the telegraphs (the
-// Grave Cleave cone, the Bonechill Breath, the Tail Lash, the shriek ring, the
+// Grave Cleave cone, the Barrowflame Breath, the Tail Lash, the shriek ring, the
 // Raise Bones sigil, a Bone Burst). Evidence tooling, not a repo test.
 //
 //   node scripts/hollow_crypt_trash_shot.mjs [outDir] [shotId ...]
@@ -77,7 +77,7 @@ export const SHOTS = [
     id: 'dragon_aliento',
     kind: 'spawn',
     mob: 'drake',
-    cast: 'crypt_bonechill_breath',
+    cast: 'crypt_barrowflame_breath',
     pitch: 0.45,
     dist: 26,
   },

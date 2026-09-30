@@ -10,7 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -55,7 +55,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "es_ES": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -100,7 +100,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "fr_FR": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -145,7 +145,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "fr_CA": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -191,7 +191,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -236,7 +236,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "de_DE": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -285,7 +285,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -331,7 +331,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -376,7 +376,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "nl_NL": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -421,7 +421,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "pl_PL": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -466,7 +466,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "id_ID": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -511,7 +511,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "tr_TR": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -556,7 +556,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "sv_SE": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -601,7 +601,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "vi_VN": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",
@@ -646,7 +646,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.rimeweb_spinner.name"
   ],
   "da_DK": [
-    "abilityUi.cast.crypt_bonechill_breath",
+    "abilityUi.cast.crypt_barrowflame_breath",
     "abilityUi.cast.crypt_grave_bolt",
     "abilityUi.cast.crypt_grave_cleave",
     "abilityUi.cast.crypt_murder_call",

@@ -12247,7 +12247,7 @@ export const zh_TW: EnTranslations = {
       "crypt_murder_call": "鴉群召喚",
       "crypt_stone_shriek": "石之尖嘯",
       "crypt_grave_cleave": "墓穴橫掃",
-      "crypt_bonechill_breath": "寒骨吐息",
+      "crypt_barrowflame_breath": "塚焰吐息",
       "crypt_tail_lash": "尾鞭",
       "crypt_wing_gust": "翼風"
     }

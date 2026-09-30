@@ -11,7 +11,7 @@
 //   Chapel Gargoyle         waits on its perch, dives in; Stone Shriek stuns. Kick it.
 //   Crow Caller             Murder Call summons another flock. Kick it.
 //   Carrion Crow            weak fast fliers, in flocks.
-//   Ossuary Drake           the flying patrol: breath in front, tail behind, a gust.
+//   Ossuary Drake           the flying patrol: fire breath in front, tail behind, a wing gust.
 //
 // Numbers are classic-era normal-mode bases for levels 7 to 10, anchored to
 // the shipped crypt trash (Crypt Shambler 7 + 2.2/level, 437 health at level 8)
@@ -21,7 +21,7 @@
 // difficulty transform (mechanicDamageMult). Merged by data.ts.
 
 import {
-  CRYPT_BONECHILL_BREATH,
+  CRYPT_BARROWFLAME_BREATH,
   CRYPT_GRAVE_BOLT,
   CRYPT_GRAVE_CLEAVE,
   CRYPT_MURDER_CALL,
@@ -348,16 +348,17 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.5,
     // It sees you from the sky: a pass overhead is a pull.
     aggroRadius: 16,
+    // Spectral fire from the soul caged in its ribs, poured down a long cone.
     breathCone: {
-      castId: CRYPT_BONECHILL_BREATH,
-      name: 'Bonechill Breath',
+      castId: CRYPT_BARROWFLAME_BREATH,
+      name: 'Barrowflame Breath',
       castTime: 2,
       every: 12,
       range: 14,
       arcDeg: 70,
       min: 26,
       max: 34,
-      school: 'frost',
+      school: 'fire',
     },
     trashKit: {
       land: { seconds: 2.2 },

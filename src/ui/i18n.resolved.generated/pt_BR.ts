@@ -12247,7 +12247,7 @@ export const pt_BR: EnTranslations = {
       "crypt_murder_call": "Murder Call",
       "crypt_stone_shriek": "Stone Shriek",
       "crypt_grave_cleave": "Grave Cleave",
-      "crypt_bonechill_breath": "Bonechill Breath",
+      "crypt_barrowflame_breath": "Barrowflame Breath",
       "crypt_tail_lash": "Tail Lash",
       "crypt_wing_gust": "Wing Gust"
     }

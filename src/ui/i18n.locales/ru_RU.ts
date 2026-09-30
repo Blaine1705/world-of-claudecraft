@@ -20010,7 +20010,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_murder_call': 'Зов стаи',
   'abilityUi.cast.crypt_stone_shriek': 'Каменный вопль',
   'abilityUi.cast.crypt_grave_cleave': 'Могильный размах',
-  'abilityUi.cast.crypt_bonechill_breath': 'Костеледенящее дыхание',
+  'abilityUi.cast.crypt_barrowflame_breath': 'Дыхание курганного пламени',
   'abilityUi.cast.crypt_tail_lash': 'Удар хвостом',
   'abilityUi.cast.crypt_wing_gust': 'Порыв крыльев',
   'entities.mobs.crypt_ossuary_warrior.name': 'Воин оссуария',

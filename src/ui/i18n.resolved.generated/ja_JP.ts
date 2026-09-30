@@ -12247,7 +12247,7 @@ export const ja_JP: EnTranslations = {
       "crypt_murder_call": "鴉群の呼び声",
       "crypt_stone_shriek": "石の絶叫",
       "crypt_grave_cleave": "墓所の薙ぎ払い",
-      "crypt_bonechill_breath": "寒骨の吐息",
+      "crypt_barrowflame_breath": "塚炎の吐息",
       "crypt_tail_lash": "尾の一撃",
       "crypt_wing_gust": "翼の突風"
     }
