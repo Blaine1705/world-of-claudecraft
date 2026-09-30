@@ -327,7 +327,7 @@ const RIFT_GATE_HEIGHT = 6.0;
 let riftGateGltf: LoadedGltf | null = null;
 
 /** Test-only: stand in for the rift gate GLB the boot preload loads (Node has no fetch path). */
-export function setRiftGateGltfForTest(gltf: GLTF | null): void {
+export function setRiftGateGltfForTest(gltf: LoadedGltf | null): void {
   riftGateGltf = gltf;
 }
 
