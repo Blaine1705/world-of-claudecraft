@@ -35,6 +35,7 @@ import {
   GLOW_FRAG,
   PARTICLE_VERT,
   ParticlePool,
+  type ParticleSpec,
 } from './crypt_fx_particles';
 import {
   dissolveLevels,
@@ -43,6 +44,7 @@ import {
   MORTHEN_SCYTHE_REACH,
   MORTHEN_SCYTHE_UNFOLD,
   MORTHEN_SMOKE_BASE,
+  MORTHEN_SOUL_COUNT,
   MORTHEN_STANCE_REFRESH_SEC,
   MORTHEN_TOLL,
   type MorthenStance,
@@ -51,6 +53,7 @@ import {
   morthenStanceGesture,
   STAFF_STRIKE_SEC,
   scytheTrail,
+  soulOrbit,
   TRANSFORM_SLAM_SEC,
   TRANSFORM_UNFOLD_SEC,
 } from './morthen_fx_core';
@@ -186,6 +189,22 @@ export class MorthenFx {
   private scan = 0;
   private seed = 0x6d0e;
   private disposed = false;
+  /** One reused particle spec for the soul flames (no per-frame allocation). */
+  private readonly spec: ParticleSpec = {
+    x: 0,
+    y: 0,
+    z: 0,
+    vx: 0,
+    vy: 0,
+    vz: 0,
+    life: 0,
+    size0: 0,
+    size1: 0,
+    r: 0,
+    g: 0,
+    b: 0,
+    a: 0,
+  };
 
   constructor(
     scene: THREE.Scene,
@@ -226,7 +245,8 @@ export class MorthenFx {
       floorVfxRenderOrder('encounter', 26),
     );
     this.glow = new ParticlePool(
-      Math.round(900 * this.density),
+      // (the soul lights take a fixed share, the same on every tier)
+      Math.round(900 * this.density) + 240,
       particleMat(GLOW_FRAG, PARTICLE_VERT, THREE.AdditiveBlending),
       floorVfxRenderOrder('encounter', 27),
     );
@@ -452,6 +472,7 @@ export class MorthenFx {
     }
     const rites = this.stance === 'scythe' ? 1.7 : 1;
     const d = this.density;
+    this.stepSouls(m, dt, s);
     // The soul smoke trailing from where his legs should be.
     const base = morthenAnchor(m.pos, m.facing, s, MORTHEN_SMOKE_BASE);
     const gy = this.groundY(m.pos.x, m.pos.z);
@@ -462,9 +483,10 @@ export class MorthenFx {
         x: base.x + Math.sin(a) * r,
         y: base.y + (this.rand() - 0.3) * 0.8 * s,
         z: base.z + Math.cos(a) * r,
-        vx: Math.sin(a) * 0.5,
+        // outward and turning round him, so the smoke under the robes churns
+        vx: Math.sin(a) * 0.5 + Math.cos(a) * 0.7,
         vy: -0.25 + this.rand() * 0.4,
-        vz: Math.cos(a) * 0.5,
+        vz: Math.cos(a) * 0.5 - Math.sin(a) * 0.7,
         life: 1.6 + this.rand() * 0.9,
         drag: 1.2,
         floor: gy + 0.2,
@@ -544,6 +566,90 @@ export class MorthenFx {
         b: 0.32,
         a: 0.9,
       });
+    }
+  }
+
+  /** The souls he hoards: soft soul lights circling him, each trailing a lick of
+   *  ghost fire back along its orbit and shedding the odd spark. The orbit widens
+   *  and hurries while he casts, and runs faster in the scythe stance. */
+  private stepSouls(m: Entity, dt: number, s: number): void {
+    const casting = !!m.castingAbility;
+    const rites = this.stance === 'scythe';
+    const d = this.density;
+    const sp = this.spec;
+    for (let k = 0; k < MORTHEN_SOUL_COUNT; k++) {
+      const o = soulOrbit(k, this.clock, casting, rites);
+      const at = morthenAnchor(m.pos, m.facing, s, o);
+      const flick = 0.85 + 0.3 * this.rand();
+      // the core: a soft, bright soul light, laid down at a steady rate as it flies
+      // (never shed by tier: the souls stay whole on every preset)
+      const cores = Math.floor(28 * dt + this.rand());
+      if (cores > 0) {
+        sp.x = at.x;
+        sp.y = at.y;
+        sp.z = at.z;
+        sp.vx = 0;
+        sp.vy = 0.2;
+        sp.vz = 0;
+        sp.ax = 0;
+        sp.ay = 0;
+        sp.az = 0;
+        sp.drag = 0;
+        sp.floor = undefined;
+        sp.spin = 0;
+        sp.life = 0.2;
+        sp.size0 = 0.62 * s * flick;
+        sp.size1 = 0.4 * s;
+        sp.r = 0.72;
+        sp.g = 1;
+        sp.b = 0.62;
+        sp.a = 0.55;
+        this.glow.emit(this.clock, sp);
+        sp.size0 = 0.22 * s * flick;
+        sp.size1 = 0.14 * s;
+        sp.r = 1;
+        sp.g = 1;
+        sp.b = 0.9;
+        sp.a = 0.9;
+        this.glow.emit(this.clock, sp);
+      }
+      // the flame trail: tongues left behind as it flies, rising and thinning
+      for (let n = 0; n < Math.floor(34 * d * dt + this.rand()); n++) {
+        sp.x = at.x + (this.rand() - 0.5) * 0.12 * s;
+        sp.y = at.y + (this.rand() - 0.5) * 0.12 * s;
+        sp.z = at.z + (this.rand() - 0.5) * 0.12 * s;
+        sp.vx = (this.rand() - 0.5) * 0.3;
+        sp.vy = 0.5 + this.rand() * 0.6;
+        sp.vz = (this.rand() - 0.5) * 0.3;
+        sp.ay = 0.8;
+        sp.drag = 0.6;
+        sp.life = 0.4 + this.rand() * 0.25;
+        sp.size0 = 0.42 * s;
+        sp.size1 = 0.08 * s;
+        sp.spin = (this.rand() - 0.5) * 2;
+        sp.r = 0.78 + this.rand() * 0.2;
+        sp.g = 0;
+        sp.b = 0;
+        sp.a = 0.75;
+        this.fire.emit(this.clock, sp);
+      }
+      // a spark now and then, drifting off
+      if (this.rand() < 5 * d * dt) {
+        sp.vx = (this.rand() - 0.5) * 0.8;
+        sp.vy = 0.6 + this.rand() * 0.8;
+        sp.vz = (this.rand() - 0.5) * 0.8;
+        sp.ay = 0;
+        sp.drag = 0.5;
+        sp.life = 0.8 + this.rand() * 0.5;
+        sp.size0 = 0.1 * s;
+        sp.size1 = 0.02;
+        sp.spin = 0;
+        sp.r = 0.7;
+        sp.g = 1;
+        sp.b = 0.55;
+        sp.a = 0.9;
+        this.glow.emit(this.clock, sp);
+      }
     }
   }
 

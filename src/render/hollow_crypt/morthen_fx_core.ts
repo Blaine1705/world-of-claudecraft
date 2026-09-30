@@ -79,7 +79,7 @@ export function morthenAnchor(
 // ---- timings (seconds; the clips are keyed at 24 fps) -----------------------------------------
 /** The blade leaves the crest this long into the Transform clip (frames 15 to 25). */
 export const TRANSFORM_UNFOLD_SEC = 0.85;
-/** The whirl overhead ends and he brings the scythe round (frame 54). */
+/** The great reaping arc that ends the unfolding lands across his front (frame 54). */
 export const TRANSFORM_SLAM_SEC = 2.2;
 /** A melee swing's cut (frames 9 to 16 at the default 1.3 attack rate), after the hit event. */
 export const SWING_CUT_START_SEC = 0.24;
@@ -99,6 +99,33 @@ export function scytheTrail(t: number): { head: number; tail: number; alpha: num
   const tail = Math.max(0, Math.min(1, (k - 0.35) / 1.2));
   const alpha = k <= 1 ? 1 : Math.max(0, 1 - (k - 1) / 0.6);
   return { head, tail, alpha };
+}
+
+// ---- the souls he hoards --------------------------------------------------------------------
+// Soul flames circle him, drawn by the effect layer as soft light trailing ghost fire back
+// along the orbit (the Blender body carries no solid souls).
+export const MORTHEN_SOUL_COUNT = 6;
+/** The orbit's radius at rest (authored yards); a cast draws it wider. */
+export const MORTHEN_SOUL_RADIUS = 1.6;
+/** The orbit's mean height (authored yards), about his ribs. */
+export const MORTHEN_SOUL_HEIGHT = 3.3;
+
+/**
+ * Where soul `k` flies `t` seconds in, as an authored offset from his centre (x right,
+ * y up, z forward). A cast widens, lifts and hurries the ring (he gathers them); the
+ * scythe stance hurries it further.
+ */
+export function soulOrbit(
+  k: number,
+  t: number,
+  casting: boolean,
+  rites: boolean,
+): { x: number; y: number; z: number } {
+  const speed = (rites ? 1.25 : 0.85) * (casting ? 1.6 : 1);
+  const a = t * speed + (k * Math.PI * 2) / MORTHEN_SOUL_COUNT;
+  const r = MORTHEN_SOUL_RADIUS * (casting ? 1.3 : 1) * (1 + 0.1 * Math.sin(t * 0.7 + k * 2.1));
+  const y = MORTHEN_SOUL_HEIGHT + (casting ? 0.5 : 0) + 0.55 * Math.sin(t * 0.8 + k * 1.7);
+  return { x: Math.cos(a) * r, y, z: Math.sin(a) * r };
 }
 
 /** The dissolve's smoke rate and soul release (0..1) `t` seconds after death. */

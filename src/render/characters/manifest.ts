@@ -3844,8 +3844,8 @@ export const VISUALS: Record<string, VisualDef> = {
   // at his template's 1.35, hovering on his smoke a hand over the flags.
   crypt_morthen_lich: {
     url: `${CREATURES}/crypt_morthen_lich.glb`,
-    height: 6.342,
-    hover: 0.077,
+    height: 6.994,
+    hover: 0.122,
     clips: MORTHEN_STAFF_CLIPS,
     phaseClips: {
       [MORTHEN_STAFF_HELD]: { clips: MORTHEN_STAFF_CLIPS },

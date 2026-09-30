@@ -65,4 +65,25 @@ node scripts/build_media_manifest.mjs generate
 ```
 
 The `crypt_morthen_lich` VISUALS row maps the clips; `VisualDef.phaseClips`
-swaps the stance, driven by `src/render/hollow_crypt/morthen_fx.ts`.
+swaps the stance, driven by `src/render/hollow_crypt/morthen_fx.ts`. Its `height`
+and `hover` are the build's printed `IDLE_HEIGHT` and `MINZ` (measured half a
+second into Idle, as the game measures him).
+
+The weapon is held, never spun: the staff is modelled IN the right fist (both
+hands are bony fists closed round a bar) and the Staff bone keeps its rest turn
+against Hand.R in every key (`tests/morthen_lich.test.ts` pins it). Each pose
+places the grip, the shaft and the blade's facing in the body's frame and the
+solver carries them with the shoulder, the elbow, the spine and the floating body:
+it turns the blade a little round the shaft and nudges the grip so the wrist stays
+straight, bends the elbow toward where a straight wrist wants it, and closes the
+off hand round the shaft for the two-handed blows. The build prints, per clip, the
+worst wrist bend, how far either fist strays from the shaft, and the staff's turn
+against the fist (`GRIP ...` lines; `--diag` prints every key). The skull is one
+sculpted surface (`skull_point`), its sockets and nose pressed in, grown 1.3x about
+the neck to fill the mitre; soul flames flicker in the sockets on their own bones.
+The souls that circle him are drawn by the effect layer (`soulOrbit`), and the
+smoke below the torn alb is a translucent `CreatureSmoke` material (vertex alpha).
+
+Debugging aids: `--nobake` skips the Cycles bake (fast pose checks), `--solo
+Part,Part` builds only the named parts, `-` as the output skips the export, and
+`--sheet dir --clips A,B --frames N` renders chosen clips.

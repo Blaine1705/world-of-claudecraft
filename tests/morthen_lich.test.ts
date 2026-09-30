@@ -5,6 +5,9 @@
 // mirrored health alone, so offline and online see the same beat.
 
 import { readFileSync } from 'node:fs';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
@@ -12,6 +15,8 @@ import {
   dissolveLevels,
   MORTHEN_SCYTHE_HELD,
   MORTHEN_SCYTHE_UNFOLD,
+  MORTHEN_SOUL_COUNT,
+  MORTHEN_SOUL_RADIUS,
   MORTHEN_STAFF_HELD,
   MORTHEN_STAFF_RESTORED_FRACTION,
   MORTHEN_TOLL,
@@ -20,6 +25,7 @@ import {
   morthenStanceGesture,
   SWING_CUT_START_SEC,
   scytheTrail,
+  soulOrbit,
 } from '../src/render/hollow_crypt/morthen_fx_core';
 import { MOBS } from '../src/sim/data';
 import {
@@ -45,6 +51,20 @@ function glbJson(): {
 }
 
 const def = VISUALS[visualKeyFor({ kind: 'mob', templateId: 'morthen' } as Entity)];
+
+async function readGlb() {
+  await MeshoptDecoder.ready;
+  const io = new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+  return io.read(GLB);
+}
+
+/** The angle (degrees) between two unit quaternions [x, y, z, w]. */
+function quatAngleDeg(a: ArrayLike<number>, b: ArrayLike<number>): number {
+  const dot = Math.abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]);
+  return (2 * Math.acos(Math.min(1, dot)) * 180) / Math.PI;
+}
 
 describe('Morthen, the Lich Bishop: his own body', () => {
   it('draws the Blender lich, not a KayKit mage', () => {
@@ -98,6 +118,84 @@ describe('Morthen, the Lich Bishop: his own body', () => {
     expect(tris).toBeGreaterThan(20_000);
     expect(tris).toBeLessThan(55_000);
     expect(readFileSync(GLB).length).toBeLessThan(3_500_000);
+  });
+});
+
+describe('Morthen, the Lich Bishop: the staff stays in his fist', () => {
+  // The staff is modelled IN the right fist and parented to it, so every swing is
+  // carried by the arm and the body. A Staff bone turning against Hand.R is the
+  // propeller the owner saw: the weapon spinning round the grip while the arm
+  // barely moved. Every key of every clip must hold the rest turn.
+  it('never turns the staff against the hand, in any clip', async () => {
+    const doc = await readGlb();
+    const staff = doc
+      .getRoot()
+      .listNodes()
+      .find((n) => n.getName() === 'Staff');
+    expect(staff, 'Staff node').toBeDefined();
+    expect(staff?.getParentNode()?.getName()).toBe('Hand.R');
+    const rest = staff?.getRotation() ?? [0, 0, 0, 1];
+    const clips = doc.getRoot().listAnimations();
+    expect(clips.length).toBeGreaterThanOrEqual(21);
+    let checked = 0;
+    for (const clip of clips) {
+      for (const ch of clip.listChannels()) {
+        if (ch.getTargetNode() !== staff || ch.getTargetPath() !== 'rotation') continue;
+        const out = ch.getSampler()?.getOutput()?.getArray();
+        if (!out) continue;
+        for (let i = 0; i + 3 < out.length; i += 4) {
+          const q = [out[i], out[i + 1], out[i + 2], out[i + 3]];
+          const len = Math.hypot(q[0], q[1], q[2], q[3]);
+          const unit = q.map((v) => v / len);
+          expect(quatAngleDeg(unit, rest), `${clip.getName()} key ${i / 4}`).toBeLessThan(3);
+          checked++;
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+
+  it('draws the soul smoke under the robes as a translucent material', async () => {
+    const doc = await readGlb();
+    const smoke = doc
+      .getRoot()
+      .listMaterials()
+      .find((m) => m.getName() === 'CreatureSmoke');
+    expect(smoke?.getAlphaMode()).toBe('BLEND');
+  });
+});
+
+describe('Morthen, the Lich Bishop: the souls circling him', () => {
+  it('flies every soul round him, evenly spaced, about his ribs', () => {
+    const at = Array.from({ length: MORTHEN_SOUL_COUNT }, (_, k) => soulOrbit(k, 0, false, false));
+    const angles = at.map((p) => Math.atan2(p.z, p.x)).sort((a, b) => a - b);
+    for (let i = 1; i < angles.length; i++)
+      expect(angles[i] - angles[i - 1]).toBeCloseTo((Math.PI * 2) / MORTHEN_SOUL_COUNT, 6);
+    for (let t = 0; t < 20; t += 0.37) {
+      for (let k = 0; k < MORTHEN_SOUL_COUNT; k++) {
+        const p = soulOrbit(k, t, false, false);
+        const r = Math.hypot(p.x, p.z);
+        expect(r).toBeGreaterThan(MORTHEN_SOUL_RADIUS * 0.85);
+        expect(r).toBeLessThan(MORTHEN_SOUL_RADIUS * 1.15);
+        expect(p.y).toBeGreaterThan(2.5);
+        expect(p.y).toBeLessThan(4.2);
+      }
+    }
+  });
+
+  it('draws them wider and higher while he casts, and hurries them', () => {
+    const rest = soulOrbit(0, 3, false, false);
+    const cast = soulOrbit(0, 3, true, false);
+    expect(Math.hypot(cast.x, cast.z)).toBeGreaterThan(Math.hypot(rest.x, rest.z) * 1.2);
+    expect(cast.y).toBeGreaterThan(rest.y);
+    // over the same second a hurried soul sweeps a longer arc
+    const arc = (casting: boolean, rites: boolean) => {
+      const a = soulOrbit(2, 1, casting, rites);
+      const b = soulOrbit(2, 1.1, casting, rites);
+      return Math.abs(Math.atan2(b.z, b.x) - Math.atan2(a.z, a.x));
+    };
+    expect(arc(true, false)).toBeGreaterThan(arc(false, false));
+    expect(arc(false, true)).toBeGreaterThan(arc(false, false));
   });
 });
 

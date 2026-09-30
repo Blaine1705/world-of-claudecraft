@@ -727,8 +727,10 @@ def bake_surface(obj, size=2048, samples=48, ao_strength=0.85, normal=True):
     ao = bpy.data.images.new(obj.name + '_ao', size, size, alpha=False, float_buffer=False)
     nrm = bpy.data.images.new(obj.name + '_normal', size // 2, size // 2, alpha=False)
     nrm.colorspace_settings.name = 'Non-Color'
-    baked = [m for m in obj.data.materials if m and m.name != 'CreatureGlow']
-    glow = [m for m in obj.data.materials if m and m.name == 'CreatureGlow']
+    # The glow and a translucent smoke keep their vertex colours (and alpha): never baked.
+    unbaked = ('CreatureGlow', 'CreatureSmoke')
+    baked = [m for m in obj.data.materials if m and m.name not in unbaked]
+    glow = [m for m in obj.data.materials if m and m.name in unbaked]
 
     def target(img):
         for m in obj.data.materials:
@@ -798,9 +800,9 @@ def bake_surface(obj, size=2048, samples=48, ao_strength=0.85, normal=True):
     # where the unlit glow material still reads them.
     col = obj.data.color_attributes.get('Col')
     if col is not None:
-        glow_index = next((i for i, m in enumerate(obj.data.materials) if m and m.name == 'CreatureGlow'), -1)
+        keep = {i for i, m in enumerate(obj.data.materials) if m and m.name in unbaked}
         for poly in obj.data.polygons:
-            if poly.material_index == glow_index:
+            if poly.material_index in keep:
                 continue
             for li in poly.loop_indices:
                 col.data[li].color = (1.0, 1.0, 1.0, 1.0)
