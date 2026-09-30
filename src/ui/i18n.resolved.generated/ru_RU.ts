@@ -12322,7 +12322,9 @@ export const ru_RU: EnTranslations = {
       "temple_pearl_slam": "Жемчужный удар",
       "temple_lightning_spit": "Молниевый плевок",
       "temple_crushing_torrent": "Сокрушительный поток",
-      "temple_hydra_tsunami": "Цунами"
+      "temple_hydra_tsunami": "Цунами",
+      "temple_ysolei_call": "Зов лунного отродья",
+      "temple_ysolei_wrath": "Утопленный гнев"
     }
   },
   "questUi": {

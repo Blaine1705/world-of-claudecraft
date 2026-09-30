@@ -19738,6 +19738,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_lightning_spit': '稲妻の吐きかけ',
   'abilityUi.cast.temple_crushing_torrent': '押し潰す奔流',
   'abilityUi.cast.temple_hydra_tsunami': '津波',
+  'abilityUi.cast.temple_ysolei_call': '月の落とし子の呼び声',
+  'abilityUi.cast.temple_ysolei_wrath': '溺れし憤怒',
   'entities.mobs.crypt_ossuary_warrior.name': '納骨堂の戦士',
   'entities.mobs.crypt_gravecaller_adept.name': '墓呼びの徒弟',
   'entities.mobs.crypt_ossuary_cutthroat.name': '納骨堂の喉裂き',

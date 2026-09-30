@@ -12322,7 +12322,9 @@ export const sv_SE: EnTranslations = {
       "temple_pearl_slam": "Pearl Slam",
       "temple_lightning_spit": "Lightning Spit",
       "temple_crushing_torrent": "Crushing Torrent",
-      "temple_hydra_tsunami": "Tsunami"
+      "temple_hydra_tsunami": "Tsunami",
+      "temple_ysolei_call": "Moonspawn Call",
+      "temple_ysolei_wrath": "Drowned Wrath"
     }
   },
   "questUi": {

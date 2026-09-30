@@ -13,6 +13,11 @@
 //                 slower. Every Undertow has one right way out: the dry half.
 //   Moonspawn     two at 60 and 30 percent, and she enrages under 30 (the
 //                 template's summonAdds and enrage, kept from the shipped fight).
+//                 Each opens with a roar on a real bar the moment she is free
+//                 (Moonspawn Call, Drowned Wrath): her Summon and Enrage clips.
+//   The body      a colossal serpent coiled on the Moon Altar (moveSpeed 0):
+//                 she never leaves it, so the causeway line (the flood's
+//                 border) always runs through her.
 //   Heroic        Riptide: each Undertow leaves a whirl where each player stood
 //                 when it began (40 frost a second for 10 s). Drowned Moon:
 //                 every 20 s a Moonspawn climbs out of the flooded half.
@@ -46,11 +51,13 @@ import {
   TIDE_TEMPLATES,
   type TideHalf,
   type TideState,
+  YSOLEI_CALL,
   YSOLEI_FLOODED,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_TIDAL_CRASH,
   YSOLEI_TUNING,
   YSOLEI_UNDERTOW,
+  YSOLEI_WRATH,
 } from './ids';
 
 const T = YSOLEI_TUNING;
@@ -67,6 +74,9 @@ function freshState(): YsoleiFightState {
     moonTimer: T.drownedMoonEvery,
     floodTick: 1,
     crashed: false,
+    summonsRoared: 0,
+    wrathRoared: false,
+    roars: [],
   };
 }
 
@@ -338,6 +348,30 @@ function stepLunar(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: Ysolei
   }
 }
 
+/** Her roars: a new Moonspawn wave or the enrage queues one, and it rises on
+ *  its own bar the moment she is free. Returns true while a roar owns her. */
+function stepRoars(boss: Entity, st: YsoleiFightState): boolean {
+  if (boss.firedSummons > st.summonsRoared) {
+    st.summonsRoared = boss.firedSummons;
+    st.roars.push(YSOLEI_CALL);
+  }
+  if (boss.enraged && !st.wrathRoared) {
+    st.wrathRoared = true;
+    st.roars.push(YSOLEI_WRATH);
+  }
+  const casting = boss.castingAbility;
+  if (casting === YSOLEI_CALL || casting === YSOLEI_WRATH) {
+    boss.swingTimer = Math.max(boss.swingTimer, 0.6);
+    boss.castRemaining = Math.max(0, boss.castRemaining - DT);
+    if (boss.castRemaining <= 0) clearCastOf(boss, casting);
+    return true;
+  }
+  if (casting !== null || st.roars.length === 0) return false;
+  const next = st.roars.shift() as string;
+  startCast(boss, next, next === YSOLEI_CALL ? T.callCast : T.wrathCast, null);
+  return true;
+}
+
 /** The fight ended: the lagoon falls back and every whirl stills. */
 export function resetYsolei(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.templeFight?.kind === 'ysolei' ? boss.templeFight : null;
@@ -350,6 +384,8 @@ export function resetYsolei(ctx: SimContext, inst: InstanceSlot, boss: Entity): 
   }
   clearCastOf(boss, YSOLEI_LUNAR_TIDE);
   clearCastOf(boss, YSOLEI_UNDERTOW);
+  clearCastOf(boss, YSOLEI_CALL);
+  clearCastOf(boss, YSOLEI_WRATH);
   boss.templeFight = undefined;
 }
 
@@ -381,5 +417,11 @@ export function tickYsolei(
   stepTide(ctx, inst, boss, st);
   stepRiptides(ctx, inst, boss, st);
   if (stepUndertow(ctx, inst, boss, st)) return;
+  if (stepRoars(boss, st)) {
+    // The clocks keep their beat through a roar.
+    st.lunarTimer -= DT;
+    st.undertowTimer -= DT;
+    return;
+  }
   stepLunar(ctx, inst, boss, st);
 }

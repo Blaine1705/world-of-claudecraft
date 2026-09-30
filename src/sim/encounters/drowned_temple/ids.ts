@@ -42,6 +42,10 @@ export const COLOSSUS_MOONLIGHT_LANCE = 'temple_moonlight_lance';
 export const COLOSSUS_RESONANT_SLAM = 'temple_resonant_slam';
 export const YSOLEI_LUNAR_TIDE = 'temple_lunar_tide';
 export const YSOLEI_UNDERTOW = 'temple_undertow';
+/** Ysolei's roar as her Moonspawn rise (a bar, never kicked). */
+export const YSOLEI_CALL = 'temple_ysolei_call';
+/** Ysolei's roar as she enrages (a bar, never kicked). */
+export const YSOLEI_WRATH = 'temple_ysolei_wrath';
 
 // ---- aura ids ---------------------------------------------------------------------
 export const SELTHE_CHORUS_MARK = 'temple_chorus_mark';
@@ -317,6 +321,9 @@ export const YSOLEI_TUNING = {
   riptideRadius: 3.5,
   riptidePerSecond: 40,
   drownedMoonEvery: 20,
+  /** The roars that open her Moonspawn and her enrage. */
+  callCast: 2.2,
+  wrathCast: 2.5,
 } as const;
 
 export const ALTAR = MOON_ALTAR;

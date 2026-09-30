@@ -20103,6 +20103,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_lightning_spit': 'Молниевый плевок',
   'abilityUi.cast.temple_crushing_torrent': 'Сокрушительный поток',
   'abilityUi.cast.temple_hydra_tsunami': 'Цунами',
+  'abilityUi.cast.temple_ysolei_call': 'Зов лунного отродья',
+  'abilityUi.cast.temple_ysolei_wrath': 'Утопленный гнев',
   'entities.mobs.crypt_ossuary_warrior.name': 'Воин оссуария',
   'entities.mobs.crypt_gravecaller_adept.name': 'Адепт Могильного Зова',
   'entities.mobs.crypt_ossuary_cutthroat.name': 'Головорез оссуария',

@@ -532,11 +532,12 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   held('lagoon_snapper', 27, 214, 'g13', FACE_EAST),
   held('lagoon_eel', 21, 215, 'g13', FACE_EAST),
   held('pale_choir_acolyte', 16, 218, 'g13', FACE_EAST),
-  // Boss 3: Ysolei coiled beside the Moon Altar.
+  // Boss 3: Ysolei coiled against the Moon Altar's east face (just clear of
+  // the altar stone's collider), on the causeway line, facing the causeway.
   {
     mobId: 'ysolei',
-    x: ALTAR_STONE.x + 8,
-    z: MOON_ALTAR.z + 5,
+    x: ALTAR_STONE.x + ALTAR_STONE.r + 0.6,
+    z: MOON_ALTAR.z,
     facing: FACE_EAST,
     idleStationary: true,
   },

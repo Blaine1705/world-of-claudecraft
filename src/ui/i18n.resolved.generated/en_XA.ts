@@ -12322,7 +12322,9 @@ export const en_XA: EnTranslations = {
       "temple_pearl_slam": "[Þéáŕļ Šļáɱ]",
       "temple_lightning_spit": "[Ļíĝĥţñíñĝ Šþíţ]",
       "temple_crushing_torrent": "[Çŕúšĥíñĝ Ţóŕŕéñţ]",
-      "temple_hydra_tsunami": "[Ţšúñáɱí]"
+      "temple_hydra_tsunami": "[Ţšúñáɱí]",
+      "temple_ysolei_call": "[Ɱóóñšþáŵñ Çáļļ]",
+      "temple_ysolei_wrath": "[Ðŕóŵñéð Ŵŕáţĥ]"
     }
   },
   "questUi": {

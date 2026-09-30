@@ -19722,6 +19722,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_lightning_spit': '번개 침',
   'abilityUi.cast.temple_crushing_torrent': '짓누르는 급류',
   'abilityUi.cast.temple_hydra_tsunami': '해일',
+  'abilityUi.cast.temple_ysolei_call': '달의 자손 부르기',
+  'abilityUi.cast.temple_ysolei_wrath': '익사한 분노',
   'entities.mobs.crypt_ossuary_warrior.name': '납골당 전사',
   'entities.mobs.crypt_gravecaller_adept.name': '무덤부름 수련생',
   'entities.mobs.crypt_ossuary_cutthroat.name': '납골당 멱따개',

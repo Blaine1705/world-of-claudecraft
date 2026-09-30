@@ -12322,7 +12322,9 @@ export const ja_JP: EnTranslations = {
       "temple_pearl_slam": "真珠の叩きつけ",
       "temple_lightning_spit": "稲妻の吐きかけ",
       "temple_crushing_torrent": "押し潰す奔流",
-      "temple_hydra_tsunami": "津波"
+      "temple_hydra_tsunami": "津波",
+      "temple_ysolei_call": "月の落とし子の呼び声",
+      "temple_ysolei_wrath": "溺れし憤怒"
     }
   },
   "questUi": {

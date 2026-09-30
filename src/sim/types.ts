@@ -4471,6 +4471,11 @@ export interface YsoleiFightState {
   floodTick: number;
   /** Anyone was caught by a Tidal Crash (the deed reads it). */
   crashed: boolean;
+  /** Moonspawn waves and the enrage already answered with a roar, and the
+   *  roars still waiting for her to be free (Moonspawn Call, Drowned Wrath). */
+  summonsRoared: number;
+  wrathRoared: boolean;
+  roars: string[];
 }
 
 export type TempleFightState =

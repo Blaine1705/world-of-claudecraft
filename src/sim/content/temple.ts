@@ -439,7 +439,11 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 2.9,
     attackSpeed: 2.5,
     armorPerLevel: 28,
-    moveSpeed: 7,
+    // The sixth pass: a colossal serpent coiled on the Moon Altar (the Blender
+    // body built for her), so she never leaves it and her reach is a giant's
+    // (the 2.5 scale: about 9.5 yd, the edge of her coils).
+    moveSpeed: 0,
+    idleStationary: true,
     aggroRadius: 18,
     // Lunar Tide, the Undertow, the Tidal Crash and the Rising Tide are the
     // rework's encounter (encounters/drowned_temple/ysolei.ts).
@@ -458,7 +462,7 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'moonshroud_robe', chance: 0.33, rollGroup: 'ysolei_blue', normalOnly: true },
       { itemId: 'moonshroud_tunic', chance: 0.33, rollGroup: 'ysolei_blue', normalOnly: true },
     ],
-    scale: 1.65,
+    scale: 2.5,
     color: 0xbcd2ec,
   },
 };

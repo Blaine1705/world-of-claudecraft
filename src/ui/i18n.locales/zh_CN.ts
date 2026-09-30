@@ -18765,6 +18765,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_lightning_spit': '闪电喷吐',
   'abilityUi.cast.temple_crushing_torrent': '碾压激流',
   'abilityUi.cast.temple_hydra_tsunami': '海啸',
+  'abilityUi.cast.temple_ysolei_call': '月裔召唤',
+  'abilityUi.cast.temple_ysolei_wrath': '溺亡之怒',
   'entities.mobs.crypt_ossuary_warrior.name': '骨堂战士',
   'entities.mobs.crypt_gravecaller_adept.name': '唤墓者学徒',
   'entities.mobs.crypt_ossuary_cutthroat.name': '骨堂割喉者',

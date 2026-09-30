@@ -12322,7 +12322,9 @@ export const zh_TW: EnTranslations = {
       "temple_pearl_slam": "珍珠猛擊",
       "temple_lightning_spit": "閃電噴吐",
       "temple_crushing_torrent": "碾壓激流",
-      "temple_hydra_tsunami": "海嘯"
+      "temple_hydra_tsunami": "海嘯",
+      "temple_ysolei_call": "月裔召喚",
+      "temple_ysolei_wrath": "溺亡之怒"
     }
   },
   "questUi": {

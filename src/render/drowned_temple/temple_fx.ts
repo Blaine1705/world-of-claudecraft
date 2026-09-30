@@ -24,7 +24,13 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { MOON_ALTAR } from '../../sim/content/drowned_temple_layout';
-import { REFLECTION_ID, tideStateOf } from '../../sim/encounters/drowned_temple/ids';
+import {
+  HYDRA_TUNING,
+  POOL,
+  REFLECTION_ID,
+  TSUNAMI_TEMPLATES,
+  tideStateOf,
+} from '../../sim/encounters/drowned_temple/ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { type TelegraphFan, TelegraphKit, type TelegraphLane } from '../floor_telegraph';
@@ -42,10 +48,11 @@ import {
   tideLook,
 } from './temple_fx_core';
 import { TempleHydra } from './temple_hydra';
+import { TempleYsoleiFx } from './temple_ysolei_fx';
 
 const FAN_SLOTS = 14;
-const LANE_SLOTS = 4;
-const OBJECT_SLOTS = 10;
+const LANE_SLOTS = 6;
+const OBJECT_SLOTS = 12;
 const MARK_SLOTS = 6;
 const TETHER_SLOTS = 6;
 const SCAN_SEC = 0.1;
@@ -74,6 +81,11 @@ interface TideSlot extends TelegraphFan {
   objectId: number;
 }
 
+interface WaveSlot extends TelegraphFan {
+  objectId: number;
+  since: number;
+}
+
 export class TempleFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -83,10 +95,12 @@ export class TempleFx {
   private readonly objects: ObjectSlot[] = [];
   private readonly marks: MarkSlot[] = [];
   private readonly tides: TideSlot[] = [];
+  private readonly waves: WaveSlot[] = [];
   private readonly tethers: THREE.Line[] = [];
   private readonly tetherPairs: [number, number][] = [];
   private readonly kit: TelegraphKit;
   private readonly hydra: TempleHydra;
+  private readonly ysolei: TempleYsoleiFx;
   private readonly flashesOn: boolean;
   private scan = 0;
   private clock = 0;
@@ -113,6 +127,8 @@ export class TempleFx {
     for (let i = 0; i < MARK_SLOTS; i++)
       this.marks.push({ ...this.kit.fan(20), playerId: -1, auraId: '' });
     for (let i = 0; i < 2; i++) this.tides.push({ ...this.kit.fan(12), objectId: -1 });
+    // The Mere Hydra's Tsunami: the half of the pool the wave will roll over.
+    for (let i = 0; i < 2; i++) this.waves.push({ ...this.kit.fan(16), objectId: -1, since: 0 });
     const tetherMat = new THREE.LineBasicMaterial({
       color: 0xdde8f5,
       transparent: true,
@@ -134,6 +150,7 @@ export class TempleFx {
     hydraRoot.name = 'drowned-temple-hydra';
     this.root.add(hydraRoot);
     this.hydra = new TempleHydra(hydraRoot, world, this.flashesOn);
+    this.ysolei = new TempleYsoleiFx(this.root, scene, world, groundY, this.flashesOn);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -141,6 +158,7 @@ export class TempleFx {
 
   handleEvent(ev: SimEvent): boolean {
     this.hydra.handleEvent(ev);
+    this.ysolei.handleEvent(ev);
     return false;
   }
 
@@ -158,6 +176,7 @@ export class TempleFx {
       this.scanWorld(world);
     }
     this.hydra.update(dt, this.clock);
+    this.ysolei.update(dt, this.clock);
     for (const slot of this.casts) {
       if (slot.casterId < 0) continue;
       const caster = world.entities.get(slot.casterId);
@@ -285,6 +304,36 @@ export class TempleFx {
         fade: look.fade,
       });
     }
+    for (const slot of this.waves) {
+      if (slot.objectId < 0) continue;
+      const obj = world.entities.get(slot.objectId);
+      if (
+        !obj ||
+        (obj.templateId !== TSUNAMI_TEMPLATES.warn && obj.templateId !== TSUNAMI_TEMPLATES.surge)
+      ) {
+        slot.objectId = -1;
+        slot.group.visible = false;
+        continue;
+      }
+      // Centred on the pool, opening toward the rim the wave stands on.
+      const cx = obj.pos.x - Math.sin(obj.facing) * POOL.r;
+      const cz = obj.pos.z - Math.cos(obj.facing) * POOL.r;
+      const radius = POOL.r + 3;
+      const fill =
+        obj.templateId === TSUNAMI_TEMPLATES.surge
+          ? 1
+          : templeTimedFill(this.clock - slot.since, HYDRA_TUNING.tsunamiCast);
+      this.kit.drapeFan(
+        slot,
+        this.groundY,
+        cx,
+        this.groundY(cx, cz),
+        cz,
+        obj.facing + Math.PI,
+        radius,
+      );
+      this.kit.paintFan(slot, { fill, clock: this.clock, range: radius });
+    }
     this.updateTethers(world);
   }
 
@@ -339,6 +388,16 @@ export class TempleFx {
           slot.group.visible = true;
           continue;
         }
+        if (e.templateId === TSUNAMI_TEMPLATES.warn || e.templateId === TSUNAMI_TEMPLATES.surge) {
+          if (this.waves.some((w) => w.objectId === e.id)) continue;
+          const slot = this.waves.find((w) => w.objectId < 0);
+          if (!slot) continue;
+          this.kit.layOutFan(slot, 180, { color: 0xff5a3c, accent: TEMPLE_ACCENTS.tide });
+          slot.objectId = e.id;
+          slot.since = this.clock;
+          slot.group.visible = true;
+          continue;
+        }
         if (tideStateOf(e.templateId) !== null) {
           if (this.tides.some((t) => t.objectId === e.id)) continue;
           const slot = this.tides.find((t) => t.objectId < 0);
@@ -387,6 +446,7 @@ export class TempleFx {
     if (this.disposed) return;
     this.disposed = true;
     this.hydra.dispose();
+    this.ysolei.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();

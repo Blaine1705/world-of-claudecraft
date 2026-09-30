@@ -12,8 +12,10 @@ import {
   COLOSSUS_RESONANT_SLAM,
   SELTHE_SEA_SONG,
   SELTHE_TIDAL_SLAP,
+  YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_UNDERTOW,
+  YSOLEI_WRATH,
 } from '../../sim/encounters/drowned_temple/ids';
 import {
   KNELLWYRM_ARRIVE,
@@ -71,6 +73,7 @@ import {
 } from '../../sim/mob/trash_kit/cast_ids';
 import {
   TEMPLE_CALL_THE_TIDE,
+  TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
@@ -4369,13 +4372,18 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.06,
   },
+  // The Lagoon Eel (scripts/assets/drowned_temple_creatures/eel.py): an
+  // S-wave climbs its column with the head held level. A new eel body swaps
+  // in here: keep its clip names (Idle, Walk, Run, Attack, Attack2, Hit,
+  // Death, Cast, Coil, Spit) or remap them in this row.
   temple_eel: {
     url: `${CREATURES}/temple_eel.glb`,
     height: 6.2,
     clips: {
       ...TEMPLE_CLIPS,
-      castByAbility: { [TEMPLE_STATIC_COIL]: 'Coil' },
-      castTimeScaleByAbility: { [TEMPLE_STATIC_COIL]: 1 },
+      castByAbility: { [TEMPLE_STATIC_COIL]: 'Coil', [TEMPLE_LIGHTNING_SPIT]: 'Spit' },
+      castTimeScaleByAbility: { [TEMPLE_STATIC_COIL]: 1, [TEMPLE_LIGHTNING_SPIT]: 1 },
+      castPlayOut: ['Spit'],
     },
     selfIllumination: 0.22,
   },
@@ -4415,10 +4423,14 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.08,
   },
-  // The Tideglass Colossus: stone blocks round a blazing prism.
+  // The Tideglass Colossus: stone blocks round a blazing prism. It walks its
+  // foe down (sixth pass): Walk and Run are its own lumbering gait. The
+  // template's 2.2 scale (its long reach) draws it at 15 world units. A new
+  // Colossus body swaps in here: keep its clip names (Idle, Walk, Run, Attack,
+  // Attack2, Hit, Death, Flare, Lance, Slam) or remap them below.
   temple_colossus: {
     url: `${CREATURES}/temple_colossus.glb`,
-    height: 15,
+    height: 15 / 2.2,
     clips: {
       ...TEMPLE_CLIPS,
       castByAbility: {
@@ -4434,16 +4446,47 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.06,
   },
-  // Ysolei, the Drowned Moon: a lunar serpent-dragon over her coils.
+  // Ysolei, Avatar of the Drowned Moon: the colossal lunar sea-serpent built
+  // in Blender by Codex (sources on the codex/ysolei branch; original work, no
+  // donor assets), coiled on the Moon Altar. Native scale is kept: her raised
+  // head stands about seven players tall. Her Idle measures 23.97 native units
+  // (the halo's top to the coil's underside, 0.34 under her pivot), so at the
+  // template's 2.5 scale the height is 23.97 / 2.5 and the hover sinks the
+  // coil's underside back under the floor. Authored PBR materials (no atlas,
+  // no tint). Each clip rides a real cast bar: Lunar_Tide (1.5 s charge, then
+  // the wave), Undertow (the 3 s channel, jaws wide; the crash plays out),
+  // Summon (Moonspawn Call), Enrage (Drowned Wrath); Bite and Tail_Sweep are
+  // her swings, Rise her flourish on a reset, and she is stationary.
   temple_ysolei: {
     url: `${CREATURES}/temple_ysolei.glb`,
-    height: 10,
+    height: 23.97 / 2.5,
+    hover: -0.339 / 2.5,
+    authoredAtlas: true,
+    clickRadius: 4.5,
     clips: {
-      ...TEMPLE_CLIPS,
-      castByAbility: { [YSOLEI_LUNAR_TIDE]: 'LunarTide', [YSOLEI_UNDERTOW]: 'Undertow' },
-      castTimeScaleByAbility: { [YSOLEI_LUNAR_TIDE]: 1.3 },
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Bite', 'Tail_Sweep'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Summon',
+      flourish: 'Rise',
+      castByAbility: {
+        [YSOLEI_LUNAR_TIDE]: 'Lunar_Tide',
+        [YSOLEI_UNDERTOW]: 'Undertow',
+        [YSOLEI_CALL]: 'Summon',
+        [YSOLEI_WRATH]: 'Enrage',
+      },
+      castTimeScaleByAbility: {
+        [YSOLEI_LUNAR_TIDE]: 1,
+        [YSOLEI_UNDERTOW]: 1,
+        [YSOLEI_CALL]: 1,
+        [YSOLEI_WRATH]: 1,
+      },
+      castPlayOut: ['Lunar_Tide', 'Undertow', 'Summon', 'Enrage'],
     },
-    selfIllumination: 0.1,
+    castPlayOutHoldsAttacks: true,
   },
   // The Mere Hydra's three heads: bodyless targets (the click capsule stays),
   // the one Hydra model drawn at the pool by drowned_temple/temple_hydra.ts.

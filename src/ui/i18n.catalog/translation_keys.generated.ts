@@ -128,6 +128,8 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.temple_tide_breath'
   | 'abilityUi.cast.temple_trident_sweep'
   | 'abilityUi.cast.temple_undertow'
+  | 'abilityUi.cast.temple_ysolei_call'
+  | 'abilityUi.cast.temple_ysolei_wrath'
   | 'abilityUi.cast.thunzharrStormcall'
   | 'abilityUi.cast.tool_recharge'
   | 'abilityUi.forms.bear'

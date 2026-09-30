@@ -12322,7 +12322,9 @@ export const ko_KR: EnTranslations = {
       "temple_pearl_slam": "진주 강타",
       "temple_lightning_spit": "번개 침",
       "temple_crushing_torrent": "짓누르는 급류",
-      "temple_hydra_tsunami": "해일"
+      "temple_hydra_tsunami": "해일",
+      "temple_ysolei_call": "달의 자손 부르기",
+      "temple_ysolei_wrath": "익사한 분노"
     }
   },
   "questUi": {

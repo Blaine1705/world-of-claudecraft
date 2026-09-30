@@ -13,7 +13,10 @@ The creatures (src/render/characters/manifest.ts VISUALS rows, the temple block)
   acolyte      The Pale Choir Acolyte (choir_folk.py): a hooded chorister with a moon bell.
   selthe       Choirmother Selthe (choir_folk.py): the tall choir mother and her Great Conch.
   colossus     The Tideglass Colossus (colossus.py): a stone giant with a prism for a heart.
-  ysolei       Ysolei (ysolei.py): the Drowned Moon, a lunar serpent-dragon.
+
+Ysolei is no longer built here: her body is the colossal serpent Codex built
+in Blender (sources on the codex/ysolei branch), shipped as
+public/models/creatures/temple_ysolei.glb.
 
 Built on the Sunken Bastion's smooth sea kit (../sunken_bastion_creatures/sea_kit.py)
 and the Hollow Crypt creature kit behind it: yards, +Z up, facing -Y, every
@@ -39,7 +42,6 @@ MODULES = {
     'acolyte': 'choir_folk:acolyte',
     'selthe': 'choir_folk:selthe',
     'colossus': 'colossus',
-    'ysolei': 'ysolei',
 }
 
 

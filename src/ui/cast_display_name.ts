@@ -123,6 +123,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_lightning_spit': true,
   'abilityUi.cast.temple_crushing_torrent': true,
   'abilityUi.cast.temple_hydra_tsunami': true,
+  'abilityUi.cast.temple_ysolei_call': true,
+  'abilityUi.cast.temple_ysolei_wrath': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

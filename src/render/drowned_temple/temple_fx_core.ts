@@ -12,6 +12,7 @@ import {
   COLOSSUS_MOONLIGHT_LANCE,
   COLOSSUS_RESONANT_SLAM,
   COLOSSUS_TUNING,
+  HYDRA_CRUSHING_TORRENT,
   HYDRA_TIDE_BREATH,
   HYDRA_TUNING,
   RIPTIDE_TEMPLATE,
@@ -20,13 +21,19 @@ import {
   SELTHE_SOLO_MARK,
   SELTHE_TUNING,
   SOLO_ECHO_TEMPLATE,
+  VENOM_POOL_TEMPLATE,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_TUNING,
   YSOLEI_UNDERTOW,
 } from '../../sim/encounters/drowned_temple/ids';
 import {
   TEMPLE_CALL_THE_TIDE,
+  TEMPLE_GLIMMER_VENOM,
+  TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
+  TEMPLE_PALE_MENDING,
+  TEMPLE_PEARL_SLAM,
+  TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
@@ -57,6 +64,7 @@ export const TEMPLE_ACCENTS = {
   prism: 0xb9a6ff,
   storm: 0x9fdcff,
   tide: 0x6fe3e0,
+  venom: 0x9cf06a,
 } as const;
 
 function cone(templateId: string): { range: number; arcDeg: number } {
@@ -67,7 +75,56 @@ function cone(templateId: string): { range: number; arcDeg: number } {
 /** Every cast that paints the floor while its bar runs, trash and bosses. */
 export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphSpec>> {
   const coil = MOBS.lagoon_eel?.trashKit?.screech;
+  const spit = MOBS.lagoon_eel?.trashKit?.line;
+  const hurl = MOBS.drowned_templeguard?.trashKit?.line;
+  const slam = MOBS.pearlguard_sentinel?.trashKit?.wingGust;
   return {
+    // The sixth pass: the trash's second jobs and the Hydra's water lane.
+    [TEMPLE_SKEWERING_TRIDENT]: {
+      shape: 'lane',
+      range: hurl?.length ?? 0,
+      arcDeg: 0,
+      halfWidth: hurl?.halfWidth ?? 1,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: TELEGRAPH_ACCENTS.physical,
+    },
+    [TEMPLE_LIGHTNING_SPIT]: {
+      shape: 'lane',
+      range: spit?.length ?? 0,
+      arcDeg: 0,
+      halfWidth: spit?.halfWidth ?? 1,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: TEMPLE_ACCENTS.storm,
+    },
+    [TEMPLE_PEARL_SLAM]: {
+      shape: 'ring',
+      range: slam?.radius ?? 0,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: TEMPLE_ACCENTS.moon,
+    },
+    [TEMPLE_PALE_MENDING]: {
+      shape: 'sigil',
+      range: 1.8,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.moon,
+    },
+    [TEMPLE_GLIMMER_VENOM]: {
+      shape: 'sigil',
+      range: 1.6,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.venom,
+    },
+    [HYDRA_CRUSHING_TORRENT]: {
+      shape: 'lane',
+      range: HYDRA_TUNING.torrentLength,
+      arcDeg: 0,
+      halfWidth: HYDRA_TUNING.torrentHalfWidth,
+      color: TELEGRAPH_THREAT_COLORS.lethal,
+      accent: TEMPLE_ACCENTS.tide,
+    },
     [TEMPLE_TRIDENT_SWEEP]: {
       shape: 'cone',
       ...cone('drowned_templeguard'),
@@ -159,8 +216,14 @@ export interface TempleObjectSpec {
 export const TEMPLE_OBJECT_SPECS: Readonly<Record<string, TempleObjectSpec>> = {
   [BRINE_SPIT_TEMPLATE]: {
     color: TELEGRAPH_THREAT_COLORS.danger,
-    accent: TEMPLE_ACCENTS.tide,
+    accent: TEMPLE_ACCENTS.venom,
     fillSeconds: HYDRA_TUNING.spitWarn,
+  },
+  // The venom a Venom Spit leaves: a standing hazard, sickly green.
+  [VENOM_POOL_TEMPLATE]: {
+    color: 0x7fd64a,
+    accent: TEMPLE_ACCENTS.venom,
+    fillSeconds: 0,
   },
   [CHORUS_ECHO_TEMPLATE]: {
     color: TELEGRAPH_THREAT_COLORS.danger,

@@ -640,6 +640,8 @@ const mergeStringsEn = {
       temple_lightning_spit: 'Lightning Spit',
       temple_crushing_torrent: 'Crushing Torrent',
       temple_hydra_tsunami: 'Tsunami',
+      temple_ysolei_call: 'Moonspawn Call',
+      temple_ysolei_wrath: 'Drowned Wrath',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
