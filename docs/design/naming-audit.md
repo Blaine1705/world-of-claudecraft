@@ -721,6 +721,17 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
 | Draining Silk | her feeding's damage line | KEEP. No match. |
 
+### The sixth lifetime-XP rung: Timeless (web-verified 2026-09-30)
+
+Scope: `prog_timeless`, the 10,000,000 lifetime-XP deed and its title reward,
+both displayed as "Timeless". Method per the standing bar: quoted exact-phrase
+search for "Timeless" as a title or achievement across WoW, RuneScape, GW2 and
+FFXIV. The word only appears inside longer, unrelated names (WoW's "Timeless
+Champion" achievement for the Timeless Isle rares, FFXIV's "A Timeless Tale"
+achievement, whose title is something else); no game ships "Timeless" alone as
+a title. Verdict: GENERIC, plain English continuing the Eternal rung. "Immortal"
+and "Undying" were rejected first because WoW's Naxxramas titles use them.
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

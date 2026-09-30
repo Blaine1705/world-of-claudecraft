@@ -264,6 +264,29 @@ describe('trigger kinds grant once, with negatives', () => {
     expect(meta.deedsEarned.has('prog_veteran')).toBe(true);
   });
 
+  it('lifetimeXp: the Timeless rung grants at 10,000,000, not one below, and wears as a title', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.lifetimeXp = 9_999_999;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_eternal')).toBe(true);
+    expect(meta.deedsEarned.has('prog_timeless')).toBe(false);
+    sim.setActiveTitle('prog_timeless');
+    expect(sim.activeTitle).toBeNull();
+    meta.lifetimeXp = 10_000_000;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    const events = sim.tick();
+    expect(meta.deedsEarned.has('prog_timeless')).toBe(true);
+    expect(events.some((ev) => ev.type === 'deedUnlocked' && ev.deedId === 'prog_timeless')).toBe(
+      true,
+    );
+    // No legacy milestone id rides the grant (the mirror is frozen at five).
+    expect(meta.unlockedMilestones.has('timeless')).toBe(false);
+    sim.setActiveTitle('prog_timeless');
+    expect(sim.activeTitle).toBe('prog_timeless');
+  });
+
   it('gathering: a proficiency one below the threshold does not grant', () => {
     const sim = makeSim();
     const { meta } = primary(sim);

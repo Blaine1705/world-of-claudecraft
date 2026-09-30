@@ -3597,6 +3597,20 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  // The sixth lifetime-XP rung, appended at the END per the append-only
+  // contract rather than beside its five siblings. Unlike those five it has
+  // no legacy milestone id: MILESTONE_DEED_TO_LEGACY is a frozen one-release
+  // mirror of the retired milestone system, so this rung is a deed title only
+  // (picked from the Book of Deeds like every post-unification title).
+  prog_timeless: {
+    id: 'prog_timeless',
+    name: 'Timeless',
+    desc: 'Earn 10,000,000 lifetime experience.',
+    category: 'progression',
+    renown: 50,
+    trigger: { kind: 'lifetimeXp', amount: 10_000_000 },
+    reward: { kind: 'title', text: 'Timeless' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {
