@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c6074f7f379940411cafbe2538bdf159dfb2ef46df865b3b830e190a4d3e4e61",
+  "rendererFingerprint": "4d0c4dd6f0abea884d82fb1c9a231873728e8ae3fa677241074a06af4ec33dae",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5323525,
-      "sha256": "bcad6707c37601f7bb06b1ca5674108d6c270e520e3ff0746a816b7c63a17fa4",
+      "bytes": 5364135,
+      "sha256": "dd35aa3ce70937b78a1f89dae396bd4758c7550e5e2a725395919970f35c6ea5",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 301,
+  "portraitCount": 320,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -971,59 +971,34 @@
       "id": "choirmother_selthe",
       "family": "humanoid",
       "finderEncounter": true,
-      "visualKey": "mob_bandit",
+      "visualKey": "temple_selthe",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue_hooded.glb",
-          "path": "public/models/chars/players/rogue_hooded.glb",
-          "bytes": 448736,
-          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+          "url": "models/creatures/temple_selthe.glb",
+          "path": "public/models/creatures/temple_selthe.glb",
+          "bytes": 849512,
+          "sha256": "5f7d4fb4baa35f5874827f2791a42f571c9f31f5879088d4a74b6b7370ca071e"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 6.5,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          },
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6b3a32",
-        "resolved": "#6b3a32",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "e18c24b76768ea9ac8dba91c20c67bce99959ff1ac75973360a5a8260a75c16a",
       "output": {
         "path": "public/ui/mobs/choirmother_selthe.webp",
-        "bytes": 2208,
-        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
+        "bytes": 2872,
+        "sha256": "403398094739a61ceda1036a49c99ba66f490168ad82628c14628ce86c37ba32"
       }
     },
     {
@@ -2087,6 +2062,40 @@
       }
     },
     {
+      "id": "drowned_pilgrim",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "temple_pilgrim",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_pilgrim.glb",
+          "path": "public/models/creatures/temple_pilgrim.glb",
+          "bytes": 447452,
+          "sha256": "856c8d37e44d589faf13bc1c0cf6722d8f89acb2b870d0efbf69eff1f95fcd77"
+        },
+        "idle": "Idle",
+        "height": 4.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "719d55d78b3dfe7c298fea06086aa0883b4df8f15fc42894469a67fdf543c96a",
+      "output": {
+        "path": "public/ui/mobs/drowned_pilgrim.webp",
+        "bytes": 1744,
+        "sha256": "b3ec9a592c913ed4c8acb5dd717ffd05560363ab09b78fa9737ded0dda802ca6"
+      }
+    },
+    {
       "id": "drowned_sergeant",
       "family": "undead",
       "finderEncounter": false,
@@ -2124,34 +2133,34 @@
       "id": "drowned_templeguard",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_minion",
+      "visualKey": "temple_templeguard",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/temple_templeguard.glb",
+          "path": "public/models/creatures/temple_templeguard.glb",
+          "bytes": 799504,
+          "sha256": "5e4f4ce341c1e743b97ec10f5fb8d3becd30d247db404575673834ce2cc7fa88"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 4.6,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#88a7a0",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "02109bcdd7518c08bdaa953f3321a2edd8b33ad4b56ca8d35b843a2fa70fc9eb",
+      "sourceFingerprint": "5832104675b31a1d131ccb021d62681b999343cd9ef9950065038ed9b0cf6917",
       "output": {
         "path": "public/ui/mobs/drowned_templeguard.webp",
-        "bytes": 2750,
-        "sha256": "95745e47abda4abe2202b40f57981ef2f3dbe5c8880f2e768eac86d167639049"
+        "bytes": 2908,
+        "sha256": "847a72a9d17d03e6e08ba4b26ccc50c2a9078bd7c0d9eeedd0cbfc29bad947a9"
       }
     },
     {
@@ -3144,34 +3153,34 @@
       "id": "glimmerscale_lurker",
       "family": "spider",
       "finderEncounter": false,
-      "visualKey": "mob_spider",
+      "visualKey": "temple_lurker",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/spider.glb",
-          "path": "public/models/creatures/spider.glb",
-          "bytes": 130436,
-          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+          "url": "models/creatures/temple_lurker.glb",
+          "path": "public/models/creatures/temple_lurker.glb",
+          "bytes": 827508,
+          "sha256": "5a69999d8209ba2b1a787811f833019d9c70bb496fbcd58d9ccc46847a70c64b"
         },
-        "idle": "Spider_Idle",
-        "height": 1.4,
+        "idle": "Idle",
+        "height": 2.4,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#bfe1ec",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "b7c2ba68bb166ffcc6b2896b3176973f67b400fd46e1af8cdcd7c0baaa0064a3",
+      "sourceFingerprint": "bf514665e24962f6f3a4d12a227e3e95eae2f7e433139a4bf58650ef6c6099d8",
       "output": {
         "path": "public/ui/mobs/glimmerscale_lurker.webp",
-        "bytes": 1816,
-        "sha256": "293b1f651affe0c534108b395152b17f4eca690c3fd0732970b7d330abcde90f"
+        "bytes": 1918,
+        "sha256": "15c7155dd559067c01c2b856b3a8351b669b17dc35a9a8750590ab9835951020"
       }
     },
     {
@@ -5223,6 +5232,74 @@
       }
     },
     {
+      "id": "lagoon_eel",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "temple_eel",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_eel.glb",
+          "path": "public/models/creatures/temple_eel.glb",
+          "bytes": 973056,
+          "sha256": "9574760e4c87b4a8ec58d9725aa878635c1a919c4af2e1c452cb4e8e327f5584"
+        },
+        "idle": "Idle",
+        "height": 6.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "8ed2e4dce94c322c9fe3c4ad5a26e85d5ab96b81f238f62ec60619437cd8b5a3",
+      "output": {
+        "path": "public/ui/mobs/lagoon_eel.webp",
+        "bytes": 2242,
+        "sha256": "249c410c855dfe18fa17601211cafcf489405361be382a605de419deaa5264ba"
+      }
+    },
+    {
+      "id": "lagoon_snapper",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "temple_snapper",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_snapper.glb",
+          "path": "public/models/creatures/temple_snapper.glb",
+          "bytes": 470780,
+          "sha256": "c43f18a23b2c3f0826fd9d8b3dbcaeb7b47c5e9c5df85a888670613f9752d9bf"
+        },
+        "idle": "Idle",
+        "height": 3.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "99babc7d09318c354fa943d5264df8cac95a0ee42be01a69bb5c34326e58f4f0",
+      "output": {
+        "path": "public/ui/mobs/lagoon_snapper.webp",
+        "bytes": 1996,
+        "sha256": "d016f7bff5e0e9836665a7c2c800e263230d6cc1b5f53c3972c4f9fdf4ed91ed"
+      }
+    },
+    {
       "id": "lily_wisp",
       "family": "elemental",
       "finderEncounter": false,
@@ -5288,6 +5365,108 @@
         "path": "public/ui/mobs/marrowlord_varkas.webp",
         "bytes": 2344,
         "sha256": "d826a49e75f7535da13a8f74ec57050b68f1dd2d28cf5af6ff43e48837df5a2b"
+      }
+    },
+    {
+      "id": "mere_hydra_head_center",
+      "family": "dragonkin",
+      "finderEncounter": false,
+      "visualKey": "temple_hydra_head",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mere_hydra.glb",
+          "path": "public/models/creatures/mere_hydra.glb",
+          "bytes": 611092,
+          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+        },
+        "idle": "Idle",
+        "height": 14,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "path": "public/ui/mobs/mere_hydra_head_center.webp",
+        "bytes": 3546,
+        "sha256": "c7cb8ef4645fd948fd87219d6061f874353e9292bd6611f2c8f2a83fef4d3701"
+      }
+    },
+    {
+      "id": "mere_hydra_head_left",
+      "family": "dragonkin",
+      "finderEncounter": false,
+      "visualKey": "temple_hydra_head",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mere_hydra.glb",
+          "path": "public/models/creatures/mere_hydra.glb",
+          "bytes": 611092,
+          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+        },
+        "idle": "Idle",
+        "height": 14,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "path": "public/ui/mobs/mere_hydra_head_left.webp",
+        "bytes": 3546,
+        "sha256": "c7cb8ef4645fd948fd87219d6061f874353e9292bd6611f2c8f2a83fef4d3701"
+      }
+    },
+    {
+      "id": "mere_hydra_head_right",
+      "family": "dragonkin",
+      "finderEncounter": false,
+      "visualKey": "temple_hydra_head",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mere_hydra.glb",
+          "path": "public/models/creatures/mere_hydra.glb",
+          "bytes": 611092,
+          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+        },
+        "idle": "Idle",
+        "height": 14,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "path": "public/ui/mobs/mere_hydra_head_right.webp",
+        "bytes": 3546,
+        "sha256": "c7cb8ef4645fd948fd87219d6061f874353e9292bd6611f2c8f2a83fef4d3701"
       }
     },
     {
@@ -5736,6 +5915,40 @@
         "path": "public/ui/mobs/moonfleece_grazer.webp",
         "bytes": 1486,
         "sha256": "96253fc7cd8100063e27b37d651d58cd218b6c1d566be5eb2b2fa8c2bdd8495e"
+      }
+    },
+    {
+      "id": "moonlit_siren",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "temple_siren",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_siren.glb",
+          "path": "public/models/creatures/temple_siren.glb",
+          "bytes": 722128,
+          "sha256": "68d474a1aadd56d19c70d9fb628bf1c2fd5a8ce672ebd17b0e5b9188578c13f4"
+        },
+        "idle": "Idle",
+        "height": 5.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "b55d703ae99104574cf48d6abcff38d4a0989e77cabcc706cf3dfaafd4662304",
+      "output": {
+        "path": "public/ui/mobs/moonlit_siren.webp",
+        "bytes": 1934,
+        "sha256": "219efe0839bfdde680a229ab4a0adaffb3bcd380f3865a0f9bb6b55c71784577"
       }
     },
     {
@@ -6580,59 +6793,34 @@
       "id": "pale_choir_acolyte",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "mob_bandit",
+      "visualKey": "temple_acolyte",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue_hooded.glb",
-          "path": "public/models/chars/players/rogue_hooded.glb",
-          "bytes": 448736,
-          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+          "url": "models/creatures/temple_acolyte.glb",
+          "path": "public/models/creatures/temple_acolyte.glb",
+          "bytes": 358624,
+          "sha256": "287364c21609607e2b1fcb5c54f49caa8f9ce80ed107c179e45f7fce14fb1a7d"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 4.4,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          },
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6b3a32",
-        "resolved": "#6b3a32",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "ba720387e6448a6b7dc63c1bdaf13ee682522ec954a15dd5f2fae0d42b61c701",
       "output": {
         "path": "public/ui/mobs/pale_choir_acolyte.webp",
-        "bytes": 2208,
-        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
+        "bytes": 2570,
+        "sha256": "0f713e3d403750e07eb4261e76677f8b599b2746e3e673ad0f0efb39ae19af9a"
       }
     },
     {
@@ -6673,34 +6861,34 @@
       "id": "pearlguard_sentinel",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "temple_sentinel",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/temple_sentinel.glb",
+          "path": "public/models/creatures/temple_sentinel.glb",
+          "bytes": 529684,
+          "sha256": "d6eb0fe084d4712b1978180967c40c4a717852b4462a405e264eeb4d7b608ffa"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
+        "idle": "Idle",
+        "height": 5.6,
         "yaw": null,
-        "hover": 0.3,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9fc6e0",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "58c764cae0ffca67adf03aaa21454e6538d4847dea0bb74c846f3099b3e68529",
+      "sourceFingerprint": "1c39f05e08cde62d597def30ee3184ccd35dbf45f5d4e7f4040ae943d94f26b8",
       "output": {
         "path": "public/ui/mobs/pearlguard_sentinel.webp",
-        "bytes": 2018,
-        "sha256": "c24bc32d98d32d563df0a32861640067de9dea7ae084eb6abda81101792c7875"
+        "bytes": 2804,
+        "sha256": "0bd88f6b3679516f031fc85a7375e180649adcca22e8f31cc57c742d4e28d8f6"
       }
     },
     {
@@ -9472,6 +9660,664 @@
       }
     },
     {
+      "id": "tideglass_colossus",
+      "family": "elemental",
+      "finderEncounter": true,
+      "visualKey": "temple_colossus",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_colossus.glb",
+          "path": "public/models/creatures/temple_colossus.glb",
+          "bytes": 1361276,
+          "sha256": "ecaef345b5c5a7e68939d629c953898e4ca6c39a6aa64a8dba8eddd9016be312"
+        },
+        "idle": "Idle",
+        "height": 15,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "819381718da0eec466caacd13d13eb2718f442be6db2bd2c9615ade5bb100084",
+      "output": {
+        "path": "public/ui/mobs/tideglass_colossus.webp",
+        "bytes": 3374,
+        "sha256": "2a58136b7588a6886c64d2e3c3f46f2845dbb3c0fac8e43a56fc204582ddaca3"
+      }
+    },
+    {
+      "id": "tideglass_reflection",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_warrior",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/knight.glb",
+          "path": "public/models/chars/players/knight.glb",
+          "bytes": 462916,
+          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Knight_Helmet",
+          "Knight_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/sword_1handed.glb",
+              "path": "public/models/weapons/sword_1handed.glb",
+              "bytes": 30608,
+              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "969663f3bb4c2124c9bccb8eaa00d8a37d508dab142088c0cadadc12f832358f",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection.webp",
+        "bytes": 2200,
+        "sha256": "52f8541186479b3e8b66237c49c59eb771834bb02418146c747d6c9f96e7b315"
+      }
+    },
+    {
+      "id": "tideglass_reflection_druid",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_druid",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/druid.glb",
+          "path": "public/models/chars/players/druid.glb",
+          "bytes": 463692,
+          "sha256": "b1156d55834d003001da5e874fbfa0eef7079442ee2125afe16f4598aeba833d"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "d6798a66a993c1bc4db45c37c4761206627fba1567a532910ea24b4589ddb360",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_druid.webp",
+        "bytes": 2354,
+        "sha256": "18bd740608e38784930af0e95d19b50d424a70b0d0391c019aa45761aa5d09cf"
+      }
+    },
+    {
+      "id": "tideglass_reflection_hunter",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_hunter",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/ranger.glb",
+          "path": "public/models/chars/players/ranger.glb",
+          "bytes": 465964,
+          "sha256": "6a9aeb0d717d66f4ddd66335afedac964a66b31c382f96b1324c84373cd851d0"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/crossbow_1handed.glb",
+              "path": "public/models/weapons/crossbow_1handed.glb",
+              "bytes": 40584,
+              "sha256": "1d1eb744880ed7b4c8222cde587c94c203ea7d56ee87c7a058be1eb85094066f"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "dfe0d5c35cb7949822090e522b55c62ec64467eb613afb1249f3e93b87371585",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_hunter.webp",
+        "bytes": 2928,
+        "sha256": "228a122373bc28993ca135decd67119249b2de82d91e1013af842f7424b3a7a7"
+      }
+    },
+    {
+      "id": "tideglass_reflection_mage",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_mage",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/mage.glb",
+          "path": "public/models/chars/players/mage.glb",
+          "bytes": 441576,
+          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Mage_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "d61433b873863f29e735c25a4b5cded6fa461e48553ef29346d2579265760bc6",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_mage.webp",
+        "bytes": 2244,
+        "sha256": "1dd242419be2a63125e7f08d1e652face9393f80b3dbee46f4c0b3bbe03110ba"
+      }
+    },
+    {
+      "id": "tideglass_reflection_paladin",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_paladin",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/paladin.glb",
+          "path": "public/models/chars/players/paladin.glb",
+          "bytes": 448820,
+          "sha256": "6481234c2f3c95087a6fbcd81b4308986142ded6e02cf42036801355f0bdfa4c"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/axe_1handed.glb",
+              "path": "public/models/weapons/axe_1handed.glb",
+              "bytes": 32372,
+              "sha256": "4dc41dbbdcc1b0fe604f9095fdc8fd61a61ec22dd2bcad346f496e3dc50d1852"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_square.glb",
+              "path": "public/models/weapons/shield_square.glb",
+              "bytes": 29960,
+              "sha256": "72b44c7882482f161b6aee28605ad2714d49b6b8f2e40763feae9e42eaa4c15b"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "b4a2c82b992a6ba90b098fd2ef719135a340ea6fe916f66449db0ed9f9e6a22d",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_paladin.webp",
+        "bytes": 2672,
+        "sha256": "3c31fe258f93280a6f8e798fc5893039d25e14496b02e660805304d6171c0153"
+      }
+    },
+    {
+      "id": "tideglass_reflection_priest",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_priest",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/mage.glb",
+          "path": "public/models/chars/players/mage.glb",
+          "bytes": 441576,
+          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "433fa9ebda297d34179b9ce54b0500faaa987f3fed9b7de4672d425e2002a980",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_priest.webp",
+        "bytes": 2244,
+        "sha256": "1dd242419be2a63125e7f08d1e652face9393f80b3dbee46f4c0b3bbe03110ba"
+      }
+    },
+    {
+      "id": "tideglass_reflection_rogue",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_rogue",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue.glb",
+          "path": "public/models/chars/players/rogue.glb",
+          "bytes": 477976,
+          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Rogue_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "8b9d28c4020713362ea155b093b303ffba06ebd70cfd10ce36e4baeddbc30bc4",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_rogue.webp",
+        "bytes": 2390,
+        "sha256": "5a20ef0654c45627eccce538474c8058ad223dd83c2f75ef56beade93d46c844"
+      }
+    },
+    {
+      "id": "tideglass_reflection_shaman",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_shaman",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/barbarian.glb",
+          "path": "public/models/chars/players/barbarian.glb",
+          "bytes": 444244,
+          "sha256": "2fb8d32c29d2b5c4b9b4b54ec502c3778f3d4d0da0e55cd1d4ed2b7c1e8d0abb"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Barbarian_BearHat"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/axe_1handed.glb",
+              "path": "public/models/weapons/axe_1handed.glb",
+              "bytes": 32372,
+              "sha256": "4dc41dbbdcc1b0fe604f9095fdc8fd61a61ec22dd2bcad346f496e3dc50d1852"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "cef44695e9d92ca17b89397a6b2ad16d5200971233dfc28bdbf014fce3468a18",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_shaman.webp",
+        "bytes": 2772,
+        "sha256": "e250bb37298ac18158d2032db1bce2eb5699499ffd2cf83079b456da30f64a48"
+      }
+    },
+    {
+      "id": "tideglass_reflection_warlock",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_warlock",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/mage.glb",
+          "path": "public/models/chars/players/mage.glb",
+          "bytes": 441576,
+          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/wand.glb",
+              "path": "public/models/weapons/wand.glb",
+              "bytes": 32520,
+              "sha256": "aecd32413de89cdd1375e9c83124af6b446fb28d58d7326b62ee342157610239"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": "Spellbook_open"
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "8f1c6d522bc207a19a0f1264d46c762fba4a03d667337417a975d71fbc620ccd",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_warlock.webp",
+        "bytes": 2498,
+        "sha256": "3bdbf45e49d2fb06a5049a0d23caf71298d4ed2aa080f4d32c3873065c9561e1"
+      }
+    },
+    {
+      "id": "tideglass_reflection_warrior",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_warrior",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/knight.glb",
+          "path": "public/models/chars/players/knight.glb",
+          "bytes": 462916,
+          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Knight_Helmet",
+          "Knight_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/sword_1handed.glb",
+              "path": "public/models/weapons/sword_1handed.glb",
+              "bytes": 30608,
+              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.72
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#cfe2ff",
+        "resolved": "#cfe2ff",
+        "strength": 0.72
+      },
+      "sourceFingerprint": "969663f3bb4c2124c9bccb8eaa00d8a37d508dab142088c0cadadc12f832358f",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_warrior.webp",
+        "bytes": 2200,
+        "sha256": "52f8541186479b3e8b66237c49c59eb771834bb02418146c747d6c9f96e7b315"
+      }
+    },
+    {
+      "id": "tidewisp",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_tidewisp",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/glimmerwisp.glb",
+          "path": "public/models/creatures/glimmerwisp.glb",
+          "bytes": 162784,
+          "sha256": "25010f4fcd2a0aba2a7ea3f01ceba83d7fb8731a2c9e7d292db8d1f211e6f1ef"
+        },
+        "idle": "Flying_Idle",
+        "height": 1.8,
+        "yaw": -1.5707963267948966,
+        "hover": 0.5,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.6
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#6fe3e0",
+        "resolved": "#6fe3e0",
+        "strength": 0.6
+      },
+      "sourceFingerprint": "0ee22e4be59f21c4dcfd5d18cb99e98825eef7d6805090754fb656f8b3cfe3a0",
+      "output": {
+        "path": "public/ui/mobs/tidewisp.webp",
+        "bytes": 1912,
+        "sha256": "60ebc7b709bf2d46dc83855ba2ffbf0b6cde4796a77af0381161d40f80c35750"
+      }
+    },
+    {
       "id": "tolling_bell",
       "family": "undead",
       "finderEncounter": false,
@@ -11076,34 +11922,34 @@
       "id": "ysolei",
       "family": "dragonkin",
       "finderEncounter": true,
-      "visualKey": "mob_dragonkin",
+      "visualKey": "temple_ysolei",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/dragonevolved.glb",
-          "path": "public/models/creatures/dragonevolved.glb",
-          "bytes": 138560,
-          "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
+          "url": "models/creatures/temple_ysolei.glb",
+          "path": "public/models/creatures/temple_ysolei.glb",
+          "bytes": 891960,
+          "sha256": "fedd953d08971387bfab1ce271e6d847c7cb28e909ccc32ccb17fee4e2dfebaf"
         },
-        "idle": "Flying_Idle",
-        "height": 2.4,
+        "idle": "Idle",
+        "height": 10,
         "yaw": null,
-        "hover": 0.25,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#bcd2ec",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "99b644f9469b359d52af3c5dd112aeae0ea378b00c0d019776e203bd62ce9e25",
+      "sourceFingerprint": "0036d2cc95bdb34e05185a3ab5f2d7c5412f15acf5147c8349e35de03ce63b46",
       "output": {
         "path": "public/ui/mobs/ysolei.webp",
-        "bytes": 2124,
-        "sha256": "04b0c598c74fe93dc06325d51c74e4a9459d6a6fbe95b65372b2a6e42c21493e"
+        "bytes": 2866,
+        "sha256": "19b5cf8942c2354e4e373294a33d5de1e7f6fc4deab80e049904dfafa81f56fa"
       }
     },
     {

@@ -127,6 +127,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "es_ES": [
@@ -247,6 +251,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "fr_FR": [
@@ -367,6 +375,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "fr_CA": [
@@ -487,6 +499,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "en_CA": [],
@@ -608,6 +624,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "de_DE": [
@@ -728,6 +748,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "zh_CN": [],
@@ -852,6 +876,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "ru_RU": [],
@@ -973,6 +1001,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "nl_NL": [
@@ -1093,6 +1125,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "pl_PL": [
@@ -1213,6 +1249,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "id_ID": [
@@ -1333,6 +1373,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "tr_TR": [
@@ -1453,6 +1497,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "sv_SE": [
@@ -1573,6 +1621,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "vi_VN": [
@@ -1693,6 +1745,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ],
   "da_DK": [
@@ -1813,6 +1869,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.vael_fog_shade.name",
     "hudChrome.auraEffect.trinket.shackle",
     "hudChrome.auraEffect.trinket.shackleSlow",
+    "hudChrome.finder.mech.chorus_and_solo",
+    "hudChrome.finder.mech.rising_tide",
+    "hudChrome.finder.mech.tideglass_reflections",
+    "hudChrome.finder.mech.undertow",
     "hudChrome.trinkets.use.shackle"
   ]
 };

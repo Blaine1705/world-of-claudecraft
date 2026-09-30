@@ -13092,6 +13092,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mist_surge': 'Волна тумана (периодический урон по области)',
   'hudChrome.finder.mech.summons_adds': 'Призывает подкрепления',
   'hudChrome.finder.mech.lunar_tide': 'Лунный прилив (периодический урон по области)',
+  'hudChrome.finder.mech.chorus_and_solo': 'Хор и соло (соберитесь у одной метки, разойдитесь от другой)',
+  'hudChrome.finder.mech.tideglass_reflections': 'Отражения Приливного стекла (убивайте отражения друг друга)',
+  'hudChrome.finder.mech.rising_tide': 'Прилив (затапливает половину острова, переходите на сухую сторону)',
+  'hudChrome.finder.mech.undertow': 'Отбойное течение (притягивает всех, убегайте до удара)',
   'hudChrome.finder.mech.enrage': 'Приходит в ярость при низком здоровье',
   'hudChrome.finder.mech.shuddering_stomp': 'Сотрясающий топот (оглушение по области)',
   'hudChrome.finder.mech.grave_inferno':

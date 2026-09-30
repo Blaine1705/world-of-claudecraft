@@ -125,8 +125,14 @@ const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [
 ];
 
 const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'choirmother_selthe', mechanics: [] },
-  { mobId: 'ysolei', final: true, mechanics: ['lunar_tide', 'summons_adds', 'enrage'] },
+  // The rework's route (drowned_temple.md): the choir, the prism, the altar.
+  { mobId: 'choirmother_selthe', mechanics: ['chorus_and_solo'] },
+  { mobId: 'tideglass_colossus', mechanics: ['tideglass_reflections'] },
+  {
+    mobId: 'ysolei',
+    final: true,
+    mechanics: ['rising_tide', 'undertow', 'lunar_tide', 'summons_adds', 'enrage'],
+  },
 ];
 
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
