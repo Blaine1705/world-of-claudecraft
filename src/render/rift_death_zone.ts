@@ -36,6 +36,7 @@ import { HoardOrbitalLightning } from './hoard_orbital_lightning';
 import { HoardPulsarFx } from './hoard_pulsars';
 import { HoardSpellFx } from './hoard_spell_fx';
 import { HoardTentaclesFx } from './hoard_tentacles';
+import { CryptCreatureFx } from './hollow_crypt/crypt_creature_fx';
 import { CryptTrashFx } from './hollow_crypt/crypt_trash_fx';
 import {
   deathZonePlan,
@@ -94,6 +95,7 @@ export class RiftDeathZoneVisuals {
   private readonly hoardMimicCoins: HoardMimicCoinsFx;
   // Dungeon trash telegraphs (the Hollow Crypt's cleaves, breaths, rings, bursts).
   private readonly cryptTrash: CryptTrashFx;
+  private readonly cryptCreatures: CryptCreatureFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -139,6 +141,14 @@ export class RiftDeathZoneVisuals {
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
     this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
+    this.cryptCreatures = new CryptCreatureFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+    );
     this.hoardGoblinCoins = new HoardGoblinCoinsFx(
       scene,
       groundY,
@@ -210,6 +220,7 @@ export class RiftDeathZoneVisuals {
     this.hoardGoblinCoins.update(dt);
     this.hoardMimicCoins.update(dt);
     this.cryptTrash.update(dt);
+    this.cryptCreatures.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -241,12 +252,14 @@ export class RiftDeathZoneVisuals {
     this.hoardGoblinCoins.dispose();
     this.hoardMimicCoins.dispose();
     this.cryptTrash.dispose();
+    this.cryptCreatures.dispose();
     this.hoardPresentation.dispose();
   }
 
   handleEvent(event: SimEvent): void {
     this.hoardPresentation.handleEvent(event);
     this.cryptTrash.handleEvent(event);
+    this.cryptCreatures.handleEvent(event);
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {
