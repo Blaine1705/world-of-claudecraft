@@ -286,6 +286,8 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       gaoler_ossick: 6.84,
       vael_the_mistcaller: 8.05,
       turretback_hermit: 3.66,
+      // The gaol's miniboss: 50 s (about 3,600) on the Hermit's template pool.
+      gaol_turnkey: 2.93,
     },
     // The crawler and the prisoner carry a heroic-priced base swing (see
     // their templates); normal damps it back to the fodder line.
@@ -448,6 +450,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       gaoler_ossick: 12.75,
       vael_the_mistcaller: 15.7,
       turretback_hermit: 7.3,
+      gaol_turnkey: 5.84,
     },
     // The light trash (the warhound, the ranged arbalest and the ward-casting
     // mistweaver) carry softer templates; lift them to the 500 heroic floor.
@@ -468,6 +471,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       knight_commander_olen: 6,
       gaoler_ossick: 6,
       vael_the_mistcaller: 6,
+      gaol_turnkey: 6,
     },
     armorMultiplier: 1.3,
     finalBossId: 'vael_the_mistcaller',

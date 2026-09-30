@@ -133,8 +133,9 @@ describe('Bastion trash: the cast table', () => {
       SUNKEN_BASTION_SPAWNS.filter((s) => s.packId === id)
         .map((s) => s.mobId)
         .sort();
+    expect(packOf('turnkey')).toEqual(['gaol_turnkey']);
+    expect(packOf('gd')).toEqual(['bastion_warhound', 'bastion_warhound', 'drowned_watchman']);
     expect(packOf('g1')).toEqual([
-      'gaol_turnkey',
       'shackled_prisoner',
       'shackled_prisoner',
       'shackled_prisoner',

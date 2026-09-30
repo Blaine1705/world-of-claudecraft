@@ -118,10 +118,16 @@ const HOLLOW_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
 ];
 
 const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [
-  // The rework's route (sunken_bastion.md): the bastion, the gaol, the crown.
+  // The rework's route (sunken_bastion.md): the bastion, the gaol (its
+  // Turnkey miniboss, then Ossick), the crown.
   { mobId: 'knight_commander_olen', mechanics: ['reaping_arc'] },
-  { mobId: 'gaoler_ossick', mechanics: ['summons_adds'] },
-  { mobId: 'vael_the_mistcaller', final: true, mechanics: ['mist_surge', 'summons_adds'] },
+  { mobId: 'gaol_turnkey', mechanics: ['iron_cage', 'summons_adds'] },
+  { mobId: 'gaoler_ossick', mechanics: ['drowned_anchor', 'shackle_pair', 'summons_adds'] },
+  {
+    mobId: 'vael_the_mistcaller',
+    final: true,
+    mechanics: ['reaper_behind', 'mist_surge', 'summons_adds'],
+  },
 ];
 
 const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [

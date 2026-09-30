@@ -1,5 +1,17 @@
 // Vael the Fogbinder on the Beacon Crown (docs/design/dungeon-rework/
-// sunken_bastion.md, "Boss 3"): find the real Vael among his fog shades.
+// sunken_bastion.md, "Boss 3"): Death itself, a hooded reaper with a great
+// scythe. Find the real Vael among his shadow copies, and never stand in
+// front of the player he rises behind.
+//
+//   Shadowstep      every 16 s (first at 10 s) he sinks into the shadows
+//                   (0.8 s, untouchable), a shadow pool opens 2.5 yd behind
+//                   one non-tank player and he waits under it for 1.6 s, then
+//                   rises out of it (0.6 s bar) and sweeps the scythe forward
+//                   through the player's back: 80 to 95 shadow to everyone in
+//                   a 150 degree, 8 yd arc along the pool's facing. Step out
+//                   of the arc (forward, or to either side) before he rises.
+//   Heroic extra    Grave Shadow: the pool lingers 6 s after the sweep and
+//                   burns anyone within 3 yd of it for 18 shadow a second.
 //
 //   Mist Surge      every 12 s (first at 6 s) a 1.5 s bar, then 30 to 40 frost to
 //                   everyone within 12 yd (every 8 s under a quarter: Last Hymn).
@@ -25,18 +37,38 @@ import { kitHash } from '../../mob/trash_kit/targets';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, dist2d, type Entity, type VaelFightState } from '../../types';
-import { claimObjectAt, claimPlayers, grantClaimDeed, localOf, mechanicDamage } from './claim';
+import {
+  claimObjectAt,
+  claimPlayers,
+  clearCastIf,
+  dropAuraById,
+  dropEncounterObject,
+  grantClaimDeed,
+  localOf,
+  mechanicDamage,
+  pickMarkTargets,
+  spawnEncounterObject,
+  startBar,
+} from './claim';
 import {
   BEACON,
   BEACON_LAMP_TEMPLATE,
   CROWN,
   DROWNED_THRALL_ID,
   FOG_SHADE_ID,
+  GRAVE_SHADOW_TEMPLATE,
+  inReapingSweep,
+  REAPER_POOL_TEMPLATE,
+  reaperPoolSpot,
   VAEL_DROWNING_HYMN,
   VAEL_EXPOSED,
   VAEL_FOG_VEIL,
   VAEL_FOGBURST,
   VAEL_MIST_SURGE,
+  VAEL_REAP_MARK,
+  VAEL_REAPING_SCYTHE,
+  VAEL_SHADOWED,
+  VAEL_SHADOWSTEP,
   VAEL_STAGGER,
   VAEL_TUNING,
   veilBeamYaw,
@@ -47,7 +79,17 @@ const T = VAEL_TUNING;
 export const VAEL_DEED = 'dgn_vael_beacon';
 
 function freshState(): VaelFightState {
-  return { kind: 'vael', surgeTimer: T.surgeFirst, veils: 0, veil: null, burst: false };
+  return {
+    kind: 'vael',
+    surgeTimer: T.surgeFirst,
+    veils: 0,
+    veil: null,
+    burst: false,
+    reapTimer: T.reapFirst,
+    reaps: 0,
+    reap: null,
+    graves: [],
+  };
 }
 
 function clearCastOf(e: Entity, castId: string): void {
@@ -346,6 +388,259 @@ function stepVeil(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFig
   if (veil.elapsed >= T.hymnSeconds) endVeil(ctx, boss, st);
 }
 
+// ---- the Shadowstep --------------------------------------------------------------------
+
+/** Pin Vael where the reap holds him (the mob AI already moved him this tick). */
+function pinAt(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  x: number,
+  z: number,
+  yaw: number,
+): void {
+  const o = ctx.instanceOriginOf(inst);
+  const g = ctx.groundPos(o.x + x, o.z + z);
+  boss.pos.x = g.x;
+  boss.pos.y = g.y;
+  boss.pos.z = g.z;
+  boss.facing = yaw;
+  boss.swingTimer = Math.max(boss.swingTimer, 1);
+  ctx.grid.update(boss);
+}
+
+/** Keep a pool spot on the crown: inside the rim, clear of the lighthouse. */
+function onCrown(x: number, z: number): { x: number; z: number } {
+  let dx = x - CROWN.x;
+  let dz = z - CROWN.z;
+  let d = Math.hypot(dx, dz);
+  const outer = CROWN.r - 2.5;
+  const inner = BEACON.r + 1.5;
+  if (d < 1e-6) {
+    dx = 0;
+    dz = 1;
+    d = 1;
+  }
+  const r = Math.min(outer, Math.max(inner, d));
+  return { x: CROWN.x + (dx / d) * r, z: CROWN.z + (dz / d) * r };
+}
+
+/** Vael sinks into the shadows: the Shadowstep bar starts (dev + cadence). */
+export function startShadowstep(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  st: VaelFightState,
+): boolean {
+  if (st.veil || st.reap) return false;
+  const mark = pickMarkTargets(boss, claimPlayers(ctx, inst), 1, st.reaps + 211)[0];
+  if (!mark) return false;
+  clearCastOf(boss, VAEL_MIST_SURGE);
+  st.reaps++;
+  st.reapTimer = T.reapEvery;
+  const at = localOf(ctx, inst, boss);
+  st.reap = {
+    phase: 'vanish',
+    elapsed: 0,
+    markId: mark.id,
+    poolId: -1,
+    x: at.x,
+    z: at.z,
+    yaw: boss.facing,
+    fromX: at.x,
+    fromZ: at.z,
+  };
+  startBar(boss, VAEL_SHADOWSTEP, T.vanishSeconds + T.poolSeconds, mark.id);
+  ctx.applyAura(boss, {
+    id: VAEL_SHADOWED,
+    name: 'Shadow Crossing',
+    kind: 'buff_dr',
+    remaining: T.vanishSeconds + T.poolSeconds,
+    duration: T.vanishSeconds + T.poolSeconds,
+    value: 0,
+    sourceId: boss.id,
+    school: 'shadow',
+  });
+  boss.damageImmune = true;
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: boss.id,
+    targetId: boss.id,
+    school: 'shadow',
+    fx: 'nova',
+    ability: VAEL_SHADOWSTEP,
+  });
+  return true;
+}
+
+/** The pool opens behind the mark (or behind whoever still stands). */
+function openPool(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFightState): boolean {
+  const reap = st.reap;
+  if (!reap) return false;
+  let mark = ctx.entities.get(reap.markId);
+  if (!mark || mark.dead || mark.ghost) {
+    mark = pickMarkTargets(boss, claimPlayers(ctx, inst), 1, st.reaps + 223)[0];
+    if (!mark) return false;
+    reap.markId = mark.id;
+  }
+  const at = localOf(ctx, inst, mark);
+  const spot = reaperPoolSpot(at.x, at.z, mark.facing);
+  const safe = onCrown(spot.x, spot.z);
+  const yaw = Math.atan2(at.x - safe.x, at.z - safe.z);
+  reap.x = safe.x;
+  reap.z = safe.z;
+  reap.yaw = yaw;
+  const pool = spawnEncounterObject(
+    ctx,
+    inst,
+    REAPER_POOL_TEMPLATE,
+    'Shadow Pool',
+    safe.x,
+    safe.z,
+    yaw,
+    1,
+  );
+  reap.poolId = pool.id;
+  ctx.applyAura(mark, {
+    id: VAEL_REAP_MARK,
+    name: 'Marked by Death',
+    // A mark, not a slow: the value leaves the runner at full speed.
+    kind: 'slow',
+    remaining: T.poolSeconds + T.riseSeconds,
+    duration: T.poolSeconds + T.riseSeconds,
+    value: 1,
+    sourceId: boss.id,
+    school: 'shadow',
+    undispellable: true,
+  });
+  // He crosses under the floor: his body waits beneath the pool.
+  pinAt(ctx, inst, boss, safe.x, safe.z, yaw);
+  boss.prevPos = { ...boss.pos };
+  boss.prevFacing = boss.facing;
+  boss.castTargetId = mark.id;
+  return true;
+}
+
+/** The scythe comes round: everyone in the arc is struck. */
+function sweep(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFightState): void {
+  const reap = st.reap;
+  if (!reap) return;
+  const o = ctx.instanceOriginOf(inst);
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: boss.id,
+    targetId: reap.markId,
+    school: 'shadow',
+    fx: 'flourish',
+    ability: VAEL_REAPING_SCYTHE,
+  });
+  for (const p of claimPlayers(ctx, inst)) {
+    if (!inReapingSweep(reap.x, reap.z, reap.yaw, p.pos.x - o.x, p.pos.z - o.z)) continue;
+    ctx.dealDamage(
+      boss,
+      p,
+      mechanicDamage(ctx, boss, T.sweepMin, T.sweepMax),
+      false,
+      'shadow',
+      'Reaping Scythe',
+      'hit',
+      true,
+    );
+  }
+}
+
+/** Close the Shadowstep: the pool dries (or, heroic, burns on), marks lift. */
+function endReap(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  st: VaelFightState,
+  keepGrave = false,
+): void {
+  const reap = st.reap;
+  if (!reap) return;
+  st.reap = null;
+  const mark = ctx.entities.get(reap.markId);
+  if (mark) dropAuraById(mark, VAEL_REAP_MARK);
+  dropAuraById(boss, VAEL_SHADOWED);
+  boss.damageImmune = false;
+  clearCastIf(boss, VAEL_SHADOWSTEP, VAEL_REAPING_SCYTHE);
+  if (reap.poolId < 0) return;
+  const pool = ctx.entities.get(reap.poolId);
+  if (keepGrave && pool) {
+    pool.templateId = GRAVE_SHADOW_TEMPLATE;
+    pool.name = 'Grave Shadow';
+    st.graves.push({ objectId: pool.id, remaining: T.graveSeconds, tick: 1 });
+    return;
+  }
+  dropEncounterObject(ctx, inst, reap.poolId);
+}
+
+function stepReap(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFightState): void {
+  const reap = st.reap;
+  if (!reap) return;
+  reap.elapsed += DT;
+  if (reap.phase === 'vanish') {
+    pinAt(ctx, inst, boss, reap.fromX, reap.fromZ, reap.yaw);
+    if (reap.elapsed < T.vanishSeconds) return;
+    if (!openPool(ctx, inst, boss, st)) {
+      endReap(ctx, inst, boss, st);
+      return;
+    }
+    reap.phase = 'pool';
+    return;
+  }
+  pinAt(ctx, inst, boss, reap.x, reap.z, reap.yaw);
+  if (reap.phase === 'pool') {
+    if (reap.elapsed < T.vanishSeconds + T.poolSeconds) return;
+    // He rises: touchable again, the scythe drawn back for the sweep.
+    reap.phase = 'rise';
+    dropAuraById(boss, VAEL_SHADOWED);
+    boss.damageImmune = false;
+    startBar(boss, VAEL_REAPING_SCYTHE, T.riseSeconds, reap.markId);
+    return;
+  }
+  boss.castRemaining = Math.max(0, T.vanishSeconds + T.poolSeconds + T.riseSeconds - reap.elapsed);
+  if (reap.elapsed < T.vanishSeconds + T.poolSeconds + T.riseSeconds) return;
+  sweep(ctx, inst, boss, st);
+  endReap(ctx, inst, boss, st, inst.difficulty === 'heroic');
+}
+
+/** Heroic Grave Shadows burn on round their pools, then dry. */
+function stepGraves(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFightState): void {
+  if (st.graves.length === 0) return;
+  for (const g of [...st.graves]) {
+    g.remaining -= DT;
+    const pool = ctx.entities.get(g.objectId);
+    if (!pool || g.remaining <= 0) {
+      dropEncounterObject(ctx, inst, g.objectId);
+      st.graves = st.graves.filter((x) => x !== g);
+      continue;
+    }
+    g.tick -= DT;
+    if (g.tick > 0) continue;
+    g.tick += 1;
+    for (const p of claimPlayers(ctx, inst)) {
+      if (dist2d(p.pos, pool.pos) > T.graveRadius) continue;
+      ctx.dealDamage(
+        boss,
+        p,
+        Math.max(1, Math.round(T.gravePerSecond * (boss.mechanicDamageMult ?? 1))),
+        false,
+        'shadow',
+        'Grave Shadow',
+        'hit',
+        true,
+      );
+    }
+  }
+}
+
+function clearGraves(ctx: SimContext, inst: InstanceSlot, st: VaelFightState): void {
+  for (const g of st.graves) dropEncounterObject(ctx, inst, g.objectId);
+  st.graves = [];
+}
+
 function stepSurge(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFightState): void {
   if (boss.castingAbility === VAEL_MIST_SURGE) {
     boss.swingTimer = Math.max(boss.swingTimer, 0.6);
@@ -394,6 +689,8 @@ export function resetVael(ctx: SimContext, inst: InstanceSlot, boss: Entity): vo
     const home = st.veil?.home;
     endVeil(ctx, boss, st);
     if (home && !boss.dead) place(ctx, inst, boss, home.x, home.z);
+    endReap(ctx, inst, boss, st);
+    clearGraves(ctx, inst, st);
   }
   clearCastOf(boss, VAEL_MIST_SURGE);
   boss.bastionFight = undefined;
@@ -411,6 +708,8 @@ export function tickVael(
     if (st) {
       if (!st.burst) grantClaimDeed(ctx, inst, VAEL_DEED);
       endVeil(ctx, boss, st);
+      endReap(ctx, inst, boss, st);
+      clearGraves(ctx, inst, st);
       boss.bastionFight = undefined;
     }
     return;
@@ -423,14 +722,23 @@ export function tickVael(
     st = freshState();
     boss.bastionFight = st;
   }
+  stepGraves(ctx, inst, boss, st);
   if (st.veil) {
     stepVeil(ctx, inst, boss, st);
+    return;
+  }
+  if (st.reap) {
+    stepReap(ctx, inst, boss, st);
     return;
   }
   const share = boss.maxHp > 0 ? boss.hp / boss.maxHp : 1;
   if (st.veils < T.veilAt.length && share <= T.veilAt[st.veils] && !ctx.isStunned(boss)) {
     startFogVeil(ctx, inst, boss, st);
     return;
+  }
+  if (boss.castingAbility === null && !ctx.isStunned(boss)) {
+    st.reapTimer -= DT;
+    if (st.reapTimer <= 0 && startShadowstep(ctx, inst, boss, st)) return;
   }
   stepSurge(ctx, inst, boss, st);
 }

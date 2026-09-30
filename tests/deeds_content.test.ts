@@ -149,8 +149,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 327 / 3625 with the Drowned Temple rework's four encounter deeds
     // (renown 10 each: +40).
     // 328 / 3635 with the Hollow Crypt fourth pass's Knellwyrm deed (+10).
-    expect(DEED_ORDER.length).toBe(328);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3635);
+    // 329 / 3645 with the Sunken Bastion fifth pass's Gaol Turnkey deed (+10).
+    expect(DEED_ORDER.length).toBe(329);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3645);
   });
 
   it('ships the audited per-category counts', () => {
@@ -175,7 +176,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
       // +4 the Drowned Temple rework's encounter deeds.
-      dungeon: 45,
+      // +1 the Sunken Bastion fifth pass's Gaol Turnkey deed.
+      dungeon: 46,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -425,6 +427,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_mere_hydra',
       // The Hollow Crypt's Knellwyrm finale (manual grant).
       'dgn_crypt_knellwyrm',
+      // The Sunken Bastion fifth pass's Gaol Turnkey miniboss (manual grant).
+      'dgn_turnkey_cage',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1067,7 +1071,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined for the Hollow Crypt fourth pass's appended Knellwyrm deed
   // (dgn_crypt_knellwyrm) the same auditable way: the 777ad913... literal
   // rotated down into PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = 'eed1c94ddf7148c487d669791443fb418a8a05919b040df466c845010979824d';
+  // Re-baselined for the Sunken Bastion fifth pass's appended Gaol Turnkey
+  // deed (dgn_turnkey_cage) the same auditable way: the eed1c94d... literal
+  // rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = 'bfd70a94893390e2b0b26eaad7891366626e891a8e1674e51af0dfede2f8f1f9';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1144,11 +1151,14 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // down here), and stripping the four must reproduce it exactly.
   //
   // The Hollow Crypt's fourth pass appends the Knellwyrm deed after
-  // dgn_mere_hydra; the previous mint is the 777ad913... literal (rotated
-  // down here), and stripping the one id must reproduce it exactly.
+  // dgn_mere_hydra; the previous mint is the 777ad913... literal.
+  //
+  // The Sunken Bastion's fifth pass appends the Gaol Turnkey deed after
+  // dgn_crypt_knellwyrm; the previous mint is the eed1c94d... literal
+  // (rotated down here), and stripping the one id must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '777ad91379cf8c854b8af2fa5e982111b4b0472c6691220163a587848cdd136d';
-  const APPENDED_SINCE: readonly string[] = ['dgn_crypt_knellwyrm'];
+    'eed1c94ddf7148c487d669791443fb418a8a05919b040df466c845010979824d';
+  const APPENDED_SINCE: readonly string[] = ['dgn_turnkey_cage'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1160,8 +1170,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_ysolei_high_and_dry',
       'dgn_mere_hydra',
+      'dgn_crypt_knellwyrm',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1383,7 +1393,7 @@ describe('table shape', () => {
     // Clue Scroll casket pair, then the release's ferry round trip as the
     // entry, then the Sunken Bastion's four encounter deeds, the Turretback
     // Hermit's last, then the Drowned Temple's four, the Mere Hydra's last.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_crypt_knellwyrm');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_turnkey_cage');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

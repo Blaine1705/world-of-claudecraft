@@ -26,6 +26,7 @@
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { reflectionIgnoresHit } from '../encounters/drowned_temple/reflection_guard';
+import { bastionWardHitPoints } from '../encounters/sunken_bastion/ward_hits';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
@@ -246,6 +247,14 @@ export function dealDamage(
   // player's own hit.
   if (nythraxisBoneSpikeWardHit(source, target)) {
     amount = NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
+  // The Sunken Bastion's Iron Cage and Drowned Anchor are wards the same way
+  // (encounters/sunken_bastion/ward_hits.ts): a fixed number of points a hit.
+  const bastionWard = bastionWardHitPoints(source, target);
+  if (bastionWard !== null) {
+    amount = bastionWard;
     resolvedHpLoss = true;
     alreadyFinal = true;
   }

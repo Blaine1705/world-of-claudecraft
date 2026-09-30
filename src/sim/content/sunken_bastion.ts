@@ -19,7 +19,9 @@
 //   Mistweaver          Fog Ward: an interruptible shield on an ally. Kick it.
 //   Drowned Sergeant    Rally the Watch (haste to its pack), enrages when low.
 //   Shackled Prisoner   fodder, in fours and fives.
-//   Gaol Turnkey        Open the Cells: two prisoners break out at half health.
+//
+// The Gaol Turnkey is the gaol's miniboss (encounters/sunken_bastion/
+// turnkey.ts): the Iron Cage, a button-mash escape, and Open the Cells.
 //
 // Numbers are classic-era normal-mode bases for levels 11 to 13, anchored to
 // the shipped Bastion Revenant and Vael's Mist Surge (16 to 24) and to a level
@@ -46,7 +48,6 @@ import {
   BASTION_BUTTRESSES,
   DROWNING_YARD,
   FOGBEACON,
-  MOORING_POSTS,
 } from './sunken_bastion_layout';
 
 const BONE_LOOT = [
@@ -308,6 +309,10 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     scale: 0.9,
     color: 0x9a9480,
   },
+  // The gaol's miniboss (encounters/sunken_bastion/turnkey.ts): the drowned
+  // jailer drops the Iron Cage on a player, who mashes the interact key to
+  // break out while the group smashes the bars. About 3,600 health on normal
+  // through the Bastion's tuning row (a 50 s fight at planning DPS).
   gaol_turnkey: {
     id: 'gaol_turnkey',
     name: 'Gaol Turnkey',
@@ -315,23 +320,84 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     maxLevel: 13,
     family: 'humanoid',
     elite: true,
-    hpBase: 64,
-    hpPerLevel: 24,
-    dmgBase: 10,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 150,
+    hpPerLevel: 32,
+    dmgBase: 11,
     dmgPerLevel: 2.6,
     attackSpeed: 2.6,
-    armorPerLevel: 22,
+    armorPerLevel: 24,
     moveSpeed: 6.5,
     aggroRadius: 12,
-    // Open the Cells: at half health two prisoners break out. Kill them fast.
+    // Open the Cells: at half health the lantern goes up and two prisoners
+    // break out. Kill them fast.
     summonAdds: { mobId: 'shackled_prisoner', count: 2, atHpPct: [0.5] },
     yells: { summon: 'Out, all of you! Out and at them!' },
+    // One guaranteed piece per archetype group, like the bosses, a tier under.
     loot: [
-      { copper: 240, chance: 1 },
-      { itemId: 'linen_scrap', chance: 0.6 },
+      { copper: 600, chance: 1 },
+      { itemId: 'jailers_iron_gauntlets', chance: 0.34, rollGroup: 'turnkey_guaranteed' },
+      { itemId: 'turnkeys_keyring_belt', chance: 0.33, rollGroup: 'turnkey_guaranteed' },
+      { itemId: 'turnkeys_lantern_cowl', chance: 0.33, rollGroup: 'turnkey_guaranteed' },
     ],
+    // The body's gameplay scale (reach, collision) stays the trash turnkey's;
+    // the miniboss presence is its drawn height (the VISUALS row).
     scale: 1.3,
     color: 0x6a5a48,
+  },
+  // The Turnkey's Iron Cage (encounters/sunken_bastion/turnkey.ts): a WARD
+  // (ward_hits.ts), never a fighter. Its health is its points, set at the drop;
+  // the prisoner's escape presses and the group's hits break them.
+  bastion_gaol_cage: {
+    id: 'bastion_gaol_cage',
+    name: 'Iron Cage',
+    minLevel: 13,
+    maxLevel: 13,
+    family: 'undead',
+    ccImmune: true,
+    slowImmune: true,
+    ignoreTaunt: true,
+    quietMechanics: true,
+    xpMult: 0,
+    hpBase: 16,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    idleStationary: true,
+    loot: [],
+    scale: 1,
+    color: 0x5a4a3c,
+  },
+  // Ossick's Drowned Anchor (encounters/sunken_bastion/ossick.ts): a WARD
+  // riding its hooked victim. Its health is the chain's links, set at the throw.
+  bastion_drowned_anchor: {
+    id: 'bastion_drowned_anchor',
+    name: 'Drowned Anchor',
+    minLevel: 13,
+    maxLevel: 13,
+    family: 'undead',
+    ccImmune: true,
+    slowImmune: true,
+    ignoreTaunt: true,
+    quietMechanics: true,
+    xpMult: 0,
+    hpBase: 12,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    idleStationary: true,
+    loot: [],
+    scale: 1,
+    color: 0x4a5250,
   },
   // The showpiece: a colossal hermit crab that took a fallen watchtower turret
   // for its shell and walks the moat ring round the Drowned Chapel.
@@ -394,9 +460,9 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     scale: 1.0,
     color: 0xb8a078,
   },
-  // Vael's Fog Shades (encounters/sunken_bastion/vael.ts): during a Fog Veil
+  // Vael's shadow copies (encounters/sunken_bastion/vael.ts): during a Fog Veil
   // three of them stand on the rim with the real Vael, wearing his name, his
-  // health and his look. They never fight back; one hit bursts a shade.
+  // health and his reaper's look. They never fight back; one hit bursts a shade.
   vael_fog_shade: {
     id: 'vael_fog_shade',
     name: 'Vael the Fogbinder',
@@ -506,8 +572,8 @@ function patrolling(
 // Pack ids read as <area><n>: f the flats, b the bailey, r the ramparts, g
 // the gaol, k the keep. Seven patrols: fa the watch on the flats, fb the
 // tideline hunters, hermit the Turretback round the moat, bc the bailey watch,
-// rc the arbalests on the wall-walk, gd the turnkey in the gaol yard, kc the
-// court hounds.
+// rc the arbalests on the wall-walk, gd the gaol yard's round, kc the court
+// hounds. The Gaol Turnkey, the gaol's miniboss, holds its own pull.
 
 /** Patrol A: three watchmen walking between the wrecks. */
 const FLATS_LOOP = [
@@ -544,7 +610,7 @@ const BAILEY_WATCH = [
   { x: -62, z: -52 },
   { x: 40, z: -52 },
 ];
-/** Patrol D: the turnkey's round of the gaol yard. */
+/** Patrol D: the watch's round of the gaol yard. */
 const GAOL_LOOP = [
   { x: -16, z: 76 },
   { x: 16, z: 76 },
@@ -627,8 +693,10 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
     idleStationary: true,
   },
   // ---- The Sunken Gaol ---------------------------------------------------------
-  // g1: the cell row (west). A turnkey and four prisoners.
-  held('gaol_turnkey', -32, 82, 'g1', FACE_EAST),
+  // The Gaol Turnkey, the gaol's miniboss, by the dead turnkeys' cell doors
+  // under the north-west cliff, where the Postern Stair comes down.
+  held('gaol_turnkey', -24, 102, 'turnkey', Math.PI * 0.75),
+  // g1: the cell row (west). Four prisoners.
   held('shackled_prisoner', -28, 76, 'g1', FACE_EAST),
   held('shackled_prisoner', -28, 88, 'g1', FACE_EAST),
   held('shackled_prisoner', -35, 76, 'g1', FACE_EAST),
@@ -643,8 +711,8 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
   held('shackled_prisoner', -5, 65, 'g3', FACE_NORTH),
   held('shackled_prisoner', 5, 65, 'g3', FACE_NORTH),
   held('shackled_prisoner', 0, 67, 'g3', FACE_NORTH),
-  // Patrol D: a turnkey and two warhounds on their round of the yard.
-  patrolling('gaol_turnkey', GAOL_LOOP, 'gd', 0),
+  // Patrol D: a watchman and two warhounds on their round of the yard.
+  patrolling('drowned_watchman', GAOL_LOOP, 'gd', 0),
   patrolling('bastion_warhound', GAOL_LOOP, 'gd', 3),
   patrolling('bastion_warhound', GAOL_LOOP, 'gd', 6),
   // Boss 2: Gaoler Ossick by the Drowning Winch, facing the grate.
@@ -693,6 +761,7 @@ export const SUNKEN_BASTION_PACKS = [
   'r1',
   'r2',
   'rc',
+  'turnkey',
   'g1',
   'g2',
   'g3',
@@ -774,7 +843,7 @@ export const SUNKEN_BASTION_GATES: DungeonGateDef[] = [
     z: 50,
     hw: 8.6,
     rot: 0,
-    packs: ['g1', 'g2', 'g3', 'gd'],
+    packs: ['turnkey', 'g1', 'g2', 'g3', 'gd'],
     sealWhileEngaged: 'gaoler_ossick',
     openText: 'The Gaol Grate rattles up into the rock.',
   },
@@ -814,10 +883,9 @@ export const SUNKEN_BASTION_GATE_OBJECTS: DungeonObjectSpawn[] = SUNKEN_BASTION_
   lootable: false,
 }));
 
-/** The encounter objects (encounters/sunken_bastion): Olen's four buttresses,
- *  Ossick's four mooring posts and the Fogbeacon's lamp. Their template ids
- *  carry their state (intact, cracked or broken; lit or dark), so the online
- *  client mirrors each with the entity. */
+/** The encounter objects (encounters/sunken_bastion): Olen's four buttresses
+ *  and the Fogbeacon's lamp. Their template ids carry their state (intact,
+ *  cracked or broken), so the online client mirrors each with the entity. */
 export const SUNKEN_BASTION_ENCOUNTER_OBJECTS: DungeonObjectSpawn[] = [
   ...BASTION_BUTTRESSES.map(
     (b): DungeonObjectSpawn => ({
@@ -826,17 +894,6 @@ export const SUNKEN_BASTION_ENCOUNTER_OBJECTS: DungeonObjectSpawn[] = [
       x: b.x,
       z: b.z,
       templateId: 'bastion_buttress_intact',
-      dungeonId: 'sunken_bastion',
-      lootable: false,
-    }),
-  ),
-  ...MOORING_POSTS.map(
-    (p): DungeonObjectSpawn => ({
-      itemId: '',
-      name: 'Lit Mooring Post',
-      x: p.x,
-      z: p.z,
-      templateId: 'bastion_post_lit',
       dungeonId: 'sunken_bastion',
       lootable: false,
     }),

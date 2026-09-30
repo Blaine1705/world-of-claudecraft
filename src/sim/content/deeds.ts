@@ -3613,7 +3613,7 @@ export const DEEDS: Record<string, DeedDef> = {
   dgn_ossick_moored: {
     id: 'dgn_ossick_moored',
     name: 'Safe Harbor',
-    desc: 'Defeat Gaoler Ossick without anyone being keelhauled.',
+    desc: 'Defeat Gaoler Ossick without anyone being dragged into the Drowning Pit.',
     category: 'dungeon',
     renown: 10,
     trigger: { kind: 'manual' },
@@ -3680,6 +3680,18 @@ export const DEEDS: Record<string, DeedDef> = {
     id: 'dgn_crypt_knellwyrm',
     name: 'Not a Hair Singed',
     desc: 'Defeat the Knellwyrm without anyone being burned by its Pyre Strafe.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Sunken Bastion's fifth pass: the Gaol Turnkey, the gaol's miniboss
+  // (src/sim/encounters/sunken_bastion/turnkey.ts), granted to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. Generic English idiom, checked 2026-09-30.
+  dgn_turnkey_cage: {
+    id: 'dgn_turnkey_cage',
+    name: 'No Cage Can Hold Us',
+    desc: 'Defeat the Gaol Turnkey without anyone being crushed in an Iron Cage.',
     category: 'dungeon',
     renown: 10,
     trigger: { kind: 'manual' },

@@ -111,7 +111,7 @@ const VAEL = 'vael_the_mistcaller';
 const FLATS = ['f1', 'f2', 'f3', 'fa', 'fb'];
 const BAILEY = ['b1', 'b2', 'hermit', 'bc'];
 const RAMPART = ['r1', 'r2', 'rc'];
-const GAOL = ['g1', 'g2', 'g3', 'gd'];
+const GAOL = ['turnkey', 'g1', 'g2', 'g3', 'gd'];
 const KEEP = ['k1', 'k2', 'k3', 'kc'];
 
 /** Everything dead up to and including a stage. */
@@ -122,8 +122,8 @@ function upTo(...stages: string[][]): Set<string> {
 describe('Sunken Bastion route contract: every pack is mandatory', () => {
   beforeEach(() => clearDungeonGateStateForTest());
 
-  it('lists 13 groups plus 7 patrols, each a real pack of the spawn list', () => {
-    expect(SUNKEN_BASTION_PACKS).toHaveLength(20);
+  it('lists 13 groups, the Gaol Turnkey and 7 patrols, each a real pack of the spawn list', () => {
+    expect(SUNKEN_BASTION_PACKS).toHaveLength(21);
     expect(SUNKEN_BASTION_PATROLS).toHaveLength(7);
     for (const p of SUNKEN_BASTION_PATROLS)
       expect(SUNKEN_BASTION_PACKS as readonly string[]).toContain(p);
@@ -135,11 +135,11 @@ describe('Sunken Bastion route contract: every pack is mandatory', () => {
       for (const m of members) expect(m.patrol, `${p} ${m.mobId}`).toBeDefined();
     }
     // Every group is three to five mobs, a patrol two or three (the
-    // showpiece Hermit patrols alone).
+    // showpiece Hermit patrols alone, the Gaol Turnkey miniboss holds alone).
     const patrols = new Set<string>(SUNKEN_BASTION_PATROLS);
     for (const p of SUNKEN_BASTION_PACKS) {
       const n = SUNKEN_BASTION_SPAWNS.filter((s) => s.packId === p).length;
-      if (p === 'hermit') expect(n).toBe(1);
+      if (p === 'hermit' || p === 'turnkey') expect(n).toBe(1);
       else expect(n, p).toBeGreaterThanOrEqual(patrols.has(p) ? 2 : 3);
       expect(n, p).toBeLessThanOrEqual(5);
     }

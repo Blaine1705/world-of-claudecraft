@@ -4,11 +4,7 @@
 // real party, the trash cleared so nothing else joins the fight.
 
 import { describe, expect, it } from 'vitest';
-import {
-  BASTION_BUTTRESSES,
-  BREACH_BASTION,
-  MOORING_POSTS,
-} from '../src/sim/content/sunken_bastion_layout';
+import { BASTION_BUTTRESSES, BREACH_BASTION } from '../src/sim/content/sunken_bastion_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   BUTTRESS_TEMPLATES,
@@ -22,15 +18,7 @@ import {
   OLEN_TUNING,
   OLEN_UNBROKEN_OATH,
   OLEN_UNDERTOW,
-  OSSICK_CUDGEL,
-  OSSICK_CUDGEL_SLOW,
-  OSSICK_GAOL_HOOK,
-  OSSICK_HOOKED,
-  OSSICK_ID,
-  OSSICK_KEELHAULED,
-  OSSICK_TUNING,
   oathLaneEnd,
-  POST_TEMPLATES,
   pickChargeTarget,
   UNDERTOW_TEMPLATE,
   VAEL_DROWNING_HYMN,
@@ -41,7 +29,6 @@ import {
   VAEL_STAGGER,
   VAEL_TUNING,
   veilBeamYaw,
-  WINCH,
 } from '../src/sim/encounters/sunken_bastion';
 import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
@@ -57,7 +44,7 @@ interface Fight {
   others: Entity[];
 }
 
-const BOSSES = new Set([OLEN_ID, OSSICK_ID, VAEL_ID]);
+const BOSSES = new Set([OLEN_ID, 'gaoler_ossick', VAEL_ID]);
 
 function fight(difficulty: 'normal' | 'heroic' = 'normal', extra = 2): Fight {
   const sim = new Sim({ seed: 17, playerClass: 'warrior', autoEquip: false, devCommands: true });
@@ -309,147 +296,8 @@ describe('Knight-Commander Olen: bait the Oathbound Charge into a buttress', () 
   });
 });
 
-// ---------------------------------------------------------------------------
-describe('Gaoler Ossick: race the hooked player to a lit mooring post', () => {
-  function yard(
-    difficulty: 'normal' | 'heroic' = 'normal',
-    extra = 2,
-  ): { f: Fight; ossick: Entity } {
-    const f = fight(difficulty, extra);
-    const ossick = boss(f, OSSICK_ID);
-    put(f, ossick, -2, 12);
-    put(f, f.tank, -2, 9);
-    for (const [i, p] of f.others.entries()) put(f, p, -14 + i * 24, 30);
-    engage(f, ossick);
-    return { f, ossick };
-  }
-
-  it('hooks a non-tank player after its bar, the keelhaul 8 s later', () => {
-    const { f, ossick } = yard();
-    run(f, OSSICK_TUNING.hookFirst + DT * 2);
-    expect(ossick.castingAbility).toBe(OSSICK_GAOL_HOOK);
-    run(f, OSSICK_TUNING.hookCast + DT);
-    const hooked = f.others.find((p) => p.auras.some((a) => a.id === OSSICK_HOOKED));
-    expect(hooked).toBeDefined();
-    expect(f.tank.auras.some((a) => a.id === OSSICK_HOOKED)).toBe(false);
-    const aura = hooked?.auras.find((a) => a.id === OSSICK_HOOKED);
-    expect(aura?.remaining).toBeCloseTo(OSSICK_TUNING.keelhaulAfter, 0);
-    expect(aura?.value).toBe(1);
-  });
-
-  it('a hooked player at a lit post is freed and the post goes dark', () => {
-    const { f, ossick } = yard();
-    run(f, OSSICK_TUNING.hookFirst + OSSICK_TUNING.hookCast + DT * 3);
-    const hooked = f.others.find((p) => p.auras.some((a) => a.id === OSSICK_HOOKED));
-    if (!hooked) throw new Error('nobody hooked');
-    const post = MOORING_POSTS[0];
-    const hold = () => put(f, hooked, post.x + 1.5, post.z);
-    const before = hooked.hp;
-    run(f, OSSICK_TUNING.keelhaulAfter + 0.2, hold);
-    expect(hooked.hp).toBeGreaterThan(before - 1);
-    expect(hooked.auras.some((a) => a.id === OSSICK_KEELHAULED)).toBe(false);
-    expect(objectAt(f, post.x, post.z)?.templateId).toBe(POST_TEMPLATES.dark);
-    const st = ossick.bastionFight;
-    expect(st?.kind === 'ossick' && st.keelhauled).toBe(false);
-  });
-
-  it('anyone else is dragged to the cage, stunned and drowned', () => {
-    const { f, ossick } = yard();
-    run(f, OSSICK_TUNING.hookFirst + OSSICK_TUNING.hookCast + DT * 3);
-    const hooked = f.others.find((p) => p.auras.some((a) => a.id === OSSICK_HOOKED));
-    if (!hooked) throw new Error('nobody hooked');
-    put(f, hooked, -2, 42);
-    run(f, OSSICK_TUNING.keelhaulAfter - 0.3);
-    const before = hooked.hp;
-    const far = Math.hypot(hooked.pos.x - f.ox - WINCH.x, hooked.pos.z - f.oz - WINCH.z);
-    run(f, 0.5);
-    expect(before - hooked.hp).toBeGreaterThanOrEqual(OSSICK_TUNING.min);
-    expect(hooked.auras.some((a) => a.id === OSSICK_KEELHAULED && a.kind === 'stun')).toBe(true);
-    const near = Math.hypot(hooked.pos.x - f.ox - WINCH.x, hooked.pos.z - f.oz - WINCH.z);
-    expect(near).toBeLessThan(far - 5);
-    const st = ossick.bastionFight;
-    expect(st?.kind === 'ossick' && st.keelhauled).toBe(true);
-  });
-
-  it('a dark post takes no pull', () => {
-    const { f, ossick } = yard();
-    const st0 = () => (ossick.bastionFight?.kind === 'ossick' ? ossick.bastionFight : null);
-    run(f, 1);
-    const st = st0();
-    if (!st) throw new Error('fight');
-    const post = MOORING_POSTS[1];
-    st.postDarkUntil[post.id] = f.sim.ctx.time + 60;
-    run(f, OSSICK_TUNING.hookFirst + OSSICK_TUNING.hookCast);
-    const hooked = f.others.find((p) => p.auras.some((a) => a.id === OSSICK_HOOKED));
-    if (!hooked) throw new Error('nobody hooked');
-    expect(objectAt(f, post.x, post.z)?.templateId).toBe(POST_TEMPLATES.dark);
-    run(f, OSSICK_TUNING.keelhaulAfter + 0.2, () => put(f, hooked, post.x + 1, post.z));
-    expect(hooked.auras.some((a) => a.id === OSSICK_KEELHAULED)).toBe(true);
-  });
-
-  it('heroic: two players are hooked, one post frees only one, and the chain drags', () => {
-    const { f } = yard('heroic', 3);
-    run(f, OSSICK_TUNING.hookFirst + OSSICK_TUNING.hookCast + DT * 3);
-    const hooked = f.others.filter((p) => p.auras.some((a) => a.id === OSSICK_HOOKED));
-    expect(hooked).toHaveLength(2);
-    for (const h of hooked) {
-      expect(h.auras.find((a) => a.id === OSSICK_HOOKED)?.value).toBe(OSSICK_TUNING.heavyChainSlow);
-    }
-    const post = MOORING_POSTS[2];
-    run(f, OSSICK_TUNING.keelhaulAfter + 0.2, () => {
-      put(f, hooked[0], post.x + 1, post.z);
-      put(f, hooked[1], post.x - 1, post.z);
-    });
-    const hauled = hooked.filter((h) => h.auras.some((a) => a.id === OSSICK_KEELHAULED));
-    expect(hauled).toHaveLength(1);
-  });
-
-  it('the cudgel falls on the tank with a slow', () => {
-    const { f, ossick } = yard();
-    run(f, OSSICK_TUNING.cudgelFirst + DT * 2);
-    expect(ossick.castingAbility).toBe(OSSICK_CUDGEL);
-    run(f, OSSICK_TUNING.cudgelCast + 0.1);
-    expect(f.tank.auras.find((a) => a.id === OSSICK_CUDGEL_SLOW)?.value).toBe(
-      OSSICK_TUNING.cudgelSlow,
-    );
-  });
-
-  it('opens the cells at 60 percent: three prisoners break out', () => {
-    const { f, ossick } = yard();
-    run(f, 0.5);
-    ossick.hp = Math.round(ossick.maxHp * 0.59);
-    run(f, DT * 2);
-    const prisoners = ossick.summonedIds
-      .map((id) => f.sim.ctx.entities.get(id))
-      .filter((e) => e?.templateId === 'shackled_prisoner' && !e.dead);
-    expect(prisoners).toHaveLength(3);
-  });
-
-  it('a wipe takes the hooks off and relights the posts; a clean kill earns Safe Harbor', () => {
-    const { f, ossick } = yard();
-    run(f, 1);
-    const st = ossick.bastionFight;
-    if (st?.kind !== 'ossick') throw new Error('fight');
-    st.postDarkUntil[MOORING_POSTS[3].id] = f.sim.ctx.time + 60;
-    run(f, DT * 2);
-    expect(objectAt(f, MOORING_POSTS[3].x, MOORING_POSTS[3].z)?.templateId).toBe(
-      POST_TEMPLATES.dark,
-    );
-    ossick.inCombat = false;
-    ossick.aggroTargetId = null;
-    ossick.aiState = 'evade';
-    run(f, DT * 2);
-    expect(objectAt(f, MOORING_POSTS[3].x, MOORING_POSTS[3].z)?.templateId).toBe(
-      POST_TEMPLATES.lit,
-    );
-    // A fresh pull, killed clean.
-    const again = yard();
-    run(again.f, 1);
-    again.f.sim.ctx.handleDeath(again.ossick, again.f.tank);
-    run(again.f, DT * 2);
-    expect(earned(again.f, again.f.tank, 'dgn_ossick_moored')).toBe(true);
-  });
-});
+// Gaoler Ossick's Drowned Anchor and Shackle Pair, the Gaol Turnkey's Iron
+// Cage and Vael's Shadowstep: tests/sunken_bastion_pass5.test.ts.
 
 // ---------------------------------------------------------------------------
 describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {

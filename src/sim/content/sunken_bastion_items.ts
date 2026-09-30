@@ -1,6 +1,7 @@
 // The Sunken Bastion rework's loot (docs/design/dungeon-rework/sunken_bastion.md,
 // section 8): Olen gains a rare chase row, the new Gaoler Ossick drops his own
-// table, and two new heroic epics join the Heroic partitions. Normal pieces sit
+// table, the Gaol Turnkey (the gaol's miniboss) drops one piece per archetype
+// group, and two new heroic epics join the Heroic partitions. Normal pieces sit
 // at the boss's level plus the quality bump with stats at primaryStatBudget;
 // the heroic epics read source level 25 (item level 31) with the five-man
 // heroic ratings. Rares in a boss's base table get their Heroic variant
@@ -78,6 +79,40 @@ export const SUNKEN_BASTION_ITEMS: Record<string, ItemDef> = {
     stats: { str: 5, sta: 4 },
     sellValue: 950,
     requiredClass: HEAVY,
+  },
+  // ---- The Gaol Turnkey, the gaol's miniboss (level 13) ----
+  jailers_iron_gauntlets: {
+    id: 'jailers_iron_gauntlets',
+    name: "Jailer's Iron Gauntlets",
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'gloves',
+    quality: 'uncommon',
+    stats: { armor: 38, str: 2, sta: 2 },
+    sellValue: 140,
+    requiredClass: HEAVY,
+  },
+  turnkeys_keyring_belt: {
+    id: 'turnkeys_keyring_belt',
+    name: "Turnkey's Keyring Belt",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'waist',
+    quality: 'uncommon',
+    stats: { armor: 24, agi: 3, sta: 1 },
+    sellValue: 140,
+    requiredClass: AGILE,
+  },
+  turnkeys_lantern_cowl: {
+    id: 'turnkeys_lantern_cowl',
+    name: "Turnkey's Lantern Cowl",
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'helmet',
+    quality: 'uncommon',
+    stats: { armor: 26, int: 3, spi: 1 },
+    sellValue: 150,
+    requiredClass: CASTER,
   },
   // ---- Heroic epics (source level 25, item level 31) ----
   drowned_commanders_breastplate: {

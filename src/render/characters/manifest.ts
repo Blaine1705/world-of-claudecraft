@@ -26,8 +26,9 @@ import {
 } from '../../sim/encounters/hollow_crypt/ids';
 import {
   OLEN_OATHBOUND_CHARGE,
+  OSSICK_ANCHOR,
   OSSICK_CUDGEL,
-  OSSICK_GAOL_HOOK,
+  OSSICK_SHACKLE,
   VAEL_MIST_SURGE,
 } from '../../sim/encounters/sunken_bastion/ids';
 import {
@@ -4093,15 +4094,20 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0x6f8a86,
     tintStrength: 0.35,
   },
-  // Gaoler Ossick: the gaol's hulking warden, flinging the Gaol Hook with a
-  // one-hand throw and bringing the cudgel down in his great slam.
+  // Gaoler Ossick: the gaol's hulking warden, hurling the Drowned Anchor with a
+  // one-hand throw, flinging the Shackle Pair with a two-hand heave, and
+  // bringing the cudgel down in his great slam.
   bastion_ossick: {
     url: `${ENEMIES}/skeleton_golem.glb`,
     height: 6.2,
     clips: {
       ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
       attack: ['Golem_Slam'],
-      castByAbility: { [OSSICK_GAOL_HOOK]: '1H_Melee_Attack_Chop', [OSSICK_CUDGEL]: 'Golem_Slam' },
+      castByAbility: {
+        [OSSICK_ANCHOR]: '1H_Melee_Attack_Chop',
+        [OSSICK_SHACKLE]: '2H_Melee_Attack_Chop',
+        [OSSICK_CUDGEL]: 'Golem_Slam',
+      },
     },
     animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
     weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],

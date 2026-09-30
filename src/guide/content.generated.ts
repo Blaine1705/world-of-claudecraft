@@ -6067,6 +6067,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_turnkey_cage",
+    "name": "No Cage Can Hold Us",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 

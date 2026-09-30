@@ -6,6 +6,7 @@
 
 import { grantDeed } from '../../deeds';
 import { createGroundObject } from '../../entity';
+import { kitHash } from '../../mob/trash_kit/targets';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
@@ -112,6 +113,77 @@ export function bossEngaged(boss: Entity): boolean {
     boss.aggroTargetId !== null &&
     (boss.aiState === 'chase' || boss.aiState === 'attack')
   );
+}
+
+/** The players a mechanic takes: hashed among the living non-tanks (never
+ *  one listed in `busy`), the tank only when nobody else is free. Zero rng. */
+export function pickMarkTargets(
+  boss: Entity,
+  players: readonly Entity[],
+  count: number,
+  salt: number,
+  busy: ReadonlySet<number> = new Set(),
+): Entity[] {
+  const free = players.filter((p) => !busy.has(p.id));
+  const pool = free.filter((p) => p.id !== boss.aggroTargetId);
+  const from = pool.length > 0 ? [...pool] : [...free];
+  const out: Entity[] = [];
+  let k = 0;
+  while (out.length < count && from.length > 0) {
+    const i = kitHash(boss.id, salt * 7 + k) % from.length;
+    out.push(from[i]);
+    from.splice(i, 1);
+    k++;
+  }
+  return out;
+}
+
+/** Drop an aura by id (no-op when absent). */
+export function dropAuraById(e: Entity, id: string): void {
+  if (e.auras.some((a) => a.id === id)) e.auras = e.auras.filter((a) => a.id !== id);
+}
+
+/** Clear a boss's own cast bar if it is running `castIds`. */
+export function clearCastIf(e: Entity, ...castIds: string[]): void {
+  if (e.castingAbility === null || !castIds.includes(e.castingAbility)) return;
+  e.castingAbility = null;
+  e.castRemaining = 0;
+  e.castTotal = 0;
+  e.castTargetId = null;
+  e.channeling = false;
+}
+
+/** Start a boss bar (a real cast bar every client mirrors). */
+export function startBar(
+  e: Entity,
+  castId: string,
+  seconds: number,
+  targetId: number | null,
+  channel = false,
+): void {
+  e.castingAbility = castId;
+  e.castTotal = seconds;
+  e.castRemaining = seconds;
+  e.castTargetId = targetId;
+  e.channeling = channel;
+}
+
+/** Remove an encounter body (a cage, an anchor) from the world and the claim:
+ *  off the owner's summons and anyone's target. */
+export function dropEncounterBody(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  owner: Entity | null,
+  id: number,
+): void {
+  const at = inst.mobIds.indexOf(id);
+  if (at >= 0) inst.mobIds.splice(at, 1);
+  if (owner) owner.summonedIds = owner.summonedIds.filter((s) => s !== id);
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
+    if (p?.targetId === id) p.targetId = null;
+  }
+  if (ctx.entities.has(id)) ctx.dropEntity(id);
 }
 
 /** Instance-local (x, z) of an entity. */

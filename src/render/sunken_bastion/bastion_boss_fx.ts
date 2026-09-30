@@ -6,11 +6,8 @@
 //    first standing buttress, as the sim resolves it), a gold oath glow under
 //    him growing with each Unbroken Oath stack, dizzy stars while Breached,
 //    and the heroic Undertow Wake flooding the lane behind a charge;
-//  - Ossick: a pillar of lantern light over every LIT mooring post with its
-//    reach ring on the flags (a post gone dark smokes out), a red reticle
-//    under the Gaol Hook's mark, the iron chain from the Drowning Winch to
-//    every hooked player (heating toward the keelhaul) and a gold guide on
-//    the floor to the nearest lit post;
+//  - (the Turnkey's cage and Ossick's anchor and shackles: bastion_gaol_fx.ts;
+//    Vael's reaper visuals: bastion_reaper_fx.ts);
 //  - Vael: the Mist Surge ring, the Fogbeacon's beam swung down onto the
 //    crown during the Fog Veil with its pool of light on the roof, a hard
 //    shadow and a gold flare on the REAL Vael when the beam finds him (light
@@ -20,8 +17,8 @@
 //
 // Rules (src/render/CLAUDE.md): pooled meshes and materials built once under
 // the telegraph root (compile-gated by BastionFx), no per-frame allocation.
-// Everything a player acts on (lanes, rings, the lit posts, the chain and its
-// guide, the beam and its reveal, the flood, the dome) draws on every tier;
+// Everything a player acts on (lanes, rings, the beam and its reveal, the
+// flood, the dome) draws on every tier;
 // only the dust, debris and smoke shed on the low effects tier.
 
 import * as THREE from 'three';
@@ -34,18 +31,12 @@ import {
   OLEN_ID,
   OLEN_OATHBOUND_CHARGE,
   OLEN_UNBROKEN_OATH,
-  OSSICK_GAOL_HOOK,
-  OSSICK_HOOKED,
-  OSSICK_KEELHAULED,
-  OSSICK_TUNING,
-  POST_TEMPLATES,
   TURRETBACK_ID,
   UNDERTOW_TEMPLATE,
   VAEL_FOG_VEIL,
   VAEL_ID,
   VAEL_MIST_SURGE,
   VAEL_TUNING,
-  WINCH,
 } from '../../sim/encounters/sunken_bastion';
 import { TRASH_WITHDRAW_AURA } from '../../sim/mob/trash_kit/support';
 import type { IWorld } from '../../world_api';
@@ -63,10 +54,7 @@ import {
   buttressAt,
   buttressCrash,
   buttressPiece,
-  chainPoints,
-  chainSag,
   HYMN_FLOOD_DEPTH,
-  hookHeat,
   hymnFlood,
   OATH_LANE_HALF,
   oathLaneLength,
@@ -81,21 +69,12 @@ type Slot = 'stone' | 'glow' | 'glass';
 
 const SCAN_SEC = 0.1;
 const BUTTRESS_SLOTS = 8;
-const POST_SLOTS = 8;
-const CHAIN_SLOTS = 4;
-const LINKS = 40;
 const WAKE_SLOTS = 4;
 const REVEAL_SLOTS = 4;
 const PUFF_SLOTS = 24;
 const DEBRIS = 18;
 const LIFT = 0.08;
-const WINCH_TOP = 4.2;
-const LANTERN_Y = 2.75;
 const DOME_R = 9.5;
-
-const GOLD = 0xffc862;
-const IRON = new THREE.Color(0.035, 0.036, 0.04);
-const HOT = new THREE.Color(1.0, 0.36, 0.12);
 
 let glowTex: THREE.Texture | null = null;
 function glow(): THREE.Texture {
@@ -212,40 +191,6 @@ void main() {
 }
 `;
 
-// The gold guide from a hooked player to a lit post: chevrons marching on.
-const GUIDE_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uLength;
-varying vec2 vUv;
-varying vec3 vWorld;
-void main() {
-  float along = (1.0 - vUv.y) * uLength;
-  float across = abs(vUv.x - 0.5) * 2.0;
-  float chev = fract(along * 0.55 - across * 0.35 - uTime * 1.6);
-  float mark = smoothstep(0.0, 0.12, chev) * (1.0 - smoothstep(0.38, 0.5, chev));
-  float fadeEnds = smoothstep(0.0, 0.08, vUv.y) * (1.0 - smoothstep(0.92, 1.0, vUv.y));
-  float a = (0.25 + 0.75 * mark) * (1.0 - across * 0.6) * fadeEnds;
-  gl_FragColor = vec4(vec3(1.0, 0.82, 0.42) * (0.8 + 0.6 * mark), a);
-  #include <colorspace_fragment>
-}
-`;
-
-// The pillar of lantern light over a lit post.
-const PILLAR_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-varying vec2 vUv;
-varying vec3 vWorld;
-${NOISE}
-void main() {
-  float up = vUv.y;
-  float motes = noise(vec2(vUv.x * 12.0, up * 6.0 - uTime * 0.8));
-  float a = pow(1.0 - up, 1.8) * (0.55 + 0.45 * motes) * uAlpha;
-  gl_FragColor = vec4(vec3(1.0, 0.8, 0.45) * a, a);
-  #include <colorspace_fragment>
-}
-`;
-
 // The dark cast shadow the beam throws off the real Vael.
 const SHADOW_FRAG = /* glsl */ `
 varying vec2 vUv;
@@ -266,23 +211,6 @@ interface ButtressSlot {
   entityId: number;
   template: string;
   withKit: boolean;
-}
-
-interface PostSlot {
-  group: THREE.Group;
-  flame: THREE.Sprite;
-  pillar: THREE.Mesh;
-  pillarMat: THREE.ShaderMaterial;
-  ring: THREE.Mesh;
-  entityId: number;
-  lit: boolean;
-  fade: number;
-}
-
-interface ChainSlot {
-  playerId: number;
-  guide: THREE.Mesh;
-  guideMat: THREE.ShaderMaterial;
 }
 
 interface WakeSlot {
@@ -326,15 +254,11 @@ export class BastionBossFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly buttresses: ButtressSlot[] = [];
-  private readonly posts: PostSlot[] = [];
-  private readonly chains: ChainSlot[] = [];
   private readonly wakes: WakeSlot[] = [];
   private readonly reveals: RevealSlot[] = [];
   private readonly puffs: Puff[] = [];
   private readonly debris: Debris[] = [];
-  private readonly links: THREE.InstancedMesh;
   private readonly debrisMesh: THREE.InstancedMesh | null;
-  private readonly reticle: THREE.Mesh;
   private readonly oathGlow: THREE.Mesh;
   private readonly oathMat: THREE.MeshBasicMaterial;
   private readonly stars: THREE.Sprite[] = [];
@@ -347,13 +271,10 @@ export class BastionBossFx {
   private readonly standing = new Map<number, Set<string>>();
   private readonly seenShades = new Set<number>();
   private readonly deadShades = new Set<number>();
-  private readonly hookedIds: number[] = [];
   private readonly buttressIds: number[] = [];
-  private readonly postIds: number[] = [];
   private readonly wakeIds: number[] = [];
   private readonly veilIds: number[] = [];
   private olenId = -1;
-  private ossickId = -1;
   private vaelId = -1;
   private lampId = -1;
   private hermitIds: number[] = [];
@@ -364,7 +285,6 @@ export class BastionBossFx {
   private floodTop = -Infinity;
   private scan = 0;
   private clock = 0;
-  private readonly tmpPts = new Float32Array(LINKS * 3);
   private readonly m4 = new THREE.Matrix4();
   private readonly q = new THREE.Quaternion();
   private readonly v = new THREE.Vector3();
@@ -391,57 +311,6 @@ export class BastionBossFx {
         withKit: false,
       });
     }
-    // Lit posts.
-    const pillarGeo = this.geo(new THREE.CylinderGeometry(0.9, 0.35, 16, 16, 1, true));
-    pillarGeo.translate(0, 8, 0);
-    const ringGeo = this.geo(
-      new THREE.RingGeometry(OSSICK_TUNING.postReach - 0.28, OSSICK_TUNING.postReach, 48),
-    );
-    ringGeo.rotateX(-Math.PI / 2);
-    const ringMat = this.basic(GOLD, 0.8);
-    for (let i = 0; i < POST_SLOTS; i++) {
-      const group = new THREE.Group();
-      group.visible = false;
-      const flame = this.sprite(0xffd27a, 0.95, 2.6);
-      flame.position.y = LANTERN_Y;
-      const pillarMat = this.shader(PILLAR_FRAG, { uAlpha: { value: 0.5 } }, true);
-      const pillar = new THREE.Mesh(pillarGeo, pillarMat);
-      pillar.frustumCulled = false;
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      ring.position.y = LIFT;
-      ring.renderOrder = floorVfxRenderOrder('encounter', 10);
-      group.add(flame, pillar, ring);
-      this.root.add(group);
-      this.posts.push({ group, flame, pillar, pillarMat, ring, entityId: -1, lit: true, fade: 1 });
-    }
-    // The hook chain: iron links, one instanced mesh for every chain.
-    const linkGeo = this.geo(new THREE.TorusGeometry(0.2, 0.055, 6, 10));
-    linkGeo.scale(1, 1.45, 1);
-    const linkMat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
-    this.materials.push(linkMat);
-    this.links = new THREE.InstancedMesh(linkGeo, linkMat, CHAIN_SLOTS * LINKS);
-    this.links.frustumCulled = false;
-    this.links.count = 0;
-    this.links.setColorAt(0, IRON);
-    this.root.add(this.links);
-    const guideGeo = this.geo(new THREE.PlaneGeometry(1, 1, 1, 1));
-    guideGeo.rotateX(-Math.PI / 2);
-    guideGeo.translate(0, 0, 0.5);
-    for (let i = 0; i < CHAIN_SLOTS; i++) {
-      const guideMat = this.shader(GUIDE_FRAG, { uLength: { value: 1 } }, true);
-      const guide = new THREE.Mesh(guideGeo, guideMat);
-      guide.visible = false;
-      guide.frustumCulled = false;
-      guide.renderOrder = floorVfxRenderOrder('encounter', 12);
-      this.root.add(guide);
-      this.chains.push({ playerId: -1, guide, guideMat });
-    }
-    const reticleGeo = this.geo(new THREE.RingGeometry(1.1, 1.45, 40, 1, 0, Math.PI * 1.6));
-    reticleGeo.rotateX(-Math.PI / 2);
-    this.reticle = new THREE.Mesh(reticleGeo, this.basic(0xff4a3a, 0.95));
-    this.reticle.visible = false;
-    this.reticle.renderOrder = floorVfxRenderOrder('encounter', 14);
-    this.root.add(this.reticle);
     // Olen's oath glow and dizzy stars.
     const discGeo = this.geo(new THREE.CircleGeometry(1, 40));
     discGeo.rotateX(-Math.PI / 2);
@@ -678,8 +547,6 @@ export class BastionBossFx {
       this.scanWorld(world);
     }
     this.updateButtresses(world);
-    this.updatePosts(world, dt);
-    this.updateChains(world);
     this.updateOlen(world);
     this.updateWakes(world, dt);
     this.updateVael(world, dt);
@@ -688,14 +555,11 @@ export class BastionBossFx {
   }
 
   private scanWorld(world: IWorld): void {
-    this.hookedIds.length = 0;
     this.buttressIds.length = 0;
-    this.postIds.length = 0;
     this.wakeIds.length = 0;
     this.veilIds.length = 0;
     this.hermitIds = [];
     this.olenId = -1;
-    this.ossickId = -1;
     this.vaelId = -1;
     let lampId = -1;
     this.standing.clear();
@@ -709,19 +573,13 @@ export class BastionBossFx {
           const list = perSlot.get(o.slot) ?? [];
           list.push({ lx: e.pos.x - o.x, lz: e.pos.z - o.z, templateId: t });
           perSlot.set(o.slot, list);
-        } else if (t === POST_TEMPLATES.lit || t === POST_TEMPLATES.dark) this.postIds.push(e.id);
-        else if (t === UNDERTOW_TEMPLATE) this.wakeIds.push(e.id);
+        } else if (t === UNDERTOW_TEMPLATE) this.wakeIds.push(e.id);
         else if (t === BEACON_LAMP_TEMPLATE) lampId = e.id;
-        continue;
-      }
-      if (e.kind === 'player') {
-        if (!e.dead && hasAura(e, OSSICK_HOOKED)) this.hookedIds.push(e.id);
         continue;
       }
       if (e.kind !== 'mob') continue;
       const t = e.templateId;
       if (t === OLEN_ID && !e.dead) this.olenId = e.id;
-      else if (t === 'gaoler_ossick' && !e.dead) this.ossickId = e.id;
       else if (t === VAEL_ID) {
         if (!e.dead) this.vaelId = e.id;
         if (!e.dead) this.veilIds.push(e.id);
@@ -880,150 +738,6 @@ export class BastionBossFx {
       w.mesh.scale.set(OATH_LANE_HALF * 2, 1, length);
       w.mat.uniforms.uLength.value = length;
       w.mat.uniforms.uAlpha.value = Math.min(1, (w.mat.uniforms.uAlpha.value as number) + dt * 3);
-    }
-  }
-
-  // ---- Ossick --------------------------------------------------------------------------
-
-  private updatePosts(world: IWorld, dt: number): void {
-    for (const p of this.posts) {
-      if (p.entityId < 0) continue;
-      const e = world.entities.get(p.entityId);
-      if (!e || (e.templateId !== POST_TEMPLATES.lit && e.templateId !== POST_TEMPLATES.dark)) {
-        p.entityId = -1;
-        p.group.visible = false;
-      }
-    }
-    for (const id of this.postIds) {
-      if (this.posts.some((p) => p.entityId === id)) continue;
-      const p = this.posts.find((s) => s.entityId < 0);
-      const e = world.entities.get(id);
-      if (!p || !e) continue;
-      p.entityId = id;
-      p.lit = e.templateId === POST_TEMPLATES.lit;
-      p.fade = p.lit ? 1 : 0;
-      p.group.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
-      p.group.visible = true;
-    }
-    for (const p of this.posts) {
-      if (p.entityId < 0) continue;
-      const e = world.entities.get(p.entityId);
-      if (!e) continue;
-      const lit = e.templateId === POST_TEMPLATES.lit;
-      if (p.lit && !lit) {
-        const at = p.group.position;
-        this.burst(at.x, at.y + LANTERN_Y, at.z, 0x70706a, 3, 0.8, 3.5, 2.2, 1.4);
-        this.burst(at.x, at.y + LANTERN_Y, at.z, 0xffc070, 1, 2.4, 0.4, 0.4);
-      }
-      p.lit = lit;
-      p.fade += (lit ? 1 : -1) * dt * 2.5;
-      p.fade = Math.min(1, Math.max(0, p.fade));
-      const flicker =
-        0.85 + 0.15 * Math.sin(this.clock * 13 + p.entityId) * Math.sin(this.clock * 7.3);
-      (p.flame.material as THREE.SpriteMaterial).opacity = 0.15 + 0.85 * p.fade * flicker;
-      (p.flame.material as THREE.SpriteMaterial).color.setHex(p.fade > 0.05 ? 0xffd27a : 0x5a4a3a);
-      p.pillar.visible = p.fade > 0.01;
-      p.pillarMat.uniforms.uAlpha.value = 0.55 * p.fade;
-      p.ring.visible = p.fade > 0.01;
-      p.ring.scale.setScalar(1 + 0.04 * Math.sin(this.clock * 3));
-    }
-  }
-
-  private updateChains(world: IWorld): void {
-    // Keep a hooked player's chain on its slot; free the rest.
-    for (const c of this.chains) {
-      if (c.playerId >= 0 && !this.hookedIds.includes(c.playerId)) {
-        const p = world.entities.get(c.playerId);
-        // Hauled: the chain snapped taut into the cage pit, a splash.
-        if (p && hasAura(p, OSSICK_KEELHAULED))
-          this.burst(p.pos.x, p.pos.y + 0.5, p.pos.z, 0xbff4ff, 4, 1.5, 5, 0.8);
-        c.playerId = -1;
-        c.guide.visible = false;
-      }
-    }
-    for (const id of this.hookedIds) {
-      if (this.chains.some((c) => c.playerId === id)) continue;
-      const c = this.chains.find((s) => s.playerId < 0);
-      if (c) c.playerId = id;
-    }
-    let n = 0;
-    for (const c of this.chains) {
-      if (c.playerId < 0) continue;
-      const p = world.entities.get(c.playerId);
-      if (!p) continue;
-      const o = bastionSlotOrigin(p.pos.x, p.pos.z);
-      const wx = o.x + WINCH.x;
-      const wz = o.z + WINCH.z;
-      const wy = this.groundY(wx, wz) + WINCH_TOP;
-      const py = p.pos.y + 1.2;
-      const span = Math.hypot(p.pos.x - wx, p.pos.z - wz);
-      // A player displaced out of the yard (a dev jump) drops the chain.
-      if (span > 48) continue;
-      chainPoints(wx, wy, wz, p.pos.x, py, p.pos.z, chainSag(span), LINKS, this.tmpPts);
-      const hook = auraOf(p, OSSICK_HOOKED);
-      const heat = hook ? hookHeat(hook.remaining, hook.duration) : 1;
-      this.c
-        .copy(IRON)
-        .lerp(HOT, heat * heat * (0.75 + 0.25 * Math.sin(this.clock * (6 + heat * 14))));
-      for (let i = 0; i < LINKS; i++) {
-        const j = Math.min(LINKS - 1, i + 1);
-        const k = i === LINKS - 1 ? i - 1 : i;
-        this.v.set(
-          this.tmpPts[j * 3] - this.tmpPts[k * 3],
-          this.tmpPts[j * 3 + 1] - this.tmpPts[k * 3 + 1],
-          this.tmpPts[j * 3 + 2] - this.tmpPts[k * 3 + 2],
-        );
-        this.v.normalize();
-        this.q.setFromUnitVectors(UP, this.v);
-        if (i % 2 === 1) this.q.multiply(QUARTER);
-        this.s.set(this.tmpPts[i * 3], this.tmpPts[i * 3 + 1], this.tmpPts[i * 3 + 2]);
-        this.m4.compose(this.s, this.q, ONE);
-        this.links.setMatrixAt(n, this.m4);
-        this.links.setColorAt(n, this.c);
-        n++;
-      }
-      // The guide to the nearest lit post.
-      let best: EntityView | null = null;
-      let bestD = Infinity;
-      for (const id of this.postIds) {
-        const post = world.entities.get(id);
-        if (!post || post.templateId !== POST_TEMPLATES.lit) continue;
-        const d = Math.hypot(post.pos.x - p.pos.x, post.pos.z - p.pos.z);
-        if (d < bestD) {
-          bestD = d;
-          best = post;
-        }
-      }
-      const reach = OSSICK_TUNING.postReach;
-      if (best && bestD > reach) {
-        const yaw = Math.atan2(best.pos.x - p.pos.x, best.pos.z - p.pos.z);
-        const len = bestD - reach * 0.8;
-        c.guide.visible = true;
-        c.guide.position.set(p.pos.x, this.groundY(p.pos.x, p.pos.z) + LIFT + 0.02, p.pos.z);
-        c.guide.rotation.y = yaw;
-        c.guide.scale.set(1.2, 1, len);
-        c.guideMat.uniforms.uLength.value = len;
-      } else c.guide.visible = false;
-    }
-    this.links.count = n;
-    this.links.instanceMatrix.needsUpdate = true;
-    if (this.links.instanceColor) this.links.instanceColor.needsUpdate = true;
-    // The Gaol Hook's mark while the cast runs.
-    const ossick = this.ossickId >= 0 ? world.entities.get(this.ossickId) : undefined;
-    const target =
-      ossick && ossick.castingAbility === OSSICK_GAOL_HOOK && ossick.castTargetId !== null
-        ? world.entities.get(ossick.castTargetId)
-        : undefined;
-    this.reticle.visible = !!target;
-    if (target && ossick) {
-      const fill = ossick.castTotal > 0 ? 1 - ossick.castRemaining / ossick.castTotal : 1;
-      this.reticle.position.set(
-        target.pos.x,
-        this.groundY(target.pos.x, target.pos.z) + LIFT + 0.03,
-        target.pos.z,
-      );
-      this.reticle.rotation.y = this.clock * 4;
-      this.reticle.scale.setScalar(1.8 - fill * 0.8);
     }
   }
 
@@ -1256,7 +970,6 @@ export class BastionBossFx {
   dispose(): void {
     if (this.beamSlot) setBeaconYaw(this.beamSlot.x, this.beamSlot.z, null);
     this.root.removeFromParent();
-    this.links.dispose();
     this.debrisMesh?.dispose();
     for (const b of this.buttresses)
       for (const list of b.pieces.values()) for (const m of list) m.dispose();
@@ -1266,9 +979,6 @@ export class BastionBossFx {
 }
 
 const ALL_STANDING: ReadonlySet<string> = new Set(['nw', 'n', 'ne', 'e']);
-const UP = new THREE.Vector3(0, 1, 0);
-const ONE = new THREE.Vector3(1, 1, 1);
-const QUARTER = new THREE.Quaternion().setFromAxisAngle(UP, Math.PI / 2);
 
 /** The boss casts BastionFx paints: Olen's lane (live length) and the Mist Surge. */
 export const BASTION_BOSS_TELEGRAPHS = {

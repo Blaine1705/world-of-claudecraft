@@ -4266,20 +4266,57 @@ export interface OlenFightState {
 
 export interface OssickFightState {
   kind: 'ossick';
-  hookTimer: number;
+  anchorTimer: number;
+  shackleTimer: number;
   cudgelTimer: number;
-  /** Hooked players and the seconds left before the winch hauls. */
-  hooks: { playerId: number; remaining: number }[];
-  /** Sim time each mooring post is dark until (by post id). */
-  postDarkUntil: Record<string, number>;
+  /** Live anchors: the hooked player, the anchor body, the seconds the chain
+   *  has held (the haul starts after the settle). */
+  anchors: { playerId: number; anchorId: number; held: number }[];
+  /** Live shackle pairs, the seconds left, and the strain tick clock. */
+  shackles: { a: number; b: number; remaining: number; tick: number }[];
   /** Open the Cells thresholds already fired. */
   cellsFired: number;
-  /** Anyone keelhauled this fight (the deed reads it). */
+  /** Anyone hauled into the Drowning Pit this fight (the deed reads it). */
   keelhauled: boolean;
-  /** Hook casts started (the deterministic victim hash salt). */
+  /** Mechanic casts started (the deterministic victim hash salt). */
   casts: number;
-  /** The players the running Gaol Hook bar will hook when it lands. */
+  /** The players the running bar will take when it lands. */
   pending: number[];
+}
+
+/** The Gaol Turnkey's fight (encounters/sunken_bastion/turnkey.ts). */
+export interface TurnkeyFightState {
+  kind: 'turnkey';
+  cageTimer: number;
+  /** Cage casts started (the deterministic victim hash salt). */
+  casts: number;
+  /** The players the running Iron Cage bar will lock up. */
+  pending: number[];
+  /** Live cages by entity id. */
+  cageIds: number[];
+  /** A cage burst on its prisoner this fight (the deed reads it). */
+  crushed: boolean;
+}
+
+/** One Iron Cage (on the cage body): its prisoner, its clocks, and the last
+ *  counted escape press (the server-side press rate limit). */
+export interface GaolCageState {
+  kind: 'cage';
+  prisonerId: number;
+  /** The Turnkey that dropped it. */
+  ownerId: number;
+  /** Seconds the cage has stood. */
+  age: number;
+  /** Sim time of the last counted press. */
+  pressAt: number;
+  /** Counted presses (tests, the log). */
+  presses: number;
+  /** The mend clock. */
+  mend: number;
+  /** Heroic brine flood: seconds of flooding already charged. */
+  flooded: number;
+  /** The floor it lands on (it drops from above: pos.y falls to this). */
+  floorY: number;
 }
 
 export interface VaelFightState {
@@ -4305,6 +4342,25 @@ export interface VaelFightState {
   } | null;
   /** A Fog Shade burst this fight (the deed reads it). */
   burst: boolean;
+  /** Seconds until the next Shadowstep. */
+  reapTimer: number;
+  /** Shadowsteps started (the deterministic victim hash salt). */
+  reaps: number;
+  /** The Shadowstep in flight: its phase clock, the mark, the pool (object id,
+   *  spot and sweep yaw) once it opens, and where he stood when he sank. */
+  reap: {
+    phase: 'vanish' | 'pool' | 'rise';
+    elapsed: number;
+    markId: number;
+    poolId: number;
+    x: number;
+    z: number;
+    yaw: number;
+    fromX: number;
+    fromZ: number;
+  } | null;
+  /** Heroic Grave Shadows still burning: object id, seconds left, tick clock. */
+  graves: { objectId: number; remaining: number; tick: number }[];
 }
 
 /** The Turretback Hermit's pull, watched for the Eviction Notice deed. */
@@ -4318,7 +4374,9 @@ export type BastionFightState =
   | OlenFightState
   | OssickFightState
   | VaelFightState
-  | HermitFightState;
+  | HermitFightState
+  | TurnkeyFightState
+  | GaolCageState;
 
 /** Per-fight state of a Drowned Temple boss (encounters/drowned_temple), on
  *  the boss entity; cleared when the fight ends (a kill, an evade, a wipe). */
@@ -4524,7 +4582,6 @@ export interface DungeonObjectSpawn {
     // The Sunken Bastion's encounter objects (encounters/sunken_bastion): the
     // state rides the template id so the online client mirrors it.
     | 'bastion_buttress_intact'
-    | 'bastion_post_lit'
     | 'bastion_beacon_lamp';
   dungeonId?: string;
   /**
