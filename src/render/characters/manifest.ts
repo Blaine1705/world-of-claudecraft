@@ -84,6 +84,7 @@ import {
   HOARD_GESTURE_ICE_AGE_RELEASE,
 } from '../hoard_boss_gestures_core';
 import type { LocoGaitThresholds } from '../locomotion';
+import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 
@@ -4071,15 +4072,27 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Cast',
     },
   },
+  // The Gaol Turnkey (scripts/assets/sunken_bastion_creatures/turnkey.py):
+  // its own bloated drowned jailer, no player body. It flails its great ring
+  // of keys overhead (KeySwing) and lashes the key chain flat across its
+  // front (ChainLash); opening the cells it hoists its lantern and rattles
+  // the keys (LanternRaise, played from the lantern flare in
+  // sunken_bastion/bastion_creature_fx.ts).
   bastion_turnkey: {
-    url: `${PLAYERS}/barbarian.glb`,
-    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`],
-    height: HUMANOID_H * 1.55,
-    clips: kaykit(['2H_Melee_Attack_Chop']),
-    show: ['Barbarian_BearHat'],
-    attach: [{ url: `${WEAPONS}/axe_2handed.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.3,
+    url: `${CREATURES}/gaol_turnkey.glb`,
+    height: 4.8,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['KeySwing', 'ChainLash'],
+      attackByAbility: { [BASTION_OPEN_CELLS_GESTURE]: 'LanternRaise' },
+      attackTimeScaleByAbility: { [BASTION_OPEN_CELLS_GESTURE]: 1 },
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    selfIllumination: 0.05,
   },
 
   // The Turretback Hermit, the Bastion's showpiece (scripts/assets/
