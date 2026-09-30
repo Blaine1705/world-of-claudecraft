@@ -4432,6 +4432,8 @@ export interface KnellwyrmFightState {
     /** Where it took wing from (instance-local). */
     fromX: number;
     fromZ: number;
+    /** The lane's encounter object (the mark, then the burning lane). */
+    objectId: number;
     /** Players the run already burned (one hit each). */
     hit: number[];
   } | null;

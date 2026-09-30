@@ -13,6 +13,7 @@ import {
   CRYPT_GRAVE_ASCENSION,
   cryptDevTrigger,
   inStrafeLane,
+  KNELL_LANE_MARK_TEMPLATE,
   KNELL_LANE_TEMPLATE,
   KNELL_PYRE_TEMPLATE,
   KNELLWYRM_ARRIVE,
@@ -352,8 +353,12 @@ describe("The Knellwyrm: the finale Morthen's dying rite summons", { timeout: 12
     expect(lane).not.toBeNull();
     if (!lane) return;
     expect(inStrafeLane(lane, victim.pos.x - r.ox, victim.pos.z - r.oz)).toBe(true);
-    // Rim to rim across the ring.
+    // Rim to rim across the ring, painted on the floor while the bar runs.
     expect(lane.length).toBeGreaterThan(RITE_RING.r);
+    const marks = objects(r, KNELL_LANE_MARK_TEMPLATE);
+    expect(marks.length).toBe(1);
+    expect(marks[0].facing).toBeCloseTo(lane.yaw, 6);
+    expect(marks[0].scale).toBeCloseTo(lane.length, 6);
     const before = victim.hp;
     let ran = false;
     let airborne = 0;
@@ -365,6 +370,7 @@ describe("The Knellwyrm: the finale Morthen's dying rite summons", { timeout: 12
     expect(airborne).toBeGreaterThan(4);
     expect(victim.hp).toBeLessThan(before);
     expect(objects(r, KNELL_LANE_TEMPLATE).length).toBe(1);
+    expect(objects(r, KNELL_LANE_MARK_TEMPLATE).length).toBe(0);
     // The lane burns while it stands; a player outside it is untouched.
     victim.hp = 1e6;
     const mid = {

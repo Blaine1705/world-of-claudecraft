@@ -55,12 +55,16 @@ export const KNELLWYRM_TOUCHDOWN = 'crypt_knellwyrm_touchdown';
 // ---- encounter object templates (the state rides the template id) ------------------------
 /** The ritual circle bursting into ghost fire: the Knellwyrm's warning. */
 export const KNELL_PYRE_TEMPLATE = 'crypt_knell_pyre';
+/** A Pyre Strafe lane while its bar runs (the telegraph); the same object
+ *  swaps to the burning template when the run has passed over it. */
+export const KNELL_LANE_MARK_TEMPLATE = 'crypt_knell_lane_mark';
 /** A lane of the ring left burning by Pyre Strafe. */
 export const KNELL_LANE_TEMPLATE = 'crypt_knell_fire_lane';
 
 /** Every Hollow Crypt encounter object template (the renderer draws them itself). */
 export const CRYPT_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   KNELL_PYRE_TEMPLATE,
+  KNELL_LANE_MARK_TEMPLATE,
   KNELL_LANE_TEMPLATE,
 ]);
 

@@ -59,6 +59,7 @@ import {
   CRYPT_ENTOMBED,
   CRYPT_GRAVE_ASCENSION,
   inStrafeLane,
+  KNELL_LANE_MARK_TEMPLATE,
   KNELL_LANE_TEMPLATE,
   KNELL_PYRE_TEMPLATE,
   KNELLWYRM_ARRIVE,
@@ -306,7 +307,26 @@ export function markPyreStrafe(
   const from = local(ctx, inst, wyrm);
   const to = local(ctx, inst, victim);
   const lane = strafeLane(from.x, from.z, to.x, to.z);
-  st.strafe = { ...lane, phase: 'mark', t: 0, fromX: from.x, fromZ: from.z, hit: [] };
+  // The lane shows at once (the telegraph), rim to rim.
+  const mark = spawnCryptObject(
+    ctx,
+    inst,
+    KNELL_LANE_MARK_TEMPLATE,
+    'Pyre Strafe',
+    lane.x,
+    lane.z,
+    lane.yaw,
+    lane.length,
+  );
+  st.strafe = {
+    ...lane,
+    phase: 'mark',
+    t: 0,
+    fromX: from.x,
+    fromZ: from.z,
+    objectId: mark.id,
+    hit: [],
+  };
   startCast(wyrm, KNELLWYRM_PYRE_STRAFE, T.strafeMark, victim.id);
   return true;
 }
@@ -367,6 +387,7 @@ function stepStrafe(
   if (s.phase === 'mark') {
     if (wyrm.castingAbility !== KNELLWYRM_PYRE_STRAFE) {
       // Broken off (it cannot be, but never strand a half-run strafe).
+      dropEncounterObject(ctx, inst, s.objectId);
       st.strafe = null;
       return false;
     }
@@ -429,16 +450,9 @@ function stepStrafe(
   if (k < 1) return true;
   clearCastOf(wyrm, KNELLWYRM_STRAFE_RUN);
   setPos(ctx, inst, wyrm, endX, endZ, floorAt(ctx, inst, endX, endZ));
-  const obj = spawnCryptObject(
-    ctx,
-    inst,
-    KNELL_LANE_TEMPLATE,
-    'Pyre Strafe',
-    s.x,
-    s.z,
-    s.yaw,
-    s.length,
-  );
+  // The marked lane catches: its object turns into the burning lane.
+  const obj = ctx.entities.get(s.objectId);
+  if (obj) obj.templateId = KNELL_LANE_TEMPLATE;
   st.lanes.push({
     x: s.x,
     z: s.z,
@@ -446,7 +460,7 @@ function stepStrafe(
     length: s.length,
     remaining: T.laneSeconds,
     tick: 1,
-    objectId: obj.id,
+    objectId: s.objectId,
   });
   st.strafe = null;
   return false;
@@ -492,6 +506,7 @@ function landBellow(ctx: SimContext, inst: InstanceSlot, wyrm: Entity): void {
 export function resetKnellwyrm(ctx: SimContext, inst: InstanceSlot, wyrm: Entity): void {
   const st = wyrm.knellwyrmFight;
   if (st) for (const lane of st.lanes) dropEncounterObject(ctx, inst, lane.objectId);
+  if (st?.strafe) dropEncounterObject(ctx, inst, st.strafe.objectId);
   for (const id of [KNELLWYRM_PYRE_STRAFE, KNELLWYRM_STRAFE_RUN, KNELLWYRM_DREAD_BELLOW])
     clearCastOf(wyrm, id);
   dropAura(wyrm, KNELLWYRM_BARED_RIBS);
@@ -508,6 +523,7 @@ export function resetKnellwyrm(ctx: SimContext, inst: InstanceSlot, wyrm: Entity
 function concludeKnellwyrm(ctx: SimContext, inst: InstanceSlot, wyrm: Entity): void {
   const st = wyrm.knellwyrmFight;
   if (st) for (const lane of st.lanes) dropEncounterObject(ctx, inst, lane.objectId);
+  if (st?.strafe) dropEncounterObject(ctx, inst, st.strafe.objectId);
   wyrm.knellwyrmFight = undefined;
   if (st && !st.burned) grantClaimDeed(ctx, inst, KNELLWYRM_DEED);
 }
