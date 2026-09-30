@@ -70,8 +70,9 @@ function hydraHead(id: string, name: string, color: number): MobTemplate {
     hpBase: 150,
     hpPerLevel: 30,
     // Snap is each head's own bite on whoever stands in its long reach (the
-    // tank); the Tide Breath and the Brine Spit are the encounter's
-    // (encounters/drowned_temple/mere_hydra.ts).
+    // tank); the elemental attacks (Freezing Breath, Venom Spit, Crushing
+    // Torrent), the Tsunami and the regrowth are the encounter's
+    // (encounters/drowned_temple/mere_hydra.ts and its hydra_* siblings).
     dmgBase: 13,
     dmgPerLevel: 2.8,
     attackSpeed: 2.6,

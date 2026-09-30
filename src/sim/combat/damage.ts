@@ -1891,7 +1891,8 @@ export function handleDeath(
     // future corpse-harvest cast, taken from the exact same eligible list the
     // heroic-reward award above uses (empty means the corpse is public at
     // once). Owned pets return earlier in this function and never reach here.
-    recordCorpseHarvestDeath(ctx, e, heroicRewardRecipients);
+    // A regrown encounter part (the Mere Hydra's head) was harvestable once.
+    if (!e.regrown) recordCorpseHarvestDeath(ctx, e, heroicRewardRecipients);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);

@@ -279,6 +279,8 @@ describe('the Mere Hydra: a fallen head grows back', () => {
     f.sim.ctx.handleDeath(heads[2], f.tank);
     expect(heads[2].loot).toBeNull();
     expect(f.sim.players.get(f.tank.id)?.xp).toBe(xp);
+    // Nor is its corpse harvestable a second time.
+    expect(heads[2].corpseHarvestState).toBeUndefined();
   });
 
   it('three heads down inside the window end it: nothing grows back', () => {

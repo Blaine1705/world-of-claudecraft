@@ -8,6 +8,7 @@
 // (Entity.regrown, read by combat/damage.ts handleDeath), so the regrowth is
 // never a farm. Zero rng.
 
+import { cancelCorpseHarvestForCorpse } from '../../professions/corpse_harvest_session';
 import type { SimContext } from '../../sim_context';
 import { addThreat } from '../../threat';
 import type { Entity, HydraFightState } from '../../types';
@@ -20,6 +21,9 @@ export const HYDRA_REGROWTH_LOG = 'A severed head of the Mere Hydra grows back!'
 
 /** Stand a fallen head back up at `share` of its health (no reward twice). */
 export function regrowHead(ctx: SimContext, head: Entity, share: number): void {
+  // A harvest reservation on the corpse never survives onto the living head.
+  cancelCorpseHarvestForCorpse(ctx, head);
+  head.corpseHarvestState = undefined;
   head.dead = false;
   head.regrown = true;
   head.hp = Math.max(1, Math.round(head.maxHp * share));
@@ -27,6 +31,8 @@ export function regrowHead(ctx: SimContext, head: Entity, share: number): void {
   head.loot = null;
   head.lootRecipientIds = undefined;
   head.harvestClaimedBy = null;
+  head.tappedById = null;
+  head.bossDamagers.clear();
   head.auras = [];
   head.castingAbility = null;
   head.castRemaining = 0;
