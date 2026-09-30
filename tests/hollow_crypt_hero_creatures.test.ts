@@ -19,6 +19,7 @@ import {
   drakeBreathCone,
   drakeStrikeShapes,
   inConeLocal,
+  paintsOwnBreath,
   shockwave,
   torrentEnvelope,
   torrentSeconds,
@@ -43,6 +44,7 @@ import {
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
+import { localizeSimAuraName } from '../src/ui/sim_i18n';
 
 const PLAYER_HEIGHT = 2.6;
 
@@ -377,6 +379,24 @@ describe('the hero creatures on screen', () => {
 });
 
 describe('the breath on the floor matches the sim cone', () => {
+  it('the drake paints its own breath (no generic orange cone on top)', () => {
+    expect(paintsOwnBreath('crypt_ossuary_drake')).toBe(true);
+    expect(paintsOwnBreath('crypt_ossuary_warrior')).toBe(false);
+  });
+
+  it('the breath and the other crypt strikes resolve through the sim name matcher', () => {
+    for (const name of [
+      'Barrowflame Breath',
+      'Grave Cleave',
+      'Tail Lash',
+      'Wing Gust',
+      'Stone Shriek',
+      'Grave Bolt',
+    ]) {
+      expect(localizeSimAuraName(name), name).not.toBeNull();
+    }
+  });
+
   it('the telegraph is the template cone in ghost-fire colour', () => {
     const spec = cryptTelegraphSpecs()[CRYPT_BARROWFLAME_BREATH];
     const cone = drakeBreathCone();
