@@ -10,23 +10,47 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "es_ES": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "fr_FR": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "fr_CA": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "de_DE": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "zh_CN": [
     "hudChrome.graphicsRestore.note"
@@ -41,33 +65,69 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.graphicsRestore.note"
   ],
   "pt_BR": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "ru_RU": [
     "hudChrome.graphicsRestore.note"
   ],
   "cs_CZ": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "nl_NL": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "pl_PL": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "id_ID": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "tr_TR": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "sv_SE": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "vi_VN": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ],
   "da_DK": [
-    "hudChrome.graphicsRestore.note"
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
   ]
 };
