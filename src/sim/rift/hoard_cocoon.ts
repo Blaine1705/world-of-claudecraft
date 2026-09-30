@@ -24,18 +24,14 @@ import {
   COCOON,
   COCOON_TOTAL_SEC,
   cocoonCount,
+  cocoonDoubles,
   cocoonHealth,
   HOARD_BROOD_COCOON_TEMPLATE,
   HOARD_COCOONED_AURA_ID,
   HOARD_SILK_COCOON_TEMPLATE,
   isCocoonVariant,
 } from './hoard_cocoon_core';
-import {
-  HOARD_DOUBLE_MECHANIC_INTENSITY,
-  hoardIntensity,
-  hoardMechanicDamage,
-  hoardPressure,
-} from './hoard_scaling';
+import { hoardIntensity, hoardMechanicDamage, hoardPressure } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_COCOON_ABILITY = 'Cocoon';
@@ -120,7 +116,7 @@ function begin(
   const held = cocoonState(state);
   held.casts++;
   held.cocoons = [];
-  const double = hoardIntensity(inst.vault, living.length) >= HOARD_DOUBLE_MECHANIC_INTENSITY;
+  const double = cocoonDoubles(inst.vault?.rarity, hoardIntensity(inst.vault, living.length));
   const count = cocoonCount(living.length, double);
   const spin = (x: number, z: number, target: Entity | null, free: number): void => {
     const total = target ? COCOON_TOTAL_SEC : BROOD_COCOON_TOTAL_SEC;

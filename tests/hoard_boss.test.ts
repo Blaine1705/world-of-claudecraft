@@ -210,6 +210,11 @@ describe('Buried Hoard boss encounter', () => {
       (id) => sim.entities.get(id)?.templateId === HOARD_BROOD_EGG_TEMPLATE,
     );
     expect(eggIds).toHaveLength(HOARD_BROOD_EGG_COUNT);
+    // Two spiderlings at half health, not four: with her swing and the cocoon,
+    // four fast adds on the tank at once were the epic hoard's wall (bench).
+    expect(HOARD_BROOD_EGG_COUNT).toBe(2);
+    // Her swing is 2.2 s (was 1.9 s, the fastest of the eight hoard bosses).
+    expect(MOBS.rift_boss_venom.attackSpeed).toBe(2.2);
     for (const [index, id] of eggIds.entries()) {
       const egg = sim.entities.get(id);
       expect(egg?.damageImmune).toBe(true);
@@ -259,7 +264,7 @@ describe('Buried Hoard boss encounter', () => {
     const eggIds = boss.summonedIds.filter(
       (id) => sim.entities.get(id)?.templateId === HOARD_BROOD_EGG_TEMPLATE,
     );
-    expect(eggIds).toHaveLength(4);
+    expect(eggIds).toHaveLength(HOARD_BROOD_EGG_COUNT);
     boss.hp = 0;
     boss.dead = true;
     tickHoardBossMechanics(sim.ctx);

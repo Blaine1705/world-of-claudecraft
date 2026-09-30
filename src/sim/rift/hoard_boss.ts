@@ -96,7 +96,10 @@ export const HOARD_SWEEP_METEOR_COUNT = 5;
 /** Share of the reference health a scattered Emberforge meteor deals to anyone under it. */
 export const HOARD_SWEEP_METEOR_DAMAGE_FRACTION = 0.14;
 export const HOARD_BONE_WAVE_COUNT = 4;
-export const HOARD_BROOD_EGG_COUNT = 4;
+/** Vysska's clutch: the spiderlings that hatch at half health. Two, not four:
+ *  four fast adds on the tank at once, on top of her swing, were the epic
+ *  hoard's wall (the Buried Hoard balance bench). */
+export const HOARD_BROOD_EGG_COUNT = 2;
 export const HOARD_BROOD_HATCH_HP = 0.5;
 export const HOARD_TOTEM_TRIGGER_HP = 0.65;
 /** No new set of tentacles rises this close above the totem's threshold while it

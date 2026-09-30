@@ -1032,7 +1032,9 @@ const BOSSES: Record<string, MobTemplate> = {
     hpPerLevel: 58,
     dmgBase: 16,
     dmgPerLevel: 3.2,
-    attackSpeed: 1.9,
+    // 2.2 s (was 1.9 s, the fastest swing of the eight hoard bosses): her kit
+    // already asks the most of the party (cocoons, silk, a hatch at half).
+    attackSpeed: 2.2,
     armorPerLevel: 24,
     moveSpeed: 7.5,
     aggroRadius: 18,

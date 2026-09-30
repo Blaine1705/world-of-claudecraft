@@ -10,6 +10,7 @@ import {
   COCOON,
   COCOON_TOTAL_SEC,
   cocoonCount,
+  cocoonDoubles,
   cocoonHealth,
   cocoonUrgency,
   HOARD_BROOD_COCOON_TEMPLATE,
@@ -17,7 +18,11 @@ import {
   HOARD_SILK_COCOON_TEMPLATE,
   isCocoonVariant,
 } from '../src/sim/rift/hoard_cocoon_core';
-import { HOARD_RARITY_PRESSURE } from '../src/sim/rift/hoard_scaling';
+import {
+  HOARD_DOUBLE_MECHANIC_INTENSITY,
+  HOARD_RARITY_PRESSURE,
+  hoardIntensity,
+} from '../src/sim/rift/hoard_scaling';
 import type { RiftInstance } from '../src/sim/rift/types';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
@@ -126,6 +131,25 @@ describe('the cocoon numbers (pure, shared with the renderer)', () => {
         if (count === 2) expect(living - count).toBeGreaterThanOrEqual(COCOON.doubleMinFreePlayers);
       }
     }
+  });
+
+  it('doubles only on a legendary map: a full epic party gets one cocoon', () => {
+    const vault = (rarity: Rarity) => ({ rarity }) as RiftInstance['vault'];
+    // Five on an epic map reach the shared double intensity (5 + 1), but her
+    // double was the epic hoard's wall (bench), so it stays a legendary ask.
+    expect(hoardIntensity(vault('epic'), 5)).toBe(HOARD_DOUBLE_MECHANIC_INTENSITY);
+    expect(cocoonDoubles('epic', hoardIntensity(vault('epic'), 5))).toBe(false);
+    expect(cocoonDoubles('rare', 99)).toBe(false);
+    expect(cocoonDoubles(undefined, 99)).toBe(false);
+    expect(cocoonDoubles('legendary', hoardIntensity(vault('legendary'), 5))).toBe(true);
+    expect(cocoonDoubles('legendary', hoardIntensity(vault('legendary'), 4))).toBe(true);
+    // Three on a legendary map (3 + 2) stay below the shared threshold.
+    expect(cocoonDoubles('legendary', hoardIntensity(vault('legendary'), 3))).toBe(false);
+  });
+
+  it('heals her half as much as before from her feeding and her devour', () => {
+    expect(COCOON.drainHealShare).toBe(0.75);
+    expect(COCOON.devourHealFraction).toBe(0.03);
   });
 
   it('scales a cocoon to the hands free to cut it, within bounds', () => {
@@ -326,6 +350,20 @@ describe('the cocoon in the fight', () => {
     addAllies(calm, 3);
     cast(calm);
     expect(cuesOf(calm.inst, 'brood-cocoon')).toHaveLength(1);
+  });
+
+  it('a full party of five on an epic map is wrapped one at a time', () => {
+    const entry = encounter('epic');
+    addAllies(entry, 4);
+    expect(everyone(entry)).toHaveLength(5);
+    cast(entry);
+    expect(cuesOf(entry.inst, 'brood-cocoon')).toHaveLength(1);
+    run(entry.sim, entry.boss, COCOON.warningSec + DT);
+    expect(wrapped(entry)).toHaveLength(1);
+    const full = encounter('legendary');
+    addAllies(full, 4);
+    cast(full);
+    expect(cuesOf(full.inst, 'brood-cocoon')).toHaveLength(2);
   });
 
   it('holds her venom back while anyone is wrapped, and only spins into a clean room', () => {

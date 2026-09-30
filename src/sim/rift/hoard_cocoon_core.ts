@@ -14,6 +14,9 @@
 //   brood-cocoon-end  the SAME id, over: `innerRadius` 0 cut open in time, 1 she
 //                     fed (or it hatched)
 
+import type { TreasureMapRarity } from '../content/treasure_maps';
+import { HOARD_DOUBLE_MECHANIC_INTENSITY } from './hoard_scaling';
+
 export const COCOON_CUE_VARIANTS = ['brood-cocoon', 'brood-cocoon-end'] as const;
 export function isCocoonVariant(variant: string | undefined): boolean {
   return (COCOON_CUE_VARIANTS as readonly string[]).includes(variant ?? '');
@@ -32,6 +35,9 @@ export const COCOON = Object.freeze({
   minFreePlayers: 1,
   doubleMaxShare: 0.5,
   doubleMinFreePlayers: 2,
+  /** The double is a LEGENDARY hoard's ask only: five on an epic map reach the
+   *  shared double intensity too, and two wrapped at once there was a wall. */
+  doubleRarity: 'legendary' as TreasureMapRarity,
   // ---- one cocoon's life
   /** The web mark is on the player this long before the silk closes. */
   warningSec: 1.6,
@@ -41,11 +47,13 @@ export const COCOON = Object.freeze({
    *  healing. Her feeding never kills by itself: it stops at a sliver. */
   drainEverySec: 1,
   drainDamageFraction: 0.07,
-  drainHealShare: 1.5,
+  /** Half what it was (1.5): her feeding healed her back through a whole phase. */
+  drainHealShare: 0.75,
   /** Not cut out in time: a last deep drink, and what it heals her (a share of
    *  her own health). */
   devourDamageFraction: 0.45,
-  devourHealFraction: 0.06,
+  /** Half what it was (0.06). */
+  devourHealFraction: 0.03,
   endSec: 0.9,
   // ---- the cocoon mob
   /** COCOON_HEALTH, as a share of the boss's own health (already scaled by party
@@ -65,6 +73,13 @@ export const COCOON = Object.freeze({
 });
 
 export const COCOON_TOTAL_SEC = COCOON.warningSec + COCOON.drainSec;
+
+/** Whether she wraps two at once: only on a legendary map, and only when the
+ *  hoard presses hard enough for any boss to double a mechanic
+ *  (hoard_scaling.ts HOARD_DOUBLE_MECHANIC_INTENSITY). */
+export function cocoonDoubles(rarity: TreasureMapRarity | undefined, intensity: number): boolean {
+  return rarity === COCOON.doubleRarity && intensity >= HOARD_DOUBLE_MECHANIC_INTENSITY;
+}
 export const BROOD_COCOON_TOTAL_SEC = COCOON.warningSec + COCOON.hatchSec;
 
 /** How many players she wraps at once: never the whole party, never so many that
