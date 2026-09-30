@@ -6,10 +6,14 @@ of the coil to a long needle-toothed head; a pale belly, a ragged dorsal fin
 crackling with blue light, rows of cyan photophores down both flanks that
 brighten as it charges, small blind glowing eyes and trailing barbels.
 
-Clips: Idle (the column swaying over its coil), Walk and Run (the coil
-sliding, the column rippling), Attack (rear and strike), Attack2 (a sideways
-lash), Hit, Death (the column falls and uncoils along the ground), Cast and
-Coil (Static Coil: the coils clench, the head thrown up, jaws wide, shuddering).
+Clips: Idle (an S-wave climbing the column over its coil, the head held
+level: the body ripples, the head never shakes), Walk and Run (the coil
+gliding, the wave running faster), Attack (rear and strike), Attack2 (a
+sideways lash), Hit, Death (the column falls and uncoils along the ground),
+Cast and Coil (Static Coil: the coils clench, the head thrown up, jaws wide,
+shuddering), Spit (Lightning Spit: drawn back crackling, then the bolt spat
+down its lane). A replacement eel model keeps these clip names, or remaps
+them in the manifest's temple_eel row.
 """
 import math
 
@@ -115,29 +119,38 @@ def body():
 
 def clips(arm):
     stand = {'S1': [('x', -2)], 'Head': [('x', 4)]}
+    chain = ['S1', 'S2', 'S3', 'S4', 'S5']
 
     def sway(ph, amp=1.0):
-        return merge(stand, {
-            'S1': [('y', 4 * math.sin(ph) * amp)],
-            'S2': [('y', -5 * math.sin(ph + 0.8) * amp)],
-            'S3': [('y', 6 * math.sin(ph + 1.6) * amp)],
-            'S4': [('y', -5 * math.sin(ph + 2.4) * amp)],
-            'S5': [('y', 4 * math.sin(ph + 3.2) * amp), ('x', 3 * math.cos(ph))],
-            'Head': [('y', -6 * math.sin(ph + 3.8) * amp)],
-            'Jaw': [('x', 6 + 5 * math.sin(ph * 2))],
-            'Fin.L': [('z', 10 * math.sin(ph * 2))],
-        })
+        """A serpentine S-wave travelling UP the column: each vertebra bends to
+        the side a beat after the one below it (the wave's crest climbs from
+        the coil to the neck), while the head counter-turns by the sum of the
+        bends below it, so it stays level and looking ahead: the body ripples,
+        the head never shakes. A slower fore-and-aft breath rides under it."""
+        side = [5.0, 7.0, 8.0, 7.0, 5.0]
+        bends = [side[k] * amp * math.sin(ph - k * 1.05) for k in range(5)]
+        pose = {}
+        for k, bone in enumerate(chain):
+            pose[bone] = [('y', bends[k]), ('x', 1.6 * amp * math.sin(ph * 0.5 - k * 0.6))]
+        # Level head: cancel the column's net roll and most of its nod.
+        pose['Head'] = [('y', -sum(bends)), ('x', -0.8 * amp * math.sin(ph * 0.5 - 2.4))]
+        pose['Jaw'] = [('x', 5 + 3 * math.sin(ph))]
+        pose['Fin.L'] = [('z', 8 * math.sin(ph - 2.0))]
+        pose['Coil'] = [('z', 4 * amp * math.sin(ph + 0.9))]
+        return merge(stand, pose)
 
-    author_clip(arm, 'Idle', loop(72, [sway(i / 6 * math.tau) for i in range(6)]))
 
     def slither(ph, amp=1.0):
-        return merge(sway(ph * 2, 1.6 * amp), {
-            'Coil': [('z', 8 * math.sin(ph) * amp), ('loc', (0.12 * math.sin(ph) * amp, 0, 0))],
-            'Root': [('loc', (0, 0, 0.05 * abs(math.sin(ph))))],
+        # Gliding on its coil: the S-wave runs faster and wider up the column
+        # and the coil itself undulates, the head still held level.
+        return merge(sway(ph, 1.5 * amp), {
+            'Coil': [('z', 7 * math.sin(ph) * amp), ('loc', (0.1 * math.sin(ph) * amp, 0, 0))],
+            'Root': [('loc', (0, 0, 0.04 * abs(math.sin(ph))))],
         })
 
-    author_clip(arm, 'Walk', loop(32, [slither(i / 4 * math.tau) for i in range(4)]))
-    author_clip(arm, 'Run', loop(20, [slither(i / 4 * math.tau, 1.4) for i in range(4)]))
+    author_clip(arm, 'Idle', loop(96, [sway(i / 8 * math.tau) for i in range(8)]))
+    author_clip(arm, 'Walk', loop(32, [slither(i / 8 * math.tau) for i in range(8)]))
+    author_clip(arm, 'Run', loop(20, [slither(i / 8 * math.tau, 1.3) for i in range(8)]))
     rear = merge(stand, {'S3': [('x', -14)], 'S4': [('x', -16)], 'S5': [('x', -14)], 'Head': [('x', -18)],
                          'Jaw': [('x', 25)]})
     strike = merge(stand, {'S2': [('x', 14)], 'S3': [('x', 20)], 'S4': [('x', 24)], 'S5': [('x', 18)],
@@ -166,7 +179,18 @@ def clips(arm):
     author_clip(arm, 'Coil', [(1, stand), (8, clench), (11, shake_a), (14, shake_b), (17, shake_a), (20, shake_b),
                               (23, shake_a), (26, shake_b), (29, shake_a), (32, shake_b), (36, clench),
                               (44, strike), (52, stand)], loop=False)
-    return ['Idle', 'Walk', 'Run', 'Attack', 'Attack2', 'Hit', 'Death', 'Cast', 'Coil']
+    # Lightning Spit: it draws the column back and down, crackling, then
+    # snaps forward and spits the bolt down its lane, jaws wide.
+    draw = merge(stand, {'S2': [('x', -6)], 'S3': [('x', -12)], 'S4': [('x', -14)], 'S5': [('x', -10)],
+                         'Head': [('x', 8)], 'Jaw': [('x', 14)], 'Fin.L': [('z', 30)]})
+    crackle_a = merge(draw, {'S4': [('y', 2)], 'Head': [('y', -2)], 'Jaw': [('x', 6)]})
+    crackle_b = merge(draw, {'S4': [('y', -2)], 'Head': [('y', 2)], 'Jaw': [('x', -4)]})
+    spit = merge(stand, {'S2': [('x', 10)], 'S3': [('x', 14)], 'S4': [('x', 12)], 'S5': [('x', 6)],
+                         'Head': [('x', -6)], 'Jaw': [('x', 42)], 'Fin.L': [('z', -12)]})
+    author_clip(arm, 'Spit', [(1, stand), (10, draw), (16, crackle_a), (22, crackle_b), (28, crackle_a),
+                              (34, crackle_b), (40, draw), (44, spit), (50, merge(spit, {'Jaw': [('x', -20)]})),
+                              (62, stand)], loop=False)
+    return ['Idle', 'Walk', 'Run', 'Attack', 'Attack2', 'Hit', 'Death', 'Cast', 'Coil', 'Spit']
 
 
 CREATURE = (BONES, body, clips, 3.5, 13.0)
