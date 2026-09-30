@@ -3806,8 +3806,9 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.6,
   },
   // The Chapel Gargoyle (scripts/assets/hollow_crypt_creatures/build_stone_gargoyle.py):
-  // a great, heavy stone brute with baked cracked-stone surfaces, about 4.5 yd
-  // tall crouched on its arch (a player stands 2.6). It is a statue while it
+  // a great, heavy stone brute with baked cracked-stone surfaces, authored about
+  // 4.5 yd tall crouched and raised to scale 1.5 by its template, so it looms
+  // well over three players high on its arch (a player stands 2.6). It is a statue while it
   // perches (`Perch`, read as airborne up on the cap), cracks free on the pull
   // (`Awaken`, keyed on the dive cue), plunges (`Dive`), slams down (`DiveLand`),
   // fights from a braced crouch (`Ready`), rakes with its talons and rears to

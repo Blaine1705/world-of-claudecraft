@@ -315,6 +315,10 @@ describe('the hero creatures on screen', () => {
     expect(v.clips.attackByAbility?.[CRYPT_PERCH_DIVE]).toBe('Awaken');
     expect(v.clips.attack).toEqual(['ClawRake', 'ClawRake2']);
     expect(v.height).toBeGreaterThan(PLAYER_HEIGHT * 2);
+    // Pass four: clearly over three times a player's height as it stands in game.
+    const inGame = v.height * MOBS.crypt_chapel_gargoyle.scale;
+    expect(inGame).toBeGreaterThanOrEqual(PLAYER_HEIGHT * 3);
+    expect(inGame).toBeLessThanOrEqual(PLAYER_HEIGHT * 3.6);
   });
 
   it('ships every authored clip in the rebuilt GLBs', () => {

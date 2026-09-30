@@ -268,7 +268,9 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
       { copper: 120, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.4 },
     ],
-    scale: 1.0,
+    // A great stone brute over three times a player's height crouched on its
+    // arch (the body is authored at 5.8 yd; the melee reach follows the body).
+    scale: 1.5,
     color: 0x8c8f99,
   },
   crypt_crow_caller: {
