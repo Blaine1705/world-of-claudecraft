@@ -4,6 +4,7 @@
 // tests/social_shared.ts. Tests here run on the entity-stripped
 // SOCIAL_TEST_WORLD via makeWorld() except the three that fight or loot a
 // live camp wolf, which keep the full built-in world via makeFullWorld().
+
 import { describe, expect, it } from 'vitest';
 import {
   CRYPT_SPAWNS,
@@ -14,7 +15,9 @@ import {
   MOBS,
 } from '../src/sim/data';
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../src/sim/eastbrook_layout';
+import { cryptDevTrigger } from '../src/sim/encounters/hollow_crypt';
 import { createMob } from '../src/sim/entity';
+import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import { type Party, Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -1080,6 +1083,10 @@ describe('the Hollow Crypt', () => {
     expect(cryptMobs.length).toBe(CRYPT_SPAWNS.length);
     // walk the player onto the boss: pulse should hit within ~12s
     const boss = nearestMob(sim, 'morthen', origin);
+    // Skip his entrance at the Rite Ring (encounters/hollow_crypt): this pins
+    // the pulse in combat, not the cinematic.
+    const claim = claimedInstanceAt(sim.ctx, mustEntity(sim, a).pos);
+    if (claim) cryptDevTrigger(sim.ctx, claim, 'skip');
     const ea = sim.entities.get(a)!;
     sim.setPlayerLevel(10, a);
     ea.hp = ea.maxHp;

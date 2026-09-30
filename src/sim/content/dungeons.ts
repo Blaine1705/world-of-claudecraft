@@ -1562,8 +1562,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: HOLLOW_CRYPT_ANCHORS.entry.x, z: HOLLOW_CRYPT_ANCHORS.entry.z },
     exitOffset: { x: HOLLOW_CRYPT_ANCHORS.exit.x, z: HOLLOW_CRYPT_ANCHORS.exit.z },
     // Morthen's ring sits on the crag ~340 yd from the door: a second exit
-    // opens beside the altar on his death.
-    bossExitPortal: { x: -12, z: 190 },
+    // opens beside the altar once the Knellwyrm his dying rite summons falls
+    // (the run's last fight; Morthen stays the final boss for lockouts).
+    bossExitPortal: { x: -12, z: 190, after: 'crypt_knellwyrm' },
     spawns: HOLLOW_CRYPT_SPAWNS,
     objects: HOLLOW_CRYPT_GATE_OBJECTS,
     gates: HOLLOW_CRYPT_GATES,

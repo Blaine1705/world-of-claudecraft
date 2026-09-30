@@ -15,6 +15,11 @@
 //                                      minion, brute, gargoyle (on a perch),
 //                                      caller, crow, drake (lands from the sky)
 //   /dev crypt reset                   free the run and claim a fresh one
+//   /dev crypt rise [skip]             wake Morthen's entrance now (or skip it:
+//                                      he stands ready at the altar)
+//   /dev crypt wyrm                    skip the entrance and slay Morthen: the
+//                                      Knellwyrm finale starts (pyre, flight in)
+//   /dev crypt trigger <strafe|bellow> fire an engaged Knellwyrm's mechanic now
 //
 // Areas: landing, cloister, grille, processional, yard, bellyard (marrow),
 // gallery, rim, web (rimeweb), choir, loft (ilvane), stair, bonestair, ring
@@ -22,6 +27,7 @@
 
 import { HOLLOW_CRYPT_ANCHORS } from '../content/hollow_crypt_layout';
 import { DUNGEONS, instanceOrigin, MOBS } from '../data';
+import { cryptDevTrigger } from '../encounters/hollow_crypt';
 import { createMob } from '../entity';
 import {
   applyDungeonMobTuning,
@@ -79,7 +85,7 @@ export const HOLLOW_CRYPT_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake> | reset';
+  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake> | rise [skip] | wyrm | trigger <strafe|bellow> | reset';
 
 /** Raise one trash mob ahead of the player, pulled at once (a gargoyle starts
  *  on a perch and a drake high in the sky, so both show their descent). */
@@ -222,6 +228,26 @@ export function handleHollowCryptDevChat(ctx: SimContext, raw: string, pid: numb
       spots[spots.length - 1];
     displacePlayerForDev(ctx, e, o.x + spawn.x + spot[0], o.z + spawn.z + spot[1]);
     log(ctx, pid, `[dev] Hollow Crypt: pack ${arg}.`);
+    return true;
+  }
+  if (verb === 'rise' || verb === 'wyrm' || verb === 'trigger') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    if (verb === 'rise') {
+      log(ctx, pid, `[dev] ${cryptDevTrigger(ctx, inst, arg === 'skip' ? 'skip' : 'rise')}`);
+      return true;
+    }
+    if (verb === 'wyrm') {
+      cryptDevTrigger(ctx, inst, 'skip');
+      const n = killMatching(ctx, pid, inst, 'morthen');
+      log(
+        ctx,
+        pid,
+        n > 0 ? '[dev] Morthen falls: the Knellwyrm is coming.' : '[dev] Morthen is already dead.',
+      );
+      return true;
+    }
+    log(ctx, pid, `[dev] ${cryptDevTrigger(ctx, inst, arg)}`);
     return true;
   }
   if (verb === 'reset') {

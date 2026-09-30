@@ -10,6 +10,11 @@
 // land in later passes. Health is placeholder too, to be set from the meters
 // harness through NormalDungeonTuning.healthMultiplierByMob.
 
+import {
+  CRYPT_BARROWFLAME_BREATH,
+  CRYPT_TAIL_LASH,
+  CRYPT_WING_GUST,
+} from '../mob/trash_kit/cast_ids';
 import type { DungeonGateDef, DungeonObjectSpawn, DungeonSpawn, MobTemplate } from '../types';
 import { ARCADE_TOP_Y } from './hollow_crypt_layout';
 
@@ -321,6 +326,75 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.3,
     color: 0x9d6cd0,
+  },
+  // The finale: the Knellwyrm, the great bone wyrm Morthen's dying rite calls
+  // down on the Rite Ring (encounters/hollow_crypt/knellwyrm.ts). Never placed:
+  // the encounter summons it out of the sky after Morthen falls. The Ossuary
+  // Drake's kit (the breath cone and its telegraph are the drake's geometry,
+  // so the painted cone is the one that burns), plus Pyre Strafe and Dread
+  // Bellow from its module. Boss rule: CC- and snare-immune (see morthen).
+  // Morthen keeps the run's loot; the wyrm pays a modest purse and reagents.
+  crypt_knellwyrm: {
+    id: 'crypt_knellwyrm',
+    name: 'Knellwyrm',
+    minLevel: 10,
+    maxLevel: 10,
+    family: 'undead',
+    elite: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 200,
+    hpPerLevel: 30,
+    dmgBase: 11,
+    dmgPerLevel: 2.8,
+    attackSpeed: 2.4,
+    armorPerLevel: 26,
+    moveSpeed: 7.5,
+    aggroRadius: 20,
+    breathCone: {
+      castId: CRYPT_BARROWFLAME_BREATH,
+      name: 'Barrowflame Breath',
+      castTime: 2,
+      every: 13,
+      range: 14,
+      arcDeg: 70,
+      min: 30,
+      max: 38,
+      school: 'fire',
+    },
+    trashKit: {
+      tailLash: {
+        castId: CRYPT_TAIL_LASH,
+        name: 'Tail Lash',
+        castTime: 1,
+        every: 10,
+        first: 7,
+        school: 'physical',
+        range: 10,
+        arcDeg: 120,
+        min: 20,
+        max: 28,
+      },
+      wingGust: {
+        castId: CRYPT_WING_GUST,
+        name: 'Wing Gust',
+        castTime: 1.5,
+        every: 19,
+        first: 11,
+        school: 'physical',
+        radius: 10,
+        knockback: 8,
+        min: 12,
+        max: 18,
+      },
+    },
+    loot: [
+      { copper: 1500, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+      { itemId: 'arcane_essence', chance: 0.5 },
+    ],
+    scale: 1.0,
+    color: 0x3b3a34,
   },
 };
 

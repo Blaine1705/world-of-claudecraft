@@ -17,6 +17,7 @@ import {
   instanceOrigin,
   MOBS,
 } from '../src/sim/data';
+import { cryptDevTrigger } from '../src/sim/encounters/hollow_crypt';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import {
   awardHeroicMarks,
@@ -1289,6 +1290,9 @@ describe('dungeons: heroic difficulty', () => {
       enterDungeon(sim.ctx, 'hollow_crypt', pid);
       const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
       const morthen = mobInInstance(sim, inst, 'morthen');
+      // Skip his entrance at the Rite Ring (encounters/hollow_crypt): this
+      // pins the pulse, not the cinematic.
+      cryptDevTrigger(sim.ctx, inst, 'skip');
       if (mult !== undefined) morthen.mechanicDamageMult = mult;
       const p = sim.entities.get(pid) as AnyEntity;
       p.maxHp = 1_000_000;

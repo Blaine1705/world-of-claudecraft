@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1093,
-      "state": "3e7e983d",
+      "state": "d9726d69",
       "events": "b65f80d4",
       "rng": {
         "draws": 76,
@@ -3636,14 +3636,41 @@
         },
         {
           "aiState": "idle",
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "crypt_entombed",
+              "kind": "buff_dr",
+              "name": "Entombed",
+              "permanent": true,
+              "remaining": 3600,
+              "school": "shadow",
+              "sourceId": 1083
+            },
+            {
+              "duration": 3600,
+              "id": "crypt_grave_ascension",
+              "kind": "buff_dr",
+              "name": "Grave Ascension",
+              "permanent": true,
+              "remaining": 3600,
+              "school": "shadow",
+              "sourceId": 1083
+            }
+          ],
           "combatTimer": 99.1,
           "comboUntil": -1,
           "critChance": 0.05,
+          "cryptRite": {
+            "finale": "none",
+            "phase": "dormant"
+          },
+          "damageImmune": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
+          "encounterHeld": true,
           "fallStartY": 24,
           "fiveSecondRule": 99,
-          "hostile": true,
           "hp": 1191,
           "id": 1083,
           "idleStationary": true,
@@ -3657,7 +3684,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 100300,
-            "y": 24,
+            "y": 17,
             "z": -1038
           },
           "potionCooldownUntil": -1,
@@ -4045,7 +4072,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1093,
-      "state": "cf58c676",
+      "state": "c33a877a",
       "events": "eb3dd672",
       "rng": {
         "draws": 76,
@@ -7653,14 +7680,41 @@
         },
         {
           "aiState": "idle",
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "crypt_entombed",
+              "kind": "buff_dr",
+              "name": "Entombed",
+              "permanent": true,
+              "remaining": 3600,
+              "school": "shadow",
+              "sourceId": 1083
+            },
+            {
+              "duration": 3600,
+              "id": "crypt_grave_ascension",
+              "kind": "buff_dr",
+              "name": "Grave Ascension",
+              "permanent": true,
+              "remaining": 3600,
+              "school": "shadow",
+              "sourceId": 1083
+            }
+          ],
           "combatTimer": 99.2,
           "comboUntil": -1,
           "critChance": 0.05,
+          "cryptRite": {
+            "finale": "none",
+            "phase": "dormant"
+          },
+          "damageImmune": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
+          "encounterHeld": true,
           "fallStartY": 24,
           "fiveSecondRule": 99,
-          "hostile": true,
           "hp": 1191,
           "id": 1083,
           "idleStationary": true,
@@ -7674,7 +7728,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 100300,
-            "y": 24,
+            "y": 17,
             "z": -1038
           },
           "potionCooldownUntil": -1,
@@ -8062,7 +8116,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1093,
-      "state": "af199427",
+      "state": "813798a1",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8073,7 +8127,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1093,
-      "state": "a4ef869e",
+      "state": "8416fd6a",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8084,7 +8138,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1093,
-      "state": "f90320ba",
+      "state": "b4023ea8",
       "events": "741638a5",
       "rng": {
         "draws": 76,

@@ -30,6 +30,7 @@ import {
   NPCS,
 } from '../data';
 import { tickTempleEncounters } from '../encounters/drowned_temple';
+import { tickCryptEncounters } from '../encounters/hollow_crypt';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
@@ -180,7 +181,8 @@ export function spawnBossExitPortal(ctx: SimContext, mob: Entity): void {
   const dungeon = DUNGEONS[inst.dungeonId];
   const portal = dungeon?.bossExitPortal;
   if (!portal) return;
-  if (mob.templateId !== HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId) return;
+  if (mob.templateId !== (portal.after ?? HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId))
+    return;
   const origin = instanceOrigin(dungeon.index, inst.slot);
   const exit = createGroundObject(
     ctx.nextId++,
@@ -1500,6 +1502,9 @@ export function updateInstances(ctx: SimContext): void {
   tickBastionEncounters(ctx);
   // The Drowned Temple's boss fights (encounters/drowned_temple), same slot.
   tickTempleEncounters(ctx);
+  // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
+  // and the Knellwyrm, same slot.
+  tickCryptEncounters(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

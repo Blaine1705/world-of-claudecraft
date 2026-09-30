@@ -409,6 +409,18 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // leaked-mob safety net below must not re-hostile them. Ambush mobs damage
   // them through seeded threat; players heal them via the escort arm in
   // Sim.isFriendlyTo. Yumi-cat pattern, verbatim.
+  // An encounter's scripted entrance owns this mob (encounters/hollow_crypt:
+  // Morthen rising, the Knellwyrm flying in): inert and non-hostile, and the
+  // safety net below must not re-hostile it until the script hands it back.
+  if (mob.encounterHeld) {
+    mob.hostile = false;
+    mob.aiState = 'idle';
+    mob.inCombat = false;
+    mob.aggroTargetId = null;
+    clearThreat(mob);
+    return;
+  }
+
   if (isEscortNpcTemplate(mob.templateId)) {
     mob.hostile = false;
     mob.aiState = 'idle';

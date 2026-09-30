@@ -4400,6 +4400,56 @@ export type TempleFightState =
   | ColossusFightState
   | YsoleiFightState;
 
+/** Morthen's entrance and the Knellwyrm finale at the Hollow Crypt's Rite Ring
+ *  (encounters/hollow_crypt), on Morthen for the claim's life: the entrance
+ *  plays once per claim, the finale once after he falls. */
+export interface CryptRiteState {
+  phase: 'dormant' | 'wakes' | 'rise' | 'proclaim' | 'descend' | 'land' | 'risen';
+  /** Seconds into the current entrance phase. */
+  t: number;
+  finale: 'none' | 'pyre' | 'arrive' | 'settle' | 'fight' | 'slain';
+  /** Seconds into the current finale phase. */
+  ft: number;
+  /** The Knellwyrm, once summoned. */
+  wyrmId: number | null;
+  /** The burning ritual circle (the warning), while it stands. */
+  pyreObjectId: number | null;
+}
+
+/** The Knellwyrm's fight (encounters/hollow_crypt/knellwyrm.ts), on the wyrm;
+ *  cleared when the fight ends (a kill, an evade, a wipe). */
+export interface KnellwyrmFightState {
+  strafeTimer: number;
+  bellowTimer: number;
+  /** A marked strafe: its lane (instance-local), then the run along it. */
+  strafe: {
+    x: number;
+    z: number;
+    yaw: number;
+    length: number;
+    phase: 'mark' | 'run';
+    t: number;
+    /** Where it took wing from (instance-local). */
+    fromX: number;
+    fromZ: number;
+    /** Players the run already burned (one hit each). */
+    hit: number[];
+  } | null;
+  /** Lanes still burning (their object ids). */
+  lanes: {
+    x: number;
+    z: number;
+    yaw: number;
+    length: number;
+    remaining: number;
+    tick: number;
+    objectId: number;
+  }[];
+  casts: number;
+  /** Someone was burned by a Pyre Strafe this fight (the deed reads it). */
+  burned: boolean;
+}
+
 /** What an in-dungeon gate looks like (render-only pick; collision is one box). */
 export type DungeonGateKind =
   | 'portcullis'
@@ -4508,7 +4558,9 @@ export interface DungeonDef {
   // Where a second exit portal opens when the final boss dies (instance-local).
   // For open-field dungeons whose boss stands far from the entrance with no
   // corridor back; absent = no boss portal (every corridor dungeon).
-  bossExitPortal?: { x: number; z: number };
+  // `after` names the mob whose death opens it when that is not the final boss
+  // (the Hollow Crypt: the Knellwyrm Morthen's dying rite summons).
+  bossExitPortal?: { x: number; z: number; after?: string };
   spawns: DungeonSpawn[];
   /** Optional dungeon id whose mob difficulty tuning applies to this room's
    * static spawn list. Rewards and lockouts still use this dungeon's own id. */
@@ -6295,6 +6347,15 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */
   templeFight?: TempleFightState;
+  /** Morthen's entrance and the Knellwyrm finale (encounters/hollow_crypt),
+   *  on Morthen. Sim authority only; the client reads casts, auras, heights. */
+  cryptRite?: CryptRiteState;
+  /** The Knellwyrm's fight state (encounters/hollow_crypt/knellwyrm.ts). */
+  knellwyrmFight?: KnellwyrmFightState;
+  /** An encounter's scripted entrance owns this mob (Morthen rising, the
+   *  Knellwyrm flying in): inert, non-hostile and out of combat, the mob AI
+   *  skips it and the encounter moves it, until the script hands it back. */
+  encounterHeld?: boolean;
   /** A Tideglass Reflection's owner: the player it mirrors and fights, who
    *  cannot hurt it (encounters/drowned_temple/reflection_guard.ts). Sim only;
    *  the client reads the owner from the Reflection's forcedTargetId. */
