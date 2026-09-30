@@ -2059,6 +2059,19 @@ export class ClientWorld extends ReconWireState implements IWorld {
     trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
   }
 
+  private flushPendingMovementFramesForCommand(now = performance.now()): void {
+    if (this.movementWireVersion !== 2 || !this.movementFrameOutbox) return;
+    const firstSeq = this.inputSeq + 1;
+    const result = this.movementFrameOutbox.flush(
+      this.ws,
+      this.movementWireIsOpen(),
+      this.inputSeq,
+      true,
+    );
+    this.inputSeq = result.lastSeq;
+    trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
+  }
+
   /** Send unconditional neutral input before an in-place renderer transition. */
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
@@ -3437,6 +3450,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'stopattack' });
   }
   unstuck(): void {
+    this.flushPendingMovementFramesForCommand();
     this.cmd({ cmd: 'unstuck' });
   }
   releaseSpirit(): void {
