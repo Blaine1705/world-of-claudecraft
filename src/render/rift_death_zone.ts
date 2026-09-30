@@ -144,7 +144,7 @@ export class RiftDeathZoneVisuals {
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
     this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
-    this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture);
+    this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
     this.cryptCreatures = new CryptCreatureFx(
       scene,
       groundY,

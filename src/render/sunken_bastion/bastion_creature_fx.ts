@@ -313,6 +313,23 @@ export class BastionCreatureFx {
   private readonly tmp = { x: 0, y: 0, z: 0 };
   private readonly v1 = new THREE.Vector3();
   private readonly v2 = new THREE.Vector3();
+  /** One reused particle record for the lantern's steady pulse (no garbage
+   *  while it burns). */
+  private readonly pulse: Particle = {
+    x: 0,
+    y: 0,
+    z: 0,
+    vx: 0,
+    vy: 0.4,
+    vz: 0,
+    life: 0.35,
+    size0: 1,
+    size1: 1,
+    r: 1,
+    g: 0.74,
+    b: 0.36,
+    a: 0,
+  };
   private clock = 0;
   private seed = 0xb017;
 
@@ -321,6 +338,7 @@ export class BastionCreatureFx {
     private readonly groundY: (x: number, z: number) => number,
     private readonly world?: IWorld,
     private readonly playGesture?: (entityId: number, gesture: string) => void,
+    private readonly reducedMotion: () => boolean = () => false,
   ) {
     const low =
       resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
@@ -582,7 +600,7 @@ export class BastionCreatureFx {
       b: 0.92,
       a: 0.55,
     });
-    const sparks = this.count(heavy ? 22 : 12);
+    const sparks = this.reducedMotion() ? 0 : this.count(heavy ? 22 : 12);
     for (let i = 0; i < sparks; i++) {
       const sp = (4 + this.rand() * 10) * big;
       const jx = (this.rand() - 0.5) * 0.9;
@@ -778,23 +796,16 @@ export class BastionCreatureFx {
       slot.ringMat.opacity = 0.85 * e;
       // The lantern keeps blazing while the flare lasts: a pulse of light
       // at the glass every few frames' worth of time.
-      if (now >= slot.nextPulse && e > 0.05) {
+      if (now >= slot.nextPulse && e > 0.05 && !this.reducedMotion()) {
         slot.nextPulse = now + 0.09;
-        this.glow.emit(now, {
-          x: slot.at.x,
-          y: slot.at.y,
-          z: slot.at.z,
-          vx: 0,
-          vy: 0.4,
-          vz: 0,
-          life: 0.35,
-          size0: 1.6 + 1.6 * e,
-          size1: 2.4 + 2.4 * e,
-          r: 1,
-          g: 0.74,
-          b: 0.36,
-          a: 0.35 * e,
-        });
+        const pulse = this.pulse;
+        pulse.x = slot.at.x;
+        pulse.y = slot.at.y;
+        pulse.z = slot.at.z;
+        pulse.size0 = 1.6 + 1.6 * e;
+        pulse.size1 = 2.4 + 2.4 * e;
+        pulse.a = 0.35 * e;
+        this.glow.emit(now, pulse);
       }
       if (t > LANTERN_FLARE_SEC) {
         slot.alive = false;
@@ -839,7 +850,10 @@ export class BastionCreatureFx {
       b: 0.24,
       a: 0.4,
     });
-    const rays = this.count(12);
+    // Reduced motion keeps the glow and the light on the floor, never the
+    // flying rays and embers.
+    const still = this.reducedMotion();
+    const rays = still ? 0 : this.count(12);
     for (let i = 0; i < rays; i++) {
       const a = (i / rays) * Math.PI * 2 + this.rand() * 0.3;
       const sp = 2.5 + this.rand();
@@ -861,7 +875,7 @@ export class BastionCreatureFx {
         a: 0.55,
       });
     }
-    const embers = this.count(48);
+    const embers = still ? 0 : this.count(48);
     for (let i = 0; i < embers; i++) {
       const a = this.rand() * Math.PI * 2;
       const up = 0.3 + this.rand() * 1.1;

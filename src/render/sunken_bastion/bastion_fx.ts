@@ -114,6 +114,7 @@ export class BastionFx {
     private readonly world?: IWorld,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     playGesture?: (entityId: number, gesture: string) => void,
+    reducedMotion?: () => boolean,
   ) {
     this.root.name = 'sunken-bastion-telegraphs';
     setRenderCategory(this.root, 'ui3d');
@@ -139,7 +140,7 @@ export class BastionFx {
     const creatures = new THREE.Group();
     creatures.name = 'sunken-bastion-creature-fx';
     this.root.add(creatures);
-    this.creatures = new BastionCreatureFx(creatures, groundY, world, playGesture);
+    this.creatures = new BastionCreatureFx(creatures, groundY, world, playGesture, reducedMotion);
     const B = BASTION_BOSS_TELEGRAPHS;
     registerBastionTelegraph(
       B.charge,
