@@ -3,17 +3,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
 
-// This suite drives the character window's DOM, never a 3D model. Its import
-// graph queues the player rig and animation GLBs on the shared asset queue at
-// import time; in Node those fetches can settle after happy-dom teardown and
-// throw ProgressEvent rejections that red an otherwise green CI shard (the
-// inspect_window and bootcamp_disengage suites met the same class). A model
-// load here stays pending forever instead.
-vi.mock('../src/render/assets/loader', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('../src/render/assets/loader')>()),
-  loadGltf: () => new Promise(() => {}),
-}));
+// The painter's portrait chip reaches the character model preload; keep it
+// inert (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
 
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
