@@ -10,7 +10,8 @@ crypt kit's contract, unchanged:
   * every part is RIGID-skinned to the current bone (`body.on(bone)`);
   * bones are (name, parent, head, tail) with `.L` mirrored onto `.R`;
   * a pose is {bone: [(axis, degrees) | ('loc', xyz) | ('scale', s)]} in the
-    rest armature frame, `.L` mirrored onto `.R`; clips are 24 fps keys.
+    rest armature frame, `.L` mirrored onto `.R` (a key ending in '!', such as
+    'Arm.L!', poses that one side only); clips are 24 fps keys.
 
 `('scale', s)` is this kit's addition: a bone scaled uniformly about its head
 (a brine sac swelling before it bursts, a throat pouch filling).
@@ -152,6 +153,10 @@ class SeaBody(Body):
 def _expand(pose):
     out = {}
     for bone, turns in pose.items():
+        if bone.endswith('!'):
+            # 'Arm.L!': this side only, never mirrored (an asymmetric pose).
+            out.setdefault(bone[:-1], []).extend(turns)
+            continue
         out.setdefault(bone, []).extend(turns)
         if bone.endswith('.L'):
             twin = bone[:-2] + '.R'

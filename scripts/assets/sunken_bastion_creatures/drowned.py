@@ -366,12 +366,18 @@ def clips(arm, v):
     hit = merge(stand, {'Spine': [('x', -12)], 'Chest': [('x', -8)], 'Head': [('x', -20), ('y', 12)],
                         'Jaw': [('x', 25)], 'Arm.L': [('y', -25)], 'Arm.R': [('y', -20)]})
     author_clip(arm, 'Hit', [(1, stand), (4, hit), (14, stand)], loop=False)
-    knees = merge(stand, {'Root': [('loc', (0, 0, -0.45))], 'Thigh.L': [('x', -80)], 'Thigh.R': [('x', -80)],
-                          'Shin.L': [('x', 95)], 'Shin.R': [('x', 95)], 'Spine': [('x', 10)],
-                          'Head': [('x', 25)], 'Jaw': [('x', 30)], 'Arm.L': [('x', 10)], 'Arm.R': [('x', 10)]})
-    flat = merge(stand, {'Root': [('x', -88), ('loc', (0, -0.3, -0.85))], 'Thigh.L': [('x', -10)],
-                         'Thigh.R': [('x', 6)], 'Arm.L': [('x', -150), ('y', -10)], 'Arm.R': [('x', -120), ('y', -30)],
+    # (Each side keyed on its own: a '.L' key would ALSO turn the right twin.)
+    knees = merge(stand, {'Root': [('loc', (0, 0, -0.45))], 'Thigh.L!': [('x', -80)], 'Thigh.R': [('x', -80)],
+                          'Shin.L!': [('x', 95)], 'Shin.R': [('x', 95)], 'Spine': [('x', 10)],
+                          'Head': [('x', 25)], 'Jaw': [('x', 30)], 'Arm.L!': [('x', 10)], 'Arm.R': [('x', 10)]})
+    # Face down on the floor (pitched forward about the feet, lifted clear of
+    # the ground and slid back over the spot it fell on), arms flung ahead.
+    flat = merge(stand, {'Root': [('x', 84), ('loc', (0, 1.3, 0.55))], 'Thigh.L!': [('x', -10)],
+                         'Thigh.R': [('x', 6)], 'Arm.L!': [('x', -150), ('y', -10)], 'Arm.R': [('x', -140)],
                          'Head': [('y', 25)], 'Jaw': [('x', 30)]})
+    if v == 'prisoner':
+        # The ball and chain drops to the floor behind the fallen convict.
+        flat = merge(flat, {'Foot.L!': [('x', -85)]})
     author_clip(arm, 'Death', [(1, stand), (10, knees), (18, knees), (30, flat), (40, flat)], loop=False)
     names = ['Idle', 'Walk', 'Run', 'Hit', 'Death']
 
