@@ -10690,7 +10690,7 @@ export class Renderer {
       // predictor's onGround inside a rift (the predictor samples the same flat
       // ground, so it would still report airborne on the platform).
       const inRift = isRiftPos(ax) && this.sim.riftFloor !== null;
-      if (e.kind === 'player' && e.onGround && !swimming) {
+      if ((e.kind === 'player' || active.flies) && e.onGround && !swimming) {
         // Cached per remote body and resampled on entity_ground_sample_core's
         // cadence; the local player samples every frame as before.
         const standY = sampleStandingSurface(v.groundSample, this.sim, ax, ay, az, dt, isSelf);
