@@ -260,7 +260,7 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   `cfg.presenceDebounceMs` window and every event inside it folds into one push.
 - Outbox (`outbox`): the ONE pickup loop, every `cfg.outboxPollMs` while it keeps
   finding work, decaying to `cfg.outboxIdleMs` once the drains come back empty.
-  `GET /internal/discord/outbox` answers seven streams at once (relay posts, the activity
+  `GET /internal/discord/outbox` answers every stream at once (`OutboxEnvelope`: relay posts, the activity
   feed, the reward-winner days, the link-change feed, the queue-pop DMs, the World PvP
   kill feed, and the King of the Hill spawn calls), replacing the
   three separate pollers and the sweep's full flex re-read. `outbox_consumer.ts` owns what

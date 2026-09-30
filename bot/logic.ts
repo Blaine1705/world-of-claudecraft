@@ -991,11 +991,15 @@ export interface HillAnnouncementItem {
  * Whether the moment an announcement calls players to has already passed, so
  * posting it now would mislead: a warning once the hill has risen, a rise once
  * it has fallen. The consumer skips these (a stalled bot's backlog), the
- * queue-pop deadline rule. A malformed time counts as stale.
+ * queue-pop deadline rule. A malformed time (either one) counts as stale.
  */
 export function hillAnnouncementIsStale(item: HillAnnouncementItem, nowMs: number): boolean {
+  const finite = (ms: unknown) => typeof ms === 'number' && Number.isFinite(ms);
+  // Both times render on the card, so both must be real; the deadline is the
+  // rise for a warning and the fall for a rise.
+  if (!finite(item.risesAtMs) || !finite(item.fallsAtMs)) return true;
   const deadline = item.phase === 'warning' ? item.risesAtMs : item.fallsAtMs;
-  return !(typeof deadline === 'number' && Number.isFinite(deadline) && deadline > nowMs);
+  return !(deadline > nowMs);
 }
 
 /** `<t:unix:style>`: Discord renders it in each reader's own time zone. */

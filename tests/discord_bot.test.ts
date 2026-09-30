@@ -1203,5 +1203,6 @@ describe('King of the Hill announcement builder', () => {
     expect(hillAnnouncementIsStale(call({ phase: 'risen' }), FALLS)).toBe(true);
     // A malformed time is never posted.
     expect(hillAnnouncementIsStale(call({ risesAtMs: Number.NaN }), 0)).toBe(true);
+    expect(hillAnnouncementIsStale(call({ fallsAtMs: Number.NaN }), 0)).toBe(true);
   });
 });
