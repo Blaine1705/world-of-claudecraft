@@ -12,12 +12,15 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { TELEGRAPH_ACCENTS } from '../src/render/floor_telegraph/telegraph_look_core';
 import {
   anchorWorld,
   coneSpot,
   DRAKE_JAWS_EXHALE,
   drakeBreathCone,
   drakeStrikeShapes,
+  GHOST_FIRE_RAMP,
+  ghostFireRampGlsl,
   inConeLocal,
   paintsOwnBreath,
   shockwave,
@@ -442,5 +445,32 @@ describe('the breath on the floor matches the sim cone', () => {
     expect(shockwave(0.5, 10, 0.5).done).toBe(true);
     expect(touchedDown(12, 0.1)).toBe(true);
     expect(touchedDown(0.5, 0.1)).toBe(false);
+  });
+});
+
+describe('Ossuary Drake: the Barrowflame reads as fire, never ice', () => {
+  it('its ghost-fire ramp is warm grave-light: green leads, blue never leads red past the embers', () => {
+    let prevHeat = 0;
+    for (const [h, r, g, b] of GHOST_FIRE_RAMP) {
+      expect(h).toBeGreaterThan(prevHeat);
+      prevHeat = h;
+      // Green-led (ghostly), and never cyan: blue stays at or under red once
+      // the flame is past its sooty embers.
+      expect(g).toBeGreaterThanOrEqual(Math.max(r, b));
+      if (h > 0.3) expect(b).toBeLessThanOrEqual(r + 0.03);
+    }
+    // White-hot at the core.
+    const [, r, g, b] = GHOST_FIRE_RAMP[GHOST_FIRE_RAMP.length - 1];
+    expect(Math.min(r, g, b)).toBeGreaterThan(0.9);
+    expect(ghostFireRampGlsl()).toContain('vec3 ghostRamp(float h)');
+  });
+
+  it('its telegraph accent is green-white ghost fire, not the old turquoise', () => {
+    const c = TELEGRAPH_ACCENTS.ghostfire;
+    const r = (c >> 16) & 255;
+    const g = (c >> 8) & 255;
+    const b = c & 255;
+    expect(g).toBeGreaterThan(r);
+    expect(b).toBeLessThan(r);
   });
 });

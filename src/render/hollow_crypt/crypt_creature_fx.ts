@@ -1,8 +1,10 @@
 // The Hollow Crypt's hero creature effects (plan: crypt_creature_fx_core.ts),
 // at the Ignivar raid's bar: the flame atlas every sprite fire in the game
-// samples, graded here into SPECTRAL fire (white-hot cyan at the jaws, teal
-// down the torrent, deep grave-green at the tips), GPU-advected particles, and
-// draped floor shaders.
+// samples, graded here into GHOSTLY FIRE (white-hot at the jaws, pale
+// green-white tongues, grave-green at the tips, sooty green-black smoke): real
+// flame shapes, upright and licking upward (never spun like shards), a heat
+// shimmer over the burning ground (Ignivar's wobble haze) and rising embers,
+// GPU-advected particles, and draped floor shaders.
 //
 //  The Ossuary Drake
 //  - Barrowflame Breath: over its 2 s bar the fire gathers in its jaws (a hot
@@ -10,7 +12,7 @@
 //    lands, a torrent pours from the jaws down onto the floor and rolls out
 //    over the WHOLE cone the sim tests (ground fire from the apex to the rim),
 //    with a heat shimmer over it and embers lifting off it; it leaves the cone
-//    scorched, smouldering teal for a few seconds.
+//    scorched, smouldering grave-green for a few seconds.
 //  - Tail sweep: a dust wake whipped across the rear cone.
 //  - Wing buffet: a ring of dust and a pale shockwave racing out to its reach.
 //  - Landing: a dust blast where it touches down.
@@ -56,6 +58,7 @@ import {
   drakeStrikeShapes,
   GARGOYLE_HEAD_SCREECH,
   gargoyleShriekRadius,
+  ghostFireRampGlsl,
   scorchPhase,
   shockwave,
   tailSweepAngle,
@@ -134,21 +137,21 @@ void main() {
   vec2 corner = position.xy + 0.5;
   vUvA = cellUv(corner, fA);
   vUvB = cellUv(corner, min(fA + 1.0, 35.0));
-  billboard(p, size, aShape.z * (uTime - aLife.x) + aShape.w * 6.2831);
+  // A flame stands upright and licks upward: never spun like a shard. Taller
+  // than wide, its base on the particle, its tip swaying with the heat.
+  vec3 camRight = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
+  vec3 camUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+  float up = position.y + 0.5;
+  float sway = sin(uTime * 7.0 + aShape.w * 40.0) * 0.14 * up * up;
+  vec2 q = vec2(position.x * 0.8 + sway, (position.y + 0.32) * 1.75);
+  vec3 w = p + (camRight * q.x + camUp * q.y) * size;
+  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
 }
 `;
 
-/** The spectral ramp: white-cyan at the jaws, teal, grave-green, then gone. */
-const GHOST_RAMP = /* glsl */ `
-vec3 ghostRamp(float h) {
-  vec3 c = mix(vec3(0.0), vec3(0.01, 0.1, 0.1), smoothstep(0.0, 0.15, h));
-  c = mix(c, vec3(0.02, 0.42, 0.38), smoothstep(0.15, 0.35, h));
-  c = mix(c, vec3(0.1, 0.85, 0.66), smoothstep(0.35, 0.55, h));
-  c = mix(c, vec3(0.45, 1.0, 0.86), smoothstep(0.55, 0.75, h));
-  c = mix(c, vec3(0.85, 1.0, 0.96), smoothstep(0.75, 0.92, h));
-  return c;
-}
-`;
+/** The ghost-fire ramp (crypt_creature_fx_core.ts GHOST_FIRE_RAMP): warm
+ *  grave-light, green-white at the core, never cyan. */
+const GHOST_RAMP = ghostFireRampGlsl();
 
 const FIRE_FRAG = /* glsl */ `
 uniform sampler2D uTex;
@@ -173,12 +176,18 @@ void main() {
   // flat atlas body into a hot core, licks and dark gaps.
   vec2 q = vUv * vec2(3.0, 2.2) + vec2(vSeed * 13.0, -uTime * 2.6 - vSeed * 7.0);
   float n = vnoise(q) * 0.6 + vnoise(q * 2.3 + 5.1) * 0.4;
-  float core = 1.0 - smoothstep(0.0, 0.55, length((vUv - vec2(0.5, 0.42)) * vec2(1.6, 1.0)));
-  float body = I * (0.35 + 0.75 * n) * (0.55 + 0.6 * core);
+  float core = 1.0 - smoothstep(0.0, 0.55, length((vUv - vec2(0.5, 0.3)) * vec2(1.7, 1.0)));
+  // A teardrop tongue: wide and round at the base, drawn to a flickering tip.
+  float halfW = mix(0.42, 0.04, smoothstep(0.08, 0.95, vUv.y)) * (0.7 + 0.45 * n) * (0.75 + 0.5 * fract(vSeed * 7.13));
+  float tongue = (1.0 - smoothstep(halfW * 0.55, halfW, abs(vUv.x - 0.5)))
+               * smoothstep(0.0, 0.12, vUv.y);
+  float body = I * tongue * (0.45 + 0.8 * n) * (0.6 + 0.65 * core);
   float er = 0.12 + 0.5 * smoothstep(0.4, 1.0, vT);
   float m = smoothstep(er, er + 0.5, body);
   float flick = 0.88 + 0.12 * sin(uTime * 23.0 + vSeed * 61.0);
-  float heat = vColor.r * mix(1.0, 0.4, smoothstep(0.05, 0.95, vT)) * flick;
+  // Hottest at the root of each tongue, cooling to grave-green at its tip.
+  float heat = vColor.r * mix(1.0, 0.4, smoothstep(0.05, 0.95, vT)) * flick
+             * mix(1.2, 0.55, smoothstep(0.05, 0.9, vUv.y));
   vec3 col = ghostRamp(clamp(body * heat, 0.0, 0.98));
   float fade = smoothstep(0.0, 0.08, vT) * (1.0 - smoothstep(0.6, 1.0, vT));
   gl_FragColor = vec4(col * 1.3, m * fade * vColor.a * 0.62);
@@ -194,6 +203,24 @@ void main() {
   float core = pow(max(1.0 - r, 0.0), 2.2);
   float fade = smoothstep(0.0, 0.1, vT) * (1.0 - smoothstep(0.55, 1.0, vT));
   gl_FragColor = vec4(vColor.rgb * (0.6 + 1.2 * core), core * fade * vColor.a);
+}
+`;
+
+/** Heat shimmer over the fire (the Ignivar furnace's wobble haze): a faint,
+ *  rising band of warped light, additive, so the air over the flames swims. */
+const HAZE_FRAG = /* glsl */ `
+uniform float uTime;
+varying float vT;
+varying float vSeed;
+varying vec4 vColor;
+varying vec2 vUv;
+void main() {
+  vec2 p = vUv - 0.5;
+  float rise = uTime * 5.0 + vSeed * 20.0;
+  float wob = sin(vUv.y * 21.0 - rise) * 0.5 + sin(vUv.x * 13.0 + rise * 0.7) * 0.5;
+  float mask = (1.0 - smoothstep(0.12, 0.5, length(p * vec2(1.0, 0.8))));
+  float fade = smoothstep(0.0, 0.2, vT) * (1.0 - smoothstep(0.55, 1.0, vT));
+  gl_FragColor = vec4(vColor.rgb * (0.7 + 0.5 * wob), mask * fade * vColor.a * (0.45 + 0.55 * wob));
 }
 `;
 
@@ -343,7 +370,7 @@ float vnoise(vec2 p) {
 float fbm(vec2 p) { return vnoise(p) * 0.55 + vnoise(p * 2.1 + 7.3) * 0.3 + vnoise(p * 4.3 - 3.1) * 0.15; }
 `;
 
-/** The scorched cone: charred ash with teal embers glowing through the cracks. */
+/** The scorched cone: charred ash with ghost-fire embers glowing through the cracks. */
 const SCORCH_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uChar;
@@ -498,6 +525,7 @@ export class CryptCreatureFx {
   private readonly fire: ParticlePool;
   private readonly glow: ParticlePool;
   private readonly dust: ParticlePool;
+  private readonly haze: ParticlePool;
   private readonly scorches: FloorPatch[] = [];
   private readonly cracks: FloorPatch[] = [];
   private readonly rings: FloorPatch[] = [];
@@ -564,7 +592,12 @@ export class CryptCreatureFx {
       particleMat(DUST_FRAG, PARTICLE_VERT, THREE.NormalBlending),
       floorVfxRenderOrder('encounter', 25),
     );
-    for (const p of [this.dust, this.fire, this.glow]) {
+    this.haze = new ParticlePool(
+      Math.round(260 * this.density),
+      particleMat(HAZE_FRAG, PARTICLE_VERT, THREE.AdditiveBlending),
+      floorVfxRenderOrder('encounter', 28),
+    );
+    for (const p of [this.dust, this.fire, this.glow, this.haze]) {
       this.geometries.push(p.mesh.geometry);
       this.root.add(p.mesh);
     }
@@ -720,13 +753,51 @@ export class CryptCreatureFx {
           ay: 1.5,
           life: 0.7 + this.rand() * 0.5,
           drag: 0.8,
-          size0: 0.9 + this.rand() * 0.6,
-          size1: 2.2 + this.rand() * 1.6,
-          spin: (this.rand() - 0.5) * 1.5,
+          size0: 0.8 + this.rand() * 0.8,
+          size1: 1.8 + this.rand() * 2.6,
+          spin: 0,
           r: 0.85 + this.rand() * 0.3,
           g: 0,
           b: 0,
           a: 0.85,
+        });
+      }
+      // The air over the burning ground swims, and embers lift off it.
+      if (i % 3 === 0) {
+        this.haze.emit(this.clock + delay + this.rand() * 0.6, {
+          x: wx,
+          y: gy + 1.2,
+          z: wz,
+          vx: 0,
+          vy: 1.4 + this.rand(),
+          vz: 0,
+          life: 1.4 + this.rand() * 0.8,
+          drag: 0.5,
+          size0: 2.4,
+          size1: 4.6 + this.rand() * 1.5,
+          r: 0.3,
+          g: 0.42,
+          b: 0.22,
+          a: 0.32,
+        });
+      }
+      if (i % 2 === 0) {
+        this.glow.emit(this.clock + delay + this.rand() * 1.2, {
+          x: wx + (this.rand() - 0.5) * 1.5,
+          y: gy + 0.3,
+          z: wz + (this.rand() - 0.5) * 1.5,
+          vx: (this.rand() - 0.5) * 1.6,
+          vy: 3 + this.rand() * 3.5,
+          vz: (this.rand() - 0.5) * 1.6,
+          ay: 0.8,
+          life: 1.1 + this.rand() * 1.1,
+          drag: 0.7,
+          size0: 0.16,
+          size1: 0.05,
+          r: 0.78 + this.rand() * 0.2,
+          g: 1,
+          b: 0.42,
+          a: 1,
         });
       }
     }
@@ -1097,6 +1168,7 @@ export class CryptCreatureFx {
     this.fire.update(this.clock);
     this.glow.update(this.clock);
     this.dust.update(this.clock);
+    this.haze.update(this.clock);
   }
 
   /** The inhale, the shriek's sonic rings, and the touchdowns, read off entity state. */
@@ -1151,7 +1223,7 @@ export class CryptCreatureFx {
       }
       h.mesh.position.set(jaws.x, jaws.y, jaws.z);
       h.mesh.scale.setScalar(0.8 + 2.4 * fill);
-      (h.mat.uniforms.uColor.value as THREE.Color).setRGB(0.4, 1, 0.85);
+      (h.mat.uniforms.uColor.value as THREE.Color).setRGB(0.62, 1, 0.38);
       h.mat.uniforms.uAlpha.value = 0.35 + 0.65 * fill;
       h.mat.uniforms.uRing.value = 0;
       h.mesh.visible = true;
@@ -1176,9 +1248,9 @@ export class CryptCreatureFx {
         drag: 0.4,
         size0: 0.35,
         size1: 0.1,
-        r: 0.45,
+        r: 0.6,
         g: 1,
-        b: 0.8,
+        b: 0.42,
         a: 0.8,
       });
     }
@@ -1269,9 +1341,9 @@ export class CryptCreatureFx {
           life: flight + 0.45 + this.rand() * 0.3,
           drag,
           floor: t.floor + 0.25,
-          size0: 0.3 + this.rand() * 0.25,
-          size1: 1.5 + this.rand() * 1.6,
-          spin: (this.rand() - 0.5) * 2.4,
+          size0: 0.35 + this.rand() * 0.25,
+          size1: 1.7 + this.rand() * 1.6,
+          spin: 0,
           r: 1.05 + this.rand() * 0.25,
           g: 0,
           b: 0,
@@ -1291,10 +1363,28 @@ export class CryptCreatureFx {
             drag: 0.6,
             size0: 0.14,
             size1: 0.06,
-            r: 0.5 + this.rand() * 0.4,
+            r: 0.75 + this.rand() * 0.25,
             g: 1,
-            b: 0.85,
+            b: 0.4,
             a: 1,
+          });
+        }
+        if (this.rand() < 0.05) {
+          this.haze.emit(this.clock + flight, {
+            x: tx,
+            y: gy + 1,
+            z: tz,
+            vx: 0,
+            vy: 1.6,
+            vz: 0,
+            life: 1.2,
+            drag: 0.6,
+            size0: 2,
+            size1: 4.2,
+            r: 0.3,
+            g: 0.42,
+            b: 0.22,
+            a: 0.3,
           });
         }
         if (this.rand() < 0.08) {
@@ -1311,14 +1401,14 @@ export class CryptCreatureFx {
             floor: t.floor + 0.8,
             size0: 1.5,
             size1: 5,
-            r: 0.08,
-            g: 0.14,
-            b: 0.14,
-            a: 0.3,
+            r: 0.05,
+            g: 0.08,
+            b: 0.035,
+            a: 0.32,
           });
         }
       }
-      // The muzzle: a white-cyan core at the jaws while it pours.
+      // The muzzle: a white-hot, green-white core at the jaws while it pours.
       const h = this.halo(-100 - t.sourceId);
       if (h) {
         const slot = this.halos.find((q) => q.mesh === h.mesh);
@@ -1328,7 +1418,7 @@ export class CryptCreatureFx {
         }
         h.mesh.position.set(jaws.x, jaws.y, jaws.z);
         h.mesh.scale.setScalar(2.2 + 0.4 * Math.sin(this.clock * 30));
-        (h.mat.uniforms.uColor.value as THREE.Color).setRGB(0.7, 1, 0.95);
+        (h.mat.uniforms.uColor.value as THREE.Color).setRGB(0.92, 1, 0.72);
         h.mat.uniforms.uAlpha.value = env;
         h.mat.uniforms.uRing.value = 0;
         h.mesh.visible = env > 0.01;

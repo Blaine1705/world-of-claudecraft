@@ -169,3 +169,30 @@ export function tailSweepAngle(t: number, arcDeg: number, seconds = 0.32): numbe
   const ease = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
   return -half + 2 * half * ease;
 }
+
+/** The Barrowflame's ghost-fire ramp as (heat, r, g, b) stops: a fire's
+ *  temperature ladder shifted to grave-light (sooty green-black, grave-green,
+ *  spectral green, pale green-white, a white-hot core). Warm, never cyan: blue
+ *  never leads red past the embers, so it reads as flame, not ice. The shader
+ *  (crypt_creature_fx.ts) is generated from these stops. */
+export const GHOST_FIRE_RAMP: readonly (readonly [number, number, number, number])[] = [
+  [0.15, 0.02, 0.05, 0.02],
+  [0.33, 0.07, 0.3, 0.09],
+  [0.52, 0.28, 0.82, 0.3],
+  [0.72, 0.64, 1.0, 0.56],
+  [0.88, 0.88, 1.0, 0.84],
+  [1.0, 1.0, 1.0, 0.97],
+];
+
+/** GLSL `vec3 ghostRamp(float h)` built from GHOST_FIRE_RAMP. */
+export function ghostFireRampGlsl(): string {
+  const f = (v: number) => v.toFixed(3);
+  let prev = 0;
+  const lines = GHOST_FIRE_RAMP.map(([h, r, g, b], i) => {
+    const from = i === 0 ? 'vec3(0.0)' : 'c';
+    const line = `  ${i === 0 ? 'vec3 c' : 'c'} = mix(${from}, vec3(${f(r)}, ${f(g)}, ${f(b)}), smoothstep(${f(prev)}, ${f(h)}, h));`;
+    prev = h;
+    return line;
+  });
+  return `vec3 ghostRamp(float h) {\n${lines.join('\n')}\n  return c;\n}\n`;
+}

@@ -36,8 +36,8 @@ export const TELEGRAPH_ACCENTS = {
   shadow: 0xa6ffcf,
   bone: 0xfff2d6,
   holy: 0xfff6c4,
-  // The Hollow Crypt drake's spectral Barrowflame.
-  ghostfire: 0x3dffe0,
+  // The Hollow Crypt drake's spectral Barrowflame: ghost fire, green-white.
+  ghostfire: 0xa8ff6a,
 } as const;
 
 /** Fill of a telegraph in [0, 1]: 0 as the bar opens, 1 as it lands. */

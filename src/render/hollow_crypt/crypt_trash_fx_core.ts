@@ -41,8 +41,8 @@ export const CRYPT_TELEGRAPH_COLORS = {
   stun: TELEGRAPH_THREAT_COLORS.control,
   shadow: TELEGRAPH_THREAT_COLORS.interrupt,
   bone: TELEGRAPH_THREAT_COLORS.danger,
-  /** The drake's spectral Barrowflame: avoidable damage; its ghost-fire
-   *  cyan rides the accent (TELEGRAPH_ACCENTS.ghostfire). */
+  /** The drake's spectral Barrowflame: avoidable damage; its green-white
+   *  ghost fire rides the accent (TELEGRAPH_ACCENTS.ghostfire). */
   ghostfire: TELEGRAPH_THREAT_COLORS.danger,
 } as const;
 

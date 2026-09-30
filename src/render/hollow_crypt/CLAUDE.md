@@ -15,8 +15,8 @@ from them.
 | `crypt_atmosphere.ts` | Sky dome with the moon and clouds, mist sea, soul column, wisps, dust, moonbeams, crag ring. All motion on `sharedUniforms.uTime`. |
 | `crypt_lights.ts` | Flames, halos, floor pools (floor ladder, `ground` band), budgeted point lights through the fire-light sink. |
 | `crypt_gates.ts` | Gate structures; one shader patch reads a per-gate `uOpen`, refreshed in `onBeforeRender` from the gate memory. |
-| `crypt_creature_fx_core.ts` | PURE: the hero creatures' effect plan: the drake's jaw anchors (measured off its Blender clips), the Barrowflame torrent and scorch timeline, cone spots, shockwave and tail-sweep curves, the touchdown test. In `RENDER_PURE_CORES`. |
-| `crypt_creature_fx.ts` | The Ossuary Drake's Barrowflame Breath (inhale, spectral torrent over the whole cone on the Ignivar flame atlas, ember lift, scorch), tail sweep, wing buffet and landing blast; the Chapel Gargoyle's awakening, dive shockwave and cracks, and Stone Shriek. Three GPU particle draws plus pooled floor shaders, one gated root, built by `rift_death_zone.ts` beside `crypt_trash_fx.ts`. |
+| `crypt_creature_fx_core.ts` | PURE: the hero creatures' effect plan: the drake's jaw anchors (measured off its Blender clips), the Barrowflame torrent and scorch timeline, the ghost-fire ramp (`GHOST_FIRE_RAMP`, warm green-white, never cyan), cone spots, shockwave and tail-sweep curves, the touchdown test. In `RENDER_PURE_CORES`. |
+| `crypt_creature_fx.ts` | The Ossuary Drake's Barrowflame Breath (inhale, a ghost-fire torrent of upright flame tongues over the whole cone on the Ignivar flame atlas, heat shimmer, ember lift, scorch), tail sweep, wing buffet and landing blast; the Chapel Gargoyle's awakening, dive shockwave and cracks, and Stone Shriek. Three GPU particle draws plus pooled floor shaders, one gated root, built by `rift_death_zone.ts` beside `crypt_trash_fx.ts`. |
 | `crypt_kit.ts` | Loads and bakes `public/models/props/hollow_crypt_kit.glb` (Blender source in `docs/design/dungeon-rework/kit/`), instances every piece, procedural stand-ins when it is missing. |
 
 Rules:

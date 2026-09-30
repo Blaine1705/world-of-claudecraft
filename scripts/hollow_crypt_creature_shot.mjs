@@ -67,6 +67,17 @@ export const SHOTS = [
     dist: 30,
     yaw: 1.1,
   },
+  // Pass four: the ghost fire up close, beside the player.
+  {
+    id: 'dragon_aliento_cerca',
+    kind: 'spawn',
+    mob: 'drake',
+    cast: 'crypt_barrowflame_breath',
+    after: 0.8,
+    pitch: 0.12,
+    dist: 20,
+    yaw: 1.5,
+  },
   {
     id: 'dragon_aliento_brasas',
     kind: 'spawn',
