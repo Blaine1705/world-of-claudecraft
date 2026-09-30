@@ -19774,4 +19774,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.promptTap': 'ここを連打して脱出',
   'hudChrome.bastionCage.buttonAria': '鉄の檻から脱出する',
   'hudChrome.bastionCage.progressAria': '脱出の進行度：{pct}',
+  'hudChrome.bastionChain.anchoredTitle': '溺死の錨に繋がれた！',
+  'hudChrome.bastionChain.anchoredLine':
+    '巻き上げ機に穴へ引きずり込まれる前に、仲間が鎖を断ち切らなければならない',
+  'hudChrome.bastionChain.allyTitle': '鎖を断て！',
+  'hudChrome.bastionChain.allyLine': '{name} が穴へ引きずられている：溺死の錨を攻撃せよ',
+  'hudChrome.bastionChain.shackledTitle': '{name} と枷で繋がれている',
+  'hudChrome.bastionChain.shackledLine':
+    '互いに {range} ヤード以内にいること（現在 {dist} ヤード）',
+  'hudChrome.bastionChain.strainedLine': '離れすぎ！鎖が二人を締め付ける：{range} ヤード以内に戻れ',
+  'hudChrome.bastionChain.brokenAria': '鎖の破損：{pct}',
+  'hudChrome.bastionChain.reachAria': '鎖の張り具合：{pct}',
 };

@@ -20142,4 +20142,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.promptTap': 'Нажимайте сюда снова и снова, чтобы вырваться',
   'hudChrome.bastionCage.buttonAria': 'Вырваться из железной клетки',
   'hudChrome.bastionCage.progressAria': 'Прогресс побега: {pct}',
+  'hudChrome.bastionChain.anchoredTitle': 'Прикован к Утопленному якорю!',
+  'hudChrome.bastionChain.anchoredLine':
+    'Группа должна разбить цепь, пока лебёдка не утащила вас в яму',
+  'hudChrome.bastionChain.allyTitle': 'Разбейте цепь!',
+  'hudChrome.bastionChain.allyLine': '{name} тащат к яме: бейте Утопленный якорь',
+  'hudChrome.bastionChain.shackledTitle': 'Скован с {name}',
+  'hudChrome.bastionChain.shackledLine':
+    'Держитесь в пределах {range} ярдов друг от друга (сейчас {dist} ярдов)',
+  'hudChrome.bastionChain.strainedLine':
+    'Слишком далеко! Цепь ранит обоих: сойдитесь ближе {range} ярдов',
+  'hudChrome.bastionChain.brokenAria': 'Цепь разбита: {pct}',
+  'hudChrome.bastionChain.reachAria': 'Натяжение цепи: {pct}',
 };

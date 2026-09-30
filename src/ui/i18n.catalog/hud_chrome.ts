@@ -8778,6 +8778,18 @@ export const hudChromeStrings = {
     buttonAria: 'Break free from the Iron Cage',
     progressAria: 'Escape progress: {pct}',
   },
+  // Gaoler Ossick's chain alert (src/ui/hud/dungeon/gaol_chain_view.ts).
+  bastionChain: {
+    anchoredTitle: 'Chained to the Drowned Anchor!',
+    anchoredLine: 'Your group must break the chain before the winch drags you into the pit',
+    allyTitle: 'Break the chain!',
+    allyLine: '{name} is being dragged to the pit: hit the Drowned Anchor',
+    shackledTitle: 'Shackled to {name}',
+    shackledLine: 'Stay within {range} yards of each other ({dist} yards apart)',
+    strainedLine: 'Too far apart! The chain bites both of you: close to {range} yards',
+    brokenAria: 'Chain broken: {pct}',
+    reachAria: 'Chain reach used: {pct}',
+  },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and
   // the unlock moment (banner, log lines, retro catch-up summary). Deed

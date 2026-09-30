@@ -6023,6 +6023,17 @@ export const ko_KR: EnTranslations = {
       "buttonAria": "강철 우리에서 탈출하기",
       "progressAria": "탈출 진행도: {pct}"
     },
+    "bastionChain": {
+      "anchoredTitle": "익사의 닻에 묶였다!",
+      "anchoredLine": "권양기가 구덩이로 끌고 가기 전에 파티가 사슬을 끊어야 합니다",
+      "allyTitle": "사슬을 끊어라!",
+      "allyLine": "{name} 님이 구덩이로 끌려가고 있습니다: 익사의 닻을 공격하세요",
+      "shackledTitle": "{name} 님과 족쇄로 묶임",
+      "shackledLine": "서로 {range}야드 이내에 머무르세요 (현재 {dist}야드)",
+      "strainedLine": "너무 멀어졌습니다! 사슬이 두 사람을 조입니다: {range}야드 이내로 모이세요",
+      "brokenAria": "사슬 파괴: {pct}",
+      "reachAria": "사슬 당김: {pct}"
+    },
     "cosmetics": {
       "title": "외형",
       "close": "외형 닫기",

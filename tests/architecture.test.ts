@@ -636,6 +636,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/hill/hill_bar_view.ts',
   // The Iron Cage escape prompt (the Gaol Turnkey's button-mash).
   'src/ui/hud/dungeon/cage_escape_view.ts',
+  // Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair).
+  'src/ui/hud/dungeon/gaol_chain_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',

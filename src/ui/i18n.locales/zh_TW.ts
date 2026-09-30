@@ -18817,4 +18817,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.promptTap': '連續點擊這裡掙脫',
   'hudChrome.bastionCage.buttonAria': '從鐵籠中掙脫',
   'hudChrome.bastionCage.progressAria': '掙脫進度：{pct}',
+  'hudChrome.bastionChain.anchoredTitle': '被溺亡之錨鎖住了！',
+  'hudChrome.bastionChain.anchoredLine': '在絞盤把你拖進深坑之前，隊友必須砸斷鎖鏈',
+  'hudChrome.bastionChain.allyTitle': '砸斷鎖鏈！',
+  'hudChrome.bastionChain.allyLine': '{name} 正被拖向深坑：攻擊溺亡之錨',
+  'hudChrome.bastionChain.shackledTitle': '與 {name} 鎖在一起',
+  'hudChrome.bastionChain.shackledLine': '彼此保持在 {range} 碼以內（目前相距 {dist} 碼）',
+  'hudChrome.bastionChain.strainedLine': '離得太遠！鎖鏈會傷害你們兩人：靠近到 {range} 碼以內',
+  'hudChrome.bastionChain.brokenAria': '鎖鏈破損：{pct}',
+  'hudChrome.bastionChain.reachAria': '鎖鏈繃緊：{pct}',
 };

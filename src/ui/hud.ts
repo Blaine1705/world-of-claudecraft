@@ -463,7 +463,7 @@ import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
 import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
-import { buildCageEscapeView, CageEscapePrompt } from './hud/dungeon';
+import { DungeonPrompts } from './hud/dungeon';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
@@ -5589,8 +5589,8 @@ export class Hud {
     layer: () => document.getElementById('ui'),
     writers: this.writerFacet,
   });
-  // The Iron Cage escape (the Gaol Turnkey): a tap on it is an interact press.
-  private readonly cageEscape = new CageEscapePrompt({
+  // Dungeon prompts: the Iron Cage escape (a tap is an interact press), Ossick's chains.
+  private readonly dungeonPrompts = new DungeonPrompts({
     layer: () => document.getElementById('ui'),
     writers: this.writerFacet,
     onPress: () => this.sim.interact(),
@@ -8912,15 +8912,14 @@ export class Hud {
     // paint call for why).
     this.buffBarPainter.paint(this.buffBarView.tick(p));
     this.debuffBarPainter.paint(this.debuffBarView.tick(p));
-    // Caged by the Gaol Turnkey: the escape prompt, every frame (the press feedback).
-    this.cageEscape.paint(
-      buildCageEscapeView({
-        auras: p.auras,
-        cage: (id) => this.sim.entities.get(id),
-        interactKey: keyCapLabel(this.keybinds.primaryLabel('interact')),
-        touch: this.isMobileLayout(),
-      }),
-    );
+    // Caged or chained in the Sunken Gaol: the prompts, every frame (press feedback, reach).
+    this.dungeonPrompts.paint({
+      player: p,
+      entity: (id) => this.sim.entities.get(id),
+      party: this.sim.partyInfo?.members,
+      interactKey: keyCapLabel(this.keybinds.primaryLabel('interact')),
+      touch: this.isMobileLayout(),
+    });
 
     // Target dots: the multi-target tracker for the debuffs the LOCAL player has
     // out, across every enemy in interest range. Same band as the aura strips

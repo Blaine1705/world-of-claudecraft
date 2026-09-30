@@ -6023,6 +6023,17 @@ export const zh_CN: EnTranslations = {
       "buttonAria": "从铁笼中挣脱",
       "progressAria": "挣脱进度：{pct}"
     },
+    "bastionChain": {
+      "anchoredTitle": "被溺亡之锚锁住了！",
+      "anchoredLine": "在绞盘把你拖进深坑之前，队友必须砸断锁链",
+      "allyTitle": "砸断锁链！",
+      "allyLine": "{name} 正被拖向深坑：攻击溺亡之锚",
+      "shackledTitle": "与 {name} 锁在一起",
+      "shackledLine": "彼此保持在 {range} 码以内（当前相距 {dist} 码）",
+      "strainedLine": "离得太远！锁链会伤害你们两人：靠近到 {range} 码以内",
+      "brokenAria": "锁链破损：{pct}",
+      "reachAria": "锁链绷紧：{pct}"
+    },
     "cosmetics": {
       "title": "外观",
       "close": "关闭外观",

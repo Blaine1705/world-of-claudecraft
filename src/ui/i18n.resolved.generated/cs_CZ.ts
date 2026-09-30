@@ -6023,6 +6023,17 @@ export const cs_CZ: EnTranslations = {
       "buttonAria": "Break free from the Iron Cage",
       "progressAria": "Escape progress: {pct}"
     },
+    "bastionChain": {
+      "anchoredTitle": "Chained to the Drowned Anchor!",
+      "anchoredLine": "Your group must break the chain before the winch drags you into the pit",
+      "allyTitle": "Break the chain!",
+      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor",
+      "shackledTitle": "Shackled to {name}",
+      "shackledLine": "Stay within {range} yards of each other ({dist} yards apart)",
+      "strainedLine": "Too far apart! The chain bites both of you: close to {range} yards",
+      "brokenAria": "Chain broken: {pct}",
+      "reachAria": "Chain reach used: {pct}"
+    },
     "cosmetics": {
       "title": "Kosmetika",
       "close": "Zavřít kosmetiku",

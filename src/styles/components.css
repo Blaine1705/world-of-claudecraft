@@ -16367,7 +16367,7 @@
     pointer-events: auto;
     touch-action: manipulation;
     user-select: none;
-    color: var(--color-text);
+    color: var(--color-text-light);
     border: 2px solid var(--color-hostile);
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
@@ -16431,6 +16431,72 @@
   }
   body.mobile-touch #bastion-cage-escape .bce-bar {
     --bar-h: 22px;
+  }
+
+  /* ---------- Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/gaol_chain_painter.ts in the Iron Cage
+     prompt's slot (the two never share a fight), shown while a chain asks
+     something of the local player. The kind classes come from the pure view;
+     the state is carried by the text too, so colour is never the only cue. */
+  #bastion-chain-alert {
+    position: absolute;
+    left: 50%;
+    bottom: 190px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    text-align: center;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #bastion-chain-alert .bca-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #bastion-chain-alert .bca-line {
+    font-size: 14px;
+  }
+  #bastion-chain-alert .bca-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-chain-alert .bca-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-chain-alert.is-anchored,
+  #bastion-chain-alert.is-strained {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-chain-alert.is-anchored .bca-title,
+  #bastion-chain-alert.is-strained .bca-title {
+    color: var(--color-hostile);
+  }
+  #bastion-chain-alert.is-strained .bca-fill {
+    --bar-color: var(--color-hostile);
+  }
+  #bastion-chain-alert.is-anchored .bca-fill,
+  #bastion-chain-alert.is-ally .bca-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-chain-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-chain-alert {
+    bottom: 42%;
+    min-width: min(420px, calc(100vw - 32px));
   }
 
   /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */

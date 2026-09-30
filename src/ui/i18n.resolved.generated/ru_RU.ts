@@ -6023,6 +6023,17 @@ export const ru_RU: EnTranslations = {
       "buttonAria": "Вырваться из железной клетки",
       "progressAria": "Прогресс побега: {pct}"
     },
+    "bastionChain": {
+      "anchoredTitle": "Прикован к Утопленному якорю!",
+      "anchoredLine": "Группа должна разбить цепь, пока лебёдка не утащила вас в яму",
+      "allyTitle": "Разбейте цепь!",
+      "allyLine": "{name} тащат к яме: бейте Утопленный якорь",
+      "shackledTitle": "Скован с {name}",
+      "shackledLine": "Держитесь в пределах {range} ярдов друг от друга (сейчас {dist} ярдов)",
+      "strainedLine": "Слишком далеко! Цепь ранит обоих: сойдитесь ближе {range} ярдов",
+      "brokenAria": "Цепь разбита: {pct}",
+      "reachAria": "Натяжение цепи: {pct}"
+    },
     "cosmetics": {
       "title": "Косметика",
       "close": "Закрыть косметику",

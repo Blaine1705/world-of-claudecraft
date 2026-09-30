@@ -6023,6 +6023,17 @@ export const zh_TW: EnTranslations = {
       "buttonAria": "從鐵籠中掙脫",
       "progressAria": "掙脫進度：{pct}"
     },
+    "bastionChain": {
+      "anchoredTitle": "被溺亡之錨鎖住了！",
+      "anchoredLine": "在絞盤把你拖進深坑之前，隊友必須砸斷鎖鏈",
+      "allyTitle": "砸斷鎖鏈！",
+      "allyLine": "{name} 正被拖向深坑：攻擊溺亡之錨",
+      "shackledTitle": "與 {name} 鎖在一起",
+      "shackledLine": "彼此保持在 {range} 碼以內（目前相距 {dist} 碼）",
+      "strainedLine": "離得太遠！鎖鏈會傷害你們兩人：靠近到 {range} 碼以內",
+      "brokenAria": "鎖鏈破損：{pct}",
+      "reachAria": "鎖鏈繃緊：{pct}"
+    },
     "cosmetics": {
       "title": "外觀",
       "close": "關閉外觀",

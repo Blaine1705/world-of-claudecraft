@@ -24,7 +24,10 @@ Rules:
   cage's fall, auras whose `sourceId` names the cage, the anchor or the shackle
   partner, mob health for the cage's and the anchor's points, object template ids),
   so the online client mirrors it with no wire or IWorld change. The escape press
-  is the ordinary `interact` command.
+  is the ordinary `interact` command. The HUD reads the same auras: the cage
+  escape prompt and the chain alert (`src/ui/hud/dungeon/`, composed as one
+  `DungeonPrompts`; `tests/sunken_bastion_chain_alert.test.ts` drives the alert
+  from a real fight).
 - Reset on evade and wipe restores the buttresses, opens the cages, drops the
   anchors and shackles, lifts the veil and dries the pools.
 - Tests: `tests/sunken_bastion_bosses.test.ts` (Olen, the veil),

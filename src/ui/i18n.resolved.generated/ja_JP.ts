@@ -6023,6 +6023,17 @@ export const ja_JP: EnTranslations = {
       "buttonAria": "鉄の檻から脱出する",
       "progressAria": "脱出の進行度：{pct}"
     },
+    "bastionChain": {
+      "anchoredTitle": "溺死の錨に繋がれた！",
+      "anchoredLine": "巻き上げ機に穴へ引きずり込まれる前に、仲間が鎖を断ち切らなければならない",
+      "allyTitle": "鎖を断て！",
+      "allyLine": "{name} が穴へ引きずられている：溺死の錨を攻撃せよ",
+      "shackledTitle": "{name} と枷で繋がれている",
+      "shackledLine": "互いに {range} ヤード以内にいること（現在 {dist} ヤード）",
+      "strainedLine": "離れすぎ！鎖が二人を締め付ける：{range} ヤード以内に戻れ",
+      "brokenAria": "鎖の破損：{pct}",
+      "reachAria": "鎖の張り具合：{pct}"
+    },
     "cosmetics": {
       "title": "コスメティック",
       "close": "コスメティックを閉じる",

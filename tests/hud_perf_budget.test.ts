@@ -774,6 +774,16 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 7, '.setAttribute': 3 },
     reflowAllow: {},
   },
+  // Gaoler Ossick's chain alert (hud/dungeon/) builds its self-mounted panel
+  // skeleton ONCE (five construction-only class assignments and the progress
+  // bar's three build-time role/range attributes); every per-frame value (the
+  // kind classes, texts, the fill width, the live aria values) rides the
+  // elided writers.
+  {
+    file: 'hud/dungeon/gaol_chain_painter.ts',
+    allow: { '.className': 5, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
   // death or an expiry only (the per-frame update elides on the pure core's
   // reference equality); the setAttribute runs once at mount.

@@ -19760,4 +19760,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.promptTap': '여기를 연타해 탈출하세요',
   'hudChrome.bastionCage.buttonAria': '강철 우리에서 탈출하기',
   'hudChrome.bastionCage.progressAria': '탈출 진행도: {pct}',
+  'hudChrome.bastionChain.anchoredTitle': '익사의 닻에 묶였다!',
+  'hudChrome.bastionChain.anchoredLine':
+    '권양기가 구덩이로 끌고 가기 전에 파티가 사슬을 끊어야 합니다',
+  'hudChrome.bastionChain.allyTitle': '사슬을 끊어라!',
+  'hudChrome.bastionChain.allyLine':
+    '{name} 님이 구덩이로 끌려가고 있습니다: 익사의 닻을 공격하세요',
+  'hudChrome.bastionChain.shackledTitle': '{name} 님과 족쇄로 묶임',
+  'hudChrome.bastionChain.shackledLine': '서로 {range}야드 이내에 머무르세요 (현재 {dist}야드)',
+  'hudChrome.bastionChain.strainedLine':
+    '너무 멀어졌습니다! 사슬이 두 사람을 조입니다: {range}야드 이내로 모이세요',
+  'hudChrome.bastionChain.brokenAria': '사슬 파괴: {pct}',
+  'hudChrome.bastionChain.reachAria': '사슬 당김: {pct}',
 };

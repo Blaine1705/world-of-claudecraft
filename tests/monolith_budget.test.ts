@@ -540,7 +540,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 18083 by the Sunken Bastion fifth pass: the chat line templates
     // (chat_template_keys.ts) and the emote wheel defaults (emote_wheel_defaults.ts)
     // moved out, buying the Iron Cage escape prompt's composition (hud/dungeon).
-    ceiling: 18083,
+    // LOWERED to 18082 when Ossick's chain alert joined it: both prompts now
+    // compose behind one DungeonPrompts member and one frame call (hud/dungeon).
+    ceiling: 18082,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

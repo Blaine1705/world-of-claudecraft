@@ -6023,6 +6023,17 @@ export const en_XA: EnTranslations = {
       "buttonAria": "[Ɓŕéáķ ƒŕéé ƒŕóɱ ţĥé Íŕóñ Çáĝé]",
       "progressAria": "[Éšçáþé þŕóĝŕéšš: {pct}]"
     },
+    "bastionChain": {
+      "anchoredTitle": "[Çĥáíñéð ţó ţĥé Ðŕóŵñéð Áñçĥóŕ!]",
+      "anchoredLine": "[Ýóúŕ ĝŕóúþ ɱúšţ ƀŕéáķ ţĥé çĥáíñ ƀéƒóŕé ţĥé ŵíñçĥ ðŕáĝš ýóú íñţó ţĥé þíţ]",
+      "allyTitle": "[Ɓŕéáķ ţĥé çĥáíñ!]",
+      "allyLine": "[{name} íš ƀéíñĝ ðŕáĝĝéð ţó ţĥé þíţ: ĥíţ ţĥé Ðŕóŵñéð Áñçĥóŕ]",
+      "shackledTitle": "[Šĥáçķļéð ţó {name}]",
+      "shackledLine": "[Šţáý ŵíţĥíñ {range} ýáŕðš óƒ éáçĥ óţĥéŕ ({dist} ýáŕðš áþáŕţ)]",
+      "strainedLine": "[Ţóó ƒáŕ áþáŕţ! Ţĥé çĥáíñ ƀíţéš ƀóţĥ óƒ ýóú: çļóšé ţó {range} ýáŕðš]",
+      "brokenAria": "[Çĥáíñ ƀŕóķéñ: {pct}]",
+      "reachAria": "[Çĥáíñ ŕéáçĥ úšéð: {pct}]"
+    },
     "cosmetics": {
       "title": "[Çóšɱéţíçš]",
       "close": "[Çļóšé Çóšɱéţíçš]",
