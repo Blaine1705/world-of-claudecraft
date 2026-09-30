@@ -29,6 +29,7 @@ import {
   MOBS,
   NPCS,
 } from '../data';
+import { tickTempleEncounters } from '../encounters/drowned_temple';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
@@ -1497,6 +1498,8 @@ export function updateInstances(ctx: SimContext): void {
   tickTrashKits(ctx);
   // The Sunken Bastion's boss fights (encounters/sunken_bastion), same slot.
   tickBastionEncounters(ctx);
+  // The Drowned Temple's boss fights (encounters/drowned_temple), same slot.
+  tickTempleEncounters(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

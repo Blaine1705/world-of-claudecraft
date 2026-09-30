@@ -7,6 +7,7 @@
 // stays on its own static set in interior_collider_sets.ts), so its ground is
 // byte-identical to before this seam existed.
 
+import { DROWNED_TEMPLE_FIELD } from '../../content/drowned_temple_layout';
 import { HOLLOW_CRYPT_FIELD } from '../../content/hollow_crypt_layout';
 import { SUNKEN_BASTION_FIELD } from '../../content/sunken_bastion_layout';
 import { wildheartFieldHeight } from '../../wildheart_field';
@@ -16,6 +17,7 @@ import type { AuthoredFieldDef } from './types';
 const AUTHORED_FIELDS: Readonly<Record<string, AuthoredFieldDef>> = {
   hollow_crypt: HOLLOW_CRYPT_FIELD,
   sunken_bastion: SUNKEN_BASTION_FIELD,
+  drowned_temple: DROWNED_TEMPLE_FIELD,
 };
 
 const hollowCryptHeight = (x: number, z: number): number =>
@@ -24,10 +26,14 @@ const hollowCryptHeight = (x: number, z: number): number =>
 const sunkenBastionHeight = (x: number, z: number): number =>
   authoredFieldHeight(SUNKEN_BASTION_FIELD, x, z);
 
+const drownedTempleHeight = (x: number, z: number): number =>
+  authoredFieldHeight(DROWNED_TEMPLE_FIELD, x, z);
+
 const FIELD_HEIGHTS: Readonly<Record<string, (lx: number, lz: number) => number>> = {
   wildheart: wildheartFieldHeight,
   hollow_crypt: hollowCryptHeight,
   sunken_bastion: sunkenBastionHeight,
+  drowned_temple: drownedTempleHeight,
 };
 
 /** The authored field record for an interior key, or null. */

@@ -166,7 +166,8 @@ describe('heroic five-man doubled health', () => {
     // party DPS, dungeon_difficulty.ts healthMultiplierByMob), off the doubling.
     expect(maxHpAt('vael_the_mistcaller', 'sunken_bastion', 'heroic')).toBe(34449);
     expect(maxHpAt('drowned_templeguard', 'drowned_temple', 'heroic')).toBe(6219); // was 3110
-    expect(maxHpAt('ysolei', 'drowned_temple', 'heroic')).toBe(13132); // was 6566
+    // The Temple rework prices Ysolei from fight length x heroic DPS (150 s).
+    expect(maxHpAt('ysolei', 'drowned_temple', 'heroic')).toBe(34497);
     expect(maxHpAt('moonspawn', 'drowned_temple', 'heroic', { summonedAdd: true })).toBe(1867); // was 933
     expect(maxHpAt('korzul_the_gravewyrm', 'gravewyrm_sanctum', 'heroic')).toBe(13138); // was 6569
   });

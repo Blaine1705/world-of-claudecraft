@@ -8,6 +8,7 @@ import { VARKHUL_CINDER_REPAIR_CAST_ID } from '../varkhul_cinder_artificer';
 import { IGNIVAR_CINDER_LANCE_CAST_ID } from './ignivar_trash_automata';
 import { BASTION_KIT_CAST_SCHOOLS } from './trash_kit/bastion_cast_ids';
 import { TRASH_KIT_CAST_SCHOOLS } from './trash_kit/cast_ids';
+import { TEMPLE_KIT_CAST_SCHOOLS } from './trash_kit/temple_cast_ids';
 
 // The scripted cast id updateHealerHold puts on a channelHeal mob (Malric, the
 // Nythraxis spirit healer) so its heal renders a real, interruptible cast bar.
@@ -33,4 +34,6 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   ...TRASH_KIT_CAST_SCHOOLS,
   // The Sunken Bastion's heals and shields (mob/trash_kit/bastion_cast_ids.ts).
   ...BASTION_KIT_CAST_SCHOOLS,
+  // The Drowned Temple's lullaby, tide call and coil (mob/trash_kit/temple_cast_ids.ts).
+  ...TEMPLE_KIT_CAST_SCHOOLS,
 };

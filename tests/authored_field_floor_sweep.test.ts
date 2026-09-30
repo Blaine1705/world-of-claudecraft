@@ -1,5 +1,6 @@
 // The floor a body stands on IS the floor that is drawn, across the whole of
-// every authored open-air field (the Hollow Crypt, the Sunken Bastion).
+// every authored open-air field (the Hollow Crypt, the Sunken Bastion, the
+// Drowned Temple).
 //
 // Live report (the Sunken Bastion, online): in the Lower Bailey by the dead
 // Turretback Hermit only the player's head showed above the paving, "and more
@@ -30,6 +31,7 @@ import {
   headlandMeshHeightAt,
   planHeadlandRock,
 } from '../src/render/sunken_bastion/bastion_headland_core';
+import { DROWNED_TEMPLE_FIELD } from '../src/sim/content/drowned_temple_layout';
 import { HOLLOW_CRYPT_FIELD } from '../src/sim/content/hollow_crypt_layout';
 import {
   BAILEY_CHAPEL,
@@ -155,6 +157,7 @@ function describeMisses(misses: Miss[]): string {
 const FIELDS: [string, AuthoredFieldDef][] = [
   ['the Hollow Crypt', HOLLOW_CRYPT_FIELD],
   ['the Sunken Bastion', SUNKEN_BASTION_FIELD],
+  ['the Drowned Temple', DROWNED_TEMPLE_FIELD],
 ];
 
 describe('an authored field is walked where it is drawn', () => {

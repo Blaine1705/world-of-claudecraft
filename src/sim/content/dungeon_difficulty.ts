@@ -298,7 +298,28 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       barnacle_crawler: 1,
       shackled_prisoner: 1,
     },
+  }, // The Drowned Temple rework (docs/design/dungeon-rework/drowned_temple.md):
+  // a health-only record. The bosses' pools come from target fight length x
+  // planning party DPS at levels 16 to 18 (about 110 to 120): Selthe 90 s
+  // (about 9,900), the Tideglass Colossus 100 s (about 11,500), Ysolei 150 s
+  // (about 18,000), and the Mere Hydra's three heads about 2,000 each (55 s
+  // for the three). Everything else keeps its raw template, so the mechanics
+  // land at their authored normal numbers.
+  drowned_temple: {
+    id: 'drowned_temple',
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    healthMultiplierByMob: {
+      choirmother_selthe: 7.97,
+      tideglass_colossus: 7.35,
+      ysolei: 8.27,
+      mere_hydra_head_left: 1.38,
+      mere_hydra_head_center: 1.38,
+      mere_hydra_head_right: 1.38,
+    },
+    damageMultiplierByMob: {},
   },
+
   wildheart_basin: {
     id: 'wildheart_basin',
     difficulty: 'normal',
@@ -461,6 +482,40 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // Ysolei's moonspawn summons are non-elite; 40% add nerf (v0.30), the
     // summoned floor drops from 250 to 150.
     addDamageMultiplier: 9.15,
+    // The rework (docs/design/dungeon-rework/drowned_temple.md): the bosses'
+    // pools set per boss from target fight length x heroic party DPS (about
+    // 230): Selthe 90 s, the Colossus 100 s, Ysolei 150 s, the Hydra's heads
+    // 55 s for the three.
+    healthMultiplierByMob: {
+      choirmother_selthe: 12.9,
+      tideglass_colossus: 12.05,
+      ysolei: 13.66,
+      mere_hydra_head_left: 2.4,
+      mere_hydra_head_center: 2.4,
+      mere_hydra_head_right: 2.4,
+    },
+    // The fodder pilgrims and the ranged siren carry softer templates; lift
+    // them to the 500 heroic floor.
+    damageMultiplierByMob: {
+      drowned_pilgrim: 27,
+      moonlit_siren: 17.5,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
+    // heroic), a fumbled boss core is lethal, an unavoidable pulse 15 percent.
+    mechanicDamageMultiplierByMob: {
+      drowned_templeguard: 5.5,
+      lagoon_snapper: 5.5,
+      lagoon_eel: 5.5,
+      glimmerscale_lurker: 5.5,
+      tidewisp: 5.5,
+      mere_hydra_head_left: 6,
+      mere_hydra_head_center: 6,
+      mere_hydra_head_right: 6,
+      choirmother_selthe: 4.5,
+      tideglass_colossus: 5,
+      ysolei: 5,
+    },
     armorMultiplier: 1.25,
     finalBossId: 'ysolei',
     marksPerParticipant: 1,

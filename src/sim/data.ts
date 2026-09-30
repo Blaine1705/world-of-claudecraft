@@ -75,6 +75,7 @@ import {
   DRAKELANDS_ROADS,
   DRAKELANDS_ZONE,
 } from './content/drakelands';
+import { DROWNED_TEMPLE_MOBS } from './content/drowned_temple';
 import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import { FORGEFATHER_ISLE_TERRAIN_EDITS } from './content/ember_coast';
 import {
@@ -461,6 +462,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...HOLLOW_CRYPT_MOBS,
   ...HOLLOW_CRYPT_TRASH_MOBS,
   ...SUNKEN_BASTION_MOBS,
+  ...DROWNED_TEMPLE_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,

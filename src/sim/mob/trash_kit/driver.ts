@@ -42,6 +42,7 @@ import {
   supportCastReady,
 } from './support';
 import { inCone, livingInReach, pickHashedTarget, pickLeapTarget } from './targets';
+import { landLullaby, lullabyReady, stepCarapace, stepDetonate } from './temple_kit';
 
 /** Kit casts in priority order: a summon before a heal or shield, a control
  *  before a strike, a bolt last. */
@@ -51,6 +52,7 @@ const CAST_KEYS = [
   'mend',
   'ward',
   'screech',
+  'lullaby',
   'wingGust',
   'tailLash',
   'line',
@@ -216,6 +218,8 @@ function castReady(
         livingSummons(ctx, mob, kit.call.summon) + kit.call.count <= kit.call.maxAlive
         ? { ok: true, target: null }
         : no;
+    case 'lullaby':
+      return lullabyReady(mob, kit, st, players);
     case 'screech':
       return kit.screech && livingInReach(players, mob.pos, kit.screech.radius).length > 0
         ? { ok: true, target: null }
@@ -255,6 +259,9 @@ function landCast(
     return;
   }
   switch (key) {
+    case 'lullaby':
+      landLullaby(ctx, mob, kit, targetId);
+      return;
     case 'bolt': {
       const def = kit.bolt;
       const target = targetId !== null ? ctx.entities.get(targetId) : undefined;
@@ -575,6 +582,16 @@ function grow(ctx: SimContext, inst: InstanceSlot, mob: Entity, into: string): v
   ctx.dropEntity(mob.id);
 }
 
+/** The claim mobs that summoned `mob` (a caller's flock). */
+function summonersOf(ctx: SimContext, inst: InstanceSlot, mob: Entity): Entity[] {
+  const out: Entity[] = [];
+  for (const id of inst.mobIds) {
+    const e = ctx.entities.get(id);
+    if (e?.summonedIds.includes(mob.id)) out.push(e);
+  }
+  return out;
+}
+
 /** One mob's kit tick. */
 function stepMob(
   ctx: SimContext,
@@ -607,7 +624,9 @@ function stepMob(
   }
   stepDescent(ctx, mob, st);
   if (stepWithdraw(ctx, mob, kit, st)) return;
+  stepCarapace(ctx, mob, kit, st);
   const list = players();
+  if (kit.detonate && stepDetonate(ctx, mob, kit, list, summonersOf(ctx, inst, mob))) return;
   if (stepCast(ctx, inst, mob, kit, st, list)) return;
   if (stepLeap(ctx, mob, kit, st, list)) return;
   tryStartCast(ctx, inst, mob, kit, st, list);

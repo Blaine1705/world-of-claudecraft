@@ -4190,6 +4190,23 @@ export interface TrashKitDef {
    *  (no attacks, no casts) taking `reduction` less damage (the Turretback
    *  Hermit's Withdraw). A breather, then the burn. */
   withdraw?: { belowHpPct: number; seconds: number; reduction: number; name: string };
+  /** An interruptible song at one player in reach (never the one it is
+   *  fighting while anyone else stands in reach): a sleep that breaks on
+   *  damage (the Pale Choir Acolyte's Lullaby). Kick it, or wake the sleeper. */
+  lullaby?: TrashKitCast & { range: number; seconds: number };
+  /** Once per pull under a share of its health: a self absorb shield worth a
+   *  share of its maximum health (the Pearlguard Sentinel's Pearl Carapace). */
+  carapace?: { belowHpPct: number; shieldPct: number; seconds: number; name: string };
+  /** A seeker that bursts on reaching its victim: within `reach` it breaks in
+   *  a splash round itself and is gone (the Tidewisp). Kill it on the way in. */
+  detonate?: {
+    reach: number;
+    radius: number;
+    min: number;
+    max: number;
+    name: string;
+    school: TrashKitCast['school'];
+  };
 }
 
 /** Per-pull runtime state of a trash kit (Entity.trashKit). */
@@ -4210,6 +4227,8 @@ export interface TrashKitState {
   aim?: number;
   /** The once-per-pull withdraw already fired. */
   withdrawn?: boolean;
+  /** The once-per-pull carapace already closed. */
+  carapaced?: boolean;
 }
 
 /** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion),
@@ -4301,6 +4320,86 @@ export type BastionFightState =
   | VaelFightState
   | HermitFightState;
 
+/** Per-fight state of a Drowned Temple boss (encounters/drowned_temple), on
+ *  the boss entity; cleared when the fight ends (a kill, an evade, a wipe). */
+export interface SeltheFightState {
+  kind: 'selthe';
+  chorusTimer: number;
+  soloTimer: number;
+  songTimer: number;
+  slapTimer: number;
+  /** Marks in flight: whose, and the seconds until each resolves. */
+  marks: { mark: 'chorus' | 'solo'; playerId: number; remaining: number }[];
+  /** Heroic Echo: marks resolving again where they fell (their object ids). */
+  echoes: {
+    mark: 'chorus' | 'solo';
+    x: number;
+    z: number;
+    remaining: number;
+    objectId: number;
+  }[];
+  /** Marks started this fight (the deterministic victim hash salt). */
+  casts: number;
+  /** Someone took a Chorus alone or a Solo caught a second player (the deed). */
+  flubbed: boolean;
+}
+
+/** The Mere Hydra's fight, SHARED by its three heads (one object referenced
+ *  from each head, so a fallen head never takes the state with it). */
+export interface HydraFightState {
+  kind: 'hydra';
+  breathTimer: number;
+  /** Which head breathes next: 0 left, 2 right. */
+  breathSide: 0 | 2;
+  spitTimer: number;
+  /** Brine Spit pools about to burst (their object ids). */
+  spits: { x: number; z: number; remaining: number; objectId: number }[];
+  casts: number;
+  /** Sim time each head fell, in the order they fell (the deed reads it). */
+  deaths: number[];
+}
+
+export interface ColossusFightState {
+  kind: 'colossus';
+  lanceTimer: number;
+  slamTimer: number;
+  /** Prism Flares fired this fight (thresholds passed). */
+  flares: number;
+  /** The Moonlight Lance's locked aim while its bar runs. */
+  lanceYaw: number | null;
+  /** Living Reflections: the add, the player it mirrors, and when it rose. */
+  reflections: { id: number; ownerId: number; born: number }[];
+  swapTimer: number;
+  casts: number;
+  /** A Reflection outlived the deed window (the deed reads it). */
+  lingered: boolean;
+}
+
+export interface YsoleiFightState {
+  kind: 'ysolei';
+  lunarTimer: number;
+  undertowTimer: number;
+  /** The Undertow in flight: its clock, and where each pulled player stood. */
+  undertow: { remaining: number; starts: { playerId: number; x: number; z: number }[] } | null;
+  /** The Rising Tide once it starts: the flooded half, the seconds to the
+   *  next switch, and the warned half. */
+  tide: { half: 'north' | 'south'; timer: number } | null;
+  /** Heroic Riptide puddles (their object ids). */
+  riptides: { x: number; z: number; remaining: number; tick: number; objectId: number }[];
+  /** Heroic Drowned Moon: seconds to the next Moonspawn out of the flood. */
+  moonTimer: number;
+  /** One tick of flood damage a second. */
+  floodTick: number;
+  /** Anyone was caught by a Tidal Crash (the deed reads it). */
+  crashed: boolean;
+}
+
+export type TempleFightState =
+  | SeltheFightState
+  | HydraFightState
+  | ColossusFightState
+  | YsoleiFightState;
+
 /** What an in-dungeon gate looks like (render-only pick; collision is one box). */
 export type DungeonGateKind =
   | 'portcullis'
@@ -4311,7 +4410,12 @@ export type DungeonGateKind =
   // The Sunken Bastion: a drawbridge that lowers over the moat ditch, and a
   // wall of Vael's fog that parts.
   | 'drawbridge'
-  | 'fog_wall';
+  | 'fog_wall'
+  // The Drowned Temple: a waterfall curtain that parts, a bridge of moonlight
+  // that assembles, and a stair that rises out of the lagoon as a pool drains.
+  | 'water_veil'
+  | 'light_bridge'
+  | 'sunken_stair';
 
 /**
  * An in-dungeon gate or encounter seal (instances/dungeon_gates.ts): one
@@ -4424,6 +4528,7 @@ export interface DungeonDef {
     | 'wildheart'
     | 'hollow_crypt'
     | 'sunken_bastion'
+    | 'drowned_temple'
     | 'lastkeep'
     | 'dawnhold';
   /**
@@ -6186,6 +6291,14 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */
   bastionFight?: BastionFightState;
+  /** Per-fight state of a Drowned Temple boss (encounters/drowned_temple). Sim
+   *  authority only; the client reads the fight from casts, auras and the
+   *  encounter objects. */
+  templeFight?: TempleFightState;
+  /** A Tideglass Reflection's owner: the player it mirrors and fights, who
+   *  cannot hurt it (encounters/drowned_temple/reflection_guard.ts). Sim only;
+   *  the client reads the owner from the Reflection's forcedTargetId. */
+  mirrorOwnerId?: number;
   // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;

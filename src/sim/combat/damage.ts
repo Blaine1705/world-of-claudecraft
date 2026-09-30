@@ -25,6 +25,7 @@
 
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { reflectionIgnoresHit } from '../encounters/drowned_temple/reflection_guard';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
@@ -234,6 +235,8 @@ export function dealDamage(
   const copiedResolvedHit = resolvedHpLoss;
   if (target.dead) return 0;
   if (target.damageImmune) return 0;
+  // A Tideglass Reflection never takes damage from the player it mirrors.
+  if (reflectionIgnoresHit(source, target)) return 0;
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
   // pet hit lands exactly one point, whatever it would have dealt, and the
   // spike's pool is its hit count. Resolved like an exact copy so no source
