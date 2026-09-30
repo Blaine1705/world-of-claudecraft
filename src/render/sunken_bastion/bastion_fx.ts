@@ -7,7 +7,9 @@
 //  - the Barnacle Crawler's Brine Burst ring, filling over its fuse where it fell;
 //  - a flash when a strike lands;
 //  - the creatures' own effects (bastion_creature_fx.ts): the Fogbound
-//    Arbalest's crossbow bolts and the Gaol Turnkey's lantern flare.
+//    Arbalest's crossbow bolts and the Gaol Turnkey's lantern flare;
+//  - the gaol's cage, anchor and shackles (bastion_gaol_fx.ts) and the
+//    reaper's pool, sweep and soul wisps (bastion_reaper_fx.ts).
 // Boss casts register more lanes and rings through registerBastionTelegraph.
 // Every shape is the shared floor telegraph (../floor_telegraph): the same
 // layered look, threat colours and edge glow as every other dungeon.
@@ -42,6 +44,8 @@ import {
   brineBurstPhase,
   brineBurstSpec,
 } from './bastion_fx_core';
+import { BastionGaolFx } from './bastion_gaol_fx';
+import { BastionReaperFx } from './bastion_reaper_fx';
 
 const FAN_SLOTS = 12;
 const LANE_SLOTS = 8;
@@ -104,6 +108,8 @@ export class BastionFx {
   private readonly seenDead = new Set<number>();
   private readonly boss: BastionBossFx;
   private readonly creatures: BastionCreatureFx;
+  private readonly gaol: BastionGaolFx;
+  private readonly reaper: BastionReaperFx;
   private scan = 0;
   private clock = 0;
   private disposed = false;
@@ -141,6 +147,9 @@ export class BastionFx {
     creatures.name = 'sunken-bastion-creature-fx';
     this.root.add(creatures);
     this.creatures = new BastionCreatureFx(creatures, groundY, world, playGesture, reducedMotion);
+    // The fifth pass's gaol and reaper visuals ride the same root and gate.
+    this.gaol = new BastionGaolFx(this.root, groundY, world, this.flashesOn);
+    this.reaper = new BastionReaperFx(this.root, groundY, world, this.flashesOn);
     const B = BASTION_BOSS_TELEGRAPHS;
     registerBastionTelegraph(
       B.charge,
@@ -175,6 +184,8 @@ export class BastionFx {
    *  Turnkey's lantern), so the generic projectile or nova is not drawn too. */
   handleEvent(ev: SimEvent): boolean {
     if (this.creatures.handleEvent(ev)) return true;
+    if (this.gaol.handleEvent(ev)) return true;
+    if (this.reaper.handleEvent(ev)) return true;
     this.flash(ev);
     return false;
   }
@@ -201,6 +212,8 @@ export class BastionFx {
     this.clock += dt;
     this.boss.update(dt);
     this.creatures.update(dt);
+    this.gaol.update(dt);
+    this.reaper.update(dt);
     this.scan -= dt;
     if (this.scan <= 0) {
       this.scan = SCAN_SEC;
@@ -337,6 +350,8 @@ export class BastionFx {
     this.disposed = true;
     this.boss.dispose();
     this.creatures.dispose();
+    this.gaol.dispose();
+    this.reaper.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
   }

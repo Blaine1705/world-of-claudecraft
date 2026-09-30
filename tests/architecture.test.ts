@@ -634,6 +634,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/world_pvp/world_pvp_window_view.ts',
   'src/ui/hud/hill/hill_bar_view.ts',
+  // The Iron Cage escape prompt (the Gaol Turnkey's button-mash).
+  'src/ui/hud/dungeon/cage_escape_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -816,6 +818,8 @@ const RENDER_PURE_CORES = [
   'src/render/sunken_bastion/bastion_boss_fx_core.ts',
   'src/render/sunken_bastion/bastion_rain_core.ts',
   'src/render/sunken_bastion/bastion_creature_fx_core.ts',
+  // The fifth pass's cage, anchor, shackle and reaper visual plan.
+  'src/render/sunken_bastion/bastion_gaol_reaper_core.ts',
   'src/render/authored_field/field_edge_plan_core.ts',
   'src/render/drowned_temple/temple_plan_core.ts',
   'src/render/drowned_temple/temple_kit_plan_core.ts',
