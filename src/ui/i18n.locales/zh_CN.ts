@@ -4507,6 +4507,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': '出售杂物',
   'itemUi.vendor.sellJunkAria': '以 {price} 出售所有杂物',
   'itemUi.vendor.sellJunkHint': '出售背包中除任务物品外的所有灰色物品。',
+  'itemUi.vendor.sellJunkNoBuyback': '灰色物品不会进入回购列表，因此此次出售无法撤销。',
   'itemUi.market.title': '世界市场',
   'itemUi.market.subtitle': '商人的交易所',
   'itemUi.market.close': '关闭市场',

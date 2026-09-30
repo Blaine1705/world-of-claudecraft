@@ -12848,7 +12848,8 @@ export const en_CA: EnTranslations = {
       "sellQuantityCancel": "Cancel",
       "sellJunk": "Sell Junk",
       "sellJunkAria": "Sell all junk for {price}",
-      "sellJunkHint": "Sells every gray item in your bags except quest items."
+      "sellJunkHint": "Sells every gray item in your bags except quest items.",
+      "sellJunkNoBuyback": "Gray items skip the buyback list, so this sale cannot be undone."
     },
     "market": {
       "title": "The World Market",

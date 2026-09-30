@@ -12848,7 +12848,8 @@ export const zh_CN: EnTranslations = {
       "sellQuantityCancel": "取消",
       "sellJunk": "出售杂物",
       "sellJunkAria": "以 {price} 出售所有杂物",
-      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。"
+      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。",
+      "sellJunkNoBuyback": "灰色物品不会进入回购列表，因此此次出售无法撤销。"
     },
     "market": {
       "title": "世界市场",

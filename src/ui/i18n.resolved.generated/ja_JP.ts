@@ -12848,7 +12848,8 @@ export const ja_JP: EnTranslations = {
       "sellQuantityCancel": "キャンセル",
       "sellJunk": "不要品を売却",
       "sellJunkAria": "{price}ですべての不要品を売却",
-      "sellJunkHint": "クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。"
+      "sellJunkHint": "クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。",
+      "sellJunkNoBuyback": "灰色アイテムは買い戻しリストに入らないため、この売却は取り消せません。"
     },
     "market": {
       "title": "ワールドマーケット",

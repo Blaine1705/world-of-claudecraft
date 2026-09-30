@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "es_ES": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "fr_FR": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "fr_CA": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "de_DE": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "nl_NL": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "pl_PL": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "id_ID": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "tr_TR": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "sv_SE": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "vi_VN": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "da_DK": [
+    "itemUi.vendor.sellJunkNoBuyback"
+  ]
 };

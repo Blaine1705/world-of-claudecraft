@@ -12848,7 +12848,8 @@ export const en_XA: EnTranslations = {
       "sellQuantityCancel": "[Çáñçéļ]",
       "sellJunk": "[Šéļļ Ĵúñķ]",
       "sellJunkAria": "[Šéļļ áļļ ĵúñķ ƒóŕ {price}]",
-      "sellJunkHint": "[Šéļļš éʋéŕý ĝŕáý íţéɱ íñ ýóúŕ ƀáĝš éẋçéþţ ɋúéšţ íţéɱš.]"
+      "sellJunkHint": "[Šéļļš éʋéŕý ĝŕáý íţéɱ íñ ýóúŕ ƀáĝš éẋçéþţ ɋúéšţ íţéɱš.]",
+      "sellJunkNoBuyback": "[Ĝŕáý íţéɱš šķíþ ţĥé ƀúýƀáçķ ļíšţ, šó ţĥíš šáļé çáññóţ ƀé úñðóñé.]"
     },
     "market": {
       "title": "[Ţĥé Ŵóŕļð Ɱáŕķéţ]",

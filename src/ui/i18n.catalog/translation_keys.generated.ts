@@ -14800,6 +14800,7 @@ export type TranslationKeyFlat =
   | 'itemUi.vendor.sellJunk'
   | 'itemUi.vendor.sellJunkAria'
   | 'itemUi.vendor.sellJunkHint'
+  | 'itemUi.vendor.sellJunkNoBuyback'
   | 'itemUi.vendor.sellQuantityCancel'
   | 'itemUi.vendor.sellQuantityConfirm'
   | 'itemUi.vendor.sellQuantityInput'
