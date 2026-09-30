@@ -9,8 +9,8 @@
     "riftControlSuppressed: guard rolls drawn, effects skipped inside the window",
     "clearRiftBossDeathZones on boss death (riftDeathZoneClear emit + floor claim)"
   ],
-  "draws": 1363,
-  "drawDigest": "772b2184",
+  "draws": 1353,
+  "drawDigest": "0e9a0b32",
   "frames": [
     {
       "tick": 0,
@@ -173,7 +173,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1028,
-      "state": "93388a35",
+      "state": "cc5c186b",
       "events": "0d0b6de2",
       "rng": {
         "draws": 58,
@@ -184,7 +184,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1028,
-      "state": "1738bb4a",
+      "state": "eee26d2f",
       "events": "741638a5",
       "rng": {
         "draws": 58,
@@ -195,7 +195,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1028,
-      "state": "f5582e31",
+      "state": "25b41d2a",
       "events": "741638a5",
       "rng": {
         "draws": 58,
@@ -206,7 +206,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1028,
-      "state": "850756a7",
+      "state": "a138a8b1",
       "events": "b93655d8",
       "rng": {
         "draws": 59,
@@ -217,7 +217,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1028,
-      "state": "0d855d8f",
+      "state": "531ef99b",
       "events": "d01a73de",
       "rng": {
         "draws": 59,
@@ -228,7 +228,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1028,
-      "state": "0d855d8f",
+      "state": "531ef99b",
       "events": "741638a5",
       "rng": {
         "draws": 59,
@@ -464,7 +464,7 @@
             "armor": 504
           },
           "stompTimer": 999,
-          "swingTimer": 0.7,
+          "swingTimer": 1,
           "targetId": 1003,
           "templateId": "rift_boss_venom",
           "terrifyTimer": 999,
@@ -477,7 +477,7 @@
           "weapon": {
             "max": 156,
             "min": 100,
-            "speed": 1.9
+            "speed": 2.2
           }
         },
         {
@@ -535,7 +535,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1028,
-      "state": "a319773b",
+      "state": "3270ceb0",
       "events": "741638a5",
       "rng": {
         "draws": 59,
@@ -546,7 +546,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1028,
-      "state": "9256861f",
+      "state": "8f3489ea",
       "events": "741638a5",
       "rng": {
         "draws": 59,
@@ -557,19 +557,19 @@
       "tick": 40,
       "time": 2,
       "nextId": 1028,
-      "state": "0f8a8bf4",
-      "events": "f28076a1",
+      "state": "ac043aa3",
+      "events": "741638a5",
       "rng": {
-        "draws": 69,
-        "digest": "9fd56823"
+        "draws": 64,
+        "digest": "540ff714"
       }
     },
     {
       "tick": 45,
       "time": 2.25,
       "nextId": 1028,
-      "state": "6a66cb32",
-      "events": "741638a5",
+      "state": "5ed10898",
+      "events": "f28076a1",
       "rng": {
         "draws": 95,
         "digest": "1231f33e"
@@ -579,7 +579,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1028,
-      "state": "234851b3",
+      "state": "4e8e7387",
       "events": "741638a5",
       "rng": {
         "draws": 135,
@@ -590,7 +590,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 1028,
-      "state": "b813f43e",
+      "state": "f7feef54",
       "events": "741638a5",
       "rng": {
         "draws": 173,
@@ -601,220 +601,220 @@
       "tick": 60,
       "time": 3,
       "nextId": 1028,
-      "state": "00055021",
+      "state": "f1f85a34",
       "events": "741638a5",
       "rng": {
-        "draws": 221,
-        "digest": "e624ff05"
+        "draws": 223,
+        "digest": "f910eabd"
       }
     },
     {
       "tick": 65,
       "time": 3.25,
       "nextId": 1028,
-      "state": "3f051ea5",
+      "state": "d00467ce",
       "events": "741638a5",
       "rng": {
-        "draws": 260,
-        "digest": "cfe29af6"
+        "draws": 265,
+        "digest": "a20e35d8"
       }
     },
     {
       "tick": 70,
       "time": 3.5,
       "nextId": 1028,
-      "state": "5f37db77",
+      "state": "16c246ab",
       "events": "741638a5",
       "rng": {
-        "draws": 307,
-        "digest": "fe52097c"
+        "draws": 312,
+        "digest": "ab163b01"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
       "nextId": 1028,
-      "state": "836934b6",
-      "events": "cfa45131",
+      "state": "2ceb1ca2",
+      "events": "741638a5",
       "rng": {
-        "draws": 353,
-        "digest": "7bf3bcfe"
+        "draws": 357,
+        "digest": "6dcb12b5"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 1028,
-      "state": "bdd7d204",
-      "events": "2ca4cbae",
+      "state": "d9d6dd62",
+      "events": "741638a5",
       "rng": {
-        "draws": 407,
-        "digest": "8b88b269"
+        "draws": 402,
+        "digest": "eedf6b77"
       }
     },
     {
       "tick": 85,
       "time": 4.25,
       "nextId": 1028,
-      "state": "dd90e66c",
-      "events": "741638a5",
+      "state": "4da7f94e",
+      "events": "3e16fcb0",
       "rng": {
-        "draws": 467,
-        "digest": "141ce285"
+        "draws": 464,
+        "digest": "57e54c7f"
       }
     },
     {
       "tick": 90,
       "time": 4.5,
       "nextId": 1028,
-      "state": "b505b669",
-      "events": "741638a5",
+      "state": "b446a2c7",
+      "events": "6c2870cd",
       "rng": {
-        "draws": 518,
-        "digest": "73c46370"
+        "draws": 514,
+        "digest": "64d004ea"
       }
     },
     {
       "tick": 95,
       "time": 4.75,
       "nextId": 1028,
-      "state": "f4282eed",
+      "state": "19e93346",
       "events": "741638a5",
       "rng": {
-        "draws": 566,
-        "digest": "cffdbb8f"
+        "draws": 564,
+        "digest": "095d10f5"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 1028,
-      "state": "45478cb8",
+      "state": "52ac9fae",
       "events": "741638a5",
       "rng": {
-        "draws": 627,
-        "digest": "af4bb757"
+        "draws": 616,
+        "digest": "d70fd811"
       }
     },
     {
       "tick": 105,
       "time": 5.25,
       "nextId": 1028,
-      "state": "1c57d816",
+      "state": "ae363b18",
       "events": "741638a5",
       "rng": {
-        "draws": 678,
-        "digest": "9401fe21"
+        "draws": 673,
+        "digest": "35eac25c"
       }
     },
     {
       "tick": 110,
       "time": 5.5,
       "nextId": 1028,
-      "state": "9beadf2b",
-      "events": "741638a5",
+      "state": "f8f60d4f",
+      "events": "d23b3981",
       "rng": {
-        "draws": 743,
-        "digest": "c7427d18"
+        "draws": 731,
+        "digest": "3f2f96be"
       }
     },
     {
       "tick": 115,
       "time": 5.75,
       "nextId": 1028,
-      "state": "f78d56ba",
-      "events": "60a7a46b",
+      "state": "eab09f58",
+      "events": "741638a5",
       "rng": {
-        "draws": 792,
-        "digest": "3b508398"
+        "draws": 777,
+        "digest": "88295fe6"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 1028,
-      "state": "ba164ec3",
-      "events": "3e16fcb0",
+      "state": "8b5864a0",
+      "events": "741638a5",
       "rng": {
-        "draws": 839,
-        "digest": "2488e998"
+        "draws": 826,
+        "digest": "3918bd87"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
       "nextId": 1028,
-      "state": "a5740915",
-      "events": "741638a5",
+      "state": "f9e15cde",
+      "events": "3e16fcb0",
       "rng": {
-        "draws": 895,
-        "digest": "241a9977"
+        "draws": 883,
+        "digest": "12982f6d"
       }
     },
     {
       "tick": 130,
       "time": 6.5,
       "nextId": 1028,
-      "state": "081399ce",
+      "state": "3e8986f1",
       "events": "741638a5",
       "rng": {
-        "draws": 946,
-        "digest": "463ddf2f"
+        "draws": 935,
+        "digest": "ec8d9e69"
       }
     },
     {
       "tick": 135,
       "time": 6.75,
       "nextId": 1028,
-      "state": "a3616e83",
+      "state": "b27e56a3",
       "events": "741638a5",
       "rng": {
-        "draws": 1010,
-        "digest": "6a0d9caf"
+        "draws": 1009,
+        "digest": "f624fdf3"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 1028,
-      "state": "174b343b",
+      "state": "3e7c0f10",
       "events": "741638a5",
       "rng": {
-        "draws": 1058,
-        "digest": "7970e268"
+        "draws": 1055,
+        "digest": "05c52526"
       }
     },
     {
       "tick": 145,
       "time": 7.25,
       "nextId": 1028,
-      "state": "53f9db06",
+      "state": "ddfb84ad",
       "events": "741638a5",
       "rng": {
-        "draws": 1118,
-        "digest": "576cb0a0"
+        "draws": 1108,
+        "digest": "7e5e4015"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
       "nextId": 1028,
-      "state": "52fb1816",
+      "state": "137969af",
       "events": "c67d7a43",
       "rng": {
-        "draws": 1174,
-        "digest": "c9a708f1"
+        "draws": 1172,
+        "digest": "c42341bd"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
       "nextId": 1028,
-      "state": "52fb1816",
+      "state": "137969af",
       "events": "741638a5",
       "rng": {
-        "draws": 1174,
-        "digest": "c9a708f1"
+        "draws": 1172,
+        "digest": "c42341bd"
       },
       "label": "detonated",
       "players": [
@@ -953,25 +953,13 @@
               "id": "stackpoison_rift_boss_venom",
               "kind": "dot",
               "name": "Deadly Venom",
-              "remaining": 8.25,
+              "remaining": 4.75,
               "school": "nature",
               "sourceId": 1026,
-              "stacks": 3,
+              "stacks": 1,
               "tickInterval": 2,
-              "tickTimer": 0.45,
-              "value": 21
-            },
-            {
-              "duration": 8,
-              "id": "venom_rift_venom_weaver",
-              "kind": "dot",
-              "name": "Venom",
-              "remaining": 4.15,
-              "school": "nature",
-              "sourceId": 1027,
-              "tickInterval": 2,
-              "tickTimer": 0.15,
-              "value": 8
+              "tickTimer": 0.75,
+              "value": 7
             }
           ],
           "blockChance": 0.05,
@@ -1067,7 +1055,7 @@
             "armor": 504
           },
           "stompTimer": 999,
-          "swingTimer": 0.15,
+          "swingTimer": 1.35,
           "targetId": 1003,
           "templateId": "rift_boss_venom",
           "terrifyTimer": 999,
@@ -1080,7 +1068,7 @@
           "weapon": {
             "max": 156,
             "min": 100,
-            "speed": 1.9
+            "speed": 2.2
           }
         },
         {
@@ -1138,44 +1126,44 @@
       "tick": 155,
       "time": 7.75,
       "nextId": 1028,
-      "state": "390e9706",
-      "events": "70bc303e",
+      "state": "f7472acb",
+      "events": "0d4cc704",
       "rng": {
-        "draws": 1234,
-        "digest": "9ccee866"
+        "draws": 1233,
+        "digest": "185ae206"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 1028,
-      "state": "f3e6e09f",
-      "events": "7a96392d",
+      "state": "782f22ed",
+      "events": "9c45fd06",
       "rng": {
-        "draws": 1289,
-        "digest": "3f26feab"
+        "draws": 1284,
+        "digest": "c44653ce"
       }
     },
     {
       "tick": 165,
       "time": 8.25,
       "nextId": 1028,
-      "state": "ce548f2e",
-      "events": "741638a5",
+      "state": "3474a1a6",
+      "events": "3e16fcb0",
       "rng": {
-        "draws": 1343,
-        "digest": "fa8da094"
+        "draws": 1339,
+        "digest": "4a097d51"
       }
     },
     {
       "tick": 166,
       "time": 8.3,
       "nextId": 1028,
-      "state": "9a7f2350",
+      "state": "d815de7e",
       "events": "741638a5",
       "rng": {
-        "draws": 1363,
-        "digest": "772b2184"
+        "draws": 1353,
+        "digest": "0e9a0b32"
       },
       "label": "boss-dead-clear",
       "players": [
@@ -1314,25 +1302,13 @@
               "id": "stackpoison_rift_boss_venom",
               "kind": "dot",
               "name": "Deadly Venom",
-              "remaining": 7.45,
+              "remaining": 3.95,
               "school": "nature",
               "sourceId": 1026,
-              "stacks": 3,
+              "stacks": 1,
               "tickInterval": 2,
-              "tickTimer": 1.65,
-              "value": 21
-            },
-            {
-              "duration": 8,
-              "id": "venom_rift_venom_weaver",
-              "kind": "dot",
-              "name": "Venom",
-              "remaining": 3.35,
-              "school": "nature",
-              "sourceId": 1027,
-              "tickInterval": 2,
-              "tickTimer": 1.35,
-              "value": 8
+              "tickTimer": 1.95,
+              "value": 7
             }
           ],
           "blockChance": 0.05,
@@ -1434,7 +1410,7 @@
             "armor": 504
           },
           "stompTimer": 999,
-          "swingTimer": 1.65,
+          "swingTimer": 0.95,
           "targetId": 1003,
           "templateId": "rift_boss_venom",
           "terrifyTimer": 999,
@@ -1447,7 +1423,7 @@
           "weapon": {
             "max": 156,
             "min": 100,
-            "speed": 1.9
+            "speed": 2.2
           }
         },
         {
@@ -1505,11 +1481,11 @@
       "tick": 166,
       "time": 8.3,
       "nextId": 1028,
-      "state": "9a7f2350",
+      "state": "d815de7e",
       "events": "741638a5",
       "rng": {
-        "draws": 1363,
-        "digest": "772b2184"
+        "draws": 1353,
+        "digest": "0e9a0b32"
       },
       "label": "final",
       "players": [
@@ -1648,25 +1624,13 @@
               "id": "stackpoison_rift_boss_venom",
               "kind": "dot",
               "name": "Deadly Venom",
-              "remaining": 7.45,
+              "remaining": 3.95,
               "school": "nature",
               "sourceId": 1026,
-              "stacks": 3,
+              "stacks": 1,
               "tickInterval": 2,
-              "tickTimer": 1.65,
-              "value": 21
-            },
-            {
-              "duration": 8,
-              "id": "venom_rift_venom_weaver",
-              "kind": "dot",
-              "name": "Venom",
-              "remaining": 3.35,
-              "school": "nature",
-              "sourceId": 1027,
-              "tickInterval": 2,
-              "tickTimer": 1.35,
-              "value": 8
+              "tickTimer": 1.95,
+              "value": 7
             }
           ],
           "blockChance": 0.05,
@@ -1768,7 +1732,7 @@
             "armor": 504
           },
           "stompTimer": 999,
-          "swingTimer": 1.65,
+          "swingTimer": 0.95,
           "targetId": 1003,
           "templateId": "rift_boss_venom",
           "terrifyTimer": 999,
@@ -1781,7 +1745,7 @@
           "weapon": {
             "max": 156,
             "min": 100,
-            "speed": 1.9
+            "speed": 2.2
           }
         },
         {
