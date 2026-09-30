@@ -232,3 +232,16 @@ describe('the Lagoon Eel: Static Coil', () => {
     expect(far.auras.some((a) => a.id === TEMPLE_STATIC_COIL)).toBe(false);
   });
 });
+
+describe('/dev temple kill trash', () => {
+  it('clears every pack and patrol, and leaves the bosses and the Hydra standing', () => {
+    const r = room();
+    r.sim.chat('/dev temple kill trash', r.me.id);
+    const spawns = DUNGEONS.drowned_temple.spawns;
+    spawns.forEach((spawn, i) => {
+      const mob = r.sim.ctx.entities.get(r.inst.mobIds[i]);
+      const trash = spawn.packId !== undefined && spawn.packId !== 'hydra';
+      expect(mob?.dead ?? true, `${spawn.mobId} #${i}`).toBe(trash);
+    });
+  });
+});
