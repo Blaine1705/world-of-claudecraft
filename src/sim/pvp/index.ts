@@ -157,14 +157,13 @@ export {
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
 export {
-  isWorldPvpSkullCopy,
   placeWorldPvpSpoils,
   settleAllWorldPvpSpoils,
   settleWorldPvpSpoils,
   settleWorldPvpSpoilsOnLeave,
   sweepWorldPvpSpoils,
   WORLD_PVP_SKULL_ITEM_ID,
-  worldPvpSkullInstance,
+  worldPvpSkullSources,
   worldPvpSpoilsLine,
 } from './world_pvp_spoils';
 export { worldPvpFfaZones, worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';

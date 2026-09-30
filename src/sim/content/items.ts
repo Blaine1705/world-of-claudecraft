@@ -3002,15 +3002,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 8,
   },
   // World PvP trophy (src/sim/pvp/world_pvp_spoils.ts): the killing blow of a
-  // flagged-vs-flagged world kill loots the loser's skull from their body. Each
-  // copy carries the victim's name (instance.signer) and reads as "<name>'s
-  // Skull". A keepsake with no vendor price, so camping an alt for skulls can
-  // never mint gold.
+  // flagged-vs-flagged world kill loots the loser's skull from their body. All
+  // skulls share one stack that records whose each one is, the way a gathered
+  // material records its gatherer (src/sim/pvp/world_pvp_trophy.ts). A keepsake
+  // with no vendor price, so camping an alt for skulls can never mint gold.
   pvp_trophy_skull: {
     id: 'pvp_trophy_skull',
     name: 'Trophy Skull',
     kind: 'junk',
-    quality: 'poor',
+    // Common, not grey: a provenance-tracked stack is a material, and grey
+    // trash is never one (tests/material_taxonomy.test.ts).
+    quality: 'common',
     noVendorSell: true,
     sellValue: 0,
   },

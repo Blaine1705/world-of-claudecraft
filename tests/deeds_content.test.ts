@@ -71,7 +71,6 @@ import {
 } from '../src/sim/professions/archetype';
 import { farmingTeachingCeilingFor } from '../src/sim/professions/farming';
 import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from '../src/sim/professions/feast';
-import { WORLD_PVP_SKULL_ITEM_ID } from '../src/sim/pvp';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
 import type { Rng } from '../src/sim/rng';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
@@ -2314,9 +2313,6 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
     for (const itemId of Object.values(quest.itemRewards ?? {})) note(itemId);
   }
   for (const recipe of ALL_RECIPES) note(recipe.resultItemId);
-  // World PvP spoils (src/sim/pvp/world_pvp_spoils.ts): the killing blow of a
-  // flagged-vs-flagged world kill loots the loser's trophy skull.
-  note(WORLD_PVP_SKULL_ITEM_ID);
   const livePoor = new Set(
     Object.values(ITEMS)
       .filter((d) => d.quality === 'poor')
@@ -2335,7 +2331,7 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
     expect(lockpickEntries).toBe(166);
   });
 
-  it('the reachable poor set is exactly the fourteen survivors with an acquisition route', () => {
+  it('the reachable poor set is exactly the thirteen survivors with an acquisition route', () => {
     // The chipped tusk is back since the phase's sixth fix round
     // output-excluded it, and the bogiron nugget and the cracked fetish since
     // the 11l QA excluded them the same way (poor again; the fen-troll and
@@ -2351,7 +2347,6 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
       'moonpale_scale',
       'ogre_toe_ring',
       'pale_pearl',
-      'pvp_trophy_skull',
       'soggy_boot',
       'soggy_moccasin',
       'tangled_weed',

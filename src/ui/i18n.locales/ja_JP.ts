@@ -18323,6 +18323,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'この素材の選択は利用できなくなりました。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × {name}が採集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × {name}から奪取',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × {name}が採集、{signer}が署名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 採集者の記録なし',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned':

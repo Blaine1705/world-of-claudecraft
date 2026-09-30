@@ -1,9 +1,8 @@
 // Permanent loot quality is separate from item rarity and name.
 import { lootQualityItemLevelBonus, lootQualityTier } from '../sim/loot_quality';
-import type { ItemDef, ItemInstancePayload } from '../sim/types';
+import type { ItemInstancePayload } from '../sim/types';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
-import { itemCopyDisplayName } from './item_copy_name_core';
 
 const TIER_KEYS: readonly TranslationKey[] = [
   'hudChrome.lootQuality.ordinary',
@@ -44,13 +43,6 @@ export function lootQualityAriaName(name: string, instance?: ItemInstancePayload
   return lootQualityTier(instance)
     ? t('hudChrome.lootQuality.itemName', { item: name, quality: lootQualityName(instance) })
     : name;
-}
-
-/** The chat-link / aria name of one COPY: its own name when it has one (the
- *  World PvP trophy skull's "<name>'s Skull", item_copy_name_core.ts), else
- *  the def's, with the rolled quality appended as lootQualityAriaName does. */
-export function lootCopyAriaName(def: ItemDef, instance?: ItemInstancePayload): string {
-  return lootQualityAriaName(itemCopyDisplayName(def, instance), instance);
 }
 
 export function lootQualityTooltipLine(instance?: ItemInstancePayload): string {

@@ -17,14 +17,13 @@ import type { MaterialComposition } from '../sim/material_sources';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
 import { LEGENDARY_PROMOTION_COST, PERFECTING_RANKS } from '../sim/professions/perfecting';
-import { isWorldPvpSkullCopy } from '../sim/pvp/world_pvp_spoils';
+import { WORLD_PVP_SKULL_ITEM_ID } from '../sim/pvp/world_pvp_trophy';
 import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
 import { durationText } from './duration_text';
 import { esc } from './esc';
 import { MASTERWORK_SEAL_IMAGE_URL } from './hud/professions/profession_art';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
-import { itemCopyOwnName } from './item_copy_name_core';
 import { ITEM_QUALITY_LABEL_KEYS } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
 import { lootQualityTooltipLine } from './loot_quality_view';
@@ -152,14 +151,11 @@ export function instanceTitleHtml(
   defName: string,
 ): string {
   const color = itemNameColor({ kind: def.kind, quality: tooltipEffectiveQuality(def, instance) });
-  // A copy named for something its def cannot know (the World PvP trophy
-  // skull's "<name>'s Skull", item_copy_name_core.ts) titles like a named one.
-  const ownName = itemCopyOwnName(def, instance) ?? undefined;
-  if (ownName === undefined) {
+  if (instance?.name === undefined) {
     return `<div class="tt-title" style="color:${color}">${esc(defName)}</div>`;
   }
   return (
-    `<div class="tt-title" style="color:${color}">${esc(ownName)}</div>` +
+    `<div class="tt-title" style="color:${color}">${esc(instance.name)}</div>` +
     `<div class="tt-sub">${esc(defName)}</div>`
   );
 }
@@ -414,7 +410,7 @@ export function isGatheredProvenance(def: ItemDef | undefined): boolean {
  *
  *  Renders nothing for a stack with no composition, which is every
  *  non-material item and every legacy stack that predates provenance. */
-export function materialSourceLines(sources?: MaterialComposition): string {
+export function materialSourceLines(sources?: MaterialComposition, itemId?: string): string {
   const summary = materialSourceSummary(sources);
   if (summary === null) return '';
   const bounded = boundedMaterialSourceRows(summary);
@@ -422,14 +418,17 @@ export function materialSourceLines(sources?: MaterialComposition): string {
   let html = '';
   for (const row of bounded.rows) {
     const count = itemNumber(row.count);
+    // A World PvP skull's recorded source is its victim, not a gatherer.
     const key: TranslationKey =
-      row.kind === 'gatherer'
-        ? row.premium
-          ? 'hudChrome.itemTooltip.materialSourceGathererSigned'
-          : 'hudChrome.itemTooltip.materialSourceGatherer'
-        : row.premium
-          ? 'hudChrome.itemTooltip.materialSourceUnrecordedSigned'
-          : 'hudChrome.itemTooltip.materialSourceUnrecorded';
+      row.kind === 'gatherer' && itemId === WORLD_PVP_SKULL_ITEM_ID
+        ? 'hudChrome.itemTooltip.trophySkullSource'
+        : row.kind === 'gatherer'
+          ? row.premium
+            ? 'hudChrome.itemTooltip.materialSourceGathererSigned'
+            : 'hudChrome.itemTooltip.materialSourceGatherer'
+          : row.premium
+            ? 'hudChrome.itemTooltip.materialSourceUnrecordedSigned'
+            : 'hudChrome.itemTooltip.materialSourceUnrecorded';
     html += `<div class="tt-sub tt-material-source" style="color:${QUALITY_COLOR.uncommon}">${esc(
       t(key, { count, name: row.name, signer: row.signer }),
     )}</div>`;
@@ -453,7 +452,7 @@ export function materialMakersMarkLines(
 ): string {
   const summary = materialSourceSummary(sources);
   return (
-    materialSourceLines(sources) +
+    materialSourceLines(sources, item.id) +
     (suppressesLegacyGatheredLine(summary) ? '' : instanceMakersMarkLine(instance, item))
   );
 }
@@ -483,9 +482,6 @@ export function itemRequiredLevelLine(item: ItemDef, playerLevel: number): strin
  *  decided from the kind alone. */
 export function instanceMakersMarkLine(instance?: ItemInstancePayload, def?: ItemDef): string {
   if (!instance?.signer) return '';
-  // A trophy skull's signer is its victim, already named in the title: no
-  // "Crafted by" line (item_copy_name_core.ts).
-  if (def && isWorldPvpSkullCopy(def.id, instance)) return '';
   if (isGatheredProvenance(def)) {
     return `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
       t('hudChrome.crafting.gatheredBy', { name: instance.signer }),

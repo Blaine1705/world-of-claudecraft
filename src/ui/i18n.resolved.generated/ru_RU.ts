@@ -4438,6 +4438,7 @@ export const ru_RU: EnTranslations = {
       "perfectedBadge": "Доведён до совершенства",
       "perfectingRank": "Совершенствование: ранг {rank} из {ranks}",
       "materialSourceGatherer": "{count} × Сборщик: {name}",
+      "trophySkullSource": "{count} × Взят у игрока {name}",
       "materialSourceGathererSigned": "{count} × Сборщик: {name}, подпись: {signer}",
       "materialSourceUnrecorded": "{count} × Сборщик не указан",
       "materialSourceUnrecordedSigned": "{count} × Сборщик не указан, подпись: {name}",

@@ -155,7 +155,12 @@ describe('world pvp spoils over the wire', () => {
         {
           itemId: WORLD_PVP_SKULL_ITEM_ID,
           count: 1,
-          instance: { signer: 'Bet' },
+          materialSources: [
+            {
+              source: { gatherer: { kind: 'character', id: 202, name: 'Bet' } },
+              count: 1,
+            },
+          ],
           personalFor: [killer.session.pid],
         },
       ],
@@ -167,7 +172,11 @@ describe('world pvp spoils over the wire', () => {
     const skull = sim
       .meta(killer.session.pid)!
       .inventory.find((s) => s.itemId === WORLD_PVP_SKULL_ITEM_ID);
-    expect(skull?.instance).toEqual({ signer: 'Bet' });
+    // One shared skull stack; its source bucket names the victim by character id.
+    expect(skull?.instance).toBeUndefined();
+    expect(skull?.materialSources).toEqual([
+      { source: { gatherer: { kind: 'character', id: 202, name: 'Bet' } }, count: 1 },
+    ]);
     expect(wireEntity(victim.p).lootList).toBeUndefined();
   });
 });

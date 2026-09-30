@@ -18635,6 +18635,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'Этот выбор материалов больше недоступен.',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × Сборщик: {name}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Взят у игрока {name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned':
     '{count} × Сборщик: {name}, подпись: {signer}',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × Сборщик не указан',

@@ -195,7 +195,14 @@ export function lootCorpse(
       if (s.instance) {
         ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId, s.count);
       } else {
-        ctx.addItem(s.itemId, s.count, meta.entityId);
+        // A provenance-tracked slot (a World PvP skull naming its victim) keeps
+        // its per-unit source buckets on the way into the bag.
+        ctx.addItem(
+          s.itemId,
+          s.count,
+          meta.entityId,
+          s.materialSources ? { materialSources: s.materialSources } : undefined,
+        );
       }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;

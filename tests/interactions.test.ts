@@ -489,7 +489,14 @@ describe('handlePickedEntity', () => {
       loot: {
         copper: 2_000,
         items: [
-          { itemId: 'pvp_trophy_skull', count: 1, instance: { signer: 'Bet' }, personalFor: [1] },
+          {
+            itemId: 'pvp_trophy_skull',
+            count: 1,
+            personalFor: [1],
+            materialSources: [
+              { source: { gatherer: { kind: 'character', id: 2, name: 'Bet' } }, count: 1 },
+            ],
+          },
         ],
       },
       pos: { x: 1, y: 0, z: 0 },

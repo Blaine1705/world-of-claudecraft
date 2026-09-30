@@ -1,17 +1,9 @@
 // Only authoritative loot receipt metadata supplies an exact-copy chat link.
 // User-typed item tokens retain their static definition-only meaning.
-import { isWorldPvpSkullCopy } from '../sim/pvp/world_pvp_spoils';
 import type { ItemInstancePayload, SimEvent } from '../sim/types';
 import { itemStackDisplayName } from './entity_display_core';
 import { parseChatSegments, tryEncodeItemLink } from './hud/quest/quest_link';
 import { t } from './i18n';
-
-/** Does this receipt name one exact copy whose link must carry its payload: a
- *  quality-rolled copy, or a copy named for someone (the World PvP trophy skull)? */
-function namesExactCopy(event: Extract<SimEvent, { type: 'loot' }>): boolean {
-  if (!event.itemId || !event.instance) return false;
-  return !!event.instance.lootQuality || isWorldPvpSkullCopy(event.itemId, event.instance);
-}
 
 export function lootQualityReceiptText(
   event: Extract<SimEvent, { type: 'loot' }>,
@@ -21,7 +13,7 @@ export function lootQualityReceiptText(
   // slot from authoritative metadata before the ordinary name localizer erases
   // the distinction between copies. Other loot messages keep their own matcher.
   if (
-    namesExactCopy(event) &&
+    event.instance?.lootQuality &&
     event.itemId &&
     /^You receive: .+\.$/.test(event.text) &&
     Number.isSafeInteger(event.count) &&
@@ -46,7 +38,7 @@ export function lootQualityReceiptBody(
   appendLink: (parent: HTMLElement, id: string, copy?: ItemInstancePayload) => void,
 ): string | Node[] {
   const text = lootQualityReceiptText(event, localize);
-  if (!event.itemId || !event.instance || !namesExactCopy(event)) return text;
+  if (!event.itemId || !event.instance?.lootQuality) return text;
   return lootQualityReceiptNodes(doc, text, event.itemId, event.instance, appendLink);
 }
 

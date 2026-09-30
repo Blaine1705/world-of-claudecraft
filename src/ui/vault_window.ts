@@ -403,8 +403,7 @@ export class VaultTab {
     // The fine rim (bag-rim-fine) joins per the release's all-surfaces
     // mark-family rule: a fine grade is marked in bags, bank, and guild bank,
     // so the vault row beside them marks it the same way.
-    const glyphKind =
-      model.kind === 'special' ? bagInstanceGlyphKind(model.instance, model.itemId) : null;
+    const glyphKind = model.kind === 'special' ? bagInstanceGlyphKind(model.instance) : null;
     const cornerMark = bagCornerMark(glyphKind, null, model.fine);
     const locked = model.kind === 'special' && isItemLocked(model.instance);
     row.className = `vault-row ui-card vault-row-${model.kind}${model.atCap ? ' at-cap' : ''}${model.overCap ? ' over-cap' : ''}${bagRimClasses(null, model.fine)}`;

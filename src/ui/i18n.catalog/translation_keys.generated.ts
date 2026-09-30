@@ -11459,6 +11459,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.itemTooltip.riftTier'
   | 'hudChrome.itemTooltip.riftUpgrade'
   | 'hudChrome.itemTooltip.statEnchanted'
+  | 'hudChrome.itemTooltip.trophySkullSource'
   | 'hudChrome.itemUniqueEquipped'
   | 'hudChrome.keybindTransfer.apply'
   | 'hudChrome.keybindTransfer.imported'

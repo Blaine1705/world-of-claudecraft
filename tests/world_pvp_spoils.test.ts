@@ -9,8 +9,8 @@
 import { describe, expect, it } from 'vitest';
 import { corpseIndicatorFor } from '../src/sim/corpse_loot_state';
 import { BUILTIN_WORLD, ITEMS, ZONES } from '../src/sim/data';
+import { isMaterialItemId } from '../src/sim/material_ids';
 import {
-  isWorldPvpSkullCopy,
   settleAllWorldPvpSpoils,
   WORLD_PVP_SKULL_ITEM_ID,
   WORLD_PVP_STAKE_CAP_COPPER,
@@ -95,6 +95,33 @@ function skullsOf(sim: Sim, pid: number) {
   return sim.meta(pid)!.inventory.filter((s) => s.itemId === WORLD_PVP_SKULL_ITEM_ID);
 }
 
+/** One victim's bucket on a skull stack: the victim recorded as a gatherer is
+ *  (their character identity and the name they died under). */
+function victim(id: number, name: string, count = 1) {
+  return { source: { gatherer: { kind: 'character' as const, id, name } }, count };
+}
+
+/** Whose skulls a slot holds, as [name, count] pairs. */
+function victims(slot: {
+  materialSources?: readonly { source: { gatherer?: { name: string } }; count: number }[];
+}) {
+  return (slot.materialSources ?? []).map((b) => [b.source.gatherer?.name ?? '', b.count]);
+}
+
+/** Fill every slot a skull could use. The skull is a provenance-tracked
+ *  material, so it may also sit in a material-only bag pool: the filler must be
+ *  a material too (copper ore, which never shares a skull's stack), or the
+ *  general slots fill while the skull still has room. Bounded so a regression
+ *  can never hang the suite. Call it BEFORE placing any skull stack: a skull
+ *  stack with room always answers "room left". */
+function fillBags(sim: Sim, pid: number): void {
+  const meta = sim.meta(pid)!;
+  for (let i = 0; i < 500 && sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, pid); i++) {
+    meta.inventory.push({ itemId: 'copper_ore', count: 1 });
+  }
+  expect(sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, pid)).toBe(false);
+}
+
 function logLines(sim: Sim, pid: number): string[] {
   return sim.events
     .filter((ev): ev is Extract<SimEvent, { type: 'log' }> => ev.type === 'log' && ev.pid === pid)
@@ -137,8 +164,8 @@ describe('the drop', () => {
         {
           itemId: WORLD_PVP_SKULL_ITEM_ID,
           count: 1,
-          instance: { signer: 'Bet' },
           personalFor: [a],
+          materialSources: [victim(1002, 'Bet')],
         },
       ],
     });
@@ -156,15 +183,11 @@ describe('the drop', () => {
     expect(sim.meta(a)!.copper).toBe(2_000);
     const skulls = skullsOf(sim, a);
     expect(skulls).toHaveLength(1);
-    expect(skulls[0].instance).toEqual({ signer: 'Bet' });
-    expect(isWorldPvpSkullCopy(skulls[0].itemId, skulls[0].instance)).toBe(true);
+    // A plain stack (no per-copy payload) whose one source bucket names Bet.
+    expect(skulls[0].instance).toBeUndefined();
+    expect(skulls[0].materialSources).toEqual([victim(1002, 'Bet')]);
     expect(lootTexts(sim, a)).toContain('You loot 20s.');
-    // The receipt carries the exact copy, so the chat link can read "Bet's Skull".
-    const receipt = sim.events.find(
-      (ev): ev is Extract<SimEvent, { type: 'loot' }> =>
-        ev.type === 'loot' && ev.pid === a && ev.itemId === WORLD_PVP_SKULL_ITEM_ID,
-    );
-    expect(receipt?.instance).toEqual({ signer: 'Bet' });
+    expect(lootTexts(sim, a)).toContain('You receive: Trophy Skull.');
     expect(ent(sim, b).lootable).toBe(false);
     expect(ent(sim, b).loot).toBeNull();
     tickSeconds(sim, 1); // the zone pass drops the spent row
@@ -260,13 +283,18 @@ describe('the drop', () => {
 
 describe('who may take it', () => {
   it.each(['release', 'revive', 'logout', 'shutdown'] as const)(
-    '%s stacks a same-victim skull when every bag slot is occupied',
+    '%s tops up an existing skull stack when every bag slot is occupied',
     (settlement) => {
       const { sim, a, b } = duel();
-      sim.ctx.addItemInstance(WORLD_PVP_SKULL_ITEM_ID, { signer: 'Bet' }, a, 1);
       const meta = sim.meta(a)!;
-      while (sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, a))
-        meta.inventory.push({ itemId: 'stag_antler', count: 1 });
+      fillBags(sim, a);
+      // An earlier skull from someone else, in place of one filler: skulls share
+      // one stack whoever they name, so its spare room is the only room left.
+      meta.inventory[0] = {
+        itemId: WORLD_PVP_SKULL_ITEM_ID,
+        count: 1,
+        materialSources: [victim(1007, 'Zed')],
+      };
       const slots = meta.inventory.length;
       slay(sim, a, b);
       sim.events = [];
@@ -274,8 +302,12 @@ describe('who may take it', () => {
       else if (settlement === 'revive') sim.revivePlayerAt(b, { ...ent(sim, b).pos });
       else if (settlement === 'logout') sim.preparePlayerLeave(a);
       else settleAllWorldPvpSpoils(sim.ctx);
-      expect(skullsOf(sim, a)).toEqual([
-        { itemId: WORLD_PVP_SKULL_ITEM_ID, count: 2, instance: { signer: 'Bet' } },
+      const skulls = skullsOf(sim, a);
+      expect(skulls).toHaveLength(1);
+      expect(skulls[0].count).toBe(2);
+      expect(victims(skulls[0]).sort()).toEqual([
+        ['Bet', 1],
+        ['Zed', 1],
       ]);
       expect(meta.inventory).toHaveLength(slots);
       expect(meta.copper).toBe(2_000);
@@ -284,31 +316,29 @@ describe('who may take it', () => {
     },
   );
 
-  it.each([
-    { instance: { signer: 'Gimel' }, count: 1 },
-    { instance: { signer: 'Bet' }, count: 20 },
-    { instance: undefined, count: 1 },
-  ])('settlement refuses an incompatible or full skull stack: %j', ({ instance, count }) => {
-    const { sim, a, b } = duel();
-    const meta = sim.meta(a)!;
-    // Fill before inserting the skull so an unsigned stack cannot mask full slots.
-    while (sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, a))
-      meta.inventory.push({ itemId: 'stag_antler', count: 1 });
-    meta.inventory[0] = {
-      itemId: WORLD_PVP_SKULL_ITEM_ID,
-      count,
-      ...(instance ? { instance } : {}),
-    };
-    const before = structuredClone(meta.inventory);
-    slay(sim, a, b);
-    sim.events = [];
-    sim.releaseSpirit(b);
-    expect(meta.inventory).toEqual(before);
-    expect(meta.copper).toBe(2_000);
-    expect(sim.events.some((ev) => ev.type === 'error' && ev.text === 'Your bags are full.')).toBe(
-      true,
-    );
-  });
+  it.each([{ count: 20 }])(
+    'settlement refuses a full skull stack with no free slot: %j',
+    ({ count }) => {
+      const { sim, a, b } = duel();
+      const meta = sim.meta(a)!;
+      // Fill before inserting the skull so its stack room cannot mask full slots.
+      fillBags(sim, a);
+      meta.inventory[0] = {
+        itemId: WORLD_PVP_SKULL_ITEM_ID,
+        count,
+        materialSources: [victim(1007, 'Zed', count)],
+      };
+      const before = structuredClone(meta.inventory);
+      slay(sim, a, b);
+      sim.events = [];
+      sim.releaseSpirit(b);
+      expect(meta.inventory).toEqual(before);
+      expect(meta.copper).toBe(2_000);
+      expect(
+        sim.events.some((ev) => ev.type === 'error' && ev.text === 'Your bags are full.'),
+      ).toBe(true);
+    },
+  );
 
   it('a stranger cannot loot the body; the killer can', () => {
     const { sim, a, b } = duel();
@@ -350,11 +380,7 @@ describe('who may take it', () => {
     slay(sim, a, b);
     // Take only the gold: the skull slot is left by filling Aleph's bags.
     const room = sim.meta(a)!;
-    const filler = Object.keys(ITEMS).find(
-      (id) => ITEMS[id].kind === 'junk' && id !== WORLD_PVP_SKULL_ITEM_ID,
-    )!;
-    while (sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, a))
-      room.inventory.push({ itemId: filler, count: 1 });
+    fillBags(sim, a);
     sim.lootCorpse(b, a);
     expect(sim.meta(a)!.copper).toBe(2_000);
     expect(ent(sim, b).loot?.items).toHaveLength(1);
@@ -417,12 +443,8 @@ describe('who may take it', () => {
   it('full bags on settle keep the gold flowing and say so for the skull', () => {
     const { sim, a, b } = duel();
     slay(sim, a, b);
-    const filler = Object.keys(ITEMS).find(
-      (id) => ITEMS[id].kind === 'junk' && id !== WORLD_PVP_SKULL_ITEM_ID,
-    )!;
     const meta = sim.meta(a)!;
-    while (sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, a))
-      meta.inventory.push({ itemId: filler, count: 1 });
+    fillBags(sim, a);
     sim.events = [];
     sim.releaseSpirit(b);
     expect(meta.copper).toBe(2_000);
@@ -434,7 +456,7 @@ describe('who may take it', () => {
     ).toBe(true);
   });
 
-  it('skulls of one victim stack; skulls of two victims do not', () => {
+  it('every skull shares one stack, and the stack remembers whose each one is', () => {
     const { sim, a, b } = duel();
     const c = fighter(sim, 'Gimel', 1003, 4);
     flag(sim, c);
@@ -452,7 +474,9 @@ describe('who may take it', () => {
     slay(sim, a, b);
     sim.lootCorpse(b, a);
     const skulls = skullsOf(sim, a);
-    expect(skulls.map((s) => [s.instance?.signer, s.count]).sort()).toEqual([
+    expect(skulls).toHaveLength(1);
+    expect(skulls[0].count).toBe(3);
+    expect(victims(skulls[0]).sort()).toEqual([
       ['Bet', 2],
       ['Gimel', 1],
     ]);
@@ -579,7 +603,8 @@ describe('/dev pvpbot (the solo playtest target)', () => {
     expect(body.loot?.copper).toBe(10_000);
     expect(sim.lootCorpse(bot.entityId, me)).toBe(true);
     expect(sim.meta(me)!.copper).toBe(10_000);
-    expect(skullsOf(sim, me)[0]?.instance).toEqual({ signer: 'Bet' });
+    // The dev bot carries a dev identity, so its skull still names it.
+    expect(victims(skullsOf(sim, me)[0])).toEqual([['Bet', 1]]);
   });
 
   it('is refused on a realm without dev commands', () => {
@@ -596,11 +621,11 @@ describe('the trophy item', () => {
     expect(def).toMatchObject({
       name: 'Trophy Skull',
       kind: 'junk',
-      quality: 'poor',
+      quality: 'common',
       sellValue: 0,
       noVendorSell: true,
     });
-    expect(isWorldPvpSkullCopy(WORLD_PVP_SKULL_ITEM_ID, undefined)).toBe(false);
-    expect(isWorldPvpSkullCopy('stag_antler', { signer: 'Bet' })).toBe(false);
+    // A provenance-tracked stack, the way gathered materials are.
+    expect(isMaterialItemId(WORLD_PVP_SKULL_ITEM_ID)).toBe(true);
   });
 });

@@ -17434,6 +17434,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': '此素材選擇已失效。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × 由{name}採集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × 取自{name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × 由{name}採集，由{signer}簽名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 未記錄採集者',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned': '{count} × 未記錄採集者，由{name}簽名',

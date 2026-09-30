@@ -22,7 +22,6 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { isEnchantedInstance } from '../sim/professions/enchanting';
-import { isWorldPvpSkullCopy } from '../sim/pvp/world_pvp_spoils';
 import type { ItemInstancePayload } from '../sim/types';
 
 export type BagInstanceGlyphKind =
@@ -34,21 +33,12 @@ export type BagInstanceGlyphKind =
   | null;
 
 /** The single glyph kind for one bag stack's payload, or null for a plain
- *  fungible stack (no payload, no corner glyph). `itemId` lets a copy whose
- *  signer is not a maker (the World PvP trophy skull) skip the maker's mark. */
-export function bagInstanceGlyphKind(
-  instance?: ItemInstancePayload,
-  itemId?: string,
-): BagInstanceGlyphKind {
+ *  fungible stack (no payload, no corner glyph). */
+export function bagInstanceGlyphKind(instance?: ItemInstancePayload): BagInstanceGlyphKind {
   if (!instance) return null;
   if (instance.rolled?.masterwork === true) return 'masterwork';
   if (isEnchantedInstance(instance)) return 'enchanted';
-  // A trophy skull's signer is its victim, not a maker (world_pvp_spoils.ts).
-  if (
-    instance.signer !== undefined &&
-    !(itemId !== undefined && isWorldPvpSkullCopy(itemId, instance))
-  )
-    return 'signed';
+  if (instance.signer !== undefined) return 'signed';
   if (instance.bindOnTrade === true || instance.boundTo !== undefined) return 'bound';
   return 'generic';
 }

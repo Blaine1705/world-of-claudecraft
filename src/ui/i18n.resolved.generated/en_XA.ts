@@ -4438,6 +4438,7 @@ export const en_XA: EnTranslations = {
       "perfectedBadge": "[Þéŕƒéçţéð]",
       "perfectingRank": "[Þéŕƒéçţíñĝ: ŕáñķ {rank} óƒ {ranks}]",
       "materialSourceGatherer": "[{count} × Çóļļéçţéð ƀý {name}]",
+      "trophySkullSource": "[{count} × Ţáķéñ ƒŕóɱ {name}]",
       "materialSourceGathererSigned": "[{count} × Çóļļéçţéð ƀý {name}, šíĝñéð ƀý {signer}]",
       "materialSourceUnrecorded": "[{count} × Ñó ĝáţĥéŕéŕ ŕéçóŕðéð]",
       "materialSourceUnrecordedSigned": "[{count} × Ñó ĝáţĥéŕéŕ ŕéçóŕðéð, šíĝñéð ƀý {name}]",

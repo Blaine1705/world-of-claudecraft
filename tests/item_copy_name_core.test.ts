@@ -1,116 +1,71 @@
-// A copy's own display name (src/ui/item_copy_name_core.ts): the World PvP
-// trophy skull reads "<victim>'s Skull" on every surface that holds the copy
-// (the loot window row, the chat receipt link, the tooltip title), while an
-// unsigned skull and every other item keep their definition's name.
+// The trophy skull's presentation (src/ui/item_copy_name_core.ts and the
+// provenance rows in src/ui/item_instance_tooltip.ts): every skull shares one
+// stack like a gathered material, and the stack says whose skulls it holds.
+// A stack (or a body's single skull) naming exactly one victim reads
+// "<victim>'s Skull"; a mixed stack reads "Trophy Skull" and lists each victim
+// on its own tooltip row, "2 × Taken from Bet", the way a material lists its
+// gatherers; a legendary's chosen name still wins everywhere.
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { emitInventoryReceipt } from '../src/sim/inventory_receipt';
-import { WORLD_PVP_SKULL_ITEM_ID, worldPvpSkullInstance } from '../src/sim/pvp';
-import type { ItemInstancePayload, SimEvent } from '../src/sim/types';
-import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
+import type { MaterialComposition } from '../src/sim/material_sources';
+import { WORLD_PVP_SKULL_ITEM_ID } from '../src/sim/pvp';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { t } from '../src/ui/i18n';
-import { itemCopyDisplayName, itemCopyOwnName } from '../src/ui/item_copy_name_core';
-import { instanceMakersMarkLine, instanceTitleHtml } from '../src/ui/item_instance_tooltip';
-import { lootQualityReceiptBody, lootQualityReceiptText } from '../src/ui/loot_quality_receipt';
-import { lootCopyAriaName } from '../src/ui/loot_quality_view';
-import { wornItemCellParts } from '../src/ui/worn_item_cell_view';
+import {
+  itemCopyDisplayName,
+  itemCopyOwnName,
+  soleSkullVictim,
+} from '../src/ui/item_copy_name_core';
+import { materialMakersMarkLines, materialSourceLines } from '../src/ui/item_instance_tooltip';
 
 const skull = ITEMS[WORLD_PVP_SKULL_ITEM_ID];
-const betsSkull = worldPvpSkullInstance('Bet');
+const from = (id: number, name: string, count: number) => ({
+  source: { gatherer: { kind: 'character' as const, id, name } },
+  count,
+});
+const onlyBet: MaterialComposition = [from(2, 'Bet', 2)];
+const mixed: MaterialComposition = [from(2, 'Bet', 2), from(3, 'Gimel', 1)];
 
-describe('the trophy skull copy name', () => {
-  it("reads <name>'s Skull for a signed copy, the def name otherwise", () => {
+describe('the trophy skull stack name', () => {
+  it("names a single-victim stack <victim>'s Skull and a mixed one Trophy Skull", () => {
     expect(t('hudChrome.worldPvp.skullName', { name: 'Bet' })).toBe("Bet's Skull");
-    expect(itemCopyOwnName(skull, betsSkull)).toBe("Bet's Skull");
-    expect(itemCopyDisplayName(skull, betsSkull)).toBe("Bet's Skull");
-    expect(itemCopyOwnName(skull, undefined)).toBeNull();
-    expect(itemCopyDisplayName(skull, undefined)).toBe(itemDisplayName(skull));
+    expect(soleSkullVictim(onlyBet)).toBe('Bet');
+    expect(soleSkullVictim(mixed)).toBeNull();
+    expect(soleSkullVictim(undefined)).toBeNull();
+    expect(itemCopyDisplayName(skull, undefined, onlyBet)).toBe("Bet's Skull");
+    expect(itemCopyDisplayName(skull, undefined, mixed)).toBe('Trophy Skull');
+    expect(itemCopyOwnName(skull)).toBeNull();
     expect(itemDisplayName(skull)).toBe('Trophy Skull');
-    // A signed copy of any other item (a crafted piece) keeps its own name.
+  });
+
+  it('only the skull reads a victim out of its sources; a chosen legendary name wins', () => {
+    const ore = Object.values(ITEMS).find((def) => def.kind === 'junk' && def.id !== skull.id)!;
+    expect(itemCopyOwnName(ore, undefined, onlyBet)).toBeNull();
     const crafted = Object.values(ITEMS).find((def) => def.kind === 'armor')!;
-    expect(itemCopyOwnName(crafted, { signer: 'Bet' })).toBeNull();
-    expect(itemCopyDisplayName(crafted, { signer: 'Bet' })).toBe(itemDisplayName(crafted));
-  });
-
-  it('titles the tooltip with the copy name over the def name, with no maker line', () => {
-    const html = instanceTitleHtml(skull, betsSkull, itemDisplayName(skull));
-    expect(html).toContain('>Bet&#39;s Skull</div>');
-    expect(html).toContain('<div class="tt-sub">Trophy Skull</div>');
-    expect(instanceTitleHtml(skull, undefined, 'Trophy Skull')).not.toContain('tt-sub');
-    expect(instanceMakersMarkLine(betsSkull, skull)).toBe('');
-    // A crafted copy's signer still reads as its maker.
-    const crafted = Object.values(ITEMS).find((def) => def.kind === 'armor')!;
-    expect(instanceMakersMarkLine({ signer: 'Bet' }, crafted)).not.toBe('');
-  });
-
-  it('names the chat link for the exact copy', () => {
-    expect(lootCopyAriaName(skull, betsSkull)).toBe("Bet's Skull");
-    expect(lootCopyAriaName(skull)).toBe('Trophy Skull');
-  });
-
-  it('the grant receipt carries the copy, so the chat line links the named skull', () => {
-    const events: SimEvent[] = [];
-    emitInventoryReceipt(
-      { emit: (ev) => events.push(ev) },
-      7,
-      WORLD_PVP_SKULL_ITEM_ID,
-      skull.name,
-      1,
-      undefined,
-      betsSkull,
-    );
-    const receipt = events[0] as Extract<SimEvent, { type: 'loot' }>;
-    expect(receipt).toMatchObject({
-      type: 'loot',
-      pid: 7,
-      text: 'You receive: Trophy Skull.',
-      itemId: WORLD_PVP_SKULL_ITEM_ID,
-      instance: { signer: 'Bet' },
-      count: 1,
-    });
-    // An ordinary signed copy (a crafted piece) keeps the plain receipt shape.
-    const plain: SimEvent[] = [];
-    emitInventoryReceipt({ emit: (ev) => plain.push(ev) }, 7, 'stag_antler', 'x', 1, undefined, {
-      signer: 'Bet',
-    });
-    expect(plain[0]).not.toHaveProperty('instance');
-
-    const appended: Array<{ id: string; instance?: ItemInstancePayload }> = [];
-    const doc = {
-      createElement: () => ({ append: () => {} }),
-      createTextNode: () => ({}),
-    } as unknown as Document;
-    expect(lootQualityReceiptText(receipt, (value) => `t:${value}`)).not.toContain('t:');
-    const body = lootQualityReceiptBody(
-      doc,
-      receipt,
-      (value) => value,
-      (_p, id, copy) => {
-        appended.push({ id, instance: copy });
-      },
-    );
-    expect(Array.isArray(body)).toBe(true);
-    expect(appended).toEqual([{ id: WORLD_PVP_SKULL_ITEM_ID, instance: { signer: 'Bet' } }]);
+    expect(itemCopyDisplayName(crafted, { name: 'Oathkeeper' })).toBe('Oathkeeper');
   });
 });
 
-describe('the skull across the item-cell family', () => {
-  it('a chosen legendary name still wins over the def name', () => {
-    const crafted = Object.values(ITEMS).find((def) => def.kind === 'armor')!;
-    expect(itemCopyOwnName(crafted, { name: 'Oathkeeper' })).toBe('Oathkeeper');
-    expect(itemCopyDisplayName(crafted, { name: 'Oathkeeper' })).toBe('Oathkeeper');
+describe('the skull provenance rows', () => {
+  it('lists each victim as "Taken from", never "Collected by"', () => {
+    const html = materialSourceLines(mixed, WORLD_PVP_SKULL_ITEM_ID);
+    expect(html).toContain(
+      t('hudChrome.itemTooltip.trophySkullSource', { count: '2', name: 'Bet' }),
+    );
+    expect(html).toContain(
+      t('hudChrome.itemTooltip.trophySkullSource', { count: '1', name: 'Gimel' }),
+    );
+    expect(t('hudChrome.itemTooltip.trophySkullSource', { count: '2', name: 'Bet' })).toBe(
+      '2 × Taken from Bet',
+    );
+    expect(html).not.toContain('Collected by');
+    // The shared item card routes the skull through the same wording.
+    expect(materialMakersMarkLines(skull, undefined, mixed)).toContain('Taken from Gimel');
   });
 
-  it('bags, banks, mail, trade and market cells name the copy', () => {
-    expect(wornItemCellParts(skull, betsSkull).name).toBe("Bet's Skull");
-    expect(wornItemCellParts(skull, betsSkull).ariaName).toBe("Bet's Skull");
-    expect(wornItemCellParts(skull, null).name).toBe('Trophy Skull');
-  });
-
-  it("the skull wears no maker's mark; a crafted signature still does", () => {
-    expect(bagInstanceGlyphKind(betsSkull, WORLD_PVP_SKULL_ITEM_ID)).toBe('generic');
-    expect(bagInstanceGlyphKind({ signer: 'Bet' }, 'stag_antler')).toBe('signed');
-    expect(bagInstanceGlyphKind({ signer: 'Bet' })).toBe('signed');
+  it('a gathered material keeps its gatherer wording', () => {
+    const html = materialSourceLines(onlyBet, 'copper_ore');
+    expect(html).toContain('Collected by Bet');
+    expect(html).not.toContain('Taken from');
   });
 });
