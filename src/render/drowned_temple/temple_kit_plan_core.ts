@@ -73,7 +73,7 @@ export function templePieceForProp(p: FieldProp): string {
   }
 }
 
-const BALUSTRADE: FieldEdgeKind = {
+export const TEMPLE_BALUSTRADE: FieldEdgeKind = {
   piece: 'Kit_Balustrade',
   inset: 0.35,
   halfLength: 2.0,
@@ -91,7 +91,7 @@ export function planTempleEdges(): TempleKitPlacement[] {
     bare: BARE,
     minDrop: 1.5,
     kindFor: (run, i) => {
-      if (run.style === 'balustrade') return BALUSTRADE;
+      if (run.style === 'balustrade') return TEMPLE_BALUSTRADE;
       if (run.style === 'masonry') return KERB;
       return templeHash(i, 5) < 0.45 ? KERB : null;
     },

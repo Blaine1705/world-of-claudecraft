@@ -16,9 +16,17 @@ import { DROWNED_TEMPLE_GATES } from '../../sim/content/drowned_temple';
 import { DROWNED_TEMPLE_FIELD, MOONBRIDGE } from '../../sim/content/drowned_temple_layout';
 import type { FieldPathSurface } from '../../sim/instances/authored_field/types';
 import type { DungeonGateDef } from '../../sim/types';
-import { GFX, sharedUniforms } from '../gfx';
+import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
+import { flagstoneDetail } from '../authored_field/field_textures';
+import { GFX, sharedUniforms, surfaceMat } from '../gfx';
 import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
-import { templeKitPiece, templeSlotMaterial } from './temple_kit';
+import { instancePlacements, templeKitPiece, templeSlotMaterial } from './temple_kit';
+import {
+  moonbridgeSpan,
+  planMoonbridgeEdges,
+  planRisingStairEdges,
+  risingStairField,
+} from './temple_rising_stair_core';
 
 interface GateRig {
   root: THREE.Group;
@@ -227,74 +235,21 @@ function pathSurface(id: string): FieldPathSurface {
   return s;
 }
 
-/** A flight of pearl steps along a path (gate-local frame supplied by caller). */
-function stairGeometry(
-  path: FieldPathSurface,
-  originX: number,
-  originZ: number,
-): THREE.BufferGeometry {
-  const parts: THREE.BufferGeometry[] = [];
-  const pts = path.points;
-  const w = path.halfWidth * 2;
-  for (let i = 0; i + 1 < pts.length; i++) {
-    const [ax, az, ah] = pts[i];
-    const [bx, bz, bh] = pts[i + 1];
-    const len = Math.hypot(bx - ax, bz - az);
-    const rise = bh - ah;
-    const steps = Math.max(1, Math.round(Math.abs(rise) / 0.42) || Math.round(len / 1.4));
-    const yaw = Math.atan2(bx - ax, bz - az);
-    for (let k = 0; k < steps; k++) {
-      const t0 = k / steps;
-      const t1 = (k + 1) / steps;
-      const top = ah + rise * t1;
-      const cx = ax + (bx - ax) * ((t0 + t1) / 2) - originX;
-      const cz = az + (bz - az) * ((t0 + t1) / 2) - originZ;
-      const depth = (len / steps) * 1.04;
-      const h = top + 30;
-      const g = new THREE.BoxGeometry(w, h, depth).translate(0, top - h / 2, 0);
-      g.rotateY(yaw);
-      g.translate(cx, 0, cz);
-      parts.push(g.index ? g.toNonIndexed() : g);
-    }
-  }
-  return mergeFlat(parts, 0xdcd8cc);
-}
-
-function mergeFlat(parts: THREE.BufferGeometry[], color: number): THREE.BufferGeometry {
-  let count = 0;
-  for (const g of parts) count += g.attributes.position.count;
-  const pos = new Float32Array(count * 3);
-  const nor = new Float32Array(count * 3);
-  const col = new Float32Array(count * 3);
-  const c = new THREE.Color(color);
-  let o = 0;
-  for (const g of parts) {
-    pos.set(g.attributes.position.array as Float32Array, o * 3);
-    nor.set(g.attributes.normal.array as Float32Array, o * 3);
-    for (let i = 0; i < g.attributes.position.count; i++) {
-      const y = (g.attributes.position.array as Float32Array)[i * 3 + 1];
-      // Algae and wet dark stone low on the risers.
-      const wet = Math.max(0, Math.min(1, (6 - y) / 8));
-      col.set([c.r * (1 - wet * 0.55), c.g * (1 - wet * 0.4), c.b * (1 - wet * 0.35)], (o + i) * 3);
-    }
-    o += g.attributes.position.count;
-  }
-  const out = new THREE.BufferGeometry();
-  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
-  out.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  out.computeBoundingSphere();
-  return out;
-}
-
-function sunkenStair(gate: DungeonGateDef): GateRig {
+/** The Prism Stair rises out of the lagoon as the Hydra's pool drains. It is
+ *  drawn by the field's own ground painter (the same wet flagstones and cliff
+ *  faces as every other stair, from temple_rising_stair_core.ts) with the
+ *  kit's balustrades down both sides, so the tread you see is the tread you
+ *  walk; the whole flight sinks and rises as one. */
+function sunkenStair(gate: DungeonGateDef, lowGfx: boolean): GateRig {
   const path = pathSurface('prism_stair_sunken');
-  const geo = stairGeometry(path, gate.x, gate.z);
-  const mesh = new THREE.Mesh(geo, templeSlotMaterial('stone'));
-  mesh.castShadow = !!GFX.standardMaterials;
-  mesh.receiveShadow = true;
   const holder = new THREE.Group();
-  holder.add(mesh);
+  const stair = new THREE.Group();
+  stair.name = 'drownedTempleRisingStair';
+  // The painters work in instance axes: shift back from the gate point.
+  stair.position.set(-gate.x, 0, -gate.z);
+  stair.add(buildAuthoredFieldTerrain(risingStairField(), { lowGfx, wet: true }));
+  stair.add(instancePlacements(planRisingStairEdges(), () => 0, lowGfx, 'drownedTempleStairRails'));
+  holder.add(stair);
   // Water streaming off the rising steps.
   const streamMat = new THREE.MeshBasicMaterial({
     color: 0xbfd6ff,
@@ -327,105 +282,102 @@ function sunkenStair(gate: DungeonGateDef): GateRig {
 
 // ---- the Moonbridge ------------------------------------------------------------------------
 
-const BRIDGE_FRAG = /* glsl */ `
-precision highp float;
-varying vec2 vUv;
-varying vec3 vWorld;
-uniform float uTime;
-${NOISE}
-void main() {
-  float n = noise(vWorld.xz * 0.6 + uTime * 0.3);
-  float edge = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x);
-  vec3 col = mix(vec3(0.62, 0.72, 0.95), vec3(0.95, 0.98, 1.0), n);
-  gl_FragColor = vec4(col, 0.74 + 0.22 * n * edge);
-  #include <colorspace_fragment>
+/** A plank of the Moonbridge: pearl stone with the terrace's own flagstone
+ *  detail (UVs in yards, like the field's floors), tinted moon-silver. */
+function plankGeometry(width: number): THREE.BufferGeometry {
+  const g = new THREE.BoxGeometry(1, 0.42, width);
+  const pos = g.getAttribute('position') as THREE.BufferAttribute;
+  const nor = g.getAttribute('normal') as THREE.BufferAttribute;
+  const uv = g.getAttribute('uv') as THREE.BufferAttribute;
+  const col = new Float32Array(pos.count * 3);
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    // World-yard UVs on every face (the flagstone reads at the field's scale).
+    const ny = Math.abs(nor.getY(i));
+    const nx = Math.abs(nor.getX(i));
+    if (ny > 0.5) uv.setXY(i, x * 0.25, z * 0.25);
+    else if (nx > 0.5) uv.setXY(i, z * 0.25, y * 0.25);
+    else uv.setXY(i, x * 0.25, y * 0.25);
+    // The terrace's pearl-blue flagstone, a touch darker underneath and along
+    // the edges, so it reads as the temple's own stone lit by the moon.
+    const under = y < 0 ? 0.62 : 1;
+    const rim = 1 - Math.min(1, Math.abs(z) / (width / 2)) ** 6 * 0.18;
+    col.set([0.5 * under * rim, 0.56 * under * rim, 0.7 * under * rim], i * 3);
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  return g;
 }
-`;
 
-function moonbridge(gate: DungeonGateDef): GateRig {
+/** The Moonbridge assembles plank by plank out of moonlight once the Colossus
+ *  falls: solid lit pearl planks (the terrace's own stone material, so it
+ *  takes the moon's light and the shadows like the floors it joins), a seam
+ *  of moonlight down the middle, and the temple's own balustrades. It spans
+ *  only the open water between the Prism Terrace's rim and the Altar Landing
+ *  (temple_rising_stair_core.ts moonbridgeSpan), so no plank lies on a floor. */
+function moonbridge(gate: DungeonGateDef, lowGfx: boolean): GateRig {
   const path = pathSurface('moonbridge');
   const planks: THREE.Mesh[] = [];
-  const material = new THREE.ShaderMaterial({
-    name: 'drownedTempleMoonbridge',
-    vertexShader: SHEET_VERT,
-    fragmentShader: BRIDGE_FRAG,
-    uniforms: { uTime: sharedUniforms.uTime },
-    transparent: true,
-    depthWrite: false,
-    side: THREE.DoubleSide,
+  const glows: THREE.Mesh[] = [];
+  const stone = flagstoneDetail();
+  const material = surfaceMat({
+    map: stone.map,
+    normalMap: lowGfx ? undefined : stone.normalMap,
+    vertexColors: true,
+    roughness: 0.62,
   });
-  const edgeMat = new THREE.MeshBasicMaterial({
-    color: 0xdde8f5,
+  const glowMat = new THREE.MeshBasicMaterial({
+    color: 0xbfd6ff,
     transparent: true,
-    opacity: 0.9,
-    name: 'drownedTempleMoonbridgeRail',
+    opacity: 0.85,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    name: 'drownedTempleMoonbridgeSeam',
   });
   const holder = new THREE.Group();
-  const from = MOONBRIDGE.fromX + 3;
-  const to = MOONBRIDGE.toX - 3;
-  const count = 26;
-  const deckAt = (x: number): number =>
-    x >= MOONBRIDGE.fromX
-      ? MOONBRIDGE.fromH
-      : x <= MOONBRIDGE.toX
-        ? MOONBRIDGE.toH
-        : MOONBRIDGE.fromH +
-          ((MOONBRIDGE.toH - MOONBRIDGE.fromH) * (MOONBRIDGE.fromX - x)) /
-            (MOONBRIDGE.fromX - MOONBRIDGE.toX);
+  const span = moonbridgeSpan();
+  const from = span.fromX;
+  const to = span.toX;
+  const deckAt = span.deckAt;
+  const count = 22;
   const step = Math.abs(to - from) / count;
-  const plankGeo = new THREE.BoxGeometry(1, 0.35, path.halfWidth * 2);
-  const postGeo = new THREE.BoxGeometry(0.16, 1.1, 0.16);
+  const width = path.halfWidth * 2;
+  const plankGeo = plankGeometry(width);
+  const seamGeo = new THREE.PlaneGeometry(1, 0.5).rotateX(-Math.PI / 2);
   const z = MOONBRIDGE.z - gate.z;
   for (let i = 0; i < count; i++) {
     const t = (i + 0.5) / count;
     const x = from + (to - from) * t;
     // Each plank follows the deck's slope, so the span reads as one smooth
-    // ramp of light instead of a flight of loose steps.
+    // ramp instead of a flight of loose steps.
     const rise = deckAt(x + step / 2) - deckAt(x - step / 2);
     const tilt = Math.atan2(rise, step);
     const plank = new THREE.Mesh(plankGeo, material);
-    plank.scale.x = (step / Math.cos(tilt)) * 0.94;
-    plank.position.set(x - gate.x, deckAt(x) - 0.17, z);
+    plank.scale.x = (step / Math.cos(tilt)) * 1.01;
+    plank.position.set(x - gate.x, deckAt(x) - 0.21, z);
     plank.rotation.z = tilt;
-    plank.renderOrder = 6;
+    plank.castShadow = !lowGfx;
+    plank.receiveShadow = true;
     holder.add(plank);
     planks.push(plank);
-    // A rail post on every other plank, each side.
-    if (i % 2 === 0) {
-      for (const side of [-1, 1]) {
-        const post = new THREE.Mesh(postGeo, edgeMat);
-        post.position.set(0, 0.72, side * (path.halfWidth - 0.1));
-        post.rotation.z = -tilt;
-        plank.add(post);
-      }
-    }
+    // The seam of moonlight down the middle of the deck.
+    const seam = new THREE.Mesh(seamGeo, glowMat);
+    seam.position.set(0, 0.215, 0);
+    seam.renderOrder = 6;
+    plank.add(seam);
+    glows.push(seam);
   }
-  // The two hand rails: one continuous bar each side along the whole span,
-  // lit once the last plank has settled.
-  const rails: THREE.Mesh[] = [];
-  const railSegs: [number, number][] = [
-    [from, MOONBRIDGE.fromX],
-    [MOONBRIDGE.fromX, MOONBRIDGE.toX],
-    [MOONBRIDGE.toX, to],
-  ];
-  for (const [a, b] of railSegs) {
-    const len = Math.abs(b - a);
-    if (len < 0.01) continue;
-    const tilt = Math.atan2(deckAt(b) - deckAt(a), b - a);
-    for (const side of [-1, 1]) {
-      const rail = new THREE.Mesh(new THREE.BoxGeometry(1, 0.12, 0.22), edgeMat);
-      rail.scale.x = len / Math.cos(tilt);
-      rail.position.set(
-        (a + b) / 2 - gate.x,
-        (deckAt(a) + deckAt(b)) / 2 + 1.1,
-        z + side * (path.halfWidth - 0.1),
-      );
-      rail.rotation.z = tilt;
-      rail.renderOrder = 6;
-      holder.add(rail);
-      rails.push(rail);
-    }
-  }
+  // The temple's own balustrades down both sides, raised once the last plank
+  // has settled (collapsed, never hidden, until then).
+  const rails = instancePlacements(
+    planMoonbridgeEdges(),
+    () => 0,
+    lowGfx,
+    'drownedTempleBridgeRails',
+  );
+  rails.position.set(-gate.x, 0, -gate.z);
+  holder.add(rails);
   // An always-drawn carrier: the planks hide while the bridge is unmade, and
   // the gate's refresh rides the render of whatever is on screen.
   const carrier = new THREE.Mesh(
@@ -440,16 +392,21 @@ function moonbridge(gate: DungeonGateDef): GateRig {
   root.add(holder);
   return {
     root,
-    apply(openness) {
-      // The planks gather from the terrace outward, each dropping into place.
+    apply(openness, _seal, since) {
+      // The planks gather from the terrace outward, each dropping into place
+      // in a flash of moonlight that settles to the seam's steady glow.
+      // An unmade plank is collapsed, never hidden: every material of the
+      // bridge stays in the drawn set the interior's compile gate links.
       planks.forEach((p, i) => {
         const at = i / planks.length;
         const k = Math.max(0, Math.min(1, (openness - at * 0.8) / 0.2));
-        p.visible = k > 0.01;
-        p.scale.y = k;
-        p.scale.z = 0.4 + 0.6 * k;
+        p.scale.y = Math.max(k, 1e-4);
+        p.scale.z = k > 0.01 ? 0.4 + 0.6 * k : 1e-4;
       });
-      for (const r of rails) r.visible = openness > 0.97;
+      const settle = openness >= 1 ? Math.max(0, 1 - since / 2) : 1;
+      glowMat.opacity = 0.45 + 0.4 * settle;
+      for (const g of glows) g.scale.x = 0.6 + 0.4 * settle;
+      rails.scale.y = openness > 0.97 ? 1 : 1e-4;
     },
   };
 }
@@ -489,6 +446,7 @@ export function buildTempleGates(
   ox: number,
   oz: number,
   ground: (x: number, z: number) => number,
+  lowGfx = false,
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = 'drownedTempleGates';
@@ -498,9 +456,9 @@ export function buildTempleGates(
       gate.kind === 'water_veil'
         ? waterVeil(gate)
         : gate.kind === 'sunken_stair'
-          ? sunkenStair(gate)
+          ? sunkenStair(gate, lowGfx)
           : gate.kind === 'light_bridge'
-            ? moonbridge(gate)
+            ? moonbridge(gate, lowGfx)
             : gate.kind === 'rite_ward'
               ? riteWard(gate)
               : wardedArch(gate, gate.id === 'prism_ward' ? 0xb9a6ff : 0xc8d8ff);

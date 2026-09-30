@@ -74,7 +74,7 @@ export async function buildDrownedTempleInterior(
   );
   group.add(buildTempleCrater({ lowGfx: deps.lowGfx, density }));
   group.add(buildTempleKit(ground, deps.lowGfx));
-  group.add(buildTempleGates(ox, oz, ground));
+  group.add(buildTempleGates(ox, oz, ground, deps.lowGfx));
   buildTempleLights(group, deps, ground);
   group.add(buildTempleSkyLagoon({ lowGfx: deps.lowGfx, density }));
   group.add(buildTempleLandmarks(ox, oz, deps.lowGfx));
