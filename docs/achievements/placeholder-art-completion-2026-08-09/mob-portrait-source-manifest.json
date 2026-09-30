@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "fdbd25e06e1db1e4648fa3a1675683423a958c76897b5e1c9c9c45267c5eda57",
+  "rendererFingerprint": "c6074f7f379940411cafbe2538bdf159dfb2ef46df865b3b830e190a4d3e4e61",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5323427,
-      "sha256": "211e4dfbf101e48cb67dd9f1061b9bbb437c54fac5093cc8b83297f34f2f87db",
+      "bytes": 5323525,
+      "sha256": "bcad6707c37601f7bb06b1ca5674108d6c270e520e3ff0746a816b7c63a17fa4",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -398,11 +398,11 @@
         "model": {
           "url": "models/creatures/drowned_revenant.glb",
           "path": "public/models/creatures/drowned_revenant.glb",
-          "bytes": 692224,
-          "sha256": "7f9380789a2bd879d57cc21032d80e9a6efc26ed1087ff9dbbebadd45699f2db"
+          "bytes": 692364,
+          "sha256": "42273a3688f3e58fc577e7dd035bd8053b790e45e48877369fa2ba17f7cd0833"
         },
         "idle": "Idle",
-        "height": 3.6,
+        "height": 4.7,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -416,7 +416,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7d5170729ba93038438b0f8bd6e0484f56ba695d4f58108ea0ec3ac9a140bb55",
+      "sourceFingerprint": "1233b46e1cbea538806050d0123247940d89c185166a1ecd68869bf823157095",
       "output": {
         "path": "public/ui/mobs/bastion_revenant.webp",
         "bytes": 2786,
@@ -2095,11 +2095,11 @@
         "model": {
           "url": "models/creatures/drowned_sergeant.glb",
           "path": "public/models/creatures/drowned_sergeant.glb",
-          "bytes": 703176,
-          "sha256": "e228e0202ff9d55f25a14f4daa20a46f8c7c41ddb1b196aeee439fe6e503dd5d"
+          "bytes": 703312,
+          "sha256": "42b2a168abf68be4a414a9337cebf954e23b1e43f2585bc17bb94ed2bab2822d"
         },
         "idle": "Idle",
-        "height": 4.2,
+        "height": 4.85,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -2113,7 +2113,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "50f3ef8ae38b9421e941eb10c069b59841e9e71a27d1d3cac83adebdce16ebf9",
+      "sourceFingerprint": "51905071faa18ffa11fd3b6bc8f3be31dfd85090ee9d55a891abece771f4512b",
       "output": {
         "path": "public/ui/mobs/drowned_sergeant.webp",
         "bytes": 2702,
@@ -2265,11 +2265,11 @@
         "model": {
           "url": "models/creatures/drowned_watchman.glb",
           "path": "public/models/creatures/drowned_watchman.glb",
-          "bytes": 687144,
-          "sha256": "cbab13d2dd53e55c36df3fc56321686d259fee0c1f32d80087ed10d9fa6b4566"
+          "bytes": 687416,
+          "sha256": "a46fc8b208f77376a7217e7323ab7c21f7f76a1e2340ca8f257f07af2daf7251"
         },
         "idle": "Idle",
-        "height": 3.8,
+        "height": 4.85,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -2283,7 +2283,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "28cc2cb9b41acee1c167dce571e55ffb61c794d69855a772fd98e2e7f368b0f4",
+      "sourceFingerprint": "6106b67f844f0c8083f0806e23afecc7778c8ddb0a9e73b109009e387d58555e",
       "output": {
         "path": "public/ui/mobs/drowned_watchman.webp",
         "bytes": 2466,
@@ -2745,11 +2745,11 @@
         "model": {
           "url": "models/creatures/drowned_arbalest.glb",
           "path": "public/models/creatures/drowned_arbalest.glb",
-          "bytes": 691048,
-          "sha256": "89476f9a13e17a5c9d15be4a59c1bbc5ea63b8002e8d59babfbac9f6922fdd46"
+          "bytes": 904180,
+          "sha256": "e43541f316f07ed17ae8a50e168bd3a5ca4079d11e114e6bde3dd77943061cf4"
         },
         "idle": "Idle",
-        "height": 3.6,
+        "height": 5.4,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -2763,11 +2763,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ede688f0e3a1ebf62bd544b86578884bc3f3866313c601cd98dcd912ff1e85cd",
+      "sourceFingerprint": "a65fe34be926ce39748ccd4ca465631d49afbb7dfb855d1af8a0d6cf6fee6b3e",
       "output": {
         "path": "public/ui/mobs/fogbound_arbalest.webp",
-        "bytes": 2412,
-        "sha256": "7eaf23aa0c9e73ab9dfb9a1378bd7ce7d80fd8f7d8f032143b86e0de464fad52"
+        "bytes": 2072,
+        "sha256": "9c3a07b1663c11e0869d6801ee566af71dc73c69d80b5c813ac9041a6ef88258"
       }
     },
     {
@@ -2972,46 +2972,31 @@
       "visualKey": "bastion_turnkey",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/barbarian.glb",
-          "path": "public/models/chars/players/barbarian.glb",
-          "bytes": 444244,
-          "sha256": "2fb8d32c29d2b5c4b9b4b54ec502c3778f3d4d0da0e55cd1d4ed2b7c1e8d0abb"
+          "url": "models/creatures/gaol_turnkey.glb",
+          "path": "public/models/creatures/gaol_turnkey.glb",
+          "bytes": 1543216,
+          "sha256": "38ca5d0684b69de3ba8df4a9bfeadb446118b1a10e2ff4a28f6fe80020ba346e"
         },
         "idle": "Idle",
-        "height": 4.03,
+        "height": 4.8,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Barbarian_BearHat"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/axe_2handed.glb",
-              "path": "public/models/weapons/axe_2handed.glb",
-              "bytes": 35248,
-              "sha256": "8a68d165fa09dfe96b4e2473344161b910ddea10a916333cbdaacdcd17493af6"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "show": null,
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#6a5a48",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d82b888e1174e6a8514af6f3ea4525ca882499175b12942e41d5276d10b20455",
+      "sourceFingerprint": "3c05ec2912de2e54adeaac6b77d7f56a85412575dd6e7a39b371fcc336dcce13",
       "output": {
         "path": "public/ui/mobs/gaol_turnkey.webp",
-        "bytes": 2544,
-        "sha256": "dd927356f610d1bd28a395bc09922b5c31931da017e7f8369d9c8e674765c486"
+        "bytes": 2442,
+        "sha256": "2628d1e386eaf125638b23c7d590ffb7f85b5e3bbad953960faaf208a1283f16"
       }
     },
     {
@@ -8526,11 +8511,11 @@
         "model": {
           "url": "models/creatures/drowned_prisoner.glb",
           "path": "public/models/creatures/drowned_prisoner.glb",
-          "bytes": 507900,
-          "sha256": "b6b4e18af680c1b8f9bdfabbbc5ad561810e960b2e535c6322ea4105666d96ff"
+          "bytes": 508808,
+          "sha256": "732c2404ee719f38cfbece7130cfdf25c2eda286f8b7b7dae8b00ddd501ed29a"
         },
         "idle": "Idle",
-        "height": 3.2,
+        "height": 4.6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -8544,7 +8529,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "281277c63ce6a4765745013c14e6233758dbbebf662d5ceadc78e8be598a43c3",
+      "sourceFingerprint": "1744db1b3c93a0f3887ac7e2dd160c9d532df562b4bc15b5bda375ddc5b4d771",
       "output": {
         "path": "public/ui/mobs/shackled_prisoner.webp",
         "bytes": 2172,

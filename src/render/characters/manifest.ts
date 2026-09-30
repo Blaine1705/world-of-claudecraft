@@ -3868,13 +3868,16 @@ export const VISUALS: Record<string, VisualDef> = {
 
   // -- the Sunken Bastion trash (sim/content/sunken_bastion.ts) ------------------
   // The Bastion's drowned garrison and its sea beasts, each its own Blender
-  // body (scripts/assets/sunken_bastion_creatures/: drowned.py, hag.py,
-  // crawler.py, hound.py), all well past the player's size, each with the
-  // clips of its one job: the watchman's halberd sweep, the arbalest's aimed
-  // lane shot, the sergeant's rallying roar, the sea hag's lure and ward.
+  // body (scripts/assets/sunken_bastion_creatures/: drowned.py, turnkey.py,
+  // hag.py, crawler.py, hound.py), all well past the player's size, each with
+  // the clips of its one job: the watchman's halberd sweep, the arbalest's
+  // aimed lane shot, the sergeant's rallying roar, the sea hag's lure and ward.
+  // The drowned stand head and shoulders over a player (about 1.6x for a
+  // prisoner, 2x for the elite sailors, 2.6x for the sergeant); presentation
+  // only, the templates' gameplay is untouched.
   bastion_drowned_revenant: {
     url: `${CREATURES}/drowned_revenant.glb`,
-    height: 3.6,
+    height: 4.7,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -3887,7 +3890,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   bastion_skel_watchman: {
     url: `${CREATURES}/drowned_watchman.glb`,
-    height: 3.8,
+    height: 4.85,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -3927,7 +3930,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   bastion_skel_sergeant: {
     url: `${CREATURES}/drowned_sergeant.glb`,
-    height: 4.2,
+    height: 4.85,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4061,7 +4064,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   bastion_prisoner: {
     url: `${CREATURES}/drowned_prisoner.glb`,
-    height: 3.2,
+    height: 4.6,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
