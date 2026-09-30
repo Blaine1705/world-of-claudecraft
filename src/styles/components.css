@@ -16344,6 +16344,95 @@
     line-height: 1.35;
   }
 
+  /* ---------- Iron Cage escape (the Gaol Turnkey's button-mash prompt) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/cage_escape_painter.ts while the local
+     player is locked in the Iron Cage, centred low over the action bar. The
+     whole panel is a button (a tap or a click is an escape press, the same
+     command the interact key sends), composed from the library panel, keycap
+     and bar. The state is carried by text as well as the fill. */
+  #bastion-cage-escape {
+    position: absolute;
+    left: 50%;
+    bottom: 190px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 320px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
+    user-select: none;
+    color: var(--color-text);
+    border: 2px solid var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-cage-escape .bce-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-hostile);
+  }
+  #bastion-cage-escape .bce-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  #bastion-cage-escape .bce-key {
+    font-size: 16px;
+    font-weight: 700;
+    animation: bce-press 0.3s ease-in-out infinite alternate;
+  }
+  #bastion-cage-escape .bce-bar {
+    --bar-h: 16px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-cage-escape .bce-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-cage-escape.is-near .bce-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @keyframes bce-throb {
+    from {
+      box-shadow: 0 0 6px color-mix(in srgb, var(--color-hostile) 40%, transparent);
+    }
+    to {
+      box-shadow: 0 0 22px color-mix(in srgb, var(--color-hostile) 80%, transparent);
+    }
+  }
+  @keyframes bce-press {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(2px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-cage-escape,
+    #bastion-cage-escape .bce-key {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-cage-escape {
+    bottom: 42%;
+    min-width: min(420px, calc(100vw - 32px));
+    padding: 16px 20px 18px;
+  }
+  body.mobile-touch #bastion-cage-escape .bce-title {
+    font-size: 22px;
+  }
+  body.mobile-touch #bastion-cage-escape .bce-bar {
+    --bar-h: 22px;
+  }
+
   /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */
   /* Self-mounted by src/ui/hud/hill/hill_bar_painter.ts, top centre below the
      Thornhollow Fields scoreboard's slot; shown only while the player stands in

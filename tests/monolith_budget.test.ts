@@ -537,7 +537,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED to 18083 by the Sunken Bastion fifth pass: the chat line templates
+    // (chat_template_keys.ts) and the emote wheel defaults (emote_wheel_defaults.ts)
+    // moved out, buying the Iron Cage escape prompt's composition (hud/dungeon).
+    ceiling: 18083,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

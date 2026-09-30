@@ -1017,9 +1017,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
-    expect(new Set(currentOwnerIds).size).toBe(1483);
-    expect(shippingIds).toHaveLength(1483);
-    expect(Object.keys(ITEMS)).toHaveLength(1657);
+    // The Sunken Bastion fifth pass's three Gaol Turnkey loot icons: 1,486.
+    expect(new Set(currentOwnerIds).size).toBe(1486);
+    expect(shippingIds).toHaveLength(1486);
+    expect(Object.keys(ITEMS)).toHaveLength(1660);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1431,13 +1432,14 @@ describe('item-art consistency accepted-art provenance', () => {
     // loot) add 119 at the 2026-09-28 release merge: 934.
     // The Sunken Bastion loot batch (sunken-bastion-icons-2026-09-29) adds 8: 942.
     // The Drowned Temple loot batch (drowned-temple-icons-2026-09-30) adds 11: 953.
-    expect(priorGeneratedIds).toHaveLength(953);
+    // The Sunken Bastion fifth pass adds the Gaol Turnkey's 3 to its batch: 956.
+    expect(priorGeneratedIds).toHaveLength(956);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1483);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1483);
+    expect(allCurrentOwnerIds).toHaveLength(1486);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1486);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1453,7 +1455,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Buried Hoards branch's 119 paintings (three batches) = 934.
       // + the Sunken Bastion rework's 8 loot icons = 942.
       // + the Drowned Temple rework's 11 loot icons = 953.
-      priorGenerated: 953,
+      // + the Gaol Turnkey's 3 (the Bastion fifth pass) = 956.
+      priorGenerated: 956,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1684,10 +1687,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483.
-    if (ownerIds.length !== 1483)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1483`);
-    if (fileIds.length !== 1483) violations.push(`shipping WebP count: ${fileIds.length} != 1483`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483. Plus the Gaol Turnkey's 3 (the Bastion fifth pass) = 1486.
+    if (ownerIds.length !== 1486)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1486`);
+    if (fileIds.length !== 1486) violations.push(`shipping WebP count: ${fileIds.length} != 1486`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

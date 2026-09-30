@@ -1,6 +1,6 @@
 # Sunken Bastion loot icons: generated-art provenance
 
-Eight shipping inventory icons for the Sunken Bastion rework's loot
+Eleven shipping inventory icons for the Sunken Bastion rework's loot
 (`src/sim/content/sunken_bastion_items.ts`, plus the Gaoler's Iron Key trinket in
 `src/sim/content/trinkets.ts`), registered in `public/ui/items/mapping.json` as the
 generated batch `sunken-bastion-icons-2026-09-29`.
@@ -36,6 +36,12 @@ generated batch `sunken-bastion-icons-2026-09-29`.
   (heroic epic).
 - `gaolers_iron_key`: the gaol's great iron key on its ring with a cold sea-green
   glint (heroic trinket).
+- `jailers_iron_gauntlets`: riveted iron mail gauntlets with rusted cuffs and a
+  length of cell chain (the Gaol Turnkey miniboss, fifth pass).
+- `turnkeys_keyring_belt`: a broad leather belt with a rusted buckle and the
+  great ring of cell keys (the Gaol Turnkey).
+- `turnkeys_lantern_cowl`: a sea-stained cloth cowl hung with a small storm
+  lantern (the Gaol Turnkey).
 
 ## Review
 

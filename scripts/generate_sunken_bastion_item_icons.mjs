@@ -238,6 +238,69 @@ const ITEMS_TO_GENERATE = [
     `,
   },
   {
+    id: 'jailers_iron_gauntlets',
+    bgDark: '#08090a',
+    bgMid: '#181b1d',
+    bgGlow: '#3a3d3e',
+    svgArt: `
+      <!-- The Gaol Turnkey's heavy mail gauntlets: riveted iron plates over
+           rusted mail, the cuffs hung with a length of cell chain -->
+      <ellipse cx="64" cy="104" rx="42" ry="7" fill="#000" opacity="0.4" />
+      <path d="M 20 92 L 24 48 Q 26 36 36 36 L 50 36 Q 58 38 58 48 L 56 92 Z" fill="url(#iron)" stroke="#0c0e0f" stroke-width="1.6" />
+      <path d="M 26 50 L 52 50 M 26 60 L 52 60 M 26 70 L 52 70" stroke="#c7cfd2" stroke-width="1.2" opacity="0.5" />
+      <path d="M 30 36 L 30 26 Q 34 22 38 26 L 38 36 M 40 36 L 40 24 Q 44 20 48 24 L 48 36" fill="url(#iron)" stroke="#0c0e0f" stroke-width="1.4" />
+      <path d="M 70 96 L 72 52 Q 74 40 84 40 L 98 40 Q 106 42 106 52 L 104 96 Z" fill="url(#iron)" stroke="#0c0e0f" stroke-width="1.6" />
+      <path d="M 74 54 L 102 54 M 74 64 L 102 64 M 74 74 L 102 74" stroke="#c7cfd2" stroke-width="1.2" opacity="0.5" />
+      <rect x="18" y="80" width="40" height="14" rx="3" fill="url(#rust)" stroke="#2a1206" stroke-width="1.6" />
+      <rect x="68" y="84" width="40" height="14" rx="3" fill="url(#rust)" stroke="#2a1206" stroke-width="1.6" />
+      <circle cx="24" cy="87" r="2" fill="#f0b070" /><circle cx="52" cy="87" r="2" fill="#f0b070" />
+      <circle cx="74" cy="91" r="2" fill="#f0b070" /><circle cx="102" cy="91" r="2" fill="#f0b070" />
+      ${chain(58, 90, 70, 94, 3, 3, '#8a9092')}
+      ${barnacles(98, 60, 4, 2.2)}
+    `,
+  },
+  {
+    id: 'turnkeys_keyring_belt',
+    bgDark: '#0a0806',
+    bgMid: '#1d150c',
+    bgGlow: '#3b2a16',
+    svgArt: `
+      <!-- The Turnkey's broad leather belt, a rusted iron buckle and the great
+           ring of cell keys swinging from it -->
+      <ellipse cx="64" cy="100" rx="46" ry="8" fill="#000" opacity="0.4" />
+      <path d="M 12 52 Q 64 36 116 52 L 114 70 Q 64 54 14 70 Z" fill="url(#leather)" stroke="#1d0f06" stroke-width="1.6" />
+      <path d="M 18 58 Q 64 44 110 58" stroke="#c99a6a" stroke-width="1.2" fill="none" opacity="0.55" stroke-dasharray="3 3" />
+      <rect x="50" y="46" width="24" height="24" rx="3" fill="url(#rust)" stroke="#2a1206" stroke-width="2" />
+      <rect x="55" y="51" width="14" height="14" rx="2" fill="none" stroke="#f0b070" stroke-width="2" />
+      <circle cx="86" cy="86" r="14" fill="none" stroke="url(#iron)" stroke-width="4" />
+      <path d="M 78 96 L 70 112 M 70 112 l -4 -2 M 70 112 l 2 4" stroke="url(#iron)" stroke-width="3.2" stroke-linecap="round" />
+      <path d="M 88 100 L 90 116 M 90 116 l -3 1 M 90 112 l 4 0" stroke="url(#iron)" stroke-width="3.2" stroke-linecap="round" />
+      <path d="M 98 94 L 110 106 M 110 106 l 1 -4 M 106 102 l 3 -3" stroke="url(#rust)" stroke-width="3.2" stroke-linecap="round" />
+      ${chain(80, 64, 84, 72, 2, 2.4, '#8a9092')}
+    `,
+  },
+  {
+    id: 'turnkeys_lantern_cowl',
+    bgDark: '#070707',
+    bgMid: '#1a1612',
+    bgGlow: '#453521',
+    svgArt: `
+      <!-- A sea-stained cloth cowl hung with the Turnkey's tiny storm lantern,
+           its flame warm against the drowned grey hood -->
+      <ellipse cx="64" cy="106" rx="40" ry="7" fill="#000" opacity="0.4" />
+      <path d="M 26 96 Q 20 60 36 36 Q 64 14 92 36 Q 108 60 102 96 Q 64 86 26 96 Z" fill="url(#seacloth)" stroke="#07201c" stroke-width="1.8" />
+      <path d="M 40 90 Q 44 56 64 50 Q 84 56 88 90 Q 64 82 40 90 Z" fill="#050807" opacity="0.85" />
+      <path d="M 36 40 Q 64 22 92 40" stroke="#b8f0e0" stroke-width="1.2" fill="none" opacity="0.45" />
+      <path d="M 30 96 l -2 8 M 46 92 l -1 9 M 82 92 l 1 9 M 98 96 l 2 8" stroke="#3a6a2a" stroke-width="2.6" stroke-linecap="round" />
+      <circle cx="96" cy="70" r="14" fill="url(#seaglow)" opacity="0.0" />
+      <path d="M 96 50 L 96 58" stroke="url(#iron)" stroke-width="2" />
+      <rect x="89" y="58" width="14" height="18" rx="2" fill="#2a2016" stroke="url(#iron)" stroke-width="2" />
+      <ellipse cx="96" cy="67" rx="4" ry="6" fill="#ffd27a" />
+      <ellipse cx="96" cy="68" rx="2" ry="3" fill="#fff4d0" />
+      <circle cx="96" cy="67" r="16" fill="#ffb040" opacity="0.18" />
+    `,
+  },
+  {
     id: 'gaolers_iron_key',
     bgDark: '#060808',
     bgMid: '#131a1a',
