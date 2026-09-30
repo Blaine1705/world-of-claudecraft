@@ -1,7 +1,7 @@
 // The Hollow Crypt's gates and seals as structures: the Undercroft Grille's
 // gatehouse and portcullis, the bone barriers, the frost-web curtains, the
-// warded arches of the Twin Seals and the choir door, the Bridge of Bone that
-// knits itself out of the mist, and the Unquiet Ward over the ring.
+// warded arches of the Twin Seals and the choir door, and the Unquiet Ward over
+// the ring.
 //
 // Every moving part is driven by ONE shader patch reading a per-gate `uOpen`
 // uniform (0 closed, 1 open) and a per-vertex `aSeq` stagger, updated from the
@@ -11,8 +11,6 @@
 
 import * as THREE from 'three';
 import { HOLLOW_CRYPT_GATES } from '../../sim/content/hollow_crypt';
-import { HOLLOW_CRYPT_FIELD } from '../../sim/content/hollow_crypt_layout';
-import type { DungeonGateDef } from '../../sim/types';
 import { GFX, sharedUniforms } from '../gfx';
 import { gateMemoryKey, gateView } from './crypt_gate_state_core';
 
@@ -383,64 +381,6 @@ function riteWard(u: OpenUniforms, width: number): THREE.Object3D[] {
   return [veil];
 }
 
-/** The bone bridge: its deck is laid along the hidden west postern path. */
-function boneBridge(
-  u: OpenUniforms,
-  gate: DungeonGateDef,
-  ground: (x: number, z: number) => number,
-): THREE.Object3D[] {
-  const path = HOLLOW_CRYPT_FIELD.surfaces.find((s) => s.id === 'west_postern');
-  if (!path || path.kind !== 'path') return [];
-  const pts = path.points;
-  const parts: THREE.BufferGeometry[] = [];
-  const planks = 40;
-  let total = 0;
-  const lens: number[] = [];
-  for (let i = 0; i + 1 < pts.length; i++) {
-    lens.push(Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]));
-    total += lens[lens.length - 1];
-  }
-  for (let k = 0; k < planks; k++) {
-    let d = (k / (planks - 1)) * total;
-    let i = 0;
-    while (i < lens.length - 1 && d > lens[i]) {
-      d -= lens[i];
-      i++;
-    }
-    const t = lens[i] > 0 ? d / lens[i] : 0;
-    const x = pts[i][0] + (pts[i + 1][0] - pts[i][0]) * t;
-    const z = pts[i][1] + (pts[i + 1][1] - pts[i][1]) * t;
-    const y = pts[i][2] + (pts[i + 1][2] - pts[i][2]) * t;
-    const yaw = Math.atan2(-(pts[i + 1][1] - pts[i][1]), pts[i + 1][0] - pts[i][0]);
-    // A rib-bone plank across the path, knitting from the arena end outward.
-    const seq = k / (planks - 1);
-    const g = box(0.55, 0.35, path.halfWidth * 2 + 0.6, 0, 0, 0);
-    g.rotateY(yaw);
-    g.translate(x, y - 0.18, z);
-    parts.push(withSeq(g, seq));
-    if (k % 4 === 0) {
-      for (const side of [-1, 1]) {
-        const nx = -Math.sin(yaw) * 0;
-        const px =
-          x + ((side * (pts[i + 1][1] - pts[i][1])) / (lens[i] || 1)) * (path.halfWidth + 0.2) + nx;
-        const pz =
-          z - ((side * (pts[i + 1][0] - pts[i][0])) / (lens[i] || 1)) * (path.halfWidth + 0.2);
-        parts.push(withSeq(cone(0.16, 2.2, px, y, pz, 0, side * 0.25), seq));
-      }
-    }
-    // The spine under the deck.
-    const spine = box(1.1, 0.8, 1.1, x, y - 1.2, z);
-    parts.push(withSeq(spine, seq));
-  }
-  void ground;
-  void gate;
-  const mesh = new THREE.Mesh(merge(parts), openableMaterial(0xe3d9c4, u, { rough: 0.75 }));
-  mesh.castShadow = true;
-  // The gate object sits at the arena end; the deck is authored in field space.
-  mesh.userData.fieldSpace = true;
-  return [mesh];
-}
-
 /**
  * Every gate structure of one slot, driven by the gate memory of the slot
  * anchored at (ox, oz). Returns the group (instance-local frame).
@@ -473,10 +413,6 @@ export function buildCryptGates(
       case 'warded_arch':
         u = openUniforms(new THREE.Vector3(), new THREE.Vector3());
         parts = wardedArch(u, width, 0xb28cff);
-        break;
-      case 'bone_bridge':
-        u = openUniforms(new THREE.Vector3(0, -12, 0), new THREE.Vector3(), 2.5);
-        parts = boneBridge(u, gate, ground);
         break;
       default:
         u = openUniforms(new THREE.Vector3(), new THREE.Vector3());

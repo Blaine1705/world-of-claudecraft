@@ -71,12 +71,12 @@ describe('/dev crypt', () => {
     const inst = claimedInstanceAt(sim.ctx, me().pos);
     if (!inst) throw new Error('no claim');
     const grille = HOLLOW_CRYPT_GATES.find((g) => g.id === 'grille');
-    const bridge = HOLLOW_CRYPT_GATES.find((g) => g.id === 'yard_bridge');
-    if (!grille || !bridge) throw new Error('gates');
+    const causeway = HOLLOW_CRYPT_GATES.find((g) => g.id === 'web_bridge');
+    if (!grille || !causeway) throw new Error('gates');
     expect(dungeonGateState(sim.ctx, inst, grille)).toBe('open');
-    expect(dungeonGateState(sim.ctx, inst, bridge)).toBe('closed');
-    sim.chat('/dev crypt kill marrow', pid);
+    expect(dungeonGateState(sim.ctx, inst, causeway)).toBe('closed');
+    sim.chat('/dev crypt kill rimeweb', pid);
     sim.tick();
-    expect(dungeonGateState(sim.ctx, inst, bridge)).toBe('open');
+    expect(dungeonGateState(sim.ctx, inst, causeway)).toBe('open');
   });
 });

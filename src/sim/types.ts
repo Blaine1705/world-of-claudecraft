@@ -4196,7 +4196,6 @@ export type DungeonGateKind =
   | 'bone_barrier'
   | 'web_curtain'
   | 'warded_arch'
-  | 'bone_bridge'
   | 'rite_ward';
 
 /**

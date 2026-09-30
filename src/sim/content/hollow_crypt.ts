@@ -611,17 +611,6 @@ export const HOLLOW_CRYPT_GATES: DungeonGateDef[] = [
     openText: 'The bone barrier before the Bell Yard crumbles.',
   },
   {
-    id: 'yard_bridge',
-    name: 'Bridge of Bone',
-    kind: 'bone_bridge',
-    x: -60,
-    z: 102,
-    hw: 6,
-    rot: across(24, -2),
-    bosses: ['sexton_marrow'],
-    openText: 'A bridge of bone knits itself across the mist.',
-  },
-  {
     id: 'web_curtain',
     name: 'Frost-Web Curtain',
     kind: 'web_curtain',
