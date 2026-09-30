@@ -6008,8 +6008,20 @@ export const ko_KR: EnTranslations = {
         "forgestorm": "대장간 폭풍(떨어지는 운석 원, 밖으로 이동)",
         "shared_pyre": "공유 화장단(집결 원, 피해 분담)",
         "anvils_decree": "모루의 칙령(공격대 전체 망치 강타 세 번, 치유로 버티기)",
-        "masters_assembly": "장인의 조립(대장간 광선 막기, 막는 사람 교대)"
+        "masters_assembly": "장인의 조립(대장간 광선 막기, 막는 사람 교대)",
+        "iron_cage": "강철 우리 (상호작용 키를 연타해 탈출, 아군은 창살을 부술 수 있음)",
+        "drowned_anchor": "익사의 닻 (희생자가 구덩이로 끌려가기 전에 사슬을 끊으세요)",
+        "shackle_pair": "쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)",
+        "reaper_behind": "그림자 건너기 (플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)"
       }
+    },
+    "bastionCage": {
+      "title": "강철 우리에 갇혔습니다!",
+      "promptKey": "{key} 키를 연타해 탈출하세요",
+      "promptNoKey": "상호작용 키를 연타해 탈출하세요",
+      "promptTap": "여기를 연타해 탈출하세요",
+      "buttonAria": "강철 우리에서 탈출하기",
+      "progressAria": "탈출 진행도: {pct}"
     },
     "cosmetics": {
       "title": "외형",
@@ -12272,10 +12284,14 @@ export const ko_KR: EnTranslations = {
       "bastion_claw_sweep": "집게 휩쓸기",
       "bastion_shell_slam": "껍질 내려찍기",
       "bastion_oathbound_charge": "맹세의 돌진",
-      "bastion_gaol_hook": "감옥 갈고리",
       "bastion_gaolers_cudgel": "간수의 곤봉",
       "bastion_mist_surge": "안개 해일",
       "bastion_drowning_hymn": "익사의 성가",
+      "bastion_iron_cage": "강철 우리",
+      "bastion_drowned_anchor_cast": "익사의 닻",
+      "bastion_shackle_pair": "쌍둥이 족쇄",
+      "bastion_shadowstep": "그림자 건너기",
+      "bastion_reaping_scythe": "수확의 낫",
       "temple_lullaby": "자장가",
       "temple_call_the_tide": "조수의 부름",
       "temple_static_coil": "정전기 똬리",
@@ -18564,6 +18580,15 @@ export const ko_KR: EnTranslations = {
       "gaolyard_striders": {
         "name": "감옥 뜰의 장화"
       },
+      "jailers_iron_gauntlets": {
+        "name": "간수의 강철 건틀릿"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "옥지기의 열쇠고리 허리띠"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "옥지기의 등불 두건"
+      },
       "conchplate_girdle": {
         "name": "소라판 허리띠"
       },
@@ -19813,6 +19838,12 @@ export const ko_KR: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "간수 오시크"
+      },
+      "bastion_gaol_cage": {
+        "name": "강철 우리"
+      },
+      "bastion_drowned_anchor": {
+        "name": "익사의 닻"
       },
       "lagoon_snapper": {
         "name": "석호 늑대거북"

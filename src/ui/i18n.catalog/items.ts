@@ -3398,6 +3398,10 @@ const ITEM_ENTITY_IDS = [
   'gaolyard_cudgel',
   'drowned_commanders_breastplate',
   'gaolyard_striders',
+  // The Gaol Turnkey miniboss's loot (sim/content/sunken_bastion_items.ts).
+  'jailers_iron_gauntlets',
+  'turnkeys_keyring_belt',
+  'turnkeys_lantern_cowl',
   // The Drowned Temple rework's loot (sim/content/drowned_temple_items.ts).
   'conchplate_girdle',
   'pale_chorus_leggings',
@@ -4368,6 +4372,10 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gaolyard_cudgel: 'Gaolyard Cudgel',
   drowned_commanders_breastplate: "Drowned Commander's Breastplate",
   gaolyard_striders: 'Gaolyard Striders',
+  // The Gaol Turnkey miniboss's loot.
+  jailers_iron_gauntlets: "Jailer's Iron Gauntlets",
+  turnkeys_keyring_belt: "Turnkey's Keyring Belt",
+  turnkeys_lantern_cowl: "Turnkey's Lantern Cowl",
   // The Drowned Temple rework's loot.
   conchplate_girdle: 'Conchplate Girdle',
   pale_chorus_leggings: 'Pale Chorus Leggings',

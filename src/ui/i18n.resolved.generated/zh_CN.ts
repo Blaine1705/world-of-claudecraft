@@ -6008,8 +6008,20 @@ export const zh_CN: EnTranslations = {
         "forgestorm": "熔炉风暴（坠落的陨石圈，移出）",
         "shared_pyre": "共享柴堆（集合圈，分摊伤害）",
         "anvils_decree": "铁砧法令（三次全团锤击，用治疗撑过）",
-        "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）"
+        "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）",
+        "iron_cage": "铁笼（连按交互键挣脱，队友可以砸开铁栏）",
+        "drowned_anchor": "溺亡之锚（在受害者被拖进深坑前砸断锁链）",
+        "shackle_pair": "双人镣铐（被锁在一起的两名玩家必须靠在一起）",
+        "reaper_behind": "穿影（死神从玩家身后升起，离开镰刀的弧线）"
       }
+    },
+    "bastionCage": {
+      "title": "你被关进了铁笼！",
+      "promptKey": "连按 {key} 挣脱",
+      "promptNoKey": "连按交互键挣脱",
+      "promptTap": "连续点击这里挣脱",
+      "buttonAria": "从铁笼中挣脱",
+      "progressAria": "挣脱进度：{pct}"
     },
     "cosmetics": {
       "title": "外观",
@@ -12272,10 +12284,14 @@ export const zh_CN: EnTranslations = {
       "bastion_claw_sweep": "巨钳横扫",
       "bastion_shell_slam": "壳塔重击",
       "bastion_oathbound_charge": "誓约冲锋",
-      "bastion_gaol_hook": "牢狱钩索",
       "bastion_gaolers_cudgel": "狱卒短棍",
       "bastion_mist_surge": "迷雾涌流",
       "bastion_drowning_hymn": "溺亡圣咏",
+      "bastion_iron_cage": "铁笼",
+      "bastion_drowned_anchor_cast": "溺亡之锚",
+      "bastion_shackle_pair": "双人镣铐",
+      "bastion_shadowstep": "穿影",
+      "bastion_reaping_scythe": "收割之镰",
       "temple_lullaby": "摇篮曲",
       "temple_call_the_tide": "潮汐召唤",
       "temple_static_coil": "静电盘绕",
@@ -18564,6 +18580,15 @@ export const zh_CN: EnTranslations = {
       "gaolyard_striders": {
         "name": "狱庭长靴"
       },
+      "jailers_iron_gauntlets": {
+        "name": "狱卒的铁护手"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "牢头的钥匙腰带"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "牢头的提灯兜帽"
+      },
       "conchplate_girdle": {
         "name": "螺甲腰带"
       },
@@ -19813,6 +19838,12 @@ export const zh_CN: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "狱卒奥西克"
+      },
+      "bastion_gaol_cage": {
+        "name": "铁笼"
+      },
+      "bastion_drowned_anchor": {
+        "name": "溺亡之锚"
       },
       "lagoon_snapper": {
         "name": "泻湖鳄龟"

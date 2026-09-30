@@ -8762,7 +8762,21 @@ export const hudChromeStrings = {
       shared_pyre: 'Shared Pyre (gathering circle, split the damage)',
       anvils_decree: "Anvil's Decree (three raid-wide hammer strikes, heal through)",
       masters_assembly: "The Master's Assembly (block the forge beams, rotate blockers)",
+      // The Sunken Bastion's fifth pass (encounters/sunken_bastion).
+      iron_cage: 'Iron Cage (mash your interact key to break out, allies can smash the bars)',
+      drowned_anchor: 'Drowned Anchor (break the chain before its victim is dragged into the pit)',
+      shackle_pair: 'Shackle Pair (two chained players must stay close together)',
+      reaper_behind: "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
     },
+  },
+  // The Gaol Turnkey's Iron Cage escape prompt (src/ui/hud/dungeon/cage_escape).
+  bastionCage: {
+    title: 'Locked in the Iron Cage!',
+    promptKey: 'Press {key} again and again to break free',
+    promptNoKey: 'Press your interact key again and again to break free',
+    promptTap: 'Tap here again and again to break free',
+    buttonAria: 'Break free from the Iron Cage',
+    progressAria: 'Escape progress: {pct}',
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and

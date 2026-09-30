@@ -6008,8 +6008,20 @@ export const ru_RU: EnTranslations = {
         "forgestorm": "Кузнечная буря (падающие метеоритные круги, выходите)",
         "shared_pyre": "Общий костёр (круг сбора, разделите урон)",
         "anvils_decree": "Указ наковальни (три удара молотом по всему рейду, вылечивайте)",
-        "masters_assembly": "Сборка мастера (блокируйте лучи кузни, меняйте блокирующих)"
+        "masters_assembly": "Сборка мастера (блокируйте лучи кузни, меняйте блокирующих)",
+        "iron_cage": "Железная клетка (жмите клавишу взаимодействия, чтобы вырваться; союзники могут ломать прутья)",
+        "drowned_anchor": "Утопленный якорь (разбейте цепь, пока жертву не утащило в яму)",
+        "shackle_pair": "Парные кандалы (двое скованных игроков должны держаться вместе)",
+        "reaper_behind": "Переход сквозь тень (жнец встаёт за спиной игрока, выйдите из дуги косы)"
       }
+    },
+    "bastionCage": {
+      "title": "Вы заперты в железной клетке!",
+      "promptKey": "Жмите {key} снова и снова, чтобы вырваться",
+      "promptNoKey": "Жмите клавишу взаимодействия снова и снова, чтобы вырваться",
+      "promptTap": "Нажимайте сюда снова и снова, чтобы вырваться",
+      "buttonAria": "Вырваться из железной клетки",
+      "progressAria": "Прогресс побега: {pct}"
     },
     "cosmetics": {
       "title": "Косметика",
@@ -12272,10 +12284,14 @@ export const ru_RU: EnTranslations = {
       "bastion_claw_sweep": "Взмах клешни",
       "bastion_shell_slam": "Удар панцирем",
       "bastion_oathbound_charge": "Клятвенный натиск",
-      "bastion_gaol_hook": "Тюремный крюк",
       "bastion_gaolers_cudgel": "Дубинка тюремщика",
       "bastion_mist_surge": "Туманный прилив",
       "bastion_drowning_hymn": "Гимн утопленников",
+      "bastion_iron_cage": "Железная клетка",
+      "bastion_drowned_anchor_cast": "Утопленный якорь",
+      "bastion_shackle_pair": "Парные кандалы",
+      "bastion_shadowstep": "Переход сквозь тень",
+      "bastion_reaping_scythe": "Жнущая коса",
       "temple_lullaby": "Колыбельная",
       "temple_call_the_tide": "Зов прилива",
       "temple_static_coil": "Статический виток",
@@ -18564,6 +18580,15 @@ export const ru_RU: EnTranslations = {
       "gaolyard_striders": {
         "name": "Сапоги тюремного двора"
       },
+      "jailers_iron_gauntlets": {
+        "name": "Железные рукавицы тюремщика"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "Пояс со связкой ключей надзирателя"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "Капюшон надзирателя с фонарём"
+      },
       "conchplate_girdle": {
         "name": "Пояс из раковинных пластин"
       },
@@ -19813,6 +19838,12 @@ export const ru_RU: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "Тюремщик Оссик"
+      },
+      "bastion_gaol_cage": {
+        "name": "Железная клетка"
+      },
+      "bastion_drowned_anchor": {
+        "name": "Утопленный якорь"
       },
       "lagoon_snapper": {
         "name": "Лагунная кусачая черепаха"

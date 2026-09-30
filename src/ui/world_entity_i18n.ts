@@ -113,6 +113,9 @@ const MOB_IDS = [
   'turretback_hermit',
   'vael_fog_shade',
   'gaoler_ossick',
+  // The Bastion's fifth pass: the Turnkey's Iron Cage and Ossick's anchor.
+  'bastion_gaol_cage',
+  'bastion_drowned_anchor',
   // The Drowned Temple rework (sim/content/drowned_temple.ts); the per-class
   // Reflections all wear the one name.
   'lagoon_snapper',

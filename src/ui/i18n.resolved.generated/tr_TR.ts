@@ -6008,8 +6008,20 @@ export const tr_TR: EnTranslations = {
         "forgestorm": "Forgestorm (düşen meteor çemberleri, dışarı çıkın)",
         "shared_pyre": "Paylaşılan Ateş (daire toplanıyor, hasarı paylaştırılıyor)",
         "anvils_decree": "Anvil'in Kararnamesi (baskın çapında üç çekiç darbesi, iyileşir)",
-        "masters_assembly": "Usta Meclisi (dövme kirişlerini bloke edin, engelleyicileri döndürün)"
+        "masters_assembly": "Usta Meclisi (dövme kirişlerini bloke edin, engelleyicileri döndürün)",
+        "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
+        "drowned_anchor": "Drowned Anchor (break the chain before its victim is dragged into the pit)",
+        "shackle_pair": "Shackle Pair (two chained players must stay close together)",
+        "reaper_behind": "Shadow Crossing (he rises behind a player, step out of the scythe's arc)"
       }
+    },
+    "bastionCage": {
+      "title": "Locked in the Iron Cage!",
+      "promptKey": "Press {key} again and again to break free",
+      "promptNoKey": "Press your interact key again and again to break free",
+      "promptTap": "Tap here again and again to break free",
+      "buttonAria": "Break free from the Iron Cage",
+      "progressAria": "Escape progress: {pct}"
     },
     "cosmetics": {
       "title": "Kozmetikler",
@@ -12272,10 +12284,14 @@ export const tr_TR: EnTranslations = {
       "bastion_claw_sweep": "Claw Sweep",
       "bastion_shell_slam": "Shell Slam",
       "bastion_oathbound_charge": "Oathbound Charge",
-      "bastion_gaol_hook": "Gaol Hook",
       "bastion_gaolers_cudgel": "Gaoler's Cudgel",
       "bastion_mist_surge": "Mist Surge",
       "bastion_drowning_hymn": "Drowning Hymn",
+      "bastion_iron_cage": "Iron Cage",
+      "bastion_drowned_anchor_cast": "Drowned Anchor",
+      "bastion_shackle_pair": "Shackle Pair",
+      "bastion_shadowstep": "Shadow Crossing",
+      "bastion_reaping_scythe": "Reaping Scythe",
       "temple_lullaby": "Lullaby",
       "temple_call_the_tide": "Call the Tide",
       "temple_static_coil": "Static Coil",
@@ -18564,6 +18580,15 @@ export const tr_TR: EnTranslations = {
       "gaolyard_striders": {
         "name": "Gaolyard Striders"
       },
+      "jailers_iron_gauntlets": {
+        "name": "Jailer's Iron Gauntlets"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "Turnkey's Keyring Belt"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "Turnkey's Lantern Cowl"
+      },
       "conchplate_girdle": {
         "name": "Conchplate Girdle"
       },
@@ -19813,6 +19838,12 @@ export const tr_TR: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "Gaoler Ossick"
+      },
+      "bastion_gaol_cage": {
+        "name": "Iron Cage"
+      },
+      "bastion_drowned_anchor": {
+        "name": "Drowned Anchor"
       },
       "lagoon_snapper": {
         "name": "Lagoon Snapper"

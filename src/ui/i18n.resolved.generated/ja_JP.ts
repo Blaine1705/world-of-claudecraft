@@ -6008,8 +6008,20 @@ export const ja_JP: EnTranslations = {
         "forgestorm": "フォージストーム（降り注ぐ隕石円、範囲外へ移動）",
         "shared_pyre": "共有の火葬（集合円、ダメージを分担）",
         "anvils_decree": "金床の勅令（全体への三連ハンマー打撃、回復で耐える）",
-        "masters_assembly": "匠の組立（鍛冶場の光線を遮る、遮る役を交代）"
+        "masters_assembly": "匠の組立（鍛冶場の光線を遮る、遮る役を交代）",
+        "iron_cage": "鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）",
+        "drowned_anchor": "溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）",
+        "shackle_pair": "連鎖の枷（鎖でつながれた二人は離れずに動く）",
+        "reaper_behind": "影渡り（死神はプレイヤーの背後に現れる、大鎌の弧から出る）"
       }
+    },
+    "bastionCage": {
+      "title": "鉄の檻に閉じ込められた！",
+      "promptKey": "{key} を連打して脱出",
+      "promptNoKey": "インタラクトキーを連打して脱出",
+      "promptTap": "ここを連打して脱出",
+      "buttonAria": "鉄の檻から脱出する",
+      "progressAria": "脱出の進行度：{pct}"
     },
     "cosmetics": {
       "title": "コスメティック",
@@ -12272,10 +12284,14 @@ export const ja_JP: EnTranslations = {
       "bastion_claw_sweep": "爪の薙ぎ払い",
       "bastion_shell_slam": "甲羅叩きつけ",
       "bastion_oathbound_charge": "誓約の突進",
-      "bastion_gaol_hook": "牢獄の鉤",
       "bastion_gaolers_cudgel": "牢番の棍棒",
       "bastion_mist_surge": "霧の奔流",
       "bastion_drowning_hymn": "溺れの聖歌",
+      "bastion_iron_cage": "鉄の檻",
+      "bastion_drowned_anchor_cast": "溺死の錨",
+      "bastion_shackle_pair": "連鎖の枷",
+      "bastion_shadowstep": "影渡り",
+      "bastion_reaping_scythe": "刈り取りの大鎌",
       "temple_lullaby": "子守歌",
       "temple_call_the_tide": "潮の呼び声",
       "temple_static_coil": "静電のとぐろ",
@@ -18564,6 +18580,15 @@ export const ja_JP: EnTranslations = {
       "gaolyard_striders": {
         "name": "牢獄庭の長靴"
       },
+      "jailers_iron_gauntlets": {
+        "name": "看守の鉄篭手"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "牢番の鍵束ベルト"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "牢番のランタン頭巾"
+      },
       "conchplate_girdle": {
         "name": "巻貝板の腰帯"
       },
@@ -19813,6 +19838,12 @@ export const ja_JP: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "牢番オシック"
+      },
+      "bastion_gaol_cage": {
+        "name": "鉄の檻"
+      },
+      "bastion_drowned_anchor": {
+        "name": "溺死の錨"
       },
       "lagoon_snapper": {
         "name": "潟湖のスナッパー"

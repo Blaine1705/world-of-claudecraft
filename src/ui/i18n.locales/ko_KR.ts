@@ -12869,7 +12869,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mist_surge': '안개 쇄도(주기적 광역 피해)',
   'hudChrome.finder.mech.summons_adds': '증원 소환',
   'hudChrome.finder.mech.lunar_tide': '달의 파도(주기적 광역 피해)',
-  'hudChrome.finder.mech.chorus_and_solo': '합창과 독창 (한 표식에는 모이고 다른 표식에서는 흩어지기)',
+  'hudChrome.finder.mech.chorus_and_solo':
+    '합창과 독창 (한 표식에는 모이고 다른 표식에서는 흩어지기)',
   'hudChrome.finder.mech.tideglass_reflections': '조수유리 투영체 (서로의 거울상을 처치)',
   'hudChrome.finder.mech.rising_tide': '밀물 (섬의 절반이 잠김, 마른 쪽으로 이동)',
   'hudChrome.finder.mech.undertow': '역류 (모두를 끌어당김, 충돌 전에 벗어나기)',
@@ -19668,7 +19669,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideglass_shiv.name': '조수유리 단도',
   'entities.items.pale_chorus_vestment.name': '창백한 합창 제의',
   'entities.items.tideglass_warmaul.name': '조수유리 전투망치',
-  'hudChrome.trinkets.use.shackle': '{range}미터 이내의 대상을 {duration}초 동안 사슬로 묶어 제자리에 고정합니다. 우두머리처럼 제어 효과에 면역인 생물은 대신 이동 속도가 {slow}% 감소하며, 감속에도 면역이면 효과가 없습니다.',
+  'hudChrome.trinkets.use.shackle':
+    '{range}미터 이내의 대상을 {duration}초 동안 사슬로 묶어 제자리에 고정합니다. 우두머리처럼 제어 효과에 면역인 생물은 대신 이동 속도가 {slow}% 감소하며, 감속에도 면역이면 효과가 없습니다.',
   'hudChrome.auraEffect.trinket.shackle': '사슬에 묶임: 이동할 수 없습니다.',
   'hudChrome.auraEffect.trinket.shackleSlow': '사슬에 묶임: 이동 속도가 {pct}% 감소합니다.',
   'entities.mobs.ossuary_sentinel.name': '납골당 파수병',
@@ -19697,7 +19699,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_claw_sweep': '집게 휩쓸기',
   'abilityUi.cast.bastion_shell_slam': '껍질 내려찍기',
   'abilityUi.cast.bastion_oathbound_charge': '맹세의 돌진',
-  'abilityUi.cast.bastion_gaol_hook': '감옥 갈고리',
   'abilityUi.cast.bastion_gaolers_cudgel': '간수의 곤봉',
   'abilityUi.cast.bastion_mist_surge': '안개 해일',
   'abilityUi.cast.bastion_drowning_hymn': '익사의 성가',
@@ -19734,4 +19735,29 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_knellwyrm_strafe_run': '강습 비행',
   'abilityUi.cast.crypt_knellwyrm_dread_bellow': '공포의 포효',
   'entities.mobs.crypt_knellwyrm.name': '조종룡',
+  // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
+  'abilityUi.cast.bastion_iron_cage': '강철 우리',
+  'abilityUi.cast.bastion_drowned_anchor_cast': '익사의 닻',
+  'abilityUi.cast.bastion_shackle_pair': '쌍둥이 족쇄',
+  'abilityUi.cast.bastion_shadowstep': '그림자 건너기',
+  'abilityUi.cast.bastion_reaping_scythe': '수확의 낫',
+  'entities.mobs.bastion_gaol_cage.name': '강철 우리',
+  'entities.mobs.bastion_drowned_anchor.name': '익사의 닻',
+  'entities.items.jailers_iron_gauntlets.name': '간수의 강철 건틀릿',
+  'entities.items.turnkeys_keyring_belt.name': '옥지기의 열쇠고리 허리띠',
+  'entities.items.turnkeys_lantern_cowl.name': '옥지기의 등불 두건',
+  'hudChrome.finder.mech.iron_cage':
+    '강철 우리 (상호작용 키를 연타해 탈출, 아군은 창살을 부술 수 있음)',
+  'hudChrome.finder.mech.drowned_anchor':
+    '익사의 닻 (희생자가 구덩이로 끌려가기 전에 사슬을 끊으세요)',
+  'hudChrome.finder.mech.shackle_pair':
+    '쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)',
+  'hudChrome.finder.mech.reaper_behind':
+    '그림자 건너기 (플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)',
+  'hudChrome.bastionCage.title': '강철 우리에 갇혔습니다!',
+  'hudChrome.bastionCage.promptKey': '{key} 키를 연타해 탈출하세요',
+  'hudChrome.bastionCage.promptNoKey': '상호작용 키를 연타해 탈출하세요',
+  'hudChrome.bastionCage.promptTap': '여기를 연타해 탈출하세요',
+  'hudChrome.bastionCage.buttonAria': '강철 우리에서 탈출하기',
+  'hudChrome.bastionCage.progressAria': '탈출 진행도: {pct}',
 };

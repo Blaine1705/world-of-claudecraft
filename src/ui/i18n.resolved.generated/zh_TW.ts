@@ -6008,8 +6008,20 @@ export const zh_TW: EnTranslations = {
         "forgestorm": "熔爐風暴（墜落的隕石圈，移出）",
         "shared_pyre": "共享柴堆（集合圈，分攤傷害）",
         "anvils_decree": "鐵砧法令（三次全團鎚擊，用治療撐過）",
-        "masters_assembly": "大師裝配（阻擋熔爐光束，輪換阻擋者）"
+        "masters_assembly": "大師裝配（阻擋熔爐光束，輪換阻擋者）",
+        "iron_cage": "鐵籠（連按互動鍵掙脫，隊友可以砸開鐵欄）",
+        "drowned_anchor": "溺亡之錨（在受害者被拖進深坑前砸斷鎖鏈）",
+        "shackle_pair": "雙人鐐銬（被鎖在一起的兩名玩家必須靠在一起）",
+        "reaper_behind": "穿影（死神從玩家身後升起，離開鐮刀的弧線）"
       }
+    },
+    "bastionCage": {
+      "title": "你被關進了鐵籠！",
+      "promptKey": "連按 {key} 掙脫",
+      "promptNoKey": "連按互動鍵掙脫",
+      "promptTap": "連續點擊這裡掙脫",
+      "buttonAria": "從鐵籠中掙脫",
+      "progressAria": "掙脫進度：{pct}"
     },
     "cosmetics": {
       "title": "外觀",
@@ -12272,10 +12284,14 @@ export const zh_TW: EnTranslations = {
       "bastion_claw_sweep": "巨鉗橫掃",
       "bastion_shell_slam": "殼塔重擊",
       "bastion_oathbound_charge": "誓約衝鋒",
-      "bastion_gaol_hook": "牢獄鉤索",
       "bastion_gaolers_cudgel": "獄卒短棍",
       "bastion_mist_surge": "迷霧湧流",
       "bastion_drowning_hymn": "溺亡聖詠",
+      "bastion_iron_cage": "鐵籠",
+      "bastion_drowned_anchor_cast": "溺亡之錨",
+      "bastion_shackle_pair": "雙人鐐銬",
+      "bastion_shadowstep": "穿影",
+      "bastion_reaping_scythe": "收割之鐮",
       "temple_lullaby": "搖籃曲",
       "temple_call_the_tide": "潮汐召喚",
       "temple_static_coil": "靜電盤繞",
@@ -18564,6 +18580,15 @@ export const zh_TW: EnTranslations = {
       "gaolyard_striders": {
         "name": "獄庭長靴"
       },
+      "jailers_iron_gauntlets": {
+        "name": "獄卒的鐵護手"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "牢頭的鑰匙腰帶"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "牢頭的提燈兜帽"
+      },
       "conchplate_girdle": {
         "name": "螺甲腰帶"
       },
@@ -19813,6 +19838,12 @@ export const zh_TW: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "獄卒奧西克"
+      },
+      "bastion_gaol_cage": {
+        "name": "鐵籠"
+      },
+      "bastion_drowned_anchor": {
+        "name": "溺亡之錨"
       },
       "lagoon_snapper": {
         "name": "潟湖鱷龜"

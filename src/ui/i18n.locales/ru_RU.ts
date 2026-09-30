@@ -13092,9 +13092,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mist_surge': 'Волна тумана (периодический урон по области)',
   'hudChrome.finder.mech.summons_adds': 'Призывает подкрепления',
   'hudChrome.finder.mech.lunar_tide': 'Лунный прилив (периодический урон по области)',
-  'hudChrome.finder.mech.chorus_and_solo': 'Хор и соло (соберитесь у одной метки, разойдитесь от другой)',
-  'hudChrome.finder.mech.tideglass_reflections': 'Отражения Приливного стекла (убивайте отражения друг друга)',
-  'hudChrome.finder.mech.rising_tide': 'Прилив (затапливает половину острова, переходите на сухую сторону)',
+  'hudChrome.finder.mech.chorus_and_solo':
+    'Хор и соло (соберитесь у одной метки, разойдитесь от другой)',
+  'hudChrome.finder.mech.tideglass_reflections':
+    'Отражения Приливного стекла (убивайте отражения друг друга)',
+  'hudChrome.finder.mech.rising_tide':
+    'Прилив (затапливает половину острова, переходите на сухую сторону)',
   'hudChrome.finder.mech.undertow': 'Отбойное течение (притягивает всех, убегайте до удара)',
   'hudChrome.finder.mech.enrage': 'Приходит в ярость при низком здоровье',
   'hudChrome.finder.mech.shuddering_stomp': 'Сотрясающий топот (оглушение по области)',
@@ -20046,9 +20049,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideglass_shiv.name': 'Заточка Приливного стекла',
   'entities.items.pale_chorus_vestment.name': 'Облачение Бледного хора',
   'entities.items.tideglass_warmaul.name': 'Боевой молот Приливного стекла',
-  'hudChrome.trinkets.use.shackle': 'Сковывает цель в пределах {range} м на месте на {duration} сек. Существо, невосприимчивое к контролю (например, босс), вместо этого замедляется на {slow}%, если оно не невосприимчиво и к замедлению.',
+  'hudChrome.trinkets.use.shackle':
+    'Сковывает цель в пределах {range} м на месте на {duration} сек. Существо, невосприимчивое к контролю (например, босс), вместо этого замедляется на {slow}%, если оно не невосприимчиво и к замедлению.',
   'hudChrome.auraEffect.trinket.shackle': 'Скован цепью: не может двигаться.',
-  'hudChrome.auraEffect.trinket.shackleSlow': 'Скован цепью: скорость передвижения снижена на {pct}%.',
+  'hudChrome.auraEffect.trinket.shackleSlow':
+    'Скован цепью: скорость передвижения снижена на {pct}%.',
   'entities.mobs.ossuary_sentinel.name': 'Страж оссуария',
   'entities.mobs.hollow_gravedigger.name': 'Могильщик Пустоты',
   'entities.mobs.rimeweb_hatchling.name': 'Паучок Инеистой Паутины',
@@ -20075,7 +20080,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_claw_sweep': 'Взмах клешни',
   'abilityUi.cast.bastion_shell_slam': 'Удар панцирем',
   'abilityUi.cast.bastion_oathbound_charge': 'Клятвенный натиск',
-  'abilityUi.cast.bastion_gaol_hook': 'Тюремный крюк',
   'abilityUi.cast.bastion_gaolers_cudgel': 'Дубинка тюремщика',
   'abilityUi.cast.bastion_mist_surge': 'Туманный прилив',
   'abilityUi.cast.bastion_drowning_hymn': 'Гимн утопленников',
@@ -20112,4 +20116,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_knellwyrm_strafe_run': 'Огненный заход',
   'abilityUi.cast.crypt_knellwyrm_dread_bellow': 'Жуткий рёв',
   'entities.mobs.crypt_knellwyrm.name': 'Погребальный змий',
+  // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
+  'abilityUi.cast.bastion_iron_cage': 'Железная клетка',
+  'abilityUi.cast.bastion_drowned_anchor_cast': 'Утопленный якорь',
+  'abilityUi.cast.bastion_shackle_pair': 'Парные кандалы',
+  'abilityUi.cast.bastion_shadowstep': 'Переход сквозь тень',
+  'abilityUi.cast.bastion_reaping_scythe': 'Жнущая коса',
+  'entities.mobs.bastion_gaol_cage.name': 'Железная клетка',
+  'entities.mobs.bastion_drowned_anchor.name': 'Утопленный якорь',
+  'entities.items.jailers_iron_gauntlets.name': 'Железные рукавицы тюремщика',
+  'entities.items.turnkeys_keyring_belt.name': 'Пояс со связкой ключей надзирателя',
+  'entities.items.turnkeys_lantern_cowl.name': 'Капюшон надзирателя с фонарём',
+  'hudChrome.finder.mech.iron_cage':
+    'Железная клетка (жмите клавишу взаимодействия, чтобы вырваться; союзники могут ломать прутья)',
+  'hudChrome.finder.mech.drowned_anchor':
+    'Утопленный якорь (разбейте цепь, пока жертву не утащило в яму)',
+  'hudChrome.finder.mech.shackle_pair':
+    'Парные кандалы (двое скованных игроков должны держаться вместе)',
+  'hudChrome.finder.mech.reaper_behind':
+    'Переход сквозь тень (жнец встаёт за спиной игрока, выйдите из дуги косы)',
+  'hudChrome.bastionCage.title': 'Вы заперты в железной клетке!',
+  'hudChrome.bastionCage.promptKey': 'Жмите {key} снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptNoKey':
+    'Жмите клавишу взаимодействия снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptTap': 'Нажимайте сюда снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.buttonAria': 'Вырваться из железной клетки',
+  'hudChrome.bastionCage.progressAria': 'Прогресс побега: {pct}',
 };

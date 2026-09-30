@@ -605,10 +605,16 @@ const mergeStringsEn = {
       bastion_claw_sweep: 'Claw Sweep',
       bastion_shell_slam: 'Shell Slam',
       bastion_oathbound_charge: 'Oathbound Charge',
-      bastion_gaol_hook: 'Gaol Hook',
       bastion_gaolers_cudgel: "Gaoler's Cudgel",
       bastion_mist_surge: 'Mist Surge',
       bastion_drowning_hymn: 'Drowning Hymn',
+      // The Bastion's fifth pass: the Gaol Turnkey's cage, Ossick's anchor and
+      // shackles, and Vael the reaper's crossing and scythe. None can be kicked.
+      bastion_iron_cage: 'Iron Cage',
+      bastion_drowned_anchor_cast: 'Drowned Anchor',
+      bastion_shackle_pair: 'Shackle Pair',
+      bastion_shadowstep: 'Shadow Crossing',
+      bastion_reaping_scythe: 'Reaping Scythe',
       // The Drowned Temple trash kit and boss casts (trash_kit/temple_cast_ids.ts,
       // encounters/drowned_temple/ids.ts). The Lullaby, the Call and the Coil
       // can be kicked.

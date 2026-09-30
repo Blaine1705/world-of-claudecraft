@@ -6008,8 +6008,20 @@ export const en_XA: EnTranslations = {
         "forgestorm": "[Ƒóŕĝéšţóŕɱ (ƒáļļíñĝ ɱéţéóŕ çíŕçļéš, ɱóʋé óúţ)]",
         "shared_pyre": "[Šĥáŕéð Þýŕé (ĝáţĥéŕíñĝ çíŕçļé, šþļíţ ţĥé ðáɱáĝé)]",
         "anvils_decree": "[Áñʋíļ'š Ðéçŕéé (ţĥŕéé ŕáíð-ŵíðé ĥáɱɱéŕ šţŕíķéš, ĥéáļ ţĥŕóúĝĥ)]",
-        "masters_assembly": "[Ţĥé Ɱášţéŕ'š Áššéɱƀļý (ƀļóçķ ţĥé ƒóŕĝé ƀéáɱš, ŕóţáţé ƀļóçķéŕš)]"
+        "masters_assembly": "[Ţĥé Ɱášţéŕ'š Áššéɱƀļý (ƀļóçķ ţĥé ƒóŕĝé ƀéáɱš, ŕóţáţé ƀļóçķéŕš)]",
+        "iron_cage": "[Íŕóñ Çáĝé (ɱášĥ ýóúŕ íñţéŕáçţ ķéý ţó ƀŕéáķ óúţ, áļļíéš çáñ šɱášĥ ţĥé ƀáŕš)]",
+        "drowned_anchor": "[Ðŕóŵñéð Áñçĥóŕ (ƀŕéáķ ţĥé çĥáíñ ƀéƒóŕé íţš ʋíçţíɱ íš ðŕáĝĝéð íñţó ţĥé þíţ)]",
+        "shackle_pair": "[Šĥáçķļé Þáíŕ (ţŵó çĥáíñéð þļáýéŕš ɱúšţ šţáý çļóšé ţóĝéţĥéŕ)]",
+        "reaper_behind": "[Šĥáðóŵ Çŕóššíñĝ (ĥé ŕíšéš ƀéĥíñð á þļáýéŕ, šţéþ óúţ óƒ ţĥé šçýţĥé'š áŕç)]"
       }
+    },
+    "bastionCage": {
+      "title": "[Ļóçķéð íñ ţĥé Íŕóñ Çáĝé!]",
+      "promptKey": "[Þŕéšš {key} áĝáíñ áñð áĝáíñ ţó ƀŕéáķ ƒŕéé]",
+      "promptNoKey": "[Þŕéšš ýóúŕ íñţéŕáçţ ķéý áĝáíñ áñð áĝáíñ ţó ƀŕéáķ ƒŕéé]",
+      "promptTap": "[Ţáþ ĥéŕé áĝáíñ áñð áĝáíñ ţó ƀŕéáķ ƒŕéé]",
+      "buttonAria": "[Ɓŕéáķ ƒŕéé ƒŕóɱ ţĥé Íŕóñ Çáĝé]",
+      "progressAria": "[Éšçáþé þŕóĝŕéšš: {pct}]"
     },
     "cosmetics": {
       "title": "[Çóšɱéţíçš]",
@@ -12272,10 +12284,14 @@ export const en_XA: EnTranslations = {
       "bastion_claw_sweep": "[Çļáŵ Šŵééþ]",
       "bastion_shell_slam": "[Šĥéļļ Šļáɱ]",
       "bastion_oathbound_charge": "[Óáţĥƀóúñð Çĥáŕĝé]",
-      "bastion_gaol_hook": "[Ĝáóļ Ĥóóķ]",
       "bastion_gaolers_cudgel": "[Ĝáóļéŕ'š Çúðĝéļ]",
       "bastion_mist_surge": "[Ɱíšţ Šúŕĝé]",
       "bastion_drowning_hymn": "[Ðŕóŵñíñĝ Ĥýɱñ]",
+      "bastion_iron_cage": "[Íŕóñ Çáĝé]",
+      "bastion_drowned_anchor_cast": "[Ðŕóŵñéð Áñçĥóŕ]",
+      "bastion_shackle_pair": "[Šĥáçķļé Þáíŕ]",
+      "bastion_shadowstep": "[Šĥáðóŵ Çŕóššíñĝ]",
+      "bastion_reaping_scythe": "[Ŕéáþíñĝ Šçýţĥé]",
       "temple_lullaby": "[Ļúļļáƀý]",
       "temple_call_the_tide": "[Çáļļ ţĥé Ţíðé]",
       "temple_static_coil": "[Šţáţíç Çóíļ]",
@@ -18564,6 +18580,15 @@ export const en_XA: EnTranslations = {
       "gaolyard_striders": {
         "name": "[Ĝáóļýáŕð Šţŕíðéŕš]"
       },
+      "jailers_iron_gauntlets": {
+        "name": "[Ĵáíļéŕ'š Íŕóñ Ĝáúñţļéţš]"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "[Ţúŕñķéý'š Ķéýŕíñĝ Ɓéļţ]"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "[Ţúŕñķéý'š Ļáñţéŕñ Çóŵļ]"
+      },
       "conchplate_girdle": {
         "name": "[Çóñçĥþļáţé Ĝíŕðļé]"
       },
@@ -19813,6 +19838,12 @@ export const en_XA: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "[Ĝáóļéŕ Óššíçķ]"
+      },
+      "bastion_gaol_cage": {
+        "name": "[Íŕóñ Çáĝé]"
+      },
+      "bastion_drowned_anchor": {
+        "name": "[Ðŕóŵñéð Áñçĥóŕ]"
       },
       "lagoon_snapper": {
         "name": "[Ļáĝóóñ Šñáþþéŕ]"
