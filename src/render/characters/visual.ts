@@ -3875,11 +3875,6 @@ export class CharacterVisual {
     next.play();
   }
 
-  /** Base clips that play once and CLAMP instead of looping: a sit-down
-   *  transition (which then hands off to the sit-idle loop), and the jump clip
-   *  of a rig that ships a landing one-shot, which holds its airborne pose for
-   *  as long as the body is off the ground. Rigs without a `land` clip keep
-   *  looping `jump` unchanged. */
   /** Is a `castPlayOut` clip on the rig right now (its cast loop or its play-out)? */
   private castPlayOutRunning(): boolean {
     const name = this.current?.getClip().name;
@@ -3893,6 +3888,11 @@ export class CharacterVisual {
     return this.def.flight === true;
   }
 
+  /** Base clips that play once and CLAMP instead of looping: a sit-down
+   *  transition (which then hands off to the sit-idle loop), and the jump clip
+   *  of a rig that ships a landing one-shot, which holds its airborne pose for
+   *  as long as the body is off the ground. Rigs without a `land` clip keep
+   *  looping `jump` unchanged, and a flier (VisualDef.flight) never clamps. */
   private isOnce(a: THREE.AnimationAction): boolean {
     if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
     // A flier's `jump` is its flight loop (or its perch): it never clamps.

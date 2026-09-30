@@ -23,6 +23,12 @@ export interface CreatureAnchor {
   up: number;
 }
 
+/** Creatures whose breath this module paints: the renderer skips its generic
+ *  fire cone for them (the torrent, the ground fire and the scorch replace it). */
+export function paintsOwnBreath(templateId: string): boolean {
+  return templateId === 'crypt_ossuary_drake';
+}
+
 /** Where the drake's jaws hang while it draws the fire up (the bar) and while
  *  it pours it out (the play-out), at its authored size (Breath clip, frames 44
  *  and 49 of build_bone_drake.py). */

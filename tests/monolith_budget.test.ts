@@ -998,7 +998,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12688 -> 12687 with the Hollow Crypt rework: the gate object
     // views (the Ignivar gates plus the in-dungeon gates) route through one
     // plan and builder in src/render/gate_objects.ts. wc -l. Exact count.
-    ceiling: 12687,
+    // Lowered to 12673 when the frost- and fire-cone spellfx branches were
+    // folded into one (the Hollow Crypt drake paints its own breath).
+    ceiling: 12673,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

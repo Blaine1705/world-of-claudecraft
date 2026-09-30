@@ -1124,6 +1124,11 @@ export class CryptCreatureFx {
         this.sonic(e, floor);
       }
     }
+    // Forget touchdown watches whose creature died, despawned or left view.
+    for (const [id] of this.watch) {
+      const e = world.entities.get(id);
+      if (!e || e.dead) this.watch.delete(id);
+    }
     for (const h of this.halos) {
       const who = h.owner >= 10_000_000 ? h.owner % 10_000_000 : h.owner;
       if (h.owner >= 0 && !seen.has(who)) {
