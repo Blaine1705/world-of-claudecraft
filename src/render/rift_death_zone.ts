@@ -38,6 +38,7 @@ import { HoardPulsarFx } from './hoard_pulsars';
 import { HoardSpellFx } from './hoard_spell_fx';
 import { HoardTentaclesFx } from './hoard_tentacles';
 import { CryptCreatureFx } from './hollow_crypt/crypt_creature_fx';
+import { CryptFinaleFx } from './hollow_crypt/crypt_finale_fx';
 import { CryptTrashFx } from './hollow_crypt/crypt_trash_fx';
 import {
   deathZonePlan,
@@ -102,6 +103,8 @@ export class RiftDeathZoneVisuals {
   // The Drowned Temple's trash and boss telegraphs, and the Mere Hydra's body.
   private readonly templeFx: TempleFx;
   private readonly cryptCreatures: CryptCreatureFx;
+  // The Hollow Crypt finale: Morthen's entrance and the Knellwyrm.
+  private readonly cryptFinale: CryptFinaleFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -157,6 +160,7 @@ export class RiftDeathZoneVisuals {
       reducedMotion,
       shake,
     );
+    this.cryptFinale = new CryptFinaleFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.hoardGoblinCoins = new HoardGoblinCoinsFx(
       scene,
       groundY,
@@ -231,6 +235,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx.update(dt);
     this.templeFx.update(dt);
     this.cryptCreatures.update(dt);
+    this.cryptFinale.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -265,6 +270,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx.dispose();
     this.templeFx.dispose();
     this.cryptCreatures.dispose();
+    this.cryptFinale.dispose();
     this.hoardPresentation.dispose();
   }
 
@@ -274,6 +280,7 @@ export class RiftDeathZoneVisuals {
     this.hoardPresentation.handleEvent(event);
     this.cryptTrash.handleEvent(event);
     this.cryptCreatures.handleEvent(event);
+    this.cryptFinale.handleEvent(event);
     this.templeFx.handleEvent(event);
     return this.bastionFx.handleEvent(event);
   }

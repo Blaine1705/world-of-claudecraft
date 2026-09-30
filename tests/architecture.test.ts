@@ -796,6 +796,8 @@ const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
   'src/render/far_lod_latch_core.ts',
+  // The Hollow Crypt finale's effect plan (Morthen's entrance, the Knellwyrm).
+  'src/render/hollow_crypt/crypt_finale_fx_core.ts',
   // The authored open-air field's terrain plan and the Hollow Crypt's dressing,
   // set-dressing and gate-memory cores (docs/design/dungeon-rework).
   'src/render/authored_field/field_mesh_core.ts',

@@ -33,6 +33,13 @@ export const MORTHEN_DESCEND = 'crypt_morthen_descend';
 /** Concealed under the ring (Morthen before the group arrives, the Knellwyrm
  *  before it arrives): the client builds no view for the entity. */
 export const CRYPT_ENTOMBED = 'crypt_entombed';
+/** Is this entity concealed by an encounter (entombed under the ring, or not
+ *  yet arrived)? Clients build no view for it: no body, plate or click. */
+export function isEntombed(e: { auras?: readonly { id: string }[] }): boolean {
+  if (!e.auras) return false;
+  for (const a of e.auras) if (a.id === CRYPT_ENTOMBED) return true;
+  return false;
+}
 /** Held by the rite through the entrance: untouchable (a cinematic, not a fight). */
 export const CRYPT_GRAVE_ASCENSION = 'crypt_grave_ascension';
 /** The Knellwyrm's ribs bared after Dread Bellow: it takes more damage. */
