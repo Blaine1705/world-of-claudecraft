@@ -11,122 +11,222 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "es_ES": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "fr_FR": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "fr_CA": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "de_DE": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "zh_CN": [
-    "hudChrome.graphicsRestore.note"
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "zh_TW": [
-    "hudChrome.graphicsRestore.note"
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "ko_KR": [
-    "hudChrome.graphicsRestore.note"
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "ja_JP": [
-    "hudChrome.graphicsRestore.note"
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "pt_BR": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "ru_RU": [
-    "hudChrome.graphicsRestore.note"
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.graphicsRestore.note",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "cs_CZ": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "nl_NL": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "pl_PL": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "id_ID": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "tr_TR": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "sv_SE": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "vi_VN": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ],
   "da_DK": [
     "entities.items.pvp_trophy_skull.name",
+    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine"
   ]

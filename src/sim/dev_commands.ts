@@ -55,6 +55,7 @@ import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleg
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL, type RiftTier } from './types';
 import { setupVarkhulDevRaid } from './varkhul_dev_raid';
+import { recordWeeklyPvpWin } from './weekly_rewards';
 import {
   worldQuestCycleOfferingQuest,
   worldQuestPuzzleVariantForCycle,
@@ -374,7 +375,7 @@ export function handleDevChat(
       return null;
     }
     if (cmd.kind === 'rise' || cmd.kind === 'end') {
-      const hill = cmd.kind === 'rise' ? riseHillNow(ctx) : endHillNow(ctx);
+      const hill = cmd.kind === 'rise' ? riseHillNow(ctx) : endHillNow(ctx, recordWeeklyPvpWin);
       emitDevLog(
         ctx,
         pid,
@@ -386,7 +387,7 @@ export function handleDevChat(
     }
     const hill =
       cmd.kind === 'next'
-        ? warnNextHillNow(ctx)
+        ? warnNextHillNow(ctx, recordWeeklyPvpWin)
         : spawnHillNow(ctx, cmd.zoneId, {
             warn: cmd.kind === 'warn',
             warningSeconds: cmd.kind === 'warn' ? cmd.seconds : undefined,
