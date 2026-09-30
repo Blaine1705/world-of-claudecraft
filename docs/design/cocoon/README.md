@@ -33,9 +33,11 @@ node scripts/build_media_manifest.mjs generate
 
 `cocoonCount(living, double)`: none alone (the brood cocoon instead); otherwise
 ONE, held to `maxShare` of the party (MAX_COCOON_PERCENT_OF_GROUP) and always
-leaving `minFreePlayers` (MIN_FREE_PLAYERS). At
-`HOARD_DOUBLE_MECHANIC_INTENSITY` it may be TWO, on the double's own terms
-(`doubleMaxShare`, `doubleMinFreePlayers`): a double always leaves at least as
+leaving `minFreePlayers` (MIN_FREE_PLAYERS). On a legendary map
+(`doubleRarity`) at `HOARD_DOUBLE_MECHANIC_INTENSITY` it may be TWO
+(`cocoonDoubles`); a full epic party reaches that intensity too but still gets
+one, since two wrapped at once was the epic hoard's wall. The double keeps its
+own terms (`doubleMaxShare`, `doubleMinFreePlayers`): a double always leaves at least as
 many free as it wraps, and a party too small for it gets one. Pinned for every
 party size.
 
