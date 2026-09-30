@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -26,6 +29,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "es_ES": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -42,6 +48,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "fr_FR": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -58,6 +67,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "fr_CA": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -75,6 +87,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -91,6 +106,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "de_DE": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -139,6 +157,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "pt_BR": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -163,6 +184,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "cs_CZ": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -179,6 +203,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "nl_NL": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -195,6 +222,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "pl_PL": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -211,6 +241,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "id_ID": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -227,6 +260,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "tr_TR": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -243,6 +279,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "sv_SE": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -259,6 +298,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "vi_VN": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -275,6 +317,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.spoilsLine"
   ],
   "da_DK": [
+    "entities.abilities.scratch.description",
+    "entities.abilities.scratch.name",
+    "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
