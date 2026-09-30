@@ -478,3 +478,38 @@ describe('Ossuary Drake: the Barrowflame reads as fire, never ice', () => {
     expect(b).toBeLessThan(r);
   });
 });
+
+describe('the Knellwyrm: its own body and its own moves', () => {
+  it('ships the drake set plus TakeWing, Strafe and Bellow, mapped to its mechanics', () => {
+    const buf = readFileSync('public/models/creatures/crypt_knellwyrm.glb');
+    const len = buf.readUInt32LE(12);
+    const json = JSON.parse(buf.subarray(20, 20 + len).toString('utf8')) as {
+      animations?: { name: string }[];
+    };
+    const names = (json.animations ?? []).map((a) => a.name);
+    expect(names).toEqual(
+      expect.arrayContaining([
+        'Idle',
+        'Fly',
+        'Glide',
+        'Land',
+        'Breath',
+        'TailSweep',
+        'WingBuffet',
+        'Death',
+        'TakeWing',
+        'Strafe',
+        'Bellow',
+      ]),
+    );
+    const v = VISUALS[visualKeyFor({ kind: 'mob', templateId: 'crypt_knellwyrm' } as never)];
+    expect(v.clips.castByAbility?.crypt_knellwyrm_pyre_strafe).toBe('TakeWing');
+    expect(v.clips.castByAbility?.crypt_knellwyrm_strafe_run).toBe('Strafe');
+    expect(v.clips.castByAbility?.crypt_knellwyrm_dread_bellow).toBe('Bellow');
+    expect(v.clips.castByAbility?.crypt_barrowflame_breath).toBe('Breath');
+    // Bigger than the drake as it stands in game.
+    const wyrm = v.height * MOBS.crypt_knellwyrm.scale;
+    const drake = VISUALS.mob_crypt_drake.height * MOBS.crypt_ossuary_drake.scale;
+    expect(wyrm).toBeGreaterThan(drake * 1.2);
+  });
+});

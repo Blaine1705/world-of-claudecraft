@@ -16,6 +16,15 @@ import {
   YSOLEI_UNDERTOW,
 } from '../../sim/encounters/drowned_temple/ids';
 import {
+  KNELLWYRM_ARRIVE,
+  KNELLWYRM_DREAD_BELLOW,
+  KNELLWYRM_PYRE_STRAFE,
+  KNELLWYRM_STRAFE_RUN,
+  MORTHEN_DESCEND,
+  MORTHEN_PROCLAIM,
+  MORTHEN_RISE,
+} from '../../sim/encounters/hollow_crypt/ids';
+import {
   OLEN_OATHBOUND_CHARGE,
   OSSICK_CUDGEL,
   OSSICK_GAOL_HOOK,
@@ -3773,10 +3782,21 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.3,
   },
+  // Morthen. His entrance at the Rite Ring (encounters/hollow_crypt) rides his
+  // cast bar: arms raised as he rises out of the floor and comes down, the
+  // taunt as he speaks over the ring.
   crypt_skel_gravecaller: {
     url: `${ENEMIES}/skeleton_mage.glb`,
     height: 3.6,
-    clips: { ...skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'), attack: ['SkelBoss_Attack'] },
+    clips: {
+      ...skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'),
+      attack: ['SkelBoss_Attack'],
+      castByAbility: {
+        [MORTHEN_RISE]: 'Spellcast_Raise',
+        [MORTHEN_PROCLAIM]: 'Taunt',
+        [MORTHEN_DESCEND]: 'Spellcast_Raise',
+      },
+    },
     animUrls: [
       `${ENEMIES}/skeleton_mage_hit_variety_anims.glb`,
       `${ENEMIES}/skelboss_ability_anims.glb`,
@@ -3896,6 +3916,53 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     castPlayOutHoldsAttacks: true,
     selfIllumination: 0.12,
+  },
+
+  // The Knellwyrm (scripts/assets/hollow_crypt_creatures/build_knellwyrm.py):
+  // the Ossuary Drake's charred kin, built on its skeleton and rig, with ghost
+  // fire burning through its skull, ribs, spine and tail and a crown of horns.
+  // Authored at the drake's size; its template raises it a quarter again. It
+  // glides in from the sky (the arrival bar), takes wing for its Pyre Strafe,
+  // flies the lane with its neck plunged and jaws wide, and rears up with its
+  // wings flung wide for Dread Bellow; the drake's strikes play to their bars.
+  mob_crypt_knellwyrm: {
+    url: `${CREATURES}/crypt_knellwyrm.glb`,
+    height: 15.07,
+    hover: -0.19,
+    flight: true,
+    clips: {
+      idle: 'Idle',
+      idleBeat: { clip: 'Roar', everySec: 14, jitterSec: 4 },
+      walk: 'Walk',
+      run: 'Run',
+      jump: 'Fly',
+      fall: 'Glide',
+      land: 'Land',
+      attack: ['Bite', 'Bite2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Roar',
+      castByAbility: {
+        [CRYPT_BARROWFLAME_BREATH]: 'Breath',
+        [CRYPT_TAIL_LASH]: 'TailSweep',
+        [CRYPT_WING_GUST]: 'WingBuffet',
+        [KNELLWYRM_ARRIVE]: 'Glide',
+        [KNELLWYRM_PYRE_STRAFE]: 'TakeWing',
+        [KNELLWYRM_STRAFE_RUN]: 'Strafe',
+        [KNELLWYRM_DREAD_BELLOW]: 'Bellow',
+      },
+      castTimeScaleByAbility: {
+        [CRYPT_BARROWFLAME_BREATH]: 1,
+        [CRYPT_TAIL_LASH]: 1,
+        [CRYPT_WING_GUST]: 1,
+        [KNELLWYRM_PYRE_STRAFE]: 1,
+        [KNELLWYRM_DREAD_BELLOW]: 1,
+      },
+      castPlayOut: ['Breath', 'TailSweep', 'WingBuffet', 'Bellow'],
+      flourish: 'Roar',
+    },
+    castPlayOutHoldsAttacks: true,
+    selfIllumination: 0.2,
   },
 
   // -- the Sunken Bastion trash (sim/content/sunken_bastion.ts) ------------------
@@ -5362,6 +5429,7 @@ const MOB_KEYS: Record<string, string> = {
   crypt_crow_caller: 'mob_crypt_crow_caller',
   crypt_carrion_crow: 'mob_crypt_crow',
   crypt_ossuary_drake: 'mob_crypt_drake',
+  crypt_knellwyrm: 'mob_crypt_knellwyrm',
   // The Sunken Bastion trash (sim/content/sunken_bastion.ts).
   drowned_watchman: 'bastion_skel_watchman',
   fogbound_arbalest: 'bastion_skel_arbalest',

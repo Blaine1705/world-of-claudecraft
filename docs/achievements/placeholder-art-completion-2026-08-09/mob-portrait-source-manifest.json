@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "4d0c4dd6f0abea884d82fb1c9a231873728e8ae3fa677241074a06af4ec33dae",
+  "rendererFingerprint": "b730c81e1aee86f1269e68de65cb17c33cc177011e9a65538c5e1431dbda41bc",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5364135,
-      "sha256": "dd35aa3ce70937b78a1f89dae396bd4758c7550e5e2a725395919970f35c6ea5",
+      "bytes": 5366676,
+      "sha256": "8a9f88fd7b1736e89f7344dce988873f4d28b228602421ce5af27a29f22b3123",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 320,
+  "portraitCount": 321,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -1370,6 +1370,40 @@
         "path": "public/ui/mobs/crypt_gravecaller_necromancer.webp",
         "bytes": 2676,
         "sha256": "3fe533bb521ca8885ed8ebb323f74eb3d65417945516a24c5ef08325d6140906"
+      }
+    },
+    {
+      "id": "crypt_knellwyrm",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_knellwyrm",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_knellwyrm.glb",
+          "path": "public/models/creatures/crypt_knellwyrm.glb",
+          "bytes": 1924772,
+          "sha256": "a344ae74b5f2541f93600c7cec6dd17703d9d2170e3f40c8fff7b099c7550c8d"
+        },
+        "idle": "Idle",
+        "height": 15.07,
+        "yaw": null,
+        "hover": -0.19,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "5330c3b195951ce3054db93e335604e86906e415e4cb05f3e18e1969f07f7b0a",
+      "output": {
+        "path": "public/ui/mobs/crypt_knellwyrm.webp",
+        "bytes": 2376,
+        "sha256": "be8b476fa944cca75e63661a0bac902106f9ca4fc297ee668aab02dd75a56227"
       }
     },
     {

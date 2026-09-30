@@ -465,7 +465,7 @@ def build_parts():
 
 
 # -------------------------------------------------------------------- clips
-def make_clips(arm):
+def make_clips(arm, extend=None):
     rig = Rig(BONES).attach(arm)
     P = rig.pose
 
@@ -674,6 +674,11 @@ def make_clips(arm):
     dead_pose['Root'] = dead['Root']
     dead_pose['__root'] = dead['__root']
     add('Death', [(1, stand(0, 0)), (10, dying), (26, slump), (40, dead_pose), (52, dead_pose)], loop_clip=False)
+    if extend is not None:
+        # A variant (build_knellwyrm.py) authors its own clips with the same
+        # pose helpers; the drake itself passes nothing and is unchanged.
+        extend({'add': add, 'P': P, 'stand': stand, 'flight': flight, 'roar': roar,
+                'exhale': exhale, 'buffet': buffet})
     return clips
 
 

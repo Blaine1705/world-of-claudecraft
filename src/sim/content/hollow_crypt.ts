@@ -393,7 +393,8 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
       { itemId: 'bone_fragments', chance: 1 },
       { itemId: 'arcane_essence', chance: 0.5 },
     ],
-    scale: 1.0,
+    // A quarter again over the Ossuary Drake: its head rides some 12 yd up.
+    scale: 1.25,
     color: 0x3b3a34,
   },
 };
