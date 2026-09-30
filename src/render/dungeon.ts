@@ -63,6 +63,7 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
+import { buildDrownedTempleInterior } from './drowned_temple';
 import {
   type PendingArenaWall,
   type PendingArenaWalls,
@@ -654,7 +655,12 @@ export class DungeonInteriors {
     await ensureDungeonAssets();
     await ensureIgnivarRaidDressingAssets(interior);
     await ensureIgnivarTileAssets(interior, loadModuleAsset);
-    if (interior === 'wildheart' || interior === 'hollow_crypt' || interior === 'sunken_bastion') {
+    if (
+      interior === 'wildheart' ||
+      interior === 'hollow_crypt' ||
+      interior === 'sunken_bastion' ||
+      interior === 'drowned_temple'
+    ) {
       // Open-air fields: their own builders, same deps and compile gate.
       const deps = { lowGfx: this.lowGfx, flames: this.flames, fireLights: this.fireLights };
       const group =
@@ -662,7 +668,9 @@ export class DungeonInteriors {
           ? buildWildheartFieldInterior(deps)
           : interior === 'hollow_crypt'
             ? await buildHollowCryptInterior(deps, ox, oz)
-            : await buildSunkenBastionInterior(deps, ox, oz);
+            : interior === 'sunken_bastion'
+              ? await buildSunkenBastionInterior(deps, ox, oz)
+              : await buildDrownedTempleInterior(deps, ox, oz);
       group.position.set(ox, 0, oz);
       group.userData.renderCategory = 'dungeon';
       await attachSceneGroupGated(this.scene, group, this.compileGate);

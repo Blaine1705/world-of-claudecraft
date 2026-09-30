@@ -18,6 +18,8 @@ import type { FogSceneState } from './interior_light_rig';
 export const HOLLOW_CRYPT_FOG_COLOR = 0x1c2238;
 /** The Sunken Bastion's storm-tide sea fog (its sky dome fades to it at the horizon). */
 export const SUNKEN_BASTION_FOG_COLOR = 0x4d5a57;
+/** The Drowned Temple's violet night haze (its sky dome fades to it at the horizon). */
+export const DROWNED_TEMPLE_FOG_COLOR = 0x252a4c;
 
 export interface FogSceneResolution {
   /** The named dungeon interior the player stands in (null/undefined in the
@@ -59,6 +61,8 @@ export function resolveFogScene(
   const inHollowCrypt = interior === 'hollow_crypt';
   // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
   const inSunkenBastion = interior === 'sunken_bastion';
+  // The Drowned Temple: open-air at night over its lagoon, under its own sky.
+  const inDrownedTemple = interior === 'drowned_temple';
   const inLastKeep = interior === 'lastkeep';
   const inDawnhold = interior === 'dawnhold';
   const desired: FogSceneState = inDelve
@@ -79,15 +83,17 @@ export function resolveFogScene(
                   ? 'hollowCrypt'
                   : inSunkenBastion
                     ? 'sunkenBastion'
-                    : inLastKeep
-                      ? 'lastkeep'
-                      : inDawnhold
-                        ? 'dawnhold'
-                        : inside
-                          ? 'dungeon'
-                          : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                            ? 'underwater'
-                            : 'outdoor';
+                    : inDrownedTemple
+                      ? 'drownedTemple'
+                      : inLastKeep
+                        ? 'lastkeep'
+                        : inDawnhold
+                          ? 'dawnhold'
+                          : inside
+                            ? 'dungeon'
+                            : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                              ? 'underwater'
+                              : 'outdoor';
   return { interior, desired };
 }
 
@@ -143,6 +149,13 @@ export function applyFogScenePreset(
     fog.color.setHex(SUNKEN_BASTION_FOG_COLOR);
     fog.near = 70;
     fog.far = 640;
+  } else if (desired === 'drownedTemple') {
+    // A thin violet night haze over the lagoon, pushed far back so the Moon
+    // Altar's column and the far rim's falls read from the Moongate Landing
+    // (440 yd), while the crater wall fades into the night.
+    fog.color.setHex(DROWNED_TEMPLE_FOG_COLOR);
+    fog.near = 140;
+    fog.far = 1050;
   } else if (desired === 'lastkeep') {
     // The Last Keep: a warm hearth-lit haze pushed well back, so its
     // grand three-story halls read golden and inhabited instead of

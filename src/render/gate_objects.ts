@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../sim/data';
+import { TEMPLE_OBJECT_TEMPLATES } from '../sim/encounters/drowned_temple/ids';
 import { BASTION_OBJECT_TEMPLATES } from '../sim/encounters/sunken_bastion/ids';
 import { dungeonGateAt, dungeonGateStateOf } from '../sim/instances/dungeon_gates';
 import { sharedUniforms } from './gfx';
@@ -50,6 +51,7 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
   const raid = ignivarRaidGatePlan(e.templateId, e.dungeonId);
   if (raid) return raid;
   if (BASTION_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 4 };
+  if (TEMPLE_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   if (dungeonGateStateOf(e.templateId) === null || !e.dungeonId) return null;
   const def = DUNGEONS[e.dungeonId];
   if (!def) return null;
