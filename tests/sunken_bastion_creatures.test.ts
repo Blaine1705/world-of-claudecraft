@@ -126,6 +126,10 @@ describe('the Sunken Bastion creature roster', () => {
     expect(def.show ?? []).toEqual([]);
     expect(def.tint).toBeUndefined();
     expect(def.clips.attackByAbility?.[BASTION_OPEN_CELLS_GESTURE]).toBe('LanternRaise');
+    // The organic-kit body (baked skin and leather, rusted iron) at a boss's
+    // stature: over three players tall as drawn.
+    expect(def.authoredAtlas).toBe(true);
+    expect((def.height * MOBS.gaol_turnkey.scale) / 2.6).toBeGreaterThanOrEqual(3);
   });
 
   it('carries a real crossbow drill on the arbalest', () => {

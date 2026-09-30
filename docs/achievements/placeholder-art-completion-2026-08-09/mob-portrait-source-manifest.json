@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "f41b315e62d8f45a23b2cd67cc2ef93db66faf7810259b97578b27e0051e4365",
+  "rendererFingerprint": "685cd90cd111ae8dbd93ed2eec6c4295516fee352290fbc70e9709065307895d",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5370429,
-      "sha256": "10b44dbffd36153944ab6c030610ebbc214626e18578e0f57d9c8b52b28a719a",
+      "sha256": "f6dcd191dd120659575d9d871ff5c1ffd71b1eca802d27cb0b7d99c57e8fd06f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3085,11 +3085,11 @@
         "model": {
           "url": "models/creatures/gaol_turnkey.glb",
           "path": "public/models/creatures/gaol_turnkey.glb",
-          "bytes": 1543216,
-          "sha256": "38ca5d0684b69de3ba8df4a9bfeadb446118b1a10e2ff4a28f6fe80020ba346e"
+          "bytes": 1091716,
+          "sha256": "fadc5bfdaea6adb79c56e3adca87fbd9b73676741b9305b8e40173765267b4a7"
         },
         "idle": "Idle",
-        "height": 6,
+        "height": 6.4,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -3103,11 +3103,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "96df0a2cd3d25b6bfb0b84ebf2a4253cd2e9e699df4764b2aad0bd3ac213e743",
+      "sourceFingerprint": "d8109a521985dd2d087129ba8a18f459a791f9bc66beef883509c37ae10e704d",
       "output": {
         "path": "public/ui/mobs/gaol_turnkey.webp",
-        "bytes": 2442,
-        "sha256": "2628d1e386eaf125638b23c7d590ffb7f85b5e3bbad953960faaf208a1283f16"
+        "bytes": 2226,
+        "sha256": "d30571d09df755d7349e9c77b33867806402baad0ef69930a24a50fa63f89f3c"
       }
     },
     {

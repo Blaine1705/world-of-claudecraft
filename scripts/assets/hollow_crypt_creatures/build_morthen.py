@@ -793,7 +793,8 @@ class RollRig(Rig):
         return out
 
 
-def key_pose(arm, pose, frame):
+def key_pose(arm, pose, frame, flicker=None):
+    flicker = FLICKER if flicker is None else flicker
     scales = pose.get('__scale', {})
     for pb in arm.pose.bones:
         pb.rotation_mode = 'QUATERNION'
@@ -809,7 +810,7 @@ def key_pose(arm, pose, frame):
     for pb in arm.pose.bones:
         pb.keyframe_insert('rotation_quaternion', frame=frame)
         pb.keyframe_insert('location', frame=frame)
-        if pb.name not in FLICKER:
+        if pb.name not in flicker:
             pb.keyframe_insert('scale', frame=frame)
 
 
@@ -818,7 +819,7 @@ def _hash(i, j):
     return x - math.floor(x)
 
 
-def clip(arm, name, keys, loop_clip=True, fire=None):
+def clip(arm, name, keys, loop_clip=True, fire=None, flicker=None):
     """keys: [(frame, pose)]; `fire` [(frame, level)] drives the flames' and the
     soul fire's flicker size (1 = burning as at rest, 0 = snuffed)."""
     import bpy
@@ -827,8 +828,9 @@ def clip(arm, name, keys, loop_clip=True, fire=None):
     act.use_fake_user = True
     arm.animation_data_create()
     arm.animation_data.action = act
+    bones = FLAMES + ['SoulFire'] if flicker is None else list(flicker)
     for frame, pose in keys:
-        key_pose(arm, pose, frame)
+        key_pose(arm, pose, frame, set(bones))
     for fc in _fcurves(act):
         for kp in fc.keyframe_points:
             kp.interpolation = 'BEZIER'
@@ -850,7 +852,7 @@ def clip(arm, name, keys, loop_clip=True, fire=None):
         lv = level(f)
         last = f + 2 > end
         ff = start if (loop_clip and last) else f
-        for bi, bname in enumerate(FLAMES + ['SoulFire']):
+        for bi, bname in enumerate(bones):
             pb = arm.pose.bones[bname]
             j = _hash(seed + bi * 7, ff)
             k = _hash(seed + bi * 13 + 3, ff)
@@ -862,10 +864,10 @@ def clip(arm, name, keys, loop_clip=True, fire=None):
                 pb.scale = (s * (0.9 + 0.15 * k), s * (0.9 + 0.15 * k), s * (0.85 + 0.45 * j))
             pb.keyframe_insert('scale', frame=f)
         if last and f != end:
-            for bname in FLAMES + ['SoulFire']:
+            for bname in bones:
                 arm.pose.bones[bname].keyframe_insert('scale', frame=end)
     for fc in _fcurves(act):
-        if '"Flame' in fc.data_path or '"SoulFire"' in fc.data_path:
+        if any(f'"{b}"' in fc.data_path for b in bones):
             if fc.data_path.endswith('scale'):
                 for kp in fc.keyframe_points:
                     kp.interpolation = 'LINEAR'

@@ -4245,17 +4245,19 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Cast',
     },
   },
-  // The Gaol Turnkey (scripts/assets/sunken_bastion_creatures/turnkey.py):
-  // its own bloated drowned jailer, no player body. It flails its great ring
-  // of keys overhead (KeySwing) and lashes the key chain flat across its
-  // front (ChainLash); opening the cells it hoists its lantern and rattles
-  // the keys (LanternRaise, played from the lantern flare in
+  // The Gaol Turnkey (scripts/assets/sunken_bastion_creatures/turnkey.py): a
+  // bloated, waterlogged jailer on the organic kit (baked drowned skin and
+  // leather, rusted iron, barnacles and weed, an iron collar and its broken
+  // chain), no player body. It flails its great ring of keys overhead
+  // (KeySwing) and lashes the key chain flat across its front (ChainLash);
+  // opening the cells it hoists its lantern and rattles the keys
+  // (LanternRaise, played from the lantern flare in
   // sunken_bastion/bastion_creature_fx.ts).
   bastion_turnkey: {
     url: `${CREATURES}/gaol_turnkey.glb`,
-    // The gaol's miniboss: drawn at a boss's size (about 7.8 at its 1.3),
-    // Ossick's own stature, three players tall.
-    height: 6.0,
+    // The gaol's miniboss: drawn at a boss's size (about 8.3 at its 1.3),
+    // over three players tall.
+    height: 6.4,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4267,8 +4269,10 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
     },
+    authoredAtlas: true,
     selfIllumination: 0.05,
-  }, // The Turnkey's Iron Cage and Ossick's Drowned Anchor (scripts/assets/
+  },
+  // The Turnkey's Iron Cage and Ossick's Drowned Anchor (scripts/assets/
   // sunken_bastion_creatures/gaol_props.py): hittable encounter bodies. The
   // cage drops onto its prisoner (the sim lowers it through pos.y) with its
   // snapped chain swinging; both rattle when struck. Authored at size.

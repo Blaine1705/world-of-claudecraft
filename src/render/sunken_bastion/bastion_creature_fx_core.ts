@@ -32,10 +32,12 @@ export const ARBALEST_RAW_HEIGHT = 3.14;
  *  crossbow level at the right cheek, the bolt tip past the prod). */
 export const ARBALEST_MUZZLE: ModelPoint = { side: -0.3, up: 1.97, fwd: 2.2 };
 
-/** The Turnkey GLB's rest bounding height (model units). */
-export const TURNKEY_RAW_HEIGHT = 3.14;
-/** The lantern held high over its head at the top of LanternRaise. */
-export const TURNKEY_LANTERN_HIGH: ModelPoint = { side: 1.05, up: 2.8, fwd: 0.35 };
+/** The Turnkey GLB's idle bounding height (model units; turnkey.py prints it
+ *  as IDLE_HEIGHT). */
+export const TURNKEY_RAW_HEIGHT = 5.78;
+/** The lantern held high over its head at the top of LanternRaise (turnkey.py
+ *  prints it as LANTERN_HIGH, measured over the body's lowest point). */
+export const TURNKEY_LANTERN_HIGH: ModelPoint = { side: 1.2, up: 5.45, fwd: 0.83 };
 /** The lantern flares as it reaches the top of the raise (frame 9 of 24 fps). */
 export const LANTERN_FLARE_DELAY = 0.36;
 export const LANTERN_FLARE_SEC = 1.1;

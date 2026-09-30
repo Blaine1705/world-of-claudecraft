@@ -2,17 +2,16 @@
 
   blender -b --factory-startup --python build_creature.py -- turretback <out.glb> [--preview out.png] [--blend out.blend]
 
-The creatures (src/render/characters/manifest.ts VISUALS rows):
+The creatures (src/render/characters/manifest.ts VISUALS rows; the Gaol Turnkey
+has its own organic-kit builder, turnkey.py, run like reaper.py):
   crawler     The Barnacle Crawler (crawler.py): a barnacled rock crab with a face.
   hound       The Bastion Warhound (hound.py): a shark-headed sea hound.
   hag         The Mist Chanter (hag.py): a hunched sea hag with a lure staff.
   drowned_<revenant|watchman|arbalest|sergeant|prisoner>
               The drowned garrison (drowned.py): one rig, five gear sets.
-  turnkey     The Gaol Turnkey (turnkey.py): a bloated drowned jailer with a ring
-              of keys, a storm lantern and dangling shackles, on its own rig.
 The sea creatures are smooth-bodied (sea_kit.py); ship each to
 public/models/creatures/ (bastion_crawler, bastion_warhound, mist_chanter,
-drowned_<variant>.glb, gaol_turnkey.glb), then `node scripts/build_media_manifest.mjs generate`.
+drowned_<variant>.glb), then `node scripts/build_media_manifest.mjs generate`.
   turretback  The Turretback Hermit: a colossal hermit crab that took a fallen
               watchtower turret for its shell, the tower (crenels, a broken
               banner, barnacles, a gull's nest) swaying on its back; one huge
@@ -312,7 +311,6 @@ SEA_MODULES = {
     'drowned_arbalest': 'drowned:arbalest',
     'drowned_sergeant': 'drowned:sergeant',
     'drowned_prisoner': 'drowned:prisoner',
-    'turnkey': 'turnkey',
 }
 
 if __name__ == '__main__':
