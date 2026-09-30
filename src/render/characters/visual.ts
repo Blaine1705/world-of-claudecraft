@@ -86,7 +86,7 @@ import { buildHalo } from './halo';
 import { HarvestRecoil } from './harvest_recoil';
 import { disposeHeldPropIdles, updateHeldPropIdles } from './held_prop_idle';
 import { noteLookAttached } from './look_pieces';
-import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import type { ClipMap, EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
 import type { ModularAppearance, ModularLook } from './modular';
 import {
@@ -1776,6 +1776,11 @@ export class CharacterVisual {
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
+    const phase = abilityId ? this.def.phaseClips?.[abilityId] : undefined;
+    if (phase) {
+      this.enterClipPhase(phase);
+      return;
+    }
     if (!abilityId && this.def.castPlayOutHoldsAttacks && this.castPlayOutRunning()) return;
     if ((abilityId === 'charge' || abilityId === 'intervene') && this.action(this.def.clips.rush)) {
       this.warriorBody.beginRush(abilityId);
@@ -1837,6 +1842,20 @@ export class CharacterVisual {
     const name = clips[this.attackIdx++ % clips.length];
     this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
     this.currentOneShotIsAttack = true;
+  }
+
+  /** A boss stance gesture (VisualDef.phaseClips): the rig's whole ClipMap
+   *  swaps in place, and the stance's `enter` one-shot plays when it names
+   *  one; every later base fade reads the new vocabulary. Idempotent. */
+  private enterClipPhase(phase: { clips: ClipMap; enter?: string }): void {
+    if (this.def.clips === phase.clips) return;
+    this.def = { ...this.def, clips: phase.clips };
+    if (phase.enter && this.action(phase.enter)) {
+      this.playOneShot(phase.enter, 1);
+      this.currentOneShotIsAttack = true;
+    } else if (!this.currentIsOneShot) {
+      this.fadeTo(this.baseAction(), FADE, false);
+    }
   }
 
   /** Bladed Gyre is instant, so it uses one short body spin instead of the
@@ -4144,7 +4163,16 @@ export class CharacterVisual {
 }
 
 function clipNamesOf(def: VisualDef): string[] {
-  const c = def.clips;
+  // A stance's vocabulary (phaseClips) must be bound too, or its clips never
+  // get an action and the swap plays nothing.
+  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
+    ...clipMapNames(p.clips),
+    ...(p.enter ? [p.enter] : []),
+  ]);
+  return [...clipMapNames(def.clips), ...phases];
+}
+
+function clipMapNames(c: ClipMap): string[] {
   return [
     c.idle,
     c.combatIdle,

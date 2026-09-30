@@ -182,6 +182,16 @@ function requiredClipNames(clips: ClipMap): string[] {
   ].filter((name): name is string => !!name);
 }
 
+/** Every clip a rig can name: its own ClipMap plus each boss stance it can
+ *  swap to (VisualDef.phaseClips) and that stance's entry one-shot. */
+function allRequiredClipNames(def: VisualDef): string[] {
+  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
+    ...requiredClipNames(p.clips),
+    ...(p.enter ? [p.enter] : []),
+  ]);
+  return [...requiredClipNames(def.clips), ...phases];
+}
+
 /** Emote specs are a fallback CHAIN (firstLoadedEmoteClip), so one is enough. */
 function emoteChains(clips: ClipMap): [string, readonly string[]][] {
   return Object.entries(clips.emote ?? {}).map(([id, spec]) => [id, spec.clips]);
@@ -312,7 +322,7 @@ describe('character ClipMaps match the shipped GLBs', () => {
       const missing: string[] = [];
       for (const [key, def] of rigs) {
         const loaded = loadedClipNames(def, standardMaterials, key);
-        for (const name of new Set(requiredClipNames(def.clips))) {
+        for (const name of new Set(allRequiredClipNames(def))) {
           if (name === SENTINEL_CLIP_NAME) continue;
           if (!loaded.has(name)) missing.push(`${key}: ${name}`);
         }
@@ -335,7 +345,7 @@ describe('character ClipMaps match the shipped GLBs', () => {
         const bodyUrl = visualAssetUrlForGraphics(def.url, standardMaterials);
         const rigNodes = nodeNamesOf(bodyUrl);
         const referenced = new Set([
-          ...requiredClipNames(def.clips),
+          ...allRequiredClipNames(def),
           ...emoteChains(def.clips).flatMap(([, chain]) => chain),
         ]);
         const sources = [

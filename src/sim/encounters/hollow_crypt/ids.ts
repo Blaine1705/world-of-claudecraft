@@ -101,6 +101,12 @@ export const MORTHEN_RISE_TUNING = {
   engageRange: 60,
 } as const;
 
+/** Morthen's Last Rites (hollow_crypt.md 5.4, phase 3) begin at this fraction
+ *  of his health. Today it only drives the presentation (the bell staff unfolds
+ *  into his scythe: src/render/hollow_crypt/morthen_fx_core.ts); the phase's
+ *  mechanics are still to be designed and will key on the same line. */
+export const MORTHEN_LAST_RITES_FRACTION = 0.35;
+
 /** Total seconds from the rite waking to the fight. */
 export const MORTHEN_ENTRANCE_SECONDS =
   MORTHEN_RISE_TUNING.wakeSeconds +

@@ -46,3 +46,23 @@ clip beside a player-sized reference; `sheet.mjs` lays them out as one animation
 sheet. The effects that ride these clips (the breath torrent, the shockwaves) live
 in `src/render/hollow_crypt/crypt_creature_fx.ts`, anchored on the jaw and head
 positions measured off these clips (`crypt_creature_fx_core.ts`).
+
+## Morthen, the Lich Bishop
+
+`build_morthen.py` builds the crypt's last boss on the organic kit: layered
+vestments over a floating skeleton that dissolves into soul smoke, an open
+ribcage of soul fire, a bone mitre, candles on the shoulders, the Book of Names
+on a wrist chain, and the bell staff whose crest unfolds into a scythe (Blade1
+and Blade2 fold on their hinges and grow on a keyed scale). Every clip exists in
+two stances, the staff set and the `Scythe*` set, plus the `Transform` between
+them; the flames and the soul fire flicker on keyed bone scales. A fourth
+material (`CreatureMetal`) keeps the bell, iron and gold metallic.
+
+```
+blender -b --factory-startup --python build_morthen.py -- public/models/creatures/crypt_morthen_lich.glb [--sheet dir] [--blend out.blend] [--fast]
+node scripts/assets/hollow_crypt_creatures/optimize.mjs public/models/creatures/crypt_morthen_lich.glb
+node scripts/build_media_manifest.mjs generate
+```
+
+The `crypt_morthen_lich` VISUALS row maps the clips; `VisualDef.phaseClips`
+swaps the stance, driven by `src/render/hollow_crypt/morthen_fx.ts`.

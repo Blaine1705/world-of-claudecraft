@@ -40,6 +40,7 @@ import { HoardTentaclesFx } from './hoard_tentacles';
 import { CryptCreatureFx } from './hollow_crypt/crypt_creature_fx';
 import { CryptFinaleFx } from './hollow_crypt/crypt_finale_fx';
 import { CryptTrashFx } from './hollow_crypt/crypt_trash_fx';
+import { MorthenFx } from './hollow_crypt/morthen_fx';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -105,6 +106,8 @@ export class RiftDeathZoneVisuals {
   private readonly cryptCreatures: CryptCreatureFx;
   // The Hollow Crypt finale: Morthen's entrance and the Knellwyrm.
   private readonly cryptFinale: CryptFinaleFx;
+  // Morthen the Lich Bishop's own body effects and his stance gestures.
+  private readonly morthenFx: MorthenFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -161,6 +164,15 @@ export class RiftDeathZoneVisuals {
       shake,
     );
     this.cryptFinale = new CryptFinaleFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.morthenFx = new MorthenFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.hoardGoblinCoins = new HoardGoblinCoinsFx(
       scene,
       groundY,
@@ -236,6 +248,7 @@ export class RiftDeathZoneVisuals {
     this.templeFx.update(dt);
     this.cryptCreatures.update(dt);
     this.cryptFinale.update(dt);
+    this.morthenFx.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -271,6 +284,7 @@ export class RiftDeathZoneVisuals {
     this.templeFx.dispose();
     this.cryptCreatures.dispose();
     this.cryptFinale.dispose();
+    this.morthenFx.dispose();
     this.hoardPresentation.dispose();
   }
 
@@ -281,6 +295,7 @@ export class RiftDeathZoneVisuals {
     this.cryptTrash.handleEvent(event);
     this.cryptCreatures.handleEvent(event);
     this.cryptFinale.handleEvent(event);
+    this.morthenFx.handleEvent(event);
     this.templeFx.handleEvent(event);
     return this.bastionFx.handleEvent(event);
   }

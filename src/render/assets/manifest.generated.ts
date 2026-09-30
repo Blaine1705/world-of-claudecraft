@@ -378,6 +378,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/crypt_drake.glb": "/media/models/creatures/crypt_drake.35dd7480cea6.glb",
   "models/creatures/crypt_gargoyle.glb": "/media/models/creatures/crypt_gargoyle.70881edd0b93.glb",
   "models/creatures/crypt_knellwyrm.glb": "/media/models/creatures/crypt_knellwyrm.a344ae74b5f2.glb",
+  "models/creatures/crypt_morthen_lich.glb": "/media/models/creatures/crypt_morthen_lich.c096a6de3c8b.glb",
   "models/creatures/demon.glb": "/media/models/creatures/demon.5a26751441d5.glb",
   "models/creatures/demon_ability_anims.glb": "/media/models/creatures/demon_ability_anims.b00e6af46c09.glb",
   "models/creatures/demon_flying_anims.glb": "/media/models/creatures/demon_flying_anims.6d089ddb34a5.glb",

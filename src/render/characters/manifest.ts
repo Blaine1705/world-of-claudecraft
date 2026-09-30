@@ -23,6 +23,7 @@ import {
   MORTHEN_DESCEND,
   MORTHEN_PROCLAIM,
   MORTHEN_RISE,
+  MORTHEN_RITE_WAKES,
 } from '../../sim/encounters/hollow_crypt/ids';
 import {
   OLEN_OATHBOUND_CHARGE,
@@ -112,6 +113,12 @@ import {
   HOARD_GESTURE_FROST_GUST,
   HOARD_GESTURE_ICE_AGE_RELEASE,
 } from '../hoard_boss_gestures_core';
+import {
+  MORTHEN_SCYTHE_HELD,
+  MORTHEN_SCYTHE_UNFOLD,
+  MORTHEN_STAFF_HELD,
+  MORTHEN_TOLL,
+} from '../hollow_crypt/morthen_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
@@ -405,6 +412,13 @@ export interface VisualDef {
    *  state; CharacterVisual's enterDeath/revive flip it. Node names as
    *  authored in the GLB. */
   corpseMeshSwap?: { hide: string; show: string };
+  /** Boss stance vocabularies keyed by a presentation gesture id (Morthen's
+   *  bell staff and the scythe it unfolds into, src/render/hollow_crypt/
+   *  morthen_fx_core.ts). The gesture, sent through the renderer's
+   *  triggerAttack seam, swaps the rig's whole ClipMap in place and plays the
+   *  stance's `enter` one-shot when it names one; a gesture for the stance
+   *  already held does nothing. `clips` should be one of these stances. */
+  phaseClips?: Record<string, { clips: ClipMap; enter?: string }>;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -1630,6 +1644,43 @@ export const NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION = 0.35;
  *  (0.88 * 2.6/1.6 * 0.9 = 1.29): a click anywhere near the spike lands on
  *  it, not on the raider it pins (owner call, 2026-09-11). */
 export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
+
+// Morthen the Gravecaller as the Lich Bishop (scripts/assets/hollow_crypt_creatures/
+// build_morthen.py): two whole vocabularies on one rig. With the BELL STAFF he
+// glides, strikes with the bell head and the shaft, tolls the bell for his
+// Shadow Pulse, and his entrance rides his cast bar: he unfurls as he rises
+// (Rise), lifts the Book of Names as he speaks (SummonSouls) and holds his ward
+// as he comes down (ShieldRitual). At his Last Rites the staff's crest UNFOLDS
+// INTO A SCYTHE (Transform) and every clip after it carries the blade out.
+const MORTHEN_STAFF_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['StaffStrike', 'StaffStrike2'],
+  attackByAbility: { [MORTHEN_TOLL]: 'BellToll' },
+  attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1 },
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'SummonSouls',
+  castByAbility: {
+    [MORTHEN_RITE_WAKES]: 'Rise',
+    [MORTHEN_RISE]: 'Rise',
+    [MORTHEN_PROCLAIM]: 'SummonSouls',
+    [MORTHEN_DESCEND]: 'ShieldRitual',
+  },
+  castTimeScaleByAbility: { [MORTHEN_RISE]: 1, [MORTHEN_PROCLAIM]: 1, [MORTHEN_DESCEND]: 1 },
+};
+const MORTHEN_SCYTHE_CLIPS: ClipMap = {
+  idle: 'ScytheIdle',
+  walk: 'ScytheWalk',
+  run: 'ScytheRun',
+  attack: ['ScytheSweep', 'ScytheSweep2'],
+  attackByAbility: { [MORTHEN_TOLL]: 'ScytheToll' },
+  attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1 },
+  hit: ['ScytheHit'],
+  death: 'ScytheDeath',
+  cast: 'ScytheSummon',
+};
 
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
@@ -3786,28 +3837,21 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.3,
   },
-  // Morthen. His entrance at the Rite Ring (encounters/hollow_crypt) rides his
-  // cast bar: arms raised as he rises out of the floor and comes down, the
-  // taunt as he speaks over the ring.
-  crypt_skel_gravecaller: {
-    url: `${ENEMIES}/skeleton_mage.glb`,
-    height: 3.6,
-    clips: {
-      ...skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'),
-      attack: ['SkelBoss_Attack'],
-      castByAbility: {
-        [MORTHEN_RISE]: 'Spellcast_Raise',
-        [MORTHEN_PROCLAIM]: 'Taunt',
-        [MORTHEN_DESCEND]: 'Spellcast_Raise',
-      },
+  // Morthen, the Lich Bishop (the clip sets above): about three players tall
+  // at his template's 1.35, hovering on his smoke a hand over the flags.
+  crypt_morthen_lich: {
+    url: `${CREATURES}/crypt_morthen_lich.glb`,
+    height: 6.342,
+    hover: 0.077,
+    clips: MORTHEN_STAFF_CLIPS,
+    phaseClips: {
+      [MORTHEN_STAFF_HELD]: { clips: MORTHEN_STAFF_CLIPS },
+      [MORTHEN_SCYTHE_HELD]: { clips: MORTHEN_SCYTHE_CLIPS },
+      [MORTHEN_SCYTHE_UNFOLD]: { clips: MORTHEN_SCYTHE_CLIPS, enter: 'Transform' },
     },
-    animUrls: [
-      `${ENEMIES}/skeleton_mage_hit_variety_anims.glb`,
-      `${ENEMIES}/skelboss_ability_anims.glb`,
-    ],
-    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.25,
+    authoredAtlas: true,
+    selfIllumination: 0.08,
+    clickRadius: 2.2,
   },
   mob_crypt_rimeweb: {
     url: `${CREATURES}/spider.glb`,
@@ -5475,7 +5519,7 @@ const MOB_KEYS: Record<string, string> = {
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'crypt_skel_sexton',
-  morthen: 'crypt_skel_gravecaller',
+  morthen: 'crypt_morthen_lich',
   cantor_ilvane: 'crypt_skel_cantor',
   hollow_chorister: 'crypt_skel_chorister',
   rimeweb: 'mob_crypt_rimeweb',

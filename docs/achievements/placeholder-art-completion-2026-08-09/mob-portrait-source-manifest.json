@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "b72fee77abe1d1e6fe47c81d1e31686b9eebaf000e04efeb009a77ff8721f782",
+  "rendererFingerprint": "f41b315e62d8f45a23b2cd67cc2ef93db66faf7810259b97578b27e0051e4365",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5370319,
-      "sha256": "404a21f4d739491114fda871bf5bdf924f0c431046898618f638e476979f57cf",
+      "bytes": 5370429,
+      "sha256": "10b44dbffd36153944ab6c030610ebbc214626e18578e0f57d9c8b52b28a719a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6125,47 +6125,34 @@
       "id": "morthen",
       "family": "undead",
       "finderEncounter": true,
-      "visualKey": "crypt_skel_gravecaller",
+      "visualKey": "crypt_morthen_lich",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_mage.glb",
-          "path": "public/models/chars/enemies/skeleton_mage.glb",
-          "bytes": 802628,
-          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+          "url": "models/creatures/crypt_morthen_lich.glb",
+          "path": "public/models/creatures/crypt_morthen_lich.glb",
+          "bytes": 2888184,
+          "sha256": "c096a6de3c8b3d3c719140b71c288cb662db616fe70eb0e870bfa02b875d76fa"
         },
-        "idle": "Idle_Combat",
-        "height": 3.6,
+        "idle": "Idle",
+        "height": 6.342,
         "yaw": null,
-        "hover": null,
+        "hover": 0.077,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_staff.glb",
-              "path": "public/models/weapons/skeleton_staff.glb",
-              "bytes": 51660,
-              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#4a235a",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "1eb35573a8158faea12406c0226993f1057cc82270ce2fb28564ee97ad809d08",
+      "sourceFingerprint": "0dc75663c7b7c741d348e154f7396ab6796db4641d18a9918a52b6d11f0e05f5",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 2216,
-        "sha256": "d586f3e83c735ad881df6a6e49cae8fed5e4827f303353174f26fcef1df3b148"
+        "bytes": 3212,
+        "sha256": "f07cab286850d8f1c824089f5e34b8f113519f124ba639067709ff1deaa221ee"
       }
     },
     {
