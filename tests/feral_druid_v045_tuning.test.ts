@@ -70,7 +70,7 @@ function spawnMob(sim: Sim, dx: number, dz: number): Entity {
 }
 
 /** Force every melee swing to land so the per-hit counts are exact. */
-function alwaysLand(sim: Sim, run: () => void): void {
+function alwaysLand<T>(sim: Sim, run: () => T): T {
   // biome-ignore lint/suspicious/noExplicitAny: reaching the Rng behind SimContext.
   const rng = rawCtx(sim).rng as any;
   const realRoll = rng.next.bind(rng);
@@ -78,7 +78,7 @@ function alwaysLand(sim: Sim, run: () => void): void {
   // (the table walks up from 0), landing an ordinary or critical hit.
   rng.next = () => 0.999;
   try {
-    run();
+    return run();
   } finally {
     rng.next = realRoll;
   }
@@ -150,6 +150,30 @@ describe('2. Scratch', () => {
     const row = (id: string) => feral?.ability?.find((entry) => entry.ability === id);
     expect(row('claw')?.dmgPct).toBe(0.15);
     expect(row('scratch')).toEqual({ ...row('claw'), ability: 'scratch' });
+  });
+
+  it("matches Rendclaw's resolved real-cast damage on one target", () => {
+    const damageFrom = (abilityId: 'claw' | 'scratch', abilityName: string): number => {
+      const { sim, player } = rig('feral');
+      shiftIntoCat(sim);
+      const mob = spawnMob(sim, 2, 0);
+      if (abilityId === 'claw') sim.targetEntity(mob.id);
+      return alwaysLand(sim, () => {
+        sim.castAbility(abilityId);
+        const events = sim.tick();
+        const hit = events.find(
+          (event) =>
+            event.type === 'damage' &&
+            event.ability === abilityName &&
+            event.targetId === mob.id &&
+            event.kind === 'hit',
+        );
+        expect(hit).toBeDefined();
+        return hit?.amount ?? 0;
+      });
+    };
+
+    expect(damageFrom('scratch', 'Scratch')).toBe(damageFrom('claw', 'Rendclaw'));
   });
 
   it('collects only live hostiles inside the 6 yd sweep', () => {

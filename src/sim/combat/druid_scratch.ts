@@ -23,6 +23,7 @@ import type { AbilityDef, Entity } from '../types';
 
 export interface WeaponSweepOpts {
   primaryDamageMult: number;
+  weaponMult?: number;
   threatFlat?: number;
   threatMult?: number;
   critBonus: number;
@@ -70,6 +71,7 @@ export function resolveWeaponSweep(
   for (const target of targets) {
     if (target.dead) continue;
     const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+      weaponMult: opts.weaponMult,
       primaryDamageMult: opts.primaryDamageMult,
       threatFlat: opts.threatFlat,
       threatMult: opts.threatMult,

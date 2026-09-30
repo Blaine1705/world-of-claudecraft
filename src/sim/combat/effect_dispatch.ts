@@ -658,6 +658,7 @@ export function runEffects(
         // Sweep variant (Scratch): every nearby hostile, combo per landed hit.
         if (eff.sweepRadius !== undefined) {
           const landed = resolveWeaponSweep(ctx, p, ability, eff.sweepRadius, eff.bonus, {
+            weaponMult: eff.weaponMult,
             primaryDamageMult,
             threatFlat: res.threatFlat,
             threatMult: res.threatMult,
