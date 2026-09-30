@@ -1534,13 +1534,21 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
 // Whether a sold unit stays out of the buyback list. Plain Poor-quality (gray)
 // junk is worthless fodder the player sells in bulk; recording it let one Sell
 // Junk sweep evict every real sale from the VENDOR_BUYBACK_LIMIT rows. A gray
-// copy that carries an instance payload (a signed drop, say) is unique, so it
-// still gets a row and can be bought back with its payload intact.
+// unit that carries anything the row would preserve (an instance payload such
+// as a signature, a crafted recipe id, or a material composition) is not
+// fungible fodder, so it still gets a row and buys back intact.
 export function skipsVendorBuyback(
   def: ItemDef | undefined,
   instance: ItemInstancePayload | undefined,
+  craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
 ): boolean {
-  return def?.quality === 'poor' && instance === undefined;
+  return (
+    def?.quality === 'poor' &&
+    instance === undefined &&
+    craftedRecipeId === undefined &&
+    materialSources === undefined
+  );
 }
 
 // `instance` carries the payload of the sold copies (absent for a plain
@@ -1569,7 +1577,7 @@ function recordVendorBuyback(
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
 ): void {
-  if (skipsVendorBuyback(ITEMS[itemId], instance)) return;
+  if (skipsVendorBuyback(ITEMS[itemId], instance, craftedRecipeId, materialSources)) return;
   const existingIndex = meta.vendorBuyback.findIndex(
     (s) =>
       s.itemId === itemId &&

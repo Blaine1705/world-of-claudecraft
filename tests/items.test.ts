@@ -1014,6 +1014,31 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(items.skipsVendorBuyback(ITEMS.wolf_fang, undefined)).toBe(false); // common
     expect(items.skipsVendorBuyback(ITEMS.apprentice_staff, undefined)).toBe(false);
     expect(items.skipsVendorBuyback(undefined, undefined)).toBe(false);
+    // A crafted id or a material composition is provenance the row would keep.
+    expect(items.skipsVendorBuyback(gray, undefined, 'some_recipe')).toBe(false);
+    expect(items.skipsVendorBuyback(gray, undefined, undefined, [])).toBe(false);
+  });
+
+  it('a single sellItem of a signed gray copy keeps its buyback row and restores the payload', () => {
+    // The instanced arm through the named-slot sell path (the sweep arm is
+    // pinned in professions_commissions.test.ts).
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.copper = 0;
+    ctx.addItemInstance('tangled_weed', { signer: 'Ayla' }, pid);
+    const slot = meta.inventory.findIndex((s) => s.itemId === 'tangled_weed');
+    items.sellItem(ctx, 'tangled_weed', 1, pid, slot);
+    expect(sim.countItem('tangled_weed', pid)).toBe(0);
+    const rows = meta.vendorBuyback as { instance?: { signer?: string } }[];
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.instance).toEqual({ signer: 'Ayla' });
+    items.buyBackItem(ctx, 'tangled_weed', 0, pid);
+    const back = (meta.inventory as { itemId: string; instance?: { signer?: string } }[]).filter(
+      (s) => s.itemId === 'tangled_weed',
+    );
+    expect(back).toHaveLength(1);
+    expect(back[0]?.instance).toEqual({ signer: 'Ayla' });
   });
 
   it('junkSellableSlot is the one sweep rule: every arm decides, and the HUD preview consumes it', () => {
