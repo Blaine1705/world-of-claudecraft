@@ -613,7 +613,7 @@ export const guideStrings = {
       'Keeps your current target when you click on empty ground, instead of clearing it.',
     ifFctScale: 'The size of the damage and healing numbers that float off your target.',
     ifClassicCombatText:
-      'Brings back the plain white and gold damage numbers that rise straight up. Leave it off (the default) to colour your spell damage by school, fan your numbers out to the sides, and make critical and unusually big hits flare.',
+      'Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.',
     ifExtraBars:
       'Reveals a second action bar row, and a third once the second is on. The slots stay reachable by their keybinds even while the rows are hidden.',
     ifHideUnused: 'Hides empty action slots so only the buttons you actually use are drawn.',

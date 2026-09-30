@@ -9296,8 +9296,8 @@
   /* Vivid combat text, the default look (Interface > Combat > Classic Combat Text turns
      it off: the painter then adds none of these classes, so every rule above renders
      byte-identical to the shipped floater). What it borrows, and why:
-       - school colours for outgoing spell damage (the elemental-number convention of
-         the looter shooters and later MMO combat text), physical staying white / gold;
+       - ability damage in a saturated gold beside the white auto-attacks, so the two
+         separate at a glance (the shipped pale parchment read as grey);
        - a heavier keyline, so a number holds its colour on a grey scene;
        - a hold-then-fade that keeps the number fully opaque for over half its life
          (the plain rise fades from the first frame, which is what read as grey);
@@ -9314,24 +9314,6 @@
   }
   .fct.fct-vivid.fct-damage-done-ability {
     color: var(--color-fct-vivid-ability);
-  }
-  .fct-damage-done-fire {
-    color: var(--color-fct-damage-done-fire);
-  }
-  .fct-damage-done-frost {
-    color: var(--color-fct-damage-done-frost);
-  }
-  .fct-damage-done-nature {
-    color: var(--color-fct-damage-done-nature);
-  }
-  .fct-damage-done-shadow {
-    color: var(--color-fct-damage-done-shadow);
-  }
-  .fct-damage-done-arcane {
-    color: var(--color-fct-damage-done-arcane);
-  }
-  .fct-damage-done-holy {
-    color: var(--color-fct-damage-done-holy);
   }
   .fct.fct-out-l,
   .fct.fct-out-r,

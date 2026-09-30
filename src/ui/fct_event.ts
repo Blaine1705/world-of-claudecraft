@@ -8,7 +8,7 @@
 // site and are spread onto this result, so the core never calls t() or reads an entity,
 // consistent with fct_core emitting discriminators and the painter localizing.
 
-import { type FctKind, type FctSchool, fctSchoolOf } from './fct_core';
+import type { FctKind } from './fct_core';
 
 /**
  * The normalized inputs each spawn occasion supplies: the raw SimEvent fields that drive
@@ -75,32 +75,24 @@ export interface FctSpawnShape {
    * every other floater in the game.
    */
   readonly delaySec?: number;
-  /**
-   * The magic school of an outgoing hit, null for physical. Set only on the two outgoing
-   * hit kinds (damage-done-ability / -auto) by withDamageFlavor below; every other shape
-   * leaves it absent.
-   */
-  readonly school?: FctSchool | null;
   /** The raw amount of an outgoing hit (for the big-hit emphasis); outgoing hits only. */
   readonly amount?: number;
 }
 
 /**
- * The damage-event fields the vivid look reads beyond the discrimination: the school a
- * hit was dealt in and its raw amount. Structural, so the hud.ts spawn site hands in the
- * damage SimEvent it already has (both an offline Sim event and a ClientWorld-mirrored one
- * carry `school` and `amount`).
+ * The damage-event field the vivid look reads beyond the discrimination: the hit's raw
+ * amount. Structural, so the hud.ts spawn site hands in the damage SimEvent it already has
+ * (both an offline Sim event and a ClientWorld-mirrored one carry `amount`).
  */
 export interface FctDamageFlavorSource {
-  readonly school?: string | null;
   readonly amount?: number;
 }
 
 /**
- * Stamp the school and amount of an OUTGOING hit onto its spawn shape, so the painter can
- * colour a spell hit by school and weigh the hit against the player's running average.
- * `ownHit` says the local player dealt it directly: a pet's or guardian's hit still gets
- * its school colour but no amount, so it neither feeds nor trips the big-hit emphasis.
+ * Stamp the amount of the local player's OWN outgoing hit onto its spawn shape, so the
+ * painter can weigh the hit against the player's running average. `ownHit` says the local
+ * player dealt it directly: a pet's or guardian's hit carries no amount, so it neither feeds
+ * nor trips the big-hit emphasis.
  * Every other shape (an avoidance word, a block, incoming damage, a heal, null) passes
  * through unchanged: incoming damage keeps its one hostile red on purpose, because "you are
  * being hurt" must read the same whatever hurt you. Pure: same input, same output.
@@ -111,9 +103,9 @@ export function withDamageFlavor(
   ownHit = true,
 ): FctSpawnShape | null {
   if (shape === null) return null;
+  if (!ownHit) return shape;
   if (shape.kind !== 'damage-done-ability' && shape.kind !== 'damage-done-auto') return shape;
-  const school = fctSchoolOf(ev.school);
-  return ownHit ? { ...shape, school, amount: ev.amount } : { ...shape, school };
+  return { ...shape, amount: ev.amount };
 }
 
 /**

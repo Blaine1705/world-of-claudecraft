@@ -104,7 +104,6 @@ import {
   type FctDescriptor,
   type FctEvent,
   type FctKind,
-  type FctSchool,
 } from './fct_core';
 import { type FctDriftLane, FctHitScale, fctDriftLane } from './fct_emphasis_core';
 import {
@@ -212,7 +211,6 @@ interface FctPending {
   target: FctAnchorSource;
   crit: boolean;
   isSelf: boolean;
-  school: FctSchool | null;
   amount: number | undefined;
   dueAt: number;
 }
@@ -298,7 +296,6 @@ export class FctPainter {
         target: FCT_EMPTY_ANCHOR,
         crit: false,
         isSelf: false,
-        school: null,
         amount: undefined,
         dueAt: 0,
       });
@@ -318,7 +315,7 @@ export class FctPainter {
     src: FctSpawnSource,
   ): FctSpawnShape | null {
     const delaySec = this.beats.delaySec(strike, now);
-    // The strike IS the damage event, so its school and amount ride onto an outgoing
+    // The strike IS the damage event, so its amount rides onto an outgoing
     // hit's shape here (withDamageFlavor leaves every other shape untouched). Only the
     // player's OWN hit carries its amount: a pet's or guardian's frequent small hits would
     // otherwise drag the big-hit baseline down until every player hit read as big.
@@ -360,7 +357,7 @@ export class FctPainter {
     // ([data-fx-level="low"] .fct.crit, and .fct.fct-vivid.crit for the vivid look); that
     // keeps the number, only dropping the pop.
     const classic = this.isClassic();
-    const d = describeFct(event, this.random(), classic);
+    const d = describeFct(event, this.random());
     // Every outgoing hit feeds the big-hit baseline, even one culled behind the camera or
     // shown classic, so the average reflects what the player actually deals.
     const bigHit = event.amount !== undefined && d.outgoing && this.hitScale.observe(event.amount);
@@ -473,7 +470,6 @@ export class FctPainter {
     slot.target = event.target;
     slot.crit = event.crit;
     slot.isSelf = event.isSelf;
-    slot.school = event.school ?? null;
     slot.amount = event.amount;
     slot.dueAt = dueAt;
     this.insertPending(slot);
@@ -508,7 +504,6 @@ export class FctPainter {
   private recyclePending(slot: FctPending): void {
     slot.text = '';
     slot.target = FCT_EMPTY_ANCHOR;
-    slot.school = null;
     slot.amount = undefined;
     this.pendingFree.push(slot);
   }

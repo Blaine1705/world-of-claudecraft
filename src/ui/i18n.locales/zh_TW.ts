@@ -16009,7 +16009,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '顯示第二排動作列，開了第二排之後還能再開第三排。即使整排隱藏著，那些格子依然可以用快捷鍵使用。',
   'guide.settingsPage.ifFctScale': '從目標身上飄起的傷害與治療數字的大小。',
   'guide.settingsPage.ifClassicCombatText':
-    '恢復為直線上升的純白色與金色傷害數字。保持關閉（預設）時，法術傷害會依系別著色，數字會向兩側散開，致命一擊和格外大的傷害會閃耀。',
+    '恢復為直線上升的純白色與淡金色傷害數字。保持關閉（預設）時，數字更醒目並向兩側散開，致命一擊和格外大的傷害會閃耀。',
   'guide.settingsPage.ifFramesIntro':
     '你自己的框、目標框，以及整個隊伍的排列方式。隊伍區塊還帶有縮放、寬度、高度、間距與欄數的滑桿，好讓團隊格線放得進你的螢幕，而分頁底部的「重設」按鈕會把每一個框都放回原位。',
   'guide.settingsPage.ifGeneralIntro':

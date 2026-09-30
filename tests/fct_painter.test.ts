@@ -679,49 +679,36 @@ describe('FctPainter.stagedShape: the damage spawn seam', () => {
   it('stamps nothing on any other damage, so the shape is returned unchanged', () => {
     const painter = shapePainter();
     const shape = painter.stagedShape({ sourceId: 4, abilityId: 'mortal_strike' }, 10, hit());
-    // An outgoing hit carries its flavor (a physical strike: no school); no delay rides it.
-    expect(shape).toEqual({
-      kind: 'damage-done-ability',
-      isSelf: false,
-      crit: false,
-      school: null,
-    });
+    expect(shape).toEqual({ kind: 'damage-done-ability', isSelf: false, crit: false });
     expect(shape?.delaySec).toBeUndefined();
   });
 
-  it('gives a pet / guardian hit its school colour but no amount (it never feeds the big-hit baseline)', () => {
+  it('gives a pet / guardian hit no amount (it never feeds the big-hit baseline)', () => {
     const painter = shapePainter();
-    const fire = { sourceId: 9, abilityId: null, school: 'fire', amount: 30 };
+    const strike = { sourceId: 9, abilityId: null, school: 'fire', amount: 30 };
     const petHit = hit({ isPlayerSource: false, isPlayerOwnedSource: true, ability: false });
-    expect(painter.stagedShape(fire, 10, petHit)).toEqual({
+    expect(painter.stagedShape(strike, 10, petHit)).toEqual({
       kind: 'damage-done-auto',
       isSelf: false,
       crit: false,
-      school: 'fire',
     });
   });
 
-  it('carries the strike school + amount onto an OUTGOING hit only', () => {
+  it("carries the strike amount onto the player's OWN outgoing hit only, and never a school", () => {
     const painter = shapePainter();
-    const fire = { sourceId: 4, abilityId: 'fireball', school: 'fire', amount: 412 };
-    expect(painter.stagedShape(fire, 10, hit())).toEqual({
-      kind: 'damage-done-ability',
-      isSelf: false,
-      crit: false,
-      school: 'fire',
-      amount: 412,
-    });
-    // Incoming damage keeps its one hostile red: no school, no amount.
+    const strike = { sourceId: 4, abilityId: 'fireball', school: 'fire', amount: 412 };
+    const own = painter.stagedShape(strike, 10, hit());
+    expect(own).toEqual({ kind: 'damage-done-ability', isSelf: false, crit: false, amount: 412 });
+    expect(own && 'school' in own).toBe(false);
+    // Incoming damage and an avoidance word carry no amount.
     const taken = painter.stagedShape(
-      fire,
+      strike,
       10,
       hit({ isPlayerSource: false, isPlayerTarget: true }),
     );
     expect(taken).toEqual({ kind: 'damage-taken', isSelf: true, crit: false });
-    expect(taken && 'school' in taken).toBe(false);
-    // An avoidance word carries no flavor either.
-    const missed = painter.stagedShape(fire, 10, hit({ damageKind: 'miss' }));
-    expect(missed && 'school' in missed).toBe(false);
+    const missed = painter.stagedShape(strike, 10, hit({ damageKind: 'miss' }));
+    expect(missed && 'amount' in missed).toBe(false);
   });
 
   it('consumes the beat even when nothing floats, so the next blade keeps its slot', () => {
@@ -889,11 +876,9 @@ describe('FctPainter: static-preset tiering', () => {
   });
 });
 
-// The per-kind colours now read semantic tokens from tokens.css. Pin both ends of that
-// indirection so the component sheet stays literal-free without changing a shipped hue.
 // The vivid combat-text look (the default) versus Classic Combat Text: which classes a
 // spawn toggles, the alternating fan-out lane, the big-hit flag, and that a held
-// (beat-staged) floater keeps its school and amount through release.
+// (beat-staged) floater keeps its amount through release.
 describe('FctPainter: vivid look and the Classic Combat Text opt-out', () => {
   function vividPainter(classic = false) {
     const facet = recordingFacet();
@@ -947,11 +932,26 @@ describe('FctPainter: vivid look and the Classic Combat Text opt-out', () => {
     expect(on(mount.childNodes[0])).toEqual(['fct-damage-taken', 'fct-vivid']);
   });
 
-  it('colours an outgoing spell by school', () => {
+  it('keeps a spell hit on the shipped ability token (no elemental colour), through the real stage', () => {
     const { painter, mount, on } = vividPainter();
-    painter.spawn(out({ school: 'frost' }), 0);
-    expect(on(mount.childNodes[0])).toContain('fct-damage-done-frost');
-    expect(on(mount.childNodes[0])).not.toContain('fct-damage-done-ability');
+    // The damage SimEvent hud.ts hands in still carries its school; it must not colour.
+    const frostbolt = { sourceId: 1, abilityId: 'frostbolt', school: 'frost', amount: 120 };
+    const shape = painter.stagedShape(frostbolt, 0, {
+      type: 'damage',
+      damageKind: 'hit',
+      ability: true,
+      crit: false,
+      isPlayerSource: true,
+      isPlayerTarget: false,
+    });
+    expect(shape).not.toBeNull();
+    painter.spawn(
+      { ...(shape as NonNullable<typeof shape>), text: '120', target: out().target },
+      0,
+    );
+    const classes = on(mount.childNodes[0]);
+    expect(classes).toContain('fct-damage-done-ability');
+    expect(classes.filter((c) => /^fct-damage-done-(?!ability$)/.test(c))).toEqual([]);
   });
 
   it('flags a hit well above the running average as big, and not the routine ones', () => {
@@ -978,14 +978,13 @@ describe('FctPainter: vivid look and the Classic Combat Text opt-out', () => {
 
   it('Classic Combat Text: no vivid class, no lane, no big flag, and the shipped colour token', () => {
     const { painter, mount, on } = vividPainter(true);
-    for (let i = 0; i < 6; i++) painter.spawn(out({ amount: 100, school: 'fire' }), 0);
-    painter.spawn(out({ amount: 900, school: 'fire', crit: true }), 0);
+    for (let i = 0; i < 6; i++) painter.spawn(out({ amount: 100 }), 0);
+    painter.spawn(out({ amount: 900, crit: true }), 0);
     for (const n of mount.childNodes) {
       const classes = on(n);
       expect(classes).not.toContain('fct-vivid');
       expect(classes.filter((c) => c.startsWith('fct-out-'))).toEqual([]);
       expect(classes).not.toContain('fct-big');
-      expect(classes).not.toContain('fct-damage-done-fire');
       expect(classes).toContain('fct-damage-done-ability');
     }
   });
@@ -1013,14 +1012,14 @@ describe('FctPainter: vivid look and the Classic Combat Text opt-out', () => {
     for (const lane of ['l', 'r', 'll', 'rr']) expect(last(`fct-out-${lane}`)).toBe(false);
   });
 
-  it('a beat-staged (held) outgoing hit keeps its school and amount through release', () => {
+  it('a beat-staged (held) outgoing hit keeps its amount through release', () => {
     const { painter, mount, on } = vividPainter();
     for (let i = 0; i < 6; i++) painter.spawn(out({ amount: 100 }), 0);
-    painter.spawn(out({ amount: 500, school: 'shadow', delaySec: 0.2 }), 0);
+    painter.spawn(out({ amount: 500, delaySec: 0.2 }), 0);
     expect(painter.heldCount()).toBe(1);
     painter.step(200);
     const released = mount.childNodes[6];
-    expect(on(released)).toContain('fct-damage-done-shadow');
+    expect(on(released)).toContain('fct-damage-done-ability');
     expect(on(released)).toContain('fct-big');
   });
 
@@ -1067,15 +1066,14 @@ describe('vivid combat text CSS contract', () => {
     return next >= 0 ? rest.slice(0, next) : rest;
   };
 
-  it('gives every school its own class and declared token', () => {
+  it('colours only by hit kind: the vivid ability gold, and no per-school damage colour', () => {
+    expect(css).toMatch(
+      /\.fct\.fct-vivid\.fct-damage-done-ability \{\s*color: var\(--color-fct-vivid-ability\);/,
+    );
+    expect(tokensCss).toMatch(/--color-fct-vivid-ability:\s*#[0-9a-f]{6};/);
     for (const school of ['fire', 'frost', 'nature', 'shadow', 'arcane', 'holy']) {
-      const cls = `.fct-damage-done-${school}`;
-      const at = css.indexOf(`${cls} {`);
-      expect(at, `${cls} in hud.css`).toBeGreaterThanOrEqual(0);
-      expect(css.slice(at, css.indexOf('}', at))).toContain(
-        `color: var(--color-fct-damage-done-${school})`,
-      );
-      expect(tokensCss).toMatch(new RegExp(`--color-fct-damage-done-${school}:\\s*#[0-9a-f]{6};`));
+      expect(css).not.toContain(`.fct-damage-done-${school}`);
+      expect(tokensCss).not.toContain(`--color-fct-damage-done-${school}`);
     }
   });
 
@@ -1166,6 +1164,8 @@ describe('vivid combat text CSS contract', () => {
   });
 });
 
+// The per-kind colours now read semantic tokens from tokens.css. Pin both ends of that
+// indirection so the component sheet stays literal-free without changing a shipped hue.
 describe('FCT colour tokens: each kind reads its byte-faithful semantic token', () => {
   const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
   const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');

@@ -1163,15 +1163,6 @@
        Ability damage moves from the pale parchment highlight to a saturated gold so it
        separates from the white auto-attacks at a glance. */
     --color-fct-vivid-ability: #ffc933;
-    /* Outgoing spell damage by school, one clearly separated hue each. Nature leans
-       lime so it never reads as the restorative heal green; holy is the pale sun tone
-       so it stays apart from the saturated ability gold. */
-    --color-fct-damage-done-fire: #ff6a1a;
-    --color-fct-damage-done-frost: #4fc8ff;
-    --color-fct-damage-done-nature: #a8f03a;
-    --color-fct-damage-done-shadow: #b77bff;
-    --color-fct-damage-done-arcane: #ff6fe0;
-    --color-fct-damage-done-holy: #fff27f;
     /* The hot underglow of a hit well above your usual (the big-hit flag). */
     --color-fct-big-flare: #ff7a1a;
     /* A solid two-pixel keyline plus a soft drop, so a number holds its colour over
@@ -1183,8 +1174,8 @@
       0 -2px 0 var(--color-keyline), 0 2px 0 var(--color-keyline),
       -2px 0 0 var(--color-keyline), 2px 0 0 var(--color-keyline),
       0 3px 4px var(--color-keyline);
-    /* A crit flares in its own colour (currentColor), so a fire crit burns orange and
-       a frost crit glows blue. Only these decorative glow blurs ride the effect tier
+    /* A crit flares in its own colour (currentColor), so an ability crit burns gold and
+       an incoming crit glows red. Only these decorative glow blurs ride the effect tier
        (the --glow-* family); the keyline above is legibility, identical on every tier. */
     --glow-fct-crit:
       var(--fct-vivid-outline), 0 0 calc(8px * var(--fx-shadow, 1)) currentColor,

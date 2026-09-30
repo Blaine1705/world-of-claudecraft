@@ -86,32 +86,7 @@ export type FctColorToken =
   | 'xp'
   | 'rested-xp'
   | 'honor'
-  | 'self-note'
-  | `damage-done-${FctSchool}`;
-
-/**
- * The magic schools an outgoing damage number is coloured by (the vivid look). Physical
- * is deliberately absent: a physical hit keeps the auto (white) vs ability (gold) split,
- * the classic-era convention every reference game shares, while a spell reads in its
- * element's colour the way school-coloured combat text does elsewhere. The set matches the
- * schools the sim's damage events carry (the same six combat_sfx.ts keys its impact cues
- * off), so an unknown or physical school simply falls back to the plain token.
- */
-export type FctSchool = 'fire' | 'frost' | 'nature' | 'shadow' | 'arcane' | 'holy';
-
-const FCT_SCHOOLS: ReadonlySet<string> = new Set<FctSchool>([
-  'fire',
-  'frost',
-  'nature',
-  'shadow',
-  'arcane',
-  'holy',
-]);
-
-/** Narrow a damage event's raw school string to a colourable magic school, else null. */
-export function fctSchoolOf(raw: string | null | undefined): FctSchool | null {
-  return raw != null && FCT_SCHOOLS.has(raw) ? (raw as FctSchool) : null;
-}
+  | 'self-note';
 
 /**
  * The OUTGOING damage kinds: the floaters the local player (or a guardian they own)
@@ -163,12 +138,6 @@ export interface FctEvent {
    * floater is described and projected when it is finally released, not when it was queued.
    */
   readonly delaySec?: number;
-  /**
-   * The magic school of an outgoing hit (damage-done-ability / -auto only; null or absent
-   * for physical and for every other kind). Drives the school colour token unless the
-   * player chose Classic Combat Text.
-   */
-  readonly school?: FctSchool | null;
   /**
    * The raw damage amount of an outgoing hit, carried beside the localized text so the
    * painter's big-hit emphasis (fct_emphasis_core.ts) can compare it with the player's
@@ -226,18 +195,8 @@ export const FCT_ANCHOR_HEAD_OFFSET = 2.2;
  */
 export const FCT_RISE_PX = 76;
 
-function colorToken(
-  kind: FctKind,
-  isSelf: boolean,
-  school: FctSchool | null,
-  classic: boolean,
-): FctColorToken {
+function colorToken(kind: FctKind, isSelf: boolean): FctColorToken {
   switch (kind) {
-    case 'damage-done-ability':
-    case 'damage-done-auto':
-      // Vivid: a spell hit reads in its school's colour (a wand auto-shot included).
-      // Classic keeps the shipped auto-white / ability-gold pair for every school.
-      return school !== null && !classic ? `damage-done-${school}` : kind;
     case 'miss':
       return isSelf ? 'miss-self' : 'miss-other';
     case 'dodge':
@@ -262,9 +221,7 @@ function colorToken(
  * in [0, 1] (the painter passes Math.random()): jitter01 = 0 maps to the minimum
  * offset (-FCT_JITTER_RANGE / 2), 1 to the maximum (+FCT_JITTER_RANGE / 2), and 0.5 to 0.
  * No Math.random / Date.now / performance.now / DOM here, so the same event + the same
- * jitter01 always produce an identical descriptor. `classic` is the player's Classic Combat
- * Text choice: it drops the school colour so every hit keeps the shipped auto / ability
- * token. The descriptor is clock-free on
+ * jitter01 always produce an identical descriptor. The descriptor is clock-free on
  * purpose: time-relative animation and ttl eviction are the driver's per-frame concern
  * (it stamps the spawn clock), which keeps this core deterministic with nothing to inject.
  */
@@ -280,11 +237,11 @@ export function blockFctAmountText(amount: number, crit: boolean, taken: boolean
   return `${sign}${amount}${crit ? '!' : ''}`;
 }
 
-export function describeFct(event: FctEvent, jitter01: number, classic = false): FctDescriptor {
+export function describeFct(event: FctEvent, jitter01: number): FctDescriptor {
   const { pos, scale } = event.target;
   return {
     text: event.text,
-    colorToken: colorToken(event.kind, event.isSelf, event.school ?? null, classic),
+    colorToken: colorToken(event.kind, event.isSelf),
     crit: event.crit,
     anchor: { x: pos.x, y: pos.y + FCT_ANCHOR_HEAD_OFFSET * scale, z: pos.z },
     jitterOffset: jitter01 * FCT_JITTER_RANGE - FCT_JITTER_RANGE / 2,
