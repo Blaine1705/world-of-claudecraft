@@ -12263,7 +12263,20 @@ export const ko_KR: EnTranslations = {
       "bastion_gaol_hook": "감옥 갈고리",
       "bastion_gaolers_cudgel": "간수의 곤봉",
       "bastion_mist_surge": "안개 해일",
-      "bastion_drowning_hymn": "익사의 성가"
+      "bastion_drowning_hymn": "익사의 성가",
+      "temple_lullaby": "자장가",
+      "temple_call_the_tide": "조수의 부름",
+      "temple_static_coil": "정전기 똬리",
+      "temple_snapper_snap": "물어뜯기",
+      "temple_trident_sweep": "삼지창 휩쓸기",
+      "temple_sea_song": "바다의 노래",
+      "temple_tidal_slap": "조수 후려치기",
+      "temple_tide_breath": "조수 숨결",
+      "temple_moonlight_lance": "달빛 창",
+      "temple_prism_flare": "프리즘 섬광",
+      "temple_resonant_slam": "공명의 강타",
+      "temple_undertow": "역류",
+      "temple_lunar_tide": "달의 조수"
     }
   },
   "questUi": {
@@ -18539,6 +18552,36 @@ export const ko_KR: EnTranslations = {
       "gaolyard_striders": {
         "name": "감옥 뜰의 장화"
       },
+      "conchplate_girdle": {
+        "name": "소라판 허리띠"
+      },
+      "pale_chorus_leggings": {
+        "name": "창백한 합창 다리보호구"
+      },
+      "refrain_silk_gloves": {
+        "name": "후렴 비단 장갑"
+      },
+      "chorus_conch": {
+        "name": "합창의 소라고둥"
+      },
+      "tideglass_pauldrons": {
+        "name": "조수유리 어깨보호구"
+      },
+      "moonburn_treads": {
+        "name": "달그을림 신발"
+      },
+      "prism_etched_cowl": {
+        "name": "프리즘 새김 두건"
+      },
+      "tideglass_shiv": {
+        "name": "조수유리 단도"
+      },
+      "pale_chorus_vestment": {
+        "name": "창백한 합창 제의"
+      },
+      "tideglass_warmaul": {
+        "name": "조수유리 전투망치"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -19755,6 +19798,63 @@ export const ko_KR: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "간수 오시크"
+      },
+      "lagoon_snapper": {
+        "name": "석호 늑대거북"
+      },
+      "lagoon_eel": {
+        "name": "석호 뱀장어"
+      },
+      "moonlit_siren": {
+        "name": "달빛 세이렌"
+      },
+      "tidewisp": {
+        "name": "조수 정령"
+      },
+      "drowned_pilgrim": {
+        "name": "익사한 순례자"
+      },
+      "mere_hydra_head_left": {
+        "name": "호수 히드라"
+      },
+      "mere_hydra_head_center": {
+        "name": "호수 히드라"
+      },
+      "mere_hydra_head_right": {
+        "name": "호수 히드라"
+      },
+      "tideglass_colossus": {
+        "name": "조수유리 거상"
+      },
+      "tideglass_reflection": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_priest": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_mage": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_druid": {
+        "name": "조수유리 투영체"
       },
       "sanctum_boneguard": {
         "name": "성소 뼈수호자"

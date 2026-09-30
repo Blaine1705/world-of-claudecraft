@@ -89,6 +89,20 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.bastion_gaolers_cudgel': true,
   'abilityUi.cast.bastion_mist_surge': true,
   'abilityUi.cast.bastion_drowning_hymn': true,
+  // The Drowned Temple trash kit and boss casts.
+  'abilityUi.cast.temple_lullaby': true,
+  'abilityUi.cast.temple_call_the_tide': true,
+  'abilityUi.cast.temple_static_coil': true,
+  'abilityUi.cast.temple_snapper_snap': true,
+  'abilityUi.cast.temple_trident_sweep': true,
+  'abilityUi.cast.temple_sea_song': true,
+  'abilityUi.cast.temple_tidal_slap': true,
+  'abilityUi.cast.temple_tide_breath': true,
+  'abilityUi.cast.temple_moonlight_lance': true,
+  'abilityUi.cast.temple_prism_flare': true,
+  'abilityUi.cast.temple_resonant_slam': true,
+  'abilityUi.cast.temple_undertow': true,
+  'abilityUi.cast.temple_lunar_tide': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

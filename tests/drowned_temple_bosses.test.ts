@@ -634,3 +634,110 @@ describe('Ysolei: run out of the undertow toward the dry half', () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+describe('the Drowned Temple deeds, granted to the claim at the kill', () => {
+  function earned(f: Fight, e: Entity, deed: string): boolean {
+    return f.sim.players.get(e.id)?.deedsEarned.has(deed) ?? false;
+  }
+
+  function killHeadsApart(gap: number): Fight {
+    const f = fight();
+    const heads = [HYDRA_LEFT_ID, HYDRA_CENTER_ID, HYDRA_RIGHT_ID].map((id) => boss(f, id));
+    put(f, f.tank, 0, 90);
+    for (const h of heads) engage(f, h);
+    run(f, 0.2);
+    for (const h of heads) {
+      f.sim.ctx.handleDeath(h, f.tank);
+      run(f, gap);
+    }
+    return f;
+  }
+
+  it('All Heads Down: three heads within 10 s earn it, a slow kill does not', () => {
+    const quick = killHeadsApart(4);
+    expect(earned(quick, quick.tank, 'dgn_mere_hydra')).toBe(true);
+    expect(earned(quick, quick.others[0], 'dgn_mere_hydra')).toBe(true);
+    const slow = killHeadsApart(6);
+    expect(earned(slow, slow.tank, 'dgn_mere_hydra')).toBe(false);
+  });
+
+  it('Every Voice in Tune: a clean kill earns it, a lone Chorus spoils it', () => {
+    const clean = fight();
+    const b = boss(clean, SELTHE_ID);
+    put(clean, clean.tank, 0, 6);
+    engage(clean, b);
+    run(clean, 1);
+    clean.sim.ctx.handleDeath(b, clean.tank);
+    run(clean, 0.2);
+    expect(earned(clean, clean.tank, 'dgn_selthe_pitch')).toBe(true);
+
+    const f = fight();
+    const b2 = boss(f, SELTHE_ID);
+    put(f, f.tank, 0, 6);
+    put(f, f.others[0], -10, -4);
+    put(f, f.others[1], 10, -4);
+    engage(f, b2);
+    run(f, SELTHE_TUNING.chorusFirst + 0.1);
+    const lone = [f.tank, ...f.others].find((p) => hasAura(p, SELTHE_CHORUS_MARK)) as Entity;
+    const far = local(f, lone).x > 0 ? -18 : 18;
+    const rest = [f.tank, ...f.others].filter((p) => p !== lone);
+    run(f, SELTHE_TUNING.markSeconds, () => {
+      for (const p of rest) put(f, p, far, 0);
+    });
+    f.sim.ctx.handleDeath(b2, f.tank);
+    run(f, 0.2);
+    expect(earned(f, f.tank, 'dgn_selthe_pitch')).toBe(false);
+  });
+
+  it('Break the Glass: Reflections broken at once earn it, a kill with no flare does not', () => {
+    const f = fight();
+    const b = boss(f, COLOSSUS_ID);
+    put(f, f.tank, 86, 204);
+    engage(f, b);
+    run(f, 0.2);
+    b.hp = Math.floor(b.maxHp * 0.74);
+    run(f, COLOSSUS_TUNING.flareCast + 0.3);
+    for (const id of f.inst.mobIds) {
+      const e = f.sim.ctx.entities.get(id);
+      if (e && !e.dead && e.templateId.startsWith(REFLECTION_ID)) f.sim.ctx.handleDeath(e, f.tank);
+    }
+    run(f, 0.2);
+    f.sim.ctx.handleDeath(b, f.tank);
+    run(f, 0.2);
+    expect(earned(f, f.tank, 'dgn_colossus_mirror')).toBe(true);
+
+    const g = fight();
+    const b2 = boss(g, COLOSSUS_ID);
+    put(g, g.tank, 86, 204);
+    engage(g, b2);
+    run(g, 0.5);
+    g.sim.ctx.handleDeath(b2, g.tank);
+    run(g, 0.2);
+    expect(earned(g, g.tank, 'dgn_colossus_mirror')).toBe(false);
+  });
+
+  it('High and Dry: nobody under the Tidal Crash earns it, one caught player spoils it', () => {
+    const f = fight();
+    const b = boss(f, YSOLEI_ID);
+    put(f, f.tank, -24, 206);
+    engage(f, b);
+    run(f, 1);
+    f.sim.ctx.handleDeath(b, f.tank);
+    run(f, 0.2);
+    expect(earned(f, f.tank, 'dgn_ysolei_high_and_dry')).toBe(true);
+
+    const g = fight();
+    const b2 = boss(g, YSOLEI_ID);
+    put(g, g.tank, -24, 206);
+    engage(g, b2);
+    run(g, YSOLEI_TUNING.undertowFirst + 0.05);
+    const at = local(g, b2);
+    run(g, YSOLEI_TUNING.undertowSeconds + 0.1, () => {
+      put(g, g.others[0], at.x + 4, at.z);
+    });
+    g.sim.ctx.handleDeath(b2, g.tank);
+    run(g, 0.2);
+    expect(earned(g, g.tank, 'dgn_ysolei_high_and_dry')).toBe(false);
+  });
+});

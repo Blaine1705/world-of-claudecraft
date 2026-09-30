@@ -12263,7 +12263,20 @@ export const ru_RU: EnTranslations = {
       "bastion_gaol_hook": "Тюремный крюк",
       "bastion_gaolers_cudgel": "Дубинка тюремщика",
       "bastion_mist_surge": "Туманный прилив",
-      "bastion_drowning_hymn": "Гимн утопленников"
+      "bastion_drowning_hymn": "Гимн утопленников",
+      "temple_lullaby": "Колыбельная",
+      "temple_call_the_tide": "Зов прилива",
+      "temple_static_coil": "Статический виток",
+      "temple_snapper_snap": "Укус",
+      "temple_trident_sweep": "Взмах трезубца",
+      "temple_sea_song": "Песнь моря",
+      "temple_tidal_slap": "Приливная пощёчина",
+      "temple_tide_breath": "Приливное дыхание",
+      "temple_moonlight_lance": "Копьё лунного света",
+      "temple_prism_flare": "Вспышка призмы",
+      "temple_resonant_slam": "Резонирующий удар",
+      "temple_undertow": "Отбойное течение",
+      "temple_lunar_tide": "Лунный прилив"
     }
   },
   "questUi": {
@@ -18539,6 +18552,36 @@ export const ru_RU: EnTranslations = {
       "gaolyard_striders": {
         "name": "Сапоги тюремного двора"
       },
+      "conchplate_girdle": {
+        "name": "Пояс из раковинных пластин"
+      },
+      "pale_chorus_leggings": {
+        "name": "Поножи Бледного хора"
+      },
+      "refrain_silk_gloves": {
+        "name": "Шёлковые перчатки припева"
+      },
+      "chorus_conch": {
+        "name": "Раковина хора"
+      },
+      "tideglass_pauldrons": {
+        "name": "Наплечники Приливного стекла"
+      },
+      "moonburn_treads": {
+        "name": "Ступни лунного ожога"
+      },
+      "prism_etched_cowl": {
+        "name": "Капюшон с призменной гравировкой"
+      },
+      "tideglass_shiv": {
+        "name": "Заточка Приливного стекла"
+      },
+      "pale_chorus_vestment": {
+        "name": "Облачение Бледного хора"
+      },
+      "tideglass_warmaul": {
+        "name": "Боевой молот Приливного стекла"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
@@ -19755,6 +19798,63 @@ export const ru_RU: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "Тюремщик Оссик"
+      },
+      "lagoon_snapper": {
+        "name": "Лагунная кусачая черепаха"
+      },
+      "lagoon_eel": {
+        "name": "Лагунный угорь"
+      },
+      "moonlit_siren": {
+        "name": "Лунная сирена"
+      },
+      "tidewisp": {
+        "name": "Приливный огонёк"
+      },
+      "drowned_pilgrim": {
+        "name": "Утонувший паломник"
+      },
+      "mere_hydra_head_left": {
+        "name": "Озёрная гидра"
+      },
+      "mere_hydra_head_center": {
+        "name": "Озёрная гидра"
+      },
+      "mere_hydra_head_right": {
+        "name": "Озёрная гидра"
+      },
+      "tideglass_colossus": {
+        "name": "Колосс Приливного стекла"
+      },
+      "tideglass_reflection": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_priest": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_mage": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "Отражение Приливного стекла"
+      },
+      "tideglass_reflection_druid": {
+        "name": "Отражение Приливного стекла"
       },
       "sanctum_boneguard": {
         "name": "Костяной страж святилища"

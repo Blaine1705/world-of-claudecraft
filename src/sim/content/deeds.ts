@@ -3634,6 +3634,44 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
+  // The Drowned Temple rework (docs/design/dungeon-rework/drowned_temple.md,
+  // "Deeds"): one per boss core and one for the Mere Hydra, granted by the
+  // encounter modules (src/sim/encounters/drowned_temple) to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. Names are generic English phrases, checked at
+  // authoring (2026-09-30).
+  dgn_selthe_pitch: {
+    id: 'dgn_selthe_pitch',
+    name: 'Every Voice in Tune',
+    desc: 'Defeat Choirmother Selthe with every Chorus shared by two or more and no Solo touching anyone else.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_colossus_mirror: {
+    id: 'dgn_colossus_mirror',
+    name: 'Break the Glass',
+    desc: 'Defeat the Tideglass Colossus with every Reflection broken within 15 seconds of rising.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_ysolei_high_and_dry: {
+    id: 'dgn_ysolei_high_and_dry',
+    name: 'High and Dry',
+    desc: 'Defeat Ysolei, Avatar of the Drowned Moon, without anyone being struck by her Tidal Crash.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_mere_hydra: {
+    id: 'dgn_mere_hydra',
+    name: 'All Heads Down',
+    desc: 'Slay all three heads of the Mere Hydra within 10 seconds of each other.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

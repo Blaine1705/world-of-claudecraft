@@ -12263,7 +12263,20 @@ export const zh_CN: EnTranslations = {
       "bastion_gaol_hook": "牢狱钩索",
       "bastion_gaolers_cudgel": "狱卒短棍",
       "bastion_mist_surge": "迷雾涌流",
-      "bastion_drowning_hymn": "溺亡圣咏"
+      "bastion_drowning_hymn": "溺亡圣咏",
+      "temple_lullaby": "摇篮曲",
+      "temple_call_the_tide": "潮汐召唤",
+      "temple_static_coil": "静电盘绕",
+      "temple_snapper_snap": "猛咬",
+      "temple_trident_sweep": "三叉戟横扫",
+      "temple_sea_song": "海之歌",
+      "temple_tidal_slap": "潮汐掌击",
+      "temple_tide_breath": "潮汐吐息",
+      "temple_moonlight_lance": "月光长枪",
+      "temple_prism_flare": "棱镜闪耀",
+      "temple_resonant_slam": "共鸣猛击",
+      "temple_undertow": "暗流",
+      "temple_lunar_tide": "月潮"
     }
   },
   "questUi": {
@@ -18539,6 +18552,36 @@ export const zh_CN: EnTranslations = {
       "gaolyard_striders": {
         "name": "狱庭长靴"
       },
+      "conchplate_girdle": {
+        "name": "螺甲腰带"
+      },
+      "pale_chorus_leggings": {
+        "name": "苍白合唱护腿"
+      },
+      "refrain_silk_gloves": {
+        "name": "叠句丝手套"
+      },
+      "chorus_conch": {
+        "name": "合唱海螺"
+      },
+      "tideglass_pauldrons": {
+        "name": "潮镜肩铠"
+      },
+      "moonburn_treads": {
+        "name": "月灼便靴"
+      },
+      "prism_etched_cowl": {
+        "name": "棱镜蚀刻兜帽"
+      },
+      "tideglass_shiv": {
+        "name": "潮镜匕首"
+      },
+      "pale_chorus_vestment": {
+        "name": "苍白合唱法衣"
+      },
+      "tideglass_warmaul": {
+        "name": "潮镜战槌"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19755,6 +19798,63 @@ export const zh_CN: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "狱卒奥西克"
+      },
+      "lagoon_snapper": {
+        "name": "泻湖鳄龟"
+      },
+      "lagoon_eel": {
+        "name": "泻湖鳗鱼"
+      },
+      "moonlit_siren": {
+        "name": "月光塞壬"
+      },
+      "tidewisp": {
+        "name": "潮汐精魂"
+      },
+      "drowned_pilgrim": {
+        "name": "溺亡朝圣者"
+      },
+      "mere_hydra_head_left": {
+        "name": "湖泊九头蛇"
+      },
+      "mere_hydra_head_center": {
+        "name": "湖泊九头蛇"
+      },
+      "mere_hydra_head_right": {
+        "name": "湖泊九头蛇"
+      },
+      "tideglass_colossus": {
+        "name": "潮镜巨像"
+      },
+      "tideglass_reflection": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_priest": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_mage": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_druid": {
+        "name": "潮镜倒影"
       },
       "sanctum_boneguard": {
         "name": "圣所骨卫"

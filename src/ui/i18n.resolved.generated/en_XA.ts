@@ -12263,7 +12263,20 @@ export const en_XA: EnTranslations = {
       "bastion_gaol_hook": "[Ĝáóļ Ĥóóķ]",
       "bastion_gaolers_cudgel": "[Ĝáóļéŕ'š Çúðĝéļ]",
       "bastion_mist_surge": "[Ɱíšţ Šúŕĝé]",
-      "bastion_drowning_hymn": "[Ðŕóŵñíñĝ Ĥýɱñ]"
+      "bastion_drowning_hymn": "[Ðŕóŵñíñĝ Ĥýɱñ]",
+      "temple_lullaby": "[Ļúļļáƀý]",
+      "temple_call_the_tide": "[Çáļļ ţĥé Ţíðé]",
+      "temple_static_coil": "[Šţáţíç Çóíļ]",
+      "temple_snapper_snap": "[Šñáþ]",
+      "temple_trident_sweep": "[Ţŕíðéñţ Šŵééþ]",
+      "temple_sea_song": "[Šéá-Šóñĝ]",
+      "temple_tidal_slap": "[Ţíðáļ Šļáþ]",
+      "temple_tide_breath": "[Ţíðé Ɓŕéáţĥ]",
+      "temple_moonlight_lance": "[Ɱóóñļíĝĥţ Ļáñçé]",
+      "temple_prism_flare": "[Þŕíšɱ Ƒļáŕé]",
+      "temple_resonant_slam": "[Ŕéšóñáñţ Šļáɱ]",
+      "temple_undertow": "[Úñðéŕţóŵ]",
+      "temple_lunar_tide": "[Ļúñáŕ Ţíðé]"
     }
   },
   "questUi": {
@@ -18539,6 +18552,36 @@ export const en_XA: EnTranslations = {
       "gaolyard_striders": {
         "name": "[Ĝáóļýáŕð Šţŕíðéŕš]"
       },
+      "conchplate_girdle": {
+        "name": "[Çóñçĥþļáţé Ĝíŕðļé]"
+      },
+      "pale_chorus_leggings": {
+        "name": "[Þáļé Çĥóŕúš Ļéĝĝíñĝš]"
+      },
+      "refrain_silk_gloves": {
+        "name": "[Ŕéƒŕáíñ Šíļķ Ĝļóʋéš]"
+      },
+      "chorus_conch": {
+        "name": "[Çĥóŕúš Çóñçĥ]"
+      },
+      "tideglass_pauldrons": {
+        "name": "[Ţíðéĝļášš Þáúļðŕóñš]"
+      },
+      "moonburn_treads": {
+        "name": "[Ɱóóñƀúŕñ Ţŕéáðš]"
+      },
+      "prism_etched_cowl": {
+        "name": "[Þŕíšɱ-Éţçĥéð Çóŵļ]"
+      },
+      "tideglass_shiv": {
+        "name": "[Ţíðéĝļášš Šĥíʋ]"
+      },
+      "pale_chorus_vestment": {
+        "name": "[Þáļé Çĥóŕúš Ʋéšţɱéñţ]"
+      },
+      "tideglass_warmaul": {
+        "name": "[Ţíðéĝļášš Ŵáŕɱáúļ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },
@@ -19755,6 +19798,63 @@ export const en_XA: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "[Ĝáóļéŕ Óššíçķ]"
+      },
+      "lagoon_snapper": {
+        "name": "[Ļáĝóóñ Šñáþþéŕ]"
+      },
+      "lagoon_eel": {
+        "name": "[Ļáĝóóñ Ééļ]"
+      },
+      "moonlit_siren": {
+        "name": "[Ɱóóñļíţ Šíŕéñ]"
+      },
+      "tidewisp": {
+        "name": "[Ţíðéŵíšþ]"
+      },
+      "drowned_pilgrim": {
+        "name": "[Ðŕóŵñéð Þíļĝŕíɱ]"
+      },
+      "mere_hydra_head_left": {
+        "name": "[Ɱéŕé Ĥýðŕá]"
+      },
+      "mere_hydra_head_center": {
+        "name": "[Ɱéŕé Ĥýðŕá]"
+      },
+      "mere_hydra_head_right": {
+        "name": "[Ɱéŕé Ĥýðŕá]"
+      },
+      "tideglass_colossus": {
+        "name": "[Ţíðéĝļášš Çóļóššúš]"
+      },
+      "tideglass_reflection": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_priest": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_mage": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
+      },
+      "tideglass_reflection_druid": {
+        "name": "[Ţíðéĝļášš Ŕéƒļéçţíóñ]"
       },
       "sanctum_boneguard": {
         "name": "[Šáñçţúɱ Ɓóñéĝúáŕð]"

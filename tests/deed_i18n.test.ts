@@ -100,15 +100,19 @@ describe('deed_i18n English resolution', () => {
     // desc, no title) at the 2026-09-28 merge into feature/buried-hoards.
     // 323 with the Sunken Bastion rework's four encounter deeds (a name and a
     // desc each, no title).
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(323);
+    // 327 with the Drowned Temple rework's four (a name and a desc each).
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(327);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
     // casket deeds. 304 with the Sunken Bastion rework's four encounter deeds.
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(304);
+    // 308 with the Drowned Temple rework's four.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(308);
     // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
     // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
-    // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc.
-    expect(manifest.length).toBe(670);
+    // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc;
+    // 678 with the Sunken Bastion's four and 686 with the Drowned Temple's four
+    // (a name and a desc each).
+    expect(manifest.length).toBe(686);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(51);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },

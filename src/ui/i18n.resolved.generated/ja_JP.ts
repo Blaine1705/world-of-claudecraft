@@ -12263,7 +12263,20 @@ export const ja_JP: EnTranslations = {
       "bastion_gaol_hook": "牢獄の鉤",
       "bastion_gaolers_cudgel": "牢番の棍棒",
       "bastion_mist_surge": "霧の奔流",
-      "bastion_drowning_hymn": "溺れの聖歌"
+      "bastion_drowning_hymn": "溺れの聖歌",
+      "temple_lullaby": "子守歌",
+      "temple_call_the_tide": "潮の呼び声",
+      "temple_static_coil": "静電のとぐろ",
+      "temple_snapper_snap": "噛みつき",
+      "temple_trident_sweep": "三叉槍の薙ぎ払い",
+      "temple_sea_song": "海の歌",
+      "temple_tidal_slap": "潮の平手打ち",
+      "temple_tide_breath": "潮のブレス",
+      "temple_moonlight_lance": "月光の槍",
+      "temple_prism_flare": "プリズムの閃光",
+      "temple_resonant_slam": "共鳴の叩きつけ",
+      "temple_undertow": "引き潮",
+      "temple_lunar_tide": "月の潮"
     }
   },
   "questUi": {
@@ -18539,6 +18552,36 @@ export const ja_JP: EnTranslations = {
       "gaolyard_striders": {
         "name": "牢獄庭の長靴"
       },
+      "conchplate_girdle": {
+        "name": "巻貝板の腰帯"
+      },
+      "pale_chorus_leggings": {
+        "name": "蒼白聖歌のレギンス"
+      },
+      "refrain_silk_gloves": {
+        "name": "リフレインの絹手袋"
+      },
+      "chorus_conch": {
+        "name": "聖歌の巻貝"
+      },
+      "tideglass_pauldrons": {
+        "name": "潮硝子の肩当て"
+      },
+      "moonburn_treads": {
+        "name": "月焼けの靴"
+      },
+      "prism_etched_cowl": {
+        "name": "プリズム刻みの頭巾"
+      },
+      "tideglass_shiv": {
+        "name": "潮硝子の小刀"
+      },
+      "pale_chorus_vestment": {
+        "name": "蒼白聖歌の祭服"
+      },
+      "tideglass_warmaul": {
+        "name": "潮硝子の戦槌"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19755,6 +19798,63 @@ export const ja_JP: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "牢番オシック"
+      },
+      "lagoon_snapper": {
+        "name": "潟湖のスナッパー"
+      },
+      "lagoon_eel": {
+        "name": "潟湖のウナギ"
+      },
+      "moonlit_siren": {
+        "name": "月照らしのセイレーン"
+      },
+      "tidewisp": {
+        "name": "潮の精"
+      },
+      "drowned_pilgrim": {
+        "name": "溺れた巡礼者"
+      },
+      "mere_hydra_head_left": {
+        "name": "湖のヒュドラ"
+      },
+      "mere_hydra_head_center": {
+        "name": "湖のヒュドラ"
+      },
+      "mere_hydra_head_right": {
+        "name": "湖のヒュドラ"
+      },
+      "tideglass_colossus": {
+        "name": "潮硝子の巨像"
+      },
+      "tideglass_reflection": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_priest": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_mage": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_druid": {
+        "name": "潮硝子の映し身"
       },
       "sanctum_boneguard": {
         "name": "聖所の骨衛兵"

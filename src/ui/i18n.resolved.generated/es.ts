@@ -12263,7 +12263,20 @@ export const es: EnTranslations = {
       "bastion_gaol_hook": "Gaol Hook",
       "bastion_gaolers_cudgel": "Gaoler's Cudgel",
       "bastion_mist_surge": "Mist Surge",
-      "bastion_drowning_hymn": "Drowning Hymn"
+      "bastion_drowning_hymn": "Drowning Hymn",
+      "temple_lullaby": "Lullaby",
+      "temple_call_the_tide": "Call the Tide",
+      "temple_static_coil": "Static Coil",
+      "temple_snapper_snap": "Snap",
+      "temple_trident_sweep": "Trident Sweep",
+      "temple_sea_song": "Sea-Song",
+      "temple_tidal_slap": "Tidal Slap",
+      "temple_tide_breath": "Tide Breath",
+      "temple_moonlight_lance": "Moonlight Lance",
+      "temple_prism_flare": "Prism Flare",
+      "temple_resonant_slam": "Resonant Slam",
+      "temple_undertow": "Undertow",
+      "temple_lunar_tide": "Lunar Tide"
     }
   },
   "questUi": {
@@ -18539,6 +18552,36 @@ export const es: EnTranslations = {
       "gaolyard_striders": {
         "name": "Gaolyard Striders"
       },
+      "conchplate_girdle": {
+        "name": "Conchplate Girdle"
+      },
+      "pale_chorus_leggings": {
+        "name": "Pale Chorus Leggings"
+      },
+      "refrain_silk_gloves": {
+        "name": "Refrain Silk Gloves"
+      },
+      "chorus_conch": {
+        "name": "Chorus Conch"
+      },
+      "tideglass_pauldrons": {
+        "name": "Tideglass Pauldrons"
+      },
+      "moonburn_treads": {
+        "name": "Moonburn Treads"
+      },
+      "prism_etched_cowl": {
+        "name": "Prism-Etched Cowl"
+      },
+      "tideglass_shiv": {
+        "name": "Tideglass Shiv"
+      },
+      "pale_chorus_vestment": {
+        "name": "Pale Chorus Vestment"
+      },
+      "tideglass_warmaul": {
+        "name": "Tideglass Warmaul"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
       },
@@ -19755,6 +19798,63 @@ export const es: EnTranslations = {
       },
       "gaoler_ossick": {
         "name": "Gaoler Ossick"
+      },
+      "lagoon_snapper": {
+        "name": "Lagoon Snapper"
+      },
+      "lagoon_eel": {
+        "name": "Lagoon Eel"
+      },
+      "moonlit_siren": {
+        "name": "Moonlit Siren"
+      },
+      "tidewisp": {
+        "name": "Tidewisp"
+      },
+      "drowned_pilgrim": {
+        "name": "Drowned Pilgrim"
+      },
+      "mere_hydra_head_left": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_center": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_right": {
+        "name": "Mere Hydra"
+      },
+      "tideglass_colossus": {
+        "name": "Tideglass Colossus"
+      },
+      "tideglass_reflection": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_priest": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_mage": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_druid": {
+        "name": "Tideglass Reflection"
       },
       "sanctum_boneguard": {
         "name": "Guardahuesos del Santuario"

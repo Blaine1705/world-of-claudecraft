@@ -6032,6 +6032,34 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_selthe_pitch",
+    "name": "Every Voice in Tune",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_colossus_mirror",
+    "name": "Break the Glass",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ysolei_high_and_dry",
+    "name": "High and Dry",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_mere_hydra",
+    "name": "All Heads Down",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -6224,6 +6252,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Selthe's Sea-Striders"
+      },
+      {
+        "kind": "item",
+        "name": "Chorus Conch"
+      },
+      {
+        "kind": "item",
+        "name": "Tideglass Shiv"
       }
     ]
   },
@@ -6263,6 +6299,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Mender's Hourglass"
+      },
+      {
+        "kind": "item",
+        "name": "Pale Chorus Vestment"
+      },
+      {
+        "kind": "item",
+        "name": "Tideglass Warmaul"
       }
     ]
   },

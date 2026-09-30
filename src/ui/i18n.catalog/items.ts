@@ -3398,6 +3398,17 @@ const ITEM_ENTITY_IDS = [
   'gaolyard_cudgel',
   'drowned_commanders_breastplate',
   'gaolyard_striders',
+  // The Drowned Temple rework's loot (sim/content/drowned_temple_items.ts).
+  'conchplate_girdle',
+  'pale_chorus_leggings',
+  'refrain_silk_gloves',
+  'chorus_conch',
+  'tideglass_pauldrons',
+  'moonburn_treads',
+  'prism_etched_cowl',
+  'tideglass_shiv',
+  'pale_chorus_vestment',
+  'tideglass_warmaul',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4357,6 +4368,17 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gaolyard_cudgel: 'Gaolyard Cudgel',
   drowned_commanders_breastplate: "Drowned Commander's Breastplate",
   gaolyard_striders: 'Gaolyard Striders',
+  // The Drowned Temple rework's loot.
+  conchplate_girdle: 'Conchplate Girdle',
+  pale_chorus_leggings: 'Pale Chorus Leggings',
+  refrain_silk_gloves: 'Refrain Silk Gloves',
+  chorus_conch: 'Chorus Conch',
+  tideglass_pauldrons: 'Tideglass Pauldrons',
+  moonburn_treads: 'Moonburn Treads',
+  prism_etched_cowl: 'Prism-Etched Cowl',
+  tideglass_shiv: 'Tideglass Shiv',
+  pale_chorus_vestment: 'Pale Chorus Vestment',
+  tideglass_warmaul: 'Tideglass Warmaul',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

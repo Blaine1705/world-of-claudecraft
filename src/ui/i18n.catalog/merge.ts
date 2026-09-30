@@ -599,6 +599,22 @@ const mergeStringsEn = {
       bastion_gaolers_cudgel: "Gaoler's Cudgel",
       bastion_mist_surge: 'Mist Surge',
       bastion_drowning_hymn: 'Drowning Hymn',
+      // The Drowned Temple trash kit and boss casts (trash_kit/temple_cast_ids.ts,
+      // encounters/drowned_temple/ids.ts). The Lullaby, the Call and the Coil
+      // can be kicked.
+      temple_lullaby: 'Lullaby',
+      temple_call_the_tide: 'Call the Tide',
+      temple_static_coil: 'Static Coil',
+      temple_snapper_snap: 'Snap',
+      temple_trident_sweep: 'Trident Sweep',
+      temple_sea_song: 'Sea-Song',
+      temple_tidal_slap: 'Tidal Slap',
+      temple_tide_breath: 'Tide Breath',
+      temple_moonlight_lance: 'Moonlight Lance',
+      temple_prism_flare: 'Prism Flare',
+      temple_resonant_slam: 'Resonant Slam',
+      temple_undertow: 'Undertow',
+      temple_lunar_tide: 'Lunar Tide',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
