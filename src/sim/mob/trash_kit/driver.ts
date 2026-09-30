@@ -31,6 +31,7 @@ import {
   type TrashKitDef,
   type TrashKitState,
 } from '../../types';
+import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
 import { spawnKitAdd } from './spawn';
 import {
@@ -108,14 +109,23 @@ function groundY(ctx: SimContext, e: Entity): number {
   return ctx.groundPos(e.pos.x, e.pos.z).y;
 }
 
-/** Fresh per-pull state: every ability waits its `first` seconds. */
-export function startTrashKit(ctx: SimContext, mob: Entity, kit: TrashKitDef): TrashKitState {
+/** Fresh per-pull state: every ability waits its `first` seconds, plus the
+ *  pack stagger (mob/pack_cast_stagger.ts) when same-type peers in the claim
+ *  were pulled with it, so a pack's casts alternate instead of landing as one. */
+export function startTrashKit(
+  ctx: SimContext,
+  mob: Entity,
+  kit: TrashKitDef,
+  inst?: InstanceSlot,
+): TrashKitState {
+  const roster = inst ? inst.mobIds.map((id) => ctx.entities.get(id)) : [];
+  const { rank, size } = packPeerRank(roster, mob, (peer) => peer.trashKit !== undefined);
   const timers: Record<string, number> = {};
   for (const key of CAST_KEYS) {
     const def = castDef(kit, key);
-    if (def) timers[key] = def.first;
+    if (def) timers[key] = def.first + packStaggerOffset(rank, size, def.every);
   }
-  if (kit.leap) timers.leap = kit.leap.first;
+  if (kit.leap) timers.leap = kit.leap.first + packStaggerOffset(rank, size, kit.leap.every);
   const st: TrashKitState = { timers, cast: null, leap: null, descent: null, engaged: 0, casts: 0 };
   // Pulled off a perch or out of the sky: come down first. The mob AI has
   // already stood it on the floor this tick, so the height it was up at is the
@@ -615,7 +625,7 @@ function stepMob(
     mob.airY = mob.pos.y > groundY(ctx, mob) + AIRBORNE ? mob.pos.y : undefined;
     return;
   }
-  const st = mob.trashKit ?? startTrashKit(ctx, mob, kit);
+  const st = mob.trashKit ?? startTrashKit(ctx, mob, kit, inst);
   mob.trashKit = st;
   st.engaged += DT;
   if (kit.grow && st.engaged >= kit.grow.after) {

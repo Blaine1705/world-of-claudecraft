@@ -122,6 +122,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { packBreathStagger } from './pack_cast_stagger';
 import { updateMobPatrol } from './patrol';
 import { playerDummyShedHp } from './practice_dummies';
 import {
@@ -1452,7 +1453,9 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       // open-world dragonkin only (no rift boss carries it), and the governed
       // table requires a MANDATORY per-entity timer field. If a rift boss
       // ever takes a breath cone, register breathTimer there first.
-      mob.breathTimer ??= breath.every;
+      // A pack's breaths alternate (mob/pack_cast_stagger.ts); a lone mob's
+      // first breath still lands one full interval in.
+      mob.breathTimer ??= breath.every + packBreathStagger(ctx, mob, breath.every);
       mob.breathTimer -= DT;
       if (mob.breathTimer <= 0 && mob.castingAbility === null) {
         mob.breathTimer = breath.every + breath.castTime;

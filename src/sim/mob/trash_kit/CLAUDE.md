@@ -19,6 +19,10 @@ Rules:
   cancels it, and the effect lands only when the bar runs out.
 - Zero rng for targets and cadence; the only draws are a landing cast's damage
   rolls, in roster order.
+- A pack's same-type casts alternate: each mob's first cast of an ability is
+  offset by its pull rank over one interval (`../pack_cast_stagger.ts`, also
+  used by the breath-cone seed); cadence and a lone mob's timing are unchanged.
+  Tests: `tests/pack_cast_stagger.test.ts`.
 - Kit state rides `Entity.trashKit` and dies with the pull (evade, reset,
   death). Flying patrols (`DungeonSpawnPatrol.altitude`) are flown by
   `mob/patrol.ts`; the landing and the perch dive are this module's.
