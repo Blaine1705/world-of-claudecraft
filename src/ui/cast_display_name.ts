@@ -77,6 +77,15 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.crypt_barrowflame_breath': true,
   'abilityUi.cast.crypt_tail_lash': true,
   'abilityUi.cast.crypt_wing_gust': true,
+  // The Hollow Crypt finale (encounters/hollow_crypt/ids.ts).
+  'abilityUi.cast.crypt_morthen_rite_wakes': true,
+  'abilityUi.cast.crypt_morthen_rise': true,
+  'abilityUi.cast.crypt_morthen_proclaim': true,
+  'abilityUi.cast.crypt_morthen_descend': true,
+  'abilityUi.cast.crypt_knellwyrm_arrive': true,
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': true,
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': true,
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': true,
   // The Sunken Bastion trash kit and boss casts.
   'abilityUi.cast.bastion_brine_mend': true,
   'abilityUi.cast.bastion_fog_ward': true,

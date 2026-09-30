@@ -3672,6 +3672,18 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
+  // The Hollow Crypt's fourth pass: the Knellwyrm finale Morthen's dying rite
+  // summons (src/sim/encounters/hollow_crypt/knellwyrm.ts), granted to every
+  // player in the claim at the kill. Cosmetic only; appended at the END per
+  // the append-only contract. Generic English idiom, checked 2026-09-30.
+  dgn_crypt_knellwyrm: {
+    id: 'dgn_crypt_knellwyrm',
+    name: 'Not a Hair Singed',
+    desc: 'Defeat the Knellwyrm without anyone being burned by its Pyre Strafe.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

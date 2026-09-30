@@ -1020,6 +1020,19 @@ const baseEnTable = {
   'mechanic.cryptGraveBolt': 'Grave Bolt',
   'mechanic.cryptRendingLeap': 'Rending Leap',
   'mechanic.cryptBoneBurst': 'Bone Burst',
+  // The Hollow Crypt finale (src/sim/encounters/hollow_crypt): Morthen's
+  // entrance and the Knellwyrm's lines, strikes and auras.
+  'log.hollowCryptMorthenRise':
+    'You climbed the Bone Stair to find me? Then your names are already in my ledger!',
+  'log.hollowCryptMorthenFinale':
+    'The rite outlives me! Knellwyrm, rise from the pyre and burn them!',
+  'log.hollowCryptKnellwyrmArrives': 'The Knellwyrm descends on the Rite Ring!',
+  'mechanic.cryptPyreStrafe': 'Pyre Strafe',
+  'mechanic.cryptDreadBellow': 'Dread Bellow',
+  'mechanic.cryptWyrmcallPyre': 'Wyrmcall Pyre',
+  'aura.cryptEntombed': 'Entombed',
+  'aura.cryptGraveAscension': 'Grave Ascension',
+  'aura.cryptBaredRibs': 'Bared Ribs',
   'aura.hoardCocooned': 'Cocooned',
   'aura.hoardHarvestedSoul': 'Harvested Soul',
   'aura.hoardSoulBurden': 'Soul Burden',
@@ -17575,6 +17588,12 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Grave Bolt': 'mechanic.cryptGraveBolt',
   'Rending Leap': 'mechanic.cryptRendingLeap',
   'Bone Burst': 'mechanic.cryptBoneBurst',
+  'Pyre Strafe': 'mechanic.cryptPyreStrafe',
+  'Dread Bellow': 'mechanic.cryptDreadBellow',
+  'Wyrmcall Pyre': 'mechanic.cryptWyrmcallPyre',
+  'Entombed': 'aura.cryptEntombed',
+  'Grave Ascension': 'aura.cryptGraveAscension',
+  'Bared Ribs': 'aura.cryptBaredRibs',
   'Cocooned': 'aura.hoardCocooned',
   'Harvested Soul': 'aura.hoardHarvestedSoul',
   'Soul Burden': 'aura.hoardSoulBurden',

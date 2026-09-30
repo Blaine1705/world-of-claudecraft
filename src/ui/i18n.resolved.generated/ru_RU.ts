@@ -12257,6 +12257,14 @@ export const ru_RU: EnTranslations = {
       "crypt_barrowflame_breath": "Дыхание курганного пламени",
       "crypt_tail_lash": "Удар хвостом",
       "crypt_wing_gust": "Порыв крыльев",
+      "crypt_morthen_rite_wakes": "Пробуждение обряда",
+      "crypt_morthen_rise": "Восход Могильного Зова",
+      "crypt_morthen_proclaim": "Могильное воззвание",
+      "crypt_morthen_descend": "Нисхождение",
+      "crypt_knellwyrm_arrive": "Спуск с небес",
+      "crypt_knellwyrm_pyre_strafe": "Погребальный налёт",
+      "crypt_knellwyrm_strafe_run": "Огненный заход",
+      "crypt_knellwyrm_dread_bellow": "Жуткий рёв",
       "bastion_brine_mend": "Целительный рассол",
       "bastion_fog_ward": "Туманный оберег",
       "bastion_halberd_sweep": "Размах алебарды",
@@ -19754,6 +19762,9 @@ export const ru_RU: EnTranslations = {
       },
       "crypt_ossuary_drake": {
         "name": "Костяной дракон оссуария"
+      },
+      "crypt_knellwyrm": {
+        "name": "Погребальный змий"
       },
       "bastion_revenant": {
         "name": "Ревенант бастиона"

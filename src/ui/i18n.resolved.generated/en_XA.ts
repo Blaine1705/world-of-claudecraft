@@ -12257,6 +12257,14 @@ export const en_XA: EnTranslations = {
       "crypt_barrowflame_breath": "[Ɓáŕŕóŵƒļáɱé Ɓŕéáţĥ]",
       "crypt_tail_lash": "[Ţáíļ Ļášĥ]",
       "crypt_wing_gust": "[Ŵíñĝ Ĝúšţ]",
+      "crypt_morthen_rite_wakes": "[Ţĥé Ŕíţé Ŵáķéš]",
+      "crypt_morthen_rise": "[Ŕíšé óƒ ţĥé Ĝŕáʋéçáļļéŕ]",
+      "crypt_morthen_proclaim": "[Ĝŕáʋé Þŕóçļáɱáţíóñ]",
+      "crypt_morthen_descend": "[Ðéšçéñţ]",
+      "crypt_knellwyrm_arrive": "[Ðéšçéñðíñĝ ƒŕóɱ ţĥé Šķý]",
+      "crypt_knellwyrm_pyre_strafe": "[Þýŕé Šţŕáƒé]",
+      "crypt_knellwyrm_strafe_run": "[Šţŕáƒíñĝ Ŕúñ]",
+      "crypt_knellwyrm_dread_bellow": "[Ðŕéáð Ɓéļļóŵ]",
       "bastion_brine_mend": "[Ɓŕíñé Ɱéñð]",
       "bastion_fog_ward": "[Ƒóĝ Ŵáŕð]",
       "bastion_halberd_sweep": "[Ĥáļƀéŕð Šŵééþ]",
@@ -19754,6 +19762,9 @@ export const en_XA: EnTranslations = {
       },
       "crypt_ossuary_drake": {
         "name": "[Óššúáŕý Ðŕáķé]"
+      },
+      "crypt_knellwyrm": {
+        "name": "[Ķñéļļŵýŕɱ]"
       },
       "bastion_revenant": {
         "name": "[Ɓášţíóñ Ŕéʋéñáñţ]"

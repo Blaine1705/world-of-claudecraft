@@ -12257,6 +12257,14 @@ export const ko_KR: EnTranslations = {
       "crypt_barrowflame_breath": "무덤불꽃 숨결",
       "crypt_tail_lash": "꼬리 채찍",
       "crypt_wing_gust": "날개 돌풍",
+      "crypt_morthen_rite_wakes": "의식의 각성",
+      "crypt_morthen_rise": "무덤부름의 승천",
+      "crypt_morthen_proclaim": "무덤의 선포",
+      "crypt_morthen_descend": "강림",
+      "crypt_knellwyrm_arrive": "하늘에서 강하",
+      "crypt_knellwyrm_pyre_strafe": "화장의 강습",
+      "crypt_knellwyrm_strafe_run": "강습 비행",
+      "crypt_knellwyrm_dread_bellow": "공포의 포효",
       "bastion_brine_mend": "소금물 치유",
       "bastion_fog_ward": "안개 보호막",
       "bastion_halberd_sweep": "미늘창 휩쓸기",
@@ -19754,6 +19762,9 @@ export const ko_KR: EnTranslations = {
       },
       "crypt_ossuary_drake": {
         "name": "납골당 뼈드레이크"
+      },
+      "crypt_knellwyrm": {
+        "name": "조종룡"
       },
       "bastion_revenant": {
         "name": "요새 망령"

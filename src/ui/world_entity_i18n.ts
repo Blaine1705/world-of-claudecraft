@@ -94,6 +94,8 @@ const MOB_IDS = [
   'crypt_crow_caller',
   'crypt_carrion_crow',
   'crypt_ossuary_drake',
+  // The Hollow Crypt finale (sim/content/hollow_crypt.ts).
+  'crypt_knellwyrm',
   'bastion_revenant',
   'tidebound_acolyte',
   'drowned_thrall',

@@ -12257,6 +12257,14 @@ export const ja_JP: EnTranslations = {
       "crypt_barrowflame_breath": "塚炎の吐息",
       "crypt_tail_lash": "尾の一撃",
       "crypt_wing_gust": "翼の突風",
+      "crypt_morthen_rite_wakes": "儀式の目覚め",
+      "crypt_morthen_rise": "墓呼びの昇天",
+      "crypt_morthen_proclaim": "墓所の宣告",
+      "crypt_morthen_descend": "降臨",
+      "crypt_knellwyrm_arrive": "天より降下",
+      "crypt_knellwyrm_pyre_strafe": "火葬の掃射",
+      "crypt_knellwyrm_strafe_run": "掃射飛行",
+      "crypt_knellwyrm_dread_bellow": "恐怖の咆哮",
       "bastion_brine_mend": "塩水の癒し",
       "bastion_fog_ward": "霧の守り",
       "bastion_halberd_sweep": "ハルバード薙ぎ",
@@ -19754,6 +19762,9 @@ export const ja_JP: EnTranslations = {
       },
       "crypt_ossuary_drake": {
         "name": "納骨堂の骨竜"
+      },
+      "crypt_knellwyrm": {
+        "name": "弔鐘竜"
       },
       "bastion_revenant": {
         "name": "砦の亡霊"

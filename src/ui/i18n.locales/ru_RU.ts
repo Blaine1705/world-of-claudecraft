@@ -20102,4 +20102,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.crypt_crow_caller.name': 'Зовущий воронов',
   'entities.mobs.crypt_carrion_crow.name': 'Ворон-падальщик',
   'entities.mobs.crypt_ossuary_drake.name': 'Костяной дракон оссуария',
+  // The Hollow Crypt finale (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_morthen_rite_wakes': 'Пробуждение обряда',
+  'abilityUi.cast.crypt_morthen_rise': 'Восход Могильного Зова',
+  'abilityUi.cast.crypt_morthen_proclaim': 'Могильное воззвание',
+  'abilityUi.cast.crypt_morthen_descend': 'Нисхождение',
+  'abilityUi.cast.crypt_knellwyrm_arrive': 'Спуск с небес',
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': 'Погребальный налёт',
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': 'Огненный заход',
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': 'Жуткий рёв',
+  'entities.mobs.crypt_knellwyrm.name': 'Погребальный змий',
 };

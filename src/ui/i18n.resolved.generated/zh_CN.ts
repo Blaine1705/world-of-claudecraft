@@ -12257,6 +12257,14 @@ export const zh_CN: EnTranslations = {
       "crypt_barrowflame_breath": "冢焰吐息",
       "crypt_tail_lash": "尾鞭",
       "crypt_wing_gust": "翼风",
+      "crypt_morthen_rite_wakes": "仪式苏醒",
+      "crypt_morthen_rise": "唤墓者升起",
+      "crypt_morthen_proclaim": "墓之宣告",
+      "crypt_morthen_descend": "降临",
+      "crypt_knellwyrm_arrive": "自天而降",
+      "crypt_knellwyrm_pyre_strafe": "火葬扫射",
+      "crypt_knellwyrm_strafe_run": "俯冲扫射",
+      "crypt_knellwyrm_dread_bellow": "恐惧咆哮",
       "bastion_brine_mend": "盐水愈合",
       "bastion_fog_ward": "雾之护佑",
       "bastion_halberd_sweep": "戟之横扫",
@@ -19754,6 +19762,9 @@ export const zh_CN: EnTranslations = {
       },
       "crypt_ossuary_drake": {
         "name": "骨堂骨龙"
+      },
+      "crypt_knellwyrm": {
+        "name": "丧钟巨龙"
       },
       "bastion_revenant": {
         "name": "堡垒亡魂"

@@ -19724,4 +19724,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.crypt_crow_caller.name': '까마귀 부르미',
   'entities.mobs.crypt_carrion_crow.name': '썩은고기 까마귀',
   'entities.mobs.crypt_ossuary_drake.name': '납골당 뼈드레이크',
+  // The Hollow Crypt finale (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_morthen_rite_wakes': '의식의 각성',
+  'abilityUi.cast.crypt_morthen_rise': '무덤부름의 승천',
+  'abilityUi.cast.crypt_morthen_proclaim': '무덤의 선포',
+  'abilityUi.cast.crypt_morthen_descend': '강림',
+  'abilityUi.cast.crypt_knellwyrm_arrive': '하늘에서 강하',
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': '화장의 강습',
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': '강습 비행',
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': '공포의 포효',
+  'entities.mobs.crypt_knellwyrm.name': '조종룡',
 };

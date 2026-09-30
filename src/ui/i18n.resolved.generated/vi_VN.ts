@@ -12257,6 +12257,14 @@ export const vi_VN: EnTranslations = {
       "crypt_barrowflame_breath": "Barrowflame Breath",
       "crypt_tail_lash": "Tail Lash",
       "crypt_wing_gust": "Wing Gust",
+      "crypt_morthen_rite_wakes": "The Rite Wakes",
+      "crypt_morthen_rise": "Rise of the Gravecaller",
+      "crypt_morthen_proclaim": "Grave Proclamation",
+      "crypt_morthen_descend": "Descent",
+      "crypt_knellwyrm_arrive": "Descending from the Sky",
+      "crypt_knellwyrm_pyre_strafe": "Pyre Strafe",
+      "crypt_knellwyrm_strafe_run": "Strafing Run",
+      "crypt_knellwyrm_dread_bellow": "Dread Bellow",
       "bastion_brine_mend": "Brine Mend",
       "bastion_fog_ward": "Fog Ward",
       "bastion_halberd_sweep": "Halberd Sweep",
@@ -19754,6 +19762,9 @@ export const vi_VN: EnTranslations = {
       },
       "crypt_ossuary_drake": {
         "name": "Ossuary Drake"
+      },
+      "crypt_knellwyrm": {
+        "name": "Knellwyrm"
       },
       "bastion_revenant": {
         "name": "Oán Linh Pháo Đài"

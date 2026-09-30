@@ -586,6 +586,16 @@ const mergeStringsEn = {
       crypt_barrowflame_breath: 'Barrowflame Breath',
       crypt_tail_lash: 'Tail Lash',
       crypt_wing_gust: 'Wing Gust',
+      // The Hollow Crypt finale (encounters/hollow_crypt/ids.ts): Morthen's
+      // entrance at the Rite Ring and the Knellwyrm. None can be kicked.
+      crypt_morthen_rite_wakes: 'The Rite Wakes',
+      crypt_morthen_rise: 'Rise of the Gravecaller',
+      crypt_morthen_proclaim: 'Grave Proclamation',
+      crypt_morthen_descend: 'Descent',
+      crypt_knellwyrm_arrive: 'Descending from the Sky',
+      crypt_knellwyrm_pyre_strafe: 'Pyre Strafe',
+      crypt_knellwyrm_strafe_run: 'Strafing Run',
+      crypt_knellwyrm_dread_bellow: 'Dread Bellow',
       // The Sunken Bastion trash kit and boss casts (trash_kit/bastion_cast_ids.ts,
       // encounters/sunken_bastion/ids.ts). The Mend and the Ward can be kicked.
       bastion_brine_mend: 'Brine Mend',

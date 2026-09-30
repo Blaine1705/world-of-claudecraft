@@ -18786,4 +18786,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.crypt_crow_caller.name': '喚鴉者',
   'entities.mobs.crypt_carrion_crow.name': '食腐烏鴉',
   'entities.mobs.crypt_ossuary_drake.name': '骨堂骨龍',
+  // The Hollow Crypt finale (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_morthen_rite_wakes': '儀式甦醒',
+  'abilityUi.cast.crypt_morthen_rise': '喚墓者升起',
+  'abilityUi.cast.crypt_morthen_proclaim': '墓之宣告',
+  'abilityUi.cast.crypt_morthen_descend': '降臨',
+  'abilityUi.cast.crypt_knellwyrm_arrive': '自天而降',
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': '火葬掃射',
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': '俯衝掃射',
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': '恐懼咆哮',
+  'entities.mobs.crypt_knellwyrm.name': '喪鐘巨龍',
 };

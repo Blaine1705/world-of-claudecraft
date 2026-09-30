@@ -19741,4 +19741,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.crypt_crow_caller.name': '鴉呼び',
   'entities.mobs.crypt_carrion_crow.name': '腐肉喰らいの鴉',
   'entities.mobs.crypt_ossuary_drake.name': '納骨堂の骨竜',
+  // The Hollow Crypt finale (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_morthen_rite_wakes': '儀式の目覚め',
+  'abilityUi.cast.crypt_morthen_rise': '墓呼びの昇天',
+  'abilityUi.cast.crypt_morthen_proclaim': '墓所の宣告',
+  'abilityUi.cast.crypt_morthen_descend': '降臨',
+  'abilityUi.cast.crypt_knellwyrm_arrive': '天より降下',
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': '火葬の掃射',
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': '掃射飛行',
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': '恐怖の咆哮',
+  'entities.mobs.crypt_knellwyrm.name': '弔鐘竜',
 };
