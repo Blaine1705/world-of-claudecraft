@@ -337,7 +337,7 @@ void main() {
   float n = noise(vWorld.xz * 0.6 + uTime * 0.3);
   float edge = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x);
   vec3 col = mix(vec3(0.62, 0.72, 0.95), vec3(0.95, 0.98, 1.0), n);
-  gl_FragColor = vec4(col, 0.55 + 0.3 * n * edge);
+  gl_FragColor = vec4(col, 0.74 + 0.22 * n * edge);
   #include <colorspace_fragment>
 }
 `;
@@ -364,30 +364,66 @@ function moonbridge(gate: DungeonGateDef): GateRig {
   const from = MOONBRIDGE.fromX + 3;
   const to = MOONBRIDGE.toX - 3;
   const count = 26;
+  const deckAt = (x: number): number =>
+    x >= MOONBRIDGE.fromX
+      ? MOONBRIDGE.fromH
+      : x <= MOONBRIDGE.toX
+        ? MOONBRIDGE.toH
+        : MOONBRIDGE.fromH +
+          ((MOONBRIDGE.toH - MOONBRIDGE.fromH) * (MOONBRIDGE.fromX - x)) /
+            (MOONBRIDGE.fromX - MOONBRIDGE.toX);
+  const step = Math.abs(to - from) / count;
   const plankGeo = new THREE.BoxGeometry(1, 0.35, path.halfWidth * 2);
-  const railGeo = new THREE.BoxGeometry(1, 0.12, 0.2);
+  const postGeo = new THREE.BoxGeometry(0.16, 1.1, 0.16);
+  const z = MOONBRIDGE.z - gate.z;
   for (let i = 0; i < count; i++) {
     const t = (i + 0.5) / count;
     const x = from + (to - from) * t;
-    const h =
-      x >= MOONBRIDGE.fromX
-        ? MOONBRIDGE.fromH
-        : x <= MOONBRIDGE.toX
-          ? MOONBRIDGE.toH
-          : MOONBRIDGE.fromH +
-            ((MOONBRIDGE.toH - MOONBRIDGE.fromH) * (MOONBRIDGE.fromX - x)) /
-              (MOONBRIDGE.fromX - MOONBRIDGE.toX);
+    // Each plank follows the deck's slope, so the span reads as one smooth
+    // ramp of light instead of a flight of loose steps.
+    const rise = deckAt(x + step / 2) - deckAt(x - step / 2);
+    const tilt = Math.atan2(rise, step);
     const plank = new THREE.Mesh(plankGeo, material);
-    plank.scale.x = (Math.abs(to - from) / count) * 0.94;
-    plank.position.set(x - gate.x, h - 0.17, MOONBRIDGE.z - gate.z);
+    plank.scale.x = (step / Math.cos(tilt)) * 0.94;
+    plank.position.set(x - gate.x, deckAt(x) - 0.17, z);
+    plank.rotation.z = tilt;
     plank.renderOrder = 6;
     holder.add(plank);
     planks.push(plank);
+    // A rail post on every other plank, each side.
+    if (i % 2 === 0) {
+      for (const side of [-1, 1]) {
+        const post = new THREE.Mesh(postGeo, edgeMat);
+        post.position.set(0, 0.72, side * (path.halfWidth - 0.1));
+        post.rotation.z = -tilt;
+        plank.add(post);
+      }
+    }
+  }
+  // The two hand rails: one continuous bar each side along the whole span,
+  // lit once the last plank has settled.
+  const rails: THREE.Mesh[] = [];
+  const railSegs: [number, number][] = [
+    [from, MOONBRIDGE.fromX],
+    [MOONBRIDGE.fromX, MOONBRIDGE.toX],
+    [MOONBRIDGE.toX, to],
+  ];
+  for (const [a, b] of railSegs) {
+    const len = Math.abs(b - a);
+    if (len < 0.01) continue;
+    const tilt = Math.atan2(deckAt(b) - deckAt(a), b - a);
     for (const side of [-1, 1]) {
-      const rail = new THREE.Mesh(railGeo, edgeMat);
-      rail.scale.x = plank.scale.x;
-      rail.position.set(0, 1.1, side * (path.halfWidth - 0.1));
-      plank.add(rail);
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(1, 0.12, 0.22), edgeMat);
+      rail.scale.x = len / Math.cos(tilt);
+      rail.position.set(
+        (a + b) / 2 - gate.x,
+        (deckAt(a) + deckAt(b)) / 2 + 1.1,
+        z + side * (path.halfWidth - 0.1),
+      );
+      rail.rotation.z = tilt;
+      rail.renderOrder = 6;
+      holder.add(rail);
+      rails.push(rail);
     }
   }
   // An always-drawn carrier: the planks hide while the bridge is unmade, and
@@ -413,6 +449,7 @@ function moonbridge(gate: DungeonGateDef): GateRig {
         p.scale.y = k;
         p.scale.z = 0.4 + 0.6 * k;
       });
+      for (const r of rails) r.visible = openness > 0.97;
     },
   };
 }

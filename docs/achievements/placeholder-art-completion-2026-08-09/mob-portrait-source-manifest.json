@@ -9740,19 +9740,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "969663f3bb4c2124c9bccb8eaa00d8a37d508dab142088c0cadadc12f832358f",
+      "sourceFingerprint": "33d9757449bcec9031002b2585b8238e0cbbea2df47b48e17a9eac4f31e6beff",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection.webp",
-        "bytes": 2200,
-        "sha256": "52f8541186479b3e8b66237c49c59eb771834bb02418146c747d6c9f96e7b315"
+        "bytes": 2054,
+        "sha256": "f87b34237b41257c55881680eefc187119e305a77747e0f9f04cbed511273b09"
       }
     },
     {
@@ -9799,19 +9799,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "d6798a66a993c1bc4db45c37c4761206627fba1567a532910ea24b4589ddb360",
+      "sourceFingerprint": "2d982ea1b651e6a15f7f113c2a17e060e9509cc9b33c9965abb61bff4ff158eb",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_druid.webp",
-        "bytes": 2354,
-        "sha256": "18bd740608e38784930af0e95d19b50d424a70b0d0391c019aa45761aa5d09cf"
+        "bytes": 2102,
+        "sha256": "a032c0de8bcbfb20544b4886c07829a8c9016ef4c85d3d40ca1cbb6d291c894d"
       }
     },
     {
@@ -9846,19 +9846,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "dfe0d5c35cb7949822090e522b55c62ec64467eb613afb1249f3e93b87371585",
+      "sourceFingerprint": "66f49deac73891136aa2645506326de26e84b25791280c9c70475cdcab0d8042",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_hunter.webp",
-        "bytes": 2928,
-        "sha256": "228a122373bc28993ca135decd67119249b2de82d91e1013af842f7424b3a7a7"
+        "bytes": 2580,
+        "sha256": "c96572cfd8ce839986e32aa711096dd1b7f1944d470fa44b77cb91c9ee344d5a"
       }
     },
     {
@@ -9907,19 +9907,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "d61433b873863f29e735c25a4b5cded6fa461e48553ef29346d2579265760bc6",
+      "sourceFingerprint": "f6b5d062325143ce6be687bb8ed3941fbdd65a970f649e54c15873c6d07eb3c9",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_mage.webp",
-        "bytes": 2244,
-        "sha256": "1dd242419be2a63125e7f08d1e652face9393f80b3dbee46f4c0b3bbe03110ba"
+        "bytes": 2108,
+        "sha256": "f89a0f1e1b02d172b2c8a8256709a7c00c354ba30a1a24d7d791d96523b146e6"
       }
     },
     {
@@ -9966,19 +9966,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "b4a2c82b992a6ba90b098fd2ef719135a340ea6fe916f66449db0ed9f9e6a22d",
+      "sourceFingerprint": "47aeae666306560184feb76340ebe89b602e8881754645bc10da8473dcdf4c5d",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_paladin.webp",
-        "bytes": 2672,
-        "sha256": "3c31fe258f93280a6f8e798fc5893039d25e14496b02e660805304d6171c0153"
+        "bytes": 2492,
+        "sha256": "7f09dda92ad1157456a9af5bbec674a0f462d1979c2d3dadd9595f3315db700d"
       }
     },
     {
@@ -10025,19 +10025,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "433fa9ebda297d34179b9ce54b0500faaa987f3fed9b7de4672d425e2002a980",
+      "sourceFingerprint": "55bd9cae3cf08874bb70aed9ff82cbf621679db491324d2d15e74bc2df043df5",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_priest.webp",
-        "bytes": 2244,
-        "sha256": "1dd242419be2a63125e7f08d1e652face9393f80b3dbee46f4c0b3bbe03110ba"
+        "bytes": 2108,
+        "sha256": "f89a0f1e1b02d172b2c8a8256709a7c00c354ba30a1a24d7d791d96523b146e6"
       }
     },
     {
@@ -10086,19 +10086,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "8b9d28c4020713362ea155b093b303ffba06ebd70cfd10ce36e4baeddbc30bc4",
+      "sourceFingerprint": "ef35cbc5ee38034478406173ed1d12785249d6c043550e475dfd1bf66f0b2af0",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_rogue.webp",
-        "bytes": 2390,
-        "sha256": "5a20ef0654c45627eccce538474c8058ad223dd83c2f75ef56beade93d46c844"
+        "bytes": 2056,
+        "sha256": "4f0fa0a5eaceedfd630e3c1f74de8f7797162d061e5b8356b0664f9cf95fff30"
       }
     },
     {
@@ -10147,19 +10147,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "cef44695e9d92ca17b89397a6b2ad16d5200971233dfc28bdbf014fce3468a18",
+      "sourceFingerprint": "323414ccfbb6a0ea7867fa966df5ad90448fd6ca0e8649c194de4284a67fa86b",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_shaman.webp",
-        "bytes": 2772,
-        "sha256": "e250bb37298ac18158d2032db1bce2eb5699499ffd2cf83079b456da30f64a48"
+        "bytes": 2532,
+        "sha256": "4956ab89e30ba6134f9a7046e7076e5986b3a916a480d33f9811385d2564dd72"
       }
     },
     {
@@ -10206,19 +10206,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "8f1c6d522bc207a19a0f1264d46c762fba4a03d667337417a975d71fbc620ccd",
+      "sourceFingerprint": "951882d99aef4817af8db2d37a704ab8ab676119a453d4564626d7a14001d9a9",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_warlock.webp",
-        "bytes": 2498,
-        "sha256": "3bdbf45e49d2fb06a5049a0d23caf71298d4ed2aa080f4d32c3873065c9561e1"
+        "bytes": 2352,
+        "sha256": "16d1281183582e1865dbcbdc1824476033222746292dcf43a8b2b99b2e5d1b3a"
       }
     },
     {
@@ -10268,19 +10268,19 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.72
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#cfe2ff",
-        "resolved": "#cfe2ff",
-        "strength": 0.72
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "969663f3bb4c2124c9bccb8eaa00d8a37d508dab142088c0cadadc12f832358f",
+      "sourceFingerprint": "33d9757449bcec9031002b2585b8238e0cbbea2df47b48e17a9eac4f31e6beff",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_warrior.webp",
-        "bytes": 2200,
-        "sha256": "52f8541186479b3e8b66237c49c59eb771834bb02418146c747d6c9f96e7b315"
+        "bytes": 2054,
+        "sha256": "f87b34237b41257c55881680eefc187119e305a77747e0f9f04cbed511273b09"
       }
     },
     {

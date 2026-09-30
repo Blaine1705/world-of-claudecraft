@@ -105,7 +105,17 @@ export function planTempleLights(): TempleLightSpot[] {
       out.push(spot('tidepool', 'Kit_TidepoolBasin', p.x, p.z));
   }
   // The Great Conch breathes gold into the court from behind the stage.
-  out.push(spot('conch', 'Kit_GreatConch', CONCH.x, CONCH.z - 8, 0, CHOIR_COURT.h + 5));
+  // The throat light sits in the turned mouth, 8 yd out along the shell's axis.
+  out.push(
+    spot(
+      'conch',
+      'Kit_GreatConch',
+      CONCH.x - 8 * Math.sin(CONCH.rot),
+      CONCH.z - 8 * Math.cos(CONCH.rot),
+      0,
+      CHOIR_COURT.h + 5,
+    ),
+  );
   // The prism plinth's violet under the Colossus, and the altar's silver.
   out.push(spot('prism', 'Kit_PrismPlinth', PRISM_TERRACE.x, PRISM_TERRACE.z + 2));
   out.push(spot('altar', 'Kit_MoonAltar', MOON_ALTAR.x, MOON_ALTAR.z));
@@ -258,7 +268,10 @@ export const TEMPLE_WATERFALLS: readonly TempleWaterfall[] = [
 ];
 
 /** The overhang the Walk's curtain pours from (render only, high overhead). */
-export const WALK_OVERHANG = { x: 78, z: 46, height: 42, length: 44, depth: 30 } as const;
+// Its centre sits 27 yd behind the curtain's lip (along the walk's outward
+// normal) and it runs 58 yd deep, so its back buries into the crater's east
+// face instead of hanging free over the lagoon.
+export const WALK_OVERHANG = { x: 84, z: 33, height: 42, length: 40, depth: 58 } as const;
 
 // ---- set dressing in the water ------------------------------------------------------------
 
@@ -273,7 +286,10 @@ export interface TempleDressing {
 }
 
 /** The Great Conch in the lagoon behind the court's stage, mouth to the court. */
-export const CONCH = { x: CHOIR_COURT.x, z: 44, scale: 0.8, y: -2.4 } as const;
+// Turned 0.95 rad off the court's axis: seen from the court the shell shows
+// its whole spiral flank and spines with the flared mouth still toward the
+// stage, instead of reading end-on as a flat pink disc.
+export const CONCH = { x: CHOIR_COURT.x, z: 44, scale: 0.8, y: -2.4, rot: 0.95 } as const;
 /** The drowned temple massing rising out of the lagoon, north-west. */
 export const SUNKEN_TEMPLE = { x: -74, z: 140, scale: 0.8, rot: 0.35 } as const;
 /** The Prism Tower in the water behind the terrace. */
@@ -341,7 +357,7 @@ export function planTempleDressing(): TempleDressing[] {
     piece: 'Kit_GreatConch',
     x: CONCH.x,
     z: CONCH.z,
-    rot: 0,
+    rot: CONCH.rot,
     scale: CONCH.scale,
     y: CONCH.y,
   });

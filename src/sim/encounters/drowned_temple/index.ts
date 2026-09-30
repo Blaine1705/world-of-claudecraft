@@ -63,7 +63,11 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     const st = boss?.templeFight;
     if (!boss || st?.kind !== 'colossus') return 'Pull the Colossus first.';
     if (what === 'lance') {
-      if (boss.castingAbility !== null) return 'The Colossus is busy; try again.';
+      // A dev trigger cuts whatever bar is running so the lance always shows.
+      if (boss.castingAbility !== null) {
+        boss.castingAbility = null;
+        boss.castRemaining = 0;
+      }
       return startLance(ctx, inst, boss, st) ? 'The Colossus aims a lance.' : 'No target.';
     }
     const n = raiseReflections(ctx, inst, boss, st);

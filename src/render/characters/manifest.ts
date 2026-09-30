@@ -5123,9 +5123,11 @@ for (const cls of ALL_CLASSES) {
   VISUALS[`temple_reflection_${cls}`] = {
     ...base,
     height: base.height * 1.15,
-    tint: 0xcfe2ff,
-    tintStrength: 0.72,
-    selfIllumination: 0.45,
+    // A tint multiplies, so near-white read as the plain class look: a cold
+    // tideglass blue with a strong inner light makes the copy read as glass.
+    tint: 0x7fb2ff,
+    tintStrength: 0.88,
+    selfIllumination: 0.62,
     envMapIntensity: 2.2,
   };
 }

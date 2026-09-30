@@ -31,14 +31,14 @@ export const SHOTS = [
   // The first vista from the Moongate Landing: the whole crater, the moon, the
   // falls, the temple and the Moon Altar's column.
   { id: 'entrada_vista', at: [0, -226], face: 0, pitch: 0.06, dist: 10 },
-  { id: 'entrada_vista_alta', at: [0, -226], face: -0.12, pitch: 0.34, dist: 22 },
+  { id: 'entrada_vista_alta', at: [0, -210], face: -0.12, pitch: 0.34, dist: 18 },
   { id: 'escalinata_peregrinos', at: [-20, -176], face: 0.5, pitch: 0.24, dist: 16 },
   { id: 'calzada_reflejos', at: [-6, -150], face: 0.1, pitch: 0.16, dist: 14 },
   { id: 'calzada_estatuas', at: [-2, -118], face: 1.3, pitch: 0.12, dist: 12 },
   { id: 'columnata_mareas', at: [0, -84], face: 0, pitch: 0.2, dist: 14 },
-  { id: 'velo_del_coro', at: [0, -48], face: 0, pitch: 0.18, dist: 12 },
+  { id: 'velo_del_coro', at: [0, -42], face: 0, pitch: 0.08, dist: 7 },
   { id: 'jefe1_patio_coro', at: [0, -16], face: 0, pitch: 0.3, dist: 20, wait: 5000 },
-  { id: 'caracola_gigante', at: [0, 16], face: 0, pitch: 0.08, dist: 10 },
+  { id: 'caracola_gigante', at: [-16, 4], face: 0.55, pitch: 0.12, dist: 12 },
   { id: 'terrazas_marea', at: [-42, 16], face: -0.9, pitch: 0.28, dist: 16 },
   { id: 'terraza_alta', at: [-64, 52], face: 0.3, pitch: 0.26, dist: 16 },
   { id: 'paseo_cascada', at: [62, 34], face: 0.55, pitch: 0.14, dist: 11 },
@@ -50,7 +50,83 @@ export const SHOTS = [
   { id: 'puente_lunar', at: [60, 208], face: -Math.PI / 2, pitch: 0.2, dist: 14 },
   { id: 'rellano_altar', at: [36, 208], face: -Math.PI / 2, pitch: 0.3, dist: 16 },
   { id: 'jefe3_altar_lunar', at: [4, 206], face: -Math.PI / 2, pitch: 0.28, dist: 22, wait: 4000 },
-  { id: 'columna_plateada', at: [-4, 190], face: -1.0, pitch: -0.1, dist: 10 },
+  { id: 'columna_plateada', at: [6, 198], face: -1.3, pitch: 0.12, dist: 14 },
+  // Each boss mechanic next to the player, for scale.
+  {
+    id: 'mecanica_selthe_coro_solo',
+    at: [0, -4],
+    face: 0,
+    pitch: 0.5,
+    dist: 20,
+    js: 'pull:choirmother_selthe',
+    cmds: ['/dev temple kill trash', '/dev temple trigger duet'],
+    wait: 1500,
+  },
+  {
+    id: 'mecanica_hidra_aliento',
+    at: [4, 82],
+    face: 0,
+    pitch: 0.36,
+    dist: 20,
+    js: 'pull:mere_hydra_head_left',
+    cmds: ['/dev temple trigger breath'],
+    cmdWait: 200,
+    wait: 700,
+  },
+  {
+    id: 'mecanica_hidra_escupitajo',
+    at: [-2, 80],
+    face: 0,
+    pitch: 0.42,
+    dist: 18,
+    js: 'pull:mere_hydra_head_center',
+    cmds: ['/dev temple trigger spit'],
+    cmdWait: 200,
+    wait: 500,
+  },
+  {
+    id: 'mecanica_coloso_reflejo',
+    at: [84, 196],
+    face: 0.2,
+    yaw: 1.1,
+    pitch: 0.3,
+    dist: 12,
+    js: 'pull:tideglass_colossus',
+    cmds: ['/dev temple trigger reflections'],
+    wait: 2200,
+  },
+  {
+    id: 'mecanica_coloso_lanza',
+    at: [84, 196],
+    face: 0.2,
+    pitch: 0.36,
+    dist: 18,
+    js: 'pull:tideglass_colossus',
+    cmds: ['/dev temple trigger lance'],
+    cmdWait: 200,
+    wait: 600,
+  },
+  {
+    id: 'mecanica_ysolei_marea',
+    at: [-16, 206],
+    face: -Math.PI / 2,
+    pitch: 0.62,
+    dist: 32,
+    js: 'pull:ysolei',
+    cmds: ['/dev temple trigger flood'],
+    wait: 2500,
+  },
+  {
+    id: 'mecanica_ysolei_resaca',
+    at: [-16, 206],
+    face: -Math.PI / 2,
+    pitch: 0.4,
+    dist: 20,
+    js: 'pull:ysolei',
+    cmds: ['/dev temple trigger undertow'],
+    cmdWait: 200,
+    wait: 1200,
+  },
 ];
 
 /** In-page helpers for a shot's js step: pull a boss onto the player (offline
@@ -174,7 +250,7 @@ async function main() {
       }
       for (const c of shot.cmds ?? []) {
         await page.evaluate((cmd) => window.__game.world.chat(cmd), c);
-        await sleep(1300);
+        await sleep(shot.cmdWait ?? 1300);
       }
       await page.evaluate((s) => {
         const p = window.__game.world.player;

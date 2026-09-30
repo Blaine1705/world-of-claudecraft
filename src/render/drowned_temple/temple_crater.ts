@@ -147,7 +147,11 @@ function buildOverhang(lowGfx: boolean): THREE.Mesh {
     const n = relief(x + 300, z + 200);
     // A ragged underside: stalactite teeth hang where the water drips.
     const under = y < 0 ? -n * 5 - (templeHash(Math.round(x), Math.round(z)) > 0.8 ? 3 : 0) : n * 3;
-    pos.setY(i, y + under);
+    // A wedge, not a slab: toward the crater face (local +x) the shelf swells
+    // up and down into the wall, so it reads as rock jutting out of the cliff.
+    const t = Math.max(0, Math.min(1, (x + o.depth / 2) / o.depth));
+    const swell = y < 0 ? -t * t * 34 : t * t * 12;
+    pos.setY(i, y + under + swell);
     pos.setX(i, x + (n - 0.5) * 3);
     const s = 0.1 + n * 0.08;
     col.set([s, s * 1.05, s * 1.25], i * 3);
