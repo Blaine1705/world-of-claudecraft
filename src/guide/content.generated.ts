@@ -6006,12 +6006,12 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false
   },
   {
-    "id": "prog_timeless",
-    "name": "Timeless",
+    "id": "prog_titan",
+    "name": "Titan",
     "category": "progression",
     "renown": 50,
     "feat": false,
-    "rewardTitle": "Timeless"
+    "rewardTitle": "Titan"
   }
 ];
 
@@ -7376,7 +7376,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "title",
-        "name": "Timeless"
+        "name": "Titan"
       }
     ]
   },

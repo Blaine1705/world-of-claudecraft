@@ -471,7 +471,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
-    // the sixth lifetime-XP rung's Timeless title joins the titles page: 496.
+    // the sixth lifetime-XP rung's Titan title joins the titles page: 496.
     expect(full).toEqual({ owned: 496, total: 496 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
@@ -505,7 +505,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    // 467 with the sixth lifetime-XP rung's Timeless title slot.
+    // 467 with the sixth lifetime-XP rung's Titan title slot.
     expect(character).toEqual({ owned: 467, total: 467 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
@@ -570,7 +570,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
-      // +1 the sixth lifetime-XP rung's Timeless title on horizons_titles: 683.
+      // +1 the sixth lifetime-XP rung's Titan title on horizons_titles: 683.
     ).toBe(683);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
@@ -3199,7 +3199,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
   // Crucible raid's flawless title + the three faction standing Champion
   // titles + the Clue Scroll Treasure Hunter title + the sixth lifetime-XP
-  // rung's Timeless title.
+  // rung's Titan title.
   horizons_titles: 50,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank

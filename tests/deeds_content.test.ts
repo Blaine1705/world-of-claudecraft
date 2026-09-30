@@ -146,7 +146,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 10 and the tenth at 25: +35).
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
-    // 320 / 3595 with the sixth lifetime-XP rung (prog_timeless at renown 50).
+    // 320 / 3595 with the sixth lifetime-XP rung (prog_titan at renown 50).
     expect(DEED_ORDER.length).toBe(320);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3595);
   });
@@ -167,7 +167,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the Phase 13 promotion capstone prog_legendmaker, then
       // +7 the faction standing ladder (a Trusted and a Champion deed per
       // allied faction plus the all-factions meta), then
-      // +1 the sixth lifetime-XP rung (prog_timeless).
+      // +1 the sixth lifetime-XP rung (prog_titan).
       progression: 76,
       // +1 the Buried Hoard goblin catch (cmb_coinsack_caught).
       combat: 11,
@@ -411,8 +411,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The release's Eastbrook ferry round trip, appended last at the fourth
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
-      // The sixth lifetime-XP rung (10,000,000 lifetime XP, the Timeless title).
-      'prog_timeless',
+      // The sixth lifetime-XP rung (10,000,000 lifetime XP, the Titan title).
+      'prog_titan',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -809,7 +809,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // the 2026-08-30 release/v0.41.0 sync merge) one more, and the three
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
-    // one more, and the sixth lifetime-XP rung (Timeless) one more.
+    // one more, and the sixth lifetime-XP rung (Titan) one more.
     expect(titles.length).toBe(52);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
@@ -1044,9 +1044,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  // Re-minted for the sixth lifetime-XP rung: one NEW deed (prog_timeless)
+  // Re-minted for the sixth lifetime-XP rung: one NEW deed (prog_titan)
   // appends at the tail; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '3497a579e2eb97c33b25fe5cff30f77711d8dc50230308abd9ac65132ef4fddc';
+  const FROZEN_CATALOG_SHA256 = '8374823cbde2d38781e7d1d90a10bb75713a4e3efff51772f37ca20ec6396b4a';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1114,19 +1114,19 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
   // and stripping the one id must reproduce it exactly.
   //
-  // The sixth lifetime-XP rung appends prog_timeless after
+  // The sixth lifetime-XP rung appends prog_titan after
   // exp_harbor_to_harbor; the previous mint is the 765c2ea1... literal
   // (rotated down here), and stripping the one id must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
     '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
-  const APPENDED_SINCE: readonly string[] = ['prog_timeless'];
+  const APPENDED_SINCE: readonly string[] = ['prog_titan'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The Timeless rung sits at the true tail after the Coinsack catch and the
+    // The Titan rung sits at the true tail after the Coinsack catch and the
     // ferry round trip. Pin its two predecessors too: this is an append into
     // a known seat, never a scattered insert or a retro-edit (the digest
     // below proves it).
@@ -1352,8 +1352,8 @@ describe('table shape', () => {
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
     // Clue Scroll casket pair, then the release's ferry round trip, then the
-    // sixth lifetime-XP rung (prog_timeless) as the final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_timeless');
+    // sixth lifetime-XP rung (prog_titan) as the final entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_titan');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -2158,16 +2158,16 @@ describe('milestone unification', () => {
     expect(DEEDS.prog_eternal.reward).toEqual({ kind: 'title', text: 'Eternal' });
   });
 
-  it('the sixth rung (Timeless) is a deed-only title at 10,000,000 lifetime XP', () => {
-    const deed = DEEDS.prog_timeless;
+  it('the sixth rung (Titan) is a deed-only title at 10,000,000 lifetime XP', () => {
+    const deed = DEEDS.prog_titan;
     expect(deed.category).toBe('progression');
     expect(deed.renown).toBe(50);
     expect(deed.trigger).toEqual({ kind: 'lifetimeXp', amount: 10_000_000 });
-    expect(deed.reward).toEqual({ kind: 'title', text: 'Timeless' });
+    expect(deed.reward).toEqual({ kind: 'title', text: 'Titan' });
     expect(deed.hidden).toBeFalsy();
     expect(deed.feat).toBeFalsy();
     // Deed-only: the frozen legacy milestone mirror does not grow.
-    expect(MILESTONE_DEED_TO_LEGACY.prog_timeless).toBeUndefined();
+    expect(MILESTONE_DEED_TO_LEGACY.prog_titan).toBeUndefined();
     expect(MILESTONES.some((m) => m.lifetimeXp === 10_000_000)).toBe(false);
     // The ladder stays strictly ascending: the new rung sits above Eternal.
     const ladder = ALL.filter((d) => d.trigger.kind === 'lifetimeXp').map((d) =>
@@ -2179,7 +2179,7 @@ describe('milestone unification', () => {
       ['prog_paragon', 1000000],
       ['prog_mythic', 2500000],
       ['prog_eternal', 5000000],
-      ['prog_timeless', 10000000],
+      ['prog_titan', 10000000],
     ]);
   });
 });

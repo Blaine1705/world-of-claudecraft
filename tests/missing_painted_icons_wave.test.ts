@@ -688,7 +688,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // the pending side on the exploration crest.
     // 319 at the 2026-09-28 release/v0.44.0 merge into Buried Hoards: the
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
-    // 320 with the sixth lifetime-XP rung (prog_timeless), also pending on the
+    // 320 with the sixth lifetime-XP rung (prog_titan), also pending on the
     // progression crest.
     expect(DEED_ORDER).toHaveLength(320);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);

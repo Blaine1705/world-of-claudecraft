@@ -98,17 +98,17 @@ describe('deed_i18n English resolution', () => {
     // name and a desc, no title) at the fourth release/v0.44.0 base merge.
     // 319 with the Buried Hoards Coinsack catch (cmb_coinsack_caught: a name and a
     // desc, no title) at the 2026-09-28 merge into feature/buried-hoards.
-    // 320 with the sixth lifetime-XP rung (prog_timeless: a name, a desc, and
-    // the Timeless title).
+    // 320 with the sixth lifetime-XP rung (prog_titan: a name, a desc, and
+    // the Titan title).
     expect(manifest.filter((row) => row.field === 'name').length).toBe(320);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
-    // casket deeds. 301 with the Timeless rung.
+    // casket deeds. 301 with the Titan rung.
     expect(manifest.filter((row) => row.field === 'desc').length).toBe(301);
     // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
     // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
     // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc;
-    // 673 with the Timeless rung's name, desc, and title.
+    // 673 with the Titan rung's name, desc, and title.
     expect(manifest.length).toBe(673);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(52);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([

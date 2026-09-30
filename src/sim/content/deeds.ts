@@ -3602,14 +3602,14 @@ export const DEEDS: Record<string, DeedDef> = {
   // no legacy milestone id: MILESTONE_DEED_TO_LEGACY is a frozen one-release
   // mirror of the retired milestone system, so this rung is a deed title only
   // (picked from the Book of Deeds like every post-unification title).
-  prog_timeless: {
-    id: 'prog_timeless',
-    name: 'Timeless',
+  prog_titan: {
+    id: 'prog_titan',
+    name: 'Titan',
     desc: 'Earn 10,000,000 lifetime experience.',
     category: 'progression',
     renown: 50,
     trigger: { kind: 'lifetimeXp', amount: 10_000_000 },
-    reward: { kind: 'title', text: 'Timeless' },
+    reward: { kind: 'title', text: 'Titan' },
   },
 };
 
