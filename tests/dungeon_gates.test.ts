@@ -124,15 +124,15 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
     expect(blockedAt(sim, inst, 'yard_barrier')).toBe(false);
   });
 
-  it('the bone bridge opens on Sexton Marrow death, not before', () => {
+  it('the Webbed Causeway opens on Rimeweb death, not before', () => {
     const { sim, inst } = setup();
-    kill(sim, inst, ['c1', 'c2', 'c3', 'c4', 'w1', 'w2', 'w3', 'w4']);
+    kill(sim, inst, ['c1', 'c2', 'c3', 'c4', 'e1', 'e2', 'e3']);
     sim.tick();
-    expect(blockedAt(sim, inst, 'yard_bridge')).toBe(true);
-    kill(sim, inst, ['sexton_marrow']);
+    expect(blockedAt(sim, inst, 'web_bridge')).toBe(true);
+    kill(sim, inst, ['rimeweb']);
     sim.tick();
-    expect(blockedAt(sim, inst, 'yard_bridge')).toBe(false);
-    expect(blockedAt(sim, inst, 'yard_barrier')).toBe(false);
+    expect(blockedAt(sim, inst, 'web_bridge')).toBe(false);
+    expect(blockedAt(sim, inst, 'web_curtain')).toBe(false);
   });
 
   it('the Twin Seals need both wing bosses, the Processional packs and the drake', () => {

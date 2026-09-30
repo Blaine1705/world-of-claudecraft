@@ -12250,7 +12250,7 @@ export const zh_CN: EnTranslations = {
       "crypt_murder_call": "鸦群召唤",
       "crypt_stone_shriek": "石之尖啸",
       "crypt_grave_cleave": "墓穴横扫",
-      "crypt_bonechill_breath": "寒骨吐息",
+      "crypt_barrowflame_breath": "冢焰吐息",
       "crypt_tail_lash": "尾鞭",
       "crypt_wing_gust": "翼风",
       "bastion_brine_mend": "盐水愈合",

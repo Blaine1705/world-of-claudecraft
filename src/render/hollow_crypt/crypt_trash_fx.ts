@@ -1,6 +1,6 @@
 // The Hollow Crypt trash telegraphs and impacts (plan: crypt_trash_fx_core.ts):
 //  - a floor telegraph under every trash cast you dodge, filling as its bar
-//    runs: the Ossuary Warrior's Grave Cleave cone, the drake's Bonechill
+//    runs: the Ossuary Warrior's Grave Cleave cone, the drake's Barrowflame
 //    Breath cone and Tail Lash behind it, the Wing Gust and Stone Shriek rings,
 //    and a kick glyph on the grave a Raise Bones is opening (and round a
 //    Murder Call);

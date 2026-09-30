@@ -7,7 +7,7 @@
 
 import { MOBS } from '../../sim/data';
 import {
-  CRYPT_BONECHILL_BREATH,
+  CRYPT_BARROWFLAME_BREATH,
   CRYPT_GRAVE_CLEAVE,
   CRYPT_MURDER_CALL,
   CRYPT_RAISE_BONES,
@@ -38,10 +38,12 @@ export interface CryptTelegraphSpec {
  *  element. */
 export const CRYPT_TELEGRAPH_COLORS = {
   physical: TELEGRAPH_THREAT_COLORS.danger,
-  frost: TELEGRAPH_THREAT_COLORS.danger,
   stun: TELEGRAPH_THREAT_COLORS.control,
   shadow: TELEGRAPH_THREAT_COLORS.interrupt,
   bone: TELEGRAPH_THREAT_COLORS.danger,
+  /** The drake's spectral Barrowflame: avoidable damage; its ghost-fire
+   *  cyan rides the accent (TELEGRAPH_ACCENTS.ghostfire). */
+  ghostfire: TELEGRAPH_THREAT_COLORS.danger,
 } as const;
 
 function breath(templateId: string) {
@@ -59,11 +61,11 @@ export function cryptTelegraphSpecs(): Readonly<Record<string, CryptTelegraphSpe
       ...breath('crypt_ossuary_warrior'),
       color: CRYPT_TELEGRAPH_COLORS.physical,
     },
-    [CRYPT_BONECHILL_BREATH]: {
+    [CRYPT_BARROWFLAME_BREATH]: {
       shape: 'cone',
       ...breath('crypt_ossuary_drake'),
-      color: CRYPT_TELEGRAPH_COLORS.frost,
-      accent: TELEGRAPH_ACCENTS.frost,
+      color: CRYPT_TELEGRAPH_COLORS.ghostfire,
+      accent: TELEGRAPH_ACCENTS.ghostfire,
     },
     [CRYPT_TAIL_LASH]: {
       shape: 'rearCone',

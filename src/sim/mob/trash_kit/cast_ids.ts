@@ -15,12 +15,18 @@ export const CRYPT_MURDER_CALL = 'crypt_murder_call';
 export const CRYPT_STONE_SHRIEK = 'crypt_stone_shriek';
 /** Ossuary Warrior: a telegraphed frontal cleave (breathCone, uninterruptible). */
 export const CRYPT_GRAVE_CLEAVE = 'crypt_grave_cleave';
-/** Ossuary Drake: its frost breath down a frontal cone (breathCone). */
-export const CRYPT_BONECHILL_BREATH = 'crypt_bonechill_breath';
+/** Ossuary Drake: a torrent of spectral fire down a frontal cone (breathCone). */
+export const CRYPT_BARROWFLAME_BREATH = 'crypt_barrowflame_breath';
 /** Ossuary Drake: a lash of its tail behind it. */
 export const CRYPT_TAIL_LASH = 'crypt_tail_lash';
 /** Ossuary Drake: a blast of its wings that throws the close ones back. */
 export const CRYPT_WING_GUST = 'crypt_wing_gust';
+
+/** Presentation cue ids (never casts): the `windup` spellfx a perched mob
+ *  sends as it dives off its perch, and a flier as it breaks off its flight
+ *  to land. The renderer keys the awaken and the sky roar on them. */
+export const CRYPT_PERCH_DIVE = 'crypt_perch_dive';
+export const CRYPT_SKY_LANDING = 'crypt_sky_landing';
 
 /** The trash kit casts a player interrupt can lock out, by school. The drake's
  *  strikes and the warrior's cleave are deliberately absent: dodge those. */

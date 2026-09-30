@@ -801,6 +801,7 @@ const RENDER_PURE_CORES = [
   'src/render/hollow_crypt/crypt_plan_core.ts',
   'src/render/hollow_crypt/crypt_kit_plan_core.ts',
   'src/render/hollow_crypt/crypt_trash_fx_core.ts',
+  'src/render/hollow_crypt/crypt_creature_fx_core.ts',
   'src/render/hollow_crypt/crypt_set_dressing_core.ts',
   'src/render/hollow_crypt/crypt_gate_state_core.ts',
   // The Sunken Bastion's dressing, kit placement and headland rock cores.

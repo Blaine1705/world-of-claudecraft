@@ -35,11 +35,14 @@ import {
   BASTION_SHELL_SLAM,
 } from '../../sim/mob/trash_kit/bastion_cast_ids';
 import {
-  CRYPT_BONECHILL_BREATH,
+  CRYPT_BARROWFLAME_BREATH,
   CRYPT_GRAVE_BOLT,
   CRYPT_GRAVE_CLEAVE,
   CRYPT_MURDER_CALL,
+  CRYPT_PERCH_DIVE,
   CRYPT_RAISE_BONES,
+  CRYPT_SKY_LANDING,
+  CRYPT_STONE_SHRIEK,
   CRYPT_TAIL_LASH,
   CRYPT_WING_GUST,
 } from '../../sim/mob/trash_kit/cast_ids';
@@ -235,6 +238,17 @@ export interface VisualDef {
    *  tail): the ground anchor is the lowest skinned vertex, so without the
    *  sink the body is lifted until the tail tip touches and the feet float. */
   hover?: number;
+  /** A creature that flies, or waits perched high over the floor (the Hollow
+   *  Crypt's drake and gargoyles): its airborne state is read from its drawn
+   *  height over the standing surface, as a player's is (a mob's `onGround`
+   *  never leaves true), so `jump` plays while it is up (LOOPED, never clamped:
+   *  a flight loop or a perch), `fall` while it plunges and `land` on touchdown. */
+  flight?: boolean;
+  /** A plain auto-attack trigger never stomps a `clips.castPlayOut` clip while
+   *  it plays (as the cast loop or as its play-out): a breath's exhale or a
+   *  tail sweep's follow-through lands in full, and the swing it would have
+   *  shown is simply skipped. Per-ability triggers still play. */
+  castPlayOutHoldsAttacks?: boolean;
   /** yaw applied so the model faces +Z (facing-0 convention) */
   yaw?: number;
   /** Optional texture-aware ambient lift for exceptionally dark authored bodies.
@@ -3637,7 +3651,7 @@ export const VISUALS: Record<string, VisualDef> = {
   crypt_skel_warrior: {
     url: `${ENEMIES}/skeleton_warrior.glb`,
     animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
-    height: 2.5,
+    height: 3.3,
     clips: {
       ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       castByAbility: { [CRYPT_GRAVE_CLEAVE]: '2H_Melee_Attack_Chop' },
@@ -3649,7 +3663,7 @@ export const VISUALS: Record<string, VisualDef> = {
   crypt_skel_adept: {
     url: `${ENEMIES}/skeleton_mage.glb`,
     animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
-    height: 2.5,
+    height: 3.2,
     clips: {
       ...skeletonClips(['2H_Melee_Attack_Chop']),
       castByAbility: { [CRYPT_GRAVE_BOLT]: 'Spellcast_Shoot' },
@@ -3662,7 +3676,7 @@ export const VISUALS: Record<string, VisualDef> = {
   crypt_skel_necromancer: {
     url: `${ENEMIES}/necromancer.glb`,
     animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
-    height: 2.5,
+    height: 3.3,
     clips: {
       ...skeletonClips(['2H_Melee_Attack_Chop']),
       castByAbility: { [CRYPT_RAISE_BONES]: 'Spellcast_Raise' },
@@ -3670,11 +3684,87 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.3,
   },
+  // The rest of the Hollow Crypt roster on the same rigs, raised a head or more
+  // over a player (2.6) so nothing in the crypt stands at player size: the
+  // cutthroat, the Bone Minion (it grows into the Brute), the Brute itself, the
+  // Sexton, the Cantor and her choir, Morthen, and Rimeweb over her brood.
+  crypt_skel_cutthroat: {
+    url: `${ENEMIES}/skeleton_rogue.glb`,
+    animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
+    height: 3.2,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_minion: {
+    url: `${ENEMIES}/skeleton_minion.glb`,
+    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
+    height: 3.5,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_brute: {
+    url: `${ENEMIES}/skeleton_golem.glb`,
+    height: 4.6,
+    clips: {
+      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+      attack: ['Golem_Slam'],
+    },
+    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
+    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_sexton: {
+    url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
+    height: 3.4,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_cantor: {
+    url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
+    height: 3.2,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  crypt_skel_chorister: {
+    url: `${ENEMIES}/necromancer.glb`,
+    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    height: 3.3,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  crypt_skel_gravecaller: {
+    url: `${ENEMIES}/skeleton_mage.glb`,
+    height: 3.6,
+    clips: { ...skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'), attack: ['SkelBoss_Attack'] },
+    animUrls: [
+      `${ENEMIES}/skeleton_mage_hit_variety_anims.glb`,
+      `${ENEMIES}/skelboss_ability_anims.glb`,
+    ],
+    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  mob_crypt_rimeweb: {
+    url: `${CREATURES}/spider.glb`,
+    height: 2.7,
+    clips: SPIDER,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
   // A hooded cultist of the Gravecallers with a crooked staff: calls the crows.
   mob_crypt_crow_caller: {
     url: `${PLAYERS}/rogue_hooded.glb`,
     animUrls: [`${PLAYERS}/rogue_hooded_hit_variety_anims.glb`],
-    height: HUMANOID_H,
+    height: 3.3,
     clips: {
       ...kaykit(['2H_Melee_Attack_Chop']),
       castByAbility: { [CRYPT_MURDER_CALL]: 'Spellcast_Raise' },
@@ -3683,30 +3773,42 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.6,
   },
-  // Blender-built creatures (scripts/assets/hollow_crypt_creatures/, rigid-skinned,
-  // vertex-coloured, facing +Z): the Chapel Gargoyle crouches still as a statue on
-  // its perch (Idle), lopes (Walk), flies (Run) and rears to shriek (Cast).
+  // The Chapel Gargoyle (scripts/assets/hollow_crypt_creatures/build_stone_gargoyle.py):
+  // a great, heavy stone brute with baked cracked-stone surfaces, about 4.5 yd
+  // tall crouched on its arch (a player stands 2.6). It is a statue while it
+  // perches (`Perch`, read as airborne up on the cap), cracks free on the pull
+  // (`Awaken`, keyed on the dive cue), plunges (`Dive`), slams down (`DiveLand`),
+  // fights from a braced crouch (`Ready`), rakes with its talons and rears to
+  // shriek. Its talons curl just under its feet: the negative hover plants them.
   mob_crypt_gargoyle: {
     url: `${CREATURES}/crypt_gargoyle.glb`,
-    height: 2.6,
+    height: 5.81,
+    hover: -0.22,
+    flight: true,
     clips: {
-      idle: 'Idle',
+      idle: 'Perch',
+      combatIdle: 'Ready',
       walk: 'Walk',
       run: 'Run',
-      attack: ['Attack', 'Attack2'],
+      jump: 'Perch',
+      fall: 'Dive',
+      land: 'DiveLand',
+      attack: ['ClawRake', 'ClawRake2'],
+      attackByAbility: { [CRYPT_PERCH_DIVE]: 'Awaken' },
+      attackTimeScaleByAbility: { [CRYPT_PERCH_DIVE]: 1.9 },
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
+      cast: 'Screech',
+      castByAbility: { [CRYPT_STONE_SHRIEK]: 'Screech' },
     },
-    // Weathered pale stone under a night moon reads as a black cut-out without it.
-    selfIllumination: 0.3,
+    selfIllumination: 0.18,
   },
   // The Carrion Crow is always on the wing: `hover` lifts it and its Death clip
   // drops the body onto the floor.
   mob_crypt_crow: {
     url: `${CREATURES}/crypt_crow.glb`,
-    height: 0.9,
-    hover: 1.4,
+    height: 1.7,
+    hover: 2.2,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -3718,31 +3820,49 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.15,
   },
-  // The Ossuary Drake: it flaps whenever it moves (it flies its patrol and runs
-  // on the wing), stands to fight, and has a clip for each of its strikes.
+  // The Ossuary Drake (scripts/assets/hollow_crypt_creatures/build_bone_drake.py):
+  // a colossal skeletal wyvern, its head about 10 yd up and its wings about 34
+  // across, centred on its SHOULDERS so the jaws that pour the Barrowflame hang
+  // over the breath cone's apex. It flies its patrol (`Fly`: two downbeats and a
+  // long glide), cries as it breaks off (`SkyRoar`, the landing cue), glides
+  // down (`Glide`), lands (`Land`), walks and runs on its wing knuckles, bites
+  // (never claws), and plays each strike to its bar: the breath inhales over the
+  // 2 s bar and its exhale plays OUT after it; the tail sweeps and the wings
+  // buffet exactly at their bars' ends. Plain swings never cut those short.
   mob_crypt_drake: {
     url: `${CREATURES}/crypt_drake.glb`,
-    height: 6.5,
+    height: 13.63,
+    hover: -0.19,
+    flight: true,
     clips: {
       idle: 'Idle',
+      idleBeat: { clip: 'Roar', everySec: 16, jitterSec: 5 },
       walk: 'Walk',
       run: 'Run',
-      attack: ['Attack', 'Attack2'],
+      jump: 'Fly',
+      fall: 'Glide',
+      land: 'Land',
+      attack: ['Bite', 'Bite2'],
+      attackByAbility: { [CRYPT_SKY_LANDING]: 'SkyRoar' },
+      attackTimeScaleByAbility: { [CRYPT_SKY_LANDING]: 1 },
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
+      cast: 'Roar',
       castByAbility: {
-        [CRYPT_BONECHILL_BREATH]: 'Breath',
-        [CRYPT_TAIL_LASH]: 'TailLash',
-        [CRYPT_WING_GUST]: 'WingGust',
+        [CRYPT_BARROWFLAME_BREATH]: 'Breath',
+        [CRYPT_TAIL_LASH]: 'TailSweep',
+        [CRYPT_WING_GUST]: 'WingBuffet',
       },
       castTimeScaleByAbility: {
-        [CRYPT_BONECHILL_BREATH]: 1,
-        [CRYPT_TAIL_LASH]: 1.25,
-        [CRYPT_WING_GUST]: 0.95,
+        [CRYPT_BARROWFLAME_BREATH]: 1,
+        [CRYPT_TAIL_LASH]: 1,
+        [CRYPT_WING_GUST]: 1,
       },
+      castPlayOut: ['Breath', 'TailSweep', 'WingBuffet'],
+      flourish: 'Roar',
     },
-    selfIllumination: 0.1,
+    castPlayOutHoldsAttacks: true,
+    selfIllumination: 0.12,
   },
 
   // -- the Sunken Bastion trash (sim/content/sunken_bastion.ts) ------------------
@@ -5007,16 +5127,19 @@ const MOB_KEYS: Record<string, string> = {
   necromancy_gravewing: 'mob_gravewing',
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
-  sexton_marrow: 'skel_mage',
-  morthen: 'skel_boss',
+  sexton_marrow: 'crypt_skel_sexton',
+  morthen: 'crypt_skel_gravecaller',
+  cantor_ilvane: 'crypt_skel_cantor',
+  hollow_chorister: 'crypt_skel_chorister',
+  rimeweb: 'mob_crypt_rimeweb',
   crypt_shambler: 'skel_rogue',
   // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
   crypt_ossuary_warrior: 'crypt_skel_warrior',
   crypt_gravecaller_adept: 'crypt_skel_adept',
-  crypt_ossuary_cutthroat: 'skel_rogue',
+  crypt_ossuary_cutthroat: 'crypt_skel_cutthroat',
   crypt_gravecaller_necromancer: 'crypt_skel_necromancer',
-  crypt_bone_minion: 'skel_minion',
-  crypt_bone_brute: 'skel_golem',
+  crypt_bone_minion: 'crypt_skel_minion',
+  crypt_bone_brute: 'crypt_skel_brute',
   crypt_chapel_gargoyle: 'mob_crypt_gargoyle',
   crypt_crow_caller: 'mob_crypt_crow_caller',
   crypt_carrion_crow: 'mob_crypt_crow',

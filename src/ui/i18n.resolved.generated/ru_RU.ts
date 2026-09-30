@@ -12250,7 +12250,7 @@ export const ru_RU: EnTranslations = {
       "crypt_murder_call": "Зов стаи",
       "crypt_stone_shriek": "Каменный вопль",
       "crypt_grave_cleave": "Могильный размах",
-      "crypt_bonechill_breath": "Костеледенящее дыхание",
+      "crypt_barrowflame_breath": "Дыхание курганного пламени",
       "crypt_tail_lash": "Удар хвостом",
       "crypt_wing_gust": "Порыв крыльев",
       "bastion_brine_mend": "Целительный рассол",

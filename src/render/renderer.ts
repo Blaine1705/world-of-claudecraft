@@ -414,6 +414,7 @@ import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
 import * as hoardValley from './hoard_valley_frame';
+import { paintsOwnBreath } from './hollow_crypt/crypt_creature_fx_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -7176,34 +7177,19 @@ export class Renderer {
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
         }
-        if (ev.fx === 'frostCone') {
+        if (ev.fx === 'frostCone' || ev.fx === 'fireCone') {
           const source = this.sim.entities.get(ev.sourceId);
-          if (source) {
+          // A creature that paints its own breath (the crypt drake) skips the generic cone.
+          if (source && !paintsOwnBreath(source.templateId)) {
+            const fire = ev.fx === 'fireCone';
             this.glacialFrontVisual.spawn(
               source.pos.x,
               groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
               source.pos.z,
               source.facing,
-              ev.range ?? 7,
+              ev.range ?? (fire ? 6 : 7),
               ev.level ?? 1,
-              ev.angle ?? 70,
-              ev.fx,
-            );
-            this.triggerAttack(ev.sourceId);
-          }
-          break;
-        }
-        if (ev.fx === 'fireCone') {
-          const source = this.sim.entities.get(ev.sourceId);
-          if (source) {
-            this.glacialFrontVisual.spawn(
-              source.pos.x,
-              groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
-              source.pos.z,
-              source.facing,
-              ev.range ?? 6,
-              ev.level ?? 1,
-              ev.angle ?? 55,
+              ev.angle ?? (fire ? 55 : 70),
               ev.fx,
             );
             this.triggerAttack(ev.sourceId);
@@ -10690,7 +10676,7 @@ export class Renderer {
       // predictor's onGround inside a rift (the predictor samples the same flat
       // ground, so it would still report airborne on the platform).
       const inRift = isRiftPos(ax) && this.sim.riftFloor !== null;
-      if (e.kind === 'player' && e.onGround && !swimming) {
+      if ((e.kind === 'player' || active.flies) && e.onGround && !swimming) {
         // Cached per remote body and resampled on entity_ground_sample_core's
         // cadence; the local player samples every frame as before.
         const standY = sampleStandingSurface(v.groundSample, this.sim, ax, ay, az, dt, isSelf);

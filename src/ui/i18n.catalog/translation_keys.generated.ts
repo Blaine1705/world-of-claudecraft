@@ -37,7 +37,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.bastion_piercing_bolt'
   | 'abilityUi.cast.bastion_shell_slam'
   | 'abilityUi.cast.crafting'
-  | 'abilityUi.cast.crypt_bonechill_breath'
+  | 'abilityUi.cast.crypt_barrowflame_breath'
   | 'abilityUi.cast.crypt_grave_bolt'
   | 'abilityUi.cast.crypt_grave_cleave'
   | 'abilityUi.cast.crypt_murder_call'

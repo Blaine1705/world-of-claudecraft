@@ -144,22 +144,6 @@ const SURFACES: FieldSurface[] = [
     edge: 'rock',
   },
   { kind: 'circle', id: 'bell_yard', x: -82, z: 116, r: 22, h: 8, edge: 'rock', ground: 'grave' },
-  {
-    kind: 'path',
-    id: 'west_postern',
-    // The Bridge of Bone: walkable only once its gate opens, drawn by the
-    // gate visuals (it knits itself out of the mist on Sexton Marrow's death).
-    hidden: true,
-    points: [
-      [-66, 104, 8],
-      [-60, 102, 8],
-      [-36, 100, 0],
-      [-20, 100, 0],
-    ],
-    halfWidth: 5,
-    edge: 'bone',
-    ground: 'bone',
-  },
   // --- East wing: the Widow's Gallery --------------------------------------
   {
     kind: 'path',

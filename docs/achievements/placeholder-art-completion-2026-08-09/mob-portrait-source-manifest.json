@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "818197a140fa6247ec99687d0ae22025a6c9cd34ed978855cbcc0da0c277fe3a",
+  "rendererFingerprint": "fdbd25e06e1db1e4648fa3a1675683423a958c76897b5e1c9c9c45267c5eda57",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5323720,
-      "sha256": "5b7ae39a2d180f795dc77ea525eb9107d01c29d2cb4daa8331565dae498a10b7",
+      "bytes": 5323427,
+      "sha256": "211e4dfbf101e48cb67dd9f1061b9bbb437c54fac5093cc8b83297f34f2f87db",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -835,34 +835,34 @@
       "id": "cantor_ilvane",
       "family": "undead",
       "finderEncounter": true,
-      "visualKey": "skel_minion",
+      "visualKey": "crypt_skel_cantor",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/chars/enemies/skeleton_mage.glb",
+          "path": "public/models/chars/enemies/skeleton_mage.glb",
+          "bytes": 802628,
+          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.2,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": 0.35
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#9d6cd0",
-        "strength": 0.25
+        "strength": 0.35
       },
-      "sourceFingerprint": "abd40ae57d09606e6cb1976e145ca09f84cdc6842e2be402d7ea119b7ab9e332",
+      "sourceFingerprint": "5658d5b36e5c9fdc00cf75c27c255ad03ff95931afcc2497a524707a5730bb7a",
       "output": {
         "path": "public/ui/mobs/cantor_ilvane.webp",
-        "bytes": 2788,
-        "sha256": "3c6acb79778ce16391680ef53d696acceb27d70f21abf3acbeb2bcad1303f96a"
+        "bytes": 2318,
+        "sha256": "02a3f8f0d1add620da348ccfe2c6ac4e23c4dad7bbffc5097059bc268d1e6b4f"
       }
     },
     {
@@ -1132,7 +1132,7 @@
       "id": "crypt_bone_brute",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_golem",
+      "visualKey": "crypt_skel_brute",
       "renderSpec": {
         "model": {
           "url": "models/chars/enemies/skeleton_golem.glb",
@@ -1141,7 +1141,7 @@
           "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
         },
         "idle": "Idle",
-        "height": 3.4,
+        "height": 4.6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -1160,7 +1160,7 @@
         "resolved": "#d9d0bc",
         "strength": 0.25
       },
-      "sourceFingerprint": "cc717c97dad2cd0ebfa671071c330c952a1da7b21aa1fd18afa82252762a476c",
+      "sourceFingerprint": "6221e592846397a812a7e50ed166cbc6cf44c01edccbd41b53176a32671aa182",
       "output": {
         "path": "public/ui/mobs/crypt_bone_brute.webp",
         "bytes": 2918,
@@ -1171,7 +1171,7 @@
       "id": "crypt_bone_minion",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_minion",
+      "visualKey": "crypt_skel_minion",
       "renderSpec": {
         "model": {
           "url": "models/chars/enemies/skeleton_minion.glb",
@@ -1180,7 +1180,7 @@
           "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.5,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -1194,7 +1194,7 @@
         "resolved": "#e8e0c8",
         "strength": 0.25
       },
-      "sourceFingerprint": "3cb5784cee05db2374d8f74dc1e5ebadd407633db93155d139c3d68555c5c4f2",
+      "sourceFingerprint": "2a2517122d0f455addb51ee6d5f4925e743db16d51902cbe2dea9bd3c750df6b",
       "output": {
         "path": "public/ui/mobs/crypt_bone_minion.webp",
         "bytes": 2842,
@@ -1214,9 +1214,9 @@
           "sha256": "448da36c47023500383b02fc77815211fe1681da10b6a0796960f540a7e460eb"
         },
         "idle": "Idle",
-        "height": 0.9,
+        "height": 1.7,
         "yaw": null,
-        "hover": 1.4,
+        "hover": 2.2,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -1228,7 +1228,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "71fc7541a3c85c7e866bbb4dbeda352df6252d298a7e82d851746b1047a76c3b",
+      "sourceFingerprint": "a730dd51566f4961fdf2175ba5bf99e814b58cdce6f348b17a044a70ef68c39f",
       "output": {
         "path": "public/ui/mobs/crypt_carrion_crow.webp",
         "bytes": 1528,
@@ -1244,13 +1244,13 @@
         "model": {
           "url": "models/creatures/crypt_gargoyle.glb",
           "path": "public/models/creatures/crypt_gargoyle.glb",
-          "bytes": 293520,
-          "sha256": "adafea80c9373e09863563ea60fc523f88629d2959cf97166e2655c93de6f996"
+          "bytes": 1080716,
+          "sha256": "70881edd0b93f0ee18dd8cbce0173a7845922717a8be2625badb13b9f36eed57"
         },
-        "idle": "Idle",
-        "height": 2.6,
+        "idle": "Perch",
+        "height": 5.81,
         "yaw": null,
-        "hover": null,
+        "hover": -0.22,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -1262,11 +1262,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7cd5eab0d9756f6b79f6b717c92685fdab90626f48af9f52afbc996a84d6027d",
+      "sourceFingerprint": "51de22576aef0fdf6fac9280704edc2955c1ea94ed445931c09211dce0e5ff85",
       "output": {
         "path": "public/ui/mobs/crypt_chapel_gargoyle.webp",
-        "bytes": 2262,
-        "sha256": "ce170f9ba0f25ac0a90e35e1deaba752d9a37db2619f3be6eecd45a8ec358a09"
+        "bytes": 2126,
+        "sha256": "26a84b566798baa1693121e72e4eaa65bc5ef9892a21104d21541e348ad6ed70"
       }
     },
     {
@@ -1282,7 +1282,7 @@
           "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 3.3,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -1309,7 +1309,7 @@
         "resolved": "#3a3440",
         "strength": 0.6
       },
-      "sourceFingerprint": "1270f76ee44d62ec009ec95b8b327afda07d56be92a76e6d2afd7f0eff81f0b5",
+      "sourceFingerprint": "6febc35336c7e1c4ba1bdb13b33150b7c2123189003cf59509dae7b67843e10f",
       "output": {
         "path": "public/ui/mobs/crypt_crow_caller.webp",
         "bytes": 1858,
@@ -1329,7 +1329,7 @@
           "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.2,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -1356,7 +1356,7 @@
         "resolved": "#8f6cc4",
         "strength": 0.35
       },
-      "sourceFingerprint": "381ec1f561536bd906a5d9a4118703168dc7f751eeca555a9dcfbe90876f0567",
+      "sourceFingerprint": "aa64a50b6ca3154eabfca3b3f13fa79fcba135b9b80f8932478e3031c349b830",
       "output": {
         "path": "public/ui/mobs/crypt_gravecaller_adept.webp",
         "bytes": 2182,
@@ -1376,7 +1376,7 @@
           "sha256": "9f1e4ea763337369a1b455afd9d07888d409d1f4efe12cf2880340937c0b16fc"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.3,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -1390,7 +1390,7 @@
         "resolved": "#6fd6a8",
         "strength": 0.3
       },
-      "sourceFingerprint": "3afc38c874310609b64b3c127db34183bd1b880fcbf4d2a0634ef4bf02c39179",
+      "sourceFingerprint": "6548b1f6fcf4210d90a8fa7692e6a56684439ab195a4c3fad049b4c5b7764ceb",
       "output": {
         "path": "public/ui/mobs/crypt_gravecaller_necromancer.webp",
         "bytes": 2676,
@@ -1401,7 +1401,7 @@
       "id": "crypt_ossuary_cutthroat",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_rogue",
+      "visualKey": "crypt_skel_cutthroat",
       "renderSpec": {
         "model": {
           "url": "models/chars/enemies/skeleton_rogue.glb",
@@ -1410,7 +1410,7 @@
           "sha256": "e6cc7ba50e84a3c2e9c800e22197c6e6621c1747dca9eb48e867c8b4529aef65"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.2,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -1424,7 +1424,7 @@
         "resolved": "#a8b0b0",
         "strength": 0.25
       },
-      "sourceFingerprint": "888bb186f0f33cce7fb656d54b5a00fad556795028ce03175ebea9dc4752ebdb",
+      "sourceFingerprint": "c9c047fb859e2c2e5dcda70d9dd22f42890d490f96fb28265ff457a8d647695b",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_cutthroat.webp",
         "bytes": 2532,
@@ -1440,13 +1440,13 @@
         "model": {
           "url": "models/creatures/crypt_drake.glb",
           "path": "public/models/creatures/crypt_drake.glb",
-          "bytes": 631044,
-          "sha256": "d0d0f83dfd1c2d418bdad740d6c749ebe4cc07e7d355670782e0f7dbdc2bb11c"
+          "bytes": 1988556,
+          "sha256": "35dd7480cea6917b7dee6342ae8b1ff88d24512134d5822fb5ef90ab0e3799db"
         },
         "idle": "Idle",
-        "height": 6.5,
+        "height": 13.63,
         "yaw": null,
-        "hover": null,
+        "hover": -0.19,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -1458,11 +1458,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bc1db88a93cd776df5a35cdde59e292e27fc7a18374ea5ddfef67ec0b07988c8",
+      "sourceFingerprint": "24f25ec7bdd3726ef2f37e9fd6b7dfd9265517496fca0c649ee63933cd2b2ded",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_drake.webp",
-        "bytes": 2550,
-        "sha256": "39bc26c6411b5b20e05ca964bc4b5a5117efcd119e354f997a742ddee0ecdbdf"
+        "bytes": 2572,
+        "sha256": "e45ee93eba58f1d7a0522fe0ffec0176d4f2541017d5b8effced1d119b6ad028"
       }
     },
     {
@@ -1478,7 +1478,7 @@
           "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.3,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -1492,7 +1492,7 @@
         "resolved": "#d8cfb8",
         "strength": 0.25
       },
-      "sourceFingerprint": "ecbbff796e12fd51f3a65aa6665f48a3e0bb109fd16e9155e93fef93008dcd94",
+      "sourceFingerprint": "9863ba612ee6166893b24e7490d2796d620f384e050e6c72e0c06352eb64c452",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_warrior.webp",
         "bytes": 2314,
@@ -4667,34 +4667,34 @@
       "id": "hollow_chorister",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_minion",
+      "visualKey": "crypt_skel_chorister",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/chars/enemies/necromancer.glb",
+          "path": "public/models/chars/enemies/necromancer.glb",
+          "bytes": 528152,
+          "sha256": "9f1e4ea763337369a1b455afd9d07888d409d1f4efe12cf2880340937c0b16fc"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.3,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": 0.3
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#7b4fa0",
-        "strength": 0.25
+        "strength": 0.3
       },
-      "sourceFingerprint": "47e90548b3e67f1607447ddc67e2546cab0c63a3d154f21d9f9b70336bcaf227",
+      "sourceFingerprint": "d5be20a639c275b28a3cb272b09bf548260c2b3a90ce398cde58a5dd13a18221",
       "output": {
         "path": "public/ui/mobs/hollow_chorister.webp",
-        "bytes": 2774,
-        "sha256": "70475d46f201a6483098d9227f1512d043de0feb1ee49d349f2436239e78f3f8"
+        "bytes": 2588,
+        "sha256": "95ba02dd3dc7838411403c77fa7426c9e32067db8e71efdb431dd5cdf8f90867"
       }
     },
     {
@@ -5825,7 +5825,7 @@
       "id": "morthen",
       "family": "undead",
       "finderEncounter": true,
-      "visualKey": "skel_boss",
+      "visualKey": "crypt_skel_gravecaller",
       "renderSpec": {
         "model": {
           "url": "models/chars/enemies/skeleton_mage.glb",
@@ -5834,7 +5834,7 @@
           "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5861,11 +5861,11 @@
         "resolved": "#4a235a",
         "strength": 0.25
       },
-      "sourceFingerprint": "cf20a028c0fcd49d6c62f6704fcbb9b933c6c3cb58ebcc6e54e8dcf3edd0848f",
+      "sourceFingerprint": "1eb35573a8158faea12406c0226993f1057cc82270ce2fb28564ee97ad809d08",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 2206,
-        "sha256": "0f1f31a372ec21e5b0d74364bd6400aed4e44b9ed3ed40fdf7bc72e6aaa59725"
+        "bytes": 2216,
+        "sha256": "d586f3e83c735ad881df6a6e49cae8fed5e4827f303353174f26fcef1df3b148"
       }
     },
     {
@@ -8270,7 +8270,7 @@
       "id": "rimeweb",
       "family": "spider",
       "finderEncounter": true,
-      "visualKey": "mob_spider",
+      "visualKey": "mob_crypt_rimeweb",
       "renderSpec": {
         "model": {
           "url": "models/creatures/spider.glb",
@@ -8279,7 +8279,7 @@
           "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
         },
         "idle": "Spider_Idle",
-        "height": 1.4,
+        "height": 2.7,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -8293,7 +8293,7 @@
         "resolved": "#e8f4ff",
         "strength": 0.35
       },
-      "sourceFingerprint": "8aa894385af54cd0fb06b56c950c826ca5bd967116932d0f052e61496af9f196",
+      "sourceFingerprint": "5548184b0491baaad77ff432bd84a3cba506fa75412907cff8e694dcd2cf58c7",
       "output": {
         "path": "public/ui/mobs/rimeweb.webp",
         "bytes": 1792,
@@ -8474,7 +8474,7 @@
       "id": "sexton_marrow",
       "family": "undead",
       "finderEncounter": true,
-      "visualKey": "skel_mage",
+      "visualKey": "crypt_skel_sexton",
       "renderSpec": {
         "model": {
           "url": "models/chars/enemies/skeleton_mage.glb",
@@ -8483,7 +8483,7 @@
           "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
         },
         "idle": "Idle_Combat",
-        "height": 2.5,
+        "height": 3.4,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -8510,11 +8510,11 @@
         "resolved": "#839192",
         "strength": 0.25
       },
-      "sourceFingerprint": "0c306427584ad5b6626decd29a01d9dd6673b0c4cd5d9c45e08e563f8fb31d72",
+      "sourceFingerprint": "814d6117e918ceca1f0a400139683e5357d9de19ab91e7fd2662d53f77b66d2e",
       "output": {
         "path": "public/ui/mobs/sexton_marrow.webp",
-        "bytes": 2218,
-        "sha256": "2f4a59251df97b2d7248c65549c87e4c0efb09c62c28edf8dd1f08350449263d"
+        "bytes": 2224,
+        "sha256": "15b604cb9281e7bc5bf604db51abef6188afde8887fa848185a878c8eb35adb8"
       }
     },
     {

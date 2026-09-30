@@ -12250,7 +12250,7 @@ export const ko_KR: EnTranslations = {
       "crypt_murder_call": "까마귀떼 부름",
       "crypt_stone_shriek": "돌의 비명",
       "crypt_grave_cleave": "무덤 가르기",
-      "crypt_bonechill_breath": "한골 숨결",
+      "crypt_barrowflame_breath": "무덤불꽃 숨결",
       "crypt_tail_lash": "꼬리 채찍",
       "crypt_wing_gust": "날개 돌풍",
       "bastion_brine_mend": "소금물 치유",

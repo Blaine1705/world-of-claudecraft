@@ -19671,7 +19671,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_murder_call': '鴉群の呼び声',
   'abilityUi.cast.crypt_stone_shriek': '石の絶叫',
   'abilityUi.cast.crypt_grave_cleave': '墓所の薙ぎ払い',
-  'abilityUi.cast.crypt_bonechill_breath': '寒骨の吐息',
+  'abilityUi.cast.crypt_barrowflame_breath': '塚炎の吐息',
   'abilityUi.cast.crypt_tail_lash': '尾の一撃',
   'abilityUi.cast.crypt_wing_gust': '翼の突風',
   'abilityUi.cast.bastion_brine_mend': '塩水の癒し',

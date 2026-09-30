@@ -31,6 +31,7 @@ import {
   type TrashKitDef,
   type TrashKitState,
 } from '../../types';
+import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
 import { spawnKitAdd } from './spawn';
 import {
   holdLineAim,
@@ -135,6 +136,7 @@ export function startTrashKit(ctx: SimContext, mob: Entity, kit: TrashKitDef): T
       targetId: mob.aggroTargetId ?? mob.id,
       school: 'physical',
       fx: 'windup',
+      ability: dive ? CRYPT_PERCH_DIVE : CRYPT_SKY_LANDING,
     });
   }
   return st;

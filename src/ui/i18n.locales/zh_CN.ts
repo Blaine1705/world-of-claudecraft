@@ -18698,7 +18698,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_murder_call': '鸦群召唤',
   'abilityUi.cast.crypt_stone_shriek': '石之尖啸',
   'abilityUi.cast.crypt_grave_cleave': '墓穴横扫',
-  'abilityUi.cast.crypt_bonechill_breath': '寒骨吐息',
+  'abilityUi.cast.crypt_barrowflame_breath': '冢焰吐息',
   'abilityUi.cast.crypt_tail_lash': '尾鞭',
   'abilityUi.cast.crypt_wing_gust': '翼风',
   'abilityUi.cast.bastion_brine_mend': '盐水愈合',

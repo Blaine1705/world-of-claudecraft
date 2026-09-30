@@ -4307,7 +4307,6 @@ export type DungeonGateKind =
   | 'bone_barrier'
   | 'web_curtain'
   | 'warded_arch'
-  | 'bone_bridge'
   | 'rite_ward'
   // The Sunken Bastion: a drawbridge that lowers over the moat ditch, and a
   // wall of Vael's fog that parts.

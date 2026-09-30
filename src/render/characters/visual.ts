@@ -1773,6 +1773,7 @@ export class CharacterVisual {
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
+    if (!abilityId && this.def.castPlayOutHoldsAttacks && this.castPlayOutRunning()) return;
     if ((abilityId === 'charge' || abilityId === 'intervene') && this.action(this.def.clips.rush)) {
       this.warriorBody.beginRush(abilityId);
       return;
@@ -3874,13 +3875,28 @@ export class CharacterVisual {
     next.play();
   }
 
+  /** Is a `castPlayOut` clip on the rig right now (its cast loop or its play-out)? */
+  private castPlayOutRunning(): boolean {
+    const name = this.current?.getClip().name;
+    if (!name || !this.def.clips.castPlayOut?.includes(name)) return false;
+    return this.currentOneShotIsCastExit || this.baseState === 'cast';
+  }
+
+  /** A flying or perching creature (VisualDef.flight): the renderer reads its
+   *  airborne state from its drawn height, as it does a player's. */
+  get flies(): boolean {
+    return this.def.flight === true;
+  }
+
   /** Base clips that play once and CLAMP instead of looping: a sit-down
    *  transition (which then hands off to the sit-idle loop), and the jump clip
    *  of a rig that ships a landing one-shot, which holds its airborne pose for
    *  as long as the body is off the ground. Rigs without a `land` clip keep
-   *  looping `jump` unchanged. */
+   *  looping `jump` unchanged, and a flier (VisualDef.flight) never clamps. */
   private isOnce(a: THREE.AnimationAction): boolean {
     if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
+    // A flier's `jump` is its flight loop (or its perch): it never clamps.
+    if (this.def.flight) return false;
     // 'fall' counts as well as 'jump'. A rig with no authored flail resolves
     // `fall` back to its jump clip (baseAction), so keying this on 'jump' alone
     // meant a long fall silently LOOPED the pose a short hop clamps. The check
