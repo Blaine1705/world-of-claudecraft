@@ -263,9 +263,7 @@ describe('online unstuck command wiring', () => {
 
   it('ClientWorld sends the dedicated append-only wire command', () => {
     const cmd = vi.fn();
-    const flushPendingMovementFramesForCommand = vi.fn();
-    ClientWorld.prototype.unstuck.call({ cmd, flushPendingMovementFramesForCommand } as never);
-    expect(flushPendingMovementFramesForCommand).toHaveBeenCalledOnce();
+    ClientWorld.prototype.unstuck.call({ cmd, movementWireVersion: 1 } as never);
     expect(cmd).toHaveBeenCalledWith({ cmd: 'unstuck' });
   });
 

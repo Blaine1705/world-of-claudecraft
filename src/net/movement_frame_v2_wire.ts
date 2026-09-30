@@ -94,6 +94,22 @@ export class MovementFrameV2Outbox {
   }
 }
 
+export function flushMovementFrameV2Outbox(
+  outbox: MovementFrameV2Outbox | undefined,
+  socket: MovementFrameSocket,
+  canSend: boolean,
+  lastSeq: number,
+  pending: Map<number, number>,
+  now: number,
+  bypassBackpressure = false,
+): number {
+  if (!outbox) return lastSeq;
+  const firstSeq = lastSeq + 1;
+  const result = outbox.flush(socket, canSend, lastSeq, bypassBackpressure);
+  trackPendingInputSequenceRange(pending, firstSeq, result.lastSeq, now);
+  return result.lastSeq;
+}
+
 export function trackPendingInputSequence(
   pending: Map<number, number>,
   seq: number,

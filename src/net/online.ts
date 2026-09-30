@@ -233,6 +233,7 @@ import {
 } from './mount_race_wire';
 import {
   encodeAnalogMoveInput,
+  flushMovementFrameV2Outbox,
   type MovementFrameV2,
   MovementFrameV2Outbox,
   trackPendingInputSequence,
@@ -1708,9 +1709,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private movementFrameOutbox: MovementFrameV2Outbox | undefined;
   onMovementWireNegotiated: ((version: 1 | 2, now: number) => void) | null = null;
   onMovementWireNeutral: ((now: number) => boolean) | null = null;
-  // No initializer on purpose: bare ClientWorld test fixtures skip field
-  // initializers, and the lazy accessor below keeps that construction idiom
-  // equivalent to a real instance.
+  // Bare ClientWorld test fixtures skip field initializers.
   private pendingTransientInput: PendingTransientInput | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
@@ -2048,37 +2047,24 @@ export class ClientWorld extends ReconWireState implements IWorld {
 
   private sendMovementTimerTick(now = performance.now()): void {
     if (this.movementWireVersion !== 2) return void this.sendInput(now);
-    const firstSeq = this.inputSeq + 1;
-    const result = this.movementFrameOutbox?.flush(
+    this.flushMovementWireOutbox(now);
+  }
+
+  private flushMovementWireOutbox(now = performance.now(), bypassBackpressure = false): void {
+    this.inputSeq = flushMovementFrameV2Outbox(
+      this.movementFrameOutbox,
       this.ws,
       this.movementWireIsOpen(),
       this.inputSeq,
+      this.pendingInputSeqSentAt,
+      now,
+      bypassBackpressure,
     );
-    if (!result) return;
-    this.inputSeq = result.lastSeq;
-    trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
   }
 
-  private flushPendingMovementFramesForCommand(now = performance.now()): void {
-    if (this.movementWireVersion !== 2 || !this.movementFrameOutbox) return;
-    const firstSeq = this.inputSeq + 1;
-    const result = this.movementFrameOutbox.flush(
-      this.ws,
-      this.movementWireIsOpen(),
-      this.inputSeq,
-      true,
-    );
-    this.inputSeq = result.lastSeq;
-    trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
-  }
-
-  /** Send unconditional neutral input before an in-place renderer transition. */
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
     this.mouselookFacing = null;
-    // On an open socket the forced path admits exactly one neutral frame
-    // despite a saturated browser buffer. The accepted neutral frame consumes
-    // any pre-pause engagement intent without putting it on the wire.
     if (this.movementWireVersion === 2) {
       return this.onMovementWireNeutral?.(now) ?? false;
     }
@@ -3450,7 +3436,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'stopattack' });
   }
   unstuck(): void {
-    this.flushPendingMovementFramesForCommand();
+    if (this.movementWireVersion === 2) this.flushMovementWireOutbox(performance.now(), true);
     this.cmd({ cmd: 'unstuck' });
   }
   releaseSpirit(): void {
