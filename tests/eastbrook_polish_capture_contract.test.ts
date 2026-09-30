@@ -707,7 +707,12 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // new renderer bytes. No capture was retaken.
   // Re-minted after compressing that helper for the monolith ratchet: same
   // content path, new renderer bytes. No capture was retaken.
-  'b5c425b62836e23621fbfa8ed1baa0405eac3b3d5879b947d8e60e3d6ca1af6d';
+  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
+  // noticeboard.ts). No capture was retaken.
+  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
+  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
+  // one tree. No capture was retaken.
+  '8967178cc644aa136b2938f006332d5cead62ec8e957379b44800ebcdc7f372f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

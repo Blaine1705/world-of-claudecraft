@@ -1402,7 +1402,12 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // new renderer bytes. No capture was retaken.
   // Re-minted after compressing that helper for the monolith ratchet: same
   // content path, new renderer bytes. No capture was retaken.
-  '1bbf9d4f6bf59516fb18c2f11f8b54333c5dfb0d815ff58be272f0098767a15a';
+  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
+  // noticeboard.ts). No capture was retaken.
+  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
+  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
+  // one tree. No capture was retaken.
+  '9c189cef2d439c88eb522e5063e8fcd209b77a7060747b45e0a6e51f4144b29a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1432,7 +1437,12 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // new renderer bytes. No capture was retaken.
   // Re-minted after compressing that helper for the monolith ratchet: same
   // content path, new renderer bytes. No capture was retaken.
-  'b5c425b62836e23621fbfa8ed1baa0405eac3b3d5879b947d8e60e3d6ca1af6d';
+  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
+  // noticeboard.ts). No capture was retaken.
+  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
+  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
+  // one tree. No capture was retaken.
+  '8967178cc644aa136b2938f006332d5cead62ec8e957379b44800ebcdc7f372f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2821,7 +2831,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
       // Helper compression for the monolith ratchet: recomputed LAST again
       // over the re-swept evidence. No capture was retaken.
-    ).toBe('e626051cead35abfd80d072d6407e16037072c6e779702ee4a032164215ec56d');
+      // GLTF parser release (LoadedGltf type swap): recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // Integrated v0.45 batch plus GLTF parser release: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+    ).toBe('610a20cb0fd05e01acf713a7d620903af6041f1615e5c5ebff003191ac322d60');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
