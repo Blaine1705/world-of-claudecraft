@@ -65,10 +65,20 @@ export class MovementFrameV2Outbox {
     return { accepted, lastSeq: accepted ? lastSeq + 1 : lastSeq };
   }
 
-  flush(socket: MovementFrameSocket, canSend: boolean, lastSeq: number): MovementFrameV2SendResult {
+  flush(
+    socket: MovementFrameSocket,
+    canSend: boolean,
+    lastSeq: number,
+    bypassBackpressure = false,
+  ): MovementFrameV2SendResult {
     if (!canSend) return { accepted: false, lastSeq };
-    while (this.pending.length > 0 && !isInputSendBackpressured(socket.bufferedAmount)) {
-      if (!sendMovementFrameV2(socket, true, this.pending[0], lastSeq + 1)) break;
+    while (
+      this.pending.length > 0 &&
+      (bypassBackpressure || !isInputSendBackpressured(socket.bufferedAmount))
+    ) {
+      if (!sendMovementFrameV2(socket, true, this.pending[0], lastSeq + 1, bypassBackpressure)) {
+        break;
+      }
       lastSeq++;
       this.pending.shift();
     }
