@@ -110,8 +110,9 @@ describe('mob portrait source manifest', () => {
     // shade and Gaoler Ossick). 320: the Drowned Temple rework's nineteen (five
     // trash, the three Mere Hydra heads, the Tideglass Colossus and its ten
     // Reflections, the plain one plus one per class). 321: the Hollow Crypt
-    // finale's Knellwyrm.
-    expect(liveIds).toHaveLength(321);
+    // finale's Knellwyrm. 323: the Sunken Bastion fifth pass's two encounter
+    // bodies (the Turnkey's Iron Cage and Ossick's Drowned Anchor).
+    expect(liveIds).toHaveLength(323);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

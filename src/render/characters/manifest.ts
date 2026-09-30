@@ -29,7 +29,10 @@ import {
   OSSICK_ANCHOR,
   OSSICK_CUDGEL,
   OSSICK_SHACKLE,
+  VAEL_DROWNING_HYMN,
   VAEL_MIST_SURGE,
+  VAEL_REAPING_SCYTHE,
+  VAEL_SHADOWSTEP,
 } from '../../sim/encounters/sunken_bastion/ids';
 import {
   VARKHUL_ANVILS_DECREE_CAST_ID,
@@ -4114,20 +4117,38 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0x5b6a64,
     tintStrength: 0.35,
   },
-  // Vael the Fogbinder and his fog shades wear ONE look (the veil hides him
-  // among them; only the Fogbeacon's beam tells them apart).
+  // Vael the Fogbinder, Death itself, and his shadow copies wear ONE look (the
+  // veil hides him among them; only the Fogbeacon's beam tells them apart):
+  // the hooded skeletal reaper built in Blender (scripts/assets/
+  // sunken_bastion_creatures/reaper.py), a great scythe in hand, soul fire in
+  // his sockets, ribs and lantern, hovering a hand over the flags. Authored at
+  // size (8.4 with the raised scythe; the hood's peak about 6.5), drawn at the
+  // template's 1.35. The Shadow Crossing's bar sinks him through the floor
+  // (Vanish) and rises him out of the pool (Emerge); the sweep off the pool is
+  // his flourish, fired by the Reaping Scythe's cue.
   bastion_vael: {
-    url: `${PLAYERS}/mage.glb`,
-    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
-    height: HUMANOID_H * 1.8,
+    url: `${CREATURES}/vael_reaper.glb`,
+    height: 8.36,
+    hover: 0.355,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
-      castByAbility: { [VAEL_MIST_SURGE]: 'Spellcast_Raise' },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [VAEL_MIST_SURGE]: 'Cast',
+        [VAEL_DROWNING_HYMN]: 'Hymn',
+        [VAEL_SHADOWSTEP]: 'Vanish',
+        [VAEL_REAPING_SCYTHE]: 'Emerge',
+      },
+      flourish: 'ScytheSweep',
     },
-    show: ['Mage_Hat'],
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
-    tint: 0x4f8f78,
-    tintStrength: 0.55,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
+    clickRadius: 2.2,
   },
 
   // The Bastion's beasts and gaol bodies, scaled well past the player.
@@ -4188,7 +4209,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // sunken_bastion/bastion_creature_fx.ts).
   bastion_turnkey: {
     url: `${CREATURES}/gaol_turnkey.glb`,
-    height: 4.8,
+    // The gaol's miniboss: drawn at a boss's size (about 7.8 at its 1.3),
+    // Ossick's own stature, three players tall.
+    height: 6.0,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4201,6 +4224,39 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Cast',
     },
     selfIllumination: 0.05,
+  }, // The Turnkey's Iron Cage and Ossick's Drowned Anchor (scripts/assets/
+  // sunken_bastion_creatures/gaol_props.py): hittable encounter bodies. The
+  // cage drops onto its prisoner (the sim lowers it through pos.y) with its
+  // snapped chain swinging; both rattle when struck. Authored at size.
+  bastion_gaol_cage: {
+    url: `${CREATURES}/gaol_cage.glb`,
+    height: 8.27,
+    hover: -0.33,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      hit: ['Hit'],
+      death: 'Idle',
+    },
+    authoredAtlas: true,
+    clickRadius: 2,
+  },
+  bastion_drowned_anchor: {
+    url: `${CREATURES}/drowned_anchor.glb`,
+    height: 6.64,
+    hover: -0.07,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      hit: ['Hit'],
+      death: 'Idle',
+    },
+    authoredAtlas: true,
+    clickRadius: 1.8,
   },
 
   // The Turretback Hermit, the Bastion's showpiece (scripts/assets/
@@ -5445,6 +5501,8 @@ const MOB_KEYS: Record<string, string> = {
   drowned_sergeant: 'bastion_skel_sergeant',
   shackled_prisoner: 'bastion_prisoner',
   gaol_turnkey: 'bastion_turnkey',
+  bastion_gaol_cage: 'bastion_gaol_cage',
+  bastion_drowned_anchor: 'bastion_drowned_anchor',
   turretback_hermit: 'mob_turretback',
   gaoler_ossick: 'bastion_ossick',
   // The Drowned Temple (sim/content/drowned_temple.ts, temple.ts).

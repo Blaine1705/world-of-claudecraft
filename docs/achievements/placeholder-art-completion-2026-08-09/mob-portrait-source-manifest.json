@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "b730c81e1aee86f1269e68de65cb17c33cc177011e9a65538c5e1431dbda41bc",
+  "rendererFingerprint": "b72fee77abe1d1e6fe47c81d1e31686b9eebaf000e04efeb009a77ff8721f782",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5366676,
-      "sha256": "8a9f88fd7b1736e89f7344dce988873f4d28b228602421ce5af27a29f22b3123",
+      "bytes": 5370319,
+      "sha256": "404a21f4d739491114fda871bf5bdf924f0c431046898618f638e476979f57cf",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 321,
+  "portraitCount": 323,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -387,6 +387,74 @@
         "path": "public/ui/mobs/barrow_wight.webp",
         "bytes": 2756,
         "sha256": "464fc4c587c2b9ace7404a1d2e50d56839d7c16d1a28875fc37afb4b5d24e5e2"
+      }
+    },
+    {
+      "id": "bastion_drowned_anchor",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_drowned_anchor",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/drowned_anchor.glb",
+          "path": "public/models/creatures/drowned_anchor.glb",
+          "bytes": 269152,
+          "sha256": "652e57ba0244986e019ded50bff44a6daee39ad73abb7aedd2e5ac70ec10f8c1"
+        },
+        "idle": "Idle",
+        "height": 6.64,
+        "yaw": null,
+        "hover": -0.07,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "bbf65153be47b78d5ef1fa8372f93290736c9aa995d0435097fee4bab4d6f903",
+      "output": {
+        "path": "public/ui/mobs/bastion_drowned_anchor.webp",
+        "bytes": 1728,
+        "sha256": "567a6c469235507aacaf31df3573b48a61965f77a93b34e276736ee8ba037d1f"
+      }
+    },
+    {
+      "id": "bastion_gaol_cage",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_gaol_cage",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/gaol_cage.glb",
+          "path": "public/models/creatures/gaol_cage.glb",
+          "bytes": 377740,
+          "sha256": "71f0b26087df106c08c841b13249fb1cd5c60f44b84a7b120d3aee7ffbb8e535"
+        },
+        "idle": "Idle",
+        "height": 8.27,
+        "yaw": null,
+        "hover": -0.33,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "af61bc603908ad9bc108ab34be1a25458bd25d22fb42f775dc45dbbbb2b7b4fd",
+      "output": {
+        "path": "public/ui/mobs/bastion_gaol_cage.webp",
+        "bytes": 2342,
+        "sha256": "1433a6b6fbe30832db3782cda2024effafc47fb5b96cfc2db172c569f7f012b0"
       }
     },
     {
@@ -3011,7 +3079,7 @@
     {
       "id": "gaol_turnkey",
       "family": "humanoid",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "bastion_turnkey",
       "renderSpec": {
         "model": {
@@ -3021,7 +3089,7 @@
           "sha256": "38ca5d0684b69de3ba8df4a9bfeadb446118b1a10e2ff4a28f6fe80020ba346e"
         },
         "idle": "Idle",
-        "height": 4.8,
+        "height": 6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -3035,7 +3103,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3c05ec2912de2e54adeaac6b77d7f56a85412575dd6e7a39b371fcc336dcce13",
+      "sourceFingerprint": "96df0a2cd3d25b6bfb0b84ebf2a4253cd2e9e699df4764b2aad0bd3ac213e743",
       "output": {
         "path": "public/ui/mobs/gaol_turnkey.webp",
         "bytes": 2442,
@@ -10630,46 +10698,31 @@
       "visualKey": "bastion_vael",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/mage.glb",
-          "path": "public/models/chars/players/mage.glb",
-          "bytes": 441576,
-          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+          "url": "models/creatures/vael_reaper.glb",
+          "path": "public/models/creatures/vael_reaper.glb",
+          "bytes": 1404664,
+          "sha256": "6d3e08f6971e185f6a325d4cdd4c0d4c1a8cfac149869315b5ac23d54e09a8ae"
         },
         "idle": "Idle",
-        "height": 4.680000000000001,
+        "height": 8.36,
         "yaw": null,
-        "hover": null,
-        "show": [
-          "Mage_Hat"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/staff.glb",
-              "path": "public/models/weapons/staff.glb",
-              "bytes": 36168,
-              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "hover": 0.355,
+        "show": null,
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.55
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#4f8f78",
-        "resolved": "#4f8f78",
-        "strength": 0.55
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d2926926ecc88083f71c4c24bccc660f683cf340f84716629568c5a983dc5015",
+      "sourceFingerprint": "7afb91da510f45f0e09b5ceb363f3865428e4d85bc5470dcaf8e27c8ab7238d6",
       "output": {
         "path": "public/ui/mobs/vael_fog_shade.webp",
-        "bytes": 2098,
-        "sha256": "58dfe50645ceb96bf8cef16a7e895b92a4ffee896e05f838b61fd3f315970763"
+        "bytes": 1798,
+        "sha256": "f26f8f33559e21356c14d3f8c2287b7908888867cb7e9ace2ef1d134b85d11a1"
       }
     },
     {
@@ -10679,46 +10732,31 @@
       "visualKey": "bastion_vael",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/mage.glb",
-          "path": "public/models/chars/players/mage.glb",
-          "bytes": 441576,
-          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+          "url": "models/creatures/vael_reaper.glb",
+          "path": "public/models/creatures/vael_reaper.glb",
+          "bytes": 1404664,
+          "sha256": "6d3e08f6971e185f6a325d4cdd4c0d4c1a8cfac149869315b5ac23d54e09a8ae"
         },
         "idle": "Idle",
-        "height": 4.680000000000001,
+        "height": 8.36,
         "yaw": null,
-        "hover": null,
-        "show": [
-          "Mage_Hat"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/staff.glb",
-              "path": "public/models/weapons/staff.glb",
-              "bytes": 36168,
-              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "hover": 0.355,
+        "show": null,
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.55
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#4f8f78",
-        "resolved": "#4f8f78",
-        "strength": 0.55
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d2926926ecc88083f71c4c24bccc660f683cf340f84716629568c5a983dc5015",
+      "sourceFingerprint": "7afb91da510f45f0e09b5ceb363f3865428e4d85bc5470dcaf8e27c8ab7238d6",
       "output": {
         "path": "public/ui/mobs/vael_the_mistcaller.webp",
-        "bytes": 2098,
-        "sha256": "58dfe50645ceb96bf8cef16a7e895b92a4ffee896e05f838b61fd3f315970763"
+        "bytes": 1798,
+        "sha256": "f26f8f33559e21356c14d3f8c2287b7908888867cb7e9ace2ef1d134b85d11a1"
       }
     },
     {

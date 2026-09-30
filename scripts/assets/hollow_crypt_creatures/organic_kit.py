@@ -385,6 +385,13 @@ def _procedural_surface(mat, kind):
         scale_a, scale_b = 1.6, 7.0
     elif kind == 'membrane':
         scale_a, scale_b = 1.2, 5.0
+    elif kind == 'iron':
+        # Sea-rotted wrought iron (the Sunken Bastion's cage and anchor):
+        # fine pitting and blotchy rust over the painted iron and rust.
+        scale_a, scale_b = 3.2, 16.0
+    elif kind == 'cloth':
+        # Tattered shadow cloth (the reaper's robe): soft mottling, fine weave pits.
+        scale_a, scale_b = 1.4, 22.0
     else:
         scale_a, scale_b = 2.2, 9.0
     # Broad mottling.
@@ -400,7 +407,7 @@ def _procedural_surface(mat, kind):
     crack.location = (-600, -300)
     crack.color_ramp.elements[0].position = 0.0
     crack.color_ramp.elements[0].color = (0, 0, 0, 1)
-    crack.color_ramp.elements[1].position = 0.06 if kind == 'stone' else 0.035
+    crack.color_ramp.elements[1].position = 0.06 if kind == 'stone' else (0.012 if kind in ('iron', 'cloth') else 0.035)
     crack.color_ramp.elements[1].color = (1, 1, 1, 1)
     nt.links.new(vor.outputs['Distance'], crack.inputs['Fac'])
     # Fine pitting.
@@ -416,7 +423,7 @@ def _procedural_surface(mat, kind):
     # tone = vertex colour x (0.78..1.08 mottling) x crack darkening x pits
     mott = nt.nodes.new('ShaderNodeMapRange')
     mott.location = (-600, -50)
-    mott.inputs['To Min'].default_value = 0.62 if kind == 'stone' else 0.78
+    mott.inputs['To Min'].default_value = 0.62 if kind in ('stone', 'iron') else 0.78
     mott.inputs['To Max'].default_value = 1.1
     nt.links.new(noise.outputs['Fac'], mott.inputs['Value'])
     m1 = _node(nt, 'ShaderNodeMix', (-350, 200))
@@ -442,13 +449,34 @@ def _procedural_surface(mat, kind):
     m3.inputs['Factor'].default_value = 0.6
     nt.links.new(_sock(m2.outputs, 'Result'), _sock(m3.inputs, 'A'))
     nt.links.new(pit_ramp.outputs['Color'], _sock(m3.inputs, 'B'))
-    nt.links.new(_sock(m3.outputs, 'Result'), bsdf.inputs['Base Color'])
+    albedo_out = _sock(m3.outputs, 'Result')
+    if kind == 'iron':
+        # Rust blooms: a broad noise pushes the painted colour toward flaking
+        # orange-brown rust, heaviest in the noise's peaks.
+        rust_n = _node(nt, 'ShaderNodeTexNoise', (-850, -800), Scale=5.5, Detail=8.0, Roughness=0.7)
+        nt.links.new(mapping.outputs['Vector'], rust_n.inputs['Vector'])
+        rust_r = nt.nodes.new('ShaderNodeValToRGB')
+        rust_r.location = (-600, -800)
+        rust_r.color_ramp.elements[0].position = 0.48
+        rust_r.color_ramp.elements[0].color = (0, 0, 0, 1)
+        rust_r.color_ramp.elements[1].position = 0.7
+        rust_r.color_ramp.elements[1].color = (1, 1, 1, 1)
+        nt.links.new(rust_n.outputs['Fac'], rust_r.inputs['Fac'])
+        m4 = _node(nt, 'ShaderNodeMix', (250, 150))
+        m4.data_type = 'RGBA'
+        m4.blend_type = 'MIX'
+        nt.links.new(rust_r.outputs['Color'], m4.inputs['Factor'])
+        nt.links.new(albedo_out, _sock(m4.inputs, 'A'))
+        _sock(m4.inputs, 'B').default_value = (0.2, 0.065, 0.02, 1)
+        albedo_out = _sock(m4.outputs, 'Result')
+    nt.links.new(albedo_out, bsdf.inputs['Base Color'])
     # Bump from cracks + pits + mottling.
     add = _node(nt, 'ShaderNodeMath', (-150, -450))
     add.operation = 'ADD'
     nt.links.new(crack.outputs['Color'], add.inputs[0])
     nt.links.new(pits.outputs['Fac'], add.inputs[1])
-    bump = _node(nt, 'ShaderNodeBump', (300, -300), Strength=0.55 if kind == 'stone' else 0.35, Distance=0.04)
+    bump = _node(nt, 'ShaderNodeBump', (300, -300), Strength=0.55 if kind in ('stone', 'iron') else 0.35,
+                 Distance=0.04)
     nt.links.new(add.outputs['Value'], bump.inputs['Height'])
     nt.links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
     mat['bake_bsdf'] = bsdf.name

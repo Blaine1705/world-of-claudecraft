@@ -58,6 +58,7 @@ import {
   OSSICK_TUNING,
   PIT_RIM,
   SHACKLED_PRISONER_ID,
+  shackleRange,
   shackleStrained,
   WINCH,
 } from './ids';
@@ -65,6 +66,8 @@ import {
 const T = OSSICK_TUNING;
 export const OSSICK_DEED = 'dgn_ossick_moored';
 const OUR_CASTS = [OSSICK_ANCHOR, OSSICK_SHACKLE, OSSICK_CUDGEL];
+/** The anchor body stands this far ahead of its victim, on the winch side. */
+const ANCHOR_LEAD = 1.4;
 
 function freshState(): OssickFightState {
   return {
@@ -115,6 +118,8 @@ export function startDrownedAnchor(
     remaining: T.anchorCast,
     duration: T.anchorCast,
     value: 1,
+    // Heroic: the Anchor Crash's reach round the mark (the client rings it).
+    ...(inst.difficulty === 'heroic' ? { value2: T.crashRadius } : {}),
     sourceId: boss.id,
     school: 'physical',
     undispellable: true,
@@ -274,11 +279,12 @@ function stepAnchors(
       const d = Math.hypot(p.pos.x - wx, p.pos.z - wz);
       pullToward(ctx, p, wx, wz, anchorDragSpeed(d, heroic) * DT, PIT_RIM - 0.05);
     }
-    // The anchor rides its victim, flukes dug into the flags behind them.
-    anchor.pos.x = p.pos.x;
+    // The anchor rides its victim a step toward the winch, flukes toward them.
+    const toWinch = Math.atan2(wx - p.pos.x, wz - p.pos.z);
+    anchor.pos.x = p.pos.x + Math.sin(toWinch) * ANCHOR_LEAD;
+    anchor.pos.z = p.pos.z + Math.cos(toWinch) * ANCHOR_LEAD;
     anchor.pos.y = p.pos.y;
-    anchor.pos.z = p.pos.z;
-    anchor.facing = Math.atan2(wx - p.pos.x, wz - p.pos.z);
+    anchor.facing = toWinch + Math.PI;
     ctx.grid.update(anchor);
     if (Math.hypot(p.pos.x - wx, p.pos.z - wz) <= PIT_RIM) {
       releaseAnchor(ctx, inst, boss, st, a.playerId, a.anchorId, false);
@@ -318,6 +324,7 @@ function shacklePair(
   st: OssickFightState,
   a: Entity,
   b: Entity,
+  heroic: boolean,
 ): void {
   for (const [p, partner] of [
     [a, b],
@@ -331,6 +338,8 @@ function shacklePair(
       remaining: T.shackleSeconds,
       duration: T.shackleSeconds,
       value: 1,
+      // The chain's reach (the client rings it round the pair).
+      value2: shackleRange(heroic),
       // The partner, not Ossick: the client draws the chain between the two.
       sourceId: partner.id,
       school: 'physical',
@@ -503,7 +512,8 @@ export function tickOssick(
       else if (p) dropAuraById(p, OSSICK_ANCHOR_MARK);
     } else {
       const [a, b] = st.pending.map((id) => ctx.entities.get(id));
-      if (a && b && !a.dead && !b.dead) shacklePair(ctx, boss, st, a, b);
+      if (a && b && !a.dead && !b.dead)
+        shacklePair(ctx, boss, st, a, b, inst.difficulty === 'heroic');
     }
     st.pending = [];
     return;
