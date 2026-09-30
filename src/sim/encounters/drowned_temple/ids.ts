@@ -5,6 +5,8 @@
 import {
   CHOIR_COURT,
   HYDRA_POOL,
+  HYDRA_POOL_COLUMN_R,
+  HYDRA_POOL_COLUMNS,
   MOON_ALTAR,
   PRISM_TERRACE,
 } from '../../content/drowned_temple_layout';
@@ -26,8 +28,15 @@ export const HYDRA_HEAD_TEMPLATES: readonly string[] = [
 // ---- cast ids (real cast bars on the bosses) -------------------------------------
 export const SELTHE_SEA_SONG = 'temple_sea_song';
 export const SELTHE_TIDAL_SLAP = 'temple_tidal_slap';
+/** The ice head's frost cone (the cast id kept from the first pass; its bar
+ *  reads Freezing Breath). */
 export const HYDRA_TIDE_BREATH = 'temple_tide_breath';
+/** The venom head's spit (the id kept from the first pass; it reads Venom Spit). */
 export const HYDRA_BRINE_SPIT = 'temple_brine_spit';
+/** The water head's torrent down a lane, with a shove. */
+export const HYDRA_CRUSHING_TORRENT = 'temple_crushing_torrent';
+/** The whole Hydra sinks and a wave rolls over one half of the pool. */
+export const HYDRA_TSUNAMI = 'temple_hydra_tsunami';
 export const COLOSSUS_PRISM_FLARE = 'temple_prism_flare';
 export const COLOSSUS_MOONLIGHT_LANCE = 'temple_moonlight_lance';
 export const COLOSSUS_RESONANT_SLAM = 'temple_resonant_slam';
@@ -38,6 +47,10 @@ export const YSOLEI_UNDERTOW = 'temple_undertow';
 export const SELTHE_CHORUS_MARK = 'temple_chorus_mark';
 export const SELTHE_SOLO_MARK = 'temple_solo_mark';
 export const HYDRA_ENRAGED = 'temple_enraged_hydra';
+/** A head under the water for the Tsunami: it takes far less damage. */
+export const HYDRA_SUBMERGED = 'temple_hydra_submerged';
+/** The Freezing Breath's chill on whoever it caught. */
+export const HYDRA_FROSTBITE = 'temple_hydra_frostbite';
 export const COLOSSUS_PRISM_WARD = 'temple_prism_ward';
 export const REFLECTION_TETHER = 'temple_reflection_tether';
 export const YSOLEI_FLOODED = 'temple_flooded';
@@ -48,10 +61,20 @@ export const SELTHE_CHORUS_BURST = 'temple_chorus_burst';
 export const SELTHE_SOLO_BURST = 'temple_solo_burst';
 export const SELTHE_ECHO_BURST = 'temple_echo_burst';
 export const REFLECTION_SHATTER = 'temple_reflection_shatter';
+/** A fallen Hydra head grows back (its regrowth burst). */
+export const HYDRA_REGROWTH = 'temple_hydra_regrowth';
 export const YSOLEI_TIDAL_CRASH = 'temple_tidal_crash';
 
 // ---- encounter object templates (the state rides the template id) ----------------
 export const BRINE_SPIT_TEMPLATE = 'temple_brine_spit_pool';
+/** The venom a Venom Spit leaves where it burst (a standing hazard). */
+export const VENOM_POOL_TEMPLATE = 'temple_venom_pool';
+/** The Tsunami's wave: warned, then rolling (its facing is the roll's heading,
+ *  its scale the pool's radius). */
+export const TSUNAMI_TEMPLATES = {
+  warn: 'temple_tsunami_warn',
+  surge: 'temple_tsunami_surge',
+} as const;
 export const CHORUS_ECHO_TEMPLATE = 'temple_chorus_echo';
 export const SOLO_ECHO_TEMPLATE = 'temple_solo_echo';
 export const RIPTIDE_TEMPLATE = 'temple_riptide_pool';
@@ -65,6 +88,8 @@ export type TideState = keyof typeof TIDE_TEMPLATES;
 /** Every Temple encounter object template (the renderer draws them itself). */
 export const TEMPLE_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   BRINE_SPIT_TEMPLATE,
+  VENOM_POOL_TEMPLATE,
+  ...Object.values(TSUNAMI_TEMPLATES),
   CHORUS_ECHO_TEMPLATE,
   SOLO_ECHO_TEMPLATE,
   RIPTIDE_TEMPLATE,
@@ -113,23 +138,58 @@ export function chorusShare(total: number, n: number): number {
   return n <= 0 ? 0 : total / n;
 }
 
-// ---- The Mere Hydra: breaths, spit and the enraged necks -------------------------------
+// ---- The Mere Hydra: three elements, one moon pool ------------------------------------
 
 export const HYDRA_TUNING = {
+  // Freezing Breath (the ice head): a frost cone that chills.
   breathFirst: 6,
-  breathEvery: 10,
+  breathEvery: 12,
   breathCast: 2,
   breathRange: 18,
   breathArcDeg: 60,
   breathMin: 110,
   breathMax: 130,
+  chillSlow: 0.3,
+  chillSeconds: 4,
+  // Venom Spit (the venom head): pools that burst, then linger as venom.
   spitFirst: 4,
-  spitEvery: 8,
+  spitEvery: 10,
   spitCount: 3,
   spitWarn: 1.5,
   spitRadius: 4,
-  spitMin: 70,
-  spitMax: 90,
+  spitMin: 60,
+  spitMax: 75,
+  venomSeconds: 6,
+  venomRadius: 3.5,
+  venomPerSecond: 20,
+  // Crushing Torrent (the water head): a lane of water that hurls you back.
+  torrentFirst: 9,
+  torrentEvery: 12,
+  torrentCast: 2,
+  torrentLength: 26,
+  torrentHalfWidth: 2.5,
+  torrentMin: 90,
+  torrentMax: 110,
+  torrentKnockback: 8,
+  // Tsunami: the Hydra sinks and a wave rolls over one half of the pool.
+  tsunamiFirst: 24,
+  tsunamiEvery: 40,
+  tsunamiCast: 4.5,
+  /** The wave starts rolling this long before the bar ends (render cue). */
+  tsunamiRoll: 1.2,
+  tsunamiMin: 160,
+  tsunamiMax: 190,
+  tsunamiKnockback: 10,
+  /** The damage a submerged head shrugs off. */
+  submergedReduction: 0.75,
+  /** Heroic backwash: the wave rolls back over the other half this long after. */
+  backwashAfter: 3.5,
+  /** A column shelters a body this far behind it, this wide. */
+  leeDepth: 5,
+  leeHalfWidth: 2,
+  // Regrowth: a fallen head grows back while another head lives.
+  regrowAfter: 20,
+  regrowShare: 0.5,
   /** Enraged Hydra: damage done per fallen head. */
   enragePerHead: 0.15,
   /** The deed: all three heads within this many seconds. */
@@ -137,6 +197,59 @@ export const HYDRA_TUNING = {
 } as const;
 
 export const POOL = HYDRA_POOL;
+
+/** The three heads' elements, left to right: ice, venom, water. */
+export type HydraElement = 'frost' | 'venom' | 'tide';
+export const HYDRA_ELEMENTS: readonly HydraElement[] = ['frost', 'venom', 'tide'];
+
+/**
+ * Which head (0 left, 1 centre, 2 right) wields each element (in HYDRA_ELEMENTS
+ * order), given which heads are dead: its own head while that lives, else the
+ * next living head round (left, centre, right, left), so the survivors inherit
+ * a fallen head's attack. Null when every head is dead. Pure: the renderer
+ * reads the same answer off the heads' dead flags.
+ */
+export function hydraElementOwners(dead: readonly boolean[]): (number | null)[] {
+  return HYDRA_ELEMENTS.map((_, i) => {
+    for (let k = 0; k < 3; k++) {
+      const h = (i + k) % 3;
+      if (!dead[h]) return h;
+    }
+    return null;
+  });
+}
+
+export type TsunamiSide = 'east' | 'west';
+
+/** The side the n-th Tsunami (0 based) rises on: east, then west, alternating. */
+export function tsunamiSide(n: number): TsunamiSide {
+  return n % 2 === 0 ? 'east' : 'west';
+}
+
+/** The heading (sim yaw, 0 toward +z) a wave rolls on: away from its side. */
+export function tsunamiHeading(side: TsunamiSide): number {
+  return side === 'east' ? -Math.PI / 2 : Math.PI / 2;
+}
+
+/** Is a spot (instance-local) on the half of the pool a wave from `side` rolls
+ *  over? The half's rim and the pool's middle line are inside. */
+export function inTsunamiPath(side: TsunamiSide, x: number, z: number): boolean {
+  if (Math.hypot(x - HYDRA_POOL.x, z - HYDRA_POOL.z) > HYDRA_POOL.r + 3) return false;
+  return side === 'east' ? x >= HYDRA_POOL.x - 1 : x <= HYDRA_POOL.x + 1;
+}
+
+/** Does a rim column shelter a spot from a wave from `side` (the spot stands in
+ *  its lee: behind it along the wave's heading, within the column's shadow)? */
+export function inTsunamiLee(side: TsunamiSide, x: number, z: number): boolean {
+  const T = HYDRA_TUNING;
+  const dir = side === 'east' ? -1 : 1;
+  for (const c of HYDRA_POOL_COLUMNS) {
+    const along = (x - c.x) * dir;
+    if (along < HYDRA_POOL_COLUMN_R * 0.5 || along > T.leeDepth + HYDRA_POOL_COLUMN_R) continue;
+    if (Math.abs(z - c.z) <= T.leeHalfWidth) return true;
+  }
+  return false;
+}
 
 // ---- The Tideglass Colossus: your own reflection fights you ----------------------------
 

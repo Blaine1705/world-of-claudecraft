@@ -4406,15 +4406,33 @@ export interface SeltheFightState {
  *  from each head, so a fallen head never takes the state with it). */
 export interface HydraFightState {
   kind: 'hydra';
+  /** Seconds to each element's next attack: the Freezing Breath (ice), the Venom
+   *  Spit (venom) and the Crushing Torrent (water). Whoever wields the element
+   *  (its own head, or the survivor that inherited it) casts it. */
   breathTimer: number;
-  /** Which head breathes next: 0 left, 2 right. */
-  breathSide: 0 | 2;
   spitTimer: number;
-  /** Brine Spit pools about to burst (their object ids). */
+  torrentTimer: number;
+  /** Venom Spit pools about to burst (their object ids). */
   spits: { x: number; z: number; remaining: number; objectId: number }[];
+  /** Venom left where a spit burst: a standing hazard for a few seconds. */
+  venom: { x: number; z: number; remaining: number; objectId: number }[];
+  /** A Crushing Torrent's locked lane while its bar runs: the caster and the aim. */
+  torrent: { headId: number; yaw: number } | null;
+  /** Seconds to the next Tsunami, and how many have rolled this fight. */
+  tsunamiTimer: number;
+  tsunamis: number;
+  /** The Tsunami in flight: the side it rises on, its clock, its wave object,
+   *  and whether a heroic backwash follows. */
+  tsunami: {
+    side: 'east' | 'west';
+    remaining: number;
+    objectId: number;
+    backwash: boolean;
+  } | null;
   casts: number;
-  /** Sim time each head fell, in the order they fell (the deed reads it). */
-  deaths: number[];
+  /** Sim time each head (left, centre, right) last fell; null while it lives.
+   *  A fallen head grows back regrowAfter seconds later while another lives. */
+  diedAt: (number | null)[];
 }
 
 export interface ColossusFightState {
@@ -4431,6 +4449,9 @@ export interface ColossusFightState {
   casts: number;
   /** A Reflection outlived the deed window (the deed reads it). */
   lingered: boolean;
+  /** Where it planted its feet for the bar in flight (instance world
+   *  coordinates), so a bar's lane and ring land where they were drawn. */
+  plantedAt: { x: number; y: number; z: number } | null;
 }
 
 export interface YsoleiFightState {
@@ -6311,6 +6332,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
    *  own death can never re-trigger the same affix (would otherwise chain forever). */
   affixSpawned?: boolean;
+  /** An encounter part that grew back after it fell (the Mere Hydra's regrown
+   *  head, encounters/drowned_temple/hydra_regrowth.ts): its first death paid
+   *  the kill, so its later deaths pay no XP, loot or kill credit. */
+  regrown?: boolean;
   /** True for a mob spawned by a RUN or script rather than placed by a CAMP
    *  (e.g. an escort ambush wave). It has no authored home in the world, so its
    *  death must not schedule an in-place respawn: handleDeath gives it an

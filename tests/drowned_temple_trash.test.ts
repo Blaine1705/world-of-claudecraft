@@ -13,10 +13,16 @@ import { applyDungeonMobTuning } from '../src/sim/instances/difficulty';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import { tickTrashKits } from '../src/sim/mob/trash_kit';
+import { TRASH_WITHDRAW_AURA } from '../src/sim/mob/trash_kit/support';
 import {
   TEMPLE_CALL_THE_TIDE,
+  TEMPLE_GLIMMER_VENOM,
+  TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_LULLABY_SLEEP,
+  TEMPLE_PALE_MENDING,
+  TEMPLE_PEARL_SLAM,
+  TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
@@ -230,6 +236,106 @@ describe('the Lagoon Eel: Static Coil', () => {
     expect(r.me.hp).toBeLessThan(1e6);
     expect(r.me.auras.some((a) => a.id === TEMPLE_STATIC_COIL && a.kind === 'stun')).toBe(true);
     expect(far.auras.some((a) => a.id === TEMPLE_STATIC_COIL)).toBe(false);
+  });
+});
+
+describe('Temple trash, sixth pass: a second readable job for every type', () => {
+  it('adds a kick to the healers and casters and a dodge to the bruisers', () => {
+    expect(MOBS.drowned_templeguard.trashKit?.line?.castId).toBe(TEMPLE_SKEWERING_TRIDENT);
+    expect(MOBS.pale_choir_acolyte.trashKit?.mend?.castId).toBe(TEMPLE_PALE_MENDING);
+    expect(MOBS.glimmerscale_lurker.trashKit?.bolt?.castId).toBe(TEMPLE_GLIMMER_VENOM);
+    expect(MOBS.pearlguard_sentinel.trashKit?.wingGust?.castId).toBe(TEMPLE_PEARL_SLAM);
+    expect(MOBS.lagoon_snapper.trashKit?.withdraw?.name).toBe('Shell Up');
+    expect(MOBS.lagoon_eel.trashKit?.line?.castId).toBe(TEMPLE_LIGHTNING_SPIT);
+    // Two kicks on two schools (one kick never locks both), three dodges.
+    expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[TEMPLE_PALE_MENDING]?.school).toBe('frost');
+    expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[TEMPLE_GLIMMER_VENOM]?.school).toBe('nature');
+    for (const id of [TEMPLE_SKEWERING_TRIDENT, TEMPLE_PEARL_SLAM, TEMPLE_LIGHTNING_SPIT])
+      expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[id], id).toBeUndefined();
+  });
+
+  it('the Lagoon Eel’s Lightning Spit hits the lane it locked, never a sidestep', () => {
+    const r = room();
+    const eel = engage(r, 'lagoon_eel', 4, 0);
+    const def = MOBS.lagoon_eel.trashKit?.line;
+    if (!def) throw new Error('arc surge');
+    let t = 0;
+    while (eel.castingAbility !== TEMPLE_LIGHTNING_SPIT && t < def.first + def.every) {
+      run(r, DT, [eel]);
+      t += DT;
+    }
+    expect(eel.castingAbility).toBe(TEMPLE_LIGHTNING_SPIT);
+    const yaw = eel.facing;
+    const inLane = addPlayer(r, 'mage', 0, 0);
+    const lx = eel.pos.x + Math.sin(yaw) * 12;
+    const lz = eel.pos.z + Math.cos(yaw) * 12;
+    inLane.pos = r.sim.ctx.groundPos(lx, lz);
+    // The one it aimed at steps out sideways.
+    r.me.pos = r.sim.ctx.groundPos(lx + Math.cos(yaw) * 6, lz - Math.sin(yaw) * 6);
+    const meBefore = r.me.hp;
+    run(r, def.castTime + 0.1, [eel]);
+    expect(inLane.hp).toBeLessThanOrEqual(1e6 - def.min);
+    expect(r.me.hp).toBe(meBefore);
+  });
+
+  it('the Acolyte’s Pale Mending heals a hurt packmate, and a kick wastes it', () => {
+    const r = room();
+    const acolyte = engage(r, 'pale_choir_acolyte', 6, 0);
+    const guard = engage(r, 'drowned_templeguard', 6, 3);
+    guard.hp = Math.floor(guard.maxHp * 0.4);
+    const def = MOBS.pale_choir_acolyte.trashKit?.mend;
+    if (!def) throw new Error('mend');
+    run(r, def.first + 0.05, [acolyte, guard]);
+    expect(acolyte.castingAbility).toBe(TEMPLE_PALE_MENDING);
+    run(r, def.castTime + 0.1, [acolyte, guard]);
+    expect(guard.hp).toBeGreaterThan(Math.floor(guard.maxHp * 0.4));
+
+    const k = room();
+    const a2 = engage(k, 'pale_choir_acolyte', 6, 0);
+    const g2 = engage(k, 'drowned_templeguard', 6, 3);
+    g2.hp = Math.floor(g2.maxHp * 0.4);
+    run(k, def.first + 0.05, [a2, g2]);
+    expect(a2.castingAbility).toBe(TEMPLE_PALE_MENDING);
+    k.sim.ctx.cancelCast(a2);
+    run(k, def.castTime + 0.1, [a2, g2]);
+    expect(g2.hp).toBe(Math.floor(g2.maxHp * 0.4));
+  });
+
+  it('the Pearlguard’s Pearl Slam hits and throws back everyone near it', () => {
+    const r = room();
+    const sentinel = engage(r, 'pearlguard_sentinel', 3, 0);
+    const def = MOBS.pearlguard_sentinel.trashKit?.wingGust;
+    if (!def) throw new Error('slam');
+    const x0 = r.me.pos.x;
+    run(r, def.first + def.castTime + 0.1, [sentinel]);
+    expect(r.me.hp).toBeLessThanOrEqual(1e6 - def.min);
+    expect(Math.abs(r.me.pos.x - x0)).toBeGreaterThan(def.knockback * 0.5);
+  });
+
+  it('the Snapper shells up once, under 35 percent', () => {
+    const r = room();
+    const snapper = engage(r, 'lagoon_snapper', 4, 0);
+    run(r, 0.2, [snapper]);
+    expect(snapper.auras.some((a) => a.id === TRASH_WITHDRAW_AURA)).toBe(false);
+    snapper.hp = Math.floor(snapper.maxHp * 0.34);
+    run(r, 0.1, [snapper]);
+    expect(snapper.auras.some((a) => a.id === TRASH_WITHDRAW_AURA)).toBe(true);
+  });
+
+  it('the Lurker’s Glimmer Venom lands on someone in reach unless kicked', () => {
+    const r = room();
+    const lurker = engage(r, 'glimmerscale_lurker', 14, 0);
+    const def = MOBS.glimmerscale_lurker.trashKit?.bolt;
+    if (!def) throw new Error('venom');
+    let t = 0;
+    while (lurker.castingAbility !== TEMPLE_GLIMMER_VENOM && t < def.first + def.every) {
+      run(r, DT, [lurker]);
+      t += DT;
+    }
+    expect(lurker.castingAbility).toBe(TEMPLE_GLIMMER_VENOM);
+    const before = r.me.hp;
+    run(r, def.castTime + 0.1, [lurker]);
+    expect(r.me.hp).toBeLessThanOrEqual(before - def.min);
   });
 });
 

@@ -1,44 +1,51 @@
 // The Mere Hydra in the Hydra Pool (docs/design/dungeon-rework/drowned_temple.md
-// 4.3): three stationary heads rising from one moon pool, one pull (G17 linked
-// parts: the heads share one fight state, referenced from each head).
+// 4.3, reworked in the sixth pass): three stationary heads rising from one moon
+// pool, one pull (G17 linked parts: the heads share one fight state, referenced
+// from each head).
 //
 //   Snap           each head bites whoever stands in its long reach (its own
 //                  swing: the tank).
-//   Tide Breath    the left and right heads take turns every 10 s: a 2 s bar,
-//                  then a 60 degree cone of frost 18 yd long (110 to 130). The
-//                  cone locks on its victim's spot when the bar starts.
-//   Brine Spit     the centre head, every 8 s: three 4 yd pools under three
-//                  players, bursting 1.5 s later (70 to 90).
-//   Enraged Hydra  each fallen head drives the others 15 percent harder, so the
-//                  group picks the order.
+//   Three elements the left head is ICE (Freezing Breath), the centre VENOM (Venom
+//                  Spit), the right WATER (Crushing Torrent): hydra_elements.ts.
+//                  When a head falls the survivors INHERIT its attack, so
+//                  killing one never makes the fight quieter.
+//   Tsunami        the Hydra sinks and a wave rolls over one half of the pool;
+//                  run to the other half or into a column's lee
+//                  (hydra_tsunami.ts).
+//   Regrowth       a fallen head grows back 20 s later while another lives
+//                  (hydra_regrowth.ts): bring the three down close together.
+//   Enraged Hydra  each fallen head drives the others 15 percent harder.
 //
-// Zero rng in every pick (the breath's and the spit's victims are hashed); the
-// only draws are the damage rolls.
+// Zero rng in every pick (the victims are hashed, the Tsunami's side
+// alternates); the only draws are the damage rolls.
 
-import { inCone, kitHash } from '../../mob/trash_kit/targets';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import { angleTo, DT, dist2d, type Entity, type HydraFightState } from '../../types';
+import { DT, type Entity, type HydraFightState } from '../../types';
+import { bossEngaged, claimBoss, clearCastOf, dropEncounterObject, grantClaimDeed } from './claim';
 import {
-  bossEngaged,
-  claimBoss,
-  claimPlayers,
-  clearCastOf,
-  dropEncounterObject,
-  grantClaimDeed,
-  mechanicDamage,
-  spawnTempleObject,
-  startCast,
-} from './claim';
+  startBrineSpit,
+  startTideBreath,
+  startTorrent,
+  stepBreath,
+  stepTorrent,
+  stepVenom,
+} from './hydra_elements';
+import { regrowHead, stepRegrowth } from './hydra_regrowth';
+import { clearTsunami, startTsunami, stepTsunami } from './hydra_tsunami';
 import {
-  BRINE_SPIT_TEMPLATE,
-  HYDRA_BRINE_SPIT,
+  HYDRA_CRUSHING_TORRENT,
   HYDRA_ENRAGED,
   HYDRA_HEAD_TEMPLATES,
+  HYDRA_SUBMERGED,
   HYDRA_TIDE_BREATH,
+  HYDRA_TSUNAMI,
   HYDRA_TUNING,
-  POOL,
+  hydraElementOwners,
 } from './ids';
+
+export { startBrineSpit, startTideBreath, startTorrent } from './hydra_elements';
+export { startTsunami } from './hydra_tsunami';
 
 const T = HYDRA_TUNING;
 export const HYDRA_DEED = 'dgn_mere_hydra';
@@ -47,11 +54,16 @@ function freshState(): HydraFightState {
   return {
     kind: 'hydra',
     breathTimer: T.breathFirst,
-    breathSide: 0,
     spitTimer: T.spitFirst,
+    torrentTimer: T.torrentFirst,
     spits: [],
+    venom: [],
+    torrent: null,
+    tsunamiTimer: T.tsunamiFirst,
+    tsunamis: 0,
+    tsunami: null,
     casts: 0,
-    deaths: [],
+    diedAt: [null, null, null],
   };
 }
 
@@ -62,142 +74,10 @@ export function hydraHeads(ctx: SimContext, inst: InstanceSlot): (Entity | null)
   return heads.some((h) => h !== null) ? heads : null;
 }
 
-/** Players round the pool (its rim and a margin). */
-function poolPlayers(ctx: SimContext, inst: InstanceSlot): Entity[] {
-  const o = ctx.instanceOriginOf(inst);
-  return claimPlayers(ctx, inst).filter(
-    (p) => !p.dead && Math.hypot(p.pos.x - o.x - POOL.x, p.pos.z - o.z - POOL.z) <= POOL.r + 14,
-  );
-}
-
-function hashedPick(players: readonly Entity[], seed: number, salt: number): Entity | null {
-  if (players.length === 0) return null;
-  return players[kitHash(seed, salt) % players.length];
-}
-
-/** Start a Tide Breath on one side head, aimed at a hashed victim. */
-export function startTideBreath(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  head: Entity,
-  st: HydraFightState,
-): boolean {
-  const players = poolPlayers(ctx, inst).filter(
-    (p) => dist2d(p.pos, head.pos) <= T.breathRange + 4,
-  );
-  st.casts++;
-  // Breathe on someone who is not the tank when anyone else is in reach.
-  const others = players.filter((p) => p.id !== head.aggroTargetId);
-  const victim = hashedPick(others.length > 0 ? others : players, head.id, st.casts);
-  if (!victim) return false;
-  head.facing = angleTo(head.pos, victim.pos);
-  head.prevFacing = head.facing;
-  startCast(head, HYDRA_TIDE_BREATH, T.breathCast, victim.id);
-  return true;
-}
-
-/** Spit three brine pools under three players (fewer when fewer stand there). */
-export function startBrineSpit(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  head: Entity,
-  st: HydraFightState,
-): number {
-  const players = poolPlayers(ctx, inst);
-  const o = ctx.instanceOriginOf(inst);
-  const picked: Entity[] = [];
-  for (let k = 0; k < T.spitCount && picked.length < players.length; k++) {
-    st.casts++;
-    const pool = players.filter((p) => !picked.includes(p));
-    const p = hashedPick(pool, head.id, st.casts * 5 + k);
-    if (p) picked.push(p);
-  }
-  for (const p of picked) {
-    const x = p.pos.x - o.x;
-    const z = p.pos.z - o.z;
-    const obj = spawnTempleObject(ctx, inst, BRINE_SPIT_TEMPLATE, 'Brine Spit', x, z, T.spitRadius);
-    st.spits.push({ x, z, remaining: T.spitWarn, objectId: obj.id });
-  }
-  if (picked.length > 0) {
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: head.id,
-      targetId: picked[0].id,
-      school: 'frost',
-      fx: 'windup',
-      ability: HYDRA_BRINE_SPIT,
-    });
-  }
-  return picked.length;
-}
-
-function landBreath(ctx: SimContext, inst: InstanceSlot, head: Entity): void {
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: head.id,
-    targetId: head.id,
-    school: 'frost',
-    fx: 'frostCone',
-    ability: HYDRA_TIDE_BREATH,
-    range: T.breathRange,
-    angle: T.breathArcDeg,
-  });
-  for (const p of claimPlayers(ctx, inst)) {
-    if (p.dead || !inCone(head.pos, head.facing, p.pos, T.breathRange, T.breathArcDeg)) continue;
-    ctx.dealDamage(
-      head,
-      p,
-      mechanicDamage(ctx, head, T.breathMin, T.breathMax),
-      false,
-      'frost',
-      'Tide Breath',
-      'hit',
-      true,
-    );
-  }
-}
-
-function stepBreath(ctx: SimContext, inst: InstanceSlot, head: Entity): void {
-  if (head.castingAbility !== HYDRA_TIDE_BREATH) return;
-  head.swingTimer = Math.max(head.swingTimer, 0.6);
-  // The cone holds the aim it took when the bar started.
-  head.facing = head.prevFacing;
-  head.castRemaining = Math.max(0, head.castRemaining - DT);
-  if (head.castRemaining > 0) return;
-  clearCastOf(head, HYDRA_TIDE_BREATH);
-  landBreath(ctx, inst, head);
-}
-
-function stepSpits(ctx: SimContext, inst: InstanceSlot, st: HydraFightState, source: Entity): void {
-  const o = ctx.instanceOriginOf(inst);
-  for (let i = st.spits.length - 1; i >= 0; i--) {
-    const s = st.spits[i];
-    s.remaining -= DT;
-    if (s.remaining > 0) continue;
-    st.spits.splice(i, 1);
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: source.id,
-      targetId: s.objectId,
-      school: 'frost',
-      fx: 'nova',
-      ability: HYDRA_BRINE_SPIT,
-    });
-    for (const p of claimPlayers(ctx, inst)) {
-      if (p.dead || Math.hypot(p.pos.x - o.x - s.x, p.pos.z - o.z - s.z) > T.spitRadius) continue;
-      ctx.dealDamage(
-        source,
-        p,
-        mechanicDamage(ctx, source, T.spitMin, T.spitMax),
-        false,
-        'frost',
-        'Brine Spit',
-        'hit',
-        true,
-      );
-    }
-    dropEncounterObject(ctx, inst, s.objectId);
-  }
+/** The head wielding each element now (ice, venom, water), or null. */
+export function elementWielders(heads: readonly (Entity | null)[]): (Entity | null)[] {
+  const owners = hydraElementOwners(heads.map((h) => !h || h.dead));
+  return owners.map((i) => (i === null ? null : heads[i]));
 }
 
 /** Enraged Hydra: every living head wears one stack per fallen head. */
@@ -225,16 +105,52 @@ function applyEnrage(ctx: SimContext, heads: readonly (Entity | null)[], fallen:
   }
 }
 
-/** The fight ended without a kill: the pools drain and the heads settle. */
+/** The fight ended without a kill: the pools drain, the wave falls back and
+ *  every fallen head grows back whole for the next attempt. */
 function resetHydra(ctx: SimContext, inst: InstanceSlot, heads: readonly (Entity | null)[]): void {
+  const anyAlive = heads.some((h) => h !== null && !h.dead);
   for (const h of heads) {
     if (!h) continue;
     const st = h.templeFight?.kind === 'hydra' ? h.templeFight : null;
-    if (st) for (const s of st.spits) dropEncounterObject(ctx, inst, s.objectId);
-    if (st) st.spits = [];
-    clearCastOf(h, HYDRA_TIDE_BREATH);
-    h.auras = h.auras.filter((a) => a.id !== HYDRA_ENRAGED);
+    if (st) {
+      for (const s of st.spits) dropEncounterObject(ctx, inst, s.objectId);
+      for (const v of st.venom) dropEncounterObject(ctx, inst, v.objectId);
+      st.spits = [];
+      st.venom = [];
+      clearTsunami(ctx, inst, st);
+    }
+    for (const id of [HYDRA_TIDE_BREATH, HYDRA_CRUSHING_TORRENT, HYDRA_TSUNAMI]) clearCastOf(h, id);
+    h.auras = h.auras.filter((a) => a.id !== HYDRA_ENRAGED && a.id !== HYDRA_SUBMERGED);
     h.templeFight = undefined;
+    if (h.dead && anyAlive) regrowHead(ctx, h, 1);
+  }
+}
+
+/** The element clocks: each fires from whoever wields it, when that head is free. */
+function stepElements(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  heads: readonly (Entity | null)[],
+  st: HydraFightState,
+): void {
+  const [ice, venom, water] = elementWielders(heads);
+  const free = (h: Entity | null): h is Entity =>
+    h !== null && !h.dead && h.castingAbility === null && !ctx.isStunned(h);
+  st.breathTimer -= DT;
+  if (st.breathTimer <= 0) {
+    st.breathTimer = free(ice) && startTideBreath(ctx, inst, ice, st) ? T.breathEvery : 1;
+  }
+  st.torrentTimer -= DT;
+  if (st.torrentTimer <= 0) {
+    st.torrentTimer = free(water) && startTorrent(ctx, inst, water, st) ? T.torrentEvery : 1;
+  }
+  st.spitTimer -= DT;
+  if (st.spitTimer <= 0) {
+    // The spit is instant (no bar): only a stun or death stops it.
+    st.spitTimer =
+      venom && !venom.dead && !ctx.isStunned(venom) && startBrineSpit(ctx, inst, venom, st) > 0
+        ? T.spitEvery
+        : 1;
   }
 }
 
@@ -244,53 +160,43 @@ export function tickMereHydra(ctx: SimContext, inst: InstanceSlot): void {
   if (!heads) return;
   const living = heads.filter((h): h is Entity => h !== null && !h.dead);
   const anyState = heads.find((h) => h?.templeFight?.kind === 'hydra')?.templeFight;
-  let st = anyState?.kind === 'hydra' ? anyState : null;
+  const found = anyState?.kind === 'hydra' ? anyState : null;
   if (living.length === 0) {
-    if (st) {
-      const d = st.deaths;
-      while (d.length < 3) d.push(ctx.time);
-      if (d.length === 3 && d[2] - d[0] <= T.deedWindow) grantClaimDeed(ctx, inst, HYDRA_DEED);
+    if (found) {
+      const d = found.diedAt.map((t) => t ?? ctx.time);
+      if (Math.max(...d) - Math.min(...d) <= T.deedWindow) grantClaimDeed(ctx, inst, HYDRA_DEED);
       resetHydra(ctx, inst, heads);
     }
     return;
   }
   const engaged = living.some((h) => bossEngaged(h));
   if (!engaged) {
-    if (st) resetHydra(ctx, inst, heads);
+    if (found) resetHydra(ctx, inst, heads);
     return;
   }
-  if (!st) {
-    st = freshState();
-    for (const h of heads) if (h) h.templeFight = st;
+  const st = found ?? freshState();
+  if (!found) for (const h of heads) if (h) h.templeFight = st;
+  // Each head's fall on the fight's clock (a regrown head clears its own).
+  heads.forEach((h, i) => {
+    if (h?.dead && st.diedAt[i] === null) st.diedAt[i] = ctx.time;
+  });
+  if (!st.tsunami) stepRegrowth(ctx, heads, st);
+  const standing = heads.filter((h): h is Entity => h !== null && !h.dead);
+  applyEnrage(ctx, heads, heads.filter((h) => h?.dead).length);
+  for (const h of standing) {
+    stepBreath(ctx, inst, h);
+    stepTorrent(ctx, inst, h, st);
   }
-  // Heads that fell since the last tick.
-  const fallen = heads.filter((h) => h !== null && h.dead).length;
-  while (st.deaths.length < fallen) st.deaths.push(ctx.time);
-  applyEnrage(ctx, heads, fallen);
-  for (const h of living) stepBreath(ctx, inst, h);
-  const center = heads[1];
-  stepSpits(ctx, inst, st, center && !center.dead ? center : living[0]);
-  // The side heads take turns breathing; a fallen side leaves it to the other.
-  st.breathTimer -= DT;
-  if (st.breathTimer <= 0) {
-    const first = heads[st.breathSide];
-    const second = heads[st.breathSide === 0 ? 2 : 0];
-    const breather =
-      first && !first.dead && first.castingAbility === null && !ctx.isStunned(first)
-        ? first
-        : second && !second.dead && second.castingAbility === null && !ctx.isStunned(second)
-          ? second
-          : null;
-    if (breather && startTideBreath(ctx, inst, breather, st)) {
-      st.breathTimer = T.breathEvery;
-      st.breathSide = breather === heads[0] ? 2 : 0;
-    } else {
-      st.breathTimer = 1;
+  const [, venomHead] = elementWielders(heads);
+  stepVenom(ctx, inst, st, venomHead ?? standing[0]);
+  if (stepTsunami(ctx, inst, standing, st)) return;
+  st.tsunamiTimer -= DT;
+  if (st.tsunamiTimer <= 0) {
+    if (startTsunami(ctx, inst, standing, st)) {
+      st.tsunamiTimer = T.tsunamiEvery;
+      return;
     }
+    st.tsunamiTimer = 0.5;
   }
-  st.spitTimer -= DT;
-  if (st.spitTimer <= 0) {
-    st.spitTimer = T.spitEvery;
-    if (center && !center.dead) startBrineSpit(ctx, inst, center, st);
-  }
+  stepElements(ctx, inst, heads, st);
 }

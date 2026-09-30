@@ -2,6 +2,11 @@
 // drowned_temple.md, "Boss 2"): your own reflection fights you; kill each
 // other's (G22 mirror reflections).
 //
+//   The walk         it chases its foe across the terrace like any boss (the
+//                    mob AI), plants its feet while a bar runs so the lane and
+//                    the ring land where they were drawn, and never steps off
+//                    the Prism Terrace (a tank who runs down the stair leaves
+//                    it pacing the rim).
 //   Reflections      at 75, 50 and 25 percent the prism flares (a 2 s bar) and
 //                    every player on the terrace gains a Reflection: a glass
 //                    copy of them that hunts its owner. It takes NO damage from
@@ -53,7 +58,46 @@ function freshState(): ColossusFightState {
     swapTimer: T.swapEvery,
     casts: 0,
     lingered: false,
+    plantedAt: null,
   };
+}
+
+/** The Colossus's own casts (the bars it plants its feet for). */
+const PLANTED_CASTS: ReadonlySet<string> = new Set([
+  COLOSSUS_PRISM_FLARE,
+  COLOSSUS_MOONLIGHT_LANCE,
+  COLOSSUS_RESONANT_SLAM,
+]);
+
+/** How far from the terrace's centre it may stand (its rim, less a step). */
+const TERRACE_WALK_RADIUS = TERRACE.r - 1.5;
+
+/** While a bar runs the Colossus stands where it began it (the mob AI walked
+ *  it this tick; this runs after, so the step is undone). Off its bars it
+ *  walks freely, but never past the terrace's rim. */
+function holdGround(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  st: ColossusFightState,
+): void {
+  if (boss.castingAbility !== null && PLANTED_CASTS.has(boss.castingAbility)) {
+    if (!st.plantedAt) st.plantedAt = { ...boss.pos };
+    if (boss.pos.x !== st.plantedAt.x || boss.pos.z !== st.plantedAt.z) {
+      boss.pos = { ...st.plantedAt };
+      ctx.rebucket(boss);
+    }
+    return;
+  }
+  st.plantedAt = null;
+  const o = ctx.instanceOriginOf(inst);
+  const dx = boss.pos.x - o.x - TERRACE.x;
+  const dz = boss.pos.z - o.z - TERRACE.z;
+  const d = Math.hypot(dx, dz);
+  if (d <= TERRACE_WALK_RADIUS) return;
+  const k = TERRACE_WALK_RADIUS / d;
+  boss.pos = ctx.groundPos(o.x + TERRACE.x + dx * k, o.z + TERRACE.z + dz * k);
+  ctx.rebucket(boss);
 }
 
 /** Players on the terrace (its disc and a margin). */
@@ -371,4 +415,5 @@ export function tickColossus(
   }
   stepReflections(ctx, inst, boss, st);
   stepCasts(ctx, inst, boss, st);
+  holdGround(ctx, inst, boss, st);
 }

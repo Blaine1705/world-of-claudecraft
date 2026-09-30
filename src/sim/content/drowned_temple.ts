@@ -10,12 +10,18 @@
 // Trash is simple and readable (README section 5): one job per type, never a
 // boss lesson.
 //
-//   Drowned Templeguard  Onrush and a telegraphed Trident Sweep. Step out.
-//   Pale Choir Acolyte   Lullaby: an interruptible sleep on one player. Kick it.
-//   Glimmerscale Lurker  Pounce: leaps onto the farthest caster and bleeds them.
-//   Pearlguard Sentinel  Onrush; Pearl Carapace shields it once when low. Burst it.
-//   Lagoon Snapper       Snap: a telegraphed bite across its front. Step out.
-//   Lagoon Eel           Static Coil: an interruptible shock round it. Kick it.
+//   Drowned Templeguard  Onrush, a telegraphed Trident Sweep and a Skewering Trident
+//                        down a lane. Step out.
+//   Pale Choir Acolyte   Lullaby: an interruptible sleep on one player, and Pale
+//                        Mending on a hurt packmate. Kick them.
+//   Glimmerscale Lurker  Pounce onto the farthest caster (a bleed), and an
+//                        interruptible Glimmer Venom bolt.
+//   Pearlguard Sentinel  Onrush; a Pearl Slam that throws back all near it; Pearl
+//                        Carapace shields it once when low. Burst it.
+//   Lagoon Snapper       Snap: a telegraphed bite across its front, and it shells
+//                        up once when low. Step out, then burn it.
+//   Lagoon Eel           Static Coil: an interruptible shock round it; Lightning Spit,
+//                        a lane of lightning. Kick one, dodge the other.
 //   Moonlit Siren        Call the Tide: an interruptible song of three Tidewisps.
 //   Tidewisp             Bursts when it reaches a player. Kill it on the way in.
 //   Drowned Pilgrim      fodder in fours, enrages when low.
@@ -27,6 +33,7 @@
 
 import {
   TEMPLE_CALL_THE_TIDE,
+  TEMPLE_LIGHTNING_SPIT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
 } from '../mob/trash_kit/temple_cast_ids';
@@ -116,6 +123,11 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
       max: 100,
       school: 'physical',
     },
+    // Shell Up (the sixth pass): once, under 35 percent, it pulls into its
+    // shell for 5 s, taking 60 percent less. Wait it out, then burn it.
+    trashKit: {
+      withdraw: { belowHpPct: 0.35, seconds: 5, reduction: 0.6, name: 'Shell Up' },
+    },
     loot: [
       { copper: 190, chance: 1 },
       { itemId: 'pale_pearl', chance: 0.5 },
@@ -152,6 +164,20 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
         stun: 1.5,
         min: 45,
         max: 55,
+      },
+      // Lightning Spit (the sixth pass): lightning spat down a lane at one player.
+      // Not a kick: step out sideways before the bar runs out.
+      line: {
+        castId: TEMPLE_LIGHTNING_SPIT,
+        name: 'Lightning Spit',
+        castTime: 1.8,
+        every: 11,
+        first: 8,
+        school: 'nature',
+        length: 24,
+        halfWidth: 1.6,
+        min: 60,
+        max: 70,
       },
     },
     loot: [
@@ -282,10 +308,11 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 2.8,
     attackSpeed: 2.8,
     armorPerLevel: 30,
-    // Stands on its plinth, turning to face its foe.
-    moveSpeed: 0,
+    // A lumbering giant that walks its foe down across the terrace (a step
+    // slower than a running player), plants its feet for each bar and never
+    // leaves the Prism Terrace (encounters/drowned_temple/tideglass_colossus.ts).
+    moveSpeed: 6,
     aggroRadius: 14,
-    idleStationary: true,
     // One guaranteed piece per archetype group, plus the Shiv chase row.
     // Heroic rides HEROIC_BOSS_LOOT.tideglass_colossus.
     loot: [
@@ -310,7 +337,9 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
       },
       { itemId: 'tideglass_shiv', chance: 0.1, normalOnly: true },
     ],
-    scale: 1.0,
+    // A giant's reach: the body's scale sets its melee reach (about 8.6 yd),
+    // so it swings from beyond its own bulk; the renderer's height allows for it.
+    scale: 2.2,
     color: 0xcfe6f0,
   },
   // The Colossus's Reflections: one per player, a glass copy of that player

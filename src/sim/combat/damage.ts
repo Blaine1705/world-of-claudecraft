@@ -1740,7 +1740,8 @@ export function handleDeath(
     // awarders below; the slot remains stable throughout this death path.
     const claimedInst = claimedInstanceForMob(ctx, e.id);
     let heroicRewardRecipients: PlayerMeta[] = [];
-    if (meta && creditEntity && !meta.leaving) {
+    // A regrown encounter part (the Mere Hydra's head) paid on its first death.
+    if (meta && creditEntity && !meta.leaving && !e.regrown) {
       const tmpl = MOBS[e.templateId];
       // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
       // in one hit by design, so it must not pay full kill XP.

@@ -99,6 +99,19 @@ export const HYDRA_HEADS: readonly { id: 'left' | 'center' | 'right'; x: number;
   { id: 'right', x: HYDRA_BODY.x - 5.3, z: HYDRA_BODY.z - 0.2 },
 ];
 
+/** The broken columns round the Hydra Pool's rim (degrees round the pool,
+ *  0 toward +z): the only cover from the Mere Hydra's Tsunami. */
+export const HYDRA_POOL_COLUMN_DEGS = [45, 80, 280, 315] as const;
+export const HYDRA_POOL_COLUMN_RING = 24.5;
+export const HYDRA_POOL_COLUMN_R = 1.3;
+/** Each rim column's centre (instance-local yards). */
+export const HYDRA_POOL_COLUMNS: readonly { x: number; z: number }[] = HYDRA_POOL_COLUMN_DEGS.map(
+  (deg) => ({
+    x: HYDRA_POOL.x + Math.sin((deg * Math.PI) / 180) * HYDRA_POOL_COLUMN_RING,
+    z: HYDRA_POOL.z + Math.cos((deg * Math.PI) / 180) * HYDRA_POOL_COLUMN_RING,
+  }),
+);
+
 /** The Prism Terrace, the Tideglass Colossus's round terrace. */
 export const PRISM_TERRACE = { x: 86, z: 208, r: 22, h: 20 } as const;
 /** The Colossus's plinth in the terrace's centre. */
@@ -544,11 +557,18 @@ const PROPS: FieldProp[] = [
   { kind: 'dt_coral_cluster', x: -46, z: 30, rot: 0.2, r: 1.6, h: 3 },
   // The Waterfall Walk: a rock spur between the ledge and the grotto.
   { kind: 'dt_coral_cluster', x: 88, z: 72, rot: 2.1, r: 1.6, h: 3 },
-  // The Hydra Pool: broken columns round the rim.
-  ...ring('dt_column_broken', HYDRA_POOL.x, HYDRA_POOL.z, 24.5, [45, 80, 280, 315], {
-    r: 1.3,
-    h: 6,
-  }),
+  // The Hydra Pool: broken columns round the rim (the Tsunami's only cover).
+  ...ring(
+    'dt_column_broken',
+    HYDRA_POOL.x,
+    HYDRA_POOL.z,
+    HYDRA_POOL_COLUMN_RING,
+    HYDRA_POOL_COLUMN_DEGS,
+    {
+      r: HYDRA_POOL_COLUMN_R,
+      h: 6,
+    },
+  ),
   // The Prism Terrace: the Colossus's plinth and the ring of broken columns.
   // The Colossus's low plinth (render only: it never leaves it, and the fight
   // is fought on its step).

@@ -21,11 +21,25 @@ export const TEMPLE_PEARL_CARAPACE = 'temple_pearl_carapace';
 export const TEMPLE_TIDEWISP_BURST = 'temple_tidewisp_burst';
 /** The Lullaby's sleep aura on its victim. */
 export const TEMPLE_LULLABY_SLEEP = 'temple_lullaby_sleep';
+// The sixth pass: a second readable job for each trash type.
+/** Drowned Templeguard: a trident hurled down a lane at one player (trashKit.line). */
+export const TEMPLE_SKEWERING_TRIDENT = 'temple_skewering_trident';
+/** Pale Choir Acolyte: an interruptible heal on a hurt packmate (trashKit.mend). */
+export const TEMPLE_PALE_MENDING = 'temple_pale_mending';
+/** Glimmerscale Lurker: an interruptible bolt of venom (trashKit.bolt). */
+export const TEMPLE_GLIMMER_VENOM = 'temple_glimmer_venom';
+/** Pearlguard Sentinel: its fists slammed down round it, a shove (trashKit.wingGust). */
+export const TEMPLE_PEARL_SLAM = 'temple_pearl_slam';
+/** Lagoon Eel: a lane of lightning spat at one player (trashKit.line). */
+export const TEMPLE_LIGHTNING_SPIT = 'temple_lightning_spit';
 
-/** The Temple trash casts a player interrupt can lock out, by school. The bite
- *  and the sweep are absent on purpose: step out of those. */
+/** The Temple trash casts a player interrupt can lock out, by school. The bite,
+ *  the sweep, the hurl, the slam and the surge are absent on purpose: step out
+ *  of those. */
 export const TEMPLE_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> = {
   [TEMPLE_LULLABY]: { school: 'arcane' },
   [TEMPLE_CALL_THE_TIDE]: { school: 'frost' },
   [TEMPLE_STATIC_COIL]: { school: 'nature' },
+  [TEMPLE_PALE_MENDING]: { school: 'frost' },
+  [TEMPLE_GLIMMER_VENOM]: { school: 'nature' },
 };

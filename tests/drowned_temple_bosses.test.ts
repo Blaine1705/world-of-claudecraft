@@ -283,17 +283,21 @@ describe('the Mere Hydra: three heads, one moon pool', () => {
     expect(heads[1].templeFight).toBe(heads[2].templeFight);
   });
 
-  it('the side heads take turns with the Tide Breath', () => {
+  it('only the ice head (the left) breathes, on its own beat', () => {
     const { f, heads } = hydraFight();
-    const breathers: string[] = [];
-    run(f, HYDRA_TUNING.breathFirst + HYDRA_TUNING.breathEvery * 2 + 0.2, () => {
-      for (const h of heads) {
-        if (h.castingAbility === HYDRA_TIDE_BREATH && breathers.at(-1) !== h.templateId)
-          breathers.push(h.templateId);
-      }
+    const starts: number[] = [];
+    const breathers = new Set<string>();
+    let was = false;
+    run(f, HYDRA_TUNING.breathFirst + HYDRA_TUNING.breathEvery + 0.5, () => {
+      const now = heads.some((h) => h.castingAbility === HYDRA_TIDE_BREATH);
+      for (const h of heads)
+        if (h.castingAbility === HYDRA_TIDE_BREATH) breathers.add(h.templateId);
+      if (now && !was) starts.push(f.sim.ctx.time);
+      was = now;
     });
-    expect(breathers.slice(0, 3)).toEqual([HYDRA_LEFT_ID, HYDRA_RIGHT_ID, HYDRA_LEFT_ID]);
-    expect(breathers).not.toContain(HYDRA_CENTER_ID);
+    expect([...breathers]).toEqual([HYDRA_LEFT_ID]);
+    expect(starts).toHaveLength(2);
+    expect(starts[1] - starts[0]).toBeCloseTo(HYDRA_TUNING.breathEvery, 1);
   });
 
   it('the breath burns only the cone it locked on when the bar began', () => {
@@ -339,9 +343,10 @@ describe('the Mere Hydra: three heads, one moon pool', () => {
     expect(heads[1].auras.find((a) => a.id === HYDRA_ENRAGED)?.value).toBeCloseTo(0.3, 5);
   });
 
-  it('a lone right head still breathes when the left one is dead', () => {
+  it('a lone right head breathes the ice once the left and centre are dead', () => {
     const { f, heads } = hydraFight();
     f.sim.ctx.handleDeath(heads[0], f.tank);
+    f.sim.ctx.handleDeath(heads[1], f.tank);
     let breathed = false;
     run(f, HYDRA_TUNING.breathFirst + 1, () => {
       if (heads[2].castingAbility === HYDRA_TIDE_BREATH) breathed = true;

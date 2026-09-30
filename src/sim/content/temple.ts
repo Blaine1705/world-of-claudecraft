@@ -8,7 +8,14 @@
 // way the per-zone modules and content/dungeons.ts are. Levels ~15-18: a step
 // up from the Sunken Bastion (13) for players climbing toward the Sanctum (20).
 
-import { TEMPLE_LULLABY, TEMPLE_TRIDENT_SWEEP } from '../mob/trash_kit/temple_cast_ids';
+import {
+  TEMPLE_GLIMMER_VENOM,
+  TEMPLE_LULLABY,
+  TEMPLE_PALE_MENDING,
+  TEMPLE_PEARL_SLAM,
+  TEMPLE_SKEWERING_TRIDENT,
+  TEMPLE_TRIDENT_SWEEP,
+} from '../mob/trash_kit/temple_cast_ids';
 import type {
   CampDef,
   DungeonDef,
@@ -162,6 +169,22 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
       max: 85,
       school: 'physical',
     },
+    // The sixth pass: the trident hurled down a lane at someone past the tank.
+    // Physical: step out sideways, never kick it.
+    trashKit: {
+      line: {
+        castId: TEMPLE_SKEWERING_TRIDENT,
+        name: 'Skewering Trident',
+        castTime: 1.8,
+        every: 14,
+        first: 7,
+        school: 'physical',
+        length: 22,
+        halfWidth: 1.3,
+        min: 60,
+        max: 70,
+      },
+    },
     loot: [
       { copper: 200, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.6 },
@@ -207,6 +230,19 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
         range: 30,
         seconds: 4,
       },
+      // The sixth pass: a hymn that knits a hurt packmate back together. Kick
+      // it (frost: a kick on the Lullaby's arcane never locks it).
+      mend: {
+        castId: TEMPLE_PALE_MENDING,
+        name: 'Pale Mending',
+        castTime: 2.5,
+        every: 14,
+        first: 5,
+        school: 'frost',
+        range: 25,
+        healPct: 0.25,
+        below: 0.6,
+      },
     },
     loot: [
       { copper: 220, chance: 1 },
@@ -245,6 +281,18 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
         fixate: 3,
         bleed: { perTick: 12, interval: 2, duration: 8 },
       },
+      // The sixth pass: a spat bolt of glimmering venom at someone in reach. Kick it.
+      bolt: {
+        castId: TEMPLE_GLIMMER_VENOM,
+        name: 'Glimmer Venom',
+        castTime: 2,
+        every: 12,
+        first: 6,
+        school: 'nature',
+        range: 25,
+        min: 45,
+        max: 55,
+      },
     },
     loot: [
       { copper: 200, chance: 1 },
@@ -281,6 +329,20 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     // shell closes over it for 8 s (a shield of a quarter of its health).
     trashKit: {
       carapace: { belowHpPct: 0.3, shieldPct: 0.25, seconds: 8, name: 'Pearl Carapace' },
+      // The sixth pass: both fists slammed down round it, throwing everyone
+      // near it back. Physical: only the tank belongs beside it.
+      wingGust: {
+        castId: TEMPLE_PEARL_SLAM,
+        name: 'Pearl Slam',
+        castTime: 1.5,
+        every: 15,
+        first: 7,
+        school: 'physical',
+        radius: 7,
+        knockback: 6,
+        min: 50,
+        max: 60,
+      },
     },
     loot: [
       { copper: 260, chance: 1 },

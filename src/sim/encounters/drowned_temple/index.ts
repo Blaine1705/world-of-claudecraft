@@ -7,13 +7,23 @@
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { bossEngaged, claimBoss, templeClaims } from './claim';
-import { COLOSSUS_ID, SELTHE_ID, YSOLEI_ID } from './ids';
-import { hydraHeads, startBrineSpit, startTideBreath, tickMereHydra } from './mere_hydra';
+import { COLOSSUS_ID, HYDRA_TUNING, SELTHE_ID, YSOLEI_ID } from './ids';
+import {
+  elementWielders,
+  hydraHeads,
+  startBrineSpit,
+  startTideBreath,
+  startTorrent,
+  startTsunami,
+  tickMereHydra,
+} from './mere_hydra';
 import { startChorus, startSolo, tickSelthe } from './selthe';
 import { raiseReflections, startLance, tickColossus } from './tideglass_colossus';
 import { startRisingTide, startUndertow, tickYsolei } from './ysolei';
 
+export { HYDRA_REGROWTH_LOG } from './hydra_regrowth';
 export * from './ids';
+export { elementWielders } from './mere_hydra';
 export { floodedHalf } from './ysolei';
 
 /** One tick of every Drowned Temple boss fight. */
@@ -30,7 +40,9 @@ export function tickTempleEncounters(ctx: SimContext): void {
 }
 
 const HELP =
-  'Mechanics: chorus, solo, duet (Selthe); breath, spit (the Hydra); reflections, lance (the Colossus); undertow, flood (Ysolei).';
+  'Mechanics: chorus, solo, duet (Selthe); breath, spit, torrent, tsunami, regrow (the Hydra); reflections, lance (the Colossus); undertow, flood (Ysolei).';
+
+const HYDRA_TRIGGERS = new Set(['breath', 'spit', 'torrent', 'tsunami', 'regrow']);
 
 /** `/dev temple trigger <mechanic>`: fire an engaged boss's mechanic now.
  *  Returns the log line. */
@@ -43,20 +55,44 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     if (what !== 'chorus') startSolo(ctx, inst, boss, st);
     return 'Selthe marks her singers.';
   }
-  if (what === 'breath' || what === 'spit') {
+  if (HYDRA_TRIGGERS.has(what)) {
     const heads = hydraHeads(ctx, inst);
     const st = heads?.find((h) => h?.templeFight?.kind === 'hydra')?.templeFight;
     if (!heads || st?.kind !== 'hydra') return 'Pull the Mere Hydra first.';
-    if (what === 'spit') {
-      const center = heads[1];
-      if (!center || center.dead) return 'The centre head is dead.';
-      return startBrineSpit(ctx, inst, center, st) > 0 ? 'The Hydra spits brine.' : 'No target.';
+    if (what === 'regrow') {
+      // Every fallen head grows back on the next tick (another must live).
+      let n = 0;
+      st.diedAt.forEach((t, i) => {
+        if (t === null) return;
+        st.diedAt[i] = ctx.time - HYDRA_TUNING.regrowAfter;
+        n++;
+      });
+      return n > 0 ? 'The fallen heads are growing back.' : 'No head has fallen.';
     }
-    const side = heads.find(
-      (h, i) => i !== 1 && h !== null && !h.dead && h.castingAbility === null,
-    );
-    if (!side) return 'No side head is free.';
-    return startTideBreath(ctx, inst, side, st) ? 'A head draws a Tide Breath.' : 'No target.';
+    const standing = heads.filter((h): h is NonNullable<typeof h> => h !== null && !h.dead);
+    // A dev trigger cuts whatever bar is running so the mechanic always shows.
+    for (const h of standing) {
+      if (h.castingAbility === null || st.tsunami) continue;
+      h.castingAbility = null;
+      h.castRemaining = 0;
+    }
+    if (what === 'tsunami') {
+      if (st.tsunami) return 'A Tsunami is already rolling.';
+      return startTsunami(ctx, inst, standing, st)
+        ? 'The Hydra sinks: a Tsunami rises.'
+        : 'No head.';
+    }
+    const [ice, venom, water] = elementWielders(heads);
+    if (what === 'spit') {
+      if (!venom) return 'No head wields the venom.';
+      return startBrineSpit(ctx, inst, venom, st) > 0 ? 'The Hydra spits venom.' : 'No target.';
+    }
+    if (what === 'torrent') {
+      if (!water) return 'No head wields the water.';
+      return startTorrent(ctx, inst, water, st) ? 'A head draws a Crushing Torrent.' : 'No target.';
+    }
+    if (!ice) return 'No head wields the ice.';
+    return startTideBreath(ctx, inst, ice, st) ? 'A head draws a Freezing Breath.' : 'No target.';
   }
   if (what === 'reflections' || what === 'lance') {
     const boss = claimBoss(ctx, inst, COLOSSUS_ID);
