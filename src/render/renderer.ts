@@ -240,8 +240,6 @@ import {
   CHARACTER_LOD_RANGE_SQ,
   type CharacterLodBands,
   characterLodBandsInto,
-  movingHoldoutActive,
-  showsStaticFarMesh,
 } from './crowd_lod';
 import { groundCueY } from './dais_lift';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
@@ -319,6 +317,7 @@ import {
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
+import { latchFarLod } from './far_lod_latch';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -503,7 +502,7 @@ import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
-import { POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
+import { remoteEntityAlpha } from './net_interp_core';
 import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
@@ -9959,15 +9958,6 @@ export class Renderer {
       const ea = isSelf
         ? Math.min(1, alpha)
         : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
-      const movingFarHoldout = movingHoldoutActive(
-        e.pos,
-        e.prevPos,
-        ea,
-        !isSelf && e.netUpdatedAt !== undefined && e.netInterval !== undefined
-          ? POS_EXTRAPOLATION_CAP
-          : 1,
-        e.vx !== 0 || e.vz !== 0,
-      );
       let wantShadow = true;
       let inProxyBand = false;
       if (isSelf) {
@@ -10028,7 +10018,8 @@ export class Renderer {
             for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
           }
         }
-        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose, movingFarHoldout);
+        if (v.visual)
+          v.isFar = latchFarLod(v, e, ea, isSelf, d2, lodBands, actionablePose, this.time);
       }
       // online, entities beyond nameplate range stream below snapshot rate;
       // each interpolates on its own clock so they move smoothly instead of

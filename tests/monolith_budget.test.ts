@@ -1000,7 +1000,9 @@ const MONOLITHS: MonolithRow[] = [
     // plan and builder in src/render/gate_objects.ts. wc -l. Exact count.
     // Lowered to 12673 when the frost- and fire-cone spellfx branches were
     // folded into one (the Hollow Crypt drake paints its own breath).
-    ceiling: 12673,
+    // Lowered after extracting the per-view far-mesh decision (the moving
+    // holdout and the hysteresis latch) into src/render/far_lod_latch.ts.
+    ceiling: 12664,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
