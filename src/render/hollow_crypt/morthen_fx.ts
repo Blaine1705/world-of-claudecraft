@@ -53,7 +53,7 @@ import {
   morthenStanceGesture,
   STAFF_STRIKE_SEC,
   scytheTrail,
-  soulOrbit,
+  soulOrbitInto,
   TRANSFORM_SLAM_SEC,
   TRANSFORM_UNFOLD_SEC,
 } from './morthen_fx_core';
@@ -189,6 +189,8 @@ export class MorthenFx {
   private scan = 0;
   private seed = 0x6d0e;
   private disposed = false;
+  private readonly soulOff = { x: 0, y: 0, z: 0 };
+  private readonly soulAt = { x: 0, y: 0, z: 0 };
   /** One reused particle spec for the soul flames (no per-frame allocation). */
   private readonly spec: ParticleSpec = {
     x: 0,
@@ -577,13 +579,21 @@ export class MorthenFx {
     const rites = this.stance === 'scythe';
     const d = this.density;
     const sp = this.spec;
+    // a hitch never dumps a burst of souls that evicts the pools' live particles
+    const step = Math.min(dt, 0.1);
+    const sin = Math.sin(m.facing);
+    const cos = Math.cos(m.facing);
+    const at = this.soulAt;
     for (let k = 0; k < MORTHEN_SOUL_COUNT; k++) {
-      const o = soulOrbit(k, this.clock, casting, rites);
-      const at = morthenAnchor(m.pos, m.facing, s, o);
+      const o = soulOrbitInto(this.soulOff, k, this.clock, casting, rites);
+      // morthenAnchor, into a scratch point
+      at.x = m.pos.x + (o.x * cos + o.z * sin) * s;
+      at.y = m.pos.y + o.y * s;
+      at.z = m.pos.z + (-o.x * sin + o.z * cos) * s;
       const flick = 0.85 + 0.3 * this.rand();
       // the core: a soft, bright soul light, laid down at a steady rate as it flies
       // (never shed by tier: the souls stay whole on every preset)
-      const cores = Math.floor(28 * dt + this.rand());
+      const cores = Math.floor(28 * step + this.rand());
       if (cores > 0) {
         sp.x = at.x;
         sp.y = at.y;
@@ -603,18 +613,18 @@ export class MorthenFx {
         sp.r = 0.72;
         sp.g = 1;
         sp.b = 0.62;
-        sp.a = 0.55;
+        sp.a = 0.34;
         this.glow.emit(this.clock, sp);
         sp.size0 = 0.22 * s * flick;
         sp.size1 = 0.14 * s;
-        sp.r = 1;
+        sp.r = 0.9;
         sp.g = 1;
-        sp.b = 0.9;
-        sp.a = 0.9;
+        sp.b = 0.82;
+        sp.a = 0.5;
         this.glow.emit(this.clock, sp);
       }
       // the flame trail: tongues left behind as it flies, rising and thinning
-      for (let n = 0; n < Math.floor(34 * d * dt + this.rand()); n++) {
+      for (let n = 0; n < Math.floor(34 * d * step + this.rand()); n++) {
         sp.x = at.x + (this.rand() - 0.5) * 0.12 * s;
         sp.y = at.y + (this.rand() - 0.5) * 0.12 * s;
         sp.z = at.z + (this.rand() - 0.5) * 0.12 * s;
@@ -634,7 +644,7 @@ export class MorthenFx {
         this.fire.emit(this.clock, sp);
       }
       // a spark now and then, drifting off
-      if (this.rand() < 5 * d * dt) {
+      if (this.rand() < 5 * d * step) {
         sp.vx = (this.rand() - 0.5) * 0.8;
         sp.vy = 0.6 + this.rand() * 0.8;
         sp.vz = (this.rand() - 0.5) * 0.8;

@@ -908,7 +908,8 @@ def build_parts():
     for k in range(8):
         wisp(si, k, 8, top=1.85, bottom=0.12, r_out=0.6, turns=-2.8, width=0.4, col_top=lerp(plum, SOUL_DEEP, 0.35),
              col_low=lerp(ink, SOUL_DEEP, 0.2), alpha=0.5, phase=0.2)
-    # threads of soul light turning inside the smoke
+    # threads of soul light turning inside the smoke (on the body mesh, not the smoke's)
+    si = part('SoulThreads', 'SmokeIn', smooth=True)
     for k in range(4):
         a0 = math.tau * k / 4 + 0.4
         pts = []
@@ -1641,9 +1642,16 @@ if __name__ == '__main__':
         keep = argv[argv.index('--solo') + 1].split(',')
         parts = [pt for pt in parts if pt.name in keep]
         mems = []
-    objects = [pt.to_object(mats) for pt in parts] + [m.to_object(mats) for m in mems]
+    # The translucent smoke is its own mesh: unbaked, it casts no shadow and has no
+    # frozen far-LOD form (glTF node extras the character pipeline reads).
+    smoke_parts = [pt for pt in parts if pt.name in ('Smoke', 'SmokeIn')]
+    objects = [pt.to_object(mats) for pt in parts if pt not in smoke_parts] + [m.to_object(mats) for m in mems]
     body = join(objects, 'MorthenLich')
-    print('TRIANGLES', triangles(body))
+    smoke = join([pt.to_object(mats) for pt in smoke_parts], 'MorthenSmoke') if smoke_parts else None
+    if smoke is not None:
+        smoke['shadowCaster'] = False
+        smoke['farBake'] = False
+    print('TRIANGLES', triangles(body) + (triangles(smoke) if smoke is not None else 0))
     if '--nobake' not in argv:
         bake_surface(body, size=512 if fast else 2048, samples=16 if fast else 40)
     # The metal keeps its shine: gold, iron and bronze read as metal, not cloth.
@@ -1653,6 +1661,8 @@ if __name__ == '__main__':
     bsdf.inputs['Roughness'].default_value = 0.45
     arm = build_armature('MorthenLich', BONES)
     bind(body, arm)
+    if smoke is not None:
+        bind(smoke, arm)
     clips = make_clips(arm)
     # The staff is locked in the fist: report the wrists, the grips and the staff turn.
     worst = {}
@@ -1668,13 +1678,17 @@ if __name__ == '__main__':
     arm.animation_data.action = bpy.data.actions['Idle']
     bpy.context.scene.frame_set(13)
     dg = bpy.context.evaluated_depsgraph_get()
-    ev = body.evaluated_get(dg)
-    zs = [(ev.matrix_world @ v.co).z for v in ev.data.vertices]
+    zs = []
+    for ob in (body, smoke):
+        if ob is None:
+            continue
+        ev = ob.evaluated_get(dg)
+        zs += [(ev.matrix_world @ v.co).z for v in ev.data.vertices]
     print('IDLE_HEIGHT', round(max(zs) - min(zs), 3), 'MINZ', round(min(zs), 3), 'MAXZ', round(max(zs), 3))
     for pb in arm.pose.bones:
         pb.scale = (1, 1, 1)
     if out != '-':
-        export(out, arm)
+        export(out, arm, extras=True)
     if '--sheet' in argv:
         setup_preview((0, -0.4, 3.1), 11, ref_x=3.4)
         only = argv[argv.index('--clips') + 1].split(',') if '--clips' in argv else clips

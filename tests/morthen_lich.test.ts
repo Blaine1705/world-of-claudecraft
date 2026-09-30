@@ -8,8 +8,11 @@ import { readFileSync } from 'node:fs';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { composedFarMeshes } from '../src/render/characters/assets';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { characterMeshCastsShadow } from '../src/render/characters/shadow_policy';
 import {
   DISSOLVE_SEC,
   dissolveLevels,
@@ -162,6 +165,43 @@ describe('Morthen, the Lich Bishop: the staff stays in his fist', () => {
       .listMaterials()
       .find((m) => m.getName() === 'CreatureSmoke');
     expect(smoke?.getAlphaMode()).toBe('BLEND');
+  });
+
+  // The smoke is vertex-alpha translucency: a depth shadow or the frozen far-LOD
+  // bake (which keeps no vertex colour) would draw it as a solid dark shell, so it
+  // ships as its own mesh that opts out of both through its node extras.
+  it('ships the smoke as its own mesh that casts no shadow and skips the far bake', async () => {
+    const doc = await readGlb();
+    const node = doc
+      .getRoot()
+      .listNodes()
+      .find((n) => n.getName() === 'MorthenSmoke');
+    expect(node?.getExtras()).toMatchObject({ shadowCaster: false, farBake: false });
+    const prims = node?.getMesh()?.listPrimitives() ?? [];
+    expect(prims.map((p) => p.getMaterial()?.getName())).toEqual(['CreatureSmoke']);
+    const body = doc
+      .getRoot()
+      .listNodes()
+      .find((n) => n.getName() === 'MorthenLich');
+    const bodyMats = (body?.getMesh()?.listPrimitives() ?? []).map((p) =>
+      p.getMaterial()?.getName(),
+    );
+    expect(bodyMats).not.toContain('CreatureSmoke');
+  });
+
+  it('honours those extras in the character pipeline', () => {
+    const root = new THREE.Group();
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3));
+    const body = new THREE.Mesh(geo, new THREE.MeshStandardMaterial());
+    body.name = 'MorthenLich';
+    const smoke = new THREE.Mesh(geo, new THREE.MeshStandardMaterial());
+    smoke.name = 'MorthenSmoke';
+    smoke.userData = { shadowCaster: false, farBake: false };
+    root.add(body, smoke);
+    expect(composedFarMeshes(root).map((m) => m.name)).toEqual(['MorthenLich']);
+    expect(characterMeshCastsShadow(body)).toBe(true);
+    expect(characterMeshCastsShadow(smoke)).toBe(false);
   });
 });
 

@@ -121,11 +121,24 @@ export function soulOrbit(
   casting: boolean,
   rites: boolean,
 ): { x: number; y: number; z: number } {
+  return soulOrbitInto({ x: 0, y: 0, z: 0 }, k, t, casting, rites);
+}
+
+/** soulOrbit into a caller-owned point (the per-frame path allocates nothing). */
+export function soulOrbitInto<T extends { x: number; y: number; z: number }>(
+  out: T,
+  k: number,
+  t: number,
+  casting: boolean,
+  rites: boolean,
+): T {
   const speed = (rites ? 1.25 : 0.85) * (casting ? 1.6 : 1);
   const a = t * speed + (k * Math.PI * 2) / MORTHEN_SOUL_COUNT;
   const r = MORTHEN_SOUL_RADIUS * (casting ? 1.3 : 1) * (1 + 0.1 * Math.sin(t * 0.7 + k * 2.1));
-  const y = MORTHEN_SOUL_HEIGHT + (casting ? 0.5 : 0) + 0.55 * Math.sin(t * 0.8 + k * 1.7);
-  return { x: Math.cos(a) * r, y, z: Math.sin(a) * r };
+  out.x = Math.cos(a) * r;
+  out.y = MORTHEN_SOUL_HEIGHT + (casting ? 0.5 : 0) + 0.55 * Math.sin(t * 0.8 + k * 1.7);
+  out.z = Math.sin(a) * r;
+  return out;
 }
 
 /** The dissolve's smoke rate and soul release (0..1) `t` seconds after death. */

@@ -2738,6 +2738,10 @@ function farBakeMeshes(root: THREE.Object3D): THREE.Mesh[] {
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh || mesh.userData.faceDecal) return;
+    // An authored opt-out (glTF node extras `farBake: false`): a translucent,
+    // vertex-alpha part (Morthen's soul smoke) has no faithful frozen form, since the
+    // bake keeps no vertex colour; far away it is dropped, not drawn as a dark shell.
+    if (mesh.userData.farBake === false) return;
     if (!meshChainVisible(mesh, root)) return;
     if (!mesh.geometry?.getAttribute('position')) return;
     out.push(mesh);

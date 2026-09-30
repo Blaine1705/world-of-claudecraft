@@ -812,7 +812,8 @@ def bake_surface(obj, size=2048, samples=48, ao_strength=0.85, normal=True):
 
 
 # ------------------------------------------------------------------ export
-def export(path, arm, image_format='JPEG', quality=86):
+def export(path, arm, image_format='JPEG', quality=86, extras=False):
+    """`extras` writes object custom properties as glTF node extras (userData)."""
     arm.animation_data.action = None
     for pb in arm.pose.bones:
         pb.rotation_quaternion = (1, 0, 0, 0)
@@ -827,7 +828,7 @@ def export(path, arm, image_format='JPEG', quality=86):
         export_animations=True, export_animation_mode='ACTIONS', export_force_sampling=True,
         export_skins=True, export_def_bones=False, export_cameras=False, export_lights=False,
         export_vertex_color='ACTIVE', export_all_vertex_colors=False,
-        export_image_format=image_format, export_jpeg_quality=quality,
+        export_image_format=image_format, export_jpeg_quality=quality, export_extras=extras,
     )
     print('WROTE', path)
 

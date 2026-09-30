@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c3ced95eb0e67530761f46c34e240ad087fb976e9f102866a8527957bfa4a37a",
+  "rendererFingerprint": "a32ba917aa719117ce1ac5c139e87d711fbab0654e5494b93085b9131799c20a",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5375492,
-      "sha256": "eaaa66c7195eba54f5064b8da309df80cce27d8d42db893c25fa2980b6c79eb5",
+      "sha256": "09fc340b3d35befd8796c4e191ddc85bdb6407127c24c6dc3c8258c08ea8861c",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6130,8 +6130,8 @@
         "model": {
           "url": "models/creatures/crypt_morthen_lich.glb",
           "path": "public/models/creatures/crypt_morthen_lich.glb",
-          "bytes": 2942144,
-          "sha256": "616c38ddc7021b71958f7503cb1da6bc01ef7947ed8bb16e3053c73b01727e68"
+          "bytes": 2994220,
+          "sha256": "d17cd53f06b7895226f9112f70cd03f99888c42469a7c676e5c999c2cda077bb"
         },
         "idle": "Idle",
         "height": 6.994,
@@ -6148,11 +6148,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1c46b421c9ab1c2b5593cbfd432ec81895ac936dc2ef278d3cbc4a94c6d5b934",
+      "sourceFingerprint": "fbbf18acc5b100632faa23afeff7023374677c29100f0d71cbeaec69454a3ab8",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 2946,
-        "sha256": "46cfd3cc5b8b7dcdd3504d7a4b07b4bb926634f14c323f2b2db4447c67f6c276"
+        "bytes": 2938,
+        "sha256": "9bb01c1474159e07ed72a526a231dfcd97c7e853d0f2465a341f95e3caba987b"
       }
     },
     {
