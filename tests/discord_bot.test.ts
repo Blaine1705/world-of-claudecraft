@@ -4,6 +4,7 @@ import {
   allTierRoleNames,
   buildActivityMessage,
   buildDailyRewardWinnersMessage,
+  buildHillAnnouncementMessage,
   buildLevelNick,
   buildLinkContent,
   buildPvpKillFeedMessage,
@@ -19,7 +20,9 @@ import {
   GATEWAY_INTENTS,
   GATEWAY_OP,
   GUILD_LARGE_THRESHOLD,
+  type HillAnnouncementItem,
   heartbeatIntervalMs,
+  hillAnnouncementIsStale,
   identifyPayload,
   indexSpecialRoleIds,
   interactionFailureFallback,
@@ -1136,5 +1139,69 @@ describe('PvP kill feed builders', () => {
     const description = (payload.embeds as { description: string }[])[0].description;
     expect(description).toBe(Array(PVP_FEED_LINES_PER_POST).fill(line).join('\n'));
     expect(description.length).toBeLessThanOrEqual(4096);
+  });
+});
+
+// ── King of the Hill spawn calls (the PvP channel) ───────────────────────────
+describe('King of the Hill announcement builder', () => {
+  const RISES = 1_790_000_000_000;
+  const FALLS = RISES + 45 * 60_000;
+  const call = (over: Partial<HillAnnouncementItem> = {}): HillAnnouncementItem => ({
+    phase: 'warning',
+    zoneName: 'Drakelands',
+    risesAtMs: RISES,
+    fallsAtMs: FALLS,
+    realm: 'Claudemoon',
+    ...over,
+  });
+
+  it('writes the warning with a live countdown to the rise and the fall time, pinging nobody', () => {
+    expect(buildHillAnnouncementMessage(call())).toEqual({
+      embeds: [
+        {
+          color: 0xf0c060,
+          author: { name: 'King of the Hill' },
+          title: 'A hill will rise in Drakelands',
+          description:
+            `It rises <t:${RISES / 1000}:R> and stands until <t:${FALLS / 1000}:t>. ` +
+            'The party with the most players standing inside takes it and earns Honor for every minute they hold it.',
+          footer: { text: 'World of ClaudeCraft (Claudemoon)' },
+        },
+      ],
+      allowed_mentions: { parse: [] },
+    });
+  });
+
+  it('writes the rise with the fall time and its countdown', () => {
+    const embed = (
+      buildHillAnnouncementMessage(call({ phase: 'risen' })).embeds as {
+        title: string;
+        description: string;
+      }[]
+    )[0];
+    expect(embed.title).toBe('A hill has risen in Drakelands');
+    expect(
+      embed.description.startsWith(
+        `It stands until <t:${FALLS / 1000}:t> (<t:${FALLS / 1000}:R>). `,
+      ),
+    ).toBe(true);
+  });
+
+  it('escapes markdown in the zone name', () => {
+    const embed = (
+      buildHillAnnouncementMessage(call({ zoneName: '*Z*' })).embeds as {
+        title: string;
+      }[]
+    )[0];
+    expect(embed.title).toBe(String.raw`A hill will rise in \*Z\*`);
+  });
+
+  it('is stale once its moment passed: a warning at the rise, a rise at the fall', () => {
+    expect(hillAnnouncementIsStale(call(), RISES - 1)).toBe(false);
+    expect(hillAnnouncementIsStale(call(), RISES)).toBe(true);
+    expect(hillAnnouncementIsStale(call({ phase: 'risen' }), RISES + 1)).toBe(false);
+    expect(hillAnnouncementIsStale(call({ phase: 'risen' }), FALLS)).toBe(true);
+    // A malformed time is never posted.
+    expect(hillAnnouncementIsStale(call({ risesAtMs: Number.NaN }), 0)).toBe(true);
   });
 });

@@ -5,6 +5,7 @@ import type {
   ActivityItem,
   DailyRewardWinnersDay,
   FlexData,
+  HillAnnouncementItem,
   PvpKillItem,
   QueuePopItem,
   RelayItem,
@@ -83,7 +84,8 @@ export type OutboxQueuePopItem = QueuePopItem;
  * `queuePops.watching` is the cadence signal: true while an opted-in, linked
  * player is waiting in a battleground or arena queue, which the poll counts as
  * work so a pop never lands in an idle-cadence gap. `pvpKills` is the World
- * PvP kill feed: names only, posted as digests to its own channel.
+ * PvP kill feed: names only, posted as digests to its own channel;
+ * `hillAnnouncements` is the King of the Hill spawn calls for that channel.
  */
 export interface OutboxEnvelope {
   relay: { items: RelayItem[] };
@@ -92,6 +94,7 @@ export interface OutboxEnvelope {
   linkChanges: { items: OutboxLinkChangeItem[] };
   queuePops: { items: OutboxQueuePopItem[]; watching: boolean };
   pvpKills: { items: PvpKillItem[] };
+  hillAnnouncements: { items: HillAnnouncementItem[] };
 }
 
 /** What a members-meta push reports back. */

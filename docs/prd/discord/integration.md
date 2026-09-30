@@ -167,6 +167,18 @@ also pushes voice-room membership so the widget shows it even without the iframe
   after a once-per-channel notice), so kill volume never lands in the relay or activity
   channel.
 
+## King of the Hill spawn calls (game -> bot -> the PvP channel)
+- The same `DISCORD_PVP_FEED_CHANNEL_ID` channel gets a card when a hill is announced
+  (the zone, a live Discord countdown to the rise, the time it falls) and another when it
+  rises. The fall is not posted.
+- `announcePhase` in `src/sim/pvp/hill.ts` fires the server-only `hillAnnounced` event
+  beside the realm's chat line, with times RELATIVE to the announcement.
+  `server/discord_hill_feed.ts` maps them onto the server's wall clock and queues the item
+  (`HILL_ANNOUNCEMENT_MAX_QUEUE`); the outbox serves it as the `hillAnnouncements` stream.
+- The bot posts calls ahead of the kill digests and skips one whose moment passed while it
+  was queued (`hillAnnouncementIsStale`), so a stalled bot never calls players to a hill
+  that is not there.
+
 ## Out of scope / follow-ups
 - Dungeon Finder proposals (`dfProposal`) as a third queue-pop kind; the observer's
   event arm is the only place that changes.

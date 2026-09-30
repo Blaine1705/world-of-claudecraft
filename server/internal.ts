@@ -24,6 +24,11 @@ import {
   setDiscordMemberMetaBulk,
 } from './discord_db';
 import {
+  drainHillAnnouncements,
+  type QueuedHillAnnouncement,
+  requeueHillAnnouncements,
+} from './discord_hill_feed';
+import {
   drainLinkChanges,
   type QueuedLinkChange,
   requeueLinkChanges,
@@ -578,9 +583,11 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  *    resync, not to this endpoint.
  *
  * The envelope field order is relay, activity, winners, linkChanges, queuePops,
- * pvpKills, and each stream keeps its queue's FIFO order. pvpKills (the World
- * PvP kill feed, server/discord_pvp_feed.ts) carries names only and is served
- * verbatim: it adds nothing to the identity read. The relay and activity streams keep the
+ * pvpKills, hillAnnouncements, and each stream keeps its queue's FIFO order.
+ * pvpKills (the World PvP kill feed, server/discord_pvp_feed.ts) and
+ * hillAnnouncements (the King of the Hill spawn calls,
+ * server/discord_hill_feed.ts) carry names only and are served verbatim: they
+ * add nothing to the identity read. The relay and activity streams keep the
  * item shapes their retired per-endpoint GETs served (invariant D11, now this
  * poll's own contract with the bot); the winners stream dropped the fields
  * announcing never used when the standalone GET's byte-parity pin retired with
@@ -596,6 +603,7 @@ export const outboxHandler: RouteHandler = async (ctx) => {
   let linkChangeItems: QueuedLinkChange[] = [];
   let queuePopItems: QueuedQueuePop[] = [];
   let pvpKillItems: QueuedPvpKill[] = [];
+  let hillItems: QueuedHillAnnouncement[] = [];
   try {
     relayItems = drainRelay();
     activityItems = drainActivity();
@@ -603,6 +611,7 @@ export const outboxHandler: RouteHandler = async (ctx) => {
     queuePopItems = drainQueuePops(Date.now());
     // Names only, no account ids: this stream never reaches the identity read.
     pvpKillItems = drainPvpKills();
+    hillItems = drainHillAnnouncements();
     const accountIds = new Set<number>();
     for (const it of relayItems) accountIds.add(it.accountId);
     for (const it of activityItems) {
@@ -688,6 +697,7 @@ export const outboxHandler: RouteHandler = async (ctx) => {
       linkChanges: { items: linkChanges },
       queuePops: { items: queuePops, watching: queuePopsWatching() },
       pvpKills: { items: pvpKillItems },
+      hillAnnouncements: { items: hillItems },
     });
   } catch (err) {
     // The queues are the bot's only copy of these items, so a failed response
@@ -698,6 +708,7 @@ export const outboxHandler: RouteHandler = async (ctx) => {
     requeueLinkChanges(linkChangeItems);
     requeueQueuePops(queuePopItems);
     requeuePvpKills(pvpKillItems);
+    requeueHillAnnouncements(hillItems);
     throw err;
   }
 };

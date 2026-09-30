@@ -712,6 +712,18 @@ describe('event_frame pure assembly', () => {
     expect(filterRoutableEvents([kill, log])).toEqual([log]);
   });
 
+  it('filterRoutableEvents drops the server-only hillAnnounced (clients already get the realm log line)', () => {
+    const call: SimEvent = {
+      type: 'hillAnnounced',
+      phase: 'warning',
+      zoneId: 'drakelands',
+      secondsUntilRise: 900,
+      secondsUntilFall: 3600,
+    };
+    const log = { type: 'log', text: 'A hill will rise in Drakelands in 15 minutes.' } as SimEvent;
+    expect(filterRoutableEvents([call, log])).toEqual([log]);
+  });
+
   it('serializeEventFragments stringifies each event once, index-aligned', () => {
     const events = [
       { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },

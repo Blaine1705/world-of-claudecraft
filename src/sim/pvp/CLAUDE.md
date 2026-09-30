@@ -149,7 +149,9 @@ ratings.
   in the attempt number so a retry searches new ground), the `/dev hill` test
   levers (`spawnHillNow`, `riseHillNow`, `endHillNow`, `warnNextHillNow`; their
   argument grammar is the pure `hill_dev.ts`), the once-a-second `updateHill` pass (the
-  phases warning, risen, fallen, each announced to the realm; then, only while
+  phases warning, risen, fallen, each announced to the realm, with the server-only
+  `hillAnnounced` twin for the Discord PvP channel beside each line: no text, no pid,
+  times relative to the announcement; then, only while
   risen, presence by party, contest, payouts through `grantHonor` with reason
   `hill_hold`), the readout (`hillInfoFor`, live fields only for a viewer in the
   hill's zone while it is risen, so the self wire elides it elsewhere), the

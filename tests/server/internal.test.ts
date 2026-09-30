@@ -103,11 +103,17 @@ import {
   setDiscordGuildMember,
   setDiscordMemberMetaBulk,
 } from '../../server/discord_db';
+// Same for the PvP kill feed and the hill calls: pure and dependency-free, so
+// the REAL queues run.
+import {
+  drainHillAnnouncements,
+  enqueueHillAnnouncement,
+  hillAnnouncementQueueDepth,
+} from '../../server/discord_hill_feed';
 // The change feed itself is pure and dependency-free, so the REAL module runs
 // here: tests enqueue into it and the outbox handler drains it, which exercises
 // the actual FIFO rather than a fake standing in for it.
 import { drainLinkChanges, enqueueLinkChange } from '../../server/discord_link_changes';
-// Same for the PvP kill feed: pure and dependency-free, so the REAL queue runs.
 import {
   drainPvpKills,
   enqueuePvpKill,
@@ -1794,6 +1800,7 @@ describe('discord/outbox', () => {
       linkChanges: { items: [] },
       queuePops: { items: [], watching: false },
       pvpKills: { items: [] },
+      hillAnnouncements: { items: [] },
     });
   });
 
@@ -1817,6 +1824,7 @@ describe('discord/outbox', () => {
       linkChanges: { items: [] },
       queuePops: { items: [], watching: false },
       pvpKills: { items: [] },
+      hillAnnouncements: { items: [] },
     });
   });
 
@@ -1951,6 +1959,45 @@ describe('discord/outbox', () => {
     expect(pvpKillQueueDepth()).toBe(0);
   });
 
+  it('serves King of the Hill calls verbatim with no identity read, and requeues them on a failed build', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    drainHillAnnouncements();
+    stubDrains();
+    const call = {
+      phase: 'warning' as const,
+      zoneName: 'Drakelands',
+      risesAtMs: 1_790_000_900_000,
+      fallsAtMs: 1_790_003_600_000,
+      realm: 'R',
+    };
+    enqueueHillAnnouncement(call);
+    vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
+
+    const r = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+    expect(r.status).toBe(200);
+    expect(dataOf(r.body).hillAnnouncements).toEqual({
+      items: [
+        {
+          phase: 'warning',
+          zoneName: 'Drakelands',
+          risesAtMs: 1_790_000_900_000,
+          fallsAtMs: 1_790_003_600_000,
+          realm: 'R',
+        },
+      ],
+    });
+    expect(vi.mocked(discordLinksForAccounts)).not.toHaveBeenCalled();
+    expect(hillAnnouncementQueueDepth()).toBe(0);
+
+    // A failed build puts the call back in the REAL queue.
+    enqueueHillAnnouncement(call);
+    stubDrains([], [activityItem(2, 'Bea')]);
+    vi.mocked(discordLinksForAccounts).mockRejectedValueOnce(new Error('identity read failed'));
+    const failed = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+    expect(failed.status).toBe(500);
+    expect(drainHillAnnouncements().map((c) => c.phase)).toEqual(['warning']);
+  });
+
   it('requeues drained PvP kills when the response build throws', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
     drainPvpKills();
@@ -1990,6 +2037,7 @@ describe('discord/outbox', () => {
       'linkChanges',
       'queuePops',
       'pvpKills',
+      'hillAnnouncements',
     ]);
   });
 

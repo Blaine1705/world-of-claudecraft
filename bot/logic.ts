@@ -974,6 +974,61 @@ export function buildPvpKillFeedMessage(items: readonly PvpKillItem[]): Record<s
   };
 }
 
+// ── King of the Hill spawn announcements (same channel as the kill feed) ─────
+// One announcement as the outbox's `hillAnnouncements` stream ships it
+// (server/discord_hill_feed.ts QueuedHillAnnouncement). Times are wall-clock
+// ms on the SERVER's clock, rendered as Discord timestamps so every reader
+// sees their own local time and a live countdown.
+export interface HillAnnouncementItem {
+  phase: 'warning' | 'risen';
+  zoneName: string;
+  risesAtMs: number;
+  fallsAtMs: number;
+  realm: string;
+}
+
+/**
+ * Whether the moment an announcement calls players to has already passed, so
+ * posting it now would mislead: a warning once the hill has risen, a rise once
+ * it has fallen. The consumer skips these (a stalled bot's backlog), the
+ * queue-pop deadline rule. A malformed time counts as stale.
+ */
+export function hillAnnouncementIsStale(item: HillAnnouncementItem, nowMs: number): boolean {
+  const deadline = item.phase === 'warning' ? item.risesAtMs : item.fallsAtMs;
+  return !(typeof deadline === 'number' && Number.isFinite(deadline) && deadline > nowMs);
+}
+
+/** `<t:unix:style>`: Discord renders it in each reader's own time zone. */
+function discordTime(ms: number, style: 'R' | 't'): string {
+  return `<t:${Math.floor(ms / 1000)}:${style}>`;
+}
+
+/** One card per announcement. Nobody is pinged. */
+export function buildHillAnnouncementMessage(item: HillAnnouncementItem): Record<string, unknown> {
+  const zone = pvpFeedName(item.zoneName);
+  const warning = item.phase === 'warning';
+  const title = warning ? `A hill will rise in ${zone}` : `A hill has risen in ${zone}`;
+  const description = warning
+    ? `It rises ${discordTime(item.risesAtMs, 'R')} and stands until ` +
+      `${discordTime(item.fallsAtMs, 't')}. The party with the most players ` +
+      'standing inside takes it and earns Honor for every minute they hold it.'
+    : `It stands until ${discordTime(item.fallsAtMs, 't')} ` +
+      `(${discordTime(item.fallsAtMs, 'R')}). The party with the most players ` +
+      'standing inside takes it and earns Honor for every minute they hold it.';
+  return {
+    embeds: [
+      {
+        color: 0xf0c060,
+        author: { name: 'King of the Hill' },
+        title,
+        description,
+        footer: { text: `World of ClaudeCraft (${item.realm || 'the realm'})` },
+      },
+    ],
+    allowed_mentions: { parse: [] },
+  };
+}
+
 // ── Daily rewards winners feed ────────────────────────────────────────────────
 // One winner row as the server's outbox actually ships it since the #2791
 // narrowing: exactly what the message builder renders plus the payout status.

@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 import {
   type ActivityItem,
   type DailyRewardWinnersDay,
+  type HillAnnouncementItem,
   PVP_FEED_LINES_PER_POST,
   type PvpKillItem,
   type RelayItem,
@@ -97,6 +98,14 @@ function pvpKill(killerName: string, victimName = 'Borin'): PvpKillItem {
   };
 }
 
+function hillCall(
+  phase: HillAnnouncementItem['phase'],
+  risesAtMs = NOW + 15 * 60_000,
+  fallsAtMs = risesAtMs + 45 * 60_000,
+): HillAnnouncementItem {
+  return { phase, zoneName: 'Drakelands', risesAtMs, fallsAtMs, realm: 'Eastbrook' };
+}
+
 function linkChange(discordUserId: string): OutboxLinkChangeItem {
   return {
     accountId: 7,
@@ -116,6 +125,7 @@ function envelope(streams: Partial<OutboxEnvelope> = {}): OutboxEnvelope {
     linkChanges: { items: [] },
     queuePops: { items: [], watching: false },
     pvpKills: { items: [] },
+    hillAnnouncements: { items: [] },
     ...streams,
   };
 }
@@ -148,6 +158,7 @@ interface Recorder {
   pops: OutboxQueuePopItem[];
   /** One entry per digest post, each the batch it carried. */
   pvpBatches: PvpKillItem[][];
+  hills: HillAnnouncementItem[];
   errors: { where: string; message: string }[];
 }
 
@@ -166,6 +177,7 @@ function recorder(
     failWinners?: (day: DailyRewardWinnersDay) => boolean;
     failQueuePop?: (item: OutboxQueuePopItem) => boolean;
     failPvpBatch?: (batch: readonly PvpKillItem[]) => boolean;
+    failHill?: (item: HillAnnouncementItem) => boolean;
     markResult?: (day: string) => unknown;
     now?: () => number;
   } = {},
@@ -180,6 +192,7 @@ function recorder(
     links: [],
     pops: [],
     pvpBatches: [],
+    hills: [],
     errors: [],
     io: {
       now: options.now ?? (() => NOW),
@@ -208,6 +221,11 @@ function recorder(
         calls.push(`pvp:${batch.length}`);
         rec.pvpBatches.push([...batch]);
         if (options.failPvpBatch?.(batch)) throw new Error(`pvp batch of ${batch.length} refused`);
+      },
+      postHillAnnouncement: async (item) => {
+        calls.push(`hill:${item.phase}`);
+        rec.hills.push(item);
+        if (options.failHill?.(item)) throw new Error(`hill ${item.phase} refused`);
       },
       postWinnersDay: async (day) => {
         calls.push(`winners:${day.day}`);
@@ -602,6 +620,10 @@ describe('outbox poll didWork signal', () => {
       { name: 'linkChanges', streams: { linkChanges: { items: [linkChange('u9')] } } },
       { name: 'queuePops', streams: { queuePops: { items: [queuePop('u9')], watching: false } } },
       { name: 'pvpKills', streams: { pvpKills: { items: [pvpKill('Annthar')] } } },
+      {
+        name: 'hillAnnouncements',
+        streams: { hillAnnouncements: { items: [hillCall('warning')] } },
+      },
       // The watch signal alone, with NOTHING drained: an opted-in player is
       // waiting in a queue, and the pop that ends the wait has a 30 s window,
       // so the loop must hold the fast cadence rather than decay to idle.
@@ -764,6 +786,7 @@ describe('outbox channel routing', () => {
       envelope({
         relay: { items: [relayItem('c1', 'Annthar')] },
         activity: { items: [activityItem('Annthar')] },
+        hillAnnouncements: { items: [hillCall('warning')] },
         pvpKills: { items: [pvpKill('Kargath', 'Annthar')] },
         winners: { days: [winnersDay('2026-07-31')] },
       }),
@@ -775,8 +798,14 @@ describe('outbox channel routing', () => {
       'relay-1',
       'activity-1',
       'pvp-1',
+      'pvp-1',
       'daily-1',
     ]);
+    // The hill call shares the kill feed's channel and is shaped by its own builder.
+    const hillEmbed = (wired.sent[2].payload.embeds as { title: string }[])[0];
+    expect(hillEmbed.title).toBe('A hill will rise in Drakelands');
+    expect(wired.sent[2].payload.allowed_mentions).toEqual({ parse: [] });
+    wired.sent.splice(2, 1);
     const pvpPayload = wired.sent[2].payload;
     // Only the kill-feed builder writes this line, and it never pings.
     expect((pvpPayload.embeds as { description: string }[])[0].description).toBe(
@@ -875,6 +904,7 @@ describe('outbox channel routing', () => {
         relay: { items: [relayItem('c1'), relayItem('c2')] },
         activity: { items: [activityItem()] },
         pvpKills: { items: [pvpKill('Kargath')] },
+        hillAnnouncements: { items: [hillCall('warning')] },
         winners: { days: [winnersDay('2026-07-31')] },
       }),
     );
@@ -975,6 +1005,64 @@ describe('outbox PvP kill feed digests', () => {
     expect(await runOutboxPoll(rec.io)).toBe(true);
     expect(rec.pvpBatches).toEqual([]);
     expect(rec.errors).toEqual([]);
+  });
+});
+
+describe('outbox King of the Hill spawn calls', () => {
+  it('posts each call after the activity cards and AHEAD of the kill digests', async () => {
+    const rec = recorder({
+      envelope: envelope({
+        activity: { items: [activityItem()] },
+        pvpKills: { items: [pvpKill('K0')] },
+        hillAnnouncements: { items: [hillCall('warning'), hillCall('risen', NOW - 1000)] },
+      }),
+    });
+
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.calls).toEqual([
+      'drain',
+      'links:0',
+      'activity:levelup',
+      'hill:warning',
+      'hill:risen',
+      'pvp:1',
+    ]);
+  });
+
+  it('skips a call whose moment already passed while it was queued, silently', async () => {
+    // A warning once the hill has risen, a rise once it has fallen: posting
+    // either would call players to a hill that is not there.
+    const rec = recorder({
+      envelope: envelope({
+        hillAnnouncements: {
+          items: [
+            hillCall('warning', NOW - 1),
+            hillCall('risen', NOW - 60_000, NOW - 1),
+            hillCall('risen', NOW - 60_000, NOW + 60_000),
+          ],
+        },
+      }),
+    });
+
+    // Still work: the drain carried items even though two were skipped.
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.hills.map((h) => [h.phase, h.fallsAtMs])).toEqual([['risen', NOW + 60_000]]);
+    expect(rec.errors).toEqual([]);
+  });
+
+  it('isolates a refused call: the rest still post and the refusal is reported', async () => {
+    const rec = recorder({
+      envelope: envelope({
+        hillAnnouncements: { items: [hillCall('warning'), hillCall('risen', NOW - 1000)] },
+        pvpKills: { items: [pvpKill('K0')] },
+      }),
+      failHill: (item) => item.phase === 'warning',
+    });
+
+    await runOutboxPoll(rec.io);
+    expect(rec.hills.map((h) => h.phase)).toEqual(['warning', 'risen']);
+    expect(rec.pvpBatches).toHaveLength(1);
+    expect(rec.errors).toEqual([{ where: 'hill', message: 'hill warning refused' }]);
   });
 });
 

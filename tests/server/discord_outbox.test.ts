@@ -70,6 +70,11 @@ import { ACTIVITY_MAX_QUEUE, drainActivity } from '../../server/discord_activity
 import type { DiscordOutboxLinkRow } from '../../server/discord_db';
 import { discordLinksForAccounts } from '../../server/discord_db';
 import {
+  drainHillAnnouncements,
+  enqueueHillAnnouncement,
+  HILL_ANNOUNCEMENT_MAX_QUEUE,
+} from '../../server/discord_hill_feed';
+import {
   drainLinkChanges,
   enqueueLinkChange,
   LINK_CHANGE_MAX_QUEUE,
@@ -108,8 +113,9 @@ const ACTIVITY_CAP = ACTIVITY_MAX_QUEUE;
  * one-day winners ask, rounded to a clean number, so ordinary drift in the
  * fixtures does not red it while a page raise or a new per-item field does.
  * The PvP kill feed joining at its 100-item cap raised the measurement to
- * 306,445 bytes, leaving about 1.37x headroom: the next stream should re-derive
- * the bound rather than assume the old slack. The test logs its
+ * 306,445 bytes, and the King of the Hill calls at their 10-item cap to
+ * 307,727, leaving about 1.36x headroom: the next stream should re-derive the
+ * bound rather than assume the old slack. The test logs its
  * own measurement, so re-deriving the headroom never means guessing at the size.
  *
  * The earlier figure was 979,051 bytes, at a whole-cap 5,000-item drain and five
@@ -218,6 +224,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   drainLinkChanges();
   drainPvpKills();
+  drainHillAnnouncements();
   process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
 });
 
@@ -226,6 +233,7 @@ afterEach(() => {
   else process.env.DISCORD_BOT_SECRET = ORIGINAL_DISCORD_SECRET;
   drainLinkChanges();
   drainPvpKills();
+  drainHillAnnouncements();
   vi.restoreAllMocks();
 });
 
@@ -259,6 +267,17 @@ describe('discord/outbox payload size at the full-cap drain', () => {
         zoneName: 'The Frostveil Reach',
         assists: 24,
         copper: 99_999_999,
+        realm: 'Claudemoon',
+      });
+    }
+
+    // The hill calls at their cap too (the REAL queue), with a wide zone name.
+    for (let i = 0; i < HILL_ANNOUNCEMENT_MAX_QUEUE; i++) {
+      enqueueHillAnnouncement({
+        phase: i % 2 === 0 ? 'warning' : 'risen',
+        zoneName: 'The Frostveil Reach',
+        risesAtMs: 1_790_000_000_000 + i,
+        fallsAtMs: 1_790_002_700_000 + i,
         realm: 'Claudemoon',
       });
     }
@@ -298,9 +317,11 @@ describe('discord/outbox payload size at the full-cap drain', () => {
       winners: { days: unknown[] };
       linkChanges: { items: unknown[] };
       pvpKills: { items: unknown[] };
+      hillAnnouncements: { items: unknown[] };
     };
     expect(payload.relay.items).toHaveLength(RELAY_CAP);
     expect(payload.pvpKills.items).toHaveLength(PVP_KILL_FEED_MAX_QUEUE);
+    expect(payload.hillAnnouncements.items).toHaveLength(HILL_ANNOUNCEMENT_MAX_QUEUE);
     expect(payload.activity.items).toHaveLength(ACTIVITY_CAP);
     expect(payload.linkChanges.items).toHaveLength(OUTBOX_LINK_CHANGE_PAGE);
     expect(payload.winners.days).toHaveLength(1);
@@ -379,5 +400,6 @@ describe('outbox contract literals', () => {
     expect(RELAY_MAX_QUEUE).toBe(50);
     expect(ACTIVITY_MAX_QUEUE).toBe(100);
     expect(PVP_KILL_FEED_MAX_QUEUE).toBe(100);
+    expect(HILL_ANNOUNCEMENT_MAX_QUEUE).toBe(10);
   });
 });
