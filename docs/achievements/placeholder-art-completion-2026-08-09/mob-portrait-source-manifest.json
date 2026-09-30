@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "749cac2ee0eed8c503446308af835ac76d83ea391b28cc31a1245ad32e42a05b",
+  "rendererFingerprint": "c3ced95eb0e67530761f46c34e240ad087fb976e9f102866a8527957bfa4a37a",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5374286,
-      "sha256": "c98c8b65786a85d9adaa70925180687b7adca03246381dc9c1acfaca4832bfdd",
+      "bytes": 5375492,
+      "sha256": "eaaa66c7195eba54f5064b8da309df80cce27d8d42db893c25fa2980b6c79eb5",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3085,8 +3085,8 @@
         "model": {
           "url": "models/creatures/gaol_turnkey.glb",
           "path": "public/models/creatures/gaol_turnkey.glb",
-          "bytes": 1091716,
-          "sha256": "fadc5bfdaea6adb79c56e3adca87fbd9b73676741b9305b8e40173765267b4a7"
+          "bytes": 1247488,
+          "sha256": "9b3cdc659540097095447a3a68eda8bc339ceedd394d538df4d56845880838b8"
         },
         "idle": "Idle",
         "height": 6.4,
@@ -3103,11 +3103,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "d8109a521985dd2d087129ba8a18f459a791f9bc66beef883509c37ae10e704d",
+      "sourceFingerprint": "9c4d393ab165e77f5ddd8e52b893a3d0c1f1cd9b790ad300b9a8bdb0bb95421b",
       "output": {
         "path": "public/ui/mobs/gaol_turnkey.webp",
-        "bytes": 2226,
-        "sha256": "d30571d09df755d7349e9c77b33867806402baad0ef69930a24a50fa63f89f3c"
+        "bytes": 1786,
+        "sha256": "3272b817a1649fcedd26190e670d50d2ea1efc7bf5cb4c3a925ae88f20e524f5"
       }
     },
     {
@@ -6130,13 +6130,13 @@
         "model": {
           "url": "models/creatures/crypt_morthen_lich.glb",
           "path": "public/models/creatures/crypt_morthen_lich.glb",
-          "bytes": 2888184,
-          "sha256": "c096a6de3c8b3d3c719140b71c288cb662db616fe70eb0e870bfa02b875d76fa"
+          "bytes": 2942144,
+          "sha256": "616c38ddc7021b71958f7503cb1da6bc01ef7947ed8bb16e3053c73b01727e68"
         },
         "idle": "Idle",
-        "height": 6.342,
+        "height": 6.994,
         "yaw": null,
-        "hover": 0.077,
+        "hover": 0.122,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -6148,11 +6148,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "0dc75663c7b7c741d348e154f7396ab6796db4641d18a9918a52b6d11f0e05f5",
+      "sourceFingerprint": "1c46b421c9ab1c2b5593cbfd432ec81895ac936dc2ef278d3cbc4a94c6d5b934",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 3212,
-        "sha256": "f07cab286850d8f1c824089f5e34b8f113519f124ba639067709ff1deaa221ee"
+        "bytes": 2946,
+        "sha256": "46cfd3cc5b8b7dcdd3504d7a4b07b4bb926634f14c323f2b2db4447c67f6c276"
       }
     },
     {
@@ -12007,8 +12007,8 @@
       "sourceFingerprint": "9195d03436ee50cc7728522e57e7c1ae052fad3f630e287ed2acefbb28d3e8d4",
       "output": {
         "path": "public/ui/mobs/ysolei.webp",
-        "bytes": 2372,
-        "sha256": "f8c641bf09648a622bde07780052f0a2881c710b83eda01e33b66b4099ab12dd"
+        "bytes": 3462,
+        "sha256": "71a04ea49352be968b189e88eb019164b1bb48197d8d11afe2762e4db7999f6c"
       }
     },
     {
