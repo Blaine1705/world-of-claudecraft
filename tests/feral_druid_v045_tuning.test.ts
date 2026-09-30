@@ -127,9 +127,10 @@ describe('2. Scratch', () => {
     expect(def.class).toBe('druid');
     expect(def.requiresForm).toBe('cat');
     expect(def.awardsCombo).toBe(1);
-    // Baseline like Rendclaw: every druid, same learn level, no spec gate,
-    // castable with no target, and it lives in the spellbook (the class kit).
-    expect(def.learnLevel).toBe(claw.learnLevel);
+    // Baseline like Rendclaw: every druid, no spec gate, castable with no
+    // target, and it lives in the spellbook (the class kit). Learned at 8,
+    // the first ding past the early-curve cap, not Rendclaw's 5.
+    expect(def.learnLevel).toBe(8);
     expect(def.specs).toBeUndefined();
     expect(def.requiresTarget).toBe(false);
     expect(CLASSES.druid.abilities).toContain('scratch');

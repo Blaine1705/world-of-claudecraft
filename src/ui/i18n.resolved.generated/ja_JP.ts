@@ -13985,9 +13985,9 @@ export const ja_JP: EnTranslations = {
         "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yd for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "スクラッチ",
+        "description": "6ヤード以内の周囲の対象を引っかき、武器ダメージに {damage} を加えたダメージを与えます。命中した対象1体ごとにコンボポイントを1獲得します。範囲内のステルス中の敵を暴きます。キャットフォーム専用。",
+        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
       },
       "ferocious_bite": {
         "name": "血噛み",

@@ -1243,7 +1243,7 @@ const classAbilityNamesEn = {
       [
         'scratch',
         'Scratch',
-        'Scratch through nearby targets within 6 yd for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
+        'Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
         { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
       ],
       [

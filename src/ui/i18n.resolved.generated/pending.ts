@@ -40,36 +40,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral"
   ],
-  "zh_CN": [
-    "entities.abilities.scratch.description",
-    "entities.abilities.scratch.name",
-    "entities.abilities.scratch.specNote_feral"
-  ],
-  "zh_TW": [
-    "entities.abilities.scratch.description",
-    "entities.abilities.scratch.name",
-    "entities.abilities.scratch.specNote_feral"
-  ],
-  "ko_KR": [
-    "entities.abilities.scratch.description",
-    "entities.abilities.scratch.name",
-    "entities.abilities.scratch.specNote_feral"
-  ],
-  "ja_JP": [
-    "entities.abilities.scratch.description",
-    "entities.abilities.scratch.name",
-    "entities.abilities.scratch.specNote_feral"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral"
   ],
-  "ru_RU": [
-    "entities.abilities.scratch.description",
-    "entities.abilities.scratch.name",
-    "entities.abilities.scratch.specNote_feral"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",

@@ -13986,7 +13986,7 @@ export const nl_NL: EnTranslations = {
       },
       "scratch": {
         "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yd for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
+        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
