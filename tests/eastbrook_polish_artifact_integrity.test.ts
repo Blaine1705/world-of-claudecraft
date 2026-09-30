@@ -1407,7 +1407,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
   // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
   // one tree. No capture was retaken.
-  '9c189cef2d439c88eb522e5063e8fcd209b77a7060747b45e0a6e51f4144b29a';
+  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
+  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
+  // was retaken.
+  'e5f28128dbd11d4d65dd1b335395ec46ee557b166da86f943394c38541a73072';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1442,7 +1445,10 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
   // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
   // one tree. No capture was retaken.
-  '8967178cc644aa136b2938f006332d5cead62ec8e957379b44800ebcdc7f372f';
+  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
+  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
+  // was retaken.
+  'a26ef61e4135d156457b0e05281358556040d5ce264f10d105ec8ae32faa06e7';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2835,7 +2841,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Integrated v0.45 batch plus GLTF parser release: recomputed LAST again
       // over the re-swept evidence. No capture was retaken.
-    ).toBe('610a20cb0fd05e01acf713a7d620903af6041f1615e5c5ebff003191ac322d60');
+      // PR #4282 Drakelands kit lane on top of that integrated v0.45 batch:
+      // recomputed LAST again over the re-swept evidence. No capture was
+      // retaken.
+    ).toBe('673b896d574ee49a891b65d06dffdd037fad153751b53c0a552ab33e68d9783f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

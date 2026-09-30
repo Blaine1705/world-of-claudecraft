@@ -1013,7 +1013,11 @@ const MONOLITHS: MonolithRow[] = [
     // half-applied (context-restore kept the hook but the renderer had lost the
     // prewarmer field/observe call). The helper modules and tests are extracted;
     // these are the renderer's remaining call sites. Exact count, zero slack.
-    ceiling: 12642,
+    // LOWERED 12642 -> 12637 by PR #4282 on top of that integrated v0.45
+    // batch: the Drakelands kit lane adds the approach prefetch while moving
+    // the visible-zone recheck cadence into zone_streaming.ts. Exact count,
+    // zero slack.
+    ceiling: 12637,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

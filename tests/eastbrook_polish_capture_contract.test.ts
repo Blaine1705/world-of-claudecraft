@@ -712,7 +712,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
   // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
   // one tree. No capture was retaken.
-  '8967178cc644aa136b2938f006332d5cead62ec8e957379b44800ebcdc7f372f';
+  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
+  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
+  // was retaken.
+  'a26ef61e4135d156457b0e05281358556040d5ce264f10d105ec8ae32faa06e7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
