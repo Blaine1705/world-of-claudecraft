@@ -121,28 +121,47 @@ const BASELINE = {
     normalDigest: '213a53c89b1da7a01abf0c4ea3849f9390368a6163a358f3fdad2f2007f0bcb1',
     gearDigest: '7a9d9d364d3d682f2db571c3f92be9c471a53fbb431c90661df5d453cb706005',
   },
+  // Re-minted for the Drowned Temple rework (docs/design/dungeon-rework/
+  // drowned_temple.md section 8): Selthe's normal table gains a guaranteed
+  // archetype group and the Chorus Conch row, the new Tideglass Colossus carries
+  // his own table, and each gains one new heroic epic. Four shipped heroic
+  // pieces moved off Ysolei (the Choirmother's Casque to Selthe; the Lunar
+  // Choir Leggings, Tidewoven Trousers and Tideworn Warboots to the Colossus),
+  // none left the game; their item defs are unchanged, only the payer moved.
   choirmother_selthe: {
-    gearIds: ['heroic_selthes_seastriders'],
-    normalDigest: 'c613531eda914e6aa4815f28a0fd741002338f401f691f957893e9ed0f38aa71',
-    gearDigest: 'd6dadf39d72dd0f7f043343d86aa9ca8da44b71fa823881641a28ce67c2fb20e',
+    gearIds: [
+      'choirmothers_casque',
+      'heroic_chorus_conch',
+      'heroic_selthes_seastriders',
+      'pale_chorus_vestment',
+    ],
+    normalDigest: 'd066bb76897cf312a782b522b93c47288d103d8f2231b56dac73a320792d5440',
+    gearDigest: '95f7eb3b6ffbd3f938e941ba06c370a680d553eb6cb8fb7acb7d53e69ec7215c',
+  },
+  tideglass_colossus: {
+    gearIds: [
+      'heroic_tideglass_shiv',
+      'lunar_choir_leggings',
+      'tideglass_warmaul',
+      'tideworn_warboots',
+      'tidewoven_trousers',
+    ],
+    normalDigest: 'abd555f798b5eab58bbbebde04facc190a50e300c695d48796b02141bf80bc1d',
+    gearDigest: '83069ff7c58946418b39a6738a41358e5f3401ae4d5cfa84b38d3fb7606dda00',
   },
   ysolei: {
     gearIds: [
       'choir_blessed_spaulders',
-      'choirmothers_casque',
       'heroic_moonshroud_breastplate',
       'heroic_moonshroud_robe',
       'heroic_moonshroud_tunic',
       'heroic_ysols_pearl_greaves',
-      'lunar_choir_leggings',
       'lunar_tide_greatstaff',
       'menders_hourglass',
       'stormbark_mantle',
-      'tideworn_warboots',
-      'tidewoven_trousers',
     ],
     normalDigest: 'aa4c9a380d095266e6cd74de3869ac1652f4a896af53c6bdd4cf406fa35ee01c',
-    gearDigest: 'b8d1423096dfc7c658a939b0ee7145b33e35305782d3884c640e27fd57dcfe65',
+    gearDigest: '0706bc5d99ae991d9db6e7b1aeb32b0415f147bff9ee2ed267e2d7c95a87747c',
   },
   korgath_the_bound: {
     gearIds: [

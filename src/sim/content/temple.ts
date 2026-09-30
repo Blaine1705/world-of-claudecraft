@@ -311,10 +311,32 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 22,
     moveSpeed: 7,
     aggroRadius: 14,
+    // The rework (drowned_temple.md 8.1): one guaranteed piece per archetype
+    // group and the Chorus Conch chase row beside her shipped drops. Heroic
+    // rides HEROIC_BOSS_LOOT.choirmother_selthe.
     loot: [
       { copper: 700, chance: 1 },
       { itemId: 'selthes_seastriders', chance: 0.4, normalOnly: true },
       { itemId: 'briny_idol', chance: 0.5 },
+      {
+        itemId: 'conchplate_girdle',
+        chance: 0.34,
+        rollGroup: 'selthe_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'pale_chorus_leggings',
+        chance: 0.33,
+        rollGroup: 'selthe_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'refrain_silk_gloves',
+        chance: 0.33,
+        rollGroup: 'selthe_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'chorus_conch', chance: 0.1, normalOnly: true },
     ],
     scale: 1.15,
     color: 0x6f8fae,

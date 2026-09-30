@@ -1017,9 +1017,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
-    expect(new Set(currentOwnerIds).size).toBe(1472);
-    expect(shippingIds).toHaveLength(1472);
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    expect(new Set(currentOwnerIds).size).toBe(1483);
+    expect(shippingIds).toHaveLength(1483);
+    expect(Object.keys(ITEMS)).toHaveLength(1657);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1181,6 +1181,14 @@ describe('item-art consistency accepted-art provenance', () => {
         'vanguard_oath_blade',
         'vanguard_fang_dagger',
         'vanguard_warstaff',
+        // The dungeon reworks' loot batches (Sunken Bastion, Drowned Temple).
+        ...mapping.generatedBatches
+          .filter(({ batchId }) =>
+            ['sunken-bastion-icons-2026-09-29', 'drowned-temple-icons-2026-09-30'].includes(
+              batchId ?? '',
+            ),
+          )
+          .flatMap(({ itemIds }) => itemIds),
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1349,8 +1357,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // its batch (faction-ladder-icons-2026-09-23) = 36. The trinket slot's icon batch
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
     // batch (warfare-season2-weapons-2026-09-25) = 38. The Sunken Bastion
-    // rework's loot icons (sunken-bastion-icons-2026-09-29) add one more.
-    expect(mapping.generatedBatches).toHaveLength(42);
+    // rework's loot icons (sunken-bastion-icons-2026-09-29) add one more, and
+    // the Drowned Temple rework's (drowned-temple-icons-2026-09-30) another.
+    expect(mapping.generatedBatches).toHaveLength(43);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1421,13 +1430,14 @@ describe('item-art consistency accepted-art provenance', () => {
     // batches (18 faction reward paintings, 5 treasure-map family, 96 hoard boss
     // loot) add 119 at the 2026-09-28 release merge: 934.
     // The Sunken Bastion loot batch (sunken-bastion-icons-2026-09-29) adds 8: 942.
-    expect(priorGeneratedIds).toHaveLength(942);
+    // The Drowned Temple loot batch (drowned-temple-icons-2026-09-30) adds 11: 953.
+    expect(priorGeneratedIds).toHaveLength(953);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1472);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1472);
+    expect(allCurrentOwnerIds).toHaveLength(1483);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1483);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1442,7 +1452,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the 4 Warfare Season 2 weapons = 815.
       // + the Buried Hoards branch's 119 paintings (three batches) = 934.
       // + the Sunken Bastion rework's 8 loot icons = 942.
-      priorGenerated: 942,
+      // + the Drowned Temple rework's 11 loot icons = 953.
+      priorGenerated: 953,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1522,6 +1533,8 @@ describe('item-art consistency accepted-art provenance', () => {
                 'hoard-boss-loot-icons-2026-09-20',
                 // The Sunken Bastion rework's loot.
                 'sunken-bastion-icons-2026-09-29',
+                // The Drowned Temple rework's loot.
+                'drowned-temple-icons-2026-09-30',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1671,10 +1684,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472.
-    if (ownerIds.length !== 1472)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1472`);
-    if (fileIds.length !== 1472) violations.push(`shipping WebP count: ${fileIds.length} != 1472`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483.
+    if (ownerIds.length !== 1483)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1483`);
+    if (fileIds.length !== 1483) violations.push(`shipping WebP count: ${fileIds.length} != 1483`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

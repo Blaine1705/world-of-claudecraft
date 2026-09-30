@@ -7143,6 +7143,32 @@
         "gaolyard_striders",
         "gaolers_iron_key"
       ]
+    },
+    {
+      "batchId": "drowned-temple-icons-2026-09-30",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_drowned_temple_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_drowned_temple_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+      "itemIds": [
+        "conchplate_girdle",
+        "pale_chorus_leggings",
+        "refrain_silk_gloves",
+        "chorus_conch",
+        "heroic_chorus_conch",
+        "tideglass_pauldrons",
+        "moonburn_treads",
+        "prism_etched_cowl",
+        "tideglass_shiv",
+        "pale_chorus_vestment",
+        "tideglass_warmaul"
+      ]
     }
   ]
 }

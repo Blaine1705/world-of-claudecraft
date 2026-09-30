@@ -324,8 +324,9 @@ describe('item webp icons', () => {
     // plus the three faction vendor weapons (riftwarden_voidblade,
     // dawnkeeper_consecrated_mace, forgemaster_crag_cleaver): 138 -> 141, plus the four Warfare Season 2 honor weapons
     // (warfare-season2-weapons-2026-09-25): 145, plus the Sunken Bastion rework's
-    // two (knight_commanders_longsword, gaolyard_cudgel): 147.
-    expect(WEAPON_IMAGE_IDS.size).toBe(147);
+    // two (knight_commanders_longsword, gaolyard_cudgel): 147, plus the Drowned
+    // Temple rework's two (tideglass_shiv, tideglass_warmaul): 149.
+    expect(WEAPON_IMAGE_IDS.size).toBe(149);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

@@ -782,14 +782,20 @@ export const RELIQUARY_HEROIC_GEAR = {
     'dreamroot_boots',
     'stormjar',
   ],
+  // The Drowned Temple rework moved four of Ysolei's heroic pieces onto
+  // Choirmother Selthe and the new Tideglass Colossus (drowned_temple.md 8.2)
+  // and gave each a new heroic epic; they share the one heroic page.
+  choirmother_selthe: ['choirmothers_casque', 'pale_chorus_vestment'],
+  tideglass_colossus: [
+    'tidewoven_trousers',
+    'lunar_choir_leggings',
+    'tideworn_warboots',
+    'tideglass_warmaul',
+  ],
   ysolei: [
     'lunar_tide_greatstaff',
-    'tidewoven_trousers',
-    'choirmothers_casque',
     'stormbark_mantle',
-    'lunar_choir_leggings',
     'choir_blessed_spaulders',
-    'tideworn_warboots',
     'menders_hourglass',
   ],
   korzul_the_gravewyrm: [
@@ -1108,24 +1114,40 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_drowned_temple',
     shelf: 'conquerors',
     name: 'The Drowned Temple',
-    desc: 'Rare spoils from Choirmother Selthe and Ysolei, Avatar of the Drowned Moon.',
+    desc: 'Rare spoils from Choirmother Selthe, the Tideglass Colossus and Ysolei, Avatar of the Drowned Moon.',
     clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'any' },
+    // Three bosses pay the page, so every row names its own. The rework's two
+    // rare chase rows append after the shipped slots.
     relics: items(
       ['ysols_pearl_greaves', fromBoss('ysolei')],
       ['moonshroud_breastplate', fromBoss('ysolei')],
       ['moonshroud_robe', fromBoss('ysolei')],
       ['moonshroud_tunic', fromBoss('ysolei')],
       ['selthes_seastriders', fromBoss('choirmother_selthe')],
+      ['chorus_conch', fromBoss('choirmother_selthe')],
+      ['tideglass_shiv', fromBoss('tideglass_colossus')],
     ),
   },
   {
     id: 'conquerors_drowned_temple_heroic',
     shelf: 'conquerors',
     name: 'Heroic Drowned Temple',
-    desc: 'Heroic-only epics from Ysolei.',
+    desc: 'Heroic-only epics from Choirmother Selthe, the Tideglass Colossus and Ysolei.',
     clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'heroic' },
-    sourceDefault: fromBoss('ysolei'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.ysolei),
+    // The shipped eight keep their slots and order; the rework moved four of
+    // them to Selthe and the Colossus and appends its two new epics.
+    relics: items(
+      ['lunar_tide_greatstaff', fromBoss('ysolei')],
+      ['tidewoven_trousers', fromBoss('tideglass_colossus')],
+      ['choirmothers_casque', fromBoss('choirmother_selthe')],
+      ['stormbark_mantle', fromBoss('ysolei')],
+      ['lunar_choir_leggings', fromBoss('tideglass_colossus')],
+      ['choir_blessed_spaulders', fromBoss('ysolei')],
+      ['tideworn_warboots', fromBoss('tideglass_colossus')],
+      ['menders_hourglass', fromBoss('ysolei')],
+      ['pale_chorus_vestment', fromBoss('choirmother_selthe')],
+      ['tideglass_warmaul', fromBoss('tideglass_colossus')],
+    ),
   },
   {
     id: 'conquerors_gravewyrm_sanctum',

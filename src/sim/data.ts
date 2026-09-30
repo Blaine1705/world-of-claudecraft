@@ -76,6 +76,7 @@ import {
   DRAKELANDS_ZONE,
 } from './content/drakelands';
 import { DROWNED_TEMPLE_MOBS } from './content/drowned_temple';
+import { DROWNED_TEMPLE_ITEMS } from './content/drowned_temple_items';
 import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import { FORGEFATHER_ISLE_TERRAIN_EDITS } from './content/ember_coast';
 import {
@@ -427,6 +428,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WILDHEART_ITEMS,
   HOLLOW_CRYPT_ITEMS,
   SUNKEN_BASTION_ITEMS,
+  DROWNED_TEMPLE_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,

@@ -167,6 +167,10 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   knight_commanders_longsword: 'sword_d',
   gaolyard_cudgel: 'hammer_b', // an iron-banded club reads as the plain mace
 
+  // ---- The Drowned Temple rework (drowned_temple_items.ts) -------------------
+  tideglass_shiv: 'dagger_c', // slim shiv; the Tideglass Dirk already rides dagger_b
+  tideglass_warmaul: 'hammer_c', // heroic epic maul (heroic clones ride heroicOf)
+
   // ---- Crucible of the Last Spring raid weapons (ignivar_loot.ts) -------------
   // Held models reuse shipped GLBs.
   forgefathers_warhammer: 'hammer_c',

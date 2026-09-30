@@ -474,7 +474,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
     // The Sunken Bastion rework adds five item relics (two rare weapons, two
     // heroic epics, the Gaoler's Iron Key): 500.
-    expect(full).toEqual({ owned: 500, total: 500 });
+    // The Drowned Temple rework adds four (two rare chase rows, two heroic
+    // epics): 504.
+    expect(full).toEqual({ owned: 504, total: 504 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -507,8 +509,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    // 471 with the Sunken Bastion rework's five new relics.
-    expect(character).toEqual({ owned: 471, total: 471 });
+    // 471 with the Sunken Bastion rework's five new relics; 475 with the Drowned
+    // Temple rework's four.
+    expect(character).toEqual({ owned: 475, total: 475 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -573,7 +576,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +5: the Sunken Bastion rework's new relics on its two pages: 687.
-    ).toBe(687);
+      // +4: the Drowned Temple rework's new relics on its two pages: 691.
+    ).toBe(691);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -809,7 +813,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
     // +5: the Sunken Bastion rework's new relics: 526.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(526);
+    // +4: the Drowned Temple rework's new relics: 530.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(530);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1076,6 +1081,9 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     knight_commander_olen: 'conquerors_sunken_bastion_heroic',
     gaoler_ossick: 'conquerors_sunken_bastion_heroic',
     vael_the_mistcaller: 'conquerors_sunken_bastion_heroic',
+    // The Drowned Temple rework: three bosses, one shared heroic page.
+    choirmother_selthe: 'conquerors_drowned_temple_heroic',
+    tideglass_colossus: 'conquerors_drowned_temple_heroic',
     ysolei: 'conquerors_drowned_temple_heroic',
     korzul_the_gravewyrm: 'conquerors_gravewyrm_sanctum_heroic',
     wildheart_high_priest: 'conquerors_wildheart_basin_heroic',
@@ -2104,6 +2112,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const page = RELIQUARY_PAGES_BY_ID.conquerors_drowned_temple;
     expect(page.desc).toBeDefined();
     expect(page.desc).toContain(MOBS.choirmother_selthe.name);
+    expect(page.desc).toContain(MOBS.tideglass_colossus.name);
     expect(page.desc).toContain(MOBS.ysolei.name);
   });
 
@@ -2119,6 +2128,9 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       // him among them), so a desc naming him names them too.
       conquerors_sunken_bastion: ['gaoler_ossick', 'vael_the_mistcaller', 'vael_fog_shade'],
       conquerors_sunken_bastion_heroic: ['gaoler_ossick', 'vael_the_mistcaller', 'vael_fog_shade'],
+      // The Drowned Temple heroic page names its first two bosses in full and
+      // Ysolei by her short form.
+      conquerors_drowned_temple_heroic: ['choirmother_selthe', 'tideglass_colossus'],
       conquerors_gravewyrm_sanctum: ['korzul_the_gravewyrm'],
       conquerors_gravewyrm_sanctum_heroic: ['korzul_the_gravewyrm'],
       conquerors_wildheart_basin_heroic: ['wildheart_high_priest'],
@@ -2149,7 +2161,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       if (named.length > 0) derivedPairs[page.id] = named;
     }
     const expected: Record<string, string[]> = {
-      conquerors_drowned_temple: ['choirmother_selthe', 'ysolei'],
+      conquerors_drowned_temple: ['choirmother_selthe', 'tideglass_colossus', 'ysolei'],
       ...Object.fromEntries(
         Object.entries(DESC_BOSSES).map(([pageId, mobIds]) => [pageId, [...mobIds].sort()]),
       ),
@@ -3176,8 +3188,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_hollow_crypt_heroic: 4,
   conquerors_sunken_bastion: 3,
   conquerors_sunken_bastion_heroic: 3,
-  conquerors_drowned_temple: 2,
-  conquerors_drowned_temple_heroic: 1,
+  conquerors_drowned_temple: 3,
+  conquerors_drowned_temple_heroic: 3,
   // NINE since Masterwrought phase 11l: the trophy recipe route added
   // fromProfession('leatherworking') beside the quiver's korzul hint.
   conquerors_gravewyrm_sanctum: 9,
@@ -4772,8 +4784,9 @@ describe('Reliquary source hint coverage', () => {
     // deliberately with the authoring.
     // The Hollow Crypt heroic page dropped its default with the rework's four
     // bosses: 14. The Sunken Bastion heroic page dropped its default the same
-    // way with the rework's three bosses: 13.
-    expect(defaults).toBe(13);
+    // way with the rework's three bosses: 13. The Drowned Temple heroic page
+    // did the same with its three: 12.
+    expect(defaults).toBe(12);
   });
 });
 

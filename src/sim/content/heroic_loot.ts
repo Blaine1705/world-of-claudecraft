@@ -710,6 +710,8 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'heroic_sextons_spadehaft',
   'heroic_knight_commanders_longsword',
   'heroic_gaolyard_cudgel',
+  'heroic_chorus_conch',
+  'heroic_tideglass_shiv',
   'heroic_boundstone_girdle',
   'heroic_boundstone_helm',
   'heroic_deathlord_legguards',
@@ -825,10 +827,25 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['heroic_gaolyard_cudgel', 0.2],
     ]).map(preserveBaseLootSource),
   ],
+  // The Drowned Temple rework (drowned_temple.md 8.2): one equipment item per
+  // boss kill; three shipped epics moved off Ysolei onto Selthe and the new
+  // Tideglass Colossus.
   choirmother_selthe: [
-    ...weightedLootGroup('choirmother_selthe_heroic', [['heroic_selthes_seastriders', 0.4]]).map(
-      preserveBaseLootSource,
-    ),
+    ...weightedLootGroup('choirmother_selthe_heroic', [
+      ['pale_chorus_vestment', 0.3],
+      ['choirmothers_casque', 0.25],
+      ['heroic_selthes_seastriders', 0.2],
+      ['heroic_chorus_conch', 0.25],
+    ]).map(preserveBaseLootSource),
+  ],
+  tideglass_colossus: [
+    ...weightedLootGroup('tideglass_colossus_heroic', [
+      ['tideglass_warmaul', 0.3],
+      ['lunar_choir_leggings', 0.2],
+      ['tidewoven_trousers', 0.2],
+      ['tideworn_warboots', 0.15],
+      ['heroic_tideglass_shiv', 0.15],
+    ]).map(preserveBaseLootSource),
   ],
   korgath_the_bound: [
     ...weightedLootGroup('korgath_the_bound_heroic', [
@@ -910,12 +927,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['heroic_moonshroud_robe', 0.33],
       ['heroic_moonshroud_tunic', 0.33],
       ['lunar_tide_greatstaff', 0.25],
-      ['tidewoven_trousers', 0.25],
-      ['choirmothers_casque', 0.25],
       ['stormbark_mantle', 0.25],
-      ['lunar_choir_leggings', 0.34],
       ['choir_blessed_spaulders', 0.33],
-      ['tideworn_warboots', 0.33],
       ['menders_hourglass', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
