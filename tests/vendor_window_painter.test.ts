@@ -454,7 +454,9 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     );
     const junkTip = built.find((html) => html.includes('Sells every gray item'));
     expect(junkTip).toBeDefined();
-    expect(junkTip).toContain('Gray items skip the buyback list, so this sale cannot be undone.');
+    expect(junkTip).toContain(
+      'Unsigned gray items skip the buyback list, so selling them cannot be undone.',
+    );
   });
 
   it('keeps click-to-buy on an unlocked row TOOLTIP', () => {

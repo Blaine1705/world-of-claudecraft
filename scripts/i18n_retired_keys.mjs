@@ -208,11 +208,9 @@ export const RETIRED_KEYS = [
   // the same change; this key keeps its reviewed overlay rows.
   'guide.arenaPage.honorFinalNote',
   // Plain gray junk stopped recording vendor buyback rows (items.ts
-  // skipsVendorBuyback). The settings note promised every mis-sold item could be
-  // bought back and the Clearing out junk page did not say the sweep was final;
-  // successors confirmVendorSellMinQualityNoteGray and junkBodyFinal say so, and
-  // their five non-Latin fills rode the same change.
-  'hudChrome.options.confirmVendorSellMinQualityNote',
+  // skipsVendorBuyback), and this page did not say the Sell Junk sweep was
+  // final. The successor junkBodyFinal says so, and its five non-Latin fills
+  // rode the same change; this key keeps its reviewed overlay rows.
   'guide.economy.junkBody',
   // Phase 20 (2026-09-03, the wiki completeness audit): the arena rewards prose
   // said a loss 'costs you nothing but rating' and that Honor's day 'rolls over

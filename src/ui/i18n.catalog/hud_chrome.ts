@@ -2663,8 +2663,8 @@ export const hudChromeStrings = {
     confirmVendorSellMinQuality: 'Confirm Sales From Quality',
     confirmVendorSellMinQualityNote:
       'Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.',
-    // Successor of confirmVendorSellMinQualityNote (retired in
-    // scripts/i18n_retired_keys.mjs): plain gray junk no longer records a
+    // Successor of confirmVendorSellMinQualityNote, which now has no consumer
+    // and keeps its reviewed overlay rows: plain gray junk no longer records a
     // buyback row (items.ts skipsVendorBuyback), so the old promise was false
     // for exactly the items this threshold always sells instantly.
     confirmVendorSellMinQualityNoteGray:
