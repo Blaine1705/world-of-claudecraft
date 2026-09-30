@@ -24,7 +24,7 @@ import {
   TSUNAMI_TEMPLATES,
   VENOM_POOL_TEMPLATE,
 } from '../src/sim/encounters/drowned_temple';
-import type { Entity } from '../src/sim/types';
+import type { Entity, HydraFightState } from '../src/sim/types';
 import {
   aura,
   boss,
@@ -49,6 +49,23 @@ function hydraFight(difficulty: 'normal' | 'heroic' = 'normal'): { f: Fight; hea
   put(f, f.others[1], POOL.x + 12, POOL.z - 12);
   for (const h of heads) engage(f, h);
   return { f, heads };
+}
+
+/** The heads' shared fight state (the pull must have ticked once). */
+function state(heads: Entity[]): HydraFightState {
+  const st = heads.find((h) => h.templeFight?.kind === 'hydra')?.templeFight;
+  if (st?.kind !== 'hydra') throw new Error('no hydra fight');
+  return st;
+}
+
+/** Skip the fight's clocks ahead (the next Tsunami this tick, a fallen head's
+ *  regrowth `left` seconds away) instead of simulating the wait. */
+function nextTsunami(heads: Entity[]): void {
+  state(heads).tsunamiTimer = 0.05;
+}
+function regrowIn(heads: Entity[], i: number, left: number): void {
+  const st = state(heads);
+  st.diedAt[i] = (st.diedAt[i] ?? 0) - (T.regrowAfter - left);
 }
 
 /** Everyone back at their marks each tick (a shove would scatter the party). */
@@ -185,9 +202,11 @@ describe('the Mere Hydra: the Tsunami', () => {
       put(f, a, east.x - 3, east.z); // in a column's lee
       put(f, b, POOL.x - 14, POOL.z - 10); // the dry west half
     };
-    expect(
-      until(f, () => heads[1].castingAbility === HYDRA_TSUNAMI, T.tsunamiFirst + 3, spots),
-    ).toBe(true);
+    run(f, 0.2, spots);
+    // Its first wave waits for its beat; skip the wait.
+    expect(state(heads).tsunamiTimer).toBeGreaterThan(T.tsunamiFirst - 1);
+    nextTsunami(heads);
+    expect(until(f, () => heads[1].castingAbility === HYDRA_TSUNAMI, 3, spots)).toBe(true);
     for (const h of heads) expect(aura(h, HYDRA_SUBMERGED)?.value).toBeCloseTo(0.75, 5);
     const wave = objects(f, TSUNAMI_TEMPLATES.warn)[0];
     expect(wave).toBeDefined();
@@ -202,21 +221,22 @@ describe('the Mere Hydra: the Tsunami', () => {
     for (const h of heads) expect(aura(h, HYDRA_SUBMERGED)).toBeUndefined();
   });
 
-  it('the next wave rises on the west', () => {
+  it('the next wave rises on the west, a full beat later', () => {
     const { f, heads } = hydraFight();
-    run(f, T.tsunamiFirst + T.tsunamiCast + 1, hold(f));
-    expect(
-      until(f, () => objects(f, TSUNAMI_TEMPLATES.warn).length > 0, T.tsunamiEvery + 2, hold(f)),
-    ).toBe(true);
+    run(f, 0.2, hold(f));
+    nextTsunami(heads);
+    run(f, T.tsunamiCast + 0.5, hold(f));
+    expect(state(heads).tsunamiTimer).toBeGreaterThan(T.tsunamiEvery - T.tsunamiCast - 1);
+    nextTsunami(heads);
+    expect(until(f, () => objects(f, TSUNAMI_TEMPLATES.warn).length > 0, 3, hold(f))).toBe(true);
     expect(local(f, objects(f, TSUNAMI_TEMPLATES.warn)[0]).x).toBeLessThan(POOL.x);
-    void heads;
   });
 
   it('heroic backwash: the wave rolls back over the other half', () => {
     const { f, heads } = hydraFight('heroic');
-    expect(
-      until(f, () => heads[1].castingAbility === HYDRA_TSUNAMI, T.tsunamiFirst + 3, hold(f)),
-    ).toBe(true);
+    run(f, 0.2, hold(f));
+    nextTsunami(heads);
+    expect(until(f, () => heads[1].castingAbility === HYDRA_TSUNAMI, 3, hold(f))).toBe(true);
     run(f, T.tsunamiCast + 0.1, hold(f));
     const back = objects(f, TSUNAMI_TEMPLATES.warn);
     expect(back).toHaveLength(1);
@@ -233,9 +253,12 @@ describe('the Mere Hydra: a fallen head grows back', () => {
     const { f, heads } = hydraFight();
     run(f, 0.2, hold(f));
     f.sim.ctx.handleDeath(heads[2], f.tank);
-    run(f, T.regrowAfter - 0.5, hold(f));
+    run(f, 0.2, hold(f));
+    // Fast-forward to a second before the regrowth.
+    regrowIn(heads, 2, 1);
+    run(f, 0.5, hold(f));
     expect(heads[2].dead).toBe(true);
-    run(f, 1, hold(f));
+    run(f, 0.7, hold(f));
     expect(heads[2].dead).toBe(false);
     expect(heads[2].hp).toBe(Math.round(heads[2].maxHp * T.regrowShare));
     expect(heads[2].inCombat).toBe(true);
@@ -248,7 +271,9 @@ describe('the Mere Hydra: a fallen head grows back', () => {
     run(f, 0.2, hold(f));
     f.sim.ctx.handleDeath(heads[2], f.tank);
     expect(heads[2].lootable || heads[2].loot !== null).toBe(true);
-    run(f, T.regrowAfter + 0.2, hold(f));
+    run(f, 0.2, hold(f));
+    regrowIn(heads, 2, 0);
+    run(f, 0.2, hold(f));
     expect(heads[2].dead).toBe(false);
     const xp = f.sim.players.get(f.tank.id)?.xp;
     f.sim.ctx.handleDeath(heads[2], f.tank);
@@ -259,11 +284,15 @@ describe('the Mere Hydra: a fallen head grows back', () => {
   it('three heads down inside the window end it: nothing grows back', () => {
     const { f, heads } = hydraFight();
     run(f, 0.2, hold(f));
+    const st = state(heads);
     for (const h of heads) {
       f.sim.ctx.handleDeath(h, f.tank);
-      run(f, 6, hold(f));
+      run(f, 1, hold(f));
     }
-    run(f, T.regrowAfter + 2, hold(f));
+    // The fight is over: no clock is left to grow a head back, however long.
+    expect(heads.every((h) => h.templeFight === undefined)).toBe(true);
+    for (let i = 0; i < 3; i++) st.diedAt[i] = -1000;
+    run(f, 2, hold(f));
     expect(heads.every((h) => h.dead)).toBe(true);
   });
 
