@@ -9,6 +9,12 @@
 // plays Death. The breath itself is a torrent of frost from the mouth socket
 // down its locked cone, the spit arcs of brine to each pool.
 //
+// The sixth pass (temple_hydra_fx.ts): each neck is tinted by its element
+// (ice, venom, water) and its element burns at the mouth of whoever wields it;
+// the Crushing Torrent pours a jet of lagoon water down its lane; the whole
+// body sinks under the pool for the Tsunami while the wave rolls; a fallen
+// head's stump stirs as its regrowth nears and the neck grows back in a burst.
+//
 // Cosmetic only; state comes from entity fields (cast bars, the dead flag,
 // damage events), so offline and online look the same.
 
@@ -19,15 +25,20 @@ import {
   BRINE_SPIT_TEMPLATE,
   HYDRA_BRINE_SPIT,
   HYDRA_CENTER_ID,
+  HYDRA_CRUSHING_TORRENT,
   HYDRA_LEFT_ID,
   HYDRA_RIGHT_ID,
   HYDRA_TIDE_BREATH,
+  HYDRA_TSUNAMI,
   HYDRA_TUNING,
+  hydraElementOwners,
+  TSUNAMI_TEMPLATES,
 } from '../../sim/encounters/drowned_temple/ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { loadGltf } from '../assets/loader';
 import { registerDeferredPreload } from '../assets/preload';
+import { TempleHydraFx, tintHydraNecks } from './temple_hydra_fx';
 
 export const MERE_HYDRA_URL = '/models/creatures/mere_hydra.glb';
 
@@ -60,6 +71,7 @@ uniform float uLife;
 uniform vec3 uFrom;
 uniform vec3 uTo;
 uniform float uSpread;
+uniform float uWidth;
 varying float vFade;
 varying vec2 vUv;
 void main() {
@@ -72,19 +84,21 @@ void main() {
   vec3 c = uFrom + dir * t + side * lane * uSpread * t + up * sin(aSeed.y * 30.0) * uSpread * 0.25 * t;
   vFade = uLife * smoothstep(0.0, 0.08, t) * (1.0 - smoothstep(0.75, 1.0, t));
   vec4 mv = viewMatrix * vec4(c, 1.0);
-  mv.xy += position.xy * (0.6 + t * 3.2) * aSeed.w;
+  mv.xy += position.xy * (0.6 + t * 3.2) * aSeed.w * uWidth;
   gl_Position = projectionMatrix * mv;
 }
 `;
 
 const BREATH_FRAG = /* glsl */ `
 precision highp float;
+uniform vec3 uColA;
+uniform vec3 uColB;
 varying float vFade;
 varying vec2 vUv;
 void main() {
   float d = length(vUv - 0.5) * 2.0;
   float core = smoothstep(1.0, 0.0, d);
-  vec3 col = mix(vec3(0.45, 0.75, 1.0), vec3(0.95, 0.98, 1.0), core * core);
+  vec3 col = mix(uColA, uColB, core * core);
   gl_FragColor = vec4(col * core * vFade, core * vFade);
 }
 `;
@@ -95,10 +109,36 @@ interface Breath {
     uLife: { value: number };
     uFrom: { value: THREE.Vector3 };
     uTo: { value: THREE.Vector3 };
+    uSpread: { value: number };
+    uWidth: { value: number };
+    uColA: { value: THREE.Color };
+    uColB: { value: THREE.Color };
   };
   life: number;
   headId: number;
+  castId: string;
 }
+
+/** Each pouring cast's look: the Freezing Breath's frost cone, the Crushing
+ *  Torrent's narrow jet of lagoon water. */
+const POURS: Readonly<
+  Record<string, { range: number; spread: number; width: number; a: number; b: number }>
+> = {
+  [HYDRA_TIDE_BREATH]: {
+    range: HYDRA_TUNING.breathRange,
+    spread: 5,
+    width: 1,
+    a: 0x73bfff,
+    b: 0xf2faff,
+  },
+  [HYDRA_CRUSHING_TORRENT]: {
+    range: HYDRA_TUNING.torrentLength,
+    spread: 1.4,
+    width: 1.35,
+    a: 0x1f6f9c,
+    b: 0xd8f2ff,
+  },
+};
 
 interface Spit {
   mesh: THREE.Mesh;
@@ -124,7 +164,7 @@ export class TempleHydra {
   private readonly tmp = new THREE.Vector3();
   private readonly spitGeo = new THREE.SphereGeometry(0.45, 10, 8);
   private readonly spitMat = new THREE.MeshBasicMaterial({
-    color: 0xa8f4ff,
+    color: 0x9cf06a,
     transparent: true,
     opacity: 0.85,
     name: 'drownedTempleBrineSpit',
@@ -136,8 +176,16 @@ export class TempleHydra {
     private readonly detail: boolean,
   ) {
     void startLoad();
-    for (let i = 0; i < 2; i++) this.breaths.push(this.makeBreath());
+    for (let i = 0; i < 3; i++) this.breaths.push(this.makeBreath());
+    this.fx = new TempleHydraFx(root, detail);
   }
+
+  private readonly fx: TempleHydraFx;
+  private waveId: number | null = null;
+  private sink = 0;
+  private readonly deadSince = [-1, -1, -1];
+  private clock = 0;
+  private readonly socketPos = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
 
   private makeBreath(): Breath {
     const n = this.detail ? 140 : 50;
@@ -160,6 +208,9 @@ export class TempleHydra {
       uFrom: { value: new THREE.Vector3() },
       uTo: { value: new THREE.Vector3() },
       uSpread: { value: 5 },
+      uWidth: { value: 1 },
+      uColA: { value: new THREE.Color(0x73bfff) },
+      uColB: { value: new THREE.Color(0xf2faff) },
     };
     const mesh = new THREE.Mesh(
       geo,
@@ -177,7 +228,7 @@ export class TempleHydra {
     mesh.visible = false;
     mesh.renderOrder = 11;
     this.root.add(mesh);
-    return { mesh, uniforms, life: 0, headId: -1 };
+    return { mesh, uniforms, life: 0, headId: -1, castId: '' };
   }
 
   /** The world entity of head `i` (L, C, R), or null. */
@@ -191,7 +242,12 @@ export class TempleHydra {
     if (!world) return;
     const me = world.entities.get(world.playerId);
     this.heads = [null, null, null];
+    this.waveId = null;
     for (const e of world.entities.values()) {
+      if (e.templateId === TSUNAMI_TEMPLATES.warn || e.templateId === TSUNAMI_TEMPLATES.surge) {
+        this.waveId = e.id;
+        continue;
+      }
       if (e.kind !== 'mob') continue;
       const i = HEADS.indexOf(e.templateId as (typeof HEADS)[number]);
       if (i < 0) continue;
@@ -211,6 +267,7 @@ export class TempleHydra {
     if (!source || this.body) return;
     const body = cloneSkinned(source);
     body.name = 'drownedTempleMereHydra';
+    tintHydraNecks(body);
     body.scale.setScalar(HYDRA_BODY.scale);
     body.rotation.y = Math.PI;
     body.traverse((o) => {
@@ -317,9 +374,9 @@ export class TempleHydra {
     this.engaged = anyEngaged;
     if (!dead) {
       for (let i = 0; i < 3; i++) {
-        const h = this.head(i);
+        const cast = this.head(i)?.castingAbility;
         if (
-          h?.castingAbility === HYDRA_TIDE_BREATH &&
+          (cast === HYDRA_TIDE_BREATH || cast === HYDRA_CRUSHING_TORRENT) &&
           this.current?.getClip().name !== 'Tide_Breath'
         )
           this.play('Tide_Breath');
@@ -328,39 +385,103 @@ export class TempleHydra {
       if (clip && !clip.isRunning() && clip.getClip().name !== 'Idle') this.play('Idle', true);
     }
     this.mixer?.update(dt);
-    // A fallen head's neck folds down into the pool (after the mixer pose).
+    // The Tsunami: the whole body sinks under the pool while the wave rolls.
+    const submerged = this.heads.some((_, i) => this.head(i)?.castingAbility === HYDRA_TSUNAMI);
+    this.sink = submerged ? Math.min(1, this.sink + dt / 1.1) : Math.max(0, this.sink - dt / 1.6);
+    this.place(center);
+    if (this.body) this.body.position.y -= this.sink * this.sink * 9;
+    // A fallen head's neck folds down into the pool (after the mixer pose);
+    // its stump stirs as the regrowth nears, and a regrown neck grows back.
+    this.clock = clock;
     for (let i = 0; i < 3; i++) {
       const h = this.head(i);
       const neck = this.necks[i];
       if (!neck || dead) continue;
-      if (h?.dead) this.fallen[i] = Math.min(1, this.fallen[i] + dt / 1.6);
-      else this.fallen[i] = 0;
+      if (h?.dead) {
+        if (this.deadSince[i] < 0) this.deadSince[i] = clock;
+        this.fallen[i] = Math.min(1, this.fallen[i] + dt / 1.6);
+      } else {
+        if (this.deadSince[i] >= 0 && this.fallen[i] > 0.5) {
+          const socket = this.sockets[i];
+          if (socket) this.fx.burstAt(socket.getWorldPosition(this.tmp), clock);
+        }
+        this.deadSince[i] = -1;
+        this.fallen[i] = Math.max(0, this.fallen[i] - dt / 1.4);
+      }
       if (this.fallen[i] > 0) {
         const k = this.fallen[i];
-        neck.scale.setScalar(Math.max(0.001, 1 - k * k));
-        neck.rotation.x += k * 0.8;
+        // The last seconds before a regrowth: the stump swells and writhes.
+        const since = this.deadSince[i] >= 0 ? clock - this.deadSince[i] : 0;
+        const stir =
+          h?.dead && since > HYDRA_TUNING.regrowAfter * 0.55
+            ? Math.min(
+                1,
+                (since - HYDRA_TUNING.regrowAfter * 0.55) / (HYDRA_TUNING.regrowAfter * 0.45),
+              )
+            : 0;
+        neck.scale.setScalar(Math.max(0.001, 1 - k * k + stir * 0.3));
+        neck.rotation.x += k * 0.8 - stir * 0.5;
+        neck.rotation.z += stir * Math.sin(clock * 9 + i) * 0.25;
       }
     }
     this.updateBreaths(dt, clock);
     this.updateSpits(dt);
+    this.updateElements(dt, clock);
+  }
+
+  /** The element glows at each wielder's mouth, and the Tsunami's wave. */
+  private updateElements(dt: number, clock: number): void {
+    const deadFlags = [0, 1, 2].map((i) => this.head(i)?.dead ?? true);
+    const sockets = [0, 1, 2].map((i) => {
+      const socket = this.sockets[i];
+      if (!socket || deadFlags[i] || this.sink > 0.4) return null;
+      return socket.getWorldPosition(this.socketPos[i]);
+    });
+    const waveEntity = this.waveId !== null ? this.world?.entities.get(this.waveId) : undefined;
+    const wave =
+      waveEntity &&
+      (waveEntity.templateId === TSUNAMI_TEMPLATES.warn ||
+        waveEntity.templateId === TSUNAMI_TEMPLATES.surge)
+        ? {
+            x: waveEntity.pos.x,
+            y: waveEntity.pos.y,
+            z: waveEntity.pos.z,
+            facing: waveEntity.facing,
+            rolling: waveEntity.templateId === TSUNAMI_TEMPLATES.surge,
+          }
+        : null;
+    this.fx.update(dt, clock, {
+      sockets,
+      wielders: hydraElementOwners(deadFlags),
+      wave,
+    });
   }
 
   private updateBreaths(dt: number, clock: number): void {
     for (let i = 0; i < 3; i++) {
       const h = this.head(i);
       if (!h || h.dead) continue;
-      // The torrent pours in the bar's last half second and a beat past it.
-      const casting = h.castingAbility === HYDRA_TIDE_BREATH;
-      const firing = casting && h.castRemaining < 0.5;
+      // Each pour runs in the bar's last half second and a beat past it.
+      const cast = h.castingAbility;
+      const pour = cast ? POURS[cast] : undefined;
+      const firing = pour !== undefined && h.castRemaining < 0.5;
       let slot = this.breaths.find((b) => b.headId === h.id);
-      if (firing && !slot) {
-        slot = this.breaths.find((b) => b.life <= 0);
-        if (slot) slot.headId = h.id;
+      if (firing && cast && (!slot || slot.castId !== cast)) {
+        slot = slot ?? this.breaths.find((b) => b.life <= 0);
+        if (slot) {
+          slot.headId = h.id;
+          slot.castId = cast;
+          const look = POURS[cast];
+          slot.uniforms.uSpread.value = look.spread;
+          slot.uniforms.uWidth.value = look.width;
+          slot.uniforms.uColA.value.setHex(look.a);
+          slot.uniforms.uColB.value.setHex(look.b);
+        }
       }
       if (!slot) continue;
       const socket = this.sockets[i];
       if (socket) socket.getWorldPosition(slot.uniforms.uFrom.value);
-      const range = HYDRA_TUNING.breathRange;
+      const range = POURS[slot.castId]?.range ?? HYDRA_TUNING.breathRange;
       slot.uniforms.uTo.value.set(
         h.pos.x + Math.sin(h.facing) * range,
         h.pos.y + 0.5,
@@ -393,6 +514,7 @@ export class TempleHydra {
   }
 
   dispose(): void {
+    this.fx.dispose();
     this.body?.removeFromParent();
     for (const b of this.breaths) {
       b.mesh.removeFromParent();
