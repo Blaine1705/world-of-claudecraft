@@ -75,17 +75,25 @@ parentheses; about 230 by 390 yd.
    ramp up to the BELL YARD (8)                         ravine, e1 e3; RIM WALK (0) e2
    [Bone Barrier: w1 to w4; seals during Marrow]        [Frost-Web Curtain: e1 to e3;
    Boss 1: Marrow under the fallen bell tower            seals during Rimeweb]
-   [Bridge of Bone: assembles on Marrow's death]        GREAT WEB (-6) Boss 2: Rimeweb
-   back to the choir                                    [Webbed Causeway: Rimeweb]
+   back down the ramp and the west causeway             GREAT WEB (-6) Boss 2: Rimeweb
+                                                        [Webbed Causeway: Rimeweb]
           |          [Undercroft Grille: c1 + c2 + c3 + c4]
  z -80  CLOISTER (0), ossuary monument, c1, c2 patrol loop, c3 east arcade, c4 grille
  z -116 THE CHAPEL STAIR down from the entry landing (20): the first vista
 ```
 
 The order is: Cloister, then BOTH wings in either order (west: Yard, Bell Yard
-and Marrow, back over the Bridge of Bone; east: Gallery, Rim Walk, Great Web and
-Rimeweb, back over the Webbed Causeway), the Processional, the Choir and Ilvane,
-the Bone Stair, the Rite Ring and Morthen.
+and Marrow, back down the yard ramp and over the west causeway; east: Gallery,
+Rim Walk, Great Web and Rimeweb, back over the Webbed Causeway), the Processional,
+the Choir and Ilvane, the Bone Stair, the Rite Ring and Morthen.
+
+**One stair, one meaning (third pass, 2026-09-30).** The first build had a Bridge
+of Bone that assembled out of the mist on Marrow's death, a white bone stair from
+the Processional up to the Bell Yard. A playtest read it as the way on, but it only
+led back into an arena already cleared, so it is gone: no gate reveals a hidden
+walkway, and the only stair the crypt builds for the route is the Bone Stair, the
+real, continuous way from the Stair Landing (5) up to the Rite Ring (24), closed
+until its guard (s1) dies (`tests/hollow_crypt_stair_route.test.ts`).
 
 **Landmarks and sight lines.** From the entry landing the whole necropolis lies
 below: the cloister, the processional, the leaning bell tower against the moon
@@ -98,8 +106,7 @@ claim roster (`src/sim/instances/dungeon_gates.ts`): a gate is closed until its
 packs and bosses are dead, sealed while its `sealWhileEngaged` boss is alive and
 engaged, open otherwise. A wipe clears the seal and never re-closes a cleared
 gate, so a corpse run always has a path. `bossChainPull` stays on. Kinds:
-portcullis, bone barrier, bone bridge (the path itself assembles), frost-web
-curtain, warded arch, rite ward.
+portcullis, bone barrier, frost-web curtain, warded arch, rite ward.
 
 ## 4. Trash (owner direction, 2026-09-29)
 
@@ -118,10 +125,10 @@ templates: `src/sim/content/hollow_crypt_trash.ts`; floor telegraphs:
 | Gravecaller Necromancer (9, elite) | KayKit necromancer | Raise Bones: 3 s interruptible channel raising a Bone Minion (two alive at most), every 15 s | Kick it, or kill the minion fast |
 | Bone Minion (8) | KayKit minion | Left alive 8 s it grows into an elite Bone Brute; on death a Bone Burst: 1.8 s ring fuse, 12 to 18 within 3.5 yd | Burn it, then step out of its ring |
 | Bone Brute (9, elite) | KayKit skeleton golem | A heavy hitter | Do not let minions grow |
-| Chapel Gargoyle (9, elite) | New stone gargoyle | Waits as a statue on a whole arcade arch, dives in when its pack is pulled; Stone Shriek: 2 s interruptible bar, 2.5 s stun within 10 yd, every 16 s | Kick it or step out of the ring |
+| Chapel Gargoyle (9, elite) | A great, heavy stone gargoyle (about 4.5 yd crouched, twice a player): ram and swept horns, ember eyes, cracked weathered stone, ribbed stone wings | Waits as a statue on a whole arcade arch, cracks free and dives in when its pack is pulled (a shockwave where it lands); rakes with its talons; Stone Shriek: 2 s interruptible bar, 2.5 s stun within 10 yd, every 16 s (violet sonic rings, a shockwave on the stun) | Kick it or step out of the ring |
 | Crow Caller (8, elite) | Hooded Gravecaller | Casts from range; Murder Call: 3 s interruptible bar summoning 4 Carrion Crows (a whole flock must fit under 6 alive), every 18 s | Kick it |
 | Carrion Crow (7) | New crow | Weak fast fliers in flocks | Area damage |
-| Ossuary Drake (10, elite) | New skeletal drake | Flies the Processional at 22 yd and lands when pulled; Bonechill Breath (2 s bar, 70 degree 14 yd cone, 26 to 34 frost), Tail Lash (1 s bar, 120 degree 10 yd cone behind it), Wing Gust (1.5 s bar, 10 yd ring, 8 yd knockback) | Tank faces it away, nobody behind, spread from the gust |
+| Ossuary Drake (10, elite) | A colossal skeletal wyvern: head about 10 yd up, wings about 34 yd across, a soul fire caged in its ribs; it walks on its wing knuckles and fights with its jaws, never its claws | Flies the Processional at 22 yd (two downbeats and a long glide), cries and glides down when pulled; bites; Barrowflame Breath (2 s bar while it draws the fire up, then a torrent of spectral fire over a 70 degree 14 yd cone, 26 to 34 fire, the cone left scorched), Tail Lash (1 s bar, 120 degree 10 yd cone behind it), Wing Gust (1.5 s bar, 10 yd ring, 8 yd knockback) | Tank faces it away, nobody behind, spread from the gust |
 
 Heroic scales every landing through the dungeon's mechanic multiplier; the
 lighter casters, the cutthroat and the non-elite crows ride their own factor to
@@ -380,8 +387,8 @@ Open air at dusk turning to night. The render lives in `src/render/hollow_crypt/
     Remembrance Candles on pillars, altar, the soul column visible from afar.
 - **Signature moments.** First vista; bell tower against the moon; the light
   column seen from every terrace; layered ground mist and chasm mist; soul-wisp
-  rivers flowing toward the ring; gate reveals (a barrier crumbles, a bridge
-  assembles bone by bone, a web curtain parts, a ward fades) over
+  rivers flowing toward the ring; gate reveals (a barrier crumbles, a web
+  curtain parts, a ward fades) over
   `GATE_REVEAL_SECONDS`.
 - **Blender kit.** `docs/design/dungeon-rework/kit/build_hollow_crypt_kit.py`
   (shared helpers `hckit.py`) bakes about fifty `Kit_*` pieces into
@@ -502,7 +509,8 @@ epics in each partition, the trinket on Ilvane, Bastion Sigil on Morthen).
 | Hollow Chorister, Hollow Gravedigger, Ossuary Sentinel, Bound Soul, Unmade Sentinel, Cantor's Cassock, Chorister's Gloves, Remembrance Candle, Reap the Unquiet, Grasp of the Grave, Name the Dead, Silk Shroud, Silk Lines, Harmony, Encore, Crescendo, Unbroken Verse, Twin Shroud, Earthbound, Unquiet Earth, Gravecall, the deed names | generic English | Shared vocabulary, no coined token |
 | Sexton Marrow, Morthen, Grave Chill, Bonechill, Gravecaller, Restless Bones | shipped | Already in the game |
 | Ossuary Drake, Chapel Gargoyle, Ossuary Cutthroat, Gravecaller Adept | exact phrases, plus game wikis | Clear (Wynncraft's "Ossuary Dragonkin" is a different name) |
-| Bonechill Breath, Stone Shriek, Murder Call | exact phrases, plus Wowhead | Clear |
+| Barrowflame Breath (was Bonechill Breath; the owner asked for fire) | exact phrase and the coined token "Barrowflame", plus game wikis (searched 2026-09-30) | Clear: no game use found. "Cryptfire" REJECTED (a Sol's RNG aura name); "Ghostflame" avoided (Elden Ring) |
+| Stone Shriek, Murder Call | exact phrases, plus Wowhead | Clear |
 | Ossuary Warrior, Gravecaller Necromancer, Bone Minion, Bone Brute, Crow Caller, Carrion Crow, Grave Cleave, Grave Bolt, Raise Bones, Bone Burst, Rending Leap, Tail Lash, Wing Gust | generic English | Shared vocabulary, no coined token. "Wing Buffet" avoided (a signature dragon ability name elsewhere) |
 
 ## 11. Optional quest follow-ups (not required)
