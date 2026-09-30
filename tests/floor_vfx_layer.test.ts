@@ -143,6 +143,7 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Sunken Bastion's boss visuals (its trash and boss telegraphs lay their
   // cones, rings, lanes and glyphs through the shared kit below).
   { file: 'src/render/sunken_bastion/bastion_boss_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/sunken_bastion/bastion_creature_fx.ts', layer: 'encounter', strict: true },
   // The shared dungeon floor telegraph (the crypt's and the Bastion's cones,
   // rings, lanes and kick glyphs, and their edge curtains).
   { file: 'src/render/floor_telegraph/telegraph_kit.ts', layer: 'encounter', strict: true },

@@ -261,19 +261,131 @@ def halberd(p):
     p.kelp((-0.68, -1.95, 0.95), 0.4, (0.05, 0.05), 0.05, KELP)
 
 
+# The crossbow's own palette: light timber, bright steel and a pale string,
+# so the weapon reads against the dark coat from the game camera.
+XB_WOOD = (0.6, 0.42, 0.25)
+XB_WOOD_D = (0.4, 0.27, 0.16)
+STEEL = (0.66, 0.68, 0.7)
+STEEL_D = (0.42, 0.44, 0.47)
+STRING = (0.93, 0.88, 0.7)
+FLETCH = (0.9, 0.9, 0.84)
+
+# Where the crossbow sits in the rest pose (the right fist): its centre line
+# runs along -Y at XB_X, level at XB_Z. The prod spans XB_PROD either side.
+XB_X = -0.62
+XB_Z = 1.0
+XB_NUT = -0.16      # the catch that holds the drawn string (and the bolt's tail)
+XB_PROD_Y = -1.26   # the prod's belly, where it crosses the tiller
+XB_TIP_Y = -1.02    # the drawn limb tips, swept back toward the shooter
+XB_PROD = 0.86      # half span of the prod
+XB_BOLT_TIP = -1.66
+XB_BUTT = 0.42      # the butt plate behind the fist
+XB_DRUM = 0.22      # the windlass drum's axle
+
+
+def ring_at(p, center, radius, tube, color, axis='y', sides=5, n=16):
+    """A closed ring (a torus of tube `tube`) round `axis` at `center`."""
+    cx, cy, cz = center
+    pts = []
+    for i in range(n + 1):
+        a = i / n * math.tau
+        u, v = math.cos(a) * radius, math.sin(a) * radius
+        pts.append((cx + u, cy, cz + v) if axis == 'y' else (cx, cy + u, cz + v) if axis == 'x'
+                   else (cx + u, cy + v, cz))
+    p.tube(pts, [tube] * len(pts), color, sides=sides, cap=False)
+
+
 def crossbow(p):
+    """A heavy arbalest: a long timber stock with a dropped butt, a wide
+    recurved steel prod, a pale string drawn back to the nut, a loaded bolt
+    with a sea-light head, a stirrup at the nose and a windlass crank.
+
+    Its moving parts ride their own bones under the right fist: Bolt (hidden
+    as the bolt leaves), StringD (the drawn string) and StringR (the string
+    snapped forward after the loose), and Crank (the windlass handle)."""
+    x, z = XB_X, XB_Z
     p.on('Hand.R')
-    # Stock along the forward axis from the fist, a bow across the front.
-    p.tube([(-0.68, 0.1, 1.0), (-0.68, -0.85, 1.02)], [0.07, 0.06], WOOD, sides=6)
-    p.tube(p.bezier((-1.2, -0.72, 1.02), (-0.68, -0.95, 1.05), (-0.16, -0.72, 1.02), 8), [0.04, 0.04], RUST_D,
-           sides=5)
-    p.tube([(-1.2, -0.72, 1.03), (-0.68, -0.4, 1.06), (-0.16, -0.72, 1.03)], [0.012, 0.012, 0.012], RAG, sides=4)
-    p.tube([(-0.68, -0.45, 1.08), (-0.68, -1.0, 1.08)], [0.02, 0.015], IRON, sides=4)
-    p.on('Chest')
-    # The quiver across the back, bolts poking out.
-    p.tube([(0.2, 0.36, 1.6), (-0.15, 0.4, 2.2)], [0.13, 0.12], LEATHER, sides=8)
+    # The stock: a dropped butt behind the fist, the grip in it, the long
+    # tiller forward to the prod. Taller than wide.
+    p.tube([(x, XB_BUTT, z - 0.18), (x, 0.24, z - 0.1), (x, 0.06, z - 0.02), (x, -0.05, z)],
+           [0.1, 0.09, 0.075, 0.07], XB_WOOD, sides=8, squash=1.6)
+    p.blob((x, XB_BUTT + 0.02, z - 0.18), (0.1, 0.05, 0.16), XB_WOOD_D)
+    p.tube([(x, -0.05, z), (x, -0.7, z + 0.02), (x, XB_PROD_Y - 0.12, z + 0.03)], [0.07, 0.065, 0.06],
+           XB_WOOD, sides=8, squash=1.35)
+    # The groove the bolt rides in, iron bands round the tiller, and the nut.
+    p.tube([(x, XB_NUT, z + 0.085), (x, XB_PROD_Y, z + 0.09)], [0.02, 0.02], XB_WOOD_D, sides=4, squash=0.4)
+    for y in (-0.42, -0.82, XB_PROD_Y + 0.12):
+        p.tube([(x, y + 0.035, z + 0.015), (x, y - 0.035, z + 0.015)], [0.078, 0.078], STEEL_D, sides=8,
+               squash=1.35)
+    p.blob((x, XB_NUT, z + 0.1), (0.055, 0.05, 0.045), STEEL_D)
+    p.blob((x, XB_NUT + 0.02, z + 0.13), (0.02, 0.02, 0.02), BRASS)
+    # The long trigger lever under the stock, swept back along the grip.
+    p.tube([(x, XB_NUT, z - 0.06), (x, XB_NUT + 0.14, z - 0.2), (x, XB_NUT + 0.42, z - 0.24)],
+           [0.022, 0.02, 0.016], STEEL_D, sides=5)
+    # The prod: steel limbs swept back to the drawn tips, recurved at the ears.
+    for s in (1, -1):
+        pts = p.bezier((x, XB_PROD_Y, z + 0.05), (x + s * XB_PROD * 0.55, XB_PROD_Y - 0.06, z + 0.05),
+                       (x + s * XB_PROD * 0.95, XB_TIP_Y + 0.02, z + 0.05), 9)
+        pts.append((x + s * XB_PROD, XB_TIP_Y - 0.05, z + 0.05))
+        radii = [0.065 - 0.032 * i / (len(pts) - 1) for i in range(len(pts))]
+        p.tube(pts, radii, STEEL, sides=8, squash=2.1)
+        # A brass nock cap at the tip (the limb stays clean bright steel so
+        # its curve reads from the game camera).
+        p.blob((x + s * XB_PROD, XB_TIP_Y - 0.05, z + 0.05), (0.05, 0.05, 0.075), BRASS)
+    # The binding lashing the prod to the tiller.
     for k in range(4):
-        p.tube([(-0.12 + k * 0.03, 0.4, 2.15), (-0.2 + k * 0.03, 0.42, 2.45)], [0.015, 0.015], WOOD, sides=4)
+        yy = XB_PROD_Y - 0.06 + k * 0.04
+        p.tube([(x - 0.09, yy, z + 0.05), (x + 0.09, yy, z + 0.05)], [0.075, 0.075], LEATHER, sides=6)
+    # The stirrup at the nose (the foot goes in it to span the prod).
+    p.tube(p.bezier((x - 0.12, XB_PROD_Y - 0.08, z + 0.02), (x, XB_PROD_Y - 0.5, z - 0.02),
+                    (x + 0.12, XB_PROD_Y - 0.08, z + 0.02), 8), [0.025, 0.025], STEEL_D, sides=5)
+    # The windlass drum at the butt (the crank rides its own bone).
+    # The crank sits on the left of the stock, where the off hand can turn it.
+    p.tube([(x - 0.11, XB_DRUM, z - 0.02), (x + 0.11, XB_DRUM, z - 0.02)], [0.06, 0.06], STEEL_D, sides=8)
+    p.on('Crank')
+    p.tube([(x + 0.13, XB_DRUM, z - 0.02), (x + 0.2, XB_DRUM, z - 0.02)], [0.02, 0.02], STEEL_D, sides=5)
+    p.tube([(x + 0.2, XB_DRUM, z - 0.02), (x + 0.2, XB_DRUM, z - 0.22)], [0.02, 0.02], STEEL_D, sides=5)
+    p.tube([(x + 0.2, XB_DRUM, z - 0.22), (x + 0.3, XB_DRUM, z - 0.22)], [0.03, 0.03], XB_WOOD_D, sides=6)
+    # The drawn string: from each tip back to the nut.
+    p.on('StringD')
+    for s in (1, -1):
+        p.tube([(x + s * XB_PROD, XB_TIP_Y - 0.05, z + 0.05), (x, XB_NUT - 0.02, z + 0.1)], [0.028, 0.028],
+               STRING, sides=5)
+    # The string after the loose: snapped straight across the tips.
+    p.on('StringR')
+    p.tube([(x - XB_PROD, XB_TIP_Y - 0.05, z + 0.05), (x + XB_PROD, XB_TIP_Y - 0.05, z + 0.05)],
+           [0.028, 0.028], STRING, sides=5)
+    # The loaded bolt: a pale fletched shaft and a barbed head with sea light.
+    p.on('Bolt')
+    p.tube([(x, XB_NUT - 0.02, z + 0.11), (x, XB_BOLT_TIP + 0.16, z + 0.11)], [0.024, 0.022], XB_WOOD,
+           sides=6)
+    p.cone((x, XB_BOLT_TIP + 0.18, z + 0.11), (x, XB_BOLT_TIP, z + 0.11), 0.065, STEEL, sides=4)
+    p.blob((x, XB_BOLT_TIP + 0.1, z + 0.11), (0.03, 0.05, 0.03), SEA_LIGHT)
+    for a in (0.0, 2.1, 4.2):
+        dx, dz = math.cos(a) * 0.055, math.sin(a) * 0.055
+        p.tube([(x + dx * 0.4, XB_NUT - 0.05, z + 0.11 + dz * 0.4), (x + dx, XB_NUT - 0.12, z + 0.11 + dz),
+                (x + dx * 0.4, XB_NUT - 0.3, z + 0.11 + dz * 0.4)], [0.012, 0.018, 0.006], FLETCH, sides=4,
+               squash=0.3)
+    p.on('Chest')
+    # The quiver across the back, a fan of pale-fletched bolts poking out.
+    p.tube([(0.24, 0.38, 1.55), (-0.18, 0.44, 2.25)], [0.15, 0.14], LEATHER, sides=8)
+    ring_at(p, (0.05, 0.41, 1.9), 0.16, 0.025, BRASS, axis='z')
+    for k in range(5):
+        bx = -0.24 + k * 0.05
+        p.tube([(bx, 0.44, 2.2), (bx - 0.05, 0.47, 2.55)], [0.018, 0.018], XB_WOOD, sides=4)
+        p.blob((bx - 0.05, 0.47, 2.57), (0.035, 0.012, 0.06), FLETCH)
+    # The bandolier strap across the chest.
+    p.tube([(0.5, -0.1, 2.12), (0.1, -0.42, 1.85), (-0.42, -0.25, 1.45)], [0.04, 0.04, 0.04], LEATHER,
+           sides=5, squash=0.4)
+
+
+# The arbalest's crossbow bones: each rides the right fist.
+ARBALEST_BONES = [
+    ('Bolt', 'Hand.R', (XB_X, XB_NUT, XB_Z + 0.11), (XB_X, XB_NUT - 0.3, XB_Z + 0.11)),
+    ('StringD', 'Hand.R', (XB_X, XB_NUT, XB_Z + 0.1), (XB_X, XB_NUT - 0.3, XB_Z + 0.1)),
+    ('StringR', 'Hand.R', (XB_X, XB_TIP_Y - 0.05, XB_Z + 0.05), (XB_X, XB_TIP_Y - 0.35, XB_Z + 0.05)),
+    ('Crank', 'Hand.R', (XB_X + 0.13, XB_DRUM, XB_Z - 0.02), (XB_X + 0.33, XB_DRUM, XB_Z - 0.02)),
+]
 
 
 def bosun(p):
@@ -323,9 +435,12 @@ def stance_for(v):
         return {'Arm.R': [('x', -25), ('y', 8)], 'Fore.R': [('x', -45)], 'Arm.L': [('x', -35), ('y', 20)],
                 'Fore.L': [('x', -45)], 'Head': [('x', 6)]}
     if v == 'arbalest':
-        # The crossbow carried level at the hip, the left hand under the stock.
-        return {'Arm.R': [('x', -22)], 'Fore.R': [('x', 22)], 'Arm.L': [('x', -30), ('y', 20)],
-                'Fore.L': [('x', -35)], 'Head': [('x', 6)]}
+        # The crossbow carried level at the hip, pointing ahead, the loose
+        # string hidden (StringR only shows after a loose).
+        # ('Arm.L!': the off arm posed on its own, never mirrored onto the right.)
+        return {'Arm.R': [('x', -22)], 'Fore.R': [('x', 22)], 'Hand.R': [('x', 16)],
+                'Arm.L!': [('x', -10), ('y', -8)], 'Fore.L!': [('x', -25)], 'Head': [('x', 6)],
+                'StringR': [('scale', 0.001)]}
     if v == 'prisoner':
         return {'Spine': [('x', 10)], 'Chest': [('x', 8)], 'Head': [('x', 12), ('y', 8)], 'Arm.R': [('x', -8)],
                 'Arm.L': [('x', -6)], 'Jaw': [('x', 10)]}
@@ -438,22 +553,7 @@ def clips(arm, v):
         author_clip(arm, 'Cast', loop(24, [drawn, drawn_b]))
         names += ['Attack', 'Attack2', 'HalberdSweep', 'Cast']
     elif v == 'arbalest':
-        bash = over(stand, {'Arm.R': [('x', -70), ('y', 10)], 'Fore.R': [('x', 10)], 'Chest': [('z', -20)],
-                             'Arm.L': [('x', -60)]})
-        author_clip(arm, 'Attack', [(1, stand), (7, merge(stand, {'Chest': [('z', 20)]})), (11, bash), (22, stand)],
-                    loop=False)
-        author_clip(arm, 'Attack2', [(1, stand), (6, merge(stand, {'Head': [('x', -10)]})),
-                                     (10, merge(bash, {'Spine': [('x', 12)]})), (22, stand)], loop=False)
-        # Aim: the crossbow shouldered, the head down along the stock, held.
-        aim = over(stand, {'Arm.R': [('x', -82), ('y', 12)], 'Fore.R': [('x', 76)], 'Arm.L': [('x', -80), ('y', 30)],
-                            'Fore.L': [('x', -10)], 'Head': [('x', 12), ('z', -8)], 'Chest': [('z', 8)],
-                            'Thigh.R': [('x', 15)], 'Thigh.L': [('x', -15)]})
-        author_clip(arm, 'Aim', [(1, stand), (8, aim), (30, merge(aim, {'Chest': [('z', 10)]})), (40, aim)], loop=False)
-        author_clip(arm, 'Cast', loop(24, [aim, merge(aim, {'Head': [('x', 14)]})]))
-        # Shoot (the Rusted Bolt): a snap to the shoulder, the loose, the kick.
-        kick = merge(aim, {'Arm.R': [('x', 14)], 'Chest': [('x', -8)], 'Head': [('x', -10)]})
-        author_clip(arm, 'Shoot', [(1, stand), (7, aim), (10, aim), (12, kick), (22, stand)], loop=False)
-        names += ['Attack', 'Attack2', 'Aim', 'Cast', 'Shoot']
+        names += arbalest_clips(arm, stand)
     else:  # prisoner
         wind = over(stand, {'Arm.R': [('x', -40), ('y', -80)], 'Fore.R': [('x', -30)], 'Chest': [('z', 30)]})
         flail = over(stand, {'Arm.R': [('x', -80), ('y', 40)], 'Fore.R': [('x', -10)], 'Chest': [('z', -30)],
@@ -469,8 +569,96 @@ def clips(arm, v):
     return names
 
 
+# ---- the arbalest's crossbow drill -------------------------------------------------------
+
+# The loose: the bolt gone, the drawn string hidden and the loose one shown.
+# Applied with over() (a scale turn multiplies, so it must REPLACE the stance's).
+LOOSED = {'Bolt': [('scale', 0.001)], 'StringD': [('scale', 0.001)], 'StringR': [('scale', 1.0)]}
+LOADED = {'Bolt': [('scale', 1.0)], 'StringD': [('scale', 1.0)], 'StringR': [('scale', 0.001)]}
+
+
+def shouldered(stand):
+    """The crossbow up at the right shoulder, level and pointing dead ahead:
+    a bladed shooter's stance (the chest turned so the off shoulder leads),
+    the cheek down on the stock and the off hand under the tiller. The arm
+    angles are solved so the butt sits in the shoulder and the crossbow
+    stays level (a numeric solve over this rig's bones)."""
+    return over(stand, {'Spine': [('x', 4), ('z', -12)], 'Chest': [('z', -28)], 'Head': [('z', 40), ('x', 20)],
+                        'Arm.R': [('x', -51.1), ('z', 47.2), ('y', -37.6)], 'Fore.R': [('x', -21.0)],
+                        'Hand.R': [('x', 96.8), ('y', 8.6), ('z', 27.4)],
+                        'Arm.L!': [('x', -61.9), ('z', -10.8), ('y', 5.6)], 'Fore.L!': [('x', -21.0)],
+                        'Thigh.L!': [('x', -16)], 'Thigh.R': [('x', 12)], 'Shin.R': [('x', 8)], 'Jaw': [('x', 8)]})
+
+
+def lowered_for_reload(stand):
+    """The crossbow tipped nose down at the waist, the off hand on the
+    windlass crank to span it again."""
+    return over(stand, {'Spine': [('x', 10)], 'Chest': [('x', 6)], 'Head': [('x', 20)],
+                        'Arm.R': [('x', -64.5), ('z', 16.3), ('y', -8.8)], 'Fore.R': [('x', 2.6)],
+                        'Hand.R': [('x', 97.2), ('y', 18.5), ('z', 0.2)],
+                        'Arm.L!': [('x', 13.5), ('z', -24.1), ('y', 46.3)], 'Fore.L!': [('x', -65.8)]})
+
+
+def arbalest_clips(arm, stand):
+    aim = shouldered(stand)
+    aim_b = merge(aim, {'Chest': [('z', 3)], 'Head': [('x', 3)]})
+    # The loose: the stock bucks up and back into the shoulder.
+    # (Solved like the aim: the whole crossbow tipped 12 degrees nose up.)
+    kick = over(aim, {'Chest': [('z', -28), ('x', -8)], 'Head': [('z', 40), ('x', 8)], 'Jaw': [('x', 16)],
+                      'Arm.R': [('x', -39.5), ('z', 52.3), ('y', -30.4)], 'Fore.R': [('x', -61.5)],
+                      'Hand.R': [('x', 115.8), ('y', 3.6), ('z', 23.3)],
+                      'Arm.L!': [('x', -51.0), ('z', -16.1), ('y', 9.6)], 'Fore.L!': [('x', -46.7)], **LOOSED})
+    settle = over(aim, LOOSED)
+    # Reload: the crossbow brought down nose first, the left hand spinning
+    # the windlass crank, a fresh bolt laid in the groove.
+    lowered = lowered_for_reload(stand)
+
+    def crank(deg):
+        return over(merge(lowered, {'Crank': [('x', deg)], 'Fore.L!': [('x', 8 * math.sin(math.radians(deg)))]}),
+                    LOOSED)
+
+    def loaded(pose):
+        return over(pose, LOADED)
+
+    names = []
+    # Shoot (the Rusted Bolt, the auto attack): up to the shoulder over the
+    # 0.6 s windup, the loose on the release frame (15), the kick, a quick
+    # crank of the windlass and a fresh bolt, back to the carry.
+    author_clip(arm, 'Shoot', [(1, loaded(stand)), (8, loaded(aim)), (14, loaded(aim_b)), (15, kick),
+                               (17, kick), (20, settle), (24, crank(0)), (27, crank(120)), (30, crank(240)),
+                               (33, crank(360)), (35, loaded(lowered)), (40, loaded(stand))], loop=False)
+    names.append('Shoot')
+    # Aim (the Piercing Bolt, a 2 s bar): shouldered by 0.4 s and held rock
+    # steady down the lane; the loose lands as the bar ends (frame 49) and the
+    # kick and reload play OUT after it (castPlayOut).
+    author_clip(arm, 'Aim', [(1, loaded(stand)), (10, loaded(aim)), (28, loaded(aim_b)), (47, loaded(aim)),
+                             (49, kick), (51, kick), (54, settle), (58, crank(0)), (61, crank(120)),
+                             (64, crank(240)), (67, crank(360)), (69, loaded(lowered)), (74, loaded(stand))],
+                loop=False)
+    names.append('Aim')
+    author_clip(arm, 'Cast', loop(24, [loaded(aim), loaded(aim_b)]))
+    names.append('Cast')
+    # Close in, it clubs with the stock and jabs with the stirrup.
+    back = over(stand, {'Arm.R': [('x', -40), ('y', -20)], 'Fore.R': [('x', -60)], 'Hand.R': [('x', 100)],
+                        'Chest': [('z', 25)], 'Arm.L!': [('x', -30)]})
+    club = over(stand, {'Arm.R': [('x', -90), ('y', 25)], 'Fore.R': [('x', -10)], 'Hand.R': [('x', 20)],
+                        'Chest': [('z', -25)], 'Spine': [('x', 10)], 'Arm.L!': [('x', -50)]})
+    author_clip(arm, 'Attack', [(1, stand), (8, back), (12, club), (24, stand)], loop=False)
+    jab = over(stand, {'Arm.R': [('x', -70)], 'Fore.R': [('x', 30)], 'Hand.R': [('x', 30)],
+                       'Chest': [('x', 12)], 'Thigh.R': [('x', -25)], 'Shin.R': [('x', 20)],
+                       'Hips': [('loc', (0, -0.12, -0.05))]})
+    author_clip(arm, 'Attack2', [(1, stand), (7, merge(stand, {'Chest': [('z', 15)]})), (11, jab), (22, stand)],
+                loop=False)
+    names += ['Attack', 'Attack2']
+    return names
+
+
+def bones_for(v):
+    return BONES + ARBALEST_BONES if v == 'arbalest' else BONES
+
+
 def creature(v):
-    return (BONES, body_for(v), lambda arm: clips(arm, v), 1.6, 8.0)
+    return (bones_for(v), body_for(v), lambda arm: clips(arm, v), 1.6, 8.0)
 
 
 VARIANTS = {v: creature(v) for v in ('revenant', 'watchman', 'arbalest', 'sergeant', 'prisoner')}

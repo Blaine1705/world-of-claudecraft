@@ -5,7 +5,9 @@
 //    Piercing Bolt lane (locked on its aim), and a kick glyph under a Brine
 //    Mend or a Fog Ward;
 //  - the Barnacle Crawler's Brine Burst ring, filling over its fuse where it fell;
-//  - a flash when a strike lands.
+//  - a flash when a strike lands;
+//  - the creatures' own effects (bastion_creature_fx.ts): the Fogbound
+//    Arbalest's crossbow bolts and the Gaol Turnkey's lantern flare.
 // Boss casts register more lanes and rings through registerBastionTelegraph.
 // Every shape is the shared floor telegraph (../floor_telegraph): the same
 // layered look, threat colours and edge glow as every other dungeon.
@@ -31,6 +33,7 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { BASTION_BOSS_TELEGRAPHS, BastionBossFx } from './bastion_boss_fx';
+import { BastionCreatureFx } from './bastion_creature_fx';
 import {
   BASTION_TELEGRAPH_COLORS,
   type BastionTelegraphSpec,
@@ -100,6 +103,7 @@ export class BastionFx {
   private readonly kit: TelegraphKit;
   private readonly seenDead = new Set<number>();
   private readonly boss: BastionBossFx;
+  private readonly creatures: BastionCreatureFx;
   private scan = 0;
   private clock = 0;
   private disposed = false;
@@ -109,6 +113,7 @@ export class BastionFx {
     private readonly groundY: (x: number, z: number) => number,
     private readonly world?: IWorld,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'sunken-bastion-telegraphs';
     setRenderCategory(this.root, 'ui3d');
@@ -129,6 +134,12 @@ export class BastionFx {
     // The boss visuals ride this root (one compile gate); their casts paint
     // through the same lane and ring pools.
     this.boss = new BastionBossFx(this.root, groundY, world, this.flashesOn);
+    // The creatures' own effects (the arbalest's bolts, the Turnkey's lantern)
+    // ride the same root and compile gate.
+    const creatures = new THREE.Group();
+    creatures.name = 'sunken-bastion-creature-fx';
+    this.root.add(creatures);
+    this.creatures = new BastionCreatureFx(creatures, groundY, world, playGesture);
     const B = BASTION_BOSS_TELEGRAPHS;
     registerBastionTelegraph(
       B.charge,
@@ -158,8 +169,16 @@ export class BastionFx {
     return this.specs[castId] ?? extraSpecs.get(castId);
   }
 
-  /** A landing strike's flash (cosmetic; the damage already has its number). */
-  handleEvent(ev: SimEvent): void {
+  /** A landing strike's flash (cosmetic; the damage already has its number).
+   *  True when a creature effect CLAIMED the event (the arbalest's bolt, the
+   *  Turnkey's lantern), so the generic projectile or nova is not drawn too. */
+  handleEvent(ev: SimEvent): boolean {
+    if (this.creatures.handleEvent(ev)) return true;
+    this.flash(ev);
+    return false;
+  }
+
+  private flash(ev: SimEvent): void {
     if (!this.flashesOn || ev.type !== 'spellfx' || !this.world) return;
     const spec = this.specFor(ev.ability ?? '');
     if (!spec || spec.shape === 'lane' || spec.shape === 'sigil') return;
@@ -180,6 +199,7 @@ export class BastionFx {
     if (!world || this.disposed) return;
     this.clock += dt;
     this.boss.update(dt);
+    this.creatures.update(dt);
     this.scan -= dt;
     if (this.scan <= 0) {
       this.scan = SCAN_SEC;
@@ -315,6 +335,7 @@ export class BastionFx {
     if (this.disposed) return;
     this.disposed = true;
     this.boss.dispose();
+    this.creatures.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
   }

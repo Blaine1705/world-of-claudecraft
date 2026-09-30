@@ -144,7 +144,7 @@ export class RiftDeathZoneVisuals {
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
     this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
-    this.bastionFx = new BastionFx(scene, groundY, world, compileGate);
+    this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture);
     this.cryptCreatures = new CryptCreatureFx(
       scene,
       groundY,
@@ -262,11 +262,13 @@ export class RiftDeathZoneVisuals {
     this.hoardPresentation.dispose();
   }
 
-  handleEvent(event: SimEvent): void {
+  /** True when a dungeon effect claimed the event outright (the renderer
+   *  then skips its generic draw of it). */
+  handleEvent(event: SimEvent): boolean {
     this.hoardPresentation.handleEvent(event);
     this.cryptTrash.handleEvent(event);
-    this.bastionFx.handleEvent(event);
     this.cryptCreatures.handleEvent(event);
+    return this.bastionFx.handleEvent(event);
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

@@ -7066,7 +7066,7 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
-    this.riftDeathZoneVisuals?.handleEvent(ev);
+    if (this.riftDeathZoneVisuals?.handleEvent(ev)) return;
     switch (ev.type) {
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {

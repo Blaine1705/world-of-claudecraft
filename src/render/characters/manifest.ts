@@ -3900,21 +3900,29 @@ export const VISUALS: Record<string, VisualDef> = {
       castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 1.05 },
     },
   },
+  // A heavy crossbow (long stock, wide steel prod, a drawn string and a
+  // loaded bolt). Shoot is the Rusted Bolt: shouldered over the 0.6 s windup,
+  // the loose on the release frame, the kick, then the windlass cranked and a
+  // fresh bolt laid in. Aim is the Piercing Bolt: held down the lane over the
+  // 2 s bar, the loose landing as the bar ends, the reload playing out after.
+  // The bolts themselves fly in sunken_bastion/bastion_creature_fx.ts.
   bastion_skel_arbalest: {
     url: `${CREATURES}/drowned_arbalest.glb`,
-    height: 3.6,
+    height: 5.4,
+    attackTimeScale: 1,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
       run: 'Run',
-      // Its swing is the Rusted Bolt: a snap to the shoulder and a loose.
       attack: ['Shoot'],
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
       castByAbility: { [BASTION_PIERCING_BOLT]: 'Aim' },
-      castTimeScaleByAbility: { [BASTION_PIERCING_BOLT]: 0.85 },
+      castTimeScaleByAbility: { [BASTION_PIERCING_BOLT]: 1 },
+      castPlayOut: ['Aim'],
     },
+    castPlayOutHoldsAttacks: true,
   },
   bastion_skel_sergeant: {
     url: `${CREATURES}/drowned_sergeant.glb`,
