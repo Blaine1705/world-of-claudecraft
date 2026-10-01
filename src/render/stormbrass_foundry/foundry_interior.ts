@@ -28,7 +28,7 @@ const ground = (x: number, z: number): number =>
   authoredFieldHeight(STORMBRASS_FOUNDRY_FIELD, x, z);
 
 /** The generic field terrain, graded for a brass foundry on slate: the paved
- *  tops cool toward slate grey, the cliff faces darken to wet mountain rock.
+ *  tops cool toward slate grey, the cliff faces darken to mountain rock.
  *  Vertex paint only (the shared materials stay untouched). */
 function tintFoundryTerrain(terrain: THREE.Group): THREE.Group {
   const grades: Record<string, [number, number, number]> = {
@@ -67,7 +67,7 @@ export function buildStormbrassFoundryInterior(
   const density = deps.lowGfx ? 0.35 : gfxTierAtLeast(GFX.effectsTier, 'high') ? 1 : 0.6;
   group.add(
     tintFoundryTerrain(
-      buildAuthoredFieldTerrain(STORMBRASS_FOUNDRY_FIELD, { lowGfx: deps.lowGfx, wet: true }),
+      buildAuthoredFieldTerrain(STORMBRASS_FOUNDRY_FIELD, { lowGfx: deps.lowGfx }),
     ),
   );
   group.add(buildFoundryDressing(ground, deps.lowGfx));

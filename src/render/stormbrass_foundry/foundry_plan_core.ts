@@ -206,3 +206,130 @@ export function arcFenceCharge(openness: number, t: number): number {
   if (k >= 1) return 0;
   return (1 - k) * (0.6 + 0.4 * (Math.sin(t * 40) > 0 ? 1 : 0));
 }
+
+// ---- the mountain round the shelf ----------------------------------------------------------
+
+/** Smooth value noise over the hashed lattice (0..1). */
+function valueNoise(x: number, z: number, salt: number): number {
+  const ix = Math.floor(x);
+  const iz = Math.floor(z);
+  const fx = x - ix;
+  const fz = z - iz;
+  const ux = fx * fx * (3 - 2 * fx);
+  const uz = fz * fz * (3 - 2 * fz);
+  const h = (a: number, b: number): number => foundryHash(a * 157 + b * 9973, salt);
+  const top = h(ix, iz) + (h(ix + 1, iz) - h(ix, iz)) * ux;
+  const bot = h(ix, iz + 1) + (h(ix + 1, iz + 1) - h(ix, iz + 1)) * ux;
+  return top + (bot - top) * uz;
+}
+
+/** How far (yards) a spot lies outside the shelf's walkable footprint. */
+export function outsideShelf(x: number, z: number): number {
+  const b = STORMBRASS_FOUNDRY_FIELD.bounds;
+  const dx = Math.max(0, b.minX - x, x - b.maxX);
+  const dz = Math.max(0, b.minZ - z, z - b.maxZ);
+  return Math.hypot(dx, dz);
+}
+
+/** The deepest the valley floor comes near the shelf: well under the sim's
+ *  void height, so nothing below the drop ever reads as a ledge to land on. */
+export const VALLEY_FLOOR_MAX_NEAR = STORMBRASS_FOUNDRY_FIELD.voidHeight - 10;
+
+/**
+ * The rock below and around the Foundry's shelf (no sea: the shelf is cut
+ * into a mountain). Near the shelf a deep, ridged scree floor far under the
+ * drop; farther out it climbs into the mountain's flanks that meet the ring
+ * of peaks. Instance-local yards.
+ */
+export function foundryValleyHeight(x: number, z: number): number {
+  const out = outsideShelf(x, z);
+  const ridged = 1 - Math.abs(valueNoise(x * 0.018, z * 0.018, 21) * 2 - 1);
+  const scree = valueNoise(x * 0.07, z * 0.07, 22);
+  // Never above the near maximum, never below the cliffs' feet (they run down
+  // to about 25 yd under the void height), so every cliff face meets rock.
+  const floor = VALLEY_FLOOR_MAX_NEAR - 14 + ridged * 10 + scree * 4;
+  // The flanks rise from about 140 yd out toward the peaks.
+  const k = Math.min(1, Math.max(0, (out - 140) / 260));
+  const flank = k * k * (3 - 2 * k) * (150 + ridged * 70);
+  return floor + flank;
+}
+
+/** The buttresses: great rock shoulders standing out of the valley round the
+ *  shelf's flanks, their tops always below the shelf's floor and never on
+ *  walkable ground. */
+export function planFoundryButtresses(
+  density: number,
+): { x: number; z: number; r: number; base: number; top: number }[] {
+  const b = STORMBRASS_FOUNDRY_FIELD.bounds;
+  const out: { x: number; z: number; r: number; base: number; top: number }[] = [];
+  const count = Math.round(14 + 10 * density);
+  const w = b.maxX - b.minX;
+  const d = b.maxZ - b.minZ;
+  const perimeter = 2 * (w + d);
+  for (let i = 0; i < count; i++) {
+    // Walk the footprint's outline, then step out past its edge.
+    let s = ((i + foundryHash(i, 30) * 0.6) / count) * perimeter;
+    let px: number;
+    let pz: number;
+    let nx: number;
+    let nz: number;
+    if (s < w) {
+      px = b.minX + s;
+      pz = b.minZ;
+      nx = 0;
+      nz = -1;
+    } else if ((s -= w) < d) {
+      px = b.maxX;
+      pz = b.minZ + s;
+      nx = 1;
+      nz = 0;
+    } else if ((s -= d) < w) {
+      px = b.maxX - s;
+      pz = b.maxZ;
+      nx = 0;
+      nz = 1;
+    } else {
+      s -= w;
+      px = b.minX;
+      pz = b.maxZ - s;
+      nx = -1;
+      nz = 0;
+    }
+    const r = 26 + foundryHash(i, 31) * 22;
+    const gap = r + 30 + foundryHash(i, 32) * 40;
+    out.push({
+      x: px + nx * gap,
+      z: pz + nz * gap,
+      r,
+      base: VALLEY_FLOOR_MAX_NEAR - 30,
+      top: -34 + foundryHash(i, 33) * 26,
+    });
+  }
+  return out;
+}
+
+/** The steam and furnace smoke that climbs the mountain's face below the
+ *  shelf's rim (vented from the foundry's works inside the rock): tall plumes
+ *  standing just past the footprint, their feet far down the cliffs. */
+export function planFoundryPlumes(
+  density: number,
+): { x: number; z: number; y: number; w: number; h: number; seed: number }[] {
+  const b = STORMBRASS_FOUNDRY_FIELD.bounds;
+  const count = Math.round(6 + 6 * density);
+  const out: { x: number; z: number; y: number; w: number; h: number; seed: number }[] = [];
+  for (let i = 0; i < count; i++) {
+    const t = (i + 0.5) / count;
+    const side = i % 2 === 0 ? -1 : 1;
+    const z = b.minZ + 30 + t * (b.maxZ - b.minZ - 60);
+    const x = side * (b.maxX + 18 + foundryHash(i, 41) * 22);
+    out.push({
+      x,
+      z,
+      y: -60 + foundryHash(i, 42) * 20,
+      w: 18 + foundryHash(i, 43) * 10,
+      h: 70 + foundryHash(i, 44) * 30,
+      seed: foundryHash(i, 45),
+    });
+  }
+  return out;
+}

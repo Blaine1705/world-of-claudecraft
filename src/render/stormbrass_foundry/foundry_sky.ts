@@ -1,23 +1,30 @@
 // The Stormbrass Foundry's sky and surroundings: a storm dome in daylight
 // (dark rolling clouds lit from inside, shafts of daylight breaking through
 // low in the south-west, the whole dome flaring white-blue when lightning hits
-// the coil), a ring of slate peaks round the shelf, a sea of cloud far below
-// the drop, and a veil of rain gusting round the camera.
+// the coil), and the mountain the shelf is cut into: a deep scree valley far
+// below the drop, rock buttresses standing out of it round the shelf, flanks
+// climbing to a ring of slate peaks. A dry storm: no rain, and no sea (the old
+// cloud sea and rain veil read as a small island in the rain).
 //
 // All motion is shader-side on the shared clock (sharedUniforms.uTime); the
 // flash is read from the same strike clock the coil's bolts use
 // (foundry_plan_core.ts coilStrikeAt), once per drawn frame in the dome's own
-// onBeforeRender. Counts and the rain shed with the graphics tier; every
+// onBeforeRender. Counts shed with the graphics tier; every
 // element is cosmetic (no telegraph, no actionable information), and the flash
 // is a fill on the sky only, so it never masks a floor telegraph.
 
 import * as THREE from 'three';
-import { STORMBRASS_FOUNDRY_VOID_HEIGHT } from '../../sim/content/stormbrass_foundry_layout';
 import { STORMBRASS_FOUNDRY_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import { STORMBRASS_FOUNDRY_SUN_DIRECTION } from '../interior_light_rig';
 import { markSharedMaterial } from '../shared_resource';
-import { COIL_TOP, coilStrikeAt, foundryHash } from './foundry_plan_core';
+import {
+  COIL_TOP,
+  coilStrikeAt,
+  foundryHash,
+  foundryValleyHeight,
+  planFoundryButtresses,
+} from './foundry_plan_core';
 
 export interface FoundrySkyOptions {
   lowGfx: boolean;
@@ -114,97 +121,114 @@ function buildDome(opts: FoundrySkyOptions): THREE.Mesh {
   return mesh;
 }
 
-// ---- the cloud sea far below the drop ----------------------------------------------------
+// ---- the mountain: valley, buttresses, peaks --------------------------------------------
 
-const SEA_VERT = /* glsl */ `
-varying vec2 vXZ;
-#include <fog_pars_vertex>
-void main() {
-  vec4 w = modelMatrix * vec4(position, 1.0);
-  vXZ = position.xz;
-  vec4 mvPosition = viewMatrix * w;
-  gl_Position = projectionMatrix * mvPosition;
-  #include <fog_vertex>
-}
-`;
-
-const SEA_FRAG = /* glsl */ `
-precision highp float;
-varying vec2 vXZ;
-uniform float uTime;
-uniform vec3 uColor;
-#include <fog_pars_fragment>
-${NOISE_GLSL}
-void main() {
-  vec2 p = vXZ * 0.012 + vec2(uTime * 0.01, uTime * 0.004);
-  float n = fbm(p) * 0.7 + fbm(p * 2.7 - uTime * 0.006) * 0.3;
-  vec3 col = mix(uColor * 0.55, vec3(0.52, 0.57, 0.64), smoothstep(0.35, 0.8, n));
-  gl_FragColor = vec4(col, 1.0);
-  #include <fog_fragment>
-}
-`;
-
-function buildCloudSea(): THREE.Mesh {
-  const material = new THREE.ShaderMaterial({
-    name: 'stormbrassCloudSea',
-    vertexShader: SEA_VERT,
-    fragmentShader: SEA_FRAG,
-    uniforms: {
-      ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
-      uTime: sharedUniforms.uTime,
-      uColor: { value: new THREE.Color(STORMBRASS_FOUNDRY_FOG_COLOR) },
-    },
-    fog: true,
-  });
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600).rotateX(-Math.PI / 2), material);
-  mesh.position.y = STORMBRASS_FOUNDRY_VOID_HEIGHT + 30;
-  mesh.name = 'stormbrassCloudSea';
-  mesh.frustumCulled = false;
-  return mesh;
+/** Linear rock colours: dark slate low, a lighter weathered grey up the
+ *  flanks, a thin snow on the heights. */
+function rockColor(y: number, salt: number, out: number[]): void {
+  const shade = 0.05 + foundryHash(salt, 9) * 0.03;
+  if (y > 150) {
+    out.push(0.42, 0.45, 0.5);
+    return;
+  }
+  const up = Math.min(1, Math.max(0, (y + 90) / 200));
+  const v = shade + up * 0.05;
+  out.push(v, v + 0.006, v + 0.014);
 }
 
-// ---- the ring of peaks -------------------------------------------------------------------
+function pushCone(
+  positions: number[],
+  colors: number[],
+  indices: number[],
+  base: number,
+  c: { x: number; z: number; r: number; y0: number; y1: number; salt: number; sides: number },
+): number {
+  const cone = new THREE.ConeGeometry(c.r, c.y1 - c.y0, c.sides, 3);
+  cone.translate(c.x, (c.y0 + c.y1) / 2, c.z);
+  const p = cone.getAttribute('position');
+  for (let k = 0; k < p.count; k++) {
+    const y = p.getY(k);
+    // A little ragged: jitter the rings.
+    const j = (foundryHash(c.salt * 131 + k, 8) - 0.5) * c.r * 0.25;
+    positions.push(p.getX(k) + j, y, p.getZ(k) - j);
+    const snow = c.y1 > 120 && y > c.y0 + (c.y1 - c.y0) * 0.8;
+    if (snow) colors.push(0.42, 0.45, 0.5);
+    else rockColor(Math.min(y, 140), c.salt + k, colors);
+  }
+  const idx = cone.index;
+  if (idx) for (let k = 0; k < idx.count; k++) indices.push(idx.getX(k) + base);
+  const n = p.count;
+  cone.dispose();
+  return base + n;
+}
 
-function buildPeaks(opts: FoundrySkyOptions): THREE.Mesh {
-  const geos: THREE.BufferGeometry[] = [];
-  const count = Math.round(18 + 14 * opts.density);
+function buildMountain(opts: FoundrySkyOptions): THREE.Mesh {
   const positions: number[] = [];
   const indices: number[] = [];
   const colors: number[] = [];
   let base = 0;
+  // The valley: a ridged heightfield from wall to wall of the peaks.
+  const segX = Math.round(36 + 28 * opts.density);
+  const segZ = Math.round(segX * 1.15);
+  const halfX = 720;
+  const halfZ = 830;
+  for (let iz = 0; iz <= segZ; iz++) {
+    for (let ix = 0; ix <= segX; ix++) {
+      const x = -halfX + (ix / segX) * halfX * 2;
+      const z = -halfZ + (iz / segZ) * halfZ * 2;
+      const y = foundryValleyHeight(x, z);
+      positions.push(x, y, z);
+      rockColor(y, ix * 977 + iz, colors);
+    }
+  }
+  for (let iz = 0; iz < segZ; iz++) {
+    for (let ix = 0; ix < segX; ix++) {
+      const a = iz * (segX + 1) + ix;
+      const b = a + 1;
+      const c = a + segX + 1;
+      const d = c + 1;
+      indices.push(a, c, b, b, c, d);
+    }
+  }
+  base = (segX + 1) * (segZ + 1);
+  // The buttresses round the shelf's flanks.
+  planFoundryButtresses(opts.density).forEach((t, i) => {
+    base = pushCone(positions, colors, indices, base, {
+      x: t.x,
+      z: t.z,
+      r: t.r,
+      y0: t.base,
+      y1: t.top,
+      salt: 500 + i,
+      sides: 6,
+    });
+  });
+  // The ring of peaks, on an oval round the long shelf.
+  const count = Math.round(18 + 14 * opts.density);
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2 + foundryHash(i, 4) * 0.2;
-    const dist = 330 + foundryHash(i, 5) * 150;
-    const h = 90 + foundryHash(i, 6) * 170;
-    const r = 70 + foundryHash(i, 7) * 60;
-    const cone = new THREE.ConeGeometry(r, h, 7, 3);
-    cone.translate(
-      Math.sin(a) * dist,
-      STORMBRASS_FOUNDRY_VOID_HEIGHT + h / 2 - 10,
-      Math.cos(a) * dist,
-    );
-    const p = cone.getAttribute('position');
-    for (let k = 0; k < p.count; k++) {
-      // A little ragged: jitter the rings, snow-dust the top fifth. Linear
-      // colours: dark slate rock under a thin snow.
-      const y = p.getY(k);
-      const j = (foundryHash(i * 131 + k, 8) - 0.5) * r * 0.25;
-      positions.push(p.getX(k) + j, y, p.getZ(k) - j);
-      const snow = y > STORMBRASS_FOUNDRY_VOID_HEIGHT + h * 0.8 ? 1 : 0;
-      const shade = 0.05 + foundryHash(i + k, 9) * 0.03;
-      colors.push(snow ? 0.42 : shade, snow ? 0.45 : shade + 0.008, snow ? 0.5 : shade + 0.018);
-    }
-    const idx = cone.index;
-    if (idx) for (let k = 0; k < idx.count; k++) indices.push(idx.getX(k) + base);
-    base += p.count;
-    geos.push(cone);
+    const dist = 200 + foundryHash(i, 5) * 130;
+    const h = 150 + foundryHash(i, 6) * 190;
+    const r = 80 + foundryHash(i, 7) * 60;
+    const x = Math.sin(a) * (114 + dist);
+    const z = Math.cos(a) * (240 + dist);
+    base = pushCone(positions, colors, indices, base, {
+      x,
+      z,
+      r,
+      y0: foundryValleyHeight(x, z) - 20,
+      y1: foundryValleyHeight(x, z) + h,
+      salt: i,
+      sides: 7,
+    });
   }
-  for (const g of geos) g.dispose();
+  // Flat-shaded facets come from the material (one shared program).
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geo.setIndex(indices);
   geo.computeVertexNormals();
+  geo.computeBoundingSphere();
   const material = new THREE.MeshLambertMaterial({
     vertexColors: true,
     flatShading: true,
@@ -213,64 +237,16 @@ function buildPeaks(opts: FoundrySkyOptions): THREE.Mesh {
   markSharedMaterial(material);
   const mesh = new THREE.Mesh(geo, material);
   mesh.name = 'stormbrassPeaks';
-  return mesh;
-}
-
-// ---- rain round the camera -----------------------------------------------------------------
-
-const RAIN_VERT = /* glsl */ `
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-const RAIN_FRAG = /* glsl */ `
-precision highp float;
-varying vec2 vUv;
-uniform float uTime;
-float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-void main() {
-  vec2 g = vec2(vUv.x * 220.0, vUv.y * 5.0 + uTime * 3.2);
-  vec2 cell = floor(g);
-  float h = hash(cell);
-  float streak = smoothstep(0.96, 1.0, h) * smoothstep(0.0, 0.4, fract(g.y)) * (1.0 - fract(g.y));
-  float gust = 0.55 + 0.45 * sin(uTime * 0.3 + vUv.x * 6.0);
-  gl_FragColor = vec4(vec3(0.82, 0.87, 0.93), streak * 0.35 * gust);
-}
-`;
-
-function buildRain(): THREE.Mesh {
-  const material = new THREE.ShaderMaterial({
-    name: 'stormbrassRain',
-    vertexShader: RAIN_VERT,
-    fragmentShader: RAIN_FRAG,
-    uniforms: { uTime: sharedUniforms.uTime },
-    transparent: true,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-  });
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, 40, 24, 1, true), material);
-  mesh.name = 'stormbrassRain';
   mesh.frustumCulled = false;
-  mesh.renderOrder = 20;
-  const cam = new THREE.Vector3();
-  mesh.onBeforeRender = (_r, _s, camera) => {
-    // Follow the camera (one matrix write, only while drawn).
-    camera.getWorldPosition(cam);
-    mesh.matrixWorld.makeTranslation(cam.x, cam.y + 6, cam.z);
-  };
   return mesh;
 }
 
-/** The whole storm: dome, peaks, cloud sea and (on richer tiers) the rain. */
+/** The whole storm: the dome over the mountain, the valley, the buttresses
+ *  and the ring of peaks (one merged rock mesh). */
 export function buildFoundrySky(opts: FoundrySkyOptions): THREE.Group {
   const group = new THREE.Group();
   group.name = 'stormbrassSky';
   group.add(buildDome(opts));
-  group.add(buildCloudSea());
-  group.add(buildPeaks(opts));
-  if (!opts.lowGfx && opts.density >= 0.6) group.add(buildRain());
+  group.add(buildMountain(opts));
   return group;
 }

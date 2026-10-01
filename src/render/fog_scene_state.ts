@@ -20,8 +20,9 @@ export const HOLLOW_CRYPT_FOG_COLOR = 0x1c2238;
 export const SUNKEN_BASTION_FOG_COLOR = 0x4d5a57;
 /** The Drowned Temple's violet night haze (its sky dome fades to it at the horizon). */
 export const DROWNED_TEMPLE_FOG_COLOR = 0x252a4c;
-/** The Stormbrass Foundry's storm-grey steam haze (its sky's horizon too). */
-export const STORMBRASS_FOUNDRY_FOG_COLOR = 0x6b788c;
+/** The Stormbrass Foundry's smoke-grey steam haze (its sky's horizon too): a
+ *  neutral slate, not the blue that read as a sea under the shelf. */
+export const STORMBRASS_FOUNDRY_FOG_COLOR = 0x6f7378;
 
 export interface FogSceneResolution {
   /** The named dungeon interior the player stands in (null/undefined in the
@@ -163,9 +164,9 @@ export function applyFogScenePreset(
     fog.near = 140;
     fog.far = 1050;
   } else if (desired === 'stormbrassFoundry') {
-    // Steam haze and a rain veil in storm daylight: pushed far back so the
+    // Steam and smoke haze in dry storm daylight: pushed far back so the
     // storm-coil tower and the Prime Draft read from the Lift Landing (430 yd),
-    // while the far peaks drown in the grey.
+    // while the valley and the far peaks drown in the grey.
     fog.color.setHex(STORMBRASS_FOUNDRY_FOG_COLOR);
     fog.near = 120;
     fog.far = 900;

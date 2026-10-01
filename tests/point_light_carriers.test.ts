@@ -623,8 +623,7 @@ describe('every point-light producer is a carrier source', () => {
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
       // The Stormbrass Foundry: mesh hooks, never a scene: a crane arm's sweep
-      // (one matrix write), the storm dome's strike flash and the rain veil
-      // following the camera, the coil's bolts and flare on the strike clock,
+      // (one matrix write), the storm dome's strike flash, the coil's bolts and flare on the strike clock,
       // the Prime Draft landmark's head turning to the viewer, and (phase 3)
       'render/stormbrass_foundry/foundry_dressing.ts: m',
       'render/stormbrass_foundry/foundry_landmarks.ts: bolt',

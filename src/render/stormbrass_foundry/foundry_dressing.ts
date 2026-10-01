@@ -24,7 +24,7 @@ import type { FieldProp } from '../../sim/instances/authored_field/types';
 import { sharedUniforms } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
 import { PartBin } from './foundry_mesh';
-import { craneYaw } from './foundry_plan_core';
+import { craneYaw, planFoundryPlumes } from './foundry_plan_core';
 import { buildPressHammers } from './foundry_press';
 
 type Ground = (x: number, z: number) => number;
@@ -574,7 +574,11 @@ void main() {
   float width = mix(0.18, 0.5, vUv.y);
   float body = smoothstep(width, width * 0.2, abs(vUv.x - 0.5));
   float a = body * smoothstep(0.0, 0.12, vUv.y) * smoothstep(1.0, 0.45, vUv.y) * n * puff;
-  gl_FragColor = vec4(vec3(0.91, 0.93, 0.94), a * 0.75);
+  // Seeds from 2 up are the furnace smoke on the mountain's face: sooty grey,
+  // thinner, never a bright column.
+  float smoke = step(1.5, vSeed);
+  vec3 col = mix(vec3(0.91, 0.93, 0.94), vec3(0.3, 0.31, 0.33), smoke);
+  gl_FragColor = vec4(col, a * mix(0.75, 0.42, smoke));
   #include <fog_fragment>
 }
 `;
@@ -592,6 +596,19 @@ function buildSteam(ground: Ground, lowGfx: boolean): THREE.Mesh | null {
       geo.rotateY(k * (Math.PI / 2) + i);
       geo.translate(v.x, g, v.z);
       const seed = new Float32Array(geo.getAttribute('position').count).fill((i * 0.37) % 1);
+      geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
+      geos.push(geo);
+    }
+  });
+  // The smoke and steam climbing the mountain's face below the rim (the same
+  // breathing shader, on great cards); fewer on the low tier.
+  planFoundryPlumes(lowGfx ? 0 : 1).forEach((pl, i) => {
+    for (let k = 0; k < 2; k++) {
+      const geo = new THREE.PlaneGeometry(pl.w, pl.h);
+      geo.translate(0, pl.h / 2, 0);
+      geo.rotateY(k * (Math.PI / 2) + i * 0.7);
+      geo.translate(pl.x, pl.y, pl.z);
+      const seed = new Float32Array(geo.getAttribute('position').count).fill(2 + pl.seed);
       geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
       geos.push(geo);
     }
