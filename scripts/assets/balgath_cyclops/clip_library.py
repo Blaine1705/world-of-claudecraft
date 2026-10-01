@@ -168,37 +168,58 @@ def idle(rig, period=4.0):
 
 # ------------------------------------------------------------------ melee
 def swipe(rig):
-    """Auto-attack: a backhand with the right fist across his front at chest height."""
+    """Auto-attack: a backhand with the right fist. He coils the fist up in front of
+    his left shoulder (well forward of the chest, elbow raised), then the hips and
+    chest uncoil and the fist sweeps out in a wide flat arc IN FRONT of him, ahead of
+    the gut, to finish out past his right side. The elbow leads, the arm opens from
+    it, the forearm rolls palm-down through the hit. Swing carried by the torso: the
+    shoulder line turns about 70 degrees between coil and follow-through."""
     st = stance(rig)
-    wind = st.but(twist=28, lean=14, hip_twist=10, look=(16, 6), pelvis=(0.25, 0.1, -0.5),
-                  hand_r=(1.6, -2.6, 8.4), pole_r=(-0.4, 1.0, -0.6), fist_r=1.0, clav_r=6,
-                  hand_l=(4.6, -1.8, 5.6), brow=10, jaw=6, foot_r=(-1.75, 0.2, 0.98))
-    strike = st.but(twist=-30, lean=18, hip_twist=-12, look=(-14, 4), pelvis=(-0.3, 0.0, -0.55),
-                    hand_r=(-6.2, -3.1, 7.6), pole_r=(-0.2, 1.0, -0.4), fist_r=1.0,
-                    hand_l=(5.0, -0.2, 5.8), brow=14, jaw=14)
-    follow = strike.but(twist=-40, hand_r=(-6.0, -0.6, 7.2), look=(-18, 2))
-    return keys_of([(0, st, 'auto'), (0.24, wind, 'in'), (0.4, strike, 'out'), (0.52, follow, 'auto'),
-                    (0.85, st, 'auto')])
+    coil = st.but(twist=30, lean=12, hip_twist=12, side=-3, look=(18, 8), pelvis=(0.3, 0.1, -0.45),
+                  hand_r=(0.1, -6.6, 10.6), pole_r=(0.1, -0.35, 1.0), fist_r=1.0, clav_r=8, hand_roll_r=0,
+                  hand_l=(5.0, -1.2, 5.8), brow=12, jaw=6, foot_r=(-1.75, 0.0, 0.98))
+    sweep = st.but(twist=2, lean=18, hip_twist=-6, look=(0, 4), pelvis=(0.0, -0.1, -0.55),
+                   hand_r=(-2.6, -7.0, 11.8), pole_r=(-0.3, 0.3, 1.0), fist_r=1.0, hand_roll_r=22,
+                   hand_l=(5.2, -0.6, 5.8), brow=16, jaw=12)
+    strike = st.but(twist=-30, lean=18, hip_twist=-14, side=3, look=(-16, 4), pelvis=(-0.3, 0.0, -0.6),
+                    hand_r=(-7.2, -4.0, 9.8), pole_r=(-0.4, 0.6, 0.7), fist_r=1.0, hand_roll_r=40,
+                    hand_l=(5.2, 0.0, 5.8), brow=16, jaw=16)
+    follow = strike.but(twist=-40, hand_r=(-6.9, -1.4, 8.6), pole_r=(-0.3, 0.8, 0.5), look=(-20, 2), hand_roll_r=35,
+                        jaw=10)
+    return keys_of([(0, st, 'auto'), (0.24, coil, 'in'), (0.33, sweep, 'linear'), (0.4, strike, 'out'),
+                    (0.54, follow, 'auto'), (0.85, st, 'auto')])
 
 
 def punch(rig):
-    """Attack variant: a downward hook with the left fist, stepping into it."""
+    """Attack variant: a straight heavy left, stepping into it. The fist chambers by
+    the chest with the elbow down and back, the hips fire first, then the chest turns
+    and the shoulder drives the fist out along one straight line down at the target,
+    the forearm pronating so the knuckles land palm-down. The elbow stays under the
+    arm the whole way (no roll of the upper arm); the weight goes forward onto the
+    stepping left foot and the trailing heel lifts."""
     st = stance(rig)
-    load = st.but(twist=-24, lean=8, hip_twist=-8, pelvis=(-0.2, 0.3, -0.45), hand_l=(3.8, 1.2, 9.4),
-                  pole_l=(0.6, 0.6, -0.8), fist_l=1.0, clav_l=10, look=(-8, 10), brow=8, jaw=4)
-    hit = st.but(twist=22, lean=30, hip_twist=10, pelvis=(0.3, -0.6, -0.95), hand_l=(1.4, -5.8, 4.2),
-                 pole_l=(1.0, 0.3, -0.5), fist_l=1.0, look=(6, 2), brow=16, jaw=16,
-                 foot_l=(1.9, -1.4, 0.98), foot_r=(-1.8, 0.9, 0.98))
-    return keys_of([(0, st, 'auto'), (0.3, load, 'in'), (0.46, hit, 'out'), (0.62, hit.but(lean=33), 'auto'),
-                    (1.0, st, 'auto')])
+    pole = (0.45, 0.45, -0.8)
+    load = st.but(twist=26, lean=8, hip_twist=12, pelvis=(0.15, 0.45, -0.5), hand_l=(3.0, -1.6, 9.0),
+                  pole_l=pole, fist_l=1.0, hand_roll_l=0, clav_l=8, look=(-6, 10), brow=10, jaw=4,
+                  hand_r=(-5.0, -2.6, 6.6), foot_l=(1.75, 0.3, 0.98))
+    drive = st.but(twist=14, lean=16, hip_twist=-10, pelvis=(0.1, -0.2, -0.75), hand_l=(2.4, -3.6, 8.0),
+                   pole_l=pole, fist_l=1.0, hand_roll_l=25, clav_l=4, look=(0, 6), brow=14, jaw=8,
+                   hand_r=(-5.2, -1.6, 6.4), foot_l=(1.85, -1.0, 0.98))
+    hit = st.but(twist=-22, lean=28, hip_twist=-14, side=2, pelvis=(0.05, -0.9, -1.0), hand_l=(1.1, -7.6, 6.0),
+                 pole_l=pole, fist_l=1.0, hand_roll_l=60, clav_l=-2, look=(4, 0), brow=18, jaw=16,
+                 hand_r=(-5.2, 0.4, 6.8), foot_l=(1.9, -1.5, 0.98), foot_r=(-1.8, 1.0, 0.98),
+                 foot_dir_r=foot_dir(-18, -1), toe_r=-20)
+    settle = hit.but(lean=31, pelvis=(0.05, -0.95, -1.08), hand_l=(1.2, -7.3, 5.6), jaw=10)
+    return keys_of([(0, st, 'auto'), (0.28, load, 'inout'), (0.37, drive, 'in'), (0.5, hit, 'out'),
+                    (0.64, settle, 'inout'), (1.0, st, 'auto')])
 
 
 def clobber(rig):
     """Attack variant: both fists clubbed down together in front of him."""
     st = stance(rig)
-    up = st.but(lean=-4, hip_tilt=-4, pelvis=(0, 0.3, -0.25), hand_l=(1.5, -1.6, 16.4), hand_r=(-1.5, -1.6, 16.4),
+    up = st.but(lean=-4, hip_tilt=-4, pelvis=(0, 0.3, -0.25), hand_l=(2.2, -1.8, 16.2), hand_r=(-2.2, -1.8, 16.2),
                 pole_l=(1.0, 0.4, 0.2), fist_l=1.0, fist_r=1.0, clav_l=14, clav_r=14, look=(0, 18), jaw=10, brow=6)
-    down = st.but(lean=36, hip_tilt=10, pelvis=(0, -0.3, -1.05), hand_l=(0.9, -6.0, 3.9), hand_r=(-0.9, -6.0, 3.9),
+    down = st.but(lean=36, hip_tilt=10, pelvis=(0, -0.3, -1.05), hand_l=(1.7, -6.8, 4.1), hand_r=(-1.7, -6.8, 4.1),
                   pole_l=(1.0, 0.2, -0.3), fist_l=1.0, fist_r=1.0, look=(0, 0), jaw=18, brow=18)
     return keys_of([(0, st, 'auto'), (0.42, up, 'in'), (0.6, down, 'out'), (0.72, down.but(lean=38), 'auto'),
                     (1.1, st, 'auto')])
@@ -220,13 +241,13 @@ def smash(rig):
     st = stance(rig)
     dip = st.but(lean=22, hip_tilt=8, pelvis=(0, 0.15, -0.95), hand_l=(4.2, 0.6, 4.6), hand_r=(-4.2, 0.6, 4.6),
                  fist_l=0.9, fist_r=0.9, look=(0, 2), brow=8)
-    raise_ = st.but(lean=-12, hip_tilt=-6, pelvis=(0, 0.45, -0.2), hand_l=(1.5, 0.6, 16.9),
-                    hand_r=(-1.5, 0.6, 16.9), pole_l=(1.0, 0.6, 0.1), fist_l=1.0, fist_r=1.0, clav_l=22, clav_r=22,
+    raise_ = st.but(lean=-12, hip_tilt=-6, pelvis=(0, 0.45, -0.2), hand_l=(2.1, 0.6, 16.7),
+                    hand_r=(-2.1, 0.6, 16.7), pole_l=(1.0, 0.6, 0.1), fist_l=1.0, fist_r=1.0, clav_l=22, clav_r=22,
                     look=(0, 26), neck=-4, jaw=26, brow=-6, eye=1.35,
                     foot_l=(2.05, 0.1, 0.98), foot_r=(-2.05, 0.1, 0.98))
-    apex = raise_.but(lean=-16, pelvis=(0, 0.55, -0.1), hand_l=(1.1, 1.8, 16.9), hand_r=(-1.1, 1.8, 16.9), eye=1.5,
+    apex = raise_.but(lean=-16, pelvis=(0, 0.55, -0.1), hand_l=(1.8, 1.8, 16.7), hand_r=(-1.8, 1.8, 16.7), eye=1.5,
                       jaw=30)
-    impact = crouch_reach(st, hand_l=(1.0, -4.5, 1.65), hand_r=(-1.0, -4.5, 1.65), pole_l=(1.0, 0.3, -0.4),
+    impact = crouch_reach(st, hand_l=(1.8, -5.3, 1.65), hand_r=(-1.8, -5.3, 1.65), pole_l=(1.0, 0.3, -0.4),
                           fist_l=1.0, fist_r=1.0,
                           jaw=24, brow=22, eye=1.2)
     jolt = impact.but(pelvis=(0, -0.65, -2.05), lean=48, look=(0, 18), jaw=20)
@@ -258,17 +279,17 @@ def hammer(rig):
     """Barrow Hammer (mob_balgath_hammer): the right fist raised over a player and
     brought down. CONTRACT: lands at 1.30 s of 1.7 s (unscaled). Right fist glows."""
     st = stance(rig)
-    load = st.but(twist=18, lean=4, hip_twist=8, pelvis=(-0.2, 0.3, -0.35), hand_r=(-2.8, 1.8, 16.2),
-                  pole_r=(-1.0, 0.4, 0.3), fist_r=1.0, clav_r=20, hand_l=(4.2, -3.4, 8.2), pole_l=(0.8, 0.5, -0.6),
+    load = st.but(twist=18, lean=4, hip_twist=8, pelvis=(-0.2, 0.3, -0.35), hand_r=(-5.4, 1.2, 15.0),
+                  pole_r=(-1.0, 0.4, 0.3), fist_r=1.0, clav_r=20, hand_l=(5.8, -3.6, 7.4), pole_l=(1.0, 0.5, -0.4),
                   fist_l=0.1, spread_l=8, look=(-6, 20), jaw=12, brow=6)
-    apex = load.but(twist=24, hand_r=(-2.4, 2.8, 16.6), lean=-2, look=(-8, 22), eye=1.3, jaw=18)
-    impact = st.but(twist=-12, lean=44, hip_tilt=18, hip_twist=-6, pelvis=(-0.3, -0.7, -1.65),
-                    hand_r=(-1.8, -4.7, 1.5), pole_r=(-1.0, 0.3, -0.3), fist_r=1.0,
-                    hand_l=(4.4, -1.6, 4.0), fist_l=0.7, look=(4, 20), neck=-12, jaw=22, brow=22, eye=1.15,
+    apex = load.but(twist=24, hand_r=(-5.1, 2.2, 15.5), lean=-2, look=(-8, 22), eye=1.3, jaw=18)
+    impact = st.but(twist=-12, lean=30, hip_tilt=12, hip_twist=-6, pelvis=(-0.3, -0.7, -1.4),
+                    hand_r=(-4.6, -6.2, 1.8), pole_r=(-1.0, 0.3, -0.3), fist_r=1.0,
+                    hand_l=(5.0, -2.6, 4.2), fist_l=0.7, look=(4, 20), neck=-12, jaw=22, brow=22, eye=1.15,
                     foot_r=(-2.0, -1.2, 0.98), foot_l=(1.9, 0.6, 0.98), knee_l=(0.4, -1, 0))
-    jolt = impact.but(pelvis=(-0.3, -0.75, -1.8), lean=46)
+    jolt = impact.but(pelvis=(-0.3, -0.75, -1.5), lean=32)
     return keys_of([(0, st, 'auto'), (0.45, load, 'out'), (0.98, apex, 'in'), (1.3, impact, 'out'),
-                    (1.36, jolt, 'auto'), (1.48, impact.but(lean=42, jaw=10), 'inout'), (1.7, st, 'auto')])
+                    (1.36, jolt, 'auto'), (1.48, impact.but(lean=28, jaw=10), 'inout'), (1.7, st, 'auto')])
 
 
 def cleave(rig):
@@ -276,21 +297,23 @@ def cleave(rig):
     front of him. CONTRACT: the arm crosses his front (the blow) at 1.50 s of 2.5 s
     (unscaled). Right fist glows."""
     st = stance(rig)
-    wind = crouch_reach(st, twist=40, hip_twist=16, lean=40, pelvis=(0.3, 0.0, -1.7),
-                        hand_r=(-5.6, 2.0, 3.0), pole_r=(-1.0, 0.6, 0.3), fist_r=1.0, hand_l=(3.6, -3.6, 3.0),
-                        pole_l=(1.0, 0.2, -0.5), fist_l=0.3, spread_l=8, look=(-10, 18), jaw=10, brow=10)
-    coil = wind.but(twist=46, hand_r=(-5.2, 2.6, 2.8), eye=1.2, jaw=16)
-    mid = crouch_reach(st, twist=-4, hip_twist=-2, lean=46, pelvis=(0.0, -0.4, -1.95),
-                       hand_r=(-0.4, -5.0, 2.8), pole_r=(-1.0, 0.0, 0.2), fist_r=1.0,
-                       hand_l=(3.8, -1.4, 3.4), fist_l=0.5, look=(0, 18), jaw=26, brow=22, eye=1.25)
-    through = crouch_reach(st, twist=-40, hip_twist=-14, lean=42, pelvis=(-0.4, -0.2, -1.8),
-                           hand_r=(4.0, -3.6, 1.9), pole_r=(-0.6, 0.6, 0.4), fist_r=1.0,
-                           hand_l=(5.0, 0.4, 4.2), look=(16, 14), jaw=18, brow=18)
-    side_ = crouch_reach(st, twist=20, hip_twist=6, lean=44, pelvis=(0.15, -0.2, -1.85), hand_r=(-5.2, -1.8, 3.2),
-                         pole_r=(-1.0, 0.3, 0.2), fist_r=1.0, hand_l=(3.7, -2.6, 3.2), fist_l=0.4, look=(-4, 18), jaw=22,
+    wind = crouch_reach(st, twist=40, hip_twist=16, lean=32, pelvis=(0.3, 0.0, -1.45),
+                        hand_r=(-8.7, -0.6, 5.2), pole_r=(-1.0, 0.6, 0.3), fist_r=1.0, hand_l=(7.2, -1.4, 5.4),
+                        pole_l=(1.0, 0.6, 0.2), fist_l=0.3, spread_l=8, look=(-10, 18), jaw=10, brow=10)
+    coil = wind.but(twist=46, hand_r=(-8.6, 0.3, 5.0), eye=1.2, jaw=16)
+    mid = crouch_reach(st, twist=8, hip_twist=4, lean=46, pelvis=(0.0, -0.4, -1.95),
+                       hand_r=(-0.4, -6.4, 2.8), pole_r=(-1.0, 0.0, 0.2), fist_r=1.0,
+                       hand_l=(5.8, -2.4, 4.4), fist_l=0.5, look=(0, 18), jaw=26, brow=22, eye=1.25)
+    through = crouch_reach(st, twist=34, hip_twist=14, lean=42, pelvis=(0.4, -0.3, -1.8),
+                           hand_r=(3.6, -6.2, 2.4), pole_r=(-0.6, 0.6, 0.4), fist_r=1.0,
+                           hand_l=(5.2, 1.0, 4.6), look=(16, 14), jaw=18, brow=18)
+    side_ = crouch_reach(st, twist=20, hip_twist=6, lean=40, pelvis=(0.15, -0.2, -1.7), hand_r=(-6.6, -3.0, 3.4),
+                         pole_r=(-1.0, 0.3, 0.2), fist_r=1.0, hand_l=(6.0, -3.4, 4.4), fist_l=0.4, look=(-4, 18), jaw=22,
                          brow=18, eye=1.2)
-    return keys_of([(0, st, 'auto'), (0.62, wind, 'auto'), (1.15, coil, 'quadin'), (1.36, side_, 'linear'), (1.5, mid, 'linear'),
-                    (1.72, through, 'out'), (2.0, through.but(twist=-36, jaw=8), 'inout'), (2.5, st, 'auto')])
+    out = st.but(lean=24, hip_tilt=10, pelvis=(0.15, 0.0, -1.0), twist=20, hand_r=(-7.8, -0.8, 6.2),
+                 pole_r=(-1.0, 0.6, 0.2), fist_r=1.0, hand_l=(5.8, -2.6, 5.0), look=(-6, 12), brow=8)
+    return keys_of([(0, st, 'auto'), (0.32, out, 'auto'), (0.62, wind, 'auto'), (1.15, coil, 'quadin'), (1.36, side_, 'linear'), (1.5, mid, 'linear'),
+                    (1.72, through, 'out'), (2.0, through.but(twist=30, jaw=8), 'inout'), (2.5, st, 'auto')])
 
 
 def barrowsweep(rig):
@@ -307,7 +330,7 @@ def barrowsweep(rig):
         # the upper body: wind (0-0.35), the backhand round behind (0.35-0.6), recover
         w = smooth(t / 0.32) * (1 - smooth((t - 0.32) / 0.18))
         h = smooth((t - 0.32) / 0.2) * (1 - smooth((t - 0.66) / 0.34))
-        wind = b.but(twist=34, look=(10, 16), hand_r=(1.2, -3.0, 9.0), fist_r=1.0, pole_r=(-0.3, 1.0, -0.4),
+        wind = b.but(twist=34, look=(10, 16), hand_r=(-0.1, -6.4, 10.2), fist_r=1.0, pole_r=(0.1, -0.35, 1.0),
                      jaw=10, brow=6)
         back = b.but(twist=-58, look=(-40, 16), hand_r=(-5.8, 3.4, 8.2), fist_r=1.0, pole_r=(-0.3, 1.0, -0.4),
                      jaw=26, brow=18)
@@ -328,11 +351,11 @@ def barrowfall(rig):
     plant = st.but(lean=24, hip_tilt=10, pelvis=(0, -0.2, -0.9), foot_l=(2.2, -0.5, 0.98), foot_r=(-2.2, 0.3, 0.98),
                    hand_l=(4.6, 0.6, 5.2), hand_r=(-4.6, 0.6, 5.2), fist_l=1.0, fist_r=1.0, look=(0, 12), jaw=8)
     rise = st.but(lean=-14, hip_tilt=-8, pelvis=(0, 0.7, 0.2), foot_l=(2.2, -0.5, 0.98), foot_r=(-2.2, 0.3, 0.98),
-                  hand_l=(1.1, 1.2, 17.0), hand_r=(-1.1, 1.2, 17.0), pole_l=(1.0, 0.7, 0.2), fist_l=1.0, fist_r=1.0,
-                  clav_l=24, clav_r=24, look=(0, 30), neck=-6, jaw=32, brow=-8, eye=1.6, toe_l=-20, toe_r=-20)
-    apex = rise.but(lean=-20, pelvis=(0, 0.95, 0.35), hand_l=(0.9, 2.6, 17.0), hand_r=(-0.9, 2.6, 17.0), eye=1.8)
+                  hand_l=(1.8, 1.2, 16.8), hand_r=(-1.8, 1.2, 16.8), pole_l=(1.0, 0.7, 0.2), fist_l=1.0, fist_r=1.0,
+                  clav_l=14, clav_r=14, look=(0, 30), neck=-6, jaw=32, brow=-8, eye=1.6, toe_l=-20, toe_r=-20)
+    apex = rise.but(lean=-20, pelvis=(0, 0.95, 0.35), hand_l=(1.6, 2.6, 16.8), hand_r=(-1.6, 2.6, 16.8), eye=1.8)
     impact = crouch_reach(st, lean=52, hip_tilt=28, pelvis=(0, -1.0, -2.25), foot_l=(2.2, -0.5, 0.98),
-                          foot_r=(-2.2, 0.3, 0.98), hand_l=(0.8, -5.1, 1.65), hand_r=(-0.8, -5.1, 1.65),
+                          foot_r=(-2.2, 0.3, 0.98), hand_l=(1.8, -5.8, 1.65), hand_r=(-1.8, -5.8, 1.65),
                           pole_l=(1.0, 0.3, -0.4), fist_l=1.0, fist_r=1.0, jaw=30, brow=24, eye=1.4)
     jolt = impact.but(pelvis=(0, -1.05, -2.45), lean=55, jaw=22)
     heave = impact.but(pelvis=(0, -0.9, -2.15), lean=50, look=(0, 30), jaw=6, brow=16, eye=1.0, clav_l=6, clav_r=6)
@@ -358,11 +381,11 @@ def toss(rig):
                        brow=12)
     strain = dig.but(pelvis=(0, -0.7, -2.0), lean=46, hand_l=L(rock_low + (grip, 0.2, 0.25)),
                      hand_r=L(rock_low + (-grip, 0.2, 0.25)), jaw=24, brow=26, look=(0, 30), fist_l=0.4, fist_r=0.4)
-    rip = st.but(lean=30, hip_tilt=14, pelvis=(0, -0.3, -1.3), hand_l=L(rock_low + (grip, 1.2, 2.6)),
-                 hand_r=L(rock_low + (-grip, 1.2, 2.6)), pole_l=(1.0, 0.3, -0.5), hand_dir_l=(-0.9, 0, -0.3),
+    rip = st.but(lean=30, hip_tilt=14, pelvis=(0, -0.3, -1.3), hand_l=L(rock_low + (grip + 0.3, -0.6, 2.4)),
+                 hand_r=L(rock_low + (-grip - 0.3, -0.6, 2.4)), pole_l=(1.0, 0.3, -0.5), hand_dir_l=(-0.9, 0, -0.3),
                  hand_dir_r=(0.9, 0, -0.3), fist_l=0.45, fist_r=0.45, jaw=28, brow=20, look=(0, 20),
                  foot_l=(2.05, -0.3, 0.98), foot_r=(-2.05, -0.3, 0.98))
-    chest = st.but(lean=6, hip_tilt=2, pelvis=(0, 0.2, -0.6), hand_l=(1.6, -2.4, 9.6), hand_r=(-1.6, -2.4, 9.6),
+    chest = st.but(lean=6, hip_tilt=2, pelvis=(0, 0.2, -0.6), hand_l=(2.0, -5.2, 10.0), hand_r=(-2.0, -5.2, 10.0),
                    hand_dir_l=(-0.9, 0, 0.3), hand_dir_r=(0.9, 0, 0.3), fist_l=0.45, fist_r=0.45, jaw=18, brow=14,
                    look=(0, 16), foot_l=(2.05, -0.3, 0.98), foot_r=(-2.05, -0.3, 0.98))
     over = st.but(lean=-14, hip_tilt=-6, pelvis=(0, 0.6, -0.15), hand_l=L(rock_high + (grip, 0.0, -0.1)),
@@ -371,10 +394,10 @@ def toss(rig):
                   brow=4, eye=1.3, foot_l=(2.05, -0.3, 0.98), foot_r=(-2.05, 0.4, 0.98))
     cock = over.but(lean=-24, hip_tilt=-10, pelvis=(0, 0.9, -0.3), hand_l=L(rock_high + (grip, 1.4, -0.4)),
                     hand_r=L(rock_high + (-grip, 1.4, -0.4)), jaw=26, eye=1.45)
-    release = st.but(lean=34, hip_tilt=14, pelvis=(0, -0.7, -0.9), hand_l=(1.4, -5.2, 9.4), hand_r=(-1.4, -5.2, 9.4),
+    release = st.but(lean=34, hip_tilt=14, pelvis=(0, -0.7, -0.9), hand_l=(3.5, -6.6, 9.6), hand_r=(-3.5, -6.6, 9.6),
                      pole_l=(1.0, 0.4, -0.5), fist_l=0.0, fist_r=0.0, spread_l=12, spread_r=12, jaw=34, brow=24,
                      eye=1.5, look=(0, 14), foot_l=(2.05, -1.2, 0.98), foot_r=(-2.05, 0.7, 0.98))
-    follow = release.but(lean=40, hand_l=(2.4, -4.6, 5.6), hand_r=(-2.4, -4.6, 5.6), jaw=14, brow=12, eye=1.1)
+    follow = release.but(lean=40, hand_l=(3.8, -5.8, 5.8), hand_r=(-3.8, -5.8, 5.8), jaw=14, brow=12, eye=1.1)
     return keys_of([(0, st, 'auto'), (0.32, dig, 'auto'), (0.5, strain, 'auto'), (0.55, strain, 'out'),
                     (0.78, rip, 'auto'), (0.94, chest, 'auto'), (1.1, over, 'auto'), (1.28, cock, 'in'),
                     (1.45, release, 'out'), (1.65, follow, 'inout'), (2.2, st, 'auto')])
@@ -443,12 +466,12 @@ def starwake(rig):
                   fist_r=0.1, spread_l=16, spread_r=16, clav_l=24, clav_r=24, jaw=24, eye=2.1, lid_up=-14, brow=-10)
     apex = call.but(lean=-22, pelvis=(0, 0.75, -0.1), hand_l=(2.9, 1.0, 17.1), hand_r=(-2.9, 1.0, 17.1), eye=2.3,
                     jaw=30)
-    fists = apex.but(fist_l=1.0, fist_r=1.0, hand_roll_l=0, hand_roll_r=0, hand_l=(1.4, 1.8, 17.0),
-                     hand_r=(-1.4, 1.8, 17.0))
+    fists = apex.but(fist_l=1.0, fist_r=1.0, hand_roll_l=0, hand_roll_r=0, hand_l=(1.9, 1.8, 16.8),
+                     hand_r=(-1.9, 1.8, 16.8))
     kneel = Body(rig, pelvis=(0.2, -0.6, -2.45), hip_tilt=22, lean=40, neck=-14, look=(0, 30),
                  foot_l=(1.9, -2.2, 0.98), foot_dir_l=foot_dir(4, 1), knee_l=(0.2, -1.0, 0.1),
                  foot_r=(-1.9, 2.4, 1.75), foot_dir_r=(-0.05, 0.25, -1.0), toe_r=-45, knee_r=(-0.1, -0.2, -1.0),
-                 hand_l=(0.9, -4.5, 1.65), hand_r=(-0.9, -4.5, 1.65), pole_l=(1.0, 0.3, -0.4),
+                 hand_l=(1.8, -5.2, 1.65), hand_r=(-1.8, -5.2, 1.65), pole_l=(1.0, 0.3, -0.4),
                  fist_l=1.0, fist_r=1.0,
                  jaw=28, brow=24, eye=1.8)
     jolt = kneel.but(pelvis=(0.2, -0.65, -2.6), lean=43)
@@ -490,10 +513,10 @@ def cover_eye(b, both=True, reach=1.0):
     """Put the hands over the eye wherever the head is in this pose."""
     e = b.eye_point()
     x, f, u = b.head_frame()
-    kw = dict(hand_l=tuple(e + f * 0.55 * reach + x * 0.55 - u * 1.1), pole_l=tuple(x * 1.0 - u * 0.6 + f * 0.2),
+    kw = dict(hand_l=tuple(e + f * 1.35 * reach + x * 0.75 - u * 1.2), pole_l=tuple(x * 1.0 - u * 0.6 + f * 0.2),
               hand_dir_l=tuple(-x * 0.55 + u * 0.75 - f * 0.1), fist_l=0.15, spread_l=8)
     if both:
-        kw.update(hand_r=tuple(e + f * 0.75 * reach - x * 0.65 - u * 0.95), pole_r=tuple(-x * 1.0 - u * 0.6 + f * 0.2),
+        kw.update(hand_r=tuple(e + f * 1.55 * reach - x * 0.85 - u * 1.05), pole_r=tuple(-x * 1.0 - u * 0.6 + f * 0.2),
                   hand_dir_r=tuple(x * 0.6 + u * 0.7 - f * 0.1), fist_r=0.3, spread_r=6)
     return b.but(**kw)
 
@@ -526,19 +549,24 @@ def blinded_loop(rig, period=4.0):
 
 
 def mend(rig, period=4.8):
-    """Barrowmend (his regen while unharried): fen mud scooped and pressed into the
-    hide of his forearm and chest, slow breaths, the eye half-lidded."""
+    """Barrowmend (his regen while unharried): the left forearm held out in front of
+    him, the right hand scoops fen mud from the ground and smears it along the top
+    of that forearm, working it in. Slow breaths, the eye half-lidded. Every
+    contact is ON the surface: the hand rides the top of the forearm, never into it."""
     st = stance(rig)
-    base = st.but(lean=20, hip_tilt=8, pelvis=(0, 0.2, -0.9), look=(10, -18), neck=10, lid_up=36, eye=0.8,
-                  hand_l=(1.8, -3.2, 7.8), pole_l=(1.0, -0.4, -0.6), fist_l=0.3, hand_dir_l=(-0.6, -0.4, 0.4))
-    scoop = base.but(hand_r=(-2.6, -4.6, 2.0), pole_r=(-1.0, 0.2, -0.4), fist_r=0.3, lean=40, hip_tilt=16,
-                     pelvis=(0, -0.2, -1.8), look=(-6, 4), hand_dir_r=(0.3, -0.3, -0.9))
-    press = base.but(hand_r=(1.0, -3.4, 7.6), pole_r=(-1.0, 0.0, -0.6), fist_r=0.15, spread_r=10,
-                     hand_dir_r=(0.8, 0.2, -0.3))
-    rub = press.but(hand_r=(2.2, -3.0, 8.4), look=(14, -20))
-    chest = base.but(hand_r=(-0.4, -2.6, 9.6), hand_dir_r=(0.6, 0.6, 0.0), fist_r=0.1, look=(0, -26), lid_up=48)
-    return keys_of([(0, base, 'auto'), (0.8, scoop, 'inout'), (1.6, press, 'auto'), (2.2, rub, 'auto'),
-                    (2.8, press, 'auto'), (3.6, chest, 'inout'), (period, base, 'auto')], loop=True)
+    base = st.but(lean=4, hip_tilt=2, pelvis=(0, 0.2, -0.7), look=(4, -2), neck=0, lid_up=36, eye=0.8, twist=10,
+                  hand_l=(4.6, -7.6, 6.4), pole_l=(1.0, 0.5, -0.3), fist_l=0.35, hand_roll_l=20,
+                  hand_r=(-4.4, -2.8, 6.4), pole_r=(-1.0, 0.4, -0.4), fist_r=0.4)
+    scoop = base.but(hand_r=(-2.8, -5.6, 2.2), pole_r=(-1.0, 0.3, -0.3), fist_r=0.3, lean=36, hip_tilt=16,
+                     pelvis=(0, -0.2, -1.7), look=(-8, 2), hand_roll_r=40)
+    lift = base.but(hand_r=(-1.6, -8.0, 8.2), pole_r=(-1.0, 0.0, -0.4), fist_r=0.3, hand_roll_r=60, look=(8, -8))
+    smear_a = base.but(twist=12, hip_twist=4, hand_r=(2.6, -8.8, 7.4), pole_r=(-0.8, -0.2, -0.6), fist_r=0.1, spread_r=10, hand_roll_r=70,
+                       look=(10, -10))
+    smear_b = smear_a.but(hand_r=(3.3, -8.4, 7.4), look=(2, -4))
+    return keys_of([(0, base, 'auto'), (0.8, scoop, 'inout'), (1.4, lift, 'auto'), (1.9, smear_a, 'auto'),
+                    (2.5, smear_b, 'auto'), (3.1, smear_a, 'auto'), (3.7, smear_b.but(hand_r=(3.0, -9.0, 7.1)), 'inout'),
+                    (period, base, 'auto')],
+                   loop=True)
 
 
 def death(rig):

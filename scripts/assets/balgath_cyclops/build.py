@@ -101,6 +101,19 @@ def build_dressing(F, workdir, fast=False):
     noise = sdf.Noise(5)
     for i, slab in enumerate(D.slab_specs()):
         hi, lo, q, n, glow = D.build_slab(F, slab, i, voxel=0.03 if fast else 0.02, noise=noise, workdir=workdir)
+        sh = A.SHOULDER if q[0] > 0 else A.mirror(A.SHOULDER)
+        if np.linalg.norm(q - sh) < 1.9 and slab.bone is None:
+            # Stone over the shoulder joint. On the TOP of the shoulder it belongs to
+            # the girdle (rigid on the clavicle, which lifts when the arm goes over
+            # the head); on the arm the old binding drove the pauldron into the
+            # trapezius and the jaw. On the side of the deltoid it rides the skin.
+            side = 'L_' if q[0] > 0 else 'R_'
+            for o in (hi, lo) + (tuple(glow) if glow else ()):
+                if n[2] > 0.55:
+                    o['binding'] = 'rigid'
+                    o['bone'] = side + 'Clavicle'
+                else:
+                    o['binding'] = 'transfer'
         pairs.append((hi, lo))
         if glow:
             pairs.append(glow)

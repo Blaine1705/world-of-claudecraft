@@ -55,6 +55,7 @@ def finger_turns(side_sign, curl1, curl2, thumb, spread=0.0):
     return out
 
 
+PRONATE_FOREARM = 0.45
 HAND_AXIS = {s: tuple(_n(A.REST[s + 'Hand'][1] - A.REST[s + 'Hand'][0])) for s in ('L_', 'R_')}
 
 
@@ -93,7 +94,7 @@ class Body:
         b = Body(self.rig)
         b.p = dict(self.p)
         for k, v in kw.items():
-            if k not in b.p:
+            if k not in b.p and not k.startswith('_home_'):
                 raise KeyError(k)
             b.p[k] = v
         return b
@@ -112,9 +113,27 @@ class Body:
                 b.p[k] = a + (o - a) * t
         return b
 
-    def pose(self, memory=None):
+    def pose(self, memory=None, resolve=True):
+        """Solve the pose; with `resolve`, then keep the arms out of the body."""
+        if not resolve:
+            return self._solve(memory)
+        snap = {k: v.copy() for k, v in memory.items()} if memory is not None else None
+        pose = self._solve(None if memory is None else dict(snap))
+        b = self
+        for _ in range(14):
+            fix = arm_clearance_fix(b, pose)
+            if fix is None:
+                break
+            b = b.but(**fix)
+            pose = b._solve(None if memory is None else dict(snap))
+        if memory is not None:
+            b._solve(memory)                  # commit this frame's bend memory once
+        return pose
+
+    def _solve(self, memory=None):
         p = self.p
         turns = {}
+        twist = {}
         aims = {}
         ik = {}
         turns['Root'] = [('z', p['yaw']), ('x', p['pitch']), ('y', p['roll'])]
@@ -130,8 +149,14 @@ class Body:
         turns['Brow'] = [('x', p['brow'])]
         turns['LidUp'] = [('x', p['lid_up'])]
         turns['LidLo'] = [('x', -p['lid_lo'])]
-        turns['L_Clavicle'] = [((0, 1, 0), -p['clav_l'])]
-        turns['R_Clavicle'] = [((0, 1, 0), p['clav_r'])]
+        # The shoulder girdle follows the hand, as a scapula does: a hand going over
+        # the head lifts the clavicle, a hand reaching across the body draws it
+        # forward. Without it the arm alone does the work, and the deltoid and the
+        # stone over it grind into the trapezius and the neck.
+        lift_l, fwd_l = girdle(p['hand_l'], 1)
+        lift_r, fwd_r = girdle(p['hand_r'], -1)
+        turns['L_Clavicle'] = [((0, 1, 0), -(p['clav_l'] + lift_l)), ((0, 0, 1), -fwd_l)]
+        turns['R_Clavicle'] = [((0, 1, 0), p['clav_r'] + lift_r), ((0, 0, 1), fwd_r)]
         # arms
         for side, s in (('L_', 1), ('R_', -1)):
             key = 'hand_l' if s > 0 else 'hand_r'
@@ -144,7 +169,10 @@ class Body:
                 aims[side + 'Hand'] = V(hd)
             roll = p['hand_roll_l'] if s > 0 else p['hand_roll_r']
             if roll:
-                turns.setdefault(side + 'Hand', []).append((HAND_AXIS[side], roll * s))
+                # pronation lives in the forearm (the radius rolls over the ulna), so it
+                # is shared between the forearm and the hand: no wrung wrist
+                twist[side + 'Forearm'] = PRONATE_FOREARM * roll * s
+                twist[side + 'Hand'] = (1 - PRONATE_FOREARM) * roll * s
         # legs
         for side, s in (('L_', 1), ('R_', -1)):
             f = p['foot_l'] if s > 0 else p['foot_r']
@@ -168,23 +196,170 @@ class Body:
         for k, v in fr.items():
             turns['R_' + k[2:]] = [R._mirror_turn(a, d) for a, d in v]
         pose = self.rig.pose(aims=aims, ik=ik, turns=turns, root=p['pelvis'], scale={'EyeCore': max(0.02, p['eye'])},
-                             mirror=False, memory=memory)
+                             mirror=False, memory=memory, twist=twist)
         return pose
 
 
     def eye_point(self):
         """Where the eye is in this pose (armature space), hands ignored."""
         b = self.but(hand_l=None, hand_r=None)
-        pose = b.pose()
+        pose = b.pose(resolve=False)
         h = pose.head['Head']
         rel = V(A.EYE) - V(A.REST['Head'][0])
         return np.array(h + pose.delta['Head'] @ rel)
 
     def head_frame(self):
         b = self.but(hand_l=None, hand_r=None)
-        pose = b.pose()
+        pose = b.pose(resolve=False)
         q = pose.delta['Head']
         return (np.array(q @ V((1, 0, 0))), np.array(q @ V((0, -1, 0))), np.array(q @ V((0, 0, 1))))
+
+
+def girdle(target, s):
+    """(elevation, protraction) of a clavicle in degrees for a wrist target."""
+    if target is None:
+        return 0.0, 0.0
+    sh = np.array(A.SHOULDER) * (1, 1, 1)
+    sh[0] *= s
+    d = _n(np.asarray(target, float) - sh)
+    elev = math.degrees(math.acos(max(-1.0, min(1.0, -d[2]))))    # 0 hanging, 180 straight up
+    lift = 26.0 * smoothstep((elev - 75.0) / 95.0)
+    across = -d[0] * s                                               # > 0 toward the other side
+    fwd = 16.0 * smoothstep((across + 0.1) / 0.7) * smoothstep((-d[1] + 0.2) / 0.8)
+    return lift, fwd
+
+
+def smoothstep(x):
+    x = max(0.0, min(1.0, x))
+    return x * x * (3 - 2 * x)
+
+
+# ------------------------------------------------------------------ body clearance
+# The bones of the flesh an arm must stay out of, and the arm's own girth along its
+# length (from the sculpt: anatomy.py's limb cones and muscle bellies).
+COLLIDE = ('Hips', 'Spine1', 'Spine2', 'Belly', 'Neck', 'Head', 'Jaw', 'Brow', 'L_Thigh', 'R_Thigh', 'L_KneeFix',
+           'R_KneeFix')
+# (segment, fraction along it, radius, chain position 0 shoulder .. 1 wrist)
+# The upper arm is measured from 62% of its length outward: nearer the joint is the
+# deltoid and the armpit, which press on the chest by anatomy.
+ARM_SAMPLES = (('UpperArm', 0.66, 1.12, 0.33), ('UpperArm', 0.85, 1.05, 0.42), ('Forearm', 0.0, 0.95, 0.5),
+               ('Forearm', 0.25, 1.25, 0.62), ('Forearm', 0.5, 1.15, 0.75), ('Forearm', 0.75, 0.95, 0.87),
+               ('Hand', 0.0, 0.8, 1.0), ('Hand', 0.45, 0.72, 1.0), ('Hand', 0.85, 0.62, 1.0))
+# The fingers are sampled at their real joints (a fist curls them back toward the
+# palm, an open hand reaches far past the hand bone): (bone, fraction, radius).
+FINGER_SAMPLES = tuple((f + k, t, r) for f in ('Index', 'Middle', 'Ring', 'Thumb')
+                       for k, t, r in (('1', 1.0, 0.36), ('2', 1.0, 0.5)))
+
+
+def _stone_samples():
+    """The barrowhide bracers stand proud of the forearm (dressing.slab_specs): an
+    outer bracer on each forearm and a second stone on the front of the right one.
+    Rest-space points carried on the forearm, with their own radius."""
+    out = []
+    for side, s in (('L_', 1), ('R_', -1)):
+        el = np.array(A.ELBOW) * (s, 1, 1)
+        wr = np.array(A.WRIST) * (s, 1, 1)
+        ax = _n(wr - el)
+        outw = _n(np.cross(ax, (0, -1.0, 0)) * -s)
+        for t in (0.35, 0.55, 0.72):
+            out.append((side + 'Forearm', el + (wr - el) * t + outw * 0.95, 0.75))
+        if s < 0:
+            front = _n(np.array((0, -1.0, 0.15)) + outw * 0.4)
+            for t in (0.3, 0.5):
+                out.append((side + 'Forearm', el + (wr - el) * t + front * 1.05, 0.7))
+    return tuple(out)
+
+
+STONE_SAMPLES = _stone_samples()
+CLEAR_MARGIN = 0.18
+RESOLVE_CAP = 1.6
+_BODY_PRIMS = None
+
+
+def body_prims():
+    global _BODY_PRIMS
+    if _BODY_PRIMS is None:
+        F = A.build_body(voxel=0.15, detail=False)
+        d = {}
+        for prim, _ in F.prims:
+            if prim.bone in COLLIDE:
+                d.setdefault(prim.bone, []).append(prim)
+        _BODY_PRIMS = d
+    return _BODY_PRIMS
+
+
+def body_distance(pose, P):
+    """Distance from armature-space points to the posed flesh (the sculpt's own
+    primitives carried on their bones)."""
+    out = np.full(len(P), 50.0)
+    for bone, plist in body_prims().items():
+        R = np.array(pose.delta[bone].to_matrix())
+        Q = np.array(A.REST[bone][0]) + (P - np.array(pose.head[bone])) @ R
+        for prim in plist:
+            out = np.minimum(out, prim.dist_pts(Q))
+    return out
+
+
+def arm_points(pose, side):
+    pts = []
+    for bone, rp, r in STONE_SAMPLES:
+        if not bone.startswith(side):
+            continue
+        h = np.array(pose.head[bone])
+        R = pose.delta[bone]
+        pts.append((h + np.array(R @ V(rp - A.REST[bone][0])), r, 0.7))
+    for seg, t, r in FINGER_SAMPLES:
+        bone = side + seg
+        h = np.array(pose.head[bone])
+        d = np.array(pose.delta[bone] @ (V(A.REST[bone][1]) - V(A.REST[bone][0])))
+        pts.append((h + d * t, r, 1.0))
+    for seg, t, r, u in ARM_SAMPLES:
+        bone = side + seg
+        h = np.array(pose.head[bone])
+        d = np.array(pose.delta[bone] @ (V(A.REST[bone][1]) - V(A.REST[bone][0])))
+        pts.append((h + d * t, r, u))
+    return pts
+
+
+def arm_clearance_fix(b, pose):
+    """Push each wrist target and elbow out of the body along the flesh's normal.
+    Returns Body overrides, or None when both arms are already clear."""
+    fix = {}
+    eps = 0.05
+    for side, hk, pk in (('L_', 'hand_l', 'pole_l'), ('R_', 'hand_r', 'pole_r')):
+        samples = arm_points(pose, side)
+        P = np.array([p for p, _, _ in samples])
+        d = body_distance(pose, P)
+        pen = np.array([r for _, r, _ in samples]) + CLEAR_MARGIN - d
+        if pen.max() <= 0.0:
+            continue
+        grads = np.zeros_like(P)
+        for a in range(3):
+            e = np.zeros(3)
+            e[a] = eps
+            grads[:, a] = (body_distance(pose, P + e) - body_distance(pose, P - e)) / (2 * eps)
+        grads /= np.maximum(np.linalg.norm(grads, axis=1, keepdims=True), 1e-6)
+        wrist_shift = np.zeros(3)
+        elbow_push = np.zeros(3)
+        for (p, r, u), pe, g in zip(samples, pen, grads):
+            if pe <= 0:
+                continue
+            wrist_shift += g * pe * min(1.0, u / 0.75)
+            elbow_push += g * pe * max(0.0, 1.0 - abs(u - 0.5) * 2.5)
+        wrist = np.array(pose.head[side + 'Hand'])
+        tgt = np.array(b.p[hk]) if b.p[hk] is not None else wrist
+        new = tgt + wrist_shift * 1.25
+        home = np.array(b.p.get('_home_' + hk, tuple(tgt)))
+        off = new - home
+        if np.linalg.norm(off) > RESOLVE_CAP:          # a nudge, never a new pose
+            new = home + off / np.linalg.norm(off) * RESOLVE_CAP
+        fix[hk] = tuple(new)
+        fix['_home_' + hk] = tuple(home)
+        if np.linalg.norm(elbow_push) > 1e-6:
+            pole = b.p[pk] if b.p[pk] is not None else (-b.p['pole_l'][0], b.p['pole_l'][1], b.p['pole_l'][2])
+            pv = _n(pole) + _n(elbow_push) * min(1.0, np.linalg.norm(elbow_push))
+            fix[pk] = tuple(_n(pv))
+    return fix or None
 
 
 # ------------------------------------------------------------------ clip helpers
@@ -205,7 +380,7 @@ NUMERIC_SKIP = set(LIMB_ROOT)
 
 
 def _roots(b):
-    pose = b.but(hand_l=None, hand_r=None).pose()
+    pose = b.but(hand_l=None, hand_r=None).pose(resolve=False)
     return {k: np.array(pose.head[bone]) for k, bone in LIMB_ROOT.items()}
 
 
@@ -214,7 +389,7 @@ def _target(b, key):
     if v is not None:
         return np.asarray(v, float)
     # a hanging limb: where it actually is in the pose
-    pose = b.pose()
+    pose = b.pose(resolve=False)
     bone = {'hand_l': 'L_Hand', 'hand_r': 'R_Hand', 'foot_l': 'L_Foot', 'foot_r': 'R_Foot'}[key]
     return np.array(pose.head[bone])
 
@@ -235,7 +410,7 @@ def resolved(b):
         if q[key] is None:
             q[key] = tuple((A.REST[side + 'Foot'][1] - A.REST[side + 'Foot'][0]).tolist())
     if q['hand_dir_l'] is None or q['hand_dir_r'] is None:
-        pose = out.pose()
+        pose = out.pose(resolve=False)
         for side, key in (('L_', 'hand_dir_l'), ('R_', 'hand_dir_r')):
             if q[key] is None:
                 rd = V(A.REST[side + 'Hand'][1]) - V(A.REST[side + 'Hand'][0])

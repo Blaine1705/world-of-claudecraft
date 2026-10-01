@@ -225,6 +225,61 @@ class Rig:
             off = joint - (root + line * (joint - root).dot(line))
             self.rest_bend[up] = off.normalized()
 
+    # How far an upper limb may roll about its own length, relative to the clavicle or
+    # the pelvis (degrees). Past it the arm reads as wrung like a towel: the elbow is
+    # turned round instead, keeping the hand where it was asked to be.
+    ROLL_LIMIT = {'L_UpperArm': 62.0, 'R_UpperArm': 62.0, 'L_Thigh': 25.0, 'R_Thigh': 25.0}
+
+    def roll_of(self, name, d1, bend, dp):
+        q = dp.inverted() @ self._limb_rotation(name, d1, bend)
+        rest_m = self.frames[name]
+        local = (rest_m.inverted() @ q.to_matrix() @ rest_m).to_quaternion()
+        if local.w < 0:
+            local.negate()
+        return math.degrees(2 * math.atan2(local.y, local.w))
+
+    ROLL_STEP = 11.0   # degrees per frame an upper limb may roll (the elbow swings round, never snaps)
+
+    def _limit_roll(self, name, lo, root, tgt, bend, dp, prev=None):
+        """Turn the bend plane round the root-to-target line until the upper bone's
+        roll is within ROLL_LIMIT and, with `prev` (last frame's roll), within
+        ROLL_STEP of it. The roll is unwrapped against `prev` first, so a pose past
+        +180 is not read as -180 and clamped to the far limit."""
+        l1, l2 = self.length[name], self.length[lo]
+        d1, d2 = two_bone(root, l1, l2, tgt, bend)
+        lim = self.ROLL_LIMIT.get(name)
+        if lim is None:
+            return d1, d2, bend, None
+        dn = (Vector(tgt) - root).normalized()
+
+        def unwrap(r):
+            if prev is None:
+                return r
+            return r + 360.0 * round((prev - r) / 360.0)
+
+        lo_r, hi_r = -lim, lim
+        if prev is not None:
+            lo_r, hi_r = max(lo_r, prev - self.ROLL_STEP), min(hi_r, prev + self.ROLL_STEP)
+            if lo_r > hi_r:
+                lo_r = hi_r = max(-lim, min(lim, prev))
+        roll = unwrap(self.roll_of(name, d1, bend, dp))
+        for _ in range(12):
+            want = max(lo_r, min(hi_r, roll))
+            over = roll - want
+            if abs(over) < 0.5:
+                break
+            trial = (Quaternion(dn, math.radians(-over)) @ bend).normalized()
+            t1, t2 = two_bone(root, l1, l2, tgt, trial)
+            tb = two_bone.last_bend.copy()
+            r2 = unwrap(self.roll_of(name, t1, tb, dp))
+            if abs(r2 - want) > abs(over):        # the roll runs against the turn here
+                trial = (Quaternion(dn, math.radians(over)) @ bend).normalized()
+                t1, t2 = two_bone(root, l1, l2, tgt, trial)
+                tb = two_bone.last_bend.copy()
+                r2 = unwrap(self.roll_of(name, t1, tb, dp))
+            d1, d2, bend, roll = t1, t2, tb, r2
+        return d1, d2, bend, roll
+
     @staticmethod
     def _frame(y, z):
         y = y.normalized()
@@ -257,7 +312,8 @@ class Rig:
 
     LIMITS = {'L_Hand': 75.0, 'R_Hand': 75.0, 'L_Foot': 60.0, 'R_Foot': 60.0}
 
-    def pose(self, aims=None, ik=None, turns=None, root=(0, 0, 0), scale=None, mirror=True, memory=None):
+    def pose(self, aims=None, ik=None, turns=None, root=(0, 0, 0), scale=None, mirror=True, memory=None,
+             twist=None):
         """aims {bone: armature dir}; ik {key: (upper, lower, target, pole)};
         turns {bone: [(axis, deg)]} (rest-frame axes, applied after the aim, carried
         by the parent); root: Root bone offset; scale {bone: s}."""
@@ -281,8 +337,13 @@ class Rig:
             if name in ik_upper:
                 lo, tgt, pole = ik_upper[name]
                 prev = memory.get(name) if memory is not None else None
-                d1, d2 = two_bone(head[name], self.length[name], self.length[lo], tgt, pole, prev)
+                d1, d2 = two_bone(head[name], self.length[name], self.length[lo], tgt, pole, prev, max_step=12.0)
                 bend = two_bone.last_bend.copy()
+                prev_roll = memory.get(name + '#roll') if memory is not None else None
+                d1, d2, bend, roll = self._limit_roll(name, lo, head[name], tgt, bend, dp,
+                                                      None if prev_roll is None else prev_roll.x)
+                if memory is not None and roll is not None:
+                    memory[name + '#roll'] = Vector((roll, 0.0, 0.0))
                 if memory is not None:
                     memory[name] = bend
                 limb_rot[name] = self._limb_rotation(name, d1, bend)
@@ -312,6 +373,10 @@ class Rig:
                 q = r0.rotation_difference(want)
             for a, deg in turns.get(name, []):
                 q = Quaternion(_axis(a).normalized(), math.radians(deg)) @ q
+            if twist and name in twist:
+                # a roll about the bone's own length (pronation): applied in the bone's
+                # rest frame first, so it stays a pure twist whatever the swing
+                q = q @ Quaternion((rt - rh).normalized(), math.radians(twist[name]))
             delta[name] = dp @ q
             rest_m = self.frames[name]
             out[name] = (rest_m.inverted() @ q.to_matrix() @ rest_m).to_quaternion()
