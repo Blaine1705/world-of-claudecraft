@@ -25,6 +25,7 @@ import { sharedUniforms } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
 import { PartBin } from './foundry_mesh';
 import { craneYaw } from './foundry_plan_core';
+import { buildPressHammers } from './foundry_press';
 
 type Ground = (x: number, z: number) => number;
 
@@ -478,9 +479,8 @@ function pressPieces(bin: PartBin, ground: Ground): void {
   bin.box('iron', 0, top, STAMPING_PRESS.z, 22, 1.1, 2.2);
   bin.box('brass', 0, top + 1.4, STAMPING_PRESS.z, 21, 0.35, 1.8);
   for (const x of MAIN_LINE_BELTS.xs) {
+    // the rams; their hammers fall on their own (foundry_press.ts)
     bin.cyl('brass', x, top - 5, top, STAMPING_PRESS.z - 3, 0.5, 0.5, 10);
-    bin.box('iron', x, top - 6.4, STAMPING_PRESS.z - 3, 2.6, 1.3, 4);
-    bin.box('hazard', x, top - 7.8, STAMPING_PRESS.z - 3, 2.65, 0.12, 4.05);
     bin.box('iron', x, top - 1, STAMPING_PRESS.z - 3, 1.2, 1, 1.6);
   }
   // Hazard paint down both edges of every belt: the walkways between read safe.
@@ -713,6 +713,7 @@ export function buildFoundryDressing(ground: Ground, lowGfx: boolean): THREE.Gro
   towerBands(bin);
   group.add(bin.build('stormbrassProps'));
   group.add(buildBelts(ground));
+  group.add(buildPressHammers(ground));
   const steam = buildSteam(ground, lowGfx);
   if (steam) group.add(steam);
   return group;

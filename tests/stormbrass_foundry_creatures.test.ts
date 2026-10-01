@@ -23,6 +23,7 @@ import {
   voltaicPlateDial,
   voltaicPlateGesture,
 } from '../src/render/stormbrass_foundry/foundry_creature_fx_core';
+import { hammerDrop } from '../src/render/stormbrass_foundry/foundry_press';
 import { VOLTAIC_CHARGED, VOLTAIC_GROUNDED } from '../src/sim/encounters/stormbrass_foundry/ids';
 import type { Entity } from '../src/sim/types';
 
@@ -52,6 +53,28 @@ function glbNodeNames(url: string): string[] {
   // The skeleton's bones only (the body mesh may well be named after a shield).
   const joints = new Set((json.skins ?? []).flatMap((s) => s.joints));
   return json.nodes.filter((_, i) => joints.has(i)).map((n) => n.name ?? '');
+}
+
+/** Per animation, the (sanitised) node names it keys a rotation for. */
+function glbRotationTracks(url: string): Map<string, Set<string>> {
+  const buf = fs.readFileSync(path.join('public', url));
+  const len = buf.readUInt32LE(12);
+  const json = JSON.parse(buf.subarray(20, 20 + len).toString('utf8')) as {
+    nodes: { name?: string }[];
+    animations: {
+      name: string;
+      channels: { sampler: number; target: { node: number; path: string } }[];
+    }[];
+  };
+  const out = new Map<string, Set<string>>();
+  for (const a of json.animations) {
+    const set = new Set<string>();
+    for (const c of a.channels)
+      if (c.target.path === 'rotation')
+        set.add((json.nodes[c.target.node].name ?? '').replace(/[[\].:/]/g, ''));
+    out.set(a.name, set);
+  }
+  return out;
 }
 
 describe('the Foundry creatures wear their own models', () => {
@@ -90,6 +113,16 @@ describe('the Foundry creatures wear their own models', () => {
         expect(n, `${key}: ${n}`).not.toMatch(
           /wrench|spanner|shield|weapon|sword|staff|riveter|tool/i,
         );
+    }
+    // The dials lay their turn on what the mixer wrote: every clip must key them.
+    for (const key of ['foundry_line_master', 'foundry_voltaic_warden']) {
+      const def = FOUNDRY_CREATURE_LOOKS[key];
+      const keyed = glbRotationTracks(def.url);
+      for (const d of def.dials ?? []) {
+        const want = d.bone.replace(/[[\].:/]/g, '');
+        for (const [clip, bones] of keyed)
+          expect(bones.has(want), `${key} ${clip} ${d.bone}`).toBe(true);
+      }
     }
     const portraitHeads = ['foundry_line_master', 'foundry_voltaic_warden', 'foundry_rangewarden'];
     for (const key of portraitHeads)
@@ -151,6 +184,13 @@ describe('the Foundry creatures presentation plan', () => {
     expect(out.x).toBeCloseTo(1);
     expect(out.z).toBeCloseTo(0);
     expect(FOUNDRY_DRAW.line_master_tock).toBeGreaterThan(0.8);
+  });
+
+  it('winds the press hammer up, slams it on the strip at the strike and lifts it after', () => {
+    expect(hammerDrop(0, 2)).toBeCloseTo(0);
+    expect(hammerDrop(1.5, 2)).toBeLessThan(0);
+    expect(hammerDrop(2.1, 2)).toBe(1);
+    expect(hammerDrop(4, 2)).toBe(0);
   });
 
   it('pins a bolt to its two ends and keeps it jagged in between', () => {

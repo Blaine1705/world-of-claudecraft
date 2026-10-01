@@ -63,6 +63,7 @@ import {
   TOCK_PRESSURE,
   TOCK_RIVET_GUN,
   TOCK_STAMPING_PRESS,
+  TOCK_TUNING,
   VOLTAIC_CHARGED,
   VOLTAIC_COIL_STRIKE,
   VOLTAIC_DISCHARGE,
@@ -103,6 +104,56 @@ import {
   voltaicFaces,
   voltaicPlateGesture,
 } from './foundry_creature_fx_core';
+import { FOUNDRY_PRESS_HAMMERS, hammerDrop } from './foundry_press';
+
+type Rgb = readonly [number, number, number];
+
+/** Does `e` wear aura `id` (from `source` when given)? A plain loop: no closure. */
+function hasAura(e: Entity, id: string, source?: number): boolean {
+  const auras = e.auras;
+  if (!auras) return false;
+  for (let i = 0; i < auras.length; i++) {
+    const a = auras[i];
+    if (a.id === id && (source === undefined || a.sourceId === source)) return true;
+  }
+  return false;
+}
+const RGB_0: Rgb = [0.9, 0.93, 0.95];
+const RGB_1: Rgb = [1, 0.92, 0.6];
+const RGB_2: Rgb = [0.6, 0.85, 1];
+const RGB_3: Rgb = [1, 0.62, 0.15];
+const RGB_4: Rgb = [1, 0.85, 0.5];
+const RGB_5: Rgb = [0.5, 0.5, 0.52];
+const RGB_6: Rgb = [0.42, 0.4, 0.38];
+const RGB_7: Rgb = [1, 0.88, 0.55];
+const RGB_8: Rgb = [0.45, 0.44, 0.44];
+const RGB_9: Rgb = [1, 0.94, 0.75];
+const RGB_10: Rgb = [0.3, 0.29, 0.28];
+const RGB_11: Rgb = [1, 0.92, 0.65];
+const RGB_12: Rgb = [0.48, 0.47, 0.46];
+const RGB_13: Rgb = [0.75, 0.9, 1];
+const RGB_14: Rgb = [0.7, 0.9, 1];
+const RGB_15: Rgb = [0.8, 0.92, 1];
+const RGB_16: Rgb = [0.85, 0.95, 1];
+const RGB_17: Rgb = [0.75, 0.92, 1];
+const RGB_18: Rgb = [0.45, 0.42, 0.38];
+const RGB_19: Rgb = [0.92, 0.96, 1];
+const RGB_20: Rgb = [0.55, 0.55, 0.56];
+const RGB_21: Rgb = [1, 0.55, 0.12];
+const RGB_22: Rgb = [1, 0.8, 0.45];
+const RGB_23: Rgb = [0.6, 1, 0.75];
+const RGB_24: Rgb = [0.32, 0.31, 0.32];
+const RGB_25: Rgb = [0.45, 0.78, 1];
+const RGB_26: Rgb = [0.5, 0.82, 1];
+const RGB_27: Rgb = [1, 0.85, 0.42];
+const RGB_28: Rgb = [1, 0.82, 0.4];
+const RGB_29: Rgb = [0.42, 0.41, 0.4];
+
+const TOCK_STACKS = [A.tockStackL, A.tockStackR] as const;
+const HAULER_NOZZLES = [A.haulerNozzleL, A.haulerNozzleR] as const;
+const BELT_ENDS = [-1, 1] as const;
+/** The beacon's amber, rewritten in place as it pulses. */
+const BEACON_RGB: [number, number, number] = [1, 0.5, 0.08];
 
 const SCAN_SEC = 0.1;
 const GESTURE_REFRESH_SEC = 2;
@@ -189,6 +240,16 @@ export class FoundryCreatureFx {
   private readonly carriers: Entity[] = [];
   private readonly cells: Entity[] = [];
   private readonly belts: Entity[] = [];
+  private readonly frames: Entity[] = [];
+  private readonly cellObjects: Entity[] = [];
+  private readonly hatches: Entity[] = [];
+  private readonly fresh: Entity[] = [];
+  private readonly live = new Set<number>();
+  /** When each marked player's lock beam was last struck. */
+  private readonly lockStruck = new Map<number, number>();
+  private rosterVersion = -1;
+  /** Each press hammer's strike clock (when its strip appeared), -1 idle. */
+  private readonly hammerAt: number[] = FOUNDRY_PRESS_HAMMERS.map(() => -1);
   private clock = 0;
   private scan = 0;
   private emitAcc = 0;
@@ -242,12 +303,12 @@ export class FoundryCreatureFx {
     this.smoke = new ParticlePool(
       Math.round(1400 * this.density) + 120,
       particleMat(DUST_FRAG, THREE.NormalBlending),
-      floorVfxRenderOrder('encounter', 25),
+      floorVfxRenderOrder('encounter', 6),
     );
     this.glow = new ParticlePool(
       Math.round(1600 * this.density) + 160,
       particleMat(GLOW_FRAG, THREE.AdditiveBlending),
-      floorVfxRenderOrder('encounter', 27),
+      floorVfxRenderOrder('encounter', 8),
     );
     for (const pool of [this.smoke, this.glow]) {
       this.geometries.push(pool.mesh.geometry);
@@ -271,7 +332,7 @@ export class FoundryCreatureFx {
       const mesh = new THREE.Mesh(ringGeo, mat);
       mesh.frustumCulled = false;
       mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 24);
+      mesh.renderOrder = floorVfxRenderOrder('encounter', 4);
       this.root.add(mesh);
       this.rings.push({ mesh, mat, born: 0, span: 1, reach: 1, alive: false });
     }
@@ -284,11 +345,8 @@ export class FoundryCreatureFx {
     for (let i = 0; i < SHELL_SLOTS; i++) this.shells.push(this.flyer(shellGeo, shellMat));
     // The Hauler's scrap plates: a riveted brass slab tumbling through the air.
     const plateGeo = new THREE.BoxGeometry(2.4, 0.18, 1.7);
-    const plateMat = new THREE.MeshStandardMaterial({
-      color: 0xb48a3c,
-      metalness: 0.6,
-      roughness: 0.45,
-    });
+    // Unlit (no light- or fog-keyed program variant to link mid-fight).
+    const plateMat = new THREE.MeshBasicMaterial({ color: 0x9a7634 });
     this.geometries.push(plateGeo);
     this.materials.push(plateMat);
     for (let i = 0; i < PLATE_SLOTS; i++) this.plates.push(this.flyer(plateGeo, plateMat));
@@ -336,7 +394,7 @@ export class FoundryCreatureFx {
       up?: number;
       life: number;
       size: [number, number];
-      color: [number, number, number];
+      color: Rgb;
       alpha: number;
       drag?: number;
       dir?: V3;
@@ -399,7 +457,7 @@ export class FoundryCreatureFx {
       up: 1.2,
       life: 1.6,
       size: [size * 0.6, size * 2.2],
-      color: [0.9, 0.93, 0.95],
+      color: RGB_0,
       alpha: 0.55,
       drag: 1.6,
       dir,
@@ -407,20 +465,13 @@ export class FoundryCreatureFx {
     });
   }
 
-  private sparks(
-    x: number,
-    y: number,
-    z: number,
-    n: number,
-    speed: number,
-    color = [1, 0.92, 0.6],
-  ): void {
+  private sparks(x: number, y: number, z: number, n: number, speed: number, color = RGB_1): void {
     this.puff(x, y, z, n, {
       speed,
       up: 2,
       life: 0.6,
       size: [0.22, 0.05],
-      color: color as [number, number, number],
+      color,
       alpha: 1,
       drag: 1.2,
       glow: true,
@@ -428,14 +479,7 @@ export class FoundryCreatureFx {
     });
   }
 
-  private flash(
-    x: number,
-    y: number,
-    z: number,
-    size: number,
-    color: [number, number, number],
-    life = 0.18,
-  ): void {
+  private flash(x: number, y: number, z: number, size: number, color: Rgb, life = 0.18): void {
     const s = this.spec;
     s.x = x;
     s.y = y;
@@ -566,7 +610,7 @@ export class FoundryCreatureFx {
         if (src) {
           this.gesture(src, VOLTAIC_DRONES);
           const c = this.chest(src, this.p);
-          this.sparks(c.x, c.y, c.z, 30, 8, [0.6, 0.85, 1]);
+          this.sparks(c.x, c.y, c.z, 30, 8, RGB_2);
         }
         return;
       case VOLTAIC_COIL_STRIKE:
@@ -631,36 +675,37 @@ export class FoundryCreatureFx {
     const pulse = 0.5 + 0.5 * Math.sin(this.clock * 14);
     for (const b of this.belts) {
       if (b.templateId !== 'foundry_belt_alarm') continue;
-      for (const end of [-1, 1]) {
+      for (const end of BELT_ENDS) {
         const z = b.pos.z + end * (half + 0.6);
         const x = b.pos.x + MAIN_LINE_BELTS.halfWidth + 0.4;
         const y = this.groundY(x, z) + 1.6;
-        this.flash(x, y, z, 1.2 + 1.4 * pulse, [1, 0.42 + 0.2 * pulse, 0.08], 0.1);
+        BEACON_RGB[1] = 0.42 + 0.2 * pulse;
+        this.flash(x, y, z, 1.2 + 1.4 * pulse, BEACON_RGB, 0.1);
       }
     }
   }
 
   private leverLands(tock: Entity): void {
     this.beltsReverse();
-    for (const a of [A.tockStackL, A.tockStackR]) {
+    for (const a of TOCK_STACKS) {
       const s = this.at(tock, a);
       this.steam(s.x, s.y, s.z, 26, 1.8, { x: 0, y: 1, z: 0 }, 7);
     }
     const b = this.at(tock, A.tockBeacon);
-    this.flash(b.x, b.y, b.z, 3.2, [1, 0.62, 0.15], 0.35);
+    this.flash(b.x, b.y, b.z, 3.2, RGB_3, 0.35);
     this.ring(tock.pos.x, tock.pos.z, 9, 0.7, 0xffb347);
     this.shakeAt(tock.pos.x, tock.pos.z, 0.25);
   }
 
   private rivets(tock: Entity, target: Entity | undefined): void {
     const m = this.at(tock, A.tockRiveter);
-    for (let k = 0; k < 3; k++) this.flash(m.x, m.y, m.z, 1.5, [1, 0.85, 0.5], 0.12);
+    for (let k = 0; k < 3; k++) this.flash(m.x, m.y, m.z, 1.5, RGB_4, 0.12);
     this.puff(m.x, m.y, m.z, 10, {
       speed: 2,
       up: 0.6,
       life: 0.9,
       size: [0.5, 1.6],
-      color: [0.5, 0.5, 0.52],
+      color: RGB_5,
       alpha: 0.5,
     });
     if (!target) return;
@@ -706,7 +751,7 @@ export class FoundryCreatureFx {
       up: 0.4,
       life: 1.2,
       size: [0.9, 2.6],
-      color: [0.42, 0.4, 0.38],
+      color: RGB_6,
       alpha: 0.6,
     });
     this.shakeAt(x, z, 0.45);
@@ -728,13 +773,13 @@ export class FoundryCreatureFx {
     s.objectId = markId;
     s.alive = true;
     this.objectPos.set(markId, { x: mark.pos.x, y: s.to.y, z: mark.pos.z });
-    this.flash(fx, fy, fz, 3, [1, 0.88, 0.55], 0.15);
+    this.flash(fx, fy, fz, 3, RGB_7, 0.15);
     this.puff(fx, fy, fz, 8, {
       speed: 3,
       up: 0.8,
       life: 1.2,
       size: [0.9, 2.4],
-      color: [0.45, 0.44, 0.44],
+      color: RGB_8,
       alpha: 0.6,
     });
     void boss;
@@ -745,7 +790,7 @@ export class FoundryCreatureFx {
     const at = this.objectPos.get(markId) ?? this.world?.entities.get(markId)?.pos;
     if (!at) return;
     const y = this.groundY(at.x, at.z);
-    this.flash(at.x, y + 1, at.z, 5, [1, 0.94, 0.75], 0.2);
+    this.flash(at.x, y + 1, at.z, 5, RGB_9, 0.2);
     this.ring(at.x, at.z, 5.5, 0.45, 0xffe2a0);
     this.sparks(at.x, y + 0.5, at.z, 28, 10);
     this.puff(at.x, y + 0.3, at.z, 22, {
@@ -753,7 +798,7 @@ export class FoundryCreatureFx {
       up: 2.2,
       life: 1.8,
       size: [1, 3.2],
-      color: [0.3, 0.29, 0.28],
+      color: RGB_10,
       alpha: 0.7,
     });
     this.shakeAt(at.x, at.z, 0.2);
@@ -761,14 +806,14 @@ export class FoundryCreatureFx {
 
   private proofShot(boss: Entity, target: Entity | undefined): void {
     const m = this.at(boss, A.rangeProofMuzzle);
-    this.flash(m.x, m.y, m.z, 5.5, [1, 0.92, 0.65], 0.22);
+    this.flash(m.x, m.y, m.z, 5.5, RGB_11, 0.22);
     const dir = { x: Math.sin(boss.facing), y: 0.15, z: Math.cos(boss.facing) };
     this.puff(m.x, m.y, m.z, 30, {
       speed: 6,
       up: 0.8,
       life: 1.6,
       size: [1, 3.4],
-      color: [0.48, 0.47, 0.46],
+      color: RGB_12,
       alpha: 0.65,
       dir,
       spread: 0.5,
@@ -777,7 +822,7 @@ export class FoundryCreatureFx {
     if (target) {
       const c = this.chest(target, this.q);
       this.sparks(c.x, c.y, c.z, 30, 9);
-      this.flash(c.x, c.y, c.z, 2.6, [1, 0.85, 0.5], 0.16);
+      this.flash(c.x, c.y, c.z, 2.6, RGB_4, 0.16);
     }
     this.shakeAt(boss.pos.x, boss.pos.z, 0.35);
   }
@@ -786,14 +831,14 @@ export class FoundryCreatureFx {
     this.gesture(boss, RANGE_DRILL_DRONES);
     const r = this.at(boss, A.rangeRack);
     this.steam(r.x, r.y, r.z, 22, 2, { x: 0, y: 1, z: 0 }, 6);
-    this.sparks(r.x, r.y, r.z, 20, 7, [0.6, 0.85, 1]);
+    this.sparks(r.x, r.y, r.z, 20, 7, RGB_2);
   }
 
   private discharge(warden: Entity): void {
     this.gesture(warden, VOLTAIC_DISCHARGE);
     const c = this.chest(warden, this.p);
-    this.flash(c.x, c.y, c.z, 9, [0.75, 0.9, 1], 0.4);
-    this.ring(warden.pos.x, warden.pos.z, 28, 0.9, ARC_WHITE);
+    this.flash(c.x, c.y, c.z, 9, RGB_13, 0.4);
+    this.ring(warden.pos.x, warden.pos.z, 24, 0.9, ARC_WHITE);
     this.ring(warden.pos.x, warden.pos.z, 18, 0.7, ARC_BLUE, 0.08);
     for (const pl of this.players) {
       if (pl.dead || Math.hypot(pl.pos.x - warden.pos.x, pl.pos.z - warden.pos.z) > 32) continue;
@@ -807,7 +852,7 @@ export class FoundryCreatureFx {
       this.q.y = this.groundY(this.q.x, this.q.z) + 0.2;
       this.arcs.strike(this.clock, c, this.q, 0.35, ARC_BLUE, 0.22, 0.25);
     }
-    this.sparks(c.x, c.y, c.z, 50, 12, [0.7, 0.9, 1]);
+    this.sparks(c.x, c.y, c.z, 50, 12, RGB_14);
     this.shakeAt(warden.pos.x, warden.pos.z, 0.4);
   }
 
@@ -819,8 +864,8 @@ export class FoundryCreatureFx {
     const to = this.chest(tgt, this.q);
     this.arcs.strike(this.clock, from, to, 0.5, ARC_WHITE, 0.3, 0.2);
     this.arcs.strike(this.clock, from, to, 0.35, ARC_BLUE, 0.18, 0.32);
-    this.sparks(to.x, to.y, to.z, 24, 7, [0.7, 0.9, 1]);
-    this.flash(to.x, to.y, to.z, 2.2, [0.6, 0.85, 1], 0.2);
+    this.sparks(to.x, to.y, to.z, 24, 7, RGB_14);
+    this.flash(to.x, to.y, to.z, 2.2, RGB_2, 0.2);
   }
 
   private coilStrike(mark: Entity | undefined): void {
@@ -836,9 +881,9 @@ export class FoundryCreatureFx {
     this.p.z = z;
     this.arcs.strike(this.clock, this.q, this.p, 0.4, ARC_WHITE, 0.55, 0.12);
     this.arcs.strike(this.clock, this.q, this.p, 0.3, ARC_BLUE, 0.3, 0.2);
-    this.flash(x, y + 1, z, 6, [0.8, 0.92, 1], 0.25);
+    this.flash(x, y + 1, z, 6, RGB_15, 0.25);
     this.ring(x, z, 4.5, 0.5, ARC_WHITE);
-    this.sparks(x, y + 0.3, z, 30, 9, [0.75, 0.9, 1]);
+    this.sparks(x, y + 0.3, z, 30, 9, RGB_13);
     this.shakeAt(x, z, 0.3);
   }
 
@@ -850,21 +895,21 @@ export class FoundryCreatureFx {
       this.q.z = hatch.pos.z;
       this.arcs.strike(this.clock, this.q, c, 0.6, ARC_WHITE, 0.45, 0.15);
     }
-    this.flash(c.x, c.y, c.z, 10, [0.85, 0.95, 1], 0.5);
-    this.sparks(c.x, c.y, c.z, 70, 14, [0.75, 0.92, 1]);
+    this.flash(c.x, c.y, c.z, 10, RGB_16, 0.5);
+    this.sparks(c.x, c.y, c.z, 70, 14, RGB_17);
     this.shakeAt(draft.pos.x, draft.pos.z, 0.5);
   }
 
   private cellBlows(at: Entity, k: number): void {
     const c = this.chest(at, this.p);
-    this.flash(c.x, c.y, c.z, 4 * k, [0.7, 0.9, 1], 0.25);
+    this.flash(c.x, c.y, c.z, 4 * k, RGB_14, 0.25);
     this.ring(at.pos.x, at.pos.z, 5 * k, 0.5, ARC_BLUE);
-    this.sparks(c.x, c.y, c.z, Math.round(36 * k), 9, [0.7, 0.9, 1]);
+    this.sparks(c.x, c.y, c.z, Math.round(36 * k), 9, RGB_14);
   }
 
   private steamBlast(hauler: Entity): void {
     const dir = { x: Math.sin(hauler.facing), y: 0.08, z: Math.cos(hauler.facing) };
-    for (const a of [A.haulerNozzleL, A.haulerNozzleR]) {
+    for (const a of HAULER_NOZZLES) {
       const n = this.at(hauler, a);
       this.steam(n.x, n.y, n.z, 60, 3, dir, 16);
     }
@@ -904,7 +949,7 @@ export class FoundryCreatureFx {
       up: 0.6,
       life: 1.3,
       size: [0.9, 2.8],
-      color: [0.45, 0.42, 0.38],
+      color: RGB_18,
       alpha: 0.6,
     });
     this.shakeAt(at.x, at.z, 0.3);
@@ -913,7 +958,7 @@ export class FoundryCreatureFx {
   private boilerBurst(e: Entity, k: number, reach: number): void {
     const c =
       e.templateId === GANTRY_HAULER_ID ? this.at(e, A.haulerBoiler) : this.chest(e, this.p);
-    this.flash(c.x, c.y, c.z, 6 * k, [0.92, 0.96, 1], 0.3);
+    this.flash(c.x, c.y, c.z, 6 * k, RGB_19, 0.3);
     this.steam(c.x, c.y, c.z, Math.round(70 * k), 2.6 * k, undefined, 9 * k);
     this.sparks(c.x, c.y, c.z, Math.round(40 * k), 10 * k);
     this.ring(e.pos.x, e.pos.z, reach, 0.7, 0xe9eef0);
@@ -922,7 +967,7 @@ export class FoundryCreatureFx {
 
   private arcPop(e: Entity): void {
     const c = this.chest(e, this.p);
-    this.flash(c.x, c.y, c.z, 2.6, [0.7, 0.9, 1], 0.2);
+    this.flash(c.x, c.y, c.z, 2.6, RGB_14, 0.2);
     for (let k = 0; k < 4; k++) {
       const a = this.rand() * Math.PI * 2;
       this.q.x = c.x + Math.sin(a) * 3;
@@ -930,7 +975,7 @@ export class FoundryCreatureFx {
       this.q.y = this.groundY(this.q.x, this.q.z) + 0.1;
       this.arcs.strike(this.clock, c, this.q, 0.3, ARC_BLUE, 0.14, 0.3);
     }
-    this.sparks(c.x, c.y, c.z, 18, 7, [0.7, 0.9, 1]);
+    this.sparks(c.x, c.y, c.z, 18, 7, RGB_14);
   }
 
   // ---------------------------------------------------------------------- frame
@@ -951,62 +996,112 @@ export class FoundryCreatureFx {
     for (const b of this.bosses) this.bossFrame(b, tick);
     if (tick) this.cellsFrame();
     this.paintFlyers();
+    this.paintHammers();
     this.paintRings();
+    this.arcs.steady = this.reducedMotion();
     this.arcs.update(this.clock);
     this.smoke.update(this.clock);
     this.glow.update(this.clock);
   }
 
-  private scanWorld(world: IWorld): void {
+  /** Rebuild the cached rosters only when membership changed (an entity came
+   *  or went); the 10 Hz pass then reads auras and casts off the short lists. */
+  private rebuildRoster(world: IWorld): void {
+    this.rosterVersion = world.entityRosterVersion;
     this.bosses.length = 0;
+    this.frames.length = 0;
     this.players.length = 0;
-    this.carriers.length = 0;
-    this.cells.length = 0;
+    this.cellObjects.length = 0;
     this.belts.length = 0;
-    const live = new Set<number>();
+    this.hatches.length = 0;
+    this.fresh.length = 0;
+    this.live.clear();
     for (const e of world.entities.values()) {
       if (e.kind === 'player') {
         this.players.push(e);
-        if (!e.dead && e.auras?.some((a) => a.id === DRAFT_CELL_CARRY)) this.carriers.push(e);
         continue;
       }
-      if (e.kind !== 'mob') {
-        const t = e.templateId;
-        if (t === 'foundry_storm_cell' || t === 'foundry_storm_cell_rolling') this.cells.push(e);
-        if (t.startsWith('foundry_belt_')) this.belts.push(e);
-        if (t === FOUNDRY_SHELL_MARK || t === FOUNDRY_SCRAP_MARK) {
-          live.add(e.id);
-          if (!this.seenObjects.has(e.id)) {
-            this.seenObjects.add(e.id);
-            if (t === FOUNDRY_SCRAP_MARK) this.pairScrapMark(world, e);
-          }
-        }
-        continue;
-      }
-      switch (e.templateId) {
-        case TOCK_ID:
-        case RANGEWARDEN_ID:
-        case VOLTAIC_WARDEN_ID:
-        case PRIME_DRAFT_ID:
-        case GANTRY_HAULER_ID:
+      const t = e.templateId;
+      if (e.kind === 'mob') {
+        if (
+          t === TOCK_ID ||
+          t === RANGEWARDEN_ID ||
+          t === VOLTAIC_WARDEN_ID ||
+          t === PRIME_DRAFT_ID ||
+          t === GANTRY_HAULER_ID
+        )
           this.bosses.push(e);
-          this.bossGestures(e);
-          break;
-        case HALF_BUILT_FRAME_ID:
-          this.frameGestures(e);
-          break;
-        default:
-          break;
+        else if (t === HALF_BUILT_FRAME_ID) this.frames.push(e);
+        continue;
+      }
+      if (!t.startsWith('foundry_')) continue;
+      if (t.startsWith('foundry_storm_cell')) this.cellObjects.push(e);
+      else if (t.startsWith('foundry_belt_')) this.belts.push(e);
+      else if (t.startsWith('foundry_hatch_')) this.hatches.push(e);
+      else if (
+        t === 'foundry_press_strip' ||
+        t === FOUNDRY_SHELL_MARK ||
+        t === FOUNDRY_SCRAP_MARK
+      ) {
+        this.live.add(e.id);
+        if (!this.seenObjects.has(e.id)) {
+          this.seenObjects.add(e.id);
+          this.fresh.push(e);
+        }
       }
     }
-    for (const id of this.seenObjects) if (!live.has(id)) this.seenObjects.delete(id);
+    for (const id of this.seenObjects) if (!this.live.has(id)) this.seenObjects.delete(id);
     for (const id of this.watch.keys()) if (!world.entities.has(id)) this.watch.delete(id);
+    for (const id of this.lockStruck.keys())
+      if (!world.entities.has(id)) this.lockStruck.delete(id);
+    this.belts.sort((p, q) => p.pos.x - q.pos.x);
+    for (const e of this.fresh) {
+      if (e.templateId === 'foundry_press_strip') this.pressFor(e);
+      else if (e.templateId === FOUNDRY_SCRAP_MARK) this.pairScrapMark(e);
+    }
   }
 
-  private pairScrapMark(world: IWorld, mark: Entity): void {
+  private scanWorld(world: IWorld): void {
+    if (world.entityRosterVersion !== this.rosterVersion) this.rebuildRoster(world);
+    this.carriers.length = 0;
+    for (const p of this.players)
+      if (!p.dead && hasAura(p, DRAFT_CELL_CARRY)) this.carriers.push(p);
+    this.cells.length = 0;
+    for (const c of this.cellObjects)
+      if (c.templateId.startsWith('foundry_storm_cell')) this.cells.push(c);
+    for (const b of this.bosses) this.bossGestures(b);
+    for (const f of this.frames) this.frameGestures(f);
+  }
+
+  /** A press strip appeared: its belt's hammer winds up and falls on time. */
+  private pressFor(strip: Entity): void {
+    const belts = this.belts;
+    if (belts.length === 0) return;
+    let best = 0;
+    for (let i = 1; i < belts.length; i++)
+      if (Math.abs(belts[i].pos.x - strip.pos.x) < Math.abs(belts[best].pos.x - strip.pos.x))
+        best = i;
+    if (best < this.hammerAt.length) this.hammerAt[best] = this.clock;
+  }
+
+  private paintHammers(): void {
+    const warning = TOCK_TUNING.pressWarning;
+    for (let i = 0; i < this.hammerAt.length; i++) {
+      const at = this.hammerAt[i];
+      if (at < 0) continue;
+      const t = this.clock - at;
+      FOUNDRY_PRESS_HAMMERS[i].drop = hammerDrop(t, warning);
+      if (t > warning + 2) {
+        this.hammerAt[i] = -1;
+        FOUNDRY_PRESS_HAMMERS[i].drop = 0;
+      }
+    }
+  }
+
+  private pairScrapMark(mark: Entity): void {
     let best: Entity | null = null;
     let bd = 60;
-    for (const e of world.entities.values()) {
+    for (const e of this.bosses) {
       if (e.templateId !== GANTRY_HAULER_ID || e.dead) continue;
       const d = Math.hypot(e.pos.x - mark.pos.x, e.pos.z - mark.pos.z);
       if (d < bd) {
@@ -1051,7 +1146,7 @@ export class FoundryCreatureFx {
 
   private frameGestures(e: Entity): void {
     const w = this.watchOf(e);
-    const booting = !e.dead && e.auras?.some((a) => a.id === FRAME_BOOTING) === true;
+    const booting = !e.dead && hasAura(e, FRAME_BOOTING);
     const g = booting ? FRAME_DORMANT_GESTURE : FRAME_AWAKE_GESTURE;
     if (g !== w.frame) {
       const first = w.frame === '';
@@ -1060,7 +1155,7 @@ export class FoundryCreatureFx {
       if (!(first && !booting)) this.gesture(e, g);
       if (!first && !booting && !e.dead) {
         const c = this.chest(e, this.p);
-        this.sparks(c.x, c.y, c.z, 24, 6, [0.7, 0.9, 1]);
+        this.sparks(c.x, c.y, c.z, 24, 6, RGB_14);
         this.steam(c.x, c.y, c.z, 10, 1.2);
       }
     }
@@ -1072,26 +1167,26 @@ export class FoundryCreatureFx {
       case TOCK_ID: {
         if (!tick) return;
         this.beltAlarm();
-        for (const a of [A.tockStackL, A.tockStackR]) {
+        for (const a of TOCK_STACKS) {
           const s = this.at(e, a);
           this.puff(s.x, s.y, s.z, 1, {
             speed: 0.6,
             up: 1.6,
             life: 2.4,
             size: [0.5, 2.2],
-            color: [0.55, 0.55, 0.56],
+            color: RGB_20,
             alpha: 0.35,
             drag: 0.8,
           });
         }
         if (e.castingAbility === TOCK_LEVER) {
           const b = this.at(e, A.tockBeacon);
-          this.flash(b.x, b.y, b.z, 2.4 + Math.sin(this.clock * 18) * 0.8, [1, 0.55, 0.12], 0.12);
+          this.flash(b.x, b.y, b.z, 2.4 + Math.sin(this.clock * 18) * 0.8, RGB_21, 0.12);
           if (this.rand() < 0.5) this.steam(b.x, b.y - 0.6, b.z, 2, 0.9, { x: 0, y: 1, z: 0 }, 3);
         }
         if (e.castingAbility === TOCK_RIVET_GUN) {
           const m = this.at(e, A.tockRiveter);
-          this.flash(m.x, m.y, m.z, 0.8, [1, 0.8, 0.45], 0.1);
+          this.flash(m.x, m.y, m.z, 0.8, RGB_22, 0.1);
         }
         return;
       }
@@ -1100,12 +1195,12 @@ export class FoundryCreatureFx {
         if (tick && e.castingAbility === RANGE_PROOF_SHOT) {
           const m = this.at(e, A.rangeProofMuzzle);
           const k = 1 - (e.castRemaining ?? 0) / Math.max(0.01, e.castTotal ?? 1);
-          this.flash(m.x, m.y, m.z, 0.6 + 2 * k, [1, 0.85, 0.5], 0.12);
+          this.flash(m.x, m.y, m.z, 0.6 + 2 * k, RGB_4, 0.12);
           this.puff(m.x, m.y, m.z, 2, {
             speed: 3 + 3 * k,
             life: 0.4,
             size: [0.15, 0.04],
-            color: [1, 0.85, 0.5],
+            color: RGB_4,
             alpha: 1,
             glow: true,
             dir: { x: 0, y: 0, z: 0 },
@@ -1118,7 +1213,7 @@ export class FoundryCreatureFx {
         if (!tick) return;
         const stored = e.auras?.find((a) => a.id === VOLTAIC_STORED);
         const bank = Math.min(1, (stored?.stacks ?? 0) / 2000);
-        const charged = e.auras?.some((a) => a.id === VOLTAIC_CHARGED) === true;
+        const charged = hasAura(e, VOLTAIC_CHARGED);
         const flipping = e.castingAbility === VOLTAIC_FLIP;
         const rate = 0.25 + 0.5 * bank + (flipping ? 0.6 : 0);
         if (this.rand() < rate) {
@@ -1128,13 +1223,13 @@ export class FoundryCreatureFx {
         }
         if (flipping || bank > 0.5) {
           const c = this.at(e, A.wardenCore, this.p);
-          this.sparks(c.x, c.y, c.z, 2, 4, charged ? [0.6, 0.85, 1] : [0.6, 1, 0.75]);
+          this.sparks(c.x, c.y, c.z, 2, 4, charged ? RGB_2 : RGB_23);
         }
         return;
       }
       case PRIME_DRAFT_ID: {
         if (!tick) return;
-        if (e.auras?.some((a) => a.id === DRAFT_OVERLOAD)) {
+        if (hasAura(e, DRAFT_OVERLOAD)) {
           // the lightning cascade crawling over the colossus while it seizes
           const c = this.chest(e, this.p);
           const h = (8.5 * (e.scale || 1)) / 2.6;
@@ -1145,7 +1240,7 @@ export class FoundryCreatureFx {
             this.q.y = e.pos.y + this.rand() * h;
             this.arcs.strike(this.clock, c, this.q, 0.22, ARC_WHITE, 0.2, 0.3);
           }
-          this.sparks(this.q.x, this.q.y, this.q.z, 4, 6, [0.75, 0.92, 1]);
+          this.sparks(this.q.x, this.q.y, this.q.z, 4, 6, RGB_17);
         }
         return;
       }
@@ -1157,13 +1252,13 @@ export class FoundryCreatureFx {
           up: 2.4,
           life: 3,
           size: [0.9, 3.6],
-          color: [0.32, 0.31, 0.32],
+          color: RGB_24,
           alpha: 0.42,
           drag: 0.7,
         });
         if (e.castingAbility === HAULER_STEAM_BLAST) {
           const dir = { x: Math.sin(e.facing), y: 0.05, z: Math.cos(e.facing) };
-          for (const a of [A.haulerNozzleL, A.haulerNozzleR]) {
+          for (const a of HAULER_NOZZLES) {
             const n = this.at(e, a);
             this.steam(n.x, n.y, n.z, 2, 0.8, dir, 3);
           }
@@ -1175,24 +1270,15 @@ export class FoundryCreatureFx {
     }
   }
 
+  /** A thin red-white beam from the glass eye to every player it marked,
+   *  re-struck as each one fades (never dragging a pooled arc it lost). */
   private lockBeams(boss: Entity): void {
-    const w = this.watchOf(boss);
     for (const pl of this.players) {
-      const marked =
-        !pl.dead && pl.auras?.some((a) => a.id === RANGE_TARGET_LOCK && a.sourceId === boss.id);
-      const slot = w.lockBeam.get(pl.id);
-      if (!marked) {
-        if (slot !== undefined) w.lockBeam.delete(pl.id);
-        continue;
-      }
+      if (pl.dead || !hasAura(pl, RANGE_TARGET_LOCK, boss.id)) continue;
+      if (this.clock - (this.lockStruck.get(pl.id) ?? -1) < 0.25) continue;
+      this.lockStruck.set(pl.id, this.clock);
       const eye = this.at(boss, A.rangeEye, this.p);
-      const c = this.chest(pl, this.q);
-      // A thin red-white crosshair beam, re-struck as it fades.
-      if (slot === undefined || this.clock - (w.lockBeam.get(-pl.id - 1) ?? 0) > 0.25) {
-        const s = this.arcs.strike(this.clock, eye, c, 0.3, 0xff5a4a, 0.05, 0.004);
-        w.lockBeam.set(pl.id, s);
-        w.lockBeam.set(-pl.id - 1, this.clock);
-      } else this.arcs.move(slot, eye, c);
+      this.arcs.strike(this.clock, eye, this.chest(pl, this.q), 0.32, 0xff5a4a, 0.05, 0.004);
     }
   }
 
@@ -1200,7 +1286,7 @@ export class FoundryCreatureFx {
     for (const cell of this.cells) {
       const y = this.groundY(cell.pos.x, cell.pos.z);
       // a crackling battery: sparks and short arcs off it, a light pillar
-      this.flash(cell.pos.x, y + 0.8, cell.pos.z, 1.6, [0.45, 0.78, 1], 0.12);
+      this.flash(cell.pos.x, y + 0.8, cell.pos.z, 1.6, RGB_25, 0.12);
       if (this.rand() < 0.5) {
         this.p.x = cell.pos.x;
         this.p.y = y + 0.8;
@@ -1216,7 +1302,7 @@ export class FoundryCreatureFx {
         up: 3,
         life: 1.2,
         size: [0.3, 0.05],
-        color: [0.5, 0.82, 1],
+        color: RGB_26,
         alpha: 0.9,
         glow: true,
         drag: 0.5,
@@ -1229,7 +1315,7 @@ export class FoundryCreatureFx {
       this.p.x = pl.pos.x + Math.sin(yaw) * 0.7;
       this.p.y = pl.pos.y + 1.3;
       this.p.z = pl.pos.z + Math.cos(yaw) * 0.7;
-      this.flash(this.p.x, this.p.y, this.p.z, 1.4 + heat, [0.45, 0.78, 1], 0.12);
+      this.flash(this.p.x, this.p.y, this.p.z, 1.4 + heat, RGB_25, 0.12);
       if (this.rand() < 0.4 + 0.5 * heat) {
         const a = this.rand() * Math.PI * 2;
         this.q.x = pl.pos.x + Math.sin(a) * 0.5;
@@ -1241,7 +1327,7 @@ export class FoundryCreatureFx {
     // The open hatch's gold breath of light.
     for (const b of this.bosses) {
       if (b.templateId !== PRIME_DRAFT_ID || b.dead) continue;
-      for (const e of this.world?.entities.values() ?? []) {
+      for (const e of this.hatches) {
         if (e.templateId !== 'foundry_hatch_open') continue;
         const y = this.groundY(e.pos.x, e.pos.z);
         this.puff(e.pos.x, y + 0.3, e.pos.z, 2, {
@@ -1249,12 +1335,12 @@ export class FoundryCreatureFx {
           up: 2.5,
           life: 1.2,
           size: [0.35, 0.08],
-          color: [1, 0.85, 0.42],
+          color: RGB_27,
           alpha: 0.9,
           glow: true,
         });
         const c = this.chest(b, this.q);
-        this.flash(c.x, c.y, c.z, 3, [1, 0.82, 0.4], 0.12);
+        this.flash(c.x, c.y, c.z, 3, RGB_28, 0.12);
         void HATCH_GOLD;
       }
     }
@@ -1294,10 +1380,10 @@ export class FoundryCreatureFx {
           up: 0.4,
           life: 0.9,
           size: [0.5, 1.5],
-          color: [0.42, 0.41, 0.4],
+          color: RGB_29,
           alpha: 0.5,
         });
-      this.flash(x, y, z, 0.9, [1, 0.8, 0.45], 0.06);
+      this.flash(x, y, z, 0.9, RGB_22, 0.06);
     } else {
       s.mesh.rotation.set(t * 7, Math.atan2(dx, dz), t * 3);
     }
@@ -1315,7 +1401,7 @@ export class FoundryCreatureFx {
       }
       const e = 1 - (1 - t) ** 3;
       r.mesh.scale.setScalar(Math.max(0.01, r.reach * e));
-      r.mat.uniforms.uAlpha.value = (1 - t) * 0.9;
+      r.mat.uniforms.uAlpha.value = (1 - t) * 0.55;
       r.mesh.visible = true;
     }
   }

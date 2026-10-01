@@ -67,6 +67,8 @@ export class FoundryArcs {
   readonly root = new THREE.Group();
   private readonly arcs: Arc[] = [];
   private readonly geometries: THREE.BufferGeometry[] = [];
+  /** Reduced motion: no strobing flicker, the bolts hold a steady glow. */
+  steady = false;
 
   constructor(slots: number) {
     this.root.name = 'foundry-arcs';
@@ -106,7 +108,8 @@ export class FoundryArcs {
       const mesh = new THREE.Mesh(g, mat);
       mesh.frustumCulled = false;
       mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 30);
+      // under the telegraph rungs (the kit draws from encounter 12 up)
+      mesh.renderOrder = floorVfxRenderOrder('encounter', 9);
       this.root.add(mesh);
       this.arcs.push({
         mesh,
@@ -181,11 +184,11 @@ export class FoundryArcs {
       }
       if (now >= s.reseed) {
         s.seed = (s.seed * 1103515245 + 12345) & 0x7fffffff;
-        s.reseed = now + 0.055;
+        s.reseed = now + (this.steady ? 0.4 : 0.055);
       }
       arcPathInto(s.from, s.to, s.seed, s.jag, PATH);
       // flicker: bright strokes with dark gaps, fading out at the end
-      const flick = 0.55 + 0.45 * Math.sin(now * 53 + s.seed);
+      const flick = this.steady ? 0.8 : 0.55 + 0.45 * Math.sin(now * 53 + s.seed);
       s.mat.uniforms.uAlpha.value = (1 - t * t) * flick;
       const arr = s.pos.array as Float32Array;
       DIR.subVectors(s.to, s.from).normalize();

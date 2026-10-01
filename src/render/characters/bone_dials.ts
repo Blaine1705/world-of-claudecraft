@@ -77,6 +77,9 @@ function findBone(model: THREE.Object3D, name: string): THREE.Object3D | null {
 export class BoneDials {
   private readonly bones: (THREE.Object3D | null)[];
   private readonly states: DialState[];
+  private readonly bases: THREE.Quaternion[];
+  private readonly lasts: THREE.Quaternion[];
+  private readonly applied: boolean[];
   private clock = 0;
 
   constructor(
@@ -84,6 +87,9 @@ export class BoneDials {
     private readonly defs: readonly BoneDialDef[],
   ) {
     this.bones = defs.map((d) => findBone(model, d.bone));
+    this.bases = defs.map(() => new THREE.Quaternion());
+    this.lasts = defs.map(() => new THREE.Quaternion());
+    this.applied = defs.map(() => false);
     this.states = defs.map((d) => {
       const first = Object.values(d.stops)[0] ?? 0;
       return { angle: first, target: first, rattleLeft: 0 };
@@ -117,8 +123,17 @@ export class BoneDials {
           def.rattle.seconds,
           def.rattle.amplitude,
         );
+      // The mixer rewrites a keyed bone every update; if it did not this time
+      // (an unkeyed re-export, no action bound), restore the pose the turn was
+      // laid on instead of compounding it.
+      const base = this.bases[i];
+      const last = this.lasts[i];
+      if (this.applied[i] && bone.quaternion.equals(last)) bone.quaternion.copy(base);
+      else base.copy(bone.quaternion);
       AXIS.set(def.axis[0], def.axis[1], def.axis[2]).normalize();
       bone.quaternion.multiply(TURN.setFromAxisAngle(AXIS, a));
+      last.copy(bone.quaternion);
+      this.applied[i] = true;
     }
   }
 }
