@@ -142,13 +142,13 @@ const SHOTS = [
   // ---- Phase 3: the Blender creatures up close, the player's knight beside
   // each (ids end in _f3; name them after the out dir to run them).
   ...bossShots('tock', 'line_master_tock', 7, Math.PI * 1.2, [
-    { id: 'cerca_f3', pitch: 0.1, dist: 9, yaw: 0.55, wait: 1500 },
+    { id: 'cerca_f3', pitch: 0.16, dist: 14, yaw: 0.25, wait: 1500 },
   ]),
   ...bossShots('rangewarden', 'rangewarden', 8, Math.PI * 0.8, [
     { id: 'cerca_f3', pitch: 0.12, dist: 10, yaw: -0.5, wait: 1500 },
   ]),
   ...bossShots('voltaic', 'voltaic_warden', 8, 0.3, [
-    { id: 'cerca_f3', pitch: 0.08, dist: 11, yaw: 0.5, wait: 1500 },
+    { id: 'cerca_f3', pitch: 0.2, dist: 20, yaw: 0.3, wait: 1500 },
   ]),
   ...[
     ['sentry', 'centinela'],
