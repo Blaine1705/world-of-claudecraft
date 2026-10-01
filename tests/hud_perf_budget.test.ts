@@ -784,6 +784,16 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 5, '.setAttribute': 3 },
     reflowAllow: {},
   },
+  // The Stormbrass Foundry's alert (hud/dungeon/) builds its self-mounted
+  // button skeleton ONCE (seven construction-only class assignments and the
+  // progress bar's three build-time role/range attributes); every per-frame
+  // value (the kind classes, texts, the hint, the fill width, the live aria
+  // values) rides the elided writers.
+  {
+    file: 'hud/dungeon/foundry_alert_painter.ts',
+    allow: { '.className': 7, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
   // death or an expiry only (the per-frame update elides on the pure core's
   // reference equality); the setAttribute runs once at mount.

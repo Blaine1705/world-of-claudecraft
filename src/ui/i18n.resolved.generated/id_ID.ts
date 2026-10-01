@@ -6035,6 +6035,28 @@ export const id_ID: EnTranslations = {
       "brokenAria": "Chain broken: {pct}",
       "reachAria": "Chain reach used: {pct}"
     },
+    "foundryAlert": {
+      "cellName": "Storm Cell",
+      "hatchName": "Core Hatch",
+      "cellTitle": "Storm Cell (Static: {amount} a second)",
+      "cellClosedLine": "The Core Hatch is shut: wait outside the gold ring",
+      "cellWarnLine": "The Core Hatch is opening: be ready at the gold ring",
+      "cellOpenLine": "The Core Hatch is open: step into the gold ring now!",
+      "dropKey": "Press {key} to drop the cell for someone else",
+      "dropClick": "Click here to drop the cell for someone else",
+      "dropTap": "Tap here to drop the cell for someone else",
+      "dropAria": "Drop the Storm Cell",
+      "cellAria": "Time before the cell shorts out: {pct}",
+      "lockTitle": "Target Lock!",
+      "lockLine": "Keep moving: the shells land where you stood a moment ago",
+      "lockAria": "Target Lock time left: {pct}",
+      "groundedTitle": "Grounded Plating",
+      "groundedLine": "Physical damage lands; spells are stored as charge",
+      "chargedTitle": "Charged Plating",
+      "chargedLine": "Spells land; physical damage is stored as charge",
+      "splitLine": "Its back half wears the other face",
+      "storedAria": "Stored Charge toward the next Discharge: {pct}"
+    },
     "cosmetics": {
       "title": "Kosmetik",
       "close": "Tutup Kosmetik",

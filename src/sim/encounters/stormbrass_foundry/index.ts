@@ -39,7 +39,6 @@ import {
 } from './prime_draft';
 
 export {
-  DRAFT_RECORD_ITEM,
   gantryPlayers,
   hatchRingCentre,
   hatchState,

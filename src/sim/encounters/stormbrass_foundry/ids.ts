@@ -445,8 +445,10 @@ export const FOUNDRY_HATCH_TEMPLATES = {
 export type HatchState = keyof typeof FOUNDRY_HATCH_TEMPLATES;
 /** A Piston Fist's mark (scale = its radius). */
 export const FOUNDRY_FIST_MARK = 'foundry_piston_fist_mark';
-/** The Draft Record left in its opened chest (the quest lore object). */
-export const FOUNDRY_DRAFT_RECORD = 'foundry_draft_record';
+/** The quest item the Draft Record carries: the lore object left in the
+ *  Prime Draft's opened chest (a ground object, so the generic pick-up and
+ *  interact-credit paths own it). */
+export const DRAFT_RECORD_ITEM = 'draft_record';
 
 /** The hatch's state `t` seconds after a cell was ejected. */
 export function hatchStateAt(t: number): HatchState {
@@ -483,5 +485,4 @@ export const FOUNDRY_OBJECT_TEMPLATES: ReadonlySet<string> = new Set<string>([
   ...Object.values(FOUNDRY_CELL_TEMPLATES),
   ...Object.values(FOUNDRY_HATCH_TEMPLATES),
   FOUNDRY_FIST_MARK,
-  FOUNDRY_DRAFT_RECORD,
 ]);

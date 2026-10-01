@@ -16,6 +16,11 @@
 // last import; every consumer names this path.
 import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { DUNGEON_LIST, ITEMS, QUESTS } from '../sim/data';
+import {
+  DRAFT_RECORD_ITEM,
+  FOUNDRY_CELL_TEMPLATES,
+  hatchStateOf,
+} from '../sim/encounters/stormbrass_foundry/ids';
 import type { Entity, PlayerClass } from '../sim/types';
 import { abilityDisplayNameFromSource } from './ability_display_name';
 import { classDisplayName, dungeonDisplayName, itemDisplayName, tEntity } from './entity_i18n';
@@ -153,6 +158,23 @@ export function investigationObjectLabel(itemId: string | null | undefined): str
   return null;
 }
 
+// The Stormbrass Foundry's encounter objects a player takes or reaches: the
+// Prime Draft's Storm Cell, its Core Hatch ring, and the Draft Record left in
+// its chest (a quest item: its own item name).
+export function foundryObjectLabel(
+  templateId: string,
+  objectItemId: string | null | undefined,
+): string | null {
+  if (templateId === FOUNDRY_CELL_TEMPLATES.ready || templateId === FOUNDRY_CELL_TEMPLATES.rolling)
+    return t('hudChrome.foundryAlert.cellName');
+  if (hatchStateOf(templateId)) return t('hudChrome.foundryAlert.hatchName');
+  if (objectItemId === DRAFT_RECORD_ITEM) {
+    const item = ITEMS[DRAFT_RECORD_ITEM];
+    if (item) return itemDisplayName(item);
+  }
+  return null;
+}
+
 export function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'object') {
     // World-quest objects first: an investigation clue, a forge station, and
@@ -164,6 +186,8 @@ export function entityDisplayName(entity: Entity): string {
     if (forgeLabel) return forgeLabel;
     if (entity.templateId === 'north_watch_cannon' || entity.templateId === 'last_keep_cannon')
       return vehicleStationDisplayName(entity.templateId);
+    const foundryLabel = foundryObjectLabel(entity.templateId, entity.objectItemId);
+    if (foundryLabel) return foundryLabel;
   }
   if (entity.kind === 'mob') {
     return entity.ownerId !== null && !isNecromancyUndead(entity)

@@ -16499,6 +16499,87 @@
     min-width: min(420px, calc(100vw - 32px));
   }
 
+  /* ---------- The Stormbrass Foundry's alert (Storm Cell, Target Lock, plating) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/foundry_alert_painter.ts in the dungeon
+     prompts' slot (the Gaol's prompts never share a fight with it). The kind
+     classes come from the pure view; the state is carried by the text too, so
+     colour is never the only cue. Only while a Storm Cell is carried does the
+     panel take the pointer (a tap drops the cell). */
+  #foundry-alert {
+    position: absolute;
+    left: 50%;
+    bottom: 190px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    touch-action: manipulation;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #foundry-alert.is-pressable {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  #foundry-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #foundry-alert .fa-line {
+    font-size: 14px;
+  }
+  #foundry-alert .fa-hint {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+  #foundry-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #foundry-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #foundry-alert.is-cell-open {
+    border-color: var(--color-friendly);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #foundry-alert.is-cell-open .fa-title {
+    color: var(--color-friendly);
+  }
+  #foundry-alert.is-locked {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #foundry-alert.is-locked .fa-title,
+  #foundry-alert.is-locked .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #foundry-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #foundry-alert {
+    bottom: 42%;
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
   /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */
   /* Self-mounted by src/ui/hud/hill/hill_bar_painter.ts, top centre below the
      Thornhollow Fields scoreboard's slot; shown only while the player stands in

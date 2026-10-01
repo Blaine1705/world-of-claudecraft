@@ -6035,6 +6035,28 @@ export const ko_KR: EnTranslations = {
       "brokenAria": "사슬 파괴: {pct}",
       "reachAria": "사슬 당김: {pct}"
     },
+    "foundryAlert": {
+      "cellName": "폭풍 전지",
+      "hatchName": "중심 해치",
+      "cellTitle": "폭풍 전지 (정전기: 초당 {amount})",
+      "cellClosedLine": "중심 해치가 닫혀 있습니다: 금색 고리 밖에서 기다리세요",
+      "cellWarnLine": "중심 해치가 열리고 있습니다: 금색 고리 옆에서 대기하세요",
+      "cellOpenLine": "중심 해치가 열렸습니다: 지금 금색 고리 안으로 들어가세요!",
+      "dropKey": "{key} 키를 눌러 전지를 내려놓고 다른 사람에게 넘기세요",
+      "dropClick": "여기를 클릭해 전지를 내려놓고 다른 사람에게 넘기세요",
+      "dropTap": "여기를 눌러 전지를 내려놓고 다른 사람에게 넘기세요",
+      "dropAria": "폭풍 전지 내려놓기",
+      "cellAria": "전지가 합선되기까지 남은 시간: {pct}",
+      "lockTitle": "표적 고정!",
+      "lockLine": "계속 움직이세요: 포탄은 방금 서 있던 자리에 떨어집니다",
+      "lockAria": "표적 고정 남은 시간: {pct}",
+      "groundedTitle": "접지 장갑",
+      "groundedLine": "물리 피해는 통하고, 주문은 전하로 저장됩니다",
+      "chargedTitle": "충전 장갑",
+      "chargedLine": "주문은 통하고, 물리 피해는 전하로 저장됩니다",
+      "splitLine": "등 쪽 절반은 반대 면입니다",
+      "storedAria": "다음 방전까지 저장된 전하: {pct}"
+    },
     "cosmetics": {
       "title": "외형",
       "close": "외형 닫기",

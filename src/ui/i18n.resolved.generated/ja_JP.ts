@@ -6035,6 +6035,28 @@ export const ja_JP: EnTranslations = {
       "brokenAria": "鎖の破損：{pct}",
       "reachAria": "鎖の張り具合：{pct}"
     },
+    "foundryAlert": {
+      "cellName": "ストームセル",
+      "hatchName": "コアハッチ",
+      "cellTitle": "ストームセル（静電気：毎秒 {amount}）",
+      "cellClosedLine": "コアハッチは閉じている：金色の輪の外で待て",
+      "cellWarnLine": "コアハッチが開きかけている：金色の輪のそばで備えよ",
+      "cellOpenLine": "コアハッチが開いた：今すぐ金色の輪に入れ！",
+      "dropKey": "{key} を押してセルを置き、仲間に託す",
+      "dropClick": "ここをクリックしてセルを置き、仲間に託す",
+      "dropTap": "ここをタップしてセルを置き、仲間に託す",
+      "dropAria": "ストームセルを置く",
+      "cellAria": "セルがショートするまでの残り時間：{pct}",
+      "lockTitle": "ターゲットロック！",
+      "lockLine": "動き続けろ：砲弾は少し前にいた場所に落ちる",
+      "lockAria": "ターゲットロックの残り時間：{pct}",
+      "groundedTitle": "接地装甲",
+      "groundedLine": "物理ダメージは通る。呪文は電荷として蓄えられる",
+      "chargedTitle": "帯電装甲",
+      "chargedLine": "呪文は通る。物理ダメージは電荷として蓄えられる",
+      "splitLine": "背中側はもう一方の面になっている",
+      "storedAria": "次の放電までに蓄えられた電荷：{pct}"
+    },
     "cosmetics": {
       "title": "コスメティック",
       "close": "コスメティックを閉じる",

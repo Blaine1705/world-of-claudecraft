@@ -6,10 +6,16 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  beltLooks,
   burstDelayForRadius,
+  FOUNDRY_AURA_MARKERS,
+  FOUNDRY_MECHANIC_COLORS,
   FOUNDRY_OBJECT_SPECS,
+  FOUNDRY_PRESS_STRIP_SPEC,
   foundryCastFill,
   foundryTelegraphSpecs,
+  platingRings,
+  storedChargeFill,
 } from '../src/render/stormbrass_foundry/foundry_fx_core';
 import {
   boltPath,
@@ -21,13 +27,33 @@ import {
   STRIKE_PERIOD,
   shutterLift,
 } from '../src/render/stormbrass_foundry/foundry_plan_core';
-import { STORMBRASS_FOUNDRY_FIELD } from '../src/sim/content/stormbrass_foundry_layout';
+import {
+  MAIN_LINE_BELTS,
+  STORMBRASS_FOUNDRY_FIELD,
+} from '../src/sim/content/stormbrass_foundry_layout';
 import { MOBS } from '../src/sim/data';
 import {
+  DRAFT_ARM_SWEEP,
+  DRAFT_CELL_CARRY,
+  DRAFT_TREMOR_STEP,
+  DRAFT_TUNING,
+  DRAFT_UNBOLT,
+  FOUNDRY_BELT_TEMPLATES,
   FOUNDRY_BURST_RING,
+  FOUNDRY_CELL_TEMPLATES,
+  FOUNDRY_COIL_STRIKE_MARK,
+  FOUNDRY_FIST_MARK,
+  FOUNDRY_HATCH_TEMPLATES,
   FOUNDRY_SCRAP_MARK,
+  FOUNDRY_SHELL_MARK,
   HAULER_STEAM_BLAST,
   HAULER_TUNING,
+  RANGE_TARGET_LOCK,
+  RANGE_TUNING,
+  TOCK_TUNING,
+  VOLTAIC_CHARGED,
+  VOLTAIC_GROUNDED,
+  VOLTAIC_TUNING,
 } from '../src/sim/encounters/stormbrass_foundry/ids';
 import { FOUNDRY_PISTON_SLAM } from '../src/sim/mob/trash_kit/foundry_cast_ids';
 
@@ -111,5 +137,59 @@ describe('Foundry dressing plan', () => {
   it('stands the landmark inside the slot footprint, behind the Gantry', () => {
     expect(Math.abs(PRIME_DRAFT_LANDMARK.z)).toBeLessThan(245);
     expect(PRIME_DRAFT_LANDMARK.height).toBeGreaterThanOrEqual(40);
+  });
+});
+
+describe('Foundry boss telegraphs draw what the sim tests (phase 2)', () => {
+  it('the bars and marks size and time from the encounter tuning', () => {
+    const specs = foundryTelegraphSpecs();
+    expect(specs[DRAFT_ARM_SWEEP].range).toBe(DRAFT_TUNING.sweepRange);
+    expect(specs[DRAFT_ARM_SWEEP].arcDeg).toBe(DRAFT_TUNING.sweepArcDeg);
+    expect(specs[DRAFT_TREMOR_STEP].range).toBe(DRAFT_TUNING.tremorRadius);
+    expect(specs[DRAFT_UNBOLT].range).toBe(DRAFT_TUNING.rivetShowerRadius);
+    expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_SHELL_MARK].fillSeconds(5)).toBe(RANGE_TUNING.shellWarning);
+    expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_FIST_MARK].fillSeconds(8)).toBe(DRAFT_TUNING.fistWarning);
+    expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_COIL_STRIKE_MARK].fillSeconds(4)).toBe(
+      VOLTAIC_TUNING.strikeWarning,
+    );
+    expect(FOUNDRY_PRESS_STRIP_SPEC.fillSeconds).toBe(TOCK_TUNING.pressWarning);
+    expect(FOUNDRY_PRESS_STRIP_SPEC.halfWidth).toBe(MAIN_LINE_BELTS.halfWidth);
+    // The things to take or reach are glyphs, never a threat colour.
+    expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_CELL_TEMPLATES.ready].sigil).toBe(true);
+    expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_HATCH_TEMPLATES.open].color).toBe(
+      FOUNDRY_MECHANIC_COLORS.hatchOpen,
+    );
+    expect(FOUNDRY_AURA_MARKERS[RANGE_TARGET_LOCK]).toBeDefined();
+    expect(FOUNDRY_AURA_MARKERS[DRAFT_CELL_CARRY]).toBeDefined();
+  });
+
+  it('the belts scroll with their objects: heading, Overtime speed, the klaxon red, idle', () => {
+    expect(beltLooks([])).toEqual([0, 1, 2, 3].map(() => ({ dir: 0, alarm: 0 })));
+    const looks = beltLooks([
+      { x: 15, templateId: FOUNDRY_BELT_TEMPLATES.run, facing: 0, scale: 5 },
+      { x: -15, templateId: FOUNDRY_BELT_TEMPLATES.alarm, facing: Math.PI, scale: 3 },
+      { x: -5, templateId: FOUNDRY_BELT_TEMPLATES.idle, facing: 0, scale: 1 },
+      { x: 5, templateId: FOUNDRY_BELT_TEMPLATES.run, facing: 0, scale: 3 },
+    ]);
+    expect(looks[0]).toEqual({ dir: -1, alarm: 1 });
+    expect(looks[1]).toEqual({ dir: 0, alarm: 0 });
+    expect(looks[2]).toEqual({ dir: 1, alarm: 0 });
+    expect(looks[3].dir).toBeCloseTo(5 / 3, 6);
+  });
+
+  it('the plating ring reads the face, and splits front and back on heroic', () => {
+    expect(platingRings([{ id: VOLTAIC_GROUNDED }])).toEqual([
+      { color: FOUNDRY_MECHANIC_COLORS.grounded, arcDeg: 360, yaw: 0 },
+    ]);
+    const split = platingRings([{ id: VOLTAIC_CHARGED, value2: 1 }]);
+    expect(split.map((r) => r.color)).toEqual([
+      FOUNDRY_MECHANIC_COLORS.charged,
+      FOUNDRY_MECHANIC_COLORS.grounded,
+    ]);
+    expect(split.map((r) => r.arcDeg)).toEqual([180, 180]);
+    expect(platingRings([{ id: 'something_else' }])).toEqual([]);
+    expect(storedChargeFill(500, 2000)).toBe(0.25);
+    expect(storedChargeFill(9000, 2000)).toBe(1);
+    expect(storedChargeFill(undefined, 2000)).toBe(0);
   });
 });

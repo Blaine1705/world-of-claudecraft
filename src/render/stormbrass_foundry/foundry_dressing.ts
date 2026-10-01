@@ -398,9 +398,11 @@ void main() {
 }
 `;
 
-// Chevrons scrolling toward the press (uDir +1) or back to the chute (-1);
-// hazard edges down both sides. Phase 2's conveyor regions (G19) drive uDir
-// and uAlarm (the red chevrons of a reversal) per belt.
+// Chevrons scrolling toward the press (uDir > 0) or back to the chute (< 0),
+// uDir in units of 3 yd a second (0: the belt stands still, its chevrons still
+// pointing toward the press); hazard edges down both sides. The Line-Master's
+// conveyors (G19) drive uDir and uAlarm (the red chevrons of a reversal) per
+// belt through FOUNDRY_BELT_UNIFORMS.
 const BELT_FRAG = /* glsl */ `
 precision highp float;
 varying vec2 vUv;
@@ -412,7 +414,8 @@ void main() {
   float along = vUv.y * uLength;
   float across = vUv.x - 0.5;
   float scroll = along - uTime * 3.0 * uDir;
-  float chev = fract((scroll - abs(across) * 3.0 * uDir) / 3.0);
+  float heading = uDir < 0.0 ? -1.0 : 1.0;
+  float chev = fract((scroll - abs(across) * 3.0 * heading) / 3.0);
   float arrow = smoothstep(0.52, 0.56, chev) * smoothstep(0.84, 0.8, chev);
   float slats = 0.85 + 0.15 * step(0.5, fract(scroll * 1.2));
   vec3 rubber = vec3(0.07, 0.075, 0.08) * slats;
@@ -426,6 +429,15 @@ void main() {
 }
 `;
 
+/** Each belt's run, shared by every built Foundry (one claim is in view at a
+ *  time): the encounter painter (foundry_fx.ts) writes them from the belts'
+ *  encounter objects, so offline and online scroll alike. Idle (0) until the
+ *  Line-Master's fight starts them. */
+export const FOUNDRY_BELT_UNIFORMS: readonly {
+  uDir: { value: number };
+  uAlarm: { value: number };
+}[] = MAIN_LINE_BELTS.xs.map(() => ({ uDir: { value: 0 }, uAlarm: { value: 0 } }));
+
 function buildBelts(ground: Ground): THREE.Group {
   const group = new THREE.Group();
   group.name = 'stormbrassBelts';
@@ -437,8 +449,8 @@ function buildBelts(ground: Ground): THREE.Group {
       fragmentShader: BELT_FRAG,
       uniforms: {
         uTime: sharedUniforms.uTime,
-        uDir: { value: 1 },
-        uAlarm: { value: 0 },
+        uDir: FOUNDRY_BELT_UNIFORMS[i].uDir,
+        uAlarm: FOUNDRY_BELT_UNIFORMS[i].uAlarm,
         uLength: { value: len },
       },
     });

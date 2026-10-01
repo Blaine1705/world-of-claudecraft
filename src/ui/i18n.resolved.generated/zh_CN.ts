@@ -6035,6 +6035,28 @@ export const zh_CN: EnTranslations = {
       "brokenAria": "锁链破损：{pct}",
       "reachAria": "锁链绷紧：{pct}"
     },
+    "foundryAlert": {
+      "cellName": "风暴电池",
+      "hatchName": "核心舱门",
+      "cellTitle": "风暴电池（静电：每秒 {amount}）",
+      "cellClosedLine": "核心舱门关闭：在金色圆环外等待",
+      "cellWarnLine": "核心舱门正在打开：在金色圆环旁准备",
+      "cellOpenLine": "核心舱门已打开：立刻走进金色圆环！",
+      "dropKey": "按 {key} 放下电池交给别人",
+      "dropClick": "点击此处放下电池交给别人",
+      "dropTap": "轻点此处放下电池交给别人",
+      "dropAria": "放下风暴电池",
+      "cellAria": "电池短路前剩余时间：{pct}",
+      "lockTitle": "目标锁定！",
+      "lockLine": "保持移动：炮弹会落在你刚才站的地方",
+      "lockAria": "目标锁定剩余时间：{pct}",
+      "groundedTitle": "接地装甲",
+      "groundedLine": "物理伤害有效；法术会被储存为电荷",
+      "chargedTitle": "充能装甲",
+      "chargedLine": "法术有效；物理伤害会被储存为电荷",
+      "splitLine": "它的背面是另一种装甲",
+      "storedAria": "下一次放电前储存的电荷：{pct}"
+    },
     "cosmetics": {
       "title": "外观",
       "close": "关闭外观",

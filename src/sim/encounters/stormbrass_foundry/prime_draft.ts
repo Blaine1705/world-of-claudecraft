@@ -72,6 +72,7 @@ import {
   DRAFT_OVERLOAD,
   DRAFT_OVERLOADED,
   DRAFT_PISTON_FIST,
+  DRAFT_RECORD_ITEM,
   DRAFT_SHORT_OUT,
   DRAFT_TREMOR_STEP,
   DRAFT_UNBOLT,
@@ -90,8 +91,6 @@ import { layCell, refreshCarry } from './storm_cells';
 export const PRIME_DRAFT_DEED = 'dgn_prime_draft_overload';
 /** Overloads the deed asks for in one fight. */
 export const PRIME_DRAFT_DEED_OVERLOADS = 3;
-/** The quest item the Draft Record carries (the lore object in its chest). */
-export const DRAFT_RECORD_ITEM = 'draft_record';
 
 /** The chat lines (re-localized by src/ui/sim_i18n.ts). */
 export const PRIME_DRAFT_LINES = {

@@ -1,6 +1,7 @@
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { ESCORTS } from '../sim/data';
+import { DRAFT_CELL_CARRY } from '../sim/encounters/stormbrass_foundry/ids';
 import { TURNKEY_CAGED } from '../sim/encounters/sunken_bastion/ids';
 import type { FarmPlotView } from '../world_api/farming';
 import { handleEscortPress } from './escort_interact';
@@ -116,6 +117,12 @@ export function tryNearbyInteraction(
   // Locked in the Gaol Turnkey's Iron Cage: every interact press is an escape
   // press (the sim counts and rate-limits it), never a scan of the room.
   if (world.player.auras?.some((a) => a.id === TURNKEY_CAGED)) {
+    world.interact();
+    return true;
+  }
+  // Carrying the Prime Draft's Storm Cell: the press drops it (the sim lays it
+  // at your feet and owns the retake lock).
+  if (world.player.auras?.some((a) => a.id === DRAFT_CELL_CARRY)) {
     world.interact();
     return true;
   }
