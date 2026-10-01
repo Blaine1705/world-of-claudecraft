@@ -102,6 +102,7 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.bastion_shackle_pair': true,
   'abilityUi.cast.bastion_shadowstep': true,
   'abilityUi.cast.bastion_reaping_scythe': true,
+  'abilityUi.cast.bastion_veil_rise': true,
   // The Drowned Temple trash kit and boss casts.
   'abilityUi.cast.temple_lullaby': true,
   'abilityUi.cast.temple_call_the_tide': true,

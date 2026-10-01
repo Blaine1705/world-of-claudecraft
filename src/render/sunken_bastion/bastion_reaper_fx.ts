@@ -24,6 +24,7 @@ import {
   VAEL_ID,
   VAEL_REAPING_SCYTHE,
   VAEL_SHADOWSTEP,
+  VAEL_VEIL_RISE,
 } from '../../sim/encounters/sunken_bastion/ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -35,6 +36,7 @@ import {
 } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
+import { pickVeilClaim, type VeilCandidate } from './bastion_boss_fx_core';
 import {
   GRAVE_SHADOW_RADIUS,
   REAPER_POOL_RADIUS,
@@ -115,6 +117,8 @@ export class BastionReaperFx {
   private readonly figureIds: number[] = [];
   private vaelId = -1;
   private vaelCast: string | null = null;
+  /** Each veil figure's last-seen bar (the rise geyser fires on its edge). */
+  private readonly figureCast = new Map<number, string | null>();
   private scan = 0;
   private clock = 0;
 
@@ -188,6 +192,8 @@ export class BastionReaperFx {
     this.poolIds.length = 0;
     this.figureIds.length = 0;
     this.vaelId = -1;
+    const vaels: VeilCandidate[] = [];
+    const me = world.entities.get(world.playerId);
     for (const e of world.entities.values()) {
       if (e.kind === 'object') {
         if (e.templateId === REAPER_POOL_TEMPLATE || e.templateId === GRAVE_SHADOW_TEMPLATE)
@@ -196,10 +202,18 @@ export class BastionReaperFx {
       }
       if (e.kind !== 'mob' || e.dead) continue;
       if (e.templateId === VAEL_ID) {
-        this.vaelId = e.id;
+        vaels.push({
+          id: e.id,
+          slot: 0,
+          // The one in a fight (mid-bar) first, else the nearest: offline
+          // every claim's Vael exists at once.
+          veiled: e.castingAbility !== null || e.aggroTargetId !== null,
+          dist: me ? Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z) : 0,
+        });
         this.figureIds.push(e.id);
       } else if (e.templateId === FOG_SHADE_ID) this.figureIds.push(e.id);
     }
+    this.vaelId = pickVeilClaim(vaels, []).vaelId;
   }
 
   /** Claims the vanish's cue (the smoke is drawn here); the sweep's cue is left
@@ -310,16 +324,31 @@ export class BastionReaperFx {
     }
   }
 
-  /** The geyser of shadow as he rises out of the pool (his Emerge bar). */
+  /** The geyser of shadow as he rises out of the pool (his Emerge bar), and
+   *  as every Fog Veil figure rises out of the roof together (the veil rise). */
   private updateRise(world: IWorld): void {
     const vael = this.vaelId >= 0 ? world.entities.get(this.vaelId) : undefined;
     const cast = vael?.castingAbility ?? null;
-    if (vael && cast === VAEL_REAPING_SCYTHE && this.vaelCast !== VAEL_REAPING_SCYTHE) {
-      const y = this.groundY(vael.pos.x, vael.pos.z);
-      this.fx.burst(vael.pos.x, y + 0.5, vael.pos.z, 0x07050c, 10, 1.6, 6, 1.1, 5.5, 0.8, true);
-      this.fx.burst(vael.pos.x, y + 1.0, vael.pos.z, 0xa8ffd8, 6, 0.4, 2.2, 0.8, 6, 1.4);
-    }
+    if (vael && cast === VAEL_REAPING_SCYTHE && this.vaelCast !== VAEL_REAPING_SCYTHE)
+      this.geyser(vael.pos.x, vael.pos.z);
+    // The veil spawns its shades on the tick he starts to rise: find them now.
+    if (cast === VAEL_VEIL_RISE && this.vaelCast !== VAEL_VEIL_RISE) this.scanWorld(world);
     this.vaelCast = cast;
+    for (const id of this.figureIds) {
+      const e = world.entities.get(id);
+      const now = e && !e.dead ? e.castingAbility : null;
+      if (e && now === VAEL_VEIL_RISE && this.figureCast.get(id) !== VAEL_VEIL_RISE)
+        this.geyser(e.pos.x, e.pos.z);
+      this.figureCast.set(id, now);
+    }
+    for (const id of this.figureCast.keys())
+      if (!world.entities.has(id)) this.figureCast.delete(id);
+  }
+
+  private geyser(x: number, z: number): void {
+    const y = this.groundY(x, z);
+    this.fx.burst(x, y + 0.5, z, 0x07050c, 10, 1.6, 6, 1.1, 5.5, 0.8, true);
+    this.fx.burst(x, y + 1.0, z, 0xa8ffd8, 6, 0.4, 2.2, 0.8, 6, 1.4);
   }
 
   private updateTrail(dt: number): void {

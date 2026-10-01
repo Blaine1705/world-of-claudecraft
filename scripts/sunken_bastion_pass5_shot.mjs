@@ -10,7 +10,10 @@
 // mode and the claim's trash is cleared first. Evidence tooling, not a repo
 // test.
 //
-//   node scripts/sunken_bastion_pass5_shot.mjs <outDir> [turnkey|ossick|vael|all] [before]
+//   node scripts/sunken_bastion_pass5_shot.mjs <outDir> [turnkey|ossick|vael|veil|all] [before]
+//
+// `veil` frames the Fog Veil alone: the four figures rising, then the beam
+// finding the real Vael.
 //
 // `before` runs the same framing against a build without the fifth pass (the
 // old mechanics' triggers). Env: SHOT_URL (http://127.0.0.1:5200/), SHOT_W /
@@ -394,7 +397,7 @@ try {
     await keepAlive();
   }
 
-  if (MODE === 'vael' || MODE === 'all') {
+  if (MODE === 'vael' || MODE === 'veil' || MODE === 'all') {
     await chat('/dev bastion kill ossick', 400);
     await chat('/dev bastion tp crown', 2500);
     const ironjaw = (await partyId('Ironjaw')) ?? (await tankAlly(-4, 222));
@@ -424,7 +427,7 @@ try {
     await engage('vael_the_mistcaller', -4, 226, ironjaw);
     await stand(12, 222, -4, 218, 0.5, 0.85, 24);
     await sleep(1500);
-    if (!BEFORE) {
+    if (!BEFORE && MODE !== 'veil') {
       await triggerUntil('reap', 'vael_the_mistcaller', 'bastion_shadowstep');
       await sleep(250);
       await shot('vael_03_se_hunde_en_la_sombra');
@@ -441,14 +444,95 @@ try {
       await engage('vael_the_mistcaller', -4, 226, ironjaw);
       await sleep(600);
     }
-    await chat('/dev bastion trigger veil', 100);
-    await stand(-4, 196, -4, 208, 0, 0.5, 38);
-    await sleep(1500);
-    await shot('vael_08_copias_en_la_niebla');
-    await sleep(1400);
-    await shot('vael_09_el_faro_revela');
-    await sleep(1400);
-    await shot('vael_10_el_faro_revela_2');
+    if (MODE === 'veil') {
+      // The Fog Veil up close: the four figures rising out of the roof, then
+      // the beam's sweep until it finds the real one (his lantern flares).
+      await stand(-4, 196, -4, 208, 0, 0.5, 38);
+      await sleep(600);
+      await chat('/dev bastion trigger veil', 0);
+      for (const ms of [100, 400, 800]) {
+        await sleep(ms === 100 ? 100 : 200);
+        await shot(`vael_veil_alza_${ms}ms`);
+      }
+      for (let i = 0; i < 16; i++) {
+        await sleep(350);
+        const lit = await page.evaluate(() => {
+          const w = window.__game.world;
+          let vael = null;
+          let lamp = null;
+          for (const e of w.ctx.entities.values()) {
+            if (e.templateId === 'vael_the_mistcaller' && !e.dead) vael = e;
+            if (e.templateId === 'bastion_beacon_lamp') lamp = e;
+          }
+          if (!vael || !lamp) return false;
+          const a = Math.atan2(vael.pos.x - lamp.pos.x, vael.pos.z - lamp.pos.z);
+          let d = a - lamp.facing;
+          while (d > Math.PI) d -= Math.PI * 2;
+          while (d < -Math.PI) d += Math.PI * 2;
+          return Math.abs(d) < 0.6;
+        });
+        if (lit) {
+          // Frame the real one up close: his lantern flares.
+          const at = await page.evaluate(
+            ([ox, oz]) => {
+              const w = window.__game.world;
+              for (const e of w.ctx.entities.values())
+                if (e.templateId === 'vael_the_mistcaller' && !e.dead)
+                  return { x: e.pos.x - ox, z: e.pos.z - oz };
+              return null;
+            },
+            [O.x, O.z],
+          );
+          if (at) {
+            const dx = -4 - at.x;
+            const dz = 208 - at.z;
+            const d = Math.hypot(dx, dz) || 1;
+            await stand(at.x + (dx / d) * 7, at.z + (dz / d) * 7, at.x, at.z, 0.5, 0.2, 9);
+          }
+          await sleep(200);
+          await shot('vael_veil_farol_revela_al_real');
+          console.log(
+            'REVEAL',
+            await page.evaluate(() => {
+              const out = [];
+              window.__game.renderer.scene.traverse((o) => {
+                if (!o.isSprite || !o.visible) return;
+                const c = o.material.color.getHex().toString(16);
+                if (c === 'ffc56a' || c === 'fff8e8' || c === '9dffc6')
+                  out.push(`${c}@${o.position.y.toFixed(1)} a${o.material.opacity.toFixed(2)}`);
+              });
+              const w = window.__game.world;
+              let info = '';
+              for (const e of w.ctx.entities.values()) {
+                if (e.templateId === 'vael_the_mistcaller')
+                  info += ` vael auras=${e.auras.map((a) => a.id).join(',')} cast=${e.castingAbility}`;
+                if (e.templateId === 'bastion_beacon_lamp')
+                  info += ` lamp kind=${e.kind} facing=${e.facing.toFixed(2)}`;
+              }
+              let sprites = 0;
+              const colors = new Set();
+              window.__game.renderer.scene.traverse((o) => {
+                if (o.isSprite) {
+                  sprites++;
+                  colors.add(o.material.color.getHex().toString(16));
+                }
+              });
+              return `${out.join(' | ')} ${info} sprites=${sprites} colors=${[...colors].slice(0, 30).join(',')}`;
+            }),
+          );
+          break;
+        }
+      }
+    } else {
+      await chat('/dev bastion trigger veil', 100);
+      await stand(-4, 196, -4, 208, 0, 0.5, 38);
+      await sleep(1500);
+      await shot('vael_08_copias_en_la_niebla');
+      await sleep(1400);
+      await shot('vael_09_el_faro_revela');
+      await sleep(1400);
+      await shot('vael_10_el_faro_revela_2');
+    }
   }
 } finally {
   await browser.close();

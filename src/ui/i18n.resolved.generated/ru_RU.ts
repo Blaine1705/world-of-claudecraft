@@ -12349,6 +12349,7 @@ export const ru_RU: EnTranslations = {
       "bastion_shackle_pair": "Парные кандалы",
       "bastion_shadowstep": "Переход сквозь тень",
       "bastion_reaping_scythe": "Жнущая коса",
+      "bastion_veil_rise": "Туманная завеса",
       "temple_lullaby": "Колыбельная",
       "temple_call_the_tide": "Зов прилива",
       "temple_static_coil": "Статический виток",

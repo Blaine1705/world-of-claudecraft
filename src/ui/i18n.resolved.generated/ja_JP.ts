@@ -12349,6 +12349,7 @@ export const ja_JP: EnTranslations = {
       "bastion_shackle_pair": "連鎖の枷",
       "bastion_shadowstep": "影渡り",
       "bastion_reaping_scythe": "刈り取りの大鎌",
+      "bastion_veil_rise": "霧のヴェール",
       "temple_lullaby": "子守歌",
       "temple_call_the_tide": "潮の呼び声",
       "temple_static_coil": "静電のとぐろ",

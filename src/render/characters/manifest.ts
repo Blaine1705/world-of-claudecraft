@@ -36,6 +36,7 @@ import {
   VAEL_MIST_SURGE,
   VAEL_REAPING_SCYTHE,
   VAEL_SHADOWSTEP,
+  VAEL_VEIL_RISE,
 } from '../../sim/encounters/sunken_bastion/ids';
 import {
   VARKHUL_ANVILS_DECREE_CAST_ID,
@@ -4196,6 +4197,8 @@ export const VISUALS: Record<string, VisualDef> = {
         [VAEL_DROWNING_HYMN]: 'Hymn',
         [VAEL_SHADOWSTEP]: 'Vanish',
         [VAEL_REAPING_SCYTHE]: 'Emerge',
+        // The Fog Veil: all four figures rise out of the roof the same way.
+        [VAEL_VEIL_RISE]: 'Emerge',
       },
       flourish: 'ScytheSweep',
     },

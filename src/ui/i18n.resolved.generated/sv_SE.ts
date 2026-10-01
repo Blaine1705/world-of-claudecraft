@@ -12349,6 +12349,7 @@ export const sv_SE: EnTranslations = {
       "bastion_shackle_pair": "Shackle Pair",
       "bastion_shadowstep": "Shadow Crossing",
       "bastion_reaping_scythe": "Reaping Scythe",
+      "bastion_veil_rise": "Fog Veil",
       "temple_lullaby": "Lullaby",
       "temple_call_the_tide": "Call the Tide",
       "temple_static_coil": "Static Coil",

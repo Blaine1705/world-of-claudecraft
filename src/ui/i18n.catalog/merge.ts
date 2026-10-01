@@ -615,6 +615,8 @@ const mergeStringsEn = {
       bastion_shackle_pair: 'Shackle Pair',
       bastion_shadowstep: 'Shadow Crossing',
       bastion_reaping_scythe: 'Reaping Scythe',
+      // The Fog Veil's figures rising out of the roof (Wordy, M16: fills).
+      bastion_veil_rise: 'Fog Veil',
       // The Drowned Temple trash kit and boss casts (trash_kit/temple_cast_ids.ts,
       // encounters/drowned_temple/ids.ts). The Lullaby, the Call and the Coil
       // can be kicked.

@@ -19775,6 +19775,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_shackle_pair': '쌍둥이 족쇄',
   'abilityUi.cast.bastion_shadowstep': '그림자 건너기',
   'abilityUi.cast.bastion_reaping_scythe': '수확의 낫',
+  'abilityUi.cast.bastion_veil_rise': '안개 장막',
   'entities.mobs.bastion_gaol_cage.name': '강철 우리',
   'entities.mobs.bastion_drowned_anchor.name': '익사의 닻',
   'entities.items.jailers_iron_gauntlets.name': '간수의 강철 건틀릿',

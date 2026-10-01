@@ -177,3 +177,54 @@ export function beamReveal(templateId: string, yaw: number, lx: number, lz: numb
   if (!inBeam(yaw, lx, lz)) return null;
   return templateId === VAEL_ID ? 'real' : 'shade';
 }
+
+/** The reveal's glow on a veiled figure, stepped one frame: it LATCHES full
+ *  the moment the beam catches the figure and then fades slowly, so the tell
+ *  outlives the beam's brief pass (the beam crosses a figure in about a
+ *  quarter second of its sweep; the glow holds about two seconds). */
+export const REVEAL_FADE_PER_SEC = 0.5;
+export function revealGlow(prev: number, lit: boolean, dt: number): number {
+  if (lit) return 1;
+  return Math.max(0, prev - REVEAL_FADE_PER_SEC * dt);
+}
+
+/** Vael's soul lantern at his hip (reaper.py REST['Lantern'], the bulb's
+ *  middle), in model units over his feet: the real Vael's flare burns HERE,
+ *  on the lantern, not on his chest. */
+export const VAEL_LANTERN = { side: 0.66, up: 2.6, fwd: 0.22 } as const;
+
+/** One Vael (or Fogbeacon lamp) candidate in view: its claim slot, whether
+ *  his Fog Veil is up, and how far it stands from the local player. */
+export interface VeilCandidate {
+  id: number;
+  slot: number;
+  veiled?: boolean;
+  dist?: number;
+}
+
+/**
+ * Which claim's Vael and lamp the beam effects follow when several Bastion
+ * claims are in the world (offline, every claim's bodies exist at once): the
+ * one whose veil is up, else the nearest Vael; the lamp is his claim's. It
+ * used to follow whichever came LAST in the roster, so the beam and the real
+ * one's flare tracked an idle Vael in another claim and never lit.
+ */
+export function pickVeilClaim(
+  vaels: readonly VeilCandidate[],
+  lamps: readonly VeilCandidate[],
+): { vaelId: number; lampId: number } {
+  let best: VeilCandidate | null = null;
+  for (const v of vaels) {
+    if (!best) {
+      best = v;
+      continue;
+    }
+    if (!!v.veiled !== !!best.veiled) {
+      if (v.veiled) best = v;
+      continue;
+    }
+    if ((v.dist ?? Infinity) < (best.dist ?? Infinity)) best = v;
+  }
+  const lamp = best ? lamps.find((l) => l.slot === best.slot) : lamps[0];
+  return { vaelId: best?.id ?? -1, lampId: lamp?.id ?? -1 };
+}

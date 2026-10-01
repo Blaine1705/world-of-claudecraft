@@ -39,6 +39,9 @@ export const VAEL_SHADOWSTEP = 'bastion_shadowstep';
 export const VAEL_REAPING_SCYTHE = 'bastion_reaping_scythe';
 export const VAEL_MIST_SURGE = 'bastion_mist_surge';
 export const VAEL_DROWNING_HYMN = 'bastion_drowning_hymn';
+/** The Fog Veil's figures (Vael and his three shades) rise out of the roof
+ *  together before the hymn: a short bar on each, his Emerge rise. */
+export const VAEL_VEIL_RISE = 'bastion_veil_rise';
 
 // ---- aura ids ---------------------------------------------------------------------
 export const OLEN_BREACHED = 'bastion_breached';
@@ -354,6 +357,9 @@ export const VAEL_TUNING = {
   poolSeconds: 1.6,
   /** Rising out of the pool, scythe drawn back (the Emerge clip). */
   riseSeconds: 0.6,
+  /** The Fog Veil's figures rise out of the roof this slowly (the Emerge
+   *  rise, played at half pace so all four read as rising, not appearing). */
+  veilRiseSeconds: 1.2,
   /** How far behind the mark the pool opens. */
   behind: 2.5,
   sweepRange: 8,

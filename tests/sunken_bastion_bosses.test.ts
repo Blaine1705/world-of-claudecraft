@@ -28,6 +28,7 @@ import {
   VAEL_MIST_SURGE,
   VAEL_STAGGER,
   VAEL_TUNING,
+  VAEL_VEIL_RISE,
   veilBeamYaw,
 } from '../src/sim/encounters/sunken_bastion';
 import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
@@ -334,20 +335,30 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     expect(f.others[1].hp).toBe(far);
   });
 
-  it('the Fog Veil: three shades wearing his name and health, all four singing', () => {
+  it('the Fog Veil: three shades wearing his name and health, all four rising, then singing', () => {
     const { f, vael } = roof();
     run(f, 0.5);
     vael.hp = Math.round(vael.maxHp * 0.69);
     run(f, DT * 2);
     const list = shades(f);
     expect(list).toHaveLength(3);
+    // All four rise out of the roof together (none simply appears) ...
+    for (const e of [vael, ...list]) {
+      expect(e.castingAbility).toBe(VAEL_VEIL_RISE);
+      expect(e.castTotal).toBe(VAEL_TUNING.veilRiseSeconds);
+    }
+    run(f, VAEL_TUNING.veilRiseSeconds);
     for (const s of list) {
       expect(s.name).toBe(vael.name);
       expect(s.hp).toBe(vael.hp);
       expect(s.maxHp).toBe(vael.maxHp);
       expect(s.castingAbility).toBe(VAEL_DROWNING_HYMN);
     }
+    // ... then all four sing, the hymn's bar on the veil's own clock.
     expect(vael.castingAbility).toBe(VAEL_DROWNING_HYMN);
+    expect(vael.castRemaining).toBeLessThan(
+      VAEL_TUNING.hymnSeconds - VAEL_TUNING.veilRiseSeconds + 0.01,
+    );
     expect(vael.auras.some((a) => a.id === VAEL_FOG_VEIL)).toBe(true);
     // Every figure stands on the rim.
     for (const e of [vael, ...list]) {
@@ -398,6 +409,7 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     run(f, DT * 2);
     expect(shades(f)).toHaveLength(0);
     expect(vael.castingAbility).not.toBe(VAEL_DROWNING_HYMN);
+    expect(vael.castingAbility).not.toBe(VAEL_VEIL_RISE);
     expect(vael.auras.some((a) => a.id === VAEL_STAGGER && a.kind === 'stun')).toBe(true);
     expect(vael.auras.find((a) => a.id === VAEL_EXPOSED)?.value).toBe(VAEL_TUNING.exposed);
   });

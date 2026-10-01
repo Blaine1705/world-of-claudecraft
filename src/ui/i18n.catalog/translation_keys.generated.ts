@@ -40,6 +40,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.bastion_shackle_pair'
   | 'abilityUi.cast.bastion_shadowstep'
   | 'abilityUi.cast.bastion_shell_slam'
+  | 'abilityUi.cast.bastion_veil_rise'
   | 'abilityUi.cast.crafting'
   | 'abilityUi.cast.crypt_barrowflame_breath'
   | 'abilityUi.cast.crypt_grave_bolt'

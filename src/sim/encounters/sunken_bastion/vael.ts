@@ -71,6 +71,7 @@ import {
   VAEL_SHADOWSTEP,
   VAEL_STAGGER,
   VAEL_TUNING,
+  VAEL_VEIL_RISE,
   veilBeamYaw,
   veilSlots,
 } from './ids';
@@ -119,6 +120,27 @@ function place(ctx: SimContext, inst: InstanceSlot, e: Entity, x: number, z: num
   e.prevFacing = e.facing;
 }
 
+/** A veil figure rises out of the roof (the Emerge rise, on a short bar). */
+function riseFromFog(e: Entity): void {
+  e.castingAbility = VAEL_VEIL_RISE;
+  e.castTotal = T.veilRiseSeconds;
+  e.castRemaining = T.veilRiseSeconds;
+  e.castTargetId = null;
+  e.channeling = false;
+}
+
+/** The figure's bar this tick: still rising, else the hymn (its bar runs on
+ *  the veil's own clock). */
+function veilBar(e: Entity, elapsed: number): void {
+  if (elapsed < T.veilRiseSeconds) {
+    if (e.castingAbility !== VAEL_VEIL_RISE) riseFromFog(e);
+    e.castRemaining = Math.max(0, T.veilRiseSeconds - elapsed);
+    return;
+  }
+  if (e.castingAbility !== VAEL_DROWNING_HYMN) channelHymn(e);
+  e.castRemaining = Math.max(0, T.hymnSeconds - elapsed);
+}
+
 function channelHymn(e: Entity): void {
   e.castingAbility = VAEL_DROWNING_HYMN;
   e.castTotal = T.hymnSeconds;
@@ -127,7 +149,8 @@ function channelHymn(e: Entity): void {
   e.channeling = true;
 }
 
-/** The fog takes Vael: three shades rise and all four begin the hymn. */
+/** The fog takes Vael: he and three shades rise out of the roof together
+ *  (none simply appears), then all four begin the hymn. */
 export function startFogVeil(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -167,11 +190,11 @@ export function startFogVeil(
     shade.hp = boss.hp;
     shade.level = boss.level;
     place(ctx, inst, shade, slots[k].x, slots[k].z);
-    channelHymn(shade);
+    riseFromFog(shade);
     shadeIds.push(shade.id);
   }
   place(ctx, inst, boss, slots[realSlot].x, slots[realSlot].z);
-  channelHymn(boss);
+  riseFromFog(boss);
   ctx.applyAura(boss, {
     id: VAEL_FOG_VEIL,
     name: 'Fog Veil',
@@ -269,6 +292,7 @@ function endVeil(ctx: SimContext, boss: Entity, st: VaelFightState): void {
   if (!veil) return;
   st.veil = null;
   clearCastOf(boss, VAEL_DROWNING_HYMN);
+  clearCastOf(boss, VAEL_VEIL_RISE);
   boss.auras = boss.auras.filter((a) => a.id !== VAEL_FOG_VEIL);
   for (const id of veil.shadeIds) {
     if (id === boss.id || id < 0) continue;
@@ -340,8 +364,7 @@ function stepVeil(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFig
       continue;
     }
     shade.hp = boss.hp;
-    if (shade.castingAbility !== VAEL_DROWNING_HYMN) channelHymn(shade);
-    shade.castRemaining = Math.max(0, T.hymnSeconds - veil.elapsed);
+    veilBar(shade, veil.elapsed);
     shade.swingTimer = Math.max(shade.swingTimer, 1);
   }
   // Drifting Shades (heroic): every figure shifts one place round the rim.
@@ -364,7 +387,7 @@ function stepVeil(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFig
     else e.facing = Math.atan2(BEACON.x - at.x, BEACON.z - at.z);
     e.swingTimer = Math.max(e.swingTimer, 1);
   }
-  boss.castRemaining = Math.max(0, T.hymnSeconds - veil.elapsed);
+  veilBar(boss, veil.elapsed);
   // The hymn swells: frost to everyone on the roof every second.
   veil.tick -= DT;
   if (veil.tick <= 0) {

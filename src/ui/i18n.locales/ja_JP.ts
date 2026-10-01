@@ -19791,6 +19791,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_shackle_pair': '連鎖の枷',
   'abilityUi.cast.bastion_shadowstep': '影渡り',
   'abilityUi.cast.bastion_reaping_scythe': '刈り取りの大鎌',
+  'abilityUi.cast.bastion_veil_rise': '霧のヴェール',
   'entities.mobs.bastion_gaol_cage.name': '鉄の檻',
   'entities.mobs.bastion_drowned_anchor.name': '溺死の錨',
   'entities.items.jailers_iron_gauntlets.name': '看守の鉄篭手',

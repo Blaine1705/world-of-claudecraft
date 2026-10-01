@@ -58,9 +58,14 @@ import {
   hymnFlood,
   OATH_LANE_HALF,
   oathLaneLength,
+  pickVeilClaim,
   predictBeamYaw,
+  revealGlow,
   standingButtressIds,
+  VAEL_LANTERN,
+  type VeilCandidate,
 } from './bastion_boss_fx_core';
+import { modelPointWorld } from './bastion_creature_fx_core';
 import { BASTION_TELEGRAPH_COLORS } from './bastion_fx_core';
 import { bastionKitPiece, bastionKitReady, bastionSlotMaterial } from './bastion_kit';
 
@@ -222,6 +227,7 @@ interface WakeSlot {
 interface RevealSlot {
   entityId: number;
   flare: THREE.Sprite;
+  core: THREE.Sprite;
   shimmer: THREE.Sprite;
   shadow: THREE.Mesh;
   shadowMat: THREE.ShaderMaterial;
@@ -256,6 +262,7 @@ export class BastionBossFx {
   private readonly buttresses: ButtressSlot[] = [];
   private readonly wakes: WakeSlot[] = [];
   private readonly reveals: RevealSlot[] = [];
+  private readonly lantern = { x: 0, y: 0, z: 0 };
   private readonly puffs: Puff[] = [];
   private readonly debris: Debris[] = [];
   private readonly debrisMesh: THREE.InstancedMesh | null;
@@ -374,17 +381,29 @@ export class BastionBossFx {
     shadowGeo.rotateX(-Math.PI / 2);
     shadowGeo.translate(0, 0, 0.5);
     for (let i = 0; i < REVEAL_SLOTS; i++) {
-      const flare = this.sprite(0xffd890, 0, 5.5);
+      // The real Vael's lantern flares: a wide amber halo round a white-hot
+      // core (two sprites), so the tell reads across the roof.
+      const flare = this.sprite(0xffc56a, 0, 9);
+      const core = this.sprite(0xfff8e8, 0, 3.2);
       const shimmer = this.sprite(0x9dffc6, 0, 4.5);
       const shadowMat = this.shader(SHADOW_FRAG, { uAlpha: { value: 0 } }, false, true);
       const shadow = new THREE.Mesh(shadowGeo, shadowMat);
       shadow.frustumCulled = false;
       shadow.renderOrder = floorVfxRenderOrder('encounter', 5);
-      for (const o of [flare, shimmer, shadow]) {
+      for (const o of [flare, core, shimmer, shadow]) {
         o.visible = false;
         this.root.add(o);
       }
-      this.reveals.push({ entityId: -1, flare, shimmer, shadow, shadowMat, kind: null, k: 0 });
+      this.reveals.push({
+        entityId: -1,
+        flare,
+        core,
+        shimmer,
+        shadow,
+        shadowMat,
+        kind: null,
+        k: 0,
+      });
     }
     // The Hermit's dome.
     const domeGeo = this.geo(
@@ -561,7 +580,10 @@ export class BastionBossFx {
     this.hermitIds = [];
     this.olenId = -1;
     this.vaelId = -1;
-    let lampId = -1;
+    const vaels: VeilCandidate[] = [];
+    const lamps: VeilCandidate[] = [];
+    const figures: { id: number; slot: number }[] = [];
+    const me = world.entities.get(world.playerId);
     this.standing.clear();
     const perSlot = new Map<number, { lx: number; lz: number; templateId: string }[]>();
     for (const e of world.entities.values()) {
@@ -574,15 +596,23 @@ export class BastionBossFx {
           list.push({ lx: e.pos.x - o.x, lz: e.pos.z - o.z, templateId: t });
           perSlot.set(o.slot, list);
         } else if (t === UNDERTOW_TEMPLATE) this.wakeIds.push(e.id);
-        else if (t === BEACON_LAMP_TEMPLATE) lampId = e.id;
+        else if (t === BEACON_LAMP_TEMPLATE)
+          lamps.push({ id: e.id, slot: bastionSlotOrigin(e.pos.x, e.pos.z).slot });
         continue;
       }
       if (e.kind !== 'mob') continue;
       const t = e.templateId;
       if (t === OLEN_ID && !e.dead) this.olenId = e.id;
       else if (t === VAEL_ID) {
-        if (!e.dead) this.vaelId = e.id;
-        if (!e.dead) this.veilIds.push(e.id);
+        if (!e.dead) {
+          vaels.push({
+            id: e.id,
+            slot: bastionSlotOrigin(e.pos.x, e.pos.z).slot,
+            veiled: hasAura(e, VAEL_FOG_VEIL),
+            dist: me ? Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z) : 0,
+          });
+          figures.push({ id: e.id, slot: bastionSlotOrigin(e.pos.x, e.pos.z).slot });
+        }
       } else if (t === FOG_SHADE_ID) {
         if (e.dead) {
           if (!this.deadShades.has(e.id)) {
@@ -590,7 +620,7 @@ export class BastionBossFx {
             this.burst(e.pos.x, e.pos.y + 1.5, e.pos.z, 0x8dffb8, 4, 2.2, 7, 1.2);
           }
         } else {
-          this.veilIds.push(e.id);
+          figures.push({ id: e.id, slot: bastionSlotOrigin(e.pos.x, e.pos.z).slot });
           if (!this.seenShades.has(e.id)) {
             this.seenShades.add(e.id);
             this.burst(e.pos.x, e.pos.y + 1.2, e.pos.z, 0x9fe8c4, 5, 2.5, 8, 1.4);
@@ -600,6 +630,13 @@ export class BastionBossFx {
         this.hermitIds.push(e.id);
     }
     for (const [slot, list] of perSlot) this.standing.set(slot, standingButtressIds(list));
+    // Several claims in the world (offline): follow the veiled (else nearest)
+    // Vael and his own claim's lamp.
+    const pick = pickVeilClaim(vaels, lamps);
+    this.vaelId = pick.vaelId;
+    const slot = vaels.find((v) => v.id === pick.vaelId)?.slot;
+    for (const f of figures) if (f.slot === slot) this.veilIds.push(f.id);
+    const lampId = pick.lampId;
     if (lampId !== this.lampId) {
       this.lampId = lampId;
       this.lampSampleAge = 99;
@@ -793,7 +830,7 @@ export class BastionBossFx {
       this.beamPool.visible = false;
       for (const r of this.reveals) {
         r.entityId = -1;
-        r.flare.visible = r.shimmer.visible = r.shadow.visible = false;
+        r.flare.visible = r.core.visible = r.shimmer.visible = r.shadow.visible = false;
       }
     }
   }
@@ -803,7 +840,7 @@ export class BastionBossFx {
     for (const r of this.reveals) {
       if (r.entityId >= 0 && !this.veilIds.includes(r.entityId)) {
         r.entityId = -1;
-        r.flare.visible = r.shimmer.visible = r.shadow.visible = false;
+        r.flare.visible = r.core.visible = r.shimmer.visible = r.shadow.visible = false;
       }
     }
     for (const id of this.veilIds) {
@@ -812,6 +849,7 @@ export class BastionBossFx {
       if (!r) break;
       r.entityId = id;
       r.k = 0;
+      r.kind = null;
     }
     const bx = o.x + CROWN_DEF.x;
     const bz = o.z + CROWN_DEF.z;
@@ -820,17 +858,25 @@ export class BastionBossFx {
       const e = world.entities.get(r.entityId);
       if (!e) continue;
       const kind = beamReveal(e.templateId, yaw, e.pos.x - o.x, e.pos.z - o.z);
+      // The real one's tell flashes on (a burst of gold off the lantern) and
+      // then holds a slow afterglow, so it is learnable at a glance.
+      if (kind === 'real' && r.k < 0.5 && this.cosmetic)
+        this.burst(e.pos.x, e.pos.y + 2.4 * e.scale, e.pos.z, 0xffd890, 10, 0.5, 2.6, 0.9, 2.4);
       if (kind) r.kind = kind;
-      r.k = Math.min(1, Math.max(0, r.k + (kind ? 6 : -2.5) * dt));
+      r.k = revealGlow(r.k, kind !== null, dt);
       const floor = this.groundY(e.pos.x, e.pos.z);
       const real = r.kind === 'real';
       r.flare.visible = real && r.k > 0.01;
+      r.core.visible = real && r.k > 0.01;
       r.shadow.visible = real && r.k > 0.01;
       r.shimmer.visible = !real && r.k > 0.01;
       if (real) {
-        const pulse = 0.85 + 0.15 * Math.sin(this.clock * 11);
-        (r.flare.material as THREE.SpriteMaterial).opacity = r.k * pulse;
-        r.flare.position.set(e.pos.x, e.pos.y + 2.3 * e.scale, e.pos.z);
+        const pulse = 0.8 + 0.2 * Math.sin(this.clock * 11);
+        (r.flare.material as THREE.SpriteMaterial).opacity = Math.min(1, r.k * 1.2) * pulse;
+        (r.core.material as THREE.SpriteMaterial).opacity = r.k;
+        modelPointWorld(e.pos.x, e.pos.y, e.pos.z, e.facing, e.scale, VAEL_LANTERN, this.lantern);
+        r.flare.position.set(this.lantern.x, this.lantern.y, this.lantern.z);
+        r.core.position.set(this.lantern.x, this.lantern.y, this.lantern.z);
         const away = Math.atan2(e.pos.x - bx, e.pos.z - bz);
         r.shadow.position.set(
           e.pos.x,

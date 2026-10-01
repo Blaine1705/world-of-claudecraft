@@ -12349,6 +12349,7 @@ export const zh_TW: EnTranslations = {
       "bastion_shackle_pair": "雙人鐐銬",
       "bastion_shadowstep": "穿影",
       "bastion_reaping_scythe": "收割之鐮",
+      "bastion_veil_rise": "霧幕",
       "temple_lullaby": "搖籃曲",
       "temple_call_the_tide": "潮汐召喚",
       "temple_static_coil": "靜電盤繞",

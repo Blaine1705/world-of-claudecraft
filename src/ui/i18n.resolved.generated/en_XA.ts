@@ -12349,6 +12349,7 @@ export const en_XA: EnTranslations = {
       "bastion_shackle_pair": "[Šĥáçķļé Þáíŕ]",
       "bastion_shadowstep": "[Šĥáðóŵ Çŕóššíñĝ]",
       "bastion_reaping_scythe": "[Ŕéáþíñĝ Šçýţĥé]",
+      "bastion_veil_rise": "[Ƒóĝ Ʋéíļ]",
       "temple_lullaby": "[Ļúļļáƀý]",
       "temple_call_the_tide": "[Çáļļ ţĥé Ţíðé]",
       "temple_static_coil": "[Šţáţíç Çóíļ]",

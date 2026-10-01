@@ -12,7 +12,9 @@ import {
   hookHeat,
   hymnFlood,
   oathLaneLength,
+  pickVeilClaim,
   predictBeamYaw,
+  revealGlow,
   standingButtressIds,
 } from '../src/render/sunken_bastion/bastion_boss_fx_core';
 import {
@@ -113,5 +115,40 @@ describe('Sunken Bastion boss fx core', () => {
     expect(beamReveal(FOG_SHADE_ID, yaw, lit.x, lit.z)).toBe('shade');
     expect(beamReveal(VAEL_ID, yaw, dark.x, dark.z)).toBeNull();
     expect(beamReveal('drowned_watchman', yaw, lit.x, lit.z)).toBeNull();
+  });
+});
+
+describe('the Fog Veil tell', () => {
+  it('latches the reveal full the moment the beam catches a figure, then fades slowly', () => {
+    expect(revealGlow(0, true, 1 / 60)).toBe(1);
+    let k = 1;
+    for (let t = 0; t < 1; t += 1 / 60) k = revealGlow(k, false, 1 / 60);
+    // A second after the beam passed, the tell still burns at about half.
+    expect(k).toBeGreaterThan(0.4);
+    for (let t = 0; t < 2; t += 1 / 60) k = revealGlow(k, false, 1 / 60);
+    expect(k).toBe(0);
+  });
+
+  it('follows the veiled Vael and his own claim’s lamp when several claims exist', () => {
+    const vaels = [
+      { id: 10, slot: 0, veiled: false, dist: 5 },
+      { id: 20, slot: 1, veiled: true, dist: 400 },
+    ];
+    const lamps = [
+      { id: 11, slot: 0 },
+      { id: 21, slot: 1 },
+    ];
+    expect(pickVeilClaim(vaels, lamps)).toEqual({ vaelId: 20, lampId: 21 });
+    // No veil up: the nearest Vael, and his lamp, whatever the roster order.
+    expect(
+      pickVeilClaim(
+        [
+          { id: 20, slot: 1, dist: 400 },
+          { id: 10, slot: 0, dist: 5 },
+        ],
+        lamps,
+      ),
+    ).toEqual({ vaelId: 10, lampId: 11 });
+    expect(pickVeilClaim([], lamps).vaelId).toBe(-1);
   });
 });

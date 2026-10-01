@@ -12349,6 +12349,7 @@ export const ko_KR: EnTranslations = {
       "bastion_shackle_pair": "쌍둥이 족쇄",
       "bastion_shadowstep": "그림자 건너기",
       "bastion_reaping_scythe": "수확의 낫",
+      "bastion_veil_rise": "안개 장막",
       "temple_lullaby": "자장가",
       "temple_call_the_tide": "조수의 부름",
       "temple_static_coil": "정전기 똬리",

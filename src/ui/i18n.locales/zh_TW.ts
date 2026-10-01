@@ -18835,6 +18835,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_shackle_pair': '雙人鐐銬',
   'abilityUi.cast.bastion_shadowstep': '穿影',
   'abilityUi.cast.bastion_reaping_scythe': '收割之鐮',
+  'abilityUi.cast.bastion_veil_rise': '霧幕',
   'entities.mobs.bastion_gaol_cage.name': '鐵籠',
   'entities.mobs.bastion_drowned_anchor.name': '溺亡之錨',
   'entities.items.jailers_iron_gauntlets.name': '獄卒的鐵護手',

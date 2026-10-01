@@ -20156,6 +20156,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_shackle_pair': 'Парные кандалы',
   'abilityUi.cast.bastion_shadowstep': 'Переход сквозь тень',
   'abilityUi.cast.bastion_reaping_scythe': 'Жнущая коса',
+  'abilityUi.cast.bastion_veil_rise': 'Туманная завеса',
   'entities.mobs.bastion_gaol_cage.name': 'Железная клетка',
   'entities.mobs.bastion_drowned_anchor.name': 'Утопленный якорь',
   'entities.items.jailers_iron_gauntlets.name': 'Железные рукавицы тюремщика',
