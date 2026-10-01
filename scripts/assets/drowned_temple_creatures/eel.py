@@ -121,30 +121,49 @@ def clips(arm):
     stand = {'S1': [('x', -2)], 'Head': [('x', 4)]}
     chain = ['S1', 'S2', 'S3', 'S4', 'S5']
 
+    # Each column bend pivot's height below the Head pivot (yards): a side
+    # bend of `t` degrees at height `h` swings the head sideways by about t*h.
+    pivot_h = [4.9, 3.8, 2.7, 1.7, 0.8]
+
+    def level(bends):
+        """Project the bends so they sum to zero (no net roll at the head) AND
+        their moments sum to zero (no sideways drift of the head): the column
+        still ripples, the head rides dead level and dead centre. (Least-squares
+        projection onto the null space of A = [[1]*5, pivot_h].)"""
+        n = len(bends)
+        a = [[1.0] * n, pivot_h]
+        g = [[sum(a[i][k] * a[j][k] for k in range(n)) for j in range(2)] for i in range(2)]
+        det = g[0][0] * g[1][1] - g[0][1] * g[1][0]
+        inv = [[g[1][1] / det, -g[0][1] / det], [-g[1][0] / det, g[0][0] / det]]
+        ab = [sum(a[i][k] * bends[k] for k in range(n)) for i in range(2)]
+        lam = [inv[i][0] * ab[0] + inv[i][1] * ab[1] for i in range(2)]
+        return [bends[k] - (a[0][k] * lam[0] + a[1][k] * lam[1]) for k in range(n)]
+
     def sway(ph, amp=1.0):
         """A serpentine S-wave travelling UP the column: each vertebra bends to
         the side a beat after the one below it (the wave's crest climbs from
-        the coil to the neck), while the head counter-turns by the sum of the
-        bends below it, so it stays level and looking ahead: the body ripples,
-        the head never shakes. A slower fore-and-aft breath rides under it."""
+        the coil to the neck). The bends are levelled (no net roll, no net
+        sideways swing at the head) and the coil never yaws, so the body
+        ripples while the head holds still, looking ahead: it never shakes.
+        A slower fore-and-aft breath rides under it."""
         side = [5.0, 7.0, 8.0, 7.0, 5.0]
-        bends = [side[k] * amp * math.sin(ph - k * 1.05) for k in range(5)]
+        bends = level([side[k] * amp * math.sin(ph - k * 1.05) for k in range(5)])
         pose = {}
         for k, bone in enumerate(chain):
             pose[bone] = [('y', bends[k]), ('x', 1.6 * amp * math.sin(ph * 0.5 - k * 0.6))]
-        # Level head: cancel the column's net roll and most of its nod.
-        pose['Head'] = [('y', -sum(bends)), ('x', -0.8 * amp * math.sin(ph * 0.5 - 2.4))]
+        # Level head: cancel most of the column's nod; it never rolls or yaws.
+        pose['Head'] = [('x', -0.8 * amp * math.sin(ph * 0.5 - 2.4))]
         pose['Jaw'] = [('x', 5 + 3 * math.sin(ph))]
         pose['Fin.L'] = [('z', 8 * math.sin(ph - 2.0))]
-        pose['Coil'] = [('z', 4 * amp * math.sin(ph + 0.9))]
         return merge(stand, pose)
 
 
     def slither(ph, amp=1.0):
         # Gliding on its coil: the S-wave runs faster and wider up the column
-        # and the coil itself undulates, the head still held level.
+        # and the coil slides side to side under it (a slide, never a yaw, so
+        # the head rides level and pointed ahead).
         return merge(sway(ph, 1.5 * amp), {
-            'Coil': [('z', 7 * math.sin(ph) * amp), ('loc', (0.1 * math.sin(ph) * amp, 0, 0))],
+            'Coil': [('loc', (0.1 * math.sin(ph) * amp, 0, 0))],
             'Root': [('loc', (0, 0, 0.04 * abs(math.sin(ph))))],
         })
 
@@ -157,10 +176,16 @@ def clips(arm):
                            'Head': [('x', 12)], 'Jaw': [('x', 38)]})
     author_clip(arm, 'Attack', [(1, stand), (9, rear), (13, strike), (17, merge(strike, {'Jaw': [('x', -30)]})),
                                 (28, stand)], loop=False)
-    wind = merge(stand, {'S3': [('y', 28)], 'S4': [('y', 18)], 'Head': [('y', 20)], 'Jaw': [('x', 20)]})
-    lash = merge(stand, {'S3': [('y', -32)], 'S4': [('y', -22)], 'Head': [('y', -25)], 'Jaw': [('x', 30)]})
-    author_clip(arm, 'Attack2', [(1, stand), (8, wind), (13, lash), (26, stand)], loop=False)
-    hit = merge(stand, {'S3': [('x', -12)], 'S4': [('x', -10)], 'Head': [('x', -22), ('y', 10)], 'Jaw': [('x', 30)]})
+    # The second swing: a low double snap straight ahead (fore and aft only:
+    # a sideways lash rolled the head half over and read as a head shake).
+    coil_back = merge(stand, {'S2': [('x', -6)], 'S3': [('x', -10)], 'S4': [('x', -12)], 'Head': [('x', -10)],
+                              'Jaw': [('x', 30)]})
+    snap = merge(stand, {'S1': [('x', 6)], 'S2': [('x', 12)], 'S3': [('x', 16)], 'S4': [('x', 18)],
+                         'Head': [('x', 6)], 'Jaw': [('x', -20)]})
+    half_back = merge(stand, {'S3': [('x', -4)], 'S4': [('x', -6)], 'Head': [('x', -4)], 'Jaw': [('x', 24)]})
+    author_clip(arm, 'Attack2', [(1, stand), (7, coil_back), (11, snap), (15, half_back), (19, snap),
+                                 (28, stand)], loop=False)
+    hit = merge(stand, {'S3': [('x', -12)], 'S4': [('x', -10)], 'Head': [('x', -22)], 'Jaw': [('x', 30)]})
     author_clip(arm, 'Hit', [(1, stand), (4, hit), (14, stand)], loop=False)
     fall = merge(stand, {'S1': [('x', 55)], 'S2': [('x', 22)], 'S3': [('x', 14)], 'S4': [('x', 8), ('y', 15)],
                          'S5': [('y', 20)], 'Head': [('y', 25)], 'Jaw': [('x', 40)]})
@@ -173,8 +198,8 @@ def clips(arm):
     clench = merge(stand, {'Coil': [('scale', 0.93)], 'S1': [('x', -6)], 'S2': [('x', 8)], 'S3': [('x', -8)],
                            'S4': [('x', 6)], 'S5': [('x', -10)], 'Head': [('x', -28)], 'Jaw': [('x', 48)],
                            'Fin.L': [('z', 35)]})
-    shake_a = merge(clench, {'S3': [('y', 3)], 'S5': [('y', -3)], 'Head': [('y', 4)]})
-    shake_b = merge(clench, {'S3': [('y', -3)], 'S5': [('y', 3)], 'Head': [('y', -4)]})
+    shake_a = merge(clench, {'S3': [('y', 3)], 'S5': [('y', -3)]})
+    shake_b = merge(clench, {'S3': [('y', -3)], 'S5': [('y', 3)]})
     author_clip(arm, 'Cast', loop(8, [shake_a, shake_b]))
     author_clip(arm, 'Coil', [(1, stand), (8, clench), (11, shake_a), (14, shake_b), (17, shake_a), (20, shake_b),
                               (23, shake_a), (26, shake_b), (29, shake_a), (32, shake_b), (36, clench),
