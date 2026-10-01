@@ -322,6 +322,60 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     damageMultiplierByMob: {},
   },
 
+  // The Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md),
+  // a NEW level 19 to 20 dungeon on the SANCTUM NORMAL calibration (the
+  // Wildheart record's ruler): the reference warrior (level-20 prot, 2861
+  // armor, Defensive Stance) takes at least 100 from every spawn-list trash
+  // swing, 50 from the non-elite Arc Drones (fodder in fours, the Sanctum's
+  // bonewalker band), 150 from the Gantry Hauler (the showpiece, Wildheart's
+  // miniboss band) and 200 from each boss. Health: the shared 1.4 puts elite
+  // trash at 1,300 to 1,900 (about 9 to 13 s each at 150 party DPS); the
+  // bosses' pools come from target fight length x planning party DPS at levels
+  // 19 to 20 (about 150): the Hauler 60 s (about 9,000), Tock, the Rangewarden
+  // and the Voltaic Warden 100 s (about 15,000), the Prime Draft 170 s (about
+  // 26,000). Every mechanic keeps its authored LANDED number (1x), decoupled
+  // from the melee factor. Pinned by tests/stormbrass_foundry_tuning.test.ts.
+  stormbrass_foundry: {
+    id: 'stormbrass_foundry',
+    difficulty: 'normal',
+    healthMultiplier: 1.4,
+    healthMultiplierByMob: {
+      gantry_hauler: 5.44,
+      line_master_tock: 8.82,
+      rangewarden: 8.47,
+      voltaic_warden: 8.47,
+      prime_draft: 11.98,
+    },
+    damageMultiplierByMob: {
+      brass_sentry: 3.8,
+      steam_bruiser: 3.4,
+      arc_drone: 4,
+      foundry_engineer: 3.8,
+      gearwright_apprentice: 4.05,
+      clockwork_hound: 3.95,
+      shieldbearer_frame: 3.5,
+      gantry_hauler: 4.8,
+      line_master_tock: 6.9,
+      rangewarden: 6.4,
+      voltaic_warden: 6.4,
+      prime_draft: 6.4,
+    },
+    mechanicDamageMultiplierByMob: {
+      brass_sentry: 1,
+      steam_bruiser: 1,
+      arc_drone: 1,
+      foundry_engineer: 1,
+      gearwright_apprentice: 1,
+      clockwork_hound: 1,
+      shieldbearer_frame: 1,
+      gantry_hauler: 1,
+      line_master_tock: 1,
+      rangewarden: 1,
+      voltaic_warden: 1,
+      prime_draft: 1,
+    },
+  },
+
   wildheart_basin: {
     id: 'wildheart_basin',
     difficulty: 'normal',
@@ -522,6 +576,56 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     },
     armorMultiplier: 1.25,
     finalBossId: 'ysolei',
+    marksPerParticipant: 1,
+  },
+  // The Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md):
+  // level 22, the shared 500 heroic mob floor. The bosses' pools come from
+  // target fight length x heroic party DPS (about 230): the Hauler 60 s, Tock,
+  // the Rangewarden and the Voltaic Warden 100 s, the Prime Draft 170 s.
+  stormbrass_foundry: {
+    id: 'stormbrass_foundry',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 4.0,
+    damageMultiplier: 15.5,
+    // No boss summons adds through summonAdds (the Hauler's Unload and the
+    // turrets ride the trash kit); kept at the half convention.
+    addDamageMultiplier: 9,
+    healthMultiplierByMob: {
+      gantry_hauler: 7.69,
+      line_master_tock: 12.05,
+      rangewarden: 12.05,
+      voltaic_warden: 12.05,
+      prime_draft: 16.69,
+    },
+    // The lighter-swinging engineers, apprentices and hounds and the
+    // NON-elite Arc Drones are lifted onto the 500 floor on their own.
+    damageMultiplierByMob: {
+      foundry_engineer: 16.6,
+      gearwright_apprentice: 16.6,
+      clockwork_hound: 16,
+      arc_drone: 30.5,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
+    // heroic), the Hauler's avoidables about 45 percent, a boss core (phase 2)
+    // is priced with its module.
+    mechanicDamageMultiplierByMob: {
+      brass_sentry: 3,
+      steam_bruiser: 3,
+      arc_drone: 3,
+      foundry_engineer: 3,
+      gearwright_apprentice: 3,
+      clockwork_hound: 3,
+      shieldbearer_frame: 3,
+      gantry_hauler: 2.5,
+      line_master_tock: 2.5,
+      rangewarden: 2.5,
+      voltaic_warden: 2.5,
+      prime_draft: 2.5,
+    },
+    armorMultiplier: 1.25,
+    finalBossId: 'prime_draft',
     marksPerParticipant: 1,
   },
   gravewyrm_sanctum: {

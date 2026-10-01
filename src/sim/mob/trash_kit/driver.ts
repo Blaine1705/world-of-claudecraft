@@ -33,6 +33,7 @@ import {
 } from '../../types';
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
+import { landScreen, screenReady, stepDeathBurst } from './foundry_kit';
 import { spawnKitAdd } from './spawn';
 import {
   holdLineAim,
@@ -52,6 +53,7 @@ const CAST_KEYS = [
   'call',
   'mend',
   'ward',
+  'screen',
   'screech',
   'lullaby',
   'wingGust',
@@ -243,6 +245,8 @@ function castReady(
         : no;
     case 'lullaby':
       return lullabyReady(mob, kit, st, players);
+    case 'screen':
+      return screenReady(ctx, inst, mob, kit) ? { ok: true, target: null } : no;
     case 'screech':
       return kit.screech && livingInReach(players, mob.pos, kit.screech.radius).length > 0
         ? { ok: true, target: null }
@@ -284,6 +288,9 @@ function landCast(
   switch (key) {
     case 'lullaby':
       landLullaby(ctx, mob, kit, targetId);
+      return;
+    case 'screen':
+      landScreen(ctx, inst, mob, kit);
       return;
     case 'bolt': {
       const def = kit.bolt;
@@ -625,6 +632,7 @@ function stepMob(
 ): void {
   if (mob.dead || mob.hp <= 0) {
     if (mob.trashKit) endTrashKit(mob);
+    if (kit?.deathBurst) stepDeathBurst(ctx, inst, mob, kit, players());
     return;
   }
   const engaged =

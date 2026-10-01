@@ -8217,6 +8217,7 @@ export const en_CA: EnTranslations = {
       "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
       "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
       "wildheartBody": "A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "The endgame raid",
       "raidBody": "Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.",
       "heroicTitle": "Heroic mode",
@@ -12325,7 +12326,12 @@ export const en_CA: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const en_CA: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Sanctum Boneguard"
       },
@@ -24063,6 +24108,11 @@ export const en_CA: EnTranslations = {
         "name": "The Wildheart Basin",
         "enterText": "Warm rain hisses on old stone. The Wildheart Basin opens before you.",
         "leaveText": "You pass back beneath the stone fangs into the Palmreach sun."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "The Last Keep",

@@ -5785,6 +5785,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.tideglass_reflection_mage.name': '潮硝子の映し身',
   'entities.mobs.tideglass_reflection_warlock.name': '潮硝子の映し身',
   'entities.mobs.tideglass_reflection_druid.name': '潮硝子の映し身',
+  'entities.mobs.brass_sentry.name': '真鍮の歩哨',
+  'entities.mobs.steam_bruiser.name': 'スチームブルーザー',
+  'entities.mobs.arc_drone.name': 'アークドローン',
+  'entities.mobs.foundry_engineer.name': '鋳造所の技師',
+  'entities.mobs.gearwright_apprentice.name': 'ギアライトの見習い',
+  'entities.mobs.clockwork_hound.name': 'コイルスプリングの猟犬',
+  'entities.mobs.shieldbearer_frame.name': '盾持ちフレーム',
+  'entities.mobs.tripod_turret.name': '三脚砲台',
+  'entities.mobs.gantry_hauler.name': 'ガントリー運搬車',
+  'entities.mobs.line_master_tock.name': 'ライン長アンブレル・トック',
+  'entities.mobs.rangewarden.name': '射撃場の番人',
+  'entities.mobs.voltaic_warden.name': 'ヴォルタイックの守護者',
+  'entities.mobs.prime_draft.name': 'プライム・ドラフト',
   'entities.mobs.sanctum_boneguard.name': '聖所の骨衛兵',
   'entities.mobs.sanctum_drakonid.name': 'サンクタム・スケイルガード',
   'entities.mobs.raised_bonewalker.name': '甦った骨歩き',
@@ -8736,6 +8749,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
   'guide.dungeonsPage.wildheartBody':
     '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。',
+  'guide.dungeonsPage.foundryBody':
+    'ストームクラッグの嵐の稜線に建つ真鍮の鋳造所。史上最初に造られたオートマトンが、稲妻の空の下で今もコンベヤーと試験射撃場を動かしている。ラインを止め、両翼を黙らせ、未完成の巨人が待つガントリーへ登れ。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
   'guide.dungeonsPage.raidBody':
     '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',
@@ -14087,6 +14102,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.enterText':
     '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
+  'entities.dungeons.stormbrass_foundry.name': 'ストームブラス鋳造所',
+  'entities.dungeons.stormbrass_foundry.enterText':
+    'ケーブルリフトが鋳造所の岩棚でがくんと止まった。真鍮の屋根が蒸気を噴き、頭上の嵐のコイルに稲妻が走る。',
+  'entities.dungeons.stormbrass_foundry.leaveText':
+    'ケーブルリフトが嵐の稜線を下り、ストームクラッグへあなたを運んだ。',
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
@@ -19731,6 +19751,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_resonant_slam': '共鳴の叩きつけ',
   'abilityUi.cast.temple_undertow': '引き潮',
   'abilityUi.cast.temple_lunar_tide': '月の潮',
+  'abilityUi.cast.foundry_piston_slam': 'ピストンスラム',
+  'abilityUi.cast.foundry_field_repair': '現場修理',
+  'abilityUi.cast.foundry_deploy_turret': '砲台設置',
+  'abilityUi.cast.foundry_steam_screen': '蒸気の障壁',
+  'abilityUi.cast.foundry_hauler_steam_blast': '蒸気噴射',
   'abilityUi.cast.temple_skewering_trident': '串刺しの三叉槍',
   'abilityUi.cast.temple_pale_mending': '蒼白の癒し',
   'abilityUi.cast.temple_glimmer_venom': '煌めく毒',

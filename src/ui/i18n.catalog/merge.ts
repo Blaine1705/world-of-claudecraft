@@ -642,6 +642,14 @@ const mergeStringsEn = {
       temple_hydra_tsunami: 'Tsunami',
       temple_ysolei_call: 'Moonspawn Call',
       temple_ysolei_wrath: 'Drowned Wrath',
+      // The Stormbrass Foundry trash kit and the Gantry Hauler's bar
+      // (trash_kit/foundry_cast_ids.ts, encounters/stormbrass_foundry/ids.ts).
+      // The Field Repair and the Steam Screen can be kicked.
+      foundry_piston_slam: 'Piston Slam',
+      foundry_field_repair: 'Field Repair',
+      foundry_deploy_turret: 'Deploy Turret',
+      foundry_steam_screen: 'Steam Screen',
+      foundry_hauler_steam_blast: 'Steam Blast',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

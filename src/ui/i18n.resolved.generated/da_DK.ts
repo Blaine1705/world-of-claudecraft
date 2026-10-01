@@ -8217,6 +8217,7 @@ export const da_DK: EnTranslations = {
       "templeBody": "En måneoplyst helligdom sunket under en glødende tjern højt oppe i bjergene, nået gennem en port af koldt lys. En druknet kult synger stadig dernede i sine rådne klædninger, og advarslerne ristet på bredden siger, at noget dybt nede kun sover. Et selvstændigt mysterium, sat til side fra hovedhistorien, for de nysgerrige og de velforberedte.",
       "sanctumBody": "Tornetops mørke hjerte, hvor kultens lange arbejde når sit frygtelige højdepunkt.",
       "wildheartBody": "En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at se, hvem der venter på toppen.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "Slutspilsraidet",
       "raidBody": "Bag en forseglet kongelig dør venter en prøvelse for ti spillere: en kamp i flere faser og en dødløs magt, som hele raidet må lukke ned sammen. Tjen din adgang, og medbring så ni venner.",
       "heroicTitle": "Heroisk tilstand",
@@ -12325,7 +12326,12 @@ export const da_DK: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const da_DK: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Helligdoms-Benvogter"
       },
@@ -24063,6 +24108,11 @@ export const da_DK: EnTranslations = {
         "name": "Vildhjertebassinet",
         "enterText": "Varm regn hvisler mod gammel sten. Vildhjertebassinet åbner sig foran dig.",
         "leaveText": "Du passerer tilbage under stentænderne ud i Palmebugtens sol."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "Den Sidste Borg",

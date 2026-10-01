@@ -8217,6 +8217,7 @@ export const nl_NL: EnTranslations = {
       "templeBody": "Een door de maan verlicht heiligdom verzonken onder een gloeiend bergmeer hoog in de pieken, te bereiken door een poort van koud licht. Een verdronken sekte zingt daar nog steeds in haar verrotte gewaden, en de waarschuwingen in de oever gekerfd zeggen dat iets beneden slechts slaapt. Een op zichzelf staand mysterie, afgezonderd van het hoofdverhaal, voor de nieuwsgierigen en de goed voorbereiden.",
       "sanctumBody": "Het duistere hart van Doorntop, waar het lange werk van de sekte zijn vreselijke hoogtepunt bereikt.",
       "wildheartBody": "Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om te zien wie er op de top wacht.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "De eindspel-raid",
       "raidBody": "Achter een verzegelde koninklijke deur wacht een beproeving voor tien spelers: een gevecht in meerdere fasen en een dodeloze macht die de hele raid samen moet uitschakelen. Verdien je toegang en breng dan negen vrienden mee.",
       "heroicTitle": "Heroïsche modus",
@@ -12325,7 +12326,12 @@ export const nl_NL: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const nl_NL: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Heiligdom-Botwacht"
       },
@@ -24063,6 +24108,11 @@ export const nl_NL: EnTranslations = {
         "name": "Het Wildhartbekken",
         "enterText": "Warme regen sist op oude steen. Het Wildhartbekken opent zich voor je.",
         "leaveText": "Je passeert terug onder de stenen slagtanden door, de zon van de Palmreik in."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "De Laatste Burcht",

@@ -8217,6 +8217,7 @@ export const zh_TW: EnTranslations = {
       "templeBody": "沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。",
       "wildheartBody": "一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔頂端看看是誰在等待。",
+      "foundryBody": "風暴岩風暴線上的一座黃銅鑄造廠，世上最早造出的自動機械仍在閃電天空下運轉著輸送帶與試驗靶場。打斷產線，平息兩翼，攀上龍門架，一個未完成的巨人正在那裡等待。",
       "raidName": "最終團隊副本",
       "raidBody": "在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。",
       "heroicTitle": "英雄模式",
@@ -12325,7 +12326,12 @@ export const zh_TW: EnTranslations = {
       "temple_crushing_torrent": "碾壓激流",
       "temple_hydra_tsunami": "海嘯",
       "temple_ysolei_call": "月裔召喚",
-      "temple_ysolei_wrath": "溺亡之怒"
+      "temple_ysolei_wrath": "溺亡之怒",
+      "foundry_piston_slam": "活塞重擊",
+      "foundry_field_repair": "現場維修",
+      "foundry_deploy_turret": "部署砲台",
+      "foundry_steam_screen": "蒸汽屏障",
+      "foundry_hauler_steam_blast": "蒸汽衝擊"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const zh_TW: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "潮鏡倒影"
       },
+      "brass_sentry": {
+        "name": "黃銅哨兵"
+      },
+      "steam_bruiser": {
+        "name": "蒸汽蠻兵"
+      },
+      "arc_drone": {
+        "name": "電弧無人機"
+      },
+      "foundry_engineer": {
+        "name": "鑄造廠工程師"
+      },
+      "gearwright_apprentice": {
+        "name": "齒輪匠學徒"
+      },
+      "clockwork_hound": {
+        "name": "捲簧獵犬"
+      },
+      "shieldbearer_frame": {
+        "name": "持盾機架"
+      },
+      "tripod_turret": {
+        "name": "三腳砲台"
+      },
+      "gantry_hauler": {
+        "name": "龍門運輸車"
+      },
+      "line_master_tock": {
+        "name": "產線主管安布雷爾·托克"
+      },
+      "rangewarden": {
+        "name": "靶場守衛"
+      },
+      "voltaic_warden": {
+        "name": "伏打守護者"
+      },
+      "prime_draft": {
+        "name": "初代原型"
+      },
       "sanctum_boneguard": {
         "name": "聖所骨衛"
       },
@@ -24063,6 +24108,11 @@ export const zh_TW: EnTranslations = {
         "name": "荒野之心盆地",
         "enterText": "溫熱的雨水在古老石面上嘶嘶作響。荒野之心盆地在你眼前展開。",
         "leaveText": "你從石牙之下穿回棕櫚之境的陽光中。"
+      },
+      "stormbrass_foundry": {
+        "name": "風暴黃銅鑄造廠",
+        "enterText": "纜車在鑄造廠平台上猛然停住。黃銅屋頂嘶嘶冒著蒸汽，閃電劈在上方的風暴線圈上。",
+        "leaveText": "纜車載著你沿風暴線回到風暴岩。"
       },
       "the_last_keep": {
         "name": "最後的堡壘",

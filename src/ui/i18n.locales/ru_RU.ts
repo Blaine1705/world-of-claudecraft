@@ -5839,6 +5839,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.tideglass_reflection_mage.name': 'Отражение Приливного стекла',
   'entities.mobs.tideglass_reflection_warlock.name': 'Отражение Приливного стекла',
   'entities.mobs.tideglass_reflection_druid.name': 'Отражение Приливного стекла',
+  'entities.mobs.brass_sentry.name': 'Латунный часовой',
+  'entities.mobs.steam_bruiser.name': 'Паровой громила',
+  'entities.mobs.arc_drone.name': 'Дуговой дрон',
+  'entities.mobs.foundry_engineer.name': 'Инженер литейной',
+  'entities.mobs.gearwright_apprentice.name': 'Ученик шестеренщика',
+  'entities.mobs.clockwork_hound.name': 'Пружинная гончая',
+  'entities.mobs.shieldbearer_frame.name': 'Щитоносный каркас',
+  'entities.mobs.tripod_turret.name': 'Треногая турель',
+  'entities.mobs.gantry_hauler.name': 'Козловой тягач',
+  'entities.mobs.line_master_tock.name': 'Мастер линии Амбрел Ток',
+  'entities.mobs.rangewarden.name': 'Страж полигона',
+  'entities.mobs.voltaic_warden.name': 'Вольтовый страж',
+  'entities.mobs.prime_draft.name': 'Первый чертеж',
   'entities.mobs.sanctum_boneguard.name': 'Костяной страж святилища',
   'entities.mobs.sanctum_drakonid.name': 'Чешуйчатый страж святилища',
   'entities.mobs.raised_bonewalker.name': 'Поднятый костеход',
@@ -8888,6 +8901,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
   'guide.dungeonsPage.wildheartBody':
     'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду, чтобы увидеть, кто ждёт на вершине.',
+  'guide.dungeonsPage.foundryBody':
+    'Латунная литейная на штормовой линии Грозового Утеса, где первые в мире автоматоны все еще гоняют конвейеры и испытательные полигоны под небом из молний. Остановите линию, усмирите оба крыла и поднимитесь на козловой кран, где ждет недостроенный гигант.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',
@@ -14318,6 +14333,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Тёплый дождь шипит на древнем камне. Перед вами открывается Котловина Дикого Сердца.',
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
+  'entities.dungeons.stormbrass_foundry.name': 'Литейная Штормовой латуни',
+  'entities.dungeons.stormbrass_foundry.enterText':
+    'Канатный подъемник с рывком останавливается на уступе литейной. Латунные крыши шипят паром, а над головой молнии бьют в штормовую катушку.',
+  'entities.dungeons.stormbrass_foundry.leaveText':
+    'Канатный подъемник спускает вас по штормовой линии обратно к Грозовому Утесу.',
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText':
@@ -20096,6 +20116,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_resonant_slam': 'Резонирующий удар',
   'abilityUi.cast.temple_undertow': 'Отбойное течение',
   'abilityUi.cast.temple_lunar_tide': 'Лунный прилив',
+  'abilityUi.cast.foundry_piston_slam': 'Удар поршня',
+  'abilityUi.cast.foundry_field_repair': 'Полевой ремонт',
+  'abilityUi.cast.foundry_deploy_turret': 'Установка турели',
+  'abilityUi.cast.foundry_steam_screen': 'Паровой заслон',
+  'abilityUi.cast.foundry_hauler_steam_blast': 'Паровой выброс',
   'abilityUi.cast.temple_skewering_trident': 'Пронзающий трезубец',
   'abilityUi.cast.temple_pale_mending': 'Бледное исцеление',
   'abilityUi.cast.temple_glimmer_venom': 'Мерцающий яд',

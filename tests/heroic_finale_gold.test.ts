@@ -40,6 +40,7 @@ const NORMAL_FINALE_COPPER: Record<string, number> = {
   drowned_temple: 6000,
   gravewyrm_sanctum: 15000,
   wildheart_basin: 15000,
+  stormbrass_foundry: 15000,
   nythraxis_boss_arena: 150000,
   ignivar_raid_arena: 150000,
   ignivar_inner_crucible: 200000,

@@ -8217,6 +8217,7 @@ export const ja_JP: EnTranslations = {
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
       "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。",
+      "foundryBody": "ストームクラッグの嵐の稜線に建つ真鍮の鋳造所。史上最初に造られたオートマトンが、稲妻の空の下で今もコンベヤーと試験射撃場を動かしている。ラインを止め、両翼を黙らせ、未完成の巨人が待つガントリーへ登れ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -12325,7 +12326,12 @@ export const ja_JP: EnTranslations = {
       "temple_crushing_torrent": "押し潰す奔流",
       "temple_hydra_tsunami": "津波",
       "temple_ysolei_call": "月の落とし子の呼び声",
-      "temple_ysolei_wrath": "溺れし憤怒"
+      "temple_ysolei_wrath": "溺れし憤怒",
+      "foundry_piston_slam": "ピストンスラム",
+      "foundry_field_repair": "現場修理",
+      "foundry_deploy_turret": "砲台設置",
+      "foundry_steam_screen": "蒸気の障壁",
+      "foundry_hauler_steam_blast": "蒸気噴射"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const ja_JP: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "潮硝子の映し身"
       },
+      "brass_sentry": {
+        "name": "真鍮の歩哨"
+      },
+      "steam_bruiser": {
+        "name": "スチームブルーザー"
+      },
+      "arc_drone": {
+        "name": "アークドローン"
+      },
+      "foundry_engineer": {
+        "name": "鋳造所の技師"
+      },
+      "gearwright_apprentice": {
+        "name": "ギアライトの見習い"
+      },
+      "clockwork_hound": {
+        "name": "コイルスプリングの猟犬"
+      },
+      "shieldbearer_frame": {
+        "name": "盾持ちフレーム"
+      },
+      "tripod_turret": {
+        "name": "三脚砲台"
+      },
+      "gantry_hauler": {
+        "name": "ガントリー運搬車"
+      },
+      "line_master_tock": {
+        "name": "ライン長アンブレル・トック"
+      },
+      "rangewarden": {
+        "name": "射撃場の番人"
+      },
+      "voltaic_warden": {
+        "name": "ヴォルタイックの守護者"
+      },
+      "prime_draft": {
+        "name": "プライム・ドラフト"
+      },
       "sanctum_boneguard": {
         "name": "聖所の骨衛兵"
       },
@@ -24063,6 +24108,11 @@ export const ja_JP: EnTranslations = {
         "name": "ワイルドハート盆地",
         "enterText": "温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。",
         "leaveText": "石の牙の下をくぐり、パームリーチの陽光へ戻った。"
+      },
+      "stormbrass_foundry": {
+        "name": "ストームブラス鋳造所",
+        "enterText": "ケーブルリフトが鋳造所の岩棚でがくんと止まった。真鍮の屋根が蒸気を噴き、頭上の嵐のコイルに稲妻が走る。",
+        "leaveText": "ケーブルリフトが嵐の稜線を下り、ストームクラッグへあなたを運んだ。"
       },
       "the_last_keep": {
         "name": "最後の砦",

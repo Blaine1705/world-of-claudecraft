@@ -4178,7 +4178,13 @@ export interface TrashKitDef {
   /** An interruptible heal on the most injured living ally in reach, for a
    *  share of that ally's maximum health (the Tidebound Acolyte's Brine Mend).
    *  Only starts while an ally is under `below` of its health. */
-  mend?: TrashKitCast & { range: number; healPct: number; below: number };
+  mend?: TrashKitCast & {
+    range: number;
+    healPct: number;
+    below: number;
+    /** Only allies of this family (the Foundry Engineer repairs automata). */
+    family?: MobFamily;
+  };
   /** An interruptible absorb shield on the most injured unshielded ally in
    *  reach, worth a share of its maximum health (the Mistweaver's Fog Ward). */
   ward?: TrashKitCast & { range: number; shieldPct: number; duration: number };
@@ -4197,6 +4203,22 @@ export interface TrashKitDef {
   /** Once per pull under a share of its health: a self absorb shield worth a
    *  share of its maximum health (the Pearlguard Sentinel's Pearl Carapace). */
   carapace?: { belowHpPct: number; shieldPct: number; seconds: number; name: string };
+  /** An interruptible screen over every ally in the fight near the caster: an
+   *  absorb shield on each worth a share of its own maximum health (the
+   *  Shieldbearer Frame's Steam Screen). Starts while an ally near it is bare. */
+  screen?: TrashKitCast & { radius: number; shieldPct: number; duration: number };
+  /** It bursts where it fell, `delay` seconds after it dies (0: at once): a
+   *  splash round the corpse (the Steam Bruiser's Boiler Burst, the Arc Drone's
+   *  Arc Pop). A delayed burst paints its ring on the floor while it builds. */
+  deathBurst?: {
+    castId: string;
+    name: string;
+    delay: number;
+    radius: number;
+    min: number;
+    max: number;
+    school: TrashKitCast['school'];
+  };
   /** A seeker that bursts on reaching its victim: within `reach` it breaks in
    *  a splash round itself and is gone (the Tidewisp). Kill it on the way in. */
   detonate?: {
@@ -4484,6 +4506,29 @@ export type TempleFightState =
   | ColossusFightState
   | YsoleiFightState;
 
+/** The Gantry Hauler's pull (encounters/stormbrass_foundry/gantry_hauler.ts),
+ *  on the Hauler; cleared when the pull ends (a kill, an evade, a wipe). */
+export interface HaulerFightState {
+  kind: 'hauler';
+  blastTimer: number;
+  tossTimer: number;
+  /** The Steam Blast's locked aim while its bar runs. */
+  blastYaw: number | null;
+  /** Scrap Tosses in flight: the plate's floor mark and the seconds to impact. */
+  tosses: { x: number; z: number; remaining: number; objectId: number }[];
+  /** Unload already dumped its drones this pull. */
+  unloaded: boolean;
+  /** Mechanic casts started (the deterministic salt). */
+  casts: number;
+  /** Anyone struck by a Scrap Toss this pull (phase 2's deed reads it). */
+  struck: boolean;
+  /** Where it braced its tracks for the Steam Blast in flight (world
+   *  coordinates), so the cone lands where it was drawn. */
+  plantedAt: { x: number; y: number; z: number } | null;
+}
+
+export type FoundryFightState = HaulerFightState;
+
 /** Morthen's entrance and the Knellwyrm finale at the Hollow Crypt's Rite Ring
  *  (encounters/hollow_crypt), on Morthen for the claim's life: the entrance
  *  plays once per claim, the finale once after he falls. */
@@ -4551,7 +4596,13 @@ export type DungeonGateKind =
   // that assembles, and a stair that rises out of the lagoon as a pool drains.
   | 'water_veil'
   | 'light_bridge'
-  | 'sunken_stair';
+  | 'sunken_stair'
+  // The Stormbrass Foundry: a brass shutter that lifts in a burst of steam, a
+  // crackling lightning fence that powers down, and a gantry bridge that
+  // swings out and extends over the gulf.
+  | 'steam_shutter'
+  | 'arc_fence'
+  | 'crane_bridge';
 
 /**
  * An in-dungeon gate or encounter seal (instances/dungeon_gates.ts): one
@@ -4666,6 +4717,7 @@ export interface DungeonDef {
     | 'hollow_crypt'
     | 'sunken_bastion'
     | 'drowned_temple'
+    | 'stormbrass_foundry'
     | 'lastkeep'
     | 'dawnhold';
   /**
@@ -6436,6 +6488,15 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */
   templeFight?: TempleFightState;
+  /** Per-fight state of a Stormbrass Foundry encounter (encounters/
+   *  stormbrass_foundry: the Gantry Hauler, and the bosses in phase 2). Sim
+   *  authority only; the client reads the fight from casts, auras and the
+   *  encounter objects. */
+  foundryFight?: FoundryFightState;
+  /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
+   *  mob/trash_kit/foundry_kit.ts): seconds left, its floor ring, and whether it
+   *  has gone off. Sim authority only. */
+  deathBurst?: { remaining: number; objectId: number | null; done: boolean };
   /** Morthen's entrance and the Knellwyrm finale (encounters/hollow_crypt),
    *  on Morthen. Sim authority only; the client reads casts, auras, heights. */
   cryptRite?: CryptRiteState;

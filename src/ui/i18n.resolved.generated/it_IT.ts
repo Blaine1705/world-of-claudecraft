@@ -8217,6 +8217,7 @@ export const it_IT: EnTranslations = {
       "templeBody": "Un santuario sommerso lungo la strada della palude, una deviazione per i curiosi e i ben preparati.",
       "sanctumBody": "Il cuore oscuro di Thornpeak, dove la lunga opera del culto raggiunge il suo apice terribile.",
       "wildheartBody": "Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per scoprire chi ti aspetta in cima.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "L'incursione di fine gioco",
       "raidBody": "Oltre una porta reale sigillata attende una prova per dieci giocatori: uno scontro a più fasi e un potere immortale che l'intera incursione deve neutralizzare insieme. Guadagnati l'ingresso, poi porta nove amici.",
       "heroicTitle": "Modalità eroica",
@@ -12325,7 +12326,12 @@ export const it_IT: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const it_IT: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Guardiano osseo del Santuario"
       },
@@ -24063,6 +24108,11 @@ export const it_IT: EnTranslations = {
         "name": "Il Bacino di Wildheart",
         "enterText": "Una pioggia calda sibila sulla pietra antica. Il Bacino di Wildheart si apre davanti a te.",
         "leaveText": "Ripassi sotto le zanne di pietra verso il sole di Palmreach."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "L'Ultima Rocca",

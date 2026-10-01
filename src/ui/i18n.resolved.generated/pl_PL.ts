@@ -8217,6 +8217,7 @@ export const pl_PL: EnTranslations = {
       "templeBody": "Skąpane w blasku księżyca sanktuarium zatopione pod świetlistym górskim jeziorkiem wysoko w szczytach, do którego dociera się przez bramę zimnego światła. Utopiony kult wciąż śpiewa tam na dole w swych zbutwiałych szatach, a ostrzeżenia wyryte na brzegu mówią, że coś na dole tylko śpi. Samodzielna tajemnica, oddzielona od głównej historii, dla ciekawskich i dobrze przygotowanych.",
       "sanctumBody": "Mroczne serce Ciernistego Szczytu, gdzie długa praca kultu osiąga swój straszliwy szczyt.",
       "wildheartBody": "Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by zobaczyć, kto czeka na szczycie.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "Rajd na koniec gry",
       "raidBody": "Za zapieczętowanymi królewskimi drzwiami czeka próba dla dziesięciu graczy: wielofazowa walka i nieśmiertelna moc, którą cały rajd musi wspólnie powstrzymać. Wywalcz sobie wstęp, a potem przyprowadź dziewięcioro przyjaciół.",
       "heroicTitle": "Tryb heroiczny",
@@ -12325,7 +12326,12 @@ export const pl_PL: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const pl_PL: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Kościostrażnik Sanktuarium"
       },
@@ -24063,6 +24108,11 @@ export const pl_PL: EnTranslations = {
         "name": "Kotlina Dzikiego Serca",
         "enterText": "Ciepły deszcz syczy na starym kamieniu. Kotlina Dzikiego Serca otwiera się przed tobą.",
         "leaveText": "Przechodzisz z powrotem pod kamiennymi kłami w słońce Palmowego Wybrzeża."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "Ostatnia Twierdza",

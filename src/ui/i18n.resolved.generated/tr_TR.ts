@@ -8217,6 +8217,7 @@ export const tr_TR: EnTranslations = {
       "templeBody": "Zirvelerin yükseklerinde, ışıldayan bir göletin altına gömülmüş, soğuk ışıktan bir geçitle ulaşılan ay ışığıyla aydınlanmış bir tapınak. Boğulmuş bir tarikat çürümüş cüppeleriyle hâlâ orada aşağıda şarkı söylüyor ve kıyıya kazınmış uyarılar, aşağıdaki bir şeyin yalnızca uyuduğunu söylüyor. Meraklılar ve iyi hazırlananlar için, ana hikâyeden ayrı duran, kendi içinde bir gizem.",
       "sanctumBody": "Tarikatın uzun emeğinin korkunç doruğuna ulaştığı, Dikenzirve'nin karanlık kalbi.",
       "wildheartBody": "İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından zirvede kimin seni beklediğini görmek için ritüel piramidine tırman.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "Son oyun akını",
       "raidBody": "Mühürlü bir kraliyet kapısının ardında on oyunculu bir sınav bekler: çok aşamalı bir savaş ve tüm akının birlikte durdurması gereken, ölümsüz bir güç. İçeri girme hakkını kazanın, sonra dokuz arkadaşınızı getirin.",
       "heroicTitle": "Kahramanca mod",
@@ -12325,7 +12326,12 @@ export const tr_TR: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const tr_TR: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Mabet Kemik Muhafızı"
       },
@@ -24063,6 +24108,11 @@ export const tr_TR: EnTranslations = {
         "name": "Yaban Yürek Çukuru",
         "enterText": "Ilık yağmur eski taşların üzerinde tıslıyor. Yaban Yürek Çukuru önünde açılıyor.",
         "leaveText": "Taş dişlerin altından geçip Palmiye Kıyısının güneşine geri dönüyorsun."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "Son Kale",

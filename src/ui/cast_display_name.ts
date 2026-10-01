@@ -125,6 +125,12 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_hydra_tsunami': true,
   'abilityUi.cast.temple_ysolei_call': true,
   'abilityUi.cast.temple_ysolei_wrath': true,
+  // The Stormbrass Foundry trash kit and the Gantry Hauler.
+  'abilityUi.cast.foundry_piston_slam': true,
+  'abilityUi.cast.foundry_field_repair': true,
+  'abilityUi.cast.foundry_deploy_turret': true,
+  'abilityUi.cast.foundry_steam_screen': true,
+  'abilityUi.cast.foundry_hauler_steam_blast': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

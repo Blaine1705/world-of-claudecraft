@@ -8217,6 +8217,7 @@ export const id_ID: EnTranslations = {
       "templeBody": "Tempat pemujaan bermandi cahaya bulan yang tenggelam di bawah danau bercahaya tinggi di puncak gunung, dijangkau melalui sebuah gerbang cahaya dingin. Sebuah pemujaan yang tenggelam masih bernyanyi di bawah sana dalam jubah lapuk mereka, dan peringatan yang terukir di tepian mengatakan sesuatu di bawah hanya tertidur. Sebuah misteri yang berdiri sendiri, terpisah dari kisah utama, untuk mereka yang penasaran dan siap sedia.",
       "sanctumBody": "Jantung kelam Thornpeak, tempat pekerjaan panjang sang pemuja mencapai puncaknya yang mengerikan.",
       "wildheartBody": "Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk melihat siapa yang menunggu di puncaknya.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "Raid akhir permainan",
       "raidBody": "Di balik pintu kerajaan yang tersegel menanti cobaan untuk sepuluh pemain: pertarungan berfase banyak dan sebuah kekuatan abadi yang harus dipadamkan bersama oleh seluruh raid. Raih jalanmu untuk masuk, lalu bawa sembilan kawan.",
       "heroicTitle": "Mode heroik",
@@ -12325,7 +12326,12 @@ export const id_ID: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const id_ID: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Pengawal Tulang Sanktum"
       },
@@ -24063,6 +24108,11 @@ export const id_ID: EnTranslations = {
         "name": "Cekungan Hati Liar",
         "enterText": "Hujan hangat mendesis di atas batu tua. Wildheart Basin terbuka di hadapanmu.",
         "leaveText": "Kau melewati kembali di bawah taring-taring batu menuju matahari Palmreach."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "Benteng Terakhir",

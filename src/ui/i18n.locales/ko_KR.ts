@@ -5750,6 +5750,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.tideglass_reflection_mage.name': '조수유리 투영체',
   'entities.mobs.tideglass_reflection_warlock.name': '조수유리 투영체',
   'entities.mobs.tideglass_reflection_druid.name': '조수유리 투영체',
+  'entities.mobs.brass_sentry.name': '황동 파수병',
+  'entities.mobs.steam_bruiser.name': '증기 난동꾼',
+  'entities.mobs.arc_drone.name': '전격 드론',
+  'entities.mobs.foundry_engineer.name': '주조소 기술자',
+  'entities.mobs.gearwright_apprentice.name': '톱니장인 견습생',
+  'entities.mobs.clockwork_hound.name': '코일스프링 사냥개',
+  'entities.mobs.shieldbearer_frame.name': '방패잡이 골격',
+  'entities.mobs.tripod_turret.name': '삼각대 포탑',
+  'entities.mobs.gantry_hauler.name': '갠트리 운반차',
+  'entities.mobs.line_master_tock.name': '라인장 앰브렐 톡',
+  'entities.mobs.rangewarden.name': '사격장 감시자',
+  'entities.mobs.voltaic_warden.name': '볼타 수호자',
+  'entities.mobs.prime_draft.name': '원형 초안',
   'entities.mobs.sanctum_boneguard.name': '성소 뼈수호자',
   'entities.mobs.sanctum_drakonid.name': '성소 비늘수호병',
   'entities.mobs.raised_bonewalker.name': '되살아난 뼈걸음꾼',
@@ -8711,6 +8724,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.',
   'guide.dungeonsPage.wildheartBody':
     '따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드에 올라 정상에서 누가 기다리는지 확인하라.',
+  'guide.dungeonsPage.foundryBody':
+    '스톰크래그 폭풍 능선에 자리한 황동 주조소. 최초로 만들어진 자동기계들이 번개 치는 하늘 아래 여전히 컨베이어와 시험 사격장을 돌리고 있다. 생산 라인을 멈추고 양 날개를 잠재운 뒤, 미완성 거인이 기다리는 갠트리로 올라가라.',
   'guide.dungeonsPage.raidName': '최종 단계 공격대',
   'guide.dungeonsPage.raidBody':
     '봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.',
@@ -14050,6 +14065,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.',
   'entities.dungeons.wildheart_basin.leaveText':
     '돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다.',
+  'entities.dungeons.stormbrass_foundry.name': '폭풍황동 주조소',
+  'entities.dungeons.stormbrass_foundry.enterText':
+    '케이블 리프트가 주조소 절벽 위에서 덜컹 멈춰 선다. 황동 지붕에서 증기가 쉭쉭 뿜어지고, 머리 위 폭풍 코일에 번개가 내리친다.',
+  'entities.dungeons.stormbrass_foundry.leaveText':
+    '케이블 리프트가 폭풍 능선을 따라 스톰크래그로 당신을 데려간다.',
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
@@ -19715,6 +19735,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_resonant_slam': '공명의 강타',
   'abilityUi.cast.temple_undertow': '역류',
   'abilityUi.cast.temple_lunar_tide': '달의 조수',
+  'abilityUi.cast.foundry_piston_slam': '피스톤 강타',
+  'abilityUi.cast.foundry_field_repair': '현장 수리',
+  'abilityUi.cast.foundry_deploy_turret': '포탑 설치',
+  'abilityUi.cast.foundry_steam_screen': '증기 방벽',
+  'abilityUi.cast.foundry_hauler_steam_blast': '증기 분사',
   'abilityUi.cast.temple_skewering_trident': '꿰뚫는 삼지창',
   'abilityUi.cast.temple_pale_mending': '창백한 치유',
   'abilityUi.cast.temple_glimmer_venom': '반짝이는 독',

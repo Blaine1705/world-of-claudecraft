@@ -8,6 +8,7 @@ import { VARKHUL_CINDER_REPAIR_CAST_ID } from '../varkhul_cinder_artificer';
 import { IGNIVAR_CINDER_LANCE_CAST_ID } from './ignivar_trash_automata';
 import { BASTION_KIT_CAST_SCHOOLS } from './trash_kit/bastion_cast_ids';
 import { TRASH_KIT_CAST_SCHOOLS } from './trash_kit/cast_ids';
+import { FOUNDRY_KIT_CAST_SCHOOLS } from './trash_kit/foundry_cast_ids';
 import { TEMPLE_KIT_CAST_SCHOOLS } from './trash_kit/temple_cast_ids';
 
 // The scripted cast id updateHealerHold puts on a channelHeal mob (Malric, the
@@ -36,4 +37,6 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   ...BASTION_KIT_CAST_SCHOOLS,
   // The Drowned Temple's lullaby, tide call and coil (mob/trash_kit/temple_cast_ids.ts).
   ...TEMPLE_KIT_CAST_SCHOOLS,
+  // The Stormbrass Foundry's repair and screen (mob/trash_kit/foundry_cast_ids.ts).
+  ...FOUNDRY_KIT_CAST_SCHOOLS,
 };

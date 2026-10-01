@@ -50,6 +50,7 @@ describe('heroic tuning data contract', () => {
       'ignivar_molten_assembly',
       'ignivar_raid_arena',
       'nythraxis_boss_arena',
+      'stormbrass_foundry',
       'sunken_bastion',
       'wildheart_basin',
     ]);
@@ -61,6 +62,7 @@ describe('heroic tuning data contract', () => {
       drowned_temple: 'ysolei',
       gravewyrm_sanctum: 'korzul_the_gravewyrm',
       wildheart_basin: 'wildheart_high_priest',
+      stormbrass_foundry: 'prime_draft',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
       ignivar_raid_arena: 'ignivar_herald_of_the_last_flame',
       ignivar_inner_crucible: 'varkhul_forgefather_of_the_last_flame',
@@ -81,6 +83,7 @@ describe('heroic tuning data contract', () => {
       drowned_temple: 1,
       gravewyrm_sanctum: 1,
       wildheart_basin: 1,
+      stormbrass_foundry: 1,
       nythraxis_boss_arena: 3,
       ignivar_raid_arena: 3,
       ignivar_inner_crucible: 3,
@@ -115,6 +118,7 @@ describe('heroic tuning data contract', () => {
       drowned_temple: [5.2, 16.5, 9.15, 1.25],
       gravewyrm_sanctum: [4.0, 15.5, 8.55, 1.2],
       wildheart_basin: [4.0, 17.25, 8.625, 1.2],
+      stormbrass_foundry: [4.0, 15.5, 9, 1.25],
       // The raid multiplier is smaller in RELATIVE terms because normal
       // Nythraxis already lands the game's hardest hits; the heroic boss
       // floors at 1200 through the dungeon-wide value while the encounter

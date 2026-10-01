@@ -8217,6 +8217,7 @@ export const vi_VN: EnTranslations = {
       "templeBody": "Một ngôi đền dưới ánh trăng chìm bên dưới một hồ băng phát sáng cao trên các đỉnh núi, đến được qua một cánh cổng ánh sáng lạnh. Một giáo phái chết chìm vẫn ca hát dưới đó trong những tấm lễ phục mục nát, và những lời cảnh báo khắc trên bờ nói rằng thứ gì đó bên dưới chỉ đang ngủ. Một bí ẩn khép kín, tách biệt khỏi cốt truyện chính, dành cho những kẻ tò mò và chuẩn bị kỹ càng.",
       "sanctumBody": "Trái tim đen tối của Đỉnh Gai, nơi công cuộc lâu dài của giáo phái đạt đến đỉnh điểm khủng khiếp.",
       "wildheartBody": "Một miệng núi lửa rừng rậm đẫm mưa, nơi hai lối đi săn bắn trên cao vòng quanh một hố sụt ngọc bích. Băng qua những hang thú và tàn tích tổ tiên, rồi leo lên kim tự tháp nghi lễ để xem ai đang chờ trên đỉnh.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "Raid cuối game",
       "raidBody": "Phía sau một cánh cửa hoàng gia niêm phong chờ đợi một thử thách mười người chơi: một trận chiến nhiều giai đoạn và một thế lực bất tử mà cả raid phải cùng nhau ngăn chặn. Hãy giành quyền vào trong, rồi rủ chín người bạn cùng đến.",
       "heroicTitle": "Chế độ Anh Hùng",
@@ -12325,7 +12326,12 @@ export const vi_VN: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const vi_VN: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Vệ Xương Thánh Đường"
       },
@@ -24063,6 +24108,11 @@ export const vi_VN: EnTranslations = {
         "name": "Lòng Chảo Trái Tim Hoang Dã",
         "enterText": "Mưa ấm rít trên nền đá cổ. The Wildheart Basin mở ra trước mắt bạn.",
         "leaveText": "Bạn đi ngang qua những nanh đá một lần nữa, trở về dưới ánh nắng Palmreach."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "Pháo Đài Cuối Cùng",

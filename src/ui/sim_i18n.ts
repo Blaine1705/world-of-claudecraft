@@ -1287,6 +1287,33 @@ const baseEnTable = {
   'aura.templeSubmerged': 'Submerged',
   'aura.templeShellUp': 'Shell Up',
   'log.drownedTempleHydraRegrows': 'A severed head of the Mere Hydra grows back!',
+  // The Stormbrass Foundry's gates and seals (sim/content/stormbrass_foundry.ts
+  // openText), the Gantry Hauler's Unload line and the trash-kit and Hauler
+  // mechanic and aura names (mob/trash_kit/foundry_kit.ts,
+  // encounters/stormbrass_foundry). Placeholder-free: EXACT matcher.
+  'log.stormbrassFoundryYardShutterOpen':
+    'Steam bursts from the Yard Shutter as it grinds up into its housing.',
+  'log.stormbrassFoundryLineShutterOpen': 'The Line Shutter hisses open onto the Main Line.',
+  'log.stormbrassFoundryWingShuttersOpen':
+    'The line falls still. The Range and Coil Shutters lift in a cloud of steam.',
+  'log.stormbrassFoundryRangeFenceOpen': 'The Range Arc Fence crackles and powers down.',
+  'log.stormbrassFoundryCoilFenceOpen': 'The Coil Arc Fence crackles and powers down.',
+  'log.stormbrassFoundryCraneBridgeOpen':
+    'With both wings silent, the Crane Bridge swings out over the gulf.',
+  'log.stormbrassFoundryGantryFenceOpen':
+    'The Gantry Arc Fence gutters out. The Prime Draft stirs in its scaffold.',
+  'log.stormbrassFoundryHaulerUnload': 'The Gantry Hauler tips its bed: Arc Drones spill out!',
+  'mechanic.foundryPistonSlam': 'Piston Slam',
+  'mechanic.foundryBoilerBurst': 'Boiler Burst',
+  'mechanic.foundryArcPop': 'Arc Pop',
+  'mechanic.foundryFieldRepair': 'Field Repair',
+  'mechanic.foundryDeployTurret': 'Deploy Turret',
+  'mechanic.foundrySpringLeap': 'Spring Leap',
+  'mechanic.foundryBrassBolt': 'Brass Bolt',
+  'mechanic.foundrySteamBlast': 'Steam Blast',
+  'mechanic.foundryScrapToss': 'Scrap Toss',
+  'mechanic.foundryBoilerRupture': 'Boiler Rupture',
+  'aura.foundrySteamScreen': 'Steam Screen',
   // The Proving Shore (tutorial island): the compulsory greeting's ferry ride,
   // the two clicked ferry bells (sim/tutorial/greeting.ts +
   // interactions/ferry_bell.ts), and the
@@ -17650,6 +17677,18 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Frostbitten: 'aura.templeFrostbitten',
   Submerged: 'aura.templeSubmerged',
   'Shell Up': 'aura.templeShellUp',
+  // The Stormbrass Foundry (mob/trash_kit/foundry_kit.ts, encounters/stormbrass_foundry).
+  'Piston Slam': 'mechanic.foundryPistonSlam',
+  'Boiler Burst': 'mechanic.foundryBoilerBurst',
+  'Arc Pop': 'mechanic.foundryArcPop',
+  'Field Repair': 'mechanic.foundryFieldRepair',
+  'Deploy Turret': 'mechanic.foundryDeployTurret',
+  'Spring Leap': 'mechanic.foundrySpringLeap',
+  'Brass Bolt': 'mechanic.foundryBrassBolt',
+  'Steam Blast': 'mechanic.foundrySteamBlast',
+  'Scrap Toss': 'mechanic.foundryScrapToss',
+  'Boiler Rupture': 'mechanic.foundryBoilerRupture',
+  'Steam Screen': 'aura.foundrySteamScreen',
   'Dread Bellow': 'mechanic.cryptDreadBellow',
   'Wyrmcall Pyre': 'mechanic.cryptWyrmcallPyre',
   'Entombed': 'aura.cryptEntombed',

@@ -32,6 +32,7 @@ import {
 import { tickTempleEncounters } from '../encounters/drowned_temple';
 import { tickCryptEncounters } from '../encounters/hollow_crypt';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
+import { tickFoundryEncounters } from '../encounters/stormbrass_foundry';
 import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
@@ -1502,6 +1503,8 @@ export function updateInstances(ctx: SimContext): void {
   tickBastionEncounters(ctx);
   // The Drowned Temple's boss fights (encounters/drowned_temple), same slot.
   tickTempleEncounters(ctx);
+  // The Stormbrass Foundry's encounters (encounters/stormbrass_foundry), same slot.
+  tickFoundryEncounters(ctx);
   // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
   // and the Knellwyrm, same slot.
   tickCryptEncounters(ctx);

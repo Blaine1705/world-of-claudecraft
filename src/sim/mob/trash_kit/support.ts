@@ -15,6 +15,7 @@
 // line's victim is the kit's hashed pick. The only draws are a landing line's
 // damage rolls, in roster order.
 
+import { MOBS } from '../../data';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { angleTo, dist2d, type Entity, type TrashKitDef, type TrashKitState } from '../../types';
@@ -51,10 +52,12 @@ export function pickMendTarget(
   caster: Entity,
   range: number,
   below: number,
+  family?: string,
 ): Entity | null {
   let best: Entity | null = null;
   for (const e of alliesInReach(ctx, inst, caster, range)) {
     if (e.id !== caster.id && !e.inCombat) continue;
+    if (family !== undefined && MOBS[e.templateId]?.family !== family) continue;
     if (hpShare(e) >= below) continue;
     if (!best || hpShare(e) < hpShare(best) - 1e-9) best = e;
     else if (Math.abs(hpShare(e) - hpShare(best)) <= 1e-9 && e.id < best.id) best = e;
@@ -96,7 +99,7 @@ export function supportCastReady(
   const no = { ok: false, target: null };
   if (key === 'mend') {
     const def = kit.mend;
-    const target = def ? pickMendTarget(ctx, inst, mob, def.range, def.below) : null;
+    const target = def ? pickMendTarget(ctx, inst, mob, def.range, def.below, def.family) : null;
     return target ? { ok: true, target } : no;
   }
   if (key === 'ward') {

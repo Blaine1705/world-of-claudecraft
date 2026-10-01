@@ -8217,6 +8217,7 @@ export const cs_CZ: EnTranslations = {
       "templeBody": "Měsíční svatyně potopená pod zářícím plesem vysoko ve štítech, dosažitelná branou studeného světla. Utopený kult tam dole stále zpívá ve shnilých rouchách a varování vyrytá na břehu říkají, že něco níže jen spí. Samostatná záhada mimo hlavní příběh, pro zvědavé a dobře připravené.",
       "sanctumBody": "Temné srdce Thornpeaku, kde dlouhá práce kultu dosáhne strašného vrcholu.",
       "wildheartBody": "Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys zjistil, kdo čeká na vrcholu.",
+      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "Endgame raid",
       "raidBody": "Za zapečetěnými královskými dveřmi čeká desetičlenná zkouška: vícefázový boj a nesmrtelná síla, kterou musí celý raid společně vyřadit. Získej si vstup a přiveď devět přátel.",
       "heroicTitle": "Hrdinský režim",
@@ -12325,7 +12326,12 @@ export const cs_CZ: EnTranslations = {
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath"
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "foundry_piston_slam": "Piston Slam",
+      "foundry_field_repair": "Field Repair",
+      "foundry_deploy_turret": "Deploy Turret",
+      "foundry_steam_screen": "Steam Screen",
+      "foundry_hauler_steam_blast": "Steam Blast"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const cs_CZ: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
       },
+      "brass_sentry": {
+        "name": "Brass Sentry"
+      },
+      "steam_bruiser": {
+        "name": "Steam Bruiser"
+      },
+      "arc_drone": {
+        "name": "Arc Drone"
+      },
+      "foundry_engineer": {
+        "name": "Foundry Engineer"
+      },
+      "gearwright_apprentice": {
+        "name": "Gearwright Apprentice"
+      },
+      "clockwork_hound": {
+        "name": "Coilspring Hound"
+      },
+      "shieldbearer_frame": {
+        "name": "Shieldbearer Frame"
+      },
+      "tripod_turret": {
+        "name": "Tripod Turret"
+      },
+      "gantry_hauler": {
+        "name": "Gantry Hauler"
+      },
+      "line_master_tock": {
+        "name": "Line-Master Ambrel Tock"
+      },
+      "rangewarden": {
+        "name": "The Rangewarden"
+      },
+      "voltaic_warden": {
+        "name": "The Voltaic Warden"
+      },
+      "prime_draft": {
+        "name": "The Prime Draft"
+      },
       "sanctum_boneguard": {
         "name": "Kostěná stráž svatyně"
       },
@@ -24063,6 +24108,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Kotlina Divokého srdce",
         "enterText": "Teplý déšť syčí na starém kameni. Kotlina Divokého srdce se otevírá před tebou.",
         "leaveText": "Vracíš se pod kamennými tesáky zpět do slunce Palmového kraje."
+      },
+      "stormbrass_foundry": {
+        "name": "The Stormbrass Foundry",
+        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
+        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "Poslední tvrz",

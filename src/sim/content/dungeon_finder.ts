@@ -141,6 +141,17 @@ const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
   },
 ];
 
+// The Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md).
+// Phase 1 places the four bosses as melee placeholders, so no preview names a
+// mechanic yet; phase 2 lists each core here (and a heroic array with the
+// heroic extras, the Nythraxis and Ignivar precedent) as it lands.
+const STORMBRASS_FOUNDRY_ENCOUNTERS: readonly FinderEncounter[] = [
+  { mobId: 'line_master_tock', mechanics: [] },
+  { mobId: 'rangewarden', mechanics: [] },
+  { mobId: 'voltaic_warden', mechanics: [] },
+  { mobId: 'prime_draft', final: true, mechanics: [] },
+];
+
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
   { mobId: 'korgath_the_bound', mechanics: ['shuddering_stomp', 'enrage'] },
   { mobId: 'grand_necromancer_velkhar', mechanics: ['summons_adds'] },
@@ -408,6 +419,34 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     autoQueue: true,
     entranceDungeonId: 'wildheart_basin',
     encounters: WILDHEART_BASIN_ENCOUNTERS,
+    lockout: 'daily',
+  },
+  {
+    id: 'stormbrass_foundry_normal',
+    dungeonId: 'stormbrass_foundry',
+    difficulty: 'normal',
+    kind: 'dungeon',
+    minLevel: 19,
+    maxLevel: 20,
+    size: 5,
+    composition: FIVE_MAN,
+    autoQueue: true,
+    entranceDungeonId: 'stormbrass_foundry',
+    encounters: STORMBRASS_FOUNDRY_ENCOUNTERS,
+    lockout: 'none',
+  },
+  {
+    id: 'stormbrass_foundry_heroic',
+    dungeonId: 'stormbrass_foundry',
+    difficulty: 'heroic',
+    kind: 'dungeon',
+    minLevel: 20,
+    maxLevel: 20,
+    size: 5,
+    composition: FIVE_MAN,
+    autoQueue: true,
+    entranceDungeonId: 'stormbrass_foundry',
+    encounters: STORMBRASS_FOUNDRY_ENCOUNTERS,
     lockout: 'daily',
   },
   {

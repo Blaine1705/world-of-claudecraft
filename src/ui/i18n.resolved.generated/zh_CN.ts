@@ -8217,6 +8217,7 @@ export const zh_CN: EnTranslations = {
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
       "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔顶端看看是谁在等待。",
+      "foundryBody": "风暴岩风暴线上的一座黄铜铸造厂，世上最早造出的自动机械仍在闪电天空下运转着传送带和试验靶场。打断产线，平息两翼，攀上龙门架，一个未完成的巨人正在那里等待。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -12325,7 +12326,12 @@ export const zh_CN: EnTranslations = {
       "temple_crushing_torrent": "碾压激流",
       "temple_hydra_tsunami": "海啸",
       "temple_ysolei_call": "月裔召唤",
-      "temple_ysolei_wrath": "溺亡之怒"
+      "temple_ysolei_wrath": "溺亡之怒",
+      "foundry_piston_slam": "活塞重击",
+      "foundry_field_repair": "现场维修",
+      "foundry_deploy_turret": "部署炮台",
+      "foundry_steam_screen": "蒸汽屏障",
+      "foundry_hauler_steam_blast": "蒸汽冲击"
     }
   },
   "questUi": {
@@ -19923,6 +19929,45 @@ export const zh_CN: EnTranslations = {
       "tideglass_reflection_druid": {
         "name": "潮镜倒影"
       },
+      "brass_sentry": {
+        "name": "黄铜哨兵"
+      },
+      "steam_bruiser": {
+        "name": "蒸汽蛮兵"
+      },
+      "arc_drone": {
+        "name": "电弧无人机"
+      },
+      "foundry_engineer": {
+        "name": "铸造厂工程师"
+      },
+      "gearwright_apprentice": {
+        "name": "齿轮匠学徒"
+      },
+      "clockwork_hound": {
+        "name": "卷簧猎犬"
+      },
+      "shieldbearer_frame": {
+        "name": "持盾机架"
+      },
+      "tripod_turret": {
+        "name": "三脚炮台"
+      },
+      "gantry_hauler": {
+        "name": "龙门运输车"
+      },
+      "line_master_tock": {
+        "name": "产线主管安布雷尔·托克"
+      },
+      "rangewarden": {
+        "name": "靶场守卫"
+      },
+      "voltaic_warden": {
+        "name": "伏打守护者"
+      },
+      "prime_draft": {
+        "name": "初代原型"
+      },
       "sanctum_boneguard": {
         "name": "圣所骨卫"
       },
@@ -24063,6 +24108,11 @@ export const zh_CN: EnTranslations = {
         "name": "荒野之心盆地",
         "enterText": "温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。",
         "leaveText": "你从石牙之下穿回棕榈之境的阳光中。"
+      },
+      "stormbrass_foundry": {
+        "name": "风暴黄铜铸造厂",
+        "enterText": "缆车在铸造厂平台上猛然停住。黄铜屋顶嘶嘶冒着蒸汽，闪电劈在上方的风暴线圈上。",
+        "leaveText": "缆车载着你沿风暴线回到风暴岩。"
       },
       "the_last_keep": {
         "name": "最后的堡垒",

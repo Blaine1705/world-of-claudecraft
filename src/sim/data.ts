@@ -230,6 +230,10 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
+import {
+  STORMBRASS_FOUNDRY_DUNGEON_DEFS,
+  STORMBRASS_FOUNDRY_MOBS,
+} from './content/stormbrass_foundry';
 import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
 import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
@@ -465,6 +469,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...HOLLOW_CRYPT_TRASH_MOBS,
   ...SUNKEN_BASTION_MOBS,
   ...DROWNED_TEMPLE_MOBS,
+  ...STORMBRASS_FOUNDRY_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,
@@ -1145,6 +1150,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
+  ...STORMBRASS_FOUNDRY_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);

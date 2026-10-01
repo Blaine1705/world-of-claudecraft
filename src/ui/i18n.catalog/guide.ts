@@ -1998,6 +1998,8 @@ export const guideStrings = {
       "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
     wildheartBody:
       'A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.',
+    foundryBody:
+      'A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',
