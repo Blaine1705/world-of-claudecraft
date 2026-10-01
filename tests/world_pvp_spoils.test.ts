@@ -37,7 +37,7 @@ function world(): Sim {
 }
 
 function place(sim: Sim, pid: number, spot: { x: number; z: number }, dx = 0): void {
-  const e = sim.entities.get(pid)!;
+  const e = ent(sim, pid);
   e.pos = { x: spot.x + dx, y: groundHeight(spot.x + dx, spot.z, SEED), z: spot.z };
   e.prevPos = { ...e.pos };
 }
@@ -45,14 +45,28 @@ function place(sim: Sim, pid: number, spot: { x: number; z: number }, dx = 0): v
 function fighter(sim: Sim, name: string, characterId: number, dx: number, level = 20): number {
   const pid = sim.addPlayer('warrior', name, { autoEquip: true, characterId });
   sim.setPlayerLevel(level, pid);
-  const e = sim.entities.get(pid)!;
+  const e = ent(sim, pid);
   e.hp = e.maxHp;
   place(sim, pid, CONTESTED, dx);
   return pid;
 }
 
 function ent(sim: Sim, pid: number): Entity {
-  return sim.entities.get(pid)!;
+  const entity = sim.entities.get(pid);
+  if (!entity) throw new Error(`missing entity ${pid}`);
+  return entity;
+}
+
+function partyMembersOf(sim: Sim, pid: number): number[] {
+  const party = sim.partyOf(pid);
+  if (!party) throw new Error(`missing party for ${pid}`);
+  return party.members;
+}
+
+function playerNamed(sim: Sim, name: string) {
+  const player = [...sim.players.values()].find((m) => m.name === name);
+  if (!player) throw new Error(`missing player ${name}`);
+  return player;
 }
 
 function flag(sim: Sim, pid: number): void {
@@ -91,8 +105,14 @@ function tickSeconds(sim: Sim, seconds: number): void {
   for (let i = 0; i < Math.round(seconds / DT); i++) sim.tick();
 }
 
+function metaOf(sim: Sim, pid: number) {
+  const meta = sim.meta(pid);
+  if (!meta) throw new Error(`missing player meta ${pid}`);
+  return meta;
+}
+
 function skullsOf(sim: Sim, pid: number) {
-  return sim.meta(pid)!.inventory.filter((s) => s.itemId === WORLD_PVP_SKULL_ITEM_ID);
+  return metaOf(sim, pid).inventory.filter((s) => s.itemId === WORLD_PVP_SKULL_ITEM_ID);
 }
 
 /** One victim's bucket on a skull stack: the victim recorded as a gatherer is
@@ -115,7 +135,7 @@ function victims(slot: {
  *  can never hang the suite. Call it BEFORE placing any skull stack: a skull
  *  stack with room always answers "room left". */
 function fillBags(sim: Sim, pid: number): void {
-  const meta = sim.meta(pid)!;
+  const meta = metaOf(sim, pid);
   for (let i = 0; i < 500 && sim.ctx.canAddItem(WORLD_PVP_SKULL_ITEM_ID, 1, pid); i++) {
     meta.inventory.push({ itemId: 'copper_ore', count: 1 });
   }
@@ -142,8 +162,8 @@ function duel() {
   const b = fighter(sim, 'Bet', 1002, 2);
   flag(sim, a);
   flag(sim, b);
-  sim.meta(a)!.copper = 0;
-  sim.meta(b)!.copper = 20_000;
+  metaOf(sim, a).copper = 0;
+  metaOf(sim, b).copper = 20_000;
   sim.events = [];
   return { sim, a, b };
 }
@@ -154,8 +174,8 @@ describe('the drop', () => {
     slay(sim, a, b);
     const body = ent(sim, b);
     // The victim is charged at the kill; the killer is paid only by looting.
-    expect(sim.meta(b)!.copper).toBe(18_000);
-    expect(sim.meta(a)!.copper).toBe(0);
+    expect(metaOf(sim, b).copper).toBe(18_000);
+    expect(metaOf(sim, a).copper).toBe(0);
     expect(body.lootable).toBe(true);
     expect(body.tappedById).toBe(a);
     expect(body.loot).toEqual({
@@ -180,7 +200,7 @@ describe('the drop', () => {
     slay(sim, a, b);
     sim.events = [];
     expect(sim.lootCorpse(b, a)).toBe(true);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     const skulls = skullsOf(sim, a);
     expect(skulls).toHaveLength(1);
     // A plain stack (no per-copy payload) whose one source bucket names Bet.
@@ -198,18 +218,18 @@ describe('the drop', () => {
 
   it('a broke victim still drops the skull; the gold slot is simply empty', () => {
     const { sim, a, b } = duel();
-    sim.meta(b)!.copper = 5; // 10% floors to nothing
+    metaOf(sim, b).copper = 5; // 10% floors to nothing
     slay(sim, a, b);
     expect(ent(sim, b).loot?.copper).toBe(0);
     expect(ent(sim, b).loot?.items.map((s) => s.itemId)).toEqual([WORLD_PVP_SKULL_ITEM_ID]);
     sim.lootCorpse(b, a);
     expect(skullsOf(sim, a)).toHaveLength(1);
-    expect(sim.meta(b)!.copper).toBe(5);
+    expect(metaOf(sim, b).copper).toBe(5);
   });
 
   it('the stake cap still binds what drops', () => {
     const { sim, a, b } = duel();
-    sim.meta(b)!.copper = 10_000_000;
+    metaOf(sim, b).copper = 10_000_000;
     slay(sim, a, b);
     expect(ent(sim, b).loot?.copper).toBe(WORLD_PVP_STAKE_CAP_COPPER);
   });
@@ -218,13 +238,13 @@ describe('the drop', () => {
     const { sim, a, b } = duel();
     const c = fighter(sim, 'Gimel', 1003, 4);
     flag(sim, c);
-    sim.meta(c)!.copper = 0;
-    sim.meta(b)!.copper = 10_000; // stake 1000 across 2: 500 each
+    metaOf(sim, c).copper = 0;
+    metaOf(sim, b).copper = 10_000; // stake 1000 across 2: 500 each
     hit(sim, c, b);
     slay(sim, a, b);
-    expect(sim.meta(c)!.copper).toBe(500);
+    expect(metaOf(sim, c).copper).toBe(500);
     expect(ent(sim, b).loot?.copper).toBe(500);
-    expect(sim.meta(b)!.copper).toBe(9_000);
+    expect(metaOf(sim, b).copper).toBe(9_000);
     expect(skullsOf(sim, c)).toHaveLength(0);
   });
 
@@ -236,7 +256,7 @@ describe('the drop', () => {
     place(sim, b, FFA, 2);
     expect(ZONES.some((z) => z.worldPvp === 'ffa')).toBe(true);
     // Unflagged victim: the blow marks the attacker, but the victim stakes nothing.
-    sim.meta(b)!.copper = 20_000;
+    metaOf(sim, b).copper = 20_000;
     slay(sim, a, b);
     expect(ent(sim, a).pvpFlag).toBe(true);
     expect(ent(sim, b).lootable).toBe(false);
@@ -247,7 +267,7 @@ describe('the drop', () => {
     place(sim, c, FFA, 4);
     place(sim, d, FFA, 6);
     flag(sim, d);
-    sim.meta(d)!.copper = 20_000;
+    metaOf(sim, d).copper = 20_000;
     slay(sim, c, d);
     expect(ent(sim, c).pvpFlag).toBeFalsy();
     expect(ent(sim, d).lootable).toBe(false);
@@ -286,7 +306,7 @@ describe('who may take it', () => {
     '%s tops up an existing skull stack when every bag slot is occupied',
     (settlement) => {
       const { sim, a, b } = duel();
-      const meta = sim.meta(a)!;
+      const meta = metaOf(sim, a);
       fillBags(sim, a);
       // An earlier skull from someone else, in place of one filler: skulls share
       // one stack whoever they name, so its spare room is the only room left.
@@ -320,7 +340,7 @@ describe('who may take it', () => {
     'settlement refuses a full skull stack with no free slot: %j',
     ({ count }) => {
       const { sim, a, b } = duel();
-      const meta = sim.meta(a)!;
+      const meta = metaOf(sim, a);
       // Fill before inserting the skull so its stack room cannot mask full slots.
       fillBags(sim, a);
       meta.inventory[0] = {
@@ -346,7 +366,7 @@ describe('who may take it', () => {
     slay(sim, a, b);
     sim.events = [];
     expect(sim.lootCorpse(b, stranger)).toBe(false);
-    expect(sim.meta(stranger)!.copper).toBe(0);
+    expect(metaOf(sim, stranger).copper).toBe(0);
     expect(ent(sim, b).loot?.copper).toBe(2_000);
     expect(sim.lootCorpse(b, a)).toBe(true);
   });
@@ -357,7 +377,7 @@ describe('who may take it', () => {
     sim.events = [];
     sim.releaseSpirit(b);
     expect(ent(sim, b).ghost).toBe(true);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     expect(skullsOf(sim, a)).toHaveLength(1);
     expect(lootTexts(sim, a)).toContain('You loot 20s.');
     expect(ent(sim, b).lootable).toBe(false);
@@ -370,7 +390,7 @@ describe('who may take it', () => {
     slay(sim, a, b);
     sim.revivePlayerAt(b, { ...ent(sim, b).pos });
     expect(ent(sim, b).dead).toBe(false);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     expect(skullsOf(sim, a)).toHaveLength(1);
     expect(sim.worldPvpBooks.spoils.size).toBe(0);
   });
@@ -379,10 +399,10 @@ describe('who may take it', () => {
     const { sim, a, b } = duel();
     slay(sim, a, b);
     // Take only the gold: the skull slot is left by filling Aleph's bags.
-    const room = sim.meta(a)!;
+    const room = metaOf(sim, a);
     fillBags(sim, a);
     sim.lootCorpse(b, a);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     expect(ent(sim, b).loot?.items).toHaveLength(1);
     // Make room, then Bet stands up at the spirit healer: the skull goes to Aleph.
     room.inventory.pop();
@@ -398,7 +418,7 @@ describe('who may take it', () => {
     body.dead = false; // a revive path that does not settle
     body.hp = body.maxHp;
     tickSeconds(sim, 1);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     expect(skullsOf(sim, a)).toHaveLength(1);
     expect(body.lootable).toBe(false);
     expect(sim.worldPvpBooks.spoils.size).toBe(0);
@@ -408,14 +428,14 @@ describe('who may take it', () => {
     const { sim, a, b } = duel();
     const c = fighter(sim, 'Gimel', 1003, 4);
     flag(sim, c);
-    sim.meta(c)!.copper = 0;
+    metaOf(sim, c).copper = 0;
     slay(sim, a, b);
     const body = ent(sim, b);
     body.dead = false;
     body.hp = body.maxHp;
     hit(sim, c, b);
     slay(sim, c, b);
-    expect(sim.meta(a)!.copper).toBe(2_000); // Aleph's unlooted share, settled
+    expect(metaOf(sim, a).copper).toBe(2_000); // Aleph's unlooted share, settled
     expect(skullsOf(sim, a)).toHaveLength(1);
     expect(body.tappedById).toBe(c);
     expect(sim.worldPvpBooks.spoils.get(b)).toBe(c);
@@ -424,26 +444,26 @@ describe('who may take it', () => {
   it('a killer removed from the world is paid on the way out; a killer already gone refunds the victim', () => {
     const { sim, a, b } = duel();
     slay(sim, a, b);
-    expect(sim.meta(b)!.copper).toBe(18_000);
-    const killer = sim.meta(a)!;
+    expect(metaOf(sim, b).copper).toBe(18_000);
+    const killer = metaOf(sim, a);
     sim.removePlayer(a);
     expect(killer.copper).toBe(2_000); // settled into the leaving purse
     expect(ent(sim, b).loot).toBeNull();
     sim.releaseSpirit(b);
-    expect(sim.meta(b)!.copper).toBe(18_000);
+    expect(metaOf(sim, b).copper).toBe(18_000);
     // A killer missing at settle time (no leave hook ran): the gold goes home.
     const { sim: s2, a: k, b: v } = duel();
     slay(s2, k, v);
     s2.players.delete(k);
     s2.releaseSpirit(v);
-    expect(s2.meta(v)!.copper).toBe(20_000);
+    expect(metaOf(s2, v).copper).toBe(20_000);
     expect(ent(s2, v).loot).toBeNull();
   });
 
   it('full bags on settle keep the gold flowing and say so for the skull', () => {
     const { sim, a, b } = duel();
     slay(sim, a, b);
-    const meta = sim.meta(a)!;
+    const meta = metaOf(sim, a);
     fillBags(sim, a);
     sim.events = [];
     sim.releaseSpirit(b);
@@ -492,9 +512,9 @@ describe('review hardening: rights, leave, shutdown, the interact key, the icon'
     expect(sim.partyOf(a)?.members).toContain(mate);
     slay(sim, a, b);
     expect(sim.lootCorpse(b, mate)).toBe(false);
-    expect(sim.meta(mate)!.copper).toBe(0);
+    expect(metaOf(sim, mate).copper).toBe(0);
     expect(ent(sim, b).loot?.copper).toBe(2_000);
-    const party = sim.partyOf(a)!.members;
+    const party = partyMembersOf(sim, a);
     expect(corpseIndicatorFor(ent(sim, b), mate, party)).toBe('none');
     expect(corpseIndicatorFor(ent(sim, b), a, party)).toBe('loot');
     expect(corpseIndicatorFor(ent(sim, b), 9_999, null)).toBe('none');
@@ -508,7 +528,7 @@ describe('review hardening: rights, leave, shutdown, the interact key, the icon'
     slay(sim, a, b);
     sim.targetEntity(b, a);
     sim.interact(a);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     expect(skullsOf(sim, a)).toHaveLength(1);
   });
 
@@ -518,52 +538,52 @@ describe('review hardening: rights, leave, shutdown, the interact key, the icon'
     const body = ent(sim, b);
     body.dead = false; // stood up by a route that did not settle, before the sweep
     expect(sim.lootCorpse(b, a)).toBe(false);
-    expect(sim.meta(a)!.copper).toBe(0);
+    expect(metaOf(sim, a).copper).toBe(0);
     tickSeconds(sim, 1);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
   });
 
   it('a victim who logs out dead pays the killer before leaving (no gold sink)', () => {
     const { sim, a, b } = duel();
     slay(sim, a, b);
     sim.preparePlayerLeave(b);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     expect(skullsOf(sim, a)).toHaveLength(1);
     sim.removePlayer(b);
     tickSeconds(sim, 1);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     // A host without the prepare hook (offline, headless) settles on removal.
     const { sim: s2, a: k, b: v } = duel();
     slay(s2, k, v);
     s2.removePlayer(v);
-    expect(s2.meta(k)!.copper).toBe(2_000);
+    expect(metaOf(s2, k).copper).toBe(2_000);
   });
 
   it('a killer who logs out is paid into the purse their leave snapshot saves', () => {
     const { sim, a, b } = duel();
     slay(sim, a, b);
     sim.preparePlayerLeave(a);
-    expect(sim.meta(a)!.copper).toBe(2_000);
+    expect(metaOf(sim, a).copper).toBe(2_000);
     expect(ent(sim, b).loot).toBeNull();
     // A settle that lands while the killer is already leaving refunds the victim.
     const { sim: s2, a: k, b: v } = duel();
     slay(s2, k, v);
-    s2.meta(k)!.leaving = true;
+    metaOf(s2, k).leaving = true;
     s2.releaseSpirit(v);
-    expect(s2.meta(k)!.copper).toBe(0);
-    expect(s2.meta(v)!.copper).toBe(20_000);
+    expect(metaOf(s2, k).copper).toBe(0);
+    expect(metaOf(s2, v).copper).toBe(20_000);
   });
 
   it('a graceful shutdown settles every body before the final save', () => {
     const { sim, a, b } = duel();
     const c = fighter(sim, 'Gimel', 1003, 4);
     flag(sim, c);
-    sim.meta(c)!.copper = 20_000;
+    metaOf(sim, c).copper = 20_000;
     slay(sim, a, b);
     hit(sim, a, c);
     slay(sim, a, c);
     settleAllWorldPvpSpoils(sim.ctx);
-    expect(sim.meta(a)!.copper).toBe(4_000);
+    expect(metaOf(sim, a).copper).toBe(4_000);
     expect(sim.worldPvpBooks.spoils.size).toBe(0);
   });
 
@@ -574,8 +594,8 @@ describe('review hardening: rights, leave, shutdown, the interact key, the icon'
     const settled = duel();
     slay(settled.sim, settled.a, settled.b);
     settled.sim.releaseSpirit(settled.b);
-    expect(settled.sim.meta(settled.a)!.counters.lootCopper).toBe(2_000);
-    expect(looted.sim.meta(looted.a)!.counters.lootCopper).toBe(2_000);
+    expect(metaOf(settled.sim, settled.a).counters.lootCopper).toBe(2_000);
+    expect(metaOf(looted.sim, looted.a).counters.lootCopper).toBe(2_000);
   });
 });
 
@@ -591,7 +611,7 @@ describe('/dev pvpbot (the solo playtest target)', () => {
     const me = fighter(sim, 'Aleph', 1001, 0, 18);
     flag(sim, me);
     sim.chat('/dev pvpbot Bet', me);
-    const bot = [...sim.players.values()].find((m) => m.name === 'Bet')!;
+    const bot = playerNamed(sim, 'Bet');
     const body = ent(sim, bot.entityId);
     expect(body.level).toBe(18);
     expect(body.pvpFlag).toBe(true);
@@ -602,7 +622,7 @@ describe('/dev pvpbot (the solo playtest target)', () => {
     slay(sim, me, bot.entityId);
     expect(body.loot?.copper).toBe(10_000);
     expect(sim.lootCorpse(bot.entityId, me)).toBe(true);
-    expect(sim.meta(me)!.copper).toBe(10_000);
+    expect(metaOf(sim, me).copper).toBe(10_000);
     // The dev bot carries a dev identity, so its skull still names it.
     expect(victims(skullsOf(sim, me)[0])).toEqual([['Bet', 1]]);
   });

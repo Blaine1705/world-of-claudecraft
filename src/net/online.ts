@@ -1,9 +1,3 @@
-import type { MaterialComposition } from '../sim/material_sources';
-import type { MaterialStackSelection } from '../sim/material_stack_selection';
-import { resolveInitialActionBarLayout } from './action_bar_restore';
-import { materialStorageTransferPayload } from './material_storage_command';
-import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
-
 // Online play: REST auth client + WebSocket world mirror.
 
 import { App } from '@capacitor/app';
@@ -52,6 +46,8 @@ import type { NamedSlotTarget } from '../sim/item_copy_ref';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
+import type { MaterialComposition } from '../sim/material_sources';
+import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
@@ -194,6 +190,7 @@ import type {
 } from '../world_api/professions';
 import { buildClientAbilityPresentation } from './ability_presentation';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
+import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { ActionBarLayoutUploader } from './action_bar_upload';
 import { anchorFields } from './anchor_fields';
 import { apiErrorFromBody } from './api_error';
@@ -226,6 +223,7 @@ import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_c
 import { inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
+import { materialStorageTransferPayload } from './material_storage_command';
 import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
@@ -267,6 +265,7 @@ import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './targ
 import { applyFerryWire, applyTransportSnapshot, clientFerryView } from './transport_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
+import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 import { whoRosterFromFrame } from './who_frame_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
@@ -1945,13 +1944,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.nativeLifecycleHandle = undefined;
     }
   }
-
   close(): void {
     this.endSession();
     this.ws.onclose = null;
     this.ws.close();
   }
-
   // Signal a deliberate logout to the server so it skips linkdead grace and
   // calls leave() immediately. Must be called before a page reload so the
   // character is properly removed from the world instead of being held

@@ -11,6 +11,7 @@ import {
   type QuestProgress,
   type WorldQuestProgress,
 } from '../sim/types';
+import { vaultPortalVisible } from '../sim/vault_portal_visibility';
 import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import {
   isWorldQuestSalvageObject,
@@ -29,6 +30,7 @@ export interface NearbyInteractionScanWorld {
   player: Entity;
   playerId?: number;
   partyInfo?: { members: readonly { pid: number }[] } | null;
+  characterId?: number;
   entities: ReadonlyMap<number, Entity>;
   questLog: ReadonlyMap<string, QuestProgress>;
   farmPatches: readonly FarmPatchDef[];
@@ -146,6 +148,7 @@ export function resolveNearbyInteractionCandidate(
       !player.dead &&
       entity.kind === 'object' &&
       entity.lootable &&
+      vaultPortalVisible(entity, playerId, world.partyInfo, world.characterId) &&
       (salvageQuest && isWorldQuestSalvageObject(entity, salvageQuest)
         ? !isWorldQuestSalvageObjectHidden(
             entity,

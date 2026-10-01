@@ -120,7 +120,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
-import { advanceHeroicLeap, heroicLeapPlacementPreview } from './combat/heroic_leap';
+import { heroicLeapPlacementPreview } from './combat/heroic_leap';
 import { clearFieldcraftState } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
 import { clearHunterTalentState, hunterPetDamageMultiplier } from './combat/hunter_shared';
@@ -203,7 +203,6 @@ import { type AbilityChargeState, applyCooldowns, serializeCooldowns } from './c
 import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
-  ABILITIES,
   ALL_RECIPES,
   abilitiesKnownAt,
   arenaOrigin,
@@ -211,7 +210,6 @@ import {
   DELVE_COMPANIONS,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
-  DUNGEON_LIST,
   delveOrigin,
   dungeonAt,
   getActiveWorldContent,
@@ -291,7 +289,6 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isChargeBearingPayload } from './item_instance_merge';
-import { meetsLevelRequirement } from './item_level_req';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import { applyKnockback as applyKnockbackImpl } from './knockback';
@@ -834,7 +831,6 @@ import { Targeting } from './targeting';
 import { addThreat, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
 import {
   type AbilityDef,
-  type AbilityEffect,
   type ArenaCombatant,
   type ArenaFormat,
   type ArenaStanding,
@@ -880,7 +876,6 @@ import {
   MAX_LEVEL,
   type MasterLootPrompt,
   type MasterLootThreshold,
-  MELEE_RANGE,
   type MountRaceSession,
   type MountTrainingSession,
   type MoveInput,
