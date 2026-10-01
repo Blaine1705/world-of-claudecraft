@@ -306,6 +306,16 @@ export function riftStateEventFor(ctx: SimContext, pid: number): RiftStateEvent 
   return buildRiftStateEvent(ctx, pid, inst, true);
 }
 
+/** Emit the riftState exit for a member about to be teleported off the floor at
+ * `from` by something other than the rift exit (a spirit release or an /unstuck
+ * to a graveyard). ClientWorld mirrors its floor from these events alone, so
+ * without the exit a ghost running back from a rift kept the rift map, minimap,
+ * and floor tracker the whole way. A no-op for a position on no member floor. */
+export function emitRiftDeparture(ctx: SimContext, pid: number, from: Vec3): void {
+  const inst = riftInstanceAtPos(ctx, from);
+  if (inst?.memberIds.has(pid)) emitRiftState(ctx, pid, inst, false);
+}
+
 export function hoardBossCueViewsForPlayer(ctx: SimContext, pid: number) {
   const player = ctx.entities.get(pid);
   if (!player) return [];
