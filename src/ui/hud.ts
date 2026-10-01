@@ -6666,11 +6666,11 @@ export class Hud {
     html += this.itemProcBlock(item) + trinketTooltipLines(item, this.sim.player);
     if (compare !== 'noset') html += this.itemSetBlock(item);
     html += materialMakersMarkLines(item, instance, materialSources);
-    // Stackables state their per-slot cap (sim/bags.ts stackSizeOf); 1-per-slot
-    // kinds, mounts, and charge payloads render nothing. A pattern's product card
-    // ('embedded' or 'noset') drops cap and price: they would read as the pattern's.
-    if (typeof compare === 'boolean')
-      html += stackSizeTooltipLine(item, instance) + vendorSellTooltipLine(item);
+    // Stack cap (sim/bags.ts stackSizeOf) and sell price; a pattern's product card omits both.
+    if (typeof compare === 'boolean') {
+      html += stackSizeTooltipLine(item, instance);
+      html += vendorSellTooltipLine(item);
+    }
     if (compare === true) html += this.itemCompareBlock(item, instance);
     return html;
   }
