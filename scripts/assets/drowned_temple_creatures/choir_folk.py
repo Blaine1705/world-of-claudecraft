@@ -135,11 +135,16 @@ def templeguard_body():
     p.on('Jaw')
     p.blob((0, -0.24, 2.26), (0.22, 0.18, 0.09), DROWNED_SKIN_D)
     # The trident in the right hand and the scallop shield on the left arm.
+    # Modelled with its prongs DOWN the hanging arm (-Z) through the fist at
+    # z 0.98: the guard stance (the doubled .L/.R arm turns) raises the
+    # forearm up and forward, which stands the prongs up and ahead and makes
+    # the Attack thrust prongs first. Modelled prongs-up, it held them behind
+    # and thrust butt first.
     p.on('Hand.R')
-    p.tube([(-0.68, -0.1, -0.2), (-0.68, -0.1, 1.0), (-0.68, -0.1, 3.0)], [0.04, 0.045, 0.04], BRONZE, sides=6)
+    p.tube([(-0.68, -0.1, 2.16), (-0.68, -0.1, 0.96), (-0.68, -0.1, -1.04)], [0.04, 0.045, 0.04], BRONZE, sides=6)
     for dx in (-0.18, 0.0, 0.18):
-        p.tube([(-0.68 + dx, -0.1, 2.95), (-0.68 + dx * 1.2, -0.1, 3.5)], [0.04, 0.005], SILVER, sides=4)
-    p.tube([(-0.9, -0.1, 3.0), (-0.46, -0.1, 3.0)], [0.04, 0.04], SILVER, sides=4)
+        p.tube([(-0.68 + dx, -0.1, -0.99), (-0.68 + dx * 1.2, -0.1, -1.54)], [0.04, 0.005], SILVER, sides=4)
+    p.tube([(-0.9, -0.1, -1.04), (-0.46, -0.1, -1.04)], [0.04, 0.04], SILVER, sides=4)
     p.on('Fore.L')
     for k in range(9):
         b = -1.0 + k / 8 * 2.0
