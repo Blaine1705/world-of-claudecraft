@@ -16344,6 +16344,29 @@
     line-height: 1.35;
   }
 
+  /* ---------- Dungeon prompts' shared slot (the Iron Cage, the chains, the Foundry) ---------- */
+  /* The three encounter prompts share one slot, clear of the WHOLE bottom
+     stack: it sits a gap above the cast bar (which already rides above the
+     action rows, the player frame and the swing timers) and lifts with it
+     when a third action row shows. They used to sit at 190px, over the player
+     frame and the stacked action rows. On touch they float above the action
+     ring's arc instead. */
+  #bastion-cage-escape,
+  #bastion-chain-alert,
+  #foundry-alert {
+    bottom: calc(260px + var(--castbar-h) + 14px);
+  }
+  body.show-actionbar3 #bastion-cage-escape,
+  body.show-actionbar3 #bastion-chain-alert,
+  body.show-actionbar3 #foundry-alert {
+    bottom: calc(312px + var(--castbar-h) + 14px);
+  }
+  body.mobile-touch #bastion-cage-escape,
+  body.mobile-touch #bastion-chain-alert,
+  body.mobile-touch #foundry-alert {
+    bottom: 56%;
+  }
+
   /* ---------- Iron Cage escape (the Gaol Turnkey's button-mash prompt) ---------- */
   /* Self-mounted by src/ui/hud/dungeon/cage_escape_painter.ts while the local
      player is locked in the Iron Cage, centred low over the action bar. The
@@ -16353,7 +16376,6 @@
   #bastion-cage-escape {
     position: absolute;
     left: 50%;
-    bottom: 190px;
     transform: translateX(-50%);
     display: none;
     flex-direction: column;
@@ -16422,7 +16444,6 @@
     }
   }
   body.mobile-touch #bastion-cage-escape {
-    bottom: 42%;
     min-width: min(420px, calc(100vw - 32px));
     padding: 16px 20px 18px;
   }
@@ -16441,28 +16462,37 @@
   #bastion-chain-alert {
     position: absolute;
     left: 50%;
-    bottom: 190px;
     transform: translateX(-50%);
     display: none;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 3px;
     z-index: 30;
     min-width: 340px;
     max-width: calc(100vw - 32px);
-    padding: 10px 18px 12px;
+    padding: 6px 16px 8px;
     pointer-events: none;
     text-align: center;
     color: var(--color-text-light);
     border: 2px solid var(--color-gold);
   }
   #bastion-chain-alert .bca-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--color-gold);
   }
   #bastion-chain-alert .bca-line {
-    font-size: 14px;
+    font-size: 13px;
+  }
+  /* The Drowned Anchor's links left: the number the whole group plays to. */
+  #bastion-chain-alert .bca-count {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-light);
+  }
+  #bastion-chain-alert .bca-hint {
+    font-size: 11px;
+    opacity: 0.85;
   }
   #bastion-chain-alert .bca-bar {
     --bar-h: 12px;
@@ -16495,7 +16525,6 @@
     }
   }
   body.mobile-touch #bastion-chain-alert {
-    bottom: 42%;
     min-width: min(420px, calc(100vw - 32px));
   }
 
@@ -16508,7 +16537,6 @@
   #foundry-alert {
     position: absolute;
     left: 50%;
-    bottom: 190px;
     transform: translateX(-50%);
     display: none;
     flex-direction: column;
@@ -16576,7 +16604,6 @@
     }
   }
   body.mobile-touch #foundry-alert {
-    bottom: 42%;
     min-width: min(420px, calc(100vw - 32px));
   }
 

@@ -6051,7 +6051,11 @@ export const ja_JP: EnTranslations = {
       "shackledLine": "互いに {range} ヤード以内にいること（現在 {dist} ヤード）",
       "strainedLine": "離れすぎ！鎖が二人を締め付ける：{range} ヤード以内に戻れ",
       "brokenAria": "鎖の破損：{pct}",
-      "reachAria": "鎖の張り具合：{pct}"
+      "reachAria": "鎖の張り具合：{pct}",
+      "linksLeft": "残りの鎖の環：{count}/{total}",
+      "linkRule": "錨への一撃ごとに、威力に関係なく環が一つ外れる",
+      "linksTarget": "鎖の環 {count}/{total}",
+      "linkBroken": "環を断った！"
     },
     "foundryAlert": {
       "cellName": "ストームセル",

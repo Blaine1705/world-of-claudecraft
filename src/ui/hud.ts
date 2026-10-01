@@ -463,7 +463,7 @@ import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
 import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
-import { DungeonPrompts } from './hud/dungeon';
+import { DungeonPrompts, wardHealthText, wardHitText } from './hud/dungeon';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
@@ -9006,7 +9006,7 @@ export class Hud {
         const hpMode = healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3);
         targetFrame.hpText = target.dead
           ? t('hud.core.dead')
-          : unitFrameHealthText(target.hp, target.maxHp, hpMode);
+          : (wardHealthText(target) ?? unitFrameHealthText(target.hp, target.maxHp, hpMode));
         targetFrame.showAbsorbText = !target.dead && hpMode !== 0;
         this.targetFramePainter.paint(unitFrameViewInto(this.targetFrameBuffer, targetFrame));
       }
@@ -11248,7 +11248,7 @@ export class Hud {
             this.fctPainter.spawn(
               {
                 ...hitShape,
-                text: `${ev.amount}${ev.crit ? '!' : ''}`,
+                text: wardHitText(tgt) ?? `${ev.amount}${ev.crit ? '!' : ''}`,
                 target: tgt,
               },
               now,

@@ -6051,7 +6051,11 @@ export const ko_KR: EnTranslations = {
       "shackledLine": "서로 {range}야드 이내에 머무르세요 (현재 {dist}야드)",
       "strainedLine": "너무 멀어졌습니다! 사슬이 두 사람을 조입니다: {range}야드 이내로 모이세요",
       "brokenAria": "사슬 파괴: {pct}",
-      "reachAria": "사슬 당김: {pct}"
+      "reachAria": "사슬 당김: {pct}",
+      "linksLeft": "남은 사슬 고리: {count}/{total}",
+      "linkRule": "닻을 칠 때마다 위력과 상관없이 고리가 하나씩 끊어진다",
+      "linksTarget": "사슬 고리 {count}/{total}",
+      "linkBroken": "고리 파괴!"
     },
     "foundryAlert": {
       "cellName": "폭풍 전지",

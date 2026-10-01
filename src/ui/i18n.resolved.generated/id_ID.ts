@@ -6051,7 +6051,11 @@ export const id_ID: EnTranslations = {
       "shackledLine": "Stay within {range} yards of each other ({dist} yards apart)",
       "strainedLine": "Too far apart! The chain bites both of you: close to {range} yards",
       "brokenAria": "Chain broken: {pct}",
-      "reachAria": "Chain reach used: {pct}"
+      "reachAria": "Chain reach used: {pct}",
+      "linksLeft": "Chain links left: {count} of {total}",
+      "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
+      "linksTarget": "{count} of {total} links",
+      "linkBroken": "Link broken!"
     },
     "foundryAlert": {
       "cellName": "Storm Cell",

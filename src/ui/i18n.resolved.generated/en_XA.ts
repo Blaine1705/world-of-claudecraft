@@ -6051,7 +6051,11 @@ export const en_XA: EnTranslations = {
       "shackledLine": "[Šţáý ŵíţĥíñ {range} ýáŕðš óƒ éáçĥ óţĥéŕ ({dist} ýáŕðš áþáŕţ)]",
       "strainedLine": "[Ţóó ƒáŕ áþáŕţ! Ţĥé çĥáíñ ƀíţéš ƀóţĥ óƒ ýóú: çļóšé ţó {range} ýáŕðš]",
       "brokenAria": "[Çĥáíñ ƀŕóķéñ: {pct}]",
-      "reachAria": "[Çĥáíñ ŕéáçĥ úšéð: {pct}]"
+      "reachAria": "[Çĥáíñ ŕéáçĥ úšéð: {pct}]",
+      "linksLeft": "[Çĥáíñ ļíñķš ļéƒţ: {count} óƒ {total}]",
+      "linkRule": "[Éʋéŕý ĥíţ óñ ţĥé áñçĥóŕ ƀŕéáķš óñé ļíñķ, ĥóŵéʋéŕ ĥáŕð íţ ļáñðš]",
+      "linksTarget": "[{count} óƒ {total} ļíñķš]",
+      "linkBroken": "[Ļíñķ ƀŕóķéñ!]"
     },
     "foundryAlert": {
       "cellName": "[Šţóŕɱ Çéļļ]",

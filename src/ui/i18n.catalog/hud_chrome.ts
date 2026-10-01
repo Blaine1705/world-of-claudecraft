@@ -8815,6 +8815,13 @@ export const hudChromeStrings = {
     strainedLine: 'Too far apart! The chain bites both of you: close to {range} yards',
     brokenAria: 'Chain broken: {pct}',
     reachAria: 'Chain reach used: {pct}',
+    // The Drowned Anchor's health is its chain's links (one per hit, however
+    // hard): the alert's count, its rule, the target frame's health text and
+    // the floating text a hit on it shows. Wordy (M16): non-Latin fills here.
+    linksLeft: 'Chain links left: {count} of {total}',
+    linkRule: 'Every hit on the anchor breaks one link, however hard it lands',
+    linksTarget: '{count} of {total} links',
+    linkBroken: 'Link broken!',
   },
   // The Stormbrass Foundry's encounter alert (src/ui/hud/dungeon/foundry_alert_view.ts):
   // the Prime Draft's Storm Cell, the Rangewarden's Target Lock and the Voltaic

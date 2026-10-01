@@ -6051,7 +6051,11 @@ export const ru_RU: EnTranslations = {
       "shackledLine": "Держитесь в пределах {range} ярдов друг от друга (сейчас {dist} ярдов)",
       "strainedLine": "Слишком далеко! Цепь ранит обоих: сойдитесь ближе {range} ярдов",
       "brokenAria": "Цепь разбита: {pct}",
-      "reachAria": "Натяжение цепи: {pct}"
+      "reachAria": "Натяжение цепи: {pct}",
+      "linksLeft": "Осталось звеньев цепи: {count} из {total}",
+      "linkRule": "Каждый удар по якорю разбивает одно звено, как бы силён он ни был",
+      "linksTarget": "Звеньев: {count} из {total}",
+      "linkBroken": "Звено разбито!"
     },
     "foundryAlert": {
       "cellName": "Грозовая батарея",

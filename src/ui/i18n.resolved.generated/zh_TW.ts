@@ -6051,7 +6051,11 @@ export const zh_TW: EnTranslations = {
       "shackledLine": "彼此保持在 {range} 碼以內（目前相距 {dist} 碼）",
       "strainedLine": "離得太遠！鎖鏈會傷害你們兩人：靠近到 {range} 碼以內",
       "brokenAria": "鎖鏈破損：{pct}",
-      "reachAria": "鎖鏈繃緊：{pct}"
+      "reachAria": "鎖鏈繃緊：{pct}",
+      "linksLeft": "剩餘鎖鏈環：{count}/{total}",
+      "linkRule": "每次擊中錨，無論傷害多少，都會斷開一環",
+      "linksTarget": "鎖鏈環 {count}/{total}",
+      "linkBroken": "斷開一環！"
     },
     "foundryAlert": {
       "cellName": "風暴電池",

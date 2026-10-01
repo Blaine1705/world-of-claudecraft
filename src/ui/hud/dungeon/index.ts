@@ -20,4 +20,4 @@ export { buildFoundryAlertView } from './foundry_alert_view';
 export type { GaolChainDeps } from './gaol_chain_painter';
 export { GaolChainAlert } from './gaol_chain_painter';
 export type { GaolChainInput, GaolChainKind, GaolChainView } from './gaol_chain_view';
-export { buildGaolChainView } from './gaol_chain_view';
+export { buildGaolChainView, wardHealthText, wardHitText } from './gaol_chain_view';

@@ -6,6 +6,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import {
+  DROWNED_ANCHOR_ID,
   OSSICK_ANCHORED,
   OSSICK_ID,
   OSSICK_SHACKLE,
@@ -18,6 +19,8 @@ import {
   type GaolChainEntity,
   type GaolChainInput,
   type GaolChainView,
+  wardHealthText,
+  wardHitText,
 } from '../src/ui/hud/dungeon/gaol_chain_view';
 import { aura, boss, engage, type Fight, fight, put, run } from './helpers/bastion_fight';
 
@@ -62,6 +65,23 @@ describe('the chain alert view (pure)', () => {
     expect(v.kind).toBe('anchored');
     expect(v.progress).toBeCloseTo(0.75, 6);
     expect(v.title).toContain('Drowned Anchor');
+    // Its health is its links: the alert counts them and states the rule.
+    expect(v.count).toBe('Chain links left: 3 of 12');
+    expect(v.hint).toContain('one link');
+  });
+
+  it('the anchor reads as links everywhere: the target frame and a hit', () => {
+    expect(wardHealthText({ templateId: DROWNED_ANCHOR_ID, hp: 9, maxHp: 12 })).toBe(
+      '9 of 12 links',
+    );
+    expect(wardHealthText({ templateId: DROWNED_ANCHOR_ID, hp: 16, maxHp: 16 })).toBe(
+      '16 of 16 links',
+    );
+    // Any other body keeps its usual health text and its number.
+    expect(wardHealthText({ templateId: 'gaoler_ossick', hp: 9, maxHp: 12 })).toBeNull();
+    expect(wardHitText({ templateId: DROWNED_ANCHOR_ID })).toBe('Link broken!');
+    expect(wardHitText({ templateId: 'gaoler_ossick' })).toBeNull();
+    expect(wardHitText(null)).toBeNull();
   });
 
   it('shackled: names the partner and the reach, and turns strained past it', () => {
