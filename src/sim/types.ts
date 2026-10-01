@@ -5336,6 +5336,11 @@ export interface QuestDef {
   requiresUsableHealAbility?: boolean;
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
+  // Offered only while this dungeon is public: a quest that points into a
+  // development-only room (DungeonDef.guideVisible false, the Crucible raid's
+  // flag) stays unavailable until that room ships (the Stormbrass Foundry's
+  // hand-off). Enforced in computeQuestState, so both hosts share it.
+  gatedWithDungeon?: string;
   // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
   // includes worn equipment and bag sockets (quests/quest_owned_count.ts) and the
   // turn-in never consumes them. For a quest that asks the player to acquire

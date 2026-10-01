@@ -19871,4 +19871,45 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상과의 거리가 {from}미터를 넘는 {stepYards}미터마다 주는 피해가 {perStep}% 증가합니다(최대 {max}%).',
   'hudChrome.auraEffect.trinket.overclock': '시전 속도가 {pct}% 증가합니다. 끝나면 과열됩니다.',
   'hudChrome.auraEffect.trinket.overheated': '시전 속도가 {pct}% 감소합니다.',
+  'entities.npcs.lift_warden_corwin.name': '승강기 관리인 코윈 애시비',
+  'entities.npcs.lift_warden_corwin.title': '폭풍선 승강기 관리자',
+  'entities.npcs.lift_warden_corwin.greeting':
+    '케이블 조심하게, 친구. 저 승강기는 아직도 폭풍선 위의 옛 주조소까지 올라가네. 그곳의 기계들은 돌아오지 않은 주인을 위해 여전히 돌아가고 있지.',
+  'entities.quests.q_sf_storm_line.title': '폭풍선',
+  'entities.quests.q_sf_storm_line.text':
+    '{playerName}, 승강기는 매시간 고철과 불꽃만 실어 내려올 뿐 살아 있는 사람은 하나도 없네. 위에서는 아직 뭔가가 선로를 끌고 있지. 기술자들이 갠트리 운반차라고 부른 거대한 증기 궤도차야. 올라가서 철도 야적장을 부수고 그 궤도차를 멈추게.',
+  'entities.quests.q_sf_storm_line.completion':
+    '야적장이 몇 년 만에 처음으로 조용해졌군. 조용하지만 비어 있진 않아. 들어 보게, 그 위에서 아직 생산 라인이 돌아가고 있어.',
+  'entities.quests.q_sf_storm_line.objectives.0.label': '갠트리 운반차 파괴',
+  'entities.quests.q_sf_stop_the_line.title': '라인을 멈춰라',
+  'entities.quests.q_sf_stop_the_line.text':
+    '생산라인 감독 앰브렐 토크는 주인이 떠난 뒤에도 주조소를 계속 돌렸고, 한 번도 멈추지 않았네. 이제 그는 벨트에 오르는 것은 무엇이든 프레스에 밀어 넣지. 그를 막게, {playerName}. 그러면 라인 전체가 그와 함께 멈출 걸세.',
+  'entities.quests.q_sf_stop_the_line.completion':
+    '토크가 멈췄고 그의 벨트도 멈췄군. 그가 무엇을 만들고 있었든, 다른 누군가를 위한 것이었어. 더 위로 가게.',
+  'entities.quests.q_sf_stop_the_line.objectives.0.label': '생산라인 감독 앰브렐 토크 처치',
+  'entities.quests.q_sf_first_draft.title': '첫 번째 초안',
+  'entities.quests.q_sf_first_draft.text':
+    '주조소 꼭대기에는 그곳의 모든 기계가 섬기도록 만들어진 것이 서 있네. 원형 초안, 끝내 완성되지 못한 거인이지. 폭풍이 그것을 깨우면 선반 아래 어떤 것도 안전하지 않아. 그것을 쓰러뜨리게, {playerName}. 그리고 그 제작자가 안에 남긴 것을 읽어 보게.',
+  'entities.quests.q_sf_first_draft.completion':
+    '기록에 따르면 폭풍은 금속을 움직일 수 있었지만 심장을 줄 수는 없었다는군. "오직 살아 있는 물만이 기억한다." 마지막 샘, 그리고 대장장이 아버지의 섬. 이건 그의 첫 작품이었네, {playerName}. 마지막 작품은 아직 저 밖에 있어.',
+  'entities.quests.q_sf_first_draft.objectives.0.label': '설계 기록 읽기',
+  'entities.quests.q_sf_forgefathers_isle.title': '대장장이 아버지의 섬으로',
+  'entities.quests.q_sf_forgefathers_isle.text':
+    '기록에는 대장장이 아버지의 섬이 나오네. 메일린이라는 기록관이 몇 달째 그곳 용광로에서 망치 자국을 해독하고 있지. 설계 기록을 그녀에게 가져가게, {playerName}. 발쿨이 여기서 무엇을 배웠고 그걸로 무엇을 했는지 그녀가 알 걸세.',
+  'entities.quests.q_sf_forgefathers_isle.completion':
+    '그의 첫 초안이군요. 그러니까 폭풍이 불보다 먼저였어요. 그렇다면 그가 무엇을 대신하려 했는지, 왜 그의 자동인형이 모두 실패했는지 알겠어요. 가까이 있어요. 나머지는 함께 읽어요.',
+  'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '기록관 메일린 찾기',
+  'hudChrome.finder.mech.moving_belts': '움직이는 벨트(바닥이 몸을 실어 나르며 레버를 당기면 반대로 돈다)',
+  'hudChrome.finder.mech.stamping_press': '프레스(프레스 앞의 칠해진 띠에서 벗어나라)',
+  'hudChrome.finder.mech.target_lock': '표적 고정(계속 움직여라: 포탄은 서 있던 자리에 떨어진다)',
+  'hudChrome.finder.mech.proof_shot': '시험 사격(탱커의 장갑을 찌그러뜨리는 무거운 포탄)',
+  'hudChrome.finder.mech.conduction_plating': '전도 장갑(올바른 종류의 피해로 공격하라)',
+  'hudChrome.finder.mech.static_lash': '정전기 채찍(탱커에게서 가까운 사람에게 튄다)',
+  'hudChrome.finder.mech.storm_cells': '폭풍 전지(열린 중심 해치로 전지를 옮겨라)',
+  'hudChrome.finder.mech.piston_fist': '피스톤 주먹(표시된 원에서 벗어나라)',
+  'hudChrome.finder.mech.tremor_step': '진동 발걸음(발 근처에서 떨어져라)',
+  'hudChrome.finder.mech.overtime_cross_feed': '초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돈다)',
+  'hudChrome.finder.mech.walking_barrage': '이동 탄막(표식 세 개, 포탄이 파편을 남긴다)',
+  'hudChrome.finder.mech.split_plating': '급속 순환과 분할 장갑(더 빨리 뒤집히고 등 쪽은 반대 면이다)',
+  'hudChrome.finder.mech.double_load': '막힌 거치대와 이중 장전(해치가 열린 동안 전지 두 개)',
 };

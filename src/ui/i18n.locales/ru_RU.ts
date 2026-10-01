@@ -20254,4 +20254,51 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.trinket.overclock':
     'Скорость произнесения увеличена на {pct}%. После окончания наступает перегрев.',
   'hudChrome.auraEffect.trinket.overheated': 'Скорость произнесения снижена на {pct}%.',
+  'entities.npcs.lift_warden_corwin.name': 'Смотритель подъемника Корвин Эшби',
+  'entities.npcs.lift_warden_corwin.title': 'Хранитель подъемника грозовой линии',
+  'entities.npcs.lift_warden_corwin.greeting':
+    'Осторожнее с тросом, друг. Этот подъемник все еще поднимается к старой литейной на грозовой линии, а тамошние машины до сих пор работают на хозяина, который так и не вернулся.',
+  'entities.quests.q_sf_storm_line.title': 'Грозовая линия',
+  'entities.quests.q_sf_storm_line.text':
+    'Каждый час подъемник привозит вниз лом и искры, {playerName}, но ни одной живой души. Там наверху что-то все еще тянет рельсы: огромный паровой гусеничник, которого инженеры звали Портальным тягачом. Поднимитесь, разгромите рельсовый двор и уничтожьте этот гусеничник.',
+  'entities.quests.q_sf_storm_line.completion':
+    'Впервые за много лет во дворе тихо. Тихо, но не пусто. Слышите? Над ним все еще работает линия.',
+  'entities.quests.q_sf_storm_line.objectives.0.label': 'Портальный тягач уничтожен',
+  'entities.quests.q_sf_stop_the_line.title': 'Остановить линию',
+  'entities.quests.q_sf_stop_the_line.text':
+    'Мастер линии Амбрел Ток продолжал запускать литейную, когда хозяин ушел, и так и не остановился. Теперь он отправляет под пресс все, что попадает на его ленты. Остановите его, {playerName}, и вся линия встанет вместе с ним.',
+  'entities.quests.q_sf_stop_the_line.completion':
+    'Ток затих, и его ленты тоже. Что бы он ни строил, он строил это для кого-то другого. Поднимайтесь выше.',
+  'entities.quests.q_sf_stop_the_line.objectives.0.label': 'Мастер линии Амбрел Ток убит',
+  'entities.quests.q_sf_first_draft.title': 'Первый чертеж',
+  'entities.quests.q_sf_first_draft.text':
+    'На вершине литейной стоит то, чему служили все тамошние машины: Первый чертеж, великан, которого так и не закончили. Если буря когда-нибудь его разбудит, ничто ниже уступа не будет в безопасности. Сразите его, {playerName}, и прочтите то, что его создатель оставил внутри.',
+  'entities.quests.q_sf_first_draft.completion':
+    'В записи сказано, что буря двигала металл, но так и не смогла дать ему сердце. «Помнит лишь живая вода». Последний Источник и Остров Отца Кузни. Это была его первая работа, {playerName}. Последняя все еще где-то там.',
+  'entities.quests.q_sf_first_draft.objectives.0.label': 'Запись чертежа прочитана',
+  'entities.quests.q_sf_forgefathers_isle.title': 'На Остров Отца Кузни',
+  'entities.quests.q_sf_forgefathers_isle.text':
+    'В записи упоминается Остров Отца Кузни. Архивариус по имени Мэйлин уже несколько месяцев читает там следы молотов в кузне. Отнесите ей запись чертежа, {playerName}: она поймет, чему Варкхул научился здесь и что он с этим сделал.',
+  'entities.quests.q_sf_forgefathers_isle.completion':
+    'Его первый чертеж. Значит, буря была раньше огня. Тогда я знаю, что он пытался заменить, и почему все его автоматы потерпели неудачу. Держитесь рядом: остальное мы прочтем вместе.',
+  'entities.quests.q_sf_forgefathers_isle.objectives.0.label': 'Архивариус Мэйлин найдена',
+  'hudChrome.finder.mech.moving_belts':
+    'Движущиеся ленты (пол несет вас и разворачивается по рычагу)',
+  'hudChrome.finder.mech.stamping_press':
+    'Штамповочный пресс (не стойте на размеченной полосе у пресса)',
+  'hudChrome.finder.mech.target_lock':
+    'Захват цели (двигайтесь: снаряды падают туда, где вы стояли)',
+  'hudChrome.finder.mech.proof_shot': 'Пробный выстрел (тяжелый снаряд, мнущий броню танка)',
+  'hudChrome.finder.mech.conduction_plating': 'Проводящая броня (бейте правильным типом урона)',
+  'hudChrome.finder.mech.static_lash': 'Статический хлыст (перескакивает с танка на стоящих рядом)',
+  'hudChrome.finder.mech.storm_cells': 'Грозовые батареи (несите батарею в открытый люк ядра)',
+  'hudChrome.finder.mech.piston_fist': 'Поршневой кулак (выйдите из отмеченного круга)',
+  'hudChrome.finder.mech.tremor_step': 'Сотрясающий шаг (держитесь подальше от его ног)',
+  'hudChrome.finder.mech.overtime_cross_feed':
+    'Сверхурочные и перекрестная подача (ленты быстрее, соседние идут навстречу)',
+  'hudChrome.finder.mech.walking_barrage': 'Огневой вал (три метки, снаряды оставляют осколки)',
+  'hudChrome.finder.mech.split_plating':
+    'Быстрый цикл и раздельная броня (смена быстрее, спина другого типа)',
+  'hudChrome.finder.mech.double_load':
+    'Заклинившие стойки и двойная загрузка (две батареи за одно открытие люка)',
 };

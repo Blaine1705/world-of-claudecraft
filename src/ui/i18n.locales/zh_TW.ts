@@ -18924,4 +18924,42 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你與目標之間的距離每超過 {from} 碼 {stepYards} 碼，造成的傷害提高 {perStep}%，最多 {max}%。',
   'hudChrome.auraEffect.trinket.overclock': '施法速度提高 {pct}%。效果結束時會過熱。',
   'hudChrome.auraEffect.trinket.overheated': '施法速度降低 {pct}%。',
+  'entities.npcs.lift_warden_corwin.name': '升降機守衛科溫·阿什比',
+  'entities.npcs.lift_warden_corwin.title': '風暴線升降機看守',
+  'entities.npcs.lift_warden_corwin.greeting': '小心纜繩，朋友。那台升降機仍會爬上風暴線上的舊鑄造廠，那裡的機器仍在為一個再也沒有回來的主人運轉。',
+  'entities.quests.q_sf_storm_line.title': '風暴線',
+  'entities.quests.q_sf_storm_line.text':
+    '每個小時升降機都會運下廢料和火花，{playerName}，卻從沒有一個活人。上面仍有東西在拉動鐵軌：一台工程師們稱為龍門運輸車的巨型蒸汽履帶車。坐上去，打垮鐵軌場，把那台履帶車拆掉。',
+  'entities.quests.q_sf_storm_line.completion': '鐵軌場多年來第一次安靜了。安靜，但並不空。聽：上面的產線還在運轉。',
+  'entities.quests.q_sf_storm_line.objectives.0.label': '摧毀龍門運輸車',
+  'entities.quests.q_sf_stop_the_line.title': '停止產線',
+  'entities.quests.q_sf_stop_the_line.text':
+    '產線主管安布雷爾·托克在主人離開後讓鑄造廠繼續運轉，而且從未停下。如今他把爬上傳送帶的一切都送進沖壓機。阻止他，{playerName}，整條產線就會隨他一起停下。',
+  'entities.quests.q_sf_stop_the_line.completion': '托克不動了，他的傳送帶也停了。不管他在造什麼，他都是為別人造的。再往上走。',
+  'entities.quests.q_sf_stop_the_line.objectives.0.label': '擊殺產線主管安布雷爾·托克',
+  'entities.quests.q_sf_first_draft.title': '初稿',
+  'entities.quests.q_sf_first_draft.text':
+    '鑄造廠頂端立著上面所有機器都為之效力的東西：初代原型，一個從未完工的巨人。如果風暴把它喚醒，平台下的一切都不安全。擊倒它，{playerName}，讀一讀它的製造者在它體內留下的東西。',
+  'entities.quests.q_sf_first_draft.completion':
+    '記錄上說，風暴能驅動金屬，卻永遠無法給它一顆心。「只有活水才會記得。」最後泉源，還有鍛父之島。這是他的第一件作品，{playerName}。最後一件仍在外面。',
+  'entities.quests.q_sf_first_draft.objectives.0.label': '閱讀設計圖記錄',
+  'entities.quests.q_sf_forgefathers_isle.title': '前往鍛父之島',
+  'entities.quests.q_sf_forgefathers_isle.text':
+    '記錄提到了鍛父之島。一位名叫梅琳的檔案員幾個月來一直在那裡的熔爐中解讀錘痕。把設計圖記錄帶給她，{playerName}：她會知道瓦爾庫爾在這裡學到了什麼，又用它做了什麼。',
+  'entities.quests.q_sf_forgefathers_isle.completion':
+    '他的初稿。原來風暴先於火焰。那我就知道他想取代的是什麼，也知道他的每一具自動機械為何失敗了。跟緊我：剩下的我們一起讀。',
+  'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '找到檔案員梅琳',
+  'hudChrome.finder.mech.moving_belts': '移動傳送帶（地面會帶著你走，拉桿後反向）',
+  'hudChrome.finder.mech.stamping_press': '沖壓機（遠離沖壓機前的塗色區域）',
+  'hudChrome.finder.mech.target_lock': '目標鎖定（保持移動：砲彈落在你站過的地方）',
+  'hudChrome.finder.mech.proof_shot': '試射砲彈（重砲會讓坦克的護甲凹陷）',
+  'hudChrome.finder.mech.conduction_plating': '傳導裝甲（用正確的傷害類型攻擊它）',
+  'hudChrome.finder.mech.static_lash': '靜電鞭笞（從坦克跳向附近的人）',
+  'hudChrome.finder.mech.storm_cells': '風暴電池（把電池帶進打開的核心艙門）',
+  'hudChrome.finder.mech.piston_fist': '活塞重拳（離開標記的圓圈）',
+  'hudChrome.finder.mech.tremor_step': '震地踏步（遠離它的腳下）',
+  'hudChrome.finder.mech.overtime_cross_feed': '加班與交叉供料（傳送帶更快，相鄰的反向運行）',
+  'hudChrome.finder.mech.walking_barrage': '徐進彈幕（三個標記，砲彈會留下彈片）',
+  'hudChrome.finder.mech.split_plating': '快速循環與分裂裝甲（翻轉更快，背面是另一種裝甲）',
+  'hudChrome.finder.mech.double_load': '卡住的電池架與雙重裝填（一次艙門窗口放入兩枚電池）',
 };

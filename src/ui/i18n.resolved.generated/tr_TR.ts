@@ -6017,7 +6017,20 @@ export const tr_TR: EnTranslations = {
         "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
         "drowned_anchor": "Drowned Anchor (break the chain before its victim is dragged into the pit)",
         "shackle_pair": "Shackle Pair (two chained players must stay close together)",
-        "reaper_behind": "Shadow Crossing (he rises behind a player, step out of the scythe's arc)"
+        "reaper_behind": "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
+        "moving_belts": "Moving Belts (the floor carries you, and reverses on the lever)",
+        "stamping_press": "Stamping Press (stay off the painted strip at the press)",
+        "target_lock": "Target Lock (keep moving: shells land where you stood)",
+        "proof_shot": "Proof Shot (a heavy shell that dents the tank)",
+        "conduction_plating": "Conduction Plating (hit it with the right damage kind)",
+        "static_lash": "Static Lash (leaps from the tank to anyone close by)",
+        "storm_cells": "Storm Cells (carry a cell into the open Core Hatch)",
+        "piston_fist": "Piston Fist (move out of the marked circle)",
+        "tremor_step": "Tremor Step (keep clear of its feet)",
+        "overtime_cross_feed": "Overtime and Cross-Feed (faster belts, neighbors run opposite)",
+        "walking_barrage": "Walking Barrage (three marks, and the shells leave shrapnel)",
+        "split_plating": "Rapid Cycling and Split Plating (faster flips, its back wears the other face)",
+        "double_load": "Jammed Racks and Double Load (two cells in one hatch window)"
       }
     },
     "bastionCage": {
@@ -21404,6 +21417,11 @@ export const tr_TR: EnTranslations = {
         "title": "Rıhtım Talim Ustası",
         "greeting": "Arkamdaki talim mankeni asla karşılık vermez ve asla devrilmez, {className}. Önemli olan sayımdır: Hasar Sayaçların ona indirdiğin her darbeyi sayar. Onu hedefleyip sayaçları aç, gerisini sana göstereyim."
       },
+      "lift_warden_corwin": {
+        "name": "Lift Warden Corwin Ashby",
+        "title": "Keeper of the Storm Line Lift",
+        "greeting": "Mind the cable, friend. That lift still climbs to the old foundry on the storm line, and the machines up there still run for a master who never came back."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Gelgit Gözcüsü",
@@ -23669,6 +23687,46 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "İyileştirme Mankenine etkili iyileştirme yapıldı"
+          }
+        }
+      },
+      "q_sf_storm_line": {
+        "title": "The Storm Line",
+        "text": "Every hour the lift brings down scrap and sparks, {playerName}, never a living soul. Something up there still hauls the rails: a great steam crawler the engineers called the Gantry Hauler. Ride up, break the Rail Yard, and put that crawler down.",
+        "completion": "The yard is quiet for the first time in years. Quiet, but not empty. Listen: the line is still running above it.",
+        "objectives": {
+          "0": {
+            "label": "Gantry Hauler destroyed"
+          }
+        }
+      },
+      "q_sf_stop_the_line": {
+        "title": "Stop the Line",
+        "text": "The Line-Master, Ambrel Tock, kept the foundry running when its master left, and he has never stopped. Now he feeds anything that climbs onto his belts into the press. Stop him, {playerName}, and the whole line stops with him.",
+        "completion": "Tock is still, and so are his belts. Whatever he was building, he was building it for someone else. Go higher.",
+        "objectives": {
+          "0": {
+            "label": "Line-Master Ambrel Tock slain"
+          }
+        }
+      },
+      "q_sf_first_draft": {
+        "title": "The First Draft",
+        "text": "At the top of the foundry stands the thing every machine up there was built to serve: the Prime Draft, a giant that was never finished. If the storm ever wakes it, nothing below the shelf is safe. Put it down, {playerName}, and read whatever its maker left inside it.",
+        "completion": "The record says the storm moved the metal but could never give it a heart. \"Only living water remembers.\" The Last Spring, and the Forgefather's Isle. This was his first work, {playerName}. The last one is still out there.",
+        "objectives": {
+          "0": {
+            "label": "Draft Record read"
+          }
+        }
+      },
+      "q_sf_forgefathers_isle": {
+        "title": "To the Forgefather's Isle",
+        "text": "The record names the Forgefather's Isle. An archivist named Maelin has been reading the hammer marks in the forge there for months. Take her the Draft Record, {playerName}: she will know what Varkhul learned here, and what he did with it.",
+        "completion": "His first draft. So the storm came before the fire. Then I know what he was trying to replace, and why every one of his automata failed. Stay close: we read the rest of this together.",
+        "objectives": {
+          "0": {
+            "label": "Archivist Maelin found"
           }
         }
       },

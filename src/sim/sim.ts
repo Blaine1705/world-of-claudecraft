@@ -686,6 +686,7 @@ import {
   UNSTUCK_SICKNESS_ID,
 } from './spirit';
 import { resolveStoragePrices, type StoragePrices } from './storage_prices';
+import { spawnLiftWarden } from './stormbrass_lift_warden';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
   CURRENT_CHARACTER_CONTENT_REVISION,
@@ -2541,6 +2542,7 @@ export class Sim {
     spawnHubPractice(this.ctx, worldContent);
     spawnHealingTrainingGround(this.ctx, worldContent);
     spawnHarborHouseKeeper(this.ctx, worldContent);
+    spawnLiftWarden(this.ctx, worldContent);
   }
 
   private spawnHealerPracticeDummy(): void {

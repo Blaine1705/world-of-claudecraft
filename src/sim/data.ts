@@ -235,6 +235,11 @@ import {
   STORMBRASS_FOUNDRY_MOBS,
 } from './content/stormbrass_foundry';
 import { STORMBRASS_FOUNDRY_ITEMS } from './content/stormbrass_foundry_items';
+import {
+  STORMBRASS_FOUNDRY_NPCS,
+  STORMBRASS_FOUNDRY_QUEST_ORDER,
+  STORMBRASS_FOUNDRY_QUESTS,
+} from './content/stormbrass_foundry_quests';
 import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
 import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
@@ -540,6 +545,10 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
+  // The Stormbrass Foundry's Lift Warden (content/stormbrass_foundry_quests.ts):
+  // dynamic, spawned under a reserved id (stormbrass_lift_warden.ts), so its
+  // place in this record moves no id.
+  ...STORMBRASS_FOUNDRY_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -572,6 +581,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...PROVING_SHORE_QUESTS,
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
+  ...STORMBRASS_FOUNDRY_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -593,6 +603,7 @@ export const QUEST_ORDER: string[] = [
   ...PROVING_SHORE_QUEST_ORDER,
   ...IGNIVAR_RAID_LORE_QUEST_ORDER,
   ...HUB_PRACTICE_QUEST_ORDER,
+  ...STORMBRASS_FOUNDRY_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported

@@ -141,15 +141,39 @@ const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
   },
 ];
 
-// The Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md).
-// Phase 1 places the four bosses as melee placeholders, so no preview names a
-// mechanic yet; phase 2 lists each core here (and a heroic array with the
-// heroic extras, the Nythraxis and Ignivar precedent) as it lands.
+// The Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md):
+// the Main Line, the two wings, the Gantry. Each boss's core first, then the
+// secondary kit; the heroic array adds each boss's heroic twists (the
+// Nythraxis and Ignivar precedent).
 const STORMBRASS_FOUNDRY_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'line_master_tock', mechanics: [] },
-  { mobId: 'rangewarden', mechanics: [] },
-  { mobId: 'voltaic_warden', mechanics: [] },
-  { mobId: 'prime_draft', final: true, mechanics: [] },
+  { mobId: 'line_master_tock', mechanics: ['moving_belts', 'stamping_press', 'summons_adds'] },
+  { mobId: 'rangewarden', mechanics: ['target_lock', 'proof_shot', 'summons_adds'] },
+  { mobId: 'voltaic_warden', mechanics: ['conduction_plating', 'static_lash', 'summons_adds'] },
+  {
+    mobId: 'prime_draft',
+    final: true,
+    mechanics: ['storm_cells', 'piston_fist', 'tremor_step', 'enrage'],
+  },
+];
+
+const STORMBRASS_FOUNDRY_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'line_master_tock',
+    mechanics: [...STORMBRASS_FOUNDRY_ENCOUNTERS[0].mechanics, 'overtime_cross_feed'],
+  },
+  {
+    mobId: 'rangewarden',
+    mechanics: [...STORMBRASS_FOUNDRY_ENCOUNTERS[1].mechanics, 'walking_barrage'],
+  },
+  {
+    mobId: 'voltaic_warden',
+    mechanics: [...STORMBRASS_FOUNDRY_ENCOUNTERS[2].mechanics, 'split_plating'],
+  },
+  {
+    mobId: 'prime_draft',
+    final: true,
+    mechanics: [...STORMBRASS_FOUNDRY_ENCOUNTERS[3].mechanics, 'double_load'],
+  },
 ];
 
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
@@ -446,7 +470,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'stormbrass_foundry',
-    encounters: STORMBRASS_FOUNDRY_ENCOUNTERS,
+    encounters: STORMBRASS_FOUNDRY_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {

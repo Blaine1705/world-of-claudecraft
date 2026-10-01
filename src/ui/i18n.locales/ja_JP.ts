@@ -19884,4 +19884,44 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象との距離が{from}ヤードを超える{stepYards}ヤードごとに与えるダメージが{perStep}%増加（最大{max}%）。',
   'hudChrome.auraEffect.trinket.overclock': '詠唱速度が{pct}%上昇。終了後にオーバーヒートする。',
   'hudChrome.auraEffect.trinket.overheated': '詠唱速度が{pct}%低下。',
+  'entities.npcs.lift_warden_corwin.name': '昇降機番コーウィン・アシュビー',
+  'entities.npcs.lift_warden_corwin.title': '嵐の線の昇降機の番人',
+  'entities.npcs.lift_warden_corwin.greeting':
+    'ケーブルに気をつけな。あの昇降機はまだ嵐の線の古い鋳造所まで登っていく。あそこの機械は、二度と戻らなかった主のためにまだ動いているんだ。',
+  'entities.quests.q_sf_storm_line.title': '嵐の線',
+  'entities.quests.q_sf_storm_line.text':
+    '{playerName}、昇降機が毎時運び下ろすのは鉄くずと火花ばかりで、生きた者は一人もいない。上ではまだ何かが線路を走っている。技師たちがガントリー運搬車と呼んだ巨大な蒸気クローラーだ。上がって操車場を叩き、あのクローラーを止めてくれ。',
+  'entities.quests.q_sf_storm_line.completion': '操車場が何年ぶりかで静かになった。静かだが、空っぽじゃない。聞け、その上でまだラインが動いている。',
+  'entities.quests.q_sf_storm_line.objectives.0.label': 'ガントリー運搬車を破壊',
+  'entities.quests.q_sf_stop_the_line.title': 'ラインを止めろ',
+  'entities.quests.q_sf_stop_the_line.text':
+    'ライン長アンブレル・トックは、主が去った後も鋳造所を動かし続け、一度も止まらなかった。今ではベルトに乗ったものを何でもプレス機に送り込む。{playerName}、奴を止めろ。そうすればライン全体が奴と共に止まる。',
+  'entities.quests.q_sf_stop_the_line.completion':
+    'トックは止まり、ベルトも止まった。奴が何を作っていたにせよ、誰か別の者のためだった。もっと上へ行け。',
+  'entities.quests.q_sf_stop_the_line.objectives.0.label': 'ライン長アンブレル・トックを倒す',
+  'entities.quests.q_sf_first_draft.title': '最初の草案',
+  'entities.quests.q_sf_first_draft.text':
+    '鋳造所の頂には、あそこのすべての機械が仕えるために作られたものが立っている。プライム・ドラフト、完成しなかった巨人だ。嵐がそれを目覚めさせたら、棚の下は何一つ安全じゃない。{playerName}、そいつを倒し、作り手がその中に残したものを読んでくれ。',
+  'entities.quests.q_sf_first_draft.completion':
+    '記録によれば、嵐は金属を動かせても、心を与えることはできなかった。「生きた水だけが覚えている」。最後の泉、そして鍛造父の島。これは奴の最初の作品だ、{playerName}。最後の作品はまだどこかにある。',
+  'entities.quests.q_sf_first_draft.objectives.0.label': '設計記録を読む',
+  'entities.quests.q_sf_forgefathers_isle.title': '鍛造父の島へ',
+  'entities.quests.q_sf_forgefathers_isle.text':
+    '記録は鍛造父の島の名を挙げている。メイリンという記録官が、何か月もそこの炉で槌の跡を読み解いている。{playerName}、設計記録を彼女に届けてくれ。ヴァルクルがここで何を学び、それで何をしたのか、彼女なら分かるはずだ。',
+  'entities.quests.q_sf_forgefathers_isle.completion':
+    '彼の最初の草案。嵐は炎より先だったのね。それなら彼が何を置き換えようとしていたのか、そして彼のオートマトンがなぜすべて失敗したのかが分かる。そばにいて。残りは一緒に読みましょう。',
+  'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '記録官メイリンを見つける',
+  'hudChrome.finder.mech.moving_belts': '動くベルト（床が運び、レバーで逆転する）',
+  'hudChrome.finder.mech.stamping_press': 'プレス機（プレス前の塗られた帯に乗るな）',
+  'hudChrome.finder.mech.target_lock': 'ターゲットロック（動き続けろ：砲弾はいた場所に落ちる）',
+  'hudChrome.finder.mech.proof_shot': '試験射撃（タンクの装甲をへこませる重い砲弾）',
+  'hudChrome.finder.mech.conduction_plating': '伝導装甲（正しい種類のダメージで攻撃せよ）',
+  'hudChrome.finder.mech.static_lash': '静電の鞭（タンクから近くの者へ跳ぶ）',
+  'hudChrome.finder.mech.storm_cells': 'ストームセル（開いたコアハッチにセルを運べ）',
+  'hudChrome.finder.mech.piston_fist': 'ピストンフィスト（印の円から出ろ）',
+  'hudChrome.finder.mech.tremor_step': '震動の踏みつけ（足元から離れろ）',
+  'hudChrome.finder.mech.overtime_cross_feed': '残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動く）',
+  'hudChrome.finder.mech.walking_barrage': '移動弾幕（三つの印、砲弾は破片を残す）',
+  'hudChrome.finder.mech.split_plating': '急速循環と分割装甲（反転が速く、背中はもう一方の面）',
+  'hudChrome.finder.mech.double_load': '詰まったラックと二重装填（一度のハッチの窓にセル二つ）',
 };

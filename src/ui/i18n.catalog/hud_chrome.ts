@@ -8775,6 +8775,21 @@ export const hudChromeStrings = {
       drowned_anchor: 'Drowned Anchor (break the chain before its victim is dragged into the pit)',
       shackle_pair: 'Shackle Pair (two chained players must stay close together)',
       reaper_behind: "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
+      // The Stormbrass Foundry (encounters/stormbrass_foundry).
+      moving_belts: 'Moving Belts (the floor carries you, and reverses on the lever)',
+      stamping_press: 'Stamping Press (stay off the painted strip at the press)',
+      target_lock: 'Target Lock (keep moving: shells land where you stood)',
+      proof_shot: 'Proof Shot (a heavy shell that dents the tank)',
+      conduction_plating: 'Conduction Plating (hit it with the right damage kind)',
+      static_lash: 'Static Lash (leaps from the tank to anyone close by)',
+      storm_cells: 'Storm Cells (carry a cell into the open Core Hatch)',
+      piston_fist: 'Piston Fist (move out of the marked circle)',
+      tremor_step: 'Tremor Step (keep clear of its feet)',
+      overtime_cross_feed: 'Overtime and Cross-Feed (faster belts, neighbors run opposite)',
+      walking_barrage: 'Walking Barrage (three marks, and the shells leave shrapnel)',
+      split_plating:
+        'Rapid Cycling and Split Plating (faster flips, its back wears the other face)',
+      double_load: 'Jammed Racks and Double Load (two cells in one hatch window)',
     },
   },
   // The Gaol Turnkey's Iron Cage escape prompt (src/ui/hud/dungeon/cage_escape).

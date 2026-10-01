@@ -3707,7 +3707,7 @@ export const DEEDS: Record<string, DeedDef> = {
   // triggers are frozen; adding the Foundry is the maintainer's call).
   dgn_stormbrass_foundry: {
     id: 'dgn_stormbrass_foundry',
-    name: 'Heart of the Storm',
+    name: 'Stormbrass Silenced',
     desc: 'Defeat the Prime Draft in the Stormbrass Foundry.',
     category: 'dungeon',
     renown: 10,

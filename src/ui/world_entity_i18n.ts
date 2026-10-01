@@ -496,6 +496,8 @@ const NPC_IDS = [
   'tidewarden_nel',
   // the Eastbrook quay's sparring master (content/practice_dummies.ts)
   'drillmaster_hale',
+  // the Stormbrass Foundry's Lift Warden (content/stormbrass_foundry_quests.ts)
+  'lift_warden_corwin',
 ] as const;
 
 const QUEST_IDS = [
@@ -730,6 +732,11 @@ const QUEST_IDS = [
   // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
   'q_hub_know_your_numbers',
   'q_hub_healing_numbers',
+  // The Stormbrass Foundry's chain (content/stormbrass_foundry_quests.ts).
+  'q_sf_storm_line',
+  'q_sf_stop_the_line',
+  'q_sf_first_draft',
+  'q_sf_forgefathers_isle',
 ] as const;
 
 const ZONE_IDS = [
