@@ -234,6 +234,7 @@ import {
   STORMBRASS_FOUNDRY_DUNGEON_DEFS,
   STORMBRASS_FOUNDRY_MOBS,
 } from './content/stormbrass_foundry';
+import { STORMBRASS_FOUNDRY_ITEMS } from './content/stormbrass_foundry_items';
 import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
 import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
@@ -433,6 +434,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   HOLLOW_CRYPT_ITEMS,
   SUNKEN_BASTION_ITEMS,
   DROWNED_TEMPLE_ITEMS,
+  STORMBRASS_FOUNDRY_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,

@@ -3133,6 +3133,8 @@ export const nl_NL: EnTranslations = {
         "pierce": "Voor {duration} sec, je auto-attacks, shots en fysieke vaardigheden (geen bloeds) slaan ook de vijand dichtst bij je doelwit binnen {reach} yd voor {share}% van de toegebrachte schade.",
         "lantern": "Zet een lantaarn aan je voeten voor {duration} sec. Een directe genezing van iemand op je of een partylidmaatje binnen {radius} yd ervan geneest ook het meest gewonde andere partylidmaatje in het licht voor {share}% van de genezing.",
         "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "rangefinder": "For {duration} sec, your damage increases by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}% at {maxAt} yd or more.",
+        "overclock": "Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.",
         "heartNova": "Breng alle hittestapels uit op een vuurvuur die {perHeat} Vuur schade per stapel ({max} op {maxHeat} stapels) aan elke vijand binnen {radius} yd doet en elke vijand die het raakt daagt uit. Schade neemt toe met Attack Power. Vereist een hittestapel."
       }
     },
@@ -4031,6 +4033,9 @@ export const nl_NL: EnTranslations = {
         "brand": "Ontvangen genezing is verminderd met {pct}%.",
         "shackle": "Chained in place: cannot move.",
         "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "rangefinder": "Damage increased by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}%.",
+        "overclock": "Casting speed increased by {pct}%. Overheated follows when it ends.",
+        "overheated": "Casting speed reduced by {pct}%.",
         "forgeHeat": "Hitte: {stacks}/{max}. Het gebruik van Tempering van de Smederij besteedt alles, en zijn wapenvuur toebrengt {pct}% meer schade.",
         "tempered": "Je melee- en afstandswapen treffen toebrengen {damage} extra Vuurschade ({pct}% meer van de bestede hitte). Elke trefferslag voegt {killExtend} sec toe, tot {maxDuration} sec totaal.",
         "temperedOther": "Melee- en afstandswapen treffen toebrengen extra Vuurschade, {pct}% meer van de bestede hitte. Schade groeit met Aanvalssterkte of Afstandsaanvalssterkte, welke het hoogst is.",
@@ -18677,6 +18682,78 @@ export const nl_NL: EnTranslations = {
       "tideglass_warmaul": {
         "name": "Tideglass Warmaul"
       },
+      "riveters_gauntlets": {
+        "name": "Riveter's Gauntlets"
+      },
+      "beltrunners_boots": {
+        "name": "Beltrunner's Boots"
+      },
+      "draftsmans_mantle": {
+        "name": "Draftsman's Mantle"
+      },
+      "tocks_torque_wrench": {
+        "name": "Tock's Torque Wrench"
+      },
+      "proofplate_legguards": {
+        "name": "Proofplate Legguards"
+      },
+      "rangefinders_hood": {
+        "name": "Rangefinder's Hood"
+      },
+      "coilwound_cord": {
+        "name": "Coilwound Cord"
+      },
+      "proving_range_quiver": {
+        "name": "Proving-Range Quiver"
+      },
+      "grounding_pauldrons": {
+        "name": "Grounding Pauldrons"
+      },
+      "arcstep_treads": {
+        "name": "Arcstep Treads"
+      },
+      "stormglass_circlet": {
+        "name": "Stormglass Circlet"
+      },
+      "voltaic_coil_staff": {
+        "name": "Voltaic Coil-Staff"
+      },
+      "draftplate_breastplate": {
+        "name": "Draftplate Breastplate"
+      },
+      "gearwork_jerkin": {
+        "name": "Gearwork Jerkin"
+      },
+      "stormbrass_robe": {
+        "name": "Stormbrass Robe"
+      },
+      "piston_maul": {
+        "name": "Prime Draft's Piston Maul"
+      },
+      "cellspark_dagger": {
+        "name": "Cellspark Dagger"
+      },
+      "governors_scepter": {
+        "name": "Governor's Scepter"
+      },
+      "line_masters_steam_hammer": {
+        "name": "Line-Master's Steam Hammer"
+      },
+      "rangewardens_targeting_visor": {
+        "name": "Rangewarden's Targeting Visor"
+      },
+      "stormglass_robes": {
+        "name": "Stormglass Robes"
+      },
+      "prime_draft_core_plate": {
+        "name": "Prime Draft Core-Plate"
+      },
+      "heartless_gearmask": {
+        "name": "Heartless Gearmask"
+      },
+      "draft_record": {
+        "name": "Draft Record"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -19534,6 +19611,12 @@ export const nl_NL: EnTranslations = {
       },
       "gaolers_iron_key": {
         "name": "Gaoler's Iron Key"
+      },
+      "rangefinders_lens": {
+        "name": "Rangefinder's Lens"
+      },
+      "overclocked_governor": {
+        "name": "Overclocked Governor"
       },
       "rift_watchers_band": {
         "name": "Breukwachter's Armband"

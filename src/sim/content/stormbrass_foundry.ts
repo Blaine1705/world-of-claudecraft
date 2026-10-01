@@ -461,10 +461,59 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     'humanoid',
     1.9,
     0x8a6d3b,
+    {
+      // Section 8.1: one guaranteed archetype piece and the Torque Wrench chase
+      // row. Heroic rides HEROIC_BOSS_LOOT.line_master_tock.
+      loot: [
+        { copper: 5000, chance: 1 },
+        {
+          itemId: 'riveters_gauntlets',
+          chance: 0.34,
+          rollGroup: 'tock_guaranteed',
+          normalOnly: true,
+        },
+        {
+          itemId: 'beltrunners_boots',
+          chance: 0.33,
+          rollGroup: 'tock_guaranteed',
+          normalOnly: true,
+        },
+        {
+          itemId: 'draftsmans_mantle',
+          chance: 0.33,
+          rollGroup: 'tock_guaranteed',
+          normalOnly: true,
+        },
+        { itemId: 'tocks_torque_wrench', chance: 0.1, normalOnly: true },
+      ],
+    },
   ),
   // The Rangewarden on the Proving Range (rangewarden.ts: G20 Target Lock
   // trail salvo, the bunkers, Proof Shot, Drill Drones). About 15,000 health.
-  rangewarden: foundryBoss('rangewarden', 'The Rangewarden', 20, 'elemental', 2.2, 0xa88940),
+  rangewarden: foundryBoss('rangewarden', 'The Rangewarden', 20, 'elemental', 2.2, 0xa88940, {
+    loot: [
+      { copper: 5000, chance: 1 },
+      {
+        itemId: 'proofplate_legguards',
+        chance: 0.34,
+        rollGroup: 'rangewarden_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'rangefinders_hood',
+        chance: 0.33,
+        rollGroup: 'rangewarden_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'coilwound_cord',
+        chance: 0.33,
+        rollGroup: 'rangewarden_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'proving_range_quiver', chance: 0.1, normalOnly: true },
+    ],
+  }),
   // The Voltaic Warden on the Coil Crown (voltaic_warden.ts: G21 Conduction
   // Plating, Stored Charge, Discharge, plated drones, Static Lash, Coil
   // Strike). About 15,000 health.
@@ -475,6 +524,30 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     'elemental',
     2.4,
     0x4e9c8a,
+    {
+      loot: [
+        { copper: 5000, chance: 1 },
+        {
+          itemId: 'grounding_pauldrons',
+          chance: 0.34,
+          rollGroup: 'voltaic_guaranteed',
+          normalOnly: true,
+        },
+        {
+          itemId: 'arcstep_treads',
+          chance: 0.33,
+          rollGroup: 'voltaic_guaranteed',
+          normalOnly: true,
+        },
+        {
+          itemId: 'stormglass_circlet',
+          chance: 0.33,
+          rollGroup: 'voltaic_guaranteed',
+          normalOnly: true,
+        },
+        { itemId: 'voltaic_coil_staff', chance: 0.1, normalOnly: true },
+      ],
+    },
   ),
   // The Prime Draft in its gantry (prime_draft.ts and storm_cells.ts: G12
   // storm cells, the Core Hatch, three phases, the enrage). About 26,000
@@ -489,7 +562,42 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     attackSpeed: 3,
     // The finale's money on the level 19 to 20 ladder (docs/design/dungeon-gold.md),
     // the shared five-man heroic finale base on heroic.
-    loot: [{ copper: 15000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 }],
+    // Section 8.1: the guaranteed archetype chest piece and the bonus group of
+    // three rares (one row of 0.06 each) beside the finale gold.
+    loot: [
+      { copper: 15000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
+      {
+        itemId: 'draftplate_breastplate',
+        chance: 0.34,
+        rollGroup: 'prime_draft_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'gearwork_jerkin',
+        chance: 0.33,
+        rollGroup: 'prime_draft_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'stormbrass_robe',
+        chance: 0.33,
+        rollGroup: 'prime_draft_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'piston_maul', chance: 0.06, rollGroup: 'prime_draft_bonus', normalOnly: true },
+      {
+        itemId: 'cellspark_dagger',
+        chance: 0.06,
+        rollGroup: 'prime_draft_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'governors_scepter',
+        chance: 0.06,
+        rollGroup: 'prime_draft_bonus',
+        normalOnly: true,
+      },
+    ],
   }),
 };
 

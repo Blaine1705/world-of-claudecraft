@@ -3133,6 +3133,8 @@ export const de_DE: EnTranslations = {
         "pierce": "{duration} Sek. lang treffen deine automatischen Angriffe, Schüsse und physischen Fähigkeiten (keine Blutungen) zusätzlich den Feind, der deinem Ziel am nächsten ist, im Umkreis von {reach} yd, für {share}% des verursachten Schadens.",
         "lantern": "Stelle {duration} Sek. lang eine Laterne zu deinen Füßen ab. Eine direkte Heilung von irgendjemandem auf dich oder ein Gruppenmitglied im Umkreis von {radius} yd davon heilt zusätzlich das am schwersten verwundete andere Gruppenmitglied in ihrem Licht um {share}% der Heilung.",
         "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "rangefinder": "For {duration} sec, your damage increases by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}% at {maxAt} yd or more.",
+        "overclock": "Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.",
         "heartNova": "Gib alle Hitzestapel für eine Feuernova aus, die jedem Feind im Umkreis von {radius} yd {perHeat} Feuerschaden pro Stapel zufügt ({max} bei {maxHeat} Stapeln) und jede getroffene Kreatur bedroht. Der Schaden steigt mit der Angriffskraft. Erfordert einen Hitzestapel."
       }
     },
@@ -4031,6 +4033,9 @@ export const de_DE: EnTranslations = {
         "brand": "Erhaltene Heilung wird um {pct}% verringert.",
         "shackle": "Chained in place: cannot move.",
         "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "rangefinder": "Damage increased by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}%.",
+        "overclock": "Casting speed increased by {pct}%. Overheated follows when it ends.",
+        "overheated": "Casting speed reduced by {pct}%.",
         "forgeHeat": "Hitze: {stacks}/{max}. Der Einsatz von Härtung des Schmiedevaters verbraucht sie vollständig, und ihr Waffenfeuer verursacht {pct}% mehr Schaden.",
         "tempered": "Deine Nah- und Fernkampf-Waffentreffer verursachen {damage} zusätzlichen Feuerschaden ({pct}% mehr durch die verbrauchte Hitze). Jeder tödliche Treffer fügt {killExtend} Sek. hinzu, insgesamt bis zu {maxDuration} Sek.",
         "temperedOther": "Nah- und Fernkampf-Waffentreffer verursachen zusätzlichen Feuerschaden, {pct}% mehr durch die verbrauchte Hitze. Der Schaden steigt mit Angriffskraft oder Fernkampf-Angriffskraft, je nachdem, welcher Wert höher ist.",
@@ -18677,6 +18682,78 @@ export const de_DE: EnTranslations = {
       "tideglass_warmaul": {
         "name": "Tideglass Warmaul"
       },
+      "riveters_gauntlets": {
+        "name": "Riveter's Gauntlets"
+      },
+      "beltrunners_boots": {
+        "name": "Beltrunner's Boots"
+      },
+      "draftsmans_mantle": {
+        "name": "Draftsman's Mantle"
+      },
+      "tocks_torque_wrench": {
+        "name": "Tock's Torque Wrench"
+      },
+      "proofplate_legguards": {
+        "name": "Proofplate Legguards"
+      },
+      "rangefinders_hood": {
+        "name": "Rangefinder's Hood"
+      },
+      "coilwound_cord": {
+        "name": "Coilwound Cord"
+      },
+      "proving_range_quiver": {
+        "name": "Proving-Range Quiver"
+      },
+      "grounding_pauldrons": {
+        "name": "Grounding Pauldrons"
+      },
+      "arcstep_treads": {
+        "name": "Arcstep Treads"
+      },
+      "stormglass_circlet": {
+        "name": "Stormglass Circlet"
+      },
+      "voltaic_coil_staff": {
+        "name": "Voltaic Coil-Staff"
+      },
+      "draftplate_breastplate": {
+        "name": "Draftplate Breastplate"
+      },
+      "gearwork_jerkin": {
+        "name": "Gearwork Jerkin"
+      },
+      "stormbrass_robe": {
+        "name": "Stormbrass Robe"
+      },
+      "piston_maul": {
+        "name": "Prime Draft's Piston Maul"
+      },
+      "cellspark_dagger": {
+        "name": "Cellspark Dagger"
+      },
+      "governors_scepter": {
+        "name": "Governor's Scepter"
+      },
+      "line_masters_steam_hammer": {
+        "name": "Line-Master's Steam Hammer"
+      },
+      "rangewardens_targeting_visor": {
+        "name": "Rangewarden's Targeting Visor"
+      },
+      "stormglass_robes": {
+        "name": "Stormglass Robes"
+      },
+      "prime_draft_core_plate": {
+        "name": "Prime Draft Core-Plate"
+      },
+      "heartless_gearmask": {
+        "name": "Heartless Gearmask"
+      },
+      "draft_record": {
+        "name": "Draft Record"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
@@ -19534,6 +19611,12 @@ export const de_DE: EnTranslations = {
       },
       "gaolers_iron_key": {
         "name": "Gaoler's Iron Key"
+      },
+      "rangefinders_lens": {
+        "name": "Rangefinder's Lens"
+      },
+      "overclocked_governor": {
+        "name": "Overclocked Governor"
       },
       "rift_watchers_band": {
         "name": "Reif des Rissbeobachters"

@@ -3133,6 +3133,8 @@ export const zh_CN: EnTranslations = {
         "pierce": "在 {duration} 秒内，你的自动攻击、射击和物理技能（流血除外）命中还会打击距离你的目标最近的、{reach} 码内的一个敌人，造成所造成伤害的 {share}%。",
         "lantern": "在你脚下放置一盏提灯，持续 {duration} 秒。任何人对提灯 {radius} 码内的你或队伍成员施放的直接治疗，还会以该治疗量的 {share}% 治疗灯光中受伤最重的另一名队伍成员。",
         "shackle": "用锁链将 {range} 码内的目标束缚在原地，持续 {duration} 秒。免疫控制的生物（例如首领）改为移动速度降低 {slow}%，除非它也免疫减速。",
+        "rangefinder": "在 {duration} 秒内，你与目标之间的距离每超过 {from} 码 {stepYards} 码，你造成的伤害提高 {perStep}%，在 {maxAt} 码或更远时最多提高 {max}%。",
+        "overclock": "使你的施法速度提高 {haste}%，持续 {duration} 秒。效果结束时你会过热：施法速度降低 {slow}%，持续 {overheat} 秒。",
         "heartNova": "消耗所有热量释放一道火焰新星，对 {radius} 码内的每个敌人每层热量造成 {perHeat} 点火焰伤害（{maxHeat} 层时为 {max} 点），并嘲讽其命中的每个生物。伤害随攻击强度提高。需要至少一层热量。"
       }
     },
@@ -4031,6 +4033,9 @@ export const zh_CN: EnTranslations = {
         "brand": "受到的治疗效果降低 {pct}%。",
         "shackle": "被锁链束缚：无法移动。",
         "shackleSlow": "锁链缠身：移动速度降低 {pct}%。",
+        "rangefinder": "你与目标之间的距离每超过 {from} 码 {stepYards} 码，造成的伤害提高 {perStep}%，最多 {max}%。",
+        "overclock": "施法速度提高 {pct}%。效果结束时会过热。",
+        "overheated": "施法速度降低 {pct}%。",
         "forgeHeat": "热量：{stacks}/{max}。使用熔铸之父的淬火会消耗所有热量，使其武器火焰伤害提高 {pct}%。",
         "tempered": "你的近战和远程武器命中额外造成 {damage} 点火焰伤害（消耗的热量使其提高 {pct}%）。每次致命一击延长 {killExtend} 秒，总计最多 {maxDuration} 秒。",
         "temperedOther": "近战和远程武器命中额外造成火焰伤害，消耗的热量使其提高 {pct}%。伤害随攻击强度或远程攻击强度中较高者提高。",
@@ -18677,6 +18682,78 @@ export const zh_CN: EnTranslations = {
       "tideglass_warmaul": {
         "name": "潮镜战槌"
       },
+      "riveters_gauntlets": {
+        "name": "铆工护手"
+      },
+      "beltrunners_boots": {
+        "name": "传送带奔行靴"
+      },
+      "draftsmans_mantle": {
+        "name": "制图师肩衣"
+      },
+      "tocks_torque_wrench": {
+        "name": "托克的扭力扳手"
+      },
+      "proofplate_legguards": {
+        "name": "试炼板甲护腿"
+      },
+      "rangefinders_hood": {
+        "name": "测距手兜帽"
+      },
+      "coilwound_cord": {
+        "name": "绕线束带"
+      },
+      "proving_range_quiver": {
+        "name": "试验靶场箭袋"
+      },
+      "grounding_pauldrons": {
+        "name": "接地肩甲"
+      },
+      "arcstep_treads": {
+        "name": "电弧步履靴"
+      },
+      "stormglass_circlet": {
+        "name": "风暴玻璃头环"
+      },
+      "voltaic_coil_staff": {
+        "name": "伏打线圈法杖"
+      },
+      "draftplate_breastplate": {
+        "name": "原型板胸甲"
+      },
+      "gearwork_jerkin": {
+        "name": "齿轮工皮甲衣"
+      },
+      "stormbrass_robe": {
+        "name": "风暴黄铜长袍"
+      },
+      "piston_maul": {
+        "name": "初代原型的活塞巨锤"
+      },
+      "cellspark_dagger": {
+        "name": "电池火花匕首"
+      },
+      "governors_scepter": {
+        "name": "调速器权杖"
+      },
+      "line_masters_steam_hammer": {
+        "name": "产线主管的蒸汽锤"
+      },
+      "rangewardens_targeting_visor": {
+        "name": "靶场守卫的瞄准面甲"
+      },
+      "stormglass_robes": {
+        "name": "风暴玻璃法袍"
+      },
+      "prime_draft_core_plate": {
+        "name": "初代原型核心板甲"
+      },
+      "heartless_gearmask": {
+        "name": "无心齿轮面具"
+      },
+      "draft_record": {
+        "name": "设计图记录"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19534,6 +19611,12 @@ export const zh_CN: EnTranslations = {
       },
       "gaolers_iron_key": {
         "name": "狱卒铁钥匙"
+      },
+      "rangefinders_lens": {
+        "name": "测距手透镜"
+      },
+      "overclocked_governor": {
+        "name": "超频调速器"
       },
       "rift_watchers_band": {
         "name": "裂隙守望者指环"

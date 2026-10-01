@@ -96,7 +96,21 @@ export type TrinketUse =
   /** Gaoler's Iron Key: chain an enemy within `range` in place for `duration`;
    *  one immune to control is slowed to `slow` of its speed instead (a target
    *  immune to slows as well shrugs it off). */
-  | { kind: 'shackle'; range: number; duration: number; slow: number };
+  | { kind: 'shackle'; range: number; duration: number; slow: number }
+  /** Rangefinder's Lens: for `duration`, your damage rises with your distance
+   *  to the target: `perStep` more for every `stepYards` yards beyond `from`
+   *  yards, up to `max`. */
+  | {
+      kind: 'rangefinder';
+      duration: number;
+      from: number;
+      stepYards: number;
+      perStep: number;
+      max: number;
+    }
+  /** Overclocked Governor: `haste` more casting speed for `duration`, then
+   *  Overheated: `slow` less casting speed for `overheat` seconds. */
+  | { kind: 'overclock'; duration: number; haste: number; overheat: number; slow: number };
 
 /** What a trinket does on its own while worn. */
 export type TrinketPassive =
@@ -160,6 +174,9 @@ export const TRINKET_AURA = Object.freeze({
   lantern: 'trinket_lantern',
   guardHeat: 'trinket_crucible_heat',
   shackle: 'trinket_shackle',
+  rangefinder: 'trinket_rangefinder',
+  overclock: 'trinket_overclock',
+  overheated: 'trinket_overheated',
 });
 
 /** The Mooring Stone's self-slow rides its own aura id beside the anchor
@@ -198,6 +215,9 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.lantern]: 'last_flame_lantern',
   [TRINKET_AURA.guardHeat]: 'heart_of_the_crucible',
   [TRINKET_AURA.shackle]: 'gaolers_iron_key',
+  [TRINKET_AURA.rangefinder]: 'rangefinders_lens',
+  [TRINKET_AURA.overclock]: 'overclocked_governor',
+  [TRINKET_AURA.overheated]: 'overclocked_governor',
 });
 
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
@@ -272,6 +292,10 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   // The Sunken Bastion's heroic Gaoler Ossick (the five-man heroic trinket
   // line of the Bastion Sigil).
   gaolers_iron_key: trinket('gaolers_iron_key', "Gaoler's Iron Key", { sta: 13 }),
+  // The Stormbrass Foundry's heroic Rangewarden and Voltaic Warden (the five-man
+  // heroic trinket line, docs/design/dungeon-rework/stormbrass_foundry.md 8.2).
+  rangefinders_lens: trinket('rangefinders_lens', "Rangefinder's Lens", { agi: 13 }),
+  overclocked_governor: trinket('overclocked_governor', 'Overclocked Governor', { int: 13 }),
 };
 
 // The Crucible of the Last Spring raid trinkets, in the order they sit in their
@@ -381,7 +405,25 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
     cooldown: 120,
     use: { kind: 'shackle', range: 30, duration: 6, slow: 0.7 },
   },
+  rangefinders_lens: {
+    cooldown: 120,
+    use: { kind: 'rangefinder', duration: 12, from: 10, stepYards: 2, perStep: 0.01, max: 0.1 },
+  },
+  overclocked_governor: {
+    cooldown: 120,
+    use: { kind: 'overclock', duration: 10, haste: 0.25, overheat: 5, slow: 0.1 },
+  },
 });
+
+/** Rangefinder's Lens: the extra damage share a hit gets at `distance` yards. */
+export function rangefinderBonusAt(
+  distance: number,
+  use: { from: number; stepYards: number; perStep: number; max: number },
+): number {
+  const steps = Math.floor((distance - use.from) / use.stepYards + 1e-9);
+  if (steps <= 0) return 0;
+  return Math.min(use.max, steps * use.perStep);
+}
 
 /** The four fortunes of the Gambler's Die, rolled with the sim's own Rng. */
 export const GAMBLE_FORTUNES = ['keenEdge', 'luckyHeal', 'gildedGuard', 'snakeEyes'] as const;

@@ -3133,6 +3133,8 @@ export const ja_JP: EnTranslations = {
         "pierce": "{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。",
         "lantern": "{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。",
         "shackle": "{range}ヤード以内の対象を{duration}秒間その場に鎖で縛る。ボスなど行動阻害に耐性のあるクリーチャーは、代わりに移動速度が{slow}%低下する（減速にも耐性がある場合は無効）。",
+        "rangefinder": "{duration}秒間、自分と対象の距離が{from}ヤードを超える{stepYards}ヤードごとに与えるダメージが{perStep}%増加する（{maxAt}ヤード以上で最大{max}%）。",
+        "overclock": "{duration}秒間、詠唱速度が{haste}%上昇する。効果が終わるとオーバーヒートし、{overheat}秒間詠唱速度が{slow}%低下する。",
         "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。"
       }
     },
@@ -4031,6 +4033,9 @@ export const ja_JP: EnTranslations = {
         "brand": "受ける回復量が{pct}%減少する。",
         "shackle": "鎖で縛られている：移動できない。",
         "shackleSlow": "鎖につながれている：移動速度が{pct}%低下。",
+        "rangefinder": "対象との距離が{from}ヤードを超える{stepYards}ヤードごとに与えるダメージが{perStep}%増加（最大{max}%）。",
+        "overclock": "詠唱速度が{pct}%上昇。終了後にオーバーヒートする。",
+        "overheated": "詠唱速度が{pct}%低下。",
         "forgeHeat": "熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。",
         "tempered": "近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。",
         "temperedOther": "近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
@@ -18677,6 +18682,78 @@ export const ja_JP: EnTranslations = {
       "tideglass_warmaul": {
         "name": "潮硝子の戦槌"
       },
+      "riveters_gauntlets": {
+        "name": "リベット工のガントレット"
+      },
+      "beltrunners_boots": {
+        "name": "ベルトランナーのブーツ"
+      },
+      "draftsmans_mantle": {
+        "name": "製図師のマントル"
+      },
+      "tocks_torque_wrench": {
+        "name": "トックのトルクレンチ"
+      },
+      "proofplate_legguards": {
+        "name": "試験板のレッグガード"
+      },
+      "rangefinders_hood": {
+        "name": "測距手のフード"
+      },
+      "coilwound_cord": {
+        "name": "コイル巻きの帯"
+      },
+      "proving_range_quiver": {
+        "name": "試験射場の矢筒"
+      },
+      "grounding_pauldrons": {
+        "name": "接地のポールドロン"
+      },
+      "arcstep_treads": {
+        "name": "アークステップのトレッド"
+      },
+      "stormglass_circlet": {
+        "name": "ストームグラスのサークレット"
+      },
+      "voltaic_coil_staff": {
+        "name": "ヴォルタのコイルスタッフ"
+      },
+      "draftplate_breastplate": {
+        "name": "試作板の胸当て"
+      },
+      "gearwork_jerkin": {
+        "name": "歯車仕掛けのジャーキン"
+      },
+      "stormbrass_robe": {
+        "name": "ストームブラスのローブ"
+      },
+      "piston_maul": {
+        "name": "プライム・ドラフトのピストンモール"
+      },
+      "cellspark_dagger": {
+        "name": "セルスパークの短剣"
+      },
+      "governors_scepter": {
+        "name": "ガバナーの王笏"
+      },
+      "line_masters_steam_hammer": {
+        "name": "ライン長のスチームハンマー"
+      },
+      "rangewardens_targeting_visor": {
+        "name": "射場番の照準バイザー"
+      },
+      "stormglass_robes": {
+        "name": "ストームグラスの法衣"
+      },
+      "prime_draft_core_plate": {
+        "name": "プライム・ドラフトのコアプレート"
+      },
+      "heartless_gearmask": {
+        "name": "心なき歯車の仮面"
+      },
+      "draft_record": {
+        "name": "設計記録"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19534,6 +19611,12 @@ export const ja_JP: EnTranslations = {
       },
       "gaolers_iron_key": {
         "name": "牢番の鉄鍵"
+      },
+      "rangefinders_lens": {
+        "name": "測距手のレンズ"
+      },
+      "overclocked_governor": {
+        "name": "オーバークロックのガバナー"
       },
       "rift_watchers_band": {
         "name": "裂け目の監視者の指輪"

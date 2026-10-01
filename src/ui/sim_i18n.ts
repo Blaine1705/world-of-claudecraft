@@ -1497,6 +1497,8 @@ const baseEnTable = {
   'aura.trinketForgeHeat': 'Forge Heat',
   'aura.trinketMoltenIgnite': 'Molten Ignite',
   'aura.trinketCrucibleHeat': 'Crucible Heat',
+  'aura.trinketOverclocked': 'Overclocked',
+  'aura.trinketOverheated': 'Overheated',
   'error.trinketNoHeat': 'Your heart holds no heat.',
 } as const;
 
@@ -17598,6 +17600,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Forge Heat': 'aura.trinketForgeHeat',
   'Molten Ignite': 'aura.trinketMoltenIgnite',
   'Crucible Heat': 'aura.trinketCrucibleHeat',
+  Overclocked: 'aura.trinketOverclocked',
+  Overheated: 'aura.trinketOverheated',
   'Crafted Momentum': 'aura.craftedMomentum',
   'Crafted Shelter': 'aura.craftedShelter',
   'Crafted Preservation': 'aura.craftedPreservation',
@@ -18161,6 +18165,7 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   'Kindling Orb': 'kindling_orb',
   'Molten Fletching': 'molten_fletching',
   'Last Flame Lantern': 'last_flame_lantern',
+  "Rangefinder's Lens": 'rangefinders_lens',
   'Heart of the Crucible': 'heart_of_the_crucible',
 };
 

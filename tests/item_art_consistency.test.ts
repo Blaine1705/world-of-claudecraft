@@ -1018,9 +1018,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
     // The Sunken Bastion fifth pass's three Gaol Turnkey loot icons: 1,486.
-    expect(new Set(currentOwnerIds).size).toBe(1486);
-    expect(shippingIds).toHaveLength(1486);
-    expect(Object.keys(ITEMS)).toHaveLength(1660);
+    // The Stormbrass Foundry's 27 loot icons (stormbrass-foundry-icons-2026-10-01): 1,513.
+    expect(new Set(currentOwnerIds).size).toBe(1513);
+    expect(shippingIds).toHaveLength(1513);
+    // 1,660 + the Foundry's 26 item definitions and their 6 generated heroic
+    // rares = 1,692.
+    expect(Object.keys(ITEMS)).toHaveLength(1692);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1182,12 +1185,15 @@ describe('item-art consistency accepted-art provenance', () => {
         'vanguard_oath_blade',
         'vanguard_fang_dagger',
         'vanguard_warstaff',
-        // The dungeon reworks' loot batches (Sunken Bastion, Drowned Temple).
+        // The dungeon reworks' loot batches (Sunken Bastion, Drowned Temple,
+        // Stormbrass Foundry).
         ...mapping.generatedBatches
           .filter(({ batchId }) =>
-            ['sunken-bastion-icons-2026-09-29', 'drowned-temple-icons-2026-09-30'].includes(
-              batchId ?? '',
-            ),
+            [
+              'sunken-bastion-icons-2026-09-29',
+              'drowned-temple-icons-2026-09-30',
+              'stormbrass-foundry-icons-2026-10-01',
+            ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
       ]),
@@ -1359,8 +1365,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
     // batch (warfare-season2-weapons-2026-09-25) = 38. The Sunken Bastion
     // rework's loot icons (sunken-bastion-icons-2026-09-29) add one more, and
-    // the Drowned Temple rework's (drowned-temple-icons-2026-09-30) another.
-    expect(mapping.generatedBatches).toHaveLength(43);
+    // the Drowned Temple rework's (drowned-temple-icons-2026-09-30) another,
+    // and the Stormbrass Foundry's (stormbrass-foundry-icons-2026-10-01) another.
+    expect(mapping.generatedBatches).toHaveLength(44);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1433,13 +1440,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Sunken Bastion loot batch (sunken-bastion-icons-2026-09-29) adds 8: 942.
     // The Drowned Temple loot batch (drowned-temple-icons-2026-09-30) adds 11: 953.
     // The Sunken Bastion fifth pass adds the Gaol Turnkey's 3 to its batch: 956.
-    expect(priorGeneratedIds).toHaveLength(956);
+    // The Stormbrass Foundry loot batch (stormbrass-foundry-icons-2026-10-01) adds 27: 983.
+    expect(priorGeneratedIds).toHaveLength(983);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1486);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1486);
+    // + the Stormbrass Foundry's 27 = 1,513.
+    expect(allCurrentOwnerIds).toHaveLength(1513);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1513);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1456,7 +1465,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Sunken Bastion rework's 8 loot icons = 942.
       // + the Drowned Temple rework's 11 loot icons = 953.
       // + the Gaol Turnkey's 3 (the Bastion fifth pass) = 956.
-      priorGenerated: 956,
+      // + the Stormbrass Foundry's 27 loot icons = 983.
+      priorGenerated: 983,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1538,6 +1548,8 @@ describe('item-art consistency accepted-art provenance', () => {
                 'sunken-bastion-icons-2026-09-29',
                 // The Drowned Temple rework's loot.
                 'drowned-temple-icons-2026-09-30',
+                // The Stormbrass Foundry's loot.
+                'stormbrass-foundry-icons-2026-10-01',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1687,10 +1699,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483. Plus the Gaol Turnkey's 3 (the Bastion fifth pass) = 1486.
-    if (ownerIds.length !== 1486)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1486`);
-    if (fileIds.length !== 1486) violations.push(`shipping WebP count: ${fileIds.length} != 1486`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483. Plus the Gaol Turnkey's 3 (the Bastion fifth pass) = 1486. Plus the Stormbrass Foundry's 27 loot icons = 1513.
+    if (ownerIds.length !== 1513)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1513`);
+    if (fileIds.length !== 1513) violations.push(`shipping WebP count: ${fileIds.length} != 1513`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -111,6 +111,12 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
       'Equip: Each attack you parry, dodge or block adds a heat stack, up to 10. Heat lasts 30 sec, refreshed whenever you gain a stack.',
     use: 'Use: Spend all heat stacks on a fire nova that deals 8 (+25) Fire damage per stack (330 at 10 stacks) to each enemy within 10 yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack. (1 min cooldown)',
   },
+  rangefinders_lens: {
+    use: 'Use: For 12 sec, your damage increases by 1% for every 2 yd between you and your target beyond 10 yd, up to 10% at 30 yd or more. (2 min cooldown)',
+  },
+  overclocked_governor: {
+    use: 'Use: Increase your casting speed by 25% for 10 sec. When it ends you are Overheated: your casting speed is reduced by 10% for 5 sec. (2 min cooldown)',
+  },
   gaolers_iron_key: {
     use: 'Use: Chain your target within 30 yd in place for 6 sec. A creature immune to control, such as a boss, is slowed by 30% instead, unless it is also immune to slows. (2 min cooldown)',
   },
@@ -144,7 +150,7 @@ function shownTotal(text: string, before: string, after: string): number {
 }
 
 describe('trinket tooltip lines', () => {
-  it('covers exactly the nineteen trinkets', () => {
+  it('covers exactly the twenty-one trinkets', () => {
     expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
     expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
   });

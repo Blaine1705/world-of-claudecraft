@@ -493,7 +493,9 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
     expect(leaks).toEqual([]);
     // The skip is not a hole: the sanctioned group must actually be present,
     // or this arm would be sweeping a surface the channel silently left.
-    expect(sanctioned, 'the sanctioned farm group must really be on these tables').toBe(10);
+    // Six five-man final bosses carry its two rows since the Stormbrass Foundry's
+    // Prime Draft joined the five shipped ones: 12.
+    expect(sanctioned, 'the sanctioned farm group must really be on these tables').toBe(12);
   });
 
   it('the rift clear pools carry no pattern id (patterns have no slot, so they cannot enter)', () => {

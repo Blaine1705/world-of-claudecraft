@@ -205,6 +205,24 @@ export function trinketAuraEffectDescriptor(
       return { key: `${KEY}.sprint`, nums: { pct: pct(a.value - 1) } };
     case TRINKET_AURA.brand:
       return { key: `${KEY}.brand`, nums: { pct: pct(a.value) } };
+    case TRINKET_AURA.rangefinder: {
+      const use = useOf('rangefinders_lens', 'rangefinder');
+      if (!use) return null;
+      return {
+        key: `${KEY}.rangefinder`,
+        nums: {
+          perStep: pct(use.perStep),
+          stepYards: use.stepYards,
+          from: use.from,
+          max: pct(use.max),
+        },
+      };
+    }
+    case TRINKET_AURA.overclock:
+      return { key: `${KEY}.overclock`, nums: { pct: pct(a.value) } };
+    case TRINKET_AURA.overheated:
+      // value is the cast-time stretch (Curse of Tongues math): 1 / (1 - slow).
+      return { key: `${KEY}.overheated`, nums: { pct: pct(1 - 1 / a.value) } };
     case TRINKET_AURA.shackle:
       // Rooted, or (on a creature immune to control) slowed.
       if (a.kind === 'slow') return { key: `${KEY}.shackleSlow`, nums: { pct: pct(1 - a.value) } };

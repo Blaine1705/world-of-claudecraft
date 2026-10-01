@@ -158,7 +158,7 @@ import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiri
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
-import { onTrinketDamage } from './trinkets';
+import { onTrinketDamage, rangefinderDamageBonus } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -476,6 +476,7 @@ export function dealDamage(
       }
     }
     damageDone += craftedPetDamageMultiplier(ctx, source) - 1;
+    damageDone += rangefinderDamageBonus(source, target);
     if (damageDone !== 0) amount = Math.round(amount * Math.max(0, 1 + damageDone));
   }
 

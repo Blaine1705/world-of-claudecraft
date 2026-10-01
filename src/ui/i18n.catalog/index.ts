@@ -1951,6 +1951,9 @@ export const en = {
       heart_of_the_crucible: { name: 'Heart of the Crucible' },
       // The Sunken Bastion's heroic Gaoler Ossick.
       gaolers_iron_key: { name: "Gaoler's Iron Key" },
+      // The Stormbrass Foundry's heroic Rangewarden and Voltaic Warden.
+      rangefinders_lens: { name: "Rangefinder's Lens" },
+      overclocked_governor: { name: 'Overclocked Governor' },
       // Faction Quartermaster vendor items
       rift_watchers_band: { name: "Rift Watcher's Band" },
       rift_surveyors_satchel: { name: "Rift Surveyor's Satchel" },

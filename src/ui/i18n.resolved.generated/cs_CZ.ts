@@ -3133,6 +3133,8 @@ export const cs_CZ: EnTranslations = {
         "pierce": "Po dobu {duration} s tvé automatické útoky, výstřely a fyzické schopnosti (kromě krvácení) zasáhnou navíc i nejbližšího nepřítele k tvému cíli v okruhu {reach} yardů za {share} % způsobeného poškození.",
         "lantern": "Umístíš si k nohám lucernu na {duration} s. Přímé léčení od kohokoli na tebe nebo na člena skupiny v okruhu {radius} yardů od ní také vyléčí nejzraněnějšího jiného člena skupiny v jejím světle za {share} % léčení.",
         "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "rangefinder": "For {duration} sec, your damage increases by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}% at {maxAt} yd or more.",
+        "overclock": "Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.",
         "heartNova": "Utratíš všechna nabití žáru na ohnivou novu, která způsobí {perHeat} ohnivého poškození za nabití ({max} při {maxHeat} nabitích) každému nepříteli v okruhu {radius} yardů a vyprovokuje každého tvora, kterého zasáhne. Poškození roste se silou útoku. Vyžaduje nabití žáru."
       }
     },
@@ -4031,6 +4033,9 @@ export const cs_CZ: EnTranslations = {
         "brand": "Přijaté léčení je sníženo o {pct} %.",
         "shackle": "Chained in place: cannot move.",
         "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "rangefinder": "Damage increased by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}%.",
+        "overclock": "Casting speed increased by {pct}%. Overheated follows when it ends.",
+        "overheated": "Casting speed reduced by {pct}%.",
         "forgeHeat": "Žár: {stacks}/{max}. Použití Kovářského kaliče spotřebuje všechen žár a jeho ohnivý úder zbraní způsobí o {pct} % více poškození.",
         "tempered": "Tvé údery zbraní na blízko a na dálku způsobí {damage} ohnivého poškození navíc (o {pct} % více z vydaného žáru). Každý smrtící úder přidá {killExtend} s, až do celkových {maxDuration} s.",
         "temperedOther": "Údery zbraní na blízko a na dálku způsobí ohnivé poškození navíc, o {pct} % více z vydaného žáru. Poškození roste se silou útoku nebo útočnou silou na dálku, podle toho, která je vyšší.",
@@ -18677,6 +18682,78 @@ export const cs_CZ: EnTranslations = {
       "tideglass_warmaul": {
         "name": "Tideglass Warmaul"
       },
+      "riveters_gauntlets": {
+        "name": "Riveter's Gauntlets"
+      },
+      "beltrunners_boots": {
+        "name": "Beltrunner's Boots"
+      },
+      "draftsmans_mantle": {
+        "name": "Draftsman's Mantle"
+      },
+      "tocks_torque_wrench": {
+        "name": "Tock's Torque Wrench"
+      },
+      "proofplate_legguards": {
+        "name": "Proofplate Legguards"
+      },
+      "rangefinders_hood": {
+        "name": "Rangefinder's Hood"
+      },
+      "coilwound_cord": {
+        "name": "Coilwound Cord"
+      },
+      "proving_range_quiver": {
+        "name": "Proving-Range Quiver"
+      },
+      "grounding_pauldrons": {
+        "name": "Grounding Pauldrons"
+      },
+      "arcstep_treads": {
+        "name": "Arcstep Treads"
+      },
+      "stormglass_circlet": {
+        "name": "Stormglass Circlet"
+      },
+      "voltaic_coil_staff": {
+        "name": "Voltaic Coil-Staff"
+      },
+      "draftplate_breastplate": {
+        "name": "Draftplate Breastplate"
+      },
+      "gearwork_jerkin": {
+        "name": "Gearwork Jerkin"
+      },
+      "stormbrass_robe": {
+        "name": "Stormbrass Robe"
+      },
+      "piston_maul": {
+        "name": "Prime Draft's Piston Maul"
+      },
+      "cellspark_dagger": {
+        "name": "Cellspark Dagger"
+      },
+      "governors_scepter": {
+        "name": "Governor's Scepter"
+      },
+      "line_masters_steam_hammer": {
+        "name": "Line-Master's Steam Hammer"
+      },
+      "rangewardens_targeting_visor": {
+        "name": "Rangewarden's Targeting Visor"
+      },
+      "stormglass_robes": {
+        "name": "Stormglass Robes"
+      },
+      "prime_draft_core_plate": {
+        "name": "Prime Draft Core-Plate"
+      },
+      "heartless_gearmask": {
+        "name": "Heartless Gearmask"
+      },
+      "draft_record": {
+        "name": "Draft Record"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -19534,6 +19611,12 @@ export const cs_CZ: EnTranslations = {
       },
       "gaolers_iron_key": {
         "name": "Gaoler's Iron Key"
+      },
+      "rangefinders_lens": {
+        "name": "Rangefinder's Lens"
+      },
+      "overclocked_governor": {
+        "name": "Overclocked Governor"
       },
       "rift_watchers_band": {
         "name": "Trhlinohlídačova obroučka"

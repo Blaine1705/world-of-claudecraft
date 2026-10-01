@@ -816,6 +816,12 @@ export const RELIQUARY_HEROIC_GEAR = {
     'bloodmane_war_legguards',
     'paired_talons',
   ],
+  // The Stormbrass Foundry (stormbrass_foundry.md 8.2): a new epic (or a
+  // trinket) on every boss, sharing the one heroic page.
+  line_master_tock: ['line_masters_steam_hammer'],
+  rangewarden: ['rangefinders_lens', 'rangewardens_targeting_visor'],
+  voltaic_warden: ['overclocked_governor', 'stormglass_robes'],
+  prime_draft: ['prime_draft_core_plate', 'heartless_gearmask'],
   nythraxis_scourge_of_thornpeak: [
     'deathless_greatblade',
     'scepter_of_the_deathless_court',
@@ -2017,6 +2023,40 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // needs a character of every class.
     excludeFromCompletion: 'personal',
     relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
+  },
+  // The Stormbrass Foundry, a new five-player dungeon (stormbrass_foundry.md
+  // section 9): appended per the append-only page table. Four bosses pay the
+  // pages, so every row names its own; only relics with committed art.
+  {
+    id: 'conquerors_stormbrass_foundry',
+    shelf: 'conquerors',
+    name: 'The Stormbrass Foundry',
+    desc: 'Rare spoils from Line-Master Ambrel Tock, the Rangewarden, the Voltaic Warden and the Prime Draft.',
+    clearSource: { kind: 'dungeon', dungeonId: 'stormbrass_foundry', difficulty: 'any' },
+    relics: items(
+      ['tocks_torque_wrench', fromBoss('line_master_tock')],
+      ['proving_range_quiver', fromBoss('rangewarden')],
+      ['voltaic_coil_staff', fromBoss('voltaic_warden')],
+      ['piston_maul', fromBoss('prime_draft')],
+      ['cellspark_dagger', fromBoss('prime_draft')],
+      ['governors_scepter', fromBoss('prime_draft')],
+    ),
+  },
+  {
+    id: 'conquerors_stormbrass_foundry_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Stormbrass Foundry',
+    desc: 'Heroic-only epics and trinkets from the four bosses of the Stormbrass Foundry.',
+    clearSource: { kind: 'dungeon', dungeonId: 'stormbrass_foundry', difficulty: 'heroic' },
+    relics: items(
+      ['line_masters_steam_hammer', fromBoss('line_master_tock')],
+      ['rangefinders_lens', fromBoss('rangewarden')],
+      ['rangewardens_targeting_visor', fromBoss('rangewarden')],
+      ['overclocked_governor', fromBoss('voltaic_warden')],
+      ['stormglass_robes', fromBoss('voltaic_warden')],
+      ['prime_draft_core_plate', fromBoss('prime_draft')],
+      ['heartless_gearmask', fromBoss('prime_draft')],
+    ),
   },
 ]);
 

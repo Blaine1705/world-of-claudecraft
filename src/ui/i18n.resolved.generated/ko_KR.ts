@@ -3133,6 +3133,8 @@ export const ko_KR: EnTranslations = {
         "pierce": "{duration}초 동안 자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.",
         "lantern": "{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.",
         "shackle": "{range}미터 이내의 대상을 {duration}초 동안 사슬로 묶어 제자리에 고정합니다. 우두머리처럼 제어 효과에 면역인 생물은 대신 이동 속도가 {slow}% 감소하며, 감속에도 면역이면 효과가 없습니다.",
+        "rangefinder": "{duration}초 동안 대상과의 거리가 {from}미터를 넘는 {stepYards}미터마다 주는 피해가 {perStep}% 증가합니다. {maxAt}미터 이상에서 최대 {max}%입니다.",
+        "overclock": "{duration}초 동안 시전 속도가 {haste}% 증가합니다. 효과가 끝나면 과열되어 {overheat}초 동안 시전 속도가 {slow}% 감소합니다.",
         "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다."
       }
     },
@@ -4031,6 +4033,9 @@ export const ko_KR: EnTranslations = {
         "brand": "받는 치유량이 {pct}% 감소합니다.",
         "shackle": "사슬에 묶임: 이동할 수 없습니다.",
         "shackleSlow": "사슬에 묶임: 이동 속도가 {pct}% 감소합니다.",
+        "rangefinder": "대상과의 거리가 {from}미터를 넘는 {stepYards}미터마다 주는 피해가 {perStep}% 증가합니다(최대 {max}%).",
+        "overclock": "시전 속도가 {pct}% 증가합니다. 끝나면 과열됩니다.",
+        "overheated": "시전 속도가 {pct}% 감소합니다.",
         "forgeHeat": "열기: {stacks}/{max}. 대장장이 아버지의 담금질을 사용하면 열기를 모두 소모하며, 그 무기 화염 피해가 {pct}% 증가합니다.",
         "tempered": "근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입힙니다(소모한 열기로 {pct}% 증가). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다.",
         "temperedOther": "근접 및 원거리 무기가 적중하면 화염 피해를 추가로 입히며, 소모한 열기로 {pct}% 증가합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
@@ -18677,6 +18682,78 @@ export const ko_KR: EnTranslations = {
       "tideglass_warmaul": {
         "name": "조수유리 전투망치"
       },
+      "riveters_gauntlets": {
+        "name": "리벳공의 건틀릿"
+      },
+      "beltrunners_boots": {
+        "name": "벨트 질주자의 장화"
+      },
+      "draftsmans_mantle": {
+        "name": "제도사의 어깨망토"
+      },
+      "tocks_torque_wrench": {
+        "name": "토크의 토크 렌치"
+      },
+      "proofplate_legguards": {
+        "name": "시험판 다리보호구"
+      },
+      "rangefinders_hood": {
+        "name": "거리측정수의 두건"
+      },
+      "coilwound_cord": {
+        "name": "코일 감은 허리끈"
+      },
+      "proving_range_quiver": {
+        "name": "시험 사격장 화살통"
+      },
+      "grounding_pauldrons": {
+        "name": "접지 어깨보호구"
+      },
+      "arcstep_treads": {
+        "name": "전호 발걸음 신발"
+      },
+      "stormglass_circlet": {
+        "name": "폭풍유리 머리띠"
+      },
+      "voltaic_coil_staff": {
+        "name": "볼타 코일 지팡이"
+      },
+      "draftplate_breastplate": {
+        "name": "초안판 흉갑"
+      },
+      "gearwork_jerkin": {
+        "name": "톱니장치 조끼"
+      },
+      "stormbrass_robe": {
+        "name": "폭풍황동 로브"
+      },
+      "piston_maul": {
+        "name": "원형 초안의 피스톤 대형망치"
+      },
+      "cellspark_dagger": {
+        "name": "전지 불꽃 단검"
+      },
+      "governors_scepter": {
+        "name": "조속기의 홀"
+      },
+      "line_masters_steam_hammer": {
+        "name": "생산라인 감독의 증기 망치"
+      },
+      "rangewardens_targeting_visor": {
+        "name": "사격장 감시자의 조준 면갑"
+      },
+      "stormglass_robes": {
+        "name": "폭풍유리 예복"
+      },
+      "prime_draft_core_plate": {
+        "name": "원형 초안의 중심판"
+      },
+      "heartless_gearmask": {
+        "name": "심장 없는 톱니 가면"
+      },
+      "draft_record": {
+        "name": "설계 기록"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -19534,6 +19611,12 @@ export const ko_KR: EnTranslations = {
       },
       "gaolers_iron_key": {
         "name": "간수의 쇠열쇠"
+      },
+      "rangefinders_lens": {
+        "name": "거리측정수의 렌즈"
+      },
+      "overclocked_governor": {
+        "name": "과부하 조속기"
       },
       "rift_watchers_band": {
         "name": "균열 감시자의 반지"

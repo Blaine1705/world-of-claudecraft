@@ -3133,6 +3133,8 @@ export const tr_TR: EnTranslations = {
         "pierce": "{duration} saniye boyunca, otomatik saldırıların, atışlarının ve fiziksel yeteneklerinin (kanama hariç) de hedefinin {reach} yd içinde en yakın düşmanı, verilen hasarın %{share} sini vur.",
         "lantern": "{duration} saniye boyunca ayaklarının dibine bir fener koy. Sen veya {radius} yd içinde bir lonca üyesine senden doğrudan bir iyileştirme de ışığı içinde en yaralı diğer lonca üyesini kalkanı açısından %{share} iyileştir.",
         "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "rangefinder": "For {duration} sec, your damage increases by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}% at {maxAt} yd or more.",
+        "overclock": "Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.",
         "heartNova": "Tüm ısı yığınlarını, {radius} yd içinde her düşmana {perHeat} Ateş hasarı ({maxHeat} yığınlarda {max}) ve her türleyen varlığa aşırı lütuf yapan ateş nova'sı harcayabilir. Hasara Attack Power artar. Bir ısı yığını gerektirir."
       }
     },
@@ -4031,6 +4033,9 @@ export const tr_TR: EnTranslations = {
         "brand": "Alınan şifa {pct}% azalıyor.",
         "shackle": "Chained in place: cannot move.",
         "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "rangefinder": "Damage increased by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}%.",
+        "overclock": "Casting speed increased by {pct}%. Overheated follows when it ends.",
+        "overheated": "Casting speed reduced by {pct}%.",
         "forgeHeat": "Isı: {stacks}/{max}. Forgefather's Temper kullanmak tümünü harcıyor ve silah ateşi {pct}% daha fazla hasar veriyor.",
         "tempered": "Yakın dövüş ve menzilli silah isabetleri {damage} ekstra Ateş hasarı verir (harcanan ısıdan {pct}% daha fazla). Her ölüm darbesi {killExtend} saniye ekler, toplamda {maxDuration} saniyeye kadar.",
         "temperedOther": "Yakın dövüş ve menzilli silah isabetleri ekstra Ateş hasarı verir, harcanan ısıdan {pct}% daha fazla. Hasar Saldırı Gücü veya Menzilli Saldırı Gücü (hangisi yüksekse) ile artar.",
@@ -18677,6 +18682,78 @@ export const tr_TR: EnTranslations = {
       "tideglass_warmaul": {
         "name": "Tideglass Warmaul"
       },
+      "riveters_gauntlets": {
+        "name": "Riveter's Gauntlets"
+      },
+      "beltrunners_boots": {
+        "name": "Beltrunner's Boots"
+      },
+      "draftsmans_mantle": {
+        "name": "Draftsman's Mantle"
+      },
+      "tocks_torque_wrench": {
+        "name": "Tock's Torque Wrench"
+      },
+      "proofplate_legguards": {
+        "name": "Proofplate Legguards"
+      },
+      "rangefinders_hood": {
+        "name": "Rangefinder's Hood"
+      },
+      "coilwound_cord": {
+        "name": "Coilwound Cord"
+      },
+      "proving_range_quiver": {
+        "name": "Proving-Range Quiver"
+      },
+      "grounding_pauldrons": {
+        "name": "Grounding Pauldrons"
+      },
+      "arcstep_treads": {
+        "name": "Arcstep Treads"
+      },
+      "stormglass_circlet": {
+        "name": "Stormglass Circlet"
+      },
+      "voltaic_coil_staff": {
+        "name": "Voltaic Coil-Staff"
+      },
+      "draftplate_breastplate": {
+        "name": "Draftplate Breastplate"
+      },
+      "gearwork_jerkin": {
+        "name": "Gearwork Jerkin"
+      },
+      "stormbrass_robe": {
+        "name": "Stormbrass Robe"
+      },
+      "piston_maul": {
+        "name": "Prime Draft's Piston Maul"
+      },
+      "cellspark_dagger": {
+        "name": "Cellspark Dagger"
+      },
+      "governors_scepter": {
+        "name": "Governor's Scepter"
+      },
+      "line_masters_steam_hammer": {
+        "name": "Line-Master's Steam Hammer"
+      },
+      "rangewardens_targeting_visor": {
+        "name": "Rangewarden's Targeting Visor"
+      },
+      "stormglass_robes": {
+        "name": "Stormglass Robes"
+      },
+      "prime_draft_core_plate": {
+        "name": "Prime Draft Core-Plate"
+      },
+      "heartless_gearmask": {
+        "name": "Heartless Gearmask"
+      },
+      "draft_record": {
+        "name": "Draft Record"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -19534,6 +19611,12 @@ export const tr_TR: EnTranslations = {
       },
       "gaolers_iron_key": {
         "name": "Gaoler's Iron Key"
+      },
+      "rangefinders_lens": {
+        "name": "Rangefinder's Lens"
+      },
+      "overclocked_governor": {
+        "name": "Overclocked Governor"
       },
       "rift_watchers_band": {
         "name": "Yarık İzleyicisinin Halkası"

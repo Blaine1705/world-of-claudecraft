@@ -7172,6 +7172,48 @@
         "pale_chorus_vestment",
         "tideglass_warmaul"
       ]
+    },
+    {
+      "batchId": "stormbrass-foundry-icons-2026-10-01",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_stormbrass_foundry_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_stormbrass_foundry_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/stormbrass-foundry-icons-2026-10-01/",
+      "itemIds": [
+        "riveters_gauntlets",
+        "beltrunners_boots",
+        "draftsmans_mantle",
+        "tocks_torque_wrench",
+        "proofplate_legguards",
+        "rangefinders_hood",
+        "coilwound_cord",
+        "proving_range_quiver",
+        "heroic_proving_range_quiver",
+        "grounding_pauldrons",
+        "arcstep_treads",
+        "stormglass_circlet",
+        "voltaic_coil_staff",
+        "draftplate_breastplate",
+        "gearwork_jerkin",
+        "stormbrass_robe",
+        "piston_maul",
+        "cellspark_dagger",
+        "governors_scepter",
+        "line_masters_steam_hammer",
+        "rangewardens_targeting_visor",
+        "stormglass_robes",
+        "prime_draft_core_plate",
+        "heartless_gearmask",
+        "rangefinders_lens",
+        "overclocked_governor",
+        "draft_record"
+      ]
     }
   ]
 }

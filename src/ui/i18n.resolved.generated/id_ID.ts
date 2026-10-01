@@ -3133,6 +3133,8 @@ export const id_ID: EnTranslations = {
         "pierce": "Selama {duration} detik, serangan otomatis, tembakan dan kemampuan fisik kamu (bukan pendarahan) juga menyerang musuh terdekat target kamu dalam jarak {reach} yard untuk {share}% dari kerusakan yang diberikan.",
         "lantern": "Letakkan lentera di kakimu selama {duration} detik. Penyembuh langsung dari siapa pun padamu atau anggota kelompok dalam jarak {radius} yard darinya juga menyembuhkan anggota kelompok lain yang paling terluka dalam cahayanya untuk {share}% dari penyembuhan.",
         "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "rangefinder": "For {duration} sec, your damage increases by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}% at {maxAt} yd or more.",
+        "overclock": "Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.",
         "heartNova": "Habiskan semua tumpukan panas pada ledakan api yang memberikan {perHeat} kerusakan Api per tumpukan ({max} di {maxHeat} tumpukan) ke setiap musuh dalam jarak {radius} yard dan mengejek setiap makhluk yang terkena. Kerusakan meningkat dengan Kekuatan Serangan. Memerlukan tumpukan panas."
       }
     },
@@ -4031,6 +4033,9 @@ export const id_ID: EnTranslations = {
         "brand": "Penyembuhan yang diterima berkurang {pct}%.",
         "shackle": "Chained in place: cannot move.",
         "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "rangefinder": "Damage increased by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}%.",
+        "overclock": "Casting speed increased by {pct}%. Overheated follows when it ends.",
+        "overheated": "Casting speed reduced by {pct}%.",
         "forgeHeat": "Panas: {stacks}/{max}. Menggunakan Badani Pandai Besi menghabiskan semuanya, dan api senjatanya menimbulkan {pct}% kerusakan lebih banyak.",
         "tempered": "Pukulan senjata jarak dekat dan jarak jauh Anda menimbulkan {damage} kerusakan Api tambahan ({pct}% lebih banyak dari panas yang dihabiskan). Setiap pukulan pembunuh menambah {killExtend} detik, hingga {maxDuration} detik total.",
         "temperedOther": "Pukulan senjata jarak dekat dan jarak jauh menimbulkan kerusakan Api tambahan, {pct}% lebih banyak dari panas yang dihabiskan. Kerusakan meningkat dengan Kekuatan Serangan atau Kekuatan Serangan Jarak Jauh, mana pun yang lebih tinggi.",
@@ -18677,6 +18682,78 @@ export const id_ID: EnTranslations = {
       "tideglass_warmaul": {
         "name": "Tideglass Warmaul"
       },
+      "riveters_gauntlets": {
+        "name": "Riveter's Gauntlets"
+      },
+      "beltrunners_boots": {
+        "name": "Beltrunner's Boots"
+      },
+      "draftsmans_mantle": {
+        "name": "Draftsman's Mantle"
+      },
+      "tocks_torque_wrench": {
+        "name": "Tock's Torque Wrench"
+      },
+      "proofplate_legguards": {
+        "name": "Proofplate Legguards"
+      },
+      "rangefinders_hood": {
+        "name": "Rangefinder's Hood"
+      },
+      "coilwound_cord": {
+        "name": "Coilwound Cord"
+      },
+      "proving_range_quiver": {
+        "name": "Proving-Range Quiver"
+      },
+      "grounding_pauldrons": {
+        "name": "Grounding Pauldrons"
+      },
+      "arcstep_treads": {
+        "name": "Arcstep Treads"
+      },
+      "stormglass_circlet": {
+        "name": "Stormglass Circlet"
+      },
+      "voltaic_coil_staff": {
+        "name": "Voltaic Coil-Staff"
+      },
+      "draftplate_breastplate": {
+        "name": "Draftplate Breastplate"
+      },
+      "gearwork_jerkin": {
+        "name": "Gearwork Jerkin"
+      },
+      "stormbrass_robe": {
+        "name": "Stormbrass Robe"
+      },
+      "piston_maul": {
+        "name": "Prime Draft's Piston Maul"
+      },
+      "cellspark_dagger": {
+        "name": "Cellspark Dagger"
+      },
+      "governors_scepter": {
+        "name": "Governor's Scepter"
+      },
+      "line_masters_steam_hammer": {
+        "name": "Line-Master's Steam Hammer"
+      },
+      "rangewardens_targeting_visor": {
+        "name": "Rangewarden's Targeting Visor"
+      },
+      "stormglass_robes": {
+        "name": "Stormglass Robes"
+      },
+      "prime_draft_core_plate": {
+        "name": "Prime Draft Core-Plate"
+      },
+      "heartless_gearmask": {
+        "name": "Heartless Gearmask"
+      },
+      "draft_record": {
+        "name": "Draft Record"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -19534,6 +19611,12 @@ export const id_ID: EnTranslations = {
       },
       "gaolers_iron_key": {
         "name": "Gaoler's Iron Key"
+      },
+      "rangefinders_lens": {
+        "name": "Rangefinder's Lens"
+      },
+      "overclocked_governor": {
+        "name": "Overclocked Governor"
       },
       "rift_watchers_band": {
         "name": "Sabuk Penjaga Retak"

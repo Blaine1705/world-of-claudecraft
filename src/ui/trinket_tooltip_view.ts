@@ -303,6 +303,22 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
         radius: n(u.radius),
         share: pct(u.share),
       });
+    case 'rangefinder':
+      return t('hudChrome.trinkets.use.rangefinder', {
+        duration: n(u.duration),
+        perStep: pct(u.perStep),
+        stepYards: n(u.stepYards),
+        from: n(u.from),
+        max: pct(u.max),
+        maxAt: n(u.from + (u.max / u.perStep) * u.stepYards),
+      });
+    case 'overclock':
+      return t('hudChrome.trinkets.use.overclock', {
+        haste: pct(u.haste),
+        duration: n(u.duration),
+        slow: pct(u.slow),
+        overheat: n(u.overheat),
+      });
     case 'shackle':
       return t('hudChrome.trinkets.use.shackle', {
         range: n(u.range),

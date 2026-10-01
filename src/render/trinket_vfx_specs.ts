@@ -461,6 +461,58 @@ const TRINKET_VFX: Readonly<Record<string, TrinketVfx>> = {
       },
     },
   },
+  // Rangefinder's Lens: a brass lens flips down over the eye; a thin ring of
+  // range marks pulses out from the wearer.
+  trinket_rangefinders_lens: {
+    spec: { c: '#ffd98a', p: 'physical', pw: 0.8, sp: 8, li: 0.8, lg: 1.5, a: 'buff' },
+    full: {
+      archetype: 'buff',
+      palette: 'physical',
+      power: 0.8,
+      buff: { style: 'raise', orbit: 'none', shellDur: 0.8 },
+      windupStyle: 'none',
+      decal: 'rune',
+      linger: 1.5,
+      rim: '#ffe7b0',
+      accent: '#fff4d6',
+      impact: {
+        flipbook: false,
+        ring: 1.2,
+        vRing: false,
+        sparks: 6,
+        debris: false,
+        smoke: false,
+        light: 0.6,
+        liteAudio: true,
+      },
+    },
+  },
+  // Overclocked Governor: the governor spins up in a crackle of blue-white
+  // sparks round the caster.
+  trinket_overclocked_governor: {
+    spec: { c: '#9fd8ff', p: 'arcane', pw: 0.9, sp: 12, vr: 1, li: 1, lg: 2, a: 'buff' },
+    full: {
+      archetype: 'buff',
+      palette: 'arcane',
+      power: 0.9,
+      buff: { style: 'raise', orbit: 'none', shellDur: 1 },
+      windupStyle: 'none',
+      decal: 'rune',
+      linger: 2,
+      rim: '#cfe8ff',
+      accent: '#ffffff',
+      impact: {
+        flipbook: false,
+        ring: 1,
+        vRing: 1.2,
+        sparks: 14,
+        debris: false,
+        smoke: false,
+        light: 1,
+        liteAudio: true,
+      },
+    },
+  },
   // ---- The Crucible of the Last Spring raid trinkets ----------------------
   // Their bespoke scene objects (the spectral hammer, the floating Kindling
   // Orb and its bolts, the Last Flame Lantern and its light) are painted by

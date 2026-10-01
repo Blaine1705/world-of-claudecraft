@@ -171,6 +171,15 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   tideglass_shiv: 'dagger_c', // slim shiv; the Tideglass Dirk already rides dagger_b
   tideglass_warmaul: 'hammer_c', // heroic epic maul (heroic clones ride heroicOf)
 
+  // ---- The Stormbrass Foundry (stormbrass_foundry_items.ts) ------------------
+  // Held models reuse shipped GLBs (heroic clones ride heroicOf).
+  tocks_torque_wrench: 'hammer_b', // a heavy wrench reads as the plain mace
+  voltaic_coil_staff: 'staff_d', // the lantern-topped staff carries the coil
+  piston_maul: 'hammer_c', // a two-handed piston maul
+  cellspark_dagger: 'dagger_c',
+  governors_scepter: 'hammer_a', // a light one-handed scepter
+  line_masters_steam_hammer: 'hammer_c', // heroic epic steam hammer
+
   // ---- Crucible of the Last Spring raid weapons (ignivar_loot.ts) -------------
   // Held models reuse shipped GLBs.
   forgefathers_warhammer: 'hammer_c',
