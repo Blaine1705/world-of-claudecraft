@@ -5,36 +5,40 @@ The NEW level 19 to 20 five-player dungeon on the storm line of Stormcrag
 branch), ticked once per claim by `tickFoundryEncounters` (`index.ts`), called
 from `instances/dungeons.ts` `updateInstances` right after the Temple's.
 
-Built in three phases. PHASE 1 (this state): the map, every pack and patrol,
-the trash kits, the Gantry Hauler's full kit, and the four bosses placed as
-melee-only placeholders in their finished arenas. Phase 2 adds the four boss
-cores (one module each, below) with their loot, deeds, Reliquary pages and the
-quest chain; phase 3 the Blender kit, the creatures and the VFX.
+Built in three phases. Phase 1: the map, every pack and patrol, the trash kits,
+the Gantry Hauler. PHASE 2 (this state): the four boss cores, one module each,
+with their loot, deeds, Reliquary pages and the quest chain. Phase 3: the Blender
+kit, the creatures and the VFX keyed on the cast, aura and object template ids
+in `ids.ts`.
 
 | Module | Role |
 |---|---|
-| `ids.ts` | Leaf: the dungeon, boss and showpiece ids, the Hauler's cast ids and tuning, the encounter object templates. The renderer, the trash kit and the tests key on it. |
-| `claim.ts` | The live Foundry claims and the Foundry's ephemeral encounter objects; the claim-generic reads are the Bastion's (`../sunken_bastion/claim.ts`), re-exported. |
-| `gantry_hauler.ts` | The Gantry Hauler (section 4.3): Steam Blast (braced 1.5 s bar, 90 degree 12 yd cone, knockback), Scrap Toss (the farthest player within 45 yd, 5 yd mark, 2 s), Unload (three Arc Drones at half health, through the trash kit's add spawner). Boiler Rupture is its `trashKit.deathBurst`. |
-| `index.ts` | The tick and `/dev foundry trigger` (blast, toss, unload). |
-
-Phase 2 adds, beside these (do not grow `gantry_hauler.ts`):
-- `line_master.ts`: G19 conveyor regions (belts in `MAIN_LINE_BELTS`, the press in `STAMPING_PRESS`, the chute in `PARTS_CHUTE`, all in `content/stormbrass_foundry_layout.ts`), resolved through `resolveMove`.
-- `rangewarden.ts`: G20 trail salvo (a fixed-tick position history per marked player).
-- `voltaic_warden.ts`: G21 conduction plating (damage-kind immunity with stored-damage release; needs a seam in `combat/damage.ts` dealDamage like the Temple's `reflection_guard.ts`).
-- `prime_draft.ts`: G12 storm cells from `CELL_RACKS`, the Core Hatch window, three phases.
-Each state rides `Entity.foundryFight` (`FoundryFightState` in `types.ts`, extend the union).
+| `ids.ts` | Leaf: the dungeon, boss and showpiece ids, every cast, aura and object template id, the tuning of all five encounters, and the pure geometry (`beltIndexAt`, `inPressStrip`, `bunkerLeeAt`, `platingFor`, `platingFacing`, `hatchStateAt`, `hatchStateOf`, `staticPerSecond`). The renderer, the HUD alert, the trash kit and the tests key on it. |
+| `claim.ts` | The live Foundry claims and objects; the claim-generic reads are the Bastion's (`../sunken_bastion/claim.ts`), re-exported; plus `arenaPlayers`, `heavySwing` (a melee multiple through armor) and `bossTarget`. |
+| `gantry_hauler.ts` | The Gantry Hauler (4.3): Steam Blast, Scrap Toss (never fired during a Steam Blast bar; a plate already in the air still lands if the Hauler falls), Unload. Boiler Rupture is its `trashKit.deathBurst`. Deed: Off the Rails. |
+| `line_master.ts` | Line-Master Ambrel Tock (5.1, G19): four belts carry every body on them through `../../conveyor.ts` (`displaceAlong`, `resolveMove`); the lever (2 s klaxon, belts reverse; heroic Overtime 5 yd/s and Cross-Feed), the Stamping Press (2 s strip, knockdown, crushes a frame), Parts Drop (three booting Half-Built Frames at 70 and 40), the Rivet Gun. Belt state rides belt objects (template idle/run/alarm, facing = heading, scale = speed); the lever gauge is the `foundry_tock_pressure` aura clock. Deed: Quality Control. |
+| `rangewarden.ts` | The Rangewarden (5.2, G20): Target Lock marks two (heroic three) non-tanks for 8 s; each second a shell paints where the mark stood 1.5 s before (a per-tick trail) and lands 0.6 s later; each bunker swallows three shells per lock in its lee; Proof Shot and Dented Plating; Drill Drones at 66 and 33; heroic Shrapnel. Deed: Clean Range. |
+| `voltaic_warden.ts` | The Voltaic Warden (5.3, G21): Grounded or Charged plating auras (value2 1 = heroic Split Plating), a 3 s rattle bar and a flip every 15 s (heroic 10 s), Discharge on the flip, two plated Arc Drones every 25 s (the opposite face), Static Lash, Coil Strike. Deed: Grounded. |
+| `voltaic_plating.ts` | Pure guard asked by `combat/damage.ts` `dealDamage`: a wrong-kind hit from a player or pet is turned aside (a resist event, threat kept) and banked on the Warden. |
+| `prime_draft.ts` | The Prime Draft (5.4, G12): Awakening bar, Bolted (rooted; Piston Fist, Arm Sweep), Unbolted at 70 (rivet shower, walks, Tremor Step), Heartless at 35 (Arc Surge, faster cycle), Overdrive below 15; the Charge Cycle and the Core Hatch window (closed, warn, open on the hatch ring object), Overload, arc back on a closed hatch, short out at 15 s; heroic Jammed Racks and Double Load. On death the Draft Record (`draft_record`, The First Draft's interact object) lies in its chest. Deed: Heartless. |
+| `storm_cells.ts` | The carry: take a cell with the pick-up command (`interaction.ts` `pickUpObject` routes here), the carrier's aura (slow, stacks = Static a second, sourceId = the hatch ring), drop with the interact press (`interaction.ts` `interact`), the 3 s retake lock. |
+| `index.ts` | The tick and `/dev foundry trigger` for every mechanic (blast, toss, unload; lever, press, parts, rivet; lock, proof, drones; flip, discharge, platedrones, lash, strike; cell, overload, fist, sweep, unbolt, tremor, heartless, surge). |
 
 Rules:
-- Deterministic: every pick is hashed or entity-id ordered; the only rng draws are damage rolls. Fixed DT countdowns.
-- Every visible state rides existing entity fields (cast bars, facing, auras, encounter object template ids and `scale` as a radius), so the online client mirrors it with no wire or IWorld change. New object templates join `FOUNDRY_OBJECT_TEMPLATES` (the renderer anchors them, `render/gate_objects.ts`) and get a floor spec in `render/stormbrass_foundry/foundry_fx_core.ts`.
-- Reset on evade and wipe drops every mark and bar (`endHaulerFight`).
-- Tests: `tests/stormbrass_foundry_trash.test.ts` (trash kits and the Hauler), `tests/stormbrass_foundry_route.test.ts` (no skipping), `tests/stormbrass_foundry_dungeon.test.ts` (record, gates on deaths, seals, bossChainPull, dev jumps), `tests/stormbrass_foundry_tuning.test.ts` (both tuning rows).
+- Deterministic: every pick is hashed (`kitHash`, `pickMarkTargets`) or entity-id / distance ordered; the only rng draws are damage rolls. Fixed DT countdowns; the Rangewarden's trail is one sample a tick.
+- Every visible state rides existing entity fields (cast bars, facing, auras, encounter object template ids and `scale`), so the online client mirrors it with no wire or IWorld change. New object templates join `FOUNDRY_OBJECT_TEMPLATES` (the renderer anchors them, `render/gate_objects.ts`) and get a floor spec in `render/stormbrass_foundry/foundry_fx_core.ts`; the HUD alert (`ui/hud/dungeon/foundry_alert_*`) reads the same auras.
+- Reset on evade and wipe drops every mark, bar, strip, shell, cell and the hatch, stops the belts and clears the plating.
+- The conveyor and other server-side displacement reach online players through movement reconciliation (no client-side belt prediction).
+- Tests: `tests/stormbrass_foundry_tock.test.ts`, `..._rangewarden.test.ts`, `..._voltaic.test.ts`, `..._prime_draft.test.ts`, `..._alert.test.ts`, `..._quests.test.ts` (on `tests/helpers/foundry_fight.ts`), `..._trash.test.ts` (trash and the Hauler), `..._route.test.ts`, `..._dungeon.test.ts` (record, gates, seals, bossChainPull, dev jumps, every dev trigger), `..._tuning.test.ts`, `..._render_core.test.ts`.
 
 Naming originality (`src/sim/content/CLAUDE.md`, re-verified 2026-10-01 against
 the design doc's section 10): every name in the design table stays except
 "Clockwork Hound", an exact monster name in Dungeons and Dragons 5e and
-Pathfinder, shipped as "Coilspring Hound" (the id `clockwork_hound` stays).
+Pathfinder, shipped as "Coilspring Hound" (the id `clockwork_hound` stays), and
+the clear deed "Heart of the Storm" (a World of Warcraft item and quest name),
+shipped as "Stormbrass Silenced" (the id `dgn_stormbrass_foundry` stays).
 "Gearwright" appears only as a surname of minor tabletop and fan characters;
-"Gearwright Apprentice" as a full name is clear. "Brass Bolt" (the turret's
-shot) and the gate names are generic English.
+"Gearwright Apprentice" as a full name is clear. "Lift Warden Corwin Ashby",
+the loot names ("Rangefinder's Lens", "Overclocked Governor" and the rest),
+the deed names and the mechanic and aura names are generic English compounds,
+clear at authoring.
