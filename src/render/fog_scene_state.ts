@@ -20,6 +20,8 @@ export const HOLLOW_CRYPT_FOG_COLOR = 0x1c2238;
 export const SUNKEN_BASTION_FOG_COLOR = 0x4d5a57;
 /** The Drowned Temple's violet night haze (its sky dome fades to it at the horizon). */
 export const DROWNED_TEMPLE_FOG_COLOR = 0x252a4c;
+/** The Stormbrass Foundry's storm-grey steam haze (its sky's horizon too). */
+export const STORMBRASS_FOUNDRY_FOG_COLOR = 0x6b788c;
 
 export interface FogSceneResolution {
   /** The named dungeon interior the player stands in (null/undefined in the
@@ -63,6 +65,8 @@ export function resolveFogScene(
   const inSunkenBastion = interior === 'sunken_bastion';
   // The Drowned Temple: open-air at night over its lagoon, under its own sky.
   const inDrownedTemple = interior === 'drowned_temple';
+  // The Stormbrass Foundry: open-air in storm daylight, under its own sky.
+  const inStormbrassFoundry = interior === 'stormbrass_foundry';
   const inLastKeep = interior === 'lastkeep';
   const inDawnhold = interior === 'dawnhold';
   const desired: FogSceneState = inDelve
@@ -85,15 +89,17 @@ export function resolveFogScene(
                     ? 'sunkenBastion'
                     : inDrownedTemple
                       ? 'drownedTemple'
-                      : inLastKeep
-                        ? 'lastkeep'
-                        : inDawnhold
-                          ? 'dawnhold'
-                          : inside
-                            ? 'dungeon'
-                            : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                              ? 'underwater'
-                              : 'outdoor';
+                      : inStormbrassFoundry
+                        ? 'stormbrassFoundry'
+                        : inLastKeep
+                          ? 'lastkeep'
+                          : inDawnhold
+                            ? 'dawnhold'
+                            : inside
+                              ? 'dungeon'
+                              : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                ? 'underwater'
+                                : 'outdoor';
   return { interior, desired };
 }
 
@@ -156,6 +162,13 @@ export function applyFogScenePreset(
     fog.color.setHex(DROWNED_TEMPLE_FOG_COLOR);
     fog.near = 140;
     fog.far = 1050;
+  } else if (desired === 'stormbrassFoundry') {
+    // Steam haze and a rain veil in storm daylight: pushed far back so the
+    // storm-coil tower and the Prime Draft read from the Lift Landing (430 yd),
+    // while the far peaks drown in the grey.
+    fog.color.setHex(STORMBRASS_FOUNDRY_FOG_COLOR);
+    fog.near = 120;
+    fog.far = 900;
   } else if (desired === 'lastkeep') {
     // The Last Keep: a warm hearth-lit haze pushed well back, so its
     // grand three-story halls read golden and inhabited instead of

@@ -287,6 +287,15 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/drowned_temple/temple_landmarks.ts',
   'src/render/drowned_temple/temple_hydra.ts',
   'src/render/drowned_temple/temple_fx.ts',
+  // The Stormbrass Foundry's sky (dome, rain veil), the steam columns, the
+  // gates (shutter steam, arc fences standing across a passage) and the coil's
+  // bolts in the air. None is a floor mark; its floor marks are the shared
+  // telegraph kit's (the ladder's own rungs) and its lamp pools sit on the
+  // ground rung (foundry_lights.ts).
+  'src/render/stormbrass_foundry/foundry_sky.ts',
+  'src/render/stormbrass_foundry/foundry_dressing.ts',
+  'src/render/stormbrass_foundry/foundry_gates.ts',
+  'src/render/stormbrass_foundry/foundry_landmarks.ts',
   // battleground objective marks and world markers far from any raid floor
   'src/render/battleground.ts',
   'src/render/battleground_fx.ts',

@@ -49,6 +49,7 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
+import { FoundryFx } from './stormbrass_foundry/foundry_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 
 const SEGMENTS = 64;
@@ -103,6 +104,7 @@ export class RiftDeathZoneVisuals {
   private readonly bastionFx: BastionFx;
   // The Drowned Temple's trash and boss telegraphs, and the Mere Hydra's body.
   private readonly templeFx: TempleFx;
+  private readonly foundryFx: FoundryFx;
   private readonly cryptCreatures: CryptCreatureFx;
   // The Hollow Crypt finale: Morthen's entrance and the Knellwyrm.
   private readonly cryptFinale: CryptFinaleFx;
@@ -155,6 +157,7 @@ export class RiftDeathZoneVisuals {
     this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
     this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
     this.templeFx = new TempleFx(scene, groundY, world, compileGate);
+    this.foundryFx = new FoundryFx(scene, groundY, world, compileGate);
     this.cryptCreatures = new CryptCreatureFx(
       scene,
       groundY,
@@ -246,6 +249,7 @@ export class RiftDeathZoneVisuals {
     this.cryptTrash.update(dt);
     this.bastionFx.update(dt);
     this.templeFx.update(dt);
+    this.foundryFx.update(dt);
     this.cryptCreatures.update(dt);
     this.cryptFinale.update(dt);
     this.morthenFx.update(dt);
@@ -282,6 +286,7 @@ export class RiftDeathZoneVisuals {
     this.cryptTrash.dispose();
     this.bastionFx.dispose();
     this.templeFx.dispose();
+    this.foundryFx.dispose();
     this.cryptCreatures.dispose();
     this.cryptFinale.dispose();
     this.morthenFx.dispose();

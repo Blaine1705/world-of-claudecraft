@@ -33,6 +33,7 @@ export type FogSceneState =
   | 'hollowCrypt'
   | 'sunkenBastion'
   | 'drownedTemple'
+  | 'stormbrassFoundry'
   | 'lastkeep'
   | 'dawnhold';
 
@@ -137,6 +138,18 @@ const DROWNED_TEMPLE_HEMI_GROUND_COLOR = 0x173640;
  *  a little west, straight down the route from the Moongate Landing, so the
  *  whole temple is seen against it and every column throws its shadow back
  *  toward the party. */
+// The Stormbrass Foundry: storm DAYLIGHT (a grey-white sun breaking through
+// the clouds from the south-west, a cool blue-grey sky bounce, a slate ground
+// bounce), bright enough that every brass surface reads; the lightning is
+// cosmetic flashes on top (render/stormbrass_foundry), never the key light.
+const STORMBRASS_FOUNDRY_SUN_INTENSITY = 2.1;
+const STORMBRASS_FOUNDRY_HEMI_INTENSITY = 1.15;
+const STORMBRASS_FOUNDRY_ENV_INTENSITY = 0.42;
+const STORMBRASS_FOUNDRY_RIM_BOOST = 1.6;
+const STORMBRASS_FOUNDRY_SUN_COLOR = 0xe8eef6;
+const STORMBRASS_FOUNDRY_HEMI_SKY_COLOR = 0x9aa8bc;
+const STORMBRASS_FOUNDRY_HEMI_GROUND_COLOR = 0x4a4e52;
+export const STORMBRASS_FOUNDRY_SUN_DIRECTION = new THREE.Vector3(-0.35, 0.72, -0.6).normalize();
 export const DROWNED_TEMPLE_MOON_DIRECTION = new THREE.Vector3(-0.14, 0.27, 0.95).normalize();
 // The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
 // ambient floor (over the candle-orange torch lights the interior itself
@@ -196,6 +209,10 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
     out.copy(DROWNED_TEMPLE_MOON_DIRECTION);
     return true;
   }
+  if (state === 'stormbrassFoundry') {
+    out.copy(STORMBRASS_FOUNDRY_SUN_DIRECTION);
+    return true;
+  }
   if (state !== 'wildheartField') return false;
   out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
   return true;
@@ -217,6 +234,7 @@ export function applyInteriorLightRig(
   const cryptMoon = state === 'hollowCrypt';
   const bastionDusk = state === 'sunkenBastion';
   const templeMoon = state === 'drownedTemple';
+  const foundryStorm = state === 'stormbrassFoundry';
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
   const ignivarForge = state === 'ignivarApproach' || state === 'ignivar' || state === 'varkhul';
@@ -234,15 +252,17 @@ export function applyInteriorLightRig(
         ? SUNKEN_BASTION_SUN_INTENSITY
         : templeMoon
           ? DROWNED_TEMPLE_MOON_INTENSITY
-          : wildheartSun
-            ? WILDHEART_SUN_INTENSITY
-            : keepHearth
-              ? LASTKEEP_SUN_INTENSITY
-              : dawnholdDay
-                ? DAWNHOLD_SUN_INTENSITY
-                : underground
-                  ? DUNGEON_SUN_INTENSITY
-                  : outdoor.sunIntensity;
+          : foundryStorm
+            ? STORMBRASS_FOUNDRY_SUN_INTENSITY
+            : wildheartSun
+              ? WILDHEART_SUN_INTENSITY
+              : keepHearth
+                ? LASTKEEP_SUN_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_SUN_INTENSITY
+                  : underground
+                    ? DUNGEON_SUN_INTENSITY
+                    : outdoor.sunIntensity;
   targets.hemi.intensity = mazeNight
     ? YUMI_MAZE_HEMI_INTENSITY
     : cryptMoon
@@ -251,15 +271,17 @@ export function applyInteriorLightRig(
         ? SUNKEN_BASTION_HEMI_INTENSITY
         : templeMoon
           ? DROWNED_TEMPLE_HEMI_INTENSITY
-          : wildheartSun
-            ? WILDHEART_HEMI_INTENSITY
-            : keepHearth
-              ? LASTKEEP_HEMI_INTENSITY
-              : dawnholdDay
-                ? DAWNHOLD_HEMI_INTENSITY
-                : underground
-                  ? DUNGEON_HEMI_INTENSITY
-                  : outdoor.hemiIntensity;
+          : foundryStorm
+            ? STORMBRASS_FOUNDRY_HEMI_INTENSITY
+            : wildheartSun
+              ? WILDHEART_HEMI_INTENSITY
+              : keepHearth
+                ? LASTKEEP_HEMI_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_HEMI_INTENSITY
+                  : underground
+                    ? DUNGEON_HEMI_INTENSITY
+                    : outdoor.hemiIntensity;
   targets.scene.environmentIntensity = mazeNight
     ? YUMI_MAZE_ENV_INTENSITY
     : cryptMoon
@@ -268,15 +290,17 @@ export function applyInteriorLightRig(
         ? SUNKEN_BASTION_ENV_INTENSITY
         : templeMoon
           ? DROWNED_TEMPLE_ENV_INTENSITY
-          : wildheartSun
-            ? WILDHEART_ENV_INTENSITY
-            : keepHearth
-              ? LASTKEEP_ENV_INTENSITY
-              : dawnholdDay
-                ? DAWNHOLD_ENV_INTENSITY
-                : underground
-                  ? DUNGEON_ENV_INTENSITY
-                  : outdoor.envIntensity;
+          : foundryStorm
+            ? STORMBRASS_FOUNDRY_ENV_INTENSITY
+            : wildheartSun
+              ? WILDHEART_ENV_INTENSITY
+              : keepHearth
+                ? LASTKEEP_ENV_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_ENV_INTENSITY
+                  : underground
+                    ? DUNGEON_ENV_INTENSITY
+                    : outdoor.envIntensity;
   targets.rim.value = mazeNight
     ? YUMI_MAZE_RIM_BOOST
     : cryptMoon
@@ -285,15 +309,17 @@ export function applyInteriorLightRig(
         ? SUNKEN_BASTION_RIM_BOOST
         : templeMoon
           ? DROWNED_TEMPLE_RIM_BOOST
-          : wildheartSun
-            ? WILDHEART_RIM_BOOST
-            : keepHearth
-              ? LASTKEEP_RIM_BOOST
-              : dawnholdDay
-                ? DAWNHOLD_RIM_BOOST
-                : underground
-                  ? DUNGEON_RIM_BOOST
-                  : 1;
+          : foundryStorm
+            ? STORMBRASS_FOUNDRY_RIM_BOOST
+            : wildheartSun
+              ? WILDHEART_RIM_BOOST
+              : keepHearth
+                ? LASTKEEP_RIM_BOOST
+                : dawnholdDay
+                  ? DAWNHOLD_RIM_BOOST
+                  : underground
+                    ? DUNGEON_RIM_BOOST
+                    : 1;
   // The rim tint defaults cool everywhere; the forge applier below re-grades
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
@@ -314,6 +340,10 @@ export function applyInteriorLightRig(
     targets.sun.color.setHex(DROWNED_TEMPLE_MOON_COLOR);
     targets.hemi.color.setHex(DROWNED_TEMPLE_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(DROWNED_TEMPLE_HEMI_GROUND_COLOR);
+  } else if (foundryStorm) {
+    targets.sun.color.setHex(STORMBRASS_FOUNDRY_SUN_COLOR);
+    targets.hemi.color.setHex(STORMBRASS_FOUNDRY_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(STORMBRASS_FOUNDRY_HEMI_GROUND_COLOR);
   } else if (wildheartSun) {
     targets.sun.color.setHex(WILDHEART_SUN_COLOR);
     targets.hemi.color.setHex(WILDHEART_HEMI_SKY_COLOR);

@@ -506,6 +506,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
   'render/drowned_temple/temple_lights.ts':
     'the Drowned Temple braziers, moon orbs, tidepools, the conch, the prism and the altar, pushed through the fireLights adopter sink the interiors are handed',
+  'render/stormbrass_foundry/foundry_lights.ts':
+    'the Stormbrass Foundry work lamps, the coil glow and the charging racks, pushed through the fireLights adopter sink the interiors are handed',
   'render/sunken_bastion/bastion_lights.ts':
     'the Sunken Bastion lanterns, braziers, fog-fire and the Fogbeacon lamp, pushed through the fireLights adopter sink the interiors are handed',
   'render/props.ts':
@@ -620,6 +622,15 @@ describe('every point-light producer is a carrier source', () => {
       'render/jail_scene.ts: swirl',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
+      // The Stormbrass Foundry: mesh hooks, never a scene: a crane arm's sweep
+      // (one matrix write), the storm dome's strike flash and the rain veil
+      // following the camera, the coil's bolts and flare on the strike clock,
+      // and the Prime Draft landmark's head turning to the viewer.
+      'render/stormbrass_foundry/foundry_dressing.ts: m',
+      'render/stormbrass_foundry/foundry_landmarks.ts: bolt',
+      'render/stormbrass_foundry/foundry_landmarks.ts: flare',
+      'render/stormbrass_foundry/foundry_landmarks.ts: m',
+      'render/stormbrass_foundry/foundry_sky.ts: mesh',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
       // the idle sweep or to Vael's lamp yaw, never a scene.
       'render/sunken_bastion/bastion_beacon.ts: mesh',
