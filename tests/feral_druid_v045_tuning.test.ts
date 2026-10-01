@@ -24,7 +24,7 @@ import { SPEC_BASELINES } from '../src/sim/content/spec_baselines';
 import { ABILITIES, CLASSES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { AbilityDef, AbilityEffect, Aura, Entity } from '../src/sim/types';
+import type { AbilityDef, AbilityEffect, Aura, Entity, SimEvent } from '../src/sim/types';
 
 type Spec = 'balance' | 'feral' | 'restoration';
 
@@ -162,7 +162,7 @@ describe('2. Scratch', () => {
         sim.castAbility(abilityId);
         const events = sim.tick();
         const hit = events.find(
-          (event) =>
+          (event): event is Extract<SimEvent, { type: 'damage' }> =>
             event.type === 'damage' &&
             event.ability === abilityName &&
             event.targetId === mob.id &&
