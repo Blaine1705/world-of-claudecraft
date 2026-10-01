@@ -12331,7 +12331,16 @@ export const ja_JP: EnTranslations = {
       "foundry_field_repair": "現場修理",
       "foundry_deploy_turret": "砲台設置",
       "foundry_steam_screen": "蒸気の障壁",
-      "foundry_hauler_steam_blast": "蒸気噴射"
+      "foundry_hauler_steam_blast": "蒸気噴射",
+      "foundry_tock_lever": "レバー操作",
+      "foundry_tock_rivet_gun": "リベットガン",
+      "foundry_proof_shot": "試験射撃",
+      "foundry_plating_flip": "装甲板反転",
+      "foundry_static_lash": "静電の鞭",
+      "foundry_draft_awaken": "覚醒",
+      "foundry_arm_sweep": "腕薙ぎ",
+      "foundry_draft_unbolt": "ボルト引きちぎり",
+      "foundry_tremor_step": "震動の踏みつけ"
     }
   },
   "questUi": {
@@ -19967,6 +19976,9 @@ export const ja_JP: EnTranslations = {
       },
       "prime_draft": {
         "name": "プライム・ドラフト"
+      },
+      "half_built_frame": {
+        "name": "未完成フレーム"
       },
       "sanctum_boneguard": {
         "name": "聖所の骨衛兵"

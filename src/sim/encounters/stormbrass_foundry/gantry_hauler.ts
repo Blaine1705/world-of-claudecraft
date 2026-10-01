@@ -28,6 +28,7 @@ import {
   claimPlayers,
   clearCastIf,
   dropEncounterObject,
+  grantClaimDeed,
   mechanicDamage,
   spawnFoundryObject,
   startBar,
@@ -40,6 +41,8 @@ import {
   HAULER_UNLOAD,
   HAULER_TUNING as T,
 } from './ids';
+
+export const HAULER_DEED = 'dgn_gantry_hauler';
 
 /** The chat line when the bed tips (re-localized by src/ui/sim_i18n.ts). */
 export const HAULER_UNLOAD_LOG = 'The Gantry Hauler tips its bed: Arc Drones spill out!';
@@ -68,7 +71,7 @@ export function haulerState(hauler: Entity, timers = true): HaulerFightState {
 /** The pull ended (a kill, an evade, a wipe): drop the marks and the bar. */
 function endHaulerFight(ctx: SimContext, inst: InstanceSlot, hauler: Entity): void {
   const st = hauler.foundryFight;
-  if (!st) return;
+  if (st?.kind !== 'hauler') return;
   for (const t of st.tosses) dropEncounterObject(ctx, inst, t.objectId);
   clearCastIf(hauler, HAULER_STEAM_BLAST);
   hauler.foundryFight = undefined;
@@ -261,10 +264,14 @@ export function tickHauler(
 ): void {
   if (hauler.dead) {
     // A plate already thrown still lands where it was marked; then the pull ends.
-    const st = hauler.foundryFight;
+    const st = hauler.foundryFight?.kind === 'hauler' ? hauler.foundryFight : undefined;
     clearCastIf(hauler, HAULER_STEAM_BLAST);
     if (st && st.tosses.length > 0) stepTosses(ctx, inst, hauler, st);
-    if (!st || st.tosses.length === 0) endHaulerFight(ctx, inst, hauler);
+    if (st && st.tosses.length === 0) {
+      // Off the Rails: nobody was hit by a plate, the last one included.
+      if (!st.struck) grantClaimDeed(ctx, inst, HAULER_DEED);
+      endHaulerFight(ctx, inst, hauler);
+    }
     return;
   }
   if (!engaged) {

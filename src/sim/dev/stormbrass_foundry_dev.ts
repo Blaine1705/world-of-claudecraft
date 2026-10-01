@@ -13,7 +13,13 @@
 //   /dev foundry pack <pack>              jump to where a pack stands (or walks)
 //   /dev foundry spawn <type>             raise one mob 10 yd ahead, pulled
 //   /dev foundry trigger <mechanic>       fire an engaged encounter's mechanic
-//                                         now (blast, toss, unload: the Hauler)
+//                                         now: blast, toss, unload (the Hauler);
+//                                         lever, press, parts, rivet (Tock);
+//                                         lock, proof, drones (the Rangewarden);
+//                                         flip, discharge, platedrones, lash,
+//                                         strike (the Voltaic Warden); cell,
+//                                         overload, fist, sweep, unbolt, tremor,
+//                                         heartless, surge (the Prime Draft)
 //   /dev foundry reset                    free the run and claim a fresh one
 //
 // Areas: landing, yard (or hauler), terraces, cranepad, mainline (or tock),
@@ -82,10 +88,11 @@ export const STORMBRASS_FOUNDRY_DEV_MOBS: Readonly<Record<string, string>> = {
   shieldbearer: 'shieldbearer_frame',
   turret: 'tripod_turret',
   hauler: 'gantry_hauler',
+  frame: 'half_built_frame',
 };
 
 const HELP =
-  '[dev] /dev foundry enter [normal|heroic] | tp <landing|yard|hauler|terraces|cranepad|mainline|tock|cranelanding|lanes|range|rangewarden|coil|coilupper|crown|voltaic|bridge|drafting|approach|gantry|prime> | gates | kill <g1..g13|pa|pb|pc|pd|hauler|tock|rangewarden|voltaic|prime|trash|all> | pack <id> | spawn <sentry|bruiser|drone|engineer|apprentice|hound|shieldbearer|turret|hauler> | trigger <blast|toss|unload> | reset';
+  '[dev] /dev foundry enter [normal|heroic] | tp <landing|yard|hauler|terraces|cranepad|mainline|tock|cranelanding|lanes|range|rangewarden|coil|coilupper|crown|voltaic|bridge|drafting|approach|gantry|prime> | gates | kill <g1..g13|pa|pb|pc|pd|hauler|tock|rangewarden|voltaic|prime|trash|all> | pack <id> | spawn <sentry|bruiser|drone|engineer|apprentice|hound|shieldbearer|turret|hauler|frame> | trigger <blast|toss|unload|lever|press|parts|rivet|lock|proof|drones|flip|discharge|platedrones|lash|strike|cell|overload|fist|sweep|unbolt|tremor|heartless|surge> | reset';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {

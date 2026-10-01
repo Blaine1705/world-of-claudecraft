@@ -12331,7 +12331,16 @@ export const cs_CZ: EnTranslations = {
       "foundry_field_repair": "Field Repair",
       "foundry_deploy_turret": "Deploy Turret",
       "foundry_steam_screen": "Steam Screen",
-      "foundry_hauler_steam_blast": "Steam Blast"
+      "foundry_hauler_steam_blast": "Steam Blast",
+      "foundry_tock_lever": "Throw the Lever",
+      "foundry_tock_rivet_gun": "Rivet Gun",
+      "foundry_proof_shot": "Proof Shot",
+      "foundry_plating_flip": "Reversing Plates",
+      "foundry_static_lash": "Static Lash",
+      "foundry_draft_awaken": "Awakening",
+      "foundry_arm_sweep": "Arm Sweep",
+      "foundry_draft_unbolt": "Tearing Free",
+      "foundry_tremor_step": "Tremor Step"
     }
   },
   "questUi": {
@@ -19967,6 +19976,9 @@ export const cs_CZ: EnTranslations = {
       },
       "prime_draft": {
         "name": "The Prime Draft"
+      },
+      "half_built_frame": {
+        "name": "Half-Built Frame"
       },
       "sanctum_boneguard": {
         "name": "Kostěná stráž svatyně"

@@ -272,3 +272,48 @@ describe('/dev foundry tp: a jump to every area and boss', () => {
     for (const id of fresh.mobIds) expect(sim.ctx.entities.get(id)?.dead, String(id)).toBe(false);
   });
 });
+
+describe('/dev foundry trigger: every boss mechanic fires on demand', () => {
+  const BY_BOSS: Record<string, string[]> = {
+    line_master_tock: ['lever', 'press', 'parts', 'rivet'],
+    rangewarden: ['lock', 'proof', 'drones'],
+    voltaic_warden: ['flip', 'discharge', 'platedrones', 'lash', 'strike'],
+    prime_draft: ['cell', 'overload', 'fist', 'sweep', 'unbolt', 'tremor', 'heartless', 'surge'],
+  };
+  for (const [templateId, mechanics] of Object.entries(BY_BOSS)) {
+    it(`${templateId}: ${mechanics.join(', ')}`, () => {
+      const { sim, me, inst } = enter();
+      // A second player so a mark always has a non-tank target.
+      const pid = sim.addPlayer('mage', 'Triggerhand');
+      const mate = sim.ctx.entities.get(pid) as Entity;
+      const boss = rosterOf(sim, inst, templateId);
+      for (const p of [me, mate]) {
+        p.maxHp = 1e7;
+        p.hp = 1e7;
+        p.pos = sim.ctx.groundPos(boss.pos.x + 3, boss.pos.z + 3);
+        p.prevPos = { ...p.pos };
+      }
+      boss.maxHp = 1e6;
+      boss.hp = 1e6;
+      sim.ctx.aggroMob(boss, me, false);
+      for (let i = 0; i < 2; i++) sim.tick();
+      for (const what of mechanics) {
+        sim.drainEvents();
+        dev(sim, me, `trigger ${what}`);
+        const lines = sim
+          .drainEvents()
+          .filter((e) => e.type === 'log')
+          .map((e) => (e as { text: string }).text);
+        expect(
+          lines.some((t) => t.startsWith('[dev] ')),
+          what,
+        ).toBe(true);
+        expect(
+          lines.some((t) => t.includes('Mechanics:') || t.includes('first.')),
+          what,
+        ).toBe(false);
+        sim.tick();
+      }
+    });
+  }
+});

@@ -112,6 +112,18 @@ export const PARTS_CHUTE = { x: 0, z: -43 } as const;
 
 /** The Proving Range, the Rangewarden's arena: a long open range. */
 export const PROVING_RANGE = { x0: -112, z0: -20, x1: -52, z1: 12, h: 10 } as const;
+/** The Proving Range's two bunkers (low walls running north to south, the
+ *  long side facing the berm): the Rangewarden's shells burst on them instead
+ *  of the ground in their lee (phase 2's cover). Half length along z, half
+ *  depth along x, height. */
+export const RANGE_BUNKERS: readonly { x: number; z: number; hw: number; hd: number; h: number }[] =
+  [
+    { x: -70, z: -8, hw: 3.5, hd: 1, h: 1.6 },
+    { x: -96, z: 2, hw: 3.5, hd: 1, h: 1.6 },
+  ];
+/** The berm of turret emplacements along the Proving Range's far (west) side,
+ *  where the Rangewarden's shells are fired from. */
+export const RANGE_BERM = { x: -109, zs: [-14, -4, 6] as const } as const;
 /** The Coil Crown, the Voltaic Warden's round platform on the storm-coil tower. */
 export const COIL_CROWN = { x: 82, z: 14, r: 26, h: 40 } as const;
 /** The great coil in the crown's centre (render hero piece, a collider). */
@@ -452,12 +464,28 @@ const PROPS: FieldProp[] = [
   { kind: 'sf_target_frame', x: -52, z: -72, rot: -0.2, hw: 1.6, hd: 0.3, h: 3 },
   // The Proving Range: bunkers across the range, target frames, and the berm
   // of turret emplacements along the far (west) side.
-  { kind: 'sf_bunker', x: -70, z: -8, rot: Math.PI / 2, hw: 3.5, hd: 1, h: 1.6 },
-  { kind: 'sf_bunker', x: -96, z: 2, rot: Math.PI / 2, hw: 3.5, hd: 1, h: 1.6 },
+  ...RANGE_BUNKERS.map(
+    (b): FieldProp => ({
+      kind: 'sf_bunker',
+      x: b.x,
+      z: b.z,
+      rot: Math.PI / 2,
+      hw: b.hw,
+      hd: b.hd,
+      h: b.h,
+    }),
+  ),
   { kind: 'sf_target_frame', x: -60, z: 6, rot: 0, hw: 1.6, hd: 0.3, h: 3 },
   { kind: 'sf_target_frame', x: -82, z: -16, rot: 0, hw: 1.6, hd: 0.3, h: 3 },
-  ...[-14, -4, 6].map(
-    (z): FieldProp => ({ kind: 'sf_turret_berm', x: -109, z, rot: Math.PI / 2, r: 1.8, h: 3 }),
+  ...RANGE_BERM.zs.map(
+    (z): FieldProp => ({
+      kind: 'sf_turret_berm',
+      x: RANGE_BERM.x,
+      z,
+      rot: Math.PI / 2,
+      r: 1.8,
+      h: 3,
+    }),
   ),
   // The Coil Stair: the pylons at the switchbacks.
   { kind: 'sf_coil_pylon', x: 54, z: -50, rot: 0, r: 1, h: 10 },

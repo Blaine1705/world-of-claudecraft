@@ -650,6 +650,17 @@ const mergeStringsEn = {
       foundry_deploy_turret: 'Deploy Turret',
       foundry_steam_screen: 'Steam Screen',
       foundry_hauler_steam_blast: 'Steam Blast',
+      // The Stormbrass Foundry's four bosses (encounters/stormbrass_foundry).
+      // None of these bars can be kicked.
+      foundry_tock_lever: 'Throw the Lever',
+      foundry_tock_rivet_gun: 'Rivet Gun',
+      foundry_proof_shot: 'Proof Shot',
+      foundry_plating_flip: 'Reversing Plates',
+      foundry_static_lash: 'Static Lash',
+      foundry_draft_awaken: 'Awakening',
+      foundry_arm_sweep: 'Arm Sweep',
+      foundry_draft_unbolt: 'Tearing Free',
+      foundry_tremor_step: 'Tremor Step',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

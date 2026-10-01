@@ -14,6 +14,7 @@ import {
   FOUNDRY_BURST_RING,
   FOUNDRY_SCRAP_MARK,
   GANTRY_HAULER_ID,
+  HAULER_DEED,
   HAULER_STEAM_BLAST,
   HAULER_TUNING,
   HAULER_UNLOAD_LOG,
@@ -462,6 +463,17 @@ describe('the Gantry Hauler (showpiece patrol)', () => {
     expect(dealt(r, far.id, 'Scrap Toss')).toHaveLength(1);
     expect(objectsOf(r, FOUNDRY_SCRAP_MARK)).toHaveLength(0);
     expect(h.foundryFight).toBeUndefined();
+    // The last plate struck someone: no Off the Rails.
+    expect(r.sim.players.get(r.me.id)?.deedsEarned.has(HAULER_DEED)).toBe(false);
+  });
+
+  it('Off the Rails: a kill with nobody hit by a plate earns the deed', () => {
+    const r = room();
+    const h = hauler(r, 4);
+    run(r, 1, [h], true);
+    r.sim.ctx.handleDeath(h, r.me);
+    run(r, 0.1, [h], true);
+    expect(r.sim.players.get(r.me.id)?.deedsEarned.has(HAULER_DEED)).toBe(true);
   });
 
   it('a wipe or an evade drops the plates in flight and the bar', () => {

@@ -12331,7 +12331,16 @@ export const ru_RU: EnTranslations = {
       "foundry_field_repair": "Полевой ремонт",
       "foundry_deploy_turret": "Установка турели",
       "foundry_steam_screen": "Паровой заслон",
-      "foundry_hauler_steam_blast": "Паровой выброс"
+      "foundry_hauler_steam_blast": "Паровой выброс",
+      "foundry_tock_lever": "Рычаг",
+      "foundry_tock_rivet_gun": "Клепальный пистолет",
+      "foundry_proof_shot": "Пробный выстрел",
+      "foundry_plating_flip": "Переворот пластин",
+      "foundry_static_lash": "Статический хлыст",
+      "foundry_draft_awaken": "Пробуждение",
+      "foundry_arm_sweep": "Размах руки",
+      "foundry_draft_unbolt": "Срыв с болтов",
+      "foundry_tremor_step": "Сотрясающий шаг"
     }
   },
   "questUi": {
@@ -19967,6 +19976,9 @@ export const ru_RU: EnTranslations = {
       },
       "prime_draft": {
         "name": "Первый чертеж"
+      },
+      "half_built_frame": {
+        "name": "Недостроенный каркас"
       },
       "sanctum_boneguard": {
         "name": "Костяной страж святилища"

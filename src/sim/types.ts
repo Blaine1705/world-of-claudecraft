@@ -4530,7 +4530,132 @@ export interface HaulerFightState {
   plantedAt: { x: number; y: number; z: number } | null;
 }
 
-export type FoundryFightState = HaulerFightState;
+/** Line-Master Ambrel Tock's fight (encounters/stormbrass_foundry/
+ *  line_master.ts): the belts, the lever, the press, the parts drops. */
+export interface TockFightState {
+  kind: 'tock';
+  /** Each belt's run, west to east: +1 toward the press, -1 back to the chute. */
+  dirs: number[];
+  leverTimer: number;
+  /** The belts the lever in flight will reverse (all four, or heroic
+   *  Cross-Feed's two). */
+  flipping: number[];
+  pressTimer: number;
+  /** The hammer coming down: its belt, the seconds left, its painted strip. */
+  press: { belt: number; remaining: number; objectId: number } | null;
+  rivetTimer: number;
+  /** Parts Drop thresholds already fired. */
+  dropsFired: number;
+  /** Frames on the belts still booting: the add and its seconds left. */
+  frames: { id: number; boot: number }[];
+  /** Lever throws this fight (the heroic Cross-Feed salt). */
+  levers: number;
+  casts: number;
+  /** Anyone caught by the Stamping Press this fight (the deed reads it). */
+  pressed: boolean;
+}
+
+/** The Rangewarden's fight (encounters/stormbrass_foundry/rangewarden.ts). */
+export interface RangewardenFightState {
+  kind: 'rangewarden';
+  lockTimer: number;
+  /** The marked players: whose, the seconds left, the shell clock, and the
+   *  trail of where they stood (one sample a tick, oldest first). */
+  marks: {
+    playerId: number;
+    remaining: number;
+    shellTimer: number;
+    trail: { x: number; z: number }[];
+  }[];
+  /** Shells in the air: where they land, the seconds left, their circle. */
+  shells: { x: number; z: number; remaining: number; objectId: number }[];
+  /** Heroic shrapnel on the ground: where, the seconds left, the tick clock. */
+  shrapnel: { x: number; z: number; remaining: number; tick: number; objectId: number }[];
+  /** Shells each bunker has swallowed this Target Lock. */
+  bunkerHits: number[];
+  proofTimer: number;
+  drillsFired: number;
+  casts: number;
+  /** Any player hit by a salvo this fight (the deed reads it). */
+  shelled: boolean;
+}
+
+/** The Voltaic Warden's fight (encounters/stormbrass_foundry/voltaic_warden.ts). */
+export interface VoltaicFightState {
+  kind: 'voltaic';
+  /** The plates' face (heroic Split Plating: the front's; the back is the other). */
+  plating: 'grounded' | 'charged';
+  /** Seconds to the next flip (the rattle bar starts flipCast before it). */
+  flipTimer: number;
+  /** Wrong-kind damage banked since the last flip. */
+  stored: number;
+  dronesTimer: number;
+  /** The drones it launched (they carry the opposite plating). */
+  droneIds: number[];
+  lashTimer: number;
+  strikeTimer: number;
+  /** Coil strikes about to land: where, the seconds left, their mark. */
+  strikes: { x: number; z: number; remaining: number; objectId: number }[];
+  casts: number;
+  /** A Discharge dealt damage this fight (the deed reads it). */
+  discharged: boolean;
+}
+
+/** One Storm Cell in the Prime Draft's fight. */
+export interface StormCellState {
+  /** Its floor object while it lies on the floor (null while carried). */
+  objectId: number | null;
+  /** Its carrier (null on the floor). */
+  carrierId: number | null;
+  /** Seconds since its rack ejected it (it shorts out at cellLife). */
+  age: number;
+  /** Seconds the current carrier has held it (Static rises with it). */
+  held: number;
+  /** One Static tick a second. */
+  tick: number;
+  /** Heroic Jammed Racks: seconds it still rolls, and its heading. */
+  roll: number;
+  rollYaw: number;
+  /** Who dropped it last, and the sim time they may take it back. */
+  droppedBy: number | null;
+  retakeAt: number;
+}
+
+/** The Prime Draft's fight (encounters/stormbrass_foundry/prime_draft.ts). */
+export interface PrimeDraftFightState {
+  kind: 'prime_draft';
+  phase: 'awaken' | 'bolted' | 'unbolted' | 'heartless';
+  fistTimer: number;
+  /** Piston Fists about to land: where, the seconds left, their mark. */
+  fists: { x: number; z: number; remaining: number; objectId: number }[];
+  sweepTimer: number;
+  /** The Arm Sweep's locked aim while its bar runs. */
+  sweepYaw: number | null;
+  tremorTimer: number;
+  surgeTimer: number;
+  cycleTimer: number;
+  /** Charge cycles started (alternates the racks). */
+  cycles: number;
+  cells: StormCellState[];
+  /** The hatch window in flight: seconds since the ejection that opened it,
+   *  and the cells slotted in it (heroic Double Load waits for two). */
+  hatch: { t: number; slotted: number } | null;
+  /** The hatch ring's object (its state rides the template id). */
+  hatchId: number | null;
+  /** Overloads this fight (the deed reads it). */
+  overloads: number;
+  enraged: boolean;
+  /** Where it stands while bolted or braced for a bar (world coordinates). */
+  plantedAt: { x: number; y: number; z: number } | null;
+  casts: number;
+}
+
+export type FoundryFightState =
+  | HaulerFightState
+  | TockFightState
+  | RangewardenFightState
+  | VoltaicFightState
+  | PrimeDraftFightState;
 
 /** Morthen's entrance and the Knellwyrm finale at the Hollow Crypt's Rite Ring
  *  (encounters/hollow_crypt), on Morthen for the claim's life: the entrance

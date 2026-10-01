@@ -3696,6 +3696,76 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
+  // The Stormbrass Foundry, a new five-player dungeon (docs/design/dungeon-
+  // rework/stormbrass_foundry.md section 9): the clear pair (its clears are
+  // recorded since its first day, deeds.ts FINAL_BOSS_DUNGEONS prime_draft),
+  // then one encounter deed per boss core and one for the Gantry Hauler,
+  // granted by the encounter modules (src/sim/encounters/stormbrass_foundry)
+  // to every player in the claim at the kill. Cosmetic only; appended at the
+  // END per the append-only contract. Generic English idioms, checked
+  // 2026-10-01. The five-player meta-deeds are left as they are (their
+  // triggers are frozen; adding the Foundry is the maintainer's call).
+  dgn_stormbrass_foundry: {
+    id: 'dgn_stormbrass_foundry',
+    name: 'Heart of the Storm',
+    desc: 'Defeat the Prime Draft in the Stormbrass Foundry.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'stormbrass_foundry', count: 1 },
+  },
+  dgn_stormbrass_foundry_heroic: {
+    id: 'dgn_stormbrass_foundry_heroic',
+    name: 'Heroic: The Stormbrass Foundry',
+    desc: 'Defeat the Prime Draft in the Stormbrass Foundry on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'stormbrass_foundry',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
+  dgn_tock_press: {
+    id: 'dgn_tock_press',
+    name: 'Quality Control',
+    desc: 'Defeat Line-Master Ambrel Tock without anyone being caught by the Stamping Press.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_rangewarden_clean: {
+    id: 'dgn_rangewarden_clean',
+    name: 'Clean Range',
+    desc: 'Defeat the Rangewarden without anyone being hit by a shell of its salvo.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_voltaic_grounded: {
+    id: 'dgn_voltaic_grounded',
+    name: 'Grounded',
+    desc: 'Defeat the Voltaic Warden without a single Discharge dealing damage.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_prime_draft_overload: {
+    id: 'dgn_prime_draft_overload',
+    name: 'Heartless',
+    desc: 'Overload the Prime Draft three times in one fight and defeat it.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_gantry_hauler: {
+    id: 'dgn_gantry_hauler',
+    name: 'Off the Rails',
+    desc: 'Defeat the Gantry Hauler without anyone being hit by its Scrap Toss.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

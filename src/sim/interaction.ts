@@ -39,6 +39,7 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryDropStormCell, tryTakeStormCell } from './encounters/stormbrass_foundry/storm_cells';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
 import { tryStartEscort } from './escort';
 import { interactIgnivarRaidLore } from './ignivar_raid_lore';
@@ -292,6 +293,8 @@ export function pickUpObject(
     openHoardRewardChest(ctx, obj.id, p.id);
     return true;
   }
+  // The Prime Draft's Storm Cell holds no item: taking it is the carry.
+  if (tryTakeStormCell(ctx, obj, p)) return true;
   const vehicleStation = vehicleStationByEntityId(obj.id);
   if (vehicleStation) return enterVehicle(ctx, vehicleStation.id, p.id);
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
@@ -461,6 +464,8 @@ export function interact(
   // Locked in the Gaol Turnkey's Iron Cage: the interact press is an escape
   // press (rate-limited and counted by the encounter), never anything else.
   if (tryCageStruggle(ctx, p)) return;
+  // Carrying the Prime Draft's Storm Cell: the interact press drops it.
+  if (tryDropStormCell(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (

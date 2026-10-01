@@ -64,6 +64,16 @@ describe('normal Foundry: the Sanctum ruler', () => {
     expect(swing).toBeLessThan(100);
   });
 
+  it("floors Tock's Half-Built Frames in the drones' 50 band, a kill-fast pool", () => {
+    const swing = minSwing('half_built_frame', 'normal');
+    expect(swing).toBeGreaterThanOrEqual(50);
+    expect(swing).toBeLessThan(100);
+    // About 5 s each at 150 party DPS: three ride the belts per Parts Drop.
+    expect(maxHp('half_built_frame', 'normal')).toBeGreaterThan(4 * 150);
+    expect(maxHp('half_built_frame', 'normal')).toBeLessThan(7 * 150);
+    expect(minSwing('half_built_frame', 'heroic')).toBeGreaterThanOrEqual(500);
+  });
+
   it('floors the Gantry Hauler at 150 and every boss at 200', () => {
     const hauler = minSwing('gantry_hauler', 'normal');
     expect(hauler).toBeGreaterThanOrEqual(150);

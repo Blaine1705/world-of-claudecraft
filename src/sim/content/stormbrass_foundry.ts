@@ -6,13 +6,12 @@
 // gates and encounter seals that make every pack mandatory, and the dungeon
 // record itself (merged by data.ts).
 //
-// PHASE 1 of 3 (see E:/woc/entregas/fundicion/NOTAS_FASE1.md and
-// src/sim/encounters/stormbrass_foundry/CLAUDE.md): the map, every trash pack
-// and patrol with its kit, the Gantry Hauler's full kit, and the four bosses as
-// placeholders that only melee. Phase 2 adds the bosses' cores (G19 conveyors,
-// G20 trail salvo, G21 conduction plating, G12 storm cells), their loot, the
-// deeds, the Reliquary pages and the quest chain; phase 3 the Blender kit,
-// the creature models, their animations and the VFX.
+// Built in three phases (src/sim/encounters/stormbrass_foundry/CLAUDE.md):
+// phase 1 the map, every trash pack and patrol with its kit and the Gantry
+// Hauler; phase 2 the four bosses' cores (G19 conveyors, G20 trail salvo, G21
+// conduction plating, G12 storm cells, each its own encounter module), their
+// loot, the deeds, the Reliquary pages and the quest chain; phase 3 the
+// Blender kit, the creature models, their animations and the VFX.
 //
 // Trash is simple and readable (README section 5): one job per type, never a
 // boss lesson.
@@ -41,6 +40,7 @@
 import {
   FOUNDRY_DUNGEON,
   GANTRY_HAULER_ID,
+  HALF_BUILT_FRAME_ID,
   HAULER_BOILER_RUPTURE,
   PRIME_DRAFT_ID,
   RANGEWARDEN_ID,
@@ -73,9 +73,9 @@ import {
 
 // ---- Mob templates --------------------------------------------------------------
 
-/** A placeholder boss (phase 1): a CC- and snare-immune elite that only melees.
- *  Phase 2 replaces its body with its core (docs section 5). */
-function placeholderBoss(
+/** A Foundry boss body: a CC- and snare-immune elite. Its core rides its
+ *  encounter module (encounters/stormbrass_foundry, docs section 5). */
+function foundryBoss(
   id: string,
   name: string,
   level: number,
@@ -104,7 +104,7 @@ function placeholderBoss(
     armorPerLevel: 30,
     moveSpeed: 7,
     aggroRadius: 14,
-    // Money only in phase 1; the boss tables (docs section 8) land in phase 2.
+    // The level-20 mid-boss money; each boss adds its own table (docs section 8).
     loot: [{ copper: 5000, chance: 1 }],
     scale,
     color,
@@ -425,10 +425,36 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     scale: 2.6,
     color: 0xb58b3c,
   },
-  // ---- The four bosses (phase 1 placeholders: melee only) ------------------------
-  // Line-Master Ambrel Tock on the Main Line (phase 2: G19 moving belts, the
-  // Stamping Press, Parts Drop, Rivet Gun). About 15,000 health (100 s).
-  line_master_tock: placeholderBoss(
+  // Line-Master Tock's Half-Built Frames (encounters/stormbrass_foundry/
+  // line_master.ts Parts Drop): unfinished brass frames the chute drops onto
+  // the belts. They ride the line and boot up 8 s later wherever they are, then
+  // swing like an Arc Drone. Kill them while they ride (or let the press do it).
+  half_built_frame: {
+    id: HALF_BUILT_FRAME_ID,
+    name: 'Half-Built Frame',
+    minLevel: 19,
+    maxLevel: 19,
+    family: 'elemental',
+    untameable: true,
+    ccImmune: true,
+    hpBase: 80,
+    hpPerLevel: 26,
+    dmgBase: 9,
+    dmgPerLevel: 2.3,
+    attackSpeed: 2,
+    armorPerLevel: 14,
+    moveSpeed: 6,
+    aggroRadius: 10,
+    xpMult: 0.3,
+    loot: [],
+    scale: 1.5,
+    color: 0x9a8a62,
+  },
+  // ---- The four bosses ----------------------------------------------------------
+  // Line-Master Ambrel Tock on the Main Line (encounters/stormbrass_foundry/
+  // line_master.ts: G19 moving belts, the Stamping Press, Parts Drop, Rivet
+  // Gun). About 15,000 health (100 s).
+  line_master_tock: foundryBoss(
     'line_master_tock',
     'Line-Master Ambrel Tock',
     19,
@@ -436,12 +462,13 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     1.9,
     0x8a6d3b,
   ),
-  // The Rangewarden on the Proving Range (phase 2: G20 Target Lock trail salvo,
-  // Proof Shot, Drill Drones). About 15,000 health (100 s).
-  rangewarden: placeholderBoss('rangewarden', 'The Rangewarden', 20, 'elemental', 2.2, 0xa88940),
-  // The Voltaic Warden on the Coil Crown (phase 2: G21 Conduction Plating,
-  // Stored Charge, Discharge, Arc Drones, Static Lash). About 15,000 health.
-  voltaic_warden: placeholderBoss(
+  // The Rangewarden on the Proving Range (rangewarden.ts: G20 Target Lock
+  // trail salvo, the bunkers, Proof Shot, Drill Drones). About 15,000 health.
+  rangewarden: foundryBoss('rangewarden', 'The Rangewarden', 20, 'elemental', 2.2, 0xa88940),
+  // The Voltaic Warden on the Coil Crown (voltaic_warden.ts: G21 Conduction
+  // Plating, Stored Charge, Discharge, plated drones, Static Lash, Coil
+  // Strike). About 15,000 health.
+  voltaic_warden: foundryBoss(
     'voltaic_warden',
     'The Voltaic Warden',
     20,
@@ -449,10 +476,11 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     2.4,
     0x4e9c8a,
   ),
-  // The Prime Draft in its gantry (phase 2: G12 storm cells, the Core Hatch,
-  // three phases, the enrage). About 26,000 health (170 s). The final boss:
-  // pulling it early wakes the whole foundry (bossChainPull).
-  prime_draft: placeholderBoss('prime_draft', 'The Prime Draft', 20, 'elemental', 2.6, 0xc9a14a, {
+  // The Prime Draft in its gantry (prime_draft.ts and storm_cells.ts: G12
+  // storm cells, the Core Hatch, three phases, the enrage). About 26,000
+  // health (170 s). The final boss: pulling it early wakes the whole foundry
+  // (bossChainPull).
+  prime_draft: foundryBoss('prime_draft', 'The Prime Draft', 20, 'elemental', 2.6, 0xc9a14a, {
     boss: true,
     hpBase: 260,
     hpPerLevel: 36,

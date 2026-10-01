@@ -12331,7 +12331,16 @@ export const zh_TW: EnTranslations = {
       "foundry_field_repair": "現場維修",
       "foundry_deploy_turret": "部署砲台",
       "foundry_steam_screen": "蒸汽屏障",
-      "foundry_hauler_steam_blast": "蒸汽衝擊"
+      "foundry_hauler_steam_blast": "蒸汽衝擊",
+      "foundry_tock_lever": "拉下拉桿",
+      "foundry_tock_rivet_gun": "鉚釘槍",
+      "foundry_proof_shot": "試射砲彈",
+      "foundry_plating_flip": "翻轉裝甲板",
+      "foundry_static_lash": "靜電鞭笞",
+      "foundry_draft_awaken": "甦醒",
+      "foundry_arm_sweep": "橫臂掃擊",
+      "foundry_draft_unbolt": "掙脫螺栓",
+      "foundry_tremor_step": "震地踏步"
     }
   },
   "questUi": {
@@ -19967,6 +19976,9 @@ export const zh_TW: EnTranslations = {
       },
       "prime_draft": {
         "name": "初代原型"
+      },
+      "half_built_frame": {
+        "name": "半成品機架"
       },
       "sanctum_boneguard": {
         "name": "聖所骨衛"

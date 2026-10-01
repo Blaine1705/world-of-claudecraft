@@ -12331,7 +12331,16 @@ export const en_XA: EnTranslations = {
       "foundry_field_repair": "[Ƒíéļð Ŕéþáíŕ]",
       "foundry_deploy_turret": "[Ðéþļóý Ţúŕŕéţ]",
       "foundry_steam_screen": "[Šţéáɱ Šçŕééñ]",
-      "foundry_hauler_steam_blast": "[Šţéáɱ Ɓļášţ]"
+      "foundry_hauler_steam_blast": "[Šţéáɱ Ɓļášţ]",
+      "foundry_tock_lever": "[Ţĥŕóŵ ţĥé Ļéʋéŕ]",
+      "foundry_tock_rivet_gun": "[Ŕíʋéţ Ĝúñ]",
+      "foundry_proof_shot": "[Þŕóóƒ Šĥóţ]",
+      "foundry_plating_flip": "[Ŕéʋéŕšíñĝ Þļáţéš]",
+      "foundry_static_lash": "[Šţáţíç Ļášĥ]",
+      "foundry_draft_awaken": "[Áŵáķéñíñĝ]",
+      "foundry_arm_sweep": "[Áŕɱ Šŵééþ]",
+      "foundry_draft_unbolt": "[Ţéáŕíñĝ Ƒŕéé]",
+      "foundry_tremor_step": "[Ţŕéɱóŕ Šţéþ]"
     }
   },
   "questUi": {
@@ -19967,6 +19976,9 @@ export const en_XA: EnTranslations = {
       },
       "prime_draft": {
         "name": "[Ţĥé Þŕíɱé Ðŕáƒţ]"
+      },
+      "half_built_frame": {
+        "name": "[Ĥáļƒ-Ɓúíļţ Ƒŕáɱé]"
       },
       "sanctum_boneguard": {
         "name": "[Šáñçţúɱ Ɓóñéĝúáŕð]"

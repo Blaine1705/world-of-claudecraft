@@ -150,8 +150,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (renown 10 each: +40).
     // 328 / 3635 with the Hollow Crypt fourth pass's Knellwyrm deed (+10).
     // 329 / 3645 with the Sunken Bastion fifth pass's Gaol Turnkey deed (+10).
-    expect(DEED_ORDER.length).toBe(329);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3645);
+    // 336 / 3715 with the Stormbrass Foundry's seven: its clear pair and five
+    // encounter deeds (renown 10 each: +70).
+    expect(DEED_ORDER.length).toBe(336);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3715);
   });
 
   it('ships the audited per-category counts', () => {
@@ -177,7 +179,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
       // +4 the Drowned Temple rework's encounter deeds.
       // +1 the Sunken Bastion fifth pass's Gaol Turnkey deed.
-      dungeon: 46,
+      // +7 the Stormbrass Foundry (a clear pair and five encounter deeds).
+      dungeon: 53,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -429,6 +432,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_crypt_knellwyrm',
       // The Sunken Bastion fifth pass's Gaol Turnkey miniboss (manual grant).
       'dgn_turnkey_cage',
+      // The Stormbrass Foundry: its clear pair, then its encounter deeds.
+      'dgn_stormbrass_foundry',
+      'dgn_stormbrass_foundry_heroic',
+      'dgn_tock_press',
+      'dgn_rangewarden_clean',
+      'dgn_voltaic_grounded',
+      'dgn_prime_draft_overload',
+      'dgn_gantry_hauler',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1074,7 +1085,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined for the Sunken Bastion fifth pass's appended Gaol Turnkey
   // deed (dgn_turnkey_cage) the same auditable way: the eed1c94d... literal
   // rotated down into PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = 'bfd70a94893390e2b0b26eaad7891366626e891a8e1674e51af0dfede2f8f1f9';
+  // Re-baselined for the Stormbrass Foundry's seven appended deeds (its clear
+  // pair and five encounter deeds) the same auditable way: the bfd70a94...
+  // literal rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = 'f9683290fea6c905762175552250903470648d0efc76a5b64c78560a8368a4db';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1154,11 +1168,22 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // dgn_mere_hydra; the previous mint is the 777ad913... literal.
   //
   // The Sunken Bastion's fifth pass appends the Gaol Turnkey deed after
-  // dgn_crypt_knellwyrm; the previous mint is the eed1c94d... literal
-  // (rotated down here), and stripping the one id must reproduce it exactly.
+  // dgn_crypt_knellwyrm; the previous mint is the eed1c94d... literal.
+  //
+  // The Stormbrass Foundry appends its seven deeds after dgn_turnkey_cage;
+  // the previous mint is the bfd70a94... literal (rotated down here), and
+  // stripping the seven must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    'eed1c94ddf7148c487d669791443fb418a8a05919b040df466c845010979824d';
-  const APPENDED_SINCE: readonly string[] = ['dgn_turnkey_cage'];
+    'bfd70a94893390e2b0b26eaad7891366626e891a8e1674e51af0dfede2f8f1f9';
+  const APPENDED_SINCE: readonly string[] = [
+    'dgn_stormbrass_foundry',
+    'dgn_stormbrass_foundry_heroic',
+    'dgn_tock_press',
+    'dgn_rangewarden_clean',
+    'dgn_voltaic_grounded',
+    'dgn_prime_draft_overload',
+    'dgn_gantry_hauler',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1170,8 +1195,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_mere_hydra',
       'dgn_crypt_knellwyrm',
+      'dgn_turnkey_cage',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1392,8 +1417,10 @@ describe('table shape', () => {
     // then the world-quest block, then the faction standing ladder, then the
     // Clue Scroll casket pair, then the release's ferry round trip as the
     // entry, then the Sunken Bastion's four encounter deeds, the Turretback
-    // Hermit's last, then the Drowned Temple's four, the Mere Hydra's last.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_turnkey_cage');
+    // Hermit's last, then the Drowned Temple's four, the Mere Hydra's last,
+    // then the Knellwyrm, the Gaol Turnkey and the Stormbrass Foundry's
+    // seven, the Gantry Hauler's last.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_gantry_hauler');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

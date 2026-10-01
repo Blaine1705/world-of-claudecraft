@@ -350,6 +350,8 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       brass_sentry: 3.8,
       steam_bruiser: 3.4,
       arc_drone: 4,
+      // Tock's Half-Built Frames swing in the drones' 50 band.
+      half_built_frame: 4,
       foundry_engineer: 3.8,
       gearwright_apprentice: 4.05,
       clockwork_hound: 3.95,
@@ -364,6 +366,7 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       brass_sentry: 1,
       steam_bruiser: 1,
       arc_drone: 1,
+      half_built_frame: 1,
       foundry_engineer: 1,
       gearwright_apprentice: 1,
       clockwork_hound: 1,
@@ -605,6 +608,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       gearwright_apprentice: 16.6,
       clockwork_hound: 16,
       arc_drone: 30.5,
+      half_built_frame: 30.5,
     },
     // Avoidable mechanics priced apart from the tank-swing floor: a missed
     // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
@@ -614,6 +618,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       brass_sentry: 3,
       steam_bruiser: 3,
       arc_drone: 3,
+      half_built_frame: 3,
       foundry_engineer: 3,
       gearwright_apprentice: 3,
       clockwork_hound: 3,

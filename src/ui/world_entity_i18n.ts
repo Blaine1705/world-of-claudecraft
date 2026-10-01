@@ -151,6 +151,7 @@ const MOB_IDS = [
   'rangewarden',
   'voltaic_warden',
   'prime_draft',
+  'half_built_frame',
   'sanctum_boneguard',
   'sanctum_drakonid',
   'raised_bonewalker',

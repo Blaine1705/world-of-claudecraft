@@ -12331,7 +12331,16 @@ export const ko_KR: EnTranslations = {
       "foundry_field_repair": "현장 수리",
       "foundry_deploy_turret": "포탑 설치",
       "foundry_steam_screen": "증기 방벽",
-      "foundry_hauler_steam_blast": "증기 분사"
+      "foundry_hauler_steam_blast": "증기 분사",
+      "foundry_tock_lever": "레버 당기기",
+      "foundry_tock_rivet_gun": "리벳 총",
+      "foundry_proof_shot": "시험 사격",
+      "foundry_plating_flip": "장갑판 반전",
+      "foundry_static_lash": "정전기 채찍",
+      "foundry_draft_awaken": "각성",
+      "foundry_arm_sweep": "팔 휩쓸기",
+      "foundry_draft_unbolt": "볼트 뜯어내기",
+      "foundry_tremor_step": "진동 발걸음"
     }
   },
   "questUi": {
@@ -19967,6 +19976,9 @@ export const ko_KR: EnTranslations = {
       },
       "prime_draft": {
         "name": "원형 초안"
+      },
+      "half_built_frame": {
+        "name": "반쯤 조립된 기체"
       },
       "sanctum_boneguard": {
         "name": "성소 뼈수호자"
