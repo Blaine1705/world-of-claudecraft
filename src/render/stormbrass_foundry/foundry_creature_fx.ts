@@ -33,6 +33,7 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
+import { MAIN_LINE_BELTS } from '../../sim/content/stormbrass_foundry_layout';
 import {
   DRAFT_ARC_BACK,
   DRAFT_ARC_SURGE,
@@ -187,6 +188,7 @@ export class FoundryCreatureFx {
   private readonly players: Entity[] = [];
   private readonly carriers: Entity[] = [];
   private readonly cells: Entity[] = [];
+  private readonly belts: Entity[] = [];
   private clock = 0;
   private scan = 0;
   private emitAcc = 0;
@@ -610,7 +612,36 @@ export class FoundryCreatureFx {
     }
   }
 
+  /** The belts reverse: steam spits along every belt, sparks off its rollers. */
+  private beltsReverse(): void {
+    const half = (MAIN_LINE_BELTS.z1 - MAIN_LINE_BELTS.z0) / 2;
+    for (const b of this.belts) {
+      for (let k = 0; k < 5; k++) {
+        const z = b.pos.z - half + (2 * half * (k + 0.5)) / 5;
+        const y = this.groundY(b.pos.x, z);
+        this.steam(b.pos.x + (this.rand() - 0.5) * 4, y + 0.3, z, 4, 1.2, { x: 0, y: 1, z: 0 }, 3);
+        this.sparks(b.pos.x + (k % 2 ? 2.4 : -2.4), y + 0.4, z, 6, 5);
+      }
+    }
+  }
+
+  /** The klaxon over the belts: a whirling amber beacon at both ends of each. */
+  private beltAlarm(): void {
+    const half = (MAIN_LINE_BELTS.z1 - MAIN_LINE_BELTS.z0) / 2;
+    const pulse = 0.5 + 0.5 * Math.sin(this.clock * 14);
+    for (const b of this.belts) {
+      if (b.templateId !== 'foundry_belt_alarm') continue;
+      for (const end of [-1, 1]) {
+        const z = b.pos.z + end * (half + 0.6);
+        const x = b.pos.x + MAIN_LINE_BELTS.halfWidth + 0.4;
+        const y = this.groundY(x, z) + 1.6;
+        this.flash(x, y, z, 1.2 + 1.4 * pulse, [1, 0.42 + 0.2 * pulse, 0.08], 0.1);
+      }
+    }
+  }
+
   private leverLands(tock: Entity): void {
+    this.beltsReverse();
     for (const a of [A.tockStackL, A.tockStackR]) {
       const s = this.at(tock, a);
       this.steam(s.x, s.y, s.z, 26, 1.8, { x: 0, y: 1, z: 0 }, 7);
@@ -931,6 +962,7 @@ export class FoundryCreatureFx {
     this.players.length = 0;
     this.carriers.length = 0;
     this.cells.length = 0;
+    this.belts.length = 0;
     const live = new Set<number>();
     for (const e of world.entities.values()) {
       if (e.kind === 'player') {
@@ -941,6 +973,7 @@ export class FoundryCreatureFx {
       if (e.kind !== 'mob') {
         const t = e.templateId;
         if (t === 'foundry_storm_cell' || t === 'foundry_storm_cell_rolling') this.cells.push(e);
+        if (t.startsWith('foundry_belt_')) this.belts.push(e);
         if (t === FOUNDRY_SHELL_MARK || t === FOUNDRY_SCRAP_MARK) {
           live.add(e.id);
           if (!this.seenObjects.has(e.id)) {
@@ -1038,6 +1071,7 @@ export class FoundryCreatureFx {
     switch (e.templateId) {
       case TOCK_ID: {
         if (!tick) return;
+        this.beltAlarm();
         for (const a of [A.tockStackL, A.tockStackR]) {
           const s = this.at(e, a);
           this.puff(s.x, s.y, s.z, 1, {
