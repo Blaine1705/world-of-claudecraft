@@ -212,6 +212,20 @@ const SHOTS = [
   },
   // ---- item 5: Ysolei
   { id: 'ysolei_escala', at: [-4, 207], face: -1.5, yaw: -1.5, pitch: 0.1, dist: 14, wait: 3000 },
+  // Her dais, a melee swing from its rim, and the camera's boss zoom: the
+  // wheel rolled all the way out (22 yd everywhere else, up to 40 with her).
+  {
+    id: 'ysolei_tarima_y_zoom',
+    at: [-15.5, 206],
+    face: -Math.PI / 2,
+    yaw: -Math.PI / 2,
+    pitch: 0.3,
+    dist: 20,
+    wheel: 100,
+    js: 'pull:ysolei',
+    stepWait: 2500,
+    wait: 1500,
+  },
   {
     id: 'ysolei_marea_lunar',
     at: [-10, 200],
@@ -417,6 +431,8 @@ async function main() {
         input.camYaw = s.yaw ?? 0;
         input.camPitch = s.pitch;
         input.camDist = s.dist;
+        // A wheel roll (zoomBy honours the live zoom ceiling).
+        if (s.wheel) input.zoomBy(s.wheel);
       }, shot);
       await sleep(shot.wait ?? 2800);
       if (shot.js) {

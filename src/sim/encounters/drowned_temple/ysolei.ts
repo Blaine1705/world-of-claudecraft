@@ -25,6 +25,7 @@
 // Zero rng in every pick (the first flooded half is hashed); the only draws
 // are the damage rolls.
 
+import { MOBS } from '../../data';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
 import { kitHash } from '../../mob/trash_kit/targets';
 import { pullToward } from '../../pull_toward';
@@ -268,7 +269,15 @@ function stepUndertow(
   boss.castRemaining = Math.max(0, u.remaining);
   for (const p of claimPlayers(ctx, inst)) {
     if (p.dead || dist2d(p.pos, boss.pos) > T.undertowReach) continue;
-    pullToward(ctx, p, boss.pos.x, boss.pos.z, T.undertowPull * DT, 2);
+    // Dragged to the edge of her coil, never inside the body.
+    pullToward(
+      ctx,
+      p,
+      boss.pos.x,
+      boss.pos.z,
+      T.undertowPull * DT,
+      MOBS[boss.templateId]?.bodyRadius ?? 2,
+    );
   }
   if (u.remaining > 0) return true;
   clearCastOf(boss, YSOLEI_UNDERTOW);

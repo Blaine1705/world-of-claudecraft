@@ -44,7 +44,7 @@ import {
   type DungeonSpawn,
   type MobTemplate,
 } from '../types';
-import { ALTAR_STONE, HYDRA_HEADS, MOON_ALTAR, PRISM_PLINTH } from './drowned_temple_layout';
+import { HYDRA_HEADS, PRISM_PLINTH, YSOLEI_DAIS } from './drowned_temple_layout';
 
 /** The Mere Hydra's three head templates, left to right. */
 export const MERE_HYDRA_HEAD_IDS = [
@@ -537,8 +537,8 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   // the altar stone's collider), on the causeway line, facing the causeway.
   {
     mobId: 'ysolei',
-    x: ALTAR_STONE.x + ALTAR_STONE.r + 0.6,
-    z: MOON_ALTAR.z,
+    x: YSOLEI_DAIS.x,
+    z: YSOLEI_DAIS.z,
     facing: FACE_EAST,
     idleStationary: true,
   },

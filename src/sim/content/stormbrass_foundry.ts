@@ -462,6 +462,8 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     1.9,
     0x8a6d3b,
     {
+      // The 8 yd foreman: melee reaches him from his body's edge (bodyRadius).
+      bodyRadius: 3.5,
       // Section 8.1: one guaranteed archetype piece and the Torque Wrench chase
       // row. Heroic rides HEROIC_BOSS_LOOT.line_master_tock.
       loot: [
@@ -491,6 +493,8 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
   // The Rangewarden on the Proving Range (rangewarden.ts: G20 Target Lock
   // trail salvo, the bunkers, Proof Shot, Drill Drones). About 15,000 health.
   rangewarden: foundryBoss('rangewarden', 'The Rangewarden', 20, 'elemental', 2.2, 0xa88940, {
+    // The great siege engine (bodyRadius: melee reaches its edge, 6.5 yd).
+    bodyRadius: 3.5,
     loot: [
       { copper: 5000, chance: 1 },
       {
@@ -525,6 +529,8 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     2.4,
     0x4e9c8a,
     {
+      // The 10 yd plated golem (bodyRadius: melee reaches its edge, 7 yd).
+      bodyRadius: 4,
       loot: [
         { copper: 5000, chance: 1 },
         {
@@ -555,6 +561,8 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
   // (bossChainPull).
   prime_draft: foundryBoss('prime_draft', 'The Prime Draft', 20, 'elemental', 2.6, 0xc9a14a, {
     boss: true,
+    // The 9 yd colossus (bodyRadius: melee reaches its edge, 7.5 yd).
+    bodyRadius: 4.5,
     hpBase: 260,
     hpPerLevel: 36,
     moveSpeed: 4.5,

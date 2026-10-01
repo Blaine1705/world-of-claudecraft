@@ -440,8 +440,11 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     attackSpeed: 2.5,
     armorPerLevel: 28,
     // The sixth pass: a colossal serpent coiled on the Moon Altar (the Blender
-    // body built for her), so she never leaves it and her reach is a giant's
-    // (the 2.5 scale: about 9.5 yd, the edge of her coils).
+    // body built for her), so she never leaves it and her reach is a giant's.
+    // Her coil spreads 8 yd round her pivot: melee reaches her from its edge
+    // (11 yd) and her own swing reaches 12, on her dais
+    // (drowned_temple_layout.ts YSOLEI_DAIS).
+    bodyRadius: 8,
     moveSpeed: 0,
     idleStationary: true,
     aggroRadius: 18,

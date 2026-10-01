@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { startAutoAttack, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import {
+  BODY_EDGE_MELEE_REACH,
   effectivePlayerAttackRange,
   RAID_BOSS_PLAYER_MELEE_RANGE,
 } from '../src/sim/combat/player_attack_reach';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
+import { combatProfileForMob } from '../src/sim/mob_combat';
 import { Sim } from '../src/sim/sim';
 import { IGNIVAR_BOSS_ID, MELEE_RANGE } from '../src/sim/types';
 
@@ -97,5 +99,62 @@ describe('raid boss player attack reach', () => {
     sim.castAbility('mortal_strike', player.id);
     expect(player.cooldowns.has('mortal_strike')).toBe(false);
     expect(boss.hp).toBe(boss.maxHp);
+  });
+});
+
+// The towering dungeon bosses author a bodyRadius (MobTemplate): a player's
+// melee reaches the edge of the body (bodyRadius + 3) instead of standing
+// inside the model (Ysolei's coils spread 8 yd round her pivot), and the
+// boss's own swing reaches one yard further, so nobody hits from outside it.
+describe('big-bodied boss reach (bodyRadius)', () => {
+  const BODIED = Object.values(MOBS).filter((m) => (m.bodyRadius ?? 0) > 0);
+
+  it('covers the reworked dungeons’ big bosses', () => {
+    const ids = BODIED.map((m) => m.id);
+    for (const id of [
+      'ysolei',
+      'crypt_knellwyrm',
+      'morthen',
+      'line_master_tock',
+      'voltaic_warden',
+      'prime_draft',
+    ])
+      expect(ids).toContain(id);
+  });
+
+  it.each(BODIED.map((m) => [m.id, m.bodyRadius as number, m.scale] as const))(
+    '%s: melee reaches its edge, and its own swing outreaches the player',
+    (id, body, scale) => {
+      const target = { kind: 'mob' as const, templateId: id };
+      const reach = effectivePlayerAttackRange(target, MELEE_RANGE);
+      expect(reach).toBe(body + BODY_EDGE_MELEE_REACH);
+      expect(effectivePlayerAttackRange(target, 30)).toBe(30);
+      expect(combatProfileForMob(id, scale).meleeRange).toBeGreaterThan(reach);
+    },
+  );
+
+  it('Ysolei: a swing lands from the edge of her coil, 10.5 yd out', () => {
+    const sim = new Sim({ seed: 771, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const player = sim.player;
+    const meta = sim.players.get(player.id);
+    if (!meta) throw new Error('no meta');
+    const boss = createMob(sim.nextId++, MOBS.ysolei, 18, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z + 10.5,
+    });
+    boss.maxHp = 1_000_000;
+    boss.hp = boss.maxHp;
+    boss.stats = { ...boss.stats, armor: 0 };
+    sim.addEntity(boss);
+    sim.targetEntity(boss.id, player.id);
+    startAutoAttack(sim.ctx, player.id);
+    player.swingTimer = 0;
+    for (let attempt = 0; attempt < 20 && boss.hp === boss.maxHp; attempt++) {
+      updatePlayerAutoAttack(sim.ctx, player, meta);
+      player.swingTimer = 0;
+    }
+    expect(boss.hp).toBeLessThan(boss.maxHp);
   });
 });

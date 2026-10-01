@@ -68,6 +68,9 @@ export const HOLLOW_CRYPT_ANCHORS = {
 
 /** The Rite Ring: centre, radius and floor height (the crag top). */
 export const HOLLOW_CRYPT_RING = { x: 0, z: 205, r: 28, h: 24 } as const;
+/** The Rite dais: a raised ring floor where Morthen stands and the Knellwyrm
+ *  lands (encounters/hollow_crypt/ids.ts MORTHEN_SPOT), sized to the wyrm. */
+export const RITE_DAIS = { x: 0, z: 212, r: 9.5, rise: 0.4 } as const;
 
 const SURFACES: FieldSurface[] = [
   // --- Lychgate Landing and the Chapel Stair -------------------------------
@@ -265,6 +268,17 @@ const SURFACES: FieldSurface[] = [
     h: HOLLOW_CRYPT_RING.h,
     edge: 'rock',
     ground: 'ritual',
+  },
+  // The Rite dais (after the ring, so it wins there).
+  {
+    kind: 'circle',
+    id: 'rite_dais',
+    x: RITE_DAIS.x,
+    z: RITE_DAIS.z,
+    r: RITE_DAIS.r,
+    h: HOLLOW_CRYPT_RING.h + RITE_DAIS.rise,
+    edge: 'masonry',
+    ground: 'bone',
   },
 ];
 

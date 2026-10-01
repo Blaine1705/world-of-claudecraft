@@ -121,6 +121,15 @@ export const PRISM_PLINTH = { x: 86, z: 210, r: 4.5 } as const;
 export const MOON_ALTAR = { x: -30, z: 206, r: 26, h: 12 } as const;
 /** The altar stone in the island's centre (under the silver column). */
 export const ALTAR_STONE = { x: -30, z: 206, r: 3 } as const;
+/** Ysolei's dais: a raised ring floor round her coil, sized to her (her
+ *  bodyRadius 8 plus the melee ring standing on its rim), centred where she
+ *  coils against the altar stone's east face. */
+export const YSOLEI_DAIS = {
+  x: ALTAR_STONE.x + ALTAR_STONE.r + 0.6,
+  z: 206,
+  r: 11.5,
+  rise: 0.4,
+} as const;
 
 /** The Moonbridge between the Prism Terrace and the Altar Landing. */
 export const MOONBRIDGE = {
@@ -510,6 +519,17 @@ const SURFACES: FieldSurface[] = [
     h: MOON_ALTAR.h,
     edge: 'masonry',
     ground: 'flagstone',
+  },
+  // Ysolei's dais (after the island, so it wins there).
+  {
+    kind: 'circle',
+    id: 'ysolei_dais',
+    x: YSOLEI_DAIS.x,
+    z: YSOLEI_DAIS.z,
+    r: YSOLEI_DAIS.r,
+    h: MOON_ALTAR.h + YSOLEI_DAIS.rise,
+    edge: 'masonry',
+    ground: 'ritual',
   },
 ];
 

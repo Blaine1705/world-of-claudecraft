@@ -337,6 +337,9 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
   crypt_knellwyrm: {
     id: 'crypt_knellwyrm',
     name: 'Knellwyrm',
+    // A wyrm drawn 19 yd tall: melee reaches it from its flank (8.5 yd), its
+    // own swing reaches 9.5 (MobTemplate.bodyRadius).
+    bodyRadius: 5.5,
     minLevel: 10,
     maxLevel: 10,
     family: 'undead',

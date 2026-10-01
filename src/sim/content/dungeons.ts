@@ -551,6 +551,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   morthen: {
     id: 'morthen',
     name: 'Morthen the Gravecaller',
+    // The 9 yd lich: melee reaches him from his robes' hem (MobTemplate.bodyRadius).
+    bodyRadius: 2.5,
     minLevel: 10,
     maxLevel: 10,
     family: 'undead',

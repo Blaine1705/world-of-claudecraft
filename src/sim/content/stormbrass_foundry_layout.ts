@@ -128,6 +128,8 @@ export const RANGE_BERM = { x: -109, zs: [-14, -4, 6] as const } as const;
 export const COIL_CROWN = { x: 82, z: 14, r: 26, h: 40 } as const;
 /** The great coil in the crown's centre (render hero piece, a collider). */
 export const GREAT_COIL = { x: 82, z: 14, r: 3.5 } as const;
+/** The Voltaic Warden's dais on the crown, under its spawn, sized to it. */
+export const VOLTAIC_DAIS = { x: 82, z: 24, r: 6, rise: 0.4 } as const;
 /** The Drafting Yard: giant blueprint tables and model frames. */
 export const DRAFTING_YARD = { x0: -50, z0: 44, x1: 50, z1: 100, h: 20 } as const;
 /** The Gantry Approach: crane yards and cell racks. */
@@ -136,6 +138,8 @@ export const GANTRY_APPROACH = { x0: -45, z0: 116, x1: 45, z1: 168, h: 25 } as c
 export const GANTRY = { x: 0, z: 205, r: 25, h: 25 } as const;
 /** Where the Prime Draft stands in its scaffold (the landmark and the boss). */
 export const PRIME_DRAFT_SPOT = { x: 0, z: 213 } as const;
+/** The Prime Draft's assembly dais in the Gantry, under its scaffold spot. */
+export const PRIME_DRAFT_DAIS = { x: 0, z: 213, r: 7.5, rise: 0.4 } as const;
 /** The two storm cell charging racks, west and east (phase 2's Charge Cycle). */
 export const CELL_RACKS: readonly { x: number; z: number }[] = [
   { x: -19, z: 204 },
@@ -348,6 +352,16 @@ const SURFACES: FieldSurface[] = [
     edge: 'balustrade',
     ground: 'ritual',
   },
+  {
+    kind: 'circle',
+    id: 'voltaic_dais',
+    x: VOLTAIC_DAIS.x,
+    z: VOLTAIC_DAIS.z,
+    r: VOLTAIC_DAIS.r,
+    h: COIL_CROWN.h + VOLTAIC_DAIS.rise,
+    edge: 'masonry',
+    ground: 'flagstone',
+  },
   // --- The Crane Bridge (walkable once extended, drawn by its gate) --------------
   {
     kind: 'path',
@@ -418,6 +432,16 @@ const SURFACES: FieldSurface[] = [
     h: GANTRY.h,
     edge: 'masonry',
     ground: 'ritual',
+  },
+  {
+    kind: 'circle',
+    id: 'prime_draft_dais',
+    x: PRIME_DRAFT_DAIS.x,
+    z: PRIME_DRAFT_DAIS.z,
+    r: PRIME_DRAFT_DAIS.r,
+    h: GANTRY.h + PRIME_DRAFT_DAIS.rise,
+    edge: 'masonry',
+    ground: 'flagstone',
   },
 ];
 
