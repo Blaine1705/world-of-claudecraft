@@ -5736,7 +5736,9 @@ export const ru_RU: EnTranslations = {
     },
     "pattern": {
       "teaches": "Использование: обучает изготовлению предмета «{item}».",
-      "teachesEnchant": "Использование: обучает наложению чар «{enchant}»."
+      "teachesEnchant": "Использование: обучает наложению чар «{enchant}».",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Снятие привязки: {name}",
