@@ -75,10 +75,19 @@ function tickWithImmortalPuller(sim: Sim, player: Entity, ticks: number): void {
 
 describe('Wildheart Basin premature boss pull', () => {
   it('opts in through content, not through a hardcoded dungeon id in sim logic', () => {
-    expect(DUNGEONS.wildheart_basin.bossChainPull).toBe(true);
+    // Wildheart and the open-air five-player reworks opt in (README section 2,
+    // docs/design/dungeon-rework: bossChainPull stays on everywhere).
+    const OPTED_IN = new Set([
+      'wildheart_basin',
+      'hollow_crypt',
+      'sunken_bastion',
+      'drowned_temple',
+      'stormbrass_foundry',
+    ]);
+    for (const id of OPTED_IN) expect(DUNGEONS[id].bossChainPull, id).toBe(true);
     // Every other dungeon keeps classic pull behavior.
     for (const dungeon of Object.values(DUNGEONS)) {
-      if (dungeon.id === 'wildheart_basin') continue;
+      if (OPTED_IN.has(dungeon.id)) continue;
       expect(dungeon.bossChainPull, dungeon.id).toBeUndefined();
     }
   });
