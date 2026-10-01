@@ -49,6 +49,7 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
+import { FoundryCreatureFx } from './stormbrass_foundry/foundry_creature_fx';
 import { FoundryFx } from './stormbrass_foundry/foundry_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 
@@ -105,6 +106,8 @@ export class RiftDeathZoneVisuals {
   // The Drowned Temple's trash and boss telegraphs, and the Mere Hydra's body.
   private readonly templeFx: TempleFx;
   private readonly foundryFx: FoundryFx;
+  // The Foundry's creature effects and their gestures (gauge, plates, frames).
+  private readonly foundryCreatures: FoundryCreatureFx;
   private readonly cryptCreatures: CryptCreatureFx;
   // The Hollow Crypt finale: Morthen's entrance and the Knellwyrm.
   private readonly cryptFinale: CryptFinaleFx;
@@ -158,6 +161,15 @@ export class RiftDeathZoneVisuals {
     this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
     this.templeFx = new TempleFx(scene, groundY, world, compileGate);
     this.foundryFx = new FoundryFx(scene, groundY, world, compileGate);
+    this.foundryCreatures = new FoundryCreatureFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.cryptCreatures = new CryptCreatureFx(
       scene,
       groundY,
@@ -250,6 +262,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx.update(dt);
     this.templeFx.update(dt);
     this.foundryFx.update(dt);
+    this.foundryCreatures.update(dt);
     this.cryptCreatures.update(dt);
     this.cryptFinale.update(dt);
     this.morthenFx.update(dt);
@@ -287,6 +300,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx.dispose();
     this.templeFx.dispose();
     this.foundryFx.dispose();
+    this.foundryCreatures.dispose();
     this.cryptCreatures.dispose();
     this.cryptFinale.dispose();
     this.morthenFx.dispose();
@@ -301,6 +315,7 @@ export class RiftDeathZoneVisuals {
     this.cryptCreatures.handleEvent(event);
     this.cryptFinale.handleEvent(event);
     this.morthenFx.handleEvent(event);
+    this.foundryCreatures.handleEvent(event);
     this.templeFx.handleEvent(event);
     return this.bastionFx.handleEvent(event);
   }
