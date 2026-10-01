@@ -11,6 +11,11 @@
 export const STILL_FOCUS = {
   'models/creatures/crypt_morthen_lich.glb': { bone: 'Head', radius: 0.33, lift: -0.24 },
   'models/creatures/gaol_turnkey.glb': { bone: 'Head', radius: 0.36, lift: -0.3 },
+  // The Stormbrass Foundry's bosses: Tock's goggles and moustache, the Warden's
+  // helm under its antlers, the Rangewarden's one glass eye.
+  'models/creatures/foundry_line_master_tock.glb': { bone: 'Head', radius: 0.3, lift: -0.15 },
+  'models/creatures/foundry_voltaic_warden.glb': { bone: 'Head', radius: 0.3, lift: -0.05 },
+  'models/creatures/foundry_rangewarden.glb': { bone: 'Head', radius: 0.42, lift: -0.15 },
   'models/creatures/temple_ysolei.glb': {
     bone: 'Head',
     radius: 0.17,

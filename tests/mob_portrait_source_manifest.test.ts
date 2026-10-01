@@ -111,8 +111,10 @@ describe('mob portrait source manifest', () => {
     // trash, the three Mere Hydra heads, the Tideglass Colossus and its ten
     // Reflections, the plain one plus one per class). 321: the Hollow Crypt
     // finale's Knellwyrm. 323: the Sunken Bastion fifth pass's two encounter
-    // bodies (the Turnkey's Iron Cage and Ossick's Drowned Anchor).
-    expect(liveIds).toHaveLength(323);
+    // bodies (the Turnkey's Iron Cage and Ossick's Drowned Anchor). 337: the
+    // Stormbrass Foundry's fourteen (its four bosses, the Gantry Hauler, Tock's
+    // Half-Built Frame and the eight trash bodies).
+    expect(liveIds).toHaveLength(337);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
