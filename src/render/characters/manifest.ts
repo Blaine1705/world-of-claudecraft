@@ -5420,6 +5420,8 @@ const FOUNDRY_PLACEHOLDER_LOOKS: Record<
     { selfIllumination: 0.45 },
   ],
   foundry_prime_draft: ['skel_golem', 0xc9a14a, 0.9, 1, { selfIllumination: 0.35 }],
+  // Tock's Half-Built Frames: a smaller, duller golem shell (phase 2).
+  foundry_half_built_frame: ['skel_golem', 0x9a8a62, 0.8, 0.7, { selfIllumination: 0.15 }],
 };
 for (const [key, [base, tint, tintStrength, grow, extra]] of Object.entries(
   FOUNDRY_PLACEHOLDER_LOOKS,
@@ -5703,6 +5705,7 @@ const MOB_KEYS: Record<string, string> = {
   rangewarden: 'foundry_rangewarden',
   voltaic_warden: 'foundry_voltaic_warden',
   prime_draft: 'foundry_prime_draft',
+  half_built_frame: 'foundry_half_built_frame',
   ...Object.fromEntries(
     ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
   ),

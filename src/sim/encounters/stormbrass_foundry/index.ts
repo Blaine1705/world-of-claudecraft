@@ -9,6 +9,7 @@
 import { sweepOrphanBurstRings } from '../../mob/trash_kit/foundry_kit';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
+import type { Entity } from '../../types';
 import { bossEngaged, claimBoss, foundryClaims } from './claim';
 import {
   haulerState,
@@ -78,19 +79,33 @@ export {
   TOCK_LINES,
 } from './line_master';
 
+/** A live boss fight whose boss lost its target for a moment (a Vanish, the
+ *  tank falling) while still in combat and not evading: the fight holds, so a
+ *  blip never replays its thresholds. Only an evade, a reset or a death ends
+ *  it (each tick's `engaged` false). */
+function paused(boss: Entity): boolean {
+  return (
+    boss.foundryFight !== undefined &&
+    !boss.dead &&
+    boss.inCombat &&
+    boss.aggroTargetId === null &&
+    (boss.aiState === 'chase' || boss.aiState === 'attack')
+  );
+}
+
 /** One tick of every Stormbrass Foundry encounter. */
 export function tickFoundryEncounters(ctx: SimContext): void {
   for (const inst of foundryClaims(ctx)) {
     const hauler = claimBoss(ctx, inst, GANTRY_HAULER_ID);
     if (hauler) tickHauler(ctx, inst, hauler, bossEngaged(hauler));
     const tock = claimBoss(ctx, inst, TOCK_ID);
-    if (tock) tickTock(ctx, inst, tock, bossEngaged(tock));
+    if (tock && !paused(tock)) tickTock(ctx, inst, tock, bossEngaged(tock));
     const range = claimBoss(ctx, inst, RANGEWARDEN_ID);
-    if (range) tickRangewarden(ctx, inst, range, bossEngaged(range));
+    if (range && !paused(range)) tickRangewarden(ctx, inst, range, bossEngaged(range));
     const warden = claimBoss(ctx, inst, VOLTAIC_WARDEN_ID);
-    if (warden) tickVoltaicWarden(ctx, inst, warden, bossEngaged(warden));
+    if (warden && !paused(warden)) tickVoltaicWarden(ctx, inst, warden, bossEngaged(warden));
     const draft = claimBoss(ctx, inst, PRIME_DRAFT_ID);
-    if (draft) tickPrimeDraft(ctx, inst, draft, bossEngaged(draft));
+    if (draft && !paused(draft)) tickPrimeDraft(ctx, inst, draft, bossEngaged(draft));
     sweepOrphanBurstRings(ctx, inst);
   }
 }

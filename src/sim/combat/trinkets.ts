@@ -518,6 +518,9 @@ export function useWornTrinket(
         value: use.haste,
         sourceId: p.id,
         school: 'arcane',
+        // Neither cancelled nor purged: Overheated always follows the burst
+        // (onTrinketAuraExpired runs on the natural expiry only).
+        undispellable: true,
       });
       fx(ctx, p, 'arcane', 'trinket_overclocked_governor');
       break;
@@ -595,7 +598,6 @@ export function isMoored(target: Entity): boolean {
 
 export type TrinketTrigger = 'weaponHit' | 'weaponCrit' | 'spellCast' | 'kill';
 
-/** Called from the set-proc and weapon-proc hooks (set_procs.ts, equip_procs.ts). */
 /** Rangefinder's Lens: the extra damage share `source` deals to `target`
  *  (dealDamage adds it to the source's damage done). Zero when not worn or
  *  not in use. */
@@ -627,6 +629,7 @@ export function onTrinketAuraExpired(ctx: SimContext, e: Entity, a: Aura): void 
   });
 }
 
+/** Called from the set-proc and weapon-proc hooks (set_procs.ts, equip_procs.ts). */
 export function runTrinketTrigger(
   ctx: SimContext,
   source: Entity,

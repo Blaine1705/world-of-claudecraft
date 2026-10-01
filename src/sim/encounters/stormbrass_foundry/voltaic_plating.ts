@@ -7,8 +7,9 @@
 // the next Discharge (voltaic_warden.ts). Heroic Split Plating turns the back
 // half to the other face, so where the attacker stands decides what lands.
 //
-// Pure (no SimContext, no rng): combat/damage.ts dealDamage asks it before any
-// mitigation, the Temple's reflection_guard.ts way, so every damage path
+// No SimContext and no rng, but not pure: a turned-aside hit on the Warden
+// banks into its fight state and its Stored Charge aura. combat/damage.ts
+// dealDamage asks it before any mitigation, the Temple's reflection_guard.ts way, so every damage path
 // (swings, spells, ticks, splashes) honours it. The plating rides auras the
 // client already mirrors.
 

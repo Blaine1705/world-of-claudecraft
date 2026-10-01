@@ -218,10 +218,13 @@ function stepMarks(
   boss: Entity,
   st: RangewardenFightState,
 ): void {
+  const present = st.marks.length > 0 ? claimPlayers(ctx, inst) : [];
   for (let i = st.marks.length - 1; i >= 0; i--) {
     const m = st.marks[i];
     const p = ctx.entities.get(m.playerId);
-    if (!p || p.dead) {
+    if (!p || p.dead || !present.includes(p)) {
+      // Dead, gone, or out of the run: the mark ends (and its crosshair).
+      if (p) dropAuraById(p, RANGE_TARGET_LOCK);
       st.marks.splice(i, 1);
       continue;
     }

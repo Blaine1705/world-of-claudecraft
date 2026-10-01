@@ -128,7 +128,7 @@ export const STORMBRASS_FOUNDRY_QUESTS: Record<string, QuestDef> = {
       },
     ],
     xpReward: 5300,
-    copperReward: 15000,
+    copperReward: 25000,
   },
   [Q.forgefathersIsle]: {
     id: Q.forgefathersIsle,

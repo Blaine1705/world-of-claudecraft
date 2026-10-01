@@ -409,6 +409,8 @@ export function tockState(ctx: SimContext, inst: InstanceSlot, boss: Entity): To
 
 function stepBars(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: TockFightState): boolean {
   const casting = boss.castingAbility;
+  // A lever bar cut short (an interrupt) still throws the lever.
+  if (st.flipping.length > 0 && casting !== TOCK_LEVER) landLever(ctx, inst, boss, st);
   if (casting !== TOCK_LEVER && casting !== TOCK_RIVET_GUN) return false;
   boss.swingTimer = Math.max(boss.swingTimer, 0.6);
   boss.castRemaining = Math.max(0, boss.castRemaining - DT);

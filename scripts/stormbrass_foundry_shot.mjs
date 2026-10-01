@@ -1,8 +1,14 @@
-// Evidence shots of the Stormbrass Foundry (phase 1) in a live offline world:
-// the vistas (the Lift Landing over the shelf, the coil tower, the Prime Draft
-// landmark), every area of the route, the four bosses in their arenas, the
-// Gantry Hauler's kit and the trash telegraphs, and the M map and minimap.
-// Evidence tooling, not a repo test.
+// Evidence shots of the Stormbrass Foundry in a live offline world: the vistas
+// (the Lift Landing over the shelf, the coil tower, the Prime Draft landmark),
+// every area of the route, the Gantry Hauler's kit and the trash telegraphs,
+// the M map, and (phase 2, ids prefixed by the boss) every boss mechanic:
+// Tock's belts, lever, press, Parts Drop and Rivet Gun; the Rangewarden's
+// Target Lock trail, bunkers, Proof Shot and Drill Drones; the Voltaic
+// Warden's plating, flip, Discharge, plated drones, Static Lash and Coil
+// Strike; the Prime Draft's waking, Piston Fist, Arm Sweep, Unbolt, Tremor
+// Step, storm cells, the carry, the Core Hatch, Overload and Heartless.
+// Evidence tooling, not a repo test. A shot id or an id prefix (tock_,
+// rangewarden_, voltaic_, prime_) after the out dir filters the run.
 //
 //   node scripts/stormbrass_foundry_shot.mjs [outDir] [shotId ...]
 //
@@ -90,7 +96,124 @@ const SHOTS = [
     wait: 400,
   },
   { id: 'mapa_m', at: [0, -40], face: 0, pitch: 0.3, dist: 18, map: true },
+  // ---- Phase 2: the boss mechanics (HUD on: cast bars and the Foundry alert).
+  // stage: [templateId, yards, angle]: pull that boss and stand `yards` from it
+  // along `angle` (sim radians, 0 = north of it), facing it.
+  ...bossShots('tock', 'line_master_tock', 14, Math.PI * 1.25, [
+    { id: 'cintas_en_marcha', pitch: 0.7, dist: 26, wait: 2500 },
+    { id: 'palanca_alarma', cmds: ['lever'], cmdWait: 900, pitch: 0.7, dist: 26 },
+    { id: 'cintas_invertidas', cmds: ['lever'], cmdWait: 2600, pitch: 0.7, dist: 26 },
+    { id: 'prensa_franja', cmds: ['press'], cmdWait: 900, pitch: 0.8, dist: 28 },
+    { id: 'piezas_marcos', cmds: ['parts'], cmdWait: 1600, pitch: 0.55, dist: 22 },
+    { id: 'pistola_remaches', cmds: ['rivet'], cmdWait: 500, pitch: 0.35, dist: 14 },
+  ]),
+  ...bossShots('rangewarden', 'rangewarden', 16, Math.PI, [
+    {
+      id: 'fijar_objetivo_rastro',
+      cmds: ['lock'],
+      cmdWait: 300,
+      walk: { dx: 1.6, dz: 0, steps: 8, ms: 450 },
+      pitch: 0.85,
+      dist: 30,
+    },
+    { id: 'bunker_cubre', cmds: ['lock'], cmdWait: 300, bunker: true, pitch: 0.75, dist: 26 },
+    { id: 'disparo_de_prueba', cmds: ['proof'], cmdWait: 900, pitch: 0.35, dist: 14 },
+    { id: 'drones_taladro', cmds: ['drones'], cmdWait: 1500, pitch: 0.5, dist: 20 },
+  ]),
+  ...bossShots('voltaic', 'voltaic_warden', 12, Math.PI, [
+    { id: 'blindaje', pitch: 0.45, dist: 16, wait: 2200 },
+    { id: 'cambio_de_placas', cmds: ['flip'], cmdWait: 1500, pitch: 0.45, dist: 16 },
+    { id: 'descarga', cmds: ['discharge'], cmdWait: 300, pitch: 0.45, dist: 18 },
+    { id: 'drones_blindados', cmds: ['platedrones'], cmdWait: 1500, pitch: 0.5, dist: 20 },
+    { id: 'latigo_estatico', cmds: ['lash'], cmdWait: 500, pitch: 0.35, dist: 14 },
+    { id: 'golpe_de_bobina', cmds: ['strike'], cmdWait: 700, pitch: 0.75, dist: 22 },
+  ]),
+  ...bossShots('prime', 'prime_draft', 16, Math.PI, [
+    { id: 'despertar', pitch: 0.2, dist: 20, wait: 1200 },
+    { id: 'puno_piston', cmds: ['fist'], cmdWait: 900, pitch: 0.8, dist: 28 },
+    { id: 'barrido_de_brazo', cmds: ['sweep'], cmdWait: 700, pitch: 0.75, dist: 28 },
+    { id: 'desatornillado', cmds: ['unbolt'], cmdWait: 1200, pitch: 0.6, dist: 30 },
+    { id: 'paso_sismico', cmds: ['tremor'], cmdWait: 900, pitch: 0.75, dist: 28 },
+    { id: 'celdas_y_escotilla', cmds: ['cell'], cmdWait: 6200, pitch: 0.85, dist: 36 },
+    { id: 'llevar_celda', cmds: ['cell'], cmdWait: 900, carry: true, pitch: 0.55, dist: 18 },
+    { id: 'sobrecarga', cmds: ['overload'], cmdWait: 700, pitch: 0.35, dist: 20 },
+    { id: 'sin_corazon_arco', cmds: ['heartless', 'surge'], cmdWait: 500, pitch: 0.4, dist: 22 },
+  ]),
 ];
+
+/** One boss's mechanic shots: each stages a fresh pull and fires its triggers. */
+function bossShots(area, templateId, yards, angle, shots) {
+  return shots.map((s) => ({
+    face: 0,
+    ...s,
+    id: `${area}_${s.id}`,
+    area,
+    hud: true,
+    stage: [templateId, yards, angle],
+    stepWait: s.stepWait ?? 1200,
+    cmds: (s.cmds ?? []).map((c) => `/dev foundry trigger ${c}`),
+    wait: s.wait ?? 250,
+  }));
+}
+
+/** In-page: pull `templateId` and say where the player should stand. */
+function pageStage([templateId, yards, angle]) {
+  const sim = window.__game.world;
+  const me = sim.player;
+  let boss = null;
+  for (const e of sim.entities.values()) {
+    if (e.kind === 'mob' && !e.dead && e.templateId === templateId) boss = e;
+  }
+  if (!boss) return null;
+  me.hp = me.maxHp;
+  boss.maxHp = Math.max(boss.maxHp, 1e6);
+  boss.hp = boss.maxHp;
+  if (boss.aiState === 'evade') {
+    boss.aiState = 'idle';
+    boss.inCombat = false;
+  }
+  me.devNoAggro = false;
+  sim.aggroMob(boss, me, false);
+  return {
+    x: boss.pos.x + Math.sin(angle) * yards,
+    z: boss.pos.z + Math.cos(angle) * yards,
+    face: angle + Math.PI,
+  };
+}
+
+/** In-page: the nearest settled Storm Cell's id and spot. */
+function pageCell() {
+  const sim = window.__game.world;
+  const me = sim.player;
+  let best = null;
+  let bestD = Infinity;
+  for (const e of sim.entities.values()) {
+    if (e.templateId !== 'foundry_storm_cell') continue;
+    const d = Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z);
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
+  }
+  return best ? { id: best.id, x: best.pos.x, z: best.pos.z } : null;
+}
+
+/** In-page: the nearest bunker object (its lee is the side away from the boss). */
+function pageBunker() {
+  const sim = window.__game.world;
+  const me = sim.player;
+  let best = null;
+  let bestD = Infinity;
+  for (const e of sim.entities.values()) {
+    if (!String(e.templateId).startsWith('foundry_bunker')) continue;
+    const d = Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z);
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
+  }
+  return best ? { x: best.pos.x, z: best.pos.z } : null;
+}
 
 /** In-page helper for a shot's js step (offline Sim only). */
 function pageStep(step) {
@@ -179,7 +302,7 @@ async function main() {
       return { x: p.pos.x, z: p.pos.z + 226 };
     });
     for (const shot of SHOTS) {
-      if (ONLY.length && !ONLY.includes(shot.id)) continue;
+      if (ONLY.length && !ONLY.some((o) => shot.id === o || shot.id.startsWith(o))) continue;
       // The HUD hides for the scenery shots and shows for the map shot.
       await page.evaluate((hide) => {
         let tag = document.getElementById('shot-hide-ui');
@@ -189,13 +312,12 @@ async function main() {
           document.head.appendChild(tag);
         }
         tag.textContent = hide ? '#ui, #nameplates { display: none !important; }' : '';
-      }, !shot.map);
+      }, !shot.map && !shot.hud);
       await sleep(1400);
-      const [lx, lz] = shot.at;
-      await page.evaluate(
-        (c) => window.__game.world.chat(c),
-        `/dev tp ${origin.x + lx} ${origin.z + lz}`,
-      );
+      const tpCmd = shot.area
+        ? `/dev foundry tp ${shot.area}`
+        : `/dev tp ${origin.x + shot.at[0]} ${origin.z + shot.at[1]}`;
+      await page.evaluate((c) => window.__game.world.chat(c), tpCmd);
       await sleep(700);
       // Strays from an earlier shot leave the stage: spawned mobs die, every
       // pulled mob drops its fight (the placed packs stay for the scenery).
@@ -212,6 +334,15 @@ async function main() {
         sim.player.devNoAggro = true;
       });
       await sleep(1200);
+      if (shot.stage) {
+        const spot = await page.evaluate(pageStage, shot.stage);
+        console.log('STAGE', shot.id, JSON.stringify(spot));
+        if (spot) {
+          await page.evaluate((c) => window.__game.world.chat(c), `/dev tp ${spot.x} ${spot.z}`);
+          shot.face = spot.face;
+        }
+        await sleep(shot.stepWait);
+      }
       if (shot.js) {
         await page.evaluate(() => {
           window.__game.world.player.devNoAggro = false;
@@ -225,6 +356,35 @@ async function main() {
         });
         await page.evaluate((cmd) => window.__game.world.chat(cmd), c);
         await sleep(shot.cmdWait ?? 1300);
+      }
+      // Walk the marked player so the Target Lock trail paints behind them.
+      if (shot.walk) {
+        for (let i = 0; i < shot.walk.steps; i++) {
+          await page.evaluate(({ dx, dz }) => {
+            const p = window.__game.world.player;
+            window.__game.world.chat(`/dev tp ${p.pos.x + dx} ${p.pos.z + dz}`);
+          }, shot.walk);
+          await sleep(shot.walk.ms);
+        }
+      }
+      // Step into the nearest bunker's lee (its east side, away from the berm).
+      if (shot.bunker) {
+        const b = await page.evaluate(pageBunker);
+        if (b) {
+          await page.evaluate((c) => window.__game.world.chat(c), `/dev tp ${b.x + 2} ${b.z}`);
+          await sleep(2600);
+        }
+      }
+      // Take the nearest Storm Cell (the pick-up command the client sends).
+      if (shot.carry) {
+        const cell = await page.evaluate(pageCell);
+        if (cell) {
+          await page.evaluate((c) => window.__game.world.chat(c), `/dev tp ${cell.x} ${cell.z}`);
+          await sleep(500);
+          const took = await page.evaluate((id) => window.__game.world.pickUpObject(id), cell.id);
+          console.log('CARRY', took);
+          await sleep(1200);
+        }
       }
       await page.evaluate((s) => {
         const p = window.__game.world.player;

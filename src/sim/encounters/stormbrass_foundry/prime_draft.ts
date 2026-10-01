@@ -86,7 +86,7 @@ import {
   staticPerSecond,
   DRAFT_TUNING as T,
 } from './ids';
-import { layCell, refreshCarry } from './storm_cells';
+import { layCell, refreshCarry, wearCarry } from './storm_cells';
 
 export const PRIME_DRAFT_DEED = 'dgn_prime_draft_overload';
 /** Overloads the deed asks for in one fight. */
@@ -428,6 +428,13 @@ function stepCells(
     }
     if (cell.carrierId === null) continue;
     const carrier = ctx.entities.get(cell.carrierId);
+    // A carrier who left the run alive (a hearth, a port out) takes nothing
+    // with them: the cell is gone, like a carrier who disconnected.
+    if (carrier && !carrier.dead && !claimPlayers(ctx, inst).includes(carrier)) {
+      dropAuraById(carrier, DRAFT_CELL_CARRY);
+      removeCell(ctx, inst, st, cell);
+      continue;
+    }
     if (!carrier || carrier.dead) {
       // A fallen carrier lets it go where they fell.
       if (carrier) {
@@ -439,6 +446,8 @@ function stepCells(
       cell.held = 0;
       continue;
     }
+    // Something stripped the carry aura (a snare breaker): wear it again.
+    if (!carrier.auras.some((a) => a.id === DRAFT_CELL_CARRY)) wearCarry(ctx, carrier, st, cell);
     cell.held += DT;
     cell.tick -= DT;
     if (cell.tick <= 1e-9) {
@@ -806,6 +815,11 @@ export function tickPrimeDraft(
     return;
   }
   if (ctx.isStunned(boss) || boss.castingAbility !== null) return;
+  // An Unbolt bar cut short (an Overload landed mid-bar) still tears it free.
+  if (st.phase !== 'bolted' && boss.auras.some((a) => a.id === DRAFT_BOLTED)) {
+    startBar(boss, DRAFT_UNBOLT, T.unboltCast, null);
+    return;
+  }
   // The phase turns.
   if (st.phase === 'bolted' && hp <= T.unboltAtHpPct) {
     startUnbolt(ctx, boss, st);

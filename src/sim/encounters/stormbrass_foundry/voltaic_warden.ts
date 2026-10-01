@@ -361,6 +361,15 @@ function landLash(ctx: SimContext, inst: InstanceSlot, boss: Entity, tank: Entit
 function endVoltaicFight(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.foundryFight?.kind === 'voltaic' ? boss.foundryFight : null;
   if (st) for (const s of st.strikes) dropEncounterObject(ctx, inst, s.objectId);
+  // Drones that outlive the fight (it fell first) shed their plating with it.
+  if (st) {
+    for (const id of st.droneIds) {
+      const drone = ctx.entities.get(id);
+      if (!drone) continue;
+      dropAuraById(drone, VOLTAIC_GROUNDED);
+      dropAuraById(drone, VOLTAIC_CHARGED);
+    }
+  }
   dropAuraById(boss, VOLTAIC_GROUNDED);
   dropAuraById(boss, VOLTAIC_CHARGED);
   dropAuraById(boss, VOLTAIC_STORED);

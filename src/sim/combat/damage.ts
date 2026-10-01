@@ -254,7 +254,11 @@ export function dealDamage(
       kind: 'resist',
     });
     ctx.enterCombat(source, target);
-    addThreat(target, source.id, amount * ctx.threatMod(source, school));
+    addThreat(
+      target,
+      source.id,
+      (amount * (threatOpts?.mult ?? 1) + (threatOpts?.flat ?? 0)) * ctx.threatMod(source, school),
+    );
     return 0;
   }
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or

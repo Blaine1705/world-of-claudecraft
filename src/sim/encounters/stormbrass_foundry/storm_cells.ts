@@ -88,7 +88,7 @@ export function layCell(
 }
 
 /** The carrier's aura: the slow, the Static a second, the hatch to read. */
-function wearCarry(
+export function wearCarry(
   ctx: SimContext,
   p: Entity,
   st: PrimeDraftFightState,

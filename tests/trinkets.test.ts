@@ -257,6 +257,8 @@ describe('the Stormbrass Foundry trinkets', () => {
     const burst = aura(sim.player, TRINKET_AURA.overclock);
     expect(burst?.kind).toBe('buff_spellhaste');
     expect(burst?.value).toBe(0.25);
+    // Neither cancelled nor purged early: Overheated always follows.
+    expect(burst?.undispellable).toBe(true);
     expect(spellHasteMult(sim.player)).toBeCloseTo(1 + sim.player.spellHaste + 0.25, 6);
     expect(aura(sim.player, TRINKET_AURA.overheated)).toBeUndefined();
     for (let t = 0; t < 10.1; t += DT) sim.tick();
