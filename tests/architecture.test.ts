@@ -806,6 +806,8 @@ const RENDER_PURE_CORES = [
   'src/render/hollow_crypt/crypt_finale_fx_core.ts',
   // Morthen the Lich Bishop's stance latch, body anchors and effect timings.
   'src/render/hollow_crypt/morthen_fx_core.ts',
+  // The Stormbrass Foundry creatures' gestures, dials and measured anchors.
+  'src/render/stormbrass_foundry/foundry_creature_fx_core.ts',
   // The authored open-air field's terrain plan and the Hollow Crypt's dressing,
   // set-dressing and gate-memory cores (docs/design/dungeon-rework).
   'src/render/authored_field/field_mesh_core.ts',

@@ -71,6 +71,7 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
+import { BoneDials } from './bone_dials';
 import { deathGroundingOffset } from './death_grounding_core';
 import {
   createGhostEffectMaterial,
@@ -795,6 +796,8 @@ export class CharacterVisual {
   private presentationScale = 1;
   private ascended = false;
   private metamorphLeftWing: THREE.Object3D | null = null;
+  /** VisualDef.dials: bones turned on top of the clips by gestures (bone_dials.ts). */
+  private dials: BoneDials | null = null;
   private metamorphRightWing: THREE.Object3D | null = null;
   private metamorphLeftWingRest = new THREE.Euler();
   private metamorphRightWingRest = new THREE.Euler();
@@ -871,6 +874,7 @@ export class CharacterVisual {
           this.tintedRigClaims,
         ),
       );
+      if (this.def.dials?.length) this.dials = new BoneDials(this.model, this.def.dials);
       if (key === 'form_metamorph') {
         this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
         this.metamorphRightWing = this.model.getObjectByName('metamorph_wing_right_hinge') ?? null;
@@ -1775,6 +1779,7 @@ export class CharacterVisual {
   }
 
   playAttack(abilityId?: string): void {
+    if (abilityId && this.dials?.handle(abilityId)) return;
     if (this.deadLock) return;
     const phase = abilityId ? this.def.phaseClips?.[abilityId] : undefined;
     if (phase) {
@@ -3505,6 +3510,7 @@ export class CharacterVisual {
 
   private updateMixer(dt: number): void {
     this.mixer.update(dt);
+    this.dials?.apply(dt);
     this.skeletonUpdates.markPoseChanged();
   }
 

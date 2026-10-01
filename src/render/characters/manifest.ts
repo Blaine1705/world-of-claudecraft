@@ -125,6 +125,8 @@ import {
 import type { LocoGaitThresholds } from '../locomotion';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
+import type { BoneDialDef } from './bone_dials';
+import { FOUNDRY_CREATURE_LOOKS } from './foundry_creature_looks';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 
 export interface EmoteClipSpec {
@@ -422,6 +424,10 @@ export interface VisualDef {
    *  stance's `enter` one-shot when it names one; a gesture for the stance
    *  already held does nothing. `clips` should be one of these stances. */
   phaseClips?: Record<string, { clips: ClipMap; enter?: string }>;
+  /** Bones turned on top of the clips by presentation gestures (the same
+   *  triggerAttack seam a stance swap rides): a boss's gauge needle, armour
+   *  plates that flip face. See bone_dials.ts for the contract. */
+  dials?: readonly BoneDialDef[];
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -5429,6 +5435,8 @@ for (const [key, [base, tint, tintStrength, grow, extra]] of Object.entries(
   const def = VISUALS[base];
   VISUALS[key] = { ...def, height: def.height * grow, tint, tintStrength, ...extra };
 }
+// Phase 3: the Foundry's own Blender creatures replace their placeholders.
+Object.assign(VISUALS, FOUNDRY_CREATURE_LOOKS);
 
 /** The composed-body variant of a class visual (every class has one). */
 export function modularVisualKey(cls: PlayerClass): string {
