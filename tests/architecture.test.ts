@@ -838,6 +838,8 @@ const RENDER_PURE_CORES = [
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',
+  // The Mere Hydra's neck fold, regrowth rise and orphaned breath pours.
+  'src/render/drowned_temple/temple_hydra_neck_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',

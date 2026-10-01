@@ -39,6 +39,13 @@ import type { IWorld } from '../../world_api';
 import { loadGltf } from '../assets/loader';
 import { registerDeferredPreload } from '../assets/preload';
 import { TempleHydraFx, tintHydraNecks } from './temple_hydra_fx';
+import {
+  freshNeck,
+  holdFallenNecks,
+  type NeckMemory,
+  releaseOrphanPours,
+  stepNeck,
+} from './temple_hydra_neck_core';
 import { tsunamiWarnProgress } from './temple_tsunami_core';
 
 export const MERE_HYDRA_URL = '/models/creatures/mere_hydra.glb';
@@ -157,7 +164,10 @@ export class TempleHydra {
   private scan = 0;
   private engaged = false;
   private allDead = false;
-  private readonly fallen = [0, 0, 0];
+  private readonly neckMem: NeckMemory[] = [freshNeck(), freshNeck(), freshNeck()];
+  private readonly sinkDir = new THREE.Vector3();
+  private readonly sinkQuat = new THREE.Quaternion();
+  private readonly sinkScale = new THREE.Vector3();
   private readonly necks: (THREE.Object3D | null)[] = [null, null, null];
   private readonly sockets: (THREE.Object3D | null)[] = [null, null, null];
   private readonly breaths: Breath[] = [];
@@ -185,7 +195,6 @@ export class TempleHydra {
   private readonly fx: TempleHydraFx;
   private waveId: number | null = null;
   private sink = 0;
-  private readonly deadSince = [-1, -1, -1];
   private clock = 0;
   private readonly socketPos = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
 
@@ -353,7 +362,10 @@ export class TempleHydra {
       this.findHeads();
     }
     const center = this.head(1) ?? this.head(0) ?? this.head(2);
-    if (!center) return;
+    if (!center) {
+      this.quenchBreaths();
+      return;
+    }
     if (!this.body) {
       this.build(center);
       if (!this.body) return;
@@ -366,10 +378,12 @@ export class TempleHydra {
     const dead = this.heads.every((_, i) => this.head(i)?.dead ?? true);
     if (dead && !this.allDead) {
       this.allDead = true;
+      // The necks that fell before stay down under the Death clip.
+      holdFallenNecks(this.neckMem);
       this.play('Death');
     } else if (!dead && this.allDead) {
       this.allDead = false;
-      this.fallen.fill(0);
+      for (let i = 0; i < 3; i++) this.neckMem[i] = freshNeck();
       this.play('Idle', true);
     }
     if (anyEngaged && !this.engaged && !dead) this.play('Emerge');
@@ -393,37 +407,35 @@ export class TempleHydra {
     this.place(center);
     if (this.body) this.body.position.y -= this.sink * this.sink * 9;
     // A fallen head's neck folds down into the pool (after the mixer pose);
-    // its stump stirs as the regrowth nears, and a regrown neck grows back.
+    // its stump stirs as the regrowth nears, and a regrown neck rises straight
+    // up out of the water (temple_hydra_neck_core.ts owns every pose).
     this.clock = clock;
     for (let i = 0; i < 3; i++) {
       const h = this.head(i);
       const neck = this.necks[i];
-      if (!neck || dead) continue;
-      if (h?.dead) {
-        if (this.deadSince[i] < 0) this.deadSince[i] = clock;
-        this.fallen[i] = Math.min(1, this.fallen[i] + dt / 1.6);
-      } else {
-        if (this.deadSince[i] >= 0 && this.fallen[i] > 0.5) {
-          const socket = this.sockets[i];
-          if (socket) this.fx.burstAt(socket.getWorldPosition(this.tmp), clock);
-        }
-        this.deadSince[i] = -1;
-        this.fallen[i] = Math.max(0, this.fallen[i] - dt / 1.4);
+      if (!neck) continue;
+      const { pose, regrew } = stepNeck(this.neckMem[i], {
+        dead: h?.dead ?? true,
+        allDead: dead,
+        regrowAfter: HYDRA_TUNING.regrowAfter,
+        clock,
+        dt,
+        phase: i,
+      });
+      if (regrew) {
+        const socket = this.sockets[i];
+        if (socket) this.fx.burstAt(socket.getWorldPosition(this.tmp), clock);
       }
-      if (this.fallen[i] > 0) {
-        const k = this.fallen[i];
-        // The last seconds before a regrowth: the stump swells and writhes.
-        const since = this.deadSince[i] >= 0 ? clock - this.deadSince[i] : 0;
-        const stir =
-          h?.dead && since > HYDRA_TUNING.regrowAfter * 0.55
-            ? Math.min(
-                1,
-                (since - HYDRA_TUNING.regrowAfter * 0.55) / (HYDRA_TUNING.regrowAfter * 0.45),
-              )
-            : 0;
-        neck.scale.setScalar(Math.max(0.001, 1 - k * k + stir * 0.3));
-        neck.rotation.x += k * 0.8 - stir * 0.5;
-        neck.rotation.z += stir * Math.sin(clock * 9 + i) * 0.25;
+      if (!pose) continue;
+      neck.scale.setScalar(pose.scale);
+      neck.rotation.x += pose.tiltX;
+      neck.rotation.z += pose.swayZ;
+      if (pose.drop > 0 && neck.parent) {
+        // Straight down in the world, in the neck base's parent frame.
+        neck.parent.getWorldQuaternion(this.sinkQuat).invert();
+        neck.parent.getWorldScale(this.sinkScale);
+        this.sinkDir.set(0, -pose.drop, 0).applyQuaternion(this.sinkQuat).divide(this.sinkScale);
+        neck.position.add(this.sinkDir);
       }
     }
     this.updateBreaths(dt, clock);
@@ -472,6 +484,9 @@ export class TempleHydra {
   }
 
   private updateBreaths(dt: number, clock: number): void {
+    // A pour whose head died, left the world or sank under the Tsunami is cut
+    // at once (it used to keep pouring from a dead head's mouth forever).
+    releaseOrphanPours(this.breaths, (id) => this.pourLive(id));
     for (let i = 0; i < 3; i++) {
       const h = this.head(i);
       if (!h || h.dead) continue;
@@ -509,6 +524,26 @@ export class TempleHydra {
       b.uniforms.uLife.value = b.life;
       (b.mesh.material as THREE.ShaderMaterial).uniforms.uTime.value = clock;
       b.mesh.visible = b.life > 0.01;
+    }
+  }
+
+  /** A pour's head is still one of the three, alive and surfaced. */
+  private pourLive(id: number): boolean {
+    if (this.sink > 0.4) return false;
+    for (let i = 0; i < 3; i++) {
+      const h = this.head(i);
+      if (h && h.id === id) return !h.dead;
+    }
+    return false;
+  }
+
+  /** Every pour dark at once (the Hydra left view). */
+  private quenchBreaths(): void {
+    for (const b of this.breaths) {
+      b.headId = -1;
+      b.life = 0;
+      b.uniforms.uLife.value = 0;
+      b.mesh.visible = false;
     }
   }
 

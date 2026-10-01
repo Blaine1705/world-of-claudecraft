@@ -119,6 +119,46 @@ describe('the Mere Hydra: one element to each head', () => {
     expect(aura(victim, HYDRA_FROSTBITE)?.value).toBeCloseTo(T.chillSlow, 5);
   });
 
+  it('a breathing head that dies mid-bar ends its breath: no bar, no channel, no cone after', () => {
+    const { f, heads } = hydraFight();
+    const left = heads[0];
+    expect(until(f, () => left.castingAbility === HYDRA_TIDE_BREATH, 10, hold(f))).toBe(true);
+    run(f, T.breathCast * 0.6, hold(f));
+    f.sim.ctx.handleDeath(left, f.tank);
+    expect(left.castingAbility).toBeNull();
+    expect(left.castRemaining).toBe(0);
+    expect(left.channeling).toBe(false);
+    let cones = 0;
+    for (let t = 0; t < T.breathCast + 2; t += 0.05) {
+      hold(f)();
+      for (const ev of f.sim.tick())
+        if (ev.type === 'spellfx' && ev.sourceId === left.id && ev.ability === HYDRA_TIDE_BREATH)
+          cones++;
+      expect(left.castingAbility).toBeNull();
+    }
+    expect(cones).toBe(0);
+  });
+
+  it('the Tsunami and a wipe leave no head mid-breath', () => {
+    const { f, heads } = hydraFight();
+    run(f, 0.2, hold(f));
+    nextTsunami(heads);
+    run(f, 0.2, hold(f));
+    expect(heads.some((h) => h.castingAbility === HYDRA_TIDE_BREATH)).toBe(false);
+    expect(heads.some((h) => h.castingAbility === HYDRA_CRUSHING_TORRENT)).toBe(false);
+    const left = heads[0];
+    run(f, T.tsunamiCast + 1, hold(f));
+    expect(until(f, () => left.castingAbility === HYDRA_TIDE_BREATH, 20, hold(f))).toBe(true);
+    for (const p of [f.tank, ...f.others]) put(f, p, 0, -230);
+    for (const h of heads) {
+      h.inCombat = false;
+      h.aggroTargetId = null;
+      h.aiState = 'evade';
+    }
+    run(f, 0.2);
+    expect(heads.map((h) => h.castingAbility)).toEqual([null, null, null]);
+  });
+
   it('a Venom Spit bursts, then leaves venom that burns every second', () => {
     const { f } = hydraFight();
     expect(until(f, () => objects(f, BRINE_SPIT_TEMPLATE).length > 0, 8, hold(f))).toBe(true);
@@ -296,6 +336,32 @@ describe('the Mere Hydra: a fallen head grows back', () => {
     for (let i = 0; i < 3; i++) st.diedAt[i] = -1000;
     run(f, 2, hold(f));
     expect(heads.every((h) => h.dead)).toBe(true);
+  });
+
+  it('a regrown head and the last one falling: every head stays dead, nothing grows back', () => {
+    const { f, heads } = hydraFight();
+    run(f, 0.2, hold(f));
+    f.sim.ctx.handleDeath(heads[0], f.tank);
+    run(f, 0.2, hold(f));
+    regrowIn(heads, 0, 0);
+    run(f, 0.2, hold(f));
+    expect(heads[0].dead).toBe(false);
+    f.sim.ctx.handleDeath(heads[1], f.tank);
+    run(f, 1, hold(f));
+    f.sim.ctx.handleDeath(heads[2], f.tank);
+    run(f, 1, hold(f));
+    f.sim.ctx.handleDeath(heads[0], f.tank);
+    // Thirty seconds on, tick by tick: no head ever stands again and no
+    // regrowth cue fires (the renderer keyed the reappearance on neither).
+    let regrowths = 0;
+    for (let t = 0; t < 30; t += 0.05) {
+      hold(f)();
+      for (const ev of f.sim.tick())
+        if (ev.type === 'spellfx' && heads.some((h) => h.id === ev.sourceId) && ev.fx === 'nova')
+          regrowths++;
+      expect(heads.map((h) => h.dead)).toEqual([true, true, true]);
+    }
+    expect(regrowths).toBe(0);
   });
 
   it('a wipe grows every fallen head back whole', () => {
