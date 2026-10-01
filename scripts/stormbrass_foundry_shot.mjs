@@ -120,7 +120,7 @@ const SHOTS = [
     { id: 'disparo_de_prueba', cmds: ['proof'], cmdWait: 900, pitch: 0.35, dist: 14 },
     { id: 'drones_taladro', cmds: ['drones'], cmdWait: 1500, pitch: 0.5, dist: 20 },
   ]),
-  ...bossShots('voltaic', 'voltaic_warden', 12, Math.PI, [
+  ...bossShots('voltaic', 'voltaic_warden', 10, 0, [
     { id: 'blindaje', pitch: 0.45, dist: 16, wait: 2200 },
     { id: 'cambio_de_placas', cmds: ['flip'], cmdWait: 1500, pitch: 0.45, dist: 16 },
     { id: 'descarga', cmds: ['discharge'], cmdWait: 300, pitch: 0.45, dist: 18 },
