@@ -30,6 +30,7 @@ import {
 } from '../../sim/encounters/drowned_temple/ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
   DUST_FRAG,
   GLOW_FRAG,
@@ -253,7 +254,7 @@ export class TempleYsoleiFx {
     this.geometries.push(spiralGeo);
     this.spiral = new THREE.Mesh(spiralGeo, spiral);
     this.spiral.rotation.x = -Math.PI / 2;
-    this.spiral.renderOrder = 7;
+    this.spiral.renderOrder = floorVfxRenderOrder('ground', 6);
     this.spiral.frustumCulled = false;
     this.spiral.scale.setScalar(COLLAPSED);
     this.root.add(this.spiral);
@@ -263,7 +264,7 @@ export class TempleYsoleiFx {
       const geo = new THREE.CircleGeometry(MOON_ALTAR.r - 0.4, 64, 0, Math.PI);
       this.geometries.push(geo);
       const mesh = new THREE.Mesh(geo, f.m);
-      mesh.renderOrder = 6;
+      mesh.renderOrder = floorVfxRenderOrder('ground', 5);
       mesh.frustumCulled = false;
       mesh.scale.setScalar(COLLAPSED);
       this.root.add(mesh);
@@ -284,7 +285,7 @@ export class TempleYsoleiFx {
   ): Burst {
     const mesh = new THREE.Mesh(geo, m);
     mesh.frustumCulled = false;
-    mesh.renderOrder = 9;
+    mesh.renderOrder = floorVfxRenderOrder('ground', 7);
     mesh.scale.setScalar(COLLAPSED);
     this.root.add(mesh);
     return { mesh, uniforms, age: -1, life, x: 0, y: 0, z: 0 };

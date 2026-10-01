@@ -115,6 +115,11 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // and water, and the wave wall and its spray ride the same band, so the
   // encounter-band telegraph of the swept half always paints over all of it.
   { file: 'src/render/drowned_temple/temple_tsunami_fx.ts', layer: 'ground', strict: true },
+  // Ysolei's cosmetic layer: the Undertow's spiral and the Rising Tide's sheets
+  // lie on the island floor, and her tide and crash bursts rise from it, all in
+  // the ground band so temple_fx.ts's encounter-band rings and flood half-disc
+  // always paint over them.
+  { file: 'src/render/drowned_temple/temple_ysolei_fx.ts', layer: 'ground', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },
