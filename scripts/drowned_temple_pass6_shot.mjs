@@ -198,6 +198,44 @@ const SHOTS = [
     cmdWait: 300,
     wait: 1200,
   },
+  // A regrowing head mid-rise (it rises straight out of the pool), and the
+  // last head falling after the other two (each stays down: nothing pops
+  // back up), its breath cut with it.
+  {
+    id: 'hidra_rebrote_a_medias',
+    at: [0, 76],
+    face: 0,
+    pitch: 0.14,
+    dist: 16,
+    js: 'kill:mere_hydra_head_left',
+    cmds: ['/dev temple trigger regrow'],
+    cmdWait: 300,
+    wait: 350,
+  },
+  {
+    id: 'hidra_ultima_cabeza_cae',
+    at: [0, 76],
+    face: 0,
+    pitch: 0.14,
+    dist: 16,
+    js: 'slay:mere_hydra_head_left,mere_hydra_head_center',
+    stepWait: 2500,
+    js2: 'kill:mere_hydra_head_right',
+    js2Wait: 150,
+    wait: 150,
+  },
+  {
+    id: 'hidra_ultima_cabeza_despues',
+    at: [0, 76],
+    face: 0,
+    pitch: 0.14,
+    dist: 16,
+    js: 'slay:mere_hydra_head_left,mere_hydra_head_center',
+    stepWait: 2500,
+    js2: 'kill:mere_hydra_head_right',
+    js2Wait: 1500,
+    wait: 300,
+  },
   // ---- item 3: the walking Colossus
   {
     id: 'coloso_persigue',
@@ -279,6 +317,22 @@ function pageStep([step, origin]) {
   const sim = window.__game.world;
   const me = sim.player;
   const [verb, id] = step.split(':');
+  if (verb === 'slay') {
+    // Several heads at once (comma list), the fight held on the player.
+    for (const e of sim.entities.values())
+      if (e.kind === 'mob' && !e.dead && e.templateId.startsWith('mere_hydra'))
+        sim.aggroMob(e, me, false);
+    const out = [];
+    for (const t of id.split(',')) {
+      for (const e of sim.entities.values())
+        if (e.kind === 'mob' && !e.dead && e.templateId === t) {
+          sim.ctx.handleDeath(e, me);
+          out.push(e.id);
+          break;
+        }
+    }
+    return out.join(',');
+  }
   let best = null;
   let bestD = Infinity;
   for (const e of sim.entities.values()) {
@@ -418,6 +472,10 @@ async function main() {
       if (shot.js) {
         console.log('STEP', shot.id, await page.evaluate(pageStep, [shot.js, origin]));
         await sleep(shot.stepWait ?? 900);
+      }
+      if (shot.js2) {
+        console.log('STEP2', shot.id, await page.evaluate(pageStep, [shot.js2, origin]));
+        await sleep(shot.js2Wait ?? 300);
       }
       for (const c of shot.cmds ?? []) {
         await page.evaluate((cmd) => window.__game.world.chat(cmd), c);
