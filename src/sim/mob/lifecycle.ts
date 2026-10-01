@@ -61,6 +61,8 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.corpseHarvestState = undefined;
   // A fresh life pays again (an encounter's regrown part: Entity.regrown).
   mob.regrown = undefined;
+  // A Foundry death burst belongs to one life (mob/trash_kit/foundry_kit.ts).
+  mob.deathBurst = undefined;
   mob.dead = false;
   mob.lootable = false;
   mob.loot = null;

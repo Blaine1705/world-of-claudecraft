@@ -6,6 +6,7 @@
 // updateInstances, beside the trash kit), so a pull or a planted cast owns its
 // tick.
 
+import { sweepOrphanBurstRings } from '../../mob/trash_kit/foundry_kit';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { bossEngaged, claimBoss, foundryClaims } from './claim';
@@ -26,6 +27,7 @@ export function tickFoundryEncounters(ctx: SimContext): void {
   for (const inst of foundryClaims(ctx)) {
     const hauler = claimBoss(ctx, inst, GANTRY_HAULER_ID);
     if (hauler) tickHauler(ctx, inst, hauler, bossEngaged(hauler));
+    sweepOrphanBurstRings(ctx, inst);
   }
 }
 

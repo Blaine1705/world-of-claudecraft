@@ -288,6 +288,21 @@ describe('death bursts: the Steam Bruiser and the Arc Drone', () => {
     expect(dealt(r, near.id, 'Boiler Burst')).toHaveLength(1);
   });
 
+  it('a ring whose mob left the world before its burst is swept off the floor', () => {
+    const r = room();
+    const bruiser = engage(r, 'steam_bruiser', 3, 0);
+    run(r, 0.1, [bruiser]);
+    r.sim.ctx.handleDeath(bruiser, r.me);
+    run(r, DT, [bruiser]);
+    expect(objectsOf(r, FOUNDRY_BURST_RING)).toHaveLength(1);
+    // Despawned before it went off (a summoned add leaving with its owner).
+    r.sim.ctx.dropEntity(bruiser.id);
+    run(r, DT, [], true);
+    expect(objectsOf(r, FOUNDRY_BURST_RING)).toHaveLength(0);
+    run(r, 2, [], true);
+    expect(dealt(r, r.me.id, 'Boiler Burst')).toHaveLength(0);
+  });
+
   it('the Arc Drone pops the moment it dies, 3 yd round it, no ring', () => {
     const r = room();
     const drone = engage(r, 'arc_drone', 2, 0);

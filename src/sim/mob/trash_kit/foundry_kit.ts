@@ -107,6 +107,33 @@ function spawnBurstRing(ctx: SimContext, inst: InstanceSlot, mob: Entity, radius
 }
 
 /**
+ * Drop any burst ring whose mob left the world before it went off (a summoned
+ * add despawned with its owner): its burst can no longer fire, so its warning
+ * must not linger on the floor. Zero rng; only walks the claim's own rosters.
+ */
+export function sweepOrphanBurstRings(ctx: SimContext, inst: InstanceSlot): number {
+  let rings: number[] | null = null;
+  for (const id of inst.objectIds) {
+    if (ctx.entities.get(id)?.templateId !== FOUNDRY_BURST_RING) continue;
+    rings ??= [];
+    rings.push(id);
+  }
+  if (!rings) return 0;
+  const owned = new Set<number>();
+  for (const id of inst.mobIds) {
+    const ring = ctx.entities.get(id)?.deathBurst?.objectId;
+    if (ring !== null && ring !== undefined) owned.add(ring);
+  }
+  let dropped = 0;
+  for (const id of rings) {
+    if (owned.has(id)) continue;
+    dropObject(ctx, inst, id);
+    dropped++;
+  }
+  return dropped;
+}
+
+/**
  * A dead kit mob with a death burst: arm it on the tick it is first seen dead,
  * count it down, and go off once. Returns true on the tick it bursts.
  */

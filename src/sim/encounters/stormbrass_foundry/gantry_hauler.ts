@@ -98,6 +98,8 @@ export function startSteamBlast(ctx: SimContext, hauler: Entity, st: HaulerFight
   st.blastTimer = T.blastEvery;
   st.casts++;
   hauler.facing = yaw;
+  // It braces its tracks where the bar starts: the cone lands where it was drawn.
+  st.plantedAt = { ...hauler.pos };
   startBar(hauler, HAULER_STEAM_BLAST, T.blastCast, target.id);
   return true;
 }
@@ -271,7 +273,9 @@ export function tickHauler(
     // It braces its tracks for the bar: the cone lands where it was drawn.
     if (!st.plantedAt) st.plantedAt = { ...hauler.pos };
     if (hauler.pos.x !== st.plantedAt.x || hauler.pos.z !== st.plantedAt.z) {
-      hauler.pos = { ...st.plantedAt };
+      hauler.pos.x = st.plantedAt.x;
+      hauler.pos.y = st.plantedAt.y;
+      hauler.pos.z = st.plantedAt.z;
       ctx.rebucket(hauler);
     }
     if (st.blastYaw !== null) hauler.facing = st.blastYaw;
@@ -283,8 +287,8 @@ export function tickHauler(
     landSteamBlast(ctx, inst, hauler, st);
     return;
   }
-  st.plantedAt = null;
   if (hauler.castingAbility !== null || ctx.isStunned(hauler)) return;
+  st.plantedAt = null;
   st.blastTimer -= DT;
   if (st.blastTimer <= 0 && !startSteamBlast(ctx, hauler, st)) st.blastTimer = 1;
 }
