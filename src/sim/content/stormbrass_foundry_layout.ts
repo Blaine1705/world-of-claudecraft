@@ -143,11 +143,14 @@ export const CELL_RACKS: readonly { x: number; z: number }[] = [
 ];
 
 /** The Crane Bridge from the Crane Landing to the Drafting Yard: it swings
- *  out and extends once both wing bosses are dead (walkable only then). */
+ *  out and extends once both wing bosses are dead (walkable only then). Its
+ *  ramp ends ON the yard's south lip (DRAFTING_YARD.z0), so the flat run that
+ *  closes the path lies inside the yard (a ramp ending short of it left a
+ *  walkable band the gate's deck never drew: the void showed through). */
 export const CRANE_BRIDGE = {
   x: 0,
   fromZ: 8,
-  toZ: 40,
+  toZ: DRAFTING_YARD.z0,
   fromH: 8,
   toH: 20,
   halfWidth: 4.5,

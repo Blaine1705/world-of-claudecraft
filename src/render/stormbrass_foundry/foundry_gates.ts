@@ -17,7 +17,13 @@ import type { DungeonGateDef } from '../../sim/types';
 import { sharedUniforms } from '../gfx';
 import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
 import { PartBin } from './foundry_mesh';
-import { arcFenceCharge, bridgeExtension, shutterLift } from './foundry_plan_core';
+import {
+  arcFenceCharge,
+  bridgeExtension,
+  CRANE_BRIDGE_APRON,
+  craneBridgeDeck,
+  shutterLift,
+} from './foundry_plan_core';
 
 interface GateRig {
   root: THREE.Group;
@@ -182,10 +188,10 @@ function arcFence(gate: DungeonGateDef): GateRig {
 function craneBridge(gate: DungeonGateDef): GateRig {
   // Built in the gate's own frame: the deck runs along +z (north) from the
   // Crane Landing's lip, pitched up from the landing's height to the yard's.
-  const span = CRANE_BRIDGE.toZ - CRANE_BRIDGE.fromZ;
-  const rise = CRANE_BRIDGE.toH - CRANE_BRIDGE.fromH;
-  const len = Math.hypot(span, rise);
-  const pitch = -Math.atan2(rise, span);
+  // The deck's numbers are the pure plan's (craneBridgeDeck), which a test
+  // pins to the walked floor: the ramp lands on the yard's lip, the apron
+  // tucks under it.
+  const { len, pitch } = craneBridgeDeck();
   const hw = CRANE_BRIDGE.halfWidth;
   const bin = new PartBin();
   bin.box('iron', 0, -0.35, len / 2, hw, 0.3, len / 2);
@@ -201,6 +207,15 @@ function craneBridge(gate: DungeonGateDef): GateRig {
   }
   const deck = bin.build(`stormbrassCraneBridge:${gate.id}`);
   deck.rotation.x = pitch;
+  // The flat apron past the ramp's end, level with the yard (counter-pitched
+  // in the deck's frame), so the landing never shows a sliver of the drop.
+  const apronBin = new PartBin();
+  apronBin.box('iron', 0, -0.35, CRANE_BRIDGE_APRON / 2, hw, 0.3, CRANE_BRIDGE_APRON / 2 + 0.1);
+  apronBin.box('brass', 0, 0.02, CRANE_BRIDGE_APRON / 2, hw * 0.92, 0.06, CRANE_BRIDGE_APRON / 2);
+  const apron = apronBin.build(`stormbrassCraneBridgeApron:${gate.id}`);
+  apron.position.set(0, 0, len);
+  apron.rotation.x = -pitch;
+  deck.add(apron);
   // The crane that swings it: a pivot tower on the landing's lip.
   const towerBin = new PartBin();
   towerBin.box('hazard', -hw - 1.6, 5, -1, 0.8, 5, 0.8);
@@ -221,10 +236,10 @@ function craneBridge(gate: DungeonGateDef): GateRig {
     deck.updateMatrix();
     if (swing.parent) swing.matrixWorld.multiplyMatrices(swing.parent.matrixWorld, swing.matrix);
     deck.matrixWorld.multiplyMatrices(swing.matrixWorld, deck.matrix);
-    for (const c of deck.children) {
-      const m = c as THREE.Mesh;
-      m.matrixWorld.multiplyMatrices(deck.matrixWorld, m.matrix);
-    }
+    for (const c of deck.children) c.matrixWorld.multiplyMatrices(deck.matrixWorld, c.matrix);
+    apron.updateMatrix();
+    apron.matrixWorld.multiplyMatrices(deck.matrixWorld, apron.matrix);
+    for (const c of apron.children) c.matrixWorld.multiplyMatrices(apron.matrixWorld, c.matrix);
   };
   return { root, apply: (openness) => apply(openness) };
 }

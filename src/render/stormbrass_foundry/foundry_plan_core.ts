@@ -10,6 +10,7 @@
 import {
   CELL_RACKS,
   COIL_CROWN,
+  CRANE_BRIDGE,
   GANTRY,
   GREAT_COIL,
   STORMBRASS_FOUNDRY_FIELD,
@@ -167,6 +168,35 @@ export function shutterLift(openness: number): number {
 export function bridgeExtension(openness: number): { swing: number; run: number } {
   const k = Math.min(1, Math.max(0, openness));
   return { swing: Math.min(1, k * 2), run: Math.max(0, k * 2 - 1) };
+}
+
+/** The flat lip the extended deck carries past its ramp's end, tucked under
+ *  the Drafting Yard's edge so no seam shows where the two meet. */
+export const CRANE_BRIDGE_APRON = 1;
+
+/** The Crane Bridge's deck fully extended, in the instance frame: the pitched
+ *  ramp the gate rig draws (`foundry_gates.ts` craneBridge), from the Crane
+ *  Landing's lip to the yard, plus its apron. `deckAt(z)` is the drawn top
+ *  over the bridge's centre line, NaN off the deck. */
+export function craneBridgeDeck(): {
+  fromZ: number;
+  toZ: number;
+  len: number;
+  pitch: number;
+  deckAt: (z: number) => number;
+} {
+  const span = CRANE_BRIDGE.toZ - CRANE_BRIDGE.fromZ;
+  const rise = CRANE_BRIDGE.toH - CRANE_BRIDGE.fromH;
+  const len = Math.hypot(span, rise);
+  const pitch = -Math.atan2(rise, span);
+  const rampEnd = CRANE_BRIDGE.fromZ + len * Math.cos(pitch);
+  const toZ = rampEnd + CRANE_BRIDGE_APRON;
+  const deckAt = (z: number): number => {
+    if (z < CRANE_BRIDGE.fromZ || z > toZ) return Number.NaN;
+    if (z >= rampEnd) return CRANE_BRIDGE.toH;
+    return CRANE_BRIDGE.fromH + ((z - CRANE_BRIDGE.fromZ) / span) * rise;
+  };
+  return { fromZ: CRANE_BRIDGE.fromZ, toZ, len, pitch, deckAt };
 }
 
 /** An arc fence's charge (1 live, 0 powered down), with a dying stutter. */
