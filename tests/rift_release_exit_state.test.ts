@@ -10,46 +10,23 @@
 // /unstuck graveyard moves had the same hole. Every graveyard move now emits the
 // exit (spirit.ts graveyardForMove -> rift/runs.ts emitRiftDeparture).
 import { describe, expect, it } from 'vitest';
-import { ActionBarLayoutUploader } from '../src/net/action_bar_upload';
-import { ClientWorld } from '../src/net/online';
-import { allocRiftCollisionToken } from '../src/sim/colliders';
-import { BUILTIN_WORLD, dungeonAt, isRiftPos } from '../src/sim/data';
-import { spawnNaturalRiftPortal } from '../src/sim/rift/portals';
-import { Sim } from '../src/sim/sim';
+import { dungeonAt, isRiftPos } from '../src/sim/data';
+import type { Sim } from '../src/sim/sim';
 import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from '../src/sim/spirit';
-import type { SimEvent } from '../src/sim/types';
-import { mapWindowMode } from '../src/ui/map_window_view';
-import { minimapMode } from '../src/ui/minimap_markers';
-import type { IWorld } from '../src/world_api';
-
-const TEST_WORLD = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
-
-type RiftStateEvent = Extract<SimEvent, { type: 'riftState' }>;
-
-function riftStates(events: SimEvent[], pid: number): RiftStateEvent[] {
-  return events.filter((e): e is RiftStateEvent => e.type === 'riftState' && e.pid === pid);
-}
+import {
+  enterNaturalRift,
+  makeRiftSim,
+  onlineMapModes,
+  type RiftStateEvent,
+  riftStates,
+} from './rift_online_shared';
 
 /** One player standing on floor 0 of a natural rift, with the entry events drained. */
 function enterRiftSolo(): { sim: Sim; pid: number; entry: RiftStateEvent } {
-  const sim = new Sim({
-    seed: 99117,
-    playerClass: 'warrior',
-    noPlayer: true,
-    autoEquip: true,
-    devCommands: true,
-    riftPortals: true,
-    world: TEST_WORLD,
-  });
+  const sim = makeRiftSim();
   const pid = sim.addPlayer('warrior', 'Runner');
   sim.setPlayerLevel(20, pid);
-  expect(spawnNaturalRiftPortal(sim.ctx, 0)).toBe(true);
-  const portal = sim.entities.get(sim.naturalRiftPortals[0].id)!;
-  sim.drainEvents();
-  sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, pid, undefined, portal);
-  const [entry] = riftStates(sim.drainEvents(), pid);
-  expect(entry?.active, 'sanity: entering emits the active floor').toBe(true);
-  expect(isRiftPos(sim.entities.get(pid)!.pos.x), 'sanity: standing in the rift band').toBe(true);
+  const entry = enterNaturalRift(sim, pid);
   return { sim, pid, entry };
 }
 
@@ -57,32 +34,6 @@ function kill(sim: Sim, pid: number): void {
   const e = sim.entities.get(pid)!;
   e.hp = 0;
   e.dead = true;
-}
-
-// Object.create skips field initializers: seed exactly what applyRiftStateEvent
-// touches (the tests/rift_collision_region_online.test.ts idiom).
-function riftReadyClient(): ClientWorld {
-  const client = Object.create(ClientWorld.prototype) as ClientWorld;
-  const c = client as any;
-  c.riftFloor = null;
-  c.riftCollisionToken = allocRiftCollisionToken();
-  c.riftEventExpiresAtMs = null;
-  c.activeBossDeathZones = [];
-  c.actionBarUploader = new ActionBarLayoutUploader((command) => c.cmd(command));
-  c.sessionEnded = false;
-  return client;
-}
-
-/** Replay a player's riftState stream into a client, then ask both map surfaces
- *  which mode they would paint with the player standing at `pos`. */
-function onlineMapModes(
-  events: RiftStateEvent[],
-  pos: { x: number; y: number; z: number },
-): { riftFloor: unknown; map: string; minimap: string } {
-  const client = riftReadyClient();
-  for (const ev of events) (client as any).applyRiftStateEvent(ev);
-  const world = { riftFloor: client.riftFloor, delveRun: null, player: { pos } } as IWorld;
-  return { riftFloor: client.riftFloor, map: mapWindowMode(world), minimap: minimapMode(world) };
 }
 
 describe('leaving a rift through a graveyard move clears the online rift floor', () => {

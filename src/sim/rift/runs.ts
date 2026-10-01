@@ -316,6 +316,31 @@ export function emitRiftDeparture(ctx: SimContext, pid: number, from: Vec3): voi
   if (inst?.memberIds.has(pid)) emitRiftState(ctx, pid, inst, false);
 }
 
+/** Detach `p` from the rift floor they stand on ahead of a teleport somewhere
+ * else entirely (a Thornhollow Fields seat): the lockpick and session teardown
+ * leaveRift runs, minus the move, plus the riftState exit the online client
+ * mirrors its floor from (members only, like emitRiftDeparture). An unclaimed
+ * hoard share is left for clearHoardRewardChest at teardown, as a release or a
+ * hearth leaves it, so the seat never pulls that rng draw forward. Returns the
+ * run's own exit spot and facing as the caller's return point, so a match that
+ * ends after the run is gone never sends the player back onto its floor. The
+ * rift twin of instances/dungeons.ts detachFromDungeon; null when `p` stands on
+ * no rift floor. */
+export function detachFromRift(
+  ctx: SimContext,
+  p: Entity,
+): { x: number; z: number; facing: number } | null {
+  const inst = riftInstanceAtPos(ctx, p.pos);
+  if (!inst) return null;
+  if (inst.lockpick) riftLockpickAbort(ctx, inst, p.id);
+  cancelProfessionSessionOnDisplacement(ctx, p);
+  p.riftSliding = false;
+  p.riftSlideDirX = 0;
+  p.riftSlideDirZ = 0;
+  if (inst.memberIds.has(p.id)) emitRiftState(ctx, p.id, inst, false);
+  return { x: inst.returnPos.x, z: inst.returnPos.z, facing: inst.returnFacing ?? 0 };
+}
+
 export function hoardBossCueViewsForPlayer(ctx: SimContext, pid: number) {
   const player = ctx.entities.get(pid);
   if (!player) return [];
