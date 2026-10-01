@@ -364,7 +364,7 @@ def main():
         o_img = to_numpy_image('BalgathORM', downsample(orm, k * 2), 'Non-Color')
         if tex_dir:
             for img, nm in ((a_img, 'albedo'), (n_img, 'normal'), (o_img, 'orm')):
-                img.filepath_raw = os.path.join(tex_dir, f'balgath_{nm}_{ship}.png')
+                img.filepath_raw = os.path.join(tex_dir, f'balgath_{nm}_{img.size[0]}.png')
                 img.file_format = 'PNG'
                 img.save()
             full = to_numpy_image('BalgathAlbedoFull', albedo)
