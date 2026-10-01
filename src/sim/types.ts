@@ -4184,6 +4184,9 @@ export interface TrashKitDef {
     below: number;
     /** Only allies of this family (the Foundry Engineer repairs automata). */
     family?: MobFamily;
+    /** Never these templates (the Foundry Engineer repairs trash automata,
+     *  never the Gantry Hauler or a boss it is pulled beside). */
+    exclude?: readonly string[];
   };
   /** An interruptible absorb shield on the most injured unshielded ally in
    *  reach, worth a share of its maximum health (the Mistweaver's Fog Ward). */

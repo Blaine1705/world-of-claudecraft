@@ -38,7 +38,15 @@
 // about 15 to 20 percent, the Hauler's avoidables about 20 to 25 percent.
 // Heroic scales them through the dungeon's difficulty transform.
 
-import { FOUNDRY_DUNGEON, HAULER_BOILER_RUPTURE } from '../encounters/stormbrass_foundry/ids';
+import {
+  FOUNDRY_DUNGEON,
+  GANTRY_HAULER_ID,
+  HAULER_BOILER_RUPTURE,
+  PRIME_DRAFT_ID,
+  RANGEWARDEN_ID,
+  TOCK_ID,
+  VOLTAIC_WARDEN_ID,
+} from '../encounters/stormbrass_foundry/ids';
 import {
   FOUNDRY_ARC_POP,
   FOUNDRY_BOILER_BURST,
@@ -234,6 +242,8 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
         healPct: 0.3,
         below: 0.7,
         family: 'elemental',
+        // Trash automata only: never the Hauler it patrols beside, never a boss.
+        exclude: [GANTRY_HAULER_ID, TOCK_ID, RANGEWARDEN_ID, VOLTAIC_WARDEN_ID, PRIME_DRAFT_ID],
       },
     },
     loot: [

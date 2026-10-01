@@ -53,11 +53,13 @@ export function pickMendTarget(
   range: number,
   below: number,
   family?: string,
+  exclude: readonly string[] = [],
 ): Entity | null {
   let best: Entity | null = null;
   for (const e of alliesInReach(ctx, inst, caster, range)) {
     if (e.id !== caster.id && !e.inCombat) continue;
     if (family !== undefined && MOBS[e.templateId]?.family !== family) continue;
+    if (exclude.includes(e.templateId)) continue;
     if (hpShare(e) >= below) continue;
     if (!best || hpShare(e) < hpShare(best) - 1e-9) best = e;
     else if (Math.abs(hpShare(e) - hpShare(best)) <= 1e-9 && e.id < best.id) best = e;
@@ -99,7 +101,9 @@ export function supportCastReady(
   const no = { ok: false, target: null };
   if (key === 'mend') {
     const def = kit.mend;
-    const target = def ? pickMendTarget(ctx, inst, mob, def.range, def.below, def.family) : null;
+    const target = def
+      ? pickMendTarget(ctx, inst, mob, def.range, def.below, def.family, def.exclude)
+      : null;
     return target ? { ok: true, target } : no;
   }
   if (key === 'ward') {

@@ -229,6 +229,30 @@ describe('the Foundry Engineer: Field Repair', () => {
     run(r, def.castTime + 0.1, [engineer, apprentice, sentry]);
     expect(sentry.hp).toBeGreaterThanOrEqual(before + Math.round(sentry.maxHp * 0.3) - 1);
   });
+
+  it('never repairs the Gantry Hauler or a boss pulled beside it (trash automata only)', () => {
+    const r = room();
+    const engineer = engage(r, 'foundry_engineer', 4, 0);
+    const hauler = engage(r, GANTRY_HAULER_ID, 6, 6);
+    const tock = engage(r, 'line_master_tock', 6, -6);
+    hauler.hp = Math.floor(hauler.maxHp * 0.2);
+    tock.hp = Math.floor(tock.maxHp * 0.3);
+    const def = MOBS.foundry_engineer.trashKit?.mend;
+    if (!def) throw new Error('repair');
+    expect(def.exclude).toEqual(
+      expect.arrayContaining([
+        GANTRY_HAULER_ID,
+        'line_master_tock',
+        'rangewarden',
+        'voltaic_warden',
+        'prime_draft',
+      ]),
+    );
+    const hp0 = [hauler.hp, tock.hp];
+    run(r, def.first + def.castTime + 1, [engineer, hauler, tock]);
+    expect(engineer.castingAbility).not.toBe(FOUNDRY_FIELD_REPAIR);
+    expect([hauler.hp, tock.hp]).toEqual(hp0);
+  });
 });
 
 describe('the Gearwright Apprentice: Deploy Turret', () => {
@@ -408,6 +432,36 @@ describe('the Gantry Hauler (showpiece patrol)', () => {
     expect(hits).toHaveLength(1);
     expect(hits[0]).toBeGreaterThanOrEqual(140);
     expect(hits[0]).toBeLessThanOrEqual(160);
+  });
+
+  it('the crane arm waits out a Steam Blast bar, then throws', () => {
+    const r = room();
+    const h = hauler(r, 4);
+    addPlayer(r, 'mage', 0, 24);
+    run(r, HAULER_TUNING.blastFirst + 0.05, [h], true);
+    expect(h.castingAbility).toBe(HAULER_STEAM_BLAST);
+    const st = h.foundryFight;
+    if (st?.kind !== 'hauler') throw new Error('state');
+    st.tossTimer = 0.05;
+    run(r, HAULER_TUNING.blastCast - 0.3, [h], true);
+    expect(h.castingAbility).toBe(HAULER_STEAM_BLAST);
+    expect(objectsOf(r, FOUNDRY_SCRAP_MARK)).toHaveLength(0);
+    run(r, 0.5, [h], true);
+    expect(h.castingAbility).toBeNull();
+    expect(objectsOf(r, FOUNDRY_SCRAP_MARK)).toHaveLength(1);
+  });
+
+  it('a plate in the air when the Hauler falls still lands, then its mark goes', () => {
+    const r = room();
+    const h = hauler(r, 4);
+    const far = addPlayer(r, 'mage', 0, 24);
+    run(r, HAULER_TUNING.tossFirst + 0.05, [h], true);
+    expect(objectsOf(r, FOUNDRY_SCRAP_MARK)).toHaveLength(1);
+    r.sim.ctx.handleDeath(h, r.me);
+    run(r, HAULER_TUNING.tossWarning + 0.1, [h], true);
+    expect(dealt(r, far.id, 'Scrap Toss')).toHaveLength(1);
+    expect(objectsOf(r, FOUNDRY_SCRAP_MARK)).toHaveLength(0);
+    expect(h.foundryFight).toBeUndefined();
   });
 
   it('a wipe or an evade drops the plates in flight and the bar', () => {

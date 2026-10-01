@@ -7,7 +7,8 @@
 //                   tracks for the bar and the cone stays where it was drawn.
 //   Scrap Toss      every 15 s the crane arm throws a plate at the FARTHEST
 //                   player within 45 yd: a 5 yd mark on the floor, 2 s later
-//                   200 to 240 to everyone still in it.
+//                   200 to 240 to everyone still in it. Never during a Steam
+//                   Blast bar; a plate in the air still lands if it falls.
 //   Unload          once, at half health: three Arc Drones spill from its bed.
 //   Boiler Rupture  2 s after it falls its boiler bursts, 8 yd (its
 //                   trashKit.deathBurst, mob/trash_kit/foundry_kit.ts).
@@ -258,7 +259,15 @@ export function tickHauler(
   hauler: Entity,
   engaged: boolean,
 ): void {
-  if (hauler.dead || !engaged) {
+  if (hauler.dead) {
+    // A plate already thrown still lands where it was marked; then the pull ends.
+    const st = hauler.foundryFight;
+    clearCastIf(hauler, HAULER_STEAM_BLAST);
+    if (st && st.tosses.length > 0) stepTosses(ctx, inst, hauler, st);
+    if (!st || st.tosses.length === 0) endHaulerFight(ctx, inst, hauler);
+    return;
+  }
+  if (!engaged) {
     endHaulerFight(ctx, inst, hauler);
     return;
   }
@@ -267,8 +276,11 @@ export function tickHauler(
   if (!st.unloaded && hauler.maxHp > 0 && hauler.hp / hauler.maxHp <= T.unloadAtHpPct) {
     unloadDrones(ctx, inst, hauler, st);
   }
+  // One thing at a time: a plate due during the Steam Blast bar waits for it.
   st.tossTimer -= DT;
-  if (st.tossTimer <= 0 && !startScrapToss(ctx, inst, hauler, st)) st.tossTimer = 1;
+  if (st.tossTimer <= 0 && hauler.castingAbility !== HAULER_STEAM_BLAST) {
+    if (!startScrapToss(ctx, inst, hauler, st)) st.tossTimer = 1;
+  }
   if (hauler.castingAbility === HAULER_STEAM_BLAST) {
     // It braces its tracks for the bar: the cone lands where it was drawn.
     if (!st.plantedAt) st.plantedAt = { ...hauler.pos };
