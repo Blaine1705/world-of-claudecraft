@@ -110,6 +110,17 @@ ratings.
   `nextId` nor the shared rng stream moves
   (`tests/warfare_vendor_npc.test.ts` asserts both). His stock is the one
   canonical `content/pvp_honor.ts` table, shared with FURY.
+- `pvp_resurrect.ts` owns the PvP Resurrect RULE (owner rule 2026-10-02): a
+  player death outside the instance plane, not jailed, whose killing blow came
+  from a hostile player or that took a hostile player's hit within
+  `PVP_RESURRECT_WINDOW_SECONDS` (10), offers a raise at the graveyard Release
+  picks at full health and mana with no Keeper's Toll. `worldPvpOnPlayerDeath`
+  stamps `Entity.pvpResurrect` at every player death from the same hostile-hit
+  books the kill credit reads; the raise is `spirit.ts` `pvpResurrect` (refused
+  to a ghost), and every revive clears the stamp (`reviveAt`). The self record
+  carries it as `pvr` (`server/self_scalar_wire.ts`); the death screen's button is
+  `src/ui/hud/death`. Imported by path from `world_pvp.ts` and `spirit.ts` (it
+  imports neither, so no cycle). Pinned by `tests/pvp_resurrect.test.ts`.
 - Import the directory's public API through `src/sim/pvp/index.ts`, with ONE
   deliberate exception: `warfare_quartermaster.ts` is NOT re-exported there
   (see the comment in `index.ts`). It needs `createNpc` from `../entity` at
