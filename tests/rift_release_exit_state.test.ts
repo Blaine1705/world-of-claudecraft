@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { ActionBarLayoutUploader } from '../src/net/action_bar_upload';
 import { ClientWorld } from '../src/net/online';
 import { allocRiftCollisionToken } from '../src/sim/colliders';
-import { BUILTIN_WORLD, isRiftPos } from '../src/sim/data';
+import { BUILTIN_WORLD, dungeonAt, isRiftPos } from '../src/sim/data';
 import { spawnNaturalRiftPortal } from '../src/sim/rift/portals';
 import { Sim } from '../src/sim/sim';
 import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from '../src/sim/spirit';
@@ -104,7 +104,26 @@ describe('leaving a rift through a graveyard move clears the online rift floor',
     expect(modes.minimap).toBe('overworld');
   });
 
-  it('without the exit the client stays locked on the rift plan (the reported bug)', () => {
+  it('the ghost walking back in rebuilds the rift floor on the client', () => {
+    const { sim, pid, entry } = enterRiftSolo();
+    const portal = sim.entities.get(sim.naturalRiftPortals[0].id)!;
+    kill(sim, pid);
+    sim.releaseSpirit(pid);
+    const exits = riftStates(sim.drainEvents(), pid);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, pid, undefined, portal);
+    const ghost = sim.entities.get(pid)!;
+    expect(isRiftPos(ghost.pos.x), 'the ghost is back on the floor').toBe(true);
+    const reentry = riftStates(sim.drainEvents(), pid);
+    expect(reentry.map((e) => e.active)).toEqual([true]);
+    const modes = onlineMapModes([entry, ...exits, ...reentry], ghost.pos);
+    expect(modes.riftFloor).not.toBeNull();
+    expect(modes.map).toBe('rift');
+    expect(modes.minimap).toBe('rift');
+  });
+
+  // Control: replays only the entry, so it passes with or without the fix. It pins
+  // the mechanism the fix relies on (the client holds its floor until an exit).
+  it('control: a client that never receives an exit stays on the rift plan', () => {
     const { sim, pid, entry } = enterRiftSolo();
     kill(sim, pid);
     sim.releaseSpirit(pid);
@@ -144,5 +163,30 @@ describe('leaving a rift through a graveyard move clears the online rift floor',
     sim.releaseSpirit(outside);
     expect(sim.entities.get(outside)!.ghost).toBe(true);
     expect(riftStates(sim.drainEvents(), outside)).toEqual([]);
+  });
+
+  it('a ghost already at the graveyard using /unstuck emits no second exit', () => {
+    const { sim, pid } = enterRiftSolo();
+    kill(sim, pid);
+    sim.releaseSpirit(pid);
+    sim.drainEvents();
+    reviveAtGraveyardForUnstuck(sim.ctx, pid, 'none');
+    expect(sim.entities.get(pid)!.dead).toBe(false);
+    expect(riftStates(sim.drainEvents(), pid)).toEqual([]);
+  });
+
+  it('a dungeon release emits no riftState (dungeon maps are position-derived)', () => {
+    const { sim } = enterRiftSolo();
+    const delver = sim.addPlayer('warrior', 'Delver');
+    sim.setPlayerLevel(20, delver);
+    sim.enterDungeon('hollow_crypt', delver);
+    expect(dungeonAt(sim.entities.get(delver)!.pos.x), 'sanity: inside the dungeon').not.toBeNull();
+    sim.drainEvents();
+    kill(sim, delver);
+    sim.releaseSpirit(delver);
+    const ghost = sim.entities.get(delver)!;
+    expect(ghost.ghost).toBe(true);
+    expect(dungeonAt(ghost.pos.x), 'the ghost is outside the dungeon').toBeNull();
+    expect(riftStates(sim.drainEvents(), delver)).toEqual([]);
   });
 });
