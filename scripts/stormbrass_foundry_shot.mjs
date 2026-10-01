@@ -139,6 +139,39 @@ const SHOTS = [
     { id: 'sobrecarga', cmds: ['overload'], cmdWait: 700, pitch: 0.35, dist: 20 },
     { id: 'sin_corazon_arco', cmds: ['heartless', 'surge'], cmdWait: 500, pitch: 0.4, dist: 22 },
   ]),
+  // ---- Phase 3: the Blender creatures up close, the player's knight beside
+  // each (ids end in _f3; name them after the out dir to run them).
+  ...bossShots('tock', 'line_master_tock', 7, Math.PI * 1.2, [
+    { id: 'cerca_f3', pitch: 0.1, dist: 9, yaw: 0.55, wait: 1500 },
+  ]),
+  ...bossShots('rangewarden', 'rangewarden', 8, Math.PI * 0.8, [
+    { id: 'cerca_f3', pitch: 0.12, dist: 10, yaw: -0.5, wait: 1500 },
+  ]),
+  ...bossShots('voltaic', 'voltaic_warden', 8, 0.3, [
+    { id: 'cerca_f3', pitch: 0.08, dist: 11, yaw: 0.5, wait: 1500 },
+  ]),
+  ...[
+    ['sentry', 'centinela'],
+    ['shieldbearer', 'escudero'],
+    ['bruiser', 'bruto'],
+    ['engineer', 'ingeniero'],
+    ['apprentice', 'aprendiza'],
+    ['hound', 'sabueso'],
+    ['drone', 'dron'],
+    ['turret', 'torreta'],
+    ['frame', 'marco'],
+    ['hauler', 'transportador'],
+  ].map(([spawn, name]) => ({
+    id: `${name}_cerca_f3`,
+    at: [0, 50],
+    face: 0,
+    yaw: 0.35,
+    pitch: 0.15,
+    dist: spawn === 'hauler' ? 22 : 10,
+    cmds: ['/dev foundry kill trash', `/dev foundry spawn ${spawn}`],
+    cmdWait: 2500,
+    wait: 300,
+  })),
 ];
 
 /** One boss's mechanic shots: each stages a fresh pull and fires its triggers. */
