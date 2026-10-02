@@ -18,6 +18,7 @@ import {
   WILDHEART_ITEMS,
 } from '../src/sim/content/wildheart';
 import {
+  JAGUAR_MAW,
   WILDHEART_BASIN_FIELD,
   WILDHEART_HEIGHTS,
 } from '../src/sim/content/wildheart_basin_layout';
@@ -612,10 +613,10 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       expect(inst.bossExitId, difficulty).not.toBeNull();
       const exit = sim.entities.get(inst.bossExitId as number) as Entity;
       expect(exit?.templateId, difficulty).toBe('dungeon_exit');
-      // At the authored spot on the shrine terrace, beside the stair head.
+      // At the authored spot in the stone jaguar's maw behind the shrine.
       const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
-      expect(exit.pos.x - origin.x).toBeCloseTo(-16, 5);
-      expect(exit.pos.z - origin.z).toBeCloseTo(206, 5);
+      expect(exit.pos.x - origin.x).toBeCloseTo(JAGUAR_MAW.portal.x, 5);
+      expect(exit.pos.z - origin.z).toBeCloseTo(JAGUAR_MAW.portal.z, 5);
       // The claim owns it: freeInstance drops it with objectIds.
       expect(inst.objectIds).toContain(inst.bossExitId);
     }

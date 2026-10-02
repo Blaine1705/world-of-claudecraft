@@ -20,6 +20,7 @@ import { buildBasinKitDressing, ensureBasinKit } from './basin_kit';
 import { buildBasinLights } from './basin_lights';
 import { buildBasinSky } from './basin_sky';
 import { buildBasinWater } from './basin_water';
+import { buildMawGlow } from './maw_glow';
 
 export interface WildheartBasinInteriorDeps {
   lowGfx: boolean;
@@ -79,6 +80,7 @@ export async function buildWildheartBasinInterior(
   group.add(buildBasinFalls({ lowGfx: deps.lowGfx, density }));
   group.add(buildBasinGates(ox, oz, ground));
   buildBasinLights(group, deps, ground);
+  buildMawGlow(group);
   group.add(buildBasinSky({ lowGfx: deps.lowGfx, density }));
   group.add(buildBasinAir({ lowGfx: deps.lowGfx, density }));
   return group;

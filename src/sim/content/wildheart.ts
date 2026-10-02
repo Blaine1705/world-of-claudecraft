@@ -69,6 +69,7 @@ import { HEROIC_FINALE_COPPER } from './dungeon_difficulty';
 import {
   BEAST_PITS,
   GORGEBLOOM_DAIS,
+  JAGUAR_MAW,
   RIVER_FORD,
   WILDHEART_BASIN_ANCHORS,
   ZULGAR_SPOT,
@@ -1146,9 +1147,10 @@ export const WILDHEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     // caldera in view and the first pack 40 yd off down the Fern Steps.
     entry: { x: WILDHEART_BASIN_ANCHORS.entry.x, z: WILDHEART_BASIN_ANCHORS.entry.z },
     exitOffset: { x: WILDHEART_BASIN_ANCHORS.exit.x, z: WILDHEART_BASIN_ANCHORS.exit.z },
-    // Opens on Zulgar's death on the shrine terrace, 440 yd up the route from
-    // the maw, so the cleared run steps out here instead of walking back.
-    bossExitPortal: { x: -16, z: 206 },
+    // Opens on Zulgar's death in the stone jaguar's maw behind the shrine,
+    // 440 yd up the route from the Idol Maw, so the cleared run walks into the
+    // jaws and steps out instead of walking back.
+    bossExitPortal: { x: JAGUAR_MAW.portal.x, z: JAGUAR_MAW.portal.z },
     spawns: WILDHEART_BASIN_SPAWNS,
     objects: [...WILDHEART_BASIN_GATE_OBJECTS],
     gates: WILDHEART_BASIN_GATES,

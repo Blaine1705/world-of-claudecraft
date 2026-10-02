@@ -122,6 +122,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/drowned_temple/temple_ysolei_fx.ts', layer: 'ground', strict: true },
   // The Wildheart Basin's brazier pools on its floors (the world's own light).
   { file: 'src/render/wildheart_basin/basin_lights.ts', layer: 'ground', strict: true },
+  // The spirit light pooled on the jaguar maw's jaw once the way out opens.
+  { file: 'src/render/wildheart_basin/maw_glow.ts', layer: 'ground', strict: true },
   // The Basin's telegraphs (the shared kit) and its creature effects: the
   // Stomp's shock rings, the spore fog, the pulses and the bursts.
   { file: 'src/render/wildheart_basin/basin_fx.ts', layer: 'encounter', strict: true },

@@ -95,6 +95,8 @@ import { BasinThorns } from './basin_thorns';
 import { BASIN_WATER_WADERS } from './basin_water';
 import { GorgebloomFx } from './gorgebloom_fx';
 import { LasherFx } from './lasher_fx';
+import { setBasinMawGlow } from './maw_glow';
+import { isBasinMawPortal, mawGlowStrength, stepMawGlow } from './maw_glow_core';
 import { SaurianFx } from './saurian_fx';
 import { ZulgarAvatarFx } from './zulgar_avatar_fx';
 
@@ -255,6 +257,9 @@ export class WildheartFx {
   private clock = 0;
   private inBasin = false;
   private zulgarState: 'idle' | 'fight' | 'hunt' = 'idle';
+  /** The way out stands open in the jaguar's maw, and its glow's level. */
+  private mawOpen = false;
+  private mawLevel = 0;
   /** The boss layer drew last frame (put away once on leaving the basin). */
   private bossShown = false;
   private disposed = false;
@@ -601,6 +606,11 @@ export class WildheartFx {
       // Out of the basin: no wake lingers on the shared water, and no boss
       // mark or telegraph stays frozen where the fight left it.
       for (const w of BASIN_WATER_WADERS.value) w.w = 0;
+      // The maw's glow is shared by every build of the basin: dark for the next run.
+      if (this.mawLevel > 0) {
+        this.mawLevel = 0;
+        setBasinMawGlow(0);
+      }
       if (this.bossShown) {
         this.bossShown = false;
         this.boss?.hideAll();
@@ -617,6 +627,8 @@ export class WildheartFx {
       this.glow.update(this.clock);
       return;
     }
+    this.mawLevel = stepMawGlow(this.mawLevel, this.mawOpen, dt);
+    setBasinMawGlow(mawGlowStrength(this.mawLevel, this.clock));
     this.paintCasts(world);
     this.paintLanes(world);
     this.paintClouds(world, dt);
@@ -901,6 +913,7 @@ export class WildheartFx {
     this.waders.length = 0;
     let basin = false;
     let zulgar: 'idle' | 'fight' | 'hunt' = 'idle';
+    let maw = false;
     this.boss?.beginScan();
     this.saurian?.beginScan();
     this.gorgebloom?.beginScan();
@@ -911,6 +924,7 @@ export class WildheartFx {
         continue;
       }
       if (e.kind !== 'mob') {
+        if (isBasinMawPortal(e)) maw = true;
         this.scanObject(e);
         continue;
       }
@@ -957,8 +971,13 @@ export class WildheartFx {
     }
     this.saurian?.endScan();
     this.gorgebloom?.endScan();
+    this.mawOpen = maw;
     this.inBasin =
-      basin || this.clouds.some((c) => c.objectId >= 0) || this.lasher.busy() || this.thorns.busy();
+      basin ||
+      maw ||
+      this.clouds.some((c) => c.objectId >= 0) ||
+      this.lasher.busy() ||
+      this.thorns.busy();
     this.zulgarState = zulgar;
   }
 

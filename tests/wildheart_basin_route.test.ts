@@ -293,12 +293,16 @@ describe('Wildheart Basin route contract: every pack is mandatory', () => {
       }
     }
     expect(voidCells).toBe(0);
-    // The boss exit portal stands on the shrine terrace's reached floor.
+    // The boss exit portal stands in the jaguar's maw past the terrace's
+    // north edge, on reached walkable floor (the jaw behind the front teeth).
     const portal = DUNGEON.bossExitPortal;
     expect(portal).toBeDefined();
     if (portal) {
       expect(spawnReached(seen, portal.x, portal.z)).toBe(true);
-      expect(authoredFieldHeight(FIELD, portal.x, portal.z)).toBe(WILDHEART_HEIGHTS.shrineTerrace);
+      expect(portal.z).toBeGreaterThan(236);
+      expect(authoredFieldHeight(FIELD, portal.x, portal.z)).toBeGreaterThan(
+        WILDHEART_HEIGHTS.shrineTerrace - 1,
+      );
     }
   });
 

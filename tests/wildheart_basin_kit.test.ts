@@ -32,6 +32,7 @@ import {
   planBasinPropPlacements,
   planCalderaRing,
   planGorgeJungle,
+  planJaguarHead,
   planPyramidCladding,
   pyramidSolidHeight,
   RIVER_CLEAR_HALF_WIDTH,
@@ -39,6 +40,7 @@ import {
 } from '../src/render/wildheart_basin/basin_kit_plan_core';
 import {
   JAGUAR_HEAD,
+  JAGUAR_MAW,
   RIM_FALLS,
   WEEPING_FALLS,
   WILDHEART_BASIN_FIELD,
@@ -63,6 +65,8 @@ interface Shape {
   max: V3;
   /** Every vertex, glTF frame (x, y up, z front). */
   points: V3[];
+  /** Vertex index triples (the jaguar head's surface is ray-cast). */
+  triangles: number[];
 }
 
 const shapes = new Map<string, Shape>();
@@ -93,12 +97,16 @@ beforeAll(async () => {
     const name = node.getName();
     if (!name.startsWith('Kit_')) continue;
     const points: V3[] = [];
+    const triangles: number[] = [];
     const m = node.getWorldMatrix();
     const mesh = node.getMesh();
     if (mesh) {
       for (const prim of mesh.listPrimitives()) {
         const a = prim.getAttribute('POSITION');
         if (!a) continue;
+        const base = points.length;
+        const idx = prim.getIndices()?.getArray();
+        if (idx) for (let i = 0; i < idx.length; i++) triangles.push(base + idx[i]);
         const e: number[] = [];
         for (let i = 0; i < a.getCount(); i++) {
           a.getElement(i, e);
@@ -117,7 +125,7 @@ beforeAll(async () => {
         min[k] = Math.min(min[k], p[k]);
         max[k] = Math.max(max[k], p[k]);
       }
-    shapes.set(name, { min, max, points });
+    shapes.set(name, { min, max, points, triangles });
   }
 });
 
@@ -323,6 +331,47 @@ describe('Wildheart Basin kit: the dressing outside the field', () => {
       expect(walkable(p.x, p.z)).toBe(false);
     }
     expect(head[0].rot).toBe(head[1].rot);
+  });
+
+  it.skipIf(!haveKit)('lays the maw walkway on the carved jaw (feet on the stone)', () => {
+    // The exit portal's walkway into the jaguar's mouth (JAGUAR_MAW): over
+    // every stretch of it inside the jaws the head's own jaw stone lies within
+    // a knee of the walked floor (never a gap a player floats over), and the
+    // head-room audit below keeps the stone from rising through the feet.
+    const p = planJaguarHead()[0];
+    const at = placer(p);
+    const shape = shapes.get('Kit_JaguarHead') as Shape;
+    const w = shape.points.map((v) => at(v[0], v[1], v[2]));
+    const t = shape.triangles;
+    expect(t.length).toBeGreaterThan(3000);
+    /** The highest stone straight under (x, z), below `cap` (a downward ray). */
+    const stoneUnder = (x: number, z: number, cap: number): number => {
+      let top = -Infinity;
+      for (let i = 0; i < t.length; i += 3) {
+        const a = w[t[i]];
+        const b = w[t[i + 1]];
+        const c = w[t[i + 2]];
+        const d = (b[2] - c[2]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[2] - c[2]);
+        if (Math.abs(d) < 1e-9) continue;
+        const l1 = ((b[2] - c[2]) * (x - c[0]) + (c[0] - b[0]) * (z - c[2])) / d;
+        const l2 = ((c[2] - a[2]) * (x - c[0]) + (a[0] - c[0]) * (z - c[2])) / d;
+        const l3 = 1 - l1 - l2;
+        if (l1 < 0 || l2 < 0 || l3 < 0) continue;
+        const y = l1 * a[1] + l2 * b[1] + l3 * c[1];
+        if (y < cap && y > top) top = y;
+      }
+      return top;
+    };
+    const floats: string[] = [];
+    for (let z = 236.5; z <= (JAGUAR_MAW.floor.at(-1)?.[0] ?? 0) - 0.25; z += 0.5) {
+      for (let x = -3; x <= 3; x += 1) {
+        const g = floor(x, z);
+        expect(walkable(x, z), `walkway at ${x},${z}`).toBe(true);
+        const top = stoneUnder(x, z, g + 1.6);
+        if (!(g - top <= 1.6)) floats.push(`${x},${z}: ${(g - top).toFixed(2)} over the jaw`);
+      }
+    }
+    expect(floats, floats.slice(0, 20).join('\n')).toEqual([]);
   });
 });
 

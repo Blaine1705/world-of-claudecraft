@@ -197,6 +197,41 @@ export const SUN_GLYPHS: readonly { x: number; z: number; r: number }[] = Array.
  *  hunt (phase B). */
 export const JAGUAR_HEAD = { x: 0, z: 262, y: 30, height: 70 } as const;
 
+/** The stone jaguar's open maw in the basin frame: the sculpt's MAW box
+ *  (docs/design/dungeon-rework/kit/jaguar_head_sculpt.py, kit x half 11.6,
+ *  y -31.6 to 5.6, z 16 to 29) through the head's placement (turned to the
+ *  terrace, so kit -y runs toward -z). The way out opens in it: when Zulgar
+ *  falls the exit portal stands on the lower jaw behind the front teeth
+ *  (`portal`), reached up a walkway over the lower incisors (`floor`: the
+ *  jaw's own surface measured off the shipped kit GLB, so the feet ride the
+ *  carved stone). The walkway is a hidden field surface: the head draws it. */
+export const JAGUAR_MAW = (() => {
+  const s = JAGUAR_HEAD.height / 70;
+  return {
+    x: JAGUAR_HEAD.x,
+    halfWidth: 11.6 * s,
+    minZ: JAGUAR_HEAD.z - 31.6 * s,
+    maxZ: JAGUAR_HEAD.z + 5.6 * s,
+    jawY: JAGUAR_HEAD.y + 16 * s,
+    roofY: JAGUAR_HEAD.y + 29 * s,
+    /** The walkway's half width: inside the lower canines (|x| 5 and out). */
+    walkHalfWidth: 4,
+    /** [z, floor height] down the walkway's centre line: off the terrace's
+     *  flat lip, over the lower incisor row (their tips knee high) and down
+     *  onto the jaw, which lies a hand below the terrace, to the foot of the
+     *  tongue (its 1.7 yd front lip closes the walkway). */
+    floor: [
+      [233, WILDHEART_HEIGHTS.shrineTerrace],
+      [236, WILDHEART_HEIGHTS.shrineTerrace],
+      [238.2, 45.9],
+      [239, 45.9],
+      [241, 45.1],
+      [244.2, 45],
+    ] as const,
+    portal: { x: JAGUAR_HEAD.x, z: 242.5 },
+  };
+})();
+
 /** The great waterfalls pouring from the caldera rim (render signature): the
  *  three on the far rim seen from the Idol Maw, and the Weeping Falls. */
 export const RIM_FALLS: readonly {
@@ -604,6 +639,13 @@ const SURFACES: FieldSurface[] = [
     edge: 'masonry',
     ground: 'ritual',
   }),
+  // --- The way out: into the stone jaguar's maw (the boss exit portal) --------------
+  path(
+    'jaguar_maw',
+    JAGUAR_MAW.floor.map(([z, h]) => [JAGUAR_MAW.x, z, h] as const),
+    JAGUAR_MAW.walkHalfWidth,
+    { hidden: true, edge: 'masonry', ground: 'ritual' },
+  ),
 ];
 
 // ---- props (kit pieces; r or hw/hd add a collider) ----------------------------------
@@ -792,7 +834,8 @@ const PROPS: FieldProp[] = [
 
 export const WILDHEART_BASIN_FIELD: AuthoredFieldDef = {
   key: 'wildheart',
-  bounds: { minX: -114, maxX: 114, minZ: -240, maxZ: 240 },
+  // North to the jaguar's maw (inside the 250 yd half slot the claim counts).
+  bounds: { minX: -114, maxX: 114, minZ: -240, maxZ: 248 },
   voidHeight: WILDHEART_BASIN_VOID_HEIGHT,
   cliffStep: 1.1,
   mapVoid: 'jungle',
