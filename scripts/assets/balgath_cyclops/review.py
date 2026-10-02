@@ -202,6 +202,10 @@ if mode == 'rot':
 
 if mode == 'checks':
     # Objective arm checks per clip (authoring gate):
+    #  * TREMOR: the zig-zag part of each arm bone's angular acceleration, frame to
+    #    frame (jitter.py; the shipped GLB gets the same measure from arm_jitter.mjs).
+    #    A held pose must hold still: a limb flipping between two poses on alternate
+    #    frames reads as a shake however small each step is.
     #  * ROLL: the twist of each arm bone about its own length, relative to its parent
     #    (swing-twist split of the keyed local rotation). Fails past an anatomical
     #    range or on a per-frame jump (the candy-wrapper and the spinning forearm).
@@ -210,6 +214,7 @@ if mode == 'checks':
     #    probes the ground check uses, so it sees the real flesh, not a bone line).
     import numpy as np
     import anatomy as A
+    import jitter as J
     F = A.build_body(voxel=0.15, detail=False)
     BODY = {'Hips', 'Spine1', 'Spine2', 'Belly', 'Neck', 'Head', 'Jaw', 'Brow',
             'L_Thigh', 'R_Thigh', 'L_KneeFix', 'R_KneeFix'}
@@ -317,6 +322,9 @@ if mode == 'checks':
         for k, (v, t) in worst_step.items():
             if v > LIM_STEP:
                 bad.append(f'{k} roll-step {v:.0f}@{t:.2f}')
+        jit = J.clip_jitter(scene, arm, act)
+        if jit['tremor'] > J.TREMOR_LIMIT:
+            bad.append(f"TREMOR {jit['bone']} {jit['tremor']:.1f}@{jit['t']:.2f}")
         if worst_clear[0] < 0.0:
             bad.append(f'INSIDE {worst_clear[1]} {worst_clear[0]:.2f}@{worst_clear[2]:.2f}')
         if worst_arm[0] < -ARMPIT_ALLOW:
@@ -328,5 +336,6 @@ if mode == 'checks':
         if '--why' in rest:
             print('  WORST_VERT', worst_vert[0], ' UPPER', worst_vert_ua[0])
         print(f'CHECK {c:22s} {"FAIL" if bad else "ok  "} upperRoll={ua:4.0f} foreRoll={fa:4.0f} step={st:4.0f} '
+              f'tremor={jit["tremor"]:4.1f} '
               f'clear={worst_clear[0]:5.2f}({worst_clear[1]}@{worst_clear[2]:.2f}) {"; ".join(bad)}')
     print('CHECK_FAILS', fails)

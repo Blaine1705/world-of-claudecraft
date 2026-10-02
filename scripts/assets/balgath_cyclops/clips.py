@@ -114,21 +114,29 @@ class Body:
         return b
 
     def pose(self, memory=None, resolve=True):
-        """Solve the pose; with `resolve`, then keep the arms out of the body."""
-        if not resolve:
-            return self._solve(memory)
-        snap = {k: v.copy() for k, v in memory.items()} if memory is not None else None
-        pose = self._solve(None if memory is None else dict(snap))
+        """Solve the pose; with `resolve`, first keep the arms out of the body
+        (`cleared`). Only the final solve reads and commits the bend memory."""
+        b = self.cleared() if resolve else self
+        return b._solve(memory)
+
+    def cleared(self):
+        """This Body with its wrist targets and poles pushed out of the flesh.
+
+        The pass runs WITHOUT the bend memory, so its answer is a pure function of
+        this frame's parameters. Run inside the memory (as it once was), the pass and
+        the per-frame bend and roll limits fed each other: last frame's elbow moved
+        this frame's push, the push moved the elbow, and a held pose never settled.
+        The upper arm flipped between two rolls about 11 degrees apart on alternate
+        frames, a 12 Hz tremor in every hold (Idle worst of all)."""
         b = self
+        pose = b._solve(None)
         for _ in range(14):
             fix = arm_clearance_fix(b, pose)
             if fix is None:
                 break
             b = b.but(**fix)
-            pose = b._solve(None if memory is None else dict(snap))
-        if memory is not None:
-            b._solve(memory)                  # commit this frame's bend memory once
-        return pose
+            pose = b._solve(None)
+        return b
 
     def _solve(self, memory=None):
         p = self.p
@@ -499,24 +507,187 @@ def sample(seq, t, loop=False):
     return blend([bm, b0, b1, bp], _cr_weights(u))
 
 
-def keys_of(seq, loop=False, dense=True):
+# Frames (sigma) the clearance corrections are smoothed over in a dense clip.
+CLEAR_SMOOTH = 3.0
+CLEAR_KEYS = (('hand_l', False), ('hand_r', False), ('pole_l', True), ('pole_r', True))
+
+
+def _explicit(b, key):
+    v = b.p[key]
+    if v is None and key == 'pole_r':
+        v = (-b.p['pole_l'][0], b.p['pole_l'][1], b.p['pole_l'][2])
+    return None if v is None else np.asarray(v, float)
+
+
+def _smooth_rows(rows, sigma, loop):
+    """Gaussian-smooth a (frames, 3) series along time; a loop wraps round."""
+    n = len(rows)
+    r = int(math.ceil(sigma * 3))
+    w = np.exp(-0.5 * (np.arange(-r, r + 1) / sigma) ** 2)
+    out = np.zeros_like(rows)
+    for i in range(n):
+        acc, tot = np.zeros(rows.shape[1]), 0.0
+        for k, wk in zip(range(-r, r + 1), w):
+            j = i + k
+            if loop:
+                j %= n
+            elif j < 0 or j >= n:
+                continue
+            acc += rows[j] * wk
+            tot += wk
+        out[i] = acc / tot
+    return out
+
+
+def _dilate_rows(rows, r, loop):
+    """Each frame takes the largest correction within r frames of it, so the smoothed
+    push is already whole when the arm reaches the flesh (smoothing alone would ease
+    it in late, and the arm would sink in at the onset)."""
+    n = len(rows)
+    norms = np.linalg.norm(rows, axis=1)
+    out = rows.copy()
+    for i in range(n):
+        best = i
+        for k in range(-r, r + 1):
+            j = i + k
+            if loop:
+                j %= n
+            elif j < 0 or j >= n:
+                continue
+            if norms[j] > norms[best] + 1e-9:
+                best = j
+        out[i] = rows[best]
+    return out
+
+
+def cleared_track(bodies, loop=False):
+    """Every frame's Body pushed out of the flesh, with the pushes smoothed in time.
+
+    The clearance pass decides each frame alone: a wrist grazing the gut gets a push
+    one frame and none the next, the elbow is shoved round on another, and the arm
+    jerks between them (a 15 to 30 deg/frame^2 rattle through the blind stagger, the
+    clobber, the swipe). So the frame-by-frame corrections (the wrist offsets and the
+    pole changes) are widened to their neighbourhood's largest and then low-passed
+    across the clip before the pose is solved: the arm eases clear of the body over a
+    few frames before it would touch, instead of being kicked out of it."""
+    res = [b.cleared() for b in bodies]
+    out = [b.but() for b in bodies]
+    for key, is_dir in CLEAR_KEYS:
+        orig = [_explicit(b, key) for b in bodies]
+        new = [_explicit(r, key) for r in res]
+        if any(o is None or q is None for o, q in zip(orig, new)):
+            for o, r in zip(out, res):
+                o.p[key] = r.p[key]
+            continue
+        delta = np.array([q - o for o, q in zip(orig, new)])
+        if not np.abs(delta).max() > 1e-9:
+            continue
+        sm = _smooth_rows(_dilate_rows(delta, int(math.ceil(CLEAR_SMOOTH * 2)), loop), CLEAR_SMOOTH, loop)
+        for o, base, d in zip(out, orig, sm):
+            v = base + d
+            if is_dir:
+                v = v / max(np.linalg.norm(v), 1e-9)
+            o.p[key] = tuple(v.tolist())
+    return out
+
+
+def keys_of(seq, loop=False, dense=True, ease_clear=True):
     """seq: [(t, Body, ease)] -> per-frame [(t, Pose, 'linear')]: every frame is
-    solved from the interpolated BODY (arcs, not quaternion blends)."""
+    solved from the interpolated BODY (arcs, not quaternion blends), out of the
+    flesh by a time-smoothed clearance (cleared_track; `ease_clear=False` keeps each
+    frame's own push), then steadied (steady_arms)."""
     if not dense:
         return [(t, b.pose(), e) for t, b, e in seq]
     end = seq[-1][0]
     nfr = int(round(end * 24))
-    out = []
+    times = [f / 24 for f in range(nfr + 1)]
+    bodies = [sample(seq, t, loop) for t in times]
+    if abs(nfr / 24 - end) > 1e-6:
+        times.append(end)
+        bodies.append(seq[-1][1])
+    # a loop's last frame IS its first: smooth over the cycle without counting it twice
+    cyc = bodies[:-1] if loop and len(bodies) > 2 else bodies
+    track = cleared_track(cyc, loop=loop) if ease_clear else [b.cleared() for b in cyc]
+    if len(cyc) < len(bodies):
+        track = track + [track[0]]
     memory = {}
     if loop:   # settle the bend memory over one pass so the loop seam matches
-        for f in range(nfr + 1):
-            sample(seq, f / 24, loop).pose(memory)
-    for f in range(nfr + 1):
-        t = f / 24
-        out.append((t, sample(seq, t, loop).pose(memory), 'linear'))
-    if abs(nfr / 24 - end) > 1e-6:
-        out.append((end, seq[-1][1].pose(memory), 'linear'))
-    return out
+        for b in track:
+            b._solve(memory)
+    poses = steady_arms([b._solve(memory) for b in track], bodies[0].rig)
+    return [(t, p, 'linear') for t, p in zip(times, poses)]
+
+
+# The arm chain, parents first (anatomy.BONES), steadied by steady_arms.
+ARM_CHAIN = ('Clavicle', 'UpperArm', 'ElbowFix', 'Forearm', 'Hand')
+STEADY_LIMIT = 1.0      # deg/frame^2 of zig-zag left in place (jitter.TREMOR_LIMIT gates at 2.5)
+
+
+def steady_arms(poses, rig, passes=24):
+    """Take the frame-to-frame zig-zag out of each arm bone's armature-space turn.
+
+    A fast blow still leaves the solver a frame or two where the bend and roll limits
+    (rig.two_bone, Rig._limit_roll) catch up with a target that outran them: the limb
+    lurches one way and back on alternate frames. Each arm bone, parents first, is
+    scanned for that pattern (jitter.py: an acceleration flipping against both
+    neighbours) and only the flagged frames are eased toward their neighbours (a
+    1-2-1 slerp), until none is left above STEADY_LIMIT. The easing works on the
+    bone's LOCAL turn, so its roll steps never grow past the rig's (review.py's
+    roll-step check); only a zig-zag the parent hands down whole is eased in
+    armature space. A single hard stop or recoil is one flip, not a zig-zag, so the
+    blows keep their snap; the fingers, the chains and everything else ride on the
+    steadied bones unchanged."""
+    import jitter as J
+    n = len(poses)
+    if n < 5:
+        return poses
+
+    def ease(qs, flagged):
+        new = list(qs)
+        for i in flagged:
+            if 0 < i < n - 1:
+                new[i] = qs[i - 1].slerp(qs[i + 1], 0.5).slerp(qs[i], 0.5)
+        return new
+
+    def aligned(qs):
+        qs = [Quaternion(q) for q in qs]
+        for i in range(1, len(qs)):
+            if qs[i].dot(qs[i - 1]) < 0:
+                qs[i].negate()
+        return qs
+
+    for side in ('L_', 'R_'):
+        for part in ARM_CHAIN:
+            name = side + part
+            parent = rig.parent[name]
+            rest_m = rig.frames[name]
+            local = aligned([(rest_m @ p[name].to_matrix() @ rest_m.inverted()).to_quaternion() for p in poses])
+
+            def world(loc):
+                return aligned([p.delta[parent] @ q for p, q in zip(poses, loc)])
+
+            touched = False
+            for _ in range(passes):
+                flagged = J.zigzag_frames(world(local), STEADY_LIMIT)
+                if not flagged:
+                    break
+                local = ease(local, flagged)
+                touched = True
+            qs = world(local)
+            for _ in range(passes):
+                flagged = J.zigzag_frames(qs, STEADY_LIMIT)
+                if not flagged:
+                    break
+                qs = ease(qs, flagged)
+                touched = True
+            for p, q in zip(poses, qs):
+                p.delta[name] = q
+                if touched:
+                    loc = p.delta[parent].inverted() @ q
+                    p[name] = (rest_m.inverted() @ loc.to_matrix() @ rest_m).to_quaternion()
+    return poses
+
+
 
 
 # ------------------------------------------------------------------ the stance

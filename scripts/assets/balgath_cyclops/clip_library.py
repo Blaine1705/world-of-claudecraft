@@ -95,14 +95,21 @@ def walk_body(rig, ph, half, base=None):
     fl, dl, tl = gait_foot(ph, 0.6, -half + 0.2, half + 0.2, 1.05, 1)
     fr, dr, tr = gait_foot((ph + 0.5) % 1.0, 0.6, -half + 0.2, half + 0.2, 1.05, -1)
     c1 = math.cos(TAU * ph)
+    c3 = math.cos(TAU * (ph - 0.3))
     bob = -0.5 - 0.2 * math.cos(2 * TAU * ph)
-    sway = 0.26 * math.cos(TAU * (ph - 0.3))
+    sway = 0.26 * c3
+    # A heavy, grounded march: the pelvis turns and rolls with the stride, and the
+    # spine takes most of it back out, so the shoulder line only rolls a little
+    # (measured: about 5 degrees of yaw and 4 of roll, peak to peak, down from 18
+    # and 15). The chest used to ADD its
+    # twist and side bend to the pelvis's (16 + 3.5 degrees on top of 7 + 4.5): the
+    # great shoulders swung like a sprinter's.
     return base.but(
-        pelvis=(sway, 0.15, bob), hip_twist=-7 * c1, hip_roll=-4.5 * math.cos(TAU * (ph - 0.3)),
-        hip_tilt=6, lean=15 + 1.5 * math.cos(2 * TAU * ph), twist=16 * c1,
-        side=3.5 * math.cos(TAU * (ph - 0.3)), look=(-4 * c1, 9 + 2 * math.cos(2 * TAU * ph)), neck=5,
-        hand_l=(5.35, -0.8 - 1.5 * math.cos(TAU * (ph - 0.5)), 5.2 + 0.35 * max(0, math.cos(TAU * (ph - 0.5)))),
-        hand_r=(-5.35, -0.8 - 1.5 * c1, 5.2 + 0.35 * max(0, c1)),
+        pelvis=(sway, 0.15, bob), hip_twist=-7 * c1, hip_roll=-4.5 * c3,
+        hip_tilt=6, lean=15 + 1.0 * math.cos(2 * TAU * ph), twist=10 * c1,
+        side=-3.0 * c3, look=(-3 * c1, 9 + 1.5 * math.cos(2 * TAU * ph)), neck=5,
+        hand_l=(5.35, -0.8 - 1.1 * math.cos(TAU * (ph - 0.5)), 5.2 + 0.25 * max(0, math.cos(TAU * (ph - 0.5)))),
+        hand_r=(-5.35, -0.8 - 1.1 * c1, 5.2 + 0.25 * max(0, c1)),
         foot_l=fl, foot_r=fr, foot_dir_l=dl, foot_dir_r=dr, toe_l=tl, toe_r=tr,
         jaw=3 + 2 * math.cos(2 * TAU * ph), fist_l=0.62, fist_r=0.62)
 
@@ -112,13 +119,18 @@ def run_body(rig, ph, half, base=None):
     fl, dl, tl = gait_foot(ph, 0.36, -half - 0.1, half - 0.1, 2.0, 1, toe_off=0.6)
     fr, dr, tr = gait_foot((ph + 0.5) % 1.0, 0.36, -half - 0.1, half - 0.1, 2.0, -1, toe_off=0.6)
     c1 = math.cos(TAU * ph)
+    c18 = math.cos(TAU * (ph - 0.18))
     bob = -0.85 + 0.4 * math.cos(2 * TAU * (ph - 0.43))
+    # As the walk: the spine counters the pelvis, so the shoulders roll with the
+    # strides (measured on the shoulder line: about 5 degrees of yaw and 2 of roll,
+    # peak to peak, down from 22 and 20). The leaning spine bends about tipped axes,
+    # so its counter-roll leads the pelvis's a little (the 0.1 phase is measured).
     return base.but(
-        pelvis=(0.16 * math.cos(TAU * (ph - 0.18)), 0.4, bob), hip_twist=-10 * c1,
-        hip_roll=-5 * math.cos(TAU * (ph - 0.18)), hip_tilt=12, lean=26 + 3 * math.cos(2 * TAU * (ph - 0.2)),
-        twist=22 * c1, look=(-6 * c1, 22), neck=8,
-        hand_l=(4.6, -1.0 - 2.2 * math.cos(TAU * (ph - 0.5)), 6.0 + 1.0 * max(0, math.cos(TAU * (ph - 0.5)))),
-        hand_r=(-4.6, -1.0 - 2.2 * c1, 6.0 + 1.0 * max(0, c1)),
+        pelvis=(0.16 * c18, 0.4, bob), hip_twist=-10 * c1,
+        hip_roll=-5 * c18, hip_tilt=12, lean=26 + 2 * math.cos(2 * TAU * (ph - 0.2)),
+        twist=11 * c1, side=-6.5 * math.cos(TAU * (ph - 0.1)), look=(-1 * c1, 22), neck=8,
+        hand_l=(4.6, -1.0 - 1.8 * math.cos(TAU * (ph - 0.5)), 6.0 + 0.8 * max(0, math.cos(TAU * (ph - 0.5)))),
+        hand_r=(-4.6, -1.0 - 1.8 * c1, 6.0 + 0.8 * max(0, c1)),
         pole_l=(0.5, 1.0, -0.6),
         foot_l=fl, foot_r=fr, foot_dir_l=dl, foot_dir_r=dr, toe_l=tl, toe_r=tr, knee_l=(0.1, -1, 0.2),
         jaw=10 + 4 * math.cos(2 * TAU * ph), fist_l=0.95, fist_r=0.95, brow=6)
@@ -131,13 +143,13 @@ RUN_PERIOD, RUN_STRIDE = 1.0, 8.38        # 8.38 yd/s (runRef)
 def walk(rig):
     nfr = int(round(WALK_PERIOD * 24))
     half = WALK_STRIDE * 0.6 / 2
-    return keys_of([(i / 24, walk_body(rig, (i / nfr) % 1.0, half), 'linear') for i in range(nfr + 1)])
+    return keys_of([(i / 24, walk_body(rig, (i / nfr) % 1.0, half), 'linear') for i in range(nfr + 1)], loop=True)
 
 
 def run(rig):
     nfr = int(round(RUN_PERIOD * 24))
     half = RUN_STRIDE * 0.35 / 2
-    return keys_of([(i / 24, run_body(rig, (i / nfr) % 1.0, half), 'linear') for i in range(nfr + 1)])
+    return keys_of([(i / 24, run_body(rig, (i / nfr) % 1.0, half), 'linear') for i in range(nfr + 1)], loop=True)
 
 
 def idle(rig, period=4.0):
@@ -330,9 +342,9 @@ def barrowsweep(rig):
         # the upper body: wind (0-0.35), the backhand round behind (0.35-0.6), recover
         w = smooth(t / 0.32) * (1 - smooth((t - 0.32) / 0.18))
         h = smooth((t - 0.32) / 0.2) * (1 - smooth((t - 0.66) / 0.34))
-        wind = b.but(twist=34, look=(10, 16), hand_r=(-0.1, -6.4, 10.2), fist_r=1.0, pole_r=(0.1, -0.35, 1.0),
+        wind = b.but(twist=34, side=0, look=(10, 16), hand_r=(-0.1, -6.4, 10.2), fist_r=1.0, pole_r=(0.1, -0.35, 1.0),
                      jaw=10, brow=6)
-        back = b.but(twist=-58, look=(-40, 16), hand_r=(-5.8, 3.4, 8.2), fist_r=1.0, pole_r=(-0.3, 1.0, -0.4),
+        back = b.but(twist=-58, side=0, look=(-40, 16), hand_r=(-5.8, 3.4, 8.2), fist_r=1.0, pole_r=(-0.3, 1.0, -0.4),
                      jaw=26, brow=18)
         b = blend([b, wind, back], [1 - w - h, w, h])
         # keep the run's legs exactly (the blend must not re-route the planted foot)
@@ -340,7 +352,11 @@ def barrowsweep(rig):
         b.p.update({k: legs.p[k] for k in ('foot_l', 'foot_r', 'foot_dir_l', 'foot_dir_r', 'toe_l', 'toe_r',
                                            'pelvis', 'hip_twist', 'hip_roll', 'hip_tilt')})
         keys.append((t, b, 'linear'))
-    return keys_of(keys)
+    # Each frame keeps its own clearance push: the backhand blends three upper bodies
+    # within a third of a second, and an eased push carries one pose's elbow into the
+    # next, folding the throwing arm's biceps into his chest (review.py `checks`).
+    # The steadying pass still takes any shake out.
+    return keys_of(keys, ease_clear=False)
 
 
 def barrowfall(rig):
@@ -619,7 +635,9 @@ def sleep(rig, period=3.8):
         ph = i / 8
         keys.append((period * ph, sleep_body(rig, math.sin(TAU * ph)), 'auto'))
     keys.append((period, keys[0][1], 'auto'))
-    return keys_of(keys, loop=True)
+    # Each frame keeps its own clearance push: Wake starts from this loop's exact first
+    # pose (the asset suite pins the seam), and Wake keeps its own pushes too.
+    return keys_of(keys, loop=True, ease_clear=False)
 
 
 def wake(rig):
@@ -643,7 +661,9 @@ def wake(rig):
     shake_a = stand.but(look=(-14, 16), head_roll=-8, clav_l=4, clav_r=20, eye=1.3)
     shake_b = stand.but(look=(12, 14), head_roll=8, clav_l=20, clav_r=4, eye=1.2)
     step = push.but(foot_l=(1.9, -0.2, 2.4), foot_dir_l=foot_dir(-10, 1), pelvis=(0.1, 0.3, -2.7), lean=34)
-    return keys_of([(0, s0, 'auto'), (0.55, stir, 'inout'), (1.3, push, 'inout'), (1.68, step, 'auto'), (2.0, knee, 'auto'),
+    # He shoves himself up off his thigh: each frame keeps its own clearance push, or an
+    # eased one lets the bracing fist sink into the thigh as he rises (review.py checks).
+    return keys_of(ease_clear=False, seq=[(0, s0, 'auto'), (0.55, stir, 'inout'), (1.3, push, 'inout'), (1.68, step, 'auto'), (2.0, knee, 'auto'),
                     (2.3, flare, 'out'), (2.85, stand, 'inout'), (3.2, shake_a, 'inout'), (3.5, shake_b, 'inout'),
                     (3.95, st, 'auto')])
 

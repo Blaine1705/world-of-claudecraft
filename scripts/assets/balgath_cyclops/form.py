@@ -31,7 +31,7 @@ def form_walk(rig):
     period, stride = FORM_WALK
     nfr = int(round(period * 24))
     half = stride * 0.6 / 2
-    return keys_of([(i / 24, LIB.walk_body(rig, (i / nfr) % 1.0, half), 'linear') for i in range(nfr + 1)])
+    return keys_of([(i / 24, LIB.walk_body(rig, (i / nfr) % 1.0, half), 'linear') for i in range(nfr + 1)], loop=True)
 
 
 def form_run(rig):
@@ -48,7 +48,7 @@ def form_run(rig):
         b = b.but(foot_l=fl, foot_r=fr, foot_dir_l=dl, foot_dir_r=dr, toe_l=tl, toe_r=tr, lean=30,
                   pelvis=(b.p['pelvis'][0], 0.5, bob))
         keys.append((i / 24, b, 'linear'))
-    return keys_of(keys)
+    return keys_of(keys, loop=True)
 
 
 def build_form(body, arm, path, target_tris=13000, tex=1024):

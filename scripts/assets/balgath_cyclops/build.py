@@ -19,7 +19,9 @@ barrowhide slabs, the gear and the eye, each as a high/low pair. Skin weights co
 from the sculpt's own primitives (rig.py). All the lows share one UV atlas; Cycles
 bakes albedo, roughness, metallic, tangent normals and occlusion from the highs.
 The clips (clips.py) are keyed on the armature, the follow-through springs run over
-each, and the GLB is exported with every clip as an action.
+each, and the GLB is exported with every clip as an action. A clip-only change does
+not need this whole run: reclip.py re-keys the clips on the saved --blend and exports
+both bodies again, gated on arm tremor (jitter.py).
 """
 import json
 import math
@@ -480,6 +482,7 @@ def export(path, arm):
     bpy.ops.export_scene.gltf(
         filepath=path, export_format='GLB', use_selection=True, export_apply=False, export_yup=True,
         export_animations=True, export_animation_mode='ACTIONS', export_force_sampling=True,
+        export_anim_slide_to_zero=True,
         export_skins=True, export_def_bones=False, export_cameras=False, export_lights=False,
         export_vertex_color='ACTIVE', export_all_vertex_colors=False,
         export_image_format='JPEG', export_jpeg_quality=86,

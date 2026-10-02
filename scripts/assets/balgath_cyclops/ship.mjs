@@ -18,6 +18,9 @@
 //    no shader patch; the pupil is a real dark slit again.
 // 2. OPTIMIZE: dedup, prune, resample the baked per-frame clips, meshopt with
 //    quantization (the optimize.mjs recipe; the runtime loader carries the decoder).
+//    The written file is read back and every clip's arm tremor measured
+//    (arm_jitter.mjs): a resample or quantization setting that roughened the motion
+//    stops the ship here.
 // 3. KTX2: the repo's compress_glb_textures.mjs codec choice (normal map UASTC, the
 //    rest ETC1S), except the normal map is resized first. UASTC is about a byte a texel,
 //    and at the baked 2048 it alone was 3.6 MB on the boss; 1024 keeps the relief at
@@ -32,6 +35,7 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, meshopt, prune, resample, textureCompress } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
+import { armJitterFailures, armJitterReport } from './arm_jitter.mjs';
 
 const rootRequire = createRequire(import.meta.url);
 const cliRequire = createRequire(rootRequire.resolve('@gltf-transform/cli'));
@@ -181,6 +185,12 @@ async function ship(input, output, budget) {
   const json = JSON.parse(buf.toString('utf8', 20, 20 + buf.readUInt32LE(12)));
   const left = (json.images ?? []).filter((i) => i.mimeType !== 'image/ktx2');
   if (left.length) throw new Error(`${input}: ${left.length} textures were not converted`);
+  // The arms must still hold still after the resample and the quantization: measured
+  // on the bytes about to ship, the same measure the asset suite runs.
+  const shaking = armJitterFailures(armJitterReport((await io.readBinary(buf)).getRoot()));
+  if (shaking.length) {
+    throw new Error(`${input}: arm tremor after the ship pass\n  ${shaking.join('\n  ')}`);
+  }
   fs.writeFileSync(output, buf);
   const images = (json.images ?? [])
     .map((i) => `${i.name}=${json.bufferViews[i.bufferView].byteLength}`)

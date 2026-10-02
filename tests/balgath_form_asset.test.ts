@@ -17,6 +17,12 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { createGlbIO } from '../scripts/anim/pose_blend.mjs';
+import {
+  ARM_TREMOR_LIMIT,
+  armJitterFailures,
+  armJitterReport,
+  rotationJitter,
+} from '../scripts/assets/balgath_cyclops/arm_jitter.mjs';
 import { VISUALS } from '../src/render/characters/manifest';
 import { FOREMAN_SHAPE_SCALE } from '../src/sim/entity';
 import { RUN_SPEED } from '../src/sim/types';
@@ -30,12 +36,12 @@ const FORM = 'public/models/chars/forms/balgath_form.glb';
 
 const PINS = {
   [BOSS]: {
-    bytes: 3_816_948,
-    sha256: '8db6af7889b5798fd87c4a24b5c117eb98efafd761a200a867af90f65d3bcc8d',
+    bytes: 3_813_512,
+    sha256: '30059f35e0c7b7299969951898c3971122003c673f10ff586457be72fd9d5a14',
   },
   [FORM]: {
-    bytes: 1_580_444,
-    sha256: 'a65a9ed6f4939e698c441e3d161f4fb772b0b3f23a0a100d564ee96d447ba6cb',
+    bytes: 1_575_456,
+    sha256: '1bfcda749fd13adfc1d20731a142fe91b32593786d5cd354acc5f57052753fcc',
   },
 } as const;
 
@@ -153,6 +159,74 @@ describe('the shipped Balgath pair', () => {
     expect(def.walkTimeScaleMax).toBeUndefined();
   });
 
+  it("holds both bodies' arms steady in every clip, measured on the shipped bytes", async () => {
+    // The owner's report: his arms shook nonstop, even standing still. The first build
+    // keyed the upper arm flipping between two rolls about 11 degrees apart on
+    // alternate frames (the arm clearance pass fed the per-frame bend limits), a 12 Hz
+    // tremor in the Idle of both bodies (about 24 deg/frame^2 here). The measure reads
+    // the shipped file, so a resample or quantization pass that roughened the motion
+    // would fail here too.
+    for (const file of [BOSS, FORM]) {
+      const report = armJitterReport(await root(file));
+      expect(report.length, file).toBeGreaterThan(10);
+      expect(armJitterFailures(report), file).toEqual([]);
+      const idle = report.find((r) => r.clip === 'Idle');
+      expect(idle?.worst.tremor, `${file} Idle`).toBeLessThan(0.5);
+      expect(idle?.worst.maxAccel, `${file} Idle breathes, nothing faster`).toBeLessThan(1);
+    }
+  });
+
+  it('starts every clip on its first key, so no loop stalls a frame at its seam', async () => {
+    // The Blender export used to keep the action's frame 1 as t = 1/24 s: the mixer held
+    // the first pose for that frame, and a loop (whose last key already IS its first
+    // pose) stood still for two frames every cycle, a hitch in every stride.
+    for (const file of [BOSS, FORM]) {
+      for (const anim of (await root(file)).listAnimations()) {
+        let first = Number.POSITIVE_INFINITY;
+        for (const ch of anim.listChannels()) {
+          first = Math.min(first, ch.getSampler()?.getInput()?.getMin([0])[0] ?? first);
+        }
+        expect(first, `${file} ${anim.getName()}`).toBeLessThan(1e-4);
+      }
+    }
+  });
+
+  it('scores a two-pose shake as tremor and a blow or a breath as none', () => {
+    const about = (deg: number) => {
+      const h = (deg * Math.PI) / 360;
+      return [Math.sin(h), 0, 0, Math.cos(h)];
+    };
+    const n = 48;
+    const shake = Array.from({ length: n }, (_, i) => about(i % 2 ? 6 : -6));
+    const breath = Array.from({ length: n }, (_, i) => about(3 * Math.sin((2 * Math.PI * i) / n)));
+    // a fist driven in over eight frames, stopped dead, held: one hard flip, no zig-zag
+    const blow = Array.from({ length: n }, (_, i) => about(i < 8 ? 40 * (i / 8) ** 3 : 40));
+    expect(rotationJitter(shake).tremor).toBeGreaterThan(ARM_TREMOR_LIMIT * 5);
+    expect(rotationJitter(breath).tremor).toBeLessThan(0.1);
+    expect(rotationJitter(blow).maxAccel).toBeGreaterThan(ARM_TREMOR_LIMIT * 4);
+    expect(rotationJitter(blow).tremor).toBeLessThan(ARM_TREMOR_LIMIT);
+  });
+
+  it('rolls the shoulders a little on the march instead of swinging them', async () => {
+    // The owner's second note: walking, the great shoulders swung like a sprinter's
+    // (the chest twisted and side-bent ON TOP of the pelvis: about 18 degrees of yaw
+    // and 15 of roll across the shoulder line in the boss's Walk). The spine now takes
+    // the pelvis's turn back out.
+    for (const file of [BOSS, FORM]) {
+      const poser = await loadRigPoser(path.join(ROOT, file), path.join(ROOT, file));
+      for (const [clip, yawMax, rollMax] of [
+        ['Walk', SHOULDER_SWING.walkYaw, SHOULDER_SWING.walkRoll],
+        ['Run', SHOULDER_SWING.runYaw, SHOULDER_SWING.runRoll],
+      ] as const) {
+        const { yaw, roll } = shoulderSwing(poser, clip);
+        expect(yaw, `${file} ${clip} shoulder yaw, peak to peak`).toBeLessThan(yawMax);
+        expect(roll, `${file} ${clip} shoulder roll, peak to peak`).toBeLessThan(rollMax);
+        // ...but they still move with the stride: a frozen torso reads as a statue.
+        expect(yaw, `${file} ${clip} shoulders frozen`).toBeGreaterThan(2);
+      }
+    }
+  });
+
   it('wears the same measured eye anchor as the boss, on the glow iris', async () => {
     const boss = VISUALS.mob_balgath_cyclops.eyeGlow;
     const form = VISUALS.form_foreman.eyeGlow;
@@ -206,6 +280,30 @@ function mul(a: ArrayLike<number>, b: ArrayLike<number>): number[] {
     for (let r = 0; r < 4; r++)
       for (let k = 0; k < 4; k++) out[c * 4 + r] += a[k * 4 + r] * b[c * 4 + k];
   return out;
+}
+
+/** Peak-to-peak ceilings (degrees) of the shoulder line over a gait cycle. */
+const SHOULDER_SWING = { walkYaw: 8, walkRoll: 6, runYaw: 8, runRoll: 6 } as const;
+
+/** Peak-to-peak yaw and roll (degrees) of the line between the shoulders over a clip. */
+function shoulderSwing(
+  poser: Awaited<ReturnType<typeof loadRigPoser>>,
+  clip: string,
+): { yaw: number; roll: number } {
+  const dur = poser.duration(clip);
+  const yaw: number[] = [];
+  const roll: number[] = [];
+  for (let i = 0; i <= 96; i++) {
+    const p = poser.pose(clip, (dur * i) / 96);
+    const l = p.at('L_UpperArm');
+    const r = p.at('R_UpperArm');
+    const s = [l[0] - r[0], l[1] - r[1], l[2] - r[2]];
+    // the rig faces +Z with +Y up: yaw turns the line about Y, roll tips it out of level
+    yaw.push((Math.atan2(s[2], s[0]) * 180) / Math.PI);
+    roll.push((Math.atan2(s[1], Math.hypot(s[0], s[2])) * 180) / Math.PI);
+  }
+  const span = (a: number[]) => Math.max(...a) - Math.min(...a);
+  return { yaw: span(yaw), roll: span(roll) };
 }
 
 /** Median horizontal speed of each foot over its contact samples, averaged. */
