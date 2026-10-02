@@ -104,6 +104,7 @@ import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { notePosedCullCentre } from './skinned_cull_bounds';
+import { applySmoothNormals } from './smooth_normals';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
@@ -1710,6 +1711,9 @@ export function assembleModel(
       }
     });
   }
+  // A faceted rig shaded smooth (VisualDef.smoothNormals), before anything
+  // measures or bakes it.
+  if (def.smoothNormals !== undefined) applySmoothNormals(root, def.smoothNormals);
   // Two-state prop mobs (the dragonkin egg) ship BOTH state meshes at the
   // origin: seed the ALIVE state (hide the corpse shell); CharacterVisual's
   // enterDeath/revive flip it (created-already-dead corpses flip on their

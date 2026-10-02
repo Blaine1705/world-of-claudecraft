@@ -269,7 +269,10 @@ type PlaceholderRow = [string, number, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, PlaceholderRow> = {
   // Basin Raptor: the velociraptor in jungle olive; about 3.8 yd at its 1.7.
-  wildheart_basin_raptor: ['mob_spearjaw', 0x6f7a3a, 0.6, 1.25],
+  // A 1,248-triangle low-poly rig flat-shaded per facet: at this size every
+  // facet read as a hard polygon, so its normals are creased smooth (60
+  // degrees: the body and tail blend, the claws, teeth and jaw stay crisp).
+  wildheart_basin_raptor: ['mob_spearjaw', 0x6f7a3a, 0.6, 1.25, { smoothNormals: 60 }],
   // Spore Toad: the frog rig, warty olive and as big as a boar (4.5 yd at 2.4).
   wildheart_spore_toad: ['mob_murloc', 0x7f8a34, 0.7, 1.1, { selfIllumination: 0.08 }],
   // Sunbone Totem-Binder: the Hexcaller under a bone-ochre wash.

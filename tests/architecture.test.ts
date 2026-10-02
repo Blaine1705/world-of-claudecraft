@@ -863,8 +863,11 @@ const RENDER_PURE_CORES = [
   'src/render/wildheart_basin/lasher_model_core.ts',
   'src/render/wildheart_basin/lasher_fx_core.ts',
   'src/render/wildheart_basin/basin_thorns_core.ts',
+  'src/render/wildheart_basin/maw_glow_core.ts',
   'src/render/characters/turn_in_place_core.ts',
   'src/render/characters/glow_pulse_core.ts',
+  // Creased smooth normals for a faceted rig (VisualDef.smoothNormals).
+  'src/render/characters/smooth_normals_core.ts',
   'src/render/drowned_temple/temple_shore_core.ts',
   'src/render/drowned_temple/temple_fx_core.ts',
   'src/render/stormbrass_foundry/foundry_plan_core.ts',

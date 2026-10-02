@@ -319,6 +319,11 @@ export interface VisualDef {
    *  albedo. For rigs whose authored PBR response reads as gloss under an
    *  interior light rig (the Ignivar raid roster). */
   matte?: boolean;
+  /** Creased smooth shading for a faceted, flat-shaded rig: the crease angle
+   *  in degrees below which neighbouring facets blend (smooth_normals.ts).
+   *  Normals only: the triangles, the skin and the silhouette are unchanged,
+   *  and only this def's clones take the smoothed geometry. */
+  smoothNormals?: number;
   /** The body atlas is an AUTHORED baked texture (a Tripo or Blender export
    *  that carries its own shading, largely dark texels), not a KayKit palette.
    *  On the low graphics tier the Lambert rebuild adds a small uniform
