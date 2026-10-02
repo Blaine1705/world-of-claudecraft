@@ -109,6 +109,12 @@ try {
     };
     window.__boss = () => sim.entities.get(window.__shotBoss);
     window.__reset = () => {
+      const p = sim.player;
+      p.pos = { ...sim.groundPos(147, 297) };
+      p.prevPos = { ...p.pos };
+      p.vx = p.vy = p.vz = 0;
+      p.facing = 0;
+      p.hp = p.maxHp;
       const b = window.__boss();
       b.dead = false;
       b.hp = b.maxHp;
@@ -248,7 +254,12 @@ try {
   if (want('death')) {
     // A real kill (the sim's own death path), then the clock by hand again.
     await page.evaluate(() => {
-      const { sim } = window.__game;
+      const { sim, input } = window.__game;
+      window.__reset();
+      input.camYaw = -0.45;
+      input.camPitch = 0.34;
+      input.camDist = 26;
+      window.__shotStep(10);
       sim.player.targetId = window.__shotBoss;
       sim.chat('/dev killtarget');
       window.__shotStep(1, true);
@@ -267,9 +278,13 @@ try {
       sim.equipItem('knucklebone_of_balgath');
       p.cooldowns.clear();
       sim.useItem('knucklebone_of_balgath');
-      input.camYaw = Math.PI / 2 + 0.2;
-      input.camPitch = 0.15;
-      input.camDist = 9;
+      // On the crater floor, seen from the side as he runs north across it.
+      p.pos = { ...sim.groundPos(147, 292) };
+      p.prevPos = { ...p.pos };
+      p.facing = 0;
+      input.camYaw = -2.0;
+      input.camPitch = 0.12;
+      input.camDist = 10;
     });
     await page.evaluate(() => window.__shotStep(10, true));
     await page.waitForFunction(
