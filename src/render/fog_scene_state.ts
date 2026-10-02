@@ -23,9 +23,10 @@ export const SUNKEN_BASTION_FOG_COLOR = 0x4d5a57;
 export const DROWNED_TEMPLE_FOG_COLOR = 0x252a4c;
 /** The Wildheart Basin's humid gold haze (its sky dome fades to it at the horizon). */
 export const WILDHEART_BASIN_FOG_COLOR = BASIN_FOG_COLOR;
-/** The Stormbrass Foundry's smoke-grey steam haze (its sky's horizon too): a
- *  neutral slate, not the blue that read as a sea under the shelf. */
-export const STORMBRASS_FOUNDRY_FOG_COLOR = 0x6f7378;
+/** The Stormbrass Foundry's storm haze of steam and smoke (its sky's horizon
+ *  too): a cold slate with only a breath of blue, never the blue that read as
+ *  a sea under the shelf. */
+export const STORMBRASS_FOUNDRY_FOG_COLOR = 0x414d5f;
 
 export interface FogSceneResolution {
   /** The named dungeon interior the player stands in (null/undefined in the
@@ -169,12 +170,14 @@ export function applyFogScenePreset(
     fog.near = 140;
     fog.far = 1050;
   } else if (desired === 'stormbrassFoundry') {
-    // Steam and smoke haze in dry storm daylight: pushed far back so the
-    // storm-coil tower and the Prime Draft read from the Lift Landing (430 yd),
-    // while the valley and the far peaks drown in the grey.
+    // Steam and smoke haze in dry storm daylight: near enough that the
+    // terraces layer back in depth (each one a shade deeper into the haze),
+    // far enough that the storm-coil tower and the Prime Draft still read
+    // from the Lift Landing (430 yd), while the valley and the far peaks
+    // drown in the grey.
     fog.color.setHex(STORMBRASS_FOUNDRY_FOG_COLOR);
-    fog.near = 120;
-    fog.far = 900;
+    fog.near = 70;
+    fog.far = 780;
   } else if (desired === 'lastkeep') {
     // The Last Keep: a warm hearth-lit haze pushed well back, so its
     // grand three-story halls read golden and inhabited instead of

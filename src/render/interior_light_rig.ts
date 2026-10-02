@@ -135,18 +135,21 @@ const DROWNED_TEMPLE_HEMI_GROUND_COLOR = 0x173640;
  *  a little west, straight down the route from the Moongate Landing, so the
  *  whole temple is seen against it and every column throws its shadow back
  *  toward the party. */
-// The Stormbrass Foundry: storm DAYLIGHT (a grey-white sun breaking through
-// the clouds from the south-west, a cool blue-grey sky bounce, a slate ground
-// bounce), bright enough that every brass surface reads; the lightning is
+// The Stormbrass Foundry: storm DAYLIGHT. A hard pale-gold sun breaking
+// through the cloud deck low in the WEST rakes across the route (the party
+// climbs north, so every stack, gantry and press is lit from the side and
+// throws a long shadow east), over a cold storm-blue sky bounce and a warm
+// soot-brown ground bounce: the forge's orange and the storm's blue pull
+// apart. Bright enough that every brass surface reads; the lightning is
 // cosmetic flashes on top (render/stormbrass_foundry), never the key light.
-const STORMBRASS_FOUNDRY_SUN_INTENSITY = 2.1;
-const STORMBRASS_FOUNDRY_HEMI_INTENSITY = 1.15;
-const STORMBRASS_FOUNDRY_ENV_INTENSITY = 0.42;
-const STORMBRASS_FOUNDRY_RIM_BOOST = 1.6;
-const STORMBRASS_FOUNDRY_SUN_COLOR = 0xe8eef6;
-const STORMBRASS_FOUNDRY_HEMI_SKY_COLOR = 0x9aa8bc;
-const STORMBRASS_FOUNDRY_HEMI_GROUND_COLOR = 0x4a4e52;
-export const STORMBRASS_FOUNDRY_SUN_DIRECTION = new THREE.Vector3(-0.35, 0.72, -0.6).normalize();
+const STORMBRASS_FOUNDRY_SUN_INTENSITY = 3.1;
+const STORMBRASS_FOUNDRY_HEMI_INTENSITY = 0.72;
+const STORMBRASS_FOUNDRY_ENV_INTENSITY = 0.5;
+const STORMBRASS_FOUNDRY_RIM_BOOST = 1.8;
+const STORMBRASS_FOUNDRY_SUN_COLOR = 0xffd6a0;
+const STORMBRASS_FOUNDRY_HEMI_SKY_COLOR = 0x7388ad;
+const STORMBRASS_FOUNDRY_HEMI_GROUND_COLOR = 0x6a4a30;
+export const STORMBRASS_FOUNDRY_SUN_DIRECTION = new THREE.Vector3(-0.74, 0.5, 0.3).normalize();
 export const DROWNED_TEMPLE_MOON_DIRECTION = new THREE.Vector3(-0.14, 0.27, 0.95).normalize();
 // The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
 // ambient floor (over the candle-orange torch lights the interior itself

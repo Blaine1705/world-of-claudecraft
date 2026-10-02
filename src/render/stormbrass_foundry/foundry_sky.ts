@@ -64,31 +64,52 @@ uniform float uFlash;
 uniform vec3 uSunDir;
 uniform vec3 uFlashDir;
 uniform vec3 uHorizon;
+uniform float uSheet;
 ${NOISE_GLSL}
+// A sheet of lightning deep inside the cloud deck: a short double pulse on
+// its own slow clock, lighting the clouds round one bearing.
+float sheet(vec3 d, float period, float offset, vec3 bearing) {
+  float beat = floor(uTime / period + offset);
+  float into = fract(uTime / period + offset) * period;
+  float lit = step(into, 0.34) * (step(into, 0.1) + step(0.17, into)) * 0.5 * step(0.35, hash(vec2(beat, offset)));
+  vec3 b = normalize(bearing + vec3(hash(vec2(beat, 3.0)) - 0.5, 0.0, hash(vec2(beat, 7.0)) - 0.5) * 0.9);
+  return lit * pow(max(0.0, dot(d, b)), 9.0);
+}
 void main() {
   vec3 d = normalize(vDir);
   float up = clamp(d.y, -0.2, 1.0);
-  vec3 zenith = vec3(0.11, 0.13, 0.17);
-  vec3 col = mix(uHorizon, zenith, smoothstep(0.0, 0.7, up));
-  // Rolling storm clouds on a flat projection of the dome.
+  // A deep storm: near-black blue overhead, the haze's own grey-blue low down.
+  vec3 zenith = vec3(0.03, 0.042, 0.075);
+  vec3 col = mix(uHorizon, zenith, smoothstep(0.0, 0.55, up));
+  // Two decks of rolling cloud on a flat projection of the dome: a slow,
+  // heavy anvil deck and a faster scud under it.
   vec2 q = d.xz / max(0.12, d.y + 0.25) * 1.6;
   float t = uTime * 0.018;
   float c = fbm(q + vec2(t, t * 0.6));
   float c2 = fbm(q * 2.1 - vec2(t * 1.7, 0.0) + c);
-  float cloud = smoothstep(0.35, 0.8, c * 0.6 + c2 * 0.5);
-  vec3 dark = vec3(0.09, 0.1, 0.13);
-  vec3 lit = vec3(0.36, 0.41, 0.49);
-  // Daylight breaking through: the thin cloud toward the sun glows.
+  float scud = fbm(q * 4.3 + vec2(t * 3.4, -t * 1.2));
+  float cloud = smoothstep(0.32, 0.78, c * 0.6 + c2 * 0.5);
+  float billow = smoothstep(0.25, 0.75, c2 * 0.7 + scud * 0.4);
+  vec3 dark = vec3(0.02, 0.027, 0.046);
+  vec3 lit = vec3(0.115, 0.155, 0.24);
+  // Daylight breaking through low in the west: the thin cloud toward the
+  // sun burns pale gold-white, and the deck's rims catch it.
   float sunA = max(0.0, dot(d, normalize(uSunDir)));
   vec3 cloudCol = mix(lit, dark, cloud);
-  cloudCol += vec3(0.86, 0.9, 0.96) * pow(sunA, 6.0) * (1.0 - cloud) * 0.7;
+  cloudCol = mix(cloudCol, cloudCol * 1.45 + vec3(0.03, 0.035, 0.05), billow * (1.0 - cloud) * 0.6);
+  cloudCol += vec3(1.0, 0.74, 0.42) * pow(sunA, 26.0) * (1.0 - cloud * 0.6) * 1.1;
+  cloudCol += vec3(0.95, 0.6, 0.34) * pow(sunA, 6.0) * (1.0 - cloud) * (0.25 + billow * 0.45) * 0.34;
   col = mix(col, cloudCol, smoothstep(-0.05, 0.12, d.y));
   // Shafts of daylight fanning down from the break.
   float shaft = pow(sunA, 3.0) * (0.5 + 0.5 * noise(vec2(atan(d.x, d.z) * 18.0, 0.5)));
-  col += vec3(0.82, 0.88, 0.94) * shaft * 0.14 * (1.0 - smoothstep(0.1, 0.6, d.y));
+  col += vec3(1.0, 0.8, 0.55) * shaft * 0.3 * (1.0 - smoothstep(0.08, 0.55, d.y));
+  // Sheet lightning walking round the storm, far off.
+  float far = sheet(d, 5.3, 0.0, vec3(-0.6, 0.35, 0.7)) + sheet(d, 7.1, 0.37, vec3(0.8, 0.3, -0.4))
+    + sheet(d, 9.7, 0.71, vec3(0.1, 0.4, 1.0));
+  col += vec3(0.62, 0.74, 1.0) * far * (0.7 + cloud) * 1.5 * uSheet;
   // The strike: the clouds light from inside round the coil, the dome flares.
   float near = pow(max(0.0, dot(d, normalize(uFlashDir))), 5.0);
-  col += vec3(0.8, 0.9, 1.0) * uFlash * (0.12 + near * 0.9 * (0.4 + cloud));
+  col += vec3(0.8, 0.9, 1.0) * uFlash * (0.14 + near * 1.1 * (0.4 + cloud));
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
 }
@@ -101,6 +122,8 @@ function buildDome(opts: FoundrySkyOptions): THREE.Mesh {
     uSunDir: { value: STORMBRASS_FOUNDRY_SUN_DIRECTION.clone() },
     uFlashDir: { value: new THREE.Vector3(COIL_TOP.x, 180, COIL_TOP.z).normalize() },
     uHorizon: { value: new THREE.Color(STORMBRASS_FOUNDRY_FOG_COLOR) },
+    // The far sheet lightning sheds on the low tier with the strike flash.
+    uSheet: { value: opts.lowGfx ? 0 : 1 },
   };
   const material = new THREE.ShaderMaterial({
     name: 'stormbrassSky',
@@ -136,30 +159,72 @@ function rockColor(y: number, salt: number, out: number[]): void {
   out.push(v, v + 0.006, v + 0.014);
 }
 
-function pushCone(
+/** One rock massif: a many-sided cone whose rings swell and pinch with the
+ *  bearing (ridges and ravines running down from an off-centre summit), shaded
+ *  by height, ravine depth and a ragged snow line. `haze` (0..1) washes a far
+ *  range toward the storm's grey so the ranges layer back in depth. */
+function pushMassif(
   positions: number[],
   colors: number[],
   indices: number[],
   base: number,
-  c: { x: number; z: number; r: number; y0: number; y1: number; salt: number; sides: number },
+  c: {
+    x: number;
+    z: number;
+    r: number;
+    y0: number;
+    y1: number;
+    salt: number;
+    sides: number;
+    rings: number;
+    haze: number;
+  },
 ): number {
-  const cone = new THREE.ConeGeometry(c.r, c.y1 - c.y0, c.sides, 3);
-  cone.translate(c.x, (c.y0 + c.y1) / 2, c.z);
-  const p = cone.getAttribute('position');
-  for (let k = 0; k < p.count; k++) {
-    const y = p.getY(k);
-    // A little ragged: jitter the rings.
-    const j = (foundryHash(c.salt * 131 + k, 8) - 0.5) * c.r * 0.25;
-    positions.push(p.getX(k) + j, y, p.getZ(k) - j);
-    const snow = c.y1 > 120 && y > c.y0 + (c.y1 - c.y0) * 0.8;
-    if (snow) colors.push(0.42, 0.45, 0.5);
-    else rockColor(Math.min(y, 140), c.salt + k, colors);
+  const ridges = 3 + Math.floor(foundryHash(c.salt, 11) * 3);
+  const phase = foundryHash(c.salt, 12) * Math.PI * 2;
+  const lean = (foundryHash(c.salt, 13) - 0.5) * c.r * 0.5;
+  const lean2 = (foundryHash(c.salt, 14) - 0.5) * c.r * 0.5;
+  const h = c.y1 - c.y0;
+  const tint = (v: number, cold: number) => {
+    const g = 0.18;
+    colors.push(
+      v + (g - v) * c.haze,
+      v + 0.006 + (g + 0.02 - v) * c.haze,
+      v + cold + (g + 0.05 - v) * c.haze,
+    );
+  };
+  for (let ring = 0; ring <= c.rings; ring++) {
+    const t = ring / c.rings;
+    // A concave flank: steep under the summit, spreading at the foot.
+    const rr = c.r * (1 - t) ** 1.35;
+    for (let k = 0; k < c.sides; k++) {
+      const a = (k / c.sides) * Math.PI * 2;
+      const ridge =
+        Math.cos(a * ridges + phase + t * 1.7) * 0.26 +
+        (foundryHash(c.salt * 131 + k * 17 + ring, 8) - 0.5) * 0.22;
+      const swell = 1 + ridge * (0.35 + 0.65 * (1 - t));
+      const y =
+        c.y0 + h * t + (foundryHash(c.salt * 57 + k + ring * 31, 9) - 0.5) * h * 0.05 * (1 - t);
+      positions.push(
+        c.x + Math.cos(a) * rr * swell + lean * t,
+        y,
+        c.z + Math.sin(a) * rr * swell + lean2 * t,
+      );
+      const snowLine = 0.62 + ridge * 0.35;
+      if (c.y1 > 150 && t > snowLine) tint(0.34 + (t - snowLine) * 0.3, 0.035);
+      else tint(0.045 + t * 0.06 + Math.max(0, ridge) * 0.07, 0.012);
+    }
   }
-  const idx = cone.index;
-  if (idx) for (let k = 0; k < idx.count; k++) indices.push(idx.getX(k) + base);
-  const n = p.count;
-  cone.dispose();
-  return base + n;
+  for (let ring = 0; ring < c.rings; ring++) {
+    for (let k = 0; k < c.sides; k++) {
+      const a0 = base + ring * c.sides + k;
+      const a1 = base + ring * c.sides + ((k + 1) % c.sides);
+      const b0 = a0 + c.sides;
+      const b1 = a1 + c.sides;
+      indices.push(a0, b0, a1, a1, b0, b1);
+    }
+  }
+  return base + (c.rings + 1) * c.sides;
 }
 
 function buildMountain(opts: FoundrySkyOptions): THREE.Mesh {
@@ -193,33 +258,56 @@ function buildMountain(opts: FoundrySkyOptions): THREE.Mesh {
   base = (segX + 1) * (segZ + 1);
   // The buttresses round the shelf's flanks.
   planFoundryButtresses(opts.density).forEach((t, i) => {
-    base = pushCone(positions, colors, indices, base, {
+    base = pushMassif(positions, colors, indices, base, {
       x: t.x,
       z: t.z,
       r: t.r,
       y0: t.base,
       y1: t.top,
       salt: 500 + i,
-      sides: 6,
+      sides: 9,
+      rings: 4,
+      haze: 0,
     });
   });
-  // The ring of peaks, on an oval round the long shelf.
-  const count = Math.round(18 + 14 * opts.density);
-  for (let i = 0; i < count; i++) {
-    const a = (i / count) * Math.PI * 2 + foundryHash(i, 4) * 0.2;
-    const dist = 200 + foundryHash(i, 5) * 130;
-    const h = 150 + foundryHash(i, 6) * 190;
-    const r = 80 + foundryHash(i, 7) * 60;
+  // Two ranges on ovals round the long shelf: the near wall of the valley
+  // (broad, ridged, snow on the heights) and a taller far range washed into
+  // the storm haze behind its gaps.
+  const near = Math.round(14 + 10 * opts.density);
+  for (let i = 0; i < near; i++) {
+    const a = (i / near) * Math.PI * 2 + foundryHash(i, 4) * 0.25;
+    const dist = 210 + foundryHash(i, 5) * 110;
     const x = Math.sin(a) * (114 + dist);
     const z = Math.cos(a) * (240 + dist);
-    base = pushCone(positions, colors, indices, base, {
+    const y0 = foundryValleyHeight(x, z) - 30;
+    base = pushMassif(positions, colors, indices, base, {
       x,
       z,
-      r,
-      y0: foundryValleyHeight(x, z) - 20,
-      y1: foundryValleyHeight(x, z) + h,
+      r: 130 + foundryHash(i, 7) * 90,
+      y0,
+      y1: y0 + 170 + foundryHash(i, 6) * 150,
       salt: i,
-      sides: 7,
+      sides: 14,
+      rings: 6,
+      haze: 0,
+    });
+  }
+  const far = Math.round(10 + 8 * opts.density);
+  for (let i = 0; i < far; i++) {
+    const a = ((i + 0.5) / far) * Math.PI * 2 + foundryHash(i, 44) * 0.3;
+    const dist = 470 + foundryHash(i, 45) * 160;
+    const x = Math.sin(a) * (114 + dist);
+    const z = Math.cos(a) * (240 + dist);
+    base = pushMassif(positions, colors, indices, base, {
+      x,
+      z,
+      r: 210 + foundryHash(i, 47) * 130,
+      y0: -80,
+      y1: 330 + foundryHash(i, 46) * 230,
+      salt: 200 + i,
+      sides: 14,
+      rings: 6,
+      haze: 0.45,
     });
   }
   // Flat-shaded facets come from the material (one shared program).
