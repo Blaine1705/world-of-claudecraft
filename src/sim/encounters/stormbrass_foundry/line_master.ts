@@ -7,9 +7,19 @@
 //   The lever       every 20 s a 2 s klaxon bar, then the belts reverse
 //                   (heroic Cross-Feed: they start alternating and each throw
 //                   reverses only two of them, the two the klaxon paints red).
-//   Stamping Press  every 12 s one belt's hammer comes down on its last 8 yd:
-//                   a 2 s painted strip, then 250 to 300 and a 1.5 s knockdown
-//                   to everyone on it. A Half-Built Frame under it is crushed.
+//   Stamping Press  each belt's hammer hangs from a carriage on an overhead
+//                   rail. Every 7 s (the first at 6 s) one carriage (heroic:
+//                   two, on two belts) slides to a player riding the belts: an
+//                   8 yd strip is painted on the rail stop nearest where the
+//                   belt will carry them in the 2.5 s warning (their z led by
+//                   the belt's run, clamped into the belt, snapped to the 2 yd
+//                   rail grid), then 250 to 300 and a 1.5 s knockdown to
+//                   everyone on it. Nobody riding: a hashed belt. Two strips
+//                   never share a belt. A Half-Built Frame under it is crushed.
+//   Scalding Vents  every 10 s (the first at 10 s) every walkway is painted
+//                   for 1.5 s, then scalds 55 to 65 a second for 5 s anyone
+//                   on a walkway inside the belts' run (scalding_vents.ts):
+//                   the belts are the floor, and the presses hunt them.
 //   Parts Drop      at 70 and 40 percent the chute drops three Half-Built
 //                   Frames onto three belts; they ride the line and boot up
 //                   8 s later wherever they are (kill them while they ride).
@@ -17,12 +27,14 @@
 //                   he is fighting.
 //
 // The deed (Quality Control): defeat him with nobody caught by the press.
-// Deterministic: the press belt, the frames' belts and the Cross-Feed pair are
-// hashed (kitHash); the only rng draws are damage rolls. Every visible state
-// rides existing fields: the belts' encounter objects (template id = idle,
-// run or alarm; facing = heading; scale = speed), the press strip object,
-// Tock's bars and his pressure aura (its clock is the gauge needle), so the
-// online client mirrors it with no wire change.
+// Deterministic: the press rider and belt, the frames' belts and the
+// Cross-Feed pair are hashed (kitHash) over id-ordered lists; the only rng
+// draws are damage rolls. Every visible state rides existing fields: the
+// belts' encounter objects (template id = idle, run or alarm; facing =
+// heading; scale = speed), the press strip objects (a carriage's rail stop is
+// its strip's position), the vent strips and the walkway aura, Tock's bars and
+// his pressure aura (its clock is the gauge needle), so the online client
+// mirrors it with no wire change.
 
 import { MAIN_LINE, MAIN_LINE_BELTS, PARTS_CHUTE } from '../../content/stormbrass_foundry_layout';
 import { type ConveyorRegion, carryOnConveyors } from '../../conveyor';
@@ -53,6 +65,8 @@ import {
   FRAME_BOOTING,
   HALF_BUILT_FRAME_ID,
   inPressStrip,
+  pressRailStops,
+  pressStripCentre,
   TOCK_TUNING as T,
   TOCK_FLATTENED,
   TOCK_LEVER,
@@ -61,6 +75,7 @@ import {
   TOCK_RIVET_GUN,
   TOCK_STAMPING_PRESS,
 } from './ids';
+import { endVents, freshVents, tickVents, VENTS_YELL } from './scalding_vents';
 
 export const TOCK_DEED = 'dgn_tock_press';
 
@@ -70,6 +85,7 @@ export const TOCK_LINES = {
   parts: 'Frames to the line! Bolt them together!',
   death: 'The line... the line has stopped...',
   partsLog: 'The parts chute rattles: Half-Built Frames drop onto the belts!',
+  vents: VENTS_YELL,
 } as const;
 
 const BELTS = MAIN_LINE_BELTS;
@@ -102,7 +118,8 @@ function freshState(inst: InstanceSlot): TockFightState {
     leverTimer: T.leverFirst,
     flipping: [],
     pressTimer: T.pressFirst,
-    press: null,
+    presses: [],
+    vent: freshVents(),
     rivetTimer: T.rivetFirst,
     dropsFired: 0,
     frames: [],
@@ -239,29 +256,29 @@ function landLever(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: TockFi
   });
 }
 
-/** Paint a press strip on a belt (hashed); the hammer lands 2 s later. */
-export function startPress(
+/** Paint one belt's press strip centred on rail stop `zc` (instance-local):
+ *  its carriage slides there and the hammer lands pressWarning later. False
+ *  (nothing painted) when that belt's carriage is already out. */
+export function paintStrip(
   ctx: SimContext,
   inst: InstanceSlot,
   boss: Entity,
   st: TockFightState,
-  belt?: number,
-): number {
-  st.casts++;
-  const b = belt ?? kitHash(boss.id, st.casts * 7 + 3) % BELT_COUNT;
-  if (st.press) dropEncounterObject(ctx, inst, st.press.objectId);
+  belt: number,
+  zc: number,
+): boolean {
+  if (belt < 0 || belt >= BELT_COUNT || st.presses.some((p) => p.belt === belt)) return false;
   const o = ctx.instanceOriginOf(inst);
   const strip = spawnFoundryObject(
     ctx,
     inst,
     FOUNDRY_PRESS_STRIP,
     'Stamping Press',
-    o.x + BELTS.xs[b],
-    o.z + BELTS.z1 - T.pressLength / 2,
+    o.x + BELTS.xs[belt],
+    o.z + zc,
     T.pressLength,
   );
-  st.press = { belt: b, remaining: T.pressWarning, objectId: strip.id };
-  st.pressTimer = T.pressEvery;
+  st.presses.push({ belt, zc, remaining: T.pressWarning, objectId: strip.id });
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
@@ -270,13 +287,65 @@ export function startPress(
     fx: 'windup',
     ability: TOCK_STAMPING_PRESS,
   });
-  return b;
+  return true;
 }
 
-function landPress(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: TockFightState): void {
-  const press = st.press;
-  if (!press) return;
-  st.press = null;
+/** The rail stop a carriage takes to catch a body at local z `z` on `belt`:
+ *  that z led by the belt's run over the warning, snapped to the rail grid. */
+function ledStop(inst: InstanceSlot, st: TockFightState, belt: number, z: number): number {
+  const speed = beltSpeed(inst.difficulty === 'heroic');
+  return pressStripCentre(BELTS, z + st.dirs[belt] * speed * T.pressWarning);
+}
+
+/** One press cycle: a carriage (heroic: two) slides to the players riding the
+ *  belts, a hashed rider on a free belt each; nobody riding a free belt, a
+ *  hashed free belt aimed at a hashed Main Line player's z (else the press
+ *  end). Returns the belts painted, in paint order. */
+export function startPress(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  st: TockFightState,
+): number[] {
+  st.casts++;
+  st.pressTimer = T.pressEvery;
+  const count = inst.difficulty === 'heroic' ? T.heroicPresses : 1;
+  const players = linePlayers(ctx, inst);
+  const free = (b: number) => b >= 0 && !st.presses.some((p) => p.belt === b);
+  const painted: number[] = [];
+  for (let n = 0; n < count; n++) {
+    const salt = st.casts * 7 + n * 31 + 3;
+    const riders: { belt: number; z: number }[] = [];
+    for (const p of players) {
+      const at = localOf(ctx, inst, p);
+      const belt = beltIndexAt(BELTS, at.x, at.z);
+      if (free(belt)) riders.push({ belt, z: at.z });
+    }
+    if (riders.length > 0) {
+      const rider = riders[kitHash(boss.id, salt) % riders.length];
+      if (paintStrip(ctx, inst, boss, st, rider.belt, ledStop(inst, st, rider.belt, rider.z)))
+        painted.push(rider.belt);
+      continue;
+    }
+    const open = BELTS.xs.map((_, i) => i).filter(free);
+    if (open.length === 0) break;
+    const belt = open[kitHash(boss.id, salt) % open.length];
+    const near = players.length > 0 ? players[kitHash(boss.id, salt + 1) % players.length] : null;
+    const zc = near
+      ? ledStop(inst, st, belt, localOf(ctx, inst, near).z)
+      : pressRailStops(BELTS)[0];
+    if (paintStrip(ctx, inst, boss, st, belt, zc)) painted.push(belt);
+  }
+  return painted;
+}
+
+function landPress(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  st: TockFightState,
+  press: TockFightState['presses'][number],
+): void {
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
@@ -288,7 +357,7 @@ function landPress(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: TockFi
   dropEncounterObject(ctx, inst, press.objectId);
   for (const p of claimPlayers(ctx, inst)) {
     const at = localOf(ctx, inst, p);
-    if (!inPressStrip(BELTS, press.belt, at.x, at.z)) continue;
+    if (!inPressStrip(BELTS, press.belt, press.zc, at.x, at.z)) continue;
     st.pressed = true;
     ctx.dealDamage(
       boss,
@@ -317,8 +386,17 @@ function landPress(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: TockFi
     const e = ctx.entities.get(id);
     if (!e || e.dead || e.templateId !== HALF_BUILT_FRAME_ID) continue;
     const at = localOf(ctx, inst, e);
-    if (inPressStrip(BELTS, press.belt, at.x, at.z)) ctx.handleDeath(e, null);
+    if (inPressStrip(BELTS, press.belt, press.zc, at.x, at.z)) ctx.handleDeath(e, null);
   }
+}
+
+/** Count every hammer down; land those whose warning ran out (paint order). */
+function stepPresses(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: TockFightState): void {
+  for (const p of st.presses) p.remaining -= DT;
+  if (!st.presses.some((p) => p.remaining <= 1e-9)) return;
+  const due = st.presses.filter((p) => p.remaining <= 1e-9);
+  st.presses = st.presses.filter((p) => p.remaining > 1e-9);
+  for (const p of due) landPress(ctx, inst, boss, st, p);
 }
 
 /** Parts Drop: three Half-Built Frames onto three belts at the chute end,
@@ -389,7 +467,8 @@ function stepFrames(ctx: SimContext, st: TockFightState): void {
 /** The fight ended: the belts stop, the strip goes, the gauge empties. */
 function endTockFight(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.foundryFight?.kind === 'tock' ? boss.foundryFight : null;
-  if (st?.press) dropEncounterObject(ctx, inst, st.press.objectId);
+  for (const p of st?.presses ?? []) dropEncounterObject(ctx, inst, p.objectId);
+  endVents(ctx, inst, st);
   clearCastIf(boss, TOCK_LEVER, TOCK_RIVET_GUN);
   dropAuraById(boss, TOCK_PRESSURE);
   paintBelts(ctx, inst, null);
@@ -459,10 +538,7 @@ export function tickTock(
   // The belts carry everything on them, then the hammer and the bars resolve.
   carryOnConveyors(ctx, lineBodies(ctx, inst), beltRegions(ctx, inst, st.dirs), DT);
   stepFrames(ctx, st);
-  if (st.press) {
-    st.press.remaining -= DT;
-    if (st.press.remaining <= 1e-9) landPress(ctx, inst, boss, st);
-  }
+  stepPresses(ctx, inst, boss, st);
   while (
     st.dropsFired < T.partsAtHpPct.length &&
     boss.maxHp > 0 &&
@@ -471,8 +547,10 @@ export function tickTock(
     st.dropsFired++;
     dropParts(ctx, inst, boss, st);
   }
+  const onLine = linePlayers(ctx, inst).length > 0;
   st.pressTimer -= DT;
-  if (st.pressTimer <= 0 && linePlayers(ctx, inst).length > 0) startPress(ctx, inst, boss, st);
+  if (st.pressTimer <= 0 && onLine) startPress(ctx, inst, boss, st);
+  tickVents(ctx, inst, boss, st, onLine);
   st.leverTimer -= DT;
   if (stepBars(ctx, inst, boss, st)) return;
   if (ctx.isStunned(boss) || boss.castingAbility !== null) return;

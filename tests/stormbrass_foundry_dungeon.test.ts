@@ -275,7 +275,7 @@ describe('/dev foundry tp: a jump to every area and boss', () => {
 
 describe('/dev foundry trigger: every boss mechanic fires on demand', () => {
   const BY_BOSS: Record<string, string[]> = {
-    line_master_tock: ['lever', 'press', 'parts', 'rivet'],
+    line_master_tock: ['lever', 'press', 'parts', 'rivet', 'vents'],
     rangewarden: ['lock', 'proof', 'drones'],
     voltaic_warden: ['flip', 'discharge', 'platedrones', 'lash', 'strike'],
     prime_draft: ['cell', 'overload', 'fist', 'sweep', 'unbolt', 'tremor', 'heartless', 'surge'],

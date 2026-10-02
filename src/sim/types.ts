@@ -4587,8 +4587,20 @@ export interface TockFightState {
    *  Cross-Feed's two). */
   flipping: number[];
   pressTimer: number;
-  /** The hammer coming down: its belt, the seconds left, its painted strip. */
-  press: { belt: number; remaining: number; objectId: number } | null;
+  /** The hammers coming down (one per belt at most): the belt, the strip's
+   *  centre (a rail stop, instance-local z), the seconds left, its strip. */
+  presses: { belt: number; zc: number; remaining: number; objectId: number }[];
+  /** The Scalding Vents' cycle: off (timer = seconds to the next warning),
+   *  warn or scald (timer = seconds left in the phase; tick = seconds to the
+   *  next scald tick), and the walkway strips while they run. */
+  vent: {
+    phase: 'off' | 'warn' | 'scald';
+    timer: number;
+    tick: number;
+    objectIds: number[];
+    /** Warnings this fight (the first draws his yell). */
+    cycles: number;
+  };
   rivetTimer: number;
   /** Parts Drop thresholds already fired. */
   dropsFired: number;

@@ -83,8 +83,13 @@ export const HALF_BUILT_FRAME_ID = 'half_built_frame';
 export const TOCK_LEVER = 'foundry_tock_lever';
 /** The Rivet Gun burst on the one he is fighting (a short bar). */
 export const TOCK_RIVET_GUN = 'foundry_tock_rivet_gun';
-/** The Stamping Press hammer coming down on one belt's last yards. */
+/** A Stamping Press hammer coming down on a stretch of one belt (its carriage
+ *  rides the belt's overhead rail to the strip first). */
 export const TOCK_STAMPING_PRESS = 'foundry_tock_stamping_press';
+/** Scalding Vents: the steam grilles along every walkway. Also the aura a
+ *  player standing on a walkway wears while they warn (value2 0) and scald
+ *  (value2 1): its clock is the phase's seconds left. */
+export const TOCK_SCALDING_VENTS = 'foundry_tock_scalding_vents';
 /** The parts chute dropping Half-Built Frames onto the belts. */
 export const TOCK_PARTS_DROP = 'foundry_tock_parts_drop';
 /** Tock's pressure gauge (an aura on Tock: its remaining time is the seconds
@@ -103,12 +108,17 @@ export const TOCK_TUNING = {
   leverEvery: 20,
   /** The klaxon bar before the belts reverse. */
   leverCast: 2,
-  pressFirst: 8,
-  pressEvery: 12,
-  /** The painted strip's warning before the hammer lands. */
-  pressWarning: 2,
-  /** The hammer covers each belt's last yards at the press end. */
+  pressFirst: 6,
+  pressEvery: 7,
+  /** The painted strip's warning before the hammer lands (the carriage slides
+   *  to it along the rail, then the hammer falls). */
+  pressWarning: 2.5,
+  /** The yards of belt one hammer covers. */
   pressLength: 8,
+  /** The carriages stop on a fixed rail grid (yards), counted from the press end. */
+  railStep: 2,
+  /** Heroic: the carriages work in pairs, two belts at once. */
+  heroicPresses: 2,
   pressMin: 250,
   pressMax: 300,
   /** The knockdown the press leaves (seconds stunned). */
@@ -123,6 +133,18 @@ export const TOCK_TUNING = {
   rivetCast: 1,
   /** The Rivet Gun hits as hard as this many of his melee swings. */
   rivetMult: 1.4,
+  /** Scalding Vents: every ventEvery seconds (the first at ventFirst) every
+   *  walkway is painted for ventWarning, then scalds for ventScald, one tick
+   *  every ventTickEvery to anyone on a walkway inside the belts' run. A tick
+   *  is a raid-pulse share of the 950 health wearer (about 6 percent), so a
+   *  whole burst stood out costs about one press: the belts are the floor. */
+  ventFirst: 10,
+  ventEvery: 10,
+  ventWarning: 1.5,
+  ventScald: 5,
+  ventTickEvery: 1,
+  ventMin: 55,
+  ventMax: 65,
 } as const;
 
 export interface BeltLayout {
@@ -141,19 +163,74 @@ export function beltIndexAt(belts: BeltLayout, lx: number, lz: number): number {
   return -1;
 }
 
-/** Is an instance-local spot under the press hammer of `belt` (its last
- *  `length` yards at the press end)? */
+/** Is an instance-local spot under the press hammer of `belt` whose strip is
+ *  centred on `zc` (the `length` yards from zc - length/2 to zc + length/2)? */
 export function inPressStrip(
   belts: BeltLayout,
   belt: number,
+  zc: number,
   lx: number,
   lz: number,
   length: number = TOCK_TUNING.pressLength,
 ): boolean {
   if (belt < 0 || belt >= belts.xs.length) return false;
-  return (
-    Math.abs(lx - belts.xs[belt]) <= belts.halfWidth && lz >= belts.z1 - length && lz <= belts.z1
-  );
+  const half = length / 2;
+  return Math.abs(lx - belts.xs[belt]) <= belts.halfWidth && lz >= zc - half && lz <= zc + half;
+}
+
+/** The fixed rail stops a strip's centre can take on any belt (instance-local
+ *  z), the press end first, one rail step apart, every strip wholly inside the
+ *  belts' run. The rails never move, so the map never shifts. */
+export function pressRailStops(
+  belts: BeltLayout,
+  length: number = TOCK_TUNING.pressLength,
+  step: number = TOCK_TUNING.railStep,
+): number[] {
+  const top = belts.z1 - length / 2;
+  const span = top - (belts.z0 + length / 2);
+  const out: number[] = [];
+  for (let k = 0; k <= Math.floor(span / step + 1e-9); k++) out.push(top - k * step);
+  return out;
+}
+
+/** The rail stop nearest `z` (clamped into the run): where a carriage parks
+ *  to strike at a spot. */
+export function pressStripCentre(
+  belts: BeltLayout,
+  z: number,
+  length: number = TOCK_TUNING.pressLength,
+  step: number = TOCK_TUNING.railStep,
+): number {
+  const top = belts.z1 - length / 2;
+  const last = Math.floor((top - (belts.z0 + length / 2)) / step + 1e-9);
+  const k = Math.min(last, Math.max(0, Math.round((top - z) / step)));
+  return top - k * step;
+}
+
+/** The floor the belts run across (instance-local), for the walkways. */
+export interface LineRect {
+  x0: number;
+  x1: number;
+}
+
+/** The walkways, west to east: the Main Line floor between and beside the
+ *  belts (their x extents; they run the belts' z band). */
+export function walkwayStrips(line: LineRect, belts: BeltLayout): { x0: number; x1: number }[] {
+  const out: { x0: number; x1: number }[] = [];
+  let from = line.x0;
+  for (const x of belts.xs) {
+    out.push({ x0: from, x1: x - belts.halfWidth });
+    from = x + belts.halfWidth;
+  }
+  out.push({ x0: from, x1: line.x1 });
+  return out;
+}
+
+/** Is an instance-local spot on a walkway the Scalding Vents reach: inside the
+ *  Main Line's width and the belts' run, and on no belt? */
+export function onWalkway(line: LineRect, belts: BeltLayout, lx: number, lz: number): boolean {
+  if (lx < line.x0 || lx > line.x1 || lz < belts.z0 || lz > belts.z1) return false;
+  return beltIndexAt(belts, lx, lz) === -1;
 }
 
 /** A belt's run state, on its encounter object: idle before and after the
@@ -166,8 +243,17 @@ export const FOUNDRY_BELT_TEMPLATES = {
   alarm: 'foundry_belt_alarm',
 } as const;
 /** The press strip painted on the belt before the hammer lands (scale = the
- *  strip's length; it stands on the strip's centre). */
+ *  strip's length; it stands on the strip's centre, a fixed rail stop: the
+ *  renderer slides that belt's carriage to it). */
 export const FOUNDRY_PRESS_STRIP = 'foundry_press_strip';
+/** A walkway's Scalding Vents strip, one per walkway while they run: warn
+ *  (painted, the steam about to burst) then scald. It stands on the walkway's
+ *  centre; scale = its length (the belts' run). The renderer matches the
+ *  strips to walkwayStrips() west to east. */
+export const FOUNDRY_VENT_TEMPLATES = {
+  warn: 'foundry_vent_warn',
+  scald: 'foundry_vent_scald',
+} as const;
 
 // ---- The Rangewarden (5.2): a marked player keeps moving (G20 trail salvo) -----
 
@@ -478,6 +564,7 @@ export const FOUNDRY_OBJECT_TEMPLATES: ReadonlySet<string> = new Set<string>([
   FOUNDRY_SCRAP_MARK,
   ...Object.values(FOUNDRY_BELT_TEMPLATES),
   FOUNDRY_PRESS_STRIP,
+  ...Object.values(FOUNDRY_VENT_TEMPLATES),
   FOUNDRY_SHELL_MARK,
   FOUNDRY_SHRAPNEL,
   ...Object.values(FOUNDRY_BUNKER_TEMPLATES),

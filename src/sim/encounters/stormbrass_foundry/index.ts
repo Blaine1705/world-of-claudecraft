@@ -38,6 +38,7 @@ import {
   startUnbolt,
   tickPrimeDraft,
 } from './prime_draft';
+import { startVents } from './scalding_vents';
 
 export {
   gantryPlayers,
@@ -111,10 +112,10 @@ export function tickFoundryEncounters(ctx: SimContext): void {
 }
 
 const HELP =
-  'Mechanics: blast, toss, unload (the Hauler); lever, press, parts, rivet (Tock); lock, proof, drones (the Rangewarden); flip, discharge, platedrones, lash, strike (the Voltaic Warden); cell, overload, fist, sweep, unbolt, tremor, heartless, surge (the Prime Draft).';
+  'Mechanics: blast, toss, unload (the Hauler); lever, press, parts, rivet, vents (Tock); lock, proof, drones (the Rangewarden); flip, discharge, platedrones, lash, strike (the Voltaic Warden); cell, overload, fist, sweep, unbolt, tremor, heartless, surge (the Prime Draft).';
 
 const HAULER_TRIGGERS = new Set(['blast', 'toss', 'unload']);
-const TOCK_TRIGGERS = new Set(['lever', 'press', 'parts', 'rivet']);
+const TOCK_TRIGGERS = new Set(['lever', 'press', 'parts', 'rivet', 'vents']);
 const RANGE_TRIGGERS = new Set(['lock', 'proof', 'drones']);
 const VOLTAIC_TRIGGERS = new Set(['flip', 'discharge', 'platedrones', 'lash', 'strike']);
 const DRAFT_TRIGGERS = new Set([
@@ -152,8 +153,17 @@ function tockTrigger(ctx: SimContext, inst: InstanceSlot, what: string): string 
   const boss = claimBoss(ctx, inst, TOCK_ID);
   if (!boss || !bossEngaged(boss)) return 'Pull Line-Master Tock first.';
   const st = tockState(ctx, inst, boss);
-  if (what === 'press')
-    return `The press comes down on belt ${startPress(ctx, inst, boss, st) + 1}.`;
+  if (what === 'press') {
+    // The carriages slide to their riders on the next rail stops.
+    const belts = startPress(ctx, inst, boss, st).map((b) => b + 1);
+    return belts.length > 0
+      ? `The press slides to belt ${belts.join(' and ')}.`
+      : 'Every carriage is already out.';
+  }
+  if (what === 'vents') {
+    startVents(ctx, inst, boss, st);
+    return 'The walkway vents hiss: steam in 1.5 s.';
+  }
   if (what === 'parts')
     return `The chute drops ${dropParts(ctx, inst, boss, st)} Half-Built Frames.`;
   cutBar(boss);

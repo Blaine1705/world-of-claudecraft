@@ -13,16 +13,17 @@ in `ids.ts`.
 
 | Module | Role |
 |---|---|
-| `ids.ts` | Leaf: the dungeon, boss and showpiece ids, every cast, aura and object template id, the tuning of all five encounters, and the pure geometry (`beltIndexAt`, `inPressStrip`, `bunkerLeeAt`, `platingFor`, `platingFacing`, `hatchStateAt`, `hatchStateOf`, `staticPerSecond`). The renderer, the HUD alert, the trash kit and the tests key on it. |
+| `ids.ts` | Leaf: the dungeon, boss and showpiece ids, every cast, aura and object template id, the tuning of all five encounters, and the pure geometry (`beltIndexAt`, `inPressStrip`, `pressRailStops`, `pressStripCentre`, `walkwayStrips`, `onWalkway`, `bunkerLeeAt`, `platingFor`, `platingFacing`, `hatchStateAt`, `hatchStateOf`, `staticPerSecond`). The renderer, the HUD alert, the trash kit and the tests key on it. |
 | `claim.ts` | The live Foundry claims and objects; the claim-generic reads are the Bastion's (`../sunken_bastion/claim.ts`), re-exported; plus `arenaPlayers`, `heavySwing` (a melee multiple through armor) and `bossTarget`. |
 | `gantry_hauler.ts` | The Gantry Hauler (4.3): Steam Blast, Scrap Toss (never fired during a Steam Blast bar; a plate already in the air still lands if the Hauler falls), Unload. Boiler Rupture is its `trashKit.deathBurst`. Deed: Off the Rails. |
-| `line_master.ts` | Line-Master Ambrel Tock (5.1, G19): four belts carry every body on them through `../../conveyor.ts` (`displaceAlong`, `resolveMove`); the lever (2 s klaxon, belts reverse; heroic Overtime 5 yd/s and Cross-Feed), the Stamping Press (2 s strip, knockdown, crushes a frame), Parts Drop (three booting Half-Built Frames at 70 and 40), the Rivet Gun. Belt state rides belt objects (template idle/run/alarm, facing = heading, scale = speed); the lever gauge is the `foundry_tock_pressure` aura clock. Deed: Quality Control. |
+| `line_master.ts` | Line-Master Ambrel Tock (5.1, G19): four belts carry every body on them through `../../conveyor.ts` (`displaceAlong`, `resolveMove`); the lever (2 s klaxon, belts reverse; heroic Overtime 5 yd/s and Cross-Feed), the Stamping Press (every 7 s a carriage slides along its belt's overhead rail to a hashed belt rider: `paintStrip` paints an 8 yd strip on the fixed rail stop nearest the rider's z led by the belt's run, 2.5 s, knockdown, crushes a frame; heroic two carriages on two belts; never two strips on one belt), the Scalding Vents (`scalding_vents.ts`), Parts Drop (three booting Half-Built Frames at 70 and 40), the Rivet Gun. Belt state rides belt objects (template idle/run/alarm, facing = heading, scale = speed); the lever gauge is the `foundry_tock_pressure` aura clock. Deed: Quality Control. |
+| `scalding_vents.ts` | Tock's Scalding Vents: every 10 s each walkway's strip object paints a 1.5 s warning (template warn), then scalds (template scald) everyone `onWalkway` a tick a second for 5 s; the walkway stander wears `TOCK_SCALDING_VENTS` (value2 0 warn, 1 scald; its clock is the phase's seconds left), which the HUD alert reads. |
 | `rangewarden.ts` | The Rangewarden (5.2, G20): Target Lock marks two (heroic three) non-tanks for 8 s; each second a shell paints where the mark stood 1.5 s before (a per-tick trail) and lands 0.6 s later; each bunker swallows three shells per lock in its lee; Proof Shot and Dented Plating; Drill Drones at 66 and 33; heroic Shrapnel. Deed: Clean Range. |
 | `voltaic_warden.ts` | The Voltaic Warden (5.3, G21): Grounded or Charged plating auras (value2 1 = heroic Split Plating), a 3 s rattle bar and a flip every 15 s (heroic 10 s), Discharge on the flip, two plated Arc Drones every 25 s (the opposite face), Static Lash, Coil Strike. Deed: Grounded. |
 | `voltaic_plating.ts` | Pure guard asked by `combat/damage.ts` `dealDamage`: a wrong-kind hit from a player or pet is turned aside (a resist event, threat kept) and banked on the Warden. |
 | `prime_draft.ts` | The Prime Draft (5.4, G12): Awakening bar, Bolted (rooted; Piston Fist, Arm Sweep), Unbolted at 70 (rivet shower, walks, Tremor Step), Heartless at 35 (Arc Surge, faster cycle), Overdrive below 15; the Charge Cycle and the Core Hatch window (closed, warn, open on the hatch ring object), Overload, arc back on a closed hatch, short out at 15 s; heroic Jammed Racks and Double Load. On death the Draft Record (`draft_record`, The First Draft's interact object) lies in its chest. Deed: Heartless. |
 | `storm_cells.ts` | The carry: take a cell with the pick-up command (`interaction.ts` `pickUpObject` routes here), the carrier's aura (slow, stacks = Static a second, sourceId = the hatch ring), drop with the interact press (`interaction.ts` `interact`), the 3 s retake lock. |
-| `index.ts` | The tick and `/dev foundry trigger` for every mechanic (blast, toss, unload; lever, press, parts, rivet; lock, proof, drones; flip, discharge, platedrones, lash, strike; cell, overload, fist, sweep, unbolt, tremor, heartless, surge). |
+| `index.ts` | The tick and `/dev foundry trigger` for every mechanic (blast, toss, unload; lever, press, parts, rivet, vents; lock, proof, drones; flip, discharge, platedrones, lash, strike; cell, overload, fist, sweep, unbolt, tremor, heartless, surge). |
 
 Rules:
 - Deterministic: every pick is hashed (`kitHash`, `pickMarkTargets`) or entity-id / distance ordered; the only rng draws are damage rolls. Fixed DT countdowns; the Rangewarden's trail is one sample a tick.
@@ -42,3 +43,9 @@ shipped as "Stormbrass Silenced" (the id `dgn_stormbrass_foundry` stays).
 the loot names ("Rangefinder's Lens", "Overclocked Governor" and the rest),
 the deed names and the mechanic and aura names are generic English compounds,
 clear at authoring.
+
+"Scalding Vents" (Tock's walkway steam, the mechanic, aura and strip name),
+web-checked 2026-10-02 (exact phrase plus the coined tokens against the major
+game wikis): no game ability, item or place of that exact name; World of
+Warcraft has only the unrelated zone "Scalding Chasm" and spells such as
+"Thermal Vent" and "Venting Flames". A generic English compound: clear.

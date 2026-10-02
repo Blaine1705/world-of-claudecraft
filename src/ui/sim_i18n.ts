@@ -1321,6 +1321,7 @@ const baseEnTable = {
   'log.stormbrassFoundryTockEngage': 'More parts for the line! Hold still and be assembled.',
   'log.stormbrassFoundryTockParts': 'Frames to the line! Bolt them together!',
   'log.stormbrassFoundryTockDeath': 'The line... the line has stopped...',
+  'log.stormbrassFoundryTockVents': "Steam's up! Off my walkways and onto the line!",
   'log.stormbrassFoundryTockPartsLog':
     'The parts chute rattles: Half-Built Frames drop onto the belts!',
   'log.stormbrassFoundryRangeEngage': 'Live-fire drill. Targets, take your positions.',
@@ -1356,6 +1357,7 @@ const baseEnTable = {
   'mechanic.foundryRivetShower': 'Rivet Shower',
   'mechanic.foundryTremorStep': 'Tremor Step',
   'mechanic.foundryArcSurge': 'Arc Surge',
+  'mechanic.foundryScaldingVents': 'Scalding Vents',
   'aura.foundryLinePressure': 'Line Pressure',
   'aura.foundryFlattened': 'Flattened',
   'aura.foundryBootingUp': 'Booting Up',
@@ -17827,6 +17829,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Rivet Shower': 'mechanic.foundryRivetShower',
   'Tremor Step': 'mechanic.foundryTremorStep',
   'Arc Surge': 'mechanic.foundryArcSurge',
+  'Scalding Vents': 'mechanic.foundryScaldingVents',
   'Line Pressure': 'aura.foundryLinePressure',
   Flattened: 'aura.foundryFlattened',
   'Booting Up': 'aura.foundryBootingUp',
