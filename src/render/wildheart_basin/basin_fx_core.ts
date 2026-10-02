@@ -35,6 +35,7 @@ import {
   TELEGRAPH_THREAT_COLORS,
   telegraphFillOf,
 } from '../floor_telegraph/telegraph_look_core';
+import { SAURIAN_DRAWN_SCALE, SAURIAN_MODEL, SAURIAN_SIM_SCALE } from './saurian_model_core';
 
 export type BasinTelegraphShape = 'cone' | 'ring' | 'lane' | 'sigil';
 
@@ -235,18 +236,20 @@ export function cloudPresence(elapsed: number, seconds: number): number {
   return fadeIn * fadeOut;
 }
 
-// ---- the Great Saurian's body (the placeholder look; manifest grows it) ---------
+// ---- the Great Saurian's body (its Blender model, saurian_model_core.ts) -------
 
-/** The Saurian's drawn proportions per unit of its sim scale: the back the
- *  howdah sits on, the hips the tail leaves from, the reach of its feet. */
+/** The Saurian's drawn proportions per unit of its sim scale (the measured
+ *  model at SAURIAN_DRAWN_SCALE): the back the howdah sits on, the hips the
+ *  tail leaves from, the reach of its feet. */
 export const SAURIAN_DRAW = {
-  /** Body height per sim scale unit (yards). */
-  height: 4.2,
-  /** The howdah's seat over its back, as a share of the height. */
-  back: 0.86,
+  /** Body height (the top of its head) per sim scale unit (yards). */
+  height: (SAURIAN_MODEL.headTop * SAURIAN_DRAWN_SCALE) / SAURIAN_SIM_SCALE,
+  /** The howdah's deck over its back, as a share of the height. */
+  back: SAURIAN_MODEL.deckTop / SAURIAN_MODEL.headTop,
   /** Behind its centre to its hips, per scale unit. */
-  hips: 1.2,
-  /** Radius its legs churn the ford, per scale unit. */
+  hips: (SAURIAN_MODEL.hipsBack * SAURIAN_DRAWN_SCALE) / SAURIAN_SIM_SCALE,
+  /** Radius its legs churn the ford, per scale unit (its feet stand 2.5 yd
+   *  out to each side, 2.9 yd fore and aft, at its drawn size). */
   wade: 1.6,
 } as const;
 

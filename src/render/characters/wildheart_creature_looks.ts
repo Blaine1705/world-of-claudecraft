@@ -1,17 +1,90 @@
-// The Wildheart Basin's PLACEHOLDER creature looks (docs/design/dungeon-rework/
-// wildheart_basin.md section 4): shipped rigs re-tinted for the jungle so every
-// new creature of the reworked basin is visible and animated from day one,
-// until the art phase gives each its own body (the Great Saurian's sauropod is
-// being modelled in Blender; its key here keeps the mob id and the visual key,
-// so the swap is a def change). manifest.ts merges these over its VISUALS and
-// maps the templates through MOB_KEYS (WILDHEART_MOB_KEYS).
+// The Wildheart Basin's creature looks (docs/design/dungeon-rework/
+// wildheart_basin.md section 4). Most are PLACEHOLDERS: shipped rigs re-tinted
+// for the jungle so every new creature of the reworked basin is visible and
+// animated from day one, until the art phase gives each its own body. The
+// Great Saurian has its own Blender body (WILDHEART_GREAT_SAURIAN_LOOK). Every
+// key keeps the mob id and the visual key, so a swap is a def change.
+// manifest.ts merges these over its VISUALS and maps the templates through
+// MOB_KEYS (WILDHEART_MOB_KEYS).
 //
 // Sizes ride the templates' sim scales (sim/content/wildheart.ts): `grow`
 // stands every creature well past a player (2.6 yd) without touching the sim's
 // reach (the owner's rule: imposing, never toy-like). Heights below are the
 // drawn height at the template's scale.
 
+import {
+  SAURIAN_ENRAGE,
+  SAURIAN_HOWDAH_BREAK,
+  SAURIAN_STOMP,
+  SAURIAN_TAIL_SWIPE,
+} from '../../sim/encounters/wildheart_basin/ids';
+import {
+  SAURIAN_CLIP,
+  SAURIAN_MODEL,
+  SAURIAN_SIM_SCALE,
+  saurianLookHeight,
+  saurianModelScale,
+} from '../wildheart_basin/saurian_model_core';
 import type { ClipMap, VisualDef } from './manifest';
+
+/** The gestures the basin's fx send the Saurian's howdah (saurian_fx.ts):
+ *  hide it at once (a view built after the break) and mend it (a reset pull). */
+export const SAURIAN_HOWDAH_GONE_GESTURE = 'wildheart_saurian_howdah_gone';
+export const SAURIAN_HOWDAH_WHOLE_GESTURE = 'wildheart_saurian_howdah_whole';
+
+/** The Great Saurian (scripts/assets/wildheart_great_saurian, built in Blender):
+ *  one sculpted skin with its Sunbone harness, the bamboo-and-bone howdah and
+ *  its troll rider, eleven hand-keyed clips. 13.4 yd to the top of its head at
+ *  its 3.2 (saurian_model_core.ts SAURIAN_DRAWN_SCALE), 27 yd nose to club.
+ *  Both strikes are cast bars whose clips land on the bar's end (the tail
+ *  crosses the cone at 1.00 s of its 1 s bar, the forefeet slam at 2.00 s of
+ *  the 2 s bar), so they play at 1x and finish as play-outs; the howdah
+ *  breaking and the enrage are gestures off their spellfx. The howdah and the
+ *  rider are their own meshes: hidden once the break has played. */
+export const WILDHEART_GREAT_SAURIAN_LOOK: VisualDef = {
+  url: SAURIAN_MODEL.url,
+  height: saurianLookHeight(),
+  clips: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Attack'],
+    attackByAbility: { [SAURIAN_HOWDAH_BREAK]: 'HowdahBreak', [SAURIAN_ENRAGE]: 'Enrage' },
+    attackTimeScaleByAbility: { [SAURIAN_HOWDAH_BREAK]: 1, [SAURIAN_ENRAGE]: 1 },
+    hit: ['Hit'],
+    death: 'Death',
+    cast: 'Roar',
+    castByAbility: { [SAURIAN_TAIL_SWIPE]: 'TailSwipe', [SAURIAN_STOMP]: 'Stomp' },
+    castTimeScaleByAbility: { [SAURIAN_TAIL_SWIPE]: 1, [SAURIAN_STOMP]: 1 },
+    castPlayOut: ['TailSwipe', 'Stomp'],
+    flourish: 'Roar',
+  },
+  castPlayOutHoldsAttacks: true,
+  oneShotsHoldAttacks: ['HowdahBreak', 'Enrage'],
+  meshToggles: [
+    {
+      nodes: ['GreatSaurianHowdah', 'GreatSaurianRider'],
+      hideAfter: {
+        gesture: SAURIAN_HOWDAH_BREAK,
+        seconds: SAURIAN_CLIP.howdahGone,
+        clip: 'HowdahBreak',
+      },
+      hideNow: SAURIAN_HOWDAH_GONE_GESTURE,
+      showNow: SAURIAN_HOWDAH_WHOLE_GESTURE,
+    },
+  ],
+  // The gaits' reference speeds at the drawn size (the planted feet slide at
+  // 2.2 and 5.4 model yards a second): its 2.1 patrol wades at about 1.1x,
+  // its 6 chase ambles at 1.26x.
+  walkRef: SAURIAN_MODEL.walkRef * saurianModelScale(SAURIAN_SIM_SCALE),
+  runRef: SAURIAN_MODEL.runRef * saurianModelScale(SAURIAN_SIM_SCALE),
+  // The swing lands its blow at 0.62 s; the death's splashes are timed off the
+  // clip at 1x (saurian_fx.ts).
+  attackTimeScale: 1.1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 4.5,
+};
 
 /** A carved prop that never moves: every clip lookup misses harmlessly. */
 const STATIC_TOTEM_CLIPS: ClipMap = {
@@ -62,20 +135,10 @@ const ROWS: Record<string, PlaceholderRow> = {
     1.64,
     { selfIllumination: 0.35, clickRadius: 3.2 },
   ],
-  // The Great Saurian (TEMPORARY until its Blender sauropod lands): the
-  // colossal tower-backed crawler in moss green, the tower on its back reading
-  // as the howdah; about 13.4 yd at its 3.2, as big as a house
-  // (render/wildheart_basin/basin_fx_core.ts SAURIAN_DRAW matches it).
-  wildheart_great_saurian: [
-    'mob_turretback',
-    0x5f7a3a,
-    0.6,
-    0.28,
-    { selfIllumination: 0.1, clickRadius: 4.5 },
-  ],
 };
 
-/** The placeholder defs, derived from the base rigs already in `visuals`. */
+/** The basin's defs: the placeholders derived from the base rigs already in
+ *  `visuals`, and the creatures with bodies of their own. */
 export function wildheartPlaceholderLooks(
   visuals: Readonly<Record<string, VisualDef>>,
 ): Record<string, VisualDef> {
@@ -85,6 +148,7 @@ export function wildheartPlaceholderLooks(
     if (!def) continue;
     out[key] = { ...def, height: def.height * grow, tint, tintStrength, ...extra };
   }
+  out.wildheart_great_saurian = WILDHEART_GREAT_SAURIAN_LOOK;
   // The Sunbone Totem: the shipped carved mask totem as a stationary prop
   // (about 6.4 yd at its 1.6), its bone and ochre kept, a faint inner glow.
   out.wildheart_sunbone_totem = {

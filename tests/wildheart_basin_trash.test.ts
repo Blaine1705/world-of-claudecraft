@@ -18,6 +18,7 @@ import {
   SAURIAN_HOWDAH_BREAK,
   SAURIAN_HOWDAH_LOG,
   SAURIAN_KNOCKDOWN,
+  SAURIAN_RIDER_LANDS,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
   SAURIAN_TUNING as T,
@@ -458,14 +459,32 @@ describe('the Great Saurian (section 4.3)', () => {
       r.inst.mobIds
         .map((id) => r.sim.ctx.entities.get(id))
         .filter((e): e is Entity => e?.templateId === HOWDAH_HEXCALLER_ID);
-    expect(riders()).toHaveLength(1);
     expect(r.events.some((e) => e.type === 'log' && e.text === SAURIAN_HOWDAH_LOG)).toBe(true);
     expect(
       r.events.some(
         (e) => e.type === 'spellfx' && e.sourceId === s.id && e.ability === SAURIAN_HOWDAH_BREAK,
       ),
     ).toBe(true);
+    // The rider is mid-leap off the broken howdah: it lands on the model's
+    // HowdahBreak beat, behind the Saurian's right flank, never at the break.
+    expect(riders()).toHaveLength(0);
+    run(r, T.riderLandDelay - 0.2, [s], true);
+    expect(riders()).toHaveLength(0);
+    run(r, 0.25, [s], true);
+    expect(riders()).toHaveLength(1);
     const rider = riders()[0];
+    expect(
+      r.events.some(
+        (e) => e.type === 'spellfx' && e.sourceId === rider.id && e.ability === SAURIAN_RIDER_LANDS,
+      ),
+    ).toBe(true);
+    // Right of its facing and behind it, at the tuned offsets.
+    const dx = rider.pos.x - s.pos.x;
+    const dz = rider.pos.z - s.pos.z;
+    const fwd = dx * Math.sin(s.facing) + dz * Math.cos(s.facing);
+    const right = -dx * Math.cos(s.facing) + dz * Math.sin(s.facing);
+    expect(fwd).toBeCloseTo(-T.riderLandBack, 1);
+    expect(right).toBeCloseTo(T.riderLandRight, 1);
     expect(rider.aggroTargetId).toBe(r.me.id);
     // The rider's Ancestral Sap is channelled on the Saurian.
     const def = MOBS.howdah_hexcaller.trashKit?.mend;

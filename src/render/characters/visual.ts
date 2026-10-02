@@ -82,6 +82,7 @@ import {
 } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { FormAdornments } from './form_adornments';
+import { GestureMeshToggles } from './gesture_mesh_toggles';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import { HarvestRecoil } from './harvest_recoil';
@@ -798,6 +799,8 @@ export class CharacterVisual {
   private metamorphLeftWing: THREE.Object3D | null = null;
   /** VisualDef.dials: bones turned on top of the clips by gestures (bone_dials.ts). */
   private dials: BoneDials | null = null;
+  /** VisualDef.meshToggles: mesh nodes hidden or shown by gestures (gesture_mesh_toggles.ts). */
+  private meshToggles: GestureMeshToggles | null = null;
   private metamorphRightWing: THREE.Object3D | null = null;
   private metamorphLeftWingRest = new THREE.Euler();
   private metamorphRightWingRest = new THREE.Euler();
@@ -875,6 +878,8 @@ export class CharacterVisual {
         ),
       );
       if (this.def.dials?.length) this.dials = new BoneDials(this.model, this.def.dials);
+      if (this.def.meshToggles?.length)
+        this.meshToggles = new GestureMeshToggles(this.model, this.def.meshToggles);
       if (key === 'form_metamorph') {
         this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
         this.metamorphRightWing = this.model.getObjectByName('metamorph_wing_right_hinge') ?? null;
@@ -1779,8 +1784,10 @@ export class CharacterVisual {
   }
 
   playAttack(abilityId?: string): void {
+    if (abilityId && this.meshToggles?.handle(abilityId)) return;
     if (abilityId && this.dials?.handle(abilityId)) return;
     if (this.deadLock) return;
+    if (!abilityId && this.oneShotHoldsAttacks()) return;
     const phase = abilityId ? this.def.phaseClips?.[abilityId] : undefined;
     if (phase) {
       this.enterClipPhase(phase);
@@ -3511,6 +3518,7 @@ export class CharacterVisual {
   private updateMixer(dt: number): void {
     this.mixer.update(dt);
     this.dials?.apply(dt);
+    this.meshToggles?.update(dt, this.current?.getClip().name ?? null);
     this.skeletonUpdates.markPoseChanged();
   }
 
@@ -3904,6 +3912,14 @@ export class CharacterVisual {
   }
 
   /** Is a `castPlayOut` clip on the rig right now (its cast loop or its play-out)? */
+  /** VisualDef.oneShotsHoldAttacks: a plain swing never cuts these one-shots. */
+  private oneShotHoldsAttacks(): boolean {
+    const held = this.def.oneShotsHoldAttacks;
+    if (!held || !this.currentIsOneShot) return false;
+    const name = this.current?.getClip().name;
+    return name !== undefined && held.includes(name);
+  }
+
   private castPlayOutRunning(): boolean {
     const name = this.current?.getClip().name;
     if (!name || !this.def.clips.castPlayOut?.includes(name)) return false;
@@ -4146,6 +4162,7 @@ export class CharacterVisual {
     this.baseState = 'idle';
     this.modelWrap.position.y = this.modelWrapGroundY;
     this.applyCorpseMeshSwap(false);
+    this.meshToggles?.reset();
     // Release the one-shot latch: a `finished` that never arrived (the rig was
     // throttled, or the clip was cut) would otherwise leave every later base
     // change committing its state while silently skipping its fade.

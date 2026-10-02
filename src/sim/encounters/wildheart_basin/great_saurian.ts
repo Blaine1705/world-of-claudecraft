@@ -9,8 +9,11 @@
 //   Earthshaking Stomp  every 16 s a 2 s bar (the floor ring is the warning),
 //                       then 12 yd round it: 160 to 200 and a 1 s knockdown.
 //   Howdah Rider        once, at half health: the howdah breaks and a Howdah
-//                       Hexcaller jumps down; its interruptible Ancestral Sap
-//                       (the trash kit's mend) is channelled on the Saurian.
+//                       Hexcaller leaps down, landing 1.8 s later behind its
+//                       right flank (the model's HowdahBreak clip throws its
+//                       own rider on the same beat); its interruptible
+//                       Ancestral Sap (the trash kit's mend) is channelled on
+//                       the Saurian.
 //   Enrage              under a fifth of its health: 30 percent more damage,
 //                       its swings and both strikes.
 //
@@ -20,7 +23,7 @@
 // never idles in the ford.
 //
 // Deterministic: no pick is rolled (the cones and rings take everyone inside,
-// the rider lands on a fixed spot behind its flank); the only rng draws are
+// the rider lands on a fixed spot behind its right flank); the only rng draws are
 // the damage rolls, in claim-player order. Every visible state rides existing
 // entity fields (the cast bar, facing, the enrage aura, the rider's own body,
 // a `nova` spellfx at the break), so the online client mirrors it with no wire
@@ -41,6 +44,7 @@ import {
   SAURIAN_HOWDAH_BREAK,
   SAURIAN_HOWDAH_LOG,
   SAURIAN_KNOCKDOWN,
+  SAURIAN_RIDER_LANDS,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
   SAURIAN_TUNING as T,
@@ -178,40 +182,90 @@ function landStomp(
   return n;
 }
 
-/** Howdah Rider: the howdah breaks and the Howdah Hexcaller jumps down beside
- *  its flank, straight into the fight. Returns the rider (null if it could not
- *  spawn). Once per pull. */
-export function breakHowdah(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  saurian: Entity,
-  st: SaurianFightState,
-): Entity | null {
+/** Howdah Rider: the howdah breaks (once per pull) and the Howdah Hexcaller
+ *  leaps off its back; it lands `riderLandDelay` later behind the right flank
+ *  (landRider), on the beat the model's HowdahBreak clip drops its own rider
+ *  into the ford, so the two never stand side by side. */
+export function breakHowdah(ctx: SimContext, saurian: Entity, st: SaurianFightState): void {
   st.howdahBroken = true;
-  const victim =
-    saurian.aggroTargetId !== null ? (ctx.entities.get(saurian.aggroTargetId) ?? null) : null;
-  // It lands off the left flank, clear of the tail and the head.
-  const side = saurian.facing - Math.PI / 2;
-  const rider = spawnKitAdd(
-    ctx,
-    inst,
-    saurian,
-    HOWDAH_HEXCALLER_ID,
-    saurian.pos.x + Math.sin(side) * 6,
-    saurian.pos.z + Math.cos(side) * 6,
-    victim,
-  );
-  st.riderId = rider?.id ?? null;
+  st.riderLandsIn = T.riderLandDelay;
   ctx.emit({
     type: 'spellfx',
     sourceId: saurian.id,
-    targetId: rider?.id ?? saurian.id,
+    targetId: saurian.id,
     school: 'physical',
     fx: 'nova',
     ability: SAURIAN_HOWDAH_BREAK,
   });
   ctx.emit({ type: 'log', text: SAURIAN_HOWDAH_LOG, color: '#e8c070', entityId: saurian.id });
+}
+
+/** The leaping rider hits the water to the Saurian's right and behind it,
+ *  straight into the fight. Returns the rider (null if it could not spawn). */
+export function landRider(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  saurian: Entity,
+  st: SaurianFightState,
+): Entity | null {
+  st.riderLandsIn = undefined;
+  const victim = riderVictim(ctx, inst, saurian);
+  // Its right is a quarter turn clockwise of its facing; behind is the reverse.
+  const f = saurian.facing;
+  const rx = -Math.cos(f);
+  const rz = Math.sin(f);
+  const rider = spawnKitAdd(
+    ctx,
+    inst,
+    saurian,
+    HOWDAH_HEXCALLER_ID,
+    saurian.pos.x + rx * T.riderLandRight - Math.sin(f) * T.riderLandBack,
+    saurian.pos.z + rz * T.riderLandRight - Math.cos(f) * T.riderLandBack,
+    victim,
+  );
+  st.riderId = rider?.id ?? null;
+  if (rider)
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: rider.id,
+      targetId: rider.id,
+      school: 'physical',
+      fx: 'nova',
+      ability: SAURIAN_RIDER_LANDS,
+    });
   return rider;
+}
+
+/** Who the landing rider goes for: the Saurian's target, or (the Saurian
+ *  fell while it leapt) the nearest living player of the claim. */
+function riderVictim(ctx: SimContext, inst: InstanceSlot, saurian: Entity): Entity | null {
+  const target =
+    saurian.aggroTargetId !== null ? (ctx.entities.get(saurian.aggroTargetId) ?? null) : null;
+  if (target && !target.dead && target.kind === 'player') return target;
+  let best: Entity | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const p of claimPlayers(ctx, inst)) {
+    if (p.dead) continue;
+    const d = dist2d(p.pos, saurian.pos);
+    if (d < bestD) {
+      best = p;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+/** The rider in mid-leap: count it down and land it (alive or dead, the
+ *  Saurian threw it). */
+function tickRiderLeap(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  saurian: Entity,
+  st: SaurianFightState,
+): void {
+  if (st.riderLandsIn === undefined) return;
+  st.riderLandsIn -= DT;
+  if (st.riderLandsIn <= 1e-9) landRider(ctx, inst, saurian, st);
 }
 
 /** Enrage under a fifth of its health: a damage-done aura for the pull (the
@@ -272,13 +326,17 @@ function settleSaurianDeed(ctx: SimContext, inst: InstanceSlot, saurian: Entity)
     st.diedAt = ctx.time;
     clearCastIf(saurian, SAURIAN_TAIL_SWIPE, SAURIAN_STOMP);
   }
+  tickRiderLeap(ctx, inst, saurian, st);
   watchRider(ctx, st);
   const rider = st.riderId !== null ? ctx.entities.get(st.riderId) : undefined;
   if (st.riderDiedAt !== undefined) {
     if (Math.abs(st.riderDiedAt - st.diedAt) <= SAURIAN_DEED_WINDOW + 1e-9)
       grantClaimDeed(ctx, inst, SAURIAN_DEED);
     st.deedSettled = true;
-  } else if (!rider || ctx.time - st.diedAt > SAURIAN_DEED_WINDOW) {
+  } else if (
+    (!rider && st.riderLandsIn === undefined) ||
+    ctx.time - st.diedAt > SAURIAN_DEED_WINDOW
+  ) {
     st.deedSettled = true;
   }
 }
@@ -300,12 +358,13 @@ export function tickSaurian(
     return;
   }
   const st = saurianState(saurian);
+  tickRiderLeap(ctx, inst, saurian, st);
   watchRider(ctx, st);
   // Both clocks run through the other strike's bar: "every 12 s", "every 16 s".
   st.tailTimer -= DT;
   st.stompTimer -= DT;
   const share = saurian.maxHp > 0 ? saurian.hp / saurian.maxHp : 1;
-  if (!st.howdahBroken && share <= T.howdahAtHpPct) breakHowdah(ctx, inst, saurian, st);
+  if (!st.howdahBroken && share <= T.howdahAtHpPct) breakHowdah(ctx, saurian, st);
   if (!st.enraged && share <= T.enrageAtHpPct) enrageSaurian(ctx, saurian, st);
   const bar = saurian.castingAbility;
   if (bar === SAURIAN_TAIL_SWIPE || bar === SAURIAN_STOMP) {

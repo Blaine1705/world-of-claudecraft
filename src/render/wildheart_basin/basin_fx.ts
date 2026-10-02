@@ -30,9 +30,9 @@ import {
   GREAT_SAURIAN_ID,
   SAURIAN_ENRAGE,
   SAURIAN_HOWDAH_BREAK,
+  SAURIAN_RIDER_LANDS,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
-  SAURIAN_TUNING,
   ZULGAR_AVATAR,
   ZULGAR_ID,
 } from '../../sim/encounters/wildheart_basin/ids';
@@ -72,10 +72,7 @@ import {
   objectFill,
   POUNCE_TRAIL_SECONDS,
   SAURIAN_DRAW,
-  STOMP_SHOCK_SECONDS,
   saurianBackPoint,
-  saurianHipPoint,
-  stompShock,
   TOTEM_PULSE_SECONDS,
   totemPulse,
   VINE_ROOT_AURAS,
@@ -84,6 +81,7 @@ import {
 import type { BasinFxHost } from './basin_fx_host';
 import { setBasinJaguarEyesBurn } from './basin_kit';
 import { BASIN_WATER_WADERS } from './basin_water';
+import { SaurianFx } from './saurian_fx';
 
 const CAST_SLOTS = 10;
 const LANE_SLOTS = 4;
@@ -118,7 +116,7 @@ interface Ring {
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
   born: number;
-  kind: 'stomp' | 'pulse' | 'shock';
+  kind: 'pulse' | 'shock';
   /** A shock's reach (yards) and span (seconds). */
   radius: number;
   span: number;
@@ -135,7 +133,7 @@ interface VineSlot {
   since: number;
 }
 interface EnrageSlot {
-  sprite: THREE.Sprite;
+  sprite: THREE.Mesh;
   entityId: number;
 }
 
@@ -198,6 +196,8 @@ export class WildheartFx {
   private readonly trails = new Map<number, number>();
   private readonly kit: TelegraphKit;
   private readonly boss: BasinBossFx | null;
+  /** The Great Saurian's body: its water, its howdah, its clips. */
+  private readonly saurian: SaurianFx | null;
   private readonly smoke: ParticlePool;
   private readonly glow: ParticlePool;
   private readonly uTime = { value: 0 };
@@ -239,6 +239,7 @@ export class WildheartFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shake?: (amount: number) => void,
+    playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'wildheart-basin-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -312,7 +313,7 @@ export class WildheartFx {
       mesh.visible = false;
       mesh.renderOrder = floorVfxRenderOrder('encounter', 4);
       this.root.add(mesh);
-      this.rings.push({ mesh, mat, born: 0, kind: 'stomp', radius: 0, span: 1, alive: false });
+      this.rings.push({ mesh, mat, born: 0, kind: 'pulse', radius: 0, span: 1, alive: false });
     }
     // The sap beams: a cylinder along +y, oriented each frame.
     const beamGeo = new THREE.CylinderGeometry(0.16, 0.16, 1, 8, 1, true).translate(0, 0.5, 0);
@@ -359,25 +360,29 @@ export class WildheartFx {
       this.root.add(mesh, glow);
       this.vines.push({ mesh, glow, entityId: -1, since: 0 });
     }
-    // The enrage's breathing red glow.
-    const enrageMat = new THREE.SpriteMaterial({
+    // The enrage's breathing red glow, pooled flat on the water round it.
+    const enrageMat = new THREE.MeshBasicMaterial({
       map: radialGlowTexture(),
       color: 0xff3a24,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.55,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       name: 'wildheartEnrageGlow',
     });
     this.materials.push(enrageMat);
+    const enrageGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+    this.geometries.push(enrageGeo);
     for (let i = 0; i < ENRAGE_SLOTS; i++) {
-      const sprite = new THREE.Sprite(enrageMat);
+      const sprite = new THREE.Mesh(enrageGeo, enrageMat);
       sprite.visible = false;
+      sprite.renderOrder = floorVfxRenderOrder('encounter', 1);
       this.root.add(sprite);
       this.enrages.push({ sprite, entityId: -1 });
     }
     // The three bosses: built under this root before the gated attach.
     this.boss = world ? new BasinBossFx(this.bossHost(), world) : null;
+    this.saurian = world ? new SaurianFx(this.bossHost(), world, playGesture) : null;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -456,7 +461,7 @@ export class WildheartFx {
     slot.kind = kind;
     slot.born = this.clock;
     slot.radius = 0;
-    slot.span = kind === 'stomp' ? STOMP_SHOCK_SECONDS : TOTEM_PULSE_SECONDS;
+    slot.span = TOTEM_PULSE_SECONDS;
     (slot.mat.uniforms.uColor.value as THREE.Color).setHex(color);
     slot.mesh.position.set(x, this.groundY(x, z) + 0.14, z);
     slot.mesh.visible = true;
@@ -482,120 +487,13 @@ export class WildheartFx {
     if (!src) return false;
     const { x, z } = src.pos;
     const gy = this.groundY(x, z);
-    const scale = src.scale || 1;
     switch (ability) {
-      case SAURIAN_STOMP: {
-        this.ring('stomp', x, z, 0xfff0c8);
-        this.ring('stomp', x, z, 0xb67bff);
-        // Dust and water thrown up all round its feet.
-        const wet = gy < 0.6;
-        this.puff(x, gy + 0.5, z, 70, {
-          speed: 9,
-          up: 2,
-          life: 1.6,
-          size: [2.2, 6.5],
-          color: wet ? [0.88, 0.95, 0.94] : [0.62, 0.55, 0.42],
-          alpha: 0.7,
-          drag: 2.2,
-          radius: SAURIAN_TUNING.stompRadius * 0.55,
-          dir: [0, 0.5, 0],
-          spread: 1,
-        });
-        this.puff(x, gy + 0.3, z, 30, {
-          speed: 3,
-          up: 7,
-          life: 1.1,
-          size: [0.4, 0.15],
-          color: wet ? [0.85, 0.95, 1] : [0.75, 0.62, 0.42],
-          alpha: 0.9,
-          gravity: 14,
-          drag: 0.3,
-          radius: SAURIAN_TUNING.stompRadius * 0.4,
-          glow: wet,
-        });
-        if (!this.reducedMotion()) this.shake?.(0.55);
-        return true;
-      }
-      case SAURIAN_TAIL_SWIPE: {
-        // A sweep of dust and spray across the rear cone, flung outward.
-        const [hx, , hz] = saurianHipPoint(src.pos, src.facing, scale);
-        const rear = src.facing + Math.PI;
-        const half = (SAURIAN_TUNING.tailArcDeg * Math.PI) / 360;
-        for (let k = 0; k < 9; k++) {
-          const a = rear - half + (2 * half * k) / 8;
-          const r = SAURIAN_TUNING.tailRange * (0.55 + 0.4 * this.rand());
-          const px = hx + Math.sin(a) * r;
-          const pz = hz + Math.cos(a) * r;
-          const tx = Math.cos(a);
-          const tz = -Math.sin(a);
-          this.puff(px, this.groundY(px, pz) + 0.6, pz, 6, {
-            speed: 7,
-            up: 1.5,
-            life: 1.1,
-            size: [1.6, 4.5],
-            color: gy < 0.6 ? [0.86, 0.94, 0.93] : [0.6, 0.54, 0.42],
-            alpha: 0.6,
-            dir: [tx + Math.sin(a) * 0.6, 0.3, tz + Math.cos(a) * 0.6],
-            spread: 0.4,
-          });
-        }
-        if (!this.reducedMotion()) this.shake?.(0.25);
-        return true;
-      }
-      case SAURIAN_HOWDAH_BREAK: {
-        const [bx, by, bz] = saurianBackPoint(src.pos, scale);
-        // The flash, the splinters, the torn banners, the dust of the fall.
-        this.puff(bx, by, bz, 10, {
-          speed: 2,
-          life: 0.5,
-          size: [5, 11],
-          color: [1, 0.78, 0.45],
-          alpha: 0.9,
-          glow: true,
-        });
-        this.puff(bx, by, bz, 60, {
-          speed: 13,
-          up: 6,
-          life: 1.6,
-          size: [0.5, 0.35],
-          color: [0.55, 0.4, 0.22],
-          alpha: 1,
-          gravity: 16,
-          drag: 0.4,
-        });
-        this.puff(bx, by + 1, bz, 26, {
-          speed: 6,
-          up: 3,
-          life: 2.6,
-          size: [1.2, 0.8],
-          color: [0.64, 0.16, 0.13],
-          alpha: 1,
-          gravity: 3,
-          drag: 0.9,
-        });
-        this.puff(bx, by - 2, bz, 30, {
-          speed: 4,
-          life: 1.8,
-          size: [2.5, 6],
-          color: [0.7, 0.62, 0.48],
-          alpha: 0.55,
-        });
-        if (!this.reducedMotion()) this.shake?.(0.35);
-        return true;
-      }
-      case SAURIAN_ENRAGE: {
-        const [bx, by, bz] = saurianBackPoint(src.pos, scale);
-        this.puff(bx, by, bz, 40, {
-          speed: 6,
-          up: 3,
-          life: 1.4,
-          size: [2.5, 7],
-          color: [1, 0.32, 0.2],
-          alpha: 0.7,
-          glow: true,
-        });
-        return true;
-      }
+      case SAURIAN_STOMP:
+      case SAURIAN_TAIL_SWIPE:
+      case SAURIAN_HOWDAH_BREAK:
+      case SAURIAN_ENRAGE:
+      case SAURIAN_RIDER_LANDS:
+        return this.saurian?.handleEvent(ev, src) ?? false;
       case WILDHEART_TOTEM_PULSE: {
         this.ring('pulse', x, z, 0xb8e070);
         this.puff(x, gy + 1.5, z, 10, {
@@ -649,6 +547,7 @@ export class WildheartFx {
       if (this.bossShown) {
         this.bossShown = false;
         this.boss?.hideAll();
+        this.saurian?.hideAll();
       }
       this.smoke.update(this.clock);
       this.glow.update(this.clock);
@@ -665,6 +564,7 @@ export class WildheartFx {
     this.paintWaders();
     this.bossShown = true;
     this.boss?.update(dt, this.clock);
+    this.saurian?.update(dt, this.clock);
     setBasinJaguarEyesBurn(jaguarEyesBurn(this.zulgarState, this.clock));
     this.smoke.update(this.clock);
     this.glow.update(this.clock);
@@ -791,11 +691,7 @@ export class WildheartFx {
         continue;
       }
       const look =
-        r.kind === 'stomp'
-          ? stompShock(elapsed)
-          : r.kind === 'pulse'
-            ? totemPulse(elapsed)
-            : shockRingLook(elapsed, r.radius, r.span);
+        r.kind === 'pulse' ? totemPulse(elapsed) : shockRingLook(elapsed, r.radius, r.span);
       r.mesh.scale.setScalar(Math.max(0.01, look.radius));
       r.mat.uniforms.uAlpha.value = look.alpha;
     }
@@ -863,19 +759,31 @@ export class WildheartFx {
       const scale = e.scale || 1;
       const k = enrageGlow(this.clock);
       const h = SAURIAN_DRAW.height * scale;
-      s.sprite.position.set(e.pos.x, e.pos.y + h * 0.5, e.pos.z);
-      s.sprite.scale.set(h * 1.6 * k, h * 1.2 * k, 1);
-      // Red steam rolling off its back.
-      if (this.rand() < dt * 10) {
+      // A blood-red glow pooled on the water round its feet (never a card
+      // standing through its body), embers and red steam boiling off its back.
+      s.sprite.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z) + 0.4, e.pos.z);
+      s.sprite.rotation.y = e.facing;
+      s.sprite.scale.set(h * 1.1 * k, 1, h * 2.1 * k);
+      if (this.rand() < dt * 14) {
         const [bx, by, bz] = saurianBackPoint(e.pos, scale);
         this.puff(bx, by, bz, 2, {
           speed: 1.2,
-          up: 2.2,
-          life: 1.8,
-          size: [1.5, 4.5],
-          color: [0.9, 0.3, 0.22],
-          alpha: 0.35,
-          radius: h * 0.25,
+          up: 2.6,
+          life: 1.9,
+          size: [1.6, 4.8],
+          color: [0.85, 0.24, 0.18],
+          alpha: 0.32,
+          radius: h * 0.28,
+        });
+        this.puff(bx, by - h * 0.15, bz, 3, {
+          speed: 1.6,
+          up: 3.4,
+          life: 1.4,
+          size: [0.28, 0.08],
+          color: [1, 0.42, 0.18],
+          alpha: 1,
+          radius: h * 0.32,
+          glow: true,
         });
       }
     }
@@ -925,6 +833,7 @@ export class WildheartFx {
     let basin = false;
     let zulgar: 'idle' | 'fight' | 'hunt' = 'idle';
     this.boss?.beginScan();
+    this.saurian?.beginScan();
     for (const e of world.entities.values()) {
       if (this.boss?.scanEntity(e)) basin = true;
       if (e.kind === 'player') {
@@ -937,6 +846,7 @@ export class WildheartFx {
       }
       if (e.templateId === GREAT_SAURIAN_ID) {
         basin = true;
+        this.saurian?.scanSaurian(e);
         if (!e.dead && this.waders.length < 4) this.waders.push(e);
         if (!e.dead && hasAura(e, SAURIAN_ENRAGE)) this.claimEnrage(e);
       }
@@ -969,6 +879,7 @@ export class WildheartFx {
       slot.castId = castId;
       slot.group.visible = true;
     }
+    this.saurian?.endScan();
     this.inBasin = basin || this.clouds.some((c) => c.objectId >= 0);
     this.zulgarState = zulgar;
   }
@@ -1030,6 +941,10 @@ export class WildheartFx {
     if (this.boss) {
       const boss = this.boss;
       attempt(() => boss.dispose());
+    }
+    if (this.saurian) {
+      const saurian = this.saurian;
+      attempt(() => saurian.dispose());
     }
     for (const g of this.geometries) attempt(() => g.dispose());
     for (const m of this.materials) attempt(() => m.dispose());

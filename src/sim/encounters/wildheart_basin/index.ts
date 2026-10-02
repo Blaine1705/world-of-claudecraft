@@ -125,9 +125,8 @@ function saurianTrigger(ctx: SimContext, inst: InstanceSlot, what: string): stri
   const st = saurianState(saurian, false);
   if (what === 'howdah') {
     if (st.howdahBroken) return 'The howdah is already broken.';
-    return breakHowdah(ctx, inst, saurian, st)
-      ? 'The howdah breaks: the Howdah Hexcaller jumps down.'
-      : 'The howdah breaks.';
+    breakHowdah(ctx, saurian, st);
+    return 'The howdah breaks: the Howdah Hexcaller leaps down.';
   }
   if (what === 'enrage') {
     if (!st.enraged) enrageSaurian(ctx, saurian, st);

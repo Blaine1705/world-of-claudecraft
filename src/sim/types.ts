@@ -4718,6 +4718,9 @@ export interface SaurianFightState {
   howdahBroken: boolean;
   /** The rider that jumped down, while it lives. */
   riderId: number | null;
+  /** Seconds until the rider, mid-leap off the broken howdah, lands (absent
+   *  once it has, or before the break). */
+  riderLandsIn?: number;
   enraged: boolean;
   /** Mechanic casts started (the deterministic salt). */
   casts: number;

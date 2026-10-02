@@ -128,6 +128,7 @@ import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_f
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import { FOUNDRY_CREATURE_LOOKS } from './foundry_creature_looks';
+import type { MeshToggleDef } from './gesture_mesh_toggles';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 
@@ -430,6 +431,12 @@ export interface VisualDef {
    *  triggerAttack seam a stance swap rides): a boss's gauge needle, armour
    *  plates that flip face. See bone_dials.ts for the contract. */
   dials?: readonly BoneDialDef[];
+  /** Mesh nodes hidden or shown by presentation gestures (the same triggerAttack
+   *  seam): the Great Saurian's howdah once it breaks. See gesture_mesh_toggles.ts. */
+  meshToggles?: readonly MeshToggleDef[];
+  /** One-shot clips a plain auto-attack never cuts while they play (a set-piece
+   *  like the howdah breaking lands in full; the swing it would show is skipped). */
+  oneShotsHoldAttacks?: readonly string[];
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and

@@ -38,6 +38,10 @@ export const SAURIAN_KNOCKDOWN = 'wildheart_saurian_knockdown';
  *  `nova` spellfx on the Saurian; the renderer drops the howdah from the
  *  model while the Saurian stays under half health or fights on). */
 export const SAURIAN_HOWDAH_BREAK = 'wildheart_saurian_howdah_break';
+/** The Howdah Hexcaller hits the water behind the Saurian's right flank (a
+ *  `nova` spellfx on the rider): the model's HowdahBreak clip throws its
+ *  render-only rider there, and the real one takes over on this beat. */
+export const SAURIAN_RIDER_LANDS = 'wildheart_saurian_rider_lands';
 /** The Saurian's Enrage under a fifth of its health (a damage-done aura). */
 export const SAURIAN_ENRAGE = 'wildheart_saurian_enrage';
 
@@ -69,6 +73,14 @@ export const SAURIAN_TUNING = {
   knockdown: 1,
   /** Howdah Rider: the howdah breaks at half health. */
   howdahAtHpPct: 0.5,
+  /** Seconds from the break to the rider landing (the HowdahBreak clip's
+   *  leap: it leaves the saddle at 0.9 s and lands at 1.8 s). */
+  riderLandDelay: 1.8,
+  /** Where it lands, in yards from the Saurian's centre at its drawn size:
+   *  to its right and behind (the clip's landing point, clear of the tail's
+   *  root and the forefeet). */
+  riderLandRight: 5.5,
+  riderLandBack: 4.9,
   /** Enrage under a fifth of its health: 30 percent more damage. */
   enrageAtHpPct: 0.2,
   enrageDamage: 0.3,

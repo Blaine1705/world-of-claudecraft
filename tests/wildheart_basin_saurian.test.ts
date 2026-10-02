@@ -11,6 +11,7 @@ import {
   HOWDAH_HEXCALLER_ID,
   SAURIAN_DEED,
   SAURIAN_DEED_WINDOW,
+  SAURIAN_TUNING,
 } from '../src/sim/encounters/wildheart_basin';
 import type { Entity } from '../src/sim/types';
 import {
@@ -34,6 +35,9 @@ function pull(f: Fight): { saurian: Entity; rider: Entity } {
   tick(f);
   f.sim.chat('/dev wildheart trigger howdah', f.tank.id);
   tick(f);
+  // Mid-leap: the rider lands on the HowdahBreak clip's beat, not at the break.
+  expect(live(f, HOWDAH_HEXCALLER_ID)).toHaveLength(0);
+  run(f, SAURIAN_TUNING.riderLandDelay);
   const [rider] = live(f, HOWDAH_HEXCALLER_ID);
   if (!rider) throw new Error('no rider');
   return { saurian, rider };
@@ -84,6 +88,25 @@ describe('Toppled Titan', () => {
     f.sim.ctx.handleDeath(rider, f.tank);
     run(f, 5);
     f.sim.ctx.handleDeath(saurian, f.tank);
+    tick(f);
+    expect(earned(f, f.tank, SAURIAN_DEED)).toBe(true);
+  });
+
+  it('the Saurian falls while its rider is mid-leap: it still lands, and counts', () => {
+    const f = fight('normal', 3, 'mage', [GREAT_SAURIAN_ID]);
+    const saurian = boss(f, GREAT_SAURIAN_ID);
+    put(f, saurian, -18, -109);
+    put(f, f.tank, -18, -103);
+    for (const p of f.others) put(f, p, -30, -100);
+    engage(f, saurian, 1e6);
+    tick(f);
+    f.sim.chat('/dev wildheart trigger howdah', f.tank.id);
+    tick(f);
+    f.sim.ctx.handleDeath(saurian, f.tank);
+    run(f, SAURIAN_TUNING.riderLandDelay);
+    const [rider] = live(f, HOWDAH_HEXCALLER_ID);
+    expect(rider).toBeDefined();
+    f.sim.ctx.handleDeath(rider, f.tank);
     tick(f);
     expect(earned(f, f.tank, SAURIAN_DEED)).toBe(true);
   });

@@ -164,7 +164,15 @@ export class RiftDeathZoneVisuals {
     this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
     this.templeFx = new TempleFx(scene, groundY, world, compileGate);
     this.foundryFx = new FoundryFx(scene, groundY, world, compileGate);
-    this.wildheartFx = new WildheartFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.wildheartFx = new WildheartFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.foundryCreatures = new FoundryCreatureFx(
       scene,
       groundY,

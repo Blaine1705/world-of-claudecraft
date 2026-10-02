@@ -338,6 +338,8 @@ describe('/dev wildheart trigger: every Saurian mechanic fires on demand', () =>
       ).toBe(false);
       sim.tick();
     }
+    // The rider lands on the HowdahBreak clip's beat.
+    for (let i = 0; i < 40; i++) sim.tick();
     expect(
       inst.mobIds.some((id) => sim.ctx.entities.get(id)?.templateId === 'howdah_hexcaller'),
     ).toBe(true);

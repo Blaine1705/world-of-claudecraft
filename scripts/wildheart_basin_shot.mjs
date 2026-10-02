@@ -121,6 +121,57 @@ const SHOTS = [
     hud: true,
     wait: 150,
   },
+  // ---- the Great Saurian's Blender body: its clips' contact frames ----
+  {
+    id: 'saurio_cuerpo_palanquin',
+    stage: ['great_saurian', 22, PI * 0.5],
+    cmds: ['/dev wildheart trigger howdah'],
+    cmdWait: 60,
+    pitch: 0.22,
+    dist: 30,
+    hud: true,
+    burst: [500, 950, 1250, 1600, 1900, 2600, 3800],
+  },
+  {
+    id: 'saurio_cuerpo_pisoton',
+    stage: ['great_saurian', 20, PI * 0.35],
+    cmds: ['/dev wildheart trigger stomp'],
+    cmdWait: 60,
+    pitch: 0.3,
+    dist: 34,
+    hud: true,
+    burst: [700, 1500, 2050, 2200, 2450, 2900],
+  },
+  {
+    id: 'saurio_cuerpo_coletazo',
+    stage: ['great_saurian', 20, PI * 0.5],
+    cmds: ['/dev wildheart trigger tail'],
+    cmdWait: 60,
+    pitch: 0.42,
+    dist: 36,
+    hud: true,
+    burst: [600, 900, 1000, 1120, 1300, 1700],
+  },
+  {
+    id: 'saurio_cuerpo_furia',
+    stage: ['great_saurian', 20, PI * 0.4],
+    cmds: ['/dev wildheart trigger enrage'],
+    cmdWait: 60,
+    pitch: 0.3,
+    dist: 32,
+    hud: true,
+    burst: [500, 900, 1400, 2000],
+  },
+  {
+    id: 'saurio_cuerpo_muerte',
+    stage: ['great_saurian', 24, PI * 0.5],
+    cmds: ['/dev wildheart kill saurian'],
+    cmdWait: 60,
+    pitch: 0.3,
+    dist: 34,
+    hud: true,
+    burst: [800, 1800, 2750, 2950, 3400, 4600],
+  },
   {
     id: 'saurio_enfurecido',
     stage: ['great_saurian', 14, PI * 0.5],
@@ -552,11 +603,13 @@ async function main() {
         }
         await sleep(1400);
       }
+      let cmdAt = Date.now();
       for (const c of shot.cmds ?? []) {
         await page.evaluate(() => {
           window.__game.world.player.devNoAggro = false;
         });
         await page.evaluate((cmd) => window.__game.world.chat(cmd), c);
+        cmdAt = Date.now();
         await sleep(shot.cmdWait ?? 1300);
       }
       if (shot.placeMobAfter) {
@@ -593,6 +646,17 @@ async function main() {
         input.camPitch = s.pitch;
         input.camDist = s.dist;
       }, shot);
+      // A burst: frames at fixed offsets (ms) after the last command, for the
+      // clip contact frames (the howdah bursting at 0.9 s, the rider at 1.8 s).
+      if (shot.burst) {
+        for (const at of shot.burst) {
+          await sleep(Math.max(0, cmdAt + at - Date.now()));
+          const file = path.join(OUT, `${PREFIX}${shot.id}_${at}.png`);
+          await page.screenshot({ path: file });
+          console.log('SHOT', file);
+        }
+        continue;
+      }
       await sleep(shot.wait ?? 2600);
       if (shot.map) {
         await page.keyboard.press('KeyM');

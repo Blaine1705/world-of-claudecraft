@@ -842,6 +842,10 @@ const RENDER_PURE_CORES = [
   // The basin's three boss encounters: cast specs from the sim tuning, aura
   // dressing, the spirit cord, the pods' swell and the seeds' arc.
   'src/render/wildheart_basin/basin_boss_fx_core.ts',
+  // The Great Saurian's Blender body (its measured model facts and clip beats)
+  // and its body effects' plan (the beats, the tail sweep, the splash curves).
+  'src/render/wildheart_basin/saurian_model_core.ts',
+  'src/render/wildheart_basin/saurian_fx_core.ts',
   'src/render/drowned_temple/temple_shore_core.ts',
   'src/render/drowned_temple/temple_fx_core.ts',
   'src/render/stormbrass_foundry/foundry_plan_core.ts',
