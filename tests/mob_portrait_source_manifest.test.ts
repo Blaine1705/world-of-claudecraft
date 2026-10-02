@@ -113,8 +113,11 @@ describe('mob portrait source manifest', () => {
     // finale's Knellwyrm. 323: the Sunken Bastion fifth pass's two encounter
     // bodies (the Turnkey's Iron Cage and Ossick's Drowned Anchor). 337: the
     // Stormbrass Foundry's fourteen (its four bosses, the Gantry Hauler, Tock's
-    // Half-Built Frame and the eight trash bodies).
-    expect(liveIds).toHaveLength(337);
+    // Half-Built Frame and the eight trash bodies). 347: the Wildheart Basin
+    // rework's ten (the Great Saurian and its Howdah Hexcaller, the Fanglord's
+    // Great Jaguar, the Gorgebloom and its Thorn Sprout, and five trash bodies:
+    // raptor, toad, Snarlvine Lasher, Totem-Binder and its totem).
+    expect(liveIds).toHaveLength(347);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
