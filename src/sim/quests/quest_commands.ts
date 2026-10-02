@@ -81,6 +81,7 @@ export function computeQuestState(
   if (questsDone.has(questId) && !quest.repeatable) return 'done';
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
+  if (quest.maxLevel && playerLevel > quest.maxLevel) return 'unavailable';
   if (quest.retired) return 'unavailable';
   // Class-locked quest (the paladin-only Divine Tome chain): invisible to any
   // other class. A missing class fails closed so a class-less caller never opens it.

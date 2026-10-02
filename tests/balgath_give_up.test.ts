@@ -20,7 +20,7 @@ import {
   WARPATH_TETHER_MARCH_MARGIN,
   warpathGiveUp,
 } from '../src/sim/mob/warpath';
-import { MUSTER_SHARDPIKE_ID } from '../src/sim/muster_pike';
+import { MUSTER_PIKE_MAX_LEVEL, MUSTER_SHARDPIKE_ID } from '../src/sim/muster_pike';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MobTemplate, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -64,7 +64,8 @@ function place(sim: Sim, e: Entity, x: number, z: number): void {
 /** Balgath in his bed, a godded level 20 standing off it, and the pull opened. */
 function pulled(opts: { pike?: boolean } = {}) {
   const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true, world: WORLD });
-  sim.setPlayerLevel(20);
+  // A pike bearer is a level 19 at most: the rack turns a level 20 away (muster_pike.ts).
+  sim.setPlayerLevel(opts.pike ? MUSTER_PIKE_MAX_LEVEL : 20);
   // Godded, or he kills the lone tester and every rule below is measured on a corpse.
   inner(sim).setGm(sim.playerId, true);
   const player = sim.player;

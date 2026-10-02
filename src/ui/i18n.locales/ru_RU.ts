@@ -1397,6 +1397,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Нажмите {key} или щёлкните по стойке, чтобы взять осколочную пику',
   'hudChrome.shardpike.promptTakePikeClick': 'Щёлкните по стойке, чтобы взять осколочную пику',
   'hudChrome.shardpike.promptTakePikeTap': 'Коснитесь стойки, чтобы взять осколочную пику',
+  'hudChrome.shardpike.promptPikeLevelCap': 'Ополчение выдаёт копья только новобранцам до {level}-го уровня включительно',
   'hudChrome.shardpike.braceTooltipLean':
     'Воткните пятку в землю и поднимите острие. Наклоняйте клавишами шага в сторону или поворота либо удерживайте две клавиши над лучом: он сам уходит в сторону, и каждый удар великана его подбивает. Удержите его вне рельсов {set} с, и пика встанет. Нужна твёрдая земля, и не из седла.',
   'hudChrome.shardpike.promptLabel': 'Указание Осколочной пики',

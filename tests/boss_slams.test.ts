@@ -77,6 +77,14 @@ describe('slam tuning', () => {
     expect(slams().cleave.windup).toBeGreaterThanOrEqual(1);
   });
 
+  it('gives the frontal cleave the longest read of his aimed attacks', () => {
+    // Owner playtest: the frontal came too fast to get out of. 2.0 s is a third longer than
+    // the 1.5 s it shipped at and still under the 2.2 s boulder, the slowest thing he does
+    // at range, so the one jump check in the fight reads well ahead of its arm.
+    expect(slams().cleave.windup).toBe(2);
+    expect(slams().cleave.windup).toBeGreaterThan(slams().hammer.windup);
+  });
+
   it('keeps the hammer small enough to step out of', () => {
     // It is aimed AT a player, so it is only fair while the footprint is something a few
     // seconds of running beats. Wider than his Barrow Smash and it is just a second one.
@@ -344,6 +352,10 @@ describe('the aimed slams in a live fight', () => {
       player.pos.z = boss.pos.z + Math.cos(aim) * 10;
       player.pos.y = groundHeight(player.pos.x, player.pos.z, sim.cfg.seed) + feetAboveGround;
       player.onGround = feetAboveGround <= 0.01;
+      // HELD, so no fall builds up: gravity left in vy across a 2 s windup drops a held
+      // jumper a yard and a half in the tick the arm lands, which measured the fixture, not
+      // the mechanic.
+      player.vy = 0;
       player.prevPos = { ...player.pos };
     };
     const hpBefore = player.hp;
@@ -370,6 +382,38 @@ describe('the aimed slams in a live fight', () => {
   it('cuts down a player who stood in the arc', () => {
     const r = rideOutCleave(0);
     expect(r.hit, 'standing in a 120-degree arc cost nothing').toBe(true);
+  });
+
+  it('holds his knockback proc for the whole cleave windup, so a jump is never undone', () => {
+    // The Backhand (30% on his melee) shoves AND grounds its victim. Landing it on a player
+    // mid-jump in the arc turned a correct read into a hit. The windup opens the same escape
+    // window his telegraphed rings already open (rift_escape_window.ts): the proc's roll is
+    // still drawn, only the shove is skipped, until the arm has come across.
+    const ring = waitForRing(CLEAVE_ABILITY, 200);
+    expect(ring, 'he never threw a cleave').not.toBeNull();
+    expect(boss.escapeWindowUntil ?? 0).toBeGreaterThanOrEqual(
+      sim.time + slams().cleave.windup - 0.1,
+    );
+  });
+
+  it('draws the cleave for its whole windup and lands it only when the windup is spent', () => {
+    // The telegraph's duration IS the read the raid gets; the arm must not come across a
+    // tick before the ring it drew has run out.
+    const ring = waitForRing(CLEAVE_ABILITY, 200);
+    expect(ring, 'he never threw a cleave').not.toBeNull();
+    expect((ring?.ev as { duration?: number } | undefined)?.duration).toBe(slams().cleave.windup);
+    let landedAfter = -1;
+    for (let i = 1; i <= 20 * 4 && landedAfter < 0; i++) {
+      for (const ev of tickAlive()) {
+        if (
+          ev.type === 'spellfxAt' &&
+          ev.fx === 'nova' &&
+          (ev as { ability?: string }).ability === CLEAVE_ABILITY
+        )
+          landedAfter = i / 20;
+      }
+    }
+    expect(landedAfter).toBeCloseTo(slams().cleave.windup, 1);
   });
 
   it('misses a player who jumped it, and carries them instead', () => {

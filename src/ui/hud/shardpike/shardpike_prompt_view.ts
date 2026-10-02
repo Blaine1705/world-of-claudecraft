@@ -15,7 +15,11 @@
 // Pure: no DOM, no clock, no i18n. It returns keys and values the painter resolves, which is
 // also what lets a Vitest assert the priority ladder directly.
 
-import { isShardpikeItem, MUSTER_SHARDPIKE_ID } from '../../../sim/lance_balance_core';
+import {
+  isShardpikeItem,
+  MUSTER_PIKE_MAX_LEVEL,
+  MUSTER_SHARDPIKE_ID,
+} from '../../../sim/lance_balance_core';
 import type { LanceGuidanceView, LanceTrialView } from '../../../world_api';
 import type { TranslationKey } from '../../i18n';
 import { SHARDPIKE_DANGER_BALANCE } from './shardpike_bar_view';
@@ -64,6 +68,8 @@ export interface ShardpikePromptInput {
   interactKey?: string;
   /** A touch layout: there is no key to name and nothing to click, only a tap. */
   touch?: boolean;
+  /** The player's level: past MUSTER_PIKE_MAX_LEVEL the rack has nothing to lend them. */
+  playerLevel?: number;
 }
 
 const HIDDEN: ShardpikePromptState = {
@@ -112,6 +118,15 @@ export function shardpikePromptState(input: ShardpikePromptInput): ShardpikeProm
     // Rung 0, the only one without a pike: standing at the muster's rack empty-handed, the
     // one thing to do is take one, and a rack that looks like scenery never says so itself.
     if (!input.rackInReach || input.dead) return HIDDEN;
+    if ((input.playerLevel ?? 0) > MUSTER_PIKE_MAX_LEVEL) {
+      return {
+        visible: true,
+        tone: 'idle',
+        bodyKey: 'hudChrome.shardpike.promptPikeLevelCap',
+        values: { level: String(MUSTER_PIKE_MAX_LEVEL) },
+        thrusts: null,
+      };
+    }
     const key = input.touch ? '' : (input.interactKey ?? '');
     let bodyKey: TranslationKey = 'hudChrome.shardpike.promptTakePikeClick';
     if (input.touch) bodyKey = 'hudChrome.shardpike.promptTakePikeTap';

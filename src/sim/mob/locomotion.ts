@@ -1,3 +1,4 @@
+import { insideRingGap } from '../boss_ring_gap';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { deferHoardTerrify } from '../rift/hoard_control_casts';
 import { hasShadowCloak } from '../shadow_action_lock';
@@ -934,7 +935,7 @@ function fireAoePulse(
   mob: Entity,
   pulse: NonNullable<MobTemplate['aoePulse']>,
   origin?: Vec3,
-): void {
+): Set<number> {
   // A windup detonation blasts from the telegraphed ring center (origin); the
   // instant path (unstamped mobs) passes nothing and keeps the live position.
   const center = origin ?? mob.pos;
@@ -950,9 +951,15 @@ function fireAoePulse(
   // (the heroic_s x4 multiplier would otherwise cross that line).
   // Mob-invariant, so computed once outside the player loop.
   const capPulse = mobInRiftInstance(ctx, mob);
+  // A ring with a safe gap (boss_ring_gap.ts, the Barrow Smash): the gap is missed.
+  const gap = pulse.safeGap;
+  const struck = new Set<number>();
   for (const meta of ctx.players.values()) {
     const pe = ctx.entities.get(meta.entityId);
-    if (pe && !pe.dead && dist2d(pe.pos, center) <= pulse.radius) {
+    if (!pe || pe.dead) continue;
+    const d = dist2d(pe.pos, center);
+    if (d <= pulse.radius && !(gap && insideRingGap(d, pulse.radius, gap))) {
+      struck.add(pe.id);
       // Heroic scaling multiplies AFTER the draw so the rng stream is
       // identical across difficulties (mechanicDamageMult, difficulty.ts).
       let dmg = Math.round(ctx.rng.range(pulse.min, pulse.max) * (mob.mechanicDamageMult ?? 1));
@@ -961,8 +968,11 @@ function fireAoePulse(
       ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
     }
   }
-  // ...and everything else standing in it, for a template that opts in.
+  // ...and everything else standing in it, for a template that opts in. The gap is a
+  // refuge for the PLAYERS who read the telegraph: the muster's soldiers and the wildlife
+  // take the whole blast as before, so a fight over a picket still razes it.
   splashNearbyMobs(ctx, mob, center, pulse.radius, pulse.min, pulse.max, school, pulse.name);
+  return struck;
 }
 
 // The War Stomp slam, extracted verbatim from the driver for the same
@@ -1039,6 +1049,10 @@ function startRiftMechanicWindup(
     mob.pulseWindupX = mob.pos.x;
     mob.pulseWindupZ = mob.pos.z;
   }
+  // A template-declared telegrapher's ring also names its caster and its mechanic, so his
+  // own render layer can draw it as he means it (the Barrow Smash's safe gap,
+  // render/balgath_ring_fx.ts); a rift boss's ring stays the anonymous generic circle.
+  const named = MOBS[mob.templateId]?.telegraphedMechanics !== undefined;
   ctx.emit({
     type: 'spellfxAt',
     x: mob.pos.x,
@@ -1047,6 +1061,9 @@ function startRiftMechanicWindup(
     fx: 'runeCircle',
     radius,
     duration: RIFT_MECHANIC_WINDUP_SEC,
+    ...(named
+      ? { sourceId: mob.id, ability: kind === 'stomp' ? 'mob_stomp_windup' : 'mob_pulse_windup' }
+      : {}),
   });
   // Animate the windup, for a TEMPLATE-declared telegrapher only.
   //
@@ -1089,6 +1106,8 @@ function emitTelegraphedImpact(
   center: Vec3,
   radius: number,
   school: Aura['school'],
+  /** Only these players are punted, for a blast that is not a solid circle (the gap). */
+  only?: ReadonlySet<number>,
 ): void {
   if (MOBS[mob.templateId]?.telegraphedMechanics === undefined) return;
   // sourceId, so the renderer can identify the caster EXACTLY. It cannot be inferred
@@ -1111,7 +1130,7 @@ function emitTelegraphedImpact(
   // behind the telegraphed-mechanics gate, and both detonations already route through it
   // with the ring's true centre and radius, which is exactly what a launch needs. One
   // hook, both slams, and nothing else in the world can reach it.
-  launchFromSlam(ctx, mob, center, radius);
+  launchFromSlam(ctx, mob, center, radius, only);
 }
 
 // Tick the in-flight instant-mechanic windups and detonate at zero. Runs from
@@ -1155,13 +1174,15 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
           y: mob.pos.y,
           z: mob.pulseWindupZ ?? mob.pos.z,
         };
-        fireAoePulse(ctx, mob, pulse, center);
+        const struck = fireAoePulse(ctx, mob, pulse, center);
         emitTelegraphedImpact(
           ctx,
           mob,
           center,
           pulse.radius,
           (pulse.school ?? 'shadow') as Aura['school'],
+          // A gapped ring punts only whom it hit; whoever stood in the gap stays put.
+          pulse.safeGap ? struck : undefined,
         );
       }
       mob.swingTimer = Math.max(mob.swingTimer, RIFT_POST_MECHANIC_SWING_GAP_SEC);

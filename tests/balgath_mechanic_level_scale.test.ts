@@ -145,7 +145,8 @@ describe('the level curve', () => {
 
 describe('each mechanic, level 6 against level 20', () => {
   for (const [verb, name, seconds, gap = 8] of [
-    ['smash', 'Barrow Smash', 7],
+    // Inside the smash's solid disc: 8 yards out is its safe gap (sim/boss_ring_gap.ts).
+    ['smash', 'Barrow Smash', 7, 3],
     ['stomp', 'Shockwave Stomp', 7, 5],
     ['hammer', 'Foreman’s Hammer', 5],
     ['cleave', 'Barrow Cleave', 5],
@@ -216,10 +217,11 @@ describe('each mechanic, level 6 against level 20', () => {
 
 describe('the muster keeps its numbers', () => {
   it('a soldier in Barrow Smash is crushed exactly as before, whatever the level nearby', () => {
-    const w = world(20);
+    // Both inside the smash's solid disc, clear of its safe gap (sim/boss_ring_gap.ts).
+    const w = world(20, 3);
     const soldier = createMob(w.sim.nextId++, MOBS.muster_footman, 12, { x: 0, y: 0, z: 0 });
     w.sim.addEntity(soldier);
-    place(w.sim, soldier, LAIR.x - 4, LAIR.z);
+    place(w.sim, soldier, LAIR.x - 2, LAIR.z);
     w.sim.chat('/dev balgath smash', w.me.id);
     run(w.sim, 7);
     const onSoldier = w.hits.filter(

@@ -38,12 +38,22 @@ export const LANCE_FIXED_DAMAGE = 150;
 /**
  * Yards of reach on the thrust, measured from the Foreman's centre. Generous on purpose: he
  * is thirteen yards of granite, and at 14 the pikeman stood a step off the edge of his Barrow
- * Smash (12) and deep inside the sweep of his cleave (20). At 22 the thrust lands from outside
- * every area blow centred on him, which is where a player holding a balance beam for five
- * seconds needs to be standing.
+ * Smash (12) and deep inside the sweep of his cleave (20). At 22 the thrust landed from just
+ * outside every area blow centred on him; at 28 (owner call: more reach) the pikeman has room
+ * to give ground from the cleave's 20-yard edge while holding a balance beam for five seconds,
+ * and is still well inside the 60-yard guidance (lance_guidance.ts) that walks them in. The
+ * brace, the set and the window are untouched: reach changes where you stand, not the trial.
  * The HUD prompt, the reticle and the tooltip all read this constant.
  */
-export const LANCE_THRUST_RANGE = 22;
+export const LANCE_THRUST_RANGE = 28;
+
+/**
+ * The highest level the muster's rack lends a pike to (src/sim/muster_pike.ts). The fight is
+ * built on a level spread (mob/eye_ward.ts): the low levels open the eye window with the
+ * pike and the level 20s spend it, so a level 20 is turned away from the rack (owner call).
+ * Lives in the pure core because the HUD's rack prompt quotes it.
+ */
+export const MUSTER_PIKE_MAX_LEVEL = 19;
 
 /** Skerrit's own pike: the quest tool (content/zone2.ts, q_socketwrights_due). */
 export const SKERRITS_SHARDPIKE_ID = 'skerrits_shardpike';

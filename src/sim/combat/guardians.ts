@@ -207,8 +207,32 @@ function ownerTarget(ctx: SimContext, owner: Entity, melee: GuardianMelee): Enti
   if (!target || target.dead || target.id === owner.id) return null;
   if (!ctx.isHostileTo(owner, target)) return null;
   if (target.kind === 'mob' ? !target.inCombat : !owner.inCombat) return null;
-  if (Math.hypot(target.pos.x - melee.postX, target.pos.z - melee.postZ) > melee.leash) return null;
+  const anchor = guardAnchor(owner, melee);
+  if (Math.hypot(target.pos.x - anchor.x, target.pos.z - anchor.z) > melee.leash) return null;
   return target;
+}
+
+/** Where a melee guardian's leash is measured from: its post, or its owner when it follows. */
+function guardAnchor(owner: Entity, melee: GuardianMelee): { x: number; z: number } {
+  return melee.followOwner ? owner.pos : { x: melee.postX, z: melee.postZ };
+}
+
+/** A follower's place in the march: a stride to its side of the owner and half one behind. */
+const FOLLOW_SIDE = 1.6;
+const FOLLOW_BEHIND = 1.2;
+/** Close enough to its place in the march to stop walking. */
+const FOLLOW_SETTLE = 1.2;
+/** How much faster than its own pace a follower closes a gap it has fallen behind on. */
+const FOLLOW_CATCH_UP = 1.25;
+
+/** The follower's spot beside its owner: same convention as the Muster Standard's spawn
+ *  (right of a body facing `f` is (cos f, -sin f)). */
+export function followSlot(owner: Entity, side: number): { x: number; z: number } {
+  const f = owner.facing;
+  return {
+    x: owner.pos.x + Math.cos(f) * FOLLOW_SIDE * side - Math.sin(f) * FOLLOW_BEHIND,
+    z: owner.pos.z - Math.sin(f) * FOLLOW_SIDE * side - Math.cos(f) * FOLLOW_BEHIND,
+  };
 }
 
 /** The most height a melee guardian swings across (a ledge above or below is out of reach). */
@@ -243,7 +267,16 @@ function updateMeleeGuardian(
     dismissGuardian(ctx, guardian);
     return false;
   }
-  if (Math.hypot(owner.pos.x - melee.postX, owner.pos.z - melee.postZ) > melee.leash) {
+  if (melee.followOwner) {
+    // Left behind past the leash (a mount, a leap, a portal): rejoin at the owner's side
+    // rather than leave. Nothing about the standard changes; only where the body stands.
+    if (dist2d(guardian.pos, owner.pos) > melee.leash) {
+      const slot = followSlot(owner, melee.followSide ?? 1);
+      guardian.pos = ctx.groundPos(slot.x, slot.z);
+      guardian.prevPos = { ...guardian.pos };
+      guardian.facing = owner.facing;
+    }
+  } else if (Math.hypot(owner.pos.x - melee.postX, owner.pos.z - melee.postZ) > melee.leash) {
     dismissFromPost(ctx, guardian, owner, melee);
     return false;
   }
@@ -252,6 +285,18 @@ function updateMeleeGuardian(
   if (!target) {
     guardian.aggroTargetId = null;
     guardian.inCombat = false;
+    if (melee.followOwner) {
+      // Fall in beside the owner and keep pace; a gap opened by a run is closed a little
+      // faster than the owner moves, so the march never strings out behind them.
+      const slot = followSlot(owner, melee.followSide ?? 1);
+      const spot = { x: slot.x, y: guardian.pos.y, z: slot.z };
+      const gap = dist2d(guardian.pos, spot);
+      if (gap > FOLLOW_SETTLE) {
+        const pace = gap > 4 ? melee.moveSpeed * FOLLOW_CATCH_UP : melee.moveSpeed;
+        ctx.moveToward(guardian, spot, pace);
+      } else guardian.facing = owner.facing;
+      return true;
+    }
     const post = { x: melee.postX, y: guardian.pos.y, z: melee.postZ };
     if (dist2d(guardian.pos, post) > 1.2) ctx.moveToward(guardian, post, melee.moveSpeed);
     return true;

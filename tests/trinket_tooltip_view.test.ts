@@ -116,10 +116,10 @@ const EXPECTED: Record<string, { equip?: string; use?: string }> = {
     use: 'Use: Take the Shape of the Foreman for 15 sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain 50% armor and cannot be knocked back. Dismounts you. (2 min cooldown)',
   },
   muster_standard: {
-    use: 'Use: Plant a Muster Standard at your feet. For 15 sec, 2 muster soldiers run to your target and fight it in melee, each hitting every 2 sec for 15 to 21 (+35) Physical damage. They attack only your target, each has 35% of your maximum health, and they leave when the standard falls, when you die, or if you move more than 40 yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it. (2 min cooldown)',
+    use: 'Use: Plant a Muster Standard at your feet. For 15 sec, 2 muster soldiers march at your side and fight your target in melee, each hitting every 2 sec for 15 to 21 (+35) Physical damage. They attack only your target, and only once it is already in combat. Each has 35% of your maximum health. Left more than 40 yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it. (2 min cooldown)',
   },
   guttered_eye: {
-    use: 'Use: Channel for 3 sec: a beam 30 yd long bursts from you the way you face and deals 18 (+24) Arcane damage every 0.5 sec to up to 8 enemies in its path (252 to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power. (2 min cooldown)',
+    use: 'Use: Channel for 3 sec: a beam 30 yd long bursts from you the way you face and deals 45 (+24) Arcane damage every 0.5 sec to up to 8 enemies in its path (414 to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power. (2 min cooldown)',
   },
   barrowstone_heart: {
     equip: `Equip: When a hit would kill you, you turn to stone for 3 sec instead: you take no damage and cannot move or act, then return with ${n(1000)} health (20% of your maximum health). Can occur once every 3 min. Never in duels or arena matches, which end at the killing blow.`,

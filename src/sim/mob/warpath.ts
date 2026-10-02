@@ -273,6 +273,9 @@ function beginPhase(ctx: SimContext, mob: Entity, def: WarpathDef, phase: Warpat
     mob.warpathBlastAt = ctx.time + WARPATH_WRECK_FUSE_SEC;
     ctx.emit({
       type: 'spellfxAt',
+      // Named, so his own render layer draws it (render/balgath_ring_fx.ts).
+      sourceId: mob.id,
+      ability: WARPATH_WRECK_ABILITY,
       x: mob.pos.x,
       z: mob.pos.z,
       school: (def.wreck.school ?? 'physical') as Aura['school'],

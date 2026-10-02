@@ -99,11 +99,11 @@ export type TrinketUse =
    *  more armor and immunity to knockbacks. */
   | { kind: 'foremanShape'; duration: number; armorPct: number }
   /** Muster Standard: plant a standard; `soldiers` muster soldiers rally from it
-   *  for `duration`, run to your target and fight it in melee, swinging every
-   *  `attackInterval` sec for `min` to `max` (+ `coef` of Attack Power, the
+   *  for `duration`, march at your side and fight your target in melee, swinging
+   *  every `attackInterval` sec for `min` to `max` (+ `coef` of Attack Power, the
    *  higher of melee and ranged, snapshotted when planted) Physical damage. Each
-   *  has `hpShare` of your maximum health. They leave with the standard, on your
-   *  death, or when you go more than `leash` yd from it. */
+   *  has `hpShare` of your maximum health. Left more than `leash` yd behind they
+   *  rejoin you; they leave with the standard or on your death. */
   | {
       kind: 'musterStandard';
       duration: number;
@@ -446,8 +446,7 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
   // Balgath's five (combat/balgath_trinkets.ts). The numbers sit beside the
   // shipped trinkets and class kit they compete with: the soldiers' swing is the
   // hunter Stampede's shape (a flat range plus a small power share, snapshotted)
-  // on a longer cooldown and fewer bodies; the glare's per-tick hit is the
-  // Stormjar's per-charge scale spread over a 3 sec aimed channel.
+  // on a longer cooldown and fewer bodies.
   knucklebone_of_balgath: {
     cooldown: 120,
     use: { kind: 'foremanShape', duration: 15, armorPct: 50 },
@@ -467,6 +466,14 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
       moveSpeed: 7.5,
     },
   },
+  // The glare is budgeted against its sister, the Muster Standard: same boss, same item
+  // level, same 2 min cooldown, so the same base damage. Two soldiers swing 7.5 times each
+  // in their 15 sec for 18 on average: 270 to one target. The glare's six ticks of 45 are
+  // that 270, front-loaded into 3 sec and laid on everything in the line. It shipped at
+  // 18 a tick (108 in all), well under the 3 sec of ordinary casting the channel costs a
+  // level 20 caster, which is why it read as a trinket that did nothing (owner playtest).
+  // The Spell Power share stays the classic one for an area channel: 3 sec / 3.5 halved
+  // for hitting many, spread over six ticks (about 0.07, rounded up to 0.08).
   guttered_eye: {
     cooldown: 120,
     use: {
@@ -475,7 +482,7 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
       every: 0.5,
       length: 30,
       halfWidth: 1.25,
-      flat: 18,
+      flat: 45,
       coef: 0.08,
       maxTargets: 8,
     },

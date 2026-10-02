@@ -541,6 +541,7 @@ export const ko_KR: EnTranslations = {
       "promptTakePike": "{key} 키를 누르거나 무기 거치대를 클릭해 조각창을 집어라",
       "promptTakePikeClick": "무기 거치대를 클릭해 조각창을 집어라",
       "promptTakePikeTap": "무기 거치대를 탭해 조각창을 집어라",
+      "promptPikeLevelCap": "소집군은 레벨 {level} 이하의 신병에게만 창을 빌려줍니다",
       "promptHoldSteadyLean": "창을 버텨라: {left}와 {right}로 기울여라",
       "leanLeft": "왼쪽으로 기울이기",
       "leanRight": "오른쪽으로 기울이기",

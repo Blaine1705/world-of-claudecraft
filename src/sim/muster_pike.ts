@@ -1,7 +1,8 @@
 // The muster pike: a Shardpike LENT off the weapon rack at the command camp, for one fight.
 //
 // Skerrit's quest hands his own pike to a level 6 who walks into Fenbridge and asks. The
-// muster does it for anyone, any level, no quest: whoever walks up to the rack below the
+// muster does it for anyone of level 19 or lower, no quest (a level 20 is turned away:
+// MUSTER_PIKE_MAX_LEVEL): whoever walks up to the rack below the
 // Starfall Crater and takes one gets a Muster Shardpike in their hands (the same trial,
 // lance_trial.ts, reads both through isShardpikeItem). What makes it LENT rather than loot:
 //
@@ -28,7 +29,7 @@ import { MUSTER_PIKE_LEASH } from './content/mirefen_muster';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import { equipItem } from './items';
-import { isShardpikeItem, MUSTER_SHARDPIKE_ID } from './lance_balance_core';
+import { isShardpikeItem, MUSTER_PIKE_MAX_LEVEL, MUSTER_SHARDPIKE_ID } from './lance_balance_core';
 import { refreshModsForEquipmentChange } from './progression/talents';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -41,7 +42,12 @@ import {
   type ItemInstancePayload,
 } from './types';
 
-export { MUSTER_SHARDPIKE_ID };
+export { MUSTER_PIKE_MAX_LEVEL, MUSTER_SHARDPIKE_ID };
+
+/** The rack's refusal to a player over MUSTER_PIKE_MAX_LEVEL (English; re-localized by the
+ *  client's EXACT matcher, sim_i18n.ts 'error.musterPikeLevel'). */
+export const MUSTER_PIKE_LEVEL_REFUSAL =
+  'The muster lends its pikes only to recruits of level 19 or lower.';
 
 /** What a lent pike displaced, to be handed back when the muster takes it again. */
 export interface LentPikeRecord {
@@ -63,9 +69,10 @@ export function isLentGear(itemId: string | null | undefined): boolean {
 }
 
 /**
- * Take a pike from the rack. Any class, any level, no quest.
+ * Take a pike from the rack. Any class, level 19 or lower (MUSTER_PIKE_MAX_LEVEL), no quest.
  *
- * Refuses (with the player's own line) while dead, while a Shardpike is already in hand
+ * Refuses (with the player's own line) over the level cap, while dead, while a Shardpike is
+ * already in hand
  * (either one: Skerrit's quest pike drives the same trial, so a second would be clutter),
  * and when the bags cannot take the pike or the weapons it would displace.
  */
@@ -75,6 +82,10 @@ export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): b
   const { meta, e: p } = r;
   if (p.dead) {
     ctx.error(pid, "You can't do that while dead.");
+    return false;
+  }
+  if (p.level > MUSTER_PIKE_MAX_LEVEL) {
+    ctx.error(pid, MUSTER_PIKE_LEVEL_REFUSAL);
     return false;
   }
   if (isShardpikeItem(meta.equipment.mainhand)) {

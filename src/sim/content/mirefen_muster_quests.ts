@@ -12,7 +12,9 @@
 //      Foreman (the training effigy) while the drillmaster's mallet shakes the ground the
 //      way a real slam does, put the lantern in its eye out, then feel the plank hide come
 //      off under your own weapon. src/sim/muster_effigy.ts runs every part of it.
-//   3. A Chip Off the Foreman: the weekly. Help a raid bring Balgath down, then report
+//      Level 19 and under only (QuestDef.maxLevel): the rack lends its pikes to no one older.
+//   3. A Chip Off the Foreman: the weekly, open straight from the briefing so a level 20
+//      who skips the drill still has it. Help a raid bring Balgath down, then report
 //      to the Commander, once per weekly reset (QuestDef.weeklyReset). The kill counts
 //      for every contributor with the weekly in their log, not just the tagging party
 //      (src/sim/muster_trophy.ts).
@@ -26,6 +28,7 @@
 // same boss already pays (q_socketwrights_due, 900) with the zone's boss-quest purse
 // (q_deacon, 1000c).
 
+import { MUSTER_PIKE_MAX_LEVEL } from '../lance_balance_core';
 import type { QuestDef } from '../types';
 import { MUSTER_BOSS_TEMPLATE_ID, MUSTER_COMMANDER_NPC_ID } from './mirefen_muster';
 
@@ -49,7 +52,7 @@ export const MUSTER_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: MUSTER_COMMANDER_NPC_ID,
     text: 'Every spear I could spare is dug in around the Starfall Crater, $N, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.',
     completionText:
-      "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. Pikes first, $N, then everyone.",
+      "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, $N, then everyone.",
     objectives: [
       {
         type: 'interact',
@@ -68,7 +71,7 @@ export const MUSTER_QUESTS: Record<string, QuestDef> = {
     name: 'Pikes First',
     giverNpcId: MUSTER_COMMANDER_NPC_ID,
     turnInNpcId: MUSTER_COMMANDER_NPC_ID,
-    text: 'Talk is cheap and pikes are not. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, $N, and feel the difference.',
+    text: 'Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, $N, and feel the difference.',
     completionText:
       'You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.',
     objectives: [
@@ -96,6 +99,9 @@ export const MUSTER_QUESTS: Record<string, QuestDef> = {
     itemRewards: {},
     requiresQuest: MUSTER_SUMMONS_QUEST_ID,
     minLevel: 6,
+    // The rack lends its pikes to level 19 and below (muster_pike.ts), so a level 20 could
+    // never finish the first step: the drill is offered only to those it can teach.
+    maxLevel: MUSTER_PIKE_MAX_LEVEL,
   },
   [MUSTER_TROPHY_QUEST_ID]: {
     id: MUSTER_TROPHY_QUEST_ID,
@@ -116,7 +122,9 @@ export const MUSTER_QUESTS: Record<string, QuestDef> = {
     xpReward: 900,
     copperReward: 1000,
     itemRewards: {},
-    requiresQuest: MUSTER_PIKE_DRILL_QUEST_ID,
+    // Behind the briefing rather than the drill: the drill is level 19 and under, and a
+    // level 20 who can never take a pike is exactly who the raid needs on the kill.
+    requiresQuest: MUSTER_SUMMONS_QUEST_ID,
     minLevel: 6,
     suggestedPlayers: 10,
     repeatable: true,

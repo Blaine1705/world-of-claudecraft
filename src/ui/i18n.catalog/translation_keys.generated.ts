@@ -13405,6 +13405,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.shardpike.promptHoldSteadyLean'
   | 'hudChrome.shardpike.promptLabel'
   | 'hudChrome.shardpike.promptLanternOut'
+  | 'hudChrome.shardpike.promptPikeLevelCap'
   | 'hudChrome.shardpike.promptResetting'
   | 'hudChrome.shardpike.promptSealed'
   | 'hudChrome.shardpike.promptStrike'

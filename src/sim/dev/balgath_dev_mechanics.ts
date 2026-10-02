@@ -60,7 +60,8 @@ const DESCRIBE: Record<BalgathDevMechanic, string> = {
   burden: 'Barrow Burden: a shared soak on you (stack; alone it is lethal by design)',
   cleave: 'Barrow Cleave: a 120-degree arm sweep aimed at you (jump it)',
   hammer: "Foreman's Hammer: one fist on your spot (move)",
-  smash: 'Barrow Smash: the 12 yd ring round his feet (walk out)',
+  smash:
+    'Barrow Smash: the 12 yd ring round his feet (walk out, or step into the open ring between the disc and the rim)',
   stomp: 'Shockwave Stomp: the 7 yd stun ring round his feet (walk out)',
   starwake:
     'Wake of the Fallen Star: the star wakes, lava fissures crawl out, geysers burst under you and along them, pools burn for 8 s, and as it erupts a Star Debris meteor shower rains down for 8 s, each meteor landing 2.5 s after its red circle appears (stand in a lane between the fissures, step out of your geyser circle, then keep moving out of the red circles)',

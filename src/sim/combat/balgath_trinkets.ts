@@ -8,7 +8,8 @@
 //   - the shape is an aura (kind 'form_foreman') that entity.ts folds into armor and
 //     body scale and that knockback.ts reads to refuse a shove; the renderer swaps the
 //     body the same way it swaps the warlock's Metamorphosis rig;
-//   - the soldiers are guardians (combat/guardians.ts) in its opt-in walking melee mode;
+//   - the soldiers are guardians (combat/guardians.ts) in its opt-in walking melee mode,
+//     following their owner;
 //   - the glare is an aura with a tick interval, its line test run server-side;
 //   - the haul is a Heroic Leap flight (combat/heroic_leap.ts) armed on the ally, with
 //     no landing blast;
@@ -170,6 +171,10 @@ function plantMusterStandard(ctx: SimContext, p: Entity, use: UseOf<'musterStand
         z: p.pos.z - Math.sin(p.facing) * 1.4 * side,
       },
       maxHp: p.maxHp * use.hpShare,
+      // They FOLLOW (owner playtest: soldiers that stood guard at the banner while the
+      // player walked on read as broken): out of a fight they march at your side, in one
+      // they fight your target wherever you take it, and left behind past the leash they
+      // rejoin you. The banner stays where it was planted, the muster's rallying point.
       melee: {
         moveSpeed: use.moveSpeed,
         reach: MELEE_RANGE,
@@ -177,6 +182,8 @@ function plantMusterStandard(ctx: SimContext, p: Entity, use: UseOf<'musterStand
         postZ: p.pos.z,
         leash: use.leash,
         postAuraId: TRINKET_AURA.musterStandard,
+        followOwner: true,
+        followSide: side,
       },
     });
   }

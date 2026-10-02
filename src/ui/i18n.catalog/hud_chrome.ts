@@ -129,6 +129,9 @@ export const hudChromeStrings = {
     promptTakePike: 'Press {key} or click the rack to take a Shardpike',
     promptTakePikeClick: 'Click the rack to take a Shardpike',
     promptTakePikeTap: 'Tap the rack to take a Shardpike',
+    // A level 20 at the rack (src/sim/muster_pike.ts MUSTER_PIKE_MAX_LEVEL): the pikes are
+    // the low levels' job, so the prompt says so instead of offering one.
+    promptPikeLevelCap: 'The muster lends its pikes only to level {level} or lower',
     promptHoldSteadyLean: 'Hold the pike steady: lean with {left} and {right}',
     // The two press-and-hold keycaps above the beam (shardpike_lean_view.ts): their
     // accessible names, with the bound key when there is one.
@@ -3979,7 +3982,7 @@ export const hudChromeStrings = {
       foremanShape:
         'Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.',
       musterStandard:
-        'Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers run to your target and fight it in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, each has {hpPct}% of your maximum health, and they leave when the standard falls, when you die, or if you move more than {leash} yd from it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.',
+        'Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.',
       gutteredGlare:
         'Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.',
       grapnel:
@@ -5421,7 +5424,8 @@ export const hudChromeStrings = {
         'A direct heal from anyone on you or a party member within {radius} yd of the lantern also heals the most wounded other party member in its light for {pct}% of the heal.',
       // Balgath's trinkets (combat/balgath_trinkets.ts).
       foremanShape: 'You are the Foreman: {armorPct}% more armor and immune to knockbacks.',
-      musterStandard: 'Your Muster Standard is planted. Its soldiers fight your target.',
+      musterStandard:
+        'Your Muster Standard is planted. Its soldiers march with you and fight your target.',
       gutteredGlare:
         'The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.',
       stoneStatue:

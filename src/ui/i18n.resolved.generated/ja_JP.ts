@@ -541,6 +541,7 @@ export const ja_JP: EnTranslations = {
       "promptTakePike": "{key}を押すか武器棚をクリックして、シャードパイクを取れ",
       "promptTakePikeClick": "武器棚をクリックしてシャードパイクを取れ",
       "promptTakePikeTap": "武器棚をタップしてシャードパイクを取れ",
+      "promptPikeLevelCap": "召集軍が槍を貸すのはレベル {level} 以下の新兵だけです",
       "promptHoldSteadyLean": "パイクを支えろ：{left}と{right}で傾けろ",
       "leanLeft": "左に傾ける",
       "leanRight": "右に傾ける",

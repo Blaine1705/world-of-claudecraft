@@ -36,6 +36,19 @@ export const BALGATH_CRATER_FADE = 0.28;
  */
 export const BALGATH_HAMMER_ABILITY = 'mob_balgath_hammer';
 export const BALGATH_CLEAVE_ABILITY = 'mob_balgath_cleave';
+/**
+ * His circle telegraphs, drawn by his own layer (balgath_ring_fx.ts) rather than the
+ * generic rune circle: the Barrow Smash (with its safe gap), the stomp, the hammer and the
+ * Barrowfall. Agreed with the sim's emitters by string (mob/locomotion.ts, boss_slams.ts,
+ * warpath.ts); tests/balgath_boss_assets.test.ts welds them.
+ */
+export const BALGATH_SMASH_RING_ABILITY = 'mob_pulse_windup';
+export const BALGATH_RING_ABILITIES: readonly string[] = [
+  BALGATH_SMASH_RING_ABILITY,
+  'mob_stomp_windup',
+  BALGATH_HAMMER_ABILITY,
+  'mob_warpath_wreck',
+];
 
 /** Half-width of the cleave arc in radians; matches the template's halfArcDeg of 60. */
 export const BALGATH_CLEAVE_HALF_ARC = (60 * Math.PI) / 180;

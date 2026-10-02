@@ -272,7 +272,7 @@ describe('the effigy is solid', () => {
 });
 
 describe('the muster quest chain', () => {
-  it('Fenwick sends you up, the Commander briefs you, and each quest opens the next', () => {
+  it('Fenwick sends you up, the Commander briefs you, and the briefing opens the rest', () => {
     const { sim, army } = drillYard();
     const commander = sim.entities.get(army.commanderId ?? -1);
     expect(commander?.kind).toBe('npc');
@@ -284,7 +284,9 @@ describe('the muster quest chain', () => {
     ]);
     expect(NPCS.warden_fenwick.questIds).toContain(MUSTER_SUMMONS_QUEST_ID);
     expect(QUESTS[MUSTER_PIKE_DRILL_QUEST_ID].requiresQuest).toBe(MUSTER_SUMMONS_QUEST_ID);
-    expect(QUESTS[MUSTER_TROPHY_QUEST_ID].requiresQuest).toBe(MUSTER_PIKE_DRILL_QUEST_ID);
+    // The weekly hangs off the briefing, not the drill: the drill is level 19 and under
+    // (the rack's cap), and a level 20 still has to be able to join the kill.
+    expect(QUESTS[MUSTER_TROPHY_QUEST_ID].requiresQuest).toBe(MUSTER_SUMMONS_QUEST_ID);
     expect(sim.questState(MUSTER_SUMMONS_QUEST_ID)).toBe('available');
     expect(sim.questState(MUSTER_PIKE_DRILL_QUEST_ID)).toBe('unavailable');
     const fenwick = [...sim.entities.values()].find((e) => e.templateId === 'warden_fenwick');
@@ -300,7 +302,7 @@ describe('the muster quest chain', () => {
     sim.turnInQuest(MUSTER_SUMMONS_QUEST_ID);
     expect(sim.questState(MUSTER_SUMMONS_QUEST_ID)).toBe('done');
     expect(sim.questState(MUSTER_PIKE_DRILL_QUEST_ID)).toBe('available');
-    expect(sim.questState(MUSTER_TROPHY_QUEST_ID)).toBe('unavailable');
+    expect(sim.questState(MUSTER_TROPHY_QUEST_ID)).toBe('available');
   });
 
   it('the drill credits the rack, the lantern and the blows in the window, then opens the weekly', () => {

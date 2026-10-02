@@ -130,6 +130,7 @@ const baseEnTable = {
   // The muster pike (src/sim/muster_pike.ts): the rack's refusal, the loan and its end,
   // and the bank's refusal of lent gear (src/sim/bank.ts). Placeholder-free: EXACT matcher.
   'error.musterPikeHeld': 'You already hold a Shardpike.',
+  'error.musterPikeLevel': 'The muster lends its pikes only to recruits of level 19 or lower.',
   'log.musterPikeTaken': 'You take a Shardpike from the muster rack.',
   'log.musterPikeReclaimed': 'The muster reclaims its Shardpike.',
   // The drill yard (src/sim/muster_effigy.ts, src/sim/muster_pike.ts): the lantern going

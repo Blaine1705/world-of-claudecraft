@@ -329,7 +329,7 @@ describe('trinket aura tooltips (English)', () => {
     [
       'Muster Standard',
       own({ id: TRINKET_AURA.musterStandard, kind: 'internal_cd', value: 2 }),
-      'Your Muster Standard is planted. Its soldiers fight your target.',
+      'Your Muster Standard is planted. Its soldiers march with you and fight your target.',
     ],
     [
       'Guttered Glare',

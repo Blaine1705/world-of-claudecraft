@@ -32,6 +32,7 @@ import { groundHeight } from '../world';
 import { splashNearbyMobs } from './boss_collateral';
 import { levelScaledMechanicDamage } from './mechanic_level_scale';
 import { claimMechanicSpacing, mechanicSpacingBlocked } from './mechanic_spacing';
+import { openRiftEscapeWindow } from './rift_escape_window';
 
 type SlamsDef = NonNullable<MobTemplate['slams']>;
 
@@ -247,6 +248,11 @@ function startCleave(ctx: SimContext, mob: Entity, def: SlamsDef): void {
   mob.slamX = Math.sin(mob.facing);
   mob.slamZ = Math.cos(mob.facing);
   claimMechanicSpacing(mob, def.cleave.windup);
+  // The windup asks the raid to JUMP, so his Backhand proc (which shoves and grounds its
+  // victim) must not land on a player mid-jump and undo a correct read. The same escape
+  // window his telegraphed rings open (rift_escape_window.ts): the proc's roll is still
+  // drawn, only the shove is skipped, until the arm has come across.
+  openRiftEscapeWindow(ctx, mob, def.cleave.windup);
   ctx.emit({
     type: 'spellfxAt',
     sourceId: mob.id,

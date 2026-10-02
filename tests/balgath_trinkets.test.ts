@@ -266,15 +266,70 @@ describe('Muster Standard: walking melee guardians', () => {
     expect(auraOf(sim.player, TRINKET_AURA.musterStandard)).toBeUndefined();
   });
 
-  it('leaves at once when you stray past the leash, taking the standard with it', () => {
-    const { sim } = planted(6);
+  /** Run the player `yards` along +x at a player's run (7 yd/s), ticking the world. */
+  const runAlong = (sim: Sim, yards: number) => {
+    const steps = Math.round(yards / (7 * DT));
+    for (let i = 0; i < steps; i++) {
+      sim.player.prevPos = { ...sim.player.pos };
+      sim.player.pos.x += 7 * DT;
+      sim.player.facing = Math.PI / 2;
+      sim.tick();
+    }
+  };
+  const soldiersOf = (sim: Sim) =>
+    [...sim.entities.values()].filter((e) => e.ownerId === sim.playerId && e.guardianState?.melee);
+
+  it('marches at your side out of combat, keeping up with a run', () => {
+    // Owner playtest: they used to stand guard at the standard while the player walked on.
+    // With nothing to fight they fall in beside you and keep pace with a run.
+    const sim = wearing('muster_standard');
+    sim.useItem('muster_standard');
+    run(sim, 0.5);
+    const start = { ...sim.player.pos };
+    runAlong(sim, 25);
     run(sim, 1);
+    expect(Math.hypot(sim.player.pos.x - start.x, sim.player.pos.z - start.z)).toBeGreaterThan(24);
+    const soldiers = soldiersOf(sim);
+    expect(soldiers).toHaveLength(2);
+    for (const s of soldiers) {
+      expect(Math.hypot(s.pos.x - sim.player.pos.x, s.pos.z - sim.player.pos.z)).toBeLessThan(4);
+      expect(s.aggroTargetId).toBeNull();
+    }
+    // Two bodies, two places: they flank you rather than stacking on one spot.
+    expect(
+      Math.hypot(soldiers[0].pos.x - soldiers[1].pos.x, soldiers[0].pos.z - soldiers[1].pos.z),
+    ).toBeGreaterThan(1);
+  });
+
+  it('fights your target wherever you take the fight, not only near the standard', () => {
+    const sim = wearing('muster_standard');
+    sim.useItem('muster_standard');
+    run(sim, 0.5);
     const use = TRINKET_SPECS.muster_standard.use as Use<'musterStandard'>;
-    const standard = auraOf(sim.player, TRINKET_AURA.musterStandard);
-    sim.player.pos.x = (standard?.value2 ?? 0) + use.leash + 2;
+    // Well past the old post leash from where the standard went in.
+    runAlong(sim, use.leash + 10);
+    const wolf = engage(foe(sim, 0, 6));
+    sim.targetEntity(wolf.id);
+    const hp = wolf.hp;
+    run(sim, 5);
+    expect(wolf.hp).toBeLessThan(hp);
+    for (const s of soldiersOf(sim)) expect(s.aggroTargetId).toBe(wolf.id);
+  });
+
+  it('rejoins you at once when left past the leash, and the standard stays up', () => {
+    const sim = wearing('muster_standard');
+    sim.useItem('muster_standard');
+    run(sim, 0.5);
+    const use = TRINKET_SPECS.muster_standard.use as Use<'musterStandard'>;
+    // A mount, a leap or a portal: far faster than any body could follow.
+    sim.player.pos.x += use.leash + 15;
+    sim.player.prevPos = { ...sim.player.pos };
     run(sim, 0.2);
-    expect([...sim.entities.values()].filter((e) => e.guardianState?.melee)).toHaveLength(0);
-    expect(auraOf(sim.player, TRINKET_AURA.musterStandard)).toBeUndefined();
+    const soldiers = soldiersOf(sim);
+    expect(soldiers).toHaveLength(2);
+    for (const s of soldiers)
+      expect(Math.hypot(s.pos.x - sim.player.pos.x, s.pos.z - sim.player.pos.z)).toBeLessThan(4);
+    expect(auraOf(sim.player, TRINKET_AURA.musterStandard)).toBeDefined();
   });
 
   it('leaves when you die', () => {
@@ -319,6 +374,24 @@ describe('Muster Standard: walking melee guardians', () => {
 // ---- The Guttered Eye ----------------------------------------------------------------------
 
 describe('The Guttered Eye: the line beam', () => {
+  it('carries the same base damage as its sister 2 min use, the Muster Standard', () => {
+    // Owner playtest: it hit too weakly (6 ticks of 18, 108 in all, under the 3 sec of
+    // casting the channel costs). Same boss, item level and cooldown as the Standard, so
+    // the same base budget: two soldiers, a swing every 2 sec for 15 sec, 18 on average.
+    const glare = TRINKET_SPECS.guttered_eye.use as Use<'gutteredGlare'>;
+    const standard = TRINKET_SPECS.muster_standard.use as Use<'musterStandard'>;
+    expect(TRINKET_SPECS.guttered_eye.cooldown).toBe(TRINKET_SPECS.muster_standard.cooldown);
+    const glareBase = glare.flat * Math.round(glare.duration / glare.every);
+    const standardBase =
+      standard.soldiers *
+      (standard.duration / standard.attackInterval) *
+      ((standard.min + standard.max) / 2);
+    expect(glareBase).toBe(270);
+    expect(glareBase).toBeCloseTo(standardBase, 6);
+    // The Spell Power share stays the classic area-channel one: 3 / 3.5, halved, per tick.
+    expect(glare.coef).toBeCloseTo(glare.duration / 3.5 / 2 / 6, 1);
+  });
+
   it('hits what lies on the line, nearest first, and nothing behind, beside or past it', () => {
     const at = (id: number, x: number, z: number) => ({ id, pos: { x, z } });
     const hits = glareLineHits(
@@ -710,7 +783,9 @@ describe('Balgath trinket tooltips print the damage and healing that land', () =
       expect(hits).toHaveLength(6);
       for (const h of hits)
         expect(h.amount, `SP ${sp}`).toBe(h.crit ? Math.round(tick * 1.5) : tick);
-      expect(tick).toBeLessThan(40);
+      // The raised glare (45 a tick at no Spell Power, the Muster Standard's budget).
+      expect(tick).toBeGreaterThanOrEqual(45);
+      expect(tick).toBeLessThan(60);
     }
   });
 

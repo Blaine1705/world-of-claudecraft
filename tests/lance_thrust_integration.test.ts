@@ -45,8 +45,10 @@ describe('real Shardpike entry and payoff', () => {
   it('preserves the approved fixed damage, rest and reach', () => {
     expect(LANCE_FIXED_DAMAGE).toBe(150);
     expect(LANCE_REST_SECONDS).toBe(5);
-    // 22 (was 14): the thrust lands from outside his 12-yard Barrow Smash ring.
-    expect(LANCE_THRUST_RANGE).toBe(22);
+    // 28 (was 22, and 14 before that): the owner asked for more reach. At 28 the pikeman
+    // stands clear of every area blow centred on him (Smash 12, Barrowfall 16, the cleave's
+    // 20) with room to give ground, and it stays under half the 60-yard guidance range.
+    expect(LANCE_THRUST_RANGE).toBe(28);
   });
   it('draws the weapon, consumes one attempt, and defers fixed damage and blind credit until contact', () => {
     const h = setup();

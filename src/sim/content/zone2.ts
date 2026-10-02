@@ -3,6 +3,7 @@
 // trolls dig into barrow-mounds, and Vael the Fogbinder waits in the
 // Sunken Bastion.
 
+import { BARROW_SMASH_GAP } from '../boss_ring_gap';
 import {
   FENBRIDGE_LAYOUT,
   FENBRIDGE_NPC_PLACEMENTS_BY_ID,
@@ -396,7 +397,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // rather than in the crater. The crater floor there is flat and he phases through
       // obstacles, so he never paces on the spot hunting for the exact coordinate.
       bedRadius: 3,
-      // Balgath_Wake runs 3.95 s (scripts/build_balgath_anims.mjs); the hold outlasts it.
+      // Balgath_Wake runs 3.96 s (scripts/assets/balgath_cyclops/clips.py); the hold covers it.
       riseSeconds: 4,
     },
     quietMechanics: true,
@@ -528,9 +529,13 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       //
       // Deliberately the rarest thing he does. A jump check every 20 seconds is a
       // heartbeat the raid learns to feel; one every five is a rhythm game.
+      //
+      // 2.0 s of wind (it shipped at 1.5): owner playtest found the frontal arriving before
+      // a raid in front of him could read it. The clip's arm crosses at 1.5 s of its own
+      // timeline, so the ClipMap slows it to 0.75 and the arm still lands on the hit.
       cleave: {
         every: 26,
-        windup: 1.5,
+        windup: 2,
         range: 20,
         halfArcDeg: 60,
         sweepSpeed: 26,
@@ -671,7 +676,9 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // MEANT to be outrun. His reach matching his arms is the honest read.
     scale: 4.2,
     // The circle smash: big, slow, telegraphed. Long cadence and a wide footprint so
-    // the ground ring reads from across the fen.
+    // the ground ring reads from across the fen. It lands as a disc round his feet and a
+    // band at the rim with a safe ring of open ground between (sim/boss_ring_gap.ts):
+    // owner playtest, the gap he saw drawn should be somewhere to step into.
     aoePulse: {
       min: 36,
       max: 50,
@@ -680,6 +687,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       name: 'Barrow Smash',
       school: 'physical',
       fx: 'nova',
+      safeGap: BARROW_SMASH_GAP,
     },
     // The shockwave stomp: tighter and quicker, and the smaller radius is also how the
     // renderer tells the two slams apart when it draws their ground rings.

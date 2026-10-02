@@ -97,6 +97,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/decor_torch_fx.ts', layer: 'ground', strict: true },
   { file: 'src/render/impact_site.ts', layer: 'ground', strict: true },
   { file: 'src/render/hill_ring.ts', layer: 'ground', strict: true },
+  // Balgath's circle telegraphs (the Barrow Smash's safe gap, his solid stomp, hammer and
+  // Barrowfall): mechanics a raid must read, on the encounter band.
+  { file: 'src/render/balgath_ring_fx.ts', layer: 'encounter', strict: true },
   // A Buried Hoard boss room's additive floor light under its kit props, kept on
   // the order it shipped with (2, the ground band's second rung).
   { file: 'src/render/hoard_room_kit.ts', layer: 'ground', strict: true },

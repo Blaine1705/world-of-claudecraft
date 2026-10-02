@@ -541,6 +541,7 @@ export const ru_RU: EnTranslations = {
       "promptTakePike": "Нажмите {key} или щёлкните по стойке, чтобы взять осколочную пику",
       "promptTakePikeClick": "Щёлкните по стойке, чтобы взять осколочную пику",
       "promptTakePikeTap": "Коснитесь стойки, чтобы взять осколочную пику",
+      "promptPikeLevelCap": "Ополчение выдаёт копья только новобранцам до {level}-го уровня включительно",
       "promptHoldSteadyLean": "Держите пику ровно: наклоняйте клавишами {left} и {right}",
       "leanLeft": "Наклон влево",
       "leanRight": "Наклон вправо",

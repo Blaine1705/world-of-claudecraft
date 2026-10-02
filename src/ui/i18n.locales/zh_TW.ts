@@ -1324,6 +1324,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.shardpike.promptTakePike': '按 {key} 或點擊武器架，取一把碎晶長矛',
   'hudChrome.shardpike.promptTakePikeClick': '點擊武器架，取一把碎晶長矛',
   'hudChrome.shardpike.promptTakePikeTap': '輕觸武器架，取一把碎晶長矛',
+  'hudChrome.shardpike.promptPikeLevelCap': '徵召營只把長矛借給 {level} 級以下的新兵',
   'hudChrome.shardpike.braceTooltipLean':
     '將矛尾抵地，矛尖上舉。用橫移鍵或轉向鍵傾斜，或按住橫樑上方的兩個按鍵：橫樑會自行偏移，他每落下一擊都會把它震歪。讓它遠離兩端{set}秒，長矛即告架穩。需要堅實的地面，且不能在坐騎上。',
   'hudChrome.shardpike.promptLabel': '碎晶長矛指示',

@@ -2559,6 +2559,10 @@ export interface MobTemplate {
     name: string;
     school?: string;
     fx?: 'nova' | 'projectile';
+    // A safe ring inside the blast (boss_ring_gap.ts): anyone standing between these two
+    // fractions of the radius is missed. Balgath's Barrow Smash only; his renderer draws
+    // the same gap from the same fractions.
+    safeGap?: { inner: number; outer: number };
   };
   // Boss mechanic: a Geddon-style stationary channel. Every `every` seconds
   // the boss roots in place, stops meleeing, and channels for `duration`,
@@ -5081,6 +5085,10 @@ export interface QuestDef {
   // teach the lesson with. Enforced in computeQuestState.
   requiresUsableHealAbility?: boolean;
   minLevel?: number;
+  // The highest level that may ACCEPT it (enforced in computeQuestState, which both hosts
+  // share). A quest already in the log stays finishable. The muster's pike tutorial is the
+  // first: its pikes are lent to level 19 and below (lance_balance_core MUSTER_PIKE_MAX_LEVEL).
+  maxLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
   // includes worn equipment and bag sockets (quests/quest_owned_count.ts) and the
@@ -5599,6 +5607,15 @@ export interface GuardianMelee {
   postZ: number;
   leash: number;
   postAuraId?: string;
+  /**
+   * Follow the OWNER instead of holding the post (combat/guardians.ts): with nothing to
+   * fight it falls in beside its owner, the leash and the target reach are measured from
+   * the owner, and a guardian left past the leash rejoins at the owner's side rather than
+   * leaving. The Muster Standard's soldiers. Absent = the post-holding mode, unchanged.
+   */
+  followOwner?: boolean;
+  /** Which side of its owner a follower walks on: -1 left, 1 right. */
+  followSide?: number;
 }
 
 /**

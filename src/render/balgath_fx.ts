@@ -22,6 +22,7 @@
 // information, and the gameplay-neutral-graphics invariant forbids hiding it.
 
 import * as THREE from 'three';
+import { BARROW_SMASH_GAP } from '../sim/boss_ring_gap';
 import { MUSTER_MALLET_POUND_ABILITY } from '../sim/muster_effigy_core';
 import type { Surface } from './audio_sink';
 import { bossAuraPlan, moteBudget, readBossVfxState } from './balgath_aura_core';
@@ -39,8 +40,10 @@ import {
   BALGATH_EYE_POOL_RADIUS,
   BALGATH_HAMMER_ABILITY,
   BALGATH_HAMMER_TRAUMA,
+  BALGATH_RING_ABILITIES,
   BALGATH_RING_SECONDS,
   BALGATH_SMASH_MIN_RADIUS,
+  BALGATH_SMASH_RING_ABILITY,
   BALGATH_SMASH_TRAUMA,
   BALGATH_STOMP_TRAUMA,
   BALGATH_STRIDE_UNITS,
@@ -59,6 +62,7 @@ import {
   BALGATH_BURDEN_ABILITY,
   BALGATH_GLARE_ABILITY,
 } from './balgath_ranged_fx_core';
+import { BalgathRingFx } from './balgath_ring_fx';
 import { BalgathStarwakeFx } from './balgath_starwake_fx';
 import {
   BALGATH_STARWAKE_CAST_ID,
@@ -237,9 +241,14 @@ export function routeBalgathSpellfxAt(
   // The cleave's telegraph is the one RUNE CIRCLE this router takes: its damage is a
   // 120-degree wedge, so the generic full circle the renderer would draw promises four
   // times the area it will hit. Returning true suppresses that circle in favour of the arc.
+  const ringTelegraph =
+    ev.fx === 'runeCircle' &&
+    ev.ability !== undefined &&
+    BALGATH_RING_ABILITIES.includes(ev.ability);
   const telegraph =
     ev.fx === 'runeCircle' &&
-    (ev.ability === BALGATH_CLEAVE_ABILITY ||
+    (ringTelegraph ||
+      ev.ability === BALGATH_CLEAVE_ABILITY ||
       ev.ability === BALGATH_BOULDER_ABILITY ||
       ev.ability === BALGATH_GLARE_ABILITY ||
       ev.ability === BALGATH_STARWAKE_FISSURE_ABILITY ||
@@ -327,10 +336,19 @@ export function routeBalgathSpellfxAt(
     fx.ranged.burdenLanded(ev.x, ev.z, ev.radius);
     return true;
   }
-  if (telegraph) {
-    fx.cleaveTelegraph(ev.x, ev.z, ev.radius, aim, ev.duration ?? 1.5);
+  // His circles: the smash with its safe gap (sim/boss_ring_gap.ts, the very fractions its
+  // hit test reads), the rest solid (balgath_ring_fx.ts).
+  if (ringTelegraph) {
+    const gap = ev.ability === BALGATH_SMASH_RING_ABILITY ? BARROW_SMASH_GAP : null;
+    fx.slamRings.telegraph(ev.x, ev.z, ev.radius, ev.duration ?? 1.2, gap);
     return true;
   }
+  if (telegraph) {
+    fx.cleaveTelegraph(ev.x, ev.z, ev.radius, aim, ev.duration ?? 2);
+    return true;
+  }
+  // A circle landed: its telegraph goes with it.
+  if (ev.fx === 'nova') fx.slamRings?.landed(ev.x, ev.z);
   if (ev.ability === BALGATH_CLEAVE_ABILITY) {
     fx.cleaveImpact(ev.x, ev.z, ev.radius, aim);
     return true;
@@ -374,6 +392,8 @@ export class BalgathFx {
   readonly ranged: BalgathRangedFx;
   /** Wake of the Fallen Star (balgath_starwake_fx.ts). */
   readonly starwake: BalgathStarwakeFx;
+  /** His circle telegraphs: the smash's safe gap, the solid stomp, hammer and Barrowfall. */
+  readonly slamRings: BalgathRingFx;
 
   constructor(
     private scene: THREE.Scene,
@@ -392,6 +412,7 @@ export class BalgathFx {
     private surfaceAt: (x: number, z: number, y: number) => Surface = () => 'dirt',
   ) {
     this.debris = new BalgathDebris(scene);
+    this.slamRings = new BalgathRingFx(scene, groundHeightAt);
     this.ranged = new BalgathRangedFx(scene, groundHeightAt, {
       felt: (trauma, x, z) => this.impactFelt(trauma, x, z),
       ground: (x, z, radius, power) => this.throwGround(x, z, radius, power),
@@ -744,6 +765,7 @@ export class BalgathFx {
     this.syncBosses(bosses, dt, reducedMotion);
     this.ranged.update(dt, reducedMotion);
     this.starwake.update(dt, reducedMotion);
+    this.slamRings.update(dt, reducedMotion);
     this.debris.update(dt);
 
     for (let i = this.rings.length - 1; i >= 0; i--) {
@@ -806,6 +828,7 @@ export class BalgathFx {
   clear(): void {
     this.ranged.clear();
     this.starwake.clear();
+    this.slamRings.clear();
     this.deaths.clear();
     this.auraCarry.clear();
     this.stride.clear();
@@ -820,6 +843,7 @@ export class BalgathFx {
     this.clear();
     this.ranged.dispose();
     this.starwake.dispose();
+    this.slamRings.dispose();
     this.debris.dispose();
     if (this.eyePool) {
       this.scene.remove(this.eyePool);

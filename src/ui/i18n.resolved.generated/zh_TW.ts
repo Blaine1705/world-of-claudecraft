@@ -541,6 +541,7 @@ export const zh_TW: EnTranslations = {
       "promptTakePike": "按 {key} 或點擊武器架，取一把碎晶長矛",
       "promptTakePikeClick": "點擊武器架，取一把碎晶長矛",
       "promptTakePikeTap": "輕觸武器架，取一把碎晶長矛",
+      "promptPikeLevelCap": "徵召營只把長矛借給 {level} 級以下的新兵",
       "promptHoldSteadyLean": "穩住長矛：用{left}和{right}傾斜",
       "leanLeft": "向左傾斜",
       "leanRight": "向右傾斜",

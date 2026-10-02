@@ -88,6 +88,7 @@ export function createShardpikeBar(
           leanKeys,
           rackInReach: rack(w),
           interactKey: interactKeyLabel(deps),
+          playerLevel: w.player.level,
           touch: doc.body?.classList.contains('mobile-touch') ?? false,
         }),
       );
