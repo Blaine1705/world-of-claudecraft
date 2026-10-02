@@ -14,7 +14,11 @@
 //   /dev wildheart spawn <type>             raise one mob 10 yd ahead, pulled
 //   /dev wildheart trigger <mechanic>       fire an engaged encounter's mechanic
 //                                           now: tail, stomp, howdah, enrage (the
-//                                           Great Saurian)
+//                                           Great Saurian); quake, stalk, hunt,
+//                                           ward, heel (the Beastmaster); seeds,
+//                                           pods, pollinate, lash, gorge (the
+//                                           Gorgebloom); pulse, spirit, prey,
+//                                           endhunt, ambush (Zulgar)
 //   /dev wildheart reset                    free the run and claim a fresh one
 //
 // Areas: landing, fern, bank, ford (or saurian), steps, hunt, huntupper, pits
@@ -87,10 +91,11 @@ export const WILDHEART_DEV_MOBS: Readonly<Record<string, string>> = {
   saurian: 'great_saurian',
   rider: 'howdah_hexcaller',
   jaguar: 'fanglord_jaguar',
+  sprout: 'thorn_sprout',
 };
 
 const HELP =
-  '[dev] /dev wildheart enter [normal|heroic] | tp <landing|fern|bank|ford|saurian|steps|hunt|huntupper|pits|beastmaster|ledge|behindfalls|falls|gorgebloom|causeway|island|plaza|convergence|stair|shrinestair|shrine|zulgar> | gates | kill <g1..g13|pa|pb|pc|pd|saurian|beastmaster|jaguar|gorgebloom|zulgar|trash|all> | pack <id> | spawn <stalker|ravager|hexcaller|binder|totem|raptor|toad|lasher|saurian|rider|jaguar> | trigger <tail|stomp|howdah|enrage> | reset';
+  '[dev] /dev wildheart enter [normal|heroic] | tp <landing|fern|bank|ford|saurian|steps|hunt|huntupper|pits|beastmaster|ledge|behindfalls|falls|gorgebloom|causeway|island|plaza|convergence|stair|shrinestair|shrine|zulgar> | gates | kill <g1..g13|pa|pb|pc|pd|saurian|beastmaster|jaguar|gorgebloom|zulgar|trash|all> | pack <id> | spawn <stalker|ravager|hexcaller|binder|totem|raptor|toad|lasher|saurian|rider|jaguar|sprout> | trigger <tail|stomp|howdah|enrage|quake|stalk|hunt|ward|heel|seeds|pods|pollinate|lash|gorge|pulse|spirit|prey|endhunt|ambush> | reset';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {

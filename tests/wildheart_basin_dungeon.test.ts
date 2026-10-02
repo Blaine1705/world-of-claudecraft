@@ -22,6 +22,7 @@ import {
   handleWildheartBasinDevChat,
   WILDHEART_DEV_AREAS,
 } from '../src/sim/dev/wildheart_basin_dev';
+import { WILDHEART_DEV_TRIGGERS, wildheartDevTrigger } from '../src/sim/encounters/wildheart_basin';
 import { authoredFieldFor } from '../src/sim/instances/authored_field';
 import { dungeonGateStateOf } from '../src/sim/instances/dungeon_gates';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
@@ -340,5 +341,60 @@ describe('/dev wildheart trigger: every Saurian mechanic fires on demand', () =>
     expect(
       inst.mobIds.some((id) => sim.ctx.entities.get(id)?.templateId === 'howdah_hexcaller'),
     ).toBe(true);
+  });
+});
+
+describe('/dev wildheart trigger: every boss mechanic fires on demand', () => {
+  const cases: [string, string[], [number, number]][] = [
+    ['wildheart_beastmaster', ['quake', 'stalk', 'hunt', 'ward', 'heel'], [-86, 60]],
+    ['the_gorgebloom', ['seeds', 'pods', 'pollinate', 'lash', 'gorge'], [90, 40]],
+    ['wildheart_high_priest', ['pulse', 'spirit', 'prey', 'endhunt', 'ambush'], [0, 214]],
+  ];
+  for (const [templateId, triggers, [lx, lz]] of cases) {
+    it(`${templateId}: ${triggers.join(', ')}`, () => {
+      const { sim, me, inst } = enter('heroic');
+      // A second player so a mark always has a non-tank to take.
+      const otherId = sim.addPlayer('mage', 'Marked');
+      sim.partyInvite(otherId, me.id);
+      sim.partyAccept(otherId);
+      const other = sim.ctx.entities.get(otherId) as Entity;
+      const o = instanceOrigin(DUNGEONS[ID].index, inst.slot);
+      const b = rosterOf(sim, inst, templateId);
+      for (const p of [me, other]) {
+        p.maxHp = 1e7;
+        p.hp = 1e7;
+      }
+      me.pos = sim.ctx.groundPos(o.x + lx, o.z + lz);
+      me.prevPos = { ...me.pos };
+      other.pos = sim.ctx.groundPos(o.x + lx + 12, o.z + lz - 6);
+      other.prevPos = { ...other.pos };
+      b.maxHp = 1e6;
+      b.hp = 1e6;
+      sim.ctx.aggroMob(b, me, false);
+      for (let i = 0; i < 2; i++) sim.tick();
+      for (const what of triggers) {
+        sim.drainEvents();
+        dev(sim, me, `trigger ${what}`);
+        const lines = sim
+          .drainEvents()
+          .filter((e) => e.type === 'log')
+          .map((e) => (e as { text: string }).text);
+        expect(
+          lines.some((t) => t.startsWith('[dev] ')),
+          what,
+        ).toBe(true);
+        expect(
+          lines.some((t) => t.includes('Mechanics:') || t.includes('first.')),
+          what,
+        ).toBe(false);
+        sim.tick();
+      }
+    });
+  }
+
+  it('the help line names every trigger', () => {
+    const { sim, inst } = enter();
+    const help = wildheartDevTrigger(sim.ctx, inst, 'help');
+    for (const what of WILDHEART_DEV_TRIGGERS) expect(help).toContain(what);
   });
 });

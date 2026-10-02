@@ -3766,6 +3766,46 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
+  // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
+  // section 9): one encounter deed per boss core and one for the Great
+  // Saurian, granted by the encounter modules (src/sim/encounters/
+  // wildheart_basin) to every player in the claim at the kill. Cosmetic only;
+  // appended at the END per the append-only contract. The design's "Divide and
+  // Conquer" is an exact World of Warcraft achievement name (the IP check,
+  // 2026-10-02), so it ships as "Kept at Bay"; the other three names returned
+  // no game use.
+  dgn_beastmaster_apart: {
+    id: 'dgn_beastmaster_apart',
+    name: 'Kept at Bay',
+    desc: 'Defeat the Fanglord Beastmaster and his Great Jaguar with Pack Bond up for less than 10 seconds in all.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_gorgebloom_clean: {
+    id: 'dgn_gorgebloom_clean',
+    name: 'Weed Control',
+    desc: 'Defeat the Gorgebloom without a single Thorn Sprout growing.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_zulgar_uncaught: {
+    id: 'dgn_zulgar_uncaught',
+    name: 'Never Caught',
+    desc: 'Defeat Zulgar, Voice of the Basin without anyone being Mauled.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_great_saurian: {
+    id: 'dgn_great_saurian',
+    name: 'Toppled Titan',
+    desc: 'Defeat the Great Saurian and its Howdah Hexcaller within 20 seconds of each other.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

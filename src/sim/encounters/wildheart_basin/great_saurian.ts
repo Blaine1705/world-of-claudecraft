@@ -14,6 +14,11 @@
 //   Enrage              under a fifth of its health: 30 percent more damage,
 //                       its swings and both strikes.
 //
+// The deed (Toppled Titan): the Saurian and its Howdah Hexcaller fall within
+// 20 s of each other; the state outlives the Saurian until that settles. Once
+// the pull is over a rider that is not fighting is dropped (index.ts), so it
+// never idles in the ford.
+//
 // Deterministic: no pick is rolled (the cones and rings take everyone inside,
 // the rider lands on a fixed spot behind its flank); the only rng draws are
 // the damage rolls, in claim-player order. Every visible state rides existing
@@ -27,9 +32,11 @@ import { inCone } from '../../mob/trash_kit/targets';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, dist2d, type Entity, type SaurianFightState } from '../../types';
-import { claimPlayers, clearCastIf, mechanicDamage, startBar } from './claim';
+import { claimPlayers, clearCastIf, grantClaimDeed, mechanicDamage, startBar } from './claim';
 import {
   HOWDAH_HEXCALLER_ID,
+  SAURIAN_DEED,
+  SAURIAN_DEED_WINDOW,
   SAURIAN_ENRAGE,
   SAURIAN_HOWDAH_BREAK,
   SAURIAN_HOWDAH_LOG,
@@ -249,6 +256,33 @@ function holdPlanted(ctx: SimContext, saurian: Entity, st: SaurianFightState): v
   }
 }
 
+/** The rider's fate, while the Saurian fights: when it fell. */
+function watchRider(ctx: SimContext, st: SaurianFightState): void {
+  if (st.riderId === null || st.riderDiedAt !== undefined) return;
+  const rider = ctx.entities.get(st.riderId);
+  if (rider?.dead) st.riderDiedAt = ctx.time;
+}
+
+/** The Saurian has fallen: settle the Toppled Titan deed (it and its rider
+ *  within 20 s of each other), then let the state go. */
+function settleSaurianDeed(ctx: SimContext, inst: InstanceSlot, saurian: Entity): void {
+  const st = saurian.wildheartFight?.kind === 'saurian' ? saurian.wildheartFight : null;
+  if (!st || st.deedSettled) return;
+  if (st.diedAt === undefined) {
+    st.diedAt = ctx.time;
+    clearCastIf(saurian, SAURIAN_TAIL_SWIPE, SAURIAN_STOMP);
+  }
+  watchRider(ctx, st);
+  const rider = st.riderId !== null ? ctx.entities.get(st.riderId) : undefined;
+  if (st.riderDiedAt !== undefined) {
+    if (Math.abs(st.riderDiedAt - st.diedAt) <= SAURIAN_DEED_WINDOW + 1e-9)
+      grantClaimDeed(ctx, inst, SAURIAN_DEED);
+    st.deedSettled = true;
+  } else if (!rider || ctx.time - st.diedAt > SAURIAN_DEED_WINDOW) {
+    st.deedSettled = true;
+  }
+}
+
 /** One tick of the Great Saurian's kit (after the mob AI). */
 export function tickSaurian(
   ctx: SimContext,
@@ -256,12 +290,17 @@ export function tickSaurian(
   saurian: Entity,
   engaged: boolean,
 ): void {
-  if (saurian.dead || !engaged) {
-    if (!engaged) dropEnrage(saurian);
+  if (saurian.dead) {
+    settleSaurianDeed(ctx, inst, saurian);
+    return;
+  }
+  if (!engaged) {
+    dropEnrage(saurian);
     if (saurian.wildheartFight) endSaurianFight(saurian);
     return;
   }
   const st = saurianState(saurian);
+  watchRider(ctx, st);
   // Both clocks run through the other strike's bar: "every 12 s", "every 16 s".
   st.tailTimer -= DT;
   st.stompTimer -= DT;

@@ -4721,9 +4721,101 @@ export interface SaurianFightState {
   enraged: boolean;
   /** Mechanic casts started (the deterministic salt). */
   casts: number;
+  /** Sim time the Saurian fell, and its rider (the Toppled Titan deed's
+   *  window); the state outlives the Saurian until the deed is settled. */
+  diedAt?: number;
+  riderDiedAt?: number;
+  deedSettled?: boolean;
 }
 
-export type WildheartFightState = SaurianFightState;
+/** The Fanglord Beastmaster's pull with his Great Jaguar
+ *  (encounters/wildheart_basin/beastmaster.ts), on the Beastmaster: one
+ *  health pool across both, Pack Bond, Stalk and the master's kit. */
+export interface BeastmasterFightState {
+  kind: 'beastmaster';
+  jaguarId: number | null;
+  /** The shared pool as last synced onto both bodies. */
+  pool: number;
+  quakeTimer: number;
+  huntTimer: number;
+  wardTimer: number;
+  heelTimer: number;
+  /** Where he braced for the Beast Pit Quake (world coordinates). */
+  plantedAt: { x: number; y: number; z: number } | null;
+  /** The jaguar's prey (Stalk) and the seconds left on its hunt. */
+  preyId: number | null;
+  stalkTimer: number;
+  biteTimer: number;
+  /** Where the jaguar crouched for Heel! (world coordinates). */
+  heelFrom: { x: number; y: number; z: number } | null;
+  bonded: boolean;
+  /** Seconds Pack Bond held this pull (the Divide and Conquer deed). */
+  bondSeconds: number;
+  casts: number;
+}
+
+/** The Great Jaguar's control windows (seconds left per kind), on the
+ *  jaguar; read by the aura gate (encounters/wildheart_basin/control_gate.ts). */
+export interface JaguarFightState {
+  kind: 'jaguar';
+  windows: { stun: number; root: number; slow: number };
+}
+
+/** The Gorgebloom's pull (encounters/wildheart_basin/gorgebloom.ts). */
+export interface GorgebloomFightState {
+  kind: 'gorgebloom';
+  seedTimer: number;
+  pollinateTimer: number;
+  lashTimer: number;
+  gorgeTimer: number;
+  /** The Vine Lash's locked aim while its bar runs. */
+  lashYaw: number | null;
+  /** The pods on the loam (instance-local spot, seconds since they landed). */
+  pods: { objectId: number; x: number; z: number; age: number }[];
+  /** Heroic Pollen Cloud: seconds each clean player has stood by a
+   *  pollinated one. */
+  cloud: { playerId: number; t: number }[];
+  /** Seconds its target has stood out of its reach, and the spit clock. */
+  outOfReach: number;
+  spitTimer: number;
+  /** A Thorn Sprout grew this pull (the Weed Control deed fails). */
+  sprouted: boolean;
+  casts: number;
+}
+
+/** Zulgar's pull (encounters/wildheart_basin/zulgar.ts). */
+export interface ZulgarFightState {
+  kind: 'zulgar';
+  phase: 'fight' | 'hunt' | 'ambush';
+  pulseTimer: number;
+  /** Spirit of the Hunt thresholds fired (70 and 40 percent). */
+  huntsFired: number;
+  /** Seconds left of the hunt (or of the ambush). */
+  huntLeft: number;
+  /** The prey marks (two on heroic Twin Prey) and which one he chases. */
+  preyIds: number[];
+  chase: number;
+  switchTimer: number;
+  /** Seconds he still feeds on a mauled prey before he hunts on. */
+  feedTimer: number;
+  /** Seconds each sun glyph stays dark (0 = lit), and its object. */
+  glyphDark: number[];
+  glyphIds: number[];
+  /** Heroic Ambush: the marked spot (instance-local) and its circle. */
+  ambushAt: { x: number; z: number } | null;
+  ambushMarkId: number | null;
+  plantedAt: { x: number; y: number; z: number } | null;
+  /** Someone was Mauled this pull (the Never Caught deed fails). */
+  mauled: boolean;
+  casts: number;
+}
+
+export type WildheartFightState =
+  | SaurianFightState
+  | BeastmasterFightState
+  | JaguarFightState
+  | GorgebloomFightState
+  | ZulgarFightState;
 
 /** Morthen's entrance and the Knellwyrm finale at the Hollow Crypt's Rite Ring
  *  (encounters/hollow_crypt), on Morthen for the claim's life: the entrance
@@ -5904,6 +5996,11 @@ export interface GuardianState {
   requiredTargetAuraId?: string;
   /** Fire-and-forget guardians may dismiss when their target contract is exhausted. */
   dismissWhenUntargeted?: boolean;
+  /** Optional melee mode (combat/guardians.ts): the guardian runs at
+   *  `moveSpeed` to its target, assisting its owner's current hostile target,
+   *  and bites within `reach` yards instead of standing and firing. Absent
+   *  (every shipped guardian), it stands and fires as before. */
+  melee?: { moveSpeed: number; reach: number };
 }
 
 /**

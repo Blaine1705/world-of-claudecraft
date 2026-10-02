@@ -38,6 +38,7 @@ import {
   type NormalDungeonTuning,
 } from '../src/sim/content/dungeon_difficulty';
 import { BUILTIN_WORLD, DUNGEONS, MOBS } from '../src/sim/data';
+import { BEAST_TUNING, ZULGAR_TUNING } from '../src/sim/encounters/wildheart_basin/ids';
 import { createMob } from '../src/sim/entity';
 import {
   applyDungeonMobTuning,
@@ -70,6 +71,7 @@ const TRASH_IDS = [
   'spore_toad',
   'vine_lasher',
   'howdah_hexcaller',
+  'thorn_sprout',
 ] as const;
 const FODDER_IDS = ['basin_raptor'] as const;
 const MINIBOSS_IDS = ['great_saurian', 'fanglord_jaguar'] as const;
@@ -121,8 +123,10 @@ describe('normal Wildheart Basin tuning data', () => {
       const planted = MOBS[spawn.mobId]?.trashKit?.call?.summon;
       if (planted) spawnIds.add(planted);
     }
-    // The Great Saurian's rider jumps down from its encounter module.
+    // The Great Saurian's rider jumps down from its encounter module, and the
+    // Gorgebloom's missed Seedpods sprout Thorn Sprouts from its own.
     spawnIds.add('howdah_hexcaller');
+    spawnIds.add('thorn_sprout');
     expect([...spawnIds].sort()).toEqual(Object.keys(tuning.damageMultiplierByMob).sort());
   });
 
@@ -160,6 +164,7 @@ describe('normal Wildheart Basin tuning data', () => {
       vine_lasher: 3.45,
       great_saurian: 4.8,
       howdah_hexcaller: 3.9,
+      thorn_sprout: 3.9,
       wildheart_beastmaster: 5.55,
       fanglord_jaguar: 4.6,
       the_gorgebloom: 6.4,
@@ -172,13 +177,13 @@ describe('normal Wildheart Basin tuning data', () => {
     });
     expect(tuning.healthMultiplierByMob).toEqual({
       great_saurian: 6.04,
-      wildheart_beastmaster: 3.91,
-      fanglord_jaguar: 4.73,
+      wildheart_beastmaster: 7.82,
+      fanglord_jaguar: 9.46,
       the_gorgebloom: 8.47,
       wildheart_high_priest: 7.21,
     });
-    // The shipped mobs' mechanics ride their own melee factor (the Sanctum
-    // default); the rework's kit mechanics are stated landed (factor 1).
+    // The shipped trash mechanics ride their own melee factor (the Sanctum
+    // default); the rework's kit and boss mechanics are stated landed (1).
     expect(tuning.mechanicDamageMultiplierByMob).toEqual({
       sunbone_totem_binder: 1,
       sunbone_totem: 1,
@@ -187,6 +192,11 @@ describe('normal Wildheart Basin tuning data', () => {
       vine_lasher: 1,
       great_saurian: 1,
       howdah_hexcaller: 1,
+      thorn_sprout: 1,
+      wildheart_beastmaster: 1,
+      fanglord_jaguar: 1,
+      the_gorgebloom: 1,
+      wildheart_high_priest: 1,
     });
   });
 });
@@ -200,7 +210,7 @@ describe('normal Wildheart Basin health', () => {
 
   it('prices each boss pool from its target fight length x 150 party DPS', () => {
     // Design sections 4.3 and 5: the Saurian 65 s, the Beastmaster and his
-    // jaguar 100 s together (half each until phase B shares the pool), the
+    // jaguar 100 s on ONE shared pool (both bodies sized to it), the
     // Gorgebloom 100 s, Zulgar 160 s.
     const pool = (id: string, target: number) => {
       const hp = normalMaxHp(id, 20);
@@ -208,8 +218,8 @@ describe('normal Wildheart Basin health', () => {
       expect(hp, id).toBeLessThan(target * 1.02);
     };
     pool('great_saurian', 10_000);
-    pool('wildheart_beastmaster', 7_500);
-    pool('fanglord_jaguar', 7_500);
+    pool('wildheart_beastmaster', 15_000);
+    pool('fanglord_jaguar', 15_000);
     pool('the_gorgebloom', 15_000);
     pool('wildheart_high_priest', 24_800);
   });
@@ -396,35 +406,27 @@ describe('normal Wildheart Basin fire-time stamping', () => {
     expect(ravager.rangedDamageMult).toBeUndefined();
   });
 
-  it('scales Zulgar Wildheart Pulse and the Beast Pit Quake by their melee factors', () => {
+  it('states the boss mechanics landed: the Pulse keeps its shipped band, the Quake hits 5.1', () => {
+    // Phase B moved Zulgar's Wildheart Pulse and the Beast Pit Quake off the
+    // template (instant, melee-factor scaled) into telegraphed encounter bars
+    // whose numbers are stated LANDED (factor 1). The Pulse keeps its shipped
+    // 170 to 243 (the old 30-43 x 5.65), the Quake meets design 5.1's 180 to
+    // 220 (it used to land 117 to 172 off the Beastmaster's melee factor).
+    expect(MOBS.wildheart_high_priest.aoePulse).toBeUndefined();
+    expect(MOBS.wildheart_beastmaster.stomp).toBeUndefined();
+    expect(MOBS.wildheart_beastmaster.warcry).toBeUndefined();
+    expect(MOBS.wildheart_beastmaster.wardAllies).toBeUndefined();
+    expect([ZULGAR_TUNING.pulseMin, ZULGAR_TUNING.pulseMax]).toEqual([170, 243]);
+    expect([BEAST_TUNING.quakeMin, BEAST_TUNING.quakeMax]).toEqual([180, 220]);
     const tuning = basinTuning();
-    const pulse = MOBS.wildheart_high_priest.aoePulse;
-    const quake = MOBS.wildheart_beastmaster.stomp;
-    expect(pulse).toBeTruthy();
-    expect(quake?.min).toBeTruthy();
-    if (!pulse || quake?.min === undefined || quake.max === undefined) return;
-    const bossMult = tuning.damageMultiplierByMob.wildheart_high_priest;
-    const masterMult = tuning.damageMultiplierByMob.wildheart_beastmaster;
-    // Raw (unmitigated) mechanic damage after the per-mob multiplier. The boss
-    // pulse sits in the same band as Korgath's Shuddering Stomp (190-285); the
-    // Quake rides the Beastmaster's new boss factor (design 5.1: 180 to 220
-    // landed is phase B's target once it becomes a telegraphed boss stomp).
-    expect(Math.round(pulse.min * bossMult)).toBe(170);
-    expect(Math.round(pulse.max * bossMult)).toBe(243);
-    expect(Math.round(quake.min * masterMult)).toBe(117);
-    expect(Math.round(quake.max * masterMult)).toBe(172);
+    for (const id of BOSS_IDS) expect(tuning.mechanicDamageMultiplierByMob?.[id], id).toBe(1);
   });
 
-  it('sizes the hexcaller heal on its ally and the beastmaster ward on the doubled pools', () => {
+  it('sizes the hexcaller heal on its ally', () => {
     // Ancestral Sap is now the trash kit's interruptible mend: a share of the
     // hurt ally's own (already doubled) pool, so it keeps pace on its own.
     const mend = MOBS.wildheart_hexcaller.trashKit?.mend;
-    const ward = MOBS.wildheart_beastmaster.wardAllies;
     expect(mend?.healPct).toBe(0.12);
-    expect(ward).toBeTruthy();
-    if (!ward) return;
-    const healMult = basinTuning().healthMultiplier;
-    expect(Math.round(ward.amount * healMult)).toBe(140);
   });
 });
 

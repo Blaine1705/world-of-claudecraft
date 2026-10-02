@@ -82,3 +82,286 @@ export const SAURIAN_HOWDAH_LOG =
 
 /** A Spore Burst cloud on the floor where a Spore Toad died (scale = radius). */
 export const WILDHEART_SPORE_CLOUD = 'wildheart_spore_cloud';
+
+/** The Great Saurian deed: it and its Howdah Hexcaller fall within 20 s. */
+export const SAURIAN_DEED = 'dgn_great_saurian';
+export const SAURIAN_DEED_WINDOW = 20;
+
+// ---- Boss 1: the Fanglord Beastmaster and his Great Jaguar (section 5.1) -----
+
+/** Pack Bond: while master and jaguar stand within reach of each other, both
+ *  take less damage (`buff_dr`) and deal more (`buff_dmg_done`, the twin aura
+ *  id below). The renderer draws the jade spirit cord between them while it
+ *  holds, brighter as they close. */
+export const BEAST_PACK_BOND = 'wildheart_pack_bond';
+export const BEAST_PACK_BOND_FURY = 'wildheart_pack_bond_fury';
+/** Stalk: the fang mark over the jaguar's prey (a mark aura on the player;
+ *  `sourceId` = the jaguar, `remaining` = the seconds left on the hunt). */
+export const BEAST_STALKED = 'wildheart_stalked';
+/** The jaguar's bite on its prey (spellfx + damage ability), and its bleed. */
+export const BEAST_JAGUAR_BITE = 'wildheart_jaguar_bite';
+export const BEAST_RENDING_BITE = 'wildheart_rending_bite';
+/** The jaguar's control windows: once a stun, a root or a slow has landed on
+ *  it, that kind of control slides off for the rest of the window (auras on
+ *  the jaguar, `remaining` = the window left). */
+export const BEAST_WARY_STUN = 'wildheart_jaguar_wary_stun';
+export const BEAST_WARY_ROOT = 'wildheart_jaguar_wary_root';
+export const BEAST_WARY_SLOW = 'wildheart_jaguar_wary_slow';
+/** Beast Pit Quake: a 1.5 s bar on the Beastmaster, then a ring round him. */
+export const BEAST_PIT_QUAKE = 'wildheart_beast_pit_quake';
+/** Call of the Hunt: both beasts attack faster for a few seconds (an aura on
+ *  each, and a `nova` spellfx on the Beastmaster). */
+export const BEAST_CALL_OF_THE_HUNT = 'wildheart_call_of_the_hunt';
+/** Thickhide Ward: an absorb shield on the jaguar (aura + `nova` spellfx). */
+export const BEAST_THICKHIDE_WARD = 'wildheart_thickhide_ward';
+/** Heroic Heel!: a 2 s bar on the jaguar (`castTargetId` = its master; the
+ *  floor arc runs from the jaguar to him), then it leaps to his side. */
+export const BEAST_HEEL = 'wildheart_jaguar_heel';
+
+export const BEAST_TUNING = {
+  /** Pack Bond reach (heroic Frenzied Bond: 20). */
+  bondReach: 15,
+  heroicBondReach: 20,
+  /** Damage taken cut and damage done rise while bonded. */
+  bondDr: 0.5,
+  bondDamage: 0.2,
+  /** Stalk: a mark lasts 10 s, then the jaguar picks another prey. */
+  stalkSeconds: 10,
+  stalkFirst: 2,
+  /** Each kind of control lands once per window. */
+  controlWindow: 20,
+  /** The jaguar bites its prey every 2 s in reach: 120 to 150, then a bleed
+   *  (20 every 2 s for 6 s). Call of the Hunt quickens the bites too. */
+  biteEvery: 2,
+  biteMin: 120,
+  biteMax: 150,
+  bleedPerTick: 20,
+  bleedInterval: 2,
+  bleedSeconds: 6,
+  /** Beast Pit Quake: every 13 s a 1.5 s bar, then 8 yd round him. */
+  quakeEvery: 13,
+  quakeFirst: 8,
+  quakeCast: 1.5,
+  quakeRadius: 8,
+  quakeMin: 180,
+  quakeMax: 220,
+  /** Call of the Hunt: every 20 s, 20 percent faster attacks for 7 s. */
+  huntEvery: 20,
+  huntFirst: 10,
+  huntSeconds: 7,
+  huntHaste: 1.2,
+  /** Thickhide Ward: every 18 s an absorb on the jaguar for 8 s (heroic 900). */
+  wardEvery: 18,
+  wardFirst: 13,
+  wardSeconds: 8,
+  wardAmount: 600,
+  heroicWardAmount: 900,
+  /** Heroic Heel!: every 25 s a 2 s bar, then the jaguar is at his side. */
+  heelEvery: 25,
+  heelFirst: 16,
+  heelCast: 2,
+  /** The deed: Pack Bond held for less than this many seconds in total. */
+  bondDeedSeconds: 10,
+} as const;
+
+/** The control group a control aura kind belongs to (the jaguar's windows),
+ *  or null when the kind is not one the windows count. */
+export function controlGroupOf(kind: string): 'stun' | 'root' | 'slow' | null {
+  if (kind === 'root') return 'root';
+  if (kind === 'slow') return 'slow';
+  if (
+    kind === 'stun' ||
+    kind === 'incapacitate' ||
+    kind === 'polymorph' ||
+    kind === 'blind' ||
+    kind === 'stasis'
+  )
+    return 'stun';
+  return null;
+}
+
+/** The wary aura id each control group leaves on the jaguar. */
+export const BEAST_WARY_AURA: Readonly<Record<'stun' | 'root' | 'slow', string>> = {
+  stun: BEAST_WARY_STUN,
+  root: BEAST_WARY_ROOT,
+  slow: BEAST_WARY_SLOW,
+};
+
+/** Pack Bond's reach for a difficulty. */
+export function bondReachFor(heroic: boolean): number {
+  return heroic ? BEAST_TUNING.heroicBondReach : BEAST_TUNING.bondReach;
+}
+
+/** How bright the spirit cord burns (0 when the bond is broken, rising to 1
+ *  as master and jaguar close): what the renderer reads. */
+export function bondStrength(distance: number, reach: number): number {
+  if (!(distance <= reach) || reach <= 0) return 0;
+  return Math.max(0.15, Math.min(1, 1 - distance / reach + 0.15));
+}
+
+export const BEASTMASTER_DEED = 'dgn_beastmaster_apart';
+
+/** The Beastmaster's lines (re-localized by src/ui/sim_i18n.ts). */
+export const BEASTMASTER_LINES = {
+  engage: 'Into the pit with them, my beauty! Hunt!',
+  heel: 'Heel! To me!',
+  death: 'Run... little one... run...',
+} as const;
+
+// ---- Boss 2: the Gorgebloom (section 5.2) ---------------------------------------
+
+/** The Thorn Sprout a missed Seedpod grows into (an elite biter). */
+export const THORN_SPROUT_ID = 'thorn_sprout';
+/** Seed Rain: a 1.5 s bar, then six Seedpods on the loam beds. */
+export const BLOOM_SEED_RAIN = 'wildheart_gorgebloom_seed_rain';
+/** A Seedpod on the loam (encounter object, `scale` = the touch radius); it
+ *  turns RIPE for its last seconds before it sprouts. */
+export const WILDHEART_SEEDPOD = 'wildheart_seedpod';
+export const WILDHEART_SEEDPOD_RIPE = 'wildheart_seedpod_ripe';
+/** A pod stomped flat (spellfx on the stomper), a pod sprouting (spellfx at
+ *  the sprout), heroic Burrowing Seeds (spellfx as a pod sinks away). */
+export const BLOOM_SEED_STOMP = 'wildheart_seedpod_stomp';
+export const BLOOM_SEED_SPROUT = 'wildheart_seedpod_sprout';
+export const BLOOM_SEED_BURROW = 'wildheart_seedpod_burrow';
+/** Pollinate: two players glow gold for 8 s (a mark aura); a pollinated
+ *  touch makes a pod sprout at once. */
+export const BLOOM_POLLINATE = 'wildheart_gorgebloom_pollinate';
+export const BLOOM_POLLINATED = 'wildheart_pollinated';
+/** Vine Lash: a 1.5 s bar, a 30 yd lane along the bloom's locked facing; the
+ *  root it leaves (the vines climb the rooted player). */
+export const BLOOM_VINE_LASH = 'wildheart_gorgebloom_vine_lash';
+export const BLOOM_VINE_LASHED = 'wildheart_vine_lashed';
+/** Gorge: a 1.5 s bar on the tank, a heavy bite, then Digesting (a dot). */
+export const BLOOM_GORGE = 'wildheart_gorgebloom_gorge';
+export const BLOOM_DIGESTING = 'wildheart_digesting';
+/** Bloom Spit: what the rooted bloom does to a target it cannot reach. */
+export const BLOOM_SPIT = 'wildheart_gorgebloom_spit';
+
+export const BLOOM_TUNING = {
+  /** Seed Rain: every 15 s, six pods; a pod sprouts 12 s after it lands
+   *  (heroic Burrowing Seeds: it burrows at 6 s and rises by a player). */
+  seedEvery: 15,
+  seedFirst: 6,
+  seedCast: 1.5,
+  seedCount: 6,
+  /** A body within this of a pod's centre touches it. */
+  podTouch: 1.6,
+  podSprout: 12,
+  heroicBurrow: 6,
+  /** The pod reads RIPE for its last seconds. */
+  podRipeFor: 4,
+  /** Pollinate: every 10 s two players for 8 s. Heroic Pollen Cloud: anyone
+   *  within 3 yd of a pollinated player for 2 s is pollinated too. */
+  pollinateEvery: 10,
+  pollinateFirst: 4,
+  pollinateCount: 2,
+  pollinateSeconds: 8,
+  cloudRadius: 3,
+  cloudSeconds: 2,
+  /** Vine Lash: every 10 s a 1.5 s bar, a 30 yd lane 2 yd either side of its
+   *  line: 180 to 220 and a 2 s root. */
+  lashEvery: 10,
+  lashFirst: 8,
+  lashCast: 1.5,
+  lashLength: 30,
+  lashHalfWidth: 2,
+  lashMin: 180,
+  lashMax: 220,
+  lashRoot: 2,
+  /** Gorge: every 15 s a 1.5 s bar, then twice its melee on the tank and
+   *  Digesting, 40 nature a second for 6 s. */
+  gorgeEvery: 15,
+  gorgeFirst: 11,
+  gorgeCast: 1.5,
+  gorgeMult: 2,
+  digestPerSecond: 40,
+  digestSeconds: 6,
+  /** Bloom Spit: once its target stands out of its reach for 1.5 s, a spit
+   *  every 2 s, 140 to 170 nature (the rooted bloom is never kited). */
+  spitDelay: 1.5,
+  spitEvery: 2,
+  spitMin: 140,
+  spitMax: 170,
+} as const;
+
+export const GORGEBLOOM_DEED = 'dgn_gorgebloom_clean';
+
+/** The Gorgebloom has no voice; its lines are emotes of the terrace
+ *  (re-localized by src/ui/sim_i18n.ts). */
+export const GORGEBLOOM_LINES = {
+  seeds: 'The Gorgebloom spits a rain of seeds across the loam!',
+  sprout: 'A Thorn Sprout bursts from the loam!',
+} as const;
+
+// ---- Boss 3: Zulgar, Voice of the Basin (section 5.3) ------------------------------
+
+/** Wildheart Pulse: a 1.5 s bar, then a ring 14 yd round him. */
+export const ZULGAR_PULSE = 'wildheart_zulgar_pulse';
+/** Spirit of the Hunt: a 1.5 s bar as the jaguar spirit takes him. */
+export const ZULGAR_SPIRIT_HUNT = 'wildheart_zulgar_spirit_hunt';
+/** The Jaguar Avatar: an aura on Zulgar for the whole hunt (`remaining` =
+ *  the hunt left). The renderer dresses him in the spirit jaguar and lights
+ *  the stone jaguar's eyes while it holds. */
+export const ZULGAR_AVATAR = 'wildheart_jaguar_avatar';
+/** The Prey: the jade claw mark on the hunted player (`sourceId` = Zulgar;
+ *  `value2` 1 on the prey he is chasing right now). */
+export const ZULGAR_PREY = 'wildheart_prey';
+/** Mauled: a caught prey is knocked down (a stun aura) and bitten. */
+export const ZULGAR_MAULED = 'wildheart_mauled';
+/** Sunstruck: a slow on the avatar when it crosses a lit sun glyph. */
+export const ZULGAR_SUNSTRUCK = 'wildheart_sunstruck';
+/** The six sun glyphs (encounter objects, `scale` = radius): lit or dark. */
+export const WILDHEART_SUN_GLYPH_LIT = 'wildheart_sun_glyph_lit';
+export const WILDHEART_SUN_GLYPH_DARK = 'wildheart_sun_glyph_dark';
+/** Heroic Ambush: he vanishes (an aura on him; immune and hidden), a 6 yd
+ *  circle marks the farthest player's spot (encounter object, `scale` =
+ *  radius), and he pounces there. */
+export const ZULGAR_VANISHED = 'wildheart_zulgar_vanished';
+export const ZULGAR_AMBUSH = 'wildheart_zulgar_ambush';
+export const WILDHEART_AMBUSH_MARK = 'wildheart_ambush_mark';
+
+export const ZULGAR_TUNING = {
+  /** Wildheart Pulse: every 12 s a 1.5 s bar, 14 yd, 170 to 243 landed. */
+  pulseEvery: 12,
+  pulseFirst: 7,
+  pulseCast: 1.5,
+  pulseRadius: 14,
+  pulseMin: 170,
+  pulseMax: 243,
+  /** Spirit of the Hunt at 70 and 40 percent: a 1.5 s bar, then 20 s. */
+  huntAtHpPct: [0.7, 0.4],
+  huntCast: 1.5,
+  huntSeconds: 20,
+  /** He chases at 110 percent of his run (a player's run speed, 7 yd a second). */
+  huntSpeedMult: 1.1,
+  /** He catches his prey within this of his reach. */
+  catchReach: 1.5,
+  /** Mauled: 500 landed and a 2 s knockdown; he feeds 1 s, then hunts on. */
+  maulDamage: 500,
+  maulStun: 2,
+  maulPause: 1,
+  /** Stuns land half as long on the avatar. */
+  huntStunScale: 0.5,
+  /** Sunstruck: 60 percent slower for 3 s; the glyph goes dark for 15 s. */
+  sunstruckSlow: 0.6,
+  sunstruckSeconds: 3,
+  glyphDarkSeconds: 15,
+  /** Heroic Twin Prey: two marks, he switches every 6 s. */
+  twinSwitch: 6,
+  /** Heroic Ambush: 2 s gone, the circle paints 0.5 s in (1.5 s warning),
+   *  6 yd, 250 to 300 landed. */
+  ambushSeconds: 2,
+  ambushWarning: 1.5,
+  ambushRadius: 6,
+  ambushMin: 250,
+  ambushMax: 300,
+} as const;
+
+export const ZULGAR_DEED = 'dgn_zulgar_uncaught';
+
+/** Zulgar's lines (re-localized by src/ui/sim_i18n.ts). */
+export const ZULGAR_LINES = {
+  hunt: 'The jaguar wakes in me! Run, little prey!',
+  huntEnds: 'The spirit sleeps... for now.',
+  ambush: 'You cannot hide from the hunter!',
+} as const;

@@ -42,6 +42,7 @@ import {
   HOWDAH_HEXCALLER_ID,
   SPORE_TOAD_ID,
   SUNBONE_TOTEM_ID,
+  THORN_SPROUT_ID,
   TOTEM_BINDER_ID,
   VINE_LASHER_ID,
   WILDHEART_DUNGEON,
@@ -575,10 +576,38 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     scale: 1.9,
     color: 0x688057,
   },
+  // What a missed Seedpod grows into (the Gorgebloom's Seed Rain, section
+  // 5.2): a thorned biter as tall as a man, rooted no longer, straight at the
+  // nearest player. Kill it fast; the tank picks it up. It withers when its
+  // parent dies. A kit add (never a pack member), no loot.
+  thorn_sprout: {
+    id: THORN_SPROUT_ID,
+    name: 'Thorn Sprout',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    untameable: true,
+    hpBase: 60,
+    hpPerLevel: 20,
+    dmgBase: 11,
+    dmgPerLevel: 2.4,
+    attackSpeed: 2,
+    armorPerLevel: 16,
+    moveSpeed: 7,
+    aggroRadius: 14,
+    xpMult: 0.3,
+    componentTags: ['bark'],
+    loot: [],
+    scale: 1.5,
+    color: 0x6b8f2a,
+  },
   // Boss 1 (design section 5.1), promoted from the twice-spawned rare: the
   // Fanglord Beastmaster and his Great Jaguar in the Beast Pits, spawned once.
-  // Phase A keeps his shipped kit; phase B adds the G15 linked pair (shared
-  // health, Pack Bond, the jaguar's Stalk).
+  // His whole kit rides encounters/wildheart_basin/beastmaster.ts (the G15
+  // linked pair: one health pool, Pack Bond, the jaguar's Stalk, the
+  // telegraphed Beast Pit Quake, Call of the Hunt, Thickhide Ward; heroic
+  // Heel! and Frenzied Bond), never a template field.
   wildheart_beastmaster: {
     id: 'wildheart_beastmaster',
     name: 'Fanglord Beastmaster',
@@ -597,46 +626,45 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 32,
     moveSpeed: 6.8,
     aggroRadius: 17,
-    warcry: {
-      radius: 15,
-      every: 12,
-      hasteMult: 1.2,
-      duration: 7,
-      name: 'Call of the Hunt',
-      school: 'physical',
-    },
-    wardAllies: {
-      radius: 13,
-      every: 14,
-      amount: 70,
-      duration: 7,
-      name: 'Thickhide Ward',
-      school: 'nature',
-    },
-    stomp: {
-      radius: 8,
-      every: 13,
-      duration: 1.1,
-      min: 21,
-      max: 31,
-      name: 'Beast Pit Quake',
-      school: 'physical',
-    },
     componentTags: ['hide', 'fang'],
+    // Section 8.1: one guaranteed archetype piece (wildheart_items.ts) beside
+    // the shipped Beastspear and Duskwhisper rows. Every gear row is
+    // normalOnly: a heroic kill pays one equipment item from
+    // HEROIC_BOSS_LOOT.wildheart_beastmaster instead.
     loot: [
       { copper: 2500, chance: 1 },
       // Guaranteed troll trophy junk: the Grubjaw rare convention (zone2.ts).
       { itemId: 'chipped_tusk', chance: 1 },
-      { itemId: 'fanglords_beastspear', chance: 0.12 },
-      { itemId: 'duskwhisper', chance: 0.12 },
+      { itemId: 'fanglords_beastspear', chance: 0.12, normalOnly: true },
+      { itemId: 'duskwhisper', chance: 0.12, normalOnly: true },
+      {
+        itemId: 'beastpit_warbelt',
+        chance: 0.34,
+        rollGroup: 'beastmaster_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'jaguar_hide_jerkin',
+        chance: 0.33,
+        rollGroup: 'beastmaster_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'hexbone_handwraps',
+        chance: 0.33,
+        rollGroup: 'beastmaster_guaranteed',
+        normalOnly: true,
+      },
     ],
     scale: 2.35,
     color: 0x485b3d,
   },
   // The Fanglord's Great Jaguar (design section 5.1): the great cat he raised
-  // from a cub, about one and a half times a horse. Phase A fights it as a
-  // plain melee elite beside its master; phase B gives the pair one health
-  // pool, Pack Bond and Stalk. The jaguar stays unnamed (the IP verdict).
+  // from a cub, about one and a half times a horse. It shares its master's
+  // health pool and hunts a marked prey (Stalk): it cannot be taunted, and
+  // stuns, roots and slows each land on it once per 20 s (the encounter's
+  // control windows); its swings are the encounter's bites. The jaguar stays
+  // unnamed (the IP verdict).
   fanglord_jaguar: {
     id: FANGLORD_JAGUAR_ID,
     name: "Fanglord's Great Jaguar",
@@ -644,7 +672,7 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     maxLevel: 20,
     family: 'beast',
     elite: true,
-    ccImmune: true,
+    ignoreTaunt: true,
     untameable: true,
     hpBase: 120,
     hpPerLevel: 30,
@@ -662,8 +690,10 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
   },
   // Boss 2 (design section 5.2): the Gorgebloom, a carnivorous flower the size
   // of a house rooted in the plunge pool at the foot of the Weeping Falls. It
-  // never moves; it turns to face its targets. Phase A: melee only; phase B
-  // adds Seed Rain, Pollinate, Vine Lash and Gorge.
+  // never moves; it turns to face its targets. Its kit rides
+  // encounters/wildheart_basin/gorgebloom.ts: Seed Rain, Pollinate, Vine
+  // Lash, Gorge and the Bloom Spit at a target out of its reach; heroic
+  // Burrowing Seeds and Pollen Cloud.
   the_gorgebloom: {
     id: GORGEBLOOM_ID,
     name: 'The Gorgebloom',
@@ -685,14 +715,41 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     idleStationary: true,
     // Rooted at the terrace's front: melee reaches it from its petals' edge.
     bodyRadius: 4.5,
-    loot: [{ copper: 2500, chance: 1 }],
+    // Section 8.1: one guaranteed archetype piece and the Falls-Blessed Staff
+    // chase row (wildheart_items.ts). Heroic rides
+    // HEROIC_BOSS_LOOT.the_gorgebloom.
+    loot: [
+      { copper: 2500, chance: 1 },
+      {
+        itemId: 'rootbound_sabatons',
+        chance: 0.34,
+        rollGroup: 'gorgebloom_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'pollen_dusted_leggings',
+        chance: 0.33,
+        rollGroup: 'gorgebloom_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'bloomsilk_cowl',
+        chance: 0.33,
+        rollGroup: 'gorgebloom_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'falls_blessed_staff', chance: 0.1, normalOnly: true },
+    ],
     scale: 2.8,
     color: 0xa3322a,
   },
   // Boss 3 (design section 5.3): Zulgar, Voice of the Basin, on the Jaguar
-  // Shrine Terrace. Phase A keeps his shipped Wildheart Pulse, Jaguar Roar and
-  // enrage; phase B adds the Spirit of the Hunt (the jaguar avatar chasing its
-  // Prey through the sun glyphs).
+  // Shrine Terrace. Jaguar Roar and the enrage stay template fields; the
+  // telegraphed Wildheart Pulse and the Spirit of the Hunt (the jaguar avatar
+  // chasing its Prey through the sun glyphs; heroic Twin Prey and Ambush)
+  // ride encounters/wildheart_basin/zulgar.ts, which also owns his control
+  // immunity (entity flags: immune outside the hunt, slowable and rootable
+  // during it), so the template carries no ccImmune.
   wildheart_high_priest: {
     id: 'wildheart_high_priest',
     name: 'Zulgar, Voice of the Basin',
@@ -701,7 +758,6 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     family: 'troll',
     elite: true,
     boss: true,
-    ccImmune: true,
     hpBase: 470,
     hpPerLevel: 54,
     dmgBase: 17,
@@ -710,7 +766,6 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 35,
     moveSpeed: 7,
     aggroRadius: 19,
-    aoePulse: { min: 30, max: 43, radius: 14, every: 9, name: 'Wildheart Pulse' },
     knockback: { chance: 0.22, distance: 7, name: 'Jaguar Roar' },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.28 },
     yells: {

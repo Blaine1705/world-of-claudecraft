@@ -106,7 +106,9 @@ describe('Wildheart Basin dungeon content', () => {
     expect(MOBS.wildheart_hexcaller.trashKit?.mend?.name).toBe('Ancestral Sap');
     expect(MOBS.wildheart_beastmaster.rare).toBeUndefined();
     expect(MOBS.wildheart_beastmaster.ccImmune).toBe(true);
-    expect(MOBS.wildheart_beastmaster.warcry?.name).toBe('Call of the Hunt');
+    // Phase B: his whole kit (Call of the Hunt, Thickhide Ward, the Quake)
+    // rides encounters/wildheart_basin/beastmaster.ts, never a template field.
+    expect(MOBS.wildheart_beastmaster.warcry).toBeUndefined();
     for (const id of TROLLS) {
       const visual = VISUALS[`mob_${id}`];
       expect(visual?.yaw, `${id} faces the game +Z movement axis`).toBe(-Math.PI / 2);
@@ -116,8 +118,12 @@ describe('Wildheart Basin dungeon content', () => {
 
   it('makes Zulgar the sole final boss with arena-scale mechanics and three epics', () => {
     const boss = MOBS.wildheart_high_priest;
-    expect(boss).toMatchObject({ boss: true, elite: true, ccImmune: true });
-    expect(boss.aoePulse?.name).toBe('Wildheart Pulse');
+    // Phase B: his control immunity is the encounter's (immune outside the
+    // hunt, slowable and rootable in it) and his Pulse a telegraphed bar
+    // (encounters/wildheart_basin/zulgar.ts), so neither is a template field.
+    expect(boss).toMatchObject({ boss: true, elite: true });
+    expect(boss.ccImmune).toBeUndefined();
+    expect(boss.aoePulse).toBeUndefined();
     expect(boss.knockback?.name).toBe('Jaguar Roar');
     expect(boss.enrage?.belowHpPct).toBe(0.3);
     // Scoped to Zulgar's own loot table: the Tier-2 loot pass added the rare
@@ -463,8 +469,13 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     const gear = entries.filter(
       (entry) => entry.itemId && ITEMS[entry.itemId]?.slot && ITEMS[entry.itemId]?.kind !== 'bag',
     );
-    // Twelve former acquisitions plus the Paired Talons trinket (content/trinkets.ts).
-    expect(gear).toHaveLength(13);
+    // Twelve former acquisitions plus the Paired Talons trinket (content/trinkets.ts),
+    // less the two epics the rework moved to the Beastmaster (Bloodmane
+    // War-Legguards) and the Gorgebloom (Sunbone Oracle's Crown):
+    // tests/wildheart_loot.test.ts pins them there.
+    expect(gear).toHaveLength(11);
+    expect(gear.some((entry) => entry.itemId === 'bloodmane_war_legguards')).toBe(false);
+    expect(gear.some((entry) => entry.itemId === 'sunbone_oracles_crown')).toBe(false);
     expect(gear.some((entry) => entry.itemId === 'paired_talons')).toBe(true);
     expect(gear.every((entry) => entry.rollGroup === 'wildheart_heroic')).toBe(true);
     expect(gear.reduce((sum, entry) => sum + entry.chance, 0)).toBe(1);

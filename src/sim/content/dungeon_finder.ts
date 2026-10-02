@@ -243,18 +243,38 @@ const NYTHRAXIS_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
   },
 ];
 
+// The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
+// section 5): the three boss cores replace the old trash rows; heroic adds each
+// boss's twists (its own array, so the normal preview never carries them).
 const WILDHEART_BASIN_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'wildheart_stalker', mechanics: [] },
-  { mobId: 'wildheart_ravager', mechanics: ['bloodmane_rend', 'tusk_sweep'] },
-  { mobId: 'wildheart_hexcaller', mechanics: ['ancestral_sap'] },
   {
     mobId: 'wildheart_beastmaster',
-    mechanics: ['call_of_the_hunt', 'thickhide_ward', 'beast_pit_quake'],
+    mechanics: ['pack_bond', 'stalk', 'shared_health', 'beast_pit_quake'],
+  },
+  {
+    mobId: 'the_gorgebloom',
+    mechanics: ['seed_rain', 'pollinate', 'vine_lash', 'gorge'],
   },
   {
     mobId: 'wildheart_high_priest',
     final: true,
-    mechanics: ['wildheart_pulse', 'jaguar_roar', 'enrage'],
+    mechanics: ['spirit_of_the_hunt', 'wildheart_pulse', 'jaguar_roar', 'enrage'],
+  },
+];
+
+const WILDHEART_BASIN_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'wildheart_beastmaster',
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[0].mechanics, 'heel_frenzied_bond'],
+  },
+  {
+    mobId: 'the_gorgebloom',
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[1].mechanics, 'burrowing_seeds'],
+  },
+  {
+    mobId: 'wildheart_high_priest',
+    final: true,
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[2].mechanics, 'twin_prey_ambush'],
   },
 ];
 
@@ -442,7 +462,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'wildheart_basin',
-    encounters: WILDHEART_BASIN_ENCOUNTERS,
+    encounters: WILDHEART_BASIN_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {

@@ -382,20 +382,22 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   // The rework (docs/design/dungeon-rework/wildheart_basin.md): the bosses'
   // pools come from target fight length x planning party DPS at level 20
   // (about 150): the Great Saurian 65 s (about 10,000), the Beastmaster and
-  // his jaguar 100 s together (about 7,500 each until phase B joins their
-  // pools), the Gorgebloom 100 s (about 15,000), Zulgar 160 s (about 24,800).
+  // his jaguar 100 s on ONE shared pool (about 15,000, both bodies sized to
+  // it: encounters/wildheart_basin/beastmaster.ts), the Gorgebloom 100 s
+  // (about 15,000), Zulgar 160 s (about 24,800).
   // The Beastmaster leaves the old 150 rare band for the boss band (200);
   // the jaguar and the Saurian swing in the 150 band, the non-elite raptors
-  // (they come in fours) in the 50 band, the rest of the new trash on the
-  // trash floor. The new kit mobs' mechanics are stated LANDED (factor 1).
+  // (they come in fours) in the 50 band, the rest of the new trash (the
+  // Gorgebloom's Thorn Sprouts too) on the trash floor. The kit mechanics,
+  // the three bosses' included, are stated LANDED (factor 1).
   wildheart_basin: {
     id: 'wildheart_basin',
     difficulty: 'normal',
     healthMultiplier: 2.0,
     healthMultiplierByMob: {
       great_saurian: 6.04,
-      wildheart_beastmaster: 3.91,
-      fanglord_jaguar: 4.73,
+      wildheart_beastmaster: 7.82,
+      fanglord_jaguar: 9.46,
       the_gorgebloom: 8.47,
       wildheart_high_priest: 7.21,
     },
@@ -410,6 +412,7 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       vine_lasher: 3.45,
       great_saurian: 4.8,
       howdah_hexcaller: 3.9,
+      thorn_sprout: 3.9,
       wildheart_beastmaster: 5.55,
       fanglord_jaguar: 4.6,
       the_gorgebloom: 6.4,
@@ -423,6 +426,11 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       vine_lasher: 1,
       great_saurian: 1,
       howdah_hexcaller: 1,
+      thorn_sprout: 1,
+      wildheart_beastmaster: 1,
+      fanglord_jaguar: 1,
+      the_gorgebloom: 1,
+      wildheart_high_priest: 1,
     },
     rangedDamageMultiplierByMob: {
       wildheart_stalker: 2.7,
@@ -700,16 +708,17 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // 455 post-mitigation at 15.5x): the open-field roster sits between
     // Orkadia's casters and the Sanctum band.
     damageMultiplier: 17.25,
-    // The kit adds (the Sunbone Totems, the Howdah Hexcaller) ride the trash
-    // kit's spawner, never summonAdds; kept at the half convention.
+    // The kit adds (the Sunbone Totems, the Howdah Hexcaller, the Gorgebloom's
+    // Thorn Sprouts) ride the trash kit's spawner, never summonAdds; kept at
+    // the half convention.
     addDamageMultiplier: 8.625,
     // The rework's pools from target fight length x heroic party DPS (about
-    // 230): the Saurian 65 s, the Beastmaster and his jaguar 100 s together,
-    // the Gorgebloom 100 s, Zulgar 160 s.
+    // 230): the Saurian 65 s, the Beastmaster and his jaguar 100 s on one
+    // shared pool (about 23,000), the Gorgebloom 100 s, Zulgar 160 s.
     healthMultiplierByMob: {
       great_saurian: 8.36,
-      wildheart_beastmaster: 5.52,
-      fanglord_jaguar: 6.67,
+      wildheart_beastmaster: 11.04,
+      fanglord_jaguar: 13.34,
       the_gorgebloom: 12.05,
       wildheart_high_priest: 9.98,
     },
@@ -719,7 +728,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     },
     // Avoidable mechanics priced apart from the tank-swing floor: a missed
     // trash dodge costs a heroic cloth wearer about 40 percent, the Saurian's
-    // avoidables about 45 percent (the Foundry's heroic convention).
+    // and the three bosses' avoidables about 45 percent (the Foundry's heroic
+    // convention): their mechanics are stated landed on normal, so 2.5x here.
     mechanicDamageMultiplierByMob: {
       sunbone_totem_binder: 3,
       sunbone_totem: 3,
@@ -727,7 +737,12 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       spore_toad: 3,
       vine_lasher: 3,
       howdah_hexcaller: 3,
+      thorn_sprout: 3,
       great_saurian: 2.5,
+      wildheart_beastmaster: 2.5,
+      fanglord_jaguar: 2.5,
+      the_gorgebloom: 2.5,
+      wildheart_high_priest: 2.5,
     },
     armorMultiplier: 1.2,
     finalBossId: 'wildheart_high_priest',
