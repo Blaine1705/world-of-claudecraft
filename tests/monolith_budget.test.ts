@@ -542,7 +542,7 @@ const MONOLITHS: MonolithRow[] = [
     // moved out, buying the Iron Cage escape prompt's composition (hud/dungeon).
     // LOWERED to 18082 when Ossick's chain alert joined it: both prompts now
     // compose behind one DungeonPrompts member and one frame call (hud/dungeon).
-    ceiling: 18082,
+    ceiling: 18073,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1007,7 +1007,7 @@ const MONOLITHS: MonolithRow[] = [
     // folded into one (the Hollow Crypt drake paints its own breath).
     // Lowered after extracting the per-view far-mesh decision (the moving
     // holdout and the hysteresis latch) into src/render/far_lod_latch.ts.
-    ceiling: 12664,
+    ceiling: 12663,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
