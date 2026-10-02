@@ -584,7 +584,7 @@ const TALL_TREE_HEIGHT = 28.3;
 const TALL_TREE_CROWN = 13;
 const PALM_TALL_HEIGHT = 17;
 const PALM_TALL_CROWN = 7;
-const GORGE_CELL = 12.5;
+const GORGE_CELL = 10;
 
 /** The lowest walkable floor within `radius` of (x, z) (Infinity if none). */
 function lowestFloorNear(x: number, z: number, radius: number): number {
@@ -614,9 +614,22 @@ export function planGorgeJungle(): BasinKitPlacement[] {
   for (let gz = -252; gz <= 300; gz += GORGE_CELL) {
     for (let gx = -126; gx <= 126; gx += GORGE_CELL) {
       const i = n++;
-      const x = gx + (basinHash(i, 21) - 0.5) * GORGE_CELL * 0.6;
-      const z = gz + (basinHash(i, 23) - 0.5) * GORGE_CELL * 0.6;
-      if (!insideCaldera(x, z, 4) || !openGorge(x, z)) continue;
+      const jx = gx + (basinHash(i, 21) - 0.5) * GORGE_CELL * 0.6;
+      const jz = gz + (basinHash(i, 23) - 0.5) * GORGE_CELL * 0.6;
+      // The jittered spot, or a nudge off a terrace's edge into a narrow gap.
+      const spot = (
+        [
+          [0, 0],
+          [4, 0],
+          [-4, 0],
+          [0, 4],
+          [0, -4],
+        ] as const
+      ).find(([dx, dz]) => openGorge(jx + dx, jz + dz));
+      if (!spot) continue;
+      const x = jx + spot[0];
+      const z = jz + spot[1];
+      if (!insideCaldera(x, z, 4)) continue;
       const river = riverDistance(x, z);
       const roll = basinHash(i, 29);
       const rot = basinHash(i, 31) * Math.PI * 2;
@@ -647,7 +660,7 @@ export function planGorgeJungle(): BasinKitPlacement[] {
         }
       }
       const scale = 0.85 + basinHash(i, 43) * 0.45;
-      if (river < RIVER_CLEAR_HALF_WIDTH + CLUMP_RADIUS * scale * 0.8) continue;
+      if (river < RIVER_CLEAR_HALF_WIDTH + CLUMP_RADIUS * scale * 0.65) continue;
       const low = lowestFloorNear(x, z, CLUMP_RADIUS * scale);
       if (VOID + CLUMP_HEIGHT * scale >= low - 1) continue;
       out.push({

@@ -290,7 +290,7 @@ describe('Wildheart Basin kit: the dressing outside the field', () => {
     expect(gorge.filter((p) => p.piece === 'Kit_CanopyClump').length).toBeGreaterThan(100);
     for (const p of gorge) {
       if (p.piece === 'Kit_CanopyClump')
-        expect(riverDistance(p.x, p.z)).toBeGreaterThan(RIVER_CLEAR_HALF_WIDTH + 2);
+        expect(riverDistance(p.x, p.z)).toBeGreaterThan(RIVER_CLEAR_HALF_WIDTH + 3);
       expect(insideCaldera(p.x, p.z), `${p.piece} at ${p.x}, ${p.z}`).toBe(true);
       expect(walkable(p.x, p.z), `${p.piece} at ${p.x}, ${p.z}`).toBe(false);
     }
