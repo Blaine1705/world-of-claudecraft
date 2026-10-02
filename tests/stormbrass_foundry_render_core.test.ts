@@ -5,17 +5,24 @@
 // from shut to open, and the lights stay inside the per-zone budget.
 
 import { describe, expect, it } from 'vitest';
+import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph/telegraph_look_core';
 import {
+  aimedLane,
   beltLooks,
   burstDelayForRadius,
+  FOUNDRY_AIMED_LANES,
   FOUNDRY_AURA_MARKERS,
   FOUNDRY_MECHANIC_COLORS,
   FOUNDRY_OBJECT_SPECS,
   FOUNDRY_PRESS_STRIP_SPEC,
   foundryCastFill,
   foundryTelegraphSpecs,
+  hatchPulse,
   platingRings,
+  pulseFront,
   storedChargeFill,
+  storedChargeGlow,
+  storedChargeRadius,
 } from '../src/render/stormbrass_foundry/foundry_fx_core';
 import {
   boltPath,
@@ -46,8 +53,10 @@ import {
   FOUNDRY_HATCH_TEMPLATES,
   FOUNDRY_SCRAP_MARK,
   FOUNDRY_SHELL_MARK,
+  FOUNDRY_SHELL_PENDING,
   HAULER_STEAM_BLAST,
   HAULER_TUNING,
+  RANGE_PROOF_SHOT,
   RANGE_TARGET_LOCK,
   RANGE_TUNING,
   TOCK_TUNING,
@@ -159,8 +168,46 @@ describe('Foundry boss telegraphs draw what the sim tests (phase 2)', () => {
     expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_HATCH_TEMPLATES.open].color).toBe(
       FOUNDRY_MECHANIC_COLORS.hatchOpen,
     );
-    expect(FOUNDRY_AURA_MARKERS[RANGE_TARGET_LOCK]).toBeDefined();
+    // No floor ring follows a marked runner (it read as the landing circle):
+    // the Target Lock is the crosshair over the head.
+    expect(FOUNDRY_AURA_MARKERS[RANGE_TARGET_LOCK]).toBeUndefined();
     expect(FOUNDRY_AURA_MARKERS[DRAFT_CELL_CARRY]).toBeDefined();
+  });
+
+  it('a shell circle reads dim for its lag, then lethal red for its last beat', () => {
+    const pending = FOUNDRY_OBJECT_SPECS[FOUNDRY_SHELL_PENDING];
+    const red = FOUNDRY_OBJECT_SPECS[FOUNDRY_SHELL_MARK];
+    expect(pending.fillSeconds(5)).toBe(RANGE_TUNING.shellLag);
+    expect(pending.color).toBe(TELEGRAPH_THREAT_COLORS.danger);
+    expect(pending.fade ?? 1).toBeLessThan(1);
+    expect(pending.sigil).not.toBe(true);
+    expect(red.color).toBe(TELEGRAPH_THREAT_COLORS.lethal);
+    expect(red.fade ?? 1).toBe(1);
+  });
+
+  it('the Proof Shot paints a lethal lane from the Rangewarden to its target', () => {
+    const lane = FOUNDRY_AIMED_LANES[RANGE_PROOF_SHOT];
+    expect(lane.color).toBe(TELEGRAPH_THREAT_COLORS.lethal);
+    expect(lane.halfWidth).toBeGreaterThan(0.5);
+    // Due east, 10 yd; due north, 3 yd; point blank still reads.
+    expect(aimedLane(0, 0, 10, 0).yaw).toBeCloseTo(Math.PI / 2, 9);
+    expect(aimedLane(0, 0, 10, 0).length).toBeCloseTo(10, 9);
+    expect(aimedLane(5, 5, 5, 8).yaw).toBeCloseTo(0, 9);
+    expect(aimedLane(5, 5, 5, 8).length).toBeCloseTo(3, 9);
+    expect(aimedLane(1, 1, 1, 1).length).toBe(2);
+  });
+
+  it('the open hatch pulses, the shut and shuddering ones do not', () => {
+    expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_HATCH_TEMPLATES.open].pulse).toBe(true);
+    expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_HATCH_TEMPLATES.warn].pulse).not.toBe(true);
+    expect(FOUNDRY_OBJECT_SPECS[FOUNDRY_HATCH_TEMPLATES.closed].pulse).not.toBe(true);
+    for (let t = 0; t < 3; t += 0.07) {
+      expect(hatchPulse(t)).toBeGreaterThanOrEqual(0);
+      expect(hatchPulse(t)).toBeLessThanOrEqual(1);
+      // Always brighter than a plain ring's rim.
+      expect(pulseFront(t)).toBeGreaterThanOrEqual(1);
+    }
+    expect(pulseFront(Math.PI / 24)).toBeGreaterThan(2);
   });
 
   it('the belts scroll with their objects: heading, Overtime speed, the klaxon red, idle', () => {
@@ -191,5 +238,29 @@ describe('Foundry boss telegraphs draw what the sim tests (phase 2)', () => {
     expect(storedChargeFill(500, 2000)).toBe(0.25);
     expect(storedChargeFill(9000, 2000)).toBe(1);
     expect(storedChargeFill(undefined, 2000)).toBe(0);
+  });
+
+  it('the Stored Charge glow and ring grow with the bank, and are dark with none', () => {
+    const none = storedChargeGlow(0);
+    expect(none.glow).toBe(0);
+    expect(none.floorArcs).toBe(0);
+    let prev = storedChargeGlow(0.01);
+    expect(prev.glow).toBeGreaterThan(0);
+    expect(prev.floorArcs).toBeGreaterThanOrEqual(1);
+    for (const f of [0.25, 0.5, 0.75, 1]) {
+      const g = storedChargeGlow(f);
+      expect(g.glow).toBeGreaterThan(prev.glow);
+      expect(g.reach).toBeGreaterThan(prev.reach);
+      expect(g.width).toBeGreaterThan(prev.width);
+      expect(g.arcChance).toBeGreaterThan(prev.arcChance);
+      expect(g.floorArcs).toBeGreaterThanOrEqual(prev.floorArcs);
+      prev = g;
+    }
+    // Bounded: a bank past full reads as full.
+    expect(storedChargeGlow(7)).toEqual(storedChargeGlow(1));
+    expect(storedChargeGlow(1).arcChance).toBeLessThanOrEqual(1);
+    expect(storedChargeRadius(0)).toBe(4.5);
+    expect(storedChargeRadius(1)).toBeGreaterThan(storedChargeRadius(0.5));
+    expect(storedChargeRadius(9)).toBe(storedChargeRadius(1));
   });
 });

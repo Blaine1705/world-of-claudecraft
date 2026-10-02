@@ -3,8 +3,12 @@
 // colour, and how it fills, all derived from the sim's own templates and
 // encounter constants so the edge a player dodges is the edge the sim tests.
 // Phase 2 adds the four bosses: the press strip, the shells, the coil strikes,
-// the fists, the cells and the hatch ring, the aura glyphs (a marked player, a
-// cell carrier), the plating rings, the Stored Charge ring and the belts.
+// the fists, the cells and the hatch ring, the aura glyphs (a cell carrier),
+// the plating rings, the Stored Charge ring and the belts. The Rangewarden's
+// shell circles paint dim the moment they are sampled and red for their last
+// beat, its Target Lock reads as a crosshair over the head
+// (foundry_lock_marker.ts) and its Proof Shot as a lane to the tank; the open
+// Core Hatch pulses under its beacon (foundry_hatch_beacon.ts).
 //
 // Three-free, DOM-free, deterministic.
 
@@ -25,10 +29,11 @@ import {
   FOUNDRY_PRESS_STRIP,
   FOUNDRY_SCRAP_MARK,
   FOUNDRY_SHELL_MARK,
+  FOUNDRY_SHELL_PENDING,
   FOUNDRY_SHRAPNEL,
   HAULER_STEAM_BLAST,
   HAULER_TUNING,
-  RANGE_TARGET_LOCK,
+  RANGE_PROOF_SHOT,
   RANGE_TUNING,
   TOCK_LEVER,
   TOCK_TUNING,
@@ -174,6 +179,10 @@ export interface FoundryObjectSpec {
   fillSeconds: (radius: number) => number;
   /** A glyph instead of a filling footprint (a thing to take, not to dodge). */
   sigil?: boolean;
+  /** The footprint's strength (1 = full; a pending shell reads dimmer). */
+  fade?: number;
+  /** A beckoning pulse on the rim (the open hatch: go now). */
+  pulse?: boolean;
 }
 
 /** The encounter objects' floor circles (their radius rides `scale`). */
@@ -191,8 +200,16 @@ export const FOUNDRY_OBJECT_SPECS: Readonly<Record<string, FoundryObjectSpec>> =
     accent: FOUNDRY_ACCENTS.brass,
     fillSeconds: () => HAULER_TUNING.tossWarning,
   },
-  // The Rangewarden's shell painting its circle a beat before it lands, and
-  // the heroic shrapnel left where one burst (a standing zone).
+  // The Rangewarden's shell circle the moment it paints under a marked
+  // player (dim, filling over the lag), then red for its last beat as the
+  // shell flies; and the heroic shrapnel left where one burst (a standing
+  // zone). The circle never moves: the object stands where it was sampled.
+  [FOUNDRY_SHELL_PENDING]: {
+    color: TELEGRAPH_THREAT_COLORS.danger,
+    accent: TELEGRAPH_ACCENTS.physical,
+    fillSeconds: () => RANGE_TUNING.shellLag,
+    fade: 0.6,
+  },
   [FOUNDRY_SHELL_MARK]: {
     color: TELEGRAPH_THREAT_COLORS.lethal,
     accent: TELEGRAPH_ACCENTS.physical,
@@ -246,8 +263,47 @@ export const FOUNDRY_OBJECT_SPECS: Readonly<Record<string, FoundryObjectSpec>> =
     color: FOUNDRY_MECHANIC_COLORS.hatchOpen,
     accent: FOUNDRY_ACCENTS.brass,
     fillSeconds: () => 0,
+    pulse: true,
   },
 };
+
+/** The open hatch's beckoning pulse (0 to 1, about twice a second): the rim
+ *  brightens on it and the beacon over the ring breathes with it. */
+export function hatchPulse(clock: number): number {
+  return 0.5 + 0.5 * Math.sin(clock * 12);
+}
+
+/** The rim brightness a pulsing ring paints at (over the plain front). */
+export function pulseFront(clock: number): number {
+  return 1 + 1.2 * hatchPulse(clock);
+}
+
+/** Casts aimed at one body that paint a lane from the caster to it while the
+ *  bar runs (the Proof Shot: who the heavy shell is for). */
+export const FOUNDRY_AIMED_LANES: Readonly<
+  Record<string, { halfWidth: number; color: number; accent: number }>
+> = {
+  [RANGE_PROOF_SHOT]: {
+    halfWidth: 1.3,
+    color: TELEGRAPH_THREAT_COLORS.lethal,
+    accent: TELEGRAPH_ACCENTS.physical,
+  },
+};
+
+/** An aimed lane from a caster at (cx, cz) to its target at (tx, tz): its
+ *  heading and length (never shorter than `min`, so a point-blank aim still
+ *  reads). */
+export function aimedLane(
+  cx: number,
+  cz: number,
+  tx: number,
+  tz: number,
+  min = 2,
+): { yaw: number; length: number } {
+  const dx = tx - cx;
+  const dz = tz - cz;
+  return { yaw: Math.atan2(dx, dz), length: Math.max(min, Math.hypot(dx, dz)) };
+}
 
 /** The Stamping Press strip: a lane over one belt's last yards, from its
  *  object (which stands on the strip's centre; its scale is the length). */
@@ -259,16 +315,13 @@ export const FOUNDRY_PRESS_STRIP_SPEC = {
   fillSeconds: TOCK_TUNING.pressWarning,
 } as const;
 
-/** Auras that draw a glyph under whoever wears them: the Rangewarden's
- *  crosshair over a marked player, the crackle round a Storm Cell carrier. */
+/** Auras that draw a glyph under whoever wears them: the crackle round a
+ *  Storm Cell carrier. (The Rangewarden's Target Lock is a crosshair over the
+ *  head, foundry_lock_marker.ts: a ring that followed the runner read as the
+ *  landing circle.) */
 export const FOUNDRY_AURA_MARKERS: Readonly<
   Record<string, { radius: number; color: number; accent: number }>
 > = {
-  [RANGE_TARGET_LOCK]: {
-    radius: 2.2,
-    color: TELEGRAPH_THREAT_COLORS.control,
-    accent: TELEGRAPH_ACCENTS.physical,
-  },
   [DRAFT_CELL_CARRY]: {
     radius: 1.8,
     color: FOUNDRY_MECHANIC_COLORS.cell,
@@ -301,6 +354,33 @@ export function platingRings(
 export function storedChargeFill(stacks: number | undefined, full: number | undefined): number {
   if (!stacks || !full || full <= 0) return 0;
   return Math.min(1, Math.max(0, stacks / full));
+}
+
+/** The Stored Charge glow on the Warden's body at a bank fill (0 to 1): the
+ *  core light's size (0 = none), the chance a tick throws an arc up its
+ *  antlers, how many arcs leap off the coil to the floor and how far, and the
+ *  arcs' width. Everything grows with the bank, so a big Discharge is seen
+ *  coming (foundry_creature_fx.ts paints it). */
+export function storedChargeGlow(fill: number): {
+  glow: number;
+  arcChance: number;
+  floorArcs: number;
+  reach: number;
+  width: number;
+} {
+  const f = Math.min(1, Math.max(0, fill));
+  return {
+    glow: f > 0 ? 1.4 + 4.6 * f : 0,
+    arcChance: 0.25 + 0.7 * f,
+    floorArcs: f > 0 ? 1 + Math.floor(f * 3) : 0,
+    reach: 3 + 6 * f,
+    width: 0.1 + 0.16 * f,
+  };
+}
+
+/** The Stored Charge ring grows with the bank: its radius at a fill. */
+export function storedChargeRadius(fill: number): number {
+  return 4.5 + 3 * Math.min(1, Math.max(0, fill));
 }
 
 export interface BeltLook {

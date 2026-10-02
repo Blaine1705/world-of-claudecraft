@@ -218,6 +218,13 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // the press strip's fill) and Scalding Vents (the jets and steam under the lanes).
   { file: 'src/render/stormbrass_foundry/foundry_press.ts', layer: 'encounter', strict: true },
   { file: 'src/render/stormbrass_foundry/foundry_vents.ts', layer: 'encounter', strict: true },
+  // The Prime Draft's open Core Hatch: a shaft standing on the hatch ring, over
+  // the ring's own telegraph.
+  {
+    file: 'src/render/stormbrass_foundry/foundry_hatch_beacon.ts',
+    layer: 'encounter',
+    strict: true,
+  },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];

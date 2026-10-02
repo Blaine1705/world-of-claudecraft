@@ -376,7 +376,7 @@ import { FrozenOrbFx, handleFrozenOrbSpellfxEvent } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
-import { buildGateObject, gateObjectPlan } from './gate_objects';
+import { buildGateObject, gateObjectPlan, isStableObjectTransition } from './gate_objects';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
 import {
@@ -420,7 +420,6 @@ import { idleSlot } from './idle_queue';
 import {
   buildIgnivarWaterConduit,
   isIgnivarWaterConduitTemplate,
-  isStableIgnivarWaterConduitTransition,
   syncIgnivarWaterConduitVisibility,
 } from './ignivar_conduit';
 import { ignivarBossFacingLocked } from './ignivar_encounter_core';
@@ -10069,7 +10068,7 @@ export class Renderer {
         // strand the object invisible through the whole 80-96yd hysteresis band
         // if the viewer retreats before the rebuild lands.
         if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
-          if (isStableIgnivarWaterConduitTransition(v.builtTemplateId, e.templateId)) {
+          if (isStableObjectTransition(v.builtTemplateId, e.templateId)) {
             v.builtTemplateId = e.templateId;
           } else {
             this.removeView(id);

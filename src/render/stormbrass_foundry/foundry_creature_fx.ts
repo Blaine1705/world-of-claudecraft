@@ -15,8 +15,10 @@
 //  - the Rangewarden: a thin lock-on beam from its glass eye to each marked
 //    player, every salvo shell's muzzle flash on the berm, its smoking arc and
 //    its burst, the Proof Shot's charge and blast, the drone rack's smoke;
-//  - the Voltaic Warden: arcs crawling from its coil to its antlers (wilder
-//    as Stored Charge builds, blue when Charged), the Static Lash's whip and
+//  - the Voltaic Warden: arcs crawling from its coil to its antlers and a
+//    core glow that swells with the Stored Charge, arcs leaping off the coil
+//    to the floor farther and thicker as the bank builds (blue when Charged,
+//    copper-green when Grounded), the Static Lash's whip and
 //    chain, the Discharge's nova and the arcs it throws to every player, the
 //    Coil Strike's bolt;
 //  - the Prime Draft: storm cells crackling where they lie and in their
@@ -117,6 +119,7 @@ import {
   pressPoseInto,
   syncPressStrike,
 } from './foundry_press_core';
+import { storedChargeFill, storedChargeGlow } from './foundry_fx_core';
 
 type Rgb = readonly [number, number, number];
 
@@ -1302,18 +1305,45 @@ export class FoundryCreatureFx {
       case VOLTAIC_WARDEN_ID: {
         if (!tick) return;
         const stored = e.auras?.find((a) => a.id === VOLTAIC_STORED);
-        const bank = Math.min(1, (stored?.stacks ?? 0) / 2000);
+        const bank = storedChargeFill(stored?.stacks, stored?.value2);
+        const g = storedChargeGlow(bank);
         const charged = hasAura(e, VOLTAIC_CHARGED);
         const flipping = e.castingAbility === VOLTAIC_FLIP;
-        const rate = 0.25 + 0.5 * bank + (flipping ? 0.6 : 0);
-        if (this.rand() < rate) {
+        const hue = charged ? ARC_BLUE : COPPER_GLOW;
+        const tint = charged ? RGB_2 : RGB_23;
+        if (this.rand() < g.arcChance + (flipping ? 0.6 : 0)) {
           const c = this.at(e, A.wardenCore, this.p);
           const tip = this.at(e, this.rand() < 0.5 ? A.wardenAntlerL : A.wardenAntlerR, this.q);
-          this.arcs.strike(this.clock, c, tip, 0.18, charged ? ARC_BLUE : COPPER_GLOW, 0.1, 0.25);
+          this.arcs.strike(this.clock, c, tip, 0.18, hue, g.width, 0.25);
         }
-        if (flipping || bank > 0.5) {
+        // The bank on its body: a core light that swells, and arcs leaping
+        // off the coil to the floor, farther and thicker as it builds.
+        if (g.glow > 0) {
           const c = this.at(e, A.wardenCore, this.p);
-          this.sparks(c.x, c.y, c.z, 2, 4, charged ? RGB_2 : RGB_23);
+          const beat = 1 + 0.12 * Math.sin(this.clock * (6 + 10 * bank));
+          this.flash(c.x, c.y, c.z, g.glow * beat, tint, 0.14);
+          for (let k = 0; k < g.floorArcs; k++) {
+            if (this.rand() > 0.3 + 0.4 * bank) continue;
+            const a = this.rand() * Math.PI * 2;
+            const r = g.reach * (0.55 + 0.45 * this.rand());
+            this.q.x = e.pos.x + Math.sin(a) * r;
+            this.q.z = e.pos.z + Math.cos(a) * r;
+            this.q.y = this.groundY(this.q.x, this.q.z) + 0.1;
+            this.arcs.strike(
+              this.clock,
+              c,
+              this.q,
+              0.2,
+              bank > 0.6 ? ARC_WHITE : hue,
+              g.width,
+              0.32,
+            );
+            if (bank > 0.4) this.sparks(this.q.x, this.q.y, this.q.z, 3, 5, tint);
+          }
+        }
+        if (flipping || bank > 0.25) {
+          const c = this.at(e, A.wardenCore, this.p);
+          this.sparks(c.x, c.y, c.z, 2 + Math.round(5 * bank), 4 + 4 * bank, tint);
         }
         return;
       }
@@ -1414,23 +1444,29 @@ export class FoundryCreatureFx {
         this.arcs.strike(this.clock, this.p, this.q, 0.12, ARC_WHITE, 0.06, 0.4);
       }
     }
-    // The open hatch's gold breath of light.
+    // The open hatch's gold breath of light: motes streaming up the beacon
+    // (foundry_hatch_beacon.ts is the every-tier shaft), sparks dancing on
+    // the ring's rim, the chest itself blazing.
     for (const b of this.bosses) {
       if (b.templateId !== PRIME_DRAFT_ID || b.dead) continue;
       for (const e of this.hatches) {
         if (e.templateId !== 'foundry_hatch_open') continue;
         const y = this.groundY(e.pos.x, e.pos.z);
-        this.puff(e.pos.x, y + 0.3, e.pos.z, 2, {
-          speed: 0.6,
-          up: 2.5,
-          life: 1.2,
-          size: [0.35, 0.08],
+        this.puff(e.pos.x, y + 0.3, e.pos.z, 4, {
+          speed: 0.9,
+          up: 7,
+          life: 1.7,
+          size: [0.45, 0.08],
           color: RGB_27,
-          alpha: 0.9,
+          alpha: 0.95,
           glow: true,
         });
+        const a = this.rand() * Math.PI * 2;
+        const r = e.scale || 4;
+        this.sparks(e.pos.x + Math.sin(a) * r, y + 0.2, e.pos.z + Math.cos(a) * r, 3, 3, RGB_27);
+        this.flash(e.pos.x, y + 0.6, e.pos.z, 3.4, RGB_28, 0.14);
         const c = this.chest(b, this.q);
-        this.flash(c.x, c.y, c.z, 3, RGB_28, 0.12);
+        this.flash(c.x, c.y, c.z, 4.2, RGB_28, 0.12);
         void HATCH_GOLD;
       }
     }

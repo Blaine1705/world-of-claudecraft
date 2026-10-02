@@ -14,11 +14,16 @@ import * as THREE from 'three';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../sim/data';
 import { TEMPLE_OBJECT_TEMPLATES } from '../sim/encounters/drowned_temple/ids';
 import { CRYPT_OBJECT_TEMPLATES } from '../sim/encounters/hollow_crypt/ids';
-import { FOUNDRY_OBJECT_TEMPLATES } from '../sim/encounters/stormbrass_foundry/ids';
+import {
+  FOUNDRY_OBJECT_TEMPLATES,
+  FOUNDRY_SHELL_MARK,
+  FOUNDRY_SHELL_PENDING,
+} from '../sim/encounters/stormbrass_foundry/ids';
 import { BASTION_OBJECT_TEMPLATES } from '../sim/encounters/sunken_bastion/ids';
 import { dungeonGateAt, dungeonGateStateOf } from '../sim/instances/dungeon_gates';
 import { sharedUniforms } from './gfx';
 import { gateMemoryKey, observeGate } from './hollow_crypt/crypt_gate_state_core';
+import { isStableIgnivarWaterConduitTransition } from './ignivar_conduit';
 import {
   buildIgnivarRaidGate,
   type IgnivarRaidGatePlan,
@@ -68,6 +73,15 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
     templateId: e.templateId,
     height: 8,
   };
+}
+
+/** A template swap the object's view survives as it stands (no rebuild): the
+ *  Ignivar conduit's own stable pairs, and a Rangewarden shell arming (its
+ *  empty anchor is the same before and after; a rebuild a shell, eight a
+ *  mark, would only flash the view's stand-in plate). */
+export function isStableObjectTransition(from: string, to: string): boolean {
+  if (from === FOUNDRY_SHELL_PENDING && to === FOUNDRY_SHELL_MARK) return true;
+  return isStableIgnivarWaterConduitTransition(from, to);
 }
 
 /** Build the view body for a gate plan. */

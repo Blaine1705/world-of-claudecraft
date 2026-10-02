@@ -5,15 +5,18 @@
 //    Deploy Turret; and the bosses' bars: Tock's lever klaxon, the Voltaic
 //    Warden's rattle, the Prime Draft's Arm Sweep, Tremor Step and rivet shower;
 //  - the encounter objects' circles, each filling to its moment: a death
-//    burst's ring, a Scrap Toss plate, a Rangewarden shell (and heroic
-//    shrapnel), a Coil Strike, a Piston Fist; and the things to take or reach:
-//    a Storm Cell's glyph and the Core Hatch's ring (dim shut, yellow
-//    shuddering, gold open);
-//  - the Stamping Press strip, a lane over one belt's last yards;
-//  - a glyph under every player a Target Lock marks and under a cell carrier;
+//    burst's ring, a Scrap Toss plate, a Rangewarden shell (dim as it paints
+//    under a marked player, red for its last beat; and heroic shrapnel), a
+//    Coil Strike, a Piston Fist; and the things to take or reach: a Storm
+//    Cell's glyph and the Core Hatch's ring (dim shut, yellow shuddering, gold
+//    open and pulsing under its beacon, foundry_hatch_beacon.ts);
+//  - the Stamping Press strip, a lane over one belt's last yards; the Proof
+//    Shot's lane from the Rangewarden to the tank while its bar runs;
+//  - a crosshair over every player a Target Lock marks
+//    (foundry_lock_marker.ts) and a glyph under a cell carrier;
 //  - the plating ring under the Voltaic Warden and its drones (copper-green
 //    Grounded, blue Charged, split front and back on heroic) and the Stored
-//    Charge ring filling at the Warden's feet;
+//    Charge ring at the Warden's feet, filling and widening with the bank;
 //  - the Main Line's belts: their scroll and their klaxon red, written into
 //    the shared belt uniforms (foundry_dressing.ts FOUNDRY_BELT_UNIFORMS);
 //  - Line-Master Tock's Scalding Vents: the walkways' floor warning, the jets
@@ -37,8 +40,10 @@ import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { FOUNDRY_BELT_UNIFORMS } from './foundry_dressing';
 import {
+  aimedLane,
   beltLooks,
   FOUNDRY_ACCENTS,
+  FOUNDRY_AIMED_LANES,
   FOUNDRY_AURA_MARKERS,
   FOUNDRY_MECHANIC_COLORS,
   FOUNDRY_OBJECT_SPECS,
@@ -49,9 +54,13 @@ import {
   foundryTimedFill,
   isBeltTemplate,
   platingRings,
+  pulseFront,
   storedChargeFill,
+  storedChargeRadius,
 } from './foundry_fx_core';
 import { FoundryVentFx } from './foundry_vents';
+import { FoundryHatchBeacon } from './foundry_hatch_beacon';
+import { FoundryLockMarkers } from './foundry_lock_marker';
 
 const CAST_SLOTS = 12;
 /** Heroic Walking Barrage leaves up to three trails of shrapnel at once. */
@@ -59,8 +68,10 @@ const OBJECT_SLOTS = 32;
 const LANE_SLOTS = 2;
 const MARKER_SLOTS = 6;
 const PLATING_SLOTS = 10;
+/** Aimed bars at once (one Rangewarden: one Proof Shot; a spare). */
+const AIM_SLOTS = 2;
 const SCAN_SEC = 0.1;
-const STORED_RADIUS = 4.5;
+const STORED_FADE = 0.45;
 
 interface CastSlot extends TelegraphFan {
   casterId: number;
@@ -76,6 +87,11 @@ interface ObjectSlot extends TelegraphFan {
 interface LaneSlot extends TelegraphLane {
   objectId: number;
   since: number;
+}
+
+interface AimSlot extends TelegraphLane {
+  casterId: number;
+  castId: string;
 }
 
 interface MarkerSlot extends TelegraphFan {
@@ -107,6 +123,9 @@ export class FoundryFx {
   private readonly markers: MarkerSlot[] = [];
   private readonly plating: PlatingSlot[] = [];
   private readonly stored: TelegraphFan & { entityId: number };
+  private readonly aims: AimSlot[] = [];
+  private readonly lockMarks: FoundryLockMarkers;
+  private readonly hatchBeacon: FoundryHatchBeacon;
   private readonly kit: TelegraphKit;
   private readonly vents: FoundryVentFx;
   private readonly beltScratch: { x: number; templateId: string; facing: number; scale: number }[] =
@@ -138,6 +157,10 @@ export class FoundryFx {
       this.markers.push({ ...this.kit.fan(14), entityId: -1, auraId: '' });
     for (let i = 0; i < PLATING_SLOTS; i++)
       this.plating.push({ ...this.kit.fan(12), entityId: -1, half: 0, color: 0, arc: 0 });
+    for (let i = 0; i < AIM_SLOTS; i++)
+      this.aims.push({ ...this.kit.lane(17), casterId: -1, castId: '' });
+    this.lockMarks = new FoundryLockMarkers(this.root);
+    this.hatchBeacon = new FoundryHatchBeacon(this.root, groundY);
     this.stored = { ...this.kit.fan(13), entityId: -1 };
     this.kit.layOutFan(this.stored, 360, {
       color: FOUNDRY_MECHANIC_COLORS.stored,
@@ -164,9 +187,45 @@ export class FoundryFx {
     this.paintCasts(world);
     this.paintObjects(world);
     this.paintLanes(world);
+    this.paintAims(world);
     this.paintMarkers(world);
+    this.lockMarks.update(world);
+    this.hatchBeacon.update(world);
     this.paintPlating(world);
     this.vents.update(dt, world, this.clock);
+  }
+
+  /** The aimed bars: a lane from the caster to the body it aims at, filling
+   *  with the bar (the Proof Shot: the heavy shell is for this one). */
+  private paintAims(world: IWorld): void {
+    for (const slot of this.aims) {
+      if (slot.casterId < 0) continue;
+      const caster = world.entities.get(slot.casterId);
+      const look = FOUNDRY_AIMED_LANES[slot.castId];
+      const aimed =
+        caster && caster.castTargetId !== null ? world.entities.get(caster.castTargetId) : null;
+      if (!caster || caster.dead || caster.castingAbility !== slot.castId || !look || !aimed) {
+        slot.casterId = -1;
+        slot.group.visible = false;
+        continue;
+      }
+      const x = caster.pos.x;
+      const z = caster.pos.z;
+      const lane = aimedLane(x, z, aimed.pos.x, aimed.pos.z);
+      this.kit.drapeLane(
+        slot,
+        this.groundY,
+        x,
+        this.groundY(x, z),
+        z,
+        lane.yaw,
+        lane.length,
+        look.halfWidth,
+        look,
+      );
+      const fill = foundryCastFill(caster.castRemaining, caster.castTotal);
+      this.kit.paintLane(slot, { fill, clock: this.clock, range: lane.length });
+    }
   }
 
   private paintCasts(world: IWorld): void {
@@ -220,7 +279,13 @@ export class FoundryFx {
         yaw,
         radius,
       );
-      this.kit.paintFan(slot, { fill, clock: this.clock, range: radius });
+      this.kit.paintFan(slot, {
+        fill,
+        clock: this.clock,
+        range: radius,
+        fade: spec.fade,
+        front: spec.pulse ? pulseFront(this.clock) : undefined,
+      });
     }
   }
 
@@ -292,12 +357,14 @@ export class FoundryFx {
     }
     const x = warden.pos.x;
     const z = warden.pos.z;
-    this.kit.drapeFan(st, this.groundY, x, this.groundY(x, z), z, 0, STORED_RADIUS);
-    this.kit.paintFan(st, {
-      fill: storedChargeFill(aura.stacks, aura.value2),
-      clock: this.clock,
-      range: STORED_RADIUS,
-    });
+    // The bank fills the ring and widens it: a full one reads from across the
+    // crown (the Discharge it will release at the flip).
+    const fill = storedChargeFill(aura.stacks, aura.value2);
+    const radius = storedChargeRadius(fill);
+    this.kit.drapeFan(st, this.groundY, x, this.groundY(x, z), z, 0, radius);
+    // A readout, not a danger: kept under half strength so a full bank never
+    // whites out the crown's floor or the Coil Strike circles painted on it.
+    this.kit.paintFan(st, { fill, clock: this.clock, range: radius, fade: STORED_FADE });
   }
 
   private scanWorld(world: IWorld): void {
@@ -305,14 +372,17 @@ export class FoundryFx {
     for (const e of world.entities.values()) {
       if (e.kind === 'player') {
         this.scanMarkers(e);
+        this.lockMarks.scan(e);
         continue;
       }
       if (e.kind !== 'mob') {
         this.scanObject(e);
+        this.hatchBeacon.scan(e);
         continue;
       }
       if (e.dead) continue;
       this.scanPlating(e);
+      this.scanAim(e);
       const castId = e.castingAbility;
       const spec = castId ? this.spec(castId) : undefined;
       if (!castId || !spec) continue;
@@ -378,6 +448,18 @@ export class FoundryFx {
     slot.group.visible = true;
   }
 
+  private scanAim(e: { id: number; castingAbility: string | null }): void {
+    const castId = e.castingAbility;
+    const look = castId ? FOUNDRY_AIMED_LANES[castId] : undefined;
+    if (!castId || !look) return;
+    if (this.aims.some((a) => a.casterId === e.id)) return;
+    const slot = this.aims.find((a) => a.casterId < 0);
+    if (!slot) return;
+    slot.casterId = e.id;
+    slot.castId = castId;
+    slot.group.visible = true;
+  }
+
   private scanMarkers(e: AuraBearer): void {
     if (e.dead || !e.auras) return;
     for (const a of e.auras) {
@@ -415,6 +497,8 @@ export class FoundryFx {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
+    this.lockMarks.dispose();
+    this.hatchBeacon.dispose();
     this.kit.dispose();
     this.vents.dispose();
   }

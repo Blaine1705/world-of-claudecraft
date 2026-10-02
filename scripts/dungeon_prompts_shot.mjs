@@ -79,6 +79,9 @@ function stage(kind) {
     body.templateId = 'prime_draft';
     other.templateId = 'foundry_storm_cell';
     other.kind = 'object';
+    // The alert only names a cell within reach: lay it at the player's feet.
+    other.pos.x = p.pos.x + 2;
+    other.pos.z = p.pos.z + 2;
     p.targetId = body.id;
     return 'floor cell';
   }
@@ -95,8 +98,11 @@ function stage(kind) {
   body.templateId = 'voltaic_warden';
   body.auras = body.auras.filter((a) => !a.id.startsWith('foundry_'));
   body.auras.push(
+    // The flip countdown rides the plating aura's own clock.
     aura(kind === 'grounded' ? 'foundry_plating_grounded' : 'foundry_plating_charged', {
       sourceId: body.id,
+      remaining: 7,
+      duration: 15,
     }),
     aura('foundry_stored_charge', { sourceId: body.id, stacks: 900, value2: 2000 }),
   );
@@ -131,6 +137,11 @@ try {
   await page.evaluate(() => window.__game.world.chat('/dev god'));
   for (const kind of WANT.length ? WANT : SCENARIOS) {
     const label = await page.evaluate(stage, kind);
+    // The Foundry alert's scene scan is keyed on the roster version: a staged
+    // template swap is not a roster change, so say one happened.
+    await page.evaluate(() => {
+      window.__game.world.entityRosterVersion++;
+    });
     await sleep(900);
     const file = path.join(OUT, `${PREFIX}${MOBILE ? 'movil_' : ''}aviso_${kind}.png`);
     await page.screenshot({ path: file });
