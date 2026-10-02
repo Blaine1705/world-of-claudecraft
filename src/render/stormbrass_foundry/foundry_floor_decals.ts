@@ -14,6 +14,7 @@ import {
   decalCorners,
   FOUNDRY_DECAL_KINDS,
   type FoundryDecalKind,
+  foundryFloorMarkHeight,
   planFoundryFloorDecals,
 } from './foundry_floor_plan_core';
 
@@ -284,8 +285,9 @@ export function buildFoundryFloorDecals(lowGfx: boolean): THREE.Mesh | null {
     const v0 = 1 - Math.floor(k / GRID) / GRID - 1 / GRID + inset;
     const uvs = [u0, v1, u1, v1, u1, v0, u0, v0];
     corners.forEach(([x, z], c) => {
-      // A hair of lift per mark, so two overlapping marks never fight.
-      pos.set([x, d.y + 0.025 + (i % 7) * 0.002, z], i * 12 + c * 3);
+      // The marks' rung of the floor's ladder, a hair apart per mark, so two
+      // overlapping marks never fight.
+      pos.set([x, foundryFloorMarkHeight(d, i), z], i * 12 + c * 3);
       nor.set([0, 1, 0], i * 12 + c * 3);
     });
     uv.set(uvs, i * 8);

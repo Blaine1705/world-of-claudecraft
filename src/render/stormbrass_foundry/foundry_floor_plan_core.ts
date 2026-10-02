@@ -55,6 +55,36 @@ export interface FoundryDecal {
   cosmetic: boolean;
 }
 
+// ---- the floor's ladder of heights ---------------------------------------------------
+// Three things lie level on a Foundry floor: the field's own floor, the painted
+// marks, and the kit's flat faces (the rail bed's ballast). Two of them at one
+// height are drawn at one depth, and they tear and shimmer as the camera moves,
+// so each stands on its own rung, a real height apart (pinned against the
+// shipped kit in tests/stormbrass_foundry_kit.test.ts).
+
+/** The lowest mark's lift over its floor (yards). */
+export const FOUNDRY_FLOOR_MARK_LIFT = 0.025;
+/** A hair more per mark, so two overlapping marks never share a height. */
+const FOUNDRY_FLOOR_MARK_STEP = 0.002;
+const FOUNDRY_FLOOR_MARK_STEPS = 7;
+/** The highest mark's lift over its floor. */
+export const FOUNDRY_FLOOR_MARK_TOP =
+  FOUNDRY_FLOOR_MARK_LIFT + (FOUNDRY_FLOOR_MARK_STEPS - 1) * FOUNDRY_FLOOR_MARK_STEP;
+/** The lowest a level kit face may lie over a floor: clear of every mark. */
+export const FOUNDRY_FLOOR_KIT_CLEAR = 0.045;
+/** A level kit face this far under the floor is buried, never drawn over it. */
+export const FOUNDRY_FLOOR_BURIED = 0.004;
+/** The rail track's lift: its ballast bed is modelled 0.05 thick with its top
+ *  at 0, so this stands the bed ON the floor with its top over every mark. */
+export const FOUNDRY_RAIL_BED_LIFT = 0.05;
+
+/** The height a mark is drawn at: its floor, its rung, and its own hair. */
+export function foundryFloorMarkHeight(d: { y: number }, index: number): number {
+  return (
+    d.y + FOUNDRY_FLOOR_MARK_LIFT + (index % FOUNDRY_FLOOR_MARK_STEPS) * FOUNDRY_FLOOR_MARK_STEP
+  );
+}
+
 const FIELD = STORMBRASS_FOUNDRY_FIELD;
 const VOID = STORMBRASS_FOUNDRY_VOID_HEIGHT;
 const floorAt = (x: number, z: number): number => authoredFieldHeight(FIELD, x, z);

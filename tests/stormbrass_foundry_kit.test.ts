@@ -30,6 +30,12 @@ import {
 import {
   decalCorners,
   FOUNDRY_DECAL_KINDS,
+  FOUNDRY_FLOOR_BURIED,
+  FOUNDRY_FLOOR_KIT_CLEAR,
+  FOUNDRY_FLOOR_MARK_LIFT,
+  FOUNDRY_FLOOR_MARK_TOP,
+  FOUNDRY_RAIL_BED_LIFT,
+  foundryFloorMarkHeight,
   planFoundryFloorDecals,
 } from '../src/render/stormbrass_foundry/foundry_floor_plan_core';
 import {
@@ -114,6 +120,19 @@ interface Shape {
 }
 
 const shapes = new Map<string, Shape>();
+/** A piece's level, up-facing triangles (glTF frame): centroid and area. */
+interface Flat {
+  x: number;
+  y: number;
+  z: number;
+  area: number;
+  tri: [V3, V3, V3];
+  /** Lazily: is it shut inside its own piece (a lid close over it)? */
+  covered?: boolean;
+}
+const flats = new Map<string, Flat[]>();
+/** Every triangle of a piece (glTF frame). */
+const meshes = new Map<string, [V3, V3, V3][]>();
 /** Triangles per shipped piece. */
 const triangles = new Map<string, number>();
 let extras: Record<string, unknown> = {};
@@ -160,6 +179,42 @@ beforeAll(async () => {
         }
       }
     }
+    const level: Flat[] = [];
+    const tris3: [V3, V3, V3][] = [];
+    if (mesh) {
+      let base = 0;
+      for (const prim of mesh.listPrimitives()) {
+        const count = prim.getAttribute('POSITION')?.getCount() ?? 0;
+        const idx = prim.getIndices();
+        const n = idx ? idx.getCount() : count;
+        for (let t = 0; t + 2 < n; t += 3) {
+          const at = (k: number): V3 => points[base + (idx ? idx.getScalar(t + k) : t + k)];
+          const [a, b, c] = [at(0), at(1), at(2)];
+          tris3.push([a, b, c]);
+          const ux = b[0] - a[0];
+          const uy = b[1] - a[1];
+          const uz = b[2] - a[2];
+          const vx = c[0] - a[0];
+          const vy = c[1] - a[1];
+          const vz = c[2] - a[2];
+          const nx = uy * vz - uz * vy;
+          const ny = uz * vx - ux * vz;
+          const nz = ux * vy - uy * vx;
+          const len = Math.hypot(nx, ny, nz);
+          if (len < 1e-6 || ny / len < 0.999) continue;
+          level.push({
+            x: (a[0] + b[0] + c[0]) / 3,
+            y: (a[1] + b[1] + c[1]) / 3,
+            z: (a[2] + b[2] + c[2]) / 3,
+            area: len / 2,
+            tri: [a, b, c],
+          });
+        }
+        base += count;
+      }
+    }
+    meshes.set(name, tris3);
+    flats.set(name, level);
     let tris = 0;
     if (mesh)
       for (const prim of mesh.listPrimitives())
@@ -1071,4 +1126,129 @@ describe('Stormbrass Foundry kit: nothing stands in a walkway without a collider
     expect(furnace.max[1]).toBeGreaterThan(L.railLift);
     expect(pad).toBe(8);
   });
+});
+
+// The floor's own ladder of heights (foundry_floor_plan_core.ts): the field's
+// floor, then the painted marks a hair over it, then the kit. A kit face lying
+// level IN the floor (the rail bed's ballast was modelled with its top at 0) is
+// drawn at the floor's own depth, and the two tear and shimmer as the camera
+// moves; one lying in the marks' band does the same against a mark over it.
+
+/** Is a level face shut inside its own piece: another face of the piece close
+ *  over its centroid (a kerb standing on the rock it caps)? */
+function coveredFlat(piece: string, f: Flat): boolean {
+  if (f.covered !== undefined) return f.covered;
+  // The whole face must be shut in: its centroid and a point toward each
+  // corner (a wide bed under a few sleepers is still seen between them).
+  const [p0, p1, p2] = f.tri;
+  const samples: [number, number][] = [[f.x, f.z]];
+  for (const q of [p0, p1, p2]) samples.push([f.x + (q[0] - f.x) * 0.8, f.z + (q[2] - f.z) * 0.8]);
+  for (const [m, n] of [
+    [p0, p1],
+    [p1, p2],
+    [p2, p0],
+  ])
+    samples.push([f.x + ((m[0] + n[0]) / 2 - f.x) * 0.8, f.z + ((m[2] + n[2]) / 2 - f.z) * 0.8]);
+  const tris = meshes.get(piece) ?? [];
+  f.covered = samples.every(([x, z]) => {
+    for (const [a, b, c] of tris) {
+      const d = (b[2] - c[2]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[2] - c[2]);
+      if (Math.abs(d) < 1e-9) continue;
+      const u = ((b[2] - c[2]) * (x - c[0]) + (c[0] - b[0]) * (z - c[2])) / d;
+      const v = ((c[2] - a[2]) * (x - c[0]) + (a[0] - c[0]) * (z - c[2])) / d;
+      if (u < 0 || v < 0 || u + v > 1) continue;
+      const y = u * a[1] + v * b[1] + (1 - u - v) * c[1];
+      if (y > f.y + 1e-4 && y < f.y + 0.4) return true;
+    }
+    return false;
+  });
+  return f.covered;
+}
+
+/** Does a floor mark lie over the point? */
+function underMark(decals: ReturnType<typeof planFoundryFloorDecals>, x: number, z: number) {
+  for (const d of decals) {
+    const dx = x - d.x;
+    const dz = z - d.z;
+    const c = Math.cos(d.rot);
+    const s = Math.sin(d.rot);
+    if (Math.abs(dx * c - dz * s) <= d.w / 2 && Math.abs(dx * s + dz * c) <= d.d / 2) return true;
+  }
+  return false;
+}
+
+describe('Stormbrass Foundry kit: the floor ladder', () => {
+  it('lifts the marks over the floor and the rail bed over the marks', () => {
+    expect(FOUNDRY_FLOOR_MARK_LIFT).toBeGreaterThanOrEqual(0.02);
+    expect(FOUNDRY_FLOOR_MARK_TOP).toBeGreaterThan(FOUNDRY_FLOOR_MARK_LIFT);
+    expect(FOUNDRY_FLOOR_KIT_CLEAR).toBeGreaterThan(FOUNDRY_FLOOR_MARK_TOP + 0.005);
+    expect(FOUNDRY_RAIL_BED_LIFT).toBeGreaterThanOrEqual(FOUNDRY_FLOOR_KIT_CLEAR);
+    const decals = planFoundryFloorDecals();
+    decals.forEach((d, i) => {
+      const y = foundryFloorMarkHeight(d, i);
+      expect(y - d.y).toBeGreaterThanOrEqual(FOUNDRY_FLOOR_MARK_LIFT - 1e-9);
+      expect(y - d.y).toBeLessThanOrEqual(FOUNDRY_FLOOR_MARK_TOP + 1e-9);
+    });
+    // The Hauler's loop, the cart siding and the range's target line: every
+    // track tile stands its bed on the floor, its top over every mark.
+    const track = planFoundryKitPlacements().filter((p) => p.piece === 'Kit_RailTrack');
+    expect(track.length).toBeGreaterThan(80);
+    for (const p of track) expect(p.lift, `track at ${p.x}, ${p.z}`).toBe(FOUNDRY_RAIL_BED_LIFT);
+  });
+
+  it.skipIf(!haveKit)('lays no kit face level in the floor, or in a mark over it', () => {
+    const decals = planFoundryFloorDecals();
+    const failures: string[] = [];
+    let seen = 0;
+    for (const p of planFoundryKitPlacements()) {
+      if (p.shear) continue;
+      const level = flats.get(p.piece);
+      if (!level || level.length === 0) continue;
+      const at = placer(p);
+      const stretch = p.scale * p.scale * (p.stretch ?? 1);
+      let inFloor = 0;
+      let inMark = 0;
+      let low = Infinity;
+      for (const f of level) {
+        const w = at(f.x, f.y, f.z);
+        const g = floor(w[0], w[2]);
+        if (g <= VOID + 1) continue;
+        const over = w[1] - g;
+        if (over <= -FOUNDRY_FLOOR_BURIED || over >= FOUNDRY_FLOOR_KIT_CLEAR - 1e-6) continue;
+        if (coveredFlat(p.piece, f)) continue;
+        if (over < FOUNDRY_FLOOR_MARK_LIFT - 1e-6) inFloor += f.area * stretch;
+        else if (underMark(decals, w[0], w[2])) inMark += f.area * stretch;
+        else continue;
+        low = Math.min(low, over);
+      }
+      if (p.piece === 'Kit_RailTrack') seen++;
+      const tag = `${p.piece} at (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`;
+      if (inFloor > 0.05)
+        failures.push(`${tag}: ${inFloor.toFixed(2)} sq yd level in the floor (${low.toFixed(3)})`);
+      else if (inMark > 0.05)
+        failures.push(`${tag}: ${inMark.toFixed(2)} sq yd level in a mark (${low.toFixed(3)})`);
+    }
+    expect(seen).toBeGreaterThan(80);
+    const first = new Map<string, string>();
+    for (const f of failures) {
+      const piece = f.split(' at ')[0];
+      if (!first.has(piece)) first.set(piece, f);
+    }
+    expect(failures, [...first.values()].join('\n')).toEqual([]);
+  });
+
+  it.skipIf(!haveKit)(
+    'the audit sees the rail bed: on the bare floor its ballast is level in it',
+    () => {
+      // The bug this ladder fixes, kept as the audit's own proof: the shipped
+      // track's ballast top is modelled at 0, wide as the whole tile.
+      const bed = (flats.get('Kit_RailTrack') ?? []).filter(
+        (f) => Math.abs(f.y) < 1e-4 && !coveredFlat('Kit_RailTrack', f),
+      );
+      const area = bed.reduce((sum, f) => sum + f.area, 0);
+      expect(area).toBeGreaterThan(3);
+      // Lifted, that face stands a rung over the highest mark.
+      expect(FOUNDRY_RAIL_BED_LIFT + bed[0].y).toBeGreaterThanOrEqual(FOUNDRY_FLOOR_KIT_CLEAR);
+    },
+  );
 });

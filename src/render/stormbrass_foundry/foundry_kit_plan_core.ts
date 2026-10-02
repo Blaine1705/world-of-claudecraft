@@ -40,6 +40,11 @@ import {
   type FieldProp,
 } from '../../sim/instances/authored_field';
 import { type FieldEdgeKind, planFieldEdgePieces } from '../authored_field/field_edge_plan_core';
+import {
+  FOUNDRY_FLOOR_KIT_CLEAR,
+  FOUNDRY_FLOOR_MARK_LIFT,
+  FOUNDRY_RAIL_BED_LIFT,
+} from './foundry_floor_plan_core';
 import { FOUNDRY_FLOOD_MASTS, PRIME_DRAFT_LANDMARK } from './foundry_plan_core';
 
 export interface FoundryKitPlacement {
@@ -553,7 +558,7 @@ export function planMainLine(): FoundryKitPlacement[] {
   // Vent grilles let into the walkways either side of the belts.
   for (const x of [-21, 21])
     for (const z of [-38, -24, -19, -8])
-      out.push({ piece: 'Kit_FloorGrille', x, z, rot: Math.PI / 2, scale: 1.3, lift: 0.01 });
+      out.push({ piece: 'Kit_FloorGrille', x, z, rot: Math.PI / 2, scale: 1.3 });
   // No fixed rams under the crown: the hammers ride their rails to the
   // riders (foundry_press.ts), and a static ram would clip one parked on the
   // press-end stop.
@@ -1228,8 +1233,40 @@ export function hammerBlow(t: number, phase: number): { lift: number; struck: nu
 
 // ---- everything static -------------------------------------------------------------------
 
-/** The whole static dressing. */
+/** The pieces modelled with a level face IN their own base plane, or a hair
+ *  over it: the rail bed's ballast (its top at 0), the railings' lip strip
+ *  (its top at 0), the drums' oil stain, a floor grille's pit. Stood straight
+ *  on a floor, that face shares the floor's depth and the two tear and shimmer
+ *  as the camera moves, so each is stood this much higher: on its own rung of
+ *  the floor's ladder (foundry_floor_plan_core.ts), a real height over the
+ *  floor and, where a mark may lie under it, over every mark. */
+export const FOUNDRY_PIECE_FLOOR_LIFT: Readonly<Record<string, number>> = {
+  Kit_RailTrack: FOUNDRY_RAIL_BED_LIFT,
+  // A buffer stop's rails meet the track's.
+  Kit_RailBuffer: FOUNDRY_RAIL_BED_LIFT,
+  Kit_FloorGrille: FOUNDRY_FLOOR_KIT_CLEAR,
+  Kit_DrumCluster: FOUNDRY_FLOOR_KIT_CLEAR,
+  Kit_RailingEdge: FOUNDRY_FLOOR_MARK_LIFT,
+  Kit_RailingEdgeB: FOUNDRY_FLOOR_MARK_LIFT,
+  Kit_RailingEdgeC: FOUNDRY_FLOOR_MARK_LIFT,
+  // Their foot pads' tops lie in the marks' band: a hair clears them.
+  Kit_ConveyorRun: 0.01,
+  Kit_Workbench: 0.01,
+};
+
+/** A placement stood on its piece's rung of the floor's ladder. */
+function onFloorRung(p: FoundryKitPlacement): FoundryKitPlacement {
+  const lift = FOUNDRY_PIECE_FLOOR_LIFT[p.piece];
+  if (lift === undefined) return p;
+  return p.y !== undefined ? { ...p, y: p.y + lift } : { ...p, lift: (p.lift ?? 0) + lift };
+}
+
+/** The whole static dressing, every piece on its rung of the floor's ladder. */
 export function planFoundryKitPlacements(): FoundryKitPlacement[] {
+  return planEveryPiece().map(onFloorRung);
+}
+
+function planEveryPiece(): FoundryKitPlacement[] {
   return [
     ...planFoundryPropPlacements(),
     ...planFoundryEdges(),
