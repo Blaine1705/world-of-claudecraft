@@ -13,6 +13,7 @@ import {
   platingFor,
   platingOf,
   VOLTAIC_TUNING as T,
+  tickFoundryEncounters,
   VOLTAIC_CHARGED,
   VOLTAIC_DEED,
   VOLTAIC_FLIP,
@@ -153,6 +154,53 @@ describe('the Voltaic Warden: Conduction Plating (G21)', () => {
     expect(b.castingAbility).toBe(VOLTAIC_FLIP);
     run(f, T.flipCast);
     expect(aura(b, VOLTAIC_CHARGED)).toBeDefined();
+  });
+
+  it('keeps its plates up through a pause (the tank lost for a moment)', () => {
+    const { f, b } = wardenFight();
+    run(f, T.flipEvery - T.flipCast - 2);
+    const st = state(b);
+    const held = st.flipTimer;
+    // A Vanish or the tank falling: still in combat, no target, the fight
+    // holds. Only the aura pass and the encounter tick run here, as they do on
+    // a held tick: the plating's own clock must not run it out.
+    for (let i = 0; i < 8 / 0.05; i++) {
+      b.aggroTargetId = null;
+      for (const a of b.auras) a.remaining -= 0.05;
+      b.auras = b.auras.filter((a) => a.remaining > 0);
+      tickFoundryEncounters(f.sim.ctx);
+      expect(b.foundryFight).toBe(st);
+      expect(platingOf(b)?.face, `plating at tick ${i}`).toBe('grounded');
+    }
+    expect(st.flipTimer).toBe(held);
+  });
+
+  it('the floored clock is topped up now and then, not re-stamped every tick', () => {
+    const { f, b } = wardenFight();
+    run(f, T.flipEvery - T.flipCast - 1);
+    b.auras.push({
+      id: 'test_stun',
+      name: 'Test Stun',
+      kind: 'stun',
+      remaining: 6,
+      duration: 6,
+      value: 0,
+      sourceId: f.tank.id,
+      school: 'physical',
+    });
+    run(f, T.flipCast + 1.5);
+    // Past the flip, stunned: the deadline (sim time + remaining) must hold
+    // still between top-ups, or the wire resends the aura every snapshot.
+    let moved = 0;
+    let last = Number.NaN;
+    for (let i = 0; i < 40; i++) {
+      run(f, 0.05);
+      const face = aura(b, VOLTAIC_GROUNDED);
+      const deadline = Math.round((i * 0.05 + (face?.remaining ?? 0)) * 100);
+      if (deadline !== last) moved++;
+      last = deadline;
+    }
+    expect(moved).toBeLessThanOrEqual(8);
   });
 
   it('Discharge: 20 percent of the bank to everyone on the crown, capped at 400', () => {

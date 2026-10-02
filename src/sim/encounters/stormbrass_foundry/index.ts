@@ -62,6 +62,7 @@ export { crownPlayers, STORED_FULL, VOLTAIC_DEED, VOLTAIC_LINES } from './voltai
 import { launchDrillDrones, rangeState, startTargetLock, tickRangewarden } from './rangewarden';
 import {
   flipPlating,
+  holdVoltaicPlating,
   launchPlatedDrones,
   startCoilStrike,
   startFlip,
@@ -105,7 +106,8 @@ export function tickFoundryEncounters(ctx: SimContext): void {
     const range = claimBoss(ctx, inst, RANGEWARDEN_ID);
     if (range && !paused(range)) tickRangewarden(ctx, inst, range, bossEngaged(range));
     const warden = claimBoss(ctx, inst, VOLTAIC_WARDEN_ID);
-    if (warden && !paused(warden)) tickVoltaicWarden(ctx, inst, warden, bossEngaged(warden));
+    if (warden && paused(warden)) holdVoltaicPlating(ctx, inst, warden);
+    else if (warden) tickVoltaicWarden(ctx, inst, warden, bossEngaged(warden));
     const draft = claimBoss(ctx, inst, PRIME_DRAFT_ID);
     if (draft && !paused(draft)) tickPrimeDraft(ctx, inst, draft, bossEngaged(draft));
     sweepOrphanBurstRings(ctx, inst);

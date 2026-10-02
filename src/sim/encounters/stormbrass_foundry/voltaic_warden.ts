@@ -93,14 +93,26 @@ export function crownPlayers(ctx: SimContext, inst: InstanceSlot): Entity[] {
   );
 }
 
-/** The floor the flip clock rides at: refreshed every tick, the plating aura
- *  never runs out, even on a Warden stunned past its flip (its rattle waits). */
+/** The floor the flip clock rides at: the plating aura never runs out, even
+ *  on a Warden stunned past its flip (its rattle waits) or one that lost its
+ *  target for a moment. Under the floor, or while the fight is held, the aura
+ *  is only topped up as it nears its end (FLIP_CLOCK_TOP_UP), so its deadline
+ *  holds still between top-ups instead of sliding (and resending) every tick. */
 const FLIP_CLOCK_FLOOR = 0.5;
+const FLIP_CLOCK_TOP_UP = 0.2;
+
+interface FlipClock {
+  /** Seconds to the next flip (may be under the floor, or negative). */
+  left: number;
+  cycle: number;
+  /** The flip timer ran this tick (false while the fight is held). */
+  running: boolean;
+}
 
 /** The plating aura's clock: the seconds to the next flip (the HUD's
  *  countdown; on the wire as an ordinary aura deadline). */
-function flipClock(inst: InstanceSlot, st: VoltaicFightState): { left: number; cycle: number } {
-  return { left: Math.max(FLIP_CLOCK_FLOOR, st.flipTimer), cycle: flipEvery(inst) };
+function flipClock(inst: InstanceSlot, st: VoltaicFightState, running = true): FlipClock {
+  return { left: st.flipTimer, cycle: flipEvery(inst), running };
 }
 
 /** Put a plating face on a body (the Warden: split on heroic). */
@@ -109,7 +121,7 @@ function wearPlating(
   e: Entity,
   face: VoltaicPlating,
   split: boolean,
-  clock: { left: number; cycle: number },
+  clock: FlipClock,
 ): void {
   dropAuraById(e, VOLTAIC_GROUNDED);
   dropAuraById(e, VOLTAIC_CHARGED);
@@ -118,7 +130,7 @@ function wearPlating(
     id: grounded ? VOLTAIC_GROUNDED : VOLTAIC_CHARGED,
     name: grounded ? 'Grounded Plating' : 'Charged Plating',
     kind: 'buff_dr',
-    remaining: clock.left,
+    remaining: Math.max(FLIP_CLOCK_FLOOR, clock.left),
     duration: clock.cycle,
     value: 0,
     value2: split ? 1 : 0,
@@ -217,7 +229,7 @@ function stampFace(
   e: Entity,
   face: VoltaicPlating,
   split: boolean,
-  clock: { left: number; cycle: number },
+  clock: FlipClock,
 ): void {
   const id = face === 'grounded' ? VOLTAIC_GROUNDED : VOLTAIC_CHARGED;
   const a = e.auras.find((x) => x.id === id);
@@ -225,8 +237,9 @@ function stampFace(
     wearPlating(ctx, e, face, split, clock);
     return;
   }
-  a.remaining = clock.left;
   a.duration = clock.cycle;
+  if (clock.running && clock.left > FLIP_CLOCK_FLOOR) a.remaining = clock.left;
+  else if (a.remaining < FLIP_CLOCK_TOP_UP) a.remaining = FLIP_CLOCK_FLOOR;
 }
 
 /** Keep every plating aura on the flip clock: the Warden's and its drones'. */
@@ -235,10 +248,18 @@ function stampFlipClock(
   inst: InstanceSlot,
   boss: Entity,
   st: VoltaicFightState,
+  running = true,
 ): void {
-  const clock = flipClock(inst, st);
+  const clock = flipClock(inst, st, running);
   stampFace(ctx, boss, st.plating, inst.difficulty === 'heroic', clock);
   for (const d of liveDrones(ctx, st)) stampFace(ctx, d, other(st.plating), false, clock);
+}
+
+/** A held fight (the Warden lost its target for a moment, index.ts paused):
+ *  nothing runs, but the plates stay up on the Warden and its drones. */
+export function holdVoltaicPlating(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
+  const st = boss.foundryFight?.kind === 'voltaic' ? boss.foundryFight : null;
+  if (st && !boss.dead) stampFlipClock(ctx, inst, boss, st, false);
 }
 
 /** Two Arc Drones with the opposite plating. Returns how many. */
