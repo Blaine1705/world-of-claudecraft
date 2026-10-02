@@ -172,6 +172,7 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.stow,
     clips.sleep,
     clips.wake,
+    ...Object.values(clips.idleByAura ?? {}),
     ...clips.attack,
     // The Shape of the Foreman's ability swings (round-robin in CharacterVisual.playAttack).
     ...(clips.abilityAttack ?? []),
@@ -250,6 +251,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'stow',
   'sleep',
   'wake',
+  'idleByAura',
   'attack',
   'abilityAttack',
   'hit',

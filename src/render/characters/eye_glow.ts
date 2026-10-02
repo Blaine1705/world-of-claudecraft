@@ -10,7 +10,12 @@
 // frame of every clip for free. This file is the Three half only: the spec and the curve
 // live in the core beside it.
 import * as THREE from 'three';
-import { type EyeGlowSpec, eyeGlowDeathIntensity, eyeGlowIntensity } from './eye_glow_core';
+import {
+  type EyeGlowSpec,
+  eyeGlowDeathIntensity,
+  eyeGlowIntensity,
+  selfLitShown,
+} from './eye_glow_core';
 
 /**
  * The lit eye: a bright core inside a soft halo.
@@ -29,6 +34,8 @@ export class EyeGlow {
   constructor(
     private spec: EyeGlowSpec,
     bone: THREE.Object3D | null,
+    /** The rig's own lit-iris meshes (EyeGlowSpec.selfLitMaterial), shown with the eye. */
+    private selfLit: readonly THREE.Object3D[] = [],
   ) {
     if (!bone) return;
     this.core = this.build(spec.radius, spec.color, 0.72);
@@ -58,6 +65,8 @@ export class EyeGlow {
     // lies for fifteen minutes are two draws for nothing.
     this.core.visible = k > 0;
     this.halo.visible = k > 0;
+    const lit = selfLitShown(k);
+    for (let i = 0; i < this.selfLit.length; i++) this.selfLit[i].visible = lit;
     (this.core.material as THREE.MeshBasicMaterial).opacity = 0.72 * k;
     (this.halo.material as THREE.MeshBasicMaterial).opacity = 0.3 * k;
     // The halo breathes in SIZE as well as brightness; a glow that only changes opacity
@@ -74,6 +83,7 @@ export class EyeGlow {
     this.deadFor = Number.POSITIVE_INFINITY;
     if (this.core) this.core.visible = false;
     if (this.halo) this.halo.visible = false;
+    for (const mesh of this.selfLit) mesh.visible = false;
   }
 
   private build(radius: number, color: number, opacity: number): THREE.Mesh {
@@ -100,6 +110,27 @@ export class EyeGlow {
     this.core = null;
     this.halo = null;
   }
+}
+
+/**
+ * The meshes of `model` that draw the named self-lit material (EyeGlowSpec.selfLitMaterial).
+ * Matched by material NAME, which every tier's material derivation keeps. Walked once, at
+ * rig build.
+ */
+export function selfLitMeshes(
+  model: THREE.Object3D | null | undefined,
+  material: string | undefined,
+): THREE.Object3D[] {
+  const out: THREE.Object3D[] = [];
+  if (!model || !material) return out;
+  model.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const m = mesh.material;
+    if (Array.isArray(m) ? m.some((x) => x.name === material) : m?.name === material)
+      out.push(mesh);
+  });
+  return out;
 }
 
 export type { EyeGlowSpec };

@@ -1,7 +1,8 @@
 // Balgath's death, as ground effects: WHEN they fire and WHERE, for balgath_fx.ts to draw.
 //
-// The fall itself is his authored clip (Balgath_Death, scripts/anim/blender_author_balgath
-// _slams.py): he staggers and topples backward, and his back hits the fen at 1.80s. This
+// The fall itself is his authored clip (Balgath_Death, scripts/assets/balgath_cyclops/
+// clip_library.py): the eye goes out, he staggers and topples backward, and his back hits
+// the fen at 1.80s (tests/balgath_death.test.ts reads it off the shipped file). This
 // core owns the two things a clip cannot carry because they belong to the WORLD rather than
 // the body:
 //
@@ -36,10 +37,10 @@ export const BALGATH_VISUAL_HEIGHT = 3.2;
 
 /**
  * Where his back lands, as a fraction of his standing height behind his feet. Measured off
- * the authored rest pose: pivoting about his heels, the body's centre comes to rest a
- * little under half his height back, the head past it.
+ * the shipped Balgath_Death's last frame: the middle of his back (halfway from his hips to
+ * his head) lies about 0.6 of his height behind where he stood.
  */
-export const BALGATH_DEATH_FALL_REACH = 0.4;
+export const BALGATH_DEATH_FALL_REACH = 0.6;
 
 /** Radius of the landing's dust and ring, as a fraction of his standing height. */
 export const BALGATH_DEATH_BLAST_FRACTION = 0.45;

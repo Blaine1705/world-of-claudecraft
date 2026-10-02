@@ -876,6 +876,7 @@ const RENDER_PURE_CORES = [
   'src/render/balgath_debris_core.ts',
   'src/render/characters/charge_glow_core.ts',
   'src/render/characters/eye_glow_core.ts',
+  'src/render/characters/aura_idle_core.ts',
   'src/render/characters/effigy_rig_core.ts',
   'src/render/balgath_fx_core.ts',
   'src/render/balgath_loot_relics_core.ts',

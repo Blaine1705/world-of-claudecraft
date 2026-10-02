@@ -16,6 +16,7 @@ vi.setConfig({ testTimeout: 120_000 });
 
 import { bossAuraPlan, readBossVfxState } from '../src/render/balgath_aura_core';
 import {
+  BALGATH_DEATH_FALL_REACH,
   BALGATH_DEATH_IMPACT_SEC,
   BALGATH_SINK_DUST_INTERVAL,
   BALGATH_VISUAL_HEIGHT,
@@ -23,7 +24,7 @@ import {
   type DeathFxCue,
   deathLandingSpot,
 } from '../src/render/balgath_death_fx_core';
-import { EyeGlow } from '../src/render/characters/eye_glow';
+import { EyeGlow, selfLitMeshes } from '../src/render/characters/eye_glow';
 import {
   EYE_GLOW_DEATH_FLICKER_SEC,
   EYE_GLOW_DEATH_OUT_SEC,
@@ -41,10 +42,10 @@ import { loadRigPoser, type PosedSkeleton } from './helpers/gltf_pose';
 
 const ROOT = resolve(__dirname, '..');
 const RIG = resolve(ROOT, 'public/models/creatures/balgath_cyclops.glb');
-const ABILITIES = resolve(ROOT, 'public/models/creatures/balgath_ability_anims.glb');
 const MANIFEST = resolve(ROOT, 'src/render/characters/manifest.ts');
-const AUTHOR = resolve(ROOT, 'scripts/anim/blender_author_balgath_slams.py');
 const BALGATH = 'balgath_cyclops';
+/** Standing height of the Blender rig in its own units (the build's idle measurement). */
+const RIG_HEIGHT = 13.96;
 
 function manifestBlock(start: string, end: string): string {
   const src = readFileSync(MANIFEST, 'utf8');
@@ -54,7 +55,7 @@ function manifestBlock(start: string, end: string): string {
 }
 
 describe('the death clip', () => {
-  it('is mapped, played at its authored speed, and replaces the standing retarget', () => {
+  it('is mapped, played at its authored speed, and the visual height is the core unit', () => {
     const map = manifestBlock('const BALGATH: ClipMap = {', '\n};').replace(/\/\/.*$/gm, '');
     expect(map).toContain("death: 'Balgath_Death'");
     expect(map).not.toContain("'Death'");
@@ -64,44 +65,45 @@ describe('the death clip', () => {
     expect(def).toContain(`height: ${BALGATH_VISUAL_HEIGHT},`);
   });
 
-  it("lands on the renderer's impact beat", () => {
-    const py = readFileSync(AUTHOR, 'utf8');
-    const beat = py.match(/\(([\d.]+), death\([^\n]*\),\s*# IMPACT/);
-    expect(beat, 'no IMPACT beat in Balgath_Death').not.toBeNull();
-    expect(Number(beat?.[1])).toBe(BALGATH_DEATH_IMPACT_SEC);
-    const data = JSON.parse(
-      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
-    );
-    const clip = data.clips.Balgath_Death;
-    expect(clip, 'Balgath_Death is not authored').toBeDefined();
-    expect(clip.duration).toBeGreaterThan(BALGATH_DEATH_IMPACT_SEC + 0.8);
-    // The Hip carries the whole topple (the tilt about his heels and the drop).
-    expect(Object.keys(clip.translation)).toEqual(['Hip']);
+  it("lands his back on the renderer's impact beat, then lies still", async () => {
+    // Read off the shipped clip (forward kinematics), not off a build-script constant: the
+    // head has done most of its fall by BALGATH_DEATH_IMPACT_SEC (the back is on the fen)
+    // and was still well up a beat before it (still toppling).
+    const poser = await loadRigPoser(RIG, RIG);
+    const end = poser.duration('Balgath_Death');
+    expect(end).toBeGreaterThan(BALGATH_DEATH_IMPACT_SEC + 0.8);
+    const head = (t: number) => poser.pose('Balgath_Death', t).at('Head')[1];
+    const drop = head(0) - head(end);
+    expect(drop, 'the head never comes down').toBeGreaterThan(RIG_HEIGHT * 0.3);
+    expect((head(0) - head(BALGATH_DEATH_IMPACT_SEC)) / drop).toBeGreaterThan(0.75);
+    expect((head(0) - head(BALGATH_DEATH_IMPACT_SEC - 0.6)) / drop).toBeLessThan(0.6);
   });
 
-  it('ends lying on his back behind his feet, where the old retarget stayed standing', async () => {
-    const poser = await loadRigPoser(RIG, ABILITIES);
-    const own = await loadRigPoser(RIG, RIG);
-    const stand = own.pose('Idle', 0.5);
-    const rise = (p: PosedSkeleton) => p.at('Head')[1] - p.at('Hip')[1];
-    // The root cause, measured: the shipped retarget's last frame is still a standing body.
-    const retarget = own.pose('Death', own.duration('Death'));
-    expect(rise(retarget)).toBeGreaterThan(rise(stand) * 0.8);
-    // The authored clip: head down level with the hip (lying), and BEHIND the feet (the
-    // rig faces +X, so backward is -X).
+  it('ends lying on his back behind his feet, where the dust lands', async () => {
+    const poser = await loadRigPoser(RIG, RIG);
+    const stand = poser.pose('Idle', 0.5);
+    const rise = (p: PosedSkeleton) => p.at('Head')[1] - p.at('Hips')[1];
+    // Head down near the level of the hips (lying), and BEHIND the feet (the rig faces +Z,
+    // so backward is -Z).
     const end = poser.duration('Balgath_Death');
     const dead = poser.pose('Balgath_Death', end);
     expect(Math.abs(rise(dead))).toBeLessThan(rise(stand) * 0.35);
-    const feetX = (dead.at('L_Foot')[0] + dead.at('R_Foot')[0]) / 2;
-    expect(dead.at('Head')[0]).toBeLessThan(feetX - rise(stand));
+    const feetZ = (dead.at('L_Foot')[2] + dead.at('R_Foot')[2]) / 2;
+    expect(dead.at('Head')[2]).toBeLessThan(feetZ - rise(stand));
+    // The landing spot the core throws its dust at: the middle of his back, as a fraction
+    // of his standing height behind where he stood.
+    const back = -(dead.at('Hips')[2] + dead.at('Head')[2]) / 2 / RIG_HEIGHT;
+    expect(Math.abs(back - BALGATH_DEATH_FALL_REACH)).toBeLessThan(0.08);
     // Held, not still moving: the last half second is the settled corpse pose.
     const settle = poser.pose('Balgath_Death', end - 0.5);
-    for (const bone of ['Head', 'Hip', 'L_Hand', 'R_Hand', 'L_Foot', 'R_Foot']) {
+    for (const bone of ['Head', 'Hips', 'L_Hand', 'R_Hand', 'L_Foot', 'R_Foot']) {
       const a = dead.at(bone);
       const b = settle.at(bone);
-      expect(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]), bone).toBeLessThan(0.05);
+      expect(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]), bone).toBeLessThan(
+        RIG_HEIGHT * 0.03,
+      );
     }
-    // Before the impact beat he is still falling (head clearly above the hip).
+    // Before the impact beat he is still falling (head clearly above the hips).
     const falling = poser.pose('Balgath_Death', BALGATH_DEATH_IMPACT_SEC - 0.4);
     expect(rise(falling)).toBeGreaterThan(Math.abs(rise(dead)));
   });
@@ -155,6 +157,52 @@ describe('the eye goes out', () => {
     expect(meshes.some((m) => m.visible)).toBe(false);
     eye.update(0.05, false, false, true);
     expect(meshes.some((m) => m.visible)).toBe(false);
+    eye.dispose();
+  });
+
+  it("puts out the rig's own lit iris with the halo, and relights it on revive", () => {
+    // The Blender body's iris is real geometry on its own glow material; dimming only the
+    // shells left it burning on the corpse. EyeGlow hides those meshes on the same curve.
+    const spec = {
+      bone: 'Head',
+      offset: [0, 0, 0] as [number, number, number],
+      color: 0x5fe8d2,
+      radius: 0.2,
+      pulseHz: 0.45,
+      selfLitMaterial: 'BalgathGlow',
+    };
+    const model = new THREE.Group();
+    const bone = new THREE.Object3D();
+    model.add(bone);
+    const iris = new THREE.Mesh(
+      new THREE.BufferGeometry(),
+      new THREE.MeshStandardMaterial({ name: 'BalgathGlow' }),
+    );
+    const body = new THREE.Mesh(
+      new THREE.BufferGeometry(),
+      new THREE.MeshStandardMaterial({ name: 'BalgathBody' }),
+    );
+    model.add(iris, body);
+    const lit = selfLitMeshes(model, spec.selfLitMaterial);
+    expect(lit).toEqual([iris]);
+    const eye = new EyeGlow(spec, bone, lit);
+    eye.update(0.05, false, false, false);
+    expect(iris.visible).toBe(true);
+    // Guttering: it drops out and back at least once before it stays out.
+    let flickers = 0;
+    let was = true;
+    for (let t = 0; t < EYE_GLOW_DEATH_OUT_SEC + 0.2; t += 0.02) {
+      eye.update(0.02, false, false, true);
+      if (iris.visible !== was) flickers++;
+      was = iris.visible;
+    }
+    expect(flickers).toBeGreaterThan(2);
+    expect(iris.visible).toBe(false);
+    expect(body.visible, 'the body is never the eye').toBe(true);
+    eye.update(0.05, false, false, false);
+    expect(iris.visible).toBe(true);
+    eye.snuff();
+    expect(iris.visible).toBe(false);
     eye.dispose();
   });
 

@@ -24,8 +24,11 @@ import {
 import { VISUALS } from '../src/render/characters/manifest';
 
 const BALGATH_KEY = 'mob_balgath_cyclops';
-/** The scale chain a manifest radius passes through before it is a world length. */
-const BALGATH_RIG_SCALE = 16.17;
+/** The scale chain a manifest radius passes through before it is a world length: the
+ *  Blender body is authored at its real 13.96 units and normalized DOWN to its 3.2
+ *  height (0.229), then drawn at his 4.2 entity scale. The old Tripo rig was normalized
+ *  UP (16.17 overall), which is why its radii were a twentieth of these. */
+const BALGATH_RIG_SCALE = (3.2 / 13.96) * 4.2;
 
 const eyeSpec = (): EyeGlowSpec => {
   const s = VISUALS[BALGATH_KEY]?.eyeGlow;
@@ -88,9 +91,10 @@ describe('the eye is never out', () => {
   });
 
   it('stays small enough that the socket does not blow out to white', () => {
-    // The first cut was 0.026 bone-local, which is a 0.84 yard ball at his 4.2x spawn scale:
-    // additive over an already-emissive eye texture, the core saturated and the one colour
-    // the encounter is named for stopped reading as a colour at all. Measured back down.
+    // A first cut on the old rig was a 0.84 yard ball: additive over an already-emissive eye,
+    // the core saturated and the one colour the encounter is named for stopped reading as a
+    // colour at all. Measured back down, and kept down for the Blender body, whose iris is
+    // lit geometry of its own that a big halo would wash out.
     const worldDiameter = eyeSpec().radius * 2 * BALGATH_RIG_SCALE;
     expect(worldDiameter).toBeLessThan(0.7);
     expect(worldDiameter, 'an eye nobody can see from range is not the point').toBeGreaterThan(

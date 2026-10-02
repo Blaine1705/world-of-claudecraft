@@ -24,7 +24,10 @@
 //                                      [--walk Walk] [--run Run]
 //
 // Output is the two numbers plus the intermediate terms, so a reviewer can check
-// the arithmetic rather than trusting it. Nothing is written; this only reads.
+// the arithmetic rather than trusting it, and a second planted-foot reading of each
+// (see plantedSpeed) that does not mistake a wide stance for a long step. Measure an
+// UNQUANTIZED export: a meshopt-quantized file stores integer positions, so its rest
+// height (and every ref) comes out meaningless. Nothing is written; this only reads.
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
@@ -98,8 +101,26 @@ function clipByName(name) {
   return root.listAnimations().find((a) => a.getName() === name) ?? null;
 }
 
+/** Linear sample (normalized lerp for a quaternion): the planted-foot speed differentiates
+ *  positions between samples, which a nearest-key sample turns into runs of zeros. */
+function lerpAt(times, values, stride, t) {
+  let i = 0;
+  while (i < times.length - 2 && times[i + 1] < t) i++;
+  const span = times[i + 1] - times[i];
+  const k = span > 0 ? Math.min(1, Math.max(0, (t - times[i]) / span)) : 0;
+  const a = values.slice(i * stride, i * stride + stride);
+  const b = times.length > 1 ? values.slice((i + 1) * stride, (i + 1) * stride + stride) : a;
+  const dot = stride === 4 ? a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3] : 1;
+  const out = Array.from(a, (v, j) => v + ((dot < 0 ? -b[j] : b[j]) - v) * k);
+  if (stride === 4) {
+    const n = Math.hypot(...out) || 1;
+    return out.map((v) => v / n);
+  }
+  return out;
+}
+
 /** node -> {T,R,S} at time t, falling back to the node's own rest transform. */
-function poseAt(anim, t) {
+function poseAt(anim, t, sample = sampleAt) {
   const pose = new Map();
   if (!anim) return pose;
   for (const channel of anim.listChannels()) {
@@ -111,7 +132,7 @@ function poseAt(anim, t) {
     const path = channel.getTargetPath();
     const stride = path === 'rotation' ? 4 : 3;
     const entry = pose.get(node) ?? {};
-    entry[path] = sampleAt(times, values, stride, t);
+    entry[path] = sample(times, values, stride, t);
     pose.set(node, entry);
   }
   return pose;
@@ -199,7 +220,47 @@ function measure(clipName) {
     if (!a || !b) continue;
     stride = Math.max(stride, Math.hypot(a[12] - b[12], a[14] - b[14]));
   }
-  return { duration, stride };
+  return { duration, stride, planted: plantedSpeed(anim, duration) };
+}
+
+/**
+ * The PLANTED foot's horizontal speed through the cycle, in rig units per second: the
+ * median speed of each foot over the samples where it sits within a small band of its own
+ * lowest point (the contact phase), averaged over both feet. A planted foot slides back
+ * at exactly the speed the body must travel for it not to skate, so this IS the clip's
+ * natural speed, and unlike the stride above it does not read the stance WIDTH as part of
+ * the step. A wide-stanced giant (Balgath's feet sit 3.7 units apart) over-reads the
+ * stride measure by half again; trust this one whenever the two disagree.
+ */
+function plantedSpeed(anim, duration) {
+  const STEPS = 240;
+  const tracks = feet.map(() => []);
+  for (let i = 0; i <= STEPS; i++) {
+    const t = (duration * i) / STEPS;
+    const world = worldMatrices(poseAt(anim, t, lerpAt));
+    feet.forEach((foot, k) => {
+      const m = world.get(foot);
+      if (m) tracks[k].push([t, m[12], m[13], m[14]]);
+    });
+  }
+  const speeds = [];
+  for (const track of tracks) {
+    if (track.length < 3) continue;
+    const ys = track.map((s) => s[2]);
+    const floor = Math.min(...ys);
+    const band = 0.03 * (Math.max(...ys) - floor) + 1e-6;
+    const contact = [];
+    for (let i = 1; i < track.length; i++) {
+      const [t0, x0, y0, z0] = track[i - 1];
+      const [t1, x1, y1, z1] = track[i];
+      if (y0 > floor + band || y1 > floor + band || t1 <= t0) continue;
+      contact.push(Math.hypot(x1 - x0, z1 - z0) / (t1 - t0));
+    }
+    if (!contact.length) continue;
+    contact.sort((a, b) => a - b);
+    speeds.push(contact[Math.floor(contact.length / 2)]);
+  }
+  return speeds.length ? speeds.reduce((a, b) => a + b, 0) / speeds.length : 0;
 }
 
 const natural = restHeight();
@@ -221,5 +282,8 @@ for (const [label, clipName] of [
   const ref = (2 * m.stride * normScale * ENTITY_SCALE) / m.duration;
   console.log(
     `${label}: ${ref.toFixed(2)}  (clip '${clipName}': stride ${m.stride.toFixed(3)}, duration ${m.duration.toFixed(3)}s)`,
+  );
+  console.log(
+    `${label} (planted foot): ${(m.planted * normScale * ENTITY_SCALE).toFixed(2)}  (${m.planted.toFixed(3)} rig units/s)`,
   );
 }

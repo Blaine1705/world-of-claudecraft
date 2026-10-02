@@ -202,6 +202,10 @@ export interface ClipMap {
   /** One-shot on the asleep-to-awake edge (the dawn rise). Absent = a plain crossfade
    *  from the sleep loop back into idle. */
   wake?: string;
+  /** Idle loops held while an aura rides the body, keyed by aura id
+   *  (aura_idle_core.ts): the standing pose between swings changes, every other
+   *  state still outranks it. The first row the body carries wins. */
+  idleByAura?: Record<string, string>;
   /** arm gesture for the Z-key sheathe toggle; the held-prop swap lands at its
    *  midpoint (see visual.ts setWeaponStowed). Absent = snap with no gesture. */
   stow?: string;
@@ -577,64 +581,60 @@ export const BALGATH_SCALE = 4.2;
 
 // Gait references: the world speed each clip NATURALLY travels at, which
 // `locomotionTimeScale` divides the body's real speed by to pick a playback rate.
-// MEASURED, never guessed, at BALGATH_SCALE:
+// MEASURED, never guessed, at BALGATH_SCALE, on the UNQUANTIZED Blender export (a
+// meshopt-quantized file stores integer positions and measures as nonsense):
 //
-//   node scripts/anim/measure_gait.mjs public/models/creatures/balgath_cyclops.glb \
-//        --height 3.2 --scale 4.2
+//   node scripts/anim/measure_gait.mjs <balgath_cyclops_raw.glb> --height 3.2 --scale 4.2
 //
-// These are what make his feet PLANT instead of skate, and getting them wrong is
-// invisible in code review and glaring in motion. At scale 2.8 with walkRef 2.76 his
-// 6.4 u/s chase divided out to 2.3, past `locomotionTimeScale`'s 1.8 walk clamp: the
-// cycle ran pinned at its ceiling and still could not cover the ground, which reads
-// exactly as a giant frantically jogging in place while sliding forward.
+// The PLANTED-FOOT reading is the one used (4.05 walk, 7.95 run). This body stands with
+// its feet 3.7 units apart, and the tool's stride reading takes that stance width for part
+// of the step, which would put the refs half again too high (6.14 / 9.42) and moon-walk
+// him. The planted reading agrees with the Blender build, which keyed the cycles so the
+// feet hold still at 4.2 and 8.15 yd/s at its own authoring scale (the game draws him at
+// 0.963 of it).
 //
-// He is also deliberately tuned to sit in ONE gait. His move speed (5.0, zone2.ts) is
-// just under the render-side GAIT_RUN_ENTER of 5.2, so he never crosses into the run
-// clip and never flip-flops across that boundary mid-chase. A stone giant that walks,
-// always, at 5.0/4.14 = 1.21x the clip's natural rate: deliberate, ground-covering, and
-// planted. The run reference is kept honest anyway, because a speed buff or a future
-// enrage could push him over and the clip must not over-drive when it does.
+// He is deliberately tuned to sit in ONE gait in combat. His move speed (5.0, zone2.ts) is
+// just under the render-side GAIT_RUN_ENTER of 5.2, so he never crosses into the run clip
+// and never flip-flops across that boundary mid-chase: 5.0/4.05 = 1.23x the clip's natural
+// rate, inside the clamp, planted. His warpath travel (6.25) is the one thing that puts him
+// in the run, at 6.25/7.95 = 0.79x.
 /**
  * The Straw Foreman's height, the shipped GLB's measured bbox (npx gltf-transform inspect):
  * about half of Balgath's 3.2 x 4.2. MUST match the file (prepareVisual normalizes by it).
  */
 export const MUSTER_EFFIGY_HEIGHT = 6.7;
-const BALGATH_WALK_REF = 4.14;
-const BALGATH_RUN_REF = 8.38;
+const BALGATH_WALK_REF = 4.05;
+const BALGATH_RUN_REF = 7.95;
 
-// Balgath, the Mirefen world boss. ONE ClipMap for BOTH silhouettes (the buried
-// foreman and the cyclops), because they are two bodies for one encounter and their
-// animation contract must not be able to drift: a mechanic that reads one way on the
-// model a raid learned on and another way on the model it fights is worse than either
-// model being slightly wrong.
-//
-// Sharing it is possible at all because the two Tripo auto-rigs came back with the
-// SAME 41 joints under the same names in the same order, so the mesh-free donor
-// baked off the foreman's poses (scripts/build_balgath_anims.mjs) binds to the
-// cyclops by name with every one of its 756 channels matched and none unmatched.
-// That is verified two ways: tests/balgath_boss_assets.test.ts pins the joint-name
-// equality, and the poses were rendered on the cyclops body before this was wired.
+// Balgath, the Mirefen world boss: the Blender-built cyclops (scripts/assets/
+// balgath_cyclops/, shipped by its ship.mjs). Every clip below lives inside the one GLB,
+// authored on its own 56-bone rig, so there are no donor files to bind by name any more:
+// the clip set and the rig cannot drift apart. tests/balgath_boss_assets.test.ts pins the
+// names, the key frames this map times against, and the geometry of the reads that matter.
 //
 // `cast` is the scry channel rather than a generic cast: the boss's only channelled
 // ability IS the eye, so the bar and the pose are the same event. `flourish` is the
 // enrage roar. `sleep` and `wake` are the night (mob/slumber.ts): the sleep loop plays
 // for as long as the wire says he is in bed, and the wake fires exactly once on the
 // asleep-to-awake edge, so `Balgath_Wake` is reachable from ONE state transition and
-// nowhere else. `Balgath_Blinded` still gets no generic slot: it has to hold for as long
-// as a debuff lasts, so it stays an encounter one-shot the machine may not pick on its own.
+// nowhere else. Blinded is two clips: the stagger plays once off the blind cue the sim
+// emits (eye_ward.ts EYE_WARD_BLIND_ABILITY), and the hunched, groping loop then holds in
+// place of his idle for as long as the Blinded aura rides (`idleByAura`). He keeps
+// fighting blind, so his swings and steps still outrank it.
 //
-// NOTE for the cyclops: its own retargeted `Attack` clip is FOLDED (the slash preset
-// collapsed that body) and is named nowhere here, which is exactly why `attack` is
-// the authored pair rather than the retarget. A test pins that it stays unnamed.
+// Not wired: `Balgath_Mend`. His Barrowmend regen only ever ticks while he is RUNNING his
+// warpath (mob/warpath.ts), and a standing loop played over a run would freeze his legs
+// while the sim slides him. It ships for a stationary heal if one is ever added.
 const BALGATH: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Run',
-  // The ordinary auto-attack is the SMALL one. The two telegraphed slams are reached
-  // only through attackByAbility, off the windup cue the sim emits when a ground ring is
-  // drawn, so they stay rare: a boss who plays his circle-smash animation on every auto
-  // teaches the raid that the animation means nothing.
-  attack: ['Balgath_Swipe'],
+  // The ordinary auto-attack is one of three SMALL swings (the backhand, a stepping hook,
+  // a two-fisted club), rotated so a long fight is not one gesture on loop. The telegraphed
+  // slams are reached only through attackByAbility, off the windup cue the sim emits when a
+  // ground ring is drawn, so they stay rare: a boss who plays his circle-smash animation on
+  // every auto teaches the raid that the animation means nothing.
+  attack: ['Balgath_Swipe', 'Balgath_Punch', 'Balgath_Clobber'],
   attackByAbility: {
     mob_pulse_windup: 'Balgath_Smash',
     mob_stomp_windup: 'Balgath_Stomp',
@@ -649,38 +649,42 @@ const BALGATH: ClipMap = {
     // His ranged kit. The boulder toss: stoop, rip a boulder out of the fen, heave it
     // overhead and hurl it (the renderer draws the boulder and launches it from his fists
     // on the clip's release frame). The glare is the scry pose aimed down a line, and the
-    // burden is the enrage bellow while the shared weight settles on the raid.
+    // burden is his palms pressing the shared weight down onto the raid.
     mob_balgath_boulder: 'Balgath_Toss',
     mob_balgath_glare: 'Balgath_EyeFlare',
-    mob_balgath_burden: 'Balgath_Roar',
+    mob_balgath_burden: 'Balgath_Burden',
+    // The pike in his eye (mob/eye_ward.ts): he clutches the socket and staggers. The loop
+    // that follows is `idleByAura` below.
+    mob_eye_ward_blinded: 'Balgath_Blinded',
   },
   // Timed so each clip's IMPACT frame lands on the moment the mechanic actually resolves,
   // not before it. Left at the default 1.3x they all land early and the boss stands frozen
   // through the rest of his own telegraph, which is what makes a windup feel disconnected
-  // from its hit.
+  // from its hit. The key frames are the Blender build's (scripts/assets/balgath_cyclops/
+  // clips.py), pinned by tests/balgath_boss_assets.test.ts.
   //
   // The two telegraphed slams divide their authored impact time by the 1.2s windup
-  // (RIFT_MECHANIC_WINDUP_SEC): the smash lands at 1.18s of its 1.75s timeline and the
-  // stomp at 0.70s of 1.30s. The smash sat at 0.79 for a while, which is 0.95/1.2, and
-  // 0.95 is where his fists reach the TOP of the raise rather than where they land: the
-  // blow arrived about a third of a second after the blast every single time.
+  // (RIFT_MECHANIC_WINDUP_SEC): the smash's fists land at 1.18s of its 1.75s timeline and
+  // the stomp's foot at 0.70s of 1.30s.
   //
   // Barrowfall divides by its own fuse instead (WARPATH_WRECK_FUSE_SEC, also 1.4s) and its
   // impact is authored at 1.4s, so it plays unscaled. Barrowsweep has no impact deadline
-  // at all (its damage resolves the instant it is emitted); its 0.75 is matched to
-  // something else entirely, the gait. Its legs are sampled off the Run cycle, and 0.75 is
-  // what the locomotion state machine independently picks for that clip at his 6.25 u/s
-  // travel speed, so the authored legs advance at exactly the rate the real run would and
-  // the composite cannot skate.
+  // at all (its damage resolves the instant it is emitted); its rate is matched to the
+  // gait instead. Its legs ARE the Run cycle, and 0.79 is what the locomotion state machine
+  // independently picks for that clip at his 6.25 u/s travel speed (6.25 / BALGATH_RUN_REF),
+  // so the legs advance at exactly the rate the real run would and the composite cannot
+  // skate.
   attackTimeScaleByAbility: {
     mob_pulse_windup: 0.98,
     mob_stomp_windup: 0.58,
-    mob_warpath_swipe: 0.75,
+    mob_warpath_swipe: 0.79,
     mob_warpath_wreck: 1,
-    // Both aimed slams are authored with their impact frame ON their template windup
-    // (1.3s and 1.5s), so they play unscaled and the blow lands with the blast.
+    // The hammer lands at 1.30s, ON its 1.3s template windup, so it plays unscaled. The
+    // cleave's arm crosses at 1.50s of 2.5s and its windup is 2.0s (zone2.ts, lengthened so
+    // the raid has longer to read the jump), so it plays at 1.5 / 2.0 = 0.75 and the arm
+    // still crosses the instant the arc resolves.
     mob_balgath_hammer: 1,
-    mob_balgath_cleave: 1,
+    mob_balgath_cleave: 0.75,
     // The toss is authored with its RELEASE at 1.45s and recovers to idle at 2.2s, the
     // mechanic's whole windup, so it plays unscaled: the boulder leaves his fists on the
     // authored frame and he is standing again as it lands.
@@ -689,9 +693,10 @@ const BALGATH: ClipMap = {
     // 0.52 that peak arrives at 2.5s, a beat before the 2.6s glare resolves, so the eye is
     // at full stretch when the beam fires rather than already settling.
     mob_balgath_glare: 0.52,
-    // The 1.6s bellow over a 6s windup: it plays once at its own pace and he holds idle
+    // The 2.2s press over a 6s windup: it plays once at its own pace and he holds idle
     // for the rest, which is what a raid-wide weight settling slowly should look like.
     mob_balgath_burden: 1,
+    mob_eye_ward_blinded: 1,
   },
   // Which fist lights up while a slam winds, and for how long.
   //
@@ -704,32 +709,31 @@ const BALGATH: ClipMap = {
   // impact frame (charge_glow_core.ts holds near full and then drops off a cliff).
   // Barrowglass teal rather than fire, because it is the same power his eye burns with.
   // `radius` is in BONE-LOCAL units, and the rig multiplies it twice on the way out: once
-  // by the visual's normScale (3.84 here) and again by the entity's own scale (4.2). A
-  // fist-sized glow is therefore about 0.04, not 0.4, and the first cut at 0.11 rendered a
-  // pair of beach balls across his chest. Target world diameter is roughly one yard.
+  // by the visual's normScale (0.229 here: the Blender body is authored at its real 14
+  // units and normalized DOWN to 3.2) and again by the entity's own scale (4.2), so about
+  // 0.96 overall. A fist-sized glow is therefore about 0.67, a world radius of 0.65 (the
+  // size the old 0.04 reached through the previous rig's 16x chain).
   chargeGlowByAbility: {
-    mob_balgath_hammer: { hand: 'r', color: 0x76e0d8, rise: 0.45, seconds: 1.3, radius: 0.04 },
-    mob_balgath_cleave: { hand: 'r', color: 0x76e0d8, rise: 0.5, seconds: 1.5, radius: 0.042 },
-    mob_pulse_windup: { hand: 'both', color: 0x76e0d8, rise: 0.5, seconds: 1.2, radius: 0.038 },
-    mob_warpath_wreck: { hand: 'both', color: 0x9ff0e6, rise: 0.45, seconds: 1.4, radius: 0.046 },
+    mob_balgath_hammer: { hand: 'r', color: 0x76e0d8, rise: 0.45, seconds: 1.3, radius: 0.67 },
+    mob_balgath_cleave: { hand: 'r', color: 0x76e0d8, rise: 0.6, seconds: 2, radius: 0.7 },
+    mob_pulse_windup: { hand: 'both', color: 0x76e0d8, rise: 0.5, seconds: 1.2, radius: 0.64 },
+    mob_warpath_wreck: { hand: 'both', color: 0x9ff0e6, rise: 0.45, seconds: 1.4, radius: 0.77 },
     // Earth-brown, not teal: this is not his eye's power but plain strength, fen soil
     // packed on both fists from the dig. It burns down to the RELEASE frame (1.45s).
-    mob_balgath_boulder: { hand: 'both', color: 0xb08a5a, rise: 0.4, seconds: 1.45, radius: 0.04 },
+    mob_balgath_boulder: { hand: 'both', color: 0xb08a5a, rise: 0.4, seconds: 1.45, radius: 0.67 },
   },
-  // His authored topple (scripts/anim/blender_author_balgath_slams.py). NOT the rig's own
-  // retargeted `Death`: that preset never leaves the idle stance (its hips move about a
-  // centimetre over 8.5s), so the clamped last frame was a standing corpse, which is why
-  // he used to die on his feet. This one lands flat on his back at 1.80s and its last
-  // frame is a resting pose the renderer holds for the whole corpse window.
+  // His authored topple: the eye goes out, he staggers and falls flat on his back, the
+  // spine landing at 1.80s (BALGATH_DEATH_IMPACT_SEC, where the renderer throws the dust);
+  // its last frame is a resting pose the renderer holds for the whole corpse window.
   death: 'Balgath_Death',
   hit: ['Hit'],
   cast: 'Balgath_EyeFlare',
-  // Wake of the Fallen Star (src/sim/mob/boss_starwake.ts): his bar is his two fists
-  // driven into the fen to wake the star, so it plays the arrival slam rather than the eye.
-  // The bar's id is the mechanic's name (the cast-bar label the client localizes).
-  castByAbility: { 'Wake of the Fallen Star': 'Balgath_Barrowfall' },
-  // Barrowfall lands its fists at 1.40 s of its 2.80 s; slowed to 0.56 they land at 2.5 s,
-  // on the end of the 2.5 s bar, which is the instant the fissures go down.
+  // Wake of the Fallen Star (src/sim/mob/boss_starwake.ts): his bar is the star called
+  // down, on his knees with both fists driven into the fen. The bar's id is the mechanic's
+  // name (the cast-bar label the client localizes).
+  castByAbility: { 'Wake of the Fallen Star': 'Balgath_Starwake' },
+  // Starwake drives its fists in at 1.40 s of its 2.80 s; slowed to 0.56 they land at
+  // 2.5 s, on the end of the 2.5 s bar, which is the instant the fissures go down.
   castTimeScaleByAbility: { 'Wake of the Fallen Star': 0.56 },
   jump: 'Jump',
   flourish: 'Balgath_Roar',
@@ -738,6 +742,9 @@ const BALGATH: ClipMap = {
   // rise the spawn was always meant to have and now has a state edge to fire on).
   sleep: 'Balgath_Sleep',
   wake: 'Balgath_Wake',
+  // Blinded (mob/eye_ward.ts): between swings he stays hunched over the socket, groping,
+  // for as long as the window lasts.
+  idleByAura: { eye_ward_blinded: 'Balgath_BlindedLoop' },
 };
 
 const DRAGONKIN_BROODLORD: ClipMap = {
@@ -2384,46 +2391,45 @@ export const VISUALS: Record<string, VisualDef> = {
     },
   },
   // The Knucklebone of Balgath's Shape of the Foreman (combat/balgath_trinkets.ts): the
-  // Mirefen world boss's own body, decimated (scripts/assets/balgath_form/), at a head
-  // above a player rather than raid-boss sized, since twenty of them can stand in one
-  // pull. Same 41-joint rig, so it wears his clips straight off the two donor files:
-  // backhand swipes for the auto-attack, the hammer, stomp and smash for abilities, and
-  // the eye-flare for a spell cast. The eye burns like his (the same measured spec).
+  // Mirefen world boss's own body at a head above a player rather than raid-boss sized,
+  // since twenty of them can stand in one pull. Built by the same Blender factory as the
+  // boss (scripts/assets/balgath_cyclops/form.py): a quarter of his triangles and his own
+  // rig, with clips of its OWN for the gaits. The boss's walk and run are a giant's lumber,
+  // timed for 4 and 8 yards a second at thirteen yards tall; at a player's size and a
+  // player's 7 yd/s those cycles had to be driven near four times over to keep up, which
+  // reads as legs whirring in place. The form's Walk and Run are re-keyed for a
+  // player-sized stride at player speed, so its legs plant. The swings, slams, glare and
+  // roar are his. The eye burns like his (the same measured anchor).
   form_foreman: {
     url: `${FORMS}/balgath_form.glb`,
-    animUrls: [`${CREATURES}/balgath_clip_donor.glb`, `${CREATURES}/balgath_ability_anims.glb`],
     authoredAtlas: true,
     height: 3.0,
-    yaw: -Math.PI / 2,
     attackTimeScale: 1.35,
-    // Gait refs MEASURED on this body carrying the donor clips (node
-    // scripts/anim/measure_gait.mjs public/models/chars/forms/balgath_form.glb --height 3.0
-    // --scale 1.1): his clips are a giant's lumber, so at a player's 7 u/s the run plays
-    // near 3.7x to keep the feet planted; the clamps are lifted to let it.
-    walkRef: 0.99,
-    runRef: 1.9,
-    walkTimeScaleMax: 3.2,
-    runTimeScaleMax: 3.9,
+    // Gait refs MEASURED on this body, planted foot (node scripts/anim/measure_gait.mjs
+    // <balgath_form_raw.glb> --height 3.0 --scale 1.1; FOREMAN_SHAPE_SCALE is 1.1): a
+    // player's 7 yd/s run plays the cycle at 7 / 6.17 = 1.13x and a 2.5 yd/s walk at
+    // 1.6x, both inside the default clamps, so no ceiling has to be lifted any more.
+    walkRef: 1.56,
+    runRef: 6.17,
     eyeGlow: {
       bone: 'Head',
-      offset: [0.013, 0.115, -0.085],
+      offset: [0, 1.22, 1.74],
       color: 0x5fe8d2,
-      // Measured on screen, not copied from the boss: this rig's head bone carries a larger
-      // world scale than his at a player's size, so his 0.019 (and a first 0.034) swallowed
-      // the whole face in a halo. At 0.008 the halo sits in the socket like his does.
-      radius: 0.008,
+      radius: 0.2,
       pulseHz: 0.45,
+      selfLitMaterial: 'BalgathGlow',
     },
     clips: {
       idle: 'Idle',
       walk: 'Walk',
       run: 'Run',
-      attack: ['Balgath_Swipe', 'Balgath_Barrowsweep'],
+      attack: ['Balgath_Swipe', 'Balgath_Punch', 'Balgath_Clobber'],
       abilityAttack: ['Balgath_Hammer', 'Balgath_Stomp', 'Balgath_Smash'],
       cast: 'Balgath_EyeFlare',
       hit: ['Hit'],
       death: 'Death',
       jump: 'Jump',
+      flourish: 'Balgath_Roar',
     },
     lazyPreload: true,
   },
@@ -4122,46 +4128,39 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_balgath_cyclops: {
     url: `${CREATURES}/balgath_cyclops.glb`,
-    animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
-    authoredAtlas: true, // baked Tripo atlas: low-tier floor rides the map
+    authoredAtlas: true, // baked Blender atlas: low-tier floor rides the map
     height: 3.2,
     clips: BALGATH,
     // Played at its authored speed: the dust, rock chips and camera shake of his landing
     // fire BALGATH_DEATH_IMPACT_SEC after the death edge (balgath_death_fx_core.ts), which
     // is the clip's own impact frame only at 1x (the shared default is 1.15).
     deathTimeScale: 1,
-    // The Barrowglass, always burning. Measured off the rig rather than guessed: the eye is
-    // the front-most head vertex resolved into the Head bone's own frame at rest, which is
-    // bone-local (0.013, 0.115, -0.085). A guessed offset puts a glowing ball behind his
-    // skull or floating off his face, and neither is obvious from the angle you happen to
-    // render a still at.
+    // The Barrowglass, always burning. The iris itself is real geometry now, lit by the
+    // GLB's own `BalgathGlow` material (with the star-light veins in his barrowhide); these
+    // shells are its halo, and `selfLitMaterial` hands that iris to the same brightness
+    // curve so it gutters out with the halo when he dies instead of burning on the corpse.
+    // The offset is MEASURED (scripts/assets/balgath_cyclops/measure_eye.mjs on the raw
+    // export): the front of the iris, the eyeball's centre pushed one radius plus the iris
+    // relief down the gaze, resolved into the Head bone's frame. Radius 0.2 bone-local is
+    // a 0.19-yard core at his 0.96 normalize-and-scale chain: the iris carries the colour,
+    // so the core only has to light the socket, and a bigger shell washed the slit pupil
+    // out.
     eyeGlow: {
       bone: 'Head',
-      offset: [0.013, 0.115, -0.085],
+      offset: [0, 1.22, 1.74],
       color: 0x5fe8d2,
-      // 0.026 (a 0.84-unit ball at his 4.2x spawn scale) blew the whole socket to white:
-      // additive on top of an already-emissive eye texture, the core saturated and the one
-      // colour the encounter is named for stopped reading as a colour at all. Measured back
-      // down until the teal survives at melee range and the point still carries at 200 yards.
-      radius: 0.019,
+      radius: 0.2,
       pulseHz: 0.45,
+      selfLitMaterial: 'BalgathGlow',
     },
-    // The Tripo creature lane rests its rigs facing +X; the game's facing-0 convention is
-    // +Z, so without this the model is drawn a quarter turn off its own heading. That is
-    // invisible in every measurement taken from the sim (facing tracked velocity exactly,
-    // to 0.000 rad) and invisible in a still, because nothing is WRONG except the mesh
-    // inside the group: he runs north with his body pointing east, feet cycling forward
-    // while he slides sideways. It is the moonwalk, and it is one field.
-    yaw: -Math.PI / 2,
-    // Gait refs MEASURED, not guessed, at the scale this boss actually spawns at
-    // (`node scripts/anim/measure_gait.mjs public/models/creatures/balgath_cyclops.glb
-    // --height 3.2 --scale 2.8`). Re-run it if BALGATH_SCALE moves.
+    // Gait refs MEASURED, not guessed, at the scale this boss actually spawns at (see the
+    // BALGATH_WALK_REF comment). Re-measure if BALGATH_SCALE moves.
     walkRef: BALGATH_WALK_REF,
     runRef: BALGATH_RUN_REF,
-    // Paler and cooler than the foreman: this one reads as bare quarried granite, so
-    // the moss does the colour work.
+    // A whisper of the template colour only: the Blender bake carries the granite, the
+    // moss and the mire mud itself.
     tint: 0xa8a496,
-    tintStrength: 0.12,
+    tintStrength: 0.06,
   },
   npc_chronicler: {
     url: `${PLAYERS}/mage.glb`,

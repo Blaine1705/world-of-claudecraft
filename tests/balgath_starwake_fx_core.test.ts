@@ -101,7 +101,7 @@ describe('curves', () => {
   it('the cast-clip remap in the character manifest keys on the template cast name', async () => {
     const { readFileSync } = await import('node:fs');
     const text = readFileSync('src/render/characters/manifest.ts', 'utf-8');
-    expect(text).toContain(`castByAbility: { '${def().name}': 'Balgath_Barrowfall' }`);
+    expect(text).toContain(`castByAbility: { '${def().name}': 'Balgath_Starwake' }`);
     expect(text).toContain(`castTimeScaleByAbility: { '${def().name}': 0.56 }`);
   });
 

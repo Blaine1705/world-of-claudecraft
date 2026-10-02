@@ -40,6 +40,8 @@ import {
 } from './balgath_boulder_kit';
 import { BALGATH_CLEAVE_HALF_ARC } from './balgath_fx_core';
 import {
+  BALGATH_BOULDER_GRIP,
+  BALGATH_BOULDER_OVERHEAD,
   BALGATH_BOULDER_RIP_SECONDS,
   BALGATH_BOULDER_SCALE,
   BALGATH_BOULDER_TRAUMA,
@@ -1194,16 +1196,18 @@ export class BalgathRangedFx {
       if (!b.launch && body) {
         const scale = body.scale ?? 4.2;
         const facing = body.facing ?? 0;
-        const side = (b.slot === 0 ? -1 : 1) * 0.55 * scale;
+        const sign = b.slot === 0 ? -1 : 1;
         const fx = Math.sin(facing);
         const fz = Math.cos(facing);
-        const gx = body.pos.x + fx * 1.3 * scale + fz * side;
-        const gz = body.pos.z + fz * 1.3 * scale - fx * side;
+        const grip = BALGATH_BOULDER_GRIP;
+        const lift = BALGATH_BOULDER_OVERHEAD;
+        const gx = body.pos.x + fx * grip.forward * scale + fz * sign * grip.side * scale;
+        const gz = body.pos.z + fz * grip.forward * scale - fx * sign * grip.side * scale;
         const hand = { x: gx, y: this.groundHeightAt(gx, gz) + 0.4, z: gz };
         const overhead = {
-          x: body.pos.x + fx * 0.3 * scale + fz * side * 0.6,
-          y: this.groundHeightAt(body.pos.x, body.pos.z) + 3.35 * scale,
-          z: body.pos.z + fz * 0.3 * scale - fx * side * 0.6,
+          x: body.pos.x + fx * lift.forward * scale + fz * sign * lift.side * scale,
+          y: this.groundHeightAt(body.pos.x, body.pos.z) + lift.height * scale,
+          z: body.pos.z + fz * lift.forward * scale - fx * sign * lift.side * scale,
         };
         if (!b.ripped && b.elapsed >= BALGATH_BOULDER_RIP_SECONDS) {
           b.ripped = true;

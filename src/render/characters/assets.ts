@@ -2193,6 +2193,8 @@ function buildTintedClone(
       const armorDyeFallbackHex = (s.userData as { armorDyeFallbackHex?: number })
         .armorDyeFallbackHex;
       mat = new THREE.MeshLambertMaterial({
+        // The name survives the tier swap: the eye glow finds a rig's self-lit iris by it.
+        name: s.name,
         map: s.map ?? null,
         color:
           armorDyeFallbackHex !== undefined

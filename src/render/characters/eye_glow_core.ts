@@ -28,6 +28,30 @@ export interface EyeGlowSpec {
   radius: number;
   /** Breaths per second. Slow: this is a pilot light, not a strobe. */
   pulseHz: number;
+  /**
+   * The GLB material that IS the lit eye on a rig whose iris is real geometry (Balgath's
+   * Blender body: `BalgathGlow`, the iris, its slit pupil and the star-light veins in his
+   * barrowhide). The shells above only halo it, so a death that dims the shells alone would
+   * leave the iris burning on the corpse. The meshes drawing this material follow the
+   * shells' brightness through `selfLitShown`. Absent = the shells are the whole eye.
+   */
+  selfLitMaterial?: string;
+}
+
+/** Below this brightness the self-lit eye mesh is hidden: out, not dimmed. */
+export const EYE_SELF_LIT_OUT = 0.1;
+
+/**
+ * Whether the rig's own lit iris draws at eye brightness `k`.
+ *
+ * Shown or hidden rather than faded, because it is an opaque emissive surface (fading it
+ * would need it transparent, which costs a sort and a program for nothing the rest of the
+ * fight). Following the same curve gives the death its gutter for free: the stutter in
+ * `eyeGlowDeathIntensity` drops through this line several times before it stays below it,
+ * so the iris flickers out with the halo and then the sclera behind it is all that is left.
+ */
+export function selfLitShown(k: number): boolean {
+  return k > EYE_SELF_LIT_OUT;
 }
 
 /**

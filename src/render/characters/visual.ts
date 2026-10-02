@@ -73,6 +73,7 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
+import { auraIdleClip } from './aura_idle_core';
 import { ChargeGlow } from './charge_glow';
 import { deathGroundingOffset } from './death_grounding_core';
 import {
@@ -83,7 +84,7 @@ import {
   ghostEffectOpacity,
 } from './effect_materials';
 import { EffigyRig } from './effigy_rig';
-import { EyeGlow } from './eye_glow';
+import { EyeGlow, selfLitMeshes } from './eye_glow';
 import { EyeWardMarker } from './eye_ward_marker';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { FormAdornments } from './form_adornments';
@@ -747,6 +748,8 @@ export class CharacterVisual {
   /** which ability's cast clip the current cast-state base action was chosen
    *  for; lets chained casts refresh their per-ability override */
   private castClipAbility: string | null = null;
+  /** The aura-held idle loop in force (ClipMap.idleByAura), or null for the rig's own. */
+  private auraIdle: string | null = null;
   private deadLock = false;
   /** consecutive frames with no action driving the pose (the T-pose watchdog) */
   private starvedFrames = 0;
@@ -930,7 +933,7 @@ export class CharacterVisual {
           this.model?.getObjectByName(spec.bone) ??
           this.model?.getObjectByName(spec.bone.toLowerCase()) ??
           null;
-        this.eyeGlow = new EyeGlow(spec, bone);
+        this.eyeGlow = new EyeGlow(spec, bone, selfLitMeshes(this.model, spec.selfLitMaterial));
         this.eyeWardMarker = new EyeWardMarker(spec, bone);
       }
       // The training effigy's planks and lantern: same reasons, same spot (it re-grades a
@@ -1140,6 +1143,12 @@ export class CharacterVisual {
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
     const rushChanged = this.warriorBody.updateRush(dt, s);
+    // An aura swapping the idle loop (Balgath blinded) is a base change for a standing
+    // body, so it rides the same fade arm below; a moving one picks it up when it stops.
+    const auraIdle = auraIdleClip(this.def.clips.idleByAura, s.auras);
+    const auraIdleChanged =
+      auraIdle !== this.auraIdle && (this.baseState === 'idle' || this.baseState === 'combatIdle');
+    this.auraIdle = auraIdle;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
@@ -1197,7 +1206,7 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsCastExit = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
-      } else if ((baseChanged || rushChanged) && !this.currentIsOneShot) {
+      } else if ((baseChanged || rushChanged || auraIdleChanged) && !this.currentIsOneShot) {
         // a cast clip frozen at its hold point must never stay paused through
         // the exit, whichever exit path runs below
         if (previousBase === 'cast' && this.current?.paused) this.current.paused = false;
@@ -3866,7 +3875,11 @@ export class CharacterVisual {
         // desiredBaseState only picks this for a rig that HAS the loop, so the
         // fallback is unreachable belt-and-braces (a def whose clip name misses
         // in the GLB resolves to null in both places and lands on idle).
-        return this.action(c.combatIdle) ?? this.action(c.idle);
+        return (
+          this.action(this.auraIdle ?? undefined) ??
+          this.action(c.combatIdle) ??
+          this.action(c.idle)
+        );
       case 'walk':
         return this.action(c.walk) ?? this.action(c.idle);
       case 'walkBack':
@@ -3925,7 +3938,8 @@ export class CharacterVisual {
         // pose for the whole fall, which is what every rig did before it.
         return this.action(c.fall) ?? this.action(c.jump) ?? this.action(c.idle);
       default:
-        return this.action(c.idle);
+        // 'idle' lands here: an aura-held loop (ClipMap.idleByAura) replaces it while it rides.
+        return this.action(this.auraIdle ?? undefined) ?? this.action(c.idle);
     }
   }
 
@@ -4373,6 +4387,9 @@ export function clipNamesOf(def: VisualDef): string[] {
     // tests/character_clipmaps.test.ts against the gate's own required-clip list).
     c.sleep,
     c.wake,
+    // The aura-held idles (Balgath's Blinded loop): same rule, a loop never bound is a
+    // pose never seen.
+    ...Object.values(c.idleByAura ?? {}),
     ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((n): n is string => !!n);
 }

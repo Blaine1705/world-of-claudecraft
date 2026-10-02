@@ -33,6 +33,18 @@ export const BALGATH_BOULDER_RIP_SECONDS = 0.55;
 /** Seconds by which the rock is held over his head. */
 export const BALGATH_BOULDER_LIFT_SECONDS = 1.1;
 
+/**
+ * Where his fists hold the boulder, in multiples of his entity scale off his feet and
+ * facing: forward, to each side, and up. MEASURED on the Balgath_Toss clip (forward
+ * kinematics on the shipped rig, tests/balgath_boss_assets.test.ts re-measures them): the
+ * dig at the rip frame has the fists 1.27 ahead and 0.67 out; at the lift frame they are
+ * overhead, 0.47 ahead and 0.70 out with the wrists at 3.64 up, so the rock between the
+ * palms rides at about 3.9. The old Tripo body heaved it to 3.35; this one lifts it clear
+ * over his crown.
+ */
+export const BALGATH_BOULDER_GRIP = Object.freeze({ forward: 1.27, side: 0.67 });
+export const BALGATH_BOULDER_OVERHEAD = Object.freeze({ forward: 0.47, side: 0.7, height: 3.9 });
+
 /** World radius of the thrown boulder (the GLB is normalized to a unit radius). */
 export const BALGATH_BOULDER_SCALE = 1.4;
 

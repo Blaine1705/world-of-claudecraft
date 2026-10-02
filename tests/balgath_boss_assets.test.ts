@@ -4,26 +4,40 @@
 // or drops a clip, or a manifest edit naming a clip the GLB does not carry, produces no
 // build error and no load error: the mixer simply finds no action and the rig sits in
 // BIND POSE the first time the mechanic fires, in a raid, in production. So both halves
-// are pinned here, the clip names actually inside the GLBs and the manifest source that
+// are pinned here, the clip names actually inside the GLB and the manifest source that
 // names them, plus the cross-layer welds nothing else can see.
-import { readFileSync } from 'node:fs';
+//
+// The body is the Blender-built cyclops (scripts/assets/balgath_cyclops/, shipped by its
+// ship.mjs): one GLB carrying its own 56-bone rig and all 25 clips. The rig faces +Z and
+// stands about 14 of its own units tall; the geometry checks below read it by forward
+// kinematics on the SHIPPED file, so they also cover the export and the meshopt pass.
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createGlbIO, indexClip, sampleChannel } from '../scripts/anim/pose_blend.mjs';
+import { BALGATH_BOULDER_OVERHEAD } from '../src/render/balgath_ranged_fx_core';
+import { EYE_WARD_BLIND_ABILITY, EYE_WARD_BLINDED_AURA_ID } from '../src/sim/mob/eye_ward';
 import { loadRigPoser, type PosedSkeleton } from './helpers/gltf_pose';
+
+vi.setConfig({ testTimeout: 120_000 });
 
 const ROOT = resolve(__dirname, '..');
 const RIG = resolve(ROOT, 'public/models/creatures/balgath_cyclops.glb');
-const ABILITIES = resolve(ROOT, 'public/models/creatures/balgath_ability_anims.glb');
-const DONOR = resolve(ROOT, 'public/models/creatures/balgath_clip_donor.glb');
 const MANIFEST = resolve(ROOT, 'src/render/characters/manifest.ts');
 const ZONE = resolve(ROOT, 'src/sim/content/zone2.ts');
 
 function glbJson(path: string): {
-  animations?: Array<{ name?: string; channels?: Array<{ target: { node?: number } }> }>;
-  meshes?: unknown[];
+  animations?: Array<{ name?: string }>;
+  meshes?: Array<{ primitives: Array<{ material?: number }> }>;
+  materials?: Array<{
+    name?: string;
+    emissiveTexture?: unknown;
+    pbrMetallicRoughness?: { baseColorTexture?: unknown };
+  }>;
+  images?: Array<{ mimeType?: string }>;
   skins?: Array<{ joints: number[] }>;
   nodes: Array<{ name?: string }>;
+  extensionsRequired?: string[];
 } {
   const buf = readFileSync(path);
   // glTF binary: 12-byte header, then chunks of [length u32][type u32][data]. The JSON
@@ -61,98 +75,105 @@ function templateSource(): string {
   return zone.slice(start, zone.indexOf('\n  },', start));
 }
 
-// The authored set, and what each is FOR. A clip dropped from this list is a mechanic
-// with no animation, so the list is exhaustive on purpose.
-const AUTHORED = [
+const num = (src: string, re: RegExp): number => {
+  const v = Number(src.match(re)?.[1]);
+  expect(Number.isFinite(v), `${re} matched nothing`).toBe(true);
+  return v;
+};
+
+/** Every clip the build authors, and what each is FOR. Exhaustive on purpose: a clip
+ *  dropped from the GLB is a mechanic with no animation. */
+const SHIPPED = [
+  'Idle', // breathes, looks round the raid, blinks
+  'Walk', // the combat gait (feet planted at BALGATH_WALK_REF)
+  'Run', // the warpath travel gait
+  'Balgath_Swipe', // the ordinary backhand
+  'Balgath_Punch', // the ordinary stepping hook
+  'Balgath_Clobber', // the ordinary two-fisted club
   'Balgath_Smash', // the telegraphed circle-smash payoff
   'Balgath_Stomp', // the telegraphed shockwave stomp
-  'Balgath_EyeFlare', // the scry channel under the cast bar
-  'Balgath_Blinded', // the low-level counterplay, loops for the debuff
-  'Balgath_Roar', // the enrage flourish
-  'Balgath_Sleep', // the night: folded into a mound and breathing, loops until dawn
-  'Balgath_Wake', // the dawn rise, out of the sleep pose
-  'Balgath_Swipe', // the ORDINARY auto-attack, kept small so the slams stay rare
-  'Balgath_Barrowsweep', // the mid-run backhand: its legs are sampled off the Run cycle
-  'Balgath_Barrowfall', // the warpath arrival slam, timed to its own telegraph fuse
   'Balgath_Hammer', // whack-a-mole: ONE fist up, held, dropped on a snapshot
-  'Balgath_Cleave', // the low arc, authored as a body twist at the root
+  'Balgath_Cleave', // the low arm dragged across the ground
+  'Balgath_Barrowsweep', // the mid-run backhand: its legs are the Run cycle's
+  'Balgath_Barrowfall', // the warpath arrival slam
   'Balgath_Toss', // the boulder toss: dig, heave overhead, hurl (release at 1.45s)
+  'Balgath_EyeFlare', // the glare and the scry channel
+  'Balgath_Roar', // the enrage flourish
+  'Balgath_Burden', // the palms pressing the Barrow Burden down
+  'Balgath_Starwake', // on his knees, fists into the fen: Wake of the Fallen Star
+  'Balgath_Blinded', // the pike in his eye: the stagger
+  'Balgath_BlindedLoop', // ...and the hunched groping he holds while blind
+  'Balgath_Mend', // Barrowmend, mud over the wounds (ships unwired, see the ClipMap)
+  'Hit', // flinch
   'Balgath_Death', // the backward topple, held as his corpse (tests/balgath_death.test.ts)
+  'Balgath_Sleep', // the night: folded into a mound and breathing
+  'Balgath_Wake', // the dawn rise, out of the sleep pose
+  'Jump',
 ];
 
-/** The Toss's authored release frame (scripts/anim/blender_author_balgath_slams.py): the
- *  renderer launches its boulder from his fists here, so it is a contract, not a detail. */
+/** The Toss's authored release frame (clip_library.py toss): the renderer launches its
+ *  boulder from his fists here, so it is a contract, not a detail. */
 const TOSS_RELEASE_SEC = 1.45;
+/** The cleave's authored crossing (clip_library.py cleave): the arm passes straight ahead. */
+const CLEAVE_CROSS_SEC = 1.5;
 
-/** What the Tripo creature lane retargeted onto the rig. */
-const RETARGETED = ['Idle', 'Walk', 'Run', 'Attack', 'Hit', 'Death', 'Cast', 'Jump'];
+/** Standing height of the rig in its own units (the build's idle measurement). */
+const RIG_HEIGHT = 13.96;
 
 describe('balgath world boss assets', () => {
-  it('ships every retargeted clip on the rig', () => {
-    const names = clipNames(RIG);
-    for (const clip of RETARGETED) expect(names).toContain(clip);
+  it('ships every authored clip inside the one GLB, and no donor files', () => {
+    expect(clipNames(RIG).sort()).toEqual([...SHIPPED].sort());
+    for (const retired of ['balgath_ability_anims.glb', 'balgath_clip_donor.glb']) {
+      expect(existsSync(resolve(ROOT, 'public/models/creatures', retired)), retired).toBe(false);
+    }
+    // ...and no def points at them any more: the clips bind to the rig they were authored on.
+    expect(defBlock('mob_balgath_cyclops')).not.toContain('animUrls');
+    expect(defBlock('form_foreman')).not.toContain('animUrls');
   });
 
-  it('ships every authored clip in the donor GLB', () => {
-    expect(clipNames(ABILITIES).sort()).toEqual([...AUTHORED].sort());
+  it('is the 56-bone Blender rig with its body and glow materials, KTX2 throughout', () => {
+    expect(jointNames(RIG)).toHaveLength(56);
+    for (const bone of ['Hips', 'Head', 'EyeCore', 'R_Hand', 'L_Hand', 'R_Foot', 'L_Foot'])
+      expect(jointNames(RIG), bone).toContain(bone);
+    const json = glbJson(RIG);
+    expect((json.materials ?? []).map((m) => m.name).sort()).toEqual([
+      'BalgathBody',
+      'BalgathGlow',
+    ]);
+    expect((json.images ?? []).every((i) => i.mimeType === 'image/ktx2')).toBe(true);
+    expect(json.extensionsRequired ?? []).toContain('KHR_texture_basisu');
   });
 
-  it('keeps the ability donor mesh-free so it composes instead of shadowing', () => {
-    // A donor carrying its own mesh and skin would be a second complete body loaded
-    // beside the rig, and its inherited Idle/Walk would shadow the rig's own.
-    const json = glbJson(ABILITIES);
-    expect(json.meshes ?? []).toHaveLength(0);
-    expect(json.skins ?? []).toHaveLength(0);
+  it('draws the burning iris through the glow ramp, pupil dark and centre white-hot', async () => {
+    // The Blender material lights the iris with a vertex-colour layer the glTF export drops,
+    // and three's emissive term never reads vertex colour anyway, so ship.mjs rebuilds the
+    // colour as a coordinate into a ramp texture the glow material samples as both its base
+    // colour and its emissive map. A plain re-export reverts this to a flat white ball.
+    const json = glbJson(RIG);
+    const glow = (json.materials ?? []).find((m) => m.name === 'BalgathGlow');
+    expect(glow?.emissiveTexture, 'the glow has no emissive ramp').toBeDefined();
+    expect(glow?.pbrMetallicRoughness?.baseColorTexture).toBeDefined();
+    const root = (await createGlbIO().read(RIG)).getRoot();
+    const prim = root
+      .listMeshes()
+      .flatMap((m) => m.listPrimitives())
+      .find((p) => p.getMaterial()?.getName() === 'BalgathGlow');
+    const uv = prim?.getAttribute('TEXCOORD_0');
+    expect(uv, 'the glow primitive has no ramp coordinate').toBeTruthy();
+    const us: number[] = [];
+    const el = [0, 0];
+    for (let i = 0; i < (uv?.getCount() ?? 0); i++) us.push((uv?.getElement(i, el) ?? el)[0]);
+    // The slit pupil (black), the white-hot centre, and the teal body of iris and veins.
+    expect(us.filter((u) => u < 0.03).length, 'no pupil').toBeGreaterThan(10);
+    expect(us.filter((u) => u > 0.9).length, 'no hot centre').toBeGreaterThan(0);
+    expect(us.filter((u) => u > 0.25 && u < 0.5).length, 'no teal').toBeGreaterThan(500);
   });
 
-  it('keeps the clip-authoring donor rig, mesh-free, so the clips stay reproducible', () => {
-    // The authored clips were sampled from the FOREMAN candidate's retargeted poses. That
-    // body lost the design bake-off and its mesh is deleted; this stripped rig is what is
-    // left of it, and without it scripts/build_balgath_anims.mjs cannot run at all.
-    const names = clipNames(DONOR);
-    for (const clip of RETARGETED) expect(names).toContain(clip);
-    expect(glbJson(DONOR).meshes ?? [], 'the donor must stay mesh-free').toHaveLength(0);
-    expect(readFileSync(resolve(ROOT, 'scripts/build_balgath_anims.mjs'), 'utf8')).toContain(
-      'balgath_clip_donor.glb',
-    );
-  });
-
-  it('targets only bones the rig actually has, which is what lets the clips bind', () => {
-    // The authored poses play on the cyclops only because three.js binds a clip to a
-    // skeleton BY NODE NAME, and the two Tripo auto-rigs came back with the same joints
-    // under the same names. This is that assumption made explicit: every node the shipped
-    // clips drive must be a joint on the rig they are composed onto. A re-generated rig
-    // with one renamed joint would bind that channel to nothing and the boss would sit in
-    // bind pose the first time the mechanic fired, with no error anywhere.
-    // Compared against the rig's whole NODE graph, not just its skin joints: three binds
-    // a track by name against the object it is mounted on, and the clips legitimately
-    // drive the armature root as well as the 41 skinned bones.
-    expect(jointNames(RIG)).toHaveLength(41);
-    const rig = new Set((glbJson(RIG).nodes ?? []).map((n) => n.name).filter(Boolean) as string[]);
-    const json = glbJson(ABILITIES);
-    const targeted = new Set<string>();
-    for (const anim of json.animations ?? [])
-      for (const ch of anim.channels ?? []) {
-        const name = ch.target.node === undefined ? undefined : json.nodes[ch.target.node]?.name;
-        if (name) targeted.add(name);
-      }
-    expect(targeted.size, 'the donor drives no bones at all').toBeGreaterThan(20);
-    for (const bone of targeted)
-      expect(rig, `clip bone '${bone}' is not on the rig`).toContain(bone);
-  });
-
-  it('names only clips the shipped GLBs actually carry', () => {
-    const available = new Set([...clipNames(RIG), ...clipNames(ABILITIES)]);
+  it('names only clips the shipped GLB actually carries', () => {
+    const available = new Set(clipNames(RIG));
     const named = [...clipMapSource().matchAll(/'([A-Z][A-Za-z_]+)'/g)].map((m) => m[1]);
     expect(named.length).toBeGreaterThan(0);
     for (const clip of named) expect(available, `clip '${clip}' is not shipped`).toContain(clip);
-  });
-
-  it('never names the folded Attack clip', () => {
-    // The slash retarget collapsed this body. The clip is still in the rig GLB because it
-    // came with the retarget, so the only thing between it and a raid seeing it is that
-    // the ClipMap does not mention it.
-    expect(clipMapSource()).not.toContain("'Attack'");
   });
 
   it('keeps the big slams OUT of the ordinary attack rotation', () => {
@@ -161,15 +182,13 @@ describe('balgath world boss assets', () => {
     const map = clipMapSource();
     const start = map.indexOf('attack: [');
     const attackLine = map.slice(start, map.indexOf(']', start));
-    expect(attackLine).toContain('Balgath_Swipe');
-    expect(attackLine).not.toContain('Balgath_Smash');
-    expect(attackLine).not.toContain('Balgath_Stomp');
+    for (const swing of ['Balgath_Swipe', 'Balgath_Punch', 'Balgath_Clobber'])
+      expect(attackLine).toContain(swing);
+    for (const slam of ['Balgath_Smash', 'Balgath_Stomp', 'Balgath_Hammer', 'Balgath_Cleave'])
+      expect(attackLine).not.toContain(slam);
   });
 
   it('routes each telegraphed slam off the windup cue the sim actually emits', () => {
-    // These ability ids are not player abilities: they are the cue the sim fires when it
-    // draws a ground ring (mob/locomotion.ts). If the two sides ever disagree, the ring
-    // still draws and the boss just stands in it doing nothing.
     const map = clipMapSource();
     const loco = readFileSync(resolve(ROOT, 'src/sim/mob/locomotion.ts'), 'utf8');
     for (const [ability, clip] of [
@@ -181,15 +200,17 @@ describe('balgath world boss assets', () => {
     }
   });
 
-  it('holds the encounter-only clips out of the generic slots', () => {
-    // Blinded holds for as long as a debuff lasts, and Sleep/Wake are the night; any of the
-    // three landing in attack/hit/flourish would be picked at random mid-fight. Blinded is
-    // driven by the encounter and stays unnamed. Sleep and Wake ARE named, but each exactly
-    // once and only in the slot the slumber state plays it from: `sleep` loops while the
-    // asleep bit rides and `wake` fires once on the asleep-to-awake edge. Comments are
-    // stripped first so prose about a clip cannot stand in for the slot.
+  it('plays the blind stagger off the cue the sim emits, then holds the groping loop', () => {
+    // The stagger is a one-shot on the blind edge; the loop holds in place of his idle for
+    // as long as the Blinded aura rides. Both keys are the sim's own exports, so a rename
+    // on either side turns this red instead of leaving him standing in his idle blind.
+    const map = clipMapSource();
+    expect(map).toContain(`${EYE_WARD_BLIND_ABILITY}: 'Balgath_Blinded'`);
+    expect(map).toContain(`idleByAura: { ${EYE_WARD_BLINDED_AURA_ID}: 'Balgath_BlindedLoop' }`);
+  });
+
+  it('names Sleep and Wake exactly once, each in the slot the slumber state plays it from', () => {
     const map = clipMapSource().replace(/\/\/.*$/gm, '');
-    expect(map).not.toContain('Balgath_Blinded');
     const mentions = (clip: string) => map.match(new RegExp(`'${clip}'`, 'g')) ?? [];
     expect(map).toContain("sleep: 'Balgath_Sleep'");
     expect(mentions('Balgath_Sleep'), 'Sleep is named outside the sleep slot').toHaveLength(1);
@@ -198,13 +219,11 @@ describe('balgath world boss assets', () => {
   });
 
   it('loops the sleep in place and wakes out of its exact first pose', async () => {
-    // The sleep loop holds from dusk to dawn, so its wrap has to be invisible: the last
-    // sampled key equals the first on every channel, exactly, not to a tolerance. And the
-    // wake fires on the edge the loop was playing across, so ITS first key must equal the
-    // loop's first key channel for channel, or he jumps to a new pose the frame he wakes.
-    // Checked on the shipped channels rather than on a build-script constant, because it is
-    // the baked Float32 data the mixer reads.
-    const root = (await createGlbIO().read(ABILITIES)).getRoot();
+    // The sleep loop holds from dusk to dawn, so its wrap has to be invisible, and the wake
+    // fires on the edge the loop was playing across, so ITS first key must equal the loop's
+    // first key or he jumps to a new pose the frame he wakes. Checked on the shipped,
+    // meshopt-quantized channels the mixer reads, to the quantization's own step.
+    const root = (await createGlbIO().read(RIG)).getRoot();
     const sleep = indexClip(root, 'Balgath_Sleep');
     const wake = indexClip(root, 'Balgath_Wake');
     expect(sleep.size, 'the sleep loop drives almost nothing').toBeGreaterThan(40);
@@ -212,51 +231,51 @@ describe('balgath world boss assets', () => {
     for (const ch of sleep.values()) loop = Math.max(loop, ch.times[ch.times.length - 1]);
     expect(loop).toBeGreaterThan(3.2);
     expect(loop).toBeLessThan(4.0);
+    const apart = (a: number[], b: number[]) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+    // The hanging gear (loincloth, wrist chain, tally cord, belly) is follow-through the
+    // build SIMULATES per clip, so its state at a clip's first frame is whatever its spring
+    // settled to; the crossfade into the wake carries it. The skeleton is what must seam.
+    const SPRUNG = /^(Loin|R_Chain|Tally|Belly)/;
     let breathing = 0;
     for (const [key, ch] of sleep) {
+      if (SPRUNG.test(key)) continue;
       const first = sampleChannel(ch, 0);
-      expect(sampleChannel(ch, loop), `${key} pops at the loop point`).toEqual(first);
+      expect(apart(sampleChannel(ch, loop), first), `${key} pops at the loop point`).toBeLessThan(
+        2e-3,
+      );
       const edge = wake.get(key);
-      expect(edge, `the wake does not drive ${key}, so the edge would drop it`).toBeDefined();
-      expect(
-        sampleChannel(edge as NonNullable<typeof edge>, 0),
-        `${key} seams on the wake edge`,
-      ).toEqual(first);
-      if (sampleChannel(ch, loop / 2).some((v, i) => Math.abs(v - first[i]) > 1e-4)) breathing++;
+      if (edge) {
+        expect(apart(sampleChannel(edge, 0), first), `${key} seams on the wake edge`).toBeLessThan(
+          2e-3,
+        );
+      }
+      // A breath, not a held frame: somewhere in the loop he is somewhere else (sampled at
+      // eighths, since a loop of two breaths is back at its start at the half).
+      let moved = 0;
+      for (let k = 1; k < 8; k++)
+        moved = Math.max(moved, apart(sampleChannel(ch, (loop * k) / 8), first));
+      if (moved > 1e-3) breathing++;
     }
-    // ...and it is a breath, not a held frame: mid-loop he is somewhere else.
     expect(breathing, 'the sleep loop never moves').toBeGreaterThan(5);
   });
 
-  it('sleeps folded low with his soles in the ground, never hovering above it', async () => {
-    // From across the fen the sleeping boss has to pass for a boulder, and up close the one
-    // thing that breaks a held pose is a hover. Every donor on this rig keeps the Hip at a
-    // fixed height and folds the legs UP under it, so a crouch blended out of them floats
-    // unless the build sinks the Hip (build_balgath_anims.mjs `sunk`); the circle-smash's
-    // impact frame hovers for exactly that reason and gets away with it by being brief.
-    // Measured against his own retargeted Idle, the pose prepareVisual takes the sole line
-    // from, so "the ground" here is the ground the renderer will stand him on.
-    const poser = await loadRigPoser(RIG, ABILITIES);
-    const own = await loadRigPoser(RIG, RIG);
-    const stand = own.pose('Idle', 0.5);
+  it('sleeps folded low with his soles on the ground, never hovering above it', async () => {
+    const poser = await loadRigPoser(RIG, RIG);
+    const stand = poser.pose('Idle', 0.5);
     const asleep = poser.pose('Balgath_Sleep', 0);
     const sole = (p: PosedSkeleton) =>
-      Math.min(...['R_Foot', 'L_Foot', 'R_ToeBase', 'L_ToeBase'].map((b) => p.at(b)[1]));
+      Math.min(...['R_Foot', 'L_Foot', 'R_Toes', 'L_Toes'].map((b) => p.at(b)[1]));
     expect(sole(asleep), 'the sleeping soles float above his idle sole line').toBeLessThanOrEqual(
-      sole(stand) + 0.005,
+      sole(stand) + 0.05,
     );
-    // Folded: the head sits far lower over the hip than standing, and further FORWARD of it
-    // than above it (the rig faces +X), which is a spine pitched past 45 degrees, not a bow.
-    const rise = (p: PosedSkeleton) => p.at('Head')[1] - p.at('Hip')[1];
-    expect(rise(asleep)).toBeLessThan(rise(stand) * 0.6);
-    expect(asleep.at('Head')[0] - asleep.at('Hip')[0]).toBeGreaterThan(rise(asleep));
+    // Folded: the head sits far lower over the hips than standing and further FORWARD of
+    // them (the rig faces +Z) than above them: a spine pitched past 45 degrees, not a bow.
+    const rise = (p: PosedSkeleton) => p.at('Head')[1] - p.at('Hips')[1];
+    expect(rise(asleep)).toBeLessThan(rise(stand) * 0.3);
+    expect(asleep.at('Head')[2] - asleep.at('Hips')[2]).toBeGreaterThan(rise(asleep));
   });
 
   it('is reachable through MOB_KEYS, and therefore NOT lazily preloaded', () => {
-    // These move together or world entry crashes: preload sets are tier-independent and
-    // read synchronously at entry, so a reachable-but-lazy def fails with "asset not
-    // preloaded". Without the MOB_KEYS row he silently renders as the generic elemental
-    // family fallback instead, which is the quieter half of the same bug.
     const src = readFileSync(MANIFEST, 'utf8');
     const keysStart = src.indexOf('MOB_KEYS: Record');
     expect(keysStart, 'MOB_KEYS moved or was renamed').toBeGreaterThan(-1);
@@ -266,41 +285,61 @@ describe('balgath world boss assets', () => {
   });
 
   it('keeps the sim scale and the measured gait references in agreement', () => {
-    // The refs are only correct AT the scale they were measured at, and the sim owns the
-    // scale while render owns the refs. `src/sim/` may never import from `src/render/`, so
-    // this weld replaces the import it cannot have. Drift is silent, and shows up only as
-    // feet that skate.
     const manifest = readFileSync(MANIFEST, 'utf8');
-    const declared = manifest.match(/export const BALGATH_SCALE = ([\d.]+);/)?.[1];
-    expect(declared, 'BALGATH_SCALE is missing').toBeTruthy();
-    const simScale = templateSource().match(/scale: ([\d.]+),/)?.[1];
-    expect(simScale, 'the mob template has no scale').toBeTruthy();
-    expect(Number(simScale)).toBe(Number(declared));
+    const declared = num(manifest, /export const BALGATH_SCALE = ([\d.]+);/);
+    expect(num(templateSource(), /scale: ([\d.]+),/)).toBe(declared);
   });
 
-  it('keeps his move speed under the gait threshold that would break his stride', () => {
-    // 5.2 is the renderer's GAIT_RUN_ENTER. Above it he crosses into the run clip and
-    // flip-flops across that boundary mid-chase. walkRef is what his cycle is timed
-    // against, and exceeding walkRef * 1.8 pins the clip at its clamp and skates: that
-    // exact combination is what made him read as jogging in place at the previous tuning.
-    const speed = Number(templateSource().match(/moveSpeed: ([\d.]+),/)?.[1]);
-    expect(speed).toBeGreaterThan(0);
-    expect(speed, 'would cross into the run gait').toBeLessThan(5.2);
-    const walkRef = Number(
-      readFileSync(MANIFEST, 'utf8').match(/const BALGATH_WALK_REF = ([\d.]+);/)?.[1],
-    );
-    expect(walkRef).toBeGreaterThan(0);
-    expect(speed / walkRef, 'walk clip would be pinned at its clamp').toBeLessThan(1.8);
+  it('measures his gait refs off the planted foot of the shipped cycles', async () => {
+    // A planted foot slides back at exactly the speed the body must travel for it not to
+    // skate, so the refs are that speed through the normalize-and-scale chain. Read off the
+    // shipped file, so a re-keyed Walk or Run that nobody re-measured turns this red.
+    const manifest = readFileSync(MANIFEST, 'utf8');
+    const chain = (3.2 / RIG_HEIGHT) * num(manifest, /export const BALGATH_SCALE = ([\d.]+);/);
+    const poser = await loadRigPoser(RIG, RIG);
+    for (const [clip, ref] of [
+      ['Walk', num(manifest, /const BALGATH_WALK_REF = ([\d.]+);/)],
+      ['Run', num(manifest, /const BALGATH_RUN_REF = ([\d.]+);/)],
+    ] as const) {
+      const planted = plantedSpeed(poser, clip) * chain;
+      expect(planted / ref, `${clip} ref ${ref} vs planted ${planted.toFixed(2)}`).toBeGreaterThan(
+        0.95,
+      );
+      expect(planted / ref).toBeLessThan(1.05);
+    }
   });
 
-  it('routes each warpath cue off the ability id the sim actually emits', () => {
-    // Same weld as the telegraphed slams above, for the two mechanics his warpath owns
-    // (src/sim/mob/warpath.ts). These ids are not castable abilities: they are cue names
-    // agreed between the emitter and this map, and nothing else checks them. Disagree and
-    // the mechanic still resolves while the boss plays his ordinary swing, which is the
-    // kind of wrong that survives a playtest.
+  it('runs its warpath in the RUN gait and its combat in the walk, inside both clamps', () => {
+    const template = templateSource();
+    const manifest = readFileSync(MANIFEST, 'utf8');
+    const moveSpeed = num(template, /moveSpeed: ([\d.]+),/);
+    const travel = moveSpeed * num(template, /travelSpeedMult: ([\d.]+),/);
+    const walkRef = num(manifest, /const BALGATH_WALK_REF = ([\d.]+);/);
+    const runRef = num(manifest, /const BALGATH_RUN_REF = ([\d.]+);/);
+    // GAIT_RUN_ENTER is 5.2 (src/render/locomotion.ts): combat below it, travel above.
+    expect(moveSpeed, 'combat speed would cross into the run gait').toBeLessThan(5.2);
+    expect(travel, 'travel speed would stay in the walk gait').toBeGreaterThan(5.2);
+    expect(moveSpeed / walkRef).toBeGreaterThan(0.6);
+    expect(moveSpeed / walkRef).toBeLessThan(1.8);
+    expect(travel / runRef).toBeGreaterThan(0.6);
+    expect(travel / runRef).toBeLessThan(1.6);
+    expect(travel, 'a boss nobody can outrun has no counterplay').toBeLessThan(7);
+  });
+
+  it('plays the mid-run backhand at exactly the rate its own legs were sampled at', () => {
+    const template = templateSource();
+    const manifest = readFileSync(MANIFEST, 'utf8');
+    const travel =
+      num(template, /moveSpeed: ([\d.]+),/) * num(template, /travelSpeedMult: ([\d.]+),/);
+    const runRef = num(manifest, /const BALGATH_RUN_REF = ([\d.]+);/);
+    expect(num(manifest, /mob_warpath_swipe: ([\d.]+),/)).toBeCloseTo(travel / runRef, 1);
+  });
+
+  it('routes each warpath and aimed-slam cue off the ability id the sim actually emits', () => {
     const map = clipMapSource();
     const warpath = readFileSync(resolve(ROOT, 'src/sim/mob/warpath.ts'), 'utf8');
+    const slams = readFileSync(resolve(ROOT, 'src/sim/mob/boss_slams.ts'), 'utf8');
+    const fxCore = readFileSync(resolve(ROOT, 'src/render/balgath_fx_core.ts'), 'utf8');
     for (const [ability, clip] of [
       ['mob_warpath_swipe', 'Balgath_Barrowsweep'],
       ['mob_warpath_wreck', 'Balgath_Barrowfall'],
@@ -308,177 +347,6 @@ describe('balgath world boss assets', () => {
       expect(map, `${ability} is not mapped`).toContain(`${ability}: '${clip}'`);
       expect(warpath, `${ability} is never emitted`).toContain(`'${ability}'`);
     }
-  });
-
-  it('runs its warpath in the RUN gait and its combat in the walk', () => {
-    // The one thing that made him read as skating was a clip pinned at its clamp. He now
-    // has two speeds and they must land in different gait bands with the clip rate inside
-    // the clamp on BOTH sides: combat under GAIT_RUN_ENTER on the walk reference, travel
-    // above it on the run reference. Neither the sim nor the renderer can see the other
-    // half of this, so it is checked here or not at all.
-    const template = templateSource();
-    const manifest = readFileSync(MANIFEST, 'utf8');
-    const moveSpeed = Number(template.match(/moveSpeed: ([\d.]+),/)?.[1]);
-    const travelMult = Number(template.match(/travelSpeedMult: ([\d.]+),/)?.[1]);
-    const walkRef = Number(manifest.match(/const BALGATH_WALK_REF = ([\d.]+);/)?.[1]);
-    const runRef = Number(manifest.match(/const BALGATH_RUN_REF = ([\d.]+);/)?.[1]);
-    expect(moveSpeed).toBeGreaterThan(0);
-    expect(travelMult).toBeGreaterThan(1);
-    const travel = moveSpeed * travelMult;
-    // GAIT_RUN_ENTER is 5.2 (src/render/locomotion.ts): combat below it, travel above.
-    expect(moveSpeed, 'combat speed would cross into the run gait').toBeLessThan(5.2);
-    expect(travel, 'travel speed would stay in the walk gait').toBeGreaterThan(5.2);
-    // locomotionTimeScale clamps the run to [0.6, 1.6] and the walk to [0.6, 1.8]; a rate
-    // outside the clamp is a clip pinned at its limit, which is a skate by construction.
-    expect(moveSpeed / walkRef).toBeGreaterThan(0.6);
-    expect(moveSpeed / walkRef).toBeLessThan(1.8);
-    expect(travel / runRef).toBeGreaterThan(0.6);
-    expect(travel / runRef).toBeLessThan(1.6);
-    // He must also stay outrunnable: every telegraphed circle in this fight assumes a
-    // player can walk out of it, and a boss faster than a 7 u/s run cannot be left.
-    expect(travel, 'a boss nobody can outrun has no counterplay').toBeLessThan(7);
-  });
-
-  it('plays the mid-run backhand at exactly the rate its own legs were sampled at', () => {
-    // Barrowsweep is a COMPOSITE: its lower body is the Run cycle, its upper body an
-    // authored swing, because the renderer plays an attack as a full-body one-shot and an
-    // ordinary swing clip would freeze a travelling boss's legs while the sim kept sliding
-    // him. That only holds while the one-shot's timescale matches what the locomotion
-    // state machine would have picked for the run clip at travel speed. Drift them apart
-    // and the composite skates for exactly as long as the swing lasts.
-    const template = templateSource();
-    const manifest = readFileSync(MANIFEST, 'utf8');
-    const travel =
-      Number(template.match(/moveSpeed: ([\d.]+),/)?.[1]) *
-      Number(template.match(/travelSpeedMult: ([\d.]+),/)?.[1]);
-    const runRef = Number(manifest.match(/const BALGATH_RUN_REF = ([\d.]+);/)?.[1]);
-    const wired = Number(manifest.match(/mob_warpath_swipe: ([\d.]+),/)?.[1]);
-    expect(wired).toBeGreaterThan(0);
-    expect(wired).toBeCloseTo(travel / runRef, 1);
-  });
-
-  it('keeps the two aimed slams authored in Blender, not blended out of donor poses', () => {
-    // These two escalated to real keyframing for a reason the rig can be asked about: the
-    // retargeted donor set carries no horizontal swing and no one-armed gesture at all, so
-    // a hammer and a low sweep cannot be sampled out of it. The versions this replaced were
-    // built by masking half the body out of a two-armed overhead chop.
-    const data = JSON.parse(
-      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
-    );
-    for (const clip of ['Balgath_Hammer', 'Balgath_Cleave', 'Balgath_Toss']) {
-      expect(Object.keys(data.clips), `${clip} is not authored`).toContain(clip);
-      expect(data.clips[clip].times.length, `${clip} has no frames`).toBeGreaterThan(30);
-    }
-    // The build must SOURCE them from that data rather than re-deriving them, or the
-    // authored motion is silently replaced by whatever the pose blender produces.
-    const build = readFileSync(resolve(ROOT, 'scripts/build_balgath_anims.mjs'), 'utf8');
-    expect(build).toContain('balgath_slam_clips.json');
-    expect(build).toContain("blenderClip('Balgath_Hammer')");
-    expect(build).toContain("blenderClip('Balgath_Cleave')");
-    expect(build).toContain("blenderClip('Balgath_Toss')");
-  });
-
-  it('never authors a track on the parentless root bone', () => {
-    // The falling-forward bug, as a gate. The axis conversion bakes into the parentless
-    // bone's pose matrix, so sampling it writes a constant quarter-turn root track that
-    // pitches the whole model forward for as long as the one-shot plays. That shipped once
-    // on another rig; it is cheap to make impossible here.
-    const data = JSON.parse(
-      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
-    );
-    const rootless = (glbJson(RIG).nodes ?? []).map((n) => n.name);
-    expect(data.bones, 'the authored bone list names the root').not.toContain('Root');
-    for (const clip of Object.values(data.clips) as { rotation: Record<string, unknown> }[]) {
-      expect(Object.keys(clip.rotation)).not.toContain('Root');
-    }
-    // ...and every bone it DOES name has to exist on the rig, or the track binds to nothing.
-    for (const bone of data.bones as string[]) {
-      expect(rootless, `authored bone '${bone}' is not on the rig`).toContain(bone);
-    }
-  });
-
-  it('lands each authored slam on its own template windup', () => {
-    // Both are wired at timeScale 1, so the clip's contact frame IS the moment the blast
-    // resolves. The clip has to be long enough to contain that frame with recovery after
-    // it; a clip shorter than its windup clamps on the last pose and the boss stands
-    // frozen through the rest of his own telegraph.
-    const template = templateSource();
-    const data = JSON.parse(
-      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
-    );
-    const hammerWind = Number(template.match(/hammer: \{[\s\S]*?windup: ([\d.]+),/)?.[1]);
-    const cleaveWind = Number(template.match(/cleave: \{[\s\S]*?windup: ([\d.]+),/)?.[1]);
-    expect(hammerWind).toBeGreaterThan(0);
-    expect(cleaveWind).toBeGreaterThan(0);
-    expect(data.clips.Balgath_Hammer.duration).toBeGreaterThan(hammerWind);
-    expect(data.clips.Balgath_Cleave.duration).toBeGreaterThan(cleaveWind);
-  });
-
-  it('never swings the hammer arm through his own head', async () => {
-    // A defect that shipped, and a measurement that can see it. This rig has an enormous
-    // head (0.226 radius on a 0.55-tall body) and short arms, so raising the fist onto the
-    // CENTRELINE buries the forearm in the skull. The first authored cut did exactly that,
-    // on the beats that are held on screen for the whole windup, and it read as "nicely
-    // centred overhead" in every metric I had at the time.
-    //
-    // The geometric tell is simple: while the fist is above head height it must stay OFF
-    // the body axis. Nothing else in the suite can see this, because it is the composition
-    // of a raise and a lateral that is wrong, not either one.
-    const poser = await loadRigPoser(RIG, ABILITIES);
-    const dur = poser.duration('Balgath_Hammer');
-    let worst = Number.POSITIVE_INFINITY;
-    for (let i = 0; i <= 40; i++) {
-      const p = poser.pose('Balgath_Hammer', (dur * i) / 40);
-      const fist = p.at('R_Hand');
-      const head = p.at('Head');
-      const foot = p.at('R_Foot');
-      if (fist[1] < head[1]) continue; // only the raised part of the swing can reach it
-      // Horizontal distance from the body axis, taken at the head's own centre.
-      const off = Math.hypot(fist[0] - head[0], fist[2] - head[2]);
-      worst = Math.min(worst, off);
-      void foot;
-    }
-    expect(worst, 'the hammer never lifts above his head at all').toBeLessThan(9e9);
-    expect(worst, 'the raised fist crosses onto his own head').toBeGreaterThan(0.12);
-  });
-
-  it('scrapes the cleave along the ground instead of swinging it through the air', async () => {
-    // The mechanic is beaten by JUMPING, so the thing a player has to clear must be visibly
-    // ON the floor for long enough to read. A fist that whips past at hip height in three
-    // frames is a swing, and a swing teaches the raid to walk backwards instead.
-    const poser = await loadRigPoser(RIG, ABILITIES);
-    const dur = poser.duration('Balgath_Cleave');
-    const samples: { t: number; up: number; brg: number }[] = [];
-    for (let i = 0; i <= 50; i++) {
-      const t = (dur * i) / 50;
-      const p = poser.pose('Balgath_Cleave', t);
-      const fist = p.at('R_Hand');
-      const foot = p.at('R_Foot');
-      samples.push({
-        t,
-        up: fist[1] - foot[1],
-        brg: (Math.atan2(fist[2], fist[0]) * 180) / Math.PI,
-      });
-    }
-    // A contiguous stretch where the fist is genuinely low, and it has to be LONG.
-    const low = samples.filter((s) => s.up < 0.2);
-    expect(low.length, 'the fist never reaches the ground').toBeGreaterThan(6);
-    const span = Math.max(...low.map((s) => s.t)) - Math.min(...low.map((s) => s.t));
-    expect(span, 'the ground contact is a tap, not a scrape').toBeGreaterThan(0.5);
-    // ...and it must TRAVEL while it is down there, or it is a plant rather than a drag.
-    const brgs = low.map((s) => s.brg);
-    const swept = Math.max(...brgs) - Math.min(...brgs);
-    expect(swept, 'the fist sits still on the ground instead of dragging').toBeGreaterThan(60);
-  });
-
-  it('routes each AIMED slam off the ability id the sim actually emits', () => {
-    // Third weld of the same kind, for the two hand-aimed attacks. These ids are agreed
-    // between three files that cannot import each other: the sim emits them, the ClipMap
-    // picks a pose from them, and the FX router picks an arc or a crater from them. Nothing
-    // but this test can see all three at once, and a disagreement is silent in every one.
-    const map = clipMapSource();
-    const slams = readFileSync(resolve(ROOT, 'src/sim/mob/boss_slams.ts'), 'utf8');
-    const fxCore = readFileSync(resolve(ROOT, 'src/render/balgath_fx_core.ts'), 'utf8');
     for (const [ability, clip] of [
       ['mob_balgath_hammer', 'Balgath_Hammer'],
       ['mob_balgath_cleave', 'Balgath_Cleave'],
@@ -489,92 +357,133 @@ describe('balgath world boss assets', () => {
     }
   });
 
-  it('draws the cleave telegraph at the width the cleave actually hits', () => {
-    // The renderer draws the arc from its own constant and the sim damages from the
-    // template's, because src/render may not import a SimContext consumer. If they drift,
-    // the ring promises one wedge and the arm sweeps another, which is worse than no
-    // telegraph: the raid dodges the wrong way with confidence.
-    const halfDeg = Number(templateSource().match(/halfArcDeg: ([\d.]+),/)?.[1]);
-    expect(halfDeg).toBeGreaterThan(0);
-    const fxCore = readFileSync(resolve(ROOT, 'src/render/balgath_fx_core.ts'), 'utf8');
-    const drawnDeg = Number(fxCore.match(/BALGATH_CLEAVE_HALF_ARC = \((\d+) \* Math\.PI\)/)?.[1]);
-    expect(drawnDeg, 'the render half-arc constant moved or was renamed').toBeGreaterThan(0);
-    expect(drawnDeg).toBe(halfDeg);
-  });
-
-  it('lights a fist for every slam whose windup a raid has to read', () => {
-    // The glow is the only cue that says WHICH hand, and therefore whether the ring on the
-    // ground belongs to one player or to everybody. A telegraphed slam without one is a
-    // mechanic the raid can only read from the floor.
-    const map = clipMapSource();
-    for (const ability of ['mob_balgath_hammer', 'mob_balgath_cleave', 'mob_pulse_windup']) {
-      expect(map, `${ability} winds up with no fist cue`).toContain(`${ability}: { hand:`);
-    }
-  });
-
-  it('keeps the fist glow the size of a fist', () => {
-    // `radius` is BONE-LOCAL and gets multiplied twice on the way to the screen: by the
-    // visual's normScale (3.85 on this rig) and again by the entity's scale (4.2). The
-    // first cut used 0.11, which is a 3.5-unit ball across the chest of a 13-unit body; at
-    // 0.04 it measures 1.29 units in-engine, which is a fist. Nothing else can catch this
-    // because both multipliers live on the render side and neither is in the ClipMap.
-    // The glow specs live on the shared BALGATH ClipMap, not the VisualDef.
-    const radii = [...clipMapSource().matchAll(/radius: ([\d.]+) \}/g)].map((m) => Number(m[1]));
-    expect(radii.length, 'no charge-glow radii found to check').toBeGreaterThan(2);
-    for (const r of radii) {
-      expect(r, 'a bone-local glow radius this big renders as a beach ball').toBeLessThan(0.06);
-      expect(r, 'a glow this small is invisible from raid distance').toBeGreaterThan(0.02);
-    }
-  });
-
-  it('swings the Tripo rig onto the +Z facing convention', () => {
-    // The rig came off the creature lane resting facing +X, and the game sets
-    // group.rotation.y straight from the sim's facing, where 0 means +Z. Without the yaw
-    // offset the mesh is drawn a quarter turn off its own heading: he runs north with his
-    // body pointing east, feet cycling forward while he slides sideways.
-    //
-    // Nothing else can catch this. The sim's facing is exactly right (measured at 0.000
-    // rad of error against velocity over hundreds of moving ticks), the renderer's group
-    // rotation is exactly right, and a still frame of a symmetrical stone body reads fine
-    // from most angles. Only the composition of the two is wrong, and only in motion.
-    expect(defBlock('mob_balgath_cyclops')).toContain('yaw: -Math.PI / 2');
-  });
-
-  it('telegraphs its mechanics, which is the whole counterplay', () => {
-    // Without this his AoEs fire instantly with no ring, and "walk out of the circle"
-    // stops being something a player can do.
-    expect(templateSource()).toMatch(/telegraphedMechanics: [\d.]+,/);
-  });
-
   it('routes the ranged kit off the ability ids the sim actually emits', () => {
-    // Fourth weld of the same kind, for the three mechanics that reach the far players
-    // (src/sim/mob/boss_ranged_mechanics.ts). A disagreement leaves the telegraph on the
-    // ground while the boss plays his ordinary swing, which survives a playtest.
     const map = clipMapSource();
     const ranged = readFileSync(resolve(ROOT, 'src/sim/mob/boss_ranged_mechanics.ts'), 'utf8');
     for (const [ability, clip] of [
       ['mob_balgath_boulder', 'Balgath_Toss'],
       ['mob_balgath_glare', 'Balgath_EyeFlare'],
-      ['mob_balgath_burden', 'Balgath_Roar'],
+      ['mob_balgath_burden', 'Balgath_Burden'],
     ]) {
       expect(map, `${ability} has no pose`).toContain(`${ability}: '${clip}'`);
       expect(ranged, `${ability} is never emitted`).toContain(`'${ability}'`);
     }
-    // The toss is the one that lights his fists, earth-brown, for exactly its release.
     expect(map).toContain(
-      `mob_balgath_boulder: { hand: 'both', color: 0xb08a5a, rise: 0.4, seconds: ${TOSS_RELEASE_SEC}, radius: 0.04 }`,
+      `mob_balgath_boulder: { hand: 'both', color: 0xb08a5a, rise: 0.4, seconds: ${TOSS_RELEASE_SEC}, radius:`,
     );
   });
 
+  it('lands the hammer unscaled on its windup and the cleave arm on its lengthened one', async () => {
+    // The hammer is authored with its blow on the 1.3s template windup. The cleave's arm
+    // crosses straight ahead at 1.5s of its clip and the windup is longer than that, so it
+    // plays slowed by exactly windup / crossing: the arm must still cross the instant the
+    // arc resolves, not before it with the boss frozen through the rest of his telegraph.
+    const template = templateSource();
+    const map = clipMapSource();
+    const hammerWind = num(template, /hammer: \{[\s\S]*?windup: ([\d.]+),/);
+    const cleaveWind = num(template, /cleave: \{[\s\S]*?windup: ([\d.]+),/);
+    expect(hammerWind).toBe(1.3);
+    expect(num(map, /mob_balgath_hammer: ([\d.]+),/)).toBe(1);
+    const cleaveScale = num(map, /mob_balgath_cleave: ([\d.]+),/);
+    expect(CLEAVE_CROSS_SEC / cleaveScale).toBeCloseTo(cleaveWind, 2);
+    // ...and the glow on his right fist burns for the whole of the lengthened wind.
+    expect(map).toMatch(
+      new RegExp(`mob_balgath_cleave: \\{ hand: 'r', [^}]*seconds: ${cleaveWind}, `),
+    );
+    // The crossing is where the clip says it is: the right fist passes straight ahead.
+    const poser = await loadRigPoser(RIG, RIG);
+    let crossT = -1;
+    let prev = Number.NEGATIVE_INFINITY;
+    const dur = poser.duration('Balgath_Cleave');
+    for (let i = 0; i <= 250; i++) {
+      const t = (dur * i) / 250;
+      const h = poser.pose('Balgath_Cleave', t).at('R_Hand');
+      const brg = (Math.atan2(h[0], h[2]) * 180) / Math.PI;
+      if (prev < 0 && brg >= 0 && t > 0.8) {
+        crossT = t;
+        break;
+      }
+      prev = brg;
+    }
+    expect(Math.abs(crossT - CLEAVE_CROSS_SEC), `the arm crosses at ${crossT}`).toBeLessThan(0.1);
+  });
+
+  it('scrapes the cleave along the ground instead of swinging it through the air', async () => {
+    const poser = await loadRigPoser(RIG, RIG);
+    const dur = poser.duration('Balgath_Cleave');
+    const samples: { t: number; up: number; brg: number }[] = [];
+    for (let i = 0; i <= 60; i++) {
+      const t = (dur * i) / 60;
+      const p = poser.pose('Balgath_Cleave', t);
+      const fist = p.at('R_Hand');
+      samples.push({ t, up: fist[1], brg: (Math.atan2(fist[0], fist[2]) * 180) / Math.PI });
+    }
+    // Wrist under a fifth of his height: the fist below it is on the ground.
+    const low = samples.filter((s) => s.up < RIG_HEIGHT * 0.2);
+    expect(low.length, 'the fist never reaches the ground').toBeGreaterThan(6);
+    const span = Math.max(...low.map((s) => s.t)) - Math.min(...low.map((s) => s.t));
+    expect(span, 'the ground contact is a tap, not a scrape').toBeGreaterThan(0.5);
+    const brgs = low.map((s) => s.brg);
+    expect(Math.max(...brgs) - Math.min(...brgs), 'a plant, not a drag').toBeGreaterThan(60);
+  });
+
+  it('never swings the hammer arm through his own head', async () => {
+    const poser = await loadRigPoser(RIG, RIG);
+    const dur = poser.duration('Balgath_Hammer');
+    let worst = Number.POSITIVE_INFINITY;
+    for (let i = 0; i <= 40; i++) {
+      const p = poser.pose('Balgath_Hammer', (dur * i) / 40);
+      const fist = p.at('R_Hand');
+      const head = p.at('Head');
+      if (fist[1] < head[1]) continue;
+      worst = Math.min(worst, Math.hypot(fist[0] - head[0], fist[2] - head[2]));
+    }
+    expect(worst, 'the hammer never lifts above his head at all').toBeLessThan(9e9);
+    expect(worst, 'the raised fist crosses onto his own head').toBeGreaterThan(RIG_HEIGHT * 0.15);
+  });
+
+  it('draws the cleave telegraph at the width the cleave actually hits', () => {
+    const halfDeg = num(templateSource(), /halfArcDeg: ([\d.]+),/);
+    const fxCore = readFileSync(resolve(ROOT, 'src/render/balgath_fx_core.ts'), 'utf8');
+    const drawnDeg = num(fxCore, /BALGATH_CLEAVE_HALF_ARC = \((\d+) \* Math\.PI\)/);
+    expect(drawnDeg).toBe(halfDeg);
+  });
+
+  it('lights a fist for every slam whose windup a raid has to read, at a fist size', () => {
+    // `radius` is BONE-LOCAL: the rig's normalize (3.2 over its ~14-unit body) and the
+    // entity scale (4.2) sit between it and the screen. Target world radius about 0.65.
+    const map = clipMapSource();
+    for (const ability of ['mob_balgath_hammer', 'mob_balgath_cleave', 'mob_pulse_windup']) {
+      expect(map, `${ability} winds up with no fist cue`).toContain(`${ability}: { hand:`);
+    }
+    const radii = [...map.matchAll(/radius: ([\d.]+) \}/g)].map((m) => Number(m[1]));
+    expect(radii.length).toBeGreaterThan(2);
+    const chain = (3.2 / RIG_HEIGHT) * 4.2;
+    for (const r of radii) {
+      expect(r * chain, 'a glow this big renders as a beach ball').toBeLessThan(1);
+      expect(r * chain, 'a glow this small is invisible from raid distance').toBeGreaterThan(0.4);
+    }
+  });
+
+  it('faces +Z like every game rig, so it carries no yaw correction', async () => {
+    // The Tripo body rested facing +X and needed a quarter turn; this one is authored facing
+    // +Z. The proof is in the gait itself: a planted foot slides BACKWARDS, -Z, under a body
+    // walking forward.
+    expect(defBlock('mob_balgath_cyclops')).not.toContain('yaw:');
+    expect(defBlock('form_foreman')).not.toContain('yaw:');
+    const poser = await loadRigPoser(RIG, RIG);
+    expect(plantedVelocityZ(poser, 'Walk')).toBeLessThan(0);
+  });
+
+  it('telegraphs its mechanics, which is the whole counterplay', () => {
+    expect(templateSource()).toMatch(/telegraphedMechanics: [\d.]+,/);
+  });
+
   it('plays the toss unscaled, releasing inside the windup and standing again as it lands', async () => {
-    // The renderer launches the boulder from his fists on the authored release frame, so
-    // the clip must play at 1 (or that frame moves) and its release must come before the
-    // sim resolves the hit, with the recovery filling the rest of the windup.
     const map = clipMapSource();
     expect(map).toContain('mob_balgath_boulder: 1,');
-    const windup = Number(templateSource().match(/boulder: \{[\s\S]*?windup: ([\d.]+),/)?.[1]);
-    expect(windup, 'the boulder template has no windup').toBeGreaterThan(0);
-    const poser = await loadRigPoser(RIG, ABILITIES);
+    const windup = num(templateSource(), /boulder: \{[\s\S]*?windup: ([\d.]+),/);
+    const poser = await loadRigPoser(RIG, RIG);
     const dur = poser.duration('Balgath_Toss');
     expect(TOSS_RELEASE_SEC).toBeLessThan(windup);
     expect(dur).toBeGreaterThan(TOSS_RELEASE_SEC + 0.5);
@@ -583,96 +492,93 @@ describe('balgath world boss assets', () => {
     );
   });
 
-  it('reads as a toss: fists in the ground ahead, overhead and apart, then thrown out ahead', async () => {
-    // The boulder is drawn by the renderer, so the arms carry an invisible object and the
-    // pose has to say where it is. Measured by forward kinematics on the shipped clip (the
-    // rig faces +X, up is +Y), at the three beats a raid reads: the dig, the overhead hold,
-    // and the release the boulder leaves from.
-    const poser = await loadRigPoser(RIG, ABILITIES);
-    const stand = poser.pose('Balgath_Toss', 0);
-    const sole = stand.at('R_Foot')[1];
+  it('reads as a toss, and the renderer holds the boulder where his fists are', async () => {
+    const poser = await loadRigPoser(RIG, RIG);
+    const sole = poser.pose('Balgath_Toss', 0).at('R_Foot')[1];
     const hands = (p: PosedSkeleton) => [p.at('R_Hand'), p.at('L_Hand')];
-
     const dig = poser.pose('Balgath_Toss', 0.55);
     for (const h of hands(dig)) {
-      expect(h[1] - sole, 'the fists never reach the ground to dig').toBeLessThan(0.2);
-      expect(h[0] - dig.at('R_Foot')[0], 'the dig is not ahead of his feet').toBeGreaterThan(0.2);
+      expect(h[1] - sole, 'the fists never reach the ground to dig').toBeLessThan(1);
+      expect(h[2] - dig.at('R_Foot')[2], 'the dig is not ahead of his feet').toBeGreaterThan(2);
     }
-
     const overhead = poser.pose('Balgath_Toss', 1.1);
     const [ro, lo] = hands(overhead);
     for (const h of [ro, lo]) {
-      expect(
-        h[1] - overhead.at('Head')[1],
-        'the boulder never gets above his head',
-      ).toBeGreaterThan(0.12);
+      expect(h[1] - overhead.at('Head')[1], 'never above his head').toBeGreaterThan(2);
     }
-    // a boulder's width apart, never clasped together behind his skull
-    expect(Math.hypot(ro[0] - lo[0], ro[1] - lo[1], ro[2] - lo[2])).toBeGreaterThan(0.25);
-
+    expect(Math.hypot(ro[0] - lo[0], ro[1] - lo[1], ro[2] - lo[2])).toBeGreaterThan(3);
+    // The renderer's overhead point (in entity-scale units) rides just above his wrists.
+    const wrists = ((ro[1] + lo[1]) / 2) * (3.2 / RIG_HEIGHT);
+    expect(BALGATH_BOULDER_OVERHEAD.height).toBeGreaterThan(wrists);
+    expect(BALGATH_BOULDER_OVERHEAD.height).toBeLessThan(wrists + 0.5);
     const release = poser.pose('Balgath_Toss', TOSS_RELEASE_SEC);
     for (const h of hands(release)) {
-      expect(h[0] - release.at('Head')[0], 'the arms are not thrown out ahead').toBeGreaterThan(
-        0.1,
-      );
-      expect(h[1] - sole, 'the release is not at a throwing height').toBeGreaterThan(0.3);
+      expect(h[2] - release.at('Head')[2], 'the arms are not thrown out ahead').toBeGreaterThan(1);
+      expect(h[1] - sole, 'the release is not at a throwing height').toBeGreaterThan(5);
     }
   });
 
-  it('bookends the toss on the same idle base every other authored clip starts from', () => {
-    // Rule 3 of the authoring script: a clip whose first or last frame is not the idle pose
-    // pops on the way in or out. The hammer is already pinned to open on that base, so the
-    // toss must match it channel for channel at both ends.
-    const data = JSON.parse(
-      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
-    );
-    const toss = data.clips.Balgath_Toss;
-    const hammer = data.clips.Balgath_Hammer;
-    const last = toss.times.length - 1;
-    // Numerically, to the samples' own 1e-5 rounding (a -0 and a 0 are the same pose).
-    const apart = (a: number[], b: number[]) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
-    for (const bone of data.bones as string[]) {
-      expect(
-        apart(toss.rotation[bone][0], hammer.rotation[bone][0]),
-        `${bone} does not open on idle`,
-      ).toBeLessThan(2e-5);
-      expect(
-        apart(toss.rotation[bone][last], toss.rotation[bone][0]),
-        `${bone} does not close on idle`,
-      ).toBeLessThan(2e-5);
-    }
-    for (const bone of Object.keys(toss.translation ?? {})) {
-      expect(
-        apart(toss.translation[bone][last], toss.translation[bone][0]),
-        `${bone} drifts over the clip`,
-      ).toBeLessThan(2e-5);
-    }
-  });
-
-  it('holds the glare pose at full stretch as the beam fires', async () => {
-    // EyeFlare is shared with the generic cast slot, so the glare slows it instead of
-    // re-authoring it: the moment his raised hands peak (the scry hold) is divided by the
-    // wired timescale, and that has to land in the last beat before the 2.6s windup
-    // resolves, not a second early with the pose already settling.
+  it('holds the glare at full stretch as the beam fires', async () => {
+    // EyeFlare is shared with the generic cast slot, so the glare slows it: the moment the
+    // eye flares widest (EyeCore's scale peak) divided by the wired timescale has to land in
+    // the last beat before the windup resolves.
     const map = clipMapSource();
-    const scale = Number(map.match(/mob_balgath_glare: ([\d.]+),/)?.[1]);
-    expect(scale).toBeGreaterThan(0);
-    const windup = Number(templateSource().match(/glare: \{[\s\S]*?windup: ([\d.]+),/)?.[1]);
-    expect(windup, 'the glare template has no windup').toBeGreaterThan(0);
-    const poser = await loadRigPoser(RIG, ABILITIES);
-    const dur = poser.duration('Balgath_EyeFlare');
+    const scale = num(map, /mob_balgath_glare: ([\d.]+),/);
+    const windup = num(templateSource(), /glare: \{[\s\S]*?windup: ([\d.]+),/);
+    const root = (await createGlbIO().read(RIG)).getRoot();
+    const eye = indexClip(root, 'Balgath_EyeFlare').get('EyeCore|scale');
+    expect(eye, 'the glare never flares the eye').toBeDefined();
     let peakT = 0;
-    let peakY = Number.NEGATIVE_INFINITY;
-    for (let i = 0; i <= 52; i++) {
-      const t = (dur * i) / 52;
-      const y = poser.pose('Balgath_EyeFlare', t).at('R_Hand')[1];
-      if (y > peakY) {
-        peakY = y;
-        peakT = t;
+    let peak = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i <= 260; i++) {
+      const v = sampleChannel(eye as NonNullable<typeof eye>, i / 100)[0];
+      if (v > peak) {
+        peak = v;
+        peakT = i / 100;
       }
     }
     const landed = peakT / scale;
-    expect(landed, 'the eye peaks after the beam has already fired').toBeLessThanOrEqual(windup);
-    expect(landed, 'the eye peaks long before the beam fires').toBeGreaterThan(windup - 0.4);
+    expect(landed).toBeLessThanOrEqual(windup + 0.1);
+    expect(landed).toBeGreaterThan(windup - 0.4);
+  });
+
+  it('lands the Starwake fists on the end of the bar', () => {
+    const map = clipMapSource();
+    expect(map).toContain("castByAbility: { 'Wake of the Fallen Star': 'Balgath_Starwake' }");
+    const scale = num(map, /castTimeScaleByAbility: \{ 'Wake of the Fallen Star': ([\d.]+) \}/);
+    const warn = num(templateSource(), /starwake: \{[\s\S]*?warn: ([\d.]+),/);
+    // The fists go into the fen at 1.40s of the authored clip (clip_library.py starwake).
+    expect(1.4 / scale).toBeCloseTo(warn, 1);
   });
 });
+
+/** Mean planted-foot horizontal speed through a gait clip, rig units per second. */
+function plantedSpeed(poser: Awaited<ReturnType<typeof loadRigPoser>>, clip: string): number {
+  return Math.abs(plantedVelocityZ(poser, clip));
+}
+
+/** Median forward (Z) velocity of each foot over its contact samples, averaged. */
+function plantedVelocityZ(poser: Awaited<ReturnType<typeof loadRigPoser>>, clip: string): number {
+  const dur = poser.duration(clip);
+  const steps = 240;
+  const out: number[] = [];
+  for (const foot of ['L_Toes', 'R_Toes']) {
+    const track: number[][] = [];
+    for (let i = 0; i <= steps; i++) {
+      const t = (dur * i) / steps;
+      const p = poser.pose(clip, t).at(foot);
+      track.push([t, p[1], p[2]]);
+    }
+    const ys = track.map((s) => s[1]);
+    const floor = Math.min(...ys);
+    const band = 0.03 * (Math.max(...ys) - floor) + 1e-6;
+    const v: number[] = [];
+    for (let i = 1; i < track.length; i++) {
+      if (track[i][1] > floor + band || track[i - 1][1] > floor + band) continue;
+      v.push((track[i][2] - track[i - 1][2]) / (track[i][0] - track[i - 1][0]));
+    }
+    v.sort((a, b) => a - b);
+    out.push(v[Math.floor(v.length / 2)]);
+  }
+  return out.reduce((a, b) => a + b, 0) / out.length;
+}

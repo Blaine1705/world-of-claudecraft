@@ -1,3 +1,5 @@
+import type { AuraIdFact } from './aura_idle_core';
+
 /** Renderer-derived animation inputs (same facts the old pose machine used). */
 export interface AnimState {
   /** horizontal speed, world units/sec */
@@ -53,6 +55,10 @@ export interface AnimState {
   /** A mob that keeps hours is in bed (Entity.asleep, mob/slumber.ts): the sleep
    *  loop outranks every locomotion and posture state below it. */
   asleep?: boolean;
+  /** The body's live aura list, by reference (never copied): a rig whose ClipMap
+   *  names `idleByAura` holds that loop in place of its idle while one rides
+   *  (aura_idle_core.ts). */
+  auras?: readonly AuraIdFact[];
 }
 
 export type BaseState =
