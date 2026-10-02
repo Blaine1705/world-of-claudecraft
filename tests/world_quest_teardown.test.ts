@@ -50,7 +50,8 @@ describe('endWorldQuestSession', () => {
   it('drops the investigation suspect the player summoned', () => {
     const { sim, meta } = setup();
     const quest = WORLD_QUESTS_BY_ID[INVESTIGATION_QUEST_ID];
-    summonQuestMob(sim.ctx, INVESTIGATION_MOB_ID, quest.area, meta.entityId, { perOwner: true });
+    const pos = { x: quest.area.x, y: 0, z: quest.area.z };
+    summonQuestMob(sim.ctx, INVESTIGATION_MOB_ID, pos, meta.entityId, { perOwner: true });
     const mob = [...sim.entities.values()].find((e) => e.templateId === INVESTIGATION_MOB_ID);
     if (!mob) throw new Error('Expected the summoned suspect');
     expect(mob.tappedById).toBe(meta.entityId);
