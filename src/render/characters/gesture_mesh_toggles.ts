@@ -41,6 +41,22 @@ export interface MeshToggleState {
 
 export type MeshToggleAction = 'schedule' | 'hide' | 'show';
 
+export type MeshToggleHidden = 'none' | 'partial' | 'whole';
+
+/** What a rig's toggles hide right now (see GestureMeshToggles.hidden). */
+export function meshToggleHidden(
+  defs: readonly MeshToggleDef[],
+  states: readonly MeshToggleState[],
+): MeshToggleHidden {
+  let out: MeshToggleHidden = 'none';
+  for (let i = 0; i < defs.length; i++) {
+    if (states[i].shown) continue;
+    if (defs[i].nodes.includes('*')) return 'whole';
+    out = 'partial';
+  }
+  return out;
+}
+
 /** What a gesture does to each toggle: [toggle index, action]. */
 export function meshToggleActions(
   defs: readonly MeshToggleDef[],
@@ -129,9 +145,22 @@ export class GestureMeshToggles {
   }
 
   /** After the mixer: count pending hides down against the current clip. */
-  update(dt: number, clip: string | null): void {
+  update(dt: number, clip: string | null): boolean {
+    let changed = false;
     for (let i = 0; i < this.defs.length; i++)
-      if (stepMeshToggle(this.defs[i], this.states[i], dt, clip)) this.paint(i);
+      if (stepMeshToggle(this.defs[i], this.states[i], dt, clip)) {
+        this.paint(i);
+        changed = true;
+      }
+    return changed;
+  }
+
+  /** What is hidden now: nothing, some nodes, or the whole model. The far
+   *  mesh and the shadow proxy are baked from the whole idle pose, so the
+   *  visual keeps the articulated rig while a part is hidden and hides both
+   *  while the whole model is. */
+  hidden(): MeshToggleHidden {
+    return meshToggleHidden(this.defs, this.states);
   }
 
   /** A revived rig shows everything again. */

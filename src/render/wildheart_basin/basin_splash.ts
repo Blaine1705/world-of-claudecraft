@@ -112,6 +112,8 @@ export class BasinSplash {
   private readonly materials: THREE.Material[] = [];
   private clock = 0;
   private seed = 0x51a7;
+  private readonly crownOut = { radius: 0, height: 0, alpha: 0 };
+  private readonly rippleOut = { radius: 0, alpha: 0 };
 
   constructor(root: THREE.Object3D) {
     const sun = new THREE.Vector3(...BASIN_SUN_DIRECTION).normalize();
@@ -215,7 +217,7 @@ export class BasinSplash {
     this.clock = clock;
     for (const c of this.crowns) {
       if (!c.alive) continue;
-      const sh = crownShape(c.spec, clock - c.born);
+      const sh = crownShape(c.spec, clock - c.born, this.crownOut);
       if (sh.alpha <= 0) {
         c.alive = false;
         c.mesh.visible = false;
@@ -227,7 +229,7 @@ export class BasinSplash {
     }
     for (const r of this.ripples) {
       if (!r.alive) continue;
-      const sh = rippleShape(r.spec, clock - r.born);
+      const sh = rippleShape(r.spec, clock - r.born, this.rippleOut);
       if (sh.alpha <= 0) {
         r.alive = false;
         r.mesh.visible = false;

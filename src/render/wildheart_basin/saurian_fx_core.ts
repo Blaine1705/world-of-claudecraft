@@ -182,15 +182,15 @@ export const CROWN_LOOKS = {
 export function crownShape(
   spec: CrownSpec,
   elapsed: number,
+  out: { radius: number; height: number; alpha: number } = { radius: 0, height: 0, alpha: 0 },
 ): { radius: number; height: number; alpha: number } {
   const t = Math.max(0, Math.min(1, elapsed / spec.life));
   const spread = 1 - (1 - t) ** 2.4;
   const rise = Math.sin(Math.PI * Math.min(1, t * 1.15)) ** 0.75;
-  return {
-    radius: spec.r0 + (spec.r1 - spec.r0) * spread,
-    height: spec.height * rise,
-    alpha: t >= 1 ? 0 : Math.min(1, (1 - t) * 1.8),
-  };
+  out.radius = spec.r0 + (spec.r1 - spec.r0) * spread;
+  out.height = spec.height * rise;
+  out.alpha = t >= 1 ? 0 : Math.min(1, (1 - t) * 1.8);
+  return out;
 }
 
 /** A ripple: rings racing out across the water from an impact. */
@@ -213,12 +213,15 @@ export const RIPPLE_LOOKS = {
 } as const satisfies Record<string, RippleSpec>;
 
 /** A ripple's leading radius and opacity `elapsed` seconds in. */
-export function rippleShape(spec: RippleSpec, elapsed: number): { radius: number; alpha: number } {
+export function rippleShape(
+  spec: RippleSpec,
+  elapsed: number,
+  out: { radius: number; alpha: number } = { radius: 0, alpha: 0 },
+): { radius: number; alpha: number } {
   const t = Math.max(0, Math.min(1, elapsed / spec.life));
-  return {
-    radius: spec.reach * (0.08 + 0.92 * (1 - (1 - t) ** 2)),
-    alpha: t >= 1 ? 0 : (1 - t) ** 1.3,
-  };
+  out.radius = spec.reach * (0.08 + 0.92 * (1 - (1 - t) ** 2));
+  out.alpha = t >= 1 ? 0 : (1 - t) ** 1.3;
+  return out;
 }
 
 // ---- the howdah's splinters -----------------------------------------------------------

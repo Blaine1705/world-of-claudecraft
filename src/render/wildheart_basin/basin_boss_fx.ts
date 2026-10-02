@@ -1221,6 +1221,3 @@ function findAura(
   for (let i = 0; i < auras.length; i++) if (auras[i].id === id) return auras[i];
   return undefined;
 }
-
-/** The head mark: three raking claw slashes on a dark backing, white so the
- *  sprite colour tints it (built once per fx). */

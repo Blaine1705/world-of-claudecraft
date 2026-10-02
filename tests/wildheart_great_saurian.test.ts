@@ -13,6 +13,7 @@ import {
   type MeshToggleDef,
   type MeshToggleState,
   meshToggleActions,
+  meshToggleHidden,
   stepMeshToggle,
 } from '../src/render/characters/gesture_mesh_toggles';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
@@ -319,5 +320,21 @@ describe('the howdah mesh latch', () => {
     applyMeshToggleAction(def, st, 'show');
     expect(st.shown).toBe(true);
     expect(meshToggleActions([def], 'unrelated')).toEqual([]);
+  });
+});
+
+describe('what the toggles hide (the far mesh and shadow proxy follow it)', () => {
+  const part: MeshToggleDef = { nodes: ['GreatSaurianHowdah'], hideNow: 'gone' };
+  const whole: MeshToggleDef = { nodes: ['*'], hideNow: 'vanish' };
+  const shown = (): MeshToggleState => ({ shown: true, hideIn: null, clipSeen: false });
+
+  it('none, a part (keep the rig articulated) or the whole model (hide the bakes too)', () => {
+    expect(meshToggleHidden([part, whole], [shown(), shown()])).toBe('none');
+    const a = shown();
+    applyMeshToggleAction(part, a, 'hide');
+    expect(meshToggleHidden([part, whole], [a, shown()])).toBe('partial');
+    const b = shown();
+    applyMeshToggleAction(whole, b, 'hide');
+    expect(meshToggleHidden([part, whole], [a, b])).toBe('whole');
   });
 });

@@ -44,6 +44,8 @@ export class ZulgarAvatarFx {
   private mixer: THREE.AnimationMixer | null = null;
   private readonly actions = new Map<Clip, THREE.AnimationAction>();
   private readonly materials: THREE.Material[] = [];
+  /** The clone's own skeletons (their bone textures are this module's). */
+  private readonly skeletons: THREE.Skeleton[] = [];
   private baseOpacity: number[] = [];
   private loop: Clip | null = null;
   private oneShot: THREE.AnimationAction | null = null;
@@ -66,7 +68,8 @@ export class ZulgarAvatarFx {
   ) {
     this.root.name = 'wildheart-zulgar-avatar';
     setRenderCategory(this.root, 'ui3d');
-    this.root.visible = false;
+    // The gate owns the root's visibility (it reveals it once linked); the body
+    // inside is what this module shows and hides.
     this.ready = loadGltf(JAGUAR_MODEL.spiritUrl)
       .then(async (gltf) => {
         if (this.disposed) return;
@@ -83,6 +86,7 @@ export class ZulgarAvatarFx {
       const mesh = o as THREE.SkinnedMesh;
       if (!mesh.isMesh) return;
       mesh.frustumCulled = false;
+      if ((mesh as THREE.SkinnedMesh).isSkinnedMesh) this.skeletons.push(mesh.skeleton);
       mesh.castShadow = false;
       mesh.receiveShadow = false;
       const src = mesh.material as THREE.MeshStandardMaterial;
@@ -98,6 +102,8 @@ export class ZulgarAvatarFx {
       this.baseOpacity.push(Math.min(0.78, m.opacity * AVATAR_LOOK.opacity));
     });
     body.scale.setScalar(AVATAR_LOOK.scale);
+    // Hidden until a hunt (the gate links hidden children all the same).
+    body.visible = false;
     this.root.add(body);
     this.body = body;
     const mixer = new THREE.AnimationMixer(body);
@@ -162,7 +168,7 @@ export class ZulgarAvatarFx {
     const active = !!e && !e.dead && hasAura(e, ZULGAR_AVATAR);
     this.fade = avatarFade(this.fade, active, dt);
     if (this.fade <= 0.001 || !e) {
-      if (this.root.visible) this.root.visible = false;
+      if (this.body.visible) this.body.visible = false;
       this.placed = false;
       return;
     }
@@ -183,9 +189,9 @@ export class ZulgarAvatarFx {
     this.z = nz;
     this.y = this.host.groundY(nx, nz);
     this.facing = turnToward(this.facing, e.facing, dt * AVATAR_LOOK.turnRate);
-    this.root.visible = true;
-    this.root.position.set(this.x, this.y, this.z);
-    this.root.rotation.y = this.facing;
+    this.body.visible = true;
+    this.body.position.set(this.x, this.y, this.z);
+    this.body.rotation.y = this.facing;
     const gait = avatarGait(this.speed);
     this.setLoop(gait, avatarGaitRate(gait, this.speed));
     this.mixer.update(dt);
@@ -225,7 +231,7 @@ export class ZulgarAvatarFx {
 
   hide(): void {
     this.fade = 0;
-    this.root.visible = false;
+    if (this.body) this.body.visible = false;
     this.placed = false;
   }
 
@@ -234,6 +240,8 @@ export class ZulgarAvatarFx {
     this.disposed = true;
     this.root.removeFromParent();
     this.mixer?.stopAllAction();
+    if (this.body) this.mixer?.uncacheRoot(this.body);
+    for (const sk of this.skeletons) sk.dispose();
     for (const m of this.materials) m.dispose();
   }
 }

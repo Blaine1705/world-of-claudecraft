@@ -1793,7 +1793,10 @@ export class CharacterVisual {
   }
 
   playAttack(abilityId?: string): void {
-    if (abilityId && this.meshToggles?.handle(abilityId)) return;
+    if (abilityId && this.meshToggles?.handle(abilityId)) {
+      this.syncFarVisibility();
+      return;
+    }
     if (abilityId && this.dials?.handle(abilityId)) return;
     if (this.deadLock) return;
     if (!abilityId && this.oneShotHoldsAttacks()) return;
@@ -2100,7 +2103,12 @@ export class CharacterVisual {
    *  a far mesh whose materials are still linking never draws early and the
    *  articulated rig never hides without a ready stand-in. */
   private syncFarVisibility(): void {
-    const showFar = farMeshShown(this.far, this.farMesh !== null, this.farCompilePending);
+    // A gesture hiding part of the model (the Saurian's broken howdah) keeps the
+    // articulated rig: the far bake still carries the part. A whole-model hide
+    // (Zulgar vanished) takes the far mesh with it.
+    const hidden = this.meshToggles?.hidden() ?? 'none';
+    const showFar =
+      hidden === 'none' && farMeshShown(this.far, this.farMesh !== null, this.farCompilePending);
     const showRig = !showFar;
     if (this.modelWrap.visible !== showRig) this.modelWrap.visible = showRig;
     if (this.farMesh && this.farMesh.visible !== showFar) this.farMesh.visible = showFar;
@@ -2109,11 +2117,10 @@ export class CharacterVisual {
 
   private syncShadowProxyVisibility(): void {
     if (!this.shadowProxy) return;
-    const show = shadowProxyShown(
-      this.proxyShadowWanted,
-      this.farMesh !== null,
-      this.farCompilePending,
-    );
+    // The proxy is the whole idle pose too: never while the toggles hide any of it.
+    const show =
+      (this.meshToggles?.hidden() ?? 'none') === 'none' &&
+      shadowProxyShown(this.proxyShadowWanted, this.farMesh !== null, this.farCompilePending);
     if (this.shadowProxy.visible !== show) this.shadowProxy.visible = show;
   }
 
@@ -3527,7 +3534,8 @@ export class CharacterVisual {
   private updateMixer(dt: number): void {
     this.mixer.update(dt);
     this.dials?.apply(dt);
-    this.meshToggles?.update(dt, this.current?.getClip().name ?? null);
+    if (this.meshToggles?.update(dt, this.current?.getClip().name ?? null))
+      this.syncFarVisibility();
     this.skeletonUpdates.markPoseChanged();
   }
 
