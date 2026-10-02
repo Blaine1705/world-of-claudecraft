@@ -8260,7 +8260,7 @@ export const ja_JP: EnTranslations = {
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
-      "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。",
+      "wildheartBody": "沈んだ偶像の奥に隠されたジャングルのカルデラ。断崖に囲まれ、滝の轟きが響く。川の浅瀬を渡り、狩りの段丘と滝を抜け、植民地の廃墟を越えて、巨大な石のジャガーの頭の下にそびえる階段状の神殿へ登れ。",
       "foundryBody": "ストームクラッグの嵐の稜線に建つ真鍮の鋳造所。史上最初に造られたオートマトンが、稲妻の空の下で今もコンベヤーと試験射撃場を動かしている。ラインを止め、両翼を黙らせ、未完成の巨人が待つガントリーへ登れ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
@@ -12385,7 +12385,12 @@ export const ja_JP: EnTranslations = {
       "foundry_draft_awaken": "覚醒",
       "foundry_arm_sweep": "腕薙ぎ",
       "foundry_draft_unbolt": "ボルト引きちぎり",
-      "foundry_tremor_step": "震動の踏みつけ"
+      "foundry_tremor_step": "震動の踏みつけ",
+      "wildheart_ancestral_sap": "祖霊の樹液",
+      "wildheart_plant_totem": "トーテム設置",
+      "wildheart_entangling_lash": "絡みつく鞭",
+      "wildheart_saurian_tail_swipe": "尾の薙ぎ払い",
+      "wildheart_saurian_stomp": "大地を揺るがす踏みつけ"
     }
   },
   "questUi": {
@@ -20631,6 +20636,33 @@ export const ja_JP: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "牙王の獣使い"
       },
+      "sunbone_totem_binder": {
+        "name": "陽骨のトーテム使い"
+      },
+      "sunbone_totem": {
+        "name": "陽骨のトーテム"
+      },
+      "basin_raptor": {
+        "name": "盆地のラプトル"
+      },
+      "spore_toad": {
+        "name": "胞子ガエル"
+      },
+      "vine_lasher": {
+        "name": "絡み蔓の鞭打ち"
+      },
+      "great_saurian": {
+        "name": "グレート・サウリアン"
+      },
+      "howdah_hexcaller": {
+        "name": "輿の呪術師"
+      },
+      "fanglord_jaguar": {
+        "name": "牙王の大ジャガー"
+      },
+      "the_gorgebloom": {
+        "name": "ゴージブルーム"
+      },
       "wildheart_high_priest": {
         "name": "盆地の声ズルガー"
       },
@@ -24286,7 +24318,7 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",
-        "enterText": "温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。",
+        "enterText": "偶像の口をくぐると、盆地を見下ろす高い岩棚に出た。崖の縁から滝が轟き落ち、はるか下では何か巨大なものが浅瀬を渡っている。",
         "leaveText": "石の牙の下をくぐり、パームリーチの陽光へ戻った。"
       },
       "stormbrass_foundry": {

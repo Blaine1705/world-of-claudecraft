@@ -1,0 +1,289 @@
+// The Great Saurian (docs/design/dungeon-rework/wildheart_basin.md section
+// 4.3): the River Ford's showpiece patrol, a long-necked war-beast as big as a
+// house carrying the Sunbone's bamboo-and-bone howdah. Its kit, on top of its
+// melee:
+//
+//   Tail Swipe          every 12 s a 1 s bar, then its tail sweeps a rear 120
+//                       degree cone 12 yd deep: 180 to 220 and an 8 yd
+//                       knockback. The cone stays where the bar was drawn.
+//   Earthshaking Stomp  every 16 s a 2 s bar (the floor ring is the warning),
+//                       then 12 yd round it: 160 to 200 and a 1 s knockdown.
+//   Howdah Rider        once, at half health: the howdah breaks and a Howdah
+//                       Hexcaller jumps down; its interruptible Ancestral Sap
+//                       (the trash kit's mend) is channelled on the Saurian.
+//   Enrage              under a fifth of its health: 30 percent more damage,
+//                       its swings and both strikes.
+//
+// Deterministic: no pick is rolled (the cones and rings take everyone inside,
+// the rider lands on a fixed spot behind its flank); the only rng draws are
+// the damage rolls, in claim-player order. Every visible state rides existing
+// entity fields (the cast bar, facing, the enrage aura, the rider's own body,
+// a `nova` spellfx at the break), so the online client mirrors it with no wire
+// change.
+
+import { applyKnockback } from '../../knockback';
+import { spawnKitAdd } from '../../mob/trash_kit/spawn';
+import { inCone } from '../../mob/trash_kit/targets';
+import type { InstanceSlot } from '../../sim';
+import type { SimContext } from '../../sim_context';
+import { DT, dist2d, type Entity, type SaurianFightState } from '../../types';
+import { claimPlayers, clearCastIf, mechanicDamage, startBar } from './claim';
+import {
+  HOWDAH_HEXCALLER_ID,
+  SAURIAN_ENRAGE,
+  SAURIAN_HOWDAH_BREAK,
+  SAURIAN_HOWDAH_LOG,
+  SAURIAN_KNOCKDOWN,
+  SAURIAN_STOMP,
+  SAURIAN_TAIL_SWIPE,
+  SAURIAN_TUNING as T,
+} from './ids';
+
+function freshState(timers = true): SaurianFightState {
+  return {
+    kind: 'saurian',
+    tailTimer: timers ? T.tailFirst : 99,
+    stompTimer: timers ? T.stompFirst : 99,
+    tailYaw: null,
+    plantedAt: null,
+    howdahBroken: false,
+    riderId: null,
+    enraged: false,
+    casts: 0,
+  };
+}
+
+/** The Saurian's fight state, started on its first engaged tick (a dev trigger
+ *  starts it with its clocks parked, so only the triggered mechanic fires). */
+export function saurianState(saurian: Entity, timers = true): SaurianFightState {
+  if (saurian.wildheartFight?.kind !== 'saurian') saurian.wildheartFight = freshState(timers);
+  return saurian.wildheartFight;
+}
+
+/** The pull ended (a kill, an evade, a wipe): drop the bar and the state. The
+ *  rider, once down, is a mob of the claim in its own right. */
+function endSaurianFight(saurian: Entity): void {
+  clearCastIf(saurian, SAURIAN_TAIL_SWIPE, SAURIAN_STOMP);
+  saurian.wildheartFight = undefined;
+}
+
+/** Start a Tail Swipe behind it. Returns true when it started. */
+export function startTailSwipe(saurian: Entity, st: SaurianFightState): boolean {
+  if (saurian.castingAbility !== null) return false;
+  st.tailYaw = saurian.facing;
+  st.tailTimer = T.tailEvery;
+  st.casts++;
+  st.plantedAt = { ...saurian.pos };
+  startBar(saurian, SAURIAN_TAIL_SWIPE, T.tailCast, null);
+  return true;
+}
+
+/** Start an Earthshaking Stomp. Returns true when it started. */
+export function startStomp(saurian: Entity, st: SaurianFightState): boolean {
+  if (saurian.castingAbility !== null) return false;
+  st.stompTimer = T.stompEvery;
+  st.casts++;
+  st.plantedAt = { ...saurian.pos };
+  startBar(saurian, SAURIAN_STOMP, T.stompCast, null);
+  return true;
+}
+
+/** The tail lands: everyone in the rear cone is struck and thrown. Returns
+ *  how many it struck. */
+function landTailSwipe(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  saurian: Entity,
+  st: SaurianFightState,
+): number {
+  const rear = (st.tailYaw ?? saurian.facing) + Math.PI;
+  st.tailYaw = null;
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: saurian.id,
+    targetId: saurian.id,
+    school: 'physical',
+    fx: 'nova',
+    ability: SAURIAN_TAIL_SWIPE,
+  });
+  let n = 0;
+  for (const p of claimPlayers(ctx, inst)) {
+    if (!inCone(saurian.pos, rear, p.pos, T.tailRange, T.tailArcDeg)) continue;
+    ctx.dealDamage(
+      saurian,
+      p,
+      mechanicDamage(ctx, saurian, T.tailMin, T.tailMax),
+      false,
+      'physical',
+      'Tail Swipe',
+      'hit',
+      true,
+    );
+    if (!p.dead) applyKnockback(ctx, saurian, p, T.tailKnockback);
+    n++;
+  }
+  return n;
+}
+
+/** The stomp lands: everyone in reach is struck and knocked down. Returns how
+ *  many it struck. */
+function landStomp(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  saurian: Entity,
+  st: SaurianFightState,
+): number {
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: saurian.id,
+    targetId: saurian.id,
+    school: 'physical',
+    fx: 'nova',
+    ability: SAURIAN_STOMP,
+  });
+  let n = 0;
+  for (const p of claimPlayers(ctx, inst)) {
+    if (dist2d(p.pos, saurian.pos) > T.stompRadius) continue;
+    ctx.dealDamage(
+      saurian,
+      p,
+      mechanicDamage(ctx, saurian, T.stompMin, T.stompMax),
+      false,
+      'physical',
+      'Earthshaking Stomp',
+      'hit',
+      true,
+    );
+    if (!p.dead) {
+      ctx.applyAura(p, {
+        id: SAURIAN_KNOCKDOWN,
+        name: 'Knocked Down',
+        kind: 'stun',
+        remaining: T.knockdown,
+        duration: T.knockdown,
+        value: 0,
+        sourceId: saurian.id,
+        school: 'physical',
+      });
+    }
+    n++;
+  }
+  return n;
+}
+
+/** Howdah Rider: the howdah breaks and the Howdah Hexcaller jumps down beside
+ *  its flank, straight into the fight. Returns the rider (null if it could not
+ *  spawn). Once per pull. */
+export function breakHowdah(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  saurian: Entity,
+  st: SaurianFightState,
+): Entity | null {
+  st.howdahBroken = true;
+  const victim =
+    saurian.aggroTargetId !== null ? (ctx.entities.get(saurian.aggroTargetId) ?? null) : null;
+  // It lands off the left flank, clear of the tail and the head.
+  const side = saurian.facing - Math.PI / 2;
+  const rider = spawnKitAdd(
+    ctx,
+    inst,
+    saurian,
+    HOWDAH_HEXCALLER_ID,
+    saurian.pos.x + Math.sin(side) * 6,
+    saurian.pos.z + Math.cos(side) * 6,
+    victim,
+  );
+  st.riderId = rider?.id ?? null;
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: saurian.id,
+    targetId: rider?.id ?? saurian.id,
+    school: 'physical',
+    fx: 'nova',
+    ability: SAURIAN_HOWDAH_BREAK,
+  });
+  ctx.emit({ type: 'log', text: SAURIAN_HOWDAH_LOG, color: '#e8c070', entityId: saurian.id });
+  return rider;
+}
+
+/** Enrage under a fifth of its health: a damage-done aura for the pull (the
+ *  damage seam folds it into every hit it deals, swings and strikes alike). */
+export function enrageSaurian(ctx: SimContext, saurian: Entity, st: SaurianFightState): void {
+  st.enraged = true;
+  ctx.applyAura(saurian, {
+    id: SAURIAN_ENRAGE,
+    name: 'Enrage',
+    kind: 'buff_dmg_done',
+    remaining: 3600,
+    duration: 3600,
+    permanent: true,
+    value: T.enrageDamage,
+    sourceId: saurian.id,
+    school: 'physical',
+    undispellable: true,
+  });
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: saurian.id,
+    targetId: saurian.id,
+    school: 'physical',
+    fx: 'nova',
+    ability: SAURIAN_ENRAGE,
+  });
+}
+
+function dropEnrage(saurian: Entity): void {
+  if (saurian.auras.some((a) => a.id === SAURIAN_ENRAGE))
+    saurian.auras = saurian.auras.filter((a) => a.id !== SAURIAN_ENRAGE);
+}
+
+/** Hold the Saurian where it braced for its bar (the mob AI may walk it). */
+function holdPlanted(ctx: SimContext, saurian: Entity, st: SaurianFightState): void {
+  if (!st.plantedAt) st.plantedAt = { ...saurian.pos };
+  if (saurian.pos.x !== st.plantedAt.x || saurian.pos.z !== st.plantedAt.z) {
+    saurian.pos.x = st.plantedAt.x;
+    saurian.pos.y = st.plantedAt.y;
+    saurian.pos.z = st.plantedAt.z;
+    ctx.rebucket(saurian);
+  }
+}
+
+/** One tick of the Great Saurian's kit (after the mob AI). */
+export function tickSaurian(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  saurian: Entity,
+  engaged: boolean,
+): void {
+  if (saurian.dead || !engaged) {
+    if (!engaged) dropEnrage(saurian);
+    if (saurian.wildheartFight) endSaurianFight(saurian);
+    return;
+  }
+  const st = saurianState(saurian);
+  // Both clocks run through the other strike's bar: "every 12 s", "every 16 s".
+  st.tailTimer -= DT;
+  st.stompTimer -= DT;
+  const share = saurian.maxHp > 0 ? saurian.hp / saurian.maxHp : 1;
+  if (!st.howdahBroken && share <= T.howdahAtHpPct) breakHowdah(ctx, inst, saurian, st);
+  if (!st.enraged && share <= T.enrageAtHpPct) enrageSaurian(ctx, saurian, st);
+  const bar = saurian.castingAbility;
+  if (bar === SAURIAN_TAIL_SWIPE || bar === SAURIAN_STOMP) {
+    holdPlanted(ctx, saurian, st);
+    if (bar === SAURIAN_TAIL_SWIPE && st.tailYaw !== null) saurian.facing = st.tailYaw;
+    saurian.swingTimer = Math.max(saurian.swingTimer, 0.6);
+    saurian.castRemaining = Math.max(0, saurian.castRemaining - DT);
+    if (saurian.castRemaining > 0) return;
+    clearCastIf(saurian, bar);
+    st.plantedAt = null;
+    if (bar === SAURIAN_TAIL_SWIPE) landTailSwipe(ctx, inst, saurian, st);
+    else landStomp(ctx, inst, saurian, st);
+    return;
+  }
+  if (bar !== null || ctx.isStunned(saurian)) return;
+  st.plantedAt = null;
+  // One strike at a time: the stomp first when both are due.
+  if (st.stompTimer <= 0) startStomp(saurian, st);
+  else if (st.tailTimer <= 0) startTailSwipe(saurian, st);
+}

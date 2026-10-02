@@ -10,6 +10,7 @@ import { BASTION_KIT_CAST_SCHOOLS } from './trash_kit/bastion_cast_ids';
 import { TRASH_KIT_CAST_SCHOOLS } from './trash_kit/cast_ids';
 import { FOUNDRY_KIT_CAST_SCHOOLS } from './trash_kit/foundry_cast_ids';
 import { TEMPLE_KIT_CAST_SCHOOLS } from './trash_kit/temple_cast_ids';
+import { WILDHEART_KIT_CAST_SCHOOLS } from './trash_kit/wildheart_cast_ids';
 
 // The scripted cast id updateHealerHold puts on a channelHeal mob (Malric, the
 // Nythraxis spirit healer) so its heal renders a real, interruptible cast bar.
@@ -37,6 +38,8 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   ...BASTION_KIT_CAST_SCHOOLS,
   // The Drowned Temple's lullaby, tide call and coil (mob/trash_kit/temple_cast_ids.ts).
   ...TEMPLE_KIT_CAST_SCHOOLS,
+  // The Wildheart Basin's Ancestral Sap (mob/trash_kit/wildheart_cast_ids.ts).
+  ...WILDHEART_KIT_CAST_SCHOOLS,
   // The Stormbrass Foundry's repair and screen (mob/trash_kit/foundry_cast_ids.ts).
   ...FOUNDRY_KIT_CAST_SCHOOLS,
 };

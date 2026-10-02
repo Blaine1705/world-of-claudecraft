@@ -1997,7 +1997,7 @@ export const guideStrings = {
     sanctumBody:
       "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
     wildheartBody:
-      'A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.',
+      'A hidden jungle caldera behind the Sunken Idol, ringed by cliffs and loud with waterfalls. Wade the river ford, hunt through the terraces and the falls, cross the ruined colony and climb the stepped shrine under a colossal stone jaguar.',
     foundryBody:
       'A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.',
     raidName: 'The endgame raid',

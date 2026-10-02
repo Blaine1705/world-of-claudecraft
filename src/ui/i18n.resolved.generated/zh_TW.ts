@@ -8260,7 +8260,7 @@ export const zh_TW: EnTranslations = {
       "bastionBody": "一座沉入沼澤、被遺忘的要塞，由溺亡的守軍與不斷上漲的潮水本身所據守。",
       "templeBody": "沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。",
-      "wildheartBody": "一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔頂端看看是誰在等待。",
+      "wildheartBody": "藏在沉沒神像背後的隱秘叢林火山口，四周懸崖環繞，瀑布轟鳴。涉過河流淺灘，穿越狩獵台地與瀑布，走過殖民地廢墟，攀上巨大石雕美洲豹頭下的階梯神殿。",
       "foundryBody": "風暴岩風暴線上的一座黃銅鑄造廠，世上最早造出的自動機械仍在閃電天空下運轉著輸送帶與試驗靶場。打斷產線，平息兩翼，攀上龍門架，一個未完成的巨人正在那裡等待。",
       "raidName": "最終團隊副本",
       "raidBody": "在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。",
@@ -12385,7 +12385,12 @@ export const zh_TW: EnTranslations = {
       "foundry_draft_awaken": "甦醒",
       "foundry_arm_sweep": "橫臂掃擊",
       "foundry_draft_unbolt": "掙脫螺栓",
-      "foundry_tremor_step": "震地踏步"
+      "foundry_tremor_step": "震地踏步",
+      "wildheart_ancestral_sap": "先祖樹汁",
+      "wildheart_plant_totem": "安置圖騰",
+      "wildheart_entangling_lash": "纏繞鞭笞",
+      "wildheart_saurian_tail_swipe": "甩尾",
+      "wildheart_saurian_stomp": "撼地踐踏"
     }
   },
   "questUi": {
@@ -20631,6 +20636,33 @@ export const zh_TW: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "獠牙領主馴獸師"
       },
+      "sunbone_totem_binder": {
+        "name": "日骨圖騰縛靈者"
+      },
+      "sunbone_totem": {
+        "name": "日骨圖騰"
+      },
+      "basin_raptor": {
+        "name": "盆地迅猛龍"
+      },
+      "spore_toad": {
+        "name": "孢子蟾蜍"
+      },
+      "vine_lasher": {
+        "name": "亂藤鞭者"
+      },
+      "great_saurian": {
+        "name": "巨型蜥腳獸"
+      },
+      "howdah_hexcaller": {
+        "name": "馱轎巫咒師"
+      },
+      "fanglord_jaguar": {
+        "name": "獠牙領主的巨型美洲豹"
+      },
+      "the_gorgebloom": {
+        "name": "噬花"
+      },
       "wildheart_high_priest": {
         "name": "盆地之聲祖爾加"
       },
@@ -24286,7 +24318,7 @@ export const zh_TW: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",
-        "enterText": "溫熱的雨水在古老石面上嘶嘶作響。荒野之心盆地在你眼前展開。",
+        "enterText": "你穿過神像巨口，踏上高懸於盆地之上的岩架。瀑布自崖頂轟然而下，而在遠處下方，某個龐然大物正涉過淺灘。",
         "leaveText": "你從石牙之下穿回棕櫚之境的陽光中。"
       },
       "stormbrass_foundry": {

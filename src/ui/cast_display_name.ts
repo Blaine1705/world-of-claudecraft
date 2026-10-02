@@ -138,6 +138,12 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.foundry_proof_shot': true,
   'abilityUi.cast.foundry_plating_flip': true,
   'abilityUi.cast.foundry_static_lash': true,
+  // The Wildheart Basin rework: its trash kit and the Great Saurian.
+  'abilityUi.cast.wildheart_ancestral_sap': true,
+  'abilityUi.cast.wildheart_plant_totem': true,
+  'abilityUi.cast.wildheart_entangling_lash': true,
+  'abilityUi.cast.wildheart_saurian_tail_swipe': true,
+  'abilityUi.cast.wildheart_saurian_stomp': true,
   'abilityUi.cast.foundry_draft_awaken': true,
   'abilityUi.cast.foundry_arm_sweep': true,
   'abilityUi.cast.foundry_draft_unbolt': true,

@@ -1,6 +1,6 @@
 // The floor a body stands on IS the floor that is drawn, across the whole of
 // every authored open-air field (the Hollow Crypt, the Sunken Bastion, the
-// Drowned Temple, the Stormbrass Foundry).
+// Drowned Temple, the Stormbrass Foundry, the Wildheart Basin).
 //
 // Live report (the Sunken Bastion, online): in the Lower Bailey by the dead
 // Turretback Hermit only the player's head showed above the paving, "and more
@@ -39,6 +39,7 @@ import {
   SUNKEN_BASTION_ANCHORS,
   SUNKEN_BASTION_FIELD,
 } from '../src/sim/content/sunken_bastion_layout';
+import { WILDHEART_BASIN_FIELD } from '../src/sim/content/wildheart_basin_layout';
 import {
   type AuthoredFieldDef,
   authoredFieldHeight,
@@ -115,7 +116,7 @@ interface Miss {
 /** Every walkable sample where the drawn top misses the walked height. */
 function sweep(def: AuthoredFieldDef, maxEdge: number, step: number) {
   const tops = planFieldTops(def, { maxEdge, layerLift: 0 });
-  const drawnAt = bucketTops([tops.stone, tops.soil], 4);
+  const drawnAt = bucketTops(Object.values(tops), 4);
   const rings = def.surfaces.map((s) => renderOutline(s));
   const misses: Miss[] = [];
   let samples = 0;
@@ -160,6 +161,7 @@ const FIELDS: [string, AuthoredFieldDef][] = [
   ['the Sunken Bastion', SUNKEN_BASTION_FIELD],
   ['the Drowned Temple', DROWNED_TEMPLE_FIELD],
   ['the Stormbrass Foundry', STORMBRASS_FOUNDRY_FIELD],
+  ['the Wildheart Basin', WILDHEART_BASIN_FIELD],
 ];
 
 describe('an authored field is walked where it is drawn', () => {
@@ -179,7 +181,7 @@ describe('an authored field is walked where it is drawn', () => {
 
 describe('the Sunken Bastion floors the report named', () => {
   const tops = planFieldTops(SUNKEN_BASTION_FIELD, { maxEdge: 3, layerLift: 0 });
-  const drawnAt = bucketTops([tops.stone, tops.soil], 4);
+  const drawnAt = bucketTops(Object.values(tops), 4);
 
   it('draws the moat ring at the moat floor, not under the bailey paving', () => {
     for (const deg of [0, 45, 90, 135, 180, 225, 270, 315]) {

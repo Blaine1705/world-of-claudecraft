@@ -1369,6 +1369,32 @@ const baseEnTable = {
   'aura.foundryOverload': 'Overload',
   'aura.foundryOverloaded': 'Overloaded',
   'aura.foundryOverdrive': 'Overdrive',
+  // The Wildheart Basin rework's gates (sim/content/wildheart.ts openText),
+  // the Great Saurian's howdah line, and the trash-kit and Saurian mechanic
+  // and aura names (mob/trash_kit/wildheart_kit.ts, encounters/wildheart_basin).
+  // Placeholder-free: EXACT matcher.
+  'log.wildheartVineBridgesOpen':
+    'With the ford cleared, the vines stir and weave two bridges across the gorge.',
+  'log.wildheartBeastPitsThornsOpen':
+    'The thorn hedge before the Beast Pits withers back into the earth.',
+  'log.wildheartWeepingFallsThornsOpen':
+    'The thorns at the foot of the Weeping Falls shrink away from the path.',
+  'log.wildheartCausewayThornsOpen':
+    'With the Beastmaster and the Gorgebloom fallen, the thorns on the Sunbone Causeway recede.',
+  'log.wildheartConvergenceWardOpen': 'The ward across the Convergence Stair flickers and fails.',
+  'log.wildheartShrineWardOpen':
+    'The Shrine Ward falls. Above the terrace, the stone jaguar watches.',
+  'log.wildheartHowdahBreaks':
+    'The howdah splinters! A Howdah Hexcaller leaps down to tend the Great Saurian.',
+  'mechanic.wildheartAncestralSap': 'Ancestral Sap',
+  'mechanic.wildheartPlantTotem': 'Plant Totem',
+  'mechanic.wildheartSunboneMending': 'Sunbone Mending',
+  'mechanic.wildheartSporeBurst': 'Spore Burst',
+  'mechanic.wildheartEntanglingLash': 'Entangling Lash',
+  'mechanic.wildheartTailSwipe': 'Tail Swipe',
+  'mechanic.wildheartEarthshakingStomp': 'Earthshaking Stomp',
+  'aura.wildheartKnockedDown': 'Knocked Down',
+  'aura.wildheartEnrage': 'Enrage',
   // The Proving Shore (tutorial island): the compulsory greeting's ferry ride,
   // the two clicked ferry bells (sim/tutorial/greeting.ts +
   // interactions/ferry_bell.ts), and the
@@ -17777,6 +17803,16 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Overload: 'aura.foundryOverload',
   Overloaded: 'aura.foundryOverloaded',
   Overdrive: 'aura.foundryOverdrive',
+  // The Wildheart Basin rework (mob/trash_kit/wildheart_kit.ts, encounters/wildheart_basin).
+  'Ancestral Sap': 'mechanic.wildheartAncestralSap',
+  'Plant Totem': 'mechanic.wildheartPlantTotem',
+  'Sunbone Mending': 'mechanic.wildheartSunboneMending',
+  'Spore Burst': 'mechanic.wildheartSporeBurst',
+  'Entangling Lash': 'mechanic.wildheartEntanglingLash',
+  'Tail Swipe': 'mechanic.wildheartTailSwipe',
+  'Earthshaking Stomp': 'mechanic.wildheartEarthshakingStomp',
+  'Knocked Down': 'aura.wildheartKnockedDown',
+  Enrage: 'aura.wildheartEnrage',
   'Dread Bellow': 'mechanic.cryptDreadBellow',
   'Wyrmcall Pyre': 'mechanic.cryptWyrmcallPyre',
   'Entombed': 'aura.cryptEntombed',

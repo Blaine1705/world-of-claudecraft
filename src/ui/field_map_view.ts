@@ -62,7 +62,7 @@ export interface FieldMapProp {
 export interface FieldMapPlan {
   key: string;
   bounds: { minX: number; maxX: number; minZ: number; maxZ: number };
-  void: 'sea' | 'mist';
+  void: 'sea' | 'mist' | 'jungle';
   heightMin: number;
   heightMax: number;
   surfaces: FieldMapSurface[];

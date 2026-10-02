@@ -45,6 +45,7 @@ import {
 } from './support';
 import { inCone, livingInReach, pickHashedTarget, pickLeapTarget } from './targets';
 import { landLullaby, lullabyReady, stepCarapace, stepDetonate } from './temple_kit';
+import { stepDeathCloud, stepPulse } from './wildheart_kit';
 
 /** Kit casts in priority order: a summon before a heal or shield, a control
  *  before a strike, a bolt last. */
@@ -515,6 +516,7 @@ function stepLeap(
       targetId: target.id,
       school: 'physical',
       fx: 'windup',
+      ...(def.castId !== undefined ? { ability: def.castId } : {}),
     });
   }
   const leap = st.leap;
@@ -633,6 +635,7 @@ function stepMob(
   if (mob.dead || mob.hp <= 0) {
     if (mob.trashKit) endTrashKit(mob);
     if (kit?.deathBurst) stepDeathBurst(ctx, inst, mob, kit, players());
+    if (kit?.deathCloud) stepDeathCloud(ctx, inst, mob, kit, players());
     return;
   }
   const engaged =
@@ -654,6 +657,7 @@ function stepMob(
     return;
   }
   stepDescent(ctx, mob, st);
+  stepPulse(ctx, inst, mob, kit, st);
   if (stepWithdraw(ctx, mob, kit, st)) return;
   stepCarapace(ctx, mob, kit, st);
   const list = players();

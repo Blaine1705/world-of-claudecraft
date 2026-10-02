@@ -8748,7 +8748,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
   'guide.dungeonsPage.wildheartBody':
-    '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。',
+    '沈んだ偶像の奥に隠されたジャングルのカルデラ。断崖に囲まれ、滝の轟きが響く。川の浅瀬を渡り、狩りの段丘と滝を抜け、植民地の廃墟を越えて、巨大な石のジャガーの頭の下にそびえる階段状の神殿へ登れ。',
   'guide.dungeonsPage.foundryBody':
     'ストームクラッグの嵐の稜線に建つ真鍮の鋳造所。史上最初に造られたオートマトンが、稲妻の空の下で今もコンベヤーと試験射撃場を動かしている。ラインを止め、両翼を黙らせ、未完成の巨人が待つガントリーへ登れ。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
@@ -14084,6 +14084,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wildheart_ravager.name': '血鬣の略奪者',
   'entities.mobs.wildheart_hexcaller.name': '陽骨の呪術師',
   'entities.mobs.wildheart_beastmaster.name': '牙王の獣使い',
+  'entities.mobs.the_gorgebloom.name': 'ゴージブルーム',
+  'entities.mobs.fanglord_jaguar.name': '牙王の大ジャガー',
+  'entities.mobs.howdah_hexcaller.name': '輿の呪術師',
+  'entities.mobs.great_saurian.name': 'グレート・サウリアン',
+  'entities.mobs.vine_lasher.name': '絡み蔓の鞭打ち',
+  'entities.mobs.spore_toad.name': '胞子ガエル',
+  'entities.mobs.basin_raptor.name': '盆地のラプトル',
+  'entities.mobs.sunbone_totem.name': '陽骨のトーテム',
+  'entities.mobs.sunbone_totem_binder.name': '陽骨のトーテム使い',
   'entities.mobs.wildheart_high_priest.name': '盆地の声ズルガー',
   'entities.mobs.apprentice_wren.name': '見習いレン',
   'entities.mobs.barrow_wight.name': '塚のワイト',
@@ -14100,7 +14109,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.the_meredark.name': 'ミアダーク',
   'entities.dungeons.wildheart_basin.name': 'ワイルドハート盆地',
   'entities.dungeons.wildheart_basin.enterText':
-    '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
+    '偶像の口をくぐると、盆地を見下ろす高い岩棚に出た。崖の縁から滝が轟き落ち、はるか下では何か巨大なものが浅瀬を渡っている。',
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
   'entities.dungeons.stormbrass_foundry.name': 'ストームブラス鋳造所',
   'entities.dungeons.stormbrass_foundry.enterText':
@@ -19929,4 +19938,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.walking_barrage': '移動弾幕（三つの印、砲弾は破片を残す）',
   'hudChrome.finder.mech.split_plating': '急速循環と分割装甲（反転が速く、背中はもう一方の面）',
   'hudChrome.finder.mech.double_load': '詰まったラックと二重装填（一度のハッチの窓にセル二つ）',
+  'abilityUi.cast.wildheart_ancestral_sap': '祖霊の樹液',
+  'abilityUi.cast.wildheart_plant_totem': 'トーテム設置',
+  'abilityUi.cast.wildheart_entangling_lash': '絡みつく鞭',
+  'abilityUi.cast.wildheart_saurian_tail_swipe': '尾の薙ぎ払い',
+  'abilityUi.cast.wildheart_saurian_stomp': '大地を揺るがす踏みつけ',
 };

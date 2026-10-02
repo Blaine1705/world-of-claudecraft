@@ -20,7 +20,6 @@ import { ignivarPropColliders } from './ignivar_props';
 import { authoredFieldColliders, authoredFieldFor } from './instances/authored_field';
 import { dungeonGateColliders } from './instances/dungeon_gate_colliders';
 import { slotGatedColliders } from './instances/dungeon_gate_state';
-import { WILDHEART_COLLIDERS } from './wildheart_field';
 
 // The Last Keep: an authored room-graph interior, so its walls (minus
 // doorways) and decor footprints all derive from the one shared layout,
@@ -33,12 +32,11 @@ const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT, undefine
 const DAWNHOLD_COLLIDERS: Collider[] = layoutColliders(DAWNHOLD_LAYOUT, undefined, DUNGEON_FLOOR_Y);
 
 // Interiors whose collision is NOT derived from an INTERIOR_LAYOUTS room plan:
-// Wildheart is an open field (walls plus prop specs) and the Last Keep is an
-// authored room graph. Both are static, so they short-circuit the per-dungeon
-// derivation below rather than falling back to the crypt plan. Authored open
-// fields (instances/authored_field) join through authoredFieldFor instead.
+// the Last Keep and Dawnhold are authored room graphs. Both are static, so they
+// short-circuit the per-dungeon derivation below rather than falling back to
+// the crypt plan. Authored open fields (instances/authored_field, the Wildheart
+// Basin among them) join through authoredFieldFor instead.
 const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
-  wildheart: WILDHEART_COLLIDERS,
   lastkeep: LASTKEEP_COLLIDERS,
   dawnhold: DAWNHOLD_COLLIDERS,
 };
@@ -47,7 +45,7 @@ const interiorSetByDungeon = new Map<string, Collider[]>();
 
 /** The derived interior collider set for a dungeon (statics short-circuit:
  *  interiors whose collision is not derived from an INTERIOR_LAYOUTS room
- *  plan, e.g. Wildheart's open field or the Last Keep's authored graph). */
+ *  plan, e.g. the Last Keep's authored graph). */
 export function derivedInteriorColliders(
   dungeonId: string | null,
   interior: string,

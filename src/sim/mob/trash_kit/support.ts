@@ -1,6 +1,8 @@
 // The trash kit's support and lane casts, and the once-per-pull withdraw
 // (MobTemplate.trashKit mend, ward, line, withdraw): the Sunken Bastion's
-// Brine Mend, Fog Ward, Piercing Bolt and the Turretback Hermit's Withdraw.
+// Brine Mend, Fog Ward, Piercing Bolt and the Turretback Hermit's Withdraw
+// (and the Wildheart Basin's Ancestral Sap and Entangling Lash, a lane that
+// roots).
 // A sibling of driver.ts, which routes these keys here.
 //
 //   mend      an interruptible heal on the most injured ally in reach, only
@@ -198,6 +200,19 @@ export function landSupportCast(
       Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1)),
     );
     ctx.dealDamage(mob, p, amount, false, def.school, def.name, 'hit', true);
+    // An entangling lane roots whoever it caught (the Vine Lasher's lash).
+    if (def.root && !p.dead) {
+      ctx.applyAura(p, {
+        id: `${def.castId}_root`,
+        name: def.name,
+        kind: 'root',
+        remaining: def.root,
+        duration: def.root,
+        value: 0,
+        sourceId: mob.id,
+        school: def.school,
+      });
+    }
   }
 }
 

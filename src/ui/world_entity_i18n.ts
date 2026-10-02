@@ -340,6 +340,16 @@ const MOB_IDS = [
   'wildheart_ravager',
   'wildheart_hexcaller',
   'wildheart_beastmaster',
+  // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md).
+  'sunbone_totem_binder',
+  'sunbone_totem',
+  'basin_raptor',
+  'spore_toad',
+  'vine_lasher',
+  'great_saurian',
+  'howdah_hexcaller',
+  'fanglord_jaguar',
+  'the_gorgebloom',
   'wildheart_high_priest',
 ] as const;
 

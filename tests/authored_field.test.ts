@@ -1,9 +1,11 @@
 // The authored open-air field system (src/sim/instances/authored_field): the
 // shared height function, path blending, the generated cliffs and colliders,
-// and the one generic groundHeight arm that also carries Wildheart unchanged.
+// and the one generic groundHeight arm that now carries the Wildheart Basin
+// too (its bespoke height function retired for a field record of its own).
 
 import { describe, expect, it } from 'vitest';
 import { HOLLOW_CRYPT_FIELD, HOLLOW_CRYPT_RING } from '../src/sim/content/hollow_crypt_layout';
+import { WILDHEART_BASIN_FIELD } from '../src/sim/content/wildheart_basin_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   type AuthoredFieldDef,
@@ -14,7 +16,6 @@ import {
   instancedFieldHeight,
 } from '../src/sim/instances/authored_field';
 import { pathHeightAt, pathHeightUnbounded } from '../src/sim/instances/authored_field/height';
-import { wildheartFieldHeight } from '../src/sim/wildheart_field';
 import { groundHeight } from '../src/sim/world';
 
 const MINI: AuthoredFieldDef = {
@@ -120,17 +121,20 @@ describe('the Hollow Crypt field', () => {
     }
   });
 
-  it('leaves the Wildheart Basin ground byte-identical', () => {
+  it('serves the Wildheart Basin from its own field record on the same engine', () => {
     const d = DUNGEONS.wildheart_basin;
-    expect(instancedFieldHeight('wildheart')).toBe(wildheartFieldHeight);
+    expect(authoredFieldFor(d.interior)).toBe(WILDHEART_BASIN_FIELD);
     const o = instanceOrigin(d.index, 2);
     for (const [x, z] of [
-      [0, 0],
-      [-37, 96],
+      [0, -222],
+      [-18, -109],
+      [-86, 40],
       [12.5, 211.25],
       [60, 150],
     ]) {
-      expect(groundHeight(o.x + x, o.z + z, 3)).toBe(wildheartFieldHeight(x, z));
+      expect(groundHeight(o.x + x, o.z + z, 3)).toBe(
+        authoredFieldHeight(WILDHEART_BASIN_FIELD, x, z),
+      );
     }
     // The shared crypt nave lives on in the Abandoned Crypt (a flat floor);
     // the Sunken Bastion moved to its own open-air field in its rework.

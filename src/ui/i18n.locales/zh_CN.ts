@@ -8406,7 +8406,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': '重置你的副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。',
   'guide.dungeonsPage.wildheartBody':
-    '一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔顶端看看是谁在等待。',
+    '藏在沉没神像背后的隐秘丛林火山口，四周悬崖环绕，瀑布轰鸣。涉过河流浅滩，穿越狩猎台地与瀑布，走过殖民地废墟，攀上巨大石雕美洲豹头下的阶梯神殿。',
   'guide.dungeonsPage.foundryBody':
     '风暴岩风暴线上的一座黄铜铸造厂，世上最早造出的自动机械仍在闪电天空下运转着传送带和试验靶场。打断产线，平息两翼，攀上龙门架，一个未完成的巨人正在那里等待。',
   'guide.dungeonsPage.raidName': '终局团队副本',
@@ -13398,6 +13398,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wildheart_ravager.name': '血鬃掠夺者',
   'entities.mobs.wildheart_hexcaller.name': '日骨巫咒师',
   'entities.mobs.wildheart_beastmaster.name': '獠牙领主驯兽师',
+  'entities.mobs.the_gorgebloom.name': '噬花',
+  'entities.mobs.fanglord_jaguar.name': '獠牙领主的巨型美洲豹',
+  'entities.mobs.howdah_hexcaller.name': '驮轿巫咒师',
+  'entities.mobs.great_saurian.name': '巨型蜥脚兽',
+  'entities.mobs.vine_lasher.name': '乱藤鞭者',
+  'entities.mobs.spore_toad.name': '孢子蟾蜍',
+  'entities.mobs.basin_raptor.name': '盆地迅猛龙',
+  'entities.mobs.sunbone_totem.name': '日骨图腾',
+  'entities.mobs.sunbone_totem_binder.name': '日骨图腾缚灵者',
   'entities.mobs.wildheart_high_priest.name': '盆地之声祖尔加',
   'entities.mobs.apprentice_wren.name': '学徒雯恩',
   'entities.mobs.barrow_wight.name': '古冢尸妖',
@@ -13414,7 +13423,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.the_meredark.name': '湖渊暗影',
   'entities.dungeons.wildheart_basin.name': '荒野之心盆地',
   'entities.dungeons.wildheart_basin.enterText':
-    '温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。',
+    '你穿过神像巨口，踏上高悬于盆地之上的岩架。瀑布自崖顶轰然而下，而在远处下方，某个庞然大物正涉过浅滩。',
   'entities.dungeons.wildheart_basin.leaveText': '你从石牙之下穿回棕榈之境的阳光中。',
   'entities.dungeons.stormbrass_foundry.name': '风暴黄铜铸造厂',
   'entities.dungeons.stormbrass_foundry.enterText':
@@ -18949,4 +18958,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.walking_barrage': '徐进弹幕（三个标记，炮弹会留下弹片）',
   'hudChrome.finder.mech.split_plating': '快速循环与分裂装甲（翻转更快，背面是另一种装甲）',
   'hudChrome.finder.mech.double_load': '卡住的电池架与双重装填（一次舱门窗口放入两枚电池）',
+  'abilityUi.cast.wildheart_ancestral_sap': '先祖树汁',
+  'abilityUi.cast.wildheart_plant_totem': '安置图腾',
+  'abilityUi.cast.wildheart_entangling_lash': '缠绕鞭笞',
+  'abilityUi.cast.wildheart_saurian_tail_swipe': '甩尾',
+  'abilityUi.cast.wildheart_saurian_stomp': '撼地践踏',
 };

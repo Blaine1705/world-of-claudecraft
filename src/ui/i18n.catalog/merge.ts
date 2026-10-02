@@ -663,6 +663,13 @@ const mergeStringsEn = {
       foundry_arm_sweep: 'Arm Sweep',
       foundry_draft_unbolt: 'Tearing Free',
       foundry_tremor_step: 'Tremor Step',
+      // The Wildheart Basin rework (trash_kit/wildheart_cast_ids.ts,
+      // encounters/wildheart_basin/ids.ts). Only Ancestral Sap can be kicked.
+      wildheart_ancestral_sap: 'Ancestral Sap',
+      wildheart_plant_totem: 'Plant Totem',
+      wildheart_entangling_lash: 'Entangling Lash',
+      wildheart_saurian_tail_swipe: 'Tail Swipe',
+      wildheart_saurian_stomp: 'Earthshaking Stomp',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

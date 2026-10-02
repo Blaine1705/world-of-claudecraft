@@ -35,6 +35,7 @@ import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { tickFoundryEncounters } from '../encounters/stormbrass_foundry';
 import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
+import { tickWildheartEncounters } from '../encounters/wildheart_basin';
 import { createGroundObject, createMob, createNpc } from '../entity';
 import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
@@ -1505,6 +1506,8 @@ export function updateInstances(ctx: SimContext): void {
   tickTempleEncounters(ctx);
   // The Stormbrass Foundry's encounters (encounters/stormbrass_foundry), same slot.
   tickFoundryEncounters(ctx);
+  // The Wildheart Basin's encounters (encounters/wildheart_basin), same slot.
+  tickWildheartEncounters(ctx);
   // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
   // and the Knellwyrm, same slot.
   tickCryptEncounters(ctx);

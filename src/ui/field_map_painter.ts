@@ -36,6 +36,8 @@ const FIELD_MAP_TOKENS = {
   wetstone: '--color-field-map-wetstone',
   quay: '--color-field-map-quay',
   shallows: '--color-field-map-shallows',
+  moss: '--color-field-map-moss',
+  basalt: '--color-field-map-basalt',
   wall: '--color-field-map-wall',
   wallTop: '--color-field-map-wall-top',
   prop: '--color-field-map-prop',

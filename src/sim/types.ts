@@ -4159,6 +4159,9 @@ export interface TrashKitDef {
   /** A leap onto the farthest mana user in reach (else the farthest player),
    *  opening a bleed and fixating on the victim for a few seconds. */
   leap?: {
+    /** The ability id its `windup` spellfx carries (the Basin Raptor's Pounce),
+     *  so the renderer can key the leap; absent: a bare windup. */
+    castId?: string;
     name: string;
     every: number;
     first: number;
@@ -4200,7 +4203,15 @@ export interface TrashKitDef {
   /** A telegraphed shot down a lane toward one player: the lane locks when the
    *  bar starts, and everyone standing in it when the bar ends is hit (the
    *  Fogbound Arbalest's Piercing Bolt). Physical: dodge it, never kick it. */
-  line?: TrashKitCast & { length: number; halfWidth: number; min: number; max: number };
+  line?: TrashKitCast & {
+    length: number;
+    halfWidth: number;
+    min: number;
+    max: number;
+    /** A root on everyone the lane catches, in seconds (the Vine Lasher's
+     *  Entangling Lash). */
+    root?: number;
+  };
   /** Once per pull, below a share of its health: it shelters for `seconds`
    *  (no attacks, no casts) taking `reduction` less damage (the Turretback
    *  Hermit's Withdraw). A breather, then the burn. */
@@ -4227,6 +4238,33 @@ export interface TrashKitDef {
     min: number;
     max: number;
     school: TrashKitCast['school'];
+  };
+  /** A healing pulse with no cast bar, every `every` seconds while it fights:
+   *  each living ally in the fight within `radius` (never itself) mends for a
+   *  share of its own maximum health (the Sunbone Totem's Sunbone Mending).
+   *  Kill the source. */
+  pulse?: {
+    castId: string;
+    name: string;
+    every: number;
+    radius: number;
+    healPct: number;
+    school: TrashKitCast['school'];
+  };
+  /** A cloud it bursts into where it dies, standing `seconds` on the floor:
+   *  every `tick` seconds each player inside `radius` takes a roll (the Spore
+   *  Toad's Spore Burst). The cloud is an encounter object of
+   *  `objectTemplate` (scale = radius) the client mirrors. Step out. */
+  deathCloud?: {
+    castId: string;
+    name: string;
+    radius: number;
+    seconds: number;
+    tick: number;
+    min: number;
+    max: number;
+    school: TrashKitCast['school'];
+    objectTemplate: string;
   };
   /** A seeker that bursts on reaching its victim: within `reach` it breaks in
    *  a splash round itself and is gone (the Tidewisp). Kill it on the way in. */
@@ -4663,6 +4701,28 @@ export type FoundryFightState =
   | VoltaicFightState
   | PrimeDraftFightState;
 
+/** The Great Saurian's pull (encounters/wildheart_basin/great_saurian.ts), on
+ *  the Saurian; cleared when the pull ends (a kill, an evade, a wipe). */
+export interface SaurianFightState {
+  kind: 'saurian';
+  tailTimer: number;
+  stompTimer: number;
+  /** The Tail Swipe's locked aim (the Saurian's facing) while its bar runs. */
+  tailYaw: number | null;
+  /** Where it braced its feet for the bar in flight (world coordinates), so
+   *  the strike lands where it was drawn. */
+  plantedAt: { x: number; y: number; z: number } | null;
+  /** The howdah broke this pull (the Howdah Hexcaller is down). */
+  howdahBroken: boolean;
+  /** The rider that jumped down, while it lives. */
+  riderId: number | null;
+  enraged: boolean;
+  /** Mechanic casts started (the deterministic salt). */
+  casts: number;
+}
+
+export type WildheartFightState = SaurianFightState;
+
 /** Morthen's entrance and the Knellwyrm finale at the Hollow Crypt's Rite Ring
  *  (encounters/hollow_crypt), on Morthen for the claim's life: the entrance
  *  plays once per claim, the finale once after he falls. */
@@ -4736,7 +4796,11 @@ export type DungeonGateKind =
   // swings out and extends over the gulf.
   | 'steam_shutter'
   | 'arc_fence'
-  | 'crane_bridge';
+  | 'crane_bridge'
+  // The Wildheart Basin: vines that weave themselves into a bridge over the
+  // gorge, and a hedge of thorns that recedes into the ground.
+  | 'vine_bridge'
+  | 'thorn_wall';
 
 /**
  * An in-dungeon gate or encounter seal (instances/dungeon_gates.ts): one
@@ -6632,9 +6696,15 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */
   foundryFight?: FoundryFightState;
+  /** Per-fight state of a Wildheart Basin encounter (encounters/wildheart_basin:
+   *  the Great Saurian, and the bosses in phase B). Sim authority only; the
+   *  client reads the fight from casts, auras and the encounter objects. */
+  wildheartFight?: WildheartFightState;
   /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
    *  mob/trash_kit/foundry_kit.ts): seconds left, its floor ring, and whether it
-   *  has gone off. Sim authority only. */
+   *  has gone off. A death cloud (trashKit.deathCloud, wildheart_kit.ts) rides
+   *  the same record: seconds the cloud still stands, its floor object, and
+   *  whether it has faded. Sim authority only. */
   deathBurst?: { remaining: number; objectId: number | null; done: boolean };
   /** Morthen's entrance and the Knellwyrm finale (encounters/hollow_crypt),
    *  on Morthen. Sim authority only; the client reads casts, auras, heights. */

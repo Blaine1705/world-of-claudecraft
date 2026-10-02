@@ -8260,7 +8260,7 @@ export const ko_KR: EnTranslations = {
       "bastionBody": "습지에 삼켜진 침수된 요새로, 물에 빠진 수호자들과 차오르는 밀물 그 자체가 지키고 있습니다.",
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
       "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
-      "wildheartBody": "따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드에 올라 정상에서 누가 기다리는지 확인하라.",
+      "wildheartBody": "가라앉은 우상 뒤에 숨겨진 정글 칼데라. 절벽에 둘러싸여 폭포 소리가 울려 퍼진다. 강 여울을 건너고, 사냥 단구와 폭포를 지나, 폐허가 된 식민지를 가로질러 거대한 석조 재규어 머리 아래의 계단식 성소로 올라가라.",
       "foundryBody": "스톰크래그 폭풍 능선에 자리한 황동 주조소. 최초로 만들어진 자동기계들이 번개 치는 하늘 아래 여전히 컨베이어와 시험 사격장을 돌리고 있다. 생산 라인을 멈추고 양 날개를 잠재운 뒤, 미완성 거인이 기다리는 갠트리로 올라가라.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
@@ -12385,7 +12385,12 @@ export const ko_KR: EnTranslations = {
       "foundry_draft_awaken": "각성",
       "foundry_arm_sweep": "팔 휩쓸기",
       "foundry_draft_unbolt": "볼트 뜯어내기",
-      "foundry_tremor_step": "진동 발걸음"
+      "foundry_tremor_step": "진동 발걸음",
+      "wildheart_ancestral_sap": "선조의 수액",
+      "wildheart_plant_totem": "토템 심기",
+      "wildheart_entangling_lash": "휘감는 채찍",
+      "wildheart_saurian_tail_swipe": "꼬리 휩쓸기",
+      "wildheart_saurian_stomp": "대지를 뒤흔드는 발구르기"
     }
   },
   "questUi": {
@@ -20631,6 +20636,33 @@ export const ko_KR: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "송곳니 군주 야수조련사"
       },
+      "sunbone_totem_binder": {
+        "name": "태양뼈 토템 결속자"
+      },
+      "sunbone_totem": {
+        "name": "태양뼈 토템"
+      },
+      "basin_raptor": {
+        "name": "분지 랩터"
+      },
+      "spore_toad": {
+        "name": "포자 두꺼비"
+      },
+      "vine_lasher": {
+        "name": "엉킨덩굴 채찍꾼"
+      },
+      "great_saurian": {
+        "name": "거대 용각수"
+      },
+      "howdah_hexcaller": {
+        "name": "가마 사술사"
+      },
+      "fanglord_jaguar": {
+        "name": "송곳니 군주의 거대 재규어"
+      },
+      "the_gorgebloom": {
+        "name": "탐식화"
+      },
       "wildheart_high_priest": {
         "name": "분지의 목소리 줄가르"
       },
@@ -24286,7 +24318,7 @@ export const ko_KR: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "야생심장 분지",
-        "enterText": "따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.",
+        "enterText": "우상의 아가리를 지나자 분지 높이 걸린 바위 턱이 나타난다. 폭포가 절벽 가장자리에서 쏟아져 내리고, 저 아래에서는 무언가 거대한 것이 여울을 건너고 있다.",
         "leaveText": "돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다."
       },
       "stormbrass_foundry": {

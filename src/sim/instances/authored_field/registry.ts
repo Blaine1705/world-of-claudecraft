@@ -3,15 +3,15 @@
 // interior collider seam consult, so a new authored field is a single row
 // here plus its content record.
 //
-// Wildheart's bespoke height function rides the same lookup (its collision
-// stays on its own static set in interior_collider_sets.ts), so its ground is
-// byte-identical to before this seam existed.
+// The Wildheart Basin left its bespoke height function for a field record of
+// its own (content/wildheart_basin_layout.ts), so every open-air dungeon now
+// rides this one engine.
 
 import { DROWNED_TEMPLE_FIELD } from '../../content/drowned_temple_layout';
 import { HOLLOW_CRYPT_FIELD } from '../../content/hollow_crypt_layout';
 import { STORMBRASS_FOUNDRY_FIELD } from '../../content/stormbrass_foundry_layout';
 import { SUNKEN_BASTION_FIELD } from '../../content/sunken_bastion_layout';
-import { wildheartFieldHeight } from '../../wildheart_field';
+import { WILDHEART_BASIN_FIELD } from '../../content/wildheart_basin_layout';
 import { authoredFieldHeight } from './height';
 import type { AuthoredFieldDef } from './types';
 
@@ -20,6 +20,7 @@ const AUTHORED_FIELDS: Readonly<Record<string, AuthoredFieldDef>> = {
   sunken_bastion: SUNKEN_BASTION_FIELD,
   drowned_temple: DROWNED_TEMPLE_FIELD,
   stormbrass_foundry: STORMBRASS_FOUNDRY_FIELD,
+  wildheart: WILDHEART_BASIN_FIELD,
 };
 
 const hollowCryptHeight = (x: number, z: number): number =>
@@ -34,8 +35,11 @@ const drownedTempleHeight = (x: number, z: number): number =>
 const stormbrassFoundryHeight = (x: number, z: number): number =>
   authoredFieldHeight(STORMBRASS_FOUNDRY_FIELD, x, z);
 
+const wildheartBasinHeight = (x: number, z: number): number =>
+  authoredFieldHeight(WILDHEART_BASIN_FIELD, x, z);
+
 const FIELD_HEIGHTS: Readonly<Record<string, (lx: number, lz: number) => number>> = {
-  wildheart: wildheartFieldHeight,
+  wildheart: wildheartBasinHeight,
   hollow_crypt: hollowCryptHeight,
   sunken_bastion: sunkenBastionHeight,
   drowned_temple: drownedTempleHeight,

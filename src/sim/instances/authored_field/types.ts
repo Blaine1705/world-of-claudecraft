@@ -23,7 +23,10 @@ export type FieldGround =
   | 'quay'
   // A flooded channel's bed under standing water (the Bastion's moat ring):
   // drawn as mud by the terrain, as water on the painted map.
-  | 'shallows';
+  | 'shallows'
+  // The Wildheart Basin: jungle loam under moss and fern, and wet basalt.
+  | 'moss'
+  | 'basalt';
 
 interface FieldSurfaceBase {
   id: string;
@@ -126,7 +129,8 @@ export interface AuthoredFieldDef {
   props: readonly FieldProp[];
   lightZones: readonly FieldLightZone[];
   /** What the painted dungeon map shows in the void round the terraces (the
-   *  sea round a coastal fortress, or the mist of a chasm; default mist).
+   *  sea round a coastal fortress, the mist of a chasm, or the jungle canopy
+   *  of a gorge floor; default mist).
    *  Render and UI only. */
-  mapVoid?: 'sea' | 'mist';
+  mapVoid?: 'sea' | 'mist' | 'jungle';
 }

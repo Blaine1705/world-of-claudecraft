@@ -8900,7 +8900,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody':
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
   'guide.dungeonsPage.wildheartBody':
-    'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду, чтобы увидеть, кто ждёт на вершине.',
+    'Скрытая за Затонувшим идолом кальдера в джунглях, окружённая скалами и полная грохота водопадов. Перейдите речной брод, пройдите охотничьи террасы и водопады, минуйте руины колонии и поднимитесь к ступенчатому святилищу под исполинской каменной головой ягуара.',
   'guide.dungeonsPage.foundryBody':
     'Латунная литейная на штормовой линии Грозового Утеса, где первые в мире автоматоны все еще гоняют конвейеры и испытательные полигоны под небом из молний. Остановите линию, усмирите оба крыла и поднимитесь на козловой кран, где ждет недостроенный гигант.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
@@ -14314,6 +14314,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wildheart_ravager.name': 'Разоритель Кровавой Гривы',
   'entities.mobs.wildheart_hexcaller.name': 'Заклинатель Солнечной Кости',
   'entities.mobs.wildheart_beastmaster.name': 'Повелитель клыков',
+  'entities.mobs.the_gorgebloom.name': 'Цветожор',
+  'entities.mobs.fanglord_jaguar.name': 'Великий ягуар Повелителя клыков',
+  'entities.mobs.howdah_hexcaller.name': 'Заклинатель с паланкина',
+  'entities.mobs.great_saurian.name': 'Великий завр',
+  'entities.mobs.vine_lasher.name': 'Хлестун спутанной лозы',
+  'entities.mobs.spore_toad.name': 'Спороносная жаба',
+  'entities.mobs.basin_raptor.name': 'Котловинный раптор',
+  'entities.mobs.sunbone_totem.name': 'Тотем Солнечной Кости',
+  'entities.mobs.sunbone_totem_binder.name': 'Связыватель тотемов Солнечной Кости',
   'entities.mobs.wildheart_high_priest.name': 'Зулгар, Голос Котловины',
   'entities.mobs.apprentice_wren.name': 'Ученица Рен',
   'entities.mobs.barrow_wight.name': 'Курганное умертвие',
@@ -14330,7 +14339,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.the_meredark.name': 'Озёрный Мрак',
   'entities.dungeons.wildheart_basin.name': 'Котловина Дикого Сердца',
   'entities.dungeons.wildheart_basin.enterText':
-    'Тёплый дождь шипит на древнем камне. Перед вами открывается Котловина Дикого Сердца.',
+    'Вы проходите сквозь пасть идола на уступ высоко над котловиной. С края скал грохочут водопады, а далеко внизу что-то огромное бредёт через брод.',
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
   'entities.dungeons.stormbrass_foundry.name': 'Литейная Штормовой латуни',
@@ -20306,4 +20315,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Быстрый цикл и раздельная броня (смена быстрее, спина другого типа)',
   'hudChrome.finder.mech.double_load':
     'Заклинившие стойки и двойная загрузка (две батареи за одно открытие люка)',
+  'abilityUi.cast.wildheart_ancestral_sap': 'Сок предков',
+  'abilityUi.cast.wildheart_plant_totem': 'Установка тотема',
+  'abilityUi.cast.wildheart_entangling_lash': 'Опутывающий хлыст',
+  'abilityUi.cast.wildheart_saurian_tail_swipe': 'Удар хвостом',
+  'abilityUi.cast.wildheart_saurian_stomp': 'Сотрясающий топот',
 };

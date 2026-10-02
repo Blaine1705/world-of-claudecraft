@@ -379,20 +379,55 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     },
   },
 
+  // The rework (docs/design/dungeon-rework/wildheart_basin.md): the bosses'
+  // pools come from target fight length x planning party DPS at level 20
+  // (about 150): the Great Saurian 65 s (about 10,000), the Beastmaster and
+  // his jaguar 100 s together (about 7,500 each until phase B joins their
+  // pools), the Gorgebloom 100 s (about 15,000), Zulgar 160 s (about 24,800).
+  // The Beastmaster leaves the old 150 rare band for the boss band (200);
+  // the jaguar and the Saurian swing in the 150 band, the non-elite raptors
+  // (they come in fours) in the 50 band, the rest of the new trash on the
+  // trash floor. The new kit mobs' mechanics are stated LANDED (factor 1).
   wildheart_basin: {
     id: 'wildheart_basin',
     difficulty: 'normal',
     healthMultiplier: 2.0,
+    healthMultiplierByMob: {
+      great_saurian: 6.04,
+      wildheart_beastmaster: 3.91,
+      fanglord_jaguar: 4.73,
+      the_gorgebloom: 8.47,
+      wildheart_high_priest: 7.21,
+    },
     damageMultiplierByMob: {
       wildheart_stalker: 3.7,
       wildheart_ravager: 3.15,
       wildheart_hexcaller: 3.9,
-      wildheart_beastmaster: 4.2,
+      sunbone_totem_binder: 3.75,
+      sunbone_totem: 1,
+      basin_raptor: 3.45,
+      spore_toad: 4,
+      vine_lasher: 3.45,
+      great_saurian: 4.8,
+      howdah_hexcaller: 3.9,
+      wildheart_beastmaster: 5.55,
+      fanglord_jaguar: 4.6,
+      the_gorgebloom: 6.4,
       wildheart_high_priest: 5.65,
+    },
+    mechanicDamageMultiplierByMob: {
+      sunbone_totem_binder: 1,
+      sunbone_totem: 1,
+      basin_raptor: 1,
+      spore_toad: 1,
+      vine_lasher: 1,
+      great_saurian: 1,
+      howdah_hexcaller: 1,
     },
     rangedDamageMultiplierByMob: {
       wildheart_stalker: 2.7,
       wildheart_hexcaller: 2.5,
+      howdah_hexcaller: 2.5,
     },
   },
 };
@@ -665,8 +700,35 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // 455 post-mitigation at 15.5x): the open-field roster sits between
     // Orkadia's casters and the Sanctum band.
     damageMultiplier: 17.25,
-    // No Wildheart boss summons adds; kept at the half convention, inert.
+    // The kit adds (the Sunbone Totems, the Howdah Hexcaller) ride the trash
+    // kit's spawner, never summonAdds; kept at the half convention.
     addDamageMultiplier: 8.625,
+    // The rework's pools from target fight length x heroic party DPS (about
+    // 230): the Saurian 65 s, the Beastmaster and his jaguar 100 s together,
+    // the Gorgebloom 100 s, Zulgar 160 s.
+    healthMultiplierByMob: {
+      great_saurian: 8.36,
+      wildheart_beastmaster: 5.52,
+      fanglord_jaguar: 6.67,
+      the_gorgebloom: 12.05,
+      wildheart_high_priest: 9.98,
+    },
+    // The non-elite raptors are lifted onto the 500 floor on their own.
+    damageMultiplierByMob: {
+      basin_raptor: 30.5,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a heroic cloth wearer about 40 percent, the Saurian's
+    // avoidables about 45 percent (the Foundry's heroic convention).
+    mechanicDamageMultiplierByMob: {
+      sunbone_totem_binder: 3,
+      sunbone_totem: 3,
+      basin_raptor: 3,
+      spore_toad: 3,
+      vine_lasher: 3,
+      howdah_hexcaller: 3,
+      great_saurian: 2.5,
+    },
     armorMultiplier: 1.2,
     finalBossId: 'wildheart_high_priest',
     marksPerParticipant: 1,

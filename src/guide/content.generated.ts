@@ -2538,7 +2538,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "wildheart_basin",
     "isRaid": false,
     "suggestedPlayers": 5,
-    "min": 20,
+    "min": 19,
     "max": 20,
     "name": "The Wildheart Basin"
   },

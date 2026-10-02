@@ -12385,7 +12385,12 @@ export const vi_VN: EnTranslations = {
       "foundry_draft_awaken": "Awakening",
       "foundry_arm_sweep": "Arm Sweep",
       "foundry_draft_unbolt": "Tearing Free",
-      "foundry_tremor_step": "Tremor Step"
+      "foundry_tremor_step": "Tremor Step",
+      "wildheart_ancestral_sap": "Ancestral Sap",
+      "wildheart_plant_totem": "Plant Totem",
+      "wildheart_entangling_lash": "Entangling Lash",
+      "wildheart_saurian_tail_swipe": "Tail Swipe",
+      "wildheart_saurian_stomp": "Earthshaking Stomp"
     }
   },
   "questUi": {
@@ -20630,6 +20635,33 @@ export const vi_VN: EnTranslations = {
       },
       "wildheart_beastmaster": {
         "name": "Thuần Thú Sư Lãnh Chúa Nanh"
+      },
+      "sunbone_totem_binder": {
+        "name": "Sunbone Totem-Binder"
+      },
+      "sunbone_totem": {
+        "name": "Sunbone Totem"
+      },
+      "basin_raptor": {
+        "name": "Basin Raptor"
+      },
+      "spore_toad": {
+        "name": "Spore Toad"
+      },
+      "vine_lasher": {
+        "name": "Snarlvine Lasher"
+      },
+      "great_saurian": {
+        "name": "Great Saurian"
+      },
+      "howdah_hexcaller": {
+        "name": "Howdah Hexcaller"
+      },
+      "fanglord_jaguar": {
+        "name": "Fanglord's Great Jaguar"
+      },
+      "the_gorgebloom": {
+        "name": "The Gorgebloom"
       },
       "wildheart_high_priest": {
         "name": "Zulgar, Tiếng Nói Của Vùng Trũng"
