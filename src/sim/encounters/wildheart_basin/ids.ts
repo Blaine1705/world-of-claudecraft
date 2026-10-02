@@ -140,6 +140,10 @@ export const BEAST_TUNING = {
   /** Stalk: a mark lasts 10 s, then the jaguar picks another prey. */
   stalkSeconds: 10,
   stalkFirst: 2,
+  /** In a group the jaguar never stalks the master's tank. With nobody else
+   *  in the pits it hunts one standing back within this many yards past the
+   *  pits' rim; with nobody there either it waits where it stands. */
+  stalkFarReach: 40,
   /** Each kind of control lands once per window. */
   controlWindow: 20,
   /** The jaguar bites its prey every 2 s in reach: 120 to 150, then a bleed
@@ -347,6 +351,10 @@ export const ZULGAR_TUNING = {
   maulDamage: 500,
   maulStun: 2,
   maulPause: 1,
+  /** A Mauled player's respite: never Prey again for 5 s from the maul (the
+   *  2 s knockdown, then a 3 s head start). He hunts another Prey meanwhile,
+   *  or, with nobody else to hunt, roars over the kill and waits it out. */
+  preyRespite: 5,
   /** Stuns land half as long on the avatar. */
   huntStunScale: 0.5,
   /** Sunstruck: 60 percent slower for 3 s; the glyph goes dark for 15 s. */

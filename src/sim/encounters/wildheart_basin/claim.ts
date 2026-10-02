@@ -10,6 +10,7 @@ import { createGroundObject } from '../../entity';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { dist2d, type Entity } from '../../types';
+import { claimPlayers, pickMarkTargets } from '../sunken_bastion/claim';
 import { WILDHEART_DUNGEON } from './ids';
 
 export { bossTarget, heavySwing } from '../stormbrass_foundry/claim';
@@ -125,4 +126,45 @@ export function nearestPlayerTo(players: readonly Entity[], x: number, z: number
     }
   }
   return best;
+}
+
+/** True when the run holds nobody but one living player (a solo run, or the
+ *  last one standing): a hunt then has nobody to take but that player. */
+export function runAlone(ctx: SimContext, inst: InstanceSlot): boolean {
+  return claimPlayers(ctx, inst).length <= 1;
+}
+
+/** A boss's tank: whom it is fighting (its aggro target), else the living
+ *  attacker highest on its threat (ties to the lower id). */
+export function tankOf(ctx: SimContext, boss: Entity): Entity | null {
+  const cur = boss.aggroTargetId !== null ? ctx.entities.get(boss.aggroTargetId) : undefined;
+  if (cur && !cur.dead) return cur;
+  let best: Entity | null = null;
+  let bestT = -1;
+  for (const [id, t] of boss.threat) {
+    const e = ctx.entities.get(id);
+    if (!e || e.dead) continue;
+    if (t > bestT || (t === bestT && best !== null && e.id < best.id)) {
+      best = e;
+      bestT = t;
+    }
+  }
+  return best;
+}
+
+/** A Basin hunt's mark (the jaguar's Stalk, Zulgar's Prey): the hashed pick
+ *  among `players` outside `busy`, NEVER the tank while the run holds anyone
+ *  else (`alone` false); alone, that one player is all there is. Null when
+ *  nobody can be had. */
+export function pickHuntMark(
+  hasher: Entity,
+  players: readonly Entity[],
+  tank: Entity | null,
+  alone: boolean,
+  salt: number,
+  busy: ReadonlySet<number> = new Set(),
+): Entity | null {
+  const pool = alone || tank === null ? players : players.filter((p) => p.id !== tank.id);
+  const [mark] = pickMarkTargets(hasher, pool, 1, salt, busy);
+  return mark ?? null;
 }

@@ -335,3 +335,56 @@ describe('the review edges: evade, a blind, a prey who leaves the pits', () => {
     expect(next?.id).not.toBe(prey.id);
   });
 });
+
+// Playtest: "can the jaguar follow the tank?" In a group it never may; alone
+// there is nobody else, so it stalks the lone player (the finder says so).
+describe('Stalk and the tank', () => {
+  it('in a group it never marks the tank: through a long pull, the master mid-bar, or the rest standing back', () => {
+    const f = fight();
+    const { bm } = pull(f);
+    const tankFree = () => {
+      expect(aura(f.tank, BEAST_STALKED)).toBeUndefined();
+    };
+    run(f, 3 * T.stalkSeconds, tankFree);
+    expect(f.others.some((p) => aura(p, BEAST_STALKED))).toBe(true);
+    // The master's bar leaves him on the tank; the mark still skips the tank.
+    f.sim.chat('/dev wildheart trigger quake', f.tank.id);
+    expect(bm.castingAbility).toBe(BEAST_PIT_QUAKE);
+    run(f, T.stalkSeconds + 0.2, tankFree);
+    // Everyone else steps back out of the pits (still within hunting reach of
+    // them): the jaguar goes after one of them, never the tank in the pits.
+    const back: [number, number][] = [
+      [-86, -4],
+      [-128, 30],
+      [-44, 30],
+    ];
+    f.others.forEach((p, i) => {
+      put(f, p, back[i][0], back[i][1]);
+    });
+    run(f, T.stalkSeconds + 0.2, tankFree);
+    expect(f.others.some((p) => aura(p, BEAST_STALKED))).toBe(true);
+  });
+
+  it('in a group with nobody else near the pits, it waits rather than hunt the tank', () => {
+    const f = fight();
+    const { jag } = pull(f);
+    for (const p of f.others) put(f, p, 0, -217);
+    const from = f.hits.length;
+    run(f, T.stalkSeconds + 2, () => {
+      expect(aura(f.tank, BEAST_STALKED)).toBeUndefined();
+    });
+    expect(hitsOn(f, f.tank, 'Jaguar Bite', from)).toHaveLength(0);
+    expect(jag.aggroTargetId).not.toBe(f.tank.id);
+  });
+
+  it('alone there is nobody else: the jaguar stalks you, bites, and marks you again', () => {
+    const f = fight('normal', 0);
+    const { jag } = pull(f);
+    expect(until(f, () => aura(f.tank, BEAST_STALKED) !== undefined, 4)).toBe(true);
+    expect(jag.aggroTargetId).toBe(f.tank.id);
+    const from = f.hits.length;
+    expect(until(f, () => hitsOn(f, f.tank, 'Jaguar Bite', from).length > 0, 8)).toBe(true);
+    run(f, T.stalkSeconds + 0.2);
+    expect(aura(f.tank, BEAST_STALKED)).toBeDefined();
+  });
+});

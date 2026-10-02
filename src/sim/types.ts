@@ -4747,6 +4747,8 @@ export interface BeastmasterFightState {
   plantedAt: { x: number; y: number; z: number } | null;
   /** The jaguar's prey (Stalk) and the seconds left on its hunt. */
   preyId: number | null;
+  /** Where the jaguar holds while nobody can be stalked (world coordinates). */
+  waitAt: { x: number; y: number; z: number } | null;
   stalkTimer: number;
   biteTimer: number;
   /** Where the jaguar crouched for Heel! (world coordinates). */
@@ -4801,6 +4803,13 @@ export interface ZulgarFightState {
   switchTimer: number;
   /** Seconds he still feeds on a mauled prey before he hunts on. */
   feedTimer: number;
+  /** The tank when the hunt began: never the Prey while anyone else stands. */
+  tankId: number | null;
+  /** Mauled players' respite (seconds left): never the Prey again until it
+   *  runs out, so knockdowns never chain. */
+  respite: { id: number; left: number }[];
+  /** He roared over the kill, waiting out a respite with nobody to hunt. */
+  waiting: boolean;
   /** Seconds each sun glyph stays dark (0 = lit), and its object. */
   glyphDark: number[];
   glyphIds: number[];

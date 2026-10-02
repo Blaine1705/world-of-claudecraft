@@ -19964,7 +19964,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thorn_sprout.name': '가시 새싹',
   'hudChrome.finder.mech.pack_bond': '무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)',
   'hudChrome.finder.mech.stalk':
-    '추적 (재규어가 표식 대상을 사냥: 끌고 다니며 감속, 속박, 기절시키세요)',
+    '추적 (재규어가 표식 대상을 사냥하며 탱커는 노리지 않고, 혼자일 때는 당신을 노림: 끌고 다니며 감속, 속박, 기절시키세요)',
   'hudChrome.finder.mech.shared_health': '생명력 공유 (하나의 생명력: 가장 안전한 쪽을 공격하세요)',
   'hudChrome.finder.mech.heel_frenzied_bond':
     '돌아와! 및 광포한 유대 (재규어가 주인에게 도약, 유대 범위 20야드)',
@@ -19975,7 +19975,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.burrowing_seeds':
     '파고드는 씨앗과 꽃가루 구름 (6초 뒤 플레이어 곁에서 솟아나고, 황금빛이 퍼집니다)',
   'hudChrome.finder.mech.spirit_of_the_hunt':
-    '사냥의 영혼 (사냥감이 화신을 빛나는 태양 문양으로 끌고 가세요)',
+    '사냥의 영혼 (사냥감이 화신을 빛나는 태양 문양으로 끌고 가세요. 물어뜯긴 플레이어는 도망칠 시간을 얻습니다)',
   'hudChrome.finder.mech.twin_prey_ambush':
     '두 사냥감과 매복 (사냥감 둘, 이후 가장 먼 플레이어를 덮칩니다)',
   'hudChrome.wildheartAlert.preyTitle': '당신이 사냥감입니다!',

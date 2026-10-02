@@ -18994,7 +18994,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_zulgar_spirit_hunt': '狩猎之魂',
   'entities.mobs.thorn_sprout.name': '荆棘幼芽',
   'hudChrome.finder.mech.pack_bond': '兽群羁绊（两者相邻时伤害减半：将它们拉开15码）',
-  'hudChrome.finder.mech.stalk': '潜行追猎（美洲豹追猎被标记的玩家：风筝它，减速、定身、击晕它）',
+  'hudChrome.finder.mech.stalk':
+    '潜行追猎（美洲豹追猎被标记的玩家，从不追坦克；单人时它追你：风筝它，减速、定身、击晕它）',
   'hudChrome.finder.mech.shared_health': '共享生命（同一血池：攻击最安全的那个）',
   'hudChrome.finder.mech.heel_frenzied_bond':
     '回来！与狂热羁绊（美洲豹跃回主人身边，羁绊范围扩至20码）',
@@ -19004,7 +19005,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gorge': '吞噬（对坦克的重咬和毒素）',
   'hudChrome.finder.mech.burrowing_seeds':
     '钻地种子与花粉云（种子6秒后在玩家身旁破土，金色会传染）',
-  'hudChrome.finder.mech.spirit_of_the_hunt': '狩猎之魂（猎物引着化身穿过点亮的太阳符文）',
+  'hudChrome.finder.mech.spirit_of_the_hunt':
+    '狩猎之魂（猎物引着化身穿过点亮的太阳符文；被撕咬的玩家获得逃跑的先机）',
   'hudChrome.finder.mech.twin_prey_ambush': '双重猎物与伏击（两个猎物，随后扑向最远的玩家）',
   'hudChrome.wildheartAlert.preyTitle': '你是猎物！',
   'hudChrome.wildheartAlert.preyLine': '祖尔加在追猎你：引他穿过点亮的太阳符文',

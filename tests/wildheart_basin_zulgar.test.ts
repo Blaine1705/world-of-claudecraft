@@ -282,3 +282,103 @@ describe('Never Caught and the reset', () => {
     expect(z.ccImmune).toBe(true);
   });
 });
+
+// Playtest: "it keeps stunning me, I can't do anything". A Mauled player gets
+// a respite (the knockdown, then a head start): never the Prey again until it
+// runs out, so knockdowns never chain. Meanwhile he hunts another Prey, or,
+// with nobody else, roars over the kill and waits it out. The tank is never
+// the Prey while anyone else stands, even mid-hunt.
+describe('the Prey respite: no chained knockdowns', () => {
+  /** Every Mauled stun window as [start, end] in seconds, per player id. */
+  function maulWindows(f: Fight, seconds: number, keep: () => void): Map<number, number[][]> {
+    const out = new Map<number, number[][]>();
+    let t = 0;
+    run(f, seconds, () => {
+      keep();
+      t += 1 / 20;
+      for (const p of [f.tank, ...f.others]) {
+        const m = aura(p, ZULGAR_MAULED);
+        if (!m) continue;
+        const list = out.get(p.id) ?? [];
+        const last = list[list.length - 1];
+        if (last && t - last[1] < 0.06) last[1] = t;
+        else list.push([t, t]);
+        out.set(p.id, list);
+      }
+    });
+    return out;
+  }
+
+  it('solo: a Mauled player standing still is never caught again during the respite', () => {
+    const f = fight('normal', 0);
+    const z = pull(f);
+    tick(f);
+    dev(f, 'prey');
+    expect(aura(f.tank, ZULGAR_PREY)).toBeDefined();
+    const avatarRoars = () => f.fx.filter((x) => x === ZULGAR_AVATAR).length;
+    const roarsBefore = avatarRoars();
+    // The worst case: the player never moves away from him.
+    const stay = () => {
+      const at = local(f, z);
+      if (Math.hypot(f.tank.pos.x - z.pos.x, f.tank.pos.z - z.pos.z) > 1.2)
+        put(f, f.tank, at.x + 1, at.z);
+    };
+    const windows = maulWindows(f, 14, stay).get(f.tank.id) ?? [];
+    expect(windows.length).toBeGreaterThanOrEqual(2);
+    for (let i = 1; i < windows.length; i++) {
+      // A full head start between one knockdown's end and the next maul.
+      expect(windows[i][0] - windows[i - 1][1]).toBeGreaterThanOrEqual(
+        T.preyRespite - T.maulStun - 0.1,
+      );
+    }
+    // With nobody else to hunt he roared over the kill before hunting again.
+    expect(avatarRoars()).toBeGreaterThan(roarsBefore);
+  });
+
+  it('solo: after the respite he marks the player again and hunts on', () => {
+    const f = fight('normal', 0);
+    const z = pull(f);
+    tick(f);
+    dev(f, 'prey');
+    const at = local(f, z);
+    put(f, f.tank, at.x + 1, at.z);
+    tick(f);
+    expect(aura(f.tank, ZULGAR_MAULED)).toBeDefined();
+    // Run away to the far side of the terrace.
+    put(f, f.tank, 0, 236);
+    run(f, T.preyRespite - 0.3);
+    expect(aura(f.tank, ZULGAR_PREY)).toBeUndefined();
+    expect(st(z).phase).toBe('hunt');
+    run(f, 0.6);
+    expect(aura(f.tank, ZULGAR_PREY)).toBeDefined();
+    expect(z.aggroTargetId).toBe(f.tank.id);
+  });
+
+  it('in a group the Mauled player is never the next Prey, and the tank is never Prey', () => {
+    const f = fight();
+    const z = pull(f);
+    tick(f);
+    dev(f, 'prey');
+    // Every chased Prey walks into him: mauls come as fast as the rules allow.
+    const feed = () => {
+      expect(aura(f.tank, ZULGAR_PREY)).toBeUndefined();
+      for (const p of f.others) {
+        if (aura(p, ZULGAR_PREY)?.value2 !== 1) continue;
+        const at = local(f, z);
+        put(f, p, at.x + 1, at.z);
+      }
+    };
+    const windows = maulWindows(f, T.huntSeconds - 1, feed);
+    expect(windows.has(f.tank.id)).toBe(false);
+    let mauls = 0;
+    for (const list of windows.values()) {
+      mauls += list.length;
+      for (let i = 1; i < list.length; i++) {
+        expect(list[i][0] - list[i - 1][1]).toBeGreaterThanOrEqual(
+          T.preyRespite - T.maulStun - 0.1,
+        );
+      }
+    }
+    expect(mauls).toBeGreaterThanOrEqual(3);
+  });
+});

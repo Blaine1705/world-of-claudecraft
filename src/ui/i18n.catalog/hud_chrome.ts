@@ -8817,7 +8817,8 @@ export const hudChromeStrings = {
       double_load: 'Jammed Racks and Double Load (two cells in one hatch window)',
       // The Wildheart Basin rework (encounters/wildheart_basin).
       pack_bond: 'Pack Bond (together they take half damage: drag them 15 yards apart)',
-      stalk: 'Stalk (the jaguar hunts a marked player: kite it, slow, root and stun it)',
+      stalk:
+        'Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)',
       shared_health: 'Shared Health (one pool: hit whichever is safest)',
       heel_frenzied_bond:
         'Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)',
@@ -8827,7 +8828,8 @@ export const hudChromeStrings = {
       gorge: 'Gorge (a heavy bite and a poison on the tank)',
       burrowing_seeds:
         'Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)',
-      spirit_of_the_hunt: 'Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs)',
+      spirit_of_the_hunt:
+        'Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)',
       twin_prey_ambush: 'Twin Prey and Ambush (two Prey, then a pounce on the farthest player)',
     },
   },

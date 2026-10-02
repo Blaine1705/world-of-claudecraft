@@ -10,7 +10,10 @@
 //                      speed. He can be slowed and rooted through the hunt, and
 //                      a stun lands for half as long (control_gate.ts). A caught
 //                      Prey is Mauled (500 and a 2 s knockdown); he feeds for a
-//                      second, then marks a new Prey. Crossing a lit sun glyph
+//                      second, then marks a new Prey. A Mauled player is never
+//                      the Prey again for 5 s (the knockdown, then a head
+//                      start), so knockdowns never chain; with nobody else to
+//                      hunt he roars over the kill and waits. Crossing a lit sun glyph
 //                      makes him Sunstruck (60 percent slower for 3 s); that
 //                      glyph goes dark for 15 s.
 //   Enrage             below 30 percent (the template's).
@@ -44,10 +47,12 @@ import {
   holdPlanted,
   localOf,
   mechanicDamage,
-  pickMarkTargets,
+  pickHuntMark,
   placeAt,
+  runAlone,
   spawnBasinObject,
   startBar,
+  tankOf,
 } from './claim';
 import {
   ZULGAR_TUNING as T,
@@ -80,6 +85,9 @@ function freshState(timers: boolean): ZulgarFightState {
     chase: 0,
     switchTimer: T.twinSwitch,
     feedTimer: 0,
+    tankId: null,
+    respite: [],
+    waiting: false,
     glyphDark: SUN_GLYPHS.map(() => 0),
     glyphIds: [],
     ambushAt: null,
@@ -212,8 +220,28 @@ function markPrey(ctx: SimContext, z: Entity, p: Entity, chased: boolean, left: 
   });
 }
 
-/** Mark a fresh Prey in slot `slot` (never one already marked, never the
- *  last one while another can be had). Returns it, or null. */
+/** Whom he may mark in slot `slot`: the terrace's players, never one marked
+ *  in another slot, never one in a Mauled respite, never the tank while
+ *  anyone else is in the run, and (`avoid`) never the last Prey while another
+ *  can be had. */
+function preyPool(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  st: ZulgarFightState,
+  slot: number,
+  avoid: number | null,
+): { players: Entity[]; busy: Set<number> } {
+  const alone = runAlone(ctx, inst);
+  const tankId = alone ? null : st.tankId;
+  const players = shrinePlayers(ctx, inst).filter((p) => p.id !== tankId);
+  const busy = new Set(st.preyIds.filter((_, i) => i !== slot));
+  for (const r of st.respite) busy.add(r.id);
+  if (avoid !== null && players.filter((p) => !busy.has(p.id)).length > 1) busy.add(avoid);
+  return { players, busy };
+}
+
+/** Mark a fresh Prey in slot `slot` (see preyPool). Returns it, or null (the
+ *  slot is freed). */
 function pickPrey(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -223,10 +251,8 @@ function pickPrey(
   avoid: number | null,
 ): Entity | null {
   st.casts++;
-  const players = shrinePlayers(ctx, inst);
-  const busy = new Set(st.preyIds.filter((_, i) => i !== slot));
-  if (avoid !== null && players.length - busy.size > 1) busy.add(avoid);
-  const [prey] = pickMarkTargets(z, players, 1, st.casts, busy);
+  const { players, busy } = preyPool(ctx, inst, st, slot, avoid);
+  const prey = pickHuntMark(z, players, null, true, st.casts, busy);
   if (!prey) {
     st.preyIds.splice(slot, 1);
     return null;
@@ -246,6 +272,11 @@ export function beginHunt(
 ): number {
   st.phase = 'hunt';
   st.huntLeft = T.huntSeconds;
+  // The tank he leaves for the hunt (his target until now, else his top
+  // threat): never the Prey while anyone else stands.
+  st.tankId = tankOf(ctx, z)?.id ?? null;
+  st.respite = [];
+  st.waiting = false;
   st.preyIds = [];
   st.chase = 0;
   st.switchTimer = T.twinSwitch;
@@ -298,6 +329,10 @@ function repaintChase(ctx: SimContext, st: ZulgarFightState): void {
 function maul(ctx: SimContext, z: Entity, st: ZulgarFightState, prey: Entity): void {
   st.mauled = true;
   st.feedTimer = T.maulPause;
+  // The respite: never his Prey again until the knockdown and a head start
+  // have run out.
+  st.respite = st.respite.filter((r) => r.id !== prey.id);
+  st.respite.push({ id: prey.id, left: T.preyRespite });
   st.plantedAt = { ...z.pos };
   dropAuraById(prey, ZULGAR_PREY);
   ctx.emit({
@@ -375,6 +410,8 @@ export function endHunt(
     if (p) dropAuraById(p, ZULGAR_PREY);
   }
   st.preyIds = [];
+  st.respite = [];
+  st.waiting = false;
   dropAuraById(z, ZULGAR_AVATAR);
   z.forcedTargetId = null;
   z.forcedTargetTimer = 0;
@@ -390,6 +427,37 @@ export function endHunt(
   if (tank) z.aggroTargetId = tank.id;
 }
 
+/** Count the Mauled respites down (a finished one frees that player). */
+function stepRespite(st: ZulgarFightState): void {
+  for (const r of st.respite) r.left -= DT;
+  st.respite = st.respite.filter((r) => r.left > 1e-9);
+}
+
+/** Nobody can be hunted yet, but a Mauled player's respite still runs (alone,
+ *  or everyone else marked or getting up): he roars over the kill once and
+ *  holds his ground until someone can be had. True while he waits; false
+ *  when the hunt has nobody left at all. */
+function waitOutRespite(ctx: SimContext, z: Entity, st: ZulgarFightState): boolean {
+  if (st.respite.length === 0) return false;
+  z.forcedTargetId = null;
+  z.forcedTargetTimer = 0;
+  z.aggroTargetId = null;
+  if (!st.plantedAt) st.plantedAt = { ...z.pos };
+  holdPlanted(ctx, z, st.plantedAt);
+  if (!st.waiting) {
+    st.waiting = true;
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: z.id,
+      targetId: z.id,
+      school: 'nature',
+      fx: 'nova',
+      ability: ZULGAR_AVATAR,
+    });
+  }
+  return true;
+}
+
 /** One tick of the hunt: switch, feed, chase, catch. */
 function stepHunt(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFightState): void {
   z.swingTimer = Math.max(z.swingTimer, 0.5);
@@ -398,6 +466,7 @@ function stepHunt(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFigh
     endHunt(ctx, inst, z, st);
     return;
   }
+  stepRespite(st);
   // A Prey who left the shrine terrace (or the run) is let go.
   const present = shrinePlayers(ctx, inst);
   for (let i = st.preyIds.length - 1; i >= 0; i--) {
@@ -407,10 +476,29 @@ function stepHunt(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFigh
     if (p) dropAuraById(p, ZULGAR_PREY);
     pickPrey(ctx, inst, z, st, i, null);
   }
-  if (st.preyIds.length === 0) {
-    endHunt(ctx, inst, z, st);
-    return;
+  if (st.feedTimer > 0) {
+    if (st.plantedAt) holdPlanted(ctx, z, st.plantedAt);
+    st.feedTimer -= DT;
+    if (st.feedTimer > 0) return;
+    // The fed-on Prey's slot takes a fresh one (never the one just Mauled).
+    const slot = Math.min(st.chase, st.preyIds.length);
+    pickPrey(ctx, inst, z, st, slot, st.preyIds[slot] ?? null);
+    repaintChase(ctx, st);
   }
+  if (st.preyIds.length === 0) {
+    // Nobody marked: a fresh Prey once one can be had, else he waits out the
+    // respite (or, with nobody left at all, the hunt ends).
+    pickPrey(ctx, inst, z, st, 0, null);
+    if (st.preyIds.length === 0) {
+      if (waitOutRespite(ctx, z, st)) return;
+      endHunt(ctx, inst, z, st);
+      return;
+    }
+    st.chase = 0;
+    repaintChase(ctx, st);
+  }
+  st.waiting = false;
+  st.plantedAt = null;
   if (st.preyIds.length > 1) {
     st.switchTimer -= DT;
     if (st.switchTimer <= 0) {
@@ -420,23 +508,13 @@ function stepHunt(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFigh
     }
   }
   st.chase = Math.min(st.chase, st.preyIds.length - 1);
-  if (st.feedTimer > 0) {
-    if (st.plantedAt) holdPlanted(ctx, z, st.plantedAt);
-    st.feedTimer -= DT;
-    if (st.feedTimer > 0) return;
-    st.plantedAt = null;
-    const slot = st.chase;
-    pickPrey(ctx, inst, z, st, slot, st.preyIds[slot] ?? null);
-    repaintChase(ctx, st);
-    if (st.preyIds.length === 0) {
-      endHunt(ctx, inst, z, st);
-      return;
-    }
-  }
   const prey = ctx.entities.get(st.preyIds[st.chase]);
   if (!prey) return;
   fixateOn(z, prey, st.huntLeft);
   if (ctx.isStunned(z)) return;
+  // Never a knockdown on a knockdown: a player still down, or in a respite,
+  // is never caught.
+  if (ctx.isStunned(prey) || st.respite.some((r) => r.id === prey.id)) return;
   const reach = combatProfileForMob(z.templateId, z.scale).meleeRange + T.catchReach;
   if (dist2d(z.pos, prey.pos) <= reach) maul(ctx, z, st, prey);
 }

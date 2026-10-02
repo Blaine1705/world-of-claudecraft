@@ -19974,7 +19974,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thorn_sprout.name': '茨の芽',
   'hudChrome.finder.mech.pack_bond': '群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）',
   'hudChrome.finder.mech.stalk':
-    '忍び狩り（ジャガーが印の者を狙う：引き回し、鈍足・拘束・スタンを）',
+    '忍び狩り（ジャガーが印の者を狙う。タンクは狙わず、ソロではあなたを狙う：引き回し、鈍足・拘束・スタンを）',
   'hudChrome.finder.mech.shared_health': '体力共有（共通の体力：最も安全な方を攻撃）',
   'hudChrome.finder.mech.heel_frenzied_bond':
     '戻れ！と狂乱の絆（ジャガーが主の元へ跳び、絆が20ヤードに広がる）',
@@ -19984,7 +19984,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.gorge': '貪り食い（タンクへの強烈な噛みつきと毒）',
   'hudChrome.finder.mech.burrowing_seeds':
     '潜る種と花粉の雲（種は6秒で誰かの傍から芽吹き、金色は広がる）',
-  'hudChrome.finder.mech.spirit_of_the_hunt': '狩りの魂（獲物は化身を光る太陽紋へ導く）',
+  'hudChrome.finder.mech.spirit_of_the_hunt':
+    '狩りの魂（獲物は化身を光る太陽紋へ導く。噛み倒された者には逃げる猶予がある）',
   'hudChrome.finder.mech.twin_prey_ambush':
     '双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）',
   'hudChrome.wildheartAlert.preyTitle': 'お前が獲物だ！',

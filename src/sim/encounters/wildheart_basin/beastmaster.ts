@@ -48,9 +48,11 @@ import {
   grantClaimDeed,
   holdPlanted,
   mechanicDamage,
-  pickMarkTargets,
+  pickHuntMark,
   placeAt,
+  runAlone,
   startBar,
+  tankOf,
 } from './claim';
 import {
   BEAST_CALL_OF_THE_HUNT,
@@ -85,6 +87,7 @@ function freshState(jaguar: Entity, pool: number, timers: boolean): BeastmasterF
     heelTimer: T.heelFirst + off,
     plantedAt: null,
     preyId: null,
+    waitAt: null,
     stalkTimer: timers ? T.stalkFirst : 0,
     biteTimer: T.biteEvery,
     heelFrom: null,
@@ -214,22 +217,42 @@ function stepBond(
   return bonded;
 }
 
-/** The pits' players (a margin past the rim): the jaguar never hunts
- *  anyone who left the pits. */
-function pitPlayers(ctx: SimContext, inst: InstanceSlot): Entity[] {
+/** The pits' players (a margin past the rim, or `extra` yards further): the
+ *  jaguar never hunts anyone who left the pits. */
+function pitPlayers(ctx: SimContext, inst: InstanceSlot, extra = 0): Entity[] {
   return arenaPlayers(
     ctx,
     inst,
     claimPlayers(ctx, inst),
     BEAST_PITS.x,
     BEAST_PITS.z,
-    BEAST_PITS.r + 12,
+    BEAST_PITS.r + 12 + extra,
   );
 }
 
+/** Whom the jaguar may stalk: the pits' players, NEVER the master's tank
+ *  while the run holds anyone else. With nobody but the tank in the pits it
+ *  looks further out (the rest standing back, within `stalkFarReach` more);
+ *  empty when nobody can be had (it waits). Alone, the lone player is all
+ *  there is: the jaguar stalks them. */
+export function stalkCandidates(ctx: SimContext, inst: InstanceSlot, bm: Entity): Entity[] {
+  const alone = runAlone(ctx, inst);
+  const tank = alone ? null : tankOf(ctx, bm);
+  const near = pitPlayers(ctx, inst).filter((p) => p.id !== tank?.id);
+  if (near.length > 0 || alone) return near;
+  return pitPlayers(ctx, inst, T.stalkFarReach).filter((p) => p.id !== tank?.id);
+}
+
+/** A group's tank stands within the jaguar's hunting reach of the pits. */
+function tankNearPits(ctx: SimContext, inst: InstanceSlot, bm: Entity): boolean {
+  if (runAlone(ctx, inst)) return false;
+  const tank = tankOf(ctx, bm);
+  return tank !== null && pitPlayers(ctx, inst, T.stalkFarReach).includes(tank);
+}
+
 /** Stalk: the jaguar marks a new prey (never the master's tank while anyone
- *  else stands, never the last prey while another can be had). Returns the
- *  prey, or null when nobody can be marked. */
+ *  else is in the run, never the last prey while another can be had).
+ *  Returns the prey, or null when nobody can be marked (it waits). */
 export function startStalk(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -240,12 +263,21 @@ export function startStalk(
   st.casts++;
   const old = st.preyId !== null ? ctx.entities.get(st.preyId) : undefined;
   if (old) dropAuraById(old, BEAST_STALKED);
-  const players = pitPlayers(ctx, inst);
-  const busy = new Set<number>(st.preyId !== null && players.length > 2 ? [st.preyId] : []);
-  const [prey] = pickMarkTargets(bm, players, 1, st.casts, busy);
+  const players = stalkCandidates(ctx, inst, bm);
+  const busy = new Set<number>(st.preyId !== null && players.length > 1 ? [st.preyId] : []);
+  const prey = pickHuntMark(bm, players, null, true, st.casts, busy);
   st.preyId = prey?.id ?? null;
   st.stalkTimer = T.stalkSeconds;
-  if (!prey) return null;
+  if (!prey) {
+    // Nobody to hunt: it lets the last prey go and holds where it stands.
+    if (old && jaguar.forcedTargetId === old.id) {
+      jaguar.forcedTargetId = null;
+      jaguar.forcedTargetTimer = 0;
+    }
+    if (st.waitAt === null) st.waitAt = { ...jaguar.pos };
+    return null;
+  }
+  st.waitAt = null;
   ctx.applyAura(prey, {
     id: BEAST_STALKED,
     name: 'Stalked',
@@ -323,11 +355,20 @@ function stepStalk(
   if (jaguar.castingAbility === BEAST_HEEL) return;
   st.stalkTimer -= DT;
   const prey = st.preyId !== null ? ctx.entities.get(st.preyId) : undefined;
-  const present = prey && !prey.dead && pitPlayers(ctx, inst).includes(prey);
+  const present = prey && !prey.dead && stalkCandidates(ctx, inst, bm).includes(prey);
   if (!present || st.stalkTimer <= 0) {
-    startStalk(ctx, inst, bm, jaguar, st);
+    if (startStalk(ctx, inst, bm, jaguar, st)) return;
+    // Nobody it may hunt but the tank near the pits (a group): it holds its
+    // ground, never turning on the tank, and looks again next tick (its own
+    // swings are held above). With nobody near the pits at all (a chain pull
+    // from afar) its own pursuit stands.
+    if (tankNearPits(ctx, inst, bm)) {
+      if (st.waitAt) holdPlanted(ctx, jaguar, st.waitAt);
+      jaguar.aggroTargetId = null;
+    }
     return;
   }
+  if (!prey) return;
   // Hold the fixate against a taunt (the jaguar ignores them) or a blip.
   jaguar.forcedTargetId = prey.id;
   jaguar.forcedTargetTimer = Math.max(st.stalkTimer, DT * 2);
