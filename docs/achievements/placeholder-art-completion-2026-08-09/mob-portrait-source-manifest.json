@@ -11440,13 +11440,13 @@
         "model": {
           "url": "models/creatures/vael_reaper.glb",
           "path": "public/models/creatures/vael_reaper.glb",
-          "bytes": 1404664,
-          "sha256": "6d3e08f6971e185f6a325d4cdd4c0d4c1a8cfac149869315b5ac23d54e09a8ae"
+          "bytes": 1493140,
+          "sha256": "5a812ab51594d09840f56e66881184f29b159e4832ea01c46e1e6de364a0c8f1"
         },
         "idle": "Idle",
-        "height": 8.36,
+        "height": 9.21,
         "yaw": null,
-        "hover": 0.355,
+        "hover": 0.406,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -11458,11 +11458,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7afb91da510f45f0e09b5ceb363f3865428e4d85bc5470dcaf8e27c8ab7238d6",
+      "sourceFingerprint": "daf5605cb2c69d581495c6d461e1295860db335adf157147bf4347f30708bfe0",
       "output": {
         "path": "public/ui/mobs/vael_fog_shade.webp",
-        "bytes": 1798,
-        "sha256": "f26f8f33559e21356c14d3f8c2287b7908888867cb7e9ace2ef1d134b85d11a1"
+        "bytes": 1740,
+        "sha256": "67be3fe9266648f9b145d250b01582e05e1982677dbe23828382d52c2be4c191"
       }
     },
     {
@@ -11474,13 +11474,13 @@
         "model": {
           "url": "models/creatures/vael_reaper.glb",
           "path": "public/models/creatures/vael_reaper.glb",
-          "bytes": 1404664,
-          "sha256": "6d3e08f6971e185f6a325d4cdd4c0d4c1a8cfac149869315b5ac23d54e09a8ae"
+          "bytes": 1493140,
+          "sha256": "5a812ab51594d09840f56e66881184f29b159e4832ea01c46e1e6de364a0c8f1"
         },
         "idle": "Idle",
-        "height": 8.36,
+        "height": 9.21,
         "yaw": null,
-        "hover": 0.355,
+        "hover": 0.406,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -11492,11 +11492,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7afb91da510f45f0e09b5ceb363f3865428e4d85bc5470dcaf8e27c8ab7238d6",
+      "sourceFingerprint": "daf5605cb2c69d581495c6d461e1295860db335adf157147bf4347f30708bfe0",
       "output": {
         "path": "public/ui/mobs/vael_the_mistcaller.webp",
-        "bytes": 1798,
-        "sha256": "f26f8f33559e21356c14d3f8c2287b7908888867cb7e9ace2ef1d134b85d11a1"
+        "bytes": 1740,
+        "sha256": "67be3fe9266648f9b145d250b01582e05e1982677dbe23828382d52c2be4c191"
       }
     },
     {

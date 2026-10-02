@@ -501,7 +501,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/tribal.glb": "/media/models/creatures/tribal.36f1f0f698db.glb",
   "models/creatures/troll_ability_anims.glb": "/media/models/creatures/troll_ability_anims.95293af97655.glb",
   "models/creatures/turretback_hermit.glb": "/media/models/creatures/turretback_hermit.e632515b16b3.glb",
-  "models/creatures/vael_reaper.glb": "/media/models/creatures/vael_reaper.6d3e08f6971e.glb",
+  "models/creatures/vael_reaper.glb": "/media/models/creatures/vael_reaper.5a812ab51594.glb",
   "models/creatures/varkhul_forgefather.glb": "/media/models/creatures/varkhul_forgefather.cfaa7b2c5d25.glb",
   "models/creatures/veiled_doe.glb": "/media/models/creatures/veiled_doe.ee0dd9450b96.glb",
   "models/creatures/veiled_stag.glb": "/media/models/creatures/veiled_stag.4854cf2afd69.glb",

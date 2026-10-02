@@ -4214,15 +4214,18 @@ export const VISUALS: Record<string, VisualDef> = {
   // veil hides him among them; only the Fogbeacon's beam tells them apart):
   // the hooded skeletal reaper built in Blender (scripts/assets/
   // sunken_bastion_creatures/reaper.py), a great scythe in hand, soul fire in
-  // his sockets, ribs and lantern, hovering a hand over the flags. Authored at
-  // size (8.4 with the raised scythe; the hood's peak about 6.5), drawn at the
+  // his sockets, ribs and lantern, hovering a hand over the flags. The scythe
+  // is modelled in his right fist and never turns against it (the arms and
+  // body swing it; tests/vael_reaper.test.ts). Authored at size (`height` and
+  // `hover` are the build's IDLE_HEIGHT and MINZ half a second into Idle, the
+  // upright scythe's blade on top; the hood's peak about 6.5), drawn at the
   // template's 1.35. The Shadow Crossing's bar sinks him through the floor
   // (Vanish) and rises him out of the pool (Emerge); the sweep off the pool is
   // his flourish, fired by the Reaping Scythe's cue.
   bastion_vael: {
     url: `${CREATURES}/vael_reaper.glb`,
-    height: 8.36,
-    hover: 0.355,
+    height: 9.21,
+    hover: 0.406,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
