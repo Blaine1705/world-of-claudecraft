@@ -79,7 +79,7 @@ function paused(mob: Entity): boolean {
  *  Saurian down or walking home) a rider that is not fighting climbs away
  *  rather than idling in the ford, where a later Zulgar pull would chain it. */
 function sweepIdleRider(ctx: SimContext, inst: InstanceSlot, saurian: Entity | null): void {
-  if (saurian && !saurian.dead && bossEngaged(saurian)) return;
+  if (saurian && !saurian.dead && (bossEngaged(saurian) || paused(saurian))) return;
   for (const id of [...inst.mobIds]) {
     const e = ctx.entities.get(id);
     if (!e || e.templateId !== HOWDAH_HEXCALLER_ID || e.dead) continue;

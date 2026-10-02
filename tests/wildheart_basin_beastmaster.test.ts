@@ -291,3 +291,47 @@ describe('Divide and Conquer, and the reset', () => {
     expect(jag.forcedTargetId).toBeNull();
   });
 });
+
+describe('the review edges: evade, a blind, a prey who leaves the pits', () => {
+  it('one body walking home ends the pull for both, and never refills the pool mid-fight', () => {
+    const f = fight();
+    const { bm, jag } = pull(f);
+    run(f, 4);
+    f.sim.ctx.dealDamage(f.others[1], jag, 3000, false, 'frost', 'Test', 'hit', true);
+    tick(f);
+    const hurt = bm.hp;
+    expect(hurt).toBeLessThan(bm.maxHp);
+    // The master loses his tank and turns for home while the jaguar still hunts.
+    bm.inCombat = false;
+    bm.aggroTargetId = null;
+    bm.aiState = 'evade';
+    tick(f);
+    expect(bm.wildheartFight).toBeUndefined();
+    expect(jag.wildheartFight).toBeUndefined();
+    expect(jag.aiState).toBe('evade');
+    expect(jag.forcedTargetId).toBeNull();
+    for (const p of f.others) expect(aura(p, BEAST_STALKED)).toBeUndefined();
+  });
+
+  it('a blind is a miss chance, never the stun window', () => {
+    const f = fight();
+    const { jag } = pull(f);
+    f.sim.ctx.applyAura(jag, control('blind', 'test_blind', f.others[0]));
+    tick(f);
+    expect(aura(jag, BEAST_WARY_STUN)).toBeUndefined();
+    f.sim.ctx.applyAura(jag, control('stun', 'test_stun', f.others[0]));
+    expect(aura(jag, 'test_stun')).toBeDefined();
+  });
+
+  it('a prey who leaves the pits is let go for one still in them', () => {
+    const f = fight();
+    pull(f);
+    expect(until(f, () => f.others.some((p) => aura(p, BEAST_STALKED)), 4)).toBe(true);
+    const prey = f.others.find((p) => aura(p, BEAST_STALKED)) as Entity;
+    put(f, prey, 0, 120);
+    run(f, 0.3);
+    const next = f.others.find((p) => aura(p, BEAST_STALKED));
+    expect(next).toBeDefined();
+    expect(next?.id).not.toBe(prey.id);
+  });
+});

@@ -596,7 +596,8 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 16,
     moveSpeed: 7,
     aggroRadius: 14,
-    xpMult: 0.3,
+    // No kill XP: a missed seed must never be a farm.
+    xpMult: 0,
     componentTags: ['bark'],
     loot: [],
     scale: 1.5,

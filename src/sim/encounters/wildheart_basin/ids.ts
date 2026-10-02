@@ -169,14 +169,9 @@ export const BEAST_TUNING = {
 export function controlGroupOf(kind: string): 'stun' | 'root' | 'slow' | null {
   if (kind === 'root') return 'root';
   if (kind === 'slow') return 'slow';
-  if (
-    kind === 'stun' ||
-    kind === 'incapacitate' ||
-    kind === 'polymorph' ||
-    kind === 'blind' ||
-    kind === 'stasis'
-  )
-    return 'stun';
+  // Every hard control shares the stun window; a blind (a miss chance) is
+  // not a control and is never counted.
+  if (kind === 'stun' || kind === 'incapacitate' || kind === 'polymorph') return 'stun';
   return null;
 }
 

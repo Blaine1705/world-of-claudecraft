@@ -66,6 +66,7 @@ import {
   BEASTMASTER_DEED,
   BEASTMASTER_LINES,
   bondReachFor,
+  controlGroupOf,
   BEAST_TUNING as T,
 } from './ids';
 
@@ -213,11 +214,17 @@ function stepBond(
   return bonded;
 }
 
-/** The pits' players (a margin past the rim), else the whole claim's. */
+/** The pits' players (a margin past the rim): the jaguar never hunts
+ *  anyone who left the pits. */
 function pitPlayers(ctx: SimContext, inst: InstanceSlot): Entity[] {
-  const all = claimPlayers(ctx, inst);
-  const pit = arenaPlayers(ctx, inst, all, BEAST_PITS.x, BEAST_PITS.z, BEAST_PITS.r + 12);
-  return pit.length > 0 ? pit : all;
+  return arenaPlayers(
+    ctx,
+    inst,
+    claimPlayers(ctx, inst),
+    BEAST_PITS.x,
+    BEAST_PITS.z,
+    BEAST_PITS.r + 12,
+  );
 }
 
 /** Stalk: the jaguar marks a new prey (never the master's tank while anyone
@@ -316,7 +323,7 @@ function stepStalk(
   if (jaguar.castingAbility === BEAST_HEEL) return;
   st.stalkTimer -= DT;
   const prey = st.preyId !== null ? ctx.entities.get(st.preyId) : undefined;
-  const present = prey && !prey.dead && claimPlayers(ctx, inst).includes(prey);
+  const present = prey && !prey.dead && pitPlayers(ctx, inst).includes(prey);
   if (!present || st.stalkTimer <= 0) {
     startStalk(ctx, inst, bm, jaguar, st);
     return;
@@ -334,9 +341,17 @@ function stepStalk(
   bite(ctx, jaguar, prey);
 }
 
-/** Tick the jaguar's control windows and show them as its Wary auras. */
+/** Tick the jaguar's control windows and show them as its Wary auras. A
+ *  window opens on the first control of its kind seen ON the jaguar (so a
+ *  control another guard refused never spends it); while it is open the aura
+ *  gate (control_gate.ts) turns that kind away. */
 function stepWindows(ctx: SimContext, jaguar: Entity): void {
   const js = jaguarState(jaguar);
+  for (const a of jaguar.auras) {
+    if (a.sourceId === jaguar.id) continue;
+    const g = controlGroupOf(a.kind);
+    if (g && js.windows[g] <= 0) js.windows[g] = T.controlWindow + DT;
+  }
   for (const g of GROUPS) {
     const left = Math.max(0, js.windows[g] - DT);
     js.windows[g] = left;
@@ -557,8 +572,19 @@ export function tickBeastmaster(
     return;
   }
   if (!jaguar) return;
-  if (!engaged) {
-    if (live) endBeastFight(ctx, bm, jaguar);
+  // One pool: a body walking home ends the pair's pull for both (its reset
+  // to full must never refill the pool while the other still fights).
+  const homeward = bm.aiState === 'evade' || jaguar.aiState === 'evade';
+  if (!engaged || (live && homeward)) {
+    if (live) {
+      endBeastFight(ctx, bm, jaguar);
+      for (const e of [bm, jaguar]) {
+        if (e.aiState === 'evade') continue;
+        e.inCombat = false;
+        e.aggroTargetId = null;
+        e.aiState = 'evade';
+      }
+    }
     return;
   }
   const st = beastState(ctx, bm, jaguar);

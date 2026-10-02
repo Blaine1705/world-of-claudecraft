@@ -1187,7 +1187,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // stripping the seven must reproduce it exactly.
   //
   // The Wildheart Basin rework appends its four encounter deeds after
-  // dgn_gantry_hauler; the previous mint is the bfd70a94... literal (rotated
+  // dgn_gantry_hauler; the previous mint is the f9683290... literal (rotated
   // down here), and stripping the four must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
     'f9683290fea6c905762175552250903470648d0efc76a5b64c78560a8368a4db';

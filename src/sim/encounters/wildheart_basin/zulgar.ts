@@ -398,7 +398,8 @@ function stepHunt(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFigh
     endHunt(ctx, inst, z, st);
     return;
   }
-  const present = claimPlayers(ctx, inst);
+  // A Prey who left the shrine terrace (or the run) is let go.
+  const present = shrinePlayers(ctx, inst);
   for (let i = st.preyIds.length - 1; i >= 0; i--) {
     const p = ctx.entities.get(st.preyIds[i]);
     if (p && !p.dead && present.includes(p)) continue;
