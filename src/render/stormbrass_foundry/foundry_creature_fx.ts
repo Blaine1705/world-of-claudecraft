@@ -40,10 +40,15 @@ import { MAIN_LINE_BELTS } from '../../sim/content/stormbrass_foundry_layout';
 import {
   DRAFT_ARC_BACK,
   DRAFT_ARC_SURGE,
+  DRAFT_BOLTED,
   DRAFT_CELL_CARRY,
   DRAFT_CHARGE_CYCLE,
+  DRAFT_ENRAGE,
   DRAFT_OVERLOAD,
+  DRAFT_PISTON_FIST,
   DRAFT_SHORT_OUT,
+  DRAFT_TUNING,
+  DRAFT_UNBOLT,
   FOUNDRY_SCRAP_MARK,
   FOUNDRY_SHELL_MARK,
   FRAME_BOOTING,
@@ -54,6 +59,7 @@ import {
   HAULER_STEAM_BLAST,
   HAULER_TUNING,
   HAULER_UNLOAD,
+  hatchStateOf,
   PRIME_DRAFT_ID,
   RANGE_DRILL_DRONES,
   RANGE_PROOF_SHOT,
@@ -105,8 +111,11 @@ import {
   tockGaugeLevel,
   VOLTAIC_PLATE_RATTLE,
   voltaicFaces,
+  voltaicFlipped,
   voltaicPlateGesture,
 } from './foundry_creature_fx_core';
+import { FoundryDraftTether } from './foundry_draft_tether';
+import { storedChargeFill, storedChargeGlow } from './foundry_fx_core';
 import { FOUNDRY_PRESS_HAMMERS } from './foundry_press';
 import {
   beginPressStrike,
@@ -119,7 +128,9 @@ import {
   pressPoseInto,
   syncPressStrike,
 } from './foundry_press_core';
-import { storedChargeFill, storedChargeGlow } from './foundry_fx_core';
+import { DraftGestures } from './prime_draft_gesture_core';
+import { PRIME_DRAFT_MODEL, primeDraftModelScale } from './prime_draft_model_core';
+import { voltaicFlipTurned } from './voltaic_model_core';
 
 type Rgb = readonly [number, number, number];
 
@@ -241,6 +252,11 @@ interface Watch {
 
 type V3 = { x: number; y: number; z: number };
 
+/** The Voltaic Warden's drone bay doors (the drones leave from both). */
+const WARDEN_BAYS = [A.wardenBayL, A.wardenBayR] as const;
+/** The Prime Draft's feet (the bolts shear off both). */
+const DRAFT_FEET = [A.draftFootL, A.draftFootR] as const;
+
 export class FoundryCreatureFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -249,6 +265,14 @@ export class FoundryCreatureFx {
   private readonly smoke: ParticlePool;
   private readonly glow: ParticlePool;
   private readonly arcs = new FoundryArcs(ARC_SLOTS);
+  /** The Prime Draft's cable terminal (its cables' far ends) and each
+   *  Draft's presentation gestures (the moorings, the hatch, the stance). */
+  private readonly tether: FoundryDraftTether;
+  private readonly draftGestures = new Map<number, DraftGestures>();
+  private readonly sendTo = { id: -1 };
+  private readonly sendGesture = (g: string): void => {
+    this.playGesture?.(this.sendTo.id, g);
+  };
   private readonly rings: Ring[] = [];
   private readonly shells: Flyer[] = [];
   private readonly plates: Flyer[] = [];
@@ -346,6 +370,7 @@ export class FoundryCreatureFx {
       this.root.add(pool.mesh);
     }
     this.root.add(this.arcs.root);
+    this.tether = new FoundryDraftTether(this.root);
     const ringGeo = new THREE.CircleGeometry(1, 64);
     ringGeo.rotateX(-Math.PI / 2);
     this.geometries.push(ringGeo);
@@ -606,6 +631,9 @@ export class FoundryCreatureFx {
       if (ab === RANGE_SALVO && src && ev.targetId !== undefined)
         this.launchShell(src, ev.targetId);
       else if (ab === HAULER_SCRAP_TOSS && src) this.scrapToss(src);
+      // The Prime Draft raises its brass fist as the mark paints: the Slam
+      // clip's fist meets the floor as the warning ends.
+      else if (ab === DRAFT_PISTON_FIST && src) this.gesture(src, DRAFT_PISTON_FIST);
       return;
     }
     if (ev.fx !== 'nova') return;
@@ -640,15 +668,31 @@ export class FoundryCreatureFx {
       case VOLTAIC_DRONES:
         if (src) {
           this.gesture(src, VOLTAIC_DRONES);
-          const c = this.chest(src, this.p);
-          this.sparks(c.x, c.y, c.z, 30, 8, RGB_2);
+          // Out of the two bay doors on its back housing, arcing off the coil.
+          const c = this.chest(src, this.q);
+          for (const bay of WARDEN_BAYS) {
+            const b = this.at(src, bay, this.p);
+            this.sparks(b.x, b.y, b.z, 18, 8, RGB_2);
+            this.flash(b.x, b.y, b.z, 2.4, RGB_2, 0.2);
+            this.arcs.strike(this.clock, c, b, 0.3, ARC_BLUE, 0.16, 0.3);
+          }
         }
         return;
       case VOLTAIC_COIL_STRIKE:
         this.coilStrike(tgt);
         return;
       case DRAFT_OVERLOAD:
-        if (src) this.overloadStrikes(src, tgt);
+        if (src) {
+          // The seizure (its Overload clip) and its lightning flaring.
+          this.gesture(src, DRAFT_OVERLOAD);
+          this.overloadStrikes(src, tgt);
+        }
+        return;
+      case DRAFT_PISTON_FIST:
+        if (src) this.fistLands(src, tgt);
+        return;
+      case DRAFT_UNBOLT:
+        if (src) this.boltsShear(src);
         return;
       case DRAFT_ARC_BACK:
       case DRAFT_SHORT_OUT:
@@ -951,6 +995,36 @@ export class FoundryCreatureFx {
     this.shakeAt(x, z, 0.3);
   }
 
+  /** The brass fist meets the floor: dust and sparks where the model's fist
+   *  struck, a heavier burst on the mark it was aimed at. */
+  private fistLands(draft: Entity, mark: Entity | undefined): void {
+    const f = this.at(draft, A.draftFist, this.p);
+    this.sparks(f.x, f.y, f.z, 26, 9, RGB_13);
+    this.steam(f.x, f.y, f.z, 10, 1.6);
+    if (mark) {
+      const y = this.groundY(mark.pos.x, mark.pos.z);
+      this.sparks(mark.pos.x, y + 0.3, mark.pos.z, 30, 10, RGB_13);
+    }
+    this.shakeAt(draft.pos.x, draft.pos.z, 0.45);
+  }
+
+  /** It tears free: rivets and sparks off both feet, arcs snapping from the
+   *  cable sockets in its back as the cables rip out. */
+  private boltsShear(draft: Entity): void {
+    for (const foot of DRAFT_FEET) {
+      const f = this.at(draft, foot, this.p);
+      this.sparks(f.x, f.y, f.z, 34, 11, RGB_13);
+      this.steam(f.x, f.y, f.z, 6, 1.2);
+    }
+    const c = this.chest(draft, this.q);
+    for (const plug of [A.draftPlugL, A.draftPlugR]) {
+      const p = this.at(draft, plug, this.p);
+      this.arcs.strike(this.clock, c, p, 0.4, ARC_WHITE, 0.24, 0.3);
+      this.sparks(p.x, p.y, p.z, 20, 9, RGB_17);
+    }
+    this.shakeAt(draft.pos.x, draft.pos.z, 0.5);
+  }
+
   private overloadStrikes(draft: Entity, hatch: Entity | undefined): void {
     const c = this.chest(draft, this.p);
     if (hatch) {
@@ -1058,6 +1132,7 @@ export class FoundryCreatureFx {
     const tick = this.emitAcc >= 0.08;
     if (tick) this.emitAcc = 0;
     for (const b of this.bosses) this.bossFrame(b, tick);
+    this.paintTether();
     if (tick) this.cellsFrame();
     this.paintFlyers();
     this.paintHammers(tick);
@@ -1116,6 +1191,8 @@ export class FoundryCreatureFx {
     }
     for (const id of this.seenObjects) if (!this.live.has(id)) this.seenObjects.delete(id);
     for (const id of this.watch.keys()) if (!world.entities.has(id)) this.watch.delete(id);
+    for (const id of this.draftGestures.keys())
+      if (!world.entities.has(id)) this.draftGestures.delete(id);
     for (const id of this.lockStruck.keys())
       if (!world.entities.has(id)) this.lockStruck.delete(id);
     this.belts.sort((p, q) => p.pos.x - q.pos.x);
@@ -1205,8 +1282,40 @@ export class FoundryCreatureFx {
     if (best) this.launchPlate(best, mark);
   }
 
+  /** The Prime Draft's gestures (prime_draft_gesture_core.ts): its moorings,
+   *  its hatch leaves, its stance and its overdrive beat, off mirrored state. */
+  private draftGesturesFor(e: Entity): DraftGestures {
+    let g = this.draftGestures.get(e.id);
+    if (!g) {
+      g = new DraftGestures();
+      this.draftGestures.set(e.id, g);
+    }
+    let ring: 'closed' | 'warn' | 'open' | null = null;
+    for (const h of this.hatches) ring = hatchStateOf(h.templateId) ?? ring;
+    this.sendTo.id = e.id;
+    g.step(
+      {
+        dead: e.dead,
+        bolted: hasAura(e, DRAFT_BOLTED),
+        inFight: e.inCombat,
+        unbolting: e.castingAbility === DRAFT_UNBOLT,
+        ring,
+        overloaded: hasAura(e, DRAFT_OVERLOAD),
+        overdrive: hasAura(e, DRAFT_ENRAGE),
+      },
+      this.clock,
+      DRAFT_TUNING.hatchWarning,
+      this.sendGesture,
+    );
+    return g;
+  }
+
   private bossGestures(e: Entity): void {
     const w = this.watchOf(e);
+    if (e.templateId === PRIME_DRAFT_ID) {
+      this.draftGesturesFor(e);
+      return;
+    }
     if (e.dead) return;
     if (e.templateId === TOCK_ID) {
       const aura = e.auras?.find((a) => a.id === TOCK_PRESSURE);
@@ -1217,7 +1326,16 @@ export class FoundryCreatureFx {
         this.gesture(e, tockGaugeGesture(level));
       }
     } else if (e.templateId === VOLTAIC_WARDEN_ID) {
-      const faces = voltaicFaces(e.auras, VOLTAIC_GROUNDED, VOLTAIC_CHARGED);
+      let faces = voltaicFaces(e.auras, VOLTAIC_GROUNDED, VOLTAIC_CHARGED);
+      // Mid flip, once the clip has pushed the plates out on their mounts,
+      // they turn to the face the flip will leave them on (the aura follows
+      // as the bar ends); a flip cut short turns them back.
+      if (
+        faces &&
+        e.castingAbility === VOLTAIC_FLIP &&
+        voltaicFlipTurned((e.castTotal ?? 0) - (e.castRemaining ?? 0))
+      )
+        faces = voltaicFlipped(faces);
       const g = faces
         ? voltaicPlateGesture(faces.front, faces.back)
         : voltaicPlateGesture('grounded', 'grounded');
@@ -1313,7 +1431,16 @@ export class FoundryCreatureFx {
         const tint = charged ? RGB_2 : RGB_23;
         if (this.rand() < g.arcChance + (flipping ? 0.6 : 0)) {
           const c = this.at(e, A.wardenCore, this.p);
-          const tip = this.at(e, this.rand() < 0.5 ? A.wardenAntlerL : A.wardenAntlerR, this.q);
+          // Off the coil to the crown's toroid, or its spire while it flips.
+          const tip = this.at(
+            e,
+            flipping && this.rand() < 0.4
+              ? A.wardenCrownTip
+              : this.rand() < 0.5
+                ? A.wardenAntlerL
+                : A.wardenAntlerR,
+            this.q,
+          );
           this.arcs.strike(this.clock, c, tip, 0.18, hue, g.width, 0.25);
         }
         // The bank on its body: a core light that swells, and arcs leaping
@@ -1352,7 +1479,7 @@ export class FoundryCreatureFx {
         if (hasAura(e, DRAFT_OVERLOAD)) {
           // the lightning cascade crawling over the colossus while it seizes
           const c = this.chest(e, this.p);
-          const h = (8.5 * (e.scale || 1)) / 2.6;
+          const h = PRIME_DRAFT_MODEL.core.up * 1.25 * primeDraftModelScale(e.scale || 1);
           for (let k = 0; k < 2; k++) {
             const a = this.rand() * Math.PI * 2;
             this.q.x = e.pos.x + Math.sin(a) * 2.4 * (e.scale || 1) * 0.6;
@@ -1472,6 +1599,18 @@ export class FoundryCreatureFx {
     }
   }
 
+  /** The Prime Draft's cable terminal follows its cables' far ends. */
+  private paintTether(): void {
+    let draft: Entity | null = null;
+    for (const b of this.bosses)
+      if (b.templateId === PRIME_DRAFT_ID && !b.dead) {
+        draft = b;
+        break;
+      }
+    const moored = draft ? (this.draftGestures.get(draft.id)?.moored ?? true) : false;
+    this.tether.update(draft, moored, draft?.inCombat ?? false);
+  }
+
   private paintFlyers(): void {
     for (const s of this.shells) this.paintFlyer(s, true);
     for (const s of this.plates) this.paintFlyer(s, false);
@@ -1544,6 +1683,7 @@ export class FoundryCreatureFx {
     this.smoke.dispose();
     this.glow.dispose();
     this.arcs.dispose();
+    this.tether.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }

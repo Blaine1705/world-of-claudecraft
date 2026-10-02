@@ -1034,21 +1034,26 @@ export function planSteamMains(): FoundryKitPlacement[] {
 
 // ---- the Prime Draft landmark ------------------------------------------------------------
 
-/** Drawn at all? One switch for the integrator: the fighting model may take
- *  the landmark's place (the colossus stepping down into the fight). */
-export const FOUNDRY_PRIME_DRAFT_LANDMARK_SHOWN = true;
+/** Is the kit's colossus (a model frame at six times its size) hung in the
+ *  cradle? OFF since the Prime Draft has its own Blender body
+ *  (prime_draft_model_core.ts): there is ONE Prime Draft, the 11.5 yd fighter
+ *  standing cabled to its scaffold on the Gantry, and a 42 yd kit automaton of
+ *  another make behind it read as a second, different machine. The cradle it
+ *  was built in (the pier, the two scaffold towers, the bays) stays as the
+ *  route's landmark silhouette with the 34 yd gantry scaffold. One switch: turn
+ *  it on to hang the kit colossus again. */
+export const FOUNDRY_PRIME_DRAFT_LANDMARK_SHOWN = false;
 
-/** The Prime Draft landmark beyond the Gantry's north lip: a colossal
- *  half-built automaton hung in its assembly frame (the kit's model frame at
- *  six times the size), on a pier out of the drop, two scaffold towers
- *  either side with their clamp arms reaching in, scaffold bays at its feet. */
+/** The Prime Draft's assembly cradle beyond the Gantry's north lip: a pier
+ *  out of the drop, two scaffold towers either side with their clamp arms
+ *  reaching in, scaffold bays at their feet; and, behind the switch above, the
+ *  kit's colossus hung in it (the model frame at six times the size). */
 export function planPrimeDraftLandmark(at: {
   x: number;
   y: number;
   z: number;
   height: number;
 }): FoundryKitPlacement[] {
-  if (!FOUNDRY_PRIME_DRAFT_LANDMARK_SHOWN) return [];
   const scale = at.height / FOUNDRY_KIT_SIZES.modelFrameHeight;
   // A yard and a half back, so the frame's front clears the Gantry's rim.
   const z = at.z + 1.5;
@@ -1062,9 +1067,10 @@ export function planPrimeDraftLandmark(at: {
       scale: pier,
       y: at.y - FOUNDRY_KIT_SIZES.pierHeight * pier,
     },
-    // Turned to face south, down the route the party climbs.
-    { piece: 'Kit_ModelFrame', x: at.x, z, rot: Math.PI, scale, y: at.y },
   ];
+  // Turned to face south, down the route the party climbs.
+  if (FOUNDRY_PRIME_DRAFT_LANDMARK_SHOWN)
+    out.push({ piece: 'Kit_ModelFrame', x: at.x, z, rot: Math.PI, scale, y: at.y });
   for (const side of [-1, 1]) {
     out.push({
       piece: 'Kit_DraftScaffoldTower',

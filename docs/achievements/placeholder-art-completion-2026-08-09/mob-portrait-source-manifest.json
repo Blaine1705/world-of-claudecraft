@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "6a8c19821e2aa9769f24b2c72fe857b3cce3be0fde9bd9e1ffe68ef256ba94e4",
+  "rendererFingerprint": "2c7f236fc680f996746f931217f56646a4af4d7976cdfa23e075f8f334088a39",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5485901,
-      "sha256": "3b42cff400ac449e5dfd1d8caac4c58fdc2664599f9983cdcc916e6fe26a7c42",
+      "bytes": 5500315,
+      "sha256": "4ce917cf24eced6842d963a6fb38316c17f4ed3b7b708d341b282f40dbd6c56e",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 347,
+  "portraitCount": 350,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -7395,36 +7395,31 @@
       "visualKey": "foundry_prime_draft",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_golem.glb",
-          "path": "public/models/chars/enemies/skeleton_golem.glb",
-          "bytes": 292776,
-          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+          "url": "models/creatures/foundry_prime_draft.glb",
+          "path": "public/models/creatures/foundry_prime_draft.glb",
+          "bytes": 3682664,
+          "sha256": "a76213b3b5a95a85761736f41b4d970efa1de2ccbf3432045fedaee0f6d90089"
         },
         "idle": "Idle",
-        "height": 3.4,
+        "height": 4.454153846153846,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
-        "weaponFix": [
-          {
-            "node": "Skeleton_Golem_Axe",
-            "rotY": 3.141592653589793
-          }
-        ],
-        "tintStrength": 0.9
+        "weaponFix": null,
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#c9a14a",
-        "resolved": "#c9a14a",
-        "strength": 0.9
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "bc41a846f2614750b1b6f11a15ba5410d2990fa2f590c531509821d0e96c69f5",
+      "sourceFingerprint": "eec567eebf018af342bb67a3cdfcad136c4a2aa088ec892444f918ca6be440d4",
       "output": {
         "path": "public/ui/mobs/prime_draft.webp",
-        "bytes": 2762,
-        "sha256": "b1ced23164974dee78bf6c000be2761102291d3b5dc58daf559e006f3f7d59fb"
+        "bytes": 3284,
+        "sha256": "92e492cdd257ca2cc4e16eefd4df8a961274348ffdefd578818bb51c2fd61da7"
       }
     },
     {
@@ -9258,6 +9253,134 @@
         "path": "public/ui/mobs/sexton_marrow.webp",
         "bytes": 2224,
         "sha256": "15b604cb9281e7bc5bf604db51abef6188afde8887fa848185a878c8eb35adb8"
+      }
+    },
+    {
+      "id": "sf_chained_hauler",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "foundry_worker_hauler",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue.glb",
+          "path": "public/models/chars/players/rogue.glb",
+          "bytes": 477976,
+          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/tools/bucket_metal.glb",
+              "path": "public/models/tools/bucket_metal.glb",
+              "bytes": 39300,
+              "sha256": "845aea08520615cfe4cdcbbedf1a021ced14f2960086a1db1c30eb79042dfed7"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.85
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7d7466",
+        "strength": 0.85
+      },
+      "sourceFingerprint": "ccaec5eab6934e22f5664a142300b4bcbedd681ec28a10fc422f0a3a19b191b3",
+      "output": {
+        "path": "public/ui/mobs/sf_chained_hauler.webp",
+        "bytes": 2050,
+        "sha256": "bd475bd1a42ca269ea84d50034db5ae743daafa6de88460b0ed782c57c285c94"
+      }
+    },
+    {
+      "id": "sf_chained_miner",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "foundry_worker_miner",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue.glb",
+          "path": "public/models/chars/players/rogue.glb",
+          "bytes": 477976,
+          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+        },
+        "idle": "2H_Melee_Attack_Chop",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/hammer_d.glb",
+              "path": "public/models/weapons/hammer_d.glb",
+              "bytes": 99344,
+              "sha256": "6d3cf3ededad8f6741b94930110934c52798ab9c31ab2c2e32ac9a8087943dab"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.85
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8a7a62",
+        "strength": 0.85
+      },
+      "sourceFingerprint": "000c3719865b2982f21a86b307fd1f074ead1e8904d7fc2977165ccaca82cdf1",
+      "output": {
+        "path": "public/ui/mobs/sf_chained_miner.webp",
+        "bytes": 2942,
+        "sha256": "aa086175f8a6e4c22e649dc67d8ccf3eeeba7b44c7773fbabebf9a3c416f89c6"
+      }
+    },
+    {
+      "id": "sf_freed_laborer",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "foundry_worker_freed",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue.glb",
+          "path": "public/models/chars/players/rogue.glb",
+          "bytes": 477976,
+          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+        },
+        "idle": "Cheer",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": [],
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.85
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9a8a6a",
+        "strength": 0.85
+      },
+      "sourceFingerprint": "39537f666a041cdb779035328bf49921554c3935bf4716d987498e2721551f06",
+      "output": {
+        "path": "public/ui/mobs/sf_freed_laborer.webp",
+        "bytes": 2578,
+        "sha256": "9c0982ba4c731572dcdc3d90543e3ffe654e039e2233611177942b3ebafbefc6"
       }
     },
     {
@@ -11955,11 +12078,11 @@
         "model": {
           "url": "models/creatures/foundry_voltaic_warden.glb",
           "path": "public/models/creatures/foundry_voltaic_warden.glb",
-          "bytes": 1518452,
-          "sha256": "73a69634a38bee537de626604024daaa82abc29933b7bc116c54db11cf4e9e9b"
+          "bytes": 3910408,
+          "sha256": "16123eeac17d48e92e86e937fde1b8e45b262e7f9483d1c23e4d17f5188eee1c"
         },
         "idle": "Idle",
-        "height": 4.17,
+        "height": 4.55,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -11973,11 +12096,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7aefebbad571fd151f8d099a5458fa932525adb37870b2131a6730e96a1c0a6f",
+      "sourceFingerprint": "1e91f31ce538b37319b65c52701e83b199bdf706aeebaa8c854f6af65e4689a1",
       "output": {
         "path": "public/ui/mobs/voltaic_warden.webp",
-        "bytes": 2522,
-        "sha256": "425c62d6aec882770b2ae2286fab0c044994749512d0ab70c23d82415f56afe0"
+        "bytes": 2922,
+        "sha256": "40987e12a8c6673dc5c0fac4b977973e8423077af59db7ea5258b71fa8eed7e7"
       }
     },
     {

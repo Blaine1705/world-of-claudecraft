@@ -28,6 +28,7 @@ import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
+import { applyClipTrackDrops } from './clip_track_drops';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { padMissingUv } from './far_bake_uv_pad';
@@ -104,8 +105,8 @@ import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { notePosedCullCentre } from './skinned_cull_bounds';
-import { applySmoothNormals } from './smooth_normals';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
+import { applySmoothNormals } from './smooth_normals';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
 import { prepareWarriorAbilityClips } from './warrior_ability_clips';
@@ -2482,6 +2483,7 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
+  applyClipTrackDrops(clips, def.clipTrackDrops);
   prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
   prepareWarriorActionFallbacks(key, clips, gltf.scene);
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No

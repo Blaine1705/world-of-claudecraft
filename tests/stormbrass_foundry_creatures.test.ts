@@ -1,6 +1,7 @@
 // The Stormbrass Foundry's own Blender creatures (phase 3): every mob of the
-// dungeon wears its built model (no placeholder left but the Prime Draft, which
-// waits on its own delivery), the GLBs carry the bones the renderer drives (the
+// dungeon wears its built model (no placeholder left: the Prime Draft and the
+// Voltaic Warden are their own deliveries, tests/stormbrass_foundry_boss_models
+// .test.ts), the GLBs carry the bones the renderer drives (the
 // dials, the portrait head) and no held tool rides a bone of its own, and the
 // pure presentation plan (gauge steps, plate faces, anchors, arcs) holds.
 
@@ -41,6 +42,7 @@ const FOUNDRY_MOBS: Record<string, string> = {
   clockwork_hound: 'foundry_hound',
   arc_drone: 'foundry_arc_drone',
   tripod_turret: 'foundry_tripod_turret',
+  prime_draft: 'foundry_prime_draft',
 };
 
 function glbNodeNames(url: string): string[] {
@@ -78,7 +80,7 @@ function glbRotationTracks(url: string): Map<string, Set<string>> {
 }
 
 describe('the Foundry creatures wear their own models', () => {
-  it('maps every Foundry mob to its built look (the Prime Draft still on its placeholder)', () => {
+  it('maps every Foundry mob to its built look, the Prime Draft included', () => {
     for (const [mob, key] of Object.entries(FOUNDRY_MOBS)) {
       expect(visualKeyFor({ kind: 'mob', templateId: mob } as Entity)).toBe(key);
       const def = VISUALS[key];
@@ -101,6 +103,11 @@ describe('the Foundry creatures wear their own models', () => {
       expect(tall / 2.6, key).toBeGreaterThanOrEqual(2.9);
       expect(tall / 2.6, key).toBeLessThanOrEqual(4.2);
     }
+    // The last boss is the biggest fighter: taller than every other, under five players.
+    const draft = FOUNDRY_CREATURE_LOOKS.foundry_prime_draft.height * 2.6;
+    for (const [key, s] of Object.entries(scale))
+      expect(draft, key).toBeGreaterThan(FOUNDRY_CREATURE_LOOKS[key].height * s);
+    expect(draft / 2.6).toBeLessThan(5);
   });
 
   it('ships the bones the renderer drives and no held tool on a bone of its own', () => {
@@ -115,7 +122,7 @@ describe('the Foundry creatures wear their own models', () => {
         );
     }
     // The dials lay their turn on what the mixer wrote: every clip must key them.
-    for (const key of ['foundry_line_master', 'foundry_voltaic_warden']) {
+    for (const key of ['foundry_line_master', 'foundry_voltaic_warden', 'foundry_prime_draft']) {
       const def = FOUNDRY_CREATURE_LOOKS[key];
       const keyed = glbRotationTracks(def.url);
       for (const d of def.dials ?? []) {
@@ -153,8 +160,8 @@ describe('the Foundry creatures presentation plan', () => {
       VOLTAIC_CHARGED,
     );
     expect(split).toEqual({ front: 'charged', back: 'grounded' });
-    const front = voltaicPlateDial('ChestPlate.L', 'front');
-    const back = voltaicPlateDial('BackPlate.L', 'back');
+    const front = voltaicPlateDial('Plate_ChestL', 'front');
+    const back = voltaicPlateDial('Plate_BackL', 'back');
     const g = voltaicPlateGesture('charged', 'grounded');
     expect(front.stops[g]).toBeCloseTo(Math.PI);
     expect(back.stops[g]).toBe(0);
@@ -170,7 +177,7 @@ describe('the Foundry creatures presentation plan', () => {
     expect(a1).toBeLessThan(Math.PI);
     for (let i = 0; i < 100; i++) stepDial(st, 5, 0.1);
     expect(st.angle).toBe(Math.PI);
-    const defs = [TOCK_GAUGE_DIAL, voltaicPlateDial('ChestPlate.L', 'front')];
+    const defs = [TOCK_GAUGE_DIAL, voltaicPlateDial('Plate_ChestL', 'front')];
     expect(dialGesture(defs, tockGaugeGesture(3)).map(([i]) => i)).toEqual([0]);
     expect(dialGesture(defs, 'foundry_plates_rattle')).toEqual([[1, 'rattle']]);
     expect(dialGesture(defs, 'nothing')).toEqual([]);

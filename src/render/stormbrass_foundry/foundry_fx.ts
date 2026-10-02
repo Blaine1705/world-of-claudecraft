@@ -58,9 +58,9 @@ import {
   storedChargeFill,
   storedChargeRadius,
 } from './foundry_fx_core';
-import { FoundryVentFx } from './foundry_vents';
 import { FoundryHatchBeacon } from './foundry_hatch_beacon';
 import { FoundryLockMarkers } from './foundry_lock_marker';
+import { FoundryVentFx } from './foundry_vents';
 
 const CAST_SLOTS = 12;
 /** Heroic Walking Barrage leaves up to three trails of shrapnel at once. */

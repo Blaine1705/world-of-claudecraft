@@ -11,9 +11,20 @@
 //
 // Held tools are modelled on the bone that carries them (no weapon bone turns
 // against a hand), and the dials (bone_dials.ts) turn the bones a clip cannot
-// know: Tock's gauge needle.
+// know: Tock's gauge needle, the Voltaic Warden's plates, the Prime Draft's
+// hatch leaves. The Warden and the Draft are their own Blender deliveries
+// (scripts/assets/foundry_voltaic_warden, scripts/assets/foundry_prime_draft),
+// measured in stormbrass_foundry/voltaic_model_core.ts and
+// prime_draft_model_core.ts.
 
 import {
+  DRAFT_ARM_SWEEP,
+  DRAFT_AWAKEN,
+  DRAFT_OVERLOAD,
+  DRAFT_PISTON_FIST,
+  DRAFT_TREMOR_STEP,
+  DRAFT_TUNING,
+  DRAFT_UNBOLT,
   HAULER_SCRAP_TOSS,
   HAULER_STEAM_BLAST,
   HAULER_UNLOAD,
@@ -39,12 +50,34 @@ import {
   FOUNDRY_STEAM_SCREEN,
 } from '../../sim/mob/trash_kit/foundry_cast_ids';
 import {
+  DRAFT_HATCH_DIALS,
   FRAME_AWAKE_GESTURE,
   FRAME_DORMANT_GESTURE,
   TOCK_GAUGE_DIAL,
+  VOLTAIC_FLIP_TRACK_DROPS,
   VOLTAIC_PLATES,
   voltaicPlateDial,
 } from '../stormbrass_foundry/foundry_creature_fx_core';
+import {
+  DRAFT_MOORINGS_GONE_GESTURE,
+  DRAFT_MOORINGS_ON_GESTURE,
+  DRAFT_OVERDRIVE_GLOW,
+  DRAFT_STANCE_OPEN,
+  DRAFT_STANCE_SHUT,
+  PRIME_DRAFT_CLIP,
+  PRIME_DRAFT_MODEL,
+  PRIME_DRAFT_SIM_SCALE,
+  primeDraftBeatRate,
+  primeDraftLookHeight,
+  primeDraftModelScale,
+} from '../stormbrass_foundry/prime_draft_model_core';
+import {
+  VOLTAIC_CLIP,
+  VOLTAIC_MODEL,
+  VOLTAIC_SIM_SCALE,
+  voltaicLookHeight,
+  voltaicModelScale,
+} from '../stormbrass_foundry/voltaic_model_core';
 import type { ClipMap, VisualDef } from './manifest';
 
 const CREATURES = 'models/creatures';
@@ -64,6 +97,50 @@ const FRAME_DORMANT_CLIPS: ClipMap = {
   run: 'Dormant',
   attack: ['Dormant'],
 };
+
+/** The Prime Draft's clips with its hatch shut: every bar lands its beat on
+ *  the bar's last frame (prime_draft_model_core.ts PRIME_DRAFT_CLIP). */
+const DRAFT_SHUT_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  // It never runs (the sim walks it at 3 yd/s): the one gait serves both.
+  run: 'Walk',
+  attack: ['Slam', 'Piston_Sweep'],
+  attackByAbility: { [DRAFT_PISTON_FIST]: 'Slam', [DRAFT_OVERLOAD]: 'Overload' },
+  attackTimeScaleByAbility: {
+    // The fist hits the floor as the 2 s warning ends.
+    [DRAFT_PISTON_FIST]: primeDraftBeatRate(PRIME_DRAFT_CLIP.slamHit, DRAFT_TUNING.fistWarning),
+    // The seizure runs the whole 6 s stun: the discharge at once, sagged and
+    // twitching to the end, its chest open (the hatch dials hold it).
+    [DRAFT_OVERLOAD]: primeDraftBeatRate(
+      PRIME_DRAFT_CLIP.overloadLength,
+      DRAFT_TUNING.overloadStun,
+    ),
+  },
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Idle',
+  castByAbility: {
+    [DRAFT_AWAKEN]: 'Wake',
+    [DRAFT_ARM_SWEEP]: 'Piston_Sweep',
+    [DRAFT_TREMOR_STEP]: 'Tremor_Step',
+    [DRAFT_UNBOLT]: 'Unbolt',
+  },
+  castTimeScaleByAbility: {
+    [DRAFT_AWAKEN]: primeDraftBeatRate(PRIME_DRAFT_CLIP.wakeFlex, DRAFT_TUNING.awakenCast),
+    [DRAFT_ARM_SWEEP]: primeDraftBeatRate(PRIME_DRAFT_CLIP.sweepCross, DRAFT_TUNING.sweepCast),
+    [DRAFT_TREMOR_STEP]: primeDraftBeatRate(PRIME_DRAFT_CLIP.tremorStomp, DRAFT_TUNING.tremorCast),
+    // The right bolts shear on the bar's last frame; the cables rip out and
+    // the bolts fly through the play-out.
+    [DRAFT_UNBOLT]: primeDraftBeatRate(PRIME_DRAFT_CLIP.unboltShearR, DRAFT_TUNING.unboltCast),
+  },
+  castPlayOut: ['Wake', 'Piston_Sweep', 'Tremor_Step', 'Unbolt'],
+};
+/** With its hatch open: it stands chest out round the empty socket. */
+const DRAFT_OPEN_CLIPS: ClipMap = { ...DRAFT_SHUT_CLIPS, idle: 'Hatch_Held' };
+/** The hatch leaves (their rotation in the hatch clips is dropped: the dials
+ *  own them, foundry_creature_fx_core.ts DRAFT_HATCH_DIALS). */
+const DRAFT_HATCH_BONES = ['HatchL', 'HatchR'] as const;
 
 export const FOUNDRY_CREATURE_LOOKS: Record<string, VisualDef> = {
   // Line-Master Ambrel Tock (tock.py): a stout foreman in a steam harness, two
@@ -129,14 +206,17 @@ export const FOUNDRY_CREATURE_LOOKS: Record<string, VisualDef> = {
     selfIllumination: 0.06,
     clickRadius: 2.4,
   },
-  // The Voltaic Warden (voltaic_warden.py): a tall plated automaton, a caged
-  // tesla coil for a chest, lightning-rod antlers. Its twelve reversible plates
-  // turn on dials (copper face or charged face out; front and back halves
-  // apart on heroic Split Plating) as its plating aura changes. Near 10 yd at
-  // its 2.4.
+  // The Voltaic Warden (scripts/assets/foundry_voltaic_warden, built in
+  // Blender; voltaic_model_core.ts): a hunched brass colossus, a glass storm
+  // coil for a chest, a tesla crown on its back. Drawn at its authored size,
+  // 10.9 yd to the spire's tip at its 2.4 (9.1 to the helm). Its twelve
+  // reversible plates turn on dials (copper face or blue face out; the front
+  // and back groups apart on heroic Split Plating): the flip clip pushes them
+  // out on their mounts and the dial turns them (its own plate rotation is
+  // dropped), so the plates always show the face the plating aura names.
   foundry_voltaic_warden: {
-    url: `${CREATURES}/foundry_voltaic_warden.glb`,
-    height: 4.17,
+    url: VOLTAIC_MODEL.url,
+    height: voltaicLookHeight(),
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -156,14 +236,81 @@ export const FOUNDRY_CREATURE_LOOKS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
       castByAbility: { [VOLTAIC_FLIP]: 'FlipRattle', [VOLTAIC_STATIC_LASH]: 'StaticLash' },
+      // Both bars play from the bar's start at 1x: the plates seat at 2.90 of
+      // the 3 s flip, the lash leaves the palm at 1.00 of its 1 s bar.
       castTimeScaleByAbility: { [VOLTAIC_FLIP]: 1, [VOLTAIC_STATIC_LASH]: 1 },
-      castPlayOut: ['StaticLash'],
+      castPlayOut: ['StaticLash', 'FlipRattle'],
     },
+    castClipSync: true,
+    oneShotsHoldAttacks: ['Discharge', 'LaunchDrones', 'CallStorm'],
+    walkRef: VOLTAIC_MODEL.walkRef * voltaicModelScale(VOLTAIC_SIM_SCALE),
+    runRef: VOLTAIC_MODEL.runRef * voltaicModelScale(VOLTAIC_SIM_SCALE),
     attackTimeScale: 1.1,
+    deathTimeScale: 1,
     dials: VOLTAIC_PLATES.map(([bone, half]) => voltaicPlateDial(bone, half)),
+    clipTrackDrops: { FlipRattle: VOLTAIC_FLIP_TRACK_DROPS },
+    // The coil's arcs, the visor and the blue plate faces go dark as it dies.
+    glowPulses: { pulses: [], materials: ['VoltaicGlow'], deathFade: VOLTAIC_CLIP.deathGlowOut },
     authoredAtlas: true,
-    selfIllumination: 0.08,
-    clickRadius: 2.2,
+    clickRadius: 3,
+  },
+  // The Prime Draft (scripts/assets/foundry_prime_draft, built in Blender;
+  // prime_draft_model_core.ts): Varkhul's first masterwork, a hunched brass
+  // and iron colossus with no heart, its right arm finished brass, its left
+  // the bare frame and claw, an empty socket behind the two-leaf hatch in its
+  // chest. Drawn 1.12 times its authored size, 11.5 yd at its 2.6: the last
+  // boss is the biggest fighter. Every bar's clip lands its beat on the bar's
+  // last frame (the flex, the claw's crossing, the stomp, the bolts shearing)
+  // and finishes as a play-out; Piston Fist and Overload are gestures off
+  // their spellfx. The hatch leaves are dials on the Core Hatch ring's state
+  // (through every clip), the open stance throws its chest out, and the
+  // moorings (the gantry cables and floor clamps) are their own mesh, hidden
+  // once it has torn free.
+  foundry_prime_draft: {
+    url: PRIME_DRAFT_MODEL.url,
+    height: primeDraftLookHeight(),
+    clips: DRAFT_SHUT_CLIPS,
+    phaseClips: {
+      [DRAFT_STANCE_OPEN]: { clips: DRAFT_OPEN_CLIPS, enter: 'Hatch_Open' },
+      [DRAFT_STANCE_SHUT]: { clips: DRAFT_SHUT_CLIPS, enter: 'Hatch_Close' },
+    },
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    oneShotsHoldAttacks: ['Slam', 'Overload'],
+    dials: DRAFT_HATCH_DIALS,
+    clipTrackDrops: {
+      Hatch_Open: DRAFT_HATCH_BONES,
+      Hatch_Held: DRAFT_HATCH_BONES,
+      Hatch_Close: DRAFT_HATCH_BONES,
+      Overload: DRAFT_HATCH_BONES,
+    },
+    meshToggles: [
+      {
+        nodes: ['PrimeDraftMoorings'],
+        hideNow: DRAFT_MOORINGS_GONE_GESTURE,
+        showNow: DRAFT_MOORINGS_ON_GESTURE,
+      },
+    ],
+    // Its lightning (the conduits, the eye, the socket's arcs): it flares on
+    // the Overload's discharge and beats while it overdrives, and it dies out
+    // with the body, gone as the eye goes dark.
+    glowPulses: {
+      materials: ['PrimeDraftGlow'],
+      pulses: [
+        { gesture: DRAFT_OVERLOAD, rise: 0.08, hold: 0.5, fall: 2.4, peak: 2.6 },
+        { gesture: DRAFT_OVERDRIVE_GLOW, rise: 0.25, hold: 0.2, fall: 0.9, peak: 1.7 },
+      ],
+      deathFade: PRIME_DRAFT_CLIP.deathEyeOut,
+    },
+    walkRef: PRIME_DRAFT_MODEL.walkRef * primeDraftModelScale(PRIME_DRAFT_SIM_SCALE),
+    runRef: PRIME_DRAFT_MODEL.walkRef * primeDraftModelScale(PRIME_DRAFT_SIM_SCALE),
+    // A plain swing borrows the two strikes at twice their pace (the fist
+    // lands at 1.0 s, the claw crosses at 0.77 s).
+    attackTimeScale: 2,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.05,
+    clickRadius: 3.6,
   },
   // The Gantry Hauler (hauler.py): a tracked steam crawler, the boiler, the
   // chimney, the klaxon and beacon, a goggled engineer in its cab, the crane

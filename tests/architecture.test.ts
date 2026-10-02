@@ -816,6 +816,12 @@ const RENDER_PURE_CORES = [
   'src/render/hollow_crypt/morthen_fx_core.ts',
   // The Stormbrass Foundry creatures' gestures, dials and measured anchors.
   'src/render/stormbrass_foundry/foundry_creature_fx_core.ts',
+  // The Voltaic Warden's and the Prime Draft's Blender bodies, measured, the
+  // Draft's presentation gestures and its cable terminal's plan.
+  'src/render/stormbrass_foundry/voltaic_model_core.ts',
+  'src/render/stormbrass_foundry/prime_draft_model_core.ts',
+  'src/render/stormbrass_foundry/prime_draft_gesture_core.ts',
+  'src/render/stormbrass_foundry/prime_draft_tether_core.ts',
   // The authored open-air field's terrain plan and the Hollow Crypt's dressing,
   // set-dressing and gate-memory cores (docs/design/dungeon-rework).
   'src/render/authored_field/field_mesh_core.ts',

@@ -11,7 +11,13 @@
 
 import type * as THREE from 'three';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
-import { type GlowPulseSet, glowPulseLevel, glowPulseSpan, glowPulsesFor } from './glow_pulse_core';
+import {
+  type GlowPulseSet,
+  glowPulseLevel,
+  glowPulseSpan,
+  glowPulsesFor,
+  glowPulseTakes,
+} from './glow_pulse_core';
 
 type Emissive = THREE.Material & { emissiveMap?: THREE.Texture | null; emissiveIntensity?: number };
 
@@ -66,9 +72,10 @@ export class GlowPulse {
     return true;
   }
 
-  /** The clone to mount over `src` (only an emissive-mapped material glows). */
+  /** The clone to mount over `src` (an emissive-mapped material glows, and
+   *  the set's named untextured glow materials). */
   material(src: THREE.Material): THREE.Material {
-    if (!(src as Emissive).emissiveMap) return src;
+    if (!glowPulseTakes(this.set, src.name, !!(src as Emissive).emissiveMap)) return src;
     let clone = this.materials.get(src);
     if (!clone) {
       clone = cloneMaterialWithHooks(src);

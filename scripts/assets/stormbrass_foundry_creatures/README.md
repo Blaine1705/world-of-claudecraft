@@ -39,7 +39,7 @@ Each build prints `IDLE_HEIGHT` and `MINZ` (the VISUALS row's `height` and
 |---|---|
 | `tock.py` | Line-Master Ambrel Tock (`line_master_tock`): the gauge needle is a dial bone |
 | `rangewarden.py` | The Rangewarden (`rangewarden`) |
-| `voltaic_warden.py` | The Voltaic Warden (`voltaic_warden`): twelve plate dial bones |
+| (moved) | The Voltaic Warden and the Prime Draft are their own deliveries: `scripts/assets/foundry_voltaic_warden/`, `scripts/assets/foundry_prime_draft/` |
 | `hauler.py` | The Gantry Hauler (`gantry_hauler`) |
 | `automaton.py` + `brass_sentry.py`, `shieldbearer.py`, `half_built_frame.py`, `steam_bruiser.py` | the automata trash |
 | `engineer_body.py` + `engineer.py`, `apprentice.py` | the Foundry Engineer and the Gearwright Apprentice |

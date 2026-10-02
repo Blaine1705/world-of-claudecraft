@@ -127,6 +127,7 @@ import type { LocoGaitThresholds } from '../locomotion';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
+import type { ClipTrackDrops } from './clip_track_drops';
 import { FOUNDRY_CREATURE_LOOKS } from './foundry_creature_looks';
 import { FOUNDRY_WORKER_LOOKS, FOUNDRY_WORKER_MOB_KEYS } from './foundry_worker_looks';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
@@ -448,6 +449,10 @@ export interface VisualDef {
    *  triggerAttack seam a stance swap rides): a boss's gauge needle, armour
    *  plates that flip face. See bone_dials.ts for the contract. */
   dials?: readonly BoneDialDef[];
+  /** Rotation tracks dropped from named clips when the visual is prepared, for
+   *  bones a dial owns (the Warden's plates through its flip clip, the Prime
+   *  Draft's hatch leaves through its hatch clips). See clip_track_drops.ts. */
+  clipTrackDrops?: ClipTrackDrops;
   /** Mesh nodes hidden or shown by presentation gestures (the same triggerAttack
    *  seam): the Great Saurian's howdah once it breaks. See gesture_mesh_toggles.ts. */
   meshToggles?: readonly MeshToggleDef[];

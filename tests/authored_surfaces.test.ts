@@ -184,6 +184,7 @@ const AUTHORED_ATLAS_DEFS = [
   'foundry_rangewarden',
   'foundry_voltaic_warden',
   'foundry_gantry_hauler',
+  'foundry_prime_draft',
   'foundry_brass_sentry',
   'foundry_shieldbearer',
   'foundry_steam_bruiser',
