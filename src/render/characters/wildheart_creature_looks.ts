@@ -2,7 +2,8 @@
 // wildheart_basin.md section 4). Most are PLACEHOLDERS: shipped rigs re-tinted
 // for the jungle so every new creature of the reworked basin is visible and
 // animated from day one, until the art phase gives each its own body. The
-// Great Saurian has its own Blender body (WILDHEART_GREAT_SAURIAN_LOOK). Every
+// Great Saurian, the Great Jaguar and the Gorgebloom have their own Blender
+// bodies (WILDHEART_GREAT_SAURIAN_LOOK and its siblings). Every
 // key keeps the mob id and the visual key, so a swap is a def change.
 // manifest.ts merges these over its VISUALS and maps the templates through
 // MOB_KEYS (WILDHEART_MOB_KEYS).
@@ -15,11 +16,31 @@
 import {
   BEAST_HEEL,
   BEAST_TUNING,
+  BLOOM_GORGE,
+  BLOOM_POLLINATE,
+  BLOOM_SEED_RAIN,
+  BLOOM_SPIT,
+  BLOOM_VINE_LASH,
   SAURIAN_ENRAGE,
   SAURIAN_HOWDAH_BREAK,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
 } from '../../sim/encounters/wildheart_basin/ids';
+import { WILDHEART_ENTANGLING_LASH } from '../../sim/mob/trash_kit/wildheart_cast_ids';
+import {
+  GORGE_RATE,
+  GORGEBLOOM_GLOW,
+  GORGEBLOOM_ROAR_GESTURE,
+  SEED_RAIN_RATE,
+  SPIT_RATE,
+  THORN_SPROUT_EMERGE_GESTURE,
+  VINE_LASH_RATE,
+} from '../wildheart_basin/gorgebloom_fx_core';
+import {
+  GORGEBLOOM_MODEL,
+  gorgebloomLookHeight,
+  gorgebloomLookHover,
+} from '../wildheart_basin/gorgebloom_model_core';
 import {
   heelPounceTimeScale,
   JAGUAR_MODEL,
@@ -27,6 +48,15 @@ import {
   jaguarLookHeight,
   jaguarModelScale,
 } from '../wildheart_basin/jaguar_model_core';
+import { lasherLashRate } from '../wildheart_basin/lasher_fx_core';
+import {
+  authoredLookHeight,
+  authoredLookHover,
+  LASHER_MODEL,
+  LASHER_SIM_SCALE,
+  SPROUT_MODEL,
+  SPROUT_SIM_SCALE,
+} from '../wildheart_basin/lasher_model_core';
 import {
   SAURIAN_CLIP,
   SAURIAN_MODEL,
@@ -95,6 +125,136 @@ export const WILDHEART_GREAT_SAURIAN_LOOK: VisualDef = {
   clickRadius: 4.5,
 };
 
+/** How fast the rooted bloom swings round to a new target (rad/s): a quarter
+ *  turn in about 0.9 s, its Turn loop playing while it comes round. */
+export const GORGEBLOOM_TURN_RATE = 2;
+
+/** The Gorgebloom (scripts/assets/wildheart_gorgebloom, built in Blender): one
+ *  sculpted skin, a bulb rooted in its pool, a five-petal rafflesia head with
+ *  a toothed maw, four pollen sacs and four spiked vines, the troll prisoners'
+ *  bones tangled in its roots. Drawn at its authored size, 13.75 yd to the top
+ *  of its raised petal at its 2.8, its waterline on the pivot (the roots sink
+ *  into the root pool on its dais). All three bars play from the bar's start
+ *  at the rate that lands their contact frame (the spit, the slam, the bite)
+ *  on the bar's last frame, and finish as play-outs; Pollinate, Bloom Spit and
+ *  the pull's roar are gestures sent by gorgebloom_fx.ts. It never walks: it
+ *  slews round to face its target, playing Turn while it comes round, and its
+ *  gullet and sacs glow from its own emissive map (GORGEBLOOM_GLOW). */
+export const WILDHEART_GORGEBLOOM_LOOK: VisualDef = {
+  url: GORGEBLOOM_MODEL.url,
+  height: gorgebloomLookHeight(),
+  hover: gorgebloomLookHover(),
+  clips: {
+    idle: 'Idle',
+    // It never walks; turning in place is all the locomotion it has.
+    walk: 'Turn',
+    run: 'Turn',
+    turn: 'Turn',
+    attack: ['Attack'],
+    hit: ['Hit'],
+    death: 'Death',
+    cast: 'Roar',
+    castByAbility: {
+      [BLOOM_SEED_RAIN]: 'SeedRain',
+      [BLOOM_VINE_LASH]: 'VineLash',
+      [BLOOM_GORGE]: 'Gorge',
+    },
+    castTimeScaleByAbility: {
+      [BLOOM_SEED_RAIN]: SEED_RAIN_RATE,
+      [BLOOM_VINE_LASH]: VINE_LASH_RATE,
+      [BLOOM_GORGE]: GORGE_RATE,
+    },
+    castPlayOut: ['SeedRain', 'VineLash', 'Gorge'],
+    attackByAbility: {
+      [BLOOM_POLLINATE]: 'Pollinate',
+      [BLOOM_SPIT]: 'BloomSpit',
+      [GORGEBLOOM_ROAR_GESTURE]: 'Roar',
+    },
+    attackTimeScaleByAbility: {
+      [BLOOM_POLLINATE]: 1,
+      [BLOOM_SPIT]: SPIT_RATE,
+      [GORGEBLOOM_ROAR_GESTURE]: 1,
+    },
+    flourish: 'Roar',
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  oneShotsHoldAttacks: ['Pollinate', 'BloomSpit', 'Roar'],
+  turnRate: GORGEBLOOM_TURN_RATE,
+  glowPulses: GORGEBLOOM_GLOW,
+  // The melee bite snaps shut at 0.54 s of the clip: a touch quick.
+  attackTimeScale: 1.2,
+  // The death's splash and sink are timed off the clip at 1x (gorgebloom_fx.ts).
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 4.5,
+};
+
+/** The Snarlvine Lasher (scripts/assets/wildheart_vine_lasher, built in
+ *  Blender): a lurching tangle of bark and vine on root feet, a branch crown,
+ *  sap-lit eyes and a fanged maw, its right arm the lash. Drawn at its authored
+ *  size, 6.5 yd to the crown spikes at its 2.2. The Entangling Lash plays
+ *  LashCast from the bar's start at the rate that lands the whip's tip on the
+ *  lane at the bar's end (lasher_fx.ts carries the lane on from there); the
+ *  swipe and the stab are its swings. */
+export const WILDHEART_VINE_LASHER_LOOK: VisualDef = {
+  url: LASHER_MODEL.url,
+  height: authoredLookHeight(LASHER_MODEL, LASHER_SIM_SCALE),
+  hover: authoredLookHover(LASHER_MODEL, LASHER_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Attack', 'Attack2'],
+    hit: ['Hit'],
+    death: 'Death',
+    cast: 'LashCast',
+    castByAbility: { [WILDHEART_ENTANGLING_LASH]: 'LashCast' },
+    castTimeScaleByAbility: {
+      [WILDHEART_ENTANGLING_LASH]: lasherLashRate(),
+    },
+    castPlayOut: ['LashCast'],
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  // Its gaits at the drawn size (one model yard per game yard).
+  walkRef: LASHER_MODEL.walkRef,
+  runRef: LASHER_MODEL.runRef,
+  attackTimeScale: 1.15,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.8,
+};
+
+/** The Thorn Sprout (the Lasher's rig at half size, its own sculpt: a seed-bud
+ *  head split by a toothed maw). 3 yd at its 1.5, over a player's head. It
+ *  bursts out of its pod with Emerge (the entrance, offered by
+ *  gorgebloom_fx.ts as it rises), bites (it has no other swing), and its
+ *  half-scale gaits are sped up to its sprint. */
+export const WILDHEART_THORN_SPROUT_LOOK: VisualDef = {
+  url: SPROUT_MODEL.url,
+  height: authoredLookHeight(SPROUT_MODEL, SPROUT_SIM_SCALE),
+  hover: authoredLookHover(SPROUT_MODEL, SPROUT_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Bite'],
+    hit: ['Hit'],
+    death: 'Death',
+    entrance: 'Emerge',
+  },
+  entranceGesture: THORN_SPROUT_EMERGE_GESTURE,
+  oneShotsHoldAttacks: ['Emerge'],
+  walkRef: SPROUT_MODEL.walkRef,
+  runRef: SPROUT_MODEL.runRef,
+  runTimeScaleMax: 2.6,
+  attackTimeScale: 1.1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.2,
+};
+
 /** A carved prop that never moves: every clip lookup misses harmlessly. */
 const STATIC_TOTEM_CLIPS: ClipMap = {
   idle: 'Idle',
@@ -112,25 +272,10 @@ const ROWS: Record<string, PlaceholderRow> = {
   wildheart_basin_raptor: ['mob_spearjaw', 0x6f7a3a, 0.6, 1.25],
   // Spore Toad: the frog rig, warty olive and as big as a boar (4.5 yd at 2.4).
   wildheart_spore_toad: ['mob_murloc', 0x7f8a34, 0.7, 1.1, { selfIllumination: 0.08 }],
-  // Snarlvine Lasher: the treant body in dark bark and vine (5.7 yd at 2.2).
-  wildheart_vine_lasher: ['mob_treant', 0x445624, 0.8, 1],
-  // Thorn Sprout (what a missed Gorgebloom seedpod grows into): the treant
-  // body smaller, in a raw thorny green with a faint sap glow; about 3.7 yd
-  // at its 1.5, still over a player's head.
-  wildheart_thorn_sprout: ['mob_treant', 0x6f9a26, 0.82, 0.95, { selfIllumination: 0.1 }],
   // Sunbone Totem-Binder: the Hexcaller under a bone-ochre wash.
   wildheart_totem_binder: ['mob_wildheart_hexcaller', 0xd9b26a, 0.3, 1.05],
   // The Howdah Hexcaller: the Hexcaller in the howdah's war red.
   wildheart_howdah_hexcaller: ['mob_wildheart_hexcaller', 0xa3322a, 0.22, 1],
-  // The Gorgebloom: the great cap rig washed blood red, rooted (it only turns
-  // to face its target); about 10 yd at its 2.8.
-  wildheart_gorgebloom: [
-    'mob_hoard_boss_mushroom',
-    0xb3202c,
-    0.7,
-    1.64,
-    { selfIllumination: 0.35, clickRadius: 3.2 },
-  ],
 };
 
 /** Zulgar vanishes (heroic Ambush): his whole model hides, then returns. */
@@ -188,6 +333,9 @@ export function wildheartPlaceholderLooks(
     out[key] = { ...def, height: def.height * grow, tint, tintStrength, ...extra };
   }
   out.wildheart_great_saurian = WILDHEART_GREAT_SAURIAN_LOOK;
+  out.wildheart_gorgebloom = WILDHEART_GORGEBLOOM_LOOK;
+  out.wildheart_vine_lasher = WILDHEART_VINE_LASHER_LOOK;
+  out.wildheart_thorn_sprout = WILDHEART_THORN_SPROUT_LOOK;
   out.wildheart_fanglord_jaguar = WILDHEART_GREAT_JAGUAR_LOOK;
   // Zulgar keeps his shipped body; it learns to vanish for the Ambush.
   const zulgar = visuals.mob_wildheart_high_priest;

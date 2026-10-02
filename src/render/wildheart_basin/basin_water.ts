@@ -1,7 +1,8 @@
 // The Wildheart Basin's water: the ford's ankle-deep shallows racing west over
 // their basalt sill (foam peeling round the basalt steps and round anything
-// big wading them), the braided river down in the gorge, and the plunge pool
-// churning at the Weeping Falls' foot. One shared material draws all three
+// big wading them), the braided river down in the gorge, the plunge pool
+// churning at the Weeping Falls' foot, and the Gorgebloom's still root pool on
+// its dais. One shared material draws them all
 // (each mesh carries its own flow, depth and edge per vertex), built with the
 // interior and linked by its compile gate.
 //
@@ -16,6 +17,7 @@ import {
   BASIN_FOG_COLOR,
   BASIN_SUN_DIRECTION,
   FORD_SHEET,
+  GORGEBLOOM_ROOT_POOL,
   PLUNGE_POOL,
   riverStations,
 } from './basin_plan_core';
@@ -293,6 +295,40 @@ function poolGeometry(lowGfx: boolean): THREE.BufferGeometry {
   return geometryOf(b);
 }
 
+/** The Gorgebloom's root pool: a still skin of water on its dais, a slow
+ *  swirl round the bulb and a little foam at the rim stones. */
+function rootPoolGeometry(lowGfx: boolean): THREE.BufferGeometry {
+  const p = GORGEBLOOM_ROOT_POOL;
+  const rings = lowGfx ? 3 : 6;
+  const segs = lowGfx ? 20 : 40;
+  const b: WaterBuffers = { positions: [], flow: [], water: [], indices: [] };
+  b.positions.push(p.x, p.y, p.z);
+  b.flow.push(0, 0);
+  b.water.push(0, 0.35);
+  for (let r = 1; r <= rings; r++) {
+    const rr = (r / rings) * p.r;
+    for (let i = 0; i < segs; i++) {
+      const a = (i / segs) * Math.PI * 2;
+      const ca = Math.cos(a);
+      const sa = Math.sin(a);
+      b.positions.push(p.x + ca * rr, p.y, p.z + sa * rr);
+      // A lazy swirl round the bulb (tangential), stirred by the falls.
+      b.flow.push(-sa * 0.45, ca * 0.45);
+      b.water.push((r / rings) ** 4, 0.35);
+    }
+  }
+  for (let i = 0; i < segs; i++) b.indices.push(0, 1 + ((i + 1) % segs), 1 + i);
+  for (let r = 1; r < rings; r++) {
+    const a0 = 1 + (r - 1) * segs;
+    const b0 = a0 + segs;
+    for (let i = 0; i < segs; i++) {
+      const i1 = (i + 1) % segs;
+      b.indices.push(a0 + i, a0 + i1, b0 + i, a0 + i1, b0 + i1, b0 + i);
+    }
+  }
+  return geometryOf(b);
+}
+
 /** Every water surface of the basin (instance-local), one shared material. */
 export function buildBasinWater(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
@@ -302,6 +338,7 @@ export function buildBasinWater(lowGfx: boolean): THREE.Group {
     ['wildheartFordWater', fordGeometry(lowGfx)],
     ['wildheartRiver', riverGeometry(lowGfx)],
     ['wildheartPlungePool', poolGeometry(lowGfx)],
+    ['wildheartGorgebloomRootPool', rootPoolGeometry(lowGfx)],
   ];
   for (const [name, geo] of meshes) {
     const mesh = new THREE.Mesh(geo, material);

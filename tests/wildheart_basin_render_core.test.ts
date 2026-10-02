@@ -618,8 +618,8 @@ describe('the boss auras and bodies', () => {
       expect(BASIN_BOSS_TEMPLATES.has(id), id).toBe(true);
       expect(MOBS[id], id).toBeDefined();
     }
-    // The Gorgebloom stands about 10 yd at its 2.8.
-    expect(bossBodyHeight(GORGEBLOOM_ID, MOBS[GORGEBLOOM_ID]?.scale ?? 1)).toBeCloseTo(10.08, 1);
+    // The Gorgebloom's Blender body stands 13.75 yd at its 2.8 (the raised petal).
+    expect(bossBodyHeight(GORGEBLOOM_ID, MOBS[GORGEBLOOM_ID]?.scale ?? 1)).toBeCloseTo(13.75, 1);
     expect(bossBodyHeight('someone', 1)).toBe(PLAYER_BODY_HEIGHT);
   });
 

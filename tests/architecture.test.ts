@@ -853,6 +853,18 @@ const RENDER_PURE_CORES = [
   'src/render/wildheart_basin/bond_cord_core.ts',
   'src/render/wildheart_basin/basin_fire_core.ts',
   'src/render/characters/stun_idle_core.ts',
+  // The Gorgebloom's Blender body (its measured anchors and beats) and its body
+  // effects' plan (beats, clip rates, the lash's thorn wave, the glow pulses),
+  // the rooted turn in place (ClipMap.turn) and the gesture-flared glow map.
+  'src/render/wildheart_basin/gorgebloom_model_core.ts',
+  'src/render/wildheart_basin/gorgebloom_fx_core.ts',
+  // The Snarlvine Lasher's and the Thorn Sprout's bodies and the Lasher's lash
+  // lane, and the thorn waves both lashes tear down their lanes.
+  'src/render/wildheart_basin/lasher_model_core.ts',
+  'src/render/wildheart_basin/lasher_fx_core.ts',
+  'src/render/wildheart_basin/basin_thorns_core.ts',
+  'src/render/characters/turn_in_place_core.ts',
+  'src/render/characters/glow_pulse_core.ts',
   'src/render/drowned_temple/temple_shore_core.ts',
   'src/render/drowned_temple/temple_fx_core.ts',
   'src/render/stormbrass_foundry/foundry_plan_core.ts',

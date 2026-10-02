@@ -11,6 +11,7 @@
 // Three-free, DOM-free, deterministic (hash noise, no Math.random).
 
 import {
+  GORGEBLOOM_DAIS,
   JAGUAR_HEAD,
   RIM_FALLS,
   RIVER_COURSE,
@@ -317,6 +318,16 @@ export const PLUNGE_POOL = {
   z: WEEPING_FALLS.z,
   r: 13,
   y: BASIN_WATER.pool,
+} as const;
+
+/** The Gorgebloom's root pool: a skin of water over its dais (the model's
+ *  origin is the waterline: its roots, rags and resting vines sink into it,
+ *  and it drowns in it when it dies). Inside the dais's rim stones. */
+export const GORGEBLOOM_ROOT_POOL = {
+  x: GORGEBLOOM_DAIS.x,
+  z: GORGEBLOOM_DAIS.z,
+  r: GORGEBLOOM_DAIS.r - 0.4,
+  y: WILDHEART_HEIGHTS.fallsTerrace + GORGEBLOOM_DAIS.rise + 0.08,
 } as const;
 
 /** Distance from (x, z) to the terrace edge (negative inside). Tests use it to

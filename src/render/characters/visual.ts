@@ -37,6 +37,7 @@ import {
   advanceSwimBlend,
   advanceTreadBlend,
   type BaseState,
+  castClipSyncTime,
   castHoldStep,
   desiredBaseState,
   drivesPose,
@@ -83,6 +84,7 @@ import {
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { FormAdornments } from './form_adornments';
 import { GestureMeshToggles } from './gesture_mesh_toggles';
+import { GlowPulse } from './glow_pulse';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import { HarvestRecoil } from './harvest_recoil';
@@ -121,6 +123,7 @@ import { stoneboundShellStyle } from './stonebound_shell_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { stunIdleClip } from './stun_idle_core';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
+import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
@@ -804,6 +807,13 @@ export class CharacterVisual {
   private dials: BoneDials | null = null;
   /** VisualDef.meshToggles: mesh nodes hidden or shown by gestures (gesture_mesh_toggles.ts). */
   private meshToggles: GestureMeshToggles | null = null;
+  /** VisualDef.glowPulses: the emissive map flared by gestures (glow_pulse.ts). */
+  private glowPulse: GlowPulse | null = null;
+  /** VisualDef.turnRate / ClipMap.turn: the rooted body's drawn heading
+   *  (turn_in_place_core.ts). */
+  private readonly turnState = createTurnInPlaceState();
+  /** The entity whose entrance (ClipMap.entrance) this rig already played. */
+  private entranceFor: unknown = undefined;
   private metamorphRightWing: THREE.Object3D | null = null;
   private metamorphLeftWingRest = new THREE.Euler();
   private metamorphRightWingRest = new THREE.Euler();
@@ -883,6 +893,7 @@ export class CharacterVisual {
       if (this.def.dials?.length) this.dials = new BoneDials(this.model, this.def.dials);
       if (this.def.meshToggles?.length)
         this.meshToggles = new GestureMeshToggles(this.model, this.def.meshToggles);
+      if (this.def.glowPulses?.pulses.length) this.glowPulse = new GlowPulse(this.def.glowPulses);
       if (key === 'form_metamorph') {
         this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
         this.metamorphRightWing = this.model.getObjectByName('metamorph_wing_right_hinge') ?? null;
@@ -1048,6 +1059,7 @@ export class CharacterVisual {
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
+    if (this.glowPulse?.step(dt, s.dead)) this.applyVisualMaterials();
     // A transparent effect whose clones finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
@@ -1103,7 +1115,9 @@ export class CharacterVisual {
     const rushChanged = this.warriorBody.updateRush(dt, s);
     // A stun swapping the idle loop (the Great Jaguar dazed) is a base change for a
     // standing body, so it rides the same fade arm below.
-    const stunIdle = stunIdleClip(this.def.clips.stunned, s.auras);
+    // A rooted body turning in place to face its target (the Gorgebloom) holds
+    // its turn loop the same way.
+    const stunIdle = stunIdleClip(this.def.clips.stunned, s.auras) ?? this.turnIdle(dt, s);
     const stunIdleChanged =
       stunIdle !== this.stunIdle && (this.baseState === 'idle' || this.baseState === 'combatIdle');
     this.stunIdle = stunIdle;
@@ -1156,6 +1170,18 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsCastExit = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+      } else if (
+        baseChanged &&
+        desired === 'cast' &&
+        this.currentIsOneShot &&
+        this.def.castClipSync &&
+        !this.oneShotHoldsAttacks()
+      ) {
+        // A bar-locked strike (VisualDef.castClipSync) takes the body from a
+        // plain swing or flinch at once: its contact frame is on the bar's end.
+        this.currentIsOneShot = false;
+        this.currentOneShotIsEmote = false;
+        this.fadeTo(this.baseAction(), 0.12, false);
       } else if ((baseChanged || rushChanged || stunIdleChanged) && !this.currentIsOneShot) {
         // a cast clip frozen at its hold point must never stay paused through
         // the exit, whichever exit path runs below
@@ -1207,6 +1233,20 @@ export class CharacterVisual {
               ? this.def.clips.castTimeScaleByAbility?.[this.castingAbility]
               : undefined) ?? 1;
           this.current.timeScale = castScale;
+          // A bar-locked strike follows the bar (it may have entered late).
+          if (
+            this.def.castClipSync &&
+            this.castingAbility &&
+            this.current === this.action(this.def.clips.castByAbility?.[this.castingAbility])
+          ) {
+            const t = castClipSyncTime(
+              this.current.time,
+              s.castElapsed,
+              castScale,
+              this.current.getClip().duration,
+            );
+            if (t !== null) this.current.time = t;
+          }
           const holdPoint = this.def.clips.castHoldPointSeconds;
           const genericCast = this.action(this.def.clips.cast);
           // The freeze covers ONLY the generic cast clip: a per-ability
@@ -1268,7 +1308,7 @@ export class CharacterVisual {
     } else {
       this.spinAngle = 0;
     }
-    this.poseWrap.rotation.y = this.spinAngle;
+    this.poseWrap.rotation.y = this.spinAngle + this.turnState.lag;
 
     // swim pose: the clip's own posture + whatever pitch and lift it still needs
     const authoredSwim = !!this.action(this.def.clips.swimSurface);
@@ -1798,7 +1838,19 @@ export class CharacterVisual {
       return;
     }
     if (abilityId && this.dials?.handle(abilityId)) return;
+    // A glow-only gesture (no clip of its own) flares the emissive map and stops
+    // here; a gesture that also names a clip (Pollinate) plays it below too.
+    if (
+      abilityId &&
+      this.glowPulse?.handle(abilityId) &&
+      !this.def.clips.attackByAbility?.[abilityId]
+    )
+      return;
     if (this.deadLock) return;
+    if (abilityId && abilityId === this.def.entranceGesture) {
+      this.playEntrance();
+      return;
+    }
     if (!abilityId && this.oneShotHoldsAttacks()) return;
     const phase = abilityId ? this.def.phaseClips?.[abilityId] : undefined;
     if (phase) {
@@ -3297,6 +3349,7 @@ export class CharacterVisual {
       this.runeTintMaterials,
       this.auraGlowMaterials,
       this.surfaceResponse.materials,
+      ...(this.glowPulse ? [this.glowPulse.materials] : []),
     ]);
   }
 
@@ -3314,6 +3367,7 @@ export class CharacterVisual {
       ...this.runeTintMaterials.values(),
       ...this.auraGlowMaterials.values(),
       ...this.surfaceResponse.materials.values(),
+      ...(this.glowPulse?.materials.values() ?? []),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
@@ -3325,6 +3379,7 @@ export class CharacterVisual {
     this.runeTintMaterials.clear();
     this.auraGlowMaterials.clear();
     this.surfaceResponse.materials.clear();
+    this.glowPulse?.materials.clear();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -3478,6 +3533,28 @@ export class CharacterVisual {
   // State machine internals
   // -------------------------------------------------------------------------
 
+  /** ClipMap.entrance, once per entity this rig draws (a pooled rig reused
+   *  for a new entity plays it again). */
+  private playEntrance(): void {
+    const id = this.clickProxy.userData.entityId;
+    const clip = this.def.clips.entrance;
+    if (!clip || this.entranceFor === id || !this.action(clip)) return;
+    this.entranceFor = id;
+    this.playOneShot(clip, 1);
+    this.currentOneShotIsAttack = true;
+  }
+
+  /** The turn loop while a rooted body swings to a new heading (ClipMap.turn,
+   *  VisualDef.turnRate), else null. Steps the drawn heading every frame (the
+   *  lag lands on poseWrap's yaw); a body on the move never plays it. */
+  private turnIdle(dt: number, s: AnimState): string | null {
+    const { turnRate, clips } = this.def;
+    if (turnRate === undefined && !clips.turn) return null;
+    const now = performance.now() / 1000;
+    stepTurnInPlace(this.turnState, this.root.parent?.rotation.y ?? 0, dt, turnRate ?? 0, now);
+    return this.turnState.turning && !s.moving && !s.dead ? (clips.turn ?? null) : null;
+  }
+
   private desiredBase(s: AnimState): BaseState {
     // Whether the LOADED rig has the clip, not whether the ClipMap names one:
     // every player ClipMap names walkBack, but baseAction() silently falls back
@@ -3601,6 +3678,8 @@ export class CharacterVisual {
     if (this.ascended) return this.ascensionMaterial(material);
     if (this.runeTint !== null) return this.runeTintMaterial(material, this.runeTint);
     if (this.surfaceResponse.active) return this.surfaceResponse.material(material);
+    // the body's own glow map flared by a gesture (VisualDef.glowPulses)
+    if (this.glowPulse?.active) return this.glowPulse.material(material);
     // lowest priority: the ability VFX buff/cast body glow
     if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
@@ -4222,6 +4301,8 @@ function clipMapNames(c: ClipMap): string[] {
     c.idle,
     c.combatIdle,
     c.stunned,
+    c.turn,
+    c.entrance,
     c.prowlIdle,
     c.prowlWalk,
     c.walk,

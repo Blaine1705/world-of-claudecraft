@@ -129,6 +129,7 @@ import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import { FOUNDRY_CREATURE_LOOKS } from './foundry_creature_looks';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
+import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 
@@ -166,6 +167,13 @@ export interface ClipMap {
   /** The dazed loop a standing body holds while a stun rides it, in place of
    *  `idle` / `combatIdle` (stun_idle_core.ts). Absent = it stands in its idle. */
   stunned?: string;
+  /** The loop a rooted body holds while it turns in place to face a new target,
+   *  in place of `idle` / `combatIdle` (turn_in_place_core.ts; pair it with
+   *  VisualDef.turnRate). Absent = it turns in its idle. */
+  turn?: string;
+  /** A one-shot the body plays once when it first arrives, on its
+   *  VisualDef.entranceGesture (the Thorn Sprout bursting out of its pod). */
+  entrance?: string;
   /** Low stalking poses for a concealed quadruped. Absent = ordinary gait. */
   prowlIdle?: string;
   prowlWalk?: string;
@@ -440,6 +448,26 @@ export interface VisualDef {
   /** One-shot clips a plain auto-attack never cuts while they play (a set-piece
    *  like the howdah breaking lands in full; the swing it would show is skipped). */
   oneShotsHoldAttacks?: readonly string[];
+  /** A rooted body slews its drawn heading toward the sim's facing at this rate
+   *  (rad/s) instead of snapping, holding `clips.turn` while it catches up
+   *  (turn_in_place_core.ts). Absent = the model follows the facing at once. */
+  turnRate?: number;
+  /** The body's own emissive map flared by presentation gestures (the same
+   *  triggerAttack seam) and faded out on death: the Gorgebloom's gullet and
+   *  pollen sacs. See glow_pulse_core.ts. */
+  glowPulses?: GlowPulseSet;
+  /** The presentation gesture that plays `clips.entrance`, ONCE per entity: a
+   *  repeat for the same entity does nothing, so an effect may keep offering
+   *  it until the view exists (the view is often built a frame or two after
+   *  the entity appears). */
+  entranceGesture?: string;
+  /** Its per-ability cast clips are timed so a contact frame lands on the
+   *  bar's end (castTimeScaleByAbility): the bar takes the body at once,
+   *  cutting a plain swing or flinch (never a one-shot in
+   *  oneShotsHoldAttacks), and the clip's time is held to the bar's elapsed
+   *  time, so a clip that entered late still strikes on the bar's end
+   *  (anim_state.ts castClipSyncTime). */
+  castClipSync?: boolean;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and

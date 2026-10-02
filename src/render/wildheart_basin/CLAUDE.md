@@ -25,11 +25,20 @@ are the single source; everything here derives from them.
 | `basin_boss_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the three bosses' cast specs from the sim tuning (`basinBossCastSpecs`: Beast Pit Quake and Wildheart Pulse rings, the Heel! lane jaguar to master, the locked Vine Lash lane, Gorge's tank-buster mark, the Seed Rain and Spirit of the Hunt charge sigils), the aura dressing (`BASIN_AURA_LOOKS`, `BASIN_HEAD_MARKS`), the Pack Bond cord's brightness (`bondCordStrength`, over the sim's `bondStrength`), the pods' swell, the seeds' arc, the glyph and shock looks, the bodies' drawn heights. |
 | `basin_boss_fx.ts` | `BasinBossFx` (PLACEHOLDER looks): the boss cast telegraphs on the shared kit, the charge sigils, the seedpod bodies and the lobbed seeds, the sun glyph overlays, the head marks (Stalked, Prey), the aura glows and motes, the Thickhide Ward shell, the Pack Bond cord. Built under WildheartFx's root before its gated attach; no light. |
 | `basin_boss_bursts.ts` | `playBasinBossBurst`: the one-shot bursts of every boss `spellfx` event (cosmetic, through the host's pools and rings). |
+| `gorgebloom_model_core.ts` | PURE: the Gorgebloom's Blender body measured (`scripts/assets/wildheart_gorgebloom`): drawn at its authored 13.75 yd with its waterline on the pivot, the maw, sacs and lash club sampled from the GLB at each contact frame, the clips' beats (every authored beat plus the GLB's one-frame `KEY_LEAD`), model space to the world. |
+| `gorgebloom_fx_core.ts` | PURE: the bloom's body beats per trigger (a bar opening, a spellfx landing, the pull, the death), the cast rates that land each strike on its bar's end, the Vine Lash thorn wave's stations, the glow pulses of its gullet and sacs (`GORGEBLOOM_GLOW`, `characters/glow_pulse_core.ts`), its glow-only and Emerge gestures, the splash looks. |
+| `gorgebloom_fx.ts` | `GorgebloomFx`: the bloom's body effects from its own anchors (the seed spit at the maw, Pollinate's four sac bursts, the lash club's slam and the thorn wave down the rest of the 30 yd lane, the Gorge bite, the spit's flash, the roar, the death: petals, the head crashing into the root pool, the sinking), a Thorn Sprout bursting from its pod (and the Emerge gesture offered until its view takes it), and the gestures that drive the model (never over a strike's play-out). |
+| `lasher_model_core.ts` / `lasher_fx_core.ts` / `lasher_fx.ts` | The Snarlvine Lasher's and the Thorn Sprout's Blender bodies measured (`scripts/assets/wildheart_vine_lasher`), and the Lasher's Entangling Lash: the whip's tip on the lane where the model's own tip lands, then the thorn wave from the whip's end to the 20 yd lane end (it replaces the generic heavy bolt). |
+| `basin_thorns_core.ts` / `basin_thorns.ts` | The thorn spikes both lashes (and a sprout's shoots) tear up: one instanced draw, a fixed pool, the lane wave's stations and delays; lent through `BasinFxHost.thorns`. |
 | `basin_kit.ts` / `basin_kit_plan_core.ts` | The Blender kit (`public/models/props/wildheart_basin_kit.glb`) and its placements: every prop, the caldera ring, the gorge jungle, the pyramid, the jaguar head. Owned by the kit build (`docs/design/dungeon-rework/kit/build_wildheart_basin_kit.py`). |
 
-The placeholder creature looks live in `../characters/wildheart_creature_looks.ts`
-(merged into the manifest; the Great Saurian's look is temporary until its Blender body,
-the Thorn Sprout's a shrunken thorny-green treant).
+The creature looks live in `../characters/wildheart_creature_looks.ts` (merged into the
+manifest): the Great Saurian, the Great Jaguar, the Gorgebloom, the Snarlvine Lasher and the
+Thorn Sprout wear their Blender bodies; the rest of the trash keeps tinted placeholders. The
+Gorgebloom stands in a root pool on its dais (`basin_water.ts`, `GORGEBLOOM_ROOT_POOL`): its
+model's origin is the waterline. It slews round to its target (`ClipMap.turn`,
+`VisualDef.turnRate`), its three bars are bar-locked (`VisualDef.castClipSync`), and its
+gullet and sacs glow from its own emissive map (`VisualDef.glowPulses`).
 
 The boss layer is PLACEHOLDER: the art phase replaces looks, never sizes (those are the
 sim's). Known gaps it owns: Zulgar's model must hide while `ZULGAR_VANISHED` holds (the

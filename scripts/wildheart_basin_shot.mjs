@@ -196,6 +196,22 @@ const SHOTS = [
     dist: 22,
     hud: true,
   },
+  // The Snarlvine Lasher's Blender body: its LashCast from the bar's start
+  // (the frames count from the cast opening), the tip on the lane at 1.5 s.
+  {
+    id: 'latigador_cuerpo',
+    at: [0, 40],
+    face: 0,
+    cmds: ['/dev wildheart kill trash', '/dev wildheart spawn lasher'],
+    cmdWait: 200,
+    waitCast: ['vine_lasher', 'wildheart_entangling_lash', 0],
+    burstFromCast: true,
+    pitch: 0.3,
+    dist: 20,
+    yaw: 1.15,
+    hud: true,
+    burst: [600, 1250, 1500, 1600, 1750, 2100],
+  },
   {
     id: 'pulso_totem',
     at: [0, 40],
@@ -350,6 +366,88 @@ const SHOTS = [
     dist: 20,
     hud: true,
     wait: 60,
+  },
+  // The Gorgebloom's Blender body: idle in its root pool at the falls, then
+  // each clip's contact frames (Seed Rain's spit, Pollinate's burst, the Vine
+  // Lash slam and its thorn wave, the Gorge bite, a Bloom Spit at range).
+  { id: 'jefe2_flor_reposo', at: [72, 40], face: PI * 0.53, pitch: 0.16, dist: 20 },
+  {
+    id: 'jefe2_flor_lluvia',
+    stage: ['the_gorgebloom', 13, -PI * 0.42],
+    cmds: ['/dev wildheart trigger seeds'],
+    cmdWait: 60,
+    pitch: 0.28,
+    dist: 26,
+    yaw: 0.35,
+    hud: true,
+    burst: [800, 1450, 1620, 1850, 2300],
+  },
+  {
+    id: 'jefe2_flor_polinizar',
+    stage: ['the_gorgebloom', 13, -PI * 0.5],
+    cmds: ['/dev wildheart trigger pollinate'],
+    cmdWait: 60,
+    pitch: 0.22,
+    dist: 24,
+    yaw: 0.3,
+    hud: true,
+    burst: [300, 620, 800, 1300],
+  },
+  {
+    id: 'jefe2_flor_latigo',
+    stage: ['the_gorgebloom', 16, -PI * 0.5],
+    cmds: ['/dev wildheart trigger lash'],
+    cmdWait: 60,
+    pitch: 0.4,
+    dist: 30,
+    yaw: -1.25,
+    hud: true,
+    burst: [700, 1250, 1500, 1580, 1700, 1900, 2300],
+  },
+  {
+    id: 'jefe2_flor_engullir',
+    stage: ['the_gorgebloom', 7, -PI * 0.5],
+    cmds: ['/dev wildheart trigger gorge'],
+    cmdWait: 60,
+    pitch: 0.2,
+    dist: 20,
+    yaw: 0.75,
+    hud: true,
+    burst: [800, 1300, 1550, 1750, 2000, 2300],
+  },
+  // A Thorn Sprout bursting out of its pod (Emerge): the frames count from
+  // the first new sprout appearing.
+  {
+    id: 'jefe2_brote_emerge',
+    stage: ['the_gorgebloom', 13, -PI * 0.42],
+    cmds: ['/dev wildheart trigger pods'],
+    cmdWait: 60,
+    waitNewMob: 'thorn_sprout',
+    pitch: 0.3,
+    dist: 16,
+    yaw: 0.35,
+    hud: true,
+    burst: [60, 250, 420, 650, 1100, 1900],
+  },
+  {
+    id: 'jefe2_flor_escupitajo',
+    stage: ['the_gorgebloom', 26, -PI * 0.5],
+    pitch: 0.2,
+    dist: 22,
+    yaw: 0.5,
+    hud: true,
+    burst: [1700, 2000, 2300, 2600, 3800],
+  },
+  {
+    id: 'jefe2_flor_muerte',
+    stage: ['the_gorgebloom', 16, -PI * 0.5],
+    cmds: ['/dev wildheart kill gorgebloom'],
+    cmdWait: 60,
+    pitch: 0.22,
+    dist: 28,
+    yaw: 0.8,
+    hud: true,
+    burst: [400, 1200, 2000, 2750, 2900, 3300, 4600],
   },
   // Zulgar (the telegraphed Pulse, Spirit of the Hunt with the Prey alert and
   // the jaguar's burning eyes, a sun glyph going dark, the heroic Ambush).
@@ -632,6 +730,15 @@ async function main() {
         }
         await sleep(1400);
       }
+      const before = shot.waitNewMob
+        ? await page.evaluate(
+            (t) =>
+              [...window.__game.world.entities.values()]
+                .filter((e) => e.templateId === t)
+                .map((e) => e.id),
+            shot.waitNewMob,
+          )
+        : [];
       let cmdAt = Date.now();
       for (const c of shot.cmds ?? []) {
         await page.evaluate(() => {
@@ -650,6 +757,33 @@ async function main() {
         while (Date.now() - t0 < 20000) {
           if (await page.evaluate(pageCasting, shot.waitCast)) break;
           await sleep(80);
+        }
+        // A burst may count its frames from the cast opening, not the command.
+        if (shot.burstFromCast) cmdAt = Date.now();
+      }
+      // Or from a new mob of a template appearing (a sprout rising from its pod),
+      // the camera turned onto it.
+      if (shot.waitNewMob) {
+        const t0 = Date.now();
+        while (Date.now() - t0 < 30000) {
+          const spot = await page.evaluate(
+            ([t, old]) => {
+              for (const e of window.__game.world.entities.values())
+                if (e.templateId === t && !e.dead && !old.includes(e.id)) return { x: e.pos.x, z: e.pos.z };
+              return null;
+            },
+            [shot.waitNewMob, before],
+          );
+          if (spot) {
+            cmdAt = Date.now();
+            const me = await page.evaluate(() => {
+              const p = window.__game.world.player.pos;
+              return { x: p.x, z: p.z };
+            });
+            shot.face = Math.atan2(spot.x - me.x, spot.z - me.z);
+            break;
+          }
+          await sleep(40);
         }
       }
       // Catch a Sunbone Totem's pulse ring mid-flight: wait for its beat.

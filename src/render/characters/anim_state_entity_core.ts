@@ -39,6 +39,10 @@ export interface AnimOverrideFacts {
   /** The live aura list (kinds only are read), handed to the rig by reference
    *  for its `stunned` loop. */
   auras?: readonly { kind?: string; remaining?: number }[];
+  /** The cast bar (for a bar-locked cast clip, VisualDef.castClipSync). */
+  castingAbility?: string | null;
+  castRemaining?: number;
+  castTotal?: number;
 }
 
 /** Mutates `st` in place. Called once per entity per frame, so it allocates
@@ -61,6 +65,11 @@ export function applyEntityAnimOverrides(
   st.combat = e.aggroTargetId !== null && !visuallyDead;
   // A dazed loop (the Great Jaguar stunned) reads the list by reference: no copy.
   st.auras = e.auras;
+  // How far its bar has run: a bar-locked cast clip follows it.
+  st.castElapsed =
+    e.castingAbility && (e.castTotal ?? 0) > 0
+      ? (e.castTotal ?? 0) - (e.castRemaining ?? 0)
+      : undefined;
   st.stealthed = stealthed && !visuallyDead;
   // Ice slide: the sim glides the player at speed but they should read as FROZEN
   // (gliding stiff on the ice), not sprinting. Suppress locomotion + airborne so

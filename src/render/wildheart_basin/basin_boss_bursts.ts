@@ -1,12 +1,13 @@
 // The Wildheart Basin bosses' one-shot bursts (PLACEHOLDER looks), split out
 // of basin_boss_fx.ts: what each boss `spellfx` event throws up the moment it
 // lands (the quake's shock and pit sand, the jaguar's slash, the Heel!
-// landing dust, the roar of Call of the Hunt, the seeds and spits launched,
-// pods squelching, sprouts bursting in thorns, the lash tearing its lane, the
-// Gorge bite, the jade pulse and transformation, the maul, the sunstrike, the
-// Ambush smoke). Everything draws through the host's pooled particles and
-// shock rings; the few bits of boss state a burst reads (a pod's last spot,
-// the lash's locked line, the bonded jaguar) come through `BossBurstHooks`.
+// landing dust, the roar of Call of the Hunt, the seeds and spits launched
+// from the Gorgebloom's maw, pods squelching, the
+// jade pulse and transformation, the maul, the sunstrike, the Ambush smoke).
+// The Gorgebloom's own body beats (Pollinate, the Vine Lash wave, the Gorge
+// bite, a sprout bursting from its pod) are gorgebloom_fx.ts's. Everything draws through the host's pooled
+// particles and shock rings; the few bits of boss state a burst reads (a pod's
+// last spot, the bonded jaguar) come through `BossBurstHooks`.
 //
 // Cosmetic only: every burst thins with the effects tier and none of them
 // carries a timing a player reacts to (the telegraphs do).
@@ -19,15 +20,11 @@ import {
   BEAST_STALKED,
   BEAST_THICKHIDE_WARD,
   BEAST_TUNING,
-  BLOOM_GORGE,
-  BLOOM_POLLINATE,
   BLOOM_SEED_BURROW,
   BLOOM_SEED_RAIN,
-  BLOOM_SEED_SPROUT,
   BLOOM_SEED_STOMP,
   BLOOM_SPIT,
-  BLOOM_TUNING,
-  BLOOM_VINE_LASH,
+  GORGEBLOOM_ID,
   ZULGAR_AMBUSH,
   ZULGAR_AVATAR,
   ZULGAR_MAULED,
@@ -40,17 +37,37 @@ import {
 import type { Entity, SimEvent } from '../../sim/types';
 import { BOSS_SPLASH, type BossSplash, bossBodyHeight } from './basin_boss_fx_core';
 import type { BasinFxHost } from './basin_fx_host';
+import { SPIT_GLOB_DELAY } from './gorgebloom_fx_core';
+import { GORGEBLOOM_CLIP, gorgebloomModelToWorld } from './gorgebloom_model_core';
 
 /** The boss state a burst reads (BasinBossFx implements it). */
 export interface BossBurstHooks {
-  /** Lob a seed (or a spit) from `src` at `target`. */
-  launchSeed(src: Entity, h: number, target: Entity, spit: boolean): void;
+  /** Lob a seed (or a spit) from `from` at `target`, `delay` seconds on. */
+  launchSeed(
+    from: { x: number; y: number; z: number },
+    target: Entity,
+    spit: boolean,
+    delay: number,
+  ): void;
   /** A pod's spot, while drawn or just gone; else where `fallback` stands. */
   podSpot(podId: number, fallback: Entity): { x: number; z: number };
-  /** The Vine Lash's locked line for its caster, else `fallback`. */
-  lashYaw(casterId: number, fallback: number): number;
   /** The jaguar bonded to the Beastmaster, while it stands. */
   bondJaguar(): Entity | undefined;
+}
+
+const MAW = { x: 0, y: 0, z: 0 };
+
+/** Where a seed (or a spit) leaves: the Gorgebloom model's maw on that clip's
+ *  launch frame; any other caster, high on its body. */
+function bloomMaw(src: Entity, h: number, spit: boolean): { x: number; y: number; z: number } {
+  if (src.templateId === GORGEBLOOM_ID) {
+    const p = spit ? GORGEBLOOM_CLIP.spitMaw : GORGEBLOOM_CLIP.seedMaw;
+    return gorgebloomModelToWorld(src.pos, src.facing, src.scale || 1, p, MAW);
+  }
+  MAW.x = src.pos.x;
+  MAW.y = src.pos.y + h * (spit ? 0.6 : 0.85);
+  MAW.z = src.pos.z;
+  return MAW;
 }
 
 /** A tinted crown (and its rings) thrown up from the floor at (x, z). */
@@ -216,11 +233,13 @@ export function playBasinBossBurst(
       return true;
     }
     case BLOOM_SEED_RAIN: {
-      if (target) hooks.launchSeed(src, h, target, false);
+      // The six pods leave the model's maw on its spit frame (the bar's end).
+      if (target) hooks.launchSeed(bloomMaw(src, h, false), target, false, 0);
       return true;
     }
     case BLOOM_SPIT: {
-      if (target) hooks.launchSeed(src, h, target, true);
+      // The glob leaves the maw a beat after the spit lands (the quick clip).
+      if (target) hooks.launchSeed(bloomMaw(src, h, true), target, true, SPIT_GLOB_DELAY);
       return true;
     }
     case BLOOM_SEED_STOMP: {
@@ -249,36 +268,6 @@ export function playBasinBossBurst(
       });
       return true;
     }
-    case BLOOM_SEED_SPROUT: {
-      const on = target ?? src;
-      const sx = on.pos.x;
-      const sz = on.pos.z;
-      const sy = host.groundY(sx, sz);
-      splashAt(host, sx, sz, BOSS_SPLASH.sprout);
-      host.shockRing(sx, sz, 0xb8ff8a, 3.2, 0.6);
-      host.puff(sx, sy + 0.4, sz, 32, {
-        speed: 9,
-        up: 5,
-        life: 1.1,
-        size: [0.4, 0.15],
-        color: [0.36, 0.55, 0.16],
-        alpha: 1,
-        gravity: 12,
-        drag: 0.5,
-      });
-      host.puff(sx, sy + 0.3, sz, 24, {
-        speed: 4,
-        up: 1.5,
-        life: 1.4,
-        size: [1.4, 3.6],
-        color: [0.46, 0.34, 0.2],
-        alpha: 0.6,
-        drag: 2,
-        radius: 1,
-      });
-      if (!host.reducedMotion()) host.shake(0.12);
-      return true;
-    }
     case BLOOM_SEED_BURROW: {
       const at = hooks.podSpot(ev.targetId, target ?? src);
       const py = host.groundY(at.x, at.z);
@@ -301,79 +290,6 @@ export function playBasinBossBurst(
         alpha: 0.5,
         drag: 2,
       });
-      return true;
-    }
-    case BLOOM_POLLINATE: {
-      if (!target) return true;
-      const th = bossBodyHeight(target.templateId, target.scale || 1);
-      host.puff(target.pos.x, target.pos.y + th * 0.5, target.pos.z, 34, {
-        speed: 3,
-        up: 1,
-        life: 1.2,
-        size: [0.5, 0.12],
-        color: [1, 0.86, 0.35],
-        alpha: 1,
-        glow: true,
-        radius: 0.8,
-      });
-      return true;
-    }
-    case BLOOM_VINE_LASH: {
-      const yaw = hooks.lashYaw(src.id, src.facing);
-      const ax = Math.sin(yaw);
-      const az = Math.cos(yaw);
-      for (let k = 0; k < 12; k++) {
-        const t = ((k + 0.5) / 12) * BLOOM_TUNING.lashLength;
-        const px = x + ax * t;
-        const pz = z + az * t;
-        const py = host.groundY(px, pz);
-        // Thorny vines bursting up out of the loam along the whole lane.
-        if (k % 2 === 0) splashAt(host, px, pz, BOSS_SPLASH.lash);
-        host.puff(px, py + 0.3, pz, 4, {
-          speed: 3,
-          up: 3.5,
-          life: 0.8,
-          size: [0.4, 0.12],
-          color: [0.32, 0.5, 0.14],
-          alpha: 1,
-          gravity: 10,
-          radius: BLOOM_TUNING.lashHalfWidth * 0.8,
-        });
-        host.puff(px, py + 0.3, pz, 3, {
-          speed: 1.5,
-          life: 1,
-          size: [1.2, 2.6],
-          color: [0.5, 0.42, 0.28],
-          alpha: 0.45,
-          radius: BLOOM_TUNING.lashHalfWidth,
-        });
-      }
-      if (!host.reducedMotion()) host.shake(0.15);
-      return true;
-    }
-    case BLOOM_GORGE: {
-      if (!target) return true;
-      const th = bossBodyHeight(target.templateId, target.scale || 1);
-      // The bite's acid splashing round the tank's feet.
-      splashAt(host, target.pos.x, target.pos.z, BOSS_SPLASH.gorge);
-      host.puff(target.pos.x, target.pos.y + th * 0.55, target.pos.z, 24, {
-        speed: 5,
-        life: 0.5,
-        size: [1.3, 0.3],
-        color: [1, 0.22, 0.24],
-        alpha: 1,
-        glow: true,
-      });
-      host.puff(target.pos.x, target.pos.y + th * 0.6, target.pos.z, 16, {
-        speed: 3,
-        up: 2,
-        life: 0.9,
-        size: [0.25, 0.12],
-        color: [0.6, 0.9, 0.3],
-        alpha: 1,
-        gravity: 10,
-      });
-      if (!host.reducedMotion()) host.shake(0.2);
       return true;
     }
     case ZULGAR_PULSE: {

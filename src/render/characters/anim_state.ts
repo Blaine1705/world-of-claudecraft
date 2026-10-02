@@ -56,6 +56,31 @@ export interface AnimState {
    *  names `stunned` holds that loop in place of its idle while a stun rides
    *  (stun_idle_core.ts). */
   auras?: readonly StunAuraFact[];
+  /** Seconds the body's cast bar has run (castTotal - castRemaining), or
+   *  undefined with no bar: a rig with VisualDef.castClipSync locks its
+   *  per-ability cast clip to it (castClipSyncTime). */
+  castElapsed?: number;
+}
+
+/** A cast clip may drift this far (clip seconds) from the bar before it is
+ *  pulled back onto it. */
+export const CAST_CLIP_SYNC_SLACK = 0.12;
+
+/**
+ * Where a bar-locked cast clip should be (VisualDef.castClipSync): the bar's
+ * elapsed time at the clip's rate, when the clip has drifted more than the
+ * slack from it (it entered late behind a swing or a flinch), else null (leave
+ * it). Clamped inside the clip so it never wraps.
+ */
+export function castClipSyncTime(
+  clipTime: number,
+  castElapsed: number | undefined,
+  rate: number,
+  duration: number,
+): number | null {
+  if (castElapsed === undefined || !Number.isFinite(castElapsed) || duration <= 0) return null;
+  const want = Math.min(duration - 1e-3, Math.max(0, castElapsed * rate));
+  return Math.abs(clipTime - want) > CAST_CLIP_SYNC_SLACK ? want : null;
 }
 
 export type BaseState =

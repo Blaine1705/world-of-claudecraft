@@ -39,6 +39,8 @@ import {
 } from '../../sim/encounters/wildheart_basin/ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { BASIN_ACCENTS } from './basin_fx_core';
+import { gorgebloomTopPerScale } from './gorgebloom_model_core';
+import { SPROUT_MODEL, SPROUT_SIM_SCALE } from './lasher_model_core';
 import type { CrownSpec, RippleSpec } from './saurian_fx_core';
 
 // ---- the boss casts ---------------------------------------------------------------
@@ -108,11 +110,12 @@ export function basinBossCastSpecs(): Readonly<Record<string, BossCastSpec>> {
       color: TELEGRAPH_THREAT_COLORS.interrupt,
       accent: BASIN_ACCENTS.physical,
     },
-    // Seed Rain: the bloom gathers its seeds (the pods are the hazard).
+    // Seed Rain: the bloom gathers its seeds (the pods are the hazard). The
+    // sigil turns round its root crown, outside the bulb.
     [BLOOM_SEED_RAIN]: {
       ...BASE,
       shape: 'charge',
-      range: 4.5,
+      range: 7,
       color: BASIN_ACCENTS.pollen,
       accent: 0xff5a3a,
     },
@@ -193,9 +196,11 @@ export function chargeLook(fill: number, t: number): { alpha: number; spin: numb
 export const BOSS_BODY_HEIGHT: Readonly<Record<string, number>> = {
   [BEASTMASTER_ID]: 3,
   [FANGLORD_JAGUAR_ID]: 1.92,
-  [GORGEBLOOM_ID]: 3.6,
+  // Its Blender body to the top of the raised petal (gorgebloom_model_core.ts).
+  [GORGEBLOOM_ID]: gorgebloomTopPerScale(),
   [ZULGAR_ID]: 3.2,
-  [THORN_SPROUT_ID]: 2.47,
+  // Its Blender body (lasher_model_core.ts), drawn at its authored 3 yd.
+  [THORN_SPROUT_ID]: SPROUT_MODEL.idleTop / SPROUT_SIM_SCALE,
 };
 /** A player's drawn height (yards at scale 1). */
 export const PLAYER_BODY_HEIGHT = 2.6;
@@ -473,6 +478,12 @@ export const BOSS_SPLASH = {
   podStomp: {
     crown: { r0: 0.35, r1: 1.7, height: 1.8, life: 0.65 },
     tint: 0xd6e05a,
+  },
+  /** A seed thumping into the loam (inside its pod's touch ring). */
+  podLand: {
+    crown: { r0: 0.3, r1: 1.4, height: 1.2, life: 0.55 },
+    ripple: { reach: 1.6, life: 0.7, rings: 2 },
+    tint: 0xb8a070,
   },
   sprout: {
     crown: { r0: 0.5, r1: 2.6, height: 3.4, life: 0.9 },

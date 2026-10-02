@@ -27,6 +27,13 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
+  BLOOM_GORGE,
+  BLOOM_POLLINATE,
+  BLOOM_SEED_RAIN,
+  BLOOM_SEED_SPROUT,
+  BLOOM_SPIT,
+  BLOOM_VINE_LASH,
+  GORGEBLOOM_ID,
   GREAT_SAURIAN_ID,
   SAURIAN_ENRAGE,
   SAURIAN_HOWDAH_BREAK,
@@ -39,6 +46,7 @@ import {
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ANCESTRAL_SAP,
+  WILDHEART_ENTANGLING_LASH,
   WILDHEART_POUNCE,
   WILDHEART_SPORE_BURST,
   WILDHEART_TOTEM_PULSE,
@@ -83,7 +91,10 @@ import {
 import type { BasinFxHost } from './basin_fx_host';
 import { setBasinJaguarEyesBurn } from './basin_kit';
 import { BasinSplash } from './basin_splash';
+import { BasinThorns } from './basin_thorns';
 import { BASIN_WATER_WADERS } from './basin_water';
+import { GorgebloomFx } from './gorgebloom_fx';
+import { LasherFx } from './lasher_fx';
 import { SaurianFx } from './saurian_fx';
 import { ZulgarAvatarFx } from './zulgar_avatar_fx';
 
@@ -202,8 +213,14 @@ export class WildheartFx {
   private readonly boss: BasinBossFx | null;
   /** The Great Saurian's body: its water, its howdah, its clips. */
   private readonly saurian: SaurianFx | null;
+  /** The Gorgebloom's body: its maw, sacs, lash and death, its clips' gestures. */
+  private readonly gorgebloom: GorgebloomFx | null;
+  /** The Snarlvine Lashers' Entangling Lash on their Blender bodies. */
+  private readonly lasher: LasherFx;
   /** The shared crowns and ripples. */
   private readonly splash: BasinSplash;
+  /** The shared thorn spikes. */
+  private readonly thorns: BasinThorns;
   /** Zulgar's jade spirit jaguar while he hunts. */
   private readonly avatar: ZulgarAvatarFx | null;
   /** Zulgar's model is hidden (heroic Ambush's vanish). */
@@ -391,9 +408,21 @@ export class WildheartFx {
       this.enrages.push({ sprite, entityId: -1 });
     }
     this.splash = new BasinSplash(this.root);
+    this.thorns = new BasinThorns(
+      this.root,
+      (x, z) => this.groundY(x, z),
+      () => this.rand(),
+    );
     // The three bosses: built under this root before the gated attach.
     this.boss = world ? new BasinBossFx(this.bossHost(), world) : null;
     this.saurian = world ? new SaurianFx(this.bossHost(), world, playGesture) : null;
+    this.lasher = new LasherFx(this.bossHost());
+    const boss = this.boss;
+    this.gorgebloom = world
+      ? new GorgebloomFx(this.bossHost(), world, playGesture, (id, fallback) =>
+          boss ? boss.lashYaw(id, fallback) : fallback,
+        )
+      : null;
     this.avatar = world ? new ZulgarAvatarFx(scene, this.bossHost(), world, compileGate) : null;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
@@ -414,6 +443,7 @@ export class WildheartFx {
       reducedMotion: () => this.reducedMotion(),
       shake: (amount) => this.shake?.(amount),
       splash: this.splash,
+      thorns: this.thorns,
     };
   }
 
@@ -507,6 +537,19 @@ export class WildheartFx {
       case SAURIAN_ENRAGE:
       case SAURIAN_RIDER_LANDS:
         return this.saurian?.handleEvent(ev, src) ?? false;
+      // The Gorgebloom's body beats; the seeds and the spit's glob are still
+      // the boss layer's (they land on its pods and slots).
+      case BLOOM_POLLINATE:
+      case BLOOM_VINE_LASH:
+      case BLOOM_GORGE:
+      case BLOOM_SEED_SPROUT:
+        return this.gorgebloom?.handleEvent(ev, src) ?? false;
+      case WILDHEART_ENTANGLING_LASH:
+        return this.lasher.handleEvent(ev, src);
+      case BLOOM_SEED_RAIN:
+      case BLOOM_SPIT:
+        this.gorgebloom?.handleEvent(ev, src);
+        return this.boss?.handleEvent(ev, src) ?? false;
       case WILDHEART_TOTEM_PULSE: {
         this.ring('pulse', x, z, 0xb8e070);
         this.puff(x, gy + 1.5, z, 10, {
@@ -562,7 +605,10 @@ export class WildheartFx {
         this.bossShown = false;
         this.boss?.hideAll();
         this.saurian?.hideAll();
+        this.gorgebloom?.hideAll();
+        this.lasher.hideAll();
         this.splash.hideAll();
+        this.thorns.hideAll();
         this.avatar?.hide();
       }
       this.smoke.update(this.clock);
@@ -581,7 +627,10 @@ export class WildheartFx {
     this.bossShown = true;
     this.boss?.update(dt, this.clock);
     this.saurian?.update(dt, this.clock);
+    this.gorgebloom?.update(dt, this.clock);
+    this.lasher.update(this.clock);
     this.splash.update(this.clock);
+    this.thorns.update(this.clock);
     this.avatar?.update(dt);
     setBasinJaguarEyesBurn(jaguarEyesBurn(this.zulgarState, this.clock));
     this.smoke.update(this.clock);
@@ -852,6 +901,7 @@ export class WildheartFx {
     let zulgar: 'idle' | 'fight' | 'hunt' = 'idle';
     this.boss?.beginScan();
     this.saurian?.beginScan();
+    this.gorgebloom?.beginScan();
     for (const e of world.entities.values()) {
       if (this.boss?.scanEntity(e)) basin = true;
       if (e.kind === 'player') {
@@ -868,6 +918,7 @@ export class WildheartFx {
         if (!e.dead && this.waders.length < 4) this.waders.push(e);
         if (!e.dead && hasAura(e, SAURIAN_ENRAGE)) this.claimEnrage(e);
       }
+      if (e.templateId === GORGEBLOOM_ID) this.gorgebloom?.scanBloom(e);
       if (e.templateId === ZULGAR_ID) {
         basin = true;
         this.avatar?.setZulgar(e);
@@ -878,6 +929,9 @@ export class WildheartFx {
       const castId = e.castingAbility;
       const spec = castId ? this.castSpec(castId) : undefined;
       if (!castId || !spec) continue;
+      // A basin cast painting the floor means the party fights in the basin,
+      // boss or no boss in view (a Snarlvine Lasher's lane far off the bosses).
+      basin = true;
       if (castId === WILDHEART_ANCESTRAL_SAP) this.claimBeam(e);
       if (spec.shape === 'lane') {
         if (this.lanes.some((l) => l.casterId === e.id)) continue;
@@ -900,7 +954,8 @@ export class WildheartFx {
       slot.group.visible = true;
     }
     this.saurian?.endScan();
-    this.inBasin = basin || this.clouds.some((c) => c.objectId >= 0);
+    this.gorgebloom?.endScan();
+    this.inBasin = basin || this.clouds.some((c) => c.objectId >= 0) || this.lasher.busy();
     this.zulgarState = zulgar;
   }
 
@@ -969,6 +1024,7 @@ export class WildheartFx {
     attempt(() => this.root.removeFromParent());
     attempt(() => this.kit.dispose());
     attempt(() => this.splash.dispose());
+    attempt(() => this.thorns.dispose());
     if (this.boss) {
       const boss = this.boss;
       attempt(() => boss.dispose());
@@ -976,6 +1032,10 @@ export class WildheartFx {
     if (this.saurian) {
       const saurian = this.saurian;
       attempt(() => saurian.dispose());
+    }
+    if (this.gorgebloom) {
+      const gorgebloom = this.gorgebloom;
+      attempt(() => gorgebloom.dispose());
     }
     if (this.avatar) {
       const avatar = this.avatar;

@@ -45,6 +45,7 @@ import {
   BASIN_AURA_LOOKS,
   BASIN_BOSS_TEMPLATES,
   BASIN_HEAD_MARKS,
+  BOSS_SPLASH,
   type BossCastSpec,
   basinBossCastSpecs,
   bondCordStrength,
@@ -922,6 +923,7 @@ export class BasinBossFx implements BossBurstHooks {
     for (const s of this.seeds) {
       if (!s.alive) continue;
       const u = (this.clock - s.born) / s.flight;
+      if (u < 0) continue;
       if (u >= 1) {
         s.alive = false;
         s.body.visible = false;
@@ -930,6 +932,8 @@ export class BasinBossFx implements BossBurstHooks {
         continue;
       }
       const p = seedArcInto(this.arc, s.from, s.to, u, s.apex);
+      s.body.visible = !s.spit;
+      s.glow.visible = true;
       s.body.position.set(p.x, p.y - 0.35, p.z);
       s.body.rotation.x = this.clock * 9;
       s.glow.position.set(p.x, p.y, p.z);
@@ -961,6 +965,17 @@ export class BasinBossFx implements BossBurstHooks {
       });
       return;
     }
+    // The pod thumps into the loam: a crown of earth and a ring through it.
+    const gy = this.host.groundY(x, z);
+    this.host.splash.crown(x, gy - 0.05, z, BOSS_SPLASH.podLand.crown, BOSS_SPLASH.podLand.tint);
+    if (BOSS_SPLASH.podLand.ripple)
+      this.host.splash.ripple(
+        x,
+        gy + 0.04,
+        z,
+        BOSS_SPLASH.podLand.ripple,
+        BOSS_SPLASH.podLand.tint,
+      );
     this.host.puff(x, y + 0.2, z, 12, {
       speed: 3.5,
       up: 2,
@@ -1175,14 +1190,20 @@ export class BasinBossFx implements BossBurstHooks {
     return { x: fallback.pos.x, z: fallback.pos.z };
   }
 
-  launchSeed(src: Entity, h: number, target: Entity, spit: boolean): void {
+  launchSeed(
+    from: { x: number; y: number; z: number },
+    target: Entity,
+    spit: boolean,
+    delay: number,
+  ): void {
     const s = this.seeds.find((x) => !x.alive) ?? this.seeds[0];
     s.alive = true;
     s.spit = spit;
-    s.born = this.clock;
+    // A delayed launch (the spit's glob) waits unseen at the maw.
+    s.born = this.clock + Math.max(0, delay);
     s.flight = spit ? SPIT_FLIGHT_SECONDS : SEED_FLIGHT_SECONDS;
     s.targetId = target.id;
-    s.from.set(src.pos.x, src.pos.y + h * (spit ? 0.6 : 0.85), src.pos.z);
+    s.from.set(from.x, from.y, from.z);
     const th =
       target.kind === 'object' ? 0.4 : bossBodyHeight(target.templateId, target.scale || 1) * 0.5;
     const ty =
@@ -1190,9 +1211,9 @@ export class BasinBossFx implements BossBurstHooks {
     s.to.set(target.pos.x, ty + th, target.pos.z);
     const d = Math.hypot(s.to.x - s.from.x, s.to.z - s.from.z);
     s.apex = spit ? 0.8 : 3 + d * 0.3;
-    s.body.visible = !spit;
+    s.body.visible = false;
     s.body.scale.setScalar(0.9);
-    s.glow.visible = true;
+    s.glow.visible = false;
     s.glow.scale.setScalar(spit ? 1.4 : 1.8);
     s.glowMat.color.setHex(spit ? 0x9cff4a : 0xff5a3a);
     // A pod already claimed waits for its seed to land.
