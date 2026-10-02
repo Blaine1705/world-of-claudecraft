@@ -201,7 +201,13 @@ describe('every multi-count interact objective has enough distinct objects to fi
     // Plus the hub healing drill (q_hub_healing_numbers, count 3), a sixth:
     // tutorial/hub_healing_drill.ts credits it off every EFFECTIVE heal that
     // lands on the friendly hub healing dummy, never through this ledger.
-    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(26);
+    //
+    // Plus the Stormbrass Foundry's worker camps (q_sf_free_the_workers, count
+    // 3), a seventh: encounters/stormbrass_foundry/workers.ts credits one per
+    // camp struck free in a run (a camp is freed once a run), never through
+    // this ledger. The camps respawn with a fresh run, so the count can be
+    // finished across runs: accepted, the quest is not repeatable.
+    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(27);
   });
 
   it.each(
@@ -211,7 +217,8 @@ describe('every multi-count interact objective has enough distinct objects to fi
         o.itemId !== 'ps_gauntlet_flag' &&
         o.itemId !== 'ps_ability_drill' &&
         o.itemId !== 'hub_dummy_drill' &&
-        o.itemId !== 'hub_healing_drill',
+        o.itemId !== 'hub_healing_drill' &&
+        o.itemId !== 'sf_worker_camp',
     ),
   )('$questId can reach $count on distinct $itemId objects', ({ itemId, count }) => {
     expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
@@ -277,7 +284,8 @@ describe('every multi-count interact objective has enough distinct objects to fi
     // (tutorial/dummy_drill.ts) credits off every blow that lands on a
     // training dummy, and hub_healing_drill (tutorial/hub_healing_drill.ts)
     // credits off every effective heal that lands on the friendly hub
-    // healing dummy. Anything ELSE missing from both placement
+    // healing dummy. sf_worker_camp (encounters/stormbrass_foundry/workers.ts)
+    // credits off a worker camp struck free. Anything ELSE missing from both placement
     // registries would mean an objective whose object spawns somewhere this
     // reasoning has not checked.
     const placedItemIds = new Set([
@@ -294,6 +302,7 @@ describe('every multi-count interact objective has enough distinct objects to fi
       'ps_gauntlet_flag',
       'ps_guild_signpost',
       'ps_passing_stone',
+      'sf_worker_camp',
       'train_valorsteed',
     ]);
   });

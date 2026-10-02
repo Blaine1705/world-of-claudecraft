@@ -73,10 +73,12 @@ const REST_AT_CART = 1.4;
 const REST_AT_HEAP = 1.8;
 /** A worker's bark carries across its camp and the pack beside it. */
 const BARK_RANGE = 45;
+/** Never shown: the camp object is an empty encounter anchor (no plate, no
+ *  tooltip, never interactable), so the name is a debugging label only. */
 const CAMP_OBJECT_NAME = 'Worker Camp';
 /** Work-worn cloth and leather: each worker takes the next tint, so a camp
  *  reads as people rather than copies (render tints the body by Entity.color). */
-const WORKER_TINTS = [0xb58a5a, 0x7f8fa6, 0xa86a4a, 0x8c8c6a, 0x9a9a9a] as const;
+const WORKER_TINTS = [0xb5562e, 0x3f68a8, 0xc8a23a, 0x7a4a8a, 0x8f9499] as const;
 
 const CAMP_TEMPLATE_IDS: ReadonlySet<string> = new Set(
   Object.values(FOUNDRY_WORKER_CAMP_TEMPLATES),
@@ -182,7 +184,9 @@ function liveWorkers(ctx: SimContext, state: FoundryWorkerCampState): Entity[] {
   const out: Entity[] = [];
   for (const id of state.workerIds) {
     const w = ctx.entities.get(id);
-    if (w) out.push(w);
+    // Nothing a player does can hurt one; a body killed some other way (a dev
+    // command, a scripted sweep) is left where it fell.
+    if (w && !w.dead) out.push(w);
   }
   return out;
 }

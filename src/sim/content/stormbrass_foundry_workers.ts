@@ -1,7 +1,7 @@
 // The Stormbrass Foundry's chained workers (the owner's idea, the foundry
 // rebuild): the miners of the storm line the foundry's machines took and kept,
 // chained at three scrap camps, each camp under the eye of a nearby trash pack.
-// A miner swings a pick at an ore seam; a hauler carries scrap from the heap to
+// A miner swings a sledge at an ore seam; a hauler carries scrap from the heap to
 // a cart and back. They are decoration until their guards fall: then a player
 // can talk to them and strike their chains ("Free them"), they cheer, walk off
 // toward the lift and are gone. The Lift Warden's "Free the Workers" asks for
@@ -53,13 +53,17 @@ export function isFoundryWorkerTemplate(templateId: string): boolean {
   return WORKER_TEMPLATE_IDS.has(templateId);
 }
 
+const CAMP_PHASE_BY_TEMPLATE: ReadonlyMap<string, FoundryWorkerCampPhase> = new Map(
+  (Object.keys(FOUNDRY_WORKER_CAMP_TEMPLATES) as FoundryWorkerCampPhase[]).map((phase) => [
+    FOUNDRY_WORKER_CAMP_TEMPLATES[phase],
+    phase,
+  ]),
+);
+
 /** The phase a camp state object's template id carries, or null for any
  *  other template. */
 export function foundryWorkerCampPhaseOf(templateId: string): FoundryWorkerCampPhase | null {
-  for (const phase of Object.keys(FOUNDRY_WORKER_CAMP_TEMPLATES) as FoundryWorkerCampPhase[]) {
-    if (FOUNDRY_WORKER_CAMP_TEMPLATES[phase] === templateId) return phase;
-  }
-  return null;
+  return CAMP_PHASE_BY_TEMPLATE.get(templateId) ?? null;
 }
 
 export interface FoundryWorkerSpot {

@@ -27,7 +27,6 @@ import {
   VOLTAIC_WARDEN_ID,
 } from './ids';
 import { dropParts, startLever, startPress, tickTock, tockState } from './line_master';
-import { tickFoundryWorkers } from './workers';
 import {
   arcSurge,
   chargeCycle,
@@ -41,6 +40,7 @@ import {
   tickPrimeDraft,
 } from './prime_draft';
 import { startVents } from './scalding_vents';
+import { tickFoundryWorkers } from './workers';
 
 export {
   gantryPlayers,

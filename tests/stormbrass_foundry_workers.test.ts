@@ -6,6 +6,7 @@
 // the run is credited per camp, and freeing all three earns the deed.
 
 import { describe, expect, it } from 'vitest';
+import { DEEDS } from '../src/sim/content/deeds';
 import { STORMBRASS_FOUNDRY_SPAWNS } from '../src/sim/content/stormbrass_foundry';
 import { STORMBRASS_FOUNDRY_FIELD } from '../src/sim/content/stormbrass_foundry_layout';
 import {
@@ -23,7 +24,6 @@ import {
   FOUNDRY_WORKERS_QUEST_ID,
   foundryWorkerCampProps,
 } from '../src/sim/content/stormbrass_foundry_workers';
-import { DEEDS } from '../src/sim/content/deeds';
 import { DUNGEONS, instanceOrigin, MOBS, QUESTS } from '../src/sim/data';
 import {
   FOUNDRY_WORKER_LINES,
@@ -36,6 +36,7 @@ import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { foundryWorkerGossip } from '../src/ui/hud/dungeon/foundry_worker_gossip_core';
+import { localizeSimText } from '../src/ui/sim_i18n';
 
 interface Run {
   sim: Sim;
@@ -128,9 +129,18 @@ describe('the camps as authored', () => {
     for (const c of FOUNDRY_WORKER_CAMPS) {
       expect(c.workers.length, c.id).toBeGreaterThanOrEqual(2);
       expect(c.workers.length, c.id).toBeLessThanOrEqual(3);
-      expect(c.workers.some((w) => w.role === 'miner'), c.id).toBe(true);
-      expect(c.workers.some((w) => w.role === 'hauler'), c.id).toBe(true);
-      expect(STORMBRASS_FOUNDRY_SPAWNS.some((s) => s.packId === c.guardPack), c.id).toBe(true);
+      expect(
+        c.workers.some((w) => w.role === 'miner'),
+        c.id,
+      ).toBe(true);
+      expect(
+        c.workers.some((w) => w.role === 'hauler'),
+        c.id,
+      ).toBe(true);
+      expect(
+        STORMBRASS_FOUNDRY_SPAWNS.some((s) => s.packId === c.guardPack),
+        c.id,
+      ).toBe(true);
     }
     expect(FOUNDRY_WORKER_CAMPS.map((c) => c.guardPack)).toEqual(['g2', 'g6', 'g12']);
   });
@@ -272,6 +282,26 @@ describe('the workers are never a fight', () => {
       expect(w.threat.size).toBe(0);
     }
     expect(r.events.some((e) => e.type === 'damage' && e.targetId === miner.id)).toBe(false);
+  });
+});
+
+describe('a worker that somehow dies', () => {
+  it('is left alone: never hauled, never turned into a freed laborer, the rest still go free', () => {
+    const r = freshRun();
+    const [miner, , hauler] = workersOf(r, 'A');
+    // Nothing a player does reaches them (they are not hostile); a raw kill
+    // (a dev command, a stray scripted sweep) must not leave a walking corpse.
+    hauler.dead = true;
+    hauler.hp = 0;
+    const at = { ...hauler.pos };
+    tick(r, 3);
+    expect(Math.hypot(hauler.pos.x - at.x, hauler.pos.z - at.z)).toBeLessThan(0.01);
+    killPack(r, 'g2');
+    tick(r, 0.2);
+    freeAt(r, r.tank, miner);
+    tick(r, 0.2);
+    expect(miner.templateId).toBe(FOUNDRY_WORKER_TEMPLATES.freed);
+    expect(hauler.templateId).toBe(FOUNDRY_WORKER_TEMPLATES.hauler);
   });
 });
 
@@ -464,11 +494,7 @@ describe('a reset', () => {
     r.inst = inst;
     tick(r, 0.1);
     const camps = foundryWorkerCampObjects(r.sim.ctx, r.inst);
-    expect(camps.map((c) => c.foundryWorkerCamp?.phase)).toEqual([
-      'guarded',
-      'guarded',
-      'guarded',
-    ]);
+    expect(camps.map((c) => c.foundryWorkerCamp?.phase)).toEqual(['guarded', 'guarded', 'guarded']);
     expect(workersOf(r, 'A').map((w) => w.templateId)).toEqual([
       FOUNDRY_WORKER_TEMPLATES.miner,
       FOUNDRY_WORKER_TEMPLATES.miner,
@@ -497,9 +523,20 @@ describe('/dev foundry workers', () => {
       const lx = r.tank.pos.x - r.ox;
       const lz = r.tank.pos.z - r.oz;
       expect(Math.hypot(lx - c.post.x, lz - c.post.z), c.id).toBeLessThan(12);
-      expect(Math.abs(r.tank.pos.y - r.sim.ctx.groundPos(r.tank.pos.x, r.tank.pos.z).y)).toBeLessThan(
-        0.5,
-      );
+      expect(
+        Math.abs(r.tank.pos.y - r.sim.ctx.groundPos(r.tank.pos.x, r.tank.pos.z).y),
+      ).toBeLessThan(0.5);
     }
+  });
+});
+
+describe('the workers speak every language', () => {
+  it('each of their three lines is re-localized by the client matcher', () => {
+    // The sim emits English (it stays language-agnostic); the client must
+    // recognize every line, or a non-English player reads raw English.
+    for (const line of Object.values(FOUNDRY_WORKER_LINES)) {
+      expect(localizeSimText(line), line).not.toBeNull();
+    }
+    expect(localizeSimText('The guards are still watching.')).toBeNull();
   });
 });
