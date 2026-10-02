@@ -54,7 +54,6 @@ const SHOTS = [
     face: -PI / 4,
     pitch: 0.42,
     dist: 26,
-    pre: ['/dev wildheart kill saurian'],
     cmds: ['/dev wildheart gates'],
     cmdWait: 900,
     wait: 350,
@@ -77,36 +76,37 @@ const SHOTS = [
   { id: 'santuario_vista_atras', at: [0, 226], face: PI, pitch: 0.32, dist: 22 },
   // ---- the map and the minimap (HUD on) ----
   { id: 'mapa_m', at: [0, -40], face: 0, pitch: 0.3, dist: 18, map: true },
-  { id: 'minimapa', at: [0, -140], face: 0, pitch: 0.3, dist: 18, hud: true },
+  { id: 'minimapa', at: [0, -104], face: 0, pitch: 0.35, dist: 18, hud: true },
   // ---- telegraphs and creature effects (HUD on: cast bars) ----
   {
     id: 'saurio_pisoton',
-    pre: ['/dev wildheart spawn saurian'],
     stage: ['great_saurian', 9, PI * 0.25],
     cmds: ['/dev wildheart trigger stomp'],
-    cmdWait: 1300,
+    cmdWait: 1100,
     pitch: 0.62,
     dist: 32,
     hud: true,
+    wait: 80,
   },
   {
     id: 'saurio_pisoton_impacto',
     stage: ['great_saurian', 9, PI * 0.25],
     cmds: ['/dev wildheart trigger stomp'],
-    cmdWait: 2150,
+    cmdWait: 2050,
     pitch: 0.5,
     dist: 30,
     hud: true,
-    wait: 120,
+    wait: 60,
   },
   {
     id: 'saurio_coletazo',
     stage: ['great_saurian', 9, PI * 0.5],
     cmds: ['/dev wildheart trigger tail'],
-    cmdWait: 650,
+    cmdWait: 420,
     pitch: 0.62,
     dist: 32,
     hud: true,
+    wait: 80,
   },
   {
     id: 'saurio_palanquin_roto',
@@ -137,6 +137,22 @@ const SHOTS = [
     pitch: 0.6,
     dist: 22,
     hud: true,
+  },
+  {
+    id: 'pulso_totem',
+    at: [0, 40],
+    face: 0,
+    cmds: [
+      '/dev wildheart kill trash',
+      '/dev wildheart spawn ravager',
+      '/dev wildheart spawn totem',
+    ],
+    cmdWait: 1200,
+    waitPulse: true,
+    pitch: 0.55,
+    dist: 20,
+    hud: true,
+    wait: 0,
   },
   {
     id: 'nube_de_esporas',
@@ -354,6 +370,15 @@ async function main() {
           if (await page.evaluate(pageCasting, shot.waitCast)) break;
           await sleep(80);
         }
+      }
+      // Catch a Sunbone Totem's pulse ring mid-flight: wait for its beat.
+      if (shot.waitPulse) {
+        await page.evaluate(() => {
+          window.__shotPulse = 0;
+          const fx = window.__game.renderer;
+          void fx;
+        });
+        await sleep(2000 - 400);
       }
       if (shot.killNearest) {
         console.log('KILL', shot.id, await page.evaluate(pageKill, shot.killNearest));

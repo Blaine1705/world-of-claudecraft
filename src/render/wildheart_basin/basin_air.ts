@@ -106,7 +106,8 @@ function buildGorgeHaze(opts: BasinAirOptions): THREE.Group {
   const b = WILDHEART_BASIN_FIELD.bounds;
   const rect = new THREE.Vector4(b.minX, b.minZ, b.maxX - b.minX, b.maxZ - b.minZ);
   // Warm and thick low in the gorge, thinning as it rises toward the terraces.
-  const layers = opts.lowGfx ? [6] : [3, 8, 14];
+  // One layer below the high effects tier, two at it (cosmetic shed).
+  const layers = opts.lowGfx || opts.density < 1 ? [6] : [4, 12];
   // Laid out in the interior's own frame (the mask reads local x, z).
   const geo = new THREE.PlaneGeometry(b.maxX - b.minX + 120, b.maxZ - b.minZ + 120)
     .rotateX(-Math.PI / 2)
@@ -120,7 +121,7 @@ function buildGorgeHaze(opts: BasinAirOptions): THREE.Group {
         ...fogUniforms(),
         uTime: sharedUniforms.uTime,
         uLayer: { value: i },
-        uAlpha: { value: [0.55, 0.38, 0.22][i] ?? 0.4 },
+        uAlpha: { value: layers.length === 1 ? 0.5 : ([0.5, 0.28][i] ?? 0.3) },
         uColor: { value: new THREE.Color(i === 0 ? 0xc9c7a0 : 0xd6cfa4) },
         uMask: { value: basinWalkMaskTexture() },
         uRect: { value: rect },
@@ -128,6 +129,7 @@ function buildGorgeHaze(opts: BasinAirOptions): THREE.Group {
       transparent: true,
       depthWrite: false,
       fog: true,
+      defines: { BFBM_OCTAVES: 3 },
     });
     const mesh = new THREE.Mesh(geo, material);
     mesh.position.y = WILDHEART_BASIN_VOID_HEIGHT + lift;
@@ -177,7 +179,11 @@ void main() {
   float near = smoothstep(6.0, 22.0, length(cameraPosition - vWorld));
   float a = core * dust * breathe * ends * near * uAlpha;
   gl_FragColor = vec4(vec3(1.0, 0.86, 0.55) * a, 1.0);
-  #include <fog_fragment>
+  // Additive: fade toward black with distance (a fog mix toward the fog
+  // colour would paint the whole quad gold where it is transparent).
+  #ifdef USE_FOG
+  gl_FragColor.rgb *= 1.0 - smoothstep(fogNear, fogFar, vFogDepth);
+  #endif
 }
 `;
 
@@ -288,7 +294,11 @@ void main() {
   vec3 col = vKind < 0.5 ? vec3(0.85, 1.0, 0.45) * 2.2 : vec3(1.0, 0.9, 0.5) * 1.2;
   float a = core * vGlow * (vKind < 0.5 ? 1.0 : 0.55);
   gl_FragColor = vec4(col * a, 1.0);
-  #include <fog_fragment>
+  // Additive: fade toward black with distance (a fog mix toward the fog
+  // colour would paint the whole quad gold where it is transparent).
+  #ifdef USE_FOG
+  gl_FragColor.rgb *= 1.0 - smoothstep(fogNear, fogFar, vFogDepth);
+  #endif
 }
 `;
 

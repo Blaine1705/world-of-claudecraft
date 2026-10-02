@@ -277,6 +277,7 @@ uniform float uDrift;
 varying float vLife;
 varying vec2 vUv;
 varying float vSeed;
+varying float vDepth;
 #include <fog_pars_vertex>
 void main() {
   vUv = uv;
@@ -293,6 +294,7 @@ void main() {
   float size = mix(aSize.x, aSize.y, burst);
   vec4 mvPosition = viewMatrix * modelMatrix * vec4(c, 1.0);
   mvPosition.xy += position.xy * size;
+  vDepth = -mvPosition.z;
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -306,14 +308,18 @@ uniform float uTime;
 varying float vLife;
 varying vec2 vUv;
 varying float vSeed;
+varying float vDepth;
 #include <fog_pars_fragment>
 ${BASIN_NOISE_GLSL}
 void main() {
+  // A puff right on the camera thins out (no screen-filling white).
+  float near = smoothstep(2.0, 14.0, vDepth);
+  if (near <= 0.001) discard;
   vec2 d = vUv - 0.5;
   float n = bnoise(vUv * 4.0 + vSeed * 31.0 + uTime * 0.05) * 0.6 + bnoise(vUv * 9.0 - vSeed * 7.0) * 0.4;
   float r = length(d) * 2.0 + (n - 0.5) * 0.5;
   float a = (1.0 - smoothstep(0.2, 1.0, r)) * smoothstep(0.0, 0.12, vLife) * (1.0 - smoothstep(0.5, 1.0, vLife));
-  gl_FragColor = vec4(uColor * (0.88 + 0.2 * n), a * uAlpha);
+  gl_FragColor = vec4(uColor * (0.88 + 0.2 * n), a * uAlpha * near);
   #include <fog_fragment>
   #include <colorspace_fragment>
 }
@@ -442,7 +448,8 @@ function mistFor(falls: readonly BasinFall[], density: number, lowGfx: boolean):
         dir: [f.nx * 0.4, f.nz * 0.4],
         rise: 4 + h(4) * 6,
         life: 14 + h(5) * 12,
-        size: [12 + h(6) * 8, 26 + h(7) * 16],
+        // Smaller banks on the lower tiers (less overdraw, same read).
+        size: [(12 + h(6) * 8) * (0.6 + 0.4 * density), (26 + h(7) * 16) * (0.6 + 0.4 * density)],
         seed: h(8),
       });
     }
@@ -502,7 +509,11 @@ void main() {
   float spray = 0.55 + 0.45 * bnoise(vec2(ang * 9.0 + uTime * 0.08, x * 2.0 + uTime * 0.05));
   float a = vBow.z * face * ends * lowArc * spray;
   gl_FragColor = vec4(spectrum(x) * a, 1.0);
-  #include <fog_fragment>
+  // Additive: fade toward black with distance (a fog mix toward the fog
+  // colour would paint the whole quad gold where it is transparent).
+  #ifdef USE_FOG
+  gl_FragColor.rgb *= 1.0 - smoothstep(fogNear, fogFar, vFogDepth);
+  #endif
 }
 `;
 

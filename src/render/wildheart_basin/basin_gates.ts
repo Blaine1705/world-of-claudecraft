@@ -41,6 +41,8 @@ import { BASIN_NOISE_GLSL } from './basin_sky';
 
 interface GateRig {
   root: THREE.Group;
+  /** The one always-drawn node whose render hook drives the gate. */
+  driver: THREE.Object3D;
   /** Called every rendered frame with the gate's openness, seal state and clock. */
   apply(openness: number, sealed: boolean, since: number): void;
 }
@@ -249,6 +251,7 @@ function vineBridge(gate: DungeonGateDef): GateRig {
   };
   return {
     root,
+    driver: meshes[0],
     apply(openness) {
       const front = Math.min(1, openness * (1 + 1.5 / total));
       tipU.uFront.value = front;
@@ -360,6 +363,7 @@ function thornWall(gate: DungeonGateDef): GateRig {
   let last = -1;
   return {
     root,
+    driver: meshes[0],
     apply(openness, sealed, since) {
       const rise = thornRise(openness);
       pulseU.uPulse.value = thornSealPulse(sealed, sharedUniforms.uTime.value) * rise;
@@ -403,6 +407,8 @@ uniform float uFlame;
 varying vec2 vUv;
 ${BASIN_NOISE_GLSL}
 void main() {
+  // A spent ward costs one compare: out before any noise.
+  if (uCharge <= 0.002) discard;
   vec2 uv = vUv;
   // Rising spirit flame: noise licking upward, thick at the base.
   float flame = bfbm(vec2(uv.x * 7.0, uv.y * 3.0 - uTime * 1.3)) ;
@@ -462,6 +468,7 @@ function ward(gate: DungeonGateDef, rite: boolean): GateRig {
   }
   return {
     root,
+    driver: sheet,
     apply(openness, sealed) {
       u.uCharge.value = Math.max(wardCharge(openness, sharedUniforms.uTime.value), sealed ? 1 : 0);
       u.uSeal.value = sealed ? 0.6 + 0.4 * Math.sin(sharedUniforms.uTime.value * 5) : 0;
@@ -517,17 +524,20 @@ export function buildBasinGates(
       holder.rotation.y = gate.rot;
     }
     holder.add(rig.root);
+    // Once per frame (the hook also fires for shadow passes), on the one
+    // node that always draws.
+    let stamp = -1;
     const refresh = (): void => {
-      const view = gateView(key, sharedUniforms.uTime.value);
+      const now = sharedUniforms.uTime.value;
+      if (now === stamp) return;
+      stamp = now;
+      const view = gateView(key, now);
       rig.apply(view.openness, view.state === 'sealed', view.since);
     };
     // Paint the initial (shut) pose before the first frame.
     rig.apply(0, false, 999);
-    holder.traverse((o) => {
-      const m = o as THREE.Mesh;
-      if (m.isMesh || (o as THREE.Line).isLine || (o as THREE.Sprite).isSprite)
-        m.onBeforeRender = refresh;
-    });
+    const m = rig.driver as THREE.Mesh;
+    m.onBeforeRender = refresh;
     group.add(holder);
   }
   return group;

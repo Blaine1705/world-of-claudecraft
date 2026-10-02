@@ -605,6 +605,8 @@ export class WildheartFx {
       this.scanWorld(world);
     }
     if (!this.inBasin) {
+      // Out of the basin: no wake lingers on the shared water.
+      for (const w of BASIN_WATER_WADERS.value) w.w = 0;
       this.smoke.update(this.clock);
       this.glow.update(this.clock);
       return;
@@ -765,7 +767,7 @@ export class WildheartFx {
     for (const v of this.vines) {
       if (v.entityId < 0) continue;
       const e = world.entities.get(v.entityId);
-      if (!e || e.dead || !e.auras?.some((a) => a.id === WILDHEART_ENTANGLED)) {
+      if (!e || e.dead || !hasAura(e, WILDHEART_ENTANGLED)) {
         v.entityId = -1;
         v.mesh.visible = false;
         v.glow.visible = false;
@@ -783,7 +785,7 @@ export class WildheartFx {
     for (const s of this.enrages) {
       if (s.entityId < 0) continue;
       const e = world.entities.get(s.entityId);
-      if (!e || e.dead || !e.auras?.some((a) => a.id === SAURIAN_ENRAGE)) {
+      if (!e || e.dead || !hasAura(e, SAURIAN_ENRAGE)) {
         s.entityId = -1;
         s.sprite.visible = false;
         continue;
@@ -854,7 +856,7 @@ export class WildheartFx {
     let zulgar = false;
     for (const e of world.entities.values()) {
       if (e.kind === 'player') {
-        if (e.auras?.some((a) => a.id === WILDHEART_ENTANGLED)) this.claimVine(e);
+        if (hasAura(e, WILDHEART_ENTANGLED)) this.claimVine(e);
         continue;
       }
       if (e.kind !== 'mob') {
@@ -864,7 +866,7 @@ export class WildheartFx {
       if (e.templateId === GREAT_SAURIAN_ID) {
         basin = true;
         if (!e.dead && this.waders.length < 4) this.waders.push(e);
-        if (!e.dead && e.auras?.some((a) => a.id === SAURIAN_ENRAGE)) this.claimEnrage(e);
+        if (!e.dead && hasAura(e, SAURIAN_ENRAGE)) this.claimEnrage(e);
       }
       if (e.templateId === ZULGAR_ID) {
         basin = true;
@@ -939,12 +941,30 @@ export class WildheartFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
-    this.root.removeFromParent();
-    this.kit.dispose();
-    for (const g of this.geometries) g.dispose();
-    for (const m of this.materials) m.dispose();
     for (const w of BASIN_WATER_WADERS.value) w.w = 0;
+    // Best effort: one throwing release never strands the rest.
+    const errors: unknown[] = [];
+    const attempt = (release: () => void): void => {
+      try {
+        release();
+      } catch (e) {
+        errors.push(e);
+      }
+    };
+    attempt(() => this.root.removeFromParent());
+    attempt(() => this.kit.dispose());
+    for (const g of this.geometries) attempt(() => g.dispose());
+    for (const m of this.materials) attempt(() => m.dispose());
+    if (errors.length > 0) throw new AggregateError(errors, 'WildheartFx dispose');
   }
+}
+
+/** Does the entity carry the aura (a loop: no per-frame closure). */
+function hasAura(e: { auras?: readonly { id: string }[] }, id: string): boolean {
+  const auras = e.auras;
+  if (!auras) return false;
+  for (let i = 0; i < auras.length; i++) if (auras[i].id === id) return true;
+  return false;
 }
 
 /** Thorny vines in a loose coil, 1.7 yd tall round a body (built once). */

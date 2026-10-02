@@ -7,7 +7,8 @@
 // cloud gaps. A dry sky: no rain curtain, no storm.
 //
 // Camera-centred (drawn at the far plane), all motion on the shared clock.
-// Cosmetic only; the cloud octaves shed with the tier.
+// Cosmetic only; the detail octaves are a build-time define that sheds with
+// the tier.
 
 import * as THREE from 'three';
 import { sharedUniforms } from '../gfx';
@@ -19,6 +20,9 @@ export interface BasinSkyOptions {
 }
 
 export const BASIN_NOISE_GLSL = /* glsl */ `
+#ifndef BFBM_OCTAVES
+#define BFBM_OCTAVES 5
+#endif
 float bhash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float bnoise(vec2 p) {
   vec2 i = floor(p); vec2 f = fract(p);
@@ -27,7 +31,7 @@ float bnoise(vec2 p) {
 }
 float bfbm(vec2 p) {
   float s = 0.0; float a = 0.5;
-  for (int i = 0; i < 5; i++) { s += bnoise(p) * a; p *= 2.03; a *= 0.5; }
+  for (int i = 0; i < BFBM_OCTAVES; i++) { s += bnoise(p) * a; p *= 2.03; a *= 0.5; }
   return s;
 }
 `;
@@ -48,7 +52,6 @@ varying vec3 vDir;
 uniform float uTime;
 uniform vec3 uSunDir;
 uniform vec3 uHorizon;
-uniform float uDetail;
 ${BASIN_NOISE_GLSL}
 // Tall cumulus round the horizon: a column field in azimuth that climbs with
 // billowing tops; returns density, writes the cloud's local up-shade.
@@ -59,7 +62,10 @@ float towers(vec3 d, out float shade) {
   float col = bfbm(vec2(az * 2.6 + t, 0.7));
   // Towers climb well past the caldera rim (the walls hide the low sky).
   float height = 0.2 + smoothstep(0.34, 0.78, col) * 0.5;
-  float billow = bfbm(vec2(az * 9.0 + t * 3.0, up * 7.0 - t)) * 0.14 + bfbm(vec2(az * 22.0, up * 18.0) + 4.0) * 0.07 * uDetail;
+  float billow = bfbm(vec2(az * 9.0 + t * 3.0, up * 7.0 - t)) * 0.14;
+#if BASIN_SKY_DETAIL
+  billow += bfbm(vec2(az * 22.0, up * 18.0) + 4.0) * 0.07;
+#endif
   float top = height + billow;
   float body = smoothstep(top, top - 0.06, up) * smoothstep(-0.06, 0.03, up);
   // Flat grey bases sitting on the haze line, cauliflower tops.
@@ -83,7 +89,11 @@ void main() {
   if (up > 0.0) {
     vec2 uv = d.xz / (up + 0.18);
     float c1 = bfbm(uv * 0.7 + vec2(uTime * 0.006, uTime * 0.003));
-    float c2 = bfbm(uv * 1.9 - vec2(uTime * 0.01, 0.0) + 9.0) * uDetail;
+#if BASIN_SKY_DETAIL
+    float c2 = bfbm(uv * 1.9 - vec2(uTime * 0.01, 0.0) + 9.0);
+#else
+    float c2 = 0.45;
+#endif
     deck = smoothstep(0.56, 0.84, c1 * 0.75 + c2 * 0.35) * smoothstep(0.02, 0.22, up);
     float lit = 0.55 + 0.45 * smoothstep(0.4, 0.95, dot(normalize(vec3(d.x, 0.0, d.z)), normalize(vec3(uSunDir.x, 0.0, uSunDir.z))) * 0.5 + 0.5);
     vec3 deckCol = mix(vec3(0.72, 0.7, 0.68), vec3(1.0, 0.95, 0.84), lit) + vec3(1.0, 0.8, 0.45) * pow(toSun, 12.0) * 0.8;
@@ -108,11 +118,13 @@ void main() {
   col += vec3(1.0, 0.92, 0.7) * disc * 3.0 * (1.0 - cover * 0.8);
   col += vec3(1.0, 0.82, 0.5) * (exp(-sunAng * 14.0) * 0.9 + exp(-sunAng * 3.2) * 0.22) * (1.0 - cover * 0.5);
   // Sun breaks: rays fanning from the sun through the cloud gaps.
+#if BASIN_SKY_DETAIL
   vec3 tu = normalize(cross(uSunDir, vec3(0.0, 1.0, 0.0)));
   vec3 tv = cross(tu, uSunDir);
   float ra = atan(dot(d, tv), dot(d, tu));
   float rays = bnoise(vec2(ra * 9.0, uTime * 0.05)) * bnoise(vec2(ra * 23.0, uTime * 0.03 + 3.0));
-  col += vec3(1.0, 0.86, 0.55) * smoothstep(0.25, 0.7, rays) * exp(-sunAng * 2.4) * 0.35 * (0.4 + cover) * uDetail;
+  col += vec3(1.0, 0.86, 0.55) * smoothstep(0.25, 0.7, rays) * exp(-sunAng * 2.4) * 0.35 * (0.4 + cover);
+#endif
   // Below the rim: the haze the caldera walls stand in.
   col = mix(col, uHorizon * 0.92, smoothstep(0.02, -0.12, up));
   gl_FragColor = vec4(col, 1.0);
@@ -130,7 +142,12 @@ export function buildBasinSky(opts: BasinSkyOptions): THREE.Mesh {
       uTime: sharedUniforms.uTime,
       uSunDir: { value: new THREE.Vector3(...BASIN_SUN_DIRECTION) },
       uHorizon: { value: new THREE.Color(BASIN_FOG_COLOR) },
-      uDetail: { value: opts.lowGfx ? 0.4 : Math.max(0.6, opts.density) },
+    },
+    // The detail octaves are a program variant fixed at build (the low tier
+    // never pays them), linked by the interior's compile gate.
+    defines: {
+      BASIN_SKY_DETAIL: opts.lowGfx ? 0 : 1,
+      BFBM_OCTAVES: opts.lowGfx ? 3 : opts.density >= 1 ? 5 : 4,
     },
     depthWrite: false,
     side: THREE.BackSide,
@@ -138,7 +155,8 @@ export function buildBasinSky(opts: BasinSkyOptions): THREE.Mesh {
   });
   const mesh = new THREE.Mesh(new THREE.SphereGeometry(500, 48, 24), material);
   mesh.name = 'wildheartBasinSky';
+  // Default order, after the opaque world: its far-plane depth lets the
+  // terrain and the walls reject its fragments before they are shaded.
   mesh.frustumCulled = false;
-  mesh.renderOrder = -10;
   return mesh;
 }

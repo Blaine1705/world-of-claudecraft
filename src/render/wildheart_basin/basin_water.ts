@@ -139,7 +139,11 @@ let sharedMaterial: THREE.ShaderMaterial | null = null;
 
 /** The one water material (built once per page, shared by every water mesh). */
 export function basinWaterMaterial(lowGfx: boolean): THREE.ShaderMaterial {
-  if (sharedMaterial) return sharedMaterial;
+  if (sharedMaterial) {
+    // The tier may have changed since the first build (a uniform: no relink).
+    sharedMaterial.uniforms.uDetail.value = lowGfx ? 0.4 : 1;
+    return sharedMaterial;
+  }
   // Only the largest drum carries the wake (the upper drums stand on it).
   const big = BASALT_STEPS[0];
   const steps = [

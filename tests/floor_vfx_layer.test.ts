@@ -304,13 +304,12 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/stormbrass_foundry/foundry_dressing.ts',
   'src/render/stormbrass_foundry/foundry_gates.ts',
   'src/render/stormbrass_foundry/foundry_landmarks.ts',
-  // The Wildheart Basin's sky, its water (the ford, the river, the plunge pool:
-  // water surfaces under the whole ladder), its waterfalls (curtains, foam,
-  // spray, mist, rainbows standing up from the water) and its air (the gorge
-  // haze over the void, god rays, motes, birds). None is a floor mark; its
-  // floor marks are the shared telegraph kit's and its brazier pools sit on
-  // the ground rung (basin_lights.ts).
-  'src/render/wildheart_basin/basin_sky.ts',
+  // The Wildheart Basin's water (the ford, the river, the plunge pool: water
+  // surfaces under the whole ladder), its waterfalls (curtains, foam, spray,
+  // mist, rainbows standing up from the water) and its air (the gorge haze
+  // over the void, god rays, motes, birds). None is a floor mark; its floor
+  // marks are the shared telegraph kit's and its brazier pools sit on the
+  // ground rung (basin_lights.ts).
   'src/render/wildheart_basin/basin_water.ts',
   'src/render/wildheart_basin/basin_falls.ts',
   'src/render/wildheart_basin/basin_air.ts',
