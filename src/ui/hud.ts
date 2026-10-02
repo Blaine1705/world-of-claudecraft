@@ -463,7 +463,7 @@ import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
 import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
-import { DungeonPrompts, wardHealthText, wardHitText } from './hud/dungeon';
+import { DungeonPrompts, fctAvoidanceText, wardHealthText, wardHitText } from './hud/dungeon';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
@@ -8915,7 +8915,7 @@ export class Hud {
     // Caged or chained in the Sunken Gaol: the prompts, every frame (press feedback, reach).
     this.dungeonPrompts.paint({
       player: p,
-      entity: (id) => this.sim.entities.get(id),
+      world: this.sim,
       party: this.sim.partyInfo?.members,
       interactKey: keyCapLabel(this.keybinds.primaryLabel('interact')),
       touch: this.isMobileLayout(),
@@ -11182,16 +11182,7 @@ export class Hud {
               this.fctPainter.spawn(
                 {
                   ...shape,
-                  text:
-                    ev.kind === 'miss'
-                      ? t('hud.combat.floatingMiss')
-                      : ev.kind === 'dodge'
-                        ? t('hud.combat.floatingDodge')
-                        : ev.kind === 'parry'
-                          ? t('hud.combat.floatingParry')
-                          : ev.kind === 'evade'
-                            ? t('hud.combat.floatingEvade')
-                            : t('hud.combat.floatingResist'),
+                  text: fctAvoidanceText(ev.kind, tgt?.auras, ev.school),
                   target: tgt,
                 },
                 now,

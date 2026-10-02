@@ -3,7 +3,8 @@
 // (low over the action bar; the Gaol's prompts never share a fight with it),
 // shown while a Foundry mechanic asks something of the local player: the
 // title, the line saying what to do, an optional hint (the drop key while you
-// carry a Storm Cell) and the bar. While carrying a cell the whole panel is a
+// carry a Storm Cell) and the bar (with the words a view prints on it: the
+// Warden's Stored Charge). While carrying a cell the whole panel is a
 // button: a tap (or a click) is the interact press that drops it, so on a
 // touch screen it IS the drop control. The skeleton is built once; every
 // per-frame value rides the PainterHost elided writers, so a still frame
@@ -39,6 +40,7 @@ interface Slots {
   hintText: HTMLElement;
   bar: HTMLElement;
   fill: HTMLElement;
+  barLabel: HTMLElement;
 }
 
 const FOUNDRY_KINDS: readonly FoundryAlertKind[] = [
@@ -48,6 +50,8 @@ const FOUNDRY_KINDS: readonly FoundryAlertKind[] = [
   'locked',
   'vent-warn',
   'vent-scald',
+  'proof',
+  'floorcell',
   'grounded',
   'charged',
 ];
@@ -99,6 +103,8 @@ export class FoundryAlert {
     w.setWidth(slots.fill, `${(progress * 100).toFixed(1)}%`);
     w.setAttr(slots.bar, 'aria-valuenow', String(Math.round(progress * 100)));
     w.setAttr(slots.bar, 'aria-valuetext', view.progressAria);
+    w.setText(slots.barLabel, view.barLabel ?? '');
+    w.setDisplay(slots.barLabel, view.barLabel ? 'block' : 'none');
   }
 
   dispose(): void {
@@ -140,8 +146,10 @@ export class FoundryAlert {
     bar.setAttribute('aria-valuemax', '100');
     const fill = doc.createElement('div');
     fill.className = 'ui-bar-fill fa-fill';
+    const barLabel = doc.createElement('div');
+    barLabel.className = 'fa-bar-label';
     bar.append(fill);
-    root.append(title, line, hint, bar);
+    root.append(title, line, hint, bar, barLabel);
     // While a cell is carried, a press on the panel drops it (the sim owns the
     // drop and the retake lock); otherwise the panel ignores the pointer.
     root.addEventListener('pointerdown', (e) => this.press(e));
@@ -150,7 +158,7 @@ export class FoundryAlert {
     });
     layer.appendChild(root);
     this.root = root;
-    this.slots = { title, line, hint, key, hintText, bar, fill };
+    this.slots = { title, line, hint, key, hintText, bar, fill, barLabel };
     return root;
   }
 }

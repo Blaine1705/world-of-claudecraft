@@ -1,8 +1,10 @@
 // The Rangewarden (src/sim/encounters/stormbrass_foundry/rangewarden.ts): the
-// G20 trail salvo (a marked player who keeps moving is never hit, one who
-// stands still is shelled, the shells land where the mark stood 1.5 s ago),
-// the bunkers as cover, Proof Shot and Dented Plating, the Drill Drones,
-// heroic Walking Barrage and Shrapnel, the reset and the Clean Range deed.
+// G20 trail salvo (each second a circle paints UNDER every marked player and
+// stays put; it lands 2.1 s later, so a mark who keeps moving is never hit and
+// one who stands still is shelled), the mark ending with its aura, the bunkers
+// as cover, Proof Shot (its floor line and tank alert) and Dented Plating, the
+// Drill Drones, heroic Walking Barrage and Shrapnel, the reset and the Clean
+// Range deed.
 
 import { describe, expect, it } from 'vitest';
 import { RANGE_BUNKERS } from '../src/sim/content/stormbrass_foundry_layout';
@@ -11,6 +13,7 @@ import {
   bunkerLeeAt,
   FOUNDRY_BUNKER_TEMPLATES,
   FOUNDRY_SHELL_MARK,
+  FOUNDRY_SHELL_PENDING,
   FOUNDRY_SHRAPNEL,
   RANGE_DENTED,
   RANGE_PROOF_SHOT,
@@ -18,10 +21,11 @@ import {
   RANGEWARDEN_DEED,
   RANGEWARDEN_ID,
   RANGE_TUNING as T,
-  trailSpot,
 } from '../src/sim/encounters/stormbrass_foundry';
 import { rangeState, startTargetLock } from '../src/sim/encounters/stormbrass_foundry/rangewarden';
 import { DT, type Entity, type RangewardenFightState } from '../src/sim/types';
+import { buildFoundryAlertView } from '../src/ui/hud/dungeon/foundry_alert_view';
+import { setLanguage, t } from '../src/ui/i18n';
 import {
   aura,
   boss,
@@ -37,6 +41,8 @@ import {
   run,
   wipe,
 } from './helpers/foundry_fight';
+
+setLanguage('en');
 
 const HOME = { x: -82, z: 0 };
 
@@ -62,12 +68,142 @@ function marked(f: Fight): Entity[] {
   return [f.tank, ...f.others].filter((p) => aura(p, RANGE_TARGET_LOCK));
 }
 
+/** Every shell circle on the range, pending (dim) or about to land (red). */
+function circles(f: Fight): Entity[] {
+  return [...objects(f, FOUNDRY_SHELL_PENDING), ...objects(f, FOUNDRY_SHELL_MARK)];
+}
+
+interface Circle {
+  x: number;
+  z: number;
+  owner: number;
+  born: number;
+  red: number;
+  gone: number;
+}
+
+/** Watch every circle tick by tick (called first thing in a run's keep, so
+ *  it sees the world the last tick left): where each was born and under whom,
+ *  that it never moves, when it turned red and when it landed. Every salvo
+ *  hit of the tick before must sit inside one of the circles that landed. */
+function circleWatch(f: Fight) {
+  const seen = new Map<number, Circle>();
+  let ticks = 0;
+  let hitMark = f.hits.length;
+  let salvoHits = 0;
+  const watch = (): void => {
+    const now = new Set<number>();
+    for (const o of circles(f)) {
+      now.add(o.id);
+      const at = local(f, o);
+      const have = seen.get(o.id);
+      if (!have) {
+        // Born last tick, exactly under one marked runner where they stood.
+        const owner = marked(f).find((p) => {
+          const lp = local(f, p);
+          return Math.hypot(lp.x - at.x, lp.z - at.z) < 1e-6;
+        });
+        expect(owner, `circle ${o.id} under a marked player`).toBeDefined();
+        expect(o.templateId).toBe(FOUNDRY_SHELL_PENDING);
+        expect(o.scale).toBe(T.shellRadius);
+        seen.set(o.id, { ...at, owner: owner?.id ?? -1, born: ticks, red: -1, gone: -1 });
+        continue;
+      }
+      // It never moves.
+      expect(at.x).toBeCloseTo(have.x, 9);
+      expect(at.z).toBeCloseTo(have.z, 9);
+      if (o.templateId === FOUNDRY_SHELL_MARK && have.red < 0) have.red = ticks;
+    }
+    const landed: Circle[] = [];
+    for (const [id, c] of seen) {
+      if (c.gone >= 0 || now.has(id)) continue;
+      c.gone = ticks;
+      landed.push(c);
+    }
+    for (let i = hitMark; i < f.hits.length; i++) {
+      const h = f.hits[i];
+      if (h.ability !== 'Salvo') continue;
+      salvoHits++;
+      const victim = f.sim.ctx.entities.get(h.targetId);
+      if (!victim) throw new Error('victim');
+      const v = local(f, victim);
+      const inside = landed.some((c) => Math.hypot(v.x - c.x, v.z - c.z) <= T.shellRadius + 1e-6);
+      expect(inside, `salvo hit on ${h.targetId} inside a landing circle`).toBe(true);
+    }
+    hitMark = f.hits.length;
+    ticks++;
+  };
+  return { seen, watch, salvoHits: () => salvoHits };
+}
+
 describe('the Rangewarden: the trail salvo (G20)', () => {
-  it('reads the shell spot 1.5 s back down the trail', () => {
-    const trail = Array.from({ length: 40 }, (_, i) => ({ x: i, z: 0 }));
-    expect(trailSpot(trail).x).toBe(39 - Math.round(T.shellLag / DT));
-    // A fresh mark has only its start: the shells open on it.
-    expect(trailSpot([{ x: 5, z: 6 }])).toEqual({ x: 5, z: 6 });
+  it('paints each circle under its own runner as it is sampled; it never moves and lands 2.1 s later', () => {
+    const { f } = rangeFight();
+    run(f, T.lockFirst - 0.1);
+    const w = circleWatch(f);
+    let angle = 0;
+    let runners: Entity[] = [];
+    run(f, 0.2 + T.lockSeconds + T.shellLag + T.shellWarning + 0.5, () => {
+      w.watch();
+      if (runners.length === 0) runners = marked(f);
+      const [a, b] = runners;
+      if (!a || !b) return;
+      // Two runners on their own loops at 7 yd a second.
+      angle += (7 * DT) / 12;
+      put(f, a, -92 + Math.sin(angle) * 10, -4 + Math.cos(angle) * 8);
+      put(f, b, -62 + Math.cos(angle) * 6, -6 + Math.sin(angle) * 6);
+    });
+    const [a, b] = runners;
+    const all = [...w.seen.values()];
+    // One circle a second for each mark's 8 s, each under its own runner.
+    expect(all.filter((c) => c.owner === a.id)).toHaveLength(T.lockSeconds);
+    expect(all.filter((c) => c.owner === b.id)).toHaveLength(T.lockSeconds);
+    for (const c of all) {
+      // Dim for the lag, red for the warning beat, then it lands.
+      expect(c.red - c.born).toBe(Math.round(T.shellLag / DT));
+      expect(c.gone - c.born).toBe(Math.round((T.shellLag + T.shellWarning) / DT));
+    }
+    // The runners never stand in their own circle as it lands.
+    expect(hitsOn(f, a, 'Salvo')).toHaveLength(0);
+    expect(hitsOn(f, b, 'Salvo')).toHaveLength(0);
+  });
+
+  it('every salvo hit lands inside the circle it painted', () => {
+    const { f } = rangeFight();
+    run(f, T.lockFirst + 0.1);
+    const [still, runner] = marked(f);
+    const w = circleWatch(f);
+    let t = 0;
+    run(f, T.lockSeconds + 3, () => {
+      w.watch();
+      t += DT;
+      // The still one shuffles inside its own circles; the runner drags its
+      // circles back and forth across the tank.
+      put(f, still, -60 + Math.sin(t) * 2, -15);
+      put(f, runner, -82 + Math.sin(t * 2) * 4, -2);
+      put(f, f.tank, -82, -2);
+    });
+    expect(w.salvoHits()).toBeGreaterThan(4);
+  });
+
+  it('ends the mark when its Target Lock aura is gone: no more circles under that player', () => {
+    const { f, b } = rangeFight();
+    run(f, T.lockFirst + 0.1);
+    const [freed, kept] = marked(f);
+    put(f, freed, -60, -15);
+    put(f, kept, -104, 8);
+    run(f, 1.5);
+    // Stripped (an immunity, a breaker, a dispel): the aura goes.
+    freed.auras = freed.auras.filter((x) => x.id !== RANGE_TARGET_LOCK);
+    const before = new Set(circles(f).map((o) => o.id));
+    run(f, 3);
+    expect(state(b).marks.some((m) => m.playerId === freed.id)).toBe(false);
+    const fresh = circles(f).filter((o) => !before.has(o.id));
+    expect(fresh.length).toBeGreaterThan(0);
+    for (const o of fresh) {
+      const at = local(f, o);
+      expect(Math.hypot(at.x + 104, at.z - 8)).toBeLessThan(1e-6);
+    }
   });
 
   it('marks two non-tank players at 8 s for 8 s', () => {
@@ -138,12 +274,12 @@ describe('the Rangewarden: the trail salvo (G20)', () => {
     const [still, runner] = marked(f);
     const lee = { x: RANGE_BUNKERS[0].x + 2, z: RANGE_BUNKERS[0].z };
     const from = f.hits.length;
-    run(f, T.lockSeconds + 1, () => {
+    run(f, T.lockSeconds + 2, () => {
       put(f, still, lee.x, lee.z);
       put(f, runner, -104 + (f.sim.ctx.time % 6), 10);
     });
     const hits = hitsOn(f, still, 'Salvo', from);
-    // The first shell opens on the spot the mark was locked at (out in the
+    // The first circle paints on the spot the mark was locked at (out in the
     // open); of the seven that follow into the lee, the wall swallows three.
     expect(hits).toHaveLength(T.lockSeconds - 1 - T.bunkerShells);
     expect(objects(f, FOUNDRY_BUNKER_TEMPLATES.breached)).toHaveLength(1);
@@ -173,6 +309,53 @@ describe('the Rangewarden: Proof Shot and Drill Drones', () => {
     expect(aura(f.tank, RANGE_DENTED)?.value).toBeCloseTo(T.dentedPct * T.dentedMax, 6);
   });
 
+  it('Proof Shot alerts the shot tank and whoever targets the Rangewarden, with the dents', () => {
+    const { f, b } = rangeFight();
+    const healer = f.others[2];
+    healer.targetId = b.id;
+    const bystander = f.others[1];
+    bystander.targetId = null;
+    const view = (p: Entity) =>
+      buildFoundryAlertView({
+        auras: p.auras,
+        targetId: p.targetId,
+        entity: (id) => f.sim.ctx.entities.get(id),
+        interactKey: 'F',
+        touch: false,
+        selfId: p.id,
+        selfPos: p.pos,
+        scene: { rangewarden: b, warden: null, draft: null, drones: [], cells: [] },
+      });
+    // No Target Lock in this test: the mark would outrank the proof alert.
+    run(f, 0.1);
+    state(b).lockTimer = 1e3;
+    // No bar yet: nothing to say.
+    expect(view(f.tank).visible).toBe(false);
+    run(f, T.proofFirst - 0.05);
+    expect(b.castingAbility).toBe(RANGE_PROOF_SHOT);
+    expect(b.castTargetId).toBe(f.tank.id);
+    for (const p of [f.tank, healer]) {
+      const v = view(p);
+      if (!v.visible) throw new Error('hidden');
+      expect(v.kind).toBe('proof');
+      expect(v.title).toBe(t('hudChrome.foundryAlert.proofTitle'));
+      expect(v.line).toBe(t('hudChrome.foundryAlert.proofLine'));
+      expect(v.hint).toBe('');
+      expect(v.progress ?? 0).toBeGreaterThan(0);
+      expect(v.progress ?? 1).toBeLessThan(0.2);
+    }
+    // Not shot at and not looking at it: no alert.
+    expect(view(bystander).visible).toBe(false);
+    run(f, T.proofCast + 0.1);
+    expect(view(f.tank).visible).toBe(false);
+    // The next bar names the dents already on the tank.
+    state(b).proofTimer = 0.01;
+    run(f, 0.1);
+    const dented = view(f.tank);
+    if (!dented.visible) throw new Error('hidden');
+    expect(dented.hint).toBe(t('hudChrome.foundryAlert.dentedLine', { stacks: '1', pct: '10%' }));
+  });
+
   it('launches three Arc Drones at 66 and again at 33 percent', () => {
     const { f, b } = rangeFight();
     run(f, 0.2);
@@ -194,7 +377,7 @@ describe('the Rangewarden: heroic', () => {
     expect(marked(f)).toHaveLength(T.heroicLockCount);
     const [still] = marked(f);
     put(f, still, -60, -15);
-    run(f, 1 + T.shellWarning + 0.1);
+    run(f, T.shellLag + T.shellWarning + 0.1);
     expect(objects(f, FOUNDRY_SHRAPNEL).length).toBeGreaterThan(0);
     const field = objects(f, FOUNDRY_SHRAPNEL)[0];
     expect(field.scale).toBe(T.shrapnelRadius);
@@ -222,12 +405,13 @@ describe('the Rangewarden: heroic', () => {
 describe('the Rangewarden: reset and the deed', () => {
   it('a wipe drops the marks, the shells and the fight state', () => {
     const { f, b } = rangeFight();
-    run(f, T.lockFirst + 1.1);
+    run(f, T.lockFirst + 1.7);
     expect(objects(f, FOUNDRY_SHELL_MARK).length).toBeGreaterThan(0);
+    expect(objects(f, FOUNDRY_SHELL_PENDING).length).toBeGreaterThan(0);
     wipe(f, b);
     run(f, 0.2);
     expect(b.foundryFight).toBeUndefined();
-    expect(objects(f, FOUNDRY_SHELL_MARK)).toHaveLength(0);
+    expect(circles(f)).toHaveLength(0);
     expect(marked(f)).toHaveLength(0);
   });
 
@@ -242,7 +426,7 @@ describe('the Rangewarden: reset and the deed', () => {
     run(hit.f, T.lockFirst + 0.1);
     const [still] = marked(hit.f);
     put(hit.f, still, -60, -15);
-    run(hit.f, 2);
+    run(hit.f, T.shellLag + T.shellWarning + 0.5);
     expect(rangeState(hit.f.sim.ctx, hit.f.inst, hit.b).shelled).toBe(true);
     hit.f.sim.ctx.handleDeath(hit.b, hit.f.tank);
     run(hit.f, 0.1);

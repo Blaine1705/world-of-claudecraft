@@ -5,12 +5,15 @@
 // alert (wildheart_alert_view.ts on the same painter family: the Prey, the
 // Stalk, the pollen, the Pack Bond readout). It owns no DOM itself; it
 // builds each view from the frame's inputs and hands it to that prompt's
-// painter.
+// painter. The frame hands it the world (its entities and roster version):
+// the prompts look bodies up by id, and the Foundry alert keeps its scene of
+// bosses, drones and floor cells off the roster (foundry_alert_scene.ts).
 
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
 import { FoundryAlert } from './foundry_alert_painter';
-import { buildFoundryAlertView, type FoundryAlertEntity } from './foundry_alert_view';
+import { FoundryAlertSceneScan, type FoundrySceneEntity } from './foundry_alert_scene';
+import { buildFoundryAlertView } from './foundry_alert_view';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
 import { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
@@ -30,7 +33,12 @@ export interface DungeonPromptsFrame {
     /** The player's target (the Foundry alert reads a plated target). */
     targetId?: number | null;
   };
-  entity: (id: number) => (GaolChainEntity & FoundryAlertEntity) | null | undefined;
+  /** The world: every body by id, and the roster version (bumped when one
+   *  comes or goes). */
+  world: {
+    entities: ReadonlyMap<number, GaolChainEntity & FoundrySceneEntity>;
+    entityRosterVersion: number;
+  };
   party: readonly { pid: number }[] | null | undefined;
   /** The interact key's label ('' when unbound). */
   interactKey: string;
@@ -42,6 +50,10 @@ export class DungeonPrompts {
   private readonly chain: GaolChainAlert;
   private readonly foundry: FoundryAlert;
   private readonly wildheart: FoundryAlert;
+  private readonly foundryScene = new FoundryAlertSceneScan();
+  private world: DungeonPromptsFrame['world'] | null = null;
+  /** One lookup for every view (no closure a frame). */
+  private readonly entity = (id: number) => this.world?.entities.get(id);
 
   constructor(deps: CageEscapeDeps) {
     this.cage = new CageEscapePrompt(deps);
@@ -56,10 +68,12 @@ export class DungeonPrompts {
 
   paint(f: DungeonPromptsFrame): void {
     const p = f.player;
+    this.world = f.world;
+    const entity = this.entity;
     this.cage.paint(
       buildCageEscapeView({
         auras: p.auras,
-        cage: f.entity,
+        cage: entity,
         interactKey: f.interactKey,
         touch: f.touch,
       }),
@@ -69,7 +83,7 @@ export class DungeonPrompts {
         selfId: p.id,
         selfPos: p.pos,
         auras: p.auras,
-        entity: f.entity,
+        entity,
         party: f.party,
       }),
     );
@@ -77,14 +91,15 @@ export class DungeonPrompts {
       buildFoundryAlertView({
         auras: p.auras,
         targetId: p.targetId,
-        entity: f.entity,
+        entity,
         interactKey: f.interactKey,
         touch: f.touch,
+        selfId: p.id,
+        selfPos: p.pos,
+        scene: this.foundryScene.update(f.world),
       }),
     );
-    this.wildheart.paint(
-      buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity: f.entity }),
-    );
+    this.wildheart.paint(buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity }));
   }
 
   dispose(): void {

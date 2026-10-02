@@ -16614,6 +16614,42 @@
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
   }
+  /* The words a view prints under its bar (the Warden's Stored Charge). */
+  #foundry-alert .fa-bar-label {
+    display: none;
+    font-size: 12px;
+    opacity: 0.9;
+  }
+  /* The Rangewarden's Proof Shot: a heavy shell at the tank, the bar is the cast. */
+  #foundry-alert.is-proof {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #foundry-alert.is-proof .fa-title,
+  #foundry-alert.is-proof .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  /* A Storm Cell on the floor: a thing to take, in the cell's own blue. */
+  #foundry-alert.is-floorcell {
+    border-color: var(--color-aura-rpg-electric);
+  }
+  #foundry-alert.is-floorcell .fa-title {
+    color: var(--color-aura-rpg-electric);
+  }
+  /* The Voltaic Warden's plating: the face that is up, copper or blue. */
+  #foundry-alert.is-grounded {
+    border-color: var(--color-bronze-light);
+  }
+  #foundry-alert.is-grounded .fa-title {
+    color: var(--color-bronze-light);
+  }
+  #foundry-alert.is-charged {
+    border-color: var(--color-aura-rpg-electric);
+  }
+  #foundry-alert.is-charged .fa-title {
+    color: var(--color-aura-rpg-electric);
+  }
   @media (prefers-reduced-motion: reduce) {
     #foundry-alert {
       animation: none;
