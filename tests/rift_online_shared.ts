@@ -1,5 +1,6 @@
 // Shared fixtures for the "a teleport off a rift floor must clear the ONLINE rift
-// floor" suites (rift_release_exit_state.test.ts, rift_bg_pop_exit_state.test.ts).
+// floor" suites (rift_release_exit_state.test.ts, rift_bg_pop_exit_state.test.ts,
+// rift_hearth_exit_state.test.ts, rift_moderation_exit_state.test.ts).
 //
 // ClientWorld mirrors `riftFloor` from riftState events alone (no snapshot field),
 // while mapWindowMode and minimapMode both lead with `world.riftFloor`. These
