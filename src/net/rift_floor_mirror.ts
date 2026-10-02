@@ -4,11 +4,12 @@
 // riftState events are the only floor source (no snapshot field), and the server
 // routes them by the VIEW's pid: while a moderator spectates, the target's stream
 // arrives instead of their own. So the mirror is also reset whenever the stream
-// it was built from stops describing the view: every spectate frame (open,
-// retarget, exit) and a reconnect that undoes a spectate swap. The server follows
-// each with the live floor of the new view, if any (server/moderation_moves.ts,
-// resumeSession). Without the reset a moderator back from watching a rift runner
-// kept the runner's rift map, minimap and collision on open ground.
+// it was built from may no longer describe the view: every spectate frame (open,
+// retarget, exit) and every reconnect hello (the old stream may have ended
+// unseen, or been a watched player's). The server follows each with the live
+// floor of the new view, if any (server/moderation_moves.ts describeRiftFloor).
+// Without the reset a moderator back from watching a rift runner kept the
+// runner's rift map, minimap and collision on open ground.
 import { clearRiftRegion, setRiftRegion } from '../sim/colliders';
 import { riftFloorColliders } from '../sim/rift/rift_gen';
 import type { SimEvent } from '../sim/types';

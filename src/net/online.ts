@@ -2292,8 +2292,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
         this.spectateFacingPending = this.spectating !== null || this.spectateExitPending;
-        // the mirrored floor may be the watched player's; resumeSession resends ours
-        if (this.spectateFacingPending) this.mirrorRiftFloor(null);
+        // no floor until resumeSession resends ours: the old stream may have ended unseen
+        this.mirrorRiftFloor(null);
         this.spectating = null;
         this.spectateExitPending = false;
         this.cfg.playerClass = this.ownPlayerClass;
@@ -4942,7 +4942,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
 
   // `ev` null resets the mirror: the riftState stream changed owner (a spectate
-  // frame, or a reconnect undoing one; rift_floor_mirror.ts).
+  // frame, or a reconnect; rift_floor_mirror.ts).
   private mirrorRiftFloor(ev: RiftStateEvent | null): void {
     this.riftFloor = swapMirroredRiftFloor(this.riftCollisionToken, this.riftFloor, ev);
     this.riftEventExpiresAtMs = ev?.active ? ev.expiresAtMs : null;

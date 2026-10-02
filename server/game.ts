@@ -362,7 +362,6 @@ import {
   leaveRiftForModeration,
   moderationReturnSpot,
   type RiftExitSpot,
-  rejoinRiftAfterModeration,
   riftExitSpotAt,
   teleportForModeration,
 } from './moderation_moves';
@@ -2097,7 +2096,6 @@ export class GameServer {
       moderatorEntity.prevPos = { ...back };
       this.sim.grid.update(moderatorEntity);
       this.sim.playerGrid.update(moderatorEntity);
-      rejoinRiftAfterModeration(this.sim, moderator.pid);
       this.sim.setGm(moderator.pid, state.priorGm);
       this.sim.restorePetAfterSpectate(moderator.pid, state.stowedPet);
     }
@@ -2122,6 +2120,8 @@ export class GameServer {
     // instead of staying stuck on the spectated target's last-sent values.
     moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: null });
+    // after the frame like enterSpectate's, never queued: a snapshot could overtake it
+    describeRiftFloor(this.sim, moderator.pid, (frame) => this.send(moderator, frame));
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }
 

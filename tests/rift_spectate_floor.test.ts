@@ -43,6 +43,7 @@ vi.mock('../server/db', () => ({
 vi.mock('../server/moderation_db', () => moderation);
 
 import { type ClientSession, GameServer } from '../server/game';
+import { HoardBossCueMirror } from '../src/net/hoard_boss_cue_mirror';
 import type { ClientWorld } from '../src/net/online';
 import { allocRiftCollisionToken } from '../src/sim/colliders';
 import { isRiftPos, setActiveWorldContent } from '../src/sim/data';
@@ -145,14 +146,19 @@ async function unspectate(server: GameServer, moderator: ClientSession) {
 // token, fed the socket's spectate and events frames in arrival order (snapshots
 // carry no rift floor, so they are not part of this replay).
 function modClient(pid: number): ClientWorld {
-  return bareClient(pid, { riftCollisionToken: allocRiftCollisionToken() });
+  return bareClient(pid, {
+    riftCollisionToken: allocRiftCollisionToken(),
+    hoardBossCueMirror: new HoardBossCueMirror(() => 1_000),
+  });
 }
 
 function replay(client: ClientWorld, ws: FakeWs): void {
   for (const call of ws.send.mock.calls) {
     const raw = String(call[0]);
     const frame = JSON.parse(raw) as { t?: string };
-    if (frame.t === 'spectate' || frame.t === 'events') (client as unknown as Wire).onMessage(raw);
+    if (frame.t === 'hello' || frame.t === 'spectate' || frame.t === 'events') {
+      (client as unknown as Wire).onMessage(raw);
+    }
   }
   ws.send.mockClear();
 }
@@ -258,22 +264,32 @@ describe('spectating a rift runner drives the view, and /unspectate resets it', 
   });
 });
 
+/** The moderator and the suspect each on their own run off one portal (separate
+ *  parties, so separate instances and floor origins), the moderator's client
+ *  mirroring its own floor. */
+function twoRuns() {
+  const t = table();
+  const { server, moderator, modWs, suspect } = t;
+  server.sim.setPlayerLevel(20, moderator.pid);
+  const client = modClient(moderator.pid);
+  const own = enterRiftRouted(server, moderator.pid);
+  const portal = server.sim.entities.get(server.sim.naturalRiftPortals[0].id);
+  if (portal?.riftSeed === undefined || portal.riftBaseLevel === undefined) {
+    throw new Error('sanity: the natural portal carries its rift seed');
+  }
+  server.sim.drainEvents();
+  server.sim.enterRift(portal.riftSeed, portal.riftBaseLevel, suspect.pid, undefined, portal);
+  const [theirs] = riftStates(server.sim.drainEvents(), suspect.pid);
+  route(server, [theirs]);
+  expect(theirs.instanceId, 'sanity: two separate runs').not.toBe(own.instanceId);
+  replay(client, modWs);
+  expect(client.riftFloor?.instanceId).toBe(own.instanceId);
+  return { ...t, client, own, theirs };
+}
+
 describe('a moderator on their own rift floor spectating another runner', () => {
   it('watches the runner floor, then /unspectate restores their own', async () => {
-    const { server, moderator, modWs, suspect } = table();
-    server.sim.setPlayerLevel(20, moderator.pid);
-    const client = modClient(moderator.pid);
-    const own = enterRiftRouted(server, moderator.pid);
-    // A second run for the suspect off the same portal (a different party, so a
-    // different instance and floor origin).
-    const portal = server.sim.entities.get(server.sim.naturalRiftPortals[0].id)!;
-    server.sim.drainEvents();
-    server.sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, suspect.pid, undefined, portal);
-    const [theirs] = riftStates(server.sim.drainEvents(), suspect.pid);
-    route(server, [theirs]);
-    expect(theirs.instanceId, 'sanity: two separate runs').not.toBe(own.instanceId);
-    replay(client, modWs);
-    expect(client.riftFloor?.instanceId).toBe(own.instanceId);
+    const { server, moderator, modWs, suspect, client, own, theirs } = twoRuns();
 
     await spectate(server, moderator, 'Suspect');
     replay(client, modWs);
@@ -289,9 +305,112 @@ describe('a moderator on their own rift floor spectating another runner', () => 
     expect(view(client, back)).toMatchObject({ instanceId: own.instanceId, region: true });
     expect(view(client, pos(server, suspect.pid)).region).toBe(false);
   });
+
+  it('the own floor rides right behind the exit frame, ahead of any tick', async () => {
+    const { server, moderator, modWs, client, own } = twoRuns();
+    await spectate(server, moderator, 'Suspect');
+    replay(client, modWs);
+
+    command(server, moderator, '/unspectate');
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
+    replay(client, modWs);
+    expect(client.riftFloor?.instanceId).toBe(own.instanceId);
+    // Nothing queued behind it drops the floor on the next tick.
+    step(server);
+    replay(client, modWs);
+    expect(client.riftFloor?.instanceId).toBe(own.instanceId);
+  });
+
+  it('a vanished target ends spectate inside the broadcast pass with the own floor', async () => {
+    const { server, moderator, modWs, suspect, client, own, theirs } = twoRuns();
+    await spectate(server, moderator, 'Suspect');
+    replay(client, modWs);
+    expect(client.riftFloor?.instanceId).toBe(theirs.instanceId);
+
+    suspect.left = true;
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
+    expect(moderator.spectating).toBeNull();
+    replay(client, modWs);
+    expect(view(client, pos(server, moderator.pid))).toMatchObject({
+      instanceId: own.instanceId,
+      region: true,
+    });
+  });
+
+  it('/unspectate then /spectate before a tick lands on the runner floor', async () => {
+    const { server, moderator, modWs, client, theirs } = twoRuns();
+    await spectate(server, moderator, 'Suspect');
+    command(server, moderator, '/unspectate');
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
+    command(server, moderator, '/spectate "Suspect"');
+    await vi.waitFor(() => expect(moderator.spectating?.name).toBe('Suspect'));
+    replay(client, modWs);
+    expect(client.riftFloor?.instanceId).toBe(theirs.instanceId);
+    step(server);
+    replay(client, modWs);
+    expect(client.riftFloor?.instanceId).toBe(theirs.instanceId);
+  });
+
+  it('a drop mid-spectate and a resume land the client back on the own floor', async () => {
+    const { server, moderator, modWs, client, own, theirs } = twoRuns();
+    await spectate(server, moderator, 'Suspect');
+    replay(client, modWs);
+    expect(client.riftFloor?.instanceId).toBe(theirs.instanceId);
+
+    // Grace start exits spectate into the dead socket; the resume rides a new one.
+    server.socketClosed(moderator, modWs as unknown as Parameters<GameServer['socketClosed']>[1]);
+    modWs.send.mockClear();
+    const ws2 = fakeWs();
+    const resumed = joined(
+      server.join(ws2, 9, 109, 'Warden', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    expect(resumed).toBe(moderator);
+    (client as unknown as Wire).reconnectAttempts = 1;
+    replay(client, ws2);
+    expect(client.spectating).toBeNull();
+    expect(view(client, pos(server, moderator.pid))).toMatchObject({
+      instanceId: own.instanceId,
+      region: true,
+    });
+  });
 });
 
-describe('a reconnect undoing a spectate swap', () => {
+describe('the client mirror on a spectate frame', () => {
+  it('drops the floor deadline and hoard cues along with the floor', () => {
+    const client = modClient(9);
+    const wire = client as unknown as Wire;
+    const expiresAt = () =>
+      (client as unknown as { riftEventExpiresAtMs: number | null }).riftEventExpiresAtMs;
+    const { server, suspect } = table();
+    const entry = enterNaturalRift(server.sim, suspect.pid);
+    wire.onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+    const cue = {
+      type: 'hoardBossCue',
+      pid: suspect.pid,
+      instanceId: entry.instanceId,
+      cueId: 1,
+      kind: 'mark',
+      phase: 'warning',
+      x: 0,
+      z: 0,
+      radius: 3,
+      durationSecs: 5,
+    };
+    wire.onMessage(JSON.stringify({ t: 'events', list: [{ ...entry, expiresAtMs: 9e12 }, cue] }));
+    expect(client.hoardBossCues()).toHaveLength(1);
+    expect(expiresAt()).toBe(9e12);
+
+    wire.onMessage(JSON.stringify({ t: 'spectate', name: null }));
+    expect(client.riftFloor).toBeNull();
+    expect(client.hoardBossCues()).toEqual([]);
+    expect(expiresAt()).toBeNull();
+  });
+});
+
+describe('a reconnect hello', () => {
   it('drops the watched floor (the server exits spectate at grace start)', () => {
     const client = modClient(9);
     const wire = client as unknown as Wire;
@@ -309,7 +428,7 @@ describe('a reconnect undoing a spectate swap', () => {
     expect(view(client, pos(server, suspect.pid)).region).toBe(false);
   });
 
-  it('a plain reconnect keeps the floor until the resume resend', () => {
+  it('a plain reconnect drops the floor until the resume resend restores a live one', () => {
     const client = modClient(1);
     const wire = client as unknown as Wire;
     wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 20061 }));
@@ -317,8 +436,14 @@ describe('a reconnect undoing a spectate swap', () => {
     const entry = { ...enterNaturalRift(server.sim, suspect.pid), pid: 1 };
     wire.onMessage(JSON.stringify({ t: 'events', list: [entry] }));
 
+    // The run may have ended while the socket was down (its exit went to the
+    // dead socket), so the hello alone never keeps a floor.
     wire.reconnectAttempts = 1;
     wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 20061 }));
+    expect(client.riftFloor).toBeNull();
+    expect(view(client, pos(server, suspect.pid)).region).toBe(false);
+    // resumeSession's describe follows the hello when the floor is still live.
+    wire.onMessage(JSON.stringify({ t: 'events', list: [entry] }));
     expect(client.riftFloor?.instanceId).toBe(entry.instanceId);
   });
 });
