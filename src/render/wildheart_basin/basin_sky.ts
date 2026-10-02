@@ -56,22 +56,23 @@ float towers(vec3 d, out float shade) {
   float az = atan(d.z, d.x);
   float up = d.y;
   float t = uTime * 0.004;
-  float col = bfbm(vec2(az * 2.6 + t, 0.7)) ;
-  float height = 0.06 + smoothstep(0.38, 0.8, col) * 0.32;
-  float billow = bfbm(vec2(az * 9.0 + t * 3.0, up * 7.0 - t)) * 0.12 + bfbm(vec2(az * 22.0, up * 18.0) + 4.0) * 0.06 * uDetail;
+  float col = bfbm(vec2(az * 2.6 + t, 0.7));
+  // Towers climb well past the caldera rim (the walls hide the low sky).
+  float height = 0.2 + smoothstep(0.34, 0.78, col) * 0.5;
+  float billow = bfbm(vec2(az * 9.0 + t * 3.0, up * 7.0 - t)) * 0.14 + bfbm(vec2(az * 22.0, up * 18.0) + 4.0) * 0.07 * uDetail;
   float top = height + billow;
-  float body = smoothstep(top, top - 0.05, up) * smoothstep(-0.06, 0.03, up);
+  float body = smoothstep(top, top - 0.06, up) * smoothstep(-0.06, 0.03, up);
   // Flat grey bases sitting on the haze line, cauliflower tops.
   shade = clamp((up + 0.02) / max(top, 0.05), 0.0, 1.0);
-  return body * smoothstep(0.32, 0.5, col + billow);
+  return body * smoothstep(0.3, 0.46, col + billow);
 }
 void main() {
   vec3 d = normalize(vDir);
   float up = d.y;
   // Gold at the horizon, a hazy turquoise overhead, a greener band between.
-  vec3 zenith = vec3(0.36, 0.6, 0.72);
-  vec3 mid = vec3(0.7, 0.78, 0.62);
-  vec3 col = mix(mid, zenith, smoothstep(0.12, 0.75, up));
+  vec3 zenith = vec3(0.16, 0.42, 0.6);
+  vec3 mid = vec3(0.46, 0.62, 0.56);
+  vec3 col = mix(mid, zenith, smoothstep(0.1, 0.7, up));
   col = mix(uHorizon * 1.08, col, smoothstep(-0.02, 0.24, up));
   float toSun = max(0.0, dot(d, uSunDir));
   // The sun's quarter of the sky glows gold through the humid air.
@@ -83,18 +84,18 @@ void main() {
     vec2 uv = d.xz / (up + 0.18);
     float c1 = bfbm(uv * 0.7 + vec2(uTime * 0.006, uTime * 0.003));
     float c2 = bfbm(uv * 1.9 - vec2(uTime * 0.01, 0.0) + 9.0) * uDetail;
-    deck = smoothstep(0.52, 0.8, c1 * 0.75 + c2 * 0.35) * smoothstep(0.02, 0.22, up);
+    deck = smoothstep(0.56, 0.84, c1 * 0.75 + c2 * 0.35) * smoothstep(0.02, 0.22, up);
     float lit = 0.55 + 0.45 * smoothstep(0.4, 0.95, dot(normalize(vec3(d.x, 0.0, d.z)), normalize(vec3(uSunDir.x, 0.0, uSunDir.z))) * 0.5 + 0.5);
     vec3 deckCol = mix(vec3(0.72, 0.7, 0.68), vec3(1.0, 0.95, 0.84), lit) + vec3(1.0, 0.8, 0.45) * pow(toSun, 12.0) * 0.8;
-    col = mix(col, deckCol, deck * 0.78);
+    col = mix(col, deckCol, deck * 0.7);
   }
 
   // The towers: sunward flanks white-gold, shadowed flanks grey-violet.
   float shade;
   float tw = towers(d, shade);
   float side = dot(normalize(vec3(d.x, 0.0, d.z)), normalize(vec3(uSunDir.x, 0.0, uSunDir.z)));
-  vec3 towerLit = vec3(1.0, 0.93, 0.78);
-  vec3 towerDark = vec3(0.56, 0.54, 0.6);
+  vec3 towerLit = vec3(1.0, 0.92, 0.76);
+  vec3 towerDark = vec3(0.5, 0.5, 0.58);
   vec3 towerCol = mix(towerDark, towerLit, smoothstep(-0.6, 0.7, side) * (0.45 + 0.55 * shade));
   towerCol = mix(towerCol, uHorizon, (1.0 - shade) * 0.35);
   col = mix(col, towerCol, tw * 0.92);

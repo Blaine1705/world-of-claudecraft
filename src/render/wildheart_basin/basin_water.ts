@@ -85,22 +85,25 @@ void main() {
   float fres = 0.03 + 0.97 * pow(1.0 - max(0.0, dot(n, view)), 5.0);
   vec3 r = reflect(-view, n);
   // The sky it mirrors: the gold haze at the horizon, the turquoise above.
-  vec3 sky = mix(uHorizon * 1.05, vec3(0.42, 0.64, 0.72), smoothstep(0.0, 0.5, r.y));
+  vec3 sky = mix(uHorizon * 0.7, vec3(0.26, 0.45, 0.52), smoothstep(0.0, 0.5, r.y));
   sky += vec3(1.0, 0.8, 0.45) * pow(max(0.0, dot(normalize(r), uSunDir)), 24.0) * 0.6;
   // Body: clear jade-green shallows over the bed, deep emerald in the gorge.
-  vec3 shallow = vec3(0.24, 0.42, 0.33);
-  vec3 deep = vec3(0.05, 0.2, 0.17);
+  vec3 shallow = vec3(0.12, 0.27, 0.2);
+  vec3 deep = vec3(0.03, 0.15, 0.13);
   vec3 body = mix(shallow, deep, vWater.y);
   // Sun glitter dancing on the riffles.
   vec3 halfV = normalize(uSunDir + view);
   float glint = pow(max(0.0, dot(n, halfV)), 300.0) * 4.0 + pow(max(0.0, dot(n, halfV)), 40.0) * 0.18;
-  vec3 col = mix(body, sky, clamp(fres * 1.25, 0.0, 1.0)) + vec3(1.0, 0.92, 0.7) * glint;
+  vec3 col = mix(body, sky, clamp(fres, 0.0, 0.55)) + vec3(1.0, 0.92, 0.7) * glint;
+  // Streaks of current: long bright threads racing downstream.
+  float thread = smoothstep(0.72, 0.95, bnoise(adv * vec2(0.08, 1.8) + 31.0));
+  col += vec3(0.5, 0.62, 0.55) * thread * 0.12 * smoothstep(0.8, 2.6, speed);
 
   // White water: along the banks, over the riffles where it runs fast, round
   // the basalt steps (a wake peeling downstream) and round every wader.
   float churn = bnoise(adv * vec2(0.9, 2.4) + 21.0) * 0.6 + bnoise(adv * vec2(2.4, 5.0) - 4.0) * 0.4;
-  float foam = smoothstep(0.62, 1.0, vWater.x) * (0.45 + 0.55 * churn);
-  foam += smoothstep(0.66, 0.9, r1 * 0.6 + churn * 0.5) * smoothstep(1.5, 4.0, speed) * 0.35;
+  float foam = smoothstep(0.9, 1.0, vWater.x) * (0.3 + 0.6 * churn);
+  foam += smoothstep(0.72, 0.92, r1 * 0.6 + churn * 0.5) * smoothstep(1.5, 4.0, speed) * 0.2;
   for (int i = 0; i < 3; i++) {
     vec2 c = uSteps[i].xy;
     float rad = uSteps[i].z;
@@ -125,7 +128,7 @@ void main() {
   foam = clamp(foam, 0.0, 1.0);
   col = mix(col, vec3(0.9, 0.97, 0.96), foam * 0.85);
   // Ankle-deep shallows show the bed through them; the gorge river does not.
-  float alpha = mix(0.62, 0.94, vWater.y) + foam * 0.3;
+  float alpha = mix(0.5, 0.92, vWater.y) + foam * 0.35 + fres * 0.2;
   gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0));
   #include <fog_fragment>
   #include <colorspace_fragment>

@@ -55,7 +55,7 @@ function normalize3(x: number, y: number, z: number): readonly [number, number, 
 export const BASIN_SUN_DIRECTION = normalize3(-0.52, 0.5, -0.69);
 
 /** The humid haze (fog colour and the sky's horizon). */
-export const BASIN_FOG_COLOR = 0xc7bf8e;
+export const BASIN_FOG_COLOR = 0xbfb98a;
 
 /** The water levels of the basin. */
 export const BASIN_WATER = {

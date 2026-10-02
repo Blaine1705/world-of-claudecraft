@@ -145,8 +145,8 @@ export function applyFogScenePreset(
     // the caldera walls soften into the gold; the gorge's own thicker haze is
     // the interior's (render/wildheart_basin/basin_air.ts).
     fog.color.setHex(WILDHEART_BASIN_FOG_COLOR);
-    fog.near = 130;
-    fog.far = 860;
+    fog.near = 150;
+    fog.far = 1050;
   } else if (desired === 'hollowCrypt') {
     // Night air over the grave-mist: a deep blue-violet veil pushed far back
     // so the whole necropolis and the ritual column read from the landing,

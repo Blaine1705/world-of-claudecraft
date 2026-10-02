@@ -183,10 +183,10 @@ const paintMoss: Painter = (h, size, rnd) => {
   for (let i = 0; i < h.length; i++) {
     // Moss cushions swell where the clump field is high; loam sinks between.
     const cushion = Math.max(0, clumps[i] - 0.42) * 1.9;
-    h[i] = 0.28 + broad[i] * 0.18 + cushion * 0.5 + fine[i] * 0.16;
+    h[i] = 0.32 + broad[i] * 0.2 + cushion * 0.34 + fine[i] * 0.06;
   }
   // Leaf litter: small flat ovals pressed into the loam.
-  for (let k = 0; k < 260; k++) {
+  for (let k = 0; k < 70; k++) {
     const cx = rnd() * size;
     const cy = rnd() * size;
     const a = rnd() * Math.PI;
@@ -201,12 +201,12 @@ const paintMoss: Painter = (h, size, rnd) => {
         const i =
           (((Math.floor(cy + y) % size) + size) % size) * size +
           (((Math.floor(cx + x) % size) + size) % size);
-        h[i] = h[i] * 0.6 + 0.3;
+        h[i] = h[i] * 0.75 + 0.18;
       }
     }
   }
   // Root threads: thin raised lines wandering across.
-  for (let k = 0; k < 24; k++) {
+  for (let k = 0; k < 9; k++) {
     let x = rnd() * size;
     let y = rnd() * size;
     let a = rnd() * Math.PI * 2;
@@ -217,7 +217,7 @@ const paintMoss: Painter = (h, size, rnd) => {
       y += Math.sin(a);
       const i =
         (((Math.floor(y) % size) + size) % size) * size + (((Math.floor(x) % size) + size) % size);
-      h[i] += 0.22;
+      h[i] += 0.12;
     }
   }
 };
@@ -277,13 +277,16 @@ function bake(
   seed: number,
   size: number,
   relief: number,
+  blur = 1,
+  /** Albedo swing from the deepest to the highest point (out of 255). */
+  contrast = 145,
 ): DetailPair {
   const cached = cache.get(key);
   if (cached) return cached;
   const rnd = lcg(seed);
   const raw = new Float32Array(size * size);
   painter(raw, size, rnd);
-  const height = blurWrap(raw, size, 1);
+  const height = blurWrap(raw, size, blur);
   const albedo = document.createElement('canvas');
   albedo.width = albedo.height = size;
   const normal = document.createElement('canvas');
@@ -297,7 +300,7 @@ function bake(
     for (let x = 0; x < size; x++) {
       const i = y * size + x;
       const hv = Math.max(0, Math.min(1, height[i]));
-      const v = Math.round(110 + hv * 145);
+      const v = Math.round(255 - contrast + hv * contrast);
       aimg.data[i * 4] = v;
       aimg.data[i * 4 + 1] = v;
       aimg.data[i * 4 + 2] = v;
@@ -343,7 +346,8 @@ export function rockDetail(): DetailPair {
 }
 
 export function mossDetail(): DetailPair {
-  return bake('moss', paintMoss, 0x6d0b, 256, 5);
+  // Soft cushions: a wider blur and a low relief (no pixel grit at range).
+  return bake('moss', paintMoss, 0x6d0b, 256, 3, 2, 80);
 }
 
 export function basaltDetail(): DetailPair {

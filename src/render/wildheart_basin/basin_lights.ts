@@ -37,7 +37,9 @@ function flameMaterial(kind: BasinLightKind): THREE.MeshBasicMaterial {
     m = new THREE.MeshBasicMaterial({
       color: BASIN_LIGHT_STYLE[kind].flame,
       transparent: true,
-      opacity: 0.95,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
       name: `wildheartFlame:${kind}`,
     });
     markSharedMaterial(m);
@@ -110,7 +112,7 @@ export function buildBasinLights(
   deps: BasinLightDeps,
   ground: (x: number, z: number) => number,
 ): void {
-  flameGeometry ??= new THREE.ConeGeometry(0.32, 1.1, 7);
+  flameGeometry ??= new THREE.ConeGeometry(0.2, 0.9, 7);
   markSharedGeometry(flameGeometry);
   poolGeometry ??= new THREE.CircleGeometry(1, 24).rotateX(-Math.PI / 2);
   markSharedGeometry(poolGeometry);
@@ -118,8 +120,8 @@ export function buildBasinLights(
     const gy = ground(spot.x, spot.z);
     const y = gy + spot.lift;
     const flame = new THREE.Mesh(flameGeometry, flameMaterial(spot.kind));
-    flame.position.set(spot.x, y + 0.35, spot.z);
-    flame.scale.setScalar(1.7);
+    flame.position.set(spot.x, y + 0.1, spot.z);
+    flame.scale.setScalar(1.15);
     group.add(flame);
     deps.flames.push(flame);
     const halo = new THREE.Sprite(haloMaterial(spot.kind));

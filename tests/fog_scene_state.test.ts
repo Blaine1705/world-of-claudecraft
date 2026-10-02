@@ -98,7 +98,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['ignivarApproach', ...raid('ignivarApproach')],
     ['ignivar', ...raid('ignivar')],
     ['varkhul', ...raid('varkhul')],
-    ['wildheartBasin', 0xc7bf8e, 130, 860],
+    ['wildheartBasin', 0xbfb98a, 150, 1050],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],
     ['delve', 0x0e0705, 14, 74],

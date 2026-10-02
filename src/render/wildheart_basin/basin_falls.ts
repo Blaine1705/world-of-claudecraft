@@ -14,7 +14,6 @@
 // and mist counts shed with the effects tier (cosmetic only).
 
 import * as THREE from 'three';
-import { rockDetail } from '../authored_field/field_textures';
 import { sharedUniforms } from '../gfx';
 import {
   BASIN_SUN_DIRECTION,
@@ -98,7 +97,10 @@ void main() {
   col += vec3(1.0, 0.86, 0.6) * (pow(max(0.0, dot(reflect(-uSunDir, vNormalW), view)), 16.0) * 0.35 + through * 0.4);
   float body = mix(0.4, 1.0, ropes) * (0.5 + 0.5 * sheet);
   float mist = smoothstep(0.7, 1.0, t) * 0.45;
-  float a = edge * (body * mix(0.7, 1.0, facing) + mist);
+  float weight = fract(seed / 3.0) * 3.0 / 0.9;
+  float a = edge * (body * mix(0.7, 1.0, facing) + mist) * weight;
+  // A thin sheet tears into ropes with clear gaps between.
+  a *= mix(1.0, smoothstep(0.35, 0.7, ropes + sheet * 0.4), 1.0 - weight);
   gl_FragColor = vec4(col, clamp(a, 0.0, 0.9));
   #include <fog_fragment>
   #include <colorspace_fragment>
@@ -122,7 +124,10 @@ function buildCurtains(falls: readonly BasinFall[], lowGfx: boolean): THREE.Mesh
         // A gentle bow and sway so the sheet never reads flat.
         const sway = Math.sin(u * 7 + t * 5 + k) * 0.5 * t;
         positions.push(x + f.nx * sway, y, z + f.nz * sway);
-        attrs.push(u, t, k * 3.7 + 1.3, f.top - f.bottom);
+        // The seed's integer part keys the noise; its tenths carry the sheet's
+        // weight (the Walk's veil is a thinner sheet the party sees through).
+        const weight = f.kind === 'veil' ? 0.5 : f.kind === 'spill' ? 0.85 : 1;
+        attrs.push(u, t, k * 3 + weight * 0.9, f.top - f.bottom);
       }
     }
     const row = across + 1;
@@ -561,44 +566,57 @@ function buildRainbows(falls: readonly BasinFall[], lowGfx: boolean): THREE.Mesh
 
 // ---- the shelf over the Waterfall Walk ---------------------------------------------
 
-/** The dark wet rock shelf the Walk's veil pours off: a wedge jutting from
- *  the east wall high over the path, its underside dripping. Render only and
- *  far over head height (no collider needed). */
+/** The dark wet rock shelf the Walk's veil pours off: a crag of basalt
+ *  boulders jutting from the east wall high over the path, heavier toward the
+ *  wall, mossed on top and dripping underneath. Render only and far over head
+ *  height (no collider needed). One merged, flat-shaded mesh. */
 function buildWalkShelf(lowGfx: boolean): THREE.Mesh {
   const s = WALK_SHELF;
-  const w = s.x1 - s.x0;
-  const d = s.z1 - s.z0;
-  const geo = new THREE.BoxGeometry(w, 10, d, lowGfx ? 8 : 18, 3, lowGfx ? 8 : 16);
-  const pos = geo.attributes.position as THREE.BufferAttribute;
-  const col = new Float32Array(pos.count * 3);
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const y = pos.getY(i);
-    const z = pos.getZ(i);
-    const n = basinHash(Math.round(x * 0.7), Math.round(z * 0.7));
-    // Thicker toward the wall (east), ragged and toothed underneath.
-    const t = (x + w / 2) / w;
-    const under = y < 0 ? -n * 3.5 - t * t * 22 : n * 2 + t * t * 10;
-    pos.setY(i, y + under);
-    pos.setZ(i, z + (n - 0.5) * 1.5);
-    const g = 0.06 + n * 0.05;
-    col.set([g * 0.9, g * 1.05, g], i * 3);
+  const positions: number[] = [];
+  const colors: number[] = [];
+  const n = lowGfx ? 9 : 16;
+  for (let i = 0; i < n; i++) {
+    const h = (k: number) => basinHash(i + 500, k);
+    // Spread along the shelf (z), denser and bigger toward the wall (east).
+    const t = h(1);
+    const toWall = 0.25 + 0.75 * Math.sqrt(h(2));
+    const x = s.x0 + (s.x1 - s.x0) * toWall;
+    const z = s.z0 + (s.z1 - s.z0) * t;
+    const r = 4 + toWall * 6 + h(3) * 3;
+    const geo = new THREE.DodecahedronGeometry(r, lowGfx ? 0 : 1).toNonIndexed();
+    const pos = geo.getAttribute('position') as THREE.BufferAttribute;
+    for (let v = 0; v < pos.count; v++) {
+      const vx = pos.getX(v);
+      const vy = pos.getY(v);
+      const vz = pos.getZ(v);
+      const j = 0.75 + basinHash(Math.round(vx * 3 + i), Math.round(vz * 3 - vy)) * 0.5;
+      // Flattened into a slab, the underside hanging lower toward the wall.
+      const y = vy * (vy < 0 ? 0.55 + toWall * 0.6 : 0.35) * j;
+      positions.push(x + vx * j * 1.1, s.y + 2 + y + (h(4) - 0.5) * 2, z + vz * j * 1.2);
+      const top = vy > r * 0.35;
+      const g = 0.07 + basinHash(v, i) * 0.04;
+      if (top) colors.push(0.16 + g, 0.24 + g * 1.4, 0.09 + g * 0.5);
+      else colors.push(g * 0.85, g * 1.02, g * 0.98);
+    }
+    geo.dispose();
   }
-  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geo.computeVertexNormals();
-  const rock = rockDetail();
+  geo.computeBoundingSphere();
   const mesh = new THREE.Mesh(
     geo,
     new THREE.MeshStandardMaterial({
       vertexColors: true,
-      map: rock.map,
-      roughness: 0.5,
+      roughness: 0.55,
+      flatShading: true,
       name: 'wildheartWalkShelf',
     }),
   );
-  mesh.position.set((s.x0 + s.x1) / 2, s.y + 4, (s.z0 + s.z1) / 2);
   mesh.name = 'wildheartWalkShelf';
   mesh.castShadow = !lowGfx;
+  mesh.receiveShadow = true;
   return mesh;
 }
 
@@ -613,7 +631,7 @@ export function buildBasinFalls(opts: BasinFallsOptions): THREE.Group {
     'wildheartBasinSpray',
     sprayFor(falls, opts.density, opts.lowGfx),
     0xeaf7f6,
-    0.42,
+    0.3,
     8,
   );
   if (spray) group.add(spray);
@@ -621,7 +639,7 @@ export function buildBasinFalls(opts: BasinFallsOptions): THREE.Group {
     'wildheartBasinFallMist',
     mistFor(falls, opts.density, opts.lowGfx),
     0xdfe8dc,
-    0.2,
+    0.11,
     6,
   );
   if (mist) group.add(mist);
