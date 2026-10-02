@@ -293,8 +293,8 @@ const paintPlate: Painter = (h, size, rnd) => {
         const fx = lx / tread - tx - 0.5;
         const fy = ly / tread - ty - 0.5;
         const flip = (tx + ty) % 2 === 0 ? 1 : -1;
-        const u = (fx + fy * flip) * 0.7071;
-        const w = (fx - fy * flip) * 0.7071;
+        const u = (fx + fy * flip) * Math.SQRT1_2;
+        const w = (fx - fy * flip) * Math.SQRT1_2;
         if (Math.abs(u) < 0.32 && Math.abs(w) < 0.08) v += 0.13;
       }
       // Sunken weld seams between the plates.

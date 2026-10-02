@@ -323,15 +323,19 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/drowned_temple/temple_landmarks.ts',
   'src/render/drowned_temple/temple_hydra.ts',
   'src/render/drowned_temple/temple_fx.ts',
-  // The Stormbrass Foundry's sky (dome, the mountain round it), the steam columns, the
-  // gates (shutter steam, arc fences standing across a passage) and the coil's
-  // bolts in the air. None is a floor mark; its floor marks are the shared
-  // telegraph kit's (the ladder's own rungs) and its lamp pools sit on the
-  // ground rung (foundry_lights.ts).
+  // The Stormbrass Foundry's sky (dome, the mountain round it), the gates
+  // (shutter steam, arc fences standing across a passage, the crane's winch
+  // steam), the coil's bolts in the air, the molten brass (the river in the
+  // gulf under the Line Catwalk, its fall, the pour streams and heat glows in
+  // the air), the spark showers and the steam and smoke cards. None is a floor
+  // mark; its floor marks are the shared telegraph kit's (the ladder's own
+  // rungs) and its lamp pools sit on the ground rung (foundry_lights.ts).
   'src/render/stormbrass_foundry/foundry_sky.ts',
-  'src/render/stormbrass_foundry/foundry_dressing.ts',
   'src/render/stormbrass_foundry/foundry_gates.ts',
   'src/render/stormbrass_foundry/foundry_landmarks.ts',
+  'src/render/stormbrass_foundry/foundry_molten.ts',
+  'src/render/stormbrass_foundry/foundry_sparks.ts',
+  'src/render/stormbrass_foundry/foundry_steam.ts',
   // The Wildheart Basin's water (the ford, the river, the plunge pool: water
   // surfaces under the whole ladder), its waterfalls (curtains, foam, spray,
   // mist, rainbows standing up from the water) and its air (the gorge haze

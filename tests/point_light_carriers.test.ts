@@ -622,13 +622,17 @@ describe('every point-light producer is a carrier source', () => {
       'render/jail_scene.ts: swirl',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
-      // The Stormbrass Foundry: mesh hooks, never a scene: a crane arm's sweep
-      // (one matrix write), the storm dome's strike flash, the coil's bolts and flare on the strike clock,
-      // the Prime Draft landmark's head turning to the viewer, and (phase 3)
-      'render/stormbrass_foundry/foundry_dressing.ts: m',
+      // The Stormbrass Foundry: mesh hooks, never a scene: the gates reading
+      // the gate memory (the shutters, the arc fences, the crane swinging the
+      // bridge span), the coil's bolts, flare and afterglow on the strike
+      // clock, the kit's movers (one matrix buffer per piece: jibs, flywheels,
+      // pistons, ladles), the ladles' pour streams, the storm dome's flash, and
+      'render/stormbrass_foundry/foundry_gates.ts: m',
       'render/stormbrass_foundry/foundry_landmarks.ts: bolt',
       'render/stormbrass_foundry/foundry_landmarks.ts: flare',
-      'render/stormbrass_foundry/foundry_landmarks.ts: m',
+      'render/stormbrass_foundry/foundry_landmarks.ts: glow',
+      'render/stormbrass_foundry/foundry_machines.ts: mesh',
+      'render/stormbrass_foundry/foundry_molten.ts: mesh',
       // the Stamping Press's hammers falling (one matrix write per hammer mesh)
       'render/stormbrass_foundry/foundry_press.ts: m',
       'render/stormbrass_foundry/foundry_sky.ts: mesh',

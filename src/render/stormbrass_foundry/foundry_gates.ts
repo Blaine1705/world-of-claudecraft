@@ -1,9 +1,10 @@
-// The Stormbrass Foundry's gates and seals as structures: the steam shutters
-// (a riveted brass shutter between two pillars that grinds up into its housing
-// in a burst of steam), the arc fences (lightning crackling between two coil
-// posts, powering down with a stutter), and the Crane Bridge (a gantry deck
-// that swings out from the Crane Landing and runs out across the gulf to the
-// Drafting Yard).
+// The Stormbrass Foundry's gates and seals as structures, built from the kit
+// (foundry_kit.ts): the steam shutters (a slatted brass roller shutter between
+// two riveted pillars that rolls up into its housing in a burst of steam), the
+// arc fences (lightning crackling between two coil posts, powering down with a
+// stutter), and the Crane Bridge: the bridge crane on the Crane Landing
+// carries the whole span on its hook, slews it across the gulf and lowers it
+// onto its seats in steam and a shower of sparks (foundry_bridge_core.ts).
 //
 // Each gate reads its on-screen state from the shared gate memory
 // (../hollow_crypt/crypt_gate_state_core.ts, fed by the mirrored gate entities
@@ -12,23 +13,39 @@
 
 import * as THREE from 'three';
 import { STORMBRASS_FOUNDRY_GATES } from '../../sim/content/stormbrass_foundry';
-import { CRANE_BRIDGE } from '../../sim/content/stormbrass_foundry_layout';
 import type { DungeonGateDef } from '../../sim/types';
 import { sharedUniforms } from '../gfx';
 import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
-import { PartBin } from './foundry_mesh';
+import {
+  BRIDGE_SPARK_GATE,
+  craneBridgePose,
+  craneBridgeProgress,
+  craneBridgeRig,
+} from './foundry_bridge_core';
+import { foundryKitMeshes, foundryKitRun, upgradeWhenKitLands } from './foundry_kit';
+import { FOUNDRY_KIT_SIZES } from './foundry_kit_plan_core';
 import {
   arcFenceCharge,
-  bridgeExtension,
   CRANE_BRIDGE_APRON,
   craneBridgeDeck,
   shutterLift,
 } from './foundry_plan_core';
+import { setSparkGate } from './foundry_sparks';
 
 interface GateRig {
   root: THREE.Group;
-  /** Called every rendered frame with the gate's openness, seal pulse and clock. */
-  apply(openness: number, seal: number, since: number): void;
+  /** True when the rig places itself in the instance frame (the bridge). */
+  absolute?: boolean;
+  /** Called every rendered frame with the gate's view and the clock. */
+  apply(openness: number, seal: number, since: number, open: boolean): void;
+}
+
+/** Push a group's own matrix and its descendants' world matrices (the rigs
+ *  move inside an onBeforeRender, after the scene's matrix pass). */
+function settle(node: THREE.Object3D): void {
+  node.updateMatrix();
+  if (node.parent) node.matrixWorld.multiplyMatrices(node.parent.matrixWorld, node.matrix);
+  for (const c of node.children) settle(c);
 }
 
 const SHEET_VERT = /* glsl */ `
@@ -59,23 +76,17 @@ void main() {
 }
 `;
 
+/** The kit shutter's own half width and travel (the contract). */
+const SHUTTER_HALF = 5.6;
+const SHUTTER_TRAVEL = 8.3;
+
 function steamShutter(gate: DungeonGateDef): GateRig {
   const w = gate.hw;
-  const bin = new PartBin();
-  // Two riveted pillars and the housing lintel the shutter rises into.
-  for (const side of [-1, 1]) {
-    bin.box('iron', side * (w + 0.7), 4.5, 0, 0.7, 4.5, 0.9);
-    bin.box('hazard', side * (w + 0.7), 1, -0.92, 0.72, 0.9, 0.04);
-  }
-  bin.box('brass', 0, 10.2, 0, w + 1.6, 1.3, 1.1);
-  bin.box('iron', 0, 11.7, 0, w + 1.2, 0.3, 0.9);
-  const frame = bin.build(`stormbrassShutterFrame:${gate.id}`);
-  const panelBin = new PartBin();
-  panelBin.box('brass', 0, 4.25, 0, w, 4.25, 0.25);
-  for (let y = 1; y < 8.5; y += 1.8) panelBin.box('iron', 0, y, -0.28, w, 0.14, 0.05);
-  for (let x = -w + 0.6; x < w; x += 1.6) panelBin.box('verdigris', x, 4.25, -0.3, 0.06, 4, 0.04);
-  panelBin.box('hazard', 0, 0.35, -0.3, w * 0.98, 0.3, 0.05);
-  const panel = panelBin.build(`stormbrassShutterPanel:${gate.id}`);
+  const stretch = w / SHUTTER_HALF;
+  const frame = foundryKitMeshes('Kit_ShutterFrame');
+  frame.scale.set(stretch, 1, 1);
+  const panel = foundryKitMeshes('Kit_ShutterPanel');
+  panel.scale.set(stretch, 1, 1);
   const puffU = { uTime: sharedUniforms.uTime, uPuff: { value: 0 } };
   const puff = new THREE.Mesh(
     new THREE.PlaneGeometry(w * 2 + 3, 9),
@@ -91,22 +102,27 @@ function steamShutter(gate: DungeonGateDef): GateRig {
   );
   puff.position.set(0, 4.5, -1.2);
   puff.renderOrder = 9;
-  // The seal: two warning lamps on the lintel that pulse while a boss holds it.
+  // The seal: two warning lamps in the housing's sockets that pulse while a
+  // boss holds it.
   const lampMat = new THREE.MeshBasicMaterial({ color: 0x551111, name: 'stormbrassSealLamp' });
-  const lamps = new THREE.Mesh(new THREE.SphereGeometry(0.4, 10, 8), lampMat);
-  lamps.position.set(0, 10.2, -1.2);
+  const lampGeo = new THREE.SphereGeometry(0.34, 10, 8);
+  const lamps = new THREE.Group();
+  for (const side of [-1, 1]) {
+    const lamp = new THREE.Mesh(lampGeo, lampMat);
+    lamp.position.set(side * 3 * stretch, 10.2, 1.18);
+    lamps.add(lamp);
+  }
   const root = new THREE.Group();
   root.add(frame, panel, puff, lamps);
   return {
     root,
     apply(openness, seal, since) {
-      panel.position.y = shutterLift(openness) * 10.5;
-      panel.updateMatrix();
-      if (panel.parent) panel.matrixWorld.multiplyMatrices(panel.parent.matrixWorld, panel.matrix);
-      for (const c of panel.children) {
-        const m = c as THREE.Mesh;
-        m.matrixWorld.multiplyMatrices(panel.matrixWorld, m.matrix);
-      }
+      // The shutter rolls up into its housing: its foot climbs, its slats
+      // gather under the drum.
+      const lift = shutterLift(openness);
+      panel.position.y = lift * SHUTTER_TRAVEL;
+      panel.scale.set(stretch, 1 - lift * 0.97, 1);
+      settle(panel);
       // A burst of steam as it lifts (and as it slams down again).
       puffU.uPuff.value = since < 3 ? Math.max(0, 1 - since / 3) : 0;
       lampMat.color.setRGB(0.35 + seal * 0.65, 0.07 + seal * 0.25, 0.07 + seal * 0.2);
@@ -146,14 +162,12 @@ void main() {
 
 function arcFence(gate: DungeonGateDef): GateRig {
   const w = gate.hw;
-  const bin = new PartBin();
+  const posts = new THREE.Group();
   for (const side of [-1, 1]) {
-    const x = side * (w + 0.5);
-    bin.cyl('iron', x, 0, 6.5, 0, 0.35, 0.55, 10);
-    for (let y = 1; y < 6; y += 0.9) bin.ring('brass', x, y, 0, 0.62, 0.1);
-    bin.add('glow', new THREE.SphereGeometry(0.45, 10, 8), x, 6.9, 0);
+    const post = foundryKitMeshes('Kit_ArcPost');
+    post.position.set(side * (w + 0.5), 0, 0);
+    posts.add(post);
   }
-  const posts = bin.build(`stormbrassArcPosts:${gate.id}`);
   const u = { uTime: sharedUniforms.uTime, uCharge: { value: 1 }, uSeal: { value: 0 } };
   const sheet = new THREE.Mesh(
     new THREE.PlaneGeometry(w * 2 + 1, 6.4),
@@ -185,63 +199,181 @@ function arcFence(gate: DungeonGateDef): GateRig {
 
 // ---- the crane bridge ------------------------------------------------------------------------
 
-function craneBridge(gate: DungeonGateDef): GateRig {
-  // Built in the gate's own frame: the deck runs along +z (north) from the
-  // Crane Landing's lip, pitched up from the landing's height to the yard's.
-  // The deck's numbers are the pure plan's (craneBridgeDeck), which a test
-  // pins to the walked floor: the ramp lands on the yard's lip, the apron
-  // tucks under it.
-  const { len, pitch } = craneBridgeDeck();
-  const hw = CRANE_BRIDGE.halfWidth;
-  const bin = new PartBin();
-  bin.box('iron', 0, -0.35, len / 2, hw, 0.3, len / 2);
-  bin.box('brass', 0, 0.02, len / 2, hw * 0.92, 0.06, len / 2);
-  for (let z = 1; z < len; z += 2) bin.box('black', 0, 0.09, z, hw * 0.9, 0.03, 0.08);
-  for (const side of [-1, 1]) {
-    bin.box('hazard', side * (hw - 0.1), 1.1, len / 2, 0.08, 0.08, len / 2);
-    for (let z = 0.5; z < len; z += 3)
-      bin.box('iron', side * (hw - 0.1), 0.55, z, 0.07, 0.55, 0.07);
-    // Truss beneath.
-    bin.beam('iron', [side * hw * 0.8, -0.6, 0.5], [side * hw * 0.8, -2.8, len / 2], 0.18);
-    bin.beam('iron', [side * hw * 0.8, -2.8, len / 2], [side * hw * 0.8, -0.6, len - 0.5], 0.18);
-  }
-  const deck = bin.build(`stormbrassCraneBridge:${gate.id}`);
-  deck.rotation.x = pitch;
+const va = new THREE.Vector3();
+const vb = new THREE.Vector3();
+const vc = new THREE.Vector3();
+const vc2 = new THREE.Vector3();
+const vx = new THREE.Vector3();
+const vy = new THREE.Vector3();
+const vz = new THREE.Vector3();
+const WORLD_UP = new THREE.Vector3(0, 1, 0);
+
+/** Lay a unit link (the kit's one-yard chain or cable along +x) from a to b. */
+function strand(link: THREE.Object3D, a: THREE.Vector3, b: THREE.Vector3, thick: number): void {
+  vx.subVectors(b, a);
+  const len = Math.max(1e-3, vx.length());
+  vx.multiplyScalar(1 / len);
+  vz.crossVectors(vx, WORLD_UP);
+  if (vz.lengthSq() < 1e-6) vz.set(0, 0, 1);
+  vz.normalize();
+  vy.crossVectors(vz, vx);
+  link.matrix.makeBasis(vx, vy, vz);
+  link.matrix.scale(vc.set(len, thick, thick));
+  link.matrix.setPosition(a);
+  if (link.parent) link.matrixWorld.multiplyMatrices(link.parent.matrixWorld, link.matrix);
+  for (const c of link.children) c.matrixWorld.multiplyMatrices(link.matrixWorld, c.matrix);
+}
+
+function craneBridge(): GateRig {
+  // The span: the deck tiles merged into one mesh per slot, its origin the
+  // south end's walking surface, running along its local +z. The deck's
+  // numbers are the pure plan's (craneBridgeDeck), which a test pins to the
+  // walked floor: the ramp lands on the yard's lip, the apron tucks under it.
+  const deck = craneBridgeDeck();
+  const rig = craneBridgeRig();
+  const tiles = Math.max(1, Math.round(deck.len / 4));
+  const span = new THREE.Group();
+  span.name = 'stormbrassCraneBridgeSpan';
+  const run = foundryKitRun('Kit_BridgeSpan', tiles, deck.len / tiles, 4);
+  // The run tiles along its local +x: turn it to run north (+z).
+  run.rotation.y = -Math.PI / 2;
+  span.add(run);
   // The flat apron past the ramp's end, level with the yard (counter-pitched
-  // in the deck's frame), so the landing never shows a sliver of the drop.
-  const apronBin = new PartBin();
-  apronBin.box('iron', 0, -0.35, CRANE_BRIDGE_APRON / 2, hw, 0.3, CRANE_BRIDGE_APRON / 2 + 0.1);
-  apronBin.box('brass', 0, 0.02, CRANE_BRIDGE_APRON / 2, hw * 0.92, 0.06, CRANE_BRIDGE_APRON / 2);
-  const apron = apronBin.build(`stormbrassCraneBridgeApron:${gate.id}`);
-  apron.position.set(0, 0, len);
-  apron.rotation.x = -pitch;
-  deck.add(apron);
-  // The crane that swings it: a pivot tower on the landing's lip.
-  const towerBin = new PartBin();
-  towerBin.box('hazard', -hw - 1.6, 5, -1, 0.8, 5, 0.8);
-  towerBin.box('iron', -hw - 1.6, 10.4, -1, 1.2, 0.5, 1.2);
-  towerBin.beam('black', [-hw - 1.6, 10.4, -1], [0, 1, len * 0.5], 0.06);
-  const tower = towerBin.build(`stormbrassCraneBridgeTower:${gate.id}`);
-  const swing = new THREE.Group();
-  swing.add(deck);
+  // in the span's frame), so the landing never shows a sliver of the drop.
+  const apron = foundryKitRun('Kit_BridgeSpan', 1, CRANE_BRIDGE_APRON + 0.2, 4);
+  apron.rotation.y = -Math.PI / 2;
+  const apronHolder = new THREE.Group();
+  apronHolder.position.set(0, 0, deck.len - 0.1);
+  apronHolder.rotation.x = -deck.pitch;
+  apronHolder.add(apron);
+  span.add(apronHolder);
+  span.rotation.order = 'YXZ';
+  // The crane's slewing jib, stretched to reach the span's middle.
+  const jib = foundryKitMeshes('Kit_CraneJib');
+  jib.position.set(rig.mast.x, rig.mast.top, rig.mast.z);
+  jib.scale.set(
+    rig.mast.scale * 1.15,
+    rig.mast.scale * 1.15,
+    rig.reach / FOUNDRY_KIT_SIZES.craneJibReach,
+  );
+  const hook = foundryKitMeshes('Kit_HookBlock');
+  // The hoist cable and the four sling chains to the span's lifting eyes.
+  const hoist = foundryKitMeshes('Kit_Cable');
+  hoist.matrixAutoUpdate = false;
+  const slings = [0, 1, 2, 3].map(() => {
+    const s = foundryKitMeshes('Kit_Chain');
+    s.matrixAutoUpdate = false;
+    return s;
+  });
+  // The winch's steam while it works, at the mast's foot.
+  const steamU = { uTime: sharedUniforms.uTime, uPuff: { value: 0 } };
+  const steam = new THREE.Mesh(
+    new THREE.PlaneGeometry(7, 12),
+    new THREE.ShaderMaterial({
+      name: 'stormbrassCraneSteam',
+      vertexShader: SHEET_VERT,
+      fragmentShader: PUFF_FRAG,
+      uniforms: steamU,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    }),
+  );
+  steam.position.set(rig.mast.x + 1.5, rig.mast.top - 12, rig.mast.z + 1.5);
+  steam.rotation.y = Math.PI / 4;
+  steam.renderOrder = 9;
   const root = new THREE.Group();
-  root.add(swing, tower);
-  const apply = (openness: number): void => {
-    const e = bridgeExtension(openness);
-    // Folded: the deck stands upright against the tower, retracted; it swings
-    // down over the gulf, then runs out to full length along its rails.
-    swing.rotation.x = -(1 - e.swing) * 1.35;
-    deck.scale.z = 0.35 + 0.65 * e.run;
-    swing.updateMatrix();
-    deck.updateMatrix();
-    if (swing.parent) swing.matrixWorld.multiplyMatrices(swing.parent.matrixWorld, swing.matrix);
-    deck.matrixWorld.multiplyMatrices(swing.matrixWorld, deck.matrix);
-    for (const c of deck.children) c.matrixWorld.multiplyMatrices(deck.matrixWorld, c.matrix);
-    apron.updateMatrix();
-    apron.matrixWorld.multiplyMatrices(deck.matrixWorld, apron.matrix);
-    for (const c of apron.children) c.matrixWorld.multiplyMatrices(apron.matrixWorld, c.matrix);
+  root.add(span, jib, hook, hoist, ...slings, steam);
+  // The swing runs on its own slow clock (the gate memory's reveal is a
+  // shutter's two seconds): from where it stood when the gate last changed.
+  let from: number | null = null;
+  let wasOpen = false;
+  let k = 0;
+  const half = deck.len / 2;
+  const eyes: [number, number][] = [
+    [-4.6, half - 6.5],
+    [4.6, half - 6.5],
+    [-4.6, half + 6.5],
+    [4.6, half + 6.5],
+  ];
+  return {
+    root,
+    absolute: true,
+    apply(openness, _seal, since, open) {
+      if (from === null) {
+        // First sight: a gate the memory snapped (never seen moving) stands
+        // where it is; one caught mid-reveal starts its swing from the far end.
+        from = openness > 0 && openness < 1 ? (open ? 0 : 1) : open ? 1 : 0;
+        wasOpen = open;
+      } else if (open !== wasOpen) {
+        from = k;
+        wasOpen = open;
+      }
+      k = craneBridgeProgress(open, since, from);
+      const pose = craneBridgePose(k, sharedUniforms.uTime.value);
+      span.position.set(pose.span.x, pose.span.y, pose.span.z);
+      span.rotation.set(pose.span.pitch, pose.span.yaw, 0);
+      jib.rotation.y = pose.jibYaw;
+      hook.position.set(pose.hook.x, pose.hook.y, pose.hook.z);
+      settle(span);
+      settle(jib);
+      settle(hook);
+      strand(hoist, va.set(pose.tip.x, pose.tip.y, pose.tip.z), vb.copy(hook.position), 1.6);
+      // The hook's lower eye down to each lifting eye on the girders.
+      va.set(pose.hook.x, pose.hook.y - 2.1, pose.hook.z);
+      slings.forEach((s, i) => {
+        vb.set(eyes[i][0], 1.3, eyes[i][1]).applyMatrix4(span.matrix);
+        // Let go once the span is seated: the chains drop to hang under the hook.
+        if (pose.release > 0) {
+          vc2.set(va.x + eyes[i][0] * 0.07, va.y - 3.2, va.z + (i < 2 ? -0.25 : 0.25));
+          vb.lerp(vc2, pose.release);
+        }
+        strand(s, va, vb, 1.4);
+      });
+      steamU.uPuff.value = pose.working * 0.9;
+      setSparkGate(BRIDGE_SPARK_GATE, pose.touchdown);
+    },
   };
-  return { root, apply: (openness) => apply(openness) };
+}
+
+function buildGates(ox: number, oz: number, ground: (x: number, z: number) => number): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'stormbrassGates';
+  for (const gate of STORMBRASS_FOUNDRY_GATES) {
+    const key = gateMemoryKey(ox, oz, gate.id);
+    const rig =
+      gate.kind === 'arc_fence'
+        ? arcFence(gate)
+        : gate.kind === 'crane_bridge'
+          ? craneBridge()
+          : steamShutter(gate);
+    const holder = new THREE.Group();
+    holder.name = `gate:${gate.id}`;
+    if (!rig.absolute) {
+      holder.position.set(gate.x, ground(gate.x, gate.z), gate.z);
+      holder.rotation.y = gate.rot;
+    }
+    holder.add(rig.root);
+    let stamp = Number.NaN;
+    const refresh = (): void => {
+      const t = sharedUniforms.uTime.value;
+      if (t === stamp) return;
+      stamp = t;
+      const view = gateView(key, t);
+      const seal = view.state === 'sealed' ? 0.7 + 0.3 * Math.sin(t * 5) : 0;
+      rig.apply(view.openness, seal, view.since, view.state === 'open');
+    };
+    holder.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      m.onBeforeRender = refresh;
+      // A rig that travels (the bridge's span on the crane) is never culled
+      // by where it was built.
+      if (rig.absolute) m.frustumCulled = false;
+    });
+    group.add(holder);
+  }
+  return group;
 }
 
 /**
@@ -253,36 +385,7 @@ export function buildFoundryGates(
   oz: number,
   ground: (x: number, z: number) => number,
 ): THREE.Group {
-  const group = new THREE.Group();
-  group.name = 'stormbrassGates';
-  for (const gate of STORMBRASS_FOUNDRY_GATES) {
-    const key = gateMemoryKey(ox, oz, gate.id);
-    const rig =
-      gate.kind === 'arc_fence'
-        ? arcFence(gate)
-        : gate.kind === 'crane_bridge'
-          ? craneBridge(gate)
-          : steamShutter(gate);
-    const holder = new THREE.Group();
-    holder.name = `gate:${gate.id}`;
-    if (gate.kind === 'crane_bridge') {
-      // The bridge hangs off the Crane Landing's lip (its path's start).
-      holder.position.set(CRANE_BRIDGE.x, CRANE_BRIDGE.fromH, CRANE_BRIDGE.fromZ);
-    } else {
-      holder.position.set(gate.x, ground(gate.x, gate.z), gate.z);
-      holder.rotation.y = gate.rot;
-    }
-    holder.add(rig.root);
-    const refresh = (): void => {
-      const view = gateView(key, sharedUniforms.uTime.value);
-      const seal =
-        view.state === 'sealed' ? 0.7 + 0.3 * Math.sin(sharedUniforms.uTime.value * 5) : 0;
-      rig.apply(view.openness, seal, view.since);
-    };
-    holder.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).onBeforeRender = refresh;
-    });
-    group.add(holder);
-  }
+  const group = buildGates(ox, oz, ground);
+  upgradeWhenKitLands(group, () => buildGates(ox, oz, ground));
   return group;
 }

@@ -15,6 +15,7 @@ import {
   GREAT_COIL,
   STORMBRASS_FOUNDRY_FIELD,
 } from '../../sim/content/stormbrass_foundry_layout';
+import { authoredFieldHeight } from '../../sim/instances/authored_field';
 
 /** The design's palette (docs/design/dungeon-rework/stormbrass_foundry.md
  *  section 7): no orange lava or ember tones; enemy power is blue-white. */
@@ -47,7 +48,7 @@ export const PRIME_DRAFT_LANDMARK = {
 /** Where the great coil's crown takes its strikes (instance-local). */
 export const COIL_TOP = { x: GREAT_COIL.x, y: COIL_CROWN.h + 30, z: GREAT_COIL.z } as const;
 
-export type FoundryLightKind = 'lamp' | 'coil' | 'cell' | 'crown';
+export type FoundryLightKind = 'lamp' | 'coil' | 'cell' | 'crown' | 'forge';
 
 export interface FoundryLightSpot {
   kind: FoundryLightKind;
@@ -55,6 +56,8 @@ export interface FoundryLightSpot {
   z: number;
   /** Height above the floor under it. */
   lift: number;
+  /** Absolute height instead (a light out over the drop: the molten river). */
+  y?: number;
 }
 
 export const FOUNDRY_LIGHT_STYLE: Readonly<
@@ -64,6 +67,9 @@ export const FOUNDRY_LIGHT_STYLE: Readonly<
   coil: { color: 0xcfe8ff, intensity: 3.2, range: 24 },
   cell: { color: 0x8fd0ff, intensity: 2.4, range: 14 },
   crown: { color: 0xa9d4ff, intensity: 3, range: 30 },
+  // The furnaces' mouths and the molten river: warm forge orange against the
+  // storm's cold blue.
+  forge: { color: 0xff8a3a, intensity: 3.4, range: 22 },
 };
 
 /** Every budgeted point light: the work lamps on their poles, the coil's
@@ -76,13 +82,102 @@ export function planFoundryLights(): FoundryLightSpot[] {
   }
   out.push({ kind: 'crown', x: GREAT_COIL.x, z: GREAT_COIL.z, lift: 12 });
   for (const r of CELL_RACKS) out.push({ kind: 'cell', x: r.x, z: r.z, lift: 3 });
-  // The Main Line's two press lamps and the Drafting Yard's plan tables.
+  // The Main Line's two press lamps.
   out.push({ kind: 'lamp', x: -22, z: -6, lift: 6 });
   out.push({ kind: 'lamp', x: 22, z: -6, lift: 6 });
-  out.push({ kind: 'lamp', x: -30, z: 84, lift: 5 });
-  out.push({ kind: 'lamp', x: 30, z: 84, lift: 5 });
+  // The forge's own light: the molten river under the Line Catwalk (out over
+  // the drop, so at its own height), the furnace feeding it, and the pour
+  // line's furnace mouth on the crane pad.
+  for (const x of [-24, 0, 24])
+    out.push({ kind: 'forge', x, z: MOLTEN_Z, lift: 0, y: MOLTEN_Y + 2 });
+  out.push({ kind: 'forge', x: -37, z: MOLTEN_Z, lift: 0, y: MOLTEN_Y + 3 });
+  out.push({ kind: 'forge', x: -33, z: -72, lift: 2 });
   return out;
 }
+
+/** The flood masts standing in the lips' parapets (the kit plan stands a
+ *  Kit_FloodMast on each; planFoundryGlows pools their light on the floor). */
+export const FOUNDRY_FLOOD_MASTS: readonly (readonly [number, number])[] = [
+  [-54.8, -155],
+  [54.8, -145],
+  [-38, -189.8],
+  [38, -189.8],
+  [39.8, -94],
+  [39.8, -70],
+  [-23.8, -22],
+  [23.8, -22],
+  [-49.8, 72],
+  [49.8, 72],
+  [-44.8, 142],
+  [44.8, 134],
+];
+/** The lamp heads' height on a flood mast. */
+export const FOUNDRY_FLOOD_MAST_LAMP = 9.1;
+
+export interface FoundryGlowSpot {
+  /** `flood`: a mast's lamp head. `ember`: a boiler's firebox door. */
+  kind: 'flood' | 'ember';
+  /** The glow's own point (instance-local, absolute height). */
+  x: number;
+  y: number;
+  z: number;
+  /** Its pool of light on the floor (null when no floor lies under it). */
+  pool: { x: number; y: number; z: number; r: number } | null;
+}
+
+/** The lit points that are NOT lights: every flood mast's lamp head and every
+ *  boiler's firebox door, each a glow in the air and a pool of its colour on
+ *  the floor it would light. Painted, not lit: the point-light budget stays
+ *  with the lamps, the coil and the forge (planFoundryLights). */
+export function planFoundryGlows(): FoundryGlowSpot[] {
+  const field = STORMBRASS_FOUNDRY_FIELD;
+  const out: FoundryGlowSpot[] = [];
+  const floorAt = (x: number, z: number) => authoredFieldHeight(field, x, z);
+  for (const [x, z] of FOUNDRY_FLOOD_MASTS) {
+    const g = floorAt(x, z);
+    // The pool falls on the floor inside the lip: toward the walkable side.
+    let px = 0;
+    let pz = 0;
+    for (let k = 0; k < 8; k++) {
+      const a = (k / 8) * Math.PI * 2;
+      if (Math.abs(floorAt(x + Math.cos(a) * 5, z + Math.sin(a) * 5) - g) < 0.5) {
+        px += Math.cos(a);
+        pz += Math.sin(a);
+      }
+    }
+    const len = Math.hypot(px, pz);
+    out.push({
+      kind: 'flood',
+      x,
+      y: g + FOUNDRY_FLOOD_MAST_LAMP,
+      z,
+      pool: len > 0.1 ? { x: x + (px / len) * 4.5, y: g, z: z + (pz / len) * 4.5, r: 9 } : null,
+    });
+  }
+  for (const p of field.props) {
+    if (p.kind !== 'sf_boiler') continue;
+    const c = Math.cos(p.rot);
+    const s = Math.sin(p.rot);
+    const g = floorAt(p.x, p.z);
+    // The firebox door on the boiler's local -x end, its glow spilling out.
+    const at = (d: number): [number, number] => [p.x - d * c, p.z + d * s];
+    const [dx, dz] = at(4.2);
+    const [fx, fz] = at(6.2);
+    out.push({
+      kind: 'ember',
+      x: dx,
+      y: g + 1.3,
+      z: dz,
+      pool: Math.abs(floorAt(fx, fz) - g) < 0.5 ? { x: fx, y: g, z: fz, r: 3.6 } : null,
+    });
+  }
+  return out;
+}
+
+/** The molten river's line and surface (foundry_kit_plan_core.ts
+ *  FOUNDRY_MOLTEN_CHANNEL; pinned equal by the render core test). */
+const MOLTEN_Z = -51;
+const MOLTEN_Y = 2.5;
 
 /** A 0..1 hash of an integer and a salt. */
 export function foundryHash(n: number, salt = 0): number {
@@ -106,6 +201,30 @@ export function coilStrikeAt(t: number, shapes: number): { shape: number; flash:
   const k = into / STRIKE_LIT;
   const flicker = k < 0.35 ? 1 : k < 0.5 ? 0.35 : 1 - (k - 0.5) * 1.6;
   return { shape: Math.floor(foundryHash(beat, 3) * shapes) % shapes, flash: Math.max(0, flicker) };
+}
+
+/** Seconds the great coil keeps glowing after a strike (its windings cool). */
+export const STRIKE_AFTERGLOW = 2.4;
+
+/** The coil's glow at render time `t`: the strike's own flare while the bolt
+ *  is lit, then a slow cooling afterglow (0 once it has faded). Looks back
+ *  one beat, so a strike late in a beat still glows into the next. */
+export function coilAfterglowAt(t: number): number {
+  let best = 0;
+  const beat = Math.floor(t / STRIKE_PERIOD);
+  for (let b = beat; b >= beat - 1; b--) {
+    if (foundryHash(b, 2) < 0.18) continue;
+    const start = b * STRIKE_PERIOD + foundryHash(b, 1) * 1.4;
+    const into = t - start;
+    if (into < 0) continue;
+    if (into <= STRIKE_LIT) {
+      best = Math.max(best, 1);
+      continue;
+    }
+    const cool = (into - STRIKE_LIT) / STRIKE_AFTERGLOW;
+    if (cool < 1) best = Math.max(best, 0.75 * (1 - cool) * (1 - cool));
+  }
+  return best;
 }
 
 /**
@@ -278,18 +397,20 @@ export function planFoundryButtresses(
       pz = b.minZ;
       nx = 0;
       nz = -1;
-    } else if ((s -= w) < d) {
+    } else if (s - w < d) {
+      s -= w;
       px = b.maxX;
       pz = b.minZ + s;
       nx = 1;
       nz = 0;
-    } else if ((s -= d) < w) {
+    } else if (s - w - d < w) {
+      s -= w + d;
       px = b.maxX - s;
       pz = b.maxZ;
       nx = 0;
       nz = 1;
     } else {
-      s -= w;
+      s -= w + d + w;
       px = b.minX;
       pz = b.maxZ - s;
       nx = -1;
