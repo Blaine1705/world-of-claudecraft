@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "504028b3749fa489ec95038a74990b16e84a53d9ee12d1f05a73ded005570c48",
+  "rendererFingerprint": "6a8c19821e2aa9769f24b2c72fe857b3cce3be0fde9bd9e1ffe68ef256ba94e4",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5485553,
-      "sha256": "361ad837352dfa2424d2c820d00f896ae5591151f1cd4ac357dcd71ef0f873e2",
+      "bytes": 5485901,
+      "sha256": "3b42cff400ac449e5dfd1d8caac4c58fdc2664599f9983cdcc916e6fe26a7c42",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -10011,31 +10011,31 @@
       "visualKey": "wildheart_gorgebloom",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_boss_mushroom.glb",
-          "path": "public/models/creatures/hoard_boss_mushroom.glb",
-          "bytes": 2401252,
-          "sha256": "194d8b09d2863713a9ad1304ab902a526cdbbd2402f0f90291427d6a1acbd163"
+          "url": "models/creatures/wildheart_gorgebloom.glb",
+          "path": "public/models/creatures/wildheart_gorgebloom.glb",
+          "bytes": 2958724,
+          "sha256": "855fb2dbd103ffe0b36028dc250850d9eb9d4f875966057016947ba1ea167129"
         },
         "idle": "Idle",
-        "height": 3.608,
+        "height": 5.213571428571429,
         "yaw": null,
-        "hover": null,
+        "hover": -0.30178571428571427,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.7
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#b3202c",
-        "resolved": "#b3202c",
-        "strength": 0.7
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "97e84b0c7807d678efeef72d5ff07f6113918c9de3d68e379503ba9392136ef8",
+      "sourceFingerprint": "b53fdb29f7b13526ed5df71cce5d3d11599162b615817ffe217f80eea97cef53",
       "output": {
         "path": "public/ui/mobs/the_gorgebloom.webp",
-        "bytes": 2780,
-        "sha256": "6de4da261471ea3d0586ef646416340139058c390a16b15c030369e33129fa2e"
+        "bytes": 2170,
+        "sha256": "5b8df5fa68d4b735fc71995fd7492dd34e5c78ad73088b83387aab3945272cf3"
       }
     },
     {
@@ -10196,31 +10196,31 @@
       "visualKey": "wildheart_thorn_sprout",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/yeti.glb",
-          "path": "public/models/creatures/yeti.glb",
-          "bytes": 41144,
-          "sha256": "acbf79f899d21a5e611e12306e47a34f54bb862ceed70c9389466130b29f4308"
+          "url": "models/creatures/wildheart_thorn_sprout.glb",
+          "path": "public/models/creatures/wildheart_thorn_sprout.glb",
+          "bytes": 2780404,
+          "sha256": "90036bcb5169ce6957d8cf98cfb3c32441d814b12a50e1bea62b42e9a1a883aa"
         },
         "idle": "Idle",
-        "height": 2.4699999999999998,
+        "height": 2.0206666666666666,
         "yaw": null,
-        "hover": null,
+        "hover": -0.016666666666666666,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.82
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6f9a26",
-        "resolved": "#6f9a26",
-        "strength": 0.82
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "c6ceefbe2e36b9dee29e6fc6e1179ed9c000657f805c1ed2d874766fba68db29",
+      "sourceFingerprint": "edbb0eab3cba403032f01db1784b02214c278a4d458eb85ac9187e71ff232b9b",
       "output": {
         "path": "public/ui/mobs/thorn_sprout.webp",
-        "bytes": 1926,
-        "sha256": "da4ba035a3fc51031905404ebf23002300e15a30a45f395734f50193943fc27a"
+        "bytes": 3180,
+        "sha256": "7f9f27664bb3870d4ad4c320f02624a094219bece1236577ebbe57e483974d97"
       }
     },
     {
@@ -11701,31 +11701,31 @@
       "visualKey": "wildheart_vine_lasher",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/yeti.glb",
-          "path": "public/models/creatures/yeti.glb",
-          "bytes": 41144,
-          "sha256": "acbf79f899d21a5e611e12306e47a34f54bb862ceed70c9389466130b29f4308"
+          "url": "models/creatures/wildheart_vine_lasher.glb",
+          "path": "public/models/creatures/wildheart_vine_lasher.glb",
+          "bytes": 3076864,
+          "sha256": "7ab19f5078fc3b684ec650d435ce6568a10f26f3e9b02d94077c8772f045fcd7"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.9886363636363633,
         "yaw": null,
-        "hover": null,
+        "hover": -0.02409090909090909,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.8
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#445624",
-        "resolved": "#445624",
-        "strength": 0.8
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "59fb39cc5be3537c2be7c846b76024b11587d1de715635e4373749afdb70b358",
+      "sourceFingerprint": "41061d02eb706721628aab3ebc3f38ecdab8fc7752dfb2cde2e9121f31887e2d",
       "output": {
         "path": "public/ui/mobs/vine_lasher.webp",
-        "bytes": 1636,
-        "sha256": "7a1fc12093d6e0c1705462332f1ad79b3bafb1477696e9ab9806f55f5f6ff908"
+        "bytes": 2302,
+        "sha256": "0538ab4baadf9f60b392cf48e557e00b408c8a81ebb35a62629a334909f7245d"
       }
     },
     {
