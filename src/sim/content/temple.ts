@@ -999,6 +999,7 @@ export const TEMPLE_DUNGEON_DEFS: Record<string, DungeonDef> = {
     // No skipping: every pack is gated, and pulling Ysolei early still wakes
     // anything left alive (instances/boss_chain_pull.ts).
     bossChainPull: true,
+    areaCastsPlant: true,
     interior: 'drowned_temple',
     suggestedPlayers: 5,
     enterText:

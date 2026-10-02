@@ -1573,6 +1573,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     // No skipping: every pack is gated, and pulling Morthen early still wakes
     // anything left alive (instances/boss_chain_pull.ts).
     bossChainPull: true,
+    areaCastsPlant: true,
     interior: 'hollow_crypt',
     suggestedPlayers: 5,
     enterText: 'You descend into the Hollow Crypt...',
@@ -1597,6 +1598,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     // No skipping: every pack is gated, and pulling Vael early still wakes
     // anything left alive (instances/boss_chain_pull.ts).
     bossChainPull: true,
+    areaCastsPlant: true,
     interior: 'sunken_bastion',
     suggestedPlayers: 5,
     enterText: 'You wade down into the Sunken Bastion...',

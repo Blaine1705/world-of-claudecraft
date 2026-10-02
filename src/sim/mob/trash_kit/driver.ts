@@ -16,7 +16,7 @@
 // draws are the damage rolls of a landing cast, in mob-roster order.
 
 import { isLockedOut, isSilenced } from '../../combat/cc';
-import { MOBS } from '../../data';
+import { DUNGEONS, MOBS } from '../../data';
 import { applyKnockback } from '../../knockback';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -33,6 +33,7 @@ import {
 } from '../../types';
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
 import { FLIER_OUT_OF_REACH } from '../patrol';
+import { holdAreaCast } from './cast_hold';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
 import { callDownLastFlier } from './flier_call';
 import { landScreen, screenReady, stepDeathBurst } from './foundry_kit';
@@ -488,6 +489,7 @@ function tryStartCast(
     mob.channeling = key === 'raise';
     if (key === 'line') lockLineAim(mob, st, target);
     else if (target) mob.facing = angleTo(mob.pos, target.pos);
+    holdAreaCast(ctx, mob, false);
     return;
   }
 }
@@ -640,6 +642,10 @@ function stepMob(
     if (kit?.deathCloud) stepDeathCloud(ctx, inst, mob, kit, players());
     return;
   }
+  // An area cast in flight (the kit's own, or the template's breath cone):
+  // the mob AI walked and turned the caster this tick; stand it back on the
+  // spot and the facing its bar began with (cast_hold.ts).
+  holdAreaCast(ctx, mob, DUNGEONS[inst.dungeonId]?.areaCastsPlant === true);
   const engaged =
     mob.inCombat &&
     mob.aggroTargetId !== null &&
@@ -692,8 +698,11 @@ export function tickTrashKits(ctx: SimContext): void {
     for (const id of inst.mobIds.slice()) {
       const mob = ctx.entities.get(id);
       if (!mob || mob.kind !== 'mob') continue;
-      const kit = MOBS[mob.templateId]?.trashKit;
-      if (!kit && mob.perchY === undefined) continue;
+      const template = MOBS[mob.templateId];
+      const kit = template?.trashKit;
+      // (A mob with no kit still plants for its breath cone: cast_hold.ts.)
+      const breath = template?.breathCone && DUNGEONS[inst.dungeonId]?.areaCastsPlant;
+      if (!kit && mob.perchY === undefined && !breath) continue;
       stepMob(ctx, inst, mob, kit, players);
     }
   }

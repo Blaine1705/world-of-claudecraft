@@ -5070,6 +5070,11 @@ export interface DungeonDef {
    * trash from a shortcut into a wipe, which is a per-dungeon design choice.
    */
   bossChainPull?: boolean;
+  /** A telegraphed area never moves with its caster: every mob of this
+   *  dungeon plants its feet, and holds its facing, for the whole bar of its
+   *  breath cone, the way every trash-kit area cast does everywhere
+   *  (mob/trash_kit/cast_hold.ts). The five reworked dungeons set it. */
+  areaCastsPlant?: boolean;
   /** In-dungeon gates and encounter seals (instances/dungeon_gates.ts). */
   gates?: readonly DungeonGateDef[];
   suggestedPlayers: number;
@@ -6820,6 +6825,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  tick (mob/trash_kit): its pull descends from here, since the mob AI of
    *  the pull tick has already stood it on the floor. Sim authority only. */
   airY?: number;
+  /** Where a dungeon mob planted its feet for the area cast in flight, and the
+   *  facing the bar began with (mob/trash_kit/cast_hold.ts): the ring, cone or
+   *  lane stays where it was drawn. Sim authority only; gone with the bar. */
+  castHold?: { castId: string; x: number; y: number; z: number; facing: number };
   /** Per-pull state of a dungeon trash kit (MobTemplate.trashKit, mob/trash_kit).
    *  Sim authority only; cleared whenever the mob leaves combat. */
   trashKit?: TrashKitState;

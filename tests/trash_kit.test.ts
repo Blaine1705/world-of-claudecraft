@@ -29,6 +29,7 @@ import {
   pickLeapTarget,
   tickTrashKits,
 } from '../src/sim/mob/trash_kit';
+import { isPlantedCast } from '../src/sim/mob/trash_kit/cast_hold';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type TrashKitState } from '../src/sim/types';
@@ -618,5 +619,157 @@ describe('trash kit: a flying patrol is out of reach, and always lands', () => {
     for (let i = 0; i < 20 * 30; i++) r.sim.tick();
     expect(drake.inCombat).toBe(false);
     expect(drake.pos.y).toBeCloseTo(drake.dungeonPatrol?.flightY ?? 0, 3);
+  });
+});
+
+// The owner's playtest (2026-10-02): a gargoyle kept chasing while it cast its
+// Stone Shriek, so the drawn ring followed it and the stun could not be
+// dodged. A mob plants its feet for the whole bar of an area cast and the area
+// stays where the bar began (mob/trash_kit/cast_hold.ts).
+describe('trash kit: an area cast plants its caster', () => {
+  const screech = MOBS.crypt_chapel_gargoyle.trashKit?.screech;
+  if (!screech) throw new Error('screech');
+  const stunned = (e: Entity) =>
+    e.auras.some((a) => a.kind === 'stun' && a.id === CRYPT_STONE_SHRIEK);
+
+  /** One full sim tick with the player running east at `speed`. */
+  function fleeTick(r: Room, speed: number): void {
+    r.me.pos = r.sim.ctx.groundPos(r.me.pos.x + speed * DT, r.me.pos.z);
+    r.me.prevPos = { ...r.me.pos };
+    r.sim.rebucket(r.me);
+    r.me.hp = r.me.maxHp;
+    r.sim.tick();
+  }
+
+  it('a gargoyle chasing a player starts Stone Shriek, stops, and the one who leaves the ring is not stunned', () => {
+    const r = room();
+    // The gargoyle is 6 yd behind (west of) the player, who runs east.
+    const garg = engage(r, 'crypt_chapel_gargoyle', -6);
+    garg.aiState = 'chase';
+    // A second player stands still beside where the bar will begin.
+    const bystander = addPlayer(r, 'mage', 0, 4);
+    r.sim.tick();
+    const st = kitOf(garg);
+    if (!st) throw new Error('no kit state');
+    // It chases first: it really runs after the fleeing player.
+    st.timers.screech = 99;
+    const chaseFrom = { ...garg.pos };
+    for (let i = 0; i < 10; i++) fleeTick(r, 7);
+    expect(garg.pos.x - chaseFrom.x).toBeGreaterThan(1.5);
+    expect(garg.castingAbility).toBeNull();
+    // Now the Shriek comes off cooldown mid-chase.
+    st.timers.screech = 0;
+    fleeTick(r, 7);
+    expect(garg.castingAbility).toBe(CRYPT_STONE_SHRIEK);
+    const drawn = { ...garg.pos };
+    expect(Math.hypot(r.me.pos.x - drawn.x, r.me.pos.z - drawn.z)).toBeLessThan(screech.radius);
+    expect(Math.hypot(bystander.pos.x - drawn.x, bystander.pos.z - drawn.z)).toBeLessThan(
+      screech.radius,
+    );
+    let ticks = 0;
+    while (garg.castingAbility === CRYPT_STONE_SHRIEK && ticks < 80) {
+      fleeTick(r, 7);
+      ticks++;
+      // Planted: it never leaves the spot the bar began on.
+      expect(Math.hypot(garg.pos.x - drawn.x, garg.pos.z - drawn.z)).toBeLessThan(0.01);
+    }
+    // The whole 2 s bar ran (not a broken cast).
+    expect(ticks * DT).toBeGreaterThan(screech.castTime - 0.2);
+    expect(ticks * DT).toBeLessThan(screech.castTime + 0.2);
+    // The runner left the drawn ring before the bar ended: no stun. The one
+    // who stayed inside it is stunned.
+    expect(Math.hypot(r.me.pos.x - drawn.x, r.me.pos.z - drawn.z)).toBeGreaterThan(screech.radius);
+    expect(stunned(r.me)).toBe(false);
+    expect(stunned(bystander)).toBe(true);
+    // The bar over, it runs again.
+    const after = { ...garg.pos };
+    for (let i = 0; i < 10; i++) fleeTick(r, 7);
+    expect(Math.hypot(garg.pos.x - after.x, garg.pos.z - after.z)).toBeGreaterThan(1.5);
+  });
+
+  it('a breath cone stays where it was drawn: the one who steps out of it is not burned', () => {
+    const r = room();
+    const breath = MOBS.crypt_ossuary_drake.breathCone;
+    if (!breath) throw new Error('breath');
+    // The drake stands 4 yd west of the player, fighting them, facing east.
+    const drake = engage(r, 'crypt_ossuary_drake', -4);
+    r.sim.tick();
+    const st = kitOf(drake);
+    if (st) for (const key of Object.keys(st.timers)) st.timers[key] = 99;
+    drake.breathTimer = 0;
+    for (let i = 0; i < 10 && drake.castingAbility === null; i++) {
+      r.me.hp = r.me.maxHp;
+      r.sim.tick();
+    }
+    expect(drake.castingAbility).toBe(CRYPT_BARROWFLAME_BREATH);
+    const drawn = { x: drake.pos.x, z: drake.pos.z, facing: drake.facing };
+    let ticks = 0;
+    let hpBefore = r.me.hp;
+    while (drake.castingAbility === CRYPT_BARROWFLAME_BREATH && ticks < 80) {
+      // Strafe north, across the cone's mouth and out of its arc.
+      r.me.pos = r.sim.ctx.groundPos(r.me.pos.x, r.me.pos.z + 7 * DT);
+      r.me.prevPos = { ...r.me.pos };
+      r.sim.rebucket(r.me);
+      r.me.hp = r.me.maxHp;
+      hpBefore = r.me.hp;
+      r.sim.tick();
+      ticks++;
+      if (drake.castingAbility === CRYPT_BARROWFLAME_BREATH) {
+        expect(Math.hypot(drake.pos.x - drawn.x, drake.pos.z - drawn.z)).toBeLessThan(0.01);
+        expect(drake.facing).toBeCloseTo(drawn.facing, 6);
+      }
+    }
+    expect(ticks * DT).toBeGreaterThan(breath.castTime - 0.2);
+    const bearing = Math.atan2(r.me.pos.x - drawn.x, r.me.pos.z - drawn.z);
+    let off = Math.abs(bearing - drawn.facing) % (Math.PI * 2);
+    if (off > Math.PI) off = Math.PI * 2 - off;
+    expect(off).toBeGreaterThan(((breath.arcDeg / 2) * Math.PI) / 180);
+    // Out of the drawn cone when the bar ended: not burned.
+    expect(r.me.hp).toBe(hpBefore);
+  });
+
+  it('every area cast of the five dungeons is a planted cast', () => {
+    const DUNGEON_IDS = [
+      'hollow_crypt',
+      'sunken_bastion',
+      'drowned_temple',
+      'stormbrass_foundry',
+      'wildheart_basin',
+    ];
+    const seen = new Set<string>();
+    for (const id of DUNGEON_IDS) {
+      const dungeon = DUNGEONS[id];
+      expect(dungeon, id).toBeDefined();
+      expect(dungeon.areaCastsPlant, id).toBe(true);
+      for (const spawn of dungeon.spawns) {
+        const template = MOBS[spawn.mobId];
+        const kit = template.trashKit;
+        const area = [
+          kit?.screech?.castId,
+          kit?.wingGust?.castId,
+          kit?.tailLash?.castId,
+          kit?.line?.castId,
+          template.breathCone?.castId,
+        ].filter((c): c is string => c !== undefined);
+        for (const castId of area) {
+          seen.add(castId);
+          expect(isPlantedCast(template, castId), `${template.id}: ${castId}`).toBe(true);
+        }
+        // A bolt, a raise or a mend tracks its target: never planted.
+        for (const castId of [kit?.bolt?.castId, kit?.raise?.castId, kit?.mend?.castId])
+          if (castId) expect(isPlantedCast(template, castId), castId).toBe(false);
+      }
+    }
+    expect(seen.size).toBeGreaterThan(8);
+    expect(seen.has(CRYPT_STONE_SHRIEK)).toBe(true);
+    expect(seen.has(CRYPT_WING_GUST)).toBe(true);
+    // Outside those dungeons a breath cone is left as it was (the open
+    // world's dragonkin, the raids): only the kit's area casts plant.
+    const drake = MOBS.crypt_ossuary_drake;
+    expect(isPlantedCast(drake, CRYPT_BARROWFLAME_BREATH, false)).toBe(false);
+    expect(isPlantedCast(drake, CRYPT_WING_GUST, false)).toBe(true);
+    const others = Object.values(DUNGEONS).filter((d) => !DUNGEON_IDS.includes(d.id));
+    expect(others.length).toBeGreaterThan(0);
+    for (const d of others) expect(d.areaCastsPlant, d.id).toBeUndefined();
   });
 });

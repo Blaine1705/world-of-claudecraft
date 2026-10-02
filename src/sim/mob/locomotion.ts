@@ -135,6 +135,7 @@ import {
 } from './rift_escape_window';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
+import { restoreCastHold } from './trash_kit/cast_hold';
 import { emitMobYell } from './yells';
 
 // This module ENFORCES the aggro ceiling and the wander ring; the numbers themselves live
@@ -1421,6 +1422,9 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   const breath = MOBS[mob.templateId]?.breathCone;
   if (breath && !riftMechanicSuppressed(mob, 'breathCone')) {
     if (mob.castingAbility === breath.castId) {
+      // A dungeon mob holds the spot and the facing its bar began with
+      // (mob/trash_kit/cast_hold.ts): the cone lands where it was drawn.
+      restoreCastHold(mob);
       mob.castRemaining = Math.max(0, mob.castRemaining - DT);
       if (mob.castRemaining <= 0) {
         mob.castingAbility = null;

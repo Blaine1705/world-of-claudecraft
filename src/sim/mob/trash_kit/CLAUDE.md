@@ -12,12 +12,16 @@ Hollow Crypt trash (`src/sim/content/hollow_crypt_trash.ts`).
 | `cast_ids.ts` | Leaf: the cast ids and the interruptible ones' schools (`TRASH_KIT_CAST_SCHOOLS`, spread into `mob/healer_channel.ts` `SCRIPTED_INTERRUPTIBLE_CHANNELS`). |
 | `targets.ts` | Pure: the hashed "random" victim, the leap's farthest-caster pick, the cone test. |
 | `spawn.ts` | The zero-rng kit add spawner (raise, call, growth), with the claim's difficulty transform. |
+| `cast_hold.ts` | A telegraphed area never moves with its caster: `holdAreaCast` plants the mob on the spot and the facing its area bar began with (screech, wing gust, tail lash, lane; and the template's breath cone where `DungeonDef.areaCastsPlant`), undoing the mob AI's step every tick until the bar lands or breaks. |
 | `flier_call.ts` | `callDownLastFlier`: an idle flying patrol lands on the nearest player once every OTHER pack of a gate that waits on its pack is dead, so a gate can never stay shut behind a flier nobody pulled. |
 | `driver.ts` | `tickTrashKits`: one pass per tick over every claim's roster, after the mob AI (called from `instances/dungeons.ts` `updateInstances`). |
 
 Rules:
 - Every cast is a real cast bar on the mob; an interrupt, a stun or a silence
   cancels it, and the effect lands only when the bar runs out.
+- An AREA cast (a ring, a cone, a lane) plants its caster for the whole bar
+  (`cast_hold.ts`): the area lands where it was drawn, so stepping out of it is
+  the counterplay. A targeted cast (bolt, mend, ward, lullaby) still tracks.
 - Zero rng for targets and cadence; the only draws are a landing cast's damage
   rolls, in roster order.
 - A pack's same-type casts alternate: each mob's first cast of an ability is

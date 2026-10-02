@@ -1158,6 +1158,7 @@ export const WILDHEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     // No skipping: every pack is gated, and pulling Zulgar with any of the
     // basin alive still brings the cult down on you (instances/boss_chain_pull.ts).
     bossChainPull: true,
+    areaCastsPlant: true,
     suggestedPlayers: 5,
     enterText:
       'You step through the idol maw onto a ledge high above the basin. Waterfalls thunder from the rim, and far below, something enormous wades the ford.',
