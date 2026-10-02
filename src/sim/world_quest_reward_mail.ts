@@ -1,12 +1,13 @@
 // World quest reward items that meet full bags: the one grant rule every
 // world quest item payout shares (the quest's fixed extra and the day's item
-// slot piece in world_quests.ts awardWorldQuest, and the slate's treasure map
-// in clue_scrolls.ts maybeAwardClueScroll). Each item that fits lands in the
+// slot piece in world_quests.ts awardWorldQuest, the slate's treasure map and
+// the treasure hunt's casket in clue_scrolls.ts, and the weekly charge's cache
+// in weekly_quests.ts creditWeeklyQuest). Each item that fits lands in the
 // bags through the inventory hub as before; each one that does not is booked
 // onto a Ravenpost letter (WORLD_QUEST_REWARD_LETTER) instead of being lost,
 // and the player is told with a worldQuestRewardMailed event the HUD shows as
-// a banner. These rewards pay once per cycle, so there is no second turn-in
-// to defer to: the mailbox is the only place a full-bag payout can wait.
+// a banner. These rewards pay once (per cycle, week, or hunt), so there is no
+// second turn-in to defer to: the mailbox is the only place one can wait.
 //
 // Unlike the awarded-loot hold (loot/awarded_loot_hold.ts), which keeps an
 // overflow on the corpse precisely so the mailbox never becomes an unlimited

@@ -202,7 +202,9 @@ export function advanceClueHunt(ctx: SimContext, meta: PlayerMeta): void {
   ctx.emit({ type: 'clueHuntStep', huntId: active.def.id, step: active.index, total, pid });
   if (hunt.step >= total) {
     meta.clueHunt = null;
-    ctx.addItem(TREASURE_CASKET_ITEM_ID, 1, pid);
+    // The hunt is spent the moment it ends, so a casket the full bags cannot
+    // hold is posted to the Ravenpost rather than forced past the capacity.
+    grantWorldQuestRewardItems(ctx, meta, [{ itemId: TREASURE_CASKET_ITEM_ID, count: 1 }]);
     ctx.emit({ type: 'clueHuntDone', huntId: active.def.id, pid });
     awardClueHuntStanding(ctx, meta, active.def);
   }

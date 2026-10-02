@@ -187,8 +187,9 @@ export const HOARD_REWARD_LETTER: LetterDef = {
 };
 
 // World quest reward letter: a world quest reward item (the quest's fixed
-// extra, the day's item slot piece, or the slate's treasure map) that did
-// not fit in the bags when it was earned. The item rides as the attachment;
+// extra, the day's item slot piece, the slate's treasure map, a treasure
+// hunt's casket, or the weekly charge's cache) that did not fit in the bags
+// when it was earned. The item rides as the attachment;
 // world_quest_reward_mail.ts fills `items` per grant, so this base carries
 // none. Body stays count-free so the letterId localizes cleanly.
 export const WORLD_QUEST_REWARD_LETTER: LetterDef = {

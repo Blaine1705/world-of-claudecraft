@@ -125,6 +125,27 @@ describe('grantWorldQuestRewardItems', () => {
   });
 });
 
+describe('collecting a mailed reward', () => {
+  it('survives a save/load of the mail book and is taken at a raven pillar once there is room', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const meta = metaOf(sim);
+    fillBags(meta, STACKABLE);
+    grantWorldQuestRewardItems(sim.ctx, meta, [{ itemId: STACKABLE, count: 2 }]);
+    sim.postOffice.loadMail(JSON.parse(JSON.stringify(sim.postOffice.serializeMail())));
+    const [letter] = rewardLetters(sim);
+    expect(letter.items.map((s) => [s.itemId, s.count])).toEqual([[STACKABLE, 2]]);
+    const box = sim.entities.get(sim.postOffice.mailboxIds[0]);
+    if (!box) throw new Error('Missing mailbox');
+    sim.player.pos = { ...box.pos };
+    sim.player.prevPos = { ...box.pos };
+    sim.rebucket(sim.player);
+    meta.inventory.pop(); // make room
+    sim.mailTake(letter.id, sim.playerId);
+    expect(sim.countItem(STACKABLE)).toBe(2);
+    expect(rewardLetters(sim)[0]?.items ?? []).toEqual([]);
+  });
+});
+
 describe('awardWorldQuest with full bags', () => {
   it("mails the quest's fixed extra instead of forcing it past the bag capacity", () => {
     const quest = WORLD_QUESTS_BY_ID.wq_drakelands_brood;

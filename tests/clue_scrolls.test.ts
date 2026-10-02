@@ -21,6 +21,7 @@ import {
   treasureCasketCopper,
 } from '../src/sim/clue_casket';
 import {
+  advanceClueHunt,
   CLUE_HUNT_STANDING,
   CLUE_HUNT_TEST_POOL,
   clueHuntFaction,
@@ -671,6 +672,30 @@ describe('the deliver step (Sim.talkToNpc)', () => {
 });
 
 describe('the dig step (using the scroll on the spot)', () => {
+  it('posts the casket to the Ravenpost when the last step lands on full bags', () => {
+    const sim = huntSim();
+    const meta = metaOf(sim);
+    startHunt(sim);
+    advanceTo(sim, 4);
+    fillBags(sim);
+    const inventoryBefore = meta.inventory.length;
+    sim.drainEvents();
+    advanceClueHunt(sim.ctx, meta);
+    const evs = sim.drainEvents();
+    expect(meta.clueHunt).toBeNull();
+    expect(sim.countItem(TREASURE_CASKET_ITEM_ID)).toBe(0);
+    expect(meta.inventory.length).toBe(inventoryBefore);
+    expect(ofType(evs, 'worldQuestRewardMailed')).toEqual([
+      { type: 'worldQuestRewardMailed', itemIds: [TREASURE_CASKET_ITEM_ID], pid: sim.playerId },
+    ]);
+    expect(
+      sim.postOffice.mail
+        .filter((m) => m.letterId === WORLD_QUEST_REWARD_LETTER.letterId)
+        .map((m) => m.items.map((slot) => [slot.itemId, slot.count])),
+    ).toEqual([[[TREASURE_CASKET_ITEM_ID, 1]]]);
+    expect(ofType(evs, 'clueHuntDone')).toHaveLength(1);
+  });
+
   it('refuses off the spot, keeps the scroll on a dig, and the last step hands the casket', () => {
     const sim = huntSim();
     const meta = metaOf(sim);
