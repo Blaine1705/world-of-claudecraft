@@ -153,18 +153,14 @@ export function tankOf(ctx: SimContext, boss: Entity): Entity | null {
 }
 
 /** A Basin hunt's mark (the jaguar's Stalk, Zulgar's Prey): the hashed pick
- *  among `players` outside `busy`, NEVER the tank while the run holds anyone
- *  else (`alone` false); alone, that one player is all there is. Null when
- *  nobody can be had. */
+ *  among `players` (already cleared of the tank by the caller) outside
+ *  `busy`. Null when nobody can be had. */
 export function pickHuntMark(
   hasher: Entity,
   players: readonly Entity[],
-  tank: Entity | null,
-  alone: boolean,
   salt: number,
   busy: ReadonlySet<number> = new Set(),
 ): Entity | null {
-  const pool = alone || tank === null ? players : players.filter((p) => p.id !== tank.id);
-  const [mark] = pickMarkTargets(hasher, pool, 1, salt, busy);
+  const [mark] = pickMarkTargets(hasher, players, 1, salt, busy);
   return mark ?? null;
 }

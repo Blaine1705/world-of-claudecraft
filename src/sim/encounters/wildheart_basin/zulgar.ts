@@ -49,7 +49,6 @@ import {
   mechanicDamage,
   pickHuntMark,
   placeAt,
-  runAlone,
   spawnBasinObject,
   startBar,
   tankOf,
@@ -221,9 +220,11 @@ function markPrey(ctx: SimContext, z: Entity, p: Entity, chased: boolean, left: 
 }
 
 /** Whom he may mark in slot `slot`: the terrace's players, never one marked
- *  in another slot, never one in a Mauled respite, never the tank while
- *  anyone else is in the run, and (`avoid`) never the last Prey while another
- *  can be had. */
+ *  in another slot, never one in a Mauled respite, and (`avoid`) never the
+ *  last Prey while another can be had. Never the tank while anyone else on
+ *  the terrace can be had or is getting up from a maul; with nobody else on
+ *  the terrace at all, the tank is the Prey (the hunt is never skipped by
+ *  standing off the terrace). */
 function preyPool(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -231,13 +232,19 @@ function preyPool(
   slot: number,
   avoid: number | null,
 ): { players: Entity[]; busy: Set<number> } {
-  const alone = runAlone(ctx, inst);
-  const tankId = alone ? null : st.tankId;
-  const players = shrinePlayers(ctx, inst).filter((p) => p.id !== tankId);
+  const terrace = shrinePlayers(ctx, inst);
+  const others = terrace.filter((p) => p.id !== st.tankId);
+  const players = others.length > 0 || st.respite.length > 0 ? others : terrace;
   const busy = new Set(st.preyIds.filter((_, i) => i !== slot));
   for (const r of st.respite) busy.add(r.id);
   if (avoid !== null && players.filter((p) => !busy.has(p.id)).length > 1) busy.add(avoid);
   return { players, busy };
+}
+
+/** Someone can be marked in slot `slot` right now. */
+function canMark(ctx: SimContext, inst: InstanceSlot, st: ZulgarFightState, slot: number): boolean {
+  const { players, busy } = preyPool(ctx, inst, st, slot, null);
+  return players.some((p) => !busy.has(p.id));
 }
 
 /** Mark a fresh Prey in slot `slot` (see preyPool). Returns it, or null (the
@@ -252,7 +259,7 @@ function pickPrey(
 ): Entity | null {
   st.casts++;
   const { players, busy } = preyPool(ctx, inst, st, slot, avoid);
-  const prey = pickHuntMark(z, players, null, true, st.casts, busy);
+  const prey = pickHuntMark(z, players, st.casts, busy);
   if (!prey) {
     st.preyIds.splice(slot, 1);
     return null;
@@ -439,9 +446,10 @@ function stepRespite(st: ZulgarFightState): void {
  *  when the hunt has nobody left at all. */
 function waitOutRespite(ctx: SimContext, z: Entity, st: ZulgarFightState): boolean {
   if (st.respite.length === 0) return false;
+  // Planted and his swings held (stepHunt): his aggro target stays as the AI
+  // keeps it, so a stun while he waits never parks the encounter.
   z.forcedTargetId = null;
   z.forcedTargetTimer = 0;
-  z.aggroTargetId = null;
   if (!st.plantedAt) st.plantedAt = { ...z.pos };
   holdPlanted(ctx, z, st.plantedAt);
   if (!st.waiting) {
@@ -480,22 +488,26 @@ function stepHunt(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFigh
     if (st.plantedAt) holdPlanted(ctx, z, st.plantedAt);
     st.feedTimer -= DT;
     if (st.feedTimer > 0) return;
-    // The fed-on Prey's slot takes a fresh one (never the one just Mauled).
-    const slot = Math.min(st.chase, st.preyIds.length);
-    pickPrey(ctx, inst, z, st, slot, st.preyIds[slot] ?? null);
+    // The fed-on Prey's slot takes a fresh one (never the one just Mauled):
+    // found by id, since a slot may have shifted while he fed.
+    const fed = st.respite[st.respite.length - 1]?.id ?? null;
+    const slot = fed !== null ? st.preyIds.indexOf(fed) : -1;
+    if (slot >= 0) pickPrey(ctx, inst, z, st, slot, fed);
+    repaintChase(ctx, st);
+  }
+  // A slot freed while nobody could be had (heroic Twin Prey keeps two)
+  // fills again as soon as someone can.
+  const want = inst.difficulty === 'heroic' ? 2 : 1;
+  while (st.preyIds.length < want && canMark(ctx, inst, st, st.preyIds.length)) {
+    if (!pickPrey(ctx, inst, z, st, st.preyIds.length, null)) break;
     repaintChase(ctx, st);
   }
   if (st.preyIds.length === 0) {
-    // Nobody marked: a fresh Prey once one can be had, else he waits out the
-    // respite (or, with nobody left at all, the hunt ends).
-    pickPrey(ctx, inst, z, st, 0, null);
-    if (st.preyIds.length === 0) {
-      if (waitOutRespite(ctx, z, st)) return;
-      endHunt(ctx, inst, z, st);
-      return;
-    }
-    st.chase = 0;
-    repaintChase(ctx, st);
+    // Nobody marked and nobody to mark: he waits out a respite (or, with
+    // nobody left at all, the hunt ends).
+    if (waitOutRespite(ctx, z, st)) return;
+    endHunt(ctx, inst, z, st);
+    return;
   }
   st.waiting = false;
   st.plantedAt = null;

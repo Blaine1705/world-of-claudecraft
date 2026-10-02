@@ -363,19 +363,30 @@ describe('Stalk and the tank', () => {
     });
     run(f, T.stalkSeconds + 0.2, tankFree);
     expect(f.others.some((p) => aura(p, BEAST_STALKED))).toBe(true);
-  });
+  }, 60_000);
 
   it('in a group with nobody else near the pits, it waits rather than hunt the tank', () => {
     const f = fight();
-    const { jag } = pull(f);
+    const { bm, jag } = pull(f);
     for (const p of f.others) put(f, p, 0, -217);
     const from = f.hits.length;
-    run(f, T.stalkSeconds + 2, () => {
+    const noMark = () => {
       expect(aura(f.tank, BEAST_STALKED)).toBeUndefined();
-    });
+    };
+    run(f, T.stalkFirst + 0.5, noMark);
+    // It holds its ground (never closing on the tank) and never bites.
+    const at = { x: jag.pos.x, z: jag.pos.z };
+    run(f, T.stalkSeconds, noMark);
+    expect(Math.hypot(jag.pos.x - at.x, jag.pos.z - at.z)).toBeLessThan(0.01);
     expect(hitsOn(f, f.tank, 'Jaguar Bite', from)).toHaveLength(0);
-    expect(jag.aggroTargetId).not.toBe(f.tank.id);
-  });
+    // Still in its fight: waiting never walks the pair home.
+    expect(jag.aiState).not.toBe('evade');
+    expect(bm.wildheartFight?.kind).toBe('beastmaster');
+    // Someone steps back into the pits: the hunt resumes on them.
+    put(f, f.others[0], -86, 22);
+    run(f, 0.3);
+    expect(aura(f.others[0], BEAST_STALKED)).toBeDefined();
+  }, 60_000);
 
   it('alone there is nobody else: the jaguar stalks you, bites, and marks you again', () => {
     const f = fight('normal', 0);

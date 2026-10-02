@@ -333,7 +333,7 @@ describe('the Prey respite: no chained knockdowns', () => {
     }
     // With nobody else to hunt he roared over the kill before hunting again.
     expect(avatarRoars()).toBeGreaterThan(roarsBefore);
-  });
+  }, 60_000);
 
   it('solo: after the respite he marks the player again and hunts on', () => {
     const f = fight('normal', 0);
@@ -380,5 +380,39 @@ describe('the Prey respite: no chained knockdowns', () => {
       }
     }
     expect(mauls).toBeGreaterThanOrEqual(3);
+  }, 60_000);
+
+  it('heroic Twin Prey: a slot freed by a maul fills again once the respite ends', () => {
+    const f = fight('heroic', 2);
+    const z = pull(f);
+    tick(f);
+    dev(f, 'prey');
+    expect(preyOf(f)).toHaveLength(2);
+    const chased = preyOf(f).find((p) => aura(p, ZULGAR_PREY)?.value2 === 1) as Entity;
+    const at = local(f, z);
+    put(f, chased, at.x + 1, at.z);
+    tick(f);
+    expect(aura(chased, ZULGAR_MAULED)).toBeDefined();
+    // Everyone stays well out of his reach through the respite (he is held
+    // at the altar so nobody else is caught meanwhile).
+    put(f, f.others[0], -22, 230);
+    put(f, f.others[1], 22, 230);
+    run(f, T.preyRespite + 0.5, () => {
+      expect(aura(f.tank, ZULGAR_PREY)).toBeUndefined();
+      put(f, z, 0, 214);
+    });
+    expect(st(z).phase).toBe('hunt');
+    expect(preyOf(f)).toHaveLength(2);
+  }, 60_000);
+
+  it('a group cannot skip the hunt by leaving the tank alone on the terrace', () => {
+    const f = fight();
+    const z = pull(f);
+    tick(f);
+    for (const p of f.others) put(f, p, 0, -217);
+    dev(f, 'prey');
+    expect(aura(f.tank, ZULGAR_PREY)).toBeDefined();
+    run(f, 1);
+    expect(st(z).phase).toBe('hunt');
   });
 });

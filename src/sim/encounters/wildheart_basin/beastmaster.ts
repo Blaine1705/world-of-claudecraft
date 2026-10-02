@@ -265,7 +265,7 @@ export function startStalk(
   if (old) dropAuraById(old, BEAST_STALKED);
   const players = stalkCandidates(ctx, inst, bm);
   const busy = new Set<number>(st.preyId !== null && players.length > 1 ? [st.preyId] : []);
-  const prey = pickHuntMark(bm, players, null, true, st.casts, busy);
+  const prey = pickHuntMark(bm, players, st.casts, busy);
   st.preyId = prey?.id ?? null;
   st.stalkTimer = T.stalkSeconds;
   if (!prey) {
@@ -274,7 +274,6 @@ export function startStalk(
       jaguar.forcedTargetId = null;
       jaguar.forcedTargetTimer = 0;
     }
-    if (st.waitAt === null) st.waitAt = { ...jaguar.pos };
     return null;
   }
   st.waitAt = null;
@@ -357,15 +356,22 @@ function stepStalk(
   const prey = st.preyId !== null ? ctx.entities.get(st.preyId) : undefined;
   const present = prey && !prey.dead && stalkCandidates(ctx, inst, bm).includes(prey);
   if (!present || st.stalkTimer <= 0) {
-    if (startStalk(ctx, inst, bm, jaguar, st)) return;
+    // Waiting with nobody to stalk: only mark again once someone can be had
+    // (the hash salt stays put while it waits).
+    const idle = st.preyId === null && st.waitAt !== null;
+    if (
+      (!idle || stalkCandidates(ctx, inst, bm).length > 0) &&
+      startStalk(ctx, inst, bm, jaguar, st)
+    )
+      return;
     // Nobody it may hunt but the tank near the pits (a group): it holds its
-    // ground, never turning on the tank, and looks again next tick (its own
-    // swings are held above). With nobody near the pits at all (a chain pull
+    // ground, never closing on the tank (its swings are held above), and
+    // looks again next tick. With nobody near the pits at all (a chain pull
     // from afar) its own pursuit stands.
     if (tankNearPits(ctx, inst, bm)) {
-      if (st.waitAt) holdPlanted(ctx, jaguar, st.waitAt);
-      jaguar.aggroTargetId = null;
-    }
+      if (st.waitAt === null) st.waitAt = { ...jaguar.pos };
+      holdPlanted(ctx, jaguar, st.waitAt);
+    } else st.waitAt = null;
     return;
   }
   if (!prey) return;
