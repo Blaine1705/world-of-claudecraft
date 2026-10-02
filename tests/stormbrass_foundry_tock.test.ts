@@ -558,6 +558,23 @@ describe('Line-Master Tock: reset and the deed', () => {
     expect(aura(b, TOCK_PRESSURE)).toBeUndefined();
   });
 
+  it('a player who died on a walkway does not keep the walkway mark after the wipe', () => {
+    const { f, b } = tockFight();
+    const walker = f.others[0];
+    run(f, T.ventFirst + T.ventWarning + 0.3, () => put(f, walker, -10, -30));
+    expect(aura(walker, TOCK_SCALDING_VENTS)).toBeDefined();
+    // Dead where they stood: the living fall back and the boss walks home.
+    walker.dead = true;
+    walker.hp = 0;
+    for (const p of [f.tank, ...f.others]) if (p !== walker) put(f, p, 0, -226);
+    b.inCombat = false;
+    b.aggroTargetId = null;
+    b.aiState = 'evade';
+    run(f, 0.2);
+    expect(b.foundryFight).toBeUndefined();
+    expect(aura(walker, TOCK_SCALDING_VENTS)).toBeUndefined();
+  });
+
   it('Quality Control: a kill with nobody pressed earns the deed; a pressed one does not', () => {
     const clean = tockFight();
     run(clean.f, 1);

@@ -23,6 +23,7 @@ import {
   PRIME_DRAFT_ID,
   RANGEWARDEN_ID,
   TOCK_ID,
+  TOCK_TUNING,
   VOLTAIC_WARDEN_ID,
 } from './ids';
 import { dropParts, startLever, startPress, tickTock, tockState } from './line_master';
@@ -162,7 +163,7 @@ function tockTrigger(ctx: SimContext, inst: InstanceSlot, what: string): string 
   }
   if (what === 'vents') {
     startVents(ctx, inst, boss, st);
-    return 'The walkway vents hiss: steam in 1.5 s.';
+    return `The walkway vents hiss: steam in ${TOCK_TUNING.ventWarning} s.`;
   }
   if (what === 'parts')
     return `The chute drops ${dropParts(ctx, inst, boss, st)} Half-Built Frames.`;

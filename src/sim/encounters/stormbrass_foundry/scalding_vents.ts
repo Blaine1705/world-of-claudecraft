@@ -209,5 +209,12 @@ export function endVents(ctx: SimContext, inst: InstanceSlot, st: TockFightState
     dropStrips(ctx, inst, st);
     st.vent.phase = 'off';
   }
-  for (const p of claimPlayers(ctx, inst)) dropAuraById(p, TOCK_SCALDING_VENTS);
+  // Every player's body, the dead and the ghosts too (claimPlayers keeps only
+  // the living): someone who fell on a walkway must not keep the mark.
+  const o = ctx.instanceOriginOf(inst);
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
+    if (!p || Math.abs(p.pos.x - o.x) >= 120 || Math.abs(p.pos.z - o.z) >= 250) continue;
+    dropAuraById(p, TOCK_SCALDING_VENTS);
+  }
 }
