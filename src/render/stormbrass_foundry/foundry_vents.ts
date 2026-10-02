@@ -367,11 +367,19 @@ export class FoundryVentFx {
         const spec = VENT_LANES[i];
         const x = this.originX + spec.x;
         const z = this.originZ + spec.z0;
+        // A lane that runs to the Main Line's very rim (the apron and the lip
+        // span the whole line) samples the drop under its edge stations: hold
+        // those on the lane's own floor, or the sheet dives into the gulf.
+        const floor = this.groundY(x, z + spec.length / 2);
+        const onFloor = (gx: number, gz: number): number => {
+          const g = this.groundY(gx, gz);
+          return g < floor - 1 ? floor : g;
+        };
         this.kit.drapeLane(
           lane,
-          this.groundY,
+          onFloor,
           x,
-          this.groundY(x, z),
+          floor,
           z,
           0,
           spec.length,

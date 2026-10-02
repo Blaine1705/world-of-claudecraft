@@ -824,7 +824,6 @@ export const FOUNDRY_LITTER: readonly [string, number, number, number][] = [
   ['Kit_DrumCluster', 10, 8.6, 0],
   // The Range Lanes and the Proving Range.
   ['Kit_Sandbags', -92, -71.6, 0],
-  ['Kit_Sandbags', -86, -71.6, 0],
   ['Kit_Sandbags', -64, -71.6, 0],
   ['Kit_Workbench', -99.5, -61, -Math.PI / 2],
   ['Kit_Sandbags', -111, -9, Math.PI / 2],

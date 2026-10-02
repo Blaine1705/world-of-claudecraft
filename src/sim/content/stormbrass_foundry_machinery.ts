@@ -115,7 +115,6 @@ export const FOUNDRY_MACHINERY_PROPS: readonly FieldProp[] = [
   // ---- The Range Lanes: target frames down the lanes (west of the workers'
   // camp B at -76, -70) and a crate stack.
   target(-92, -73.5, 0),
-  target(-86, -73.5, 0),
   target(-64, -73.5, 0),
   crates(-101.5, -50, EAST),
   // ---- The Proving Range: the range officer's observation post in the
