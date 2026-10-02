@@ -116,8 +116,9 @@ describe('mob portrait source manifest', () => {
     // Half-Built Frame and the eight trash bodies). 347: the Wildheart Basin
     // rework's ten (the Great Saurian and its Howdah Hexcaller, the Fanglord's
     // Great Jaguar, the Gorgebloom and its Thorn Sprout, and five trash bodies:
-    // raptor, toad, Snarlvine Lasher, Totem-Binder and its totem).
-    expect(liveIds).toHaveLength(347);
+    // raptor, toad, Snarlvine Lasher, Totem-Binder and its totem). 350: the
+    // Foundry's chained workers (the miner, the hauler and the freed laborer).
+    expect(liveIds).toHaveLength(350);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

@@ -19,10 +19,10 @@ import {
   hatchRingCentre,
   PRIME_DRAFT_ID,
   RANGE_TARGET_LOCK,
+  RANGEWARDEN_ID,
   TOCK_ID,
   TOCK_SCALDING_VENTS,
   TOCK_TUNING,
-  RANGEWARDEN_ID,
   VOLTAIC_CHARGED,
   VOLTAIC_FLIP,
   VOLTAIC_GROUNDED,
@@ -31,10 +31,10 @@ import {
   VOLTAIC_WARDEN_ID,
 } from '../src/sim/encounters/stormbrass_foundry';
 import { chargeCycle } from '../src/sim/encounters/stormbrass_foundry/prime_draft';
+import { launchPlatedDrones } from '../src/sim/encounters/stormbrass_foundry/voltaic_warden';
 import type { Entity } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { spellFxCue } from '../src/ui/combat_sfx';
-import { launchPlatedDrones } from '../src/sim/encounters/stormbrass_foundry/voltaic_warden';
 import { foundryObjectLabel } from '../src/ui/entity_display_core';
 import {
   FoundryAlertSceneScan,
