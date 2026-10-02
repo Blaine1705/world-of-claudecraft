@@ -86,15 +86,16 @@ void main() {
   vec3 r = reflect(-view, n);
   // The sky it mirrors: the gold haze at the horizon, the turquoise above.
   vec3 sky = mix(uHorizon * 0.7, vec3(0.26, 0.45, 0.52), smoothstep(0.0, 0.5, r.y));
-  sky += vec3(1.0, 0.8, 0.45) * pow(max(0.0, dot(normalize(r), uSunDir)), 24.0) * 0.6;
+  sky += vec3(1.0, 0.8, 0.45) * pow(max(0.0, dot(normalize(r), uSunDir)), 48.0) * 0.28;
   // Body: clear jade-green shallows over the bed, deep emerald in the gorge.
   vec3 shallow = vec3(0.12, 0.27, 0.2);
   vec3 deep = vec3(0.03, 0.15, 0.13);
   vec3 body = mix(shallow, deep, vWater.y);
   // Sun glitter dancing on the riffles.
   vec3 halfV = normalize(uSunDir + view);
-  float glint = pow(max(0.0, dot(n, halfV)), 300.0) * 2.4 + pow(max(0.0, dot(n, halfV)), 40.0) * 0.1;
-  vec3 col = mix(body, sky, clamp(fres, 0.0, 0.42)) + vec3(1.0, 0.88, 0.62) * glint;
+  float glint = pow(max(0.0, dot(n, halfV)), 300.0) * 1.6 + pow(max(0.0, dot(n, halfV)), 40.0) * 0.06;
+  // Low gold-hour sun down the ford: cap the mirror so it never washes out.
+  vec3 col = mix(body, sky, clamp(fres, 0.0, 0.3)) + vec3(1.0, 0.88, 0.62) * glint;
   // Streaks of current: long bright threads racing downstream.
   float thread = smoothstep(0.72, 0.95, bnoise(adv * vec2(0.08, 1.8) + 31.0));
   col += vec3(0.5, 0.62, 0.55) * thread * 0.12 * smoothstep(0.8, 2.6, speed);
