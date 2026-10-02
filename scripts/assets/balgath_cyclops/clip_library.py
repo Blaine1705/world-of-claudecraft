@@ -15,7 +15,7 @@ import math
 import numpy as np
 
 import anatomy as A
-from clips import Body, blend, keys_of, stance
+from clips import Body, blend, hang, keys_of, stance
 
 TAU = math.tau
 
@@ -195,16 +195,19 @@ def swipe(rig):
     shoulder line turns about 70 degrees between coil and follow-through."""
     st = stance(rig)
     coil = st.but(twist=30, lean=12, hip_twist=12, side=-3, look=(18, 8), pelvis=(0.3, 0.1, -0.45),
-                  hand_r=(0.1, -6.6, 10.6), pole_r=(0.1, -0.35, 1.0), fist_r=1.0, clav_r=8, hand_roll_r=0,
-                  hand_l=(5.0, -1.2, 5.8), brow=12, jaw=6, foot_r=(-1.75, 0.0, 0.98))
+                  hand_r=(0.1, -6.6, 10.6), pole_r=(0.1, -0.35, 1.0), fist_r=1.0, clav_r=8, hand_roll_r=10,
+                  brow=12, jaw=6, foot_r=(-1.75, 0.0, 0.98))
+    coil = hang(coil, 'l', (-0.2, -0.3, 0.3))            # the off arm: a relaxed hang, counter-swinging
     sweep = st.but(twist=2, lean=18, hip_twist=-6, look=(0, 4), pelvis=(0.0, -0.1, -0.55),
-                   hand_r=(-2.6, -7.0, 11.8), pole_r=(-0.3, 0.3, 1.0), fist_r=1.0, hand_roll_r=22,
-                   hand_l=(5.2, -0.6, 5.8), brow=16, jaw=12)
+                   hand_r=(-2.6, -7.0, 11.8), pole_r=(-0.3, 0.3, 1.0), fist_r=1.0, hand_roll_r=30,
+                   brow=16, jaw=12)
+    sweep = hang(sweep, 'l', (0.0, 0.3, 0.35))
     strike = st.but(twist=-30, lean=18, hip_twist=-14, side=3, look=(-16, 4), pelvis=(-0.3, 0.0, -0.6),
                     hand_r=(-7.2, -4.0, 9.8), pole_r=(-0.4, 0.6, 0.7), fist_r=1.0, hand_roll_r=40,
-                    hand_l=(5.2, 0.0, 5.8), brow=16, jaw=16)
-    follow = strike.but(twist=-40, hand_r=(-6.9, -1.4, 8.6), pole_r=(-0.3, 0.8, 0.5), look=(-20, 2), hand_roll_r=35,
-                        jaw=10)
+                    brow=16, jaw=16)
+    strike = hang(strike, 'l', (0.1, 0.9, 0.4))
+    follow = hang(strike.but(twist=-40, hand_r=(-6.9, -1.4, 8.6), pole_r=(-0.3, 0.8, 0.5), look=(-20, 2),
+                             hand_roll_r=35, jaw=10), 'l', (0.1, 0.9, 0.4))
     return keys_of([(0, st, 'auto'), (0.24, coil, 'in'), (0.33, sweep, 'linear'), (0.4, strike, 'out'),
                     (0.54, follow, 'auto'), (0.85, st, 'auto')])
 
@@ -226,9 +229,11 @@ def punch(rig):
                    hand_r=(-5.2, -1.6, 6.4), foot_l=(1.85, -1.0, 0.98))
     hit = st.but(twist=-22, lean=28, hip_twist=-14, side=2, pelvis=(0.05, -0.9, -1.0), hand_l=(1.1, -7.6, 6.0),
                  pole_l=pole, fist_l=1.0, hand_roll_l=60, clav_l=-2, look=(4, 0), brow=18, jaw=16,
-                 hand_r=(-5.2, 0.4, 6.8), foot_l=(1.9, -1.5, 0.98), foot_r=(-1.8, 1.0, 0.98),
+                 foot_l=(1.9, -1.5, 0.98), foot_r=(-1.8, 1.0, 0.98),
                  foot_dir_r=foot_dir(-18, -1), toe_r=-20)
-    settle = hit.but(lean=31, pelvis=(0.05, -0.95, -1.08), hand_l=(1.2, -7.3, 5.6), jaw=10)
+    hit = hang(hit, 'r', (0.2, 1.3, 0.9), fist_r=0.9)    # the counter arm: drawn back, bent, palm in
+    settle = hang(hit.but(lean=31, pelvis=(0.05, -0.95, -1.08), hand_l=(1.2, -7.3, 5.6), jaw=10), 'r',
+                  (0.2, 1.2, 0.8))
     return keys_of([(0, st, 'auto'), (0.28, load, 'inout'), (0.37, drive, 'in'), (0.5, hit, 'out'),
                     (0.64, settle, 'inout'), (1.0, st, 'auto')])
 
@@ -236,7 +241,7 @@ def punch(rig):
 def clobber(rig):
     """Attack variant: both fists clubbed down together in front of him."""
     st = stance(rig)
-    up = st.but(lean=-4, hip_tilt=-4, pelvis=(0, 0.3, -0.25), hand_l=(2.2, -1.8, 16.2), hand_r=(-2.2, -1.8, 16.2),
+    up = st.but(lean=-4, hip_tilt=-4, pelvis=(0, 0.3, -0.25), hand_l=(2.2, -1.6, 15.1), hand_r=(-2.2, -1.6, 15.1),
                 pole_l=(1.0, 0.4, 0.2), fist_l=1.0, fist_r=1.0, clav_l=14, clav_r=14, look=(0, 18), jaw=10, brow=6)
     down = st.but(lean=36, hip_tilt=10, pelvis=(0, -0.3, -1.05), hand_l=(1.7, -6.8, 4.1), hand_r=(-1.7, -6.8, 4.1),
                   pole_l=(1.0, 0.2, -0.3), fist_l=1.0, fist_r=1.0, look=(0, 0), jaw=18, brow=18)
@@ -260,11 +265,11 @@ def smash(rig):
     st = stance(rig)
     dip = st.but(lean=22, hip_tilt=8, pelvis=(0, 0.15, -0.95), hand_l=(4.2, 0.6, 4.6), hand_r=(-4.2, 0.6, 4.6),
                  fist_l=0.9, fist_r=0.9, look=(0, 2), brow=8)
-    raise_ = st.but(lean=-12, hip_tilt=-6, pelvis=(0, 0.45, -0.2), hand_l=(2.1, 0.6, 16.7),
-                    hand_r=(-2.1, 0.6, 16.7), pole_l=(1.0, 0.6, 0.1), fist_l=1.0, fist_r=1.0, clav_l=22, clav_r=22,
+    raise_ = st.but(lean=-12, hip_tilt=-6, pelvis=(0, 0.45, -0.2), hand_l=(2.1, 0.6, 15.7),
+                    hand_r=(-2.1, 0.6, 15.7), pole_l=(1.0, 0.6, 0.1), fist_l=1.0, fist_r=1.0, clav_l=22, clav_r=22,
                     look=(0, 26), neck=-4, jaw=26, brow=-6, eye=1.35,
                     foot_l=(2.05, 0.1, 0.98), foot_r=(-2.05, 0.1, 0.98))
-    apex = raise_.but(lean=-16, pelvis=(0, 0.55, -0.1), hand_l=(1.8, 1.8, 16.7), hand_r=(-1.8, 1.8, 16.7), eye=1.5,
+    apex = raise_.but(lean=-16, pelvis=(0, 0.55, -0.1), hand_l=(1.8, 1.8, 15.6), hand_r=(-1.8, 1.8, 15.6), eye=1.5,
                       jaw=30)
     impact = crouch_reach(st, hand_l=(1.8, -5.3, 1.65), hand_r=(-1.8, -5.3, 1.65), pole_l=(1.0, 0.3, -0.4),
                           fist_l=1.0, fist_r=1.0,
@@ -299,13 +304,15 @@ def hammer(rig):
     brought down. CONTRACT: lands at 1.30 s of 1.7 s (unscaled). Right fist glows."""
     st = stance(rig)
     load = st.but(twist=18, lean=4, hip_twist=8, pelvis=(-0.2, 0.3, -0.35), hand_r=(-5.4, 1.2, 15.0),
-                  pole_r=(-1.0, 0.4, 0.3), fist_r=1.0, clav_r=20, hand_l=(5.8, -3.6, 7.4), pole_l=(1.0, 0.5, -0.4),
+                  pole_r=(-1.0, 0.4, 0.3), fist_r=1.0, clav_r=20,
                   fist_l=0.1, spread_l=8, look=(-6, 20), jaw=12, brow=6)
+    load = hang(load, 'l', (0.3, -1.5, 1.5))             # the off arm out in front for balance, elbow bent
     apex = load.but(twist=24, hand_r=(-5.1, 2.2, 15.5), lean=-2, look=(-8, 22), eye=1.3, jaw=18)
     impact = st.but(twist=-12, lean=30, hip_tilt=12, hip_twist=-6, pelvis=(-0.3, -0.7, -1.4),
                     hand_r=(-4.6, -6.2, 1.8), pole_r=(-1.0, 0.3, -0.3), fist_r=1.0,
-                    hand_l=(5.0, -2.6, 4.2), fist_l=0.7, look=(4, 20), neck=-12, jaw=22, brow=22, eye=1.15,
+                    fist_l=0.7, look=(4, 20), neck=-12, jaw=22, brow=22, eye=1.15,
                     foot_r=(-2.0, -1.2, 0.98), foot_l=(1.9, 0.6, 0.98), knee_l=(0.4, -1, 0))
+    impact = hang(impact, 'l', (0.2, 0.7, 0.3))          # the off arm thrown back, bent, palm in
     jolt = impact.but(pelvis=(-0.3, -0.75, -1.5), lean=32)
     return keys_of([(0, st, 'auto'), (0.45, load, 'out'), (0.98, apex, 'in'), (1.3, impact, 'out'),
                     (1.36, jolt, 'auto'), (1.48, impact.but(lean=28, jaw=10), 'inout'), (1.7, st, 'auto')])
@@ -376,11 +383,11 @@ def barrowfall(rig):
     plant = st.but(lean=24, hip_tilt=10, pelvis=(0, -0.2, -0.9), foot_l=(2.2, -0.5, 0.98), foot_r=(-2.2, 0.3, 0.98),
                    hand_l=(4.6, 0.6, 5.2), hand_r=(-4.6, 0.6, 5.2), fist_l=1.0, fist_r=1.0, look=(0, 12), jaw=8)
     rise = st.but(lean=-14, hip_tilt=-8, pelvis=(0, 0.7, 0.2), foot_l=(2.2, -0.5, 0.98), foot_r=(-2.2, 0.3, 0.98),
-                  hand_l=(1.8, 1.2, 16.8), hand_r=(-1.8, 1.2, 16.8), pole_l=(1.0, 0.7, 0.2), fist_l=1.0, fist_r=1.0,
+                  hand_l=(1.8, 1.2, 16.4), hand_r=(-1.8, 1.2, 16.4), pole_l=(1.0, 0.7, 0.2), fist_l=1.0, fist_r=1.0,
                   clav_l=14, clav_r=14, look=(0, 30), neck=-6, jaw=32, brow=-8, eye=1.6, toe_l=-20, toe_r=-20)
-    apex = rise.but(lean=-20, pelvis=(0, 0.95, 0.35), hand_l=(1.6, 2.6, 16.8), hand_r=(-1.6, 2.6, 16.8), eye=1.8)
+    apex = rise.but(lean=-20, pelvis=(0, 0.95, 0.35), hand_l=(1.6, 2.6, 16.3), hand_r=(-1.6, 2.6, 16.3), eye=1.8)
     impact = crouch_reach(st, lean=52, hip_tilt=28, pelvis=(0, -1.0, -2.25), foot_l=(2.2, -0.5, 0.98),
-                          foot_r=(-2.2, 0.3, 0.98), hand_l=(1.8, -5.8, 1.65), hand_r=(-1.8, -5.8, 1.65),
+                          foot_r=(-2.2, 0.3, 0.98), hand_l=(1.9, -6.7, 1.65), hand_r=(-1.9, -6.7, 1.65),
                           pole_l=(1.0, 0.3, -0.4), fist_l=1.0, fist_r=1.0, jaw=30, brow=24, eye=1.4)
     jolt = impact.but(pelvis=(0, -1.05, -2.45), lean=55, jaw=22)
     heave = impact.but(pelvis=(0, -0.9, -2.15), lean=50, look=(0, 30), jaw=6, brow=16, eye=1.0, clav_l=6, clav_r=6)
@@ -513,8 +520,8 @@ def starwake(rig):
 def hit(rig):
     st = stance(rig)
     flinch = st.but(lean=-2, hip_tilt=-5, pelvis=(0.15, 0.75, -0.3), neck=-12, look=(-16, 26), lid_up=30, brow=24,
-                    jaw=16, twist=-10, hand_l=(5.9, 0.4, 6.3), hand_r=(-5.0, -0.4, 7.0), clav_l=12, clav_r=12,
-                    head_roll=10, side=4)
+                    jaw=16, twist=-10, clav_l=12, clav_r=12, head_roll=10, side=4)
+    flinch = hang(hang(flinch, 'l', (0.2, 0.5, 0.7)), 'r', (0.1, -0.5, 1.2))
     return keys_of([(0, st, 'auto'), (0.08, flinch, 'out'), (0.24, flinch.but(lean=4, look=(-10, 18)), 'inout'),
                     (0.62, st, 'auto')])
 

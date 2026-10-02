@@ -309,6 +309,14 @@ ARMPIT_SLACK = 0.35
 ARMPIT_BONES = ('Spine1', 'Spine2')
 CLEAR_MARGIN = 0.18
 RESOLVE_CAP = 1.6
+# A push that only clears the UPPER arm may swing the arm away from the body, never
+# straighten it: the pushed wrist stays within the reach that leaves the elbow this
+# many degrees of bend (or within the authored reach, when the author asked for a
+# longer one). Unbounded, any such push ran the wrist out to full reach, and every
+# clip's off arm, wind-up and recovery locked into the straight, out-turned arm the
+# stance had been rid of. A forearm, a hand or a stone inside the body still gets the
+# whole push (a fist driven down between the thighs must be able to reach past them).
+PUSH_MIN_BEND = 20.0
 _BODY_PRIMS = None
 
 
@@ -398,6 +406,13 @@ def arm_clearance_fix(b, pose):
         tgt = np.array(b.p[hk]) if b.p[hk] is not None else wrist
         new = tgt + wrist_shift * 1.25
         home = np.array(b.p.get('_home_' + hk, tuple(tgt)))
+        sh = np.array(pose.head[side + 'UpperArm'])
+        l1, l2 = b.rig.length[side + 'UpperArm'], b.rig.length[side + 'Forearm']
+        reach = math.sqrt(l1 * l1 + l2 * l2 + 2 * l1 * l2 * math.cos(math.radians(PUSH_MIN_BEND)))
+        reach = max(reach, float(np.linalg.norm(home - sh)))
+        lower_in = any(pe > 0 and u >= 0.5 for (_, _, u), pe in zip(samples, pen))
+        if not lower_in and np.linalg.norm(new - sh) > reach:
+            new = sh + (new - sh) / np.linalg.norm(new - sh) * reach
         off = new - home
         if np.linalg.norm(off) > RESOLVE_CAP:          # a nudge, never a new pose
             new = home + off / np.linalg.norm(off) * RESOLVE_CAP
@@ -549,6 +564,7 @@ def sample(seq, t, loop=False):
 
 # Frames (sigma) the clearance corrections are smoothed over in a dense clip.
 CLEAR_SMOOTH = 3.0
+END_PIN = 6.0
 CLEAR_KEYS = (('hand_l', False), ('hand_r', False), ('pole_l', True), ('pole_r', True))
 
 
@@ -623,6 +639,16 @@ def cleared_track(bodies, loop=False):
         if not np.abs(delta).max() > 1e-9:
             continue
         sm = _smooth_rows(_dilate_rows(delta, int(math.ceil(CLEAR_SMOOTH * 2)), loop), CLEAR_SMOOTH, loop)
+        if not loop:
+            # A clip's first and last frames are the poses the mixer crossfades with
+            # (the stance, or the clip's documented end pose): they keep their OWN push
+            # (none, for the stance), and the eased push fades in over END_PIN frames.
+            # Widened and smoothed across the seam, a push from the wind-up reached back
+            # into frame 0 and the clip began off the stance.
+            n = len(sm)
+            for i in range(n):
+                w = smoothstep(min(i, n - 1 - i) / END_PIN)
+                sm[i] = delta[i] + (sm[i] - delta[i]) * w
         for o, base, d in zip(out, orig, sm):
             v = base + d
             if is_dir:
@@ -642,7 +668,11 @@ def keys_of(seq, loop=False, dense=True, ease_clear=True):
     nfr = int(round(end * 24))
     times = [f / 24 for f in range(nfr + 1)]
     bodies = [sample(seq, t, loop) for t in times]
-    if abs(nfr / 24 - end) > 1e-6:
+    # A clip whose length is not a whole number of frames: when the frame grid stops
+    # short of the end, the end pose is keyed at its own time; when the grid's last frame
+    # already lies past it, that frame IS the end pose (sample() holds it) and stays the
+    # last key, so nothing after it can be eased off the pose.
+    if nfr / 24 < end - 1e-6:
         times.append(end)
         bodies.append(seq[-1][1])
     # a loop's last frame IS its first: smooth over the cycle without counting it twice
@@ -654,8 +684,104 @@ def keys_of(seq, loop=False, dense=True, ease_clear=True):
     if loop:   # settle the bend memory over one pass so the loop seam matches
         for b in track:
             b._solve(memory)
-    poses = steady_arms([b._solve(memory) for b in track], bodies[0].rig)
+    poses = [b._solve(memory) for b in track]
+    if not loop:
+        poses = settle_tail(poses, track, bodies[0].rig)
+    poses = steady_arms(poses, bodies[0].rig)
     return [(t, p, 'linear') for t, p in zip(times, poses)]
+
+
+TAIL_MAX = 24          # frames the settle may take
+TAIL_RATE = 1.0        # degrees per frame it adds to an arm bone (more only if TAIL_MAX is too short)
+
+
+def settle_tail(poses, track, rig):
+    """Land a clip's last frame exactly on its end pose.
+
+    The per-frame bend and roll limits (the memory) let the elbow trail a fast
+    recovery: the wrist is back on the stance but the elbow is still swinging round to
+    it, so the clip ended up to 29 degrees of arm roll short of the stance and the
+    crossfade to Idle (0.1 s) had to finish the move. The end pose is solved on its own
+    (no memory: exactly what the next clip starts from), and what the forward solve
+    still lacks on each arm bone is turned in evenly over the last frames, as many as
+    the difference needs at TAIL_RATE (none, when the forward solve already lands). A
+    constant extra turn per frame, so the roll steps the rig allows are not exceeded."""
+    n = len(poses)
+    kmax = min(TAIL_MAX, n - 1)
+    if kmax < 2:
+        return poses
+    names = [side + part for side in ('L_', 'R_') for part in ('UpperArm', 'ElbowFix', 'Forearm', 'Hand')]
+
+    def local(p, name):
+        rest_m = rig.frames[name]
+        return (rest_m @ p[name].to_matrix() @ rest_m.inverted()).to_quaternion()
+
+    end = track[-1]._solve(None)
+    lack = {}
+    for name in names:
+        q = local(poses[-1], name).inverted() @ local(end, name)
+        if q.w < 0:
+            q.negate()
+        lack[name] = q
+    gap = max(math.degrees(q.angle) for q in lack.values())
+    if gap < 0.01:
+        return poses
+    k = max(2, min(kmax, int(math.ceil(gap / TAIL_RATE))))
+    for j in range(k):
+        w = (j + 1) / k
+        p = poses[n - k + j]
+        for name in names:
+            rest_m = rig.frames[name]
+            m = local(p, name) @ Quaternion().slerp(lack[name], w)
+            p[name] = (rest_m.inverted() @ m.to_matrix() @ rest_m).to_quaternion()
+            p.delta[name] = p.delta[rig.parent[name]] @ m
+    return poses
+    names = [side + part for side in ('L_', 'R_') for part in ('UpperArm', 'ElbowFix', 'Forearm', 'Hand')]
+
+    def local(p, name):
+        rest_m = rig.frames[name]
+        return (rest_m @ p[name].to_matrix() @ rest_m.inverted()).to_quaternion()
+
+    memory = {}
+    back = [None] * kmax
+    for j in range(kmax - 1, -1, -1):
+        back[j] = track[n - kmax + j]._solve(memory)
+    gap = max(math.degrees(local(poses[-1], nm).rotation_difference(local(back[-1], nm)).angle) for nm in names)
+    gap = min(gap, 360.0 - gap)
+    if gap < 0.01:
+        return poses
+    k = max(2, min(kmax, int(math.ceil(gap / TAIL_RATE))))
+    for j in range(k):
+        w = (j + 1) / k
+        p, q = poses[n - k + j], back[kmax - k + j]
+        for name in names:
+            rest_m = rig.frames[name]
+            a, c = local(p, name), local(q, name)
+            if a.dot(c) < 0:
+                c.negate()
+            m = a.slerp(c, w)
+            p[name] = (rest_m.inverted() @ m.to_matrix() @ rest_m).to_quaternion()
+            p.delta[name] = p.delta[rig.parent[name]] @ m
+    return poses
+    memory = {}
+    back = [None] * k
+    for j in range(k - 1, -1, -1):
+        back[j] = track[n - k + j]._solve(memory)
+    for j in range(k):
+        w = 1.0 if times[n - k + j] >= times[-1] - 1e-9 else smoothstep((j + 1) / k)
+        p, q = poses[n - k + j], back[j]
+        for side in ('L_', 'R_'):
+            for part in ('UpperArm', 'ElbowFix', 'Forearm', 'Hand'):
+                name = side + part
+                rest_m = rig.frames[name]
+                a = (rest_m @ p[name].to_matrix() @ rest_m.inverted()).to_quaternion()
+                c = (rest_m @ q[name].to_matrix() @ rest_m.inverted()).to_quaternion()
+                if a.dot(c) < 0:
+                    c.negate()
+                m = a.slerp(c, w)
+                p[name] = (rest_m.inverted() @ m.to_matrix() @ rest_m).to_quaternion()
+                p.delta[name] = p.delta[rig.parent[name]] @ m
+    return poses
 
 
 # The arm chain, parents first (anatomy.BONES), steadied by steady_arms.
@@ -748,6 +874,42 @@ def stance(rig):
                 foot_dir_l=(0.12, -1.48, -0.64), foot_dir_r=(-0.12, -1.48, -0.64),
                 fist_l=0.5, fist_r=0.58, clav_l=-1, clav_r=-1, clav_fwd_l=-6, clav_fwd_r=-5,
                 lid_up=18, lid_lo=7, brow=6)
+
+
+_HANG_REF = {}
+
+
+def hang(b, side, off=(0.0, 0.0, 0.0), **kw):
+    """The Body `b` with one arm ('l' or 'r') in the stance's relaxed hang, carried by
+    THIS pose's shoulder and turned with its chest: the elbow bent and behind him, the
+    palm on the thigh. `off` shifts the wrist (out from the body, back, up) for a
+    counter-swing. The off arm of every blow hangs this way: written as fixed
+    armature points, it was dragged straight whenever the torso leaned or turned
+    away from them."""
+    s = 1 if side == 'l' else -1
+    bone = ('L_' if s > 0 else 'R_') + 'UpperArm'
+    hk, pk = 'hand_' + side, 'pole_' + side
+
+    def frame(body):
+        pose = body.but(**{hk: None}).pose(resolve=False)
+        x = pose.delta['Spine2'] @ V((1, 0, 0))
+        return np.array(pose.head[bone]), math.atan2(x.y, x.x)
+
+    key = (id(b.rig), side)
+    if key not in _HANG_REF:
+        st = stance(b.rig)
+        sh, yaw0 = frame(st)
+        pole = st.p['pole_l'] if s > 0 else (st.p['pole_r'] or (-st.p['pole_l'][0], st.p['pole_l'][1], st.p['pole_l'][2]))
+        _HANG_REF[key] = (np.array(st.p[hk]) - sh, np.array(pole, float), yaw0)
+    rel, pole, yaw0 = _HANG_REF[key]
+    sh, yaw = frame(b)
+    c, sn = math.cos(yaw - yaw0), math.sin(yaw - yaw0)
+
+    def turn(v):
+        return np.array((v[0] * c - v[1] * sn, v[0] * sn + v[1] * c, v[2]))
+
+    tgt = sh + turn(rel + np.array((off[0] * s, off[1], off[2])))
+    return b.but(**{hk: tuple(tgt.tolist()), pk: tuple(turn(pole).tolist())}, **kw)
 
 
 def make_clips(arm, only=None):

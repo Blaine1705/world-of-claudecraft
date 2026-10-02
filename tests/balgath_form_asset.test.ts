@@ -25,8 +25,15 @@ import {
 } from '../scripts/assets/balgath_cyclops/arm_jitter.mjs';
 import {
   ARM_POSTURE_CLIPS,
+  ARM_SEAM_OPEN,
   armPostureFailures,
+  armSeamFailures,
+  armSeamReport,
   clipArmPosture,
+  OFF_ARM,
+  offArmFailures,
+  offArmReport,
+  SEAM_GAP_MAX,
 } from '../scripts/assets/balgath_cyclops/arm_posture.mjs';
 import { VISUALS } from '../src/render/characters/manifest';
 import { FOREMAN_SHAPE_SCALE } from '../src/sim/entity';
@@ -41,12 +48,12 @@ const FORM = 'public/models/chars/forms/balgath_form.glb';
 
 const PINS = {
   [BOSS]: {
-    bytes: 3_828_800,
-    sha256: '5fefcc1b53352808f455428a0adacf8ba4a4d02b8fbc5c445eca3ed25aab9274',
+    bytes: 3_783_864,
+    sha256: '57533e87247145af66d7a310c3f4d8bed3b5ef786a95964407f37cf4f85791d9',
   },
   [FORM]: {
-    bytes: 1_585_788,
-    sha256: 'c4513f8b897ca25971df41e9a882d717a3dd929b208586ffc6718397bf16907d',
+    bytes: 1_558_288,
+    sha256: 'bcffd9a47cf3a0f4fa9fd4b035bd5dba33ebc4a91ace523fa878b54ccb84a00d',
   },
 } as const;
 
@@ -204,6 +211,54 @@ describe('the shipped Balgath pair', () => {
       expect(idle.maxPalmOff, `${file} Idle palm`).toBeLessThan(28);
       // the palm must not face behind him (it read 0.8 of the way back)
       expect(idle.maxPalmBack, `${file} Idle palm`).toBeLessThan(0.25);
+    }
+  });
+
+  it('starts and ends every action clip in the stance, so no crossfade swings an arm', async () => {
+    // The owner's next report: standing was right, but "when he attacks, the arms move
+    // like they did before". Every action clip still began and ended in the old locked,
+    // out-turned arm (up to 52 degrees off the stance going in, 76 coming out), so the
+    // 0.1 s crossfade swung the arm through the difference, and the three attack
+    // variants chained through it (up to 65 degrees between one blow's end and the
+    // next one's start).
+    for (const file of [BOSS, FORM]) {
+      const r = await root(file);
+      expect(armSeamFailures(r), file).toEqual([]);
+      const seams = armSeamReport(r);
+      // every seam the open list does not name meets the stance to within a hair
+      const closed = seams.filter((g) => !(`${g.clip}|${g.edge}` in ARM_SEAM_OPEN));
+      expect(closed.length, file).toBeGreaterThan(15);
+      for (const g of closed) {
+        expect(g.gap, `${file} ${g.clip} ${g.edge} (${g.bone})`).toBeLessThan(SEAM_GAP_MAX);
+      }
+      // the attack variants chain: each one's end is the next one's start
+      for (const clip of ['Balgath_Swipe', 'Balgath_Punch', 'Balgath_Clobber']) {
+        for (const edge of ['start', 'end']) {
+          const g = seams.find((s) => s.clip === clip && s.edge === edge);
+          expect(g?.against, `${file} ${clip} ${edge}`).toBe('Idle');
+          expect(g?.gap, `${file} ${clip} ${edge}`).toBeLessThan(1);
+        }
+      }
+    }
+  });
+
+  it('keeps the off arm of a one-handed blow in the relaxed hang', async () => {
+    // The arm that does not strike was written as fixed points in space, so a lean or a
+    // turn of the torso dragged it straight (3.6 degrees of elbow in the Swipe, the
+    // Punch, the Hammer and the Hit) with the palm up to 69 degrees off the thigh. It
+    // now hangs from the posed shoulder and turns with the chest.
+    for (const file of [BOSS, FORM]) {
+      const r = await root(file);
+      expect(offArmFailures(r), file).toEqual([]);
+      const arms = offArmReport(r);
+      expect(arms.map((o) => `${o.clip} ${o.side}`).sort(), file).toEqual(
+        Object.entries(OFF_ARM)
+          .flatMap(([clip, sides]) => sides.map((side) => `${clip} ${side}`))
+          .sort(),
+      );
+      for (const o of arms) {
+        expect(o.minElbowBend, `${file} ${o.clip} ${o.side}`).toBeGreaterThan(20);
+      }
     }
   });
 

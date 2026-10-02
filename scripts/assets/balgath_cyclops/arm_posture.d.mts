@@ -24,3 +24,30 @@ export interface ClipArmPosture {
 
 export function clipArmPosture(root: Root, clipName: string, fps?: number): ClipArmPosture;
 export function armPostureFailures(root: Root, clips?: readonly string[]): string[];
+
+export const SEAM_GAP_MAX: number;
+export const ARM_SEAM_EXCEPTIONS: readonly (readonly string[])[];
+export const ARM_SEAM_FREE: { readonly start: readonly string[]; readonly end: readonly string[] };
+export const ARM_SEAM_OPEN: Readonly<Record<string, number>>;
+export const OFF_ARM: Readonly<Record<string, readonly string[]>>;
+export const OFF_ARM_PALM_MAX: number;
+
+export interface ArmSeam {
+  clip: string;
+  edge: string;
+  against: string;
+  gap: number;
+  bone: string;
+}
+
+export interface OffArm {
+  clip: string;
+  side: string;
+  minElbowBend: number;
+  maxPalmOff: number;
+}
+
+export function armSeamReport(root: Root): ArmSeam[];
+export function armSeamFailures(root: Root, limit?: number): string[];
+export function offArmReport(root: Root): OffArm[];
+export function offArmFailures(root: Root): string[];
