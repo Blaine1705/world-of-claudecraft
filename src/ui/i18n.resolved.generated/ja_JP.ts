@@ -3924,7 +3924,8 @@ export const ja_JP: EnTranslations = {
         "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
       },
       "foundry": {
-        "scaldingVents": "メインラインの通路に立っており、蒸気孔が警告中か噴出中である。蒸気が噴き出すと、通路にいる者全員に{every}秒ごとに{min}から{max}の火炎ダメージを{seconds}秒間与える（ヒロイックでは{heroicMin}から{heroicMax}）。ベルトに乗れば安全。"
+        "scaldingVents": "メインラインのベルト以外の床に立っており、蒸気孔が警告中か噴出中である。蒸気が噴き出すと、ベルトに乗っていない者全員に{every}秒ごとに{min}から{max}の火炎ダメージを{seconds}秒間与える（ヒロイックでは{heroicMin}から{heroicMax}）。安全なのはベルトの上だけ。",
+        "targetLock": "射撃場の番人に追尾されている。{every}秒ごとに立っている場所に円が描かれ、その{delay}秒後に砲弾が着弾して{radius}ヤード以内の全員に{min}から{max}の火炎ダメージを与える（ヒロイックでは{heroicMin}から{heroicMax}）。動き続けろ。移動阻害を解除する効果ではこの印は消えない。"
       },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",

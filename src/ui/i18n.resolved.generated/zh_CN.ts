@@ -3924,7 +3924,8 @@ export const zh_CN: EnTranslations = {
         "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。"
       },
       "foundry": {
-        "scaldingVents": "你站在主产线的通道上，蒸汽口正在预警或喷发。蒸汽喷出后，每{every}秒对通道上的所有人造成{min}到{max}点火焰伤害，持续{seconds}秒（英雄难度为{heroicMin}到{heroicMax}点）。站在传送带上即可安全。"
+        "scaldingVents": "你站在主产线传送带以外的地面上，蒸汽口正在预警或喷发。蒸汽喷出后，每{every}秒对所有不在传送带上的人造成{min}到{max}点火焰伤害，持续{seconds}秒（英雄难度为{heroicMin}到{heroicMax}点）。只有传送带上是安全的。",
+        "targetLock": "靶场守卫正在锁定你。每{every}秒会在你所站的位置画出一个圆圈，{delay}秒后炮弹落下，对{radius}码内的所有人造成{min}到{max}点火焰伤害（英雄难度为{heroicMin}到{heroicMax}点）。保持移动。解除减速的效果无法移除此标记。"
       },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",

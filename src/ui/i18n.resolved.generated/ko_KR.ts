@@ -3924,7 +3924,8 @@ export const ko_KR: EnTranslations = {
         "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
       },
       "foundry": {
-        "scaldingVents": "메인 라인의 통로 위에 서 있으며, 증기구가 경고 중이거나 분출 중입니다. 증기가 터지면 통로 위의 모든 대상에게 {every}초마다 {min}~{max}의 화염 피해를 {seconds}초 동안 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 벨트 위에 서면 안전합니다."
+        "scaldingVents": "메인 라인에서 벨트가 아닌 바닥 위에 서 있으며, 증기구가 경고 중이거나 분출 중입니다. 증기가 터지면 벨트 위에 있지 않은 모든 대상에게 {every}초마다 {min}~{max}의 화염 피해를 {seconds}초 동안 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 벨트 위만 안전합니다.",
+        "targetLock": "사격장 감시자가 당신을 추적하고 있습니다. {every}초마다 서 있는 자리에 원이 그려지고, {delay}초 뒤 포탄이 떨어져 {radius}미터 내의 모든 대상에게 {min}~{max}의 화염 피해를 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 계속 움직이십시오. 이동 방해를 해제하는 효과로는 이 표식이 사라지지 않습니다."
       },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",

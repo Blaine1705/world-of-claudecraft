@@ -3924,7 +3924,8 @@ export const es_ES: EnTranslations = {
         "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
       },
       "foundry": {
-        "scaldingVents": "You stand on a Main Line walkway while its vents warn or blow. Once the steam bursts, it deals {min} to {max} Fire damage every {every} sec for {seconds} sec ({heroicMin} to {heroicMax} on Heroic) to anyone on a walkway. Step onto a belt to be safe."
+        "scaldingVents": "You stand on Main Line floor that is not a belt while its vents warn or blow. Once the steam bursts, it deals {min} to {max} Fire damage every {every} sec for {seconds} sec ({heroicMin} to {heroicMax} on Heroic) to anyone not on a belt. Only the belts are safe.",
+        "targetLock": "The Rangewarden is tracking you. Every {every} sec a circle is painted where you stand, and {delay} sec later a shell lands on it for {min} to {max} Fire damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. Keep moving. Effects that break snares do not remove this mark."
       },
       "sharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, dividido entre el número de jugadores dentro del círculo (un {perPlayer}% cada uno con {players} jugadores).",
       "varkhulSharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.",

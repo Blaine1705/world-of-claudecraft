@@ -9411,6 +9411,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.formShadow'
   | 'hudChrome.auraEffect.formTravel'
   | 'hudChrome.auraEffect.foundry.scaldingVents'
+  | 'hudChrome.auraEffect.foundry.targetLock'
   | 'hudChrome.auraEffect.freeCast'
   | 'hudChrome.auraEffect.freeExecute'
   | 'hudChrome.auraEffect.funeralHarvestLock'
