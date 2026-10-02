@@ -14,7 +14,10 @@
 //
 // Env: SHOT_URL (http://127.0.0.1:5200/), SHOT_PRESET (4), SHOT_W / SHOT_H
 // (1600x900), SHOT_GPU=0 to force SwiftShader, SHOT_PREFIX (default
-// "fundicion_").
+// "fundicion_"), SHOT_GATES=0 to leave every gate shut at boot (the Crane
+// Bridge moment opens its own: momento_puente_grua kills both wing bosses and
+// frames the swing). A shot with a `burst` list writes one frame per offset
+// (ms after its commands), for the moments that move.
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -96,6 +99,63 @@ const SHOTS = [
     wait: 400,
   },
   { id: 'mapa_m', at: [0, -40], face: 0, pitch: 0.3, dist: 18, map: true },
+  // ---- The environment's moments (ids prefixed momento_).
+  // The Crane Bridge swinging into place: run with SHOT_GATES=0.
+  {
+    id: 'momento_puente_grua',
+    at: [9, 45],
+    face: Math.PI,
+    yaw: Math.PI,
+    pitch: 0.55,
+    dist: 20,
+    cmds: ['/dev foundry kill rangewarden', '/dev foundry kill voltaic'],
+    cmdWait: 250,
+    wait: 100,
+    burst: [300, 2000, 3600, 5200, 6800, 8000, 9400, 11000],
+  },
+  // The ladles tipping into the moulds on the crane pad (a 16 s round).
+  {
+    id: 'momento_vertido',
+    at: [-12, -66],
+    face: -Math.PI / 2,
+    yaw: 0.25,
+    pitch: 0.18,
+    dist: 15,
+    burst: [0, 2700, 5400, 8100, 10800, 13500],
+  },
+  { id: 'momento_canal_fundido', at: [0, -51], face: Math.PI / 2, pitch: 0.55, dist: 16 },
+  { id: 'momento_canal_horno', at: [-3, -52], face: -Math.PI / 2, pitch: 0.3, dist: 16 },
+  // Lightning on the great coil, from the crown's stair and from the lift.
+  {
+    id: 'momento_rayo_bobina',
+    at: [95, -32],
+    face: 0,
+    pitch: -0.2,
+    dist: 34,
+    burst: Array.from({ length: 22 }, (_, i) => i * 230),
+  },
+  {
+    id: 'momento_rayo_desde_el_ascensor',
+    at: [0, -228],
+    face: 0.33,
+    pitch: -0.02,
+    dist: 12,
+    burst: Array.from({ length: 22 }, (_, i) => i * 230),
+  },
+  { id: 'momento_prensa', at: [0, -22], face: 0, pitch: 0.02, dist: 18 },
+  {
+    id: 'momento_estacion_del_ascensor',
+    at: [0, -222],
+    face: Math.PI,
+    yaw: Math.PI,
+    pitch: 0.15,
+    dist: 16,
+  },
+  { id: 'momento_vista_del_ascensor', at: [0, -214], face: 0, pitch: 0.12, dist: 16 },
+  { id: 'momento_campo_torre', at: [-80, -4], face: Math.PI / 2, yaw: 0.5, pitch: 0.2, dist: 22 },
+  { id: 'momento_grua_del_patio', at: [0, -186], face: 0, pitch: 0.12, dist: 26 },
+  { id: 'momento_coloso', at: [0, 188], face: 0, pitch: -0.08, dist: 30 },
+  { id: 'momento_vista_del_valle', at: [50, -150], face: Math.PI / 2, pitch: 0.1, dist: 20 },
   // ---- Phase 2: the boss mechanics (HUD on: cast bars and the Foundry alert).
   // stage: [templateId, yards, angle]: pull that boss and stand `yards` from it
   // along `angle` (sim radians, 0 = north of it), facing it.
@@ -312,7 +372,9 @@ async function main() {
       settleMs: 4000,
     });
     if (!booted) throw new Error('offline world did not boot');
-    for (const cmd of ['/dev level 20', '/dev god', '/dev foundry enter', '/dev foundry gates']) {
+    const boot = ['/dev level 20', '/dev god', '/dev foundry enter'];
+    if (process.env.SHOT_GATES !== '0') boot.push('/dev foundry gates');
+    for (const cmd of boot) {
       await page.evaluate((c) => window.__game.world.chat(c), cmd);
       await sleep(1300);
     }
@@ -433,6 +495,17 @@ async function main() {
         await page.keyboard.press('KeyM');
         await sleep(1500);
       }
+      if (shot.burst) {
+        let waited = 0;
+        for (const ms of shot.burst) {
+          await sleep(Math.max(0, ms - waited));
+          waited = ms;
+          const frame = path.join(OUT, `${PREFIX}${shot.id}_${ms}.png`);
+          await page.screenshot({ path: frame });
+          console.log('SHOT', frame);
+        }
+        continue;
+      }
       const file = path.join(OUT, `${PREFIX}${shot.id}.png`);
       await page.screenshot({ path: file });
       console.log('SHOT', file);
@@ -443,17 +516,21 @@ async function main() {
       const perf = await page.evaluate(
         () =>
           new Promise((resolve) => {
+            // The renderer's counters run on (never reset per frame here):
+            // report the per-frame mean over the sampled window.
             const info = window.__game.renderer.webgl.info.render;
             let frames = 0;
             const t0 = performance.now();
+            const calls0 = info.calls;
+            const tris0 = info.triangles;
             const tick = () => {
               frames++;
               if (performance.now() - t0 < 1500) requestAnimationFrame(tick);
               else
                 resolve({
                   fps: Math.round((frames * 1000) / (performance.now() - t0)),
-                  calls: info.calls,
-                  tris: info.triangles,
+                  calls: Math.round((info.calls - calls0) / frames),
+                  tris: Math.round((info.triangles - tris0) / frames),
                 });
             };
             requestAnimationFrame(tick);
