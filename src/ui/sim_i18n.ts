@@ -1341,6 +1341,12 @@ const baseEnTable = {
   'error.stormbrassFoundryCellRolling': 'The Storm Cell is still rolling.',
   'error.stormbrassFoundryCellCarrying': 'You are already carrying a Storm Cell.',
   'error.stormbrassFoundryCellRetake': 'The Storm Cell is still crackling from your grip.',
+  // The Foundry's chained workers (encounters/stormbrass_foundry/workers.ts
+  // FOUNDRY_WORKER_LINES): the refusal while the guards stand, and the
+  // workers' two calls. Placeholder-free: EXACT matcher.
+  'error.stormbrassFoundryWorkersGuarded': 'The guards are still watching. Deal with them first.',
+  'log.stormbrassFoundryWorkersUnguarded': 'The guards are down! Friend, strike these chains, please!',
+  'log.stormbrassFoundryWorkersFreed': 'Free! We are free! To the lift, all of you!',
   'mechanic.foundryStampingPress': 'Stamping Press',
   'mechanic.foundryRivetGun': 'Rivet Gun',
   'mechanic.foundrySalvo': 'Salvo',

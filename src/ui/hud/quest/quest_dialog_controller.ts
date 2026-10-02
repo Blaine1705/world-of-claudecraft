@@ -21,6 +21,11 @@ import type { PainterHostPresentation } from '../../painter_host';
 import { clueHuntTitle } from '../../quest_event_view';
 import { svgIcon } from '../../ui_icons';
 import {
+  foundryWorkerDialog,
+  foundryWorkerGossip,
+  isFoundryWorkerEntity,
+} from '../dungeon/foundry_worker_gossip_core';
+import {
   isWorldQuestInstructorOrEscort,
   worldQuestInstructorDialog,
 } from '../../world_quest_instructor_view';
@@ -115,6 +120,10 @@ interface ProfessionPreviewContent {
 export class QuestDialogController {
   private npcId: number | null = null;
   private investigationSig: string | null = null;
+  // The open Foundry worker's camp phase (null when the dialog is not a
+  // worker's): the camp's guards can fall, or another player free it, while
+  // the dialog is up, so refreshIfChanged repaints on a flip.
+  private workerPhase: string | null = null;
   private detailQuestId: string | null = null;
   // The staleness signature refreshIfChanged watches, as of the last gossip
   // render (null = no gossip list currently painted): the profession-intro
@@ -144,7 +153,10 @@ export class QuestDialogController {
     const npc = world.entities.get(npcId);
     if (
       !npc ||
-      (npc.kind !== 'npc' && !isInvestigationTarget(npcId) && !isWorldQuestInstructorOrEscort(npc))
+      (npc.kind !== 'npc' &&
+        !isInvestigationTarget(npcId) &&
+        !isWorldQuestInstructorOrEscort(npc) &&
+        !isFoundryWorkerEntity(npc))
     )
       return;
     // Service NPCs short-circuit the gossip menu:
@@ -233,6 +245,7 @@ export class QuestDialogController {
     this.clueReplyOpen = false;
     this.detailQuestId = null;
     this.investigationSig = null;
+    this.workerPhase = null;
     this.lastIntroHintVisible = null;
     this.lastGossipRowSig = null;
     this.lastClueRowSig = '';
@@ -270,6 +283,13 @@ export class QuestDialogController {
     if (this.clueReplyOpen) return;
     if (this.investigationSig !== null) {
       if (investigationSignature(this.deps.world()) !== this.investigationSig) this.refresh();
+      return;
+    }
+    if (this.workerPhase !== null) {
+      const world = this.deps.world();
+      const worker = world.entities.get(this.npcId);
+      const phase = worker ? foundryWorkerGossip(worker, world.entities) : null;
+      if (phase !== this.workerPhase) this.refresh();
       return;
     }
     if (this.detailQuestId !== null || this.lastIntroHintVisible === null) return;
@@ -377,6 +397,8 @@ export class QuestDialogController {
     const world = this.deps.world();
     if (this.renderInvestigation(npc)) return;
     this.investigationSig = null;
+    if (this.renderFoundryWorker(npc)) return;
+    this.workerPhase = null;
     if (this.renderWorldQuestInstructor(npc)) return;
     this.clueReplyOpen = false;
     const definition = NPCS[npc.templateId];
@@ -879,6 +901,38 @@ export class QuestDialogController {
       });
       this.deps.element.appendChild(button);
     }
+    this.bindClose();
+    this.showAndFocus();
+    return true;
+  }
+
+  /** A Stormbrass Foundry worker's gossip (foundry_worker_gossip_core.ts):
+   *  the worker's line for its camp's phase and, once the guards are down,
+   *  "Free them", which sends the same authoritative target + interact the
+   *  discuss row does (the sim strikes the chains, every host alike). */
+  private renderFoundryWorker(npc: Entity): boolean {
+    if (!isFoundryWorkerEntity(npc)) return false;
+    const world = this.deps.world();
+    const phase = foundryWorkerGossip(npc, world.entities);
+    if (phase === null) return false;
+    const view = foundryWorkerDialog(phase);
+    this.workerPhase = phase;
+    this.npcId = npc.id;
+    this.detailQuestId = null;
+    markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
+    const name = this.deps.text.mobName(npc.templateId);
+    let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(name)}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    html += `<div class="qd-text">"${esc(t(view.line))}"</div>`;
+    if (view.offersFree) {
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-free-workers="1" aria-label="${esc(t('hudChrome.foundryWorkers.freeAria', { name }))}"><span class="gold">${svgIcon('questlog')}</span> ${esc(t('hudChrome.foundryWorkers.free'))}</button>`;
+    }
+    this.deps.element.innerHTML = html;
+    this.deps.element.querySelector('[data-free-workers]')?.addEventListener('click', () => {
+      const liveWorld = this.deps.world();
+      liveWorld.targetEntity(npc.id);
+      liveWorld.interact();
+      this.close(true);
+    });
     this.bindClose();
     this.showAndFocus();
     return true;

@@ -20340,6 +20340,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_sf_forgefathers_isle.completion':
     'Его первый чертеж. Значит, буря была раньше огня. Тогда я знаю, что он пытался заменить, и почему все его автоматы потерпели неудачу. Держитесь рядом: остальное мы прочтем вместе.',
   'entities.quests.q_sf_forgefathers_isle.objectives.0.label': 'Архивариус Мэйлин найдена',
+  'entities.mobs.sf_chained_miner.name': 'Закованный рудокоп',
+  'entities.mobs.sf_chained_hauler.name': 'Закованный носильщик',
+  'entities.mobs.sf_freed_laborer.name': 'Освобождённый рабочий',
+  'entities.quests.q_sf_free_the_workers.title': 'Освободить рабочих',
+  'entities.quests.q_sf_free_the_workers.text':
+    '{playerName}, рудокопы, что работали на этом уступе, так и не спустились. Литейная оставила их себе: закованные в лагерях у куч лома, они добывают руду и таскают лом для хозяина, ушедшего давным-давно, а его машины стоят на страже. Перебей стражу в каждом лагере и сбей с них цепи. Все три лагеря. Отправь их домой.',
+  'entities.quests.q_sf_free_the_workers.completion':
+    '{playerName}, они спустились по линии на своих ногах, все до единого, щурясь на небо, будто успели его забыть. Что бы ты ни разбил там наверху, долина запомнит именно это.',
+  'entities.quests.q_sf_free_the_workers.objectives.0.label': 'Лагеря рабочих освобождены',
+  'hudChrome.foundryWorkers.guardedLine':
+    'Не сейчас, друг, не пока стража смотрит. Увидят, что мы разговариваем, и всех нас под пресс.',
+  'hudChrome.foundryWorkers.unguardedLine':
+    'Стража пала? Тогда прошу, сбей эти цепи, пока у нас хватает духу бежать!',
+  'hudChrome.foundryWorkers.freedLine': 'Свобода! Мы идём домой. Спасибо, друг, спасибо!',
+  'hudChrome.foundryWorkers.free': 'Освободить их',
+  'hudChrome.foundryWorkers.freeAria': 'Освободить {name} и остальных закованных в этом лагере',
   'hudChrome.finder.mech.moving_belts':
     'Движущиеся ленты (пол несет вас и разворачивается по рычагу)',
   'hudChrome.finder.mech.stamping_press':

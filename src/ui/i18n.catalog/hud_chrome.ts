@@ -8935,6 +8935,19 @@ export const hudChromeStrings = {
     bondLine: 'Together they take half damage: pull them apart',
     timeAria: '{seconds} seconds left',
   },
+  // The Stormbrass Foundry's chained workers' gossip (src/ui/hud/dungeon/
+  // foundry_worker_gossip_core.ts, painted by the quest dialog): the line a
+  // worker says in each camp phase and the one button, offered once the
+  // camp's guards are dead. Wordy (M16): non-Latin fills here.
+  foundryWorkers: {
+    guardedLine:
+      'Not now, friend, not while the guards are watching. If they see us talking, it is the press for all of us.',
+    unguardedLine:
+      'The guards are down? Then please, strike these chains while we still have the nerve to run!',
+    freedLine: 'Free! We are going home. Thank you, friend, thank you!',
+    free: 'Free them',
+    freeAria: 'Free {name} and the others chained at this camp',
+  },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and
   // the unlock moment (banner, log lines, retro catch-up summary). Deed

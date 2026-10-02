@@ -19954,6 +19954,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_sf_forgefathers_isle.completion':
     '그의 첫 초안이군요. 그러니까 폭풍이 불보다 먼저였어요. 그렇다면 그가 무엇을 대신하려 했는지, 왜 그의 자동인형이 모두 실패했는지 알겠어요. 가까이 있어요. 나머지는 함께 읽어요.',
   'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '기록관 메일린 찾기',
+  'entities.mobs.sf_chained_miner.name': '사슬에 묶인 광부',
+  'entities.mobs.sf_chained_hauler.name': '사슬에 묶인 운반꾼',
+  'entities.mobs.sf_freed_laborer.name': '풀려난 노동자',
+  'entities.quests.q_sf_free_the_workers.title': '노동자 해방',
+  'entities.quests.q_sf_free_the_workers.text':
+    '{playerName}, 이 바위 선반에서 일하던 광부들은 아무도 내려오지 못했네. 주조소가 그들을 붙잡아 두었지. 고철 야영지에 사슬로 묶인 채, 오래전에 떠난 주인을 위해 광석을 캐고 고철을 나르고 있네. 주인의 기계들이 그들을 감시하고 있고. 각 야영지의 감시자를 쓰러뜨리고 사슬을 끊어 주게. 세 야영지 모두. 그들을 집으로 보내 주게.',
+  'entities.quests.q_sf_free_the_workers.completion':
+    '{playerName}, 그들이 제 발로 선로를 따라 내려왔네. 한 사람도 빠짐없이. 하늘을 잊었던 사람들처럼 눈을 깜빡이며 올려다보더군. 저 위에서 무엇을 부쉈든, 골짜기가 기억할 것은 바로 이 일일세.',
+  'entities.quests.q_sf_free_the_workers.objectives.0.label': '노동자 야영지 해방',
+  'hudChrome.foundryWorkers.guardedLine':
+    '지금은 안 돼, 감시자들이 지켜보고 있어. 우리가 이야기하는 걸 들키면 모두 프레스 행이야.',
+  'hudChrome.foundryWorkers.unguardedLine':
+    '감시자들이 쓰러졌다고? 그럼 제발, 도망칠 용기가 남아 있을 때 이 사슬을 끊어 줘!',
+  'hudChrome.foundryWorkers.freedLine': '자유다! 이제 집에 간다. 고마워, 정말 고마워!',
+  'hudChrome.foundryWorkers.free': '그들을 풀어 준다',
+  'hudChrome.foundryWorkers.freeAria': '{name}와 이 야영지에 묶인 다른 이들을 풀어 준다',
   'hudChrome.finder.mech.moving_belts':
     '움직이는 벨트(바닥이 몸을 실어 나르며 레버를 당기면 반대로 돈다)',
   'hudChrome.finder.mech.stamping_press':

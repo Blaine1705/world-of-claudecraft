@@ -18986,6 +18986,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_sf_forgefathers_isle.completion':
     '他的初稿。原来风暴先于火焰。那我就知道他想取代的是什么，也知道他的每一具自动机械为何失败了。跟紧我：剩下的我们一起读。',
   'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '找到档案员梅琳',
+  'entities.mobs.sf_chained_miner.name': '戴镣的矿工',
+  'entities.mobs.sf_chained_hauler.name': '戴镣的搬运工',
+  'entities.mobs.sf_freed_laborer.name': '获救的劳工',
+  'entities.quests.q_sf_free_the_workers.title': '解救劳工',
+  'entities.quests.q_sf_free_the_workers.text':
+    '{playerName}，在这片岩架上干活的矿工一个都没下来过。铸造厂把他们扣下了：锁在废料营地里，为一个早已离去的主人挖矿石、搬废料，由他的机器看守着。打倒每个营地的看守，砸开他们的锁链。三个营地都要。送他们回家。',
+  'entities.quests.q_sf_free_the_workers.completion':
+    '{playerName}，他们是自己走着顺着线路下来的，一个不少，眯着眼望着天空，好像早已忘了它的模样。不管你在上面砸毁了什么，山谷会记住的是这件事。',
+  'entities.quests.q_sf_free_the_workers.objectives.0.label': '已解救的劳工营地',
+  'hudChrome.foundryWorkers.guardedLine':
+    '现在不行，朋友，看守还盯着呢。要是被看见我们说话，大家都得进压机。',
+  'hudChrome.foundryWorkers.unguardedLine':
+    '看守倒下了？那求求你，趁我们还有胆子跑，砸开这些锁链吧！',
+  'hudChrome.foundryWorkers.freedLine': '自由了！我们要回家了。谢谢你，朋友，谢谢你！',
+  'hudChrome.foundryWorkers.free': '解救他们',
+  'hudChrome.foundryWorkers.freeAria': '解救{name}和这个营地里其他被锁住的人',
   'hudChrome.finder.mech.moving_belts': '移动传送带（地面会带着你走，拉杆后反向）',
   'hudChrome.finder.mech.stamping_press': '冲压机（锤头沿轨道滑向传送带上的玩家：离开涂色区域）',
   'hudChrome.finder.mech.scalding_vents': '灼热蒸汽口（通道会周期性喷出蒸汽：发光时站上传送带）',

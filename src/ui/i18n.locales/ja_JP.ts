@@ -19965,6 +19965,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_sf_forgefathers_isle.completion':
     '彼の最初の草案。嵐は炎より先だったのね。それなら彼が何を置き換えようとしていたのか、そして彼のオートマトンがなぜすべて失敗したのかが分かる。そばにいて。残りは一緒に読みましょう。',
   'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '記録官メイリンを見つける',
+  'entities.mobs.sf_chained_miner.name': '鎖につながれた鉱夫',
+  'entities.mobs.sf_chained_hauler.name': '鎖につながれた運搬人',
+  'entities.mobs.sf_freed_laborer.name': '解放された労働者',
+  'entities.quests.q_sf_free_the_workers.title': '労働者を解放せよ',
+  'entities.quests.q_sf_free_the_workers.text':
+    '{playerName}、この岩棚で働いていた鉱夫たちは、一人も下りてこなかった。鋳造所が彼らを捕らえたままなんだ。鉄くず置き場で鎖につながれ、とうの昔に去った主のために鉱石を掘り、鉄くずを運び続けている。見張りは主の機械どもだ。各野営地の見張りを倒し、鎖を断ち切ってくれ。三つの野営地すべてだ。彼らを家に帰してやってくれ。',
+  'entities.quests.q_sf_free_the_workers.completion':
+    '{playerName}、彼らは自分の足でラインを下りてきた。一人残らずだ。空を忘れていたかのように、まぶしそうに見上げていたよ。上で何を壊してきたにせよ、谷の者たちが覚えているのはこのことだろう。',
+  'entities.quests.q_sf_free_the_workers.objectives.0.label': '労働者の野営地を解放',
+  'hudChrome.foundryWorkers.guardedLine':
+    '今はだめだ、見張りが見ている。話しているところを見られたら、全員プレス機送りだ。',
+  'hudChrome.foundryWorkers.unguardedLine':
+    '見張りが倒れた？ それなら頼む、逃げる勇気があるうちにこの鎖を断ち切ってくれ！',
+  'hudChrome.foundryWorkers.freedLine': '自由だ！ 家に帰れる。ありがとう、本当にありがとう！',
+  'hudChrome.foundryWorkers.free': '彼らを解放する',
+  'hudChrome.foundryWorkers.freeAria': '{name}と、この野営地で鎖につながれた者たちを解放する',
   'hudChrome.finder.mech.moving_belts': '動くベルト（床が運び、レバーで逆転する）',
   'hudChrome.finder.mech.stamping_press':
     'プレス機（ハンマーはレールを伝ってベルト上の者へ迫る：塗られた帯から降りろ）',

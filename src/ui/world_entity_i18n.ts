@@ -152,6 +152,10 @@ const MOB_IDS = [
   'voltaic_warden',
   'prime_draft',
   'half_built_frame',
+  // The Foundry's chained workers (sim/content/stormbrass_foundry_workers.ts).
+  'sf_chained_miner',
+  'sf_chained_hauler',
+  'sf_freed_laborer',
   'sanctum_boneguard',
   'sanctum_drakonid',
   'raised_bonewalker',
@@ -749,6 +753,7 @@ const QUEST_IDS = [
   'q_sf_stop_the_line',
   'q_sf_first_draft',
   'q_sf_forgefathers_isle',
+  'q_sf_free_the_workers',
 ] as const;
 
 const ZONE_IDS = [

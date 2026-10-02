@@ -1,5 +1,6 @@
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
+import { isFoundryWorkerTemplate } from '../sim/content/stormbrass_foundry_workers';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import {
   dist2d,
@@ -167,7 +168,11 @@ export function resolveNearbyInteractionCandidate(
       preferNpcId !== null &&
       entity.id === preferNpcId &&
       distance <= INTERACT_RANGE;
-    if (entity.kind === 'npc' && (promoted || distance < bestNpcDistance)) {
+    // A Stormbrass Foundry worker is mob-kind but talks like an npc (its gossip).
+    const talks =
+      entity.kind === 'npc' ||
+      (entity.kind === 'mob' && !entity.dead && isFoundryWorkerTemplate(entity.templateId));
+    if (talks && (promoted || distance < bestNpcDistance)) {
       const isGhostHealer = entity.templateId === 'spirit_healer' && player.ghost;
       const isLivingNpc = entity.templateId !== 'spirit_healer' && !player.dead;
       if (isGhostHealer || isLivingNpc) {
