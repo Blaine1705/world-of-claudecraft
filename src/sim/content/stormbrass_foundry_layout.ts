@@ -33,8 +33,8 @@
 // renderer (terrain, set dressing, light) all read this one record.
 
 import type { AuthoredFieldDef, FieldProp, FieldSurface } from '../instances/authored_field/types';
-import { foundryWorkerCampProps } from './stormbrass_foundry_workers';
 import { FOUNDRY_MACHINERY_PROPS } from './stormbrass_foundry_machinery';
+import { foundryWorkerCampProps } from './stormbrass_foundry_workers';
 
 /** The mountain drop under the shelf (the void between the walkways). */
 export const STORMBRASS_FOUNDRY_VOID_HEIGHT = -80;
@@ -84,6 +84,15 @@ export const STORMBRASS_FOUNDRY_ANCHORS = {
 
 /** The Lift Landing where the cable lift arrives (the first vista). */
 export const LIFT_LANDING = { x: 0, z: -224, r: 11, h: 12 } as const;
+/** The cable-lift station: off the landing's EAST rim on its own pier, its
+ *  gate turned to the landing (behind the arrival it stood between the camera
+ *  and the first vista). The renderer draws the kit's station here and the
+ *  collider below closes the rim under its gate. */
+export const LIFT_STATION = {
+  x: LIFT_LANDING.x + LIFT_LANDING.r + 2.6,
+  z: LIFT_LANDING.z,
+  rot: -Math.PI / 2,
+} as const;
 /** The Rail Yard: rails, carts and brass plate stacks, the Hauler's loop. */
 export const RAIL_YARD = { x0: -55, z0: -190, x1: 55, z1: -128, h: 0 } as const;
 
@@ -448,9 +457,18 @@ const SURFACES: FieldSurface[] = [
 ];
 
 const PROPS: FieldProp[] = [
-  // The Lift Landing: the cable-lift station behind the arrival (the lift
-  // cage, its winch house and the lightning rod on its roof).
-  { kind: 'sf_lift_station', x: 0, z: -236, rot: 0, hw: 6, hd: 1.5, h: 12 },
+  // The Lift Landing: the cable-lift station off the east rim (the lift
+  // cage, its winch house and the lightning rod on its roof). The collider is
+  // its gate front, from the rim out (the rest hangs over the drop).
+  {
+    kind: 'sf_lift_station',
+    x: LIFT_STATION.x,
+    z: LIFT_STATION.z,
+    rot: LIFT_STATION.rot,
+    hw: 6.2,
+    hd: 2.6,
+    h: 20,
+  },
   { kind: 'sf_work_lamp', x: -8, z: -218, rot: 0, r: 0.6, h: 4 },
   { kind: 'sf_work_lamp', x: 8, z: -218, rot: 0, r: 0.6, h: 4 },
   // The Rail Yard: the cart line (G1's side) and the brass plate stacks (G2's).

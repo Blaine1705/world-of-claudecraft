@@ -1,7 +1,7 @@
 // The Stormbrass Foundry's working machinery (docs/design/dungeon-rework/
 // stormbrass_foundry.md, section 7): the boilers, engine houses, smokestacks,
-// the pour line's furnace and gantry legs, crate stacks and the workers'
-// camp pieces standing on the walkways. Each is a collider the size of the
+// the pour line's furnace and gantry legs and crate stacks standing on the
+// walkways (the chained workers' camp pieces are stormbrass_foundry_workers.ts). Each is a collider the size of the
 // kit piece the renderer draws over it (src/render/stormbrass_foundry/
 // foundry_kit_plan_core.ts), set back against the terraces' edges, clear of
 // every pack, patrol, gate and the route (tests/stormbrass_foundry_kit.test.ts
@@ -40,19 +40,9 @@ function target(x: number, z: number, rot: number): FieldProp {
   return { kind: 'sf_target_frame', x, z, rot, hw: 1.6, hd: 0.3, h: 3 };
 }
 
-/** A workers' camp: the ore seam a miner picks at (its face toward the camp)
- *  and the scrap heap the others sort. */
-function oreSeam(x: number, z: number, rot: number): FieldProp {
-  return { kind: 'sf_ore_seam', x, z, rot, hw: 1.6, hd: 1, h: 2.6 };
-}
-
 /** A small storm coil on a rim (a winding on insulator legs, a glow on top). */
 function stormCoil(x: number, z: number): FieldProp {
   return { kind: 'sf_storm_coil', x, z, rot: 0, r: 1, h: 6.5 };
-}
-
-function scrapHeap(x: number, z: number): FieldProp {
-  return { kind: 'sf_scrap_heap', x, z, rot: 0.4, r: 1.5, h: 2.2 };
 }
 
 /** The pour line on the crane pad: the furnace on the west lip (its mouth to
@@ -70,17 +60,17 @@ export const FOUNDRY_POUR_LINE = {
 
 export const FOUNDRY_MACHINERY_PROPS: readonly FieldProp[] = [
   // ---- The Rail Yard: boilers and stacks on the south lip, engine houses on
-  // the east and west lips, crate stacks by the sidings, and camp A.
+  // the east and west lips, crate stacks by the sidings. (The chained workers'
+  // camps are the workers module's props, stormbrass_foundry_workers.ts: camp A
+  // works the south-east corner, so the east engine house stands north of it.)
   boiler(-20, -186.5, 0),
   boiler(20, -186.5, 0),
   stack(-12.5, -188),
   stack(12.5, -188),
-  engine(51, -183, WEST),
+  engine(51, -164, WEST),
   engine(-51, -176, EAST),
   crates(-52, -142, EAST),
   crates(52, -150, EAST),
-  oreSeam(52.6, -170.5, WEST),
-  scrapHeap(47, -175),
   // The yard gantry spanning the Hauler's loop: its two leg bogies (the
   // gantry itself is one render piece over them).
   { kind: 'sf_gantry_leg', x: -27, z: -160, rot: 0, hw: 1.8, hd: 3.1, h: 16 },
@@ -122,13 +112,12 @@ export const FOUNDRY_MACHINERY_PROPS: readonly FieldProp[] = [
   // ---- The Crane Landing behind the press: the bridge crane's engine house.
   engine(19.5, 7, 0),
   crates(-21, 8, 0),
-  // ---- The Range Lanes: target frames down the lanes, a crate stack, camp B.
+  // ---- The Range Lanes: target frames down the lanes (west of the workers'
+  // camp B at -76, -70) and a crate stack.
+  target(-92, -73.5, 0),
   target(-86, -73.5, 0),
-  target(-74, -73.5, 0),
   target(-64, -73.5, 0),
   crates(-101.5, -50, EAST),
-  oreSeam(-92, -74.9, 0),
-  scrapHeap(-100.5, -68),
   // ---- The Proving Range: the range officer's observation post in the
   // south-east corner, behind the firing line.
   { kind: 'sf_observation_post', x: -55.5, z: -16.5, rot: WEST, hw: 2.1, hd: 2.2, h: 9 },
@@ -143,10 +132,8 @@ export const FOUNDRY_MACHINERY_PROPS: readonly FieldProp[] = [
   // The plan tables' two work lamps.
   { kind: 'sf_work_lamp', x: -30, z: 84, rot: 0, r: 0.6, h: 4 },
   { kind: 'sf_work_lamp', x: 30, z: 84, rot: 0, r: 0.6, h: 4 },
-  // ---- The Gantry Approach: camp C by the crane yard, a boiler by the
+  // ---- The Gantry Approach: a boiler by the
   // catwalk, an engine house and its stack by the stair, a crate stack.
-  oreSeam(-43.6, 122, EAST),
-  scrapHeap(-35.5, 119),
   boiler(-24, 165.6, 0),
   engine(24, 120, 0),
   stack(32.5, 119.5),

@@ -23,12 +23,17 @@ import { HAULER_LOOP, STORMBRASS_FOUNDRY_SPAWNS } from '../../sim/content/stormb
 import {
   CRANE_BRIDGE,
   LIFT_LANDING,
+  LIFT_STATION,
   MAIN_LINE_BELTS,
   STAMPING_PRESS,
   STORMBRASS_FOUNDRY_FIELD,
   STORMBRASS_FOUNDRY_VOID_HEIGHT,
 } from '../../sim/content/stormbrass_foundry_layout';
 import { FOUNDRY_POUR_LINE } from '../../sim/content/stormbrass_foundry_machinery';
+import {
+  FOUNDRY_WORKER_CAMPS,
+  type FoundryWorkerCampId,
+} from '../../sim/content/stormbrass_foundry_workers';
 import {
   authoredFieldHeight,
   authoredFieldSurfaceAt,
@@ -105,6 +110,13 @@ export const FOUNDRY_KIT_SIZES = {
   /** The model frame's height (the Prime Draft landmark is one, scaled up). */
   modelFrameHeight: 7,
   pipeRunTile: 4,
+  /** The workers' camp pieces as built: the seam's half width, the heap's
+   *  radius, the chain post's height, the cart's half length. */
+  oreSeamHalf: 1.6,
+  oreSeamHalfDepth: 1.06,
+  scrapHeapRadius: 1.5,
+  chainPostHeight: 1.5,
+  scrapCartHalf: 1.1,
 } as const;
 
 // ---- the sim props --------------------------------------------------------------------
@@ -181,6 +193,10 @@ export function foundryPieceForProp(p: FieldProp): string {
       return 'Kit_ScrapHeap';
     case 'sf_ore_seam':
       return 'Kit_OreSeam';
+    case 'sf_chain_post':
+      return 'Kit_ChainPost';
+    case 'sf_scrap_cart':
+      return 'Kit_ScrapCart';
     case 'sf_observation_post':
       return 'Kit_ObservationPost';
     case 'sf_storm_coil':
@@ -192,11 +208,26 @@ export function foundryPieceForProp(p: FieldProp): string {
 
 /** The scale a prop's piece draws at, fitted to its collider where one piece
  *  serves several sizes. */
-function propScale(p: FieldProp, piece: string): { scale: number; stretch?: number } {
+function propScale(
+  p: FieldProp,
+  piece: string,
+): { scale: number; stretch?: number; scaleY?: number } {
   if (piece === 'Kit_CraneMast') return { scale: (p.h ?? 16) / FOUNDRY_KIT_SIZES.craneMastTop };
   if (piece === 'Kit_PlateStack') return { scale: Math.max(0.7, (p.h ?? 3) / 3) };
   if (piece === 'Kit_Bunker') return { scale: 1, stretch: (p.hw ?? 3.5) / 3.5 };
   if (piece === 'Kit_PourFrame') return { scale: (p.h ?? 9) / 9 };
+  // The workers' camp pieces fit the workers module's colliders (a seam and a
+  // post well over a worker's head, a cart a hauler can load).
+  if (piece === 'Kit_OreSeam') {
+    // Its depth fits the collider (nothing of the rock stands outside it); its
+    // width and height take the collider's width, so the seam towers.
+    const scale = (p.hd ?? 1) / FOUNDRY_KIT_SIZES.oreSeamHalfDepth;
+    const wide = (p.hw ?? 1.6) / FOUNDRY_KIT_SIZES.oreSeamHalf / scale;
+    return { scale, stretch: wide, scaleY: wide };
+  }
+  if (piece === 'Kit_ScrapHeap') return { scale: (p.r ?? 1.5) / FOUNDRY_KIT_SIZES.scrapHeapRadius };
+  if (piece === 'Kit_ChainPost') return { scale: (p.h ?? 1.5) / FOUNDRY_KIT_SIZES.chainPostHeight };
+  if (piece === 'Kit_ScrapCart') return { scale: (p.hd ?? 1.1) / FOUNDRY_KIT_SIZES.scrapCartHalf };
   return { scale: p.scale ?? 1 };
 }
 
@@ -215,8 +246,9 @@ export function bridgeCraneProp(): FieldProp | null {
   return FIELD.props.find(isBridgeCrane) ?? null;
 }
 
-/** Where the lift station is drawn: off the Lift Landing's east rim. */
-export const FOUNDRY_LIFT_STATION = { x: LIFT_LANDING.x + LIFT_LANDING.r + 2.6, z: LIFT_LANDING.z };
+/** Where the lift station is drawn: off the Lift Landing's east rim (the sim
+ *  prop's own spot, stormbrass_foundry_layout.ts LIFT_STATION). */
+export const FOUNDRY_LIFT_STATION = LIFT_STATION;
 
 /** Every sim prop's kit placement. */
 export function planFoundryPropPlacements(): FoundryKitPlacement[] {
@@ -224,16 +256,14 @@ export function planFoundryPropPlacements(): FoundryKitPlacement[] {
   for (const p of FIELD.props) {
     const piece = foundryPieceForProp(p);
     if (!piece) continue;
-    const { scale, stretch } = propScale(p, piece);
+    const { scale, stretch, scaleY } = propScale(p, piece);
     const at: FoundryKitPlacement = { piece, x: p.x, z: p.z, rot: p.rot, scale };
     if (stretch !== undefined) at.stretch = stretch;
+    if (scaleY !== undefined) at.scaleY = scaleY;
     // The lift station stands off the landing's EAST rim on its own pier, its
-    // gate turned to the landing (its collider keeps the back lip): behind
-    // the arrival it would stand between the camera and the first vista.
+    // gate turned to the landing (the sim prop stands there too): it takes
+    // the landing's floor, not the drop under it.
     if (piece === 'Kit_LiftStation') {
-      at.x = FOUNDRY_LIFT_STATION.x;
-      at.z = FOUNDRY_LIFT_STATION.z;
-      at.rot = -Math.PI / 2;
       at.y = LIFT_LANDING.h;
       const pier = 0.62;
       const top = LIFT_LANDING.h - 0.1;
@@ -331,7 +361,14 @@ const TOWER_SURFACE = 'coil_crown';
 function inLiftStation(x: number, z: number): boolean {
   const s = FIELD.props.find((p) => p.kind === 'sf_lift_station');
   if (!s) return false;
-  return Math.abs(x - s.x) <= (s.hw ?? 6) + 1 && Math.abs(z - s.z) <= (s.hd ?? 1.5) + 2.5;
+  // Into the station's own frame (it is turned to face the landing).
+  const c = Math.cos(s.rot);
+  const sn = Math.sin(s.rot);
+  const dx = x - s.x;
+  const dz = z - s.z;
+  const lx = dx * c - dz * sn;
+  const lz = dx * sn + dz * c;
+  return Math.abs(lx) <= (s.hw ?? 6) + 1 && Math.abs(lz) <= (s.hd ?? 1.5) + 2.5;
 }
 
 /** Every edge piece: catwalk railings on the balustraded walks and stairs and
@@ -457,8 +494,8 @@ function slenderPier(x: number, z: number, top: number, i: number): FoundryKitPl
 export const PRESS_CROWN_LIFT = FOUNDRY_KIT_SIZES.pressCrownLift;
 
 /** The belts' side frames (both sides of every belt, end to end), their end
- *  drums at the chute, and the Stamping Press: the crown on its five posts,
- *  the four rams over the belts. */
+ *  drums at the chute, and the Stamping Press's crown on its five posts (the
+ *  hammers and their carriages are the sliding rig's, foundry_press.ts). */
 export function planMainLine(): FoundryKitPlacement[] {
   const out: FoundryKitPlacement[] = [];
   const len = MAIN_LINE_BELTS.z1 - MAIN_LINE_BELTS.z0;
@@ -517,19 +554,9 @@ export function planMainLine(): FoundryKitPlacement[] {
   for (const x of [-21, 21])
     for (const z of [-38, -24, -19, -8])
       out.push({ piece: 'Kit_FloorGrille', x, z, rot: Math.PI / 2, scale: 1.3, lift: 0.01 });
-  for (const x of MAIN_LINE_BELTS.xs) {
-    // The rams down to the hammers' tops (foundry_press.ts hangs the heads
-    // 6.4 under the old 13 yd head; their tops sit near 7.9).
-    out.push({
-      piece: 'Kit_PressRam',
-      x,
-      z: STAMPING_PRESS.z - 3,
-      rot: 0,
-      scale: 1,
-      y: g + 7.9,
-      scaleY: (PRESS_CROWN_LIFT - 7.9) / FOUNDRY_KIT_SIZES.pressRamLength,
-    });
-  }
+  // No fixed rams under the crown: the hammers ride their rails to the
+  // riders (foundry_press.ts), and a static ram would clip one parked on the
+  // press-end stop.
   return out;
 }
 
@@ -755,42 +782,16 @@ export function planSkyline(): FoundryKitPlacement[] {
 
 // ---- the workers' camps and the floor litter -------------------------------------------
 
-/** The three camps where chained workers labour (the WORKERS agent's spots,
- *  rewired to the workers module at integration): instance-local, with the
- *  floor they stand on. Each is about 6 yd across, its centre kept walkable. */
+/** The three camps where chained workers labour: the workers module's own
+ *  posts (sim/content/stormbrass_foundry_workers.ts FOUNDRY_WORKER_CAMPS is the
+ *  single source of truth). Their seam, heap, post and cart are sim props, so
+ *  planFoundryPropPlacements draws them with the kit's camp pieces. */
 export const FOUNDRY_WORKER_CAMP_SPOTS: readonly {
-  id: 'A' | 'B' | 'C';
+  id: FoundryWorkerCampId;
   x: number;
   z: number;
   floor: number;
-}[] = [
-  { id: 'A', x: 44, z: -170, floor: 0 },
-  { id: 'B', x: -96, z: -72, floor: 10 },
-  { id: 'C', x: -38, z: 124, floor: 25 },
-];
-
-/** Each camp's knee-high pieces (the ore seam and scrap heap are sim props):
- *  the chain post the workers are chained to, a scrap cart. */
-export function planWorkerCamps(): FoundryKitPlacement[] {
-  const out: FoundryKitPlacement[] = [];
-  const offsets: Record<string, { post: [number, number]; cart: [number, number, number] }> = {
-    A: { post: [2.2, 0.4], cart: [-3.2, -2.8, 0.6] },
-    B: { post: [0.6, -1.8], cart: [3.6, 1.6, -0.4] },
-    C: { post: [-2.0, -0.6], cart: [1.6, -3.4, 1.1] },
-  };
-  for (const c of FOUNDRY_WORKER_CAMP_SPOTS) {
-    const o = offsets[c.id];
-    out.push({ piece: 'Kit_ChainPost', x: c.x + o.post[0], z: c.z + o.post[1], rot: 0, scale: 1 });
-    out.push({
-      piece: 'Kit_ScrapCart',
-      x: c.x + o.cart[0],
-      z: c.z + o.cart[1],
-      rot: o.cart[2],
-      scale: 1,
-    });
-  }
-  return out;
-}
+}[] = FOUNDRY_WORKER_CAMPS.map((c) => ({ id: c.id, x: c.post.x, z: c.post.z, floor: c.floor }));
 
 /** Knee-high litter along the terraces' edges: crates, ingot stacks, oil
  *  drums, sandbag berms on the range, workbenches by the engineers. Every
@@ -822,8 +823,8 @@ export const FOUNDRY_LITTER: readonly [string, number, number, number][] = [
   // The Crane Landing.
   ['Kit_DrumCluster', 10, 8.6, 0],
   // The Range Lanes and the Proving Range.
+  ['Kit_Sandbags', -92, -71.6, 0],
   ['Kit_Sandbags', -86, -71.6, 0],
-  ['Kit_Sandbags', -74, -71.6, 0],
   ['Kit_Sandbags', -64, -71.6, 0],
   ['Kit_Workbench', -99.5, -61, -Math.PI / 2],
   ['Kit_Sandbags', -111, -9, Math.PI / 2],
@@ -1233,7 +1234,6 @@ export function planFoundryKitPlacements(): FoundryKitPlacement[] {
     ...planPourLine(),
     ...planMoltenChannel(),
     ...planSkyline(),
-    ...planWorkerCamps(),
     ...planLitter(),
     ...planCables(),
     ...planTargetLine(),
@@ -1558,5 +1558,9 @@ export const FOUNDRY_GATE_PIECES: readonly string[] = [
 ];
 
 /** The pieces another painter adopts through foundryKitPiece (the moving
- *  press: foundry_press.ts). */
-export const FOUNDRY_ADOPTED_PIECES: readonly string[] = ['Kit_PressHammer', 'Kit_PressCarriage'];
+ *  press: foundry_press.ts takes the carriage, the hammer and the ram). */
+export const FOUNDRY_ADOPTED_PIECES: readonly string[] = [
+  'Kit_PressHammer',
+  'Kit_PressCarriage',
+  'Kit_PressRam',
+];

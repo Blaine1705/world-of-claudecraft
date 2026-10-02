@@ -12,24 +12,39 @@
 // The rails are fixed and render-only (no floor, no collider): the hammers
 // come to the players, the map never shifts.
 //
-// The carriage and the hammer are built procedurally here (carriageParts,
-// hammerParts: riveted, ribbed, collared), each as its own PartBin so the
-// Blender kit's Kit_PressCarriage and Kit_PressHammer can replace either
-// builder without touching the rig.
+// The carriage and the hammer are the Blender kit's Kit_PressCarriage and
+// Kit_PressHammer (foundry_kit.ts foundryKitPiece; the interior awaits the kit
+// before it builds, so they are compiled with the rest of the kit behind the
+// interior's gate), the hammer stretched onto the strike's footprint
+// (foundry_press_core.ts pressHammerKitScale), and Kit_PressRam is the
+// telescoping ram between them. Under the kit carriage hangs
+// the procedural motor housing and sleeve the telescoping ram slides in. If
+// the kit failed to load, the procedural carriage and hammer (carriageParts,
+// hammerParts) draw instead: the rig never depends on the file.
 
 import * as THREE from 'three';
 import { MAIN_LINE_BELTS, STAMPING_PRESS } from '../../sim/content/stormbrass_foundry_layout';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import {
+  FOUNDRY_SLOTS,
+  type FoundryBakedPiece,
+  foundryKitPiece,
+  foundryPieceMaterial,
+} from './foundry_kit';
 import { PartBin } from './foundry_mesh';
 import {
   HAMMER_FACE_Y,
   HAMMER_HALF_LENGTH,
   HAMMER_HALF_WIDTH,
   HAMMER_TRAVEL,
+  KIT_PRESS_HAMMER,
+  KIT_PRESS_RAM_LENGTH,
   PRESS_HOME_Z,
   PRESS_RAIL_STOPS,
+  PRESS_RAIL_TOP,
   PRESS_RAIL_Y,
   PRESS_RAIL_Z0,
+  pressHammerKitScale,
 } from './foundry_press_core';
 
 type Ground = (x: number, z: number) => number;
@@ -152,6 +167,11 @@ function gantryParts(bin: PartBin, ground: Ground): void {
 /** A carriage, about its rail's underside at (0, 0, 0): the trolley clasping
  *  the rail on four brass wheels, its motor housing and the ram's sleeve. */
 function carriageParts(bin: PartBin): void {
+  trolleyParts(bin);
+  sleeveParts(bin);
+}
+
+function trolleyParts(bin: PartBin): void {
   bin.box('iron', 0, -0.52, 0, 1.2, 0.4, 1.75);
   bin.box('iron', 0, -0.98, 0, 0.95, 0.1, 1.5);
   for (const side of [-1, 1]) {
@@ -178,7 +198,11 @@ function carriageParts(bin: PartBin): void {
     }
   }
   for (const end of [-1, 1]) bin.box('hazard', 0, -0.52, end * 1.76, 1.2, 0.36, 0.02);
-  // The motor housing and the sleeve the ram slides in, banded in brass.
+}
+
+/** The motor housing and the sleeve the ram slides in, banded in brass (under
+ *  the kit carriage's cylinder mount, or the procedural trolley). */
+function sleeveParts(bin: PartBin): void {
   bin.cyl('brass', 0, -1.5, -1.08, 0, 1.0, 1.1, 16);
   bin.cyl('iron', 0, -SLEEVE_DROP, -1.5, 0, 0.72, 0.8, 16);
   bin.ring('brass', 0, -SLEEVE_DROP + 0.12, 0, 0.74, 0.1);
@@ -225,13 +249,33 @@ function ramParts(bin: PartBin): void {
   for (const end of [-1, 1]) bin.cyl('brass', 0, 0, 1, end * 2.5, 0.17, 0.17, 8);
 }
 
+/** One plain mesh per slot of an adopted kit piece under a group, sharing the
+ *  kit's baked geometry and its slot materials (no new program, no copy). */
+function kitPart(name: string, piece: string, baked: FoundryBakedPiece): THREE.Group {
+  const group = new THREE.Group();
+  group.name = name;
+  for (const slot of FOUNDRY_SLOTS) {
+    const g = baked[slot];
+    if (!g) continue;
+    const mesh = new THREE.Mesh(g, foundryPieceMaterial(piece, slot));
+    mesh.name = `${name}:${slot}`;
+    mesh.castShadow = slot === 'metal' || slot === 'paint';
+    mesh.receiveShadow = mesh.castShadow;
+    group.add(mesh);
+  }
+  return group;
+}
+
 /** Give every mesh of `part` its place each frame: `place` writes the part's
  *  transform, then each mesh takes it (one matrix write a mesh). */
 function drive(part: THREE.Object3D, place: () => void): void {
   for (const child of part.children) {
     const m = child as THREE.Mesh;
     // Its own copy: three recomputes a bound in place.
-    m.geometry.boundingSphere = RIG_BOUND.clone();
+    // (An adopted kit geometry is shared by the four belts' meshes and only
+    // by them: it takes the rig's bound once.)
+    if (m.geometry.boundingSphere?.radius !== RIG_BOUND.radius)
+      m.geometry.boundingSphere = RIG_BOUND.clone();
     m.onBeforeRender = () => {
       place();
       part.updateMatrix();
@@ -252,6 +296,10 @@ export function buildPressHammers(ground: Ground): THREE.Group {
   const shadowGeo = new THREE.PlaneGeometry(HAMMER_HALF_WIDTH * 2, HAMMER_HALF_LENGTH * 2);
   shadowGeo.rotateX(-Math.PI / 2);
   shadowGeo.boundingSphere = RIG_BOUND.clone();
+  const kitCarriage = foundryKitPiece('Kit_PressCarriage');
+  const kitHammer = foundryKitPiece('Kit_PressHammer');
+  const kitRam = foundryKitPiece('Kit_PressRam');
+  const fit = pressHammerKitScale();
   MAIN_LINE_BELTS.xs.forEach((x, i) => {
     const state = FOUNDRY_PRESS_HAMMERS[i];
     const floor = ground(x, PRESS_HOME_Z);
@@ -259,31 +307,55 @@ export function buildPressHammers(ground: Ground): THREE.Group {
     const faceY = (): number => floor + HAMMER_FACE_Y - state.drop * HAMMER_TRAVEL;
 
     const carriageBin = new PartBin();
-    carriageParts(carriageBin);
+    if (kitCarriage) sleeveParts(carriageBin);
+    else carriageParts(carriageBin);
     const carriage = carriageBin.build(`stormbrassPressCarriage:${i}`);
     carriage.position.set(x, railY, state.z);
     drive(carriage, () => {
       carriage.position.z = state.z;
     });
     group.add(carriage);
+    if (kitCarriage) {
+      // The kit trolley: its wheels on the rail's top, its body clasping the
+      // beam down to the sleeve's motor housing.
+      const trolley = kitPart(`stormbrassPressTrolley:${i}`, 'Kit_PressCarriage', kitCarriage);
+      trolley.position.set(x, railY + PRESS_RAIL_TOP, state.z);
+      drive(trolley, () => {
+        trolley.position.z = state.z;
+      });
+      group.add(trolley);
+    }
 
-    const hammerBin = new PartBin();
-    hammerParts(hammerBin);
-    const hammer = hammerBin.build(`stormbrassHammer:${i}`);
+    let hammer: THREE.Object3D;
+    if (kitHammer) {
+      hammer = kitPart(`stormbrassHammer:${i}`, 'Kit_PressHammer', kitHammer);
+      hammer.scale.set(fit.x, 1, fit.z);
+    } else {
+      const hammerBin = new PartBin();
+      hammerParts(hammerBin);
+      hammer = hammerBin.build(`stormbrassHammer:${i}`);
+    }
     hammer.position.set(x, faceY(), state.z);
     drive(hammer, () => {
       hammer.position.set(x, faceY(), state.z);
     });
     group.add(hammer);
 
-    const ramBin = new PartBin();
-    ramParts(ramBin);
-    const ram = ramBin.build(`stormbrassPressRam:${i}`);
+    let ram: THREE.Object3D;
+    // The kit ram is built KIT_PRESS_RAM_LENGTH tall from its foot; the
+    // procedural one a unit tall.
+    const ramUnit = kitRam ? KIT_PRESS_RAM_LENGTH : 1;
+    if (kitRam) ram = kitPart(`stormbrassPressRam:${i}`, 'Kit_PressRam', kitRam);
+    else {
+      const ramBin = new PartBin();
+      ramParts(ramBin);
+      ram = ramBin.build(`stormbrassPressRam:${i}`);
+    }
     const stretch = (): void => {
-      const crown = faceY() + HEAD_H + 0.5;
+      const crown = faceY() + (kitHammer ? KIT_PRESS_HAMMER.headTop : HEAD_H + 0.5);
       ram.position.set(x, crown, state.z);
       // Up into the sleeve, whatever the drop: the ram never shows a gap.
-      ram.scale.y = Math.max(0.2, railY - SLEEVE_DROP + 1.4 - crown);
+      ram.scale.y = Math.max(0.2, railY - SLEEVE_DROP + 1.4 - crown) / ramUnit;
     };
     stretch();
     drive(ram, stretch);

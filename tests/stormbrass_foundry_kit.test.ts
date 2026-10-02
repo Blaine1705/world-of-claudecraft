@@ -72,6 +72,14 @@ import {
   craneBridgeDeck,
   planFoundryLights,
 } from '../src/render/stormbrass_foundry/foundry_plan_core';
+import {
+  HAMMER_HALF_LENGTH,
+  HAMMER_HALF_WIDTH,
+  KIT_PRESS_HAMMER,
+  KIT_PRESS_RAM_LENGTH,
+  PRESS_RAIL_TOP,
+  pressHammerKitScale,
+} from '../src/render/stormbrass_foundry/foundry_press_core';
 import { HAULER_LOOP, STORMBRASS_FOUNDRY_GATES } from '../src/sim/content/stormbrass_foundry';
 import {
   CRANE_BRIDGE,
@@ -82,6 +90,7 @@ import {
   FOUNDRY_MACHINERY_PROPS,
   FOUNDRY_POUR_LINE,
 } from '../src/sim/content/stormbrass_foundry_machinery';
+import { FOUNDRY_WORKER_CAMPS } from '../src/sim/content/stormbrass_foundry_workers';
 import {
   authoredFieldCliffRuns,
   authoredFieldHeight,
@@ -275,7 +284,12 @@ describe('Stormbrass Foundry kit: the piece list and the shipped GLB', () => {
     for (const piece of FOUNDRY_ADOPTED_PIECES) used.add(piece);
     expect([...used].sort()).toEqual([...shipped].sort());
     // The pieces the other painters adopt exist (foundryKitPiece).
-    for (const piece of ['Kit_PressHammer', 'Kit_PressCarriage', 'Kit_GreatCoilGlow'])
+    for (const piece of [
+      'Kit_PressHammer',
+      'Kit_PressCarriage',
+      'Kit_PressRam',
+      'Kit_GreatCoilGlow',
+    ])
       expect(shipped.has(piece), piece).toBe(true);
   });
 
@@ -394,6 +408,25 @@ describe('Stormbrass Foundry kit: the piece list and the shipped GLB', () => {
     // The ladle hangs under its trunnions; the hammer strikes with its origin.
     expect((shapes.get('Kit_Ladle') as Shape).min[1]).toBeGreaterThan(-3.6);
     expect(Math.abs((shapes.get('Kit_PressHammer') as Shape).min[1])).toBeLessThan(0.1);
+    // The sliding press rig (foundry_press.ts) adopts the hammer, the carriage
+    // and the ram on these measurements: the stretched head covers exactly
+    // the press strip (the belt's width, the strip's length), the ram is a
+    // foot-origin rod, the carriage hangs under its wheels' tread.
+    const hammer = shapes.get('Kit_PressHammer') as Shape;
+    expect(hammer.max[0]).toBeCloseTo(KIT_PRESS_HAMMER.halfWidth, 1);
+    expect(hammer.max[2]).toBeCloseTo(KIT_PRESS_HAMMER.halfLength, 1);
+    expect(hammer.max[1]).toBeCloseTo(KIT_PRESS_HAMMER.rodTop, 1);
+    const fit = pressHammerKitScale();
+    expect(hammer.max[0] * fit.x).toBeCloseTo(HAMMER_HALF_WIDTH, 1);
+    expect(hammer.max[2] * fit.z).toBeCloseTo(HAMMER_HALF_LENGTH, 1);
+    const ram = shapes.get('Kit_PressRam') as Shape;
+    expect(Math.abs(ram.min[1])).toBeLessThan(0.05);
+    expect(ram.max[1]).toBeCloseTo(KIT_PRESS_RAM_LENGTH, 1);
+    const carriage = shapes.get('Kit_PressCarriage') as Shape;
+    expect(carriage.min[1]).toBeLessThan(-2);
+    expect(carriage.max[1]).toBeLessThan(PRESS_RAIL_TOP);
+    // No fixed ram stands under the crown any more (a parked hammer clipped it).
+    expect(planFoundryKitPlacements().some((p) => p.piece === 'Kit_PressRam')).toBe(false);
   });
 });
 
@@ -456,22 +489,42 @@ describe('Stormbrass Foundry kit: the layout props', () => {
     }
   });
 
-  it('leaves the three workers camps walkable at their centre, on their floor', () => {
-    expect(FOUNDRY_WORKER_CAMP_SPOTS).toHaveLength(3);
-    for (const c of FOUNDRY_WORKER_CAMP_SPOTS) {
-      expect(floor(c.x, c.z), c.id).toBeCloseTo(c.floor, 3);
-      for (const p of FIELD.props) {
-        if (p.r === undefined && p.hw === undefined) continue;
-        expect(colliderDistance(p, c.x, c.z), `camp ${c.id} vs ${p.kind}`).toBeGreaterThan(1.2);
+  it("dresses the workers' FINAL camps: the workers module's posts, each prop a kit piece", () => {
+    // The single source of truth is the workers module (the env pass once
+    // dressed the briefed spots): the plan's spots are its posts, verbatim.
+    expect(FOUNDRY_WORKER_CAMP_SPOTS.map((c) => [c.id, c.x, c.z, c.floor])).toEqual([
+      ['A', 42.5, -179.5, 0],
+      ['B', -76, -70, 10],
+      ['C', -35.5, 127, 25],
+    ]);
+    const placed = planFoundryPropPlacements();
+    const at = (piece: string, x: number, z: number) =>
+      placed.find((p) => p.piece === piece && p.x === x && p.z === z);
+    for (const c of FOUNDRY_WORKER_CAMPS) {
+      expect(floor(c.post.x, c.post.z), c.id).toBeCloseTo(c.floor, 3);
+      // The post stands well over a worker's head, the seam towers over them.
+      expect(at('Kit_ChainPost', c.post.x, c.post.z)?.scale, c.id).toBeCloseTo(2, 3);
+      const seam = at('Kit_OreSeam', c.seam.x, c.seam.z);
+      expect((seam?.scale ?? 0) * (seam?.stretch ?? 0), c.id).toBeCloseTo(2, 3);
+      expect((seam?.scale ?? 0) * (seam?.scaleY ?? 0), c.id).toBeCloseTo(2, 3);
+      expect(at('Kit_ScrapHeap', c.heap.x, c.heap.z)?.scale, c.id).toBeCloseTo(1.2, 3);
+      expect(at('Kit_ScrapCart', c.cart.x, c.cart.z)?.rot, c.id).toBe(c.cart.rot);
+      // No machinery collider (the env's boilers, engine houses, targets,
+      // crates) stands where a worker stands or within the camp's working room.
+      const stands = [...c.workers, c.heap.stand, c.cart.stand, c.post, c.leave];
+      for (const p of FOUNDRY_MACHINERY_PROPS) {
+        for (const w of stands)
+          expect(colliderDistance(p, w.x, w.z), `camp ${c.id} vs ${p.kind}`).toBeGreaterThan(1.5);
+        for (const q of [c.seam, c.heap, c.cart])
+          expect(colliderDistance(p, q.x, q.z), `camp ${c.id} prop vs ${p.kind}`).toBeGreaterThan(
+            3.5,
+          );
       }
-      // Its ore seam and scrap heap stand within reach of it.
-      const near = FOUNDRY_MACHINERY_PROPS.filter(
-        (p) =>
-          (p.kind === 'sf_ore_seam' || p.kind === 'sf_scrap_heap') &&
-          Math.hypot(p.x - c.x, p.z - c.z) < 10,
-      );
-      expect(near.map((p) => p.kind).sort(), c.id).toEqual(['sf_ore_seam', 'sf_scrap_heap']);
     }
+    // The camps' kinds are the workers module's alone (no second seam or heap).
+    expect(
+      FOUNDRY_MACHINERY_PROPS.filter((p) => p.kind === 'sf_ore_seam' || p.kind === 'sf_scrap_heap'),
+    ).toEqual([]);
   });
 });
 
@@ -875,6 +928,9 @@ describe('Stormbrass Foundry kit: the Crane Bridge swing', () => {
 
 /** Pieces allowed in a walkway's head room without a collider, and why. */
 const HEAD_ROOM_ALLOWANCE: Readonly<Record<string, number>> = {
+  // The workers' chain post at twice its built size: the loose chain off its
+  // ring hangs a little over a knee beside the post's own collider.
+  Kit_ChainPost: 2,
   // A railing on the lip, inside the cliff collider's reach (the Temple's
   // balustrade precedent).
   Kit_RailingEdge: 1.9,
@@ -986,11 +1042,6 @@ describe('Stormbrass Foundry kit: nothing stands in a walkway without a collider
           if (box.min[1] > floor(p.x, p.z) + 14.2) failures.push(`${tag}: over its posts`);
           continue;
         }
-        case 'Kit_PressRam':
-          // Hangs from the crown.
-          if (box.max[1] < floor(p.x, p.z) + FOUNDRY_KIT_SIZES.pressCrownLift - 0.3)
-            failures.push(`${tag}: short of the crown`);
-          continue;
         case 'Kit_LadleRail': {
           // Carried by the furnace's hood and the east post.
           const pad = floor(FOUNDRY_POUR_LINE.posts[0], FOUNDRY_POUR_LINE.railZ);

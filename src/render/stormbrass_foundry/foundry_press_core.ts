@@ -30,6 +30,27 @@ export const HAMMER_TRAVEL = HAMMER_FACE_Y - 0.18;
 export const HAMMER_HALF_WIDTH = MAIN_LINE_BELTS.halfWidth + 0.1;
 export const HAMMER_HALF_LENGTH = TOCK_TUNING.pressLength / 2;
 
+/** The Blender kit's press pieces as built (the kit contract, audited against
+ *  the shipped GLB by tests/stormbrass_foundry_kit.test.ts): Kit_PressHammer's
+ *  origin is its striking face (the head to `headTop`, its own rod to
+ *  `rodTop`); Kit_PressCarriage's origin is its wheels' contact on the rail's
+ *  top. */
+export const KIT_PRESS_HAMMER = { halfWidth: 2.43, halfLength: 2.65, headTop: 2.8, rodTop: 7 };
+/** Kit_PressRam's height as built, from its foot. */
+export const KIT_PRESS_RAM_LENGTH = 5;
+/** The rail's top (the carriage wheels' tread) over its underside. */
+export const PRESS_RAIL_TOP = 1.07;
+
+/** The kit hammer's stretch onto the strike's footprint: the belt's width and
+ *  the press strip's length exactly (the head is what the strip telegraphs),
+ *  its height as built. */
+export function pressHammerKitScale(): { x: number; z: number } {
+  return {
+    x: HAMMER_HALF_WIDTH / KIT_PRESS_HAMMER.halfWidth,
+    z: HAMMER_HALF_LENGTH / KIT_PRESS_HAMMER.halfLength,
+  };
+}
+
 /** The share of the warning the carriage spends sliding to its stop. */
 export const PRESS_SLIDE_SHARE = 0.52;
 /** The slam's fall, the held bite and the climb back (seconds). */

@@ -25,7 +25,6 @@ import { ensureFoundryMountains } from './foundry_mountains';
 import { foundryHash } from './foundry_plan_core';
 import { buildFoundrySky } from './foundry_sky';
 import { buildFoundryVents } from './foundry_vents';
-import { buildFoundryWorkerCamps } from './foundry_worker_camps';
 
 export interface StormbrassFoundryInteriorDeps {
   lowGfx: boolean;
@@ -156,8 +155,6 @@ export async function buildStormbrassFoundryInterior(
   const decals = buildFoundryFloorDecals(deps.lowGfx);
   if (decals) group.add(decals);
   group.add(buildFoundryDressing(ground, deps.lowGfx, density));
-  // The chained workers' camps (stand-ins until the kit carries their kinds).
-  group.add(buildFoundryWorkerCamps(ground));
   group.add(buildFoundryGates(ox, oz, ground));
   // Line-Master Tock's Scalding Vents: the walkway grilles and their jets.
   group.add(buildFoundryVents(ground, deps.lowGfx));

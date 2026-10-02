@@ -10,9 +10,9 @@
 // Pure data: the camps (instance-local spots on the authored field, every one
 // verified on the walkable floor by tests/stormbrass_foundry_workers.test.ts),
 // the worker templates, the quest and the deed id. The behavior is
-// encounters/stormbrass_foundry/workers.ts; the camp props draw from
-// render/stormbrass_foundry/foundry_worker_camps.ts until the Blender kit
-// carries the same prop kinds.
+// encounters/stormbrass_foundry/workers.ts; the camp props are drawn by the
+// Blender kit's own pieces (render/stormbrass_foundry/foundry_kit_plan_core.ts
+// foundryPieceForProp), fitted to these colliders.
 //
 // Names checked 2026-10-02 (encounters/stormbrass_foundry/CLAUDE.md): "Chained
 // Miner", "Chained Hauler", "Freed Laborer" and "Free the Workers" are generic
