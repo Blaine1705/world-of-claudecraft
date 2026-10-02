@@ -156,11 +156,11 @@ function coilStrikeSparks(): SparkEmitter[] {
       vx: 0,
       vy: 3,
       vz: 0,
-      spread: 13,
-      life: 1.3,
+      spread: 17,
+      life: 1.6,
       gravity: 12,
-      size: 0.24,
-      count: 130,
+      size: 0.34,
+      count: 220,
       hue: 1,
       gate: 3,
     },
@@ -170,22 +170,42 @@ function coilStrikeSparks(): SparkEmitter[] {
 /** The showers where the Crane Bridge's span grinds onto its seats (the
  *  gate's rig opens the gate over the last yard of the lowering). */
 function bridgeSeatSparks(): SparkEmitter[] {
-  return craneBridgeSeats().map((s) => ({
-    x: s.x,
-    y: s.y,
-    z: s.z,
-    vx: 0,
-    vy: 3.4,
-    vz: 0,
-    spread: 5.5,
-    life: 1.0,
-    gravity: 10,
-    size: 0.14,
-    count: 100,
-    hue: 0,
-    gate: BRIDGE_SPARK_GATE,
-    across: { x: 9, z: 0 },
-  }));
+  // A fountain off each seat's whole width, and a low sheet skittering out
+  // across the deck from under the span.
+  return craneBridgeSeats().flatMap((s) => [
+    {
+      x: s.x,
+      y: s.y,
+      z: s.z,
+      vx: 0,
+      vy: 7.5,
+      vz: 0,
+      spread: 7,
+      life: 1.3,
+      gravity: 11,
+      size: 0.22,
+      count: 260,
+      hue: 0,
+      gate: BRIDGE_SPARK_GATE,
+      across: { x: 9, z: 0 },
+    },
+    {
+      x: s.x,
+      y: s.y + 0.1,
+      z: s.z,
+      vx: 0,
+      vy: 1.2,
+      vz: 0,
+      spread: 9,
+      life: 0.8,
+      gravity: 6,
+      size: 0.16,
+      count: 160,
+      hue: 0,
+      gate: BRIDGE_SPARK_GATE,
+      across: { x: 9, z: 0 },
+    },
+  ]);
 }
 
 /** Build the kit dressing, the machines, the belts, the hot metal, the steam. */

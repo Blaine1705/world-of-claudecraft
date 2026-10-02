@@ -92,6 +92,7 @@ void main() {
   float a = pow(max(0.0, 1.0 - d), 2.2) * 0.75;
   if (a < 0.004) discard;
   gl_FragColor = vec4(uColor * a, a);
+  #include <colorspace_fragment>
 }
 `;
 

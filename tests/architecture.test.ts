@@ -887,6 +887,8 @@ const RENDER_PURE_CORES = [
   'src/render/stormbrass_foundry/foundry_kit_plan_core.ts',
   // The Crane Bridge's swing: the crane's rig and the carried span's pose.
   'src/render/stormbrass_foundry/foundry_bridge_core.ts',
+  // The Foundry's floor marks (stains, paint, chalk, ruts, craters): where each lies.
+  'src/render/stormbrass_foundry/foundry_floor_plan_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

@@ -142,7 +142,7 @@ export function foundryPieceForProp(p: FieldProp): string {
     case 'sf_bunker':
       return 'Kit_Bunker';
     case 'sf_target_frame':
-      return 'Kit_TargetFrame';
+      return 'Kit_TargetFrameB';
     case 'sf_turret_berm':
       return 'Kit_TurretEmplacement';
     case 'sf_coil_pylon':
@@ -215,6 +215,9 @@ export function bridgeCraneProp(): FieldProp | null {
   return FIELD.props.find(isBridgeCrane) ?? null;
 }
 
+/** Where the lift station is drawn: off the Lift Landing's east rim. */
+export const FOUNDRY_LIFT_STATION = { x: LIFT_LANDING.x + LIFT_LANDING.r + 2.6, z: LIFT_LANDING.z };
+
 /** Every sim prop's kit placement. */
 export function planFoundryPropPlacements(): FoundryKitPlacement[] {
   const out: FoundryKitPlacement[] = [];
@@ -224,18 +227,21 @@ export function planFoundryPropPlacements(): FoundryKitPlacement[] {
     const { scale, stretch } = propScale(p, piece);
     const at: FoundryKitPlacement = { piece, x: p.x, z: p.z, rot: p.rot, scale };
     if (stretch !== undefined) at.stretch = stretch;
-    // The lift station stands on the landing's back lip, its winch house out
-    // over the drop: it takes the landing's floor, not the void under it.
+    // The lift station stands off the landing's EAST rim on its own pier, its
+    // gate turned to the landing (its collider keeps the back lip): behind
+    // the arrival it would stand between the camera and the first vista.
     if (piece === 'Kit_LiftStation') {
+      at.x = FOUNDRY_LIFT_STATION.x;
+      at.z = FOUNDRY_LIFT_STATION.z;
+      at.rot = -Math.PI / 2;
       at.y = LIFT_LANDING.h;
-      // Its own pier out of the drop, under the winch house and the cage.
       const pier = 0.62;
       const top = LIFT_LANDING.h - 0.1;
       const base = VOID - 12;
       out.push({
         piece: 'Kit_Pier',
-        x: p.x,
-        z: p.z - 3,
+        x: at.x + 3,
+        z: at.z,
         rot: 0,
         scale: pier,
         scaleY: (top - base) / (FOUNDRY_KIT_SIZES.pierHeight * pier),
@@ -295,6 +301,29 @@ export const FOUNDRY_TOWER_PANEL: FieldEdgeKind = {
   halfDepth: 0.3,
 };
 
+/** The variants of each edge tile (same contract, so any one fits any run). */
+export const FOUNDRY_EDGE_VARIANTS: Readonly<Record<string, readonly string[]>> = {
+  Kit_RailingEdge: ['Kit_RailingEdgeB', 'Kit_RailingEdgeC'],
+  Kit_MachineLip: ['Kit_RetainingWall', 'Kit_MachineLipB'],
+  Kit_PipeEdge: ['Kit_PipeEdgeB', 'Kit_PipeEdgeC'],
+};
+
+/** Break a run's repetition: the tile a spot draws. Retaining walls come in
+ *  stretches (the mountain cut held back for a few bays at a time), the rest
+ *  one tile at a time. Deterministic in the spot. */
+export function foundryEdgeVariant(piece: string, x: number, z: number): string {
+  const v = FOUNDRY_EDGE_VARIANTS[piece];
+  if (!v) return piece;
+  const h = foundryKitHash(Math.round(x * 7.3 + z * 13.7), 91);
+  if (piece === 'Kit_MachineLip') {
+    const stretch = foundryKitHash(Math.floor(x / 14) * 31 + Math.floor(z / 14) * 17, 92);
+    if (stretch < 0.42) return v[0];
+    return h < 0.16 ? v[1] : piece;
+  }
+  if (piece === 'Kit_RailingEdge') return h < 0.2 ? v[0] : h < 0.3 ? v[1] : piece;
+  return h < 0.3 ? v[0] : h < 0.55 ? v[1] : piece;
+}
+
 /** The Coil Crown's tower: the panels clad its drop down to this many yards. */
 const TOWER_SURFACE = 'coil_crown';
 
@@ -325,7 +354,7 @@ export function planFoundryEdges(): FoundryKitPlacement[] {
   })
     .filter((e) => !inLiftStation(e.x, e.z))
     .map((e) => ({
-      piece: e.piece,
+      piece: foundryEdgeVariant(e.piece, e.x, e.z),
       x: e.x,
       z: e.z,
       rot: e.rot,
@@ -865,24 +894,23 @@ export function planLitter(): FoundryKitPlacement[] {
  *  pulley, and the conduits from each lightning rod to the great coil. */
 export function planCables(): FoundryKitPlacement[] {
   const out: FoundryKitPlacement[] = [];
-  const station = FIELD.props.find((p) => p.kind === 'sf_lift_station');
-  if (station) {
-    const g = ground(station.x, LIFT_LANDING.z);
-    for (const dx of [-1.6, 1.6]) {
-      const from = { x: station.x + dx, y: g + 13, z: station.z - 6 };
-      const to = { x: station.x + dx * 5, y: VOID - 20, z: station.z - 180 };
-      const run = Math.hypot(to.x - from.x, to.z - from.z);
-      out.push({
-        piece: 'Kit_Cable',
-        x: from.x,
-        z: from.z,
-        rot: yawAlong((to.x - from.x) / run, (to.z - from.z) / run),
-        scale: 1.3,
-        stretch: run / 1.3,
-        shear: (to.y - from.y) / run,
-        y: from.y,
-      });
-    }
+  // The station's back (its cable stubs) faces east: the cables run out and
+  // down the mountain from the pulley.
+  const S = FOUNDRY_LIFT_STATION;
+  for (const dz of [-0.95, 0.95]) {
+    const from = { x: S.x + 10, y: LIFT_LANDING.h + 15.35, z: S.z + dz };
+    const to = { x: S.x + 190, y: VOID - 30, z: S.z - 60 + dz * 6 };
+    const run = Math.hypot(to.x - from.x, to.z - from.z);
+    out.push({
+      piece: 'Kit_Cable',
+      x: from.x,
+      z: from.z,
+      rot: yawAlong((to.x - from.x) / run, (to.z - from.z) / run),
+      scale: 1.3,
+      stretch: run / 1.3,
+      shear: (to.y - from.y) / run,
+      y: from.y,
+    });
   }
   return out;
 }
@@ -1060,6 +1088,137 @@ export function planPrimeDraftLandmark(at: {
   return out;
 }
 
+// ---- the mine adits in the shelf's faces --------------------------------------------------
+
+/** Where the foundry bites into the mountain: mine adits let into the
+ *  shelf's cliff faces under the lips (a portal, rails out onto a timber
+ *  ledge, an ore tub, spoil down the face). `out` is the face's outward
+ *  direction; `drop` how far under the lip's floor the adit's floor lies. */
+export const FOUNDRY_ADITS: readonly {
+  x: number;
+  z: number;
+  out: readonly [number, number];
+  drop: number;
+}[] = [
+  { x: -55, z: -167, out: [-1, 0], drop: 10 },
+  { x: 55, z: -160, out: [1, 0], drop: 11 },
+  { x: -40, z: -96, out: [-1, 0], drop: 9 },
+  { x: 50, z: 70, out: [1, 0], drop: 11 },
+  { x: -50, z: 88, out: [-1, 0], drop: 10 },
+  { x: -45, z: 150, out: [-1, 0], drop: 12 },
+  { x: 45, z: 126, out: [1, 0], drop: 10 },
+];
+/** How far the cliff face has flared out from the lip at an adit's depth. */
+const ADIT_FLARE = 0.22;
+
+export function planAdits(): FoundryKitPlacement[] {
+  return FOUNDRY_ADITS.map((a) => {
+    const floor = ground(a.x - a.out[0] * 1.5, a.z - a.out[1] * 1.5);
+    const push = a.drop * ADIT_FLARE + 0.6;
+    return {
+      piece: 'Kit_MineAdit',
+      x: a.x + a.out[0] * push,
+      z: a.z + a.out[1] * push,
+      // The piece's front (its local +z) turns outward.
+      rot: Math.atan2(a.out[0], a.out[1]),
+      scale: 1,
+      y: floor - a.drop,
+      cosmetic: true,
+    };
+  });
+}
+
+// ---- the Forge Gauntlet: the blast furnace and the steam hammers ----------------------
+
+/** The Gantry Catwalk walks between a roaring blast furnace (east, in the
+ *  drop on its pier, its tap arch turned to the walk) and a row of steam
+ *  hammers striking in rhythm (west, each on its pier). Render only: all of
+ *  it stands in the drop, clear of every floor. */
+export const FOUNDRY_FORGE = {
+  furnace: { x: 33, z: 184, base: 19, pier: 1.4 },
+  hammers: [
+    { x: -21, z: 172 },
+    { x: -21, z: 178 },
+    { x: -21, z: 184 },
+  ],
+  hammerBase: 25,
+  hammerPier: 0.5,
+  /** The tup's strike face over the hammer's base, struck and raised. */
+  strikeAt: 1.7,
+  raise: 3.1,
+  /** Seconds of one hammer's blow. */
+  period: 2.4,
+} as const;
+
+/** The furnace's hot points in the instance frame (the piece faces west). */
+export function forgeFurnacePoints(): {
+  mouth: { x: number; y: number; z: number };
+  runnerEnd: { x: number; y: number; z: number };
+  throat: { x: number; y: number; z: number };
+} {
+  const F = FOUNDRY_FORGE.furnace;
+  return {
+    mouth: { x: F.x - 8.4, y: F.base + 3.2, z: F.z },
+    runnerEnd: { x: F.x - 12.4, y: F.base + 0.7, z: F.z },
+    throat: { x: F.x, y: F.base + 43, z: F.z },
+  };
+}
+
+export function planForgeGauntlet(): FoundryKitPlacement[] {
+  const G = FOUNDRY_FORGE;
+  const out: FoundryKitPlacement[] = [];
+  const pier = (x: number, z: number, top: number, scale: number): FoundryKitPlacement => {
+    const base = VOID - 12;
+    return {
+      piece: 'Kit_Pier',
+      x,
+      z,
+      rot: 0,
+      scale,
+      scaleY: (top - base) / (FOUNDRY_KIT_SIZES.pierHeight * scale),
+      y: base,
+    };
+  };
+  out.push(pier(G.furnace.x, G.furnace.z, G.furnace.base, G.furnace.pier));
+  out.push({
+    piece: 'Kit_BlastFurnace',
+    x: G.furnace.x,
+    z: G.furnace.z,
+    // Its tap arch (local +z) turns west, to the catwalk.
+    rot: -Math.PI / 2,
+    scale: 1,
+    y: G.furnace.base,
+  });
+  for (const h of G.hammers) {
+    out.push(pier(h.x, h.z, G.hammerBase, G.hammerPier));
+    out.push({
+      piece: 'Kit_SteamHammer',
+      x: h.x,
+      z: h.z,
+      // Its front turns east, to the catwalk.
+      rot: Math.PI / 2,
+      scale: 1,
+      y: G.hammerBase,
+    });
+  }
+  return out;
+}
+
+/** A steam hammer's tup at time `t`: its lift over the struck position
+ *  (0 struck, 1 raised) and whether the blow has just landed (the sparks).
+ *  A slow lift, a hang at the top, a fast fall. */
+export function hammerBlow(t: number, phase: number): { lift: number; struck: number } {
+  const k = (((t / FOUNDRY_FORGE.period + phase) % 1) + 1) % 1;
+  if (k < 0.1) return { lift: 0, struck: 1 - k / 0.1 };
+  if (k < 0.72) {
+    const u = (k - 0.1) / 0.62;
+    return { lift: u * u * (3 - 2 * u), struck: 0 };
+  }
+  if (k < 0.86) return { lift: 1, struck: 0 };
+  const u = (k - 0.86) / 0.14;
+  return { lift: 1 - u * u, struck: 0 };
+}
+
 // ---- everything static -------------------------------------------------------------------
 
 /** The whole static dressing. */
@@ -1080,6 +1239,8 @@ export function planFoundryKitPlacements(): FoundryKitPlacement[] {
     ...planYardGantry(),
     ...planParapetPieces(),
     ...planSteamMains(),
+    ...planAdits(),
+    ...planForgeGauntlet(),
     ...planPrimeDraftLandmark(PRIME_DRAFT_LANDMARK),
   ];
 }
@@ -1096,7 +1257,9 @@ export type FoundryMotion =
   /** A ladle: runs along the pour rail, tips over a mould, runs back. */
   | 'ladle'
   /** The ladle's trolley: runs with it, never tips. */
-  | 'trolley';
+  | 'trolley'
+  /** A steam hammer's tup: a slow lift, a fast blow (hammerBlow). */
+  | 'hammer';
 
 export interface FoundryMover {
   piece: string;
@@ -1195,6 +1358,21 @@ export function planFoundryMovers(): FoundryMover[] {
       phase: 0,
     });
   }
+  // The Forge Gauntlet's tups, each a third of a blow behind the last.
+  FOUNDRY_FORGE.hammers.forEach((h, k) => {
+    out.push({
+      piece: 'Kit_SteamHammerRam',
+      x: h.x,
+      y: FOUNDRY_FORGE.hammerBase + FOUNDRY_FORGE.strikeAt,
+      z: h.z,
+      rot: Math.PI / 2,
+      scale: 1,
+      motion: 'hammer',
+      rate: 1 / FOUNDRY_FORGE.period,
+      phase: k / 3,
+      amp: k,
+    });
+  });
   // The ladles on the pour line and their trolleys.
   const L = FOUNDRY_POUR_LINE;
   const railY = ground(L.posts[0], L.railZ) + L.railLift;
@@ -1314,6 +1492,12 @@ export const FOUNDRY_SOURCES: Readonly<
     { kind: 'steam', x: 5.7, y: 7.85, z: -0.6 },
   ],
   Kit_PipeValve: [{ kind: 'steam', x: 0, y: 1.3, z: 0 }],
+  Kit_BlastFurnace: [
+    { kind: 'smoke', x: 0, y: 46, z: 0 },
+    { kind: 'smoke', x: -10.6, y: 34, z: -2 },
+    { kind: 'smoke', x: 0, y: 9, z: 9 },
+  ],
+  Kit_SteamHammer: [{ kind: 'steam', x: 0, y: 11.2, z: -0.9 }],
 };
 
 /** Every steam and smoke source of the static dressing, placed. */
@@ -1329,7 +1513,10 @@ export function planFoundryEmitters(placements: readonly FoundryKitPlacement[]):
       const lx = src.x * p.scale * (p.stretch ?? 1);
       const lz = src.z * p.scale;
       const smoke = src.kind === 'smoke';
-      const big = p.piece === 'Kit_BoilerHouse' || p.piece === 'Kit_FurnaceMouth';
+      const big =
+        p.piece === 'Kit_BoilerHouse' ||
+        p.piece === 'Kit_FurnaceMouth' ||
+        p.piece === 'Kit_BlastFurnace';
       out.push({
         kind: src.kind,
         x: p.x + lx * c + lz * s,

@@ -443,6 +443,33 @@ export function rockDetail(): DetailPair {
   return bake('rock', paintRock, 0x9e11, 256, 7);
 }
 
+/** Bedded mountain rock (the Stormbrass Foundry's cut faces): level beds of
+ *  uneven thickness, each its own tone, a dark parting between them, fine
+ *  lamination and a slow warp so no bed runs dead straight. */
+const paintStrata: Painter = (h, size, rnd) => {
+  const fine = noiseField(size, rnd, 44);
+  const broad = noiseField(size, rnd, 6);
+  const bed = new Float32Array(size);
+  let y = 0;
+  while (y < size) {
+    const thick = 5 + Math.floor(rnd() * 24);
+    const tone = 0.32 + rnd() * 0.58;
+    for (let k = 0; k < thick && y + k < size; k++) bed[y + k] = k === 0 ? tone * 0.35 : tone;
+    y += thick;
+  }
+  for (let py = 0; py < size; py++) {
+    for (let px = 0; px < size; px++) {
+      const i = py * size + px;
+      const warped = (((py + Math.round((broad[i] - 0.5) * 12)) % size) + size) % size;
+      h[i] = bed[warped] * 0.72 + fine[i] * 0.2 + Math.sin(warped * 1.9) * 0.04;
+    }
+  }
+};
+
+export function strataDetail(): DetailPair {
+  return bake('strata', paintStrata, 0x57a7, 256, 6, 1, 150);
+}
+
 export function mossDetail(): DetailPair {
   // Soft cushions: a wider blur and a low relief (no pixel grit at range).
   return bake('moss', paintMoss, 0x6d0b, 256, 3, 2, 80);

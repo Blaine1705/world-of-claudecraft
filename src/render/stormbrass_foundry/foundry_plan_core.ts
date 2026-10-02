@@ -92,6 +92,9 @@ export function planFoundryLights(): FoundryLightSpot[] {
     out.push({ kind: 'forge', x, z: MOLTEN_Z, lift: 0, y: MOLTEN_Y + 2 });
   out.push({ kind: 'forge', x: -37, z: MOLTEN_Z, lift: 0, y: MOLTEN_Y + 3 });
   out.push({ kind: 'forge', x: -33, z: -72, lift: 2 });
+  // The Forge Gauntlet's blast furnace mouth (foundry_kit_plan_core.ts
+  // forgeFurnacePoints; pinned equal by the kit test), out over the drop.
+  out.push({ kind: 'forge', x: 21, z: 184, lift: 0, y: 23 });
   return out;
 }
 

@@ -237,6 +237,17 @@ export function setFoundryCoilGlow(k: number): void {
   foundryCoilGlowMaterial().color.setScalar(COIL_GLOW_REST + (1.6 - COIL_GLOW_REST) * t);
 }
 
+/** Light the whole kit with a coil strike: `flash` (0..1) washes the metal
+ *  and paint slots in the bolt's blue-white. A uniform write on the two lit
+ *  slot materials (never a program change); the caller passes 0 on the low tier. */
+export function setFoundryStrikeFlash(flash: number): void {
+  const f = Math.max(0, Math.min(1, flash));
+  for (const slot of ['metal', 'paint'] as const) {
+    const m = foundrySlotMaterial(slot) as THREE.MeshStandardMaterial | THREE.MeshLambertMaterial;
+    m.emissive.setRGB(0.1 * f, 0.13 * f, 0.19 * f);
+  }
+}
+
 function materialFor(piece: string, slot: FoundrySlot): THREE.Material {
   return piece === COIL_GLOW && slot === 'glow'
     ? foundryCoilGlowMaterial()
@@ -622,7 +633,12 @@ const NO_SHADOW: ReadonlySet<string> = new Set([
   'Kit_PipeRun',
   'Kit_PipeValve',
   'Kit_MachineLip',
+  'Kit_MachineLipB',
+  'Kit_RetainingWall',
   'Kit_PipeEdge',
+  'Kit_PipeEdgeB',
+  'Kit_PipeEdgeC',
+  'Kit_MineAdit',
   'Kit_TowerPanel',
   'Kit_CatwalkTruss',
   'Kit_ChannelSegment',

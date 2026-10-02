@@ -51,6 +51,7 @@ import {
 } from './rift_death_zone_core';
 import { FoundryCreatureFx } from './stormbrass_foundry/foundry_creature_fx';
 import { FoundryFx } from './stormbrass_foundry/foundry_fx';
+import { setFoundryShakeSink } from './stormbrass_foundry/foundry_shake';
 import { FoundryWorkerFx } from './stormbrass_foundry/foundry_worker_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { WildheartFx } from './wildheart_basin';
@@ -168,6 +169,7 @@ export class RiftDeathZoneVisuals {
     this.templeFx = new TempleFx(scene, groundY, world, compileGate);
     this.foundryFx = new FoundryFx(scene, groundY, world, compileGate);
     this.foundryWorkers = new FoundryWorkerFx(scene, groundY, world, compileGate, reducedMotion);
+    setFoundryShakeSink(shake, reducedMotion);
     this.wildheartFx = new WildheartFx(
       scene,
       groundY,

@@ -140,6 +140,7 @@ function buildDome(opts: FoundrySkyOptions): THREE.Mesh {
   mesh.renderOrder = -10;
   mesh.onBeforeRender = () => {
     uniforms.uFlash.value = opts.lowGfx ? 0 : coilStrikeAt(sharedUniforms.uTime.value, 3).flash;
+    HAZE_FLASH.value = uniforms.uFlash.value;
   };
   return mesh;
 }
@@ -156,13 +157,30 @@ function rockColor(y: number, salt: number, out: number[]): void {
   }
   const up = Math.min(1, Math.max(0, (y + 90) / 200));
   const v = shade + up * 0.05;
-  out.push(v, v + 0.006, v + 0.014);
+  // Scree and spoil: a shade warmer than the slate above it.
+  out.push(v + 0.012, v + 0.008, v + 0.006);
 }
 
-/** One rock massif: a many-sided cone whose rings swell and pinch with the
- *  bearing (ridges and ravines running down from an off-centre summit), shaded
- *  by height, ravine depth and a ragged snow line. `haze` (0..1) washes a far
- *  range toward the storm's grey so the ranges layer back in depth. */
+/** The mountain's beds, as vertex paint (linear): warm ochre sandstone, cold
+ *  slate, dark shale, a rust ironstone (the cliff faces' own beds, darker for
+ *  the distance). */
+const MASSIF_BEDS: readonly (readonly [number, number, number])[] = [
+  [0.15, 0.125, 0.1],
+  [0.1, 0.105, 0.12],
+  [0.07, 0.066, 0.068],
+  [0.14, 0.09, 0.065],
+  [0.12, 0.11, 0.1],
+];
+
+/** One rock massif: a many-sided, many-ringed cone whose rings swell and
+ *  pinch with the bearing in several overlaid waves (ridges and ravines
+ *  running down from an off-centre summit), painted in level strata with a
+ *  pale scree apron at its foot and a ragged snow line, and smooth-shaded so
+ *  it reads as weathered rock, not facets. `haze` (0..1) washes a far range
+ *  toward the storm's grey. `benches` cuts it into quarry terraces (the
+ *  buttresses round the shelf: where the foundry bit into the mountain), each
+ *  bench a pale cut face over a dark tread. `reach` caps the swell so a
+ *  buttress never grows past its planned radius. */
 function pushMassif(
   positions: number[],
   colors: number[],
@@ -178,44 +196,84 @@ function pushMassif(
     sides: number;
     rings: number;
     haze: number;
+    benches?: number;
+    reach?: number;
   },
 ): number {
-  const ridges = 3 + Math.floor(foundryHash(c.salt, 11) * 3);
-  const phase = foundryHash(c.salt, 12) * Math.PI * 2;
+  const waves = [3, 5, 8, 13].map((n, i) => ({
+    n: n + Math.floor(foundryHash(c.salt, 11 + i) * 2),
+    phase: foundryHash(c.salt, 15 + i) * Math.PI * 2,
+    amp: [0.2, 0.13, 0.08, 0.05][i],
+    twist: (foundryHash(c.salt, 19 + i) - 0.5) * 3,
+  }));
+  // A ridge, not a cone: stretched along its own bearing.
+  const long = c.benches ? 1 : 1.15 + foundryHash(c.salt, 23) * 0.75;
+  const bearing = foundryHash(c.salt, 24) * Math.PI;
+  const bc = Math.cos(bearing);
+  const bs = Math.sin(bearing);
   const lean = (foundryHash(c.salt, 13) - 0.5) * c.r * 0.5;
   const lean2 = (foundryHash(c.salt, 14) - 0.5) * c.r * 0.5;
   const h = c.y1 - c.y0;
-  const tint = (v: number, cold: number) => {
-    const g = 0.18;
+  const reach = c.reach ?? 1.45;
+  const paint = (rgb: readonly [number, number, number], k: number) => {
+    const g = 0.17;
     colors.push(
-      v + (g - v) * c.haze,
-      v + 0.006 + (g + 0.02 - v) * c.haze,
-      v + cold + (g + 0.05 - v) * c.haze,
+      rgb[0] * k + (g - rgb[0] * k) * c.haze,
+      rgb[1] * k + (g + 0.02 - rgb[1] * k) * c.haze,
+      rgb[2] * k + (g + 0.055 - rgb[2] * k) * c.haze,
     );
   };
-  for (let ring = 0; ring <= c.rings; ring++) {
-    const t = ring / c.rings;
-    // A concave flank: steep under the summit, spreading at the foot.
-    const rr = c.r * (1 - t) ** 1.35;
-    for (let k = 0; k < c.sides; k++) {
-      const a = (k / c.sides) * Math.PI * 2;
-      const ridge =
-        Math.cos(a * ridges + phase + t * 1.7) * 0.26 +
-        (foundryHash(c.salt * 131 + k * 17 + ring, 8) - 0.5) * 0.22;
-      const swell = 1 + ridge * (0.35 + 0.65 * (1 - t));
-      const y =
-        c.y0 + h * t + (foundryHash(c.salt * 57 + k + ring * 31, 9) - 0.5) * h * 0.05 * (1 - t);
-      positions.push(
-        c.x + Math.cos(a) * rr * swell + lean * t,
-        y,
-        c.z + Math.sin(a) * rr * swell + lean2 * t,
-      );
-      const snowLine = 0.62 + ridge * 0.35;
-      if (c.y1 > 150 && t > snowLine) tint(0.34 + (t - snowLine) * 0.3, 0.035);
-      else tint(0.045 + t * 0.06 + Math.max(0, ridge) * 0.07, 0.012);
+  // The rings: plain for a peak; for a benched buttress, a tread and a riser
+  // per bench (height and radius step in turn).
+  const profile: { t: number; rad: number; riser: boolean }[] = [];
+  if (c.benches) {
+    for (let j = 0; j <= c.benches; j++) {
+      const t = j / c.benches;
+      const rad = (1 - t) ** 0.8;
+      profile.push({ t, rad, riser: false });
+      if (j < c.benches) profile.push({ t: (j + 1) / c.benches, rad: rad * 0.94, riser: true });
+    }
+  } else {
+    for (let ring = 0; ring <= c.rings; ring++) {
+      const t = ring / c.rings;
+      // A concave flank: steep under the summit, spreading at the foot.
+      profile.push({ t, rad: 0.2 + 0.8 * (1 - t) ** 0.95, riser: false });
     }
   }
-  for (let ring = 0; ring < c.rings; ring++) {
+  profile.forEach((p, ring) => {
+    for (let k = 0; k < c.sides; k++) {
+      const a = (k / c.sides) * Math.PI * 2;
+      let ridge = 0;
+      for (const w of waves) ridge += Math.cos(a * w.n + w.phase + p.t * w.twist) * w.amp;
+      const swell = Math.min(reach, 1 + ridge * (0.4 + 0.6 * (1 - p.t)));
+      const jitter = c.benches
+        ? 0
+        : (foundryHash(c.salt * 57 + k + ring * 31, 9) - 0.5) * h * 0.03 * (1 - p.t);
+      // The crest rises and dips with the bearing: a ragged ridgeline, no point.
+      const crest = c.benches ? 0 : ridge * h * 0.34 * p.t * p.t;
+      const y = c.y0 + h * p.t + jitter + crest;
+      const lx = Math.cos(a) * c.r * p.rad * swell * long;
+      const lz = Math.sin(a) * c.r * p.rad * swell;
+      positions.push(
+        c.x + lx * bc - lz * bs + lean * p.t,
+        y,
+        c.z + lx * bs + lz * bc + lean2 * p.t,
+      );
+      const bed = Math.floor((y + ridge * 30) / 16);
+      const rock =
+        MASSIF_BEDS[((bed % MASSIF_BEDS.length) + MASSIF_BEDS.length) % MASSIF_BEDS.length];
+      const lit = 0.8 + Math.max(0, ridge) * 1.1 + p.t * 0.35;
+      const snowLine = 0.6 + ridge * 0.5;
+      if (c.benches) paint(p.riser ? [0.2, 0.18, 0.16] : [0.075, 0.07, 0.07], 1);
+      else if (c.y1 > 150 && p.t > snowLine)
+        paint([0.5, 0.53, 0.58], 0.7 + (p.t - snowLine) * 0.6 + Math.max(0, ridge) * 0.4);
+      else if (p.t < 0.14 && ridge < 0)
+        // Scree fanned out of the ravines at the foot.
+        paint([0.17, 0.16, 0.15], 1 - p.t * 2);
+      else paint(rock, lit);
+    }
+  });
+  for (let ring = 0; ring + 1 < profile.length; ring++) {
     for (let k = 0; k < c.sides; k++) {
       const a0 = base + ring * c.sides + k;
       const a1 = base + ring * c.sides + ((k + 1) % c.sides);
@@ -224,7 +282,73 @@ function pushMassif(
       indices.push(a0, b0, a1, a1, b0, b1);
     }
   }
-  return base + (c.rings + 1) * c.sides;
+  return base + profile.length * c.sides;
+}
+
+// ---- haze between the ranges -----------------------------------------------------------
+
+const HAZE_VERT = /* glsl */ `
+varying float vY;
+void main() {
+  vY = position.y;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+const HAZE_FRAG = /* glsl */ `
+precision highp float;
+varying float vY;
+uniform vec3 uColor;
+uniform float uDensity;
+uniform float uFlash;
+void main() {
+  // Thick in the valley, thinning to nothing up the flanks.
+  float a = uDensity * smoothstep(1.0, 0.0, vY) * smoothstep(0.0, 0.12, vY + 0.02);
+  vec3 col = uColor + vec3(0.5, 0.6, 0.8) * uFlash * 0.35;
+  gl_FragColor = vec4(col, a);
+  #include <colorspace_fragment>
+}
+`;
+
+/** Two veils of valley haze standing between the shelf and the near range,
+ *  and between the near and the far: each range sinks a shade deeper into the
+ *  storm's grey-blue, and the peaks float clear of it. Open elliptical
+ *  curtains seen from inside; cosmetic (shed on the low tier). */
+/** The strike's flash on the haze (the dome's own hook writes it). */
+const HAZE_FLASH = { value: 0 };
+
+function buildHaze(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'stormbrassHaze';
+  for (const [rx, rz, top, density] of [
+    [250, 400, 190, 0.34],
+    [520, 690, 330, 0.5],
+  ] as const) {
+    const geo = new THREE.CylinderGeometry(1, 1, 1, 48, 1, true).translate(0, 0.5, 0);
+    const mesh = new THREE.Mesh(
+      geo,
+      new THREE.ShaderMaterial({
+        name: 'stormbrassHaze',
+        vertexShader: HAZE_VERT,
+        fragmentShader: HAZE_FRAG,
+        uniforms: {
+          uColor: { value: new THREE.Color(STORMBRASS_FOUNDRY_FOG_COLOR) },
+          uDensity: { value: density },
+          uFlash: HAZE_FLASH,
+        },
+        transparent: true,
+        depthWrite: false,
+        side: THREE.BackSide,
+        fog: false,
+      }),
+    );
+    mesh.scale.set(rx, top + 140, rz);
+    mesh.position.y = -140;
+    mesh.name = 'stormbrassHazeVeil';
+    mesh.frustumCulled = false;
+    mesh.renderOrder = -5;
+    group.add(mesh);
+  }
+  return group;
 }
 
 function buildMountain(opts: FoundrySkyOptions): THREE.Mesh {
@@ -265,9 +389,12 @@ function buildMountain(opts: FoundrySkyOptions): THREE.Mesh {
       y0: t.base,
       y1: t.top,
       salt: 500 + i,
-      sides: 9,
+      sides: 14,
       rings: 4,
       haze: 0,
+      // Quarried in terraces: where the foundry bit into the mountain.
+      benches: 4,
+      reach: 1,
     });
   });
   // Two ranges on ovals round the long shelf: the near wall of the valley
@@ -287,8 +414,8 @@ function buildMountain(opts: FoundrySkyOptions): THREE.Mesh {
       y0,
       y1: y0 + 170 + foundryHash(i, 6) * 150,
       salt: i,
-      sides: 14,
-      rings: 6,
+      sides: 30,
+      rings: 12,
       haze: 0,
     });
   }
@@ -305,12 +432,13 @@ function buildMountain(opts: FoundrySkyOptions): THREE.Mesh {
       y0: -80,
       y1: 330 + foundryHash(i, 46) * 230,
       salt: 200 + i,
-      sides: 14,
-      rings: 6,
-      haze: 0.45,
+      sides: 24,
+      rings: 9,
+      haze: 0.55,
     });
   }
-  // Flat-shaded facets come from the material (one shared program).
+  // Smooth-shaded (the massifs share their vertices): weathered rock, the
+  // ridges and ravines carried by the shape and the paint.
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
@@ -319,13 +447,18 @@ function buildMountain(opts: FoundrySkyOptions): THREE.Mesh {
   geo.computeBoundingSphere();
   const material = new THREE.MeshLambertMaterial({
     vertexColors: true,
-    flatShading: true,
     name: 'stormbrassPeaks',
   });
   markSharedMaterial(material);
   const mesh = new THREE.Mesh(geo, material);
   mesh.name = 'stormbrassPeaks';
   mesh.frustumCulled = false;
+  // A coil strike lights the whole valley for its instant (a uniform write).
+  if (!opts.lowGfx)
+    mesh.onBeforeRender = () => {
+      const f = coilStrikeAt(sharedUniforms.uTime.value, 3).flash;
+      material.emissive.setRGB(0.07 * f, 0.09 * f, 0.13 * f);
+    };
   return mesh;
 }
 
@@ -336,5 +469,6 @@ export function buildFoundrySky(opts: FoundrySkyOptions): THREE.Group {
   group.name = 'stormbrassSky';
   group.add(buildDome(opts));
   group.add(buildMountain(opts));
+  if (!opts.lowGfx) group.add(buildHaze());
   return group;
 }

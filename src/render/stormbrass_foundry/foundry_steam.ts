@@ -63,6 +63,7 @@ void main() {
   vec3 col = mix(vec3(0.92, 0.94, 0.95), soot, smoke);
   gl_FragColor = vec4(col, a * mix(0.75, 0.7, smoke));
   #include <fog_fragment>
+  #include <colorspace_fragment>
 }
 `;
 

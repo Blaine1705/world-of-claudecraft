@@ -38,7 +38,7 @@ export interface SparkEmitter {
 }
 
 /** Gates: 0 always on; the painter writes the rest each frame. */
-export const SPARK_GATES = 5;
+export const SPARK_GATES = 8;
 
 const VERT = /* glsl */ `
 attribute vec3 aOrigin;
@@ -52,7 +52,6 @@ varying float vAge;
 varying float vHue;
 varying float vAlpha;
 varying vec2 vUv;
-#include <fog_pars_vertex>
 float h1(float n) { return fract(sin(n) * 43758.5453); }
 void main() {
   float seed = aMisc.x;
@@ -80,8 +79,6 @@ void main() {
   vHue = aMisc.y;
   vAlpha = gate;
   vUv = position.xy + 0.5;
-  vec4 mvPosition = mv;
-  #include <fog_vertex>
 }
 `;
 
@@ -91,16 +88,15 @@ varying float vAge;
 varying float vHue;
 varying float vAlpha;
 varying vec2 vUv;
-#include <fog_pars_fragment>
 void main() {
   float core = smoothstep(0.5, 0.0, abs(vUv.x - 0.5)) * smoothstep(0.0, 0.25, vUv.y) * smoothstep(1.0, 0.55, vUv.y);
-  vec3 fire = mix(vec3(1.0, 0.92, 0.6), mix(vec3(1.0, 0.45, 0.08), vec3(0.6, 0.08, 0.02), smoothstep(0.5, 1.0, vAge)), smoothstep(0.0, 0.45, vAge));
+  vec3 fire = mix(vec3(1.0, 0.8, 0.36), mix(vec3(1.0, 0.36, 0.05), vec3(0.6, 0.08, 0.02), smoothstep(0.5, 1.0, vAge)), smoothstep(0.0, 0.3, vAge));
   vec3 storm = mix(vec3(0.92, 0.97, 1.0), vec3(0.45, 0.65, 1.0), vAge);
   vec3 col = mix(fire, storm, vHue);
   float a = core * vAlpha * (1.0 - smoothstep(0.7, 1.0, vAge));
   if (a < 0.01) discard;
-  gl_FragColor = vec4(col * 1.6, a);
-  #include <fog_fragment>
+  gl_FragColor = vec4(col * 1.15, a);
+  #include <colorspace_fragment>
 }
 `;
 
@@ -119,7 +115,6 @@ function sparkMaterial(): THREE.ShaderMaterial {
       vertexShader: VERT,
       fragmentShader: FRAG,
       uniforms: {
-        ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
         uTime: sharedUniforms.uTime,
         uGates: gates,
       },

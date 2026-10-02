@@ -28,8 +28,15 @@ import {
   craneBridgeRig,
 } from '../src/render/stormbrass_foundry/foundry_bridge_core';
 import {
+  decalCorners,
+  FOUNDRY_DECAL_KINDS,
+  planFoundryFloorDecals,
+} from '../src/render/stormbrass_foundry/foundry_floor_plan_core';
+import {
   FOUNDRY_ADOPTED_PIECES,
   FOUNDRY_COLLIDER_ONLY,
+  FOUNDRY_EDGE_VARIANTS,
+  FOUNDRY_FORGE,
   FOUNDRY_GATE_PIECES,
   FOUNDRY_KIT_SIZES,
   FOUNDRY_LITTER,
@@ -39,11 +46,15 @@ import {
   FOUNDRY_SKYLINE,
   FOUNDRY_WORKER_CAMP_SPOTS,
   type FoundryKitPlacement,
+  forgeFurnacePoints,
+  foundryEdgeVariant,
   foundryPieceForProp,
   foundrySpawnPoints,
+  hammerBlow,
   ladleState,
   POUR_CYCLE,
   pistonStroke,
+  planAdits,
   planCatwalkTrusses,
   planFoundryEdges,
   planFoundryEmitters,
@@ -281,8 +292,14 @@ describe('Stormbrass Foundry kit: the piece list and the shipped GLB', () => {
     // Per piece: a hero piece at most 20k, a tile drawn hundreds of times far less.
     const tiles = new Set([
       'Kit_RailingEdge',
+      'Kit_RailingEdgeB',
+      'Kit_RailingEdgeC',
       'Kit_MachineLip',
+      'Kit_MachineLipB',
+      'Kit_RetainingWall',
       'Kit_PipeEdge',
+      'Kit_PipeEdgeB',
+      'Kit_PipeEdgeC',
       'Kit_TowerPanel',
       'Kit_CatwalkTruss',
       'Kit_BeltHousing',
@@ -324,8 +341,14 @@ describe('Stormbrass Foundry kit: the piece list and the shipped GLB', () => {
     // Tiles join end to end along x.
     for (const [name, half] of [
       ['Kit_RailingEdge', 2],
+      ['Kit_RailingEdgeB', 2],
+      ['Kit_RailingEdgeC', 2],
       ['Kit_MachineLip', 2],
+      ['Kit_MachineLipB', 2],
+      ['Kit_RetainingWall', 2],
       ['Kit_PipeEdge', 2],
+      ['Kit_PipeEdgeB', 2],
+      ['Kit_PipeEdgeC', 2],
       ['Kit_TowerPanel', 2],
       ['Kit_CatwalkTruss', 2],
       ['Kit_BeltHousing', 2],
@@ -341,7 +364,19 @@ describe('Stormbrass Foundry kit: the piece list and the shipped GLB', () => {
     }
     // The truss hangs wholly under its deck; a railing stays a knee tall.
     expect((shapes.get('Kit_CatwalkTruss') as Shape).max[1]).toBeLessThanOrEqual(0);
-    expect((shapes.get('Kit_RailingEdge') as Shape).max[1]).toBeLessThanOrEqual(1.4);
+    for (const name of ['Kit_RailingEdge', 'Kit_RailingEdgeB', 'Kit_RailingEdgeC'])
+      expect((shapes.get(name) as Shape).max[1], name).toBeLessThanOrEqual(1.4);
+    // An edge tile's variants keep its contract: the same depth down the face
+    // and the same kerb height, so any one fits any run.
+    for (const [basePiece, variants] of Object.entries(FOUNDRY_EDGE_VARIANTS)) {
+      const b = shapes.get(basePiece) as Shape;
+      for (const v of variants) {
+        const s = shapes.get(v) as Shape;
+        expect(Math.abs(s.min[1] - b.min[1]), v).toBeLessThan(0.1);
+        expect(s.max[1], v).toBeLessThanOrEqual(b.max[1] + 0.05);
+        expect(s.max[2], v).toBeLessThanOrEqual(b.max[2] + 0.3);
+      }
+    }
     // Spinning parts turn about their hub (the origin).
     for (const name of ['Kit_Flywheel', 'Kit_Gear']) {
       const s = shapes.get(name) as Shape;
@@ -443,7 +478,11 @@ describe('Stormbrass Foundry kit: the layout props', () => {
 describe('Stormbrass Foundry kit: the plan', () => {
   it('rails every balustraded walk, lips every terrace, clads the tower', () => {
     const edges = planFoundryEdges();
-    const count = (piece: string) => edges.filter((e) => e.piece === piece).length;
+    // (A tile and its variants count as one family.)
+    const count = (piece: string) =>
+      edges.filter(
+        (e) => e.piece === piece || (FOUNDRY_EDGE_VARIANTS[piece] ?? []).includes(e.piece),
+      ).length;
     expect(count('Kit_RailingEdge')).toBeGreaterThan(80);
     expect(count('Kit_MachineLip')).toBeGreaterThan(80);
     expect(count('Kit_PipeEdge')).toBeGreaterThan(60);
@@ -523,7 +562,10 @@ describe('Stormbrass Foundry kit: the plan', () => {
     expect(pierTop).toBeCloseTo(furnace.y as number, 3);
     expect(walkable(furnace.x, furnace.z)).toBe(false);
     // The forge's lights ride the river.
-    const forge = planFoundryLights().filter((l) => l.kind === 'forge' && l.y !== undefined);
+    // (The Forge Gauntlet's furnace carries its own, far up the route.)
+    const forge = planFoundryLights().filter(
+      (l) => l.kind === 'forge' && l.y !== undefined && l.z !== FOUNDRY_FORGE.furnace.z,
+    );
     expect(forge.length).toBeGreaterThanOrEqual(3);
     for (const l of forge) {
       expect(l.z).toBe(C.z);
@@ -665,6 +707,97 @@ describe('Stormbrass Foundry kit: the working machinery', () => {
   });
 });
 
+describe('Stormbrass Foundry kit: the second pass', () => {
+  it('breaks every long edge run into its variants, deterministically', () => {
+    const edges = planFoundryEdges();
+    for (const [basePiece, variants] of Object.entries(FOUNDRY_EDGE_VARIANTS)) {
+      const family = edges.filter((e) => e.piece === basePiece || variants.includes(e.piece));
+      expect(family.length, basePiece).toBeGreaterThan(20);
+      for (const v of [basePiece, ...variants])
+        expect(family.filter((e) => e.piece === v).length / family.length, v).toBeGreaterThan(0.05);
+    }
+    expect(foundryEdgeVariant('Kit_PipeEdge', 3, 4)).toBe(foundryEdgeVariant('Kit_PipeEdge', 3, 4));
+    expect(foundryEdgeVariant('Kit_TowerPanel', 3, 4)).toBe('Kit_TowerPanel');
+  });
+
+  it('stands the Forge Gauntlet in the drop either side of the Gantry Catwalk', () => {
+    const G = FOUNDRY_FORGE;
+    // The catwalk runs up x 0 between them; neither stands over a floor.
+    expect(G.furnace.x).toBeGreaterThan(20);
+    for (const h of G.hammers) expect(h.x).toBeLessThan(-12);
+    // (Its hearth, r 9.5; the GLB audit holds every vertex of it off the floors.)
+    for (let dx = -9; dx <= 9; dx += 3)
+      for (let dz = -9; dz <= 9; dz += 3)
+        expect(walkable(G.furnace.x + dx, G.furnace.z + dz), `furnace ${dx}, ${dz}`).toBe(false);
+    for (const h of G.hammers)
+      for (let dx = -2; dx <= 2; dx += 1)
+        for (let dz = -3.6; dz <= 3.6; dz += 1.2)
+          expect(walkable(h.x + dx, h.z + dz), `hammer ${h.x + dx}, ${h.z + dz}`).toBe(false);
+    // The furnace's forge light sits at its mouth (foundry_plan_core.ts).
+    const mouth = forgeFurnacePoints().mouth;
+    const light = planFoundryLights().find((l) => l.kind === 'forge' && l.z === G.furnace.z);
+    expect(light).toBeDefined();
+    expect(Math.hypot((light?.x ?? 0) - mouth.x, (light?.y ?? 0) - mouth.y)).toBeLessThan(5);
+    // One tup per hammer, each a third of a blow behind the last.
+    const tups = planFoundryMovers().filter((m) => m.motion === 'hammer');
+    expect(tups).toHaveLength(G.hammers.length);
+    expect(new Set(tups.map((m) => m.phase)).size).toBe(G.hammers.length);
+  });
+
+  it('lifts a tup slowly and drops it fast, sparking only as it lands', () => {
+    let rising = 0;
+    let falling = 0;
+    let prev = hammerBlow(0, 0).lift;
+    for (let t = 0.01; t < FOUNDRY_FORGE.period; t += 0.01) {
+      const b = hammerBlow(t, 0);
+      expect(b.lift).toBeGreaterThanOrEqual(0);
+      expect(b.lift).toBeLessThanOrEqual(1);
+      if (b.struck > 0) expect(b.lift).toBe(0);
+      if (b.lift > prev + 1e-9) rising++;
+      if (b.lift < prev - 1e-9) falling++;
+      prev = b.lift;
+    }
+    expect(rising).toBeGreaterThan(falling * 3);
+    expect(hammerBlow(0, 0).struck).toBe(1);
+  });
+
+  it('lets the mine adits into cliff faces, clear of every floor', () => {
+    const adits = planAdits();
+    expect(adits.length).toBeGreaterThanOrEqual(5);
+    for (const a of adits) {
+      expect(walkable(a.x, a.z), `${a.x}, ${a.z}`).toBe(false);
+      expect(cliffDistance(a.x, a.z)).toBeLessThan(5);
+    }
+  });
+
+  it('lays every floor mark flat on one floor, and the same every time', () => {
+    const decals = planFoundryFloorDecals();
+    expect(decals.length).toBeGreaterThan(350);
+    expect(decals.filter((d) => !d.cosmetic).length).toBeGreaterThan(80);
+    for (const kind of FOUNDRY_DECAL_KINDS)
+      expect(
+        decals.some((d) => d.kind === kind),
+        kind,
+      ).toBe(true);
+    for (const d of decals) {
+      expect(d.y, `${d.kind} at ${d.x}, ${d.z}`).toBe(floor(d.x, d.z));
+      for (const [x, z] of decalCorners(d))
+        expect(floor(x, z), `${d.kind} corner at ${x}, ${z}`).toBeCloseTo(d.y, 2);
+    }
+    // Every range target has its craters.
+    const targets = FIELD.props.filter((p) => p.kind === 'sf_target_frame');
+    for (const t of targets)
+      expect(
+        decals.some(
+          (d) =>
+            (d.kind === 'crater' || d.kind === 'scorch') && Math.hypot(d.x - t.x, d.z - t.z) < 8,
+        ),
+        `target at ${t.x}, ${t.z}`,
+      ).toBe(true);
+    expect(planFoundryFloorDecals()).toEqual(decals);
+  });
+});
+
 describe('Stormbrass Foundry kit: the Crane Bridge swing', () => {
   it('seats the span exactly on the walked deck', () => {
     const deck = craneBridgeDeck();
@@ -745,6 +878,8 @@ const HEAD_ROOM_ALLOWANCE: Readonly<Record<string, number>> = {
   // A railing on the lip, inside the cliff collider's reach (the Temple's
   // balustrade precedent).
   Kit_RailingEdge: 1.9,
+  Kit_RailingEdgeB: 1.9,
+  Kit_RailingEdgeC: 1.9,
 };
 /** Knee-high litter (kerbs, ingots, drums, sandbags, rails) is fine anywhere. */
 const KNEE = 1.6;
@@ -804,7 +939,15 @@ describe('Stormbrass Foundry kit: nothing stands in a walkway without a collider
             failures.push(`${tag}: no deck over the truss`);
           continue;
         }
+        case 'Kit_MineAdit': {
+          // Let into a cliff face under a lip.
+          if (cliffDistance(p.x, p.z) > 5) failures.push(`${tag}: no cliff face behind it`);
+          if (walkable(p.x, p.z)) failures.push(`${tag}: on a floor`);
+          continue;
+        }
         case 'Kit_BoilerHouse':
+        case 'Kit_BlastFurnace':
+        case 'Kit_SteamHammer':
         case 'Kit_FurnaceMouth':
         case 'Kit_LiftStation':
         case 'Kit_ModelFrame':

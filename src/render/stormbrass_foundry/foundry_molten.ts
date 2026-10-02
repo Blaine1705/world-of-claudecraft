@@ -21,11 +21,13 @@ import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { radialGlowTexture } from '../textures';
 import {
   FOUNDRY_MOLTEN_CHANNEL as C,
+  FOUNDRY_FORGE,
   FOUNDRY_KIT_SIZES,
   FOUNDRY_POUR_MOULDS,
+  forgeFurnacePoints,
   ladleState,
 } from './foundry_kit_plan_core';
-import { LADLE_TIP } from './foundry_machines';
+import { HAMMER_SPARK_GATE, LADLE_TIP } from './foundry_machines';
 import { buildFoundrySparks, type SparkEmitter, setSparkGate } from './foundry_sparks';
 
 const ground = (x: number, z: number): number =>
@@ -99,6 +101,7 @@ void main() {
   col *= 0.7 + 0.4 * wall;
   gl_FragColor = vec4(col, 1.0);
   #include <fog_fragment>
+  #include <colorspace_fragment>
 }
 `;
 
@@ -123,6 +126,32 @@ void main() {
   vec3 col = mix(vec3(1.0, 0.86, 0.5), vec3(1.0, 0.42, 0.08), smoothstep(0.1, 0.9, vUv.y) + n * 0.2);
   gl_FragColor = vec4(col * 1.3, a);
   #include <fog_fragment>
+  #include <colorspace_fragment>
+}
+`;
+
+// A tongue of flame: v runs UP from the root (0), u across. Ragged tongues
+// climb and tear off; uPour is how hard it burns.
+const FLAME_FRAG = /* glsl */ `
+precision highp float;
+varying vec2 vUv;
+uniform float uTime;
+uniform float uPour;
+uniform float uLength;
+${NOISE}
+#include <fog_pars_fragment>
+void main() {
+  float h = vUv.y;
+  float n = fbm(vec2(vUv.x * 3.2, h * uLength * 0.35 - uTime * 2.6));
+  float lick = fbm(vec2(vUv.x * 7.0 + 4.0, h * uLength * 0.7 - uTime * 4.4));
+  float width = mix(0.46, 0.06, pow(h, 0.8)) * (0.75 + 0.5 * n);
+  float body = smoothstep(width, width * 0.3, abs(vUv.x - 0.5) + (lick - 0.5) * 0.22 * h);
+  float a = body * smoothstep(1.0, 0.55, h + (n - 0.5) * 0.5) * uPour;
+  if (a < 0.02) discard;
+  vec3 col = mix(vec3(1.0, 0.9, 0.55), vec3(1.0, 0.36, 0.05), smoothstep(0.0, 0.7, h + lick * 0.3));
+  col = mix(col, vec3(0.5, 0.08, 0.02), smoothstep(0.6, 1.0, h));
+  gl_FragColor = vec4(col * 1.35, a);
+  #include <colorspace_fragment>
 }
 `;
 
@@ -231,7 +260,7 @@ function buildPourStreams(): THREE.Group {
   const pivotY = floor + L.railLift - FOUNDRY_KIT_SIZES.ladleHang;
   const mouldTop = floor + 0.8;
   const length = pivotY - mouldTop;
-  const geo = markSharedGeometry(streamGeometry(0.9, 1));
+  const geo = markSharedGeometry(streamGeometry(1.7, 1));
   FOUNDRY_POUR_MOULDS.forEach((_, lane) => {
     const pour = { value: 0 };
     const mat = shader(
@@ -244,6 +273,14 @@ function buildPourStreams(): THREE.Group {
     mesh.name = `stormbrassPour:${lane}`;
     mesh.renderOrder = 6;
     mesh.matrixAutoUpdate = false;
+    // The pour's own light: a glare where the metal strikes the mould and a
+    // halo down the stream, swelling with the pour.
+    const glare = new THREE.Sprite(pourGlareMaterial());
+    glare.position.set(FOUNDRY_POUR_MOULDS[lane], mouldTop + 0.6, L.railZ);
+    glare.renderOrder = 6;
+    const halo = new THREE.Sprite(pourGlareMaterial());
+    halo.renderOrder = 6;
+    group.add(glare, halo);
     // The ladles' phases (planFoundryMovers): half a round apart.
     const phase = lane * 0.5;
     const place = (): void => {
@@ -259,6 +296,10 @@ function buildPourStreams(): THREE.Group {
       mesh.matrixWorld.multiplyMatrices(group.matrixWorld, mesh.matrix);
       pour.value = s.pour;
       setSparkGate(1 + lane, s.pour);
+      const flicker = 0.9 + 0.1 * Math.sin(sharedUniforms.uTime.value * 31 + lane);
+      glare.scale.setScalar(0.001 + s.pour * 13 * flicker);
+      halo.position.set(s.x, (top + mouldTop) / 2, L.railZ + lz);
+      halo.scale.set(0.001 + s.pour * 5, 0.001 + s.pour * (top - mouldTop) * 1.5, 1);
     };
     place();
     mesh.onBeforeRender = place;
@@ -268,6 +309,167 @@ function buildPourStreams(): THREE.Group {
     group.add(mesh);
   });
   return group;
+}
+
+let pourGlare: THREE.SpriteMaterial | null = null;
+
+function pourGlareMaterial(): THREE.SpriteMaterial {
+  if (!pourGlare) {
+    pourGlare = new THREE.SpriteMaterial({
+      map: radialGlowTexture(),
+      color: 0xffb04a,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false,
+      name: 'stormbrassPourGlare',
+    });
+    markSharedMaterial(pourGlare);
+  }
+  return pourGlare;
+}
+
+/** A flame card pair rooted at (0, 0, 0) and climbing `length` yards. */
+function flameGeometry(width: number, length: number): THREE.BufferGeometry {
+  const g = streamGeometry(width, length);
+  // streamGeometry hangs DOWN with v = 0 at the top: stand it up.
+  const p = g.getAttribute('position');
+  for (let i = 0; i < p.count; i++) p.setY(i, -p.getY(i));
+  p.needsUpdate = true;
+  g.computeBoundingSphere();
+  return g;
+}
+
+/** The Forge Gauntlet's blast furnace: flame roaring out of the tap arch and
+ *  off the throat, the slag running off the end of its runner into the drop,
+ *  and the glare of it all on the catwalk's side. */
+function buildBlastFurnaceFire(lowGfx: boolean): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'stormbrassBlastFurnaceFire';
+  const at = forgeFurnacePoints();
+  const flame = (
+    name: string,
+    x: number,
+    y: number,
+    z: number,
+    width: number,
+    length: number,
+    tilt: number,
+  ): void => {
+    const mesh = new THREE.Mesh(
+      flameGeometry(width, length),
+      shader(name, FLAME_FRAG, { uPour: { value: 1 }, uLength: { value: length } }, true),
+    );
+    (mesh.material as THREE.ShaderMaterial).blending = THREE.AdditiveBlending;
+    mesh.position.set(x, y, z);
+    // Blown out of the arch toward the catwalk (west).
+    mesh.rotation.z = tilt;
+    mesh.name = name;
+    mesh.renderOrder = 6;
+    group.add(mesh);
+  };
+  flame('stormbrassFurnaceMouthFlame', at.mouth.x + 0.4, at.mouth.y - 1.6, at.mouth.z, 4.6, 9, 0.5);
+  flame('stormbrassFurnaceThroatFlame', at.throat.x, at.throat.y, at.throat.z, 7, 13, 0);
+  // The slag off the runner's end, down into the drop.
+  const fallLen = at.runnerEnd.y - C.fall.bottom;
+  const fall = new THREE.Mesh(
+    streamGeometry(2.4, fallLen),
+    shader(
+      'stormbrassSlagFall',
+      FALL_FRAG,
+      { uPour: { value: 1 }, uLength: { value: fallLen } },
+      true,
+    ),
+  );
+  fall.position.set(at.runnerEnd.x - 0.3, at.runnerEnd.y, at.runnerEnd.z);
+  fall.name = 'stormbrassSlagFall';
+  fall.renderOrder = 6;
+  group.add(fall);
+  if (!lowGfx) {
+    for (const [p, size] of [
+      [at.mouth, 22],
+      [at.throat, 30],
+    ] as const) {
+      const glare = new THREE.Sprite(pourGlareMaterial());
+      glare.position.set(p.x - 1.5, p.y, p.z);
+      glare.scale.setScalar(size);
+      glare.renderOrder = 6;
+      group.add(glare);
+    }
+  }
+  return group;
+}
+
+/** The sparks of the Forge Gauntlet: the furnace's mouth and throat, the
+ *  slag's fall, and a burst off each anvil as its hammer lands. */
+function forgeSparkEmitters(): SparkEmitter[] {
+  const at = forgeFurnacePoints();
+  const out: SparkEmitter[] = [
+    {
+      x: at.mouth.x,
+      y: at.mouth.y - 0.6,
+      z: at.mouth.z,
+      vx: -7,
+      vy: 4,
+      vz: 0,
+      spread: 5,
+      life: 1.5,
+      gravity: 8,
+      size: 0.2,
+      count: 180,
+      hue: 0,
+      gate: 0,
+    },
+    {
+      x: at.throat.x,
+      y: at.throat.y,
+      z: at.throat.z,
+      vx: -1.5,
+      vy: 7,
+      vz: 0,
+      spread: 4,
+      life: 3,
+      gravity: -0.6,
+      size: 0.22,
+      count: 130,
+      hue: 0,
+      gate: 0,
+    },
+    {
+      x: at.runnerEnd.x - 0.3,
+      y: at.runnerEnd.y,
+      z: at.runnerEnd.z,
+      vx: -1.6,
+      vy: 1.6,
+      vz: 0,
+      spread: 2.4,
+      life: 1.8,
+      gravity: 9,
+      size: 0.16,
+      count: 60,
+      hue: 0,
+      gate: 0,
+    },
+  ];
+  FOUNDRY_FORGE.hammers.forEach((h, k) => {
+    out.push({
+      x: h.x,
+      y: FOUNDRY_FORGE.hammerBase + FOUNDRY_FORGE.strikeAt,
+      z: h.z,
+      vx: 0,
+      vy: 3.5,
+      vz: 0,
+      spread: 9,
+      life: 0.7,
+      gravity: 12,
+      size: 0.15,
+      count: 110,
+      hue: 0,
+      gate: HAMMER_SPARK_GATE + k,
+    });
+  });
+  return out;
 }
 
 /** A soft heat glow hanging over the hot metal (additive cards). */
@@ -318,11 +520,11 @@ export function moltenSparkEmitters(
       vx: 0,
       vy: 6.2,
       vz: 0,
-      spread: 5.2,
-      life: 1.2,
+      spread: 7.5,
+      life: 1.5,
       gravity: 11,
-      size: 0.13,
-      count: 150,
+      size: 0.18,
+      count: 320,
       hue: 0,
       gate: 1 + lane,
     });
@@ -333,10 +535,26 @@ export function moltenSparkEmitters(
       vx: 0,
       vy: 0.6,
       vz: 0,
-      spread: 2.4,
+      spread: 2.8,
       life: 1.1,
       gravity: 10,
-      size: 0.1,
+      size: 0.14,
+      count: 160,
+      hue: 0,
+      gate: 1 + lane,
+    });
+    // Embers carried up on the heat over the mould.
+    out.push({
+      x,
+      y: pad + 1.2,
+      z: L.railZ,
+      vx: 0,
+      vy: 3.4,
+      vz: 0,
+      spread: 1.8,
+      life: 2.6,
+      gravity: -1.2,
+      size: 0.12,
       count: 90,
       hue: 0,
       gate: 1 + lane,
@@ -450,10 +668,11 @@ export function buildFoundryMolten(opts: FoundryMoltenOptions): THREE.Group {
   group.add(buildFall());
   group.add(buildSpout());
   group.add(buildPourStreams());
+  group.add(buildBlastFurnaceFire(opts.lowGfx));
   if (!opts.lowGfx) group.add(buildHeatGlow());
   group.add(
     buildFoundrySparks(
-      [...moltenSparkEmitters(opts.grinder), ...opts.extraSparks],
+      [...moltenSparkEmitters(opts.grinder), ...forgeSparkEmitters(), ...opts.extraSparks],
       opts.lowGfx ? 0.35 : opts.density,
     ),
   );

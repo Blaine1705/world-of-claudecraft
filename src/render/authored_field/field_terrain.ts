@@ -22,6 +22,7 @@ import {
   plateDetail,
   rockDetail,
   soilDetail,
+  strataDetail,
 } from './field_textures';
 
 function geometryOf(data: FieldMeshData, indexed: boolean): THREE.BufferGeometry {
@@ -51,6 +52,9 @@ export interface FieldTerrainOptions {
    *  running down to the void floor, so the dungeon's own trusses show. The
    *  sim's lip colliders are unchanged. */
   shallow?: { surfaces: ReadonlySet<string>; depth: number };
+  /** The cliff faces' rock: fractured slabs (the default) or level bedded
+   *  strata (a shelf cut into a mountain). */
+  cliffRock?: 'slabs' | 'strata';
 }
 
 /** Build the ground of a field: tops (one mesh per texture family) and cliffs. */
@@ -64,7 +68,7 @@ export function buildAuthoredFieldTerrain(
     maxEdge: opts.maxEdge ?? (opts.lowGfx ? 6 : 3),
     layerLift: 0,
   });
-  const rock = rockDetail();
+  const rock = opts.cliffRock === 'strata' ? strataDetail() : rockDetail();
   // Each family's detail pair and its sheen; a material is minted only for a
   // family the field actually draws (the shared cache dedupes the rest).
   const looks: Record<

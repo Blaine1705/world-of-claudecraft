@@ -12,16 +12,22 @@ import * as THREE from 'three';
 import { sharedUniforms } from '../gfx';
 import { FOUNDRY_SLOTS, foundryPieceGeometry, foundryPieceMaterial } from './foundry_kit';
 import {
+  FOUNDRY_FORGE,
   FOUNDRY_KIT_SIZES,
   type FoundryMover,
+  hammerBlow,
   jibYaw,
   ladleState,
   pistonStroke,
   planFoundryMovers,
 } from './foundry_kit_plan_core';
+import { setSparkGate } from './foundry_sparks';
 
 /** How far a ladle swings over to pour (radians about its trunnions). */
 export const LADLE_TIP = 1.55;
+
+/** The first steam hammer's spark gate (one each, foundry_sparks.ts). */
+export const HAMMER_SPARK_GATE = 5;
 
 const q = new THREE.Quaternion();
 const qa = new THREE.Quaternion();
@@ -47,6 +53,13 @@ export function moverMatrix(mv: FoundryMover, t: number, out: THREE.Matrix4): TH
     case 'slew':
       yaw = jibYaw(t, mv.rot, mv.rate, mv.phase, mv.amp ?? 0.9);
       break;
+    case 'hammer': {
+      const blow = hammerBlow(t, mv.phase);
+      pos.y += blow.lift * FOUNDRY_FORGE.raise;
+      // The blow's sparks (the hammers' gates follow the bridge's).
+      setSparkGate(HAMMER_SPARK_GATE + (mv.amp ?? 0), blow.struck);
+      break;
+    }
     case 'ladle':
     case 'trolley': {
       const s = ladleState(t, mv.phase, mv.amp ?? 0);
@@ -94,11 +107,15 @@ export function buildFoundryMachines(
     const pose = (): void => {
       const t = sharedUniforms.uTime.value;
       if (t === stamp) return;
+      // The instance buffer uploads BEFORE this hook runs, so what is written
+      // here is drawn next frame: pose for the frame that will show it (one
+      // frame's time ahead), so a ladle and its pour stream stay together.
+      const lead = Number.isNaN(stamp) ? 0 : Math.min(0.05, Math.max(0, t - stamp));
       stamp = t;
-      list.forEach((mv, i) => {
-        moverMatrix(mv, t, m);
+      for (let i = 0; i < list.length; i++) {
+        moverMatrix(list[i], t + lead, m);
         m.toArray(matrices.array as Float32Array, i * 16);
-      });
+      }
       matrices.needsUpdate = true;
     };
     pose();
@@ -106,7 +123,8 @@ export function buildFoundryMachines(
     const r = reach(piece);
     const box = new THREE.Box3();
     for (const mv of list) {
-      const travel = mv.motion === 'ladle' || mv.motion === 'trolley' ? 26 : 0;
+      const travel =
+        mv.motion === 'ladle' || mv.motion === 'trolley' ? 26 : mv.motion === 'hammer' ? 4 : 0;
       const ext = r * mv.scale + travel;
       box.expandByPoint(new THREE.Vector3(mv.x - ext, mv.y - ext, mv.z - ext));
       box.expandByPoint(new THREE.Vector3(mv.x + ext, mv.y + ext, mv.z + ext));

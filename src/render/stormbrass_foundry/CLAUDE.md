@@ -23,6 +23,9 @@ here). The dungeon's creatures are the Blender looks in
 | `foundry_molten.ts` | The molten river in the gulf under the Line Catwalk (drifting slag plates, white-gold seams), its fall, the furnace spout, the ladles' pour streams, heat glows, the spark emitter list. |
 | `foundry_sparks.ts` | Every spark shower in ONE instanced draw (flight in the vertex shader), gated per shower (`setSparkGate`: the two pours, the coil strike, the bridge seats). |
 | `foundry_steam.ts` | Steam and smoke cards from the emitter list (one instanced draw per kind). |
+| `foundry_floor_plan_core.ts` | PURE: the floor marks (`planFoundryFloorDecals`): oil, scorch, puddles, slag, drains, grilles, plate seams, hazard bands, lane lines, chalk layouts, the Rail Yard turntable, ruts and craters on the ranges. Authored marks follow the props (a crater ring round every target, ash before every firebox); the scatter is hashed per ground and sheds on the low tier. Every mark lies flat on ONE floor, off the belts. |
+| `foundry_floor_decals.ts` | The floor marks as ONE merged, lit, shadow-receiving mesh from one procedural 4 by 4 atlas, on the floor ladder's GROUND rung (under every player effect and telegraph). |
+| `foundry_shake.ts` | The environment's camera-shake sink (`setFoundryShakeSink`, wired by `../rift_death_zone.ts`; `foundryShake`): the Crane Bridge's clang. Reduced motion mutes it. |
 | `foundry_bridge_core.ts` | PURE: the Crane Bridge swing (`craneBridgePose`, `craneBridgeProgress`): the crane carries the span on its hook, seats it, then drops the slings and hoists the hook clear (`CRANE_BRIDGE_SEAT_SHARE`). |
 | `foundry_gates.ts` | Steam shutters, arc fences and the Crane Bridge rig on kit pieces, driven by the shared gate memory. |
 | `foundry_plan_core.ts` | PURE: palette, the budgeted light spots (`planFoundryLights`), the painted glows (`planFoundryGlows`: flood masts and firebox doors, no lights), the strike clock and afterglow, bolt paths, the valley height and buttresses, the bridge deck, gate motion curves. |
@@ -39,6 +42,18 @@ here). The dungeon's creatures are the Blender looks in
 | `foundry_vents.ts` / `foundry_vents_core.ts` | Line-Master Tock's Scalding Vents: `buildFoundryVents` (walkway grilles, glowing pits and the shader jets, built with the interior) and `FoundryVentFx` (owned by `FoundryFx`: the five walkway lanes in the shared telegraph kit, the two uniforms eased from the live strip objects, the steam pool). The lanes are actionable and draw on every tier; on the low tier every other jet blows and the steam thins. The jets fade near the camera and the steam is kept thin so it never hides the belts, the press strips or the boss. |
 | `foundry_lock_marker.ts` | `FoundryLockMarkers`: a red crosshair billboard over every player wearing the Rangewarden's Target Lock (who is marked). Actionable, every tier, `depthTest: false`; one geometry and one material under the `FoundryFx` root, the reticle drawn and turned in its shader. It replaced a floor ring that followed the runner and read as the landing circle. |
 | `foundry_hatch_beacon.ts` | `FoundryHatchBeacon`: an additive gold shaft standing on the Prime Draft's Core Hatch while it is open (where to carry the Storm Cell, and when). Actionable, every tier; one cylinder and one material under the `FoundryFx` root, breathing at the hatch ring's rate, on the encounter band's top step (over the ring's own telegraph). |
+
+Second pass additions inside the modules above: edge tile VARIANTS (`foundryEdgeVariant`,
+`FOUNDRY_EDGE_VARIANTS`: railing, machine lip / retaining wall, pipe edge, same contract so
+any tile fits any run), mine adits let into the cliff faces (`planAdits`), the Forge
+Gauntlet either side of the Gantry Catwalk (`FOUNDRY_FORGE`, `planForgeGauntlet`: a blast
+furnace on a pier with flame, slag fall and sparks in `foundry_molten.ts`, three steam
+hammers whose tups are `hammer` movers with a spark gate each), bedded strata and ore veins
+painted on the cliff faces (`foundry_interior.ts` `paintStrata` over the `strata` rock
+detail), ridged strata massifs, benched quarry buttresses and two haze veils
+(`foundry_sky.ts`), and a coil strike that washes the kit, the peaks and the haze
+(`setFoundryStrikeFlash`). Custom shaders here author LINEAR colours and end with
+`#include <colorspace_fragment>`.
 
 Rules: motion is shader-side on `sharedUniforms.uTime`, or one matrix write per
 moving mesh in its own `onBeforeRender` (pinned in `tests/point_light_carriers.test.ts`);

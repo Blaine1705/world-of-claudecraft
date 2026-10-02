@@ -21,6 +21,7 @@ import {
   craneBridgePose,
   craneBridgeProgress,
   craneBridgeRig,
+  craneBridgeSeats,
 } from './foundry_bridge_core';
 import { foundryKitMeshes, foundryKitRun, upgradeWhenKitLands } from './foundry_kit';
 import { FOUNDRY_KIT_SIZES } from './foundry_kit_plan_core';
@@ -30,6 +31,7 @@ import {
   craneBridgeDeck,
   shutterLift,
 } from './foundry_plan_core';
+import { foundryShake } from './foundry_shake';
 import { setSparkGate } from './foundry_sparks';
 
 interface GateRig {
@@ -71,8 +73,11 @@ float noise(vec2 p) {
 }
 void main() {
   float n = noise(vec2(vUv.x * 6.0, vUv.y * 4.0 - uTime * 2.0)) * 0.7 + noise(vUv * 13.0 + uTime) * 0.3;
-  float body = smoothstep(0.0, 0.25, vUv.y) * smoothstep(1.0, 0.4, vUv.y);
+  // A soft-edged billow (no card edge shows): ragged at the sides and the top.
+  float side = smoothstep(0.5, 0.18, abs(vUv.x - 0.5) + (n - 0.5) * 0.18);
+  float body = smoothstep(0.0, 0.25, vUv.y) * smoothstep(1.0, 0.4, vUv.y) * side;
   gl_FragColor = vec4(vec3(0.93, 0.95, 0.96), n * body * uPuff * 0.85);
+  #include <colorspace_fragment>
 }
 `;
 
@@ -157,6 +162,7 @@ void main() {
   vec3 col = mix(vec3(0.75, 0.88, 1.0), vec3(1.0, 0.85, 0.9), uSeal);
   float veil = 0.08 * uCharge;
   gl_FragColor = vec4(col, (min(1.0, a) + veil) * uCharge);
+  #include <colorspace_fragment>
 }
 `;
 
@@ -282,8 +288,28 @@ function craneBridge(): GateRig {
   steam.position.set(rig.mast.x + 1.5, rig.mast.top - 12, rig.mast.z + 1.5);
   steam.rotation.y = Math.PI / 4;
   steam.renderOrder = 9;
+  // The seats: a wall of dust and steam bursting from under each end as the
+  // span slams home.
+  const slamU = { uTime: sharedUniforms.uTime, uPuff: { value: 0 } };
+  const slamMat = new THREE.ShaderMaterial({
+    name: 'stormbrassBridgeSlam',
+    vertexShader: SHEET_VERT,
+    fragmentShader: PUFF_FRAG,
+    uniforms: slamU,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+  const slams = craneBridgeSeats().map((seat) => {
+    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(16, 9), slamMat);
+    sheet.position.set(seat.x, seat.y + 3.4, seat.z);
+    sheet.renderOrder = 9;
+    return sheet;
+  });
   const root = new THREE.Group();
-  root.add(span, jib, hook, hoist, ...slings, steam);
+  root.add(span, jib, hook, hoist, ...slings, steam, ...slams);
+  /** Has this swing's clang rung (once per seating)? */
+  let clanged = true;
   // The swing runs on its own slow clock (the gate memory's reveal is a
   // shutter's two seconds): from where it stood when the gate last changed.
   let from: number | null = null;
@@ -328,10 +354,19 @@ function craneBridge(): GateRig {
           vc2.set(va.x + eyes[i][0] * 0.07, va.y - 3.2, va.z + (i < 2 ? -0.25 : 0.25));
           vb.lerp(vc2, pose.release);
         }
-        strand(s, va, vb, 1.4);
+        strand(s, va, vb, 2.2);
       });
       steamU.uPuff.value = pose.working * 0.9;
-      setSparkGate(BRIDGE_SPARK_GATE, pose.touchdown);
+      // The span grinds down in a storm of sparks; the instant it seats, the
+      // whole landing rings (one camera shake) and dust bursts from both seats.
+      const seating = pose.release > 0 && pose.release < 1;
+      setSparkGate(BRIDGE_SPARK_GATE, Math.max(pose.touchdown, seating ? 1 - pose.release : 0));
+      slamU.uPuff.value = seating ? 1 - pose.release : pose.touchdown * 0.5;
+      if (k < 0.5) clanged = false;
+      else if (!clanged && open && pose.release > 0) {
+        clanged = true;
+        foundryShake(0.55);
+      }
     },
   };
 }
