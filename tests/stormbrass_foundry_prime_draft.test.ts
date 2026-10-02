@@ -7,7 +7,7 @@
 // and the Heartless deed.
 
 import { describe, expect, it } from 'vitest';
-import { CELL_RACKS } from '../src/sim/content/stormbrass_foundry_layout';
+import { CELL_RACKS, GANTRY } from '../src/sim/content/stormbrass_foundry_layout';
 import {
   carriedCell,
   DRAFT_ARM_SWEEP,
@@ -263,14 +263,43 @@ describe('the Prime Draft: the three phases', () => {
     expect(hitsOn(f, f.others[2], 'Arm Sweep', sweepFrom)).toHaveLength(0);
   });
 
-  it('never steps off its spot while bolted', () => {
+  it('holds still through its Awakening bar', () => {
     const { f, b } = draftFight();
-    awake(f, b);
+    put(f, f.tank, 0, 190);
+    run(f, 0.1);
     const at = local(f, b);
-    put(f, f.tank, 0, 180);
-    run(f, 3);
+    run(f, T.awakenCast - 0.3);
+    expect(b.castingAbility).toBe(DRAFT_AWAKEN);
     expect(local(f, b).x).toBeCloseTo(at.x, 3);
     expect(local(f, b).z).toBeCloseTo(at.z, 3);
+  });
+
+  it('steps slowly toward its target while bolted, never past the Gantry edge', () => {
+    const { f, b } = draftFight();
+    const st = awake(f, b);
+    expect(st.phase).toBe('bolted');
+    expect(b.moveSpeed).toBe(T.boltedSpeed);
+    expect(T.boltedSpeed).toBeLessThan(T.unboltedSpeed);
+    // The tank backs off across the Gantry and out past its far edge.
+    const at = local(f, b);
+    put(f, f.tank, 0, 175);
+    run(f, 3);
+    const step = Math.hypot(local(f, b).x - at.x, local(f, b).z - at.z);
+    expect(step).toBeGreaterThan(1);
+    // Slow: well under what its unbolted walk would cover.
+    expect(step).toBeLessThan(T.unboltedSpeed * 3 * 0.75);
+    expect(local(f, b).z).toBeLessThan(at.z);
+    // However long the tank waits out there, it never leaves the Gantry.
+    const edge = GANTRY.r - T.gantryMargin;
+    let farthest = 0;
+    run(f, 20, () => {
+      const p = local(f, b);
+      farthest = Math.max(farthest, Math.hypot(p.x - GANTRY.x, p.z - GANTRY.z));
+    });
+    expect(farthest).toBeLessThanOrEqual(edge + 1e-6);
+    // It reached that edge (not stuck short of it).
+    const p = local(f, b);
+    expect(Math.hypot(p.x - GANTRY.x, p.z - GANTRY.z)).toBeGreaterThan(edge - 1);
   });
 
   it('Unbolted at 70 percent: a rivet shower, it walks, and Tremor Step every 10 s', () => {

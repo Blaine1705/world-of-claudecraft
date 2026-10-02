@@ -1,7 +1,8 @@
 // The Voltaic Warden (src/sim/encounters/stormbrass_foundry/voltaic_warden.ts
 // and voltaic_plating.ts): the G21 conduction plating (the wrong kind of damage
 // is turned aside through combat/damage.ts and banked), the Discharge on the
-// flip, the plated drones, Static Lash and its leap, the Coil Strike, heroic
+// flip, the flip countdown on the plating aura (kept up through a stunned
+// flip), the plated drones, Static Lash and its leap, the Coil Strike, heroic
 // Rapid Cycling and Split Plating, the reset and the Grounded deed.
 
 import { describe, expect, it } from 'vitest';
@@ -102,6 +103,56 @@ describe('the Voltaic Warden: Conduction Plating (G21)', () => {
     expect(strike(f, f.others[0], b, 'frost', 100)).toBeGreaterThan(0);
     expect(strike(f, f.tank, b, 'physical', 100)).toBe(0);
     expect(state(b).stored).toBe(100);
+  });
+
+  it('the plating aura counts down to the flip, on the Warden and its drones alike', () => {
+    const { f, b } = wardenFight();
+    run(f, 5);
+    const face = aura(b, VOLTAIC_GROUNDED);
+    expect(face).toBeDefined();
+    // A real clock the client mirrors (a deadline on the wire), not a
+    // permanent aura.
+    expect(face?.permanent).not.toBe(true);
+    expect(face?.duration).toBe(T.flipEvery);
+    expect(face?.remaining ?? 0).toBeCloseTo(T.flipEvery - 5, 1);
+    launchPlatedDrones(f.sim.ctx, f.inst, b, state(b));
+    run(f, 1);
+    for (const d of live(f, ARC_DRONE_ID)) {
+      const df = aura(d, VOLTAIC_CHARGED);
+      expect(df?.duration).toBe(T.flipEvery);
+      expect(df?.remaining ?? 0).toBeCloseTo(T.flipEvery - 6, 1);
+    }
+    // After the flip the new face counts down a fresh cycle.
+    run(f, T.flipEvery - 6 + 0.5);
+    expect(aura(b, VOLTAIC_CHARGED)?.remaining ?? 0).toBeCloseTo(T.flipEvery - 0.5, 1);
+  });
+
+  it('a Warden stunned past its flip keeps its plates up, then flips once the stun ends', () => {
+    const { f, b } = wardenFight();
+    run(f, T.flipEvery - T.flipCast - 1);
+    // Straight onto the aura list: a boss shrugs off an ordinary stun, but an
+    // encounter stun (an Overload, a scripted knockdown) holds it like this.
+    b.auras.push({
+      id: 'test_stun',
+      name: 'Test Stun',
+      kind: 'stun',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: f.tank.id,
+      school: 'physical',
+    });
+    for (let i = 0; i < 8 / 0.05; i++) {
+      run(f, 0.05);
+      const face = aura(b, VOLTAIC_GROUNDED);
+      expect(face, `plating at tick ${i}`).toBeDefined();
+      expect(face?.remaining ?? 0).toBeGreaterThan(0);
+    }
+    expect(aura(b, VOLTAIC_CHARGED)).toBeUndefined();
+    run(f, 0.2);
+    expect(b.castingAbility).toBe(VOLTAIC_FLIP);
+    run(f, T.flipCast);
+    expect(aura(b, VOLTAIC_CHARGED)).toBeDefined();
   });
 
   it('Discharge: 20 percent of the bank to everyone on the crown, capped at 400', () => {

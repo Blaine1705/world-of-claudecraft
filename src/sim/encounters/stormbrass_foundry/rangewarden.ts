@@ -3,12 +3,15 @@
 // follow (G20 trail salvo).
 //
 //   Target Lock   every 18 s two non-tank players (heroic Walking Barrage:
-//                 three) are marked for 8 s. Every second the berm turrets
-//                 fire at the spot where each marked player stood 1.5 s
-//                 earlier: a 5 yd circle paints for 0.6 s, then 250 to 300 to
-//                 everyone in it. Keep moving and the shells land behind you;
-//                 stand still and you are shelled; run through the group and
-//                 you drag the shells into your friends.
+//                 three) are marked for 8 s (a crosshair over their heads).
+//                 As the mark lands and then every second, a 5 yd circle
+//                 paints UNDER each marked player and stays there: dim for
+//                 1.5 s, red for the last 0.6 s while the berm turret's shell
+//                 flies, then 250 to 300 to everyone in it. Keep moving and
+//                 the shells land behind you; stand still and you are shelled;
+//                 run through the group and you drag the shells into your
+//                 friends. The mark ends the moment its aura is gone (expired,
+//                 stripped by an immunity); circles already painted still land.
 //   Bunkers       the range's two low bunkers are cover: a shell landing in a
 //                 bunker's lee (east of the wall, away from the berm) bursts on
 //                 the wall instead, three times per Target Lock before the
@@ -22,11 +25,11 @@
 //                 crossed back quickly.
 //
 // The deed (Clean Range): defeat it with nobody hit by a salvo shell.
-// Deterministic: the marks are hashed (pickMarkTargets), each marked player's
-// trail is a fixed-tick position history (one sample a tick), the only rng
-// draws are damage rolls. Every visible state rides existing fields: the
-// Target Lock aura, the shell and shrapnel objects, the bunker objects
-// (sound or breached), the Proof Shot bar.
+// Deterministic: the marks are hashed (pickMarkTargets), each circle samples
+// its player's position on a fixed tick, the only rng draws are damage rolls.
+// Every visible state rides existing fields: the Target Lock aura, the shell
+// circles (pending, then red: their template) and the shrapnel objects, the
+// bunker objects (sound or breached), the Proof Shot bar (its castTargetId).
 
 import { PROVING_RANGE, RANGE_BUNKERS } from '../../content/stormbrass_foundry_layout';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
@@ -54,6 +57,7 @@ import {
   bunkerLeeAt,
   FOUNDRY_BUNKER_TEMPLATES,
   FOUNDRY_SHELL_MARK,
+  FOUNDRY_SHELL_PENDING,
   FOUNDRY_SHRAPNEL,
   RANGE_DENTED,
   RANGE_DRILL_DRONES,
@@ -72,10 +76,6 @@ export const RANGEWARDEN_LINES = {
   drones: 'Drill drones, launch. Flush them out.',
   death: 'Range... clear...',
 } as const;
-
-/** Trail samples kept per marked player: the shell lag at 20 Hz plus slack. */
-const TRAIL_SAMPLES = Math.ceil(T.shellLag / DT) + 4;
-const LAG_TICKS = Math.round(T.shellLag / DT);
 
 function freshState(): RangewardenFightState {
   return {
@@ -148,12 +148,7 @@ export function startTargetLock(
   const picks = pickMarkTargets(boss, rangePlayers(ctx, inst), count, st.casts, busy);
   for (const p of picks) {
     const at = localOf(ctx, inst, p);
-    st.marks.push({
-      playerId: p.id,
-      remaining: T.lockSeconds,
-      shellTimer: T.shellEvery,
-      trail: [at],
-    });
+    st.marks.push({ playerId: p.id, remaining: T.lockSeconds, shellTimer: T.shellEvery });
     ctx.applyAura(p, {
       id: RANGE_TARGET_LOCK,
       name: 'Target Lock',
@@ -174,20 +169,17 @@ export function startTargetLock(
       fx: 'windup',
       ability: RANGE_TARGET_LOCK,
     });
+    // The first circle paints under them as the mark lands.
+    paintShell(ctx, inst, st, at);
   }
   return picks.length;
 }
 
-/** Where the mark stood `shellLag` seconds ago (its oldest sample before then). */
-export function trailSpot(trail: readonly { x: number; z: number }[]): { x: number; z: number } {
-  const i = Math.max(0, trail.length - 1 - LAG_TICKS);
-  return trail[i];
-}
-
-function fireShell(
+/** Paint a circle under a marked player, where they stand right now: dim
+ *  until the berm gun fires, and it never moves. */
+function paintShell(
   ctx: SimContext,
   inst: InstanceSlot,
-  boss: Entity,
   st: RangewardenFightState,
   at: { x: number; z: number },
 ): void {
@@ -195,46 +187,58 @@ function fireShell(
   const obj = spawnFoundryObject(
     ctx,
     inst,
-    FOUNDRY_SHELL_MARK,
+    FOUNDRY_SHELL_PENDING,
     'Shell',
     o.x + at.x,
     o.z + at.z,
     T.shellRadius,
   );
-  st.shells.push({ x: at.x, z: at.z, remaining: T.shellWarning, objectId: obj.id });
+  st.shells.push({
+    x: at.x,
+    z: at.z,
+    remaining: T.shellLag + T.shellWarning,
+    objectId: obj.id,
+    fired: false,
+  });
+}
+
+/** The berm gun fires at a painted circle: it turns red for its last beat. */
+function fireShell(
+  ctx: SimContext,
+  boss: Entity,
+  shell: RangewardenFightState['shells'][number],
+): void {
+  shell.fired = true;
+  const obj = ctx.entities.get(shell.objectId);
+  if (obj) obj.templateId = FOUNDRY_SHELL_MARK;
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
-    targetId: obj.id,
+    targetId: shell.objectId,
     school: 'fire',
     fx: 'windup',
     ability: RANGE_SALVO,
   });
 }
 
-function stepMarks(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  boss: Entity,
-  st: RangewardenFightState,
-): void {
+function stepMarks(ctx: SimContext, inst: InstanceSlot, st: RangewardenFightState): void {
   const present = st.marks.length > 0 ? claimPlayers(ctx, inst) : [];
   for (let i = st.marks.length - 1; i >= 0; i--) {
     const m = st.marks[i];
     const p = ctx.entities.get(m.playerId);
-    if (!p || p.dead || !present.includes(p)) {
-      // Dead, gone, or out of the run: the mark ends (and its crosshair).
+    const locked = p?.auras.some((a) => a.id === RANGE_TARGET_LOCK) === true;
+    if (!p || p.dead || !locked || !present.includes(p)) {
+      // Dead, gone, out of the run, or its aura is gone (expired, stripped
+      // by an immunity): the mark ends, and no more circles paint.
       if (p) dropAuraById(p, RANGE_TARGET_LOCK);
       st.marks.splice(i, 1);
       continue;
     }
-    m.trail.push(localOf(ctx, inst, p));
-    if (m.trail.length > TRAIL_SAMPLES) m.trail.shift();
     m.remaining -= DT;
     m.shellTimer -= DT;
-    if (m.shellTimer <= 1e-9) {
+    if (m.shellTimer <= 1e-9 && m.remaining > 1e-9) {
       m.shellTimer += T.shellEvery;
-      fireShell(ctx, inst, boss, st, trailSpot(m.trail));
+      paintShell(ctx, inst, st, localOf(ctx, inst, p));
     }
     if (m.remaining <= 1e-9) {
       st.marks.splice(i, 1);
@@ -319,6 +323,7 @@ function stepShells(
   for (let i = st.shells.length - 1; i >= 0; i--) {
     const s = st.shells[i];
     s.remaining -= DT;
+    if (!s.fired && s.remaining <= T.shellWarning + 1e-9) fireShell(ctx, boss, s);
     if (s.remaining > 1e-9) continue;
     st.shells.splice(i, 1);
     landShell(ctx, inst, boss, st, s);
@@ -462,8 +467,10 @@ export function tickRangewarden(
     return;
   }
   const st = rangeState(ctx, inst, boss);
-  stepMarks(ctx, inst, boss, st);
+  // The circles already painted first, so one painted this tick (by a mark
+  // below or a fresh lock) counts its full 2.1 s from the next tick.
   stepShells(ctx, inst, boss, st);
+  stepMarks(ctx, inst, st);
   while (
     st.drillsFired < T.drillAtHpPct.length &&
     boss.maxHp > 0 &&

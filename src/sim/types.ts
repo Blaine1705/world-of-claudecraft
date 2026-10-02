@@ -4617,16 +4617,16 @@ export interface TockFightState {
 export interface RangewardenFightState {
   kind: 'rangewarden';
   lockTimer: number;
-  /** The marked players: whose, the seconds left, the shell clock, and the
-   *  trail of where they stood (one sample a tick, oldest first). */
+  /** The marked players: whose, the seconds left, the clock to the next
+   *  circle painted under them. */
   marks: {
     playerId: number;
     remaining: number;
     shellTimer: number;
-    trail: { x: number; z: number }[];
   }[];
-  /** Shells in the air: where they land, the seconds left, their circle. */
-  shells: { x: number; z: number; remaining: number; objectId: number }[];
+  /** The painted circles: where they land (never moving), the seconds left,
+   *  their object, and whether the berm gun has fired (the red beat). */
+  shells: { x: number; z: number; remaining: number; objectId: number; fired: boolean }[];
   /** Heroic shrapnel on the ground: where, the seconds left, the tick clock. */
   shrapnel: { x: number; z: number; remaining: number; tick: number; objectId: number }[];
   /** Shells each bunker has swallowed this Target Lock. */

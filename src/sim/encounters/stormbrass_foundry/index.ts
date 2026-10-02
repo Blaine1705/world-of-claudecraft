@@ -49,7 +49,7 @@ export {
   PRIME_DRAFT_DEED_OVERLOADS,
   PRIME_DRAFT_LINES,
 } from './prime_draft';
-export { RANGEWARDEN_DEED, RANGEWARDEN_LINES, rangePlayers, trailSpot } from './rangewarden';
+export { RANGEWARDEN_DEED, RANGEWARDEN_LINES, rangePlayers } from './rangewarden';
 export {
   carriedCell,
   isStormCellObject,

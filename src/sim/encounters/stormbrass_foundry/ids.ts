@@ -257,7 +257,8 @@ export const FOUNDRY_VENT_TEMPLATES = {
 
 // ---- The Rangewarden (5.2): a marked player keeps moving (G20 trail salvo) -----
 
-/** Target Lock: the crosshair over a marked player (an aura on the player). */
+/** Target Lock: the crosshair over a marked player (an aura on the player;
+ *  the mark ends when the aura is gone, however it went). */
 export const RANGE_TARGET_LOCK = 'foundry_target_lock';
 /** One berm shell (the spellfx muzzle cue and the impact). */
 export const RANGE_SALVO = 'foundry_range_salvo';
@@ -277,10 +278,12 @@ export const RANGE_TUNING = {
   /** Players marked per Target Lock (heroic Walking Barrage: three). */
   lockCount: 2,
   heroicLockCount: 3,
-  /** A shell is fired every second at where the mark stood this long ago. */
+  /** Every second a circle paints under each marked player and stays put:
+   *  dim for `shellLag`, then red for `shellWarning` while the shell flies,
+   *  then it lands (2.1 s after the spot was sampled). */
   shellEvery: 1,
   shellLag: 1.5,
-  /** The painted circle's beat before the shell lands. */
+  /** The red beat before the shell lands (the berm gun fires as it starts). */
   shellWarning: 0.6,
   shellRadius: 5,
   shellMin: 250,
@@ -304,7 +307,11 @@ export const RANGE_TUNING = {
   shrapnelPerSecond: 40,
 } as const;
 
-/** A shell's painted circle before it lands (scale = its radius). */
+/** A shell's circle the moment it is painted under a marked player, dim until
+ *  the berm gun fires (scale = its radius); it never moves. */
+export const FOUNDRY_SHELL_PENDING = 'foundry_shell_pending';
+/** The same circle in its last beat, red, the shell in the air (scale = its
+ *  radius). */
 export const FOUNDRY_SHELL_MARK = 'foundry_shell_mark';
 /** Heroic shrapnel on the ground (scale = its radius). */
 export const FOUNDRY_SHRAPNEL = 'foundry_shrapnel_field';
@@ -429,7 +436,8 @@ export const DRAFT_OVERLOADED = 'foundry_overloaded';
 export const DRAFT_ARC_BACK = 'foundry_cell_arc_back';
 /** A cell left too long shorts out over the whole gantry. */
 export const DRAFT_SHORT_OUT = 'foundry_cell_short_out';
-/** Its feet are bolted in (phase 1: an aura on the Draft). */
+/** Its feet are bolted in (phase 1: an aura on the Draft; it drags them after
+ *  its target at a crawl, inside the Gantry). */
 export const DRAFT_BOLTED = 'foundry_draft_bolted';
 /** Below 15 percent: it runs past every limit. */
 export const DRAFT_ENRAGE = 'foundry_draft_overdrive';
@@ -455,6 +463,10 @@ export const DRAFT_TUNING = {
   sweepArcDeg: 120,
   sweepMin: 280,
   sweepMax: 330,
+  /** Bolted, it drags its feet after its target this slowly (yards a second),
+   *  never closer than this to the Gantry's edge. */
+  boltedSpeed: 1.6,
+  gantryMargin: 6,
   // Phase 2, Unbolted.
   unboltAtHpPct: 0.7,
   unboltCast: 2.5,
@@ -565,6 +577,7 @@ export const FOUNDRY_OBJECT_TEMPLATES: ReadonlySet<string> = new Set<string>([
   ...Object.values(FOUNDRY_BELT_TEMPLATES),
   FOUNDRY_PRESS_STRIP,
   ...Object.values(FOUNDRY_VENT_TEMPLATES),
+  FOUNDRY_SHELL_PENDING,
   FOUNDRY_SHELL_MARK,
   FOUNDRY_SHRAPNEL,
   ...Object.values(FOUNDRY_BUNKER_TEMPLATES),

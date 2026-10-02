@@ -23,8 +23,10 @@
 // The deed (Grounded): defeat it without a single Discharge dealing damage.
 // Deterministic: the strike and the lash's leap are hashed or entity-id
 // ordered; the only rng draws are damage rolls. Every visible state rides
-// existing fields: the plating auras (value2 1 on a split Warden), the Stored
-// Charge aura (stacks = the bank), the bars, the strike marks.
+// existing fields: the plating auras (value2 1 on a split Warden; their clock
+// is the flip countdown, refreshed every tick and never run out, so a stunned
+// Warden past its flip keeps its plates), the Stored Charge aura (stacks =
+// the bank), the bars, the strike marks.
 
 import { COIL_CROWN } from '../../content/stormbrass_foundry_layout';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
@@ -91,8 +93,24 @@ export function crownPlayers(ctx: SimContext, inst: InstanceSlot): Entity[] {
   );
 }
 
+/** The floor the flip clock rides at: refreshed every tick, the plating aura
+ *  never runs out, even on a Warden stunned past its flip (its rattle waits). */
+const FLIP_CLOCK_FLOOR = 0.5;
+
+/** The plating aura's clock: the seconds to the next flip (the HUD's
+ *  countdown; on the wire as an ordinary aura deadline). */
+function flipClock(inst: InstanceSlot, st: VoltaicFightState): { left: number; cycle: number } {
+  return { left: Math.max(FLIP_CLOCK_FLOOR, st.flipTimer), cycle: flipEvery(inst) };
+}
+
 /** Put a plating face on a body (the Warden: split on heroic). */
-function wearPlating(ctx: SimContext, e: Entity, face: VoltaicPlating, split: boolean): void {
+function wearPlating(
+  ctx: SimContext,
+  e: Entity,
+  face: VoltaicPlating,
+  split: boolean,
+  clock: { left: number; cycle: number },
+): void {
   dropAuraById(e, VOLTAIC_GROUNDED);
   dropAuraById(e, VOLTAIC_CHARGED);
   const grounded = face === 'grounded';
@@ -100,9 +118,8 @@ function wearPlating(ctx: SimContext, e: Entity, face: VoltaicPlating, split: bo
     id: grounded ? VOLTAIC_GROUNDED : VOLTAIC_CHARGED,
     name: grounded ? 'Grounded Plating' : 'Charged Plating',
     kind: 'buff_dr',
-    remaining: 3600,
-    duration: 3600,
-    permanent: true,
+    remaining: clock.left,
+    duration: clock.cycle,
     value: 0,
     value2: split ? 1 : 0,
     sourceId: e.id,
@@ -187,9 +204,41 @@ export function flipPlating(
   setStored(ctx, boss, st, 0);
   st.plating = other(st.plating);
   st.flipTimer = flipEvery(inst);
-  wearPlating(ctx, boss, st.plating, heroic);
-  for (const d of liveDrones(ctx, st)) wearPlating(ctx, d, other(st.plating), false);
+  const clock = flipClock(inst, st);
+  wearPlating(ctx, boss, st.plating, heroic, clock);
+  for (const d of liveDrones(ctx, st)) wearPlating(ctx, d, other(st.plating), false, clock);
   return amount;
+}
+
+/** Set one body's plating aura to the flip clock (a face something stripped
+ *  is put back). */
+function stampFace(
+  ctx: SimContext,
+  e: Entity,
+  face: VoltaicPlating,
+  split: boolean,
+  clock: { left: number; cycle: number },
+): void {
+  const id = face === 'grounded' ? VOLTAIC_GROUNDED : VOLTAIC_CHARGED;
+  const a = e.auras.find((x) => x.id === id);
+  if (!a) {
+    wearPlating(ctx, e, face, split, clock);
+    return;
+  }
+  a.remaining = clock.left;
+  a.duration = clock.cycle;
+}
+
+/** Keep every plating aura on the flip clock: the Warden's and its drones'. */
+function stampFlipClock(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  st: VoltaicFightState,
+): void {
+  const clock = flipClock(inst, st);
+  stampFace(ctx, boss, st.plating, inst.difficulty === 'heroic', clock);
+  for (const d of liveDrones(ctx, st)) stampFace(ctx, d, other(st.plating), false, clock);
 }
 
 /** Two Arc Drones with the opposite plating. Returns how many. */
@@ -216,7 +265,7 @@ export function launchPlatedDrones(
       victim,
     );
     if (!drone) continue;
-    wearPlating(ctx, drone, other(st.plating), false);
+    wearPlating(ctx, drone, other(st.plating), false, flipClock(inst, st));
     st.droneIds.push(drone.id);
     n++;
   }
@@ -383,7 +432,7 @@ export function voltaicState(ctx: SimContext, inst: InstanceSlot, boss: Entity):
   const st = freshState();
   st.flipTimer = flipEvery(inst);
   boss.foundryFight = st;
-  wearPlating(ctx, boss, st.plating, inst.difficulty === 'heroic');
+  wearPlating(ctx, boss, st.plating, inst.difficulty === 'heroic', flipClock(inst, st));
   setStored(ctx, boss, st, 0);
   emitMobYell(ctx, boss, VOLTAIC_LINES.engage);
   return st;
@@ -418,10 +467,10 @@ export function tickVoltaicWarden(
   }
   const st = voltaicState(ctx, inst, boss);
   stepStrikes(ctx, inst, boss, st);
-  liveDrones(ctx, st);
   st.flipTimer -= DT;
   st.dronesTimer -= DT;
   st.strikeTimer -= DT;
+  stampFlipClock(ctx, inst, boss, st);
   if (st.dronesTimer <= 0) launchPlatedDrones(ctx, inst, boss, st);
   if (st.strikeTimer <= 0) startCoilStrike(ctx, inst, boss, st);
   if (boss.castingAbility === VOLTAIC_FLIP || boss.castingAbility === VOLTAIC_STATIC_LASH) {

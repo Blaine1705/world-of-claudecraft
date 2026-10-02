@@ -13,9 +13,10 @@
 //                   cell carried into a CLOSED hatch's ring arcs back (190 to
 //                   210 to the carrier and anyone within 5 yd); a cell not
 //                   slotted 15 s after its ejection shorts out over the gantry.
-//   Bolted (100-70) its feet are bolted into the gantry: Piston Fist slams a
-//                   player's spot (8 yd, 2 s) and Arm Sweep covers 120 degrees
-//                   in front of it (the tank's side).
+//   Bolted (100-70) its feet are bolted into the gantry: it drags them after
+//                   its target at a crawl (never past the Gantry's edge),
+//                   Piston Fist slams a player's spot (8 yd, 2 s) and Arm
+//                   Sweep covers 120 degrees in front of it (the tank's side).
 //   Unbolted (70)   it tears its feet free in a shower of rivets and walks
 //                   slowly; Tremor Step every 10 s (a 1.5 s bar, 10 yd).
 //   Heartless (35)  its chest flares: Arc Surge every 15 s hits the three
@@ -184,10 +185,11 @@ function paintHatch(
 
 function bolt(ctx: SimContext, boss: Entity): void {
   dropAuraById(boss, DRAFT_BOLTED);
+  // A marker, not a root: bolted, it still drags its feet (boltedSpeed).
   ctx.applyAura(boss, {
     id: DRAFT_BOLTED,
     name: 'Bolted',
-    kind: 'root',
+    kind: 'buff_dr',
     remaining: 3600,
     duration: 3600,
     permanent: true,
@@ -573,7 +575,7 @@ export function arcSurge(
   return near.length;
 }
 
-/** Hold it where it stands for a bar (or while bolted), facing its aim. */
+/** Hold it where it stands for a bar (and while it wakes), facing its aim. */
 function hold(ctx: SimContext, boss: Entity, st: PrimeDraftFightState): void {
   if (!st.plantedAt) st.plantedAt = { ...boss.pos };
   if (boss.pos.x !== st.plantedAt.x || boss.pos.z !== st.plantedAt.z) {
@@ -582,6 +584,21 @@ function hold(ctx: SimContext, boss: Entity, st: PrimeDraftFightState): void {
     boss.pos.z = st.plantedAt.z;
     ctx.rebucket(boss);
   }
+}
+
+/** Bolted, it never walks past the Gantry's edge: back onto the circle
+ *  `gantryMargin` inside it. */
+function keepInGantry(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
+  const o = ctx.instanceOriginOf(inst);
+  const cx = o.x + GANTRY.x;
+  const cz = o.z + GANTRY.z;
+  const dx = boss.pos.x - cx;
+  const dz = boss.pos.z - cz;
+  const d = Math.hypot(dx, dz);
+  const edge = GANTRY.r - T.gantryMargin;
+  if (d <= edge) return;
+  boss.pos = ctx.groundPos(cx + (dx / d) * edge, cz + (dz / d) * edge);
+  ctx.rebucket(boss);
 }
 
 function landBar(
@@ -593,6 +610,7 @@ function landBar(
 ): void {
   if (castId === DRAFT_AWAKEN) {
     st.phase = 'bolted';
+    boss.moveSpeed = T.boltedSpeed;
     return;
   }
   if (castId === DRAFT_UNBOLT) {
@@ -792,8 +810,9 @@ export function tickPrimeDraft(
   }
   const st = draftState(ctx, inst, boss);
   const hp = boss.maxHp > 0 ? boss.hp / boss.maxHp : 1;
-  // Bolted (and while waking) it never steps off its spot.
-  if (st.phase === 'awaken' || st.phase === 'bolted') hold(ctx, boss, st);
+  // Waking it never steps off its spot; bolted it crawls, inside the Gantry.
+  if (st.phase === 'awaken') hold(ctx, boss, st);
+  else if (st.phase === 'bolted') keepInGantry(ctx, inst, boss);
   stepCells(ctx, inst, boss, st);
   landFists(ctx, inst, boss, st);
   paintHatch(ctx, inst, boss, st);
@@ -810,7 +829,8 @@ export function tickPrimeDraft(
     boss.castRemaining = Math.max(0, boss.castRemaining - DT);
     if (boss.castRemaining > 0) return;
     clearCastIf(boss, casting);
-    if (st.phase === 'unbolted' || st.phase === 'heartless') st.plantedAt = null;
+    // The bar is done: it walks again from where it stood.
+    st.plantedAt = null;
     landBar(ctx, inst, boss, st, casting);
     return;
   }
