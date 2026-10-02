@@ -288,6 +288,7 @@ const SHOTS = [
   // the jaguar's burning eyes, a sun glyph going dark, the heroic Ambush).
   {
     id: 'jefe3_pulso',
+    placeMob: ['wildheart_high_priest', 0, 220],
     stage: ['wildheart_high_priest', 6, PI],
     cmds: ['/dev wildheart trigger pulse'],
     cmdWait: 950,
@@ -298,39 +299,41 @@ const SHOTS = [
   },
   {
     id: 'jefe3_espiritu_de_la_caza',
-    stage: ['wildheart_high_priest', 12, PI],
+    placeMob: ['wildheart_high_priest', 0, 220],
+    stage: ['wildheart_high_priest', 30, PI],
     cmds: ['/dev wildheart trigger spirit'],
-    cmdWait: 2300,
+    cmdWait: 1600,
     pitch: 0.25,
     dist: 30,
     hud: true,
-    wait: 200,
+    wait: 0,
   },
   {
     id: 'jefe3_ojos_del_jaguar',
-    stage: ['wildheart_high_priest', 14, PI],
+    placeMob: ['wildheart_high_priest', 0, 220],
+    stage: ['wildheart_high_priest', 30, PI],
     cmds: ['/dev wildheart trigger prey'],
-    cmdWait: 600,
-    face: PI,
-    yaw: PI,
-    pitch: 0.12,
-    dist: 40,
+    cmdWait: 100,
+    pitch: 0.05,
+    dist: 12,
     hud: true,
     wait: 300,
   },
   {
     id: 'jefe3_glifo_solar',
-    stage: ['wildheart_high_priest', 12, PI],
+    placeMob: ['wildheart_high_priest', 0, 220],
+    stage: ['wildheart_high_priest', 30, PI],
     cmds: ['/dev wildheart trigger prey'],
-    cmdWait: 200,
+    cmdWait: 100,
     placeMobAfter: ['wildheart_high_priest', 7, 230.1],
     pitch: 0.55,
     dist: 30,
     hud: true,
-    wait: 400,
+    wait: 150,
   },
   {
     id: 'jefe3_emboscada',
+    placeMob: ['wildheart_high_priest', 0, 220],
     stage: ['wildheart_high_priest', 16, PI],
     cmds: ['/dev wildheart trigger ambush'],
     cmdWait: 900,
@@ -536,6 +539,10 @@ async function main() {
         sim.player.devNoAggro = true;
       });
       await sleep(1000);
+      if (shot.placeMob) {
+        await page.evaluate(pagePlaceMob, [...shot.placeMob, origin.x, origin.z]);
+        await sleep(300);
+      }
       if (shot.stage) {
         const spot = await page.evaluate(pageStage, shot.stage);
         console.log('STAGE', shot.id, JSON.stringify(spot));
@@ -544,10 +551,6 @@ async function main() {
           shot.face = spot.face;
         }
         await sleep(1400);
-      }
-      if (shot.placeMob) {
-        await page.evaluate(pagePlaceMob, [...shot.placeMob, origin.x, origin.z]);
-        await sleep(300);
       }
       for (const c of shot.cmds ?? []) {
         await page.evaluate(() => {
@@ -594,6 +597,12 @@ async function main() {
       if (shot.map) {
         await page.keyboard.press('KeyM');
         await sleep(1500);
+      }
+      if (shot.hud) {
+        const auras = await page.evaluate(() =>
+          window.__game.world.player.auras.map((x) => x.id).join(','),
+        );
+        console.log('AURAS', shot.id, auras);
       }
       const file = path.join(OUT, `${PREFIX}${shot.id}.png`);
       await page.screenshot({ path: file });
