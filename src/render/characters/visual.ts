@@ -119,6 +119,7 @@ import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { stoneboundShellStyle } from './stonebound_shell_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
+import { stunIdleClip } from './stun_idle_core';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
@@ -725,6 +726,8 @@ export class CharacterVisual {
   /** which ability's cast clip the current cast-state base action was chosen
    *  for; lets chained casts refresh their per-ability override */
   private castClipAbility: string | null = null;
+  /** The dazed loop in force (ClipMap.stunned), or null for the rig's own idle. */
+  private stunIdle: string | null = null;
   private deadLock = false;
   /** consecutive frames with no action driving the pose (the T-pose watchdog) */
   private starvedFrames = 0;
@@ -1098,6 +1101,12 @@ export class CharacterVisual {
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
     const rushChanged = this.warriorBody.updateRush(dt, s);
+    // A stun swapping the idle loop (the Great Jaguar dazed) is a base change for a
+    // standing body, so it rides the same fade arm below.
+    const stunIdle = stunIdleClip(this.def.clips.stunned, s.auras);
+    const stunIdleChanged =
+      stunIdle !== this.stunIdle && (this.baseState === 'idle' || this.baseState === 'combatIdle');
+    this.stunIdle = stunIdle;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
@@ -1147,7 +1156,7 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsCastExit = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
-      } else if ((baseChanged || rushChanged) && !this.currentIsOneShot) {
+      } else if ((baseChanged || rushChanged || stunIdleChanged) && !this.currentIsOneShot) {
         // a cast clip frozen at its hold point must never stay paused through
         // the exit, whichever exit path runs below
         if (previousBase === 'cast' && this.current?.paused) this.current.paused = false;
@@ -3714,7 +3723,11 @@ export class CharacterVisual {
         // desiredBaseState only picks this for a rig that HAS the loop, so the
         // fallback is unreachable belt-and-braces (a def whose clip name misses
         // in the GLB resolves to null in both places and lands on idle).
-        return this.action(c.combatIdle) ?? this.action(c.idle);
+        return (
+          this.action(this.stunIdle ?? undefined) ??
+          this.action(c.combatIdle) ??
+          this.action(c.idle)
+        );
       case 'walk':
         return this.action(c.walk) ?? this.action(c.idle);
       case 'walkBack':
@@ -3769,7 +3782,8 @@ export class CharacterVisual {
         // pose for the whole fall, which is what every rig did before it.
         return this.action(c.fall) ?? this.action(c.jump) ?? this.action(c.idle);
       default:
-        return this.action(c.idle);
+        // 'idle' lands here: a dazed loop (ClipMap.stunned) replaces it while a stun rides.
+        return this.action(this.stunIdle ?? undefined) ?? this.action(c.idle);
     }
   }
 
@@ -4199,6 +4213,7 @@ function clipMapNames(c: ClipMap): string[] {
   return [
     c.idle,
     c.combatIdle,
+    c.stunned,
     c.prowlIdle,
     c.prowlWalk,
     c.walk,

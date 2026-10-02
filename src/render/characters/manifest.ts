@@ -163,6 +163,9 @@ export interface ClipMap {
    *  Its pose should match what the rig's attack and hit one-shots open and
    *  close on, so those blend into and out of it without a snap. */
   combatIdle?: string;
+  /** The dazed loop a standing body holds while a stun rides it, in place of
+   *  `idle` / `combatIdle` (stun_idle_core.ts). Absent = it stands in its idle. */
+  stunned?: string;
   /** Low stalking poses for a concealed quadruped. Absent = ordinary gait. */
   prowlIdle?: string;
   prowlWalk?: string;

@@ -510,6 +510,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/wild_boar.glb": "/media/models/creatures/wild_boar.de4e128ddd96.glb",
   "models/creatures/wildheart_beastmaster.glb": "/media/models/creatures/wildheart_beastmaster.399c39ab6c95.glb",
   "models/creatures/wildheart_beastmaster_hit_variety_anims.glb": "/media/models/creatures/wildheart_beastmaster_hit_variety_anims.3fe1bb737abd.glb",
+  "models/creatures/wildheart_great_jaguar.glb": "/media/models/creatures/wildheart_great_jaguar.d5b816ebc918.glb",
+  "models/creatures/wildheart_great_jaguar_spirit.glb": "/media/models/creatures/wildheart_great_jaguar_spirit.dd1f73434be2.glb",
   "models/creatures/wildheart_great_saurian.glb": "/media/models/creatures/wildheart_great_saurian.0d326ddeafed.glb",
   "models/creatures/wildheart_hexcaller.glb": "/media/models/creatures/wildheart_hexcaller.f25e9ea2acad.glb",
   "models/creatures/wildheart_hexcaller_ability_anims.glb": "/media/models/creatures/wildheart_hexcaller_ability_anims.e9771819f8f1.glb",

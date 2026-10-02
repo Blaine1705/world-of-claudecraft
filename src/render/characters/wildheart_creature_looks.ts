@@ -13,11 +13,20 @@
 // drawn height at the template's scale.
 
 import {
+  BEAST_HEEL,
+  BEAST_TUNING,
   SAURIAN_ENRAGE,
   SAURIAN_HOWDAH_BREAK,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
 } from '../../sim/encounters/wildheart_basin/ids';
+import {
+  heelPounceTimeScale,
+  JAGUAR_MODEL,
+  JAGUAR_SIM_SCALE,
+  jaguarLookHeight,
+  jaguarModelScale,
+} from '../wildheart_basin/jaguar_model_core';
 import {
   SAURIAN_CLIP,
   SAURIAN_MODEL,
@@ -113,19 +122,6 @@ const ROWS: Record<string, PlaceholderRow> = {
   wildheart_totem_binder: ['mob_wildheart_hexcaller', 0xd9b26a, 0.3, 1.05],
   // The Howdah Hexcaller: the Hexcaller in the howdah's war red.
   wildheart_howdah_hexcaller: ['mob_wildheart_hexcaller', 0xa3322a, 0.22, 1],
-  // The Fanglord's Great Jaguar: the great cat in gold (its rosettes stay the
-  // texture's dark marks); about 4.6 yd at its 2.4, a head over a horse.
-  wildheart_fanglord_jaguar: ['form_cat', 0xd8a548, 0.45, 1, { clickRadius: 1.8 }],
-  // The Fanglord's Whistle's spirit jaguar (combat/wildheart_trinkets.ts): the
-  // same great cat washed in Zulgar's jade spirit flame and lit from within,
-  // a little smaller than the Fanglord's own.
-  wildheart_spirit_jaguar: [
-    'form_cat',
-    0x5fe0a0,
-    0.65,
-    0.9,
-    { selfIllumination: 0.35, clickRadius: 1.4 },
-  ],
   // The Gorgebloom: the great cap rig washed blood red, rooted (it only turns
   // to face its target); about 10 yd at its 2.8.
   wildheart_gorgebloom: [
@@ -135,6 +131,45 @@ const ROWS: Record<string, PlaceholderRow> = {
     1.64,
     { selfIllumination: 0.35, clickRadius: 3.2 },
   ],
+};
+
+/** The Great Jaguar's clips (both bodies: the Fanglord's and its jade spirit). */
+const GREAT_JAGUAR_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Bite', 'Claw'],
+  hit: ['Hit'],
+  death: 'Death',
+  // Stunned in a control window: the dazed loop, head hanging, legs splayed.
+  stunned: 'Stunned',
+  cast: 'Roar',
+  // Heel!: the crouch, the wiggle and the leap, slowed so the forepaws land on
+  // the bar's last frame, where the sim sets it down at its master's side.
+  castByAbility: { [BEAST_HEEL]: 'Pounce' },
+  castTimeScaleByAbility: { [BEAST_HEEL]: heelPounceTimeScale(BEAST_TUNING.heelCast) },
+  castPlayOut: ['Pounce'],
+  // Call of the Hunt: the master's roar answered (a gesture off its spellfx).
+  attackByAbility: { roar: 'Roar' },
+  attackTimeScaleByAbility: { roar: 1 },
+  flourish: 'Roar',
+};
+
+/** The Fanglord's Great Jaguar (scripts/assets/wildheart_great_jaguar, built in
+ *  Blender): one sculpted skin in gold with black rosettes, Sunbone war paint,
+ *  bone ornaments and the collar's jade ring the Pack Bond ties to. Drawn at
+ *  its authored size, 4.7 yd to its ears at its 2.4. */
+export const WILDHEART_GREAT_JAGUAR_LOOK: VisualDef = {
+  url: JAGUAR_MODEL.url,
+  height: jaguarLookHeight(),
+  clips: GREAT_JAGUAR_CLIPS,
+  castPlayOutHoldsAttacks: true,
+  walkRef: JAGUAR_MODEL.walkRef * jaguarModelScale(JAGUAR_SIM_SCALE),
+  runRef: JAGUAR_MODEL.runRef * jaguarModelScale(JAGUAR_SIM_SCALE),
+  attackTimeScale: 1.15,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.8,
 };
 
 /** The basin's defs: the placeholders derived from the base rigs already in
@@ -149,6 +184,22 @@ export function wildheartPlaceholderLooks(
     out[key] = { ...def, height: def.height * grow, tint, tintStrength, ...extra };
   }
   out.wildheart_great_saurian = WILDHEART_GREAT_SAURIAN_LOOK;
+  out.wildheart_fanglord_jaguar = WILDHEART_GREAT_JAGUAR_LOOK;
+  // The Fanglord's Whistle's spirit jaguar (combat/wildheart_trinkets.ts): the
+  // great cat's jade spirit body (translucent, its rosettes burning), at the
+  // size the trinket's placeholder drew so a pet never walls off a fight.
+  const spiritHeight = (visuals.form_cat?.height ?? 1.9) * 0.9;
+  const spiritScale = spiritHeight / JAGUAR_MODEL.idleBoundsHeight;
+  out.wildheart_spirit_jaguar = {
+    url: JAGUAR_MODEL.spiritUrl,
+    height: spiritHeight,
+    clips: GREAT_JAGUAR_CLIPS,
+    castPlayOutHoldsAttacks: true,
+    walkRef: JAGUAR_MODEL.walkRef * spiritScale,
+    runRef: JAGUAR_MODEL.runRef * spiritScale,
+    attackTimeScale: 1.15,
+    clickRadius: 1.4,
+  };
   // The Sunbone Totem: the shipped carved mask totem as a stationary prop
   // (about 6.4 yd at its 1.6), its bone and ochre kept, a faint inner glow.
   out.wildheart_sunbone_totem = {

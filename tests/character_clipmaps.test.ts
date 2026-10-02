@@ -149,6 +149,7 @@ function requiredClipNames(clips: ClipMap): string[] {
   return [
     clips.idle,
     clips.combatIdle,
+    clips.stunned,
     clips.prowlIdle,
     clips.prowlWalk,
     clips.walk,
@@ -203,6 +204,7 @@ function emoteChains(clips: ClipMap): [string, readonly string[]][] {
 const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'idle',
   'combatIdle',
+  'stunned',
   'prowlIdle',
   'prowlWalk',
   'walk',

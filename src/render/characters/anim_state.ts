@@ -1,3 +1,5 @@
+import type { StunAuraFact } from './stun_idle_core';
+
 /** Renderer-derived animation inputs (same facts the old pose machine used). */
 export interface AnimState {
   /** horizontal speed, world units/sec */
@@ -50,6 +52,10 @@ export interface AnimState {
    *  from a mob's live aggro target or a player's targeted auto-attack, so peers brace
    *  identically with no new wire traffic. Display-only; never gates gameplay. */
   combat?: boolean;
+  /** The body's live aura list, by reference (never copied): a rig whose ClipMap
+   *  names `stunned` holds that loop in place of its idle while a stun rides
+   *  (stun_idle_core.ts). */
+  auras?: readonly StunAuraFact[];
 }
 
 export type BaseState =

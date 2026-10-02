@@ -846,6 +846,10 @@ const RENDER_PURE_CORES = [
   // and its body effects' plan (the beats, the tail sweep, the splash curves).
   'src/render/wildheart_basin/saurian_model_core.ts',
   'src/render/wildheart_basin/saurian_fx_core.ts',
+  // The Fanglord's Great Jaguar's Blender body (its measured facts and beats), and
+  // the dazed loop a stunned body holds (ClipMap.stunned).
+  'src/render/wildheart_basin/jaguar_model_core.ts',
+  'src/render/characters/stun_idle_core.ts',
   'src/render/drowned_temple/temple_shore_core.ts',
   'src/render/drowned_temple/temple_fx_core.ts',
   'src/render/stormbrass_foundry/foundry_plan_core.ts',

@@ -262,6 +262,18 @@ const SHOTS = [
     hud: true,
     wait: 200,
   },
+  // The Great Jaguar's Blender body: its Heel! leap and the bond cord.
+  {
+    id: 'jefe1_jaguar_salto',
+    stage: ['wildheart_beastmaster', 12, PI * 0.15],
+    placeMob: ['fanglord_jaguar', -86, 24],
+    cmds: ['/dev wildheart trigger heel'],
+    cmdWait: 60,
+    pitch: 0.35,
+    dist: 26,
+    hud: true,
+    burst: [600, 1300, 1700, 2000, 2150, 2500],
+  },
   {
     id: 'jefe1_a_mi',
     stage: ['wildheart_beastmaster', 9, PI * 0.15],
