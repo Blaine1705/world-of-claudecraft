@@ -130,12 +130,20 @@ describe('weekly vault sheet scales with the screen', () => {
     // 1366x768 passes the desktop sheet gate, but at UI scale 1.5 the zoomed
     // space is only ~911x512 author px.
     const win = await mountVault(1366, 768, 1.5);
-    const arts = [...win.querySelectorAll<HTMLElement>('.weekly-vault-illustration')];
-    expect(arts.length).toBe(12);
-    for (const art of arts) {
-      const r = art.getBoundingClientRect();
-      expect(r.width).toBeGreaterThanOrEqual(MIN_ART);
-      expect(r.height).toBeCloseTo(r.width, 0);
+    const tiles = [...win.querySelectorAll<HTMLElement>('.weekly-tracks .weekly-milestone')];
+    expect(tiles.length).toBe(12);
+    for (const tile of tiles) {
+      const art = part(tile, '.weekly-vault-illustration').getBoundingClientRect();
+      // The painted vault is the square the contained image fills.
+      expect(Math.min(art.width, art.height)).toBeGreaterThanOrEqual(MIN_ART);
+      // Wrapped labels (these narrow tiles wrap the locked "Unlocks 1
+      // loot-table roll" footer) take room from the art, never draw over it.
+      expect(art.top).toBeGreaterThanOrEqual(
+        part(tile, '.weekly-milestone-heading').getBoundingClientRect().bottom - SLACK,
+      );
+      expect(art.bottom).toBeLessThanOrEqual(
+        part(tile, '.weekly-milestone-footer').getBoundingClientRect().top + SLACK,
+      );
     }
     // The extra height scrolls inside the panel; the window itself stays put.
     expect(win.getBoundingClientRect().bottom).toBeLessThanOrEqual(768 + SLACK);
