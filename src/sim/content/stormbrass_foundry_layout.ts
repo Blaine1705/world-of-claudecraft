@@ -460,7 +460,7 @@ const PROPS: FieldProp[] = [
   { kind: 'sf_plate_stack', x: 47, z: -138, rot: -0.2, hw: 2.4, hd: 1.6, h: 2.4 },
   { kind: 'sf_steam_vent', x: -30, z: -186, rot: 0 },
   { kind: 'sf_steam_vent', x: 30, z: -186, rot: 0 },
-  { kind: 'sf_water_tower', x: -50, z: -186, rot: 0, r: 2.4, h: 12 },
+  { kind: 'sf_water_tower', x: -50, z: -186, rot: 0, r: 2.8, h: 12 },
   // The Assembly Terraces: the parts line and the cranes.
   { kind: 'sf_parts_line', x: -24, z: -110, rot: Math.PI / 2, hw: 1.2, hd: 12, h: 1.4 },
   { kind: 'sf_crane_base', x: 34, z: -106, rot: 0, r: 2, h: 16 },
@@ -545,7 +545,7 @@ const PROPS: FieldProp[] = [
   { kind: 'sf_cell_rack_small', x: 40, z: 138, rot: Math.PI / 2, hw: 2.5, hd: 1, h: 3.5 },
   { kind: 'sf_cell_rack_small', x: 40, z: 162, rot: Math.PI / 2, hw: 2.5, hd: 1, h: 3.5 },
   // The Gantry: the scaffold round the Prime Draft and the two charging racks.
-  { kind: 'sf_gantry_scaffold', x: 0, z: 228, rot: 0, hw: 11, hd: 1.5, h: 34 },
+  { kind: 'sf_gantry_scaffold', x: 0, z: 228, rot: 0, hw: 11.6, hd: 1.5, h: 34 },
   ...CELL_RACKS.map(
     (r, i): FieldProp => ({
       kind: 'sf_cell_rack',

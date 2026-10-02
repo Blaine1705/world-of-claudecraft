@@ -46,6 +46,11 @@ function oreSeam(x: number, z: number, rot: number): FieldProp {
   return { kind: 'sf_ore_seam', x, z, rot, hw: 1.6, hd: 1, h: 2.6 };
 }
 
+/** A small storm coil on a rim (a winding on insulator legs, a glow on top). */
+function stormCoil(x: number, z: number): FieldProp {
+  return { kind: 'sf_storm_coil', x, z, rot: 0, r: 1, h: 6.5 };
+}
+
 function scrapHeap(x: number, z: number): FieldProp {
   return { kind: 'sf_scrap_heap', x, z, rot: 0.4, r: 1.5, h: 2.2 };
 }
@@ -76,6 +81,10 @@ export const FOUNDRY_MACHINERY_PROPS: readonly FieldProp[] = [
   crates(52, -150, EAST),
   oreSeam(52.6, -170.5, WEST),
   scrapHeap(47, -175),
+  // The yard gantry spanning the Hauler's loop: its two leg bogies (the
+  // gantry itself is one render piece over them).
+  { kind: 'sf_gantry_leg', x: -27, z: -160, rot: 0, hw: 1.8, hd: 3.1, h: 16 },
+  { kind: 'sf_gantry_leg', x: 27, z: -160, rot: 0, hw: 1.8, hd: 3.1, h: 16 },
   // ---- The Assembly Terraces: the parts line's engine house, the boiler and
   // piston engine on its south lip, and the pour line on the crane pad.
   engine(-36, -100, EAST),
@@ -106,6 +115,10 @@ export const FOUNDRY_MACHINERY_PROPS: readonly FieldProp[] = [
   engine(33, -61, 0),
   boiler(-24, -60.5, 0),
   stack(-15, -60.2),
+  // ---- The Main Line: the parts chute's two leg frames on the south lip's
+  // corners (the hopper they carry spans the belts, high over every head).
+  { kind: 'sf_chute_leg', x: -23.45, z: -42.85, rot: 0, hw: 0.5, hd: 1.1, h: 9.5 },
+  { kind: 'sf_chute_leg', x: 23.45, z: -42.85, rot: 0, hw: 0.5, hd: 1.1, h: 9.5 },
   // ---- The Crane Landing behind the press: the bridge crane's engine house.
   engine(19.5, 7, 0),
   crates(-21, 8, 0),
@@ -116,6 +129,9 @@ export const FOUNDRY_MACHINERY_PROPS: readonly FieldProp[] = [
   crates(-101.5, -50, EAST),
   oreSeam(-92, -74.9, 0),
   scrapHeap(-100.5, -68),
+  // ---- The Proving Range: the range officer's observation post in the
+  // south-east corner, behind the firing line.
+  { kind: 'sf_observation_post', x: -55.5, z: -16.5, rot: WEST, hw: 2.1, hd: 2.2, h: 9 },
   // ---- The Drafting Yard: a boiler, a stack and an engine house on the north
   // lip, crate stacks by the steam vents, one more model frame.
   boiler(-44, 95.8, EAST),
@@ -135,7 +151,14 @@ export const FOUNDRY_MACHINERY_PROPS: readonly FieldProp[] = [
   engine(24, 120, 0),
   stack(32.5, 119.5),
   crates(42.5, 150, EAST),
-  // ---- The Gantry: two great stacks flanking the scaffold.
+  // ---- The Gantry: two great stacks flanking the scaffold, a storm coil
+  // either side of the catwalk's mouth.
   stack(-18.5, 218),
   stack(18.5, 218),
+  stormCoil(-20.5, 193.5),
+  stormCoil(20.5, 193.5),
+  // ---- The Coil Crown: storm coils on the rim between the lightning rods.
+  stormCoil(105, 14),
+  stormCoil(82, 37),
+  stormCoil(59, 14),
 ];
