@@ -24,13 +24,14 @@ in `ids.ts`.
 | `prime_draft.ts` | The Prime Draft (5.4, G12): Awakening bar, Bolted (a slow crawl at `DRAFT_TUNING.boltedSpeed`, clamped to `GANTRY.r - gantryMargin`, holding still only while waking and during its bars; Piston Fist, Arm Sweep), Unbolted at 70 (rivet shower, walks, Tremor Step), Heartless at 35 (Arc Surge, faster cycle), Overdrive below 15; the Charge Cycle and the Core Hatch window (closed, warn, open on the hatch ring object), Overload, arc back on a closed hatch, short out at 15 s; heroic Jammed Racks and Double Load. On death the Draft Record (`draft_record`, The First Draft's interact object) lies in its chest. Deed: Heartless. |
 | `storm_cells.ts` | The carry: take a cell with the pick-up command (`interaction.ts` `pickUpObject` routes here), the carrier's aura (slow, stacks = Static a second, sourceId = the hatch ring), drop with the interact press (`interaction.ts` `interact`), the 3 s retake lock. |
 | `index.ts` | The tick and `/dev foundry trigger` for every mechanic (blast, toss, unload; lever, press, parts, rivet, vents; lock, proof, drones; flip, discharge, platedrones, lash, strike; cell, overload, fist, sweep, unbolt, tremor, heartless, surge). |
+| `workers.ts` | The chained workers (`content/stormbrass_foundry_workers.ts`): per run, three scrap camps (A the Rail Yard under g2, B the Range Lanes under g6, C the Gantry Approach under g12), spawned the first tick a claim is live. The workers are mob-kind bodies held inert by `encounterHeld`, carried on `inst.npcIds` (never `inst.mobIds`: no pack, gate, chain pull, clear or loot rule counts them). One state object per camp stands at its chain post (`Entity.foundryWorkerCamp`; its template id mirrors the phase: guarded, unguarded, freed). Guards dead: a worker calls out. `tryFreeFoundryWorkers` (the targeted interact press, `interaction.ts`; the gossip's "Free them" sends exactly that) strikes the chains: the workers become Freed Laborers, cheer, walk toward the lift and vanish; every holder of Free the Workers in the claim is credited; the third camp grants the deed Every Chain Struck. `/dev foundry workers [free <a|b|c|all>|reset]`. |
 
 Rules:
 - Deterministic: every pick is hashed (`kitHash`, `pickMarkTargets`) or entity-id / distance ordered; the only rng draws are damage rolls. Fixed DT countdowns; the Rangewarden samples a marked player's spot once a second, when the circle paints.
 - Every visible state rides existing entity fields (cast bars, facing, auras, encounter object template ids and `scale`), so the online client mirrors it with no wire or IWorld change. New object templates join `FOUNDRY_OBJECT_TEMPLATES` (the renderer anchors them, `render/gate_objects.ts`) and get a floor spec in `render/stormbrass_foundry/foundry_fx_core.ts`; the HUD alert (`ui/hud/dungeon/foundry_alert_*`) reads the same auras.
 - Reset on evade and wipe drops every mark, bar, strip, shell, cell and the hatch, stops the belts and clears the plating.
 - The conveyor and other server-side displacement reach online players through movement reconciliation (no client-side belt prediction).
-- Tests: `tests/stormbrass_foundry_tock.test.ts`, `..._rangewarden.test.ts`, `..._voltaic.test.ts`, `..._prime_draft.test.ts`, `..._alert.test.ts`, `..._quests.test.ts` (on `tests/helpers/foundry_fight.ts`), `..._trash.test.ts` (trash and the Hauler), `..._route.test.ts`, `..._dungeon.test.ts` (record, gates, seals, bossChainPull, dev jumps, every dev trigger), `..._tuning.test.ts`, `..._render_core.test.ts`.
+- Tests: `tests/stormbrass_foundry_tock.test.ts`, `..._rangewarden.test.ts`, `..._voltaic.test.ts`, `..._prime_draft.test.ts`, `..._alert.test.ts`, `..._quests.test.ts` (on `tests/helpers/foundry_fight.ts`), `..._trash.test.ts` (trash and the Hauler), `..._route.test.ts`, `..._dungeon.test.ts` (record, gates, seals, bossChainPull, dev jumps, every dev trigger), `..._tuning.test.ts`, `..._render_core.test.ts`, `..._workers.test.ts` (the camps, the gossip gate, the credit, the despawn, a reset, the dev commands) and `..._workers_render.test.ts` (the chain plan, the looks).
 
 Naming originality (`src/sim/content/CLAUDE.md`, re-verified 2026-10-01 against
 the design doc's section 10): every name in the design table stays except
@@ -49,3 +50,13 @@ web-checked 2026-10-02 (exact phrase plus the coined tokens against the major
 game wikis): no game ability, item or place of that exact name; World of
 Warcraft has only the unrelated zone "Scalding Chasm" and spells such as
 "Thermal Vent" and "Venting Flames". A generic English compound: clear.
+
+The chained workers (checked 2026-10-02, exact-phrase searches against the
+major game wikis): "Chained Miner", "Chained Hauler" and "Freed Laborer" are
+plain English descriptions with no use as a proper name in another game (World
+of Warcraft has "Enslaved Miner", RuneScape Classic "Mining Slave": different
+names; "thrall" was never used); the quest title "Free the Workers" and the
+deed "Every Chain Struck" returned no game use. The quest giver stays Lift
+Warden Corwin Ashby: he keeps the lift the freed walk to, and the dungeon's
+quests are all taken from him in one stop at the door; a second giver on the
+Lift Landing would split that stop in two for no gain.

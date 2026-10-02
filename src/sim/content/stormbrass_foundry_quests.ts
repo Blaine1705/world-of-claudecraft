@@ -29,6 +29,7 @@
 import { IGNIVAR_FORGE_APPROACH_ID } from '../ignivar_raid_ids';
 import type { NpcDef, QuestDef } from '../types';
 import { STORMBRASS_FOUNDRY_DOOR } from './stormbrass_foundry';
+import { FOUNDRY_WORKERS_QUEST, FOUNDRY_WORKERS_QUEST_ID } from './stormbrass_foundry_workers';
 
 export const LIFT_WARDEN_NPC_ID = 'lift_warden_corwin';
 
@@ -59,7 +60,13 @@ export const STORMBRASS_FOUNDRY_NPCS: Record<string, NpcDef> = {
     pos: { ...LIFT_WARDEN_POS },
     facing: -Math.PI / 2 - 0.6,
     color: 0xc9a14a,
-    questIds: [Q.stormLine, Q.stopTheLine, Q.firstDraft, Q.forgefathersIsle],
+    questIds: [
+      Q.stormLine,
+      Q.stopTheLine,
+      Q.firstDraft,
+      FOUNDRY_WORKERS_QUEST_ID,
+      Q.forgefathersIsle,
+    ],
     // Spawned under its reserved id by ../stormbrass_lift_warden.ts.
     dynamic: true,
     greeting:
@@ -156,6 +163,8 @@ export const STORMBRASS_FOUNDRY_QUESTS: Record<string, QuestDef> = {
     gatedWithDungeon: IGNIVAR_FORGE_APPROACH_ID,
     shareable: false,
   },
+  // The chained workers' side quest (content/stormbrass_foundry_workers.ts).
+  [FOUNDRY_WORKERS_QUEST_ID]: FOUNDRY_WORKERS_QUEST,
 };
 
 /** The chain in the order the Lift Warden offers it (quest log, guide). */
@@ -163,5 +172,6 @@ export const STORMBRASS_FOUNDRY_QUEST_ORDER: readonly string[] = [
   Q.stormLine,
   Q.stopTheLine,
   Q.firstDraft,
+  FOUNDRY_WORKERS_QUEST_ID,
   Q.forgefathersIsle,
 ];

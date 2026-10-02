@@ -3806,6 +3806,19 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
+  // The Stormbrass Foundry's chained workers (content/stormbrass_foundry_workers.ts):
+  // every camp freed in one run, granted by encounters/stormbrass_foundry/
+  // workers.ts to every player in the claim as the last chain falls. Cosmetic
+  // only; appended at the END per the append-only contract. "Every Chain
+  // Struck" returned no game use (the IP check, 2026-10-02).
+  dgn_foundry_workers_freed: {
+    id: 'dgn_foundry_workers_freed',
+    name: 'Every Chain Struck',
+    desc: 'Free all three chained worker camps in the Stormbrass Foundry in a single run.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

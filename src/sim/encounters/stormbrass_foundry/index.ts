@@ -27,6 +27,7 @@ import {
   VOLTAIC_WARDEN_ID,
 } from './ids';
 import { dropParts, startLever, startPress, tickTock, tockState } from './line_master';
+import { tickFoundryWorkers } from './workers';
 import {
   arcSurge,
   chargeCycle,
@@ -58,6 +59,11 @@ export {
 } from './storm_cells';
 export { platingOf, platingTurnsAside } from './voltaic_plating';
 export { crownPlayers, STORED_FULL, VOLTAIC_DEED, VOLTAIC_LINES } from './voltaic_warden';
+export {
+  FOUNDRY_WORKER_LINES,
+  foundryWorkerCampObjects,
+  tryFreeFoundryWorkers,
+} from './workers';
 
 import { launchDrillDrones, rangeState, startTargetLock, tickRangewarden } from './rangewarden';
 import {
@@ -111,6 +117,7 @@ export function tickFoundryEncounters(ctx: SimContext): void {
     const draft = claimBoss(ctx, inst, PRIME_DRAFT_ID);
     if (draft && !paused(draft)) tickPrimeDraft(ctx, inst, draft, bossEngaged(draft));
     sweepOrphanBurstRings(ctx, inst);
+    tickFoundryWorkers(ctx, inst);
   }
 }
 

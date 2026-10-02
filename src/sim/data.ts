@@ -240,6 +240,7 @@ import {
   STORMBRASS_FOUNDRY_QUEST_ORDER,
   STORMBRASS_FOUNDRY_QUESTS,
 } from './content/stormbrass_foundry_quests';
+import { FOUNDRY_WORKER_MOBS } from './content/stormbrass_foundry_workers';
 import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
 import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
@@ -479,6 +480,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...SUNKEN_BASTION_MOBS,
   ...DROWNED_TEMPLE_MOBS,
   ...STORMBRASS_FOUNDRY_MOBS,
+  ...FOUNDRY_WORKER_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,

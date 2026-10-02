@@ -40,6 +40,7 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { tryDropStormCell, tryTakeStormCell } from './encounters/stormbrass_foundry/storm_cells';
+import { tryFreeFoundryWorkers } from './encounters/stormbrass_foundry/workers';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
 import { tryStartEscort } from './escort';
 import { interactIgnivarRaidLore } from './ignivar_raid_lore';
@@ -523,6 +524,8 @@ export function interact(
         pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
       }
+      // A Stormbrass Foundry worker: "Free them" (encounters/stormbrass_foundry/workers.ts).
+      if (tryFreeFoundryWorkers(ctx, target, p)) return;
       if (talkToWeeklyKeeper(ctx, target, p)) return;
       if (target.kind === 'npc' && ctx.bankerIds.includes(target.id)) {
         // Opening the bank window counts as banker business for the NPC ledger.

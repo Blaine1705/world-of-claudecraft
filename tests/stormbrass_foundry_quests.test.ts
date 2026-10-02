@@ -51,7 +51,13 @@ describe('the Lift Warden', () => {
         (npc as Entity).pos.z - LIFT_WARDEN_POS.z,
       ),
     ).toBeLessThan(0.01);
-    expect(npc?.questIds).toEqual([Q.stormLine, Q.stopTheLine, Q.firstDraft, Q.forgefathersIsle]);
+    expect(npc?.questIds).toEqual([
+      Q.stormLine,
+      Q.stopTheLine,
+      Q.firstDraft,
+      'q_sf_free_the_workers',
+      Q.forgefathersIsle,
+    ]);
   });
 
   it('opens the three dungeon quests together at level 19, never below', () => {

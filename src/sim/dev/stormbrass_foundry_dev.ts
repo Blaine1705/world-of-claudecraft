@@ -21,15 +21,26 @@
 //                                         overload, fist, sweep, unbolt, tremor,
 //                                         heartless, surge (the Prime Draft)
 //   /dev foundry reset                    free the run and claim a fresh one
+//   /dev foundry workers [free <a|b|c|all>|reset]
+//                                         the chained workers' camps: their
+//                                         state, strike a camp's chains now, or
+//                                         raise every camp fresh (chained,
+//                                         guarded)
 //
 // Areas: landing, yard (or hauler), terraces, cranepad, mainline (or tock),
 // cranelanding, lanes, range (or rangewarden), coil, coilupper, crown (or
-// voltaic), bridge, drafting, approach, gantry (or prime). Each boss name lands
-// beside that boss, on its floor.
+// voltaic), bridge, drafting, approach, gantry (or prime), and the worker
+// camps campa, campb, campc. Each boss name lands beside that boss, on its
+// floor.
 
 import { STORMBRASS_FOUNDRY_ANCHORS } from '../content/stormbrass_foundry_layout';
 import { DUNGEONS, instanceOrigin, MOBS } from '../data';
 import { foundryDevTrigger } from '../encounters/stormbrass_foundry';
+import {
+  devFreeFoundryWorkers,
+  foundryWorkersStatus,
+  resetFoundryWorkerCamps,
+} from '../encounters/stormbrass_foundry/workers';
 import { createMob } from '../entity';
 import {
   applyDungeonMobTuning,
@@ -67,6 +78,11 @@ export const STORMBRASS_FOUNDRY_DEV_AREAS: Readonly<Record<string, { x: number; 
   approach: { x: 0, z: 118 },
   gantry: { x: 0, z: 186 },
   prime: { x: 0, z: 186 },
+  // The chained workers' camps (content/stormbrass_foundry_workers.ts): a few
+  // yards off each camp, outside its guards' reach.
+  campa: { x: 36, z: -175 },
+  campb: { x: -70, z: -60 },
+  campc: { x: -26, z: 121 },
 };
 
 const BOSS_ALIASES: Readonly<Record<string, string>> = {
@@ -92,7 +108,7 @@ export const STORMBRASS_FOUNDRY_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev foundry enter [normal|heroic] | tp <landing|yard|hauler|terraces|cranepad|mainline|tock|cranelanding|lanes|range|rangewarden|coil|coilupper|crown|voltaic|bridge|drafting|approach|gantry|prime> | gates | kill <g1..g13|pa|pb|pc|pd|hauler|tock|rangewarden|voltaic|prime|trash|all> | pack <id> | spawn <sentry|bruiser|drone|engineer|apprentice|hound|shieldbearer|turret|hauler|frame> | trigger <blast|toss|unload|lever|press|parts|rivet|lock|proof|drones|flip|discharge|platedrones|lash|strike|cell|overload|fist|sweep|unbolt|tremor|heartless|surge> | reset';
+  '[dev] /dev foundry enter [normal|heroic] | tp <landing|yard|hauler|terraces|cranepad|mainline|tock|cranelanding|lanes|range|rangewarden|coil|coilupper|crown|voltaic|bridge|drafting|approach|gantry|prime|campa|campb|campc> | gates | kill <g1..g13|pa|pb|pc|pd|hauler|tock|rangewarden|voltaic|prime|trash|all> | pack <id> | spawn <sentry|bruiser|drone|engineer|apprentice|hound|shieldbearer|turret|hauler|frame> | trigger <blast|toss|unload|lever|press|parts|rivet|lock|proof|drones|flip|discharge|platedrones|lash|strike|cell|overload|fist|sweep|unbolt|tremor|heartless|surge> | reset | workers [free <a|b|c|all>|reset]';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {
@@ -160,8 +176,38 @@ export function killFoundryMatching(
   return killed;
 }
 
+/** `/dev foundry workers [free <a|b|c|all>|reset]`; false for any other line. */
+function handleFoundryWorkersDev(ctx: SimContext, raw: string, pid: number): boolean {
+  const m = /^\/dev\s+foundry\s+workers(?:\s+(\S+))?(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (!m) return false;
+  const verb = (m[1] ?? '').toLowerCase();
+  const which = (m[2] ?? 'all').toLowerCase();
+  const inst = ensureInside(ctx, pid);
+  if (!inst) {
+    ctx.error(pid, '[dev] Could not enter the Stormbrass Foundry.');
+    return true;
+  }
+  if (verb === 'free' && ['a', 'b', 'c', 'all'].includes(which)) {
+    const n = devFreeFoundryWorkers(ctx, inst, which);
+    log(ctx, pid, `[dev] Struck the chains at ${n} worker camp${n === 1 ? '' : 's'}.`);
+    return true;
+  }
+  if (verb === 'reset') {
+    resetFoundryWorkerCamps(ctx, inst);
+    log(ctx, pid, '[dev] The worker camps stand again, chained and guarded.');
+    return true;
+  }
+  if (verb === '') {
+    log(ctx, pid, `[dev] Worker camps: ${foundryWorkersStatus(ctx, inst)}.`);
+    return true;
+  }
+  ctx.error(pid, HELP);
+  return true;
+}
+
 /** Handles `/dev foundry ...`; returns false for any other line. */
 export function handleStormbrassFoundryDevChat(ctx: SimContext, raw: string, pid: number): boolean {
+  if (handleFoundryWorkersDev(ctx, raw, pid)) return true;
   const m = /^\/dev\s+foundry(?:\s+(\S+))?(?:\s+(\S+))?\s*$/i.exec(raw);
   if (!m) return false;
   const verb = (m[1] ?? '').toLowerCase();

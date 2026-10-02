@@ -4715,6 +4715,21 @@ export type FoundryFightState =
   | VoltaicFightState
   | PrimeDraftFightState;
 
+/** A Stormbrass Foundry worker camp in one run (encounters/stormbrass_foundry/
+ *  workers.ts), kept on the camp's state object. */
+export interface FoundryWorkerCampState {
+  camp: 'A' | 'B' | 'C';
+  phase: 'guarded' | 'unguarded' | 'freed';
+  /** The camp's living workers, in spawn order (a freed one leaves the list
+   *  as it walks off and vanishes). */
+  workerIds: number[];
+  /** Sim time the chains came off (0 until then). */
+  freedAt: number;
+  /** Per hauler (by entity id): the leg it walks (0 to the cart, 1 back to the
+   *  heap) and the seconds it still rests at the leg's end. */
+  haul: Record<number, { leg: 0 | 1; rest: number }>;
+}
+
 /** The Great Saurian's pull (encounters/wildheart_basin/great_saurian.ts), on
  *  the Saurian; cleared when the pull ends (a kill, an evade, a wipe). */
 export interface SaurianFightState {
@@ -6838,6 +6853,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Knellwyrm flying in): inert, non-hostile and out of combat, the mob AI
    *  skips it and the encounter moves it, until the script hands it back. */
   encounterHeld?: boolean;
+  /** A Stormbrass Foundry worker camp's run state, on the camp's state object
+   *  (encounters/stormbrass_foundry/workers.ts): its camp, its workers' entity
+   *  ids, its phase (mirrored in the object's template id for the client),
+   *  when it was freed, and each hauler's leg of its loop. Sim authority only. */
+  foundryWorkerCamp?: FoundryWorkerCampState;
   /** A Tideglass Reflection's owner: the player it mirrors and fights, who
    *  cannot hurt it (encounters/drowned_temple/reflection_guard.ts). Sim only;
    *  the client reads the owner from the Reflection's forcedTargetId. */

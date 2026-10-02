@@ -33,6 +33,7 @@
 // renderer (terrain, set dressing, light) all read this one record.
 
 import type { AuthoredFieldDef, FieldProp, FieldSurface } from '../instances/authored_field/types';
+import { foundryWorkerCampProps } from './stormbrass_foundry_workers';
 
 /** The mountain drop under the shelf (the void between the walkways). */
 export const STORMBRASS_FOUNDRY_VOID_HEIGHT = -80;
@@ -554,6 +555,9 @@ const PROPS: FieldProp[] = [
       h: 5,
     }),
   ),
+  // The chained workers' three scrap camps (stormbrass_foundry_workers.ts):
+  // the ore seam, the scrap heap, the chain post and the cart at each.
+  ...foundryWorkerCampProps(),
 ];
 
 export const STORMBRASS_FOUNDRY_FIELD: AuthoredFieldDef = {
