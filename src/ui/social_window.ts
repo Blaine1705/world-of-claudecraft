@@ -54,6 +54,7 @@ import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import { classColorCss } from './inspect_view';
 import { moneyHtml } from './money_html';
 import { localizeZone } from './server_i18n';
+import { type SocialRowPlayer, socialRowMenuPoint, socialRowPlayer } from './social_row_menu_core';
 import {
   blockRows,
   friendRows,
@@ -142,6 +143,8 @@ export interface SocialWindowDeps {
   showPrompt(text: string, acceptLabel: string, onAccept: () => void, onDecline: () => void): void;
   /** Open the chat bar pre-filled with a whisper to this player. */
   startWhisper(name: string): void;
+  /** A row right-click: open the menu that player's unit frame opens (social_row_menu_core). */
+  openPlayerMenu(row: SocialRowPlayer, x: number, y: number): void;
 }
 
 function cap(s: string): string {
@@ -398,7 +401,7 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
     actions += `<button type="button" class="soc-x ui-disc" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
   const tip = esc(dotTitle(m.online, m.status, m.zone));
   return (
-    `<div class="soc-row${m.online ? '' : ' is-offline'}">` +
+    `<div class="soc-row${m.online ? '' : ' is-offline'}" data-player="${esc(m.name)}">` +
     `<span class="soc-dot ${m.dot === 'off' ? '' : m.dot}" title="${tip}"></span>` +
     `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
     `<span class="soc-meta" title="${tip}">${meta}</span>` +
@@ -714,6 +717,9 @@ export class SocialWindow {
     const body = el.querySelector('.soc-body') as HTMLElement | null;
     if (body) {
       body.addEventListener('click', (e) => this.onBodyClick(e));
+      // Right-click on a player row opens that player's menu, delegated the same
+      // way so it survives every refreshList swap.
+      body.addEventListener('contextmenu', (e) => this.onBodyContextMenu(e as MouseEvent));
       // Enter in the billboard edit input saves. Delegated on the persistent
       // body like the click handler, so it survives every refreshList swap.
       body.addEventListener('keydown', (e) => {
@@ -932,6 +938,18 @@ export class SocialWindow {
     }
   }
 
+  // The delegated row right-click. Only a row that names a player (data-player)
+  // claims the event; anywhere else in the body keeps the native menu.
+  private onBodyContextMenu(e: MouseEvent): void {
+    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-player]');
+    const player = row ? socialRowPlayer(row.dataset) : null;
+    if (!row || !player) return;
+    e.preventDefault();
+    const { x, y } = socialRowMenuPoint(e, row.getBoundingClientRect());
+    this.deps.hideTooltip();
+    this.deps.openPlayerMenu(player, x, y);
+  }
+
   // The Ranks tab body: null (hidden tab) falls back to the empty state.
   private ranksHtml(): string {
     const view = guildRanksPanelView(this.deps.world().socialInfo);
@@ -1075,7 +1093,7 @@ export class SocialWindow {
           : '';
         const tip = esc(dotTitle(f.online, f.status, f.zone));
         return (
-          `<div class="soc-row${f.online ? '' : ' is-offline'}">` +
+          `<div class="soc-row${f.online ? '' : ' is-offline'}" data-player="${esc(f.name)}">` +
           `<span class="soc-dot ${f.dot === 'off' ? '' : f.dot}" title="${tip}"></span>` +
           `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(f.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(f.cls) }))}</span></span>` +
           `<span class="soc-meta" title="${tip}">${meta}</span>` +
@@ -1099,7 +1117,7 @@ export class SocialWindow {
     return rows
       .map(
         (r) =>
-          `<div class="soc-row">` +
+          `<div class="soc-row" data-player="${esc(r.name)}">` +
           `<span class="soc-name">${esc(r.name)}</span>` +
           `<span class="soc-actions soc-actions-end"><button type="button" class="soc-x ui-disc" data-act="${act}" data-name="${esc(r.name)}" title="${esc(title(r.name))}">${svgIcon('close')}</button></span>` +
           `</div>`,
@@ -1250,7 +1268,7 @@ export class SocialWindow {
       .map((p) => {
         const since = formatDateTime(new Date(p.sinceMs), { dateStyle: 'medium' });
         return (
-          `<div class="soc-row">` +
+          `<div class="soc-row" data-player="${esc(p.name)}">` +
           `<span class="soc-id"><span class="soc-name" style="--class-color:${classColorCss(p.cls)}">${esc(p.name)}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(p.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(p.cls) }))}</span></span>` +
           `<span class="soc-meta">${esc(t('hudChrome.pledge.since', { date: since }))}</span>` +
           `<span class="soc-actions">` +
@@ -1278,7 +1296,7 @@ export class SocialWindow {
                 ? `<button type="button" class="soc-x ui-disc" data-act="raid-move" data-pid="${m.pid}" data-group="${m.moveTo}" title="${esc(t('hud.social.raidMoveToGroup', { group: formatNumber(m.moveTo, { maximumFractionDigits: 0 }) }))}">${esc(formatNumber(m.moveTo, { maximumFractionDigits: 0 }))}</button>`
                 : '';
             return (
-              `<div class="soc-row raid-row">` +
+              `<div class="soc-row raid-row" data-player="${esc(m.name)}" data-pid="${m.pid}">` +
               `<span class="soc-id"><span class="soc-name" style="--class-color:${classColorCss(m.cls)}">${esc(m.name)}${m.isLead ? `<span class="rank">${esc(t('hud.social.raidLeader'))}</span>` : ''}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
               `<span class="soc-meta">${esc(formatNumber(m.hpPct, { maximumFractionDigits: 0 }))}%</span>` +
               (move ? `<span class="soc-actions">${move}</span>` : '') +
@@ -1357,7 +1375,7 @@ export class SocialWindow {
           ? `<span class="soc-name" style="--class-color:${classColorCss(r.cls)}">${esc(r.name)}</span>`
           : `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(r.cls)}" data-whisper="${esc(r.name)}" title="${esc(t('hud.social.whisperTitle', { name: r.name }))}">${esc(r.name)}</button>`;
         return (
-          `<div class="soc-row soc-who-row" role="row">` +
+          `<div class="soc-row soc-who-row" role="row" data-player="${esc(r.name)}">` +
           `<span class="soc-who-cell who-dot" role="cell"><span class="soc-dot ${r.dot}" title="${tip}"></span></span>` +
           `<span class="soc-who-cell who-name" role="cell">${name}</span>` +
           `<span class="soc-who-cell who-level" role="cell">${n(r.level)}</span>` +

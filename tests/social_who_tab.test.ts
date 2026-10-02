@@ -34,10 +34,12 @@ const ROSTER: WhoRosterInfo = {
 let world: TestWorld;
 let root: HTMLElement;
 let whispers: string[];
+let menus: { name: string; pid: number | null; x: number; y: number }[];
 
 beforeEach(() => {
   document.body.innerHTML = '';
   whispers = [];
+  menus = [];
   world = {
     socialInfo: { friends: [], ignores: [], blocks: [], guild: null, myPledge: null },
     whoInfo: null,
@@ -76,6 +78,7 @@ function makeWindow(): SocialWindow {
     restoreFocus: noop,
     showPrompt: noop,
     startWhisper: (name) => whispers.push(name),
+    openPlayerMenu: (row, x, y) => menus.push({ ...row, x, y }),
   };
   return new SocialWindow(deps);
 }
@@ -272,6 +275,52 @@ describe('Who tab: request on select, paint on answer', () => {
     win.refreshIfChanged();
     (root.querySelector('.who-name .soc-link[data-whisper="Bryn"]') as HTMLElement).click();
     expect(whispers).toEqual(['Bryn']);
+  });
+
+  it('opens the player menu from a right-click anywhere on a row, at the cursor', () => {
+    const win = makeWindow();
+    win.toggle();
+    clickTab('who');
+    world.whoInfo = ROSTER;
+    win.refreshIfChanged();
+    const cell = root.querySelector('[data-player="Bryn"] .who-zone') as HTMLElement;
+    const ev = new MouseEvent('contextmenu', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 120,
+      clientY: 80,
+    });
+    cell.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(true);
+    expect(menus).toEqual([{ name: 'Bryn', pid: null, x: 120, y: 80 }]);
+    expect(whispers).toEqual([]);
+  });
+
+  it('keeps the native menu for a right-click outside any player row', () => {
+    const win = makeWindow();
+    win.toggle();
+    clickTab('who');
+    world.whoInfo = ROSTER;
+    win.refreshIfChanged();
+    const ev = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    (root.querySelector('select[data-field="who-cls"]') as HTMLElement).dispatchEvent(ev);
+    (root.querySelector('.soc-who-header') as HTMLElement).dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(false);
+    expect(menus).toEqual([]);
+  });
+
+  it('still opens the player menu after a content refresh swaps the rows', () => {
+    const win = makeWindow();
+    win.toggle();
+    clickTab('who');
+    world.whoInfo = ROSTER;
+    win.refreshIfChanged();
+    world.whoInfo = { ...ROSTER, total: 2, rows: ROSTER.rows.slice(0, 2) };
+    win.refreshIfChanged();
+    (root.querySelector('[data-player="Mira"]') as HTMLElement).dispatchEvent(
+      new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 5, clientY: 6 }),
+    );
+    expect(menus).toEqual([{ name: 'Mira', pid: null, x: 5, y: 6 }]);
   });
 
   it('says when the server capped the answer', () => {

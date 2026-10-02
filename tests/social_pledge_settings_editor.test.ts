@@ -57,6 +57,7 @@ function openPledgesTab(newPlayerFriendly: boolean): SocialWindow {
     restoreFocus: noop,
     showPrompt: noop,
     startWhisper: noop,
+    openPlayerMenu: noop,
   };
   const win = new SocialWindow(deps);
   win.toggle();

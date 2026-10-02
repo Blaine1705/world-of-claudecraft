@@ -146,6 +146,43 @@ describe('social_window: delegated row listeners (no per-tick churn)', () => {
   });
 });
 
+describe('social_window: row right-click opens the player menu', () => {
+  it('wires ONE delegated contextmenu listener on the body, dispatched by onBodyContextMenu', () => {
+    expect(painter).toMatch(/body\.addEventListener\('contextmenu'/);
+    expect(painter).toContain('private onBodyContextMenu(');
+  });
+
+  it('claims only a row that names a player, and hands it to the openPlayerMenu dep', () => {
+    const start = painter.indexOf('private onBodyContextMenu(');
+    const handler = painter.slice(start, painter.indexOf('\n  }\n', start));
+    expect(handler).toContain(".closest<HTMLElement>('[data-player]')");
+    // The early return sits BEFORE preventDefault, so a right-click on an input
+    // or the empty body keeps the native browser menu.
+    expect(handler.indexOf('return;')).toBeGreaterThan(-1);
+    expect(handler.indexOf('return;')).toBeLessThan(handler.indexOf('e.preventDefault()'));
+    expect(handler).toContain('this.deps.openPlayerMenu(player, x, y)');
+  });
+
+  it('tags a player row on every roster tab (friends, guild, ignore/block, pledges, raid, who)', () => {
+    // Six row builders, each must carry the attribute the handler resolves.
+    expect(painter.match(/<div class="soc-row[^`]*data-player="\$\{esc\(/g)?.length).toBe(6);
+    // The raid row also carries its member pid, so an out-of-range member still
+    // opens the pid-keyed frame menu.
+    expect(painter).toMatch(/raid-row" data-player="\$\{esc\(m\.name\)\}" data-pid="\$\{m\.pid\}"/);
+  });
+
+  it('hud routes the dep to the self, unit-frame, and by-name menus', () => {
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const start = hud.indexOf('openPlayerMenu: (row, x, y) => {');
+    expect(start).toBeGreaterThan(-1);
+    const wiring = hud.slice(start, hud.indexOf('    },', start));
+    expect(wiring).toContain('socialRowMenuTarget(row, this.sim)');
+    expect(wiring).toContain("to.kind === 'self') this.openSelfContextMenu(x, y)");
+    expect(wiring).toContain("to.kind === 'unit') this.openContextMenu(to.pid, to.name, x, y)");
+    expect(wiring).toContain('else this.openChatPlayerContextMenu(to.name, x, y)');
+  });
+});
+
 describe('social_window: guild roster grouping + hide-offline toggle', () => {
   // The grouping + filter decisions are unit-tested in social_view.test.ts and the
   // persistence in guild_hide_offline.test.ts; here we pin that the thin painter
@@ -324,6 +361,13 @@ describe('social_window: guild displayed-role chip (rendered rows)', () => {
     const html = guildMemberRowHtml(row({ rank: 'leader', joinedAt: NOW - 3 * DAY }), NOW);
     expect(chips(html)).toEqual(['<span class="rank">Guild Master</span>']);
     expect(html).not.toContain('soc-tenure');
+  });
+
+  it('tags the row with the member name for the right-click player menu (escaped)', () => {
+    expect(guildMemberRowHtml(row(), NOW)).toMatch(
+      /^<div class="soc-row is-offline" data-player="Gorak">/,
+    );
+    expect(guildMemberRowHtml(row({ name: 'A"b<' }), NOW)).toContain('data-player="A&quot;b&lt;"');
   });
 
   it('escapes the member name around the chip', () => {
