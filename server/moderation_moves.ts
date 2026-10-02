@@ -65,7 +65,23 @@ export function rejoinRiftAfterModeration(sim: Sim, pid: number): void {
   if (ev) sim.ctx.emit(ev);
 }
 
-/** Where a moderator's return leg lands: the saved spot, unless it is a rift floor
+/** Hand `pid`'s live rift floor straight to a socket through `deliver`, as an
+ *  events frame, for a client whose mirror does not hold it. A no-op off every
+ *  member floor. A resumed session gets its own floor; a spectate open or
+ *  retarget gets the target's, because the client resets its mirror on every
+ *  spectate frame (src/net/rift_floor_mirror.ts) and the event router forwards
+ *  only the target's floor transitions, so a view opened on a runner already
+ *  inside a rift would otherwise show the overworld map. */
+export function describeRiftFloor(
+  sim: Sim,
+  pid: number,
+  deliver: (frame: { t: 'events'; list: RiftStateEvent[] }) => void,
+): void {
+  const ev = riftStateEventFor(sim.ctx, pid);
+  if (ev) deliver({ t: 'events', list: [ev] });
+}
+
+/** Where a moderator's return leg lands:the saved spot, unless it is a rift floor
  *  `pid` no longer belongs to (the run emptied and was freed, or the slot reused,
  *  while they were away), in which case the run's exit spot recorded on the way out. */
 export function moderationReturnSpot(
