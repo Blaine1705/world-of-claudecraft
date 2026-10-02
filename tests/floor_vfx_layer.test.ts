@@ -336,6 +336,8 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/stormbrass_foundry/foundry_molten.ts',
   'src/render/stormbrass_foundry/foundry_sparks.ts',
   'src/render/stormbrass_foundry/foundry_steam.ts',
+  // The storm cloud banks among the peaks (far behind the world, under every rung).
+  'src/render/stormbrass_foundry/foundry_clouds.ts',
   // The Wildheart Basin's water (the ford, the river, the plunge pool: water
   // surfaces under the whole ladder), its waterfalls (curtains, foam, spray,
   // mist, rainbows standing up from the water) and its air (the gorge haze

@@ -21,6 +21,7 @@ import { ensureFoundryKit } from './foundry_kit';
 import { FOUNDRY_OPEN_WALK_FASCIA, FOUNDRY_OPEN_WALKS } from './foundry_kit_plan_core';
 import { buildFoundryLandmarks } from './foundry_landmarks';
 import { buildFoundryLights } from './foundry_lights';
+import { ensureFoundryMountains } from './foundry_mountains';
 import { foundryHash } from './foundry_plan_core';
 import { buildFoundrySky } from './foundry_sky';
 import { buildFoundryVents } from './foundry_vents';
@@ -138,7 +139,7 @@ export async function buildStormbrassFoundryInterior(
   ox: number,
   oz: number,
 ): Promise<THREE.Group> {
-  await ensureFoundryKit();
+  await Promise.all([ensureFoundryKit(), ensureFoundryMountains()]);
   const group = new THREE.Group();
   group.name = 'stormbrassFoundryField';
   // Cosmetic density sheds with the effects tier (never a telegraph or a gate).

@@ -585,8 +585,8 @@ describe('Stormbrass Foundry kit: the plan', () => {
       if (p.piece !== 'Kit_BoilerHouse') continue;
       const pier = pieces.find((q) => q.piece === 'Kit_Pier' && q.x === p.x && q.z === p.z);
       expect(pier).toBeDefined();
-      const top =
-        ((pier as FoundryKitPlacement).y as number) + FOUNDRY_KIT_SIZES.pierHeight * p.scale;
+      const q = pier as FoundryKitPlacement;
+      const top = (q.y as number) + FOUNDRY_KIT_SIZES.pierHeight * q.scale * (q.scaleY ?? 1);
       expect(top).toBeCloseTo(p.y as number, 3);
       expect((pier as FoundryKitPlacement).y as number).toBeLessThan(VOID);
     }

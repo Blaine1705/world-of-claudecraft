@@ -735,8 +735,9 @@ export function planSkyline(): FoundryKitPlacement[] {
       z: s.z,
       rot: s.rot,
       scale,
-      y: s.top - FOUNDRY_KIT_SIZES.pierHeight * scale,
-      scaleY: 1,
+      // Down into the valley floor, whatever its own height.
+      y: VOID - 26,
+      scaleY: (s.top - (VOID - 26)) / (FOUNDRY_KIT_SIZES.pierHeight * scale),
       cosmetic: true,
     });
     out.push({

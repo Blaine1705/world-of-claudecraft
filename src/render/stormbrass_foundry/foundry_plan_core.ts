@@ -432,6 +432,65 @@ export function planFoundryButtresses(
   return out;
 }
 
+export interface FoundryCloudBank {
+  x: number;
+  y: number;
+  z: number;
+  /** Width and height of the bank (yards). */
+  w: number;
+  h: number;
+  seed: number;
+}
+
+/** The storm's cloud banks sitting AMONG the peaks (not painted on the dome):
+ *  heavy banks snagged on the ranges and the hero peaks, scud in the passes,
+ *  and mist lying in the through-valley to the south-west. Sorted far to near
+ *  from the shelf, so they blend in order for a viewer standing on it. */
+export function planFoundryCloudBanks(density: number): FoundryCloudBank[] {
+  const out: FoundryCloudBank[] = [];
+  // Snagged on the hero peaks: the Stormhorn (north), the Split Tooth (east),
+  // the Anvil (west).
+  const snags: [number, number, number, number, number][] = [
+    [-150, 330, 600, 420, 170],
+    [60, 400, 690, 520, 200],
+    [190, 300, 560, 380, 150],
+    [520, 300, -40, 420, 160],
+    [600, 380, 180, 460, 190],
+    [-520, 230, -60, 480, 150],
+    [-600, 300, -250, 420, 170],
+  ];
+  snags.forEach(([x, y, z, w, h], i) => {
+    out.push({ x, y, z, w, h, seed: 0.11 + i * 0.123 });
+  });
+  // A ragged ring among the ranges.
+  const ring = Math.round(6 + 10 * density);
+  for (let i = 0; i < ring; i++) {
+    const a = (i / ring) * Math.PI * 2 + foundryHash(i, 81) * 0.5;
+    const r = 330 + foundryHash(i, 82) * 300;
+    out.push({
+      x: Math.sin(a) * r,
+      y: 150 + foundryHash(i, 83) * 230,
+      z: Math.cos(a) * r * 1.15,
+      w: 260 + foundryHash(i, 84) * 260,
+      h: 110 + foundryHash(i, 85) * 110,
+      seed: foundryHash(i, 86),
+    });
+  }
+  // Mist lying down the through-valley, south-west.
+  for (let i = 0; i < Math.round(2 + 3 * density); i++) {
+    const k = 0.35 + i * 0.16;
+    out.push({
+      x: -420 * k - 60,
+      y: -30 + i * 14,
+      z: -760 * k - 120,
+      w: 420 + i * 40,
+      h: 90,
+      seed: 0.5 + i * 0.097,
+    });
+  }
+  return out.sort((p, q) => Math.hypot(q.x, q.z) - Math.hypot(p.x, p.z));
+}
+
 /** The steam and furnace smoke that climbs the mountain's face below the
  *  shelf's rim (vented from the foundry's works inside the rock): tall plumes
  *  standing just past the footprint, their feet far down the cliffs. */

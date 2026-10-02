@@ -18,6 +18,8 @@ import { STORMBRASS_FOUNDRY_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import { STORMBRASS_FOUNDRY_SUN_DIRECTION } from '../interior_light_rig';
 import { markSharedMaterial } from '../shared_resource';
+import { buildFoundryClouds, setFoundryCloudFlash } from './foundry_clouds';
+import { buildFoundryMountainMesh, setFoundryMountainFlash } from './foundry_mountains';
 import {
   COIL_TOP,
   coilStrikeAt,
@@ -141,6 +143,8 @@ function buildDome(opts: FoundrySkyOptions): THREE.Mesh {
   mesh.onBeforeRender = () => {
     uniforms.uFlash.value = opts.lowGfx ? 0 : coilStrikeAt(sharedUniforms.uTime.value, 3).flash;
     HAZE_FLASH.value = uniforms.uFlash.value;
+    setFoundryMountainFlash(uniforms.uFlash.value * 0.16);
+    setFoundryCloudFlash(uniforms.uFlash.value);
   };
   return mesh;
 }
@@ -468,7 +472,15 @@ export function buildFoundrySky(opts: FoundrySkyOptions): THREE.Group {
   const group = new THREE.Group();
   group.name = 'stormbrassSky';
   group.add(buildDome(opts));
-  group.add(buildMountain(opts));
-  if (!opts.lowGfx) group.add(buildHaze());
+  // The sculpted heightfield when it has landed (foundry_mountains.ts), else
+  // the procedural massifs behind their haze veils.
+  const real = buildFoundryMountainMesh(opts.lowGfx);
+  if (real) {
+    group.add(real);
+  } else {
+    group.add(buildMountain(opts));
+    if (!opts.lowGfx) group.add(buildHaze());
+  }
+  group.add(buildFoundryClouds(opts.lowGfx, opts.density));
   return group;
 }
