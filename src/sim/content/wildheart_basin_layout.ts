@@ -298,13 +298,17 @@ const SURFACES: FieldSurface[] = [
     H.fernLanding,
     { edge: 'rock', ground: 'moss' },
   ),
+  // The descent runs along the gorge wall and lands on the bank's level BEFORE
+  // it meets the bank, then walks straight onto it: a ramp still in the air
+  // where the bank (listed later) takes over would be cut off by a cliff.
   path(
     'fern_steps_lower',
     [
       [-26, -174, H.fernLanding],
       [-21, -170.7, H.fernLanding],
-      [10, -150, H.bank],
-      [16, -146, H.bank],
+      [9, -161.5, 5.4],
+      [14.5, -156, H.bank],
+      [15, -146, H.bank],
     ],
     6,
     { stairs: true, edge: 'rock', ground: 'basalt' },
@@ -698,13 +702,15 @@ const PROPS: FieldProp[] = [
   { kind: 'wb_hide_rack', x: -104, z: -4, rot: -0.6, hw: 2.4, hd: 0.6, h: 3 },
   { kind: 'wb_beast_cage', x: -68, z: -18, rot: 0.3, hw: 2, hd: 2, h: 3.5 },
   // The Beast Pits: bone fences round the rim, cages and the judging stone.
-  ...[200, 240, 280, 120, 80].map((deg): FieldProp => {
+  // Each fence runs ALONG the rim (its long axis tangent, tusks turned out),
+  // clear of the stair's mouth (180), the judging stone (0) and the cages.
+  ...[80, 120, 150, 210, 240, 280].map((deg): FieldProp => {
     const a = (deg * PI) / 180;
     return {
       kind: 'wb_bone_fence',
       x: BEAST_PITS.x + Math.sin(a) * 21.5,
       z: BEAST_PITS.z + Math.cos(a) * 21.5,
-      rot: a + PI / 2,
+      rot: a,
       hw: 4,
       hd: 0.4,
       h: 2.6,
