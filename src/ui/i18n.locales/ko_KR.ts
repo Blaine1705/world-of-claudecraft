@@ -1364,7 +1364,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.shardpike.promptTakePike': '{key} 키를 누르거나 무기 거치대를 클릭해 조각창을 집어라',
   'hudChrome.shardpike.promptTakePikeClick': '무기 거치대를 클릭해 조각창을 집어라',
   'hudChrome.shardpike.promptTakePikeTap': '무기 거치대를 탭해 조각창을 집어라',
-  'hudChrome.shardpike.promptPikeLevelCap': '소집군은 레벨 {level} 이하의 신병에게만 창을 빌려줍니다',
+  'hudChrome.shardpike.promptPikeLevelCap':
+    '소집군은 레벨 {level} 이하의 신병에게만 창을 빌려줍니다',
   'hudChrome.shardpike.braceTooltipLean':
     '창끝을 땅에 박고 창날을 치켜든다. 좌우 이동 키나 회전 키로, 또는 막대 위의 두 키를 누르고 있어 기울여라. 막대는 저절로 흔들리고, 그가 내려치는 일격마다 튕겨 나간다. {set}초 동안 양 끝에 닿지 않게 버티면 창이 자리 잡는다. 단단한 땅이 필요하며, 탈것 위에서는 불가능하다.',
   'hudChrome.shardpike.promptLabel': '조각창 지시',
