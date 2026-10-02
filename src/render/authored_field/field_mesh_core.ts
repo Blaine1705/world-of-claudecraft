@@ -53,16 +53,23 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   shallows: [0.14, 0.14, 0.11],
   moss: [0.16, 0.2, 0.1],
   basalt: [0.17, 0.18, 0.17],
+  // The Stormbrass Foundry: blued steel deck plate, near-black bar grating,
+  // flagstone under a film of soot.
+  plate: [0.27, 0.28, 0.3],
+  grating: [0.2, 0.2, 0.21],
+  soot: [0.22, 0.21, 0.21],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
-export const FIELD_TOP_FAMILIES = ['stone', 'soil', 'moss', 'basalt'] as const;
+export const FIELD_TOP_FAMILIES = ['stone', 'soil', 'moss', 'basalt', 'plate', 'grating'] as const;
 export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
 
 /** Which texture family a ground kind draws with. */
 export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
   if (ground === 'moss') return 'moss';
   if (ground === 'basalt') return 'basalt';
+  if (ground === 'plate') return 'plate';
+  if (ground === 'grating') return 'grating';
   return ground === 'earth' ||
     ground === 'grave' ||
     ground === 'frost' ||
@@ -357,6 +364,8 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   const dirt = Math.max(0, fieldNoise(x * 0.07 - 3, z * 0.07 + 5, 2) - 0.6) * 1.6;
   if (ground === 'moss') return mossColor(base, k, patch, dirt);
   if (ground === 'basalt') return basaltColor(base, k, patch);
+  if (ground === 'plate' || ground === 'grating' || ground === 'soot')
+    return sootColor(base, k, patch, dirt, ground === 'grating');
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
   const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
@@ -385,6 +394,16 @@ function basaltColor(base: Rgb, k: number, patch: number): Rgb {
     base[1] * k * (1 + seam * 0.35 + dry * 0.3),
     base[2] * k * (1.06 - seam * 0.3 + dry * 0.25),
   ];
+}
+
+/** Foundry floors: soot pooled in drifts, oil-dark stains, and the odd
+ *  bright worn track where boots and carts polish the metal. */
+function sootColor(base: Rgb, k: number, patch: number, dirt: number, grating: boolean): Rgb {
+  const soot = Math.min(1, Math.max(0, patch - 0.5) * 2.2);
+  const worn = grating ? 0 : Math.max(0, 0.32 - patch) * 1.4;
+  const oil = Math.min(1, dirt * 1.2);
+  const t = k * (1 - soot * 0.45) * (1 - oil * 0.3) + worn * 0.18;
+  return [base[0] * t + oil * 0.012, base[1] * t + oil * 0.01, base[2] * t * (1 + worn * 0.1)];
 }
 
 function pushVertex(
@@ -417,6 +436,8 @@ export function planFieldTops(
     soil: { positions: [], colors: [], uvs: [], indices: [] },
     moss: { positions: [], colors: [], uvs: [], indices: [] },
     basalt: { positions: [], colors: [], uvs: [], indices: [] },
+    plate: { positions: [], colors: [], uvs: [], indices: [] },
+    grating: { positions: [], colors: [], uvs: [], indices: [] },
   };
   const clippers = laterClippers(def);
   def.surfaces.forEach((s, layer) => {
@@ -494,6 +515,9 @@ export interface FieldCliffOptions {
   rowStep: number;
   /** How far a face bulges out per yard of depth below its top (massif flare). */
   flare: number;
+  /** Surfaces whose drop into the void stops `depth` yards under their top
+   *  (open air under a catwalk; the dungeon draws its own trusses there). */
+  shallow?: { surfaces: ReadonlySet<string>; depth: number };
 }
 
 /** Cliff rock tint: cold strata banding, darker with depth. */
@@ -602,6 +626,7 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
     let ring = densify(renderOutline(s), opts.columnStep);
     if (signedArea(ring) < 0) ring = ring.reverse();
     planRisers(def, index, ring, out);
+    const shallow = opts.shallow?.surfaces.has(s.id) ? opts.shallow.depth : 0;
     const n = ring.length;
     const tops: number[] = [];
     const bottoms: number[] = [];
@@ -620,7 +645,10 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
       const top = surfaceTopHeight(s, x, z);
       tops.push(top);
       const outside = authoredFieldHeight(def, x + nx * 0.8, z + nz * 0.8);
-      bottoms.push(outside <= def.voidHeight + 0.5 ? opts.voidFloor : Math.min(top, outside) - 0.4);
+      const open = outside <= def.voidHeight + 0.5;
+      bottoms.push(
+        open && shallow ? top - shallow : open ? opts.voidFloor : Math.min(top, outside) - 0.4,
+      );
     }
     const drop = Math.max(...tops.map((t, i) => t - bottoms[i]));
     if (drop < 0.3) continue;

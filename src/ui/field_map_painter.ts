@@ -41,6 +41,9 @@ const FIELD_MAP_TOKENS = {
   shallows: '--color-field-map-shallows',
   moss: '--color-field-map-moss',
   basalt: '--color-field-map-basalt',
+  plate: '--color-field-map-plate',
+  grating: '--color-field-map-grating',
+  soot: '--color-field-map-soot',
   wall: '--color-field-map-wall',
   wallTop: '--color-field-map-wall-top',
   prop: '--color-field-map-prop',
@@ -427,7 +430,40 @@ export class FieldMapPlateArt {
     const k = FIELD_MAP_PX_PER_YARD;
     ctx.strokeStyle = c.ink;
     ctx.fillStyle = c.ink;
-    if (ground === 'flagstone' || ground === 'bone' || ground === 'ritual' || ground === 'quay') {
+    if (ground === 'grating') {
+      // Catwalk grating: fine load bars along the walk.
+      ctx.globalAlpha = 0.24;
+      ctx.lineWidth = 0.6;
+      for (let x = minX; x <= maxX; x += k * 0.7) {
+        ctx.beginPath();
+        ctx.moveTo(x, minY);
+        ctx.lineTo(x, maxY);
+        ctx.stroke();
+      }
+    } else if (ground === 'plate') {
+      // Deck plate: a two-yard grid of welded seams.
+      const plate = 2 * k;
+      ctx.globalAlpha = 0.2;
+      ctx.lineWidth = 0.7;
+      for (let y = minY; y <= maxY; y += plate) {
+        ctx.beginPath();
+        ctx.moveTo(minX, y);
+        ctx.lineTo(maxX, y);
+        ctx.stroke();
+      }
+      for (let x = minX; x <= maxX; x += plate) {
+        ctx.beginPath();
+        ctx.moveTo(x, minY);
+        ctx.lineTo(x, maxY);
+        ctx.stroke();
+      }
+    } else if (
+      ground === 'flagstone' ||
+      ground === 'bone' ||
+      ground === 'ritual' ||
+      ground === 'quay' ||
+      ground === 'soot'
+    ) {
       // Coursed flags (planks on the quay): staggered joints every two yards.
       const course = 2 * k;
       ctx.globalAlpha = ground === 'quay' ? 0.22 : 0.16;

@@ -17,7 +17,9 @@ import {
 import {
   basaltDetail,
   flagstoneDetail,
+  gratingDetail,
   mossDetail,
+  plateDetail,
   rockDetail,
   soilDetail,
 } from './field_textures';
@@ -44,6 +46,11 @@ export interface FieldTerrainOptions {
   /** Rain-soaked ground: the stone and soil tops take a wet sheen (lower
    *  roughness), so the storm's light glints off the flags. */
   wet?: boolean;
+  /** Surfaces whose drop is open air under them (a catwalk, a steel stair):
+   *  their drawn face stops this many yards below the walking top instead of
+   *  running down to the void floor, so the dungeon's own trusses show. The
+   *  sim's lip colliders are unchanged. */
+  shallow?: { surfaces: ReadonlySet<string>; depth: number };
 }
 
 /** Build the ground of a field: tops (one mesh per texture family) and cliffs. */
@@ -62,13 +69,16 @@ export function buildAuthoredFieldTerrain(
   // family the field actually draws (the shared cache dedupes the rest).
   const looks: Record<
     FieldTopFamily,
-    { detail: () => ReturnType<typeof rockDetail>; rough: number }
+    { detail: () => ReturnType<typeof rockDetail>; rough: number; metal?: number }
   > = {
     stone: { detail: flagstoneDetail, rough: opts.wet ? 0.62 : 0.93 },
     soil: { detail: soilDetail, rough: opts.wet ? 0.72 : 0.98 },
     // Jungle moss stays matte; wet basalt glints.
     moss: { detail: mossDetail, rough: 0.97 },
     basalt: { detail: basaltDetail, rough: opts.wet ? 0.42 : 0.55 },
+    // The Foundry's steel: deck plate with a dull sheen, grating darker.
+    plate: { detail: plateDetail, rough: 0.58, metal: 0.35 },
+    grating: { detail: gratingDetail, rough: 0.66, metal: 0.3 },
   };
   for (const family of FIELD_TOP_FAMILIES) {
     const data = tops[family];
@@ -79,6 +89,7 @@ export function buildAuthoredFieldTerrain(
       normalMap: opts.lowGfx ? undefined : pair.normalMap,
       vertexColors: true,
       roughness: looks[family].rough,
+      ...(looks[family].metal !== undefined ? { metalness: looks[family].metal } : {}),
     });
     const mesh = new THREE.Mesh(geometryOf(data, false), material);
     mesh.name = `fieldTop:${family}`;
@@ -90,6 +101,7 @@ export function buildAuthoredFieldTerrain(
     columnStep: opts.lowGfx ? 3 : 1.6,
     rowStep: opts.lowGfx ? 6 : 3,
     flare: 0.22,
+    ...(opts.shallow ? { shallow: opts.shallow } : {}),
   });
   if (cliffs.positions.length > 0) {
     const mesh = new THREE.Mesh(

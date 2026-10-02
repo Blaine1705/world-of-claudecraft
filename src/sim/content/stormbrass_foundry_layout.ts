@@ -34,6 +34,7 @@
 
 import type { AuthoredFieldDef, FieldProp, FieldSurface } from '../instances/authored_field/types';
 import { foundryWorkerCampProps } from './stormbrass_foundry_workers';
+import { FOUNDRY_MACHINERY_PROPS } from './stormbrass_foundry_machinery';
 
 /** The mountain drop under the shelf (the void between the walkways). */
 export const STORMBRASS_FOUNDRY_VOID_HEIGHT = -80;
@@ -171,7 +172,7 @@ const SURFACES: FieldSurface[] = [
     r: LIFT_LANDING.r,
     h: LIFT_LANDING.h,
     edge: 'balustrade',
-    ground: 'flagstone',
+    ground: 'plate',
   },
   // --- The Lift Stair down to the Rail Yard --------------------------------------
   {
@@ -186,12 +187,12 @@ const SURFACES: FieldSurface[] = [
     halfWidth: 5,
     stairs: true,
     edge: 'balustrade',
-    ground: 'flagstone',
+    ground: 'grating',
   },
   // --- The Rail Yard (G1, G2, patrol A: the Gantry Hauler) ------------------------
   rect('rail_yard', RAIL_YARD.x0, RAIL_YARD.z0, RAIL_YARD.x1, RAIL_YARD.z1, RAIL_YARD.h, {
     edge: 'rock',
-    ground: 'quay',
+    ground: 'soot',
   }),
   // --- The Yard Stair up to the Assembly Terraces (the Yard Shutter across it) ----
   {
@@ -206,10 +207,10 @@ const SURFACES: FieldSurface[] = [
     halfWidth: 6,
     stairs: true,
     edge: 'masonry',
-    ground: 'flagstone',
+    ground: 'soot',
   },
   // --- The Assembly Terraces: the parts line (G3) and the crane pad (G4) ----------
-  rect('terrace_parts_line', -40, -114, 40, -88, 4, { edge: 'masonry', ground: 'flagstone' }),
+  rect('terrace_parts_line', -40, -114, 40, -88, 4, { edge: 'masonry', ground: 'plate' }),
   {
     kind: 'path',
     id: 'terrace_stair',
@@ -222,9 +223,9 @@ const SURFACES: FieldSurface[] = [
     halfWidth: 6,
     stairs: true,
     edge: 'masonry',
-    ground: 'flagstone',
+    ground: 'soot',
   },
-  rect('terrace_crane_pad', -40, -80, 40, -58, 8, { edge: 'masonry', ground: 'flagstone' }),
+  rect('terrace_crane_pad', -40, -80, 40, -58, 8, { edge: 'masonry', ground: 'plate' }),
   // --- The Line Catwalk into the Main Line (the Line Shutter across it) ------------
   {
     kind: 'path',
@@ -235,12 +236,12 @@ const SURFACES: FieldSurface[] = [
     ],
     halfWidth: 5,
     edge: 'balustrade',
-    ground: 'ritual',
+    ground: 'grating',
   },
   // --- The Main Line and the Crane Landing behind the press (Line-Master Tock) ---
   rect('main_line', MAIN_LINE.x0, MAIN_LINE.z0, MAIN_LINE.x1, MAIN_LINE.z1, MAIN_LINE.h, {
     edge: 'masonry',
-    ground: 'ritual',
+    ground: 'plate',
   }),
   // --- West: the Range Catwalk and the Range Lanes (G5, G6, patrol B) -------------
   {
@@ -255,7 +256,7 @@ const SURFACES: FieldSurface[] = [
     halfWidth: 5,
     stairs: true,
     edge: 'balustrade',
-    ground: 'ritual',
+    ground: 'grating',
   },
   rect('range_lanes', -104, -76, -48, -30, 10, { edge: 'rock', ground: 'earth' }),
   {
@@ -267,7 +268,7 @@ const SURFACES: FieldSurface[] = [
     ],
     halfWidth: 5,
     edge: 'balustrade',
-    ground: 'flagstone',
+    ground: 'grating',
   },
   // --- The Proving Range (the Rangewarden) ----------------------------------------
   rect(
@@ -292,7 +293,7 @@ const SURFACES: FieldSurface[] = [
     halfWidth: 5,
     stairs: true,
     edge: 'balustrade',
-    ground: 'ritual',
+    ground: 'grating',
   },
   {
     kind: 'circle',
@@ -302,7 +303,7 @@ const SURFACES: FieldSurface[] = [
     r: 10,
     h: 10,
     edge: 'rock',
-    ground: 'flagstone',
+    ground: 'plate',
   },
   {
     kind: 'path',
@@ -316,7 +317,7 @@ const SURFACES: FieldSurface[] = [
     halfWidth: 5,
     stairs: true,
     edge: 'balustrade',
-    ground: 'flagstone',
+    ground: 'grating',
   },
   {
     kind: 'circle',
@@ -326,7 +327,7 @@ const SURFACES: FieldSurface[] = [
     r: 9,
     h: 24,
     edge: 'rock',
-    ground: 'flagstone',
+    ground: 'plate',
   },
   {
     kind: 'path',
@@ -340,7 +341,7 @@ const SURFACES: FieldSurface[] = [
     halfWidth: 5,
     stairs: true,
     edge: 'balustrade',
-    ground: 'flagstone',
+    ground: 'grating',
   },
   // --- The Coil Crown (the Voltaic Warden) -----------------------------------------
   {
@@ -351,7 +352,7 @@ const SURFACES: FieldSurface[] = [
     r: COIL_CROWN.r,
     h: COIL_CROWN.h,
     edge: 'balustrade',
-    ground: 'ritual',
+    ground: 'plate',
   },
   {
     kind: 'circle',
@@ -376,7 +377,7 @@ const SURFACES: FieldSurface[] = [
     ],
     halfWidth: CRANE_BRIDGE.halfWidth,
     edge: 'balustrade',
-    ground: 'ritual',
+    ground: 'grating',
   },
   // --- The Drafting Yard (G9, G10, G11) -------------------------------------------
   rect(
@@ -386,7 +387,7 @@ const SURFACES: FieldSurface[] = [
     DRAFTING_YARD.x1,
     DRAFTING_YARD.z1,
     DRAFTING_YARD.h,
-    { edge: 'masonry', ground: 'flagstone' },
+    { edge: 'masonry', ground: 'soot' },
   ),
   {
     kind: 'path',
@@ -400,7 +401,7 @@ const SURFACES: FieldSurface[] = [
     halfWidth: 6,
     stairs: true,
     edge: 'masonry',
-    ground: 'flagstone',
+    ground: 'soot',
   },
   // --- The Gantry Approach (G12, G13, patrol D) -----------------------------------
   rect(
@@ -410,7 +411,7 @@ const SURFACES: FieldSurface[] = [
     GANTRY_APPROACH.x1,
     GANTRY_APPROACH.z1,
     GANTRY_APPROACH.h,
-    { edge: 'masonry', ground: 'quay' },
+    { edge: 'masonry', ground: 'plate' },
   ),
   {
     kind: 'path',
@@ -421,7 +422,7 @@ const SURFACES: FieldSurface[] = [
     ],
     halfWidth: 6,
     edge: 'balustrade',
-    ground: 'ritual',
+    ground: 'grating',
   },
   // --- The Gantry (the Prime Draft) -----------------------------------------------
   {
@@ -432,7 +433,7 @@ const SURFACES: FieldSurface[] = [
     r: GANTRY.r,
     h: GANTRY.h,
     edge: 'masonry',
-    ground: 'ritual',
+    ground: 'plate',
   },
   {
     kind: 'circle',
@@ -539,7 +540,8 @@ const PROPS: FieldProp[] = [
   { kind: 'sf_steam_vent', x: -46, z: 50, rot: 0 },
   { kind: 'sf_steam_vent', x: 46, z: 50, rot: 0 },
   // The Gantry Approach: the crane yard and the cell racks.
-  { kind: 'sf_crane_base', x: -38, z: 124, rot: 0, r: 2, h: 20 },
+  // Set back to the yard's north lip: camp C holds the old spot.
+  { kind: 'sf_crane_base', x: -39, z: 160, rot: 0, r: 2, h: 20 },
   { kind: 'sf_cell_rack_small', x: 40, z: 138, rot: Math.PI / 2, hw: 2.5, hd: 1, h: 3.5 },
   { kind: 'sf_cell_rack_small', x: 40, z: 162, rot: Math.PI / 2, hw: 2.5, hd: 1, h: 3.5 },
   // The Gantry: the scaffold round the Prime Draft and the two charging racks.
@@ -568,7 +570,7 @@ export const STORMBRASS_FOUNDRY_FIELD: AuthoredFieldDef = {
   mapVoid: 'mist',
   surfaces: SURFACES,
   walls: [],
-  props: PROPS,
+  props: [...PROPS, ...FOUNDRY_MACHINERY_PROPS],
   lightZones: [
     { id: 'landing', x: 0, z: -215, r: 40, key: 0xdfe6ee, accent: 0xffd98a, fog: 0x80838a },
     { id: 'yard', x: 0, z: -160, r: 60, key: 0xd8dfe8, accent: 0xffc870, fog: 0x7a7d84 },

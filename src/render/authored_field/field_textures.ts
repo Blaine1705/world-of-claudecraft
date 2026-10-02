@@ -264,6 +264,104 @@ const paintBasalt: Painter = (h, size, rnd) => {
   }
 };
 
+/** Riveted steel deck plate (the Stormbrass Foundry): four plates to the
+ *  tile, each with a diamond tread, sunken weld seams, a rivet row along every
+ *  edge, and scuffs where boots and carts wear it. */
+const paintPlate: Painter = (h, size, rnd) => {
+  const cells = 2;
+  const cell = size / cells;
+  const tone: number[] = [];
+  for (let i = 0; i < cells * cells; i++) tone.push(0.56 + rnd() * 0.16);
+  const grain = noiseField(size, rnd, 40);
+  const broad = noiseField(size, rnd, 5);
+  const tread = 8;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const cx = Math.floor(x / cell);
+      const cy = Math.floor(y / cell);
+      const lx = x - cx * cell;
+      const ly = y - cy * cell;
+      const edge = Math.min(lx, ly, cell - 1 - lx, cell - 1 - ly);
+      let v =
+        tone[cy * cells + cx] +
+        (grain[y * size + x] - 0.5) * 0.08 +
+        (broad[y * size + x] - 0.5) * 0.08;
+      // The diamond tread: short raised lozenges, alternating diagonals.
+      if (edge > 6) {
+        const ty = Math.floor(ly / tread);
+        const tx = Math.floor(lx / tread);
+        const fx = lx / tread - tx - 0.5;
+        const fy = ly / tread - ty - 0.5;
+        const flip = (tx + ty) % 2 === 0 ? 1 : -1;
+        const u = (fx + fy * flip) * 0.7071;
+        const w = (fx - fy * flip) * 0.7071;
+        if (Math.abs(u) < 0.32 && Math.abs(w) < 0.08) v += 0.13;
+      }
+      // Sunken weld seams between the plates.
+      if (edge < 2) v = 0.18 + edge * 0.08;
+      h[y * size + x] = v;
+    }
+  }
+  // Rivets: a row of domes a few pixels in from every plate edge.
+  for (let cy = 0; cy < cells; cy++) {
+    for (let cx = 0; cx < cells; cx++) {
+      const x0 = cx * cell;
+      const y0 = cy * cell;
+      for (let t = 6; t < cell - 3; t += 12) {
+        for (const [rx, ry] of [
+          [x0 + t, y0 + 5],
+          [x0 + t, y0 + cell - 6],
+          [x0 + 5, y0 + t],
+          [x0 + cell - 6, y0 + t],
+        ]) {
+          for (let dy = -2; dy <= 2; dy++) {
+            for (let dx = -2; dx <= 2; dx++) {
+              const d = Math.hypot(dx, dy);
+              if (d > 2.3) continue;
+              const i = ((ry + dy + size) % size) * size + ((rx + dx + size) % size);
+              h[i] = Math.max(h[i], 0.78 - d * 0.1);
+            }
+          }
+        }
+      }
+    }
+  }
+  // Scuffs and gouges.
+  for (let k = 0; k < 60; k++) {
+    let x = rnd() * size;
+    let y = rnd() * size;
+    const a = rnd() * Math.PI * 2;
+    const len = 5 + rnd() * 18;
+    for (let s = 0; s < len; s++) {
+      x += Math.cos(a);
+      y += Math.sin(a);
+      const i =
+        (((Math.floor(y) % size) + size) % size) * size + (((Math.floor(x) % size) + size) % size);
+      h[i] *= 0.82;
+    }
+  }
+};
+
+/** Catwalk bar grating: load bars along the tile, cross rods every few
+ *  inches, the dark drop showing through every gap. */
+const paintGrating: Painter = (h, size, rnd) => {
+  const pitch = 8;
+  const cross = 32;
+  const grain = noiseField(size, rnd, 48);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const bar = x % pitch < 3;
+      const rod = y % cross < 2;
+      let v = 0.04;
+      if (bar) v = 0.62 + (x % pitch === 1 ? 0.12 : 0) + (grain[y * size + x] - 0.5) * 0.12;
+      else if (rod) v = 0.5 + (grain[y * size + x] - 0.5) * 0.1;
+      // A frame band every tile edge (the panel's own border).
+      if (y % (size / 2) < 3) v = 0.58 + (grain[y * size + x] - 0.5) * 0.08;
+      h[y * size + x] = v;
+    }
+  }
+};
+
 interface DetailPair {
   map: THREE.CanvasTexture;
   normalMap: THREE.CanvasTexture;
@@ -352,4 +450,14 @@ export function mossDetail(): DetailPair {
 
 export function basaltDetail(): DetailPair {
   return bake('basalt', paintBasalt, 0xba5a, 256, 8);
+}
+
+export function plateDetail(): DetailPair {
+  return bake('plate', paintPlate, 0x7a7e, 256, 7, 0, 160);
+}
+
+export function gratingDetail(): DetailPair {
+  // Hard bar edges: no blur, a deep relief and the full albedo swing (the
+  // gaps read black, the drop showing through).
+  return bake('grating', paintGrating, 0x96a1, 256, 9, 0, 200);
 }

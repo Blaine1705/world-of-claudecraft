@@ -26,7 +26,12 @@ export type FieldGround =
   | 'shallows'
   // The Wildheart Basin: jungle loam under moss and fern, and wet basalt.
   | 'moss'
-  | 'basalt';
+  | 'basalt'
+  // The Stormbrass Foundry: riveted steel deck plate, catwalk bar grating,
+  // and soot-stained flagstone.
+  | 'plate'
+  | 'grating'
+  | 'soot';
 
 interface FieldSurfaceBase {
   id: string;

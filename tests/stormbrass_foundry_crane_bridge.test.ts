@@ -19,6 +19,7 @@ import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 describe('the Crane Bridge, extended', () => {
   const tops = planFieldTops(STORMBRASS_FOUNDRY_FIELD, { maxEdge: 3, layerLift: 0 });
   const deck = craneBridgeDeck();
+  const families = Object.values(tops);
 
   it('reaches from inside the Crane Landing onto the Drafting Yard', () => {
     expect(deck.fromZ).toBeLessThanOrEqual(MAIN_LINE.z1);
@@ -32,17 +33,18 @@ describe('the Crane Bridge, extended', () => {
     for (let z = CRANE_BRIDGE.fromZ - 4; z <= DRAFTING_YARD.z0 + 4; z += 0.5) {
       for (const x of [-4, 0, 4]) {
         const walked = authoredFieldHeight(STORMBRASS_FOUNDRY_FIELD, x, z);
+        // Every texture family the field paints (the Foundry's floors are
+        // deck plate, grating and sooty flagstone).
+        const terrain = families.map((f) => drawnTopAt(f, x, z)).filter((h) => !Number.isNaN(h));
         let drawn = deck.deckAt(z);
-        if (Number.isNaN(drawn)) drawn = drawnTopAt(tops.stone, x, z);
-        if (Number.isNaN(drawn)) drawn = drawnTopAt(tops.soil, x, z);
+        if (Number.isNaN(drawn) && terrain.length > 0) drawn = Math.max(...terrain);
         if (Number.isNaN(drawn)) {
           gaps.push(`${x},${z}`);
           continue;
         }
         samples++;
         // Where the deck and the yard overlap the higher top is what shows.
-        const tops3 = [drawn, drawnTopAt(tops.stone, x, z), drawnTopAt(tops.soil, x, z)];
-        const top = Math.max(...tops3.filter((h) => !Number.isNaN(h)));
+        const top = Math.max(drawn, ...terrain);
         worst = Math.max(worst, Math.abs(top - walked));
       }
     }
