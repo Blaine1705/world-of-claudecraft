@@ -111,8 +111,12 @@ describe('the quests follow the rule', () => {
   it('offers Pikes First up to level 19 only, and says so', () => {
     expect(computeQuestState(MUSTER_PIKE_DRILL_QUEST_ID, log, done, 19)).toBe('available');
     expect(computeQuestState(MUSTER_PIKE_DRILL_QUEST_ID, log, done, 20)).toBe('unavailable');
-    expect(QUESTS[MUSTER_PIKE_DRILL_QUEST_ID]?.text).toContain('level 19 or lower');
-    expect(QUESTS[MUSTER_SUMMONS_QUEST_ID]?.completionText).toContain('level 19 or lower');
+    expect(QUESTS[MUSTER_PIKE_DRILL_QUEST_ID]?.text).toContain(
+      `level ${MUSTER_PIKE_MAX_LEVEL} or lower`,
+    );
+    expect(QUESTS[MUSTER_SUMMONS_QUEST_ID]?.completionText).toContain(
+      `level ${MUSTER_PIKE_MAX_LEVEL} or lower`,
+    );
   });
 
   it('opens the weekly to a level 20 straight from the briefing', () => {

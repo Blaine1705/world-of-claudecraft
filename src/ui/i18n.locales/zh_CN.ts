@@ -18386,11 +18386,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_muster_summons.text':
     '我能抽出的每一杆长矛都在星陨坑周围扎了营，{playerName}，就为了围住从坑里走出来的那东西。征召指挥官守在俯瞰火山坑的南坡营地，在这里的东南方。去向指挥官报到。你会听到我们怎么对付他，好好听着，因为没听的人都躺在芦苇里了。',
   'entities.quests.q_muster_summons.completion':
-    '芬威克派来的？很好。听着，这话我只说一遍，而他一句都不会说。巴尔加斯沿着我们的哨站巡行：坑沿、西边的平地、南坡、西南坑沿上的缺口，然后再绕一圈，他停下的每一个哨站都会被夷平。钢铁伤不了他。他的皮会把刀刃弹开，只会砍他的团队最后只会累死。他唯一的弱点是眼睛。一杆撑稳的长矛刺穿冢琉璃就能让他失明，而他失明时皮会剥落：那时全团一起打他，狠狠地打。之后皮会重新合上，我们等下一次机会。先长矛，{playerName}，再所有人。',
+    '芬威克派来的？很好。听着，这话我只说一遍，而他一句都不会说。巴尔加斯沿着我们的哨站巡行：坑沿、西边的平地、南坡、西南坑沿上的缺口，然后再绕一圈，他停下的每一个哨站都会被夷平。钢铁伤不了他。他的皮会把刀刃弹开，只会砍他的团队最后只会累死。他唯一的弱点是眼睛。一杆撑稳的长矛刺穿冢琉璃就能让他失明，而他失明时皮会剥落：那时全团一起打他，狠狠地打。之后皮会重新合上，我们等下一次机会。先长矛，{playerName}，再所有人。兵器架只把长矛借给19级及以下的新兵：年轻人刺瞎他的眼睛，老兵们抓住这个窗口。',
   'entities.quests.q_muster_summons.objectives.0.label': '向征召指挥官报到',
   'entities.quests.q_muster_pike_drill.title': '长矛先行',
   'entities.quests.q_muster_pike_drill.text':
-    '说话不值钱，长矛可值钱。从我旁边的兵器架上拿一杆碎晶长矛，然后去营地西头找稻草工头：小伙子们用木板和稻草扎的，只有真家伙一半大，眼睛的位置放着一盏灯笼。架起长矛，操练官砸地的时候也要稳住矛尖，因为真家伙晃得更厉害。等你手臂笃定了，就把矛尖刺进灯笼。他的木板会掉下来：然后用你自己的武器打他，{playerName}，感受一下差别。',
+    '说话不值钱，长矛可值钱。从我旁边的兵器架上拿一杆碎晶长矛，然后去营地西头找稻草工头：小伙子们用木板和稻草扎的，只有真家伙一半大，眼睛的位置放着一盏灯笼。架起长矛，操练官砸地的时候也要稳住矛尖，因为真家伙晃得更厉害。等你手臂笃定了，就把矛尖刺进灯笼。他的木板会掉下来：然后用你自己的武器打他，{playerName}，感受一下差别。兵器架只把长矛借给19级及以下的新兵。',
   'entities.quests.q_muster_pike_drill.completion':
     '感觉到打进去了吧？在真家伙身上，那是全团挥砍的十四口气，然后他的皮又会合上。记住这一课。工头会来考你的。',
   'entities.quests.q_muster_pike_drill.objectives.0.label': '从征召兵器架上取下碎晶长矛',
@@ -18760,13 +18760,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.foremanShape':
     '化身工头之形，持续{duration}秒：你变成独眼巨人，以拳头作战，保留所有技能及其伤害。护甲提高{armorPct}%，且无法被击退。会使你解除坐骑。',
   'hudChrome.trinkets.use.musterStandard':
-    '在脚下插下征召军旗。{duration}秒内，{soldiers}名征召士兵冲向你的目标进行近战，每人每{every}秒造成{damage}点物理伤害。他们只攻击你的目标，每人拥有你最大生命值的{hpPct}%；军旗倒下、你死亡或你离开军旗超过{leash}码时，他们会离开。伤害随攻击强度或远程攻击强度中较高者提高，在插旗时确定。',
+    '在脚下插下征召军旗。{duration}秒内，{soldiers}名征召士兵跟随在你身边，并与你的目标进行近战，每人每{every}秒造成{damage}点物理伤害。他们只攻击你的目标，且只在目标已进入战斗时出手。每人拥有你最大生命值的{hpPct}%。落后你超过{leash}码时，他们会立即回到你身边。军旗倒下或你死亡时，他们会离开。伤害随攻击强度或远程攻击强度中较高者提高，在插旗时确定。',
   'hudChrome.trinkets.use.gutteredGlare':
     '引导{duration}秒：一道{length}码长的光束从你面朝的方向射出，每{every}秒对路径上最多{max}个敌人造成{tick}点奥术伤害（整个引导期间对每个敌人共{total}点）。转身即可横扫光束；移动或施法会使其结束。伤害随法术强度提高。',
   'hudChrome.trinkets.use.grapnel':
     '用钩索钩住{range}码内你能看见的一名小队或团队成员，将其从空中拉到你身边，并在其落地时为其恢复{heal}点生命值。无法拉动敌人，也无法拉动在载具中、在船上、化作石像或被无法打破的效果控制的盟友。治疗量随治疗强度提高。',
   'hudChrome.auraEffect.trinket.foremanShape': '你就是工头：护甲提高{armorPct}%，免疫击退。',
-  'hudChrome.auraEffect.trinket.musterStandard': '你的征召军旗已插下。士兵们正与你的目标作战。',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    '你的征召军旗已插下。士兵们跟随你，并与你的目标作战。',
   'hudChrome.auraEffect.trinket.gutteredGlare':
     '光束每{every}秒对路径上的敌人造成{tick}点奥术伤害。移动或施法会使其结束。',
   'hudChrome.auraEffect.trinket.stoneStatue':
