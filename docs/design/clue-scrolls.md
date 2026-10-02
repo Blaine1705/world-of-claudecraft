@@ -21,6 +21,12 @@ design contract; the anchors are `src/sim/clue_scrolls.ts` (the engine),
 - Scrolls are items (`CLUE_SCROLL_ITEM_ID`): soulbound, never sold or listed,
   stacking to `CLUE_SCROLL_STACK_MAX`. An entitlement that cannot be held is
   lost and said so in the chat log.
+- The board now pays a treasure map instead of a scroll (the Buried Hoards
+  rework, `maybeAwardClueScroll`). A map the bags cannot hold is not lost: it
+  is posted to the Ravenpost on a `world_quest_reward` letter, the same
+  full-bags rule every world quest reward item follows
+  (`src/sim/world_quest_reward_mail.ts`), and the player gets a banner and a
+  chat line saying so (`worldQuestRewardMailed`).
 
 ## The hunt
 
