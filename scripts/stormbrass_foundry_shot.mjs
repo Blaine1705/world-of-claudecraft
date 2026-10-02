@@ -103,15 +103,15 @@ const SHOTS = [
   // The Crane Bridge swinging into place: run with SHOT_GATES=0.
   {
     id: 'momento_puente_grua',
-    at: [9, 45],
+    at: [8, 49],
     face: Math.PI,
-    yaw: Math.PI,
-    pitch: 0.55,
-    dist: 20,
+    yaw: 2.85,
+    pitch: 0.42,
+    dist: 13,
     cmds: ['/dev foundry kill rangewarden', '/dev foundry kill voltaic'],
     cmdWait: 250,
     wait: 100,
-    burst: [300, 2000, 3600, 5200, 6800, 8000, 9400, 11000],
+    burst: [300, 2000, 3600, 5200, 6000, 6400, 6800, 7200, 7600, 8000, 8400, 8800, 9400, 11000],
   },
   // The ladles tipping into the moulds on the crane pad (a 16 s round).
   {
@@ -155,6 +155,39 @@ const SHOTS = [
   { id: 'momento_campo_torre', at: [-80, -4], face: Math.PI / 2, yaw: 0.5, pitch: 0.2, dist: 22 },
   { id: 'momento_grua_del_patio', at: [0, -186], face: 0, pitch: 0.12, dist: 26 },
   { id: 'momento_coloso', at: [0, 188], face: 0, pitch: -0.08, dist: 30 },
+  // The Forge Gauntlet: the blast furnace and the steam hammers either side
+  // of the Gantry Catwalk.
+  {
+    id: 'momento_fragua_horno',
+    at: [0, 172],
+    face: 1.2,
+    yaw: 1.2,
+    pitch: 0.02,
+    dist: 20,
+    burst: [0, 700, 1400],
+  },
+  {
+    id: 'momento_fragua_martillos',
+    at: [0, 176],
+    face: -1.4,
+    yaw: -1.4,
+    pitch: 0.12,
+    dist: 16,
+    burst: [0, 400, 800, 1200, 1600, 2000],
+  },
+  { id: 'momento_fragua_pasarela', at: [0, 166], face: 0, pitch: 0.2, dist: 22 },
+  // The floors, the cliffs and the mountain, close.
+  { id: 'suelo_patio_de_planos', at: [-10, 70], face: 0.6, pitch: 0.7, dist: 20 },
+  { id: 'suelo_aproximacion', at: [6, 140], face: -0.4, pitch: 0.7, dist: 20 },
+  { id: 'suelo_campo_de_tiro', at: [-84, -6], face: 2.4, pitch: 0.6, dist: 20 },
+  { id: 'suelo_patio_de_vias', at: [6, -150], face: 3.3, pitch: 0.65, dist: 24 },
+  { id: 'suelo_terraza', at: [-10, -100], face: 1.2, pitch: 0.7, dist: 18 },
+  { id: 'dianas', at: [-80, -62], face: Math.PI, yaw: Math.PI, pitch: 0.12, dist: 16 },
+  { id: 'acantilado_y_bocamina', at: [50, -136], face: 3.6, yaw: 3.6, pitch: 0.3, dist: 30 },
+  { id: 'acantilado_terrazas', at: [-50, -150], face: 0.5, yaw: 0.5, pitch: 0.12, dist: 14 },
+  { id: 'acantilado_desde_el_ascensor', at: [-9, -226], face: 0.9, yaw: 0.9, pitch: 0.1, dist: 10 },
+  { id: 'montanas', at: [40, 60], face: 1.3, yaw: 1.3, pitch: -0.1, dist: 12 },
+  { id: 'montanas_oeste', at: [-40, -150], face: -1.4, yaw: -1.4, pitch: -0.08, dist: 12 },
   { id: 'momento_vista_del_valle', at: [50, -150], face: Math.PI / 2, pitch: 0.1, dist: 20 },
   // ---- Phase 2: the boss mechanics (HUD on: cast bars and the Foundry alert).
   // stage: [templateId, yards, angle]: pull that boss and stand `yards` from it
@@ -496,10 +529,11 @@ async function main() {
         await sleep(1500);
       }
       if (shot.burst) {
-        let waited = 0;
+        // Offsets are wall-clock from the burst's start (a screenshot itself
+        // takes a few hundred ms, so a relative sleep would drift).
+        const began = Date.now();
         for (const ms of shot.burst) {
-          await sleep(Math.max(0, ms - waited));
-          waited = ms;
+          await sleep(Math.max(0, ms - (Date.now() - began)));
           const frame = path.join(OUT, `${PREFIX}${shot.id}_${ms}.png`);
           await page.screenshot({ path: frame });
           console.log('SHOT', frame);
