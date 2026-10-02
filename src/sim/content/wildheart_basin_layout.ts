@@ -609,8 +609,8 @@ const PI = Math.PI;
 /** Big jungle trees (kapok with buttress roots): trunk colliders only. */
 const TREES: readonly [number, number, number, number][] = [
   // [x, z, rot, scale]
-  [-46, -206, 0.4, 1],
-  [-58, -176, 1.2, 1.15],
+  [-47, -188, 0.4, 1],
+  [-47, -167, 1.2, 1.15],
   [-60, -142, 0.2, 1.1],
   [58, -144, -0.6, 1.05],
   [-50, -86, 0.9, 0.95],
@@ -623,7 +623,7 @@ const TREES: readonly [number, number, number, number][] = [
   [106, -74, 0.3, 1.05],
   [74, -50, -1.1, 0.95],
   [70, 30, 0.6, 1.1],
-  [64, 56, -0.4, 1.0],
+  [68, 54, -0.4, 1.0],
   [-44, -32, 0.8, 1.1],
   [44, -30, -0.5, 1.05],
   [-46, 30, 1.0, 1.2],
@@ -638,7 +638,7 @@ const TREES: readonly [number, number, number, number][] = [
 /** Giant ferns, palms and undergrowth: dressing only, no collider. */
 const FERNS: readonly [number, number, number][] = [
   [-12, -226, 0.3],
-  [12, -228, -0.4],
+  [10, -229, -0.4],
   [-44, -186, 0.6],
   [-24, -168, -0.2],
   [-46, -168, 1.1],
@@ -726,8 +726,8 @@ const PROPS: FieldProp[] = [
   { kind: 'wb_totem', x: 94, z: -20, rot: PI, r: 0.9, h: 7 },
   // The Weeping Falls terrace: the plunge pool's rim stones and two totems
   // where the trolls bring their offerings.
-  { kind: 'wb_pool_rim', x: 104, z: 28, rot: -PI / 2, r: 1.6, h: 2 },
-  { kind: 'wb_pool_rim', x: 104, z: 60, rot: -PI / 2, r: 1.6, h: 2 },
+  { kind: 'wb_pool_rim', x: 102, z: 32, rot: -PI / 2, r: 1.6, h: 2 },
+  { kind: 'wb_pool_rim', x: 102, z: 52, rot: -PI / 2, r: 1.6, h: 2 },
   { kind: 'wb_totem', x: 66, z: 30, rot: 0.6, r: 0.9, h: 7 },
   { kind: 'wb_totem', x: 70, z: 58, rot: 1.2, r: 0.9, h: 7 },
   // The Central Island: the Court colony ruins swallowed by roots.
@@ -741,8 +741,8 @@ const PROPS: FieldProp[] = [
   { kind: 'wb_ruin_column', x: 33, z: 30, rot: 0.5, r: 1.2, h: 5 },
   { kind: 'wb_ruin_column', x: 12, z: 50, rot: 1.4, r: 1.2, h: 4 },
   // The Convergence Stair's warded arch posts (the gate draws the ward).
-  { kind: 'wb_ward_post', x: -8.5, z: 75, rot: 0, r: 1, h: 7 },
-  { kind: 'wb_ward_post', x: 8.5, z: 75, rot: 0, r: 1, h: 7 },
+  { kind: 'wb_ward_post', x: -6.3, z: 75, rot: 0, r: 0.7, h: 7 },
+  { kind: 'wb_ward_post', x: 6.3, z: 75, rot: 0, r: 0.7, h: 7 },
   // The Upper Convergence: braziers and banners at the foot of the pyramid.
   { kind: 'wb_brazier', x: -12, z: 122, rot: 0, r: 0.7, h: 2.4 },
   { kind: 'wb_brazier', x: 12, z: 122, rot: 0, r: 0.7, h: 2.4 },

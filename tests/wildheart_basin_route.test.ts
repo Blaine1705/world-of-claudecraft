@@ -348,6 +348,16 @@ describe('Wildheart Basin route contract: every pack is mandatory', () => {
     }
   });
 
+  it('stands every prop on a walkable floor (a collider never hangs over the gorge)', () => {
+    for (const p of FIELD.props) {
+      if (p.kind === 'wb_idol_maw') continue; // the render-only jaw over the landing's lip
+      expect(
+        authoredFieldHeight(FIELD, p.x, p.z),
+        `${p.kind} at ${p.x},${p.z} over the gorge`,
+      ).toBeGreaterThan(FIELD.voidHeight);
+    }
+  });
+
   it('the Great Saurian wades the ford shallows, never the basalt steps', () => {
     const saurian = WILDHEART_BASIN_SPAWNS.find((s) => s.mobId === 'great_saurian');
     expect(saurian?.patrol).toBeDefined();
