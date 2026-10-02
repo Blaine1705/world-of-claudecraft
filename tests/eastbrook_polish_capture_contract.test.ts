@@ -718,7 +718,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
   // moves the renderer leaf and extracts world cue spell gating. No capture
   // was retaken.
-  'b09ccd97e1a54a132fa38c506d3aa83c4facee43cc524c89c2ef65b761e4dd70';
+  // Re-minted for the v0.45 release batch after entity-view policy moved.
+  // No capture was retaken.
+  '68d48dd165e6d7e304df2356d3a4d7c5ab3d998a9eb643b8d258198e5a33693b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
