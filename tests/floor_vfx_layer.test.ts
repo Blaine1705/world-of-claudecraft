@@ -131,6 +131,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Great Saurian's water (crowns, ripples) on the ground band: cosmetic,
   // so every telegraph of the ford paints over it.
   { file: 'src/render/wildheart_basin/saurian_fx.ts', layer: 'ground', strict: true },
+  // The Pack Bond's ground glows under master and jaguar (the lowest encounter rung).
+  { file: 'src/render/wildheart_basin/bond_cord.ts', layer: 'encounter', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },

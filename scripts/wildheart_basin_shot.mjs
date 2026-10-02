@@ -371,6 +371,19 @@ const SHOTS = [
     hud: true,
     wait: 0,
   },
+  // The jade spirit jaguar wrapping him through the hunt.
+  {
+    id: 'jefe3_avatar_jaguar',
+    placeMob: ['wildheart_high_priest', 0, 220],
+    stage: ['wildheart_high_priest', 16, PI * 0.8],
+    cmds: ['/dev wildheart trigger spirit'],
+    cmdWait: 60,
+    pitch: 0.18,
+    dist: 20,
+    yaw: 1.1,
+    hud: true,
+    burst: [1700, 2400, 3200, 4200],
+  },
   {
     id: 'jefe3_ojos_del_jaguar',
     placeMob: ['wildheart_high_priest', 0, 220],

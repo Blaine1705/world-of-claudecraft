@@ -133,6 +133,10 @@ const ROWS: Record<string, PlaceholderRow> = {
   ],
 };
 
+/** Zulgar vanishes (heroic Ambush): his whole model hides, then returns. */
+export const ZULGAR_HIDE_GESTURE = 'wildheart_zulgar_hide';
+export const ZULGAR_SHOW_GESTURE = 'wildheart_zulgar_show';
+
 /** The Great Jaguar's clips (both bodies: the Fanglord's and its jade spirit). */
 const GREAT_JAGUAR_CLIPS: ClipMap = {
   idle: 'Idle',
@@ -185,6 +189,13 @@ export function wildheartPlaceholderLooks(
   }
   out.wildheart_great_saurian = WILDHEART_GREAT_SAURIAN_LOOK;
   out.wildheart_fanglord_jaguar = WILDHEART_GREAT_JAGUAR_LOOK;
+  // Zulgar keeps his shipped body; it learns to vanish for the Ambush.
+  const zulgar = visuals.mob_wildheart_high_priest;
+  if (zulgar)
+    out.mob_wildheart_high_priest = {
+      ...zulgar,
+      meshToggles: [{ nodes: ['*'], hideNow: ZULGAR_HIDE_GESTURE, showNow: ZULGAR_SHOW_GESTURE }],
+    };
   // The Fanglord's Whistle's spirit jaguar (combat/wildheart_trinkets.ts): the
   // great cat's jade spirit body (translucent, its rosettes burning), at the
   // size the trinket's placeholder drew so a pet never walls off a fight.

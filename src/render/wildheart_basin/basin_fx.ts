@@ -35,6 +35,7 @@ import {
   SAURIAN_TAIL_SWIPE,
   ZULGAR_AVATAR,
   ZULGAR_ID,
+  ZULGAR_VANISHED,
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ANCESTRAL_SAP,
@@ -44,6 +45,7 @@ import {
 } from '../../sim/mob/trash_kit/wildheart_cast_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { ZULGAR_HIDE_GESTURE, ZULGAR_SHOW_GESTURE } from '../characters/wildheart_creature_looks';
 import { type TelegraphFan, TelegraphKit, type TelegraphLane } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -82,6 +84,7 @@ import type { BasinFxHost } from './basin_fx_host';
 import { setBasinJaguarEyesBurn } from './basin_kit';
 import { BASIN_WATER_WADERS } from './basin_water';
 import { SaurianFx } from './saurian_fx';
+import { ZulgarAvatarFx } from './zulgar_avatar_fx';
 
 const CAST_SLOTS = 10;
 const LANE_SLOTS = 4;
@@ -198,6 +201,10 @@ export class WildheartFx {
   private readonly boss: BasinBossFx | null;
   /** The Great Saurian's body: its water, its howdah, its clips. */
   private readonly saurian: SaurianFx | null;
+  /** Zulgar's jade spirit jaguar while he hunts. */
+  private readonly avatar: ZulgarAvatarFx | null;
+  /** Zulgar's model is hidden (heroic Ambush's vanish). */
+  private zulgarHidden = false;
   private readonly smoke: ParticlePool;
   private readonly glow: ParticlePool;
   private readonly uTime = { value: 0 };
@@ -239,7 +246,7 @@ export class WildheartFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shake?: (amount: number) => void,
-    playGesture?: (entityId: number, gesture: string) => void,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'wildheart-basin-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -383,6 +390,7 @@ export class WildheartFx {
     // The three bosses: built under this root before the gated attach.
     this.boss = world ? new BasinBossFx(this.bossHost(), world) : null;
     this.saurian = world ? new SaurianFx(this.bossHost(), world, playGesture) : null;
+    this.avatar = world ? new ZulgarAvatarFx(scene, this.bossHost(), world, compileGate) : null;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -524,6 +532,7 @@ export class WildheartFx {
         this.trails.set(src.id, this.clock + POUNCE_TRAIL_SECONDS);
         return false;
       default:
+        this.avatar?.handleEvent(ev);
         return this.boss?.handleEvent(ev, src) ?? false;
     }
   }
@@ -548,6 +557,7 @@ export class WildheartFx {
         this.bossShown = false;
         this.boss?.hideAll();
         this.saurian?.hideAll();
+        this.avatar?.hide();
       }
       this.smoke.update(this.clock);
       this.glow.update(this.clock);
@@ -565,6 +575,7 @@ export class WildheartFx {
     this.bossShown = true;
     this.boss?.update(dt, this.clock);
     this.saurian?.update(dt, this.clock);
+    this.avatar?.update(dt);
     setBasinJaguarEyesBurn(jaguarEyesBurn(this.zulgarState, this.clock));
     this.smoke.update(this.clock);
     this.glow.update(this.clock);
@@ -852,6 +863,8 @@ export class WildheartFx {
       }
       if (e.templateId === ZULGAR_ID) {
         basin = true;
+        this.avatar?.setZulgar(e);
+        this.syncZulgarHidden(e);
         if (!e.dead && e.inCombat) zulgar = hasAura(e, ZULGAR_AVATAR) ? 'hunt' : 'fight';
       }
       if (e.dead) continue;
@@ -897,6 +910,16 @@ export class WildheartFx {
     slot.emit = 0;
     slot.drapedX = Number.NaN;
     slot.group.visible = true;
+  }
+
+  /** Heroic Ambush: his model is gone while the vanish holds (the nameplate
+   *  and the floor circle still say where the fight is), back on the landing.
+   *  Re-sent each scan while it holds, so a view rebuilt mid-vanish hides too. */
+  private syncZulgarHidden(e: Entity): void {
+    const hidden = !e.dead && hasAura(e, ZULGAR_VANISHED);
+    if (hidden) this.playGesture?.(e.id, ZULGAR_HIDE_GESTURE);
+    else if (this.zulgarHidden) this.playGesture?.(e.id, ZULGAR_SHOW_GESTURE);
+    this.zulgarHidden = hidden;
   }
 
   private claimVine(e: Entity): void {
@@ -945,6 +968,10 @@ export class WildheartFx {
     if (this.saurian) {
       const saurian = this.saurian;
       attempt(() => saurian.dispose());
+    }
+    if (this.avatar) {
+      const avatar = this.avatar;
+      attempt(() => avatar.dispose());
     }
     for (const g of this.geometries) attempt(() => g.dispose());
     for (const m of this.materials) attempt(() => m.dispose());

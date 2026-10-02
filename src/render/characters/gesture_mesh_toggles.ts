@@ -19,7 +19,7 @@
 import type * as THREE from 'three';
 
 export interface MeshToggleDef {
-  /** GLB node names the toggle hides and shows. */
+  /** GLB node names the toggle hides and shows ('*': the whole model). */
   nodes: readonly string[];
   /** Hide `seconds` after this gesture (its clip plays the nodes out). */
   hideAfter?: { gesture: string; seconds: number; clip: string };
@@ -102,6 +102,8 @@ export class GestureMeshToggles {
     private readonly defs: readonly MeshToggleDef[],
   ) {
     this.nodes = defs.map((d) => {
+      // '*' names the whole model (a body that vanishes outright).
+      if (d.nodes.includes('*')) return [model];
       const found: THREE.Object3D[] = [];
       model.traverse((n) => {
         if (d.nodes.includes(n.name)) found.push(n);

@@ -63,6 +63,8 @@ import {
 } from './basin_boss_fx_core';
 import { type BasinPuffOptions, basinCastFill } from './basin_fx_core';
 import type { BasinFxHost } from './basin_fx_host';
+import { BondCord } from './bond_cord';
+import { jaguarBondAnchor } from './jaguar_model_core';
 
 const FAN_SLOTS = 4;
 const LANE_SLOTS = 3;
@@ -201,29 +203,6 @@ void main() {
   gl_FragColor = vec4(col, mix(darkA, litA, uLit) * uAlpha);
 }
 `;
-const CORD_VERT = /* glsl */ `
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-/** Pack Bond's spirit cord: jade spirit flowing both ways along it. */
-const CORD_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uStrength;
-varying vec2 vUv;
-void main() {
-  float flowA = fract(vUv.y * 5.0 - uTime * 1.6);
-  float flowB = fract(vUv.y * 3.0 + uTime * 1.1);
-  float pulse = smoothstep(0.0, 0.25, flowA) * (1.0 - smoothstep(0.35, 0.6, flowA));
-  float pulse2 = smoothstep(0.0, 0.2, flowB) * (1.0 - smoothstep(0.3, 0.5, flowB));
-  float edge = 1.0 - abs(vUv.x - 0.5) * 2.0;
-  vec3 col = mix(vec3(0.25, 0.85, 0.55), vec3(0.85, 1.0, 0.9), max(pulse, pulse2) * 0.7);
-  float a = (0.3 + pulse * 0.7 + pulse2 * 0.5) * edge * uStrength;
-  gl_FragColor = vec4(col * a, 1.0);
-}
-`;
 const WARD_VERT = /* glsl */ `
 varying vec3 vN;
 varying vec3 vV;
@@ -262,8 +241,7 @@ export class BasinBossFx implements BossBurstHooks {
   private readonly marks: MarkSlot[] = [];
   private readonly dresses: DressSlot[] = [];
   private readonly wards: WardSlot[] = [];
-  private readonly cord: THREE.Mesh;
-  private readonly cordMat: THREE.ShaderMaterial;
+  private readonly cord: BondCord;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly textures: THREE.Texture[] = [];
@@ -298,6 +276,7 @@ export class BasinBossFx implements BossBurstHooks {
     drag: 1,
   };
   private readonly up = new THREE.Vector3(0, 1, 0);
+  private readonly feet: [number, number, number, number] = [0, 0, 0, 0];
   private bondMaster = -1;
   private bondJaguarId = -1;
   /** The Vine Lash lane's last locked yaw (its burst lands after the bar). */
@@ -488,24 +467,8 @@ export class BasinBossFx implements BossBurstHooks {
       root.add(mesh);
       this.wards.push({ mesh, mat, entityId: -1 });
     }
-    // Pack Bond's spirit cord (a cylinder along +y, oriented each frame).
-    const cordGeo = new THREE.CylinderGeometry(0.2, 0.2, 1, 10, 1, true).translate(0, 0.5, 0);
-    this.geometries.push(cordGeo);
-    this.cordMat = new THREE.ShaderMaterial({
-      name: 'wildheartPackBondCord',
-      uniforms: { uTime: host.uTime, uStrength: { value: 0 } },
-      vertexShader: CORD_VERT,
-      fragmentShader: CORD_FRAG,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-    });
-    this.materials.push(this.cordMat);
-    this.cord = new THREE.Mesh(cordGeo, this.cordMat);
-    this.cord.frustumCulled = false;
-    this.cord.visible = false;
-    root.add(this.cord);
+    // Pack Bond's braided jade cord (bond_cord.ts).
+    this.cord = new BondCord(host);
   }
 
   // ------------------------------------------------------------------- scan
@@ -1021,7 +984,7 @@ export class BasinBossFx implements BossBurstHooks {
       !findAura(bm, BEAST_PACK_BOND) ||
       !findAura(cat, BEAST_PACK_BOND)
     ) {
-      this.cord.visible = false;
+      this.cord.hide();
       return;
     }
     const strength = bondCordStrength(Math.hypot(bm.pos.x - cat.pos.x, bm.pos.z - cat.pos.z));
@@ -1030,35 +993,18 @@ export class BasinBossFx implements BossBurstHooks {
       bm.pos.y + bossBodyHeight(bm.templateId, bm.scale || 1) * 0.6,
       bm.pos.z,
     );
+    // The jaguar end ties to its collar's jade ring, over its shoulders.
+    const ring = jaguarBondAnchor(cat.scale || 1);
     const to = this.tmpB.set(
-      cat.pos.x,
-      cat.pos.y + bossBodyHeight(cat.templateId, cat.scale || 1) * 0.55,
-      cat.pos.z,
+      cat.pos.x + Math.sin(cat.facing) * ring.forward,
+      cat.pos.y + ring.up,
+      cat.pos.z + Math.cos(cat.facing) * ring.forward,
     );
-    const len = from.distanceTo(to);
-    const mx = (from.x + to.x) / 2;
-    const my = (from.y + to.y) / 2;
-    const mz = (from.z + to.z) / 2;
-    to.sub(from).normalize();
-    this.cord.position.copy(from);
-    this.cord.quaternion.setFromUnitVectors(this.up, to);
-    const thick = 0.6 + 0.9 * strength;
-    this.cord.scale.set(thick, Math.max(0.01, len), thick);
-    this.cordMat.uniforms.uStrength.value = 0.35 + 0.65 * strength;
-    this.cord.visible = true;
-    // Jade sparks shed along it, more as they close.
-    if (this.host.rand() < dt * 16 * strength * this.host.density) {
-      const k = this.host.rand() - 0.5;
-      this.host.puff(mx + to.x * len * k, my + to.y * len * k, mz + to.z * len * k, 1, {
-        speed: 0.6,
-        up: 0.5,
-        life: 0.9,
-        size: [0.4, 0.1],
-        color: [0.45, 1, 0.7],
-        alpha: 0.9,
-        glow: true,
-      });
-    }
+    this.feet[0] = bm.pos.x;
+    this.feet[1] = bm.pos.z;
+    this.feet[2] = cat.pos.x;
+    this.feet[3] = cat.pos.z;
+    this.cord.show(from, to, this.feet, strength, dt);
   }
 
   // ------------------------------------------------------------------- events
@@ -1129,7 +1075,7 @@ export class BasinBossFx implements BossBurstHooks {
       w.entityId = -1;
       w.mesh.visible = false;
     }
-    this.cord.visible = false;
+    this.cord.hide();
     this.lashCaster = -1;
   }
 
@@ -1168,6 +1114,7 @@ export class BasinBossFx implements BossBurstHooks {
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
     for (const t of this.textures) t.dispose();
+    this.cord.dispose();
   }
 }
 
