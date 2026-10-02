@@ -39,19 +39,15 @@ import {
   SAURIAN_HOWDAH_GONE_GESTURE,
   SAURIAN_HOWDAH_WHOLE_GESTURE,
 } from '../characters/wildheart_creature_looks';
-import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { surfaceMat } from '../gfx';
 import { STOMP_SHOCK_SECONDS, stompShock } from './basin_fx_core';
 import type { BasinFxHost } from './basin_fx_host';
-import { BASIN_SUN_DIRECTION } from './basin_plan_core';
 import {
   CROWN_LOOKS,
   type CrownSpec,
-  crownShape,
   howdahDeck,
   RIPPLE_LOOKS,
   type RippleSpec,
-  rippleShape,
   type SaurianBeat,
   type SaurianTrigger,
   SPLINTER_COLORS,
@@ -76,107 +72,14 @@ import {
   saurianStride,
 } from './saurian_model_core';
 
-const CROWN_SLOTS = 22;
-const RIPPLE_SLOTS = 22;
 const BEAT_SLOTS = 48;
 /** The ford's water stands this far over its bed. */
 const WATER_LIFT = 0.32;
+/** The ford's water in a crown (the splash module's tint). */
+const WATER_TINT = 0xffffff;
 /** Seconds between re-sends of the howdah's latched state. */
 const LATCH_RESEND = 1;
 
-const CROWN_VERT = /* glsl */ `
-uniform float uRadius;
-uniform float uHeight;
-uniform float uSeed;
-varying float vV;
-varying float vShade;
-varying float vStreak;
-uniform vec3 uSun;
-void main() {
-  float a = atan(position.z, position.x);
-  float v = position.y;
-  // A torn rim: the sheet stands taller in ragged tongues round the ring.
-  float jag = 0.5 + 0.3 * sin(a * 7.0 + uSeed * 3.1) + 0.2 * sin(a * 19.0 + uSeed * 7.7);
-  float h = uHeight * (0.42 + 0.58 * clamp(jag, 0.0, 1.0));
-  // It flares outward as it climbs, the classic crown of a heavy splash.
-  float r = uRadius * (1.0 + 0.42 * v * v);
-  vec3 p = vec3(cos(a) * r, v * h, sin(a) * r);
-  vV = v;
-  vStreak = a;
-  vec3 n = normalize(vec3(cos(a), 0.35, sin(a)));
-  vShade = 0.72 + 0.4 * max(dot(n, uSun), 0.0);
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
-}
-`;
-
-const CROWN_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform float uSeed;
-varying float vV;
-varying float vShade;
-varying float vStreak;
-float h1(float n) { return fract(sin(n) * 43758.5453); }
-void main() {
-  // Vertical streaks of thicker water, thinning to spray at the lip.
-  float s = vStreak * 9.5493 + uSeed * 5.0;
-  float streak = mix(h1(floor(s)), h1(floor(s) + 1.0), smoothstep(0.0, 1.0, fract(s)));
-  float body = smoothstep(0.0, 0.08, vV) * (1.0 - smoothstep(0.55 + 0.3 * streak, 1.0, vV));
-  float foam = 1.0 - smoothstep(0.0, 0.35, vV);
-  vec3 col = mix(vec3(0.74, 0.86, 0.84), vec3(1.0, 0.99, 0.95), foam * 0.7 + streak * 0.3) * vShade;
-  float a = body * (0.32 + 0.48 * streak + 0.3 * foam) * uAlpha;
-  gl_FragColor = vec4(col, a);
-}
-`;
-
-const RIPPLE_VERT = /* glsl */ `
-varying vec2 vLocal;
-void main() {
-  vLocal = position.xz;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-const RIPPLE_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform float uRings;
-uniform float uSeed;
-varying vec2 vLocal;
-void main() {
-  float r = length(vLocal);
-  float a = atan(vLocal.y, vLocal.x);
-  float wob = 0.012 * sin(a * 11.0 + uSeed) + 0.008 * sin(a * 27.0 - uSeed * 2.0);
-  float sum = 0.0;
-  for (int i = 0; i < 4; i++) {
-    float fi = float(i);
-    if (fi >= uRings) break;
-    float ri = 1.0 - fi * 0.17;
-    float w = 0.022 + fi * 0.008;
-    float band = 1.0 - smoothstep(0.0, w, abs(r + wob - ri));
-    // The crest bright, the trough behind it a faint dark line.
-    float trough = 1.0 - smoothstep(0.0, w * 1.6, abs(r + wob - (ri - w * 2.2)));
-    sum += band * (1.0 - fi * 0.2) - trough * 0.25;
-  }
-  float inside = 1.0 - smoothstep(0.96, 1.0, r);
-  float a1 = clamp(sum, -0.3, 1.0) * inside * uAlpha;
-  vec3 col = a1 >= 0.0 ? vec3(0.95, 1.0, 0.98) : vec3(0.18, 0.26, 0.22);
-  gl_FragColor = vec4(col, abs(a1) * 0.42);
-}
-`;
-
-interface CrownSlot {
-  mesh: THREE.Mesh;
-  mat: THREE.ShaderMaterial;
-  spec: CrownSpec;
-  born: number;
-  alive: boolean;
-}
-interface RippleSlot {
-  mesh: THREE.Mesh;
-  mat: THREE.ShaderMaterial;
-  spec: RippleSpec;
-  born: number;
-  alive: boolean;
-}
 interface PendingBeat {
   at: number;
   beat: SaurianBeat | null;
@@ -212,8 +115,6 @@ interface Tracker {
 }
 
 export class SaurianFx {
-  private readonly crowns: CrownSlot[] = [];
-  private readonly ripples: RippleSlot[] = [];
   private readonly beats: PendingBeat[] = [];
   private readonly trackers = new Map<number, Tracker>();
   private readonly geometries: THREE.BufferGeometry[] = [];
@@ -245,56 +146,6 @@ export class SaurianFx {
     private readonly world: IWorld,
     private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
-    const sun = new THREE.Vector3(...BASIN_SUN_DIRECTION).normalize();
-    const crownGeo = new THREE.CylinderGeometry(1, 1, 1, 56, 6, true).translate(0, 0.5, 0);
-    this.geometries.push(crownGeo);
-    for (let i = 0; i < CROWN_SLOTS; i++) {
-      const mat = new THREE.ShaderMaterial({
-        name: 'wildheartSaurianCrown',
-        uniforms: {
-          uRadius: { value: 1 },
-          uHeight: { value: 1 },
-          uAlpha: { value: 0 },
-          uSeed: { value: i * 3.7 },
-          uSun: { value: sun },
-        },
-        vertexShader: CROWN_VERT,
-        fragmentShader: CROWN_FRAG,
-        transparent: true,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      });
-      this.materials.push(mat);
-      const mesh = new THREE.Mesh(crownGeo, mat);
-      mesh.frustumCulled = false;
-      mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('ground', 6);
-      host.root.add(mesh);
-      this.crowns.push({ mesh, mat, spec: CROWN_LOOKS.footfall, born: 0, alive: false });
-    }
-    const rippleGeo = new THREE.CircleGeometry(1, 72).rotateX(-Math.PI / 2);
-    this.geometries.push(rippleGeo);
-    for (let i = 0; i < RIPPLE_SLOTS; i++) {
-      const mat = new THREE.ShaderMaterial({
-        name: 'wildheartSaurianRipple',
-        uniforms: {
-          uAlpha: { value: 0 },
-          uRings: { value: 2 },
-          uSeed: { value: i * 2.3 },
-        },
-        vertexShader: RIPPLE_VERT,
-        fragmentShader: RIPPLE_FRAG,
-        transparent: true,
-        depthWrite: false,
-      });
-      this.materials.push(mat);
-      const mesh = new THREE.Mesh(rippleGeo, mat);
-      mesh.frustumCulled = false;
-      mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('ground', 5);
-      host.root.add(mesh);
-      this.ripples.push({ mesh, mat, spec: RIPPLE_LOOKS.footfall, born: 0, alive: false });
-    }
     // The howdah's splinters: one instanced draw, coloured per instance.
     for (const kind of Object.keys(SPLINTER_MIX) as SplinterKind[]) {
       const n = Math.max(2, Math.round(SPLINTER_MIX[kind] * host.density));
@@ -429,20 +280,10 @@ export class SaurianFx {
     this.clock = clock;
     this.stepTrackers(dt);
     this.fireBeats();
-    this.paintCrowns();
-    this.paintRipples();
     this.stepSplinters(dt);
   }
 
   hideAll(): void {
-    for (const c of this.crowns) {
-      c.alive = false;
-      c.mesh.visible = false;
-    }
-    for (const r of this.ripples) {
-      r.alive = false;
-      r.mesh.visible = false;
-    }
     for (const b of this.beats) b.live = false;
     this.sState.fill(0);
     this.splintersLive = 0;
@@ -621,31 +462,11 @@ export class SaurianFx {
   }
 
   private crown(x: number, z: number, spec: CrownSpec): void {
-    const slot = this.crowns.find((c) => !c.alive) ?? this.oldest(this.crowns);
-    slot.alive = true;
-    slot.spec = spec;
-    slot.born = this.clock;
-    slot.mat.uniforms.uSeed.value = this.host.rand() * 40;
-    slot.mesh.position.set(x, this.waterY(x, z) - 0.05, z);
-    slot.mesh.rotation.y = this.host.rand() * Math.PI * 2;
-    slot.mesh.visible = true;
+    this.host.splash.crown(x, this.waterY(x, z) - 0.05, z, spec, WATER_TINT);
   }
 
   private ripple(x: number, z: number, spec: RippleSpec): void {
-    const slot = this.ripples.find((r) => !r.alive) ?? this.oldest(this.ripples);
-    slot.alive = true;
-    slot.spec = spec;
-    slot.born = this.clock;
-    slot.mat.uniforms.uRings.value = spec.rings;
-    slot.mat.uniforms.uSeed.value = this.host.rand() * 40;
-    slot.mesh.position.set(x, this.waterY(x, z) + 0.03, z);
-    slot.mesh.visible = true;
-  }
-
-  private oldest<T extends { born: number }>(slots: T[]): T {
-    let best = slots[0];
-    for (const s of slots) if (s.born < best.born) best = s;
-    return best;
+    this.host.splash.ripple(x, this.waterY(x, z) + 0.03, z, spec);
   }
 
   private waterY(x: number, z: number): number {
@@ -1060,33 +881,4 @@ export class SaurianFx {
   }
 
   // ----- the pools
-
-  private paintCrowns(): void {
-    for (const c of this.crowns) {
-      if (!c.alive) continue;
-      const s = crownShape(c.spec, this.clock - c.born);
-      if (s.alpha <= 0) {
-        c.alive = false;
-        c.mesh.visible = false;
-        continue;
-      }
-      c.mat.uniforms.uRadius.value = s.radius;
-      c.mat.uniforms.uHeight.value = Math.max(0.01, s.height);
-      c.mat.uniforms.uAlpha.value = s.alpha;
-    }
-  }
-
-  private paintRipples(): void {
-    for (const r of this.ripples) {
-      if (!r.alive) continue;
-      const s = rippleShape(r.spec, this.clock - r.born);
-      if (s.alpha <= 0) {
-        r.alive = false;
-        r.mesh.visible = false;
-        continue;
-      }
-      r.mesh.scale.setScalar(Math.max(0.05, s.radius));
-      r.mat.uniforms.uAlpha.value = s.alpha;
-    }
-  }
 }

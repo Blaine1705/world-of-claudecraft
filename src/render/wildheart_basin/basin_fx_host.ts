@@ -6,6 +6,7 @@
 import type * as THREE from 'three';
 import type { TelegraphKit } from '../floor_telegraph';
 import type { BasinPuffOptions } from './basin_fx_core';
+import type { BasinSplash } from './basin_splash';
 
 export interface BasinFxHost {
   readonly root: THREE.Group;
@@ -19,4 +20,6 @@ export interface BasinFxHost {
   rand(): number;
   reducedMotion(): boolean;
   shake(amount: number): void;
+  /** The shared crowns and ripples (water, sand, goo, acid). */
+  readonly splash: BasinSplash;
 }

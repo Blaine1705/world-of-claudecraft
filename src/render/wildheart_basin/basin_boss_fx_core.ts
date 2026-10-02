@@ -39,6 +39,7 @@ import {
 } from '../../sim/encounters/wildheart_basin/ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { BASIN_ACCENTS } from './basin_fx_core';
+import type { CrownSpec, RippleSpec } from './saurian_fx_core';
 
 // ---- the boss casts ---------------------------------------------------------------
 
@@ -261,8 +262,9 @@ const MOTES: Omit<BasinAuraMotes, 'rate' | 'color' | 'size' | 'life'> = {
 export const BASIN_AURA_LOOKS: Readonly<Record<string, BasinAuraLook>> = {
   // Pollinated: a golden haze and pollen drifting off the player.
   [BLOOM_POLLINATED]: {
-    glow: { color: 0xffd860, size: 1.5, lift: 0.5, alpha: 0.5, pulse: 0.2, pulseHz: 2 },
-    motes: { ...MOTES, rate: 14, color: [1, 0.86, 0.35], size: [0.28, 0.1], life: 1.8 },
+    // A golden haze of pollen hanging round them, drifting thick.
+    glow: { color: 0xffd860, size: 1.9, lift: 0.5, alpha: 0.58, pulse: 0.25, pulseHz: 1.6 },
+    motes: { ...MOTES, rate: 26, color: [1, 0.86, 0.35], size: [0.34, 0.1], life: 2.2 },
   },
   // Call of the Hunt: both beasts burn red while it holds.
   [BEAST_CALL_OF_THE_HUNT]: {
@@ -445,3 +447,60 @@ export function shockRingLook(
 export function wardShimmer(t: number): number {
   return 0.55 + 0.25 * Math.sin(t * 3.3) + 0.2 * Math.sin(t * 7.9);
 }
+
+// ---- the bosses' splashes (basin_splash.ts crowns and ripples, tinted) ----------
+
+/** One burst's crown and its rings. */
+export interface BossSplash {
+  crown: CrownSpec;
+  ripple?: RippleSpec;
+  tint: number;
+}
+
+/** Every boss burst that throws the floor up: sand, pulp, thorns, acid, gold,
+ *  spirit. Reaches stay inside each mechanic's own telegraphed radius. */
+export const BOSS_SPLASH = {
+  quake: {
+    crown: { r0: 1.8, r1: BEAST_TUNING.quakeRadius, height: 2.8, life: 1.0 },
+    ripple: { reach: BEAST_TUNING.quakeRadius, life: 1.3, rings: 3 },
+    tint: 0xe2c49a,
+  },
+  landing: {
+    crown: { r0: 1.0, r1: 3.6, height: 1.8, life: 0.8 },
+    ripple: { reach: 4.5, life: 1.1, rings: 2 },
+    tint: 0xd8c4a0,
+  },
+  podStomp: {
+    crown: { r0: 0.35, r1: 1.7, height: 1.8, life: 0.65 },
+    tint: 0xd6e05a,
+  },
+  sprout: {
+    crown: { r0: 0.5, r1: 2.6, height: 3.4, life: 0.9 },
+    ripple: { reach: 3.5, life: 1.0, rings: 2 },
+    tint: 0x6f9a3a,
+  },
+  lash: {
+    crown: { r0: 0.4, r1: 1.6, height: 2.6, life: 0.75 },
+    tint: 0x7aa84a,
+  },
+  gorge: {
+    crown: { r0: 0.8, r1: 2.6, height: 2.6, life: 0.85 },
+    ripple: { reach: 3.2, life: 1.0, rings: 2 },
+    tint: 0xb6ff5a,
+  },
+  pulse: {
+    crown: { r0: 2.0, r1: ZULGAR_TUNING.pulseRadius, height: 2.4, life: 0.9 },
+    ripple: { reach: ZULGAR_TUNING.pulseRadius, life: 1.2, rings: 3 },
+    tint: 0x9affd0,
+  },
+  sunstruck: {
+    crown: { r0: 0.8, r1: 4.0, height: 4.6, life: 0.85 },
+    ripple: { reach: 5, life: 1.0, rings: 2 },
+    tint: 0xffd870,
+  },
+  ambush: {
+    crown: { r0: 1.2, r1: ZULGAR_TUNING.ambushRadius, height: 3.2, life: 0.9 },
+    ripple: { reach: ZULGAR_TUNING.ambushRadius + 1, life: 1.2, rings: 3 },
+    tint: 0xd8c4a0,
+  },
+} as const satisfies Record<string, BossSplash>;

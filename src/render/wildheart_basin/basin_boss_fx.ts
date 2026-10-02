@@ -39,7 +39,6 @@ import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import type { TelegraphFan, TelegraphLane, TelegraphPaint } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
-import { surfaceMat } from '../gfx';
 import { radialGlowTexture } from '../textures';
 import { type BossBurstHooks, playBasinBossBurst } from './basin_boss_bursts';
 import {
@@ -63,6 +62,8 @@ import {
 } from './basin_boss_fx_core';
 import { type BasinPuffOptions, basinCastFill } from './basin_fx_core';
 import type { BasinFxHost } from './basin_fx_host';
+import { huntRingMaterial, huntSigilTexture } from './basin_mark_art';
+import { seedpodGeometry, seedpodMaterial } from './basin_seedpod';
 import { BondCord } from './bond_cord';
 import { jaguarBondAnchor } from './jaguar_model_core';
 
@@ -109,6 +110,9 @@ interface PodSlot {
 interface GlyphSlot {
   disc: THREE.Mesh;
   mat: THREE.ShaderMaterial;
+  /** The shaft of sunlight standing on a lit glyph. */
+  shaft: THREE.Mesh;
+  shaftMat: THREE.ShaderMaterial;
   halo: THREE.Sprite;
   haloMat: THREE.SpriteMaterial;
   objectId: number;
@@ -130,6 +134,9 @@ interface SeedSlot {
 interface MarkSlot {
   sprite: THREE.Sprite;
   mat: THREE.SpriteMaterial;
+  /** The ring of claw rakes under the hunted player's feet. */
+  ring: THREE.Mesh;
+  ringMat: THREE.ShaderMaterial;
   entityId: number;
   auraId: string;
 }
@@ -203,6 +210,28 @@ void main() {
   gl_FragColor = vec4(col, mix(darkA, litA, uLit) * uAlpha);
 }
 `;
+/** A lit sun glyph's shaft of light: brightest at its foot, rays turning. */
+const SHAFT_VERT = /* glsl */ `
+varying vec3 vLocal;
+void main() {
+  vLocal = position;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+const SHAFT_FRAG = /* glsl */ `
+uniform float uAlpha;
+uniform float uTime;
+varying vec3 vLocal;
+void main() {
+  float a = atan(vLocal.z, vLocal.x);
+  float v = vLocal.y;
+  float rays = 0.55 + 0.45 * pow(max(0.0, cos(a * 5.0 + uTime * 0.5 + v * 1.5)), 3.0);
+  float fall = (1.0 - smoothstep(0.0, 1.0, v)) * smoothstep(0.0, 0.04, v);
+  float motes = 0.8 + 0.2 * sin(v * 24.0 - uTime * 3.0 + a * 3.0);
+  gl_FragColor = vec4(vec3(1.0, 0.82, 0.45) * fall * rays * motes * uAlpha, 1.0);
+}
+`;
+
 const WARD_VERT = /* glsl */ `
 varying vec3 vN;
 varying vec3 vV;
@@ -348,12 +377,18 @@ export class BasinBossFx implements BossBurstHooks {
         emit: 0,
       });
     }
-    // The seed: a fat red ovoid with a darker seam (pods and lobbed seeds).
-    const seedGeo = new THREE.SphereGeometry(0.5, 14, 10).scale(1, 1.25, 1);
+    // The seed: a ribbed bulb whose veins burn as it ripens (basin_seedpod.ts),
+    // a material per pod for its own glow; the lobbed seeds share one.
+    const seedGeo = seedpodGeometry();
     this.geometries.push(seedGeo);
-    const seedMat = surfaceMat({ color: 0x8e1622, roughness: 0.42, emissive: 0x3c0508 });
+    const seedMat = seedpodMaterial(host.uTime);
+    seedMat.uniforms.uGlow.value = 0.9;
+    seedMat.uniforms.uRipe.value = 1;
+    this.materials.push(seedMat);
     for (let i = 0; i < POD_SLOTS; i++) {
-      const body = new THREE.Mesh(seedGeo, seedMat);
+      const podMat = seedpodMaterial(host.uTime);
+      this.materials.push(podMat);
+      const body = new THREE.Mesh(seedGeo, podMat);
       body.visible = false;
       root.add(body);
       const g = sprite(0xd82a2a, 0.5, 'wildheartPodGlow');
@@ -388,7 +423,9 @@ export class BasinBossFx implements BossBurstHooks {
         to: new THREE.Vector3(),
       });
     }
-    // The sun glyphs' overlay and halo.
+    // The sun glyphs' overlay, their shafts of light and halo.
+    const shaftGeo = new THREE.CylinderGeometry(0.7, 1, 1, 32, 1, true).translate(0, 0.5, 0);
+    this.geometries.push(shaftGeo);
     for (let i = 0; i < GLYPH_SLOTS; i++) {
       const mat = new THREE.ShaderMaterial({
         name: 'wildheartSunGlyph',
@@ -406,10 +443,27 @@ export class BasinBossFx implements BossBurstHooks {
       disc.visible = false;
       disc.renderOrder = floorVfxRenderOrder('encounter', 3);
       root.add(disc);
+      const shaftMat = new THREE.ShaderMaterial({
+        name: 'wildheartSunShaft',
+        uniforms: { uAlpha: { value: 0 }, uTime: host.uTime },
+        vertexShader: SHAFT_VERT,
+        fragmentShader: SHAFT_FRAG,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+      });
+      this.materials.push(shaftMat);
+      const shaft = new THREE.Mesh(shaftGeo, shaftMat);
+      shaft.frustumCulled = false;
+      shaft.visible = false;
+      root.add(shaft);
       const halo = sprite(0xffc860, 0.5, 'wildheartGlyphHalo');
       this.glyphs.push({
         disc,
         mat,
+        shaft,
+        shaftMat,
         halo: halo.s,
         haloMat: halo.mat,
         objectId: -1,
@@ -417,7 +471,9 @@ export class BasinBossFx implements BossBurstHooks {
       });
     }
     // Head marks: the fang and the claw.
-    const clawTex = clawGlyphTexture();
+    const clawTex = huntSigilTexture();
+    const ringGeo = new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2);
+    this.geometries.push(ringGeo);
     this.textures.push(clawTex);
     for (let i = 0; i < MARK_SLOTS; i++) {
       const mat = new THREE.SpriteMaterial({
@@ -432,7 +488,14 @@ export class BasinBossFx implements BossBurstHooks {
       const s = new THREE.Sprite(mat);
       s.visible = false;
       root.add(s);
-      this.marks.push({ sprite: s, mat, entityId: -1, auraId: '' });
+      const ringMat = huntRingMaterial(host.uTime);
+      this.materials.push(ringMat);
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.frustumCulled = false;
+      ring.visible = false;
+      ring.renderOrder = floorVfxRenderOrder('encounter', 6);
+      root.add(ring);
+      this.marks.push({ sprite: s, mat, ring, ringMat, entityId: -1, auraId: '' });
     }
     // Aura dressing: one glow sprite per bearer and aura.
     for (let i = 0; i < DRESS_SLOTS; i++) {
@@ -775,8 +838,17 @@ export class BasinBossFx implements BossBurstHooks {
       );
       const gy = this.host.groundY(p.x, p.z);
       const s = swell.scale * 1.1;
-      p.body.position.set(p.x, gy + 0.5 * s, p.z);
+      // Seated in the loam, leaning a little, its glow climbing as it ripens.
+      p.body.position.set(p.x, gy - 0.08 * s, p.z);
       p.body.scale.setScalar(s);
+      p.body.rotation.set(
+        0.08 * Math.sin(p.objectId),
+        p.objectId * 1.7,
+        0.08 * Math.cos(p.objectId),
+      );
+      const podMat = p.body.material as THREE.ShaderMaterial;
+      podMat.uniforms.uGlow.value = Math.min(1, 0.25 + swell.glow);
+      podMat.uniforms.uRipe.value = ripe ? 1 : 0;
       p.glow.position.set(p.x, gy + 0.6 * s, p.z);
       p.glow.scale.setScalar(1.2 + swell.glow * 2.2);
       p.glowMat.color.setHex(ripe ? 0xff6a2a : 0xd82a2a);
@@ -805,6 +877,7 @@ export class BasinBossFx implements BossBurstHooks {
         g.objectId = -1;
         g.disc.visible = false;
         g.halo.visible = false;
+        g.shaft.visible = false;
         continue;
       }
       const lit = t === WILDHEART_SUN_GLYPH_LIT;
@@ -820,6 +893,13 @@ export class BasinBossFx implements BossBurstHooks {
       g.halo.scale.set(r * 2.6, r * 1.3, 1);
       g.haloMat.color.setHex(lit ? 0xffc860 : 0xb0401a);
       g.haloMat.opacity = look.halo;
+      // A lit glyph stands in a shaft of sunlight; a spent one has none.
+      g.shaft.visible = lit;
+      if (lit) {
+        g.shaft.position.set(x, gy + 0.05, z);
+        g.shaft.scale.set(r * 0.85, 11, r * 0.85);
+        g.shaftMat.uniforms.uAlpha.value = 0.32 * look.alpha;
+      }
       // A lit glyph breathes gold sparks upward.
       g.emit += dt * (lit ? 5 : 0.8) * this.host.density;
       while (g.emit >= 1) {
@@ -850,7 +930,7 @@ export class BasinBossFx implements BossBurstHooks {
         continue;
       }
       const p = seedArcInto(this.arc, s.from, s.to, u, s.apex);
-      s.body.position.set(p.x, p.y, p.z);
+      s.body.position.set(p.x, p.y - 0.35, p.z);
       s.body.rotation.x = this.clock * 9;
       s.glow.position.set(p.x, p.y, p.z);
       if (this.host.rand() < 0.6 * this.host.density) {
@@ -900,14 +980,21 @@ export class BasinBossFx implements BossBurstHooks {
       if (!e || !aura) {
         m.entityId = -1;
         m.sprite.visible = false;
+        m.ring.visible = false;
         continue;
       }
       const look = headMarkLook(m.auraId, aura.value2 === 1, this.clock);
       const h = bossBodyHeight(e.templateId, e.scale || 1);
-      m.sprite.position.set(e.pos.x, e.pos.y + h + 0.95, e.pos.z);
-      m.sprite.scale.setScalar(look.size);
+      m.sprite.position.set(e.pos.x, e.pos.y + h + 1.1, e.pos.z);
+      m.sprite.scale.setScalar(look.size * 1.25);
       m.mat.color.setHex(look.color);
       m.mat.opacity = look.alpha;
+      // The ring of rakes at their feet: the hunted read from any angle.
+      m.ring.visible = true;
+      m.ring.position.set(e.pos.x, this.host.groundY(e.pos.x, e.pos.z) + 0.08, e.pos.z);
+      m.ring.scale.setScalar(1.5 + 0.25 * look.size);
+      (m.ringMat.uniforms.uColor.value as THREE.Color).setHex(look.color);
+      m.ringMat.uniforms.uAlpha.value = look.alpha * 0.85;
     }
   }
 
@@ -1057,6 +1144,7 @@ export class BasinBossFx implements BossBurstHooks {
       g.objectId = -1;
       g.disc.visible = false;
       g.halo.visible = false;
+      g.shaft.visible = false;
     }
     for (const s of this.seeds) {
       s.alive = false;
@@ -1066,6 +1154,7 @@ export class BasinBossFx implements BossBurstHooks {
     for (const m of this.marks) {
       m.entityId = -1;
       m.sprite.visible = false;
+      m.ring.visible = false;
     }
     for (const d of this.dresses) {
       d.entityId = -1;
@@ -1135,33 +1224,3 @@ function findAura(
 
 /** The head mark: three raking claw slashes on a dark backing, white so the
  *  sprite colour tints it (built once per fx). */
-function clawGlyphTexture(): THREE.CanvasTexture {
-  const size = 128;
-  const c = document.createElement('canvas');
-  c.width = size;
-  c.height = size;
-  const ctx = c.getContext('2d');
-  if (ctx) {
-    const g = ctx.createRadialGradient(64, 64, 8, 64, 64, 62);
-    g.addColorStop(0, 'rgba(255,255,255,0.55)');
-    g.addColorStop(0.55, 'rgba(255,255,255,0.18)');
-    g.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, size, size);
-    ctx.lineCap = 'round';
-    for (const pass of [0, 1]) {
-      ctx.strokeStyle = pass === 0 ? 'rgba(20,6,6,0.85)' : 'rgba(255,255,255,1)';
-      for (let k = 0; k < 3; k++) {
-        const ox = 34 + k * 22;
-        ctx.lineWidth = pass === 0 ? 15 - k : 9 - k;
-        ctx.beginPath();
-        ctx.moveTo(ox - 6, 20);
-        ctx.quadraticCurveTo(ox + 14, 60, ox - 2, 108);
-        ctx.stroke();
-      }
-    }
-  }
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}

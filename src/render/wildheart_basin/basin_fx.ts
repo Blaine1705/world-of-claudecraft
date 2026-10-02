@@ -82,6 +82,7 @@ import {
 } from './basin_fx_core';
 import type { BasinFxHost } from './basin_fx_host';
 import { setBasinJaguarEyesBurn } from './basin_kit';
+import { BasinSplash } from './basin_splash';
 import { BASIN_WATER_WADERS } from './basin_water';
 import { SaurianFx } from './saurian_fx';
 import { ZulgarAvatarFx } from './zulgar_avatar_fx';
@@ -201,6 +202,8 @@ export class WildheartFx {
   private readonly boss: BasinBossFx | null;
   /** The Great Saurian's body: its water, its howdah, its clips. */
   private readonly saurian: SaurianFx | null;
+  /** The shared crowns and ripples. */
+  private readonly splash: BasinSplash;
   /** Zulgar's jade spirit jaguar while he hunts. */
   private readonly avatar: ZulgarAvatarFx | null;
   /** Zulgar's model is hidden (heroic Ambush's vanish). */
@@ -387,6 +390,7 @@ export class WildheartFx {
       this.root.add(sprite);
       this.enrages.push({ sprite, entityId: -1 });
     }
+    this.splash = new BasinSplash(this.root);
     // The three bosses: built under this root before the gated attach.
     this.boss = world ? new BasinBossFx(this.bossHost(), world) : null;
     this.saurian = world ? new SaurianFx(this.bossHost(), world, playGesture) : null;
@@ -409,6 +413,7 @@ export class WildheartFx {
       rand: () => this.rand(),
       reducedMotion: () => this.reducedMotion(),
       shake: (amount) => this.shake?.(amount),
+      splash: this.splash,
     };
   }
 
@@ -557,6 +562,7 @@ export class WildheartFx {
         this.bossShown = false;
         this.boss?.hideAll();
         this.saurian?.hideAll();
+        this.splash.hideAll();
         this.avatar?.hide();
       }
       this.smoke.update(this.clock);
@@ -575,6 +581,7 @@ export class WildheartFx {
     this.bossShown = true;
     this.boss?.update(dt, this.clock);
     this.saurian?.update(dt, this.clock);
+    this.splash.update(this.clock);
     this.avatar?.update(dt);
     setBasinJaguarEyesBurn(jaguarEyesBurn(this.zulgarState, this.clock));
     this.smoke.update(this.clock);
@@ -961,6 +968,7 @@ export class WildheartFx {
     };
     attempt(() => this.root.removeFromParent());
     attempt(() => this.kit.dispose());
+    attempt(() => this.splash.dispose());
     if (this.boss) {
       const boss = this.boss;
       attempt(() => boss.dispose());

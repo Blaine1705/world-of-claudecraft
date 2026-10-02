@@ -38,7 +38,7 @@ import {
   ZULGAR_VANISHED,
 } from '../../sim/encounters/wildheart_basin/ids';
 import type { Entity, SimEvent } from '../../sim/types';
-import { bossBodyHeight } from './basin_boss_fx_core';
+import { BOSS_SPLASH, type BossSplash, bossBodyHeight } from './basin_boss_fx_core';
 import type { BasinFxHost } from './basin_fx_host';
 
 /** The boss state a burst reads (BasinBossFx implements it). */
@@ -51,6 +51,13 @@ export interface BossBurstHooks {
   lashYaw(casterId: number, fallback: number): number;
   /** The jaguar bonded to the Beastmaster, while it stands. */
   bondJaguar(): Entity | undefined;
+}
+
+/** A tinted crown (and its rings) thrown up from the floor at (x, z). */
+function splashAt(host: BasinFxHost, x: number, z: number, look: BossSplash): void {
+  const y = host.groundY(x, z);
+  host.splash.crown(x, y, z, look.crown, look.tint);
+  if (look.ripple) host.splash.ripple(x, y + 0.06, z, look.ripple, look.tint);
 }
 
 /** Play the burst of one boss spellfx event; true when it was one of theirs. */
@@ -66,6 +73,8 @@ export function playBasinBossBurst(
   const h = bossBodyHeight(src.templateId, src.scale || 1);
   switch (ev.ability) {
     case BEAST_PIT_QUAKE: {
+      // The pit's sand heaves up in a wall racing out to the ring's edge.
+      splashAt(host, x, z, BOSS_SPLASH.quake);
       host.shockRing(x, z, 0xffe0b0, BEAST_TUNING.quakeRadius * 1.05, 0.8);
       host.shockRing(x, z, 0xff6a2a, BEAST_TUNING.quakeRadius, 0.6);
       host.puff(x, gy + 0.4, z, 55, {
@@ -96,6 +105,7 @@ export function playBasinBossBurst(
     }
     case BEAST_HEEL: {
       // The jaguar lands at its master's side.
+      splashAt(host, x, z, BOSS_SPLASH.landing);
       host.shockRing(x, z, 0xffe0b0, 4, 0.5);
       host.puff(x, gy + 0.4, z, 30, {
         speed: 6,
@@ -216,6 +226,8 @@ export function playBasinBossBurst(
     case BLOOM_SEED_STOMP: {
       const at = hooks.podSpot(ev.targetId, target ?? src);
       const py = host.groundY(at.x, at.z);
+      // Squelch: the pod bursts in a crown of yellow-green pulp.
+      splashAt(host, at.x, at.z, BOSS_SPLASH.podStomp);
       host.puff(at.x, py + 0.3, at.z, 18, {
         speed: 3.5,
         up: 3,
@@ -242,6 +254,7 @@ export function playBasinBossBurst(
       const sx = on.pos.x;
       const sz = on.pos.z;
       const sy = host.groundY(sx, sz);
+      splashAt(host, sx, sz, BOSS_SPLASH.sprout);
       host.shockRing(sx, sz, 0xb8ff8a, 3.2, 0.6);
       host.puff(sx, sy + 0.4, sz, 32, {
         speed: 9,
@@ -314,6 +327,8 @@ export function playBasinBossBurst(
         const px = x + ax * t;
         const pz = z + az * t;
         const py = host.groundY(px, pz);
+        // Thorny vines bursting up out of the loam along the whole lane.
+        if (k % 2 === 0) splashAt(host, px, pz, BOSS_SPLASH.lash);
         host.puff(px, py + 0.3, pz, 4, {
           speed: 3,
           up: 3.5,
@@ -339,6 +354,8 @@ export function playBasinBossBurst(
     case BLOOM_GORGE: {
       if (!target) return true;
       const th = bossBodyHeight(target.templateId, target.scale || 1);
+      // The bite's acid splashing round the tank's feet.
+      splashAt(host, target.pos.x, target.pos.z, BOSS_SPLASH.gorge);
       host.puff(target.pos.x, target.pos.y + th * 0.55, target.pos.z, 24, {
         speed: 5,
         life: 0.5,
@@ -360,6 +377,7 @@ export function playBasinBossBurst(
       return true;
     }
     case ZULGAR_PULSE: {
+      splashAt(host, x, z, BOSS_SPLASH.pulse);
       host.shockRing(x, z, 0x5fe0a0, ZULGAR_TUNING.pulseRadius, 0.9);
       host.shockRing(x, z, 0xd8fff0, ZULGAR_TUNING.pulseRadius * 0.9, 0.7);
       host.puff(x, gy + 0.4, z, 44, {
@@ -435,6 +453,7 @@ export function playBasinBossBurst(
       const on = target ?? src;
       const r = on.kind === 'object' ? on.scale || 2 : 2;
       const sy = host.groundY(on.pos.x, on.pos.z);
+      splashAt(host, on.pos.x, on.pos.z, BOSS_SPLASH.sunstruck);
       host.shockRing(on.pos.x, on.pos.z, 0xffd860, r * 1.8, 0.7);
       host.puff(on.pos.x, sy + 1, on.pos.z, 1, {
         speed: 0,
@@ -460,6 +479,7 @@ export function playBasinBossBurst(
     case ZULGAR_AMBUSH: {
       const landing = ev.ability === ZULGAR_AMBUSH;
       if (landing) {
+        splashAt(host, x, z, BOSS_SPLASH.ambush);
         host.shockRing(x, z, 0xff6a2a, ZULGAR_TUNING.ambushRadius, 0.6);
         host.shockRing(x, z, 0x5fe0a0, ZULGAR_TUNING.ambushRadius * 1.2, 0.8);
       }

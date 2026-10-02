@@ -128,9 +128,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Basin's three bosses (composed by basin_fx.ts): their cast telegraphs
   // on the shared kit, the charge sigils and the sun glyph overlays.
   { file: 'src/render/wildheart_basin/basin_boss_fx.ts', layer: 'encounter', strict: true },
-  // The Great Saurian's water (crowns, ripples) on the ground band: cosmetic,
-  // so every telegraph of the ford paints over it.
-  { file: 'src/render/wildheart_basin/saurian_fx.ts', layer: 'ground', strict: true },
+  // The basin's shared splashes (the Saurian's water, the pit's sand, the pods'
+  // goo, Gorge's acid: crowns and ripples) on the ground band: cosmetic, so
+  // every telegraph paints over them.
+  { file: 'src/render/wildheart_basin/basin_splash.ts', layer: 'ground', strict: true },
   // The Pack Bond's ground glows under master and jaguar (the lowest encounter rung).
   { file: 'src/render/wildheart_basin/bond_cord.ts', layer: 'encounter', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
