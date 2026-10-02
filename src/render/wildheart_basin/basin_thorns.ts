@@ -21,7 +21,11 @@ varying vec3 vN;
 void main() {
   vV = aV;
   mat4 m = modelMatrix * instanceMatrix;
-  vN = normalize(mat3(m) * normal);
+  // The spikes are scaled unevenly (girth, height): the normal takes the
+  // inverse scale so a stretched thorn still lights along its flanks.
+  mat3 im = mat3(instanceMatrix);
+  vec3 s2 = vec3(dot(im[0], im[0]), dot(im[1], im[1]), dot(im[2], im[2]));
+  vN = normalize(mat3(modelMatrix) * (im * (normal / max(s2, vec3(1e-6)))));
   gl_Position = projectionMatrix * viewMatrix * m * vec4(position, 1.0);
 }
 `;
@@ -122,13 +126,21 @@ export class BasinThorns {
     this.born[slot] = this.clock + delay;
     if (!this.live[slot]) this.liveCount++;
     this.live[slot] = 1;
-    this.mesh.visible = true;
   }
 
+  /** Some spike still stands (or waits to tear up). */
+  busy(): boolean {
+    return this.liveCount > 0;
+  }
+
+  /** Lay every standing spike out; the draw only covers the slots up to the
+   *  highest one standing (spawns fill from the bottom), and only those
+   *  matrices upload. Owns the mesh's visibility. */
   update(clock: number): void {
     this.clock = clock;
     if (this.liveCount <= 0) return;
     let live = 0;
+    let hi = -1;
     for (let i = 0; i < THORN_SLOTS; i++) {
       if (!this.live[i]) continue;
       const g = thornGrowthInto(clock - this.born[i], this.growth);
@@ -138,6 +150,7 @@ export class BasinThorns {
         continue;
       }
       live++;
+      hi = i;
       const o = i * 3;
       const h = this.size[i * 2] * g.grow;
       const w = this.size[i * 2 + 1] * (0.6 + 0.4 * Math.min(1, g.grow));
@@ -147,16 +160,23 @@ export class BasinThorns {
       this.tmpScale.set(w, Math.max(0.001, h), w);
       this.mesh.setMatrixAt(i, this.tmpM.compose(this.tmpPos, this.tmpQ, this.tmpScale));
     }
-    this.mesh.instanceMatrix.needsUpdate = true;
+    const used = hi + 1;
+    this.mesh.count = Math.max(1, used);
+    const m = this.mesh.instanceMatrix;
+    m.clearUpdateRanges();
+    m.addUpdateRange(0, Math.max(1, used) * 16);
+    m.needsUpdate = true;
     this.liveCount = live;
-    if (live === 0) this.mesh.visible = false;
+    this.mesh.visible = live > 0;
   }
 
   hideAll(): void {
     this.live.fill(0);
     this.liveCount = 0;
     for (let i = 0; i < THORN_SLOTS; i++) this.mesh.setMatrixAt(i, this.zero);
-    this.mesh.instanceMatrix.needsUpdate = true;
+    const m = this.mesh.instanceMatrix;
+    m.clearUpdateRanges();
+    m.needsUpdate = true;
     this.mesh.visible = false;
   }
 

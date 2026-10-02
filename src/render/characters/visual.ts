@@ -1059,7 +1059,10 @@ export class CharacterVisual {
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
-    if (this.glowPulse?.step(dt, s.dead)) this.applyVisualMaterials();
+    // A glow edge re-mounts only when nothing outranks it (a surface response
+    // owns the materials until it ends, and re-applies them itself then).
+    if (this.glowPulse?.step(dt, s.dead) && !this.surfaceResponse.active)
+      this.applyVisualMaterials();
     // A transparent effect whose clones finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
@@ -1117,7 +1120,8 @@ export class CharacterVisual {
     // standing body, so it rides the same fade arm below.
     // A rooted body turning in place to face its target (the Gorgebloom) holds
     // its turn loop the same way.
-    const stunIdle = stunIdleClip(this.def.clips.stunned, s.auras) ?? this.turnIdle(dt, s);
+    const turnIdle = this.turnIdle(dt, s);
+    const stunIdle = stunIdleClip(this.def.clips.stunned, s.auras) ?? turnIdle;
     const stunIdleChanged =
       stunIdle !== this.stunIdle && (this.baseState === 'idle' || this.baseState === 'combatIdle');
     this.stunIdle = stunIdle;
@@ -2331,6 +2335,14 @@ export class CharacterVisual {
     if (this.disposed || this.deadLock) return;
     if (this.surfaceResponse.trigger(school, strength, contact)) this.applyVisualMaterials();
   }
+  /** The pool hands this rig to a new entity (pooled_visual_lifecycle.ts):
+   *  no glow pulse, turn or entrance carries over from the last one. */
+  resetForReuse(): void {
+    this.turnState.seeded = false;
+    this.entranceFor = undefined;
+    if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
+  }
+
   clearElementResponse(): void {
     this.harvestRecoil.clear();
     this.warriorBody.clearContactRecoil();
@@ -3379,7 +3391,7 @@ export class CharacterVisual {
     this.runeTintMaterials.clear();
     this.auraGlowMaterials.clear();
     this.surfaceResponse.materials.clear();
-    this.glowPulse?.materials.clear();
+    this.glowPulse?.forget();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the

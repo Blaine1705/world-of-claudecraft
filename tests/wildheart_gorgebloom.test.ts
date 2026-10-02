@@ -558,3 +558,23 @@ describe('a bar-locked strike clip (VisualDef.castClipSync)', () => {
     expect(st.castElapsed).toBeUndefined();
   });
 });
+
+describe('the glow on a pooled rig', () => {
+  it('a rig handed to a new entity drops its pulses and its death fade', async () => {
+    const { GlowPulse } = await import('../src/render/characters/glow_pulse');
+    const glow = new GlowPulse(GORGEBLOOM_GLOW);
+    expect(glow.handle(GORGEBLOOM_GULLET_GESTURE)).toBe(true);
+    expect(glow.step(0.1, false)).toBe(true);
+    expect(glow.active).toBe(true);
+    // Reset reports the clones were mounted, and nothing runs after it.
+    expect(glow.reset()).toBe(true);
+    expect(glow.active).toBe(false);
+    expect(glow.step(0.1, false)).toBe(false);
+    // A dead rig keeps its dark clones mounted until it is reused.
+    glow.step(0.1, true);
+    expect(glow.active).toBe(true);
+    expect(glow.reset()).toBe(true);
+    expect(glow.step(0.1, false)).toBe(false);
+    expect(glow.handle('unrelated')).toBe(false);
+  });
+});

@@ -611,6 +611,8 @@ export class WildheartFx {
         this.thorns.hideAll();
         this.avatar?.hide();
       }
+      // A thorn wave still standing as the basin is left sinks on its clock.
+      this.thorns.update(this.clock);
       this.smoke.update(this.clock);
       this.glow.update(this.clock);
       return;
@@ -955,7 +957,8 @@ export class WildheartFx {
     }
     this.saurian?.endScan();
     this.gorgebloom?.endScan();
-    this.inBasin = basin || this.clouds.some((c) => c.objectId >= 0) || this.lasher.busy();
+    this.inBasin =
+      basin || this.clouds.some((c) => c.objectId >= 0) || this.lasher.busy() || this.thorns.busy();
     this.zulgarState = zulgar;
   }
 

@@ -370,7 +370,7 @@ const SHOTS = [
   // The Gorgebloom's Blender body: idle in its root pool at the falls, then
   // each clip's contact frames (Seed Rain's spit, Pollinate's burst, the Vine
   // Lash slam and its thorn wave, the Gorge bite, a Bloom Spit at range).
-  { id: 'jefe2_flor_reposo', at: [72, 40], face: PI * 0.53, pitch: 0.16, dist: 20 },
+  { id: 'jefe2_flor_reposo', at: [79, 41], face: PI * 0.52, pitch: 0.1, dist: 14, yaw: 0.2 },
   {
     id: 'jefe2_flor_lluvia',
     stage: ['the_gorgebloom', 13, -PI * 0.42],
@@ -440,12 +440,12 @@ const SHOTS = [
   },
   {
     id: 'jefe2_flor_muerte',
-    stage: ['the_gorgebloom', 16, -PI * 0.5],
+    stage: ['the_gorgebloom', 15, -PI * 0.3],
     cmds: ['/dev wildheart kill gorgebloom'],
     cmdWait: 60,
-    pitch: 0.22,
-    dist: 28,
-    yaw: 0.8,
+    pitch: 0.24,
+    dist: 22,
+    yaw: -0.55,
     hud: true,
     burst: [400, 1200, 2000, 2750, 2900, 3300, 4600],
   },
@@ -769,7 +769,8 @@ async function main() {
           const spot = await page.evaluate(
             ([t, old]) => {
               for (const e of window.__game.world.entities.values())
-                if (e.templateId === t && !e.dead && !old.includes(e.id)) return { x: e.pos.x, z: e.pos.z };
+                if (e.templateId === t && !e.dead && !old.includes(e.id))
+                  return { x: e.pos.x, z: e.pos.z };
               return null;
             },
             [shot.waitNewMob, before],

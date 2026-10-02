@@ -88,9 +88,10 @@ interface Tracker {
   seen: boolean;
   dead: boolean;
   engaged: boolean;
-  /** The bar the effects already reacted to (its cast id and total), or ''. */
-  barKey: string;
+  /** The bar the effects already reacted to, and its time left last frame
+   *  (a bar of the same id restarting shows as that time jumping back up). */
   barCast: string | null;
+  barRemaining: number;
   /** Its strike clip plays out until then (no gesture may cut it). */
   playOutUntil: number;
   lastSeed: number;
@@ -264,8 +265,8 @@ export class GorgebloomFx {
         dead: e.dead,
         // A view joining a fight already under way never roars it in again.
         engaged: e.inCombat && !e.dead,
-        barKey: '',
         barCast: null,
+        barRemaining: 0,
         playOutUntil: -1,
         lastSeed: -1e9,
         lastPollinate: -1e9,
@@ -308,17 +309,18 @@ export class GorgebloomFx {
       // A bar opening: its windup beats, the gullet stoked for the spit and
       // the bite. A bar ending starts its strike's play-out window.
       const bar = e.dead ? null : e.castingAbility;
-      const key = bar ? `${bar}:${e.castTotal.toFixed(2)}` : '';
-      if (key !== t.barKey) {
+      const restarted =
+        bar !== null && bar === t.barCast && e.castRemaining > t.barRemaining + 0.05;
+      if (bar !== t.barCast || restarted) {
         if (t.barCast && !bar) t.playOutUntil = this.clock + bloomPlayOutSeconds(t.barCast);
         const trigger = bloomBarTrigger(bar);
         if (trigger && e.castRemaining > e.castTotal - 0.3) {
           this.schedule(trigger, e);
           if (trigger !== 'lashBar') this.playGesture?.(e.id, GORGEBLOOM_GULLET_GESTURE);
         }
-        t.barKey = key;
         t.barCast = bar;
       }
+      t.barRemaining = bar ? e.castRemaining : 0;
     }
   }
 

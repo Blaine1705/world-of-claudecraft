@@ -18,6 +18,9 @@ type Emissive = THREE.Material & { emissiveMap?: THREE.Texture | null; emissiveI
 export class GlowPulse {
   /** Source material to its glowing clone (disposed with the visual). */
   readonly materials = new Map<THREE.Material, THREE.Material>();
+  /** The same pairs in arrays: the per-frame write walks these (no iterator). */
+  private readonly srcs: THREE.Material[] = [];
+  private readonly clones: THREE.Material[] = [];
   private readonly ages: Float32Array;
   private readonly spans: number[];
   private readonly hits: number[] = [];
@@ -55,7 +58,7 @@ export class GlowPulse {
     const level = glowPulseLevel(this.set, this.ages, this.deadFor);
     if (want && level !== this.level) {
       this.level = level;
-      for (const [src, clone] of this.materials) this.write(src, clone);
+      for (let i = 0; i < this.srcs.length; i++) this.write(this.srcs[i], this.clones[i]);
     }
     if (want === this.active) return false;
     this.active = want;
@@ -70,9 +73,29 @@ export class GlowPulse {
     if (!clone) {
       clone = cloneMaterialWithHooks(src);
       this.materials.set(src, clone);
+      this.srcs.push(src);
+      this.clones.push(clone);
     }
     this.write(src, clone);
     return clone;
+  }
+
+  /** A rig handed to a new entity starts dark of pulses and alive. Returns
+   *  true when the clones were mounted (the caller re-applies its materials). */
+  reset(): boolean {
+    this.ages.fill(-1);
+    this.deadFor = -1;
+    this.level = 1;
+    const was = this.active;
+    this.active = false;
+    return was;
+  }
+
+  /** The visual disposed the clones: forget them. */
+  forget(): void {
+    this.materials.clear();
+    this.srcs.length = 0;
+    this.clones.length = 0;
   }
 
   private write(src: THREE.Material, clone: THREE.Material): void {
