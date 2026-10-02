@@ -76,6 +76,10 @@ const SHOTS = [
   { id: 'plaza_colonia', at: [24, 20], face: 0, pitch: 0.34, dist: 20 },
   { id: 'convergencia_escalera', at: [0, 100], face: 0, pitch: 0.18, dist: 18 },
   { id: 'terraza_santuario', at: [0, 202], face: 0, pitch: 0.02, dist: 16 },
+  // The colossal jaguar head up close, and a Sunbone brazier's fire.
+  { id: 'cabeza_jaguar', at: [0, 196], face: 0, pitch: -0.18, dist: 10 },
+  { id: 'cabeza_jaguar_tres_cuartos', at: [-30, 214], face: 0.55, pitch: -0.12, dist: 12 },
+  { id: 'brasero_fuego', at: [0, 200], face: Math.PI / 2, pitch: 0.12, dist: 6, yaw: -0.5 },
   { id: 'santuario_vista_atras', at: [0, 226], face: PI, pitch: 0.32, dist: 22 },
   // ---- the map and the minimap (HUD on) ----
   { id: 'mapa_m', at: [0, -40], face: 0, pitch: 0.3, dist: 18, map: true },

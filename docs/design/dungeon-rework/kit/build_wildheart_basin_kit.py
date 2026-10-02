@@ -57,7 +57,7 @@ BASALT_DEEP = (0.17, 0.18, 0.17)
 LIME = (0.71, 0.68, 0.58)          # the Court colony's limestone
 LIME_WARM = (0.77, 0.71, 0.57)
 LIME_GREY = (0.58, 0.59, 0.53)
-JAG_STONE = (0.6, 0.6, 0.51)       # the jaguar head and the idol
+JAG_STONE = (0.74, 0.65, 0.5)      # the jaguar head and the idol: warm weathered limestone
 OCHRE = (0.85, 0.7, 0.42)          # sunbone ochre #D9B26A
 OCHRE_DARK = (0.66, 0.5, 0.28)
 WARRED = (0.64, 0.2, 0.165)        # troll war red #A3322A
@@ -498,13 +498,19 @@ def jaguar_mask(p, center, w, color=LIME, yaw=0.0, paint=True):
 # ================================================================= hero pieces
 def jaguar_head():
     """HERO: the colossal stone jaguar carved into the north rim behind the
-    shrine terrace, 70 yd tall, its maw roaring open toward the terrace, the
-    Sunbone's ochre and war red on its brow and jaws, the jungle reclaiming it
-    (roots down its cheeks, moss on every ledge, vines from its jaws). Its eyes
-    are a separate node (Kit_JaguarEyes) the render lights during the hunt.
-    Origin at the head's base (the lower jaw's foot); the plinth runs 60 yd down
-    into the rim so it never floats."""
-    p = P('JaguarHead', moss=0.45, seed=3)
+    shrine terrace, 70 yd tall, its maw roaring open toward the terrace: one
+    sculpted mass (jaguar_head_sculpt.py: a great cat's skull with sharp
+    cheekbones, a brow driven down in fury, crossed fangs, snarl furrows, carved
+    rosettes and cheek scrolls, eroded, cracked and chipped), the Sunbone's ochre
+    and war red on its brow and cheeks, the jungle reclaiming it (roots down its
+    cheeks, moss on every ledge, vines from its jaws). Its eyes are a separate
+    node (Kit_JaguarEyes) the render lights during the hunt. Origin at the
+    head's base; the plinth runs 60 yd down into the rim so it never floats."""
+    import numpy as np  # Blender's bundled numpy
+
+    import jaguar_head_sculpt as js
+
+    p = P('JaguarHead', moss=0.5, seed=3)
     S = JAG_STONE
     # The rim it is carved from: rough basalt and rubble under and behind it.
     loft_z(p, [(-64, 0, 6, 40, 30, 2.2), (-48, 0, 5, 39, 29, 2.2), (-30, 0, 6, 37, 28, 2.2), (-12, 0, 5, 34, 25, 2.3),
@@ -519,135 +525,71 @@ def jaguar_head():
     for k in range(6):
         a = -PI + PI * (k + 0.5) / 6
         fern_tuft(p, (math.cos(a) * 30, math.sin(a) * 22 + 4, p.rng.uniform(-24, -4)), 3.0, 7, LEAF)
-    # The lower jaw, thrust forward and down in the roar.
-    loft_y(p, [(8, 0, 9.0, 17, 8, 2.6), (-4, 0, 8.4, 15.5, 7.4, 2.8), (-12, 0, 8.2, 13, 6.4, 3.0),
-               (-17, 0, 8.4, 11, 5.4, 3.0), (-19.2, 0, 8.8, 9, 4.0, 3.0)], 24, S)
-    # The chin's carved beard of scrolls.
-    for s in (-1, 0, 1):
-        p.box((s * 4.6, -18.4, 4.6), (3.8, 1.6, 3.0), p.vary(S, 0.05), bevel=0.4, taper=0.7)
-    # The upper jaw and muzzle.
-    loft_y(p, [(6, 0, 36, 19.5, 9, 2.6), (-8, 0, 36, 17.5, 8.6, 2.8), (-18, 0, 35.6, 14.5, 7.6, 3.0),
-               (-24, 0, 35.6, 12, 6.4, 3.2), (-25.8, 0, 36.2, 10, 5.0, 3.0)], 24, S)
-    # The cranium and the heavy brow.
-    loft_y(p, [(-13, 0, 52, 22, 12, 2.4), (-7, 0, 53, 25.5, 16, 2.4), (5, 0, 52, 27.5, 19, 2.3),
-               (15, 0, 50, 25, 18, 2.3), (22, 0, 46, 20, 14, 2.2), (24, 0, 44, 14, 9, 2.2)], 26, S)
-    # Cheeks: great rounded masses flaring behind the jaws.
-    for s in (-1, 1):
-        loft_y(p, [(12, s * 20, 34, 8, 13, 2.4), (2, s * 21, 34, 9, 14, 2.4), (-7, s * 19.5, 35, 7.5, 11, 2.4),
-                   (-11, s * 17.5, 36, 5, 7, 2.4)], 18, p.vary(S, 0.03))
-        # Whisker pads and carved whisker scrolls on the muzzle side.
-        for k in range(3):
-            cz = 31.5 + k * 2.6
-            cy = -19 + k * 0.6
-            pts = []
-            for i in range(14):
-                t = i / 13
-                a = t * TAU * 1.25
-                rr = 1.7 * (1 - t * 0.75)
-                pts.append((s * (13.2 - k * 0.6), cy + math.cos(a) * rr, cz + math.sin(a) * rr))
-            p.sweep(pts, 0.32, 0.18, p.vary(S, 0.04), sides=5)
-    # The maw's inside: the dark throat, the palate ridges, the gums and tongue.
-    p.box((0, -1.5, 21.5), (24, 3, 15), MAW_DARK)
-    for k in range(5):
-        p.box((0, -4 - k * 3.6, 27.6), (18 - k * 1.6, 1.0, 0.8), p.vary(WARRED_DARK, 0.08), bevel=0.2)
-    loft_y(p, [(-2, 0, 14.2, 9, 2.2, 2.2), (-12, 0, 15.0, 8, 1.8, 2.2), (-19, 0, 15.6, 5.5, 1.4, 2.2)], 14,
-           WARRED_DARK)
-    paint_band(p, (0, -21.5, 15.6), (21, 0.4, 0.9), WARRED)
-    paint_band(p, (0, -24.5, 28.6), (21, 0.4, 0.9), WARRED)
-    # Teeth: the four great canines crossing in the open maw, incisors between.
-    for s in (-1, 1):
-        p.sweep([(s * 9.6, -21.2, 29.5), (s * 10.0, -22.4, 24), (s * 9.6, -22.0, 18.5), (s * 9.0, -21.0, 15.8)],
-                2.3, 0.12, BONE_OLD, sides=8)
-        p.sweep([(s * 6.4, -19.6, 13.8), (s * 6.7, -20.8, 18.5), (s * 6.4, -20.6, 22.0), (s * 5.9, -19.8, 24.2)],
-                1.9, 0.1, BONE_OLD, sides=8)
-        for k in range(3):
-            x = s * (2.8 + k * 1.7)
-            p.spike((x, -23.5, 28.8), 0.75, 2.4, BONE_OLD, sides=5, lean=(0, 0.2))
-            p.box((x, -23.5, 27.6), (1.0, 1.0, 1.6), BONE_OLD, taper=0.25, pitch=PI)
-            p.box((s * (2.2 + k * 1.5), -21.4, 15.6), (0.9, 0.9, 1.4), BONE_OLD, taper=0.3)
-        for k in range(4):
-            p.box((s * (11.5 + k * 0.8), -16 + k * 3.4, 27.8), (1.2, 2.6, 1.6), BONE_OLD, taper=0.4, pitch=PI)
-            p.box((s * (10.5 + k * 0.6), -16 + k * 3.4, 15.8), (1.2, 2.6, 1.4), BONE_OLD, taper=0.4)
-    # The nose: a flat-topped bridge, a broad pad, flared nostrils; whisker pads.
-    p.box((0, -17, 45.0), (8.5, 19, 3.4), p.vary(S, 0.04), bevel=0.6, taper=0.8)
-    p.box((0, -26.0, 42.0), (12, 3.6, 5.0), p.vary(S, 0.04), bevel=0.8, taper=0.72)
-    for s in (-1, 1):
-        p.box((s * 2.8, -27.7, 40.8), (2.6, 0.8, 1.7), DARK)
-        loft_y(p, [(-14, s * 6.5, 40.2, 4.6, 3.6, 2.4), (-21, s * 6.8, 39.8, 5.2, 3.9, 2.4),
-                   (-26.4, s * 6.2, 39.2, 4.0, 3.0, 2.4)], 14, p.vary(S, 0.03))
-        for k in range(3):
-            p.box((s * (6.5 + k * 0.5), -26.6 + k * 0.8, 38.4 + k * 1.3), (0.5, 0.4, 0.5), DARK)
-    # The brow: one heavy angular ridge, its inner ends driven down in fury,
-    # a V notch over the bridge; almond sockets slanting up and out, ringed
-    # in Sunbone ochre and slashed with war red.
-    for s in (-1, 1):
-        p.box((s * 10.5, -14.6, 55.6), (16, 6.4, 4.4), p.vary(S, 0.04), bevel=0.7, roll=-s * 0.3)
-        p.box((s * 20.5, -11.0, 57.8), (7, 6, 3.6), p.vary(S, 0.04), bevel=0.6, roll=-s * 0.05)
-        p.box((s * 12, -12.6, 49.2), (12.6, 2.6, 6.6), MAW_DARK, roll=-s * 0.22)
-        with p.as_kind(PAINT):
-            p.box((s * 12.2, -13.6, 45.0), (13.0, 1.6, 1.1), OCHRE, roll=-s * 0.22)
-            p.box((s * 12.0, -14.4, 53.1), (12.0, 1.0, 0.8), OCHRE_DARK, roll=-s * 0.3)
-            for k in range(3):
-                p.box((s * (19.8 + k * 0.5), -10.4 + k * 1.3, 45.5 - k * 2.6), (5.2, 0.7, 1.0), WARRED,
-                      roll=s * 0.5, yaw=s * 0.4)
-    p.box((0, -16.2, 52.5), (5, 3, 4), p.vary(S, 0.04), bevel=0.5, pitch=0.3)
-    # A carved headband of glyph blocks and a stepped crest (the Court's
-    # headdress on the beast), so the crown reads square and monumental.
-    for k in range(9):
-        x = -16 + k * 4
-        a = x / 26.0
-        y = -10.8 + 4.5 * a * a
-        p.box((x, y, 60.4), (3.6, 2.0, 3.0), p.vary(LIME_WARM if k % 2 else S, 0.05), bevel=0.25,
-              yaw=-a * 0.9)
-        p.box((x, y - 1.05, 60.4), (1.8, 0.3, 1.6), DARK if k % 3 == 1 else OCHRE_DARK, yaw=-a * 0.9)
-    for k in range(5):
-        w = 22 - k * 4
-        p.box((0, 4 + k * 0.4, 69.0 + k * 1.6), (w, 14 - k * 1.6, 1.8), p.vary(S, 0.05), bevel=0.4)
-    # Ears: smaller, set back on the skull, tipped out; an ochre-stained hollow.
-    for s in (-1, 1):
-        mark = p.mark()
-        p.rock((0, 0, 0), (9.5, 4.6, 10.5), p.vary(S, 0.04), jitter=0.05, subdivisions=2)
-        with p.as_kind(PAINT):
-            p.rock((0, -1.9, -0.6), (5.6, 1.6, 6.2), OCHRE_DARK, jitter=0.05, subdivisions=1)
-        p.turn(mark, Matrix.Translation((s * 21.0, 12.0, 66.5)) @ Matrix.Rotation(-s * 0.35, 4, 'Y')
-               @ Matrix.Rotation(s * 0.25, 4, 'Z'))
-        # Great volutes on the cheeks.
-        pts = []
-        for i in range(22):
-            t = i / 21
-            a = PI * 0.6 + t * TAU * 1.35
-            rr = 5.0 * (1 - t * 0.78)
-            pts.append((s * 24.8, -6 + math.cos(a) * rr, 26 + math.sin(a) * rr))
-        p.sweep(pts, 0.9, 0.45, p.vary(LIME_WARM, 0.04), sides=6)
-    # The sun disc on the brow, the Court's sigil the trolls painted over.
-    sun_disc(p, (0, -9.2, 63.5), 5.2, axis=(0, -1, 0.75))
-    # Rosettes (the jaguar's spots) carved round the cranium and cheeks.
-    spots = [(-1, -2, 60), (-1, 8, 62), (-1, 14, 54), (-1, 2, 47), (-1, -5, 38), (-1, 6, 33),
-             (1, -2, 60), (1, 8, 62), (1, 14, 54), (1, 2, 47), (1, -5, 38), (1, 6, 33)]
-    for s, y, z in spots:
-        x = s * 25.4 if z > 44 else s * 27.5
-        ax = (s, 0.05, (z - 50) / 40)
-        p.prism((x, y, z), 9, 2.0, 1.9, 0.6, BASALT_MID, axis=ax)
-        p.prism((x + s * 0.3, y, z), 9, 1.15, 1.0, 0.65, p.vary(S, 0.04), axis=ax)
-    # The jungle taking it back: roots down the cheeks, vines from the jaws,
-    # ferns along the brow and the crown.
+    # The sculpted head, as plain faces with a colour each.
+    field = js.build_field()
+    verts, faces = js.mesh_field(field, bpy)
+    bm = p.bm
+    vs = [bm.verts.new(Vector(v)) for v in verts]
+    made = []
+    for f in faces:
+        try:
+            made.append(bm.faces.new([vs[i] for i in f]))
+        except ValueError:
+            pass
+    bm.normal_update()
+    centres = np.array([tuple(f.calc_center_median()) for f in made])
+    normals = np.array([tuple(f.normal) for f in made])
+    kinds = js.face_kinds(field, centres, normals)
+    colors = {
+        'stone': S, 'throat': MAW_DARK, 'tooth': BONE_OLD, 'tongue': WARRED_DARK,
+        'leather': BASALT_DEEP, 'lip': BASALT_DEEP, 'ochre': OCHRE, 'red': WARRED, 'rosette': BASALT_MID,
+    }
+    tone = js.Noise(23)
+    for f, kind in zip(made, kinds):
+        f.smooth = True
+        c = colors[kind]
+        if kind == 'stone':
+            q = f.calc_center_median()
+            k = 0.93 + 0.12 * float(tone.fbm(q.x * 0.06, q.y * 0.06, q.z * 0.06, 2))
+            c = tuple(max(0.0, min(1.0, ch * k)) for ch in c)
+        if kind in ('ochre', 'red'):
+            with p.as_kind(PAINT):
+                p._paint([f], c, STONE)
+        else:
+            p._paint([f], c, STONE)
+    # The Court's sun on the brow, the sigil the trolls painted over.
+    brow = field.snap([(0.0, -12.0, 63.0)], lift=0.15)[0]
+    axis = field.gradient(np.array([brow]))[0]
+    sun_disc(p, tuple(brow), 4.4, axis=tuple(axis))
+
+    def on_surface(pts, lift):
+        # Densify the path first, so a root hugs the carving between its marks.
+        dense = []
+        for i in range(len(pts) - 1):
+            for t in (0.0, 0.25, 0.5, 0.75):
+                dense.append(tuple(pts[i][k] + (pts[i + 1][k] - pts[i][k]) * t for k in range(3)))
+        dense.append(tuple(pts[-1]))
+        return [tuple(q) for q in field.snap(dense, lift=lift, steps=10)]
+
+    # The jungle taking it back: roots down the cheeks, vines from the jaws and
+    # the brow, ferns along the ledges.
     for s in (-1, 1):
         for k in range(3):
             y0 = -4 + k * 8
-            pts = [(s * (6 + k * 5), y0, 71), (s * (17 + k * 2), y0 + 2, 66), (s * (26 + k * 0.6), y0 + 1, 52),
-                   (s * (28.6 + k * 0.4), y0 - 1, 36), (s * (27 + k), y0 + 2, 18), (s * (30 + k * 2), y0, 2),
-                   (s * (32 + k * 2), y0 + 3, -10)]
-            root(p, pts, 1.3 - k * 0.2, 0.9, ROOT)
+            pts = [(s * (6 + k * 5), y0 + 4, 69), (s * (15 + k * 2), y0 + 4, 64), (s * (21 + k * 0.6), y0 + 1, 52),
+                   (s * (23 + k * 0.4), y0 - 1, 36), (s * (24 + k), y0 + 2, 18), (s * (25 + k * 2), y0, 4)]
+            root(p, on_surface(pts, 0.9 - k * 0.15) + [(s * (32 + k * 2), y0 + 3, -10)], 1.3 - k * 0.2, 0.9, ROOT)
         for k in range(4):
-            vine(p, (s * (4 + k * 3.4), -23.2 + k * 0.4, 29.0), 6 + k * 2.2, 0.8, 0.14, phase=k * 1.3 + s,
-                 leaves=5)
-            vine(p, (s * (6 + k * 4.2), -17 + k * 0.6, 54.0), 4 + k * 1.6, 0.6, 0.12, phase=k * 0.7, leaves=4)
-        fern_tuft(p, (s * 12, -13.5, 59.4), 2.6, 7, LEAF)
-        fern_tuft(p, (s * 14, 2, 70.5), 2.6, 7, LEAF_LIGHT)
-        fern_tuft(p, (s * 14, -22.6, 42.0), 2.0, 6, LEAF)
-    fern_tuft(p, (0, 6, 76.2), 3.4, 9, LEAF)
-    blob(p, (12, 16, 70), (12, 10, 6), JADE)
-    blob(p, (-13, 18, 69.5), (10, 9, 5), JADE_DARK)
+            top = on_surface([(s * (4 + k * 3.4), -23.0 + k * 0.4, 29.2)], 0.2)[0]
+            vine(p, top, 6 + k * 2.2, 0.8, 0.14, phase=k * 1.3 + s, leaves=5)
+            top = on_surface([(s * (6 + k * 4.2), -17.0 + k * 0.6, 55.0)], 0.2)[0]
+            vine(p, top, 4 + k * 1.6, 0.6, 0.12, phase=k * 0.7, leaves=4)
+        fern_tuft(p, on_surface([(s * 13, -13.0, 59.0)], 0.1)[0], 2.6, 7, LEAF)
+        fern_tuft(p, on_surface([(s * 14, 2, 70.0)], 0.1)[0], 2.6, 7, LEAF_LIGHT)
+        fern_tuft(p, on_surface([(s * 15, -21.0, 41.0)], 0.1)[0], 2.0, 6, LEAF)
+    fern_tuft(p, on_surface([(0, 6, 70.0)], 0.1)[0], 3.4, 9, LEAF)
+    blob(p, on_surface([(12, 16, 66)], 1.0)[0], (12, 10, 6), JADE)
+    blob(p, on_surface([(-13, 18, 65)], 1.0)[0], (10, 9, 5), JADE_DARK)
     return p
 
 
@@ -658,9 +600,10 @@ def jaguar_eyes():
     p = P('JaguarEyes', moss=0.0)
     for s in (-1, 1):
         mark = p.mark()
-        p.rock((0, 0, 0), (9.6, 2.2, 4.8), JADE_FLAME, mat=GLOW, jitter=0.0, subdivisions=2)
-        p.box((0, -1.05, 0), (1.0, 0.3, 4.2), (0.04, 0.12, 0.08), mat=GLOW, taper=0.35)
-        p.turn(mark, Matrix.Translation((s * 12, -13.4, 49.2)) @ Matrix.Rotation(-s * 0.22, 4, 'Y'))
+        # Narrow almonds, slanting up and out: a hunter's glare, not an owl's.
+        p.rock((0, 0, 0), (8.4, 1.8, 3.6), JADE_FLAME, mat=GLOW, jitter=0.0, subdivisions=2)
+        p.box((0, -0.86, 0), (0.9, 0.3, 3.2), (0.04, 0.12, 0.08), mat=GLOW, taper=0.35)
+        p.turn(mark, Matrix.Translation((s * 12, -13.4, 49.2)) @ Matrix.Rotation(-s * 0.3, 4, 'Y'))
     return p
 
 

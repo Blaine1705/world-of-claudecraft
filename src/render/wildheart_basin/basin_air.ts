@@ -232,7 +232,7 @@ function buildGodRays(opts: BasinAirOptions): THREE.Mesh | null {
       uniforms: {
         ...fogUniforms(),
         uTime: sharedUniforms.uTime,
-        uAlpha: { value: opts.lowGfx ? 0.07 : 0.11 },
+        uAlpha: { value: opts.lowGfx ? 0.08 : 0.14 },
       },
       transparent: true,
       depthWrite: false,

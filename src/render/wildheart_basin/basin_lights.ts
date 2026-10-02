@@ -3,8 +3,9 @@
 // jade spirit flame burning in the stone jaguar's eyes. Every point light
 // rides the renderer's budgeted carriers (pushed to the fire-light sink, at
 // most eight per light zone: tests/wildheart_basin_render_core.test.ts);
-// flames flicker through the renderer's shared flame list; halos and floor
-// pools are emissive cards, never lights. The daylight itself is the
+// the fire itself is basin_fire.ts's flipbook tongues and embers (one
+// instanced draw); halos and floor pools are emissive cards, never lights.
+// The daylight itself is the
 // `wildheartBasin` state of interior_light_rig.ts.
 
 import * as THREE from 'three';
@@ -12,6 +13,7 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { FireLightSink } from '../point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { radialGlowTexture } from '../textures';
+import { buildBasinFires } from './basin_fire';
 import {
   BASIN_LIGHT_STYLE,
   type BasinLightKind,
@@ -25,28 +27,9 @@ export interface BasinLightDeps {
   fireLights: FireLightSink;
 }
 
-let flameGeometry: THREE.BufferGeometry | null = null;
 let poolGeometry: THREE.BufferGeometry | null = null;
-const flameMaterials = new Map<BasinLightKind, THREE.MeshBasicMaterial>();
 const haloMaterials = new Map<BasinLightKind, THREE.SpriteMaterial>();
 const poolMaterials = new Map<BasinLightKind, THREE.MeshBasicMaterial>();
-
-function flameMaterial(kind: BasinLightKind): THREE.MeshBasicMaterial {
-  let m = flameMaterials.get(kind);
-  if (!m) {
-    m = new THREE.MeshBasicMaterial({
-      color: BASIN_LIGHT_STYLE[kind].flame,
-      transparent: true,
-      opacity: 0.8,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      name: `wildheartFlame:${kind}`,
-    });
-    markSharedMaterial(m);
-    flameMaterials.set(kind, m);
-  }
-  return m;
-}
 
 function haloMaterial(kind: BasinLightKind): THREE.SpriteMaterial {
   let m = haloMaterials.get(kind);
@@ -112,18 +95,15 @@ export function buildBasinLights(
   deps: BasinLightDeps,
   ground: (x: number, z: number) => number,
 ): void {
-  flameGeometry ??= new THREE.ConeGeometry(0.2, 0.9, 7);
-  markSharedGeometry(flameGeometry);
   poolGeometry ??= new THREE.CircleGeometry(1, 24).rotateX(-Math.PI / 2);
   markSharedGeometry(poolGeometry);
+  const fires: { x: number; y: number; z: number }[] = [];
   for (const spot of planBasinLights()) {
     const gy = ground(spot.x, spot.z);
     const y = gy + spot.lift;
-    const flame = new THREE.Mesh(flameGeometry, flameMaterial(spot.kind));
-    flame.position.set(spot.x, y + 0.1, spot.z);
-    flame.scale.setScalar(1.15);
-    group.add(flame);
-    deps.flames.push(flame);
+    // The bowl's fire: flipbook tongues, a hot core and embers (basin_fire.ts),
+    // one draw for every brazier, gathered below.
+    fires.push({ x: spot.x, y: y - 0.15, z: spot.z });
     const halo = new THREE.Sprite(haloMaterial(spot.kind));
     halo.position.set(spot.x, y + 0.5, spot.z);
     halo.scale.set(4.6, 4.6, 1);
@@ -138,6 +118,8 @@ export function buildBasinLights(
       group.add(pool);
     }
   }
+  const fire = buildBasinFires(fires, deps.lowGfx);
+  if (fire) group.add(fire);
   // The jaguar's eyes: a jade glow card in each socket and one light between
   // them, cast forward onto the brow and the head's face (never the arena).
   for (const eye of JAGUAR_EYES) {

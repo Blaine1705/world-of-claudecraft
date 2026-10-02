@@ -93,8 +93,8 @@ void main() {
   vec3 body = mix(shallow, deep, vWater.y);
   // Sun glitter dancing on the riffles.
   vec3 halfV = normalize(uSunDir + view);
-  float glint = pow(max(0.0, dot(n, halfV)), 300.0) * 4.0 + pow(max(0.0, dot(n, halfV)), 40.0) * 0.18;
-  vec3 col = mix(body, sky, clamp(fres, 0.0, 0.55)) + vec3(1.0, 0.92, 0.7) * glint;
+  float glint = pow(max(0.0, dot(n, halfV)), 300.0) * 2.4 + pow(max(0.0, dot(n, halfV)), 40.0) * 0.1;
+  vec3 col = mix(body, sky, clamp(fres, 0.0, 0.42)) + vec3(1.0, 0.88, 0.62) * glint;
   // Streaks of current: long bright threads racing downstream.
   float thread = smoothstep(0.72, 0.95, bnoise(adv * vec2(0.08, 1.8) + 31.0));
   col += vec3(0.5, 0.62, 0.55) * thread * 0.12 * smoothstep(0.8, 2.6, speed);

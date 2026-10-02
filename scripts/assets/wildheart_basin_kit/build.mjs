@@ -75,6 +75,7 @@ export function sourceFingerprint(root = ROOT) {
   for (const file of [
     'docs/design/dungeon-rework/kit/hckit.py',
     'docs/design/dungeon-rework/kit/build_wildheart_basin_kit.py',
+    'docs/design/dungeon-rework/kit/jaguar_head_sculpt.py',
     'scripts/assets/wildheart_basin_kit/build.mjs',
   ]) {
     hash

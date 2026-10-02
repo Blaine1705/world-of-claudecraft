@@ -76,13 +76,18 @@ void main() {
   vec3 d = normalize(vDir);
   float up = d.y;
   // Gold at the horizon, a hazy turquoise overhead, a greener band between.
-  vec3 zenith = vec3(0.16, 0.42, 0.6);
-  vec3 mid = vec3(0.46, 0.62, 0.56);
-  vec3 col = mix(mid, zenith, smoothstep(0.1, 0.7, up));
-  col = mix(uHorizon * 1.08, col, smoothstep(-0.02, 0.24, up));
+  // Golden hour: a deep turquoise overhead, a clear aqua band, and the gold
+  // haze only low on the horizon, burning orange toward the sun and cooling
+  // to violet-grey opposite it.
+  vec3 zenith = vec3(0.07, 0.3, 0.52);
+  vec3 mid = vec3(0.34, 0.6, 0.64);
+  vec3 col = mix(mid, zenith, smoothstep(0.06, 0.62, up));
   float toSun = max(0.0, dot(d, uSunDir));
-  // The sun's quarter of the sky glows gold through the humid air.
-  col += vec3(0.55, 0.38, 0.12) * pow(toSun, 6.0) * 0.6 + vec3(0.35, 0.26, 0.1) * pow(toSun, 2.0) * 0.25;
+  float sunSide = dot(normalize(vec3(d.x, 0.0, d.z) + 1e-4), normalize(vec3(uSunDir.x, 0.0, uSunDir.z))) * 0.5 + 0.5;
+  vec3 horizon = mix(uHorizon * vec3(0.78, 0.8, 0.92), uHorizon * vec3(1.18, 0.98, 0.72), sunSide);
+  col = mix(horizon, col, smoothstep(-0.02, 0.16 + 0.08 * sunSide, up));
+  // The sun's quarter of the sky glows gold-orange through the humid air.
+  col += vec3(0.75, 0.42, 0.12) * pow(toSun, 5.0) * 0.7 + vec3(0.42, 0.26, 0.08) * pow(toSun, 2.0) * 0.32;
 
   // Fair-weather cloud deck drifting over.
   float deck = 0.0;

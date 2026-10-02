@@ -73,17 +73,20 @@ const YUMI_MAZE_RIM_BOOST = 1.7;
 // falls' rainbows read from the maw), with a pale green-gold sky bounce off
 // the humid air and a mossy ground bounce off the canopy. The braziers and
 // the jaguar's eyes ride the light sink; nothing else lights the basin.
-const WILDHEART_SUN_INTENSITY = 2.55;
-const WILDHEART_HEMI_INTENSITY = 1.3;
+// Golden hour: a strong warm key against a cool, low sky fill, so the light
+// has a side and a shadow side (the flat, front-lit noon it replaced read as
+// paper).
+const WILDHEART_SUN_INTENSITY = 3.2;
+const WILDHEART_HEMI_INTENSITY = 0.82;
 /** Where the afternoon sun hangs (from the ground toward it). The renderer's
  *  per-frame key-light aim takes it in place of the world sun while the basin
  *  is the fog state. */
 export const WILDHEART_KEY_LIGHT_DIRECTION = new THREE.Vector3(...BASIN_SUN_DIRECTION);
-const WILDHEART_ENV_INTENSITY = 0.42;
-const WILDHEART_RIM_BOOST = 1.45;
-const WILDHEART_SUN_COLOR = 0xffd99a;
-const WILDHEART_HEMI_SKY_COLOR = 0xd2e2b4;
-const WILDHEART_HEMI_GROUND_COLOR = 0x4c5a2c;
+const WILDHEART_ENV_INTENSITY = 0.32;
+const WILDHEART_RIM_BOOST = 1.6;
+const WILDHEART_SUN_COLOR = 0xffc075;
+const WILDHEART_HEMI_SKY_COLOR = 0x9fc3cf;
+const WILDHEART_HEMI_GROUND_COLOR = 0x3b4a23;
 // The Hollow Crypt: an OPEN-AIR necropolis under a vast moon. It hides the
 // world's day-night dome (its own moonlit sky rides the interior group, so the
 // look never depends on the realm's clock) and grades the one sun into a cold

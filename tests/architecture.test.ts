@@ -851,6 +851,7 @@ const RENDER_PURE_CORES = [
   'src/render/wildheart_basin/jaguar_model_core.ts',
   'src/render/wildheart_basin/zulgar_avatar_core.ts',
   'src/render/wildheart_basin/bond_cord_core.ts',
+  'src/render/wildheart_basin/basin_fire_core.ts',
   'src/render/characters/stun_idle_core.ts',
   'src/render/drowned_temple/temple_shore_core.ts',
   'src/render/drowned_temple/temple_fx_core.ts',

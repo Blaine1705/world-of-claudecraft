@@ -31,13 +31,15 @@ describe('the Wildheart Basin interior and the light census', () => {
     };
     const outdoor = { sunIntensity: 1.2, hemiIntensity: 0.4, envIntensity: 0.3 };
     applyInteriorLightRig('wildheartBasin', targets, outdoor);
-    // A bright warm key over a green-gold sky bounce and a mossy ground bounce.
-    expect(sun.intensity).toBe(2.55);
-    expect(hemi.intensity).toBe(1.3);
-    expect(scene.environmentIntensity).toBe(0.42);
-    expect(sun.color.getHex()).toBe(0xffd99a);
-    expect(hemi.color.getHex()).toBe(0xd2e2b4);
-    expect(hemi.groundColor.getHex()).toBe(0x4c5a2c);
+    // Golden hour: a strong warm key over a cool, low sky fill and a mossy
+    // ground bounce, so every form has a lit side and a shadow side.
+    expect(sun.intensity).toBe(3.2);
+    expect(hemi.intensity).toBe(0.82);
+    expect(sun.intensity / hemi.intensity).toBeGreaterThan(3);
+    expect(scene.environmentIntensity).toBe(0.32);
+    expect(sun.color.getHex()).toBe(0xffc075);
+    expect(hemi.color.getHex()).toBe(0x9fc3cf);
+    expect(hemi.groundColor.getHex()).toBe(0x3b4a23);
     applyInteriorLightRig('outdoor', targets, outdoor);
     expect(sun.intensity).toBe(outdoor.sunIntensity);
     expect(hemi.intensity).toBe(outdoor.hemiIntensity);
@@ -50,13 +52,14 @@ describe('the Wildheart Basin interior and the light census', () => {
     expect(interiorKeyLightDirection('wildheartBasin', out)).toBe(true);
     expect(out.equals(WILDHEART_KEY_LIGHT_DIRECTION)).toBe(true);
     expect(WILDHEART_KEY_LIGHT_DIRECTION.toArray()).toEqual([...BASIN_SUN_DIRECTION]);
-    // Low afternoon sun in the south-west, behind the Idol Maw: the party
-    // looks north into the caldera with the sun at its back (the rainbows).
+    // Low golden-hour sun in the west-south-west, over the Idol Maw's left
+    // shoulder: the party looks north into a caldera raked from the side
+    // (never front-lit), the rainbows still toward the maw.
     expect(WILDHEART_KEY_LIGHT_DIRECTION.length()).toBeCloseTo(1, 6);
     expect(WILDHEART_KEY_LIGHT_DIRECTION.y).toBeGreaterThan(0.3);
-    expect(WILDHEART_KEY_LIGHT_DIRECTION.y).toBeLessThan(0.7);
-    expect(WILDHEART_KEY_LIGHT_DIRECTION.z).toBeLessThan(-0.5);
-    expect(WILDHEART_KEY_LIGHT_DIRECTION.x).toBeLessThan(0);
+    expect(WILDHEART_KEY_LIGHT_DIRECTION.y).toBeLessThan(0.5);
+    expect(WILDHEART_KEY_LIGHT_DIRECTION.z).toBeLessThan(0);
+    expect(WILDHEART_KEY_LIGHT_DIRECTION.x).toBeLessThan(-0.7);
   });
 
   it('hides the world dome under its own sky', () => {

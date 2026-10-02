@@ -48,11 +48,13 @@ function normalize3(x: number, y: number, z: number): readonly [number, number, 
   return [x / l, y / l, z / l];
 }
 
-/** Where the afternoon sun stands, from the ground toward it: low in the
- *  south-west behind the Idol Maw, so the whole caldera is lit from the side as
- *  the party looks in, every fall's spray holds its rainbow toward the maw and
- *  the Waterfall Walk, and the jaguar head is lit on its brow. */
-export const BASIN_SUN_DIRECTION = normalize3(-0.52, 0.5, -0.69);
+/** Where the golden-hour sun stands, from the ground toward it: low in the
+ *  west-south-west, over the Idol Maw's left shoulder, so the caldera is RAKED
+ *  from the side as the party looks in (long shadows reaching east across the
+ *  terraces, every trunk and stair modelled, the canopy's shafts slanting in),
+ *  every fall's spray still holds its rainbow toward the maw, and the jaguar
+ *  head is lit across its left cheek with its right in shadow. */
+export const BASIN_SUN_DIRECTION = normalize3(-0.84, 0.4, -0.37);
 
 /** The humid haze (fog colour and the sky's horizon). */
 export const BASIN_FOG_COLOR = 0xbfb98a;
@@ -456,7 +458,7 @@ export function planGodRays(): GodRay[] {
   for (const p of WILDHEART_BASIN_FIELD.props) {
     if (p.kind !== 'wb_jungle_tree') continue;
     i++;
-    if (i % 2 === 0) continue;
+    if (i % 3 === 0) continue;
     const y = basinFloorAt(p.x, p.z) ?? 0;
     out.push({
       x: p.x + (basinHash(i, 2) - 0.5) * 6,

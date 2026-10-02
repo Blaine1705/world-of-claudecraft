@@ -26,6 +26,7 @@ import {
   seedArcInto,
   shockRingLook,
 } from '../src/render/wildheart_basin/basin_boss_fx_core';
+import { BRAZIER_FIRE, fireInstanceCount } from '../src/render/wildheart_basin/basin_fire_core';
 import {
   BASIN_OBJECT_SPECS,
   basinTelegraphSpecs,
@@ -632,5 +633,17 @@ describe('the boss auras and bodies', () => {
       expect(hunt).toBeLessThanOrEqual(1);
       expect(hunt).toBeGreaterThanOrEqual(0.88);
     }
+  });
+});
+
+describe('the brazier fires', () => {
+  it('burn tongues, a core and embers, thinner on the low tier but never out', () => {
+    const full = fireInstanceCount(false);
+    const low = fireInstanceCount(true);
+    expect(full.total).toBe(full.tongues + full.cores + full.embers);
+    expect(low.tongues).toBeGreaterThan(0);
+    expect(low.cores).toBeGreaterThan(0);
+    expect(low.total).toBeLessThan(full.total);
+    expect(BRAZIER_FIRE.tongue).toBeGreaterThan(0.8);
   });
 });

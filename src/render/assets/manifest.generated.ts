@@ -1251,7 +1251,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/wickharbor_harbor.glb": "/media/models/props/wickharbor_harbor.0c2872d47270.glb",
   "models/props/wickharbor_wharf.glb": "/media/models/props/wickharbor_wharf.655410d0d104.glb",
   "models/props/wildheart_ancestor_ruin.glb": "/media/models/props/wildheart_ancestor_ruin.5f37b9de8ac2.glb",
-  "models/props/wildheart_basin_kit.glb": "/media/models/props/wildheart_basin_kit.381cd86fa141.glb",
+  "models/props/wildheart_basin_kit.glb": "/media/models/props/wildheart_basin_kit.8aceaeeabcc9.glb",
   "models/props/wildheart_beast_den.glb": "/media/models/props/wildheart_beast_den.10cd806a8f1f.glb",
   "models/props/wildheart_canopy_platform.glb": "/media/models/props/wildheart_canopy_platform.6606edaccdd5.glb",
   "models/props/wildheart_giant_fern.glb": "/media/models/props/wildheart_giant_fern.f1497af995f7.glb",
