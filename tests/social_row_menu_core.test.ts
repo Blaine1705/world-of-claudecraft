@@ -9,25 +9,33 @@ import {
 
 // A Social window row right-click opens the menu that player's unit frame opens.
 // The routing is pure, so it is pinned here against the two IWorld hosts' shapes:
-// the offline Sim and the online ClientWorld both expose playerId, player.name and
-// an entities Map (the ClientWorld one holds only the ~120yd interest scope).
+// the offline Sim and the online ClientWorld both expose playerId, player.name,
+// spectating and an entities Map. They differ in what that map holds: the offline
+// Sim holds the whole world, the ClientWorld mirror only the ~120yd interest scope.
 
 type Ent = { id: number; kind: 'player' | 'mob' | 'npc'; name: string };
 
-function world(selfName: string, selfPid: number, others: Ent[]): SocialRowMenuWorld {
+function world(
+  selfName: string,
+  selfPid: number,
+  others: Ent[],
+  spectating: string | null = null,
+): SocialRowMenuWorld {
   const entities = new Map<number, Ent>();
   entities.set(selfPid, { id: selfPid, kind: 'player', name: selfName });
   for (const e of others) entities.set(e.id, e);
-  return { playerId: selfPid, player: { name: selfName }, entities };
+  return { spectating, playerId: selfPid, player: { name: selfName }, entities };
 }
 
-// Sim-shaped: the whole offline world is in the map. ClientWorld-shaped: a mirror
-// whose entities are only what the last snapshot carried. Same structural slice.
+// Sim-shaped: the whole offline world is in the map (Dalen, far across the zone,
+// included). ClientWorld-shaped: a mirror whose entities are only what the last
+// snapshot carried, so the far-off Dalen is absent there.
 const HOSTS = {
   sim: () =>
     world('Aria', 1, [
       { id: 7, kind: 'player', name: 'Borin' },
       { id: 9, kind: 'mob', name: 'Kessa' },
+      { id: 11, kind: 'player', name: 'Dalen' },
     ]),
   clientWorld: () =>
     world('Aria', 101, [
@@ -122,18 +130,59 @@ describe.each(Object.entries(HOSTS))('socialRowMenuTarget (%s-shaped world)', (_
   });
 });
 
+describe('socialRowMenuTarget: the two hosts differ only in roster scope', () => {
+  it('the offline Sim opens the unit menu for a far player the online mirror does not hold', () => {
+    expect(socialRowMenuTarget({ name: 'Dalen', pid: null }, HOSTS.sim())).toEqual({
+      kind: 'unit',
+      pid: 11,
+      name: 'Dalen',
+    });
+    expect(socialRowMenuTarget({ name: 'Dalen', pid: null }, HOSTS.clientWorld())).toEqual({
+      kind: 'name',
+      name: 'Dalen',
+    });
+  });
+});
+
+describe('socialRowMenuTarget while spectating', () => {
+  // A spectate repoints playerId and player at the WATCHED character, so neither
+  // the self check nor the pid lookup describes the moderator at the keyboard.
+  const spectate = () =>
+    world('Watched', 50, [{ id: 7, kind: 'player', name: 'Borin' }], 'Watched');
+
+  it('never opens the self menu for the watched character', () => {
+    expect(socialRowMenuTarget({ name: 'Watched', pid: 50 }, spectate())).toEqual({
+      kind: 'name',
+      name: 'Watched',
+    });
+  });
+
+  it('never opens a pid-keyed unit menu, even for a player in view or a raid row', () => {
+    expect(socialRowMenuTarget({ name: 'Borin', pid: null }, spectate())).toEqual({
+      kind: 'name',
+      name: 'Borin',
+    });
+    expect(socialRowMenuTarget({ name: 'Borin', pid: 7 }, spectate())).toEqual({
+      kind: 'name',
+      name: 'Borin',
+    });
+  });
+});
+
 describe('socialRowMenuPoint: pointer vs keyboard open', () => {
   const rect = { left: 40, bottom: 300 };
 
-  it('a pointer right-click opens at the cursor', () => {
-    expect(socialRowMenuPoint({ clientX: 120, clientY: 80 }, rect)).toEqual({ x: 120, y: 80 });
+  it('a pointer right-click opens at the cursor and never measures the row', () => {
+    let reads = 0;
+    const measure = () => {
+      reads++;
+      return rect;
+    };
+    expect(socialRowMenuPoint({ clientX: 120, clientY: 80 }, measure)).toEqual({ x: 120, y: 80 });
+    expect(reads).toBe(0);
   });
 
-  it('a keyboard open (0,0) anchors under the row instead of the screen corner', () => {
-    expect(socialRowMenuPoint({ clientX: 0, clientY: 0 }, rect)).toEqual({ x: 40, y: 300 });
-  });
-
-  it('falls back to the event point when there is no row box', () => {
-    expect(socialRowMenuPoint({ clientX: 0, clientY: 0 }, null)).toEqual({ x: 0, y: 0 });
+  it('a keyboard or synthetic open (0,0) anchors under the row instead of the screen corner', () => {
+    expect(socialRowMenuPoint({ clientX: 0, clientY: 0 }, () => rect)).toEqual({ x: 40, y: 300 });
   });
 });

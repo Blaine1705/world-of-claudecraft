@@ -1,17 +1,20 @@
 // Social window row right-click: which player menu a row opens. A right-click on a
 // Friends / Who / Guild / Raid / Pledges / Ignored / Blocked row opens the SAME menu
 // a right-click on that player's unit frame would. DOM-free (social_window.ts reads
-// the row's data attributes and the event point; hud.ts opens the chosen menu), so
-// the routing is unit-tested in Node against plain Sim- and ClientWorld-shaped stubs.
+// the row's data attributes and the event point, routes through here, then opens the
+// chosen menu through its hud deps), so the routing is unit-tested in Node.
 //
 // The routing, in order:
+// - while spectating: the by-name menu for every row. A spectate repoints playerId
+//   and player at the WATCHED character, so "self" and the pid lookup would answer
+//   for the wrong person;
 // - yourself: your own player-frame menu (party, loot, dungeon difficulty);
-// - a player with a live pid (a raid row carries its member pid, so an out-of-range
-//   raid member still gets the frame menu with promote/kick; anyone else resolves
-//   through the interest-scoped entity roster): the unit-frame menu, keyed by pid;
-// - a player with no entity near you (an offline friend, a far-off /who row): the
-//   by-name player menu, the same one a chat name opens, since there is no frame
-//   to mirror and every pid-keyed row (trade, duel) would be a no-op.
+// - a player with a pid: the unit-frame menu, keyed by pid. A raid row carries its
+//   member pid, so an out-of-range raid member gets exactly what their party frame
+//   gives (promote and remove included); anyone else resolves through the
+//   interest-scoped entity roster;
+// - a player with no frame anywhere (an offline friend, a far-off /who row): the
+//   by-name player menu, the same one a chat name opens.
 
 import type { Entity } from '../sim/types';
 
@@ -29,6 +32,7 @@ export type SocialRowMenuTarget =
 
 /** The slice of IWorld the routing reads (both Sim and ClientWorld satisfy it). */
 export interface SocialRowMenuWorld {
+  spectating: string | null;
   playerId: number;
   player: Pick<Entity, 'name'>;
   entities: Map<number, Pick<Entity, 'id' | 'kind' | 'name'>>;
@@ -58,6 +62,7 @@ export function socialRowMenuTarget(
   row: SocialRowPlayer,
   world: SocialRowMenuWorld,
 ): SocialRowMenuTarget {
+  if (world.spectating !== null) return { kind: 'name', name: row.name };
   if (row.pid === world.playerId || row.name.toLowerCase() === world.player.name.toLowerCase())
     return { kind: 'self' };
   const pid = row.pid ?? livePlayerPid(world.entities.values(), row.name);
@@ -65,14 +70,16 @@ export function socialRowMenuTarget(
 }
 
 /**
- * Where the menu opens. A pointer right-click carries real client coords; the
- * keyboard Menu key (Shift+F10) fires contextmenu at 0,0, so fall back to the
- * row's own box so the menu does not open in the corner of the screen.
+ * Where the menu opens. A pointer right-click carries real client coords; a
+ * synthetic or keyboard contextmenu can arrive at 0,0, so fall back to the row's
+ * own box so the menu does not open in the corner of the screen. The box is read
+ * lazily, so a pointer right-click never pays for a layout read.
  */
 export function socialRowMenuPoint(
   ev: { clientX: number; clientY: number },
-  rowRect: { left: number; bottom: number } | null,
+  rowRect: () => { left: number; bottom: number },
 ): { x: number; y: number } {
-  if (ev.clientX > 0 || ev.clientY > 0 || !rowRect) return { x: ev.clientX, y: ev.clientY };
-  return { x: rowRect.left, y: rowRect.bottom };
+  if (ev.clientX > 0 || ev.clientY > 0) return { x: ev.clientX, y: ev.clientY };
+  const rect = rowRect();
+  return { x: rect.left, y: rect.bottom };
 }

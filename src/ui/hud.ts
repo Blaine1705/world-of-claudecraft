@@ -863,7 +863,7 @@ import {
   tSim,
 } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
-import { livePlayerPid, socialRowMenuTarget } from './social_row_menu_core';
+import { livePlayerPid } from './social_row_menu_core';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
@@ -5175,12 +5175,10 @@ export class Hud {
     showPrompt: (text, acceptLabel, onAccept, onDecline) =>
       this.showPrompt(text, acceptLabel, onAccept, onDecline),
     startWhisper: (name) => this.startWhisper(name),
-    openPlayerMenu: (row, x, y) => {
-      const to = socialRowMenuTarget(row, this.sim);
-      if (to.kind === 'self') this.openSelfContextMenu(x, y);
-      else if (to.kind === 'unit') this.openContextMenu(to.pid, to.name, x, y);
-      else this.openChatPlayerContextMenu(to.name, x, y);
-    },
+    openSelfMenu: (x, y) => this.openSelfContextMenu(x, y),
+    openUnitMenu: (pid, name, x, y) => this.openContextMenu(pid, name, x, y),
+    openNameMenu: (name, x, y) => this.openChatPlayerContextMenu(name, x, y),
+    isMobileLayout: () => this.isMobileLayout(),
   });
   // Set by main.ts once the realm's /api/status advert answers, which lands AFTER
   // this window is constructed: a hosted dev/PBE realm booted with

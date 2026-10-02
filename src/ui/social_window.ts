@@ -52,9 +52,15 @@ import {
 } from './guild_ranks_view';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import { classColorCss } from './inspect_view';
+import { bindMobileFrameLongPress } from './mobile_frame_long_press';
 import { moneyHtml } from './money_html';
 import { localizeZone } from './server_i18n';
-import { type SocialRowPlayer, socialRowMenuPoint, socialRowPlayer } from './social_row_menu_core';
+import {
+  type SocialRowPlayer,
+  socialRowMenuPoint,
+  socialRowMenuTarget,
+  socialRowPlayer,
+} from './social_row_menu_core';
 import {
   blockRows,
   friendRows,
@@ -143,8 +149,14 @@ export interface SocialWindowDeps {
   showPrompt(text: string, acceptLabel: string, onAccept: () => void, onDecline: () => void): void;
   /** Open the chat bar pre-filled with a whisper to this player. */
   startWhisper(name: string): void;
-  /** A row right-click: open the menu that player's unit frame opens (social_row_menu_core). */
-  openPlayerMenu(row: SocialRowPlayer, x: number, y: number): void;
+  // The player menus a row right-click (or a touch long-press) can open; which one
+  // is social_row_menu_core's call: your own unit frame's menu, another player's
+  // unit-frame menu (pid-keyed), or the by-name menu a chat name opens.
+  openSelfMenu(x: number, y: number): void;
+  openUnitMenu(pid: number, name: string, x: number, y: number): void;
+  openNameMenu(name: string, x: number, y: number): void;
+  /** The touch layout, which gates the long-press path exactly as the unit frames do. */
+  isMobileLayout(): boolean;
 }
 
 function cap(s: string): string {
@@ -435,6 +447,9 @@ export class SocialWindow {
   // every structural repaint; applyGuildCreateLock re-stamps the fresh button.
   private guildCreateLocked = false;
   private guildCreateTimer: number | undefined;
+  // The player row under the last pointerdown in the body, read by the touch
+  // long-press (its callback carries only the press point).
+  private pressedRow: HTMLElement | null = null;
   // Who tab: the local sort / class chip plus the last server-side search
   // (who_tab_view.ts owns the decisions). Window-local like the tab itself.
   private who: WhoTabState = { ...DEFAULT_WHO_TAB_STATE };
@@ -718,8 +733,21 @@ export class SocialWindow {
     if (body) {
       body.addEventListener('click', (e) => this.onBodyClick(e));
       // Right-click on a player row opens that player's menu, delegated the same
-      // way so it survives every refreshList swap.
+      // way so it survives every refreshList swap. Touch has no right-click (iOS
+      // never fires contextmenu), so a long-press opens it too, as on the frames.
       body.addEventListener('contextmenu', (e) => this.onBodyContextMenu(e as MouseEvent));
+      body.addEventListener('pointerdown', (e) => {
+        this.pressedRow = (e.target as HTMLElement).closest<HTMLElement>('[data-player]');
+      });
+      bindMobileFrameLongPress(
+        body,
+        (x, y) => {
+          const player = this.pressedRow ? socialRowPlayer(this.pressedRow.dataset) : null;
+          if (player) this.openPlayerMenu(player, x, y);
+        },
+        () => this.deps.isMobileLayout(),
+        { ignoreSelector: 'input, select, textarea' },
+      );
       // Enter in the billboard edit input saves. Delegated on the persistent
       // body like the click handler, so it survives every refreshList swap.
       body.addEventListener('keydown', (e) => {
@@ -945,9 +973,16 @@ export class SocialWindow {
     const player = row ? socialRowPlayer(row.dataset) : null;
     if (!row || !player) return;
     e.preventDefault();
-    const { x, y } = socialRowMenuPoint(e, row.getBoundingClientRect());
+    const { x, y } = socialRowMenuPoint(e, () => row.getBoundingClientRect());
+    this.openPlayerMenu(player, x, y);
+  }
+
+  private openPlayerMenu(player: SocialRowPlayer, x: number, y: number): void {
     this.deps.hideTooltip();
-    this.deps.openPlayerMenu(player, x, y);
+    const to = socialRowMenuTarget(player, this.deps.world());
+    if (to.kind === 'self') this.deps.openSelfMenu(x, y);
+    else if (to.kind === 'unit') this.deps.openUnitMenu(to.pid, to.name, x, y);
+    else this.deps.openNameMenu(to.name, x, y);
   }
 
   // The Ranks tab body: null (hidden tab) falls back to the empty state.

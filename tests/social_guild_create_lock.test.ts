@@ -65,7 +65,10 @@ function openWindow(): SocialWindow {
     restoreFocus: noop,
     showPrompt: noop,
     startWhisper: noop,
-    openPlayerMenu: noop,
+    openSelfMenu: noop,
+    openUnitMenu: noop,
+    openNameMenu: noop,
+    isMobileLayout: () => false,
   };
   const win = new SocialWindow(deps);
   win.toggle();

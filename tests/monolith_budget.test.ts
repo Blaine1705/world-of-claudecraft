@@ -537,10 +537,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    // LOWERED 18093 -> 18092 by the Social row right-click menu: the by-name pid
-    // lookup moved to src/ui/social_row_menu_core.ts (livePlayerPid), which paid
-    // for the new openPlayerMenu dep wiring with a line to spare.
-    ceiling: 18092,
+    // LOWERED 18093 -> 18090 by the Social row right-click menu: the by-name pid
+    // lookup moved to src/ui/social_row_menu_core.ts (livePlayerPid) and the row
+    // routing lives in social_window.ts, so hud.ts keeps only one-line menu deps.
+    ceiling: 18090,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
