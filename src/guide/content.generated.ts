@@ -6131,6 +6131,34 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_beastmaster_apart",
+    "name": "Kept at Bay",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_gorgebloom_clean",
+    "name": "Weed Control",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_zulgar_uncaught",
+    "name": "Never Caught",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_great_saurian",
+    "name": "Toppled Titan",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -6575,6 +6603,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Fangknife of Zulgar"
+      },
+      {
+        "kind": "item",
+        "name": "Falls-Blessed Staff"
       }
     ]
   },
@@ -6610,6 +6642,22 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Paired Talons"
+      },
+      {
+        "kind": "item",
+        "name": "Fanglord's Whistle"
+      },
+      {
+        "kind": "item",
+        "name": "Fanglord's Hide Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Gorgebloom Seedpod"
+      },
+      {
+        "kind": "item",
+        "name": "Thorncrowned Greathelm"
       }
     ]
   },

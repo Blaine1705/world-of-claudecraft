@@ -3439,6 +3439,16 @@ const ITEM_ENTITY_IDS = [
   'prime_draft_core_plate',
   'heartless_gearmask',
   'draft_record',
+  // The Wildheart Basin rework's loot (sim/content/wildheart_items.ts).
+  'beastpit_warbelt',
+  'jaguar_hide_jerkin',
+  'hexbone_handwraps',
+  'rootbound_sabatons',
+  'pollen_dusted_leggings',
+  'bloomsilk_cowl',
+  'falls_blessed_staff',
+  'fanglords_hide_mantle',
+  'thornroot_greathelm',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4438,6 +4448,16 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   prime_draft_core_plate: 'Prime Draft Core-Plate',
   heartless_gearmask: 'Heartless Gearmask',
   draft_record: 'Draft Record',
+  // The Wildheart Basin rework's loot.
+  beastpit_warbelt: 'Beastpit Warbelt',
+  jaguar_hide_jerkin: 'Jaguar-Hide Jerkin',
+  hexbone_handwraps: 'Hexbone Handwraps',
+  rootbound_sabatons: 'Rootbound Sabatons',
+  pollen_dusted_leggings: 'Pollen-Dusted Leggings',
+  bloomsilk_cowl: 'Bloomsilk Cowl',
+  falls_blessed_staff: 'Falls-Blessed Staff',
+  fanglords_hide_mantle: "Fanglord's Hide Mantle",
+  thornroot_greathelm: 'Thorncrowned Greathelm',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -19834,7 +19834,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.foundryAlert.cellTitle': '폭풍 전지 (정전기: 초당 {amount})',
   'hudChrome.foundryAlert.cellClosedLine': '중심 해치가 닫혀 있습니다: 금색 고리 밖에서 기다리세요',
   'hudChrome.foundryAlert.cellWarnLine': '중심 해치가 열리고 있습니다: 금색 고리 옆에서 대기하세요',
-  'hudChrome.foundryAlert.cellOpenLine': '중심 해치가 열렸습니다: 지금 금색 고리 안으로 들어가세요!',
+  'hudChrome.foundryAlert.cellOpenLine':
+    '중심 해치가 열렸습니다: 지금 금색 고리 안으로 들어가세요!',
   'hudChrome.foundryAlert.dropKey': '{key} 키를 눌러 전지를 내려놓고 다른 사람에게 넘기세요',
   'hudChrome.foundryAlert.dropClick': '여기를 클릭해 전지를 내려놓고 다른 사람에게 넘기세요',
   'hudChrome.foundryAlert.dropTap': '여기를 눌러 전지를 내려놓고 다른 사람에게 넘기세요',
@@ -19885,6 +19886,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상과의 거리가 {from}미터를 넘는 {stepYards}미터마다 주는 피해가 {perStep}% 증가합니다(최대 {max}%).',
   'hudChrome.auraEffect.trinket.overclock': '시전 속도가 {pct}% 증가합니다. 끝나면 과열됩니다.',
   'hudChrome.auraEffect.trinket.overheated': '시전 속도가 {pct}% 감소합니다.',
+  'entities.items.beastpit_warbelt.name': '야수 구덩이 전투 허리띠',
+  'entities.items.jaguar_hide_jerkin.name': '재규어 가죽 조끼',
+  'entities.items.hexbone_handwraps.name': '저주뼈 손싸개',
+  'entities.items.rootbound_sabatons.name': '뿌리 얽힌 철장화',
+  'entities.items.pollen_dusted_leggings.name': '꽃가루 묻은 다리보호구',
+  'entities.items.bloomsilk_cowl.name': '꽃비단 두건',
+  'entities.items.falls_blessed_staff.name': '폭포의 축복을 받은 지팡이',
+  'entities.items.fanglords_hide_mantle.name': '송곳니 군주의 가죽 어깨걸이',
+  'entities.items.thornroot_greathelm.name': '가시관 대투구',
+  'entities.items.fanglords_whistle.name': '송곳니 군주의 호루라기',
+  'entities.items.gorgebloom_seedpod.name': '탐식화 씨앗꼬투리',
+  'hudChrome.trinkets.use.spiritPack':
+    '{duration}초 동안 영혼 재규어를 불러 곁에서 싸우게 합니다. 재규어는 대상에게 달려가 {every}초마다 물어뜯어 {min}~{max}의 물리 피해를 주며, 다른 적을 대상으로 지정하면 그 적에게로 옮겨 갑니다. 지정한 적이 없으면 {range}미터 내에서 당신과 가장 가까운 적을 공격합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가하며, 불러낼 때 결정됩니다. {range}미터 내의 적대적 대상이 필요합니다.',
+  'hudChrome.trinkets.use.seedburst':
+    '{range}미터 내의 대상에게 씨앗을 심습니다. {delay}초 후 씨앗이 대상이 있는 곳(또는 죽은 곳)에서 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 대상이 먼저 죽었다면 피해가 {bonus}% 증가합니다({empowered}). 피해량은 주문력에 비례해 증가하며, 심을 때 결정됩니다. 씨앗이 터지기 전에 당신이 죽으면 씨앗은 시듭니다.',
+  'hudChrome.auraEffect.trinket.spiritPack':
+    '영혼 재규어가 곁에서 싸우며 {every}초마다 대상을 물어뜯어 {min}~{max}의 물리 피해를 줍니다.',
+  'hudChrome.auraEffect.trinket.seedburst':
+    '탐식화의 씨앗입니다. 이 효과가 끝나면 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 그 전에 이 적이 죽으면 피해가 {bonus}% 증가합니다({empowered}).',
   'entities.npcs.lift_warden_corwin.name': '승강기 관리인 코윈 애시비',
   'entities.npcs.lift_warden_corwin.title': '폭풍선 승강기 관리자',
   'entities.npcs.lift_warden_corwin.greeting':
@@ -19913,7 +19933,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_sf_forgefathers_isle.completion':
     '그의 첫 초안이군요. 그러니까 폭풍이 불보다 먼저였어요. 그렇다면 그가 무엇을 대신하려 했는지, 왜 그의 자동인형이 모두 실패했는지 알겠어요. 가까이 있어요. 나머지는 함께 읽어요.',
   'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '기록관 메일린 찾기',
-  'hudChrome.finder.mech.moving_belts': '움직이는 벨트(바닥이 몸을 실어 나르며 레버를 당기면 반대로 돈다)',
+  'hudChrome.finder.mech.moving_belts':
+    '움직이는 벨트(바닥이 몸을 실어 나르며 레버를 당기면 반대로 돈다)',
   'hudChrome.finder.mech.stamping_press': '프레스(프레스 앞의 칠해진 띠에서 벗어나라)',
   'hudChrome.finder.mech.target_lock': '표적 고정(계속 움직여라: 포탄은 서 있던 자리에 떨어진다)',
   'hudChrome.finder.mech.proof_shot': '시험 사격(탱커의 장갑을 찌그러뜨리는 무거운 포탄)',
@@ -19922,13 +19943,70 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.storm_cells': '폭풍 전지(열린 중심 해치로 전지를 옮겨라)',
   'hudChrome.finder.mech.piston_fist': '피스톤 주먹(표시된 원에서 벗어나라)',
   'hudChrome.finder.mech.tremor_step': '진동 발걸음(발 근처에서 떨어져라)',
-  'hudChrome.finder.mech.overtime_cross_feed': '초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돈다)',
+  'hudChrome.finder.mech.overtime_cross_feed':
+    '초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돈다)',
   'hudChrome.finder.mech.walking_barrage': '이동 탄막(표식 세 개, 포탄이 파편을 남긴다)',
-  'hudChrome.finder.mech.split_plating': '급속 순환과 분할 장갑(더 빨리 뒤집히고 등 쪽은 반대 면이다)',
+  'hudChrome.finder.mech.split_plating':
+    '급속 순환과 분할 장갑(더 빨리 뒤집히고 등 쪽은 반대 면이다)',
   'hudChrome.finder.mech.double_load': '막힌 거치대와 이중 장전(해치가 열린 동안 전지 두 개)',
   'abilityUi.cast.wildheart_ancestral_sap': '선조의 수액',
   'abilityUi.cast.wildheart_plant_totem': '토템 심기',
   'abilityUi.cast.wildheart_entangling_lash': '휘감는 채찍',
   'abilityUi.cast.wildheart_saurian_tail_swipe': '꼬리 휩쓸기',
   'abilityUi.cast.wildheart_saurian_stomp': '대지를 뒤흔드는 발구르기',
+  'abilityUi.cast.wildheart_beast_pit_quake': '야수 구덩이 진동',
+  'abilityUi.cast.wildheart_jaguar_heel': '돌아와!',
+  'abilityUi.cast.wildheart_gorgebloom_seed_rain': '씨앗 비',
+  'abilityUi.cast.wildheart_gorgebloom_vine_lash': '덩굴 채찍',
+  'abilityUi.cast.wildheart_gorgebloom_gorge': '포식',
+  'abilityUi.cast.wildheart_zulgar_pulse': '야생심장 파동',
+  'abilityUi.cast.wildheart_zulgar_spirit_hunt': '사냥의 영혼',
+  'entities.mobs.thorn_sprout.name': '가시 새싹',
+  'hudChrome.finder.mech.pack_bond': '무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)',
+  'hudChrome.finder.mech.stalk':
+    '추적 (재규어가 표식 대상을 사냥: 끌고 다니며 감속, 속박, 기절시키세요)',
+  'hudChrome.finder.mech.shared_health': '생명력 공유 (하나의 생명력: 가장 안전한 쪽을 공격하세요)',
+  'hudChrome.finder.mech.heel_frenzied_bond':
+    '돌아와! 및 광포한 유대 (재규어가 주인에게 도약, 유대 범위 20야드)',
+  'hudChrome.finder.mech.seed_rain': '씨앗 비 (깨끗한 플레이어가 싹트기 전에 씨앗을 밟으세요)',
+  'hudChrome.finder.mech.pollinate': '수분 (황금빛 플레이어는 씨앗을 피하세요, 즉시 싹이 틉니다)',
+  'hudChrome.finder.mech.vine_lash': '덩굴 채찍 (가시 통로에서 벗어나지 않으면 속박됩니다)',
+  'hudChrome.finder.mech.gorge': '포식 (방어 담당에게 강력한 물기와 독)',
+  'hudChrome.finder.mech.burrowing_seeds':
+    '파고드는 씨앗과 꽃가루 구름 (6초 뒤 플레이어 곁에서 솟아나고, 황금빛이 퍼집니다)',
+  'hudChrome.finder.mech.spirit_of_the_hunt':
+    '사냥의 영혼 (사냥감이 화신을 빛나는 태양 문양으로 끌고 가세요)',
+  'hudChrome.finder.mech.twin_prey_ambush':
+    '두 사냥감과 매복 (사냥감 둘, 이후 가장 먼 플레이어를 덮칩니다)',
+  'hudChrome.wildheartAlert.preyTitle': '당신이 사냥감입니다!',
+  'hudChrome.wildheartAlert.preyLine': '줄가르가 당신을 쫓습니다: 빛나는 태양 문양으로 끌고 가세요',
+  'hudChrome.wildheartAlert.preyWaitLine':
+    '지금은 다른 사냥감을 쫓습니다: 대비하세요, 대상이 바뀝니다',
+  'hudChrome.wildheartAlert.stalkedTitle': '추적당함!',
+  'hudChrome.wildheartAlert.stalkedLine': '재규어가 당신을 사냥합니다: 주인에게서 멀리 끌고 가세요',
+  'hudChrome.wildheartAlert.pollinatedTitle': '수분됨!',
+  'hudChrome.wildheartAlert.pollinatedLine': '씨앗에서 떨어지세요: 닿으면 싹이 틉니다',
+  'hudChrome.wildheartAlert.bondTitle': '무리의 유대',
+  'hudChrome.wildheartAlert.bondLine': '함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요',
+  'hudChrome.wildheartAlert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.wildheart.packBond':
+    '짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.',
+  'hudChrome.auraEffect.wildheart.packBondFury':
+    '짝이 가까이 있는 동안 주는 피해가 {pct}% 증가합니다.',
+  'hudChrome.auraEffect.wildheart.stalked':
+    '거대 재규어가 당신을 사냥하며 도발을 무시합니다. 물 때마다 {min}~{max}의 물리 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고 출혈을 일으킵니다. 주인에게서 멀리 끌고 가세요.',
+  'hudChrome.auraEffect.wildheart.waryStuns':
+    '이미 기절을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 기절은 통하지 않습니다.',
+  'hudChrome.auraEffect.wildheart.waryRoots':
+    '이미 속박을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 속박은 통하지 않습니다.',
+  'hudChrome.auraEffect.wildheart.warySlows':
+    '이미 감속을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 감속은 통하지 않습니다.',
+  'hudChrome.auraEffect.wildheart.pollinated':
+    '씨앗 꼬투리를 건드리면 즉시 가시 새싹이 자라납니다. 씨앗을 피하고 깨끗한 플레이어가 밟게 하세요. 아무도 건드리지 않은 꼬투리는 {seconds}초 뒤 싹이 틉니다(영웅 난이도에서는 {heroic}초 뒤 땅속으로 파고들어 가장 가까운 플레이어 곁에서 솟아납니다).',
+  'hudChrome.auraEffect.wildheart.prey':
+    '줄가르가 당신을 사냥합니다. 빛나는 태양 문양을 밟게 하면 {slow}% 느려집니다. 붙잡히면 물어뜯겨 {damage}의 피해(영웅 난이도 {heroic})를 입고 {stun}초 동안 쓰러집니다.',
+  'hudChrome.auraEffect.wildheart.avatar':
+    '이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.',
+  'hudChrome.auraEffect.wildheart.vanished':
+    '모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다.',
 };

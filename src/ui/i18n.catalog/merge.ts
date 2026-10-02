@@ -670,6 +670,15 @@ const mergeStringsEn = {
       wildheart_entangling_lash: 'Entangling Lash',
       wildheart_saurian_tail_swipe: 'Tail Swipe',
       wildheart_saurian_stomp: 'Earthshaking Stomp',
+      // The Wildheart Basin's three bosses (encounters/wildheart_basin). None
+      // of these bars can be kicked.
+      wildheart_beast_pit_quake: 'Beast Pit Quake',
+      wildheart_jaguar_heel: 'Heel!',
+      wildheart_gorgebloom_seed_rain: 'Seed Rain',
+      wildheart_gorgebloom_vine_lash: 'Vine Lash',
+      wildheart_gorgebloom_gorge: 'Gorge',
+      wildheart_zulgar_pulse: 'Wildheart Pulse',
+      wildheart_zulgar_spirit_hunt: 'Spirit of the Hunt',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

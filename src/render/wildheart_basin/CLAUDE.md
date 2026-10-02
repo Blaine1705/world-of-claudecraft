@@ -20,11 +20,22 @@ are the single source; everything here derives from them.
 | `basin_lights.ts` | Brazier flames, halos and floor pools (the floor ladder's `ground` rung), the jaguar's eye glow, and the budgeted point lights through the fire-light sink. |
 | `basin_gates.ts` | The vine bridges weaving segment by segment (Kit_VineBridge instances), the thorn walls sinking and surging back sealed (Kit_ThornWall), the warded arch and the Shrine Ward, driven by the shared gate memory. |
 | `basin_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the telegraph specs from the sim tuning (Tail Swipe rear cone, Stomp ring, Entangling Lash lane, the Sap kick glyph), the spore cloud's look, the Saurian's drawn proportions and the effect timelines. |
-| `basin_fx.ts` | `WildheartFx`: the floor telegraphs (the shared `../floor_telegraph` kit) and the creature effects: the Stomp's shock and dust, the Tail Swipe's sweep, the howdah bursting, the enrage glow, the totem pulses, the sap beam, the vines on a rooted player, the Pounce trail, the spore fog, the waders' foam, the jaguar's eyes burning while Zulgar fights. |
+| `basin_fx.ts` | `WildheartFx`: the floor telegraphs (the shared `../floor_telegraph` kit) and the creature effects: the Stomp's shock and dust, the Tail Swipe's sweep, the howdah bursting, the enrage glow, the totem pulses, the sap beam, the vines on a rooted player (the trash lash and the Gorgebloom's Vine Lash, `VINE_ROOT_AURAS`), the Pounce trail, the spore fog, the waders' foam, the jaguar's eyes (`jaguarEyesBurn`: a gleam idle, a smoulder while Zulgar fights, full fire during the Jaguar Avatar's hunt). Every encounter object's floor edge (`BASIN_OBJECT_SPECS`: spore clouds, seedpods, sun glyphs, the Ambush circle) rides its pooled object slots; only the spore cloud fogs (`fog`), persistent objects stand as long as the sim keeps them, and a template that flips in place (a pod ripening, a glyph going dark) re-lays its look. Composes `BasinBossFx`. |
+| `basin_fx_host.ts` | `BasinFxHost`: the type-only seam WildheartFx lends the boss modules (its root, kit, particle pools, shock rings). |
+| `basin_boss_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the three bosses' cast specs from the sim tuning (`basinBossCastSpecs`: Beast Pit Quake and Wildheart Pulse rings, the Heel! lane jaguar to master, the locked Vine Lash lane, Gorge's tank-buster mark, the Seed Rain and Spirit of the Hunt charge sigils), the aura dressing (`BASIN_AURA_LOOKS`, `BASIN_HEAD_MARKS`), the Pack Bond cord's brightness (`bondCordStrength`, over the sim's `bondStrength`), the pods' swell, the seeds' arc, the glyph and shock looks, the bodies' drawn heights. |
+| `basin_boss_fx.ts` | `BasinBossFx` (PLACEHOLDER looks): the boss cast telegraphs on the shared kit, the charge sigils, the seedpod bodies and the lobbed seeds, the sun glyph overlays, the head marks (Stalked, Prey), the aura glows and motes, the Thickhide Ward shell, the Pack Bond cord. Built under WildheartFx's root before its gated attach; no light. |
+| `basin_boss_bursts.ts` | `playBasinBossBurst`: the one-shot bursts of every boss `spellfx` event (cosmetic, through the host's pools and rings). |
 | `basin_kit.ts` / `basin_kit_plan_core.ts` | The Blender kit (`public/models/props/wildheart_basin_kit.glb`) and its placements: every prop, the caldera ring, the gorge jungle, the pyramid, the jaguar head. Owned by the kit build (`docs/design/dungeon-rework/kit/build_wildheart_basin_kit.py`). |
 
 The placeholder creature looks live in `../characters/wildheart_creature_looks.ts`
-(merged into the manifest; the Great Saurian's look is temporary until its Blender body).
+(merged into the manifest; the Great Saurian's look is temporary until its Blender body,
+the Thorn Sprout's a shrunken thorny-green treant).
+
+The boss layer is PLACEHOLDER: the art phase replaces looks, never sizes (those are the
+sim's). Known gaps it owns: Zulgar's model must hide while `ZULGAR_VANISHED` holds (the
+fx only throws smoke at the vanish and the landing, and the renderer still draws him),
+the Avatar wants a real spirit-jaguar body over the glow, and the pods want a modelled
+seed in place of the ovoid.
 
 Rules:
 - Cosmetic only: nothing here decides or hides an outcome. Spray, mist, motes, birds and the
@@ -40,8 +51,9 @@ Rules:
   or in the fx root (attached through `attachSceneGroupGated`); module caches are marked
   shared so the interior sweep never disposes them.
 - Floor marks sit on the floor ladder (`../floor_vfx_layer.ts`): brazier pools on `ground`,
-  every telegraph and creature effect on `encounter`; the sky, water, falls and air are
-  registered out of scope in `tests/floor_vfx_layer.test.ts`.
+  every telegraph and creature effect on `encounter` (`basin_fx.ts` and `basin_boss_fx.ts`
+  both registered strict); the sky, water, falls and air are registered out of scope in
+  `tests/floor_vfx_layer.test.ts`.
 
 Tests: `tests/wildheart_basin_render_core.test.ts` (the cores), `tests/wildheart_field_lights.test.ts`
 (the light state), `tests/wildheart_basin_kit.test.ts` (the kit). Evidence:

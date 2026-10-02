@@ -3135,6 +3135,8 @@ export const zh_TW: EnTranslations = {
         "shackle": "用鎖鏈將 {range} 碼內的目標束縛在原地，持續 {duration} 秒。免疫控制的生物（例如首領）改為移動速度降低 {slow}%，除非它也免疫緩速。",
         "rangefinder": "在 {duration} 秒內，你與目標之間的距離每超過 {from} 碼 {stepYards} 碼，你造成的傷害提高 {perStep}%，在 {maxAt} 碼或更遠時最多提高 {max}%。",
         "overclock": "使你的施法速度提高 {haste}%，持續 {duration} 秒。效果結束時你會過熱：施法速度降低 {slow}%，持續 {overheat} 秒。",
+        "spiritPack": "召喚一隻靈魂美洲豹在你身邊戰鬥，持續{duration}秒。牠會奔向你的目標，每{every}秒撕咬一次，造成{min}到{max}點物理傷害，並會轉而攻擊你選中的其他敵人。若你沒有選中敵人，牠會攻擊{range}碼內離你最近的敵人。傷害隨攻擊強度或遠程攻擊強度（取較高者）提高，在召喚時確定。需要{range}碼內的敵對目標。",
+        "seedburst": "在{range}碼內的目標身上種下一顆種子。{delay}秒後，種子在目標所在處（或其死亡處）爆裂，對{radius}碼內的每個敵人造成{damage}點自然傷害；若目標先行死亡，傷害提高{bonus}%（{empowered}）。傷害隨法術強度提高，在種下時確定。若你在種子爆裂前死亡，種子會枯萎。",
         "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。"
       }
     },
@@ -3909,6 +3911,18 @@ export const zh_TW: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "夥伴靠近時受到的傷害降低{pct}%。將馴獸師和他的美洲豹拉開即可打破羈絆。",
+        "packBondFury": "夥伴靠近時造成的傷害提高{pct}%。",
+        "stalked": "巨型美洲豹在追獵你，且無視嘲諷。每次撕咬造成{min}到{max}點物理傷害（英雄難度{heroicMin}到{heroicMax}點）並造成流血。把牠引離牠的主人。",
+        "waryStuns": "牠已被擊暈過一次。在此效果結束前，後續的擊暈都會失效。",
+        "waryRoots": "牠已被定身過一次。在此效果結束前，後續的定身都會失效。",
+        "warySlows": "牠已被減速過一次。在此效果結束前，後續的減速都會失效。",
+        "pollinated": "觸碰種莢會使其立刻長出荊棘幼芽。遠離種子，讓未授粉的玩家去踩碎它們；無人觸碰的種莢會在{seconds}秒後發芽（英雄難度下它會在{heroic}秒後鑽入地下，在最近的玩家身旁破土而出）。",
+        "prey": "祖爾加在追獵你。引他踏過點亮的太陽符文，使他減速{slow}%。若被他追上，你會被撕咬，受到{damage}點傷害（英雄難度{heroic}點）並被擊倒{stun}秒。",
+        "avatar": "移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。",
+        "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。"
+      },
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
       "makersBrand": "持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。",
@@ -4036,6 +4050,8 @@ export const zh_TW: EnTranslations = {
         "rangefinder": "你與目標之間的距離每超過 {from} 碼 {stepYards} 碼，造成的傷害提高 {perStep}%，最多 {max}%。",
         "overclock": "施法速度提高 {pct}%。效果結束時會過熱。",
         "overheated": "施法速度降低 {pct}%。",
+        "spiritPack": "一隻靈魂美洲豹在你身邊戰鬥，每{every}秒撕咬你的目標一次，造成{min}到{max}點物理傷害。",
+        "seedburst": "噬花的種子。此效果結束時爆裂，對{radius}碼內的每個敵人造成{damage}點自然傷害；若此敵人在此之前死亡，傷害提高{bonus}%（{empowered}）。",
         "forgeHeat": "熱量：{stacks}/{max}。使用熔鑄之父的淬火會消耗所有熱量，使其武器火焰傷害提高 {pct}%。",
         "tempered": "你的近戰和遠程武器命中額外造成 {damage} 點火焰傷害（消耗的熱量使其提高 {pct}%）。每次致命一擊延長 {killExtend} 秒，總計最多 {maxDuration} 秒。",
         "temperedOther": "近戰和遠程武器命中額外造成火焰傷害，消耗的熱量使其提高 {pct}%。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
@@ -6030,7 +6046,18 @@ export const zh_TW: EnTranslations = {
         "overtime_cross_feed": "加班與交叉供料（傳送帶更快，相鄰的反向運行）",
         "walking_barrage": "徐進彈幕（三個標記，砲彈會留下彈片）",
         "split_plating": "快速循環與分裂裝甲（翻轉更快，背面是另一種裝甲）",
-        "double_load": "卡住的電池架與雙重裝填（一次艙門窗口放入兩枚電池）"
+        "double_load": "卡住的電池架與雙重裝填（一次艙門窗口放入兩枚電池）",
+        "pack_bond": "獸群羈絆（兩者相鄰時傷害減半：將牠們拉開15碼）",
+        "stalk": "潛行追獵（美洲豹追獵被標記的玩家：風箏牠，減速、定身、擊暈牠）",
+        "shared_health": "共享生命（同一血池：攻擊最安全的那個）",
+        "heel_frenzied_bond": "回來！與狂熱羈絆（美洲豹躍回主人身邊，羈絆範圍擴至20碼）",
+        "seed_rain": "種子雨（未授粉的玩家在種子發芽前踩碎它們）",
+        "pollinate": "授粉（金色的玩家遠離種子，否則它們會立刻發芽）",
+        "vine_lash": "藤鞭（離開荊棘通道，否則會被定身）",
+        "gorge": "吞噬（對坦克的重咬和毒素）",
+        "burrowing_seeds": "鑽地種子與花粉雲（種子6秒後在玩家身旁破土，金色會傳染）",
+        "spirit_of_the_hunt": "狩獵之魂（獵物引著化身穿過點亮的太陽符文）",
+        "twin_prey_ambush": "雙重獵物與伏擊（兩個獵物，隨後撲向最遠的玩家）"
       }
     },
     "bastionCage": {
@@ -6078,6 +6105,18 @@ export const zh_TW: EnTranslations = {
       "chargedLine": "法術有效；物理傷害會被儲存為電荷",
       "splitLine": "它的背面是另一種裝甲",
       "storedAria": "下一次放電前儲存的電荷：{pct}"
+    },
+    "wildheartAlert": {
+      "preyTitle": "你是獵物！",
+      "preyLine": "祖爾加在追獵你：引他穿過點亮的太陽符文",
+      "preyWaitLine": "他正在追另一個獵物：做好準備，他會切換",
+      "stalkedTitle": "被追獵！",
+      "stalkedLine": "美洲豹在追獵你：把牠引離牠的主人",
+      "pollinatedTitle": "已授粉！",
+      "pollinatedLine": "遠離種子：你的觸碰會讓它們發芽",
+      "bondTitle": "獸群羈絆",
+      "bondLine": "在一起時牠們傷害減半：把牠們拉開",
+      "timeAria": "剩餘{seconds}秒"
     },
     "cosmetics": {
       "title": "外觀",
@@ -12390,7 +12429,14 @@ export const zh_TW: EnTranslations = {
       "wildheart_plant_totem": "安置圖騰",
       "wildheart_entangling_lash": "纏繞鞭笞",
       "wildheart_saurian_tail_swipe": "甩尾",
-      "wildheart_saurian_stomp": "撼地踐踏"
+      "wildheart_saurian_stomp": "撼地踐踏",
+      "wildheart_beast_pit_quake": "獸坑震盪",
+      "wildheart_jaguar_heel": "回來！",
+      "wildheart_gorgebloom_seed_rain": "種子雨",
+      "wildheart_gorgebloom_vine_lash": "藤鞭",
+      "wildheart_gorgebloom_gorge": "吞噬",
+      "wildheart_zulgar_pulse": "荒野之心脈衝",
+      "wildheart_zulgar_spirit_hunt": "狩獵之魂"
     }
   },
   "questUi": {
@@ -18777,6 +18823,33 @@ export const zh_TW: EnTranslations = {
       "draft_record": {
         "name": "設計圖記錄"
       },
+      "beastpit_warbelt": {
+        "name": "獸坑戰腰帶"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "美洲豹皮短上衣"
+      },
+      "hexbone_handwraps": {
+        "name": "咒骨裹手"
+      },
+      "rootbound_sabatons": {
+        "name": "縛根鐵靴"
+      },
+      "pollen_dusted_leggings": {
+        "name": "沾滿花粉的護腿"
+      },
+      "bloomsilk_cowl": {
+        "name": "花綢兜帽"
+      },
+      "falls_blessed_staff": {
+        "name": "瀑布祝福法杖"
+      },
+      "fanglords_hide_mantle": {
+        "name": "獠牙領主的獸皮肩甲"
+      },
+      "thornroot_greathelm": {
+        "name": "荊冠巨盔"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19640,6 +19713,12 @@ export const zh_TW: EnTranslations = {
       },
       "overclocked_governor": {
         "name": "超頻調速器"
+      },
+      "fanglords_whistle": {
+        "name": "獠牙領主的哨子"
+      },
+      "gorgebloom_seedpod": {
+        "name": "噬花種莢"
       },
       "rift_watchers_band": {
         "name": "裂隙守望者指環"
@@ -20665,6 +20744,9 @@ export const zh_TW: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地之聲祖爾加"
+      },
+      "thorn_sprout": {
+        "name": "荊棘幼芽"
       },
       "ironvein_foreman": {
         "name": "鐵脈工頭"

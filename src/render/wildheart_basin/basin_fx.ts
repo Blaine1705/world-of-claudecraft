@@ -15,6 +15,8 @@
 //  - the ford's foam round the Saurian's legs (the water's wader uniform) and
 //    the jaguar's eyes burning while Zulgar fights.
 // Every telegraph is the shared floor telegraph kit (../floor_telegraph).
+// The three bosses' visuals are their own module (basin_boss_fx.ts), composed
+// here: it draws under this root, on this kit, through these pools.
 //
 // Rules (src/render/CLAUDE.md): pooled geometry and materials built once,
 // attached through the compile gate, no per-frame allocation in the pools.
@@ -31,11 +33,11 @@ import {
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
   SAURIAN_TUNING,
+  ZULGAR_AVATAR,
   ZULGAR_ID,
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ANCESTRAL_SAP,
-  WILDHEART_ENTANGLED,
   WILDHEART_POUNCE,
   WILDHEART_SPORE_BURST,
   WILDHEART_TOTEM_PULSE,
@@ -55,8 +57,11 @@ import {
 } from '../hollow_crypt/crypt_fx_particles';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { radialGlowTexture } from '../textures';
+import { BasinBossFx } from './basin_boss_fx';
+import { shockRingLook } from './basin_boss_fx_core';
 import {
   BASIN_OBJECT_SPECS,
+  type BasinPuffOptions,
   type BasinTelegraphSpec,
   basinCastFill,
   basinTelegraphSpecs,
@@ -64,6 +69,7 @@ import {
   enrageGlow,
   entangleGrowth,
   jaguarEyesBurn,
+  objectFill,
   POUNCE_TRAIL_SECONDS,
   SAURIAN_DRAW,
   STOMP_SHOCK_SECONDS,
@@ -72,21 +78,23 @@ import {
   stompShock,
   TOTEM_PULSE_SECONDS,
   totemPulse,
+  VINE_ROOT_AURAS,
   waderRadius,
 } from './basin_fx_core';
+import type { BasinFxHost } from './basin_fx_host';
 import { setBasinJaguarEyesBurn } from './basin_kit';
 import { BASIN_WATER_WADERS } from './basin_water';
 
 const CAST_SLOTS = 10;
 const LANE_SLOTS = 4;
-const CLOUD_SLOTS = 10;
-const RING_SLOTS = 10;
+/** Spore clouds plus the bosses' objects: about 12 seedpods, the 6 sun
+ *  glyphs and the Ambush circle. */
+const CLOUD_SLOTS = 24;
+const RING_SLOTS = 16;
 const BEAM_SLOTS = 4;
-const VINE_SLOTS = 6;
+const VINE_SLOTS = 8;
 const ENRAGE_SLOTS = 2;
 const SCAN_SEC = 0.1;
-
-type Rgb = readonly [number, number, number];
 
 interface CastSlot extends TelegraphFan {
   casterId: number;
@@ -97,14 +105,23 @@ interface LaneSlot extends TelegraphLane {
 }
 interface CloudSlot extends TelegraphFan {
   objectId: number;
+  /** The template its look was laid for (a pod ripens, a glyph goes dark). */
+  templateId: string;
   since: number;
   emit: number;
+  /** Where it was last draped (an object that stays put drapes once). */
+  drapedX: number;
+  drapedZ: number;
+  drapedR: number;
 }
 interface Ring {
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
   born: number;
-  kind: 'stomp' | 'pulse';
+  kind: 'stomp' | 'pulse' | 'shock';
+  /** A shock's reach (yards) and span (seconds). */
+  radius: number;
+  span: number;
   alive: boolean;
 }
 interface Beam {
@@ -180,6 +197,7 @@ export class WildheartFx {
   private readonly enrages: EnrageSlot[] = [];
   private readonly trails = new Map<number, number>();
   private readonly kit: TelegraphKit;
+  private readonly boss: BasinBossFx | null;
   private readonly smoke: ParticlePool;
   private readonly glow: ParticlePool;
   private readonly uTime = { value: 0 };
@@ -209,7 +227,9 @@ export class WildheartFx {
   private scan = 0;
   private clock = 0;
   private inBasin = false;
-  private zulgarEngaged = false;
+  private zulgarState: 'idle' | 'fight' | 'hunt' = 'idle';
+  /** The boss layer drew last frame (put away once on leaving the basin). */
+  private bossShown = false;
   private disposed = false;
 
   constructor(
@@ -231,7 +251,16 @@ export class WildheartFx {
       this.casts.push({ ...this.kit.fan(18), casterId: -1, castId: '' });
     for (let i = 0; i < LANE_SLOTS; i++) this.lanes.push({ ...this.kit.lane(17), casterId: -1 });
     for (let i = 0; i < CLOUD_SLOTS; i++)
-      this.clouds.push({ ...this.kit.fan(16), objectId: -1, since: 0, emit: 0 });
+      this.clouds.push({
+        ...this.kit.fan(16),
+        objectId: -1,
+        templateId: '',
+        since: 0,
+        emit: 0,
+        drapedX: Number.NaN,
+        drapedZ: Number.NaN,
+        drapedR: 0,
+      });
     const particleMat = (frag: string, blending: THREE.Blending) => {
       const m = new THREE.ShaderMaterial({
         name: 'wildheartFxParticles',
@@ -283,7 +312,7 @@ export class WildheartFx {
       mesh.visible = false;
       mesh.renderOrder = floorVfxRenderOrder('encounter', 4);
       this.root.add(mesh);
-      this.rings.push({ mesh, mat, born: 0, kind: 'stomp', alive: false });
+      this.rings.push({ mesh, mat, born: 0, kind: 'stomp', radius: 0, span: 1, alive: false });
     }
     // The sap beams: a cylinder along +y, oriented each frame.
     const beamGeo = new THREE.CylinderGeometry(0.16, 0.16, 1, 8, 1, true).translate(0, 0.5, 0);
@@ -347,9 +376,27 @@ export class WildheartFx {
       this.root.add(sprite);
       this.enrages.push({ sprite, entityId: -1 });
     }
+    // The three bosses: built under this root before the gated attach.
+    this.boss = world ? new BasinBossFx(this.bossHost(), world) : null;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
+  }
+
+  /** What the boss layer borrows: this root, kit, pools and rings. */
+  private bossHost(): BasinFxHost {
+    return {
+      root: this.root,
+      kit: this.kit,
+      density: this.density,
+      uTime: this.uTime,
+      groundY: (x, z) => this.groundY(x, z),
+      puff: (x, y, z, n, o) => this.puff(x, y, z, n, o),
+      shockRing: (x, z, color, radius, seconds) => this.shockRing(x, z, color, radius, seconds),
+      rand: () => this.rand(),
+      reducedMotion: () => this.reducedMotion(),
+      shake: (amount) => this.shake?.(amount),
+    };
   }
 
   private rand(): number {
@@ -359,26 +406,7 @@ export class WildheartFx {
 
   // ---------------------------------------------------------------- particles
 
-  private puff(
-    x: number,
-    y: number,
-    z: number,
-    n: number,
-    o: {
-      speed: number;
-      up?: number;
-      life: number;
-      size: [number, number];
-      color: Rgb;
-      alpha: number;
-      drag?: number;
-      dir?: [number, number, number];
-      spread?: number;
-      glow?: boolean;
-      gravity?: number;
-      radius?: number;
-    },
-  ): void {
+  private puff(x: number, y: number, z: number, n: number, o: BasinPuffOptions): void {
     if (this.reducedMotion() && n > 4) n = Math.ceil(n / 3);
     const pool = o.glow ? this.glow : this.smoke;
     const count = Math.max(1, Math.round(n * this.density));
@@ -422,14 +450,24 @@ export class WildheartFx {
     }
   }
 
-  private ring(kind: Ring['kind'], x: number, z: number, color: number): void {
+  private ring(kind: Ring['kind'], x: number, z: number, color: number): Ring {
     const slot = this.rings.find((r) => !r.alive) ?? this.rings[0];
     slot.alive = true;
     slot.kind = kind;
     slot.born = this.clock;
+    slot.radius = 0;
+    slot.span = kind === 'stomp' ? STOMP_SHOCK_SECONDS : TOTEM_PULSE_SECONDS;
     (slot.mat.uniforms.uColor.value as THREE.Color).setHex(color);
     slot.mesh.position.set(x, this.groundY(x, z) + 0.14, z);
     slot.mesh.visible = true;
+    return slot;
+  }
+
+  /** A shock ring racing out to `radius` over `seconds` (the bosses' bursts). */
+  private shockRing(x: number, z: number, color: number, radius: number, seconds: number): void {
+    const slot = this.ring('shock', x, z, color);
+    slot.radius = radius;
+    slot.span = seconds;
   }
 
   // ------------------------------------------------------------------- events
@@ -588,7 +626,7 @@ export class WildheartFx {
         this.trails.set(src.id, this.clock + POUNCE_TRAIL_SECONDS);
         return false;
       default:
-        return false;
+        return this.boss?.handleEvent(ev, src) ?? false;
     }
   }
 
@@ -605,8 +643,13 @@ export class WildheartFx {
       this.scanWorld(world);
     }
     if (!this.inBasin) {
-      // Out of the basin: no wake lingers on the shared water.
+      // Out of the basin: no wake lingers on the shared water, and no boss
+      // mark or telegraph stays frozen where the fight left it.
       for (const w of BASIN_WATER_WADERS.value) w.w = 0;
+      if (this.bossShown) {
+        this.bossShown = false;
+        this.boss?.hideAll();
+      }
       this.smoke.update(this.clock);
       this.glow.update(this.clock);
       return;
@@ -620,7 +663,9 @@ export class WildheartFx {
     this.paintEnrage(world, dt);
     this.paintTrails(world, dt);
     this.paintWaders();
-    setBasinJaguarEyesBurn(jaguarEyesBurn(this.zulgarEngaged, this.clock));
+    this.bossShown = true;
+    this.boss?.update(dt, this.clock);
+    setBasinJaguarEyesBurn(jaguarEyesBurn(this.zulgarState, this.clock));
     this.smoke.update(this.clock);
     this.glow.update(this.clock);
   }
@@ -688,15 +733,36 @@ export class WildheartFx {
         slot.group.visible = false;
         continue;
       }
+      if (obj.templateId !== slot.templateId) {
+        // Its template flipped in place (a pod ripening, a glyph going dark):
+        // re-lay its look and restart its sweep.
+        this.kit.layOutFan(slot, 360, { color: spec.color, accent: spec.accent });
+        slot.templateId = obj.templateId;
+        slot.since = this.clock;
+        slot.drapedX = Number.NaN;
+      }
       const radius = obj.scale;
       const x = obj.pos.x;
       const z = obj.pos.z;
       const gy = this.groundY(x, z);
       const elapsed = this.clock - slot.since;
       const presence = cloudPresence(elapsed, spec.seconds);
-      this.kit.drapeFan(slot, this.groundY, x, gy, z, 0, radius);
-      // A standing hazard: its edge drawn full from its first tick.
-      this.kit.paintFan(slot, { fill: 1, clock: this.clock, range: radius, fade: presence });
+      if (x !== slot.drapedX || z !== slot.drapedZ || radius !== slot.drapedR) {
+        this.kit.drapeFan(slot, this.groundY, x, gy, z, 0, radius);
+        slot.drapedX = x;
+        slot.drapedZ = z;
+        slot.drapedR = radius;
+      }
+      // A standing hazard draws its edge full from its first tick; a ripe pod
+      // and the Ambush circle sweep over the seconds they leave; a pod or a
+      // glyph is a tint and a rim (a spot to use).
+      this.kit.paintFan(slot, {
+        fill: objectFill(spec, elapsed),
+        clock: this.clock,
+        range: radius,
+        fade: presence * spec.fade,
+      });
+      if (!spec.fog) continue;
       // The fog of spores boiling inside its edge (cosmetic).
       slot.emit += dt * 26 * this.density;
       while (slot.emit >= 1) {
@@ -719,13 +785,17 @@ export class WildheartFx {
     for (const r of this.rings) {
       if (!r.alive) continue;
       const elapsed = this.clock - r.born;
-      const span = r.kind === 'stomp' ? STOMP_SHOCK_SECONDS : TOTEM_PULSE_SECONDS;
-      if (elapsed > span) {
+      if (elapsed > r.span) {
         r.alive = false;
         r.mesh.visible = false;
         continue;
       }
-      const look = r.kind === 'stomp' ? stompShock(elapsed) : totemPulse(elapsed);
+      const look =
+        r.kind === 'stomp'
+          ? stompShock(elapsed)
+          : r.kind === 'pulse'
+            ? totemPulse(elapsed)
+            : shockRingLook(elapsed, r.radius, r.span);
       r.mesh.scale.setScalar(Math.max(0.01, look.radius));
       r.mat.uniforms.uAlpha.value = look.alpha;
     }
@@ -767,7 +837,7 @@ export class WildheartFx {
     for (const v of this.vines) {
       if (v.entityId < 0) continue;
       const e = world.entities.get(v.entityId);
-      if (!e || e.dead || !hasAura(e, WILDHEART_ENTANGLED)) {
+      if (!e || e.dead || !vineRooted(e)) {
         v.entityId = -1;
         v.mesh.visible = false;
         v.glow.visible = false;
@@ -853,10 +923,12 @@ export class WildheartFx {
   private scanWorld(world: IWorld): void {
     this.waders.length = 0;
     let basin = false;
-    let zulgar = false;
+    let zulgar: 'idle' | 'fight' | 'hunt' = 'idle';
+    this.boss?.beginScan();
     for (const e of world.entities.values()) {
+      if (this.boss?.scanEntity(e)) basin = true;
       if (e.kind === 'player') {
-        if (hasAura(e, WILDHEART_ENTANGLED)) this.claimVine(e);
+        if (vineRooted(e)) this.claimVine(e);
         continue;
       }
       if (e.kind !== 'mob') {
@@ -870,7 +942,7 @@ export class WildheartFx {
       }
       if (e.templateId === ZULGAR_ID) {
         basin = true;
-        zulgar = !e.dead && e.inCombat;
+        if (!e.dead && e.inCombat) zulgar = hasAura(e, ZULGAR_AVATAR) ? 'hunt' : 'fight';
       }
       if (e.dead) continue;
       const castId = e.castingAbility;
@@ -898,7 +970,7 @@ export class WildheartFx {
       slot.group.visible = true;
     }
     this.inBasin = basin || this.clouds.some((c) => c.objectId >= 0);
-    this.zulgarEngaged = zulgar;
+    this.zulgarState = zulgar;
   }
 
   private scanObject(e: Entity): void {
@@ -909,8 +981,10 @@ export class WildheartFx {
     if (!slot) return;
     this.kit.layOutFan(slot, 360, { color: spec.color, accent: spec.accent });
     slot.objectId = e.id;
+    slot.templateId = e.templateId;
     slot.since = this.clock;
     slot.emit = 0;
+    slot.drapedX = Number.NaN;
     slot.group.visible = true;
   }
 
@@ -953,10 +1027,20 @@ export class WildheartFx {
     };
     attempt(() => this.root.removeFromParent());
     attempt(() => this.kit.dispose());
+    if (this.boss) {
+      const boss = this.boss;
+      attempt(() => boss.dispose());
+    }
     for (const g of this.geometries) attempt(() => g.dispose());
     for (const m of this.materials) attempt(() => m.dispose());
     if (errors.length > 0) throw new AggregateError(errors, 'WildheartFx dispose');
   }
+}
+
+/** Is the entity held by a root the climbing vines dress (a loop). */
+function vineRooted(e: { auras?: readonly { id: string }[] }): boolean {
+  for (let i = 0; i < VINE_ROOT_AURAS.length; i++) if (hasAura(e, VINE_ROOT_AURAS[i])) return true;
+  return false;
 }
 
 /** Does the entity carry the aura (a loop: no per-frame closure). */

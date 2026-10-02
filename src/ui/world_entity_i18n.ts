@@ -351,6 +351,8 @@ const MOB_IDS = [
   'fanglord_jaguar',
   'the_gorgebloom',
   'wildheart_high_priest',
+  // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
+  'thorn_sprout',
 ] as const;
 
 const NPC_IDS = [

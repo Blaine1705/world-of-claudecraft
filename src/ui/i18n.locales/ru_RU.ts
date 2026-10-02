@@ -20200,7 +20200,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionChain.brokenAria': 'Цепь разбита: {pct}',
   'hudChrome.bastionChain.reachAria': 'Натяжение цепи: {pct}',
   'hudChrome.bastionChain.linksLeft': 'Осталось звеньев цепи: {count} из {total}',
-  'hudChrome.bastionChain.linkRule': 'Каждый удар по якорю разбивает одно звено, как бы силён он ни был',
+  'hudChrome.bastionChain.linkRule':
+    'Каждый удар по якорю разбивает одно звено, как бы силён он ни был',
   'hudChrome.bastionChain.linksTarget': 'Звеньев: {count} из {total}',
   'hudChrome.bastionChain.linkBroken': 'Звено разбито!',
   'abilityUi.cast.foundry_tock_lever': 'Рычаг',
@@ -20268,6 +20269,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.trinket.overclock':
     'Скорость произнесения увеличена на {pct}%. После окончания наступает перегрев.',
   'hudChrome.auraEffect.trinket.overheated': 'Скорость произнесения снижена на {pct}%.',
+  'entities.items.beastpit_warbelt.name': 'Боевой пояс звериных ям',
+  'entities.items.jaguar_hide_jerkin.name': 'Куртка из шкуры ягуара',
+  'entities.items.hexbone_handwraps.name': 'Обмотки из заклятой кости',
+  'entities.items.rootbound_sabatons.name': 'Сабатоны, оплетённые корнями',
+  'entities.items.pollen_dusted_leggings.name': 'Поножи в пыльце',
+  'entities.items.bloomsilk_cowl.name': 'Капюшон из цветочного шёлка',
+  'entities.items.falls_blessed_staff.name': 'Посох, благословлённый водопадами',
+  'entities.items.fanglords_hide_mantle.name': 'Кожаная мантия Повелителя клыков',
+  'entities.items.thornroot_greathelm.name': 'Великий шлем в терновом венце',
+  'entities.items.fanglords_whistle.name': 'Свисток Повелителя клыков',
+  'entities.items.gorgebloom_seedpod.name': 'Семенная коробочка Цветожора',
+  'hudChrome.trinkets.use.spiritPack':
+    'Призывает духа-ягуара, который сражается рядом с вами {duration} сек. Он бежит к вашей цели и кусает её каждые {every} сек., нанося от {min} до {max} ед. физического урона, и переключается на любого другого врага, которого вы выберете целью. Если враг не выбран, он атакует ближайшего к вам врага в радиусе {range} м. Урон растёт с силой атаки или силой дальнего боя (большей из них) и фиксируется при призыве. Требуется враждебная цель в пределах {range} м.',
+  'hudChrome.trinkets.use.seedburst':
+    'Сажает семя на вашу цель в пределах {range} м. Через {delay} сек. оно лопается там, где стоит цель (или где она погибла), нанося {damage} ед. урона от сил природы каждому врагу в радиусе {radius} м, или на {bonus}% больше ({empowered}), если цель погибла раньше. Урон растёт с силой заклинаний и фиксируется при посадке. Если вы погибнете до того, как семя лопнет, оно засохнет.',
+  'hudChrome.auraEffect.trinket.spiritPack':
+    'Дух-ягуар сражается рядом с вами, кусая вашу цель каждые {every} сек. и нанося от {min} до {max} ед. физического урона.',
+  'hudChrome.auraEffect.trinket.seedburst':
+    'Семя Цветожора. Когда эффект закончится, оно лопнет, нанося {damage} ед. урона от сил природы каждому врагу в радиусе {radius} м, или на {bonus}% больше ({empowered}), если этот враг погибнет раньше.',
   'entities.npcs.lift_warden_corwin.name': 'Смотритель подъемника Корвин Эшби',
   'entities.npcs.lift_warden_corwin.title': 'Хранитель подъемника грозовой линии',
   'entities.npcs.lift_warden_corwin.greeting':
@@ -20320,4 +20340,64 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_entangling_lash': 'Опутывающий хлыст',
   'abilityUi.cast.wildheart_saurian_tail_swipe': 'Удар хвостом',
   'abilityUi.cast.wildheart_saurian_stomp': 'Сотрясающий топот',
+  'abilityUi.cast.wildheart_beast_pit_quake': 'Сотрясение звериных ям',
+  'abilityUi.cast.wildheart_jaguar_heel': 'К ноге!',
+  'abilityUi.cast.wildheart_gorgebloom_seed_rain': 'Семенной дождь',
+  'abilityUi.cast.wildheart_gorgebloom_vine_lash': 'Удар лозы',
+  'abilityUi.cast.wildheart_gorgebloom_gorge': 'Пожирание',
+  'abilityUi.cast.wildheart_zulgar_pulse': 'Импульс Дикого Сердца',
+  'abilityUi.cast.wildheart_zulgar_spirit_hunt': 'Дух охоты',
+  'entities.mobs.thorn_sprout.name': 'Терновый росток',
+  'hudChrome.finder.mech.pack_bond':
+    'Узы стаи (вместе получают вдвое меньше урона: разведите их на 15 ярдов)',
+  'hudChrome.finder.mech.stalk':
+    'Выслеживание (ягуар охотится на отмеченного: уводите его, замедляйте, обездвиживайте, оглушайте)',
+  'hudChrome.finder.mech.shared_health': 'Общее здоровье (один запас: бейте того, кого безопаснее)',
+  'hudChrome.finder.mech.heel_frenzied_bond':
+    'К ноге! и Неистовые узы (ягуар прыгает к хозяину, узы действуют на 20 ярдов)',
+  'hudChrome.finder.mech.seed_rain':
+    'Семенной дождь (чистые игроки давят семена, пока те не проросли)',
+  'hudChrome.finder.mech.pollinate':
+    'Опыление (золотые игроки держатся подальше от семян, иначе те тут же прорастут)',
+  'hudChrome.finder.mech.vine_lash': 'Удар лозы (выйдите из колючей полосы, иначе вас обездвижит)',
+  'hudChrome.finder.mech.gorge': 'Пожирание (тяжёлый укус и яд на танке)',
+  'hudChrome.finder.mech.burrowing_seeds':
+    'Зарывающиеся семена и Пыльцевое облако (через 6 секунд росток встаёт рядом с игроком, золото передаётся)',
+  'hudChrome.finder.mech.spirit_of_the_hunt':
+    'Дух охоты (Добыча уводит аватара через горящие солнечные глифы)',
+  'hudChrome.finder.mech.twin_prey_ambush':
+    'Двойная добыча и Засада (две Добычи, затем прыжок на самого дальнего игрока)',
+  'hudChrome.wildheartAlert.preyTitle': 'Вы добыча!',
+  'hudChrome.wildheartAlert.preyLine':
+    'Зулгар охотится на вас: ведите его через горящие солнечные глифы',
+  'hudChrome.wildheartAlert.preyWaitLine':
+    'Сейчас он гонится за другой Добычей: будьте готовы, он сменит цель',
+  'hudChrome.wildheartAlert.stalkedTitle': 'Вас выслеживают!',
+  'hudChrome.wildheartAlert.stalkedLine': 'Ягуар охотится на вас: уведите его подальше от хозяина',
+  'hudChrome.wildheartAlert.pollinatedTitle': 'Опылены!',
+  'hudChrome.wildheartAlert.pollinatedLine':
+    'Держитесь подальше от семян: от вашего касания они прорастают',
+  'hudChrome.wildheartAlert.bondTitle': 'Узы стаи',
+  'hudChrome.wildheartAlert.bondLine': 'Вместе они получают вдвое меньше урона: разведите их',
+  'hudChrome.wildheartAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.wildheart.packBond':
+    'Получает на {pct}% меньше урона, пока напарник рядом. Разведите Повелителя клыков и его ягуара, чтобы разорвать узы.',
+  'hudChrome.auraEffect.wildheart.packBondFury':
+    'Наносит на {pct}% больше урона, пока напарник рядом.',
+  'hudChrome.auraEffect.wildheart.stalked':
+    'Великий ягуар охотится на вас и не поддаётся провокации. Каждый укус наносит {min}–{max} физического урона ({heroicMin}–{heroicMax} в героическом режиме) и вызывает кровотечение. Уведите его от хозяина.',
+  'hudChrome.auraEffect.wildheart.waryStuns':
+    'Оглушение уже сработало. Пока эффект действует, новые оглушения не срабатывают.',
+  'hudChrome.auraEffect.wildheart.waryRoots':
+    'Обездвиживание уже сработало. Пока эффект действует, новые обездвиживания не срабатывают.',
+  'hudChrome.auraEffect.wildheart.warySlows':
+    'Замедление уже сработало. Пока эффект действует, новые замедления не срабатывают.',
+  'hudChrome.auraEffect.wildheart.pollinated':
+    'От вашего касания семенной стручок сразу прорастает Терновым ростком. Держитесь подальше от семян, пусть их давят чистые игроки; нетронутый стручок прорастает через {seconds} сек. (в героическом режиме через {heroic} сек. он зарывается и вылезает рядом с ближайшим игроком).',
+  'hudChrome.auraEffect.wildheart.prey':
+    'Зулгар охотится на вас. Проведите его через горящий солнечный глиф, чтобы замедлить на {slow}%. Если он вас догонит, вас растерзают: {damage} урона ({heroic} в героическом режиме) и падение на {stun} сек.',
+  'hudChrome.auraEffect.wildheart.avatar':
+    'Движется на {pct}% быстрее и охотится на свою Добычу. Замедления и обездвиживания действуют, оглушения длятся вдвое меньше.',
+  'hudChrome.auraEffect.wildheart.vanished':
+    'Скрыт и неуязвим. Вот-вот бросится на самого дальнего игрока.',
 };

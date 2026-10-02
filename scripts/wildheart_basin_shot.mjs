@@ -5,7 +5,10 @@
 // its curtain, the Weeping Falls arena, the shrine under the jaguar head, the
 // M map and the minimap, and the telegraphs (the Saurian's Stomp and Tail
 // Swipe, the howdah breaking, the enrage, the Vine Lasher's lash, a Spore
-// Toad's cloud). Evidence tooling, not a repo test. A shot id or an id prefix
+// Toad's cloud), and the three bosses' mechanics (phase B: Pack Bond, Stalk,
+// the Quake, Heel!, Seed Rain and the pods, Pollinate, Vine Lash, Gorge, the
+// Pulse, Spirit of the Hunt, a sun glyph, the Ambush). Evidence tooling, not a
+// repo test. A shot id or an id prefix
 // after the out dir filters the run.
 //
 //   node scripts/wildheart_basin_shot.mjs [outDir] [shotId ...]
@@ -165,6 +168,176 @@ const SHOTS = [
     dist: 16,
     hud: true,
     wait: 1200,
+  }, // ---- phase B: the three bosses (HUD on: cast bars and the encounter alert) ----
+  // The Fanglord Beastmaster and his Great Jaguar (Pack Bond, Stalk, the Quake,
+  // Call of the Hunt, Thickhide Ward, Heel!). Alone, the jaguar's prey is the
+  // player, so the alert reads Stalked.
+  {
+    id: 'jefe1_vinculo',
+    stage: ['wildheart_beastmaster', 9, PI * 0.15],
+    cmdWait: 600,
+    pitch: 0.45,
+    dist: 24,
+    hud: true,
+    wait: 400,
+  },
+  {
+    id: 'jefe1_acecho',
+    stage: ['wildheart_beastmaster', 16, PI * 0.2],
+    cmds: ['/dev wildheart trigger stalk'],
+    cmdWait: 1600,
+    pitch: 0.4,
+    dist: 20,
+    hud: true,
+    wait: 300,
+  },
+  {
+    id: 'jefe1_temblor',
+    stage: ['wildheart_beastmaster', 6, PI * 0.15],
+    cmds: ['/dev wildheart trigger quake'],
+    cmdWait: 950,
+    pitch: 0.6,
+    dist: 26,
+    hud: true,
+    wait: 60,
+  },
+  {
+    id: 'jefe1_llamada_y_piel',
+    stage: ['wildheart_beastmaster', 9, PI * 0.15],
+    cmds: ['/dev wildheart trigger hunt', '/dev wildheart trigger ward'],
+    cmdWait: 300,
+    pitch: 0.4,
+    dist: 22,
+    hud: true,
+    wait: 200,
+  },
+  {
+    id: 'jefe1_a_mi',
+    stage: ['wildheart_beastmaster', 9, PI * 0.15],
+    placeMob: ['fanglord_jaguar', -86, 24],
+    cmds: ['/dev wildheart trigger heel'],
+    cmdWait: 1100,
+    pitch: 0.6,
+    dist: 34,
+    hud: true,
+    wait: 60,
+  },
+  // The Gorgebloom (Seed Rain, the pods ripening and sprouting, Pollinate,
+  // Vine Lash, Gorge).
+  {
+    id: 'jefe2_lluvia_de_semillas',
+    stage: ['the_gorgebloom', 9, -PI * 0.5],
+    cmds: ['/dev wildheart trigger seeds'],
+    cmdWait: 1700,
+    pitch: 0.55,
+    dist: 30,
+    hud: true,
+    wait: 200,
+  },
+  {
+    id: 'jefe2_vainas_maduras',
+    stage: ['the_gorgebloom', 9, -PI * 0.5],
+    cmds: ['/dev wildheart trigger pods'],
+    cmdWait: 9000,
+    pitch: 0.55,
+    dist: 30,
+    hud: true,
+    wait: 100,
+  },
+  {
+    id: 'jefe2_brotes_espinosos',
+    stage: ['the_gorgebloom', 9, -PI * 0.5],
+    cmds: ['/dev wildheart trigger pods'],
+    cmdWait: 12600,
+    pitch: 0.5,
+    dist: 28,
+    hud: true,
+    wait: 200,
+  },
+  {
+    id: 'jefe2_polinizado',
+    stage: ['the_gorgebloom', 9, -PI * 0.5],
+    cmds: ['/dev wildheart trigger pods', '/dev wildheart trigger pollinate'],
+    cmdWait: 700,
+    pitch: 0.42,
+    dist: 18,
+    hud: true,
+    wait: 200,
+  },
+  {
+    id: 'jefe2_latigo_de_liana',
+    stage: ['the_gorgebloom', 14, -PI * 0.5],
+    cmds: ['/dev wildheart trigger lash'],
+    cmdWait: 950,
+    pitch: 0.6,
+    dist: 30,
+    hud: true,
+    wait: 60,
+  },
+  {
+    id: 'jefe2_engullir',
+    stage: ['the_gorgebloom', 7, -PI * 0.5],
+    cmds: ['/dev wildheart trigger gorge'],
+    cmdWait: 900,
+    pitch: 0.4,
+    dist: 20,
+    hud: true,
+    wait: 60,
+  },
+  // Zulgar (the telegraphed Pulse, Spirit of the Hunt with the Prey alert and
+  // the jaguar's burning eyes, a sun glyph going dark, the heroic Ambush).
+  {
+    id: 'jefe3_pulso',
+    stage: ['wildheart_high_priest', 6, PI],
+    cmds: ['/dev wildheart trigger pulse'],
+    cmdWait: 950,
+    pitch: 0.6,
+    dist: 30,
+    hud: true,
+    wait: 60,
+  },
+  {
+    id: 'jefe3_espiritu_de_la_caza',
+    stage: ['wildheart_high_priest', 12, PI],
+    cmds: ['/dev wildheart trigger spirit'],
+    cmdWait: 2300,
+    pitch: 0.25,
+    dist: 30,
+    hud: true,
+    wait: 200,
+  },
+  {
+    id: 'jefe3_ojos_del_jaguar',
+    stage: ['wildheart_high_priest', 14, PI],
+    cmds: ['/dev wildheart trigger prey'],
+    cmdWait: 600,
+    face: PI,
+    yaw: PI,
+    pitch: 0.12,
+    dist: 40,
+    hud: true,
+    wait: 300,
+  },
+  {
+    id: 'jefe3_glifo_solar',
+    stage: ['wildheart_high_priest', 12, PI],
+    cmds: ['/dev wildheart trigger prey'],
+    cmdWait: 200,
+    placeMobAfter: ['wildheart_high_priest', 7, 230.1],
+    pitch: 0.55,
+    dist: 30,
+    hud: true,
+    wait: 400,
+  },
+  {
+    id: 'jefe3_emboscada',
+    stage: ['wildheart_high_priest', 16, PI],
+    cmds: ['/dev wildheart trigger ambush'],
+    cmdWait: 900,
+    pitch: 0.6,
+    dist: 34,
+    hud: true,
+    wait: 60,
   },
 ];
 
@@ -201,6 +374,21 @@ function pageCasting([templateId, castId, share]) {
     if (e.castTotal > 0 && 1 - e.castRemaining / e.castTotal >= share) return true;
   }
   return false;
+}
+
+/** In-page: move the living mob of templateId to an instance-local spot. */
+function pagePlaceMob([templateId, lx, lz, ox, oz]) {
+  const sim = window.__game.world;
+  for (const e of sim.entities.values()) {
+    if (e.kind !== 'mob' || e.dead || e.templateId !== templateId) continue;
+    const at = sim.groundPos(ox + lx, oz + lz);
+    e.pos.x = at.x;
+    e.pos.y = at.y;
+    e.pos.z = at.z;
+    e.prevPos = { ...e.pos };
+    return e.id;
+  }
+  return null;
 }
 
 /** In-page: kill the nearest living mob of `templateId` through the sim. */
@@ -357,12 +545,20 @@ async function main() {
         }
         await sleep(1400);
       }
+      if (shot.placeMob) {
+        await page.evaluate(pagePlaceMob, [...shot.placeMob, origin.x, origin.z]);
+        await sleep(300);
+      }
       for (const c of shot.cmds ?? []) {
         await page.evaluate(() => {
           window.__game.world.player.devNoAggro = false;
         });
         await page.evaluate((cmd) => window.__game.world.chat(cmd), c);
         await sleep(shot.cmdWait ?? 1300);
+      }
+      if (shot.placeMobAfter) {
+        await page.evaluate(pagePlaceMob, [...shot.placeMobAfter, origin.x, origin.z]);
+        await sleep(400);
       }
       if (shot.waitCast) {
         const t0 = Date.now();

@@ -32,6 +32,10 @@ const ROWS: Record<string, PlaceholderRow> = {
   wildheart_spore_toad: ['mob_murloc', 0x7f8a34, 0.7, 1.1, { selfIllumination: 0.08 }],
   // Snarlvine Lasher: the treant body in dark bark and vine (5.7 yd at 2.2).
   wildheart_vine_lasher: ['mob_treant', 0x445624, 0.8, 1],
+  // Thorn Sprout (what a missed Gorgebloom seedpod grows into): the treant
+  // body smaller, in a raw thorny green with a faint sap glow; about 3.7 yd
+  // at its 1.5, still over a player's head.
+  wildheart_thorn_sprout: ['mob_treant', 0x6f9a26, 0.82, 0.95, { selfIllumination: 0.1 }],
   // Sunbone Totem-Binder: the Hexcaller under a bone-ochre wash.
   wildheart_totem_binder: ['mob_wildheart_hexcaller', 0xd9b26a, 0.3, 1.05],
   // The Howdah Hexcaller: the Hexcaller in the howdah's war red.
@@ -39,6 +43,16 @@ const ROWS: Record<string, PlaceholderRow> = {
   // The Fanglord's Great Jaguar: the great cat in gold (its rosettes stay the
   // texture's dark marks); about 4.6 yd at its 2.4, a head over a horse.
   wildheart_fanglord_jaguar: ['form_cat', 0xd8a548, 0.45, 1, { clickRadius: 1.8 }],
+  // The Fanglord's Whistle's spirit jaguar (combat/wildheart_trinkets.ts): the
+  // same great cat washed in Zulgar's jade spirit flame and lit from within,
+  // a little smaller than the Fanglord's own.
+  wildheart_spirit_jaguar: [
+    'form_cat',
+    0x5fe0a0,
+    0.65,
+    0.9,
+    { selfIllumination: 0.35, clickRadius: 1.4 },
+  ],
   // The Gorgebloom: the great cap rig washed blood red, rooted (it only turns
   // to face its target); about 10 yd at its 2.8.
   wildheart_gorgebloom: [
@@ -89,6 +103,7 @@ export const WILDHEART_MOB_KEYS: Readonly<Record<string, string>> = {
   basin_raptor: 'wildheart_basin_raptor',
   spore_toad: 'wildheart_spore_toad',
   vine_lasher: 'wildheart_vine_lasher',
+  thorn_sprout: 'wildheart_thorn_sprout',
   sunbone_totem_binder: 'wildheart_totem_binder',
   sunbone_totem: 'wildheart_sunbone_totem',
   howdah_hexcaller: 'wildheart_howdah_hexcaller',

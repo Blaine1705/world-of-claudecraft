@@ -11,14 +11,23 @@
 
 import { MOBS } from '../../sim/data';
 import {
+  BLOOM_TUNING,
+  BLOOM_VINE_LASHED,
   GREAT_SAURIAN_ID,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
   SAURIAN_TUNING,
+  WILDHEART_AMBUSH_MARK,
+  WILDHEART_SEEDPOD,
+  WILDHEART_SEEDPOD_RIPE,
   WILDHEART_SPORE_CLOUD,
+  WILDHEART_SUN_GLYPH_DARK,
+  WILDHEART_SUN_GLYPH_LIT,
+  ZULGAR_TUNING,
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ANCESTRAL_SAP,
+  WILDHEART_ENTANGLED,
   WILDHEART_ENTANGLING_LASH,
 } from '../../sim/mob/trash_kit/wildheart_cast_ids';
 import {
@@ -100,16 +109,116 @@ export function basinTelegraphSpecs(): Readonly<Record<string, BasinTelegraphSpe
   };
 }
 
-/** The encounter objects' floor looks (scale = radius). */
-export const BASIN_OBJECT_SPECS: Readonly<
-  Record<string, { color: number; accent: number; seconds: number }>
-> = {
+/** How an encounter object's edge fills: `full` at once (a standing hazard),
+ *  `sweep` over `fillSeconds` from first sight (the time left before it
+ *  bites), `outline` never (the tint and the rim only: a spot to use). */
+export type BasinObjectFill = 'full' | 'sweep' | 'outline';
+
+export interface BasinObjectSpec {
+  /** The threat colour (TELEGRAPH_THREAT_COLORS). */
+  color: number;
+  accent: number;
+  /** Seconds it stands (Infinity: as long as the sim keeps it). */
+  seconds: number;
+  /** Only the spore cloud boils with fog. */
+  fog: boolean;
+  fill: BasinObjectFill;
+  /** Seconds a `sweep` takes. */
+  fillSeconds: number;
+  /** Master fade of the floor shape (a dark glyph burns low). */
+  fade: number;
+}
+
+/** The encounter objects' floor looks (scale = radius). The object's template
+ *  id carries its look; an object whose template flips (a pod ripening, a
+ *  glyph going dark) re-lays its look in place. */
+export const BASIN_OBJECT_SPECS: Readonly<Record<string, BasinObjectSpec>> = {
   [WILDHEART_SPORE_CLOUD]: {
     color: TELEGRAPH_THREAT_COLORS.danger,
     accent: BASIN_ACCENTS.pollen,
     seconds: MOBS.spore_toad?.trashKit?.deathCloud?.seconds ?? 6,
+    fog: true,
+    fill: 'full',
+    fillSeconds: 0,
+    fade: 1,
+  },
+  // A seedpod: its touch radius, a spot to stomp (gold: act on it).
+  [WILDHEART_SEEDPOD]: {
+    color: TELEGRAPH_THREAT_COLORS.interrupt,
+    accent: BASIN_ACCENTS.vine,
+    seconds: Number.POSITIVE_INFINITY,
+    fog: false,
+    fill: 'outline',
+    fillSeconds: 0,
+    fade: 1,
+  },
+  // Ripe: the edge sweeps over the seconds left before a Thorn Sprout bursts.
+  [WILDHEART_SEEDPOD_RIPE]: {
+    color: TELEGRAPH_THREAT_COLORS.danger,
+    accent: BASIN_ACCENTS.pollen,
+    seconds: Number.POSITIVE_INFINITY,
+    fog: false,
+    fill: 'sweep',
+    fillSeconds: BLOOM_TUNING.podRipeFor,
+    fade: 1,
+  },
+  // A lit sun glyph: lead the avatar through it (gold: act on it).
+  [WILDHEART_SUN_GLYPH_LIT]: {
+    color: TELEGRAPH_THREAT_COLORS.interrupt,
+    accent: BASIN_ACCENTS.holy,
+    seconds: Number.POSITIVE_INFINITY,
+    fog: false,
+    fill: 'outline',
+    fillSeconds: 0,
+    fade: 1,
+  },
+  // A dark glyph: spent for now, its edge an ember.
+  [WILDHEART_SUN_GLYPH_DARK]: {
+    color: TELEGRAPH_THREAT_COLORS.interrupt,
+    accent: BASIN_ACCENTS.holy,
+    seconds: Number.POSITIVE_INFINITY,
+    fog: false,
+    fill: 'outline',
+    fillSeconds: 0,
+    fade: 0.3,
+  },
+  // Heroic Ambush: the circle he lands in, filling over its warning.
+  [WILDHEART_AMBUSH_MARK]: {
+    color: TELEGRAPH_THREAT_COLORS.danger,
+    accent: BASIN_ACCENTS.spirit,
+    seconds: Number.POSITIVE_INFINITY,
+    fog: false,
+    fill: 'sweep',
+    fillSeconds: ZULGAR_TUNING.ambushWarning,
+    fade: 1,
   },
 };
+
+/** An encounter object's fill `elapsed` seconds after its look was laid. */
+export function objectFill(spec: BasinObjectSpec, elapsed: number): number {
+  if (spec.fill === 'full') return 1;
+  if (spec.fill === 'outline' || spec.fillSeconds <= 0) return 0;
+  return Math.min(1, Math.max(0, elapsed / spec.fillSeconds));
+}
+
+/** Every root aura the climbing vines dress (the trash lash and Vine Lash). */
+export const VINE_ROOT_AURAS: readonly string[] = [WILDHEART_ENTANGLED, BLOOM_VINE_LASHED];
+
+/** One burst of the fx's particle pools (basin_fx.ts `puff`). */
+export interface BasinPuffOptions {
+  speed: number;
+  up?: number;
+  life: number;
+  size: readonly [number, number];
+  color: readonly [number, number, number];
+  alpha: number;
+  drag?: number;
+  dir?: [number, number, number];
+  spread?: number;
+  glow?: boolean;
+  gravity?: number;
+  radius?: number;
+}
 
 /** Fill of a cast telegraph in [0, 1] (the sim's own bar). */
 export function basinCastFill(castRemaining: number, castTotal: number): number {
@@ -202,8 +311,11 @@ export function enrageGlow(t: number): number {
   return 0.65 + 0.35 * Math.sin(t * 6.5) ** 2;
 }
 
-/** The jaguar's eyes: a steady burn over the basin, full spirit fire while
- *  Zulgar fights (a colour write on the kit's eyes material). */
-export function jaguarEyesBurn(zulgarEngaged: boolean, t: number): number {
-  return zulgarEngaged ? 0.85 + 0.15 * Math.sin(t * 3.1) : 0.42;
+/** The jaguar's eyes (a colour write on the kit's eyes material): a steady
+ *  gleam over the basin, a smoulder while Zulgar fights, full spirit fire
+ *  while the Jaguar Avatar hunts. */
+export function jaguarEyesBurn(state: 'idle' | 'fight' | 'hunt', t: number): number {
+  if (state === 'hunt') return 0.94 + 0.06 * Math.sin(t * 9.3);
+  if (state === 'fight') return 0.68 + 0.1 * Math.sin(t * 3.1);
+  return 0.42;
 }

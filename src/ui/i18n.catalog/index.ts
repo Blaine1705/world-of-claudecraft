@@ -1954,6 +1954,9 @@ export const en = {
       // The Stormbrass Foundry's heroic Rangewarden and Voltaic Warden.
       rangefinders_lens: { name: "Rangefinder's Lens" },
       overclocked_governor: { name: 'Overclocked Governor' },
+      // The Wildheart Basin's heroic Fanglord Beastmaster and Gorgebloom.
+      fanglords_whistle: { name: "Fanglord's Whistle" },
+      gorgebloom_seedpod: { name: 'Gorgebloom Seedpod' },
       // Faction Quartermaster vendor items
       rift_watchers_band: { name: "Rift Watcher's Band" },
       rift_surveyors_satchel: { name: "Rift Surveyor's Satchel" },

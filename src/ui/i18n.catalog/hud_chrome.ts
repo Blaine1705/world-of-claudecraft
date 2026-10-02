@@ -3897,6 +3897,10 @@ export const hudChromeStrings = {
         'For {duration} sec, your damage increases by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}% at {maxAt} yd or more.',
       overclock:
         'Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.',
+      spiritPack:
+        'Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.',
+      seedburst:
+        'Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.',
       heartNova:
         'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
     },
@@ -5124,6 +5128,23 @@ export const hudChromeStrings = {
     },
   },
   auraEffect: {
+    // The Wildheart Basin's marks and boss auras (src/ui/wildheart_aura_effect.ts).
+    wildheart: {
+      packBond:
+        'Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.',
+      packBondFury: 'Deals {pct}% more damage while its partner stands close.',
+      stalked:
+        'The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.',
+      waryStuns: 'A stun has landed on it. Further stuns slide off until this ends.',
+      waryRoots: 'A root has landed on it. Further roots slide off until this ends.',
+      warySlows: 'A slow has landed on it. Further slows slide off until this ends.',
+      pollinated:
+        'Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).',
+      prey: 'Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.',
+      avatar:
+        'Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.',
+      vanished: 'Hidden and immune to damage. He is about to pounce on the farthest player.',
+    },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     varkhulSharedPyre:
@@ -5318,6 +5339,10 @@ export const hudChromeStrings = {
         'Damage increased by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}%.',
       overclock: 'Casting speed increased by {pct}%. Overheated follows when it ends.',
       overheated: 'Casting speed reduced by {pct}%.',
+      spiritPack:
+        'A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.',
+      seedburst:
+        'A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.',
       forgeHeat:
         "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
       tempered:
@@ -8790,6 +8815,20 @@ export const hudChromeStrings = {
       split_plating:
         'Rapid Cycling and Split Plating (faster flips, its back wears the other face)',
       double_load: 'Jammed Racks and Double Load (two cells in one hatch window)',
+      // The Wildheart Basin rework (encounters/wildheart_basin).
+      pack_bond: 'Pack Bond (together they take half damage: drag them 15 yards apart)',
+      stalk: 'Stalk (the jaguar hunts a marked player: kite it, slow, root and stun it)',
+      shared_health: 'Shared Health (one pool: hit whichever is safest)',
+      heel_frenzied_bond:
+        'Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)',
+      seed_rain: 'Seed Rain (clean players stomp the seeds before they sprout)',
+      pollinate: 'Pollinate (golden players stay off the seeds, or they sprout at once)',
+      vine_lash: 'Vine Lash (step out of the thorny lane or be rooted)',
+      gorge: 'Gorge (a heavy bite and a poison on the tank)',
+      burrowing_seeds:
+        'Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)',
+      spirit_of_the_hunt: 'Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs)',
+      twin_prey_ambush: 'Twin Prey and Ambush (two Prey, then a pounce on the farthest player)',
     },
   },
   // The Gaol Turnkey's Iron Cage escape prompt (src/ui/hud/dungeon/cage_escape).
@@ -8847,6 +8886,19 @@ export const hudChromeStrings = {
     chargedLine: 'Spells land; physical damage is stored as charge',
     splitLine: 'Its back half wears the other face',
     storedAria: 'Stored Charge toward the next Discharge: {pct}',
+  },
+  // The Wildheart Basin's encounter alert (src/ui/hud/dungeon/wildheart_alert_view.ts).
+  wildheartAlert: {
+    preyTitle: 'You are the Prey!',
+    preyLine: 'Zulgar hunts you: run him through the lit sun glyphs',
+    preyWaitLine: 'He chases the other Prey now: be ready, he switches',
+    stalkedTitle: 'Stalked!',
+    stalkedLine: 'The jaguar hunts you: kite it away from its master',
+    pollinatedTitle: 'Pollinated!',
+    pollinatedLine: 'Stay off the seeds: your touch makes them sprout',
+    bondTitle: 'Pack Bond',
+    bondLine: 'Together they take half damage: pull them apart',
+    timeAria: '{seconds} seconds left',
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and

@@ -18920,18 +18920,40 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你与目标之间的距离每超过 {from} 码 {stepYards} 码，造成的伤害提高 {perStep}%，最多 {max}%。',
   'hudChrome.auraEffect.trinket.overclock': '施法速度提高 {pct}%。效果结束时会过热。',
   'hudChrome.auraEffect.trinket.overheated': '施法速度降低 {pct}%。',
+  'entities.items.beastpit_warbelt.name': '兽坑战腰带',
+  'entities.items.jaguar_hide_jerkin.name': '美洲豹皮短上衣',
+  'entities.items.hexbone_handwraps.name': '咒骨裹手',
+  'entities.items.rootbound_sabatons.name': '缚根铁靴',
+  'entities.items.pollen_dusted_leggings.name': '沾满花粉的护腿',
+  'entities.items.bloomsilk_cowl.name': '花绸兜帽',
+  'entities.items.falls_blessed_staff.name': '瀑布祝福法杖',
+  'entities.items.fanglords_hide_mantle.name': '獠牙领主的兽皮肩甲',
+  'entities.items.thornroot_greathelm.name': '荆冠巨盔',
+  'entities.items.fanglords_whistle.name': '獠牙领主的哨子',
+  'entities.items.gorgebloom_seedpod.name': '噬花种荚',
+  'hudChrome.trinkets.use.spiritPack':
+    '召唤一只灵魂美洲豹在你身边战斗，持续{duration}秒。它会奔向你的目标，每{every}秒撕咬一次，造成{min}到{max}点物理伤害，并会转而攻击你选中的其他敌人。若你没有选中敌人，它会攻击{range}码内离你最近的敌人。伤害随攻击强度或远程攻击强度（取较高者）提高，在召唤时确定。需要{range}码内的敌对目标。',
+  'hudChrome.trinkets.use.seedburst':
+    '在{range}码内的目标身上种下一颗种子。{delay}秒后，种子在目标所在处（或其死亡处）爆裂，对{radius}码内的每个敌人造成{damage}点自然伤害；若目标先行死亡，伤害提高{bonus}%（{empowered}）。伤害随法术强度提高，在种下时确定。若你在种子爆裂前死亡，种子会枯萎。',
+  'hudChrome.auraEffect.trinket.spiritPack':
+    '一只灵魂美洲豹在你身边战斗，每{every}秒撕咬你的目标一次，造成{min}到{max}点物理伤害。',
+  'hudChrome.auraEffect.trinket.seedburst':
+    '噬花的种子。此效果结束时爆裂，对{radius}码内的每个敌人造成{damage}点自然伤害；若此敌人在此之前死亡，伤害提高{bonus}%（{empowered}）。',
   'entities.npcs.lift_warden_corwin.name': '升降机守卫科温·阿什比',
   'entities.npcs.lift_warden_corwin.title': '风暴线升降机看守',
-  'entities.npcs.lift_warden_corwin.greeting': '小心缆绳，朋友。那台升降机仍会爬上风暴线上的旧铸造厂，那里的机器仍在为一个再也没有回来的主人运转。',
+  'entities.npcs.lift_warden_corwin.greeting':
+    '小心缆绳，朋友。那台升降机仍会爬上风暴线上的旧铸造厂，那里的机器仍在为一个再也没有回来的主人运转。',
   'entities.quests.q_sf_storm_line.title': '风暴线',
   'entities.quests.q_sf_storm_line.text':
     '每个小时升降机都会运下废料和火花，{playerName}，却从没有一个活人。上面仍有东西在拉动铁轨：一台工程师们称为龙门运输车的巨型蒸汽履带车。坐上去，打垮铁轨场，把那台履带车拆掉。',
-  'entities.quests.q_sf_storm_line.completion': '铁轨场多年来第一次安静了。安静，但并不空。听：上面的产线还在运转。',
+  'entities.quests.q_sf_storm_line.completion':
+    '铁轨场多年来第一次安静了。安静，但并不空。听：上面的产线还在运转。',
   'entities.quests.q_sf_storm_line.objectives.0.label': '摧毁龙门运输车',
   'entities.quests.q_sf_stop_the_line.title': '停止产线',
   'entities.quests.q_sf_stop_the_line.text':
     '产线主管安布雷尔·托克在主人离开后让铸造厂继续运转，而且从未停下。如今他把爬上传送带的一切都送进冲压机。阻止他，{playerName}，整条产线就会随他一起停下。',
-  'entities.quests.q_sf_stop_the_line.completion': '托克不动了，他的传送带也停了。不管他在造什么，他都是为别人造的。再往上走。',
+  'entities.quests.q_sf_stop_the_line.completion':
+    '托克不动了，他的传送带也停了。不管他在造什么，他都是为别人造的。再往上走。',
   'entities.quests.q_sf_stop_the_line.objectives.0.label': '击杀产线主管安布雷尔·托克',
   'entities.quests.q_sf_first_draft.title': '初稿',
   'entities.quests.q_sf_first_draft.text':
@@ -18963,4 +18985,53 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_entangling_lash': '缠绕鞭笞',
   'abilityUi.cast.wildheart_saurian_tail_swipe': '甩尾',
   'abilityUi.cast.wildheart_saurian_stomp': '撼地践踏',
+  'abilityUi.cast.wildheart_beast_pit_quake': '兽坑震荡',
+  'abilityUi.cast.wildheart_jaguar_heel': '回来！',
+  'abilityUi.cast.wildheart_gorgebloom_seed_rain': '种子雨',
+  'abilityUi.cast.wildheart_gorgebloom_vine_lash': '藤鞭',
+  'abilityUi.cast.wildheart_gorgebloom_gorge': '吞噬',
+  'abilityUi.cast.wildheart_zulgar_pulse': '荒野之心脉冲',
+  'abilityUi.cast.wildheart_zulgar_spirit_hunt': '狩猎之魂',
+  'entities.mobs.thorn_sprout.name': '荆棘幼芽',
+  'hudChrome.finder.mech.pack_bond': '兽群羁绊（两者相邻时伤害减半：将它们拉开15码）',
+  'hudChrome.finder.mech.stalk': '潜行追猎（美洲豹追猎被标记的玩家：风筝它，减速、定身、击晕它）',
+  'hudChrome.finder.mech.shared_health': '共享生命（同一血池：攻击最安全的那个）',
+  'hudChrome.finder.mech.heel_frenzied_bond':
+    '回来！与狂热羁绊（美洲豹跃回主人身边，羁绊范围扩至20码）',
+  'hudChrome.finder.mech.seed_rain': '种子雨（未授粉的玩家在种子发芽前踩碎它们）',
+  'hudChrome.finder.mech.pollinate': '授粉（金色的玩家远离种子，否则它们会立刻发芽）',
+  'hudChrome.finder.mech.vine_lash': '藤鞭（离开荆棘通道，否则会被定身）',
+  'hudChrome.finder.mech.gorge': '吞噬（对坦克的重咬和毒素）',
+  'hudChrome.finder.mech.burrowing_seeds':
+    '钻地种子与花粉云（种子6秒后在玩家身旁破土，金色会传染）',
+  'hudChrome.finder.mech.spirit_of_the_hunt': '狩猎之魂（猎物引着化身穿过点亮的太阳符文）',
+  'hudChrome.finder.mech.twin_prey_ambush': '双重猎物与伏击（两个猎物，随后扑向最远的玩家）',
+  'hudChrome.wildheartAlert.preyTitle': '你是猎物！',
+  'hudChrome.wildheartAlert.preyLine': '祖尔加在追猎你：引他穿过点亮的太阳符文',
+  'hudChrome.wildheartAlert.preyWaitLine': '他正在追另一个猎物：做好准备，他会切换',
+  'hudChrome.wildheartAlert.stalkedTitle': '被追猎！',
+  'hudChrome.wildheartAlert.stalkedLine': '美洲豹在追猎你：把它引离它的主人',
+  'hudChrome.wildheartAlert.pollinatedTitle': '已授粉！',
+  'hudChrome.wildheartAlert.pollinatedLine': '远离种子：你的触碰会让它们发芽',
+  'hudChrome.wildheartAlert.bondTitle': '兽群羁绊',
+  'hudChrome.wildheartAlert.bondLine': '在一起时它们伤害减半：把它们拉开',
+  'hudChrome.wildheartAlert.timeAria': '剩余{seconds}秒',
+  'hudChrome.auraEffect.wildheart.packBond':
+    '伙伴靠近时受到的伤害降低{pct}%。将驯兽师和他的美洲豹拉开即可打破羁绊。',
+  'hudChrome.auraEffect.wildheart.packBondFury': '伙伴靠近时造成的伤害提高{pct}%。',
+  'hudChrome.auraEffect.wildheart.stalked':
+    '巨型美洲豹在追猎你，且无视嘲讽。每次撕咬造成{min}到{max}点物理伤害（英雄难度{heroicMin}到{heroicMax}点）并造成流血。把它引离它的主人。',
+  'hudChrome.auraEffect.wildheart.waryStuns':
+    '它已被击晕过一次。在此效果结束前，后续的击晕都会失效。',
+  'hudChrome.auraEffect.wildheart.waryRoots':
+    '它已被定身过一次。在此效果结束前，后续的定身都会失效。',
+  'hudChrome.auraEffect.wildheart.warySlows':
+    '它已被减速过一次。在此效果结束前，后续的减速都会失效。',
+  'hudChrome.auraEffect.wildheart.pollinated':
+    '触碰种荚会使其立刻长出荆棘幼芽。远离种子，让未授粉的玩家去踩碎它们；无人触碰的种荚会在{seconds}秒后发芽（英雄难度下它会在{heroic}秒后钻入地下，在最近的玩家身旁破土而出）。',
+  'hudChrome.auraEffect.wildheart.prey':
+    '祖尔加在追猎你。引他踏过点亮的太阳符文，使他减速{slow}%。若被他追上，你会被撕咬，受到{damage}点伤害（英雄难度{heroic}点）并被击倒{stun}秒。',
+  'hudChrome.auraEffect.wildheart.avatar':
+    '移动速度提高{pct}%，追猎它的猎物。减速和定身可以生效，击晕的持续时间减半。',
+  'hudChrome.auraEffect.wildheart.vanished': '隐匿且免疫伤害。他即将扑向最远的玩家。',
 };

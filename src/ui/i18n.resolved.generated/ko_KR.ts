@@ -3135,6 +3135,8 @@ export const ko_KR: EnTranslations = {
         "shackle": "{range}미터 이내의 대상을 {duration}초 동안 사슬로 묶어 제자리에 고정합니다. 우두머리처럼 제어 효과에 면역인 생물은 대신 이동 속도가 {slow}% 감소하며, 감속에도 면역이면 효과가 없습니다.",
         "rangefinder": "{duration}초 동안 대상과의 거리가 {from}미터를 넘는 {stepYards}미터마다 주는 피해가 {perStep}% 증가합니다. {maxAt}미터 이상에서 최대 {max}%입니다.",
         "overclock": "{duration}초 동안 시전 속도가 {haste}% 증가합니다. 효과가 끝나면 과열되어 {overheat}초 동안 시전 속도가 {slow}% 감소합니다.",
+        "spiritPack": "{duration}초 동안 영혼 재규어를 불러 곁에서 싸우게 합니다. 재규어는 대상에게 달려가 {every}초마다 물어뜯어 {min}~{max}의 물리 피해를 주며, 다른 적을 대상으로 지정하면 그 적에게로 옮겨 갑니다. 지정한 적이 없으면 {range}미터 내에서 당신과 가장 가까운 적을 공격합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가하며, 불러낼 때 결정됩니다. {range}미터 내의 적대적 대상이 필요합니다.",
+        "seedburst": "{range}미터 내의 대상에게 씨앗을 심습니다. {delay}초 후 씨앗이 대상이 있는 곳(또는 죽은 곳)에서 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 대상이 먼저 죽었다면 피해가 {bonus}% 증가합니다({empowered}). 피해량은 주문력에 비례해 증가하며, 심을 때 결정됩니다. 씨앗이 터지기 전에 당신이 죽으면 씨앗은 시듭니다.",
         "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다."
       }
     },
@@ -3909,6 +3911,18 @@ export const ko_KR: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.",
+        "packBondFury": "짝이 가까이 있는 동안 주는 피해가 {pct}% 증가합니다.",
+        "stalked": "거대 재규어가 당신을 사냥하며 도발을 무시합니다. 물 때마다 {min}~{max}의 물리 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고 출혈을 일으킵니다. 주인에게서 멀리 끌고 가세요.",
+        "waryStuns": "이미 기절을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 기절은 통하지 않습니다.",
+        "waryRoots": "이미 속박을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 속박은 통하지 않습니다.",
+        "warySlows": "이미 감속을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 감속은 통하지 않습니다.",
+        "pollinated": "씨앗 꼬투리를 건드리면 즉시 가시 새싹이 자라납니다. 씨앗을 피하고 깨끗한 플레이어가 밟게 하세요. 아무도 건드리지 않은 꼬투리는 {seconds}초 뒤 싹이 틉니다(영웅 난이도에서는 {heroic}초 뒤 땅속으로 파고들어 가장 가까운 플레이어 곁에서 솟아납니다).",
+        "prey": "줄가르가 당신을 사냥합니다. 빛나는 태양 문양을 밟게 하면 {slow}% 느려집니다. 붙잡히면 물어뜯겨 {damage}의 피해(영웅 난이도 {heroic})를 입고 {stun}초 동안 쓰러집니다.",
+        "avatar": "이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.",
+        "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
+      },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -4036,6 +4050,8 @@ export const ko_KR: EnTranslations = {
         "rangefinder": "대상과의 거리가 {from}미터를 넘는 {stepYards}미터마다 주는 피해가 {perStep}% 증가합니다(최대 {max}%).",
         "overclock": "시전 속도가 {pct}% 증가합니다. 끝나면 과열됩니다.",
         "overheated": "시전 속도가 {pct}% 감소합니다.",
+        "spiritPack": "영혼 재규어가 곁에서 싸우며 {every}초마다 대상을 물어뜯어 {min}~{max}의 물리 피해를 줍니다.",
+        "seedburst": "탐식화의 씨앗입니다. 이 효과가 끝나면 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 그 전에 이 적이 죽으면 피해가 {bonus}% 증가합니다({empowered}).",
         "forgeHeat": "열기: {stacks}/{max}. 대장장이 아버지의 담금질을 사용하면 열기를 모두 소모하며, 그 무기 화염 피해가 {pct}% 증가합니다.",
         "tempered": "근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입힙니다(소모한 열기로 {pct}% 증가). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다.",
         "temperedOther": "근접 및 원거리 무기가 적중하면 화염 피해를 추가로 입히며, 소모한 열기로 {pct}% 증가합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
@@ -6030,7 +6046,18 @@ export const ko_KR: EnTranslations = {
         "overtime_cross_feed": "초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돈다)",
         "walking_barrage": "이동 탄막(표식 세 개, 포탄이 파편을 남긴다)",
         "split_plating": "급속 순환과 분할 장갑(더 빨리 뒤집히고 등 쪽은 반대 면이다)",
-        "double_load": "막힌 거치대와 이중 장전(해치가 열린 동안 전지 두 개)"
+        "double_load": "막힌 거치대와 이중 장전(해치가 열린 동안 전지 두 개)",
+        "pack_bond": "무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)",
+        "stalk": "추적 (재규어가 표식 대상을 사냥: 끌고 다니며 감속, 속박, 기절시키세요)",
+        "shared_health": "생명력 공유 (하나의 생명력: 가장 안전한 쪽을 공격하세요)",
+        "heel_frenzied_bond": "돌아와! 및 광포한 유대 (재규어가 주인에게 도약, 유대 범위 20야드)",
+        "seed_rain": "씨앗 비 (깨끗한 플레이어가 싹트기 전에 씨앗을 밟으세요)",
+        "pollinate": "수분 (황금빛 플레이어는 씨앗을 피하세요, 즉시 싹이 틉니다)",
+        "vine_lash": "덩굴 채찍 (가시 통로에서 벗어나지 않으면 속박됩니다)",
+        "gorge": "포식 (방어 담당에게 강력한 물기와 독)",
+        "burrowing_seeds": "파고드는 씨앗과 꽃가루 구름 (6초 뒤 플레이어 곁에서 솟아나고, 황금빛이 퍼집니다)",
+        "spirit_of_the_hunt": "사냥의 영혼 (사냥감이 화신을 빛나는 태양 문양으로 끌고 가세요)",
+        "twin_prey_ambush": "두 사냥감과 매복 (사냥감 둘, 이후 가장 먼 플레이어를 덮칩니다)"
       }
     },
     "bastionCage": {
@@ -6078,6 +6105,18 @@ export const ko_KR: EnTranslations = {
       "chargedLine": "주문은 통하고, 물리 피해는 전하로 저장됩니다",
       "splitLine": "등 쪽 절반은 반대 면입니다",
       "storedAria": "다음 방전까지 저장된 전하: {pct}"
+    },
+    "wildheartAlert": {
+      "preyTitle": "당신이 사냥감입니다!",
+      "preyLine": "줄가르가 당신을 쫓습니다: 빛나는 태양 문양으로 끌고 가세요",
+      "preyWaitLine": "지금은 다른 사냥감을 쫓습니다: 대비하세요, 대상이 바뀝니다",
+      "stalkedTitle": "추적당함!",
+      "stalkedLine": "재규어가 당신을 사냥합니다: 주인에게서 멀리 끌고 가세요",
+      "pollinatedTitle": "수분됨!",
+      "pollinatedLine": "씨앗에서 떨어지세요: 닿으면 싹이 틉니다",
+      "bondTitle": "무리의 유대",
+      "bondLine": "함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요",
+      "timeAria": "{seconds}초 남음"
     },
     "cosmetics": {
       "title": "외형",
@@ -12390,7 +12429,14 @@ export const ko_KR: EnTranslations = {
       "wildheart_plant_totem": "토템 심기",
       "wildheart_entangling_lash": "휘감는 채찍",
       "wildheart_saurian_tail_swipe": "꼬리 휩쓸기",
-      "wildheart_saurian_stomp": "대지를 뒤흔드는 발구르기"
+      "wildheart_saurian_stomp": "대지를 뒤흔드는 발구르기",
+      "wildheart_beast_pit_quake": "야수 구덩이 진동",
+      "wildheart_jaguar_heel": "돌아와!",
+      "wildheart_gorgebloom_seed_rain": "씨앗 비",
+      "wildheart_gorgebloom_vine_lash": "덩굴 채찍",
+      "wildheart_gorgebloom_gorge": "포식",
+      "wildheart_zulgar_pulse": "야생심장 파동",
+      "wildheart_zulgar_spirit_hunt": "사냥의 영혼"
     }
   },
   "questUi": {
@@ -18777,6 +18823,33 @@ export const ko_KR: EnTranslations = {
       "draft_record": {
         "name": "설계 기록"
       },
+      "beastpit_warbelt": {
+        "name": "야수 구덩이 전투 허리띠"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "재규어 가죽 조끼"
+      },
+      "hexbone_handwraps": {
+        "name": "저주뼈 손싸개"
+      },
+      "rootbound_sabatons": {
+        "name": "뿌리 얽힌 철장화"
+      },
+      "pollen_dusted_leggings": {
+        "name": "꽃가루 묻은 다리보호구"
+      },
+      "bloomsilk_cowl": {
+        "name": "꽃비단 두건"
+      },
+      "falls_blessed_staff": {
+        "name": "폭포의 축복을 받은 지팡이"
+      },
+      "fanglords_hide_mantle": {
+        "name": "송곳니 군주의 가죽 어깨걸이"
+      },
+      "thornroot_greathelm": {
+        "name": "가시관 대투구"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -19640,6 +19713,12 @@ export const ko_KR: EnTranslations = {
       },
       "overclocked_governor": {
         "name": "과부하 조속기"
+      },
+      "fanglords_whistle": {
+        "name": "송곳니 군주의 호루라기"
+      },
+      "gorgebloom_seedpod": {
+        "name": "탐식화 씨앗꼬투리"
       },
       "rift_watchers_band": {
         "name": "균열 감시자의 반지"
@@ -20665,6 +20744,9 @@ export const ko_KR: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "분지의 목소리 줄가르"
+      },
+      "thorn_sprout": {
+        "name": "가시 새싹"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"

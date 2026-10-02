@@ -125,6 +125,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Basin's telegraphs (the shared kit) and its creature effects: the
   // Stomp's shock rings, the spore fog, the pulses and the bursts.
   { file: 'src/render/wildheart_basin/basin_fx.ts', layer: 'encounter', strict: true },
+  // The Basin's three bosses (composed by basin_fx.ts): their cast telegraphs
+  // on the shared kit, the charge sigils and the sun glyph overlays.
+  { file: 'src/render/wildheart_basin/basin_boss_fx.ts', layer: 'encounter', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },

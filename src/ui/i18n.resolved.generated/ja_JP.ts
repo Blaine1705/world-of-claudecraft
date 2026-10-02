@@ -3135,6 +3135,8 @@ export const ja_JP: EnTranslations = {
         "shackle": "{range}ヤード以内の対象を{duration}秒間その場に鎖で縛る。ボスなど行動阻害に耐性のあるクリーチャーは、代わりに移動速度が{slow}%低下する（減速にも耐性がある場合は無効）。",
         "rangefinder": "{duration}秒間、自分と対象の距離が{from}ヤードを超える{stepYards}ヤードごとに与えるダメージが{perStep}%増加する（{maxAt}ヤード以上で最大{max}%）。",
         "overclock": "{duration}秒間、詠唱速度が{haste}%上昇する。効果が終わるとオーバーヒートし、{overheat}秒間詠唱速度が{slow}%低下する。",
+        "spiritPack": "{duration}秒間、霊のジャガーを呼び出して共に戦わせる。ジャガーは対象へ駆け寄り、{every}秒ごとに噛みついて{min}～{max}の物理ダメージを与え、あなたが別の敵を対象にするとそちらへ移る。敵を対象にしていない場合は、{range}ヤード以内であなたに最も近い敵を攻撃する。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加し、呼び出した時点で確定する。{range}ヤード以内の敵対的な対象が必要。",
+        "seedburst": "{range}ヤード以内の対象に種を植える。{delay}秒後、種は対象のいる場所（または死んだ場所）で弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。対象が先に死んでいた場合は{bonus}%増加（{empowered}）。ダメージは呪文力に応じて増加し、植えた時点で確定する。種が弾ける前にあなたが死ぬと、種は枯れる。",
         "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。"
       }
     },
@@ -3909,6 +3911,18 @@ export const ja_JP: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。",
+        "packBondFury": "相棒が近くにいる間、与えるダメージが{pct}%増加する。",
+        "stalked": "大ジャガーがあなたを狙い、挑発を受け付けない。噛みつきは{min}～{max}の物理ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、出血させる。主から引き離せ。",
+        "waryStuns": "一度スタンを受けた。この効果が切れるまで、以降のスタンは効かない。",
+        "waryRoots": "一度拘束を受けた。この効果が切れるまで、以降の拘束は効かない。",
+        "warySlows": "一度鈍足を受けた。この効果が切れるまで、以降の鈍足は効かない。",
+        "pollinated": "種莢に触れると、すぐに茨の芽が生える。種には近づかず、花粉のない者に踏み潰させよう。放置された種莢は{seconds}秒で芽吹く（ヒロイックでは{heroic}秒で地中に潜り、最も近い者の傍から現れる）。",
+        "prey": "ズルガーがあなたを狙っている。光る太陽紋を踏ませると{slow}%鈍足になる。捕まると引き裂かれ、{damage}のダメージ（ヒロイックでは{heroic}）を受けて{stun}秒間倒される。",
+        "avatar": "移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。",
+        "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
+      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -4036,6 +4050,8 @@ export const ja_JP: EnTranslations = {
         "rangefinder": "対象との距離が{from}ヤードを超える{stepYards}ヤードごとに与えるダメージが{perStep}%増加（最大{max}%）。",
         "overclock": "詠唱速度が{pct}%上昇。終了後にオーバーヒートする。",
         "overheated": "詠唱速度が{pct}%低下。",
+        "spiritPack": "霊のジャガーが共に戦い、{every}秒ごとに対象へ噛みついて{min}～{max}の物理ダメージを与える。",
+        "seedburst": "ゴージブルームの種。この効果が切れると弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。それまでにこの敵が死んだ場合は{bonus}%増加（{empowered}）。",
         "forgeHeat": "熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。",
         "tempered": "近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。",
         "temperedOther": "近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
@@ -6030,7 +6046,18 @@ export const ja_JP: EnTranslations = {
         "overtime_cross_feed": "残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動く）",
         "walking_barrage": "移動弾幕（三つの印、砲弾は破片を残す）",
         "split_plating": "急速循環と分割装甲（反転が速く、背中はもう一方の面）",
-        "double_load": "詰まったラックと二重装填（一度のハッチの窓にセル二つ）"
+        "double_load": "詰まったラックと二重装填（一度のハッチの窓にセル二つ）",
+        "pack_bond": "群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）",
+        "stalk": "忍び狩り（ジャガーが印の者を狙う：引き回し、鈍足・拘束・スタンを）",
+        "shared_health": "体力共有（共通の体力：最も安全な方を攻撃）",
+        "heel_frenzied_bond": "戻れ！と狂乱の絆（ジャガーが主の元へ跳び、絆が20ヤードに広がる）",
+        "seed_rain": "種の雨（花粉のない者が芽吹く前に種を踏み潰す）",
+        "pollinate": "受粉（金色の者は種に触れるな、すぐに芽吹く）",
+        "vine_lash": "蔓の鞭（茨の帯から出ろ、さもなくば拘束される）",
+        "gorge": "貪り食い（タンクへの強烈な噛みつきと毒）",
+        "burrowing_seeds": "潜る種と花粉の雲（種は6秒で誰かの傍から芽吹き、金色は広がる）",
+        "spirit_of_the_hunt": "狩りの魂（獲物は化身を光る太陽紋へ導く）",
+        "twin_prey_ambush": "双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）"
       }
     },
     "bastionCage": {
@@ -6078,6 +6105,18 @@ export const ja_JP: EnTranslations = {
       "chargedLine": "呪文は通る。物理ダメージは電荷として蓄えられる",
       "splitLine": "背中側はもう一方の面になっている",
       "storedAria": "次の放電までに蓄えられた電荷：{pct}"
+    },
+    "wildheartAlert": {
+      "preyTitle": "お前が獲物だ！",
+      "preyLine": "ズルガーが狙っている：光る太陽紋を通らせろ",
+      "preyWaitLine": "今はもう一人の獲物を追っている：備えろ、標的が変わる",
+      "stalkedTitle": "狙われている！",
+      "stalkedLine": "ジャガーが狙っている：主から引き離せ",
+      "pollinatedTitle": "受粉した！",
+      "pollinatedLine": "種に近づくな：触れると芽吹く",
+      "bondTitle": "群れの絆",
+      "bondLine": "並んでいると被ダメージ半減：引き離せ",
+      "timeAria": "残り{seconds}秒"
     },
     "cosmetics": {
       "title": "コスメティック",
@@ -12390,7 +12429,14 @@ export const ja_JP: EnTranslations = {
       "wildheart_plant_totem": "トーテム設置",
       "wildheart_entangling_lash": "絡みつく鞭",
       "wildheart_saurian_tail_swipe": "尾の薙ぎ払い",
-      "wildheart_saurian_stomp": "大地を揺るがす踏みつけ"
+      "wildheart_saurian_stomp": "大地を揺るがす踏みつけ",
+      "wildheart_beast_pit_quake": "獣穴の地震",
+      "wildheart_jaguar_heel": "戻れ！",
+      "wildheart_gorgebloom_seed_rain": "種の雨",
+      "wildheart_gorgebloom_vine_lash": "蔓の鞭",
+      "wildheart_gorgebloom_gorge": "貪り食い",
+      "wildheart_zulgar_pulse": "ワイルドハートの脈動",
+      "wildheart_zulgar_spirit_hunt": "狩りの魂"
     }
   },
   "questUi": {
@@ -18777,6 +18823,33 @@ export const ja_JP: EnTranslations = {
       "draft_record": {
         "name": "設計記録"
       },
+      "beastpit_warbelt": {
+        "name": "獣の穴の戦帯"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "ジャガー革のジャーキン"
+      },
+      "hexbone_handwraps": {
+        "name": "呪骨のハンドラップ"
+      },
+      "rootbound_sabatons": {
+        "name": "根縛りのサバトン"
+      },
+      "pollen_dusted_leggings": {
+        "name": "花粉まみれのレギンス"
+      },
+      "bloomsilk_cowl": {
+        "name": "花絹のカウル"
+      },
+      "falls_blessed_staff": {
+        "name": "滝に祝福された杖"
+      },
+      "fanglords_hide_mantle": {
+        "name": "牙王の獣皮マントル"
+      },
+      "thornroot_greathelm": {
+        "name": "茨冠のグレートヘルム"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19640,6 +19713,12 @@ export const ja_JP: EnTranslations = {
       },
       "overclocked_governor": {
         "name": "オーバークロックのガバナー"
+      },
+      "fanglords_whistle": {
+        "name": "牙王の呼び笛"
+      },
+      "gorgebloom_seedpod": {
+        "name": "ゴージブルームの種莢"
       },
       "rift_watchers_band": {
         "name": "裂け目の監視者の指輪"
@@ -20665,6 +20744,9 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地の声ズルガー"
+      },
+      "thorn_sprout": {
+        "name": "茨の芽"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"

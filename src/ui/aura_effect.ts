@@ -118,6 +118,7 @@ import {
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
 } from '../sim/varkhul_shared_pyre';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
+import { wildheartAuraEffectDescriptor } from './wildheart_aura_effect';
 
 export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 
@@ -177,6 +178,9 @@ export function auraEffectDescriptor(
   // not say what the trinket does with it).
   const trinket = trinketAuraEffectDescriptor(a, viewer);
   if (trinket) return trinket;
+  // The Wildheart Basin's marks and boss auras say their rule (wildheart_aura_effect.ts).
+  const basin = wildheartAuraEffectDescriptor(a);
+  if (basin) return basin;
   // This is a four-second placement marker, not a damage-taken modifier. Its
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.

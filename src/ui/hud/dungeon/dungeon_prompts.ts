@@ -1,7 +1,9 @@
 // The dungeon encounter prompts the HUD composes as ONE member with ONE frame
 // call: the Iron Cage escape (cage_escape_*), Gaoler Ossick's chain alert
 // (gaol_chain_*) and the Stormbrass Foundry's alert (foundry_alert_*: the
-// Storm Cell, the Target Lock, the plating readout). It owns no DOM itself; it
+// Storm Cell, the Target Lock, the plating readout) and the Wildheart Basin's
+// alert (wildheart_alert_view.ts on the same painter family: the Prey, the
+// Stalk, the pollen, the Pack Bond readout). It owns no DOM itself; it
 // builds each view from the frame's inputs and hands it to that prompt's
 // painter.
 
@@ -11,6 +13,7 @@ import { FoundryAlert } from './foundry_alert_painter';
 import { buildFoundryAlertView, type FoundryAlertEntity } from './foundry_alert_view';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
+import { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
 
 export interface DungeonPromptsFrame {
   player: {
@@ -38,11 +41,17 @@ export class DungeonPrompts {
   private readonly cage: CageEscapePrompt;
   private readonly chain: GaolChainAlert;
   private readonly foundry: FoundryAlert;
+  private readonly wildheart: FoundryAlert;
 
   constructor(deps: CageEscapeDeps) {
     this.cage = new CageEscapePrompt(deps);
     this.chain = new GaolChainAlert(deps);
     this.foundry = new FoundryAlert(deps);
+    this.wildheart = new FoundryAlert(deps, {
+      id: 'wildheart-alert',
+      className: 'ui-panel-strong foundry-alert wildheart-alert',
+      kinds: WILDHEART_ALERT_KINDS,
+    });
   }
 
   paint(f: DungeonPromptsFrame): void {
@@ -73,11 +82,15 @@ export class DungeonPrompts {
         touch: f.touch,
       }),
     );
+    this.wildheart.paint(
+      buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity: f.entity }),
+    );
   }
 
   dispose(): void {
     this.cage.dispose();
     this.chain.dispose();
     this.foundry.dispose();
+    this.wildheart.dispose();
   }
 }

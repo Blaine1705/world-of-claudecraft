@@ -8,9 +8,20 @@
 // touch screen it IS the drop control. The skeleton is built once; every
 // per-frame value rides the PainterHost elided writers, so a still frame
 // writes nothing.
+//
+// The shared encounter alert family: the Wildheart Basin's alert
+// (wildheart_alert_view.ts) paints through this same class under its own
+// root id and kind list (AlertLook).
 
 import type { PainterHostWriters } from '../../painter_host';
 import type { FoundryAlertKind, FoundryAlertView } from './foundry_alert_view';
+
+/** One encounter alert's mount: its root id, root classes and kind classes. */
+export interface AlertLook {
+  id: string;
+  className: string;
+  kinds: readonly string[];
+}
 
 export interface FoundryAlertDeps {
   /** The HUD layer the panel mounts into (null before the HUD exists). */
@@ -30,7 +41,7 @@ interface Slots {
   fill: HTMLElement;
 }
 
-const KINDS: readonly FoundryAlertKind[] = [
+const FOUNDRY_KINDS: readonly FoundryAlertKind[] = [
   'cell-closed',
   'cell-warn',
   'cell-open',
@@ -39,14 +50,28 @@ const KINDS: readonly FoundryAlertKind[] = [
   'charged',
 ];
 
+const FOUNDRY_LOOK: AlertLook = {
+  id: 'foundry-alert',
+  className: 'ui-panel-strong foundry-alert',
+  kinds: FOUNDRY_KINDS,
+};
+
+/** A painted alert: the Foundry's view, or any family member's with a string kind. */
+export type EncounterAlertView =
+  | { visible: false }
+  | (Omit<Extract<FoundryAlertView, { visible: true }>, 'kind'> & { kind: string });
+
 export class FoundryAlert {
   private root: HTMLButtonElement | null = null;
   private slots: Slots | null = null;
   private pressable = false;
 
-  constructor(private readonly deps: FoundryAlertDeps) {}
+  constructor(
+    private readonly deps: FoundryAlertDeps,
+    private readonly look: AlertLook = FOUNDRY_LOOK,
+  ) {}
 
-  paint(view: FoundryAlertView): void {
+  paint(view: EncounterAlertView): void {
     const w = this.deps.writers;
     if (!view.visible) {
       this.pressable = false;
@@ -58,7 +83,7 @@ export class FoundryAlert {
     if (!root || !slots) return;
     this.pressable = view.pressable;
     w.setDisplay(root, 'flex');
-    for (const k of KINDS) w.toggleClass(root, `is-${k}`, view.kind === k);
+    for (const k of this.look.kinds) w.toggleClass(root, `is-${k}`, view.kind === k);
     w.toggleClass(root, 'is-pressable', view.pressable);
     w.setText(slots.title, view.title);
     w.setText(slots.line, view.line);
@@ -93,8 +118,9 @@ export class FoundryAlert {
     const doc = layer.ownerDocument;
     const root = doc.createElement('button');
     root.type = 'button';
-    root.id = 'foundry-alert';
-    root.className = 'ui-panel-strong foundry-alert';
+    const { id, className } = this.look;
+    root.id = id;
+    root.className = className;
     const title = doc.createElement('div');
     title.className = 'fa-title ui-cin';
     const line = doc.createElement('div');

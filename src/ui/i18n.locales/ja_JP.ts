@@ -19898,6 +19898,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象との距離が{from}ヤードを超える{stepYards}ヤードごとに与えるダメージが{perStep}%増加（最大{max}%）。',
   'hudChrome.auraEffect.trinket.overclock': '詠唱速度が{pct}%上昇。終了後にオーバーヒートする。',
   'hudChrome.auraEffect.trinket.overheated': '詠唱速度が{pct}%低下。',
+  'entities.items.beastpit_warbelt.name': '獣の穴の戦帯',
+  'entities.items.jaguar_hide_jerkin.name': 'ジャガー革のジャーキン',
+  'entities.items.hexbone_handwraps.name': '呪骨のハンドラップ',
+  'entities.items.rootbound_sabatons.name': '根縛りのサバトン',
+  'entities.items.pollen_dusted_leggings.name': '花粉まみれのレギンス',
+  'entities.items.bloomsilk_cowl.name': '花絹のカウル',
+  'entities.items.falls_blessed_staff.name': '滝に祝福された杖',
+  'entities.items.fanglords_hide_mantle.name': '牙王の獣皮マントル',
+  'entities.items.thornroot_greathelm.name': '茨冠のグレートヘルム',
+  'entities.items.fanglords_whistle.name': '牙王の呼び笛',
+  'entities.items.gorgebloom_seedpod.name': 'ゴージブルームの種莢',
+  'hudChrome.trinkets.use.spiritPack':
+    '{duration}秒間、霊のジャガーを呼び出して共に戦わせる。ジャガーは対象へ駆け寄り、{every}秒ごとに噛みついて{min}～{max}の物理ダメージを与え、あなたが別の敵を対象にするとそちらへ移る。敵を対象にしていない場合は、{range}ヤード以内であなたに最も近い敵を攻撃する。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加し、呼び出した時点で確定する。{range}ヤード以内の敵対的な対象が必要。',
+  'hudChrome.trinkets.use.seedburst':
+    '{range}ヤード以内の対象に種を植える。{delay}秒後、種は対象のいる場所（または死んだ場所）で弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。対象が先に死んでいた場合は{bonus}%増加（{empowered}）。ダメージは呪文力に応じて増加し、植えた時点で確定する。種が弾ける前にあなたが死ぬと、種は枯れる。',
+  'hudChrome.auraEffect.trinket.spiritPack':
+    '霊のジャガーが共に戦い、{every}秒ごとに対象へ噛みついて{min}～{max}の物理ダメージを与える。',
+  'hudChrome.auraEffect.trinket.seedburst':
+    'ゴージブルームの種。この効果が切れると弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。それまでにこの敵が死んだ場合は{bonus}%増加（{empowered}）。',
   'entities.npcs.lift_warden_corwin.name': '昇降機番コーウィン・アシュビー',
   'entities.npcs.lift_warden_corwin.title': '嵐の線の昇降機の番人',
   'entities.npcs.lift_warden_corwin.greeting':
@@ -19905,7 +19924,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_sf_storm_line.title': '嵐の線',
   'entities.quests.q_sf_storm_line.text':
     '{playerName}、昇降機が毎時運び下ろすのは鉄くずと火花ばかりで、生きた者は一人もいない。上ではまだ何かが線路を走っている。技師たちがガントリー運搬車と呼んだ巨大な蒸気クローラーだ。上がって操車場を叩き、あのクローラーを止めてくれ。',
-  'entities.quests.q_sf_storm_line.completion': '操車場が何年ぶりかで静かになった。静かだが、空っぽじゃない。聞け、その上でまだラインが動いている。',
+  'entities.quests.q_sf_storm_line.completion':
+    '操車場が何年ぶりかで静かになった。静かだが、空っぽじゃない。聞け、その上でまだラインが動いている。',
   'entities.quests.q_sf_storm_line.objectives.0.label': 'ガントリー運搬車を破壊',
   'entities.quests.q_sf_stop_the_line.title': 'ラインを止めろ',
   'entities.quests.q_sf_stop_the_line.text':
@@ -19934,7 +19954,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.storm_cells': 'ストームセル（開いたコアハッチにセルを運べ）',
   'hudChrome.finder.mech.piston_fist': 'ピストンフィスト（印の円から出ろ）',
   'hudChrome.finder.mech.tremor_step': '震動の踏みつけ（足元から離れろ）',
-  'hudChrome.finder.mech.overtime_cross_feed': '残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動く）',
+  'hudChrome.finder.mech.overtime_cross_feed':
+    '残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動く）',
   'hudChrome.finder.mech.walking_barrage': '移動弾幕（三つの印、砲弾は破片を残す）',
   'hudChrome.finder.mech.split_plating': '急速循環と分割装甲（反転が速く、背中はもう一方の面）',
   'hudChrome.finder.mech.double_load': '詰まったラックと二重装填（一度のハッチの窓にセル二つ）',
@@ -19943,4 +19964,57 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_entangling_lash': '絡みつく鞭',
   'abilityUi.cast.wildheart_saurian_tail_swipe': '尾の薙ぎ払い',
   'abilityUi.cast.wildheart_saurian_stomp': '大地を揺るがす踏みつけ',
+  'abilityUi.cast.wildheart_beast_pit_quake': '獣穴の地震',
+  'abilityUi.cast.wildheart_jaguar_heel': '戻れ！',
+  'abilityUi.cast.wildheart_gorgebloom_seed_rain': '種の雨',
+  'abilityUi.cast.wildheart_gorgebloom_vine_lash': '蔓の鞭',
+  'abilityUi.cast.wildheart_gorgebloom_gorge': '貪り食い',
+  'abilityUi.cast.wildheart_zulgar_pulse': 'ワイルドハートの脈動',
+  'abilityUi.cast.wildheart_zulgar_spirit_hunt': '狩りの魂',
+  'entities.mobs.thorn_sprout.name': '茨の芽',
+  'hudChrome.finder.mech.pack_bond': '群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）',
+  'hudChrome.finder.mech.stalk':
+    '忍び狩り（ジャガーが印の者を狙う：引き回し、鈍足・拘束・スタンを）',
+  'hudChrome.finder.mech.shared_health': '体力共有（共通の体力：最も安全な方を攻撃）',
+  'hudChrome.finder.mech.heel_frenzied_bond':
+    '戻れ！と狂乱の絆（ジャガーが主の元へ跳び、絆が20ヤードに広がる）',
+  'hudChrome.finder.mech.seed_rain': '種の雨（花粉のない者が芽吹く前に種を踏み潰す）',
+  'hudChrome.finder.mech.pollinate': '受粉（金色の者は種に触れるな、すぐに芽吹く）',
+  'hudChrome.finder.mech.vine_lash': '蔓の鞭（茨の帯から出ろ、さもなくば拘束される）',
+  'hudChrome.finder.mech.gorge': '貪り食い（タンクへの強烈な噛みつきと毒）',
+  'hudChrome.finder.mech.burrowing_seeds':
+    '潜る種と花粉の雲（種は6秒で誰かの傍から芽吹き、金色は広がる）',
+  'hudChrome.finder.mech.spirit_of_the_hunt': '狩りの魂（獲物は化身を光る太陽紋へ導く）',
+  'hudChrome.finder.mech.twin_prey_ambush':
+    '双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）',
+  'hudChrome.wildheartAlert.preyTitle': 'お前が獲物だ！',
+  'hudChrome.wildheartAlert.preyLine': 'ズルガーが狙っている：光る太陽紋を通らせろ',
+  'hudChrome.wildheartAlert.preyWaitLine': '今はもう一人の獲物を追っている：備えろ、標的が変わる',
+  'hudChrome.wildheartAlert.stalkedTitle': '狙われている！',
+  'hudChrome.wildheartAlert.stalkedLine': 'ジャガーが狙っている：主から引き離せ',
+  'hudChrome.wildheartAlert.pollinatedTitle': '受粉した！',
+  'hudChrome.wildheartAlert.pollinatedLine': '種に近づくな：触れると芽吹く',
+  'hudChrome.wildheartAlert.bondTitle': '群れの絆',
+  'hudChrome.wildheartAlert.bondLine': '並んでいると被ダメージ半減：引き離せ',
+  'hudChrome.wildheartAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.wildheart.packBond':
+    '相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。',
+  'hudChrome.auraEffect.wildheart.packBondFury':
+    '相棒が近くにいる間、与えるダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.wildheart.stalked':
+    '大ジャガーがあなたを狙い、挑発を受け付けない。噛みつきは{min}～{max}の物理ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、出血させる。主から引き離せ。',
+  'hudChrome.auraEffect.wildheart.waryStuns':
+    '一度スタンを受けた。この効果が切れるまで、以降のスタンは効かない。',
+  'hudChrome.auraEffect.wildheart.waryRoots':
+    '一度拘束を受けた。この効果が切れるまで、以降の拘束は効かない。',
+  'hudChrome.auraEffect.wildheart.warySlows':
+    '一度鈍足を受けた。この効果が切れるまで、以降の鈍足は効かない。',
+  'hudChrome.auraEffect.wildheart.pollinated':
+    '種莢に触れると、すぐに茨の芽が生える。種には近づかず、花粉のない者に踏み潰させよう。放置された種莢は{seconds}秒で芽吹く（ヒロイックでは{heroic}秒で地中に潜り、最も近い者の傍から現れる）。',
+  'hudChrome.auraEffect.wildheart.prey':
+    'ズルガーがあなたを狙っている。光る太陽紋を踏ませると{slow}%鈍足になる。捕まると引き裂かれ、{damage}のダメージ（ヒロイックでは{heroic}）を受けて{stun}秒間倒される。',
+  'hudChrome.auraEffect.wildheart.avatar':
+    '移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。',
+  'hudChrome.auraEffect.wildheart.vanished':
+    '姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。',
 };

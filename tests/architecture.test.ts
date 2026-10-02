@@ -640,6 +640,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/gaol_chain_view.ts',
   // The Stormbrass Foundry's alert (the Storm Cell, Target Lock, the plating).
   'src/ui/hud/dungeon/foundry_alert_view.ts',
+  // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
+  'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -837,6 +839,9 @@ const RENDER_PURE_CORES = [
   // and its telegraph and creature-effect specs.
   'src/render/wildheart_basin/basin_plan_core.ts',
   'src/render/wildheart_basin/basin_fx_core.ts',
+  // The basin's three boss encounters: cast specs from the sim tuning, aura
+  // dressing, the spirit cord, the pods' swell and the seeds' arc.
+  'src/render/wildheart_basin/basin_boss_fx_core.ts',
   'src/render/drowned_temple/temple_shore_core.ts',
   'src/render/drowned_temple/temple_fx_core.ts',
   'src/render/stormbrass_foundry/foundry_plan_core.ts',
