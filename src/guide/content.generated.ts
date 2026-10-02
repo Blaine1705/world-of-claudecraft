@@ -6159,6 +6159,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_foundry_workers_freed",
+    "name": "Every Chain Struck",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 

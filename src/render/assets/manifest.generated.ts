@@ -1229,6 +1229,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/star_heart_crystal.glb": "/media/models/props/star_heart_crystal.413842e8d919.glb",
   "models/props/statue_block.glb": "/media/models/props/statue_block.522cacbeb3b0.glb",
   "models/props/statue_head.glb": "/media/models/props/statue_head.2835dc7f475e.glb",
+  "models/props/stormbrass_foundry_kit.glb": "/media/models/props/stormbrass_foundry_kit.2e474d45ef96.glb",
+  "models/props/stormbrass_foundry_mountains.glb": "/media/models/props/stormbrass_foundry_mountains.6fda9c089c81.glb",
   "models/props/streetlamp_amberfall_crystal.glb": "/media/models/props/streetlamp_amberfall_crystal.0bc09ff610e9.glb",
   "models/props/streetlamp_drakelands_brazier.glb": "/media/models/props/streetlamp_drakelands_brazier.9fe8cf7385bc.glb",
   "models/props/streetlamp_eastbrook_civic.glb": "/media/models/props/streetlamp_eastbrook_civic.3b5160907428.glb",

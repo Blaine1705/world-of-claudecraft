@@ -3923,6 +3923,9 @@ export const ja_JP: EnTranslations = {
         "avatar": "移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。",
         "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
       },
+      "foundry": {
+        "scaldingVents": "メインラインの通路に立っており、蒸気孔が警告中か噴出中である。蒸気が噴き出すと、通路にいる者全員に{every}秒ごとに{min}から{max}の火炎ダメージを{seconds}秒間与える（ヒロイックでは{heroicMin}から{heroicMax}）。ベルトに乗れば安全。"
+      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -6035,7 +6038,8 @@ export const ja_JP: EnTranslations = {
         "shackle_pair": "連鎖の枷（鎖でつながれた二人は離れずに動く）",
         "reaper_behind": "影渡り（死神はプレイヤーの背後に現れる、大鎌の弧から出る）",
         "moving_belts": "動くベルト（床が運び、レバーで逆転する）",
-        "stamping_press": "プレス機（プレス前の塗られた帯に乗るな）",
+        "stamping_press": "プレス機（ハンマーはレールを伝ってベルト上の者へ迫る：塗られた帯から降りろ）",
+        "scalding_vents": "灼熱の蒸気孔（通路は周期的に蒸気を噴く：光ったらベルトに乗れ）",
         "target_lock": "ターゲットロック（動き続けろ：砲弾はいた場所に落ちる）",
         "proof_shot": "試験射撃（タンクの装甲をへこませる重い砲弾）",
         "conduction_plating": "伝導装甲（正しい種類のダメージで攻撃せよ）",
@@ -6043,7 +6047,7 @@ export const ja_JP: EnTranslations = {
         "storm_cells": "ストームセル（開いたコアハッチにセルを運べ）",
         "piston_fist": "ピストンフィスト（印の円から出ろ）",
         "tremor_step": "震動の踏みつけ（足元から離れろ）",
-        "overtime_cross_feed": "残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動く）",
+        "overtime_cross_feed": "残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動き、プレスが二台同時に落ちる）",
         "walking_barrage": "移動弾幕（三つの印、砲弾は破片を残す）",
         "split_plating": "急速循環と分割装甲（反転が速く、背中はもう一方の面）",
         "double_load": "詰まったラックと二重装填（一度のハッチの窓にセル二つ）",
@@ -6088,9 +6092,9 @@ export const ja_JP: EnTranslations = {
       "cellName": "ストームセル",
       "hatchName": "コアハッチ",
       "cellTitle": "ストームセル（静電気：毎秒 {amount}）",
-      "cellClosedLine": "コアハッチは閉じている：金色の輪の外で待て",
+      "cellClosedLine": "コアハッチまで運べ：開くまで金色の輪の外で待て",
       "cellWarnLine": "コアハッチが開きかけている：金色の輪のそばで備えよ",
-      "cellOpenLine": "コアハッチが開いた：今すぐ金色の輪に入れ！",
+      "cellOpenLine": "開いたコアハッチに運び込め：今すぐ金色の輪に入れ！",
       "dropKey": "{key} を押してセルを置き、仲間に託す",
       "dropClick": "ここをクリックしてセルを置き、仲間に託す",
       "dropTap": "ここをタップしてセルを置き、仲間に託す",
@@ -6099,12 +6103,31 @@ export const ja_JP: EnTranslations = {
       "lockTitle": "ターゲットロック！",
       "lockLine": "動き続けろ：砲弾は少し前にいた場所に落ちる",
       "lockAria": "ターゲットロックの残り時間：{pct}",
-      "groundedTitle": "接地装甲",
+      "proofTitle": "プルーフショット！",
+      "proofLine": "タンクに重砲弾：防御スキルか挑発交代を",
+      "dentedLine": "へこんだ装甲 x{stacks}：被物理ダメージ +{pct}",
+      "proofAria": "プルーフショット：{pct}",
+      "floorCellTitle": "床にストームセル！",
+      "floorCellLine": "ストームセルを拾え（インタラクトまたはクリック）",
+      "floorCellLineTouch": "ストームセルを拾え（タップ）",
+      "floorCellHint": "その後、コアハッチが開いたら運び込め",
+      "groundedTitle": "銅の面：武器が通る",
       "groundedLine": "物理ダメージは通る。呪文は電荷として蓄えられる",
-      "chargedTitle": "帯電装甲",
+      "groundedDronesLine": "呪文は弾かれる：ドローンを攻撃せよ",
+      "chargedTitle": "青の面：呪文が通る",
       "chargedLine": "呪文は通る。物理ダメージは電荷として蓄えられる",
+      "chargedDronesLine": "武器は弾かれる：ドローンを攻撃せよ",
       "splitLine": "背中側はもう一方の面になっている",
-      "storedAria": "次の放電までに蓄えられた電荷：{pct}"
+      "ventWarnTitle": "灼熱の蒸気孔！",
+      "ventWarnLine": "通路から蒸気が噴き出す：今すぐベルトに乗れ",
+      "ventScaldTitle": "灼熱の蒸気！",
+      "ventScaldLine": "通路で焼かれている：ベルトに乗れ",
+      "ventAria": "蒸気孔の残り時間：{pct}",
+      "flipIn": "装甲板は {seconds} 秒後に反転する",
+      "flipInSplit": "装甲板は {seconds} 秒後に反転する。背中側はもう一方の面になっている",
+      "flipNow": "装甲板が反転中：蓄積電荷が放出される！",
+      "storedAria": "蓄積電荷 {pct}：反転時に放出される",
+      "turnedAside": "弾かれた"
     },
     "wildheartAlert": {
       "preyTitle": "お前が獲物だ！",
@@ -6117,6 +6140,13 @@ export const ja_JP: EnTranslations = {
       "bondTitle": "群れの絆",
       "bondLine": "並んでいると被ダメージ半減：引き離せ",
       "timeAria": "残り{seconds}秒"
+    },
+    "foundryWorkers": {
+      "guardedLine": "今はだめだ、見張りが見ている。話しているところを見られたら、全員プレス機送りだ。",
+      "unguardedLine": "見張りが倒れた？ それなら頼む、逃げる勇気があるうちにこの鎖を断ち切ってくれ！",
+      "freedLine": "自由だ！ 家に帰れる。ありがとう、本当にありがとう！",
+      "free": "彼らを解放する",
+      "freeAria": "{name}と、この野営地で鎖につながれた者たちを解放する"
     },
     "cosmetics": {
       "title": "コスメティック",
@@ -20187,6 +20217,15 @@ export const ja_JP: EnTranslations = {
       "half_built_frame": {
         "name": "未完成フレーム"
       },
+      "sf_chained_miner": {
+        "name": "鎖につながれた鉱夫"
+      },
+      "sf_chained_hauler": {
+        "name": "鎖につながれた運搬人"
+      },
+      "sf_freed_laborer": {
+        "name": "解放された労働者"
+      },
       "sanctum_boneguard": {
         "name": "聖所の骨衛兵"
       },
@@ -23846,6 +23885,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "記録官メイリンを見つける"
+          }
+        }
+      },
+      "q_sf_free_the_workers": {
+        "title": "労働者を解放せよ",
+        "text": "{playerName}、この岩棚で働いていた鉱夫たちは、一人も下りてこなかった。鋳造所が彼らを捕らえたままなんだ。鉄くず置き場で鎖につながれ、とうの昔に去った主のために鉱石を掘り、鉄くずを運び続けている。見張りは主の機械どもだ。各野営地の見張りを倒し、鎖を断ち切ってくれ。三つの野営地すべてだ。彼らを家に帰してやってくれ。",
+        "completion": "{playerName}、彼らは自分の足でラインを下りてきた。一人残らずだ。空を忘れていたかのように、まぶしそうに見上げていたよ。上で何を壊してきたにせよ、谷の者たちが覚えているのはこのことだろう。",
+        "objectives": {
+          "0": {
+            "label": "労働者の野営地を解放"
           }
         }
       },

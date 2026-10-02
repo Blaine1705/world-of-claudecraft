@@ -3923,6 +3923,9 @@ export const zh_TW: EnTranslations = {
         "avatar": "移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。",
         "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。"
       },
+      "foundry": {
+        "scaldingVents": "你站在主產線的通道上，蒸汽口正在預警或噴發。蒸汽噴出後，每{every}秒對通道上的所有人造成{min}到{max}點火焰傷害，持續{seconds}秒（英雄難度為{heroicMin}到{heroicMax}點）。站在傳送帶上即可安全。"
+      },
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
       "makersBrand": "持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。",
@@ -6035,7 +6038,8 @@ export const zh_TW: EnTranslations = {
         "shackle_pair": "雙人鐐銬（被鎖在一起的兩名玩家必須靠在一起）",
         "reaper_behind": "穿影（死神從玩家身後升起，離開鐮刀的弧線）",
         "moving_belts": "移動傳送帶（地面會帶著你走，拉桿後反向）",
-        "stamping_press": "沖壓機（遠離沖壓機前的塗色區域）",
+        "stamping_press": "沖壓機（錘頭沿軌道滑向傳送帶上的玩家：離開塗色區域）",
+        "scalding_vents": "灼熱蒸汽口（通道會週期性噴出蒸汽：發光時站上傳送帶）",
         "target_lock": "目標鎖定（保持移動：砲彈落在你站過的地方）",
         "proof_shot": "試射砲彈（重砲會讓坦克的護甲凹陷）",
         "conduction_plating": "傳導裝甲（用正確的傷害類型攻擊它）",
@@ -6043,7 +6047,7 @@ export const zh_TW: EnTranslations = {
         "storm_cells": "風暴電池（把電池帶進打開的核心艙門）",
         "piston_fist": "活塞重拳（離開標記的圓圈）",
         "tremor_step": "震地踏步（遠離它的腳下）",
-        "overtime_cross_feed": "加班與交叉供料（傳送帶更快，相鄰的反向運行）",
+        "overtime_cross_feed": "加班與交叉供料（傳送帶更快，相鄰的反向運行，兩台沖壓機同時落下）",
         "walking_barrage": "徐進彈幕（三個標記，砲彈會留下彈片）",
         "split_plating": "快速循環與分裂裝甲（翻轉更快，背面是另一種裝甲）",
         "double_load": "卡住的電池架與雙重裝填（一次艙門窗口放入兩枚電池）",
@@ -6088,9 +6092,9 @@ export const zh_TW: EnTranslations = {
       "cellName": "風暴電池",
       "hatchName": "核心艙門",
       "cellTitle": "風暴電池（靜電：每秒 {amount}）",
-      "cellClosedLine": "核心艙門關閉：在金色圓環外等待",
+      "cellClosedLine": "把它帶到核心艙門：在金色圓環外等待艙門打開",
       "cellWarnLine": "核心艙門正在打開：在金色圓環旁準備",
-      "cellOpenLine": "核心艙門已打開：立刻走進金色圓環！",
+      "cellOpenLine": "把它帶進打開的核心艙門：立刻走進金色圓環！",
       "dropKey": "按 {key} 放下電池交給別人",
       "dropClick": "點擊此處放下電池交給別人",
       "dropTap": "輕點此處放下電池交給別人",
@@ -6099,12 +6103,31 @@ export const zh_TW: EnTranslations = {
       "lockTitle": "目標鎖定！",
       "lockLine": "保持移動：砲彈會落在你剛才站的地方",
       "lockAria": "目標鎖定剩餘時間：{pct}",
-      "groundedTitle": "接地裝甲",
+      "proofTitle": "校驗射擊！",
+      "proofLine": "重型砲彈射向坦克：開減傷或換嘲諷",
+      "dentedLine": "凹陷裝甲 x{stacks}：受到的物理傷害 +{pct}",
+      "proofAria": "校驗射擊：{pct}",
+      "floorCellTitle": "風暴電池掉在地上！",
+      "floorCellLine": "拾取風暴電池（互動或點擊）",
+      "floorCellLineTouch": "拾取風暴電池（輕點它）",
+      "floorCellHint": "然後在核心艙門打開時把它帶進去",
+      "groundedTitle": "銅面：武器有效",
       "groundedLine": "物理傷害有效；法術會被儲存為電荷",
-      "chargedTitle": "充能裝甲",
+      "groundedDronesLine": "法術會被彈開：攻擊無人機",
+      "chargedTitle": "藍面：法術有效",
       "chargedLine": "法術有效；物理傷害會被儲存為電荷",
+      "chargedDronesLine": "武器會被彈開：攻擊無人機",
       "splitLine": "它的背面是另一種裝甲",
-      "storedAria": "下一次放電前儲存的電荷：{pct}"
+      "ventWarnTitle": "灼熱蒸汽口！",
+      "ventWarnLine": "蒸汽即將從通道噴出：立刻站上傳送帶",
+      "ventScaldTitle": "灼熱蒸汽！",
+      "ventScaldLine": "你正在通道上被燙傷：站上傳送帶",
+      "ventAria": "蒸汽口剩餘時間：{pct}",
+      "flipIn": "裝甲板將在 {seconds} 秒後翻轉",
+      "flipInSplit": "裝甲板將在 {seconds} 秒後翻轉；它的背面是另一種裝甲",
+      "flipNow": "裝甲板正在翻轉：儲存的電荷即將釋放！",
+      "storedAria": "儲存電荷 {pct}：翻轉時釋放",
+      "turnedAside": "被彈開"
     },
     "wildheartAlert": {
       "preyTitle": "你是獵物！",
@@ -6117,6 +6140,13 @@ export const zh_TW: EnTranslations = {
       "bondTitle": "獸群羈絆",
       "bondLine": "在一起時牠們傷害減半：把牠們拉開",
       "timeAria": "剩餘{seconds}秒"
+    },
+    "foundryWorkers": {
+      "guardedLine": "現在不行，朋友，看守還盯著呢。要是被看見我們說話，大家都得進壓機。",
+      "unguardedLine": "看守倒下了？那求求你，趁我們還有膽子跑，砸開這些鎖鏈吧！",
+      "freedLine": "自由了！我們要回家了。謝謝你，朋友，謝謝你！",
+      "free": "解救他們",
+      "freeAria": "解救{name}和這個營地裡其他被鎖住的人"
     },
     "cosmetics": {
       "title": "外觀",
@@ -20187,6 +20217,15 @@ export const zh_TW: EnTranslations = {
       "half_built_frame": {
         "name": "半成品機架"
       },
+      "sf_chained_miner": {
+        "name": "戴鐐的礦工"
+      },
+      "sf_chained_hauler": {
+        "name": "戴鐐的搬運工"
+      },
+      "sf_freed_laborer": {
+        "name": "獲救的勞工"
+      },
       "sanctum_boneguard": {
         "name": "聖所骨衛"
       },
@@ -23846,6 +23885,16 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "找到檔案員梅琳"
+          }
+        }
+      },
+      "q_sf_free_the_workers": {
+        "title": "解救勞工",
+        "text": "{playerName}，在這片岩架上幹活的礦工一個都沒下來過。鑄造廠把他們扣下了：鎖在廢料營地裡，為一個早已離去的主人挖礦石、搬廢料，由他的機器看守著。打倒每個營地的看守，砸開他們的鎖鏈。三個營地都要。送他們回家。",
+        "completion": "{playerName}，他們是自己走著順著線路下來的，一個不少，瞇著眼望著天空，好像早已忘了它的模樣。不管你在上面砸毀了什麼，山谷會記住的是這件事。",
+        "objectives": {
+          "0": {
+            "label": "已解救的勞工營地"
           }
         }
       },

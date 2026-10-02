@@ -3923,6 +3923,9 @@ export const ko_KR: EnTranslations = {
         "avatar": "이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.",
         "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
       },
+      "foundry": {
+        "scaldingVents": "메인 라인의 통로 위에 서 있으며, 증기구가 경고 중이거나 분출 중입니다. 증기가 터지면 통로 위의 모든 대상에게 {every}초마다 {min}~{max}의 화염 피해를 {seconds}초 동안 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 벨트 위에 서면 안전합니다."
+      },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -6035,7 +6038,8 @@ export const ko_KR: EnTranslations = {
         "shackle_pair": "쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)",
         "reaper_behind": "그림자 건너기 (플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)",
         "moving_belts": "움직이는 벨트(바닥이 몸을 실어 나르며 레버를 당기면 반대로 돈다)",
-        "stamping_press": "프레스(프레스 앞의 칠해진 띠에서 벗어나라)",
+        "stamping_press": "프레스(망치가 레일을 타고 벨트 위의 플레이어에게 다가온다: 칠해진 띠에서 벗어나라)",
+        "scalding_vents": "뜨거운 증기구(통로가 주기적으로 증기를 뿜는다: 빛나면 벨트로 올라가라)",
         "target_lock": "표적 고정(계속 움직여라: 포탄은 서 있던 자리에 떨어진다)",
         "proof_shot": "시험 사격(탱커의 장갑을 찌그러뜨리는 무거운 포탄)",
         "conduction_plating": "전도 장갑(올바른 종류의 피해로 공격하라)",
@@ -6043,7 +6047,7 @@ export const ko_KR: EnTranslations = {
         "storm_cells": "폭풍 전지(열린 중심 해치로 전지를 옮겨라)",
         "piston_fist": "피스톤 주먹(표시된 원에서 벗어나라)",
         "tremor_step": "진동 발걸음(발 근처에서 떨어져라)",
-        "overtime_cross_feed": "초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돈다)",
+        "overtime_cross_feed": "초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돌며, 프레스 두 대가 동시에 내려친다)",
         "walking_barrage": "이동 탄막(표식 세 개, 포탄이 파편을 남긴다)",
         "split_plating": "급속 순환과 분할 장갑(더 빨리 뒤집히고 등 쪽은 반대 면이다)",
         "double_load": "막힌 거치대와 이중 장전(해치가 열린 동안 전지 두 개)",
@@ -6088,9 +6092,9 @@ export const ko_KR: EnTranslations = {
       "cellName": "폭풍 전지",
       "hatchName": "중심 해치",
       "cellTitle": "폭풍 전지 (정전기: 초당 {amount})",
-      "cellClosedLine": "중심 해치가 닫혀 있습니다: 금색 고리 밖에서 기다리세요",
+      "cellClosedLine": "전지를 중심 해치로 옮기세요: 열릴 때까지 금색 고리 밖에서 기다리세요",
       "cellWarnLine": "중심 해치가 열리고 있습니다: 금색 고리 옆에서 대기하세요",
-      "cellOpenLine": "중심 해치가 열렸습니다: 지금 금색 고리 안으로 들어가세요!",
+      "cellOpenLine": "열린 중심 해치로 전지를 옮기세요: 지금 금색 고리 안으로 들어가세요!",
       "dropKey": "{key} 키를 눌러 전지를 내려놓고 다른 사람에게 넘기세요",
       "dropClick": "여기를 클릭해 전지를 내려놓고 다른 사람에게 넘기세요",
       "dropTap": "여기를 눌러 전지를 내려놓고 다른 사람에게 넘기세요",
@@ -6099,12 +6103,31 @@ export const ko_KR: EnTranslations = {
       "lockTitle": "표적 고정!",
       "lockLine": "계속 움직이세요: 포탄은 방금 서 있던 자리에 떨어집니다",
       "lockAria": "표적 고정 남은 시간: {pct}",
-      "groundedTitle": "접지 장갑",
+      "proofTitle": "검증 사격!",
+      "proofLine": "탱커에게 강력한 포탄: 방어 기술을 쓰거나 도발을 교대하세요",
+      "dentedLine": "찌그러진 장갑 x{stacks}: 받는 물리 피해 +{pct}",
+      "proofAria": "검증 사격: {pct}",
+      "floorCellTitle": "바닥에 폭풍 전지!",
+      "floorCellLine": "폭풍 전지를 집으세요 (상호작용 또는 클릭)",
+      "floorCellLineTouch": "폭풍 전지를 집으세요 (전지를 터치)",
+      "floorCellHint": "그런 다음 중심 해치가 열리면 그 안으로 옮기세요",
+      "groundedTitle": "구리 면: 무기 공격이 통합니다",
       "groundedLine": "물리 피해는 통하고, 주문은 전하로 저장됩니다",
-      "chargedTitle": "충전 장갑",
+      "groundedDronesLine": "주문은 튕겨 나갑니다: 드론을 공격하세요",
+      "chargedTitle": "푸른 면: 주문이 통합니다",
       "chargedLine": "주문은 통하고, 물리 피해는 전하로 저장됩니다",
+      "chargedDronesLine": "무기 공격은 튕겨 나갑니다: 드론을 공격하세요",
       "splitLine": "등 쪽 절반은 반대 면입니다",
-      "storedAria": "다음 방전까지 저장된 전하: {pct}"
+      "ventWarnTitle": "뜨거운 증기구!",
+      "ventWarnLine": "통로에서 증기가 터져 나온다: 지금 벨트로 올라가라",
+      "ventScaldTitle": "뜨거운 증기!",
+      "ventScaldLine": "통로에서 데고 있다: 벨트로 올라가라",
+      "ventAria": "증기구 남은 시간: {pct}",
+      "flipIn": "{seconds}초 후 장갑판이 반전합니다",
+      "flipInSplit": "{seconds}초 후 장갑판이 반전합니다. 등 쪽 절반은 반대 면입니다",
+      "flipNow": "장갑판이 반전 중: 저장된 전하가 방출됩니다!",
+      "storedAria": "저장된 전하 {pct}: 반전할 때 방출됩니다",
+      "turnedAside": "튕겨 냄"
     },
     "wildheartAlert": {
       "preyTitle": "당신이 사냥감입니다!",
@@ -6117,6 +6140,13 @@ export const ko_KR: EnTranslations = {
       "bondTitle": "무리의 유대",
       "bondLine": "함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요",
       "timeAria": "{seconds}초 남음"
+    },
+    "foundryWorkers": {
+      "guardedLine": "지금은 안 돼, 감시자들이 지켜보고 있어. 우리가 이야기하는 걸 들키면 모두 프레스 행이야.",
+      "unguardedLine": "감시자들이 쓰러졌다고? 그럼 제발, 도망칠 용기가 남아 있을 때 이 사슬을 끊어 줘!",
+      "freedLine": "자유다! 이제 집에 간다. 고마워, 정말 고마워!",
+      "free": "그들을 풀어 준다",
+      "freeAria": "{name}와 이 야영지에 묶인 다른 이들을 풀어 준다"
     },
     "cosmetics": {
       "title": "외형",
@@ -20187,6 +20217,15 @@ export const ko_KR: EnTranslations = {
       "half_built_frame": {
         "name": "반쯤 조립된 기체"
       },
+      "sf_chained_miner": {
+        "name": "사슬에 묶인 광부"
+      },
+      "sf_chained_hauler": {
+        "name": "사슬에 묶인 운반꾼"
+      },
+      "sf_freed_laborer": {
+        "name": "풀려난 노동자"
+      },
       "sanctum_boneguard": {
         "name": "성소 뼈수호자"
       },
@@ -23846,6 +23885,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "기록관 메일린 찾기"
+          }
+        }
+      },
+      "q_sf_free_the_workers": {
+        "title": "노동자 해방",
+        "text": "{playerName}, 이 바위 선반에서 일하던 광부들은 아무도 내려오지 못했네. 주조소가 그들을 붙잡아 두었지. 고철 야영지에 사슬로 묶인 채, 오래전에 떠난 주인을 위해 광석을 캐고 고철을 나르고 있네. 주인의 기계들이 그들을 감시하고 있고. 각 야영지의 감시자를 쓰러뜨리고 사슬을 끊어 주게. 세 야영지 모두. 그들을 집으로 보내 주게.",
+        "completion": "{playerName}, 그들이 제 발로 선로를 따라 내려왔네. 한 사람도 빠짐없이. 하늘을 잊었던 사람들처럼 눈을 깜빡이며 올려다보더군. 저 위에서 무엇을 부쉈든, 골짜기가 기억할 것은 바로 이 일일세.",
+        "objectives": {
+          "0": {
+            "label": "노동자 야영지 해방"
           }
         }
       },

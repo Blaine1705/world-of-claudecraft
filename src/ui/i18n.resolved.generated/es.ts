@@ -3923,6 +3923,9 @@ export const es: EnTranslations = {
         "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
         "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
       },
+      "foundry": {
+        "scaldingVents": "You stand on a Main Line walkway while its vents warn or blow. Once the steam bursts, it deals {min} to {max} Fire damage every {every} sec for {seconds} sec ({heroicMin} to {heroicMax} on Heroic) to anyone on a walkway. Step onto a belt to be safe."
+      },
       "sharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, dividido entre el número de jugadores dentro del círculo (un {perPlayer}% cada uno con {players} jugadores).",
       "varkhulSharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.",
       "makersBrand": "Durante {duration} s, cada acumulación aumenta el daño recibido de Varkhul en un {pct}%. Se acumula hasta {max} veces. Los tanques deben rotar a las {swap} acumulaciones.",
@@ -6035,7 +6038,8 @@ export const es: EnTranslations = {
         "shackle_pair": "Shackle Pair (two chained players must stay close together)",
         "reaper_behind": "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
         "moving_belts": "Moving Belts (the floor carries you, and reverses on the lever)",
-        "stamping_press": "Stamping Press (stay off the painted strip at the press)",
+        "stamping_press": "Stamping Press (the hammers ride their rails to the belt riders: step off the painted strip)",
+        "scalding_vents": "Scalding Vents (the walkways steam on a rhythm: get onto a belt when they glow)",
         "target_lock": "Target Lock (keep moving: shells land where you stood)",
         "proof_shot": "Proof Shot (a heavy shell that dents the tank)",
         "conduction_plating": "Conduction Plating (hit it with the right damage kind)",
@@ -6043,7 +6047,7 @@ export const es: EnTranslations = {
         "storm_cells": "Storm Cells (carry a cell into the open Core Hatch)",
         "piston_fist": "Piston Fist (move out of the marked circle)",
         "tremor_step": "Tremor Step (keep clear of its feet)",
-        "overtime_cross_feed": "Overtime and Cross-Feed (faster belts, neighbors run opposite)",
+        "overtime_cross_feed": "Overtime and Cross-Feed (faster belts, neighbors run opposite, two presses strike at once)",
         "walking_barrage": "Walking Barrage (three marks, and the shells leave shrapnel)",
         "split_plating": "Rapid Cycling and Split Plating (faster flips, its back wears the other face)",
         "double_load": "Jammed Racks and Double Load (two cells in one hatch window)",
@@ -6088,9 +6092,9 @@ export const es: EnTranslations = {
       "cellName": "Storm Cell",
       "hatchName": "Core Hatch",
       "cellTitle": "Storm Cell (Static: {amount} a second)",
-      "cellClosedLine": "The Core Hatch is shut: wait outside the gold ring",
+      "cellClosedLine": "Carry it to the Core Hatch: wait outside the gold ring until it opens",
       "cellWarnLine": "The Core Hatch is opening: be ready at the gold ring",
-      "cellOpenLine": "The Core Hatch is open: step into the gold ring now!",
+      "cellOpenLine": "Carry it into the open Core Hatch: step into the gold ring now!",
       "dropKey": "Press {key} to drop the cell for someone else",
       "dropClick": "Click here to drop the cell for someone else",
       "dropTap": "Tap here to drop the cell for someone else",
@@ -6099,12 +6103,31 @@ export const es: EnTranslations = {
       "lockTitle": "Target Lock!",
       "lockLine": "Keep moving: the shells land where you stood a moment ago",
       "lockAria": "Target Lock time left: {pct}",
-      "groundedTitle": "Grounded Plating",
+      "proofTitle": "Proof Shot!",
+      "proofLine": "A heavy shell at the tank: use a defensive or taunt swap",
+      "dentedLine": "Dented Plating x{stacks}: +{pct} physical damage taken",
+      "proofAria": "Proof Shot: {pct}",
+      "floorCellTitle": "Storm Cell on the floor!",
+      "floorCellLine": "Take a Storm Cell (interact or click)",
+      "floorCellLineTouch": "Take a Storm Cell (tap it)",
+      "floorCellHint": "Then carry it into the Core Hatch when it opens",
+      "groundedTitle": "Copper face: weapons land",
       "groundedLine": "Physical damage lands; spells are stored as charge",
-      "chargedTitle": "Charged Plating",
+      "groundedDronesLine": "Spells are turned aside: hit the drones",
+      "chargedTitle": "Blue face: spells land",
       "chargedLine": "Spells land; physical damage is stored as charge",
+      "chargedDronesLine": "Weapons are turned aside: hit the drones",
       "splitLine": "Its back half wears the other face",
-      "storedAria": "Stored Charge toward the next Discharge: {pct}"
+      "ventWarnTitle": "Scalding Vents!",
+      "ventWarnLine": "Steam bursts from the walkways: step onto a belt now",
+      "ventScaldTitle": "Scalding steam!",
+      "ventScaldLine": "The walkway is scalding you: get onto a belt",
+      "ventAria": "Vent time left: {pct}",
+      "flipIn": "The plates flip in {seconds} seconds",
+      "flipInSplit": "The plates flip in {seconds} seconds; the back half wears the other face",
+      "flipNow": "The plates are flipping: the Stored Charge is released!",
+      "storedAria": "Stored Charge {pct}: released at the flip",
+      "turnedAside": "Turned aside"
     },
     "wildheartAlert": {
       "preyTitle": "You are the Prey!",
@@ -6117,6 +6140,13 @@ export const es: EnTranslations = {
       "bondTitle": "Pack Bond",
       "bondLine": "Together they take half damage: pull them apart",
       "timeAria": "{seconds} seconds left"
+    },
+    "foundryWorkers": {
+      "guardedLine": "Not now, friend, not while the guards are watching. If they see us talking, it is the press for all of us.",
+      "unguardedLine": "The guards are down? Then please, strike these chains while we still have the nerve to run!",
+      "freedLine": "Free! We are going home. Thank you, friend, thank you!",
+      "free": "Free them",
+      "freeAria": "Free {name} and the others chained at this camp"
     },
     "cosmetics": {
       "title": "Cosméticos",
@@ -20187,6 +20217,15 @@ export const es: EnTranslations = {
       "half_built_frame": {
         "name": "Half-Built Frame"
       },
+      "sf_chained_miner": {
+        "name": "Chained Miner"
+      },
+      "sf_chained_hauler": {
+        "name": "Chained Hauler"
+      },
+      "sf_freed_laborer": {
+        "name": "Freed Laborer"
+      },
       "sanctum_boneguard": {
         "name": "Guardahuesos del Santuario"
       },
@@ -23846,6 +23885,16 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Archivist Maelin found"
+          }
+        }
+      },
+      "q_sf_free_the_workers": {
+        "title": "Free the Workers",
+        "text": "The miners who worked this shelf never came down, {playerName}. The foundry kept them: chained at its scrap camps, digging ore and hauling scrap for a master who left long ago, with his machines standing guard. Break the guards at each camp and strike the chains. All three camps. Send them home.",
+        "completion": "They came down the line on their own feet, {playerName}, every one of them, blinking at the sky like they had forgotten it. Whatever else you broke up there, this is the part the valley will remember.",
+        "objectives": {
+          "0": {
+            "label": "Worker camps freed"
           }
         }
       },
