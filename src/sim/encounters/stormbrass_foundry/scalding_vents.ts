@@ -1,14 +1,17 @@
 // Line-Master Tock's Scalding Vents (line_master.ts runs it each fight tick):
-// the steam grilles along every Main Line walkway blow on a rhythm, so the
-// belts are the floor to fight on and the walkways are only for crossing.
+// the steam grilles in every Main Line floor that is not a belt (the walkways,
+// the apron past the press and the lip before the chute: ids.ts ventFloors)
+// blow on a rhythm, so the belts are the ONLY floor to fight on (the owner's
+// call: no apron to tank the Line-Master on and skip the presses) and the
+// rest is only for crossing.
 //
 //   off    ventEvery - ventWarning - ventScald seconds of quiet (the first
 //          warning comes ventFirst seconds into the fight).
 //   warn   ventWarning seconds: every walkway is painted (one strip object a
 //          walkway, template warn) and the grilles hiss.
 //   scald  ventScald seconds (template scald): a tick of fire damage every
-//          ventTickEvery to everyone standing on a walkway inside the belts'
-//          run (onWalkway), the first the moment the steam bursts.
+//          ventTickEvery to everyone standing on Main Line floor that is not
+//          a belt (onWalkway), the first the moment the steam bursts.
 //
 // A player on a walkway wears the TOCK_SCALDING_VENTS aura while the vents
 // warn (value2 0) or scald (value2 1), its clock the phase's seconds left: the

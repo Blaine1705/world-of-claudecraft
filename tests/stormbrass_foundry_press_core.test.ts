@@ -31,6 +31,7 @@ import {
   VENT_GRILLE_HALF,
   VENT_LANE_STYLE,
   VENT_LANES,
+  VENT_WALKWAY_COUNT,
   ventEase,
   ventGrilles,
   ventHeatTarget,
@@ -38,12 +39,17 @@ import {
   ventLaneFill,
   ventPhaseOf,
 } from '../src/render/stormbrass_foundry/foundry_vents_core';
-import { MAIN_LINE, MAIN_LINE_BELTS } from '../src/sim/content/stormbrass_foundry_layout';
+import {
+  MAIN_LINE,
+  MAIN_LINE_BELTS,
+  STAMPING_PRESS,
+} from '../src/sim/content/stormbrass_foundry_layout';
 import {
   FOUNDRY_VENT_TEMPLATES,
   onWalkway,
   pressRailStops,
   TOCK_TUNING as T,
+  ventFloors,
   walkwayStrips,
 } from '../src/sim/encounters/stormbrass_foundry/ids';
 
@@ -154,15 +160,37 @@ describe('the press gantry plan', () => {
 });
 
 describe("the Scalding Vents' plan", () => {
-  it('lays one lane on every sim walkway, exactly its width and the run of the belts', () => {
+  it('lays one lane on every floor the sim scalds: the walkways, the apron, the lip', () => {
     const ways = walkwayStrips(MAIN_LINE, MAIN_LINE_BELTS);
-    expect(VENT_LANES).toHaveLength(ways.length);
+    const floors = ventFloors(MAIN_LINE, MAIN_LINE_BELTS);
+    expect(VENT_WALKWAY_COUNT).toBe(ways.length);
+    expect(VENT_LANES).toHaveLength(floors.length);
+    expect(floors.length).toBe(ways.length + 2);
     VENT_LANES.forEach((lane, i) => {
-      expect(lane.x - lane.halfWidth).toBeCloseTo(ways[i].x0, 6);
-      expect(lane.x + lane.halfWidth).toBeCloseTo(ways[i].x1, 6);
-      expect(lane.z0).toBe(MAIN_LINE_BELTS.z0);
-      expect(lane.z0 + lane.length).toBe(MAIN_LINE_BELTS.z1);
+      expect(lane.x - lane.halfWidth).toBeCloseTo(floors[i].x0, 6);
+      expect(lane.x + lane.halfWidth).toBeCloseTo(floors[i].x1, 6);
+      expect(lane.z0).toBe(floors[i].z0);
+      expect(lane.z0 + lane.length).toBe(floors[i].z1);
     });
+    // The walkway lanes lead (the strip objects' order: lane 0 is the west
+    // walkway the painter takes its origin from), running the belts' length.
+    for (let i = 0; i < ways.length; i++) {
+      expect(VENT_LANES[i].x - VENT_LANES[i].halfWidth).toBeCloseTo(ways[i].x0, 6);
+      expect(VENT_LANES[i].z0).toBe(MAIN_LINE_BELTS.z0);
+      expect(VENT_LANES[i].z0 + VENT_LANES[i].length).toBe(MAIN_LINE_BELTS.z1);
+    }
+    // The telegraph leaves no unpainted hazard: every non-belt spot of the
+    // Main Line lies inside a lane, and no lane covers a belt.
+    const inLane = (x: number, z: number) =>
+      VENT_LANES.some(
+        (l) =>
+          Math.abs(x - l.x) <= l.halfWidth + 1e-9 &&
+          z >= l.z0 - 1e-9 &&
+          z <= l.z0 + l.length + 1e-9,
+      );
+    for (let x = MAIN_LINE.x0 + 0.25; x < MAIN_LINE.x1; x += 0.5)
+      for (let z = MAIN_LINE.z0 + 0.25; z < MAIN_LINE.z1; z += 0.5)
+        expect(inLane(x, z), `${x}, ${z}`).toBe(onWalkway(MAIN_LINE, MAIN_LINE_BELTS, x, z));
     expect(VENT_LANE_STYLE.color).toBe(TELEGRAPH_THREAT_COLORS.danger);
   });
 
@@ -179,6 +207,14 @@ describe("the Scalding Vents' plan", () => {
     const first = (lane: number) =>
       Math.min(...grilles.filter((g) => g.x === VENT_LANES[lane].x).map((g) => g.z));
     expect(first(0)).not.toBeCloseTo(first(1), 3);
+    // The press-end apron has its own grilles, clear of the press posts.
+    const apron = grilles.filter((g) => g.z > MAIN_LINE_BELTS.z1);
+    expect(apron.length).toBeGreaterThanOrEqual(10);
+    for (const g of apron)
+      for (const x of STAMPING_PRESS.postXs)
+        expect(Math.hypot(g.x - x, g.z - STAMPING_PRESS.z)).toBeGreaterThan(
+          STAMPING_PRESS.postR + VENT_GRILLE_HALF,
+        );
   });
 
   it('reads the phase off the strip template and runs the look with it', () => {

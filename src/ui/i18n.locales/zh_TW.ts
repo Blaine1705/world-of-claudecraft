@@ -19092,5 +19092,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。',
   'hudChrome.auraEffect.wildheart.vanished': '隱匿且免疫傷害。他即將撲向最遠的玩家。',
   'hudChrome.auraEffect.foundry.scaldingVents':
-    '你站在主產線的通道上，蒸汽口正在預警或噴發。蒸汽噴出後，每{every}秒對通道上的所有人造成{min}到{max}點火焰傷害，持續{seconds}秒（英雄難度為{heroicMin}到{heroicMax}點）。站在傳送帶上即可安全。',
+    '你站在主產線傳送帶以外的地面上，蒸汽口正在預警或噴發。蒸汽噴出後，每{every}秒對所有不在傳送帶上的人造成{min}到{max}點火焰傷害，持續{seconds}秒（英雄難度為{heroicMin}到{heroicMax}點）。只有傳送帶上是安全的。',
+  'hudChrome.auraEffect.foundry.targetLock':
+    '靶場守衛正在鎖定你。每{every}秒會在你所站的位置畫出一個圓圈，{delay}秒後砲彈落下，對{radius}碼內的所有人造成{min}到{max}點火焰傷害（英雄難度為{heroicMin}到{heroicMax}點）。保持移動。解除減速的效果無法移除此標記。',
 };

@@ -135,7 +135,8 @@ export const TOCK_TUNING = {
   rivetMult: 1.4,
   /** Scalding Vents: every ventEvery seconds (the first at ventFirst) every
    *  walkway is painted for ventWarning, then scalds for ventScald, one tick
-   *  every ventTickEvery to anyone on a walkway inside the belts' run. A tick
+   *  every ventTickEvery to anyone on Main Line floor that is not a belt
+   *  (the walkways, the press-end apron, the chute-end lip: ventFloors). A tick
    *  is a raid-pulse share of the 950 health wearer (about 6 percent), so a
    *  whole burst stood out costs about one press: the belts are the floor. */
   ventFirst: 10,
@@ -207,10 +208,20 @@ export function pressStripCentre(
   return top - k * step;
 }
 
-/** The floor the belts run across (instance-local), for the walkways. */
+/** The floor the belts run across (instance-local): the whole Main Line. */
 export interface LineRect {
   x0: number;
   x1: number;
+  z0: number;
+  z1: number;
+}
+
+/** A rectangle of floor the Scalding Vents reach (instance-local). */
+export interface VentFloor {
+  x0: number;
+  x1: number;
+  z0: number;
+  z1: number;
 }
 
 /** The walkways, west to east: the Main Line floor between and beside the
@@ -226,10 +237,29 @@ export function walkwayStrips(line: LineRect, belts: BeltLayout): { x0: number; 
   return out;
 }
 
-/** Is an instance-local spot on a walkway the Scalding Vents reach: inside the
- *  Main Line's width and the belts' run, and on no belt? */
+/** Every floor of the Main Line that is not a belt, as the rectangles the
+ *  Scalding Vents scald and the renderer paints: the walkways between and
+ *  beside the belts (west to east, the strip objects' order), then the apron
+ *  past the belts' press end (the press frame and the Crane Landing) and the
+ *  lip before their chute end. The fight is fought ON the belts: there is no
+ *  safe floor to tank the Line-Master on. */
+export function ventFloors(line: LineRect, belts: BeltLayout): VentFloor[] {
+  const out: VentFloor[] = walkwayStrips(line, belts).map((w) => ({
+    x0: w.x0,
+    x1: w.x1,
+    z0: belts.z0,
+    z1: belts.z1,
+  }));
+  if (line.z1 > belts.z1) out.push({ x0: line.x0, x1: line.x1, z0: belts.z1, z1: line.z1 });
+  if (belts.z0 > line.z0) out.push({ x0: line.x0, x1: line.x1, z0: line.z0, z1: belts.z0 });
+  return out;
+}
+
+/** Is an instance-local spot on floor the Scalding Vents reach: anywhere on
+ *  the Main Line that is not a belt (a walkway, the press-end apron, the
+ *  chute-end lip)? */
 export function onWalkway(line: LineRect, belts: BeltLayout, lx: number, lz: number): boolean {
-  if (lx < line.x0 || lx > line.x1 || lz < belts.z0 || lz > belts.z1) return false;
+  if (lx < line.x0 || lx > line.x1 || lz < line.z0 || lz > line.z1) return false;
   return beltIndexAt(belts, lx, lz) === -1;
 }
 
@@ -296,6 +326,10 @@ export const RANGE_TUNING = {
   proofEvery: 15,
   proofCast: 1.5,
   proofMult: 1.5,
+  /** The berm gun's reach for a Proof Shot: across the Proving Range corner to
+   *  corner (60 by 32 yd) and no farther. The bar never starts on, and the
+   *  shell never lands on, a target beyond it (a tank who left the range). */
+  proofReach: 70,
   dentedPct: 0.1,
   dentedMax: 3,
   dentedSeconds: 12,

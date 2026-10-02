@@ -1,16 +1,22 @@
 // Pure plan of Line-Master Tock's Scalding Vents (foundry_vents.ts draws it):
-// where every walkway's floor warning lies, where the steam grilles sit along
-// each walkway, and how the look runs with the phase the sim's strip objects
+// where the floor warning lies (every Main Line floor that is not a belt: the
+// walkways, the press-end apron, the chute-end lip), where the steam grilles
+// sit, and how the look runs with the phase the sim's strip objects
 // carry (sim/encounters/stormbrass_foundry/scalding_vents.ts: template warn,
 // then scald, then gone). Everything is derived from the sim's own layout and
 // tuning, so the strip a player reads is the floor the sim scalds.
 //
 // Three-free, DOM-free, deterministic.
 
-import { MAIN_LINE, MAIN_LINE_BELTS } from '../../sim/content/stormbrass_foundry_layout';
+import {
+  MAIN_LINE,
+  MAIN_LINE_BELTS,
+  STORMBRASS_FOUNDRY_FIELD,
+} from '../../sim/content/stormbrass_foundry_layout';
 import {
   FOUNDRY_VENT_TEMPLATES,
   TOCK_TUNING,
+  ventFloors,
   walkwayStrips,
 } from '../../sim/encounters/stormbrass_foundry/ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
@@ -33,15 +39,17 @@ export interface VentLane {
   length: number;
 }
 
-/** The five walkways as floor lanes, west to east (the strip objects' order). */
-export const VENT_LANES: readonly VentLane[] = walkwayStrips(MAIN_LINE, MAIN_LINE_BELTS).map(
-  (w) => ({
-    x: (w.x0 + w.x1) / 2,
-    halfWidth: (w.x1 - w.x0) / 2,
-    z0: MAIN_LINE_BELTS.z0,
-    length: MAIN_LINE_BELTS.z1 - MAIN_LINE_BELTS.z0,
-  }),
-);
+/** Every floor the sim scalds as a floor lane: the five walkways west to east
+ *  (the strip objects' order, so lane 0 is the west walkway), then the
+ *  press-end apron and the chute-end lip across the whole line. */
+export const VENT_LANES: readonly VentLane[] = ventFloors(MAIN_LINE, MAIN_LINE_BELTS).map((f) => ({
+  x: (f.x0 + f.x1) / 2,
+  halfWidth: (f.x1 - f.x0) / 2,
+  z0: f.z0,
+  length: f.z1 - f.z0,
+}));
+/** How many of the lanes are walkways (the rest lie across the line's ends). */
+export const VENT_WALKWAY_COUNT = walkwayStrips(MAIN_LINE, MAIN_LINE_BELTS).length;
 
 /** The floor warning's look: avoidable damage, steam in its motes. */
 export const VENT_LANE_STYLE = {
@@ -62,11 +70,52 @@ export const VENT_GRILLE_SPACING = 3.5;
 /** A grille's half size (a square floor grate). */
 export const VENT_GRILLE_HALF = 0.85;
 
+/** Is a grille at (x, z) clear of every collider standing on the Main Line
+ *  (the press posts, the crane, the engine house, the crates, the chute legs)? */
+function grilleClear(x: number, z: number): boolean {
+  const pad = VENT_GRILLE_HALF + 0.6;
+  for (const p of STORMBRASS_FOUNDRY_FIELD.props) {
+    const dx = x - p.x;
+    const dz = z - p.z;
+    if (p.r !== undefined && p.r > 0) {
+      if (Math.hypot(dx, dz) < p.r + pad) return false;
+    } else if (p.hw !== undefined && p.hd !== undefined) {
+      const c = Math.cos(p.rot);
+      const sn = Math.sin(p.rot);
+      const lx = dx * c - dz * sn;
+      const lz = dx * sn + dz * c;
+      if (Math.abs(lx) < p.hw + pad && Math.abs(lz) < p.hd + pad) return false;
+    }
+  }
+  return true;
+}
+
 /** Every steam grille: a row down each walkway's centre line, staggered from
- *  one walkway to the next so the jets never line up into a wall. */
+ *  one walkway to the next so the jets never line up into a wall, and a
+ *  staggered grid over the press-end apron (clear of what stands on it). The
+ *  chute-end lip is too narrow for a grille: its lane alone warns. */
 export function ventGrilles(): VentGrille[] {
   const out: VentGrille[] = [];
-  VENT_LANES.forEach((lane, w) => {
+  const apron = VENT_LANES[VENT_WALKWAY_COUNT];
+  if (apron) {
+    const rows = Math.max(1, Math.floor((apron.length - 2 * VENT_GRILLE_HALF) / 4.5));
+    for (let r = 0; r < rows; r++) {
+      const z = apron.z0 + 2.2 + r * 4.5;
+      const stagger = r % 2 === 0 ? 0 : 2.5;
+      let i = 0;
+      for (
+        let x = apron.x - apron.halfWidth + 2 + stagger;
+        x <= apron.x + apron.halfWidth - 2;
+        x += 5
+      ) {
+        i++;
+        if (z + VENT_GRILLE_HALF > apron.z0 + apron.length - 0.5) continue;
+        if (!grilleClear(x, z)) continue;
+        out.push({ x, z, seed: ((((r * 11 + i * 17) * 0.6180339) % 1) + 1) % 1 });
+      }
+    }
+  }
+  VENT_LANES.slice(0, VENT_WALKWAY_COUNT).forEach((lane, w) => {
     const count = Math.floor(lane.length / VENT_GRILLE_SPACING);
     const pad = (lane.length - (count - 1) * VENT_GRILLE_SPACING) / 2;
     const stagger = w % 2 === 0 ? 0 : VENT_GRILLE_SPACING / 2;

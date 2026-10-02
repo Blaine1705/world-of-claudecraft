@@ -22,8 +22,14 @@ import {
   RANGEWARDEN_ID,
   RANGE_TUNING as T,
 } from '../src/sim/encounters/stormbrass_foundry';
-import { rangeState, startTargetLock } from '../src/sim/encounters/stormbrass_foundry/rangewarden';
+import {
+  inProofReach,
+  rangeState,
+  startTargetLock,
+} from '../src/sim/encounters/stormbrass_foundry/rangewarden';
 import { DT, type Entity, type RangewardenFightState } from '../src/sim/types';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
+import { foundryHeroicAmount } from '../src/ui/foundry_aura_effect';
 import { buildFoundryAlertView } from '../src/ui/hud/dungeon/foundry_alert_view';
 import { setLanguage, t } from '../src/ui/i18n';
 import {
@@ -287,6 +293,112 @@ describe('the Rangewarden: the trail salvo (G20)', () => {
     startTargetLock(f.sim.ctx, f.inst, b, state(b));
     expect(objects(f, FOUNDRY_BUNKER_TEMPLATES.breached)).toHaveLength(0);
     expect(objects(f, FOUNDRY_BUNKER_TEMPLATES.sound)).toHaveLength(RANGE_BUNKERS.length);
+  });
+});
+
+describe('the Rangewarden: owner decisions (the mark holds, the gun has a reach)', () => {
+  it('Target Lock is a mark no slow immunity refuses and no snare-break strips', () => {
+    const { f } = rangeFight();
+    // Every non-tank is immune to slows before the lock goes out.
+    for (const p of f.others)
+      f.sim.ctx.applyAura(p, {
+        id: 'test_slow_immunity',
+        name: 'Unhindered',
+        kind: 'slow_immunity',
+        remaining: 60,
+        duration: 60,
+        value: 0,
+        sourceId: p.id,
+        school: 'physical',
+      });
+    run(f, T.lockFirst + 0.1);
+    const locked = marked(f);
+    expect(locked).toHaveLength(T.lockCount);
+    for (const p of locked) {
+      const mark = aura(p, RANGE_TARGET_LOCK);
+      expect(mark?.unbreakableControl).toBe(true);
+      expect(mark?.undispellable).toBe(true);
+      // Not a snare at all: full speed, and nothing a root or slow break finds.
+      expect(mark?.kind).toBe('vulnerability');
+      expect(mark?.value).toBe(0);
+      // An ordinary snare-break (the shape of every one in src/sim/combat:
+      // strip the root and slow auras that are not unbreakable control).
+      p.auras = p.auras.filter(
+        (a) => !((a.kind === 'root' || a.kind === 'slow') && a.unbreakableControl !== true),
+      );
+      expect(aura(p, RANGE_TARGET_LOCK)).toBeDefined();
+    }
+    // The mark still does its work: circles keep painting under the runners.
+    const before = circles(f).length;
+    run(f, T.shellEvery + 0.1);
+    expect(circles(f).length).toBeGreaterThan(before);
+    expect(marked(f)).toHaveLength(T.lockCount);
+  });
+
+  it('the mark adds nothing to the damage its wearer takes', () => {
+    const { f } = rangeFight();
+    run(f, T.lockFirst + 0.1);
+    const p = marked(f)[0];
+    expect(aura(p, RANGE_TARGET_LOCK)?.value).toBe(0);
+    const d = auraEffectDescriptor({ id: RANGE_TARGET_LOCK, kind: 'vulnerability', value: 0 });
+    expect(d?.key).toBe('hudChrome.auraEffect.foundry.targetLock');
+    expect(d?.nums).toEqual({
+      every: T.shellEvery,
+      delay: T.shellLag + T.shellWarning,
+      radius: T.shellRadius,
+      min: T.shellMin,
+      max: T.shellMax,
+      heroicMin: foundryHeroicAmount(RANGEWARDEN_ID, T.shellMin),
+      heroicMax: foundryHeroicAmount(RANGEWARDEN_ID, T.shellMax),
+    });
+    const text = t('hudChrome.auraEffect.foundry.targetLock', d?.nums ?? {});
+    expect(text).toContain(`${T.shellMin} to ${T.shellMax} Fire damage`);
+    expect(text).not.toContain('{');
+  });
+
+  it('Proof Shot never starts on a target beyond the gun reach, and fires once they are back', () => {
+    const { f, b } = rangeFight();
+    expect(T.proofReach).toBe(70);
+    // The tank holds aggro from far outside the range (a live Rangewarden left behind).
+    const far = () => {
+      put(f, b, HOME.x, HOME.z);
+      put(f, f.tank, HOME.x + T.proofReach + 12, HOME.z);
+      b.aggroTargetId = f.tank.id;
+    };
+    const from = f.hits.length;
+    let cast = false;
+    run(f, T.proofFirst + T.proofEvery + 2, () => {
+      far();
+      if (b.castingAbility === RANGE_PROOF_SHOT) cast = true;
+    });
+    expect(cast).toBe(false);
+    expect(inProofReach(b, f.tank)).toBe(false);
+    expect(hitsOn(f, f.tank, 'Proof Shot', from)).toHaveLength(0);
+    expect(aura(f.tank, RANGE_DENTED)).toBeUndefined();
+    // Back in reach: the shot was waiting, ready.
+    const near = () => {
+      put(f, b, HOME.x, HOME.z);
+      put(f, f.tank, HOME.x, HOME.z - 2);
+      b.aggroTargetId = f.tank.id;
+    };
+    run(f, 0.2, near);
+    expect(b.castingAbility).toBe(RANGE_PROOF_SHOT);
+    run(f, T.proofCast + 0.1, near);
+    expect(hitsOn(f, f.tank, 'Proof Shot', from)).toHaveLength(1);
+  });
+
+  it('a Proof Shot whose target leaves the reach during the bar falls short', () => {
+    const { f, b } = rangeFight();
+    run(f, T.proofFirst + 0.05);
+    expect(b.castingAbility).toBe(RANGE_PROOF_SHOT);
+    const from = f.hits.length;
+    run(f, T.proofCast + 0.1, () => {
+      put(f, b, HOME.x, HOME.z);
+      put(f, f.tank, HOME.x + T.proofReach + 12, HOME.z);
+    });
+    expect(b.castingAbility).not.toBe(RANGE_PROOF_SHOT);
+    expect(hitsOn(f, f.tank, 'Proof Shot', from)).toHaveLength(0);
+    expect(aura(f.tank, RANGE_DENTED)).toBeUndefined();
   });
 });
 

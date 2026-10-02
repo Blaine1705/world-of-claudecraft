@@ -30,6 +30,7 @@ import {
   TOCK_PRESSURE,
   TOCK_RIVET_GUN,
   TOCK_SCALDING_VENTS,
+  ventFloors,
   walkwayStrips,
 } from '../src/sim/encounters/stormbrass_foundry';
 import {
@@ -182,7 +183,7 @@ describe('Line-Master Tock: the press rail (pure geometry)', () => {
     expect(inPressStrip(B, 7, zc, B.xs[1], zc)).toBe(false);
   });
 
-  it('the walkways are the Main Line floor between and beside the belts, inside their run', () => {
+  it('the vents reach every Main Line floor that is not a belt: walkways, apron and lip', () => {
     const ways = walkwayStrips(MAIN_LINE, B);
     expect(ways).toHaveLength(B.xs.length + 1);
     expect(ways[0].x0).toBe(MAIN_LINE.x0);
@@ -193,10 +194,43 @@ describe('Line-Master Tock: the press rail (pure geometry)', () => {
       expect(beltIndexAt(B, mid, -24)).toBe(-1);
     }
     for (const x of B.xs) expect(onWalkway(MAIN_LINE, B, x, -24)).toBe(false);
-    // Beyond the belts' run (the press end, the chute end) the floor never vents.
-    expect(onWalkway(MAIN_LINE, B, 0, B.z1 + 1)).toBe(false);
-    expect(onWalkway(MAIN_LINE, B, 0, B.z0 - 1)).toBe(false);
+    // The owner's call: no safe floor to tank him on. The apron past the
+    // belts' press end and the lip before their chute end vent too, across
+    // the whole line, in the belts' own columns as well.
+    expect(onWalkway(MAIN_LINE, B, 0, B.z1 + 1)).toBe(true);
+    expect(onWalkway(MAIN_LINE, B, 0, B.z0 - 1)).toBe(true);
+    for (const x of B.xs) {
+      expect(onWalkway(MAIN_LINE, B, x, B.z1 + 0.5)).toBe(true);
+      expect(onWalkway(MAIN_LINE, B, x, MAIN_LINE.z1 - 0.1)).toBe(true);
+      expect(onWalkway(MAIN_LINE, B, x, MAIN_LINE.z0 + 0.1)).toBe(true);
+      // ...and the belt itself stays safe to its very ends.
+      expect(onWalkway(MAIN_LINE, B, x, B.z1)).toBe(false);
+      expect(onWalkway(MAIN_LINE, B, x, B.z0)).toBe(false);
+    }
+    // Off the Main Line nothing vents.
     expect(onWalkway(MAIN_LINE, B, MAIN_LINE.x1 + 1, -24)).toBe(false);
+    expect(onWalkway(MAIN_LINE, B, 0, MAIN_LINE.z1 + 0.5)).toBe(false);
+    expect(onWalkway(MAIN_LINE, B, 0, MAIN_LINE.z0 - 0.5)).toBe(false);
+    // The floors, as rectangles: the walkways, then the apron, then the lip;
+    // together with the belts they tile the whole line exactly.
+    const floors = ventFloors(MAIN_LINE, B);
+    expect(floors).toHaveLength(ways.length + 2);
+    expect(floors[ways.length]).toEqual({
+      x0: MAIN_LINE.x0,
+      x1: MAIN_LINE.x1,
+      z0: B.z1,
+      z1: MAIN_LINE.z1,
+    });
+    expect(floors[ways.length + 1]).toEqual({
+      x0: MAIN_LINE.x0,
+      x1: MAIN_LINE.x1,
+      z0: MAIN_LINE.z0,
+      z1: B.z0,
+    });
+    const area = (r: { x0: number; x1: number; z0: number; z1: number }) =>
+      (r.x1 - r.x0) * (r.z1 - r.z0);
+    const belts = B.xs.length * 2 * B.halfWidth * (B.z1 - B.z0);
+    expect(floors.reduce((sum, r) => sum + area(r), 0) + belts).toBeCloseTo(area(MAIN_LINE), 6);
   });
 });
 
@@ -357,10 +391,11 @@ describe('Line-Master Tock: Scalding Vents (the walkways are not safe)', () => {
     });
   }
 
-  it('warns every walkway for 1.5 s, then scalds walkway standers each second for 5 s, never belt riders', () => {
+  it('warns every floor for 1.5 s, then scalds everyone off a belt each second for 5 s, never belt riders', () => {
     const { f } = tockFight();
     const walker = f.others[0];
     const rider = f.others[1];
+    // On the apron past the press end: no longer a place to stand the fight out.
     const beyond = f.others[2];
     const spots: [Entity, number, number][] = [
       [walker, -10, -30],
@@ -374,10 +409,11 @@ describe('Line-Master Tock: Scalding Vents (the walkways are not safe)', () => {
     const warn = objects(f, FOUNDRY_VENT_TEMPLATES.warn);
     expect(warn).toHaveLength(B.xs.length + 1);
     for (const o of warn) expect(o.scale).toBe(B.z1 - B.z0);
-    // The walker wears the warning; the rider and the one past the press do not.
+    // The walker and the one on the apron past the press wear the warning;
+    // the rider does not.
     expect(aura(walker, TOCK_SCALDING_VENTS)?.value2).toBe(0);
     expect(aura(rider, TOCK_SCALDING_VENTS)).toBeUndefined();
-    expect(aura(beyond, TOCK_SCALDING_VENTS)).toBeUndefined();
+    expect(aura(beyond, TOCK_SCALDING_VENTS)?.value2).toBe(0);
     // He yells as the first vents of the fight hiss (never again after).
     const yells = f.lines.filter((l) => l === TOCK_LINES.vents).length;
     expect(yells).toBeGreaterThan(0);
@@ -396,7 +432,8 @@ describe('Line-Master Tock: Scalding Vents (the walkways are not safe)', () => {
       expect(h.school).toBe('fire');
     }
     expect(hitsOn(f, rider, 'Scalding Vents', from)).toHaveLength(0);
-    expect(hitsOn(f, beyond, 'Scalding Vents', from)).toHaveLength(0);
+    // The apron burns exactly like a walkway: every tick of the burst.
+    expect(hitsOn(f, beyond, 'Scalding Vents', from)).toHaveLength(T.ventScald / T.ventTickEvery);
     expect(hitsOn(f, f.tank, 'Scalding Vents', from)).toHaveLength(0);
     // The steam dies: the strips lift and the warning aura goes.
     expect(objects(f, FOUNDRY_VENT_TEMPLATES.scald)).toHaveLength(0);

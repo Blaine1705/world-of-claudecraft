@@ -2,6 +2,7 @@
 // halves:
 //
 //  - buildFoundryVents: the steam grilles let into every Main Line walkway
+//    and the apron past the press (every floor that is not a belt vents)
 //    (iron grates over a pit that glows as the boilers build) and the jets
 //    that burst up from them, built with the interior (instance-local, one
 //    merged mesh each, prewarmed with the arena). The jets are one draw: every
@@ -10,7 +11,8 @@
 //    they blow and how hot the grilles glow.
 //  - FoundryVentFx: the live half the telegraph painter (foundry_fx.ts) owns.
 //    It reads the walkway strip objects the sim mirrors (template warn, then
-//    scald), drapes the floor warning down every walkway with the shared
+//    scald), drapes the floor warning over every non-belt floor (the walkways,
+//    the press-end apron, the chute-end lip: VENT_LANES) with the shared
 //    telegraph kit, eases the two uniforms toward the phase, and throws the
 //    steam that boils off the jets (a pooled GPU particle cloud).
 //

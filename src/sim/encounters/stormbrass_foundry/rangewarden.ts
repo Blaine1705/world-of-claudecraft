@@ -16,7 +16,8 @@
 //                 bunker's lee (east of the wall, away from the berm) bursts on
 //                 the wall instead, three times per Target Lock before the
 //                 bunker is blown open until the next lock.
-//   Proof Shot    every 15 s a 1.5 s bar, then a heavy shell at the tank (1.5
+//   Proof Shot    (only at a tank within proofReach, start and landing)
+//                 every 15 s a 1.5 s bar, then a heavy shell at the tank (1.5
 //                 times its melee) and Dented Plating: +10 percent physical
 //                 damage taken for 12 s, up to 3 stacks.
 //   Drill Drones  at 66 and 33 percent three Arc Drones launch from its back.
@@ -152,14 +153,19 @@ export function startTargetLock(
     ctx.applyAura(p, {
       id: RANGE_TARGET_LOCK,
       name: 'Target Lock',
-      // A mark, not a slow: the value leaves the runner at full speed.
-      kind: 'slow',
+      // A mark, never a snare (the owner's call): the mark ends only with its
+      // clock or the fight. It is a zero-value vulnerability (adds nothing to
+      // the damage taken, like Tock's walkway mark), so slow immunity cannot
+      // refuse it and no snare-break (which strips root and slow auras) finds
+      // it; unbreakableControl keeps the control-breaks off it as well.
+      kind: 'vulnerability',
       remaining: T.lockSeconds,
       duration: T.lockSeconds,
-      value: 1,
+      value: 0,
       sourceId: boss.id,
       school: 'physical',
       undispellable: true,
+      unbreakableControl: true,
     });
     ctx.emit({
       type: 'spellfx',
@@ -387,6 +393,11 @@ export function launchDrillDrones(
   return n;
 }
 
+/** Is `target` within the berm gun's reach for a Proof Shot? */
+export function inProofReach(boss: Entity, target: Entity): boolean {
+  return Math.hypot(target.pos.x - boss.pos.x, target.pos.z - boss.pos.z) <= T.proofReach;
+}
+
 /** Proof Shot lands: the heavy shell, then a dent in the tank's plating. */
 function landProofShot(ctx: SimContext, boss: Entity, tank: Entity): void {
   ctx.emit({
@@ -488,12 +499,17 @@ export function tickRangewarden(
     const targetId = boss.castTargetId;
     clearCastIf(boss, RANGE_PROOF_SHOT);
     const tank = targetId !== null ? ctx.entities.get(targetId) : undefined;
-    if (tank && !tank.dead) landProofShot(ctx, boss, tank);
+    // A target who ran out of reach during the bar: the shell falls short.
+    if (tank && !tank.dead && inProofReach(boss, tank)) landProofShot(ctx, boss, tank);
     return;
   }
   if (ctx.isStunned(boss) || boss.castingAbility !== null) return;
   st.proofTimer -= DT;
   if (st.proofTimer <= 0 && boss.aggroTargetId !== null) {
+    // Only at a target the gun can reach (never across the instance at a tank
+    // who left a live Rangewarden behind); the shot waits, ready, until then.
+    const aimed = ctx.entities.get(boss.aggroTargetId);
+    if (!aimed || aimed.dead || !inProofReach(boss, aimed)) return;
     st.proofTimer = T.proofEvery;
     startBar(boss, RANGE_PROOF_SHOT, T.proofCast, boss.aggroTargetId);
   }
