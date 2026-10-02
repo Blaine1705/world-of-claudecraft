@@ -6,9 +6,10 @@ import {
   RAID_BOSS_PLAYER_MELEE_RANGE,
 } from '../src/sim/combat/player_attack_reach';
 import { MOBS } from '../src/sim/data';
+import { HAULER_TUNING } from '../src/sim/encounters/stormbrass_foundry/ids';
 import { createMob } from '../src/sim/entity';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
-import { combatProfileForMob } from '../src/sim/mob_combat';
+import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
 import { Sim } from '../src/sim/sim';
 import { IGNIVAR_BOSS_ID, MELEE_RANGE } from '../src/sim/types';
 
@@ -127,7 +128,8 @@ describe('big-bodied boss reach (bodyRadius)', () => {
     (id, body, scale) => {
       const target = { kind: 'mob' as const, templateId: id };
       const reach = effectivePlayerAttackRange(target, MELEE_RANGE);
-      expect(reach).toBe(body + BODY_EDGE_MELEE_REACH);
+      // (A body under 2 yd, the great jaguar's, keeps the stock reach.)
+      expect(reach).toBe(Math.max(MELEE_RANGE, body + BODY_EDGE_MELEE_REACH));
       expect(effectivePlayerAttackRange(target, 30)).toBe(30);
       expect(combatProfileForMob(id, scale).meleeRange).toBeGreaterThan(reach);
     },
@@ -156,5 +158,102 @@ describe('big-bodied boss reach (bodyRadius)', () => {
       player.swingTimer = 0;
     }
     expect(boss.hp).toBeLessThan(boss.maxHp);
+  });
+});
+
+// The dungeons' great NON-boss bodies take the same rule (the owner's playtest:
+// a melee player had to stand inside the Gantry Hauler to hit it). Each radius
+// is sized to the drawn footprint and held under the creature's own point-blank
+// mechanic, so nobody fights it from outside what it throws at its feet.
+describe('large dungeon creature reach (bodyRadius)', () => {
+  /** Does a warrior's swing land on the template from `dist` yards? */
+  function swingLands(templateId: string, level: number, dist: number): boolean {
+    const sim = new Sim({ seed: 771, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const player = sim.player;
+    const meta = sim.players.get(player.id);
+    if (!meta) throw new Error('no meta');
+    const mob = createMob(sim.nextId++, MOBS[templateId], level, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z + dist,
+    });
+    mob.maxHp = 1_000_000;
+    mob.hp = mob.maxHp;
+    mob.stats = { ...mob.stats, armor: 0 };
+    sim.addEntity(mob);
+    sim.targetEntity(mob.id, player.id);
+    startAutoAttack(sim.ctx, player.id);
+    player.swingTimer = 0;
+    for (let attempt = 0; attempt < 20 && mob.hp === mob.maxHp; attempt++) {
+      updatePlayerAutoAttack(sim.ctx, player, meta);
+      player.swingTimer = 0;
+    }
+    return mob.hp < mob.maxHp;
+  }
+
+  // [template, level, the drawn half-width, the bodyRadius]
+  const CREATURES = [
+    ['gantry_hauler', 20, 3.75, 5],
+    ['turretback_hermit', 13, 4.3, 4.5],
+    ['mere_hydra_head_left', 17, 3, 3],
+    ['mere_hydra_head_center', 17, 3, 3],
+    ['mere_hydra_head_right', 17, 3, 3],
+    ['great_saurian', 20, 3.5, 4],
+    ['the_gorgebloom', 20, 4, 4.5],
+  ] as const;
+
+  it.each(CREATURES)(
+    '%s: a swing lands from its body edge, and none from beyond its own reach',
+    (id, level, halfWidth, body) => {
+      const template = MOBS[id];
+      expect(template.bodyRadius).toBe(body);
+      // The radius covers the drawn flank, so the reach starts outside the model.
+      expect(body).toBeGreaterThanOrEqual(halfWidth);
+      const reach = body + BODY_EDGE_MELEE_REACH;
+      expect(reach).toBeGreaterThan(MELEE_RANGE);
+      const own = combatProfileForMob(id, template.scale).meleeRange;
+      expect(own).toBeGreaterThanOrEqual(reach + 1);
+      // At the body's edge, well outside the stock 5 yd: the swing lands.
+      expect(swingLands(id, level, reach - 0.1)).toBe(true);
+      // Just past the player's reach, and past the creature's own: nothing.
+      expect(swingLands(id, level, reach + 0.2)).toBe(false);
+      expect(swingLands(id, level, own + 0.2)).toBe(false);
+    },
+  );
+
+  it('the Gantry Hauler: its kit still covers everyone who can hit it, and its pull is unchanged', () => {
+    const hauler = MOBS.gantry_hauler;
+    const reach = effectivePlayerAttackRange({ kind: 'mob', templateId: hauler.id }, MELEE_RANGE);
+    expect(reach).toBe(8);
+    // Steam Blast's cone and the Boiler Rupture reach every melee position.
+    expect(HAULER_TUNING.blastRange).toBeGreaterThanOrEqual(reach + 3);
+    expect(hauler.trashKit?.deathBurst?.radius).toBeGreaterThanOrEqual(reach);
+    // Scrap Toss still picks the farthest player well past the melee ring.
+    expect(HAULER_TUNING.tossReach).toBeGreaterThan(reach * 3);
+    // The pull: its aggro radius and its own swing reach are what they were
+    // before it had a body (the scale default), so the Rail Yard patrol is
+    // pulled and fought from the same distances.
+    expect(hauler.aggroRadius).toBe(14);
+    const profile = combatProfileForMob(hauler.id, hauler.scale);
+    expect(profile.meleeRange).toBeCloseTo(scaledDefaultMobMeleeRange(hauler.scale), 6);
+    expect(profile.canLeash).toBe(true);
+    // It holds its nose (6.8 yd of hull ahead of the pivot) short of its
+    // target, never driving the plough over them, and inside their reach.
+    expect(profile.desiredRange).toBeGreaterThan(6.8 + 0.5);
+    expect(profile.desiredRange).toBeLessThan(reach);
+  });
+
+  it('the Turretback Hermit: Shell Slam and Claw Sweep still cover its melee ring', () => {
+    const hermit = MOBS.turretback_hermit;
+    const reach = effectivePlayerAttackRange({ kind: 'mob', templateId: hermit.id }, MELEE_RANGE);
+    expect(reach).toBe(7.5);
+    expect(hermit.trashKit?.wingGust?.radius).toBeGreaterThanOrEqual(reach);
+    expect(hermit.breathCone?.range).toBeGreaterThanOrEqual(reach);
+  });
+
+  it('the Snarlvine Lasher needs none: stock reach already stands outside its 2.6 yd body', () => {
+    expect(MOBS.vine_lasher.bodyRadius).toBeUndefined();
+    expect(MELEE_RANGE).toBeGreaterThan(2.6 + 2);
   });
 });

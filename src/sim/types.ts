@@ -2029,7 +2029,9 @@ export interface MobTemplate {
   loot: LootEntry[];
   scale: number; // render hint
   /** A big body's reach from its pivot to the edge players stand at (yards).
-   *  Set on the towering bosses: a player's melee reaches it from bodyRadius +
+   *  Set on the towering bosses and the dungeons' great non-boss bodies (the
+   *  Gantry Hauler, the Turretback Hermit, the Mere Hydra's heads, the Great
+   *  Saurian): a player's melee reaches it from bodyRadius +
    *  3 (combat/player_attack_reach.ts) instead of the stock 5 yd that put them
    *  inside the model, and the boss's own swing reaches one yard past that
    *  (mob_combat.ts), so nobody can hit it from outside its reach. */

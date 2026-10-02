@@ -80,6 +80,10 @@ function hydraHead(id: string, name: string, color: number): MobTemplate {
     moveSpeed: 0,
     aggroRadius: 16,
     idleStationary: true,
+    // Each head rises inside the one Hydra's 12 yd body: melee reaches it from
+    // 6 yd (bodyRadius + 3), off the body's edge in the pool. The Snap keeps
+    // its 8 yd.
+    bodyRadius: 3,
     loot: [{ copper: 400, chance: 1 }],
     // A long neck: the body's scale sets the Snap's reach (8 yd); the renderer
     // draws the one Hydra model at its own size.

@@ -409,6 +409,11 @@ export const STORMBRASS_FOUNDRY_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 30,
     moveSpeed: 6,
     aggroRadius: 14,
+    // The crawler is drawn 7.5 yd wide and 13.5 long: melee reaches it from 8
+    // yd (bodyRadius + 3), off its flanks and its nose instead of inside the
+    // hull, and still inside its Boiler Rupture. Its own swing keeps its
+    // 9.8 yd, and it holds its nose just short of its target (mob_combat.ts).
+    bodyRadius: 5,
     trashKit: {
       // Boiler Rupture: 2 s after it falls its boiler bursts, 8 yd.
       deathBurst: {

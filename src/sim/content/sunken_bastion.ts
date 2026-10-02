@@ -421,6 +421,10 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 30,
     moveSpeed: 5,
     aggroRadius: 11,
+    // The crab is drawn 8.6 yd wide under its 15 yd tower: melee reaches it
+    // from 7.5 yd (bodyRadius + 3) instead of from under the shell, still
+    // inside the Shell Slam's 8, and its own claws reach 8.5.
+    bodyRadius: 4.5,
     // Claw Sweep: a wide frontal. The tank turns it away from the group.
     breathCone: {
       castId: BASTION_CLAW_SWEEP,
