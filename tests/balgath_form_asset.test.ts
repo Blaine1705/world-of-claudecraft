@@ -23,6 +23,11 @@ import {
   armJitterReport,
   rotationJitter,
 } from '../scripts/assets/balgath_cyclops/arm_jitter.mjs';
+import {
+  ARM_POSTURE_CLIPS,
+  armPostureFailures,
+  clipArmPosture,
+} from '../scripts/assets/balgath_cyclops/arm_posture.mjs';
 import { VISUALS } from '../src/render/characters/manifest';
 import { FOREMAN_SHAPE_SCALE } from '../src/sim/entity';
 import { RUN_SPEED } from '../src/sim/types';
@@ -36,12 +41,12 @@ const FORM = 'public/models/chars/forms/balgath_form.glb';
 
 const PINS = {
   [BOSS]: {
-    bytes: 3_813_512,
-    sha256: '30059f35e0c7b7299969951898c3971122003c673f10ff586457be72fd9d5a14',
+    bytes: 3_828_800,
+    sha256: '5fefcc1b53352808f455428a0adacf8ba4a4d02b8fbc5c445eca3ed25aab9274',
   },
   [FORM]: {
-    bytes: 1_575_456,
-    sha256: '1bfcda749fd13adfc1d20731a142fe91b32593786d5cd354acc5f57052753fcc',
+    bytes: 1_585_788,
+    sha256: 'c4513f8b897ca25971df41e9a882d717a3dd929b208586ffc6718397bf16907d',
   },
 } as const;
 
@@ -173,6 +178,32 @@ describe('the shipped Balgath pair', () => {
       const idle = report.find((r) => r.clip === 'Idle');
       expect(idle?.worst.tremor, `${file} Idle`).toBeLessThan(0.5);
       expect(idle?.worst.maxAccel, `${file} Idle breathes, nothing faster`).toBeLessThan(1);
+    }
+  });
+
+  it('hangs both arms relaxed: elbows bent, palms on the thighs, in every resting loop', async () => {
+    // The owner's report after the tremor fix: the arms hung "in a straight line", the
+    // shoulders read as pushed forward and the palms faced backward. Measured on the
+    // shipped bytes, every Idle frame was a locked elbow (3.6 degrees of bend, the
+    // solver's full reach) with the palm 60 degrees off his thigh, mostly behind him:
+    // the arm clearance pass held a hanging upper arm to its whole girth off the lat,
+    // could never clear it, and shoved the wrist out to the end of its reach.
+    for (const file of [BOSS, FORM]) {
+      const r = await root(file);
+      expect(armPostureFailures(r), file).toEqual([]);
+      for (const clip of ARM_POSTURE_CLIPS) {
+        expect(
+          r.listAnimations().some((a) => a.getName() === clip),
+          `${file} ${clip}`,
+        ).toBe(true);
+      }
+      const idle = clipArmPosture(r, 'Idle');
+      // a relaxed hang, not a flexed pose: bent, but nowhere near a right angle
+      expect(idle.minElbowBend, `${file} Idle`).toBeGreaterThan(20);
+      expect(Math.max(...idle.frames.map((f) => f.elbowBend)), `${file} Idle`).toBeLessThan(45);
+      expect(idle.maxPalmOff, `${file} Idle palm`).toBeLessThan(28);
+      // the palm must not face behind him (it read 0.8 of the way back)
+      expect(idle.maxPalmBack, `${file} Idle palm`).toBeLessThan(0.25);
     }
   });
 

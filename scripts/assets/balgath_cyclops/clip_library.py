@@ -96,6 +96,7 @@ def walk_body(rig, ph, half, base=None):
     fr, dr, tr = gait_foot((ph + 0.5) % 1.0, 0.6, -half + 0.2, half + 0.2, 1.05, -1)
     c1 = math.cos(TAU * ph)
     c3 = math.cos(TAU * (ph - 0.3))
+    cl = math.cos(TAU * (ph - 0.5))
     bob = -0.5 - 0.2 * math.cos(2 * TAU * ph)
     sway = 0.26 * c3
     # A heavy, grounded march: the pelvis turns and rolls with the stride, and the
@@ -108,10 +109,13 @@ def walk_body(rig, ph, half, base=None):
         pelvis=(sway, 0.15, bob), hip_twist=-7 * c1, hip_roll=-4.5 * c3,
         hip_tilt=6, lean=15 + 1.0 * math.cos(2 * TAU * ph), twist=10 * c1,
         side=-3.0 * c3, look=(-3 * c1, 9 + 1.5 * math.cos(2 * TAU * ph)), neck=5,
-        hand_l=(5.35, -0.8 - 1.1 * math.cos(TAU * (ph - 0.5)), 5.2 + 0.25 * max(0, math.cos(TAU * (ph - 0.5)))),
-        hand_r=(-5.35, -0.8 - 1.1 * c1, 5.2 + 0.25 * max(0, c1)),
+        # The arms swing from the stance's hang, opposite the legs: the fist rises and
+        # the elbow folds as it comes forward, drops and opens as it goes back (never a
+        # straight rod, never a locked elbow).
+        hand_l=(6.1, -1.6 - 1.2 * cl, 5.35 + 0.5 * max(0, cl) + 0.22 * min(0, cl)),
+        hand_r=(-6.0, -1.7 - 1.2 * c1, 5.3 + 0.5 * max(0, c1) + 0.22 * min(0, c1)),
         foot_l=fl, foot_r=fr, foot_dir_l=dl, foot_dir_r=dr, toe_l=tl, toe_r=tr,
-        jaw=3 + 2 * math.cos(2 * TAU * ph), fist_l=0.62, fist_r=0.62)
+        jaw=3 + 2 * math.cos(2 * TAU * ph), fist_l=0.55, fist_r=0.6)
 
 
 def run_body(rig, ph, half, base=None):
@@ -156,16 +160,19 @@ def idle(rig, period=4.0):
     """Breathing: the chest swells and the shoulders rise, the gut follows; the head
     sways as he looks over the raid; the fists flex."""
     base = stance(rig)
+    hl, hr = base.p['hand_l'], base.p['hand_r']
     keys = []
     for i in range(9):
         ph = i / 8
         br = math.sin(TAU * ph)
         b = base.but(
             pelvis=(0.04 * math.sin(TAU * ph), 0.1, -0.36 - 0.06 * br),
-            lean=12 - 1.8 * br, neck=4 + 1.0 * br, clav_l=-4 + 3 * br, clav_r=-4 + 3 * br,
+            lean=12 - 1.8 * br, neck=4 + 1.0 * br,
+            clav_l=base.p['clav_l'] + 2.5 * br, clav_r=base.p['clav_r'] + 2.5 * br,
             look=(7 * math.sin(TAU * ph + 0.6), 9 + 2 * math.sin(TAU * ph * 2)),
-            hand_l=(5.55, -0.95, 5.0 + 0.12 * br), hand_r=(-5.55, -0.95, 5.0 + 0.12 * br),
-            fist_l=0.72 + 0.12 * math.sin(TAU * ph + 1), fist_r=0.72 + 0.12 * math.sin(TAU * ph + 2.5),
+            hand_l=(hl[0], hl[1], hl[2] + 0.12 * br), hand_r=(hr[0], hr[1], hr[2] + 0.12 * br),
+            fist_l=base.p['fist_l'] + 0.1 * math.sin(TAU * ph + 1),
+            fist_r=base.p['fist_r'] + 0.1 * math.sin(TAU * ph + 2.5),
             jaw=2 + 2 * max(0, -br), brow=6 + 2 * br)
         keys.append((period * ph, b, 'auto'))
     # one slow, heavy blink
@@ -342,10 +349,12 @@ def barrowsweep(rig):
         # the upper body: wind (0-0.35), the backhand round behind (0.35-0.6), recover
         w = smooth(t / 0.32) * (1 - smooth((t - 0.32) / 0.18))
         h = smooth((t - 0.32) / 0.2) * (1 - smooth((t - 0.66) / 0.34))
+        # (the throwing shoulder is authored level and unset, as the fold was tuned: the
+        # stance's raised, set-back shoulder presses the folded biceps into the chest)
         wind = b.but(twist=34, side=0, look=(10, 16), hand_r=(-0.1, -6.4, 10.2), fist_r=1.0, pole_r=(0.1, -0.35, 1.0),
-                     jaw=10, brow=6)
+                     jaw=10, brow=6, clav_r=-4, clav_fwd_r=0)
         back = b.but(twist=-58, side=0, look=(-40, 16), hand_r=(-5.8, 3.4, 8.2), fist_r=1.0, pole_r=(-0.3, 1.0, -0.4),
-                     jaw=26, brow=18)
+                     jaw=26, brow=18, clav_r=-4, clav_fwd_r=0)
         b = blend([b, wind, back], [1 - w - h, w, h])
         # keep the run's legs exactly (the blend must not re-route the planted foot)
         legs = run_body(rig, ph, half)
@@ -387,7 +396,11 @@ def toss(rig):
     ground until 0.55 s (RIP), held over his head by 1.1 s (LIFT), leaves his hands at
     1.45 s (RELEASE); he is standing again at 2.2 s. The renderer draws the boulder
     at his hands: low in front (1.3 x his scale forward) and overhead (3.35 x)."""
-    st = stance(rig)
+    rest = stance(rig)
+    # The heave is authored on the shoulders it was tuned with (level, no set, the
+    # elbows a little wider): overhead, his upper arms pass the head with nothing to
+    # spare, and the resting stance's broad set-back shoulders close that gap.
+    st = rest.but(pole_l=(0.8, 1.0, 0.1), clav_l=-4, clav_r=-4, clav_fwd_l=0, clav_fwd_r=0)
     rock_low = np.array((0.0, -5.0, 1.5))
     rock_high = np.array((0.0, -0.5, 16.6))
     grip = 1.55
@@ -414,9 +427,9 @@ def toss(rig):
                      pole_l=(1.0, 0.4, -0.5), fist_l=0.0, fist_r=0.0, spread_l=12, spread_r=12, jaw=34, brow=24,
                      eye=1.5, look=(0, 14), foot_l=(2.05, -1.2, 0.98), foot_r=(-2.05, 0.7, 0.98))
     follow = release.but(lean=40, hand_l=(3.8, -5.8, 5.8), hand_r=(-3.8, -5.8, 5.8), jaw=14, brow=12, eye=1.1)
-    return keys_of([(0, st, 'auto'), (0.32, dig, 'auto'), (0.5, strain, 'auto'), (0.55, strain, 'out'),
+    return keys_of([(0, rest, 'auto'), (0.32, dig, 'auto'), (0.5, strain, 'auto'), (0.55, strain, 'out'),
                     (0.78, rip, 'auto'), (0.94, chest, 'auto'), (1.1, over, 'auto'), (1.28, cock, 'in'),
-                    (1.45, release, 'out'), (1.65, follow, 'inout'), (2.2, st, 'auto')])
+                    (1.45, release, 'out'), (1.65, follow, 'inout'), (2.2, rest, 'auto')])
 
 
 def eye_flare(rig):

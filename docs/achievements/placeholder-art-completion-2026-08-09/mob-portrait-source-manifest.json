@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "3c63f62bd180a5387de159ab87fbfa3750e3176cc328d3941e7b0982b5f19f1b",
+  "rendererFingerprint": "34ab62255ca8cc83208d1eafd1e2d9277cc286717559a60d976d0c4f8b3a56a7",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5295019,
-      "sha256": "26e9d170f422bbb0911c822617d78afb6d9de7611370f8c6460e33da8f2ad1aa",
+      "sha256": "78a8d01621f91dc6542e66f95d8da2171feac52b2159dfbf0622b03aa6d02f2e",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -296,8 +296,8 @@
         "model": {
           "url": "models/creatures/balgath_cyclops.glb",
           "path": "public/models/creatures/balgath_cyclops.glb",
-          "bytes": 3813512,
-          "sha256": "30059f35e0c7b7299969951898c3971122003c673f10ff586457be72fd9d5a14"
+          "bytes": 3828800,
+          "sha256": "5fefcc1b53352808f455428a0adacf8ba4a4d02b8fbc5c445eca3ed25aab9274"
         },
         "idle": "Idle",
         "height": 3.2,
@@ -314,11 +314,11 @@
         "resolved": "#a8a496",
         "strength": 0.06
       },
-      "sourceFingerprint": "839b8de2efaeb568423f3d7e649d0da5833ad8a3edba6c2cdfe796c09b0d8034",
+      "sourceFingerprint": "e489286a119f0211e894a90689a20023e167eacf9f2aadbe74eff1665444c8ac",
       "output": {
         "path": "public/ui/mobs/balgath_cyclops.webp",
-        "bytes": 2544,
-        "sha256": "3679186576956868fdcfcc16884d35eb1d795e93d7b19401a2eb6493ae54345d"
+        "bytes": 2470,
+        "sha256": "8557cc13e48a873d4e9412c67e5e6b5dfee5e961ff0cf94841a16a75a584cd9b"
       }
     },
     {

@@ -79,6 +79,7 @@ class Body:
         toe_l=0.0, toe_r=0.0,        # toe bend (deg, - curls up)
         knee_l=(0.15, -1.0, 0.0), knee_r=None,
         clav_l=0.0, clav_r=0.0,      # shrug (deg, + raises the shoulder)
+        clav_fwd_l=0.0, clav_fwd_r=0.0,  # shoulder set (deg, + rolls it forward, - draws it back)
         jaw=0.0, brow=0.0, lid_up=0.0, lid_lo=0.0, eye=1.0,
     )
 
@@ -163,8 +164,14 @@ class Body:
         # stone over it grind into the trapezius and the neck.
         lift_l, fwd_l = girdle(p['hand_l'], 1)
         lift_r, fwd_r = girdle(p['hand_r'], -1)
-        turns['L_Clavicle'] = [((0, 1, 0), -(p['clav_l'] + lift_l)), ((0, 0, 1), -fwd_l)]
-        turns['R_Clavicle'] = [((0, 1, 0), p['clav_r'] + lift_r), ((0, 0, 1), fwd_r)]
+        # The shoulder SET (clav_fwd: the stance draws the shoulders back and broad) is a
+        # resting posture: it lets go as the hand leaves its hang, so a reaching or a
+        # raised arm gets the whole girdle (set back, an arm overhead ground its
+        # deltoid into the head).
+        set_l = p['clav_fwd_l'] * hang_weight(p['hand_l'], 1)
+        set_r = p['clav_fwd_r'] * hang_weight(p['hand_r'], -1)
+        turns['L_Clavicle'] = [((0, 1, 0), -(p['clav_l'] + lift_l)), ((0, 0, 1), -(fwd_l + set_l))]
+        turns['R_Clavicle'] = [((0, 1, 0), p['clav_r'] + lift_r), ((0, 0, 1), fwd_r + set_r)]
         # arms
         for side, s in (('L_', 1), ('R_', -1)):
             key = 'hand_l' if s > 0 else 'hand_r'
@@ -237,6 +244,17 @@ def girdle(target, s):
     return lift, fwd
 
 
+def hang_weight(target, s):
+    """1 while a wrist target hangs below its shoulder, fading to 0 as it lifts or
+    reaches away (40 to 70 degrees off straight down)."""
+    if target is None:
+        return 1.0
+    sh = np.array(A.SHOULDER) * (s, 1, 1)
+    d = _n(np.asarray(target, float) - sh)
+    elev = math.degrees(math.acos(max(-1.0, min(1.0, -d[2]))))
+    return 1.0 - smoothstep((elev - 40.0) / 30.0)
+
+
 def smoothstep(x):
     x = max(0.0, min(1.0, x))
     return x * x * (3 - 2 * x)
@@ -279,6 +297,16 @@ def _stone_samples():
 
 
 STONE_SAMPLES = _stone_samples()
+# A HANGING upper arm rests on the lat (the closed armpit; review.py allows that skin
+# up to 0.45 of compression), so its two samples may come this much nearer the torso
+# than their girth. Held to the full girth no hanging arm was ever clear: the pass
+# shoved the wrist out to the end of its reach, and every rest pose came out a
+# straight, locked arm held 44 degrees off the body with the elbow turned out and the
+# palm facing backward. The allowance fades out as the arm lifts off the hang or
+# swings in front of the chest (a raised, a reaching or a folded arm keeps its whole
+# girth off the chest).
+ARMPIT_SLACK = 0.35
+ARMPIT_BONES = ('Spine1', 'Spine2')
 CLEAR_MARGIN = 0.18
 RESOLVE_CAP = 1.6
 _BODY_PRIMS = None
@@ -296,16 +324,27 @@ def body_prims():
     return _BODY_PRIMS
 
 
-def body_distance(pose, P):
+def body_distance(pose, P, slack=None):
     """Distance from armature-space points to the posed flesh (the sculpt's own
-    primitives carried on their bones)."""
+    primitives carried on their bones). `slack` (one number per point) is added to
+    the distances to the torso wall (ARMPIT_BONES) only."""
     out = np.full(len(P), 50.0)
     for bone, plist in body_prims().items():
         R = np.array(pose.delta[bone].to_matrix())
         Q = np.array(A.REST[bone][0]) + (P - np.array(pose.head[bone])) @ R
+        extra = slack if slack is not None and bone in ARMPIT_BONES else 0.0
         for prim in plist:
-            out = np.minimum(out, prim.dist_pts(Q))
+            out = np.minimum(out, prim.dist_pts(Q) + extra)
     return out
+
+
+def armpit_slack(pose, side, samples):
+    """Per-sample torso allowance of one arm: ARMPIT_SLACK on the upper arm's samples
+    while it hangs (measured against the chest's own down), none on anything else."""
+    bone = side + 'UpperArm'
+    d = pose.delta['Spine2'].inverted() @ (pose.delta[bone] @ (V(A.REST[bone][1]) - V(A.REST[bone][0])).normalized())
+    hang = smoothstep((-d.z - 0.35) / 0.3) * (1.0 - smoothstep((-d.y - 0.3) / 0.3))
+    return np.array([ARMPIT_SLACK * hang if u < 0.5 else 0.0 for _, _, u in samples])
 
 
 def arm_points(pose, side):
@@ -337,7 +376,8 @@ def arm_clearance_fix(b, pose):
     for side, hk, pk in (('L_', 'hand_l', 'pole_l'), ('R_', 'hand_r', 'pole_r')):
         samples = arm_points(pose, side)
         P = np.array([p for p, _, _ in samples])
-        d = body_distance(pose, P)
+        slack = armpit_slack(pose, side, samples)
+        d = body_distance(pose, P, slack)
         pen = np.array([r for _, r, _ in samples]) + CLEAR_MARGIN - d
         if pen.max() <= 0.0:
             continue
@@ -345,7 +385,7 @@ def arm_clearance_fix(b, pose):
         for a in range(3):
             e = np.zeros(3)
             e[a] = eps
-            grads[:, a] = (body_distance(pose, P + e) - body_distance(pose, P - e)) / (2 * eps)
+            grads[:, a] = (body_distance(pose, P + e, slack) - body_distance(pose, P - e, slack)) / (2 * eps)
         grads /= np.maximum(np.linalg.norm(grads, axis=1, keepdims=True), 1e-6)
         wrist_shift = np.zeros(3)
         elbow_push = np.zeros(3)
@@ -692,14 +732,22 @@ def steady_arms(poses, rig, passes=24):
 
 # ------------------------------------------------------------------ the stance
 def stance(rig):
-    """Idle stance: knees bent, gut forward, the great shoulders rolled forward,
-    the head thrust out and low, the fists half closed and hanging heavy."""
+    """Idle stance: knees bent, gut forward, the head thrust out and low. The great
+    shoulders sit BACK and broad (clavicles drawn back and a touch up), the arms hang
+    heavy a little off the ribs with the elbows pointing behind him and bent about
+    30 degrees, the forearms a little forward, the palms facing his thighs (thumbs
+    forward) and the fingers in a loose curl. The right arm hangs a shade closer and
+    lower than the left: nobody stands square.
+
+    The wrists and the poles are chosen so the clearance pass has nothing to push
+    (measured: no arm sample inside its margin), so a hold is exactly this pose."""
     return Body(rig,
                 pelvis=(0, 0.1, -0.36), hip_tilt=4, lean=12, neck=4, look=(0, 9),
-                hand_l=(5.55, -0.95, 5.0), hand_r=(-5.55, -0.95, 5.0), pole_l=(0.8, 1.0, 0.1),
+                hand_l=(6.2, -1.7, 5.5), hand_r=(-6.05, -1.9, 5.4), pole_l=(0.5, 1.0, 0.1),
                 foot_l=(1.75, 0.3, 0.98), foot_r=(-1.75, 0.45, 0.98),
                 foot_dir_l=(0.12, -1.48, -0.64), foot_dir_r=(-0.12, -1.48, -0.64),
-                fist_l=0.72, fist_r=0.72, clav_l=-4, clav_r=-4, lid_up=18, lid_lo=7, brow=6)
+                fist_l=0.5, fist_r=0.58, clav_l=-1, clav_r=-1, clav_fwd_l=-6, clav_fwd_r=-5,
+                lid_up=18, lid_lo=7, brow=6)
 
 
 def make_clips(arm, only=None):

@@ -87,9 +87,9 @@ export function rotationJitter(qs) {
   return { maxAccel, accelFrame, tremor, tremorFrame };
 }
 
-/** World rotation sampler for one clip of a gltf-transform Root. */
-function worldSampler(root, clipName) {
-  const idx = indexClip(root, clipName);
+/** World rotation sampler for one clip of a gltf-transform Root (null clip: the rest pose). */
+export function worldSampler(root, clipName) {
+  const idx = clipName === null ? new Map() : indexClip(root, clipName);
   const parent = new Map();
   for (const n of root.listNodes()) for (const c of n.listChildren()) parent.set(c, n);
   const byName = new Map(root.listNodes().map((n) => [n.getName(), n]));
