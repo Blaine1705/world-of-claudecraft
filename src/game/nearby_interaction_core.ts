@@ -1,6 +1,6 @@
+import { isFoundryWorkerTemplate } from '../sim/content/stormbrass_foundry_workers';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
-import { isFoundryWorkerTemplate } from '../sim/content/stormbrass_foundry_workers';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import {
   dist2d,

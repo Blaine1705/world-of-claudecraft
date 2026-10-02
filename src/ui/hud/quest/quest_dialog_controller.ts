@@ -21,11 +21,6 @@ import type { PainterHostPresentation } from '../../painter_host';
 import { clueHuntTitle } from '../../quest_event_view';
 import { svgIcon } from '../../ui_icons';
 import {
-  foundryWorkerDialog,
-  foundryWorkerGossip,
-  isFoundryWorkerEntity,
-} from '../dungeon/foundry_worker_gossip_core';
-import {
   isWorldQuestInstructorOrEscort,
   worldQuestInstructorDialog,
 } from '../../world_quest_instructor_view';
@@ -34,6 +29,11 @@ import {
   investigationSignature,
   isInvestigationTarget,
 } from '../../world_quest_investigation_view';
+import {
+  foundryWorkerDialog,
+  foundryWorkerGossip,
+  isFoundryWorkerEntity,
+} from '../dungeon/foundry_worker_gossip_core';
 import { archetypeImageUrl } from '../professions/profession_art';
 import { buildAttunementPreview } from '../professions/profession_identity_view';
 import { isStationMasterNpc } from '../vendor/train_view';

@@ -1,5 +1,5 @@
-import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isFoundryWorkerTemplate } from '../sim/content/stormbrass_foundry_workers';
+import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { ESCORTS } from '../sim/data';
