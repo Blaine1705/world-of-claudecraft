@@ -5,12 +5,14 @@
 // tickTrashKits inside a real claimed crypt, the hoard add-cast test's shape.
 
 import { describe, expect, it } from 'vitest';
+import { startAutoAttack, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import { HOLLOW_CRYPT_SPAWNS } from '../src/sim/content/hollow_crypt';
 import { ARCADE_TOP_Y, HOLLOW_CRYPT_FIELD } from '../src/sim/content/hollow_crypt_layout';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { applyDungeonMobTuning } from '../src/sim/instances/difficulty';
+import { dungeonPacksDead } from '../src/sim/instances/dungeon_gates';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import { patrolPointAt } from '../src/sim/mob/patrol';
@@ -479,5 +481,142 @@ describe('trash kit: pulls and difficulty', () => {
     expect(before - r.me.hp).toBeGreaterThanOrEqual(
       Math.floor(def.min * (mob.mechanicDamageMult ?? 1)) - 1,
     );
+  });
+});
+
+// The owner's playtest (2026-10-02): the Ossuary Drake showed its ring on the
+// floor and took a warrior's Charge while it flew, and with every other mob
+// dead it never came down, so the Twin Seals never opened. A flier on its loop
+// is nobody's target, it sees the floor under it whatever the level of who
+// walks there, and the last pack of its gate always comes down.
+describe('trash kit: a flying patrol is out of reach, and always lands', () => {
+  function drakeOf(r: Room): Entity {
+    const idx = HOLLOW_CRYPT_SPAWNS.findIndex((s) => s.mobId === 'crypt_ossuary_drake');
+    return r.sim.ctx.entities.get(r.inst.mobIds[idx]) as Entity;
+  }
+  /** Stand the player `dx` yards east of the drake's spot, on the floor. */
+  function standBy(r: Room, drake: Entity, dx: number): void {
+    r.me.pos = r.sim.ctx.groundPos(drake.pos.x + dx, drake.pos.z);
+    r.me.prevPos = { ...r.me.pos };
+    r.sim.rebucket(r.me);
+  }
+  function killPack(r: Room, pack: string): void {
+    HOLLOW_CRYPT_SPAWNS.forEach((s, i) => {
+      if (s.packId !== pack) return;
+      const mob = r.sim.ctx.entities.get(r.inst.mobIds[i]);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    });
+  }
+
+  it('cannot be charged, swung at or struck from the floor while it flies', () => {
+    const r = room();
+    const drake = drakeOf(r);
+    r.me.devNoAggro = true; // hold the pull: this is about reach, not sight
+    for (let i = 0; i < 20; i++) r.sim.tick();
+    expect(drake.pos.y).toBeCloseTo(drake.dungeonPatrol?.flightY ?? 0, 3);
+    // 12 yd off its shadow: inside Charge's 8 to 25 yd, were it on the floor.
+    standBy(r, drake, 12);
+    r.me.facing = Math.atan2(drake.pos.x - r.me.pos.x, drake.pos.z - r.me.pos.z);
+    r.sim.targetEntity(drake.id, r.me.id);
+    // (Held by the dev no-aggro it hovers where it saw the player: still aloft.)
+    for (let i = 0; i < 10; i++) r.sim.tick();
+    expect(drake.pos.y).toBeCloseTo(drake.dungeonPatrol?.flightY ?? 0, 3);
+    expect(r.sim.ctx.isHostileTo(r.me, drake)).toBe(false);
+    const before = { ...r.me.pos };
+    r.sim.castAbility('charge', r.me.id);
+    for (let i = 0; i < 10; i++) r.sim.tick();
+    expect(r.me.cooldowns.has('charge')).toBe(false);
+    expect(Math.hypot(r.me.pos.x - before.x, r.me.pos.z - before.z)).toBeLessThan(0.01);
+    expect(drake.hp).toBe(drake.maxHp);
+    expect(drake.inCombat).toBe(false);
+    expect(drake.auras.some((a) => a.kind === 'stun')).toBe(false);
+    // Right under it, in melee range of its shadow: no swing lands either.
+    standBy(r, drake, 2);
+    const meta = r.sim.players.get(r.me.id);
+    if (!meta) throw new Error('no meta');
+    startAutoAttack(r.sim.ctx, r.me.id);
+    for (let i = 0; i < 10; i++) {
+      r.sim.tick();
+      r.me.swingTimer = 0;
+      updatePlayerAutoAttack(r.sim.ctx, r.me, meta);
+    }
+    expect(drake.hp).toBe(drake.maxHp);
+    expect(drake.pos.y).toBeCloseTo(drake.dungeonPatrol?.flightY ?? 0, 3);
+  });
+
+  it('is a target again the moment it is pulled, and on the floor', () => {
+    const r = room();
+    const drake = drakeOf(r);
+    for (let i = 0; i < 20; i++) r.sim.tick();
+    standBy(r, drake, 0);
+    r.sim.tick();
+    expect(drake.aiState === 'chase' || drake.aiState === 'attack').toBe(true);
+    expect(r.sim.ctx.isHostileTo(r.me, drake)).toBe(true);
+    const land = MOBS.crypt_ossuary_drake.trashKit?.land?.seconds ?? 1;
+    for (let t = 0; t < land + 0.5; t += DT) r.sim.tick();
+    expect(r.sim.ctx.isHostileTo(r.me, drake)).toBe(true);
+  });
+
+  it('sees a level 20 player walking the middle of its yard, whatever their level', () => {
+    const r = room();
+    const drake = drakeOf(r);
+    expect(r.me.level).toBe(20);
+    expect(drake.level).toBeLessThan(r.me.level - 5);
+    // The Processional's centre line, abeam of the drake's first long leg
+    // (x 14, z 28 to 104): 14 yd from its line, inside its 16 yd sight.
+    r.me.pos = r.sim.ctx.groundPos(r.ox, r.oz + 66);
+    r.me.prevPos = { ...r.me.pos };
+    r.sim.rebucket(r.me);
+    let pulled = false;
+    for (let i = 0; i < 20 * 60 && !pulled; i++) {
+      r.sim.tick();
+      r.me.hp = r.me.maxHp;
+      pulled = drake.aggroTargetId === r.me.id;
+    }
+    expect(pulled).toBe(true);
+  });
+
+  it('comes down once the rest of its gate is dead, and the Twin Seals can open', () => {
+    const r = room();
+    const drake = drakeOf(r);
+    const gate = DUNGEONS.hollow_crypt.gates?.find((g) => g.packs?.includes('drake'));
+    if (!gate?.packs) throw new Error('no gate lists the drake');
+    // The player waits at the grille's mouth, 40 yd and more from the loop's
+    // far end and outside the drake's sight of the loop's near end.
+    r.me.pos = r.sim.ctx.groundPos(r.ox - 34, r.oz + 30);
+    r.me.prevPos = { ...r.me.pos };
+    r.sim.rebucket(r.me);
+    for (let i = 0; i < 20 * 5; i++) r.sim.tick();
+    expect(drake.inCombat).toBe(false);
+    for (const pack of gate.packs) if (pack !== 'drake') killPack(r, pack);
+    expect(dungeonPacksDead(r.sim.ctx, r.inst, gate.packs)).toBe(false);
+    let landed = false;
+    for (let i = 0; i < 20 * 90 && !landed; i++) {
+      r.sim.tick();
+      r.me.hp = r.me.maxHp;
+      const floor = authoredFieldHeight(HOLLOW_CRYPT_FIELD, drake.pos.x - r.ox, drake.pos.z - r.oz);
+      landed = drake.aggroTargetId === r.me.id && Math.abs(drake.pos.y - floor) < 0.01;
+    }
+    expect(landed).toBe(true);
+    expect(r.sim.ctx.isHostileTo(r.me, drake)).toBe(true);
+    // Killed on the floor, its pack is dead and the gate's packs are all down.
+    drake.hp = 0;
+    drake.dead = true;
+    expect(dungeonPacksDead(r.sim.ctx, r.inst, gate.packs)).toBe(true);
+  });
+
+  it('holds its flight while another pack of its gate still stands', () => {
+    const r = room();
+    const drake = drakeOf(r);
+    r.me.pos = r.sim.ctx.groundPos(r.ox - 34, r.oz + 30);
+    r.me.prevPos = { ...r.me.pos };
+    r.sim.rebucket(r.me);
+    killPack(r, 'p1');
+    for (let i = 0; i < 20 * 30; i++) r.sim.tick();
+    expect(drake.inCombat).toBe(false);
+    expect(drake.pos.y).toBeCloseTo(drake.dungeonPatrol?.flightY ?? 0, 3);
   });
 });

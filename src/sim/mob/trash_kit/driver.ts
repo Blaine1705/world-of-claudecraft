@@ -32,7 +32,9 @@ import {
   type TrashKitState,
 } from '../../types';
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
+import { FLIER_OUT_OF_REACH } from '../patrol';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
+import { callDownLastFlier } from './flier_call';
 import { landScreen, screenReady, stepDeathBurst } from './foundry_kit';
 import { spawnKitAdd } from './spawn';
 import {
@@ -647,6 +649,16 @@ function stepMob(
     holdPerch(mob);
     // Remember how high it waits (a perch, a flight loop) for its pull.
     mob.airY = mob.pos.y > groundY(ctx, mob) + AIRBORNE ? mob.pos.y : undefined;
+    if (mob.dungeonPatrol?.flightY !== undefined) {
+      // A flying patrol on the wing is nobody's target: no swing, charge or
+      // spell reaches it from the floor (the Knellwyrm's flight in reads the
+      // same way). The mob AI's safety net makes it hostile again at the top
+      // of every tick, so it is a target the tick it is pulled, and whenever
+      // it is low enough to hit.
+      if (mob.pos.y > groundY(ctx, mob) + FLIER_OUT_OF_REACH) mob.hostile = false;
+      // The last pack of a gate never stays on the wing (flier_call.ts).
+      callDownLastFlier(ctx, inst, mob, players());
+    }
     return;
   }
   const st = mob.trashKit ?? startTrashKit(ctx, mob, kit, inst);

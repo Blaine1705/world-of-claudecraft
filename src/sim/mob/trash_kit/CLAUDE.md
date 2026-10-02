@@ -12,6 +12,7 @@ Hollow Crypt trash (`src/sim/content/hollow_crypt_trash.ts`).
 | `cast_ids.ts` | Leaf: the cast ids and the interruptible ones' schools (`TRASH_KIT_CAST_SCHOOLS`, spread into `mob/healer_channel.ts` `SCRIPTED_INTERRUPTIBLE_CHANNELS`). |
 | `targets.ts` | Pure: the hashed "random" victim, the leap's farthest-caster pick, the cone test. |
 | `spawn.ts` | The zero-rng kit add spawner (raise, call, growth), with the claim's difficulty transform. |
+| `flier_call.ts` | `callDownLastFlier`: an idle flying patrol lands on the nearest player once every OTHER pack of a gate that waits on its pack is dead, so a gate can never stay shut behind a flier nobody pulled. |
 | `driver.ts` | `tickTrashKits`: one pass per tick over every claim's roster, after the mob AI (called from `instances/dungeons.ts` `updateInstances`). |
 
 Rules:
@@ -26,4 +27,11 @@ Rules:
 - Kit state rides `Entity.trashKit` and dies with the pull (evade, reset,
   death). Flying patrols (`DungeonSpawnPatrol.altitude`) are flown by
   `mob/patrol.ts`; the landing and the perch dive are this module's.
+- A flying patrol on the wing is nobody's target: the idle pass clears
+  `hostile` every tick it waits more than `FLIER_OUT_OF_REACH` (`mob/patrol.ts`)
+  over the floor, so no swing, charge or spell reaches it from the ground; the
+  mob AI makes it hostile again the tick it is pulled. Its sight is its whole
+  authored `aggroRadius` whatever the player's level (`flierSightRadius`), and
+  pack pulls and the boss chain pull still take it (`patrolFlierAloft`). The
+  renderer hides the ground reticle under it (`render/selection_ring.ts`).
 - Tests: `tests/trash_kit.test.ts`.

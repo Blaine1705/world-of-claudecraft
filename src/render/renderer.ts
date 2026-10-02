@@ -718,7 +718,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
-import { drapeRingLocalY } from './selection_ring';
+import { drapeRingLocalY, reticleShownUnder } from './selection_ring';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
@@ -11336,7 +11336,7 @@ export class Renderer {
         ringMat.color.setHex(this.isHostileSelectionTarget(target) ? 0xcc2222 : 0xd4af37);
         if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
         ringMat.opacity = 0.78 + 0.2 * Math.sin(this.time * 4.5); // gentle pulse
-        this.selectionRing.visible = true;
+        this.selectionRing.visible = reticleShownUnder(tv.group, this.selectionRing);
       } else {
         this.selectionRing.visible = false;
       }

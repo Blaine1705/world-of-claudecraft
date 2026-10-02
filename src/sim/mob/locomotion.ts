@@ -123,7 +123,7 @@ import {
   tickMechanicSpacing,
 } from './mechanic_spacing';
 import { packBreathStagger } from './pack_cast_stagger';
-import { updateMobPatrol } from './patrol';
+import { flierSightRadius, updateMobPatrol } from './patrol';
 import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
@@ -607,7 +607,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           4,
           Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
         );
-        radius *= ctx.delveDetectMult(e);
+        radius = flierSightRadius(mob, radius, template.aggroRadius) * ctx.delveDetectMult(e);
         if (hasEscapeStealth(e)) return;
         // stealthed rogues are harder to detect, relative to observer level
         if (e.auras.some((a) => a.kind === 'stealth'))

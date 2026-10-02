@@ -12,6 +12,7 @@
 import { DUNGEON_FLOOR_Y } from '../data';
 import type { SimContext } from '../sim_context';
 import { DT, type DungeonSpawnPatrol, type Entity } from '../types';
+import { MAX_AGGRO_RADIUS } from './aggro_ranges';
 
 /** A loop's default pace: a stroll at 40 percent of the mob's run speed. */
 export const PATROL_DEFAULT_PACE = 0.4;
@@ -89,6 +90,26 @@ export function updateMobPatrol(ctx: SimContext, mob: Entity): boolean {
   const step = behind > CATCH_UP_DISTANCE ? speed * CATCH_UP_MULT : speed;
   if (ctx.moveToward(mob, dest, step)) mob.facing = target.facing;
   return true;
+}
+
+/** A flier this far over the floor is out of every ground attack's reach. */
+export const FLIER_OUT_OF_REACH = 3;
+
+/** Is the mob a flying patrol on the wing, out of reach (so not hostile: the
+ *  trash kit's idle pass, mob/trash_kit/driver.ts, clears the flag every tick
+ *  it waits that high)? Its pack and a boss's chain pull still bring it down
+ *  with the rest. */
+export function patrolFlierAloft(mob: Entity): boolean {
+  return mob.dungeonPatrol?.flightY !== undefined && mob.aiState === 'idle' && !mob.hostile;
+}
+
+/** How far a flying patrol sees a player on the floor under it. A walker's
+ *  sight shrinks with the player's level (to 4 yd for one far above it), which
+ *  a loop flown yards off the walkways can never close: a flier keeps its
+ *  whole authored sight, so a pass overhead is a pull at any level. */
+export function flierSightRadius(mob: Entity, radius: number, authored: number): number {
+  if (mob.dungeonPatrol?.flightY === undefined) return radius;
+  return Math.max(radius, Math.min(MAX_AGGRO_RADIUS, authored));
 }
 
 /** How fast a flier climbs back to its loop after a landing (yards/second). */
