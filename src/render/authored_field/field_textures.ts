@@ -1,7 +1,8 @@
 // Procedural detail textures for authored open-air fields: worn flagstones,
-// grave soil and cliff rock, each an albedo multiplier (tinted by the vertex
-// paint) plus a matching normal map baked from the same height field, so the
-// stone reads carved under a raking moon. Built once per page and shared by
+// grave soil, jungle moss over loam, wet basalt column tops and cliff rock,
+// each an albedo multiplier (tinted by the vertex paint) plus a matching
+// normal map baked from the same height field, so the stone reads carved
+// under a raking light. Built once per page and shared by
 // every field (markSharedTexture semantics via the material cache).
 //
 // Deterministic: a local LCG, never Math.random.
@@ -173,6 +174,96 @@ const paintRock: Painter = (h, size, rnd) => {
   }
 };
 
+/** Jungle loam under moss: soft cushions of moss over dark loam, with leaf
+ *  litter and root threads between the clumps. */
+const paintMoss: Painter = (h, size, rnd) => {
+  const broad = noiseField(size, rnd, 5);
+  const clumps = noiseField(size, rnd, 22);
+  const fine = noiseField(size, rnd, 80);
+  for (let i = 0; i < h.length; i++) {
+    // Moss cushions swell where the clump field is high; loam sinks between.
+    const cushion = Math.max(0, clumps[i] - 0.42) * 1.9;
+    h[i] = 0.28 + broad[i] * 0.18 + cushion * 0.5 + fine[i] * 0.16;
+  }
+  // Leaf litter: small flat ovals pressed into the loam.
+  for (let k = 0; k < 260; k++) {
+    const cx = rnd() * size;
+    const cy = rnd() * size;
+    const a = rnd() * Math.PI;
+    const ca = Math.cos(a);
+    const sa = Math.sin(a);
+    const len = 2 + rnd() * 3.5;
+    for (let y = -5; y <= 5; y++) {
+      for (let x = -5; x <= 5; x++) {
+        const u = (x * ca + y * sa) / len;
+        const v = (-x * sa + y * ca) / (len * 0.45);
+        if (u * u + v * v > 1) continue;
+        const i =
+          (((Math.floor(cy + y) % size) + size) % size) * size +
+          (((Math.floor(cx + x) % size) + size) % size);
+        h[i] = h[i] * 0.6 + 0.3;
+      }
+    }
+  }
+  // Root threads: thin raised lines wandering across.
+  for (let k = 0; k < 24; k++) {
+    let x = rnd() * size;
+    let y = rnd() * size;
+    let a = rnd() * Math.PI * 2;
+    const len = 30 + rnd() * 70;
+    for (let s = 0; s < len; s++) {
+      a += (rnd() - 0.5) * 0.35;
+      x += Math.cos(a);
+      y += Math.sin(a);
+      const i =
+        (((Math.floor(y) % size) + size) % size) * size + (((Math.floor(x) % size) + size) % size);
+      h[i] += 0.22;
+    }
+  }
+};
+
+/** Wet basalt: the tops of hexagonal columns, each a slab of its own tone
+ *  with dark sunken joints, fine pitting and a polished wet sheen. */
+const paintBasalt: Painter = (h, size, rnd) => {
+  // A tileable hex lattice: cells of 4 across the tile, jittered.
+  const cols = 4;
+  const rows = 4;
+  const pts: [number, number, number][] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let q = 0; q < cols; q++) {
+      const ox = (q + (r % 2) * 0.5 + (rnd() - 0.5) * 0.25) * (size / cols);
+      const oy = (r + (rnd() - 0.5) * 0.25) * (size / rows);
+      pts.push([ox, oy, 0.5 + rnd() * 0.4]);
+    }
+  }
+  const grain = noiseField(size, rnd, 64);
+  const broad = noiseField(size, rnd, 7);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      let d1 = Infinity;
+      let d2 = Infinity;
+      let tone = 0.6;
+      for (const [px, py, t] of pts) {
+        let dx = Math.abs(x - px);
+        let dy = Math.abs(y - py);
+        dx = Math.min(dx, size - dx);
+        dy = Math.min(dy, size - dy);
+        const d = Math.hypot(dx, dy);
+        if (d < d1) {
+          d2 = d1;
+          d1 = d;
+          tone = t;
+        } else if (d < d2) d2 = d;
+      }
+      const joint = Math.min(1, (d2 - d1) / 4);
+      const i = y * size + x;
+      // A slight dome on each column top, darker grout in the joints.
+      const dome = Math.max(0, 1 - d1 / (size / cols)) * 0.12;
+      h[i] = (tone + dome + grain[i] * 0.12 + (broad[i] - 0.5) * 0.1) * (0.18 + 0.82 * joint);
+    }
+  }
+};
+
 interface DetailPair {
   map: THREE.CanvasTexture;
   normalMap: THREE.CanvasTexture;
@@ -249,4 +340,12 @@ export function soilDetail(): DetailPair {
 
 export function rockDetail(): DetailPair {
   return bake('rock', paintRock, 0x9e11, 256, 7);
+}
+
+export function mossDetail(): DetailPair {
+  return bake('moss', paintMoss, 0x6d0b, 256, 5);
+}
+
+export function basaltDetail(): DetailPair {
+  return bake('basalt', paintBasalt, 0xba5a, 256, 8);
 }

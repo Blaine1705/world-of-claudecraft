@@ -51,10 +51,18 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   wetstone: [0.23, 0.26, 0.26],
   quay: [0.3, 0.3, 0.28],
   shallows: [0.14, 0.14, 0.11],
+  moss: [0.16, 0.2, 0.1],
+  basalt: [0.17, 0.18, 0.17],
 };
 
+/** The texture families a walkable top draws with (one mesh each). */
+export const FIELD_TOP_FAMILIES = ['stone', 'soil', 'moss', 'basalt'] as const;
+export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
+
 /** Which texture family a ground kind draws with. */
-export function fieldGroundFamily(ground: FieldGround): 'stone' | 'soil' {
+export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
+  if (ground === 'moss') return 'moss';
+  if (ground === 'basalt') return 'basalt';
   return ground === 'earth' ||
     ground === 'grave' ||
     ground === 'frost' ||
@@ -347,10 +355,36 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
       ? Math.max(0, patch - (damp ? 0.5 : 0.58)) * (damp ? 2.2 : 1.8)
       : 0;
   const dirt = Math.max(0, fieldNoise(x * 0.07 - 3, z * 0.07 + 5, 2) - 0.6) * 1.6;
+  if (ground === 'moss') return mossColor(base, k, patch, dirt);
+  if (ground === 'basalt') return basaltColor(base, k, patch);
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
   const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
   return [r, g, b];
+}
+
+/** Jungle moss: bright sunlit cushions, darker damp loam showing through,
+ *  never one flat green (the patches and the dirt fields break it up). */
+function mossColor(base: Rgb, k: number, patch: number, dirt: number): Rgb {
+  const lush = Math.max(0, patch - 0.45) * 1.6;
+  const loam = Math.min(1, dirt * 1.4);
+  return [
+    base[0] * k * (1 + lush * 0.25) * (1 - loam * 0.2) + loam * 0.05,
+    base[1] * k * (1 + lush * 0.45) * (1 - loam * 0.35) + loam * 0.03,
+    base[2] * k * (1 - lush * 0.2) * (1 - loam * 0.3) + loam * 0.015,
+  ];
+}
+
+/** Wet basalt: near-black with a cool cast, a few mossy seams where it is
+ *  damp and dry grey crowns where the sun dries it. */
+function basaltColor(base: Rgb, k: number, patch: number): Rgb {
+  const seam = Math.max(0, patch - 0.6) * 1.8;
+  const dry = Math.max(0, 0.35 - patch) * 1.2;
+  return [
+    base[0] * k * (1 - seam * 0.25 + dry * 0.35),
+    base[1] * k * (1 + seam * 0.35 + dry * 0.3),
+    base[2] * k * (1.06 - seam * 0.3 + dry * 0.25),
+  ];
 }
 
 function pushVertex(
@@ -377,10 +411,12 @@ function pushVertex(
 export function planFieldTops(
   def: AuthoredFieldDef,
   opts: FieldTopOptions,
-): Record<'stone' | 'soil', FieldMeshData> {
-  const out: Record<'stone' | 'soil', FieldMeshData> = {
+): Record<FieldTopFamily, FieldMeshData> {
+  const out: Record<FieldTopFamily, FieldMeshData> = {
     stone: { positions: [], colors: [], uvs: [], indices: [] },
     soil: { positions: [], colors: [], uvs: [], indices: [] },
+    moss: { positions: [], colors: [], uvs: [], indices: [] },
+    basalt: { positions: [], colors: [], uvs: [], indices: [] },
   };
   const clippers = laterClippers(def);
   def.surfaces.forEach((s, layer) => {

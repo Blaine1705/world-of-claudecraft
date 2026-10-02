@@ -7,8 +7,20 @@
 import * as THREE from 'three';
 import type { AuthoredFieldDef } from '../../sim/instances/authored_field';
 import { surfaceMat } from '../gfx';
-import { type FieldMeshData, planFieldCliffs, planFieldTops } from './field_mesh_core';
-import { flagstoneDetail, rockDetail, soilDetail } from './field_textures';
+import {
+  FIELD_TOP_FAMILIES,
+  type FieldMeshData,
+  type FieldTopFamily,
+  planFieldCliffs,
+  planFieldTops,
+} from './field_mesh_core';
+import {
+  basaltDetail,
+  flagstoneDetail,
+  mossDetail,
+  rockDetail,
+  soilDetail,
+} from './field_textures';
 
 function geometryOf(data: FieldMeshData, indexed: boolean): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
@@ -34,7 +46,7 @@ export interface FieldTerrainOptions {
   wet?: boolean;
 }
 
-/** Build the ground of a field: tops (stone, soil) and cliffs, one mesh each. */
+/** Build the ground of a field: tops (one mesh per texture family) and cliffs. */
 export function buildAuthoredFieldTerrain(
   def: AuthoredFieldDef,
   opts: FieldTerrainOptions,
@@ -45,27 +57,30 @@ export function buildAuthoredFieldTerrain(
     maxEdge: opts.maxEdge ?? (opts.lowGfx ? 6 : 3),
     layerLift: 0,
   });
-  const stone = flagstoneDetail();
-  const soil = soilDetail();
   const rock = rockDetail();
-  const topMats = {
-    stone: surfaceMat({
-      map: stone.map,
-      normalMap: opts.lowGfx ? undefined : stone.normalMap,
-      vertexColors: true,
-      roughness: opts.wet ? 0.62 : 0.93,
-    }),
-    soil: surfaceMat({
-      map: soil.map,
-      normalMap: opts.lowGfx ? undefined : soil.normalMap,
-      vertexColors: true,
-      roughness: opts.wet ? 0.72 : 0.98,
-    }),
+  // Each family's detail pair and its sheen; a material is minted only for a
+  // family the field actually draws (the shared cache dedupes the rest).
+  const looks: Record<
+    FieldTopFamily,
+    { detail: () => ReturnType<typeof rockDetail>; rough: number }
+  > = {
+    stone: { detail: flagstoneDetail, rough: opts.wet ? 0.62 : 0.93 },
+    soil: { detail: soilDetail, rough: opts.wet ? 0.72 : 0.98 },
+    // Jungle moss stays matte; wet basalt glints.
+    moss: { detail: mossDetail, rough: 0.97 },
+    basalt: { detail: basaltDetail, rough: opts.wet ? 0.42 : 0.55 },
   };
-  for (const family of ['stone', 'soil'] as const) {
+  for (const family of FIELD_TOP_FAMILIES) {
     const data = tops[family];
     if (data.positions.length === 0) continue;
-    const mesh = new THREE.Mesh(geometryOf(data, false), topMats[family]);
+    const pair = looks[family].detail();
+    const material = surfaceMat({
+      map: pair.map,
+      normalMap: opts.lowGfx ? undefined : pair.normalMap,
+      vertexColors: true,
+      roughness: looks[family].rough,
+    });
+    const mesh = new THREE.Mesh(geometryOf(data, false), material);
     mesh.name = `fieldTop:${family}`;
     mesh.receiveShadow = true;
     group.add(mesh);

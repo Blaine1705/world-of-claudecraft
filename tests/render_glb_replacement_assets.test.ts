@@ -7,6 +7,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   statSync,
@@ -46,7 +47,6 @@ import { stationsPreloadInternalsForTest } from '../src/render/stations';
 import { transportShipInternalsForTest } from '../src/render/transport_ship';
 import { wickharborHarborInternalsForTest } from '../src/render/wickharbor_harbor';
 import { wickharborWharfInternalsForTest } from '../src/render/wickharbor_wharf';
-import { wildheartPropsPreloadInternalsForTest } from '../src/render/wildheart_props';
 import { wispMazeKitPreloadInternalsForTest } from '../src/render/wisp_maze_kit';
 import { wyrmwatchHarborInternalsForTest } from '../src/render/wyrmwatch_harbor';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
@@ -758,7 +758,14 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
   });
 
   it('Wildheart Basin jungle prop assets', () => {
-    for (const url of Object.values(wildheartPropsPreloadInternalsForTest.assetUrl)) {
+    // The bespoke caldera renderer that drew these retired with the Basin's
+    // rework (render/wildheart_basin); the shipped models stay (the door
+    // portal draws the jaguar gate, the creature looks the mask totem).
+    const shipped = readdirSync(path.join(publicDir, 'models/props'))
+      .filter((f) => /^wildheart_.*\.glb$/.test(f) && f !== 'wildheart_basin_kit.glb')
+      .map((f) => `/models/props/${f}`);
+    expect(shipped.length).toBeGreaterThanOrEqual(10);
+    for (const url of shipped) {
       expectAssetExistsAndManifested(url);
       const file = path.join(publicDir, url.replace(/^\//, ''));
       const size = statSync(file).size;

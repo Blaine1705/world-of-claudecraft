@@ -13,6 +13,7 @@ import { dungeonAt, isArenaPos, isBgPos, isDelvePos, isYumiMazePos } from '../si
 import { waterLevelAt } from '../sim/world';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import type { FogSceneState } from './interior_light_rig';
+import { BASIN_FOG_COLOR } from './wildheart_basin/basin_plan_core';
 
 /** The Hollow Crypt's night fog colour (its sky dome fades to it at the horizon). */
 export const HOLLOW_CRYPT_FOG_COLOR = 0x1c2238;
@@ -20,6 +21,8 @@ export const HOLLOW_CRYPT_FOG_COLOR = 0x1c2238;
 export const SUNKEN_BASTION_FOG_COLOR = 0x4d5a57;
 /** The Drowned Temple's violet night haze (its sky dome fades to it at the horizon). */
 export const DROWNED_TEMPLE_FOG_COLOR = 0x252a4c;
+/** The Wildheart Basin's humid gold haze (its sky dome fades to it at the horizon). */
+export const WILDHEART_BASIN_FOG_COLOR = BASIN_FOG_COLOR;
 /** The Stormbrass Foundry's smoke-grey steam haze (its sky's horizon too): a
  *  neutral slate, not the blue that read as a sea under the shelf. */
 export const STORMBRASS_FOUNDRY_FOG_COLOR = 0x6f7378;
@@ -56,9 +59,9 @@ export function resolveFogScene(
   const inTemple = interior === 'temple';
   const inNythraxis = interior === 'nythraxis';
   const ignivarRaidFogState = ignivarRaidFogStateForInterior(interior ?? null);
-  // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
-  // sky dome and the daylight rig and only swaps in its own field haze.
-  const inWildheartField = interior === 'wildheart';
+  // The Wildheart Basin: an open-air jungle caldera on a humid gold
+  // afternoon, under its OWN sky (the world dome hides inside it).
+  const inWildheartBasin = interior === 'wildheart';
   // The Hollow Crypt is open-air too, but at night under its OWN sky: the
   // world dome hides and the interior group carries the moonlit sky.
   const inHollowCrypt = interior === 'hollow_crypt';
@@ -82,8 +85,8 @@ export function resolveFogScene(
             ? 'nythraxis'
             : ignivarRaidFogState
               ? ignivarRaidFogState
-              : inWildheartField
-                ? 'wildheartField'
+              : inWildheartBasin
+                ? 'wildheartBasin'
                 : inHollowCrypt
                   ? 'hollowCrypt'
                   : inSunkenBastion
@@ -136,12 +139,14 @@ export function applyFogScenePreset(
     // matching the three state names here is the same condition the renderer
     // held as (ignivarRaidFogState && desired === ignivarRaidFogState)
     applyIgnivarRaidFog(desired, fog);
-  } else if (desired === 'wildheartField') {
-    // Sunlit humid depth keeps the full caldera readable while the rear
-    // shrine and limestone shell settle into a warm green atmospheric veil.
-    fog.color.setHex(0x8ca786);
-    fog.near = 105;
-    fog.far = 430;
+  } else if (desired === 'wildheartBasin') {
+    // Humid gold haze over the jungle caldera: pushed far back so the falls,
+    // the river and the stone jaguar read from the Idol Maw (480 yd), while
+    // the caldera walls soften into the gold; the gorge's own thicker haze is
+    // the interior's (render/wildheart_basin/basin_air.ts).
+    fog.color.setHex(WILDHEART_BASIN_FOG_COLOR);
+    fog.near = 130;
+    fog.far = 860;
   } else if (desired === 'hollowCrypt') {
     // Night air over the grave-mist: a deep blue-violet veil pushed far back
     // so the whole necropolis and the ritual column read from the landing,

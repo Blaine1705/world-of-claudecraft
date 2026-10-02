@@ -66,7 +66,7 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
     expect(resolveFogScene(true, interiorPx('temple'), 5, cam, SEED).desired).toBe('temple');
     expect(resolveFogScene(true, interiorPx('nythraxis'), 5, cam, SEED).desired).toBe('nythraxis');
     expect(resolveFogScene(true, interiorPx('wildheart'), 5, cam, SEED).desired).toBe(
-      'wildheartField',
+      'wildheartBasin',
     );
     expect(resolveFogScene(true, interiorPx('lastkeep'), 5, cam, SEED).desired).toBe('lastkeep');
     expect(resolveFogScene(true, interiorPx('dawnhold'), 5, cam, SEED).desired).toBe('dawnhold');
@@ -98,7 +98,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['ignivarApproach', ...raid('ignivarApproach')],
     ['ignivar', ...raid('ignivar')],
     ['varkhul', ...raid('varkhul')],
-    ['wildheartField', 0x8ca786, 105, 430],
+    ['wildheartBasin', 0xc7bf8e, 130, 860],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],
     ['delve', 0x0e0705, 14, 74],

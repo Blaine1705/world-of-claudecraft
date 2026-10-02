@@ -23,6 +23,9 @@ const FIELD_MAP_TOKENS = {
   foam: '--color-field-map-foam',
   mist: '--color-field-map-mist',
   mistSwirl: '--color-field-map-mist-swirl',
+  canopy: '--color-field-map-canopy',
+  canopyDark: '--color-field-map-canopy-dark',
+  canopyLight: '--color-field-map-canopy-light',
   ink: '--color-field-map-ink',
   shadow: '--color-field-map-shadow',
   highlight: '--color-field-map-highlight',
@@ -73,7 +76,7 @@ export class FieldMapPlateArt {
   /** The void colour a map canvas fills round the plate. */
   backdrop(plan: FieldMapPlan): string {
     const c = this.resolve();
-    return plan.void === 'sea' ? c.seaDeep : c.mist;
+    return plan.void === 'sea' ? c.seaDeep : plan.void === 'jungle' ? c.canopyDark : c.mist;
   }
 
   /** The field's painted plate (built once, then cached). */
@@ -107,8 +110,9 @@ export class FieldMapPlateArt {
       ctx.stroke();
     };
 
-    // ---- the void: the sea with its shoals and swell, or the chasm mist ----
-    ctx.fillStyle = plan.void === 'sea' ? c.seaDeep : c.mist;
+    // ---- the void: the sea with its shoals and swell, the gorge's jungle
+    // canopy with its river, or the chasm mist ----
+    ctx.fillStyle = this.backdrop(plan);
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
@@ -140,6 +144,8 @@ export class FieldMapPlateArt {
         ctx.arc(x, y + len, len, Math.PI * 1.25, Math.PI * 1.75);
         ctx.stroke();
       }
+    } else if (plan.void === 'jungle') {
+      this.jungle(ctx, plan, canvas, px, py, c);
     } else {
       ctx.fillStyle = c.mistSwirl;
       for (let i = 0; i < 90; i++) {
@@ -323,6 +329,82 @@ export class FieldMapPlateArt {
     return canvas;
   }
 
+  /** The gorge floor seen from above: a canopy of crowns, the river winding
+   *  through it and the pools under the falls (water, never a sea). */
+  private jungle(
+    ctx: CanvasRenderingContext2D,
+    plan: FieldMapPlan,
+    canvas: HTMLCanvasElement,
+    px: (x: number) => number,
+    py: (z: number) => number,
+    c: FieldMapColors,
+  ): void {
+    const k = FIELD_MAP_PX_PER_YARD;
+    // Crowns: a dense scatter, mid-green bodies with lit tops.
+    const count = Math.round((canvas.width * canvas.height) / 260);
+    for (let i = 0; i < count; i++) {
+      const x = hash(i, 3.1) * canvas.width;
+      const y = hash(5.7, i) * canvas.height;
+      const r = (2.2 + hash(i, 8.3) * 3.4) * k;
+      ctx.globalAlpha = 0.55 + hash(i, 2.9) * 0.3;
+      ctx.fillStyle = c.canopy;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.35;
+      ctx.fillStyle = c.canopyLight;
+      ctx.beginPath();
+      ctx.arc(x - r * 0.25, y - r * 0.25, r * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // The river: a dark bank line, the water, a pale current down its middle.
+    const ribbon = (points: readonly [number, number][]): void => {
+      ctx.beginPath();
+      points.forEach(([x, z], i) => {
+        if (i === 0) ctx.moveTo(px(x), py(z));
+        else ctx.lineTo(px(x), py(z));
+      });
+    };
+    for (const w of plan.water.lines) {
+      ctx.strokeStyle = c.canopyDark;
+      ctx.lineWidth = (w.width + 4) * k;
+      ribbon(w.points);
+      ctx.stroke();
+      ctx.strokeStyle = c.shallows;
+      ctx.lineWidth = w.width * k;
+      ribbon(w.points);
+      ctx.stroke();
+      ctx.strokeStyle = c.foam;
+      ctx.globalAlpha = 0.3;
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([7, 6]);
+      ribbon(w.points);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+    for (const p of plan.water.pools) {
+      ctx.fillStyle = c.shallows;
+      ctx.beginPath();
+      ctx.arc(px(p.x), py(p.z), p.r * k, 0, Math.PI * 2);
+      ctx.fill();
+      // Foam rings where the falls come down.
+      ctx.strokeStyle = c.foam;
+      ctx.lineWidth = 1.4;
+      for (const [f, a] of [
+        [0.4, 0.7],
+        [0.7, 0.4],
+      ] as const) {
+        ctx.globalAlpha = a;
+        ctx.beginPath();
+        ctx.arc(px(p.x), py(p.z), p.r * k * f, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
   /** The ground's own texture, clipped to its terrace. */
   private texture(
     ctx: CanvasRenderingContext2D,
@@ -381,6 +463,39 @@ export class FieldMapPlateArt {
             Math.PI * 2,
           );
           ctx.stroke();
+        }
+      }
+    } else if (ground === 'basalt') {
+      // Columnar basalt: the hexagonal tops of the columns.
+      ctx.globalAlpha = 0.24;
+      ctx.lineWidth = 0.8;
+      const r = k * 1.3;
+      const w = r * Math.sqrt(3);
+      for (let y = minY, row = 0; y <= maxY + r; y += r * 1.5, row++) {
+        for (let x = minX + (row % 2) * (w / 2); x <= maxX + w; x += w) {
+          ctx.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
+            const hx = x + Math.cos(a) * r * 0.92;
+            const hy = y + Math.sin(a) * r * 0.92;
+            if (i === 0) ctx.moveTo(hx, hy);
+            else ctx.lineTo(hx, hy);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
+    } else if (ground === 'moss') {
+      // Jungle moss: soft lit cushions and dark tufts.
+      for (let y = minY; y <= maxY; y += k * 1.6) {
+        for (let x = minX; x <= maxX; x += k * 1.6) {
+          const h = hash(x * 0.9, y * 1.1);
+          if (h < 0.4) continue;
+          ctx.globalAlpha = 0.16;
+          ctx.fillStyle = h > 0.7 ? c.highlight : c.ink;
+          ctx.beginPath();
+          ctx.arc(x + hash(y, x) * k, y, k * (0.3 + h * 0.4), 0, Math.PI * 2);
+          ctx.fill();
         }
       }
     } else if (ground === 'shallows') {

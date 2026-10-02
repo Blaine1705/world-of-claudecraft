@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { sharedUniforms } from './gfx';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
+import { BASIN_SUN_DIRECTION } from './wildheart_basin/basin_plan_core';
 
 /** Every fog scene state the renderer resolves to (single source of truth). */
 export type FogSceneState =
@@ -29,7 +30,7 @@ export type FogSceneState =
   | 'underwater'
   | 'rift'
   | 'practice'
-  | 'wildheartField'
+  | 'wildheartBasin'
   | 'hollowCrypt'
   | 'sunkenBastion'
   | 'drownedTemple'
@@ -37,17 +38,12 @@ export type FogSceneState =
   | 'lastkeep'
   | 'dawnhold';
 
-/** The states whose scene is open to the sky: the overworld, Wildheart's field
- *  and the Thornhollow Fields hollow keep the sky dome (hiding it there left a
- *  black void above the ramparts); every interior, the maze, the rift and the
- *  water hide it. */
+/** The states whose scene is open to the sky: the overworld and the
+ *  Thornhollow Fields hollow keep the sky dome (hiding it there left a black
+ *  void above the ramparts); every interior, the maze, the rift and the water
+ *  hide it, and the open-air dungeon fields carry their own sky. */
 export function isOpenAirFogState(state: FogSceneState): boolean {
-  return (
-    state === 'outdoor' ||
-    state === 'hoardValley' ||
-    state === 'wildheartField' ||
-    state === 'battleground'
-  );
+  return state === 'outdoor' || state === 'hoardValley' || state === 'battleground';
 }
 
 // dungeon interiors: kill the daylight so torchlight carries the scene
@@ -71,25 +67,23 @@ const YUMI_MAZE_SUN_INTENSITY = 1.32;
 const YUMI_MAZE_HEMI_INTENSITY = 0.38;
 const YUMI_MAZE_ENV_INTENSITY = 0.25;
 const YUMI_MAZE_RIM_BOOST = 1.7;
-// Wildheart's sunlit caldera: the legs carry what used to be a second
-// directional (0.88) and hemisphere (0.9) fill pair added by wildheart_props.ts
-// on top of these, folded in here so the light census never changes. The
-// fill sun cast no shadow, so it lit the faces the shadowed world sun leaves
-// dark (the gate arch fronts, the ground under the totems); the unshadowed
-// hemisphere takes that share and the sun a little less than the plain sum
-// (ground band measured at 41 before, 45 after, headless at the gate).
-const WILDHEART_SUN_INTENSITY = 2.4;
-const WILDHEART_HEMI_INTENSITY = 1.8;
-// Where the caldera's sun stands: the direction the removed fill pair aimed
-// from (position (-45, 72, -35) at target (0, 2, 135)), so the gate arch and
-// the totems keep their lit faces. The renderer's per-frame key-light aim
-// takes it in place of the world sun while the field is the fog state.
-export const WILDHEART_KEY_LIGHT_DIRECTION = new THREE.Vector3(-45, 70, -170).normalize();
-const WILDHEART_ENV_INTENSITY = 0.28;
-const WILDHEART_RIM_BOOST = 1.5;
-const WILDHEART_SUN_COLOR = 0xffd48c;
-const WILDHEART_HEMI_SKY_COLOR = 0xd8ebca;
-const WILDHEART_HEMI_GROUND_COLOR = 0x5b4a2d;
+// The Wildheart Basin: an OPEN-AIR jungle caldera on a humid gold-green
+// afternoon, under its own sky (render/wildheart_basin). The one sun is the
+// key light, warm gold and low in the south-west behind the Idol Maw (so the
+// falls' rainbows read from the maw), with a pale green-gold sky bounce off
+// the humid air and a mossy ground bounce off the canopy. The braziers and
+// the jaguar's eyes ride the light sink; nothing else lights the basin.
+const WILDHEART_SUN_INTENSITY = 2.55;
+const WILDHEART_HEMI_INTENSITY = 1.3;
+/** Where the afternoon sun hangs (from the ground toward it). The renderer's
+ *  per-frame key-light aim takes it in place of the world sun while the basin
+ *  is the fog state. */
+export const WILDHEART_KEY_LIGHT_DIRECTION = new THREE.Vector3(...BASIN_SUN_DIRECTION);
+const WILDHEART_ENV_INTENSITY = 0.42;
+const WILDHEART_RIM_BOOST = 1.45;
+const WILDHEART_SUN_COLOR = 0xffd99a;
+const WILDHEART_HEMI_SKY_COLOR = 0xd2e2b4;
+const WILDHEART_HEMI_GROUND_COLOR = 0x4c5a2c;
 // The Hollow Crypt: an OPEN-AIR necropolis under a vast moon. It hides the
 // world's day-night dome (its own moonlit sky rides the interior group, so the
 // look never depends on the realm's clock) and grades the one sun into a cold
@@ -213,7 +207,7 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
     out.copy(STORMBRASS_FOUNDRY_SUN_DIRECTION);
     return true;
   }
-  if (state !== 'wildheartField') return false;
+  if (state !== 'wildheartBasin') return false;
   out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
   return true;
 }
@@ -230,7 +224,7 @@ export function applyInteriorLightRig(
   outdoor: OutdoorLightLegs,
 ): void {
   const mazeNight = state === 'yumiMaze';
-  const wildheartSun = state === 'wildheartField';
+  const wildheartSun = state === 'wildheartBasin';
   const cryptMoon = state === 'hollowCrypt';
   const bastionDusk = state === 'sunkenBastion';
   const templeMoon = state === 'drownedTemple';

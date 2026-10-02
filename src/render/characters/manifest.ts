@@ -129,6 +129,7 @@ import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import { FOUNDRY_CREATURE_LOOKS } from './foundry_creature_looks';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
+import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -5440,6 +5441,8 @@ for (const [key, [base, tint, tintStrength, grow, extra]] of Object.entries(
 }
 // Phase 3: the Foundry's own Blender creatures replace their placeholders.
 Object.assign(VISUALS, FOUNDRY_CREATURE_LOOKS);
+// The Wildheart Basin's placeholder creatures (wildheart_creature_looks.ts).
+Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 
 /** The composed-body variant of a class visual (every class has one). */
 export function modularVisualKey(cls: PlayerClass): string {
@@ -5717,6 +5720,7 @@ const MOB_KEYS: Record<string, string> = {
   voltaic_warden: 'foundry_voltaic_warden',
   prime_draft: 'foundry_prime_draft',
   half_built_frame: 'foundry_half_built_frame',
+  ...WILDHEART_MOB_KEYS,
   ...Object.fromEntries(
     ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
   ),

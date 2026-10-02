@@ -467,6 +467,10 @@
     --color-field-map-foam: #e2f1f2;
     --color-field-map-mist: #16181d;
     --color-field-map-mist-swirl: #3a3f4a;
+    /* the jungle canopy over a gorge floor (the Wildheart Basin) */
+    --color-field-map-canopy: #2f5a36;
+    --color-field-map-canopy-dark: #1b3322;
+    --color-field-map-canopy-light: #5a8a48;
     --color-field-map-ink: #140f0a;
     --color-field-map-shadow: rgba(4, 6, 10, 0.5);
     --color-field-map-highlight: #fff4d6;

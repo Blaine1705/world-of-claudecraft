@@ -506,6 +506,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
   'render/drowned_temple/temple_lights.ts':
     'the Drowned Temple braziers, moon orbs, tidepools, the conch, the prism and the altar, pushed through the fireLights adopter sink the interiors are handed',
+  'render/wildheart_basin/basin_lights.ts':
+    'the Wildheart Basin Sunbone braziers and the jaguar eyes, pushed through the fireLights adopter sink the interiors are handed',
   'render/stormbrass_foundry/foundry_lights.ts':
     'the Stormbrass Foundry work lamps, the coil glow and the charging racks, pushed through the fireLights adopter sink the interiors are handed',
   'render/sunken_bastion/bastion_lights.ts':
@@ -523,8 +525,6 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'fall and impact lights handed to registerBudgetPointLight, born hidden, marked on the rank rebuild',
   'render/weapon_vfx.ts':
     'weapon-skin light: in the world a hidden view light marked on reconcile; in a preview canvas the only point lights of that scene, all driven live together',
-  'render/wildheart_props.ts':
-    'the Wildheart fire light, pushed through the fireLights adopter sink the interiors are handed',
   'render/wyrmwatch_harbor_house.ts':
     'the Harbormaster House hearth and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/yumi_maze.ts': 'maze brazier lights pushed through the fireLights adopter sink',
@@ -635,6 +635,10 @@ describe('every point-light producer is a carrier source', () => {
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
       // the idle sweep or to Vael's lamp yaw, never a scene.
       'render/sunken_bastion/bastion_beacon.ts: mesh',
+      // The Wildheart Basin's gates: mesh hooks reading the gate memory (the
+      // vine bridges weaving, the thorn walls sinking, the wards failing),
+      // never a scene.
+      'render/wildheart_basin/basin_gates.ts: m',
     ]);
 
     expect(sourceOf('render/light_pulses.ts')).toContain('markPointLightSource(light);');

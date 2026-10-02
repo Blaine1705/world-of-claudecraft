@@ -52,6 +52,7 @@ import {
 import { FoundryCreatureFx } from './stormbrass_foundry/foundry_creature_fx';
 import { FoundryFx } from './stormbrass_foundry/foundry_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
+import { WildheartFx } from './wildheart_basin';
 
 const SEGMENTS = 64;
 const BASE_COLOR = 0xff2200;
@@ -106,6 +107,8 @@ export class RiftDeathZoneVisuals {
   // The Drowned Temple's trash and boss telegraphs, and the Mere Hydra's body.
   private readonly templeFx: TempleFx;
   private readonly foundryFx: FoundryFx;
+  // The Wildheart Basin's telegraphs and creature effects (the Saurian, the trash).
+  private readonly wildheartFx: WildheartFx;
   // The Foundry's creature effects and their gestures (gauge, plates, frames).
   private readonly foundryCreatures: FoundryCreatureFx;
   private readonly cryptCreatures: CryptCreatureFx;
@@ -161,6 +164,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
     this.templeFx = new TempleFx(scene, groundY, world, compileGate);
     this.foundryFx = new FoundryFx(scene, groundY, world, compileGate);
+    this.wildheartFx = new WildheartFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.foundryCreatures = new FoundryCreatureFx(
       scene,
       groundY,
@@ -262,6 +266,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx.update(dt);
     this.templeFx.update(dt);
     this.foundryFx.update(dt);
+    this.wildheartFx.update(dt);
     this.foundryCreatures.update(dt);
     this.cryptCreatures.update(dt);
     this.cryptFinale.update(dt);
@@ -300,6 +305,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx.dispose();
     this.templeFx.dispose();
     this.foundryFx.dispose();
+    this.wildheartFx.dispose();
     this.foundryCreatures.dispose();
     this.cryptCreatures.dispose();
     this.cryptFinale.dispose();
@@ -317,7 +323,8 @@ export class RiftDeathZoneVisuals {
     this.morthenFx.handleEvent(event);
     this.foundryCreatures.handleEvent(event);
     this.templeFx.handleEvent(event);
-    return this.bastionFx.handleEvent(event);
+    const basin = this.wildheartFx.handleEvent(event);
+    return this.bastionFx.handleEvent(event) || basin;
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

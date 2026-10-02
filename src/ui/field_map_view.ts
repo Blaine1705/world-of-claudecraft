@@ -10,6 +10,12 @@
 //
 // DOM-free, Three-free, deterministic.
 
+import {
+  RIM_FALLS,
+  RIVER_COURSE,
+  RIVER_FORD,
+  WEEPING_FALLS,
+} from '../sim/content/wildheart_basin_layout';
 import { DUNGEONS } from '../sim/data';
 import {
   type AuthoredFieldDef,
@@ -76,7 +82,44 @@ export interface FieldMapPlan {
   /** The dungeon's gates and seals: WHERE each passage is (a gate that is
    *  still shut is the live `gate` marker, never this static mark). */
   gates: (FieldMapSegment & { seal: boolean })[];
+  /** Running and standing water in the void (a gorge's river and the pools
+   *  under its falls), drawn over the void and under the terraces. */
+  water: FieldMapWater;
 }
+
+export interface FieldMapWater {
+  /** River ribbons: a centreline and its width (yards). */
+  lines: { points: [number, number][]; width: number }[];
+  /** Plunge pools at the foot of falls. */
+  pools: { x: number; z: number; r: number }[];
+}
+
+/** The water a field's void holds (render and map only; the sim walks none of
+ *  it). The Wildheart Basin: the river down the gorge, the ford's spill into
+ *  it, the pools under the rim falls and the Weeping Falls' plunge pool. */
+const FIELD_MAP_WATER: Readonly<Record<string, () => FieldMapWater>> = {
+  wildheart: () => ({
+    lines: [
+      { points: RIVER_COURSE.map(([x, z]): [number, number] => [x, z]), width: 13 },
+      {
+        points: [
+          [RIVER_FORD.x0, (RIVER_FORD.z0 + RIVER_FORD.z1) / 2],
+          [RIVER_FORD.x0 - 14, (RIVER_FORD.z0 + RIVER_FORD.z1) / 2 + 12],
+          [-112, -58],
+        ],
+        width: 10,
+      },
+    ],
+    pools: [
+      { x: WEEPING_FALLS.x + 1, z: WEEPING_FALLS.z, r: 13 },
+      ...RIM_FALLS.filter((f) => f.id !== 'weeping').map((f) => ({
+        x: f.x + Math.sin(f.facing) * 6,
+        z: f.z + Math.cos(f.facing) * 6,
+        r: f.width * 0.8,
+      })),
+    ],
+  }),
+};
 
 function landmarkOf(kind: string): FieldMapLandmark | null {
   if (kind.includes('beacon')) return 'beacon';
@@ -212,6 +255,7 @@ export function fieldMapPlan(def: AuthoredFieldDef): FieldMapPlan {
     props,
     landmarks,
     gates: gates.map(gateBar),
+    water: FIELD_MAP_WATER[def.key]?.() ?? { lines: [], pools: [] },
   };
   plans.set(def, plan);
   return plan;
