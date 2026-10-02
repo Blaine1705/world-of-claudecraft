@@ -7,6 +7,9 @@
 // The Fern Steps once came down onto the south bank still several yards up:
 // the bank's floor (listed later, so it wins) cut the ramp off along its
 // south edge and the generated cliff stood a wall across the way down. The
+// bank now leaves the ramp's band out (a notch), so the ramp keeps one
+// straight slope (a bend on a slope would draw a seam) and only its side
+// drops to the bank. The
 // fences were turned radial, poking through the rim's bone rails.
 
 import { describe, expect, it } from 'vitest';
@@ -32,7 +35,14 @@ import { clearDungeonGateStateForTest } from '../src/sim/instances/dungeon_gate_
 const FIELD = WILDHEART_BASIN_FIELD;
 const CLIFFS = authoredFieldCliffRuns(FIELD);
 type PathSurface = Extract<FieldSurface, { kind: 'path' }>;
-const PATHS = FIELD.surfaces.filter((s): s is PathSurface => s.kind === 'path');
+/** Walkways that end on purpose: the way into the stone jaguar's maw stops
+ *  at the exit portal against the head's throat (sealed at the back) and
+ *  starts on the open shrine terrace beside the altar. Its own suite
+ *  (tests/wildheart_basin_maw_portal.test.ts) walks a player through it. */
+const DEAD_ENDS = new Set(['jaguar_maw']);
+const PATHS = FIELD.surfaces.filter(
+  (s): s is PathSurface => s.kind === 'path' && !DEAD_ENDS.has(s.id),
+);
 
 function segDist(px: number, pz: number, ax: number, az: number, bx: number, bz: number): number {
   const dx = bx - ax;

@@ -302,6 +302,17 @@ function path(
 
 const H = WILDHEART_HEIGHTS;
 
+/** Where the lower Fern Steps cross the south bank's edge (z -152) while
+ *  still above it: the bank leaves this triangle to the ramp (its north edge
+ *  0.3 inside the ramp's 6 yd band, out to the cross-section where it reaches
+ *  the bank's level at (10, -150)). The ramp's side drops to the bank along
+ *  the notch, never across the way down. */
+const FERN_STEPS_NOTCH: [number, number][] = [
+  [-3.26, -152],
+  [6.835, -145.26],
+  [11.34, -152],
+];
+
 const SURFACES: FieldSurface[] = [
   // --- The Idol Maw Landing: the carved lip inside the idol's jaw ------------------
   circle('idol_landing', IDOL_LANDING.x, IDOL_LANDING.z, IDOL_LANDING.r, IDOL_LANDING.h, {
@@ -333,17 +344,17 @@ const SURFACES: FieldSurface[] = [
     H.fernLanding,
     { edge: 'rock', ground: 'moss' },
   ),
-  // The descent runs along the gorge wall and lands on the bank's level BEFORE
-  // it meets the bank, then walks straight onto it: a ramp still in the air
-  // where the bank (listed later) takes over would be cut off by a cliff.
+  // One straight descent (a bend on a slope draws a seam): the south bank
+  // below leaves the ramp's band out (FERN_STEPS_NOTCH), since the bank,
+  // listed later, would otherwise cut the ramp off with a cliff across it
+  // while it is still in the air.
   path(
     'fern_steps_lower',
     [
       [-26, -174, H.fernLanding],
       [-21, -170.7, H.fernLanding],
-      [9, -161.5, 5.4],
-      [14.5, -156, H.bank],
-      [15, -146, H.bank],
+      [10, -150, H.bank],
+      [16, -146, H.bank],
     ],
     6,
     { stairs: true, edge: 'rock', ground: 'basalt' },
@@ -351,12 +362,7 @@ const SURFACES: FieldSurface[] = [
   // --- The River Ford (G2 on the bank, G3 on the basalt steps, the Saurian) -------
   poly(
     'south_bank',
-    [
-      [-66, -152],
-      [66, -152],
-      [66, -128],
-      [-66, -128],
-    ],
+    [[-66, -152], ...FERN_STEPS_NOTCH, [66, -152], [66, -128], [-66, -128]],
     H.bank,
     { edge: 'rock', ground: 'moss' },
   ),
