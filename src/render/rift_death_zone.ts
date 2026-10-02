@@ -51,6 +51,7 @@ import {
 } from './rift_death_zone_core';
 import { FoundryCreatureFx } from './stormbrass_foundry/foundry_creature_fx';
 import { FoundryFx } from './stormbrass_foundry/foundry_fx';
+import { FoundryWorkerFx } from './stormbrass_foundry/foundry_worker_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { WildheartFx } from './wildheart_basin';
 
@@ -107,6 +108,8 @@ export class RiftDeathZoneVisuals {
   // The Drowned Temple's trash and boss telegraphs, and the Mere Hydra's body.
   private readonly templeFx: TempleFx;
   private readonly foundryFx: FoundryFx;
+  // The Foundry's chained workers: their chains and shackles.
+  private readonly foundryWorkers: FoundryWorkerFx;
   // The Wildheart Basin's telegraphs and creature effects (the Saurian, the trash).
   private readonly wildheartFx: WildheartFx;
   // The Foundry's creature effects and their gestures (gauge, plates, frames).
@@ -164,6 +167,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
     this.templeFx = new TempleFx(scene, groundY, world, compileGate);
     this.foundryFx = new FoundryFx(scene, groundY, world, compileGate);
+    this.foundryWorkers = new FoundryWorkerFx(scene, groundY, world, compileGate, reducedMotion);
     this.wildheartFx = new WildheartFx(
       scene,
       groundY,
@@ -274,6 +278,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx.update(dt);
     this.templeFx.update(dt);
     this.foundryFx.update(dt);
+    this.foundryWorkers.update(dt);
     this.wildheartFx.update(dt);
     this.foundryCreatures.update(dt);
     this.cryptCreatures.update(dt);
@@ -313,6 +318,7 @@ export class RiftDeathZoneVisuals {
     this.bastionFx.dispose();
     this.templeFx.dispose();
     this.foundryFx.dispose();
+    this.foundryWorkers.dispose();
     this.wildheartFx.dispose();
     this.foundryCreatures.dispose();
     this.cryptCreatures.dispose();

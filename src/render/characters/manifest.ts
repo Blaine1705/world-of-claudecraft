@@ -128,6 +128,7 @@ import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_f
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import { FOUNDRY_CREATURE_LOOKS } from './foundry_creature_looks';
+import { FOUNDRY_WORKER_LOOKS, FOUNDRY_WORKER_MOB_KEYS } from './foundry_worker_looks';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
@@ -5491,6 +5492,8 @@ for (const [key, [base, tint, tintStrength, grow, extra]] of Object.entries(
 }
 // Phase 3: the Foundry's own Blender creatures replace their placeholders.
 Object.assign(VISUALS, FOUNDRY_CREATURE_LOOKS);
+// The Foundry's chained workers (foundry_worker_looks.ts).
+Object.assign(VISUALS, FOUNDRY_WORKER_LOOKS);
 // The Wildheart Basin's placeholder creatures (wildheart_creature_looks.ts).
 Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 
@@ -5773,6 +5776,7 @@ const MOB_KEYS: Record<string, string> = {
   voltaic_warden: 'foundry_voltaic_warden',
   prime_draft: 'foundry_prime_draft',
   half_built_frame: 'foundry_half_built_frame',
+  ...FOUNDRY_WORKER_MOB_KEYS,
   ...WILDHEART_MOB_KEYS,
   ...Object.fromEntries(
     ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),

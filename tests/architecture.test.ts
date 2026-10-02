@@ -646,6 +646,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/foundry_fct_core.ts',
   // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
+  // The Stormbrass Foundry's chained workers' gossip (the line, "Free them").
+  'src/ui/hud/dungeon/foundry_worker_gossip_core.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -878,6 +880,8 @@ const RENDER_PURE_CORES = [
   'src/render/stormbrass_foundry/foundry_fx_core.ts',
   'src/render/stormbrass_foundry/foundry_press_core.ts',
   'src/render/stormbrass_foundry/foundry_vents_core.ts',
+  // The Foundry's chained workers: the chain's span, links and fall.
+  'src/render/stormbrass_foundry/foundry_worker_fx_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

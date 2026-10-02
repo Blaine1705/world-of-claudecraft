@@ -225,6 +225,12 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
     layer: 'encounter',
     strict: true,
   },
+  // The Stormbrass Foundry's chained workers: the sparks off their struck chains.
+  {
+    file: 'src/render/stormbrass_foundry/foundry_worker_fx.ts',
+    layer: 'encounter',
+    strict: true,
+  },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];

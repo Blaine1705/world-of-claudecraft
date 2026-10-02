@@ -11,6 +11,7 @@
 // pipeline rebuilds on becomes a reveal instead of a pop.
 
 import * as THREE from 'three';
+import { foundryWorkerCampPhaseOf } from '../sim/content/stormbrass_foundry_workers';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../sim/data';
 import { TEMPLE_OBJECT_TEMPLATES } from '../sim/encounters/drowned_temple/ids';
 import { CRYPT_OBJECT_TEMPLATES } from '../sim/encounters/hollow_crypt/ids';
@@ -61,6 +62,9 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
   if (TEMPLE_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   if (CRYPT_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   if (FOUNDRY_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
+  // A Foundry worker camp's state object: its chains draw from the world
+  // (stormbrass_foundry/foundry_worker_fx.ts).
+  if (foundryWorkerCampPhaseOf(e.templateId) !== null) return { encounterAnchor: true, height: 2 };
   if (dungeonGateStateOf(e.templateId) === null || !e.dungeonId) return null;
   const def = DUNGEONS[e.dungeonId];
   if (!def) return null;
