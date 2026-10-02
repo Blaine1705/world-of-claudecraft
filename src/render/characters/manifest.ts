@@ -5582,6 +5582,9 @@ const MOB_KEYS: Record<string, string> = {
   guardian_stampede_0: 'greyjaw',
   guardian_stampede_1: 'mob_boar',
   guardian_stampede_2: 'mob_raptor',
+  // The Fanglord's Whistle's spirit jaguar (a transient trinket guardian):
+  // the jade spirit cat of wildheart_creature_looks.ts.
+  guardian_fanglords_spirit_jaguar: 'wildheart_spirit_jaguar',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',

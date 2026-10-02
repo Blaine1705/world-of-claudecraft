@@ -257,6 +257,7 @@ import {
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import { WEEKLY_EMISSARY_NPC_DEF } from './content/weekly_quests';
 import { WILDHEART_DUNGEON_DEFS, WILDHEART_ITEMS, WILDHEART_MOBS } from './content/wildheart';
+import { WILDHEART_BASIN_ITEMS } from './content/wildheart_items';
 import {
   WILLOWFEN_CAMPS,
   WILLOWFEN_ITEMS,
@@ -440,6 +441,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   SUNKEN_BASTION_ITEMS,
   DROWNED_TEMPLE_ITEMS,
   STORMBRASS_FOUNDRY_ITEMS,
+  WILDHEART_BASIN_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,

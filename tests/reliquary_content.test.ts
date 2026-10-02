@@ -478,8 +478,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // The Drowned Temple rework adds four (two rare chase rows, two heroic
     // epics): 504.
     // The Stormbrass Foundry adds thirteen (six rares, five heroic epics, two
-    // trinkets): 517.
-    expect(full).toEqual({ owned: 517, total: 517 });
+    // trinkets): 517. The Wildheart Basin rework adds five (the Falls-Blessed
+    // Staff, two heroic epics, two trinkets): 522.
+    expect(full).toEqual({ owned: 522, total: 522 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -513,8 +514,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     // 471 with the Sunken Bastion rework's five new relics; 475 with the Drowned
-    // Temple rework's four; 488 with the Stormbrass Foundry's thirteen.
-    expect(character).toEqual({ owned: 488, total: 488 });
+    // Temple rework's four; 488 with the Stormbrass Foundry's thirteen; 493
+    // with the Wildheart Basin rework's five.
+    expect(character).toEqual({ owned: 493, total: 493 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -581,7 +583,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +5: the Sunken Bastion rework's new relics on its two pages: 687.
       // +4: the Drowned Temple rework's new relics on its two pages: 691.
       // +13: the Stormbrass Foundry's two new pages: 704.
-    ).toBe(704);
+      // +5: the Wildheart Basin rework's new relics on its two pages: 709.
+    ).toBe(709);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -819,7 +822,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // +5: the Sunken Bastion rework's new relics: 526.
     // +4: the Drowned Temple rework's new relics: 530.
     // +13: the Stormbrass Foundry's new relics: 543.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(543);
+    // +5: the Wildheart Basin rework's new relics: 548.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(548);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1096,6 +1100,9 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     voltaic_warden: 'conquerors_stormbrass_foundry_heroic',
     prime_draft: 'conquerors_stormbrass_foundry_heroic',
     korzul_the_gravewyrm: 'conquerors_gravewyrm_sanctum_heroic',
+    // The Wildheart Basin rework: three bosses, one shared heroic page.
+    wildheart_beastmaster: 'conquerors_wildheart_basin_heroic',
+    the_gorgebloom: 'conquerors_wildheart_basin_heroic',
     wildheart_high_priest: 'conquerors_wildheart_basin_heroic',
     [NYTHRAXIS_RAID_BOSS_ID]: 'conquerors_nythraxis_heroic',
     ignivar_herald_of_the_last_flame: 'conquerors_ignivar_heroic',
@@ -2147,7 +2154,11 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       conquerors_stormbrass_foundry: ['line_master_tock'],
       conquerors_gravewyrm_sanctum: ['korzul_the_gravewyrm'],
       conquerors_gravewyrm_sanctum_heroic: ['korzul_the_gravewyrm'],
-      conquerors_wildheart_basin_heroic: ['wildheart_high_priest'],
+      // The Wildheart Basin pages name the Fanglord Beastmaster in full (and
+      // Zulgar in full on the heroic page); "the Gorgebloom" is the lower-case
+      // running form of "The Gorgebloom".
+      conquerors_wildheart_basin: ['wildheart_beastmaster'],
+      conquerors_wildheart_basin_heroic: ['wildheart_beastmaster', 'wildheart_high_priest'],
       conquerors_hollow_crypt_heroic: ['morthen'],
       conquerors_nythraxis: ['nythraxis_scourge_of_thornpeak'],
       conquerors_ignivar: ['ignivar_herald_of_the_last_flame'],
@@ -3208,8 +3219,10 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // fromProfession('leatherworking') beside the quiver's korzul hint.
   conquerors_gravewyrm_sanctum: 9,
   conquerors_gravewyrm_sanctum_heroic: 1,
-  conquerors_wildheart_basin: 2,
-  conquerors_wildheart_basin_heroic: 1,
+  // The Wildheart Basin rework: the Gorgebloom's staff joins the normal page;
+  // all three bosses pay the heroic page.
+  conquerors_wildheart_basin: 3,
+  conquerors_wildheart_basin_heroic: 3,
   conquerors_nythraxis: 1,
   conquerors_nythraxis_heroic: 1,
   // The Crucible raid pages: each room's one boss drops every relic, so all
@@ -4802,8 +4815,9 @@ describe('Reliquary source hint coverage', () => {
     // The Hollow Crypt heroic page dropped its default with the rework's four
     // bosses: 14. The Sunken Bastion heroic page dropped its default the same
     // way with the rework's three bosses: 13. The Drowned Temple heroic page
-    // did the same with its three: 12.
-    expect(defaults).toBe(12);
+    // did the same with its three: 12. The Wildheart Basin heroic page did the
+    // same with its three: 11.
+    expect(defaults).toBe(11);
   });
 });
 

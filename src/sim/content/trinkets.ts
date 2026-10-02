@@ -110,7 +110,36 @@ export type TrinketUse =
     }
   /** Overclocked Governor: `haste` more casting speed for `duration`, then
    *  Overheated: `slow` less casting speed for `overheat` seconds. */
-  | { kind: 'overclock'; duration: number; haste: number; overheat: number; slow: number };
+  | { kind: 'overclock'; duration: number; haste: number; overheat: number; slow: number }
+  /** Fanglord's Whistle: a spirit jaguar fights beside you for `duration`,
+   *  running to your target within `range` and biting it every
+   *  `attackInterval` seconds for `min` to `max` (+ `coef` of your Attack
+   *  Power, snapshotted when it is summoned) physical damage. It runs at
+   *  `moveSpeed` yards per second. */
+  | {
+      kind: 'spiritPack';
+      range: number;
+      duration: number;
+      attackInterval: number;
+      min: number;
+      max: number;
+      coef: number;
+      moveSpeed: number;
+    }
+  /** Gorgebloom Seedpod: plant a seed on your target within `range`; after
+   *  `delay` seconds it bursts where the target stands (or where it died) for
+   *  `flat` (+ `coef` of your Spell Power, snapshotted when it is planted)
+   *  nature damage to every enemy within `radius`, `deathBonus` more if the
+   *  target died first. */
+  | {
+      kind: 'seedburst';
+      range: number;
+      delay: number;
+      radius: number;
+      flat: number;
+      coef: number;
+      deathBonus: number;
+    };
 
 /** What a trinket does on its own while worn. */
 export type TrinketPassive =
@@ -177,6 +206,8 @@ export const TRINKET_AURA = Object.freeze({
   rangefinder: 'trinket_rangefinder',
   overclock: 'trinket_overclock',
   overheated: 'trinket_overheated',
+  spiritPack: 'trinket_spirit_pack',
+  seedburst: 'trinket_seedburst',
 });
 
 /** The Mooring Stone's self-slow rides its own aura id beside the anchor
@@ -218,6 +249,8 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.rangefinder]: 'rangefinders_lens',
   [TRINKET_AURA.overclock]: 'overclocked_governor',
   [TRINKET_AURA.overheated]: 'overclocked_governor',
+  [TRINKET_AURA.spiritPack]: 'fanglords_whistle',
+  [TRINKET_AURA.seedburst]: 'gorgebloom_seedpod',
 });
 
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
@@ -296,6 +329,11 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   // heroic trinket line, docs/design/dungeon-rework/stormbrass_foundry.md 8.2).
   rangefinders_lens: trinket('rangefinders_lens', "Rangefinder's Lens", { agi: 13 }),
   overclocked_governor: trinket('overclocked_governor', 'Overclocked Governor', { int: 13 }),
+  // The Wildheart Basin's heroic Fanglord Beastmaster and Gorgebloom (the
+  // five-man heroic trinket line, docs/design/dungeon-rework/wildheart_basin.md
+  // 8.2): item level 31, line budget round(31 x 0.6 x 0.7) = 13.
+  fanglords_whistle: trinket('fanglords_whistle', "Fanglord's Whistle", { agi: 13 }),
+  gorgebloom_seedpod: trinket('gorgebloom_seedpod', 'Gorgebloom Seedpod', { int: 13 }),
 };
 
 // The Crucible of the Last Spring raid trinkets, in the order they sit in their
@@ -412,6 +450,46 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
   overclocked_governor: {
     cooldown: 120,
     use: { kind: 'overclock', duration: 10, haste: 0.25, overheat: 5, slow: 0.1 },
+  },
+  // Fanglord's Whistle: one of the Packlord Stampede's three beasts (content/
+  // classes.ts stampede: 18 to 24 physical plus 8 percent of the hunter's
+  // power, every 2 sec, for 12 sec), so the trinket pays a third of a level-17
+  // class cooldown on the five-man heroic trinkets' 2 min timer. Six bites at
+  // a heroic level-20 agile's 200 to 300 Attack Power land about 220 to 270,
+  // in line with the Rangefinder's Lens's 10 percent of a 230 DPS heroic
+  // (README section 7) for its 12 sec (about 276). It runs at the Fanglord's
+  // Great Jaguar's speed (8 yd/s, wildheart.ts).
+  fanglords_whistle: {
+    cooldown: 120,
+    use: {
+      kind: 'spiritPack',
+      range: 30,
+      duration: 12,
+      attackInterval: 2,
+      min: 18,
+      max: 24,
+      coef: 0.08,
+      moveSpeed: 8,
+    },
+  },
+  // Gorgebloom Seedpod: the Stormjar's full jar on each target it strikes (ten
+  // charges of 8 plus 7 percent of Spell Power: 80 plus 70 percent) re-timed
+  // from its 90 sec cooldown to this 2 min one (x 4/3: about 107 plus 93
+  // percent) is the burst on a target that died first (75 x 1.5 = 112.5 plus
+  // 0.6 x 1.5 = 90 percent); the plain burst is two thirds of it. Like the
+  // Heart of the Crucible's nova it has no target cap; the 6 sec wait and the
+  // 8 yd radius are its price.
+  gorgebloom_seedpod: {
+    cooldown: 120,
+    use: {
+      kind: 'seedburst',
+      range: 30,
+      delay: 6,
+      radius: 8,
+      flat: 75,
+      coef: 0.6,
+      deathBonus: 0.5,
+    },
   },
 });
 

@@ -281,24 +281,51 @@ const BASELINE = {
     normalDigest: 'eb7b5ceae049074c21ee1a1356aa988b43668663463e1463a3311868ad6bca24',
     gearDigest: '5fbe16c1c4cc2b558795499ee644ebb7dabd3b08660d60753c8f9d9e51cb8cfc',
   },
+  // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
+  // 8.1 and 8.2): the promoted Fanglord Beastmaster and the Gorgebloom carry
+  // their own normal tables and heroic partitions. Two of Zulgar's shipped epics
+  // moved: the Bloodmane War-Legguards to the Beastmaster, the Sunbone Oracle's
+  // Crown to the Gorgebloom. Zulgar's gearDigest was re-minted over his eleven
+  // remaining ids; the digest over his former thirteen (62b6f9de...) was
+  // verified unchanged against the live defs, so no shipped def moved, and his
+  // normalDigest is untouched (his normal table did not change).
+  wildheart_beastmaster: {
+    gearIds: [
+      'bloodmane_war_legguards',
+      'fanglords_hide_mantle',
+      'fanglords_whistle',
+      'heroic_duskwhisper',
+      'heroic_fanglords_beastspear',
+    ],
+    normalDigest: '2b77baeac4eb143d651b270b56d8817a67a25548847bccbc19940845b869ab00',
+    gearDigest: 'cea40481cdc6e06219743c724bb85c665f458948ddb1637dd8c66212d36f5e66',
+  },
+  the_gorgebloom: {
+    gearIds: [
+      'gorgebloom_seedpod',
+      'heroic_falls_blessed_staff',
+      'sunbone_oracles_crown',
+      'thornroot_greathelm',
+    ],
+    normalDigest: '0b84deb71fae16440456c25cdc1f47197204d89b396b6d1aead08a1d93b16ad5',
+    gearDigest: '06a83a9d0fc7e2ff0b8199c97ad6548460984b69bc402da6587e36ce4e648594',
+  },
   wildheart_high_priest: {
     gearIds: [
       'basin_stalkers_tunic',
-      'bloodmane_war_legguards',
       'bloodmane_warleggings',
       'greatfang_of_the_basin',
       'heroic_wildheart_fangknife',
       'heroic_wildheart_hexwood_staff',
       'heroic_wildheart_tuskblade',
       'paired_talons',
-      'sunbone_oracles_crown',
       'sunbone_ritual_hauberk',
       'sunbone_ritual_sarong',
       'verdant_heart_vestment',
       'vineclaw_stalking_breeches',
     ],
     normalDigest: 'dc4c6a27f87b5cd5ab11237b791de5a2707e2b55329f7c1aada4a4fb9cfe34f8',
-    gearDigest: '62b6f9de2378727e1e5e2c42d127d08705f32fcd284410b4326e7ec950931da8',
+    gearDigest: 'a3f7229c4d359f2a08f2a78533acf9a090d9b2c06ff539d75b085da7b7ec95b9',
   },
 } as const;
 

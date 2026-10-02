@@ -807,13 +807,16 @@ export const RELIQUARY_HEROIC_GEAR = {
     'wyrmchoir_handwraps',
     'wildsoul_maul',
   ],
+  // The Wildheart Basin rework moved two of Zulgar's heroic epics onto the
+  // promoted Fanglord Beastmaster and the Gorgebloom (wildheart_basin.md 8.2)
+  // and gave each a new epic and a trinket; they share the one heroic page.
+  wildheart_beastmaster: ['bloodmane_war_legguards', 'fanglords_whistle', 'fanglords_hide_mantle'],
+  the_gorgebloom: ['sunbone_oracles_crown', 'gorgebloom_seedpod', 'thornroot_greathelm'],
   wildheart_high_priest: [
     'basin_stalkers_tunic',
     'verdant_heart_vestment',
     'sunbone_ritual_hauberk',
     'greatfang_of_the_basin',
-    'sunbone_oracles_crown',
-    'bloodmane_war_legguards',
     'paired_talons',
   ],
   // The Stormbrass Foundry (stormbrass_foundry.md 8.2): a new epic (or a
@@ -1260,24 +1263,42 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_wildheart_basin',
     shelf: 'conquerors',
     name: 'The Wildheart Basin',
-    desc: 'Signature weapons from Zulgar and the Fanglord.',
+    desc: 'Signature weapons from the Fanglord Beastmaster, the Gorgebloom and Zulgar.',
     clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'any' },
+    // The rework (wildheart_basin.md section 9) appends the Gorgebloom's rare
+    // chase row; Duskwhisper and the Beastspear name the promoted Fanglord
+    // Beastmaster, a real boss now.
     relics: items(
       ['fanglords_beastspear', fromBoss('wildheart_beastmaster')],
       ['duskwhisper', fromBoss('wildheart_beastmaster')],
       ['wildheart_tuskblade', fromBoss('wildheart_high_priest')],
       ['wildheart_hexwood_staff', fromBoss('wildheart_high_priest')],
       ['wildheart_fangknife', fromBoss('wildheart_high_priest')],
+      ['falls_blessed_staff', fromBoss('the_gorgebloom')],
     ),
   },
   {
     id: 'conquerors_wildheart_basin_heroic',
     shelf: 'conquerors',
     name: 'Heroic Wildheart Basin',
-    desc: 'Heroic-only epics from Zulgar, Voice of the Basin.',
+    desc: 'Heroic-only epics and trinkets from the Fanglord Beastmaster, the Gorgebloom and Zulgar, Voice of the Basin.',
     clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'heroic' },
-    sourceDefault: fromBoss('wildheart_high_priest'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.wildheart_high_priest),
+    // The shipped seven keep their slots and order; the rework moved two of
+    // them to the Beastmaster and the Gorgebloom and appends their new epics
+    // and trinkets.
+    relics: items(
+      ['basin_stalkers_tunic', fromBoss('wildheart_high_priest')],
+      ['verdant_heart_vestment', fromBoss('wildheart_high_priest')],
+      ['sunbone_ritual_hauberk', fromBoss('wildheart_high_priest')],
+      ['greatfang_of_the_basin', fromBoss('wildheart_high_priest')],
+      ['sunbone_oracles_crown', fromBoss('the_gorgebloom')],
+      ['bloodmane_war_legguards', fromBoss('wildheart_beastmaster')],
+      ['paired_talons', fromBoss('wildheart_high_priest')],
+      ['fanglords_whistle', fromBoss('wildheart_beastmaster')],
+      ['fanglords_hide_mantle', fromBoss('wildheart_beastmaster')],
+      ['gorgebloom_seedpod', fromBoss('the_gorgebloom')],
+      ['thornroot_greathelm', fromBoss('the_gorgebloom')],
+    ),
   },
   // ---- Raid ----
   {

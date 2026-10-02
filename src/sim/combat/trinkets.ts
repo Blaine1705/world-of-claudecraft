@@ -38,6 +38,7 @@ import { meleeSwing } from './auto_attack';
 import { isUnbreakableControlAura } from './cc';
 import { applyHeal } from './heal';
 import { relocateSwept } from './heroic_leap';
+import { plantSeedpod, summonSpiritJaguar } from './wildheart_trinkets';
 
 /** The control kinds the Mooring Stone shrugs off and the Medallion breaks. */
 const CONTROL_KINDS: ReadonlySet<string> = new Set([
@@ -523,6 +524,19 @@ export function useWornTrinket(
         undispellable: true,
       });
       fx(ctx, p, 'arcane', 'trinket_overclocked_governor');
+      break;
+    }
+    case 'spiritPack':
+    case 'seedburst': {
+      // The Wildheart Basin's two (combat/wildheart_trinkets.ts): both need a
+      // hostile target in range.
+      const target = hostileTarget(ctx, p, use.range);
+      if (!target) {
+        ctx.error(meta.entityId, 'You have no target.');
+        return false;
+      }
+      if (use.kind === 'spiritPack') summonSpiritJaguar(ctx, p, target, use);
+      else plantSeedpod(ctx, p, target, use);
       break;
     }
     case 'heartNova': {

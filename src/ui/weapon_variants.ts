@@ -180,6 +180,10 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   governors_scepter: 'hammer_a', // a light one-handed scepter
   line_masters_steam_hammer: 'hammer_c', // heroic epic steam hammer
 
+  // ---- The Wildheart Basin rework (wildheart_items.ts) -----------------------
+  // Held model reuses a shipped GLB (the heroic clone rides heroicOf).
+  falls_blessed_staff: 'staff_c', // a gnarled, vine-wound staff of the falls
+
   // ---- Crucible of the Last Spring raid weapons (ignivar_loot.ts) -------------
   // Held models reuse shipped GLBs.
   forgefathers_warhammer: 'hammer_c',

@@ -117,6 +117,14 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
   overclocked_governor: {
     use: 'Use: Increase your casting speed by 25% for 10 sec. When it ends you are Overheated: your casting speed is reduced by 10% for 5 sec. (2 min cooldown)',
   },
+  // 18 to 24 plus 8% of 500 Attack Power: 58 to 64.
+  fanglords_whistle: {
+    use: 'Use: Call a spirit jaguar to fight beside you for 12 sec. It runs to your target and bites it for 58 to 64 Physical damage every 2 sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within 30 yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within 30 yd. (2 min cooldown)',
+  },
+  // 75 plus 60% of 300 Spell Power: 255, or 383 (x 1.5) on a fallen target.
+  gorgebloom_seedpod: {
+    use: 'Use: Plant a seed on your target within 30 yd. After 6 sec it bursts where the target stands, or where it died, dealing 255 Nature damage to each enemy within 8 yd, or 50% more (383) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts. (2 min cooldown)',
+  },
   gaolers_iron_key: {
     use: 'Use: Chain your target within 30 yd in place for 6 sec. A creature immune to control, such as a boss, is slowed by 30% instead, unless it is also immune to slows. (2 min cooldown)',
   },
@@ -150,7 +158,7 @@ function shownTotal(text: string, before: string, after: string): number {
 }
 
 describe('trinket tooltip lines', () => {
-  it('covers exactly the twenty-one trinkets', () => {
+  it('covers exactly the twenty-three trinkets', () => {
     expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
     expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
   });
@@ -173,6 +181,41 @@ describe('trinket tooltip lines', () => {
     expect(plain).toBeDefined();
     if (plain) expect(trinketTooltipLines(plain, VIEWER)).toBe('');
     expect(trinketTooltipLineTexts('not_an_item', VIEWER)).toEqual([]);
+  });
+
+  it('resolves the Wildheart trinkets against the power combat snapshots', () => {
+    const use = (id: string, v: TrinketTooltipViewer) =>
+      trinketTooltipLineTexts(id, v).at(-1)?.text;
+    // The jaguar's bite reads the higher of melee and ranged Attack Power.
+    const hunter = { ...VIEWER, attackPower: 100, rangedPower: 400 };
+    expect(use('fanglords_whistle', hunter)).toContain('bites it for 50 to 56 Physical damage');
+    expect(use('fanglords_whistle', { ...VIEWER, attackPower: 100 })).toContain(
+      'bites it for 26 to 32 Physical damage',
+    );
+    // The seed's burst moves with Spell Power: +60 for +100.
+    expect(use('gorgebloom_seedpod', { ...VIEWER, spellPower: 100 })).toContain(
+      'dealing 135 Nature damage to each enemy within 8 yd, or 50% more (203)',
+    );
+    expect(use('gorgebloom_seedpod', { ...VIEWER, spellPower: 200 })).toContain(
+      'dealing 195 Nature damage to each enemy within 8 yd, or 50% more (293)',
+    );
+    // A real Sim at that power snapshots exactly the printed bite.
+    const sim = wearing('fanglords_whistle');
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
+      x: sim.player.pos.x,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z + 3,
+    });
+    mob.hostile = true;
+    sim.addEntity(mob);
+    sim.targetEntity(mob.id, sim.player.id);
+    sim.player.attackPower = 100;
+    sim.player.rangedPower = 0;
+    sim.useItem('fanglords_whistle');
+    const jaguar = [...sim.entities.values()].find(
+      (e) => e.ownerId === sim.player.id && e.guardianState,
+    );
+    expect([jaguar?.guardianState?.minDamage, jaguar?.guardianState?.maxDamage]).toEqual([26, 32]);
   });
 
   it('moves every power-scaled number with the viewer power, as combat resolves it', () => {

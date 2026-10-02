@@ -12,6 +12,7 @@
 // maximum-health amount uses the viewer's live maximum health.
 
 import { TRINKET_EQUIP_LOCKOUT } from '../sim/combat/trinkets';
+import { seedburstDamage, spiritJaguarBite } from '../sim/combat/wildheart_trinkets';
 import {
   GAMBLE,
   type GambleFortune,
@@ -318,6 +319,27 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
         duration: n(u.duration),
         slow: pct(u.slow),
         overheat: n(u.overheat),
+      });
+    case 'spiritPack': {
+      // The bite the jaguar would snapshot if called now (combat/
+      // wildheart_trinkets.ts summonSpiritJaguar).
+      const bite = spiritJaguarBite(u, trinketWeaponPower(viewer));
+      return t('hudChrome.trinkets.use.spiritPack', {
+        duration: n(u.duration),
+        min: n(bite.min),
+        max: n(bite.max),
+        every: n(u.attackInterval),
+        range: n(u.range),
+      });
+    }
+    case 'seedburst':
+      return t('hudChrome.trinkets.use.seedburst', {
+        range: n(u.range),
+        delay: n(u.delay),
+        damage: n(seedburstDamage(u, viewer.spellPower, false)),
+        radius: n(u.radius),
+        bonus: pct(u.deathBonus),
+        empowered: n(seedburstDamage(u, viewer.spellPower, true)),
       });
     case 'shackle':
       return t('hudChrome.trinkets.use.shackle', {

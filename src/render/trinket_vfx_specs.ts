@@ -513,6 +513,97 @@ const TRINKET_VFX: Readonly<Record<string, TrinketVfx>> = {
       },
     },
   },
+  // Fanglord's Whistle: a jade spirit-flame swirl round the wearer as the
+  // spirit jaguar answers the call (the jaguar itself is the summoned guardian).
+  trinket_fanglords_whistle: {
+    spec: { c: '#5fe0a0', p: 'nature', pw: 0.9, sp: 12, vr: 1, li: 0.9, lg: 1.5, a: 'buff' },
+    full: {
+      archetype: 'buff',
+      palette: 'nature',
+      power: 0.9,
+      buff: { style: 'raise', orbit: 'none', shellDur: 1 },
+      motifs: ['claws'],
+      motifAt: 'caster',
+      windupStyle: 'none',
+      linger: 1.5,
+      rim: '#8ff0c0',
+      accent: '#d9b26a',
+      impact: {
+        flipbook: false,
+        ring: 1,
+        vRing: 1.1,
+        sparks: 12,
+        debris: false,
+        smoke: false,
+        light: 0.9,
+        liteAudio: true,
+      },
+    },
+  },
+  // Gorgebloom Seedpod, planting: a pollen-yellow seed sinks into the target.
+  trinket_gorgebloom_seedpod: {
+    spec: { c: '#e8e05a', p: 'nature', pw: 0.8, sp: 10, li: 0.7, lg: 1.2, a: 'burst' },
+    full: {
+      archetype: 'burst',
+      palette: 'nature',
+      power: 0.8,
+      burst: { style: 'skybeam' },
+      shaft: 0.35,
+      motifs: ['vines'],
+      motifAt: 'target',
+      windupStyle: 'none',
+      linger: 1.2,
+      rim: '#f4ee9a',
+      accent: '#6c8a3a',
+      impact: {
+        flipbook: false,
+        ring: false,
+        vRing: false,
+        sparks: 10,
+        debris: false,
+        smoke: false,
+        light: 0.7,
+        focused: true,
+      },
+    },
+  },
+  // Gorgebloom Seedpod, bursting: a pollen nova blooms where the seed lay, its
+  // radius the draped telegraph ring of the event's own radius.
+  trinket_gorgebloom_seedpod_burst: {
+    spec: {
+      c: '#d8e04a',
+      p: 'nature',
+      pw: 1.1,
+      sp: 24,
+      rg: 2,
+      vr: 1,
+      li: 1.3,
+      lg: 1.5,
+      a: 'nova',
+    },
+    full: {
+      archetype: 'nova',
+      palette: 'nature',
+      power: 1.1,
+      nova: { radius: 8 },
+      windupStyle: 'none',
+      motifs: ['vines'],
+      motifAt: 'caster',
+      decal: 'rune',
+      linger: 1.5,
+      rim: '#f4ee9a',
+      accent: '#3f7d4e',
+      impact: {
+        flipbook: true,
+        ring: 2,
+        vRing: true,
+        sparks: 24,
+        debris: false,
+        smoke: false,
+        light: 1.3,
+      },
+    },
+  },
   // ---- The Crucible of the Last Spring raid trinkets ----------------------
   // Their bespoke scene objects (the spectral hammer, the floating Kindling
   // Orb and its bolts, the Last Flame Lantern and its light) are painted by

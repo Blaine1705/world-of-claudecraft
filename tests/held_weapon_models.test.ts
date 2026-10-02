@@ -70,6 +70,7 @@ describe('held weapon models', () => {
       'heroic_deathless_heartwood',
       'heroic_direfang_greatblade',
       'heroic_duskwhisper',
+      'heroic_falls_blessed_staff',
       'heroic_fang_of_korzul',
       'heroic_fanglords_beastspear',
       'heroic_gaolyard_cudgel',

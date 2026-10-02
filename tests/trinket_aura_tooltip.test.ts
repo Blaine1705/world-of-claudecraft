@@ -105,6 +105,8 @@ describe('trinket aura icons', () => {
       trinket_rangefinder: 'rangefinders_lens',
       trinket_overclock: 'overclocked_governor',
       trinket_overheated: 'overclocked_governor',
+      trinket_spirit_pack: 'fanglords_whistle',
+      trinket_seedburst: 'gorgebloom_seedpod',
     });
     // Every trinket with a use or passive aura owns at least one of them; the
     // Medallion of Defiance applies none (it only breaks control).
@@ -248,6 +250,16 @@ describe('trinket aura tooltips (English)', () => {
       'Overclocked',
       own({ id: TRINKET_AURA.overclock, kind: 'buff_spellhaste', value: 0.25 }),
       'Casting speed increased by 25%. Overheated follows when it ends.',
+    ],
+    [
+      "Fanglord's Whistle",
+      own({ id: TRINKET_AURA.spiritPack, kind: 'internal_cd', value: 26, value2: 32 }),
+      'A spirit jaguar fights beside you, biting your target for 26 to 32 Physical damage every 2 sec.',
+    ],
+    [
+      'Gorgebloom Seedpod',
+      own({ id: TRINKET_AURA.seedburst, kind: 'internal_cd', value: 135 }),
+      'A Gorgebloom seed. When this expires it bursts for 135 Nature damage to each enemy within 8 yd, or 50% more (203) if this enemy dies before then.',
     ],
     [
       'Overheated',

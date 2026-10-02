@@ -721,7 +721,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1055,
-      "state": "96f8d686",
+      "state": "a5b02d84",
       "events": "592b020d",
       "rng": {
         "draws": 308,
@@ -732,7 +732,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1055,
-      "state": "8d170edb",
+      "state": "ac0487fd",
       "events": "741638a5",
       "rng": {
         "draws": 348,
@@ -940,7 +940,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "necromancers_soulsteps"
+                "itemId": "necromancers_soulspire_mantle"
               }
             ]
           },
@@ -989,7 +989,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1055,
-      "state": "8d170edb",
+      "state": "ac0487fd",
       "events": "741638a5",
       "rng": {
         "draws": 348,
@@ -1197,7 +1197,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "necromancers_soulsteps"
+                "itemId": "necromancers_soulspire_mantle"
               }
             ]
           },

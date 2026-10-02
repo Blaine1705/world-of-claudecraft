@@ -718,6 +718,8 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'heroic_piston_maul',
   'heroic_cellspark_dagger',
   'heroic_governors_scepter',
+  'heroic_falls_blessed_staff',
+  'heroic_fanglords_beastspear',
   'riveters_gauntlets',
   'beltrunners_boots',
   'draftsmans_mantle',
@@ -1020,9 +1022,39 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
     ...heroicFarmPatternRows(),
   ],
-  // Heroic mid-boss table: the Fanglord Beastmaster drops the heroic twin of
-  // Duskwhisper (the normal drops from his normal-mode kill in WILDHEART_ITEMS).
-  wildheart_beastmaster: [{ itemId: 'heroic_duskwhisper', chance: 0.18 }],
+  // The Wildheart Basin rework (wildheart_basin.md 8.2): one equipment item per
+  // boss kill. The Fanglord Beastmaster, promoted to a real boss, pays the
+  // Fanglord's Whistle, the new Hide Mantle, his two shipped chase weapons'
+  // Heroic twins and the Bloodmane War-Legguards moved off Zulgar. The design
+  // table gives the Heroic Duskwhisper 0.20; the Heroic Fanglord's Beastspear
+  // shares that weight (0.10 each) because its base row is normalOnly now and
+  // this partition is its only heroic path (the shipped Reliquary page counts
+  // both difficulties, so a heroic kill must still pay every one of its
+  // relics). Duskwhisper keeps its five-man boss tier; the Beastspear keeps
+  // its shipped generated tier (PRESERVED_BASE_LOOT_SOURCES).
+  wildheart_beastmaster: [
+    ...weightedLootGroup('wildheart_beastmaster_heroic', [
+      ['fanglords_whistle', 0.25],
+      ['fanglords_hide_mantle', 0.3],
+      ['heroic_duskwhisper', 0.1],
+      ['heroic_fanglords_beastspear', 0.1],
+      ['bloodmane_war_legguards', 0.25],
+    ]).map(preserveBaseLootSource),
+  ],
+  // The Gorgebloom: the Gorgebloom Seedpod, the new Thorncrowned Greathelm, the
+  // Sunbone Oracle's Crown moved off Zulgar, and the generated Heroic
+  // Falls-Blessed Staff (its base tier preserved, the Foundry's rare rows).
+  the_gorgebloom: [
+    ...weightedLootGroup('the_gorgebloom_heroic', [
+      ['gorgebloom_seedpod', 0.25],
+      ['thornroot_greathelm', 0.3],
+      ['sunbone_oracles_crown', 0.25],
+      ['heroic_falls_blessed_staff', 0.2],
+    ]).map(preserveBaseLootSource),
+  ],
+  // Zulgar keeps his shipped partition minus the two epics the rework moved to
+  // the Beastmaster and the Gorgebloom; weightedLootGroup renormalizes the
+  // remaining weights. Mount reins and the farm pattern rows are unchanged.
   wildheart_high_priest: [
     ...weightedLootGroup('wildheart_heroic', [
       ['bloodmane_warleggings', 0.34],
@@ -1035,8 +1067,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['verdant_heart_vestment', 0.33],
       ['sunbone_ritual_hauberk', 0.33],
       ['greatfang_of_the_basin', 0.34],
-      ['sunbone_oracles_crown', 0.33],
-      ['bloodmane_war_legguards', 0.33],
       ['paired_talons', 0.25],
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },

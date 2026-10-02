@@ -223,6 +223,31 @@ export function trinketAuraEffectDescriptor(
     case TRINKET_AURA.overheated:
       // value is the cast-time stretch (Curse of Tongues math): 1 / (1 - slow).
       return { key: `${KEY}.overheated`, nums: { pct: pct(1 - 1 / a.value) } };
+    case TRINKET_AURA.spiritPack:
+      // value/value2 are the bite range the jaguar snapshotted at its call.
+      return {
+        key: `${KEY}.spiritPack`,
+        nums: {
+          min: round(a.value),
+          max: round(a.value2 ?? a.value),
+          every: useOf('fanglords_whistle', 'spiritPack')?.attackInterval ?? 0,
+        },
+      };
+    case TRINKET_AURA.seedburst: {
+      // value is the unrounded planted base the burst rounds (combat/
+      // wildheart_trinkets.ts seedDamageFromBase).
+      const use = useOf('gorgebloom_seedpod', 'seedburst');
+      const bonus = use?.deathBonus ?? 0;
+      return {
+        key: `${KEY}.seedburst`,
+        nums: {
+          damage: Math.max(1, round(a.value)),
+          empowered: Math.max(1, round(a.value * (1 + bonus))),
+          bonus: pct(bonus),
+          radius: use?.radius ?? 0,
+        },
+      };
+    }
     case TRINKET_AURA.shackle:
       // Rooted, or (on a creature immune to control) slowed.
       if (a.kind === 'slow') return { key: `${KEY}.shackleSlow`, nums: { pct: pct(1 - a.value) } };

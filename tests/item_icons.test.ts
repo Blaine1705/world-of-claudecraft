@@ -328,8 +328,9 @@ describe('item webp icons', () => {
     // Temple rework's two (tideglass_shiv, tideglass_warmaul): 149, plus the
     // Stormbrass Foundry's six (tocks_torque_wrench, voltaic_coil_staff,
     // piston_maul, cellspark_dagger, governors_scepter,
-    // line_masters_steam_hammer): 155.
-    expect(WEAPON_IMAGE_IDS.size).toBe(155);
+    // line_masters_steam_hammer): 155, plus the Wildheart Basin rework's
+    // Falls-Blessed Staff: 156.
+    expect(WEAPON_IMAGE_IDS.size).toBe(156);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

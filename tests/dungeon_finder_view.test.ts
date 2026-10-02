@@ -194,7 +194,11 @@ describe('dungeon finder view core', () => {
       (e) => e.mobId === 'wildheart_beastmaster',
     );
     expect(beastmaster?.final).toBe(false);
-    expect(beastmaster?.heroicSingles.map((i) => i.itemId)).toContain('heroic_duskwhisper');
+    // The promoted Beastmaster pays one equipment item per heroic kill: Heroic
+    // Duskwhisper rides his weighted heroic partition (design section 8.2).
+    expect(beastmaster?.heroicGroups.flatMap((g) => g.items.map((i) => i.itemId))).toContain(
+      'heroic_duskwhisper',
+    );
   });
 
   it('previews the live non-finale equipment budget on Heroic only', () => {
