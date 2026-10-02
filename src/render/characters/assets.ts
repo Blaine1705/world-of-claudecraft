@@ -103,6 +103,7 @@ import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_
 import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
+import { notePosedCullCentre } from './skinned_cull_bounds';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
@@ -2502,17 +2503,23 @@ export function prepareVisual(key: string): PreparedVisual {
 
   // body bounds from the skinned meshes only (weapons would skew the height)
   const bounds = new THREE.Box3();
+  const local = new THREE.Box3();
   const v = new THREE.Vector3();
   temp.traverse((o) => {
     const sm = o as THREE.SkinnedMesh;
     if (!sm.isSkinnedMesh || !meshChainVisible(sm, temp)) return;
     const pos = sm.geometry.getAttribute('position');
+    // The posed centre in the mesh's own space too: the cull sphere's centre
+    // (skinned_cull_bounds.ts; a quantized rig's geometry centre is not it).
+    local.makeEmpty();
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos as THREE.BufferAttribute, i);
       sm.applyBoneTransform(i, v);
+      local.expandByPoint(v);
       v.applyMatrix4(sm.matrixWorld);
       bounds.expandByPoint(v);
     }
+    if (!local.isEmpty()) notePosedCullCentre(sm.geometry, local.getCenter(v));
   });
   // Non-skinned models (procedural form GLBs animated by node transforms, with no
   // skeleton — e.g. the chicken-cow Travel Form) contribute no skinned meshes, so
