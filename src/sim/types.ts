@@ -4254,7 +4254,9 @@ export interface TrashKitDef {
   /** A cloud it bursts into where it dies, standing `seconds` on the floor:
    *  every `tick` seconds each player inside `radius` takes a roll (the Spore
    *  Toad's Spore Burst). The cloud is an encounter object of
-   *  `objectTemplate` (scale = radius) the client mirrors. Step out. */
+   *  `objectTemplate` (scale = radius) the client mirrors. Step out. It rides
+   *  the mob's `deathBurst` record, so a template carries a deathCloud OR a
+   *  deathBurst, never both (pinned in tests/wildheart_basin_trash.test.ts). */
   deathCloud?: {
     castId: string;
     name: string;

@@ -278,6 +278,19 @@ describe('the Sunbone Totem-Binder and its totems', () => {
     expect(totems().length).toBe(2);
   });
 
+  it('a totem crumbles once its binder is dead, so it never strands a fight', () => {
+    const r = room();
+    const binder = engage(r, 'sunbone_totem_binder', 6, 0);
+    const def = MOBS.sunbone_totem_binder.trashKit?.call;
+    if (!def) throw new Error('plant');
+    run(r, def.first + def.castTime + 0.1, [binder]);
+    const totem = r.sim.ctx.entities.get(binder.summonedIds[0]) as Entity;
+    expect(totem.dead).toBe(false);
+    r.sim.ctx.handleDeath(binder, r.me);
+    run(r, 0.2, [totem]);
+    expect(totem.dead).toBe(true);
+  });
+
   it('a killed totem stops mending', () => {
     const r = room();
     const binder = engage(r, 'sunbone_totem_binder', 6, 0);
@@ -340,6 +353,26 @@ describe('the Spore Toad: Spore Burst', () => {
     expect(objectsOf(r, WILDHEART_SPORE_CLOUD)).toHaveLength(0);
     run(r, 3, [toad]);
     expect(dealt(r, near.id, 'Spore Burst')).toHaveLength(6);
+  });
+});
+
+describe('death clouds and bursts', () => {
+  it('a template carries a death cloud or a death burst, never both (one record)', () => {
+    for (const [id, t] of Object.entries(MOBS)) {
+      if (t.trashKit?.deathCloud) expect(t.trashKit.deathBurst, id).toBeUndefined();
+    }
+  });
+
+  it('a cloud whose toad left the world before it faded is swept off the floor', () => {
+    const r = room();
+    const toad = engage(r, 'spore_toad', 3, 0);
+    run(r, 0.1, [toad]);
+    r.sim.ctx.handleDeath(toad, r.me);
+    run(r, DT, [toad]);
+    expect(objectsOf(r, WILDHEART_SPORE_CLOUD)).toHaveLength(1);
+    r.sim.ctx.dropEntity(toad.id);
+    run(r, DT, [], true);
+    expect(objectsOf(r, WILDHEART_SPORE_CLOUD)).toHaveLength(0);
   });
 });
 

@@ -5,6 +5,8 @@
 //   pulse       no cast bar: every `every` seconds each living ally in the
 //               fight within `radius` (never the source) mends for a share of
 //               its own maximum health. Kill the source fast.
+//               A pulse source whose summoner has died crumbles: a totem never
+//               outlives its binder, so it can never strand a fight on its own.
 //   deathCloud  where the mob dies a cloud stands on the floor for `seconds`;
 //               every `tick` seconds each player inside takes a roll. The cloud
 //               is an encounter object the client mirrors (scale = radius), so
@@ -36,6 +38,15 @@ function pulseAllies(ctx: SimContext, inst: InstanceSlot, from: Entity, radius: 
   return out;
 }
 
+/** Is the mob that summoned `add` (its owner in the claim) still alive? */
+function livingSummoner(ctx: SimContext, inst: InstanceSlot, add: Entity): boolean {
+  for (const id of inst.mobIds) {
+    const e = ctx.entities.get(id);
+    if (e && !e.dead && e.hp > 0 && e.summonedIds.includes(add.id)) return true;
+  }
+  return false;
+}
+
 /**
  * The healing pulse of an engaged mob (a Sunbone Totem): count down, and on
  * each beat mend every hurt ally in reach. Returns how many it mended.
@@ -49,6 +60,10 @@ export function stepPulse(
 ): number {
   const def = kit.pulse;
   if (!def) return 0;
+  if (mob.summonedAdd && !livingSummoner(ctx, inst, mob)) {
+    ctx.handleDeath(mob, null);
+    return 0;
+  }
   const left = (st.timers[PULSE_TIMER] ?? def.every) - DT;
   if (left > 1e-9) {
     st.timers[PULSE_TIMER] = left;
@@ -154,4 +169,32 @@ export function stepDeathCloud(
     st.objectId = null;
   }
   return struck;
+}
+
+/**
+ * Drop any cloud of `templateId` no mob of the claim still owns (its mob
+ * respawned or left the world before the cloud faded): its poison can no
+ * longer tick, so its warning must not linger on the floor. Zero rng; only
+ * walks the claim's own rosters. Returns how many it dropped.
+ */
+export function sweepOrphanClouds(ctx: SimContext, inst: InstanceSlot, templateId: string): number {
+  let clouds: number[] | null = null;
+  for (const id of inst.objectIds) {
+    if (ctx.entities.get(id)?.templateId !== templateId) continue;
+    clouds ??= [];
+    clouds.push(id);
+  }
+  if (!clouds) return 0;
+  const owned = new Set<number>();
+  for (const id of inst.mobIds) {
+    const cloud = ctx.entities.get(id)?.deathBurst?.objectId;
+    if (cloud !== null && cloud !== undefined) owned.add(cloud);
+  }
+  let dropped = 0;
+  for (const id of clouds) {
+    if (owned.has(id)) continue;
+    dropObject(ctx, inst, id);
+    dropped++;
+  }
+  return dropped;
 }

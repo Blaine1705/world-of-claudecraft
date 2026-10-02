@@ -6,6 +6,7 @@
 // updateInstances, beside the trash kit), so a pull or a planted cast owns its
 // tick.
 
+import { sweepOrphanClouds } from '../../mob/trash_kit/wildheart_kit';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
@@ -18,7 +19,7 @@ import {
   startTailSwipe,
   tickSaurian,
 } from './great_saurian';
-import { GREAT_SAURIAN_ID } from './ids';
+import { GREAT_SAURIAN_ID, WILDHEART_SPORE_CLOUD } from './ids';
 
 export { breakHowdah, saurianState } from './great_saurian';
 export * from './ids';
@@ -42,6 +43,7 @@ export function tickWildheartEncounters(ctx: SimContext): void {
   for (const inst of wildheartClaims(ctx)) {
     const saurian = claimBoss(ctx, inst, GREAT_SAURIAN_ID);
     if (saurian && !paused(saurian)) tickSaurian(ctx, inst, saurian, bossEngaged(saurian));
+    sweepOrphanClouds(ctx, inst, WILDHEART_SPORE_CLOUD);
   }
 }
 
