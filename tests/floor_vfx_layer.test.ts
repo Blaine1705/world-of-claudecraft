@@ -214,6 +214,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/hoard_orbital_lightning.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hoard_pulsars.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hoard_tentacles.ts', layer: 'encounter', strict: true },
+  // The Stormbrass Foundry's Stamping Press (the hammer's footprint on the belt, over
+  // the press strip's fill) and Scalding Vents (the jets and steam under the lanes).
+  { file: 'src/render/stormbrass_foundry/foundry_press.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/stormbrass_foundry/foundry_vents.ts', layer: 'encounter', strict: true },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];

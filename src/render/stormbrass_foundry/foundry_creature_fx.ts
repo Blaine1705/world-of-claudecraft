@@ -9,8 +9,9 @@
 //    nova events (Parts Drop, Drill Drones, Unload, Discharge, the drones);
 //  - Line-Master Tock: smoke from his pack's stacks, the beacon's whirling
 //    flare and a steam blast as the lever lands, the riveter's muzzle flashes
-//    and the rivets hammering home, the Stamping Press's shockwave, steam and
-//    sparks;
+//    and the rivets hammering home, the Stamping Press's carriages sliding
+//    along their rails (wheel sparks, the brake's hiss, the ram venting as it
+//    winds up) and the slam's shockwave, dust walls, steam and sparks;
 //  - the Rangewarden: a thin lock-on beam from its glass eye to each marked
 //    player, every salvo shell's muzzle flash on the berm, its smoking arc and
 //    its burst, the Proof Shot's charge and blast, the drone rack's smoke;
@@ -104,7 +105,18 @@ import {
   voltaicFaces,
   voltaicPlateGesture,
 } from './foundry_creature_fx_core';
-import { FOUNDRY_PRESS_HAMMERS, hammerDrop } from './foundry_press';
+import { FOUNDRY_PRESS_HAMMERS } from './foundry_press';
+import {
+  beginPressStrike,
+  createPressRig,
+  HAMMER_HALF_LENGTH,
+  HAMMER_HALF_WIDTH,
+  PRESS_RAIL_Y,
+  type PressPose,
+  pressBeltOf,
+  pressPoseInto,
+  syncPressStrike,
+} from './foundry_press_core';
 
 type Rgb = readonly [number, number, number];
 
@@ -152,6 +164,13 @@ const RGB_29: Rgb = [0.42, 0.41, 0.4];
 const TOCK_STACKS = [A.tockStackL, A.tockStackR] as const;
 const HAULER_NOZZLES = [A.haulerNozzleL, A.haulerNozzleR] as const;
 const BELT_ENDS = [-1, 1] as const;
+const BELT_MID_Z = (MAIN_LINE_BELTS.z0 + MAIN_LINE_BELTS.z1) / 2;
+/** The slam's dust walls: stations along the strip's two long edges, thrown
+ *  out to either side; the steam goes straight up the hammer's flanks. */
+const PRESS_DUST_STATIONS = [-0.8, -0.4, 0, 0.4, 0.8] as const;
+const PRESS_DUST_WEST = { x: -1, y: 0.25, z: 0 } as const;
+const PRESS_DUST_EAST = { x: 1, y: 0.25, z: 0 } as const;
+const PRESS_STEAM_UP = { x: 0, y: 1, z: 0 } as const;
 /** The beacon's amber, rewritten in place as it pulses. */
 const BEACON_RGB: [number, number, number] = [1, 0.5, 0.08];
 
@@ -248,8 +267,17 @@ export class FoundryCreatureFx {
   /** When each marked player's lock beam was last struck. */
   private readonly lockStruck = new Map<number, number>();
   private rosterVersion = -1;
-  /** Each press hammer's strike clock (when its strip appeared), -1 idle. */
-  private readonly hammerAt: number[] = FOUNDRY_PRESS_HAMMERS.map(() => -1);
+  /** The Stamping Press's carriages (foundry_press_core.ts), each one's last
+   *  strike spot in the world (the strip is gone when its slam is heard) and
+   *  the way it was last seen travelling. */
+  private readonly pressRig = createPressRig();
+  private readonly pressSpot: V3[] = this.pressRig.map(() => ({ x: 0, y: 0, z: 0 }));
+  private readonly pressMoving: number[] = this.pressRig.map(() => 0);
+  private readonly pressPose: PressPose = { z: 0, drop: 0, shadow: 0, moving: 0 };
+  /** The claim's origin in the world, read off the belts (the rails are
+   *  instance-local). */
+  private pressOriginX = 0;
+  private pressOriginZ = 0;
   private clock = 0;
   private scan = 0;
   private emitAcc = 0;
@@ -586,7 +614,7 @@ export class FoundryCreatureFx {
         if (src) this.rivets(src, tgt);
         return;
       case TOCK_STAMPING_PRESS:
-        this.pressStrikes(tgt ?? src);
+        this.pressLands(ev.targetId, tgt);
         return;
       case TOCK_PARTS_DROP:
         if (src) this.gesture(src, TOCK_PARTS_DROP);
@@ -737,24 +765,57 @@ export class FoundryCreatureFx {
     this.sparks(c.x, c.y, c.z, 22, 6);
   }
 
-  private pressStrikes(obj: Entity | undefined): void {
-    if (!obj) return;
-    const x = obj.pos.x;
-    const z = obj.pos.z + (obj.scale > 1 ? -obj.scale / 2 : 0);
+  /** The sim's hit landed on strip `stripId`: pull that belt's carriage onto
+   *  the tick that hurt and play the slam where the strip stood (the strip
+   *  itself is already gone). */
+  private pressLands(stripId: number | undefined, strip: Entity | undefined): void {
+    const rig = this.pressRig;
+    let i = -1;
+    for (let k = 0; k < rig.length; k++) if (rig[k].at >= 0 && rig[k].stripId === stripId) i = k;
+    if (i < 0) {
+      // A strip this painter never saw (it arrived mid-warning): slam where it lies.
+      if (strip) this.pressStrikes(strip.pos.x, strip.pos.z);
+      return;
+    }
+    const c = rig[i];
+    if (c.struck) return;
+    c.struck = true;
+    syncPressStrike(c, this.clock, TOCK_TUNING.pressWarning);
+    this.pressStrikes(this.pressSpot[i].x, this.pressSpot[i].z);
+  }
+
+  /** The slam on the strip centred at (x, z): two shockwaves, a flash, dust
+   *  walls thrown out from under both long edges, steam up the hammer's
+   *  flanks and sparks off its ends. */
+  private pressStrikes(x: number, z: number): void {
     const y = this.groundY(x, z);
-    this.ring(x, z, 9, 0.6, 0xffd36a);
-    this.ring(x, z, 5, 0.4, 0xffffff, 0.05);
-    this.steam(x, y + 0.6, z, 34, 2.4, { x: 0, y: 0.4, z: 0 }, 9);
-    this.sparks(x, y + 0.4, z, 50, 11);
-    this.puff(x, y + 0.2, z, 24, {
-      speed: 6,
-      up: 0.4,
-      life: 1.2,
-      size: [0.9, 2.6],
-      color: RGB_6,
-      alpha: 0.6,
-    });
-    this.shakeAt(x, z, 0.45);
+    const w = HAMMER_HALF_WIDTH;
+    const l = HAMMER_HALF_LENGTH;
+    this.ring(x, z, 14, 0.75, 0xffd36a);
+    this.ring(x, z, 8, 0.45, 0xffffff, 0.05);
+    this.ring(x, z, 18, 1.1, 0xff8a3a, 0.12);
+    this.flash(x, y + 0.6, z, 11, RGB_9, 0.2);
+    this.flash(x, y + 1.4, z, 5, RGB_1, 0.32);
+    for (const side of BELT_ENDS) {
+      const out = side < 0 ? PRESS_DUST_WEST : PRESS_DUST_EAST;
+      for (const k of PRESS_DUST_STATIONS)
+        this.puff(x + side * w, y + 0.25, z + k * l, 10, {
+          speed: 9,
+          up: 0.7,
+          life: 1.8,
+          size: [1.1, 4.2],
+          color: RGB_6,
+          alpha: 0.62,
+          dir: out,
+          spread: 0.4,
+        });
+      this.steam(x + side * w, y + 0.8, z - l * 0.5, 12, 2.2, PRESS_STEAM_UP, 10);
+      this.steam(x + side * w, y + 0.8, z + l * 0.5, 12, 2.2, PRESS_STEAM_UP, 10);
+      this.sparks(x, y + 0.4, z + side * l, 44, 14);
+      this.sparks(x + side * w, y + 0.4, z, 44, 14);
+    }
+    this.sparks(x, y + 0.4, z, 60, 16);
+    this.shakeAt(x, z, 0.6);
   }
 
   private launchShell(boss: Entity, markId: number): void {
@@ -996,7 +1057,7 @@ export class FoundryCreatureFx {
     for (const b of this.bosses) this.bossFrame(b, tick);
     if (tick) this.cellsFrame();
     this.paintFlyers();
-    this.paintHammers();
+    this.paintHammers(tick);
     this.paintRings();
     this.arcs.steady = this.reducedMotion();
     this.arcs.update(this.clock);
@@ -1073,27 +1134,56 @@ export class FoundryCreatureFx {
     for (const f of this.frames) this.frameGestures(f);
   }
 
-  /** A press strip appeared: its belt's hammer winds up and falls on time. */
+  /** A press strip appeared: its belt's carriage leaves for the strip's rail
+   *  stop (the strip's own position) and the strike's clock starts. */
   private pressFor(strip: Entity): void {
-    const belts = this.belts;
-    if (belts.length === 0) return;
-    let best = 0;
-    for (let i = 1; i < belts.length; i++)
-      if (Math.abs(belts[i].pos.x - strip.pos.x) < Math.abs(belts[best].pos.x - strip.pos.x))
-        best = i;
-    if (best < this.hammerAt.length) this.hammerAt[best] = this.clock;
+    const west = this.belts[0];
+    if (!west) return;
+    this.pressOriginX = west.pos.x - MAIN_LINE_BELTS.xs[0];
+    this.pressOriginZ = west.pos.z - BELT_MID_Z;
+    const i = pressBeltOf(strip.pos.x - this.pressOriginX);
+    beginPressStrike(this.pressRig[i], strip.pos.z - this.pressOriginZ, this.clock, strip.id);
+    const spot = this.pressSpot[i];
+    spot.x = strip.pos.x;
+    spot.y = this.groundY(strip.pos.x, strip.pos.z);
+    spot.z = strip.pos.z;
   }
 
-  private paintHammers(): void {
+  /** Pose every carriage (its place on the rail, its hammer, its shadow) and
+   *  dress the motion: wheel sparks while it slides, the brake's hiss as it
+   *  parks, the ram venting through the wind-up. */
+  private paintHammers(tick: boolean): void {
     const warning = TOCK_TUNING.pressWarning;
-    for (let i = 0; i < this.hammerAt.length; i++) {
-      const at = this.hammerAt[i];
-      if (at < 0) continue;
-      const t = this.clock - at;
-      FOUNDRY_PRESS_HAMMERS[i].drop = hammerDrop(t, warning);
-      if (t > warning + 2) {
-        this.hammerAt[i] = -1;
-        FOUNDRY_PRESS_HAMMERS[i].drop = 0;
+    const rig = this.pressRig;
+    for (let i = 0; i < rig.length; i++) {
+      const c = rig[i];
+      const live = c.at >= 0;
+      const t = this.clock - c.at;
+      const pose = pressPoseInto(c, this.clock, warning, this.pressPose);
+      const h = FOUNDRY_PRESS_HAMMERS[i];
+      h.z = pose.z;
+      h.drop = pose.drop;
+      h.shadow = pose.shadow;
+      if (!live) continue;
+      const spot = this.pressSpot[i];
+      // The slam's event never came (out of earshot): play it on the rig's clock.
+      if (!c.struck && t >= warning) {
+        c.struck = true;
+        this.pressStrikes(spot.x, spot.z);
+      }
+      const z = this.pressOriginZ + pose.z;
+      const railY = spot.y + PRESS_RAIL_Y;
+      const was = this.pressMoving[i];
+      this.pressMoving[i] = pose.moving;
+      if (pose.moving !== 0) {
+        if (!tick) continue;
+        for (const side of BELT_ENDS)
+          this.sparks(spot.x + side * 0.62, railY + 0.2, z - pose.moving * 1.1, 3, 4);
+      } else if (was !== 0) {
+        this.steam(spot.x, railY - 0.6, z, 16, 1.6, undefined, 5);
+        this.sparks(spot.x, railY + 0.1, z, 14, 7);
+      } else if (tick && pose.drop < 0) {
+        this.steam(spot.x, railY - 3, z, 3, 1.1, undefined, 3);
       }
     }
   }
@@ -1410,6 +1500,11 @@ export class FoundryCreatureFx {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
+    // The gantry outlives this painter (it is the interior's): park it.
+    for (const h of FOUNDRY_PRESS_HAMMERS) {
+      h.drop = 0;
+      h.shadow = 0;
+    }
     this.smoke.dispose();
     this.glow.dispose();
     this.arcs.dispose();

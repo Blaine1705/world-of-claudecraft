@@ -15,7 +15,9 @@
 //    Grounded, blue Charged, split front and back on heroic) and the Stored
 //    Charge ring filling at the Warden's feet;
 //  - the Main Line's belts: their scroll and their klaxon red, written into
-//    the shared belt uniforms (foundry_dressing.ts FOUNDRY_BELT_UNIFORMS).
+//    the shared belt uniforms (foundry_dressing.ts FOUNDRY_BELT_UNIFORMS);
+//  - Line-Master Tock's Scalding Vents: the walkways' floor warning, the jets
+//    and their steam (its own member, foundry_vents.ts FoundryVentFx).
 // Every shape is the shared floor telegraph (../floor_telegraph); phase 3
 // dresses the bosses' own VFX on top.
 //
@@ -49,6 +51,7 @@ import {
   platingRings,
   storedChargeFill,
 } from './foundry_fx_core';
+import { FoundryVentFx } from './foundry_vents';
 
 const CAST_SLOTS = 12;
 /** Heroic Walking Barrage leaves up to three trails of shrapnel at once. */
@@ -105,6 +108,7 @@ export class FoundryFx {
   private readonly plating: PlatingSlot[] = [];
   private readonly stored: TelegraphFan & { entityId: number };
   private readonly kit: TelegraphKit;
+  private readonly vents: FoundryVentFx;
   private readonly beltScratch: { x: number; templateId: string; facing: number; scale: number }[] =
     [];
   private scan = 0;
@@ -123,6 +127,7 @@ export class FoundryFx {
       resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
         .tier !== 'low';
     this.kit = new TelegraphKit(this.root, flashesOn);
+    this.vents = new FoundryVentFx(this.root, groundY, flashesOn);
     for (let i = 0; i < CAST_SLOTS; i++)
       this.casts.push({ ...this.kit.fan(18), casterId: -1, castId: '' });
     for (let i = 0; i < OBJECT_SLOTS; i++)
@@ -161,6 +166,7 @@ export class FoundryFx {
     this.paintLanes(world);
     this.paintMarkers(world);
     this.paintPlating(world);
+    this.vents.update(dt, world, this.clock);
   }
 
   private paintCasts(world: IWorld): void {
@@ -410,5 +416,6 @@ export class FoundryFx {
     this.disposed = true;
     this.root.removeFromParent();
     this.kit.dispose();
+    this.vents.dispose();
   }
 }

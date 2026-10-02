@@ -23,7 +23,7 @@ import {
   voltaicPlateDial,
   voltaicPlateGesture,
 } from '../src/render/stormbrass_foundry/foundry_creature_fx_core';
-import { hammerDrop } from '../src/render/stormbrass_foundry/foundry_press';
+import { hammerDrop } from '../src/render/stormbrass_foundry/foundry_press_core';
 import { VOLTAIC_CHARGED, VOLTAIC_GROUNDED } from '../src/sim/encounters/stormbrass_foundry/ids';
 import type { Entity } from '../src/sim/types';
 

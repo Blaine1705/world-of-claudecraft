@@ -17,6 +17,7 @@ import { buildFoundryGates } from './foundry_gates';
 import { buildFoundryLandmarks } from './foundry_landmarks';
 import { buildFoundryLights } from './foundry_lights';
 import { buildFoundrySky } from './foundry_sky';
+import { buildFoundryVents } from './foundry_vents';
 
 export interface StormbrassFoundryInteriorDeps {
   lowGfx: boolean;
@@ -72,6 +73,8 @@ export function buildStormbrassFoundryInterior(
   );
   group.add(buildFoundryDressing(ground, deps.lowGfx));
   group.add(buildFoundryGates(ox, oz, ground));
+  // Line-Master Tock's Scalding Vents: the walkway grilles and their jets.
+  group.add(buildFoundryVents(ground, deps.lowGfx));
   buildFoundryLights(group, deps, ground);
   group.add(buildFoundrySky({ lowGfx: deps.lowGfx, density }));
   group.add(buildFoundryLandmarks(deps.lowGfx));
