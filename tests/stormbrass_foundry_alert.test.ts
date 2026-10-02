@@ -7,6 +7,7 @@
 // auras and objects the sim mirrors.
 
 import { describe, expect, it } from 'vitest';
+import { MAIN_LINE_BELTS } from '../src/sim/content/stormbrass_foundry_layout';
 import {
   DRAFT_CELL_CARRY,
   FOUNDRY_CELL_TEMPLATES,
@@ -14,11 +15,17 @@ import {
   hatchRingCentre,
   PRIME_DRAFT_ID,
   RANGE_TARGET_LOCK,
+  TOCK_ID,
+  TOCK_SCALDING_VENTS,
+  TOCK_TUNING,
   VOLTAIC_CHARGED,
   VOLTAIC_GROUNDED,
   VOLTAIC_STORED,
 } from '../src/sim/encounters/stormbrass_foundry';
 import { chargeCycle } from '../src/sim/encounters/stormbrass_foundry/prime_draft';
+import type { Entity } from '../src/sim/types';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
+import { spellFxCue } from '../src/ui/combat_sfx';
 import { foundryObjectLabel } from '../src/ui/entity_display_core';
 import {
   buildFoundryAlertView,
@@ -168,5 +175,92 @@ describe('the Foundry alert from a real Prime Draft fight', () => {
     const c = hatchRingCentre(b);
     run(f, 0.2, () => put(f, runner, c.x - f.ox, c.z - f.oz));
     expect(view().visible).toBe(false);
+  });
+});
+
+describe("the Foundry alert on Tock's Scalding Vents", () => {
+  it('a walkway stander is told to get onto a belt: warning first, then the scald', () => {
+    const warn = buildFoundryAlertView(
+      input({ auras: [{ id: TOCK_SCALDING_VENTS, value2: 0, remaining: 0.75, duration: 1.5 }] }),
+    );
+    if (!warn.visible) throw new Error('hidden');
+    expect(warn.kind).toBe('vent-warn');
+    expect(warn.title).toBe(t('hudChrome.foundryAlert.ventWarnTitle'));
+    expect(warn.line).toBe(t('hudChrome.foundryAlert.ventWarnLine'));
+    expect(warn.progress).toBeCloseTo(0.5, 6);
+    expect(warn.pressable).toBe(false);
+    const scald = buildFoundryAlertView(
+      input({ auras: [{ id: TOCK_SCALDING_VENTS, value2: 1, remaining: 4, duration: 5 }] }),
+    );
+    if (!scald.visible) throw new Error('hidden');
+    expect(scald.kind).toBe('vent-scald');
+    expect(scald.title).toBe(t('hudChrome.foundryAlert.ventScaldTitle'));
+    expect(scald.line).toBe(t('hudChrome.foundryAlert.ventScaldLine'));
+    expect(scald.progress).toBeCloseTo(0.8, 6);
+  });
+
+  it('the vents outrank a plated target; nobody off the walkways sees them', () => {
+    const plated: FoundryAlertEntity = { auras: [{ id: VOLTAIC_GROUNDED }] };
+    const v = buildFoundryAlertView(
+      input({ auras: [{ id: TOCK_SCALDING_VENTS, value2: 0 }], targetId: 2, entity: () => plated }),
+    );
+    expect(v.visible && v.kind).toBe('vent-warn');
+    expect(buildFoundryAlertView(input({ auras: [] })).visible).toBe(false);
+  });
+
+  it('reads the walkway aura of a real Tock fight: shown on a walkway, gone on a belt', () => {
+    const f = fight();
+    const b = boss(f, TOCK_ID);
+    put(f, b, 0, -22);
+    put(f, f.tank, MAIN_LINE_BELTS.xs[1], -22);
+    engage(f, b);
+    const walker = f.others[0];
+    const rider = f.others[1];
+    const keep = () => {
+      put(f, walker, -10, -30);
+      put(f, rider, MAIN_LINE_BELTS.xs[0], -30);
+    };
+    const view = (e: Entity) =>
+      buildFoundryAlertView({
+        auras: e.auras,
+        targetId: e.targetId,
+        entity: (id) => f.sim.ctx.entities.get(id),
+        interactKey: 'F',
+        touch: false,
+      });
+    run(f, TOCK_TUNING.ventFirst + 0.2, keep);
+    expect(view(walker).visible && (view(walker) as { kind: string }).kind).toBe('vent-warn');
+    expect(view(rider).visible).toBe(false);
+    run(f, TOCK_TUNING.ventWarning, keep);
+    expect(view(walker).visible && (view(walker) as { kind: string }).kind).toBe('vent-scald');
+    // Stepping onto a belt clears it at once.
+    run(f, 0.1, () => put(f, walker, MAIN_LINE_BELTS.xs[1], -30));
+    expect(view(walker).visible).toBe(false);
+  });
+
+  it('the vents hiss on their windup; any other windup stays silent', () => {
+    const ev = { type: 'spellfx', sourceId: 1, targetId: 9, school: 'fire', fx: 'windup' } as const;
+    expect(spellFxCue({ ...ev, ability: TOCK_SCALDING_VENTS })).toEqual({
+      key: 'ui_aura_steam_hiss',
+      anchorId: 9,
+    });
+    expect(spellFxCue({ ...ev, ability: 'foundry_tock_stamping_press' })).toBeNull();
+    expect(spellFxCue(ev)).toBeNull();
+  });
+
+  it('the walkway mark says its rule and its real numbers, not a 0 percent vulnerability', () => {
+    const d = auraEffectDescriptor({ id: TOCK_SCALDING_VENTS, kind: 'vulnerability', value: 0 });
+    expect(d?.key).toBe('hudChrome.auraEffect.foundry.scaldingVents');
+    expect(d?.nums).toEqual({
+      min: TOCK_TUNING.ventMin,
+      max: TOCK_TUNING.ventMax,
+      every: TOCK_TUNING.ventTickEvery,
+      seconds: TOCK_TUNING.ventScald,
+      heroicMin: Math.round(TOCK_TUNING.ventMin * 2.5),
+      heroicMax: Math.round(TOCK_TUNING.ventMax * 2.5),
+    });
+    const text = t('hudChrome.auraEffect.foundry.scaldingVents', d?.nums ?? {});
+    expect(text).toContain(`${TOCK_TUNING.ventMin} to ${TOCK_TUNING.ventMax} Fire damage`);
+    expect(text).not.toContain('{');
   });
 });

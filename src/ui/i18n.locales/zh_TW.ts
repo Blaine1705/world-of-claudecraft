@@ -18902,6 +18902,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.foundryAlert.chargedLine': '法術有效；物理傷害會被儲存為電荷',
   'hudChrome.foundryAlert.splitLine': '它的背面是另一種裝甲',
   'hudChrome.foundryAlert.storedAria': '下一次放電前儲存的電荷：{pct}',
+  'hudChrome.foundryAlert.ventWarnTitle': '灼熱蒸汽口！',
+  'hudChrome.foundryAlert.ventWarnLine': '蒸汽即將從通道噴出：立刻站上傳送帶',
+  'hudChrome.foundryAlert.ventScaldTitle': '灼熱蒸汽！',
+  'hudChrome.foundryAlert.ventScaldLine': '你正在通道上被燙傷：站上傳送帶',
+  'hudChrome.foundryAlert.ventAria': '蒸汽口剩餘時間：{pct}',
   'hudChrome.foundryAlert.cellName': '風暴電池',
   'hudChrome.foundryAlert.hatchName': '核心艙門',
   'entities.items.riveters_gauntlets.name': '鉚工護手',
@@ -18986,7 +18991,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '他的初稿。原來風暴先於火焰。那我就知道他想取代的是什麼，也知道他的每一具自動機械為何失敗了。跟緊我：剩下的我們一起讀。',
   'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '找到檔案員梅琳',
   'hudChrome.finder.mech.moving_belts': '移動傳送帶（地面會帶著你走，拉桿後反向）',
-  'hudChrome.finder.mech.stamping_press': '沖壓機（遠離沖壓機前的塗色區域）',
+  'hudChrome.finder.mech.stamping_press': '沖壓機（錘頭沿軌道滑向傳送帶上的玩家：離開塗色區域）',
+  'hudChrome.finder.mech.scalding_vents': '灼熱蒸汽口（通道會週期性噴出蒸汽：發光時站上傳送帶）',
   'hudChrome.finder.mech.target_lock': '目標鎖定（保持移動：砲彈落在你站過的地方）',
   'hudChrome.finder.mech.proof_shot': '試射砲彈（重砲會讓坦克的護甲凹陷）',
   'hudChrome.finder.mech.conduction_plating': '傳導裝甲（用正確的傷害類型攻擊它）',
@@ -18994,7 +19000,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.storm_cells': '風暴電池（把電池帶進打開的核心艙門）',
   'hudChrome.finder.mech.piston_fist': '活塞重拳（離開標記的圓圈）',
   'hudChrome.finder.mech.tremor_step': '震地踏步（遠離它的腳下）',
-  'hudChrome.finder.mech.overtime_cross_feed': '加班與交叉供料（傳送帶更快，相鄰的反向運行）',
+  'hudChrome.finder.mech.overtime_cross_feed':
+    '加班與交叉供料（傳送帶更快，相鄰的反向運行，兩台沖壓機同時落下）',
   'hudChrome.finder.mech.walking_barrage': '徐進彈幕（三個標記，砲彈會留下彈片）',
   'hudChrome.finder.mech.split_plating': '快速循環與分裂裝甲（翻轉更快，背面是另一種裝甲）',
   'hudChrome.finder.mech.double_load': '卡住的電池架與雙重裝填（一次艙門窗口放入兩枚電池）',
@@ -19054,4 +19061,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.wildheart.avatar':
     '移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。',
   'hudChrome.auraEffect.wildheart.vanished': '隱匿且免疫傷害。他即將撲向最遠的玩家。',
+  'hudChrome.auraEffect.foundry.scaldingVents':
+    '你站在主產線的通道上，蒸汽口正在預警或噴發。蒸汽噴出後，每{every}秒對通道上的所有人造成{min}到{max}點火焰傷害，持續{seconds}秒（英雄難度為{heroicMin}到{heroicMax}點）。站在傳送帶上即可安全。',
 };

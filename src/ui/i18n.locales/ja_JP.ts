@@ -19862,6 +19862,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.foundryAlert.chargedLine': '呪文は通る。物理ダメージは電荷として蓄えられる',
   'hudChrome.foundryAlert.splitLine': '背中側はもう一方の面になっている',
   'hudChrome.foundryAlert.storedAria': '次の放電までに蓄えられた電荷：{pct}',
+  'hudChrome.foundryAlert.ventWarnTitle': '灼熱の蒸気孔！',
+  'hudChrome.foundryAlert.ventWarnLine': '通路から蒸気が噴き出す：今すぐベルトに乗れ',
+  'hudChrome.foundryAlert.ventScaldTitle': '灼熱の蒸気！',
+  'hudChrome.foundryAlert.ventScaldLine': '通路で焼かれている：ベルトに乗れ',
+  'hudChrome.foundryAlert.ventAria': '蒸気孔の残り時間：{pct}',
   'hudChrome.foundryAlert.cellName': 'ストームセル',
   'hudChrome.foundryAlert.hatchName': 'コアハッチ',
   'entities.items.riveters_gauntlets.name': 'リベット工のガントレット',
@@ -19946,7 +19951,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '彼の最初の草案。嵐は炎より先だったのね。それなら彼が何を置き換えようとしていたのか、そして彼のオートマトンがなぜすべて失敗したのかが分かる。そばにいて。残りは一緒に読みましょう。',
   'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '記録官メイリンを見つける',
   'hudChrome.finder.mech.moving_belts': '動くベルト（床が運び、レバーで逆転する）',
-  'hudChrome.finder.mech.stamping_press': 'プレス機（プレス前の塗られた帯に乗るな）',
+  'hudChrome.finder.mech.stamping_press':
+    'プレス機（ハンマーはレールを伝ってベルト上の者へ迫る：塗られた帯から降りろ）',
+  'hudChrome.finder.mech.scalding_vents':
+    '灼熱の蒸気孔（通路は周期的に蒸気を噴く：光ったらベルトに乗れ）',
   'hudChrome.finder.mech.target_lock': 'ターゲットロック（動き続けろ：砲弾はいた場所に落ちる）',
   'hudChrome.finder.mech.proof_shot': '試験射撃（タンクの装甲をへこませる重い砲弾）',
   'hudChrome.finder.mech.conduction_plating': '伝導装甲（正しい種類のダメージで攻撃せよ）',
@@ -19955,7 +19963,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.piston_fist': 'ピストンフィスト（印の円から出ろ）',
   'hudChrome.finder.mech.tremor_step': '震動の踏みつけ（足元から離れろ）',
   'hudChrome.finder.mech.overtime_cross_feed':
-    '残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動く）',
+    '残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動き、プレスが二台同時に落ちる）',
   'hudChrome.finder.mech.walking_barrage': '移動弾幕（三つの印、砲弾は破片を残す）',
   'hudChrome.finder.mech.split_plating': '急速循環と分割装甲（反転が速く、背中はもう一方の面）',
   'hudChrome.finder.mech.double_load': '詰まったラックと二重装填（一度のハッチの窓にセル二つ）',
@@ -20018,4 +20026,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。',
   'hudChrome.auraEffect.wildheart.vanished':
     '姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。',
+  'hudChrome.auraEffect.foundry.scaldingVents':
+    'メインラインの通路に立っており、蒸気孔が警告中か噴出中である。蒸気が噴き出すと、通路にいる者全員に{every}秒ごとに{min}から{max}の火炎ダメージを{seconds}秒間与える（ヒロイックでは{heroicMin}から{heroicMax}）。ベルトに乗れば安全。',
 };

@@ -146,7 +146,10 @@ const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
 // secondary kit; the heroic array adds each boss's heroic twists (the
 // Nythraxis and Ignivar precedent).
 const STORMBRASS_FOUNDRY_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'line_master_tock', mechanics: ['moving_belts', 'stamping_press', 'summons_adds'] },
+  {
+    mobId: 'line_master_tock',
+    mechanics: ['moving_belts', 'stamping_press', 'scalding_vents', 'summons_adds'],
+  },
   { mobId: 'rangewarden', mechanics: ['target_lock', 'proof_shot', 'summons_adds'] },
   { mobId: 'voltaic_warden', mechanics: ['conduction_plating', 'static_lash', 'summons_adds'] },
   {

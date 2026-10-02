@@ -7,17 +7,21 @@
 //    time left before the cell shorts out;
 //  - marked by the Rangewarden's Target Lock: keep moving, the bar is the
 //    mark's time left;
+//  - standing on a Main Line walkway while Line-Master Tock's Scalding Vents
+//    warn or blow (the walkway aura; value2 0 warning, 1 scalding): get onto a
+//    belt, the bar is the phase's time left;
 //  - targeting a plated body (the Voltaic Warden or one of its drones): which
 //    kind of damage lands and which is stored, the back half on heroic Split
 //    Plating, and (on the Warden) the bar is the Stored Charge banked toward
 //    the next Discharge.
-// Priority: the cell over the mark over the plating readout. The painter
+// Priority: the cell over the mark over the vents over the plating readout. The painter
 // (foundry_alert_painter.ts) only paints; every decision is here.
 
 import {
   DRAFT_CELL_CARRY,
   hatchStateOf,
   RANGE_TARGET_LOCK,
+  TOCK_SCALDING_VENTS,
   VOLTAIC_CHARGED,
   VOLTAIC_GROUNDED,
   VOLTAIC_STORED,
@@ -29,6 +33,8 @@ export type FoundryAlertKind =
   | 'cell-warn'
   | 'cell-open'
   | 'locked'
+  | 'vent-warn'
+  | 'vent-scald'
   | 'grounded'
   | 'charged';
 
@@ -146,6 +152,28 @@ function lockView(mark: AlertAura): FoundryAlertLive {
   };
 }
 
+function ventView(vent: AlertAura): FoundryAlertLive {
+  const scalding = vent.value2 === 1;
+  const left = timeLeft(vent);
+  const title = scalding
+    ? t('hudChrome.foundryAlert.ventScaldTitle')
+    : t('hudChrome.foundryAlert.ventWarnTitle');
+  return {
+    visible: true,
+    kind: scalding ? 'vent-scald' : 'vent-warn',
+    title,
+    line: scalding
+      ? t('hudChrome.foundryAlert.ventScaldLine')
+      : t('hudChrome.foundryAlert.ventWarnLine'),
+    hint: '',
+    key: '',
+    progress: left,
+    progressAria: t('hudChrome.foundryAlert.ventAria', { pct: pct(left) }),
+    pressable: false,
+    buttonAria: title,
+  };
+}
+
 function platingView(target: FoundryAlertEntity): FoundryAlertLive | null {
   const grounded = auraOf(target.auras, VOLTAIC_GROUNDED);
   const charged = grounded ? null : auraOf(target.auras, VOLTAIC_CHARGED);
@@ -181,6 +209,8 @@ export function buildFoundryAlertView(input: FoundryAlertInput): FoundryAlertVie
   if (carry) return cellView(carry, input);
   const mark = auraOf(input.auras, RANGE_TARGET_LOCK);
   if (mark) return lockView(mark);
+  const vent = auraOf(input.auras, TOCK_SCALDING_VENTS);
+  if (vent) return ventView(vent);
   if (input.targetId !== null && input.targetId !== undefined) {
     const target = input.entity(input.targetId);
     if (target && !target.dead) {

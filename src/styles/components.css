@@ -16601,6 +16601,19 @@
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
   }
+  /* Line-Master Tock's Scalding Vents: the warning throbs hot, the burst burns red. */
+  #foundry-alert.is-vent-warn,
+  #foundry-alert.is-vent-scald {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.6s ease-in-out infinite alternate;
+  }
+  #foundry-alert.is-vent-warn .fa-title,
+  #foundry-alert.is-vent-scald .fa-title,
+  #foundry-alert.is-vent-warn .fa-fill,
+  #foundry-alert.is-vent-scald .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
   @media (prefers-reduced-motion: reduce) {
     #foundry-alert {
       animation: none;

@@ -5145,6 +5145,11 @@ export const hudChromeStrings = {
         'Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.',
       vanished: 'Hidden and immune to damage. He is about to pounce on the farthest player.',
     },
+    // The Stormbrass Foundry's marks (src/ui/foundry_aura_effect.ts).
+    foundry: {
+      scaldingVents:
+        'You stand on a Main Line walkway while its vents warn or blow. Once the steam bursts, it deals {min} to {max} Fire damage every {every} sec for {seconds} sec ({heroicMin} to {heroicMax} on Heroic) to anyone on a walkway. Step onto a belt to be safe.',
+    },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     varkhulSharedPyre:
@@ -8802,7 +8807,10 @@ export const hudChromeStrings = {
       reaper_behind: "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
       // The Stormbrass Foundry (encounters/stormbrass_foundry).
       moving_belts: 'Moving Belts (the floor carries you, and reverses on the lever)',
-      stamping_press: 'Stamping Press (stay off the painted strip at the press)',
+      stamping_press:
+        'Stamping Press (the hammers ride their rails to the belt riders: step off the painted strip)',
+      scalding_vents:
+        'Scalding Vents (the walkways steam on a rhythm: get onto a belt when they glow)',
       target_lock: 'Target Lock (keep moving: shells land where you stood)',
       proof_shot: 'Proof Shot (a heavy shell that dents the tank)',
       conduction_plating: 'Conduction Plating (hit it with the right damage kind)',
@@ -8810,7 +8818,8 @@ export const hudChromeStrings = {
       storm_cells: 'Storm Cells (carry a cell into the open Core Hatch)',
       piston_fist: 'Piston Fist (move out of the marked circle)',
       tremor_step: 'Tremor Step (keep clear of its feet)',
-      overtime_cross_feed: 'Overtime and Cross-Feed (faster belts, neighbors run opposite)',
+      overtime_cross_feed:
+        'Overtime and Cross-Feed (faster belts, neighbors run opposite, two presses strike at once)',
       walking_barrage: 'Walking Barrage (three marks, and the shells leave shrapnel)',
       split_plating:
         'Rapid Cycling and Split Plating (faster flips, its back wears the other face)',
@@ -8888,6 +8897,12 @@ export const hudChromeStrings = {
     chargedLine: 'Spells land; physical damage is stored as charge',
     splitLine: 'Its back half wears the other face',
     storedAria: 'Stored Charge toward the next Discharge: {pct}',
+    // Line-Master Tock's Scalding Vents, while you stand on a walkway.
+    ventWarnTitle: 'Scalding Vents!',
+    ventWarnLine: 'Steam bursts from the walkways: step onto a belt now',
+    ventScaldTitle: 'Scalding steam!',
+    ventScaldLine: 'The walkway is scalding you: get onto a belt',
+    ventAria: 'Vent time left: {pct}',
   },
   // The Wildheart Basin's encounter alert (src/ui/hud/dungeon/wildheart_alert_view.ts).
   wildheartAlert: {

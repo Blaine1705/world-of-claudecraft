@@ -20232,6 +20232,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.foundryAlert.chargedLine': 'Заклинания проходят; физический урон копится как заряд',
   'hudChrome.foundryAlert.splitLine': 'Его задняя половина носит другую сторону',
   'hudChrome.foundryAlert.storedAria': 'Накопленный заряд до следующего разряда: {pct}',
+  'hudChrome.foundryAlert.ventWarnTitle': 'Обжигающие клапаны!',
+  'hudChrome.foundryAlert.ventWarnLine': 'Из проходов вырывается пар: немедленно встаньте на ленту',
+  'hudChrome.foundryAlert.ventScaldTitle': 'Обжигающий пар!',
+  'hudChrome.foundryAlert.ventScaldLine': 'Проход обжигает вас: встаньте на ленту',
+  'hudChrome.foundryAlert.ventAria': 'Осталось времени клапанов: {pct}',
   'hudChrome.foundryAlert.cellName': 'Грозовая батарея',
   'hudChrome.foundryAlert.hatchName': 'Люк ядра',
   'entities.items.riveters_gauntlets.name': 'Рукавицы клепальщика',
@@ -20319,7 +20324,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.moving_belts':
     'Движущиеся ленты (пол несет вас и разворачивается по рычагу)',
   'hudChrome.finder.mech.stamping_press':
-    'Штамповочный пресс (не стойте на размеченной полосе у пресса)',
+    'Штамповочный пресс (молоты едут по рельсам к тем, кто на лентах: сойдите с размеченной полосы)',
+  'hudChrome.finder.mech.scalding_vents':
+    'Обжигающие клапаны (проходы ритмично выпускают пар: встаньте на ленту, когда они светятся)',
   'hudChrome.finder.mech.target_lock':
     'Захват цели (двигайтесь: снаряды падают туда, где вы стояли)',
   'hudChrome.finder.mech.proof_shot': 'Пробный выстрел (тяжелый снаряд, мнущий броню танка)',
@@ -20329,7 +20336,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.piston_fist': 'Поршневой кулак (выйдите из отмеченного круга)',
   'hudChrome.finder.mech.tremor_step': 'Сотрясающий шаг (держитесь подальше от его ног)',
   'hudChrome.finder.mech.overtime_cross_feed':
-    'Сверхурочные и перекрестная подача (ленты быстрее, соседние идут навстречу)',
+    'Сверхурочные и перекрестная подача (ленты быстрее, соседние идут навстречу, два пресса бьют разом)',
   'hudChrome.finder.mech.walking_barrage': 'Огневой вал (три метки, снаряды оставляют осколки)',
   'hudChrome.finder.mech.split_plating':
     'Быстрый цикл и раздельная броня (смена быстрее, спина другого типа)',
@@ -20400,4 +20407,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Движется на {pct}% быстрее и охотится на свою Добычу. Замедления и обездвиживания действуют, оглушения длятся вдвое меньше.',
   'hudChrome.auraEffect.wildheart.vanished':
     'Скрыт и неуязвим. Вот-вот бросится на самого дальнего игрока.',
+  'hudChrome.auraEffect.foundry.scaldingVents':
+    'Вы стоите на проходе главной линии, пока клапаны предупреждают или выпускают пар. Когда пар вырывается, он наносит от {min} до {max} ед. урона от огня каждые {every} сек. в течение {seconds} сек. (от {heroicMin} до {heroicMax} в героическом режиме) всем, кто стоит на проходе. На ленте вы в безопасности.',
 };

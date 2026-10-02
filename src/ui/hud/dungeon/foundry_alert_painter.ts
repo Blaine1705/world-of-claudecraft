@@ -46,6 +46,8 @@ const FOUNDRY_KINDS: readonly FoundryAlertKind[] = [
   'cell-warn',
   'cell-open',
   'locked',
+  'vent-warn',
+  'vent-scald',
   'grounded',
   'charged',
 ];

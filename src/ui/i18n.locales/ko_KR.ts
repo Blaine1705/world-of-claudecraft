@@ -19850,6 +19850,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.foundryAlert.chargedLine': '주문은 통하고, 물리 피해는 전하로 저장됩니다',
   'hudChrome.foundryAlert.splitLine': '등 쪽 절반은 반대 면입니다',
   'hudChrome.foundryAlert.storedAria': '다음 방전까지 저장된 전하: {pct}',
+  'hudChrome.foundryAlert.ventWarnTitle': '뜨거운 증기구!',
+  'hudChrome.foundryAlert.ventWarnLine': '통로에서 증기가 터져 나온다: 지금 벨트로 올라가라',
+  'hudChrome.foundryAlert.ventScaldTitle': '뜨거운 증기!',
+  'hudChrome.foundryAlert.ventScaldLine': '통로에서 데고 있다: 벨트로 올라가라',
+  'hudChrome.foundryAlert.ventAria': '증기구 남은 시간: {pct}',
   'hudChrome.foundryAlert.cellName': '폭풍 전지',
   'hudChrome.foundryAlert.hatchName': '중심 해치',
   'entities.items.riveters_gauntlets.name': '리벳공의 건틀릿',
@@ -19935,7 +19940,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_sf_forgefathers_isle.objectives.0.label': '기록관 메일린 찾기',
   'hudChrome.finder.mech.moving_belts':
     '움직이는 벨트(바닥이 몸을 실어 나르며 레버를 당기면 반대로 돈다)',
-  'hudChrome.finder.mech.stamping_press': '프레스(프레스 앞의 칠해진 띠에서 벗어나라)',
+  'hudChrome.finder.mech.stamping_press':
+    '프레스(망치가 레일을 타고 벨트 위의 플레이어에게 다가온다: 칠해진 띠에서 벗어나라)',
+  'hudChrome.finder.mech.scalding_vents':
+    '뜨거운 증기구(통로가 주기적으로 증기를 뿜는다: 빛나면 벨트로 올라가라)',
   'hudChrome.finder.mech.target_lock': '표적 고정(계속 움직여라: 포탄은 서 있던 자리에 떨어진다)',
   'hudChrome.finder.mech.proof_shot': '시험 사격(탱커의 장갑을 찌그러뜨리는 무거운 포탄)',
   'hudChrome.finder.mech.conduction_plating': '전도 장갑(올바른 종류의 피해로 공격하라)',
@@ -19944,7 +19952,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.piston_fist': '피스톤 주먹(표시된 원에서 벗어나라)',
   'hudChrome.finder.mech.tremor_step': '진동 발걸음(발 근처에서 떨어져라)',
   'hudChrome.finder.mech.overtime_cross_feed':
-    '초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돈다)',
+    '초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돌며, 프레스 두 대가 동시에 내려친다)',
   'hudChrome.finder.mech.walking_barrage': '이동 탄막(표식 세 개, 포탄이 파편을 남긴다)',
   'hudChrome.finder.mech.split_plating':
     '급속 순환과 분할 장갑(더 빨리 뒤집히고 등 쪽은 반대 면이다)',
@@ -20009,4 +20017,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.',
   'hudChrome.auraEffect.wildheart.vanished':
     '모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다.',
+  'hudChrome.auraEffect.foundry.scaldingVents':
+    '메인 라인의 통로 위에 서 있으며, 증기구가 경고 중이거나 분출 중입니다. 증기가 터지면 통로 위의 모든 대상에게 {every}초마다 {min}~{max}의 화염 피해를 {seconds}초 동안 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 벨트 위에 서면 안전합니다.',
 };
