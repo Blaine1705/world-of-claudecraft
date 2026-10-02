@@ -71,8 +71,8 @@ ENAMEL = (0.85, 0.87, 0.86)
 CERAMIC = (0.82, 0.80, 0.72)
 TIMBER = (0.46, 0.34, 0.22)
 TIMBER_DARK = (0.37, 0.27, 0.18)
-STONE = (0.36, 0.37, 0.40)
-STONE_LIGHT = (0.46, 0.46, 0.47)
+STONE = (0.46, 0.45, 0.45)
+STONE_LIGHT = (0.58, 0.56, 0.54)
 BRICK = (0.45, 0.24, 0.17)
 CANVAS = (0.55, 0.49, 0.36)
 BLUEPRINT = (0.17, 0.33, 0.58)
@@ -97,6 +97,10 @@ GLASS_WARM = (0.95, 0.84, 0.6)
 GLASS_STORM = (0.55, 0.72, 0.86)
 
 STEEL_BARE = (0.44, 0.45, 0.47)
+ROCK = (0.50, 0.46, 0.42)
+ROCK_DARK = (0.36, 0.33, 0.31)
+ROCK_PALE = (0.60, 0.57, 0.52)
+ASHLAR = (0.56, 0.54, 0.50)
 BOILER_COPPER = (0.62, 0.37, 0.24)
 RUST_DEEP = (0.28, 0.14, 0.08)
 HEAT_STRAW = (0.66, 0.52, 0.28)
@@ -4788,6 +4792,470 @@ def chain_hang():
 
 
 # @@END_PIECES@@
+
+
+# ====================================================== second pass: variants, rock, forge
+def _railing(p, balusters):
+    p.box((0, -0.13, -0.45), (4.0, 0.04, 0.9), IRON)
+    p.box((0, -0.06, -0.88), (4.0, 0.18, 0.04), IRON)
+    p.box((0, -0.06, -0.025), (4.0, 0.18, 0.05), IRON)
+    for x in (-1.0, 1.0):
+        p.box((x, -0.06, -0.45), (0.06, 0.14, 0.82), IRON)
+    for k in range(8):
+        x = -1.75 + k * 0.5
+        p.rivet((x, -0.15, -0.14), NY, 0.035, STEEL)
+        p.rivet((x, -0.15, -0.76), NY, 0.035, STEEL)
+    p.box((0, -0.1, 0.08), (4.0, 0.03, 0.16), SLATE, mat=PAINT)
+    for x0, x1 in ((-2.0, -1.94), (-0.06, 0.06), (1.94, 2.0)):
+        p.bx((x0, -0.08, 0), (x1, 0.06, 1.2), IRON)
+        p.bx((x0, -0.1, 0), (x1, 0.12, 0.03), IRON)
+    p.cyl((-2.0, -0.01, 1.25), (2.0, -0.01, 1.25), 0.05, BRASS, sides=8, cap0=False, cap1=False)
+    p.box((0, -0.01, 0.66), (4.0, 0.025, 0.08), IRON)
+    if balusters:
+        for k in range(14):
+            x = -1.8 + k * (3.6 / 13)
+            if abs(x) < 0.12:
+                continue
+            p.box((x, -0.01, 0.42), (0.035, 0.02, 0.4), STEEL_DARK)
+
+
+@piece('RailingEdgeB', tile=2.0, knee=1.3)
+def railing_edge_b():
+    """A railing tile variant (same contract as Kit_RailingEdge): balusters
+    under the mid rail, an enamelled warning plate with a hazard border, and a
+    coiled rope hung on the stanchion."""
+    p = P('RailingEdgeB', rust=0.6, ground=0.0, grime=None, ao_dist=0.5)
+    _railing(p, True)
+    p.box((1.0, -0.03, 0.93), (0.9, 0.02, 0.36), ENAMEL, mat=PAINT, bevel=0.01)
+    p.stripes((0.55, -0.0405, 0.75), X, Z, NY, 0.9, 0.07, pitch=0.14, slant=1.0)
+    p.box((1.0, -0.042, 0.98), (0.5, 0.004, 0.14), OXBLOOD, mat=PAINT)
+    with p.as_kind(K_SOFT):
+        p.torus((-0.12, -0.1, 0.8), NY, 0.2, 0.05, CANVAS, seg=10, sides=5, mat=PAINT)
+        p.torus((-0.12, -0.14, 0.8), NY, 0.17, 0.045, CANVAS, seg=10, sides=5, mat=PAINT)
+    return p
+
+
+@piece('RailingEdgeC', tile=2.0, knee=1.3)
+def railing_edge_c():
+    """A railing tile variant: a dented, patched bay (a welded plate over the
+    mid rail, a bent top rail section in bare steel) with a hung lantern."""
+    p = P('RailingEdgeC', rust=0.85, ground=0.0, grime=None, ao_dist=0.5)
+    _railing(p, False)
+    p.box((-0.9, -0.03, 0.62), (1.3, 0.03, 0.5), STEEL_DARK, bevel=0.01, rot=(0, 0.04, 0))
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            p.rivet((-0.9 + sx * 0.55, -0.05, 0.62 + sz * 0.19), NY, 0.035, BRASS)
+    p.box((0.9, -0.02, 0.4), (1.5, 0.02, 0.05), RUST, mat=PAINT, rot=(0, -0.12, 0))
+    p.cyl((1.0, -0.12, 1.2), (1.0, -0.12, 0.98), 0.012, IRON, sides=4)
+    p.box((1.0, -0.12, 0.86), (0.16, 0.16, 0.22), BRASS, bevel=0.02)
+    p.box((1.0, -0.12, 0.86), (0.11, 0.165, 0.14), BULB, mat=GLOW)
+    return p
+
+
+def _lip_kerb(p):
+    p.box((0, 0, 0.025), (4.0, 0.6, 0.65), IRON)
+    p.stripes((-2.0, -0.3005, 0.2), X, Z, NY, 4.0, 0.12, pitch=0.36, slant=1.0)
+
+
+@piece('RetainingWall', tile=2.0, knee=0.35)
+def retaining_wall():
+    """A machine-lip variant (same contract: tiles along X, outer face Y -0.3,
+    Z -8..0.35): the mountain cut held by a battered wall of dressed stone
+    courses, a stone buttress, iron tie plates with brass bolts, and two weep
+    pipes staining the courses under them."""
+    p = P('RetainingWall', rust=0.8, verd=0.6, ground=None, grime=None, ao_dist=0.5, ao=0.5)
+    _lip_kerb(p)
+    p.soot.append((Vector((-1.2, -0.7, -4.4)), 1.3))
+    p.soot.append((Vector((0.9, -0.8, -6.6)), 1.2))
+    courses = 8
+    with p.as_kind(K_STONE):
+        for k in range(courses):
+            z1 = -0.3 - k * (7.7 / courses)
+            z0 = z1 - 7.7 / courses
+            batter = 0.07 * k
+            off = 0.0 if k % 2 == 0 else 2.0 / 3
+            xs = [-2.0] + [x for x in (-2.0 + off + i * (4.0 / 3) for i in range(4)) if -1.99 < x < 1.99] + [2.0]
+            for (xa, xb) in zip(xs, xs[1:]):
+                if xb - xa < 0.05:
+                    continue
+                proud = 0.05 * p.rng.random()
+                p.bx((xa + 0.02, -0.34 - batter - proud, z0 + 0.02), (xb - 0.02, 0.1, z1 - 0.02),
+                     p.vary(ASHLAR if (k % 3) else ROCK_PALE, 0.1), mat=PAINT)
+            p.bx((-2.0, -0.3 - batter, z0), (2.0, 0.05, z1), ROCK_DARK, mat=PAINT)
+        p.quad_prism([(1.25, -0.3, -0.5), (1.25, -0.75, -1.2), (1.25, -1.45, -8.0), (1.25, -0.3, -8.0)], X, 0.7,
+                     ROCK_PALE, mat=PAINT)
+    for (x, z) in ((-0.9, -2.2), (0.2, -5.3)):
+        p.box((x, -0.52 - 0.07 * (-z / 0.96), z), (0.5, 0.08, 0.5), IRON, bevel=0.02, rot=(0, 0, PI / 4))
+        p.rivet((x, -0.6 - 0.07 * (-z / 0.96), z), NY, 0.09, BRASS, sides=6)
+    for (x, z) in ((-1.2, -3.6), (0.9, -5.9)):
+        p.cyl((x, -0.3, z), (x, -0.95, z - 0.12), 0.11, COPPER, sides=7)
+        p.turned((x, -0.5, z - 0.03), NY, [(0.16, 0), (0.16, 0.06)], BRASS, sides=7)
+    return p
+
+
+@piece('MachineLipB', tile=2.0, knee=0.35)
+def machine_lip_b():
+    """A machine-lip variant (same contract): riveted plate with a great
+    outfall pipe on a flanged elbow, an inspection hatch with a handwheel, a
+    cat ladder down the face and a caged lamp over the hatch."""
+    p = P('MachineLipB', rust=0.75, verd=0.6, ground=None, grime=None, ao_dist=0.8)
+    _lip_kerb(p)
+    p.box((0, -0.24, -4.15), (4.0, 0.12, 7.7), IRON)
+    for x in (-2.0 + 4.0 / 3, 2.0 - 4.0 / 3):
+        p.box((x, -0.32, -4.15), (0.1, 0.06, 7.7), IRON)
+        p.rivets((x, -0.355, -7.6), (x, -0.355, -0.7), NY, 1.1, 0.045, BRASS)
+    # Outfall.
+    p.soot.append((Vector((-1.0, -1.0, -6.4)), 1.6))
+    p.turned((-1.0, -0.3, -4.6), NY, [(0.7, 0), (0.7, 0.1), (0.56, 0.14), (0.56, 0.8), (0.62, 0.84), (0.62, 0.92),
+                                      (0.5, 0.92)], COPPER, sides=10, cap1=False)
+    with p.as_kind(K_PLAIN):
+        p.cyl((-1.0, -1.1, -4.6), (-1.0, -1.09, -4.6), 0.5, DARK, sides=12, mat=PAINT, smooth=False)
+    # Hatch.
+    p.box((0.9, -0.32, -2.6), (1.2, 0.08, 1.5), STEEL_DARK, bevel=0.03)
+    for sx in (-1, 1):
+        for sz in (-1, 0, 1):
+            p.rivet((0.9 + sx * 0.5, -0.37, -2.6 + sz * 0.6), NY, 0.05, BRASS)
+    p.box((0.9, -0.4, -2.6), (0.6, 0.05, 0.08), BRASS)
+    p.box((0.9, -0.4, -2.6), (0.08, 0.05, 0.6), BRASS)
+    p.box((0.9, -0.4, -1.5), (0.3, 0.2, 0.3), BRASS, bevel=0.03)
+    p.box((0.9, -0.5, -1.5), (0.2, 0.03, 0.2), BULB, mat=GLOW)
+    ladder(p, (1.75, -0.42, -7.9), (1.75, -0.42, -0.2), (0, -1, 0), width=0.42, rung=0.7)
+    return p
+
+
+def _rock_face(p, salt, top=-0.5):
+    """A rough rock slab under a kerb in strata (each bed its own tone),
+    identical at X -2 and +2 so tiles join."""
+    rows = (0.0, -0.8, -1.7, -2.7, -3.7, -4.6, -5.3, -6.0)
+    beds = (ROCK, ROCK_PALE, ROCK, ROCK_DARK, ROCK, ROCK_PALE, ROCK_DARK)
+    rings = []
+    for z in rows:
+        ring = []
+        for k, x in enumerate((-2.0, -1.33, -0.67, 0.0, 0.67, 1.33, 2.0)):
+            xs = x if abs(x) < 1.99 else 2.0
+            bulge = 0.0 if z == 0.0 else 0.1 + 0.34 * _fbm(xs * 0.9 + salt, 1.7 + salt, z * 0.75) + 0.06 * (k % 2)
+            ring.append((x, top + 0.2 - bulge if z != 0.0 else top, z))
+        ring += [(2.0, 0.5, z), (-2.0, 0.5, z)]
+        rings.append(ring)
+    with p.as_kind(K_STONE):
+        for k, (a, b) in enumerate(zip(rings, rings[1:])):
+            p.grid([a, b], beds[k % len(beds)], PAINT, smooth=False, cap0=False, cap1=(k == len(rings) - 2))
+
+
+@piece('PipeEdgeB', tile=2.0, knee=0.9)
+def pipe_edge_b():
+    """A pipe-edge variant (same contract: Y +-0.5, Z -6..0.9): one fat lagged
+    steam main in enamelled bands on saddles, a junction box with a gauge, and
+    a rock face under the kerb shot through with an ore vein (brass ochre and
+    verdigris) and a seep of rust."""
+    p = P('PipeEdgeB', rust=0.75, verd=0.8, ground=None, grime=None, ao_dist=0.5, ao=0.5)
+    p.box((0, 0, 0.1), (4.0, 1.0, 0.24), IRON)
+    p.cyl((-2.0, -0.05, 0.55), (2.0, -0.05, 0.55), 0.3, ENAMEL, sides=10, mat=PAINT, cap0=False, cap1=False)
+    for x in (-1.5, -0.5, 0.5, 1.5):
+        p.turned((x - 0.05, -0.05, 0.55), X, [(0.325, 0), (0.325, 0.1)], BRASS, sides=10)
+    for x in (-1.0, 1.0):
+        p.box((x, -0.05, 0.3), (0.2, 0.7, 0.16), IRON, bevel=0.02)
+    p.box((0.0, 0.34, 0.5), (0.5, 0.2, 0.5), SLATE, mat=PAINT, bevel=0.03)
+    p.gauge((0.0, 0.23, 0.56), NY, 0.12)
+    _rock_face(p, 9.0)
+    # The vein: a ragged diagonal seam of ore plates let into the rock.
+    with p.as_kind(K_PLAIN):
+        for k in range(7):
+            t = k / 6
+            x = -1.5 + 3.0 * t
+            z = -1.3 - 3.6 * t + 0.25 * math.sin(k * 2.1)
+            c = (0.72, 0.52, 0.2) if k % 3 else (0.3, 0.56, 0.47)
+            p.box((x, -0.66, z), (0.62, 0.1, 0.26), p.vary(c, 0.12), mat=METAL if k % 3 else PAINT,
+                  rot=(0.1, 0.5, 0.0))
+    p.soot.append((Vector((1.2, -0.7, -5.4)), 1.0))
+    return p
+
+
+@piece('PipeEdgeC', tile=2.0, knee=0.9)
+def pipe_edge_c():
+    """A pipe-edge variant: the kerb carries no pipes here, only a low riveted
+    plate upstand and a drain spout; under it bare stepped rock strata, lighter
+    and darker beds, with a timber-shored patch."""
+    p = P('PipeEdgeC', rust=0.75, verd=0.6, ground=None, grime=None, ao_dist=0.5, ao=0.5)
+    p.box((0, 0, 0.1), (4.0, 1.0, 0.24), IRON)
+    p.box((0, -0.36, 0.42), (4.0, 0.08, 0.5), IRON)
+    p.rivets((-1.8, -0.405, 0.56), (1.8, -0.405, 0.56), NY, 0.45, 0.045, BRASS)
+    p.box((0, -0.36, 0.69), (4.0, 0.14, 0.05), STEEL_DARK)
+    _rock_face(p, 21.0)
+    with p.as_kind(K_STONE):
+        for (z, c) in ((-1.4, ROCK_PALE), (-3.2, ROCK_DARK), (-4.9, ROCK_PALE)):
+            p.box((0, -0.5, z), (4.0, 0.5, 0.34), p.vary(c, 0.06), mat=PAINT)
+    with p.as_kind(K_SOFT):
+        for x in (-0.9, -0.2, 0.5):
+            p.box((x, -0.82, -2.3), (0.26, 0.14, 1.5), p.vary(TIMBER, 0.1), mat=PAINT)
+        p.box((-0.2, -0.92, -1.75), (1.9, 0.12, 0.2), TIMBER_DARK, mat=PAINT)
+        p.box((-0.2, -0.92, -2.85), (1.9, 0.12, 0.2), TIMBER_DARK, mat=PAINT)
+    p.cyl((1.4, -0.4, 0.1), (1.4, -0.95, -0.05), 0.09, COPPER, sides=6)
+    return p
+
+
+@piece('MineAdit')
+def mine_adit():
+    """A mine adit in a cliff face (origin on the face at the adit's floor;
+    outward is -Y; X +-3.2, Y -7..+1, Z -7..5.2): a dressed stone portal with a
+    keystone, timber sets inside a dark throat, a lamp over the arch, rails
+    running out onto a timber trestle ledge braced back into the rock, an ore
+    tub at the ledge's end and a spoil chute spilling scree below."""
+    p = P('MineAdit', rust=0.8, verd=0.4, ground=None, grime=None, ao_dist=0.8, ao=0.6)
+    with p.as_kind(K_PLAIN):
+        p.box((0, 0.6, 1.5), (3.2, 1.0, 3.0), DARK, mat=PAINT)
+        p.arc_block((0, 0.6, 3.0), NY, 0.02, 1.6, 0.5, 0.0, PI, DARK, seg=8, mat=PAINT, up=Z)
+    with p.as_kind(K_STONE):
+        for sx in (-1, 1):
+            for k in range(5):
+                p.box((sx * 2.0, -0.1, 0.3 + k * 0.6), (0.8 + 0.1 * (k % 2), 0.9, 0.56), p.vary(STONE_LIGHT, 0.1),
+                      mat=PAINT, bevel=0.04)
+        for k in range(9):
+            a0, a1 = PI * k / 9 + 0.015, PI * (k + 1) / 9 - 0.015
+            p.arc_block((0, -0.1, 3.0), NY, 1.6, 2.5 if k != 4 else 2.75, 0.45, a0, a1, p.vary(STONE_LIGHT, 0.1),
+                        seg=2, mat=PAINT, up=Z)
+        p.box((0, -0.05, -0.2), (5.2, 1.0, 0.4), STONE, mat=PAINT, bevel=0.05)
+    with p.as_kind(K_SOFT):
+        for y in (0.15, 0.75):
+            for sx in (-1, 1):
+                p.box((sx * 1.35, y, 1.5), (0.26, 0.26, 3.0), p.vary(TIMBER, 0.1), mat=PAINT)
+            p.box((0, y, 3.1), (3.2, 0.28, 0.28), TIMBER_DARK, mat=PAINT)
+    p.cage_lamp((0, -0.62, 4.9), r=0.2, h=0.5, hood=True)
+    p.box((0, -0.4, 5.5), (0.12, 0.5, 0.1), IRON)
+    # The ledge: deck planks on two beams, raking braces back into the face.
+    with p.as_kind(K_SOFT):
+        for sx in (-1, 1):
+            p.box((sx * 1.3, -3.4, -0.25), (0.3, 6.6, 0.34), TIMBER_DARK, mat=PAINT)
+            p.flat((sx * 1.3, -6.2, -0.4), (sx * 1.3, -0.1, -6.6), 0.3, 0.3, TIMBER, up=(sx, 0, 0), mat=PAINT)
+            p.flat((sx * 1.3, -3.2, -0.4), (sx * 1.3, -0.1, -3.6), 0.26, 0.26, TIMBER, up=(sx, 0, 0), mat=PAINT)
+        for k in range(13):
+            p.box((0, -0.45 - k * 0.5, -0.04), (3.4 - 0.2 * (k % 2), 0.44, 0.09), p.vary(TIMBER, 0.14), mat=PAINT)
+        p.flat((-1.3, -3.3, -3.4), (1.3, -3.3, -3.4), 0.22, 0.22, TIMBER_DARK, up=Z, mat=PAINT)
+    for sx in (-1, 1):
+        p.box((sx * 0.55, -3.2, 0.09), (0.09, 7.4, 0.14), STEEL_DARK)
+        for y in (-6.6, -0.3):
+            p.cyl((sx * 1.62, y, 0.0), (sx * 1.62, y, 1.1), 0.05, IRON, sides=5)
+        p.cyl((sx * 1.62, -6.6, 1.05), (sx * 1.62, -0.3, 1.05), 0.04, IRON, sides=5)
+    p.box((0, -6.85, 0.3), (1.5, 0.2, 0.5), IRON, bevel=0.03)
+    # The ore tub.
+    with p.at(T(0, -5.2, 0.16)):
+        for sx in (-1, 1):
+            for sy in (-1, 1):
+                p.turned((sx * 0.55 - 0.05, sy * 0.5, 0.2), X, [(0.2, 0), (0.2, 0.1)], IRON, sides=10)
+        rings = [[(-0.6, -0.8, 0.3), (0.6, -0.8, 0.3), (0.6, 0.8, 0.3), (-0.6, 0.8, 0.3)],
+                 [(-0.85, -1.0, 1.3), (0.85, -1.0, 1.3), (0.85, 1.0, 1.3), (-0.85, 1.0, 1.3)]]
+        p.grid(rings, IRON, METAL, smooth=False, cap1=False)
+        p.rivets((-0.75, -0.93, 1.2), (0.75, -0.93, 1.2), NY, 0.3, 0.04, BRASS)
+        with p.as_kind(K_STONE):
+            p.rockish((0, 0, 1.25), (1.5, 1.8, 0.7), ORE, jitter=0.3, flat_bottom=True)
+        with p.as_kind(K_PLAIN):
+            for (x, y) in ((0.3, 0.3), (-0.35, -0.2), (0.1, -0.55)):
+                p.box((x, y, 1.52), (0.22, 0.2, 0.14), (0.78, 0.56, 0.22), rot=(0.4, 0.3, 0.5))
+    # Spoil spilling down the face under the ledge.
+    with p.as_kind(K_STONE):
+        for k in range(6):
+            p.rockish((-2.3 + 0.2 * k, -0.7 - 0.25 * k, -1.2 - 1.0 * k), (1.5 + 0.25 * k, 1.2 + 0.2 * k, 0.9),
+                      p.vary(ROCK, 0.15), jitter=0.3)
+    return p
+
+
+@piece('TargetFrameB', foot=('box', 1.6, 0.3))
+def target_frame_b():
+    """A range target that reads at 80 yd (X +-1.6, Y +-0.3, Z 0..3): a square
+    timber-backed butt in a battered iron frame, bold enamel-white and oxblood
+    rings to a brass bull, a blackened scorch across one quarter, shell holes
+    punched clean through, a splintered corner, a lane number plate on top."""
+    p = P('TargetFrameB', rust=0.8, ao=0.5)
+    for s in (-1, 1):
+        p.box((s * 1.45, 0, 0.04), (0.3, 0.6, 0.08), IRON, bevel=0.02)
+        p.ibeam((s * 1.45, 0, 0.08), (s * 1.45, 0, 2.86), 0.16, 0.16, 0.03, IRON, up=(0, -1, 0))
+        p.flat((s * 1.45, 0.28, 0.1), (s * 1.45, 0.0, 1.5), 0.1, 0.04, IRON, up=(s, 0, 0))
+    p.ibeam((-1.6, 0, 2.92), (1.6, 0, 2.92), 0.16, 0.2, 0.03, IRON, up=Z)
+    cz = 1.52
+    with p.as_kind(K_SOFT):
+        for k in range(6):
+            x = -1.1 + k * 0.44
+            top = 2.62 if k not in (4, 5) else (2.3 if k == 4 else 1.95)
+            p.bx((x - 0.21, 0.0, 0.42), (x + 0.21, 0.12, top), p.vary((0.62, 0.47, 0.3), 0.14), mat=PAINT)
+        # The splintered corner.
+        for (x, z, a) in ((0.72, 2.36, 0.5), (0.98, 2.1, -0.4), (1.16, 2.0, 0.8)):
+            p.box((x, 0.06, z), (0.07, 0.08, 0.5), TIMBER, mat=PAINT, rot=(0, a, 0))
+    with p.as_kind(K_PLAIN):
+        washer(p, (0, -0.012, cz), NY, 0.0, 1.08, 0.012, ENAMEL, sides=24)
+        washer(p, (0, -0.02, cz), NY, 0.62, 0.86, 0.008, OXBLOOD, sides=24)
+        washer(p, (0, -0.02, cz), NY, 0.2, 0.42, 0.008, OXBLOOD, sides=20)
+        # Scorch: a dark wedge and its soot fringe.
+        p.arc_block((0, -0.03, cz), NY, 0.55, 1.07, 0.004, 3.7, 4.5, (0.2, 0.17, 0.15), seg=5, mat=PAINT, up=Z)
+        p.arc_block((0, -0.031, cz), NY, 0.75, 1.0, 0.004, 3.9, 4.3, DARK, seg=3, mat=PAINT, up=Z)
+        for (x, z, r) in ((0.34, 0.3, 0.1), (-0.5, -0.16, 0.09), (0.08, -0.6, 0.12), (-0.22, 0.7, 0.08),
+                          (0.72, -0.34, 0.09), (-0.78, 0.5, 0.1), (0.12, 0.06, 0.07), (-0.3, -0.72, 0.1)):
+            washer(p, (x, -0.036, cz + z), NY, 0.0, r, 0.003, DARK, sides=7)
+            washer(p, (x, -0.034, cz + z), NY, r, r * 1.45, 0.003, (0.5, 0.4, 0.3), sides=7)
+    p.turned((0, -0.03, cz), NY, [(0.16, 0), (0.16, 0.03), (0.1, 0.05)], BRASS, sides=12)
+    p.box((0, -0.02, 2.72), (0.7, 0.04, 0.3), ENAMEL, mat=PAINT, bevel=0.01)
+    p.box((0, -0.045, 2.72), (0.12, 0.01, 0.2), DARK, mat=PAINT)
+    return p
+
+
+@piece('BlastFurnace')
+def blast_furnace():
+    """HERO: a blast furnace standing in the drop beside the path (origin base
+    centre; within r 9.5; Z 0..46; the tap arch faces -Y): an octagonal stone
+    hearth with a roaring tap arch and a slag runner, a ring of tuyeres fed by
+    a great bustle pipe, a banded brick shaft tapering to a charging deck, four
+    iron columns, a bell hopper and its skip incline, a fat downcomer and a
+    stove stack. Glow: tap mouth (0, -8.2, 3.2), runner to Y -12, tuyere
+    peepholes at Z 9.2, the throat's flare at Z 39. Smoke leaves (0, 0, 46)."""
+    p = P('BlastFurnace', rust=0.75, verd=0.5, ao_dist=2.6, ao=0.9)
+    p.heat.append((Vector((0, -8.4, 3.2)), 5.0))
+    p.soot.append((Vector((0, -8.0, 8.0)), 4.5))
+    p.soot.append((Vector((0, 0, 41.0)), 7.0))
+    with p.as_kind(K_STONE):
+        p.turned((0, 0, 0), Z, [(8.6, 0), (8.6, 0.8), (8.2, 1.0), (8.0, 7.2), (8.4, 7.5), (8.4, 8.2), (7.6, 8.4)],
+                 ASHLAR, sides=8, mat=PAINT, smooth=False, phase=PI / 8)
+        for k in range(8):
+            a = TAU * k / 8
+            d = Vector((math.cos(a), math.sin(a), 0))
+            p.flat(d * 8.3, d * 8.05 + Vector((0, 0, 7.4)), 1.5, 0.7, p.vary(STONE_LIGHT, 0.08), up=d, mat=PAINT)
+    # The tap arch.
+    with p.as_kind(K_PLAIN):
+        p.box((0, -7.5, 1.9), (3.6, 1.2, 3.0), SOOT, mat=PAINT)
+    p.box((0, -8.12, 2.0), (3.0, 0.06, 2.6), MOLTEN, mat=GLOW)
+    p.arc_block((0, -8.12, 3.3), NY, 0.02, 1.5, 0.03, 0.0, PI, MOLTEN, seg=10, mat=GLOW, up=Z)
+    p.box((0, -8.16, 1.7), (1.9, 0.04, 1.6), MOLTEN_HOT, mat=GLOW)
+    with p.as_kind(K_STONE):
+        for k in range(11):
+            a0, a1 = PI * k / 11 + 0.012, PI * (k + 1) / 11 - 0.012
+            p.arc_block((0, -8.15, 3.3), NY, 1.8, 2.6 if k != 5 else 2.85, 0.35, a0, a1, p.vary(STONE_LIGHT, 0.1),
+                        seg=2, mat=PAINT, up=Z)
+        for sx in (-1, 1):
+            p.box((sx * 2.2, -8.15, 1.65), (0.8, 0.7, 3.3), STONE_LIGHT, mat=PAINT, bevel=0.05)
+            p.box((sx * 1.3, -10.3, 0.5), (0.5, 4.2, 1.0), BRICK, mat=PAINT, bevel=0.04)
+        p.box((0, -10.3, 0.2), (2.2, 4.2, 0.4), BRICK, mat=PAINT)
+    p.box((0, -10.3, 0.62), (2.0, 4.2, 0.1), MOLTEN, mat=GLOW)
+    p.box((0, -10.3, 0.68), (1.1, 4.2, 0.04), MOLTEN_HOT, mat=GLOW)
+    p.arc_block((0, -8.5, 3.3), NY, 1.7, 1.82, 0.4, -0.02, PI + 0.02, IRON, seg=10, up=Z)
+    # Tuyeres and the bustle pipe.
+    p.torus((0, 0, 11.2), Z, 8.6, 0.75, COPPER, seg=24, sides=8)
+    for k in range(8):
+        a = TAU * k / 8 + PI / 8
+        d = Vector((math.cos(a), math.sin(a), 0))
+        p.tube([d * 8.6 + Vector((0, 0, 10.6)), d * 8.7 + Vector((0, 0, 9.6)), d * 7.6 + Vector((0, 0, 9.2))], 0.3,
+               COPPER, sides=7)
+        p.flange(d * 8.0 + Vector((0, 0, 9.25)), d, 0.48, 0.1, BRASS, bolts=6, sides=10)
+        p.turned(d * 8.12 + Vector((0, 0, 9.25)), d, [(0.2, 0), (0.2, 0.02)], MOLTEN, sides=8, mat=GLOW)
+        p.flange(d * 8.6 + Vector((0, 0, 11.2)), d.cross(Vector((0, 0, 1))), 0.95, 0.12, BRASS, bolts=8, sides=12)
+    # The shaft: bosh, belly, stack.
+    with p.as_kind(K_STONE):
+        prof = [(7.0, 8.2), (7.4, 12.0), (7.4, 13.0)]
+        for k in range(9):
+            z = 13.0 + k * 2.6
+            r = 7.4 - 2.6 * (k / 9)
+            prof += [(r, z), (r - 0.04, z + 2.5)]
+        prof += [(4.8, 36.4), (5.2, 36.6), (5.2, 37.2)]
+        p.turned((0, 0, 0), Z, prof, BRICK, sides=20, mat=PAINT)
+    for k in range(9):
+        z = 13.0 + k * 2.6
+        r = 7.4 - 2.6 * (k / 9)
+        p.band((0, 0, z), Z, r, 0.5, IRON, rivets=20, rivet_r=0.09, sides=20, lip=0.1)
+    p.band((0, 0, 12.4), Z, 7.4, 0.9, BRASS_DARK, rivets=24, rivet_r=0.1, sides=20, lip=0.14)
+    # Columns and the charging deck.
+    for k in range(4):
+        a = TAU * k / 4 + PI / 4
+        d = Vector((math.cos(a), math.sin(a), 0))
+        p.ibeam(d * 8.9, d * 6.6 + Vector((0, 0, 36.6)), 0.9, 0.8, 0.12, IRON, up=d)
+        for z in (16.0, 26.0):
+            r = 8.9 - 2.3 * (z / 36.6)
+            p.flat(d * r + Vector((0, 0, z)), d * (r - 1.6) + Vector((0, 0, z)), 0.5, 0.2, IRON, up=Z)
+    p.annulus((0, 0, 37.0), Z, 4.6, 8.4, 0.2, IRON, sides=20)
+    for k in range(20):
+        a = TAU * k / 20
+        c = Vector((math.cos(a) * 8.3, math.sin(a) * 8.3, 37.2))
+        p.cyl(c, c + Vector((0, 0, 1.3)), 0.06, IRON, sides=4)
+    p.torus((0, 0, 38.5), Z, 8.3, 0.07, BRASS, seg=20, sides=4)
+    # Throat, bell hopper and the flare.
+    p.turned((0, 0, 37.2), Z, [(4.6, 0), (4.6, 1.6), (3.0, 3.4), (3.0, 4.2), (3.6, 4.4), (3.6, 4.8), (2.6, 5.0)],
+             SOOT_IRON, sides=16)
+    p.turned((0, 0, 41.4), Z, [(1.6, 0), (2.4, 2.0), (2.4, 2.6), (1.2, 4.2), (0.3, 4.6)], BRASS_DARK, sides=14)
+    for k in range(6):
+        a = TAU * k / 6
+        p.turned((math.cos(a) * 3.3, math.sin(a) * 3.3, 41.9), Z, [(0.26, 0), (0.12, 0.4)], EMBER, sides=6, mat=GLOW)
+    # Skip incline up the +Y side.
+    for sx in (-1, 1):
+        p.ibeam((sx * 1.3, 17.5, 0.0), (sx * 1.3, 4.6, 41.0), 0.5, 0.34, 0.06, IRON, up=(sx, 0, 0))
+    for k in range(10):
+        t = (k + 0.5) / 10
+        y = 17.5 + (4.6 - 17.5) * t
+        z = 41.0 * t
+        p.box((0, y, z), (2.9, 0.16, 0.16), IRON)
+    with p.at(T(0, 11.0, 20.6) @ R('X', math.atan2(12.9, 41.0))):
+        p.box((0, 0.6, 0), (2.2, 1.6, 3.0), STEEL_DARK, bevel=0.06)
+        p.rivets((-1.0, -0.21, -1.3), (-1.0, -0.21, 1.3), NY, 0.5, 0.06, BRASS)
+    # Downcomer and stove stack on the +X side.
+    p.tube(fillet([(3.0, 0, 41.0), (9.5, 0, 37.0), (11.5, 0, 22.0), (11.5, 0, 6.0)], 2.5), 1.0, SOOT_IRON, sides=10)
+    for z in (30.0, 18.0, 8.0):
+        p.band((11.5 - (0.13 * (z - 22.0) if z > 22 else 0.0), 0, z), Z, 1.0, 0.4, BRASS_DARK, rivets=8, rivet_r=0.07,
+               sides=10)
+    p.turned((11.5, 0, 0), Z, [(2.2, 0), (2.2, 5.4), (1.6, 6.6)], SOOT_IRON, sides=12)
+    stack(p, (-10.6, 2.0, 0.0), 1.5, 1.1, 34.0, bands=(9.0, 20.0, 30.0), seams=4)
+    p.cyl((-9.2, 1.6, 9.0), (-7.2, 1.2, 10.4), 0.5, COPPER, sides=8)
+    return p
+
+
+@piece('SteamHammer')
+def steam_hammer():
+    """A steam hammer's frame (origin base centre; X +-3.0, Y +-1.7, Z 0..11.2;
+    its front faces -Y): two cast A-standards arching to an entablature, the
+    steam cylinder with its valve chest on top, guide bars down the inside, a
+    stone-bedded anvil block with a glowing billet on it (glow at Z 1.62), a
+    valve lever, and a steam exhaust at the top (0, 0.9, 11.2). The tup is
+    Kit_SteamHammerRam (strike face at Z 1.7, raised to about Z 4.8)."""
+    p = P('SteamHammer', rust=0.65, verd=0.45, ao_dist=1.6)
+    p.heat.append((Vector((0, 0, 1.6)), 1.4))
+    with p.as_kind(K_STONE):
+        p.box((0, 0, 0.25), (6.0, 3.4, 0.5), STONE, mat=PAINT, bevel=0.06)
+    for sx in (-1, 1):
+        pts = [(sx * 2.7, 0, 0.5), (sx * 2.5, 0, 3.6), (sx * 1.5, 0, 6.2), (sx * 1.05, 0, 7.4)]
+        for (a, b) in zip(pts, pts[1:]):
+            p.flat(a, b, 1.5, 0.5, IRON, up=(0, 1, 0), bevel=0.04)
+        p.box((sx * 2.7, 0, 0.7), (1.0, 2.2, 0.4), IRON, bevel=0.06)
+        for sy in (-1, 1):
+            p.bolt((sx * 2.9, sy * 0.8, 0.9), Z, 0.09, 0.1)
+            p.rivets((sx * 2.55, sy * 0.77, 1.2), (sx * 1.6, sy * 0.77, 5.8), (0, sy, 0), 0.6, 0.06, BRASS)
+        p.box((sx * 0.72, 0, 5.0), (0.16, 0.5, 4.6), STEEL, bevel=0.02)
+    p.box((0, 0, 7.5), (3.2, 1.9, 0.6), IRON, bevel=0.08)
+    p.stripes((-1.6, -0.953, 7.3), X, Z, NY, 3.2, 0.2, pitch=0.3, slant=1.0)
+    p.turned((0, 0, 7.8), Z, [(1.0, 0), (1.0, 0.2), (0.86, 0.3), (0.86, 2.6), (1.0, 2.7), (1.0, 2.9), (0.6, 3.1),
+                              (0.2, 3.3)], BRASS_DARK, sides=16)
+    p.band((0, 0, 8.6), Z, 0.86, 0.22, BRASS, rivets=10, rivet_r=0.05, sides=16)
+    p.band((0, 0, 9.9), Z, 0.86, 0.22, BRASS, rivets=10, rivet_r=0.05, sides=16)
+    p.box((0, 1.05, 9.2), (0.9, 0.5, 1.6), IRON, bevel=0.05)
+    p.tube(fillet([(0, 1.3, 10.0), (0, 1.3, 10.8), (0, 0.9, 11.2)], 0.2), 0.14, COPPER, sides=7)
+    p.gauge((0.0, -0.9, 9.3), NY, 0.2)
+    p.cyl((1.0, -0.8, 7.8), (1.9, -1.4, 5.2), 0.045, STEEL, sides=5)
+    p.sphere((1.9, -1.4, 5.2), 0.1, OXBLOOD, mat=PAINT, rings=3, sides=6)
+    # The anvil and the billet.
+    p.box((0, 0, 0.95), (1.9, 1.7, 0.9), IRON, bevel=0.1, taper=0.8)
+    p.box((0, 0, 1.47), (1.3, 1.2, 0.16), STEEL_DARK, bevel=0.03)
+    p.box((0, 0, 1.62), (0.9, 0.5, 0.16), MOLTEN, mat=GLOW)
+    p.box((0, 0, 1.66), (0.5, 0.3, 0.1), MOLTEN_HOT, mat=GLOW)
+    return p
+
+
+@piece('SteamHammerRam')
+def steam_hammer_ram():
+    """The steam hammer's tup (origin at the STRIKE FACE centre, bottom): a
+    heavy tapered block with guide shoes and a dovetailed die, on a polished
+    piston rod 4.4 long."""
+    p = P('SteamHammerRam', rust=0.5, ground=None, grime=None, ao_dist=0.6)
+    p.box((0, 0, 0.14), (1.0, 0.7, 0.28), STEEL_DARK, bevel=0.03)
+    p.box((0, 0, 1.0), (1.3, 1.1, 1.5), IRON, bevel=0.08, taper=1.12)
+    for sx in (-1, 1):
+        p.box((sx * 0.7, 0, 1.0), (0.14, 0.62, 1.2), BRASS, bevel=0.02)
+    p.rivets((-0.5, -0.56, 1.5), (0.5, -0.56, 1.5), NY, 0.25, 0.05, BRASS)
+    p.turned((0, 0, 1.75), Z, [(0.4, 0), (0.4, 0.14), (0.2, 0.22), (0.17, 4.4)], STEEL, sides=10)
+    return p
+
 
 
 # ===================================================================== checks
