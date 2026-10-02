@@ -242,7 +242,7 @@ export function riftRecoveryPointSafe(ctx: SimContext, p: Entity, pos: Vec3): bo
   return true;
 }
 
-type RiftStateEvent = Extract<SimEvent, { type: 'riftState' }>;
+export type RiftStateEvent = Extract<SimEvent, { type: 'riftState' }>;
 
 function buildRiftStateEvent(
   ctx: SimContext,
@@ -325,10 +325,13 @@ export function emitRiftDeparture(ctx: SimContext, pid: number, from: Vec3): voi
  * run's own exit spot and facing as the caller's return point, so a match that
  * ends after the run is gone never sends the player back onto its floor. The
  * rift twin of instances/dungeons.ts detachFromDungeon; null when `p` stands on
- * no rift floor. */
+ * no rift floor. `deliver` replaces the event queue for a caller whose own queued
+ * events would not reach the client (server/moderation_moves.ts: a moderator
+ * entering spectate, whose router drops their own pid's events). */
 export function detachFromRift(
   ctx: SimContext,
   p: Entity,
+  deliver: (ev: RiftStateEvent) => void = (ev) => ctx.emit(ev),
 ): { x: number; z: number; facing: number } | null {
   const inst = riftInstanceAtPos(ctx, p.pos);
   if (!inst) return null;
@@ -337,7 +340,7 @@ export function detachFromRift(
   p.riftSliding = false;
   p.riftSlideDirX = 0;
   p.riftSlideDirZ = 0;
-  if (inst.memberIds.has(p.id)) emitRiftState(ctx, p.id, inst, false);
+  if (inst.memberIds.has(p.id)) deliver(buildRiftStateEvent(ctx, p.id, inst, false));
   return { x: inst.returnPos.x, z: inst.returnPos.z, facing: inst.returnFacing ?? 0 };
 }
 
