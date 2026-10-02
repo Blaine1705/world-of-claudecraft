@@ -921,11 +921,15 @@ const WILDHEART_HEXCALLER: ClipMap = {
 // across all 5 Wildheart Basin mobs. This clip is baked off wildheart_high_priest.glb's
 // own donor poses (a climactic Cast hold into Jump's own pose repurposed as a downward
 // slam/roar release), so only mob_wildheart_high_priest gets it; the other 4 Wildheart
-// mobs are untouched. Wired into both attack and cast; deliberately the longest and most
-// dramatic of the five, befitting the dungeon boss.
+// mobs are untouched. Deliberately the longest and most dramatic of the five, befitting
+// the dungeon boss: it is his CAST (the Pulse and the Spirit of the Hunt bars). His
+// melee swing is Wildheart_High_Priest_Swing (same builder, off his own Attack donor):
+// played as a swing the slam heaved his whole body (its Jump donor turns the pelvis
+// 140 degrees), so the swing keeps his legs and pelvis on the idle stance and lets the
+// arms, shoulders and spine carry a wind-up, a rake down and a recovery.
 const WILDHEART_HIGH_PRIEST: ClipMap = {
   ...TRIPO_BIPED_FULL_RIG,
-  attack: ['Wildheart_High_Priest_Attack'],
+  attack: ['Wildheart_High_Priest_Swing'],
   cast: 'Wildheart_High_Priest_Attack',
 };
 

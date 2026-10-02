@@ -38,7 +38,10 @@ function manifestBlock(startAnchor: string, endAnchor: string): string {
 describe('Zulgar, Voice of the Basin bespoke attack/cast (issue #2889 round 2)', () => {
   it('ships Wildheart_High_Priest_Attack in a mesh-free donor GLB', () => {
     const glbPath = 'public/models/creatures/wildheart_high_priest_ability_anims.glb';
-    expect(clipNamesOf(glbPath)).toEqual(['Wildheart_High_Priest_Attack']);
+    expect(clipNamesOf(glbPath)).toEqual([
+      'Wildheart_High_Priest_Attack',
+      'Wildheart_High_Priest_Swing',
+    ]);
     expect(meshCountOf(glbPath)).toBe(0);
   });
 
@@ -49,7 +52,8 @@ describe('Zulgar, Voice of the Basin bespoke attack/cast (issue #2889 round 2)',
     expect(highPriestBlock).not.toContain('clips: TRIPO_BIPED_FULL_RIG,');
 
     const highPriestConstBlock = manifestBlock('const WILDHEART_HIGH_PRIEST: ClipMap = {', '};');
-    expect(highPriestConstBlock).toContain("attack: ['Wildheart_High_Priest_Attack']");
+    // The melee swing is its own planted clip; the slam stays his cast.
+    expect(highPriestConstBlock).toContain("attack: ['Wildheart_High_Priest_Swing']");
     expect(highPriestConstBlock).toContain("cast: 'Wildheart_High_Priest_Attack'");
 
     // TRIPO_BIPED_FULL_RIG itself (the constant definition, not a VisualDef using it) must
