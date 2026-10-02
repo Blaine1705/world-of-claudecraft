@@ -7,12 +7,12 @@
 // builds each view from the frame's inputs and hands it to that prompt's
 // painter. The frame hands it the world (its entities and roster version):
 // the prompts look bodies up by id, and the Foundry alert keeps its scene of
-// bosses, drones and floor cells off the roster (foundry_alert_scene.ts).
+// bosses, drones and floor cells off the roster (foundry_alert_scene_core.ts).
 
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
 import { FoundryAlert } from './foundry_alert_painter';
-import { FoundryAlertSceneScan, type FoundrySceneEntity } from './foundry_alert_scene';
+import { FoundryAlertSceneScan, type FoundrySceneEntity } from './foundry_alert_scene_core';
 import { buildFoundryAlertView } from './foundry_alert_view';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';

@@ -640,6 +640,10 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/gaol_chain_view.ts',
   // The Stormbrass Foundry's alert (the Storm Cell, Target Lock, the plating).
   'src/ui/hud/dungeon/foundry_alert_view.ts',
+  // Its scene scan (the bodies the alert reads off the world) and the floating
+  // combat text's avoidance word ("Turned aside" on a plated body).
+  'src/ui/hud/dungeon/foundry_alert_scene_core.ts',
+  'src/ui/hud/dungeon/foundry_fct_core.ts',
   // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',

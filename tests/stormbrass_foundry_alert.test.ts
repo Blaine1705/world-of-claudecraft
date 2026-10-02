@@ -4,8 +4,8 @@
 // Storm Cell on the floor asks for a taker, the Voltaic Warden's plating says
 // which face is up and which damage lands to everyone near it (the drones
 // line, the flip countdown, the Stored Charge bar), and the priority is cell,
-// mark, Proof Shot, floor cell, plating. The scene scan (foundry_alert_scene.ts)
-// and the floating "Turned aside" word (foundry_fct.ts) ride here too. Driven
+// mark, Proof Shot, floor cell, plating. The scene scan (foundry_alert_scene_core.ts)
+// and the floating "Turned aside" word (foundry_fct_core.ts) ride here too. Driven
 // from real fights as well, so the view reads exactly the auras and objects
 // the sim mirrors. (The Proof Shot alert: stormbrass_foundry_rangewarden.test.ts.)
 
@@ -39,7 +39,7 @@ import { foundryObjectLabel } from '../src/ui/entity_display_core';
 import {
   FoundryAlertSceneScan,
   type FoundrySceneEntity,
-} from '../src/ui/hud/dungeon/foundry_alert_scene';
+} from '../src/ui/hud/dungeon/foundry_alert_scene_core';
 import {
   buildFoundryAlertView,
   FLOOR_CELL_REACH,
@@ -48,7 +48,7 @@ import {
   type FoundryAlertScene,
   WARDEN_REACH,
 } from '../src/ui/hud/dungeon/foundry_alert_view';
-import { fctAvoidanceText, platingTurnedAside } from '../src/ui/hud/dungeon/foundry_fct';
+import { fctAvoidanceText, platingTurnedAside } from '../src/ui/hud/dungeon/foundry_fct_core';
 import { setLanguage, t } from '../src/ui/i18n';
 import { boss, engage, fight, local, objects, put, run } from './helpers/foundry_fight';
 
@@ -216,6 +216,21 @@ describe('the Foundry alert view', () => {
     expect(v.barLabel).toBe(t('hudChrome.foundryAlert.storedAria', { pct: '45%' }));
     expect(v.barLabel).toBe('Stored Charge 45%: released at the flip');
     expect(v.progressAria).toBe(v.barLabel);
+    // On a phone the caption goes (the bar and its aria still carry the bank).
+    const phone = shown(
+      buildFoundryAlertView(
+        input({ selfPos: { x: 20, z: 0 }, scene: scene({ warden }), touch: true }),
+      ),
+    );
+    expect(phone.barLabel).toBe('');
+    expect(phone.progressAria).toBe(v.barLabel);
+    expect(phone.progress).toBeCloseTo(0.45, 6);
+    // Inside the last second the flip is simply due (never "1 seconds").
+    const due: FoundryAlertEntity = {
+      ...warden,
+      auras: [{ id: VOLTAIC_GROUNDED, value2: 0, remaining: 0.5, duration: 15 }],
+    };
+    expect(shown(view(20, { warden: due })).hint).toBe(t('hudChrome.foundryAlert.flipNow'));
     // Off the crown: no readout.
     expect(view(WARDEN_REACH + 1).visible).toBe(false);
     // A fallen Warden, or one out of its fight (no face): nothing.

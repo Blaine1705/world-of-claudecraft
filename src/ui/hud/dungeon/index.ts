@@ -12,8 +12,8 @@ export type { DungeonPromptsFrame } from './dungeon_prompts';
 export { DungeonPrompts } from './dungeon_prompts';
 export type { AlertLook, EncounterAlertView, FoundryAlertDeps } from './foundry_alert_painter';
 export { FoundryAlert } from './foundry_alert_painter';
-export type { FoundrySceneEntity, FoundrySceneWorld } from './foundry_alert_scene';
-export { FoundryAlertSceneScan } from './foundry_alert_scene';
+export type { FoundrySceneEntity, FoundrySceneWorld } from './foundry_alert_scene_core';
+export { FoundryAlertSceneScan } from './foundry_alert_scene_core';
 export type {
   FoundryAlertEntity,
   FoundryAlertInput,
@@ -22,7 +22,7 @@ export type {
   FoundryAlertView,
 } from './foundry_alert_view';
 export { buildFoundryAlertView } from './foundry_alert_view';
-export { fctAvoidanceText, platingTurnedAside } from './foundry_fct';
+export { fctAvoidanceText, platingTurnedAside } from './foundry_fct_core';
 export type { GaolChainDeps } from './gaol_chain_painter';
 export { GaolChainAlert } from './gaol_chain_painter';
 export type { GaolChainInput, GaolChainKind, GaolChainView } from './gaol_chain_view';

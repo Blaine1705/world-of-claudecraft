@@ -22,7 +22,7 @@
 //    and (on the Warden) the bar is the Stored Charge released at the flip.
 // Priority: the cell, the mark, the vents, the Proof Shot, a cell on the floor, then the
 // plating readout. The bodies not on the player (the bosses, the drones, the
-// floor cells) come from the frame's scene (foundry_alert_scene.ts). The
+// floor cells) come from the frame's scene (foundry_alert_scene_core.ts). The
 // painter (foundry_alert_painter.ts) only paints; every decision is here.
 
 import {
@@ -140,7 +140,7 @@ function auraOf(auras: readonly AlertAura[] | undefined, id: string): AlertAura 
 }
 
 function pct(share: number): string {
-  return formatNumber(share, { style: 'percent', maximumFractionDigits: 0 });
+  return formatNumber(share, PERCENT);
 }
 
 function timeLeft(a: AlertAura): number {
@@ -235,9 +235,11 @@ function ventView(vent: AlertAura): FoundryAlertLive {
 
 /** The Rangewarden mid Proof Shot that concerns the player: aimed at them, or
  *  the one they target. */
+function shooting(e: FoundryAlertEntity | null | undefined): e is FoundryAlertEntity {
+  return !!e && !e.dead && e.templateId === RANGEWARDEN_ID && e.castingAbility === RANGE_PROOF_SHOT;
+}
+
 function proofShooter(input: FoundryAlertInput): FoundryAlertEntity | null {
-  const shooting = (e: FoundryAlertEntity | null | undefined): e is FoundryAlertEntity =>
-    !!e && !e.dead && e.templateId === RANGEWARDEN_ID && e.castingAbility === RANGE_PROOF_SHOT;
   const scene = input.scene?.rangewarden;
   if (shooting(scene) && input.selfId !== undefined && scene.castTargetId === input.selfId)
     return scene;
@@ -330,6 +332,9 @@ function platedBody(input: FoundryAlertInput): FoundryAlertEntity | null {
   return null;
 }
 
+const WHOLE = { maximumFractionDigits: 0 } as const;
+const PERCENT = { style: 'percent', maximumFractionDigits: 0 } as const;
+
 /** The flip line: flipping now, or the seconds to it off the face aura's
  *  clock (the encounter keeps it on the next flip); '' with no clock. */
 function flipLine(body: FoundryAlertEntity, face: AlertAura): string {
@@ -338,9 +343,11 @@ function flipLine(body: FoundryAlertEntity, face: AlertAura): string {
   if (!face.duration || face.duration <= 0 || face.remaining === undefined)
     return split ? t('hudChrome.foundryAlert.splitLine') : '';
   // Whole seconds, rounded up (a hair of slack so 10.0 never reads as 11).
-  const seconds = formatNumber(Math.max(1, Math.ceil(face.remaining - 0.05)), {
-    maximumFractionDigits: 0,
-  });
+  // Inside the last second (a Warden stunned past its flip rides the clock's
+  // floor) the flip is simply due: no "1 seconds".
+  const whole = Math.ceil(face.remaining - 0.05);
+  if (whole <= 1) return t('hudChrome.foundryAlert.flipNow');
+  const seconds = formatNumber(whole, WHOLE);
   return split
     ? t('hudChrome.foundryAlert.flipInSplit', { seconds })
     : t('hudChrome.foundryAlert.flipIn', { seconds });
@@ -381,7 +388,9 @@ function platingView(body: FoundryAlertEntity, input: FoundryAlertInput): Foundr
     key: '',
     progress: share,
     progressAria: barLabel,
-    barLabel,
+    // A phone's short landscape view: the bar already shows the bank, so its
+    // caption goes and the standing readout stays four rows tall.
+    barLabel: input.touch ? '' : barLabel,
     pressable: false,
     buttonAria: title,
   };
