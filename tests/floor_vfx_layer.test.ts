@@ -150,6 +150,13 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   },
   // The Sledge Tusker's enrage glow pooled on the ice round its feet.
   { file: 'src/render/gravewyrm_sanctum_fx/tusker_fx.ts', layer: 'encounter', strict: true },
+  // The Gravewyrm Sanctum's three bosses: their cast telegraphs on the shared
+  // kit, the plate overlays, the meltwater, the rings, the landing shadow.
+  {
+    file: 'src/render/gravewyrm_sanctum_bosses/sanctum_boss_fx.ts',
+    layer: 'encounter',
+    strict: true,
+  },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },

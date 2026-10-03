@@ -22,6 +22,7 @@ import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dunge
 import { TempleFx } from './drowned_temple/temple_fx';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { SanctumFx } from './gravewyrm_sanctum_fx';
+import { SanctumBossFx } from './gravewyrm_sanctum_bosses';
 import { HoardBoneReaperFx } from './hoard_bone_reaper';
 import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
@@ -124,6 +125,8 @@ export class RiftDeathZoneVisuals {
   // The Gravewyrm Sanctum's telegraphs and creature effects (the Sledge
   // Tusker and its sledge, the trash).
   private readonly sanctumFx: SanctumFx;
+  // The Gravewyrm Sanctum's three bosses: chains, plates, meltwater, telegraphs.
+  private readonly sanctumBosses: SanctumBossFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -219,6 +222,15 @@ export class RiftDeathZoneVisuals {
       shake,
       playGesture,
     );
+    this.sanctumBosses = new SanctumBossFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.hoardGoblinCoins = new HoardGoblinCoinsFx(
       scene,
       groundY,
@@ -300,6 +312,7 @@ export class RiftDeathZoneVisuals {
     this.cryptFinale.update(dt);
     this.morthenFx.update(dt);
     this.sanctumFx.update(dt);
+    this.sanctumBosses.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -341,6 +354,7 @@ export class RiftDeathZoneVisuals {
     this.cryptFinale.dispose();
     this.morthenFx.dispose();
     this.sanctumFx.dispose();
+    this.sanctumBosses.dispose();
     this.hoardPresentation.dispose();
   }
 
@@ -356,7 +370,8 @@ export class RiftDeathZoneVisuals {
     this.templeFx.handleEvent(event);
     const basin = this.wildheartFx.handleEvent(event);
     const sanctum = this.sanctumFx.handleEvent(event);
-    return this.bastionFx.handleEvent(event) || basin || sanctum;
+    const sanctumBoss = this.sanctumBosses.handleEvent(event);
+    return this.bastionFx.handleEvent(event) || basin || sanctum || sanctumBoss;
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

@@ -828,6 +828,7 @@ const RENDER_PURE_CORES = [
   'src/render/stormbrass_foundry/prime_draft_tether_core.ts',
   // The Gravewyrm Sanctum bosses' Blender bodies, measured, and their gestures.
   'src/render/gravewyrm_sanctum_bosses/boss_model_core.ts',
+  'src/render/gravewyrm_sanctum_bosses/boss_fx_core.ts',
   // The authored open-air field's terrain plan and the Hollow Crypt's dressing,
   // set-dressing and gate-memory cores (docs/design/dungeon-rework).
   'src/render/authored_field/field_mesh_core.ts',
