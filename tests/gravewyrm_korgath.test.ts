@@ -555,3 +555,44 @@ describe('Korgath the Bound: determinism and /dev', () => {
     }
   });
 });
+
+describe('Korgath the Bound: the live sim (mob AI on)', () => {
+  it('a real pull: the shackles stay put and hittable, he stays leashed, a break lands', () => {
+    const r = room();
+    const sim = r.sim;
+    // Lay the lock out on a real tick first (he is idle).
+    sim.tick();
+    const st0 = korgathState(r.boss) as KorgathFightState;
+    expect(st0.engaged).toBe(false);
+    r.me.pos = at(r, KORGATH_SPOT.x, KORGATH_SPOT.z - 3);
+    r.me.prevPos = { ...r.me.pos };
+    sim.ctx.aggroMob(r.boss, r.me, false);
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+    const st = korgathState(r.boss) as KorgathFightState;
+    expect(st.engaged).toBe(true);
+    for (const tool of SEAL_TOOLS) {
+      const s = shackleOf(r, st, tool) as Entity;
+      expect(s.encounterHeld, tool).toBe(false);
+      expect(s.hostile, tool).toBe(true);
+      expect(s.hp, tool).toBe(s.maxHp);
+      const spot = pillarAt(tool).shackle;
+      expect(dist2d(s.pos, at(r, spot.x, spot.z)), tool).toBeLessThan(0.01);
+    }
+    // The tank walks off: he follows only to his leash.
+    r.me.pos = at(r, KORGATH_SPOT.x, KORGATH_SPOT.z + 17);
+    r.me.prevPos = { ...r.me.pos };
+    for (let i = 0; i < 20 * 4; i++) sim.tick();
+    expect(dist2d(r.boss.pos, at(r, KORGATH_SPOT.x, KORGATH_SPOT.z))).toBeLessThanOrEqual(
+      T.leashRadius + 1e-6,
+    );
+    // A shackle hit down to nothing breaks its chain on the next tick.
+    const s = shackleOf(r, st, 'bellows') as Entity;
+    sim.ctx.dealDamage(r.me, s, s.maxHp * 0.5, false, 'physical', 'test', 'hit');
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(s.hp).toBeLessThan(s.maxHp);
+    sim.ctx.dealDamage(r.me, s, s.maxHp, false, 'physical', 'test', 'hit');
+    sim.tick();
+    expect(st.chains[3].broken).toBe(true);
+    expect(lockbound(r)).toBeCloseTo(0.6, 10);
+  });
+});
