@@ -1168,7 +1168,11 @@ describe('the new dungeons', () => {
           Math.abs(e.pos.x - origin.x) < 120,
       ).length;
     expect(addsNear()).toBe(0);
+    // The waves are his encounter's (encounters/gravewyrm_sanctum/velkhar.ts):
+    // they come while he is in his fight, on a target.
     velkhar.inCombat = true;
+    velkhar.aggroTargetId = a;
+    velkhar.aiState = 'attack';
     velkhar.hp = Math.floor(velkhar.maxHp * 0.6);
     sim.tick();
     expect(addsNear()).toBe(3);

@@ -157,6 +157,7 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       glacier_splinter: 1,
       sledge_tusker: 1,
       korgath_the_bound: 1,
+      grand_necromancer_velkhar: 1,
       korzul_the_gravewyrm: 15,
     });
     // The bosses' and the Tusker's pools from fight length x 150 party DPS.

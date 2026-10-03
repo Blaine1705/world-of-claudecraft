@@ -246,6 +246,8 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       sledge_tusker: 1,
       // Korgath's chain kit is stated LANDED (KORGATH_TUNING).
       korgath_the_bound: 1,
+      // Velkhar's Soulfire Trench and Shadow Volley are stated LANDED.
+      grand_necromancer_velkhar: 1,
       korzul_the_gravewyrm: 15,
     },
   },
@@ -766,6 +768,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       // about 45 percent, a fumbled Strain or Stomp about 55 (the Foundry's
       // boss convention).
       korgath_the_bound: 2.5,
+      // The bosses' telegraphed mechanics on the Foundry's heroic factor.
+      grand_necromancer_velkhar: 2.5,
     },
     armorMultiplier: 1.2,
     finalBossId: 'korzul_the_gravewyrm',

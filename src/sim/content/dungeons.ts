@@ -977,7 +977,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 20,
     moveSpeed: 7,
     aggroRadius: 15,
-    summonAdds: { mobId: 'raised_bonewalker', count: 3, atHpPct: [0.66, 0.33] },
+    // His Raised Bonewalkers (the Waking Thaw and the kept 66 and 33 percent
+    // waves) climb out of the thaw pools: encounters/gravewyrm_sanctum/velkhar.ts
+    // owns them, so the template carries no summonAdds.
     loot: [
       { copper: 5000, chance: 1 },
       {
