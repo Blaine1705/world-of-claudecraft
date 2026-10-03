@@ -228,7 +228,7 @@ const SHOTS = [
     id: 'jefe3_placas',
     at: [0, 190],
     stage: [KORZUL, 12, PI],
-    cmds: [T('crack 0'), T('crack 1'), T('break 2'), T('break 8')],
+    cmds: [T('crack0'), T('crack1'), T('break2'), T('break8')],
     cmdWait: 200,
     pitch: 0.9,
     dist: 60,
@@ -293,7 +293,7 @@ const SHOTS = [
     id: 'jefe3_cria',
     at: [0, 190],
     stage: [KORZUL, 18, PI],
-    cmds: [T('break 1'), T('break 3'), T('flight'), T('brood')],
+    cmds: [T('break1'), T('break3'), T('flight'), T('brood')],
     cmdWait: 1600,
     pitch: 0.6,
     dist: 40,
@@ -428,11 +428,12 @@ async function main() {
         }
         tag.textContent = hide ? '#ui, #nameplates { display: none !important; }' : '';
       }, !shot.hud);
-      // Strays from an earlier shot drop their fight (each boss resets).
+      // Strays from an earlier shot drop their fight (each boss resets; the
+      // Seal Shackles are Korgath's parts and follow his fight).
       await page.evaluate(() => {
         const sim = window.__game.world;
         for (const e of [...sim.entities.values()]) {
-          if (e.kind !== 'mob' || e.dead) continue;
+          if (e.kind !== 'mob' || e.dead || e.templateId.startsWith('sanctum_shackle_')) continue;
           if (e.inCombat) {
             e.inCombat = false;
             e.aggroTargetId = null;
