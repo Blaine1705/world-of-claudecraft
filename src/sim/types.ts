@@ -9,6 +9,9 @@ import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
 import type { TreasureMapRarity } from './content/treasure_maps';
+import type { KorgathFightState } from './encounters/gravewyrm_sanctum/korgath_state';
+import type { KorzulFightState } from './encounters/gravewyrm_sanctum/korzul_state';
+import type { VelkharFightState } from './encounters/gravewyrm_sanctum/velkhar_state';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
@@ -4912,7 +4915,11 @@ export interface TuskerFightState {
   casts: number;
 }
 
-export type SanctumFightState = TuskerFightState;
+export type SanctumFightState =
+  | TuskerFightState
+  | KorgathFightState
+  | VelkharFightState
+  | KorzulFightState;
 
 /** Morthen's entrance and the Knellwyrm finale at the Hollow Crypt's Rite Ring
  *  (encounters/hollow_crypt), on Morthen for the claim's life: the entrance

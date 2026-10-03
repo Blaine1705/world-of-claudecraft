@@ -5,6 +5,10 @@
 //
 // docs/design/dungeon-rework/gravewyrm_sanctum.md sections 3, 5 and 6.
 
+import { SANCTUM_BOSS_OBJECT_TEMPLATES } from './boss_ids';
+
+export * from './boss_ids';
+
 export const SANCTUM_DUNGEON = 'gravewyrm_sanctum';
 
 /** The three bosses, in route order (their cores are phase B). */
@@ -147,4 +151,5 @@ export const SANCTUM_OBJECT_TEMPLATES: ReadonlySet<string> = new Set<string>([
   SANCTUM_SOULFIRE_PATCH,
   SANCTUM_TOSS_RING,
   ...Array.from({ length: SANCTUM_STORY_STEPS + 1 }, (_, i) => sanctumStoryTemplate(i)),
+  ...SANCTUM_BOSS_OBJECT_TEMPLATES,
 ]);

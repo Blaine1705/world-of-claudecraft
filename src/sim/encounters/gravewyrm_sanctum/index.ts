@@ -11,11 +11,16 @@ import { sweepOrphanTossRings } from '../../mob/trash_kit/sanctum_kit';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
 import { bossEngaged, claimBoss, sanctumClaims } from './claim';
-import { SLEDGE_TUSKER_ID } from './ids';
+import { KORGATH_ID, KORZUL_ID, SLEDGE_TUSKER_ID, VELKHAR_ID } from './ids';
+import { tickKorgath } from './korgath';
+import { tickKorzul } from './korzul';
 import { stepPatches, tickTusker } from './sledge_tusker';
 import { tickStory } from './story';
+import { tickVelkhar } from './velkhar';
 
 export * from './ids';
+export { korgathDevTrigger } from './korgath';
+export { korzulDevTrigger } from './korzul';
 export {
   enrageTusker,
   spillBraziers,
@@ -25,6 +30,7 @@ export {
   tuskerState,
 } from './sledge_tusker';
 export { earnedStoryStep, raiseStory, storyMarkers, storyStep } from './story';
+export { velkharDevTrigger } from './velkhar';
 
 /** A live fight whose mob lost its target for a moment (the tank falling)
  *  while still in combat and not evading: the fight holds, so a blip never
@@ -48,6 +54,13 @@ export function tickSanctumEncounters(ctx: SimContext): void {
     else if (tusker?.sanctumFight?.kind === 'tusker')
       // A blip with no target holds the fight, but its braziers still burn out.
       stepPatches(ctx, inst, tusker, tusker.sanctumFight);
+    // The three bosses (phase B), in route order. A paused fight holds.
+    const korgath = claimBoss(ctx, inst, KORGATH_ID);
+    if (korgath && !paused(korgath)) tickKorgath(ctx, inst, korgath, bossEngaged(korgath));
+    const velkhar = claimBoss(ctx, inst, VELKHAR_ID);
+    if (velkhar && !paused(velkhar)) tickVelkhar(ctx, inst, velkhar, bossEngaged(velkhar));
+    const korzul = claimBoss(ctx, inst, KORZUL_ID);
+    if (korzul && !paused(korzul)) tickKorzul(ctx, inst, korzul, bossEngaged(korzul));
     tickStory(ctx, inst);
     sweepOrphanBurstRings(ctx, inst);
     sweepOrphanTossRings(ctx, inst);

@@ -29,6 +29,10 @@ import { GRAVEWYRM_SANCTUM_ANCHORS } from '../content/gravewyrm_sanctum_layout';
 import { DUNGEONS, instanceOrigin, MOBS } from '../data';
 import {
   enrageTusker,
+  KORGATH_ID,
+  KORZUL_ID,
+  korgathDevTrigger,
+  korzulDevTrigger,
   SLEDGE_TUSKER_ID,
   sanctumStoryTemplate,
   spillBraziers,
@@ -36,6 +40,8 @@ import {
   startTuskSweep,
   storyMarkers,
   tuskerState,
+  VELKHAR_ID,
+  velkharDevTrigger,
 } from '../encounters/gravewyrm_sanctum';
 import { bossEngaged, claimBoss } from '../encounters/gravewyrm_sanctum/claim';
 import { createMob } from '../entity';
@@ -172,6 +178,17 @@ export function killSanctumMatching(
 /** `/dev sanctum trigger <mechanic>`: fire an engaged Sledge Tusker's mechanic
  *  now, cutting whatever bar runs so it always shows. */
 export function sanctumDevTrigger(ctx: SimContext, inst: InstanceSlot, what: string): string {
+  // An engaged boss answers first (each owns its own mechanic names).
+  for (const [id, trigger] of [
+    [KORGATH_ID, korgathDevTrigger],
+    [VELKHAR_ID, velkharDevTrigger],
+    [KORZUL_ID, korzulDevTrigger],
+  ] as const) {
+    const boss = claimBoss(ctx, inst, id);
+    if (!boss || boss.dead || !bossEngaged(boss)) continue;
+    const reply = trigger(ctx, inst, boss, what);
+    if (reply !== null) return reply;
+  }
   const tusker = claimBoss(ctx, inst, SLEDGE_TUSKER_ID);
   if (!tusker || tusker.dead || !bossEngaged(tusker))
     return 'Pull the Sledge Tusker first (sweep, trample, spill, enrage).';
