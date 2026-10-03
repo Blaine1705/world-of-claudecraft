@@ -1007,7 +1007,10 @@ const MONOLITHS: MonolithRow[] = [
     // folded into one (the Hollow Crypt drake paints its own breath).
     // Lowered after extracting the per-view far-mesh decision (the moving
     // holdout and the hysteresis latch) into src/render/far_lod_latch.ts.
-    ceiling: 12663,
+    // LOWERED 12663 -> 12661: the boot-attached static dressing list (lake
+    // flora, the Farshore strand, now the Sanctum's Seal Gate) moved into
+    // src/render/static_world_features.ts. wc -l. Exact count.
+    ceiling: 12661,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

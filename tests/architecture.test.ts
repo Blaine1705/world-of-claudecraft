@@ -935,6 +935,8 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_room_themes_core.ts',
   'src/render/hoard_tide_wave_fx_core.ts',
   'src/render/hoard_entrance_core.ts',
+  // The Gravewyrm Sanctum Seal Gate's cosmetic plan (mist flow, rime fan).
+  'src/render/sanctum_seal_gate_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',

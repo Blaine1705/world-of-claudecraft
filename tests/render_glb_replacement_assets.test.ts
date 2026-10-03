@@ -43,6 +43,7 @@ import { ignivarEnvPropsInternalsForTest } from '../src/render/ignivar_env_props
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
+import { sanctumSealGatePreloadInternalsForTest } from '../src/render/sanctum_seal_gate';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
 import { transportShipInternalsForTest } from '../src/render/transport_ship';
 import { wickharborHarborInternalsForTest } from '../src/render/wickharbor_harbor';
@@ -499,6 +500,10 @@ async function expectArmouryGlbContract(
 }
 
 describe('GLB-replacement asset preload sets resolve to real, manifested files', () => {
+  it('Gravewyrm Sanctum Seal Gate assets', () => {
+    for (const url of sanctumSealGatePreloadInternalsForTest.urls)
+      expectAssetExistsAndManifested(url);
+  });
   it('buried hoard entrance asset', () => {
     for (const url of hoardEntrancePreloadInternalsForTest.urls)
       expectAssetExistsAndManifested(url);

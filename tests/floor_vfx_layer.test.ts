@@ -97,6 +97,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/decor_torch_fx.ts', layer: 'ground', strict: true },
   { file: 'src/render/impact_site.ts', layer: 'ground', strict: true },
   { file: 'src/render/hill_ring.ts', layer: 'ground', strict: true },
+  // The Sanctum Seal Gate's rime fan and the cold mist it breathes out over
+  // the plaza: the world's own marks, under every telegraph.
+  { file: 'src/render/sanctum_seal_gate.ts', layer: 'ground', strict: true },
   // A Buried Hoard boss room's additive floor light under its kit props, kept on
   // the order it shipped with (2, the ground band's second rung).
   { file: 'src/render/hoard_room_kit.ts', layer: 'ground', strict: true },

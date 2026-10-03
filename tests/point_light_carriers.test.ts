@@ -516,6 +516,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'campfire and prop fire lights, the seed of the fireLights registry, mass hidden in the constructor',
   'render/quest_objects.ts':
     'the ground-object glow inside the entity view body, a view light marked on reconcile',
+  'render/sanctum_seal_gate.ts':
+    'the Seal Gate rune light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/realm_flora.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/soulwell.ts':
