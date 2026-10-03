@@ -1637,6 +1637,8 @@ const baseEnTable = {
   // localizes an owned mob's name through this aura-name map).
   'aura.trinketSpiritJaguar': 'Spirit Jaguar',
   'error.trinketNoHeat': 'Your heart holds no heat.',
+  'error.trinketNeedAlly': 'You need an ally as your target.',
+  'aura.trinketQuenched': 'Quenched',
 } as const;
 
 const petEnTable = {
@@ -17740,6 +17742,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Overclocked: 'aura.trinketOverclocked',
   Overheated: 'aura.trinketOverheated',
   'Spirit Jaguar': 'aura.trinketSpiritJaguar',
+  Quenched: 'aura.trinketQuenched',
   'Crafted Momentum': 'aura.craftedMomentum',
   'Crafted Shelter': 'aura.craftedShelter',
   'Crafted Preservation': 'aura.craftedPreservation',
@@ -18377,6 +18380,9 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   "Rangefinder's Lens": 'rangefinders_lens',
   "Fanglord's Whistle": 'fanglords_whistle',
   'Gorgebloom Seedpod': 'gorgebloom_seedpod',
+  "Foreman's Last Link": 'foremans_last_link',
+  'Phial of the Tithe': 'phial_of_the_tithe',
+  'Quenchwater Flask': 'quenchwater_flask',
   'Heart of the Crucible': 'heart_of_the_crucible',
 };
 

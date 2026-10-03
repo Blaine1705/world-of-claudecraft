@@ -184,6 +184,10 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // Held model reuses a shipped GLB (the heroic clone rides heroicOf).
   falls_blessed_staff: 'staff_c', // a gnarled, vine-wound staff of the falls
 
+  // ---- The Gravewyrm Sanctum rework (gravewyrm_sanctum_items.ts) --------------
+  // Held model reuses a shipped GLB.
+  hammer_of_the_open_lock: 'hammer_c', // heroic epic: the Smith's forge hammer
+
   // ---- Crucible of the Last Spring raid weapons (ignivar_loot.ts) -------------
   // Held models reuse shipped GLBs.
   forgefathers_warhammer: 'hammer_c',

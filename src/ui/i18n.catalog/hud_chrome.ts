@@ -3901,6 +3901,12 @@ export const hudChromeStrings = {
         'Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.',
       seedburst:
         'Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.',
+      tether:
+        'Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.',
+      harvest:
+        'For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.',
+      quench:
+        'Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
       heartNova:
         'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
     },
@@ -5368,6 +5374,16 @@ export const hudChromeStrings = {
         'A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.',
       seedburst:
         'A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.',
+      tether:
+        "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+      tetherLink: 'You take {pct}% of the damage your chained ally would take.',
+      harvest:
+        'Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.',
+      quench:
+        "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+      quenchOther:
+        "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+      quenched: 'Attack speed slowed by {pct}%.',
       forgeHeat:
         "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
       tempered:

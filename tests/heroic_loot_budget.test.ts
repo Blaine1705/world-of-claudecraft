@@ -163,9 +163,16 @@ const BASELINE = {
     normalDigest: 'aa4c9a380d095266e6cd74de3869ac1652f4a896af53c6bdd4cf406fa35ee01c',
     gearDigest: '0706bc5d99ae991d9db6e7b1aeb32b0415f147bff9ee2ed267e2d7c95a87747c',
   },
+  // Re-minted for the Gravewyrm Sanctum rework (gravewyrm_sanctum.md 9.1 and
+  // 9.2): Korgath and Velkhar drop their own normal trios (the shared
+  // Korzul trio left their normal tables, so their normalDigest moved) and
+  // each heroic partition gains its new epic and trinket (Korzul a trinket),
+  // the shipped rows keeping their ratios. No existing item def changed.
   korgath_the_bound: {
     gearIds: [
       'boneplate_vest',
+      'foremans_last_link',
+      'hammer_of_the_open_lock',
       'heroic_boundstone_helm',
       'heroic_gravewyrm_mantle',
       'heroic_gravewyrm_sabatons',
@@ -179,8 +186,8 @@ const BASELINE = {
       'revenant_silk_robe',
       'zealotsbane_blade',
     ],
-    normalDigest: '48c75a437f0d7672490273450f6a49fbc974378155beefd3184a71cea13c2521',
-    gearDigest: '3b2983de5d71e532d19a604a4cbdbf843d264f7ac974d8b44562892cba824dc7',
+    normalDigest: '6fa5a52afef7983ca8991697d2e796dc4bc84d0de46a7d10ce98e1ab60f35bf8',
+    gearDigest: 'c4033bc838d0e8d8f6e8a4f81e3ec8120489ff1b740622268a49c381ba96ab84',
   },
   grand_necromancer_velkhar: {
     gearIds: [
@@ -194,10 +201,12 @@ const BASELINE = {
       'heroic_staff_of_velkhar',
       'heroic_wyrmshadow_legguards',
       'nightwalk_jerkin',
+      'phial_of_the_tithe',
       'revenant_silk_robe',
+      'vestments_of_the_waking_rite',
     ],
-    normalDigest: 'e9b35e13c5de33a5bf786cdba760f19b6b769a4bf712de6ee2ff0698ed1fcb09',
-    gearDigest: '19d839abf88e5d2efdbd0230589c511e709e2ec65cd13c9da3df67a2207bbda5',
+    normalDigest: '62c880eee810ad051ad35935d67b930d3c651c9c8cf144469a5c2c56a8c078b2',
+    gearDigest: 'da77419dc10780f1b5396a508652704acdce97e8654f14f3f7d2241c53de40db',
   },
   korzul_the_gravewyrm: {
     gearIds: [
@@ -223,6 +232,7 @@ const BASELINE = {
       'heroic_wyrmshadow_harness',
       'heroic_wyrmshadow_talongrips',
       'nightwalk_jerkin',
+      'quenchwater_flask',
       'revenant_silk_robe',
       'sanctum_prowlers_grips',
       'shroud_of_the_gravewyrm',
@@ -230,7 +240,7 @@ const BASELINE = {
       'wyrmchoir_handwraps',
     ],
     normalDigest: '0ac50f2ff6acdc808e5c24f721c84b337eade18ea81d2463f77bdd437599946a',
-    gearDigest: '483612e11a843da003d682b74a7934bc686b57107e8a39dc779285efdb198c6a',
+    gearDigest: '1b45c53a49eac046886c4ccb2e2c7fb5db583abc3002e8b7bded49e194e2eead',
   },
   // The Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md
   // 8.1 and 8.2), a new five-player dungeon: every boss carries its own normal

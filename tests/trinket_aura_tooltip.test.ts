@@ -107,6 +107,11 @@ describe('trinket aura icons', () => {
       trinket_overheated: 'overclocked_governor',
       trinket_spirit_pack: 'fanglords_whistle',
       trinket_seedburst: 'gorgebloom_seedpod',
+      trinket_tether: 'foremans_last_link',
+      trinket_tether_link: 'foremans_last_link',
+      trinket_harvest: 'phial_of_the_tithe',
+      trinket_quench: 'quenchwater_flask',
+      trinket_quenched: 'quenchwater_flask',
     });
     // Every trinket with a use or passive aura owns at least one of them; the
     // Medallion of Defiance applies none (it only breaks control).
@@ -260,6 +265,32 @@ describe('trinket aura tooltips (English)', () => {
       'Gorgebloom Seedpod',
       own({ id: TRINKET_AURA.seedburst, kind: 'internal_cd', value: 135 }),
       'A Gorgebloom seed. When this expires it bursts for 135 Nature damage to each enemy within 8 yd, or 50% more (203) if this enemy dies before then.',
+    ],
+    [
+      "Foreman's Last Link (the chained ally)",
+      foreign({ id: TRINKET_AURA.tether, kind: 'internal_cd', value: 0.3 }),
+      "Chained by Foreman's Last Link: 30% of the damage that would reach your health is dealt to the one who chained you instead.",
+    ],
+    [
+      "Foreman's Last Link (the wearer)",
+      own({ id: TRINKET_AURA.tetherLink, kind: 'internal_cd', value: 12 }),
+      'You take 30% of the damage your chained ally would take.',
+    ],
+    [
+      'Phial of the Tithe',
+      own({ id: TRINKET_AURA.harvest, kind: 'internal_cd', value: 0.05, value2: 20 }),
+      'Each hostile creature that dies within 20 yd of you restores 5% of your maximum health and mana.',
+    ],
+    [
+      // 40 plus 20% of 500 Attack Power: 140.
+      'Quenchwater Flask',
+      own({ id: TRINKET_AURA.quench, kind: 'internal_cd', value: 2, stacks: 2 }),
+      "Your next 2 weapon hits deal 140 extra Frost damage. The last one slows the target's attacks by 15%.",
+    ],
+    [
+      'Quenched',
+      foreign({ id: TRINKET_AURA.quenched, kind: 'attackspeed', value: 1 / 0.85 }),
+      'Attack speed slowed by 15%.',
     ],
     [
       'Overheated',

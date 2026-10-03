@@ -480,7 +480,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // The Stormbrass Foundry adds thirteen (six rares, five heroic epics, two
     // trinkets): 517. The Wildheart Basin rework adds five (the Falls-Blessed
     // Staff, two heroic epics, two trinkets): 522.
-    expect(full).toEqual({ owned: 522, total: 522 });
+    // The Gravewyrm Sanctum rework adds five (two heroic epics, three
+    // trinkets): 527.
+    expect(full).toEqual({ owned: 527, total: 527 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -516,7 +518,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 471 with the Sunken Bastion rework's five new relics; 475 with the Drowned
     // Temple rework's four; 488 with the Stormbrass Foundry's thirteen; 493
     // with the Wildheart Basin rework's five.
-    expect(character).toEqual({ owned: 493, total: 493 });
+    // 498 with the Gravewyrm Sanctum rework's five.
+    expect(character).toEqual({ owned: 498, total: 498 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -584,7 +587,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +4: the Drowned Temple rework's new relics on its two pages: 691.
       // +13: the Stormbrass Foundry's two new pages: 704.
       // +5: the Wildheart Basin rework's new relics on its two pages: 709.
-    ).toBe(709);
+      // +5: the Gravewyrm Sanctum rework's new relics on its heroic page: 714.
+    ).toBe(714);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -823,7 +827,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // +4: the Drowned Temple rework's new relics: 530.
     // +13: the Stormbrass Foundry's new relics: 543.
     // +5: the Wildheart Basin rework's new relics: 548.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(548);
+    // +5: the Gravewyrm Sanctum rework's new relics: 553.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(553);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1104,6 +1109,9 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     wildheart_beastmaster: 'conquerors_wildheart_basin_heroic',
     the_gorgebloom: 'conquerors_wildheart_basin_heroic',
     wildheart_high_priest: 'conquerors_wildheart_basin_heroic',
+    // The Gravewyrm Sanctum rework: three bosses, one shared heroic page.
+    korgath_the_bound: 'conquerors_gravewyrm_sanctum_heroic',
+    grand_necromancer_velkhar: 'conquerors_gravewyrm_sanctum_heroic',
     [NYTHRAXIS_RAID_BOSS_ID]: 'conquerors_nythraxis_heroic',
     ignivar_herald_of_the_last_flame: 'conquerors_ignivar_heroic',
     varkhul_forgefather_of_the_last_flame: 'conquerors_varkhul_heroic',
@@ -1209,8 +1217,16 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     }
     // Anti-vacuity: something is actually excluded, and every id of every excluded boss is
     // a carve-out, so GEAR_BOSSES cannot silently shed a boss that still owes the catalog.
+    // Korgath and Velkhar were the last all-carve-out bosses until the
+    // Gravewyrm Sanctum rework gave each a new epic and trinket, so no whole
+    // boss drops out today; the walk still proves the filter excludes ids.
     const droppedBosses = Object.keys(HEROIC_BOSS_LOOT).filter((b) => !GEAR_BOSSES.includes(b));
-    expect(droppedBosses.length).toBeGreaterThan(0);
+    const excludesSomething = Object.values(HEROIC_BOSS_LOOT).some(
+      (entries) =>
+        catalogueableHeroicIds(entries).length <
+        new Set(entries.flatMap((e) => (typeof e.itemId === 'string' ? [e.itemId] : []))).size,
+    );
+    expect(excludesSomething).toBe(true);
     for (const bossId of droppedBosses) {
       for (const entry of HEROIC_BOSS_LOOT[bossId]) {
         if (entry.preserveSourceTier) continue;
@@ -2153,7 +2169,12 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       // other three by their "the ..." forms.
       conquerors_stormbrass_foundry: ['line_master_tock'],
       conquerors_gravewyrm_sanctum: ['korzul_the_gravewyrm'],
-      conquerors_gravewyrm_sanctum_heroic: ['korzul_the_gravewyrm'],
+      // The Gravewyrm Sanctum heroic page names all three bosses in full.
+      conquerors_gravewyrm_sanctum_heroic: [
+        'korgath_the_bound',
+        'grand_necromancer_velkhar',
+        'korzul_the_gravewyrm',
+      ],
       // The Wildheart Basin pages name the Fanglord Beastmaster in full (and
       // Zulgar in full on the heroic page); "the Gorgebloom" is the lower-case
       // running form of "The Gorgebloom".
@@ -3218,7 +3239,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // NINE since Masterwrought phase 11l: the trophy recipe route added
   // fromProfession('leatherworking') beside the quiver's korzul hint.
   conquerors_gravewyrm_sanctum: 9,
-  conquerors_gravewyrm_sanctum_heroic: 1,
+  // The Gravewyrm Sanctum rework: all three bosses pay the heroic page.
+  conquerors_gravewyrm_sanctum_heroic: 3,
   // The Wildheart Basin rework: the Gorgebloom's staff joins the normal page;
   // all three bosses pay the heroic page.
   conquerors_wildheart_basin: 3,
@@ -4817,7 +4839,8 @@ describe('Reliquary source hint coverage', () => {
     // way with the rework's three bosses: 13. The Drowned Temple heroic page
     // did the same with its three: 12. The Wildheart Basin heroic page did the
     // same with its three: 11.
-    expect(defaults).toBe(11);
+    // The Gravewyrm Sanctum heroic page did the same with its three: 10.
+    expect(defaults).toBe(10);
   });
 });
 

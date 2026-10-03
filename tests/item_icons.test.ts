@@ -329,8 +329,9 @@ describe('item webp icons', () => {
     // Stormbrass Foundry's six (tocks_torque_wrench, voltaic_coil_staff,
     // piston_maul, cellspark_dagger, governors_scepter,
     // line_masters_steam_hammer): 155, plus the Wildheart Basin rework's
-    // Falls-Blessed Staff: 156.
-    expect(WEAPON_IMAGE_IDS.size).toBe(156);
+    // Falls-Blessed Staff: 156, plus the Gravewyrm Sanctum rework's Hammer of
+    // the Open Lock: 157.
+    expect(WEAPON_IMAGE_IDS.size).toBe(157);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

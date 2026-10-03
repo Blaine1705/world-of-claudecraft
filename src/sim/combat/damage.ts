@@ -153,6 +153,7 @@ import {
 import { duskhymnChannelStopped, vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
+import { onHarvestDeath, tetherRedirect } from './sanctum_trinkets';
 import { applySetProcs } from './set_procs';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
@@ -754,6 +755,9 @@ export function dealDamage(
   // sharing, so only damage that would reach health can be reduced/transferred.
   if (!resolvedHpLoss) {
     amount = mitigateVicariousSuffering(ctx, source, target, amount, abilityId);
+    // Foreman's Last Link moves its share of what is left to the tether's
+    // wearer (combat/sanctum_trinkets.ts).
+    amount = tetherRedirect(ctx, source, target, amount, school, abilityId);
   }
 
   if (target.damageFloorHp !== undefined) {
@@ -1535,6 +1539,9 @@ export function handleDeath(
   if (killer && killer.id !== e.id && !killer.dead) {
     applySetProcs(ctx, killer, e, 'kill');
   }
+  // The Phial of the Tithe pays every nearby wearer for an enemy's death
+  // (combat/sanctum_trinkets.ts). No rng.
+  if (e.kind === 'mob') onHarvestDeath(ctx, e);
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn

@@ -38,6 +38,13 @@ import { meleeSwing } from './auto_attack';
 import { isUnbreakableControlAura } from './cc';
 import { applyHeal } from './heal';
 import { relocateSwept } from './heroic_leap';
+import {
+  applyHarvest,
+  applyQuench,
+  applyTether,
+  quenchStrike,
+  tetherTarget,
+} from './sanctum_trinkets';
 import { plantSeedpod, summonSpiritJaguar } from './wildheart_trinkets';
 
 /** The control kinds the Mooring Stone shrugs off and the Medallion breaks. */
@@ -539,6 +546,24 @@ export function useWornTrinket(
       else plantSeedpod(ctx, p, target, use);
       break;
     }
+    case 'tether': {
+      // The Gravewyrm Sanctum's three (combat/sanctum_trinkets.ts).
+      const ally = tetherTarget(ctx, p, use.range);
+      if (!ally) {
+        ctx.error(meta.entityId, 'You need an ally as your target.');
+        return false;
+      }
+      applyTether(ctx, p, ally, use);
+      break;
+    }
+    case 'harvest': {
+      applyHarvest(ctx, p, use);
+      break;
+    }
+    case 'quench': {
+      applyQuench(ctx, p, use);
+      break;
+    }
     case 'heartNova': {
       const stacks = findAura(p, TRINKET_AURA.guardHeat)?.stacks ?? 0;
       if (stacks <= 0) {
@@ -667,6 +692,7 @@ export function runTrinketTrigger(
     if (passive?.kind === 'twinStrike') twinStrike(ctx, source, target, passive);
     // Last, so an earlier rider never lands on a target the fire just killed.
     if (worn.spec.use.kind === 'temper') temperStrike(ctx, source, target, worn.spec.use);
+    else if (worn.spec.use.kind === 'quench') quenchStrike(ctx, source, target, worn.spec.use);
   }
   if (trigger === 'weaponHit' && passive?.kind === 'heat') {
     addStack(ctx, source, TRINKET_AURA.heat, 'Forge Heat', passive.max, passive.duration);

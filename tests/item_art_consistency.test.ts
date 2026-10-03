@@ -1020,12 +1020,14 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Sunken Bastion fifth pass's three Gaol Turnkey loot icons: 1,486.
     // The Stormbrass Foundry's 27 loot icons (stormbrass-foundry-icons-2026-10-01): 1,513.
     // The Wildheart Basin rework's 11 loot icons (wildheart-basin-icons-2026-10-02): 1,524.
-    expect(new Set(currentOwnerIds).size).toBe(1524);
-    expect(shippingIds).toHaveLength(1524);
+    // The Gravewyrm Sanctum rework's 11 loot icons (gravewyrm-sanctum-icons-2026-10-03): 1,535.
+    expect(new Set(currentOwnerIds).size).toBe(1535);
+    expect(shippingIds).toHaveLength(1535);
     // 1,660 + the Foundry's 26 item definitions and their 6 generated heroic
     // rares = 1,692, + the Wildheart Basin rework's 11 definitions and its one
     // generated heroic rare (the Heroic Falls-Blessed Staff) = 1,704.
-    expect(Object.keys(ITEMS)).toHaveLength(1704);
+    // + the Gravewyrm Sanctum rework's 11 definitions = 1,715.
+    expect(Object.keys(ITEMS)).toHaveLength(1715);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1196,6 +1198,7 @@ describe('item-art consistency accepted-art provenance', () => {
               'drowned-temple-icons-2026-09-30',
               'stormbrass-foundry-icons-2026-10-01',
               'wildheart-basin-icons-2026-10-02',
+              'gravewyrm-sanctum-icons-2026-10-03',
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1371,7 +1374,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // the Drowned Temple rework's (drowned-temple-icons-2026-09-30) another,
     // and the Stormbrass Foundry's (stormbrass-foundry-icons-2026-10-01) another,
     // and the Wildheart Basin rework's (wildheart-basin-icons-2026-10-02) another.
-    expect(mapping.generatedBatches).toHaveLength(45);
+    // and the Gravewyrm Sanctum rework's (gravewyrm-sanctum-icons-2026-10-03) another.
+    expect(mapping.generatedBatches).toHaveLength(46);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1446,14 +1450,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Sunken Bastion fifth pass adds the Gaol Turnkey's 3 to its batch: 956.
     // The Stormbrass Foundry loot batch (stormbrass-foundry-icons-2026-10-01) adds 27: 983.
     // The Wildheart Basin loot batch (wildheart-basin-icons-2026-10-02) adds 11: 994.
-    expect(priorGeneratedIds).toHaveLength(994);
+    // The Gravewyrm Sanctum loot batch (gravewyrm-sanctum-icons-2026-10-03) adds 11: 1005.
+    expect(priorGeneratedIds).toHaveLength(1005);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // + the Stormbrass Foundry's 27 = 1,513. + the Wildheart Basin's 11 = 1,524.
-    expect(allCurrentOwnerIds).toHaveLength(1524);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1524);
+    // + the Gravewyrm Sanctum's 11 = 1,535.
+    expect(allCurrentOwnerIds).toHaveLength(1535);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1535);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1472,7 +1478,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Gaol Turnkey's 3 (the Bastion fifth pass) = 956.
       // + the Stormbrass Foundry's 27 loot icons = 983.
       // + the Wildheart Basin rework's 11 loot icons = 994.
-      priorGenerated: 994,
+      // + the Gravewyrm Sanctum rework's 11 loot icons = 1005.
+      priorGenerated: 1005,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1558,6 +1565,8 @@ describe('item-art consistency accepted-art provenance', () => {
                 'stormbrass-foundry-icons-2026-10-01',
                 // The Wildheart Basin rework's loot.
                 'wildheart-basin-icons-2026-10-02',
+                // The Gravewyrm Sanctum rework's loot.
+                'gravewyrm-sanctum-icons-2026-10-03',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1707,10 +1716,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483. Plus the Gaol Turnkey's 3 (the Bastion fifth pass) = 1486. Plus the Stormbrass Foundry's 27 loot icons = 1513. Plus the Wildheart Basin rework's 11 loot icons = 1524.
-    if (ownerIds.length !== 1524)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1524`);
-    if (fileIds.length !== 1524) violations.push(`shipping WebP count: ${fileIds.length} != 1524`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483. Plus the Gaol Turnkey's 3 (the Bastion fifth pass) = 1486. Plus the Stormbrass Foundry's 27 loot icons = 1513. Plus the Wildheart Basin rework's 11 loot icons = 1524. Plus the Gravewyrm Sanctum rework's 11 loot icons = 1535.
+    if (ownerIds.length !== 1535)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1535`);
+    if (fileIds.length !== 1535) violations.push(`shipping WebP count: ${fileIds.length} != 1535`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

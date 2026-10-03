@@ -139,6 +139,25 @@ export type TrinketUse =
       flat: number;
       coef: number;
       deathBonus: number;
+    }
+  /** Foreman's Last Link: chain yourself to an ally (not yourself) within
+   *  `range` for `duration`; `share` of the damage that reaches their health is
+   *  taken by you instead. */
+  | { kind: 'tether'; range: number; duration: number; share: number }
+  /** Phial of the Tithe: for `duration`, each enemy that dies within `radius`
+   *  of you restores `restore` of your maximum health and mana. */
+  | { kind: 'harvest'; duration: number; radius: number; restore: number }
+  /** Quenchwater Flask: your next `hits` weapon hits within `duration` deal
+   *  `flat` (+ `coef` of your Attack Power) bonus frost damage; the last one
+   *  quenches the target, slowing its attacks by `slow` for `slowDuration`. */
+  | {
+      kind: 'quench';
+      duration: number;
+      hits: number;
+      flat: number;
+      coef: number;
+      slow: number;
+      slowDuration: number;
     };
 
 /** What a trinket does on its own while worn. */
@@ -208,6 +227,11 @@ export const TRINKET_AURA = Object.freeze({
   overheated: 'trinket_overheated',
   spiritPack: 'trinket_spirit_pack',
   seedburst: 'trinket_seedburst',
+  tether: 'trinket_tether',
+  tetherLink: 'trinket_tether_link',
+  harvest: 'trinket_harvest',
+  quench: 'trinket_quench',
+  quenched: 'trinket_quenched',
 });
 
 /** The Mooring Stone's self-slow rides its own aura id beside the anchor
@@ -251,6 +275,11 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.overheated]: 'overclocked_governor',
   [TRINKET_AURA.spiritPack]: 'fanglords_whistle',
   [TRINKET_AURA.seedburst]: 'gorgebloom_seedpod',
+  [TRINKET_AURA.tether]: 'foremans_last_link',
+  [TRINKET_AURA.tetherLink]: 'foremans_last_link',
+  [TRINKET_AURA.harvest]: 'phial_of_the_tithe',
+  [TRINKET_AURA.quench]: 'quenchwater_flask',
+  [TRINKET_AURA.quenched]: 'quenchwater_flask',
 });
 
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
@@ -334,6 +363,11 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   // 8.2): item level 31, line budget round(31 x 0.6 x 0.7) = 13.
   fanglords_whistle: trinket('fanglords_whistle', "Fanglord's Whistle", { agi: 13 }),
   gorgebloom_seedpod: trinket('gorgebloom_seedpod', 'Gorgebloom Seedpod', { int: 13 }),
+  // The Gravewyrm Sanctum's heroic bosses (the five-man heroic trinket line,
+  // docs/design/dungeon-rework/gravewyrm_sanctum.md 9.2): item level 31, 13.
+  foremans_last_link: trinket('foremans_last_link', "Foreman's Last Link", { sta: 13 }),
+  phial_of_the_tithe: trinket('phial_of_the_tithe', 'Phial of the Tithe', { int: 13 }),
+  quenchwater_flask: trinket('quenchwater_flask', 'Quenchwater Flask', { str: 13 }),
 };
 
 // The Crucible of the Last Spring raid trinkets, in the order they sit in their
@@ -489,6 +523,38 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
       flat: 75,
       coef: 0.6,
       deathBonus: 0.5,
+    },
+  },
+  // Foreman's Last Link: the classic Blessing of Sacrifice share (30 percent
+  // of the damage an ally takes moves to the caster) on the five-man heroic
+  // trinkets' 2 min timer, for 10 sec. It moves damage, never removes it: the
+  // tank's Stamina line is its price.
+  foremans_last_link: {
+    cooldown: 120,
+    use: { kind: 'tether', range: 20, duration: 10, share: 0.3 },
+  },
+  // Phial of the Tithe: 5 percent of health and mana per enemy that dies near
+  // you inside 15 sec. A five-man trash pack (four to six) pays 20 to 30
+  // percent, about one mana potion's worth at level 20; a lone boss pays 5.
+  phial_of_the_tithe: {
+    cooldown: 120,
+    use: { kind: 'harvest', duration: 15, radius: 20, restore: 0.05 },
+  },
+  // Quenchwater Flask: three swings of 40 frost plus 20 percent of Attack
+  // Power. At a heroic level-20 strength wearer's 250 Attack Power that is
+  // three hits of 90 (270), in line with the Rangefinder's Lens's 10 percent
+  // of a 230 DPS heroic for its 12 sec (about 276). The third one quenches:
+  // 15 percent slower attacks (the swing interval x 1 / 0.85) for 8 sec.
+  quenchwater_flask: {
+    cooldown: 120,
+    use: {
+      kind: 'quench',
+      duration: 12,
+      hits: 3,
+      flat: 40,
+      coef: 0.2,
+      slow: 0.15,
+      slowDuration: 8,
     },
   },
 });

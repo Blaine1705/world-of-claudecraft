@@ -806,7 +806,14 @@ export const RELIQUARY_HEROIC_GEAR = {
     'gravescale_girdle',
     'wyrmchoir_handwraps',
     'wildsoul_maul',
+    // The Gravewyrm Sanctum rework's Quenchwater Flask (gravewyrm_sanctum.md 9.2).
+    'quenchwater_flask',
   ],
+  // The Gravewyrm Sanctum rework (gravewyrm_sanctum.md 9.2): Korgath and
+  // Velkhar each pay a new epic and a trinket, Korzul a trinket; all three
+  // share the one heroic page.
+  korgath_the_bound: ['foremans_last_link', 'hammer_of_the_open_lock'],
+  grand_necromancer_velkhar: ['phial_of_the_tithe', 'vestments_of_the_waking_rite'],
   // The Wildheart Basin rework moved two of Zulgar's heroic epics onto the
   // promoted Fanglord Beastmaster and the Gorgebloom (wildheart_basin.md 8.2)
   // and gave each a new epic and a trinket; they share the one heroic page.
@@ -1254,10 +1261,20 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_gravewyrm_sanctum_heroic',
     shelf: 'conquerors',
     name: 'Heroic Gravewyrm Sanctum',
-    desc: 'Heroic-only epics from Korzul the Gravewyrm.',
+    desc: 'Heroic-only epics and trinkets from Korgath the Bound, Grand Necromancer Velkhar and Korzul the Gravewyrm.',
     clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'heroic' },
-    sourceDefault: fromBoss('korzul_the_gravewyrm'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.korzul_the_gravewyrm),
+    // The shipped seven keep their slots and order; the rework (gravewyrm_
+    // sanctum.md section 10) appends Korzul's Quenchwater Flask, then Korgath's
+    // and Velkhar's new epics and trinkets, each hinted to its boss.
+    relics: items(
+      ...RELIQUARY_HEROIC_GEAR.korzul_the_gravewyrm.map(
+        (id) => [id, fromBoss('korzul_the_gravewyrm')] as const,
+      ),
+      ['hammer_of_the_open_lock', fromBoss('korgath_the_bound')],
+      ['vestments_of_the_waking_rite', fromBoss('grand_necromancer_velkhar')],
+      ['foremans_last_link', fromBoss('korgath_the_bound')],
+      ['phial_of_the_tithe', fromBoss('grand_necromancer_velkhar')],
+    ),
   },
   {
     id: 'conquerors_wildheart_basin',

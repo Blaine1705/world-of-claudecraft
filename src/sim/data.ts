@@ -139,6 +139,7 @@ import {
 } from './content/galecrest';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
+import { GRAVEWYRM_SANCTUM_ITEMS } from './content/gravewyrm_sanctum_items';
 import {
   type GraveyardDef,
   LAST_KEEP_GRAVEYARD_ID,
@@ -444,6 +445,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DROWNED_TEMPLE_ITEMS,
   STORMBRASS_FOUNDRY_ITEMS,
   WILDHEART_BASIN_ITEMS,
+  GRAVEWYRM_SANCTUM_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,

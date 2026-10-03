@@ -30,6 +30,18 @@ export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
 // archetype; healer-facing pieces never take Hit (heals are not resisted by level).
 // The ilvl 33/37 raid variants scale these up + add a secondary rating (see
 // heroic_variants.ts). See docs/prd/combat-ratings-and-jewelry.md.
+/** A shipped heroic partition squeezed into `share` of a reworked boss's one
+ *  guaranteed equipment roll, its rows keeping their ratios (the Gravewyrm
+ *  Sanctum rework, gravewyrm_sanctum.md 9.2: the new epics and trinkets take
+ *  the rest). */
+function sharedPartition(
+  share: number,
+  rows: readonly (readonly [string, number])[],
+): [string, number][] {
+  const total = rows.reduce((sum, [, weight]) => sum + weight, 0);
+  return rows.map(([itemId, weight]) => [itemId, (weight * share) / total]);
+}
+
 export const ARMOR_RATING = 40; // 40 rating = 4.0%
 export const FIVE_MAN_WEAPON_RATING = 50; // 50 rating = 5.0%
 const RAID_WEAPON_PRIMARY_RATING = 65; // 65 rating = 6.5%
@@ -904,34 +916,44 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   ],
   korgath_the_bound: [
     ...weightedLootGroup('korgath_the_bound_heroic', [
-      ['boneplate_vest', 0.34],
-      ['revenant_silk_robe', 0.33],
-      ['nightwalk_jerkin', 0.33],
-      ['zealotsbane_blade', 0.19],
-      ['heroic_korgaths_chainwraps', 0.1],
-      ['heroic_staff_of_velkhar', 0.1],
-      ['heroic_shadowmeld_tunic', 0.1],
-      ['heroic_wyrmcult_grand_robe', 0.1],
-      ['heroic_gravewyrm_sabatons', 0.1],
-      ['heroic_wyrmcult_soulsteps', 0.1],
-      ['heroic_wyrmshadow_treads', 0.05],
-      ['heroic_boundstone_helm', 0.08],
-      ['heroic_gravewyrm_mantle', 0.08],
+      ['foremans_last_link', 0.2],
+      ['hammer_of_the_open_lock', 0.25],
+      // The shipped partition keeps its ratios inside the remaining 0.55.
+      ...sharedPartition(0.55, [
+        ['boneplate_vest', 0.34],
+        ['revenant_silk_robe', 0.33],
+        ['nightwalk_jerkin', 0.33],
+        ['zealotsbane_blade', 0.19],
+        ['heroic_korgaths_chainwraps', 0.1],
+        ['heroic_staff_of_velkhar', 0.1],
+        ['heroic_shadowmeld_tunic', 0.1],
+        ['heroic_wyrmcult_grand_robe', 0.1],
+        ['heroic_gravewyrm_sabatons', 0.1],
+        ['heroic_wyrmcult_soulsteps', 0.1],
+        ['heroic_wyrmshadow_treads', 0.05],
+        ['heroic_boundstone_helm', 0.08],
+        ['heroic_gravewyrm_mantle', 0.08],
+      ]),
     ]).map(preserveBaseLootSource),
   ],
   grand_necromancer_velkhar: [
     ...weightedLootGroup('grand_necromancer_velkhar_heroic', [
-      ['boneplate_vest', 0.34],
-      ['revenant_silk_robe', 0.33],
-      ['nightwalk_jerkin', 0.33],
-      ['emberwood_staff', 0.2],
-      ['heroic_boneguard_breastplate', 0.1],
-      ['heroic_shadowmeld_tunic', 0.1],
-      ['heroic_staff_of_velkhar', 0.1],
-      ['heroic_gravewyrm_stalkers_treads', 0.1],
-      ['heroic_deathlord_legguards', 0.05],
-      ['heroic_necromancers_soulsteps', 0.05],
-      ['heroic_wyrmshadow_legguards', 0.05],
+      ['phial_of_the_tithe', 0.2],
+      ['vestments_of_the_waking_rite', 0.25],
+      // The shipped partition keeps its ratios inside the remaining 0.55.
+      ...sharedPartition(0.55, [
+        ['boneplate_vest', 0.34],
+        ['revenant_silk_robe', 0.33],
+        ['nightwalk_jerkin', 0.33],
+        ['emberwood_staff', 0.2],
+        ['heroic_boneguard_breastplate', 0.1],
+        ['heroic_shadowmeld_tunic', 0.1],
+        ['heroic_staff_of_velkhar', 0.1],
+        ['heroic_gravewyrm_stalkers_treads', 0.1],
+        ['heroic_deathlord_legguards', 0.05],
+        ['heroic_necromancers_soulsteps', 0.05],
+        ['heroic_wyrmshadow_legguards', 0.05],
+      ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'necromancers_reagent_satchel', chance: 0.2, preserveSourceTier: true },
   ],
@@ -991,33 +1013,37 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   ],
   korzul_the_gravewyrm: [
     ...weightedLootGroup('korzul_heroic', [
-      ['boneplate_vest', 0.34],
-      ['revenant_silk_robe', 0.33],
-      ['nightwalk_jerkin', 0.33],
-      ['cultist_flayer', 0.1],
-      ['heroic_wyrmfang_greatblade', 0.05],
-      ['heroic_staff_of_the_gravewyrm', 0.05],
-      ['heroic_fang_of_korzul', 0.05],
-      ['heroic_deathlord_warplate', 0.05],
-      ['heroic_necromancers_starshroud', 0.05],
-      ['heroic_wyrmshadow_harness', 0.05],
-      ['heroic_boundstone_girdle', 0.05],
-      ['heroic_gravewyrm_gauntlets', 0.05],
-      ['heroic_deathlords_dread_visage', 0.04],
-      ['heroic_necromancers_soulspire_mantle', 0.04],
-      ['heroic_wyrmshadow_talongrips', 0.04],
-      ['heroic_nightfangs_greatstaff', 0.05],
-      ['heroic_wildgrowth_leggings', 0.05],
-      ['heroic_grovewardens_grips', 0.05],
-      ['heroic_verdant_walkers', 0.05],
-      ['heroic_gravewyrm_bone_quiver', 0.05],
-      ['gravewyrm_cleaver', 0.34],
-      ['shroud_of_the_gravewyrm', 0.33],
-      ['sanctum_prowlers_grips', 0.33],
-      ['gravewyrm_claws', 0.25],
-      ['gravescale_girdle', 0.25],
-      ['wyrmchoir_handwraps', 0.25],
-      ['wildsoul_maul', 0.25],
+      ['quenchwater_flask', 0.15],
+      // The shipped partition keeps its ratios inside the remaining 0.85.
+      ...sharedPartition(0.85, [
+        ['boneplate_vest', 0.34],
+        ['revenant_silk_robe', 0.33],
+        ['nightwalk_jerkin', 0.33],
+        ['cultist_flayer', 0.1],
+        ['heroic_wyrmfang_greatblade', 0.05],
+        ['heroic_staff_of_the_gravewyrm', 0.05],
+        ['heroic_fang_of_korzul', 0.05],
+        ['heroic_deathlord_warplate', 0.05],
+        ['heroic_necromancers_starshroud', 0.05],
+        ['heroic_wyrmshadow_harness', 0.05],
+        ['heroic_boundstone_girdle', 0.05],
+        ['heroic_gravewyrm_gauntlets', 0.05],
+        ['heroic_deathlords_dread_visage', 0.04],
+        ['heroic_necromancers_soulspire_mantle', 0.04],
+        ['heroic_wyrmshadow_talongrips', 0.04],
+        ['heroic_nightfangs_greatstaff', 0.05],
+        ['heroic_wildgrowth_leggings', 0.05],
+        ['heroic_grovewardens_grips', 0.05],
+        ['heroic_verdant_walkers', 0.05],
+        ['heroic_gravewyrm_bone_quiver', 0.05],
+        ['gravewyrm_cleaver', 0.34],
+        ['shroud_of_the_gravewyrm', 0.33],
+        ['sanctum_prowlers_grips', 0.33],
+        ['gravewyrm_claws', 0.25],
+        ['gravescale_girdle', 0.25],
+        ['wyrmchoir_handwraps', 0.25],
+        ['wildsoul_maul', 0.25],
+      ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
     ...heroicFarmPatternRows(),

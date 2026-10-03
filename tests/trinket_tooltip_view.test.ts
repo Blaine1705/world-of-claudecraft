@@ -117,6 +117,17 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
   overclocked_governor: {
     use: 'Use: Increase your casting speed by 25% for 10 sec. When it ends you are Overheated: your casting speed is reduced by 10% for 5 sec. (2 min cooldown)',
   },
+  foremans_last_link: {
+    use: 'Use: Chain yourself to a friendly player within 20 yd for 10 sec. 30% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you. (2 min cooldown)',
+  },
+  // 5% of the viewer's 5000 maximum health: 250.
+  phial_of_the_tithe: {
+    use: 'Use: For 15 sec, each hostile creature that dies within 20 yd of you restores 5% of your maximum health (250) and 5% of your maximum mana. (2 min cooldown)',
+  },
+  // 40 plus 20% of 500 Attack Power: 40 (+100).
+  quenchwater_flask: {
+    use: 'Use: Your next 3 melee or ranged weapon hits within 12 sec deal 40 (+100) extra Frost damage. The last of them also quenches the target, slowing its attacks by 15% for 8 sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher. (2 min cooldown)',
+  },
   // 18 to 24 plus 8% of 500 Attack Power: 58 to 64.
   fanglords_whistle: {
     use: 'Use: Call a spirit jaguar to fight beside you for 12 sec. It runs to your target and bites it for 58 to 64 Physical damage every 2 sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within 30 yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within 30 yd. (2 min cooldown)',
@@ -158,7 +169,7 @@ function shownTotal(text: string, before: string, after: string): number {
 }
 
 describe('trinket tooltip lines', () => {
-  it('covers exactly the twenty-three trinkets', () => {
+  it('covers exactly the twenty-six trinkets', () => {
     expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
     expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
   });

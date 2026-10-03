@@ -928,19 +928,19 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 5000, chance: 1 },
       {
-        itemId: 'boneplate_vest',
+        itemId: 'foremans_grips',
         chance: 0.34,
         rollGroup: 'korgath_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'revenant_silk_robe',
+        itemId: 'serac_stride_boots',
         chance: 0.33,
         rollGroup: 'korgath_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'nightwalk_jerkin',
+        itemId: 'seal_rune_mantle',
         chance: 0.33,
         rollGroup: 'korgath_guaranteed_uncommon',
         normalOnly: true,
@@ -983,19 +983,19 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 5000, chance: 1 },
       {
-        itemId: 'boneplate_vest',
+        itemId: 'thawbound_legguards',
         chance: 0.34,
         rollGroup: 'velkhar_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'revenant_silk_robe',
+        itemId: 'pyre_tenders_hood',
         chance: 0.33,
         rollGroup: 'velkhar_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'nightwalk_jerkin',
+        itemId: 'meltwater_cord',
         chance: 0.33,
         rollGroup: 'velkhar_guaranteed_uncommon',
         normalOnly: true,

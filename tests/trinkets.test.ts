@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { tonguesMult } from '../src/sim/combat/cc';
 import { applyHeal } from '../src/sim/combat/heal';
+import { quenchDamage } from '../src/sim/combat/sanctum_trinkets';
 import { spellHasteMult } from '../src/sim/combat/spell_combat';
 import { restorableCooldown } from '../src/sim/combat/trinket_seams';
 import { runTrinketTrigger, TRINKET_EQUIP_LOCKOUT } from '../src/sim/combat/trinkets';
@@ -62,13 +63,15 @@ const damageBy = (events: SimEvent[], ability: string) =>
   events.filter((ev) => ev.type === 'damage' && ev.ability === ability);
 
 describe('the trinket catalog', () => {
-  it('ships twenty-three trinkets, each with one attribute and a use', () => {
+  it('ships twenty-six trinkets, each with one attribute and a use', () => {
     const ids = Object.keys(TRINKET_ITEMS);
     // The Sunken Bastion rework's Gaoler's Iron Key is the nineteenth; the
     // Stormbrass Foundry's Rangefinder's Lens and Overclocked Governor are the
     // twentieth and twenty-first; the Wildheart Basin's Fanglord's Whistle and
-    // Gorgebloom Seedpod are the twenty-second and twenty-third.
-    expect(ids).toHaveLength(23);
+    // Gorgebloom Seedpod are the twenty-second and twenty-third; the Gravewyrm
+    // Sanctum's Foreman's Last Link, Phial of the Tithe and Quenchwater Flask
+    // the twenty-fourth to twenty-sixth.
+    expect(ids).toHaveLength(26);
     for (const id of ids) {
       const item = TRINKET_ITEMS[id];
       expect(item.slot).toBe('trinket');
@@ -279,6 +282,126 @@ describe('the Stormbrass Foundry trinkets', () => {
     expect(heat?.undispellable).toBe(true);
     for (let t = 0; t < 5.1; t += DT) sim.tick();
     expect(aura(sim.player, TRINKET_AURA.overheated)).toBeUndefined();
+  });
+});
+
+describe('the Gravewyrm Sanctum trinkets', () => {
+  const QUENCH = TRINKET_SPECS.quenchwater_flask.use as Extract<
+    (typeof TRINKET_SPECS)[string]['use'],
+    { kind: 'quench' }
+  >;
+  const tickFor = (sim: Sim, seconds: number): void => {
+    for (let t = 0; t < seconds - 1e-9; t += DT) sim.tick();
+  };
+
+  it("Foreman's Last Link: 30 percent of the ally's damage moves to the wearer for 10 sec", () => {
+    const sim = wearing('foremans_last_link', 'priest');
+    const wolf = foe(sim, 6);
+    const allyId = sim.addPlayer('warrior', 'Linked');
+    const ally = sim.ctx.entities.get(allyId) as Entity;
+    ally.pos = { ...sim.player.pos, x: sim.player.pos.x + 4 };
+    const me = sim.player;
+    // Deep pools set after every aura lands (an aura re-derives the stats).
+    const pools = () => {
+      for (const e of [ally, me]) {
+        e.maxHp = 50000;
+        e.hp = 50000;
+      }
+    };
+    // A hostile target is refused (and costs no cooldown).
+    sim.useItem('foremans_last_link');
+    expect(me.cooldowns.get(trinketCooldownKey('foremans_last_link')) ?? 0).toBe(0);
+    expect(aura(me, TRINKET_AURA.tetherLink)).toBeUndefined();
+    sim.targetEntity(ally.id, me.id);
+    sim.useItem('foremans_last_link');
+    expect(aura(ally, TRINKET_AURA.tether)?.sourceId).toBe(me.id);
+    expect(aura(me, TRINKET_AURA.tetherLink)?.remaining).toBe(10);
+    expect(me.cooldowns.get(trinketCooldownKey('foremans_last_link'))).toBe(120);
+    pools();
+    const allyBefore = ally.hp;
+    const meBefore = me.hp;
+    sim.ctx.dealDamage(
+      wolf,
+      ally,
+      1000,
+      false,
+      'physical',
+      'Bite',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+    );
+    expect(allyBefore - ally.hp).toBe(700);
+    expect(meBefore - me.hp).toBe(300);
+    // Once the chain falls off, the ally takes it all again.
+    tickFor(sim, 10.1);
+    expect(aura(ally, TRINKET_AURA.tether)).toBeUndefined();
+    pools();
+    const after = ally.hp;
+    sim.ctx.dealDamage(
+      wolf,
+      ally,
+      1000,
+      false,
+      'physical',
+      'Bite',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+    );
+    expect(after - ally.hp).toBe(1000);
+  });
+
+  it('Phial of the Tithe: each enemy dying within 20 yd for 15 sec restores 5 percent health and mana', () => {
+    const sim = wearing('phial_of_the_tithe', 'mage');
+    const me = sim.player;
+    sim.useItem('phial_of_the_tithe');
+    expect(aura(me, TRINKET_AURA.harvest)?.remaining).toBe(15);
+    me.hp = Math.round(me.maxHp / 2);
+    me.resource = 0;
+    const near = foe(sim, 8, 100);
+    const far = foe(sim, 30, 100);
+    sim.ctx.dealDamage(me, far, 1000, false, 'fire', 'Test', 'hit');
+    expect(far.dead).toBe(true);
+    expect(me.resource).toBe(0);
+    const hp0 = me.hp;
+    sim.ctx.dealDamage(me, near, 1000, false, 'fire', 'Test', 'hit');
+    expect(near.dead).toBe(true);
+    expect(me.hp - hp0).toBe(Math.round(me.maxHp * 0.05));
+    expect(me.resource).toBe(Math.round(me.maxResource * 0.05));
+    // Spent window: nothing more.
+    tickFor(sim, 15.1);
+    const late = foe(sim, 5, 100);
+    const hp1 = me.hp;
+    const mana1 = me.resource;
+    sim.ctx.dealDamage(me, late, 1000, false, 'fire', 'Test', 'hit');
+    expect(me.hp).toBe(hp1);
+    expect(me.resource).toBe(mana1);
+  });
+
+  it('Quenchwater Flask: three weapon hits of frost, the third quenches the target', () => {
+    const sim = wearing('quenchwater_flask', 'warrior');
+    const wolf = foe(sim, 3);
+    const me = sim.player;
+    sim.useItem('quenchwater_flask');
+    expect(aura(me, TRINKET_AURA.quench)?.stacks).toBe(3);
+    sim.drainEvents();
+    for (let i = 0; i < 4; i++) runTrinketTrigger(sim.ctx, me, wolf, 'weaponHit');
+    const hits = damageBy(sim.drainEvents(), 'Quenchwater Flask');
+    expect(hits).toHaveLength(3);
+    const power = Math.max(me.attackPower, me.rangedPower);
+    expect(quenchDamage(QUENCH, power)).toBe(Math.round(40 + 0.2 * power));
+    expect(aura(me, TRINKET_AURA.quench)).toBeUndefined();
+    const quenched = wolf.auras.find((a) => a.id === TRINKET_AURA.quenched);
+    expect(quenched?.kind).toBe('attackspeed');
+    expect(quenched?.value).toBeCloseTo(1 / 0.85, 9);
+    expect(quenched?.remaining).toBe(8);
   });
 });
 
