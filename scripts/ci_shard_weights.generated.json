@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4838,
+    "files": 4840,
     "harvestedFiles": 3947,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -2489,6 +2489,17 @@
           722
         ]
       },
+      "tests/gravewyrm_sanctum_rune_wall.test.ts": {
+        "ms": 4220,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum playtest fixes (walls audit, rune wall lore): new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          4220,
+          4448,
+          3386
+        ]
+      },
       "tests/gravewyrm_sanctum_terrain.test.ts": {
         "ms": 929,
         "method": "local-median",
@@ -2509,6 +2520,17 @@
           6583,
           7326,
           7088
+        ]
+      },
+      "tests/gravewyrm_sanctum_walls.test.ts": {
+        "ms": 14040,
+        "method": "local-median",
+        "measured": "2026-10-03",
+        "reason": "Gravewyrm Sanctum playtest fixes (walls audit, rune wall lore): new files CI has not harvested yet, measured locally (3 runs, Windows)",
+        "runs": [
+          14040,
+          16652,
+          13185
         ]
       },
       "tests/gravewyrm_velkhar.test.ts": {
@@ -9795,8 +9817,10 @@
   "tests/gravewyrm_sanctum_mountains.test.ts": 97,
   "tests/gravewyrm_sanctum_render_core.test.ts": 51,
   "tests/gravewyrm_sanctum_route.test.ts": 718,
+  "tests/gravewyrm_sanctum_rune_wall.test.ts": 4220,
   "tests/gravewyrm_sanctum_terrain.test.ts": 929,
   "tests/gravewyrm_sanctum_trash.test.ts": 7088,
+  "tests/gravewyrm_sanctum_walls.test.ts": 14040,
   "tests/gravewyrm_velkhar.test.ts": 7176,
   "tests/graveyard_command.test.ts": 2024,
   "tests/grix_tunnelking_presence.test.ts": 10,
