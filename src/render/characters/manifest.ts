@@ -133,6 +133,7 @@ import { FOUNDRY_WORKER_LOOKS, FOUNDRY_WORKER_MOB_KEYS } from './foundry_worker_
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
+import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 
 export interface EmoteClipSpec {
@@ -5501,6 +5502,9 @@ Object.assign(VISUALS, FOUNDRY_CREATURE_LOOKS);
 Object.assign(VISUALS, FOUNDRY_WORKER_LOOKS);
 // The Wildheart Basin's placeholder creatures (wildheart_creature_looks.ts).
 Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
+// The Gravewyrm Sanctum's creatures: the Sledge Tusker's Blender body and the
+// re-tinted trash placeholders (sanctum_creature_looks.ts).
+Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 
 /** The composed-body variant of a class visual (every class has one). */
 export function modularVisualKey(cls: PlayerClass): string {
@@ -5704,7 +5708,6 @@ const MOB_KEYS: Record<string, string> = {
   bastion_revenant: 'bastion_drowned_revenant',
   tidebound_acolyte: 'bastion_acolyte',
   knight_commander_olen: 'bastion_olen',
-  sanctum_boneguard: 'skel_warrior',
   nythraxis_scourge_of_thornpeak: 'skel_golem',
   nythraxis_skeleton_warrior: 'skel_warrior',
   nythraxis_heroic_warrior_add: 'skel_warrior',
@@ -5783,6 +5786,7 @@ const MOB_KEYS: Record<string, string> = {
   half_built_frame: 'foundry_half_built_frame',
   ...FOUNDRY_WORKER_MOB_KEYS,
   ...WILDHEART_MOB_KEYS,
+  ...SANCTUM_MOB_KEYS,
   ...Object.fromEntries(
     ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
   ),

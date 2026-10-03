@@ -267,6 +267,9 @@ const CLIPLESS_RIGS = new Set([
   // The Wildheart Basin's Sunbone Totem: the shipped carved mask totem as a
   // stationary prop mob (wildheart_creature_looks.ts), no rig to lose.
   'wildheart_sunbone_totem',
+  // The Gravewyrm Sanctum's Soul Brazier: the shipped infernal brazier as a
+  // stationary prop mob (sanctum_creature_looks.ts), its fire drawn by the fx.
+  'sanctum_soul_brazier',
   // Nyxaris's Bound Pulsar: the nucleus as a static prop; every motion it has is
   // drawn round it procedurally (src/render/hoard_pulsars.ts)
   'mob_bound_pulsar',

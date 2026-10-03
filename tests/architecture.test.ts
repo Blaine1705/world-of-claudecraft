@@ -876,6 +876,12 @@ const RENDER_PURE_CORES = [
   'src/render/wildheart_basin/lasher_fx_core.ts',
   'src/render/wildheart_basin/basin_thorns_core.ts',
   'src/render/wildheart_basin/maw_glow_core.ts',
+  // The Gravewyrm Sanctum's Sledge Tusker body and sledge (measured facts,
+  // clip beats, the sledge's trailer drag and the bowls onto their patches)
+  // and its creature effects' plan (telegraph specs, the Trample lane's
+  // length, the object looks, the palette and the timelines).
+  'src/render/gravewyrm_sanctum_fx/tusker_model_core.ts',
+  'src/render/gravewyrm_sanctum_fx/sanctum_fx_core.ts',
   'src/render/characters/turn_in_place_core.ts',
   'src/render/characters/glow_pulse_core.ts',
   // Creased smooth normals for a faceted rig (VisualDef.smoothNormals).
