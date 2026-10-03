@@ -251,6 +251,8 @@ describe('Velkhar: where the dead fall (G24)', () => {
     expect(risen).toBeDefined();
     expect(risen?.hp).toBe(Math.round((risen as Entity).maxHp * T.riseHpShare));
     expect(risen?.auras.some((a) => a.id === VELKHAR_TWICE_WOKEN)).toBe(false);
+    // It paid its kill already: a second death pays no XP (no meltwater loop).
+    expect(risen?.regrown).toBe(true);
     expect(r.boss.hp - hpBefore).toBe(Math.round(r.boss.maxHp * T.titheHeal));
     expect(r.sim.ctx.entities.has(w.id)).toBe(false);
     expect(velkharState(r.boss).rises).toBe(1);

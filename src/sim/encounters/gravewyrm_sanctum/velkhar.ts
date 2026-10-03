@@ -504,6 +504,9 @@ function riseAgain(
   dropEncounterBody(ctx, inst, boss, corpseId);
   const add = raiseWalker(ctx, inst, boss, st, x, z);
   if (!add) return null;
+  // A Bonewalker that rose again paid its kill already: no second XP (the
+  // Mere Hydra's regrown-head rule), so meltwater is never an XP loop.
+  add.regrown = true;
   st.rises++;
   if (inst.difficulty === 'heroic') {
     add.hp = add.maxHp;
