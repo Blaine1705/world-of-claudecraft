@@ -6166,6 +6166,41 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_korgath_all_chains",
+    "name": "A Kinder End",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_korgath_still_bound",
+    "name": "The Lock Holds",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_velkhar_cold",
+    "name": "Cold Comfort",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_korzul_thin_ice",
+    "name": "Thin Ice",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_sledge_tusker",
+    "name": "Cold Cargo",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -6583,6 +6618,26 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Wildsoul Maul"
+      },
+      {
+        "kind": "item",
+        "name": "Quenchwater Flask"
+      },
+      {
+        "kind": "item",
+        "name": "Hammer of the Open Lock"
+      },
+      {
+        "kind": "item",
+        "name": "Vestments of the Waking Rite"
+      },
+      {
+        "kind": "item",
+        "name": "Foreman's Last Link"
+      },
+      {
+        "kind": "item",
+        "name": "Phial of the Tithe"
       }
     ]
   },

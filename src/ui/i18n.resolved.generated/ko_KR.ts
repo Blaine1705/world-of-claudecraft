@@ -3137,6 +3137,9 @@ export const ko_KR: EnTranslations = {
         "overclock": "{duration}초 동안 시전 속도가 {haste}% 증가합니다. 효과가 끝나면 과열되어 {overheat}초 동안 시전 속도가 {slow}% 감소합니다.",
         "spiritPack": "{duration}초 동안 영혼 재규어를 불러 곁에서 싸우게 합니다. 재규어는 대상에게 달려가 {every}초마다 물어뜯어 {min}~{max}의 물리 피해를 주며, 다른 적을 대상으로 지정하면 그 적에게로 옮겨 갑니다. 지정한 적이 없으면 {range}미터 내에서 당신과 가장 가까운 적을 공격합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가하며, 불러낼 때 결정됩니다. {range}미터 내의 적대적 대상이 필요합니다.",
         "seedburst": "{range}미터 내의 대상에게 씨앗을 심습니다. {delay}초 후 씨앗이 대상이 있는 곳(또는 죽은 곳)에서 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 대상이 먼저 죽었다면 피해가 {bonus}% 증가합니다({empowered}). 피해량은 주문력에 비례해 증가하며, 심을 때 결정됩니다. 씨앗이 터지기 전에 당신이 죽으면 씨앗은 시듭니다.",
+        "tether": "{range}미터 내의 아군 플레이어와 {duration}초 동안 사슬로 연결됩니다. 그 아군의 생명력에 닿을 피해의 {share}%를 대신 당신이 받습니다. 당신이 죽으면 일찍 끝납니다. 자신이 아닌 아군 플레이어를 대상으로 지정해야 합니다.",
+        "harvest": "{duration}초 동안 당신으로부터 {radius}미터 내에서 적대적인 생물이 죽을 때마다 최대 생명력의 {pct}%({health})와 최대 마나의 {pct}%를 회복합니다.",
+        "quench": "{duration}초 내에 다음 {hits}번의 근접 또는 원거리 무기 적중이 {damage}의 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상을 담금질하여 {slowDuration}초 동안 공격 속도를 {slow}% 늦춥니다. 효과가 끝나면 남은 적중은 사라집니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가합니다.",
         "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다."
       }
     },
@@ -3923,6 +3926,17 @@ export const ko_KR: EnTranslations = {
         "avatar": "이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.",
         "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
       },
+      "sanctum": {
+        "lockbound": "받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.",
+        "enrage": "주는 피해가 {pct}% 증가합니다.",
+        "grasp": "녹은 물에 서 있어 주는 피해가 {pct}% 증가합니다. 녹은 물에서 죽으면 가라앉았다가 {seconds}초 후 다시 일어납니다. 차가운 얼음 위에서 죽여야 다시 일어나지 않습니다.",
+        "twiceWoken": "녹은 물에서 다시 일어나 주는 피해가 {pct}% 증가합니다.",
+        "doused": "발밑 얼음판이 깨져 담금질 물이 무덤의 지옥불을 꺼뜨렸습니다.",
+        "airborne": "공중에 있어 공격할 수 없습니다. 가장 많은 플레이어가 선 얼음판에 추락 강하로 내려앉아 {radius}야드 안의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
+        "wyrmsEye": "이 효과가 끝나면 코르줄이 당신이 선 얼음판 전체에 내리꽂는 불길을 쏟아붓습니다: 그 위의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 얼음판에 금이 가거나 이미 금이 가 있었다면 부서집니다. 멀쩡한 얼음 위에서 파티와 떨어져 서십시오.",
+        "quenchWater": "열린 담금질 물속: 이동 속도가 {slow}% 감소하고 매초 {damage}의 피해(영웅 난이도 {heroic})로 불탑니다. 아무 얼음판이나 물가로 헤엄치십시오.",
+        "shardFlare": "심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다."
+      },
       "foundry": {
         "scaldingVents": "메인 라인에서 벨트가 아닌 바닥 위에 서 있으며, 증기구가 경고 중이거나 분출 중입니다. 증기가 터지면 벨트 위에 있지 않은 모든 대상에게 {every}초마다 {min}~{max}의 화염 피해를 {seconds}초 동안 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 벨트 위만 안전합니다.",
         "targetLock": "사격장 감시자가 당신을 추적하고 있습니다. {every}초마다 서 있는 자리에 원이 그려지고, {delay}초 뒤 포탄이 떨어져 {radius}미터 내의 모든 대상에게 {min}~{max}의 화염 피해를 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 계속 움직이십시오. 이동 방해를 해제하는 효과로는 이 표식이 사라지지 않습니다."
@@ -4056,6 +4070,12 @@ export const ko_KR: EnTranslations = {
         "overheated": "시전 속도가 {pct}% 감소합니다.",
         "spiritPack": "영혼 재규어가 곁에서 싸우며 {every}초마다 대상을 물어뜯어 {min}~{max}의 물리 피해를 줍니다.",
         "seedburst": "탐식화의 씨앗입니다. 이 효과가 끝나면 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 그 전에 이 적이 죽으면 피해가 {bonus}% 증가합니다({empowered}).",
+        "tether": "십장의 마지막 고리에 묶임: 당신의 생명력에 닿을 피해의 {pct}%를 당신을 묶은 자가 대신 받습니다.",
+        "tetherLink": "묶인 아군이 받을 피해의 {pct}%를 당신이 받습니다.",
+        "harvest": "당신으로부터 {radius}미터 내에서 적대적인 생물이 죽을 때마다 최대 생명력과 마나의 {pct}%를 회복합니다.",
+        "quench": "다음 {stacks}번의 무기 적중이 {damage}의 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상의 공격 속도를 {slow}% 늦춥니다.",
+        "quenchOther": "다음 {stacks}번의 무기 적중이 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상의 공격 속도를 {slow}% 늦춥니다.",
+        "quenched": "공격 속도가 {pct}% 감소합니다.",
         "forgeHeat": "열기: {stacks}/{max}. 대장장이 아버지의 담금질을 사용하면 열기를 모두 소모하며, 그 무기 화염 피해가 {pct}% 증가합니다.",
         "tempered": "근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입힙니다(소모한 열기로 {pct}% 증가). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다.",
         "temperedOther": "근접 및 원거리 무기가 적중하면 화염 피해를 추가로 입히며, 소모한 열기로 {pct}% 증가합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
@@ -6010,6 +6030,9 @@ export const ko_KR: EnTranslations = {
         "deathless_court": "불사의 궁정(영웅 전용, 불사의 격노 이후 왕실 궁정이 일어남)",
         "bloodmane_rend": "블러드메인 렌드(출혈, 대상 교체 주의)",
         "tusk_sweep": "터스크 스윕(전방 휩쓸기)",
+        "grave_breath": "무덤 숨결 (전방 화염 원뿔, 덮은 얼음에 금이 감)",
+        "plate_floor": "깨지는 얼음 (불길이 호수 얼음판을 깨뜨려 가라앉힘, 드러난 물에 들어가지 말 것)",
+        "wyrm_flights": "비행 단계 (70%와 40%: 고룡의 눈은 멀쩡한 얼음 위로, 착지시킬 곳에 모일 것)",
         "ancestral_sap": "조상의 수액(아군 치유)",
         "call_of_the_hunt": "사냥의 부름(주변 아군 가속)",
         "thickhide_ward": "두꺼운 가죽 결계(주변 아군 보호막)",
@@ -6062,7 +6085,16 @@ export const ko_KR: EnTranslations = {
         "gorge": "포식 (방어 담당에게 강력한 물기와 독)",
         "burrowing_seeds": "파고드는 씨앗과 꽃가루 구름 (6초 뒤 플레이어 곁에서 솟아나고, 황금빛이 퍼집니다)",
         "spirit_of_the_hunt": "사냥의 영혼 (사냥감이 화신을 빛나는 태양 문양으로 끌고 가세요. 물어뜯긴 플레이어는 도망칠 시간을 얻습니다)",
-        "twin_prey_ambush": "두 사냥감과 매복 (사냥감 둘, 이후 가장 먼 플레이어를 덮칩니다)"
+        "twin_prey_ambush": "두 사냥감과 매복 (사냥감 둘, 이후 가장 먼 플레이어를 덮칩니다)",
+        "seal_shackles": "봉인 족쇄(사슬을 하나 끊을 때마다 그가 받는 피해가 20% 늘고 공격 하나가 풀려남)",
+        "chain_strain": "사슬 당기기(사슬이 아직 남은 모든 기둥에서 물러서기)",
+        "korgath_stomp": "전율의 발구르기(그의 주변 고리 밖으로 나가기)",
+        "rerivet_last_link": "재리벳과 마지막 고리(사슬을 다시 박는 몰이막대장이를 차단, 사슬이 하나 남으면 10초마다 사슬 당기기)",
+        "waking_thaw": "깨어나는 해빙 (망자들이 해빙 웅덩이에서 기어 나옵니다)",
+        "unquenched_held": "봉인 또는 꺼지지 않음 (망자는 차가운 얼음 위에서 처치하고, 녹은 물에서는 절대 처치하지 마세요)",
+        "soulfire_trench": "영혼불 도랑 (영혼불 줄기, 이후 녹은 물 띠가 남습니다)",
+        "shadow_volley": "암흑 화살 세례 (모두에게 암흑 피해)",
+        "warm_hands_twice_woken": "따뜻한 손과 두 번 깨어남 (영웅 전용, 망자를 계속 움직이게 하세요. 다시 일어난 자는 더 강해집니다)"
       }
     },
     "bastionCage": {
@@ -6140,6 +6172,45 @@ export const ko_KR: EnTranslations = {
       "pollinatedLine": "씨앗에서 떨어지세요: 닿으면 싹이 틉니다",
       "bondTitle": "무리의 유대",
       "bondLine": "함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요",
+      "timeAria": "{seconds}초 남음"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "담금질 물속이다!",
+      "quenchLine": "불타고 느려진다: 가장 가까운 얼음이나 물가로 헤엄쳐라",
+      "plungeTitle": "내리꽂는 불길!",
+      "plungeLine": "발밑 얼음판 전체가 곧 불탄다: 당장 벗어나라",
+      "descentTitle": "추락 강하!",
+      "descentLine": "바로 여기에 내려앉는다: 그림자에서 벗어나라",
+      "eyeTitle": "고룡의 눈이 당신을 노린다!",
+      "eyeLine": "표식이 끝나면 서 있는 얼음판이 불탄다: 멀쩡한 얼음 위에서 파티와 떨어져라",
+      "eyeCrackedLine": "금 간 얼음 위에 서 있다: 표식이 끝나기 전에 멀쩡한 얼음판으로 가라",
+      "flailTitle": "사슬 도리깨!",
+      "flailLine": "사슬이 그려진 선을 따라 내리친다: 선에서 벗어나라",
+      "chargeTitle": "문턱 돌진!",
+      "chargeLine": "선을 따라 돌진한다: 선에서 벗어나고 가장자리에서 멀어져라",
+      "trenchTitle": "영혼불 도랑!",
+      "trenchLine": "영혼불이 선을 가르고 녹은 물을 남긴다: 벗어나라",
+      "strainTitle": "사슬 당기기!",
+      "strainLine": "온전한 기둥이 곧 터진다: 기둥에서 멀어져라",
+      "infernoTitle": "무덤의 지옥불!",
+      "infernoLine": "파동마다 더 거세진다: 그의 사거리 밖으로 나가라",
+      "stompTitle": "전율의 발구르기!",
+      "stompLine": "발이 내려오기 전에 그에게서 멀어져라",
+      "breathTitle": "무덤 숨결!",
+      "breathLine": "숨결 부채꼴 안에 있다: 옆으로 빠져라",
+      "maulTitle": "망치 휘두르기!",
+      "maulLine": "앞에 있는 모든 것을 휩쓴다: 뒤로 돌아가라",
+      "tailTitle": "꼬리 휩쓸기!",
+      "tailLine": "그의 뒤에 서 있다: 꼬리가 오기 전에 벗어나라",
+      "meltwaterTitle": "녹은 물속",
+      "meltwaterLine": "당신의 뼈걸음이가 녹은 물에 서 있다: 차가운 얼음 위로 끌어내라",
+      "meltwaterTargetLine": "대상이 녹은 물에서 죽으면 다시 일어난다: 차가운 얼음 위까지 기다려라",
+      "crackedTitle": "금 간 얼음",
+      "crackedLine": "여기에 불이 닿으면 이 얼음판이 부서진다: 그의 불길을 여기서 돌려라",
+      "flightTitle": "코르줄이 날아오른다",
+      "flightLine": "멀쩡한 얼음 위에 모여 착지 지점을 고른 뒤 흩어져라",
+      "lockboundTitle": "자물쇠 속박",
+      "lockboundLine": "사슬 {chains}개가 버틴다: 받는 피해 {pct}% 감소. 봉인 족쇄를 부숴 벗겨내라.",
       "timeAria": "{seconds}초 남음"
     },
     "foundryWorkers": {
@@ -12474,7 +12545,23 @@ export const ko_KR: EnTranslations = {
       "sanctum_plant_brazier": "영혼 화로 설치",
       "sanctum_ice_block_toss": "얼음덩이 던지기",
       "sanctum_tusker_tusk_sweep": "엄니 휩쓸기",
-      "sanctum_tusker_trample": "짓밟기"
+      "sanctum_tusker_trample": "짓밟기",
+      "sanctum_korgath_maul_arc": "대망치 호격",
+      "sanctum_korgath_chain_flail": "사슬 채찍",
+      "sanctum_korgath_threshold_charge": "문턱 돌진",
+      "sanctum_korgath_foremans_bellow": "감독관의 포효",
+      "sanctum_korgath_strain": "사슬 당기기",
+      "sanctum_korgath_stomp": "전율의 발구르기",
+      "sanctum_goadsmith_rerivet": "재리벳",
+      "sanctum_velkhar_soulfire_trench": "영혼불 도랑",
+      "sanctum_velkhar_shadow_volley": "암흑 화살 세례",
+      "sanctum_korzul_break_free": "얼음 깨기",
+      "sanctum_korzul_grave_breath": "무덤 숨결",
+      "sanctum_korzul_tail_sweep": "꼬리 휩쓸기",
+      "sanctum_korzul_grave_inferno": "무덤 지옥불",
+      "sanctum_korzul_wing_gale": "날개 돌풍",
+      "sanctum_korzul_plunging_fire": "쏟아지는 불길",
+      "sanctum_korzul_crashing_descent": "추락 강하"
     }
   },
   "questUi": {
@@ -18888,6 +18975,30 @@ export const ko_KR: EnTranslations = {
       "thornroot_greathelm": {
         "name": "가시관 대투구"
       },
+      "foremans_grips": {
+        "name": "십장의 장갑"
+      },
+      "serac_stride_boots": {
+        "name": "빙탑 걸음 장화"
+      },
+      "seal_rune_mantle": {
+        "name": "봉인 룬 어깨망토"
+      },
+      "thawbound_legguards": {
+        "name": "해빙 족쇄 다리보호구"
+      },
+      "pyre_tenders_hood": {
+        "name": "화장터지기의 두건"
+      },
+      "meltwater_cord": {
+        "name": "녹은 물 허리끈"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "열린 자물쇠의 망치"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "깨움 의식의 예복"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -19757,6 +19868,15 @@ export const ko_KR: EnTranslations = {
       },
       "gorgebloom_seedpod": {
         "name": "탐식화 씨앗꼬투리"
+      },
+      "foremans_last_link": {
+        "name": "십장의 마지막 고리"
+      },
+      "phial_of_the_tithe": {
+        "name": "십일조의 약병"
+      },
+      "quenchwater_flask": {
+        "name": "담금질 물 플라스크"
       },
       "rift_watchers_band": {
         "name": "균열 감시자의 반지"
@@ -20815,6 +20935,18 @@ export const ko_KR: EnTranslations = {
       },
       "sledge_tusker": {
         "name": "썰매 끄는 거대엄니"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "망치 족쇄"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "집게 족쇄"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "모루 족쇄"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "풀무 족쇄"
       },
       "thorn_sprout": {
         "name": "가시 새싹"

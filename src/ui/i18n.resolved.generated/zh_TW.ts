@@ -3137,6 +3137,9 @@ export const zh_TW: EnTranslations = {
         "overclock": "使你的施法速度提高 {haste}%，持續 {duration} 秒。效果結束時你會過熱：施法速度降低 {slow}%，持續 {overheat} 秒。",
         "spiritPack": "召喚一隻靈魂美洲豹在你身邊戰鬥，持續{duration}秒。牠會奔向你的目標，每{every}秒撕咬一次，造成{min}到{max}點物理傷害，並會轉而攻擊你選中的其他敵人。若你沒有選中敵人，牠會攻擊{range}碼內離你最近的敵人。傷害隨攻擊強度或遠程攻擊強度（取較高者）提高，在召喚時確定。需要{range}碼內的敵對目標。",
         "seedburst": "在{range}碼內的目標身上種下一顆種子。{delay}秒後，種子在目標所在處（或其死亡處）爆裂，對{radius}碼內的每個敵人造成{damage}點自然傷害；若目標先行死亡，傷害提高{bonus}%（{empowered}）。傷害隨法術強度提高，在種下時確定。若你在種子爆裂前死亡，種子會枯萎。",
+        "tether": "用鎖鏈將你與{range}碼內的一名友方玩家相連，持續{duration}秒。本應傷及其生命值的傷害中有{share}%改由你承受。你死亡時提前結束。需要以你之外的友方玩家為目標。",
+        "harvest": "在{duration}秒內，每有一個敵對生物在你{radius}碼內死亡，就為你恢復{pct}%的最大生命值（{health}）和{pct}%的最大法力值。",
+        "quench": "在{duration}秒內，你接下來的{hits}次近戰或遠程武器命中額外造成{damage}點冰霜傷害。最後一次命中還會淬火目標，使其攻擊速度降低{slow}%，持續{slowDuration}秒。效果結束時未用完的命中次數會失效。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
         "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。"
       }
     },
@@ -3923,6 +3926,17 @@ export const zh_TW: EnTranslations = {
         "avatar": "移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。",
         "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。"
       },
+      "sanctum": {
+        "lockbound": "受到的傷害降低{pct}%：每條仍然完好的鎖鏈提供{per}%。打破一個封印鐐銬即可讓其鎖鏈脫落。",
+        "enrage": "造成的傷害提高{pct}%。",
+        "grasp": "站在融水中，造成的傷害提高{pct}%。如果它死在融水中，會沉下並在{seconds}秒後再次復生；在寒冰上擊殺它才能讓它不再起來。",
+        "twiceWoken": "從融水中再次復生，造成的傷害提高{pct}%。",
+        "doused": "他腳下的冰板碎裂，淬火之水撲滅了他的墓場煉獄。",
+        "airborne": "身在空中，無法被攻擊。他會以墜擊降落落在站人最多的冰板上，對{radius}碼內的所有人造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。",
+        "wyrmsEye": "此效果結束時，科祖爾會向你所在的整塊冰板傾瀉俯衝烈焰：對其上所有人造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點），冰板開裂，若已開裂則碎裂。站在完好的冰面上，遠離隊伍。",
+        "quenchWater": "身處開闊的淬火之水：移動速度降低{slow}%，每秒受到{damage}點灼燒傷害（英雄難度{heroic}點）。游向任意冰板或岸邊。",
+        "shardFlare": "心之碎片閃耀：墓穴吐息每{breath}秒一次，振翼狂風每{gale}秒一次。"
+      },
       "foundry": {
         "scaldingVents": "你站在主產線傳送帶以外的地面上，蒸汽口正在預警或噴發。蒸汽噴出後，每{every}秒對所有不在傳送帶上的人造成{min}到{max}點火焰傷害，持續{seconds}秒（英雄難度為{heroicMin}到{heroicMax}點）。只有傳送帶上是安全的。",
         "targetLock": "靶場守衛正在鎖定你。每{every}秒會在你所站的位置畫出一個圓圈，{delay}秒後砲彈落下，對{radius}碼內的所有人造成{min}到{max}點火焰傷害（英雄難度為{heroicMin}到{heroicMax}點）。保持移動。解除減速的效果無法移除此標記。"
@@ -4056,6 +4070,12 @@ export const zh_TW: EnTranslations = {
         "overheated": "施法速度降低 {pct}%。",
         "spiritPack": "一隻靈魂美洲豹在你身邊戰鬥，每{every}秒撕咬你的目標一次，造成{min}到{max}點物理傷害。",
         "seedburst": "噬花的種子。此效果結束時爆裂，對{radius}碼內的每個敵人造成{damage}點自然傷害；若此敵人在此之前死亡，傷害提高{bonus}%（{empowered}）。",
+        "tether": "被工頭的最後一環鎖住：本應傷及你生命值的傷害中有{pct}%改由鎖住你的人承受。",
+        "tetherLink": "你承受被鎖住的盟友本應受到的傷害的{pct}%。",
+        "harvest": "每有一個敵對生物在你{radius}碼內死亡，就為你恢復{pct}%的最大生命值和法力值。",
+        "quench": "你接下來的{stacks}次武器命中額外造成{damage}點冰霜傷害。最後一次命中使目標的攻擊速度降低{slow}%。",
+        "quenchOther": "接下來的{stacks}次武器命中造成額外冰霜傷害。最後一次命中使目標的攻擊速度降低{slow}%。",
+        "quenched": "攻擊速度降低 {pct}%。",
         "forgeHeat": "熱量：{stacks}/{max}。使用熔鑄之父的淬火會消耗所有熱量，使其武器火焰傷害提高 {pct}%。",
         "tempered": "你的近戰和遠程武器命中額外造成 {damage} 點火焰傷害（消耗的熱量使其提高 {pct}%）。每次致命一擊延長 {killExtend} 秒，總計最多 {maxDuration} 秒。",
         "temperedOther": "近戰和遠程武器命中額外造成火焰傷害，消耗的熱量使其提高 {pct}%。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
@@ -6010,6 +6030,9 @@ export const zh_TW: EnTranslations = {
         "deathless_court": "不死宮廷（僅英雄難度，不死之怒後王庭崛起）",
         "bloodmane_rend": "血鬃撕裂（流血，注意目標切換）",
         "tusk_sweep": "獠牙橫掃（正面順劈）",
+        "grave_breath": "墳墓吐息（正面火焰錐形，會使覆蓋的冰面開裂）",
+        "plate_floor": "碎冰（他的火焰會使湖面冰板開裂並沉沒，遠離開闊水面）",
+        "wyrm_flights": "飛行階段（70%和40%時：帶著巨龍之眼走到完好的冰面上，在他應降落的地方集合）",
         "ancestral_sap": "祖靈汁液（治療其盟友）",
         "call_of_the_hunt": "狩獵召喚（加速附近盟友）",
         "thickhide_ward": "厚皮護盾（護盾附近盟友）",
@@ -6062,7 +6085,16 @@ export const zh_TW: EnTranslations = {
         "gorge": "吞噬（對坦克的重咬和毒素）",
         "burrowing_seeds": "鑽地種子與花粉雲（種子6秒後在玩家身旁破土，金色會傳染）",
         "spirit_of_the_hunt": "狩獵之魂（獵物引著化身穿過點亮的太陽符文；被撕咬的玩家獲得逃跑的先機）",
-        "twin_prey_ambush": "雙重獵物與伏擊（兩個獵物，隨後撲向最遠的玩家）"
+        "twin_prey_ambush": "雙重獵物與伏擊（兩個獵物，隨後撲向最遠的玩家）",
+        "seal_shackles": "封印鐐銬（每打斷一條鎖鏈，他受到的傷害提高20%，並解放他的一種攻擊）",
+        "chain_strain": "繃鏈（遠離每根鎖鏈仍完好的柱子）",
+        "korgath_stomp": "震顫踐踏（離開他周圍的圓環）",
+        "rerivet_last_link": "重鉚與最後一環（打斷重新鉚上鎖鏈的刺棒匠；只剩一條鎖鏈時，每10秒繃鏈一次）",
+        "waking_thaw": "甦醒融冰（亡者從融冰池中爬出）",
+        "unquenched_held": "封存或未熄（在寒冰上擊殺亡者，切勿在融水中）",
+        "soulfire_trench": "魂火溝壑（一道魂火，隨後留下一條融水帶）",
+        "shadow_volley": "暗影箭雨（對所有人造成暗影傷害）",
+        "warm_hands_twice_woken": "溫熱之手與二度甦醒（僅限英雄難度，讓亡者保持移動；復起者會更強）"
       }
     },
     "bastionCage": {
@@ -6140,6 +6172,45 @@ export const zh_TW: EnTranslations = {
       "pollinatedLine": "遠離種子：你的觸碰會讓它們發芽",
       "bondTitle": "獸群羈絆",
       "bondLine": "在一起時牠們傷害減半：把牠們拉開",
+      "timeAria": "剩餘{seconds}秒"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "身陷淬火之水！",
+      "quenchLine": "它會灼燒並減速你：游向最近的冰面或岸邊",
+      "plungeTitle": "俯衝烈焰！",
+      "plungeLine": "你腳下的整塊冰板即將燃燒：立刻離開",
+      "descentTitle": "墜擊降落！",
+      "descentLine": "他就落在這裡：離開他的陰影",
+      "eyeTitle": "巨龍之眼盯上了你！",
+      "eyeLine": "印記結束時你所在的冰板會燃燒：待在完好的冰面上，遠離隊伍",
+      "eyeCrackedLine": "你站在開裂的冰面上：在印記結束前走到完好的冰板上",
+      "flailTitle": "鎖鏈連枷！",
+      "flailLine": "鎖鏈會沿著標出的路線抽下：離開那條線",
+      "chargeTitle": "門檻衝鋒！",
+      "chargeLine": "他會沿路線衝鋒：離開路線，遠離邊緣",
+      "trenchTitle": "魂火溝壑！",
+      "trenchLine": "魂火會切開這條路線並留下融水：離開它",
+      "strainTitle": "繃鏈！",
+      "strainLine": "完好的石柱即將爆發：遠離它們",
+      "infernoTitle": "墓場煉獄！",
+      "infernoLine": "每次脈衝都更猛烈：離開他的範圍",
+      "stompTitle": "震顫踐踏！",
+      "stompLine": "在他的腳落下前遠離他",
+      "breathTitle": "墓穴吐息！",
+      "breathLine": "你站在吐息錐形範圍內：向側面躲開",
+      "maulTitle": "重錘橫掃！",
+      "maulLine": "他會橫掃面前的一切：繞到他身後",
+      "tailTitle": "尾擊橫掃！",
+      "tailLine": "你站在他身後：在尾巴掃來前離開",
+      "meltwaterTitle": "身處融水",
+      "meltwaterLine": "你的骸骨行者站在融水中：把它拖到寒冰上",
+      "meltwaterTargetLine": "你的目標若死在融水中會再次復生：等它到寒冰上",
+      "crackedTitle": "開裂的冰面",
+      "crackedLine": "這裡的火焰會擊碎這塊冰板：別讓他的火焰落在這裡",
+      "flightTitle": "科祖爾騰空而起",
+      "flightLine": "聚集在完好的冰面上決定他的落點，然後散開",
+      "lockboundTitle": "鎖縛",
+      "lockboundLine": "{chains}條鎖鏈仍在：他受到的傷害降低{pct}%。打破封印鐐銬來解除它。",
       "timeAria": "剩餘{seconds}秒"
     },
     "foundryWorkers": {
@@ -12474,7 +12545,23 @@ export const zh_TW: EnTranslations = {
       "sanctum_plant_brazier": "放置靈魂火盆",
       "sanctum_ice_block_toss": "投擲冰塊",
       "sanctum_tusker_tusk_sweep": "獠牙橫掃",
-      "sanctum_tusker_trample": "踐踏"
+      "sanctum_tusker_trample": "踐踏",
+      "sanctum_korgath_maul_arc": "重錘弧斬",
+      "sanctum_korgath_chain_flail": "鎖鏈鞭笞",
+      "sanctum_korgath_threshold_charge": "門檻衝鋒",
+      "sanctum_korgath_foremans_bellow": "工頭的咆哮",
+      "sanctum_korgath_strain": "繃鏈",
+      "sanctum_korgath_stomp": "震顫踐踏",
+      "sanctum_goadsmith_rerivet": "重鉚",
+      "sanctum_velkhar_soulfire_trench": "魂火溝壑",
+      "sanctum_velkhar_shadow_volley": "暗影箭雨",
+      "sanctum_korzul_break_free": "破冰而出",
+      "sanctum_korzul_grave_breath": "墳墓吐息",
+      "sanctum_korzul_tail_sweep": "尾掃",
+      "sanctum_korzul_grave_inferno": "墓場煉獄",
+      "sanctum_korzul_wing_gale": "翼風",
+      "sanctum_korzul_plunging_fire": "傾瀉烈焰",
+      "sanctum_korzul_crashing_descent": "墜擊降落"
     }
   },
   "questUi": {
@@ -18888,6 +18975,30 @@ export const zh_TW: EnTranslations = {
       "thornroot_greathelm": {
         "name": "荊冠巨盔"
       },
+      "foremans_grips": {
+        "name": "工頭護手"
+      },
+      "serac_stride_boots": {
+        "name": "冰塔跋涉長靴"
+      },
+      "seal_rune_mantle": {
+        "name": "封印符文披肩"
+      },
+      "thawbound_legguards": {
+        "name": "融縛護腿"
+      },
+      "pyre_tenders_hood": {
+        "name": "守柴人兜帽"
+      },
+      "meltwater_cord": {
+        "name": "融水束帶"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "開鎖之錘"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "甦醒儀式法衣"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19757,6 +19868,15 @@ export const zh_TW: EnTranslations = {
       },
       "gorgebloom_seedpod": {
         "name": "噬花種莢"
+      },
+      "foremans_last_link": {
+        "name": "工頭的最後一環"
+      },
+      "phial_of_the_tithe": {
+        "name": "什一稅之瓶"
+      },
+      "quenchwater_flask": {
+        "name": "淬火水瓶"
       },
       "rift_watchers_band": {
         "name": "裂隙守望者指環"
@@ -20815,6 +20935,18 @@ export const zh_TW: EnTranslations = {
       },
       "sledge_tusker": {
         "name": "拖橇巨牙獸"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "鐵錘鐐銬"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "鐵鉗鐐銬"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "鐵砧鐐銬"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "風箱鐐銬"
       },
       "thorn_sprout": {
         "name": "荊棘幼芽"

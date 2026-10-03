@@ -3137,6 +3137,9 @@ export const id_ID: EnTranslations = {
         "overclock": "Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.",
         "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
         "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
+        "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
+        "harvest": "For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.",
+        "quench": "Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
         "heartNova": "Habiskan semua tumpukan panas pada ledakan api yang memberikan {perHeat} kerusakan Api per tumpukan ({max} di {maxHeat} tumpukan) ke setiap musuh dalam jarak {radius} yard dan mengejek setiap makhluk yang terkena. Kerusakan meningkat dengan Kekuatan Serangan. Memerlukan tumpukan panas."
       }
     },
@@ -3923,6 +3926,17 @@ export const id_ID: EnTranslations = {
         "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
         "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
       },
+      "sanctum": {
+        "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
+        "enrage": "Deals {pct}% more damage.",
+        "grasp": "Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.",
+        "twiceWoken": "Rose again from the meltwater and deals {pct}% more damage.",
+        "doused": "His plate broke under him and the quench-water put out his Grave Inferno.",
+        "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
+        "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
+        "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
+        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec."
+      },
       "foundry": {
         "scaldingVents": "You stand on Main Line floor that is not a belt while its vents warn or blow. Once the steam bursts, it deals {min} to {max} Fire damage every {every} sec for {seconds} sec ({heroicMin} to {heroicMax} on Heroic) to anyone not on a belt. Only the belts are safe.",
         "targetLock": "The Rangewarden is tracking you. Every {every} sec a circle is painted where you stand, and {delay} sec later a shell lands on it for {min} to {max} Fire damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. Keep moving. Effects that break snares do not remove this mark."
@@ -4056,6 +4070,12 @@ export const id_ID: EnTranslations = {
         "overheated": "Casting speed reduced by {pct}%.",
         "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
         "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
+        "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+        "tetherLink": "You take {pct}% of the damage your chained ally would take.",
+        "harvest": "Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.",
+        "quench": "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenchOther": "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenched": "Attack speed slowed by {pct}%.",
         "forgeHeat": "Panas: {stacks}/{max}. Menggunakan Badani Pandai Besi menghabiskan semuanya, dan api senjatanya menimbulkan {pct}% kerusakan lebih banyak.",
         "tempered": "Pukulan senjata jarak dekat dan jarak jauh Anda menimbulkan {damage} kerusakan Api tambahan ({pct}% lebih banyak dari panas yang dihabiskan). Setiap pukulan pembunuh menambah {killExtend} detik, hingga {maxDuration} detik total.",
         "temperedOther": "Pukulan senjata jarak dekat dan jarak jauh menimbulkan kerusakan Api tambahan, {pct}% lebih banyak dari panas yang dihabiskan. Kerusakan meningkat dengan Kekuatan Serangan atau Kekuatan Serangan Jarak Jauh, mana pun yang lebih tinggi.",
@@ -6010,6 +6030,9 @@ export const id_ID: EnTranslations = {
         "deathless_court": "Istana Tanpa Kematian (khusus heroic, istana kerajaan bangkit setelah Amarah Tanpa Kematian)",
         "bloodmane_rend": "Bloodmane Rend (berdarah, perhatikan pertukaran target)",
         "tusk_sweep": "Sapu Tusk (belah depan)",
+        "grave_breath": "Grave Breath (frontal fire cone, it cracks the ice it covers)",
+        "plate_floor": "Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)",
+        "wyrm_flights": "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
         "ancestral_sap": "Getah Leluhur (menyembuhkan sekutunya)",
         "call_of_the_hunt": "Call of the Hunt (mempercepat sekutu terdekat)",
         "thickhide_ward": "Thickhide Ward (melindungi sekutu terdekat)",
@@ -6062,7 +6085,16 @@ export const id_ID: EnTranslations = {
         "gorge": "Gorge (a heavy bite and a poison on the tank)",
         "burrowing_seeds": "Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)",
         "spirit_of_the_hunt": "Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)",
-        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)"
+        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)",
+        "seal_shackles": "Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)",
+        "chain_strain": "Strain (step away from every pillar whose chain still holds)",
+        "korgath_stomp": "Shuddering Stomp (step out of the ring round him)",
+        "rerivet_last_link": "Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)",
+        "waking_thaw": "Waking Thaw (the dead climb out of the thaw pools)",
+        "unquenched_held": "Held or Unquenched (kill the dead on cold ice, never in meltwater)",
+        "soulfire_trench": "Soulfire Trench (a line of soulfire, then a strip of meltwater)",
+        "shadow_volley": "Shadow Volley (shadow damage to everyone)",
+        "warm_hands_twice_woken": "Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)"
       }
     },
     "bastionCage": {
@@ -6140,6 +6172,45 @@ export const id_ID: EnTranslations = {
       "pollinatedLine": "Stay off the seeds: your touch makes them sprout",
       "bondTitle": "Pack Bond",
       "bondLine": "Together they take half damage: pull them apart",
+      "timeAria": "{seconds} seconds left"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "In the quench-water!",
+      "quenchLine": "It burns and slows you: swim to the nearest ice or the shore",
+      "plungeTitle": "Plunging Fire!",
+      "plungeLine": "Your whole plate is about to burn: get off it now",
+      "descentTitle": "Crashing Descent!",
+      "descentLine": "He lands right here: step out of his shadow",
+      "eyeTitle": "Wyrm's Eye on you!",
+      "eyeLine": "Your plate burns when the mark ends: stay on sound ice, away from the group",
+      "eyeCrackedLine": "You stand on cracked ice: walk to a sound plate before the mark ends",
+      "flailTitle": "Chain Flail!",
+      "flailLine": "The chain whips down the painted lane: step out of it",
+      "chargeTitle": "Threshold Charge!",
+      "chargeLine": "He charges down the lane: get out of it, away from the edge",
+      "trenchTitle": "Soulfire Trench!",
+      "trenchLine": "Soulfire cuts the lane and leaves meltwater: get out of it",
+      "strainTitle": "Strain!",
+      "strainLine": "The intact pillars are about to lash out: get away from them",
+      "infernoTitle": "Grave Inferno!",
+      "infernoLine": "Each pulse burns harder: get out of his reach",
+      "stompTitle": "Shuddering Stomp!",
+      "stompLine": "Get away from him before his foot comes down",
+      "breathTitle": "Grave Breath!",
+      "breathLine": "You stand in the breath cone: get out to the side",
+      "maulTitle": "Maul Arc!",
+      "maulLine": "He swings through everything in front of him: get behind him",
+      "tailTitle": "Tail Sweep!",
+      "tailLine": "You stand behind him: get out before the tail hits",
+      "meltwaterTitle": "In the meltwater",
+      "meltwaterLine": "Your Bonewalker stands in meltwater: drag it onto the cold ice",
+      "meltwaterTargetLine": "If your target dies in meltwater it rises again: wait for cold ice",
+      "crackedTitle": "Cracked ice",
+      "crackedLine": "Fire here breaks this plate: keep his fire off it",
+      "flightTitle": "Korzul takes flight",
+      "flightLine": "Stack on sound ice to choose where he lands, then step off",
+      "lockboundTitle": "Lockbound",
+      "lockboundLine": "{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.",
       "timeAria": "{seconds} seconds left"
     },
     "foundryWorkers": {
@@ -12474,7 +12545,23 @@ export const id_ID: EnTranslations = {
       "sanctum_plant_brazier": "Plant Soul Brazier",
       "sanctum_ice_block_toss": "Ice Block Toss",
       "sanctum_tusker_tusk_sweep": "Tusk Sweep",
-      "sanctum_tusker_trample": "Trample"
+      "sanctum_tusker_trample": "Trample",
+      "sanctum_korgath_maul_arc": "Maul Arc",
+      "sanctum_korgath_chain_flail": "Chain Flail",
+      "sanctum_korgath_threshold_charge": "Threshold Charge",
+      "sanctum_korgath_foremans_bellow": "Foreman's Bellow",
+      "sanctum_korgath_strain": "Strain",
+      "sanctum_korgath_stomp": "Shuddering Stomp",
+      "sanctum_goadsmith_rerivet": "Re-rivet",
+      "sanctum_velkhar_soulfire_trench": "Soulfire Trench",
+      "sanctum_velkhar_shadow_volley": "Shadow Volley",
+      "sanctum_korzul_break_free": "Break Free",
+      "sanctum_korzul_grave_breath": "Grave Breath",
+      "sanctum_korzul_tail_sweep": "Tail Sweep",
+      "sanctum_korzul_grave_inferno": "Grave Inferno",
+      "sanctum_korzul_wing_gale": "Wing Gale",
+      "sanctum_korzul_plunging_fire": "Plunging Fire",
+      "sanctum_korzul_crashing_descent": "Crashing Descent"
     }
   },
   "questUi": {
@@ -18888,6 +18975,30 @@ export const id_ID: EnTranslations = {
       "thornroot_greathelm": {
         "name": "Thorncrowned Greathelm"
       },
+      "foremans_grips": {
+        "name": "Foreman's Grips"
+      },
+      "serac_stride_boots": {
+        "name": "Serac-Stride Boots"
+      },
+      "seal_rune_mantle": {
+        "name": "Seal-Rune Mantle"
+      },
+      "thawbound_legguards": {
+        "name": "Thawbound Legguards"
+      },
+      "pyre_tenders_hood": {
+        "name": "Pyre-Tender's Hood"
+      },
+      "meltwater_cord": {
+        "name": "Meltwater Cord"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "Hammer of the Open Lock"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "Vestments of the Waking Rite"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -19757,6 +19868,15 @@ export const id_ID: EnTranslations = {
       },
       "gorgebloom_seedpod": {
         "name": "Gorgebloom Seedpod"
+      },
+      "foremans_last_link": {
+        "name": "Foreman's Last Link"
+      },
+      "phial_of_the_tithe": {
+        "name": "Phial of the Tithe"
+      },
+      "quenchwater_flask": {
+        "name": "Quenchwater Flask"
       },
       "rift_watchers_band": {
         "name": "Sabuk Penjaga Retak"
@@ -20815,6 +20935,18 @@ export const id_ID: EnTranslations = {
       },
       "sledge_tusker": {
         "name": "Sledge Tusker"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "Hammer Shackle"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "Tongs Shackle"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "Anvil Shackle"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "Bellows Shackle"
       },
       "thorn_sprout": {
         "name": "Thorn Sprout"

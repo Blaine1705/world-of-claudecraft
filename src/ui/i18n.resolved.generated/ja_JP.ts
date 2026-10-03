@@ -3137,6 +3137,9 @@ export const ja_JP: EnTranslations = {
         "overclock": "{duration}秒間、詠唱速度が{haste}%上昇する。効果が終わるとオーバーヒートし、{overheat}秒間詠唱速度が{slow}%低下する。",
         "spiritPack": "{duration}秒間、霊のジャガーを呼び出して共に戦わせる。ジャガーは対象へ駆け寄り、{every}秒ごとに噛みついて{min}～{max}の物理ダメージを与え、あなたが別の敵を対象にするとそちらへ移る。敵を対象にしていない場合は、{range}ヤード以内であなたに最も近い敵を攻撃する。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加し、呼び出した時点で確定する。{range}ヤード以内の敵対的な対象が必要。",
         "seedburst": "{range}ヤード以内の対象に種を植える。{delay}秒後、種は対象のいる場所（または死んだ場所）で弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。対象が先に死んでいた場合は{bonus}%増加（{empowered}）。ダメージは呪文力に応じて増加し、植えた時点で確定する。種が弾ける前にあなたが死ぬと、種は枯れる。",
+        "tether": "{range}ヤード以内の味方プレイヤー1人と{duration}秒間鎖でつながる。その味方の体力に届くはずのダメージの{share}%を代わりにあなたが受ける。あなたが死亡すると早期に終了する。自分以外の味方プレイヤーを対象にする必要がある。",
+        "harvest": "{duration}秒間、あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力の{pct}%（{health}）と最大マナの{pct}%を回復する。",
+        "quench": "{duration}秒以内の次の{hits}回の近接または遠隔武器の命中が、追加で{damage}の冷気ダメージを与える。最後の命中は対象を焼き入れし、{slowDuration}秒間その攻撃速度を{slow}%低下させる。効果が終わると未使用の命中は失われる。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加する。",
         "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。"
       }
     },
@@ -3923,6 +3926,17 @@ export const ja_JP: EnTranslations = {
         "avatar": "移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。",
         "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
       },
+      "sanctum": {
+        "lockbound": "受けるダメージが{pct}%減少：まだ残っている鎖1本につき{per}%。封印の枷を壊すとその鎖が外れる。",
+        "enrage": "与えるダメージが{pct}%増加。",
+        "grasp": "融け水の中に立ち、与えるダメージが{pct}%増加。融け水の中で死ぬと沈み、{seconds}秒後に再び起き上がる。冷たい氷の上で倒せば二度と起きない。",
+        "twiceWoken": "融け水から再び起き上がり、与えるダメージが{pct}%増加。",
+        "doused": "足元の氷板が割れ、焼き入れの水が墓場のインフェルノを消した。",
+        "airborne": "空中にいて攻撃できない。最も多くのプレイヤーが立つ氷板へ墜落の降下で着地し、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。",
+        "wyrmsEye": "この効果が切れると、コルズルが立っている氷板全体に降り注ぐ炎を浴びせる：上にいる全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）、氷板にひびが入り、すでにひびがあれば砕ける。無傷の氷の上で仲間から離れて立て。",
+        "quenchWater": "開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。",
+        "shardFlare": "心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。"
+      },
       "foundry": {
         "scaldingVents": "メインラインのベルト以外の床に立っており、蒸気孔が警告中か噴出中である。蒸気が噴き出すと、ベルトに乗っていない者全員に{every}秒ごとに{min}から{max}の火炎ダメージを{seconds}秒間与える（ヒロイックでは{heroicMin}から{heroicMax}）。安全なのはベルトの上だけ。",
         "targetLock": "射撃場の番人に追尾されている。{every}秒ごとに立っている場所に円が描かれ、その{delay}秒後に砲弾が着弾して{radius}ヤード以内の全員に{min}から{max}の火炎ダメージを与える（ヒロイックでは{heroicMin}から{heroicMax}）。動き続けろ。移動阻害を解除する効果ではこの印は消えない。"
@@ -4056,6 +4070,12 @@ export const ja_JP: EnTranslations = {
         "overheated": "詠唱速度が{pct}%低下。",
         "spiritPack": "霊のジャガーが共に戦い、{every}秒ごとに対象へ噛みついて{min}～{max}の物理ダメージを与える。",
         "seedburst": "ゴージブルームの種。この効果が切れると弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。それまでにこの敵が死んだ場合は{bonus}%増加（{empowered}）。",
+        "tether": "親方の最後の鎖環でつながれている：あなたの体力に届くはずのダメージの{pct}%を、代わりにあなたをつないだ者が受ける。",
+        "tetherLink": "つないだ味方が受けるはずのダメージの{pct}%をあなたが受ける。",
+        "harvest": "あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力と最大マナの{pct}%を回復する。",
+        "quench": "次の{stacks}回の武器の命中が追加で{damage}の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。",
+        "quenchOther": "次の{stacks}回の武器の命中が追加の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。",
+        "quenched": "攻撃速度が{pct}%低下。",
         "forgeHeat": "熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。",
         "tempered": "近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。",
         "temperedOther": "近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
@@ -6010,6 +6030,9 @@ export const ja_JP: EnTranslations = {
         "deathless_court": "不死の宮廷（英雄限定、不死の憤怒の後に王家の廷臣が蘇る）",
         "bloodmane_rend": "ブラッドメインレンド（出血、対象交代に注意）",
         "tusk_sweep": "タスクスイープ（前方クリーブ）",
+        "grave_breath": "墓所のブレス（前方の炎の扇形、範囲内の氷にひびが入る）",
+        "plate_floor": "砕ける氷（炎で湖の氷板が割れて沈む、開いた水面に入らない）",
+        "wyrm_flights": "飛行フェーズ（70%と40%：ワームの目は無傷の氷の上へ、着地させたい場所に集合）",
         "ancestral_sap": "アンセストラルサップ（味方を回復）",
         "call_of_the_hunt": "コール・オブ・ザ・ハント（周囲の味方を加速）",
         "thickhide_ward": "シックハイドウォード（周囲の味方を守護）",
@@ -6062,7 +6085,16 @@ export const ja_JP: EnTranslations = {
         "gorge": "貪り食い（タンクへの強烈な噛みつきと毒）",
         "burrowing_seeds": "潜る種と花粉の雲（種は6秒で誰かの傍から芽吹き、金色は広がる）",
         "spirit_of_the_hunt": "狩りの魂（獲物は化身を光る太陽紋へ導く。噛み倒された者には逃げる猶予がある）",
-        "twin_prey_ambush": "双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）"
+        "twin_prey_ambush": "双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）",
+        "seal_shackles": "封印の枷（鎖を1本断つごとに彼の被ダメージが20%増え、攻撃が1つ解き放たれる）",
+        "chain_strain": "鎖の引き締め（鎖がまだ残る柱から離れる）",
+        "korgath_stomp": "震える踏みつけ（彼の周りの輪から出る）",
+        "rerivet_last_link": "再鋲打ちと最後の環（鎖を打ち直す突き棒鍛冶を阻止する。鎖が残り1本になると10秒ごとに鎖の引き締め）",
+        "waking_thaw": "目覚めの雪解け（死者が融氷の池から這い上がる）",
+        "unquenched_held": "封じか不滅か（死者は冷たい氷の上で倒せ、融水の中では倒すな）",
+        "soulfire_trench": "魂火の溝（魂火の線、その後に融水の帯が残る）",
+        "shadow_volley": "影の斉射（全員に闇ダメージ）",
+        "warm_hands_twice_woken": "温かな手と二度目の目覚め（英雄のみ、死者を動かし続けよ。再び起きた者は強くなる）"
       }
     },
     "bastionCage": {
@@ -6140,6 +6172,45 @@ export const ja_JP: EnTranslations = {
       "pollinatedLine": "種に近づくな：触れると芽吹く",
       "bondTitle": "群れの絆",
       "bondLine": "並んでいると被ダメージ半減：引き離せ",
+      "timeAria": "残り{seconds}秒"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "焼き入れの水の中だ！",
+      "quenchLine": "焼かれて鈍る：一番近い氷か岸まで泳げ",
+      "plungeTitle": "降り注ぐ炎！",
+      "plungeLine": "足元の氷板全体が燃え上がる：今すぐ降りろ",
+      "descentTitle": "墜落の降下！",
+      "descentLine": "ここに降りてくる：影から出ろ",
+      "eyeTitle": "ワームの眼に狙われた！",
+      "eyeLine": "印が消えると立っている氷板が燃える：無傷の氷の上で仲間から離れろ",
+      "eyeCrackedLine": "ひびの入った氷の上だ：印が消える前に無傷の氷板へ移れ",
+      "flailTitle": "鎖の殻竿！",
+      "flailLine": "鎖が描かれた線に沿って振り下ろされる：線から出ろ",
+      "chargeTitle": "敷居の突進！",
+      "chargeLine": "線に沿って突進してくる：線から出て、端から離れろ",
+      "trenchTitle": "魂火の溝！",
+      "trenchLine": "魂火が線を裂き、融け水を残す：そこから出ろ",
+      "strainTitle": "鎖の引き絞り！",
+      "strainLine": "無傷の柱が今にも弾ける：柱から離れろ",
+      "infernoTitle": "墓場のインフェルノ！",
+      "infernoLine": "脈動のたびに激しくなる：彼の届く範囲から出ろ",
+      "stompTitle": "身震いの踏みつけ！",
+      "stompLine": "足が下りる前に彼から離れろ",
+      "breathTitle": "墓のブレス！",
+      "breathLine": "ブレスの扇の中にいる：横へ抜けろ",
+      "maulTitle": "大槌の弧！",
+      "maulLine": "前方すべてをなぎ払う：背後へ回れ",
+      "tailTitle": "尾のなぎ払い！",
+      "tailLine": "背後に立っている：尾が来る前に離れろ",
+      "meltwaterTitle": "融け水の中",
+      "meltwaterLine": "お前のボーンウォーカーが融け水の中にいる：冷たい氷の上へ引きずり出せ",
+      "meltwaterTargetLine": "ターゲットは融け水の中で死ぬと再び起き上がる：冷たい氷の上まで待て",
+      "crackedTitle": "ひびの入った氷",
+      "crackedLine": "ここに炎が当たるとこの氷板は砕ける：彼の炎をここに向けさせるな",
+      "flightTitle": "コルズルが飛び立つ",
+      "flightLine": "無傷の氷の上に集まって降下地点を選び、その後に離れろ",
+      "lockboundTitle": "錠縛",
+      "lockboundLine": "鎖が{chains}本残っている：被ダメージが{pct}%減少。封印の枷を壊して剥がせ。",
       "timeAria": "残り{seconds}秒"
     },
     "foundryWorkers": {
@@ -12474,7 +12545,23 @@ export const ja_JP: EnTranslations = {
       "sanctum_plant_brazier": "魂の火鉢を置く",
       "sanctum_ice_block_toss": "氷塊投げ",
       "sanctum_tusker_tusk_sweep": "牙薙ぎ",
-      "sanctum_tusker_trample": "踏みつぶし"
+      "sanctum_tusker_trample": "踏みつぶし",
+      "sanctum_korgath_maul_arc": "大槌の弧撃",
+      "sanctum_korgath_chain_flail": "鎖の鞭打ち",
+      "sanctum_korgath_threshold_charge": "境界の突進",
+      "sanctum_korgath_foremans_bellow": "親方の咆哮",
+      "sanctum_korgath_strain": "鎖の引き締め",
+      "sanctum_korgath_stomp": "震える踏みつけ",
+      "sanctum_goadsmith_rerivet": "再鋲打ち",
+      "sanctum_velkhar_soulfire_trench": "魂火の溝",
+      "sanctum_velkhar_shadow_volley": "影の斉射",
+      "sanctum_korzul_break_free": "氷の封印を破る",
+      "sanctum_korzul_grave_breath": "墓所のブレス",
+      "sanctum_korzul_tail_sweep": "尾の薙ぎ払い",
+      "sanctum_korzul_grave_inferno": "墓場のインフェルノ",
+      "sanctum_korzul_wing_gale": "翼の烈風",
+      "sanctum_korzul_plunging_fire": "降り注ぐ炎",
+      "sanctum_korzul_crashing_descent": "墜落着地"
     }
   },
   "questUi": {
@@ -18888,6 +18975,30 @@ export const ja_JP: EnTranslations = {
       "thornroot_greathelm": {
         "name": "茨冠のグレートヘルム"
       },
+      "foremans_grips": {
+        "name": "親方の籠手"
+      },
+      "serac_stride_boots": {
+        "name": "氷塔渡りのブーツ"
+      },
+      "seal_rune_mantle": {
+        "name": "封印ルーンのマントル"
+      },
+      "thawbound_legguards": {
+        "name": "融けた枷のレッグガード"
+      },
+      "pyre_tenders_hood": {
+        "name": "火葬番の頭巾"
+      },
+      "meltwater_cord": {
+        "name": "雪解け水の飾り紐"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "開かれた錠の大槌"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "目覚めの儀の祭服"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19757,6 +19868,15 @@ export const ja_JP: EnTranslations = {
       },
       "gorgebloom_seedpod": {
         "name": "ゴージブルームの種莢"
+      },
+      "foremans_last_link": {
+        "name": "親方の最後の鎖環"
+      },
+      "phial_of_the_tithe": {
+        "name": "十分の一税の小瓶"
+      },
+      "quenchwater_flask": {
+        "name": "焼き入れ水のフラスコ"
       },
       "rift_watchers_band": {
         "name": "裂け目の監視者の指輪"
@@ -20815,6 +20935,18 @@ export const ja_JP: EnTranslations = {
       },
       "sledge_tusker": {
         "name": "そり引きの巨牙獣"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "大槌の枷"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "火ばさみの枷"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "金床の枷"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "ふいごの枷"
       },
       "thorn_sprout": {
         "name": "茨の芽"
