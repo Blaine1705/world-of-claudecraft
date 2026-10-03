@@ -27,6 +27,7 @@ import {
   collapsePose,
   crackReveal,
   eyeOpen,
+  FACE_BURST_AT,
   FACE_CHAIN_ENTRIES,
   FACE_EVENT_SECONDS,
   FACE_ORIGIN,
@@ -35,6 +36,7 @@ import {
   faceChainEntries,
   faceToGame,
   faceY,
+  frozenWyrmShown,
   heartGlow,
   plateFallPose,
   WYRM_HEAD,
@@ -176,6 +178,25 @@ describe('the stage timelines', () => {
     expect(end.k).toBe(1);
     expect(end.drop).toBe(COLLAPSE_DROP);
     expect(collapsePose(FACE_EVENT_SECONDS.collapse * 5).drop).toBe(COLLAPSE_DROP);
+  });
+
+  it('lets the frozen wyrm go on the burst beat, the same moment the live body tears out', async () => {
+    const bosses = await import('../src/render/gravewyrm_sanctum_bosses/boss_model_core');
+    expect(FACE_BURST_AT).toBe(bosses.KORZUL_BURST_AT);
+    expect(frozenWyrmShown(-1)).toBe(true);
+    expect(frozenWyrmShown(0)).toBe(true);
+    expect(frozenWyrmShown(FACE_BURST_AT - 0.01)).toBe(true);
+    expect(frozenWyrmShown(FACE_BURST_AT)).toBe(false);
+    // The face shudders in place until the burst, then breaks and falls.
+    for (let t = 0; t < FACE_BURST_AT - 1e-6; t += 0.05)
+      expect(Math.abs(collapsePose(t).drop)).toBeLessThanOrEqual(0.6);
+    expect(collapsePose(FACE_BURST_AT + 1.5).drop).toBeGreaterThan(1);
+    let prev = collapsePose(FACE_BURST_AT).drop;
+    for (let t = FACE_BURST_AT; t <= FACE_EVENT_SECONDS.collapse; t += 0.05) {
+      const d = collapsePose(t).drop;
+      expect(d).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = d;
+    }
   });
 
   it('opens his eye only once the face has calved', () => {

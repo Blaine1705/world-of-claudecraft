@@ -9,8 +9,11 @@
 //                     (heroic Deep Quench: never). A broken plate is open
 //                     quench-water: 50 percent slow and 60 a second (heroic
 //                     150) to a player in it.
-//   Break Free        his pull: he bursts out of the Calving Face's ice (a 3 s
-//                     bar while he is untouchable), then fights.
+//   Break Free        his pull (korzul_emerge.ts): the Calving Face bursts and
+//                     he tears out at its foot (a 3 s bar), climbs, glides over
+//                     the lake and lands on the arena centre; out of reach the
+//                     whole way, his fight and its clocks begin at the
+//                     touchdown. A player out on the plates wakes him.
 //   Grave Breath      every 15 s (12 s in the last phase) a 2 s bar along the
 //                     tank's line, then a 60 degree cone 30 yd past his body:
 //                     250 to 300 on anyone but the tank, and up to three
@@ -73,6 +76,7 @@ import { type Aura, DT, dist2d, type Entity } from '../../types';
 import { pickMarkTargets } from '../sunken_bastion/claim';
 import { plateTemplate } from './boss_ids';
 import {
+  bossEngaged,
   claimPlayers,
   clearCastIf,
   dropAuraById,
@@ -105,6 +109,7 @@ import {
   SANCTUM_QUENCH_WATER,
   SCALEGUARD_ID,
 } from './ids';
+import { skipEmerge, startEmerge, stepEmerge, wakeKorzul } from './korzul_emerge';
 import type { KorzulFightState, KorzulFlight } from './korzul_state';
 import {
   burnPlate,
@@ -121,8 +126,6 @@ const T = KORZUL_TUNING;
 
 /** His drawn body radius (the template's bodyRadius): cones reach from it. */
 export const KORZUL_BODY = 5;
-/** Break Free's bar: the ice bursts and he climbs out onto the lake. */
-export const KORZUL_EMERGE_SECONDS = 3;
 /** The climb from the ice to the hover. */
 export const KORZUL_TAKEOFF_SECONDS = 1.8;
 /** How fast he glides between plates on the wing (yards a second). */
@@ -141,8 +144,7 @@ export const THIN_ICE_PLATES = 12;
 
 /** His sim-English log lines (re-localized by the client's EXACT matcher,
  *  src/ui/sim_i18n.ts). */
-export const KORZUL_BREAK_FREE_LOG =
-  'The Calving Face bursts apart! Korzul the Gravewyrm tears himself free of the ice.';
+export { KORZUL_BREAK_FREE_LOG } from './korzul_emerge';
 export const KORZUL_FLIGHT_LOG = 'Korzul beats his wings and takes to the air above the lake!';
 export const KORZUL_DOUSED_LOG =
   'The ice gives way under Korzul! He plunges into the quench, Doused.';
@@ -174,6 +176,7 @@ function freshState(): KorzulFightState {
     broodIds: [],
     quenchTick: 1,
     casts: 0,
+    emergeFrom: null,
   };
 }
 
@@ -1055,7 +1058,11 @@ export function resetKorzul(ctx: SimContext, inst: InstanceSlot, boss: Entity): 
   const st = boss.sanctumFight?.kind === 'korzul' ? boss.sanctumFight : null;
   if (!st) return;
   const aloft =
-    st.phase === 'gale' || st.phase === 'takeoff' || st.phase === 'air' || st.phase === 'drown';
+    st.phase === 'emerge' ||
+    st.phase === 'gale' ||
+    st.phase === 'takeoff' ||
+    st.phase === 'air' ||
+    st.phase === 'drown';
   clearFightObjects(ctx, inst, boss, st);
   if (aloft || boss.damageImmune) releaseAloft(boss);
   if (!boss.dead) {
@@ -1120,41 +1127,29 @@ export function tickKorzul(
     return;
   }
   if (st.phase === 'slain') return;
-  if (!engaged) {
+  // A player out on the plates wakes him (an ordinary aggro: the chain pull
+  // and the Hollow Ward's seal answer it as any pull).
+  const fighting =
+    engaged || (st.phase === 'idle' && wakeKorzul(ctx, inst, boss) && bossEngaged(boss));
+  if (!fighting) {
     if (st.phase !== 'idle') resetKorzul(ctx, inst, boss);
     return;
   }
   stepPlates(ctx, inst, st);
-  if (st.phase !== 'idle') stepQuench(ctx, inst, boss, st);
+  // The quench-water is his: it bites once he has landed.
+  if (st.phase !== 'idle' && st.phase !== 'emerge') stepQuench(ctx, inst, boss, st);
   if (boss.enraged && !st.enraged) {
     st.enraged = true;
     marker(boss, ctx, KORZUL_ENRAGE, 'Enrage');
   }
   switch (st.phase) {
-    case 'idle': {
-      // The pull: the ice bursts and he climbs out onto the lake.
-      st.phase = 'emerge';
-      st.pt = 0;
-      st.plantedAt = { ...boss.pos };
-      boss.damageImmune = true;
-      startBar(boss, KORZUL_BREAK_FREE, KORZUL_EMERGE_SECONDS, null);
-      nova(ctx, boss, boss, KORZUL_BREAK_FREE, 'frost');
-      log(ctx, boss, KORZUL_BREAK_FREE_LOG);
+    case 'idle':
+      // The pull: Break Free, the cinematic (korzul_emerge.ts).
+      startEmerge(ctx, inst, boss, st);
       return;
-    }
-    case 'emerge': {
-      if (st.plantedAt) holdPlanted(ctx, boss, st.plantedAt);
-      boss.damageImmune = true;
-      st.pt += DT;
-      boss.castRemaining = Math.max(0, KORZUL_EMERGE_SECONDS - st.pt);
-      boss.swingTimer = Math.max(boss.swingTimer, 0.6);
-      if (st.pt < KORZUL_EMERGE_SECONDS - 1e-9) return;
-      clearCastIf(boss, KORZUL_BREAK_FREE);
-      boss.damageImmune = false;
-      st.plantedAt = null;
-      st.phase = 'ground';
+    case 'emerge':
+      stepEmerge(ctx, inst, boss, st);
       return;
-    }
     case 'ground':
       stepGround(ctx, inst, boss, st);
       return;
@@ -1219,11 +1214,8 @@ export function korzulDevTrigger(
     return Number.isInteger(n) && n >= 0 && n < LAKE_PLATES.length ? n : null;
   };
   const ground = (): boolean => {
-    if (st.phase === 'emerge' || st.phase === 'idle') {
-      clearCastIf(boss, KORZUL_BREAK_FREE);
-      boss.damageImmune = false;
-      st.phase = 'ground';
-    }
+    // A trigger skips what is left of Break Free: he stands on the centre.
+    if (st.phase === 'emerge' || st.phase === 'idle') skipEmerge(ctx, inst, boss, st);
     if (st.phase !== 'ground') return false;
     clearCastIf(boss, ...GROUND_BARS, KORZUL_GRAVE_INFERNO);
     st.inferno = null;

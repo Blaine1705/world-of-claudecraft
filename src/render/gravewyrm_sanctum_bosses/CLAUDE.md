@@ -20,6 +20,14 @@ and `scale`/`facing`), so offline and online draw the same. A claimed `spellfx` 
 renderer's own handling, so this layer replays the boss's clip for it through
 `playGesture` (ChainBreak, ChainYank, Roar, Hit, BreakFree).
 
+Korzul's Break Free (the sim's `korzul_emerge_plan.ts`): his body stays hidden from his
+pull until the BreakFree clip's burst beat (`KORZUL_BURST_AT`, `korzulBodyView`), the
+same frame the face's frozen wyrm goes (`render/gravewyrm_sanctum/sanctum_face_core.ts`
+`frozenWyrmShown`); the cinematic's clock is read off the bar, its beats played once
+(`emergeCuesBetween`: the burst, the takeoff, the Land one-shot), his shadow follows him
+down (`emergeShadow`) and the touchdown cracks the plates white for a moment
+(`plateShock`, render only).
+
 Rules: the telegraphs are the shared kit in the threat palette on every tier
 (fairness); particles, steam and rune glow thin on the low tier (`density`). Every
 mesh and material is built once in the constructor under one root attached through

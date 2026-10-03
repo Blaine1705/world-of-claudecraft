@@ -227,8 +227,10 @@ export const KORZUL_PLUNGING_FIRE = 'sanctum_korzul_plunging_fire';
 export const KORZUL_BROOD = 'sanctum_korzul_brood_from_below';
 /** Crashing Descent: a bar while his shadow grows, then a `nova` on landing. */
 export const KORZUL_CRASHING_DESCENT = 'sanctum_korzul_crashing_descent';
-/** His pull: he bursts out of the ice (a `nova` spellfx). */
+/** His pull: he bursts out of the ice (Break Free's bar, a `nova` spellfx). */
 export const KORZUL_BREAK_FREE = 'sanctum_korzul_break_free';
+/** Break Free's end: he lands on the arena centre (a `nova` spellfx; no damage). */
+export const KORZUL_TOUCHDOWN = 'sanctum_korzul_touchdown';
 /** The last phase: the shard flares (aura on him). */
 export const KORZUL_SHARD_FLARE = 'sanctum_korzul_shard_flare';
 export const KORZUL_ENRAGE = 'sanctum_korzul_enrage';

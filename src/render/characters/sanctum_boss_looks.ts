@@ -38,6 +38,7 @@ import {
   VELKHAR_SOULFIRE_TRENCH,
   VELKHAR_TUNING,
 } from '../../sim/encounters/gravewyrm_sanctum/boss_ids';
+import { KORZUL_EMERGE } from '../../sim/encounters/gravewyrm_sanctum/korzul_emerge_plan';
 import {
   bossLookHeight,
   bossModelScale,
@@ -50,6 +51,8 @@ import {
   KORGATH_WHOLE_GESTURE,
   KORZUL_BODY,
   KORZUL_CLIP,
+  KORZUL_EMERGE_LAND_GESTURE,
+  KORZUL_EMERGE_LAND_RATE,
   KORZUL_FROZEN_STANCE,
   KORZUL_HEARTBEAT_FLARE_GESTURE,
   KORZUL_HEARTBEAT_GESTURE,
@@ -67,8 +70,8 @@ import type { ClipMap, VisualDef } from './manifest';
 const K = KORGATH_TUNING;
 const V = VELKHAR_TUNING;
 const Z = KORZUL_TUNING;
-/** Korzul's emergence bar (korzul.ts KORZUL_EMERGE_SECONDS). */
-const KORZUL_EMERGE_BAR = 3;
+/** Korzul's emergence bar (korzul_emerge_plan.ts: Break Free's burst beat). */
+const KORZUL_EMERGE_BAR = KORZUL_EMERGE.burst;
 
 /** The broken chains hang from the wrist rings once their chain has broken
  *  (re-sent by the effects, so a view rebuilt mid-fight shows the state). */
@@ -92,6 +95,8 @@ const KORZUL_CLIPS: ClipMap = {
     [KORZUL_ENRAGE]: 'Roar',
     [KORZUL_SHARD_FLARE]: 'Roar',
     [KORZUL_TAKEOFF_GESTURE]: 'TakeOff',
+    // Break Free's landing on the centre: the fall's impact on the touchdown.
+    [KORZUL_EMERGE_LAND_GESTURE]: 'Land',
   },
   attackTimeScaleByAbility: {
     [KORZUL_DOUSED]: 1,
@@ -99,6 +104,7 @@ const KORZUL_CLIPS: ClipMap = {
     [KORZUL_SHARD_FLARE]: 1,
     // The sim climbs to the hover in 1.8 s (korzul.ts KORZUL_TAKEOFF_SECONDS).
     [KORZUL_TAKEOFF_GESTURE]: 2.79 / 1.8,
+    [KORZUL_EMERGE_LAND_GESTURE]: KORZUL_EMERGE_LAND_RATE,
   },
   hit: ['Hit'],
   death: 'Death',

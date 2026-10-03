@@ -34,17 +34,34 @@ import {
 } from '../src/sim/encounters/gravewyrm_sanctum';
 import { claimBoss } from '../src/sim/encounters/gravewyrm_sanctum/claim';
 import {
-  KORZUL_EMERGE_SECONDS,
+  burnLakePlate,
+  KORZUL_TAKEOFF_SECONDS,
   korzulDevTrigger,
   korzulState,
   thinIceEarned,
 } from '../src/sim/encounters/gravewyrm_sanctum/korzul';
+import {
+  emergeBeat,
+  emergeFacing,
+  emergePose,
+  KORZUL_EMERGE,
+  KORZUL_EMERGE_ALTITUDE,
+  KORZUL_EMERGE_ARC_AT,
+  KORZUL_EMERGE_FROM,
+  KORZUL_EMERGE_LAND_AT,
+  KORZUL_EMERGE_RISE_AT,
+  KORZUL_EMERGE_SECONDS,
+  KORZUL_EMERGE_TO,
+  KORZUL_WAKE_RADIUS,
+} from '../src/sim/encounters/gravewyrm_sanctum/korzul_emerge_plan';
 import type { KorzulFightState } from '../src/sim/encounters/gravewyrm_sanctum/korzul_state';
 import {
   conePlates,
   nearestPlate,
   plateIndexAt,
 } from '../src/sim/encounters/gravewyrm_sanctum/plates';
+import { storyStep } from '../src/sim/encounters/gravewyrm_sanctum/story';
+import { dungeonGateState } from '../src/sim/instances/dungeon_gates';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -113,7 +130,8 @@ function run(r: Room, seconds: number, engaged = true): void {
   }
 }
 
-/** Pull him and let Break Free play out. */
+/** Pull him and let Break Free play out (the whole cinematic: he lands on
+ *  the arena centre and his fight begins). */
 function pullOut(r: Room): KorzulFightState {
   run(r, KORZUL_EMERGE_SECONDS + 0.1);
   return st(r);
@@ -155,6 +173,8 @@ function quiet(s: KorzulFightState): void {
 describe('Korzul: the plate floor (G25)', () => {
   it('lays nineteen Sound plates on the lake before the pull, one per LAKE_PLATES centre', () => {
     const r = room();
+    // On the shore side of the pull's trigger: nothing stirs yet.
+    put(r, r.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS - 6);
     run(r, DT, false);
     const s = korzulState(r.sim.ctx, r.inst, r.boss);
     expect(s.phase).toBe('idle');
@@ -230,17 +250,6 @@ describe('Korzul: the plate floor (G25)', () => {
 });
 
 describe('Korzul: the ground kit', () => {
-  it('Break Free: the pull is a 3 s bar while he climbs out, untouchable', () => {
-    const r = room();
-    run(r, DT);
-    expect(r.boss.castingAbility).toBe(KORZUL_BREAK_FREE);
-    expect(r.boss.damageImmune).toBe(true);
-    run(r, KORZUL_EMERGE_SECONDS);
-    expect(r.boss.castingAbility).toBeNull();
-    expect(r.boss.damageImmune).toBe(false);
-    expect(st(r).phase).toBe('ground');
-  });
-
   it('Grave Breath: a 2 s bar along the tank, then the cone burns everyone but the tank and the plates it covers', () => {
     const r = room();
     const s = pullOut(r);
@@ -666,5 +675,313 @@ describe('Korzul: determinism', () => {
       });
     };
     expect(trace()).toBe(trace());
+  });
+});
+
+describe('Korzul: Break Free, the cinematic of his pull', () => {
+  const MECHANIC_FX = new Set([
+    KORZUL_GRAVE_BREATH,
+    KORZUL_GRAVE_INFERNO,
+    KORZUL_PLUNGING_FIRE,
+    KORZUL_CRASHING_DESCENT,
+    KORZUL_DOUSED,
+    KORZUL_SHARD_FLARE,
+    'sanctum_korzul_tail_sweep',
+    'sanctum_korzul_wing_gale',
+    'sanctum_korzul_brood_from_below',
+  ]);
+  const TOUCHDOWN = 'sanctum_korzul_touchdown';
+  const local = (r: Room) => ({ x: r.boss.pos.x - r.ox, z: r.boss.pos.z - r.oz });
+  const floorAt = (r: Room) => r.sim.ctx.groundPos(r.boss.pos.x, r.boss.pos.z).y;
+  /** The real tick (the mob AI and every system running); nobody dies. */
+  const realTick = (r: Room, ticks: number, each?: () => void): void => {
+    for (let i = 0; i < ticks; i++) {
+      for (const meta of r.sim.ctx.players.values()) {
+        const p = r.sim.ctx.entities.get(meta.entityId);
+        if (p) p.hp = p.maxHp;
+      }
+      r.events.push(...r.sim.tick());
+      each?.();
+      r.events.push(...r.sim.drainEvents());
+    }
+  };
+
+  it('the timeline: burst, rise, arc, land in order, 7 to 10 s, the climb the flights climb', () => {
+    expect(KORZUL_EMERGE.burst).toBe(3);
+    expect(KORZUL_EMERGE.rise).toBe(KORZUL_TAKEOFF_SECONDS);
+    expect(0).toBeLessThan(KORZUL_EMERGE_RISE_AT);
+    expect(KORZUL_EMERGE_RISE_AT).toBeLessThan(KORZUL_EMERGE_ARC_AT);
+    expect(KORZUL_EMERGE_ARC_AT).toBeLessThan(KORZUL_EMERGE_LAND_AT);
+    expect(KORZUL_EMERGE_LAND_AT).toBeLessThan(KORZUL_EMERGE_SECONDS);
+    expect(KORZUL_EMERGE_SECONDS).toBeGreaterThanOrEqual(7);
+    expect(KORZUL_EMERGE_SECONDS).toBeLessThanOrEqual(10);
+    expect(emergeBeat(0)).toBe('burst');
+    expect(emergeBeat(KORZUL_EMERGE_RISE_AT)).toBe('rise');
+    expect(emergeBeat(KORZUL_EMERGE_ARC_AT)).toBe('arc');
+    expect(emergeBeat(KORZUL_EMERGE_LAND_AT)).toBe('land');
+    expect(emergeBeat(KORZUL_EMERGE_SECONDS)).toBe('done');
+  });
+
+  it('the path: from the face foot, up, over the lake to the arena centre, and down, never a jump', () => {
+    // The start is walkable floor on the north shelf, north of the lake; the
+    // end is the middle plate.
+    const dFace = Math.hypot(
+      KORZUL_EMERGE_FROM.x - WYRMS_HOLLOW.x,
+      KORZUL_EMERGE_FROM.z - WYRMS_HOLLOW.z,
+    );
+    expect(dFace).toBeGreaterThan(WYRMS_HOLLOW.lakeR);
+    expect(dFace).toBeLessThan(WYRMS_HOLLOW.shelfR);
+    expect(KORZUL_EMERGE_TO).toEqual({ x: LAKE_PLATES[0].x, z: LAKE_PLATES[0].z });
+    expect(emergeFacing(KORZUL_EMERGE_FROM)).toBeCloseTo(Math.PI, 6);
+    const from = KORZUL_EMERGE_FROM;
+    const to = KORZUL_EMERGE_TO;
+    const len = Math.hypot(to.x - from.x, to.z - from.z);
+    let prev = emergePose(0, from);
+    let progress = 0;
+    let peak = 0;
+    expect(prev).toMatchObject({ x: from.x, z: from.z, h: 0 });
+    for (let t = DT; t <= KORZUL_EMERGE_SECONDS + 1e-9; t += DT) {
+      const p = emergePose(t, from);
+      // On the straight line from the face to the centre, never back.
+      const along = ((p.x - from.x) * (to.x - from.x) + (p.z - from.z) * (to.z - from.z)) / len;
+      const off = Math.abs((p.x - from.x) * (to.z - from.z) - (p.z - from.z) * (to.x - from.x));
+      expect(off / len).toBeLessThan(1e-9);
+      expect(along).toBeGreaterThanOrEqual(progress - 1e-9);
+      progress = along;
+      // Never under the floor, and no step bigger than a fast wingbeat.
+      expect(p.h).toBeGreaterThanOrEqual(0);
+      expect(Math.hypot(p.x - prev.x, p.z - prev.z, p.h - prev.h)).toBeLessThan(1.6);
+      peak = Math.max(peak, p.h);
+      prev = p;
+    }
+    expect(progress).toBeCloseTo(len, 6);
+    expect(peak).toBeGreaterThan(KORZUL_EMERGE_ALTITUDE);
+    expect(emergePose(KORZUL_EMERGE_ARC_AT, from).h).toBeCloseTo(KORZUL_EMERGE_ALTITUDE, 6);
+    expect(emergePose(KORZUL_EMERGE_LAND_AT, from)).toMatchObject({ x: to.x, z: to.z });
+    expect(emergePose(KORZUL_EMERGE_SECONDS, from)).toMatchObject({ x: to.x, z: to.z, h: 0 });
+    // The burst holds him at the face; the landing falls faster as it ends.
+    expect(emergePose(KORZUL_EMERGE.burst - DT, from)).toMatchObject({ x: from.x, z: from.z });
+    const h1 = emergePose(KORZUL_EMERGE_LAND_AT + 0.2, from).h;
+    const h2 = emergePose(KORZUL_EMERGE_LAND_AT + 0.4, from).h;
+    const h3 = emergePose(KORZUL_EMERGE_LAND_AT + 0.6, from).h;
+    expect(h2 - h3).toBeGreaterThan(h1 - h2);
+  });
+
+  it('the face still whole: he tears out at its foot behind the bar, flies the arc and lands on the centre', () => {
+    const r = room();
+    run(r, DT);
+    const s = st(r);
+    expect(s.phase).toBe('emerge');
+    expect(r.boss.castingAbility).toBe(KORZUL_BREAK_FREE);
+    expect(r.boss.castTotal).toBe(KORZUL_EMERGE.burst);
+    expect(local(r).x).toBeCloseTo(KORZUL_EMERGE_FROM.x, 6);
+    expect(local(r).z).toBeCloseTo(KORZUL_EMERGE_FROM.z, 6);
+    expect(r.boss.pos.y - floorAt(r)).toBeCloseTo(0, 6);
+    // No streak across the lake from where he lay hidden.
+    expect(r.boss.prevPos).toEqual(r.boss.pos);
+    expect(r.boss.facing).toBeCloseTo(Math.PI, 6);
+    expect(
+      r.events.some((e) => e.type === 'log' && (e as { text: string }).text.includes('Calving')),
+    ).toBe(true);
+    // The bar ends, he climbs, then flies over the lake.
+    run(r, KORZUL_EMERGE.burst + KORZUL_EMERGE.rise * 0.5);
+    expect(r.boss.castingAbility).toBeNull();
+    expect(local(r).z).toBeCloseTo(KORZUL_EMERGE_FROM.z, 6);
+    expect(r.boss.pos.y - floorAt(r)).toBeGreaterThan(1);
+    run(r, KORZUL_EMERGE.rise * 0.5 + KORZUL_EMERGE.arc * 0.5);
+    const mid = local(r);
+    expect(mid.z).toBeLessThan(KORZUL_EMERGE_FROM.z - 5);
+    expect(mid.z).toBeGreaterThan(KORZUL_EMERGE_TO.z + 5);
+    expect(r.boss.pos.y - floorAt(r)).toBeGreaterThan(KORZUL_EMERGE_ALTITUDE);
+    expect(s.phase).toBe('emerge');
+    run(r, KORZUL_EMERGE_SECONDS - (KORZUL_EMERGE_ARC_AT + KORZUL_EMERGE.arc * 0.5) + DT);
+    expect(s.phase).toBe('ground');
+    expect(local(r).x).toBeCloseTo(KORZUL_EMERGE_TO.x, 6);
+    expect(local(r).z).toBeCloseTo(KORZUL_EMERGE_TO.z, 6);
+    expect(r.boss.pos.y - floorAt(r)).toBeCloseTo(0, 6);
+    expect(
+      r.events.some(
+        (e) => e.type === 'spellfx' && (e as { ability?: string }).ability === TOUCHDOWN,
+      ),
+    ).toBe(true);
+  });
+
+  it('cannot be engaged before the landing ends: no damage either way, no strike, no burn, no swing, not attackable', () => {
+    const r = room();
+    // The route cleared (no pack answers the pull), one quiet tick off the
+    // lake so the plates lie, then a broken plate with a swimmer in it (the
+    // quench-water is his, so it waits for him too).
+    for (const what of ['trash', 'korgath', 'velkhar'])
+      r.sim.chat(`/dev sanctum kill ${what}`, r.me.id);
+    put(r, r.me, 0, 120);
+    realTick(r, 1);
+    const s = korzulState(r.sim.ctx, r.inst, r.boss);
+    expect(s.phase).toBe('idle');
+    burnLakePlate(r.sim.ctx, r.inst, s, 12);
+    burnLakePlate(r.sim.ctx, r.inst, s, 12);
+    const before = s.plates.map((p) => p.state);
+    const swimmer = addPlayer(r, 'Swim', LAKE_PLATES[12].x, LAKE_PLATES[12].z);
+    // The tank waits at the face's foot, in his reach the moment he is out.
+    put(r, r.me, KORZUL_EMERGE_FROM.x, KORZUL_EMERGE_FROM.z - 6);
+    r.me.targetId = r.boss.id;
+    r.events = [];
+    let ticks = 0;
+    let damageTried = 0;
+    realTick(r, Math.round(KORZUL_EMERGE_SECONDS / DT) + 40, () => {
+      if (s.phase !== 'emerge') return;
+      ticks++;
+      expect(r.boss.inCombat).toBe(true);
+      expect(r.boss.damageImmune).toBe(true);
+      expect(r.boss.hostile).toBe(false);
+      expect(r.sim.isHostileTo(r.me, r.boss)).toBe(false);
+      expect([null, KORZUL_BREAK_FREE]).toContain(r.boss.castingAbility);
+      expect(r.boss.swingTimer).toBeGreaterThan(0);
+      // A hit straight at him lands nothing.
+      r.sim.ctx.dealDamage(r.me, r.boss, 500, false, 'physical', 'Test', 'hit', true);
+      damageTried++;
+      expect(r.boss.hp).toBe(r.boss.maxHp);
+      r.sim.startAutoAttack(r.me.id);
+      expect(s.plates.map((p) => p.state)).toEqual(before);
+      expect(s.breathTimer).toBe(T.breathFirst);
+      expect(s.tailTimer).toBe(T.tailFirst);
+      expect(s.infernoTimer).toBe(T.infernoFirst);
+    });
+    // The whole cinematic ran under the gate, then the fight began.
+    expect(damageTried).toBeGreaterThan(0);
+    expect(Math.abs(ticks - Math.round(KORZUL_EMERGE_SECONDS / DT))).toBeLessThanOrEqual(1);
+    const landing = r.events.findIndex(
+      (e) => e.type === 'spellfx' && (e as { ability?: string }).ability === TOUCHDOWN,
+    );
+    expect(landing).toBeGreaterThan(0);
+    for (const e of r.events.slice(0, landing)) {
+      if (e.type === 'damage') {
+        const d = e as { sourceId: number; targetId: number; amount: number };
+        expect(d.sourceId).not.toBe(r.boss.id);
+        if (d.targetId === r.boss.id) expect(d.amount).toBe(0);
+      }
+      if (e.type === 'spellfx')
+        expect(MECHANIC_FX.has((e as { ability?: string }).ability ?? '')).toBe(false);
+    }
+    const beforeLanding: Room = { ...r, events: r.events.slice(0, landing) };
+    expect(damageTo(beforeLanding, swimmer, 'Quench-Water')).toHaveLength(0);
+    expect(
+      beforeLanding.events.some((e) => e.type === 'damage' && (e as { amount: number }).amount > 0),
+    ).toBe(false);
+    // Landed: in reach, and the quench-water bites from now on.
+    expect(s.phase).toBe('ground');
+    expect(r.boss.damageImmune).toBe(false);
+    expect(r.boss.hostile).toBe(true);
+    expect(r.sim.isHostileTo(r.me, r.boss)).toBe(true);
+    const hp = r.boss.hp;
+    r.sim.ctx.dealDamage(r.me, r.boss, 500, false, 'physical', 'Test', 'hit', true);
+    expect(r.boss.hp).toBeLessThan(hp);
+    expect(damageTo(r, swimmer, 'Quench-Water').length).toBeGreaterThan(0);
+  }, 60_000);
+
+  it("the fight's mechanics clock starts at the touchdown", () => {
+    const r = room();
+    put(r, r.me, KORZUL_EMERGE_TO.x, KORZUL_EMERGE_TO.z - 14);
+    r.sim.ctx.aggroMob(r.boss, r.me, false);
+    let landedAt = -1;
+    let breathAt = -1;
+    let tick = 0;
+    realTick(r, Math.round((KORZUL_EMERGE_SECONDS + T.breathFirst + 2) / DT), () => {
+      tick++;
+      r.me.damageImmune = true;
+      if (landedAt < 0 && st(r).phase === 'ground') landedAt = tick;
+      if (breathAt < 0 && r.boss.castingAbility === KORZUL_GRAVE_BREATH) breathAt = tick;
+    });
+    expect(landedAt * DT).toBeCloseTo(KORZUL_EMERGE_SECONDS, 0);
+    expect(breathAt).toBeGreaterThan(landedAt);
+    expect((breathAt - landedAt) * DT).toBeCloseTo(T.breathFirst, 0);
+  }, 60_000);
+
+  it('the pull: a player out on the plates wakes him (the chain pull answers); short of the ring nothing stirs', () => {
+    const far = room();
+    put(far, far.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS - 2);
+    realTick(far, 20);
+    expect(st(far).phase).toBe('idle');
+    expect(far.boss.inCombat).toBe(false);
+
+    const r = room();
+    put(r, r.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS + 1.5);
+    realTick(r, 1);
+    expect(st(r).phase).toBe('emerge');
+    expect(r.boss.aggroTargetId).toBe(r.me.id);
+    // The Sanctum punishes a skipped pack: everything left alive comes.
+    const woken = r.inst.mobIds
+      .map((id) => r.sim.ctx.entities.get(id))
+      .filter((e) => e && e.id !== r.boss.id && !e.dead && e.aiState === 'chase');
+    expect(woken.length).toBeGreaterThan(0);
+    expect(storyStep(r.sim.ctx, r.inst)).toBe(8);
+  });
+
+  it('the Hollow Ward seals behind the group the moment he wakes, cinematic included', () => {
+    const r = room();
+    r.sim.chat('/dev sanctum kill trash', r.me.id);
+    const ward = DUNGEONS[DUNGEON].gates?.find((g) => g.id === 'hollow_ward');
+    if (!ward) throw new Error('no Hollow Ward');
+    put(r, r.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS - 2);
+    realTick(r, 2);
+    expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('open');
+    put(r, r.me, 0, WYRMS_HOLLOW.z - 10);
+    realTick(r, 2);
+    expect(st(r).phase).toBe('emerge');
+    expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('sealed');
+  });
+
+  it('a wipe mid-flight restores him; with the ice already gone the next pull rises from where he stands', () => {
+    const r = room();
+    run(r, KORZUL_EMERGE_ARC_AT + 1);
+    const s = st(r);
+    expect(s.phase).toBe('emerge');
+    expect(r.boss.pos.y - floorAt(r)).toBeGreaterThan(1);
+    r.boss.inCombat = false;
+    r.boss.aggroTargetId = null;
+    r.boss.aiState = 'evade';
+    run(r, DT, false);
+    expect(s.phase).toBe('idle');
+    expect(r.boss.castingAbility).toBeNull();
+    expect(r.boss.damageImmune).toBe(false);
+    expect(r.boss.hostile).toBe(true);
+    expect(r.boss.pos.y - floorAt(r)).toBeLessThan(0.01);
+    expect(plateTemplates(r).every((t) => t === 'sanctum_plate_sound')).toBe(true);
+    // Home again (the evade walks him back), the face long broken: the next
+    // pull plays from his own spot, never from the face.
+    r.boss.aiState = 'idle';
+    put(r, r.boss, 0, 214);
+    expect(storyStep(r.sim.ctx, r.inst)).toBe(8);
+    run(r, DT);
+    expect(s.phase).toBe('emerge');
+    expect(local(r).z).toBeCloseTo(214, 6);
+    run(r, KORZUL_EMERGE_SECONDS);
+    expect(s.phase).toBe('ground');
+    expect(local(r).z).toBeCloseTo(KORZUL_EMERGE_TO.z, 6);
+  });
+
+  it('a dev trigger mid-cinematic skips it cleanly: he stands on the centre and the mechanic fires', () => {
+    const r = room();
+    run(r, KORZUL_EMERGE.burst + 1);
+    expect(st(r).phase).toBe('emerge');
+    r.sim.chat('/dev sanctum trigger breath', r.me.id);
+    expect(st(r).phase).toBe('ground');
+    expect(r.boss.castingAbility).toBe(KORZUL_GRAVE_BREATH);
+    expect(r.boss.damageImmune).toBe(false);
+    expect(r.boss.hostile).toBe(true);
+    expect(local(r).z).toBeCloseTo(KORZUL_EMERGE_TO.z, 6);
+    expect(r.boss.pos.y - floorAt(r)).toBeLessThan(0.01);
+    expect(r.boss.auras.some((a) => a.id === KORZUL_AIRBORNE)).toBe(false);
+  });
+
+  it('the landing throws the close clear, without a scratch', () => {
+    const r = room();
+    run(r, KORZUL_EMERGE_LAND_AT);
+    const under = addPlayer(r, 'Under', KORZUL_EMERGE_TO.x + 2, KORZUL_EMERGE_TO.z);
+    r.events = [];
+    run(r, KORZUL_EMERGE.land + DT);
+    expect(st(r).phase).toBe('ground');
+    const d = Math.hypot(under.pos.x - r.boss.pos.x, under.pos.z - r.boss.pos.z);
+    expect(d).toBeGreaterThan(6);
+    expect(r.events.filter((e) => e.type === 'damage')).toHaveLength(0);
   });
 });

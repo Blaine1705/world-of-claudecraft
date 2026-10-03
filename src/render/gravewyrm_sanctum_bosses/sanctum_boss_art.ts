@@ -49,6 +49,7 @@ uniform float uState;     // 0 sound, 1 cracked, 2 broken
 uniform float uRefreeze;  // cracked: share of the refreeze still to go (-1 never)
 uniform float uFlash;     // a burn coming (breath, plunging fire, the eye's plate)
 uniform float uSink;      // 0..1 the plate tipping under (render only)
+uniform float uShock;     // 0..1 his landing cracking through it (render only, fades)
 uniform float uSeed;
 uniform float uDetail;
 varying vec2 vP;
@@ -107,6 +108,14 @@ void main() {
     col += vec3(1.0, 0.45, 0.1) * tip * 2.0;
     a = max(a, tip);
   }
+  if (uShock > 0.0) {
+    // A white fracture web racing through the ice, gone as it settles: the
+    // weight of him, never a state (the plate stays what the sim says).
+    vec3 sv = voronoi(q * 1.4 + 1.7);
+    float web = 1.0 - smoothstep(0.0, 0.06, sv.y);
+    col += vec3(0.75, 0.92, 1.0) * web * uShock * 1.8;
+    a = max(a, web * uShock * 0.85);
+  }
   if (uFlash > 0.0) {
     float beat = 0.6 + 0.4 * sin(uTime * 12.0);
     col += vec3(1.0, 0.42, 0.08) * uFlash * beat * (0.5 + 0.5 * smoothstep(0.2, edge, r));
@@ -125,6 +134,7 @@ export function plateMaterial(uTime: { value: number }, seed: number, detail: bo
       uRefreeze: { value: -1 },
       uFlash: { value: 0 },
       uSink: { value: 1 },
+      uShock: { value: 0 },
       uSeed: { value: seed },
       uDetail: { value: detail ? 1 : 0.5 },
     },

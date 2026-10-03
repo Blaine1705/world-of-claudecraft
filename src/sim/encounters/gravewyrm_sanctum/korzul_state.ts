@@ -12,7 +12,8 @@ import type { PlateRec } from './plates';
 export type KorzulPhase =
   /** Not in his fight (frozen in the face before the pull, or reset). */
   | 'idle'
-  /** The pull: he bursts out of the ice (Break Free's bar). */
+  /** The pull: Break Free, the cinematic (the burst, the rise, the arc over
+   *  the lake, the landing), out of reach throughout. */
   | 'emerge'
   /** On the ice, his ground kit. */
   | 'ground'
@@ -50,7 +51,8 @@ export interface KorzulFlight {
 export interface KorzulFightState {
   kind: 'korzul';
   phase: KorzulPhase;
-  /** Seconds into the current phase step (emerge, gale, takeoff, drown). */
+  /** Seconds into the current phase step (emerge: since the pull; gale,
+   *  takeoff, drown). */
   pt: number;
   /** The lake: one record per LAKE_PLATES entry. */
   plates: PlateRec[];
@@ -80,4 +82,7 @@ export interface KorzulFightState {
   quenchTick: number;
   /** Mechanic casts started (the deterministic salt). */
   casts: number;
+  /** Break Free's cinematic (korzul_emerge.ts): where he set out from
+   *  (claim-local; `pt` is its clock). Null outside it. */
+  emergeFrom: { x: number; z: number } | null;
 }

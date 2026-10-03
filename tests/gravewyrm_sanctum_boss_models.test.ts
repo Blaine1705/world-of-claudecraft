@@ -170,3 +170,45 @@ describe('Korzul in the ice: one dragon on screen', () => {
     ]);
   });
 });
+
+describe('Korzul breaking free: the body appears only at the face, on the burst', () => {
+  it('stays hidden through Break Free until the ice bursts, then shows (a body once seen is never hidden again)', async () => {
+    const core = await import('../src/render/gravewyrm_sanctum_bosses/boss_model_core');
+    const plan = await import('../src/sim/encounters/gravewyrm_sanctum/korzul_emerge_plan');
+    // The burst beat: the clip's own burst at the bar's play rate, inside the bar.
+    expect(core.KORZUL_BURST_AT).toBeCloseTo(
+      (core.KORZUL_CLIP.breakFreeBurst * plan.KORZUL_EMERGE.burst) / core.KORZUL_CLIP.breakFreeSlam,
+      9,
+    );
+    expect(core.KORZUL_BURST_AT).toBeGreaterThan(1);
+    expect(core.KORZUL_BURST_AT).toBeLessThan(plan.KORZUL_EMERGE.burst);
+    const v = core.korzulBodyView;
+    expect(v(7, false, false, false, null)).toBe('frozen');
+    // Pulled out of the ice: hidden until the burst beat, shown from it.
+    expect(v(8, true, false, true, 0)).toBe('bursting');
+    expect(v(8, true, false, true, core.KORZUL_BURST_AT - 0.01)).toBe('bursting');
+    expect(v(8, true, false, true, core.KORZUL_BURST_AT)).toBe('shown');
+    // Past the bar (rise, arc, landing): shown.
+    expect(v(8, true, false, true, null)).toBe('shown');
+    // A body already seen (a re-pull with the ice gone) is never hidden again.
+    expect(v(8, true, false, false, 0)).toBe('shown');
+    expect(v(8, false, true, true, 0)).toBe('shown');
+  });
+
+  it('lands with the Land clip, its impact on the touchdown of the sim timeline', async () => {
+    const core = await import('../src/render/gravewyrm_sanctum_bosses/boss_model_core');
+    const plan = await import('../src/sim/encounters/gravewyrm_sanctum/korzul_emerge_plan');
+    const clips = VISUALS.sanctum_korzul.clips;
+    expect(clips.attackByAbility?.[core.KORZUL_EMERGE_LAND_GESTURE]).toBe('Land');
+    const rate = clips.attackTimeScaleByAbility?.[core.KORZUL_EMERGE_LAND_GESTURE] ?? 0;
+    expect(core.KORZUL_CLIP.landImpact / rate).toBeCloseTo(plan.KORZUL_EMERGE.land, 9);
+    // The burst bar keeps its slam on the bar's end.
+    expect(clips.castByAbility?.sanctum_korzul_break_free).toBe('BreakFree');
+    expect(clips.castTimeScaleByAbility?.sanctum_korzul_break_free).toBeCloseTo(
+      contactRate(core.KORZUL_CLIP.breakFreeSlam, plan.KORZUL_EMERGE.burst),
+      9,
+    );
+    // The landing clip's own height track is dropped: the sim's fall carries it.
+    expect(VISUALS.sanctum_korzul.clipPositionDrops?.Land).toEqual(['Root']);
+  });
+});

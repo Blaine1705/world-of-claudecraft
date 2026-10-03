@@ -9,9 +9,12 @@ import {
   breathPlates,
   chainPoint,
   chainWhipReach,
+  emergeCuesBetween,
+  emergeShadow,
   infernoLevel,
   type PlateSpot,
   plateLook,
+  plateShock,
   plateUnder,
   refreezeShown,
   SANCTUM_CAST_SPECS,
@@ -134,5 +137,47 @@ describe('Korzul plate floor', () => {
     expect(shadowGrowth(1)).toBe(1);
     expect(unquenchedLeft(0)).toBe(1);
     expect(unquenchedLeft(4)).toBe(0);
+  });
+});
+
+describe('Korzul breaking free, drawn', () => {
+  it('plays each beat once, in order, at the moments of the sim timeline', async () => {
+    const plan = await import('../src/sim/encounters/gravewyrm_sanctum/korzul_emerge_plan');
+    const burstAt = 1.45;
+    const seen: [string, number][] = [];
+    let last = 0;
+    for (let t = 0.05; t <= plan.KORZUL_EMERGE_SECONDS + 1; t += 1 / 60) {
+      for (const cue of emergeCuesBetween(last, t, burstAt)) seen.push([cue, t]);
+      last = t;
+    }
+    expect(seen.map((c) => c[0])).toEqual(['burst', 'takeoff', 'land']);
+    expect(seen[0][1]).toBeCloseTo(burstAt, 1);
+    expect(seen[1][1]).toBeCloseTo(plan.KORZUL_EMERGE_RISE_AT, 1);
+    expect(seen[2][1]).toBeCloseTo(plan.KORZUL_EMERGE_LAND_AT, 1);
+    // A late frame that jumps past two beats plays both; a still frame none.
+    expect(emergeCuesBetween(1, plan.KORZUL_EMERGE_RISE_AT + 0.1, burstAt)).toEqual([
+      'burst',
+      'takeoff',
+    ]);
+    expect(emergeCuesBetween(2, 2, burstAt)).toEqual([]);
+  });
+
+  it('his shadow tightens and darkens as he comes down; the plates crack white for a moment', async () => {
+    const plan = await import('../src/sim/encounters/gravewyrm_sanctum/korzul_emerge_plan');
+    const high = emergeShadow(plan.KORZUL_EMERGE_ALTITUDE + plan.KORZUL_EMERGE_LIFT);
+    const low = emergeShadow(0);
+    expect(low.alpha).toBeGreaterThan(high.alpha);
+    expect(low.r).toBeLessThan(high.r);
+    let prev = emergeShadow(20).alpha;
+    for (let h = 19; h >= 0; h--) {
+      const a = emergeShadow(h).alpha;
+      expect(a).toBeGreaterThanOrEqual(prev);
+      prev = a;
+    }
+    expect(plateShock(-1)).toBe(0);
+    expect(plateShock(0)).toBe(1);
+    expect(plateShock(0.9)).toBeGreaterThan(0);
+    expect(plateShock(0.9)).toBeLessThan(1);
+    expect(plateShock(2)).toBe(0);
   });
 });

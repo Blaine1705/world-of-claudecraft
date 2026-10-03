@@ -12,6 +12,7 @@
 // Three-free, DOM-free, deterministic.
 
 import type { SealTool } from '../../sim/encounters/gravewyrm_sanctum/boss_ids';
+import { KORZUL_EMERGE } from '../../sim/encounters/gravewyrm_sanctum/korzul_emerge_plan';
 
 export interface BossBody {
   url: string;
@@ -168,6 +169,37 @@ export const KORZUL_SHOW_GESTURE = 'sanctum_korzul_show';
 export function korzulBodyHidden(storyStep: number, inCombat: boolean, dead: boolean): boolean {
   return storyStep < 8 && !inCombat && !dead;
 }
+
+/** The moment the ice bursts in Break Free's bar (seconds into it): the
+ *  BreakFree clip's burst beat at the bar's play rate (its slam lands on the
+ *  bar's end). The live body appears here, at the face's foot, the same frame
+ *  the frozen Korzul in the face is gone (sanctum_face_core.ts). */
+export const KORZUL_BURST_AT =
+  (KORZUL_CLIP.breakFreeBurst * KORZUL_EMERGE.burst) / KORZUL_CLIP.breakFreeSlam;
+
+/** Korzul's own body: `frozen` in the ice (hidden, the frozen stance), pulled
+ *  but still `bursting` (hidden: the face's frozen wyrm is the one seen until
+ *  the burst beat), or `shown`. `inIce`: this view was hidden in the ice when
+ *  the pull came (a body already seen is never hidden again);
+ *  `breakFreeElapsed`: seconds into Break Free's bar, null without it. */
+export type KorzulBodyView = 'frozen' | 'bursting' | 'shown';
+export function korzulBodyView(
+  storyStep: number,
+  inCombat: boolean,
+  dead: boolean,
+  inIce: boolean,
+  breakFreeElapsed: number | null,
+): KorzulBodyView {
+  if (korzulBodyHidden(storyStep, inCombat, dead)) return 'frozen';
+  if (inIce && !dead && breakFreeElapsed !== null && breakFreeElapsed < KORZUL_BURST_AT)
+    return 'bursting';
+  return 'shown';
+}
+
+/** Break Free's landing one-shot (the Land clip), its impact on the
+ *  touchdown (korzul_emerge_plan.ts: the land beat). */
+export const KORZUL_EMERGE_LAND_GESTURE = 'sanctum_korzul_emerge_land';
+export const KORZUL_EMERGE_LAND_RATE = KORZUL_CLIP.landImpact / KORZUL_EMERGE.land;
 /** Velkhar's thaw channel played off a pyre flare. */
 export const VELKHAR_THAW_GESTURE = 'sanctum_velkhar_thaw_gesture';
 

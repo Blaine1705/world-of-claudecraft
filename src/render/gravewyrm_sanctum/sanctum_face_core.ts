@@ -12,6 +12,7 @@
 //
 // Three-free, DOM-free, deterministic.
 
+import { KORZUL_BURST_AT } from '../gravewyrm_sanctum_bosses/boss_model_core';
 import { faceStageLook, heartbeat } from './sanctum_plan_core';
 
 // ---- the face's frame -------------------------------------------------------------
@@ -262,14 +263,28 @@ export function calveProgress(since: number): number {
   return clamp01(since / FACE_EVENT_SECONDS.calve);
 }
 
-/** The collapse (stage 5): the face shudders, then slumps forward and down
- *  into the lake and stays there as a broken ruin (the Quench behind it is
- *  never bared). Returns the drop (yards), the forward pitch and the share
- *  played. */
+/** The moment the ice lets him go (seconds after stage 5 rose, his pull):
+ *  Break Free's burst beat, when the live Korzul tears out at the face's
+ *  foot (render/gravewyrm_sanctum_bosses/boss_model_core.ts). The face
+ *  shudders up to it, then breaks and slumps; the frozen wyrm is gone the
+ *  same frame the live body is shown, so there is never two of him. */
+export const FACE_BURST_AT = KORZUL_BURST_AT;
+
+/** Is the frozen Korzul still in the face, `since` seconds after stage 5
+ *  rose (negative: the stage not risen)? */
+export function frozenWyrmShown(since: number): boolean {
+  return since < FACE_BURST_AT;
+}
+
+/** The collapse (stage 5): the face shudders until the ice bursts, then
+ *  slumps forward and down into the lake and stays there as a broken ruin
+ *  (the Quench behind it is never bared). Returns the drop (yards), the
+ *  forward pitch and the share played. */
 export function collapsePose(since: number): { drop: number; pitch: number; k: number } {
   const k = clamp01(since / FACE_EVENT_SECONDS.collapse);
-  const shudder = k < 0.18 ? Math.sin(since * 40) * 0.6 * (k / 0.18) : 0;
-  const fall = easeIn(clamp01((k - 0.18) / 0.82));
+  const burst = FACE_BURST_AT / FACE_EVENT_SECONDS.collapse;
+  const shudder = k < burst ? Math.sin(since * 40) * 0.6 * (k / burst) : 0;
+  const fall = easeIn(clamp01((k - burst) / (1 - burst)));
   return { drop: fall * COLLAPSE_DROP + shudder, pitch: fall * 0.14, k };
 }
 

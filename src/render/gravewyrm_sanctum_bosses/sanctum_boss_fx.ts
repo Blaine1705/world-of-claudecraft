@@ -48,6 +48,7 @@ import {
   KORZUL_ID,
   KORZUL_PLUNGING_FIRE,
   KORZUL_SHARD_FLARE,
+  KORZUL_TOUCHDOWN,
   KORZUL_TUNING,
   KORZUL_WING_GALE,
   KORZUL_WYRMS_EYE,
@@ -74,6 +75,10 @@ import {
   VELKHAR_UNQUENCHED,
   VELKHAR_WAKING_THAW,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
+import {
+  KORZUL_EMERGE_RISE_AT,
+  KORZUL_EMERGE_SECONDS,
+} from '../../sim/encounters/gravewyrm_sanctum/korzul_emerge_plan';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import {
@@ -104,9 +109,12 @@ import {
   breathPlates,
   chainPoint,
   chainWhipReach,
+  emergeCuesBetween,
+  emergeShadow,
   infernoLevel,
   type PlateSpot,
   plateLook,
+  plateShock,
   plateUnder,
   refreezeShown,
   SANCTUM_CAST_SPECS,
@@ -115,6 +123,7 @@ import {
   shadowGrowth,
   specColor,
   specYaw,
+  TOUCHDOWN_SHOCK_REACH,
   unquenchedLeft,
 } from './boss_fx_core';
 import {
@@ -126,6 +135,8 @@ import {
   KORGATH_RUNES_GESTURE,
   KORGATH_WHOLE_GESTURE,
   KORZUL_BODY,
+  KORZUL_BURST_AT,
+  KORZUL_EMERGE_LAND_GESTURE,
   KORZUL_FROZEN_STANCE,
   KORZUL_HEARTBEAT_FLARE_GESTURE,
   KORZUL_HEARTBEAT_GESTURE,
@@ -133,7 +144,7 @@ import {
   KORZUL_MOUTH_REST,
   KORZUL_SHOW_GESTURE,
   KORZUL_TAKEOFF_GESTURE,
-  korzulBodyHidden,
+  korzulBodyView,
   VELKHAR_FLAME_GESTURE,
   VELKHAR_FLAME_Y,
   VELKHAR_THAW_GESTURE,
@@ -206,6 +217,8 @@ interface PlateSlot {
   state: number;
   refreeze: number | null;
   brokeAt: number;
+  /** The touchdown's crack through it (render only). */
+  shockAt: number;
   spot: PlateSpot;
 }
 interface MeltSlot {
@@ -312,6 +325,9 @@ export class SanctumBossFx {
   private storyStep = 0;
   /** Korzul views we froze (only those are told to break free). */
   private readonly frozenSent = new Set<number>();
+  /** Break Free's cinematic on screen: his id, the clock when the pull came
+   *  (from the bar's elapsed time), the last clock its cues were played to. */
+  private emerge: { id: number; t0: number; last: number } | null = null;
   private readonly airborne = new Set<number>();
   /** The bar each boss carried last frame (a new bar flares its glow). */
   private readonly lastBar = new Map<number, string | null>();
@@ -390,6 +406,7 @@ export class SanctumBossFx {
         state: 0,
         refreeze: null,
         brokeAt: -99,
+        shockAt: -99,
         spot: { id: -1, x: 0, z: 0, r: 8, state: 'sound' },
       });
     }
@@ -983,32 +1000,78 @@ export class SanctumBossFx {
         this.ring(x, z, SANCTUM_COLORS.frost, 0.5, 5, 0.8, 0.2);
         return true;
       case KORZUL_BREAK_FREE:
-        this.ring(x, z, SANCTUM_COLORS.frost, 4, 40, 1.6, 0.08);
-        this.spray(this.glow, 140, x, gy + 8, z, {
-          speed: 18,
-          up: 12,
-          spread: 14,
-          life: 1.8,
-          size0: 0.8,
-          size1: 0.15,
-          color: SANCTUM_COLORS.frost,
-          gravity: 14,
-        });
-        this.spray(this.mist, 120, x, gy + 2, z, {
-          speed: 12,
-          up: 4,
-          spread: 16,
-          life: 3,
-          size0: 3,
-          size1: 9,
-          color: SANCTUM_COLORS.frost,
-          alpha: 0.75,
-        });
-        this.shakeNear(x, z, 1.2, 90);
+        // The pull: the burst itself plays on the bar's burst beat
+        // (stepKorzul), where the face lets him go.
+        return true;
+      case KORZUL_TOUCHDOWN:
+        this.touchdown(x, z, gy);
+        if (this.emerge?.id === ev.sourceId) this.emerge = null;
         return true;
       default:
         return false;
     }
+  }
+
+  /** The ice bursts round him (Break Free's beat). */
+  private burst(x: number, z: number): void {
+    const gy = this.groundY(x, z);
+    this.ring(x, z, SANCTUM_COLORS.frost, 4, 40, 1.6, 0.08);
+    this.spray(this.glow, 140, x, gy + 8, z, {
+      speed: 18,
+      up: 12,
+      spread: 14,
+      life: 1.8,
+      size0: 0.8,
+      size1: 0.15,
+      color: SANCTUM_COLORS.frost,
+      gravity: 14,
+    });
+    this.spray(this.mist, 120, x, gy + 2, z, {
+      speed: 12,
+      up: 4,
+      spread: 16,
+      life: 3,
+      size0: 3,
+      size1: 9,
+      color: SANCTUM_COLORS.frost,
+      alpha: 0.75,
+    });
+    this.shakeNear(x, z, 1.2, 90);
+  }
+
+  /** He lands on the centre (Break Free's end): a frost and snow burst, ice
+   *  chips, the plates round him cracking white for a moment, the ground
+   *  shaking. No telegraph: it hurts nobody. */
+  private touchdown(x: number, z: number, gy: number): void {
+    this.ring(x, z, SANCTUM_COLORS.frost, 5, 30, 1.2, 0.1);
+    this.ring(x, z, SANCTUM_COLORS.steam, 2, 18, 0.8, 0.16);
+    // Low and thin: snow thrown along the ice, never a wall over a camera
+    // that stands near the centre.
+    this.spray(this.mist, 60, x, gy + 0.4, z, {
+      speed: 13,
+      up: 1.2,
+      spread: 8,
+      life: 1.8,
+      size0: 1.4,
+      size1: 4.5,
+      color: SANCTUM_COLORS.steam,
+      alpha: 0.4,
+      gravity: 1.5,
+    });
+    this.spray(this.glow, 90, x, gy + 1, z, {
+      speed: 11,
+      up: 9,
+      spread: 8,
+      life: 1.4,
+      size0: 0.6,
+      size1: 0.12,
+      color: SANCTUM_COLORS.frost,
+      gravity: 16,
+    });
+    for (const p of this.plates)
+      if (p.objectId >= 0 && Math.hypot(p.spot.x - x, p.spot.z - z) <= TOUCHDOWN_SHOCK_REACH)
+        p.shockAt = this.clock;
+    this.shakeNear(x, z, 1.4, 90);
   }
 
   private castFill(e: Entity): number {
@@ -1537,17 +1600,40 @@ export class SanctumBossFx {
         play(k.id, c.broken ? KORGATH_BROKEN_GESTURE[c.tool] : KORGATH_WHOLE_GESTURE[c.tool]);
       }
     const z = this.entity(this.korzulId);
-    if (z) {
-      const frozen = korzulBodyHidden(this.storyStep, z.inCombat, z.dead);
-      if (frozen) {
-        play(z.id, KORZUL_FROZEN_STANCE);
-        play(z.id, KORZUL_HIDE_GESTURE);
-        this.frozenSent.add(z.id);
-      } else if (this.frozenSent.has(z.id)) {
-        play(z.id, KORZUL_SHOW_GESTURE);
+    if (z) this.syncKorzulBody(z, true);
+  }
+
+  /** Korzul's own body: hidden in the ice, still hidden through Break Free's
+   *  first beat (the face's frozen wyrm is the one seen until the ice
+   *  bursts), then shown at the face's foot. `resend` re-sends the held
+   *  state (a rebuilt view); otherwise only a change is sent. */
+  private syncKorzulBody(z: Entity, resend: boolean): void {
+    const play = this.playGesture;
+    if (!play) return;
+    const elapsed =
+      z.castingAbility === KORZUL_BREAK_FREE ? Math.max(0, z.castTotal - z.castRemaining) : null;
+    const view = korzulBodyView(
+      this.storyStep,
+      z.inCombat,
+      z.dead,
+      this.frozenSent.has(z.id),
+      elapsed,
+    );
+    if (view === 'frozen') {
+      if (!resend && this.frozenSent.has(z.id)) return;
+      play(z.id, KORZUL_FROZEN_STANCE);
+      play(z.id, KORZUL_HIDE_GESTURE);
+      this.frozenSent.add(z.id);
+    } else if (view === 'bursting') {
+      // Pulled: his waking clips (Break Free plays hidden), the body unseen.
+      if (resend) {
         play(z.id, KORZUL_BREAK_FREE);
-        this.frozenSent.delete(z.id);
+        play(z.id, KORZUL_HIDE_GESTURE);
       }
+    } else if (this.frozenSent.has(z.id)) {
+      play(z.id, KORZUL_SHOW_GESTURE);
+      play(z.id, KORZUL_BREAK_FREE);
+      this.frozenSent.delete(z.id);
     }
   }
 
@@ -2020,6 +2106,10 @@ export class SanctumBossFx {
 
   private stepKorzul(world: IWorld, dt: number): void {
     const z = this.entity(this.korzulId);
+    if (z) {
+      this.syncKorzulBody(z, false);
+      this.stepEmerge(z);
+    }
     // Takeoff: the airborne aura's first tick plays his TakeOff.
     if (z) {
       const up = z.auras.some((a) => a.id === KORZUL_AIRBORNE);
@@ -2072,6 +2162,7 @@ export class SanctumBossFx {
           ? refreezeShown(p.refreeze, this.clock - p.stepAt)
           : -1;
       u.uSink.value = p.state === 2 ? Math.min(1, (this.clock - p.brokeAt) / 1.6) : 1;
+      u.uShock.value = plateShock(this.clock - p.shockAt);
     }
     // The landing shadow.
     const shadowObj = this.objFans.find(
@@ -2086,7 +2177,45 @@ export class SanctumBossFx {
       this.shadow.rotation.y = z ? z.facing : 0;
       this.shadowMat.uniforms.uAlpha.value = 0.35 + 0.5 * k;
       this.shadow.visible = true;
+    } else if (
+      z &&
+      this.emerge?.id === z.id &&
+      this.clock - this.emerge.t0 >= KORZUL_EMERGE_RISE_AT
+    ) {
+      // Break Free's flight: his own shadow under him on the ice.
+      const gy = this.groundY(z.pos.x, z.pos.z);
+      const look = emergeShadow(Math.max(0, z.pos.y - gy));
+      this.shadow.position.set(z.pos.x, gy + 0.1, z.pos.z);
+      this.shadow.scale.set(look.r, 1, look.r);
+      this.shadow.rotation.y = z.facing;
+      this.shadowMat.uniforms.uAlpha.value = look.alpha;
+      this.shadow.visible = true;
     } else this.shadow.visible = false;
+  }
+
+  /** Break Free's cinematic (sim korzul_emerge.ts): its clock from the bar
+   *  (re-anchored while the bar runs, so a late frame or a snapshot's jitter
+   *  never drifts it), and its beats played once each: the ice bursting at
+   *  the face's foot, the takeoff, the landing clip. */
+  private stepEmerge(z: Entity): void {
+    if (z.castingAbility === KORZUL_BREAK_FREE && z.castTotal > 0) {
+      const t0 = this.clock - Math.max(0, z.castTotal - z.castRemaining);
+      if (!this.emerge || this.emerge.id !== z.id)
+        this.emerge = { id: z.id, t0, last: this.clock - t0 - 1e-6 };
+      else if (Math.abs(this.emerge.t0 - t0) > 0.3) this.emerge.t0 = t0;
+    }
+    const e = this.emerge;
+    if (!e || e.id !== z.id) return;
+    const t = this.clock - e.t0;
+    for (const cue of emergeCuesBetween(e.last, t, KORZUL_BURST_AT)) {
+      if (cue === 'burst') this.burst(z.pos.x, z.pos.z);
+      else if (cue === 'takeoff') this.playGesture?.(z.id, KORZUL_TAKEOFF_GESTURE);
+      else this.playGesture?.(z.id, KORZUL_EMERGE_LAND_GESTURE);
+    }
+    e.last = t;
+    // Over: landed, a wipe, or his fight already begun (a dev skip, then a bar).
+    const fighting = z.castingAbility !== null && z.castingAbility !== KORZUL_BREAK_FREE;
+    if (t > KORZUL_EMERGE_SECONDS + 1 || z.dead || !z.inCombat || fighting) this.emerge = null;
   }
 
   dispose(): void {

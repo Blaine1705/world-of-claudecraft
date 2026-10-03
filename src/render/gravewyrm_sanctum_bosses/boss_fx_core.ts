@@ -20,6 +20,12 @@ import {
   plateOf,
 } from '../../sim/encounters/gravewyrm_sanctum/boss_ids';
 import {
+  KORZUL_EMERGE_ALTITUDE,
+  KORZUL_EMERGE_LAND_AT,
+  KORZUL_EMERGE_LIFT,
+  KORZUL_EMERGE_RISE_AT,
+} from '../../sim/encounters/gravewyrm_sanctum/korzul_emerge_plan';
+import {
   TELEGRAPH_ACCENTS,
   TELEGRAPH_THREAT_COLORS,
   type TelegraphThreat,
@@ -280,4 +286,38 @@ export function shadowGrowth(k: number): number {
 /** An Unquenched ring's countdown share (1 as it sinks, 0 as it rises). */
 export function unquenchedLeft(seconds: number, riseDelay = 4): number {
   return Math.min(1, Math.max(0, 1 - seconds / riseDelay));
+}
+
+// ---- Korzul's Break Free (sim korzul_emerge_plan.ts) ---------------------------------
+
+/** A beat of the cinematic the effects play once, at its moment. */
+export type KorzulEmergeCue = 'burst' | 'takeoff' | 'land';
+
+/** The cues whose moment falls in (t0, t1] (seconds since the pull): the
+ *  burst at `burstAt` (the clip's beat), the takeoff as the rise begins, the
+ *  landing clip as the fall begins. */
+export function emergeCuesBetween(t0: number, t1: number, burstAt: number): KorzulEmergeCue[] {
+  const out: KorzulEmergeCue[] = [];
+  const crossed = (at: number) => t0 < at && t1 >= at;
+  if (crossed(burstAt)) out.push('burst');
+  if (crossed(KORZUL_EMERGE_RISE_AT)) out.push('takeoff');
+  if (crossed(KORZUL_EMERGE_LAND_AT)) out.push('land');
+  return out;
+}
+
+/** His shadow on the ice while he flies the arc and comes down: faint and
+ *  wide high up, tight and dark as he lands (`height` over the floor, yards;
+ *  `r` in yards). */
+export function emergeShadow(height: number): { r: number; alpha: number } {
+  const top = KORZUL_EMERGE_ALTITUDE + KORZUL_EMERGE_LIFT;
+  const k = Math.max(0, Math.min(1, 1 - height / top));
+  return { r: 13 * (1.45 - 0.45 * k), alpha: 0.12 + 0.6 * k * k };
+}
+
+/** The touchdown's crack through the plates round him (render only; their
+ *  state is the sim's): 1 at the impact, gone in under two seconds. */
+export const TOUCHDOWN_SHOCK_REACH = 26;
+export function plateShock(secondsSince: number): number {
+  if (secondsSince < 0 || secondsSince >= 1.8) return 0;
+  return (1 - secondsSince / 1.8) ** 1.5;
 }

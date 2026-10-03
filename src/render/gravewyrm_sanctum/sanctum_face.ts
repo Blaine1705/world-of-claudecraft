@@ -35,6 +35,7 @@ import {
   collapsePose,
   crackReveal,
   eyeOpen,
+  FACE_BURST_AT,
   FACE_CHAIN_ENTRIES,
   FACE_EVENT_SECONDS,
   FACE_FRONT_Z,
@@ -46,6 +47,7 @@ import {
   faceChainEntries,
   faceTop,
   faceY,
+  frozenWyrmShown,
   heartGlow,
   plateFallPose,
   SCAR,
@@ -948,17 +950,21 @@ export function buildSanctumFace(
       const pose = collapsePose(s5);
       frame.position.y = FACE_ORIGIN.y - pose.drop;
       frame.rotation.x = -pose.pitch;
-      wyrm.visible = pose.k < 0.22;
-      halo.visible = pose.k < 0.3;
+      // The frozen wyrm is gone the frame the live Korzul bursts out at the
+      // face's foot (Break Free's beat): never two of him, never a gap.
+      const held = frozenWyrmShown(s5);
+      const sinceBurst = s5 - FACE_BURST_AT;
+      wyrm.visible = held;
+      halo.visible = s5 < FACE_BURST_AT + 0.4;
       wide.visible = pose.k < 0.6;
-      eye.visible = pose.k < 0.22;
-      collapseDust.u.uT.value = s5 < 8 ? s5 : -1;
+      eye.visible = held;
+      collapseDust.u.uT.value = sinceBurst >= 0 && sinceBurst < 8 ? sinceBurst : -1;
       if (!rippled5 && pose.k > 0.4 && s5 < 20) {
         rippled5 = true;
         triggerSanctumLakeRipple(0, FACE_ORIGIN.z - 20, t);
       }
       chunks.forEach((ch, i) => {
-        const f = chunkFlight(i, s5, 0.6 + (i % 5) * 0.25);
+        const f = chunkFlight(i, s5, FACE_BURST_AT - 0.1 + (i % 5) * 0.2);
         ch.mesh.visible = f.visible;
         // Kit frame: the lake is +z, height is y; rest on the apron.
         ch.mesh.position.set(ch.from.x + f.x, Math.max(1.5, ch.from.y + f.y), ch.from.z - f.z);

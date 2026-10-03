@@ -8,8 +8,12 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { SanctumBossFx } from '../src/render/gravewyrm_sanctum_bosses';
 import {
+  KORZUL_BURST_AT,
+  KORZUL_EMERGE_LAND_GESTURE,
   KORZUL_FROZEN_STANCE,
   KORZUL_HEARTBEAT_GESTURE,
+  KORZUL_HIDE_GESTURE,
+  KORZUL_SHOW_GESTURE,
   KORZUL_TAKEOFF_GESTURE,
   VELKHAR_THAW_GESTURE,
 } from '../src/render/gravewyrm_sanctum_bosses/boss_model_core';
@@ -19,8 +23,10 @@ import {
   KORGATH_ID,
   KORGATH_STRAIN,
   KORZUL_AIRBORNE,
+  KORZUL_BREAK_FREE,
   KORZUL_GRAVE_BREATH,
   KORZUL_ID,
+  KORZUL_TOUCHDOWN,
   KORZUL_WYRMS_EYE,
   plateTemplate,
   SANCTUM_HELD_STATUE,
@@ -31,6 +37,11 @@ import {
   sealChainTemplate,
   VELKHAR_ID,
 } from '../src/sim/encounters/gravewyrm_sanctum/ids';
+import {
+  KORZUL_EMERGE,
+  KORZUL_EMERGE_LAND_AT,
+  KORZUL_EMERGE_RISE_AT,
+} from '../src/sim/encounters/gravewyrm_sanctum/korzul_emerge_plan';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
@@ -141,6 +152,65 @@ describe('SanctumBossFx', () => {
     expect(gestures).toContainEqual([korzul.id, KORZUL_TAKEOFF_GESTURE]);
     // The heart-shard beats.
     expect(gestures).toContainEqual([korzul.id, KORZUL_HEARTBEAT_GESTURE]);
+    expect(entities.size).toBeGreaterThan(19);
+    fx.dispose();
+  });
+
+  it('keeps Korzul out of sight through Break Free until the ice bursts, then flies, lands and cracks the plates', () => {
+    const { fx, add, gestures, entities } = setup();
+    const marker = add(ent('object', sanctumStoryTemplate(7), 0, 150));
+    const korzul = add(ent('mob', KORZUL_ID, 0, 214, { scale: 1.8 }));
+    for (let i = 0; i < 19; i++)
+      add(ent('object', plateTemplate('sound'), i * 3, 192, { scale: 8 }));
+    fx.update(0.6);
+    expect(gestures).toContainEqual([korzul.id, KORZUL_HIDE_GESTURE]);
+    // The pull: the face's foot, Break Free's bar, the story at step 8.
+    marker.templateId = sanctumStoryTemplate(8);
+    korzul.pos = { x: 0, y: 0, z: 235 };
+    korzul.inCombat = true;
+    korzul.castingAbility = KORZUL_BREAK_FREE;
+    korzul.castTotal = KORZUL_EMERGE.burst;
+    korzul.castRemaining = KORZUL_EMERGE.burst;
+    const pull = {
+      type: 'spellfx',
+      sourceId: korzul.id,
+      targetId: korzul.id,
+      school: 'frost',
+      fx: 'nova',
+      ability: KORZUL_BREAK_FREE,
+    } as unknown as SimEvent;
+    expect(fx.handleEvent(pull)).toBe(true);
+    const shownAt = () =>
+      gestures.findIndex((g) => g[0] === korzul.id && g[1] === KORZUL_SHOW_GESTURE);
+    const has = (g: string) => gestures.some((x) => x[0] === korzul.id && x[1] === g);
+    const step = (seconds: number) => {
+      for (let t = 0; t < seconds - 1e-9; t += 0.05) {
+        korzul.castRemaining = Math.max(0, korzul.castRemaining - 0.05);
+        if (korzul.castRemaining <= 0) korzul.castingAbility = null;
+        fx.update(0.05);
+      }
+    };
+    // Up to just before the burst: still hidden (the face's frozen wyrm is the one seen).
+    step(KORZUL_BURST_AT - 0.1);
+    expect(shownAt()).toBe(-1);
+    step(0.2);
+    expect(shownAt()).toBeGreaterThanOrEqual(0);
+    // The takeoff as the rise begins, the landing clip as the fall begins.
+    step(KORZUL_EMERGE_RISE_AT - KORZUL_BURST_AT);
+    expect(has(KORZUL_TAKEOFF_GESTURE)).toBe(true);
+    expect(has(KORZUL_EMERGE_LAND_GESTURE)).toBe(false);
+    korzul.pos = { x: 0, y: 14, z: 210 };
+    step(KORZUL_EMERGE_LAND_AT - KORZUL_EMERGE_RISE_AT);
+    expect(has(KORZUL_EMERGE_LAND_GESTURE)).toBe(true);
+    // Never hidden again once out.
+    const hides = gestures.filter((g) => g[0] === korzul.id && g[1] === KORZUL_HIDE_GESTURE);
+    korzul.pos = { x: 0, y: 0, z: 192 };
+    const touchdown = { ...pull, ability: KORZUL_TOUCHDOWN } as SimEvent;
+    expect(fx.handleEvent(touchdown)).toBe(true);
+    step(1);
+    expect(gestures.filter((g) => g[0] === korzul.id && g[1] === KORZUL_HIDE_GESTURE)).toHaveLength(
+      hides.length,
+    );
     expect(entities.size).toBeGreaterThan(19);
     fx.dispose();
   });
