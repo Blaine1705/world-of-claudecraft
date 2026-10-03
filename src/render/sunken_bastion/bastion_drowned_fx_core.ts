@@ -1,6 +1,7 @@
 // Pure plan for the drowned garrison's own effects (bastion_drowned_fx.ts):
 // the sea still running off them. While one stands near the player, water
-// drips from the brim of its helm and from its buckler and blade; when it is
+// drips from the brim of its helm and from its buckler and blade (from the
+// war hound's jaws and collar); when it is
 // struck, brine sprays off it away from the blow; when it rushes, it kicks a
 // spray up from its boots; when it falls, the sea it drowned in pours out of
 // it in a gush of brine and mist and its sea light lifts away as motes.
@@ -43,6 +44,18 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     ],
     chest: { side: 0, up: 2.96, fwd: 0.42 },
     eyes: { side: 0.03, up: 4.0, fwd: 0.45 },
+  },
+  // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
+  bastion_warhound: {
+    rawHeight: 4.4,
+    drips: [
+      { side: 0, up: 3.06, fwd: 3.7 },
+      { side: 0, up: 2.98, fwd: 2.1 },
+      { side: 0, up: 2.26, fwd: 2.11 },
+      { side: 0.55, up: 2.6, fwd: 1.6 },
+    ],
+    chest: { side: 0, up: 2.4, fwd: 1.9 },
+    eyes: { side: 0, up: 3.75, fwd: 3.2 },
   },
 };
 

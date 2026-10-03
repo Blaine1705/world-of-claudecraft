@@ -182,6 +182,7 @@ const AUTHORED_ATLAS_DEFS = [
   // Bishop (Morthen); and the Bastion's sculpted drowned (the Revenant first)
   'bastion_vael',
   'bastion_drowned_revenant',
+  'bastion_warhound',
   'bastion_gaol_cage',
   'bastion_drowned_anchor',
   'bastion_turnkey',

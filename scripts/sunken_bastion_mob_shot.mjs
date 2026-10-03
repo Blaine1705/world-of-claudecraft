@@ -1,11 +1,13 @@
-// In-game evidence of the Bastion Revenant beside the player: boots an offline
-// world on an already-running dev server, enters the Sunken Bastion, clears it
-// and raises one revenant (/dev bastion spawn revenant) on the Cistern Yard
-// paving, then captures it idle (from the normal MMO camera and close), walking
-// up to the player, swinging, struck, and dying. Evidence tooling, not a repo
-// test.
+// In-game evidence of one Sunken Bastion trash creature beside the player: boots
+// an offline world on an already-running dev server, enters the Sunken Bastion,
+// clears it and raises one creature (/dev bastion spawn <type>) on the Cistern
+// Yard paving, then captures it idle (from the normal MMO camera, close, face on
+// and from the side), walking up to the player, swinging, struck, and dying.
+// Evidence tooling, not a repo test.
 //
-//   node scripts/sunken_bastion_revenant_shot.mjs [outDir] [prefix]
+//   node scripts/sunken_bastion_mob_shot.mjs <type> [outDir] [prefix]
+//
+// <type> is a /dev bastion spawn name (revenant, warhound, watchman, ...).
 //
 // Env: SHOT_URL (http://127.0.0.1:5241/), SHOT_PRESET (4), SHOT_W / SHOT_H
 // (1600x900), SHOT_ONLY (comma list of shot names).
@@ -16,8 +18,11 @@ import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.SHOT_URL ?? 'http://127.0.0.1:5241/';
-const OUT = process.argv[2] ?? path.join('tmp', 'bastion_revenant');
-const PREFIX = process.argv[3] ?? '';
+const TYPE = process.argv[2] ?? 'revenant';
+const OUT = process.argv[3] ?? path.join('tmp', `bastion_${TYPE}`);
+const PREFIX = process.argv[4] ?? '';
+const DIST = Number(process.env.SHOT_DIST ?? 7);
+const CAM_K = Number(process.env.SHOT_CAM_K ?? 1);
 const W = Number(process.env.SHOT_W ?? 1600);
 const H = Number(process.env.SHOT_H ?? 900);
 const PRESET = Number(process.env.SHOT_PRESET ?? 4);
@@ -84,13 +89,13 @@ async function main() {
     await page.addStyleTag({ content: '#ui, #nameplates { display: none !important; }' });
     const camera = (yaw, pitch, dist) =>
       page.evaluate(
-        ([y, p, d]) => {
+        ([y, p, d, k]) => {
           const input = window.__game.input;
           input.camYaw = y;
           input.camPitch = p;
-          input.camDist = d;
+          input.camDist = d * k;
         },
-        [yaw, pitch, dist],
+        [yaw, pitch, dist, CAM_K],
       );
     const shot = async (name) => {
       const file = path.join(OUT, `${PREFIX}${name}.png`);
@@ -115,7 +120,7 @@ async function main() {
         p.prevFacing = 0;
         p.devNoAggro = false;
       });
-      await chat('/dev bastion spawn revenant');
+      await chat(`/dev bastion spawn ${TYPE}`);
       await sleep(300);
       return page.evaluate(
         ([d, pl]) => {
@@ -146,13 +151,13 @@ async function main() {
 
     // Hold the idle body where the shot wants it, facing the player.
     const pin = () =>
-      page.evaluate(() => {
+      page.evaluate((dist) => {
         const sim = window.__game.world;
         const me = sim.player;
         const mob = sim.entities.get(me.targetId);
         if (!mob) return;
         mob.pos.x = me.pos.x + 1.0;
-        mob.pos.z = me.pos.z + 7;
+        mob.pos.z = me.pos.z + dist;
         mob.prevPos = { ...mob.pos };
         mob.vx = 0;
         mob.vz = 0;
@@ -160,9 +165,9 @@ async function main() {
         mob.prevFacing = mob.facing;
         mob.homePos = { ...mob.pos };
         if (mob.home) mob.home = { ...mob.pos };
-      });
+      }, DIST);
     if (want('idle_mmo') || want('idle_close') || want('idle_side') || want('face')) {
-      await spawn(7, false);
+      await spawn(DIST, false);
       await chat('/dev freezemobs on');
       await pin();
       await camera(0.55, 0.32, 12);

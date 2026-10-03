@@ -4120,7 +4120,7 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 1.73,
     runRef: 6.68,
     authoredAtlas: true,
-    selfIllumination: 0.1,
+    selfIllumination: 0.18,
   },
   bastion_skel_watchman: {
     url: `${CREATURES}/drowned_watchman.glb`,
@@ -4306,11 +4306,20 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.06,
   },
-  // The Bastion Warhound: a shark-headed sea hound in the garrison's spiked
-  // war-collar. Its Lunge flies in the Leap pose and lands on Land.
+  // The Bastion Warhound: one of the garrison's war mastiffs, drowned with its
+  // handlers and risen with them (scripts/assets/sunken_bastion_drowned/
+  // warhound/: the quadruped sculpt kit). Gaunt and slack-hided, the ribs
+  // standing out and a hole torn through the left flank to the bone, a snarl
+  // of yellowed teeth under an iron chamfron, sea light in its eyes and throat;
+  // a spiked iron war collar with a snapped chain, a quilted war-coat with
+  // riveted lames down the spine and the Bastion's caparison on the flanks,
+  // barnacled and hung with kelp. Its Lunge flies in the Leap pose (held while
+  // airborne) and lands on Land; Attack is a lunging bite with a tearing
+  // shake, Attack2 rears up and slams both forepaws down; Howl is its
+  // flourish. walkRef/runRef are the clips' own foot speeds at the drawn size.
   bastion_warhound: {
     url: `${CREATURES}/bastion_warhound.glb`,
-    height: 3.0,
+    height: 3.55,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4318,11 +4327,15 @@ export const VISUALS: Record<string, VisualDef> = {
       attack: ['Attack', 'Attack2'],
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
       jump: 'Leap',
       land: 'Land',
+      stunned: 'Stunned',
+      flourish: 'Howl',
     },
-    selfIllumination: 0.06,
+    walkRef: 2.22,
+    runRef: 8.07,
+    authoredAtlas: true,
+    selfIllumination: 0.14,
   },
   bastion_prisoner: {
     url: `${CREATURES}/drowned_prisoner.glb`,

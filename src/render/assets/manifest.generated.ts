@@ -364,7 +364,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/alpaca.glb": "/media/models/creatures/alpaca.a0de882ed487.glb",
   "models/creatures/aurelhorn.glb": "/media/models/creatures/aurelhorn.a72e8eeee246.glb",
   "models/creatures/bastion_crawler.glb": "/media/models/creatures/bastion_crawler.71754edf8828.glb",
-  "models/creatures/bastion_warhound.glb": "/media/models/creatures/bastion_warhound.a61c11879aa1.glb",
+  "models/creatures/bastion_warhound.glb": "/media/models/creatures/bastion_warhound.45912d864c47.glb",
   "models/creatures/bear_ability_anims.glb": "/media/models/creatures/bear_ability_anims.3813019f7d8f.glb",
   "models/creatures/bear_form.glb": "/media/models/creatures/bear_form.bff8bb3c9419.glb",
   "models/creatures/bull.glb": "/media/models/creatures/bull.a00c2c292526.glb",

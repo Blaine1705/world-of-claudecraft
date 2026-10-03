@@ -52,7 +52,10 @@ function referencedClips(key: string): string[] {
 
 const ROSTER: Record<string, { glb: string; unique: string[] }> = {
   barnacle_crawler: { glb: 'bastion_crawler.glb', unique: ['Attack2', 'Death', 'Cast'] },
-  bastion_warhound: { glb: 'bastion_warhound.glb', unique: ['Leap', 'Land', 'Attack2'] },
+  bastion_warhound: {
+    glb: 'bastion_warhound.glb',
+    unique: ['Leap', 'Land', 'Attack2', 'Howl', 'Stunned'],
+  },
   bastion_revenant: { glb: 'drowned_revenant.glb', unique: ['Attack', 'Attack2'] },
   drowned_watchman: { glb: 'drowned_watchman.glb', unique: ['HalberdSweep'] },
   fogbound_arbalest: { glb: 'drowned_arbalest.glb', unique: ['Aim', 'Shoot'] },

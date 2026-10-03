@@ -12,6 +12,12 @@ nothing here runs in the build or the game.
   Sanctum trash kit, copied unchanged except one hook: `build_core.run` calls the
   creature's optional `anatomy.post_mesh(pairs)` after binding (the Revenant grows its
   head there).
+- `warhound/`: the Bastion Warhound (`public/models/creatures/bastion_warhound.glb`), a
+  self-contained quadruped builder (the Wildheart Great Jaguar's kit: one sculpted skin, a
+  digitigrade rig, the whole-body pose language in `clips.py`) reshaped into a drowned war
+  mastiff. Build from `warhound/` with `build.py -- <abs>/bastion_warhound_raw.glb --bake 2048
+  --tex <abs>/tex --blend <abs>/bastion_warhound.blend` (`--voxel 0.03 --nobake` for a clay
+  look); `reclip.py` re-keys the clips on a baked .blend, `anchors.py` prints the effect anchors.
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),
