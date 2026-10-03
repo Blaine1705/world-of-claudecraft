@@ -248,7 +248,9 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       korgath_the_bound: 1,
       // Velkhar's Soulfire Trench and Shadow Volley are stated LANDED.
       grand_necromancer_velkhar: 1,
-      korzul_the_gravewyrm: 15,
+      // His whole kit (encounters/gravewyrm_sanctum/korzul.ts) is stated
+      // LANDED: Grave Breath, the Inferno's pulses, the flights, the water.
+      korzul_the_gravewyrm: 1,
     },
   },
   nythraxis_boss_arena: {
@@ -770,6 +772,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       korgath_the_bound: 2.5,
       // The bosses' telegraphed mechanics on the Foundry's heroic factor.
       grand_necromancer_velkhar: 2.5,
+      // Korzul's landed kit at the Foundry's heroic boss factor (the
+      // quench-water lands 60 x 2.5 = 150 a second, design 6.3).
+      korzul_the_gravewyrm: 2.5,
     },
     armorMultiplier: 1.2,
     finalBossId: 'korzul_the_gravewyrm',

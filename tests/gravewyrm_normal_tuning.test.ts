@@ -33,7 +33,7 @@ import {
 } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEON_DEFS } from '../src/sim/content/dungeons';
 import { MOBS } from '../src/sim/data';
-import { KORGATH_TUNING } from '../src/sim/encounters/gravewyrm_sanctum/ids';
+import { KORGATH_TUNING, KORZUL_TUNING } from '../src/sim/encounters/gravewyrm_sanctum/ids';
 import { createMob } from '../src/sim/entity';
 import {
   applyDungeonMobTuning,
@@ -146,10 +146,9 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       grand_necromancer_velkhar: 6.6,
       korzul_the_gravewyrm: 8.5,
     });
-    // Korzul's avoidable Grave Inferno prices off the tank-swing line: 15x
-    // makes standing all four pulses (raw 1050-1350) lethal to a ~1000hp
-    // fresh melee pool while his melee stays on the boss calibration above.
-    // The rework's kit mechanics are stated LANDED (factor 1).
+    // The rework's kit mechanics are stated LANDED (factor 1), Korzul's whole
+    // phase B kit included (encounters/gravewyrm_sanctum/korzul.ts): his
+    // Inferno moved off the template, so its old 15x override is gone.
     expect(tuning.mechanicDamageMultiplierByMob).toEqual({
       sanctum_drakonid: 1,
       broodsworn_thawcaller: 1,
@@ -162,6 +161,7 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       korgath_the_bound: 1,
       grand_necromancer_velkhar: 1,
       korzul_the_gravewyrm: 15,
+      korzul_the_gravewyrm: 1,
     });
     // The bosses' and the Tusker's pools from fight length x 150 party DPS.
     expect(tuning.healthMultiplierByMob).toEqual({
@@ -253,28 +253,23 @@ describe('normal Gravewyrm Sanctum mechanic scaling', () => {
         tuning.mechanicDamageMultiplierByMob?.[id] ?? tuning.damageMultiplierByMob[id];
       expect(mob.mechanicDamageMult, id).toBe(expected);
     }
-    // The one live override, asserted concretely: Korzul's entity mechanics
-    // run at 15x while his melee template transform stays at 8.5x.
+    // Korzul's landed kit runs at factor 1 while his melee template
+    // transform stays at 8.5x.
     const korzul = createMob(1, MOBS.korzul_the_gravewyrm, 20, { x: 0, y: 0, z: 0 });
     applyDungeonMobTuning(korzul, SANCTUM, 'normal');
-    expect(korzul.mechanicDamageMult).toBe(15);
+    expect(korzul.mechanicDamageMult).toBe(1);
   });
 
-  it('scales Grave Inferno by the mechanic override; Korgath states his kit landed', () => {
+  it('states Grave Inferno and Korgath kit LANDED in their encounters', () => {
     const tuning = sanctumTuning();
-    // Korzul's aoePulse is GONE (2026-07): Grave Inferno replaced it, a
-    // stationary 8s channel with four escalating avoidable pulses.
+    // Korzul's aoePulse is GONE (2026-07), and his Grave Inferno moved off the
+    // template into the encounter (phase B), so the plate under him can cut it.
     expect(MOBS.korzul_the_gravewyrm.aoePulse).toBeUndefined();
-    const inferno = MOBS.korzul_the_gravewyrm.infernoChannel;
-    expect(inferno).toBeTruthy();
-    if (!inferno) return;
-    // Raw (unmitigated) mechanic damage after the per-mob multiplier: the
-    // FOURTH (largest) inferno pulse on normal.
-    const mult = tuning.mechanicDamageMultiplierByMob?.korzul_the_gravewyrm;
-    expect(mult).toBe(15);
-    if (mult === undefined) return;
-    expect(inferno.min * inferno.pulses * mult).toBe(420);
-    expect(inferno.max * inferno.pulses * mult).toBe(540);
+    expect(MOBS.korzul_the_gravewyrm.infernoChannel).toBeUndefined();
+    // The FOURTH (largest) Inferno pulse on normal, landed (factor 1).
+    expect(tuning.mechanicDamageMultiplierByMob?.korzul_the_gravewyrm).toBe(1);
+    expect(KORZUL_TUNING.infernoMin * KORZUL_TUNING.infernoPulses).toBe(280);
+    expect(KORZUL_TUNING.infernoMax * KORZUL_TUNING.infernoPulses).toBe(360);
     // Korgath's Shuddering Stomp moved off the template into his encounter
     // (KORGATH_TUNING, telegraphed with a bar): 190 to 285 LANDED at factor 1.
     expect(MOBS.korgath_the_bound.stomp).toBeUndefined();
@@ -372,8 +367,10 @@ describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () =
   });
 
   it('stamps the heroic boss mechanic multiplier from the per-mob override', () => {
+    // Korzul's landed kit at the Foundry's heroic boss factor (2.5): the
+    // quench-water lands 150 a second.
     const boss = createMob(1, MOBS.korzul_the_gravewyrm, 22, { x: 0, y: 0, z: 0 });
     applyDungeonMobTuning(boss, SANCTUM, 'heroic');
-    expect(boss.mechanicDamageMult).toBe(19);
+    expect(boss.mechanicDamageMult).toBe(2.5);
   });
 });

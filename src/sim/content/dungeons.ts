@@ -1065,26 +1065,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 7,
     aggroRadius: 18,
-    // Grave Inferno (2026-07): the old Necrotic Shockwave aoePulse hit every
-    // melee for an unavoidable, unmitigated 570-798 each 8s. Replaced by a
-    // Geddon-style stationary channel: 8s rooted, no melee, four escalating
-    // fire pulses (base x1/2/3/4 x the per-mob mechanic multiplier), 14yd.
-    // Moving out at the windup eats the small first pulse or nothing.
-    // The 50% hp gate (2026-07-26) guarantees the channel fires once per kill
-    // on BOTH difficulties: a group out-pacing the 30s cadence used to skip
-    // the mechanic entirely. One gate only, and it lands before the 30% enrage
-    // so the burn phase never stacks on enraged melee.
-    infernoChannel: {
-      every: 30,
-      duration: 8,
-      pulses: 4,
-      min: 7,
-      max: 9,
-      radius: 14,
-      name: 'Grave Inferno',
-      school: 'fire',
-      atHpPct: [0.5],
-    },
+    // The great wyrm: melee reaches him from his body's edge (about 5 yd).
+    bodyRadius: 5,
+    // Grave Inferno, the breath, the tail, the flights and the plate floor are
+    // the encounter's (encounters/gravewyrm_sanctum/korzul.ts, design 6.3):
+    // the Inferno moved off the template (infernoChannel) so the plate under
+    // him can break it (Doused). Its numbers are stated LANDED there.
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       // 15000c base rolls to 9000c to 21000c (the 0.6x to 1.4x loot band):
