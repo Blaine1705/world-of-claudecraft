@@ -9,7 +9,7 @@ from surface import NT, cavity, srgb
 
 KINDS = ('flesh', 'nacre', 'marble', 'silver', 'pearl', 'pupil')
 GLOWS = {
-    'glow_eye': ((0.78, 0.98, 1.0), 6.0, 'PilgrimEyes'),
+    'glow_eye': ((0.55, 0.95, 1.0), 4.5, 'PilgrimEyes'),
     'glow_pearl': ((0.86, 0.96, 1.0), 7.0, 'PilgrimMoonPearl'),
     'glow_flare': ((0.62, 0.3, 1.0), 6.0, 'PilgrimFrenzyFlare'),
 }

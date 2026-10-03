@@ -488,7 +488,7 @@ def build_diadem(voxel):
     for i in range(4):
         F.add(RoundCone(pts[i], pts[i + 1], 0.028 * GS, 0.028 * GS, bone='Head'), 0.015 * GS)
     # the brow crescent
-    cc = g(0, -1.86, 1.36)
+    cc = g(0, -1.84, 1.42)
 
     class Disc(sdf.Prim):
         def __init__(self, c, r, t):
@@ -500,7 +500,7 @@ def build_diadem(voxel):
             dy = np.abs(Y_ - self.c[1]) - self.t
             return np.sqrt(np.maximum(dr, 0) ** 2 + np.maximum(dy, 0) ** 2) + np.minimum(np.maximum(dr, dy), 0)
 
-    F.add(X.Diff(Disc(cc, 0.11 * GS, 0.02 * GS), Disc(cc + g(0.0, 0, 0.06), 0.1 * GS, 0.1 * GS), 0.008 * GS,
+    F.add(X.Diff(Disc(cc, 0.16 * GS, 0.026 * GS), Disc(cc + g(0.0, 0, 0.075), 0.145 * GS, 0.1 * GS), 0.008 * GS,
                  bone='Head'), 0.01 * GS)
     return F
 

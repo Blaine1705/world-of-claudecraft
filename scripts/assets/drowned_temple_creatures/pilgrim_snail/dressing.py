@@ -23,8 +23,10 @@ def build_eyes():
         e2 = A.g(0.42 * s, -1.92, 1.92) + A.g(0.0, -0.02, 0.04)
         fwd = A.unit((0.15 * s, -1.0, 0.1))
         g = K.Part(p + 'EyeGlow', 'glow_eye', bone=p + 'Eye2')
-        g.sphere(e2 + fwd * 0.045 * GS, (0.085 * GS, 0.085 * GS, 0.085 * GS), seg=12, rings=8)
+        # a moon orb set in the bulb, no pupil: it glows, it does not goggle
+        g.sphere(e2 + fwd * 0.05 * GS, (0.072 * GS, 0.072 * GS, 0.072 * GS), seg=12, rings=8)
         out.append(_pair(g))
+        continue
         pu = K.Part(p + 'Pupil', 'pupil', bone=p + 'Eye2')
         side = A.unit(np.cross(fwd, (0, 0, 1)))
         R = np.stack([side, fwd, np.cross(side, fwd)], axis=1)
