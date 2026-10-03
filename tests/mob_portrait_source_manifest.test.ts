@@ -118,7 +118,11 @@ describe('mob portrait source manifest', () => {
     // Great Jaguar, the Gorgebloom and its Thorn Sprout, and five trash bodies:
     // raptor, toad, Snarlvine Lasher, Totem-Binder and its totem). 350: the
     // Foundry's chained workers (the miner, the hauler and the freed laborer).
-    expect(liveIds).toHaveLength(350);
+    // 358: the Gravewyrm Sanctum rework's eight trash bodies (Thawcaller,
+    // Goadsmith, Pyre-Tender, Soul Brazier, Rime Whelp, Ogre Sledge-Hauler,
+    // Glacier Splinter and the Sledge Tusker). 362: Korgath's four Seal
+    // Shackles (hammer, tongs, anvil, bellows).
+    expect(liveIds).toHaveLength(362);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

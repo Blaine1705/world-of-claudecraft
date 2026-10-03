@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "5872732eb2612f7eca7f6a9698faa1b62c556c9cfcaa5a13f6484d489244d531",
+  "rendererFingerprint": "5535fafe18ac8c9f440b9a67e2a14a1be2c527eadf75c95952457307b46f86e2",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5539861,
-      "sha256": "979fc12fc474596eeaa8f3409c7b9dabd7d02ba6c7d908e8b276ccdbcb6ef34d",
+      "bytes": 5552006,
+      "sha256": "d0050bf29be816a3124f2b66dc242d408e08d02f09bc80df1fe4fd14c125ff8b",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 358,
+  "portraitCount": 362,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -3897,49 +3897,34 @@
       "id": "grand_necromancer_velkhar",
       "family": "humanoid",
       "finderEncounter": true,
-      "visualKey": "mob_dark_caster",
+      "visualKey": "sanctum_velkhar",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/mage.glb",
-          "path": "public/models/chars/players/mage.glb",
-          "bytes": 441576,
-          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+          "url": "models/creatures/sanctum_velkhar.glb",
+          "path": "public/models/creatures/sanctum_velkhar.glb",
+          "bytes": 2754672,
+          "sha256": "52551c877e287d22b30ad64d30d29b3a2b55db30282fb8fea17aa83c67b3bdfd"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 4.048,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Mage_Hat"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/staff.glb",
-              "path": "public/models/weapons/staff.glb",
-              "bytes": 36168,
-              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "show": null,
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.5
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#512e5f",
-        "strength": 0.5
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "c5152e9c6abf5ced4589b1e2ee72050df1fa91febba28d98ced80ff4ff3f06e4",
+      "sourceFingerprint": "fc50b5ba62c5924a2acf428715a51911a20b982753ab304c6a535a6c7e07e5fa",
       "output": {
         "path": "public/ui/mobs/grand_necromancer_velkhar.webp",
-        "bytes": 2128,
-        "sha256": "f6f89ebf2b9521c966e915128e43d798e5407a3380f95712ae99f852f781d450"
+        "bytes": 2192,
+        "sha256": "9bf749a45b16df9558971bc6df71dd7ab5a7cec5de30b504cfa5f9025bc46eab"
       }
     },
     {
@@ -5794,68 +5779,68 @@
       "id": "korgath_the_bound",
       "family": "ogre",
       "finderEncounter": true,
-      "visualKey": "mob_ogre",
+      "visualKey": "sanctum_korgath",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/ogre.glb",
-          "path": "public/models/creatures/ogre.glb",
-          "bytes": 494060,
-          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
         },
         "idle": "Idle",
-        "height": 2.8,
+        "height": 6.846666666666667,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.12
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#8f6f46",
-        "strength": 0.12
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "a0302554a6d323032808701d6cdbc14bd464ecefaf491ee50c9bf5ff5c207022",
+      "sourceFingerprint": "8851b569e25f335a030cf24d92bf540e9cd5a6dc93fcd6dc8d44351536e8d297",
       "output": {
         "path": "public/ui/mobs/korgath_the_bound.webp",
-        "bytes": 2424,
-        "sha256": "4f1bfcbdd19b0d071075f6b1e047ed54a4485a807b3d6a823d84d8d5de5a1289"
+        "bytes": 2934,
+        "sha256": "8a3d14396b4560e1859949d1f96ea9a6a3379464a6e4b6fc7a1732abd6b5631a"
       }
     },
     {
       "id": "korzul_the_gravewyrm",
       "family": "dragonkin",
       "finderEncounter": true,
-      "visualKey": "mob_dragonkin",
+      "visualKey": "sanctum_korzul",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/dragonevolved.glb",
-          "path": "public/models/creatures/dragonevolved.glb",
-          "bytes": 138560,
-          "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
+          "url": "models/creatures/sanctum_korzul.glb",
+          "path": "public/models/creatures/sanctum_korzul.glb",
+          "bytes": 4516928,
+          "sha256": "abfb84bffa168999760e568dd95d1059d18d56fe42ab382cb6e302a277e4acb8"
         },
-        "idle": "Flying_Idle",
-        "height": 2.4,
+        "idle": "Idle",
+        "height": 12.13888888888889,
         "yaw": null,
-        "hover": 0.25,
+        "hover": -0.1388888888888889,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#3d5c45",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "fcb7f89c02987b23574ea2a1e137371ea7ca8b37696c28167b04cb7d3cdd3cd0",
+      "sourceFingerprint": "c0ee19f51cb70bd5a62a3475993d74c7573cc9793910db0efc456c4ef0de7c9f",
       "output": {
         "path": "public/ui/mobs/korzul_the_gravewyrm.webp",
-        "bytes": 2172,
-        "sha256": "b5feea4f14f3f7739f4cba0cd2f6594d86fd0c0fd9784dc4981b7c7c8633f5df"
+        "bytes": 2372,
+        "sha256": "277ddb2d9322cee43923c1b240190302932fbb742a931ebdde7a4faf70875372"
       }
     },
     {
@@ -6689,8 +6674,8 @@
         "model": {
           "url": "models/creatures/crypt_morthen_lich.glb",
           "path": "public/models/creatures/crypt_morthen_lich.glb",
-          "bytes": 2994220,
-          "sha256": "d17cd53f06b7895226f9112f70cd03f99888c42469a7c676e5c999c2cda077bb"
+          "bytes": 3366996,
+          "sha256": "71088e679c39b0a9b079ea3a2744fc54c26bf2af8eac2ac5d30a3e8c39532e07"
         },
         "idle": "Idle",
         "height": 6.994,
@@ -6707,11 +6692,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "fbbf18acc5b100632faa23afeff7023374677c29100f0d71cbeaec69454a3ab8",
+      "sourceFingerprint": "d74f5eeb65789839a436f080861e15f2a1c46d415c722df082e6b6c35b5525bf",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 2938,
-        "sha256": "9bb01c1474159e07ed72a526a231dfcd97c7e853d0f2465a341f95e3caba987b"
+        "bytes": 2362,
+        "sha256": "f25ca69b5dc22ecd3b59d26513f590f9fce2e4df19c081ce86497c5d98646ec3"
       }
     },
     {
@@ -9391,6 +9376,142 @@
         "path": "public/ui/mobs/sanctum_drakonid.webp",
         "bytes": 2096,
         "sha256": "3c24a0c54b9cf61175046a4337112f24214b2c87b3f2cbda0e0d71dd49e5d172"
+      }
+    },
+    {
+      "id": "sanctum_shackle_anvil",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_seal_shackle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "path": "public/ui/mobs/sanctum_shackle_anvil.webp",
+        "bytes": 2950,
+        "sha256": "0c0192d21a435bab459088903b4ec783a5d173acf5e1196f69092f3499ed9ad7"
+      }
+    },
+    {
+      "id": "sanctum_shackle_bellows",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_seal_shackle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "path": "public/ui/mobs/sanctum_shackle_bellows.webp",
+        "bytes": 2950,
+        "sha256": "0c0192d21a435bab459088903b4ec783a5d173acf5e1196f69092f3499ed9ad7"
+      }
+    },
+    {
+      "id": "sanctum_shackle_hammer",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_seal_shackle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "path": "public/ui/mobs/sanctum_shackle_hammer.webp",
+        "bytes": 2950,
+        "sha256": "0c0192d21a435bab459088903b4ec783a5d173acf5e1196f69092f3499ed9ad7"
+      }
+    },
+    {
+      "id": "sanctum_shackle_tongs",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_seal_shackle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "path": "public/ui/mobs/sanctum_shackle_tongs.webp",
+        "bytes": 2950,
+        "sha256": "0c0192d21a435bab459088903b4ec783a5d173acf5e1196f69092f3499ed9ad7"
       }
     },
     {
