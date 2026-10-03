@@ -25,12 +25,14 @@ export interface ModelPoint {
   fwd: number;
 }
 
-/** The arbalest GLB's rest bounding height (model units; the Blender build
- *  prints it), which the VISUALS height normalizes. */
-export const ARBALEST_RAW_HEIGHT = 3.14;
-/** Where the loaded bolt's head sits at the loose (the shouldered aim, the
- *  crossbow level at the right cheek, the bolt tip past the prod). */
-export const ARBALEST_MUZZLE: ModelPoint = { side: -0.3, up: 1.97, fwd: 2.2 };
+/** The arbalest GLB's bounding height half a second into Idle (model units;
+ *  scripts/assets/sunken_bastion_drowned/kit/anchors.py prints it as
+ *  RAW_HEIGHT), which the VISUALS height normalizes. */
+export const ARBALEST_RAW_HEIGHT = 4.253;
+/** Where the loaded bolt's head sits in the held aim just before the loose
+ *  (the stock shouldered, the crossbow level down the lane, the bolt tip past
+ *  the prod; anchors.py prints it as the muzzle anchor at Shoot:0.5). */
+export const ARBALEST_MUZZLE: ModelPoint = { side: -0.18, up: 3.16, fwd: 1.67 };
 
 /** The Turnkey GLB's idle bounding height (model units; turnkey.py prints it
  *  as IDLE_HEIGHT). */

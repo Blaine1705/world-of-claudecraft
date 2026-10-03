@@ -184,6 +184,7 @@ const AUTHORED_ATLAS_DEFS = [
   'bastion_drowned_revenant',
   'bastion_warhound',
   'bastion_skel_watchman',
+  'bastion_skel_arbalest',
   'bastion_gaol_cage',
   'bastion_drowned_anchor',
   'bastion_turnkey',

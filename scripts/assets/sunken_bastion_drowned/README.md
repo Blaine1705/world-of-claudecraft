@@ -24,6 +24,13 @@ nothing here runs in the build or the game.
   never-keyed Weapon bone, a sea-light lantern at the hip; `clips.py` has Idle, CombatIdle,
   Walk, Run, Attack, Attack2, HalberdSweep, Cast, Hit, Death. Anchors print with
   `../kit/anchors.py` (the generic one, reading `anatomy.ANCHORS`).
+- `arbalest/`: the Fogbound Arbalest (`public/models/creatures/drowned_arbalest.glb`): a deep
+  hood and mantle (`hood_weights`), face rags, a quilted gambeson, a quiver and the windlass
+  crossbow, laid out in the frame the posed fist gives it in the shouldered aim
+  (`XB_FWD`/`XB_UPV`, from `kit/hand_frame_probe.py`); the bolt, the drawn and loosed strings
+  and the crank ride their own bones so Shoot and Aim show the loose (keyed scales) and the
+  windlass reload. The muzzle anchor at `Shoot:0.5` is `ARBALEST_MUZZLE` in
+  `bastion_creature_fx_core.ts` (`../kit/anchors.py -- <abs>/arbalest Shoot:0.5`).
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),

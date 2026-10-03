@@ -1,7 +1,10 @@
 """Print a drowned biped's effect anchors (the game's ModelPoint side/up/fwd) half a
 second into Idle, as the renderer measures it, plus the raw bounding height.
 
-  blender -b <x.blend> --python anchors.py -- <builder dir>
+  blender -b <x.blend> --python anchors.py -- <builder dir> [Clip:t ...]
+
+Extra Clip:t arguments print the anchors again at that time of that clip (over the
+Idle floor), e.g. the arbalest's muzzle at the loose.
 
 The creature's anatomy module lists them in ANCHORS = {name: (bone, rest point)};
 rest points are in the rest armature space (the head ones already grown by
@@ -46,3 +49,13 @@ def posed(bone, p):
 for name, (bone, p) in getattr(A, 'ANCHORS', {}).items():
     w = posed(bone, p)
     print('ANCHOR', name, '{ side: %.2f, up: %.2f, fwd: %.2f }' % (w.x, w.z - minz, -w.y))
+
+
+for spec in argv[1:]:
+    clip, t = spec.split(':')
+    R.set_action(arm, bpy.data.actions[clip])
+    f = bpy.data.actions[clip].frame_range[0] + float(t) * scene.render.fps
+    scene.frame_set(int(math.floor(f)), subframe=f - math.floor(f))
+    for name, (bone, p) in getattr(A, 'ANCHORS', {}).items():
+        w = posed(bone, p)
+        print('ANCHOR@' + spec, name, '{ side: %.2f, up: %.2f, fwd: %.2f }' % (w.x, w.z - minz, -w.y))

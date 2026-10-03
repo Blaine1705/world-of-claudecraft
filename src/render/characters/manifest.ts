@@ -4152,15 +4152,21 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.16,
   },
-  // A heavy crossbow (long stock, wide steel prod, a drawn string and a
-  // loaded bolt). Shoot is the Rusted Bolt: shouldered over the 0.6 s windup,
-  // the loose on the release frame, the kick, then the windlass cranked and a
-  // fresh bolt laid in. Aim is the Piercing Bolt: held down the lane over the
-  // 2 s bar, the loose landing as the bar ends, the reload playing out after.
-  // The bolts themselves fly in sunken_bastion/bastion_creature_fx.ts.
+  // The Fogbound Arbalest: the wall's marksman sculpted whole on the
+  // Revenant's kit, stooped and wary where the Watchman stands tall: a deep
+  // sodden hood and mantle, rags wound over the lower face, a quilted gambeson
+  // instead of plate, a quiver at the hip and a heavy windlass crossbow (long
+  // stock, steel prod, a drawn string and a loaded bolt, each on its own bone)
+  // carried low across the body. Shoot is the Rusted Bolt: shouldered over the
+  // 0.6 s windup, the loose on the release frame (the bolt and the drawn string
+  // vanish, the loosed string shows), the kick, then the nose dropped, the
+  // windlass cranked and a fresh bolt laid in. Aim is the Piercing Bolt: held
+  // down the lane over the 2 s bar, the loose landing as the bar ends, the
+  // reload playing out after. The bolts themselves fly in
+  // sunken_bastion/bastion_creature_fx.ts from ARBALEST_MUZZLE.
   bastion_skel_arbalest: {
     url: `${CREATURES}/drowned_arbalest.glb`,
-    height: 5.4,
+    height: 5.1,
     attackTimeScale: 1,
     clips: {
       idle: 'Idle',
@@ -4175,6 +4181,10 @@ export const VISUALS: Record<string, VisualDef> = {
       castPlayOut: ['Aim'],
     },
     castPlayOutHoldsAttacks: true,
+    walkRef: 1.55,
+    runRef: 7.2,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
   bastion_skel_sergeant: {
     url: `${CREATURES}/drowned_sergeant.glb`,

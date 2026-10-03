@@ -60,6 +60,19 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0, up: 2.97, fwd: 0.51 },
     eyes: { side: 0.01, up: 4.17, fwd: 0.31 },
   },
+  // The arbalest: water off the sodden mantle's shoulders and back and the
+  // crossbow's nose carried low.
+  fogbound_arbalest: {
+    rawHeight: 4.253,
+    drips: [
+      { side: 0.52, up: 2.91, fwd: 0.04 },
+      { side: 0.22, up: 1.58, fwd: 0.98 },
+      { side: -0.5, up: 2.91, fwd: 0.04 },
+      { side: 0.01, up: 3.12, fwd: -0.33 },
+    ],
+    chest: { side: 0.01, up: 2.66, fwd: 0.48 },
+    eyes: { side: 0.08, up: 3.72, fwd: 0.77 },
+  },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {
     rawHeight: 4.4,
