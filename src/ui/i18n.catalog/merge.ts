@@ -700,6 +700,15 @@ const mergeStringsEn = {
       // Grand Necromancer Velkhar (encounters/gravewyrm_sanctum/velkhar.ts).
       sanctum_velkhar_soulfire_trench: 'Soulfire Trench',
       sanctum_velkhar_shadow_volley: 'Shadow Volley',
+      // Korzul the Gravewyrm (encounters/gravewyrm_sanctum/korzul.ts). None of
+      // his bars can be kicked.
+      sanctum_korzul_break_free: 'Break Free',
+      sanctum_korzul_grave_breath: 'Grave Breath',
+      sanctum_korzul_tail_sweep: 'Tail Sweep',
+      sanctum_korzul_grave_inferno: 'Grave Inferno',
+      sanctum_korzul_wing_gale: 'Wing Gale',
+      sanctum_korzul_plunging_fire: 'Plunging Fire',
+      sanctum_korzul_crashing_descent: 'Crashing Descent',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

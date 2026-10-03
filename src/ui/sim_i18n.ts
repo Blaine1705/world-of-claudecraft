@@ -1451,6 +1451,25 @@ const baseEnTable = {
   'mechanic.sanctumUnquenched': 'Unquenched',
   'aura.sanctumGraspOfTheThawed': 'Grasp of the Thawed',
   'aura.sanctumTwiceWoken': 'Twice-Woken',
+  // Korzul the Gravewyrm (encounters/gravewyrm_sanctum/korzul.ts): his log
+  // lines (EXACT) and his mechanic and aura names. Tail Sweep shares the
+  // rift key below.
+  'log.sanctumKorzulBreakFree':
+    'The Calving Face bursts apart! Korzul the Gravewyrm tears himself free of the ice.',
+  'log.sanctumKorzulFlight': 'Korzul beats his wings and takes to the air above the lake!',
+  'log.sanctumKorzulDoused': 'The ice gives way under Korzul! He plunges into the quench, Doused.',
+  'log.sanctumKorzulShard': "The shard in Korzul's chest flares, and the aurora burns with it!",
+  'log.sanctumKorzulNoIce':
+    'No ice is left on the lake. Korzul hangs over the open quench and breathes without pause!',
+  'mechanic.sanctumGraveBreath': 'Grave Breath',
+  'mechanic.sanctumGraveInferno': 'Grave Inferno',
+  'mechanic.sanctumPlungingFire': 'Plunging Fire',
+  'mechanic.sanctumCrashingDescent': 'Crashing Descent',
+  'mechanic.sanctumQuenchWater': 'Quench-Water',
+  'aura.sanctumWyrmsEye': "Wyrm's Eye",
+  'aura.sanctumAirborne': 'Airborne',
+  'aura.sanctumDoused': 'Doused',
+  'aura.sanctumShardFlare': 'Shard Flare',
   // The Wildheart Basin's three bosses (encounters/wildheart_basin: beastmaster.ts,
   // gorgebloom.ts, zulgar.ts): their yells and log lines (EXACT) and the
   // mechanic and aura names.
@@ -17936,6 +17955,15 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Unquenched: 'mechanic.sanctumUnquenched',
   'Grasp of the Thawed': 'aura.sanctumGraspOfTheThawed',
   'Twice-Woken': 'aura.sanctumTwiceWoken',
+  'Grave Breath': 'mechanic.sanctumGraveBreath',
+  'Grave Inferno': 'mechanic.sanctumGraveInferno',
+  'Plunging Fire': 'mechanic.sanctumPlungingFire',
+  'Crashing Descent': 'mechanic.sanctumCrashingDescent',
+  'Quench-Water': 'mechanic.sanctumQuenchWater',
+  "Wyrm's Eye": 'aura.sanctumWyrmsEye',
+  Airborne: 'aura.sanctumAirborne',
+  Doused: 'aura.sanctumDoused',
+  'Shard Flare': 'aura.sanctumShardFlare',
   'Jaguar Bite': 'mechanic.wildheartJaguarBite',
   'Beast Pit Quake': 'mechanic.wildheartBeastPitQuake',
   'Vine Lash': 'mechanic.wildheartVineLash',

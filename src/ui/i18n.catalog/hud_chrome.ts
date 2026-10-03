@@ -8794,6 +8794,11 @@ export const hudChromeStrings = {
         'The Deathless Court (heroic only, the royal court rises after Deathless Rage)',
       bloodmane_rend: 'Bloodmane Rend (bleed, watch for target swaps)',
       tusk_sweep: 'Tusk Sweep (frontal cleave)',
+      grave_breath: 'Grave Breath (frontal fire cone, it cracks the ice it covers)',
+      plate_floor:
+        'Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)',
+      wyrm_flights:
+        "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
       ancestral_sap: 'Ancestral Sap (heals its allies)',
       call_of_the_hunt: 'Call of the Hunt (hastens nearby allies)',
       thickhide_ward: 'Thickhide Ward (shields nearby allies)',

@@ -194,7 +194,11 @@ const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
       'shadow_volley',
     ],
   },
-  { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['grave_inferno', 'enrage'] },
+  {
+    mobId: 'korzul_the_gravewyrm',
+    final: true,
+    mechanics: ['grave_inferno', 'enrage', 'grave_breath', 'plate_floor', 'wyrm_flights'],
+  },
 ];
 
 // The heroic tier adds each boss's heroic twists (its own array, so the normal

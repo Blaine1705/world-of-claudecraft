@@ -921,12 +921,7 @@ function stepDrown(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: Korzul
 // ------------------------------------------------------------------ the tick
 
 /** The ground fight. */
-function stepGround(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  boss: Entity,
-  st: KorzulFightState,
-): void {
+function stepGround(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: KorzulFightState): void {
   // Every clock runs through the other strikes' bars (start to start).
   st.breathTimer -= DT;
   st.tailTimer -= DT;
