@@ -97,7 +97,7 @@ void main() {
   // Fog motes drifting through the light.
   float dust = noise(vec2(vLocal.z * 0.18 - uTime * 0.9, atan(vLocal.y, vLocal.x) * 3.0)) * 0.5
     + noise(vec2(vLocal.z * 0.05 - uTime * 0.3, vLocal.x * 0.3)) * 0.5;
-  float fall = pow(1.0 - along, 1.35) * smoothstep(0.0, 0.03, along);
+  float fall = pow(max(1.0 - along, 0.0), 1.35) * smoothstep(0.0, 0.03, along);
   float i = core * fall * (0.5 + 0.5 * dust) * (0.6 + 0.4 * grazing) * 1.35;
   gl_FragColor = vec4(uColor * i, i);
   #include <colorspace_fragment>

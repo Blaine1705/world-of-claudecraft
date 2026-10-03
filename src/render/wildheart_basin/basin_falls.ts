@@ -286,7 +286,7 @@ void main() {
   vLife = life;
   vec3 c = aBase.xyz;
   // Flung out and up from the plunge, then carried off on the air.
-  float burst = 1.0 - pow(1.0 - life, 2.0);
+  float burst = 1.0 - pow(max(1.0 - life, 0.0), 2.0);
   c.xz += aMotion.xy * burst * (6.0 + aBase.w * 8.0);
   c.y += aMotion.z * (burst * 1.2 - life * life * 0.25);
   c.x += uDrift * life * 6.0;

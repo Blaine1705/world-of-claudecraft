@@ -220,7 +220,7 @@ void main() {
   float w = mix(1.1, 6.5, age);
   float h = w * 0.42;
   mvPosition.xy += vec2(position.x * w, position.y * h);
-  vAlpha = pow(sin(age * 3.14159), 1.3) * gust * smoothstep(3.0, 9.0, -mvPosition.z);
+  vAlpha = pow(max(sin(age * 3.14159), 0.0), 1.3) * gust * smoothstep(3.0, 9.0, -mvPosition.z);
   vQuad = position.xy;
   vSeed = seed + floor(uTime * 0.2 + aPhase);
   gl_Position = projectionMatrix * mvPosition;

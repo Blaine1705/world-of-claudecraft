@@ -122,7 +122,9 @@ export const WILDHEART_GREAT_SAURIAN_LOOK: VisualDef = {
   attackTimeScale: 1.1,
   deathTimeScale: 1,
   authoredAtlas: true,
-  clickRadius: 4.5,
+  // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,
+  // tests/nythraxis_bone_spike_model.test.ts): wider swallows the raid's clicks.
+  clickRadius: 4.4,
 };
 
 /** How fast the rooted bloom swings round to a new target (rad/s): a quarter
@@ -187,7 +189,9 @@ export const WILDHEART_GORGEBLOOM_LOOK: VisualDef = {
   // The death's splash and sink are timed off the clip at 1x (gorgebloom_fx.ts).
   deathTimeScale: 1,
   authoredAtlas: true,
-  clickRadius: 4.5,
+  // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,
+  // tests/nythraxis_bone_spike_model.test.ts): wider swallows the raid's clicks.
+  clickRadius: 4.4,
 };
 
 /** The Snarlvine Lasher (scripts/assets/wildheart_vine_lasher, built in

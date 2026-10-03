@@ -84,7 +84,7 @@ void main() {
   vec2 slope = (vec2(r1 - 0.5, r2 - 0.5)) * 0.35 + (vec2(r3, bnoise(adv * 2.1 - 3.0)) - 0.5) * 0.18 * uDetail;
   vec3 n = normalize(vec3(dir.x * slope.x + side.x * slope.y, 1.0, dir.y * slope.x + side.y * slope.y));
   vec3 view = normalize(cameraPosition - vWorld);
-  float fres = 0.03 + 0.97 * pow(1.0 - max(0.0, dot(n, view)), 5.0);
+  float fres = 0.03 + 0.97 * pow(max(1.0 - max(0.0, dot(n, view)), 0.0), 5.0);
   vec3 r = reflect(-view, n);
   // The sky it mirrors: the gold haze at the horizon, the turquoise above.
   vec3 sky = mix(uHorizon * 0.7, vec3(0.26, 0.45, 0.52), smoothstep(0.0, 0.5, r.y));

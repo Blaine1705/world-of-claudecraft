@@ -3952,6 +3952,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // shriek. Its talons curl just under its feet: the negative hover plants them.
   mob_crypt_gargoyle: {
     url: `${CREATURES}/crypt_gargoyle.glb`,
+    authoredAtlas: true,
     height: 5.81,
     hover: -0.22,
     flight: true,
@@ -4001,6 +4002,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // buffet exactly at their bars' ends. Plain swings never cut those short.
   mob_crypt_drake: {
     url: `${CREATURES}/crypt_drake.glb`,
+    authoredAtlas: true,
     height: 13.63,
     hover: -0.19,
     flight: true,
@@ -4044,6 +4046,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // wings flung wide for Dread Bellow; the drake's strikes play to their bars.
   mob_crypt_knellwyrm: {
     url: `${CREATURES}/crypt_knellwyrm.glb`,
+    authoredAtlas: true,
     height: 15.07,
     hover: -0.19,
     flight: true,
@@ -4533,7 +4536,9 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 23.97 / 2.5,
     hover: -0.339 / 2.5,
     authoredAtlas: true,
-    clickRadius: 4.5,
+    // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,
+    // tests/nythraxis_bone_spike_model.test.ts): wider swallows the raid's clicks.
+    clickRadius: 4.4,
     clips: {
       idle: 'Idle',
       walk: 'Idle',
@@ -4575,12 +4580,15 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 2.6,
   },
-  // A Tidewisp: a glimmerwisp of living lagoon water.
+  // A Tidewisp: a glimmerwisp of living lagoon water. glimmerwisp.glb is an
+  // unrigged bespoke mesh that ships no clips (see mob_glimmerwisp), so this
+  // names STATIC_PROP and registers in CLIPLESS_RIGS
+  // (tests/character_clipmaps.test.ts) instead of borrowing FLOATING.
   temple_tidewisp: {
     url: `${CREATURES}/glimmerwisp.glb`,
     height: 1.8,
     hover: 0.5,
-    clips: FLOATING,
+    clips: STATIC_PROP,
     yaw: -Math.PI / 2,
     tint: 0x6fe3e0,
     tintStrength: 0.6,

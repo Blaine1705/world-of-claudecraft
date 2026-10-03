@@ -307,7 +307,9 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.05,
-    clickRadius: 6,
+    // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,
+    // tests/nythraxis_bone_spike_model.test.ts): wider swallows the raid's clicks.
+    clickRadius: 4.4,
   },
 };
 

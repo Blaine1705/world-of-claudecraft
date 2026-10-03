@@ -77,7 +77,7 @@ float curtains(float az, float north, float t) {
     float sheet = exp(-(off * off) / (w * w));
     float haze = exp(-(off * off) / (w * w * 10.0)) * 0.2;
     // Fine vertical rays drifting along the fold.
-    float rays = 0.3 + 0.7 * pow(noise(vec2(u * 0.09 + fk * 13.0 - t * 5.0, fk * 3.0)), 1.5);
+    float rays = 0.3 + 0.7 * pow(max(noise(vec2(u * 0.09 + fk * 13.0 - t * 5.0, fk * 3.0)), 0.0), 1.5);
     // The ribbon fades out along its length (no endless band).
     float span = smoothstep(1.3, 0.35, abs(az + (fk - 1.0) * 0.35));
     s += (sheet * rays + haze) * span * (1.0 - fk * 0.18);
@@ -97,9 +97,9 @@ void main() {
   // through a lilac into the blue.
   vec2 h2 = normalize(d.xz + vec2(1e-5));
   float west = max(0.0, dot(h2, normalize(uAfterglow.xz)));
-  float band = pow(west, 3.0) * exp(-max(0.0, up - 0.01) * 9.0);
+  float band = pow(max(west, 0.0), 3.0) * exp(-max(0.0, up - 0.01) * 9.0);
   col += uAfterglow * band * 1.25;
-  col += vec3(0.18, 0.07, 0.16) * pow(west, 2.0) * exp(-max(0.0, up) * 3.5) * 0.45;
+  col += vec3(0.18, 0.07, 0.16) * pow(max(west, 0.0), 2.0) * exp(-max(0.0, up) * 3.5) * 0.45;
   // Stars: hashed points on the dome, more of them overhead and in the east,
   // gone where the afterglow and the aurora are bright.
   vec3 cell = floor(d * 230.0);

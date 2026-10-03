@@ -121,7 +121,7 @@ varying vec2 vUv;
 ${GHOST_RAMP}
 void main() {
   float v = vUv.y;
-  float souls = pow(0.5 + 0.5 * sin((v * 9.0 - uTime * 2.4 + vUv.x * 18.8 + uSeed) ), 3.0);
+  float souls = pow(max(0.5 + 0.5 * sin((v * 9.0 - uTime * 2.4 + vUv.x * 18.8 + uSeed) ), 0.0), 3.0);
   float streak = 0.5 + 0.5 * sin(v * 40.0 - uTime * 7.0 + vUv.x * 60.0);
   float body = souls * 0.8 + streak * 0.25;
   float fade = smoothstep(0.0, 0.08, v) * (1.0 - smoothstep(0.55, 1.0, v));

@@ -41,7 +41,7 @@ void main() {
   vec3 bark = mix(vec3(0.09, 0.12, 0.05), vec3(0.22, 0.34, 0.1), smoothstep(0.05, 0.55, vV));
   vec3 col = mix(bark, vec3(0.5, 0.07, 0.06), smoothstep(0.62, 0.97, vV)) * lit;
   // A wet sap sheen along the flanks.
-  col += vec3(0.55, 0.8, 0.25) * pow(1.0 - abs(n.y), 4.0) * 0.07;
+  col += vec3(0.55, 0.8, 0.25) * pow(max(1.0 - abs(n.y), 0.0), 4.0) * 0.07;
   gl_FragColor = vec4(col, 1.0);
 }
 `;

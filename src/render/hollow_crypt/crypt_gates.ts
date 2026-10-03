@@ -113,7 +113,7 @@ function wardMaterial(color: number, u: OpenUniforms): THREE.ShaderMaterial {
       void main() {
         float edge = smoothstep(0.0, 0.12, vUv.x) * smoothstep(1.0, 0.88, vUv.x) * smoothstep(0.0, 0.05, vUv.y) * smoothstep(1.0, 0.8, vUv.y);
         float runes = noise(vUv * vec2(18.0, 10.0) + vec2(0.0, uTime * 0.6));
-        float sheet = 0.18 + 0.55 * pow(runes, 3.0) + 0.25 * sin(vUv.y * 40.0 - uTime * 3.0) * 0.5;
+        float sheet = 0.18 + 0.55 * pow(max(runes, 0.0), 3.0) + 0.25 * sin(vUv.y * 40.0 - uTime * 3.0) * 0.5;
         // Opening shatters it upward from the floor.
         float gone = smoothstep(vUv.y - 0.15, vUv.y + 0.05, uOpen * 1.2 + noise(vUv * 9.0) * 0.2 - 0.1);
         float a = edge * sheet * (1.0 - gone) * (0.7 + 0.5 * uSeal);
@@ -330,9 +330,12 @@ function webCurtain(u: OpenUniforms, width: number): THREE.Object3D[] {
       );
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', '#include <common>\nuniform float uOpen;\nuniform float uSeal;')
+      // After the texel and vertex colour, before the basic shading reads
+      // diffuseColor.rgb: a seal tint written any later never reaches the
+      // pixel, and the stock final write (with its NaN guard) stays untouched.
       .replace(
-        '#include <opaque_fragment>',
-        'diffuseColor.a *= (1.0 - uOpen);\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.8, 0.55, 1.0), uSeal * 0.6);\n#include <opaque_fragment>',
+        '#include <color_fragment>',
+        '#include <color_fragment>\ndiffuseColor.a *= (1.0 - uOpen);\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.8, 0.55, 1.0), uSeal * 0.6);',
       );
   };
   material.customProgramCacheKey = () => 'hollowCryptWebCurtain:v1';

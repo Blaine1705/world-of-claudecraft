@@ -186,7 +186,7 @@ varying vec3 vWorld;
 ${NOISE}
 void main() {
   vec3 view = normalize(cameraPosition - vWorld);
-  float fres = pow(1.0 - abs(dot(view, vNormalW)), 2.2);
+  float fres = pow(max(1.0 - abs(dot(view, vNormalW)), 0.0), 2.2);
   float cells = noise(vWorld.xz * 1.6 + vWorld.y * 0.9 + uTime * 0.4);
   float web = smoothstep(0.42, 0.5, cells) - smoothstep(0.5, 0.58, cells);
   vec3 col = mix(vec3(0.2, 0.75, 0.7), vec3(0.8, 1.0, 0.95), web);

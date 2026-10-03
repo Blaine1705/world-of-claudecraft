@@ -55,7 +55,7 @@ void main() {
   vec3 glowCol = mix(vec3(1.0, 0.42, 0.12), vec3(1.0, 0.82, 0.3), uRipe);
   col += glowCol * (vein * 1.6 + beak * 1.1) * uGlow * throb;
   // A wet sheen on the bulb.
-  float rim = pow(1.0 - abs(n.y), 3.0) * 0.12;
+  float rim = pow(max(1.0 - abs(n.y), 0.0), 3.0) * 0.12;
   col += vec3(1.0, 0.85, 0.75) * rim * lit;
   gl_FragColor = vec4(col, 1.0);
 }

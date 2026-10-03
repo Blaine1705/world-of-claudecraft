@@ -145,7 +145,7 @@ varying float vH;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 void main() {
   float yards = vAlong * uScale;
-  float fall = pow(1.0 - vH, 1.7);
+  float fall = pow(max(1.0 - vH, 0.0), 1.7);
   float streak = 0.55 + 0.45 * sin(yards * 2.3 + uTime * 3.1 + vH * 3.0) * sin(yards * 0.9 - uTime * 1.7);
   vec2 g = vec2(yards * 2.2, vH * 3.0 - uTime * 1.6);
   vec2 id = floor(g);

@@ -99,7 +99,7 @@ void main() {
   vec3 col = mix(band, zenith, smoothstep(0.04, 0.7, up));
   col = mix(uHorizon * 1.3 + vec3(0.02, 0.02, 0.05), col, smoothstep(-0.02, 0.24, up));
   float toMoon = max(0.0, dot(normalize(vec3(d.x, 0.0, d.z)), normalize(vec3(uMoonDir.x, 0.0, uMoonDir.z))));
-  col += vec3(0.07, 0.08, 0.14) * pow(toMoon, 4.0) * (1.0 - smoothstep(0.0, 0.6, up));
+  col += vec3(0.07, 0.08, 0.14) * pow(max(toMoon, 0.0), 4.0) * (1.0 - smoothstep(0.0, 0.6, up));
 
   // Stars: a jittered grid, twinkling, thinning toward the horizon and the moon.
   vec3 cell = floor(d * 460.0);
@@ -107,7 +107,7 @@ void main() {
   vec3 jitter = vec3(hash3(cell + 1.3), hash3(cell + 2.7), hash3(cell + 4.1)) - 0.5;
   vec3 starDir = normalize((cell + 0.5 + jitter * 0.8) / 460.0);
   float starD = length(d - starDir) * 460.0;
-  float star = smoothstep(0.4, 0.0, starD) * step(0.978, h) * (0.3 + 0.7 * pow(hash3(cell + 9.1), 3.0));
+  float star = smoothstep(0.4, 0.0, starD) * step(0.978, h) * (0.3 + 0.7 * pow(max(hash3(cell + 9.1), 0.0), 3.0));
   float twinkle = 0.55 + 0.45 * sin(uTime * (1.3 + h * 3.0) + h * 40.0);
   float glow;
   float disc;
@@ -211,7 +211,7 @@ void main() {
   vec3 view = normalize(cameraPosition - vWorld);
   vec3 r = reflect(-view, n);
   r.y = abs(r.y);
-  float fres = 0.04 + 0.96 * pow(1.0 - max(0.0, dot(n, view)), 5.0);
+  float fres = 0.04 + 0.96 * pow(max(1.0 - max(0.0, dot(n, view)), 0.0), 5.0);
 
   // The mirror: the night sky and the moon, broken by the ripples.
   float disc;

@@ -50,11 +50,11 @@ void main() {
   float r = spread * sqrt(h11(seed * 5.3));
   vec3 p = aBase + vec3(cos(ang) * r, 0.0, sin(ang) * r);
   // Rise, easing off as it cools; drift on the cold air down the cirque.
-  float rise = (1.0 - pow(1.0 - life, 1.7)) * climb;
+  float rise = (1.0 - pow(max(1.0 - life, 0.0), 1.7)) * climb;
   p.y += rise;
   p.x += life * life * climb * 0.35 + sin(uTime * 0.3 + seed) * 0.4 * life;
   p.z += life * climb * 0.12;
-  float size = mix(0.9, 3.4, pow(life, 0.7)) * mix(1.0, 1.35, vSoot) * (0.75 + 0.5 * h11(seed));
+  float size = mix(0.9, 3.4, pow(max(life, 0.0), 0.7)) * mix(1.0, 1.35, vSoot) * (0.75 + 0.5 * h11(seed));
   vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
   // A slow turn per puff so no two cards share their billow's grain.
   float rot = seed * 3.1 + uTime * 0.05 * (h11(seed * 9.1) - 0.5);

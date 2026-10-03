@@ -103,7 +103,7 @@ void main() {
   if (u > uHead || u < uTail) discard;
   float along = (u - uTail) / max(uHead - uTail, 1e-3);
   float rim = smoothstep(0.0, 1.0, vUv.y);
-  float edge = pow(rim, 3.0);
+  float edge = pow(max(rim, 0.0), 3.0);
   float flick = 0.85 + 0.15 * sin(uTime * 31.0 + u * 40.0);
   float heat = clamp(along * (0.35 + 0.65 * edge) * flick, 0.0, 0.98);
   vec3 col = ghostRamp(0.35 + 0.63 * heat) * (1.2 + 1.3 * edge);

@@ -101,7 +101,7 @@ varying float vShade;
 void main() {
   float across = 1.0 - vUv.x * vUv.x;
   // Bright at the head (y 0), fading up the blurred tail (y 1).
-  float along = pow(1.0 - vUv.y, 1.6) * smoothstep(0.0, 0.06, vUv.y + 0.02);
+  float along = pow(max(1.0 - vUv.y, 0.0), 1.6) * smoothstep(0.0, 0.06, vUv.y + 0.02);
   gl_FragColor = vec4(uColor * vShade, 0.38 * vAlpha * across * along);
   #include <colorspace_fragment>
 }

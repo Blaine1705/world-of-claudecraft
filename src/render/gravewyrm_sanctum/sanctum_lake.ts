@@ -105,11 +105,11 @@ float lakeRipple(vec2 p) {
     float age = uTime - r.z;
     if (r.w < 0.5 || age <= 0.0 || age >= ${RIPPLE.life.toFixed(2)}) continue;
     float t = age / ${RIPPLE.life.toFixed(2)};
-    float rad = ${RIPPLE.reach.toFixed(1)} * (1.0 - pow(1.0 - t, 1.8));
-    float str = pow(1.0 - t, 1.4) * min(1.0, age / 0.15);
+    float rad = ${RIPPLE.reach.toFixed(1)} * (1.0 - pow(max(1.0 - t, 0.0), 1.8));
+    float str = pow(max(1.0 - t, 0.0), 1.4) * min(1.0, age / 0.15);
     float d = length(p - r.xy);
     float w = 1.6 + age * 2.4;
-    float ring = exp(-pow((d - rad) / w, 2.0));
+    float ring = exp(-pow(abs((d - rad) / w), 2.0));
     // A thin powder wake behind the front, broken up by the ice's grain.
     float wake = smoothstep(rad, rad - w * 4.0, d) * smoothstep(0.0, w * 6.0, rad - d + w * 6.0) * 0.22;
     rip += (ring + wake) * str * (0.55 + 0.45 * lfbm(p * 0.35 + age * 3.0));
@@ -454,7 +454,8 @@ function buildApron(lowGfx: boolean): THREE.Mesh {
   const tCol: number[] = [];
   const tIdx: number[] = [];
   const corner = (i: number, j: number): number => {
-    const key = i * 100000 + j;
+    // j runs 0..nz inclusive, so a stride of nz + 1 keys every corner uniquely.
+    const key = i * (nz + 1) + j;
     let v = cornerIndex.get(key);
     if (v !== undefined) return v;
     const x = x0 + i * cell;

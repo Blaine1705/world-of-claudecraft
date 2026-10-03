@@ -379,7 +379,7 @@ uniform vec3 uTint;
 varying vec3 vN;
 varying vec3 vV;
 void main() {
-  float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.0);
+  float f = pow(max(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0), 2.0);
   float top = 0.5 + 0.5 * normalize(vN).y;
   vec3 col = uTint * (0.35 + 0.4 * top) + vec3(0.85, 0.95, 1.0) * f * 1.3;
   gl_FragColor = vec4(col, (0.62 + 0.38 * f) * uAlpha);
@@ -509,7 +509,7 @@ varying vec3 vL;
 void main() {
   vec3 n = normalize(vN);
   float key = 0.35 + 0.65 * max(dot(n, normalize(vec3(0.4, 0.8, 0.3))), 0.0);
-  float rim = pow(1.0 - abs(dot(n, normalize(vV))), 3.0);
+  float rim = pow(max(1.0 - abs(dot(n, normalize(vV))), 0.0), 3.0);
   vec3 iron = vec3(0.13, 0.135, 0.15) * key + vec3(0.75, 0.88, 1.0) * rim * 0.35;
   // Rime on the top faces.
   iron = mix(iron, vec3(0.82, 0.92, 1.0), smoothstep(0.55, 0.95, n.y) * 0.45);

@@ -253,7 +253,7 @@ varying vec3 vN;
 varying vec3 vV;
 varying vec3 vP;
 void main() {
-  float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.2);
+  float f = pow(max(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0), 2.2);
   float plates = step(0.82, fract(vP.y * 5.0 + sin(vP.x * 6.0) * 0.4 - uTime * 0.6));
   vec3 col = mix(vec3(0.95, 0.66, 0.28), vec3(1.0, 0.92, 0.7), plates);
   gl_FragColor = vec4(col, (f * 0.85 + plates * f * 0.4 + 0.04) * uAlpha);

@@ -78,7 +78,7 @@ void main() {
   vec3 hot = vec3(0.86, 1.0, 0.92);
   vec3 col = mix(jade, hot, max(p1, p2) * (0.45 + 0.55 * strand));
   float body = mix(0.16 + 0.22 * p1, 0.5 + 0.7 * p1 + 0.45 * p2, strand);
-  float rim = mix(pow(vRim, 1.6), 0.55 + 0.45 * vRim, strand);
+  float rim = mix(pow(max(vRim, 0.0), 1.6), 0.55 + 0.45 * vRim, strand);
   float a = body * rim * ends * (0.3 + 0.7 * uStrength);
   gl_FragColor = vec4(col * a, 1.0);
 }

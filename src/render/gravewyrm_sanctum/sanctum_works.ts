@@ -99,7 +99,7 @@ void main() {
     float body = smoothstep(0.92, 0.84, r);
     float rim = smoothstep(1.0, 0.92, r) * (1.0 - body);
     vec3 view = normalize(cameraPosition - vWorld);
-    float fres = pow(1.0 - max(0.0, view.y), 3.0);
+    float fres = pow(max(1.0 - max(0.0, view.y), 0.0), 3.0);
     float ripple = noise(w * 3.0 + vec2(uTime * 0.4, -uTime * 0.3));
     vec3 water = vec3(0.004, 0.014, 0.024) + vec3(0.06, 0.1, 0.18) * fres * (0.5 + 0.5 * ripple);
     // A glint of the pyre in it.
@@ -158,7 +158,7 @@ void main() {
   float riffle = smoothstep(0.7, 0.86, flow) * 0.7;
   float foam = clamp(bank * (0.5 + 0.5 * flow) + riffle, 0.0, 1.0);
   vec3 view = normalize(cameraPosition - vWorld);
-  float fres = pow(1.0 - max(0.0, view.y), 3.0);
+  float fres = pow(max(1.0 - max(0.0, view.y), 0.0), 3.0);
   vec3 deep = vec3(0.01, 0.08, 0.1);
   vec3 lit = vec3(0.05, 0.26, 0.3);
   vec3 col = mix(deep, lit, flow * 0.7) + vec3(0.12, 0.2, 0.32) * fres * 0.7;

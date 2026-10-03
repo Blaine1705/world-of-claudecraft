@@ -488,7 +488,7 @@ export const TSUNAMI_FOAM_FADE_GLSL = /* glsl */ `
 float tsunamiFoamAlpha(float t) {
   if (t <= 0.0 || t >= 1.0) return 0.0;
   float settle = smoothstep(0.0, ${f(FOAM_FADE_IN)}, t);
-  float thin = pow(1.0 - smoothstep(${f(FOAM_FADE_IN)}, 1.0, t), 1.3);
+  float thin = pow(max(1.0 - smoothstep(${f(FOAM_FADE_IN)}, 1.0, t), 0.0), 1.3);
   return ${f(TSUNAMI_FOAM_PEAK_ALPHA)} * settle * thin;
 }
 `;

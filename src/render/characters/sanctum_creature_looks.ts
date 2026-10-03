@@ -117,7 +117,9 @@ export const SANCTUM_SLEDGE_TUSKER_LOOK: VisualDef = {
   attackTimeScale: 1,
   deathTimeScale: 1,
   authoredAtlas: true,
-  clickRadius: 4.5,
+  // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,
+  // tests/nythraxis_bone_spike_model.test.ts): wider swallows the raid's clicks.
+  clickRadius: 4.4,
 };
 
 /** A carved prop that never moves: every clip lookup misses harmlessly. */
@@ -223,6 +225,7 @@ export function sanctumCreatureLooks(
     url: 'models/props/infernal_brazier.glb',
     height: sanctumDrawnHeight(SOUL_BRAZIER_ID, 1),
     clips: STATIC_PROP_CLIPS,
+    authoredAtlas: true,
     tint: 0x6f5a9e,
     tintStrength: 0.45,
     selfIllumination: 0.3,

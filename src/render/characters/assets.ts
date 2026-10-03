@@ -2451,6 +2451,17 @@ export const PALADIN_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> 
   [PALADIN_BASTION_SWEEP_CLIP]: '1H_Melee_Attack_Slice_Diagonal',
 };
 
+/** Every visual key whose clip map names the synthesized paladin clips: the
+ *  classic and modular paladin, plus the Drowned Temple's paladin Reflection
+ *  (manifest.ts copies the class def, attackByAbility included). */
+export function synthesizesPaladinClips(key: string): boolean {
+  return (
+    key === 'player_paladin' ||
+    key === modularVisualKey('paladin') ||
+    key === 'temple_reflection_paladin'
+  );
+}
+
 /** Test-only observation window into the shared tinted-material cache. */
 export const tintedMaterialInternalsForTest = {
   cacheSize: (): number => matCache.size,
@@ -2469,10 +2480,11 @@ export function prepareVisual(key: string): PreparedVisual {
   for (const url of def.animUrls ?? []) {
     for (const clip of resolvedGltf(url).animations) clips.set(clip.name, clip);
   }
-  // The modular paladin mirrors the classic clip map (attackByAbility includes
-  // the synthesized Verdict and Sweep names), so it needs the same synthesis:
-  // its animUrls lead with the class GLB, which supplies both source clips.
-  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+  // The modular paladin and the paladin Reflection mirror the classic clip map
+  // (attackByAbility includes the synthesized Verdict and Sweep names), so they
+  // need the same synthesis: the modular animUrls lead with the class GLB, and
+  // the Reflection draws the class GLB itself, which supplies both sources.
+  if (synthesizesPaladinClips(key)) {
     const verdictBase = clips.get(PALADIN_SYNTHESIZED_CLIP_SOURCES[PALADIN_TEMPLARS_VERDICT_CLIP]);
     if (!verdictBase) throw new Error('Paladin Templar Verdict requires 2H_Melee_Attack_Chop');
     clips.set(PALADIN_TEMPLARS_VERDICT_CLIP, createPaladinTemplarsVerdictClip(verdictBase));

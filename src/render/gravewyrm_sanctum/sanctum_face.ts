@@ -221,7 +221,7 @@ void main() {
   vec3 N = normalize(vNormalW);
   if (!gl_FrontFacing) N = -N;
   float ndv = abs(dot(N, V));
-  float fres = pow(1.0 - ndv, 3.0);
+  float fres = pow(max(1.0 - ndv, 0.0), 3.0);
   // Layers inside the ice, seen at depth along the view: frozen bubble
   // streams and old fracture planes, faint (the wyrm must read through it).
   float inner = 0.0;
@@ -318,20 +318,23 @@ function wyrmMaterial(
         '#include <common>',
         '#include <common>\nvarying vec3 vSWorld;\nuniform float uFrontZ;\nuniform vec3 uHeadPos;\nuniform float uCalved;',
       )
+      // Right after the stock final write (and its NaN guard), before tone
+      // mapping: gl_FragColor.rgb is outgoingLight there, so the grade reads
+      // the same lit colour without replacing the guarded write.
       .replace(
-        '#include <opaque_fragment>',
+        '#include <tonemapping_fragment>',
         `{
           float depthIce = max(0.0, vSWorld.z - uFrontZ);
           float bare = (1.0 - smoothstep(9.0, 16.0, length(vSWorld - uHeadPos))) * uCalved;
           float absorb = (1.0 - exp(-depthIce / 11.0)) * (1.0 - bare);
           vec3 ice = vec3(${ICE_LIN.map((v) => (v * 1.4).toFixed(3)).join(', ')});
-          vec3 lit = outgoingLight - totalEmissiveRadiance;
+          vec3 lit = gl_FragColor.rgb - totalEmissiveRadiance;
           // Rime on every surface that faces the sky.
           lit = mix(lit, lit + ice * 0.12, 0.5);
           lit = mix(lit, ice * (0.18 + 0.3 * exp(-depthIce / 30.0)), absorb * 0.84);
-          outgoingLight = lit + totalEmissiveRadiance * mix(1.0, 0.6, absorb);
+          gl_FragColor.rgb = lit + totalEmissiveRadiance * mix(1.0, 0.6, absorb);
         }
-        #include <opaque_fragment>`,
+        #include <tonemapping_fragment>`,
       );
   };
   m.customProgramCacheKey = () => (src ? 'gravewyrmSanctumWyrm' : 'gravewyrmSanctumWyrmFallback');

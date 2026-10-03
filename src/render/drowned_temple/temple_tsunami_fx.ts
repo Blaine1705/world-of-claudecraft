@@ -131,7 +131,7 @@ void main() {
   zy.x += sin(x * 0.45 + uTime * 3.0) * 0.25 * smoothstep(0.6, 1.0, v) * (1.0 - side);
   // Broken: the upper water throws forward and slumps into the floor.
   zy.x += uCollapse * 3.0 * h01;
-  zy.y *= pow(1.0 - uCollapse, 1.5);
+  zy.y *= pow(max(1.0 - uCollapse, 0.0), 1.5);
   vec4 w = modelMatrix * vec4(x, zy.y, zy.x, 1.0);
   vWorld = w.xyz;
   vN = normalize(mat3(modelMatrix) * vec3(0.0, nzy.y, nzy.x));
@@ -170,7 +170,7 @@ void main() {
   float e = abs(u - 0.5) * 2.0;
   vec3 V = normalize(cameraPosition - vWorld);
   float ndv = abs(dot(normalize(vN), V));
-  float fres = pow(1.0 - ndv, 3.0);
+  float fres = pow(max(1.0 - ndv, 0.0), 3.0);
   // Thick and dark at the foot, thinning toward the lip, where light passes
   // through the water (strongest face-on, the way a backlit lip glows).
   float thin = front * smoothstep(0.5, 0.92, v);
@@ -180,7 +180,7 @@ void main() {
   vec2 q = vec2(u * uWidth * 0.22, v * 3.2 - uTime * 0.9);
   float warp = vnoise(q * 1.3 + vec2(0.0, uTime * 0.3));
   float streak = vnoise(vec2(u * uWidth * 0.55 + warp * 1.5, v * 1.6 - uTime * 1.25));
-  float caustic = pow(1.0 - abs(vnoise(q * 2.1 + warp * 2.0) * 2.0 - 1.0), 6.0);
+  float caustic = pow(max(1.0 - abs(vnoise(q * 2.1 + warp * 2.0) * 2.0 - 1.0), 0.0), 6.0);
   col += uCrest * (caustic * 0.35 + smoothstep(0.55, 0.85, streak) * 0.18)
        * (0.3 + 0.7 * up) * (0.6 + 0.4 * thin);
   // The sky's sheen at grazing angles.

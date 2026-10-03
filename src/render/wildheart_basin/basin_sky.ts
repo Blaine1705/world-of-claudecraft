@@ -87,7 +87,7 @@ void main() {
   vec3 horizon = mix(uHorizon * vec3(0.78, 0.8, 0.92), uHorizon * vec3(1.18, 0.98, 0.72), sunSide);
   col = mix(horizon, col, smoothstep(-0.02, 0.16 + 0.08 * sunSide, up));
   // The sun's quarter of the sky glows gold-orange through the humid air.
-  col += vec3(0.75, 0.42, 0.12) * pow(toSun, 5.0) * 0.7 + vec3(0.42, 0.26, 0.08) * pow(toSun, 2.0) * 0.32;
+  col += vec3(0.75, 0.42, 0.12) * pow(max(toSun, 0.0), 5.0) * 0.7 + vec3(0.42, 0.26, 0.08) * pow(max(toSun, 0.0), 2.0) * 0.32;
 
   // Fair-weather cloud deck drifting over.
   float deck = 0.0;
@@ -101,7 +101,7 @@ void main() {
 #endif
     deck = smoothstep(0.56, 0.84, c1 * 0.75 + c2 * 0.35) * smoothstep(0.02, 0.22, up);
     float lit = 0.55 + 0.45 * smoothstep(0.4, 0.95, dot(normalize(vec3(d.x, 0.0, d.z)), normalize(vec3(uSunDir.x, 0.0, uSunDir.z))) * 0.5 + 0.5);
-    vec3 deckCol = mix(vec3(0.72, 0.7, 0.68), vec3(1.0, 0.95, 0.84), lit) + vec3(1.0, 0.8, 0.45) * pow(toSun, 12.0) * 0.8;
+    vec3 deckCol = mix(vec3(0.72, 0.7, 0.68), vec3(1.0, 0.95, 0.84), lit) + vec3(1.0, 0.8, 0.45) * pow(max(toSun, 0.0), 12.0) * 0.8;
     col = mix(col, deckCol, deck * 0.7);
   }
 

@@ -63,7 +63,20 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
   });
 
   it('resolves the named interiors, and reports the interior for the prewarm seam', () => {
-    expect(resolveFogScene(true, interiorPx('temple'), 5, cam, SEED).desired).toBe('temple');
+    // The five-dungeon rework moved each reworked dungeon onto its own
+    // open-air interior and fog state (the legacy 'temple' interior is gone).
+    expect(resolveFogScene(true, interiorPx('drowned_temple'), 5, cam, SEED).desired).toBe(
+      'drownedTemple',
+    );
+    expect(resolveFogScene(true, interiorPx('hollow_crypt'), 5, cam, SEED).desired).toBe(
+      'hollowCrypt',
+    );
+    expect(resolveFogScene(true, interiorPx('sunken_bastion'), 5, cam, SEED).desired).toBe(
+      'sunkenBastion',
+    );
+    expect(resolveFogScene(true, interiorPx('gravewyrm_sanctum'), 5, cam, SEED).desired).toBe(
+      'gravewyrmSanctum',
+    );
     expect(resolveFogScene(true, interiorPx('nythraxis'), 5, cam, SEED).desired).toBe('nythraxis');
     expect(resolveFogScene(true, interiorPx('wildheart'), 5, cam, SEED).desired).toBe(
       'wildheartBasin',
@@ -100,6 +113,9 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['varkhul', ...raid('varkhul')],
     ['wildheartBasin', 0xbfb98a, 150, 1050],
     ['gravewyrmSanctum', 0x3d5a82, 90, 980],
+    ['hollowCrypt', 0x1c2238, 70, 460],
+    ['sunkenBastion', 0x4d5a57, 70, 640],
+    ['drownedTemple', 0x252a4c, 140, 1050],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],
     ['delve', 0x0e0705, 14, 74],

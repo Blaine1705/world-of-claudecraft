@@ -104,7 +104,7 @@ void main() {
   vec3 band = vec3(0.058, 0.072, 0.07);
   vec3 warm = vec3(0.62, 0.36, 0.14);
   vec3 col = mix(band, zenith, smoothstep(0.08, 0.7, up));
-  col = mix(col, warm, pow(towardSun, 5.0) * (1.0 - smoothstep(0.0, 0.34, up)) * 0.55);
+  col = mix(col, warm, pow(max(towardSun, 0.0), 5.0) * (1.0 - smoothstep(0.0, 0.34, up)) * 0.55);
   col = mix(uHorizon * 1.15, col, smoothstep(-0.03, 0.2, up));
 
   // The low sun: a pale, diffused disc, a wide glow under the cloud deck.
@@ -269,7 +269,7 @@ void main() {
   vec2 rp = vWorld.xz * 0.35 + vec2(uTime * 0.4, uTime * 0.25);
   n = normalize(n + vec3(noise(rp) - 0.5, 0.0, noise(rp + 17.0) - 0.5) * 0.35);
   vec3 view = normalize(cameraPosition - vWorld);
-  float fres = pow(1.0 - max(0.0, dot(n, view)), 4.0);
+  float fres = pow(max(1.0 - max(0.0, dot(n, view)), 0.0), 4.0);
   vec3 sun = normalize(uSunDir);
   vec3 halfV = normalize(sun + view);
   float glint = pow(max(0.0, dot(n, halfV)), 180.0) * 2.2 + pow(max(0.0, dot(n, halfV)), 22.0) * 0.18;

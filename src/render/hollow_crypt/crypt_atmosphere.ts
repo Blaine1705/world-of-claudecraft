@@ -77,7 +77,7 @@ void main() {
   col = mix(uHorizon * 1.35 + vec3(0.03, 0.03, 0.05), col, smoothstep(-0.02, 0.22, up));
   // Soul-green breath on the northern horizon, under the column.
   float north = max(0.0, dot(normalize(vec3(d.x, 0.0, d.z)), vec3(0.0, 0.0, 1.0)));
-  col += vec3(0.02, 0.07, 0.05) * pow(north, 6.0) * (1.0 - smoothstep(0.0, 0.35, up));
+  col += vec3(0.02, 0.07, 0.05) * pow(max(north, 0.0), 6.0) * (1.0 - smoothstep(0.0, 0.35, up));
 
   // Stars: a jittered grid on the sphere, twinkling, thinning toward the horizon.
   vec3 cell = floor(d * 420.0);
@@ -85,7 +85,7 @@ void main() {
   vec3 jitter = vec3(hash3(cell + 1.3), hash3(cell + 2.7), hash3(cell + 4.1)) - 0.5;
   vec3 starDir = normalize((cell + 0.5 + jitter * 0.8) / 420.0);
   float starD = length(d - starDir) * 420.0;
-  float star = smoothstep(0.38, 0.0, starD) * step(0.982, h) * (0.3 + 0.7 * pow(hash3(cell + 9.1), 3.0));
+  float star = smoothstep(0.38, 0.0, starD) * step(0.982, h) * (0.3 + 0.7 * pow(max(hash3(cell + 9.1), 0.0), 3.0));
   float twinkle = 0.6 + 0.4 * sin(uTime * (1.5 + h * 3.0) + h * 40.0);
   float milky = fbm(vec2(atan(d.z, d.x) * 2.0, d.y * 3.0) + 7.0);
   star *= smoothstep(0.02, 0.3, up) * twinkle * (0.7 + milky);
@@ -263,7 +263,7 @@ float noise(vec2 p) {
 void main() {
   vec3 view = normalize(cameraPosition - vWorld);
   float facing = abs(dot(normalize(vNormalW), view));
-  float body = pow(facing, uPower);
+  float body = pow(max(facing, 0.0), uPower);
   // Long vertical soul streaks climbing the beam (angle round the AXIS, so
   // the pattern never bands horizontally on the near face).
   float ang = atan(vWorld.z - vAxis.y, vWorld.x - vAxis.x);

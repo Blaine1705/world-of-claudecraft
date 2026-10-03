@@ -67,7 +67,7 @@ float rings(vec2 p) {
 }
 void main() {
   vec3 view = normalize(cameraPosition - vWorld);
-  float fres = pow(1.0 - max(0.0, view.y), 3.0);
+  float fres = pow(max(1.0 - max(0.0, view.y), 0.0), 3.0);
   float rain = rings(vWorld.xz * 1.6);
   vec3 n = normalize(vec3(0.0, 1.0, 0.0) + vec3(rain * 0.2, 0.0, rain * 0.15));
   vec3 h = normalize(normalize(uSunDir) + view);

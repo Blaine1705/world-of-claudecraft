@@ -80,7 +80,7 @@ void main() {
   float hz = waves(p + vec2(0.0, 0.15), t);
   vec3 n = normalize(vec3((h0 - hx) * 2.2, 1.0, (h0 - hz) * 2.2));
   vec3 view = normalize(cameraPosition - vWorld);
-  float fres = pow(1.0 - max(0.0, dot(n, view)), 4.0);
+  float fres = pow(max(1.0 - max(0.0, dot(n, view)), 0.0), 4.0);
   // Near-black blue-green water, deepest in the middle (meltwater over a
   // melted-out bowl), a little bluer toward the slush at the edge.
   vec3 deep = vec3(0.004, 0.016, 0.02);
