@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "2c7f236fc680f996746f931217f56646a4af4d7976cdfa23e075f8f334088a39",
+  "rendererFingerprint": "5872732eb2612f7eca7f6a9698faa1b62c556c9cfcaa5a13f6484d489244d531",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -14,7 +14,7 @@
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "154",
-    "browserVersion": "Edg/154.0.4258.48",
+    "browserVersion": "Edg/154.0.4258.53",
     "requestedBackend": "swiftshader",
     "fingerprint": "04a5c1851d9e9c277dd6de4cae5e56afae22c5cc793b00f37e35af4536bdd2f4"
   },
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5500315,
-      "sha256": "4ce917cf24eced6842d963a6fb38316c17f4ed3b7b708d341b282f40dbd6c56e",
+      "bytes": 5539861,
+      "sha256": "979fc12fc474596eeaa8f3409c7b9dabd7d02ba6c7d908e8b276ccdbcb6ef34d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 350,
+  "portraitCount": 358,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -897,6 +897,123 @@
         "path": "public/ui/mobs/breach_wretch.webp",
         "bytes": 1688,
         "sha256": "7a472425d553051ade36fab448f8cb0091f2bb76a555e93b535ed21ea1a6f427"
+      }
+    },
+    {
+      "id": "broodsworn_goadsmith",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "sanctum_goadsmith",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/barbarian.glb",
+          "path": "public/models/chars/players/barbarian.glb",
+          "bytes": 444244,
+          "sha256": "2fb8d32c29d2b5c4b9b4b54ec502c3778f3d4d0da0e55cd1d4ed2b7c1e8d0abb"
+        },
+        "idle": "Idle",
+        "height": 2.6285714285714286,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Barbarian_BearHat"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/spear_a.glb",
+              "path": "public/models/weapons/spear_a.glb",
+              "bytes": 78552,
+              "sha256": "27e7969ec3efdd8ba59f2530ceb2ffddefe9bfd247c462dc2e916f47292aa2af"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.38
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#6e4a32",
+        "resolved": "#6e4a32",
+        "strength": 0.38
+      },
+      "sourceFingerprint": "c14780e39a2bede3fc53a3ab2c89528d5547d2868f916bf115bfd561d8114fd4",
+      "output": {
+        "path": "public/ui/mobs/broodsworn_goadsmith.webp",
+        "bytes": 2130,
+        "sha256": "521226d349db2d5d4309d2fc627308d820f915a310061f0de0f73cc8d6879003"
+      }
+    },
+    {
+      "id": "broodsworn_pyre_tender",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "sanctum_pyre_tender",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_void_acolyte.glb",
+          "path": "public/models/creatures/hoard_void_acolyte.glb",
+          "bytes": 1986904,
+          "sha256": "9465f25cb1e7ae7bde5f5f1e43cd8453d2beea0362e60ddebdfe84ca167a5b4f"
+        },
+        "idle": "Idle",
+        "height": 2.666666666666667,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#c0743c",
+        "resolved": "#c0743c",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "768009ae7f87f45b75481ee01a68b6427ae699f4b9d5cfa6fb4083843b3c3839",
+      "output": {
+        "path": "public/ui/mobs/broodsworn_pyre_tender.webp",
+        "bytes": 1998,
+        "sha256": "7d3a5d5599b1de9381b483b9f9ce2303b73f9294c69dfc639ddcce962c917a4d"
+      }
+    },
+    {
+      "id": "broodsworn_thawcaller",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "sanctum_thawcaller",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mist_chanter.glb",
+          "path": "public/models/creatures/mist_chanter.glb",
+          "bytes": 718832,
+          "sha256": "52292a56aff636442aa9b6d73038c152298ac4cbec61809b68387cc1059310e8"
+        },
+        "idle": "Idle",
+        "height": 2.75,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.24
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#c49a74",
+        "resolved": "#c49a74",
+        "strength": 0.24
+      },
+      "sourceFingerprint": "0446a7415207452a766f6ca8af7827e757b408616cd1c818ec8a72c898ffa3ad",
+      "output": {
+        "path": "public/ui/mobs/broodsworn_thawcaller.webp",
+        "bytes": 1920,
+        "sha256": "b420b0d5d7f943e82a7c7d5cab0d5d47c67e512a78b9fdfe9249fa87fd373d26"
       }
     },
     {
@@ -3453,6 +3570,40 @@
         "path": "public/ui/mobs/gilded_stag.webp",
         "bytes": 2190,
         "sha256": "72e9707199f5fdf5c39173076ec2da933a5535c2c9f2729c9c111b98d3278dec"
+      }
+    },
+    {
+      "id": "glacier_splinter",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_glacier_splinter",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_rime_elemental.glb",
+          "path": "public/models/creatures/hoard_rime_elemental.glb",
+          "bytes": 794868,
+          "sha256": "d358238863159c91c58b8e81086b1954c8ad6f4d0f3931358acb825599259c5e"
+        },
+        "idle": "Idle",
+        "height": 2.842105263157895,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.5
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#86c8ec",
+        "resolved": "#86c8ec",
+        "strength": 0.5
+      },
+      "sourceFingerprint": "5d7f535f4744a293dd719ba35092bd3bf6c458007114780fb520064d1fc3839d",
+      "output": {
+        "path": "public/ui/mobs/glacier_splinter.webp",
+        "bytes": 1914,
+        "sha256": "4224e5fdaebb9d35770ff30c5cb2eb4707ad5553b435af19539b418299b6b426"
       }
     },
     {
@@ -7117,6 +7268,40 @@
       }
     },
     {
+      "id": "ogre_sledge_hauler",
+      "family": "ogre",
+      "finderEncounter": false,
+      "visualKey": "sanctum_sledge_hauler",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
+        },
+        "idle": "Idle",
+        "height": 2.761904761904762,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.36
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7a6248",
+        "resolved": "#7a6248",
+        "strength": 0.36
+      },
+      "sourceFingerprint": "8ce2bb642f11341f1a3a967b38014fd50f44f63acc23271f40d10bc34de6efb9",
+      "output": {
+        "path": "public/ui/mobs/ogre_sledge_hauler.webp",
+        "bytes": 2244,
+        "sha256": "183e0b70bc5286dca13a1abc9e4fb71b888e1b10f627bf4854e0995d61db5d7a"
+      }
+    },
+    {
       "id": "old_cragmaw",
       "family": "beast",
       "finderEncounter": false,
@@ -7460,34 +7645,34 @@
       "id": "raised_bonewalker",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_minion",
+      "visualKey": "sanctum_raised_bonewalker",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/hoard_frost_revenant.glb",
+          "path": "public/models/creatures/hoard_frost_revenant.glb",
+          "bytes": 2579768,
+          "sha256": "de8ccda356e5ed496c9cd9393393a59a249779280eb8e9071fa4bc5e80e96a04"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 3.7,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": 0.4
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#c8cfc8",
-        "strength": 0.25
+        "source": "fixed",
+        "authored": "#aebdb4",
+        "resolved": "#aebdb4",
+        "strength": 0.4
       },
-      "sourceFingerprint": "f03c004f0931165a6f4b3b58ee466ed2264d3f816446f55016fa5eb9b2155cdd",
+      "sourceFingerprint": "3be7a80cad46b39e8e0ecad0cdb9d0139c42900a8f80c7ae44b498531e23b4ee",
       "output": {
         "path": "public/ui/mobs/raised_bonewalker.webp",
-        "bytes": 2800,
-        "sha256": "bba40e8255adc900269d2cd991c7ac7a8f786f9c7fdfc450593aea9776e5cff2"
+        "bytes": 2256,
+        "sha256": "4aa045272023ac7d8359c7446cbe47f2bc38edbf1151a8d00802bc6d4b22ddd0"
       }
     },
     {
@@ -9005,6 +9190,40 @@
       }
     },
     {
+      "id": "rime_whelp",
+      "family": "dragonkin",
+      "finderEncounter": false,
+      "visualKey": "sanctum_rime_whelp",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_stormscale_drake.glb",
+          "path": "public/models/creatures/hoard_stormscale_drake.glb",
+          "bytes": 1126964,
+          "sha256": "39078b78f1da88222301cda15578309f0d8305f3d2b21fa3c4452d34b8d20dbe"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.7
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#e4f4ff",
+        "resolved": "#e4f4ff",
+        "strength": 0.7
+      },
+      "sourceFingerprint": "147d8fc34c7194d303cf4d16c955c04a9b84f1331e50c19e1c083e9cfcdaddf1",
+      "output": {
+        "path": "public/ui/mobs/rime_whelp.webp",
+        "bytes": 2004,
+        "sha256": "0348744ab80e7dbd874a6242b2eda7aecc3da2a5b3a1e515db8fa328989748ee"
+      }
+    },
+    {
       "id": "rimeweb",
       "family": "spider",
       "finderEncounter": true,
@@ -9110,41 +9329,41 @@
       "id": "sanctum_boneguard",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_warrior",
+      "visualKey": "sanctum_boneguard",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/hoard_frost_revenant.glb",
+          "path": "public/models/creatures/hoard_frost_revenant.glb",
+          "bytes": 2579768,
+          "sha256": "de8ccda356e5ed496c9cd9393393a59a249779280eb8e9071fa4bc5e80e96a04"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 4,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": 0.42
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#cfc8b0",
-        "strength": 0.25
+        "source": "fixed",
+        "authored": "#c4d3dc",
+        "resolved": "#c4d3dc",
+        "strength": 0.42
       },
-      "sourceFingerprint": "00255d675d7766e83b6ea9863ad405840a8f21193e1f1bf337c21f22e6434661",
+      "sourceFingerprint": "95197d805672845f77c1cadb499071d2cf876e3f8189447df380406f84fdd503",
       "output": {
         "path": "public/ui/mobs/sanctum_boneguard.webp",
-        "bytes": 2380,
-        "sha256": "a24a15b8f0f666ba40d6d0099bbf3c6d0af8b16226557e2e9f59325447e2eb49"
+        "bytes": 2268,
+        "sha256": "894e1abfaea8ee1bfe78a5cc280d213614504103b1bf48cb624698fe14065cab"
       }
     },
     {
       "id": "sanctum_drakonid",
       "family": "dragonkin",
       "finderEncounter": false,
-      "visualKey": "mob_dragonkin",
+      "visualKey": "sanctum_scaleguard",
       "renderSpec": {
         "model": {
           "url": "models/creatures/dragonevolved.glb",
@@ -9153,25 +9372,25 @@
           "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
         },
         "idle": "Flying_Idle",
-        "height": 2.4,
+        "height": 3.03448275862069,
         "yaw": null,
-        "hover": 0.25,
+        "hover": 0.31609195402298856,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.34
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#567d46",
-        "strength": 0.2
+        "source": "fixed",
+        "authored": "#9cc8c4",
+        "resolved": "#9cc8c4",
+        "strength": 0.34
       },
-      "sourceFingerprint": "d203457fa8530e4fabc4c846abe4b14fe1dd1bdd59171b2b3051ef1c8a2ec9ea",
+      "sourceFingerprint": "c4ea70e4f36953500cba02f728746d5b5b33a1b95ece64aa6d0fbdd6324f2531",
       "output": {
         "path": "public/ui/mobs/sanctum_drakonid.webp",
-        "bytes": 2182,
-        "sha256": "1f294d58c7ff944f5a9aaf2aaf8a2c4078d34ee26d62016811cf09f324a91f8f"
+        "bytes": 2096,
+        "sha256": "3c24a0c54b9cf61175046a4337112f24214b2c87b3f2cbda0e0d71dd49e5d172"
       }
     },
     {
@@ -9652,6 +9871,40 @@
       }
     },
     {
+      "id": "sledge_tusker",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "sanctum_sledge_tusker",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sledge_tusker.glb",
+          "path": "public/models/creatures/sledge_tusker.glb",
+          "bytes": 3163112,
+          "sha256": "67afc2947f55121e26305d741a23a028a5cf139b3ae6e3f0df9dbaaac6d6255d"
+        },
+        "idle": "Idle",
+        "height": 2.778571428571429,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "abb3333470ee0203fe0d5cec9bef43bc123fa05c77a495a0a78e40618ef2bca4",
+      "output": {
+        "path": "public/ui/mobs/sledge_tusker.webp",
+        "bytes": 2514,
+        "sha256": "dce80848749ca8134bb388e774ce4e36ee4a27ab55ae5afe270c5764108a1bb9"
+      }
+    },
+    {
       "id": "sloomtooth_the_drowned",
       "family": "mudfin",
       "finderEncounter": false,
@@ -9717,6 +9970,40 @@
         "path": "public/ui/mobs/snowdrift_wolf.webp",
         "bytes": 1952,
         "sha256": "95d2adedcb70754fa6b11262760d32f55065b59391247d2d8473558fe8c201e7"
+      }
+    },
+    {
+      "id": "soul_brazier",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_soul_brazier",
+      "renderSpec": {
+        "model": {
+          "url": "models/props/infernal_brazier.glb",
+          "path": "public/models/props/infernal_brazier.glb",
+          "bytes": 150536,
+          "sha256": "94436661fb9b4d789dc9f0fa415700cf04d6d1509b838b3e923d715945e5451f"
+        },
+        "idle": "Idle",
+        "height": 1.4999999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.45
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#6f5a9e",
+        "resolved": "#6f5a9e",
+        "strength": 0.45
+      },
+      "sourceFingerprint": "739d68ca367f5ea5d761d0d7854a498eb9d7444185b22572722fdb4f3b3ddc06",
+      "output": {
+        "path": "public/ui/mobs/soul_brazier.webp",
+        "bytes": 1564,
+        "sha256": "d470db2a1303c2722b3dc12434a3e43100715e1400e2c6aabec37965522891a2"
       }
     },
     {
