@@ -17554,9 +17554,15 @@ const itemNameToId = buildNameReverseMap(
   'item',
   Object.entries(ITEMS).map(([id, it]) => [it.heroicOf ?? id, it.name] as const),
 );
+// A mob that wears a boss's name is that boss's copy (Vael's Fog Veil shades
+// are named as Vael on purpose, so the name alone never gives the real one
+// away). Every sim line that splices the name (a yell, a death, a deed) is the
+// boss's own, so the boss wins the name.
+const isBossMob = (id: string): boolean => MOBS[id]?.boss === true;
 const mobNameToId = buildNameReverseMap(
   'mob',
   Object.entries(MOBS).map(([id, m]) => [id, m.name] as const),
+  isBossMob,
 );
 const abilityNameToId = buildNameReverseMap(
   'ability',
