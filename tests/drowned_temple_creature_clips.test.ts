@@ -21,7 +21,9 @@ import {
 import { updateBossMechanics } from '../src/sim/mob/boss_mechanics';
 import {
   TEMPLE_LIGHTNING_SPIT,
+  TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_STATIC_COIL,
+  TEMPLE_TRIDENT_SWEEP,
 } from '../src/sim/mob/trash_kit/temple_cast_ids';
 
 function clipsOf(path: string): string[] {
@@ -122,6 +124,53 @@ describe('the Tide Pilgrim: the sacred sea snail', () => {
     expect(isTemplePilgrimFrenzyCue({ ...nova, fx: 'projectile' }, 'drowned_pilgrim')).toBe(false);
     expect(isTemplePilgrimFrenzyCue({ ...nova, ability: 'x' }, 'drowned_pilgrim')).toBe(false);
     expect(isTemplePilgrimFrenzyCue({ ...nova, type: 'aura' }, 'drowned_pilgrim')).toBe(false);
+  });
+});
+
+describe('the Nacre Templeguard: the seahorse temple knight', () => {
+  it('ships its own body with a clip for every job', () => {
+    expect(clipsOf('public/models/creatures/temple_templeguard.glb').sort()).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'Cast',
+        'CombatIdle',
+        'Death',
+        'Hit',
+        'Hurl',
+        'Idle',
+        'Run',
+        'TridentSweep',
+        'Walk',
+      ].sort(),
+    );
+    const v = visualOf('drowned_templeguard');
+    expect(v.url).toMatch(/temple_templeguard\.glb$/);
+    expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
+    expect(v.clips.combatIdle).toBe('CombatIdle');
+    expect(v.clips.death).toBe('Death');
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 5.5 to the crest at its 1.1: a little over twice the 2.6 player.
+    expect(v.height * (MOBS.drowned_templeguard.scale ?? 1)).toBeCloseTo(5.5, 2);
+  });
+
+  it('strikes each cast on its bar end: the sweep and the hurled trident', () => {
+    const c = visualOf('drowned_templeguard').clips;
+    expect(c.castByAbility?.[TEMPLE_TRIDENT_SWEEP]).toBe('TridentSweep');
+    expect(c.castByAbility?.[TEMPLE_SKEWERING_TRIDENT]).toBe('Hurl');
+    // Authored to the sim's bars (1.5 s and 1.8 s): played at their own pace,
+    // held to the bar and finished as one-shots after it.
+    expect(c.castTimeScaleByAbility?.[TEMPLE_TRIDENT_SWEEP]).toBe(1);
+    expect(c.castTimeScaleByAbility?.[TEMPLE_SKEWERING_TRIDENT]).toBe(1);
+    expect(c.castPlayOut).toEqual(expect.arrayContaining(['TridentSweep', 'Hurl']));
+    expect(MOBS.drowned_templeguard.breathCone?.castTime).toBe(1.5);
+    expect(MOBS.drowned_templeguard.trashKit?.line?.castTime).toBe(1.8);
+    const v = visualOf('drowned_templeguard');
+    expect(v.castClipSync).toBe(true);
+    // A mob's Onrush is plain fast movement (no cast event), so it runs on Run:
+    // the warrior-only rush slots must stay unmapped or they would swallow it.
+    expect(c.rush).toBeUndefined();
+    expect(c.rushArrival).toBeUndefined();
   });
 });
 

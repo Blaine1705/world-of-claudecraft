@@ -10,6 +10,8 @@
 // PACK="x,z,face,yaw,pitch,dist" (instance-local) adds the pack shots;
 // CAST_WAIT (ms, default 6000) is how long the fight runs before the
 // habilidad shots (raise it for a mob with a long cast cooldown).
+// CASTS="castId:shotId:ms,..." adds one shot per entry, taken `ms` after that
+// cast's bar opens (a windup, the strike on the bar's end, a play-out).
 // Env: SHOT_URL (http://127.0.0.1:5242/), BROWSER_PATH, SHOT_PRESET (4),
 // SHOT_W / SHOT_H (1600x900), SHOT_GPU=0 to force SwiftShader, SHOT_PREFIX,
 // SHOT_DEBUG=1 to log the nova spellfx cues the renderer received per shot.
@@ -30,6 +32,10 @@ const MOB = process.env.MOB ?? 'drowned_pilgrim';
 const SPAWN = process.env.SPAWN ?? 'pilgrim';
 const CAST_WAIT = Number(process.env.CAST_WAIT ?? 6000);
 const PACK = process.env.PACK?.split(',').map(Number);
+const CASTS = (process.env.CASTS ?? '')
+  .split(',')
+  .filter(Boolean)
+  .map((c) => c.split(':'));
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -117,6 +123,19 @@ const SHOTS = [
     stepWait: 300,
     wait: 300,
   },
+  ...CASTS.map(([castId, id, ms]) => ({
+    id,
+    at: [0, -12],
+    face: 0,
+    yaw: 0.6,
+    pitch: 0.3,
+    dist: 13,
+    spawn: true,
+    js: 'cast',
+    castId,
+    stepWait: Number(ms),
+    wait: 40,
+  })),
   {
     id: 'frenesi',
     at: [0, -12],
@@ -155,7 +174,7 @@ const SHOTS = [
   },
 ];
 
-function pageStep([verb, mob, castWait]) {
+function pageStep([verb, mob, castWait, castId]) {
   const sim = window.__game.world;
   const me = sim.player;
   let best = null;
@@ -193,7 +212,8 @@ function pageStep([verb, mob, castWait]) {
     return new Promise((resolve) => {
       const t0 = performance.now();
       const tick = () => {
-        if (best.castingAbility) resolve(`${best.id} casting ${best.castingAbility}`);
+        if (best.castingAbility && (!castId || best.castingAbility === castId))
+          resolve(`${best.id} casting ${best.castingAbility}`);
         else if (performance.now() - t0 > castWait) resolve(`${best.id} no cast`);
         else setTimeout(tick, 50);
       };
@@ -316,7 +336,11 @@ async function main() {
         });
       }
       if (shot.js) {
-        console.log('STEP', shot.id, await page.evaluate(pageStep, [shot.js, MOB, CAST_WAIT]));
+        console.log(
+          'STEP',
+          shot.id,
+          await page.evaluate(pageStep, [shot.js, MOB, CAST_WAIT, shot.castId ?? null]),
+        );
         await sleep(shot.stepWait ?? 900);
       }
       await page.evaluate((s) => {

@@ -76,6 +76,7 @@ import {
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
+  TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
@@ -4413,15 +4414,38 @@ export const VISUALS: Record<string, VisualDef> = {
   // the clips of its jobs. Heights allow for the templates' own scale, so the
   // drawn sizes land at about 2x the player for the trash, 3x for the bosses'
   // kin and far more for the Colossus and Ysolei. Presentation only.
+  // The Nacre Templeguard (drowned_templeguard; scripts/assets/
+  // drowned_temple_creatures/templeguard_seahorse/): a living nacre statue of a
+  // temple knight with a seahorse's head and fan crest, ridged plate over
+  // white coral, a coral-and-nacre trident and a scallop shield. It fights from
+  // a braced guard (CombatIdle), thrusts (Attack) and shield-bashes (Attack2),
+  // and runs with the trident couched like a lance (Run, which also carries
+  // the heroic Onrush dash: a mob's charge is plain fast movement, so the
+  // warrior-only rush/rushArrival slots stay unmapped). Both casts are
+  // bar-locked one-shots that strike on the bar's end: Trident Sweep (1.5 s)
+  // swings at 1.5, Skewering Trident (1.8 s) throws at 1.8, the trident flying
+  // down the lane while a water trident re-forms in its fist. Dying, its light
+  // bursts out and it slumps into a heap of plate and pearls. Drawn 5.5 to the
+  // crest at its 1.1 (2.1 players).
   temple_templeguard: {
     url: `${CREATURES}/temple_templeguard.glb`,
-    height: 4.6,
+    height: 5.0,
     clips: {
       ...TEMPLE_CLIPS,
-      castByAbility: { [TEMPLE_TRIDENT_SWEEP]: 'TridentSweep' },
-      castTimeScaleByAbility: { [TEMPLE_TRIDENT_SWEEP]: 1.3 },
+      combatIdle: 'CombatIdle',
+      castByAbility: {
+        [TEMPLE_TRIDENT_SWEEP]: 'TridentSweep',
+        [TEMPLE_SKEWERING_TRIDENT]: 'Hurl',
+      },
+      castTimeScaleByAbility: { [TEMPLE_TRIDENT_SWEEP]: 1, [TEMPLE_SKEWERING_TRIDENT]: 1 },
+      castPlayOut: ['TridentSweep', 'Hurl'],
     },
-    selfIllumination: 0.14,
+    walkRef: 1.43,
+    runRef: 6.13,
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    authoredAtlas: true,
+    selfIllumination: 0.05,
   },
   // The Drowned Pilgrim (drowned_pilgrim; scripts/assets/drowned_temple_creatures/
   // pilgrim_snail/, built as the design's "Tide Pilgrim"):

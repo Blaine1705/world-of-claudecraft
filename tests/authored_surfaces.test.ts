@@ -199,6 +199,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_ysolei',
   // the Drowned Temple's Blender Tide Pilgrim (the sacred sea snail)
   'temple_pilgrim',
+  // the Drowned Temple's Blender Nacre Templeguard (the seahorse temple knight)
+  'temple_templeguard',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',
