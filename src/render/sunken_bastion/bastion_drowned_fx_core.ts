@@ -45,6 +45,21 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0, up: 2.96, fwd: 0.42 },
     eyes: { side: 0.03, up: 4.0, fwd: 0.45 },
   },
+  // The watchman: water off the kettle hat's drooping brim all round, the
+  // halberd's head and the lantern at his hip.
+  drowned_watchman: {
+    rawHeight: 4.946,
+    drips: [
+      { side: 0.59, up: 4.06, fwd: 0.08 },
+      { side: 0.02, up: 4.11, fwd: 0.7 },
+      { side: -0.58, up: 4.08, fwd: 0.1 },
+      { side: -0.36, up: 4.46, fwd: 1.61 },
+      { side: -0.01, up: 4.12, fwd: -0.52 },
+      { side: 0.56, up: 2.16, fwd: 0.09 },
+    ],
+    chest: { side: 0, up: 2.97, fwd: 0.51 },
+    eyes: { side: 0.01, up: 4.17, fwd: 0.31 },
+  },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {
     rawHeight: 4.4,

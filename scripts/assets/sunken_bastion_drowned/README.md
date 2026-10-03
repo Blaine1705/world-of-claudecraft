@@ -18,6 +18,12 @@ nothing here runs in the build or the game.
   mastiff. Build from `warhound/` with `build.py -- <abs>/bastion_warhound_raw.glb --bake 2048
   --tex <abs>/tex --blend <abs>/bastion_warhound.blend` (`--voxel 0.03 --nobake` for a clay
   look); `reclip.py` re-keys the clips on a baked .blend, `anchors.py` prints the effect anchors.
+- `watchman/`: the Drowned Watchman (`public/models/creatures/drowned_watchman.glb`), built
+  the Revenant's way from the same kit: a gaunt head under a kettle hat, a riveted
+  brigandine, a split watch coat (`tabard_weights`), the halberd and its pennon on the
+  never-keyed Weapon bone, a sea-light lantern at the hip; `clips.py` has Idle, CombatIdle,
+  Walk, Run, Attack, Attack2, HalberdSweep, Cast, Hit, Death. Anchors print with
+  `../kit/anchors.py` (the generic one, reading `anatomy.ANCHORS`).
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),
@@ -36,3 +42,7 @@ node scripts/build_media_manifest.mjs generate
 Quick clay look (no bake): add `--k 1.6 --nobake`. Reviews:
 `blender -b x.blend --python ../kit/review.py -- <out> views|closeup|checks|analyze --builder <abs>/revenant [--knight knight.glb]`.
 Anchors: `blender -b x.blend --python anchors.py -- <abs>/revenant`.
+
+Posing aids in `kit/`: `probe_aim.py` (which weapon directions a key pose can reach),
+`hand_frame_probe.py` (the rest-space directions a posed fist turns onto given world
+directions, to lay a held prop out so it points where it should in its key pose).

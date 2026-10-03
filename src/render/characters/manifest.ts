@@ -4122,11 +4122,20 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.18,
   },
+  // The Drowned Watchman: the wall watch sculpted whole on the Revenant's kit,
+  // gaunt and upright where the Revenant is bloated and hunched: a kettle hat
+  // with a drooping brim, a riveted brigandine with the tower sigil, a split
+  // watch coat to the knees, a long halberd with a sodden pennon and a sea-light
+  // lantern at the hip. He stands at attention with the pole upright, thrusts
+  // and chops with both hands, and the Halberd Sweep winds the pole back
+  // through the bar and lands the sweep as it ends (1.575 s at 1.05x = the 1.5 s
+  // bar), the follow-through playing out after.
   bastion_skel_watchman: {
     url: `${CREATURES}/drowned_watchman.glb`,
-    height: 4.85,
+    height: 4.9,
     clips: {
       idle: 'Idle',
+      combatIdle: 'CombatIdle',
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
@@ -4136,7 +4145,12 @@ export const VISUALS: Record<string, VisualDef> = {
       // The pole is drawn back through the bar and sweeps as it ends.
       castByAbility: { [BASTION_HALBERD_SWEEP]: 'HalberdSweep' },
       castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 1.05 },
+      castPlayOut: ['HalberdSweep'],
     },
+    walkRef: 1.45,
+    runRef: 6.33,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
   // A heavy crossbow (long stock, wide steel prod, a drawn string and a
   // loaded bolt). Shoot is the Rusted Bolt: shouldered over the 0.6 s windup,

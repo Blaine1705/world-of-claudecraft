@@ -50,6 +50,22 @@ describe('the drowned effects plan', () => {
     expect(nextDripIndex(spec.drips.length - 1, spec)).toBe(0);
   });
 
+  it('sets the anchors of every body on its drawn body: eyes up top, drips off the floor', () => {
+    for (const [id, spec] of Object.entries(DROWNED_FX)) {
+      const key = visualKeyFor({ kind: 'mob', templateId: id } as Entity);
+      const scale = MOBS[id].scale ?? 1;
+      const drawn = VISUALS[key].height * scale;
+      const k = modelScale(VISUALS[key].height, scale, spec.rawHeight);
+      for (const d of spec.drips) {
+        const y = modelPointWorld(0, 0, 0, 0, k, d, out()).y;
+        expect(y, id).toBeGreaterThan(drawn * 0.2);
+        expect(y, id).toBeLessThan(drawn * 1.05);
+      }
+      expect(modelPointWorld(0, 0, 0, 0, k, spec.eyes, out()).y, id).toBeGreaterThan(drawn * 0.75);
+      expect(modelPointWorld(0, 0, 0, 0, k, spec.chest, out()).y, id).toBeGreaterThan(drawn * 0.4);
+    }
+  });
+
   it('throws the brine away from the blow', () => {
     // The attacker stands west of the body: the spray goes east.
     const d = sprayDirection(10, 0, 4, 0, 0, { x: 0, z: 0 });

@@ -57,7 +57,7 @@ const ROSTER: Record<string, { glb: string; unique: string[] }> = {
     unique: ['Leap', 'Land', 'Attack2', 'Howl', 'Stunned'],
   },
   bastion_revenant: { glb: 'drowned_revenant.glb', unique: ['Attack', 'Attack2'] },
-  drowned_watchman: { glb: 'drowned_watchman.glb', unique: ['HalberdSweep'] },
+  drowned_watchman: { glb: 'drowned_watchman.glb', unique: ['HalberdSweep', 'CombatIdle'] },
   fogbound_arbalest: { glb: 'drowned_arbalest.glb', unique: ['Aim', 'Shoot'] },
   drowned_sergeant: { glb: 'drowned_sergeant.glb', unique: ['Rally'] },
   shackled_prisoner: { glb: 'drowned_prisoner.glb', unique: ['Attack', 'Attack2'] },
