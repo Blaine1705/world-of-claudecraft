@@ -56,6 +56,7 @@ export { MAX_BODY_RADIUS } from './collider_cells';
 // consumer, so only it is imported (not re-exported) for internal use here.
 export { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from './rift_regions';
 
+import { colliderTopAt, MOVE_TOP_EPS, pushOut, resolveAgainst, rotY } from './collider_pushout';
 import {
   DAWNHOLD_PARAPET_HALF,
   DAWNHOLD_WALL_LEDGES,
@@ -78,6 +79,7 @@ import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
 import { harborStructureColliders } from './harbor_structures';
+import { interiorCollidersNear, resolveInteriorAgainst } from './interior_collider_cells';
 import { interiorCollidersFor } from './interior_collider_sets';
 import {
   benchDrawnHeight,
@@ -209,6 +211,10 @@ export interface ObbCollider {
 
 export type Collider = CircleCollider | ObbCollider;
 
+// The push-out kernel (pushOut, resolveAgainst, the pass-over gate and the
+// top sampler) lives in collider_pushout.ts so the interior cell index shares it.
+export { colliderTopAt, MOVE_TOP_EPS } from './collider_pushout';
+
 /**
  * A shaped (non-flat) standable top: real roofs pitch. `moveTopY` stays the
  * MAXIMUM surface height (the ridge line or cone peak), so blocking logic can
@@ -227,30 +233,6 @@ export interface TopSlope {
   pitch: number;
   /** lowest surface height (absolute Y); the slope clamps here (the eaves) */
   eaveY: number;
-}
-
-/**
- * The standable surface height of a collider at a point: `moveTopY` for flat
- * tops, the pitched surface for sloped ones (never above `moveTopY`, never
- * below the eaves). Infinity for full-height colliders, which have no top.
- */
-export function colliderTopAt(c: Collider, x: number, z: number): number {
-  const top = c.moveTopY;
-  if (top === undefined) return Infinity;
-  const s = c.topSlope;
-  if (!s) return top;
-  let run: number;
-  if (s.kind === 'cone' || c.type === 'circle') {
-    run = Math.hypot(x - c.x, z - c.z);
-  } else {
-    const cos = Math.cos(-c.rot);
-    const sin = Math.sin(-c.rot);
-    const lx = (x - c.x) * cos + (z - c.z) * sin;
-    const lz = -(x - c.x) * sin + (z - c.z) * cos;
-    // The surface falls across the axis PERPENDICULAR to the ridge line.
-    run = s.axis === 'z' ? Math.abs(lx) : Math.abs(lz);
-  }
-  return Math.max(s.eaveY, top - run * s.pitch);
 }
 
 // ---------------------------------------------------------------------------
@@ -278,8 +260,6 @@ export function colliderTopAt(c: Collider, x: number, z: number): number {
  * module, never the reverse.
  */
 export const MANTLE_REACH = 0.9;
-/** Float slack when comparing feet height against a collider top. */
-export const MOVE_TOP_EPS = 1e-3;
 // How much of the body radius must overlap a standable top before it supports
 // the mover: standing needs the center meaningfully over the prop, while the
 // full collision radius still gates entry, so a jump can graze past a rim
@@ -321,33 +301,8 @@ export function moverHeight(e: { pos: { y: number }; onGround: boolean }): Mover
   return { y: e.pos.y, lift: e.onGround ? 0 : MANTLE_REACH };
 }
 
-/** Head clearance a mover with height needs to walk beneath an elevated slab
- *  (`passUnderY`): a touch above the tallest body so a deck one yard overhead
- *  still walls, while a real balcony admits the walk below. */
-const PASS_UNDER_HEADROOM = 2.1;
-
-// Does the mover pass clean over this collider at (x, z)? Full-height
-// colliders (moveTopY undefined) never pass; standable tops grant the mantle
-// lift. Sloped tops are sampled at the mover's own point, so the eaves of a
-// roof pass a body the ridge would still wall. An elevated slab that carries
-// `passUnderY` also passes the mover walking BENEATH it when their head
-// clears its underside (the balcony-walk contract); height-less movers never
-// reach here, so mobs and pathfinding still see a full-height solid.
-function passesOver(c: Collider, mover: MoverHeight | undefined, x: number, z: number): boolean {
-  if (!mover || c.moveTopY === undefined) return false;
-  if (c.passUnderY !== undefined && mover.y + PASS_UNDER_HEADROOM <= c.passUnderY) return true;
-  return colliderTopAt(c, x, z) <= mover.y + (c.standable ? mover.lift : 0) + MOVE_TOP_EPS;
-}
-
 function topY(seed: number, x: number, z: number, height: number): number {
   return groundHeight(x, z, seed) + height;
-}
-
-// rotate a local offset by a three.js rotation.y angle
-function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
-  const c = Math.cos(rot),
-    s = Math.sin(rot);
-  return { x: lx * c + lz * s, z: -lx * s + lz * c };
 }
 
 // default backward offset/radius for a mine's spoil mound behind the timber portal,
@@ -1729,60 +1684,6 @@ function collidersInCell(grid: ColliderGrid, seed: number, gx: number, gz: numbe
   return combined;
 }
 
-// Push (x,z) out of one collider. Returns the corrected point, or null if clear.
-function pushOut(c: Collider, x: number, z: number, r: number): { x: number; z: number } | null {
-  if (c.type === 'circle') {
-    const dx = x - c.x,
-      dz = z - c.z;
-    const min = c.r + r;
-    const d2 = dx * dx + dz * dz;
-    if (d2 >= min * min) return null;
-    const d = Math.sqrt(d2);
-    if (d < 1e-6) return { x: c.x + min, z: c.z };
-    const k = min / d;
-    return { x: c.x + dx * k, z: c.z + dz * k };
-  }
-  // OBB: into local frame
-  const local = rotY(x - c.x, z - c.z, -c.rot);
-  const ex = c.hw + r,
-    ez = c.hd + r;
-  if (Math.abs(local.x) >= ex || Math.abs(local.z) >= ez) return null;
-  const pushX = ex - Math.abs(local.x);
-  const pushZ = ez - Math.abs(local.z);
-  const out = { x: local.x, z: local.z };
-  if (pushX < pushZ) out.x = Math.sign(local.x || 1) * ex;
-  else out.z = Math.sign(local.z || 1) * ez;
-  const world = rotY(out.x, out.z, c.rot);
-  return { x: c.x + world.x, z: c.z + world.z };
-}
-
-function resolveAgainst(
-  list: Collider[],
-  x: number,
-  z: number,
-  r: number,
-  ignoreFences = false,
-  mover?: MoverHeight,
-): { x: number; z: number } {
-  let px = x,
-    pz = z;
-  for (let iter = 0; iter < 3; iter++) {
-    let moved = false;
-    for (const c of list) {
-      if (ignoreFences && c.type === 'obb' && c.isFence) continue;
-      if (passesOver(c, mover, px, pz)) continue;
-      const res = pushOut(c, px, pz, r);
-      if (res) {
-        px = res.x;
-        pz = res.z;
-        moved = true;
-      }
-    }
-    if (!moved) break;
-  }
-  return { x: px, z: pz };
-}
-
 function instanceLocal(
   x: number,
   z: number,
@@ -1868,7 +1769,7 @@ export function resolvePosition(
     const colliders = interiorCollidersFor(dungeonId, interior, ox, oz);
     // `mover` rides through so a jumping body passes over (and lands on) the
     // standable furniture tops, exactly as it does in the open world.
-    const local = resolveAgainst(colliders, x - ox, z - oz, r, ignoreFences, mover);
+    const local = resolveInteriorAgainst(colliders, x - ox, z - oz, r, ignoreFences, mover);
     return { x: local.x + ox, z: local.z + oz };
   }
   const grid = gridFor(seed);
@@ -1983,7 +1884,8 @@ export function supportHeightAt(
     // rampart and stair decks are ordinary standable colliders there.)
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
     const list = interiorCollidersFor(dungeonId, interior, ox, oz);
-    return bestStandableTop(list, x - ox, z - oz, r, maxY);
+    const near = interiorCollidersNear(list, x - ox, z - oz, r * SUPPORT_OVERLAP);
+    return bestStandableTop(near, x - ox, z - oz, r, maxY);
   }
   const grid = gridFor(seed);
   // A single-cell read is complete BY CONSTRUCTION: gridFor registers every
@@ -2417,7 +2319,12 @@ function sightBlockedAt(
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
-    const list = interiorCollidersFor(dungeonId, interior, ox, oz);
+    const list = interiorCollidersNear(
+      interiorCollidersFor(dungeonId, interior, ox, oz),
+      x - ox,
+      z - oz,
+      r,
+    );
     return overlapsAny(list, x - ox, z - oz, r, sightY, false);
   }
   const grid = gridFor(seed);

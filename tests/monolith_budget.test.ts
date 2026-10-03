@@ -2202,7 +2202,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 2513 -> 2486 with the Hollow Crypt rework: the static interior
     // collider table and interiorCollidersFor moved into interior_collider_sets.ts
     // (which now also applies the per-slot dungeon gate view). wc -l. Exact count.
-    ceiling: 2486,
+    // LOWERED 2486 -> 2392 with the interior collider cell index: the push-out
+    // kernel (pushOut, resolveAgainst, passesOver, rotY, colliderTopAt) moved
+    // verbatim to collider_pushout.ts, the index itself is
+    // interior_collider_cells.ts. wc -l. Exact count.
+    ceiling: 2392,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
