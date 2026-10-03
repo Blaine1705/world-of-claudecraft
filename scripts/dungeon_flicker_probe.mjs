@@ -73,7 +73,10 @@ try {
         let k = 0;
         Object.defineProperty(r, 'lastBudgetPressure', {
           configurable: true,
-          get: () => 0.9 + 0.1 * Math.sin((k += 0.37)),
+          get: () => {
+            k += 0.37;
+            return 0.9 + 0.1 * Math.sin(k);
+          },
           set: () => {},
         });
       }
