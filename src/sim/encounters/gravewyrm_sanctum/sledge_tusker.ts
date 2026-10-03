@@ -16,6 +16,9 @@
 //                     second to anyone inside.
 //   Enrage            under a fifth of its health: 30 percent more damage.
 //
+// Killed with no one ever hit by its Trample, it grants the Cold Cargo deed
+// (`dgn_sledge_tusker`) to the claim.
+//
 // On its death the first plate of ice falls from the Calving Face (story.ts
 // reads the dead Tusker; the face is render only).
 //
@@ -39,12 +42,14 @@ import {
   claimPlayers,
   clearCastIf,
   dropEncounterObject,
+  grantClaimDeed,
   holdPlanted,
   mechanicDamage,
   spawnSanctumObject,
   startBar,
 } from './claim';
 import {
+  SANCTUM_DEED_IDS,
   SANCTUM_SOULFIRE_PATCH,
   TUSKER_TUNING as T,
   TUSKER_ENRAGE,
@@ -76,6 +81,7 @@ function freshState(timers = true): TuskerFightState {
     patches: [],
     enraged: false,
     trampleLanded: false,
+    deedDone: false,
     casts: 0,
   };
 }
@@ -411,6 +417,11 @@ export function tickTusker(
   if (tusker.dead) {
     // The braziers burn out on the road after it falls.
     if (!st0) return;
+    // Cold Cargo: it fell without its Trample ever landing on anyone.
+    if (!st0.deedDone) {
+      st0.deedDone = true;
+      if (!st0.trampleLanded) grantClaimDeed(ctx, inst, SANCTUM_DEED_IDS.sledgeTusker);
+    }
     clearCastIf(tusker, TUSKER_TUSK_SWEEP, TUSKER_TRAMPLE);
     stepPatches(ctx, inst, tusker, st0);
     if (st0.patches.length === 0) tusker.sanctumFight = undefined;

@@ -4911,6 +4911,8 @@ export interface TuskerFightState {
   enraged: boolean;
   /** Anyone hit by a Trample this pull (the Cold Cargo deed reads it). */
   trampleLanded: boolean;
+  /** The Cold Cargo check ran at its death (granted or not), once. */
+  deedDone: boolean;
   /** Mechanic casts started (the deterministic salt). */
   casts: number;
 }

@@ -155,8 +155,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 340 / 3755 with the Wildheart Basin rework's four encounter deeds
     // (renown 10 each: +40).
     // 341 / 3765 with the Stormbrass Foundry's chained workers' deed (+10).
-    expect(DEED_ORDER.length).toBe(341);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3765);
+    // 346 / 3815 with the Gravewyrm Sanctum rework's five encounter deeds
+    // (renown 10 each: +50).
+    expect(DEED_ORDER.length).toBe(346);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3815);
   });
 
   it('ships the audited per-category counts', () => {
@@ -185,7 +187,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +7 the Stormbrass Foundry (a clear pair and five encounter deeds).
       // +4 the Wildheart Basin rework's encounter deeds.
       // +1 the Stormbrass Foundry's chained workers (every camp freed).
-      dungeon: 58,
+      // +5 the Gravewyrm Sanctum rework's encounter deeds.
+      dungeon: 63,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -452,6 +455,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_great_saurian',
       // The Stormbrass Foundry's chained workers: every camp freed in one run.
       'dgn_foundry_workers_freed',
+      // The Gravewyrm Sanctum rework: one deed per boss core and the Tusker.
+      'dgn_korgath_all_chains',
+      'dgn_korgath_still_bound',
+      'dgn_velkhar_cold',
+      'dgn_korzul_thin_ice',
+      'dgn_sledge_tusker',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1107,7 +1116,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined for the Stormbrass Foundry's chained workers' deed
   // (dgn_foundry_workers_freed) the same auditable way: the e73fb6e4...
   // literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = '00bb91ab2fec009a3e31dafe9be1d7949967c466d253e780a176642869863895';
+  // Re-baselined for the Gravewyrm Sanctum rework's five appended deeds
+  // (dgn_korgath_all_chains, dgn_korgath_still_bound, dgn_velkhar_cold,
+  // dgn_korzul_thin_ice, dgn_sledge_tusker) the same auditable way: the
+  // 00bb91ab... literal rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = 'eb81c59b1092aba6386190a68112a15b1470f05b09cf8b0f87eb6a2516ed4063';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1199,9 +1212,18 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // The Stormbrass Foundry's chained workers append their deed after
   // dgn_great_saurian; the previous mint is the e73fb6e4... literal (rotated
   // down here), and stripping the one must reproduce it exactly.
+  //
+  // The Gravewyrm Sanctum rework appends its five deeds after
+  // dgn_foundry_workers_freed; the previous mint is the 00bb91ab... literal.
   const PRE_APPEND_CATALOG_SHA256 =
-    'e73fb6e4b251302b3d6e148e979ee988cb79b4cc9850b26d2b5c052466fab799';
-  const APPENDED_SINCE: readonly string[] = ['dgn_foundry_workers_freed'];
+    '00bb91ab2fec009a3e31dafe9be1d7949967c466d253e780a176642869863895';
+  const APPENDED_SINCE: readonly string[] = [
+    'dgn_korgath_all_chains',
+    'dgn_korgath_still_bound',
+    'dgn_velkhar_cold',
+    'dgn_korzul_thin_ice',
+    'dgn_sledge_tusker',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1213,8 +1235,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_zulgar_uncaught',
       'dgn_great_saurian',
+      'dgn_foundry_workers_freed',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1438,7 +1460,7 @@ describe('table shape', () => {
     // Hermit's last, then the Drowned Temple's four, the Mere Hydra's last,
     // then the Knellwyrm, the Gaol Turnkey and the Stormbrass Foundry's
     // seven, the Gantry Hauler's last.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_foundry_workers_freed');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_sledge_tusker');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

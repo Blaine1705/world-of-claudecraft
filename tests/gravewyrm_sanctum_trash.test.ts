@@ -15,6 +15,7 @@ import { STORY_MARKERS } from '../src/sim/content/gravewyrm_sanctum_layout';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { handleGravewyrmSanctumDevChat } from '../src/sim/dev/gravewyrm_sanctum_dev';
 import {
+  SANCTUM_DEED_IDS,
   SANCTUM_SOULFIRE_PATCH,
   SANCTUM_TOSS_RING,
   SLEDGE_TUSKER_ID,
@@ -399,6 +400,29 @@ describe('the Sledge Tusker (design section 5.3)', () => {
     expect(dealt(r, aside.id, 'Trample')).toHaveLength(0);
     run(r, T.trampleRun + 0.1, [t], true);
     expect(Math.hypot(t.pos.x - from.x, t.pos.z - from.z)).toBeGreaterThan(10);
+  });
+
+  it('Cold Cargo: a kill with no Trample landed earns the deed; a landed Trample loses it', () => {
+    const earned = (r: Room) =>
+      r.sim.players.get(r.me.id)?.deedsEarned.has(SANCTUM_DEED_IDS.sledgeTusker) ?? false;
+    const r = room();
+    const t = tusker(r, 0, 0);
+    run(r, 1, [t], true);
+    r.sim.ctx.dealDamage(r.me, t, 1e7, false, 'physical', 'Test', 'hit', false);
+    run(r, 0.1, [], true);
+    expect(t.dead).toBe(true);
+    expect(earned(r)).toBe(true);
+
+    const g = room();
+    const t2 = tusker(g, 0, 0);
+    g.me.pos = g.sim.ctx.groundPos(t2.pos.x + 4, t2.pos.z);
+    addPlayer(g, 'mage', -4, -20);
+    run(g, T.trampleFirst + T.trampleCast + 0.1, [t2], true);
+    expect(t2.sanctumFight?.kind === 'tusker' && t2.sanctumFight.trampleLanded).toBe(true);
+    g.sim.ctx.dealDamage(g.me, t2, 1e7, false, 'physical', 'Test', 'hit', false);
+    run(g, 0.1, [], true);
+    expect(t2.dead).toBe(true);
+    expect(earned(g)).toBe(false);
   });
 
   it('the Trample lane stops short of a drop', () => {

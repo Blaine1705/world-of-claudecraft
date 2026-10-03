@@ -3819,6 +3819,54 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
+  // The Gravewyrm Sanctum rework (docs/design/dungeon-rework/gravewyrm_sanctum.md
+  // section 10): one deed per boss core and one for the Sledge Tusker, granted
+  // by the encounter modules (src/sim/encounters/gravewyrm_sanctum) to every
+  // player in the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. The five names are common English phrases with no
+  // distinctive game use (the IP check, 2026-10-03; "Cold Comfort" is also a
+  // Guild Wars 2 achievement title, an everyday idiom kept as shared
+  // vocabulary).
+  dgn_korgath_all_chains: {
+    id: 'dgn_korgath_all_chains',
+    name: 'A Kinder End',
+    desc: 'Defeat Korgath the Bound with all four of his chains broken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_korgath_still_bound: {
+    id: 'dgn_korgath_still_bound',
+    name: 'The Lock Holds',
+    desc: 'Defeat Korgath the Bound on Heroic difficulty with at least two of his chains never broken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_velkhar_cold: {
+    id: 'dgn_velkhar_cold',
+    name: 'Cold Comfort',
+    desc: 'Defeat Grand Necromancer Velkhar without a single Raised Bonewalker rising a second time.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_korzul_thin_ice: {
+    id: 'dgn_korzul_thin_ice',
+    name: 'Thin Ice',
+    desc: 'Defeat Korzul the Gravewyrm with at least twelve of the nineteen lake plates unbroken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_sledge_tusker: {
+    id: 'dgn_sledge_tusker',
+    name: 'Cold Cargo',
+    desc: 'Defeat the Sledge Tusker without anyone being hit by its Trample.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {
