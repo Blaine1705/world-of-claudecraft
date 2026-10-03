@@ -12,7 +12,7 @@ import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
 import { bossEngaged, claimBoss, sanctumClaims } from './claim';
 import { SLEDGE_TUSKER_ID } from './ids';
-import { tickTusker } from './sledge_tusker';
+import { stepPatches, tickTusker } from './sledge_tusker';
 import { tickStory } from './story';
 
 export * from './ids';
@@ -45,6 +45,9 @@ export function tickSanctumEncounters(ctx: SimContext): void {
   for (const inst of sanctumClaims(ctx)) {
     const tusker = claimBoss(ctx, inst, SLEDGE_TUSKER_ID);
     if (tusker && !paused(tusker)) tickTusker(ctx, inst, tusker, bossEngaged(tusker));
+    else if (tusker?.sanctumFight?.kind === 'tusker')
+      // A blip with no target holds the fight, but its braziers still burn out.
+      stepPatches(ctx, inst, tusker, tusker.sanctumFight);
     tickStory(ctx, inst);
     sweepOrphanBurstRings(ctx, inst);
     sweepOrphanTossRings(ctx, inst);

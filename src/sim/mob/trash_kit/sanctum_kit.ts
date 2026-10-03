@@ -230,7 +230,8 @@ function livingSummoner(ctx: SimContext, inst: InstanceSlot, add: Entity): boole
 /**
  * The quickening soulfire of an engaged mob (a Soul Brazier): count down, and
  * on each beat every ally in the fight near it swings faster for a while.
- * Returns how many it stoked.
+ * Returns how many it stoked, or -1 when it guttered out (its summoner is
+ * dead and so is it now: the caller stops).
  */
 export function stepStoke(
   ctx: SimContext,
@@ -243,7 +244,7 @@ export function stepStoke(
   if (!def) return 0;
   if (mob.summonedAdd && !livingSummoner(ctx, inst, mob)) {
     ctx.handleDeath(mob, null);
-    return 0;
+    return -1;
   }
   const left = (st.timers[STOKE_TIMER] ?? def.every) - DT;
   if (left > 1e-9) {

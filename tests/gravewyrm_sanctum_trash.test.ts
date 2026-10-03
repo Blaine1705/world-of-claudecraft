@@ -311,7 +311,8 @@ describe('the Ogre Sledge-Hauler: Ice Block Toss', () => {
     run(r, def.first + 0.05, [ogre]);
     expect(objectsOf(r, SANCTUM_TOSS_RING)).toHaveLength(1);
     r.sim.ctx.handleDeath(ogre, r.me);
-    run(r, 0.2, [], true);
+    // The kit itself lifts it when the pull ends (no encounter sweep needed).
+    run(r, 0.2, [], false);
     expect(objectsOf(r, SANCTUM_TOSS_RING)).toHaveLength(0);
   });
 });
@@ -423,6 +424,23 @@ describe('the Sledge Tusker (design section 5.3)', () => {
     // They go out after 10 s, even if the Tusker falls first.
     r.sim.ctx.handleDeath(t, r.me);
     run(r, T.patchSeconds, [], true);
+    expect(objectsOf(r, SANCTUM_SOULFIRE_PATCH)).toHaveLength(0);
+  });
+
+  it('its soulfire patches keep burning out while the fight pauses on a lost target', () => {
+    const r = room();
+    const t = tusker(r);
+    run(r, 0.1, [t], true);
+    t.hp = Math.floor(t.maxHp * 0.49);
+    run(r, 0.1, [t], true);
+    expect(objectsOf(r, SANCTUM_SOULFIRE_PATCH)).toHaveLength(3);
+    // The tank drops: in combat, chasing, no target (the paused hold).
+    for (let k = 0; k < (T.patchSeconds + 0.5) / DT; k++) {
+      t.inCombat = true;
+      t.aiState = 'chase';
+      t.aggroTargetId = null;
+      tickSanctumEncounters(r.sim.ctx);
+    }
     expect(objectsOf(r, SANCTUM_SOULFIRE_PATCH)).toHaveLength(0);
   });
 

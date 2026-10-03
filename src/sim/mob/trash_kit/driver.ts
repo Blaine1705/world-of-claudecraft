@@ -658,6 +658,13 @@ function summonersOf(ctx: SimContext, inst: InstanceSlot, mob: Entity): Entity[]
   return out;
 }
 
+/** The pull ended in the claim (a death, an evade, a reset): a toss that will
+ *  never land lifts its ring, then the kit state goes. */
+function endPull(ctx: SimContext, inst: InstanceSlot, mob: Entity): void {
+  if (mob.trashKit) dropToss(ctx, inst, mob.trashKit);
+  endTrashKit(mob);
+}
+
 /** One mob's kit tick. */
 function stepMob(
   ctx: SimContext,
@@ -667,7 +674,7 @@ function stepMob(
   players: () => Entity[],
 ): void {
   if (mob.dead || mob.hp <= 0) {
-    if (mob.trashKit) endTrashKit(mob);
+    if (mob.trashKit) endPull(ctx, inst, mob);
     if (kit?.deathBurst) stepDeathBurst(ctx, inst, mob, kit, players());
     if (kit?.deathCloud) stepDeathCloud(ctx, inst, mob, kit, players());
     return;
@@ -683,7 +690,7 @@ function stepMob(
     mob.aggroTargetId !== null &&
     (mob.aiState === 'chase' || mob.aiState === 'attack');
   if (!engaged || !kit) {
-    if (mob.trashKit) endTrashKit(mob);
+    if (mob.trashKit) endPull(ctx, inst, mob);
     holdPerch(mob);
     // Remember how high it waits (a perch, a flight loop) for its pull.
     mob.airY = mob.pos.y > groundY(ctx, mob) + AIRBORNE ? mob.pos.y : undefined;
@@ -701,7 +708,8 @@ function stepMob(
   }
   stepDescent(ctx, mob, st);
   stepPulse(ctx, inst, mob, kit, st);
-  stepStoke(ctx, inst, mob, kit, st);
+  // A brazier whose tender fell gutters out: nothing more this tick.
+  if (stepStoke(ctx, inst, mob, kit, st) < 0) return;
   if (stepWithdraw(ctx, mob, kit, st)) return;
   stepCarapace(ctx, mob, kit, st);
   const list = players();

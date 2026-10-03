@@ -332,8 +332,8 @@ export function spillBraziers(
 }
 
 /** The burning patches: count down, scorch whoever stands in one each second,
- *  and go out. */
-function stepPatches(
+ *  and go out. Exported for the paused tick (a lost target never freezes them). */
+export function stepPatches(
   ctx: SimContext,
   inst: InstanceSlot,
   tusker: Entity,
