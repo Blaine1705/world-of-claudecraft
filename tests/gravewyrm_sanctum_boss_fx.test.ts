@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { SanctumBossFx } from '../src/render/gravewyrm_sanctum_bosses';
 import {
   KORZUL_FROZEN_STANCE,
+  KORZUL_HEARTBEAT_GESTURE,
   KORZUL_TAKEOFF_GESTURE,
   VELKHAR_THAW_GESTURE,
 } from '../src/render/gravewyrm_sanctum_bosses/boss_model_core';
@@ -138,6 +139,8 @@ describe('SanctumBossFx', () => {
     korzul.auras.push({ id: KORZUL_AIRBORNE } as never);
     fx.update(0.6);
     expect(gestures).toContainEqual([korzul.id, KORZUL_TAKEOFF_GESTURE]);
+    // The heart-shard beats.
+    expect(gestures).toContainEqual([korzul.id, KORZUL_HEARTBEAT_GESTURE]);
     expect(entities.size).toBeGreaterThan(19);
     fx.dispose();
   });

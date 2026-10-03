@@ -47,6 +47,7 @@ import {
   KORZUL_GRAVE_INFERNO,
   KORZUL_ID,
   KORZUL_PLUNGING_FIRE,
+  KORZUL_SHARD_FLARE,
   KORZUL_TUNING,
   KORZUL_WING_GALE,
   KORZUL_WYRMS_EYE,
@@ -117,15 +118,20 @@ import {
   unquenchedLeft,
 } from './boss_fx_core';
 import {
+  heartbeatEvery,
   KORGATH_ANCHOR_REST,
   KORGATH_ANCHORS,
   KORGATH_BROKEN_CHAIN_MESH,
   KORGATH_BROKEN_GESTURE,
+  KORGATH_RUNES_GESTURE,
   KORGATH_WHOLE_GESTURE,
   KORZUL_BODY,
   KORZUL_FROZEN_STANCE,
+  KORZUL_HEARTBEAT_FLARE_GESTURE,
+  KORZUL_HEARTBEAT_GESTURE,
   KORZUL_MOUTH_REST,
   KORZUL_TAKEOFF_GESTURE,
+  VELKHAR_FLAME_GESTURE,
   VELKHAR_FLAME_Y,
   VELKHAR_THAW_GESTURE,
 } from './boss_model_core';
@@ -304,6 +310,9 @@ export class SanctumBossFx {
   /** Korzul views we froze (only those are told to break free). */
   private readonly frozenSent = new Set<number>();
   private readonly airborne = new Set<number>();
+  /** The bar each boss carried last frame (a new bar flares its glow). */
+  private readonly lastBar = new Map<number, string | null>();
+  private heartbeat = 0;
   private readonly flaresSeen = new Set<number>();
   private readonly objectsSeen = new Map<number, number>();
   /** The plates as spots, refreshed each scan (breath and eye reads). */
@@ -1180,6 +1189,7 @@ export class SanctumBossFx {
       this.gestureClock = GESTURE_SEC;
       this.sendGestures();
     }
+    this.stepGlows(dt);
     this.stepCasts();
     this.stepKorgath();
     this.stepVelkhar();
@@ -1533,6 +1543,32 @@ export class SanctumBossFx {
         play(z.id, KORZUL_BREAK_FREE);
         this.frozenSent.delete(z.id);
       }
+    }
+  }
+
+  /** The bodies' own glow: Korzul's heartbeat, Korgath's runes on a Strain,
+   *  Velkhar's flame on every bar. */
+  private stepGlows(dt: number): void {
+    const play = this.playGesture;
+    if (!play) return;
+    const z = this.entity(this.korzulId);
+    if (z) {
+      const flaring = z.auras.some((a) => a.id === KORZUL_SHARD_FLARE);
+      this.heartbeat -= dt;
+      if (this.heartbeat <= 0) {
+        this.heartbeat = heartbeatEvery(flaring);
+        play(z.id, flaring ? KORZUL_HEARTBEAT_FLARE_GESTURE : KORZUL_HEARTBEAT_GESTURE);
+      }
+    }
+    for (const id of [this.korgathId, this.velkharId]) {
+      const e = this.entity(id);
+      if (!e) continue;
+      const bar = e.castingAbility;
+      if (bar && bar !== this.lastBar.get(id)) {
+        if (id === this.korgathId && bar === KORGATH_STRAIN) play(id, KORGATH_RUNES_GESTURE);
+        if (id === this.velkharId) play(id, VELKHAR_FLAME_GESTURE);
+      }
+      this.lastBar.set(id, bar);
     }
   }
 

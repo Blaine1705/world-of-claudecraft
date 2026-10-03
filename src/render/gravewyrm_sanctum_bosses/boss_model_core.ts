@@ -159,3 +159,16 @@ export const KORZUL_FROZEN_STANCE = 'sanctum_korzul_frozen';
 export const KORZUL_TAKEOFF_GESTURE = 'sanctum_korzul_takeoff';
 /** Velkhar's thaw channel played off a pyre flare. */
 export const VELKHAR_THAW_GESTURE = 'sanctum_velkhar_thaw_gesture';
+
+/** Body glow gestures: Korzul's shard heartbeat (and its flare in the last
+ *  phase), Korgath's runes burning as he Strains, Velkhar's soul flame
+ *  roaring as he casts. */
+export const KORZUL_HEARTBEAT_GESTURE = 'sanctum_korzul_heartbeat';
+export const KORZUL_HEARTBEAT_FLARE_GESTURE = 'sanctum_korzul_heartbeat_flare';
+export const KORGATH_RUNES_GESTURE = 'sanctum_korgath_runes';
+export const VELKHAR_FLAME_GESTURE = 'sanctum_velkhar_flame';
+
+/** Seconds between heartbeats: about 40 a minute, faster once the shard flares. */
+export function heartbeatEvery(flaring: boolean): number {
+  return flaring ? 0.95 : 1.5;
+}

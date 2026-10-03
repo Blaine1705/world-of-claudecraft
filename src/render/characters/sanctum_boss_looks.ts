@@ -46,13 +46,17 @@ import {
   KORGATH_BROKEN_CHAIN_MESH,
   KORGATH_BROKEN_GESTURE,
   KORGATH_CLIP,
+  KORGATH_RUNES_GESTURE,
   KORGATH_WHOLE_GESTURE,
   KORZUL_BODY,
   KORZUL_CLIP,
   KORZUL_FROZEN_STANCE,
+  KORZUL_HEARTBEAT_FLARE_GESTURE,
+  KORZUL_HEARTBEAT_GESTURE,
   KORZUL_TAKEOFF_GESTURE,
   VELKHAR_BODY,
   VELKHAR_CLIP,
+  VELKHAR_FLAME_GESTURE,
   VELKHAR_THAW_GESTURE,
 } from '../gravewyrm_sanctum_bosses/boss_model_core';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
@@ -180,6 +184,12 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     castPlayOutHoldsAttacks: true,
     oneShotsHoldAttacks: ['ChainBreak', 'Roar', 'ChainYank'],
     meshToggles: KORGATH_CHAIN_TOGGLES,
+    // His runes and goad brands (the body's emissive map) burn as he Strains
+    // and go dark as he kneels.
+    glowPulses: {
+      pulses: [{ gesture: KORGATH_RUNES_GESTURE, rise: 1.6, hold: 0.5, fall: 1.4, peak: 2.4 }],
+      deathFade: 2.5,
+    },
     walkRef: KORGATH_BODY.walkRef * bossModelScale(KORGATH_BODY, KORGATH_BODY.simScale),
     runRef: 11 * bossModelScale(KORGATH_BODY, KORGATH_BODY.simScale),
     attackTimeScale: 1.15,
@@ -216,6 +226,12 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     castClipSync: true,
     castPlayOutHoldsAttacks: true,
     oneShotsHoldAttacks: ['Thaw'],
+    // The caged soul flame roars as he casts and gutters out as he dies.
+    glowPulses: {
+      materials: ['VelkharSoulfire', 'VelkharFrostlight'],
+      pulses: [{ gesture: VELKHAR_FLAME_GESTURE, rise: 0.4, hold: 0.6, fall: 1.2, peak: 2.2 }],
+      deathFade: 2,
+    },
     walkRef: VELKHAR_BODY.walkRef * bossModelScale(VELKHAR_BODY, VELKHAR_BODY.simScale),
     runRef: VELKHAR_BODY.walkRef * bossModelScale(VELKHAR_BODY, VELKHAR_BODY.simScale),
     walkTimeScaleMax: 3,
@@ -246,6 +262,31 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     clipPositionDrops: Object.fromEntries(
       ['TakeOff', 'FlyIdle', 'FlyForward', 'BreathAir', 'Land'].map((c) => [c, ['Root']]),
     ),
+    // The heart-shard beats (lub, dub) and flares in the last phase; dark as
+    // the lake takes him.
+    glowPulses: {
+      pulses: [
+        { gesture: KORZUL_HEARTBEAT_GESTURE, rise: 0.1, hold: 0.04, fall: 0.5, peak: 1.4 },
+        {
+          gesture: KORZUL_HEARTBEAT_GESTURE,
+          delay: 0.28,
+          rise: 0.08,
+          hold: 0.03,
+          fall: 0.6,
+          peak: 1.25,
+        },
+        { gesture: KORZUL_HEARTBEAT_FLARE_GESTURE, rise: 0.1, hold: 0.08, fall: 0.5, peak: 2.4 },
+        {
+          gesture: KORZUL_HEARTBEAT_FLARE_GESTURE,
+          delay: 0.24,
+          rise: 0.08,
+          hold: 0.05,
+          fall: 0.55,
+          peak: 2,
+        },
+      ],
+      deathFade: 4,
+    },
     castClipSync: true,
     castPlayOutHoldsAttacks: true,
     oneShotsHoldAttacks: ['BreakFree', 'TakeOff', 'Roar'],
