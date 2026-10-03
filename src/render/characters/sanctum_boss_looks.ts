@@ -33,6 +33,7 @@ import {
   KORZUL_TAIL_SWEEP,
   KORZUL_TUNING,
   KORZUL_WING_GALE,
+  SEAL_SHACKLE_IDS,
   VELKHAR_SHADOW_VOLLEY,
   VELKHAR_SOULFIRE_TRENCH,
   VELKHAR_TUNING,
@@ -60,6 +61,8 @@ import type { ClipMap, VisualDef } from './manifest';
 const K = KORGATH_TUNING;
 const V = VELKHAR_TUNING;
 const Z = KORZUL_TUNING;
+/** Korzul's emergence bar (korzul.ts KORZUL_EMERGE_SECONDS). */
+const KORZUL_EMERGE_BAR = 3;
 
 /** The broken chains hang from the wrist rings once their chain has broken
  *  (re-sent by the effects, so a view rebuilt mid-fight shows the state). */
@@ -88,7 +91,8 @@ const KORZUL_CLIPS: ClipMap = {
     [KORZUL_DOUSED]: 1,
     [KORZUL_ENRAGE]: 1,
     [KORZUL_SHARD_FLARE]: 1,
-    [KORZUL_TAKEOFF_GESTURE]: 1,
+    // The sim climbs to the hover in 1.8 s (korzul.ts KORZUL_TAKEOFF_SECONDS).
+    [KORZUL_TAKEOFF_GESTURE]: 2.79 / 1.8,
   },
   hit: ['Hit'],
   death: 'Death',
@@ -100,6 +104,8 @@ const KORZUL_CLIPS: ClipMap = {
     [KORZUL_WING_GALE]: 'WingBuffet',
     [KORZUL_PLUNGING_FIRE]: 'BreathAir',
     [KORZUL_CRASHING_DESCENT]: 'Land',
+    // His pull: the 3 s emergence bar bursts the ice, the forefeet slam on its end.
+    [KORZUL_BREAK_FREE]: 'BreakFree',
   },
   castTimeScaleByAbility: {
     // The inhale is the bar: the fire leaves the jaws on the bar's end.
@@ -111,9 +117,10 @@ const KORZUL_CLIPS: ClipMap = {
     // The fire pours across the plate through the warning and ends on its end.
     [KORZUL_PLUNGING_FIRE]: contactRate(KORZUL_CLIP.breathAirEnd, Z.plungeWarn),
     [KORZUL_CRASHING_DESCENT]: contactRate(KORZUL_CLIP.landImpact, Z.descentWarn),
+    [KORZUL_BREAK_FREE]: contactRate(KORZUL_CLIP.breakFreeSlam, KORZUL_EMERGE_BAR),
   },
   // Not the Inferno: Doused cuts it (to Hit) the moment his plate breaks.
-  castPlayOut: ['BreathGround', 'TailSwipe', 'WingBuffet', 'BreathAir', 'Land'],
+  castPlayOut: ['BreathGround', 'TailSwipe', 'WingBuffet', 'BreathAir', 'Land', 'BreakFree'],
   flourish: 'Roar',
 };
 
@@ -229,7 +236,9 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     clips: KORZUL_CLIPS,
     phaseClips: {
       [KORZUL_FROZEN_STANCE]: { clips: KORZUL_FROZEN_CLIPS },
-      [KORZUL_BREAK_FREE]: { clips: KORZUL_CLIPS, enter: 'BreakFree' },
+      // The emergence bar itself plays BreakFree (castByAbility); the stance
+      // swap only hands him his waking clips.
+      [KORZUL_BREAK_FREE]: { clips: KORZUL_CLIPS },
     },
     castClipSync: true,
     castPlayOutHoldsAttacks: true,
@@ -244,8 +253,20 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
   },
 };
 
-/** The boss templates to their looks. */
+/** The Seal Shackles: stationary parts drawn by the boss effects (an iron
+ *  cuff at each pillar's foot, sanctum_boss_fx.ts), so the mob itself is only
+ *  its click capsule, nameplate and bars. */
+SANCTUM_BOSS_LOOKS.sanctum_seal_shackle = {
+  url: KORGATH_BODY.url,
+  height: 2,
+  clips: { idle: 'Idle', walk: 'Idle', run: 'Idle', attack: ['Hit'], hit: ['Hit'], death: 'Death' },
+  bodyless: true,
+  clickRadius: 1.8,
+};
+
+/** The boss templates (and the shackles) to their looks. */
 export const SANCTUM_BOSS_MOB_KEYS: Record<string, string> = {
+  ...Object.fromEntries(Object.values(SEAL_SHACKLE_IDS).map((id) => [id, 'sanctum_seal_shackle'])),
   korgath_the_bound: 'sanctum_korgath',
   grand_necromancer_velkhar: 'sanctum_velkhar',
   korzul_the_gravewyrm: 'sanctum_korzul',

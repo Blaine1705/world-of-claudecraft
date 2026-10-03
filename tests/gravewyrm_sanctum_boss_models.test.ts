@@ -131,7 +131,8 @@ describe('the Sanctum bosses draw their own bodies', () => {
   it('holds Korzul frozen in the ice until his pull, then breaks him free', () => {
     const def = SANCTUM_BOSS_LOOKS.sanctum_korzul;
     expect(def.phaseClips?.[KORZUL_FROZEN_STANCE].clips.idle).toBe('Frozen');
-    expect(def.phaseClips?.[KORZUL_BREAK_FREE].enter).toBe('BreakFree');
+    expect(def.phaseClips?.[KORZUL_BREAK_FREE].clips.idle).toBe('Idle');
+    expect(def.clips.castByAbility?.[KORZUL_BREAK_FREE]).toBe('BreakFree');
     expect(def.flight).toBe(true);
   });
 });

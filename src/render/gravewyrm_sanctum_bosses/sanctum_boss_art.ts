@@ -486,3 +486,83 @@ vec3 wyrmRamp(float h) {
     .replace(ghostRampGlsl, `${ghostRampGlsl}\n${ramp}`)
     .replace('ghostRamp(clamp(body * heat', 'wyrmRamp(clamp(body * heat');
 }
+
+// ---- the Seal Shackles (the sim's stationary parts are drawn bodyless) ---------------
+
+const IRON_FRAG = /* glsl */ `
+uniform vec3 uRune;
+uniform float uRuneOn;
+uniform float uBroken;
+varying vec3 vN;
+varying vec3 vV;
+varying vec3 vL;
+void main() {
+  vec3 n = normalize(vN);
+  float key = 0.35 + 0.65 * max(dot(n, normalize(vec3(0.4, 0.8, 0.3))), 0.0);
+  float rim = pow(1.0 - abs(dot(n, normalize(vV))), 3.0);
+  vec3 iron = vec3(0.13, 0.135, 0.15) * key + vec3(0.75, 0.88, 1.0) * rim * 0.35;
+  // Rime on the top faces.
+  iron = mix(iron, vec3(0.82, 0.92, 1.0), smoothstep(0.55, 0.95, n.y) * 0.45);
+  // The Smith's runes cut round the cuff: bands that burn the shackle's colour.
+  float band = step(0.82, fract(vL.y * 2.2 + vL.x * 1.1)) * (1.0 - uBroken);
+  vec3 col = iron + uRune * band * uRuneOn * 2.2;
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+const IRON_VERT = /* glsl */ `
+varying vec3 vN;
+varying vec3 vV;
+varying vec3 vL;
+void main() {
+  vec4 wp = modelMatrix * vec4(position, 1.0);
+  vN = normalize(mat3(modelMatrix) * normal);
+  vV = normalize(cameraPosition - wp.xyz);
+  vL = position;
+  gl_Position = projectionMatrix * viewMatrix * wp;
+}
+`;
+
+export function ironMaterial() {
+  return new THREE.ShaderMaterial({
+    name: 'sanctumSealShackle',
+    uniforms: {
+      uRune: { value: new THREE.Color(0x6cc8ff) },
+      uRuneOn: { value: 1 },
+      uBroken: { value: 0 },
+    },
+    vertexShader: IRON_VERT,
+    fragmentShader: IRON_FRAG,
+  });
+}
+
+/** A Seal Shackle: an iron cuff standing on its anchor block, its ring facing
+ *  +z (toward Korgath), about a man high (yards). `open`: the cuff sundered. */
+export function shackleGeometry(open: boolean): THREE.BufferGeometry {
+  const ring = new THREE.TorusGeometry(0.85, 0.24, 8, 22, open ? Math.PI * 1.45 : Math.PI * 2);
+  if (open) ring.rotateZ(Math.PI * 0.8);
+  ring.translate(0, 1.55, 0);
+  const block = new THREE.BoxGeometry(1.7, 0.75, 1.3).translate(0, 0.375, 0);
+  const bolt = new THREE.CylinderGeometry(0.22, 0.28, 0.6, 8).translate(0, 0.95, 0);
+  const parts = [ring, block, bolt];
+  let count = 0;
+  const flat = parts.map((p) => {
+    const np = p.toNonIndexed();
+    np.computeVertexNormals();
+    count += np.getAttribute('position').count;
+    p.dispose();
+    return np;
+  });
+  const pos = new Float32Array(count * 3);
+  const nor = new Float32Array(count * 3);
+  let o = 0;
+  for (const np of flat) {
+    pos.set(np.getAttribute('position').array as Float32Array, o * 3);
+    nor.set(np.getAttribute('normal').array as Float32Array, o * 3);
+    o += np.getAttribute('position').count;
+    np.dispose();
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  return g;
+}

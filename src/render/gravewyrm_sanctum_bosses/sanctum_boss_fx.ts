@@ -136,9 +136,11 @@ import {
   chainMaterial,
   heldStatueGeometry,
   iceMaterial,
+  ironMaterial,
   meltMaterial,
   plateMaterial,
   ringMaterial,
+  shackleGeometry,
   shadowMaterial,
   wyrmEyeTexture,
   wyrmFireFrag,
@@ -233,6 +235,10 @@ interface ChainSlot {
   mat: THREE.ShaderMaterial;
   glow: THREE.Sprite;
   glowMat: THREE.SpriteMaterial;
+  /** The cuff at the pillar's foot, whole or sundered. */
+  cuff: THREE.Mesh;
+  cuffOpen: THREE.Mesh;
+  cuffMat: THREE.ShaderMaterial;
   objectId: number;
   broken: boolean;
   /** Seconds since the break (the whip plays over the first 0.8). */
@@ -442,7 +448,17 @@ export class SanctumBossFx {
     }
     // Korgath's four chains, and the glow at each shackle.
     const glowTex = typeof document !== 'undefined' ? radialGlowTexture() : null;
+    const cuffGeo = shackleGeometry(false);
+    const cuffOpenGeo = shackleGeometry(true);
+    this.geometries.push(cuffGeo, cuffOpenGeo);
     for (const tool of SEAL_TOOLS) {
+      const cuffMat = ironMaterial();
+      this.materials.push(cuffMat);
+      const cuff = new THREE.Mesh(cuffGeo, cuffMat);
+      const cuffOpen = new THREE.Mesh(cuffOpenGeo, cuffMat);
+      cuff.visible = false;
+      cuffOpen.visible = false;
+      this.root.add(cuff, cuffOpen);
       const geo = chainGeometry();
       this.geometries.push(geo);
       const mat = chainMaterial(this.uTime);
@@ -468,6 +484,9 @@ export class SanctumBossFx {
         mat,
         glow,
         glowMat,
+        cuff,
+        cuffOpen,
+        cuffMat,
         objectId: -1,
         broken: false,
         whipAt: -99,
@@ -799,19 +818,24 @@ export class SanctumBossFx {
           color: SANCTUM_COLORS.goadRed,
         });
         return true;
-      case VELKHAR_WAKING_THAW:
-        this.spray(this.soulfire, 90, x, gy + 0.2, z, {
-          speed: 3,
-          up: 9,
-          spread: 5,
-          life: 1.4,
-          size0: 2.2,
-          size1: 0.6,
-          color: 0xffffff,
-        });
-        this.ring(x, z, SANCTUM_COLORS.soulfire, 1, VELKHAR_TUNING.trenchWidth + 6, 0.9, 0.14);
-        this.shakeNear(x, z, 0.3);
+      case VELKHAR_WAKING_THAW: {
+        // At the pyre (the boss's beat targets its flare object) or the add.
+        const tgt = this.world.entities.get(ev.targetId);
+        const pyre = tgt && tgt.kind === 'object' ? tgt : at;
+        this.thawBurst(pyre.pos.x, pyre.pos.z);
         return true;
+      }
+      case VELKHAR_SOULFIRE_TRENCH: {
+        if (ev.fx !== 'nova') return false;
+        const lane = this.lanes.find((l) => l.objectId === ev.targetId);
+        if (lane) this.trenchBurst(lane);
+        return true;
+      }
+      case VELKHAR_TITHE: {
+        const v = this.world.entities.get(ev.targetId) ?? at;
+        this.titheBurst(at.pos.x, at.pos.z, v.pos.x, v.pos.z);
+        return true;
+      }
       case VELKHAR_SHADOW_VOLLEY:
         if (ev.fx !== 'nova') return false;
         this.ring(x, z, SANCTUM_COLORS.soulViolet, 1, 26, 1.0, 0.08);
@@ -824,18 +848,6 @@ export class SanctumBossFx {
           size1: 0.2,
           color: SANCTUM_COLORS.soulViolet,
         });
-        return true;
-      case VELKHAR_TITHE:
-        this.spray(this.soulfire, 40, x, gy + 0.3, z, {
-          speed: 1.5,
-          up: 6,
-          spread: 2,
-          life: 1.2,
-          size0: 1.4,
-          size1: 0.3,
-          color: 0xffffff,
-        });
-        this.ring(x, z, SANCTUM_COLORS.soulfire, 4, 0.5, 0.8, 0.2);
         return true;
       case VELKHAR_HELD:
         this.ring(x, z, SANCTUM_COLORS.frost, 0.3, 4, 0.6, 0.2);
@@ -1044,6 +1056,91 @@ export class SanctumBossFx {
         });
     }
     this.shakeNear(lane.x, lane.z, 0.5);
+  }
+
+  /** A pyre flares: soulfire erupts over its pool and the dead climb out. */
+  private thawBurst(x: number, z: number): void {
+    const gy = this.groundY(x, z);
+    this.spray(this.soulfire, 90, x, gy + 0.2, z, {
+      speed: 3,
+      up: 9,
+      spread: 5,
+      life: 1.4,
+      size0: 2.2,
+      size1: 0.6,
+      color: 0xffffff,
+    });
+    this.ring(x, z, SANCTUM_COLORS.soulfire, 1, 9, 0.9, 0.14);
+    this.spray(this.mist, 40, x, gy + 0.3, z, {
+      speed: 3,
+      up: 4,
+      spread: 6,
+      life: 2.2,
+      size0: 1.5,
+      size1: 4.5,
+      color: SANCTUM_COLORS.steam,
+      alpha: 0.6,
+    });
+    this.shakeNear(x, z, 0.3);
+  }
+
+  /** The trench lands: soulfire runs the lane and melts it to water. */
+  private trenchBurst(lane: CastLane): void {
+    const steps = Math.max(4, Math.round(lane.length / 2));
+    for (let i = 0; i <= steps; i++) {
+      const t = (i / steps) * lane.length;
+      const px = lane.x + Math.sin(lane.yaw) * t;
+      const pz = lane.z + Math.cos(lane.yaw) * t;
+      const gy = this.groundY(px, pz);
+      this.spray(this.soulfire, 7, px, gy + 0.1, pz, {
+        speed: 1,
+        up: 5,
+        spread: VELKHAR_TUNING.trenchWidth,
+        life: 1.1,
+        size0: 2,
+        size1: 0.6,
+        color: 0xffffff,
+      });
+      this.spray(this.mist, 3, px, gy + 0.2, pz, {
+        speed: 0.6,
+        up: 2,
+        spread: VELKHAR_TUNING.trenchWidth,
+        life: 2.4,
+        size0: 1.2,
+        size1: 3.6,
+        color: SANCTUM_COLORS.steam,
+        alpha: 0.55,
+      });
+    }
+    this.shakeNear(lane.x, lane.z, 0.35);
+  }
+
+  /** The tithe returned: soulfire runs from the risen dead into Velkhar. */
+  private titheBurst(fx: number, fz: number, vx: number, vz: number): void {
+    const vy = this.groundY(vx, vz);
+    this.spray(this.soulfire, 40, vx, vy + 0.3, vz, {
+      speed: 1.5,
+      up: 6,
+      spread: 2,
+      life: 1.2,
+      size0: 1.4,
+      size1: 0.3,
+      color: 0xffffff,
+    });
+    this.ring(vx, vz, SANCTUM_COLORS.soulfire, 4, 0.5, 0.8, 0.2);
+    const d = Math.hypot(vx - fx, vz - fz) || 1;
+    this.spray(this.glow, 24, fx, this.groundY(fx, fz) + 1.2, fz, {
+      speed: Math.min(20, d * 1.4),
+      up: 2,
+      life: 0.8,
+      size0: 0.6,
+      size1: 0.2,
+      color: SANCTUM_COLORS.soulfire,
+      dirX: vx - fx,
+      dirZ: vz - fz,
+      cone: 0.25,
+      drag: 0.5,
+    });
   }
 
   /** The fire pours on a whole plate. */
@@ -1627,6 +1724,24 @@ export class SanctumBossFx {
     // The chains themselves.
     for (const c of this.chains) {
       const o = this.entity(c.objectId);
+      // The cuff stands at the pillar's foot for the claim's life: whole and
+      // rune-lit while its chain holds, sundered once broken.
+      if (o) {
+        const gy0 = this.groundY(o.pos.x, o.pos.z);
+        const pillar = this.pillarAt.get(c.tool);
+        const face = pillar ? Math.atan2(o.pos.x - pillar.x, o.pos.z - pillar.z) : 0;
+        for (const m of [c.cuff, c.cuffOpen]) {
+          m.position.set(o.pos.x, gy0, o.pos.z);
+          m.rotation.y = face;
+        }
+        c.cuff.visible = !c.broken;
+        c.cuffOpen.visible = c.broken;
+        c.cuffMat.uniforms.uBroken.value = c.broken ? 1 : 0;
+        c.cuffMat.uniforms.uRuneOn.value = straining ? 0.6 + 0.8 * strainFill : 0.55;
+      } else {
+        c.cuff.visible = false;
+        c.cuffOpen.visible = false;
+      }
       if (!o || !k) {
         c.mesh.visible = false;
         c.glow.visible = false;
@@ -1683,6 +1798,7 @@ export class SanctumBossFx {
         const gl = shackleGlow(share);
         const flick = 0.75 + 0.25 * Math.sin(this.clock * gl.flicker * 6.28 + c.objectId);
         c.glowMat.color.setRGB(gl.r, gl.g, gl.b);
+        c.cuffMat.uniforms.uRune.value.setRGB(gl.r, gl.g, gl.b);
         c.glowMat.opacity = (0.55 + 0.45 * flick) * (straining ? 1.3 : 1);
         const size = 2.6 + (straining ? 1.4 * strainFill : 0);
         c.glow.scale.set(size, size, 1);
