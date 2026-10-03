@@ -197,7 +197,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.sellJunkNoBuyback"
   ],
   "zh_CN": [
-    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
@@ -207,7 +206,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "zh_TW": [
-    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
@@ -217,7 +215,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "ko_KR": [
-    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
@@ -227,7 +224,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "ja_JP": [
-    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
@@ -268,7 +264,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.sellJunkNoBuyback"
   ],
   "ru_RU": [
-    "guide.worldPvpPage.hillBodyRanked",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
