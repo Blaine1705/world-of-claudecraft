@@ -1,9 +1,9 @@
 // Bone dials (VisualDef.dials): a few named bones a rig turns ON TOP of its
 // clips, set by presentation gestures sent through the renderer's
 // triggerAttack seam (the same route a boss stance swap takes). They show a
-// value the clips cannot know: Line-Master Tock's pressure gauge needle
-// climbing toward the lever throw, the Voltaic Warden's armour plates turning
-// copper face or charged face out (front and back halves apart on heroic).
+// value the clips cannot know (a pressure gauge's needle climbing, armour
+// plates turning one face or the other out). The Stormbrass Foundry's bosses,
+// its first users, are parked; the mechanism stays for any rig.
 //
 // Contract: every dial bone is keyed by every clip of its GLB (the Blender
 // builds key every bone on every frame), so the mixer rewrites its pose each

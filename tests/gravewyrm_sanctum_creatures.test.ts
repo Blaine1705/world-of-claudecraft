@@ -23,7 +23,7 @@ import {
   TUSKER_TRACES_ON_GESTURE,
   TUSKER_UNHITCH_GESTURE,
 } from '../src/render/characters/sanctum_creature_looks';
-import { burstDelayForRadius } from '../src/render/death_burst_fx_core';
+import { burstDelayForRadius, burstRingFill } from '../src/render/death_burst_fx_core';
 import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph/telegraph_look_core';
 import {
   buildGateObject,
@@ -537,7 +537,19 @@ describe('a death burst ring fills on its own mob fuse', () => {
     // A ring with no name still reads off the nearest delayed burst's radius.
     expect(burstDelayForRadius(splinter?.radius ?? 0)).toBe(splinter?.delay);
     // The Rime Whelp's Hoarfrost Pop goes off at once: it paints no ring, so
-    // it never steers a ring's fuse.
+    // it never steers a ring's fuse (a ring that names it still reads the
+    // nearest DELAYED burst, never a zero fuse).
     expect(MOBS.rime_whelp?.trashKit?.deathBurst?.delay).toBe(0);
+    expect(burstDelayForRadius(3, MOBS.rime_whelp?.name)).toBe(splinter?.delay);
+  });
+
+  it('fills the ring from empty to full over its fuse, clamped', () => {
+    expect(burstRingFill(0, 2)).toBe(0);
+    expect(burstRingFill(1, 2)).toBe(0.5);
+    expect(burstRingFill(2, 2)).toBe(1);
+    expect(burstRingFill(5, 2)).toBe(1);
+    expect(burstRingFill(-1, 2)).toBe(0);
+    // A zero fuse is a standing ring: full at once.
+    expect(burstRingFill(0, 0)).toBe(1);
   });
 });

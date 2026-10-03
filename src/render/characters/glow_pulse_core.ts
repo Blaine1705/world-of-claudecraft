@@ -28,8 +28,8 @@ export interface GlowPulseDef {
 export interface GlowPulseSet {
   pulses: readonly GlowPulseDef[];
   /** Material names (as shipped in the GLB) that glow WITHOUT an emissive map:
-   *  a body whose light is its own untextured emissive material (the Prime
-   *  Draft's lightning conduits and eye, the Voltaic Warden's coil arcs). */
+   *  a body whose light is its own untextured emissive material (lightning
+   *  conduits, an eye, coil arcs). */
   materials?: readonly string[];
   /** Seconds a dead body takes to go dark (absent: the glow stays on). */
   deathFade?: number;

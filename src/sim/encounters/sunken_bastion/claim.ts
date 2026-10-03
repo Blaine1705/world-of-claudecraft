@@ -1,8 +1,9 @@
 // Shared claim helpers for the Sunken Bastion encounters: the claim's origin,
 // its players, its bosses by template, its encounter objects by template and
-// spot, ephemeral encounter objects, mechanic damage and the deed grant.
-// Every read walks the claim's own rosters in their stored order, so the
-// encounters stay deterministic (zero rng here).
+// spot, ephemeral encounter objects, mechanic damage, the deed grant, and a
+// boss's heavy swing at its target. Every read walks the claim's own rosters
+// in their stored order, so the encounters stay deterministic (the only rng
+// draws are mechanicDamage's and heavySwing's damage rolls).
 
 import { grantDeed } from '../../deeds';
 import { effectiveArmorOf } from '../../effective_stats';

@@ -36,6 +36,7 @@ import { applyDungeonMobTuning } from '../src/sim/instances/difficulty';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import { tickTrashKits } from '../src/sim/mob/trash_kit';
+import { DEATH_BURST_RING, sweepOrphanBurstRings } from '../src/sim/mob/trash_kit/death_burst';
 import {
   SANCTUM_CINDER_BREATH,
   SANCTUM_GOAD,
@@ -362,8 +363,41 @@ describe('the Rime Whelp and the Glacier Splinter: their deaths', () => {
     r.sim.ctx.handleDeath(splinter, r.me);
     run(r, 1.5, [splinter]);
     expect(dealt(r, r.me.id, 'Shatter')).toHaveLength(0);
+    // The burst builds as a ring on the floor where it fell, sized to its reach.
+    const rings = objectsOf(r, DEATH_BURST_RING);
+    expect(rings).toHaveLength(1);
+    expect(rings[0].scale).toBe(MOBS.glacier_splinter.trashKit?.deathBurst?.radius);
+    expect(splinter.deathBurst?.objectId).toBe(rings[0].id);
     run(r, 0.7, [splinter]);
     expect(dealt(r, r.me.id, 'Shatter')).toHaveLength(1);
+    // It goes off once and lifts its ring.
+    expect(objectsOf(r, DEATH_BURST_RING)).toHaveLength(0);
+    expect(r.sim.ctx.entities.has(rings[0].id)).toBe(false);
+    run(r, 2, [splinter]);
+    expect(dealt(r, r.me.id, 'Shatter')).toHaveLength(1);
+  });
+
+  it('a burst ring whose mob left the world before it went off is swept off the floor', () => {
+    const r = room();
+    const splinter = engage(r, 'glacier_splinter', 3, 0);
+    run(r, 0.1, [splinter]);
+    r.sim.ctx.handleDeath(splinter, r.me);
+    run(r, 0.5, [splinter]);
+    const ring = objectsOf(r, DEATH_BURST_RING)[0];
+    expect(ring).toBeDefined();
+    // The body leaves the claim (a despawn) before its fuse runs out.
+    r.inst.mobIds.splice(r.inst.mobIds.indexOf(splinter.id), 1);
+    r.sim.ctx.dropEntity(splinter.id);
+    expect(sweepOrphanBurstRings(r.sim.ctx, r.inst)).toBe(1);
+    expect(objectsOf(r, DEATH_BURST_RING)).toHaveLength(0);
+    expect(r.sim.ctx.entities.has(ring.id)).toBe(false);
+    // A ring whose mob still lies there is never swept.
+    const other = engage(r, 'glacier_splinter', 3, 0);
+    run(r, 0.1, [other]);
+    r.sim.ctx.handleDeath(other, r.me);
+    run(r, 0.5, [other]);
+    expect(sweepOrphanBurstRings(r.sim.ctx, r.inst)).toBe(0);
+    expect(objectsOf(r, DEATH_BURST_RING)).toHaveLength(1);
   });
 });
 

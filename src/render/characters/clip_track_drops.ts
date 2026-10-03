@@ -3,9 +3,8 @@
 //
 // A dial lays its turn on top of whatever the mixer wrote. That composes with
 // a clip that keys the bone at rest, but not with a clip that turns the bone
-// itself: the Voltaic Warden's FlipRattle turns every plate half a turn, and
-// the Prime Draft's hatch clips swing the hatch leaves open, so the dial's
-// turn would land on top of the clip's (a double turn while the clip plays,
+// itself (a clip that turns a plate half a turn, or swings a hatch leaf
+// open), so the dial's turn would land on top of the clip's (a double turn while the clip plays,
 // and a second spin through the armour as the clip cross-fades back to rest).
 // Dropping those tracks leaves ONE owner of the bone, the dial, driven by the
 // mirrored encounter state; the rest of the clip (the body, the plate mounts

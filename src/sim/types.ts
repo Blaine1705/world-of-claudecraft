@@ -2033,8 +2033,9 @@ export interface MobTemplate {
   scale: number; // render hint
   /** A big body's reach from its pivot to the edge players stand at (yards).
    *  Set on the towering bosses and the dungeons' great non-boss bodies (the
-   *  Turretback Hermit, the Mere Hydra's heads, the Great Saurian): a player's melee reaches it from bodyRadius +
-   *  3 (combat/player_attack_reach.ts) instead of the stock 5 yd that put them
+   *  Turretback Hermit, the Mere Hydra's heads, the Great Saurian): a
+   *  player's melee reaches it from bodyRadius + 3
+   *  (combat/player_attack_reach.ts) instead of the stock 5 yd that put them
    *  inside the model, and the boss's own swing reaches one yard past that
    *  (mob_combat.ts), so nobody can hit it from outside its reach. */
   bodyRadius?: number;
@@ -5437,7 +5438,8 @@ export interface QuestDef {
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   // Offered only while this dungeon is public: a quest that points into a
   // development-only room (DungeonDef.guideVisible false, the Crucible raid's
-  // flag) stays unavailable until that room ships. Enforced in computeQuestState, so both hosts share it.
+  // flag) stays unavailable until that room ships. Enforced in
+  // computeQuestState, so both hosts share it.
   gatedWithDungeon?: string;
   // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
   // includes worn equipment and bag sockets (quests/quest_owned_count.ts) and the

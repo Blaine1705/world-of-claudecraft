@@ -458,8 +458,8 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
   // power, every 2 sec, for 12 sec), so the trinket pays a third of a level-17
   // class cooldown on the five-man heroic trinkets' 2 min timer. Six bites at
   // a heroic level-20 agile's 200 to 300 Attack Power land about 220 to 270,
-  // in line with the Rangefinder's Lens's 10 percent of a 230 DPS heroic
-  // (README section 7) for its 12 sec (about 276). It runs at the Fanglord's
+  // in line with a five-man heroic trinket's budget: 10 percent of a 230 DPS
+  // heroic (README section 7) for 12 sec (about 276). It runs at the Fanglord's
   // Great Jaguar's speed (8 yd/s, wildheart.ts).
   fanglords_whistle: {
     cooldown: 120,
@@ -510,8 +510,8 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
   },
   // Quenchwater Flask: three swings of 40 frost plus 20 percent of Attack
   // Power. At a heroic level-20 strength wearer's 250 Attack Power that is
-  // three hits of 90 (270), in line with the Rangefinder's Lens's 10 percent
-  // of a 230 DPS heroic for its 12 sec (about 276). The third one quenches:
+  // three hits of 90 (270), in line with a five-man heroic trinket's budget:
+  // 10 percent of a 230 DPS heroic for 12 sec (about 276). The third one quenches:
   // 15 percent slower attacks (the swing interval x 1 / 0.85) for 8 sec.
   quenchwater_flask: {
     cooldown: 120,

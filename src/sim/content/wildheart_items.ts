@@ -118,7 +118,7 @@ export const WILDHEART_BASIN_ITEMS: Record<string, ItemDef> = {
   },
   // The Gorgebloom's rare chase row: item level 23. 2H dps on the
   // weaponDpsBudget(23) x TWOHAND_DPS_MULT curve (13.6 x 1.15, about 15.6 at
-  // speed 3.1); the Voltaic Coil-Staff's stat line.
+  // speed 3.1); the item-level-23 rare caster staff's stat line.
   falls_blessed_staff: {
     id: 'falls_blessed_staff',
     name: 'Falls-Blessed Staff',
