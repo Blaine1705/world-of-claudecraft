@@ -59,9 +59,9 @@ const LISTED = [
   { id: 'guarda_boveda_cerrada', closed: true, at: [0, 74], face: 0, pitch: 0.18, dist: 12 },
   { id: 'puerta_tributo_cerrada', closed: true, at: [0, 116], face: 0, pitch: 0.18, dist: 12 },
   // ---- the first vista ----
-  { id: 'vista_rellano', at: [0, -206], face: 0, pitch: 0.12, dist: 12 },
-  { id: 'vista_rellano_alta', at: [0, -198], face: 0, pitch: 0.42, dist: 30 },
-  { id: 'vista_rellano_cielo', at: [0, -206], face: 0, pitch: -0.28, dist: 9 },
+  { id: 'vista_rellano', at: [0, -218], face: 0, pitch: 0.1, dist: 9 },
+  { id: 'vista_rellano_alta', at: [0, -214], face: 0, pitch: 0.3, dist: 16 },
+  { id: 'vista_rellano_cielo', at: [0, -218], face: 0, pitch: -0.2, dist: 9 },
   { id: 'tunel_de_la_puerta', at: [0, -218], face: PI, yaw: PI, pitch: 0.12, dist: 16 },
   // ---- the route ----
   { id: 'patio_de_la_clave', at: [-4, -186], face: 0.5, yaw: 0.5, pitch: 0.24, dist: 20 },
@@ -164,8 +164,8 @@ const LISTED = [
     rise: 8,
     burst: [200, 1200, 2400, 3600, 5000, 7000, 9000],
   },
-  { id: 'vista_rellano_etapa3', at: [0, -206], face: 0, pitch: 0.12, dist: 12, step: 6 },
-  { id: 'vista_rellano_etapa4', at: [0, -206], face: 0, pitch: 0.12, dist: 12, step: 7 },
+  { id: 'vista_rellano_etapa3', at: [0, -218], face: 0, pitch: 0.1, dist: 9, step: 6 },
+  { id: 'vista_rellano_etapa4', at: [0, -218], face: 0, pitch: 0.1, dist: 9, step: 7 },
   // ---- the gates opening (after the closed shots: /dev sanctum gates) ----
   {
     id: 'puerta_escarcha_abriendose',

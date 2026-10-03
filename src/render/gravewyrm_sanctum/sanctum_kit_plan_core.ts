@@ -26,7 +26,6 @@ import {
   GRAVEWYRM_SANCTUM_FIELD,
   GRAVEWYRM_SANCTUM_VOID_HEIGHT,
   ICE_BRIDGE,
-  KEYSTONE_COURT,
   MELT_CHANNEL,
   RITUAL_VAULT,
   ROAD_BENDS,
@@ -600,9 +599,9 @@ export function planRockDressing(): SanctumKitPlacement[] {
 
 /** The landmarks the layout names without a prop: the natural ice arch
  *  under the Serac Field's bridge path (its deck a hand under the walked
- *  path, its arch and abutments falling into the crevasse), and the inner
- *  face of the sealed gate over the foot of the Landing Stair, the empty
- *  keystone socket at its apex, framing the court. */
+ *  path, its arch and abutments falling into the crevasse). The kit's
+ *  keystone gate face is NOT stood over the Landing Stair: its jambs boxed
+ *  the first vista into a corridor; the socket is the court's plinth prop. */
 export function planLandmarks(): SanctumKitPlacement[] {
   const bridgeLen = Math.abs(ICE_BRIDGE.toZ - ICE_BRIDGE.fromZ);
   return [
@@ -616,16 +615,6 @@ export function planLandmarks(): SanctumKitPlacement[] {
       scale: 1,
       stretch: (bridgeLen + 8) / 26,
       depth: (ICE_BRIDGE.halfWidth * 2) / 6,
-    },
-    {
-      piece: 'Kit_KeystoneSocket',
-      x: 0,
-      z: KEYSTONE_COURT.z0 - 0.5,
-      y: KEYSTONE_COURT.h,
-      rot: 0,
-      scale: 1,
-      // The jambs stand clear of the 12 yd stair.
-      stretch: 1.36,
     },
   ];
 }

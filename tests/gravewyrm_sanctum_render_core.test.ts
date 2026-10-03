@@ -338,6 +338,17 @@ describe('the kit placement plan', () => {
     expect(pieces.has('Kit_Sastrugi')).toBe(false);
   });
 
+  it('keeps the first vista open: nothing tall stands between the landing and the court (lip modules hang below the floor)', () => {
+    expect(plan.some((p) => p.piece === 'Kit_KeystoneSocket')).toBe(false);
+    for (const p of plan) {
+      const inCorridor = Math.abs(p.x) < 14 && p.z > -216 && p.z < -190;
+      if (inCorridor)
+        expect(p.piece, `${p.piece} at ${p.x}, ${p.z}`).not.toMatch(
+          /Crag|GlacierWall|VaultWall|Socket|Serac|Tunnel/,
+        );
+    }
+  });
+
   it('lights every fire prop once', () => {
     const fires = planSanctumFires();
     const props = GRAVEWYRM_SANCTUM_FIELD.props.filter((p) =>
