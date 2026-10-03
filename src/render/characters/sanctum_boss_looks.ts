@@ -308,6 +308,7 @@ SANCTUM_BOSS_LOOKS.sanctum_seal_shackle = {
   height: 2,
   clips: { idle: 'Idle', walk: 'Idle', run: 'Idle', attack: ['Hit'], hit: ['Hit'], death: 'Death' },
   bodyless: true,
+  authoredAtlas: true,
   clickRadius: 1.8,
 };
 

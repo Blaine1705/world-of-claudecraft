@@ -198,6 +198,7 @@ const AUTHORED_ATLAS_DEFS = [
   'sanctum_korgath',
   'sanctum_velkhar',
   'sanctum_korzul',
+  'sanctum_seal_shackle',
 ];
 
 describe('authored surfaces', () => {
