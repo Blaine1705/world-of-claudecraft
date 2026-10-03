@@ -56,6 +56,8 @@ export function chainPullInstanceOnBossAggro(
     ) {
       continue;
     }
+    // A flier pulled off its loop is a target from this tick.
+    mob.hostile = true;
     mob.aiState = 'chase';
     mob.aggroTargetId = target.id;
     mob.inCombat = true;

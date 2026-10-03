@@ -31,10 +31,12 @@ Rules:
 - Kit state rides `Entity.trashKit` and dies with the pull (evade, reset,
   death). Flying patrols (`DungeonSpawnPatrol.altitude`) are flown by
   `mob/patrol.ts`; the landing and the perch dive are this module's.
-- A flying patrol on the wing is nobody's target: the idle pass clears
-  `hostile` every tick it waits more than `FLIER_OUT_OF_REACH` (`mob/patrol.ts`)
-  over the floor, so no swing, charge or spell reaches it from the ground; the
-  mob AI makes it hostile again the tick it is pulled. Its sight is its whole
+- A flying patrol on the wing is nobody's target: the mob AI keeps `hostile`
+  false while it waits more than `FLIER_OUT_OF_REACH` over the floor
+  (`mob/patrol.ts` `flierWaitingAloft`, read in `mob/locomotion.ts`), so no
+  swing, charge or spell reaches it from the ground; every pull path (its own
+  sight, its pack, the boss chain pull, `flier_call.ts`) makes it a target the
+  tick it is pulled. Its sight is its whole
   authored `aggroRadius` whatever the player's level (`flierSightRadius`), and
   pack pulls and the boss chain pull still take it (`patrolFlierAloft`). The
   renderer hides the ground reticle under it (`render/selection_ring.ts`).

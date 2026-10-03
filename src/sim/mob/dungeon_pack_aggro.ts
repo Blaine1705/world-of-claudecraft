@@ -24,6 +24,8 @@ export function aggroDungeonPackmates(
     ) {
       continue;
     }
+    // A flier pulled off its loop is a target from this tick.
+    packmate.hostile = true;
     packmate.aiState = 'chase';
     packmate.aggroTargetId = target.id;
     packmate.inCombat = true;

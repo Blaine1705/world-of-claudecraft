@@ -60,7 +60,9 @@ export function callDownLastFlier(
     }
   }
   if (!best) return false;
-  // The pull the flier's own sight would have made: its pack lands with it.
+  // The pull the flier's own sight would have made: its pack lands with it,
+  // and it is a target from this tick.
+  if (!ctx.aggroMob(mob, best, true)) return false;
   mob.hostile = true;
-  return ctx.aggroMob(mob, best, true);
+  return true;
 }

@@ -32,7 +32,6 @@ import {
   type TrashKitState,
 } from '../../types';
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
-import { FLIER_OUT_OF_REACH } from '../patrol';
 import { holdAreaCast } from './cast_hold';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
 import { callDownLastFlier } from './flier_call';
@@ -165,6 +164,7 @@ export function endTrashKit(mob: Entity): void {
   const st = mob.trashKit;
   if (st?.cast) clearCast(mob, st.cast.castId);
   mob.trashKit = undefined;
+  mob.castHold = undefined;
 }
 
 /** An idle perched mob back on its spawn spot sits on its perch again. */
@@ -646,6 +646,8 @@ function stepMob(
   // the mob AI walked and turned the caster this tick; stand it back on the
   // spot and the facing its bar began with (cast_hold.ts).
   holdAreaCast(ctx, mob, DUNGEONS[inst.dungeonId]?.areaCastsPlant === true);
+  // A mob with no kit came only for its breath cone's hold.
+  if (!kit && mob.perchY === undefined) return;
   const engaged =
     mob.inCombat &&
     mob.aggroTargetId !== null &&
@@ -655,16 +657,9 @@ function stepMob(
     holdPerch(mob);
     // Remember how high it waits (a perch, a flight loop) for its pull.
     mob.airY = mob.pos.y > groundY(ctx, mob) + AIRBORNE ? mob.pos.y : undefined;
-    if (mob.dungeonPatrol?.flightY !== undefined) {
-      // A flying patrol on the wing is nobody's target: no swing, charge or
-      // spell reaches it from the floor (the Knellwyrm's flight in reads the
-      // same way). The mob AI's safety net makes it hostile again at the top
-      // of every tick, so it is a target the tick it is pulled, and whenever
-      // it is low enough to hit.
-      if (mob.pos.y > groundY(ctx, mob) + FLIER_OUT_OF_REACH) mob.hostile = false;
-      // The last pack of a gate never stays on the wing (flier_call.ts).
+    // The last pack of a gate never stays on the wing (flier_call.ts).
+    if (!engaged && mob.dungeonPatrol?.flightY !== undefined)
       callDownLastFlier(ctx, inst, mob, players());
-    }
     return;
   }
   const st = mob.trashKit ?? startTrashKit(ctx, mob, kit, inst);

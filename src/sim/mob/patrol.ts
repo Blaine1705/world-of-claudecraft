@@ -95,10 +95,18 @@ export function updateMobPatrol(ctx: SimContext, mob: Entity): boolean {
 /** A flier this far over the floor is out of every ground attack's reach. */
 export const FLIER_OUT_OF_REACH = 3;
 
-/** Is the mob a flying patrol on the wing, out of reach (so not hostile: the
- *  trash kit's idle pass, mob/trash_kit/driver.ts, clears the flag every tick
- *  it waits that high)? Its pack and a boss's chain pull still bring it down
- *  with the rest. */
+/** Is the mob a flying patrol waiting on its loop, out of every ground
+ *  attack's reach? The mob AI keeps such a mob non-hostile (nobody's target)
+ *  until it is pulled (mob/locomotion.ts). */
+export function flierWaitingAloft(ctx: SimContext, mob: Entity): boolean {
+  if (mob.dungeonPatrol?.flightY === undefined || mob.aiState !== 'idle' || mob.inCombat)
+    return false;
+  return mob.pos.y > ctx.groundPos(mob.pos.x, mob.pos.z).y + FLIER_OUT_OF_REACH;
+}
+
+/** Is the mob a flying patrol on the wing (non-hostile while it waits)? Its
+ *  pack and a boss's chain pull still bring it down with the rest, and make it
+ *  a target at once. */
 export function patrolFlierAloft(mob: Entity): boolean {
   return mob.dungeonPatrol?.flightY !== undefined && mob.aiState === 'idle' && !mob.hostile;
 }
