@@ -1087,7 +1087,8 @@ function concludeKorzul(
   boss: Entity,
   st: KorzulFightState,
 ): void {
-  const thin = thinIceEarned(plateStates(st));
+  // Only a fought kill earns the deed (a dev kill from the ice never does).
+  const thin = st.phase !== 'idle' && thinIceEarned(plateStates(st));
   clearFightObjects(ctx, inst, boss, st);
   releaseAloft(boss);
   const at = localOf(ctx, inst, boss);
