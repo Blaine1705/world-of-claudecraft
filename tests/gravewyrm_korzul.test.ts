@@ -463,7 +463,16 @@ describe('Korzul: the flights (G26)', () => {
     expect(shadow?.scale).toBe(T.descentRadius);
     expect(plateIndexAt((shadow as Entity).pos.x - r.ox, (shadow as Entity).pos.z - r.oz)).toBe(2);
     r.events = [];
-    run(r, T.descentWarn + DT);
+    // He holds his height while the shadow grows, then dives through the
+    // bar's second half (no snap from full height at the end).
+    const floorY = () => r.sim.ctx.groundPos(r.boss.pos.x, r.boss.pos.z).y;
+    run(r, T.descentWarn * 0.4);
+    expect(r.boss.pos.y - floorY()).toBeGreaterThan(T.flightAltitude - 0.01);
+    run(r, T.descentWarn * 0.45);
+    const late = r.boss.pos.y - floorY();
+    expect(late).toBeGreaterThan(0);
+    expect(late).toBeLessThan(T.flightAltitude * 0.2);
+    run(r, T.descentWarn * 0.15 + DT);
     expect(s.phase).toBe('ground');
     expect(s.flights).toBe(1);
     expect(r.boss.damageImmune).toBe(false);

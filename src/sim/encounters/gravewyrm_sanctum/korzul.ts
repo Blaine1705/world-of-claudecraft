@@ -837,7 +837,11 @@ function stepAir(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: KorzulFi
   }
   holdAloft(boss);
   f.t += DT;
-  const y = floorUnder(ctx, inst, f.hoverX, f.hoverZ) + T.flightAltitude;
+  // Crashing Descent: he holds his height while his shadow grows, then dives
+  // through the bar's second half (accelerating), so the landing reads as a
+  // fall onto the plate rather than a snap at the end of the bar.
+  const dive = f.landing ? Math.min(1, f.landing.remaining / (T.descentWarn * 0.5)) : 1;
+  const y = floorUnder(ctx, inst, f.hoverX, f.hoverZ) + T.flightAltitude * dive * dive;
   flyStep(ctx, inst, boss, st, f.hoverX, f.hoverZ, y);
   // The eyes count down; when they close the fire's warning starts.
   if (f.eyes.length > 0) {
