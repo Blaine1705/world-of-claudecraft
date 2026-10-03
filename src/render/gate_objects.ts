@@ -24,6 +24,7 @@ import {
 import { BASTION_OBJECT_TEMPLATES } from '../sim/encounters/sunken_bastion/ids';
 import { dungeonGateAt, dungeonGateStateOf } from '../sim/instances/dungeon_gates';
 import { sharedUniforms } from './gfx';
+import { observeSanctumStoryMarker } from './gravewyrm_sanctum/sanctum_story_core';
 import { gateMemoryKey, observeGate } from './hollow_crypt/crypt_gate_state_core';
 import { isStableIgnivarWaterConduitTransition } from './ignivar_conduit';
 import {
@@ -65,7 +66,12 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
   if (FOUNDRY_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   // The Sanctum's patches, toss rings and story markers (the Calving Face reads
   // the markers' crack step; render/gravewyrm_sanctum).
-  if (SANCTUM_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
+  if (SANCTUM_OBJECT_TEMPLATES.has(e.templateId)) {
+    // A story marker's view reports its crack step to the face's memory (a
+    // template swap rebuilds the view, so every rise is seen here).
+    observeSanctumStoryMarker(e, sharedUniforms.uTime.value);
+    return { encounterAnchor: true, height: 2 };
+  }
   // A Foundry worker camp's state object: its chains draw from the world
   // (stormbrass_foundry/foundry_worker_fx.ts).
   if (foundryWorkerCampPhaseOf(e.templateId) !== null) return { encounterAnchor: true, height: 2 };
