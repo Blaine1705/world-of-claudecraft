@@ -103,6 +103,7 @@ describe('Wildheart Basin premature boss pull', () => {
       'sunken_bastion',
       'drowned_temple',
       'stormbrass_foundry',
+      'gravewyrm_sanctum',
     ]);
     for (const id of OPTED_IN) expect(DUNGEONS[id].bossChainPull, id).toBe(true);
     // Every other dungeon keeps classic pull behavior.
@@ -272,13 +273,16 @@ describe('Wildheart Basin premature boss pull', () => {
     expect(stillIdle.length).toBe(others.length - pack.length);
   });
 
-  it('leaves a dungeon that did not opt in on classic boss-pull behavior', () => {
+  it('wakes the whole Gravewyrm Sanctum too now that its Ice Tomb rework opts in', () => {
     const { sim, player, boss, others } = claim('gravewyrm_sanctum', 'korzul_the_gravewyrm');
 
     sim.aggroMob(boss, player, false);
 
     expect(boss.aiState).toBe('chase');
-    for (const mob of others) expect(mob.aiState, mob.templateId).toBe('idle');
+    for (const mob of others) {
+      expect(mob.aiState, mob.templateId).toBe('chase');
+      expect(mob.aggroTargetId, mob.templateId).toBe(player.id);
+    }
   });
 
   it('draws no rng, so the shared draw order and the parity goldens are unaffected', () => {
