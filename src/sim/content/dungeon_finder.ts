@@ -180,9 +180,23 @@ const STORMBRASS_FOUNDRY_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
 ];
 
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'korgath_the_bound', mechanics: ['shuddering_stomp', 'enrage'] },
+  {
+    mobId: 'korgath_the_bound',
+    mechanics: ['seal_shackles', 'chain_strain', 'korgath_stomp', 'enrage'],
+  },
   { mobId: 'grand_necromancer_velkhar', mechanics: ['summons_adds'] },
   { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['grave_inferno', 'enrage'] },
+];
+
+// The heroic tier adds each boss's heroic twists (its own array, so the normal
+// preview never carries them).
+const GRAVEWYRM_SANCTUM_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'korgath_the_bound',
+    mechanics: [...GRAVEWYRM_SANCTUM_ENCOUNTERS[0].mechanics, 'rerivet_last_link'],
+  },
+  GRAVEWYRM_SANCTUM_ENCOUNTERS[1],
+  GRAVEWYRM_SANCTUM_ENCOUNTERS[2],
 ];
 
 const NYTHRAXIS_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
@@ -437,7 +451,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'gravewyrm_sanctum',
-    encounters: GRAVEWYRM_SANCTUM_ENCOUNTERS,
+    encounters: GRAVEWYRM_SANCTUM_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {

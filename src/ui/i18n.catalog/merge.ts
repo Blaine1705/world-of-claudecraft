@@ -688,6 +688,15 @@ const mergeStringsEn = {
       sanctum_ice_block_toss: 'Ice Block Toss',
       sanctum_tusker_tusk_sweep: 'Tusk Sweep',
       sanctum_tusker_trample: 'Trample',
+      // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts). Only the
+      // Goadsmith's heroic Re-rivet can be kicked.
+      sanctum_korgath_maul_arc: 'Maul Arc',
+      sanctum_korgath_chain_flail: 'Chain Flail',
+      sanctum_korgath_threshold_charge: 'Threshold Charge',
+      sanctum_korgath_foremans_bellow: "Foreman's Bellow",
+      sanctum_korgath_strain: 'Strain',
+      sanctum_korgath_stomp: 'Shuddering Stomp',
+      sanctum_goadsmith_rerivet: 'Re-rivet',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

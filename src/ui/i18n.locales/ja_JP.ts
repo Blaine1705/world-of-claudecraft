@@ -14102,6 +14102,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.ogre_sledge_hauler.name': 'オーガのそり引き',
   'entities.mobs.glacier_splinter.name': '氷河の破片',
   'entities.mobs.sledge_tusker.name': 'そり引きの巨牙獣',
+  'entities.mobs.sanctum_shackle_hammer.name': '大槌の枷',
+  'entities.mobs.sanctum_shackle_tongs.name': '火ばさみの枷',
+  'entities.mobs.sanctum_shackle_anvil.name': '金床の枷',
+  'entities.mobs.sanctum_shackle_bellows.name': 'ふいごの枷',
   'entities.mobs.apprentice_wren.name': '見習いレン',
   'entities.mobs.barrow_wight.name': '塚のワイト',
   'entities.mobs.castaway_navigator.name': '航海士スリ',
@@ -20025,6 +20029,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_ice_block_toss': '氷塊投げ',
   'abilityUi.cast.sanctum_tusker_tusk_sweep': '牙薙ぎ',
   'abilityUi.cast.sanctum_tusker_trample': '踏みつぶし',
+  'abilityUi.cast.sanctum_korgath_maul_arc': '大槌の弧撃',
+  'abilityUi.cast.sanctum_korgath_chain_flail': '鎖の鞭打ち',
+  'abilityUi.cast.sanctum_korgath_threshold_charge': '境界の突進',
+  'abilityUi.cast.sanctum_korgath_foremans_bellow': '親方の咆哮',
+  'abilityUi.cast.sanctum_korgath_strain': '鎖の引き締め',
+  'abilityUi.cast.sanctum_korgath_stomp': '震える踏みつけ',
+  'abilityUi.cast.sanctum_goadsmith_rerivet': '再鋲打ち',
   'entities.mobs.thorn_sprout.name': '茨の芽',
   'hudChrome.finder.mech.pack_bond': '群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）',
   'hudChrome.finder.mech.stalk':
@@ -20042,6 +20053,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '狩りの魂（獲物は化身を光る太陽紋へ導く。噛み倒された者には逃げる猶予がある）',
   'hudChrome.finder.mech.twin_prey_ambush':
     '双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）',
+  'hudChrome.finder.mech.seal_shackles':
+    '封印の枷（鎖を1本断つごとに彼の被ダメージが20%増え、攻撃が1つ解き放たれる）',
+  'hudChrome.finder.mech.chain_strain': '鎖の引き締め（鎖がまだ残る柱から離れる）',
+  'hudChrome.finder.mech.korgath_stomp': '震える踏みつけ（彼の周りの輪から出る）',
+  'hudChrome.finder.mech.rerivet_last_link':
+    '再鋲打ちと最後の環（鎖を打ち直す突き棒鍛冶を阻止する。鎖が残り1本になると10秒ごとに鎖の引き締め）',
   'hudChrome.wildheartAlert.preyTitle': 'お前が獲物だ！',
   'hudChrome.wildheartAlert.preyLine': 'ズルガーが狙っている：光る太陽紋を通らせろ',
   'hudChrome.wildheartAlert.preyWaitLine': '今はもう一人の獲物を追っている：備えろ、標的が変わる',

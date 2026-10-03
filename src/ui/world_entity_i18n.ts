@@ -364,6 +364,11 @@ const MOB_IDS = [
   'ogre_sledge_hauler',
   'glacier_splinter',
   'sledge_tusker',
+  // Korgath's Seal Shackles (encounters/gravewyrm_sanctum/korgath.ts).
+  'sanctum_shackle_hammer',
+  'sanctum_shackle_tongs',
+  'sanctum_shackle_anvil',
+  'sanctum_shackle_bellows',
   // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
   'thorn_sprout',
 ] as const;

@@ -14064,6 +14064,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.ogre_sledge_hauler.name': '썰매 끄는 오우거',
   'entities.mobs.glacier_splinter.name': '빙하 파편',
   'entities.mobs.sledge_tusker.name': '썰매 끄는 거대엄니',
+  'entities.mobs.sanctum_shackle_hammer.name': '망치 족쇄',
+  'entities.mobs.sanctum_shackle_tongs.name': '집게 족쇄',
+  'entities.mobs.sanctum_shackle_anvil.name': '모루 족쇄',
+  'entities.mobs.sanctum_shackle_bellows.name': '풀무 족쇄',
   'entities.mobs.apprentice_wren.name': '견습생 렌',
   'entities.mobs.barrow_wight.name': '봉분 망자',
   'entities.mobs.castaway_navigator.name': '항해사 술리',
@@ -20016,6 +20020,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_ice_block_toss': '얼음덩이 던지기',
   'abilityUi.cast.sanctum_tusker_tusk_sweep': '엄니 휩쓸기',
   'abilityUi.cast.sanctum_tusker_trample': '짓밟기',
+  'abilityUi.cast.sanctum_korgath_maul_arc': '대망치 호격',
+  'abilityUi.cast.sanctum_korgath_chain_flail': '사슬 채찍',
+  'abilityUi.cast.sanctum_korgath_threshold_charge': '문턱 돌진',
+  'abilityUi.cast.sanctum_korgath_foremans_bellow': '감독관의 포효',
+  'abilityUi.cast.sanctum_korgath_strain': '사슬 당기기',
+  'abilityUi.cast.sanctum_korgath_stomp': '전율의 발구르기',
+  'abilityUi.cast.sanctum_goadsmith_rerivet': '재리벳',
   'entities.mobs.thorn_sprout.name': '가시 새싹',
   'hudChrome.finder.mech.pack_bond': '무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)',
   'hudChrome.finder.mech.stalk':
@@ -20033,6 +20044,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '사냥의 영혼 (사냥감이 화신을 빛나는 태양 문양으로 끌고 가세요. 물어뜯긴 플레이어는 도망칠 시간을 얻습니다)',
   'hudChrome.finder.mech.twin_prey_ambush':
     '두 사냥감과 매복 (사냥감 둘, 이후 가장 먼 플레이어를 덮칩니다)',
+  'hudChrome.finder.mech.seal_shackles':
+    '봉인 족쇄(사슬을 하나 끊을 때마다 그가 받는 피해가 20% 늘고 공격 하나가 풀려남)',
+  'hudChrome.finder.mech.chain_strain': '사슬 당기기(사슬이 아직 남은 모든 기둥에서 물러서기)',
+  'hudChrome.finder.mech.korgath_stomp': '전율의 발구르기(그의 주변 고리 밖으로 나가기)',
+  'hudChrome.finder.mech.rerivet_last_link':
+    '재리벳과 마지막 고리(사슬을 다시 박는 몰이막대장이를 차단, 사슬이 하나 남으면 10초마다 사슬 당기기)',
   'hudChrome.wildheartAlert.preyTitle': '당신이 사냥감입니다!',
   'hudChrome.wildheartAlert.preyLine': '줄가르가 당신을 쫓습니다: 빛나는 태양 문양으로 끌고 가세요',
   'hudChrome.wildheartAlert.preyWaitLine':

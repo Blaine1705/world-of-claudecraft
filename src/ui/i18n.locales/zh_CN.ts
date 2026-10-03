@@ -13417,6 +13417,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.ogre_sledge_hauler.name': '食人魔拉橇工',
   'entities.mobs.glacier_splinter.name': '冰川碎片',
   'entities.mobs.sledge_tusker.name': '拖橇巨牙兽',
+  'entities.mobs.sanctum_shackle_hammer.name': '铁锤镣铐',
+  'entities.mobs.sanctum_shackle_tongs.name': '铁钳镣铐',
+  'entities.mobs.sanctum_shackle_anvil.name': '铁砧镣铐',
+  'entities.mobs.sanctum_shackle_bellows.name': '风箱镣铐',
   'entities.mobs.apprentice_wren.name': '学徒雯恩',
   'entities.mobs.barrow_wight.name': '古冢尸妖',
   'entities.mobs.castaway_navigator.name': '领航员苏莉',
@@ -19045,6 +19049,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_ice_block_toss': '投掷冰块',
   'abilityUi.cast.sanctum_tusker_tusk_sweep': '獠牙横扫',
   'abilityUi.cast.sanctum_tusker_trample': '践踏',
+  'abilityUi.cast.sanctum_korgath_maul_arc': '重锤弧斩',
+  'abilityUi.cast.sanctum_korgath_chain_flail': '锁链鞭笞',
+  'abilityUi.cast.sanctum_korgath_threshold_charge': '门槛冲锋',
+  'abilityUi.cast.sanctum_korgath_foremans_bellow': '工头的咆哮',
+  'abilityUi.cast.sanctum_korgath_strain': '绷链',
+  'abilityUi.cast.sanctum_korgath_stomp': '震颤践踏',
+  'abilityUi.cast.sanctum_goadsmith_rerivet': '重铆',
   'entities.mobs.thorn_sprout.name': '荆棘幼芽',
   'hudChrome.finder.mech.pack_bond': '兽群羁绊（两者相邻时伤害减半：将它们拉开15码）',
   'hudChrome.finder.mech.stalk':
@@ -19061,6 +19072,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.spirit_of_the_hunt':
     '狩猎之魂（猎物引着化身穿过点亮的太阳符文；被撕咬的玩家获得逃跑的先机）',
   'hudChrome.finder.mech.twin_prey_ambush': '双重猎物与伏击（两个猎物，随后扑向最远的玩家）',
+  'hudChrome.finder.mech.seal_shackles':
+    '封印镣铐（每打断一条锁链，他受到的伤害提高20%，并解放他的一种攻击）',
+  'hudChrome.finder.mech.chain_strain': '绷链（远离每根锁链仍完好的柱子）',
+  'hudChrome.finder.mech.korgath_stomp': '震颤践踏（离开他周围的圆环）',
+  'hudChrome.finder.mech.rerivet_last_link':
+    '重铆与最后一环（打断重新铆上锁链的刺棒匠；只剩一条锁链时，每10秒绷链一次）',
   'hudChrome.wildheartAlert.preyTitle': '你是猎物！',
   'hudChrome.wildheartAlert.preyLine': '祖尔加在追猎你：引他穿过点亮的太阳符文',
   'hudChrome.wildheartAlert.preyWaitLine': '他正在追另一个猎物：做好准备，他会切换',

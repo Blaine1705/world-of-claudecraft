@@ -14332,6 +14332,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.ogre_sledge_hauler.name': 'Огр-тягач саней',
   'entities.mobs.glacier_splinter.name': 'Осколок ледника',
   'entities.mobs.sledge_tusker.name': 'Санный бивнерог',
+  'entities.mobs.sanctum_shackle_hammer.name': 'Оковы Молота',
+  'entities.mobs.sanctum_shackle_tongs.name': 'Оковы Клещей',
+  'entities.mobs.sanctum_shackle_anvil.name': 'Оковы Наковальни',
+  'entities.mobs.sanctum_shackle_bellows.name': 'Оковы Мехов',
   'entities.mobs.apprentice_wren.name': 'Ученица Рен',
   'entities.mobs.barrow_wight.name': 'Курганное умертвие',
   'entities.mobs.castaway_navigator.name': 'Штурман Сули',
@@ -20404,6 +20408,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_ice_block_toss': 'Бросок ледяной глыбы',
   'abilityUi.cast.sanctum_tusker_tusk_sweep': 'Взмах бивнями',
   'abilityUi.cast.sanctum_tusker_trample': 'Растаптывание',
+  'abilityUi.cast.sanctum_korgath_maul_arc': 'Дуга кувалды',
+  'abilityUi.cast.sanctum_korgath_chain_flail': 'Цепной хлыст',
+  'abilityUi.cast.sanctum_korgath_threshold_charge': 'Рывок через порог',
+  'abilityUi.cast.sanctum_korgath_foremans_bellow': 'Рёв бригадира',
+  'abilityUi.cast.sanctum_korgath_strain': 'Натяжение',
+  'abilityUi.cast.sanctum_korgath_stomp': 'Сотрясающий топот',
+  'abilityUi.cast.sanctum_goadsmith_rerivet': 'Переклёпка',
   'entities.mobs.thorn_sprout.name': 'Терновый росток',
   'hudChrome.finder.mech.pack_bond':
     'Узы стаи (вместе получают вдвое меньше урона: разведите их на 15 ярдов)',
@@ -20424,6 +20435,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Дух охоты (Добыча уводит аватара через горящие солнечные глифы; растерзанный игрок получает фору)',
   'hudChrome.finder.mech.twin_prey_ambush':
     'Двойная добыча и Засада (две Добычи, затем прыжок на самого дальнего игрока)',
+  'hudChrome.finder.mech.seal_shackles':
+    'Печатные оковы (каждая разбитая цепь увеличивает получаемый им урон на 20% и освобождает одну из его атак)',
+  'hudChrome.finder.mech.chain_strain': 'Натяжение (отойдите от каждого столпа, чья цепь ещё цела)',
+  'hudChrome.finder.mech.korgath_stomp': 'Сотрясающий топот (выйдите из кольца вокруг него)',
+  'hudChrome.finder.mech.rerivet_last_link':
+    'Переклёпка и Последнее звено (прервите кузнеца-погонщика, заново склёпывающего цепь; когда остаётся одна цепь, Натяжение каждые 10 секунд)',
   'hudChrome.wildheartAlert.preyTitle': 'Вы добыча!',
   'hudChrome.wildheartAlert.preyLine':
     'Зулгар охотится на вас: ведите его через горящие солнечные глифы',

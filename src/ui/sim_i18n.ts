@@ -1430,6 +1430,19 @@ const baseEnTable = {
   'mechanic.sanctumTuskSweep': 'Tusk Sweep',
   'mechanic.sanctumTrample': 'Trample',
   'mechanic.sanctumSpilledBraziers': 'Spilled Braziers',
+  // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts): his lines as
+  // the chains come off (EXACT), his mechanic and aura names.
+  'log.sanctumKorgathPull': 'The lock holds! No one passes the foreman!',
+  'log.sanctumKorgathChain1': 'Who... who holds the line?',
+  'log.sanctumKorgathChain2': 'The quench. Does it hold?',
+  'log.sanctumKorgathChain3': 'I remember the forge... I remember the seal...',
+  'log.sanctumKorgathFree': 'The lock is open. Maker, forgive your foreman.',
+  'mechanic.sanctumMaulArc': 'Maul Arc',
+  'mechanic.sanctumChainFlail': 'Chain Flail',
+  'mechanic.sanctumThresholdCharge': 'Threshold Charge',
+  'mechanic.sanctumForemansBellow': "Foreman's Bellow",
+  'mechanic.sanctumStrain': 'Strain',
+  'aura.sanctumLockbound': 'Lockbound',
   // The Wildheart Basin's three bosses (encounters/wildheart_basin: beastmaster.ts,
   // gorgebloom.ts, zulgar.ts): their yells and log lines (EXACT) and the
   // mechanic and aura names.
@@ -17898,6 +17911,14 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Tusk Sweep': 'mechanic.sanctumTuskSweep',
   Trample: 'mechanic.sanctumTrample',
   'Spilled Braziers': 'mechanic.sanctumSpilledBraziers',
+  // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts); his Shuddering
+  // Stomp and Enrage share the keys above.
+  'Maul Arc': 'mechanic.sanctumMaulArc',
+  'Chain Flail': 'mechanic.sanctumChainFlail',
+  'Threshold Charge': 'mechanic.sanctumThresholdCharge',
+  "Foreman's Bellow": 'mechanic.sanctumForemansBellow',
+  Strain: 'mechanic.sanctumStrain',
+  Lockbound: 'aura.sanctumLockbound',
   'Jaguar Bite': 'mechanic.wildheartJaguarBite',
   'Beast Pit Quake': 'mechanic.wildheartBeastPitQuake',
   'Vine Lash': 'mechanic.wildheartVineLash',

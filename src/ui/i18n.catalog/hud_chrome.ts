@@ -8860,6 +8860,13 @@ export const hudChromeStrings = {
       spirit_of_the_hunt:
         'Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)',
       twin_prey_ambush: 'Twin Prey and Ambush (two Prey, then a pounce on the farthest player)',
+      // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts).
+      seal_shackles:
+        'Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)',
+      chain_strain: 'Strain (step away from every pillar whose chain still holds)',
+      korgath_stomp: 'Shuddering Stomp (step out of the ring round him)',
+      rerivet_last_link:
+        'Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)',
     },
   },
   // The Gaol Turnkey's Iron Cage escape prompt (src/ui/hud/dungeon/cage_escape).
