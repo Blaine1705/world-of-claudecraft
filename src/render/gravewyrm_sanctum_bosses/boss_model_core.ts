@@ -157,6 +157,17 @@ export const KORGATH_WHOLE_GESTURE: Readonly<Record<SealTool, string>> = {
 /** Korzul's frozen stance (before his pull) and the takeoff one-shot. */
 export const KORZUL_FROZEN_STANCE = 'sanctum_korzul_frozen';
 export const KORZUL_TAKEOFF_GESTURE = 'sanctum_korzul_takeoff';
+/** Before his pull the showpiece is the frozen Korzul inside the Calving Face
+ *  (the environment's static GLB): the boss's own body hides until the face
+ *  collapses (story step 8) or he is pulled, then shows for his BreakFree. */
+export const KORZUL_HIDE_GESTURE = 'sanctum_korzul_hide';
+export const KORZUL_SHOW_GESTURE = 'sanctum_korzul_show';
+
+/** Whether Korzul's own body is hidden: still in the ice (the story below
+ *  step 8, not in combat, not dead). */
+export function korzulBodyHidden(storyStep: number, inCombat: boolean, dead: boolean): boolean {
+  return storyStep < 8 && !inCombat && !dead;
+}
 /** Velkhar's thaw channel played off a pyre flare. */
 export const VELKHAR_THAW_GESTURE = 'sanctum_velkhar_thaw_gesture';
 

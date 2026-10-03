@@ -53,6 +53,8 @@ import {
   KORZUL_FROZEN_STANCE,
   KORZUL_HEARTBEAT_FLARE_GESTURE,
   KORZUL_HEARTBEAT_GESTURE,
+  KORZUL_HIDE_GESTURE,
+  KORZUL_SHOW_GESTURE,
   KORZUL_TAKEOFF_GESTURE,
   VELKHAR_BODY,
   VELKHAR_CLIP,
@@ -250,6 +252,9 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     hover: -0.25 / KORZUL_BODY.simScale,
     flight: true,
     clips: KORZUL_CLIPS,
+    // Still in the ice the showpiece is the environment's frozen Korzul in the
+    // Calving Face: his own body hides until the face collapses or he is pulled.
+    meshToggles: [{ nodes: ['*'], hideNow: KORZUL_HIDE_GESTURE, showNow: KORZUL_SHOW_GESTURE }],
     phaseClips: {
       [KORZUL_FROZEN_STANCE]: { clips: KORZUL_FROZEN_CLIPS },
       // The emergence bar itself plays BreakFree (castByAbility); the stance

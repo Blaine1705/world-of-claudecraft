@@ -129,8 +129,11 @@ import {
   KORZUL_FROZEN_STANCE,
   KORZUL_HEARTBEAT_FLARE_GESTURE,
   KORZUL_HEARTBEAT_GESTURE,
+  KORZUL_HIDE_GESTURE,
   KORZUL_MOUTH_REST,
+  KORZUL_SHOW_GESTURE,
   KORZUL_TAKEOFF_GESTURE,
+  korzulBodyHidden,
   VELKHAR_FLAME_GESTURE,
   VELKHAR_FLAME_Y,
   VELKHAR_THAW_GESTURE,
@@ -1535,11 +1538,13 @@ export class SanctumBossFx {
       }
     const z = this.entity(this.korzulId);
     if (z) {
-      const frozen = this.storyStep < 8 && !z.inCombat;
+      const frozen = korzulBodyHidden(this.storyStep, z.inCombat, z.dead);
       if (frozen) {
         play(z.id, KORZUL_FROZEN_STANCE);
+        play(z.id, KORZUL_HIDE_GESTURE);
         this.frozenSent.add(z.id);
       } else if (this.frozenSent.has(z.id)) {
+        play(z.id, KORZUL_SHOW_GESTURE);
         play(z.id, KORZUL_BREAK_FREE);
         this.frozenSent.delete(z.id);
       }

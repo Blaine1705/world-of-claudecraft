@@ -155,3 +155,18 @@ describe('the Sanctum bosses draw their own bodies', () => {
     expect(clips.get('FlyIdle')?.tracks.map((t) => t.name)).toEqual(['Root.quaternion']);
   });
 });
+
+describe('Korzul in the ice: one dragon on screen', () => {
+  it('his own body hides until the face collapses or he is pulled', async () => {
+    const core = await import('../src/render/gravewyrm_sanctum_bosses/boss_model_core');
+    expect(core.korzulBodyHidden(0, false, false)).toBe(true);
+    expect(core.korzulBodyHidden(7, false, false)).toBe(true);
+    expect(core.korzulBodyHidden(8, false, false)).toBe(false);
+    expect(core.korzulBodyHidden(3, true, false)).toBe(false);
+    expect(core.korzulBodyHidden(3, false, true)).toBe(false);
+    const look = VISUALS.sanctum_korzul;
+    expect(look.meshToggles).toEqual([
+      { nodes: ['*'], hideNow: core.KORZUL_HIDE_GESTURE, showNow: core.KORZUL_SHOW_GESTURE },
+    ]);
+  });
+});
