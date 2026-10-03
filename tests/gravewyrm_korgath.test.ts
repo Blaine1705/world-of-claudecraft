@@ -616,7 +616,6 @@ describe('Korgath the Bound: the live sim (mob AI on)', () => {
     r.me.pos = at(r, 0, -120);
     r.me.prevPos = { ...r.me.pos };
     r.me.devNoAggro = true;
-    sim.ctx.dropThreat?.(r.boss, r.me.id);
     r.boss.aggroTargetId = null;
     r.boss.inCombat = false;
     r.boss.aiState = 'evade';
