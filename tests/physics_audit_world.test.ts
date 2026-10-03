@@ -17,6 +17,7 @@ import {
 import {
   ARENA_X,
   BUILTIN_WORLD,
+  DUNGEON_X_THRESHOLD,
   DUNGEONS,
   GATHER_NODES,
   instanceOrigin,
@@ -226,6 +227,27 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
     // The Abandoned Crypt draws no arch (invisible click box): no jambs.
     const nyth = DUNGEONS.nythraxis_crypt.doorPos;
     expect(isBlocked(SEED, nyth.x + DOOR_ARCH_JAMB_X, nyth.z, 0.4)).toBe(false);
+  });
+
+  it('the Sanctum Seal Gate pylons block while its mouth stays a walkable trigger lane', () => {
+    // The Seal Gate (src/sim/sanctum_seal_gate.ts) hands its own pylons in
+    // place of the generic jambs: the plinths wall |x| 2.0 to 5.3, the lane
+    // between them is the walk-in trigger, and the exit drop 4yd south is open.
+    const door = DUNGEONS.gravewyrm_sanctum.doorPos;
+    for (const sx of [-1, 1]) {
+      expect(isBlocked(SEED, door.x + sx * 3.65, door.z, 0.4), `pylon ${sx}`).toBe(true);
+      expect(isBlocked(SEED, door.x + sx * DOOR_ARCH_JAMB_X, door.z, 0.4), `no jamb ${sx}`).toBe(
+        false,
+      );
+    }
+    expect(isBlocked(SEED, door.x, door.z, 0.5)).toBe(false);
+    expect(isBlocked(SEED, door.x, door.z - 4, 0.6)).toBe(false);
+    const sim = makeSim();
+    teleport(sim, door.x, door.z - 8, 0);
+    hold(sim, { forward: true }, 40);
+    expect(sim.player.pos.x, 'walked through the gate into the instance').toBeGreaterThan(
+      DUNGEON_X_THRESHOLD,
+    );
   });
 
   it('the delve arch slab is solid and the exit drop lands clear of it', () => {
