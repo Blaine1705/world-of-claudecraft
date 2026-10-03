@@ -18,6 +18,9 @@
 //    lantern light racing out
 //    over the floor. It replaces the generic nova for this mob.
 //
+//  The drowned (bastion_drowned_fx.ts) write their drips, sprays and death
+//  gush into these same two particle draws.
+//
 // Rules (src/render/CLAUDE.md): everything is built once and pooled, rides
 // the Bastion telegraph root (one compile gate), and nothing allocates per
 // frame. Cosmetic only: the damage is already the sim's, so the particle
@@ -55,6 +58,7 @@ import {
   TURNKEY_LANTERN_HIGH,
   TURNKEY_RAW_HEIGHT,
 } from './bastion_creature_fx_core';
+import { BastionDrownedFx } from './bastion_drowned_fx';
 
 const BOLT_SLOTS = 8;
 const FLARE_SLOTS = 3;
@@ -308,6 +312,7 @@ export class BastionCreatureFx {
   private readonly mist: Particles;
   private readonly bolts: BoltSlot[] = [];
   private readonly flares: FlareSlot[] = [];
+  private readonly drowned: BastionDrownedFx;
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly tmp = { x: 0, y: 0, z: 0 };
@@ -362,7 +367,7 @@ export class BastionCreatureFx {
       floorVfxRenderOrder('encounter', 30),
     );
     this.glow = new Particles(
-      Math.round(520 * this.density),
+      Math.round(680 * this.density),
       shader(PARTICLE_FRAG, THREE.AdditiveBlending),
       floorVfxRenderOrder('encounter', 32),
     );
@@ -372,6 +377,7 @@ export class BastionCreatureFx {
     }
     this.buildBolts(root);
     this.buildFlares(root);
+    this.drowned = new BastionDrownedFx(this.glow, this.mist, world, this.density, reducedMotion);
     for (const m of root.children) tagVfxSubtree(m);
   }
 
@@ -496,6 +502,7 @@ export class BastionCreatureFx {
 
   /** Claims an arbalest's shot or the Turnkey's call; true when it drew it. */
   handleEvent(ev: SimEvent): boolean {
+    this.drowned.observe(ev, this.clock);
     if (ev.type !== 'spellfx' || !this.world) return false;
     const source = this.world.entities.get(ev.sourceId);
     if (!source || source.kind !== 'mob') return false;
@@ -812,6 +819,7 @@ export class BastionCreatureFx {
         slot.ring.visible = false;
       }
     }
+    this.drowned.update(now);
     this.glow.update(now);
     this.mist.update(now);
   }

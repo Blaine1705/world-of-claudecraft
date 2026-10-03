@@ -836,6 +836,8 @@ const RENDER_PURE_CORES = [
   'src/render/sunken_bastion/bastion_boss_fx_core.ts',
   'src/render/sunken_bastion/bastion_rain_core.ts',
   'src/render/sunken_bastion/bastion_creature_fx_core.ts',
+  // The drowned garrison's drips, sprays and death gush.
+  'src/render/sunken_bastion/bastion_drowned_fx_core.ts',
   // The fifth pass's cage, anchor, shackle and reaper visual plan.
   'src/render/sunken_bastion/bastion_gaol_reaper_core.ts',
   'src/render/authored_field/field_edge_plan_core.ts',
