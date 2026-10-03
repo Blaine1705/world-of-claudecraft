@@ -268,7 +268,7 @@ export class FoundryFx {
         slot.since = this.clock;
       }
       const radius = obj.scale;
-      const fill = foundryTimedFill(this.clock - slot.since, spec.fillSeconds(radius));
+      const fill = foundryTimedFill(this.clock - slot.since, spec.fillSeconds(radius, obj.name));
       const yaw = spec.sigil ? this.clock * 0.9 : 0;
       this.kit.drapeFan(
         slot,

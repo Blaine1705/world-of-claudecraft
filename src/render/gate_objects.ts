@@ -90,9 +90,11 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
 }
 
 /** A template swap the object's view survives as it stands (no rebuild): the
- *  Ignivar conduit's own stable pairs, and a Rangewarden shell arming (its
- *  empty anchor is the same before and after; a rebuild a shell, eight a
- *  mark, would only flash the view's stand-in plate). */
+ *  Ignivar conduit's own stable pairs and a Rangewarden shell arming (each
+ *  empty anchor is the same before and after; a rebuild would only flash the
+ *  view's stand-in plate). A Sanctum story marker's step change DOES rebuild
+ *  its empty anchor: the rebuild is what reports the new crack step to the
+ *  Calving Face's memory (gravewyrm_sanctum/sanctum_story_core.ts). */
 export function isStableObjectTransition(from: string, to: string): boolean {
   if (from === FOUNDRY_SHELL_PENDING && to === FOUNDRY_SHELL_MARK) return true;
   return isStableIgnivarWaterConduitTransition(from, to);

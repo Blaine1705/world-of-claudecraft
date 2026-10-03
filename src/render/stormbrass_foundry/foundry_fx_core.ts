@@ -175,8 +175,8 @@ export interface FoundryObjectSpec {
   color: number;
   accent: number;
   /** Seconds the ring takes to fill (its moment is at 1; 0 = full at once,
-   *  a standing zone rather than a countdown). */
-  fillSeconds: (radius: number) => number;
+   *  a standing zone rather than a countdown), from its radius and its name. */
+  fillSeconds: (radius: number, name?: string) => number;
   /** A glyph instead of a filling footprint (a thing to take, not to dodge). */
   sigil?: boolean;
   /** The footprint's strength (1 = full; a pending shell reads dimmer). */
@@ -192,7 +192,7 @@ export const FOUNDRY_OBJECT_SPECS: Readonly<Record<string, FoundryObjectSpec>> =
   [FOUNDRY_BURST_RING]: {
     color: TELEGRAPH_THREAT_COLORS.danger,
     accent: FOUNDRY_ACCENTS.steam,
-    fillSeconds: (radius) => burstDelayForRadius(radius),
+    fillSeconds: (radius, name) => burstDelayForRadius(radius, name),
   },
   // A Scrap Toss plate about to land.
   [FOUNDRY_SCRAP_MARK]: {
@@ -416,24 +416,29 @@ export function beltLooks(
 }
 
 /** The death-burst delay the templates author for a ring of this radius (the
- *  ring carries only its radius; the delay is read back from the content). */
-const delays = new Map<number, number>();
+ *  ring carries its radius and its mob's name; the delay is read back from the
+ *  content). Two templates can share a radius with different fuses (a Steam
+ *  Bruiser's 6 yd boiler at 1.5 s, a Glacier Splinter's 6 yd Shatter at 2 s),
+ *  so a template of the ring's own name wins over the nearest radius. */
+const delays = new Map<string, number>();
 
-export function burstDelayForRadius(radius: number): number {
-  const cached = delays.get(radius);
+export function burstDelayForRadius(radius: number, name?: string): number {
+  const key = `${radius}|${name ?? ''}`;
+  const cached = delays.get(key);
   if (cached !== undefined) return cached;
   let best = 1.5;
   let bestGap = Infinity;
   for (const t of Object.values(MOBS)) {
     const b = t.trashKit?.deathBurst;
     if (!b || b.delay <= 0) continue;
-    const gap = Math.abs(b.radius - radius);
+    // Its own template: an exact name beats any radius match.
+    const gap = Math.abs(b.radius - radius) + (name !== undefined && t.name === name ? -1e6 : 0);
     if (gap < bestGap) {
       bestGap = gap;
       best = b.delay;
     }
   }
-  delays.set(radius, best);
+  delays.set(key, best);
   return best;
 }
 

@@ -139,6 +139,17 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/wildheart_basin/basin_splash.ts', layer: 'ground', strict: true },
   // The Pack Bond's ground glows under master and jaguar (the lowest encounter rung).
   { file: 'src/render/wildheart_basin/bond_cord.ts', layer: 'encounter', strict: true },
+  // The Gravewyrm Sanctum's telegraphs (the shared kit), the soulfire patches'
+  // glow and flames, the shock rings and the particle pools.
+  { file: 'src/render/gravewyrm_sanctum_fx/sanctum_fx.ts', layer: 'encounter', strict: true },
+  // The Sanctum trash's aura glows pooled under the goaded and stoked mobs.
+  {
+    file: 'src/render/gravewyrm_sanctum_fx/sanctum_trash_fx.ts',
+    layer: 'encounter',
+    strict: true,
+  },
+  // The Sledge Tusker's enrage glow pooled on the ice round its feet.
+  { file: 'src/render/gravewyrm_sanctum_fx/tusker_fx.ts', layer: 'encounter', strict: true },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },
