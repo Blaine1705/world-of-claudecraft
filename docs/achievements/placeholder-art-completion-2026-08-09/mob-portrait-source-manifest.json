@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "3905ab436b08cc23813588d6146793893f61a75051dbfa6c09ad9476afaf10a8",
+  "rendererFingerprint": "85b52d8967882475c2bce98350718bb47fd275d1fd60f7c21eb625f0d616cee5",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5474133,
-      "sha256": "b95eb6d858431b718a0f6d1c6ead504912531b9b463c7070764e4724f9e8aaa4",
+      "bytes": 5475969,
+      "sha256": "3a658f3fb29999f846a061b477ae940e636a59a24fb91db2a6f1cba3b2b795f1",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -432,8 +432,8 @@
         "model": {
           "url": "models/creatures/drowned_anchor.glb",
           "path": "public/models/creatures/drowned_anchor.glb",
-          "bytes": 269152,
-          "sha256": "652e57ba0244986e019ded50bff44a6daee39ad73abb7aedd2e5ac70ec10f8c1"
+          "bytes": 513480,
+          "sha256": "d9d2bf8eda6826102cd8c48220f7ce2adc509f7eb05d8c0606fe50949c8b57ab"
         },
         "idle": "Idle",
         "height": 6.64,
@@ -450,11 +450,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bbf65153be47b78d5ef1fa8372f93290736c9aa995d0435097fee4bab4d6f903",
+      "sourceFingerprint": "9215049ef76eae054624e09795d3efb697431ffb835bc44e0993ef4c5e9bf2b8",
       "output": {
         "path": "public/ui/mobs/bastion_drowned_anchor.webp",
-        "bytes": 1728,
-        "sha256": "567a6c469235507aacaf31df3573b48a61965f77a93b34e276736ee8ba037d1f"
+        "bytes": 1664,
+        "sha256": "8752c02705794e686307a275f1cdb520f634b4ea27ecd922e1382cdb4a664c0f"
       }
     },
     {
@@ -466,8 +466,8 @@
         "model": {
           "url": "models/creatures/gaol_cage.glb",
           "path": "public/models/creatures/gaol_cage.glb",
-          "bytes": 377740,
-          "sha256": "71f0b26087df106c08c841b13249fb1cd5c60f44b84a7b120d3aee7ffbb8e535"
+          "bytes": 565080,
+          "sha256": "d2da328d9b5595f414a1d820fb8a256f1ca39cfafa590f6785c2eedd6e842c77"
         },
         "idle": "Idle",
         "height": 8.27,
@@ -484,11 +484,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "af61bc603908ad9bc108ab34be1a25458bd25d22fb42f775dc45dbbbb2b7b4fd",
+      "sourceFingerprint": "e1643febcf389257223f754ef6902fcb52d222fbccbffdf4590f5b5fae0f157a",
       "output": {
         "path": "public/ui/mobs/bastion_gaol_cage.webp",
-        "bytes": 2342,
-        "sha256": "1433a6b6fbe30832db3782cda2024effafc47fb5b96cfc2db172c569f7f012b0"
+        "bytes": 2296,
+        "sha256": "e7dadbae7eac0b683373778ff03e8d728a1a2f9c5eb8570d6bbfece01a2a9c33"
       }
     },
     {
@@ -1438,8 +1438,8 @@
         "model": {
           "url": "models/creatures/crypt_gargoyle.glb",
           "path": "public/models/creatures/crypt_gargoyle.glb",
-          "bytes": 1080716,
-          "sha256": "70881edd0b93f0ee18dd8cbce0173a7845922717a8be2625badb13b9f36eed57"
+          "bytes": 1982324,
+          "sha256": "6ce1811d4c3a86180074ce40ebf61734318077a732d5b7f440510820ad76387a"
         },
         "idle": "Perch",
         "height": 5.81,
@@ -1456,11 +1456,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "51de22576aef0fdf6fac9280704edc2955c1ea94ed445931c09211dce0e5ff85",
+      "sourceFingerprint": "7d01f5eeca2cf6b4c9e5d2725d2337f6b642df6f9a3a586f925678b11730f5f4",
       "output": {
         "path": "public/ui/mobs/crypt_chapel_gargoyle.webp",
-        "bytes": 2126,
-        "sha256": "26a84b566798baa1693121e72e4eaa65bc5ef9892a21104d21541e348ad6ed70"
+        "bytes": 2152,
+        "sha256": "ceb14a77d74a257f1dba64c6efb77434408c905fecc0409bdb42ac305e1af42c"
       }
     },
     {
@@ -1600,8 +1600,8 @@
         "model": {
           "url": "models/creatures/crypt_knellwyrm.glb",
           "path": "public/models/creatures/crypt_knellwyrm.glb",
-          "bytes": 1924772,
-          "sha256": "a344ae74b5f2541f93600c7cec6dd17703d9d2170e3f40c8fff7b099c7550c8d"
+          "bytes": 2513888,
+          "sha256": "82514cd4fc812833e767011bf7cb9ddc2fab17cd0d1802558a9d96491340ae8e"
         },
         "idle": "Idle",
         "height": 15.07,
@@ -1618,11 +1618,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "5330c3b195951ce3054db93e335604e86906e415e4cb05f3e18e1969f07f7b0a",
+      "sourceFingerprint": "4e69ad0929fdf136a39722950b6fb85b81741db3e9b6428bcf3f85de1ef74134",
       "output": {
         "path": "public/ui/mobs/crypt_knellwyrm.webp",
-        "bytes": 2376,
-        "sha256": "be8b476fa944cca75e63661a0bac902106f9ca4fc297ee668aab02dd75a56227"
+        "bytes": 2394,
+        "sha256": "1e9029d1b710874ce2a33e2432352a8cb525cf2e86a8bfca1b83640daa8fd586"
       }
     },
     {
@@ -1668,8 +1668,8 @@
         "model": {
           "url": "models/creatures/crypt_drake.glb",
           "path": "public/models/creatures/crypt_drake.glb",
-          "bytes": 1988556,
-          "sha256": "35dd7480cea6917b7dee6342ae8b1ff88d24512134d5822fb5ef90ab0e3799db"
+          "bytes": 2424492,
+          "sha256": "9521ffb529f0262d40aedb2c30a2dad3fdaa2767ba9c534861705c60f68e0607"
         },
         "idle": "Idle",
         "height": 13.63,
@@ -1686,11 +1686,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "24f25ec7bdd3726ef2f37e9fd6b7dfd9265517496fca0c649ee63933cd2b2ded",
+      "sourceFingerprint": "8fa4864c8760f8e11b5ecaa98a1ba0d491581f1734dde3d5861a0ac448c3d381",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_drake.webp",
-        "bytes": 2572,
-        "sha256": "e45ee93eba58f1d7a0522fe0ffec0176d4f2541017d5b8effced1d119b6ad028"
+        "bytes": 2570,
+        "sha256": "d939394c7a168f8841d07dc7f92aad5662059e5b280e8fa3e13f54f8ebdef567"
       }
     },
     {
@@ -3270,8 +3270,8 @@
         "model": {
           "url": "models/creatures/gaol_turnkey.glb",
           "path": "public/models/creatures/gaol_turnkey.glb",
-          "bytes": 1247488,
-          "sha256": "9b3cdc659540097095447a3a68eda8bc339ceedd394d538df4d56845880838b8"
+          "bytes": 2070704,
+          "sha256": "a36383f312bfc403f0d38b2bc78859f6b8f01fabe1b76862b5c2be10e2463d57"
         },
         "idle": "Idle",
         "height": 6.4,
@@ -3288,11 +3288,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9c4d393ab165e77f5ddd8e52b893a3d0c1f1cd9b790ad300b9a8bdb0bb95421b",
+      "sourceFingerprint": "2f77e5de6895db66d9d0aca1a868e470060462321d971c1f97b23399072e7b1c",
       "output": {
         "path": "public/ui/mobs/gaol_turnkey.webp",
-        "bytes": 1786,
-        "sha256": "3272b817a1649fcedd26190e670d50d2ea1efc7bf5cb4c3a925ae88f20e524f5"
+        "bytes": 1742,
+        "sha256": "333065716b309ce832dd56ac208a883f1d708ac6b9fd2c812f37d3561287acc6"
       }
     },
     {
@@ -3698,8 +3698,8 @@
         "model": {
           "url": "models/creatures/sanctum_velkhar.glb",
           "path": "public/models/creatures/sanctum_velkhar.glb",
-          "bytes": 2754672,
-          "sha256": "52551c877e287d22b30ad64d30d29b3a2b55db30282fb8fea17aa83c67b3bdfd"
+          "bytes": 2754456,
+          "sha256": "7bf7e4751af3318a78fcc33cf3ccf3ee21a45210a93fb90f61800a46a0b2ccb9"
         },
         "idle": "Idle",
         "height": 4.048,
@@ -3716,11 +3716,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "fc50b5ba62c5924a2acf428715a51911a20b982753ab304c6a535a6c7e07e5fa",
+      "sourceFingerprint": "9cc917fb26af40dc344725f963805b09f81ba1fd716f879a5d961d49d182da3b",
       "output": {
         "path": "public/ui/mobs/grand_necromancer_velkhar.webp",
-        "bytes": 2192,
-        "sha256": "9bf749a45b16df9558971bc6df71dd7ab5a7cec5de30b504cfa5f9025bc46eab"
+        "bytes": 2176,
+        "sha256": "59f21ec32b3f5c9f87bacf83588755d3392c0c3e9ee6a61f6e636242dfc06059"
       }
     },
     {
@@ -11098,7 +11098,7 @@
           "bytes": 162784,
           "sha256": "25010f4fcd2a0aba2a7ea3f01ceba83d7fb8731a2c9e7d292db8d1f211e6f1ef"
         },
-        "idle": "Flying_Idle",
+        "idle": "Idle",
         "height": 1.8,
         "yaw": -1.5707963267948966,
         "hover": 0.5,
@@ -11113,7 +11113,7 @@
         "resolved": "#6fe3e0",
         "strength": 0.6
       },
-      "sourceFingerprint": "0ee22e4be59f21c4dcfd5d18cb99e98825eef7d6805090754fb656f8b3cfe3a0",
+      "sourceFingerprint": "52d8a88cabd2ad003e32872c77c607a387cd1a2a88fceb6a587233bc6bfe717e",
       "output": {
         "path": "public/ui/mobs/tidewisp.webp",
         "bytes": 1912,
@@ -11401,8 +11401,8 @@
         "model": {
           "url": "models/creatures/vael_reaper.glb",
           "path": "public/models/creatures/vael_reaper.glb",
-          "bytes": 1493140,
-          "sha256": "5a812ab51594d09840f56e66881184f29b159e4832ea01c46e1e6de364a0c8f1"
+          "bytes": 2112176,
+          "sha256": "1418e5200072668d6cb324edc35a6230cc753447e3a5e983974485ebd1e92d3f"
         },
         "idle": "Idle",
         "height": 9.21,
@@ -11419,11 +11419,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "daf5605cb2c69d581495c6d461e1295860db335adf157147bf4347f30708bfe0",
+      "sourceFingerprint": "bc28feec43652168c035bd2cb0a3eab5d1459f0a5f0c18891e76ca4070df5ae8",
       "output": {
         "path": "public/ui/mobs/vael_fog_shade.webp",
-        "bytes": 1740,
-        "sha256": "67be3fe9266648f9b145d250b01582e05e1982677dbe23828382d52c2be4c191"
+        "bytes": 1710,
+        "sha256": "774fcf6315403beb4eb17cc73647ec6bbe9aae8a4f6c1562a8573b6d43872d7a"
       }
     },
     {
@@ -11435,8 +11435,8 @@
         "model": {
           "url": "models/creatures/vael_reaper.glb",
           "path": "public/models/creatures/vael_reaper.glb",
-          "bytes": 1493140,
-          "sha256": "5a812ab51594d09840f56e66881184f29b159e4832ea01c46e1e6de364a0c8f1"
+          "bytes": 2112176,
+          "sha256": "1418e5200072668d6cb324edc35a6230cc753447e3a5e983974485ebd1e92d3f"
         },
         "idle": "Idle",
         "height": 9.21,
@@ -11453,11 +11453,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "daf5605cb2c69d581495c6d461e1295860db335adf157147bf4347f30708bfe0",
+      "sourceFingerprint": "bc28feec43652168c035bd2cb0a3eab5d1459f0a5f0c18891e76ca4070df5ae8",
       "output": {
         "path": "public/ui/mobs/vael_the_mistcaller.webp",
-        "bytes": 1740,
-        "sha256": "67be3fe9266648f9b145d250b01582e05e1982677dbe23828382d52c2be4c191"
+        "bytes": 1710,
+        "sha256": "774fcf6315403beb4eb17cc73647ec6bbe9aae8a4f6c1562a8573b6d43872d7a"
       }
     },
     {
