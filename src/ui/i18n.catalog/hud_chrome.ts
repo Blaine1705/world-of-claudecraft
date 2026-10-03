@@ -8867,6 +8867,13 @@ export const hudChromeStrings = {
       korgath_stomp: 'Shuddering Stomp (step out of the ring round him)',
       rerivet_last_link:
         'Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)',
+      // Grand Necromancer Velkhar (encounters/gravewyrm_sanctum/velkhar.ts).
+      waking_thaw: 'Waking Thaw (the dead climb out of the thaw pools)',
+      unquenched_held: 'Held or Unquenched (kill the dead on cold ice, never in meltwater)',
+      soulfire_trench: 'Soulfire Trench (a line of soulfire, then a strip of meltwater)',
+      shadow_volley: 'Shadow Volley (shadow damage to everyone)',
+      warm_hands_twice_woken:
+        'Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)',
     },
   },
   // The Gaol Turnkey's Iron Cage escape prompt (src/ui/hud/dungeon/cage_escape).

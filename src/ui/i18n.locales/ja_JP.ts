@@ -20036,6 +20036,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_korgath_strain': '鎖の引き締め',
   'abilityUi.cast.sanctum_korgath_stomp': '震える踏みつけ',
   'abilityUi.cast.sanctum_goadsmith_rerivet': '再鋲打ち',
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': '魂火の溝',
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': '影の斉射',
+  'hudChrome.finder.mech.waking_thaw': '目覚めの雪解け（死者が融氷の池から這い上がる）',
+  'hudChrome.finder.mech.unquenched_held':
+    '封じか不滅か（死者は冷たい氷の上で倒せ、融水の中では倒すな）',
+  'hudChrome.finder.mech.soulfire_trench': '魂火の溝（魂火の線、その後に融水の帯が残る）',
+  'hudChrome.finder.mech.shadow_volley': '影の斉射（全員に闇ダメージ）',
+  'hudChrome.finder.mech.warm_hands_twice_woken':
+    '温かな手と二度目の目覚め（英雄のみ、死者を動かし続けよ。再び起きた者は強くなる）',
   'entities.mobs.thorn_sprout.name': '茨の芽',
   'hudChrome.finder.mech.pack_bond': '群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）',
   'hudChrome.finder.mech.stalk':

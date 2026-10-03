@@ -697,6 +697,9 @@ const mergeStringsEn = {
       sanctum_korgath_strain: 'Strain',
       sanctum_korgath_stomp: 'Shuddering Stomp',
       sanctum_goadsmith_rerivet: 'Re-rivet',
+      // Grand Necromancer Velkhar (encounters/gravewyrm_sanctum/velkhar.ts).
+      sanctum_velkhar_soulfire_trench: 'Soulfire Trench',
+      sanctum_velkhar_shadow_volley: 'Shadow Volley',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

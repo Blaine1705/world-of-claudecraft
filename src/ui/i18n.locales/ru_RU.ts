@@ -20415,6 +20415,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_korgath_strain': 'Натяжение',
   'abilityUi.cast.sanctum_korgath_stomp': 'Сотрясающий топот',
   'abilityUi.cast.sanctum_goadsmith_rerivet': 'Переклёпка',
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': 'Траншея душевного огня',
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': 'Залп тьмы',
+  'hudChrome.finder.mech.waking_thaw':
+    'Пробуждающая оттепель (мертвецы выбираются из талых прудов)',
+  'hudChrome.finder.mech.unquenched_held':
+    'Скованные или Неугасшие (убивайте мертвецов на холодном льду, никогда в талой воде)',
+  'hudChrome.finder.mech.soulfire_trench':
+    'Траншея душевного огня (линия душевного огня, затем полоса талой воды)',
+  'hudChrome.finder.mech.shadow_volley': 'Залп тьмы (урон тьмой по всем)',
+  'hudChrome.finder.mech.warm_hands_twice_woken':
+    'Тёплые руки и Дважды пробуждённые (только героический режим: не давайте мертвецам стоять; восставший возвращается сильнее)',
   'entities.mobs.thorn_sprout.name': 'Терновый росток',
   'hudChrome.finder.mech.pack_bond':
     'Узы стаи (вместе получают вдвое меньше урона: разведите их на 15 ярдов)',

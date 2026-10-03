@@ -160,6 +160,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.sanctum_ice_block_toss': true,
   'abilityUi.cast.sanctum_tusker_tusk_sweep': true,
   'abilityUi.cast.sanctum_tusker_trample': true,
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': true,
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': true,
   'abilityUi.cast.foundry_draft_awaken': true,
   'abilityUi.cast.foundry_arm_sweep': true,
   'abilityUi.cast.foundry_draft_unbolt': true,

@@ -20027,6 +20027,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_korgath_strain': '사슬 당기기',
   'abilityUi.cast.sanctum_korgath_stomp': '전율의 발구르기',
   'abilityUi.cast.sanctum_goadsmith_rerivet': '재리벳',
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': '영혼불 도랑',
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': '암흑 화살 세례',
+  'hudChrome.finder.mech.waking_thaw': '깨어나는 해빙 (망자들이 해빙 웅덩이에서 기어 나옵니다)',
+  'hudChrome.finder.mech.unquenched_held':
+    '봉인 또는 꺼지지 않음 (망자는 차가운 얼음 위에서 처치하고, 녹은 물에서는 절대 처치하지 마세요)',
+  'hudChrome.finder.mech.soulfire_trench': '영혼불 도랑 (영혼불 줄기, 이후 녹은 물 띠가 남습니다)',
+  'hudChrome.finder.mech.shadow_volley': '암흑 화살 세례 (모두에게 암흑 피해)',
+  'hudChrome.finder.mech.warm_hands_twice_woken':
+    '따뜻한 손과 두 번 깨어남 (영웅 전용, 망자를 계속 움직이게 하세요. 다시 일어난 자는 더 강해집니다)',
   'entities.mobs.thorn_sprout.name': '가시 새싹',
   'hudChrome.finder.mech.pack_bond': '무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)',
   'hudChrome.finder.mech.stalk':

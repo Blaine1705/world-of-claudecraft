@@ -184,7 +184,16 @@ const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
     mobId: 'korgath_the_bound',
     mechanics: ['seal_shackles', 'chain_strain', 'korgath_stomp', 'enrage'],
   },
-  { mobId: 'grand_necromancer_velkhar', mechanics: ['summons_adds'] },
+  {
+    mobId: 'grand_necromancer_velkhar',
+    mechanics: [
+      'waking_thaw',
+      'summons_adds',
+      'unquenched_held',
+      'soulfire_trench',
+      'shadow_volley',
+    ],
+  },
   { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['grave_inferno', 'enrage'] },
 ];
 
@@ -195,7 +204,10 @@ const GRAVEWYRM_SANCTUM_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
     mobId: 'korgath_the_bound',
     mechanics: [...GRAVEWYRM_SANCTUM_ENCOUNTERS[0].mechanics, 'rerivet_last_link'],
   },
-  GRAVEWYRM_SANCTUM_ENCOUNTERS[1],
+  {
+    mobId: 'grand_necromancer_velkhar',
+    mechanics: [...GRAVEWYRM_SANCTUM_ENCOUNTERS[1].mechanics, 'warm_hands_twice_woken'],
+  },
   GRAVEWYRM_SANCTUM_ENCOUNTERS[2],
 ];
 

@@ -19074,6 +19074,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_korgath_strain': '繃鏈',
   'abilityUi.cast.sanctum_korgath_stomp': '震顫踐踏',
   'abilityUi.cast.sanctum_goadsmith_rerivet': '重鉚',
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': '魂火溝壑',
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': '暗影箭雨',
+  'hudChrome.finder.mech.waking_thaw': '甦醒融冰（亡者從融冰池中爬出）',
+  'hudChrome.finder.mech.unquenched_held': '封存或未熄（在寒冰上擊殺亡者，切勿在融水中）',
+  'hudChrome.finder.mech.soulfire_trench': '魂火溝壑（一道魂火，隨後留下一條融水帶）',
+  'hudChrome.finder.mech.shadow_volley': '暗影箭雨（對所有人造成暗影傷害）',
+  'hudChrome.finder.mech.warm_hands_twice_woken':
+    '溫熱之手與二度甦醒（僅限英雄難度，讓亡者保持移動；復起者會更強）',
   'entities.mobs.thorn_sprout.name': '荊棘幼芽',
   'hudChrome.finder.mech.pack_bond': '獸群羈絆（兩者相鄰時傷害減半：將牠們拉開15碼）',
   'hudChrome.finder.mech.stalk':
