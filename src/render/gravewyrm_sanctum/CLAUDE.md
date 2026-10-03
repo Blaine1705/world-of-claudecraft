@@ -58,6 +58,18 @@ Rules:
   `sanctum_works.ts`, registered strict in `tests/floor_vfx_layer.test.ts`); the sky and the
   face are out of scope there.
 - Custom shaders author LINEAR colours and end with `#include <colorspace_fragment>`.
+- A kit that lands after the interior's cap swaps the dressing, the lake and the gates in
+  place (`upgradeWhenSanctumKitLands`); every kit group carries hidden carriers of the
+  three slot materials in both variants (`slotProgramWarmers`), so that swap links no
+  program. The face, the frozen wyrm, the chains and the pillars do NOT upgrade late: a
+  slot built before they landed keeps its stand-ins (the interior waits for them, capped
+  at 8 to 9 s).
+- The mountains' snout is carved round the face block on the CPU at load
+  (`carveFaceBlock`), never by a fragment discard (it would cost the biggest opaque mesh
+  its early depth). The sky dome draws after the opaque world (`renderOrder` 1000, depth
+  on the far plane), so the aurora's march only runs on open sky.
+- `SANCTUM_SHARD_UNIFORMS` and the peaks' wash are module state: two claimed slots in
+  view at once share the aurora's level (the last driver to run wins).
 - Swapping the wyrm: drop a new static GLB in the same frame (+Z his front, origin under
   his body) and change `FROZEN_WYRM_URL`; `FROZEN_WYRM` places it, the head, eye and heart
   anchors (`FROZEN_*_LOCAL`) are measured off the pose.

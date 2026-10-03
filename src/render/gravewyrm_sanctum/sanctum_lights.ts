@@ -45,7 +45,7 @@ export const SANCTUM_FIRE_SIZE: Readonly<Record<SanctumFireKind, number>> = {
   brazier: 0.78,
   pyre: 1.4,
   soulBrazier: 0.78,
-  thawPyre: 2.45,
+  thawPyre: 3.0,
 };
 
 function fireSize(kind: SanctumFireKind): number {
@@ -84,7 +84,7 @@ function poolMaterial(kind: SanctumFireKind): THREE.MeshBasicMaterial {
       transparent: true,
       // The snow throws the fire back: a warm (or soul-green) stain round
       // every fire, kept faint so a telegraph always reads over it.
-      opacity: SANCTUM_FIRE_STYLE[kind].soul ? 0.2 : 0.24,
+      opacity: kind === 'thawPyre' ? 0.06 : SANCTUM_FIRE_STYLE[kind].soul ? 0.16 : 0.24,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       name: `gravewyrmSanctumPool:${kind}`,
