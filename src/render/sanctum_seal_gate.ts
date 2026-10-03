@@ -34,6 +34,7 @@ import {
   sanctumMistPuff,
   sanctumMistPuffCount,
 } from './sanctum_seal_gate_core';
+import { sealGateSurfaceMaterial, setSealSurfaceOrigin } from './sanctum_seal_gate_surface';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 const GATE_URL = '/models/props/sanctum_seal_gate.glb';
@@ -63,10 +64,15 @@ export interface SanctumSealGateView {
 
 let runeMat: THREE.MeshBasicMaterial | null = null;
 
+/** The Blender nodes whose KitStone is the MOUNTAIN's rock (the spur the
+ *  tunnel is cut into, the ice tongue's cheeks), not the Smith's masonry. */
+const MOUNTAIN_ROCK_NODES = new Set(['Entrance_Tunnel', 'Entrance_IceTongue']);
+
 /** The lit slots go through surfaceMat every time (it caches per graphics
  *  tier, so a live profile switch gets the new tier's material); the runes
- *  are unlit on every tier. */
-function kitMaterial(name: string): THREE.Material {
+ *  are unlit on every tier. The mountain rock and the glacier ice take the
+ *  Thornpeak surfaces (sanctum_seal_gate_surface.ts, cached per tier too). */
+function kitMaterial(name: string, node = ''): THREE.Material {
   if (name === 'KitGlow') {
     if (!runeMat) {
       // The Smith's runes: unlit, a faint clean blue, low like embers.
@@ -77,10 +83,19 @@ function kitMaterial(name: string): THREE.Material {
     }
     return runeMat;
   }
-  if (name === 'KitIce') {
-    return surfaceMat({ vertexColors: true, roughness: 0.28, emissive: 0x15202c });
-  }
+  if (name === 'KitIce') return sealGateSurfaceMaterial('ice');
+  if (MOUNTAIN_ROCK_NODES.has(node)) return sealGateSurfaceMaterial('rock');
   return surfaceMat({ vertexColors: true, roughness: 0.9 });
+}
+
+/** The mountain-rock piece a mesh belongs to, if any: the loader names a
+ *  one-primitive node's mesh after the node, and parents a multi-primitive
+ *  node's meshes under a group that carries it. */
+function entrancePiece(node: THREE.Object3D): string {
+  for (let o: THREE.Object3D | null = node; o; o = o.parent) {
+    if (MOUNTAIN_ROCK_NODES.has(o.name)) return o.name;
+  }
+  return node.name;
 }
 
 function seat(source: THREE.Group, castShadow: boolean): THREE.Group {
@@ -88,7 +103,8 @@ function seat(source: THREE.Group, castShadow: boolean): THREE.Group {
   model.traverse((node) => {
     if (!(node instanceof THREE.Mesh)) return;
     markSharedGeometry(node.geometry);
-    const swap = (m: THREE.Material) => kitMaterial(m.name);
+    const piece = entrancePiece(node);
+    const swap = (m: THREE.Material) => kitMaterial(m.name, piece);
     node.material = Array.isArray(node.material) ? node.material.map(swap) : swap(node.material);
     node.castShadow = castShadow;
     node.receiveShadow = true;
@@ -323,6 +339,7 @@ function rimeFan(door: { x: number; z: number }, base: number, seed: number): TH
 export function buildSanctumSealGate(seed: number): SanctumSealGateView {
   const door = DUNGEONS[SANCTUM_SEAL_GATE_DUNGEON_ID].doorPos;
   const base = terrainHeight(door.x, door.z, seed);
+  setSealSurfaceOrigin(door.x, base, door.z);
   const group = new THREE.Group();
   group.name = 'sanctumSealGate';
   const gate = new THREE.Group();

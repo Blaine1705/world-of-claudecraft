@@ -3,6 +3,14 @@
 // (sanctum_seal_gate.ts: one point light, two cull groups, one instanced mist
 // draw on the shared clock, the floor ladder, the stand-in when no GLB loaded).
 // Three.js runs headless in Node (no WebGL needed for the scene graph).
+// The mountain surfaces (sanctum_seal_gate_surface.ts): the spur's Thornpeak
+// rock and the glacier ice, toned to the terrain around them and lit like it,
+// with the inside test pinned against the shipped GLB's own geometry.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
@@ -14,17 +22,29 @@ import {
   sanctumSealGateInternalsForTest,
 } from '../src/render/sanctum_seal_gate';
 import {
+  type LinearRgb,
+  linearLuma,
   type MistPose,
   rimeFanAlpha,
   rimeFanVertex,
+  SANCTUM_GLACIER_ICE,
   SANCTUM_MIST_FILM,
   SANCTUM_MIST_FLOW,
   SANCTUM_RIME_FAN,
   SANCTUM_RUNE_LIGHT,
+  SANCTUM_THORNPEAK_ROCK,
   sanctumMistPose,
   sanctumMistPuff,
   sanctumMistPuffCount,
+  sealGateIceEdge,
+  sealGateRockInside,
+  sealGateSnowCover,
 } from '../src/render/sanctum_seal_gate_core';
+import {
+  SANCTUM_ICE_PROGRAM_KEY,
+  SANCTUM_ROCK_PROGRAM_KEY,
+  sealGateSurfaceInternalsForTest,
+} from '../src/render/sanctum_seal_gate_surface';
 import { DUNGEONS } from '../src/sim/data';
 import { terrainHeight } from '../src/sim/world';
 
@@ -214,5 +234,218 @@ describe('the Seal Gate painter', () => {
     expect(runes).toBeInstanceOf(THREE.MeshBasicMaterial);
     expect(runes.vertexColors).toBe(true);
     expect(runes.color.r).toBeLessThan(1);
+  });
+});
+
+// ---- the mountain surfaces ----------------------------------------------------------
+
+/** max / min channel: 1 is grey, the old glacier blue was 3.8. */
+function chroma(c: LinearRgb): number {
+  return Math.max(...c) / Math.min(...c);
+}
+
+interface FakeShader {
+  uniforms: Record<string, THREE.IUniform>;
+  vertexShader: string;
+  fragmentShader: string;
+}
+
+function compileHook(material: THREE.Material, lib: 'standard' | 'lambert'): FakeShader {
+  const shader: FakeShader = {
+    uniforms: {},
+    vertexShader: THREE.ShaderLib[lib].vertexShader,
+    fragmentShader: THREE.ShaderLib[lib].fragmentShader,
+  };
+  material.onBeforeCompile(
+    shader as unknown as THREE.WebGLProgramParametersWithUniforms,
+    null as unknown as THREE.WebGLRenderer,
+  );
+  return shader;
+}
+
+describe('the Thornpeak rock and glacier ice plan', () => {
+  it('keeps the tunnel inside dark and tones every outer face as the mountain', () => {
+    // the tunnel floor, its walls and vault, and the flags in front of the mouth
+    expect(sealGateRockInside(0, 0.5, 10)).toBe(true);
+    expect(sealGateRockInside(3.5, 6, 12)).toBe(true);
+    expect(sealGateRockInside(0, 10.5, 4)).toBe(true);
+    expect(sealGateRockInside(1, 0.2, 0)).toBe(true);
+    // the crest above the vault, the flanks, the facade round the mouth, the
+    // rock behind the tunnel's end and the ice tongue's cheeks are mountain
+    expect(sealGateRockInside(0, 14, 4)).toBe(false);
+    expect(sealGateRockInside(0, 21, 26)).toBe(false);
+    expect(sealGateRockInside(8, 5, 10)).toBe(false);
+    expect(sealGateRockInside(2, 6, 2.2)).toBe(false);
+    expect(sealGateRockInside(0, 8, 30)).toBe(false);
+    expect(sealGateRockInside(-18, 40, 45)).toBe(false);
+  });
+
+  it('the inside test matches the shipped tunnel: dark slate in, mountain rock out', async () => {
+    await MeshoptDecoder.ready;
+    const doc = await new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
+      .readBinary(
+        readFileSync(path.join(__dirname, '..', 'public/models/props/sanctum_seal_gate.glb')),
+      );
+    const node = doc
+      .getRoot()
+      .listNodes()
+      .find((n) => n.getName() === 'Entrance_Tunnel');
+    if (!node) throw new Error('Entrance_Tunnel missing from the gate GLB');
+    const t = node.getTranslation();
+    const sc = node.getScale();
+    const prim = node.getMesh()?.listPrimitives()[0];
+    const pos = prim?.getAttribute('POSITION');
+    const col = prim?.getAttribute('COLOR_0');
+    if (!pos || !col) throw new Error('the tunnel lost its positions or colours');
+    const p: number[] = [];
+    const c: number[] = [];
+    let inside = 0;
+    let outside = 0;
+    for (let i = 0; i < pos.getCount(); i++) {
+      pos.getElement(i, p);
+      col.getElement(i, c);
+      const lx = p[0] * sc[0] + t[0];
+      const y = p[1] * sc[1] + t[1];
+      const lz = p[2] * sc[2] + t[2];
+      const luma = linearLuma([c[0], c[1], c[2]]);
+      if (sealGateRockInside(lx, y, lz)) {
+        inside++;
+        // the builder lit only the rimed floor by the mouth inside the tunnel
+        if (luma >= 0.09) {
+          expect(y, `bright inside vertex ${lx},${y},${lz}`).toBeLessThan(2.5);
+          expect(lz).toBeLessThan(8);
+        }
+      } else {
+        outside++;
+        // every outer face is the mountain's tone, bar the mouth's rim ring
+        if (luma < 0.09) {
+          expect(lz, `dark outer vertex ${lx},${y},${lz}`).toBeLessThanOrEqual(
+            SANCTUM_THORNPEAK_ROCK.insideFrontLz,
+          );
+        }
+      }
+    }
+    expect(inside).toBeGreaterThan(1000);
+    expect(outside).toBeGreaterThan(1000);
+  });
+
+  it('the rock and ice sit at the mountain snow and rock values, never a saturated glow', () => {
+    const r = SANCTUM_THORNPEAK_ROCK;
+    const i = SANCTUM_GLACIER_ICE;
+    // cool grey granite under a near-neutral snow, like the terrain's
+    expect(linearLuma(r.snow)).toBeGreaterThan(linearLuma(r.rock) * 2.5);
+    expect(linearLuma(r.rockDark)).toBeLessThan(linearLuma(r.rock));
+    for (const c of [r.rock, r.rockDark, r.snow]) expect(chroma(c)).toBeLessThan(1.2);
+    // the frost on the ice is the same snow, the faces a step under it, the
+    // crevasses the one deep blue; the body ice stays well under the old
+    // saturated glacier blue (chroma 3.8)
+    expect(Math.abs(linearLuma(i.frost) - linearLuma(r.snow))).toBeLessThan(0.08);
+    expect(chroma(i.frost)).toBeLessThan(1.25);
+    for (const c of [i.clear, i.bubbly, i.edge]) {
+      expect(chroma(c)).toBeLessThan(3);
+      expect(linearLuma(c)).toBeGreaterThan(linearLuma(r.rock) * 2);
+    }
+    expect(linearLuma(i.clear)).toBeLessThan(linearLuma(i.bubbly));
+    expect(linearLuma(i.bubbly)).toBeLessThan(linearLuma(i.frost));
+    // the scattering thin edge brightens toward the snow, never past it by much
+    expect(linearLuma(i.edge)).toBeGreaterThan(linearLuma(i.bubbly));
+    expect(linearLuma(i.edge)).toBeLessThan(linearLuma(i.frost) * 1.15);
+    expect(linearLuma(i.deep)).toBeLessThan(linearLuma(i.clear) / 2);
+  });
+
+  it('snow lies on upward faces, and the thin-edge scatter lives at the silhouette', () => {
+    expect(sealGateSnowCover(1, 0.5)).toBe(1);
+    expect(sealGateSnowCover(0, 0.5)).toBe(0);
+    expect(sealGateSnowCover(0.6, 0.5)).toBeGreaterThan(sealGateSnowCover(0.5, 0.5));
+    expect(sealGateIceEdge(0)).toBe(1);
+    expect(sealGateIceEdge(1)).toBe(0);
+    expect(sealGateIceEdge(-1)).toBe(0);
+    expect(sealGateIceEdge(0.3)).toBeGreaterThan(sealGateIceEdge(0.6));
+  });
+});
+
+describe('the mountain surface materials', () => {
+  it('routes the spur and the tongue cheeks to the rock, every KitIce to the glacier ice', () => {
+    sanctumSealGateInternalsForTest.resetCaches();
+    sealGateSurfaceInternalsForTest.reset();
+    const { kitMaterial } = sanctumSealGateInternalsForTest;
+    const rock = kitMaterial('KitStone', 'Entrance_Tunnel');
+    expect(rock.name).toBe('SanctumThornpeakRock');
+    expect(kitMaterial('KitStone', 'Entrance_IceTongue')).toBe(rock);
+    // the Smith's masonry and the props keep the plain lit stone
+    expect(kitMaterial('KitStone', 'Entrance_Pylons')).not.toBe(rock);
+    expect(kitMaterial('KitStone', 'Entrance_PlazaProps')).not.toBe(rock);
+    const ice = kitMaterial('KitIce', 'Entrance_Lintel') as THREE.MeshStandardMaterial;
+    expect(ice.name).toBe('SanctumGlacierIce');
+    expect(kitMaterial('KitIce', 'Entrance_IceTongue')).toBe(ice);
+    // lit like the terrain: no self-glow at night
+    expect(ice.emissive.getHex()).toBe(0);
+    expect(ice.vertexColors).toBe(true);
+    expect(rock.customProgramCacheKey()).toContain(SANCTUM_ROCK_PROGRAM_KEY);
+    expect(ice.customProgramCacheKey()).toContain(SANCTUM_ICE_PROGRAM_KEY);
+  });
+
+  it('the gate seats the shared door origin both programs read', () => {
+    const view = buildSanctumSealGate(SEED);
+    const door = DUNGEONS.gravewyrm_sanctum.doorPos;
+    const origin = sealGateSurfaceInternalsForTest.origin.value;
+    expect(origin.x).toBe(door.x);
+    expect(origin.z).toBe(door.z);
+    expect(origin.y).toBeCloseTo(view.cullGroups[0].position.y, 6);
+  });
+
+  it('the hooks splice the core constants, deterministically, on the PBR tier', () => {
+    sealGateSurfaceInternalsForTest.reset();
+    sanctumSealGateInternalsForTest.resetCaches();
+    const { kitMaterial } = sanctumSealGateInternalsForTest;
+    const rock = kitMaterial('KitStone', 'Entrance_Tunnel');
+    const ice = kitMaterial('KitIce');
+    const a = compileHook(rock, 'standard');
+    const b = compileHook(rock, 'standard');
+    // a dry compile and the real link see the same program (no caching, no
+    // appending across calls)
+    expect(b.fragmentShader).toBe(a.fragmentShader);
+    expect(b.vertexShader).toBe(a.vertexShader);
+    expect(a.uniforms.uSealOrigin).toBe(sealGateSurfaceInternalsForTest.origin);
+    const r = SANCTUM_THORNPEAK_ROCK;
+    for (const v of [r.insideHalfWidth, r.insideEndLz, r.insideFrontLz, r.roofY0, r.roofSlope]) {
+      expect(a.fragmentShader).toContain(v.toFixed(4));
+    }
+    expect(a.fragmentShader).toContain(r.snow.map((v) => v.toFixed(4)).join(', '));
+    expect(a.fragmentShader).toContain('sealPerturb( - vViewPosition');
+    expect(a.vertexShader).toContain('vSealWPos');
+    const iceShader = compileHook(ice, 'standard');
+    const g = SANCTUM_GLACIER_ICE;
+    expect(iceShader.fragmentShader).toContain(g.deep.map((v) => v.toFixed(4)).join(', '));
+    expect(iceShader.fragmentShader).toContain(g.stepHeight.toFixed(4));
+    expect(iceShader.fragmentShader).toContain('roughnessFactor = mix(');
+  });
+
+  it('the Lambert tier gets the same tone in a lighter program (no bump, no roughness)', () => {
+    sealGateSurfaceInternalsForTest.reset();
+    sanctumSealGateInternalsForTest.resetCaches();
+    const restore = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
+    try {
+      const { kitMaterial } = sanctumSealGateInternalsForTest;
+      const rock = kitMaterial('KitStone', 'Entrance_Tunnel');
+      const ice = kitMaterial('KitIce');
+      expect(rock).toBeInstanceOf(THREE.MeshLambertMaterial);
+      expect(ice).toBeInstanceOf(THREE.MeshLambertMaterial);
+      for (const m of [rock, ice]) {
+        const sh = compileHook(m, 'lambert');
+        expect(sh.fragmentShader).toContain('diffuseColor.rgb = ');
+        expect(sh.fragmentShader).not.toContain('sealPerturb( - vViewPosition');
+        expect(sh.fragmentShader).not.toContain('roughnessFactor = mix(');
+        expect(m.customProgramCacheKey()).toContain(':lite');
+      }
+      expect(compileHook(rock, 'lambert').fragmentShader).toContain(
+        SANCTUM_THORNPEAK_ROCK.snow.map((v) => v.toFixed(4)).join(', '),
+      );
+    } finally {
+      restore();
+      sealGateSurfaceInternalsForTest.reset();
+    }
   });
 });
