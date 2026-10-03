@@ -869,11 +869,17 @@ export function tickKorgath(
       endKorgathFight(ctx, inst, boss, st0);
       return;
     }
+    // Walking home after a wipe: the lock is laid out once he is back (the
+    // reset at his spawn despawns his summoned adds, the shackles with them).
+    if (boss.aiState === 'evade') return;
     // Before the pull: the lock is laid out and the shackles wait, untouchable.
+    // A shackle body lost while he was out of his fight is raised again, so a
+    // pull never starts on a chain nobody broke.
     const st = korgathFight(ctx, inst, boss);
     for (const chain of st.chains) {
       const s = chain.shackleId !== null ? ctx.entities.get(chain.shackleId) : undefined;
       if (s && !s.dead) holdShackle(s, boss, false);
+      else if (!chain.broken) raiseShackle(ctx, inst, boss, chain);
     }
     return;
   }

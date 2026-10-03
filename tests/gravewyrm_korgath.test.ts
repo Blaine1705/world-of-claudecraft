@@ -440,6 +440,10 @@ describe('Korgath the Bound: the wipe, the story and the deeds', () => {
     r.boss.inCombat = false;
     r.boss.aiState = 'evade';
     tick(r, DT);
+    // Walking home the lock stays down; it is laid out once he is back.
+    tick(r, DT);
+    expect(korgathState(r.boss)).toBeNull();
+    r.boss.aiState = 'idle';
     tick(r, DT);
     const fresh = korgathState(r.boss) as KorgathFightState;
     expect(fresh).not.toBe(st);
@@ -594,5 +598,49 @@ describe('Korgath the Bound: the live sim (mob AI on)', () => {
     sim.tick();
     expect(st.chains[3].broken).toBe(true);
     expect(lockbound(r)).toBeCloseTo(0.6, 10);
+  });
+
+  it('a real wipe and re-pull: the lock is laid out again and no chain breaks on the pull', () => {
+    const r = room();
+    const sim = r.sim;
+    sim.tick();
+    r.me.pos = at(r, KORGATH_SPOT.x, KORGATH_SPOT.z - 3);
+    r.me.prevPos = { ...r.me.pos };
+    sim.ctx.aggroMob(r.boss, r.me, false);
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect((korgathState(r.boss) as KorgathFightState).engaged).toBe(true);
+    // He is dragged to the terrace's far edge, then the tank runs off: he
+    // evades and walks home (the reset at his spawn despawns his adds).
+    r.boss.pos = at(r, KORGATH_SPOT.x + 9, KORGATH_SPOT.z + 9);
+    r.boss.prevPos = { ...r.boss.pos };
+    r.me.pos = at(r, 0, -120);
+    r.me.prevPos = { ...r.me.pos };
+    r.me.devNoAggro = true;
+    sim.ctx.dropThreat?.(r.boss, r.me.id);
+    r.boss.aggroTargetId = null;
+    r.boss.inCombat = false;
+    r.boss.aiState = 'evade';
+    let sawWalk = false;
+    for (let i = 0; i < 20 * 20; i++) {
+      sim.tick();
+      if (r.boss.aiState === 'evade') sawWalk = true;
+    }
+    expect(sawWalk).toBe(true);
+    expect(r.boss.aiState).not.toBe('evade');
+    const fresh = korgathState(r.boss) as KorgathFightState;
+    expect(fresh.engaged).toBe(false);
+    for (const tool of SEAL_TOOLS) {
+      const s = shackleOf(r, fresh, tool);
+      expect(s && !s.dead, tool).toBe(true);
+    }
+    // The re-pull keeps all four chains.
+    r.me.devNoAggro = false;
+    r.me.pos = at(r, KORGATH_SPOT.x, KORGATH_SPOT.z - 3);
+    r.me.prevPos = { ...r.me.pos };
+    sim.ctx.aggroMob(r.boss, r.me, false);
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    const st = korgathState(r.boss) as KorgathFightState;
+    expect(st.engaged).toBe(true);
+    expect(st.chains.filter((c) => c.broken)).toHaveLength(0);
   });
 });
