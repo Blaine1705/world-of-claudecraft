@@ -4430,10 +4430,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // down (Attack2); below 30 percent its enrage rears it up and blazes the
   // shrine violet (Frenzy, played off the enrage's nova through the temple's
   // gesture hook); dying, it pulls into its shell, topples and its pearl goes
-  // dark. Drawn about 4.2 tall at its 0.95 (1.6 players), about 5.5 long.
+  // dark. Drawn about 4.65 tall to the shrine at its 0.95 (1.8 players).
   temple_pilgrim: {
     url: `${CREATURES}/temple_pilgrim.glb`,
-    height: 4.42,
+    height: 4.9,
     clips: {
       ...TEMPLE_CLIPS,
       attackByAbility: { [TEMPLE_PILGRIM_FRENZY_GESTURE]: 'Frenzy' },

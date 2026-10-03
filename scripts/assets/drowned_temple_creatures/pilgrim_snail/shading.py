@@ -11,7 +11,7 @@ KINDS = ('flesh', 'nacre', 'marble', 'silver', 'pearl', 'pupil')
 GLOWS = {
     'glow_eye': ((0.55, 0.95, 1.0), 4.5, 'PilgrimEyes'),
     'glow_pearl': ((0.86, 0.96, 1.0), 7.0, 'PilgrimMoonPearl'),
-    'glow_flare': ((0.62, 0.3, 1.0), 6.0, 'PilgrimFrenzyFlare'),
+    'glow_flare': ((0.36, 0.3, 1.0), 1.1, 'PilgrimFrenzyFlare'),
 }
 EMIT_STRENGTH = 4.0
 
@@ -87,11 +87,19 @@ def shade(mat, k):
         knob = _attr(t, 'RegKnob')
         lip = _attr(t, 'RegLip')
         # the shell between the plates: deep turquoise with pearl spiral bands
-        band = t.smooth(t.noise(t.scale_vec(1.0, 1.0, 6.0), scale=1.4, detail=3, dist=0.6), 0.42, 0.62)
+        # banding that FOLLOWS the coil (a real snail's colour bands): stripes
+        # across the tube's angle, and fine growth lines across the whorl
+        psi = _attr(t, 'RegPsi')
+        tt = _attr(t, 'RegT')
+        wob = t.math('MULTIPLY', t.noise(scale=3.0, detail=2), 0.25)
+        stripes = t.math('SINE', t.math('ADD', t.math('MULTIPLY', psi, 5.0), wob))
+        band = t.smooth(stripes, 0.15, 0.55)
+        growth = t.smooth(t.math('SINE', t.math('MULTIPLY', tt, 460.0)), 0.85, 1.0)
         teal = t.ramp(t.noise(scale=3.0, detail=4), [(0.3, srgb((0.05, 0.3, 0.36))), (0.7, srgb((0.1, 0.46, 0.5)))])
         pearl = t.ramp(t.noise(scale=6.0, detail=3, w=1.0), [(0.25, srgb((0.72, 0.8, 0.84))), (0.5, srgb((0.82, 0.78, 0.9))),
                                                              (0.75, srgb((0.7, 0.88, 0.86)))])
-        color = t.mix(t.math('MULTIPLY', band, 0.7), teal, pearl)
+        color = t.mix(t.math('MULTIPLY', band, 0.85), teal, pearl)
+        color = t.mix(t.math('MULTIPLY', growth, 0.25), color, srgb((0.03, 0.16, 0.2)))
         # the nacre sheen: a lilac and sea-green play of colour over everything
         sheen = t.ramp(t.noise(scale=2.2, detail=2, w=3.0), [(0.3, srgb((0.86, 0.8, 1.0))), (0.7, srgb((0.8, 1.0, 0.95)))])
         color = t.mix(0.25, color, sheen, 'MULTIPLY')

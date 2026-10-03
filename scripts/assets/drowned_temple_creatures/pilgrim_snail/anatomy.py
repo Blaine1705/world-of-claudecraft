@@ -37,14 +37,28 @@ def lerp(a, b, t):
 
 
 # ------------------------------------------------------------------ the shell's geometry
-SHELL_BASE = g(0.22, 0.5, 0.98)
-SHELL_AXIS = unit((0.0, 0.72, 1.0))
-SE1 = np.array((1.0, 0.0, 0.0))
-SE2 = np.cross(SHELL_AXIS, SE1)          # back and a little down
-R0, RHO0, Q = 0.56 * GS, 0.84 * GS, 0.56  # spiral radius, tube radius, shrink per turn
-HC = 0.66 * GS / (1 - Q)                  # the axial climb (0.8 over the first whorl)
-TMAX = 2.3                               # the spire is cut flat here (the shrine)
-PHI0 = math.pi                            # the aperture (t = 0) sits on its right side
+# A helicoid snail shell carried on the back: the coil's axis points to the
+# snail's left, up and a little back, so the spiral reads from its left side
+# and from behind, and the spire rises up and out where the shrine stands.
+SHELL_AXIS = unit((0.86, 0.22, 0.46))
+_down = np.array((0.0, -0.6, -1.0))
+SE1 = unit(_down - SHELL_AXIS * float(_down @ SHELL_AXIS))
+SE2 = np.cross(SHELL_AXIS, SE1)
+R0, RHO0, Q = 0.78 * GS, 0.64 * GS, 0.64   # spiral radius, tube radius, shrink per turn
+HC = 0.5 * GS / (1 - Q)                   # the axial climb (0.5 over the first whorl)
+TMAX = 3.4                                # the spire is cut flat here (the shrine)
+PHI0 = 0.0                                # the aperture (t = 0) sits low and in front
+APERTURE = g(-0.3, -0.02, 0.68)            # where the body enters the shell
+SHELL_BASE = APERTURE - SE1 * R0          # the axis passes here at the aperture whorl
+
+
+def _centre_shell():
+    global SHELL_BASE
+    ts = np.linspace(0, TMAX, 200)
+    pts = np.array([spiral_point(t) for t in ts])
+    w = np.array([spiral(t)[2] ** 2 for t in ts])
+    mx = float((pts[:, 0] * w).sum() / w.sum())
+    SHELL_BASE = SHELL_BASE - np.array((mx - 0.04 * GS, 0.0, 0.0))
 
 
 def spiral(t):
@@ -63,6 +77,9 @@ def spiral_point(t, psi=None, off=0.0):
     if psi is None:
         return c
     return c + (radial * math.cos(psi) + SHELL_AXIS * math.sin(psi)) * (rho + off)
+
+
+_centre_shell()
 
 
 def shell_coords(X_, Y_, Z_):
@@ -115,10 +132,10 @@ class SpiralShell(sdf.Prim):
 
 # The carved plate band on the outer face of the body whorl and the next.
 PLATES_PER_TURN = 10
-PLATE_PSI = (math.radians(-28), math.radians(34))
-PLATE_T = (0.06, 1.45)
-KNOBS_PER_TURN = 7
-KNOB_PSI = math.radians(66)
+PLATE_PSI = (math.radians(-95), math.radians(-30))
+PLATE_T = (0.06, 1.9)
+KNOBS_PER_TURN = 6
+KNOB_PSI = math.radians(48)
 
 
 def plate_uv(t, psi):
@@ -217,13 +234,30 @@ def _bones():
     return L
 
 
+_SHRINE_O = None
+
+
+def shell_top():
+    """The highest point of the shell's outer surface (the body whorl's crest)."""
+    best = None
+    for t in np.linspace(0.0, 1.6, 81):
+        for psi in np.linspace(-1.5, 1.5, 61):
+            p = spiral_point(t, psi)
+            if best is None or p[2] > best[2]:
+                best = p
+    return best
+
+
 def shrine_origin():
-    """The plinth's underside centre: straight above the cut spire."""
-    c = spiral_point(TMAX)
-    return np.array((c[0], c[1], c[2] + spiral(TMAX)[2] * 0.6))
+    """The plinth's underside centre: on the crest of the shell, over the foot."""
+    global _SHRINE_O
+    if _SHRINE_O is None:
+        top = shell_top()
+        _SHRINE_O = np.array((top[0], top[1], top[2] + 0.02 * GS))
+    return _SHRINE_O
 
 
-SHRINE = dict(plinth_r=0.46, plinth_h=0.11, col_r=0.04, col_ring=0.345, col_h=0.52, dome_r=0.42, dome_h=0.31)
+SHRINE = dict(plinth_r=0.42, plinth_h=0.1, col_r=0.038, col_ring=0.315, col_h=0.44, dome_r=0.38, dome_h=0.28)
 
 
 def shrine_pearl():
@@ -288,24 +322,51 @@ def build_body(voxel):
     F.add(RoundCone(g(0, -1.05, 0.78), g(0, -1.48, 1.0), 0.4 * GS, 0.34 * GS, bone='Neck2'), 0.14 * GS)
     F.add(Ellipsoid(g(0, -1.66, 1.05), g(0.4, 0.36, 0.3), bone='Head'), 0.12 * GS)
     F.add(Ellipsoid(g(0, -1.62, 1.2), g(0.28, 0.22, 0.12), bone='Head'), 0.08 * GS)     # brow
-    # the snout: a broad, flattened, down-turned conch's snout with a toothed mouth
-    F.add(Ellipsoid(g(0, -1.98, 0.97), g(0.27, 0.3, 0.19), bone='Snout1'), 0.1 * GS)
-    F.add(Ellipsoid(g(0, -2.2, 0.86), g(0.24, 0.24, 0.15), bone='Snout2'), 0.08 * GS)
-    F.add(Ellipsoid(g(0, -2.38, 0.74), g(0.21, 0.16, 0.12), bone='Snout3'), 0.06 * GS)
-    tip = g(0, -2.46, 0.68)
-    ax = unit((0, -0.6, -1.0))
-    F.add(Torus(tip + ax * 0.02 * GS, ax, 0.11 * GS, 0.04 * GS, bone='Snout3'), 0.03 * GS)
-    F.sub(Ellipsoid(tip + ax * 0.06 * GS, g(0.1, 0.08, 0.1)), 0.02 * GS)
+    # the snout: a broad, down-turned conch's snout ending in a fleshy mouth disc
+    F.add(Ellipsoid(g(0, -1.98, 0.97), g(0.29, 0.3, 0.2), bone='Snout1'), 0.1 * GS)
+    F.add(Ellipsoid(g(0, -2.2, 0.85), g(0.27, 0.24, 0.17), bone='Snout2'), 0.08 * GS)
+    F.add(Ellipsoid(g(0, -2.38, 0.72), g(0.25, 0.17, 0.15), bone='Snout3'), 0.06 * GS)
+    # brow and cheek pads round the eye stalks
     for s_ in (1, -1):
-        # two short lip feelers at the mouth's corners
-        c0 = g(0.17 * s_, -2.36, 0.72)
-        F.add(RoundCone(c0, c0 + g(0.12 * s_, -0.14, -0.1), 0.04 * GS, 0.015 * GS, bone='Snout3'), 0.02 * GS)
+        F.add(Ellipsoid(g(0.2 * s_, -1.72, 1.12), g(0.14, 0.16, 0.1), bone='Head'), 0.07 * GS)
+        F.add(Ellipsoid(g(0.24 * s_, -2.06, 0.86), g(0.1, 0.2, 0.12), bone='Snout1'), 0.06 * GS)
+    tip = g(0, -2.46, 0.6)
+    ax = unit((0, -0.55, -1.0))
+    # the mouth: thick everted lips round a deep, ringed throat
+    F.add(Torus(tip, ax, 0.15 * GS, 0.06 * GS, bone='Snout3', squash=0.8), 0.04 * GS)
+    F.sub(Ellipsoid(tip + ax * 0.04 * GS, g(0.12, 0.1, 0.12)), 0.03 * GS)
+    for i in range(3):
+        F.groove(Torus(tip - ax * (0.02 + 0.05 * i) * GS, ax, (0.09 - 0.012 * i) * GS, 0.004 * GS), 0.012 * GS,
+                 0.012 * GS)
+    # a ring of oral tentacles round the lips, curling down and in
+    for i in range(7):
+        a_ = math.pi * (0.1 + 0.8 * i / 6)
+        side = np.array((math.cos(a_), 0.0, 0.0))
+        o = tip + np.array((math.cos(a_) * 0.15, -math.sin(a_) * 0.04, -math.sin(a_) * 0.02)) * GS * 1.0
+        d = unit(np.array((math.cos(a_) * 0.5, -0.45, -0.75)))
+        L = (0.22 + 0.08 * math.sin(a_)) * GS
+        p1 = o + d * L * 0.55
+        p2 = o + d * L + np.array((-math.cos(a_) * 0.06, -0.02, 0.05)) * GS
+        F.add(RoundCone(o, p1, 0.035 * GS, 0.024 * GS, bone='Snout3'), 0.02 * GS)
+        F.add(RoundCone(p1, p2, 0.024 * GS, 0.01 * GS, bone='Snout3'), 0.012 * GS)
+        _ = side
+    # skin folds: soft rolls across the neck and the snout's top
+    for i, (y, z, r) in enumerate(((-0.75, 0.82, 0.48), (-0.98, 0.92, 0.44), (-1.2, 1.0, 0.4), (-1.42, 1.08, 0.36))):
+        F.ridge(Torus(g(0, y, z), (0, 1.0, -0.35), r * GS, 0.01 * GS), 0.035 * GS, 0.03 * GS)
+    for i, y in enumerate((-1.94, -2.08, -2.22)):
+        F.groove(Torus(g(0, y, 0.98 - 0.12 * i), (0, 1.0, -0.6), (0.27 - 0.02 * i) * GS, 0.005 * GS), 0.02 * GS,
+                 0.018 * GS)
     # eye stalks with their bulbs, the feelers
     for s, p in ((1, 'L_'), (-1, 'R_')):
         e0, e1, e2 = g(0.17 * s, -1.62, 1.2), g(0.3 * s, -1.78, 1.56), g(0.42 * s, -1.92, 1.92)
         F.add(RoundCone(e0, e1, 0.085 * GS, 0.06 * GS, bone=p + 'Eye1'), 0.07 * GS)
         F.add(RoundCone(e1, e2, 0.06 * GS, 0.052 * GS, bone=p + 'Eye2'), 0.03 * GS)
         F.add(Sphere(e2 + g(0.0, -0.02, 0.04), 0.115 * GS, bone=p + 'Eye2'), 0.05 * GS)
+    # the pedal groove: a crease along each flank just above the skirt
+    for s_ in (1, -1):
+        pts = [g(s_ * (rx + 0.0), y, 0.24) for y, z, rx, rz, b_ in FOOT[1:-1]]
+        for p0, p1 in zip(pts, pts[1:]):
+            F.groove(RoundCone(p0, p1, 0.005 * GS, 0.005 * GS), 0.03 * GS, 0.03 * GS)
     # the flat sole
     zs = F.axes[2][None, None, :]
     F.d = smax(F.d, -(zs - 0.0), 0.05 * GS).astype(np.float32)
@@ -335,9 +396,8 @@ def build_shell(voxel):
     F.add(Torus(a0 + tang * 0.02 * GS, tang, rho * 1.0, 0.075 * GS), 0.06 * GS)
     # the socket under the shrine: the cut spire grows a short carved collar
     top = shrine_origin()
-    c = spiral_point(TMAX - 0.15)
-    F.add(RoundCone(c, top + g(0, 0, 0.02), 0.2 * GS, 0.33 * GS), 0.12 * GS)
-    F.add(Torus(top + g(0, 0, -0.04), (0, 0, 1), 0.33 * GS, 0.05 * GS), 0.04 * GS)
+    F.add(RoundCone(top - g(0, 0, 0.3), top + g(0, 0, 0.02), 0.36 * GS, 0.34 * GS), 0.1 * GS)
+    F.add(Torus(top + g(0, 0, -0.04), (0, 0, 1), 0.34 * GS, 0.05 * GS), 0.04 * GS)
     F.displace(shell_detail, band=0.25 * GS)
     return F
 
@@ -363,6 +423,7 @@ def shell_paint(obj):
         'RegKnob': knob,
         'RegLip': np.clip(lip, 0, 1),
         'RegT': t / TMAX,
+        'RegPsi': psi,
     }
     me = obj.data
     for nm, arr in vals.items():

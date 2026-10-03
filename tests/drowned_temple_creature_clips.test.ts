@@ -104,8 +104,8 @@ describe('the Tide Pilgrim: the sacred sea snail', () => {
     expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
     expect(v.clips.death).toBe('Death');
     expect(v.authoredAtlas).toBe(true);
-    // Drawn about 4.2 tall at its 0.95: well over the 2.6 player.
-    expect(v.height * (MOBS.drowned_pilgrim.scale ?? 1)).toBeCloseTo(4.2, 1);
+    // Drawn about 4.65 tall to the shrine at its 0.95: well over the 2.6 player.
+    expect(v.height * (MOBS.drowned_pilgrim.scale ?? 1)).toBeCloseTo(4.66, 1);
   });
 
   it('plays its Frenzy off the enrage cue, and no swing cuts it short', () => {
