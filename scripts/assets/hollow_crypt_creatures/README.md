@@ -16,7 +16,10 @@ Blender from code, in the chunky KayKit style of the rest of the cast:
   blender -b --factory-startup --python build_creature.py -- drake    public/models/creatures/crypt_drake.glb
   ```
 
-  then `node scripts/build_media_manifest.mjs generate`.
+  then `node scripts/assets/compress_glb_textures.mjs <file.glb>` (every shipped
+  GLB texture is KTX2, pinned by `tests/glb_texture_compression.test.ts`) and
+  `node scripts/build_media_manifest.mjs generate`. The same two steps follow the
+  hero creature, Morthen and Sunken Bastion exports below.
 
 Clips: Idle, Walk, Run, Attack, Hit, Death, Cast on all three (Attack2 on the
 gargoyle and drake), plus the drake's Breath, TailLash and WingGust. The
