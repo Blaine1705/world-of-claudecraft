@@ -28,7 +28,7 @@ import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
-import { applyClipTrackDrops } from './clip_track_drops';
+import { applyClipPositionDrops, applyClipTrackDrops } from './clip_track_drops';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { padMissingUv } from './far_bake_uv_pad';
@@ -2484,6 +2484,7 @@ export function prepareVisual(key: string): PreparedVisual {
   }
 
   applyClipTrackDrops(clips, def.clipTrackDrops);
+  applyClipPositionDrops(clips, def.clipPositionDrops);
   prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
   prepareWarriorActionFallbacks(key, clips, gltf.scene);
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No

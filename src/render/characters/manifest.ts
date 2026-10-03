@@ -455,6 +455,10 @@ export interface VisualDef {
    *  bones a dial owns (the Warden's plates through its flip clip, the Prime
    *  Draft's hatch leaves through its hatch clips). See clip_track_drops.ts. */
   clipTrackDrops?: ClipTrackDrops;
+  /** Position tracks removed from named clips when the visual is prepared: an
+   *  airborne clip that carries its altitude on its root, for a body the sim
+   *  already lifts (Korzul's hover clips). See clip_track_drops.ts. */
+  clipPositionDrops?: ClipTrackDrops;
   /** Mesh nodes hidden or shown by presentation gestures (the same triggerAttack
    *  seam): the Great Saurian's howdah once it breaks. See gesture_mesh_toggles.ts. */
   meshToggles?: readonly MeshToggleDef[];

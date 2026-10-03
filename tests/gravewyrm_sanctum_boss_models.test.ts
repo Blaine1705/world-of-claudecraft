@@ -5,7 +5,9 @@
 
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { applyClipPositionDrops } from '../src/render/characters/clip_track_drops';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
   SANCTUM_BOSS_LOOKS,
@@ -134,5 +136,22 @@ describe('the Sanctum bosses draw their own bodies', () => {
     expect(def.phaseClips?.[KORZUL_BREAK_FREE].clips.idle).toBe('Idle');
     expect(def.clips.castByAbility?.[KORZUL_BREAK_FREE]).toBe('BreakFree');
     expect(def.flight).toBe(true);
+  });
+
+  it('lets the sim own his flight height (the hover clips lose their Root climb)', () => {
+    const drops = SANCTUM_BOSS_LOOKS.sanctum_korzul.clipPositionDrops ?? {};
+    for (const clip of ['TakeOff', 'FlyIdle', 'FlyForward', 'BreathAir', 'Land'])
+      expect(drops[clip]).toEqual(['Root']);
+    const clips = new Map<string, THREE.AnimationClip>([
+      [
+        'FlyIdle',
+        new THREE.AnimationClip('FlyIdle', 1, [
+          new THREE.VectorKeyframeTrack('Root.position', [0, 1], [0, 6, 0, 0, 6, 0]),
+          new THREE.QuaternionKeyframeTrack('Root.quaternion', [0], [0, 0, 0, 1]),
+        ]),
+      ],
+    ]);
+    applyClipPositionDrops(clips, drops);
+    expect(clips.get('FlyIdle')?.tracks.map((t) => t.name)).toEqual(['Root.quaternion']);
   });
 });

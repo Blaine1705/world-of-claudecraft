@@ -240,6 +240,12 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
       // swap only hands him his waking clips.
       [KORZUL_BREAK_FREE]: { clips: KORZUL_CLIPS },
     },
+    // The sim lifts him to his hover (korzul.ts, pos.y up flightAltitude): the
+    // airborne clips' own Root climb (+6 yd) is dropped so the height has one
+    // owner and he never pops between the takeoff, the hover and the landing.
+    clipPositionDrops: Object.fromEntries(
+      ['TakeOff', 'FlyIdle', 'FlyForward', 'BreathAir', 'Land'].map((c) => [c, ['Root']]),
+    ),
     castClipSync: true,
     castPlayOutHoldsAttacks: true,
     oneShotsHoldAttacks: ['BreakFree', 'TakeOff', 'Roar'],

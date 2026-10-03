@@ -54,3 +54,30 @@ export function applyClipTrackDrops(
     clips.set(name, new THREE.AnimationClip(clip.name, clip.duration, kept, clip.blendMode));
   }
 }
+
+/** Is `trackName` the position of one of `bones`? (VisualDef.clipPositionDrops:
+ *  an airborne clip that carries its own altitude on its root, drawn by a sim
+ *  that already lifts the body, keeps ONE owner of the height.) */
+export function isDroppedPositionTrack(trackName: string, bones: readonly string[]): boolean {
+  const dot = trackName.lastIndexOf('.');
+  if (dot < 0 || trackName.slice(dot + 1) !== 'position') return false;
+  const node = trackName.slice(0, dot);
+  for (const b of bones) if (trackBone(b) === node) return true;
+  return false;
+}
+
+/** Rewrite the named clips without the named bones' position tracks (one
+ *  shallow copy per clip, once per prepared visual). */
+export function applyClipPositionDrops(
+  clips: Map<string, THREE.AnimationClip>,
+  drops: ClipTrackDrops | undefined,
+): void {
+  if (!drops) return;
+  for (const [name, bones] of Object.entries(drops)) {
+    const clip = clips.get(name);
+    if (!clip) continue;
+    const kept = clip.tracks.filter((t) => !isDroppedPositionTrack(t.name, bones));
+    if (kept.length === clip.tracks.length) continue;
+    clips.set(name, new THREE.AnimationClip(clip.name, clip.duration, kept, clip.blendMode));
+  }
+}
