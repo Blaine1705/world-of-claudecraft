@@ -194,6 +194,10 @@ const AUTHORED_ATLAS_DEFS = [
   'foundry_hound',
   'foundry_arc_drone',
   'foundry_tripod_turret',
+  // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
+  'sanctum_korgath',
+  'sanctum_velkhar',
+  'sanctum_korzul',
 ];
 
 describe('authored surfaces', () => {
