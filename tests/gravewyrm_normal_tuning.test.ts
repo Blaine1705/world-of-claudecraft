@@ -118,6 +118,9 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       const summoned = MOBS[spawn.mobId]?.summonAdds?.mobId;
       if (summoned) spawnIds.add(summoned);
     }
+    // Velkhar's Raised Bonewalkers climb out of his thaw pools (his encounter,
+    // encounters/gravewyrm_sanctum/velkhar.ts, not a template summonAdds).
+    spawnIds.add('raised_bonewalker');
     expect([...spawnIds].sort()).toEqual(Object.keys(tuning.damageMultiplierByMob).sort());
     // The mechanic override map may only re-price mobs the melee map covers.
     for (const id of Object.keys(tuning.mechanicDamageMultiplierByMob ?? {})) {
