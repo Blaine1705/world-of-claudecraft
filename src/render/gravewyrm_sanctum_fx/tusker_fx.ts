@@ -48,7 +48,7 @@ import {
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { setRenderCategory } from '../renderer_diagnostics';
-import { enrageBreath, rgb, SANCTUM_PALETTE } from './sanctum_fx_core';
+import { enrageBreath, FLAME_HEAT, rgb, SANCTUM_PALETTE } from './sanctum_fx_core';
 import type { SanctumFxHost } from './sanctum_fx_host';
 import {
   bowlFlight,
@@ -74,6 +74,9 @@ import {
   tuskerModelScale,
   tuskerStride,
 } from './tusker_model_core';
+
+/** Either side of a body (walked without allocating). */
+const SIDES = [-1, 1] as const;
 
 /** Seconds between re-sends of the trace chains' latched state. */
 const LATCH_RESEND = 1;
@@ -608,7 +611,7 @@ export class TuskerFx {
     const k = tuskerModelScale(t.scale);
     const rate = dt * 60 * this.host.density;
     // The wake: snow thrown out to both sides and the ice chewed up behind.
-    for (const side of [-1, 1]) {
+    for (const side of SIDES) {
       if (this.host.rand() > rate * 0.5) continue;
       const p = modelToWorld(t, t.chargeYaw, k, side * 2.2, 1.5, this.tmpPt);
       const gy = this.host.groundY(p.x, p.z);
@@ -829,7 +832,7 @@ export class TuskerFx {
           up: 2.5,
           life: 1.1,
           size: [1.4, 0.4],
-          color: [1, 0, 0],
+          color: FLAME_HEAT,
           alpha: 1,
           pool: 'soulfire',
           radius: 1.2,
@@ -863,7 +866,7 @@ export class TuskerFx {
           up: 1.1,
           life: 0.75,
           size: [1.15, 0.45],
-          color: [1, 0, 0],
+          color: FLAME_HEAT,
           alpha: 1,
           pool: 'soulfire',
           radius: 0.35,

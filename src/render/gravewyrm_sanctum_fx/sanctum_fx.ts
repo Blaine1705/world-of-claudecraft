@@ -65,6 +65,7 @@ import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { radialGlowTexture } from '../textures';
 import {
+  FLAME_HEAT,
   isSanctumObject,
   objectFill,
   PYRE_RAMP,
@@ -156,6 +157,8 @@ export class SanctumFx {
   private readonly rings: Ring[] = [];
   private readonly kit: TelegraphKit;
   private readonly pools: Record<SanctumPool, ParticlePool>;
+  /** The pools as a list (walked every frame without allocating). */
+  private readonly poolList: ParticlePool[];
   private readonly shards: SanctumShards;
   private readonly trash: SanctumTrashFx | null;
   private readonly tusker: TuskerFx | null;
@@ -287,6 +290,7 @@ export class SanctumFx {
         7,
       ),
     };
+    this.poolList = [this.pools.smoke, this.pools.glow, this.pools.soulfire, this.pools.pyre];
     // Shock and pulse rings over the ice.
     const ringGeo = new THREE.CircleGeometry(1, 72).rotateX(-Math.PI / 2);
     this.geometries.push(ringGeo);
@@ -469,7 +473,7 @@ export class SanctumFx {
         this.tusker?.hideAll();
         this.shards.hideAll();
       }
-      for (const p of Object.values(this.pools)) p.update(this.clock);
+      for (const p of this.poolList) p.update(this.clock);
       return;
     }
     this.shown = true;
@@ -480,7 +484,7 @@ export class SanctumFx {
     this.trash?.update(dt, this.clock);
     this.tusker?.update(dt, this.clock);
     this.shards.update(dt);
-    for (const p of Object.values(this.pools)) p.update(this.clock);
+    for (const p of this.poolList) p.update(this.clock);
   }
 
   private castSpec(castId: string): SanctumTelegraphSpec | undefined {
@@ -582,8 +586,8 @@ export class SanctumFx {
           speed: 0.25,
           up: 1.2,
           life: 0.9,
-          size: [1.5, 0.5],
-          color: [1, 0, 0],
+          size: [2.2, 0.8],
+          color: FLAME_HEAT,
           alpha: 1,
           pool: 'soulfire',
           radius: radius * 0.85,

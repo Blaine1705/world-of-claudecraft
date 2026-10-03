@@ -318,6 +318,11 @@ export const PYRE_RAMP: readonly (readonly [number, number, number, number])[] =
   [1.0, 1.0, 0.97, 0.85],
 ];
 
+/** The heat a flame puff is born with (a flame pool reads `color[0]`): held
+ *  in the ramp's middle so the soulfire burns violet-green and the pyre
+ *  orange, never bloomed to white. */
+export const FLAME_HEAT: readonly [number, number, number] = [0.6, 0, 0];
+
 /** GLSL `vec3 <name>(float h)` built from a ramp's stops. */
 export function rampGlsl(
   stops: readonly (readonly [number, number, number, number])[],

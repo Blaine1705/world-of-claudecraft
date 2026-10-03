@@ -53,6 +53,7 @@ import { surfaceMat } from '../gfx';
 import {
   BLOCK_RELEASE,
   blockFlight,
+  FLAME_HEAT,
   goadedPulse,
   hoarfrostRadius,
   objectFill,
@@ -66,6 +67,9 @@ import {
   stokeReach,
 } from './sanctum_fx_core';
 import type { SanctumFxHost } from './sanctum_fx_host';
+
+/** Either side of a body (walked without allocating). */
+const SIDES = [-1, 1] as const;
 
 const BEAM_SLOTS = 6;
 const AURA_SLOTS = 10;
@@ -198,7 +202,9 @@ export class SanctumTrashFx {
     );
     this.goadBeamMat = beamMat('sanctumGoadSparks', 0xb3200e, 0xffb070, 3.4);
     for (let i = 0; i < BEAM_SLOTS; i++) {
-      const mesh = new THREE.Mesh(beamGeo, this.soulBeamMat);
+      // Both tether looks ride a pooled mesh from the start, so the compile
+      // gate links both programs before the first Goad or Warming Rite.
+      const mesh = new THREE.Mesh(beamGeo, i % 2 === 0 ? this.soulBeamMat : this.goadBeamMat);
       mesh.frustumCulled = false;
       mesh.visible = false;
       host.root.add(mesh);
@@ -223,7 +229,8 @@ export class SanctumTrashFx {
     const planeGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
     this.geometries.push(planeGeo);
     for (let i = 0; i < AURA_SLOTS; i++) {
-      const mesh = new THREE.Mesh(planeGeo, this.goadedMat);
+      // Both glows are on a mesh at the gated attach (both programs link).
+      const mesh = new THREE.Mesh(planeGeo, i % 2 === 0 ? this.goadedMat : this.stokedMat);
       mesh.visible = false;
       mesh.renderOrder = floorVfxRenderOrder('encounter', 2);
       host.root.add(mesh);
@@ -448,7 +455,7 @@ export class SanctumTrashFx {
       up: 2.4,
       life: 0.9,
       size: [1.3, 0.5],
-      color: [1, 0, 0],
+      color: FLAME_HEAT,
       alpha: 1,
       pool: 'pyre',
       radius: 0.9,
@@ -465,7 +472,7 @@ export class SanctumTrashFx {
       up: 2.4,
       life: 1,
       size: [1.2, 0.4],
-      color: [1, 0, 0],
+      color: FLAME_HEAT,
       alpha: 1,
       pool: 'soulfire',
       radius: 0.6,
@@ -936,7 +943,7 @@ export class SanctumTrashFx {
       up: 1.3,
       life: 0.8,
       size: [1.3, 0.5],
-      color: [1, 0, 0],
+      color: FLAME_HEAT,
       alpha: 1,
       pool: 'soulfire',
       radius: 0.45,
@@ -959,7 +966,7 @@ export class SanctumTrashFx {
     const gy = this.host.groundY(e.pos.x, e.pos.z);
     const fx = Math.sin(e.facing);
     const fz = Math.cos(e.facing);
-    for (const side of [-1, 1]) {
+    for (const side of SIDES) {
       if (this.host.rand() > rate) continue;
       // The yoke's two braziers ride out past her shoulders, a little behind.
       const x = e.pos.x + fz * side * h * 0.2 - fx * h * 0.05;
@@ -969,7 +976,7 @@ export class SanctumTrashFx {
         up: 1,
         life: 0.6,
         size: [0.75, 0.3],
-        color: [1, 0, 0],
+        color: FLAME_HEAT,
         alpha: 1,
         pool: 'pyre',
         radius: 0.15,

@@ -78,6 +78,7 @@ import {
   tuskerStride,
   worldToModel,
 } from '../src/render/gravewyrm_sanctum_fx/tusker_model_core';
+import { FIRE_FRAG, GHOST_RAMP } from '../src/render/hollow_crypt/crypt_fx_particles';
 import { burstDelayForRadius } from '../src/render/stormbrass_foundry/foundry_fx_core';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import {
@@ -455,6 +456,12 @@ describe('the Sanctum telegraphs are the sim own shapes', () => {
     expect(mid[3]).toBeGreaterThan(mid[2]);
     const top = SOULFIRE_RAMP[SOULFIRE_RAMP.length - 1];
     expect(top[2]).toBeGreaterThan(top[1]);
+    // The flame shader really swaps its ramp (a drift in the crypt's ramp text
+    // would otherwise leave the soulfire silently ghost-green).
+    expect(FIRE_FRAG).toContain(GHOST_RAMP);
+    const soul = FIRE_FRAG.replace(GHOST_RAMP, glsl);
+    expect(soul).not.toBe(FIRE_FRAG);
+    expect(soul).toContain(glsl);
   });
 });
 

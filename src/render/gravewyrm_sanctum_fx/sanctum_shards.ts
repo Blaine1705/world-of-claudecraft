@@ -203,6 +203,9 @@ export class SanctumShards {
   }
 
   dispose(): void {
+    // The instance buffers are the mesh's own (the material is the shared
+    // surfaceMat cache's: never disposed here).
+    this.mesh.dispose();
     this.geo.dispose();
   }
 }

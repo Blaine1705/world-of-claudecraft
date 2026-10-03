@@ -400,13 +400,14 @@ export function sledgeToWorld(
  * clip throws it onto the soulfire patch the sim lit for it: the sim lays the
  * patches from the Tusker's own frame at the pull (and halves a spot that
  * falls off the road), the sledge stands where it was really dragged, so each
- * bowl is matched to its nearest patch within `reach` yards. A bowl with no
+ * bowl is matched to its nearest free patch within `reach` yards (wide: the
+ * sim frame at the pull can stand well off the hauled sledge). A bowl with no
  * patch in reach keeps the clip's spot (offset zero).
  */
 export function bowlOffsets(
   pose: SledgePose,
   patches: readonly { x: number; z: number }[],
-  reach = 9,
+  reach = 30,
 ): { x: number; z: number }[] {
   const taken = new Set<number>();
   const at = { x: 0, z: 0 };
