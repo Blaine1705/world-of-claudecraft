@@ -299,3 +299,23 @@ export function tideLook(
   }
   return { visible: true, fill: 1, fade: 1 };
 }
+
+/** The Tide Pilgrim's frenzy gesture (the manifest maps it to its `Frenzy` clip). */
+export const TEMPLE_PILGRIM_FRENZY_GESTURE = 'temple_pilgrim_frenzy';
+
+/** True for the Tide Pilgrim's frenzy cue: the classic trash enrage
+ *  (sim/mob/boss_mechanics.ts) marks itself with a self-aimed, ability-less
+ *  'nova' spellfx, and the pilgrim has no other nova. The temple claims it: the
+ *  snail rears and its shrine blazes violet in place of the generic fire burst. */
+export function isTemplePilgrimFrenzyCue(
+  ev: { type: string; fx?: string; sourceId?: number; targetId?: number; ability?: string },
+  sourceTemplateId: string | undefined,
+): boolean {
+  return (
+    ev.type === 'spellfx' &&
+    ev.fx === 'nova' &&
+    ev.sourceId === ev.targetId &&
+    !ev.ability &&
+    sourceTemplateId === 'drowned_pilgrim'
+  );
+}

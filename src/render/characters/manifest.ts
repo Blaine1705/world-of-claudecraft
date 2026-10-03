@@ -110,6 +110,7 @@ import {
 } from '../../sim/varkhul_cinder_artificer';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import { TEMPLE_PILGRIM_FRENZY_GESTURE } from '../drowned_temple/temple_fx_core';
 import {
   HOARD_GESTURE_CALL_HAMMER,
   HOARD_GESTURE_CALL_STORM,
@@ -4422,11 +4423,25 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.14,
   },
+  // The Tide Pilgrim (scripts/assets/drowned_temple_creatures/pilgrim_snail/):
+  // a giant sacred sea snail with a moon shrine on its carved nacre shell. It
+  // glides on a pedal wave, darts its snout (Attack) and crashes its shell
+  // down (Attack2); below 30 percent its enrage rears it up and blazes the
+  // shrine violet (Frenzy, played off the enrage's nova through the temple's
+  // gesture hook); dying, it pulls into its shell, topples and its pearl goes
+  // dark. Drawn about 4.2 tall at its 0.95 (1.6 players), about 5.5 long.
   temple_pilgrim: {
     url: `${CREATURES}/temple_pilgrim.glb`,
-    height: 4.4,
-    clips: TEMPLE_CLIPS,
-    selfIllumination: 0.16,
+    height: 4.42,
+    clips: {
+      ...TEMPLE_CLIPS,
+      attackByAbility: { [TEMPLE_PILGRIM_FRENZY_GESTURE]: 'Frenzy' },
+      attackTimeScaleByAbility: { [TEMPLE_PILGRIM_FRENZY_GESTURE]: 1 },
+    },
+    // A swing landing mid-frenzy must not cut the rear and the violet blaze short.
+    oneShotsHoldAttacks: ['Frenzy'],
+    authoredAtlas: true,
+    selfIllumination: 0.05,
   },
   temple_acolyte: {
     url: `${CREATURES}/temple_acolyte.glb`,

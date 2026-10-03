@@ -197,6 +197,8 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_crypt_drake',
   'mob_crypt_knellwyrm',
   'temple_ysolei',
+  // the Drowned Temple's Blender Tide Pilgrim (the sacred sea snail)
+  'temple_pilgrim',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

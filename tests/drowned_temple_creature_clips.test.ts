@@ -7,6 +7,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import {
+  isTemplePilgrimFrenzyCue,
+  TEMPLE_PILGRIM_FRENZY_GESTURE,
+} from '../src/render/drowned_temple/temple_fx_core';
 import { MOBS } from '../src/sim/data';
 import {
   YSOLEI_CALL,
@@ -86,5 +90,36 @@ describe('the Lagoon Eel and the Colossus', () => {
     );
     expect(v.clips.walk).toBe('Walk');
     expect(v.height * (MOBS.tideglass_colossus.scale ?? 1)).toBeCloseTo(15, 3);
+  });
+});
+
+describe('the Tide Pilgrim: the sacred sea snail', () => {
+  it('ships its own body with a clip for every job', () => {
+    expect(clipsOf('public/models/creatures/temple_pilgrim.glb').sort()).toEqual(
+      ['Attack', 'Attack2', 'Cast', 'Death', 'Frenzy', 'Hit', 'Idle', 'Run', 'Walk'].sort(),
+    );
+    const v = visualOf('drowned_pilgrim');
+    expect(v.url).toMatch(/temple_pilgrim\.glb$/);
+    expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
+    expect(v.clips.death).toBe('Death');
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn about 4.2 tall at its 0.95: well over the 2.6 player.
+    expect(v.height * (MOBS.drowned_pilgrim.scale ?? 1)).toBeCloseTo(4.2, 1);
+  });
+
+  it('plays its Frenzy off the enrage cue, and no swing cuts it short', () => {
+    const v = visualOf('drowned_pilgrim');
+    expect(v.clips.attackByAbility?.[TEMPLE_PILGRIM_FRENZY_GESTURE]).toBe('Frenzy');
+    expect(v.oneShotsHoldAttacks).toContain('Frenzy');
+    expect(MOBS.drowned_pilgrim.enrage).toBeDefined();
+    // The shape boss_mechanics.ts emits when a trash mob enrages.
+    const nova = { type: 'spellfx', sourceId: 7, targetId: 7, school: 'fire', fx: 'nova' };
+    expect(isTemplePilgrimFrenzyCue(nova, 'drowned_pilgrim')).toBe(true);
+    expect(isTemplePilgrimFrenzyCue(nova, 'drowned_templeguard')).toBe(false);
+    expect(isTemplePilgrimFrenzyCue(nova, undefined)).toBe(false);
+    expect(isTemplePilgrimFrenzyCue({ ...nova, targetId: 8 }, 'drowned_pilgrim')).toBe(false);
+    expect(isTemplePilgrimFrenzyCue({ ...nova, fx: 'projectile' }, 'drowned_pilgrim')).toBe(false);
+    expect(isTemplePilgrimFrenzyCue({ ...nova, ability: 'x' }, 'drowned_pilgrim')).toBe(false);
+    expect(isTemplePilgrimFrenzyCue({ ...nova, type: 'aura' }, 'drowned_pilgrim')).toBe(false);
   });
 });

@@ -38,9 +38,11 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import {
+  isTemplePilgrimFrenzyCue,
   TEMPLE_ACCENTS,
   TEMPLE_MARK_SPECS,
   TEMPLE_OBJECT_SPECS,
+  TEMPLE_PILGRIM_FRENZY_GESTURE,
   type TempleTelegraphSpec,
   templeTelegraphFill,
   templeTelegraphSpecs,
@@ -111,6 +113,7 @@ export class TempleFx {
     private readonly groundY: (x: number, z: number) => number,
     private readonly world?: IWorld,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'drowned-temple-telegraphs';
     setRenderCategory(this.root, 'ui3d');
@@ -156,9 +159,17 @@ export class TempleFx {
       .catch(() => {});
   }
 
+  /** True when the temple claims the event (the renderer skips its generic draw). */
   handleEvent(ev: SimEvent): boolean {
     this.hydra.handleEvent(ev);
     this.ysolei.handleEvent(ev);
+    if (ev.type === 'spellfx') {
+      const source = this.world?.entities.get(ev.sourceId);
+      if (isTemplePilgrimFrenzyCue(ev, source?.templateId)) {
+        this.playGesture?.(ev.sourceId, TEMPLE_PILGRIM_FRENZY_GESTURE);
+        return true;
+      }
+    }
     return false;
   }
 
