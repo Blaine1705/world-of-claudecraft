@@ -586,22 +586,26 @@ def rivets(p, pts, r, color=IRON_DARK):
 
 
 # ------------------------------------------------------------- carved runes
-# An angular stroke alphabet on a 4 by 6 grid (x right, y up): the Smith's
-# runes for the rune wall's three words, and his four tools for the pillars.
+# Angular stroke runes on a 4 by 6 grid (x right, y up). The Smith's runes are
+# pictures, never letters: no language is cut into his stone (the meaning
+# reaches the player as a localized lore line, never as baked text). The
+# rune wall carries his three acts (heat, the hammer, quench); the pillars
+# carry his four tools.
 GLYPHS = {
-    'H': [((0, 0), (0, 6)), ((4, 0), (4, 6)), ((0, 3), (4, 3))],
-    'E': [((0, 0), (0, 6)), ((0, 6), (4, 6)), ((0, 3), (3, 3)), ((0, 0), (4, 0))],
-    'A': [((0, 0), (2, 6)), ((2, 6), (4, 0)), ((0.9, 2.6), (3.1, 2.6))],
-    'T': [((0, 6), (4, 6)), ((2, 6), (2, 0))],
-    'M': [((0, 0), (0, 6)), ((0, 6), (2, 3)), ((2, 3), (4, 6)), ((4, 6), (4, 0))],
-    'R': [((0, 0), (0, 6)), ((0, 6), (3, 6)), ((3, 6), (4, 5)), ((4, 5), (4, 4)), ((4, 4), (3, 3)),
-          ((3, 3), (0, 3)), ((1.6, 3), (4, 0))],
-    'Q': [((1, 0), (3, 0)), ((3, 0), (4, 1)), ((4, 1), (4, 5)), ((4, 5), (3, 6)), ((3, 6), (1, 6)),
-          ((1, 6), (0, 5)), ((0, 5), (0, 1)), ((0, 1), (1, 0)), ((2.4, 1.6), (4.6, -0.6))],
-    'U': [((0, 6), (0, 1)), ((0, 1), (1, 0)), ((1, 0), (3, 0)), ((3, 0), (4, 1)), ((4, 1), (4, 6))],
-    'N': [((0, 0), (0, 6)), ((0, 6), (4, 0)), ((4, 0), (4, 6))],
-    'C': [((4, 6), (1, 6)), ((1, 6), (0, 5)), ((0, 5), (0, 1)), ((0, 1), (1, 0)), ((1, 0), (4, 0))],
-    '.': [((0.2, 0.0), (0.8, 0.6)), ((0.8, 0.0), (0.2, 0.6))],
+    # Heat: a flame over the hearth's bowl.
+    'heat': [((2, 6), (3.3, 4.0)), ((3.3, 4.0), (3.0, 2.2)), ((3.0, 2.2), (2, 1.5)), ((2, 1.5), (1.0, 2.2)),
+             ((1.0, 2.2), (0.7, 4.0)), ((0.7, 4.0), (2, 6)), ((2, 2.3), (2, 4.2)), ((0.2, 0.5), (3.8, 0.5)),
+             ((0.2, 0.5), (0.2, 1.1)), ((3.8, 0.5), (3.8, 1.1))],
+    # Quench: the work plunged point first into rolling water.
+    'quench': [((2, 6), (2, 2.5)), ((1.2, 3.4), (2, 2.5)), ((2.8, 3.4), (2, 2.5)),
+               ((0, 1.7), (0.67, 2.1)), ((0.67, 2.1), (1.33, 1.7)), ((1.33, 1.7), (2, 2.1)),
+               ((2, 2.1), (2.67, 1.7)), ((2.67, 1.7), (3.33, 2.1)), ((3.33, 2.1), (4, 1.7)),
+               ((0, 0.4), (0.67, 0.8)), ((0.67, 0.8), (1.33, 0.4)), ((1.33, 0.4), (2, 0.8)),
+               ((2, 0.8), (2.67, 0.4)), ((2.67, 0.4), (3.33, 0.8)), ((3.33, 0.8), (4, 0.4))],
+    # The cartouche round each of the rune wall's great runes (centred on the
+    # rune's own 4 by 6 cell: a long hexagon, its points up and down).
+    'cartouche': [((2, 7.1), (6.0, 6.2)), ((6.0, 6.2), (6.0, -0.2)), ((6.0, -0.2), (2, -1.1)),
+                  ((2, -1.1), (-2.0, -0.2)), ((-2.0, -0.2), (-2.0, 6.2)), ((-2.0, 6.2), (2, 7.1))],
     # The Smith's four tools.
     'hammer': [((2, 0), (2, 4.4)), ((0.4, 4.4), (3.6, 4.4)), ((0.4, 5.8), (3.6, 5.8)), ((0.4, 4.4), (0.4, 5.8)),
                ((3.6, 4.4), (3.6, 5.8)), ((1.4, 0.8), (2.6, 0.8))],
@@ -635,10 +639,3 @@ def rune_strokes(p, glyph, origin, unit, width, y, glow=RUNE, groove=SLATE_DEEP,
         p.box((mid.x, y + out * 0.03, mid.z), (L + width * 0.5, 0.1, width * 1.9), groove, roll=-ang)
         with p.as_kind(PAINT):
             p.box((mid.x, y + out * 0.075, mid.z), (L, 0.06, width * 0.8), glow, mat=GLOW, roll=-ang)
-
-
-def word_width(word, unit, gap):
-    w = 0.0
-    for ch in word:
-        w += (1.0 if ch == '.' else 4.0) * unit + gap
-    return w - gap

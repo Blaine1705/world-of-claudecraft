@@ -1330,6 +1330,11 @@ const baseEnTable = {
     "The Hollow Ward fails. On the lake, the ice groans under the Wyrm's weight.",
   'log.sanctumTuskerSpill':
     'The sledge tips over! Burning soul braziers spill across the Sledge Road.',
+  // The rune wall's lore line (encounters/gravewyrm_sanctum/rune_wall.ts
+  // RUNE_WALL_LORE_LOG): the wall carries runes, never letters, so this line is
+  // where its meaning reaches the player.
+  'log.sanctumRuneWall':
+    "The Smith's runes, cut the height of a man, name the three acts of his craft: heat, the hammer, and the quench. The quench still holds the Wyrm in the ice.",
   'mechanic.sanctumCinderBreath': 'Cinder Breath',
   'mechanic.sanctumWarmingRite': 'Warming Rite',
   'mechanic.sanctumGoad': 'Goad',

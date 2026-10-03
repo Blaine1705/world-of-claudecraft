@@ -73,6 +73,17 @@ const LISTED = [
   { id: 'seracs_desde_abajo', at: [-82, -40], face: PI, yaw: PI, pitch: 0.05, dist: 14 },
   { id: 'cornisa_del_ancla', at: [80, -92], face: 1.3, yaw: 1.3, pitch: 0.12, dist: 16 },
   { id: 'muro_de_runas', at: [96, -94], face: PI / 2, yaw: PI / 2, pitch: 0.08, dist: 14 },
+  // The same, with the HUD shown: the rune wall's lore line in the chat (it is
+  // read on approach, once per claim, so this shot runs right after the one above).
+  {
+    id: 'muro_de_runas_lore',
+    ui: true,
+    at: [96, -94],
+    face: PI / 2,
+    yaw: PI / 2,
+    pitch: 0.08,
+    dist: 14,
+  },
   {
     id: 'gigantes_en_el_hielo',
     at: [96, -46],
@@ -269,7 +280,7 @@ async function main() {
           document.head.appendChild(tag);
         }
         tag.textContent = hide ? '#ui, #nameplates { display: none !important; }' : '';
-      }, !shot.map);
+      }, !shot.map && !shot.ui);
       await chat(`/dev tp ${origin.x + shot.at[0]} ${origin.z + shot.at[1]}`);
       await sleep(900);
       if (shot.step !== undefined) {

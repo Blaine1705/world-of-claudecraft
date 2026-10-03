@@ -59,7 +59,7 @@ from gwkit import (  # noqa: E402
     PYRE, RIME, ROCK, ROPE, RUNE, RUNE_DEAD, RUNE_DIM, SEAL_EDGE, SEAL_STONE, SLATE, SLATE_DARK, SLATE_DEEP,
     SLATE_LIGHT, SLATE_RUST, SNOW, SOOT, SOUL, SOUL_VIOLET, STONE, TAU, TIMBER, TIMBER_DARK, P, _fbm, chain_link,
     chain_run, crystal, hull, icicles, link_loop, loft_x, loft_z, loop_tube, mix, rivets, rune_strokes, shard, slab,
-    snowcap, word_width,
+    snowcap,
 )
 from hckit import export_kit  # noqa: E402
 import gravewyrm_sculpt as gs  # noqa: E402
@@ -265,10 +265,18 @@ def smiths_hammer():
 
 def rune_wall():
     """HERO: the Anchor Ledge's rune wall (22 wide, 15 tall): a rock face of
-    cleaved slate round a dressed panel cut with the Smith's three words in
-    runes the height of a man, HEAT. HAMMER. QUENCH., one word to a line,
-    each letter a chiselled channel with his blue light in it; a frame of
-    small runes, snow on the ledges, icicles off the lintel."""
+    cleaved slate round a dressed panel cut with the Smith's three acts in
+    runes the height of a man, one to a line from the top: heat (a flame
+    over the hearth), the hammer (his tool rune, as on the seal pillars),
+    quench (the work plunged into water). Each great rune stands in a
+    cartouche, the three cartouches linked point to point, and a band of
+    small runes runs out to either side between carved rules (the bellows
+    with the heat, the anvil and the tongs with the hammer, the tongs with
+    the quench).
+    Pictures, never letters: no language is cut into the stone (the meaning
+    reaches the player as a localized lore line). Each rune is a chiselled
+    channel with his blue light in it; a frame of small ticks, snow on the
+    ledges, icicles off the lintel."""
     p = P('RuneWall', frost=0.6, seed=45, ao_dist=3.0)
     blocks = [('rockd', (0, 3.6, 8), (25, 5.5, 17), None, 0.3, 0)]
     for k in range(6):
@@ -288,12 +296,26 @@ def rune_wall():
     p.box((0, -0.6, 7.0), (18.6, 1.0, 11.6), (0.24, 0.255, 0.28), bevel=0.06)
     p.box((0, -1.05, 12.95), (19.2, 0.6, 0.5), SEAL_EDGE, bevel=0.06)
     p.box((0, -1.05, 1.05), (19.2, 0.6, 0.5), SEAL_EDGE, bevel=0.06)
-    unit, gap, width = 0.36, 0.62, 0.2
-    for word, z in (('HEAT.', 9.25), ('HAMMER.', 5.85), ('QUENCH.', 2.45)):
-        x = -word_width(word, unit, gap) / 2
-        for ch in word:
-            rune_strokes(p, ch, (x, z), unit, width, -1.1, glow=RUNE)
-            x += (1.0 if ch == '.' else 4.0) * unit + gap
+    # The three acts, top to bottom: (great rune, its band's two small runes,
+    # the line's centre height). Great runes 0.38 a grid step (2.3 tall), the
+    # band's 0.19; the cartouches (8 by 8.2 steps) all but meet point to point.
+    unit, width, small, small_w = 0.38, 0.26, 0.19, 0.11
+    for great, band, zc in (('heat', ('heat', 'bellows'), 10.15), ('hammer', ('anvil', 'tongs'), 6.7),
+                            ('quench', ('tongs', 'quench'), 3.25)):
+        origin = (-2 * unit, zc - 3 * unit)
+        rune_strokes(p, great, origin, unit, width, -1.1, glow=RUNE)
+        rune_strokes(p, 'cartouche', origin, unit, 0.16, -1.1, glow=RUNE_DIM)
+        for s_ in (-1, 1):
+            # The band's two carved rules, then four small runes alternating
+            # outward from the cartouche.
+            for dz in (-0.82, 0.82):
+                p.box((s_ * 5.4, -1.13, zc + dz), (6.4, 0.1, 0.2), SLATE_DEEP)
+                with p.as_kind(PAINT):
+                    p.box((s_ * 5.4, -1.175, zc + dz), (6.4, 0.06, 0.08), RUNE_DIM, mat=GLOW)
+            for k in range(4):
+                cx = s_ * (3.15 + k * 1.5)
+                rune_strokes(p, band[k % 2], (cx - 2 * small, zc - 3 * small), small, small_w, -1.1,
+                             glow=RUNE_DIM)
     for k in range(30):
         x = -9.0 + k * 0.62
         for z in (12.6, 1.4):

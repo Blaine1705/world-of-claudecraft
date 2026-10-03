@@ -1141,7 +1141,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/gravestone_cross.glb": "/media/models/props/gravestone_cross.e5e80d10917f.glb",
   "models/props/gravestone_decorative.glb": "/media/models/props/gravestone_decorative.99857d708b17.glb",
   "models/props/gravestone_round.glb": "/media/models/props/gravestone_round.a96321115d06.glb",
-  "models/props/gravewyrm_sanctum_kit.glb": "/media/models/props/gravewyrm_sanctum_kit.5bf2580431ab.glb",
+  "models/props/gravewyrm_sanctum_kit.glb": "/media/models/props/gravewyrm_sanctum_kit.6df4063477a3.glb",
   "models/props/gravewyrm_sanctum_korzul_frozen.glb": "/media/models/props/gravewyrm_sanctum_korzul_frozen.b83f4117a4c3.glb",
   "models/props/gravewyrm_sanctum_mountains.glb": "/media/models/props/gravewyrm_sanctum_mountains.fadc7db9737c.glb",
   "models/props/hanging_cage.glb": "/media/models/props/hanging_cage.3fbac209b03a.glb",

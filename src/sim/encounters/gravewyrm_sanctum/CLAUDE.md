@@ -19,6 +19,7 @@ templates, spawns, packs, patrols, gates and story markers are
 | `meltwater.ts` | Pure: is a point in meltwater (a pool, a live strip, a heroic puddle), and a ray's reach to the vault's rim. |
 | `plates.ts` | Pure G25 plate floor over `LAKE_PLATES`: nearest-centre membership (`plateIndexAt`, the shelf is none), the cone-covers-plate test and `conePlates`, the Sound to Cracked to Broken ladder (`burnPlate`), the refreeze (`stepRefreeze`) and the template id each plate's object carries (`plateRecTemplate`). |
 | `korzul.ts` + `korzul_state.ts` | Korzul the Gravewyrm (design 6.3). His state lives for the claim (`phase` 'idle' between pulls) because the nineteen plate objects exist before the pull. Break Free (a 3 s bar, immune), Grave Breath (burns the covered plates), Tail Sweep, Grave Inferno (moved off the template: pulses 2 and 4 burn his plate, a break Douses him and ends it), quench-water on broken plates, two flights at 70 and 40 percent (G26 on `mob/flight.ts`: in combat, threat kept, `hostile` false and `damageImmune` every tick aloft, `KORZUL_AIRBORNE` aura, `pos.y` up `flightAltitude`; Wyrm's Eye, Plunging Fire, Brood from Below, Crashing Descent), the last phase, and the no-ice soft enrage. Heroic: Deep Quench, Twin Eyes. Thin Ice at his death. |
+| `rune_wall.ts` | The Anchor Ledge's rune wall as a readable lore object (design section 3): the kit wall carries the Smith's picture runes (heat, the hammer, quench), never letters, so its meaning reaches each claim player once, on walking up in front of it (`inRuneWallReadZone`), as a pid-scoped `log` line (`RUNE_WALL_LORE_LOG`, re-localized by `src/ui/sim_i18n.ts` `log.sanctumRuneWall`). Per-claim memory keyed by the slot and its exit entity. |
 | `index.ts` | `tickSanctumEncounters` (called from `instances/dungeons.ts` after the trash kit) and the public surface. |
 
 The trash kit's Sanctum keys (`goad`, `toss`, `stoke`, the death burst's `slow`)
@@ -47,4 +48,6 @@ rest generic English or glaciology terms). "Ice Tomb" is never a display name.
 
 Tests: `tests/gravewyrm_korgath.test.ts` (Korgath's core), `tests/gravewyrm_velkhar.test.ts` (Velkhar), `tests/gravewyrm_korzul.test.ts` (Korzul), `tests/gravewyrm_sanctum_route.test.ts` (route contract, heights,
 arenas, story marker reach), `tests/gravewyrm_sanctum_trash.test.ts` (kits, the
-Tusker, the story steps, `/dev sanctum`), `tests/gravewyrm_normal_tuning.test.ts`.
+Tusker, the story steps, `/dev sanctum`), `tests/gravewyrm_normal_tuning.test.ts`,
+`tests/gravewyrm_sanctum_rune_wall.test.ts` (the rune wall's read zone, its once-per-claim
+line, its i18n key, and no letters in the kit's runes).

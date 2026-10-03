@@ -14,6 +14,7 @@ import { bossEngaged, claimBoss, sanctumClaims } from './claim';
 import { KORGATH_ID, KORZUL_ID, SLEDGE_TUSKER_ID, VELKHAR_ID } from './ids';
 import { tickKorgath } from './korgath';
 import { tickKorzul } from './korzul';
+import { tickRuneWallLore } from './rune_wall';
 import { stepPatches, tickTusker } from './sledge_tusker';
 import { tickStory } from './story';
 import { tickVelkhar } from './velkhar';
@@ -21,6 +22,7 @@ import { tickVelkhar } from './velkhar';
 export * from './ids';
 export { korgathDevTrigger } from './korgath';
 export { korzulDevTrigger } from './korzul';
+export { inRuneWallReadZone, RUNE_WALL_LORE_LOG } from './rune_wall';
 export {
   enrageTusker,
   spillBraziers,
@@ -62,6 +64,7 @@ export function tickSanctumEncounters(ctx: SimContext): void {
     const korzul = claimBoss(ctx, inst, KORZUL_ID);
     if (korzul && !paused(korzul)) tickKorzul(ctx, inst, korzul, bossEngaged(korzul));
     tickStory(ctx, inst);
+    tickRuneWallLore(ctx, inst);
     sweepOrphanBurstRings(ctx, inst);
     sweepOrphanTossRings(ctx, inst);
   }
