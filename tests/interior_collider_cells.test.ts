@@ -6,7 +6,10 @@
 // wider than the registration margin (the ring read) and bodies so wide the
 // index steps aside. The bounded resolve's fallback (a push that carries the
 // point out of its cell) must actually fire somewhere in the sample, or the
-// test would not be covering the arm that makes the subset exact.
+// test would not be covering the arm that makes the subset exact. Every
+// interior a dungeon record names is swept (the six reworked authored fields
+// densely), plus a slot with half its gates open (its own filtered list and
+// index) and the degenerate radii the index must step aside for.
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { colliderBounds } from '../src/sim/collider_cells';
@@ -18,6 +21,10 @@ import {
   supportHeightAt,
 } from '../src/sim/colliders';
 import { DUNGEON_FLOOR_Y, DUNGEONS, instanceOrigin } from '../src/sim/data';
+import {
+  clearDungeonGateStateForTest,
+  setOpenDungeonGates,
+} from '../src/sim/instances/dungeon_gate_state';
 import {
   INTERIOR_CELL,
   INTERIOR_CELL_MARGIN,
@@ -36,10 +43,15 @@ const REWORKED = [
   'stormbrass_foundry',
   'wildheart_basin',
 ];
+/** Every dungeon that names an interior (one per interior set). */
+const ALL_INTERIORS = Object.keys(DUNGEONS).filter((id) => DUNGEONS[id].interior);
 // 0.5 is BODY_RADIUS; 1.6 reads ring 1 and 20 ring 2 (bodies wider than the margin).
 const RADII = [0.5, 0.8, 1.6, 20];
 
-afterEach(() => setInteriorCellIndexEnabled(true));
+afterEach(() => {
+  setInteriorCellIndexEnabled(true);
+  clearDungeonGateStateForTest();
+});
 
 function interiorList(dungeonId: string): Collider[] {
   return derivedInteriorColliders(dungeonId, DUNGEONS[dungeonId].interior as string, {});
@@ -47,9 +59,10 @@ function interiorList(dungeonId: string): Collider[] {
 
 /** Local sample points: a coarse lattice over the field, every collider's
  *  centre (deep inside: the long pushes), its edges, and the cell borders. */
-function samplePoints(list: Collider[]): { x: number; z: number }[] {
+function samplePoints(list: Collider[], step = 7.3): { x: number; z: number }[] {
   const pts: { x: number; z: number }[] = [];
-  for (let x = -118; x <= 118; x += 7.3) for (let z = -248; z <= 248; z += 7.3) pts.push({ x, z });
+  for (let x = -118; x <= 118; x += step)
+    for (let z = -248; z <= 248; z += step) pts.push({ x, z });
   for (const c of list) {
     const b = colliderBounds(c);
     pts.push(
@@ -86,10 +99,27 @@ describe('interior collider cell index', () => {
     }
   });
 
-  it('steps aside past the widest ring, and when disabled', () => {
+  it('never files a collider twice in one interior list (the ring read dedupes)', () => {
+    for (const id of ALL_INTERIORS) {
+      const list = interiorList(id);
+      expect(new Set(list).size, id).toBe(list.length);
+    }
+  });
+
+  it('steps aside past the widest ring, for a NaN or negative reach, and when disabled', () => {
     const list = interiorList('gravewyrm_sanctum');
     expect(interiorCellCandidates(list, 0, 0, INTERIOR_CELL_MARGIN + 3 * INTERIOR_CELL)).toBeNull();
     expect(interiorCellCandidates(list, Number.NaN, 0, 1)).toBeNull();
+    expect(interiorCellCandidates(list, 0, 0, Number.NaN)).toBeNull();
+    expect(interiorCellCandidates(list, 0, 0, -1)).toBeNull();
+    // ...so a degenerate radius resolves exactly like the full scan.
+    const o = instanceOrigin(DUNGEONS.gravewyrm_sanctum.index, 0);
+    for (const r of [Number.NaN, -0.5, -40]) {
+      for (const p of samplePoints(list, 23)) {
+        const [a, b] = both(() => resolvePosition(SEED, o.x + p.x, o.z + p.z, r));
+        expect(Object.is(a.x, b.x) && Object.is(a.z, b.z), `r ${r} (${p.x}, ${p.z})`).toBe(true);
+      }
+    }
     setInteriorCellIndexEnabled(false);
     expect(interiorCellCandidates(list, 0, 0, 1)).toBeNull();
   });
@@ -98,12 +128,12 @@ describe('interior collider cell index', () => {
     let fallbacks = 0;
     let pushed = 0;
     const mismatches: string[] = [];
-    for (const id of REWORKED) {
+    for (const id of ALL_INTERIORS) {
       const def = DUNGEONS[id];
       const o = instanceOrigin(def.index, 0);
       const list = interiorList(id);
       const mover = { y: DUNGEON_FLOOR_Y + 0.4, lift: 0.9 };
-      for (const p of samplePoints(list)) {
+      for (const p of samplePoints(list, REWORKED.includes(id) ? 7.3 : 13)) {
         for (const r of RADII) {
           const wx = o.x + p.x;
           const wz = o.z + p.z;
@@ -135,14 +165,39 @@ describe('interior collider cell index', () => {
     expect(fallbacks).toBeGreaterThan(0);
   });
 
+  it('a slot with gates open resolves identically through its own filtered list', () => {
+    const mismatches: string[] = [];
+    let gated = 0;
+    for (const id of ALL_INTERIORS) {
+      const gates = DUNGEONS[id].gates ?? [];
+      if (gates.length === 0) continue;
+      gated++;
+      const o = instanceOrigin(DUNGEONS[id].index, 1);
+      setOpenDungeonGates(
+        o.x,
+        o.z,
+        gates.filter((_, i) => i % 2 === 0).map((g) => g.id),
+      );
+      const list = interiorList(id);
+      for (const p of samplePoints(list, 11)) {
+        for (const r of [0.5, 1.6]) {
+          const [a, b] = both(() => resolvePosition(SEED, o.x + p.x, o.z + p.z, r));
+          if (a.x !== b.x || a.z !== b.z) mismatches.push(`${id} gated (${p.x}, ${p.z}) r ${r}`);
+        }
+      }
+    }
+    expect(gated).toBeGreaterThanOrEqual(6);
+    expect(mismatches).toEqual([]);
+  });
+
   it('supportHeightAt and line of sight are identical with the index on and off', () => {
     const mismatches: string[] = [];
     let blocked = 0;
-    for (const id of REWORKED) {
+    for (const id of ALL_INTERIORS) {
       const def = DUNGEONS[id];
       const o = instanceOrigin(def.index, 0);
       const list = interiorList(id);
-      const pts = samplePoints(list);
+      const pts = samplePoints(list, REWORKED.includes(id) ? 7.3 : 13);
       for (let i = 0; i < pts.length; i++) {
         const p = pts[i];
         const wx = o.x + p.x;

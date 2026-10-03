@@ -28,7 +28,11 @@
 // Built lazily per list identity (the shared per-dungeon set, and each slot's
 // gate-filtered view from instances/dungeon_gate_state.ts, which is a new
 // array whenever a gate opens), cached in a WeakMap. Pure module: no Sim
-// state, no rng.
+// state, no rng. CONTRACT: an interior list and its colliders are never
+// mutated in place once published (they are concat and filter products); a
+// list that grows re-indexes, but an in-place swap or a moved collider would
+// leave a stale index. The ring read also assumes no collider appears twice
+// in one list (checked by the test).
 
 import { cellKey, colliderBounds } from './collider_cells';
 import { type ResolveBox, resolveAgainst } from './collider_pushout';
@@ -123,9 +127,12 @@ export function interiorCellCandidates(
   reach: number,
 ): Collider[] | null {
   if (!indexEnabled || !Number.isFinite(x) || !Number.isFinite(z)) return null;
+  // A NaN or negative reach (a NaN or negative radius) has no AABB bound: a
+  // circle with c.r + r < 0 still pushes, and NaN fails every comparison open.
+  if (!(reach >= 0)) return null;
   const excess = reach - INTERIOR_CELL_MARGIN;
   const ring = excess <= 0 ? 0 : Math.ceil(excess / INTERIOR_CELL);
-  if (ring > MAX_RING) return null;
+  if (!(ring <= MAX_RING)) return null;
   const index = indexFor(list);
   const gx = Math.floor(x / INTERIOR_CELL);
   const gz = Math.floor(z / INTERIOR_CELL);
