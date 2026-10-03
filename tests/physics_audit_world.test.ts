@@ -25,6 +25,7 @@ import {
   YUMI_BAND_X_MIN,
 } from '../src/sim/data';
 import { CRYPT_LAYOUT, DAIS_HEIGHT, tombSlotRoll } from '../src/sim/dungeon_layout';
+import { morthenEntranceHeight } from '../src/sim/encounters/hollow_crypt/ids';
 import {
   CHAPEL_HALL_ROOF_EAVE,
   CHAPEL_HALL_ROOF_TOP,
@@ -525,8 +526,12 @@ describe('dungeon deep sweep', () => {
       // A perched gargoyle waits on its arch, a flying patrol on the wing
       // (mob/trash_kit): each at its own authored height, not the floor.
       const up = e.perchY ?? e.dungeonPatrol?.flightY;
-      const g = up ?? groundHeight(e.pos.x, e.pos.z, SEED);
-      expect(Math.abs(e.pos.y - g)).toBeLessThan(0.01);
+      // Morthen waits buried under the Rite Ring for his entrance
+      // (encounters/hollow_crypt/morthen_rise.ts): his floor plus the
+      // entrance's authored height, 0 once he has risen.
+      const rite = e.cryptRite ? morthenEntranceHeight(e.cryptRite.phase, e.cryptRite.t) : 0;
+      const g = up ?? groundHeight(e.pos.x, e.pos.z, SEED) + rite;
+      expect(Math.abs(e.pos.y - g), e.templateId).toBeLessThan(0.01);
       checked++;
     }
     console.log('mob y checks:', checked);
