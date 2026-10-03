@@ -853,7 +853,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // The five-dungeon rework's 58 base items and its eight generated Heroic
+    // variants: 1,683 (the same live count the Field Kit test below pins).
+    expect(Object.keys(ITEMS)).toHaveLength(1683);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -869,8 +871,13 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(currentOwnerIds.has(id), `${id} still has a current mapping owner`).toBe(true);
     }
 
+    // The art-pending ledger (ITEM_ART_PENDING) stages a wave's generated
+    // heroic variants outside the audited catalog until their paintings land,
+    // exactly as the sealed-audit test above and the audit CLI account them
+    // (the Hollow Crypt's Heroic Cantor's Hymnal is the one staged today).
     const generatedHeroics = Object.entries(ITEMS).filter(
-      ([, item]) => 'heroicOf' in item && typeof item.heroicOf === 'string',
+      ([id, item]) =>
+        'heroicOf' in item && typeof item.heroicOf === 'string' && !ITEM_ART_PENDING.has(id),
     );
     const datedIdSet = new Set(datedIds);
     // Membership against the CURRENT mapping owners, not the dated snapshot: the
@@ -879,9 +886,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // like every other heroic weapon variant.
     const heroicWithOwnWebp = generatedHeroics.filter(([id]) => currentOwnerIds.has(id));
     const heroicArtAliases = generatedHeroics.filter(([id]) => !currentOwnerIds.has(id));
-    expect(generatedHeroics).toHaveLength(78);
-    expect(heroicWithOwnWebp).toHaveLength(59);
-    expect(heroicArtAliases).toHaveLength(19);
+    // 85 / 60 / 25 with the five-dungeon rework's seven unstaged Heroic
+    // variants (named below): the Heroic Chorus Conch ships its own painting,
+    // the six Heroic weapons alias their base weapon's art.
+    expect(generatedHeroics).toHaveLength(85);
+    expect(heroicWithOwnWebp).toHaveLength(60);
+    expect(heroicArtAliases).toHaveLength(25);
     expect(heroicArtAliases.every(([, item]) => item.kind === 'weapon')).toBe(true);
     // The 14 new heroic defs the release's gap-fill and Bramblehide waves add
     // are named additions, never a silent side effect of widening the
@@ -903,14 +913,26 @@ describe('item-art consistency accepted-art provenance', () => {
       ...(releaseGapWeaponBatch?.itemIds.map((id) => heroicVariantId(id)) ?? []),
     ]);
     expect(expectedNewHeroicIds).toHaveLength(14);
+    // The five-dungeon rework's seven unstaged Heroic variants, named the same
+    // way: one own-art conch from its dungeon batch, six weapon aliases.
+    const reworkHeroicIds = [
+      'heroic_chorus_conch',
+      'heroic_falls_blessed_staff',
+      'heroic_gaolyard_cudgel',
+      'heroic_knight_commanders_longsword',
+      'heroic_rimeweb_fang',
+      'heroic_sextons_spadehaft',
+      'heroic_tideglass_shiv',
+    ];
+    expect(heroicWithOwnWebp.map(([id]) => id)).toContain('heroic_chorus_conch');
     const heroicIdSet = new Set(generatedHeroics.map(([id]) => id));
-    for (const id of expectedNewHeroicIds) {
+    for (const id of [...expectedNewHeroicIds, ...reworkHeroicIds]) {
       expect(heroicIdSet.has(id), `${id} is a live heroic def`).toBe(true);
     }
     // Everything else in the current heroic set is the dated 64: this proves
-    // the release's 14 heroic defs are exactly the additive ones, not a
-    // silent expansion of what was already there.
-    const expectedNewHeroicIdSet = new Set(expectedNewHeroicIds);
+    // the release's 14 heroic defs and the rework's seven are exactly the
+    // additive ones, not a silent expansion of what was already there.
+    const expectedNewHeroicIdSet = new Set([...expectedNewHeroicIds, ...reworkHeroicIds]);
     const preReleaseHeroics = generatedHeroics.filter(([id]) => !expectedNewHeroicIdSet.has(id));
     expect(preReleaseHeroics).toHaveLength(64);
 

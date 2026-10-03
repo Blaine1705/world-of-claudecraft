@@ -5611,6 +5611,27 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'cmb_coinsack_caught',
   // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
   'exp_harbor_to_harbor',
+  // The five-dungeon rework's encounter deeds (content/deeds.ts, appended in
+  // DEED_ORDER): the dungeon category crest until their paintings are commissioned.
+  'dgn_olen_buttress',
+  'dgn_ossick_moored',
+  'dgn_vael_beacon',
+  'dgn_turretback',
+  'dgn_selthe_pitch',
+  'dgn_colossus_mirror',
+  'dgn_ysolei_high_and_dry',
+  'dgn_mere_hydra',
+  'dgn_crypt_knellwyrm',
+  'dgn_turnkey_cage',
+  'dgn_beastmaster_apart',
+  'dgn_gorgebloom_clean',
+  'dgn_zulgar_uncaught',
+  'dgn_great_saurian',
+  'dgn_korgath_all_chains',
+  'dgn_korgath_still_bound',
+  'dgn_velkhar_cold',
+  'dgn_korzul_thin_ice',
+  'dgn_sledge_tusker',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

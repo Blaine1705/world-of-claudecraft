@@ -688,7 +688,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // the pending side on the exploration crest.
     // 319 at the 2026-09-28 release/v0.44.0 merge into Buried Hoards: the
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
-    expect(DEED_ORDER).toHaveLength(319);
+    // 338 with the five-dungeon rework's 19 encounter deeds, all on the
+    // pending side on the deed_cat_dungeon crest.
+    expect(DEED_ORDER).toHaveLength(338);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

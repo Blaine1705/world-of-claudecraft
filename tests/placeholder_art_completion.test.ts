@@ -323,6 +323,13 @@ describe('v0.36 placeholder-art completion evidence', () => {
       // dungeon: scripts/generate_sunken_bastion_item_icons.mjs).
       'knight_commanders_longsword',
       'gaolyard_cudgel',
+      // The Drowned Temple, Wildheart Basin and Gravewyrm Sanctum reworks' boss
+      // weapons, likewise painted with their dungeons
+      // (scripts/generate_<dungeon>_item_icons.mjs).
+      'tideglass_shiv',
+      'tideglass_warmaul',
+      'falls_blessed_staff',
+      'hammer_of_the_open_lock',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(
