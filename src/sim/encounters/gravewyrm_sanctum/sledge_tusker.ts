@@ -422,7 +422,9 @@ export function tickTusker(
   }
   const st = tuskerState(tusker);
   // The pull: it unhitches its sledge where it stands (the Unhitch clip).
-  st.sledge ??= { x: tusker.pos.x, z: tusker.pos.z, yaw: tusker.facing };
+  // The heading it hauled on is the one the tick began with (prevFacing): the
+  // mob AI has already turned it toward its target by now.
+  st.sledge ??= { x: tusker.pos.x, z: tusker.pos.z, yaw: tusker.prevFacing };
   stepPatches(ctx, inst, tusker, st);
   // Both clocks run through the other strike's bar.
   st.sweepTimer -= DT;
