@@ -497,7 +497,11 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
         root: 2,
       },
     },
-    componentTags: ['bark'],
+    // No componentTags: animated plant, like the shipped treants
+    // (orchard_treant, treant_elder), so its corpse offers no harvest. No
+    // HARVEST_COMPONENT_ITEMS family is wood, and an unmapped tag would be a
+    // corpse that advertises a harvest it can never pay
+    // (tests/harvest_geography.test.ts).
     loot: [{ copper: 400, chance: 1 }],
     scale: 2.2,
     color: 0x4f6a2e,
@@ -599,7 +603,8 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 14,
     // No kill XP: a missed seed must never be a farm.
     xpMult: 0,
-    componentTags: ['bark'],
+    // No componentTags: a plant like the Snarlvine Lasher, and a missed seed
+    // must never be a harvest farm either.
     loot: [],
     scale: 1.5,
     color: 0x6b8f2a,

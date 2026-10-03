@@ -308,8 +308,9 @@ export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 6.5,
     aggroRadius: 13,
-    // Below 30 percent it hits 30 percent harder.
-    enrage: { belowHpPct: 0.3, dmgMult: 1.3 },
+    // Below 30 percent it hits 30 percent harder and swings 20 percent faster
+    // (classic trash frenzy, the shipped 1.3 / 1.2 pairing).
+    enrage: { belowHpPct: 0.3, dmgMult: 1.3, hasteMult: 1.2 },
     trashKit: {
       // Ice Block Toss: a block of ice at the farthest player, onto a 5 yd ring
       // painted where they stood 2 s before it lands.

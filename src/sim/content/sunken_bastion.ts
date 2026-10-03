@@ -279,7 +279,8 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
       name: 'Rally the Watch',
       school: 'physical',
     },
-    enrage: { belowHpPct: 0.3, dmgMult: 1.3 },
+    // Classic trash frenzy: harder and faster, the shipped 1.3 / 1.2 pairing.
+    enrage: { belowHpPct: 0.3, dmgMult: 1.3, hasteMult: 1.2 },
     yells: { enrage: 'Hold the wall, you dogs!' },
     loot: [
       { copper: 220, chance: 1 },

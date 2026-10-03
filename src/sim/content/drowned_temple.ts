@@ -283,7 +283,8 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 6.5,
     aggroRadius: 11,
     xpMult: 0.5,
-    enrage: { belowHpPct: 0.3, dmgMult: 1.3 },
+    // Classic trash frenzy: harder and faster, the shipped 1.3 / 1.2 pairing.
+    enrage: { belowHpPct: 0.3, dmgMult: 1.3, hasteMult: 1.2 },
     loot: [
       { copper: 40, chance: 1 },
       { itemId: 'linen_scrap', chance: 0.3 },
@@ -472,10 +473,11 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   held('glimmerscale_lurker', -57, 17, 'g6', FACE_EAST),
   held('glimmerscale_lurker', -53, 26, 'g6', FACE_EAST),
   held('pale_choir_acolyte', -60, 24, 'g6', FACE_EAST),
-  // g7: the high terrace. A sentinel and two templeguards.
+  // g7: the high terrace. A sentinel and two templeguards (the west one
+  // clear of the tide basin at (-72, 72), whose collider would hold it).
   held('pearlguard_sentinel', -66, 66, 'g7'),
   held('drowned_templeguard', -62, 72, 'g7'),
-  held('drowned_templeguard', -70, 72, 'g7'),
+  held('drowned_templeguard', -68, 76, 'g7'),
   // ---- East: the Waterfall Walk -------------------------------------------------
   // g8: the ledge. A siren and four pilgrims.
   held('moonlit_siren', 58, 24, 'g8', FACE_WEST),
