@@ -48,7 +48,7 @@ export const GRAVEWYRM_SANCTUM_VOID_HEIGHT = -60;
 /** The floor heights of the route, from the pass down to the lake. */
 export const GRAVEWYRM_HEIGHTS = {
   landing: 55,
-  court: 50,
+  court: 47.5,
   upperBend: 46,
   lowerBend: 42,
   fork: 38,
@@ -311,8 +311,8 @@ const SURFACES: FieldSurface[] = [
     id: 'landing_stair',
     points: [
       [0, -214, H.landing],
-      [0, -210, H.landing],
-      [0, -201, H.court],
+      [0, -211, H.landing],
+      [0, -200, H.court],
       [0, -196, H.court],
     ],
     halfWidth: 6,
