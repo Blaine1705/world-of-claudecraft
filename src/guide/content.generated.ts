@@ -2527,14 +2527,6 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "name": "Gravewyrm Sanctum"
   },
   {
-    "id": "stormbrass_foundry",
-    "isRaid": false,
-    "suggestedPlayers": 5,
-    "min": 18,
-    "max": 20,
-    "name": "The Stormbrass Foundry"
-  },
-  {
     "id": "wildheart_basin",
     "isRaid": false,
     "suggestedPlayers": 5,
@@ -6084,55 +6076,6 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false
   },
   {
-    "id": "dgn_stormbrass_foundry",
-    "name": "Stormbrass Silenced",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
-    "id": "dgn_stormbrass_foundry_heroic",
-    "name": "Heroic: The Stormbrass Foundry",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
-    "id": "dgn_tock_press",
-    "name": "Quality Control",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
-    "id": "dgn_rangewarden_clean",
-    "name": "Clean Range",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
-    "id": "dgn_voltaic_grounded",
-    "name": "Grounded",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
-    "id": "dgn_prime_draft_overload",
-    "name": "Heartless",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
-    "id": "dgn_gantry_hauler",
-    "name": "Off the Rails",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
     "id": "dgn_beastmaster_apart",
     "name": "Kept at Bay",
     "category": "dungeon",
@@ -6156,13 +6099,6 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   {
     "id": "dgn_great_saurian",
     "name": "Toppled Titan",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
-    "id": "dgn_foundry_workers_freed",
-    "name": "Every Chain Struck",
     "category": "dungeon",
     "renown": 10,
     "feat": false
@@ -9082,72 +9018,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Vanguard's Warstaff"
-      }
-    ]
-  },
-  {
-    "id": "conquerors_stormbrass_foundry",
-    "shelf": "conquerors",
-    "name": "The Stormbrass Foundry",
-    "relics": [
-      {
-        "kind": "item",
-        "name": "Tock's Torque Wrench"
-      },
-      {
-        "kind": "item",
-        "name": "Proving-Range Quiver"
-      },
-      {
-        "kind": "item",
-        "name": "Voltaic Coil-Staff"
-      },
-      {
-        "kind": "item",
-        "name": "Prime Draft's Piston Maul"
-      },
-      {
-        "kind": "item",
-        "name": "Cellspark Dagger"
-      },
-      {
-        "kind": "item",
-        "name": "Governor's Scepter"
-      }
-    ]
-  },
-  {
-    "id": "conquerors_stormbrass_foundry_heroic",
-    "shelf": "conquerors",
-    "name": "Heroic Stormbrass Foundry",
-    "relics": [
-      {
-        "kind": "item",
-        "name": "Line-Master's Steam Hammer"
-      },
-      {
-        "kind": "item",
-        "name": "Rangefinder's Lens"
-      },
-      {
-        "kind": "item",
-        "name": "Rangewarden's Targeting Visor"
-      },
-      {
-        "kind": "item",
-        "name": "Overclocked Governor"
-      },
-      {
-        "kind": "item",
-        "name": "Stormglass Robes"
-      },
-      {
-        "kind": "item",
-        "name": "Prime Draft Core-Plate"
-      },
-      {
-        "kind": "item",
-        "name": "Heartless Gearmask"
       }
     ]
   }

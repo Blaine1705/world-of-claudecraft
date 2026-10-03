@@ -3133,8 +3133,6 @@ export const zh_CN: EnTranslations = {
         "pierce": "在 {duration} 秒内，你的自动攻击、射击和物理技能（流血除外）命中还会打击距离你的目标最近的、{reach} 码内的一个敌人，造成所造成伤害的 {share}%。",
         "lantern": "在你脚下放置一盏提灯，持续 {duration} 秒。任何人对提灯 {radius} 码内的你或队伍成员施放的直接治疗，还会以该治疗量的 {share}% 治疗灯光中受伤最重的另一名队伍成员。",
         "shackle": "用锁链将 {range} 码内的目标束缚在原地，持续 {duration} 秒。免疫控制的生物（例如首领）改为移动速度降低 {slow}%，除非它也免疫减速。",
-        "rangefinder": "在 {duration} 秒内，你与目标之间的距离每超过 {from} 码 {stepYards} 码，你造成的伤害提高 {perStep}%，在 {maxAt} 码或更远时最多提高 {max}%。",
-        "overclock": "使你的施法速度提高 {haste}%，持续 {duration} 秒。效果结束时你会过热：施法速度降低 {slow}%，持续 {overheat} 秒。",
         "spiritPack": "召唤一只灵魂美洲豹在你身边战斗，持续{duration}秒。它会奔向你的目标，每{every}秒撕咬一次，造成{min}到{max}点物理伤害，并会转而攻击你选中的其他敌人。若你没有选中敌人，它会攻击{range}码内离你最近的敌人。伤害随攻击强度或远程攻击强度（取较高者）提高，在召唤时确定。需要{range}码内的敌对目标。",
         "seedburst": "在{range}码内的目标身上种下一颗种子。{delay}秒后，种子在目标所在处（或其死亡处）爆裂，对{radius}码内的每个敌人造成{damage}点自然伤害；若目标先行死亡，伤害提高{bonus}%（{empowered}）。伤害随法术强度提高，在种下时确定。若你在种子爆裂前死亡，种子会枯萎。",
         "tether": "用锁链将你与{range}码内的一名友方玩家相连，持续{duration}秒。本应伤及其生命值的伤害中有{share}%改由你承受。你死亡时提前结束。需要以你之外的友方玩家为目标。",
@@ -3937,10 +3935,6 @@ export const zh_CN: EnTranslations = {
         "quenchWater": "身处开阔的淬火之水：移动速度降低{slow}%，每秒受到{damage}点灼烧伤害（英雄难度{heroic}点）。游向任意冰板或岸边。",
         "shardFlare": "心之碎片闪耀：墓穴吐息每{breath}秒一次，振翼狂风每{gale}秒一次。"
       },
-      "foundry": {
-        "scaldingVents": "你站在主产线传送带以外的地面上，蒸汽口正在预警或喷发。蒸汽喷出后，每{every}秒对所有不在传送带上的人造成{min}到{max}点火焰伤害，持续{seconds}秒（英雄难度为{heroicMin}到{heroicMax}点）。只有传送带上是安全的。",
-        "targetLock": "靶场守卫正在锁定你。每{every}秒会在你所站的位置画出一个圆圈，{delay}秒后炮弹落下，对{radius}码内的所有人造成{min}到{max}点火焰伤害（英雄难度为{heroicMin}到{heroicMax}点）。保持移动。解除减速的效果无法移除此标记。"
-      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -4065,9 +4059,6 @@ export const zh_CN: EnTranslations = {
         "brand": "受到的治疗效果降低 {pct}%。",
         "shackle": "被锁链束缚：无法移动。",
         "shackleSlow": "锁链缠身：移动速度降低 {pct}%。",
-        "rangefinder": "你与目标之间的距离每超过 {from} 码 {stepYards} 码，造成的伤害提高 {perStep}%，最多 {max}%。",
-        "overclock": "施法速度提高 {pct}%。效果结束时会过热。",
-        "overheated": "施法速度降低 {pct}%。",
         "spiritPack": "一只灵魂美洲豹在你身边战斗，每{every}秒撕咬你的目标一次，造成{min}到{max}点物理伤害。",
         "seedburst": "噬花的种子。此效果结束时爆裂，对{radius}码内的每个敌人造成{damage}点自然伤害；若此敌人在此之前死亡，伤害提高{bonus}%（{empowered}）。",
         "tether": "被工头的最后一环锁住：本应伤及你生命值的伤害中有{pct}%改由锁住你的人承受。",
@@ -6061,20 +6052,6 @@ export const zh_CN: EnTranslations = {
         "drowned_anchor": "溺亡之锚（在受害者被拖进深坑前砸断锁链）",
         "shackle_pair": "双人镣铐（被锁在一起的两名玩家必须靠在一起）",
         "reaper_behind": "穿影（死神从玩家身后升起，离开镰刀的弧线）",
-        "moving_belts": "移动传送带（地面会带着你走，拉杆后反向）",
-        "stamping_press": "冲压机（锤头沿轨道滑向传送带上的玩家：离开涂色区域）",
-        "scalding_vents": "灼热蒸汽口（通道会周期性喷出蒸汽：发光时站上传送带）",
-        "target_lock": "目标锁定（保持移动：炮弹落在你站过的地方）",
-        "proof_shot": "试射炮弹（重炮会让坦克的护甲凹陷）",
-        "conduction_plating": "传导装甲（用正确的伤害类型攻击它）",
-        "static_lash": "静电鞭笞（从坦克跳向附近的人）",
-        "storm_cells": "风暴电池（把电池带进打开的核心舱门）",
-        "piston_fist": "活塞重拳（离开标记的圆圈）",
-        "tremor_step": "震地踏步（远离它的脚下）",
-        "overtime_cross_feed": "加班与交叉供料（传送带更快，相邻的反向运行，两台冲压机同时落下）",
-        "walking_barrage": "徐进弹幕（三个标记，炮弹会留下弹片）",
-        "split_plating": "快速循环与分裂装甲（翻转更快，背面是另一种装甲）",
-        "double_load": "卡住的电池架与双重装填（一次舱门窗口放入两枚电池）",
         "pack_bond": "兽群羁绊（两者相邻时伤害减半：将它们拉开15码）",
         "stalk": "潜行追猎（美洲豹追猎被标记的玩家，从不追坦克；单人时它追你：风筝它，减速、定身、击晕它）",
         "shared_health": "共享生命（同一血池：攻击最安全的那个）",
@@ -6120,47 +6097,6 @@ export const zh_CN: EnTranslations = {
       "linkRule": "每次击中锚，无论伤害多少，都会断开一环",
       "linksTarget": "锁链环 {count}/{total}",
       "linkBroken": "断开一环！"
-    },
-    "foundryAlert": {
-      "cellName": "风暴电池",
-      "hatchName": "核心舱门",
-      "cellTitle": "风暴电池（静电：每秒 {amount}）",
-      "cellClosedLine": "把它带到核心舱门：在金色圆环外等待舱门打开",
-      "cellWarnLine": "核心舱门正在打开：在金色圆环旁准备",
-      "cellOpenLine": "把它带进打开的核心舱门：立刻走进金色圆环！",
-      "dropKey": "按 {key} 放下电池交给别人",
-      "dropClick": "点击此处放下电池交给别人",
-      "dropTap": "轻点此处放下电池交给别人",
-      "dropAria": "放下风暴电池",
-      "cellAria": "电池短路前剩余时间：{pct}",
-      "lockTitle": "目标锁定！",
-      "lockLine": "保持移动：炮弹会落在你刚才站的地方",
-      "lockAria": "目标锁定剩余时间：{pct}",
-      "proofTitle": "校验射击！",
-      "proofLine": "重型炮弹射向坦克：开减伤或换嘲讽",
-      "dentedLine": "凹陷装甲 x{stacks}：受到的物理伤害 +{pct}",
-      "proofAria": "校验射击：{pct}",
-      "floorCellTitle": "风暴电池掉在地上！",
-      "floorCellLine": "拾取风暴电池（互动或点击）",
-      "floorCellLineTouch": "拾取风暴电池（轻点它）",
-      "floorCellHint": "然后在核心舱门打开时把它带进去",
-      "groundedTitle": "铜面：武器有效",
-      "groundedLine": "物理伤害有效；法术会被储存为电荷",
-      "groundedDronesLine": "法术会被弹开：攻击无人机",
-      "chargedTitle": "蓝面：法术有效",
-      "chargedLine": "法术有效；物理伤害会被储存为电荷",
-      "chargedDronesLine": "武器会被弹开：攻击无人机",
-      "splitLine": "它的背面是另一种装甲",
-      "ventWarnTitle": "灼热蒸汽口！",
-      "ventWarnLine": "蒸汽即将从通道喷出：立刻站上传送带",
-      "ventScaldTitle": "灼热蒸汽！",
-      "ventScaldLine": "你正在通道上被烫伤：站上传送带",
-      "ventAria": "蒸汽口剩余时间：{pct}",
-      "flipIn": "装甲板将在 {seconds} 秒后翻转",
-      "flipInSplit": "装甲板将在 {seconds} 秒后翻转；它的背面是另一种装甲",
-      "flipNow": "装甲板正在翻转：储存的电荷即将释放！",
-      "storedAria": "储存电荷 {pct}：翻转时释放",
-      "turnedAside": "被弹开"
     },
     "wildheartAlert": {
       "preyTitle": "你是猎物！",
@@ -6212,13 +6148,6 @@ export const zh_CN: EnTranslations = {
       "lockboundTitle": "锁缚",
       "lockboundLine": "{chains}条锁链仍在：他受到的伤害降低{pct}%。打破封印镣铐来解除它。",
       "timeAria": "剩余{seconds}秒"
-    },
-    "foundryWorkers": {
-      "guardedLine": "现在不行，朋友，看守还盯着呢。要是被看见我们说话，大家都得进压机。",
-      "unguardedLine": "看守倒下了？那求求你，趁我们还有胆子跑，砸开这些锁链吧！",
-      "freedLine": "自由了！我们要回家了。谢谢你，朋友，谢谢你！",
-      "free": "解救他们",
-      "freeAria": "解救{name}和这个营地里其他被锁住的人"
     },
     "cosmetics": {
       "title": "外观",
@@ -8402,7 +8331,6 @@ export const zh_CN: EnTranslations = {
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "隐藏在棘峰高处的一座冰川，一条巨龙被封冻在冰中，邪教正焚烧窃取的灵魂将它解冻。从高山隘口一路下行，穿过冰塔、铁匠断裂的锁链与邪教的火堆，直到冰川脚下的冰封湖面。",
       "wildheartBody": "藏在沉没神像背后的隐秘丛林火山口，四周悬崖环绕，瀑布轰鸣。涉过河流浅滩，穿越狩猎台地与瀑布，走过殖民地废墟，攀上巨大石雕美洲豹头下的阶梯神殿。",
-      "foundryBody": "风暴岩风暴线上的一座黄铜铸造厂，世上最早造出的自动机械仍在闪电天空下运转着传送带和试验靶场。打断产线，平息两翼，攀上龙门架，一个未完成的巨人正在那里等待。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -12513,20 +12441,6 @@ export const zh_CN: EnTranslations = {
       "temple_hydra_tsunami": "海啸",
       "temple_ysolei_call": "月裔召唤",
       "temple_ysolei_wrath": "溺亡之怒",
-      "foundry_piston_slam": "活塞重击",
-      "foundry_field_repair": "现场维修",
-      "foundry_deploy_turret": "部署炮台",
-      "foundry_steam_screen": "蒸汽屏障",
-      "foundry_hauler_steam_blast": "蒸汽冲击",
-      "foundry_tock_lever": "拉下拉杆",
-      "foundry_tock_rivet_gun": "铆钉枪",
-      "foundry_proof_shot": "试射炮弹",
-      "foundry_plating_flip": "翻转装甲板",
-      "foundry_static_lash": "静电鞭笞",
-      "foundry_draft_awaken": "苏醒",
-      "foundry_arm_sweep": "横臂扫击",
-      "foundry_draft_unbolt": "挣脱螺栓",
-      "foundry_tremor_step": "震地踏步",
       "wildheart_ancestral_sap": "先祖树汁",
       "wildheart_plant_totem": "安置图腾",
       "wildheart_entangling_lash": "缠绕鞭笞",
@@ -18876,78 +18790,6 @@ export const zh_CN: EnTranslations = {
       "tideglass_warmaul": {
         "name": "潮镜战槌"
       },
-      "riveters_gauntlets": {
-        "name": "铆工护手"
-      },
-      "beltrunners_boots": {
-        "name": "传送带奔行靴"
-      },
-      "draftsmans_mantle": {
-        "name": "制图师肩衣"
-      },
-      "tocks_torque_wrench": {
-        "name": "托克的扭力扳手"
-      },
-      "proofplate_legguards": {
-        "name": "试炼板甲护腿"
-      },
-      "rangefinders_hood": {
-        "name": "测距手兜帽"
-      },
-      "coilwound_cord": {
-        "name": "绕线束带"
-      },
-      "proving_range_quiver": {
-        "name": "试验靶场箭袋"
-      },
-      "grounding_pauldrons": {
-        "name": "接地肩甲"
-      },
-      "arcstep_treads": {
-        "name": "电弧步履靴"
-      },
-      "stormglass_circlet": {
-        "name": "风暴玻璃头环"
-      },
-      "voltaic_coil_staff": {
-        "name": "伏打线圈法杖"
-      },
-      "draftplate_breastplate": {
-        "name": "原型板胸甲"
-      },
-      "gearwork_jerkin": {
-        "name": "齿轮工皮甲衣"
-      },
-      "stormbrass_robe": {
-        "name": "风暴黄铜长袍"
-      },
-      "piston_maul": {
-        "name": "初代原型的活塞巨锤"
-      },
-      "cellspark_dagger": {
-        "name": "电池火花匕首"
-      },
-      "governors_scepter": {
-        "name": "调速器权杖"
-      },
-      "line_masters_steam_hammer": {
-        "name": "产线主管的蒸汽锤"
-      },
-      "rangewardens_targeting_visor": {
-        "name": "靶场守卫的瞄准面甲"
-      },
-      "stormglass_robes": {
-        "name": "风暴玻璃法袍"
-      },
-      "prime_draft_core_plate": {
-        "name": "初代原型核心板甲"
-      },
-      "heartless_gearmask": {
-        "name": "无心齿轮面具"
-      },
-      "draft_record": {
-        "name": "设计图记录"
-      },
       "beastpit_warbelt": {
         "name": "兽坑战腰带"
       },
@@ -19857,12 +19699,6 @@ export const zh_CN: EnTranslations = {
       "gaolers_iron_key": {
         "name": "狱卒铁钥匙"
       },
-      "rangefinders_lens": {
-        "name": "测距手透镜"
-      },
-      "overclocked_governor": {
-        "name": "超频调速器"
-      },
       "fanglords_whistle": {
         "name": "獠牙领主的哨子"
       },
@@ -20302,57 +20138,6 @@ export const zh_CN: EnTranslations = {
       },
       "tideglass_reflection_druid": {
         "name": "潮镜倒影"
-      },
-      "brass_sentry": {
-        "name": "黄铜哨兵"
-      },
-      "steam_bruiser": {
-        "name": "蒸汽蛮兵"
-      },
-      "arc_drone": {
-        "name": "电弧无人机"
-      },
-      "foundry_engineer": {
-        "name": "铸造厂工程师"
-      },
-      "gearwright_apprentice": {
-        "name": "齿轮匠学徒"
-      },
-      "clockwork_hound": {
-        "name": "卷簧猎犬"
-      },
-      "shieldbearer_frame": {
-        "name": "持盾机架"
-      },
-      "tripod_turret": {
-        "name": "三脚炮台"
-      },
-      "gantry_hauler": {
-        "name": "龙门运输车"
-      },
-      "line_master_tock": {
-        "name": "产线主管安布雷尔·托克"
-      },
-      "rangewarden": {
-        "name": "靶场守卫"
-      },
-      "voltaic_warden": {
-        "name": "伏打守护者"
-      },
-      "prime_draft": {
-        "name": "初代原型"
-      },
-      "half_built_frame": {
-        "name": "半成品机架"
-      },
-      "sf_chained_miner": {
-        "name": "戴镣的矿工"
-      },
-      "sf_chained_hauler": {
-        "name": "戴镣的搬运工"
-      },
-      "sf_freed_laborer": {
-        "name": "获救的劳工"
       },
       "sanctum_boneguard": {
         "name": "圣所骨卫"
@@ -21738,11 +21523,6 @@ export const zh_CN: EnTranslations = {
         "name": "操练官黑尔",
         "title": "码头陪练师",
         "greeting": "我身后那具假人从不还手，也永远打不倒，{className}。真正重要的是账目：你的伤害统计会记下你落在它身上的每一击。把它设为目标，打开伤害统计窗口，剩下的交给我来教你。"
-      },
-      "lift_warden_corwin": {
-        "name": "升降机守卫科温·阿什比",
-        "title": "风暴线升降机看守",
-        "greeting": "小心缆绳，朋友。那台升降机仍会爬上风暴线上的旧铸造厂，那里的机器仍在为一个再也没有回来的主人运转。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -24012,56 +23792,6 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
-      "q_sf_storm_line": {
-        "title": "风暴线",
-        "text": "每个小时升降机都会运下废料和火花，{playerName}，却从没有一个活人。上面仍有东西在拉动铁轨：一台工程师们称为龙门运输车的巨型蒸汽履带车。坐上去，打垮铁轨场，把那台履带车拆掉。",
-        "completion": "铁轨场多年来第一次安静了。安静，但并不空。听：上面的产线还在运转。",
-        "objectives": {
-          "0": {
-            "label": "摧毁龙门运输车"
-          }
-        }
-      },
-      "q_sf_stop_the_line": {
-        "title": "停止产线",
-        "text": "产线主管安布雷尔·托克在主人离开后让铸造厂继续运转，而且从未停下。如今他把爬上传送带的一切都送进冲压机。阻止他，{playerName}，整条产线就会随他一起停下。",
-        "completion": "托克不动了，他的传送带也停了。不管他在造什么，他都是为别人造的。再往上走。",
-        "objectives": {
-          "0": {
-            "label": "击杀产线主管安布雷尔·托克"
-          }
-        }
-      },
-      "q_sf_first_draft": {
-        "title": "初稿",
-        "text": "铸造厂顶端立着上面所有机器都为之效力的东西：初代原型，一个从未完工的巨人。如果风暴把它唤醒，平台下的一切都不安全。击倒它，{playerName}，读一读它的制造者在它体内留下的东西。",
-        "completion": "记录上说，风暴能驱动金属，却永远无法给它一颗心。“只有活水才会记得。”最后泉源，还有锻父之岛。这是他的第一件作品，{playerName}。最后一件仍在外面。",
-        "objectives": {
-          "0": {
-            "label": "阅读设计图记录"
-          }
-        }
-      },
-      "q_sf_forgefathers_isle": {
-        "title": "前往锻父之岛",
-        "text": "记录提到了锻父之岛。一位名叫梅琳的档案员几个月来一直在那里的熔炉中解读锤痕。把设计图记录带给她，{playerName}：她会知道瓦尔库尔在这里学到了什么，又用它做了什么。",
-        "completion": "他的初稿。原来风暴先于火焰。那我就知道他想取代的是什么，也知道他的每一具自动机械为何失败了。跟紧我：剩下的我们一起读。",
-        "objectives": {
-          "0": {
-            "label": "找到档案员梅琳"
-          }
-        }
-      },
-      "q_sf_free_the_workers": {
-        "title": "解救劳工",
-        "text": "{playerName}，在这片岩架上干活的矿工一个都没下来过。铸造厂把他们扣下了：锁在废料营地里，为一个早已离去的主人挖矿石、搬废料，由他的机器看守着。打倒每个营地的看守，砸开他们的锁链。三个营地都要。送他们回家。",
-        "completion": "{playerName}，他们是自己走着顺着线路下来的，一个不少，眯着眼望着天空，好像早已忘了它的模样。不管你在上面砸毁了什么，山谷会记住的是这件事。",
-        "objectives": {
-          "0": {
-            "label": "已解救的劳工营地"
-          }
-        }
-      },
       "q_drowned_choir": {
         "title": "溺亡唱诗班",
         "text": "那些涉行者并非孤身行动。它们之中游走着溺亡信徒——随神殿一同沉没的邪教徒，至今仍披着腐烂的法衣，仍在岸边礁石上吟唱祷词。让其中八名永远噤声，再为我带回它们随身携带的六件祭品。我想知道它们打算献给女神什么。",
@@ -24615,11 +24345,6 @@ export const zh_CN: EnTranslations = {
         "name": "荒野之心盆地",
         "enterText": "你穿过神像巨口，踏上高悬于盆地之上的岩架。瀑布自崖顶轰然而下，而在远处下方，某个庞然大物正涉过浅滩。",
         "leaveText": "你从石牙之下穿回棕榈之境的阳光中。"
-      },
-      "stormbrass_foundry": {
-        "name": "风暴黄铜铸造厂",
-        "enterText": "缆车在铸造厂平台上猛然停住。黄铜屋顶嘶嘶冒着蒸汽，闪电劈在上方的风暴线圈上。",
-        "leaveText": "缆车载着你沿风暴线回到风暴岩。"
       },
       "the_last_keep": {
         "name": "最后的堡垒",

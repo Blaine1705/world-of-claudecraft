@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "5535fafe18ac8c9f440b9a67e2a14a1be2c527eadf75c95952457307b46f86e2",
+  "rendererFingerprint": "3905ab436b08cc23813588d6146793893f61a75051dbfa6c09ad9476afaf10a8",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5552006,
-      "sha256": "d0050bf29be816a3124f2b66dc242d408e08d02f09bc80df1fe4fd14c125ff8b",
+      "bytes": 5474133,
+      "sha256": "b95eb6d858431b718a0f6d1c6ead504912531b9b463c7070764e4724f9e8aaa4",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 362,
+  "portraitCount": 345,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -183,40 +183,6 @@
         "path": "public/ui/mobs/apprentice_wren.webp",
         "bytes": 2758,
         "sha256": "f3a098000bee47793b197dae0d51c7ca9448f3c2a3459059d10f99595cf7b294"
-      }
-    },
-    {
-      "id": "arc_drone",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "foundry_arc_drone",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_arc_drone.glb",
-          "path": "public/models/creatures/foundry_arc_drone.glb",
-          "bytes": 444900,
-          "sha256": "ab5af50c8a6a3aa2966a14bdb4e36bae3805242954da6fb3618907cee3972257"
-        },
-        "idle": "Idle",
-        "height": 1.2,
-        "yaw": null,
-        "hover": 0.93,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "22d3aedf9837e19f59de2e04605bf4b299e9e496a1459fef1382e4f9b7ad4b4a",
-      "output": {
-        "path": "public/ui/mobs/arc_drone.webp",
-        "bytes": 2564,
-        "sha256": "c75e57121337d76e42a41609ca1ad411372b4ca486750c7249de8ef30b880531"
       }
     },
     {
@@ -832,40 +798,6 @@
       }
     },
     {
-      "id": "brass_sentry",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "foundry_brass_sentry",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_brass_sentry.glb",
-          "path": "public/models/creatures/foundry_brass_sentry.glb",
-          "bytes": 880516,
-          "sha256": "6dc78bf07a92f5ab1931e7aedeb73bbf07065f6e156e59309d5e8842e2bf89ea"
-        },
-        "idle": "Idle",
-        "height": 2.69,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "a2dc69cde170f4025857008795659c432b638285a22e6e4fe4ac9265e0e20326",
-      "output": {
-        "path": "public/ui/mobs/brass_sentry.webp",
-        "bytes": 3262,
-        "sha256": "2e703e281c2d9810aeac0a4155a0d29b3b1c2002d847d793acc158b7eee4b04c"
-      }
-    },
-    {
       "id": "breach_wretch",
       "family": "burrower",
       "finderEncounter": false,
@@ -1320,40 +1252,6 @@
         "path": "public/ui/mobs/cindraleth_maw_matriarch.webp",
         "bytes": 2436,
         "sha256": "39bafb97c82172605678ebc755f420536c26b91c5f388d992f5359c4a877a15c"
-      }
-    },
-    {
-      "id": "clockwork_hound",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "foundry_hound",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_hound.glb",
-          "path": "public/models/creatures/foundry_hound.glb",
-          "bytes": 758472,
-          "sha256": "ccdf2bd4ee58ac555c7a20bd7607d8dbb30b4b725236b02e5ebdb50ba95c2599"
-        },
-        "idle": "Idle",
-        "height": 2.08,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "6b297e431236f6cdf3fb5dbae4fb95aa0b1f4998160c07b19bf71ef9cb9fcdd3",
-      "output": {
-        "path": "public/ui/mobs/clockwork_hound.webp",
-        "bytes": 2946,
-        "sha256": "c5fc024718159b87c51b0b60c027ba933a5097c214d6bf5f7a5e2438ad50e495"
       }
     },
     {
@@ -3203,40 +3101,6 @@
       }
     },
     {
-      "id": "foundry_engineer",
-      "family": "humanoid",
-      "finderEncounter": false,
-      "visualKey": "foundry_engineer",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_engineer.glb",
-          "path": "public/models/creatures/foundry_engineer.glb",
-          "bytes": 648404,
-          "sha256": "a71ae8379a83d61911756f233a5325b0002c24126770938d625eca0d808c0f9a"
-        },
-        "idle": "Idle",
-        "height": 2.31,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "937f152c128d02b8d1337b2032fc499d8b77fa26ad52950d92f3dc2bb7488395",
-      "output": {
-        "path": "public/ui/mobs/foundry_engineer.webp",
-        "bytes": 2410,
-        "sha256": "2c331f9b879cd11ceb94eaab764bb3d59a15954ba81494344d077868a8f5082f"
-      }
-    },
-    {
       "id": "friendly_player_dummy",
       "family": "humanoid",
       "finderEncounter": false,
@@ -3398,40 +3262,6 @@
       }
     },
     {
-      "id": "gantry_hauler",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "foundry_gantry_hauler",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_gantry_hauler.glb",
-          "path": "public/models/creatures/foundry_gantry_hauler.glb",
-          "bytes": 1976136,
-          "sha256": "ba90daef030b67633546a4661e5b4ab82bc688163d2e61be027fd8849ab8bb33"
-        },
-        "idle": "Idle",
-        "height": 3.47,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "a7aeaf993fb2655692104b2d9021d4c53760521b19d398022f843f3fbcadff6c",
-      "output": {
-        "path": "public/ui/mobs/gantry_hauler.webp",
-        "bytes": 2262,
-        "sha256": "f5f9cd16a3dd8d54345d590a392cc89d35df4e2948bc5459a0ba0b347187f823"
-      }
-    },
-    {
       "id": "gaol_turnkey",
       "family": "humanoid",
       "finderEncounter": true,
@@ -3502,40 +3332,6 @@
         "path": "public/ui/mobs/gaoler_ossick.webp",
         "bytes": 2786,
         "sha256": "dee65f2f8fa1ad0332576ec2c3894cecc1de72eab55f10dae2f7b11efef0c81a"
-      }
-    },
-    {
-      "id": "gearwright_apprentice",
-      "family": "humanoid",
-      "finderEncounter": false,
-      "visualKey": "foundry_apprentice",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_apprentice.glb",
-          "path": "public/models/creatures/foundry_apprentice.glb",
-          "bytes": 580676,
-          "sha256": "9f9061ac77f461d8343292e6694ad6e7591faba98df77ea4f57e8af7e60743c3"
-        },
-        "idle": "Idle",
-        "height": 2.32,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "c21b7e336c6472b5b4d76b136ab2698734630a260260bfbffd8698bb56a5c180",
-      "output": {
-        "path": "public/ui/mobs/gearwright_apprentice.webp",
-        "bytes": 2304,
-        "sha256": "c3fe1bacecfcf45a9f40c1a8301bba3ea3fa6956deb5a9cda7429a00deead139"
       }
     },
     {
@@ -4320,40 +4116,6 @@
         "path": "public/ui/mobs/grubjaw.webp",
         "bytes": 2142,
         "sha256": "de48a90c28d1fa473856186aba8119eb2458e4cc99cc0f3ebd5aedc606704a69"
-      }
-    },
-    {
-      "id": "half_built_frame",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "foundry_half_built_frame",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_half_built_frame.glb",
-          "path": "public/models/creatures/foundry_half_built_frame.glb",
-          "bytes": 601916,
-          "sha256": "0156a87a15bd8f012a6cf78e0a505f71520e318be5865552c07c15cf68842153"
-        },
-        "idle": "Idle",
-        "height": 2.4,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "573bb28449fd0de3b791011cc3a2b34c7b4e2e429eb488c295e5ec771b3c6dcf",
-      "output": {
-        "path": "public/ui/mobs/half_built_frame.webp",
-        "bytes": 3494,
-        "sha256": "0648383ae7cd470a110d68316e0f4f6918b9a7022d3350e5278f2ed2be3ec0d9"
       }
     },
     {
@@ -5946,40 +5708,6 @@
       }
     },
     {
-      "id": "line_master_tock",
-      "family": "humanoid",
-      "finderEncounter": true,
-      "visualKey": "foundry_line_master",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_line_master_tock.glb",
-          "path": "public/models/creatures/foundry_line_master_tock.glb",
-          "bytes": 1745456,
-          "sha256": "e09c3574ae5a16ecdfce06c68dd4650b66e279ea7d89b5771105e9b0ed2e997b"
-        },
-        "idle": "Idle",
-        "height": 4.32,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "765508bd190925b82bd397c8c9756bf6fc5db5e3785e9c429f1b20f435306d4a",
-      "output": {
-        "path": "public/ui/mobs/line_master_tock.webp",
-        "bytes": 2434,
-        "sha256": "8538a08432c2b1653c69466fccba7e0fe657de65745688ce17361f85776345fb"
-      }
-    },
-    {
       "id": "marrowlord_varkas",
       "family": "undead",
       "finderEncounter": false,
@@ -7559,40 +7287,6 @@
       }
     },
     {
-      "id": "prime_draft",
-      "family": "elemental",
-      "finderEncounter": true,
-      "visualKey": "foundry_prime_draft",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_prime_draft.glb",
-          "path": "public/models/creatures/foundry_prime_draft.glb",
-          "bytes": 3682664,
-          "sha256": "a76213b3b5a95a85761736f41b4d970efa1de2ccbf3432045fedaee0f6d90089"
-        },
-        "idle": "Idle",
-        "height": 4.454153846153846,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "eec567eebf018af342bb67a3cdfcad136c4a2aa088ec892444f918ca6be440d4",
-      "output": {
-        "path": "public/ui/mobs/prime_draft.webp",
-        "bytes": 3284,
-        "sha256": "92e492cdd257ca2cc4e16eefd4df8a961274348ffdefd578818bb51c2fd61da7"
-      }
-    },
-    {
       "id": "pyre_colossus",
       "family": "demon",
       "finderEncounter": false,
@@ -7658,40 +7352,6 @@
         "path": "public/ui/mobs/raised_bonewalker.webp",
         "bytes": 2256,
         "sha256": "4aa045272023ac7d8359c7446cbe47f2bc38edbf1151a8d00802bc6d4b22ddd0"
-      }
-    },
-    {
-      "id": "rangewarden",
-      "family": "elemental",
-      "finderEncounter": true,
-      "visualKey": "foundry_rangewarden",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_rangewarden.glb",
-          "path": "public/models/creatures/foundry_rangewarden.glb",
-          "bytes": 1621256,
-          "sha256": "c7e37f85716f25cf335a158703e2af3f7f2c813f42797e11b060590465a3dd1f"
-        },
-        "idle": "Idle",
-        "height": 3.6,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "1dba8bde09dbaba26461f815365cd6bc5068c005b906c261fd89eaa466d0ae3d",
-      "output": {
-        "path": "public/ui/mobs/rangewarden.webp",
-        "bytes": 2640,
-        "sha256": "c1cf31d48b2b464e55b70433cd2f16635672788d26d48014da52e083e25e0fff"
       }
     },
     {
@@ -9596,134 +9256,6 @@
       }
     },
     {
-      "id": "sf_chained_hauler",
-      "family": "humanoid",
-      "finderEncounter": false,
-      "visualKey": "foundry_worker_hauler",
-      "renderSpec": {
-        "model": {
-          "url": "models/chars/players/rogue.glb",
-          "path": "public/models/chars/players/rogue.glb",
-          "bytes": 477976,
-          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
-        },
-        "idle": "Idle",
-        "height": 2.6,
-        "yaw": null,
-        "hover": null,
-        "show": [],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/tools/bucket_metal.glb",
-              "path": "public/models/tools/bucket_metal.glb",
-              "bytes": 39300,
-              "sha256": "845aea08520615cfe4cdcbbedf1a021ced14f2960086a1db1c30eb79042dfed7"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
-        "weaponFix": null,
-        "tintStrength": 0.85
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7d7466",
-        "strength": 0.85
-      },
-      "sourceFingerprint": "ccaec5eab6934e22f5664a142300b4bcbedd681ec28a10fc422f0a3a19b191b3",
-      "output": {
-        "path": "public/ui/mobs/sf_chained_hauler.webp",
-        "bytes": 2050,
-        "sha256": "bd475bd1a42ca269ea84d50034db5ae743daafa6de88460b0ed782c57c285c94"
-      }
-    },
-    {
-      "id": "sf_chained_miner",
-      "family": "humanoid",
-      "finderEncounter": false,
-      "visualKey": "foundry_worker_miner",
-      "renderSpec": {
-        "model": {
-          "url": "models/chars/players/rogue.glb",
-          "path": "public/models/chars/players/rogue.glb",
-          "bytes": 477976,
-          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
-        },
-        "idle": "2H_Melee_Attack_Chop",
-        "height": 2.6,
-        "yaw": null,
-        "hover": null,
-        "show": [],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/hammer_d.glb",
-              "path": "public/models/weapons/hammer_d.glb",
-              "bytes": 99344,
-              "sha256": "6d3cf3ededad8f6741b94930110934c52798ab9c31ab2c2e32ac9a8087943dab"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
-        "weaponFix": null,
-        "tintStrength": 0.85
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#8a7a62",
-        "strength": 0.85
-      },
-      "sourceFingerprint": "000c3719865b2982f21a86b307fd1f074ead1e8904d7fc2977165ccaca82cdf1",
-      "output": {
-        "path": "public/ui/mobs/sf_chained_miner.webp",
-        "bytes": 2942,
-        "sha256": "aa086175f8a6e4c22e649dc67d8ccf3eeeba7b44c7773fbabebf9a3c416f89c6"
-      }
-    },
-    {
-      "id": "sf_freed_laborer",
-      "family": "humanoid",
-      "finderEncounter": false,
-      "visualKey": "foundry_worker_freed",
-      "renderSpec": {
-        "model": {
-          "url": "models/chars/players/rogue.glb",
-          "path": "public/models/chars/players/rogue.glb",
-          "bytes": 477976,
-          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
-        },
-        "idle": "Cheer",
-        "height": 2.6,
-        "yaw": null,
-        "hover": null,
-        "show": [],
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.85
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9a8a6a",
-        "strength": 0.85
-      },
-      "sourceFingerprint": "39537f666a041cdb779035328bf49921554c3935bf4716d987498e2721551f06",
-      "output": {
-        "path": "public/ui/mobs/sf_freed_laborer.webp",
-        "bytes": 2578,
-        "sha256": "9c0982ba4c731572dcdc3d90543e3ffe654e039e2233611177942b3ebafbefc6"
-      }
-    },
-    {
       "id": "shackled_prisoner",
       "family": "undead",
       "finderEncounter": false,
@@ -9789,40 +9321,6 @@
         "path": "public/ui/mobs/shardlord_kazzix.webp",
         "bytes": 1960,
         "sha256": "0f135e48609bdaa8f771e06984b0a124c0b91aea1d29938527c09a95d0f665ea"
-      }
-    },
-    {
-      "id": "shieldbearer_frame",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "foundry_shieldbearer",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_shieldbearer_frame.glb",
-          "path": "public/models/creatures/foundry_shieldbearer_frame.glb",
-          "bytes": 755736,
-          "sha256": "cfaf096791c55f2d1d3ec419532c9ebf5a332a488f5f86a48d8c67cf166a06a7"
-        },
-        "idle": "Idle",
-        "height": 2.86,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "426a6f0085cca5e847f5a80c71f7579420b5785f3200af2a70350cb5fcae3b0f",
-      "output": {
-        "path": "public/ui/mobs/shieldbearer_frame.webp",
-        "bytes": 3200,
-        "sha256": "190ea4233e1de3772301f4919ae55ab9205465176b7eeda59a129c516dbd75ad"
       }
     },
     {
@@ -10295,40 +9793,6 @@
         "path": "public/ui/mobs/stable_horse.webp",
         "bytes": 1960,
         "sha256": "ae6839c40d2839e30f89722c2ad5450af25b6864efe601ff3257a2c68c1061b8"
-      }
-    },
-    {
-      "id": "steam_bruiser",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "foundry_steam_bruiser",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_steam_bruiser.glb",
-          "path": "public/models/creatures/foundry_steam_bruiser.glb",
-          "bytes": 771116,
-          "sha256": "1ee3c9adf230ff6ade77ddf633c1f05be3bb796d383b70ac2fd7911b89771509"
-        },
-        "idle": "Idle",
-        "height": 2.875,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "09fdd8b471f6a8841d20df8c93819085fd8cf5e62d2878200c2a93d99bf00c66",
-      "output": {
-        "path": "public/ui/mobs/steam_bruiser.webp",
-        "bytes": 2588,
-        "sha256": "5bd8448aedf504a0e7a15e8600ec1d15dab2124c6617651fefb49f180d062114"
       }
     },
     {
@@ -11861,40 +11325,6 @@
       }
     },
     {
-      "id": "tripod_turret",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "foundry_tripod_turret",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_tripod_turret.glb",
-          "path": "public/models/creatures/foundry_tripod_turret.glb",
-          "bytes": 371304,
-          "sha256": "919fb4656ee10305a7c0bcedee0da0c97ca9e2957700fa44e5fa91163fc3431e"
-        },
-        "idle": "Idle",
-        "height": 1.73,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "b4d62303f45164406a4c0c1bbec35f47dae4126b99869690f8778a4e29b8789d",
-      "output": {
-        "path": "public/ui/mobs/tripod_turret.webp",
-        "bytes": 1838,
-        "sha256": "ca1328213d774e79a601c0fd9bd1eb6c6ae4561c3225856a67f4a0873bf8d2ca"
-      }
-    },
-    {
       "id": "tunnel_rat",
       "family": "burrower",
       "finderEncounter": false,
@@ -12475,40 +11905,6 @@
         "path": "public/ui/mobs/void_stalker.webp",
         "bytes": 1806,
         "sha256": "11efc080bffad7b9ddf6adea6339aa884eedfd3ee5ada17eecf3201e4e98eac1"
-      }
-    },
-    {
-      "id": "voltaic_warden",
-      "family": "elemental",
-      "finderEncounter": true,
-      "visualKey": "foundry_voltaic_warden",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/foundry_voltaic_warden.glb",
-          "path": "public/models/creatures/foundry_voltaic_warden.glb",
-          "bytes": 3910408,
-          "sha256": "16123eeac17d48e92e86e937fde1b8e45b262e7f9483d1c23e4d17f5188eee1c"
-        },
-        "idle": "Idle",
-        "height": 4.55,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": null
-      },
-      "tint": {
-        "source": "none",
-        "authored": null,
-        "resolved": null,
-        "strength": null
-      },
-      "sourceFingerprint": "1e91f31ce538b37319b65c52701e83b199bdf706aeebaa8c854f6af65e4689a1",
-      "output": {
-        "path": "public/ui/mobs/voltaic_warden.webp",
-        "bytes": 2922,
-        "sha256": "40987e12a8c6673dc5c0fac4b977973e8423077af59db7ea5258b71fa8eed7e7"
       }
     },
     {

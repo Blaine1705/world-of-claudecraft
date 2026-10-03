@@ -3133,8 +3133,6 @@ export const it_IT: EnTranslations = {
         "pierce": "Per {duration} sec, i tuoi attacchi automatici, colpi a distanza e abilità fisiche (non i sanguinamenti) colpiscono anche il nemico più vicino al tuo bersaglio entro {reach} m per il {share}% del danno inflitto.",
         "lantern": "Posiziona una lanterna ai tuoi piedi per {duration} sec. Una cura diretta ricevuta da te o da un membro del gruppo entro {radius} m da essa cura anche il membro del gruppo più ferito nella sua luce per il {share}% della cura.",
         "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
-        "rangefinder": "For {duration} sec, your damage increases by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}% at {maxAt} yd or more.",
-        "overclock": "Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.",
         "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
         "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
         "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
@@ -3937,10 +3935,6 @@ export const it_IT: EnTranslations = {
         "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
         "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec."
       },
-      "foundry": {
-        "scaldingVents": "You stand on Main Line floor that is not a belt while its vents warn or blow. Once the steam bursts, it deals {min} to {max} Fire damage every {every} sec for {seconds} sec ({heroicMin} to {heroicMax} on Heroic) to anyone not on a belt. Only the belts are safe.",
-        "targetLock": "The Rangewarden is tracking you. Every {every} sec a circle is painted where you stand, and {delay} sec later a shell lands on it for {min} to {max} Fire damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. Keep moving. Effects that break snares do not remove this mark."
-      },
       "sharedPyre": "Infligge il {total}% della salute massima di ogni giocatore, diviso per il numero di giocatori all'interno del cerchio ({perPlayer}% ciascuno con {players} giocatori).",
       "varkhulSharedPyre": "Infligge il {total}% della salute massima di ogni giocatore, divisa tra i giocatori all'interno del cerchio ({perPlayer}% ciascuno con {players} giocatori). Ogni giocatore mancante infligge inoltre il {missingPenalty}% della salute massima all'intera incursione, compresi i giocatori all'interno del cerchio.",
       "makersBrand": "Per {duration} sec, ogni accumulo aumenta i danni subiti da Varkhul del {pct}%. Si accumula fino a {max} volte. I tank dovrebbero dare il cambio a {swap} accumuli.",
@@ -4065,9 +4059,6 @@ export const it_IT: EnTranslations = {
         "brand": "Le cure ricevute sono ridotte del {pct}%.",
         "shackle": "Chained in place: cannot move.",
         "shackleSlow": "Chained: movement speed reduced by {pct}%.",
-        "rangefinder": "Damage increased by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}%.",
-        "overclock": "Casting speed increased by {pct}%. Overheated follows when it ends.",
-        "overheated": "Casting speed reduced by {pct}%.",
         "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
         "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
         "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
@@ -6061,20 +6052,6 @@ export const it_IT: EnTranslations = {
         "drowned_anchor": "Drowned Anchor (break the chain before its victim is dragged into the pit)",
         "shackle_pair": "Shackle Pair (two chained players must stay close together)",
         "reaper_behind": "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
-        "moving_belts": "Moving Belts (the floor carries you, and reverses on the lever)",
-        "stamping_press": "Stamping Press (the hammers ride their rails to the belt riders: step off the painted strip)",
-        "scalding_vents": "Scalding Vents (the walkways steam on a rhythm: get onto a belt when they glow)",
-        "target_lock": "Target Lock (keep moving: shells land where you stood)",
-        "proof_shot": "Proof Shot (a heavy shell that dents the tank)",
-        "conduction_plating": "Conduction Plating (hit it with the right damage kind)",
-        "static_lash": "Static Lash (leaps from the tank to anyone close by)",
-        "storm_cells": "Storm Cells (carry a cell into the open Core Hatch)",
-        "piston_fist": "Piston Fist (move out of the marked circle)",
-        "tremor_step": "Tremor Step (keep clear of its feet)",
-        "overtime_cross_feed": "Overtime and Cross-Feed (faster belts, neighbors run opposite, two presses strike at once)",
-        "walking_barrage": "Walking Barrage (three marks, and the shells leave shrapnel)",
-        "split_plating": "Rapid Cycling and Split Plating (faster flips, its back wears the other face)",
-        "double_load": "Jammed Racks and Double Load (two cells in one hatch window)",
         "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
         "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
         "shared_health": "Shared Health (one pool: hit whichever is safest)",
@@ -6120,47 +6097,6 @@ export const it_IT: EnTranslations = {
       "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
       "linksTarget": "{count} of {total} links",
       "linkBroken": "Link broken!"
-    },
-    "foundryAlert": {
-      "cellName": "Storm Cell",
-      "hatchName": "Core Hatch",
-      "cellTitle": "Storm Cell (Static: {amount} a second)",
-      "cellClosedLine": "Carry it to the Core Hatch: wait outside the gold ring until it opens",
-      "cellWarnLine": "The Core Hatch is opening: be ready at the gold ring",
-      "cellOpenLine": "Carry it into the open Core Hatch: step into the gold ring now!",
-      "dropKey": "Press {key} to drop the cell for someone else",
-      "dropClick": "Click here to drop the cell for someone else",
-      "dropTap": "Tap here to drop the cell for someone else",
-      "dropAria": "Drop the Storm Cell",
-      "cellAria": "Time before the cell shorts out: {pct}",
-      "lockTitle": "Target Lock!",
-      "lockLine": "Keep moving: the shells land where you stood a moment ago",
-      "lockAria": "Target Lock time left: {pct}",
-      "proofTitle": "Proof Shot!",
-      "proofLine": "A heavy shell at the tank: use a defensive or taunt swap",
-      "dentedLine": "Dented Plating x{stacks}: +{pct} physical damage taken",
-      "proofAria": "Proof Shot: {pct}",
-      "floorCellTitle": "Storm Cell on the floor!",
-      "floorCellLine": "Take a Storm Cell (interact or click)",
-      "floorCellLineTouch": "Take a Storm Cell (tap it)",
-      "floorCellHint": "Then carry it into the Core Hatch when it opens",
-      "groundedTitle": "Copper face: weapons land",
-      "groundedLine": "Physical damage lands; spells are stored as charge",
-      "groundedDronesLine": "Spells are turned aside: hit the drones",
-      "chargedTitle": "Blue face: spells land",
-      "chargedLine": "Spells land; physical damage is stored as charge",
-      "chargedDronesLine": "Weapons are turned aside: hit the drones",
-      "splitLine": "Its back half wears the other face",
-      "ventWarnTitle": "Scalding Vents!",
-      "ventWarnLine": "Steam bursts from the walkways: step onto a belt now",
-      "ventScaldTitle": "Scalding steam!",
-      "ventScaldLine": "The walkway is scalding you: get onto a belt",
-      "ventAria": "Vent time left: {pct}",
-      "flipIn": "The plates flip in {seconds} seconds",
-      "flipInSplit": "The plates flip in {seconds} seconds; the back half wears the other face",
-      "flipNow": "The plates are flipping: the Stored Charge is released!",
-      "storedAria": "Stored Charge {pct}: released at the flip",
-      "turnedAside": "Turned aside"
     },
     "wildheartAlert": {
       "preyTitle": "You are the Prey!",
@@ -6212,13 +6148,6 @@ export const it_IT: EnTranslations = {
       "lockboundTitle": "Lockbound",
       "lockboundLine": "{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.",
       "timeAria": "{seconds} seconds left"
-    },
-    "foundryWorkers": {
-      "guardedLine": "Not now, friend, not while the guards are watching. If they see us talking, it is the press for all of us.",
-      "unguardedLine": "The guards are down? Then please, strike these chains while we still have the nerve to run!",
-      "freedLine": "Free! We are going home. Thank you, friend, thank you!",
-      "free": "Free them",
-      "freeAria": "Free {name} and the others chained at this camp"
     },
     "cosmetics": {
       "title": "Cosmetici",
@@ -8402,7 +8331,6 @@ export const it_IT: EnTranslations = {
       "templeBody": "Un santuario sommerso lungo la strada della palude, una deviazione per i curiosi e i ben preparati.",
       "sanctumBody": "Il cuore oscuro di Thornpeak, dove la lunga opera del culto raggiunge il suo apice terribile.",
       "wildheartBody": "Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per scoprire chi ti aspetta in cima.",
-      "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "L'incursione di fine gioco",
       "raidBody": "Oltre una porta reale sigillata attende una prova per dieci giocatori: uno scontro a più fasi e un potere immortale che l'intera incursione deve neutralizzare insieme. Guadagnati l'ingresso, poi porta nove amici.",
       "heroicTitle": "Modalità eroica",
@@ -12513,20 +12441,6 @@ export const it_IT: EnTranslations = {
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
       "temple_ysolei_wrath": "Drowned Wrath",
-      "foundry_piston_slam": "Piston Slam",
-      "foundry_field_repair": "Field Repair",
-      "foundry_deploy_turret": "Deploy Turret",
-      "foundry_steam_screen": "Steam Screen",
-      "foundry_hauler_steam_blast": "Steam Blast",
-      "foundry_tock_lever": "Throw the Lever",
-      "foundry_tock_rivet_gun": "Rivet Gun",
-      "foundry_proof_shot": "Proof Shot",
-      "foundry_plating_flip": "Reversing Plates",
-      "foundry_static_lash": "Static Lash",
-      "foundry_draft_awaken": "Awakening",
-      "foundry_arm_sweep": "Arm Sweep",
-      "foundry_draft_unbolt": "Tearing Free",
-      "foundry_tremor_step": "Tremor Step",
       "wildheart_ancestral_sap": "Ancestral Sap",
       "wildheart_plant_totem": "Plant Totem",
       "wildheart_entangling_lash": "Entangling Lash",
@@ -18876,78 +18790,6 @@ export const it_IT: EnTranslations = {
       "tideglass_warmaul": {
         "name": "Tideglass Warmaul"
       },
-      "riveters_gauntlets": {
-        "name": "Riveter's Gauntlets"
-      },
-      "beltrunners_boots": {
-        "name": "Beltrunner's Boots"
-      },
-      "draftsmans_mantle": {
-        "name": "Draftsman's Mantle"
-      },
-      "tocks_torque_wrench": {
-        "name": "Tock's Torque Wrench"
-      },
-      "proofplate_legguards": {
-        "name": "Proofplate Legguards"
-      },
-      "rangefinders_hood": {
-        "name": "Rangefinder's Hood"
-      },
-      "coilwound_cord": {
-        "name": "Coilwound Cord"
-      },
-      "proving_range_quiver": {
-        "name": "Proving-Range Quiver"
-      },
-      "grounding_pauldrons": {
-        "name": "Grounding Pauldrons"
-      },
-      "arcstep_treads": {
-        "name": "Arcstep Treads"
-      },
-      "stormglass_circlet": {
-        "name": "Stormglass Circlet"
-      },
-      "voltaic_coil_staff": {
-        "name": "Voltaic Coil-Staff"
-      },
-      "draftplate_breastplate": {
-        "name": "Draftplate Breastplate"
-      },
-      "gearwork_jerkin": {
-        "name": "Gearwork Jerkin"
-      },
-      "stormbrass_robe": {
-        "name": "Stormbrass Robe"
-      },
-      "piston_maul": {
-        "name": "Prime Draft's Piston Maul"
-      },
-      "cellspark_dagger": {
-        "name": "Cellspark Dagger"
-      },
-      "governors_scepter": {
-        "name": "Governor's Scepter"
-      },
-      "line_masters_steam_hammer": {
-        "name": "Line-Master's Steam Hammer"
-      },
-      "rangewardens_targeting_visor": {
-        "name": "Rangewarden's Targeting Visor"
-      },
-      "stormglass_robes": {
-        "name": "Stormglass Robes"
-      },
-      "prime_draft_core_plate": {
-        "name": "Prime Draft Core-Plate"
-      },
-      "heartless_gearmask": {
-        "name": "Heartless Gearmask"
-      },
-      "draft_record": {
-        "name": "Draft Record"
-      },
       "beastpit_warbelt": {
         "name": "Beastpit Warbelt"
       },
@@ -19857,12 +19699,6 @@ export const it_IT: EnTranslations = {
       "gaolers_iron_key": {
         "name": "Gaoler's Iron Key"
       },
-      "rangefinders_lens": {
-        "name": "Rangefinder's Lens"
-      },
-      "overclocked_governor": {
-        "name": "Overclocked Governor"
-      },
       "fanglords_whistle": {
         "name": "Fanglord's Whistle"
       },
@@ -20302,57 +20138,6 @@ export const it_IT: EnTranslations = {
       },
       "tideglass_reflection_druid": {
         "name": "Tideglass Reflection"
-      },
-      "brass_sentry": {
-        "name": "Brass Sentry"
-      },
-      "steam_bruiser": {
-        "name": "Steam Bruiser"
-      },
-      "arc_drone": {
-        "name": "Arc Drone"
-      },
-      "foundry_engineer": {
-        "name": "Foundry Engineer"
-      },
-      "gearwright_apprentice": {
-        "name": "Gearwright Apprentice"
-      },
-      "clockwork_hound": {
-        "name": "Coilspring Hound"
-      },
-      "shieldbearer_frame": {
-        "name": "Shieldbearer Frame"
-      },
-      "tripod_turret": {
-        "name": "Tripod Turret"
-      },
-      "gantry_hauler": {
-        "name": "Gantry Hauler"
-      },
-      "line_master_tock": {
-        "name": "Line-Master Ambrel Tock"
-      },
-      "rangewarden": {
-        "name": "The Rangewarden"
-      },
-      "voltaic_warden": {
-        "name": "The Voltaic Warden"
-      },
-      "prime_draft": {
-        "name": "The Prime Draft"
-      },
-      "half_built_frame": {
-        "name": "Half-Built Frame"
-      },
-      "sf_chained_miner": {
-        "name": "Chained Miner"
-      },
-      "sf_chained_hauler": {
-        "name": "Chained Hauler"
-      },
-      "sf_freed_laborer": {
-        "name": "Freed Laborer"
       },
       "sanctum_boneguard": {
         "name": "Guardiano osseo del Santuario"
@@ -21738,11 +21523,6 @@ export const it_IT: EnTranslations = {
         "name": "Maestro d’Addestramento Hale",
         "title": "Maestro di Duello del Molo",
         "greeting": "Quel manichino alle mie spalle non contrattacca e non cade mai, {className}. Conta il totale: i tuoi Misuratori dei Danni contano ogni colpo che gli infliggi. Selezionalo e apri i misuratori, poi ti guiderò nel resto."
-      },
-      "lift_warden_corwin": {
-        "name": "Lift Warden Corwin Ashby",
-        "title": "Keeper of the Storm Line Lift",
-        "greeting": "Mind the cable, friend. That lift still climbs to the old foundry on the storm line, and the machines up there still run for a master who never came back."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -24012,56 +23792,6 @@ export const it_IT: EnTranslations = {
           }
         }
       },
-      "q_sf_storm_line": {
-        "title": "The Storm Line",
-        "text": "Every hour the lift brings down scrap and sparks, {playerName}, never a living soul. Something up there still hauls the rails: a great steam crawler the engineers called the Gantry Hauler. Ride up, break the Rail Yard, and put that crawler down.",
-        "completion": "The yard is quiet for the first time in years. Quiet, but not empty. Listen: the line is still running above it.",
-        "objectives": {
-          "0": {
-            "label": "Gantry Hauler destroyed"
-          }
-        }
-      },
-      "q_sf_stop_the_line": {
-        "title": "Stop the Line",
-        "text": "The Line-Master, Ambrel Tock, kept the foundry running when its master left, and he has never stopped. Now he feeds anything that climbs onto his belts into the press. Stop him, {playerName}, and the whole line stops with him.",
-        "completion": "Tock is still, and so are his belts. Whatever he was building, he was building it for someone else. Go higher.",
-        "objectives": {
-          "0": {
-            "label": "Line-Master Ambrel Tock slain"
-          }
-        }
-      },
-      "q_sf_first_draft": {
-        "title": "The First Draft",
-        "text": "At the top of the foundry stands the thing every machine up there was built to serve: the Prime Draft, a giant that was never finished. If the storm ever wakes it, nothing below the shelf is safe. Put it down, {playerName}, and read whatever its maker left inside it.",
-        "completion": "The record says the storm moved the metal but could never give it a heart. \"Only living water remembers.\" The Last Spring, and the Forgefather's Isle. This was his first work, {playerName}. The last one is still out there.",
-        "objectives": {
-          "0": {
-            "label": "Draft Record read"
-          }
-        }
-      },
-      "q_sf_forgefathers_isle": {
-        "title": "To the Forgefather's Isle",
-        "text": "The record names the Forgefather's Isle. An archivist named Maelin has been reading the hammer marks in the forge there for months. Take her the Draft Record, {playerName}: she will know what Varkhul learned here, and what he did with it.",
-        "completion": "His first draft. So the storm came before the fire. Then I know what he was trying to replace, and why every one of his automata failed. Stay close: we read the rest of this together.",
-        "objectives": {
-          "0": {
-            "label": "Archivist Maelin found"
-          }
-        }
-      },
-      "q_sf_free_the_workers": {
-        "title": "Free the Workers",
-        "text": "The miners who worked this shelf never came down, {playerName}. The foundry kept them: chained at its scrap camps, digging ore and hauling scrap for a master who left long ago, with his machines standing guard. Break the guards at each camp and strike the chains. All three camps. Send them home.",
-        "completion": "They came down the line on their own feet, {playerName}, every one of them, blinking at the sky like they had forgotten it. Whatever else you broke up there, this is the part the valley will remember.",
-        "objectives": {
-          "0": {
-            "label": "Worker camps freed"
-          }
-        }
-      },
       "q_drowned_choir": {
         "title": "Il Coro Annegato",
         "text": "I guadatori non agiscono da soli. Tra loro camminano i Devoti Annegati — la setta che affondò col tempio, ancora nelle loro vesti marcite, ancora intenti a cantare la preghiera dalle rocce della riva. Riducine otto al silenzio e portami sei delle offerte che recano. Voglio sapere cosa intendono donare alla loro dea.",
@@ -24615,11 +24345,6 @@ export const it_IT: EnTranslations = {
         "name": "Il Bacino di Wildheart",
         "enterText": "Una pioggia calda sibila sulla pietra antica. Il Bacino di Wildheart si apre davanti a te.",
         "leaveText": "Ripassi sotto le zanne di pietra verso il sole di Palmreach."
-      },
-      "stormbrass_foundry": {
-        "name": "The Stormbrass Foundry",
-        "enterText": "The cable lift jolts to a stop on the foundry shelf. Brass roofs hiss with steam, and lightning cracks against the storm coil above.",
-        "leaveText": "The cable lift carries you back down the storm line to Stormcrag."
       },
       "the_last_keep": {
         "name": "L'Ultima Rocca",

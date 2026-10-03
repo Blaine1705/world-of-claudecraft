@@ -3133,8 +3133,6 @@ export const ko_KR: EnTranslations = {
         "pierce": "{duration}초 동안 자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.",
         "lantern": "{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.",
         "shackle": "{range}미터 이내의 대상을 {duration}초 동안 사슬로 묶어 제자리에 고정합니다. 우두머리처럼 제어 효과에 면역인 생물은 대신 이동 속도가 {slow}% 감소하며, 감속에도 면역이면 효과가 없습니다.",
-        "rangefinder": "{duration}초 동안 대상과의 거리가 {from}미터를 넘는 {stepYards}미터마다 주는 피해가 {perStep}% 증가합니다. {maxAt}미터 이상에서 최대 {max}%입니다.",
-        "overclock": "{duration}초 동안 시전 속도가 {haste}% 증가합니다. 효과가 끝나면 과열되어 {overheat}초 동안 시전 속도가 {slow}% 감소합니다.",
         "spiritPack": "{duration}초 동안 영혼 재규어를 불러 곁에서 싸우게 합니다. 재규어는 대상에게 달려가 {every}초마다 물어뜯어 {min}~{max}의 물리 피해를 주며, 다른 적을 대상으로 지정하면 그 적에게로 옮겨 갑니다. 지정한 적이 없으면 {range}미터 내에서 당신과 가장 가까운 적을 공격합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가하며, 불러낼 때 결정됩니다. {range}미터 내의 적대적 대상이 필요합니다.",
         "seedburst": "{range}미터 내의 대상에게 씨앗을 심습니다. {delay}초 후 씨앗이 대상이 있는 곳(또는 죽은 곳)에서 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 대상이 먼저 죽었다면 피해가 {bonus}% 증가합니다({empowered}). 피해량은 주문력에 비례해 증가하며, 심을 때 결정됩니다. 씨앗이 터지기 전에 당신이 죽으면 씨앗은 시듭니다.",
         "tether": "{range}미터 내의 아군 플레이어와 {duration}초 동안 사슬로 연결됩니다. 그 아군의 생명력에 닿을 피해의 {share}%를 대신 당신이 받습니다. 당신이 죽으면 일찍 끝납니다. 자신이 아닌 아군 플레이어를 대상으로 지정해야 합니다.",
@@ -3937,10 +3935,6 @@ export const ko_KR: EnTranslations = {
         "quenchWater": "열린 담금질 물속: 이동 속도가 {slow}% 감소하고 매초 {damage}의 피해(영웅 난이도 {heroic})로 불탑니다. 아무 얼음판이나 물가로 헤엄치십시오.",
         "shardFlare": "심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다."
       },
-      "foundry": {
-        "scaldingVents": "메인 라인에서 벨트가 아닌 바닥 위에 서 있으며, 증기구가 경고 중이거나 분출 중입니다. 증기가 터지면 벨트 위에 있지 않은 모든 대상에게 {every}초마다 {min}~{max}의 화염 피해를 {seconds}초 동안 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 벨트 위만 안전합니다.",
-        "targetLock": "사격장 감시자가 당신을 추적하고 있습니다. {every}초마다 서 있는 자리에 원이 그려지고, {delay}초 뒤 포탄이 떨어져 {radius}미터 내의 모든 대상에게 {min}~{max}의 화염 피해를 입힙니다(영웅 난이도에서는 {heroicMin}~{heroicMax}). 계속 움직이십시오. 이동 방해를 해제하는 효과로는 이 표식이 사라지지 않습니다."
-      },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -4065,9 +4059,6 @@ export const ko_KR: EnTranslations = {
         "brand": "받는 치유량이 {pct}% 감소합니다.",
         "shackle": "사슬에 묶임: 이동할 수 없습니다.",
         "shackleSlow": "사슬에 묶임: 이동 속도가 {pct}% 감소합니다.",
-        "rangefinder": "대상과의 거리가 {from}미터를 넘는 {stepYards}미터마다 주는 피해가 {perStep}% 증가합니다(최대 {max}%).",
-        "overclock": "시전 속도가 {pct}% 증가합니다. 끝나면 과열됩니다.",
-        "overheated": "시전 속도가 {pct}% 감소합니다.",
         "spiritPack": "영혼 재규어가 곁에서 싸우며 {every}초마다 대상을 물어뜯어 {min}~{max}의 물리 피해를 줍니다.",
         "seedburst": "탐식화의 씨앗입니다. 이 효과가 끝나면 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 그 전에 이 적이 죽으면 피해가 {bonus}% 증가합니다({empowered}).",
         "tether": "십장의 마지막 고리에 묶임: 당신의 생명력에 닿을 피해의 {pct}%를 당신을 묶은 자가 대신 받습니다.",
@@ -6061,20 +6052,6 @@ export const ko_KR: EnTranslations = {
         "drowned_anchor": "익사의 닻 (희생자가 구덩이로 끌려가기 전에 사슬을 끊으세요)",
         "shackle_pair": "쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)",
         "reaper_behind": "그림자 건너기 (플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)",
-        "moving_belts": "움직이는 벨트(바닥이 몸을 실어 나르며 레버를 당기면 반대로 돈다)",
-        "stamping_press": "프레스(망치가 레일을 타고 벨트 위의 플레이어에게 다가온다: 칠해진 띠에서 벗어나라)",
-        "scalding_vents": "뜨거운 증기구(통로가 주기적으로 증기를 뿜는다: 빛나면 벨트로 올라가라)",
-        "target_lock": "표적 고정(계속 움직여라: 포탄은 서 있던 자리에 떨어진다)",
-        "proof_shot": "시험 사격(탱커의 장갑을 찌그러뜨리는 무거운 포탄)",
-        "conduction_plating": "전도 장갑(올바른 종류의 피해로 공격하라)",
-        "static_lash": "정전기 채찍(탱커에게서 가까운 사람에게 튄다)",
-        "storm_cells": "폭풍 전지(열린 중심 해치로 전지를 옮겨라)",
-        "piston_fist": "피스톤 주먹(표시된 원에서 벗어나라)",
-        "tremor_step": "진동 발걸음(발 근처에서 떨어져라)",
-        "overtime_cross_feed": "초과 근무와 교차 공급(벨트가 빨라지고 이웃 벨트가 반대로 돌며, 프레스 두 대가 동시에 내려친다)",
-        "walking_barrage": "이동 탄막(표식 세 개, 포탄이 파편을 남긴다)",
-        "split_plating": "급속 순환과 분할 장갑(더 빨리 뒤집히고 등 쪽은 반대 면이다)",
-        "double_load": "막힌 거치대와 이중 장전(해치가 열린 동안 전지 두 개)",
         "pack_bond": "무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)",
         "stalk": "추적 (재규어가 표식 대상을 사냥하며 탱커는 노리지 않고, 혼자일 때는 당신을 노림: 끌고 다니며 감속, 속박, 기절시키세요)",
         "shared_health": "생명력 공유 (하나의 생명력: 가장 안전한 쪽을 공격하세요)",
@@ -6120,47 +6097,6 @@ export const ko_KR: EnTranslations = {
       "linkRule": "닻을 칠 때마다 위력과 상관없이 고리가 하나씩 끊어진다",
       "linksTarget": "사슬 고리 {count}/{total}",
       "linkBroken": "고리 파괴!"
-    },
-    "foundryAlert": {
-      "cellName": "폭풍 전지",
-      "hatchName": "중심 해치",
-      "cellTitle": "폭풍 전지 (정전기: 초당 {amount})",
-      "cellClosedLine": "전지를 중심 해치로 옮기세요: 열릴 때까지 금색 고리 밖에서 기다리세요",
-      "cellWarnLine": "중심 해치가 열리고 있습니다: 금색 고리 옆에서 대기하세요",
-      "cellOpenLine": "열린 중심 해치로 전지를 옮기세요: 지금 금색 고리 안으로 들어가세요!",
-      "dropKey": "{key} 키를 눌러 전지를 내려놓고 다른 사람에게 넘기세요",
-      "dropClick": "여기를 클릭해 전지를 내려놓고 다른 사람에게 넘기세요",
-      "dropTap": "여기를 눌러 전지를 내려놓고 다른 사람에게 넘기세요",
-      "dropAria": "폭풍 전지 내려놓기",
-      "cellAria": "전지가 합선되기까지 남은 시간: {pct}",
-      "lockTitle": "표적 고정!",
-      "lockLine": "계속 움직이세요: 포탄은 방금 서 있던 자리에 떨어집니다",
-      "lockAria": "표적 고정 남은 시간: {pct}",
-      "proofTitle": "검증 사격!",
-      "proofLine": "탱커에게 강력한 포탄: 방어 기술을 쓰거나 도발을 교대하세요",
-      "dentedLine": "찌그러진 장갑 x{stacks}: 받는 물리 피해 +{pct}",
-      "proofAria": "검증 사격: {pct}",
-      "floorCellTitle": "바닥에 폭풍 전지!",
-      "floorCellLine": "폭풍 전지를 집으세요 (상호작용 또는 클릭)",
-      "floorCellLineTouch": "폭풍 전지를 집으세요 (전지를 터치)",
-      "floorCellHint": "그런 다음 중심 해치가 열리면 그 안으로 옮기세요",
-      "groundedTitle": "구리 면: 무기 공격이 통합니다",
-      "groundedLine": "물리 피해는 통하고, 주문은 전하로 저장됩니다",
-      "groundedDronesLine": "주문은 튕겨 나갑니다: 드론을 공격하세요",
-      "chargedTitle": "푸른 면: 주문이 통합니다",
-      "chargedLine": "주문은 통하고, 물리 피해는 전하로 저장됩니다",
-      "chargedDronesLine": "무기 공격은 튕겨 나갑니다: 드론을 공격하세요",
-      "splitLine": "등 쪽 절반은 반대 면입니다",
-      "ventWarnTitle": "뜨거운 증기구!",
-      "ventWarnLine": "통로에서 증기가 터져 나온다: 지금 벨트로 올라가라",
-      "ventScaldTitle": "뜨거운 증기!",
-      "ventScaldLine": "통로에서 데고 있다: 벨트로 올라가라",
-      "ventAria": "증기구 남은 시간: {pct}",
-      "flipIn": "{seconds}초 후 장갑판이 반전합니다",
-      "flipInSplit": "{seconds}초 후 장갑판이 반전합니다. 등 쪽 절반은 반대 면입니다",
-      "flipNow": "장갑판이 반전 중: 저장된 전하가 방출됩니다!",
-      "storedAria": "저장된 전하 {pct}: 반전할 때 방출됩니다",
-      "turnedAside": "튕겨 냄"
     },
     "wildheartAlert": {
       "preyTitle": "당신이 사냥감입니다!",
@@ -6212,13 +6148,6 @@ export const ko_KR: EnTranslations = {
       "lockboundTitle": "자물쇠 속박",
       "lockboundLine": "사슬 {chains}개가 버틴다: 받는 피해 {pct}% 감소. 봉인 족쇄를 부숴 벗겨내라.",
       "timeAria": "{seconds}초 남음"
-    },
-    "foundryWorkers": {
-      "guardedLine": "지금은 안 돼, 감시자들이 지켜보고 있어. 우리가 이야기하는 걸 들키면 모두 프레스 행이야.",
-      "unguardedLine": "감시자들이 쓰러졌다고? 그럼 제발, 도망칠 용기가 남아 있을 때 이 사슬을 끊어 줘!",
-      "freedLine": "자유다! 이제 집에 간다. 고마워, 정말 고마워!",
-      "free": "그들을 풀어 준다",
-      "freeAria": "{name}와 이 야영지에 묶인 다른 이들을 풀어 준다"
     },
     "cosmetics": {
       "title": "외형",
@@ -8402,7 +8331,6 @@ export const ko_KR: EnTranslations = {
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
       "sanctumBody": "가시봉우리 높은 곳에 숨겨진 빙하. 한 마리 용이 얼음 속에 갇혀 있고, 교단은 훔친 영혼을 불태워 그 얼음을 녹이고 있다. 높은 고개에서 얼음 탑과 대장장이의 끊어진 사슬, 교단의 불길을 지나 빙하 발치의 얼어붙은 호수까지 내려간다.",
       "wildheartBody": "가라앉은 우상 뒤에 숨겨진 정글 칼데라. 절벽에 둘러싸여 폭포 소리가 울려 퍼진다. 강 여울을 건너고, 사냥 단구와 폭포를 지나, 폐허가 된 식민지를 가로질러 거대한 석조 재규어 머리 아래의 계단식 성소로 올라가라.",
-      "foundryBody": "스톰크래그 폭풍 능선에 자리한 황동 주조소. 최초로 만들어진 자동기계들이 번개 치는 하늘 아래 여전히 컨베이어와 시험 사격장을 돌리고 있다. 생산 라인을 멈추고 양 날개를 잠재운 뒤, 미완성 거인이 기다리는 갠트리로 올라가라.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
       "heroicTitle": "영웅 난이도",
@@ -12513,20 +12441,6 @@ export const ko_KR: EnTranslations = {
       "temple_hydra_tsunami": "해일",
       "temple_ysolei_call": "달의 자손 부르기",
       "temple_ysolei_wrath": "익사한 분노",
-      "foundry_piston_slam": "피스톤 강타",
-      "foundry_field_repair": "현장 수리",
-      "foundry_deploy_turret": "포탑 설치",
-      "foundry_steam_screen": "증기 방벽",
-      "foundry_hauler_steam_blast": "증기 분사",
-      "foundry_tock_lever": "레버 당기기",
-      "foundry_tock_rivet_gun": "리벳 총",
-      "foundry_proof_shot": "시험 사격",
-      "foundry_plating_flip": "장갑판 반전",
-      "foundry_static_lash": "정전기 채찍",
-      "foundry_draft_awaken": "각성",
-      "foundry_arm_sweep": "팔 휩쓸기",
-      "foundry_draft_unbolt": "볼트 뜯어내기",
-      "foundry_tremor_step": "진동 발걸음",
       "wildheart_ancestral_sap": "선조의 수액",
       "wildheart_plant_totem": "토템 심기",
       "wildheart_entangling_lash": "휘감는 채찍",
@@ -18876,78 +18790,6 @@ export const ko_KR: EnTranslations = {
       "tideglass_warmaul": {
         "name": "조수유리 전투망치"
       },
-      "riveters_gauntlets": {
-        "name": "리벳공의 건틀릿"
-      },
-      "beltrunners_boots": {
-        "name": "벨트 질주자의 장화"
-      },
-      "draftsmans_mantle": {
-        "name": "제도사의 어깨망토"
-      },
-      "tocks_torque_wrench": {
-        "name": "토크의 토크 렌치"
-      },
-      "proofplate_legguards": {
-        "name": "시험판 다리보호구"
-      },
-      "rangefinders_hood": {
-        "name": "거리측정수의 두건"
-      },
-      "coilwound_cord": {
-        "name": "코일 감은 허리끈"
-      },
-      "proving_range_quiver": {
-        "name": "시험 사격장 화살통"
-      },
-      "grounding_pauldrons": {
-        "name": "접지 어깨보호구"
-      },
-      "arcstep_treads": {
-        "name": "전호 발걸음 신발"
-      },
-      "stormglass_circlet": {
-        "name": "폭풍유리 머리띠"
-      },
-      "voltaic_coil_staff": {
-        "name": "볼타 코일 지팡이"
-      },
-      "draftplate_breastplate": {
-        "name": "초안판 흉갑"
-      },
-      "gearwork_jerkin": {
-        "name": "톱니장치 조끼"
-      },
-      "stormbrass_robe": {
-        "name": "폭풍황동 로브"
-      },
-      "piston_maul": {
-        "name": "원형 초안의 피스톤 대형망치"
-      },
-      "cellspark_dagger": {
-        "name": "전지 불꽃 단검"
-      },
-      "governors_scepter": {
-        "name": "조속기의 홀"
-      },
-      "line_masters_steam_hammer": {
-        "name": "생산라인 감독의 증기 망치"
-      },
-      "rangewardens_targeting_visor": {
-        "name": "사격장 감시자의 조준 면갑"
-      },
-      "stormglass_robes": {
-        "name": "폭풍유리 예복"
-      },
-      "prime_draft_core_plate": {
-        "name": "원형 초안의 중심판"
-      },
-      "heartless_gearmask": {
-        "name": "심장 없는 톱니 가면"
-      },
-      "draft_record": {
-        "name": "설계 기록"
-      },
       "beastpit_warbelt": {
         "name": "야수 구덩이 전투 허리띠"
       },
@@ -19857,12 +19699,6 @@ export const ko_KR: EnTranslations = {
       "gaolers_iron_key": {
         "name": "간수의 쇠열쇠"
       },
-      "rangefinders_lens": {
-        "name": "거리측정수의 렌즈"
-      },
-      "overclocked_governor": {
-        "name": "과부하 조속기"
-      },
       "fanglords_whistle": {
         "name": "송곳니 군주의 호루라기"
       },
@@ -20302,57 +20138,6 @@ export const ko_KR: EnTranslations = {
       },
       "tideglass_reflection_druid": {
         "name": "조수유리 투영체"
-      },
-      "brass_sentry": {
-        "name": "황동 파수병"
-      },
-      "steam_bruiser": {
-        "name": "증기 난동꾼"
-      },
-      "arc_drone": {
-        "name": "전격 드론"
-      },
-      "foundry_engineer": {
-        "name": "주조소 기술자"
-      },
-      "gearwright_apprentice": {
-        "name": "톱니장인 견습생"
-      },
-      "clockwork_hound": {
-        "name": "코일스프링 사냥개"
-      },
-      "shieldbearer_frame": {
-        "name": "방패잡이 골격"
-      },
-      "tripod_turret": {
-        "name": "삼각대 포탑"
-      },
-      "gantry_hauler": {
-        "name": "갠트리 운반차"
-      },
-      "line_master_tock": {
-        "name": "라인장 앰브렐 톡"
-      },
-      "rangewarden": {
-        "name": "사격장 감시자"
-      },
-      "voltaic_warden": {
-        "name": "볼타 수호자"
-      },
-      "prime_draft": {
-        "name": "원형 초안"
-      },
-      "half_built_frame": {
-        "name": "반쯤 조립된 기체"
-      },
-      "sf_chained_miner": {
-        "name": "사슬에 묶인 광부"
-      },
-      "sf_chained_hauler": {
-        "name": "사슬에 묶인 운반꾼"
-      },
-      "sf_freed_laborer": {
-        "name": "풀려난 노동자"
       },
       "sanctum_boneguard": {
         "name": "성소 뼈수호자"
@@ -21738,11 +21523,6 @@ export const ko_KR: EnTranslations = {
         "name": "교관 헤일",
         "title": "부두 대련 사범",
         "greeting": "내 뒤에 있는 허수아비는 되받아치지도, 쓰러지지도 않는다, {className}. 중요한 건 장부다. 네가 저기에 꽂은 일격은 하나도 빠짐없이 피해량 미터가 세어 준다. 저것을 대상으로 삼고 미터를 열어라, 나머지는 내가 알려주마."
-      },
-      "lift_warden_corwin": {
-        "name": "승강기 관리인 코윈 애시비",
-        "title": "폭풍선 승강기 관리자",
-        "greeting": "케이블 조심하게, 친구. 저 승강기는 아직도 폭풍선 위의 옛 주조소까지 올라가네. 그곳의 기계들은 돌아오지 않은 주인을 위해 여전히 돌아가고 있지."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -24012,56 +23792,6 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
-      "q_sf_storm_line": {
-        "title": "폭풍선",
-        "text": "{playerName}, 승강기는 매시간 고철과 불꽃만 실어 내려올 뿐 살아 있는 사람은 하나도 없네. 위에서는 아직 뭔가가 선로를 끌고 있지. 기술자들이 갠트리 운반차라고 부른 거대한 증기 궤도차야. 올라가서 철도 야적장을 부수고 그 궤도차를 멈추게.",
-        "completion": "야적장이 몇 년 만에 처음으로 조용해졌군. 조용하지만 비어 있진 않아. 들어 보게, 그 위에서 아직 생산 라인이 돌아가고 있어.",
-        "objectives": {
-          "0": {
-            "label": "갠트리 운반차 파괴"
-          }
-        }
-      },
-      "q_sf_stop_the_line": {
-        "title": "라인을 멈춰라",
-        "text": "생산라인 감독 앰브렐 토크는 주인이 떠난 뒤에도 주조소를 계속 돌렸고, 한 번도 멈추지 않았네. 이제 그는 벨트에 오르는 것은 무엇이든 프레스에 밀어 넣지. 그를 막게, {playerName}. 그러면 라인 전체가 그와 함께 멈출 걸세.",
-        "completion": "토크가 멈췄고 그의 벨트도 멈췄군. 그가 무엇을 만들고 있었든, 다른 누군가를 위한 것이었어. 더 위로 가게.",
-        "objectives": {
-          "0": {
-            "label": "생산라인 감독 앰브렐 토크 처치"
-          }
-        }
-      },
-      "q_sf_first_draft": {
-        "title": "첫 번째 초안",
-        "text": "주조소 꼭대기에는 그곳의 모든 기계가 섬기도록 만들어진 것이 서 있네. 원형 초안, 끝내 완성되지 못한 거인이지. 폭풍이 그것을 깨우면 선반 아래 어떤 것도 안전하지 않아. 그것을 쓰러뜨리게, {playerName}. 그리고 그 제작자가 안에 남긴 것을 읽어 보게.",
-        "completion": "기록에 따르면 폭풍은 금속을 움직일 수 있었지만 심장을 줄 수는 없었다는군. \"오직 살아 있는 물만이 기억한다.\" 마지막 샘, 그리고 대장장이 아버지의 섬. 이건 그의 첫 작품이었네, {playerName}. 마지막 작품은 아직 저 밖에 있어.",
-        "objectives": {
-          "0": {
-            "label": "설계 기록 읽기"
-          }
-        }
-      },
-      "q_sf_forgefathers_isle": {
-        "title": "대장장이 아버지의 섬으로",
-        "text": "기록에는 대장장이 아버지의 섬이 나오네. 메일린이라는 기록관이 몇 달째 그곳 용광로에서 망치 자국을 해독하고 있지. 설계 기록을 그녀에게 가져가게, {playerName}. 발쿨이 여기서 무엇을 배웠고 그걸로 무엇을 했는지 그녀가 알 걸세.",
-        "completion": "그의 첫 초안이군요. 그러니까 폭풍이 불보다 먼저였어요. 그렇다면 그가 무엇을 대신하려 했는지, 왜 그의 자동인형이 모두 실패했는지 알겠어요. 가까이 있어요. 나머지는 함께 읽어요.",
-        "objectives": {
-          "0": {
-            "label": "기록관 메일린 찾기"
-          }
-        }
-      },
-      "q_sf_free_the_workers": {
-        "title": "노동자 해방",
-        "text": "{playerName}, 이 바위 선반에서 일하던 광부들은 아무도 내려오지 못했네. 주조소가 그들을 붙잡아 두었지. 고철 야영지에 사슬로 묶인 채, 오래전에 떠난 주인을 위해 광석을 캐고 고철을 나르고 있네. 주인의 기계들이 그들을 감시하고 있고. 각 야영지의 감시자를 쓰러뜨리고 사슬을 끊어 주게. 세 야영지 모두. 그들을 집으로 보내 주게.",
-        "completion": "{playerName}, 그들이 제 발로 선로를 따라 내려왔네. 한 사람도 빠짐없이. 하늘을 잊었던 사람들처럼 눈을 깜빡이며 올려다보더군. 저 위에서 무엇을 부쉈든, 골짜기가 기억할 것은 바로 이 일일세.",
-        "objectives": {
-          "0": {
-            "label": "노동자 야영지 해방"
-          }
-        }
-      },
       "q_drowned_choir": {
         "title": "익사한 성가대",
         "text": "물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.",
@@ -24615,11 +24345,6 @@ export const ko_KR: EnTranslations = {
         "name": "야생심장 분지",
         "enterText": "우상의 아가리를 지나자 분지 높이 걸린 바위 턱이 나타난다. 폭포가 절벽 가장자리에서 쏟아져 내리고, 저 아래에서는 무언가 거대한 것이 여울을 건너고 있다.",
         "leaveText": "돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다."
-      },
-      "stormbrass_foundry": {
-        "name": "폭풍황동 주조소",
-        "enterText": "케이블 리프트가 주조소 절벽 위에서 덜컹 멈춰 선다. 황동 지붕에서 증기가 쉭쉭 뿜어지고, 머리 위 폭풍 코일에 번개가 내리친다.",
-        "leaveText": "케이블 리프트가 폭풍 능선을 따라 스톰크래그로 당신을 데려간다."
       },
       "the_last_keep": {
         "name": "마지막 요새",

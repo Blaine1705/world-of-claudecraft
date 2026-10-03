@@ -3133,8 +3133,6 @@ export const ja_JP: EnTranslations = {
         "pierce": "{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。",
         "lantern": "{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。",
         "shackle": "{range}ヤード以内の対象を{duration}秒間その場に鎖で縛る。ボスなど行動阻害に耐性のあるクリーチャーは、代わりに移動速度が{slow}%低下する（減速にも耐性がある場合は無効）。",
-        "rangefinder": "{duration}秒間、自分と対象の距離が{from}ヤードを超える{stepYards}ヤードごとに与えるダメージが{perStep}%増加する（{maxAt}ヤード以上で最大{max}%）。",
-        "overclock": "{duration}秒間、詠唱速度が{haste}%上昇する。効果が終わるとオーバーヒートし、{overheat}秒間詠唱速度が{slow}%低下する。",
         "spiritPack": "{duration}秒間、霊のジャガーを呼び出して共に戦わせる。ジャガーは対象へ駆け寄り、{every}秒ごとに噛みついて{min}～{max}の物理ダメージを与え、あなたが別の敵を対象にするとそちらへ移る。敵を対象にしていない場合は、{range}ヤード以内であなたに最も近い敵を攻撃する。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加し、呼び出した時点で確定する。{range}ヤード以内の敵対的な対象が必要。",
         "seedburst": "{range}ヤード以内の対象に種を植える。{delay}秒後、種は対象のいる場所（または死んだ場所）で弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。対象が先に死んでいた場合は{bonus}%増加（{empowered}）。ダメージは呪文力に応じて増加し、植えた時点で確定する。種が弾ける前にあなたが死ぬと、種は枯れる。",
         "tether": "{range}ヤード以内の味方プレイヤー1人と{duration}秒間鎖でつながる。その味方の体力に届くはずのダメージの{share}%を代わりにあなたが受ける。あなたが死亡すると早期に終了する。自分以外の味方プレイヤーを対象にする必要がある。",
@@ -3937,10 +3935,6 @@ export const ja_JP: EnTranslations = {
         "quenchWater": "開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。",
         "shardFlare": "心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。"
       },
-      "foundry": {
-        "scaldingVents": "メインラインのベルト以外の床に立っており、蒸気孔が警告中か噴出中である。蒸気が噴き出すと、ベルトに乗っていない者全員に{every}秒ごとに{min}から{max}の火炎ダメージを{seconds}秒間与える（ヒロイックでは{heroicMin}から{heroicMax}）。安全なのはベルトの上だけ。",
-        "targetLock": "射撃場の番人に追尾されている。{every}秒ごとに立っている場所に円が描かれ、その{delay}秒後に砲弾が着弾して{radius}ヤード以内の全員に{min}から{max}の火炎ダメージを与える（ヒロイックでは{heroicMin}から{heroicMax}）。動き続けろ。移動阻害を解除する効果ではこの印は消えない。"
-      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -4065,9 +4059,6 @@ export const ja_JP: EnTranslations = {
         "brand": "受ける回復量が{pct}%減少する。",
         "shackle": "鎖で縛られている：移動できない。",
         "shackleSlow": "鎖につながれている：移動速度が{pct}%低下。",
-        "rangefinder": "対象との距離が{from}ヤードを超える{stepYards}ヤードごとに与えるダメージが{perStep}%増加（最大{max}%）。",
-        "overclock": "詠唱速度が{pct}%上昇。終了後にオーバーヒートする。",
-        "overheated": "詠唱速度が{pct}%低下。",
         "spiritPack": "霊のジャガーが共に戦い、{every}秒ごとに対象へ噛みついて{min}～{max}の物理ダメージを与える。",
         "seedburst": "ゴージブルームの種。この効果が切れると弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。それまでにこの敵が死んだ場合は{bonus}%増加（{empowered}）。",
         "tether": "親方の最後の鎖環でつながれている：あなたの体力に届くはずのダメージの{pct}%を、代わりにあなたをつないだ者が受ける。",
@@ -6061,20 +6052,6 @@ export const ja_JP: EnTranslations = {
         "drowned_anchor": "溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）",
         "shackle_pair": "連鎖の枷（鎖でつながれた二人は離れずに動く）",
         "reaper_behind": "影渡り（死神はプレイヤーの背後に現れる、大鎌の弧から出る）",
-        "moving_belts": "動くベルト（床が運び、レバーで逆転する）",
-        "stamping_press": "プレス機（ハンマーはレールを伝ってベルト上の者へ迫る：塗られた帯から降りろ）",
-        "scalding_vents": "灼熱の蒸気孔（通路は周期的に蒸気を噴く：光ったらベルトに乗れ）",
-        "target_lock": "ターゲットロック（動き続けろ：砲弾はいた場所に落ちる）",
-        "proof_shot": "試験射撃（タンクの装甲をへこませる重い砲弾）",
-        "conduction_plating": "伝導装甲（正しい種類のダメージで攻撃せよ）",
-        "static_lash": "静電の鞭（タンクから近くの者へ跳ぶ）",
-        "storm_cells": "ストームセル（開いたコアハッチにセルを運べ）",
-        "piston_fist": "ピストンフィスト（印の円から出ろ）",
-        "tremor_step": "震動の踏みつけ（足元から離れろ）",
-        "overtime_cross_feed": "残業とクロスフィード（ベルトが速くなり、隣同士が逆向きに動き、プレスが二台同時に落ちる）",
-        "walking_barrage": "移動弾幕（三つの印、砲弾は破片を残す）",
-        "split_plating": "急速循環と分割装甲（反転が速く、背中はもう一方の面）",
-        "double_load": "詰まったラックと二重装填（一度のハッチの窓にセル二つ）",
         "pack_bond": "群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）",
         "stalk": "忍び狩り（ジャガーが印の者を狙う。タンクは狙わず、ソロではあなたを狙う：引き回し、鈍足・拘束・スタンを）",
         "shared_health": "体力共有（共通の体力：最も安全な方を攻撃）",
@@ -6120,47 +6097,6 @@ export const ja_JP: EnTranslations = {
       "linkRule": "錨への一撃ごとに、威力に関係なく環が一つ外れる",
       "linksTarget": "鎖の環 {count}/{total}",
       "linkBroken": "環を断った！"
-    },
-    "foundryAlert": {
-      "cellName": "ストームセル",
-      "hatchName": "コアハッチ",
-      "cellTitle": "ストームセル（静電気：毎秒 {amount}）",
-      "cellClosedLine": "コアハッチまで運べ：開くまで金色の輪の外で待て",
-      "cellWarnLine": "コアハッチが開きかけている：金色の輪のそばで備えよ",
-      "cellOpenLine": "開いたコアハッチに運び込め：今すぐ金色の輪に入れ！",
-      "dropKey": "{key} を押してセルを置き、仲間に託す",
-      "dropClick": "ここをクリックしてセルを置き、仲間に託す",
-      "dropTap": "ここをタップしてセルを置き、仲間に託す",
-      "dropAria": "ストームセルを置く",
-      "cellAria": "セルがショートするまでの残り時間：{pct}",
-      "lockTitle": "ターゲットロック！",
-      "lockLine": "動き続けろ：砲弾は少し前にいた場所に落ちる",
-      "lockAria": "ターゲットロックの残り時間：{pct}",
-      "proofTitle": "プルーフショット！",
-      "proofLine": "タンクに重砲弾：防御スキルか挑発交代を",
-      "dentedLine": "へこんだ装甲 x{stacks}：被物理ダメージ +{pct}",
-      "proofAria": "プルーフショット：{pct}",
-      "floorCellTitle": "床にストームセル！",
-      "floorCellLine": "ストームセルを拾え（インタラクトまたはクリック）",
-      "floorCellLineTouch": "ストームセルを拾え（タップ）",
-      "floorCellHint": "その後、コアハッチが開いたら運び込め",
-      "groundedTitle": "銅の面：武器が通る",
-      "groundedLine": "物理ダメージは通る。呪文は電荷として蓄えられる",
-      "groundedDronesLine": "呪文は弾かれる：ドローンを攻撃せよ",
-      "chargedTitle": "青の面：呪文が通る",
-      "chargedLine": "呪文は通る。物理ダメージは電荷として蓄えられる",
-      "chargedDronesLine": "武器は弾かれる：ドローンを攻撃せよ",
-      "splitLine": "背中側はもう一方の面になっている",
-      "ventWarnTitle": "灼熱の蒸気孔！",
-      "ventWarnLine": "通路から蒸気が噴き出す：今すぐベルトに乗れ",
-      "ventScaldTitle": "灼熱の蒸気！",
-      "ventScaldLine": "通路で焼かれている：ベルトに乗れ",
-      "ventAria": "蒸気孔の残り時間：{pct}",
-      "flipIn": "装甲板は {seconds} 秒後に反転する",
-      "flipInSplit": "装甲板は {seconds} 秒後に反転する。背中側はもう一方の面になっている",
-      "flipNow": "装甲板が反転中：蓄積電荷が放出される！",
-      "storedAria": "蓄積電荷 {pct}：反転時に放出される",
-      "turnedAside": "弾かれた"
     },
     "wildheartAlert": {
       "preyTitle": "お前が獲物だ！",
@@ -6212,13 +6148,6 @@ export const ja_JP: EnTranslations = {
       "lockboundTitle": "錠縛",
       "lockboundLine": "鎖が{chains}本残っている：被ダメージが{pct}%減少。封印の枷を壊して剥がせ。",
       "timeAria": "残り{seconds}秒"
-    },
-    "foundryWorkers": {
-      "guardedLine": "今はだめだ、見張りが見ている。話しているところを見られたら、全員プレス機送りだ。",
-      "unguardedLine": "見張りが倒れた？ それなら頼む、逃げる勇気があるうちにこの鎖を断ち切ってくれ！",
-      "freedLine": "自由だ！ 家に帰れる。ありがとう、本当にありがとう！",
-      "free": "彼らを解放する",
-      "freeAria": "{name}と、この野営地で鎖につながれた者たちを解放する"
     },
     "cosmetics": {
       "title": "コスメティック",
@@ -8402,7 +8331,6 @@ export const ja_JP: EnTranslations = {
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの高みに隠された氷河。一頭の竜が氷の中に囚われ、カルトは盗んだ魂を燃やしてその氷を解かそうとしている。高い峠から氷の塔、鍛冶神の砕けた鎖、カルトの炎を越えて、氷河の麓の凍った湖へと下っていきます。",
       "wildheartBody": "沈んだ偶像の奥に隠されたジャングルのカルデラ。断崖に囲まれ、滝の轟きが響く。川の浅瀬を渡り、狩りの段丘と滝を抜け、植民地の廃墟を越えて、巨大な石のジャガーの頭の下にそびえる階段状の神殿へ登れ。",
-      "foundryBody": "ストームクラッグの嵐の稜線に建つ真鍮の鋳造所。史上最初に造られたオートマトンが、稲妻の空の下で今もコンベヤーと試験射撃場を動かしている。ラインを止め、両翼を黙らせ、未完成の巨人が待つガントリーへ登れ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -12513,20 +12441,6 @@ export const ja_JP: EnTranslations = {
       "temple_hydra_tsunami": "津波",
       "temple_ysolei_call": "月の落とし子の呼び声",
       "temple_ysolei_wrath": "溺れし憤怒",
-      "foundry_piston_slam": "ピストンスラム",
-      "foundry_field_repair": "現場修理",
-      "foundry_deploy_turret": "砲台設置",
-      "foundry_steam_screen": "蒸気の障壁",
-      "foundry_hauler_steam_blast": "蒸気噴射",
-      "foundry_tock_lever": "レバー操作",
-      "foundry_tock_rivet_gun": "リベットガン",
-      "foundry_proof_shot": "試験射撃",
-      "foundry_plating_flip": "装甲板反転",
-      "foundry_static_lash": "静電の鞭",
-      "foundry_draft_awaken": "覚醒",
-      "foundry_arm_sweep": "腕薙ぎ",
-      "foundry_draft_unbolt": "ボルト引きちぎり",
-      "foundry_tremor_step": "震動の踏みつけ",
       "wildheart_ancestral_sap": "祖霊の樹液",
       "wildheart_plant_totem": "トーテム設置",
       "wildheart_entangling_lash": "絡みつく鞭",
@@ -18876,78 +18790,6 @@ export const ja_JP: EnTranslations = {
       "tideglass_warmaul": {
         "name": "潮硝子の戦槌"
       },
-      "riveters_gauntlets": {
-        "name": "リベット工のガントレット"
-      },
-      "beltrunners_boots": {
-        "name": "ベルトランナーのブーツ"
-      },
-      "draftsmans_mantle": {
-        "name": "製図師のマントル"
-      },
-      "tocks_torque_wrench": {
-        "name": "トックのトルクレンチ"
-      },
-      "proofplate_legguards": {
-        "name": "試験板のレッグガード"
-      },
-      "rangefinders_hood": {
-        "name": "測距手のフード"
-      },
-      "coilwound_cord": {
-        "name": "コイル巻きの帯"
-      },
-      "proving_range_quiver": {
-        "name": "試験射場の矢筒"
-      },
-      "grounding_pauldrons": {
-        "name": "接地のポールドロン"
-      },
-      "arcstep_treads": {
-        "name": "アークステップのトレッド"
-      },
-      "stormglass_circlet": {
-        "name": "ストームグラスのサークレット"
-      },
-      "voltaic_coil_staff": {
-        "name": "ヴォルタのコイルスタッフ"
-      },
-      "draftplate_breastplate": {
-        "name": "試作板の胸当て"
-      },
-      "gearwork_jerkin": {
-        "name": "歯車仕掛けのジャーキン"
-      },
-      "stormbrass_robe": {
-        "name": "ストームブラスのローブ"
-      },
-      "piston_maul": {
-        "name": "プライム・ドラフトのピストンモール"
-      },
-      "cellspark_dagger": {
-        "name": "セルスパークの短剣"
-      },
-      "governors_scepter": {
-        "name": "ガバナーの王笏"
-      },
-      "line_masters_steam_hammer": {
-        "name": "ライン長のスチームハンマー"
-      },
-      "rangewardens_targeting_visor": {
-        "name": "射場番の照準バイザー"
-      },
-      "stormglass_robes": {
-        "name": "ストームグラスの法衣"
-      },
-      "prime_draft_core_plate": {
-        "name": "プライム・ドラフトのコアプレート"
-      },
-      "heartless_gearmask": {
-        "name": "心なき歯車の仮面"
-      },
-      "draft_record": {
-        "name": "設計記録"
-      },
       "beastpit_warbelt": {
         "name": "獣の穴の戦帯"
       },
@@ -19857,12 +19699,6 @@ export const ja_JP: EnTranslations = {
       "gaolers_iron_key": {
         "name": "牢番の鉄鍵"
       },
-      "rangefinders_lens": {
-        "name": "測距手のレンズ"
-      },
-      "overclocked_governor": {
-        "name": "オーバークロックのガバナー"
-      },
       "fanglords_whistle": {
         "name": "牙王の呼び笛"
       },
@@ -20302,57 +20138,6 @@ export const ja_JP: EnTranslations = {
       },
       "tideglass_reflection_druid": {
         "name": "潮硝子の映し身"
-      },
-      "brass_sentry": {
-        "name": "真鍮の歩哨"
-      },
-      "steam_bruiser": {
-        "name": "スチームブルーザー"
-      },
-      "arc_drone": {
-        "name": "アークドローン"
-      },
-      "foundry_engineer": {
-        "name": "鋳造所の技師"
-      },
-      "gearwright_apprentice": {
-        "name": "ギアライトの見習い"
-      },
-      "clockwork_hound": {
-        "name": "コイルスプリングの猟犬"
-      },
-      "shieldbearer_frame": {
-        "name": "盾持ちフレーム"
-      },
-      "tripod_turret": {
-        "name": "三脚砲台"
-      },
-      "gantry_hauler": {
-        "name": "ガントリー運搬車"
-      },
-      "line_master_tock": {
-        "name": "ライン長アンブレル・トック"
-      },
-      "rangewarden": {
-        "name": "射撃場の番人"
-      },
-      "voltaic_warden": {
-        "name": "ヴォルタイックの守護者"
-      },
-      "prime_draft": {
-        "name": "プライム・ドラフト"
-      },
-      "half_built_frame": {
-        "name": "未完成フレーム"
-      },
-      "sf_chained_miner": {
-        "name": "鎖につながれた鉱夫"
-      },
-      "sf_chained_hauler": {
-        "name": "鎖につながれた運搬人"
-      },
-      "sf_freed_laborer": {
-        "name": "解放された労働者"
       },
       "sanctum_boneguard": {
         "name": "聖所の骨衛兵"
@@ -21738,11 +21523,6 @@ export const ja_JP: EnTranslations = {
         "name": "教練官ヘイル",
         "title": "波止場の稽古師範",
         "greeting": "後ろのダミーは打ち返しもしなければ倒れもしない、{className}。大事なのは記録だ。お前が当てた一撃は残らずダメージメーターが数えてくれる。あれを標的にしてメーターを開け、あとは俺が教えてやる。"
-      },
-      "lift_warden_corwin": {
-        "name": "昇降機番コーウィン・アシュビー",
-        "title": "嵐の線の昇降機の番人",
-        "greeting": "ケーブルに気をつけな。あの昇降機はまだ嵐の線の古い鋳造所まで登っていく。あそこの機械は、二度と戻らなかった主のためにまだ動いているんだ。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -24012,56 +23792,6 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
-      "q_sf_storm_line": {
-        "title": "嵐の線",
-        "text": "{playerName}、昇降機が毎時運び下ろすのは鉄くずと火花ばかりで、生きた者は一人もいない。上ではまだ何かが線路を走っている。技師たちがガントリー運搬車と呼んだ巨大な蒸気クローラーだ。上がって操車場を叩き、あのクローラーを止めてくれ。",
-        "completion": "操車場が何年ぶりかで静かになった。静かだが、空っぽじゃない。聞け、その上でまだラインが動いている。",
-        "objectives": {
-          "0": {
-            "label": "ガントリー運搬車を破壊"
-          }
-        }
-      },
-      "q_sf_stop_the_line": {
-        "title": "ラインを止めろ",
-        "text": "ライン長アンブレル・トックは、主が去った後も鋳造所を動かし続け、一度も止まらなかった。今ではベルトに乗ったものを何でもプレス機に送り込む。{playerName}、奴を止めろ。そうすればライン全体が奴と共に止まる。",
-        "completion": "トックは止まり、ベルトも止まった。奴が何を作っていたにせよ、誰か別の者のためだった。もっと上へ行け。",
-        "objectives": {
-          "0": {
-            "label": "ライン長アンブレル・トックを倒す"
-          }
-        }
-      },
-      "q_sf_first_draft": {
-        "title": "最初の草案",
-        "text": "鋳造所の頂には、あそこのすべての機械が仕えるために作られたものが立っている。プライム・ドラフト、完成しなかった巨人だ。嵐がそれを目覚めさせたら、棚の下は何一つ安全じゃない。{playerName}、そいつを倒し、作り手がその中に残したものを読んでくれ。",
-        "completion": "記録によれば、嵐は金属を動かせても、心を与えることはできなかった。「生きた水だけが覚えている」。最後の泉、そして鍛造父の島。これは奴の最初の作品だ、{playerName}。最後の作品はまだどこかにある。",
-        "objectives": {
-          "0": {
-            "label": "設計記録を読む"
-          }
-        }
-      },
-      "q_sf_forgefathers_isle": {
-        "title": "鍛造父の島へ",
-        "text": "記録は鍛造父の島の名を挙げている。メイリンという記録官が、何か月もそこの炉で槌の跡を読み解いている。{playerName}、設計記録を彼女に届けてくれ。ヴァルクルがここで何を学び、それで何をしたのか、彼女なら分かるはずだ。",
-        "completion": "彼の最初の草案。嵐は炎より先だったのね。それなら彼が何を置き換えようとしていたのか、そして彼のオートマトンがなぜすべて失敗したのかが分かる。そばにいて。残りは一緒に読みましょう。",
-        "objectives": {
-          "0": {
-            "label": "記録官メイリンを見つける"
-          }
-        }
-      },
-      "q_sf_free_the_workers": {
-        "title": "労働者を解放せよ",
-        "text": "{playerName}、この岩棚で働いていた鉱夫たちは、一人も下りてこなかった。鋳造所が彼らを捕らえたままなんだ。鉄くず置き場で鎖につながれ、とうの昔に去った主のために鉱石を掘り、鉄くずを運び続けている。見張りは主の機械どもだ。各野営地の見張りを倒し、鎖を断ち切ってくれ。三つの野営地すべてだ。彼らを家に帰してやってくれ。",
-        "completion": "{playerName}、彼らは自分の足でラインを下りてきた。一人残らずだ。空を忘れていたかのように、まぶしそうに見上げていたよ。上で何を壊してきたにせよ、谷の者たちが覚えているのはこのことだろう。",
-        "objectives": {
-          "0": {
-            "label": "労働者の野営地を解放"
-          }
-        }
-      },
       "q_drowned_choir": {
         "title": "溺れし聖歌隊",
         "text": "渡り手どもは独りで動いているのではない。その中に溺れし信徒たちが歩いている——神殿とともに沈んだ教団だ。腐った祭服をまとったまま、岸の岩場から祈りを歌い続けている。八体を沈黙させ、奴らが携える供物を六つ持ち帰れ。奴らが女神に何を捧げようとしているのか、私は知りたいのだ。",
@@ -24615,11 +24345,6 @@ export const ja_JP: EnTranslations = {
         "name": "ワイルドハート盆地",
         "enterText": "偶像の口をくぐると、盆地を見下ろす高い岩棚に出た。崖の縁から滝が轟き落ち、はるか下では何か巨大なものが浅瀬を渡っている。",
         "leaveText": "石の牙の下をくぐり、パームリーチの陽光へ戻った。"
-      },
-      "stormbrass_foundry": {
-        "name": "ストームブラス鋳造所",
-        "enterText": "ケーブルリフトが鋳造所の岩棚でがくんと止まった。真鍮の屋根が蒸気を噴き、頭上の嵐のコイルに稲妻が走る。",
-        "leaveText": "ケーブルリフトが嵐の稜線を下り、ストームクラッグへあなたを運んだ。"
       },
       "the_last_keep": {
         "name": "最後の砦",
