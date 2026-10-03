@@ -4423,7 +4423,8 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.14,
   },
-  // The Tide Pilgrim (scripts/assets/drowned_temple_creatures/pilgrim_snail/):
+  // The Drowned Pilgrim (drowned_pilgrim; scripts/assets/drowned_temple_creatures/
+  // pilgrim_snail/, built as the design's "Tide Pilgrim"):
   // a giant sacred sea snail with a moon shrine on its carved nacre shell. It
   // glides on a pedal wave, darts its snout (Attack) and crashes its shell
   // down (Attack2); below 30 percent its enrage rears it up and blazes the

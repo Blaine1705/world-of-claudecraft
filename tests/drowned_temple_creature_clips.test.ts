@@ -18,6 +18,7 @@ import {
   YSOLEI_UNDERTOW,
   YSOLEI_WRATH,
 } from '../src/sim/encounters/drowned_temple';
+import { updateBossMechanics } from '../src/sim/mob/boss_mechanics';
 import {
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_STATIC_COIL,
@@ -112,14 +113,48 @@ describe('the Tide Pilgrim: the sacred sea snail', () => {
     expect(v.clips.attackByAbility?.[TEMPLE_PILGRIM_FRENZY_GESTURE]).toBe('Frenzy');
     expect(v.oneShotsHoldAttacks).toContain('Frenzy');
     expect(MOBS.drowned_pilgrim.enrage).toBeDefined();
-    // The shape boss_mechanics.ts emits when a trash mob enrages.
     const nova = { type: 'spellfx', sourceId: 7, targetId: 7, school: 'fire', fx: 'nova' };
     expect(isTemplePilgrimFrenzyCue(nova, 'drowned_pilgrim')).toBe(true);
+    expect(isTemplePilgrimFrenzyCue({ ...nova, school: 'nature' }, 'drowned_pilgrim')).toBe(false);
     expect(isTemplePilgrimFrenzyCue(nova, 'drowned_templeguard')).toBe(false);
     expect(isTemplePilgrimFrenzyCue(nova, undefined)).toBe(false);
     expect(isTemplePilgrimFrenzyCue({ ...nova, targetId: 8 }, 'drowned_pilgrim')).toBe(false);
     expect(isTemplePilgrimFrenzyCue({ ...nova, fx: 'projectile' }, 'drowned_pilgrim')).toBe(false);
     expect(isTemplePilgrimFrenzyCue({ ...nova, ability: 'x' }, 'drowned_pilgrim')).toBe(false);
     expect(isTemplePilgrimFrenzyCue({ ...nova, type: 'aura' }, 'drowned_pilgrim')).toBe(false);
+  });
+});
+
+describe('the pilgrim frenzy cue rides the real enrage', () => {
+  it('the nova the sim emits when a pilgrim drops under 30 percent is the cue', () => {
+    const events: Array<Record<string, unknown>> = [];
+    const ctx = {
+      emit: (ev: Record<string, unknown>) => events.push(ev),
+      delveRunForMob: () => null,
+    };
+    const mob = {
+      id: 41,
+      templateId: 'drowned_pilgrim',
+      name: 'Drowned Pilgrim',
+      kind: 'mob',
+      dead: false,
+      enraged: false,
+      hp: 25,
+      maxHp: 100,
+    };
+    updateBossMechanics(ctx as never, mob as never);
+    expect(mob.enraged).toBe(true);
+    const novas = events.filter((ev) => ev.type === 'spellfx' && ev.fx === 'nova');
+    expect(novas).toHaveLength(1);
+    expect(isTemplePilgrimFrenzyCue(novas[0] as never, 'drowned_pilgrim')).toBe(true);
+  });
+
+  it('the temple claims the cue and the dungeon visuals pass the claim on', () => {
+    const fx = readFileSync('src/render/drowned_temple/temple_fx.ts', 'utf8');
+    expect(fx).toContain('this.playGesture(ev.sourceId, TEMPLE_PILGRIM_FRENZY_GESTURE)');
+    const zone = readFileSync('src/render/rift_death_zone.ts', 'utf8');
+    expect(zone).toContain('new TempleFx(scene, groundY, world, compileGate, playGesture)');
+    expect(zone).toMatch(/const temple = this\.templeFx\.handleEvent\(event\)/);
+    expect(zone).toMatch(/\|\| temple \|\|/);
   });
 });

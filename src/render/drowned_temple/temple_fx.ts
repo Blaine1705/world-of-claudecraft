@@ -165,8 +165,10 @@ export class TempleFx {
     this.ysolei.handleEvent(ev);
     if (ev.type === 'spellfx') {
       const source = this.world?.entities.get(ev.sourceId);
-      if (isTemplePilgrimFrenzyCue(ev, source?.templateId)) {
-        this.playGesture?.(ev.sourceId, TEMPLE_PILGRIM_FRENZY_GESTURE);
+      // Claimed only when the Frenzy can actually play (a host without the
+      // gesture hook keeps the generic burst).
+      if (this.playGesture && isTemplePilgrimFrenzyCue(ev, source?.templateId)) {
+        this.playGesture(ev.sourceId, TEMPLE_PILGRIM_FRENZY_GESTURE);
         return true;
       }
     }

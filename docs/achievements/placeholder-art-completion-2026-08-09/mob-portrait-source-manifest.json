@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "85b52d8967882475c2bce98350718bb47fd275d1fd60f7c21eb625f0d616cee5",
+  "rendererFingerprint": "06350d0e135b12bf163841a66bb6d477e0e14f15692218fffb99fce5e69ef9e8",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5475969,
-      "sha256": "3a658f3fb29999f846a061b477ae940e636a59a24fb91db2a6f1cba3b2b795f1",
+      "bytes": 5475790,
+      "sha256": "4ac7dc1e5ceffba9cad4847f77bc3387afe36f0f3c885a06a7518df9401becd2",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -2323,11 +2323,11 @@
         "model": {
           "url": "models/creatures/temple_pilgrim.glb",
           "path": "public/models/creatures/temple_pilgrim.glb",
-          "bytes": 447452,
-          "sha256": "856c8d37e44d589faf13bc1c0cf6722d8f89acb2b870d0efbf69eff1f95fcd77"
+          "bytes": 2538756,
+          "sha256": "607f5c1dfa2bba4f31b1985862ab2f667bf7d52e48693a1ed1b5190c50bf165b"
         },
         "idle": "Idle",
-        "height": 4.4,
+        "height": 4.42,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -2341,11 +2341,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "719d55d78b3dfe7c298fea06086aa0883b4df8f15fc42894469a67fdf543c96a",
+      "sourceFingerprint": "8b9da29cf2eabf7e037d6b56151901e4fab42103b7f05c9058a60bf8c2de21de",
       "output": {
         "path": "public/ui/mobs/drowned_pilgrim.webp",
-        "bytes": 1744,
-        "sha256": "b3ec9a592c913ed4c8acb5dd717ffd05560363ab09b78fa9737ded0dda802ca6"
+        "bytes": 2404,
+        "sha256": "2068180ecb5925d66d2bbbba0dfa2c418929379574d6449e72f9ccb3ad952c95"
       }
     },
     {
