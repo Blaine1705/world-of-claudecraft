@@ -15,8 +15,8 @@
 //
 // The step only ever rises for the life of the claim (a wipe never re-freezes
 // the face); a freed claim drops its markers with every other object. The
-// chain count (steps 2 to 5) is phase B's: until Korgath's shackles exist only
-// his death moves the face past step 1. Zero rng.
+// chain count (steps 2 to 5) is Korgath's: every chain the group breaks in his
+// pull (korgath.ts korgathChainsBroken) cracks the face one step more. Zero rng.
 
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -30,6 +30,7 @@ import {
   sanctumStoryTemplate,
   VELKHAR_ID,
 } from './ids';
+import { korgathChainsBroken } from './korgath';
 
 /** The crack step the claim's encounter state has earned right now (before the
  *  latch): the deepest beat reached. `chainsBroken` is phase B's count. */
@@ -74,6 +75,6 @@ export function raiseStory(ctx: SimContext, inst: InstanceSlot, step: number): n
 
 /** One tick of the claim's story: latch the step the run has earned. */
 export function tickStory(ctx: SimContext, inst: InstanceSlot): void {
-  const earned = earnedStoryStep(ctx, inst);
+  const earned = earnedStoryStep(ctx, inst, korgathChainsBroken(ctx, inst));
   if (earned > 0 && earned > storyStep(ctx, inst)) raiseStory(ctx, inst, earned);
 }

@@ -923,7 +923,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 15,
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
-    stomp: { radius: 10, every: 12, duration: 1.5, min: 20, max: 30, name: 'Shuddering Stomp' },
+    // Shuddering Stomp and his chain kit run in encounters/gravewyrm_sanctum/
+    // korgath.ts (KORGATH_TUNING), telegraphed with a bar.
     loot: [
       { copper: 5000, chance: 1 },
       {

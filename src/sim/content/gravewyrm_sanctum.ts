@@ -37,7 +37,13 @@
 // fumbled trash dodge costs about 15 to 20 percent, the Tusker's avoidables
 // about 20 to 25. Heroic scales them through the dungeon's difficulty transform.
 
-import { SANCTUM_DUNGEON, SANCTUM_STORY_PREFIX } from '../encounters/gravewyrm_sanctum/ids';
+import {
+  SANCTUM_DUNGEON,
+  SANCTUM_STORY_PREFIX,
+  SEAL_SHACKLE_IDS,
+  SEAL_TOOLS,
+  type SealTool,
+} from '../encounters/gravewyrm_sanctum/ids';
 import {
   SANCTUM_GOAD,
   SANCTUM_HOARFROST_POP,
@@ -51,6 +57,47 @@ import type { DungeonGateDef, DungeonObjectSpawn, DungeonSpawn, MobTemplate } fr
 import { KORGATH_SPOT, KORZUL_SPOT, STORY_MARKERS, VELKHAR_SPOT } from './gravewyrm_sanctum_layout';
 
 // ---- Mob templates --------------------------------------------------------------
+
+/** Korgath's four Seal Shackles, one template per chain so its nameplate names
+ *  the chain it pins. */
+function sealShackles(): Record<string, MobTemplate> {
+  const names: Record<SealTool, string> = {
+    hammer: 'Hammer Shackle',
+    tongs: 'Tongs Shackle',
+    anvil: 'Anvil Shackle',
+    bellows: 'Bellows Shackle',
+  };
+  const out: Record<string, MobTemplate> = {};
+  for (const tool of SEAL_TOOLS) {
+    const id = SEAL_SHACKLE_IDS[tool];
+    out[id] = {
+      id,
+      name: names[tool],
+      minLevel: 20,
+      maxLevel: 20,
+      family: 'elemental',
+      untameable: true,
+      ccImmune: true,
+      slowImmune: true,
+      ignoreTaunt: true,
+      quietMechanics: true,
+      xpMult: 0,
+      hpBase: 750,
+      hpPerLevel: 0,
+      dmgBase: 0,
+      dmgPerLevel: 0,
+      attackSpeed: 999,
+      armorPerLevel: 20,
+      moveSpeed: 0,
+      aggroRadius: 0,
+      idleStationary: true,
+      loot: [],
+      scale: 1.4,
+      color: 0x5b7da8,
+    };
+  }
+  return out;
+}
 
 export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
   // A Gravecaller in furs swinging a soulfire censer on a chain.
@@ -316,6 +363,13 @@ export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
     scale: 1.9,
     color: 0x7fc4e8,
   },
+  // Korgath's four Seal Shackles (encounters/gravewyrm_sanctum/korgath.ts, G23):
+  // the iron cuff at each seal pillar's foot where his chain is pinned. Raised
+  // by his encounter (never placed in the spawn list, so they never count
+  // toward a clear, never chain-pull and drop nothing), held untouchable until
+  // he is pulled, and never moving, swinging or taking a taunt. About 1,500
+  // health on normal through the dungeon's tuning rows.
+  ...sealShackles(),
   // The showpiece patrol: a shaggy mountain tusker as big as a house, dragging
   // a sledge of burning soul braziers up and down the haul road. Its kit rides
   // encounters/gravewyrm_sanctum/sledge_tusker.ts.

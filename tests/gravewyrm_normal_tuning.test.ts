@@ -33,6 +33,7 @@ import {
 } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEON_DEFS } from '../src/sim/content/dungeons';
 import { MOBS } from '../src/sim/data';
+import { KORGATH_TUNING } from '../src/sim/encounters/gravewyrm_sanctum/ids';
 import { createMob } from '../src/sim/entity';
 import {
   applyDungeonMobTuning,
@@ -155,12 +156,17 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       ogre_sledge_hauler: 1,
       glacier_splinter: 1,
       sledge_tusker: 1,
+      korgath_the_bound: 1,
       korzul_the_gravewyrm: 15,
     });
     // The bosses' and the Tusker's pools from fight length x 150 party DPS.
     expect(tuning.healthMultiplierByMob).toEqual({
       sledge_tusker: 5.43,
       korgath_the_bound: 5.53,
+      sanctum_shackle_hammer: 2,
+      sanctum_shackle_tongs: 2,
+      sanctum_shackle_anvil: 2,
+      sanctum_shackle_bellows: 2,
       grand_necromancer_velkhar: 7.61,
       korzul_the_gravewyrm: 7.83,
     });
@@ -250,25 +256,26 @@ describe('normal Gravewyrm Sanctum mechanic scaling', () => {
     expect(korzul.mechanicDamageMult).toBe(15);
   });
 
-  it('scales Grave Inferno by the mechanic override and Korgath stomp by his melee factor', () => {
+  it('scales Grave Inferno by the mechanic override; Korgath states his kit landed', () => {
     const tuning = sanctumTuning();
     // Korzul's aoePulse is GONE (2026-07): Grave Inferno replaced it, a
     // stationary 8s channel with four escalating avoidable pulses.
     expect(MOBS.korzul_the_gravewyrm.aoePulse).toBeUndefined();
     const inferno = MOBS.korzul_the_gravewyrm.infernoChannel;
-    const korgathStomp = MOBS.korgath_the_bound.stomp;
     expect(inferno).toBeTruthy();
-    expect(korgathStomp?.min).toBeTruthy();
-    if (!inferno || korgathStomp?.min === undefined || korgathStomp.max === undefined) return;
+    if (!inferno) return;
     // Raw (unmitigated) mechanic damage after the per-mob multiplier: the
-    // FOURTH (largest) inferno pulse on normal, and the stomp band.
+    // FOURTH (largest) inferno pulse on normal.
     const mult = tuning.mechanicDamageMultiplierByMob?.korzul_the_gravewyrm;
     expect(mult).toBe(15);
     if (mult === undefined) return;
     expect(inferno.min * inferno.pulses * mult).toBe(420);
     expect(inferno.max * inferno.pulses * mult).toBe(540);
-    expect(korgathStomp.min * tuning.damageMultiplierByMob.korgath_the_bound).toBe(190);
-    expect(korgathStomp.max * tuning.damageMultiplierByMob.korgath_the_bound).toBe(285);
+    // Korgath's Shuddering Stomp moved off the template into his encounter
+    // (KORGATH_TUNING, telegraphed with a bar): 190 to 285 LANDED at factor 1.
+    expect(MOBS.korgath_the_bound.stomp).toBeUndefined();
+    expect(tuning.mechanicDamageMultiplierByMob?.korgath_the_bound).toBe(1);
+    expect([KORGATH_TUNING.stompMin, KORGATH_TUNING.stompMax]).toEqual([190, 285]);
   });
 
   it('leaves untuned normal dungeons untouched', () => {
@@ -315,8 +322,8 @@ describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () =
     korgath_the_bound: {
       dmgBase: 266,
       dmgPerLevel: 55.1,
-      hpBase: 2685.8,
-      hpPerLevel: 371.88,
+      hpBase: 2046.2,
+      hpPerLevel: 283.32,
       armorPerLevel: 36,
     },
     grand_necromancer_velkhar: {

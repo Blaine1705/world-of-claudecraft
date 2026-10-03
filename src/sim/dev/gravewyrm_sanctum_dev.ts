@@ -13,7 +13,11 @@
 //   /dev sanctum pack <pack>              jump to where a pack stands (or walks)
 //   /dev sanctum spawn <type>             raise one mob 10 yd ahead, pulled
 //   /dev sanctum trigger <mechanic>       fire an engaged Tusker's mechanic now:
-//                                         sweep, trample, spill, enrage
+//                                         sweep, trample, spill, enrage; or an
+//                                         engaged Korgath's: maul, flail,
+//                                         charge, bellow, strain, stomp,
+//                                         enrage, break <tool>, rerivet <tool>
+//                                         (hammer, tongs, anvil, bellows)
 //   /dev sanctum face <0..8>              set the Calving Face's crack step
 //                                         (0 arrival, 1 Tusker dead, 2 to 5
 //                                         chains, 6 Korgath, 7 Velkhar, 8 the
@@ -107,7 +111,7 @@ export const GRAVEWYRM_SANCTUM_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev sanctum enter [normal|heroic] | tp <landing|court|road|tusker|upper|lower|fork|serac|seraclower|anchor|anchorlower|terrace|korgath|bridge|works|workslower|vault|velkhar|shore|lake|korzul> | gates | kill <g1..g12|pa|pb|pc|pd|tusker|korgath|velkhar|korzul|trash|all> | pack <id> | spawn <boneguard|scaleguard|thawcaller|goadsmith|pyretender|brazier|whelp|ogre|splinter|bonewalker|tusker> | trigger <sweep|trample|spill|enrage> | face <0..8> | reset';
+  '[dev] /dev sanctum enter [normal|heroic] | tp <landing|court|road|tusker|upper|lower|fork|serac|seraclower|anchor|anchorlower|terrace|korgath|bridge|works|workslower|vault|velkhar|shore|lake|korzul> | gates | kill <g1..g12|pa|pb|pc|pd|tusker|korgath|velkhar|korzul|trash|all> | pack <id> | spawn <boneguard|scaleguard|thawcaller|goadsmith|pyretender|brazier|whelp|ogre|splinter|bonewalker|tusker> | trigger <sweep|trample|spill|enrage|maul|flail|charge|bellow|strain|stomp|break <tool>|rerivet <tool>> | face <0..8> | reset';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {
@@ -215,7 +219,8 @@ export function sanctumDevTrigger(ctx: SimContext, inst: InstanceSlot, what: str
 
 /** Handles `/dev sanctum ...`; returns false for any other line. */
 export function handleGravewyrmSanctumDevChat(ctx: SimContext, raw: string, pid: number): boolean {
-  const m = /^\/dev\s+sanctum(?:\s+(\S+))?(?:\s+(\S+))?\s*$/i.exec(raw);
+  // The trigger's mechanic may take a word of its own (`trigger break hammer`).
+  const m = /^\/dev\s+sanctum(?:\s+(\S+))?(?:\s+(\S+(?:\s+\S+)?))?\s*$/i.exec(raw);
   if (!m) return false;
   const verb = (m[1] ?? '').toLowerCase();
   const arg = (m[2] ?? '').toLowerCase();

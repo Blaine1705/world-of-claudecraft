@@ -7,6 +7,7 @@
 //
 // docs/design/dungeon-rework/gravewyrm_sanctum.md section 5.1.
 
+import { GOADSMITH_RERIVET } from '../../encounters/gravewyrm_sanctum/boss_ids';
 import type { Aura } from '../../types';
 
 /** Sanctum Scaleguard: a telegraphed breath of cinders across its front
@@ -42,4 +43,6 @@ export const SANCTUM_SHATTER = 'sanctum_shatter';
 export const SANCTUM_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> = {
   [SANCTUM_WARMING_RITE]: { school: 'shadow' },
   [SANCTUM_GOAD]: { school: 'fire' },
+  // Korgath's heroic Re-rivet: the Goadsmith's 6 s channel at a broken pillar.
+  [GOADSMITH_RERIVET]: { school: 'fire' },
 };

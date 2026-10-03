@@ -209,7 +209,14 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     healthMultiplier: 2.0,
     healthMultiplierByMob: {
       sledge_tusker: 5.43,
+      // Korgath's body about 12,000 (80 s), plus his four Seal Shackles at
+      // about 1,500 each (encounters/gravewyrm_sanctum/korgath.ts): about 105 s
+      // with all four broken, longer the more chains the group leaves on.
       korgath_the_bound: 5.53,
+      sanctum_shackle_hammer: 2,
+      sanctum_shackle_tongs: 2,
+      sanctum_shackle_anvil: 2,
+      sanctum_shackle_bellows: 2,
       grand_necromancer_velkhar: 7.61,
       korzul_the_gravewyrm: 7.83,
     },
@@ -237,6 +244,8 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       ogre_sledge_hauler: 1,
       glacier_splinter: 1,
       sledge_tusker: 1,
+      // Korgath's chain kit is stated LANDED (KORGATH_TUNING).
+      korgath_the_bound: 1,
       korzul_the_gravewyrm: 15,
     },
   },
@@ -722,7 +731,12 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // Korzul 160 s on the ground (phase B retunes them with their cores).
     healthMultiplierByMob: {
       sledge_tusker: 7.69,
-      korgath_the_bound: 10.33,
+      // Korgath's body 80 s (about 18,400) plus four shackles of about 2,300.
+      korgath_the_bound: 7.87,
+      sanctum_shackle_hammer: 3.07,
+      sanctum_shackle_tongs: 3.07,
+      sanctum_shackle_anvil: 3.07,
+      sanctum_shackle_bellows: 3.07,
       grand_necromancer_velkhar: 10.83,
       korzul_the_gravewyrm: 11.2,
     },
@@ -748,6 +762,10 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       ogre_sledge_hauler: 3,
       glacier_splinter: 3,
       sledge_tusker: 2.5,
+      // Korgath's chain kit: a missed avoidable costs a heroic cloth wearer
+      // about 45 percent, a fumbled Strain or Stomp about 55 (the Foundry's
+      // boss convention).
+      korgath_the_bound: 2.5,
     },
     armorMultiplier: 1.2,
     finalBossId: 'korzul_the_gravewyrm',
