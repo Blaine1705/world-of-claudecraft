@@ -1,4 +1,3 @@
-import { isFoundryWorkerTemplate } from '../sim/content/stormbrass_foundry_workers';
 import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
@@ -225,12 +224,6 @@ export function shouldDeferPickedCorpseToGatherNode(
   );
 }
 
-/** A Stormbrass Foundry worker (mob-kind, held inert by the sim) talks like an
- *  npc: the click opens its gossip (quest dialog), never the attack branch. */
-function isTalkableWorker(e: Entity): boolean {
-  return e.kind === 'mob' && !e.dead && isFoundryWorkerTemplate(e.templateId);
-}
-
 /** Route a picked entity and report only completed non-combat world interactions. */
 export function handlePickedEntity(
   world: PickInteractionWorld,
@@ -296,7 +289,7 @@ export function handlePickedEntity(
       }
       hud.showError(t('questUi.errors.tooFar'));
       return false;
-    } else if (e.kind === 'npc' || isTalkableWorker(e)) {
+    } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) {
         if (e.templateId === 'spirit_healer') {
           // The Spirit Healer resurrects a ghost in place (with Resurrection
@@ -401,7 +394,7 @@ export function handlePickedEntity(
         hud.openLoot(id, screenX, screenY);
         return true;
       }
-    } else if (e.kind === 'npc' || isTalkableWorker(e)) {
+    } else if (e.kind === 'npc') {
       // left-click talks too — Mac trackpads make right-click a chore;
       // out of range it just targets (no error spam while exploring)
       const d = dist2d(world.player.pos, e.pos);

@@ -94,7 +94,7 @@ export function buildAuthoredFieldTerrain(
     // Jungle moss stays matte; wet basalt glints.
     moss: { detail: mossDetail, rough: 0.97 },
     basalt: { detail: basaltDetail, rough: opts.wet ? 0.42 : 0.55 },
-    // The Foundry's steel: deck plate with a dull sheen, grating darker.
+    // Steel works: deck plate with a dull sheen, grating darker.
     plate: { detail: plateDetail, rough: 0.58, metal: 0.35 },
     grating: { detail: gratingDetail, rough: 0.66, metal: 0.3 },
     // The Gravewyrm Sanctum: matte wind-packed snow, lake and glacier ice

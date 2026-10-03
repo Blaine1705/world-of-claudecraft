@@ -1951,9 +1951,6 @@ export const en = {
       heart_of_the_crucible: { name: 'Heart of the Crucible' },
       // The Sunken Bastion's heroic Gaoler Ossick.
       gaolers_iron_key: { name: "Gaoler's Iron Key" },
-      // The Stormbrass Foundry's heroic Rangewarden and Voltaic Warden.
-      rangefinders_lens: { name: "Rangefinder's Lens" },
-      overclocked_governor: { name: 'Overclocked Governor' },
       // The Wildheart Basin's heroic Fanglord Beastmaster and Gorgebloom.
       fanglords_whistle: { name: "Fanglord's Whistle" },
       gorgebloom_seedpod: { name: 'Gorgebloom Seedpod' },

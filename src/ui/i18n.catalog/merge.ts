@@ -644,25 +644,6 @@ const mergeStringsEn = {
       temple_hydra_tsunami: 'Tsunami',
       temple_ysolei_call: 'Moonspawn Call',
       temple_ysolei_wrath: 'Drowned Wrath',
-      // The Stormbrass Foundry trash kit and the Gantry Hauler's bar
-      // (trash_kit/foundry_cast_ids.ts, encounters/stormbrass_foundry/ids.ts).
-      // The Field Repair and the Steam Screen can be kicked.
-      foundry_piston_slam: 'Piston Slam',
-      foundry_field_repair: 'Field Repair',
-      foundry_deploy_turret: 'Deploy Turret',
-      foundry_steam_screen: 'Steam Screen',
-      foundry_hauler_steam_blast: 'Steam Blast',
-      // The Stormbrass Foundry's four bosses (encounters/stormbrass_foundry).
-      // None of these bars can be kicked.
-      foundry_tock_lever: 'Throw the Lever',
-      foundry_tock_rivet_gun: 'Rivet Gun',
-      foundry_proof_shot: 'Proof Shot',
-      foundry_plating_flip: 'Reversing Plates',
-      foundry_static_lash: 'Static Lash',
-      foundry_draft_awaken: 'Awakening',
-      foundry_arm_sweep: 'Arm Sweep',
-      foundry_draft_unbolt: 'Tearing Free',
-      foundry_tremor_step: 'Tremor Step',
       // The Wildheart Basin rework (trash_kit/wildheart_cast_ids.ts,
       // encounters/wildheart_basin/ids.ts). Only Ancestral Sap can be kicked.
       wildheart_ancestral_sap: 'Ancestral Sap',

@@ -1552,8 +1552,6 @@ describe('dungeons: heroic boss drops', () => {
       'ysolei',
       'korzul_the_gravewyrm',
       'wildheart_high_priest',
-      // The Stormbrass Foundry's final boss (a new five-man).
-      'prime_draft',
     ];
     for (const bossId of FIVE_MAN_FINAL_BOSSES) {
       const table = HEROIC_BOSS_LOOT[bossId];

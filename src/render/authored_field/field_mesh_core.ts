@@ -53,8 +53,8 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   shallows: [0.14, 0.14, 0.11],
   moss: [0.16, 0.2, 0.1],
   basalt: [0.17, 0.18, 0.17],
-  // The Stormbrass Foundry: blued steel deck plate, near-black bar grating,
-  // flagstone under a film of soot.
+  // Steel works: blued steel deck plate, near-black bar grating, flagstone
+  // under a film of soot.
   plate: [0.27, 0.28, 0.3],
   grating: [0.2, 0.2, 0.21],
   soot: [0.22, 0.21, 0.21],
@@ -425,7 +425,7 @@ function basaltColor(base: Rgb, k: number, patch: number): Rgb {
   ];
 }
 
-/** Foundry floors: soot pooled in drifts, oil-dark stains, and the odd
+/** Steel-works floors: soot pooled in drifts, oil-dark stains, and the odd
  *  bright worn track where boots and carts polish the metal. */
 function sootColor(base: Rgb, k: number, patch: number, dirt: number, grating: boolean): Rgb {
   const soot = Math.min(1, Math.max(0, patch - 0.5) * 2.2);

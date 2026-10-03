@@ -1,8 +1,8 @@
 // HUD domain: dungeon encounter prompts the local player acts on: the Gaol
-// Turnkey's Iron Cage escape, Gaoler Ossick's chain alert, the Stormbrass
-// Foundry's alert, the Wildheart Basin's and the Gravewyrm Sanctum's, composed by the HUD as one
-// DungeonPrompts member; and the floating avoidance word (the plating's
-// "Turned aside").
+// Turnkey's Iron Cage escape, Gaoler Ossick's chain alert, the Wildheart
+// Basin's and the Gravewyrm Sanctum's alerts (the shared encounter alert
+// painter), composed by the HUD as one DungeonPrompts member; and the floating
+// avoidance word.
 
 export type { CageEscapeDeps } from './cage_escape_painter';
 export { CageEscapePrompt } from './cage_escape_painter';
@@ -10,19 +10,14 @@ export type { CageEscapeInput, CageEscapeLive, CageEscapeView } from './cage_esc
 export { buildCageEscapeView } from './cage_escape_view';
 export type { DungeonPromptsFrame } from './dungeon_prompts';
 export { DungeonPrompts } from './dungeon_prompts';
-export type { AlertLook, EncounterAlertView, FoundryAlertDeps } from './foundry_alert_painter';
-export { FoundryAlert } from './foundry_alert_painter';
-export type { FoundrySceneEntity, FoundrySceneWorld } from './foundry_alert_scene_core';
-export { FoundryAlertSceneScan } from './foundry_alert_scene_core';
+export type { AlertLook, EncounterAlertDeps } from './encounter_alert_painter';
+export { EncounterAlert } from './encounter_alert_painter';
 export type {
-  FoundryAlertEntity,
-  FoundryAlertInput,
-  FoundryAlertKind,
-  FoundryAlertScene,
-  FoundryAlertView,
-} from './foundry_alert_view';
-export { buildFoundryAlertView } from './foundry_alert_view';
-export { fctAvoidanceText, platingTurnedAside } from './foundry_fct_core';
+  EncounterAlertHidden,
+  EncounterAlertLive,
+  EncounterAlertView,
+} from './encounter_alert_view';
+export { fctAvoidanceText } from './fct_avoidance_core';
 export type { GaolChainDeps } from './gaol_chain_painter';
 export { GaolChainAlert } from './gaol_chain_painter';
 export type { GaolChainInput, GaolChainKind, GaolChainView } from './gaol_chain_view';

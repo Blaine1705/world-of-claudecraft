@@ -9,17 +9,14 @@
 // (item_budget.ts):
 //   gloves 21 uncommon: 6, feet: 5, shoulder: 6, legs: 7, helmet: 7, waist: 6
 // (caster pieces carry their free stamina baseline, round(budget / 3), on top).
-// Armor matches the same-slot item-level-21 Stormbrass Foundry siblings:
-// Proofplate Legguards (mail legs 153), Rangefinder's Hood (leather helmet
-// 86), Coilwound Cord (cloth waist 34), Arcstep Treads (leather feet 72).
-// The mail gloves and cloth shoulder have only item-level-20 siblings
-// (Riveter's Gauntlets 104, Draftsman's Mantle 44), one point of armor per
-// level up: 106 and 45.
+// Armor follows the same-slot item-level-21 five-man values: mail legs 153,
+// leather helmet 86, cloth waist 34, leather feet 72. The mail gloves and
+// cloth shoulder step up from their item-level-20 values (104 and 44), one
+// point of armor per level up: 106 and 45.
 //
 // The two heroic epics read source level 25 (item level 31) with the five-man
-// heroic ratings, each matched to its same-slot shipped sibling: the Hammer of
-// the Open Lock to Line-Master's Steam Hammer (Heavy two-hander, 50 hit), the
-// Vestments of the Waking Rite to the Stormglass Robes (cloth chest, 40
+// heroic ratings for their slot: the Hammer of the Open Lock as a Heavy
+// two-hander (50 hit), the Vestments of the Waking Rite as a cloth chest (40
 // haste). The three trinkets live with the others in content/trinkets.ts.
 //
 // Names were re-checked at authoring (2026-10-03, design section 11):

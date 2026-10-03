@@ -74,7 +74,6 @@ import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
-import { onTrinketAuraExpired } from './trinkets';
 import { tickSacrilegiousMarch, tickWarlockTalentState } from './warlock_talents';
 
 const SECOND_WIND_THRESHOLD = 0.35;
@@ -516,7 +515,6 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
       }
       applyGreaterInvisibilityAftereffect(ctx, e, a);
-      onTrinketAuraExpired(ctx, e, a);
       // A HoT that ran its FULL duration (this natural-expiry path, never a
       // dispel/overwrite) reports to the caster's talent procs. No rng.
       if (a.kind === 'hot') {

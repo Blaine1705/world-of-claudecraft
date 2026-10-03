@@ -40,7 +40,6 @@ const REWORKED = [
   'hollow_crypt',
   'sunken_bastion',
   'drowned_temple',
-  'stormbrass_foundry',
   'wildheart_basin',
 ];
 /** Every dungeon that names an interior (one per interior set). */
@@ -186,7 +185,9 @@ describe('interior collider cell index', () => {
         }
       }
     }
-    expect(gated).toBeGreaterThanOrEqual(6);
+    // The five gated open-air reworks (the Stormbrass Foundry, the sixth, is
+    // parked).
+    expect(gated).toBeGreaterThanOrEqual(5);
     expect(mismatches).toEqual([]);
   });
 

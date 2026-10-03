@@ -13,9 +13,9 @@ import { dist2d, type Entity } from '../../types';
 import { claimPlayers, pickMarkTargets } from '../sunken_bastion/claim';
 import { WILDHEART_DUNGEON } from './ids';
 
-export { bossTarget, heavySwing } from '../stormbrass_foundry/claim';
 export {
   bossEngaged,
+  bossTarget,
   claimBoss,
   claimPlayers,
   clearCastIf,
@@ -23,6 +23,7 @@ export {
   dropEncounterBody,
   dropEncounterObject,
   grantClaimDeed,
+  heavySwing,
   localOf,
   mechanicDamage,
   pickMarkTargets,

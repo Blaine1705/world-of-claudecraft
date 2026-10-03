@@ -508,8 +508,6 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the Drowned Temple braziers, moon orbs, tidepools, the conch, the prism and the altar, pushed through the fireLights adopter sink the interiors are handed',
   'render/wildheart_basin/basin_lights.ts':
     'the Wildheart Basin Sunbone braziers and the jaguar eyes, pushed through the fireLights adopter sink the interiors are handed',
-  'render/stormbrass_foundry/foundry_lights.ts':
-    'the Stormbrass Foundry work lamps, the coil glow and the charging racks, pushed through the fireLights adopter sink the interiors are handed',
   'render/gravewyrm_sanctum/sanctum_lights.ts':
     'the Gravewyrm Sanctum braziers, soul brazier, Thaw Works soul pyres and the vault thaw pyres, pushed through the fireLights adopter sink the interiors are handed',
   'render/sunken_bastion/bastion_lights.ts':
@@ -633,20 +631,6 @@ describe('every point-light producer is a carrier source', () => {
       'render/jail_scene.ts: swirl',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
-      // The Stormbrass Foundry: mesh hooks, never a scene: the gates reading
-      // the gate memory (the shutters, the arc fences, the crane swinging the
-      // bridge span), the coil's bolts, flare and afterglow on the strike
-      // clock, the kit's movers (one matrix buffer per piece: jibs, flywheels,
-      // pistons, ladles), the ladles' pour streams, the storm dome's flash, and
-      'render/stormbrass_foundry/foundry_gates.ts: m',
-      'render/stormbrass_foundry/foundry_landmarks.ts: bolt',
-      'render/stormbrass_foundry/foundry_landmarks.ts: flare',
-      'render/stormbrass_foundry/foundry_landmarks.ts: glow',
-      'render/stormbrass_foundry/foundry_machines.ts: mesh',
-      'render/stormbrass_foundry/foundry_molten.ts: mesh',
-      // the Stamping Press's hammers falling (one matrix write per hammer mesh)
-      'render/stormbrass_foundry/foundry_press.ts: m',
-      'render/stormbrass_foundry/foundry_sky.ts: mesh',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
       // the idle sweep or to Vael's lamp yaw, never a scene.
       'render/sunken_bastion/bastion_beacon.ts: mesh',

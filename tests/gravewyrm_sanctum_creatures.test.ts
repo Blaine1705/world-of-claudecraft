@@ -9,7 +9,7 @@
 // the body, the Trample lane's reach to a drop, the Cinder Breath, the toss
 // ring's bar); every new creature stands clearly past a player; the story
 // markers draw nothing; and a Glacier Splinter's Shatter ring fills on its own
-// fuse, not a same-radius Foundry burst's.
+// fuse.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
@@ -23,6 +23,7 @@ import {
   TUSKER_TRACES_ON_GESTURE,
   TUSKER_UNHITCH_GESTURE,
 } from '../src/render/characters/sanctum_creature_looks';
+import { burstDelayForRadius } from '../src/render/death_burst_fx_core';
 import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph/telegraph_look_core';
 import {
   buildGateObject,
@@ -79,7 +80,6 @@ import {
   worldToModel,
 } from '../src/render/gravewyrm_sanctum_fx/tusker_model_core';
 import { FIRE_FRAG, GHOST_RAMP } from '../src/render/hollow_crypt/crypt_fx_particles';
-import { burstDelayForRadius } from '../src/render/stormbrass_foundry/foundry_fx_core';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import {
   SANCTUM_DUNGEON,
@@ -528,18 +528,16 @@ describe('the Sanctum encounter objects', () => {
 });
 
 describe('a death burst ring fills on its own mob fuse', () => {
-  it('tells a Glacier Splinter Shatter from a Steam Bruiser boiler of the same radius', () => {
+  it("reads a Glacier Splinter's Shatter fuse off its own template", () => {
     const splinter = MOBS.glacier_splinter?.trashKit?.deathBurst;
-    const bruiser = MOBS.steam_bruiser?.trashKit?.deathBurst;
-    expect(splinter?.radius).toBe(bruiser?.radius);
-    expect(splinter?.delay).not.toBe(bruiser?.delay);
+    expect(splinter?.delay).toBe(2);
     expect(burstDelayForRadius(splinter?.radius ?? 0, MOBS.glacier_splinter?.name)).toBe(
       splinter?.delay,
     );
-    expect(burstDelayForRadius(bruiser?.radius ?? 0, MOBS.steam_bruiser?.name)).toBe(
-      bruiser?.delay,
-    );
-    // The Gantry Hauler's 8 yd rupture still reads off its radius alone.
-    expect(burstDelayForRadius(8)).toBe(MOBS.gantry_hauler?.trashKit?.deathBurst?.delay);
+    // A ring with no name still reads off the nearest delayed burst's radius.
+    expect(burstDelayForRadius(splinter?.radius ?? 0)).toBe(splinter?.delay);
+    // The Rime Whelp's Hoarfrost Pop goes off at once: it paints no ring, so
+    // it never steers a ring's fuse.
+    expect(MOBS.rime_whelp?.trashKit?.deathBurst?.delay).toBe(0);
   });
 });

@@ -4,8 +4,7 @@
 // (the ring of Thornpeak's summits closing the bowl on every side, the pass
 // behind the Gate Landing, the crevasse floor under the field at -62 to -74,
 // and the Quench rising behind the Calving Face) with a painted albedo and an
-// OBJECT-SPACE normal map in the GLB's occlusion slot, exactly as the
-// Foundry's mountains ship. Loaded when a Sanctum interior is first built and
+// OBJECT-SPACE normal map in the GLB's occlusion slot. Loaded when a Sanctum interior is first built and
 // awaited (capped), so its program and buffers reach the GPU behind the
 // interior's compile gate. If it fails to load, a procedural ring of slate
 // massifs and a glacier tongue stands in.

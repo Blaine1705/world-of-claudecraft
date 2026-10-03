@@ -235,28 +235,11 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/hoard_orbital_lightning.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hoard_pulsars.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hoard_tentacles.ts', layer: 'encounter', strict: true },
-  // The Stormbrass Foundry's Stamping Press (the hammer's footprint on the belt, over
-  // the press strip's fill) and Scalding Vents (the jets and steam under the lanes).
-  { file: 'src/render/stormbrass_foundry/foundry_press.ts', layer: 'encounter', strict: true },
   // The Gravewyrm Sanctum's fire pools, the vault's meltwater pools and the
   // Thaw Works' stains and melt channel: the floor's own marks.
   { file: 'src/render/gravewyrm_sanctum/sanctum_lights.ts', layer: 'ground', strict: true },
   { file: 'src/render/gravewyrm_sanctum/sanctum_vault.ts', layer: 'ground', strict: true },
   { file: 'src/render/gravewyrm_sanctum/sanctum_works.ts', layer: 'ground', strict: true },
-  { file: 'src/render/stormbrass_foundry/foundry_vents.ts', layer: 'encounter', strict: true },
-  // The Prime Draft's open Core Hatch: a shaft standing on the hatch ring, over
-  // the ring's own telegraph.
-  {
-    file: 'src/render/stormbrass_foundry/foundry_hatch_beacon.ts',
-    layer: 'encounter',
-    strict: true,
-  },
-  // The Stormbrass Foundry's chained workers: the sparks off their struck chains.
-  {
-    file: 'src/render/stormbrass_foundry/foundry_worker_fx.ts',
-    layer: 'encounter',
-    strict: true,
-  },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];
@@ -349,21 +332,6 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/drowned_temple/temple_landmarks.ts',
   'src/render/drowned_temple/temple_hydra.ts',
   'src/render/drowned_temple/temple_fx.ts',
-  // The Stormbrass Foundry's sky (dome, the mountain round it), the gates
-  // (shutter steam, arc fences standing across a passage, the crane's winch
-  // steam), the coil's bolts in the air, the molten brass (the river in the
-  // gulf under the Line Catwalk, its fall, the pour streams and heat glows in
-  // the air), the spark showers and the steam and smoke cards. None is a floor
-  // mark; its floor marks are the shared telegraph kit's (the ladder's own
-  // rungs) and its lamp pools sit on the ground rung (foundry_lights.ts).
-  'src/render/stormbrass_foundry/foundry_sky.ts',
-  'src/render/stormbrass_foundry/foundry_gates.ts',
-  'src/render/stormbrass_foundry/foundry_landmarks.ts',
-  'src/render/stormbrass_foundry/foundry_molten.ts',
-  'src/render/stormbrass_foundry/foundry_sparks.ts',
-  'src/render/stormbrass_foundry/foundry_steam.ts',
-  // The storm cloud banks among the peaks (far behind the world, under every rung).
-  'src/render/stormbrass_foundry/foundry_clouds.ts',
   // The Wildheart Basin's water (the ford, the river, the plunge pool: water
   // surfaces under the whole ladder), its waterfalls (curtains, foam, spray,
   // mist, rainbows standing up from the water) and its air (the gorge haze

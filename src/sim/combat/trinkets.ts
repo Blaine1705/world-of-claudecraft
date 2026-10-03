@@ -21,7 +21,6 @@ import { isPlayerRemovableAura } from '../aura_classify';
 import {
   GAMBLE,
   GAMBLE_FORTUNES,
-  rangefinderBonusAt,
   TRINKET_AURA,
   TRINKET_SPECS,
   type TrinketPassive,
@@ -33,7 +32,7 @@ import { ITEMS, MOBS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
-import { type Aura, dist2d, type Entity, MELEE_RANGE } from '../types';
+import { type Aura, type Entity, MELEE_RANGE } from '../types';
 import { meleeSwing } from './auto_attack';
 import { isUnbreakableControlAura } from './cc';
 import { applyHeal } from './heal';
@@ -508,31 +507,6 @@ export function useWornTrinket(
       fxOn(ctx, p, target, 'physical', 'trinket_gaolers_iron_key');
       break;
     }
-    case 'rangefinder': {
-      ctx.applyAura(
-        p,
-        marker(p, TRINKET_AURA.rangefinder, "Rangefinder's Lens", use.duration, use.max),
-      );
-      fx(ctx, p, 'physical', 'trinket_rangefinders_lens');
-      break;
-    }
-    case 'overclock': {
-      ctx.applyAura(p, {
-        id: TRINKET_AURA.overclock,
-        name: 'Overclocked',
-        kind: 'buff_spellhaste',
-        remaining: use.duration,
-        duration: use.duration,
-        value: use.haste,
-        sourceId: p.id,
-        school: 'arcane',
-        // Neither cancelled nor purged: Overheated always follows the burst
-        // (onTrinketAuraExpired runs on the natural expiry only).
-        undispellable: true,
-      });
-      fx(ctx, p, 'arcane', 'trinket_overclocked_governor');
-      break;
-    }
     case 'spiritPack':
     case 'seedburst': {
       // The Wildheart Basin's two (combat/wildheart_trinkets.ts): both need a
@@ -636,37 +610,6 @@ export function isMoored(target: Entity): boolean {
 // ---- passives off the gear-proc hooks -----------------------------------------
 
 export type TrinketTrigger = 'weaponHit' | 'weaponCrit' | 'spellCast' | 'kill';
-
-/** Rangefinder's Lens: the extra damage share `source` deals to `target`
- *  (dealDamage adds it to the source's damage done). Zero when not worn or
- *  not in use. */
-export function rangefinderDamageBonus(source: Entity, target: Entity): number {
-  if (source.kind !== 'player' || !findAura(source, TRINKET_AURA.rangefinder)) return 0;
-  const use = trinketSpec('rangefinders_lens')?.use;
-  if (use?.kind !== 'rangefinder') return 0;
-  return rangefinderBonusAt(dist2d(source.pos, target.pos), use);
-}
-
-/** A trinket aura ran its full course (combat/auras.ts natural expiry): the
- *  Overclocked Governor's burst gives way to Overheated. */
-export function onTrinketAuraExpired(ctx: SimContext, e: Entity, a: Aura): void {
-  if (a.id !== TRINKET_AURA.overclock || e.dead) return;
-  const use = trinketSpec('overclocked_governor')?.use;
-  if (use?.kind !== 'overclock') return;
-  ctx.applyAura(e, {
-    id: TRINKET_AURA.overheated,
-    name: 'Overheated',
-    // Cast times stretch so casting speed drops by `slow` (Curse of Tongues
-    // math), never removable by a player's dispel or cleanse.
-    kind: 'tongues',
-    remaining: use.overheat,
-    duration: use.overheat,
-    value: 1 / (1 - use.slow),
-    sourceId: e.id,
-    school: 'arcane',
-    undispellable: true,
-  });
-}
 
 /** Called from the set-proc and weapon-proc hooks (set_procs.ts, equip_procs.ts). */
 export function runTrinketTrigger(

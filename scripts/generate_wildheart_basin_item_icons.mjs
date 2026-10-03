@@ -1,9 +1,8 @@
 // scripts/generate_wildheart_basin_item_icons.mjs
 // Generates the shipping 128x128 WebP item icons for the Wildheart Basin
 // rework's loot (src/sim/content/wildheart_items.ts and the two trinkets in
-// src/sim/content/trinkets.ts). Same recipe as
-// generate_stormbrass_foundry_item_icons.mjs: an authored SVG composition per
-// item over a three-stop radial ground, rasterized with Sharp, meeting the
+// src/sim/content/trinkets.ts): an authored SVG composition per item over a
+// three-stop radial ground, rasterized with Sharp, meeting the
 // woc-item-icon-v1 contract (opaque dark vignette, warm top-left key light,
 // cool bottom-right shadow, centered silhouette with safe padding, distinct art
 // per item). The palette is the basin's own (wildheart_basin.md section 7):

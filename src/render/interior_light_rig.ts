@@ -35,7 +35,6 @@ export type FogSceneState =
   | 'hollowCrypt'
   | 'sunkenBastion'
   | 'drownedTemple'
-  | 'stormbrassFoundry'
   | 'gravewyrmSanctum'
   | 'lastkeep'
   | 'dawnhold';
@@ -137,21 +136,6 @@ const DROWNED_TEMPLE_HEMI_GROUND_COLOR = 0x173640;
  *  a little west, straight down the route from the Moongate Landing, so the
  *  whole temple is seen against it and every column throws its shadow back
  *  toward the party. */
-// The Stormbrass Foundry: storm DAYLIGHT. A hard pale-gold sun breaking
-// through the cloud deck low in the WEST rakes across the route (the party
-// climbs north, so every stack, gantry and press is lit from the side and
-// throws a long shadow east), over a cold storm-blue sky bounce and a warm
-// soot-brown ground bounce: the forge's orange and the storm's blue pull
-// apart. Bright enough that every brass surface reads; the lightning is
-// cosmetic flashes on top (render/stormbrass_foundry), never the key light.
-const STORMBRASS_FOUNDRY_SUN_INTENSITY = 3.1;
-const STORMBRASS_FOUNDRY_HEMI_INTENSITY = 0.72;
-const STORMBRASS_FOUNDRY_ENV_INTENSITY = 0.5;
-const STORMBRASS_FOUNDRY_RIM_BOOST = 1.8;
-const STORMBRASS_FOUNDRY_SUN_COLOR = 0xffd6a0;
-const STORMBRASS_FOUNDRY_HEMI_SKY_COLOR = 0x7388ad;
-const STORMBRASS_FOUNDRY_HEMI_GROUND_COLOR = 0x6a4a30;
-export const STORMBRASS_FOUNDRY_SUN_DIRECTION = new THREE.Vector3(-0.74, 0.5, 0.3).normalize();
 // The Gravewyrm Sanctum: an OPEN-AIR glacier cirque at the blue hour of a
 // clear polar dusk, under its own sky (render/gravewyrm_sanctum). No sun: the
 // key is the cold sky itself, strongest from the bright west where the
@@ -231,10 +215,6 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
     out.copy(DROWNED_TEMPLE_MOON_DIRECTION);
     return true;
   }
-  if (state === 'stormbrassFoundry') {
-    out.copy(STORMBRASS_FOUNDRY_SUN_DIRECTION);
-    return true;
-  }
   if (state === 'gravewyrmSanctum') {
     out.copy(GRAVEWYRM_SANCTUM_KEY_DIRECTION);
     return true;
@@ -260,7 +240,6 @@ export function applyInteriorLightRig(
   const cryptMoon = state === 'hollowCrypt';
   const bastionDusk = state === 'sunkenBastion';
   const templeMoon = state === 'drownedTemple';
-  const foundryStorm = state === 'stormbrassFoundry';
   const sanctumDusk = state === 'gravewyrmSanctum';
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
@@ -279,19 +258,17 @@ export function applyInteriorLightRig(
         ? SUNKEN_BASTION_SUN_INTENSITY
         : templeMoon
           ? DROWNED_TEMPLE_MOON_INTENSITY
-          : foundryStorm
-            ? STORMBRASS_FOUNDRY_SUN_INTENSITY
-            : sanctumDusk
-              ? GRAVEWYRM_SANCTUM_KEY_INTENSITY
-              : wildheartSun
-                ? WILDHEART_SUN_INTENSITY
-                : keepHearth
-                  ? LASTKEEP_SUN_INTENSITY
-                  : dawnholdDay
-                    ? DAWNHOLD_SUN_INTENSITY
-                    : underground
-                      ? DUNGEON_SUN_INTENSITY
-                      : outdoor.sunIntensity;
+          : sanctumDusk
+            ? GRAVEWYRM_SANCTUM_KEY_INTENSITY
+            : wildheartSun
+              ? WILDHEART_SUN_INTENSITY
+              : keepHearth
+                ? LASTKEEP_SUN_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_SUN_INTENSITY
+                  : underground
+                    ? DUNGEON_SUN_INTENSITY
+                    : outdoor.sunIntensity;
   targets.hemi.intensity = mazeNight
     ? YUMI_MAZE_HEMI_INTENSITY
     : cryptMoon
@@ -300,19 +277,17 @@ export function applyInteriorLightRig(
         ? SUNKEN_BASTION_HEMI_INTENSITY
         : templeMoon
           ? DROWNED_TEMPLE_HEMI_INTENSITY
-          : foundryStorm
-            ? STORMBRASS_FOUNDRY_HEMI_INTENSITY
-            : sanctumDusk
-              ? GRAVEWYRM_SANCTUM_HEMI_INTENSITY
-              : wildheartSun
-                ? WILDHEART_HEMI_INTENSITY
-                : keepHearth
-                  ? LASTKEEP_HEMI_INTENSITY
-                  : dawnholdDay
-                    ? DAWNHOLD_HEMI_INTENSITY
-                    : underground
-                      ? DUNGEON_HEMI_INTENSITY
-                      : outdoor.hemiIntensity;
+          : sanctumDusk
+            ? GRAVEWYRM_SANCTUM_HEMI_INTENSITY
+            : wildheartSun
+              ? WILDHEART_HEMI_INTENSITY
+              : keepHearth
+                ? LASTKEEP_HEMI_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_HEMI_INTENSITY
+                  : underground
+                    ? DUNGEON_HEMI_INTENSITY
+                    : outdoor.hemiIntensity;
   targets.scene.environmentIntensity = mazeNight
     ? YUMI_MAZE_ENV_INTENSITY
     : cryptMoon
@@ -321,19 +296,17 @@ export function applyInteriorLightRig(
         ? SUNKEN_BASTION_ENV_INTENSITY
         : templeMoon
           ? DROWNED_TEMPLE_ENV_INTENSITY
-          : foundryStorm
-            ? STORMBRASS_FOUNDRY_ENV_INTENSITY
-            : sanctumDusk
-              ? GRAVEWYRM_SANCTUM_ENV_INTENSITY
-              : wildheartSun
-                ? WILDHEART_ENV_INTENSITY
-                : keepHearth
-                  ? LASTKEEP_ENV_INTENSITY
-                  : dawnholdDay
-                    ? DAWNHOLD_ENV_INTENSITY
-                    : underground
-                      ? DUNGEON_ENV_INTENSITY
-                      : outdoor.envIntensity;
+          : sanctumDusk
+            ? GRAVEWYRM_SANCTUM_ENV_INTENSITY
+            : wildheartSun
+              ? WILDHEART_ENV_INTENSITY
+              : keepHearth
+                ? LASTKEEP_ENV_INTENSITY
+                : dawnholdDay
+                  ? DAWNHOLD_ENV_INTENSITY
+                  : underground
+                    ? DUNGEON_ENV_INTENSITY
+                    : outdoor.envIntensity;
   targets.rim.value = mazeNight
     ? YUMI_MAZE_RIM_BOOST
     : cryptMoon
@@ -342,19 +315,17 @@ export function applyInteriorLightRig(
         ? SUNKEN_BASTION_RIM_BOOST
         : templeMoon
           ? DROWNED_TEMPLE_RIM_BOOST
-          : foundryStorm
-            ? STORMBRASS_FOUNDRY_RIM_BOOST
-            : sanctumDusk
-              ? GRAVEWYRM_SANCTUM_RIM_BOOST
-              : wildheartSun
-                ? WILDHEART_RIM_BOOST
-                : keepHearth
-                  ? LASTKEEP_RIM_BOOST
-                  : dawnholdDay
-                    ? DAWNHOLD_RIM_BOOST
-                    : underground
-                      ? DUNGEON_RIM_BOOST
-                      : 1;
+          : sanctumDusk
+            ? GRAVEWYRM_SANCTUM_RIM_BOOST
+            : wildheartSun
+              ? WILDHEART_RIM_BOOST
+              : keepHearth
+                ? LASTKEEP_RIM_BOOST
+                : dawnholdDay
+                  ? DAWNHOLD_RIM_BOOST
+                  : underground
+                    ? DUNGEON_RIM_BOOST
+                    : 1;
   // The rim tint defaults cool everywhere; the forge applier below re-grades
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
@@ -375,10 +346,6 @@ export function applyInteriorLightRig(
     targets.sun.color.setHex(DROWNED_TEMPLE_MOON_COLOR);
     targets.hemi.color.setHex(DROWNED_TEMPLE_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(DROWNED_TEMPLE_HEMI_GROUND_COLOR);
-  } else if (foundryStorm) {
-    targets.sun.color.setHex(STORMBRASS_FOUNDRY_SUN_COLOR);
-    targets.hemi.color.setHex(STORMBRASS_FOUNDRY_HEMI_SKY_COLOR);
-    targets.hemi.groundColor.setHex(STORMBRASS_FOUNDRY_HEMI_GROUND_COLOR);
   } else if (sanctumDusk) {
     targets.sun.color.setHex(GRAVEWYRM_SANCTUM_KEY_COLOR);
     targets.hemi.color.setHex(GRAVEWYRM_SANCTUM_HEMI_SKY_COLOR);

@@ -2,7 +2,7 @@
 // colliders.ts (resolvePosition, the sight sampler, the standable-top query)
 // read the colliders near a point instead of scanning the whole list. The
 // authored open fields (the Gravewyrm Sanctum, the Drowned Temple, the
-// Foundry, the Wildheart Basin, the Hollow Crypt, the Sunken Bastion) carry
+// Wildheart Basin, the Hollow Crypt, the Sunken Bastion) carry
 // thousands of cliff, wall and prop colliders, and a chain pull runs that full
 // scan for every mob step: it was most of a Sanctum tick.
 //

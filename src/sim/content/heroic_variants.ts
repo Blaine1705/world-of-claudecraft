@@ -34,7 +34,6 @@ import {
   NYTHRAXIS_RAID_BOSS_ID,
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
 } from './heroic_loot';
-import { STORMBRASS_FOUNDRY_DUNGEON_DEFS } from './stormbrass_foundry';
 import { TEMPLE_DUNGEON_DEFS } from './temple';
 import { WILDHEART_DUNGEON_DEFS } from './wildheart';
 
@@ -176,7 +175,7 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
   return variant as ItemDef;
 }
 
-// The seven dungeon/raid instances that have a heroic difficulty. Only mobs that
+// The six dungeon/raid instances that have a heroic difficulty. Only mobs that
 // spawn inside one of these instances can drop a heroic-upgraded variant.
 const HEROIC_INSTANCE_IDS = new Set([
   'hollow_crypt',
@@ -184,7 +183,6 @@ const HEROIC_INSTANCE_IDS = new Set([
   'drowned_temple',
   'gravewyrm_sanctum',
   'wildheart_basin',
-  'stormbrass_foundry',
   'nythraxis_boss_arena',
 ]);
 
@@ -193,7 +191,6 @@ for (const def of [
   ...Object.values(DUNGEON_DEFS),
   ...Object.values(TEMPLE_DUNGEON_DEFS),
   ...Object.values(WILDHEART_DUNGEON_DEFS),
-  ...Object.values(STORMBRASS_FOUNDRY_DUNGEON_DEFS),
 ]) {
   if (!HEROIC_INSTANCE_IDS.has(def.id)) continue;
   for (const spawn of def.spawns) HEROIC_ELIGIBLE_MOBS.add(spawn.mobId);

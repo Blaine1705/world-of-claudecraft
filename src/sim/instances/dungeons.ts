@@ -33,7 +33,6 @@ import { tickTempleEncounters } from '../encounters/drowned_temple';
 import { tickSanctumEncounters } from '../encounters/gravewyrm_sanctum';
 import { tickCryptEncounters } from '../encounters/hollow_crypt';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
-import { tickFoundryEncounters } from '../encounters/stormbrass_foundry';
 import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { tickWildheartEncounters } from '../encounters/wildheart_basin';
@@ -1505,8 +1504,6 @@ export function updateInstances(ctx: SimContext): void {
   tickBastionEncounters(ctx);
   // The Drowned Temple's boss fights (encounters/drowned_temple), same slot.
   tickTempleEncounters(ctx);
-  // The Stormbrass Foundry's encounters (encounters/stormbrass_foundry), same slot.
-  tickFoundryEncounters(ctx);
   // The Wildheart Basin's encounters (encounters/wildheart_basin), same slot.
   tickWildheartEncounters(ctx);
   // The Gravewyrm Sanctum's encounters (encounters/gravewyrm_sanctum), same slot.

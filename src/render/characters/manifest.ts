@@ -128,8 +128,6 @@ import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_f
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import type { ClipTrackDrops } from './clip_track_drops';
-import { FOUNDRY_CREATURE_LOOKS } from './foundry_creature_looks';
-import { FOUNDRY_WORKER_LOOKS, FOUNDRY_WORKER_MOB_KEYS } from './foundry_worker_looks';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
@@ -5426,86 +5424,6 @@ for (const cls of ALL_CLASSES) {
   };
 }
 
-// The Stormbrass Foundry's PLACEHOLDER looks (phase 1 of 3, docs/design/
-// dungeon-rework/stormbrass_foundry.md): shipped rigs re-tinted in brass,
-// dark iron and verdigris so every creature is visible and animated from day
-// one. Phase 3 replaces each key's def with the dungeon's own Blender creature
-// (the mob ids and these visual keys stay). Sizes ride the templates' scales
-// (sim/content/stormbrass_foundry.ts), all well past a player's height.
-// Each row: [base def, tint, tint strength, height factor over the base, extra].
-// The height factor stands every creature well past a player (the owner's
-// rule: imposing, never toy-like) without touching the sim's reach.
-const FOUNDRY_PLACEHOLDER_LOOKS: Record<
-  string,
-  [string, number, number, number, Partial<VisualDef>?]
-> = {
-  foundry_brass_sentry: [
-    'npc_knight',
-    0xc9a14a,
-    0.85,
-    1.3,
-    {
-      attach: [{ url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' }],
-      selfIllumination: 0.12,
-    },
-  ],
-  foundry_steam_bruiser: ['skel_golem', 0xb08a3e, 0.85, 1, { selfIllumination: 0.3 }],
-  foundry_arc_drone: ['mob_glimmerwisp', 0x7fc4ff, 0.7, 1, { selfIllumination: 0.5 }],
-  foundry_engineer: [
-    'npc_smith',
-    0x6b5a44,
-    0.35,
-    1.25,
-    { attach: [{ url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' }] },
-  ],
-  foundry_apprentice: ['npc_scout', 0x4e9c8a, 0.4, 1.25],
-  foundry_hound: ['mob_wolf', 0xc79a3c, 0.65, 1.4],
-  foundry_shieldbearer: [
-    'mob_ignivar_crucible_warden',
-    0x8a929c,
-    0.85,
-    1.15,
-    { selfIllumination: 0.3 },
-  ],
-  foundry_tripod_turret: ['mob_spider', 0xc9a14a, 0.7, 1],
-  // The Hauler: the Turretback's colossal crawler hauling its tower reads as a
-  // tracked crawler hauling its boiler; brought down from its own 15 yd.
-  foundry_gantry_hauler: ['mob_turretback', 0xc9a14a, 0.75, 0.22, { selfIllumination: 0.2 }],
-  foundry_line_master: [
-    'npc_smith',
-    0x8a6d3b,
-    0.45,
-    1.15,
-    { attach: [{ url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' }] },
-  ],
-  foundry_rangewarden: [
-    'mob_ignivar_ember_sentinel',
-    0xc9a14a,
-    0.9,
-    1.1,
-    { selfIllumination: 0.4 },
-  ],
-  foundry_voltaic_warden: [
-    'mob_ignivar_crucible_warden',
-    0x4e9c8a,
-    0.9,
-    1.1,
-    { selfIllumination: 0.45 },
-  ],
-  foundry_prime_draft: ['skel_golem', 0xc9a14a, 0.9, 1, { selfIllumination: 0.35 }],
-  // Tock's Half-Built Frames: a smaller, duller golem shell (phase 2).
-  foundry_half_built_frame: ['skel_golem', 0x9a8a62, 0.8, 0.7, { selfIllumination: 0.15 }],
-};
-for (const [key, [base, tint, tintStrength, grow, extra]] of Object.entries(
-  FOUNDRY_PLACEHOLDER_LOOKS,
-)) {
-  const def = VISUALS[base];
-  VISUALS[key] = { ...def, height: def.height * grow, tint, tintStrength, ...extra };
-}
-// Phase 3: the Foundry's own Blender creatures replace their placeholders.
-Object.assign(VISUALS, FOUNDRY_CREATURE_LOOKS);
-// The Foundry's chained workers (foundry_worker_looks.ts).
-Object.assign(VISUALS, FOUNDRY_WORKER_LOOKS);
 // The Wildheart Basin's placeholder creatures (wildheart_creature_looks.ts).
 Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 // The Gravewyrm Sanctum's creatures: the Sledge Tusker's Blender body and the
@@ -5776,23 +5694,6 @@ const MOB_KEYS: Record<string, string> = {
   mere_hydra_head_center: 'temple_hydra_head',
   mere_hydra_head_right: 'temple_hydra_head',
   tideglass_reflection: 'temple_reflection_warrior',
-  // The Stormbrass Foundry (sim/content/stormbrass_foundry.ts): phase-1
-  // placeholder looks (FOUNDRY_PLACEHOLDER_LOOKS above).
-  brass_sentry: 'foundry_brass_sentry',
-  steam_bruiser: 'foundry_steam_bruiser',
-  arc_drone: 'foundry_arc_drone',
-  foundry_engineer: 'foundry_engineer',
-  gearwright_apprentice: 'foundry_apprentice',
-  clockwork_hound: 'foundry_hound',
-  shieldbearer_frame: 'foundry_shieldbearer',
-  tripod_turret: 'foundry_tripod_turret',
-  gantry_hauler: 'foundry_gantry_hauler',
-  line_master_tock: 'foundry_line_master',
-  rangewarden: 'foundry_rangewarden',
-  voltaic_warden: 'foundry_voltaic_warden',
-  prime_draft: 'foundry_prime_draft',
-  half_built_frame: 'foundry_half_built_frame',
-  ...FOUNDRY_WORKER_MOB_KEYS,
   ...WILDHEART_MOB_KEYS,
   ...SANCTUM_MOB_KEYS,
   ...SANCTUM_BOSS_MOB_KEYS,

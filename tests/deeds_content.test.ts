@@ -150,15 +150,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (renown 10 each: +40).
     // 328 / 3635 with the Hollow Crypt fourth pass's Knellwyrm deed (+10).
     // 329 / 3645 with the Sunken Bastion fifth pass's Gaol Turnkey deed (+10).
-    // 336 / 3715 with the Stormbrass Foundry's seven: its clear pair and five
-    // encounter deeds (renown 10 each: +70).
-    // 340 / 3755 with the Wildheart Basin rework's four encounter deeds
+    // 333 / 3685 with the Wildheart Basin rework's four encounter deeds
     // (renown 10 each: +40).
-    // 341 / 3765 with the Stormbrass Foundry's chained workers' deed (+10).
-    // 346 / 3815 with the Gravewyrm Sanctum rework's five encounter deeds
-    // (renown 10 each: +50).
-    expect(DEED_ORDER.length).toBe(346);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3815);
+    // 338 / 3735 with the Gravewyrm Sanctum rework's five encounter deeds
+    // (renown 10 each: +50). The Stormbrass Foundry's eight deeds left with
+    // the parked dungeon (never shipped).
+    expect(DEED_ORDER.length).toBe(338);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3735);
   });
 
   it('ships the audited per-category counts', () => {
@@ -184,11 +182,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
       // +4 the Drowned Temple rework's encounter deeds.
       // +1 the Sunken Bastion fifth pass's Gaol Turnkey deed.
-      // +7 the Stormbrass Foundry (a clear pair and five encounter deeds).
       // +4 the Wildheart Basin rework's encounter deeds.
-      // +1 the Stormbrass Foundry's chained workers (every camp freed).
       // +5 the Gravewyrm Sanctum rework's encounter deeds.
-      dungeon: 63,
+      dungeon: 55,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -440,21 +436,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_crypt_knellwyrm',
       // The Sunken Bastion fifth pass's Gaol Turnkey miniboss (manual grant).
       'dgn_turnkey_cage',
-      // The Stormbrass Foundry: its clear pair, then its encounter deeds.
-      'dgn_stormbrass_foundry',
-      'dgn_stormbrass_foundry_heroic',
-      'dgn_tock_press',
-      'dgn_rangewarden_clean',
-      'dgn_voltaic_grounded',
-      'dgn_prime_draft_overload',
-      'dgn_gantry_hauler',
       // The Wildheart Basin rework: its four encounter deeds.
       'dgn_beastmaster_apart',
       'dgn_gorgebloom_clean',
       'dgn_zulgar_uncaught',
       'dgn_great_saurian',
-      // The Stormbrass Foundry's chained workers: every camp freed in one run.
-      'dgn_foundry_workers_freed',
       // The Gravewyrm Sanctum rework: one deed per boss core and the Tusker.
       'dgn_korgath_all_chains',
       'dgn_korgath_still_bound',
@@ -1106,21 +1092,15 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined for the Sunken Bastion fifth pass's appended Gaol Turnkey
   // deed (dgn_turnkey_cage) the same auditable way: the eed1c94d... literal
   // rotated down into PRE_APPEND_CATALOG_SHA256.
-  // Re-baselined for the Stormbrass Foundry's seven appended deeds (its clear
-  // pair and five encounter deeds) the same auditable way: the bfd70a94...
-  // literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  // Re-baselined for the Wildheart Basin rework's four appended encounter
-  // deeds (dgn_beastmaster_apart, dgn_gorgebloom_clean, dgn_zulgar_uncaught,
-  // dgn_great_saurian) the same auditable way: the f9683290... literal rotated
-  // down into PRE_APPEND_CATALOG_SHA256.
-  // Re-baselined for the Stormbrass Foundry's chained workers' deed
-  // (dgn_foundry_workers_freed) the same auditable way: the e73fb6e4...
-  // literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  // Re-baselined for the Gravewyrm Sanctum rework's five appended deeds
-  // (dgn_korgath_all_chains, dgn_korgath_still_bound, dgn_velkhar_cold,
-  // dgn_korzul_thin_ice, dgn_sledge_tusker) the same auditable way: the
-  // 00bb91ab... literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = 'eb81c59b1092aba6386190a68112a15b1470f05b09cf8b0f87eb6a2516ed4063';
+  // Re-baselined when the Stormbrass Foundry was parked: its eight deeds
+  // (never shipped) left the catalog, so the Wildheart Basin rework's four
+  // encounter deeds (dgn_beastmaster_apart, dgn_gorgebloom_clean,
+  // dgn_zulgar_uncaught, dgn_great_saurian) and the Gravewyrm Sanctum
+  // rework's five (dgn_korgath_all_chains, dgn_korgath_still_bound,
+  // dgn_velkhar_cold, dgn_korzul_thin_ice, dgn_sledge_tusker) now append
+  // straight after dgn_turnkey_cage, minted the same auditable way: the
+  // Turnkey's bfd70a94... literal rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = '668cf4cbf66f29ab425ac55c43fce082fede5b6144432ee94bae9e51bd75316c';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1202,22 +1182,18 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // The Sunken Bastion's fifth pass appends the Gaol Turnkey deed after
   // dgn_crypt_knellwyrm; the previous mint is the eed1c94d... literal.
   //
-  // The Stormbrass Foundry appends its seven deeds after dgn_turnkey_cage;
-  // the previous mint is the bfd70a94... literal (rotated down here), and
-  // stripping the seven must reproduce it exactly.
-  //
-  // The Wildheart Basin rework appends its four encounter deeds after
-  // dgn_gantry_hauler; the previous mint is the f9683290... literal.
-  //
-  // The Stormbrass Foundry's chained workers append their deed after
-  // dgn_great_saurian; the previous mint is the e73fb6e4... literal (rotated
-  // down here), and stripping the one must reproduce it exactly.
-  //
-  // The Gravewyrm Sanctum rework appends its five deeds after
-  // dgn_foundry_workers_freed; the previous mint is the 00bb91ab... literal.
+  // The Wildheart Basin rework's four deeds and the Gravewyrm Sanctum
+  // rework's five append after dgn_turnkey_cage (the Stormbrass Foundry's
+  // deeds that once sat between them left with the parked dungeon); the
+  // previous mint is the Turnkey's bfd70a94... literal (rotated down here),
+  // and stripping the nine must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '00bb91ab2fec009a3e31dafe9be1d7949967c466d253e780a176642869863895';
+    'bfd70a94893390e2b0b26eaad7891366626e891a8e1674e51af0dfede2f8f1f9';
   const APPENDED_SINCE: readonly string[] = [
+    'dgn_beastmaster_apart',
+    'dgn_gorgebloom_clean',
+    'dgn_zulgar_uncaught',
+    'dgn_great_saurian',
     'dgn_korgath_all_chains',
     'dgn_korgath_still_bound',
     'dgn_velkhar_cold',
@@ -1235,8 +1211,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_great_saurian',
-      'dgn_foundry_workers_freed',
+      'dgn_crypt_knellwyrm',
+      'dgn_turnkey_cage',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1458,8 +1434,8 @@ describe('table shape', () => {
     // Clue Scroll casket pair, then the release's ferry round trip as the
     // entry, then the Sunken Bastion's four encounter deeds, the Turretback
     // Hermit's last, then the Drowned Temple's four, the Mere Hydra's last,
-    // then the Knellwyrm, the Gaol Turnkey and the Stormbrass Foundry's
-    // seven, the Gantry Hauler's last.
+    // then the Knellwyrm and the Gaol Turnkey, then the Wildheart Basin's
+    // four and the Gravewyrm Sanctum's five, the Sledge Tusker's last.
     expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_sledge_tusker');
   });
 

@@ -784,13 +784,14 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 5, '.setAttribute': 3 },
     reflowAllow: {},
   },
-  // The Stormbrass Foundry's alert (hud/dungeon/) builds its self-mounted
-  // button skeleton ONCE (eight construction-only class assignments and the
-  // progress bar's three build-time role/range attributes); every per-frame
-  // value (the kind classes, texts, the hint, the fill width, the live aria
-  // values) rides the elided writers.
+  // The shared encounter alert (hud/dungeon/, the Wildheart Basin's and the
+  // Gravewyrm Sanctum's) builds its self-mounted button skeleton ONCE (eight
+  // construction-only class assignments and the progress bar's three
+  // build-time role/range attributes); every per-frame value (the kind
+  // classes, texts, the hint, the fill width, the live aria values) rides the
+  // elided writers.
   {
-    file: 'hud/dungeon/foundry_alert_painter.ts',
+    file: 'hud/dungeon/encounter_alert_painter.ts',
     allow: { '.className': 8, '.setAttribute': 3 },
     reflowAllow: {},
   },

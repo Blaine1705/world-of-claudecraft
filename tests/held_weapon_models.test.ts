@@ -65,7 +65,6 @@ describe('held weapon models', () => {
 
     expect(heroicWeapons.map((item) => item.id)).toEqual([
       'heroic_bonewrought_greatsword',
-      'heroic_cellspark_dagger',
       'heroic_courtiers_bonefang',
       'heroic_deathless_heartwood',
       'heroic_direfang_greatblade',
@@ -74,22 +73,18 @@ describe('held weapon models', () => {
       'heroic_fang_of_korzul',
       'heroic_fanglords_beastspear',
       'heroic_gaolyard_cudgel',
-      'heroic_governors_scepter',
       'heroic_gravecourt_hewer',
       'heroic_gravewyrm_thornmaul',
       'heroic_kingsbane_last_oath',
       'heroic_knight_commanders_longsword',
       'heroic_maul_of_the_scourged_wilds',
       'heroic_nightfangs_greatstaff',
-      'heroic_piston_maul',
       'heroic_rimeweb_fang',
       'heroic_sextons_spadehaft',
       'heroic_staff_of_the_gravewyrm',
       'heroic_staff_of_velkhar',
       'heroic_thornpeak_wardblade',
       'heroic_tideglass_shiv',
-      'heroic_tocks_torque_wrench',
-      'heroic_voltaic_coil_staff',
       'heroic_wildheart_fangknife',
       'heroic_wildheart_hexwood_staff',
       'heroic_wildheart_tuskblade',
@@ -234,10 +229,9 @@ describe('held weapon models', () => {
       .map((item) => item.id)
       .sort();
     expect(unmapped).toEqual([
-      // The dungeon reworks' held offhands: the Hollow Crypt's Cantor's Hymnal,
-      // the Drowned Temple's Chorus Conch and the Stormbrass Foundry's
-      // Proving-Range Quiver (each with its Heroic clone). A hymnal, a conch and
-      // a quiver have no shared held model yet (the quiver class of gap below).
+      // The dungeon reworks' held offhands: the Hollow Crypt's Cantor's Hymnal
+      // and the Drowned Temple's Chorus Conch (each with its Heroic clone). A
+      // hymnal and a conch have no shared held model yet.
       'cantors_hymnal',
       // The Buried Hoard held offhands (a chalice and a void orb, each in its three
       // map-rarity tiers) are the orb class of gap: the shared art set has no
@@ -272,14 +266,12 @@ describe('held weapon models', () => {
       'heroic_chorus_conch',
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
-      'heroic_proving_range_quiver',
       'heroic_wraithfire_orb',
       'legendary_chalice_of_living_tides',
       'legendary_orb_collapsing_void',
       'moggers_hide_quiver',
       'orb_collapsing_void',
       'orb_of_the_last_spring',
-      'proving_range_quiver',
       'rare_chalice_of_living_tides',
       'rare_orb_collapsing_void',
       'valefire_lantern',

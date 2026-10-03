@@ -11,13 +11,13 @@
 //   gloves 21 uncommon: 6, feet: 5, legs: 7, helmet: 7
 //   two-hand staff 23 rare: round(round(23 x 0.8 x 1.0 x 0.7) x 1.3) = 17
 // (caster pieces carry their free stamina baseline, round(budget / 3), on top).
-// Armor matches the same-slot shipped item-level-21 siblings: Gearwork and
-// Nightwalk Jerkins (105), Vineclaw Stalking Breeches (95), Stormglass Circlet
-// (49), Gravebound Silk Wraps and Shearkeeper Gloves (52). No mail waist or
-// feet piece ships at item level 21, so those two ride the Foundry's own
-// same-level slot ratios over the 170 mail chest (Draftplate Breastplate):
-// waist 0.565 (Coilwound Cord 34 over Stormbrass Robe 60) = 96, feet 0.686
-// (Arcstep Treads 72 over Gearwork Jerkin 105) = 117.
+// Armor matches the same-slot shipped item-level-21 siblings: the Nightwalk
+// Jerkin (105), Vineclaw Stalking Breeches (95), Gravebound Silk Wraps and
+// Shearkeeper Gloves (52); the cloth helmet takes the item-level-21 value 49.
+// No mail waist or feet piece ships at item level 21, so those two ride the
+// item-level-21 slot ratios over the 170 mail chest: waist 0.565 (cloth waist
+// 34 over cloth chest 60) = 96, feet 0.686 (leather feet 72 over leather
+// chest 105) = 117.
 //
 // The two heroic epics read source level 25 (item level 31) with the five-man
 // heroic armor rating, each matched to its same-slot shipped sibling in

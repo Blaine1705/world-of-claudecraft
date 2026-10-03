@@ -155,17 +155,6 @@ function buildCombatProfileForMob(templateId: string, scale: number): MobCombatP
       meleeRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE),
       desiredRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE) * 0.8,
     };
-  // The Gantry Hauler is LONG (13.5 yd nose to tail, 7.5 wide): its bodyRadius
-  // is sized to its flanks, so the body rule below would settle it with its
-  // plough over its target. It keeps the reach its scale always gave it and
-  // holds its nose (6.8 yd ahead of its pivot) just short of the one it fights,
-  // inside the 8 yd a player's melee reaches it from.
-  if (templateId === 'gantry_hauler')
-    return {
-      ...DEFAULT_MOB_COMBAT_PROFILE,
-      meleeRange: scaledDefaultMobMeleeRange(scale),
-      desiredRange: 7.5,
-    };
   // A towering boss with an authored body (MobTemplate.bodyRadius): its swing
   // reaches one yard past where a player's melee reaches it, so nobody hits
   // it from outside its own reach, and it settles at its body's edge.

@@ -68,7 +68,6 @@ const FIVE_MANS = [
   'drowned_temple',
   'gravewyrm_sanctum',
   'wildheart_basin',
-  'stormbrass_foundry',
 ];
 const RAID = 'nythraxis_boss_arena';
 const RAID_BOSS = 'nythraxis_scourge_of_thornpeak';
@@ -236,8 +235,6 @@ describe('heroic tuning data contract', () => {
       drowned_temple: [5.2, 16.5, 9.15],
       gravewyrm_sanctum: [4.0, 15.5, 8.55],
       wildheart_basin: [4.0, 17.25, 8.625],
-      // The new Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md).
-      stormbrass_foundry: [4.0, 15.5, 9],
       nythraxis_boss_arena: [3.2, 7.25, 7.25],
       ignivar_raid_arena: [1.75, 2, 2],
       ignivar_inner_crucible: [5 / 3, 1.2459633027522936, 1],

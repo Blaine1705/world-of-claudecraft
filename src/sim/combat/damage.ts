@@ -26,7 +26,6 @@
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { reflectionIgnoresHit } from '../encounters/drowned_temple/reflection_guard';
-import { platingTurnsAside } from '../encounters/stormbrass_foundry/voltaic_plating';
 import { bastionWardHitPoints } from '../encounters/sunken_bastion/ward_hits';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
@@ -159,7 +158,7 @@ import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiri
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
-import { onTrinketDamage, rangefinderDamageBonus } from './trinkets';
+import { onTrinketDamage } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -240,28 +239,6 @@ export function dealDamage(
   if (target.damageImmune) return 0;
   // A Tideglass Reflection never takes damage from the player it mirrors.
   if (reflectionIgnoresHit(source, target)) return 0;
-  // The Voltaic Warden's plating turns the wrong kind of damage aside (and
-  // banks it as Stored Charge): a resist the attacker sees, threat kept.
-  if (source && platingTurnsAside(source, target, school, amount)) {
-    ctx.emit({
-      type: 'damage',
-      sourceId: source.id,
-      targetId: target.id,
-      amount: 0,
-      crit: false,
-      school,
-      ability,
-      abilityId,
-      kind: 'resist',
-    });
-    ctx.enterCombat(source, target);
-    addThreat(
-      target,
-      source.id,
-      (amount * (threatOpts?.mult ?? 1) + (threatOpts?.flat ?? 0)) * ctx.threatMod(source, school),
-    );
-    return 0;
-  }
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
   // pet hit lands exactly one point, whatever it would have dealt, and the
   // spike's pool is its hit count. Resolved like an exact copy so no source
@@ -481,7 +458,6 @@ export function dealDamage(
       }
     }
     damageDone += craftedPetDamageMultiplier(ctx, source) - 1;
-    damageDone += rangefinderDamageBonus(source, target);
     if (damageDone !== 0) amount = Math.round(amount * Math.max(0, 1 + damageDone));
   }
 

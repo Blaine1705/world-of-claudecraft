@@ -2,7 +2,6 @@ import { furyAudioClaimed } from '../game/fury_audio_core';
 import type { SfxId } from '../game/sfx_manifest.generated';
 import { warriorRecoveryAudio } from '../game/warrior_recovery_core';
 import { ABILITIES, MOBS } from '../sim/data';
-import { TOCK_SCALDING_VENTS } from '../sim/encounters/stormbrass_foundry/ids';
 import type { Aura, Entity, SimEvent } from '../sim/types';
 import { isAuraDebuff } from './auras_view';
 
@@ -485,20 +484,8 @@ export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | 
   return school ? SCHOOL_CUES[school].impact : null;
 }
 
-// An encounter 'windup' is silent by default (the ranged-mob telegraph). The
-// Stormbrass Foundry's Scalding Vents hiss as their warning paints and again
-// as the steam bursts: both moments are a windup anchored on the middle
-// walkway's strip (encounters/stormbrass_foundry/scalding_vents.ts).
-const WINDUP_ABILITY_CUES: Partial<Record<string, SfxId>> = {
-  [TOCK_SCALDING_VENTS]: 'ui_aura_steam_hiss',
-};
-
 export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number } | null {
   if (furyAudioClaimed(event)) return null;
-  if (event.fx === 'windup') {
-    const key = event.ability && WINDUP_ABILITY_CUES[event.ability];
-    return key ? { key, anchorId: event.targetId } : null;
-  }
   if (event.fx === 'projectile') {
     if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
     const school = magicSchool(event.school);

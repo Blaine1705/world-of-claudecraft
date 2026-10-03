@@ -19,10 +19,11 @@ import * as THREE from 'three';
 import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dungeons';
+import { DeathBurstFx } from './death_burst_fx';
 import { TempleFx } from './drowned_temple/temple_fx';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
-import { SanctumFx } from './gravewyrm_sanctum_fx';
 import { SanctumBossFx } from './gravewyrm_sanctum_bosses';
+import { SanctumFx } from './gravewyrm_sanctum_fx';
 import { HoardBoneReaperFx } from './hoard_bone_reaper';
 import { HoardBossDressing } from './hoard_boss_dressing';
 import { HoardBossFx } from './hoard_boss_fx';
@@ -51,10 +52,6 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
-import { FoundryCreatureFx } from './stormbrass_foundry/foundry_creature_fx';
-import { FoundryFx } from './stormbrass_foundry/foundry_fx';
-import { setFoundryShakeSink } from './stormbrass_foundry/foundry_shake';
-import { FoundryWorkerFx } from './stormbrass_foundry/foundry_worker_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { WildheartFx } from './wildheart_basin';
 
@@ -110,13 +107,10 @@ export class RiftDeathZoneVisuals {
   private readonly bastionFx: BastionFx;
   // The Drowned Temple's trash and boss telegraphs, and the Mere Hydra's body.
   private readonly templeFx: TempleFx;
-  private readonly foundryFx: FoundryFx;
-  // The Foundry's chained workers: their chains and shackles.
-  private readonly foundryWorkers: FoundryWorkerFx;
+  // The trash kit's death-burst rings (any dungeon's kit mob that bursts).
+  private readonly deathBursts: DeathBurstFx;
   // The Wildheart Basin's telegraphs and creature effects (the Saurian, the trash).
   private readonly wildheartFx: WildheartFx;
-  // The Foundry's creature effects and their gestures (gauge, plates, frames).
-  private readonly foundryCreatures: FoundryCreatureFx;
   private readonly cryptCreatures: CryptCreatureFx;
   // The Hollow Crypt finale: Morthen's entrance and the Knellwyrm.
   private readonly cryptFinale: CryptFinaleFx;
@@ -174,19 +168,8 @@ export class RiftDeathZoneVisuals {
     this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
     this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
     this.templeFx = new TempleFx(scene, groundY, world, compileGate);
-    this.foundryFx = new FoundryFx(scene, groundY, world, compileGate);
-    this.foundryWorkers = new FoundryWorkerFx(scene, groundY, world, compileGate, reducedMotion);
-    setFoundryShakeSink(shake, reducedMotion);
+    this.deathBursts = new DeathBurstFx(scene, groundY, world, compileGate);
     this.wildheartFx = new WildheartFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-      playGesture,
-    );
-    this.foundryCreatures = new FoundryCreatureFx(
       scene,
       groundY,
       world,
@@ -304,10 +287,8 @@ export class RiftDeathZoneVisuals {
     this.cryptTrash.update(dt);
     this.bastionFx.update(dt);
     this.templeFx.update(dt);
-    this.foundryFx.update(dt);
-    this.foundryWorkers.update(dt);
+    this.deathBursts.update(dt);
     this.wildheartFx.update(dt);
-    this.foundryCreatures.update(dt);
     this.cryptCreatures.update(dt);
     this.cryptFinale.update(dt);
     this.morthenFx.update(dt);
@@ -346,10 +327,8 @@ export class RiftDeathZoneVisuals {
     this.cryptTrash.dispose();
     this.bastionFx.dispose();
     this.templeFx.dispose();
-    this.foundryFx.dispose();
-    this.foundryWorkers.dispose();
+    this.deathBursts.dispose();
     this.wildheartFx.dispose();
-    this.foundryCreatures.dispose();
     this.cryptCreatures.dispose();
     this.cryptFinale.dispose();
     this.morthenFx.dispose();
@@ -366,7 +345,6 @@ export class RiftDeathZoneVisuals {
     this.cryptCreatures.handleEvent(event);
     this.cryptFinale.handleEvent(event);
     this.morthenFx.handleEvent(event);
-    this.foundryCreatures.handleEvent(event);
     this.templeFx.handleEvent(event);
     const basin = this.wildheartFx.handleEvent(event);
     const sanctum = this.sanctumFx.handleEvent(event);

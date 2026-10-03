@@ -264,7 +264,7 @@ const paintBasalt: Painter = (h, size, rnd) => {
   }
 };
 
-/** Riveted steel deck plate (the Stormbrass Foundry): four plates to the
+/** Riveted steel deck plate (a steel-works floor): four plates to the
  *  tile, each with a diamond tread, sunken weld seams, a rivet row along every
  *  edge, and scuffs where boots and carts wear it. */
 const paintPlate: Painter = (h, size, rnd) => {
@@ -827,7 +827,7 @@ export function rockDetail(): DetailPair {
   return bake('rock', paintRock, 0x9e11, 256, 7);
 }
 
-/** Bedded mountain rock (the Stormbrass Foundry's cut faces): level beds of
+/** Bedded mountain rock (a shelf cut into a mountain): level beds of
  *  uneven thickness, each its own tone, a dark parting between them, fine
  *  lamination and a slow warp so no bed runs dead straight. */
 const paintStrata: Painter = (h, size, rnd) => {

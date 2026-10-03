@@ -102,9 +102,6 @@ describe('trinket aura icons', () => {
       trinket_lantern: 'last_flame_lantern',
       trinket_crucible_heat: 'heart_of_the_crucible',
       trinket_shackle: 'gaolers_iron_key',
-      trinket_rangefinder: 'rangefinders_lens',
-      trinket_overclock: 'overclocked_governor',
-      trinket_overheated: 'overclocked_governor',
       trinket_spirit_pack: 'fanglords_whistle',
       trinket_seedburst: 'gorgebloom_seedpod',
       trinket_tether: 'foremans_last_link',
@@ -247,16 +244,6 @@ describe('trinket aura tooltips (English)', () => {
       'Your next 2 direct heals or direct non-Physical damage hits repeat for 30% of their amount.',
     ],
     [
-      "Rangefinder's Lens",
-      own({ id: TRINKET_AURA.rangefinder, kind: 'internal_cd', value: 0.1 }),
-      'Damage increased by 1% for every 2 yd between you and your target beyond 10 yd, up to 10%.',
-    ],
-    [
-      'Overclocked',
-      own({ id: TRINKET_AURA.overclock, kind: 'buff_spellhaste', value: 0.25 }),
-      'Casting speed increased by 25%. Overheated follows when it ends.',
-    ],
-    [
       "Fanglord's Whistle",
       own({ id: TRINKET_AURA.spiritPack, kind: 'internal_cd', value: 26, value2: 32 }),
       'A spirit jaguar fights beside you, biting your target for 26 to 32 Physical damage every 2 sec.',
@@ -291,11 +278,6 @@ describe('trinket aura tooltips (English)', () => {
       'Quenched',
       foreign({ id: TRINKET_AURA.quenched, kind: 'attackspeed', value: 1 / 0.85 }),
       'Attack speed slowed by 15%.',
-    ],
-    [
-      'Overheated',
-      own({ id: TRINKET_AURA.overheated, kind: 'tongues', value: 1 / 0.9 }),
-      'Casting speed reduced by 10%.',
     ],
     [
       'Keen Edge',

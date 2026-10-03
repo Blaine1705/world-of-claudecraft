@@ -6,7 +6,7 @@
 // updateInstances, beside the trash kit), so a pull or a planted cast owns its
 // tick.
 
-import { sweepOrphanBurstRings } from '../../mob/trash_kit/foundry_kit';
+import { sweepOrphanBurstRings } from '../../mob/trash_kit/death_burst';
 import { sweepOrphanTossRings } from '../../mob/trash_kit/sanctum_kit';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';

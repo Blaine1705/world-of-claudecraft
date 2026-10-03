@@ -6,10 +6,9 @@ import {
   RAID_BOSS_PLAYER_MELEE_RANGE,
 } from '../src/sim/combat/player_attack_reach';
 import { MOBS } from '../src/sim/data';
-import { HAULER_TUNING } from '../src/sim/encounters/stormbrass_foundry/ids';
 import { createMob } from '../src/sim/entity';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
-import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
+import { combatProfileForMob } from '../src/sim/mob_combat';
 import { Sim } from '../src/sim/sim';
 import { IGNIVAR_BOSS_ID, MELEE_RANGE } from '../src/sim/types';
 
@@ -112,15 +111,7 @@ describe('big-bodied boss reach (bodyRadius)', () => {
 
   it('covers the reworked dungeons’ big bosses', () => {
     const ids = BODIED.map((m) => m.id);
-    for (const id of [
-      'ysolei',
-      'crypt_knellwyrm',
-      'morthen',
-      'line_master_tock',
-      'voltaic_warden',
-      'prime_draft',
-    ])
-      expect(ids).toContain(id);
+    for (const id of ['ysolei', 'crypt_knellwyrm', 'morthen']) expect(ids).toContain(id);
   });
 
   it.each(BODIED.map((m) => [m.id, m.bodyRadius as number, m.scale] as const))(
@@ -162,7 +153,7 @@ describe('big-bodied boss reach (bodyRadius)', () => {
 });
 
 // The dungeons' great NON-boss bodies take the same rule (the owner's playtest:
-// a melee player had to stand inside the Gantry Hauler to hit it). Each radius
+// a melee player had to stand inside a great body to hit it). Each radius
 // is sized to the drawn footprint and held under the creature's own point-blank
 // mechanic, so nobody fights it from outside what it throws at its feet.
 describe('large dungeon creature reach (bodyRadius)', () => {
@@ -194,7 +185,6 @@ describe('large dungeon creature reach (bodyRadius)', () => {
 
   // [template, level, the drawn half-width, the bodyRadius]
   const CREATURES = [
-    ['gantry_hauler', 20, 3.75, 5],
     ['turretback_hermit', 13, 4.3, 4.5],
     ['mere_hydra_head_left', 17, 3, 3],
     ['mere_hydra_head_center', 17, 3, 3],
@@ -221,28 +211,6 @@ describe('large dungeon creature reach (bodyRadius)', () => {
       expect(swingLands(id, level, own + 0.2)).toBe(false);
     },
   );
-
-  it('the Gantry Hauler: its kit still covers everyone who can hit it, and its pull is unchanged', () => {
-    const hauler = MOBS.gantry_hauler;
-    const reach = effectivePlayerAttackRange({ kind: 'mob', templateId: hauler.id }, MELEE_RANGE);
-    expect(reach).toBe(8);
-    // Steam Blast's cone and the Boiler Rupture reach every melee position.
-    expect(HAULER_TUNING.blastRange).toBeGreaterThanOrEqual(reach + 3);
-    expect(hauler.trashKit?.deathBurst?.radius).toBeGreaterThanOrEqual(reach);
-    // Scrap Toss still picks the farthest player well past the melee ring.
-    expect(HAULER_TUNING.tossReach).toBeGreaterThan(reach * 3);
-    // The pull: its aggro radius and its own swing reach are what they were
-    // before it had a body (the scale default), so the Rail Yard patrol is
-    // pulled and fought from the same distances.
-    expect(hauler.aggroRadius).toBe(14);
-    const profile = combatProfileForMob(hauler.id, hauler.scale);
-    expect(profile.meleeRange).toBeCloseTo(scaledDefaultMobMeleeRange(hauler.scale), 6);
-    expect(profile.canLeash).toBe(true);
-    // It holds its nose (6.8 yd of hull ahead of the pivot) short of its
-    // target, never driving the plough over them, and inside their reach.
-    expect(profile.desiredRange).toBeGreaterThan(6.8 + 0.5);
-    expect(profile.desiredRange).toBeLessThan(reach);
-  });
 
   it('the Turretback Hermit: Shell Slam and Claw Sweep still cover its melee ring', () => {
     const hermit = MOBS.turretback_hermit;

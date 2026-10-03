@@ -24,10 +24,6 @@ export const SUNKEN_BASTION_FOG_COLOR = 0x4d5a57;
 export const DROWNED_TEMPLE_FOG_COLOR = 0x252a4c;
 /** The Wildheart Basin's humid gold haze (its sky dome fades to it at the horizon). */
 export const WILDHEART_BASIN_FOG_COLOR = BASIN_FOG_COLOR;
-/** The Stormbrass Foundry's storm haze of steam and smoke (its sky's horizon
- *  too): a cold slate with only a breath of blue, never the blue that read as
- *  a sea under the shelf. */
-export const STORMBRASS_FOUNDRY_FOG_COLOR = 0x414d5f;
 /** The Gravewyrm Sanctum's thin blue dusk (its sky's horizon too): clear air
  *  that only turns blue with distance, never a murk and never a sea mist. */
 export const GRAVEWYRM_SANCTUM_FOG_COLOR = SANCTUM_FOG_COLOR;
@@ -74,8 +70,6 @@ export function resolveFogScene(
   const inSunkenBastion = interior === 'sunken_bastion';
   // The Drowned Temple: open-air at night over its lagoon, under its own sky.
   const inDrownedTemple = interior === 'drowned_temple';
-  // The Stormbrass Foundry: open-air in storm daylight, under its own sky.
-  const inStormbrassFoundry = interior === 'stormbrass_foundry';
   // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.
   const inGravewyrmSanctum = interior === 'gravewyrm_sanctum';
   const inLastKeep = interior === 'lastkeep';
@@ -100,19 +94,17 @@ export function resolveFogScene(
                     ? 'sunkenBastion'
                     : inDrownedTemple
                       ? 'drownedTemple'
-                      : inStormbrassFoundry
-                        ? 'stormbrassFoundry'
-                        : inGravewyrmSanctum
-                          ? 'gravewyrmSanctum'
-                          : inLastKeep
-                            ? 'lastkeep'
-                            : inDawnhold
-                              ? 'dawnhold'
-                              : inside
-                                ? 'dungeon'
-                                : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                                  ? 'underwater'
-                                  : 'outdoor';
+                      : inGravewyrmSanctum
+                        ? 'gravewyrmSanctum'
+                        : inLastKeep
+                          ? 'lastkeep'
+                          : inDawnhold
+                            ? 'dawnhold'
+                            : inside
+                              ? 'dungeon'
+                              : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                ? 'underwater'
+                                : 'outdoor';
   return { interior, desired };
 }
 
@@ -177,15 +169,6 @@ export function applyFogScenePreset(
     fog.color.setHex(DROWNED_TEMPLE_FOG_COLOR);
     fog.near = 140;
     fog.far = 1050;
-  } else if (desired === 'stormbrassFoundry') {
-    // Steam and smoke haze in dry storm daylight: near enough that the
-    // terraces layer back in depth (each one a shade deeper into the haze),
-    // far enough that the storm-coil tower and the Prime Draft still read
-    // from the Lift Landing (430 yd), while the valley and the far peaks
-    // drown in the grey.
-    fog.color.setHex(STORMBRASS_FOUNDRY_FOG_COLOR);
-    fog.near = 70;
-    fog.far = 780;
   } else if (desired === 'gravewyrmSanctum') {
     // Thin, clear polar dusk: the air only turns blue with distance, pushed
     // far back so the whole cirque, the lake far below and the dragon in the

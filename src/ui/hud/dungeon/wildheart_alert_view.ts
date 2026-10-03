@@ -9,9 +9,8 @@
 //  - targeting the Beastmaster or his jaguar while Pack Bond holds: pull them
 //    apart.
 // Every bar is the mark's own time left. Priority: the Prey over the Stalk
-// over the pollen over the bond readout. The painter is the Foundry alert's
-// (foundry_alert_painter.ts, the shared encounter alert family); every
-// decision is here.
+// over the pollen over the bond readout. The painter is the shared encounter
+// alert's (encounter_alert_painter.ts); every decision is here.
 
 import {
   BEAST_PACK_BOND,
@@ -22,7 +21,7 @@ import {
   ZULGAR_PREY,
 } from '../../../sim/encounters/wildheart_basin/ids';
 import { formatNumber, t } from '../../i18n';
-import type { FoundryAlertHidden, FoundryAlertLive } from './foundry_alert_view';
+import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
 export type WildheartAlertKind = 'prey' | 'prey-wait' | 'stalked' | 'pollinated' | 'bonded';
 
@@ -35,10 +34,10 @@ export const WILDHEART_ALERT_KINDS: readonly WildheartAlertKind[] = [
   'bonded',
 ];
 
-export type WildheartAlertLive = Omit<FoundryAlertLive, 'kind'> & { kind: WildheartAlertKind };
-export type WildheartAlertView = WildheartAlertLive | FoundryAlertHidden;
+export type WildheartAlertLive = Omit<EncounterAlertLive, 'kind'> & { kind: WildheartAlertKind };
+export type WildheartAlertView = WildheartAlertLive | EncounterAlertHidden;
 
-const HIDDEN: FoundryAlertHidden = { visible: false };
+const HIDDEN: EncounterAlertHidden = { visible: false };
 
 interface AlertAura {
   id: string;

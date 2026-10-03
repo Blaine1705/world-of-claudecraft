@@ -11182,7 +11182,7 @@ export class Hud {
               this.fctPainter.spawn(
                 {
                   ...shape,
-                  text: fctAvoidanceText(ev.kind, tgt?.auras, ev.school),
+                  text: fctAvoidanceText(ev.kind),
                   target: tgt,
                 },
                 now,

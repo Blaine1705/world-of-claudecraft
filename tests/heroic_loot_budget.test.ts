@@ -242,55 +242,6 @@ const BASELINE = {
     normalDigest: '0ac50f2ff6acdc808e5c24f721c84b337eade18ea81d2463f77bdd437599946a',
     gearDigest: '1b45c53a49eac046886c4ccb2e2c7fb5db583abc3002e8b7bded49e194e2eead',
   },
-  // The Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md
-  // 8.1 and 8.2), a new five-player dungeon: every boss carries its own normal
-  // table (a guaranteed archetype piece and a rare chase row; the Prime Draft
-  // a bonus group of three rares) and a heroic partition with a new epic (or a
-  // trinket), the generated heroic rares and the normal pieces on their tier.
-  line_master_tock: {
-    gearIds: [
-      'beltrunners_boots',
-      'draftsmans_mantle',
-      'heroic_tocks_torque_wrench',
-      'line_masters_steam_hammer',
-      'riveters_gauntlets',
-    ],
-    normalDigest: '117e56bdffa6c32eb2dc7bf8bc259ba0cd641ba5b6c6f10e509f185b8286c694',
-    gearDigest: 'd1a7562ac2894ea9d84c3e002f47c312538d218a0388abe141b4b0cee7d74ced',
-  },
-  rangewarden: {
-    gearIds: [
-      'coilwound_cord',
-      'heroic_proving_range_quiver',
-      'proofplate_legguards',
-      'rangefinders_lens',
-      'rangewardens_targeting_visor',
-    ],
-    normalDigest: '79734f3df9c83af16644298b82be1730f52865ba3603b5b829e06c9f5377f112',
-    gearDigest: '3639a37e7b327e8902bcb5b145bbc56a2a44f8ae677bf6146a0d8ce81099a6ae',
-  },
-  voltaic_warden: {
-    gearIds: [
-      'arcstep_treads',
-      'grounding_pauldrons',
-      'heroic_voltaic_coil_staff',
-      'overclocked_governor',
-      'stormglass_robes',
-    ],
-    normalDigest: 'e0ac02df6c4a3de3b9f696455e6c86beaac7ad27af965d8a13b5989343c2511b',
-    gearDigest: '43e6e5b36291f41c9613c5d13ebeb5e2c98b10b8c3ddaa67afb4a85a288c98f4',
-  },
-  prime_draft: {
-    gearIds: [
-      'heartless_gearmask',
-      'heroic_cellspark_dagger',
-      'heroic_governors_scepter',
-      'heroic_piston_maul',
-      'prime_draft_core_plate',
-    ],
-    normalDigest: 'eb7b5ceae049074c21ee1a1356aa988b43668663463e1463a3311868ad6bca24',
-    gearDigest: '5fbe16c1c4cc2b558795499ee644ebb7dabd3b08660d60753c8f9d9e51cb8cfc',
-  },
   // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
   // 8.1 and 8.2): the promoted Fanglord Beastmaster and the Gorgebloom carry
   // their own normal tables and heroic partitions. Two of Zulgar's shipped epics

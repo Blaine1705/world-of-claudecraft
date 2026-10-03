@@ -728,12 +728,11 @@ describe('trash kit: an area cast plants its caster', () => {
     expect(r.me.hp).toBe(hpBefore);
   });
 
-  it('every area cast of the six reworked dungeons is a planted cast', () => {
+  it('every area cast of the five reworked dungeons is a planted cast', () => {
     const DUNGEON_IDS = [
       'hollow_crypt',
       'sunken_bastion',
       'drowned_temple',
-      'stormbrass_foundry',
       'wildheart_basin',
       'gravewyrm_sanctum',
     ];

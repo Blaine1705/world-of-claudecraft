@@ -1,21 +1,17 @@
 // The dungeon encounter prompts the HUD composes as ONE member with ONE frame
 // call: the Iron Cage escape (cage_escape_*), Gaoler Ossick's chain alert
-// (gaol_chain_*) and the Stormbrass Foundry's alert (foundry_alert_*: the
-// Storm Cell, the Target Lock, the plating readout) and the Wildheart Basin's
-// alert (wildheart_alert_view.ts on the same painter family: the Prey, the
+// (gaol_chain_*), the Wildheart Basin's alert (wildheart_alert_view.ts on the
+// shared encounter alert painter, encounter_alert_painter.ts: the Prey, the
 // Stalk, the pollen, the Pack Bond readout) and the Gravewyrm Sanctum's
 // (sanctum_alert_view.ts on the same family: the chains, the meltwater, the
-// lake). It owns no DOM itself; it
-// builds each view from the frame's inputs and hands it to that prompt's
-// painter. The frame hands it the world (its entities and roster version):
-// the prompts look bodies up by id, and the Foundry alert keeps its scene of
-// bosses, drones and floor cells off the roster (foundry_alert_scene_core.ts).
+// lake). It owns no DOM itself; it builds each view from the frame's inputs
+// and hands it to that prompt's painter. The frame hands it the world (its
+// entities and roster version): the prompts look bodies up by id, and the
+// Sanctum alert keeps its scene off the roster (sanctum_alert_scene_core.ts).
 
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
-import { FoundryAlert } from './foundry_alert_painter';
-import { FoundryAlertSceneScan, type FoundrySceneEntity } from './foundry_alert_scene_core';
-import { buildFoundryAlertView } from './foundry_alert_view';
+import { EncounterAlert } from './encounter_alert_painter';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
@@ -34,13 +30,13 @@ export interface DungeonPromptsFrame {
       duration?: number;
       stacks?: number;
     }[];
-    /** The player's target (the Foundry alert reads a plated target). */
+    /** The player's target (an alert may read the boss being targeted). */
     targetId?: number | null;
   };
   /** The world: every body by id, and the roster version (bumped when one
    *  comes or goes). */
   world: {
-    entities: ReadonlyMap<number, GaolChainEntity & FoundrySceneEntity & SanctumSceneEntity>;
+    entities: ReadonlyMap<number, GaolChainEntity & SanctumSceneEntity>;
     entityRosterVersion: number;
   };
   party: readonly { pid: number }[] | null | undefined;
@@ -52,10 +48,8 @@ export interface DungeonPromptsFrame {
 export class DungeonPrompts {
   private readonly cage: CageEscapePrompt;
   private readonly chain: GaolChainAlert;
-  private readonly foundry: FoundryAlert;
-  private readonly wildheart: FoundryAlert;
-  private readonly sanctum: FoundryAlert;
-  private readonly foundryScene = new FoundryAlertSceneScan();
+  private readonly wildheart: EncounterAlert;
+  private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private world: DungeonPromptsFrame['world'] | null = null;
   /** One lookup for every view (no closure a frame). */
@@ -64,15 +58,14 @@ export class DungeonPrompts {
   constructor(deps: CageEscapeDeps) {
     this.cage = new CageEscapePrompt(deps);
     this.chain = new GaolChainAlert(deps);
-    this.foundry = new FoundryAlert(deps);
-    this.wildheart = new FoundryAlert(deps, {
+    this.wildheart = new EncounterAlert(deps, {
       id: 'wildheart-alert',
-      className: 'ui-panel-strong foundry-alert wildheart-alert',
+      className: 'ui-panel-strong encounter-alert wildheart-alert',
       kinds: WILDHEART_ALERT_KINDS,
     });
-    this.sanctum = new FoundryAlert(deps, {
+    this.sanctum = new EncounterAlert(deps, {
       id: 'sanctum-alert',
-      className: 'ui-panel-strong foundry-alert sanctum-alert',
+      className: 'ui-panel-strong encounter-alert sanctum-alert',
       kinds: SANCTUM_ALERT_KINDS,
     });
   }
@@ -98,18 +91,6 @@ export class DungeonPrompts {
         party: f.party,
       }),
     );
-    this.foundry.paint(
-      buildFoundryAlertView({
-        auras: p.auras,
-        targetId: p.targetId,
-        entity,
-        interactKey: f.interactKey,
-        touch: f.touch,
-        selfId: p.id,
-        selfPos: p.pos,
-        scene: this.foundryScene.update(f.world),
-      }),
-    );
     this.wildheart.paint(buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity }));
     this.sanctum.paint(
       buildSanctumAlertView({
@@ -126,7 +107,6 @@ export class DungeonPrompts {
   dispose(): void {
     this.cage.dispose();
     this.chain.dispose();
-    this.foundry.dispose();
     this.wildheart.dispose();
     this.sanctum.dispose();
   }

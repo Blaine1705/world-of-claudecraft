@@ -95,11 +95,10 @@ function harness(admit = true, trinketRelics?: TrinketRelicsHook) {
 
 describe('trinket VFX specs', () => {
   it('gives every sim trinket cue id its own authored spec through the registry', () => {
-    // 21, + the Gaoler's Iron Key and the Stormbrass Foundry's two cues (never
-    // re-pinned here when they landed): 24, + the Wildheart Basin's whistle
-    // call, seed plant and seed burst: 27.
-    // + the Gravewyrm Sanctum's link, phial, tithe paid, flask and quench: 32.
-    expect(EMITTED_IDS).toHaveLength(32);
+    // 21, + the Gaoler's Iron Key (never re-pinned here when it landed): 22,
+    // + the Wildheart Basin's whistle call, seed plant and seed burst: 25.
+    // + the Gravewyrm Sanctum's link, phial, tithe paid, flask and quench: 30.
+    expect(EMITTED_IDS).toHaveLength(30);
     expect(Object.keys(TRINKET_VFX_SPECS).sort()).toEqual(EMITTED_IDS);
     for (const id of EMITTED_IDS) {
       const spec = abilityVfxSpec(id);

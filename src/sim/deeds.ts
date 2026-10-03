@@ -148,10 +148,6 @@ export const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   // Without this entry Zulgar kills write no dungeonClears record, so the
   // dgn_wildheart_basin deed pair ships permanently unearnable (0/1 forever).
   wildheart_high_priest: 'wildheart_basin',
-  // The Stormbrass Foundry records its clears from its first day, so its clear
-  // deeds (phase 2, docs/design/dungeon-rework/stormbrass_foundry.md section 9)
-  // credit every run already finished.
-  prime_draft: 'stormbrass_foundry',
   // The Crucible of the Last Spring raid credits per boss room: each raid
   // room is its own dungeon id, and each boss dies through the generic
   // kill-credit path (no bespoke lockout roster yet; the launch pass owns

@@ -102,7 +102,6 @@ describe('Wildheart Basin premature boss pull', () => {
       'hollow_crypt',
       'sunken_bastion',
       'drowned_temple',
-      'stormbrass_foundry',
       'gravewyrm_sanctum',
     ]);
     for (const id of OPTED_IN) expect(DUNGEONS[id].bossChainPull, id).toBe(true);

@@ -47,9 +47,7 @@ export const IGNIVAR_RAID_LORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 0, z: 0 },
     facing: 0,
     color: 0xd9a35f,
-    // The Stormbrass Foundry's hand-off (content/stormbrass_foundry_quests.ts)
-    // turns in here, where Echoes in Iron begins.
-    questIds: [IGNIVAR_LORE_QUEST_IDS.echoesInIron, 'q_sf_forgefathers_isle'],
+    questIds: [IGNIVAR_LORE_QUEST_IDS.echoesInIron],
     greeting:
       'Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide.',
     dynamic: true,

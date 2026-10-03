@@ -2,8 +2,8 @@
 // and his Great Jaguar, the Gorgebloom, Zulgar): a real claimed Basin with a
 // real party, every pack and patrol cleared (the Great Saurian too), the gates
 // open, and every damage event recorded so a suite can read what each
-// mechanic dealt without racing the health top-up. The Foundry harness's shape
-// (tests/helpers/foundry_fight.ts).
+// mechanic dealt without racing the health top-up. The Bastion harness's
+// shape.
 
 import { DUNGEONS, instanceOrigin } from '../../src/sim/data';
 import {

@@ -5,11 +5,12 @@
 // encounters stay deterministic (zero rng here).
 
 import { grantDeed } from '../../deeds';
+import { effectiveArmorOf } from '../../effective_stats';
 import { createGroundObject } from '../../entity';
 import { kitHash } from '../../mob/trash_kit/targets';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import type { Entity } from '../../types';
+import { type Entity, mobArmorReduction } from '../../types';
 
 export const BASTION_DUNGEON = 'sunken_bastion';
 
@@ -190,4 +191,26 @@ export function dropEncounterBody(
 export function localOf(ctx: SimContext, inst: InstanceSlot, e: Entity): { x: number; z: number } {
   const o = ctx.instanceOriginOf(inst);
   return { x: e.pos.x - o.x, z: e.pos.z - o.z };
+}
+
+/** A heavy swing at the one a boss is fighting: `mult` of its own melee roll,
+ *  through the target's armor like any swing. */
+export function heavySwing(
+  ctx: SimContext,
+  boss: Entity,
+  target: Entity,
+  mult: number,
+  ability: string,
+): number {
+  const roll = ctx.rng.range(boss.weapon.min, boss.weapon.max) * mult;
+  const dr = mobArmorReduction(boss, target, effectiveArmorOf(target));
+  const amount = Math.max(1, Math.round(roll * (1 - dr)));
+  return ctx.dealDamage(boss, target, amount, false, 'physical', ability, 'hit', true);
+}
+
+/** The boss's own living current target, or null. */
+export function bossTarget(ctx: SimContext, boss: Entity): Entity | null {
+  if (boss.aggroTargetId === null) return null;
+  const t = ctx.entities.get(boss.aggroTargetId);
+  return t && !t.dead ? t : null;
 }

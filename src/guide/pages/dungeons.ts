@@ -21,7 +21,6 @@ const BODY: Record<string, TranslationKey> = {
   drowned_temple: 'guide.dungeonsPage.templeBody',
   gravewyrm_sanctum: 'guide.dungeonsPage.sanctumBody',
   wildheart_basin: 'guide.dungeonsPage.wildheartBody',
-  stormbrass_foundry: 'guide.dungeonsPage.foundryBody',
   raid: 'guide.dungeonsPage.raidBody',
 };
 

@@ -1,11 +1,10 @@
 // The Gravewyrm Sanctum alert's scene: the bodies the alert reads that are not
 // the local player (the three bosses, the Bonewalkers, the seal chain objects,
 // the lake plates, the Plunging Fire warnings, the landing shadows and the
-// Soulfire Trench lanes). Pure and DOM-free, the Foundry scene's idiom
-// (foundry_alert_scene_core.ts): it walks the world's entities ONLY when the
-// roster changed, keeps the references, and the view reads each live template
-// off them (a plate cracking or a chain breaking changes its template id, not
-// the roster).
+// Soulfire Trench lanes). Pure and DOM-free: it walks the world's entities
+// ONLY when the roster changed, keeps the references, and the view reads each
+// live template off them (a plate cracking or a chain breaking changes its
+// template id, not the roster).
 
 import {
   BONEWALKER_ID,

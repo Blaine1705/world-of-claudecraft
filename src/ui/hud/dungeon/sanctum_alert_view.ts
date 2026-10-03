@@ -15,8 +15,8 @@
 // Bonewalker in meltwater (the tank); your target in meltwater; cracked ice
 // under you during Korzul's fight; Korzul in the air; then the Lockbound
 // readout on a targeted Korgath. Every bar is the threat's own time left (the
-// caster's bar or the mark). The painter is the Foundry alert's
-// (foundry_alert_painter.ts, the shared encounter alert family).
+// caster's bar or the mark). The painter is the shared encounter alert's
+// (encounter_alert_painter.ts).
 
 import { SEAL_PILLARS } from '../../../sim/content/gravewyrm_sanctum_layout';
 import {
@@ -52,7 +52,7 @@ import {
   VELKHAR_TUNING,
 } from '../../../sim/encounters/gravewyrm_sanctum/ids';
 import { formatNumber, t } from '../../i18n';
-import type { FoundryAlertHidden, FoundryAlertLive } from './foundry_alert_view';
+import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
 export type SanctumAlertKind =
   | 'quench'
@@ -98,10 +98,10 @@ export const SANCTUM_ALERT_KINDS: readonly SanctumAlertKind[] = [
   'lockbound',
 ];
 
-export type SanctumAlertLive = Omit<FoundryAlertLive, 'kind'> & { kind: SanctumAlertKind };
-export type SanctumAlertView = SanctumAlertLive | FoundryAlertHidden;
+export type SanctumAlertLive = Omit<EncounterAlertLive, 'kind'> & { kind: SanctumAlertKind };
+export type SanctumAlertView = SanctumAlertLive | EncounterAlertHidden;
 
-const HIDDEN: FoundryAlertHidden = { visible: false };
+const HIDDEN: EncounterAlertHidden = { visible: false };
 
 /** Extra yards past a strike's stated reach a warning still fires at (the
  *  bosses' bodies are wide; a warning errs toward telling). */

@@ -5839,19 +5839,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.tideglass_reflection_mage.name': 'Отражение Приливного стекла',
   'entities.mobs.tideglass_reflection_warlock.name': 'Отражение Приливного стекла',
   'entities.mobs.tideglass_reflection_druid.name': 'Отражение Приливного стекла',
-  'entities.mobs.brass_sentry.name': 'Латунный часовой',
-  'entities.mobs.steam_bruiser.name': 'Паровой громила',
-  'entities.mobs.arc_drone.name': 'Дуговой дрон',
-  'entities.mobs.foundry_engineer.name': 'Инженер литейной',
-  'entities.mobs.gearwright_apprentice.name': 'Ученик шестеренщика',
-  'entities.mobs.clockwork_hound.name': 'Пружинная гончая',
-  'entities.mobs.shieldbearer_frame.name': 'Щитоносный каркас',
-  'entities.mobs.tripod_turret.name': 'Треногая турель',
-  'entities.mobs.gantry_hauler.name': 'Козловой тягач',
-  'entities.mobs.line_master_tock.name': 'Мастер линии Амбрел Ток',
-  'entities.mobs.rangewarden.name': 'Страж полигона',
-  'entities.mobs.voltaic_warden.name': 'Вольтовый страж',
-  'entities.mobs.prime_draft.name': 'Первый чертеж',
   'entities.mobs.sanctum_boneguard.name': 'Костяной страж святилища',
   'entities.mobs.sanctum_drakonid.name': 'Чешуйчатый страж святилища',
   'entities.mobs.raised_bonewalker.name': 'Поднятый костеход',
@@ -8901,8 +8888,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Скрытый ледник высоко на Терновых высотах, где в толще льда замёрз дракон, а культ сжигает украденные души, чтобы растопить его. Спуститесь с высокого перевала мимо ледяных башен, разорванных цепей Кузнеца и костров культа к замёрзшему озеру у подножия ледника.',
   'guide.dungeonsPage.wildheartBody':
     'Скрытая за Затонувшим идолом кальдера в джунглях, окружённая скалами и полная грохота водопадов. Перейдите речной брод, пройдите охотничьи террасы и водопады, минуйте руины колонии и поднимитесь к ступенчатому святилищу под исполинской каменной головой ягуара.',
-  'guide.dungeonsPage.foundryBody':
-    'Латунная литейная на штормовой линии Грозового Утеса, где первые в мире автоматоны все еще гоняют конвейеры и испытательные полигоны под небом из молний. Остановите линию, усмирите оба крыла и поднимитесь на козловой кран, где ждет недостроенный гигант.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',
@@ -13148,9 +13133,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Бессмертный двор (только на героическом, королевский двор восстаёт после Бессмертной ярости)',
   'hudChrome.finder.mech.bloodmane_rend': 'Кровавый разрыв (кровотечение, следите за сменой цели)',
   'hudChrome.finder.mech.tusk_sweep': 'Удар бивнями (рассекающий удар спереди)',
-  'hudChrome.finder.mech.grave_breath': 'Могильное дыхание (конус огня спереди, раскалывает лёд под собой)',
-  'hudChrome.finder.mech.plate_floor': 'Ломкий лёд (его огонь раскалывает и топит плиты озера, не заходите в открытую воду)',
-  'hudChrome.finder.mech.wyrm_flights': 'Полёты (на 70% и 40%: несите Око змея на целый лёд, соберитесь там, где он должен приземлиться)',
+  'hudChrome.finder.mech.grave_breath':
+    'Могильное дыхание (конус огня спереди, раскалывает лёд под собой)',
+  'hudChrome.finder.mech.plate_floor':
+    'Ломкий лёд (его огонь раскалывает и топит плиты озера, не заходите в открытую воду)',
+  'hudChrome.finder.mech.wyrm_flights':
+    'Полёты (на 70% и 40%: несите Око змея на целый лёд, соберитесь там, где он должен приземлиться)',
   'hudChrome.finder.mech.ancestral_sap': 'Соки предков (лечит союзников)',
   'hudChrome.finder.mech.call_of_the_hunt': 'Зов охоты (ускоряет союзников поблизости)',
   'hudChrome.finder.mech.thickhide_ward': 'Толстокожая защита (щит для союзников поблизости)',
@@ -14357,11 +14345,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы проходите сквозь пасть идола на уступ высоко над котловиной. С края скал грохочут водопады, а далеко внизу что-то огромное бредёт через брод.',
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
-  'entities.dungeons.stormbrass_foundry.name': 'Литейная Штормовой латуни',
-  'entities.dungeons.stormbrass_foundry.enterText':
-    'Канатный подъемник с рывком останавливается на уступе литейной. Латунные крыши шипят паром, а над головой молнии бьют в штормовую катушку.',
-  'entities.dungeons.stormbrass_foundry.leaveText':
-    'Канатный подъемник спускает вас по штормовой линии обратно к Грозовому Утесу.',
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText':
@@ -20140,11 +20123,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_resonant_slam': 'Резонирующий удар',
   'abilityUi.cast.temple_undertow': 'Отбойное течение',
   'abilityUi.cast.temple_lunar_tide': 'Лунный прилив',
-  'abilityUi.cast.foundry_piston_slam': 'Удар поршня',
-  'abilityUi.cast.foundry_field_repair': 'Полевой ремонт',
-  'abilityUi.cast.foundry_deploy_turret': 'Установка турели',
-  'abilityUi.cast.foundry_steam_screen': 'Паровой заслон',
-  'abilityUi.cast.foundry_hauler_steam_blast': 'Паровой выброс',
   'abilityUi.cast.temple_skewering_trident': 'Пронзающий трезубец',
   'abilityUi.cast.temple_pale_mending': 'Бледное исцеление',
   'abilityUi.cast.temple_glimmer_venom': 'Мерцающий яд',
@@ -20219,95 +20197,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Каждый удар по якорю разбивает одно звено, как бы силён он ни был',
   'hudChrome.bastionChain.linksTarget': 'Звеньев: {count} из {total}',
   'hudChrome.bastionChain.linkBroken': 'Звено разбито!',
-  'abilityUi.cast.foundry_tock_lever': 'Рычаг',
-  'abilityUi.cast.foundry_tock_rivet_gun': 'Клепальный пистолет',
-  'abilityUi.cast.foundry_proof_shot': 'Пробный выстрел',
-  'abilityUi.cast.foundry_plating_flip': 'Переворот пластин',
-  'abilityUi.cast.foundry_static_lash': 'Статический хлыст',
-  'abilityUi.cast.foundry_draft_awaken': 'Пробуждение',
-  'abilityUi.cast.foundry_arm_sweep': 'Размах руки',
-  'abilityUi.cast.foundry_draft_unbolt': 'Срыв с болтов',
-  'abilityUi.cast.foundry_tremor_step': 'Сотрясающий шаг',
-  'entities.mobs.half_built_frame.name': 'Недостроенный каркас',
-  'hudChrome.foundryAlert.cellTitle': 'Грозовая батарея (статика: {amount} в секунду)',
-  'hudChrome.foundryAlert.cellClosedLine':
-    'Несите ее к люку ядра: ждите за золотым кругом, пока он не откроется',
-  'hudChrome.foundryAlert.cellWarnLine': 'Люк ядра открывается: будьте готовы у золотого круга',
-  'hudChrome.foundryAlert.cellOpenLine':
-    'Несите ее в открытый люк ядра: немедленно войдите в золотой круг!',
-  'hudChrome.foundryAlert.dropKey': 'Нажмите {key}, чтобы бросить батарею для другого',
-  'hudChrome.foundryAlert.dropClick': 'Нажмите сюда, чтобы бросить батарею для другого',
-  'hudChrome.foundryAlert.dropTap': 'Коснитесь здесь, чтобы бросить батарею для другого',
-  'hudChrome.foundryAlert.dropAria': 'Бросить грозовую батарею',
-  'hudChrome.foundryAlert.cellAria': 'Время до замыкания батареи: {pct}',
-  'hudChrome.foundryAlert.lockTitle': 'Захват цели!',
-  'hudChrome.foundryAlert.lockLine': 'Двигайтесь: снаряды падают туда, где вы только что стояли',
-  'hudChrome.foundryAlert.lockAria': 'Осталось времени захвата: {pct}',
-  'hudChrome.foundryAlert.groundedTitle': 'Медная сторона: оружие наносит урон',
-  'hudChrome.foundryAlert.groundedLine': 'Физический урон проходит; заклинания копятся как заряд',
-  'hudChrome.foundryAlert.chargedTitle': 'Синяя сторона: заклинания наносят урон',
-  'hudChrome.foundryAlert.chargedLine': 'Заклинания проходят; физический урон копится как заряд',
-  'hudChrome.foundryAlert.splitLine': 'Его задняя половина носит другую сторону',
-  'hudChrome.foundryAlert.ventWarnTitle': 'Обжигающие клапаны!',
-  'hudChrome.foundryAlert.ventWarnLine': 'Из проходов вырывается пар: немедленно встаньте на ленту',
-  'hudChrome.foundryAlert.ventScaldTitle': 'Обжигающий пар!',
-  'hudChrome.foundryAlert.ventScaldLine': 'Проход обжигает вас: встаньте на ленту',
-  'hudChrome.foundryAlert.ventAria': 'Осталось времени клапанов: {pct}',
-  'hudChrome.foundryAlert.storedAria': 'Накопленный заряд {pct}: высвобождается при перевороте',
-  'hudChrome.foundryAlert.proofTitle': 'Пробный выстрел!',
-  'hudChrome.foundryAlert.proofLine':
-    'Тяжелый снаряд в танка: защитная способность или смена провокации',
-  'hudChrome.foundryAlert.dentedLine':
-    'Помятая броня x{stacks}: +{pct} получаемого физического урона',
-  'hudChrome.foundryAlert.proofAria': 'Пробный выстрел: {pct}',
-  'hudChrome.foundryAlert.floorCellTitle': 'Грозовая батарея на полу!',
-  'hudChrome.foundryAlert.floorCellLine': 'Возьмите грозовую батарею (взаимодействие или щелчок)',
-  'hudChrome.foundryAlert.floorCellLineTouch': 'Возьмите грозовую батарею (коснитесь ее)',
-  'hudChrome.foundryAlert.floorCellHint': 'Затем несите ее в люк ядра, когда он откроется',
-  'hudChrome.foundryAlert.groundedDronesLine': 'Заклинания отражаются: бейте дронов',
-  'hudChrome.foundryAlert.chargedDronesLine': 'Оружие отражается: бейте дронов',
-  'hudChrome.foundryAlert.flipIn': 'Пластины перевернутся через {seconds} с',
-  'hudChrome.foundryAlert.flipInSplit':
-    'Пластины перевернутся через {seconds} с; задняя половина носит другую сторону',
-  'hudChrome.foundryAlert.flipNow': 'Пластины переворачиваются: накопленный заряд высвобождается!',
-  'hudChrome.foundryAlert.turnedAside': 'Отражено',
-  'hudChrome.foundryAlert.cellName': 'Грозовая батарея',
-  'hudChrome.foundryAlert.hatchName': 'Люк ядра',
-  'entities.items.riveters_gauntlets.name': 'Рукавицы клепальщика',
-  'entities.items.beltrunners_boots.name': 'Сапоги бегуна по ленте',
-  'entities.items.draftsmans_mantle.name': 'Наплечье чертежника',
-  'entities.items.tocks_torque_wrench.name': 'Динамометрический ключ Тока',
-  'entities.items.proofplate_legguards.name': 'Испытанные поножи',
-  'entities.items.rangefinders_hood.name': 'Капюшон дальномерщика',
-  'entities.items.coilwound_cord.name': 'Пояс с медной обмоткой',
-  'entities.items.proving_range_quiver.name': 'Колчан испытательного полигона',
-  'entities.items.grounding_pauldrons.name': 'Заземляющие наплечники',
-  'entities.items.arcstep_treads.name': 'Ботинки дугового шага',
-  'entities.items.stormglass_circlet.name': 'Обруч из грозового стекла',
-  'entities.items.voltaic_coil_staff.name': 'Вольтов посох-катушка',
-  'entities.items.draftplate_breastplate.name': 'Нагрудник опытной брони',
-  'entities.items.gearwork_jerkin.name': 'Куртка с шестернями',
-  'entities.items.stormbrass_robe.name': 'Роба грозовой латуни',
-  'entities.items.piston_maul.name': 'Поршневой молот Первого чертежа',
-  'entities.items.cellspark_dagger.name': 'Кинжал батарейной искры',
-  'entities.items.governors_scepter.name': 'Скипетр регулятора',
-  'entities.items.line_masters_steam_hammer.name': 'Паровой молот мастера линии',
-  'entities.items.rangewardens_targeting_visor.name': 'Прицельное забрало Смотрителя полигона',
-  'entities.items.stormglass_robes.name': 'Одеяния из грозового стекла',
-  'entities.items.prime_draft_core_plate.name': 'Пластина ядра Первого чертежа',
-  'entities.items.heartless_gearmask.name': 'Бессердечная маска из шестерней',
-  'entities.items.draft_record.name': 'Запись чертежа',
-  'entities.items.rangefinders_lens.name': 'Линза дальномерщика',
-  'entities.items.overclocked_governor.name': 'Разогнанный регулятор',
-  'hudChrome.trinkets.use.rangefinder':
-    'В течение {duration} сек. ваш урон увеличивается на {perStep}% за каждые {stepYards} м между вами и целью сверх {from} м, до {max}% на {maxAt} м и дальше.',
-  'hudChrome.trinkets.use.overclock':
-    'Увеличивает скорость произнесения заклинаний на {haste}% на {duration} сек. Когда эффект заканчивается, вы перегреваетесь: скорость произнесения снижается на {slow}% на {overheat} сек.',
-  'hudChrome.auraEffect.trinket.rangefinder':
-    'Урон увеличен на {perStep}% за каждые {stepYards} м между вами и целью сверх {from} м, до {max}%.',
-  'hudChrome.auraEffect.trinket.overclock':
-    'Скорость произнесения увеличена на {pct}%. После окончания наступает перегрев.',
-  'hudChrome.auraEffect.trinket.overheated': 'Скорость произнесения снижена на {pct}%.',
   'entities.items.beastpit_warbelt.name': 'Боевой пояс звериных ям',
   'entities.items.jaguar_hide_jerkin.name': 'Куртка из шкуры ягуара',
   'entities.items.hexbone_handwraps.name': 'Обмотки из заклятой кости',
@@ -20355,71 +20244,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.trinket.quenchOther':
     'Следующие {stacks} попаданий оружием наносят дополнительный урон от магии льда. Последнее замедляет атаки цели на {slow}%.',
   'hudChrome.auraEffect.trinket.quenched': 'Скорость атаки снижена на {pct}%.',
-  'entities.npcs.lift_warden_corwin.name': 'Смотритель подъемника Корвин Эшби',
-  'entities.npcs.lift_warden_corwin.title': 'Хранитель подъемника грозовой линии',
-  'entities.npcs.lift_warden_corwin.greeting':
-    'Осторожнее с тросом, друг. Этот подъемник все еще поднимается к старой литейной на грозовой линии, а тамошние машины до сих пор работают на хозяина, который так и не вернулся.',
-  'entities.quests.q_sf_storm_line.title': 'Грозовая линия',
-  'entities.quests.q_sf_storm_line.text':
-    'Каждый час подъемник привозит вниз лом и искры, {playerName}, но ни одной живой души. Там наверху что-то все еще тянет рельсы: огромный паровой гусеничник, которого инженеры звали Портальным тягачом. Поднимитесь, разгромите рельсовый двор и уничтожьте этот гусеничник.',
-  'entities.quests.q_sf_storm_line.completion':
-    'Впервые за много лет во дворе тихо. Тихо, но не пусто. Слышите? Над ним все еще работает линия.',
-  'entities.quests.q_sf_storm_line.objectives.0.label': 'Портальный тягач уничтожен',
-  'entities.quests.q_sf_stop_the_line.title': 'Остановить линию',
-  'entities.quests.q_sf_stop_the_line.text':
-    'Мастер линии Амбрел Ток продолжал запускать литейную, когда хозяин ушел, и так и не остановился. Теперь он отправляет под пресс все, что попадает на его ленты. Остановите его, {playerName}, и вся линия встанет вместе с ним.',
-  'entities.quests.q_sf_stop_the_line.completion':
-    'Ток затих, и его ленты тоже. Что бы он ни строил, он строил это для кого-то другого. Поднимайтесь выше.',
-  'entities.quests.q_sf_stop_the_line.objectives.0.label': 'Мастер линии Амбрел Ток убит',
-  'entities.quests.q_sf_first_draft.title': 'Первый чертеж',
-  'entities.quests.q_sf_first_draft.text':
-    'На вершине литейной стоит то, чему служили все тамошние машины: Первый чертеж, великан, которого так и не закончили. Если буря когда-нибудь его разбудит, ничто ниже уступа не будет в безопасности. Сразите его, {playerName}, и прочтите то, что его создатель оставил внутри.',
-  'entities.quests.q_sf_first_draft.completion':
-    'В записи сказано, что буря двигала металл, но так и не смогла дать ему сердце. «Помнит лишь живая вода». Последний Источник и Остров Отца Кузни. Это была его первая работа, {playerName}. Последняя все еще где-то там.',
-  'entities.quests.q_sf_first_draft.objectives.0.label': 'Запись чертежа прочитана',
-  'entities.quests.q_sf_forgefathers_isle.title': 'На Остров Отца Кузни',
-  'entities.quests.q_sf_forgefathers_isle.text':
-    'В записи упоминается Остров Отца Кузни. Архивариус по имени Мэйлин уже несколько месяцев читает там следы молотов в кузне. Отнесите ей запись чертежа, {playerName}: она поймет, чему Варкхул научился здесь и что он с этим сделал.',
-  'entities.quests.q_sf_forgefathers_isle.completion':
-    'Его первый чертеж. Значит, буря была раньше огня. Тогда я знаю, что он пытался заменить, и почему все его автоматы потерпели неудачу. Держитесь рядом: остальное мы прочтем вместе.',
-  'entities.quests.q_sf_forgefathers_isle.objectives.0.label': 'Архивариус Мэйлин найдена',
-  'entities.mobs.sf_chained_miner.name': 'Закованный рудокоп',
-  'entities.mobs.sf_chained_hauler.name': 'Закованный носильщик',
-  'entities.mobs.sf_freed_laborer.name': 'Освобождённый рабочий',
-  'entities.quests.q_sf_free_the_workers.title': 'Освободить рабочих',
-  'entities.quests.q_sf_free_the_workers.text':
-    '{playerName}, рудокопы, что работали на этом уступе, так и не спустились. Литейная оставила их себе: закованные в лагерях у куч лома, они добывают руду и таскают лом для хозяина, ушедшего давным-давно, а его машины стоят на страже. Перебей стражу в каждом лагере и сбей с них цепи. Все три лагеря. Отправь их домой.',
-  'entities.quests.q_sf_free_the_workers.completion':
-    '{playerName}, они спустились по линии на своих ногах, все до единого, щурясь на небо, будто успели его забыть. Что бы ты ни разбил там наверху, долина запомнит именно это.',
-  'entities.quests.q_sf_free_the_workers.objectives.0.label': 'Лагеря рабочих освобождены',
-  'hudChrome.foundryWorkers.guardedLine':
-    'Не сейчас, друг, не пока стража смотрит. Увидят, что мы разговариваем, и всех нас под пресс.',
-  'hudChrome.foundryWorkers.unguardedLine':
-    'Стража пала? Тогда прошу, сбей эти цепи, пока у нас хватает духу бежать!',
-  'hudChrome.foundryWorkers.freedLine': 'Свобода! Мы идём домой. Спасибо, друг, спасибо!',
-  'hudChrome.foundryWorkers.free': 'Освободить их',
-  'hudChrome.foundryWorkers.freeAria': 'Освободить {name} и остальных закованных в этом лагере',
-  'hudChrome.finder.mech.moving_belts':
-    'Движущиеся ленты (пол несет вас и разворачивается по рычагу)',
-  'hudChrome.finder.mech.stamping_press':
-    'Штамповочный пресс (молоты едут по рельсам к тем, кто на лентах: сойдите с размеченной полосы)',
-  'hudChrome.finder.mech.scalding_vents':
-    'Обжигающие клапаны (проходы ритмично выпускают пар: встаньте на ленту, когда они светятся)',
-  'hudChrome.finder.mech.target_lock':
-    'Захват цели (двигайтесь: снаряды падают туда, где вы стояли)',
-  'hudChrome.finder.mech.proof_shot': 'Пробный выстрел (тяжелый снаряд, мнущий броню танка)',
-  'hudChrome.finder.mech.conduction_plating': 'Проводящая броня (бейте правильным типом урона)',
-  'hudChrome.finder.mech.static_lash': 'Статический хлыст (перескакивает с танка на стоящих рядом)',
-  'hudChrome.finder.mech.storm_cells': 'Грозовые батареи (несите батарею в открытый люк ядра)',
-  'hudChrome.finder.mech.piston_fist': 'Поршневой кулак (выйдите из отмеченного круга)',
-  'hudChrome.finder.mech.tremor_step': 'Сотрясающий шаг (держитесь подальше от его ног)',
-  'hudChrome.finder.mech.overtime_cross_feed':
-    'Сверхурочные и перекрестная подача (ленты быстрее, соседние идут навстречу, два пресса бьют разом)',
-  'hudChrome.finder.mech.walking_barrage': 'Огневой вал (три метки, снаряды оставляют осколки)',
-  'hudChrome.finder.mech.split_plating':
-    'Быстрый цикл и раздельная броня (смена быстрее, спина другого типа)',
-  'hudChrome.finder.mech.double_load':
-    'Заклинившие стойки и двойная загрузка (две батареи за одно открытие люка)',
   'abilityUi.cast.wildheart_ancestral_sap': 'Сок предков',
   'abilityUi.cast.wildheart_plant_totem': 'Установка тотема',
   'abilityUi.cast.wildheart_entangling_lash': 'Опутывающий хлыст',
@@ -20586,8 +20410,4 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Движется на {pct}% быстрее и охотится на свою Добычу. Замедления и обездвиживания действуют, оглушения длятся вдвое меньше.',
   'hudChrome.auraEffect.wildheart.vanished':
     'Скрыт и неуязвим. Вот-вот бросится на самого дальнего игрока.',
-  'hudChrome.auraEffect.foundry.scaldingVents':
-    'Вы стоите на полу главной линии вне лент, пока клапаны предупреждают или выпускают пар. Когда пар вырывается, он наносит от {min} до {max} ед. урона от огня каждые {every} сек. в течение {seconds} сек. (от {heroicMin} до {heroicMax} в героическом режиме) всем, кто стоит не на ленте. Безопасно только на лентах.',
-  'hudChrome.auraEffect.foundry.targetLock':
-    'Страж полигона держит вас на прицеле. Каждые {every} сек. там, где вы стоите, рисуется круг, и через {delay} сек. в него падает снаряд, нанося от {min} до {max} ед. урона от огня (от {heroicMin} до {heroicMax} в героическом режиме) всем в радиусе {radius} м. Не останавливайтесь. Эффекты, снимающие замедление, эту метку не убирают.',
 };

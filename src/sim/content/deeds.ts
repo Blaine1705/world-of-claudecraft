@@ -3696,76 +3696,6 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
-  // The Stormbrass Foundry, a new five-player dungeon (docs/design/dungeon-
-  // rework/stormbrass_foundry.md section 9): the clear pair (its clears are
-  // recorded since its first day, deeds.ts FINAL_BOSS_DUNGEONS prime_draft),
-  // then one encounter deed per boss core and one for the Gantry Hauler,
-  // granted by the encounter modules (src/sim/encounters/stormbrass_foundry)
-  // to every player in the claim at the kill. Cosmetic only; appended at the
-  // END per the append-only contract. Generic English idioms, checked
-  // 2026-10-01. The five-player meta-deeds are left as they are (their
-  // triggers are frozen; adding the Foundry is the maintainer's call).
-  dgn_stormbrass_foundry: {
-    id: 'dgn_stormbrass_foundry',
-    name: 'Stormbrass Silenced',
-    desc: 'Defeat the Prime Draft in the Stormbrass Foundry.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'dungeonClears', dungeonId: 'stormbrass_foundry', count: 1 },
-  },
-  dgn_stormbrass_foundry_heroic: {
-    id: 'dgn_stormbrass_foundry_heroic',
-    name: 'Heroic: The Stormbrass Foundry',
-    desc: 'Defeat the Prime Draft in the Stormbrass Foundry on Heroic difficulty.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: {
-      kind: 'dungeonClears',
-      dungeonId: 'stormbrass_foundry',
-      difficulty: 'heroic',
-      count: 1,
-    },
-  },
-  dgn_tock_press: {
-    id: 'dgn_tock_press',
-    name: 'Quality Control',
-    desc: 'Defeat Line-Master Ambrel Tock without anyone being caught by the Stamping Press.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'manual' },
-  },
-  dgn_rangewarden_clean: {
-    id: 'dgn_rangewarden_clean',
-    name: 'Clean Range',
-    desc: 'Defeat the Rangewarden without anyone being hit by a shell of its salvo.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'manual' },
-  },
-  dgn_voltaic_grounded: {
-    id: 'dgn_voltaic_grounded',
-    name: 'Grounded',
-    desc: 'Defeat the Voltaic Warden without a single Discharge dealing damage.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'manual' },
-  },
-  dgn_prime_draft_overload: {
-    id: 'dgn_prime_draft_overload',
-    name: 'Heartless',
-    desc: 'Overload the Prime Draft three times in one fight and defeat it.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'manual' },
-  },
-  dgn_gantry_hauler: {
-    id: 'dgn_gantry_hauler',
-    name: 'Off the Rails',
-    desc: 'Defeat the Gantry Hauler without anyone being hit by its Scrap Toss.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'manual' },
-  },
   // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
   // section 9): one encounter deed per boss core and one for the Great
   // Saurian, granted by the encounter modules (src/sim/encounters/
@@ -3802,19 +3732,6 @@ export const DEEDS: Record<string, DeedDef> = {
     id: 'dgn_great_saurian',
     name: 'Toppled Titan',
     desc: 'Defeat the Great Saurian and its Howdah Hexcaller within 20 seconds of each other.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'manual' },
-  },
-  // The Stormbrass Foundry's chained workers (content/stormbrass_foundry_workers.ts):
-  // every camp freed in one run, granted by encounters/stormbrass_foundry/
-  // workers.ts to every player in the claim as the last chain falls. Cosmetic
-  // only; appended at the END per the append-only contract. "Every Chain
-  // Struck" returned no game use (the IP check, 2026-10-02).
-  dgn_foundry_workers_freed: {
-    id: 'dgn_foundry_workers_freed',
-    name: 'Every Chain Struck',
-    desc: 'Free all three chained worker camps in the Stormbrass Foundry in a single run.',
     category: 'dungeon',
     renown: 10,
     trigger: { kind: 'manual' },

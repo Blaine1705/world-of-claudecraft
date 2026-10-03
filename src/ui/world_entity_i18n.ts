@@ -137,25 +137,6 @@ const MOB_IDS = [
   'tideglass_reflection_mage',
   'tideglass_reflection_warlock',
   'tideglass_reflection_druid',
-  // The Stormbrass Foundry (sim/content/stormbrass_foundry.ts).
-  'brass_sentry',
-  'steam_bruiser',
-  'arc_drone',
-  'foundry_engineer',
-  'gearwright_apprentice',
-  'clockwork_hound',
-  'shieldbearer_frame',
-  'tripod_turret',
-  'gantry_hauler',
-  'line_master_tock',
-  'rangewarden',
-  'voltaic_warden',
-  'prime_draft',
-  'half_built_frame',
-  // The Foundry's chained workers (sim/content/stormbrass_foundry_workers.ts).
-  'sf_chained_miner',
-  'sf_chained_hauler',
-  'sf_freed_laborer',
   'sanctum_boneguard',
   'sanctum_drakonid',
   'raised_bonewalker',
@@ -526,8 +507,6 @@ const NPC_IDS = [
   'tidewarden_nel',
   // the Eastbrook quay's sparring master (content/practice_dummies.ts)
   'drillmaster_hale',
-  // the Stormbrass Foundry's Lift Warden (content/stormbrass_foundry_quests.ts)
-  'lift_warden_corwin',
 ] as const;
 
 const QUEST_IDS = [
@@ -762,12 +741,6 @@ const QUEST_IDS = [
   // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
   'q_hub_know_your_numbers',
   'q_hub_healing_numbers',
-  // The Stormbrass Foundry's chain (content/stormbrass_foundry_quests.ts).
-  'q_sf_storm_line',
-  'q_sf_stop_the_line',
-  'q_sf_first_draft',
-  'q_sf_forgefathers_isle',
-  'q_sf_free_the_workers',
 ] as const;
 
 const ZONE_IDS = [
@@ -799,7 +772,6 @@ const DUNGEON_IDS = [
   'ignivar_molten_assembly',
   'ignivar_inner_crucible',
   'wildheart_basin',
-  'stormbrass_foundry',
   'the_last_keep',
   'dawnhold_castle',
 ] as const;

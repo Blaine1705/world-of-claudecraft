@@ -2,7 +2,7 @@
 // toss, stoke): the Broodsworn Goadsmith's Goad, the Ogre Sledge-Hauler's Ice
 // Block Toss and the Soul Brazier's quickening soulfire. A sibling of
 // driver.ts, which routes these keys here. (The Rime Whelp's slowing pop and
-// the Glacier Splinter's shatter ride the shared death burst, foundry_kit.ts.)
+// the Glacier Splinter's shatter ride the shared death burst, death_burst.ts.)
 //
 //   goad    an interruptible goad at one ally in the fight: a damage-done aura
 //           for a few seconds (another ally before itself, never one already

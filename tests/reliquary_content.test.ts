@@ -383,12 +383,11 @@ describe('Reliquary Conqueror catalog structure', () => {
     // closeout of docs/prd/ignivar-raid-loot.md) + the Roots' Bramblehide
     // set page (the eighth epic armor family).
     // +1: conquerors_vanguard_gallery (Warfare Season 2).
-    // +2: the Stormbrass Foundry's page pair (a new five-player dungeon).
-    expect(CONQUEROR_PAGES.length).toBe(36);
+    expect(CONQUEROR_PAGES.length).toBe(34);
     expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(46);
+    expect(RELIQUARY_PAGES.length).toBe(44);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -477,12 +476,11 @@ describe('Reliquary Conqueror catalog structure', () => {
     // heroic epics, the Gaoler's Iron Key): 500.
     // The Drowned Temple rework adds four (two rare chase rows, two heroic
     // epics): 504.
-    // The Stormbrass Foundry adds thirteen (six rares, five heroic epics, two
-    // trinkets): 517. The Wildheart Basin rework adds five (the Falls-Blessed
-    // Staff, two heroic epics, two trinkets): 522.
+    // The Wildheart Basin rework adds five (the Falls-Blessed Staff, two heroic
+    // epics, two trinkets): 509.
     // The Gravewyrm Sanctum rework adds five (two heroic epics, three
-    // trinkets): 527.
-    expect(full).toEqual({ owned: 527, total: 527 });
+    // trinkets): 514.
+    expect(full).toEqual({ owned: 514, total: 514 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -516,10 +514,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     // 471 with the Sunken Bastion rework's five new relics; 475 with the Drowned
-    // Temple rework's four; 488 with the Stormbrass Foundry's thirteen; 493
-    // with the Wildheart Basin rework's five.
-    // 498 with the Gravewyrm Sanctum rework's five.
-    expect(character).toEqual({ owned: 498, total: 498 });
+    // Temple rework's four; 480 with the Wildheart Basin rework's five.
+    // 485 with the Gravewyrm Sanctum rework's five.
+    expect(character).toEqual({ owned: 485, total: 485 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -585,10 +582,9 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +5: the Sunken Bastion rework's new relics on its two pages: 687.
       // +4: the Drowned Temple rework's new relics on its two pages: 691.
-      // +13: the Stormbrass Foundry's two new pages: 704.
-      // +5: the Wildheart Basin rework's new relics on its two pages: 709.
-      // +5: the Gravewyrm Sanctum rework's new relics on its heroic page: 714.
-    ).toBe(714);
+      // +5: the Wildheart Basin rework's new relics on its two pages: 696.
+      // +5: the Gravewyrm Sanctum rework's new relics on its heroic page: 701.
+    ).toBe(701);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -825,10 +821,9 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
     // +5: the Sunken Bastion rework's new relics: 526.
     // +4: the Drowned Temple rework's new relics: 530.
-    // +13: the Stormbrass Foundry's new relics: 543.
-    // +5: the Wildheart Basin rework's new relics: 548.
-    // +5: the Gravewyrm Sanctum rework's new relics: 553.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(553);
+    // +5: the Wildheart Basin rework's new relics: 535.
+    // +5: the Gravewyrm Sanctum rework's new relics: 540.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(540);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1099,11 +1094,6 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     choirmother_selthe: 'conquerors_drowned_temple_heroic',
     tideglass_colossus: 'conquerors_drowned_temple_heroic',
     ysolei: 'conquerors_drowned_temple_heroic',
-    // The Stormbrass Foundry: four bosses, one shared heroic page.
-    line_master_tock: 'conquerors_stormbrass_foundry_heroic',
-    rangewarden: 'conquerors_stormbrass_foundry_heroic',
-    voltaic_warden: 'conquerors_stormbrass_foundry_heroic',
-    prime_draft: 'conquerors_stormbrass_foundry_heroic',
     korzul_the_gravewyrm: 'conquerors_gravewyrm_sanctum_heroic',
     // The Wildheart Basin rework: three bosses, one shared heroic page.
     wildheart_beastmaster: 'conquerors_wildheart_basin_heroic',
@@ -1953,7 +1943,6 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   drowned_temple: { pageId: 'conquerors_drowned_temple', floor: 5 },
   gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 32 },
   wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 4 },
-  stormbrass_foundry: { pageId: 'conquerors_stormbrass_foundry', floor: 6 },
   nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 16 },
   // The Crucible raid rooms (per-boss pages). The derivation excludes the
   // sigil redemption tokens by kind; the token-liveness arm below proves the
@@ -2165,9 +2154,6 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       // The Drowned Temple heroic page names its first two bosses in full and
       // Ysolei by her short form.
       conquerors_drowned_temple_heroic: ['choirmother_selthe', 'tideglass_colossus'],
-      // The Stormbrass Foundry page names Line-Master Tock in full and the
-      // other three by their "the ..." forms.
-      conquerors_stormbrass_foundry: ['line_master_tock'],
       conquerors_gravewyrm_sanctum: ['korzul_the_gravewyrm'],
       // The Gravewyrm Sanctum heroic page names all three bosses in full.
       conquerors_gravewyrm_sanctum_heroic: [
@@ -3316,9 +3302,6 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_warfare_gallery: 2,
   conquerors_warfare_armory: 2,
   conquerors_vanguard_gallery: 2,
-  // The Stormbrass Foundry: all four bosses pay each page.
-  conquerors_stormbrass_foundry: 4,
-  conquerors_stormbrass_foundry_heroic: 4,
   // The retired vault is deliberately sourceless (excludeFromCompletion:
   // retired relics have no door to name), so it resolves to zero sources.
   horizons_vault_of_ages: 0,

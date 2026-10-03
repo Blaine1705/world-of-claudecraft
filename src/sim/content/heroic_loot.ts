@@ -724,21 +724,8 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'heroic_gaolyard_cudgel',
   'heroic_chorus_conch',
   'heroic_tideglass_shiv',
-  'heroic_tocks_torque_wrench',
-  'heroic_proving_range_quiver',
-  'heroic_voltaic_coil_staff',
-  'heroic_piston_maul',
-  'heroic_cellspark_dagger',
-  'heroic_governors_scepter',
   'heroic_falls_blessed_staff',
   'heroic_fanglords_beastspear',
-  'riveters_gauntlets',
-  'beltrunners_boots',
-  'draftsmans_mantle',
-  'proofplate_legguards',
-  'coilwound_cord',
-  'grounding_pauldrons',
-  'arcstep_treads',
   'heroic_boundstone_girdle',
   'heroic_boundstone_helm',
   'heroic_deathlord_legguards',
@@ -873,46 +860,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['tideworn_warboots', 0.15],
       ['heroic_tideglass_shiv', 0.15],
     ]).map(preserveBaseLootSource),
-  ],
-  // The Stormbrass Foundry (stormbrass_foundry.md 8.2): one equipment item per
-  // boss kill, a new epic (or a trinket) on every boss, the generated heroic
-  // rares, and the normal archetype pieces on their own tier.
-  line_master_tock: [
-    ...weightedLootGroup('line_master_tock_heroic', [
-      ['line_masters_steam_hammer', 0.35],
-      ['heroic_tocks_torque_wrench', 0.2],
-      ['riveters_gauntlets', 0.15],
-      ['beltrunners_boots', 0.15],
-      ['draftsmans_mantle', 0.15],
-    ]).map(preserveBaseLootSource),
-  ],
-  rangewarden: [
-    ...weightedLootGroup('rangewarden_heroic', [
-      ['rangefinders_lens', 0.25],
-      ['rangewardens_targeting_visor', 0.3],
-      ['heroic_proving_range_quiver', 0.2],
-      ['proofplate_legguards', 0.125],
-      ['coilwound_cord', 0.125],
-    ]).map(preserveBaseLootSource),
-  ],
-  voltaic_warden: [
-    ...weightedLootGroup('voltaic_warden_heroic', [
-      ['overclocked_governor', 0.25],
-      ['stormglass_robes', 0.3],
-      ['heroic_voltaic_coil_staff', 0.2],
-      ['grounding_pauldrons', 0.125],
-      ['arcstep_treads', 0.125],
-    ]).map(preserveBaseLootSource),
-  ],
-  prime_draft: [
-    ...weightedLootGroup('prime_draft_heroic', [
-      ['prime_draft_core_plate', 0.25],
-      ['heartless_gearmask', 0.25],
-      ['heroic_piston_maul', 0.17],
-      ['heroic_cellspark_dagger', 0.17],
-      ['heroic_governors_scepter', 0.16],
-    ]).map(preserveBaseLootSource),
-    ...heroicFarmPatternRows(),
   ],
   korgath_the_bound: [
     ...weightedLootGroup('korgath_the_bound_heroic', [
@@ -1069,7 +1016,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   ],
   // The Gorgebloom: the Gorgebloom Seedpod, the new Thorncrowned Greathelm, the
   // Sunbone Oracle's Crown moved off Zulgar, and the generated Heroic
-  // Falls-Blessed Staff (its base tier preserved, the Foundry's rare rows).
+  // Falls-Blessed Staff (its base tier preserved).
   the_gorgebloom: [
     ...weightedLootGroup('the_gorgebloom_heroic', [
       ['gorgebloom_seedpod', 0.25],

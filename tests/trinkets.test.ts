@@ -2,10 +2,8 @@
 // src/sim/content/trinkets.ts): using the worn trinket through useItem, its
 // cooldown, and every use and passive against a real Sim.
 import { describe, expect, it } from 'vitest';
-import { tonguesMult } from '../src/sim/combat/cc';
 import { applyHeal } from '../src/sim/combat/heal';
 import { quenchDamage } from '../src/sim/combat/sanctum_trinkets';
-import { spellHasteMult } from '../src/sim/combat/spell_combat';
 import { restorableCooldown } from '../src/sim/combat/trinket_seams';
 import { runTrinketTrigger, TRINKET_EQUIP_LOCKOUT } from '../src/sim/combat/trinkets';
 import {
@@ -17,7 +15,6 @@ import {
 } from '../src/sim/combat/wildheart_trinkets';
 import {
   GAMBLE,
-  rangefinderBonusAt,
   TRINKET_AURA,
   TRINKET_ITEMS,
   TRINKET_SPECS,
@@ -58,20 +55,18 @@ function foe(sim: Sim, distance = 3, hp = 20000): Entity {
 }
 
 const aura = (e: Entity, id: string) => e.auras.find((a) => a.id === id);
-const LENS = { from: 10, stepYards: 2, perStep: 0.01, max: 0.1 };
 const damageBy = (events: SimEvent[], ability: string) =>
   events.filter((ev) => ev.type === 'damage' && ev.ability === ability);
 
 describe('the trinket catalog', () => {
-  it('ships twenty-six trinkets, each with one attribute and a use', () => {
+  it('ships twenty-four trinkets, each with one attribute and a use', () => {
     const ids = Object.keys(TRINKET_ITEMS);
     // The Sunken Bastion rework's Gaoler's Iron Key is the nineteenth; the
-    // Stormbrass Foundry's Rangefinder's Lens and Overclocked Governor are the
-    // twentieth and twenty-first; the Wildheart Basin's Fanglord's Whistle and
-    // Gorgebloom Seedpod are the twenty-second and twenty-third; the Gravewyrm
-    // Sanctum's Foreman's Last Link, Phial of the Tithe and Quenchwater Flask
-    // the twenty-fourth to twenty-sixth.
-    expect(ids).toHaveLength(26);
+    // Wildheart Basin's Fanglord's Whistle and Gorgebloom Seedpod are the
+    // twentieth and twenty-first; the Gravewyrm Sanctum's Foreman's Last Link,
+    // Phial of the Tithe and Quenchwater Flask the twenty-second to
+    // twenty-fourth.
+    expect(ids).toHaveLength(24);
     for (const id of ids) {
       const item = TRINKET_ITEMS[id];
       expect(item.slot).toBe('trinket');
@@ -232,56 +227,6 @@ describe('the tank trinkets', () => {
     sim3.useItem('gaolers_iron_key');
     expect(aura(far, TRINKET_AURA.shackle)).toBeUndefined();
     expect(sim3.player.cooldowns.get(trinketCooldownKey('gaolers_iron_key')) ?? 0).toBe(0);
-  });
-});
-
-describe('the Stormbrass Foundry trinkets', () => {
-  it("Rangefinder's Lens: damage rises 1 percent per 2 yd past 10 yd, capped at 10 percent", () => {
-    expect(rangefinderBonusAt(8, LENS)).toBe(0);
-    expect(rangefinderBonusAt(10, LENS)).toBe(0);
-    expect(rangefinderBonusAt(12, LENS)).toBeCloseTo(0.01, 9);
-    expect(rangefinderBonusAt(21, LENS)).toBeCloseTo(0.05, 9);
-    expect(rangefinderBonusAt(30, LENS)).toBeCloseTo(0.1, 9);
-    expect(rangefinderBonusAt(45, LENS)).toBeCloseTo(0.1, 9);
-
-    // Through the real damage path: the same hit, at 30 yd, with and without it.
-    const hitAt = (use: boolean): number => {
-      const sim = wearing('rangefinders_lens', 'hunter');
-      const mob = foe(sim, 30);
-      if (use) sim.useItem('rangefinders_lens');
-      sim.player.auras = sim.player.auras.filter((a) => a.id === TRINKET_AURA.rangefinder);
-      return sim.ctx.dealDamage(sim.player, mob, 200, false, 'physical', 'Test Shot', 'hit');
-    };
-    const plain = hitAt(false);
-    const lensed = hitAt(true);
-    expect(lensed).toBe(Math.round(plain * 1.1));
-    const sim = wearing('rangefinders_lens', 'hunter');
-    foe(sim, 30);
-    sim.useItem('rangefinders_lens');
-    expect(aura(sim.player, TRINKET_AURA.rangefinder)?.remaining).toBe(12);
-    expect(sim.player.cooldowns.get(trinketCooldownKey('rangefinders_lens'))).toBe(120);
-  });
-
-  it('Overclocked Governor: +25 percent casting speed for 10 sec, then Overheated for 5 sec', () => {
-    const sim = wearing('overclocked_governor', 'mage');
-    sim.useItem('overclocked_governor');
-    const burst = aura(sim.player, TRINKET_AURA.overclock);
-    expect(burst?.kind).toBe('buff_spellhaste');
-    expect(burst?.value).toBe(0.25);
-    // Neither cancelled nor purged early: Overheated always follows.
-    expect(burst?.undispellable).toBe(true);
-    expect(spellHasteMult(sim.player)).toBeCloseTo(1 + sim.player.spellHaste + 0.25, 6);
-    expect(aura(sim.player, TRINKET_AURA.overheated)).toBeUndefined();
-    for (let t = 0; t < 10.1; t += DT) sim.tick();
-    expect(aura(sim.player, TRINKET_AURA.overclock)).toBeUndefined();
-    const heat = aura(sim.player, TRINKET_AURA.overheated);
-    expect(heat?.kind).toBe('tongues');
-    expect(heat?.remaining).toBeGreaterThan(4.8);
-    // Cast times stretch so casting speed drops by 10 percent.
-    expect(tonguesMult(sim.player)).toBeCloseTo(1 / 0.9, 6);
-    expect(heat?.undispellable).toBe(true);
-    for (let t = 0; t < 5.1; t += DT) sim.tick();
-    expect(aura(sim.player, TRINKET_AURA.overheated)).toBeUndefined();
   });
 });
 

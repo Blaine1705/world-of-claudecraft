@@ -1865,28 +1865,6 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('mage', { hands: 'rogue' }),
     props: 'harbormaster',
   },
-  // Lift Warden Corwin Ashby of the Stormcrag cable lift: a weathered lift-keeper
-  // in verdigris work clothes and a mechanic's leathers, grey-streaked hair under
-  // the storm, a short beard, and the heavy wrench he keeps the cable with. The
-  // Stormbrass Foundry's brass-and-verdigris palette.
-  lift_warden_corwin: {
-    app: {
-      gender: 'male',
-      hair: 'buzz',
-      ...hair(28, 0.15, 0.5),
-      beard: 'full',
-      brows: 'thick',
-      eyeShape: 'narrow',
-      ...eyes(200, 0.35, 0.4),
-      ...skin(24, 0.42, 0.42),
-      mouth: 'smile',
-      face: face({ jaw: 0.35, brow: 0.2, nose: 0.15 }),
-      body: body({ shoulders: 0.2 }),
-      outfit: 'verdigris',
-    },
-    worn: kit('barbarian'),
-    props: 'hammer',
-  },
   // Reeve Ottoline of Lanternmere: the harvest never ends; neither do ledgers.
   reeve_ottoline: {
     app: {

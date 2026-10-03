@@ -141,44 +141,6 @@ const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
   },
 ];
 
-// The Stormbrass Foundry (docs/design/dungeon-rework/stormbrass_foundry.md):
-// the Main Line, the two wings, the Gantry. Each boss's core first, then the
-// secondary kit; the heroic array adds each boss's heroic twists (the
-// Nythraxis and Ignivar precedent).
-const STORMBRASS_FOUNDRY_ENCOUNTERS: readonly FinderEncounter[] = [
-  {
-    mobId: 'line_master_tock',
-    mechanics: ['moving_belts', 'stamping_press', 'scalding_vents', 'summons_adds'],
-  },
-  { mobId: 'rangewarden', mechanics: ['target_lock', 'proof_shot', 'summons_adds'] },
-  { mobId: 'voltaic_warden', mechanics: ['conduction_plating', 'static_lash', 'summons_adds'] },
-  {
-    mobId: 'prime_draft',
-    final: true,
-    mechanics: ['storm_cells', 'piston_fist', 'tremor_step', 'enrage'],
-  },
-];
-
-const STORMBRASS_FOUNDRY_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
-  {
-    mobId: 'line_master_tock',
-    mechanics: [...STORMBRASS_FOUNDRY_ENCOUNTERS[0].mechanics, 'overtime_cross_feed'],
-  },
-  {
-    mobId: 'rangewarden',
-    mechanics: [...STORMBRASS_FOUNDRY_ENCOUNTERS[1].mechanics, 'walking_barrage'],
-  },
-  {
-    mobId: 'voltaic_warden',
-    mechanics: [...STORMBRASS_FOUNDRY_ENCOUNTERS[2].mechanics, 'split_plating'],
-  },
-  {
-    mobId: 'prime_draft',
-    final: true,
-    mechanics: [...STORMBRASS_FOUNDRY_ENCOUNTERS[3].mechanics, 'double_load'],
-  },
-];
-
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
   {
     mobId: 'korgath_the_bound',
@@ -496,34 +458,6 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     autoQueue: true,
     entranceDungeonId: 'wildheart_basin',
     encounters: WILDHEART_BASIN_ENCOUNTERS_HEROIC,
-    lockout: 'daily',
-  },
-  {
-    id: 'stormbrass_foundry_normal',
-    dungeonId: 'stormbrass_foundry',
-    difficulty: 'normal',
-    kind: 'dungeon',
-    minLevel: 19,
-    maxLevel: 20,
-    size: 5,
-    composition: FIVE_MAN,
-    autoQueue: true,
-    entranceDungeonId: 'stormbrass_foundry',
-    encounters: STORMBRASS_FOUNDRY_ENCOUNTERS,
-    lockout: 'none',
-  },
-  {
-    id: 'stormbrass_foundry_heroic',
-    dungeonId: 'stormbrass_foundry',
-    difficulty: 'heroic',
-    kind: 'dungeon',
-    minLevel: 20,
-    maxLevel: 20,
-    size: 5,
-    composition: FIVE_MAN,
-    autoQueue: true,
-    entranceDungeonId: 'stormbrass_foundry',
-    encounters: STORMBRASS_FOUNDRY_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {

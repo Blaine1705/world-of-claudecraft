@@ -3,7 +3,7 @@
 The reworked level-20 jungle caldera (`docs/design/dungeon-rework/wildheart_basin.md`
 on the `design/dungeon-rework` branch), ticked once per claim by
 `tickWildheartEncounters` (`index.ts`), called from `instances/dungeons.ts`
-`updateInstances` right after the Foundry's.
+`updateInstances` right after the Drowned Temple's.
 
 Built in phases. PHASE A: the field record (`sim/content/wildheart_basin_layout.ts`,
 interior key `wildheart` on the shared authored-field engine), every pack and patrol with
@@ -15,7 +15,7 @@ the looks, never the ids.
 | Module | Role |
 |---|---|
 | `ids.ts` | Leaf: every dungeon, boss, showpiece and trash id, every cast, aura and object template id, the tuning of all four encounters (`SAURIAN_TUNING`, `BEAST_TUNING`, `BLOOM_TUNING`, `ZULGAR_TUNING`), the deed ids and lines, and the pure helpers `controlGroupOf`, `bondReachFor`, `bondStrength`. The content, the renderer, the HUD alert, the dev helpers and the tests key on it. |
-| `claim.ts` | The live Basin claims, the Basin's ephemeral objects (`spawnBasinObject`), `arenaPlayers`, `holdPlanted`, `placeAt`, `farthestPlayer`, `nearestPlayerTo`; the claim-generic reads are the Bastion's and the Foundry's, re-exported. |
+| `claim.ts` | The live Basin claims, the Basin's ephemeral objects (`spawnBasinObject`), `arenaPlayers`, `holdPlanted`, `placeAt`, `farthestPlayer`, `nearestPlayerTo`; the claim-generic reads are the Bastion's, re-exported. |
 | `great_saurian.ts` | The Great Saurian (4.3): Tail Swipe, Earthshaking Stomp, Howdah Rider, Enrage. Its state outlives it until the Toppled Titan deed settles (it and its rider within 20 s of each other). |
 | `beastmaster.ts` | The Fanglord Beastmaster and his Great Jaguar (5.1, G15): ONE health pool (`syncPool`: every body's loss comes off both, both fall together), Pack Bond (auras `buff_dr` 0.5 and `buff_dmg_done` 0.2 within 15 yd, heroic 20), Stalk (the jaguar ignores taunts, fixates a hashed non-tank for 10 s and bites with a bleed; its control windows show as Wary auras), Beast Pit Quake (1.5 s bar), Call of the Hunt, Thickhide Ward, heroic Heel! (2 s bar; a stun stops it). Deed: Kept at Bay. |
 | `control_gate.ts` | Pure aura gate asked by `combat/trinket_seams.ts` `auraGuarded` (Sim.applyAura): the jaguar's once-per-20-s window per control kind, and Zulgar's hunt (only true stuns land, halved). |

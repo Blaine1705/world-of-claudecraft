@@ -126,18 +126,6 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_hydra_tsunami': true,
   'abilityUi.cast.temple_ysolei_call': true,
   'abilityUi.cast.temple_ysolei_wrath': true,
-  // The Stormbrass Foundry trash kit and the Gantry Hauler.
-  'abilityUi.cast.foundry_piston_slam': true,
-  'abilityUi.cast.foundry_field_repair': true,
-  'abilityUi.cast.foundry_deploy_turret': true,
-  'abilityUi.cast.foundry_steam_screen': true,
-  'abilityUi.cast.foundry_hauler_steam_blast': true,
-  // The Stormbrass Foundry's four bosses.
-  'abilityUi.cast.foundry_tock_lever': true,
-  'abilityUi.cast.foundry_tock_rivet_gun': true,
-  'abilityUi.cast.foundry_proof_shot': true,
-  'abilityUi.cast.foundry_plating_flip': true,
-  'abilityUi.cast.foundry_static_lash': true,
   // The Wildheart Basin rework: its trash kit and the Great Saurian.
   'abilityUi.cast.wildheart_ancestral_sap': true,
   'abilityUi.cast.wildheart_plant_totem': true,
@@ -176,10 +164,6 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.sanctum_korzul_wing_gale': true,
   'abilityUi.cast.sanctum_korzul_plunging_fire': true,
   'abilityUi.cast.sanctum_korzul_crashing_descent': true,
-  'abilityUi.cast.foundry_draft_awaken': true,
-  'abilityUi.cast.foundry_arm_sweep': true,
-  'abilityUi.cast.foundry_draft_unbolt': true,
-  'abilityUi.cast.foundry_tremor_step': true,
 };
 export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');

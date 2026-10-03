@@ -117,7 +117,6 @@ import {
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC,
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
 } from '../sim/varkhul_shared_pyre';
-import { foundryAuraEffectDescriptor } from './foundry_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
 import { wildheartAuraEffectDescriptor } from './wildheart_aura_effect';
@@ -183,9 +182,6 @@ export function auraEffectDescriptor(
   // The Wildheart Basin's marks and boss auras say their rule (wildheart_aura_effect.ts).
   const basin = wildheartAuraEffectDescriptor(a);
   if (basin) return basin;
-  // The Stormbrass Foundry's marks say their rule (foundry_aura_effect.ts).
-  const foundry = foundryAuraEffectDescriptor(a);
-  if (foundry) return foundry;
   // The Gravewyrm Sanctum's boss auras say their rule (sanctum_aura_effect.ts).
   const sanctum = sanctumAuraEffectDescriptor(a);
   if (sanctum) return sanctum;

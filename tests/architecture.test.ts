@@ -638,20 +638,16 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/cage_escape_view.ts',
   // Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair).
   'src/ui/hud/dungeon/gaol_chain_view.ts',
-  // The Stormbrass Foundry's alert (the Storm Cell, Target Lock, the plating).
-  'src/ui/hud/dungeon/foundry_alert_view.ts',
-  // Its scene scan (the bodies the alert reads off the world) and the floating
-  // combat text's avoidance word ("Turned aside" on a plated body).
-  'src/ui/hud/dungeon/foundry_alert_scene_core.ts',
-  'src/ui/hud/dungeon/foundry_fct_core.ts',
+  // The shared encounter alert family's view contract, and the floating
+  // combat text's avoidance word.
+  'src/ui/hud/dungeon/encounter_alert_view.ts',
+  'src/ui/hud/dungeon/fct_avoidance_core.ts',
   // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its
   // scene scan.
   'src/ui/hud/dungeon/sanctum_alert_view.ts',
   'src/ui/hud/dungeon/sanctum_alert_scene_core.ts',
-  // The Stormbrass Foundry's chained workers' gossip (the line, "Free them").
-  'src/ui/hud/dungeon/foundry_worker_gossip_core.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -818,14 +814,6 @@ const RENDER_PURE_CORES = [
   'src/render/hollow_crypt/crypt_finale_fx_core.ts',
   // Morthen the Lich Bishop's stance latch, body anchors and effect timings.
   'src/render/hollow_crypt/morthen_fx_core.ts',
-  // The Stormbrass Foundry creatures' gestures, dials and measured anchors.
-  'src/render/stormbrass_foundry/foundry_creature_fx_core.ts',
-  // The Voltaic Warden's and the Prime Draft's Blender bodies, measured, the
-  // Draft's presentation gestures and its cable terminal's plan.
-  'src/render/stormbrass_foundry/voltaic_model_core.ts',
-  'src/render/stormbrass_foundry/prime_draft_model_core.ts',
-  'src/render/stormbrass_foundry/prime_draft_gesture_core.ts',
-  'src/render/stormbrass_foundry/prime_draft_tether_core.ts',
   // The Gravewyrm Sanctum bosses' Blender bodies, measured, and their gestures.
   'src/render/gravewyrm_sanctum_bosses/boss_model_core.ts',
   'src/render/gravewyrm_sanctum_bosses/boss_fx_core.ts',
@@ -895,19 +883,8 @@ const RENDER_PURE_CORES = [
   'src/render/characters/smooth_normals_core.ts',
   'src/render/drowned_temple/temple_shore_core.ts',
   'src/render/drowned_temple/temple_fx_core.ts',
-  'src/render/stormbrass_foundry/foundry_plan_core.ts',
-  'src/render/stormbrass_foundry/foundry_fx_core.ts',
-  'src/render/stormbrass_foundry/foundry_press_core.ts',
-  'src/render/stormbrass_foundry/foundry_vents_core.ts',
-  // The Foundry's chained workers: the chain's span, links and fall.
-  'src/render/stormbrass_foundry/foundry_worker_fx_core.ts',
-  // The Foundry kit's placement plan (props, edges, trusses, the rail loop, the
-  // pour line, the molten channel, the skyline, the movers and their curves).
-  'src/render/stormbrass_foundry/foundry_kit_plan_core.ts',
-  // The Crane Bridge's swing: the crane's rig and the carried span's pose.
-  'src/render/stormbrass_foundry/foundry_bridge_core.ts',
-  // The Foundry's floor marks (stains, paint, chalk, ruts, craters): where each lies.
-  'src/render/stormbrass_foundry/foundry_floor_plan_core.ts',
+  // The trash kit's death-burst rings: their look and their fuse.
+  'src/render/death_burst_fx_core.ts',
   // The Gravewyrm Sanctum (render/gravewyrm_sanctum): the palette, fires and
   // air spots; the Calving Face's frame, swap seam and stage curves; the
   // story-step memory; the Smith's chains; the kit placement plan; the gates'

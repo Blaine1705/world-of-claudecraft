@@ -34,8 +34,8 @@ import {
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
 import { holdAreaCast } from './cast_hold';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
+import { stepDeathBurst } from './death_burst';
 import { callDownLastFlier } from './flier_call';
-import { landScreen, screenReady, stepDeathBurst } from './foundry_kit';
 import {
   dropToss,
   landGoad,
@@ -65,7 +65,6 @@ const CAST_KEYS = [
   'call',
   'mend',
   'ward',
-  'screen',
   'goad',
   'screech',
   'lullaby',
@@ -260,8 +259,6 @@ function castReady(
         : no;
     case 'lullaby':
       return lullabyReady(mob, kit, st, players);
-    case 'screen':
-      return screenReady(ctx, inst, mob, kit) ? { ok: true, target: null } : no;
     case 'goad': {
       const ally = pickGoadTarget(ctx, inst, mob, kit);
       return ally ? { ok: true, target: ally } : no;
@@ -311,9 +308,6 @@ function landCast(
   switch (key) {
     case 'lullaby':
       landLullaby(ctx, mob, kit, targetId);
-      return;
-    case 'screen':
-      landScreen(ctx, inst, mob, kit);
       return;
     case 'goad':
       landGoad(ctx, mob, kit, targetId);

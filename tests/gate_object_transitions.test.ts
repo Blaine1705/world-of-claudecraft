@@ -1,41 +1,37 @@
 // The object views a template swap leaves standing (render/gate_objects.ts
 // isStableObjectTransition): the renderer rebuilds an object's view when its
-// template changes, except across these pairs.
+// template changes, except across these pairs. And the trash kit's death
+// burst ring is an empty encounter anchor: its floor ring is drawn from the
+// world (render/death_burst_fx.ts), never a default object mesh.
 
 import { describe, expect, it } from 'vitest';
 import { gateObjectPlan, isStableObjectTransition } from '../src/render/gate_objects';
-import {
-  FOUNDRY_OBJECT_TEMPLATES,
-  FOUNDRY_SHELL_MARK,
-  FOUNDRY_SHELL_PENDING,
-  FOUNDRY_SHRAPNEL,
-} from '../src/sim/encounters/stormbrass_foundry/ids';
+import { DEATH_BURST_RING } from '../src/sim/mob/trash_kit/death_burst';
 
 describe('stable object template transitions', () => {
-  it('a Rangewarden shell arming keeps its view; nothing else about a shell does', () => {
-    expect(isStableObjectTransition(FOUNDRY_SHELL_PENDING, FOUNDRY_SHELL_MARK)).toBe(true);
-    expect(isStableObjectTransition(FOUNDRY_SHELL_MARK, FOUNDRY_SHELL_PENDING)).toBe(false);
-    expect(isStableObjectTransition(FOUNDRY_SHELL_PENDING, FOUNDRY_SHRAPNEL)).toBe(false);
-    expect(isStableObjectTransition(FOUNDRY_SHELL_PENDING, 'mailbox')).toBe(false);
-    expect(isStableObjectTransition('mailbox', FOUNDRY_SHELL_MARK)).toBe(false);
-  });
-
-  it('both ends of the stable pair are the same empty encounter anchor', () => {
-    // The premise of skipping the rebuild: were one to leave the set, the kept
-    // view would be the wrong one.
-    expect(FOUNDRY_OBJECT_TEMPLATES.has(FOUNDRY_SHELL_PENDING)).toBe(true);
-    expect(FOUNDRY_OBJECT_TEMPLATES.has(FOUNDRY_SHELL_MARK)).toBe(true);
-    const at = { dungeonId: null, pos: { x: 0, z: 0 } };
-    const pending = gateObjectPlan({ ...at, templateId: FOUNDRY_SHELL_PENDING });
-    const armed = gateObjectPlan({ ...at, templateId: FOUNDRY_SHELL_MARK });
-    expect(pending).toEqual({ encounterAnchor: true, height: 2 });
-    expect(armed).toEqual(pending);
-  });
-
   it('still answers for the Ignivar conduit pairs', () => {
     expect(
       isStableObjectTransition('ignivar_water_conduit_ready', 'ignivar_water_conduit_active'),
     ).toBe(true);
     expect(isStableObjectTransition('ignivar_water_conduit_ready', 'mailbox')).toBe(false);
+  });
+
+  it('a death burst ring is no stable pair with anything', () => {
+    expect(isStableObjectTransition(DEATH_BURST_RING, 'mailbox')).toBe(false);
+    expect(isStableObjectTransition('mailbox', DEATH_BURST_RING)).toBe(false);
+  });
+});
+
+describe('the death burst ring view', () => {
+  it('is an empty encounter anchor wherever it lies', () => {
+    const at = { dungeonId: 'gravewyrm_sanctum', pos: { x: 0, z: 0 } };
+    expect(gateObjectPlan({ ...at, templateId: DEATH_BURST_RING })).toEqual({
+      encounterAnchor: true,
+      height: 2,
+    });
+    expect(gateObjectPlan({ ...at, dungeonId: null, templateId: DEATH_BURST_RING })).toEqual({
+      encounterAnchor: true,
+      height: 2,
+    });
   });
 });

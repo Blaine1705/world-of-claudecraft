@@ -39,8 +39,6 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
-import { tryDropStormCell, tryTakeStormCell } from './encounters/stormbrass_foundry/storm_cells';
-import { tryFreeFoundryWorkers } from './encounters/stormbrass_foundry/workers';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
 import { tryStartEscort } from './escort';
 import { interactIgnivarRaidLore } from './ignivar_raid_lore';
@@ -294,8 +292,6 @@ export function pickUpObject(
     openHoardRewardChest(ctx, obj.id, p.id);
     return true;
   }
-  // The Prime Draft's Storm Cell holds no item: taking it is the carry.
-  if (tryTakeStormCell(ctx, obj, p)) return true;
   const vehicleStation = vehicleStationByEntityId(obj.id);
   if (vehicleStation) return enterVehicle(ctx, vehicleStation.id, p.id);
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
@@ -465,8 +461,6 @@ export function interact(
   // Locked in the Gaol Turnkey's Iron Cage: the interact press is an escape
   // press (rate-limited and counted by the encounter), never anything else.
   if (tryCageStruggle(ctx, p)) return;
-  // Carrying the Prime Draft's Storm Cell: the interact press drops it.
-  if (tryDropStormCell(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (
@@ -524,8 +518,6 @@ export function interact(
         pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
       }
-      // A Stormbrass Foundry worker: "Free them" (encounters/stormbrass_foundry/workers.ts).
-      if (tryFreeFoundryWorkers(ctx, target, p)) return;
       if (talkToWeeklyKeeper(ctx, target, p)) return;
       if (target.kind === 'npc' && ctx.bankerIds.includes(target.id)) {
         // Opening the bank window counts as banker business for the NPC ledger.

@@ -1,6 +1,5 @@
 // Evidence shots of the dungeon encounter prompts (src/ui/hud/dungeon/: the
-// Iron Cage escape, Gaoler Ossick's chain alert, the Stormbrass Foundry's
-// alert) on desktop and on a touch phone, staged in a live offline world by
+// Iron Cage escape and Gaoler Ossick's chain alert) on desktop and on a touch phone, staged in a live offline world by
 // putting the mechanic's aura on the local player (and the body it names on a
 // nearby mob), so the HUD reads exactly what a fight would hand it. Evidence
 // tooling, not a repo test: it checks the prompts' slot clears the action
@@ -8,10 +7,8 @@
 //
 //   node scripts/dungeon_prompts_shot.mjs <outDir> [scenario ...]
 //
-// Scenarios: chain (anchored, the links left), ally (a party member hooked),
-// cell (carrying a Storm Cell into an open hatch), floorcell (a cell on the
-// floor), proof (the Rangewarden's Proof Shot at you, the tank), grounded and
-// charged (the Voltaic Warden's plating, targeted). Env: SHOT_URL
+// Scenarios: chain (anchored, the links left), ally (a party member hooked).
+// Env: SHOT_URL
 // (http://127.0.0.1:5200/), SHOT_VIEWPORT (desktop | mobile), SHOT_PREFIX.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -30,7 +27,7 @@ const VIEW = MOBILE
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const SCENARIOS = ['chain', 'ally', 'cell', 'floorcell', 'proof', 'grounded', 'charged'];
+const SCENARIOS = ['chain', 'ally'];
 
 /** In-page: stage one scenario's auras and bodies; returns a label. */
 function stage(kind) {
@@ -43,8 +40,7 @@ function stage(kind) {
       Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z),
   );
   const body = mobs[0];
-  const other = mobs[1] ?? mobs[0];
-  p.auras = p.auras.filter((a) => !a.id.startsWith('bastion_') && !a.id.startsWith('foundry_'));
+  p.auras = p.auras.filter((a) => !a.id.startsWith('bastion_'));
   const aura = (id, extra) => ({
     id,
     name: id,
@@ -70,43 +66,6 @@ function stage(kind) {
     p.targetId = body.id;
     return `anchor ${body.id}`;
   }
-  if (kind === 'cell') {
-    other.templateId = 'foundry_hatch_open';
-    p.auras.push(aura('foundry_storm_cell_carry', { sourceId: other.id, stacks: 40 }));
-    return 'carry';
-  }
-  if (kind === 'floorcell') {
-    body.templateId = 'prime_draft';
-    other.templateId = 'foundry_storm_cell';
-    other.kind = 'object';
-    // The alert only names a cell within reach: lay it at the player's feet.
-    other.pos.x = p.pos.x + 2;
-    other.pos.z = p.pos.z + 2;
-    p.targetId = body.id;
-    return 'floor cell';
-  }
-  if (kind === 'proof') {
-    body.templateId = 'rangewarden';
-    body.castingAbility = 'foundry_proof_shot';
-    body.castTargetId = p.id;
-    body.castRemaining = 1.2;
-    body.castTotal = 1.5;
-    p.auras.push(aura('foundry_dented_plating', { kind: 'expose', stacks: 2, value: 0.2 }));
-    p.targetId = body.id;
-    return 'proof';
-  }
-  body.templateId = 'voltaic_warden';
-  body.auras = body.auras.filter((a) => !a.id.startsWith('foundry_'));
-  body.auras.push(
-    // The flip countdown rides the plating aura's own clock.
-    aura(kind === 'grounded' ? 'foundry_plating_grounded' : 'foundry_plating_charged', {
-      sourceId: body.id,
-      remaining: 7,
-      duration: 15,
-    }),
-    aura('foundry_stored_charge', { sourceId: body.id, stacks: 900, value2: 2000 }),
-  );
-  p.targetId = body.id;
   return kind;
 }
 
@@ -137,8 +96,8 @@ try {
   await page.evaluate(() => window.__game.world.chat('/dev god'));
   for (const kind of WANT.length ? WANT : SCENARIOS) {
     const label = await page.evaluate(stage, kind);
-    // The Foundry alert's scene scan is keyed on the roster version: a staged
-    // template swap is not a roster change, so say one happened.
+    // An alert's scene scan is keyed on the roster version: a staged template
+    // swap is not a roster change, so say one happened.
     await page.evaluate(() => {
       window.__game.world.entityRosterVersion++;
     });

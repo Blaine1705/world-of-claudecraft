@@ -27,8 +27,8 @@ export type FieldGround =
   // The Wildheart Basin: jungle loam under moss and fern, and wet basalt.
   | 'moss'
   | 'basalt'
-  // The Stormbrass Foundry: riveted steel deck plate, catwalk bar grating,
-  // and soot-stained flagstone.
+  // Steel works: riveted steel deck plate, catwalk bar grating, and
+  // soot-stained flagstone (unused while the Stormbrass Foundry is parked).
   | 'plate'
   | 'grating'
   | 'soot'

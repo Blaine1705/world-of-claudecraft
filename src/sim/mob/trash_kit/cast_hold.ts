@@ -4,7 +4,7 @@
 // the cone or the lane stays where it was drawn and stepping out of it is the
 // counterplay. The mob AI still walks and turns the mob every tick; this runs
 // after it (the trash kit's pass) and undoes the step, the way the Tideglass
-// Colossus and the Gantry Hauler hold their ground for their own bars.
+// Colossus holds its ground for its own bars.
 //
 // The hold rides `Entity.castHold` and dies with the bar (it lands, breaks,
 // or the pull ends). Zero rng.
@@ -14,7 +14,7 @@ import type { SimContext } from '../../sim_context';
 import type { Entity, MobTemplate } from '../../types';
 
 /** Is `castId` one of the template's area casts (the ones it plants for)?
- *  A bolt, a raise, a call, a mend, a ward, a lullaby or a screen tracks its
+ *  A bolt, a raise, a call, a mend, a ward or a lullaby tracks its
  *  target or its allies and is never planted. The trash kit's area casts plant
  *  everywhere; the template's breath cone (a field the open world's dragonkin
  *  and the raids share) only where the dungeon asks (`breath`:

@@ -111,18 +111,16 @@ describe('mob portrait source manifest', () => {
     // trash, the three Mere Hydra heads, the Tideglass Colossus and its ten
     // Reflections, the plain one plus one per class). 321: the Hollow Crypt
     // finale's Knellwyrm. 323: the Sunken Bastion fifth pass's two encounter
-    // bodies (the Turnkey's Iron Cage and Ossick's Drowned Anchor). 337: the
-    // Stormbrass Foundry's fourteen (its four bosses, the Gantry Hauler, Tock's
-    // Half-Built Frame and the eight trash bodies). 347: the Wildheart Basin
-    // rework's ten (the Great Saurian and its Howdah Hexcaller, the Fanglord's
-    // Great Jaguar, the Gorgebloom and its Thorn Sprout, and five trash bodies:
-    // raptor, toad, Snarlvine Lasher, Totem-Binder and its totem). 350: the
-    // Foundry's chained workers (the miner, the hauler and the freed laborer).
-    // 358: the Gravewyrm Sanctum rework's eight trash bodies (Thawcaller,
-    // Goadsmith, Pyre-Tender, Soul Brazier, Rime Whelp, Ogre Sledge-Hauler,
-    // Glacier Splinter and the Sledge Tusker). 362: Korgath's four Seal
-    // Shackles (hammer, tongs, anvil, bellows).
-    expect(liveIds).toHaveLength(362);
+    // bodies (the Turnkey's Iron Cage and Ossick's Drowned Anchor). 333: the
+    // Wildheart Basin rework's ten (the Great Saurian and its Howdah
+    // Hexcaller, the Fanglord's Great Jaguar, the Gorgebloom and its Thorn
+    // Sprout, and five trash bodies: raptor, toad, Snarlvine Lasher,
+    // Totem-Binder and its totem). 341: the Gravewyrm Sanctum rework's eight
+    // trash bodies (Thawcaller, Goadsmith, Pyre-Tender, Soul Brazier, Rime
+    // Whelp, Ogre Sledge-Hauler, Glacier Splinter and the Sledge Tusker). 345:
+    // Korgath's four Seal Shackles (hammer, tongs, anvil, bellows). The
+    // Stormbrass Foundry's seventeen bodies left with the parked dungeon.
+    expect(liveIds).toHaveLength(345);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

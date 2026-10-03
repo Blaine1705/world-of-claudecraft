@@ -3893,10 +3893,6 @@ export const hudChromeStrings = {
         'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
       shackle:
         'Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.',
-      rangefinder:
-        'For {duration} sec, your damage increases by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}% at {maxAt} yd or more.',
-      overclock:
-        'Increase your casting speed by {haste}% for {duration} sec. When it ends you are Overheated: your casting speed is reduced by {slow}% for {overheat} sec.',
       spiritPack:
         'Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.',
       seedburst:
@@ -5169,13 +5165,6 @@ export const hudChromeStrings = {
       shardFlare:
         'The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.',
     },
-    // The Stormbrass Foundry's marks (src/ui/foundry_aura_effect.ts).
-    foundry: {
-      scaldingVents:
-        'You stand on Main Line floor that is not a belt while its vents warn or blow. Once the steam bursts, it deals {min} to {max} Fire damage every {every} sec for {seconds} sec ({heroicMin} to {heroicMax} on Heroic) to anyone not on a belt. Only the belts are safe.',
-      targetLock:
-        'The Rangewarden is tracking you. Every {every} sec a circle is painted where you stand, and {delay} sec later a shell lands on it for {min} to {max} Fire damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. Keep moving. Effects that break snares do not remove this mark.',
-    },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     varkhulSharedPyre:
@@ -5366,10 +5355,6 @@ export const hudChromeStrings = {
       brand: 'Healing received is reduced by {pct}%.',
       shackle: 'Chained in place: cannot move.',
       shackleSlow: 'Chained: movement speed reduced by {pct}%.',
-      rangefinder:
-        'Damage increased by {perStep}% for every {stepYards} yd between you and your target beyond {from} yd, up to {max}%.',
-      overclock: 'Casting speed increased by {pct}%. Overheated follows when it ends.',
-      overheated: 'Casting speed reduced by {pct}%.',
       spiritPack:
         'A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.',
       seedburst:
@@ -8846,25 +8831,6 @@ export const hudChromeStrings = {
       drowned_anchor: 'Drowned Anchor (break the chain before its victim is dragged into the pit)',
       shackle_pair: 'Shackle Pair (two chained players must stay close together)',
       reaper_behind: "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
-      // The Stormbrass Foundry (encounters/stormbrass_foundry).
-      moving_belts: 'Moving Belts (the floor carries you, and reverses on the lever)',
-      stamping_press:
-        'Stamping Press (the hammers ride their rails to the belt riders: step off the painted strip)',
-      scalding_vents:
-        'Scalding Vents (the walkways steam on a rhythm: get onto a belt when they glow)',
-      target_lock: 'Target Lock (keep moving: shells land where you stood)',
-      proof_shot: 'Proof Shot (a heavy shell that dents the tank)',
-      conduction_plating: 'Conduction Plating (hit it with the right damage kind)',
-      static_lash: 'Static Lash (leaps from the tank to anyone close by)',
-      storm_cells: 'Storm Cells (carry a cell into the open Core Hatch)',
-      piston_fist: 'Piston Fist (move out of the marked circle)',
-      tremor_step: 'Tremor Step (keep clear of its feet)',
-      overtime_cross_feed:
-        'Overtime and Cross-Feed (faster belts, neighbors run opposite, two presses strike at once)',
-      walking_barrage: 'Walking Barrage (three marks, and the shells leave shrapnel)',
-      split_plating:
-        'Rapid Cycling and Split Plating (faster flips, its back wears the other face)',
-      double_load: 'Jammed Racks and Double Load (two cells in one hatch window)',
       // The Wildheart Basin rework (encounters/wildheart_basin).
       pack_bond: 'Pack Bond (together they take half damage: drag them 15 yards apart)',
       stalk:
@@ -8928,55 +8894,6 @@ export const hudChromeStrings = {
     linksTarget: '{count} of {total} links',
     linkBroken: 'Link broken!',
   },
-  // The Stormbrass Foundry's encounter alert (src/ui/hud/dungeon/foundry_alert_view.ts):
-  // the Prime Draft's Storm Cell, the Rangewarden's Target Lock and the Voltaic
-  // Warden's plating readout.
-  foundryAlert: {
-    cellName: 'Storm Cell',
-    hatchName: 'Core Hatch',
-    cellTitle: 'Storm Cell (Static: {amount} a second)',
-    cellClosedLine: 'Carry it to the Core Hatch: wait outside the gold ring until it opens',
-    cellWarnLine: 'The Core Hatch is opening: be ready at the gold ring',
-    cellOpenLine: 'Carry it into the open Core Hatch: step into the gold ring now!',
-    dropKey: 'Press {key} to drop the cell for someone else',
-    dropClick: 'Click here to drop the cell for someone else',
-    dropTap: 'Tap here to drop the cell for someone else',
-    dropAria: 'Drop the Storm Cell',
-    cellAria: 'Time before the cell shorts out: {pct}',
-    lockTitle: 'Target Lock!',
-    lockLine: 'Keep moving: the shells land where you stood a moment ago',
-    lockAria: 'Target Lock time left: {pct}',
-    // The Rangewarden's Proof Shot, to the tank it aims at and to anyone
-    // targeting the Rangewarden while the bar runs.
-    proofTitle: 'Proof Shot!',
-    proofLine: 'A heavy shell at the tank: use a defensive or taunt swap',
-    dentedLine: 'Dented Plating x{stacks}: +{pct} physical damage taken',
-    proofAria: 'Proof Shot: {pct}',
-    // A Storm Cell lying on the Gantry floor near the player.
-    floorCellTitle: 'Storm Cell on the floor!',
-    floorCellLine: 'Take a Storm Cell (interact or click)',
-    floorCellLineTouch: 'Take a Storm Cell (tap it)',
-    floorCellHint: 'Then carry it into the Core Hatch when it opens',
-    groundedTitle: 'Copper face: weapons land',
-    groundedLine: 'Physical damage lands; spells are stored as charge',
-    groundedDronesLine: 'Spells are turned aside: hit the drones',
-    chargedTitle: 'Blue face: spells land',
-    chargedLine: 'Spells land; physical damage is stored as charge',
-    chargedDronesLine: 'Weapons are turned aside: hit the drones',
-    splitLine: 'Its back half wears the other face',
-    // Line-Master Tock's Scalding Vents, while you stand on a walkway.
-    ventWarnTitle: 'Scalding Vents!',
-    ventWarnLine: 'Steam bursts from the walkways: step onto a belt now',
-    ventScaldTitle: 'Scalding steam!',
-    ventScaldLine: 'The walkway is scalding you: get onto a belt',
-    ventAria: 'Vent time left: {pct}',
-    flipIn: 'The plates flip in {seconds} seconds',
-    flipInSplit: 'The plates flip in {seconds} seconds; the back half wears the other face',
-    flipNow: 'The plates are flipping: the Stored Charge is released!',
-    storedAria: 'Stored Charge {pct}: released at the flip',
-    // Floating combat text over a plated body that turned a hit aside.
-    turnedAside: 'Turned aside',
-  },
   // The Wildheart Basin's encounter alert (src/ui/hud/dungeon/wildheart_alert_view.ts).
   wildheartAlert: {
     preyTitle: 'You are the Prey!',
@@ -9031,19 +8948,6 @@ export const hudChromeStrings = {
     lockboundLine:
       '{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.',
     timeAria: '{seconds} seconds left',
-  },
-  // The Stormbrass Foundry's chained workers' gossip (src/ui/hud/dungeon/
-  // foundry_worker_gossip_core.ts, painted by the quest dialog): the line a
-  // worker says in each camp phase and the one button, offered once the
-  // camp's guards are dead. Wordy (M16): non-Latin fills here.
-  foundryWorkers: {
-    guardedLine:
-      'Not now, friend, not while the guards are watching. If they see us talking, it is the press for all of us.',
-    unguardedLine:
-      'The guards are down? Then please, strike these chains while we still have the nerve to run!',
-    freedLine: 'Free! We are going home. Thank you, friend, thank you!',
-    free: 'Free them',
-    freeAria: 'Free {name} and the others chained at this camp',
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and

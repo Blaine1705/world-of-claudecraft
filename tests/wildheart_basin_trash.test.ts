@@ -5,8 +5,7 @@
 // with its root, the Ravager's enrage), plus the Great Saurian's showpiece kit
 // (src/sim/encounters/wildheart_basin/great_saurian.ts): Tail Swipe, the
 // Earthshaking Stomp, the Howdah Rider and the Enrage. Driven through
-// tickTrashKits / tickWildheartEncounters inside a real claimed Basin (the
-// Foundry trash test's shape).
+// tickTrashKits / tickWildheartEncounters inside a real claimed Basin.
 
 import { describe, expect, it } from 'vitest';
 import { WILDHEART_BASIN_SPAWNS } from '../src/sim/content/wildheart';

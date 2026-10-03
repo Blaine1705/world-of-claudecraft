@@ -366,7 +366,7 @@ describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () =
   });
 
   it('stamps the heroic boss mechanic multiplier from the per-mob override', () => {
-    // Korzul's landed kit at the Foundry's heroic boss factor (2.5): the
+    // Korzul's landed kit at the five-man heroic boss factor (2.5): the
     // quench-water lands 150 a second.
     const boss = createMob(1, MOBS.korzul_the_gravewyrm, 22, { x: 0, y: 0, z: 0 });
     applyDungeonMobTuning(boss, SANCTUM, 'heroic');

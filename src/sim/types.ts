@@ -2033,8 +2033,7 @@ export interface MobTemplate {
   scale: number; // render hint
   /** A big body's reach from its pivot to the edge players stand at (yards).
    *  Set on the towering bosses and the dungeons' great non-boss bodies (the
-   *  Gantry Hauler, the Turretback Hermit, the Mere Hydra's heads, the Great
-   *  Saurian): a player's melee reaches it from bodyRadius +
+   *  Turretback Hermit, the Mere Hydra's heads, the Great Saurian): a player's melee reaches it from bodyRadius +
    *  3 (combat/player_attack_reach.ts) instead of the stock 5 yd that put them
    *  inside the model, and the boss's own swing reaches one yard past that
    *  (mob_combat.ts), so nobody can hit it from outside its reach. */
@@ -4196,10 +4195,10 @@ export interface TrashKitDef {
     range: number;
     healPct: number;
     below: number;
-    /** Only allies of this family (the Foundry Engineer repairs automata). */
+    /** Only allies of this family. */
     family?: MobFamily;
-    /** Never these templates (the Foundry Engineer repairs trash automata,
-     *  never the Gantry Hauler or a boss it is pulled beside). */
+    /** Never these templates (a mender that tends trash only, never the
+     *  great body or the boss it is pulled beside). */
     exclude?: readonly string[];
   };
   /** An interruptible absorb shield on the most injured unshielded ally in
@@ -4228,13 +4227,10 @@ export interface TrashKitDef {
   /** Once per pull under a share of its health: a self absorb shield worth a
    *  share of its maximum health (the Pearlguard Sentinel's Pearl Carapace). */
   carapace?: { belowHpPct: number; shieldPct: number; seconds: number; name: string };
-  /** An interruptible screen over every ally in the fight near the caster: an
-   *  absorb shield on each worth a share of its own maximum health (the
-   *  Shieldbearer Frame's Steam Screen). Starts while an ally near it is bare. */
-  screen?: TrashKitCast & { radius: number; shieldPct: number; duration: number };
   /** It bursts where it fell, `delay` seconds after it dies (0: at once): a
-   *  splash round the corpse (the Steam Bruiser's Boiler Burst, the Arc Drone's
-   *  Arc Pop). A delayed burst paints its ring on the floor while it builds. */
+   *  splash round the corpse (the Rime Whelp's Hoarfrost Pop, the Glacier
+   *  Splinter's Shatter). A delayed burst paints its ring on the floor while
+   *  it builds. */
   deathBurst?: {
     castId: string;
     name: string;
@@ -4586,181 +4582,6 @@ export type TempleFightState =
   | ColossusFightState
   | YsoleiFightState;
 
-/** The Gantry Hauler's pull (encounters/stormbrass_foundry/gantry_hauler.ts),
- *  on the Hauler; cleared when the pull ends (a kill, an evade, a wipe). */
-export interface HaulerFightState {
-  kind: 'hauler';
-  blastTimer: number;
-  tossTimer: number;
-  /** The Steam Blast's locked aim while its bar runs. */
-  blastYaw: number | null;
-  /** Scrap Tosses in flight: the plate's floor mark and the seconds to impact. */
-  tosses: { x: number; z: number; remaining: number; objectId: number }[];
-  /** Unload already dumped its drones this pull. */
-  unloaded: boolean;
-  /** Mechanic casts started (the deterministic salt). */
-  casts: number;
-  /** Anyone struck by a Scrap Toss this pull (phase 2's deed reads it). */
-  struck: boolean;
-  /** Where it braced its tracks for the Steam Blast in flight (world
-   *  coordinates), so the cone lands where it was drawn. */
-  plantedAt: { x: number; y: number; z: number } | null;
-}
-
-/** Line-Master Ambrel Tock's fight (encounters/stormbrass_foundry/
- *  line_master.ts): the belts, the lever, the press, the parts drops. */
-export interface TockFightState {
-  kind: 'tock';
-  /** Each belt's run, west to east: +1 toward the press, -1 back to the chute. */
-  dirs: number[];
-  leverTimer: number;
-  /** The belts the lever in flight will reverse (all four, or heroic
-   *  Cross-Feed's two). */
-  flipping: number[];
-  pressTimer: number;
-  /** The hammers coming down (one per belt at most): the belt, the strip's
-   *  centre (a rail stop, instance-local z), the seconds left, its strip. */
-  presses: { belt: number; zc: number; remaining: number; objectId: number }[];
-  /** The Scalding Vents' cycle: off (timer = seconds to the next warning),
-   *  warn or scald (timer = seconds left in the phase; tick = seconds to the
-   *  next scald tick), and the walkway strips while they run. */
-  vent: {
-    phase: 'off' | 'warn' | 'scald';
-    timer: number;
-    tick: number;
-    objectIds: number[];
-    /** Warnings this fight (the first draws his yell). */
-    cycles: number;
-  };
-  rivetTimer: number;
-  /** Parts Drop thresholds already fired. */
-  dropsFired: number;
-  /** Frames on the belts still booting: the add and its seconds left. */
-  frames: { id: number; boot: number }[];
-  /** Lever throws this fight (the heroic Cross-Feed salt). */
-  levers: number;
-  casts: number;
-  /** Anyone caught by the Stamping Press this fight (the deed reads it). */
-  pressed: boolean;
-}
-
-/** The Rangewarden's fight (encounters/stormbrass_foundry/rangewarden.ts). */
-export interface RangewardenFightState {
-  kind: 'rangewarden';
-  lockTimer: number;
-  /** The marked players: whose, the seconds left, the clock to the next
-   *  circle painted under them. */
-  marks: {
-    playerId: number;
-    remaining: number;
-    shellTimer: number;
-  }[];
-  /** The painted circles: where they land (never moving), the seconds left,
-   *  their object, and whether the berm gun has fired (the red beat). */
-  shells: { x: number; z: number; remaining: number; objectId: number; fired: boolean }[];
-  /** Heroic shrapnel on the ground: where, the seconds left, the tick clock. */
-  shrapnel: { x: number; z: number; remaining: number; tick: number; objectId: number }[];
-  /** Shells each bunker has swallowed this Target Lock. */
-  bunkerHits: number[];
-  proofTimer: number;
-  drillsFired: number;
-  casts: number;
-  /** Any player hit by a salvo this fight (the deed reads it). */
-  shelled: boolean;
-}
-
-/** The Voltaic Warden's fight (encounters/stormbrass_foundry/voltaic_warden.ts). */
-export interface VoltaicFightState {
-  kind: 'voltaic';
-  /** The plates' face (heroic Split Plating: the front's; the back is the other). */
-  plating: 'grounded' | 'charged';
-  /** Seconds to the next flip (the rattle bar starts flipCast before it). */
-  flipTimer: number;
-  /** Wrong-kind damage banked since the last flip. */
-  stored: number;
-  dronesTimer: number;
-  /** The drones it launched (they carry the opposite plating). */
-  droneIds: number[];
-  lashTimer: number;
-  strikeTimer: number;
-  /** Coil strikes about to land: where, the seconds left, their mark. */
-  strikes: { x: number; z: number; remaining: number; objectId: number }[];
-  casts: number;
-  /** A Discharge dealt damage this fight (the deed reads it). */
-  discharged: boolean;
-}
-
-/** One Storm Cell in the Prime Draft's fight. */
-export interface StormCellState {
-  /** Its floor object while it lies on the floor (null while carried). */
-  objectId: number | null;
-  /** Its carrier (null on the floor). */
-  carrierId: number | null;
-  /** Seconds since its rack ejected it (it shorts out at cellLife). */
-  age: number;
-  /** Seconds the current carrier has held it (Static rises with it). */
-  held: number;
-  /** One Static tick a second. */
-  tick: number;
-  /** Heroic Jammed Racks: seconds it still rolls, and its heading. */
-  roll: number;
-  rollYaw: number;
-  /** Who dropped it last, and the sim time they may take it back. */
-  droppedBy: number | null;
-  retakeAt: number;
-}
-
-/** The Prime Draft's fight (encounters/stormbrass_foundry/prime_draft.ts). */
-export interface PrimeDraftFightState {
-  kind: 'prime_draft';
-  phase: 'awaken' | 'bolted' | 'unbolted' | 'heartless';
-  fistTimer: number;
-  /** Piston Fists about to land: where, the seconds left, their mark. */
-  fists: { x: number; z: number; remaining: number; objectId: number }[];
-  sweepTimer: number;
-  /** The Arm Sweep's locked aim while its bar runs. */
-  sweepYaw: number | null;
-  tremorTimer: number;
-  surgeTimer: number;
-  cycleTimer: number;
-  /** Charge cycles started (alternates the racks). */
-  cycles: number;
-  cells: StormCellState[];
-  /** The hatch window in flight: seconds since the ejection that opened it,
-   *  and the cells slotted in it (heroic Double Load waits for two). */
-  hatch: { t: number; slotted: number } | null;
-  /** The hatch ring's object (its state rides the template id). */
-  hatchId: number | null;
-  /** Overloads this fight (the deed reads it). */
-  overloads: number;
-  enraged: boolean;
-  /** Where it stands while bolted or braced for a bar (world coordinates). */
-  plantedAt: { x: number; y: number; z: number } | null;
-  casts: number;
-}
-
-export type FoundryFightState =
-  | HaulerFightState
-  | TockFightState
-  | RangewardenFightState
-  | VoltaicFightState
-  | PrimeDraftFightState;
-
-/** A Stormbrass Foundry worker camp in one run (encounters/stormbrass_foundry/
- *  workers.ts), kept on the camp's state object. */
-export interface FoundryWorkerCampState {
-  camp: 'A' | 'B' | 'C';
-  phase: 'guarded' | 'unguarded' | 'freed';
-  /** The camp's living workers, in spawn order (a freed one leaves the list
-   *  as it walks off and vanishes). */
-  workerIds: number[];
-  /** Sim time the chains came off (0 until then). */
-  freedAt: number;
-  /** Per hauler (by entity id): the leg it walks (0 to the cart, 1 back to the
-   *  heap) and the seconds it still rests at the leg's end. */
-  haul: Record<number, { leg: 0 | 1; rest: number }>;
-}
-
 /** The Great Saurian's pull (encounters/wildheart_basin/great_saurian.ts), on
  *  the Saurian; cleared when the pull ends (a kill, an evade, a wipe). */
 export interface SaurianFightState {
@@ -4991,12 +4812,6 @@ export type DungeonGateKind =
   | 'water_veil'
   | 'light_bridge'
   | 'sunken_stair'
-  // The Stormbrass Foundry: a brass shutter that lifts in a burst of steam, a
-  // crackling lightning fence that powers down, and a gantry bridge that
-  // swings out and extends over the gulf.
-  | 'steam_shutter'
-  | 'arc_fence'
-  | 'crane_bridge'
   // The Wildheart Basin: vines that weave themselves into a bridge over the
   // gorge, and a hedge of thorns that recedes into the ground.
   | 'vine_bridge'
@@ -5124,7 +4939,6 @@ export interface DungeonDef {
     | 'hollow_crypt'
     | 'sunken_bastion'
     | 'drowned_temple'
-    | 'stormbrass_foundry'
     | 'gravewyrm_sanctum'
     | 'lastkeep'
     | 'dawnhold';
@@ -5623,8 +5437,7 @@ export interface QuestDef {
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   // Offered only while this dungeon is public: a quest that points into a
   // development-only room (DungeonDef.guideVisible false, the Crucible raid's
-  // flag) stays unavailable until that room ships (the Stormbrass Foundry's
-  // hand-off). Enforced in computeQuestState, so both hosts share it.
+  // flag) stays unavailable until that room ships. Enforced in computeQuestState, so both hosts share it.
   gatedWithDungeon?: string;
   // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
   // includes worn equipment and bag sockets (quests/quest_owned_count.ts) and the
@@ -6915,11 +6728,6 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */
   templeFight?: TempleFightState;
-  /** Per-fight state of a Stormbrass Foundry encounter (encounters/
-   *  stormbrass_foundry: the Gantry Hauler, and the bosses in phase 2). Sim
-   *  authority only; the client reads the fight from casts, auras and the
-   *  encounter objects. */
-  foundryFight?: FoundryFightState;
   /** Per-fight state of a Wildheart Basin encounter (encounters/wildheart_basin:
    *  the Great Saurian, and the bosses in phase B). Sim authority only; the
    *  client reads the fight from casts, auras and the encounter objects. */
@@ -6929,7 +6737,7 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and objects. */
   sanctumFight?: SanctumFightState;
   /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
-   *  mob/trash_kit/foundry_kit.ts): seconds left, its floor ring, and whether it
+   *  mob/trash_kit/death_burst.ts): seconds left, its floor ring, and whether it
    *  has gone off. A death cloud (trashKit.deathCloud, wildheart_kit.ts) rides
    *  the same record: seconds the cloud still stands, its floor object, and
    *  whether it has faded. Sim authority only. */
@@ -6943,11 +6751,6 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Knellwyrm flying in): inert, non-hostile and out of combat, the mob AI
    *  skips it and the encounter moves it, until the script hands it back. */
   encounterHeld?: boolean;
-  /** A Stormbrass Foundry worker camp's run state, on the camp's state object
-   *  (encounters/stormbrass_foundry/workers.ts): its camp, its workers' entity
-   *  ids, its phase (mirrored in the object's template id for the client),
-   *  when it was freed, and each hauler's leg of its loop. Sim authority only. */
-  foundryWorkerCamp?: FoundryWorkerCampState;
   /** A Tideglass Reflection's owner: the player it mirrors and fights, who
    *  cannot hurt it (encounters/drowned_temple/reflection_guard.ts). Sim only;
    *  the client reads the owner from the Reflection's forcedTargetId. */

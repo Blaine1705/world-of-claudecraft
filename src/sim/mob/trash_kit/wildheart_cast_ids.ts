@@ -1,6 +1,6 @@
 // The Wildheart Basin trash kit's cast ids, as a dependency-free leaf (the
 // Hollow Crypt's live in cast_ids.ts, the Bastion's in bastion_cast_ids.ts, the
-// Temple's in temple_cast_ids.ts, the Foundry's in foundry_cast_ids.ts): the
+// Temple's in temple_cast_ids.ts): the
 // content (wildheart.ts), the kit driver, the interrupt table
 // (mob/healer_channel.ts) and the renderer's telegraph table all key on these.
 

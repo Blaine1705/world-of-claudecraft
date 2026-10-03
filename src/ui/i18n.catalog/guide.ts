@@ -1998,8 +1998,6 @@ export const guideStrings = {
       "A hidden glacier high on Thornpeak, where a dragon lies frozen in the ice and the cult burns stolen souls to thaw it. Descend from the high pass past ice towers, the Smith's broken chains and the cult's fires to the frozen lake at the glacier's foot.",
     wildheartBody:
       'A hidden jungle caldera behind the Sunken Idol, ringed by cliffs and loud with waterfalls. Wade the river ford, hunt through the terraces and the falls, cross the ruined colony and climb the stepped shrine under a colossal stone jaguar.',
-    foundryBody:
-      'A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',

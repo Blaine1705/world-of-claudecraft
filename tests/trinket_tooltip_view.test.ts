@@ -111,12 +111,6 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
       'Equip: Each attack you parry, dodge or block adds a heat stack, up to 10. Heat lasts 30 sec, refreshed whenever you gain a stack.',
     use: 'Use: Spend all heat stacks on a fire nova that deals 8 (+25) Fire damage per stack (330 at 10 stacks) to each enemy within 10 yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack. (1 min cooldown)',
   },
-  rangefinders_lens: {
-    use: 'Use: For 12 sec, your damage increases by 1% for every 2 yd between you and your target beyond 10 yd, up to 10% at 30 yd or more. (2 min cooldown)',
-  },
-  overclocked_governor: {
-    use: 'Use: Increase your casting speed by 25% for 10 sec. When it ends you are Overheated: your casting speed is reduced by 10% for 5 sec. (2 min cooldown)',
-  },
   foremans_last_link: {
     use: 'Use: Chain yourself to a friendly player within 20 yd for 10 sec. 30% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you. (2 min cooldown)',
   },
