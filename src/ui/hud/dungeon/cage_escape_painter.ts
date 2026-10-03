@@ -45,7 +45,7 @@ export class CageEscapePrompt {
     w.setText(slots.title, view.title);
     w.setText(slots.prompt, view.prompt);
     w.setText(slots.key, view.key);
-    w.setDisplay(slots.key, view.key ? 'inline-flex' : 'none');
+    w.setStyleProp(slots.key, 'display', view.key ? 'inline-flex' : 'none');
     w.setWidth(slots.fill, `${(view.progress * 100).toFixed(1)}%`);
     w.setAttr(root, 'aria-label', view.buttonAria);
     w.setAttr(slots.bar, 'aria-valuenow', String(Math.round(view.progress * 100)));

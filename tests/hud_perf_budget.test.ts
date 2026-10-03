@@ -775,13 +775,14 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     reflowAllow: {},
   },
   // Gaoler Ossick's chain alert (hud/dungeon/) builds its self-mounted panel
-  // skeleton ONCE (five construction-only class assignments and the progress
+  // skeleton ONCE in ensureRoot (seven construction-only class assignments: the
+  // root, title, links-left count, line, hint, bar and fill; plus the progress
   // bar's three build-time role/range attributes); every per-frame value (the
-  // kind classes, texts, the fill width, the live aria values) rides the
-  // elided writers.
+  // kind classes, texts, the count and hint visibility, the fill width, the
+  // live aria values) rides the elided writers.
   {
     file: 'hud/dungeon/gaol_chain_painter.ts',
-    allow: { '.className': 5, '.setAttribute': 3 },
+    allow: { '.className': 7, '.setAttribute': 3 },
     reflowAllow: {},
   },
   // The shared encounter alert (hud/dungeon/, the Wildheart Basin's and the

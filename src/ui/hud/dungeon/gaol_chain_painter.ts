@@ -45,10 +45,10 @@ export class GaolChainAlert {
     for (const k of KINDS) w.toggleClass(root, `is-${k}`, view.kind === k);
     w.setText(slots.title, view.title);
     w.setText(slots.count, view.count);
-    w.setDisplay(slots.count, view.count ? '' : 'none');
+    w.setStyleProp(slots.count, 'display', view.count ? '' : 'none');
     w.setText(slots.line, view.line);
     w.setText(slots.hint, view.hint);
-    w.setDisplay(slots.hint, view.hint ? '' : 'none');
+    w.setStyleProp(slots.hint, 'display', view.hint ? '' : 'none');
     w.setWidth(slots.fill, `${(view.progress * 100).toFixed(1)}%`);
     w.setAttr(slots.bar, 'aria-valuenow', String(Math.round(view.progress * 100)));
     w.setAttr(slots.bar, 'aria-valuetext', view.progressAria);

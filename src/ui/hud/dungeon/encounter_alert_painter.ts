@@ -67,7 +67,7 @@ export class EncounterAlert {
     w.setDisplay(slots.hint, view.hint ? 'flex' : 'none');
     w.setText(slots.hintText, view.hint);
     w.setText(slots.key, view.key);
-    w.setDisplay(slots.key, view.key ? 'inline-flex' : 'none');
+    w.setStyleProp(slots.key, 'display', view.key ? 'inline-flex' : 'none');
     w.setAttr(root, 'aria-label', view.buttonAria);
     w.setDisplay(slots.bar, view.progress === null ? 'none' : 'block');
     const progress = view.progress ?? 0;
@@ -75,7 +75,7 @@ export class EncounterAlert {
     w.setAttr(slots.bar, 'aria-valuenow', String(Math.round(progress * 100)));
     w.setAttr(slots.bar, 'aria-valuetext', view.progressAria);
     w.setText(slots.barLabel, view.barLabel ?? '');
-    w.setDisplay(slots.barLabel, view.barLabel ? 'block' : 'none');
+    w.setStyleProp(slots.barLabel, 'display', view.barLabel ? 'block' : 'none');
   }
 
   dispose(): void {
