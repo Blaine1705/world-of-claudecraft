@@ -821,6 +821,7 @@ const RENDER_PURE_CORES = [
   // set-dressing and gate-memory cores (docs/design/dungeon-rework).
   'src/render/authored_field/field_mesh_core.ts',
   'src/render/authored_field/field_clip_core.ts',
+  'src/render/authored_field/field_skirt_core.ts',
   'src/render/hollow_crypt/crypt_plan_core.ts',
   'src/render/hollow_crypt/crypt_kit_plan_core.ts',
   'src/render/hollow_crypt/crypt_trash_fx_core.ts',

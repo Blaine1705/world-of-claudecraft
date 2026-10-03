@@ -35,5 +35,10 @@ Rules:
   surface cut into an earlier, higher one (a moat, a ramp) is drawn where it is
   walked. `tests/authored_field_floor_sweep.test.ts` sweeps every field and fails
   on any drawn-versus-walked mismatch; run it after any layout edit.
+- The rock skirt follows the same ownership: it stands only along the stretch of
+  an outline whose ground the surface still owns (`field_skirt_core.ts`), so a
+  later stair cut down through a lip draws no wall across itself, and a skirt's
+  flare never leans over a neighbouring floor. The same sweep fails on any drawn
+  face that crosses a body's height over walkable floor without a collider.
 - Tests: `tests/authored_field.test.ts` (height, cliffs, colliders) and the
   dungeon route contract `tests/hollow_crypt_route.test.ts`.

@@ -29,6 +29,7 @@ import {
   ringBox,
   subtractAll,
 } from './field_clip_core';
+import { ownedSkirtRing } from './field_skirt_core';
 
 export interface FieldMeshData {
   positions: number[];
@@ -797,6 +798,38 @@ function planRisers(
   }
 }
 
+/** The longest outward flare (up to `push`) that keeps a skirt vertex at
+ *  height `y`, and the faces it shares with its neighbours `side` yards
+ *  either way along the outline, from standing over a walkable floor they
+ *  would rise through. */
+function flareClear(
+  def: AuthoredFieldDef,
+  ex: number,
+  ez: number,
+  n: readonly [number, number],
+  y: number,
+  push: number,
+  side: number,
+): number {
+  const clear = (x: number, z: number): boolean => {
+    const floor = authoredFieldHeight(def, x, z);
+    return floor <= def.voidHeight + 0.5 || y < floor - 0.5;
+  };
+  let p = push;
+  for (let k = 0; k < 5; k++) {
+    const x = ex + n[0] * p;
+    const z = ez + n[1] * p;
+    if (
+      clear(x, z) &&
+      clear(x - n[1] * side, z + n[0] * side) &&
+      clear(x + n[1] * side, z - n[0] * side)
+    )
+      return p;
+    p *= 0.5;
+  }
+  return 0;
+}
+
 /**
  * The rock under every surface: its outline dropped as one closed skirt, pinned
  * at the walkable edge (the wall you collide with is the wall you see), straight
@@ -813,6 +846,11 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
     let ring = densify(renderOutline(s), opts.columnStep);
     if (signedArea(ring) < 0) ring = ring.reverse();
     planRisers(def, index, ring, out, paint);
+    // The skirt stands only where this surface owns the ground inside its
+    // outline: a later surface across it (a stair cut down through the lip)
+    // draws its own sides there (field_skirt_core.ts).
+    const skirt = ownedSkirtRing(def, index, ring);
+    ring = skirt.ring;
     const shallow = opts.shallow?.surfaces.has(s.id) ? opts.shallow.depth : 0;
     const n = ring.length;
     const tops: number[] = [];
@@ -831,6 +869,10 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
       normals.push([nx, nz]);
       const top = surfaceTopHeight(s, x, z);
       tops.push(top);
+      if (!skirt.owned[i]) {
+        bottoms.push(top);
+        continue;
+      }
       const outside = authoredFieldHeight(def, x + nx * 0.8, z + nz * 0.8);
       const open = outside <= def.voidHeight + 0.5;
       bottoms.push(
@@ -856,7 +898,12 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
         const jag = straight
           ? 0
           : (fieldNoise(ex * 0.35 + y * 0.21, ez * 0.35 - y * 0.17, 3) - 0.3) * 2.6;
-        const push = straight ? 0 : Math.max(0, depth * opts.flare + jag);
+        const flare = straight ? 0 : Math.max(0, depth * opts.flare + jag);
+        // The massif never flares out over a neighbouring walkable floor at
+        // or below the rock's height (it would stand through that floor's
+        // walk): it pulls back toward its own lip there.
+        const push =
+          flare > 0 ? flareClear(def, ex, ez, normals[k], y, flare, opts.columnStep * 0.6) : 0;
         const x = ex + normals[k][0] * push;
         const z = ez + normals[k][1] * push;
         const run = { style } as FieldCliffRun;
@@ -869,6 +916,8 @@ export function planFieldCliffs(def: AuthoredFieldDef, opts: FieldCliffOptions):
     const stride = n + 1;
     for (let r = 0; r < rows; r++) {
       for (let i = 0; i < n; i++) {
+        // No face between two left-out columns (a later surface's ground).
+        if (!skirt.owned[i] && !skirt.owned[(i + 1) % n]) continue;
         const i0 = base + r * stride + i;
         const i1 = i0 + 1;
         const i2 = i0 + stride;

@@ -23,6 +23,7 @@ import {
 import {
   drawnTopAt,
   type FieldMeshData,
+  planFieldCliffs,
   planFieldTops,
   renderOutline,
   triangulatePolygon,
@@ -42,8 +43,11 @@ import {
 import { WILDHEART_BASIN_FIELD } from '../src/sim/content/wildheart_basin_layout';
 import {
   type AuthoredFieldDef,
+  authoredFieldCliffRuns,
   authoredFieldHeight,
   authoredFieldSurfaceAt,
+  CLIFF_HALF_DEPTH,
+  type FieldCliffRun,
 } from '../src/sim/instances/authored_field';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
 
@@ -176,6 +180,174 @@ describe('an authored field is walked where it is drawn', () => {
         expect(misses.length, describeMisses(misses)).toBe(0);
       });
     }
+  }
+});
+
+/** A drawn rock face is a wall a body walks into where it crosses a body's
+ *  height over a walkable floor; there it must stand on a cliff run (the
+ *  generated collider) or inside a prop's or an authored wall's footprint. */
+const BODY_LOW = MAX_STEP_HEIGHT + 0.25;
+const BODY_HIGH = 2.2;
+
+/** Is (x, z) within a body's reach of a collider: a cliff run (the
+ *  generated wall), a prop's footprint or an authored wall? The runs are
+ *  bucketed on an 8 yd grid so a sweep reads only the ones nearby. */
+function colliderProbe(def: AuthoredFieldDef, runs: FieldCliffRun[]) {
+  const reach = CLIFF_HALF_DEPTH + 0.5;
+  const CELL = 8;
+  const buckets = new Map<string, FieldCliffRun[]>();
+  for (const r of runs) {
+    for (
+      let cx = Math.floor((Math.min(r.ax, r.bx) - reach) / CELL);
+      cx <= Math.floor((Math.max(r.ax, r.bx) + reach) / CELL);
+      cx++
+    )
+      for (
+        let cz = Math.floor((Math.min(r.az, r.bz) - reach) / CELL);
+        cz <= Math.floor((Math.max(r.az, r.bz) + reach) / CELL);
+        cz++
+      ) {
+        const key = `${cx},${cz}`;
+        const list = buckets.get(key) ?? [];
+        list.push(r);
+        buckets.set(key, list);
+      }
+  }
+  return (x: number, z: number): boolean => {
+    for (const r of buckets.get(`${Math.floor(x / CELL)},${Math.floor(z / CELL)}`) ?? []) {
+      const dx = r.bx - r.ax;
+      const dz = r.bz - r.az;
+      const l2 = dx * dx + dz * dz || 1;
+      const t = Math.max(0, Math.min(1, ((x - r.ax) * dx + (z - r.az) * dz) / l2));
+      if (Math.hypot(r.ax + dx * t - x, r.az + dz * t - z) < reach) return true;
+    }
+    for (const o of [...def.props, ...def.walls]) {
+      const ox = x - o.x;
+      const oz = z - o.z;
+      if ('r' in o && o.r !== undefined && o.r > 0) {
+        if (Math.hypot(ox, oz) < o.r + 0.5) return true;
+        continue;
+      }
+      if (o.hw === undefined || o.hd === undefined) continue;
+      const c = Math.cos(o.rot ?? 0);
+      const s = Math.sin(o.rot ?? 0);
+      if (Math.abs(ox * c - oz * s) < o.hw + 0.5 && Math.abs(ox * s + oz * c) < o.hd + 0.5)
+        return true;
+    }
+    return false;
+  };
+}
+
+/** Points of the drawn cliff faces that stand through a body's height over
+ *  a walkable floor with no collider under them. */
+function wallsWalkedThrough(def: AuthoredFieldDef): string[] {
+  const mesh = planFieldCliffs(def, {
+    voidFloor: def.voidHeight - 25,
+    columnStep: 1.6,
+    rowStep: 3,
+    flare: 0.22,
+  });
+  const underCollider = colliderProbe(def, authoredFieldCliffRuns(def));
+  const range = floorRange(def);
+  const p = mesh.positions;
+  const found = new Map<string, string>();
+  for (let t = 0; t < mesh.indices.length; t += 3) {
+    const v = [0, 1, 2].map((k) => {
+      const i = mesh.indices[t + k] * 3;
+      return [p[i], p[i + 1], p[i + 2]];
+    });
+    // Cheap reject: the floors under the triangle's footprint (a 1 yd grid,
+    // padded a cell) never put it in a body's band.
+    const [lo, hi] = range(
+      Math.min(v[0][0], v[1][0], v[2][0]),
+      Math.max(v[0][0], v[1][0], v[2][0]),
+      Math.min(v[0][2], v[1][2], v[2][2]),
+      Math.max(v[0][2], v[1][2], v[2][2]),
+    );
+    if (hi <= def.voidHeight + 1) continue;
+    if (Math.max(v[0][1], v[1][1], v[2][1]) < lo + BODY_LOW) continue;
+    if (Math.min(v[0][1], v[1][1], v[2][1]) > hi + BODY_HIGH) continue;
+    const [a, b1, c] = v;
+    const span = Math.max(
+      Math.hypot(a[0] - b1[0], a[1] - b1[1], a[2] - b1[2]),
+      Math.hypot(b1[0] - c[0], b1[1] - c[1], b1[2] - c[2]),
+      Math.hypot(c[0] - a[0], c[1] - a[1], c[2] - a[2]),
+    );
+    const n = Math.max(2, Math.ceil(span / 0.5));
+    for (let i = 0; i <= n; i++) {
+      for (let j = 0; j <= n - i; j++) {
+        const u = i / n;
+        const w = j / n;
+        const r = 1 - u - w;
+        const x = a[0] * r + b1[0] * u + c[0] * w;
+        const y = a[1] * r + b1[1] * u + c[1] * w;
+        const z = a[2] * r + b1[2] * u + c[2] * w;
+        if (y < lo + BODY_LOW || y > hi + BODY_HIGH) continue;
+        const floor = authoredFieldHeight(def, x, z);
+        if (floor <= def.voidHeight + 1) continue;
+        if (y < floor + BODY_LOW || y > floor + BODY_HIGH) continue;
+        if (underCollider(x, z)) continue;
+        const key = `${Math.round(x)},${Math.round(z)}`;
+        if (!found.has(key))
+          found.set(
+            key,
+            `(${x.toFixed(1)}, ${z.toFixed(1)}) face at ${y.toFixed(2)} over ${authoredFieldSurfaceAt(def, x, z)?.id} at ${floor.toFixed(2)}`,
+          );
+      }
+    }
+  }
+  return [...found.values()];
+}
+
+/** The lowest and highest walkable floor over a box of the field (a 1 yd
+ *  grid padded a cell; the void is no floor: an all-void box reads void). */
+function floorRange(def: AuthoredFieldDef) {
+  const b = def.bounds;
+  const w = Math.ceil(b.maxX - b.minX) + 3;
+  const h = Math.ceil(b.maxZ - b.minZ) + 3;
+  const grid = new Float32Array(w * h);
+  for (let j = 0; j < h; j++)
+    for (let i = 0; i < w; i++)
+      grid[j * w + i] = authoredFieldHeight(def, b.minX - 1 + i, b.minZ - 1 + j);
+  return (x0: number, x1: number, z0: number, z1: number): [number, number] => {
+    let lo = Infinity;
+    let hi = -Infinity;
+    const i0 = Math.max(0, Math.floor(x0 - b.minX));
+    const i1 = Math.min(w - 1, Math.ceil(x1 - b.minX) + 2);
+    const j0 = Math.max(0, Math.floor(z0 - b.minZ));
+    const j1 = Math.min(h - 1, Math.ceil(z1 - b.minZ) + 2);
+    for (let j = j0; j <= j1; j++)
+      for (let i = i0; i <= i1; i++) {
+        const f = grid[j * w + i];
+        if (f <= def.voidHeight + 1) continue;
+        if (f < lo) lo = f;
+        if (f > hi) hi = f;
+      }
+    return lo > hi ? [def.voidHeight, def.voidHeight] : [lo, hi];
+  };
+}
+
+/** One known sliver, pinned so it cannot spread: at the foot of the
+ *  Wildheart Basin's Fern Steps the ramp's skirt turns from a straight face
+ *  down onto the south bank to a flared massif into the gulf, and the one
+ *  triangle that bridges the two columns leans a hand over the bank's edge
+ *  (a skirt-topology limit, older than the skirt-ownership fix). */
+function knownSliver(def: AuthoredFieldDef, f: string): boolean {
+  if (def !== WILDHEART_BASIN_FIELD) return false;
+  const m = /^\((-?[\d.]+), (-?[\d.]+)\)/.exec(f);
+  return !!m && Math.hypot(Number(m[1]) + 5.6, Number(m[2]) + 151) < 1.5;
+}
+
+describe('an authored field draws no rock face across a walkable floor', () => {
+  // The Gravewyrm Sanctum, playtest 2026-10-03: a surface's skirt was dropped
+  // along its whole outline, also where a later stair cut down through its lip
+  // owns the ground, so a wall stood across the stair with no collider (the
+  // owner walked through it after Velkhar and on the way to Korzul).
+  for (const [name, def] of FIELDS) {
+    it(`${name}: every drawn face over a walkable floor stands on a collider`, () => {
+      const bad = wallsWalkedThrough(def).filter((f) => !knownSliver(def, f));
+      expect(bad, bad.slice(0, 15).join('\n')).toEqual([]);
+    }, 180_000);
   }
 });
 
