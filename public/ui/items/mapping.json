@@ -7224,6 +7224,37 @@
         "phial_of_the_tithe",
         "quenchwater_flask"
       ]
+    },
+    {
+      "batchId": "hollow-crypt-icons-2026-10-03",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_hollow_crypt_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art with a per-plate volume sheen and a soft paint-grain filter, over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_hollow_crypt_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+      "itemIds": [
+        "gravedirt_treads",
+        "bellrope_girdle",
+        "sextons_spadehaft",
+        "rimesilk_mantle",
+        "bonechill_carapace_vest",
+        "rimeweb_hunters_leggings",
+        "rimeweb_fang",
+        "cantors_cassock",
+        "choirward_leggings",
+        "choristers_gloves",
+        "cantors_hymnal",
+        "heroic_cantors_hymnal",
+        "gravecallers_vestments",
+        "unquiet_stalkers_hood",
+        "sextons_burial_spade",
+        "rimesilk_hood"
+      ]
     }
   ]
 }

@@ -330,6 +330,11 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'tideglass_warmaul',
       'falls_blessed_staff',
       'hammer_of_the_open_lock',
+      // The Hollow Crypt rework's three
+      // (scripts/generate_hollow_crypt_item_icons.mjs).
+      'sextons_spadehaft',
+      'sextons_burial_spade',
+      'rimeweb_fang',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

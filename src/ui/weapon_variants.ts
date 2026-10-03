@@ -175,6 +175,15 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // Held model reuses a shipped GLB (the heroic clone rides heroicOf).
   falls_blessed_staff: 'staff_c', // a gnarled, vine-wound staff of the falls
 
+  // ---- The Hollow Crypt rework (hollow_crypt_items.ts) -------------------------
+  // Held models reuse shipped GLBs (the heroic clones ride heroicOf). The two
+  // spades classify as axes (weapon_skin_rules.ts) and hold the two-handed axe
+  // model like the Tunnelking's Spade; the fang rides dagger_c with the other
+  // fangs (fang_of_korzul, drowned_choir_fang).
+  sextons_spadehaft: 'adv_axe_2handed',
+  sextons_burial_spade: 'adv_axe_2handed', // heroic epic: the Gravecaller's burial spade
+  rimeweb_fang: 'dagger_c',
+
   // ---- The Gravewyrm Sanctum rework (gravewyrm_sanctum_items.ts) --------------
   // Held model reuses a shipped GLB.
   hammer_of_the_open_lock: 'hammer_c', // heroic epic: the Smith's forge hammer

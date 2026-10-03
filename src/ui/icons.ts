@@ -5548,7 +5548,8 @@ export const ITEM_ART_PENDING = new Set<string>([
   // procedural icon stands in until then. The season weapons never park here:
   // an unpainted weapon already draws its procedural icon.
   ...SEASON2_SETS.flatMap((set) => set.itemIds),
-  // The Hollow Crypt rework's per-boss loot: painted icons owned by the art pass.
+  // The Hollow Crypt rework's per-boss loot: EMPTY since its painted wave
+  // (hollow-crypt-icons-2026-10-03) landed; the seam stays for the next park.
   ...HOLLOW_CRYPT_ART_PENDING_ITEM_IDS,
 ]);
 

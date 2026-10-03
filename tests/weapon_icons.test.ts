@@ -63,11 +63,10 @@ describe('painted weapon inventory icons', () => {
     // faction-vendor-icons-2026-09-16), landed by the wq-reputation merge.
     // 141 -> 145: the four Warfare Season 2 honor weapons, painted in
     // warfare-season2-weapons-2026-09-25 (second release/v0.44.0 base merge).
-    // 145 -> 154: the five-dungeon rework's nine weapons. Six ship painted
-    // icons in their dungeon batches (asserted in the registry test below);
-    // the Hollow Crypt's three (sextons_spadehaft, sextons_burial_spade,
-    // rimeweb_fang) still await their paintings, so this test stays red until
-    // that art lands with their ITEM_WEAPON_VARIANTS rows.
+    // 145 -> 154: the five-dungeon rework's nine weapons, each painted in its
+    // dungeon's batch (asserted in the registry test below), the Hollow
+    // Crypt's three (sextons_spadehaft, sextons_burial_spade, rimeweb_fang)
+    // in hollow-crypt-icons-2026-10-03.
     expect(baseWeapons).toHaveLength(154);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
@@ -114,9 +113,9 @@ describe('painted weapon inventory icons', () => {
     // (faction-vendor-icons-2026-09-16, asserted below as `factionBatch`), nine
     // with the Warfare Season 2 weapons (warfare-season2-weapons-2026-09-25).
     // Thirteen with the dungeon rework's four icon batches (Sunken Bastion,
-    // Drowned Temple, Wildheart Basin, Gravewyrm Sanctum), asserted below as
-    // `reworkWeaponIds`.
-    expect(weaponBatches).toHaveLength(13);
+    // Drowned Temple, Wildheart Basin, Gravewyrm Sanctum), fourteen with the
+    // Hollow Crypt's, asserted below as `reworkWeaponIds`.
+    expect(weaponBatches).toHaveLength(14);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -259,6 +258,7 @@ describe('painted weapon inventory icons', () => {
       'drowned-temple-icons-2026-09-30',
       'wildheart-basin-icons-2026-10-02',
       'gravewyrm-sanctum-icons-2026-10-03',
+      'hollow-crypt-icons-2026-10-03',
     ];
     for (const batchId of reworkBatchIds) {
       expect(
@@ -275,6 +275,9 @@ describe('painted weapon inventory icons', () => {
       'gaolyard_cudgel',
       'hammer_of_the_open_lock',
       'knight_commanders_longsword',
+      'rimeweb_fang',
+      'sextons_burial_spade',
+      'sextons_spadehaft',
       'tideglass_shiv',
       'tideglass_warmaul',
     ]);

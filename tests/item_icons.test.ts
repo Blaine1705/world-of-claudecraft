@@ -327,8 +327,10 @@ describe('item webp icons', () => {
     // two (knight_commanders_longsword, gaolyard_cudgel): 147, plus the Drowned
     // Temple rework's two (tideglass_shiv, tideglass_warmaul): 149, plus the
     // Wildheart Basin rework's Falls-Blessed Staff: 150, plus the Gravewyrm
-    // Sanctum rework's Hammer of the Open Lock: 151.
-    expect(WEAPON_IMAGE_IDS.size).toBe(151);
+    // Sanctum rework's Hammer of the Open Lock: 151, plus the Hollow Crypt
+    // rework's three (sextons_spadehaft, sextons_burial_spade, rimeweb_fang;
+    // hollow-crypt-icons-2026-10-03): 154.
+    expect(WEAPON_IMAGE_IDS.size).toBe(154);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -388,27 +390,14 @@ describe('item webp icons', () => {
     // follow-up art pass.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(season2Armor).toHaveLength(135);
-    // Open wave: the Hollow Crypt rework's per-boss loot (content/hollow_crypt_items.ts),
-    // its non-weapon pieces plus the generated Heroic Hymnal, painted in its art pass.
-    const hollowCrypt = [
-      'bellrope_girdle',
-      'bonechill_carapace_vest',
-      'cantors_cassock',
-      'cantors_hymnal',
-      'choirward_leggings',
-      'choristers_gloves',
-      'gravecallers_vestments',
-      'gravedirt_treads',
-      'heroic_cantors_hymnal',
-      'rimesilk_hood',
-      'rimesilk_mantle',
-      'rimeweb_hunters_leggings',
-      'unquiet_stalkers_hood',
-    ];
+    // The Hollow Crypt rework's per-boss loot left the ledger when its wave
+    // (hollow-crypt-icons-2026-10-03) painted every non-weapon piece and the
+    // generated Heroic Hymnal: HOLLOW_CRYPT_ART_PENDING_ITEM_IDS is declared
+    // empty in content/hollow_crypt_items.ts.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual([...season2Armor, ...hollowCrypt].sort());
+    ).toEqual([...season2Armor].sort());
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

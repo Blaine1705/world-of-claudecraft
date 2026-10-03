@@ -874,7 +874,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // The art-pending ledger (ITEM_ART_PENDING) stages a wave's generated
     // heroic variants outside the audited catalog until their paintings land,
     // exactly as the sealed-audit test above and the audit CLI account them
-    // (the Hollow Crypt's Heroic Cantor's Hymnal is the one staged today).
+    // (none is staged today: the Hollow Crypt's Heroic Cantor's Hymnal, the
+    // last staged one, now ships its own painting).
     const generatedHeroics = Object.entries(ITEMS).filter(
       ([id, item]) =>
         'heroicOf' in item && typeof item.heroicOf === 'string' && !ITEM_ART_PENDING.has(id),
@@ -888,9 +889,11 @@ describe('item-art consistency accepted-art provenance', () => {
     const heroicArtAliases = generatedHeroics.filter(([id]) => !currentOwnerIds.has(id));
     // 85 / 60 / 25 with the five-dungeon rework's seven unstaged Heroic
     // variants (named below): the Heroic Chorus Conch ships its own painting,
-    // the six Heroic weapons alias their base weapon's art.
-    expect(generatedHeroics).toHaveLength(85);
-    expect(heroicWithOwnWebp).toHaveLength(60);
+    // the six Heroic weapons alias their base weapon's art. 86 / 61 / 25 once
+    // the Heroic Cantor's Hymnal leaves the art-pending ledger with its own
+    // painting (hollow-crypt-icons-2026-10-03).
+    expect(generatedHeroics).toHaveLength(86);
+    expect(heroicWithOwnWebp).toHaveLength(61);
     expect(heroicArtAliases).toHaveLength(25);
     expect(heroicArtAliases.every(([, item]) => item.kind === 'weapon')).toBe(true);
     // The 14 new heroic defs the release's gap-fill and Bramblehide waves add
@@ -913,9 +916,11 @@ describe('item-art consistency accepted-art provenance', () => {
       ...(releaseGapWeaponBatch?.itemIds.map((id) => heroicVariantId(id)) ?? []),
     ]);
     expect(expectedNewHeroicIds).toHaveLength(14);
-    // The five-dungeon rework's seven unstaged Heroic variants, named the same
-    // way: one own-art conch from its dungeon batch, six weapon aliases.
+    // The five-dungeon rework's eight Heroic variants, named the same way: two
+    // own-art offhands from their dungeon batches (the conch and the hymnal),
+    // six weapon aliases.
     const reworkHeroicIds = [
+      'heroic_cantors_hymnal',
       'heroic_chorus_conch',
       'heroic_falls_blessed_staff',
       'heroic_gaolyard_cudgel',
@@ -925,12 +930,13 @@ describe('item-art consistency accepted-art provenance', () => {
       'heroic_tideglass_shiv',
     ];
     expect(heroicWithOwnWebp.map(([id]) => id)).toContain('heroic_chorus_conch');
+    expect(heroicWithOwnWebp.map(([id]) => id)).toContain('heroic_cantors_hymnal');
     const heroicIdSet = new Set(generatedHeroics.map(([id]) => id));
     for (const id of [...expectedNewHeroicIds, ...reworkHeroicIds]) {
       expect(heroicIdSet.has(id), `${id} is a live heroic def`).toBe(true);
     }
     // Everything else in the current heroic set is the dated 64: this proves
-    // the release's 14 heroic defs and the rework's seven are exactly the
+    // the release's 14 heroic defs and the rework's eight are exactly the
     // additive ones, not a silent expansion of what was already there.
     const expectedNewHeroicIdSet = new Set([...expectedNewHeroicIds, ...reworkHeroicIds]);
     const preReleaseHeroics = generatedHeroics.filter(([id]) => !expectedNewHeroicIdSet.has(id));
@@ -1042,8 +1048,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Sunken Bastion fifth pass's three Gaol Turnkey loot icons: 1,486.
     // The Wildheart Basin rework's 11 loot icons (wildheart-basin-icons-2026-10-02): 1,497.
     // The Gravewyrm Sanctum rework's 11 loot icons (gravewyrm-sanctum-icons-2026-10-03): 1,508.
-    expect(new Set(currentOwnerIds).size).toBe(1508);
-    expect(shippingIds).toHaveLength(1508);
+    // The Hollow Crypt rework's 16 loot icons (hollow-crypt-icons-2026-10-03): 1,524.
+    expect(new Set(currentOwnerIds).size).toBe(1524);
+    expect(shippingIds).toHaveLength(1524);
     // 1,660 + the Wildheart Basin rework's 11 definitions and its one
     // generated heroic rare (the Heroic Falls-Blessed Staff) = 1,672.
     // + the Gravewyrm Sanctum rework's 11 definitions = 1,683.
@@ -1210,7 +1217,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'vanguard_fang_dagger',
         'vanguard_warstaff',
         // The dungeon reworks' loot batches (Sunken Bastion, Drowned Temple,
-        // Wildheart Basin, Gravewyrm Sanctum).
+        // Wildheart Basin, Gravewyrm Sanctum, Hollow Crypt).
         ...mapping.generatedBatches
           .filter(({ batchId }) =>
             [
@@ -1218,6 +1225,7 @@ describe('item-art consistency accepted-art provenance', () => {
               'drowned-temple-icons-2026-09-30',
               'wildheart-basin-icons-2026-10-02',
               'gravewyrm-sanctum-icons-2026-10-03',
+              'hollow-crypt-icons-2026-10-03',
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1392,8 +1400,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // rework's loot icons (sunken-bastion-icons-2026-09-29) add one more, and
     // the Drowned Temple rework's (drowned-temple-icons-2026-09-30) another,
     // and the Wildheart Basin rework's (wildheart-basin-icons-2026-10-02) another.
-    // and the Gravewyrm Sanctum rework's (gravewyrm-sanctum-icons-2026-10-03) another.
-    expect(mapping.generatedBatches).toHaveLength(45);
+    // and the Gravewyrm Sanctum rework's (gravewyrm-sanctum-icons-2026-10-03) another,
+    // and the Hollow Crypt rework's (hollow-crypt-icons-2026-10-03) another.
+    expect(mapping.generatedBatches).toHaveLength(46);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1468,14 +1477,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Sunken Bastion fifth pass adds the Gaol Turnkey's 3 to its batch: 956.
     // The Wildheart Basin loot batch (wildheart-basin-icons-2026-10-02) adds 11: 967.
     // The Gravewyrm Sanctum loot batch (gravewyrm-sanctum-icons-2026-10-03) adds 11: 978.
-    expect(priorGeneratedIds).toHaveLength(978);
+    // The Hollow Crypt loot batch (hollow-crypt-icons-2026-10-03) adds 16: 994.
+    expect(priorGeneratedIds).toHaveLength(994);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // + the Wildheart Basin's 11 = 1,497. + the Gravewyrm Sanctum's 11 = 1,508.
-    expect(allCurrentOwnerIds).toHaveLength(1508);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1508);
+    // + the Hollow Crypt's 16 = 1,524.
+    expect(allCurrentOwnerIds).toHaveLength(1524);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1524);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1494,7 +1505,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Gaol Turnkey's 3 (the Bastion fifth pass) = 956.
       // + the Wildheart Basin rework's 11 loot icons = 967.
       // + the Gravewyrm Sanctum rework's 11 loot icons = 978.
-      priorGenerated: 978,
+      // + the Hollow Crypt rework's 16 loot icons = 994.
+      priorGenerated: 994,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1580,6 +1592,8 @@ describe('item-art consistency accepted-art provenance', () => {
                 'wildheart-basin-icons-2026-10-02',
                 // The Gravewyrm Sanctum rework's loot.
                 'gravewyrm-sanctum-icons-2026-10-03',
+                // The Hollow Crypt rework's loot.
+                'hollow-crypt-icons-2026-10-03',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1729,10 +1743,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483. Plus the Gaol Turnkey's 3 (the Bastion fifth pass) = 1486. Plus the Wildheart Basin rework's 11 loot icons = 1497. Plus the Gravewyrm Sanctum rework's 11 loot icons = 1508.
-    if (ownerIds.length !== 1508)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1508`);
-    if (fileIds.length !== 1508) violations.push(`shipping WebP count: ${fileIds.length} != 1508`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483. Plus the Gaol Turnkey's 3 (the Bastion fifth pass) = 1486. Plus the Wildheart Basin rework's 11 loot icons = 1497. Plus the Gravewyrm Sanctum rework's 11 loot icons = 1508. Plus the Hollow Crypt rework's 16 loot icons = 1524.
+    if (ownerIds.length !== 1524)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1524`);
+    if (fileIds.length !== 1524) violations.push(`shipping WebP count: ${fileIds.length} != 1524`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

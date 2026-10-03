@@ -5,8 +5,9 @@
 // heroic ratings. Rares in a boss's base table get their Heroic variant
 // generated (content/heroic_variants.ts), never hand-authored here.
 //
-// Painted icon art for every id below is pending (src/ui/icons.ts
-// ITEM_ART_PENDING): the procedural icon stands in until the art pass.
+// Every id below ships a painted icon (batch hollow-crypt-icons-2026-10-03,
+// scripts/generate_hollow_crypt_item_icons.mjs), the generated Heroic
+// Cantor's Hymnal included; the two Heroic weapons keep their base painting.
 
 import type { ItemDef } from '../types';
 import { ARMOR_RATING, FIVE_MAN_WEAPON_RATING } from './heroic_loot';
@@ -193,12 +194,7 @@ export const HOLLOW_CRYPT_ITEMS: Record<string, ItemDef> = {
   },
 };
 
-/** Every new Hollow Crypt item id whose painted icon is still to be made
- *  (weapons draw their procedural icon already and never park here; the one
- *  generated non-weapon Heroic variant, the Hymnal's, does). */
-export const HOLLOW_CRYPT_ART_PENDING_ITEM_IDS = [
-  ...Object.values(HOLLOW_CRYPT_ITEMS)
-    .filter((def) => def.kind !== 'weapon')
-    .map((def) => def.id),
-  'heroic_cantors_hymnal',
-];
+// EMPTY since the hollow-crypt-icons-2026-10-03 wave painted every non-weapon
+// piece and the generated Heroic Cantor's Hymnal (the weapons never parked
+// here: their paintings ride ITEM_WEAPON_VARIANTS).
+export const HOLLOW_CRYPT_ART_PENDING_ITEM_IDS: readonly string[] = [];

@@ -311,15 +311,20 @@ describe('missing painted icon accepted-art manifest', () => {
     // The Nythraxis gap-fill one-handers add three generated heroic resolvers at
     // the current head (heroic_courtiers_bonefang, heroic_gravecourt_hewer,
     // heroic_thornpeak_wardblade): 210/16/12 become 213/19/15.
+    // The five-dungeon rework's six generated Heroic weapons
+    // (heroic_falls_blessed_staff, heroic_gaolyard_cudgel,
+    // heroic_knight_commanders_longsword, heroic_rimeweb_fang,
+    // heroic_sextons_spadehaft, heroic_tideglass_shiv) add their resolvers the
+    // same way: 213/19/15 become 219/25/21.
     expect(accepted.scope).toEqual({
-      targetRows: 213,
+      targetRows: 219,
       rasterPaintings: 194,
       abilities: 90,
       items: 101,
       deeds: 3,
-      heroicWeaponResolvers: 19,
+      heroicWeaponResolvers: 25,
       originalInventoryRows: 197,
-      supplementalCurrentHeadRows: 15,
+      supplementalCurrentHeadRows: 21,
     });
     expect(accepted.assets).toHaveLength(194);
     expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
@@ -336,7 +341,7 @@ describe('missing painted icon accepted-art manifest', () => {
         accepted.assets.filter((asset) => asset.kind === kind).map((asset) => asset.id),
       ).toEqual(ids);
     }
-    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(19);
+    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(25);
     expect(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id)).toEqual(
       sorted(new Set(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id))),
     );
