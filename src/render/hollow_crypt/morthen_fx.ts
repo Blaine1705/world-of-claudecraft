@@ -39,7 +39,7 @@ import {
 } from './crypt_fx_particles';
 import {
   dissolveLevels,
-  MORTHEN_CANDLES,
+  MORTHEN_MITRE_EYE,
   MORTHEN_RIBS,
   MORTHEN_SCYTHE_REACH,
   MORTHEN_SCYTHE_UNFOLD,
@@ -495,9 +495,10 @@ export class MorthenFx {
         size0: 1.1 * s,
         size1: (2.8 + this.rand() * 1.4) * s,
         spin: (this.rand() - 0.5) * 0.8,
-        r: 0.2,
-        g: 0.14,
-        b: 0.27,
+        // Dark green-grey, the v2 body's own soul smoke (no longer plum).
+        r: 0.12,
+        g: 0.16,
+        b: 0.14,
         a: 0.42,
       });
     }
@@ -544,18 +545,13 @@ export class MorthenFx {
         a: 0.8,
       });
     }
-    // Sparks off the candle flames on his shoulders.
+    // Soul-green sparks rising off the burning eye on his mitre.
     if (this.rand() < 8 * d * dt) {
-      const side = this.rand() < 0.5 ? 1 : -1;
-      const c = morthenAnchor(m.pos, m.facing, s, {
-        x: MORTHEN_CANDLES.x * side,
-        y: MORTHEN_CANDLES.y,
-        z: MORTHEN_CANDLES.z,
-      });
+      const c = morthenAnchor(m.pos, m.facing, s, MORTHEN_MITRE_EYE);
       this.glow.emit(this.clock, {
-        x: c.x + (this.rand() - 0.5) * 0.3 * s,
+        x: c.x + (this.rand() - 0.5) * 0.16 * s,
         y: c.y,
-        z: c.z + (this.rand() - 0.5) * 0.3 * s,
+        z: c.z + (this.rand() - 0.5) * 0.16 * s,
         vx: (this.rand() - 0.5) * 0.4,
         vy: 0.9 + this.rand() * 0.8,
         vz: (this.rand() - 0.5) * 0.4,
@@ -563,9 +559,9 @@ export class MorthenFx {
         drag: 0.5,
         size0: 0.12 * s,
         size1: 0.02,
-        r: 1,
-        g: 0.72,
-        b: 0.32,
+        r: 0.6,
+        g: 1,
+        b: 0.5,
         a: 0.9,
       });
     }
@@ -738,9 +734,9 @@ export class MorthenFx {
         floor: gy + 0.2,
         size0: 1.2,
         size1: 3.6,
-        r: 0.3,
-        g: 0.24,
-        b: 0.36,
+        r: 0.2,
+        g: 0.27,
+        b: 0.22,
         a: 0.5,
       });
     }
@@ -801,9 +797,9 @@ export class MorthenFx {
         size0: 1.4 * s,
         size1: (4 + this.rand() * 2.5) * s,
         spin: (this.rand() - 0.5) * 0.6,
-        r: 0.18,
-        g: 0.13,
-        b: 0.24,
+        r: 0.11,
+        g: 0.15,
+        b: 0.13,
         a: 0.5,
       });
     }

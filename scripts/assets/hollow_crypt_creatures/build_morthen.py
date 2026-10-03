@@ -3,36 +3,42 @@ the Knellwyrm (src/sim/encounters/hollow_crypt/morthen_rise.ts, his entrance).
 
   blender -b --factory-startup --python build_morthen.py -- <out.glb> [--sheet dir] [--blend out.blend] [--fast]
 
-A towering dead prelate who never touches the floor. Layered funeral vestments
-(a plum chasuble torn at the hem over a grey alb, a gold-banded stole, a stiff
-standing collar) hang from a gaunt skeleton; below the waist there are no legs,
-only a twisting funnel of soul smoke that the robes dissolve into. The chasuble
-parts over an open ribcage where green soul fire burns. A tall BONE MITRE of two
-fused plates, ridged with vertebrae, carries a burning eye. Clusters of melting
-funeral candles stand on both shoulder plates, their wax running down over the
-bone. The BOOK OF NAMES, a heavy iron-cornered tome, hangs from his left wrist
-on a chain; it rises and opens when he reads the names. In his right hand, the
-BELL STAFF: a vertebral shaft crowned by a gothic iron cradle with a funeral
-bell hanging in it, and a folded iron crest over it that UNFOLDS INTO A GREAT
-SCYTHE (Blade1 swings down and out of the crest, Blade2 flicks out of it).
+A towering dead prelate who never touches the floor, drawn in the family of Vael
+(sunken_bastion_creatures/reaper.py) but unmistakably a bishop (v2, 2026-10-03).
+A deep folded COWL of near-black grave shroud hides a gaunt skull whose sockets
+burn with green soul fire; over the cowl's crown sits the tall BONE MITRE, his
+signature: two plates joined at blackened silver seams, parting into two horns at
+the top, ridged with vertebrae, an open slit eye of soul fire on its front plate
+with rays and cracks of cold light cut into the bone, and two linen lappets
+falling down his back. A short ragged shoulder cape (the mozzetta) rides over a
+long tattered cope that parts over an open ribcage of soul fire; a STOLE of old
+grave linen hangs down both sides of the ribs and the shroud's flare, sewn with
+closed-eye sigils of the Sleep in soul fire. Wide shroud sleeves, bony fists, a
+knotted cord cincture, and below the long rags a churning funnel of soul smoke.
+In his right hand the BELL STAFF: a vertebral shaft crowned by a gothic iron
+cradle with a funeral bell hanging in it, and a folded iron crest over it that
+UNFOLDS INTO A GREAT SCYTHE (Blade1 swings down and out of the crest, Blade2
+flicks out of it). No candles, no Book of Names: the Chain, Book and BookLid
+bones and the candle Flame bones stay in the rig, bare, so every clip keys
+exactly what it always did.
 
 Built on the organic kit (organic_kit.py): smooth parts bound one bone each, the
-robes as membranes weighted across hanging spars, a Cycles bake of the cloth and
-bone surfaces with their ambient occlusion, a metal material for the bell, the
-iron and the gold, the soul fire, eyes, flames and runes on the glow material.
-Flames and the soul fire flicker on keyed bone scales in every clip.
+shroud, cope, mozzetta and stole as membranes weighted across hanging spars, a
+Cycles bake of the cloth and bone surfaces with their ambient occlusion, a metal
+material for the bell, the iron and the silver, the soul fire, eyes, sigils and
+runes on the glow material. The soul fire flickers on keyed bone scales.
 
-Scale (yards; a player stands about 2.6): 5.85 to the mitre's peak at rest; the
-game draws him at his template's 1.35, so some 7.9 yards: three players tall.
+Scale (yards; a player stands about 2.6): about 6.3 to the mitre's horns at rest;
+the game draws him at his template's 1.35, three players tall and more.
 
 Clips (24 fps). The staff set, before his last rites:
-  Idle          hovering: a slow bob, the smoke turning, the bell and the book swaying.
+  Idle          hovering: a slow bob, the smoke turning, the bell swaying.
   Walk, Run     the glide: leaning in, robes and smoke streaming back.
   StaffStrike   the bell head brought down overhead onto his victim.
   StaffStrike2  a backhand bash across the front with the shaft.
   BellToll      Shadow Pulse: the staff thrust high, the bell tolling hard.
   Rise          the entrance: curled in his robes, he unfurls as he rises.
-  SummonSouls   reading the names: the book floats up open, the staff raised,
+  SummonSouls   reading the names: the off hand raised, the staff raised,
                 the souls whirling (the rise's proclamation, the generic cast).
   ShieldRitual  the ward: the staff held level before him, the souls a ring.
   Hit, Death    a recoil; the fire gutters out and the vestments fold empty.
@@ -57,33 +63,36 @@ from organic_kit import (  # noqa: E402
 METAL = 3
 
 # ------------------------------------------------------------------ palette
-VEST = (0.4, 0.13, 0.46)          # the chasuble, deep plum
-VEST_HI = (0.55, 0.22, 0.6)
-VEST_DARK = (0.19, 0.06, 0.22)
-ALB = (0.5, 0.47, 0.54)           # the grey alb under it
-ALB_DARK = (0.32, 0.27, 0.36)
-SMOKE = (0.52, 0.46, 0.62)
-SMOKE_DARK = (0.2, 0.17, 0.26)
-GOLD = (0.92, 0.74, 0.32)
-GOLD_HI = (1.0, 0.9, 0.55)
+# v2 (2026-10-03): Vael's family, a bishop. A near-black grave shroud with a cold
+# green cast, a hooded cowl under a tall BONE MITRE, a short shoulder cape
+# (the mozzetta) over a long tattered cope, a pale grave-linen stole down the
+# front with soul-lit sigils, blackened silver for every fitting, and the green
+# soul fire in the ribs, the sockets, the mitre's sigil and the blade's edge.
+SHROUD = (0.062, 0.072, 0.07)       # the grave shroud and the hood
+SHROUD_HI = (0.12, 0.14, 0.135)
+SHROUD_EDGE = (0.2, 0.225, 0.215)
+COPE = (0.07, 0.095, 0.085)         # the cope and the mozzetta: a hair greener than the shroud
+COPE_DARK = (0.035, 0.045, 0.042)
+LINEN = (0.45, 0.43, 0.38)           # the stole and the cope's back orphrey, old grave linen
+LINEN_DARK = (0.3, 0.29, 0.26)
+SMOKE = (0.16, 0.2, 0.18)
+SMOKE_DARK = (0.05, 0.065, 0.06)
+SILVER = (0.42, 0.44, 0.43)         # blackened silver: rings, ferrules, the mitre's edges
+SILVER_HI = (0.62, 0.65, 0.62)
 BONE = (0.8, 0.76, 0.66)
 BONE_OLD = (0.62, 0.57, 0.47)
 BONE_DARK = (0.32, 0.28, 0.23)
 SOCKET = (0.02, 0.018, 0.025)
-CAVITY = (0.035, 0.02, 0.04)
+CAVITY = (0.02, 0.026, 0.024)
 SOUL = (0.55, 1.0, 0.45)          # ghost fire: green-white, never cyan
 SOUL_HOT = (0.92, 1.0, 0.82)
 SOUL_DEEP = (0.14, 0.48, 0.12)
-WAX = (0.86, 0.8, 0.64)
-WAX_OLD = (0.68, 0.6, 0.44)
-FLAME = (1.0, 0.66, 0.24)
-FLAME_HOT = (1.0, 0.93, 0.72)
-BRONZE = (0.66, 0.48, 0.26)
-VERDI = (0.36, 0.62, 0.5)
-IRON = (0.15, 0.15, 0.17)
-IRON_HI = (0.34, 0.34, 0.37)
-LEATHER = (0.26, 0.09, 0.07)
-PAGE = (0.76, 0.69, 0.53)
+BRONZE = (0.4, 0.3, 0.19)
+VERDI = (0.3, 0.52, 0.42)
+IRON = (0.13, 0.135, 0.14)
+IRON_HI = (0.3, 0.31, 0.32)
+LEATHER = (0.12, 0.08, 0.07)
+ROPE = (0.2, 0.19, 0.16)
 
 SKIRT = 12   # smoke-robe spars round the waist
 CHAS = 11    # chasuble spars round the shoulders (the front stays open)
@@ -404,7 +413,7 @@ def fist(p, wrist, h, a, n, rings=(1, 3), bar=GRIP_R_BAR):
             if i == 0 and k in rings:
                 mid = pos.lerp(end, 0.55)
                 d = (end - pos).normalized()
-                p.tube([mid - d * 0.02, mid + d * 0.02], [r0 * 1.75, r0 * 1.75], GOLD, sides=9, mat=METAL)
+                p.tube([mid - d * 0.02, mid + d * 0.02], [r0 * 1.75, r0 * 1.75], SILVER, sides=9, mat=METAL)
             pos = end
         # the claw of the fingertip, a hooked point against the bar
         tip = on_bar(phi + 0.42, off, rad - 0.006)
@@ -426,6 +435,98 @@ def fist(p, wrist, h, a, n, rings=(1, 3), bar=GRIP_R_BAR):
     return c
 
 
+# The head is modelled in Vael's head frame (sunken_bastion_creatures/reaper.py) and
+# carried onto the rig's head by HEAD_M (HEAD_XF stays the bones' frame, so Jaw and
+# FlameEye keep their rest heads): a gaunt face deep in a cowl, Vael's family.
+HEAD_M = Matrix.Translation((0.0, -0.24, 4.4)) @ Matrix.Scale(0.9, 4) @ Matrix.Translation((0.0, 0.36, -5.6))
+# The mitre: one solid of two bone plates joined at the side seams, its band gripping
+# the cowl's crown.
+MITRE_BASE = 4.86
+MITRE_H = 1.36
+
+
+def _mitre_hw(t):
+    return 0.34 * (1 + 0.2 * math.sin(t * math.pi * 0.85)) * (1 - t ** 2.2) + 0.02
+
+
+def _mitre_hd(t):
+    return 0.19 * (1 - t ** 2.4) + 0.03
+
+
+def _mitre_yc(t):
+    return -0.08 - 0.07 * t
+
+
+def _catmull(pts, n):
+    """`n` + 1 points along a Catmull-Rom curve through `pts`."""
+    pts = [Vector(p) for p in pts]
+    ext = [pts[0] * 2 - pts[1]] + pts + [pts[-1] * 2 - pts[-2]]
+    out = []
+    for i in range(n + 1):
+        u = i / n * (len(pts) - 1)
+        k = min(int(u), len(pts) - 2)
+        f = u - k
+        p0, p1, p2, p3 = ext[k], ext[k + 1], ext[k + 2], ext[k + 3]
+        out.append(0.5 * ((2 * p1) + (-p0 + p2) * f + (2 * p0 - 5 * p1 + 4 * p2 - p3) * f * f
+                          + (-p0 + 3 * p1 - 3 * p2 + p3) * f * f * f))
+    return out
+
+
+COWL_PATH = [(0, 0.12, 4.86), (0, 0.24, 5.3), (0, 0.16, 5.7), (0, -0.12, 5.86), (0, -0.44, 5.82), (0, -0.7, 5.66),
+             (0, -0.88, 5.44)]
+COWL_R = [0.36, 0.44, 0.42, 0.38, 0.4, 0.48, 0.57]
+
+
+def cowl(p, n=26, sides=30, squash=1.16):
+    """The cowl in Vael's head frame: a folded tube over the skull from the nape to the
+    face, open at both ends, its brow drawn forward into a peak. Folds run down it,
+    deepening toward the opening; the valleys are shaded dark."""
+    before = set(p.bm.faces)
+    path = _catmull(COWL_PATH, n)
+    radii = []
+    for i in range(n + 1):
+        u = i / n * (len(COWL_R) - 1)
+        k = min(int(u), len(COWL_R) - 2)
+        radii.append(COWL_R[k] + (COWL_R[k + 1] - COWL_R[k]) * (u - k))
+    grid, tone = [], {}
+    rim = []
+    for i, c in enumerate(path):
+        u = i / n
+        tng = (path[min(n, i + 1)] - path[max(0, i - 1)]).normalized()
+        side = tng.cross(Vector((1, 0, 0))).normalized()
+        upv = tng.cross(side).normalized()
+        if side.z < 0:
+            side = -side
+        row = []
+        for k in range(sides):
+            a = math.tau * k / sides
+            ca, sa = math.cos(a), math.sin(a)
+            amp = 0.02 + 0.07 * u ** 1.5
+            fold = 0.55 * math.sin(7 * a + 2.1 * u) + 0.45 * math.sin(12 * a - 3.0 * u + 0.7)
+            r = radii[i] * (1 + amp * fold)
+            pos = c + side * ca * r + upv * sa * r * squash
+            # the brow of the cowl drawn forward and down into a peak over the face
+            peak = max(0.0, ca) ** 3 * max(0.0, (u - 0.6) / 0.4) ** 2
+            pos += tng * 0.13 * peak - side * 0.06 * peak
+            # the cheeks of the opening hang a little lower and closer
+            pos -= side * 0.06 * max(0.0, -ca) * max(0.0, (u - 0.7) / 0.3)
+            v = p.bm.verts.new(pos)
+            tone[v] = 0.75 + 0.35 * max(-1.0, min(1.0, fold)) * min(1.0, u * 2)
+            row.append(v)
+            if i == n:
+                rim.append(pos.copy())
+        grid.append(row)
+    for i in range(n):
+        for k in range(sides):
+            p.bm.faces.new((grid[i][k], grid[i][(k + 1) % sides], grid[i + 1][(k + 1) % sides], grid[i + 1][k]))
+    faces = p._new_faces(before)
+    p._paint(faces, SHROUD_HI, MEMBRANE)
+    for f in faces:
+        for lp in f.loops:
+            lp[p.col] = (*[ch * tone[lp.vert] for ch in SHROUD_HI], 1.0)
+    p.tube(rim + [rim[0]], [0.02] * (len(rim) + 1), SHROUD_EDGE, sides=6, cap=False)
+
+
 def build_parts():
     parts = []
 
@@ -434,13 +535,13 @@ def build_parts():
         parts.append(pt)
         return pt
 
-    # --- the torso: a dark cavity behind an open ribcage full of soul fire -------------
+    # --- the torso: grave cloth below, an open ribcage of soul fire above ------------------
     torso = part('Torso', 'Spine', subdiv=1)
     torso.loft([
         ((0, 0.04, 2.5), 0.46, 0.34, 2.4, (0, 0, 1)),
         ((0, 0.06, 2.95), 0.42, 0.32, 2.4, (0, 0, 1)),
         ((0, 0.08, 3.3), 0.52, 0.34, 2.6, (0, 0, 1)),
-    ], ALB_DARK, sides=18, mat=MEMBRANE)
+    ], SHROUD, sides=18, mat=MEMBRANE)
     chest = part('ChestShell', 'Chest', subdiv=1)
     chest.loft([
         ((0, 0.1, 3.3), 0.54, 0.3, 2.6, (0, 0, 1)),
@@ -458,7 +559,6 @@ def build_parts():
             pts = [Vector((s * (0.03 + w * math.sin(t * math.pi * 0.64)), -0.41 + 0.4 * (1 - math.cos(t * math.pi * 0.64)),
                            z - 0.12 * t)) for t in (j / 7 for j in range(8))]
             ribs.tube(pts, [0.03 - 0.003 * i] * 8, lerp(BONE, BONE_OLD, i / 6), sides=6)
-    # The spine behind the ribs, then bare down to the smoke under them.
     for i in range(11):
         z = 3.86 - i * 0.12
         y = 0.02 if z > 3.3 else -0.12
@@ -467,303 +567,223 @@ def build_parts():
         if z <= 3.3:
             for s in (-1, 1):
                 ribs.spike((s * 0.05, y - 0.02, z), 0.025, 0.12, BONE_OLD, sides=4, lean=(s * 0.1, -0.02))
-    # A rosary of bone beads slung under the ribs, a gold reliquary at its foot.
-    beads = [Vector((math.sin(t) * 0.36, -0.36 - 0.08 * math.cos(t), 3.26 - 0.46 * math.cos(t * 0.5) ** 2 + 0.46))
-             for t in (math.radians(a) for a in range(-80, 81, 8))]
-    for b in beads:
-        ribs.blob(b, (0.05, 0.05, 0.05), BONE, segments=6, rings=4)
-    low = min(beads, key=lambda v: v.z)
-    ribs.tube([low, low - Vector((0, 0, 0.18))], [0.01, 0.01], GOLD, sides=4, mat=METAL)
-    ribs.blob(low - Vector((0, 0.02, 0.28)), (0.1, 0.05, 0.14), GOLD, segments=8, rings=6, mat=METAL)
-    ribs.blob(low - Vector((0, 0.05, 0.28)), (0.05, 0.02, 0.07), SOUL, mat=GLOW, segments=6, rings=4)
-    # The soul fire caged in the ribs (flickers on the SoulFire bone).
+    # The soul fire caged in the ribs (flickers on the SoulFire bone): a deep green
+    # mass, a hot heart and tongues licking up between the ribs.
     fire = part('SoulFireCore', 'SoulFire', smooth=True)
-    fire.blob((0, -0.12, 3.46), (0.42, 0.3, 0.44), SOUL_DEEP, mat=GLOW, segments=12, rings=10)
-    fire.blob((0, -0.18, 3.44), (0.26, 0.2, 0.3), SOUL, mat=GLOW, segments=10, rings=8)
-    fire.blob((0, -0.21, 3.42), (0.13, 0.1, 0.16), SOUL_HOT, mat=GLOW, segments=8, rings=6)
+    fire.blob((0, -0.12, 3.46), (0.42, 0.3, 0.46), SOUL_DEEP, mat=GLOW, segments=12, rings=10)
+    fire.blob((0, -0.18, 3.44), (0.27, 0.21, 0.31), SOUL, mat=GLOW, segments=10, rings=8)
+    fire.blob((0, -0.22, 3.42), (0.14, 0.11, 0.17), SOUL_HOT, mat=GLOW, segments=8, rings=6)
     for k in range(7):
         a = k * 2.4
         x = math.sin(a) * 0.16
         y = -0.14 + math.cos(a) * 0.08
-        h = 0.26 + 0.08 * ((k * 5) % 3)
-        fire.spike((x, y, 3.5), 0.07, h, lerp(SOUL, SOUL_HOT, 0.4), sides=5, lean=(x * 0.4, -0.05), mat=GLOW)
-    # --- the skull: long, gaunt and cracked, the sockets deep and burning -------------------
-    # Sculpted as one surface (skull_point): a long cranium over a narrow face, the
-    # eye sockets and the nose pressed IN (real hollows the soul fire burns in),
-    # the brow and the blade of each cheekbone standing out, the cheeks sunk.
-    head = part('Skull', 'Head', smooth=True)
-    head_mark = head.mark()
-    sculpt_skull(head)
-    # upper teeth: long, thin and uneven, two lost, along the maxilla's edge
-    for k in range(9):
+        h = 0.22 + 0.07 * ((k * 5) % 3)
+        fire.spike((x, y, 3.48), 0.065, h, lerp(SOUL, SOUL_HOT, 0.4), sides=5, lean=(x * 0.4, -0.05), mat=GLOW)
+    # --- the skull, deep in the cowl (Vael's recipe, a lich bishop's face) -------------------
+    # Modelled in Vael's head frame (reaper.py) and carried onto the rig's head by HEAD_M:
+    # a long cranium, an overhanging brow, deep sockets with embers of soul fire in them,
+    # blade cheekbones, a narrow upper jaw and a compact mandible on the Jaw bone.
+    head = part('Skull', 'Head', smooth=True, subdiv=1)
+    hm = head.mark()
+    head.blob((0, -0.34, 5.72), (0.37, 0.52, 0.5), BONE, segments=18, rings=14)          # the cranium, long
+    head.blob((0, -0.56, 5.8), (0.31, 0.24, 0.15), BONE, segments=14, rings=8)           # the brow
+    head.loft([
+        ((0, -0.5, 5.66), 0.19, 0.12, 2.6, (0, -0.25, -1)),
+        ((0, -0.58, 5.5), 0.155, 0.1, 2.4, (0, -0.2, -1)),
+        ((0, -0.62, 5.38), 0.115, 0.08, 2.2, (0, -0.2, -1)),
+    ], BONE, sides=14)
+    for s in (-1, 1):
+        head.blob((s * 0.12, -0.68, 5.6), (0.13, 0.09, 0.11), SOCKET, segments=12, rings=8)   # deep sockets
+        head.loft([
+            ((s * 0.14, -0.6, 5.5), 0.03, 0.04, 2.0, (s * 1, -0.6, -0.2)),
+            ((s * 0.22, -0.55, 5.48), 0.04, 0.05, 2.0, (s * 1, -0.6, -0.2)),
+            ((s * 0.28, -0.43, 5.5), 0.02, 0.03, 2.0, (s * 1, -0.6, -0.2)),
+        ], BONE_OLD, sides=8)
+        head.blob((s * 0.25, -0.33, 5.62), (0.07, 0.11, 0.1), BONE_OLD, segments=8, rings=6)   # temples
+        head.blob((s * 0.16, -0.6, 5.42), (0.07, 0.05, 0.06), BONE_DARK, segments=8, rings=6)  # sunken cheeks
+    head.prism((0, -0.665, 5.5), 3, 0.045, 0.001, 0.09, SOCKET, axis=(0, -0.3, -1))       # nasal cavity
+    for k in range(8):
         if k in (2, 6):
             continue
-        phi = (k - 4) * 0.1
-        base, nrm, _ = skull_point(phi, -1.08)
-        ln = 0.055 + 0.018 * ((k * 7) % 3) / 2
-        head.tube([base + nrm * 0.004, base + Vector((0, -0.004, -ln * 0.55)), base + Vector((0, -0.006, -ln))],
-                  [0.0125, 0.011, 0.004], lerp(BONE_OLD, WAX_OLD, 0.35 * ((k * 5) % 3) / 2), sides=6)
-    # cracks: dark fissures over the cranium, one lit from inside
-    for path, glow in ((((-0.3, 0.85), (-0.36, 0.7), (-0.31, 0.58), (-0.4, 0.48)), False),
-                       (((1.25, 0.9), (1.32, 0.72), (1.4, 0.55), (1.38, 0.4)), True),
-                       (((-1.6, 0.6), (-1.7, 0.45), (-1.62, 0.3)), False)):
-        pts = [skull_point(ph, th)[0] + skull_point(ph, th)[1] * 0.003 for ph, th in path]
-        head.tube(pts, [0.009] * (len(pts) - 1) + [0.003], SOUL_DEEP if glow else SOCKET, mat=GLOW if glow else BODY,
-                  sides=4)
-    head.turn(head_mark, HEAD_XF)
+        x = (k - 3.5) * 0.032
+        head.box((x, -0.655 + abs(x) * 0.4, 5.365 - 0.008 * (k % 3)), (0.024, 0.022, 0.06 + 0.012 * (k % 2)),
+                 BONE_OLD, bevel=0.004)                                                  # upper teeth, two lost
+    # cracks over the cranium, two lit from inside by the fire behind the sockets
+    for pts, glow in ((((-0.1, -0.7, 5.86), (-0.06, -0.66, 5.98), (-0.11, -0.58, 6.08)), True),
+                      (((0.15, -0.6, 5.92), (0.2, -0.5, 6.03), (0.16, -0.38, 6.1)), True),
+                      (((0.3, -0.2, 5.8), (0.34, -0.1, 5.7)), False)):
+        head.tube([Vector(p) for p in pts], [0.012] * (len(pts) - 1) + [0.004], SOUL if glow else SOCKET,
+                  mat=GLOW if glow else BODY, sides=4)
+    head.turn(hm, HEAD_M)
     jaw = part('Jaw', 'Jaw', smooth=True)
-    jaw_mark = jaw.mark()
-    # the mandible hangs slack: narrow, a pointed chin, cracked through on the left
+    jm = jaw.mark()
+    jaw.loft([
+        ((-0.2, -0.42, 5.36), 0.03, 0.05, 2.0, (1, -0.4, 0)),
+        ((-0.12, -0.58, 5.3), 0.04, 0.05, 2.0, (1, -0.4, 0)),
+        ((0, -0.63, 5.27), 0.05, 0.055, 2.0, (1, 0, 0)),
+        ((0.12, -0.58, 5.3), 0.04, 0.05, 2.0, (1, 0.4, 0)),
+        ((0.2, -0.42, 5.36), 0.03, 0.05, 2.0, (1, 0.4, 0)),
+    ], BONE, sides=8)
     for s in (-1, 1):
-        jaw.tube([Vector((s * 0.165, -0.235, 4.25)), Vector((s * 0.163, -0.262, 4.14)), Vector((s * 0.148, -0.32, 4.07)),
-                  Vector((s * 0.1, -0.43, 4.035)), Vector((s * 0.035, -0.495, 4.02)), Vector((0, -0.502, 4.02))],
-                 [0.03, 0.032, 0.033, 0.031, 0.03, 0.03], BONE, sides=10, squash=1.9)
-        jaw.blob((s * 0.165, -0.235, 4.26), (0.055, 0.07, 0.06), BONE_OLD, segments=8, rings=6)   # the condyle
-        jaw.tube([Vector((s * 0.16, -0.275, 4.19)), Vector((s * 0.15, -0.3, 4.24)), Vector((s * 0.14, -0.31, 4.28))],
-                 [0.018, 0.012, 0.003], BONE_OLD, sides=6)                                          # the coronoid
-    jaw.blob((0, -0.505, 4.012), (0.08, 0.055, 0.06), BONE, segments=10, rings=6)
+        jaw.tube([Vector((s * 0.2, -0.42, 5.36)), Vector((s * 0.21, -0.36, 5.46)), Vector((s * 0.22, -0.33, 5.52))],
+                 [0.035, 0.03, 0.035], BONE_OLD, sides=7)                                 # the ramus to the hinge
     for k in range(7):
-        if k in (1, 4):
+        if k in (1, 5):
             continue
-        x = (k - 3) * 0.03
-        y = -0.49 + x * x * 2.6
-        jaw.tube([Vector((x, y, 4.04)), Vector((x, y - 0.002, 4.06)), Vector((x, y - 0.004, 4.08 + 0.008 * (k % 2)))],
-                 [0.011, 0.01, 0.003], BONE_OLD, sides=6)
-    jaw.tube([Vector((0.06, -0.51, 4.05)), Vector((0.078, -0.505, 4.028)), Vector((0.07, -0.507, 4.012)),
-              Vector((0.088, -0.5, 3.995))], [0.006, 0.007, 0.006, 0.003], SOCKET, sides=4)
-    jaw.turn(jaw_mark, HEAD_XF)
-    # the neck: three cervical vertebrae under the skull
+        x = (k - 3) * 0.034
+        jaw.box((x, -0.615 + abs(x) * 0.4, 5.325), (0.023, 0.02, 0.05), BONE_OLD, bevel=0.004)
+    jaw.tube([Vector((0.05, -0.655, 5.3)), Vector((0.07, -0.65, 5.27)), Vector((0.085, -0.64, 5.25))],
+             [0.007, 0.006, 0.003], SOCKET, sides=4)                                       # a crack through the chin
+    jaw.turn(jm, HEAD_M)
     for i, z in enumerate((3.92, 4.0, 4.08)):
-        jaw_n = part(f'Cervical{i}', 'Neck', smooth=True)
-        jaw_n.blob((0, -0.1 - 0.02 * i, z), (0.15, 0.13, 0.07), lerp(BONE, BONE_OLD, 0.3 * i), segments=10, rings=6)
-        jaw_n.box((0, -0.03 - 0.02 * i, z), (0.04, 0.12, 0.05), BONE_OLD, bevel=0.01)
-        for sx in (-1, 1):
-            jaw_n.spike((sx * 0.06, -0.1 - 0.02 * i, z), 0.02, 0.06, BONE_OLD, sides=4, lean=(sx * 0.05, 0.0))
-    # the soul flames deep in the sockets, each on its own flickering bone: a white-hot
-    # point in the bowl and a flame of soul fire licking up out of it over the rim
+        cv = part(f'Cervical{i}', 'Neck', smooth=True)
+        cv.blob((0, -0.1 - 0.02 * i, z), (0.14, 0.12, 0.07), lerp(BONE, BONE_OLD, 0.3 * i), segments=10, rings=6)
+    # The soul fire in the sockets, each on its flickering bone: a white-hot ember, a green
+    # flare filling the socket's mouth and a tongue of ghost fire licking up over the brow.
     for s, tag in ((1, '.L'), (-1, '.R')):
-        e = Vector((s * EYE.x, EYE.y, EYE.z))
         fl = part('FlameEye' + tag, 'FlameEye' + tag, smooth=True)
-        fl_mark = fl.mark()
-        e_ = e
-        e = HEAD_XF.inverted() @ e_
-        fl.blob(e + Vector((0, -0.015, -0.01)), (0.03, 0.02, 0.03), SOUL_HOT, mat=GLOW, segments=8, rings=6)
-        fl.tube([e + Vector((0, -0.012, -0.025)), e + Vector((0, -0.024, 0.01)), e + Vector((s * 0.01, -0.034, 0.05)),
-                 e + Vector((s * 0.024, -0.036, 0.09)), e + Vector((s * 0.04, -0.03, 0.125))],
-                [0.02, 0.022, 0.014, 0.006, 0.001], [SOUL_HOT, SOUL, SOUL, SOUL, SOUL_DEEP], mat=GLOW, sides=7)
-        fl.tube([e + Vector((-s * 0.012, -0.018, 0.0)), e + Vector((-s * 0.008, -0.03, 0.04)),
-                 e + Vector((s * 0.004, -0.032, 0.075))], [0.011, 0.007, 0.001], [SOUL, SOUL, SOUL_DEEP], mat=GLOW,
-                sides=5)
-        fl.turn(fl_mark, HEAD_XF)
-    # --- the bone mitre: two fused plates, ridged, a burning eye -----------------------------
+        fm = fl.mark()
+        e = Vector((s * 0.12, -0.75, 5.6))
+        fl.blob(e + Vector((0, 0.03, 0)), (0.12, 0.03, 0.1), SOUL_DEEP, mat=GLOW, segments=10, rings=6)
+        fl.blob(e, (0.075, 0.03, 0.07), SOUL, mat=GLOW, segments=10, rings=6)
+        fl.blob(e + Vector((0, -0.012, 0)), (0.04, 0.02, 0.04), SOUL_HOT, mat=GLOW, segments=8, rings=6)
+        fl.tube([e + Vector((0, -0.01, 0.02)), e + Vector((s * 0.01, -0.02, 0.07)), e + Vector((s * 0.03, -0.015, 0.13)),
+                 e + Vector((s * 0.06, 0.0, 0.19))], [0.03, 0.02, 0.01, 0.001], [SOUL_HOT, SOUL, SOUL, SOUL_DEEP],
+                mat=GLOW, sides=6)
+        fl.turn(fm, HEAD_M)
+    # --- the cowl: Vael's deep hood, folded, the mitre's band gripping its crown --------------
+    hood = part('Hood', 'Head', smooth=True, subdiv=1)
+    hood_mark = hood.mark()
+    cowl(hood)
+    hood.turn(hood_mark, HEAD_M)
+    # --- the bone mitre: one solid of two plates joined at the side seams ---------------------
     mit = part('Mitre', 'Head', smooth=True)
-    mit_mark = mit.mark()
-    for plate_y, tilt in ((-0.16, -1), (0.14, 1)):
-        secs = []
-        for i in range(9):
-            t = i / 8
-            z = 4.62 + t * 1.2
-            hw = 0.33 * (1 + 0.16 * math.sin(t * math.pi * 0.9)) * (1 - t ** 2.2) + 0.012
-            secs.append(((0, plate_y + tilt * 0.08 * t * t - 0.07 * t, z), hw, 0.035, 2.4, (0, 0, 1)))
-        mit.loft(secs, BONE, sides=12)
-        # vertebral ridge up the plate's middle
-        for i in range(8):
-            t = (i + 0.5) / 9
-            z = 4.66 + t * 1.12
-            mit.blob((0, plate_y + tilt * 0.08 * t * t - 0.07 * t + tilt * 0.035, z), (0.08 * (1 - t * 0.6), 0.04, 0.07),
-                     BONE_OLD, segments=8, rings=5)
-        # bony flanges along the rim
-        for s in (-1, 1):
-            for i in range(6):
-                t = 0.1 + i * 0.14
-                hw = 0.33 * (1 + 0.16 * math.sin(t * math.pi * 0.9)) * (1 - t ** 2.2)
-                mit.spike((s * (hw + 0.005), plate_y + tilt * 0.08 * t * t - 0.07 * t, 4.62 + t * 1.2), 0.03,
-                          0.1 * (1 - t * 0.5), GOLD, sides=4, lean=(s * 0.08, 0), mat=METAL)
-            # a gilt edge up each side of the plate
-            edge = []
-            for i in range(9):
-                t = i / 8
-                hw = 0.33 * (1 + 0.16 * math.sin(t * math.pi * 0.9)) * (1 - t ** 2.2) + 0.012
-                edge.append(Vector((s * hw, plate_y + tilt * 0.08 * t * t - 0.07 * t, 4.62 + t * 1.2)))
-            mit.tube(edge, [0.028] * 8 + [0.012], GOLD, sides=5, mat=METAL)
-    # the band round the brow, gold-banded bone, and the side walls between the plates
-    mit.loft([((0, -0.01, 4.6), 0.4, 0.34, 2.2, (0, 0, 1)), ((0, -0.01, 4.74), 0.38, 0.3, 2.2, (0, 0, 1))],
-             BONE_OLD, sides=18)
-    mit.loft([((0, -0.01, 4.63), 0.41, 0.35, 2.2, (0, 0, 1)), ((0, -0.01, 4.68), 0.41, 0.35, 2.2, (0, 0, 1))],
-             GOLD, sides=18, mat=METAL)
-    # the eye on the front plate
-    mit.blob((0, -0.21, 5.0), (0.16, 0.05, 0.22), GOLD, segments=10, rings=8, mat=METAL)
-    mit.blob((0, -0.235, 5.0), (0.1, 0.03, 0.14), SOUL, mat=GLOW, segments=10, rings=8)
-    mit.blob((0, -0.25, 5.0), (0.04, 0.02, 0.06), SOUL_HOT, mat=GLOW, segments=8, rings=6)
-    for k in range(6):
-        a = math.tau * k / 6
-        mit.spike((math.sin(a) * 0.19, -0.2, 5.0 + math.cos(a) * 0.26), 0.02, 0.1, GOLD_HI, sides=4,
-                  lean=(math.sin(a) * 0.08, 0), mat=METAL)
-    # the lappets hanging down the back, strung with bone beads
-    for s in (-1, 1):
-        base = Vector((s * 0.18, 0.28, 4.66))
-        pts = [base + Vector((s * 0.03 * t, 0.12 * t, -0.9 * t)) for t in (i / 6 for i in range(7))]
-        mit.tube(pts, [0.07] * 7, VEST_HI, sides=6, squash=0.25, mat=MEMBRANE)
-        for i in range(1, 7):
-            mit.blob(pts[i] + Vector((0, 0.03, 0)), (0.05, 0.04, 0.05), BONE_OLD, segments=6, rings=4)
-        mit.blob(pts[-1] + Vector((0, 0.03, -0.08)), (0.07, 0.06, 0.1), GOLD, segments=8, rings=5, mat=METAL)
-    # the mitre sits down over the long cranium, its band on the brow
-    mit.turn(mit_mark, Matrix.Translation((0, -0.12, 0.2)))
-    # --- the high collar behind the skull and the shoulder plates with their candles ----------
-    col = part('Collar', 'Chest', smooth=True)
+    MB = lerp(BONE, BONE_OLD, 0.3)
+    secs = []
     for i in range(9):
-        a = math.radians(-120 + 240 * i / 8)
-        x, y = math.sin(a) * 0.52, math.cos(a) * 0.42 + 0.06
-        top = 4.6 + 0.3 * math.cos(a * 0.8)
-        col.tube([Vector((x, y, 3.92)), Vector((x * 1.12, y * 1.12 + 0.04, (3.92 + top) / 2)),
-                  Vector((x * 1.25, y * 1.2 + 0.1, top))], [0.13, 0.12, 0.05], VEST, sides=5, squash=0.28,
-                 mat=MEMBRANE)
-        col.tube([Vector((x * 1.26, y * 1.22 + 0.1, top)), Vector((x * 1.27, y * 1.23 + 0.1, top + 0.02))], [0.05, 0.035],
-                 GOLD, sides=5, mat=METAL)
+        t = 0.6 * i / 8
+        secs.append(((0, _mitre_yc(t), MITRE_BASE + t * MITRE_H), _mitre_hw(t), _mitre_hd(t), 2.0, (0, 0, 1)))
+    mit.loft(secs, MB, sides=20)
+    # above 0.6 the two plates part into horns, front and back, a dark cleft between
+    for face in (-1, 1):
+        secs = []
+        for i in range(7):
+            t = 0.58 + 0.42 * i / 6
+            hd = _mitre_hd(t) * 0.5
+            off = face * (_mitre_hd(t) * 0.5 + 0.035 * ((t - 0.58) / 0.42) ** 1.5)
+            secs.append(((0, _mitre_yc(t) + off, MITRE_BASE + t * MITRE_H), _mitre_hw(t), hd, 2.0, (0, 0, 1)))
+        mit.loft(secs, MB if face < 0 else lerp(MB, BONE_DARK, 0.2), sides=16)
+    mit.loft([((0, _mitre_yc(0.6), MITRE_BASE + 0.6 * MITRE_H), _mitre_hw(0.6) * 0.9, 0.03, 2.0, (0, 0, 1)),
+              ((0, _mitre_yc(0.97), MITRE_BASE + 0.97 * MITRE_H), 0.03, 0.02, 2.0, (0, 0, 1))], SOCKET, sides=10)
+    for face in (-1, 1):
+        # a vertebral ridge up the middle of each plate
+        for i in range(10):
+            t = (i + 0.4) / 11
+            y = _mitre_yc(t) + face * (_mitre_hd(t) + 0.005)
+            mit.blob((0, y, MITRE_BASE + 0.04 + t * MITRE_H * 0.95), (0.07 * (1 - t * 0.5), 0.045, 0.06),
+                     BONE_OLD, segments=8, rings=5)
     for s in (-1, 1):
-        # a pauldron of old bone: a scapula shell over the shoulder, a skull on its point
-        sh = Vector((s * 0.74, 0.0, 3.9))
-        col.blob(sh, (0.5, 0.52, 0.2), BONE, rot=(0, s * 0.35, 0), segments=14, rings=8)
-        col.blob(sh + Vector((s * 0.1, 0, -0.04)), (0.56, 0.56, 0.12), BONE_OLD, rot=(0, s * 0.45, 0), segments=14,
-                 rings=6)
-        col.skull((s * 1.02, -0.18, 3.74), size=0.16, yaw=s * 0.5, color=BONE)
-        for k in range(4):
-            a = math.radians(-60 + 40 * k)
-            col.spike(sh + Vector((s * 0.36 * math.cos(a), 0.3 * math.sin(a), -0.02)), 0.035, 0.18, BONE_OLD, sides=4,
-                      lean=(s * 0.12, 0.03 * math.sin(a)))
-        # the gold-banded stole edging the opening, falling to the waist
-        stole = [Vector((s * 0.2, -0.3, 4.0)), Vector((s * 0.36, -0.44, 3.72)), Vector((s * 0.46, -0.48, 3.35)),
-                 Vector((s * 0.44, -0.46, 2.95)), Vector((s * 0.38, -0.48, 2.5)), Vector((s * 0.36, -0.52, 2.05))]
-        col.tube(stole, [0.14] * 6, VEST_HI, sides=6, squash=0.2, mat=MEMBRANE, up=(0, -1, 0))
-        for edge in (-1, 1):
-            col.tube([v + Vector((edge * 0.125, -0.03, 0)) for v in stole], [0.016] * 6, GOLD, sides=5, mat=METAL)
+        # blackened silver along the side seams, bone spines along them
+        seam = [Vector((s * _mitre_hw(i / 12), _mitre_yc(i / 12), MITRE_BASE + i / 12 * MITRE_H)) for i in range(13)]
+        mit.tube(seam, [0.03] * 12 + [0.012], SILVER, sides=6, mat=METAL)
         for i in range(5):
-            c = stole[i].lerp(stole[i + 1], 0.5) + Vector((0, -0.045, 0))
-            col.blob(c, (0.06, 0.02, 0.06), GOLD_HI, segments=6, rings=4, mat=METAL)
-            col.prism(c + Vector((0, -0.012, 0)), 4, 0.03, 0.03, 0.01, SOUL, mat=GLOW, axis=(0, -1, 0), phase=0.785)
-        for j in range(5):
-            x = s * (0.3 + j * 0.03)
-            col.tube([Vector((x, -0.52, 2.02)), Vector((x, -0.53, 1.9))], [0.012, 0.008], GOLD, sides=4, mat=METAL)
-        # the candles, wax pooled on the plate and running down over its edge
-        for i, (base, h, r) in enumerate(CANDLES):
-            b = Vector((s * base[0], base[1], base[2]))
-            col.lathe(tuple(b), [(r * 1.1, 0), (r, r * 0.4), (r * 0.98, h * 0.9), (r * 0.8, h)], 9,
-                      lerp(WAX, WAX_OLD, 0.25 * i), mat=BODY)
-            col.tube([b + Vector((0, 0, h - 0.01)), b + Vector((0, 0, h + 0.05))], [0.008, 0.006], SOCKET, sides=4)
-            for d in range(4):
-                a = (d * 1.7 + i) % math.tau
-                top = b + Vector((math.cos(a) * r, math.sin(a) * r, h * (0.9 - 0.12 * d)))
-                drop = 0.12 + 0.1 * d + 0.08 * i
-                col.tube([top, top + Vector((math.cos(a) * 0.012, math.sin(a) * 0.012, -drop * 0.6)),
-                          top + Vector((math.cos(a) * 0.018, math.sin(a) * 0.018, -drop))], [0.022, 0.018, 0.024],
-                         WAX, sides=5)
-        col.blob(Vector((s * 0.72, -0.02, 3.97)), (0.34, 0.3, 0.05), WAX_OLD, segments=10, rings=5)
-        for d in range(6):
-            a = math.radians(-100 + 40 * d)
-            top = Vector((s * (0.72 + 0.3 * math.cos(a)), -0.02 + 0.26 * math.sin(a), 3.95))
-            drop = 0.2 + 0.14 * ((d * 3) % 4)
-            col.tube([top, top + Vector((s * 0.05, 0, -drop * 0.5)), top + Vector((s * 0.07, 0, -drop))],
-                     [0.03, 0.022, 0.028], WAX, sides=5)
-    # the flames, each on its own flickering bone
-    for i, (base, h, r) in enumerate(CANDLES):
-        for s, tag in ((1, '.L'), (-1, '.R')):
-            wick = Vector((s * base[0], base[1], base[2] + h + 0.03))
-            fl = part(f'Flame{i}{tag}', f'Flame{i}{tag}', smooth=True)
-            fl.blob(wick + Vector((0, 0, 0.06)), (0.07, 0.07, 0.15), FLAME, mat=GLOW, segments=8, rings=6)
-            fl.blob(wick + Vector((0, 0, 0.04)), (0.035, 0.035, 0.08), FLAME_HOT, mat=GLOW, segments=6, rings=5)
-            fl.spike(wick + Vector((0, 0, 0.08)), 0.03, 0.16, FLAME, sides=5, mat=GLOW)
-    # --- the cincture: knotted bone beads, skull charms ---------------------------------------
-    belt = part('Belt', 'Hips', smooth=True)
-    belt.tube([Vector((math.sin(math.tau * i / 32) * 0.56, -math.cos(math.tau * i / 32) * 0.46, 2.52 + 0.03 * math.sin(i)))
-               for i in range(33)], [0.05] * 33, GOLD, sides=6, cap=False, mat=METAL)
+            t = 0.12 + i * 0.15
+            mit.spike((s * (_mitre_hw(t) + 0.012), _mitre_yc(t), MITRE_BASE + t * MITRE_H), 0.026,
+                      0.12 * (1 - t * 0.5), BONE_OLD, sides=4, lean=(s * 0.1, 0))
+    for face in (-1, 1):
+        y = _mitre_yc(1.0) + face * 0.05
+        mit.spike((0, y, MITRE_BASE + MITRE_H - 0.02), 0.03, 0.14, BONE_OLD, sides=5, lean=(0, face * 0.04))
+    # the band: blackened silver gripping the cowl's crown, bone studs round it
+    mit.loft([((0, _mitre_yc(0), MITRE_BASE - 0.1), _mitre_hw(0) + 0.05, _mitre_hd(0) + 0.05, 2.2, (0, 0, 1)),
+              ((0, _mitre_yc(0), MITRE_BASE + 0.07), _mitre_hw(0) + 0.025, _mitre_hd(0) + 0.025, 2.2, (0, 0, 1))],
+             SILVER, sides=24, mat=METAL)
     for i in range(16):
         a = math.tau * i / 16
-        belt.blob((math.sin(a) * 0.58, -math.cos(a) * 0.48, 2.52), (0.07, 0.06, 0.06), BONE_OLD, segments=6, rings=4)
-    for s, drop in ((-1, 0.7), (1, 1.0), (-0.4, 0.5)):
-        belt.tube([Vector((s * 0.24, -0.47, 2.5)), Vector((s * 0.27, -0.5, 2.5 - drop * 0.5)),
-                   Vector((s * 0.25, -0.48, 2.5 - drop))], [0.025, 0.02, 0.02], GOLD, sides=5, mat=METAL)
-        belt.skull((s * 0.25, -0.48, 2.36 - drop), size=0.1, color=BONE_OLD)
-    # --- arms: bell sleeves of plum and gold, bony fists ---------------------------------------
+        mit.blob((math.sin(a) * (_mitre_hw(0) + 0.06), _mitre_yc(0) - math.cos(a) * (_mitre_hd(0) + 0.06),
+                  MITRE_BASE - 0.015), (0.045, 0.045, 0.05), BONE_OLD, segments=6, rings=4)
+    # The sigil on the front plate: an open eye of soul fire in a silver almond, rays of
+    # cold light cut into the bone round it, cracks of fire running up toward the peak.
+    ts = 0.32
+    fz = MITRE_BASE + ts * MITRE_H
+    fy = _mitre_yc(ts) - _mitre_hd(ts)
+    ring = []
+    for i in range(33):
+        a = math.tau * i / 32
+        ring.append(Vector((math.sin(a) * abs(math.sin(a)) ** 0.2 * 0.15, fy - 0.004,
+                            fz + math.cos(a) * 0.12)))
+    mit.tube(ring, [0.02] * 33, SILVER, sides=6, cap=False, mat=METAL)
+    mit.blob((0, fy + 0.008, fz), (0.28, 0.04, 0.2), SOCKET, segments=12, rings=8)
+    mit.blob((0, fy - 0.01, fz), (0.07, 0.028, 0.17), SOUL, mat=GLOW, segments=12, rings=8)
+    mit.blob((0, fy - 0.022, fz), (0.022, 0.018, 0.12), SOUL_HOT, mat=GLOW, segments=8, rings=6)
+    for k in range(10):
+        a = math.tau * k / 10 + 0.31
+        r0, r1 = 0.24, 0.31 + 0.06 * (k % 2)
+        p0 = Vector((math.sin(a) * r0 * 0.7, 0, fz + math.cos(a) * r0))
+        p1 = Vector((math.sin(a) * r1 * 0.7, 0, fz + math.cos(a) * r1))
+        for p in (p0, p1):
+            t = (p.z - MITRE_BASE) / MITRE_H
+            p.y = _mitre_yc(t) - _mitre_hd(t) * math.sqrt(max(0.0, 1 - (p.x / _mitre_hw(t)) ** 2)) - 0.004
+        mit.tube([p0, p1], [0.011, 0.004], SOUL_DEEP, mat=GLOW, sides=4)
+    for path in (((0.0, 0.52), (-0.04, 0.62), (0.02, 0.72), (-0.02, 0.84)), ((0.05, 0.55), (0.1, 0.66))):
+        pts = []
+        for x, t in path:
+            pts.append(Vector((x, _mitre_yc(t) - _mitre_hd(t) - 0.004, MITRE_BASE + t * MITRE_H)))
+        mit.tube(pts, [0.011] * (len(pts) - 1) + [0.003], SOUL, mat=GLOW, sides=4)
+    # the lappets: two strips of grave linen falling from the back of the mitre over the cowl
+    for s in (-1, 1):
+        base = Vector((s * 0.2, _mitre_yc(0) + _mitre_hd(0) + 0.06, MITRE_BASE - 0.04))
+        pts = [base + Vector((s * 0.05 * t, 0.16 * t + 0.14 * t * t, -1.05 * t)) for t in (i / 7 for i in range(8))]
+        mit.tube(pts, [0.075] * 8, LINEN_DARK, sides=6, squash=0.22, mat=MEMBRANE, up=(0, 1, 0))
+        for e in (-1, 1):
+            mit.tube([p + Vector((e * 0.07, 0.012, 0)) for p in pts], [0.011] * 8, SILVER, sides=4, mat=METAL)
+        mit.tube([pts[-1] + Vector((-0.075, 0.01, -0.02)), pts[-1] + Vector((0.075, 0.01, -0.02))], [0.02, 0.02],
+                 SILVER, sides=6, mat=METAL)
+        for j in range(5):
+            x = -0.06 + 0.03 * j
+            mit.tube([pts[-1] + Vector((x, 0.01, -0.03)), pts[-1] + Vector((x, 0.012, -0.14 - 0.03 * (j % 2)))],
+                     [0.008, 0.004], LINEN_DARK, sides=4)
+    # --- the cincture: a knotted cord with bone beads ------------------------------------------
+    belt = part('Belt', 'Hips', smooth=True)
+    belt.tube([Vector((math.sin(math.tau * i / 32) * 0.56, -math.cos(math.tau * i / 32) * 0.46, 2.52 + 0.03 * math.sin(i)))
+               for i in range(33)], [0.045] * 33, ROPE, sides=6, cap=False)
+    for i in range(10):
+        a = math.tau * (i + 0.5) / 10
+        belt.blob((math.sin(a) * 0.585, -math.cos(a) * 0.485, 2.52), (0.06, 0.055, 0.06), BONE_OLD, segments=6, rings=4)
+    belt.blob((0.16, -0.5, 2.5), (0.11, 0.08, 0.1), ROPE, segments=8, rings=6)   # the knot
+    # --- arms: wide shroud sleeves, tattered, bony fists ---------------------------------------
     for s, tag in ((1, '.L'), (-1, '.R')):
         a0, a1 = REST['Arm' + tag]
         up = part('Sleeve' + tag, 'Arm' + tag, smooth=True)
-        up.tube([a0.lerp(a1, t) for t in (0, 0.33, 0.66, 1.0)], [0.24, 0.22, 0.21, 0.23], VEST, sides=12, mat=MEMBRANE)
+        up.tube([a0.lerp(a1, t) for t in (0, 0.33, 0.66, 1.0)], [0.25, 0.22, 0.21, 0.23], SHROUD_HI, sides=12,
+                mat=MEMBRANE)
         f0, f1 = REST['Fore' + tag]
         fd = (f1 - f0).normalized()
+        fu = fd.orthogonal().normalized()
+        fv = fd.cross(fu).normalized()
         lo = part('Cuff' + tag, 'Fore' + tag, smooth=True)
-        lo.tube([f0.lerp(f1, t) for t in (0, 0.3, 0.6, 0.85, 1.0)], [0.22, 0.26, 0.32, 0.4, 0.45], VEST, sides=16,
-                cap=False, mat=MEMBRANE)
-        lo.tube([f1 + fd * 0.01, f1 + fd * 0.05], [0.46, 0.465], GOLD, sides=16, cap=False, mat=METAL)
-        # the ragged hem of the bell sleeve, hanging on past the cuff along the forearm
-        u = fd.orthogonal().normalized()
-        v = fd.cross(u).normalized()
-        for k in range(9):
-            ang = math.tau * k / 9
-            out = u * math.cos(ang) + v * math.sin(ang)
-            base = f1 + out * 0.42 - fd * 0.04
+        lo.tube([f0.lerp(f1, t) for t in (0, 0.3, 0.6, 0.85, 1.0)], [0.21, 0.24, 0.29, 0.35, 0.39], SHROUD, sides=16,
+                cap=False, mat=MEMBRANE, up=tuple(fu))
+        # a thin hem of grave linen just inside the bell of the sleeve
+        lo.tube([f1 - fd * 0.06, f1 - fd * 0.01], [0.365, 0.372], LINEN_DARK, sides=16, cap=False, mat=MEMBRANE)
+        # tatters hang from the lower half of the bell, falling (not fanning round the fist)
+        down = Vector((0, 0, -1))
+        for k in range(11):
+            ang = math.tau * k / 11
+            ring = fu * math.cos(ang) + fv * math.sin(ang)
+            if ring.z > 0.35:
+                continue
+            base = f1 + ring * 0.37 - fd * 0.06
             ln = 0.3 + 0.35 * ((k * 37) % 5) / 5
-            lo.tube([base, base + out * 0.05 + fd * ln * 0.5, base + out * 0.09 + fd * ln], [0.12, 0.09, 0.02], VEST,
-                    sides=4, squash=0.12, mat=MEMBRANE, up=tuple(out))
+            hang = (down * 0.75 + fd * 0.25 + ring * 0.1).normalized()
+            lo.tube([base, base + ring * 0.03 + hang * ln * 0.5, base + ring * 0.05 + hang * ln], [0.1, 0.075, 0.015],
+                    SHROUD_EDGE if k % 3 == 0 else SHROUD, sides=4, squash=0.14, mat=MEMBRANE, up=tuple(ring))
         hand = part('Hand' + tag, 'Hand' + tag, smooth=True)
         if s > 0:
-            fist(hand, WRIST_L, H_L, A_L, N_L, rings=(1, 3))
+            fist(hand, WRIST_L, H_L, A_L, N_L, rings=(1,))
         else:
-            fist(hand, WRIST_R, H_R, A_R, N_R, rings=(0, 2))
-    # the manacle and chain on the left wrist
-    ch1 = part('Manacle', 'Hand.L', smooth=True)
-    w = Vector(REST['Hand.L'][0])
-    ch1.tube([w + Vector((0, 0, 0.04)), w + Vector((0, 0, -0.06))], [0.14, 0.14], IRON, sides=10, cap=False, mat=METAL)
-    ch1.blob(w + Vector((0.13, -0.02, -0.02)), (0.05, 0.05, 0.06), IRON_HI, segments=6, rings=4, mat=METAL)
-
-    def links(p, a, b, n, phase=0.0):
-        a, b = Vector(a), Vector(b)
-        for i in range(n):
-            c = a.lerp(b, (i + 0.5) / n)
-            d = (b - a).normalized()
-            side = Vector((1, 0, 0)) if (i + phase) % 2 == 0 else Vector((0, 1, 0))
-            ring = [c + d * 0.045 * math.cos(t) + side * 0.028 * math.sin(t) for t in (j * math.tau / 10 for j in range(11))]
-            p.tube(ring, [0.012] * 11, IRON_HI if i % 3 == 0 else IRON, sides=5, cap=False, mat=METAL)
-
-    links(ch1, REST['Chain1'][0], REST['Chain1'][1], 4)
-    ch2 = part('Chain', 'Chain2', smooth=True)
-    links(ch2, REST['Chain2'][0], REST['Chain2'][1], 4, 1)
-    # --- the Book of Names -----------------------------------------------------------------------
-    bk = part('Book', 'Book', smooth=False)
-    bk_mark = bk.mark()
-    t0 = Vector(BOOK_TOP)
-    # the book hangs with its spine up; covers face +-X
-    ctr = t0 + Vector((0, 0, -0.27))
-    bk.box(tuple(ctr + Vector((-0.07, 0, 0))), (0.035, 0.46, 0.52), LEATHER, bevel=0.012)       # back cover
-    bk.box(tuple(ctr + Vector((0.005, 0, -0.005))), (0.12, 0.43, 0.49), PAGE, bevel=0.004)      # the page block
-    for z in (-0.19, -0.06, 0.07, 0.2):
-        bk.box(tuple(ctr + Vector((0.005, -0.216, z))), (0.12, 0.004, 0.012), (0.45, 0.4, 0.3))  # page edges
-    bk.tube([t0 + Vector((-0.07, -0.23, 0.01)), t0 + Vector((0.06, -0.23, 0.01))], [0.05, 0.05], LEATHER, sides=8,
-            mat=BODY)
-    bk.tube([t0 + Vector((-0.07, -0.23, 0.01)), t0 + Vector((-0.07, 0.23, 0.01))], [0.045, 0.045], LEATHER, sides=8)
-    for y in (-0.14, 0.0, 0.14):
-        bk.tube([t0 + Vector((-0.1, y, 0.01)), t0 + Vector((0.08, y, 0.01))], [0.018, 0.018], GOLD, sides=6, mat=METAL)
-    bk.blob(t0 + Vector((-0.01, 0, 0.06)), (0.07, 0.07, 0.07), IRON_HI, segments=8, rings=5, mat=METAL)   # the ring
-    for y in (-1, 1):
-        for z in (-1, 1):
-            bk.box(tuple(ctr + Vector((-0.085, y * 0.2, z * 0.23))), (0.02, 0.09, 0.09), IRON, bevel=0.01, mat=METAL)
-    lid = part('BookLid', 'BookLid', smooth=False)
-    lid_mark = lid.mark()
-    lid.box(tuple(ctr + Vector((0.085, 0, 0))), (0.035, 0.46, 0.52), LEATHER, bevel=0.012)
-    for y in (-1, 1):
-        for z in (-1, 1):
-            lid.box(tuple(ctr + Vector((0.1, y * 0.2, z * 0.23))), (0.02, 0.09, 0.09), IRON, bevel=0.01, mat=METAL)
-    lid.skull(tuple(ctr + Vector((0.11, 0, -0.04))), size=0.13, yaw=math.pi / 2, color=BONE)
-    lid.box(tuple(ctr + Vector((0.1, 0, 0.19))), (0.012, 0.3, 0.05), GOLD, bevel=0.004, mat=METAL)
-    lid.box(tuple(ctr + Vector((0.08, 0.25, -0.02))), (0.05, 0.06, 0.14), IRON_HI, bevel=0.01, mat=METAL)  # the clasp
-    # the burning names on the open pages (hidden under the lid when shut)
-    for i in range(5):
-        z = -0.18 + i * 0.085
-        lid.box(tuple(ctr + Vector((0.064, -0.08, z))), (0.004, 0.24, 0.018), SOUL, mat=GLOW)
-        bk.box(tuple(ctr + Vector((0.066, 0.06, z + 0.02))), (0.004, 0.2, 0.016), SOUL, mat=GLOW)
-    # The tome is heavy: every part of it grown about its ring at the spine.
-    tome = Matrix.Translation(t0) @ Matrix.Scale(1.4, 4) @ Matrix.Translation(-t0)
-    bk.turn(bk_mark, tome)
-    lid.turn(lid_mark, tome)
+            fist(hand, WRIST_R, H_R, A_R, N_R, rings=(2,))
+    # (The Book of Names and its chain are gone: the Chain, Book and BookLid bones stay
+    # in the rig, bare, so every clip keys exactly what it always did.)
     # --- the bell staff and the folded scythe ----------------------------------------------------
     st = part('Staff', 'Staff', smooth=True)
     up = Vector((0, 0, 1))
@@ -771,7 +791,6 @@ def build_parts():
     bottom = g - up * SHAFT_BELOW
     top = g + up * SHAFT_ABOVE
     n = 30
-    # the two grips, bound in black leather under the fists (the shaft's vertebrae stop there)
     grips = [(g, 0.17), (g - up * GRIP2, 0.15)]
 
     def in_grip(pt, pad=0.0):
@@ -793,18 +812,24 @@ def build_parts():
         wrap = [c + up * (-half + 2 * half * j / 48) + Vector((math.cos(j * turns_ * math.tau / 48),
                                                                 math.sin(j * turns_ * math.tau / 48), 0)) * (GRIP_R_BAR + 0.004)
                 for j in range(49)]
-        st.tube(wrap, [0.011] * 49, (0.16, 0.06, 0.05), sides=5, cap=False)
+        st.tube(wrap, [0.011] * 49, LINEN_DARK, sides=5, cap=False)
         for e in (-1, 1):
-            st.tube([c + up * (e * (half + 0.06) - 0.035), c + up * (e * (half + 0.06) + 0.035)], [0.088, 0.088], GOLD,
+            st.tube([c + up * (e * (half + 0.06) - 0.035), c + up * (e * (half + 0.06) + 0.035)], [0.088, 0.088], SILVER,
                     sides=10, mat=METAL)
     for t in (0.0, 0.62, 0.9):
         c = bottom.lerp(top, t)
-        st.tube([c - up * 0.07, c + up * 0.07], [0.1, 0.1], GOLD, sides=10, mat=METAL)
+        st.tube([c - up * 0.07, c + up * 0.07], [0.1, 0.1], SILVER, sides=10, mat=METAL)
     st.spike(bottom, 0.08, -0.3, IRON, sides=6, mat=METAL)
-    st.blob(bottom - up * 0.02, (0.13, 0.13, 0.1), GOLD, segments=8, rings=5, mat=METAL)
+    st.blob(bottom - up * 0.02, (0.13, 0.13, 0.1), SILVER, segments=8, rings=5, mat=METAL)
+    # a ribbon of grave linen knotted under the cradle
+    kn = top - up * 1.12
+    for k, ln in ((0, 0.9), (1, 0.65)):
+        sx = (k * 2 - 1)
+        st.tube([kn + Vector((0.06 * sx, 0, 0)), kn + Vector((0.12 * sx, 0.04, -ln * 0.5)), kn + Vector((0.18 * sx, 0.1, -ln))],
+                [0.06, 0.05, 0.012], LINEN_DARK, sides=4, squash=0.25, mat=MEMBRANE)
     # the gothic cradle: two iron arms rising to a pointed arch, the bell hung between them
     cb = top - up * 0.95
-    st.blob(cb, (0.22, 0.2, 0.16), GOLD, segments=10, rings=6, mat=METAL)
+    st.blob(cb, (0.22, 0.2, 0.16), SILVER, segments=10, rings=6, mat=METAL)
     for s in (-1, 1):
         arm_pts = [cb + Vector((s * 0.08, 0, 0.05)), cb + Vector((s * 0.46, 0, 0.35)), cb + Vector((s * 0.5, 0, 0.72)),
                    cb + Vector((s * 0.36, 0, 0.98)), cb + Vector((s * 0.12, 0, 1.08)), top + up * 0.13]
@@ -814,8 +839,7 @@ def build_parts():
             st.spike(p, 0.025, 0.16, IRON_HI, sides=4, lean=(s * 0.12, 0), mat=METAL)
         st.skull(tuple(cb + Vector((s * 0.52, -0.02, 0.55))), size=0.1, yaw=0, color=BONE_OLD)
     st.tube([cb + Vector((-0.44, 0, 0.62)), cb + Vector((0.44, 0, 0.62))], [0.035, 0.035], IRON_HI, sides=6, mat=METAL)
-    st.blob(top + up * 0.12, (0.11, 0.11, 0.11), GOLD, segments=8, rings=6, mat=METAL)            # the crest hinge
-    # the bell (on its own bone, swinging)
+    st.blob(top + up * 0.12, (0.11, 0.11, 0.11), SILVER, segments=8, rings=6, mat=METAL)            # the crest hinge
     bl = part('Bell', 'Bell', smooth=True)
     pv = Vector(BELL_PIVOT)
     bl.tube([pv + Vector((0, 0, 0.02)), pv - Vector((0, 0, 0.1))], [0.04, 0.04], IRON, sides=6, mat=METAL)
@@ -829,8 +853,7 @@ def build_parts():
     bl.skull(tuple(pv - Vector((0, 0.19, 0.42))), size=0.1, color=BONE_OLD)
     bl.tube([pv - Vector((0, 0, 0.12)), pv - Vector((0, 0, 0.5))], [0.018, 0.018], IRON, sides=5, mat=METAL)
     bl.blob(pv - Vector((0, 0, 0.53)), (0.07, 0.07, 0.08), IRON_HI, segments=8, rings=5, mat=METAL)   # clapper
-    bl.blob(pv - Vector((0, 0, 0.44)), (0.13, 0.13, 0.08), SOUL_DEEP, mat=GLOW, segments=10, rings=5)  # soul light in its throat
-    # the blade: two halves, each on its hinge; modelled OUT (the scythe) and folded by the clips
+    bl.blob(pv - Vector((0, 0, 0.44)), (0.16, 0.16, 0.08), SOUL, mat=GLOW, segments=10, rings=5)     # soul light in its throat
     for tag, t_a, t_b, dx in (('Blade1', 0.0, BLADE_MID, 0.0), ('Blade2', BLADE_MID, 1.0, 0.045)):
         bp = part(tag, tag, smooth=True)
         nseg = 10
@@ -850,16 +873,10 @@ def build_parts():
             bp.spike(spine[i] + Vector((0, 0, 0.02)), 0.05, 0.17, IRON_HI, sides=4, lean=(0, 0.05), mat=METAL)
         rn = [pnt + Vector((0.038, 0, -0.16 * (1 - (t_a + (t_b - t_a) * i / nseg)))) for i, pnt in enumerate(spine)]
         bp.tube(rn, [0.012] * len(rn), SOUL_DEEP, mat=GLOW, sides=4)
-        # the hinge knuckle
-        bp.blob(spine[0], (0.13, 0.1, 0.13), GOLD, segments=8, rings=6, mat=METAL)
+        bp.blob(spine[0], (0.13, 0.1, 0.13), SILVER, segments=8, rings=6, mat=METAL)
         if tag == 'Blade1':
             bp.skull(tuple(spine[0] + Vector((0, -0.06, 0.1))), size=0.12, color=BONE)
-    # (The souls he has gathered circle him as soul flames drawn by the effect layer,
-    # src/render/hollow_crypt/morthen_fx.ts, never as solid shapes on the body.)
-    # --- the soul smoke the body dissolves into ------------------------------------------------
-    # Layered, translucent wisps (the smoke material: vertex alpha, soft at both edges and
-    # fading out at the foot) spiral down from under the torn alb. The outer veil turns on
-    # the Smoke bone and the inner one against it on SmokeIn, so the smoke churns.
+    # --- the soul smoke the shroud dissolves into ----------------------------------------------
     def wisp(p, k, count, top, bottom, r_out, turns, width, col_top, col_low, alpha, phase=0.0):
         a0 = math.tau * k / count + phase + 0.35 * math.sin(k * 3.1)
         n = 18
@@ -868,7 +885,6 @@ def build_parts():
             t = i / n
             z = top - t * (top - bottom)
             a = a0 + t * turns
-            # the funnel: full under the hem, drawn in to a thin tail near the floor
             prof = r_out * (0.22 + 0.78 * math.sin(math.pi * 0.5 * max(0.0, min(1.0, (z - bottom) / max(0.2, top - bottom)))) ** 0.8)
             rr = prof + 0.06 * math.sin(t * 7 + k * 1.7)
             c = Vector((math.sin(a) * rr, -math.cos(a) * rr, z))
@@ -876,7 +892,6 @@ def build_parts():
             tang = Vector((math.cos(a), math.sin(a), 0)) * rr * turns + Vector((0, 0, -(top - bottom)))
             side = tang.normalized().cross(radial).normalized()
             w = width * (0.35 + 0.65 * math.sin(math.pi * min(1.0, t * 1.1 + 0.05))) * (1.0 - 0.35 * t)
-            # the wisp billows: its middle bows out from the funnel
             bow = radial * w * 0.25
             fade = min(1.0, t / 0.18) * (1.0 - t) ** 1.3
             col = lerp(col_top, col_low, t ** 1.2)
@@ -895,38 +910,53 @@ def build_parts():
                     edge = lp.vert is verts[row][0] or lp.vert is verts[row][2]
                     lp[p.col] = (*col_, 0.0 if edge else verts[row][4])
 
-    ink = (0.12, 0.08, 0.16)
-    plum = (0.3, 0.18, 0.36)
+    ink = SMOKE_DARK
+    murk = lerp(SMOKE, SOUL_DEEP, 0.18)
     sm = part('Smoke', 'Smoke', smooth=True)
     for k in range(16):
         wisp(sm, k, 16, top=1.95 - 0.12 * (k % 3), bottom=0.05 + 0.05 * (k % 2), r_out=1.0, turns=2.5 + 0.35 * (k % 3),
-             width=0.42 + 0.1 * (k % 2), col_top=lerp(plum, SMOKE, 0.25 * (k % 2)), col_low=ink, alpha=0.55)
+             width=0.42 + 0.1 * (k % 2), col_top=lerp(murk, SMOKE, 0.3 * (k % 2)), col_low=ink, alpha=0.58)
     for k in range(8):
-        wisp(sm, k, 8, top=1.6, bottom=0.25, r_out=1.18, turns=1.9, width=0.8, col_top=lerp(plum, ink, 0.4),
-             col_low=ink, alpha=0.22, phase=0.3)
+        wisp(sm, k, 8, top=1.6, bottom=0.25, r_out=1.18, turns=1.9, width=0.8, col_top=lerp(murk, ink, 0.4),
+             col_low=ink, alpha=0.24, phase=0.3)
     si = part('SmokeIn', 'SmokeIn', smooth=True)
     for k in range(8):
-        wisp(si, k, 8, top=1.85, bottom=0.12, r_out=0.6, turns=-2.8, width=0.4, col_top=lerp(plum, SOUL_DEEP, 0.35),
-             col_low=lerp(ink, SOUL_DEEP, 0.2), alpha=0.5, phase=0.2)
+        wisp(si, k, 8, top=1.85, bottom=0.12, r_out=0.6, turns=-2.8, width=0.4, col_top=lerp(SMOKE, SOUL_DEEP, 0.55),
+             col_low=lerp(ink, SOUL_DEEP, 0.3), alpha=0.55, phase=0.2)
     # threads of soul light turning inside the smoke (on the body mesh, not the smoke's)
     si = part('SoulThreads', 'SmokeIn', smooth=True)
-    for k in range(4):
-        a0 = math.tau * k / 4 + 0.4
+    for k in range(5):
+        a0 = math.tau * k / 5 + 0.4 + 0.5 * math.sin(k * 2.3)
         pts = []
-        for i in range(10):
-            t = i / 9
-            a = a0 - t * 3.6
-            r = 0.12 + 0.3 * math.sin(t * math.pi)
-            pts.append(Vector((math.sin(a) * r, -math.cos(a) * r, 0.35 + t * 1.6)))
-        si.tube(pts, [0.004 + 0.018 * math.sin(t * math.pi) for t in (i / 9 for i in range(10))],
-                [lerp(SOUL_DEEP, SOUL, math.sin(t * math.pi)) for t in (i / 9 for i in range(10))], mat=GLOW, sides=4)
+        for i in range(12):
+            t = i / 11
+            a = a0 - t * (3.0 + 0.6 * (k % 3))
+            r = 0.12 + (0.26 + 0.06 * (k % 2)) * math.sin(t * math.pi) + 0.04 * math.sin(t * 9 + k)
+            pts.append(Vector((math.sin(a) * r, -math.cos(a) * r, 0.85 + t * (1.15 + 0.12 * (k % 3)))))
+        si.tube(pts, [0.003 + 0.011 * math.sin(t * math.pi) for t in (i / 11 for i in range(12))],
+                [lerp(SOUL_DEEP, SOUL, math.sin(t * math.pi)) for t in (i / 11 for i in range(12))], mat=GLOW, sides=4)
     return parts
+
+
+def mozzetta_spar(k):
+    """The shoulder cape's k-th spar, just outside the cope's own (chas_spar):
+    collar, shoulder, hem. Open over the ribs like the cope."""
+    th, st = chas_spar(k)
+    sx, cy = math.sin(th), math.cos(th)
+    front = max(0.0, -cy)
+    return th, [
+        (sx * 0.5, cy * 0.38 + 0.03, 4.08),
+        (sx * 0.86, cy * 0.55 + 0.05, 4.0),
+        (sx * 1.05, cy * 0.67 + 0.08, 3.7 + front * 0.1),
+        (sx * 1.11, cy * 0.73 + 0.1, 3.38 + front * 0.24),
+    ]
 
 
 def build_membranes():
     mems = []
-    # The alb: from the waist it flares over the hips and hangs in rags to the knee.
-    skirt = Membrane('Alb', ALB, seed=17)
+    # The shroud: from the waist it flares over the hips and hangs in long rags, slit to
+    # the knee, the soul smoke churning out between and under them.
+    skirt = Membrane('Shroud', SHROUD, seed=17)
     spars = []
     for k in range(SKIRT):
         st = skirt_spar(k)
@@ -936,19 +966,14 @@ def build_membranes():
                       (tuple(a1.lerp(b1, 0.5)), f'Skirt{k}b'), (tuple(b1), f'Skirt{k}b'),
                       (tuple(b1.lerp(c1, 0.5)), f'Skirt{k}c'), (tuple(c1), f'Skirt{k}c')])
     for k in range(SKIRT):
-        # the alb ends in rags about the knee; below it there is only the soul smoke
-        skirt.panel(spars[k], spars[(k + 1) % SKIRT], rows=14, cols=6, scallop=0.1, tear=1.0, shade=0.95,
-                    reach=0.64)
-    # Darken toward the smoke: the lower rows fade from alb grey to smoke.
-    zs = [co.z for co, _ in skirt.verts]
+        skirt.panel(spars[k], spars[(k + 1) % SKIRT], rows=18, cols=6, scallop=0.12, tear=1.35, shade=0.95,
+                    reach=0.82)
     for i, (co, _) in enumerate(skirt.verts):
-        k = max(0.0, min(1.0, (2.2 - co.z) / 2.0))
-        base = skirt.cols_rgb[i]
-        skirt.cols_rgb[i] = lerp(base, lerp(SMOKE, SMOKE_DARK, k), k ** 0.8)
-    del zs
+        k = max(0.0, min(1.0, (2.0 - co.z) / 1.6))
+        skirt.cols_rgb[i] = lerp(skirt.cols_rgb[i], lerp(SMOKE_DARK, lerp(SMOKE, SOUL_DEEP, 0.2), k), k ** 1.4 * 0.8)
     mems.append(skirt)
-    # The chasuble: collar to hem over the shoulders, open over the ribs, torn at the hem.
-    chas = Membrane('Chasuble', VEST, seed=23)
+    # The cope: collar to a torn hem over the shoulders, open over the ribs, trailing.
+    cope = Membrane('Cope', COPE, seed=23)
     cs = []
     for k in range(CHAS):
         th, st = chas_spar(k)
@@ -956,20 +981,94 @@ def build_membranes():
         mid_bone = f'Chas{k}a'
         if abs(sx) > 0.7:
             mid_bone = 'Arm.L' if sx > 0 else 'Arm.R'
-        cs.append([(st[0], 'Neck'), (st[1], 'Chest'), (st[2], mid_bone), (st[3], f'Chas{k}b'), (st[4], f'Chas{k}c')])
+        a3, a4 = Vector(st[3]), Vector(st[4])
+        tail = a4 + (a4 - a3) * 0.45
+        cs.append([(st[0], 'Neck'), (st[1], 'Chest'), (st[2], mid_bone), (st[3], f'Chas{k}b'), (st[4], f'Chas{k}c'),
+                   (tuple(tail), f'Chas{k}c')])
     for k in range(CHAS - 1):
-        chas.panel(cs[k], cs[k + 1], rows=18, cols=5, scallop=0.03, tear=0.7, shade=0.95, sag=0.04)
-    # The orphrey: a gold band down the chasuble's back and along its hem.
-    for i, (co, w) in enumerate(chas.verts):
+        cope.panel(cs[k], cs[k + 1], rows=20, cols=5, scallop=0.04, tear=1.1, shade=0.95, sag=0.04)
+    # The orphrey: a band of grave linen down the cope's back; the front edges in linen too.
+    for i, (co, w) in enumerate(cope.verts):
         th = math.atan2(co.x, co.y + 0.001)
-        if abs(th) < 0.1 and co.z < 3.7:
-            chas.cols_rgb[i] = GOLD
-        elif abs(th) < 0.16 and co.z < 3.7:
-            chas.cols_rgb[i] = lerp(chas.cols_rgb[i], GOLD, 0.4)
-        elif co.z < 1.6:
-            chas.cols_rgb[i] = lerp(chas.cols_rgb[i], VEST_DARK, 0.35)
-    mems.append(chas)
+        if abs(th) < 0.06 and co.z < 3.75:
+            cope.cols_rgb[i] = LINEN_DARK
+        elif abs(th) < 0.1 and co.z < 3.75:
+            cope.cols_rgb[i] = lerp(cope.cols_rgb[i], SILVER, 0.5)
+        elif abs(abs(th) - math.radians(150)) < 0.05:
+            cope.cols_rgb[i] = lerp(cope.cols_rgb[i], LINEN_DARK, 0.75)
+        if co.z < 1.4:
+            cope.cols_rgb[i] = lerp(cope.cols_rgb[i], COPE_DARK, min(1.0, (1.4 - co.z) / 0.8) * 0.7)
+    mems.append(cope)
+    # The mozzetta: a short shoulder cape over the cope, ragged at its hem, its sides
+    # riding the upper arms so a raised arm lifts it.
+    moz = Membrane('Mozzetta', COPE, seed=31)
+    ms = []
+    for k in range(CHAS):
+        th, st = mozzetta_spar(k)
+        sx = math.sin(th)
+        mid = 'Chest'
+        hem = f'Chas{k}a'
+        if abs(sx) > 0.6:
+            hem = 'Arm.L' if sx > 0 else 'Arm.R'
+        if abs(sx) > 0.85:
+            mid = hem
+        ms.append([(st[0], 'Chest'), (st[1], 'Chest'), (st[2], mid), (st[3], hem)])
+    for k in range(CHAS - 1):
+        moz.panel(ms[k], ms[k + 1], rows=14, cols=8, scallop=0.03, tear=0.22, shade=0.9, sag=0.012)
+    for i, (co, w) in enumerate(moz.verts):
+        moz.cols_rgb[i] = lerp(moz.cols_rgb[i], SHROUD_HI, 0.35)
+    mems.append(moz)
+    # The stole: two long bands of grave linen from the collar down either side of the
+    # open ribs, over the cincture and down the shroud's flare to a fringed end.
+    for s, tag in ((1, 'L'), (-1, 'R')):
+        stole = Membrane('Stole' + tag, LINEN, seed=41 + s)
+        sk = 1 if s > 0 else SKIRT - 1
+        inner, outer = [], []
+        for x0, side in ((0.26, inner), (0.42, outer)):
+            for (x, y, z), bone in (((x0 - 0.06, -0.36, 4.02), 'Chest'), ((x0 - 0.01, -0.5, 3.72), 'Chest'),
+                                    ((x0, -0.54, 3.3), 'Chest'), ((x0 - 0.01, -0.5, 2.9), 'Spine'),
+                                    ((x0 - 0.03, -0.5, 2.52), 'Hips'), ((x0 - 0.02, -0.72, 2.08), f'Skirt{sk}a'),
+                                    ((x0 - 0.01, -0.9, 1.68), f'Skirt{sk}a'), ((x0, -0.86, 1.3), f'Skirt{sk}b')):
+                side.append(((s * x, y, z), bone))
+        stole.panel(inner, outer, rows=24, cols=3, scallop=0.0, tear=0.0, shade=1.0)
+        for i, (co, w) in enumerate(stole.verts):
+            col = i % 4
+            if col in (0, 3):
+                stole.cols_rgb[i] = SILVER
+            elif co.z < 1.45:
+                stole.cols_rgb[i] = LINEN_DARK
+        mems.append(stole)
     return mems
+
+
+def build_stole_sigils():
+    """The soul-lit sigils sewn down the stole and its fringe, on the bones the stole
+    rides there (the stole is a membrane; these are small glow plates over it)."""
+    parts = []
+    for s in (1, -1):
+        sk = 1 if s > 0 else SKIRT - 1
+        for z, y, bone in ((3.56, -0.535, 'Chest'), (3.12, -0.535, 'Chest'), (2.72, -0.515, 'Spine'),
+                           (1.86, -0.835, f'Skirt{sk}a'), (1.5, -0.905, f'Skirt{sk}b')):
+            p = Part(f'Sigil{z}{s}', bone, smooth=True)
+            c = Vector((s * 0.335, y - 0.01, z))
+            lid = [c + Vector((0.05 * math.cos(a), 0, -0.022 * math.sin(a) + 0.01)) for a in
+                   (math.pi * j / 8 for j in range(9))]
+            p.tube(lid, [0.0075] * 9, SOUL, mat=GLOW, sides=4)
+            for j in (-1, 0, 1):
+                b0 = c + Vector((0.026 * j, 0, -0.016 + 0.004 * abs(j)))
+                p.tube([b0, b0 + Vector((0.012 * j, 0, -0.03))], [0.0055, 0.002], SOUL, mat=GLOW, sides=4)
+            p.tube([c + Vector((0, 0, 0.03)), c + Vector((0, 0, 0.07))], [0.006, 0.002], SOUL_DEEP, mat=GLOW, sides=4)
+            parts.append(p)
+        # the fringe and a silver weight at the end
+        p = Part(f'StoleEnd{s}', f'Skirt{sk}b', smooth=True)
+        e = Vector((s * 0.34, -0.87, 1.27))
+        p.tube([e + Vector((-0.09, 0, 0)), e + Vector((0.09, 0, 0))], [0.022, 0.022], SILVER, sides=6, mat=METAL)
+        for j in range(7):
+            x = -0.075 + 0.025 * j
+            p.tube([e + Vector((x, 0, -0.01)), e + Vector((x, -0.01, -0.13 - 0.04 * (j % 3)))], [0.008, 0.004],
+                   LINEN_DARK, sides=4)
+        parts.append(p)
+    return parts
 
 
 # -------------------------------------------------------------------- posing
@@ -1068,6 +1167,33 @@ def clip(arm, name, keys, loop_clip=True, fire=None, flicker=None):
     bones = FLAMES + ['SoulFire'] if flicker is None else list(flicker)
     for frame, pose in keys:
         key_pose(arm, pose, frame, set(bones))
+    # Quaternion continuity (v2): q and -q are the same turn, but the curves interpolate the
+    # four components, so a key on the far hemisphere from the one before makes an arm bone
+    # spin the long way round between them (a fist or forearm flip in a frame or two). Each key
+    # is flipped onto the previous key's hemisphere: every key pose stays exactly what it
+    # was, only the in-betweens take the short way.
+    quat = {}
+    for fc in _fcurves(act):
+        # only the arm chain: the smoke, the soul ring and the blade's hinge turn past half a
+        # circle between keys on purpose and keep their long way round
+        if fc.data_path.endswith('rotation_quaternion') and any(
+                f'"{b}' in fc.data_path for b in ('Arm.', 'Fore.', 'Hand.')):
+            quat.setdefault(fc.data_path, {})[fc.array_index] = fc
+    for chans in quat.values():
+        if len(chans) != 4:
+            continue
+        fcs = [chans[i] for i in range(4)]
+        n = len(fcs[0].keyframe_points)
+        prev = None
+        for k in range(n):
+            q = [fc.keyframe_points[k].co[1] for fc in fcs]
+            if prev is not None and sum(a * b for a, b in zip(prev, q)) < 0:
+                q = [-c for c in q]
+                for fc, c in zip(fcs, q):
+                    fc.keyframe_points[k].co[1] = c
+            prev = q
+        for fc in fcs:
+            fc.update()
     for fc in _fcurves(act):
         for kp in fc.keyframe_points:
             kp.interpolation = 'BEZIER'
@@ -1636,7 +1762,7 @@ if __name__ == '__main__':
     _procedural_surface(metal, 'bone')
     mats.append(metal)
     mats.append(smoke_material())
-    parts = build_parts()
+    parts = build_parts() + build_stole_sigils()
     mems = build_membranes()
     if '--solo' in argv:   # a debugging aid: build only the named parts
         keep = argv[argv.index('--solo') + 1].split(',')

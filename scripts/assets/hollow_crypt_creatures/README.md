@@ -49,11 +49,15 @@ positions measured off these clips (`crypt_creature_fx_core.ts`).
 
 ## Morthen, the Lich Bishop
 
-`build_morthen.py` builds the crypt's last boss on the organic kit: layered
-vestments over a floating skeleton that dissolves into soul smoke, an open
-ribcage of soul fire, a bone mitre, candles on the shoulders, the Book of Names
-on a wrist chain, and the bell staff whose crest unfolds into a scythe (Blade1
-and Blade2 fold on their hinges and grow on a keyed scale). Every clip exists in
+`build_morthen.py` builds the crypt's last boss on the organic kit, in the
+family of the Sunken Bastion's Vael (v2): a deep near-black cowl over a skull with
+soul-fire eyes, the tall bone mitre with its slit eye of soul fire and linen
+lappets, a mozzetta over a tattered cope that parts on an open ribcage of soul
+fire, a stole sewn with closed-eye sigils, and a churning funnel of dark green
+soul smoke below; no candles, no Book of Names. The bell staff's crest unfolds
+into a scythe (Blade1 and Blade2 fold on their hinges and grow on a keyed scale).
+The arm keys keep quaternion hemisphere continuity inside `clip()`, so no
+in-between frame spins the long way round. Every clip exists in
 two stances, the staff set and the `Scythe*` set, plus the `Transform` between
 them; the flames and the soul fire flicker on keyed bone scales. A fourth
 material (`CreatureMetal`) keeps the bell, iron and gold metallic.

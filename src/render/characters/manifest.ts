@@ -133,8 +133,8 @@ import { FOUNDRY_WORKER_LOOKS, FOUNDRY_WORKER_MOB_KEYS } from './foundry_worker_
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
-import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks';
+import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 
 export interface EmoteClipSpec {
@@ -1719,7 +1719,8 @@ export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
 // build_morthen.py): two whole vocabularies on one rig. With the BELL STAFF he
 // glides, strikes with the bell head and the shaft, tolls the bell for his
 // Shadow Pulse, and his entrance rides his cast bar: he unfurls as he rises
-// (Rise), lifts the Book of Names as he speaks (SummonSouls) and holds his ward
+// (Rise), raises his off hand as he speaks the names (SummonSouls; the v2 body
+// carries no Book of Names) and holds his ward
 // as he comes down (ShieldRitual). At his Last Rites the staff's crest UNFOLDS
 // INTO A SCYTHE (Transform) and every clip after it carries the blade out.
 const MORTHEN_STAFF_CLIPS: ClipMap = {

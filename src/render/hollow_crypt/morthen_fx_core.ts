@@ -53,8 +53,9 @@ export const MORTHEN_STANCE_REFRESH_SEC = 1;
 // ---- the body, measured off the Blender rig (authored yards, x right, y up, z forward) ----
 /** The soul fire caged in his ribs. */
 export const MORTHEN_RIBS = { x: 0, y: 3.45, z: 0.16 } as const;
-/** The candle clusters on his shoulders (left; the right mirrors x). */
-export const MORTHEN_CANDLES = { x: 0.7, y: 4.35, z: 0.02 } as const;
+/** The slit eye of soul fire on his mitre's front plate (rest pose; the v2
+ *  body dropped the shoulder candles, so the sparks rise off the mitre). */
+export const MORTHEN_MITRE_EYE = { x: 0, y: 5.3, z: 0.32 } as const;
 /** The base of the smoke he trails. */
 export const MORTHEN_SMOKE_BASE = { x: 0, y: 0.6, z: 0 } as const;
 /** The reach of his scythe from his centre (the trail's radius). */

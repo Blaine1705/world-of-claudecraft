@@ -16,6 +16,8 @@ import { characterMeshCastsShadow } from '../src/render/characters/shadow_policy
 import {
   DISSOLVE_SEC,
   dissolveLevels,
+  MORTHEN_MITRE_EYE,
+  MORTHEN_RIBS,
   MORTHEN_SCYTHE_HELD,
   MORTHEN_SCYTHE_UNFOLD,
   MORTHEN_SOUL_COUNT,
@@ -83,6 +85,17 @@ describe('Morthen, the Lich Bishop: his own body', () => {
     const drawn = def.height * MOBS.morthen.scale;
     expect(drawn / PLAYER_HEIGHT).toBeGreaterThan(2.9);
     expect(def.hover).toBeGreaterThan(0);
+  });
+
+  it('sheds his sparks off the mitre eye, not the retired shoulder candles', () => {
+    // The v2 body (Vael's family) has no shoulder candles: the sparks rise off
+    // the slit eye on the mitre's front plate, on his centre line, above the
+    // soul-fire eyes (about 4.4) and the ribs, below the mitre's horns.
+    expect(MORTHEN_MITRE_EYE.x).toBe(0);
+    expect(MORTHEN_MITRE_EYE.y).toBeGreaterThan(4.6);
+    expect(MORTHEN_MITRE_EYE.y).toBeGreaterThan(MORTHEN_RIBS.y);
+    expect(MORTHEN_MITRE_EYE.y).toBeLessThan(def.height);
+    expect(MORTHEN_MITRE_EYE.z).toBeGreaterThan(0);
   });
 
   it('ships every clip of both stances, each his own', () => {
