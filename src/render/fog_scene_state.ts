@@ -11,6 +11,7 @@
 // settled); this module owns the resolution and the settled preset values.
 import { dungeonAt, isArenaPos, isBgPos, isDelvePos, isYumiMazePos } from '../sim/data';
 import { waterLevelAt } from '../sim/world';
+import { SANCTUM_FOG_COLOR } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import type { FogSceneState } from './interior_light_rig';
 import { BASIN_FOG_COLOR } from './wildheart_basin/basin_plan_core';
@@ -27,6 +28,9 @@ export const WILDHEART_BASIN_FOG_COLOR = BASIN_FOG_COLOR;
  *  too): a cold slate with only a breath of blue, never the blue that read as
  *  a sea under the shelf. */
 export const STORMBRASS_FOUNDRY_FOG_COLOR = 0x414d5f;
+/** The Gravewyrm Sanctum's thin blue dusk (its sky's horizon too): clear air
+ *  that only turns blue with distance, never a murk and never a sea mist. */
+export const GRAVEWYRM_SANCTUM_FOG_COLOR = SANCTUM_FOG_COLOR;
 
 export interface FogSceneResolution {
   /** The named dungeon interior the player stands in (null/undefined in the
@@ -72,6 +76,8 @@ export function resolveFogScene(
   const inDrownedTemple = interior === 'drowned_temple';
   // The Stormbrass Foundry: open-air in storm daylight, under its own sky.
   const inStormbrassFoundry = interior === 'stormbrass_foundry';
+  // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.
+  const inGravewyrmSanctum = interior === 'gravewyrm_sanctum';
   const inLastKeep = interior === 'lastkeep';
   const inDawnhold = interior === 'dawnhold';
   const desired: FogSceneState = inDelve
@@ -96,15 +102,17 @@ export function resolveFogScene(
                       ? 'drownedTemple'
                       : inStormbrassFoundry
                         ? 'stormbrassFoundry'
-                        : inLastKeep
-                          ? 'lastkeep'
-                          : inDawnhold
-                            ? 'dawnhold'
-                            : inside
-                              ? 'dungeon'
-                              : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                                ? 'underwater'
-                                : 'outdoor';
+                        : inGravewyrmSanctum
+                          ? 'gravewyrmSanctum'
+                          : inLastKeep
+                            ? 'lastkeep'
+                            : inDawnhold
+                              ? 'dawnhold'
+                              : inside
+                                ? 'dungeon'
+                                : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                  ? 'underwater'
+                                  : 'outdoor';
   return { interior, desired };
 }
 
@@ -178,6 +186,15 @@ export function applyFogScenePreset(
     fog.color.setHex(STORMBRASS_FOUNDRY_FOG_COLOR);
     fog.near = 70;
     fog.far = 780;
+  } else if (desired === 'gravewyrmSanctum') {
+    // Thin, clear polar dusk: the air only turns blue with distance, pushed
+    // far back so the whole cirque, the lake far below and the dragon in the
+    // Calving Face read from the Gate Landing (about 480 yd), while the ring
+    // of Thornpeak's summits settles into the blue hour. The steam over the
+    // Thaw Works and the vault is the interior's own (render/gravewyrm_sanctum).
+    fog.color.setHex(GRAVEWYRM_SANCTUM_FOG_COLOR);
+    fog.near = 90;
+    fog.far = 980;
   } else if (desired === 'lastkeep') {
     // The Last Keep: a warm hearth-lit haze pushed well back, so its
     // grand three-story halls read golden and inhabited instead of
