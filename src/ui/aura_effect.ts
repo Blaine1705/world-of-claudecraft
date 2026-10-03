@@ -118,6 +118,7 @@ import {
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
 } from '../sim/varkhul_shared_pyre';
 import { foundryAuraEffectDescriptor } from './foundry_aura_effect';
+import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
 import { wildheartAuraEffectDescriptor } from './wildheart_aura_effect';
 
@@ -185,6 +186,9 @@ export function auraEffectDescriptor(
   // The Stormbrass Foundry's marks say their rule (foundry_aura_effect.ts).
   const foundry = foundryAuraEffectDescriptor(a);
   if (foundry) return foundry;
+  // The Gravewyrm Sanctum's boss auras say their rule (sanctum_aura_effect.ts).
+  const sanctum = sanctumAuraEffectDescriptor(a);
+  if (sanctum) return sanctum;
   // This is a four-second placement marker, not a damage-taken modifier. Its
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.
