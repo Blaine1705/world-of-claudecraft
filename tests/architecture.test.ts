@@ -895,6 +895,19 @@ const RENDER_PURE_CORES = [
   'src/render/stormbrass_foundry/foundry_bridge_core.ts',
   // The Foundry's floor marks (stains, paint, chalk, ruts, craters): where each lies.
   'src/render/stormbrass_foundry/foundry_floor_plan_core.ts',
+  // The Gravewyrm Sanctum (render/gravewyrm_sanctum): the palette, fires and
+  // air spots; the Calving Face's frame, swap seam and stage curves; the
+  // story-step memory; the Smith's chains; the kit placement plan; the gates'
+  // motion; the lake's plate cells; the fires' counts; the Thaw Works' marks.
+  'src/render/gravewyrm_sanctum/sanctum_plan_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_face_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_story_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_chains_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_kit_plan_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_gates_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_lake_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_works_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

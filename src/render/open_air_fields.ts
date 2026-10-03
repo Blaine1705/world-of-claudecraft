@@ -5,6 +5,7 @@
 
 import type * as THREE from 'three';
 import { buildDrownedTempleInterior } from './drowned_temple';
+import { buildGravewyrmSanctumInterior } from './gravewyrm_sanctum';
 import { buildHollowCryptInterior } from './hollow_crypt';
 import type { FireLightSink } from './point_light_budget';
 import { buildStormbrassFoundryInterior } from './stormbrass_foundry';
@@ -28,4 +29,5 @@ export const OPEN_AIR_FIELDS: Readonly<
   sunken_bastion: buildSunkenBastionInterior,
   drowned_temple: buildDrownedTempleInterior,
   stormbrass_foundry: buildStormbrassFoundryInterior,
+  gravewyrm_sanctum: buildGravewyrmSanctumInterior,
 };

@@ -510,6 +510,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the Wildheart Basin Sunbone braziers and the jaguar eyes, pushed through the fireLights adopter sink the interiors are handed',
   'render/stormbrass_foundry/foundry_lights.ts':
     'the Stormbrass Foundry work lamps, the coil glow and the charging racks, pushed through the fireLights adopter sink the interiors are handed',
+  'render/gravewyrm_sanctum/sanctum_lights.ts':
+    'the Gravewyrm Sanctum braziers, soul brazier, Thaw Works soul pyres and the vault thaw pyres, pushed through the fireLights adopter sink the interiors are handed',
   'render/sunken_bastion/bastion_lights.ts':
     'the Sunken Bastion lanterns, braziers, fog-fire and the Fogbeacon lamp, pushed through the fireLights adopter sink the interiors are handed',
   'render/props.ts':
@@ -613,6 +615,13 @@ describe('every point-light producer is a carrier source', () => {
       'render/gather_nodes.ts: target',
       'render/goblin_rocket_sled_fx.ts: inner',
       'render/goblin_rocket_sled_fx.ts: outer',
+      // The Gravewyrm Sanctum: mesh hooks, never a scene: the gates reading
+      // the gate memory (the ice walls shattering, the chain grates rising,
+      // the Chain Bridge falling taut, the wards failing) and the sky dome,
+      // the interior's frame driver (the Calving Face's story, the chains,
+      // the shard's light on the dome and the peaks).
+      'render/gravewyrm_sanctum/sanctum_gates.ts: m',
+      'render/gravewyrm_sanctum/sanctum_sky.ts: mesh',
       // Mesh hooks, never a scene (the 2026-09-28 release/v0.44.0 merge into
       // feature/buried-hoards): the hoard entrance's rim clock and light cards,
       // and the reward chest's cards, motes and pool clock.
