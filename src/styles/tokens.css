@@ -489,6 +489,11 @@
     --color-field-map-plate: #6c7178;
     --color-field-map-grating: #4a4d52;
     --color-field-map-soot: #5c5752;
+    --color-field-map-snow: #dfe9f1;
+    --color-field-map-ice: #7fb3cf;
+    --color-field-map-slate: #4a5058;
+    --color-field-map-crevasse: #2e6f9e;
+    --color-field-map-crevasse-deep: #0d1f33;
     --color-field-map-wall: #4b433a;
     --color-field-map-wall-top: #a79b87;
     --color-field-map-prop: #3c352c;

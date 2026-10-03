@@ -31,7 +31,12 @@ export type FieldGround =
   // and soot-stained flagstone.
   | 'plate'
   | 'grating'
-  | 'soot';
+  | 'soot'
+  // Gravewyrm Sanctum: wind-packed snow, clear glacier and lake ice, and the
+  // bare slate of Thornpeak.
+  | 'snow'
+  | 'ice'
+  | 'slate';
 
 interface FieldSurfaceBase {
   id: string;
@@ -135,7 +140,7 @@ export interface AuthoredFieldDef {
   lightZones: readonly FieldLightZone[];
   /** What the painted dungeon map shows in the void round the terraces (the
    *  sea round a coastal fortress, the mist of a chasm, or the jungle canopy
-   *  of a gorge floor; default mist).
-   *  Render and UI only. */
-  mapVoid?: 'sea' | 'mist' | 'jungle';
+   *  of a gorge floor, or the blue dark of a glacier's crevasses; default
+   *  mist). Render and UI only. */
+  mapVoid?: 'sea' | 'mist' | 'jungle' | 'crevasse';
 }

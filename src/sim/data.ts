@@ -138,6 +138,7 @@ import {
   GALECREST_ZONE,
 } from './content/galecrest';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
 import {
   type GraveyardDef,
   LAST_KEEP_GRAVEYARD_ID,
@@ -481,6 +482,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...DROWNED_TEMPLE_MOBS,
   ...STORMBRASS_FOUNDRY_MOBS,
   ...FOUNDRY_WORKER_MOBS,
+  ...GRAVEWYRM_SANCTUM_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,

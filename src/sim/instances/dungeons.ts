@@ -30,6 +30,7 @@ import {
   NPCS,
 } from '../data';
 import { tickTempleEncounters } from '../encounters/drowned_temple';
+import { tickSanctumEncounters } from '../encounters/gravewyrm_sanctum';
 import { tickCryptEncounters } from '../encounters/hollow_crypt';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { tickFoundryEncounters } from '../encounters/stormbrass_foundry';
@@ -1508,6 +1509,8 @@ export function updateInstances(ctx: SimContext): void {
   tickFoundryEncounters(ctx);
   // The Wildheart Basin's encounters (encounters/wildheart_basin), same slot.
   tickWildheartEncounters(ctx);
+  // The Gravewyrm Sanctum's encounters (encounters/gravewyrm_sanctum), same slot.
+  tickSanctumEncounters(ctx);
   // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
   // and the Knellwyrm, same slot.
   tickCryptEncounters(ctx);

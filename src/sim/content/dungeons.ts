@@ -20,6 +20,7 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
+import { SANCTUM_CINDER_BREATH } from '../mob/trash_kit/sanctum_cast_ids';
 import type {
   DungeonDef,
   DungeonSpawn,
@@ -30,6 +31,13 @@ import type {
 } from '../types';
 import { CRUCIBLE_PROFESSION_PATTERN_LOOT } from './crucible_collections';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
+import {
+  GRAVEWYRM_SANCTUM_GATE_OBJECTS,
+  GRAVEWYRM_SANCTUM_GATES,
+  GRAVEWYRM_SANCTUM_SPAWNS,
+  GRAVEWYRM_SANCTUM_STORY_OBJECTS,
+} from './gravewyrm_sanctum';
+import { GRAVEWYRM_SANCTUM_ANCHORS } from './gravewyrm_sanctum_layout';
 import { HOLLOW_CRYPT_GATE_OBJECTS, HOLLOW_CRYPT_GATES, HOLLOW_CRYPT_SPAWNS } from './hollow_crypt';
 import { HOLLOW_CRYPT_ANCHORS } from './hollow_crypt_layout';
 import {
@@ -846,6 +854,20 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 26,
     moveSpeed: 7,
     aggroRadius: 13,
+    // Cinder Breath (the Ice Tomb rework): the drowned brood still breathes
+    // cinders. A telegraphed 90 degree cone across its front; only the tank
+    // belongs in it.
+    breathCone: {
+      castId: SANCTUM_CINDER_BREATH,
+      name: 'Cinder Breath',
+      castTime: 2,
+      every: 12,
+      range: 8,
+      arcDeg: 90,
+      min: 150,
+      max: 180,
+      school: 'fire',
+    },
     loot: [
       { copper: 350, chance: 1 },
       { itemId: 'cracked_wyrm_scale', chance: 0.5 },
@@ -1386,32 +1408,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
 // The Sunken Bastion's spawns, packs and gates live in sunken_bastion.ts (the
 // open-air sea fortress rework).
 
-// Gravewyrm Sanctum: three chambers — the Boneworks (z<60), the Ritual Vault
-// (75-115) and the Wyrm's Hollow (115+) — with Korgath holding the first
-// waist, Velkhar the second, and Korzul on the great dais at the end.
-const SANCTUM_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'sanctum_boneguard', x: -3, z: 20 },
-  { mobId: 'sanctum_boneguard', x: 3, z: 21 },
-  { mobId: 'sanctum_boneguard', x: -8, z: 30 },
-  { mobId: 'sanctum_drakonid', x: -4, z: 31 },
-  { mobId: 'sanctum_drakonid', x: 7, z: 44 },
-  { mobId: 'sanctum_boneguard', x: 3, z: 45 },
-  { mobId: 'sanctum_boneguard', x: -6, z: 58 },
-  { mobId: 'sanctum_drakonid', x: -2, z: 59 },
-  { mobId: 'korgath_the_bound', x: 0, z: 72 },
-  { mobId: 'sanctum_drakonid', x: -7, z: 86 },
-  { mobId: 'sanctum_boneguard', x: -3, z: 87 },
-  { mobId: 'sanctum_boneguard', x: 6, z: 100 },
-  { mobId: 'sanctum_drakonid', x: 2, z: 101 },
-  { mobId: 'grand_necromancer_velkhar', x: 0, z: 114 },
-  { mobId: 'sanctum_boneguard', x: -4, z: 112 },
-  { mobId: 'sanctum_boneguard', x: 4, z: 112 },
-  { mobId: 'sanctum_drakonid', x: -5, z: 130 },
-  { mobId: 'sanctum_drakonid', x: -1, z: 132 },
-  { mobId: 'korzul_the_gravewyrm', x: 0, z: 146 },
-  { mobId: 'sanctum_drakonid', x: -5, z: 144 },
-  { mobId: 'sanctum_drakonid', x: 5, z: 144 },
-];
+// Gravewyrm Sanctum: the Ice Tomb of the Wyrm rework (gravewyrm_sanctum.ts):
+// its spawns, packs, gates and story markers live there, on the open-air
+// glacier cirque of gravewyrm_sanctum_layout.ts.
 
 const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 },
@@ -1608,11 +1607,23 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: 'gravewyrm_sanctum',
     name: 'Gravewyrm Sanctum',
     index: 2,
-    doorPos: { x: 0, z: 858 }, // sealed gate in the graveyard, off the Sanctum Approach slope
-    entry: { x: 0, z: -2 }, // clear-of-aggro arrival (see dungeon_entry_clearance test)
-    exitOffset: { x: 0, z: -6 },
-    spawns: SANCTUM_SPAWN_LIST,
-    interior: 'sanctum',
+    doorPos: { x: 0, z: 858 }, // the Smith's Seal Gate in the graveyard, off the Sanctum Approach slope
+    // The Ice Tomb rework (content/gravewyrm_sanctum*.ts): arrival on the Gate
+    // Landing, 5 yd above and 44 yd from the first pack, so no mob can pull the
+    // moment you step out of the gate tunnel. See dungeon_entry_clearance test.
+    entry: { x: GRAVEWYRM_SANCTUM_ANCHORS.entry.x, z: GRAVEWYRM_SANCTUM_ANCHORS.entry.z },
+    exitOffset: { x: GRAVEWYRM_SANCTUM_ANCHORS.exit.x, z: GRAVEWYRM_SANCTUM_ANCHORS.exit.z },
+    // The Wyrm's Hollow lies 410 yd down the cirque from the gate: a second
+    // exit opens on the Shore of the Held once Korzul falls.
+    bossExitPortal: { x: -14, z: 138 },
+    spawns: GRAVEWYRM_SANCTUM_SPAWNS,
+    objects: [...GRAVEWYRM_SANCTUM_GATE_OBJECTS, ...GRAVEWYRM_SANCTUM_STORY_OBJECTS],
+    gates: GRAVEWYRM_SANCTUM_GATES,
+    // No skipping: every pack is gated, and pulling Korzul early still wakes
+    // anything left alive (instances/boss_chain_pull.ts).
+    bossChainPull: true,
+    areaCastsPlant: true,
+    interior: 'gravewyrm_sanctum',
     suggestedPlayers: 5,
     enterText: 'The air goes cold. Something vast breathes below...',
     leaveText: 'You stagger back into the mountain wind.',

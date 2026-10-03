@@ -1403,6 +1403,33 @@ const baseEnTable = {
   'mechanic.wildheartEarthshakingStomp': 'Earthshaking Stomp',
   'aura.wildheartKnockedDown': 'Knocked Down',
   'aura.wildheartEnrage': 'Enrage',
+  // The Gravewyrm Sanctum rework's gates (sim/content/gravewyrm_sanctum.ts
+  // openText), the Sledge Tusker's spill line, and the trash-kit and Tusker
+  // mechanic and aura names (mob/trash_kit/sanctum_kit.ts,
+  // encounters/gravewyrm_sanctum). Placeholder-free: EXACT matcher.
+  'log.sanctumRimeGateOpen':
+    'The Rime Gate cracks from top to bottom and crashes down in a storm of ice.',
+  'log.sanctumChainStairsOpen':
+    'Both wings fall silent. The grates of the Chain Stairs rise on groaning chains.',
+  'log.sanctumChainBridgeOpen':
+    "A slack chain as thick as a mast falls across the gulf and pulls taut: the Smith's chain is the way down.",
+  'log.sanctumVaultWardOpen': 'The Vault Ward gutters out. Below, the thaw pyres roar.',
+  'log.sanctumTitheGateOpen':
+    'With the rite broken, the Tithe Gate shatters. The shore of the held lies open.',
+  'log.sanctumHollowWardOpen':
+    "The Hollow Ward fails. On the lake, the ice groans under the Wyrm's weight.",
+  'log.sanctumTuskerSpill':
+    'The sledge tips over! Burning soul braziers spill across the Sledge Road.',
+  'mechanic.sanctumCinderBreath': 'Cinder Breath',
+  'mechanic.sanctumWarmingRite': 'Warming Rite',
+  'mechanic.sanctumGoad': 'Goad',
+  'mechanic.sanctumPlantSoulBrazier': 'Plant Soul Brazier',
+  'mechanic.sanctumHoarfrostPop': 'Hoarfrost Pop',
+  'mechanic.sanctumIceBlockToss': 'Ice Block Toss',
+  'mechanic.sanctumShatter': 'Shatter',
+  'mechanic.sanctumTuskSweep': 'Tusk Sweep',
+  'mechanic.sanctumTrample': 'Trample',
+  'mechanic.sanctumSpilledBraziers': 'Spilled Braziers',
   // The Wildheart Basin's three bosses (encounters/wildheart_basin: beastmaster.ts,
   // gorgebloom.ts, zulgar.ts): their yells and log lines (EXACT) and the
   // mechanic and aura names.
@@ -17859,6 +17886,18 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Earthshaking Stomp': 'mechanic.wildheartEarthshakingStomp',
   'Knocked Down': 'aura.wildheartKnockedDown',
   Enrage: 'aura.wildheartEnrage',
+  // The Gravewyrm Sanctum rework (mob/trash_kit/sanctum_kit.ts, encounters/gravewyrm_sanctum).
+  // Its Soul Brazier's Soulfire, Knocked Down and Enrage share the keys above.
+  'Cinder Breath': 'mechanic.sanctumCinderBreath',
+  'Warming Rite': 'mechanic.sanctumWarmingRite',
+  Goad: 'mechanic.sanctumGoad',
+  'Plant Soul Brazier': 'mechanic.sanctumPlantSoulBrazier',
+  'Hoarfrost Pop': 'mechanic.sanctumHoarfrostPop',
+  'Ice Block Toss': 'mechanic.sanctumIceBlockToss',
+  Shatter: 'mechanic.sanctumShatter',
+  'Tusk Sweep': 'mechanic.sanctumTuskSweep',
+  Trample: 'mechanic.sanctumTrample',
+  'Spilled Braziers': 'mechanic.sanctumSpilledBraziers',
   'Jaguar Bite': 'mechanic.wildheartJaguarBite',
   'Beast Pit Quake': 'mechanic.wildheartBeastPitQuake',
   'Vine Lash': 'mechanic.wildheartVineLash',

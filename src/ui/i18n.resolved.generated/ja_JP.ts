@@ -8329,7 +8329,7 @@ export const ja_JP: EnTranslations = {
       "hollowBody": "墓荒らしに遭った礼拝堂の地下墓所。死んだばかりの者たちが安らぎを拒んでいます。新たなパーティにとって、最初の本当の試練です。",
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
-      "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
+      "sanctumBody": "ソーンピークの高みに隠された氷河。一頭の竜が氷の中に囚われ、カルトは盗んだ魂を燃やしてその氷を解かそうとしている。高い峠から氷の塔、鍛冶神の砕けた鎖、カルトの炎を越えて、氷河の麓の凍った湖へと下っていきます。",
       "wildheartBody": "沈んだ偶像の奥に隠されたジャングルのカルデラ。断崖に囲まれ、滝の轟きが響く。川の浅瀬を渡り、狩りの段丘と滝を抜け、植民地の廃墟を越えて、巨大な石のジャガーの頭の下にそびえる階段状の神殿へ登れ。",
       "foundryBody": "ストームクラッグの嵐の稜線に建つ真鍮の鋳造所。史上最初に造られたオートマトンが、稲妻の空の下で今もコンベヤーと試験射撃場を動かしている。ラインを止め、両翼を黙らせ、未完成の巨人が待つガントリーへ登れ。",
       "raidName": "エンドコンテンツのレイド",
@@ -12467,7 +12467,14 @@ export const ja_JP: EnTranslations = {
       "wildheart_gorgebloom_vine_lash": "蔓の鞭",
       "wildheart_gorgebloom_gorge": "貪り食い",
       "wildheart_zulgar_pulse": "ワイルドハートの脈動",
-      "wildheart_zulgar_spirit_hunt": "狩りの魂"
+      "wildheart_zulgar_spirit_hunt": "狩りの魂",
+      "sanctum_cinder_breath": "残り火のブレス",
+      "sanctum_warming_rite": "温めの儀式",
+      "sanctum_goad": "駆り立て",
+      "sanctum_plant_brazier": "魂の火鉢を置く",
+      "sanctum_ice_block_toss": "氷塊投げ",
+      "sanctum_tusker_tusk_sweep": "牙薙ぎ",
+      "sanctum_tusker_trample": "踏みつぶし"
     }
   },
   "questUi": {
@@ -20784,6 +20791,30 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地の声ズルガー"
+      },
+      "broodsworn_thawcaller": {
+        "name": "竜誓団の解氷術師"
+      },
+      "broodsworn_goadsmith": {
+        "name": "竜誓団の突き棒鍛冶"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "竜誓団の薪守り"
+      },
+      "soul_brazier": {
+        "name": "魂の火鉢"
+      },
+      "rime_whelp": {
+        "name": "霧氷の幼竜"
+      },
+      "ogre_sledge_hauler": {
+        "name": "オーガのそり引き"
+      },
+      "glacier_splinter": {
+        "name": "氷河の破片"
+      },
+      "sledge_tusker": {
+        "name": "そり引きの巨牙獣"
       },
       "thorn_sprout": {
         "name": "茨の芽"

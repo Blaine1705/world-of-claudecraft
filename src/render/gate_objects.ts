@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { foundryWorkerCampPhaseOf } from '../sim/content/stormbrass_foundry_workers';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../sim/data';
 import { TEMPLE_OBJECT_TEMPLATES } from '../sim/encounters/drowned_temple/ids';
+import { SANCTUM_OBJECT_TEMPLATES } from '../sim/encounters/gravewyrm_sanctum/ids';
 import { CRYPT_OBJECT_TEMPLATES } from '../sim/encounters/hollow_crypt/ids';
 import {
   FOUNDRY_OBJECT_TEMPLATES,
@@ -62,6 +63,9 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
   if (TEMPLE_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   if (CRYPT_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   if (FOUNDRY_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
+  // The Sanctum's patches, toss rings and story markers (the Calving Face reads
+  // the markers' crack step; render/gravewyrm_sanctum).
+  if (SANCTUM_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   // A Foundry worker camp's state object: its chains draw from the world
   // (stormbrass_foundry/foundry_worker_fx.ts).
   if (foundryWorkerCampPhaseOf(e.templateId) !== null) return { encounterAnchor: true, height: 2 };

@@ -58,6 +58,11 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   plate: [0.27, 0.28, 0.3],
   grating: [0.2, 0.2, 0.21],
   soot: [0.22, 0.21, 0.21],
+  // Gravewyrm Sanctum: wind-packed snow, blue glacier and lake ice, and the
+  // dark slate of Thornpeak.
+  snow: [0.74, 0.79, 0.86],
+  ice: [0.36, 0.52, 0.64],
+  slate: [0.2, 0.21, 0.23],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
@@ -67,7 +72,8 @@ export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
 /** Which texture family a ground kind draws with. */
 export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
   if (ground === 'moss') return 'moss';
-  if (ground === 'basalt') return 'basalt';
+  if (ground === 'basalt' || ground === 'slate') return 'basalt';
+  if (ground === 'snow') return 'soil';
   if (ground === 'plate') return 'plate';
   if (ground === 'grating') return 'grating';
   return ground === 'earth' ||

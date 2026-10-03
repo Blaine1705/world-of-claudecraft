@@ -32,6 +32,7 @@ import {
   planHeadlandRock,
 } from '../src/render/sunken_bastion/bastion_headland_core';
 import { DROWNED_TEMPLE_FIELD } from '../src/sim/content/drowned_temple_layout';
+import { GRAVEWYRM_SANCTUM_FIELD } from '../src/sim/content/gravewyrm_sanctum_layout';
 import { HOLLOW_CRYPT_FIELD } from '../src/sim/content/hollow_crypt_layout';
 import { STORMBRASS_FOUNDRY_FIELD } from '../src/sim/content/stormbrass_foundry_layout';
 import {
@@ -162,6 +163,7 @@ const FIELDS: [string, AuthoredFieldDef][] = [
   ['the Drowned Temple', DROWNED_TEMPLE_FIELD],
   ['the Stormbrass Foundry', STORMBRASS_FOUNDRY_FIELD],
   ['the Wildheart Basin', WILDHEART_BASIN_FIELD],
+  ['the Gravewyrm Sanctum', GRAVEWYRM_SANCTUM_FIELD],
 ];
 
 describe('an authored field is walked where it is drawn', () => {

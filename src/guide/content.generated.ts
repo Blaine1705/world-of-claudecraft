@@ -2519,20 +2519,20 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "name": "The Drowned Temple"
   },
   {
+    "id": "gravewyrm_sanctum",
+    "isRaid": false,
+    "suggestedPlayers": 5,
+    "min": 18,
+    "max": 20,
+    "name": "Gravewyrm Sanctum"
+  },
+  {
     "id": "stormbrass_foundry",
     "isRaid": false,
     "suggestedPlayers": 5,
     "min": 18,
     "max": 20,
     "name": "The Stormbrass Foundry"
-  },
-  {
-    "id": "gravewyrm_sanctum",
-    "isRaid": false,
-    "suggestedPlayers": 5,
-    "min": 19,
-    "max": 20,
-    "name": "Gravewyrm Sanctum"
   },
   {
     "id": "wildheart_basin",

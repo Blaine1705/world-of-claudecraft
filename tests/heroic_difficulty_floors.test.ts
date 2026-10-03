@@ -170,7 +170,9 @@ describe('heroic five-man doubled health', () => {
     // The Temple rework prices Ysolei from fight length x heroic DPS (150 s).
     expect(maxHpAt('ysolei', 'drowned_temple', 'heroic')).toBe(34497);
     expect(maxHpAt('moonspawn', 'drowned_temple', 'heroic', { summonedAdd: true })).toBe(1867); // was 933
-    expect(maxHpAt('korzul_the_gravewyrm', 'gravewyrm_sanctum', 'heroic')).toBe(13138); // was 6569
+    // The Ice Tomb rework prices Korzul from fight length x heroic DPS (160 s
+    // on the ground; phase B adds his flights).
+    expect(maxHpAt('korzul_the_gravewyrm', 'gravewyrm_sanctum', 'heroic')).toBe(36785);
   });
 });
 
@@ -247,6 +249,10 @@ describe('heroic tuning data contract', () => {
       korgath_the_bound: 19,
       grand_necromancer_velkhar: 19,
       korzul_the_gravewyrm: 19,
+      // The Ice Tomb rework's lighter cultists and NON-elite whelps ride the 500 floor.
+      broodsworn_thawcaller: 16.6,
+      broodsworn_pyre_tender: 16.6,
+      rime_whelp: 30.5,
     });
     // The rework's lighter casters, cutthroat and non-elite crows ride the 500 floor.
     expect(HEROIC_DUNGEON_TUNING.hollow_crypt.damageMultiplierByMob).toEqual({

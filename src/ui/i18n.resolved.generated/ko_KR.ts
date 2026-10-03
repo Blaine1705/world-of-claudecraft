@@ -8329,7 +8329,7 @@ export const ko_KR: EnTranslations = {
       "hollowBody": "도굴당한 예배당 묘소로, 갓 죽은 자들이 안식하기를 거부하는 곳. 새 파티의 첫 진정한 시험대입니다.",
       "bastionBody": "습지에 삼켜진 침수된 요새로, 물에 빠진 수호자들과 차오르는 밀물 그 자체가 지키고 있습니다.",
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
-      "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
+      "sanctumBody": "가시봉우리 높은 곳에 숨겨진 빙하. 한 마리 용이 얼음 속에 갇혀 있고, 교단은 훔친 영혼을 불태워 그 얼음을 녹이고 있다. 높은 고개에서 얼음 탑과 대장장이의 끊어진 사슬, 교단의 불길을 지나 빙하 발치의 얼어붙은 호수까지 내려간다.",
       "wildheartBody": "가라앉은 우상 뒤에 숨겨진 정글 칼데라. 절벽에 둘러싸여 폭포 소리가 울려 퍼진다. 강 여울을 건너고, 사냥 단구와 폭포를 지나, 폐허가 된 식민지를 가로질러 거대한 석조 재규어 머리 아래의 계단식 성소로 올라가라.",
       "foundryBody": "스톰크래그 폭풍 능선에 자리한 황동 주조소. 최초로 만들어진 자동기계들이 번개 치는 하늘 아래 여전히 컨베이어와 시험 사격장을 돌리고 있다. 생산 라인을 멈추고 양 날개를 잠재운 뒤, 미완성 거인이 기다리는 갠트리로 올라가라.",
       "raidName": "최종 단계 공격대",
@@ -12467,7 +12467,14 @@ export const ko_KR: EnTranslations = {
       "wildheart_gorgebloom_vine_lash": "덩굴 채찍",
       "wildheart_gorgebloom_gorge": "포식",
       "wildheart_zulgar_pulse": "야생심장 파동",
-      "wildheart_zulgar_spirit_hunt": "사냥의 영혼"
+      "wildheart_zulgar_spirit_hunt": "사냥의 영혼",
+      "sanctum_cinder_breath": "잿불 숨결",
+      "sanctum_warming_rite": "온기의 의식",
+      "sanctum_goad": "몰아세우기",
+      "sanctum_plant_brazier": "영혼 화로 설치",
+      "sanctum_ice_block_toss": "얼음덩이 던지기",
+      "sanctum_tusker_tusk_sweep": "엄니 휩쓸기",
+      "sanctum_tusker_trample": "짓밟기"
     }
   },
   "questUi": {
@@ -20784,6 +20791,30 @@ export const ko_KR: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "분지의 목소리 줄가르"
+      },
+      "broodsworn_thawcaller": {
+        "name": "용서약단 해빙술사"
+      },
+      "broodsworn_goadsmith": {
+        "name": "용서약단 몰이막대장이"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "용서약단 장작불지기"
+      },
+      "soul_brazier": {
+        "name": "영혼 화로"
+      },
+      "rime_whelp": {
+        "name": "서리 새끼용"
+      },
+      "ogre_sledge_hauler": {
+        "name": "썰매 끄는 오우거"
+      },
+      "glacier_splinter": {
+        "name": "빙하 파편"
+      },
+      "sledge_tusker": {
+        "name": "썰매 끄는 거대엄니"
       },
       "thorn_sprout": {
         "name": "가시 새싹"

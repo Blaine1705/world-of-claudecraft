@@ -23,6 +23,9 @@ render-only light zones. Everything else is DERIVED from that record:
 Rules:
 - Author every path to start and end with a short flat run INSIDE the surface
   it joins, so the join is continuous and no cliff appears there.
+- Keep every path's slope under about 0.75 yd of rise per yard: the cliff
+  generator probes 0.6 yd either side of an outline, so a steeper ramp reads
+  as a drop and walls itself off where it crosses a surface edge.
 - Keep the collider count modest (interior lists are scanned linearly): prefer
   few long edges over many short ones.
 - Pure, deterministic, no `SimContext`, no rng, no DOM or Three imports; the

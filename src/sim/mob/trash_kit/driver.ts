@@ -36,6 +36,15 @@ import { holdAreaCast } from './cast_hold';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
 import { callDownLastFlier } from './flier_call';
 import { landScreen, screenReady, stepDeathBurst } from './foundry_kit';
+import {
+  dropToss,
+  landGoad,
+  landToss,
+  lockToss,
+  pickGoadTarget,
+  pickTossTarget,
+  stepStoke,
+} from './sanctum_kit';
 import { spawnKitAdd } from './spawn';
 import {
   holdLineAim,
@@ -57,11 +66,13 @@ const CAST_KEYS = [
   'mend',
   'ward',
   'screen',
+  'goad',
   'screech',
   'lullaby',
   'wingGust',
   'tailLash',
   'line',
+  'toss',
   'bolt',
 ] as const;
 type CastKey = (typeof CAST_KEYS)[number];
@@ -69,7 +80,7 @@ type CastKey = (typeof CAST_KEYS)[number];
 /** Physical kit casts: a silence never breaks them and no school lockout
  *  stops them (dodge these, never kick them). */
 function isPhysicalKey(key: CastKey): boolean {
-  return key === 'tailLash' || key === 'wingGust' || key === 'line';
+  return key === 'tailLash' || key === 'wingGust' || key === 'line' || key === 'toss';
 }
 
 function isSupportKey(key: CastKey): key is SupportKey {
@@ -251,6 +262,14 @@ function castReady(
       return lullabyReady(mob, kit, st, players);
     case 'screen':
       return screenReady(ctx, inst, mob, kit) ? { ok: true, target: null } : no;
+    case 'goad': {
+      const ally = pickGoadTarget(ctx, inst, mob, kit);
+      return ally ? { ok: true, target: ally } : no;
+    }
+    case 'toss': {
+      const victim = pickTossTarget(players, mob, kit);
+      return victim ? { ok: true, target: victim } : no;
+    }
     case 'screech':
       return kit.screech && livingInReach(players, mob.pos, kit.screech.radius).length > 0
         ? { ok: true, target: null }
@@ -295,6 +314,12 @@ function landCast(
       return;
     case 'screen':
       landScreen(ctx, inst, mob, kit);
+      return;
+    case 'goad':
+      landGoad(ctx, mob, kit, targetId);
+      return;
+    case 'toss':
+      landToss(ctx, inst, mob, kit, st, players);
       return;
     case 'bolt': {
       const def = kit.bolt;
@@ -443,13 +468,17 @@ function stepCast(
   if (broken) {
     clearCast(mob, cast.castId);
     st.cast = null;
+    if (key === 'toss') dropToss(ctx, inst, st);
     return false;
   }
   mob.castRemaining = Math.max(0, mob.castRemaining - DT);
   mob.swingTimer = Math.max(mob.swingTimer, SWING_HOLD_SECONDS);
   const target = cast.targetId !== null ? ctx.entities.get(cast.targetId) : undefined;
-  // A lane holds the aim it locked at the start; everything else tracks.
+  // A lane holds the aim it locked at the start, a toss the spot it marked;
+  // everything else tracks.
   if (key === 'line') holdLineAim(mob, st);
+  else if (key === 'toss' && st.toss)
+    mob.facing = angleTo(mob.pos, { x: st.toss.x, y: 0, z: st.toss.z });
   else if (target && !target.dead) mob.facing = angleTo(mob.pos, target.pos);
   if (mob.castRemaining > 0) return true;
   clearCast(mob, cast.castId);
@@ -489,6 +518,7 @@ function tryStartCast(
     mob.channeling = key === 'raise';
     if (key === 'line') lockLineAim(mob, st, target);
     else if (target) mob.facing = angleTo(mob.pos, target.pos);
+    if (key === 'toss') lockToss(ctx, inst, mob, kit, st, target);
     holdAreaCast(ctx, mob, false);
     return;
   }
@@ -671,6 +701,7 @@ function stepMob(
   }
   stepDescent(ctx, mob, st);
   stepPulse(ctx, inst, mob, kit, st);
+  stepStoke(ctx, inst, mob, kit, st);
   if (stepWithdraw(ctx, mob, kit, st)) return;
   stepCarapace(ctx, mob, kit, st);
   const list = players();

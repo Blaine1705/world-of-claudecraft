@@ -44,6 +44,11 @@ const FIELD_MAP_TOKENS = {
   plate: '--color-field-map-plate',
   grating: '--color-field-map-grating',
   soot: '--color-field-map-soot',
+  snow: '--color-field-map-snow',
+  ice: '--color-field-map-ice',
+  slate: '--color-field-map-slate',
+  crevasse: '--color-field-map-crevasse',
+  crevasseDeep: '--color-field-map-crevasse-deep',
   wall: '--color-field-map-wall',
   wallTop: '--color-field-map-wall-top',
   prop: '--color-field-map-prop',
@@ -79,6 +84,7 @@ export class FieldMapPlateArt {
   /** The void colour a map canvas fills round the plate. */
   backdrop(plan: FieldMapPlan): string {
     const c = this.resolve();
+    if (plan.void === 'crevasse') return c.crevasseDeep;
     return plan.void === 'sea' ? c.seaDeep : plan.void === 'jungle' ? c.canopyDark : c.mist;
   }
 
@@ -149,6 +155,38 @@ export class FieldMapPlateArt {
       }
     } else if (plan.void === 'jungle') {
       this.jungle(ctx, plan, canvas, px, py, c);
+    } else if (plan.void === 'crevasse') {
+      // Glacier crevasses: the ice glows blue under every lip and darkens into
+      // the depth, with long hairline fractures across the dark.
+      for (const [width, alpha] of [
+        [22, 0.16],
+        [12, 0.24],
+        [5, 0.34],
+      ] as const) {
+        ctx.strokeStyle = c.crevasse;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = width * k;
+        for (const s of plan.surfaces) {
+          path(s.points);
+          ctx.stroke();
+        }
+      }
+      ctx.strokeStyle = c.crevasse;
+      ctx.lineWidth = 1;
+      const cracks = Math.round((canvas.width * canvas.height) / 6000);
+      for (let i = 0; i < cracks; i++) {
+        ctx.globalAlpha = 0.18 + hash(i, 6.1) * 0.2;
+        let x = hash(i, 3.7) * canvas.width;
+        let y = hash(8.3, i) * canvas.height;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        for (let j = 0; j < 4; j++) {
+          x += (hash(i, j + 0.5) - 0.5) * 40;
+          y += 8 + hash(j + 0.3, i) * 26;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
     } else {
       ctx.fillStyle = c.mistSwirl;
       for (let i = 0; i < 90; i++) {

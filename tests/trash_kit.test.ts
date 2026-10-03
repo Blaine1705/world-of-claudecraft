@@ -728,13 +728,14 @@ describe('trash kit: an area cast plants its caster', () => {
     expect(r.me.hp).toBe(hpBefore);
   });
 
-  it('every area cast of the five dungeons is a planted cast', () => {
+  it('every area cast of the six reworked dungeons is a planted cast', () => {
     const DUNGEON_IDS = [
       'hollow_crypt',
       'sunken_bastion',
       'drowned_temple',
       'stormbrass_foundry',
       'wildheart_basin',
+      'gravewyrm_sanctum',
     ];
     const seen = new Set<string>();
     for (const id of DUNGEON_IDS) {
@@ -749,6 +750,7 @@ describe('trash kit: an area cast plants its caster', () => {
           kit?.wingGust?.castId,
           kit?.tailLash?.castId,
           kit?.line?.castId,
+          kit?.toss?.castId,
           template.breathCone?.castId,
         ].filter((c): c is string => c !== undefined);
         for (const castId of area) {

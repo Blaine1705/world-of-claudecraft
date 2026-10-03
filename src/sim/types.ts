@@ -4240,6 +4240,9 @@ export interface TrashKitDef {
     min: number;
     max: number;
     school: TrashKitCast['school'];
+    /** A slow on everyone the burst catches: `mult` of their run speed for
+     *  `seconds` (the Rime Whelp's Hoarfrost Pop). */
+    slow?: { mult: number; seconds: number };
   };
   /** A healing pulse with no cast bar, every `every` seconds while it fights:
    *  each living ally in the fight within `radius` (never itself) mends for a
@@ -4269,6 +4272,27 @@ export interface TrashKitDef {
     max: number;
     school: TrashKitCast['school'];
     objectTemplate: string;
+  };
+  /** An interruptible goad at one ally in the fight within `range` (another
+   *  before itself, never one already goaded): a damage-done aura worth
+   *  `damagePct` for `seconds` (the Broodsworn Goadsmith's Goad). Kick it. */
+  goad?: TrashKitCast & { range: number; damagePct: number; seconds: number };
+  /** A telegraphed throw at the farthest living player within `range`: the
+   *  spot locks when the bar starts (a ring object the client mirrors, scale =
+   *  radius), and everyone inside `radius` of it when the bar ends is hit (the
+   *  Ogre Sledge-Hauler's Ice Block Toss). Physical: dodge it, never kick it. */
+  toss?: TrashKitCast & { range: number; radius: number; min: number; max: number };
+  /** No cast bar: every `every` seconds each living ally in the fight within
+   *  `radius` (never the source) swings `hastePct` faster for `seconds` (the
+   *  Soul Brazier). A stoke source whose summoner has died gutters out. */
+  stoke?: {
+    castId: string;
+    name: string;
+    every: number;
+    radius: number;
+    hastePct: number;
+    seconds: number;
+    school: TrashKitCast['school'];
   };
   /** A seeker that bursts on reaching its victim: within `reach` it breaks in
    *  a splash round itself and is gone (the Tidewisp). Kill it on the way in. */
@@ -4302,6 +4326,8 @@ export interface TrashKitState {
   withdrawn?: boolean;
   /** The once-per-pull carapace already closed. */
   carapaced?: boolean;
+  /** A toss's locked landing spot (world) and its ring object while its bar runs. */
+  toss?: { x: number; z: number; objectId: number | null };
 }
 
 /** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion),
@@ -4858,6 +4884,36 @@ export type WildheartFightState =
   | GorgebloomFightState
   | ZulgarFightState;
 
+/** The Sledge Tusker's pull (encounters/gravewyrm_sanctum/sledge_tusker.ts),
+ *  on the Tusker: Tusk Sweep, Trample, Spilled Braziers and its enrage. */
+export interface TuskerFightState {
+  kind: 'tusker';
+  sweepTimer: number;
+  trampleTimer: number;
+  /** The Tusk Sweep's locked aim (the Tusker's facing) while its bar runs. */
+  sweepYaw: number | null;
+  /** Trample: the lane locked at the bar's start (world start, yaw, length),
+   *  then the charge down it (`t` seconds into the run). */
+  lane: { x: number; z: number; yaw: number; length: number } | null;
+  charge: { x: number; z: number; yaw: number; length: number; t: number; hit: number[] } | null;
+  /** Where it braced its feet for the bar in flight (world coordinates). */
+  plantedAt: { x: number; y: number; z: number } | null;
+  /** Where it unhitched its sledge when pulled (world, and its facing then):
+   *  the sledge waits there and tips at half health. */
+  sledge: { x: number; z: number; yaw: number } | null;
+  /** The sledge tipped this pull (the soulfire patches are down). */
+  spilled: boolean;
+  /** The burning patches still on the road: object id, seconds left, tick clock. */
+  patches: { objectId: number; x: number; z: number; remaining: number; tick: number }[];
+  enraged: boolean;
+  /** Anyone hit by a Trample this pull (the Cold Cargo deed reads it). */
+  trampleLanded: boolean;
+  /** Mechanic casts started (the deterministic salt). */
+  casts: number;
+}
+
+export type SanctumFightState = TuskerFightState;
+
 /** Morthen's entrance and the Knellwyrm finale at the Hollow Crypt's Rite Ring
  *  (encounters/hollow_crypt), on Morthen for the claim's life: the entrance
  *  plays once per claim, the finale once after he falls. */
@@ -4935,7 +4991,13 @@ export type DungeonGateKind =
   // The Wildheart Basin: vines that weave themselves into a bridge over the
   // gorge, and a hedge of thorns that recedes into the ground.
   | 'vine_bridge'
-  | 'thorn_wall';
+  | 'thorn_wall'
+  // Gravewyrm Sanctum: a wall of ice that shatters and falls, a chain-hung
+  // grate that rises, and a great chain that falls across the gulf and pulls
+  // taut as a walkway.
+  | 'ice_wall'
+  | 'chain_gate'
+  | 'chain_bridge';
 
 /**
  * An in-dungeon gate or encounter seal (instances/dungeon_gates.ts): one
@@ -4992,7 +5054,10 @@ export interface DungeonObjectSpawn {
     // The Sunken Bastion's encounter objects (encounters/sunken_bastion): the
     // state rides the template id so the online client mirrors it.
     | 'bastion_buttress_intact'
-    | 'bastion_beacon_lamp';
+    | 'bastion_beacon_lamp'
+    // The Gravewyrm Sanctum's story markers (encounters/gravewyrm_sanctum/
+    // story.ts): the Calving Face's crack step rides the template id.
+    | 'sanctum_story_0';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -5051,6 +5116,7 @@ export interface DungeonDef {
     | 'sunken_bastion'
     | 'drowned_temple'
     | 'stormbrass_foundry'
+    | 'gravewyrm_sanctum'
     | 'lastkeep'
     | 'dawnhold';
   /**
@@ -6849,6 +6915,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  the Great Saurian, and the bosses in phase B). Sim authority only; the
    *  client reads the fight from casts, auras and the encounter objects. */
   wildheartFight?: WildheartFightState;
+  /** Per-fight state of a Gravewyrm Sanctum encounter (encounters/
+   *  gravewyrm_sanctum: the Sledge Tusker, and the bosses in phase B). Sim
+   *  authority only; the client reads the fight from casts, auras and objects. */
+  sanctumFight?: SanctumFightState;
   /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
    *  mob/trash_kit/foundry_kit.ts): seconds left, its floor ring, and whether it
    *  has gone off. A death cloud (trashKit.deathCloud, wildheart_kit.ts) rides

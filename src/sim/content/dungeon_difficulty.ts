@@ -195,19 +195,48 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       ignivar_crucible_warden: 2,
     },
   },
+  // The Ice Tomb rework (docs/design/dungeon-rework/gravewyrm_sanctum.md): the
+  // pools come from target fight length x planning party DPS at level 20
+  // (about 150): the Sledge Tusker 60 s (about 9,000), Korgath 80 s on his
+  // body (about 12,000; phase B adds his four Seal Shackles), Velkhar 100 s
+  // (about 15,000), Korzul 160 s on the ground (about 24,000). The new trash
+  // swings on the trash floor (100), the non-elite Rime Whelps in the 50 band,
+  // the Tusker in the 150 band; every new kit mechanic (the Scaleguard's
+  // Cinder Breath among them) is stated LANDED (factor 1).
   gravewyrm_sanctum: {
     id: 'gravewyrm_sanctum',
     difficulty: 'normal',
     healthMultiplier: 2.0,
+    healthMultiplierByMob: {
+      sledge_tusker: 5.43,
+      korgath_the_bound: 5.53,
+      grand_necromancer_velkhar: 7.61,
+      korzul_the_gravewyrm: 7.83,
+    },
     damageMultiplierByMob: {
       sanctum_boneguard: 3.8,
       sanctum_drakonid: 3.7,
       raised_bonewalker: 3.75,
+      broodsworn_thawcaller: 3.8,
+      broodsworn_goadsmith: 3.8,
+      broodsworn_pyre_tender: 3.8,
+      rime_whelp: 4,
+      ogre_sledge_hauler: 3.4,
+      glacier_splinter: 3.7,
+      sledge_tusker: 4.8,
       korgath_the_bound: 9.5,
       grand_necromancer_velkhar: 6.6,
       korzul_the_gravewyrm: 8.5,
     },
     mechanicDamageMultiplierByMob: {
+      sanctum_drakonid: 1,
+      broodsworn_thawcaller: 1,
+      broodsworn_goadsmith: 1,
+      broodsworn_pyre_tender: 1,
+      rime_whelp: 1,
+      ogre_sledge_hauler: 1,
+      glacier_splinter: 1,
+      sledge_tusker: 1,
       korzul_the_gravewyrm: 15,
     },
   },
@@ -688,10 +717,37 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // The Sanctum bosses must out-hit their retuned NORMAL selves (normal
     // floors them at 200-301 post-mitigation since the v0.30 fresh-group
     // pressure pass): 19x lands 652-708, comfortably above.
+    // The Ice Tomb rework's pools from target fight length x heroic party DPS
+    // (about 230): the Sledge Tusker 60 s, Korgath 105 s, Velkhar 100 s,
+    // Korzul 160 s on the ground (phase B retunes them with their cores).
+    healthMultiplierByMob: {
+      sledge_tusker: 7.69,
+      korgath_the_bound: 10.33,
+      grand_necromancer_velkhar: 10.83,
+      korzul_the_gravewyrm: 11.2,
+    },
     damageMultiplierByMob: {
       korgath_the_bound: 19,
       grand_necromancer_velkhar: 19,
       korzul_the_gravewyrm: 19,
+      // The lighter-swinging cultists and the NON-elite Rime Whelps are lifted
+      // onto the 500 floor on their own.
+      broodsworn_thawcaller: 16.6,
+      broodsworn_pyre_tender: 16.6,
+      rime_whelp: 30.5,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a heroic cloth wearer about 40 percent, the Tusker's
+    // avoidables about 45 percent (the Foundry's heroic convention).
+    mechanicDamageMultiplierByMob: {
+      sanctum_drakonid: 3,
+      broodsworn_thawcaller: 3,
+      broodsworn_goadsmith: 3,
+      broodsworn_pyre_tender: 3,
+      rime_whelp: 3,
+      ogre_sledge_hauler: 3,
+      glacier_splinter: 3,
+      sledge_tusker: 2.5,
     },
     armorMultiplier: 1.2,
     finalBossId: 'korzul_the_gravewyrm',

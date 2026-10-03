@@ -8329,7 +8329,7 @@ export const en_CA: EnTranslations = {
       "hollowBody": "A grave-robbed chapel crypt where the newly dead refuse to rest. The first real test of a new party.",
       "bastionBody": "A flooded fortress lost to the marsh, held by drowned defenders and the rising tide itself.",
       "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
-      "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
+      "sanctumBody": "A hidden glacier high on Thornpeak, where a dragon lies frozen in the ice and the cult burns stolen souls to thaw it. Descend from the high pass past ice towers, the Smith's broken chains and the cult's fires to the frozen lake at the glacier's foot.",
       "wildheartBody": "A hidden jungle caldera behind the Sunken Idol, ringed by cliffs and loud with waterfalls. Wade the river ford, hunt through the terraces and the falls, cross the ruined colony and climb the stepped shrine under a colossal stone jaguar.",
       "foundryBody": "A brass foundry on the storm line of Stormcrag, where the first automata ever built still run the conveyors and test ranges under a sky of lightning. Break the line, silence both wings and climb to the gantry where an unfinished giant waits.",
       "raidName": "The endgame raid",
@@ -12467,7 +12467,14 @@ export const en_CA: EnTranslations = {
       "wildheart_gorgebloom_vine_lash": "Vine Lash",
       "wildheart_gorgebloom_gorge": "Gorge",
       "wildheart_zulgar_pulse": "Wildheart Pulse",
-      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt"
+      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "sanctum_cinder_breath": "Cinder Breath",
+      "sanctum_warming_rite": "Warming Rite",
+      "sanctum_goad": "Goad",
+      "sanctum_plant_brazier": "Plant Soul Brazier",
+      "sanctum_ice_block_toss": "Ice Block Toss",
+      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
+      "sanctum_tusker_trample": "Trample"
     }
   },
   "questUi": {
@@ -20784,6 +20791,30 @@ export const en_CA: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "Zulgar, Voice of the Basin"
+      },
+      "broodsworn_thawcaller": {
+        "name": "Broodsworn Thawcaller"
+      },
+      "broodsworn_goadsmith": {
+        "name": "Broodsworn Goadsmith"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "Broodsworn Pyre-Tender"
+      },
+      "soul_brazier": {
+        "name": "Soul Brazier"
+      },
+      "rime_whelp": {
+        "name": "Rime Whelp"
+      },
+      "ogre_sledge_hauler": {
+        "name": "Ogre Sledge-Hauler"
+      },
+      "glacier_splinter": {
+        "name": "Glacier Splinter"
+      },
+      "sledge_tusker": {
+        "name": "Sledge Tusker"
       },
       "thorn_sprout": {
         "name": "Thorn Sprout"

@@ -8329,7 +8329,7 @@ export const zh_TW: EnTranslations = {
       "hollowBody": "一座被盜墓洗劫的禮拜堂地穴，新死的亡者拒絕安息。新隊伍的第一個真正考驗。",
       "bastionBody": "一座沉入沼澤、被遺忘的要塞，由溺亡的守軍與不斷上漲的潮水本身所據守。",
       "templeBody": "沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。",
-      "sanctumBody": "棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。",
+      "sanctumBody": "隱藏在棘峰高處的一座冰川，一條巨龍被封凍在冰中，邪教正焚燒竊取的靈魂將它解凍。從高山隘口一路下行，穿過冰塔、鐵匠斷裂的鎖鏈與邪教的火堆，直到冰川腳下的冰封湖面。",
       "wildheartBody": "藏在沉沒神像背後的隱秘叢林火山口，四周懸崖環繞，瀑布轟鳴。涉過河流淺灘，穿越狩獵台地與瀑布，走過殖民地廢墟，攀上巨大石雕美洲豹頭下的階梯神殿。",
       "foundryBody": "風暴岩風暴線上的一座黃銅鑄造廠，世上最早造出的自動機械仍在閃電天空下運轉著輸送帶與試驗靶場。打斷產線，平息兩翼，攀上龍門架，一個未完成的巨人正在那裡等待。",
       "raidName": "最終團隊副本",
@@ -12467,7 +12467,14 @@ export const zh_TW: EnTranslations = {
       "wildheart_gorgebloom_vine_lash": "藤鞭",
       "wildheart_gorgebloom_gorge": "吞噬",
       "wildheart_zulgar_pulse": "荒野之心脈衝",
-      "wildheart_zulgar_spirit_hunt": "狩獵之魂"
+      "wildheart_zulgar_spirit_hunt": "狩獵之魂",
+      "sanctum_cinder_breath": "餘燼吐息",
+      "sanctum_warming_rite": "回暖儀式",
+      "sanctum_goad": "驅策",
+      "sanctum_plant_brazier": "放置靈魂火盆",
+      "sanctum_ice_block_toss": "投擲冰塊",
+      "sanctum_tusker_tusk_sweep": "獠牙橫掃",
+      "sanctum_tusker_trample": "踐踏"
     }
   },
   "questUi": {
@@ -20784,6 +20791,30 @@ export const zh_TW: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地之聲祖爾加"
+      },
+      "broodsworn_thawcaller": {
+        "name": "龍誓融冰召喚者"
+      },
+      "broodsworn_goadsmith": {
+        "name": "龍誓刺棒匠"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "龍誓柴堆看守"
+      },
+      "soul_brazier": {
+        "name": "靈魂火盆"
+      },
+      "rime_whelp": {
+        "name": "霜凇幼龍"
+      },
+      "ogre_sledge_hauler": {
+        "name": "食人魔拉橇工"
+      },
+      "glacier_splinter": {
+        "name": "冰川碎片"
+      },
+      "sledge_tusker": {
+        "name": "拖橇巨牙獸"
       },
       "thorn_sprout": {
         "name": "荊棘幼芽"

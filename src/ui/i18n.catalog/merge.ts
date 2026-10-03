@@ -679,6 +679,15 @@ const mergeStringsEn = {
       wildheart_gorgebloom_gorge: 'Gorge',
       wildheart_zulgar_pulse: 'Wildheart Pulse',
       wildheart_zulgar_spirit_hunt: 'Spirit of the Hunt',
+      // The Gravewyrm Sanctum rework (trash_kit/sanctum_cast_ids.ts,
+      // encounters/gravewyrm_sanctum/ids.ts). Warming Rite and Goad can be kicked.
+      sanctum_cinder_breath: 'Cinder Breath',
+      sanctum_warming_rite: 'Warming Rite',
+      sanctum_goad: 'Goad',
+      sanctum_plant_brazier: 'Plant Soul Brazier',
+      sanctum_ice_block_toss: 'Ice Block Toss',
+      sanctum_tusker_tusk_sweep: 'Tusk Sweep',
+      sanctum_tusker_trample: 'Trample',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

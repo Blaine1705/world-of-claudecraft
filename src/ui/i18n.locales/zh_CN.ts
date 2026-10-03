@@ -8404,7 +8404,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     '在队伍仍占用着副本时切换难度，旧的占用会滞留一阵，然后自行释放。队长也可以让它们一次性释放：在自己的头像菜单中选择“重置所有副本”，或输入 /dungeon reset。重置只有在难度确实更改之后才生效，只有在里面不再有任何人（无论活着还是倒下）时才生效，只有在里面每具尸体都被拾取干净之后才生效，而且两次重置之间隔着一段短暂的冷却。若你们带着错误的难度来到门口，游戏会在副本开始前告知。团队副本从不以这种方式重置；适用的是它自己的锁定规则。',
   'guide.dungeonsPage.resetTitle': '重置你的副本',
-  'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。',
+  'guide.dungeonsPage.sanctumBody':
+    '隐藏在棘峰高处的一座冰川，一条巨龙被封冻在冰中，邪教正焚烧窃取的灵魂将它解冻。从高山隘口一路下行，穿过冰塔、铁匠断裂的锁链与邪教的火堆，直到冰川脚下的冰封湖面。',
   'guide.dungeonsPage.wildheartBody':
     '藏在沉没神像背后的隐秘丛林火山口，四周悬崖环绕，瀑布轰鸣。涉过河流浅滩，穿越狩猎台地与瀑布，走过殖民地废墟，攀上巨大石雕美洲豹头下的阶梯神殿。',
   'guide.dungeonsPage.foundryBody':
@@ -13408,6 +13409,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sunbone_totem.name': '日骨图腾',
   'entities.mobs.sunbone_totem_binder.name': '日骨图腾缚灵者',
   'entities.mobs.wildheart_high_priest.name': '盆地之声祖尔加',
+  'entities.mobs.broodsworn_thawcaller.name': '龙誓融冰召唤者',
+  'entities.mobs.broodsworn_goadsmith.name': '龙誓刺棒匠',
+  'entities.mobs.broodsworn_pyre_tender.name': '龙誓柴堆看守',
+  'entities.mobs.soul_brazier.name': '灵魂火盆',
+  'entities.mobs.rime_whelp.name': '霜凇幼龙',
+  'entities.mobs.ogre_sledge_hauler.name': '食人魔拉橇工',
+  'entities.mobs.glacier_splinter.name': '冰川碎片',
+  'entities.mobs.sledge_tusker.name': '拖橇巨牙兽',
   'entities.mobs.apprentice_wren.name': '学徒雯恩',
   'entities.mobs.barrow_wight.name': '古冢尸妖',
   'entities.mobs.castaway_navigator.name': '领航员苏莉',
@@ -19029,6 +19038,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_gorgebloom_gorge': '吞噬',
   'abilityUi.cast.wildheart_zulgar_pulse': '荒野之心脉冲',
   'abilityUi.cast.wildheart_zulgar_spirit_hunt': '狩猎之魂',
+  'abilityUi.cast.sanctum_cinder_breath': '余烬吐息',
+  'abilityUi.cast.sanctum_warming_rite': '回暖仪式',
+  'abilityUi.cast.sanctum_goad': '驱策',
+  'abilityUi.cast.sanctum_plant_brazier': '放置灵魂火盆',
+  'abilityUi.cast.sanctum_ice_block_toss': '投掷冰块',
+  'abilityUi.cast.sanctum_tusker_tusk_sweep': '獠牙横扫',
+  'abilityUi.cast.sanctum_tusker_trample': '践踏',
   'entities.mobs.thorn_sprout.name': '荆棘幼芽',
   'hudChrome.finder.mech.pack_bond': '兽群羁绊（两者相邻时伤害减半：将它们拉开15码）',
   'hudChrome.finder.mech.stalk':

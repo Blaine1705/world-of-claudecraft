@@ -8,6 +8,7 @@
 // rides this one engine.
 
 import { DROWNED_TEMPLE_FIELD } from '../../content/drowned_temple_layout';
+import { GRAVEWYRM_SANCTUM_FIELD } from '../../content/gravewyrm_sanctum_layout';
 import { HOLLOW_CRYPT_FIELD } from '../../content/hollow_crypt_layout';
 import { STORMBRASS_FOUNDRY_FIELD } from '../../content/stormbrass_foundry_layout';
 import { SUNKEN_BASTION_FIELD } from '../../content/sunken_bastion_layout';
@@ -21,6 +22,7 @@ const AUTHORED_FIELDS: Readonly<Record<string, AuthoredFieldDef>> = {
   drowned_temple: DROWNED_TEMPLE_FIELD,
   stormbrass_foundry: STORMBRASS_FOUNDRY_FIELD,
   wildheart: WILDHEART_BASIN_FIELD,
+  gravewyrm_sanctum: GRAVEWYRM_SANCTUM_FIELD,
 };
 
 const hollowCryptHeight = (x: number, z: number): number =>
@@ -38,12 +40,16 @@ const stormbrassFoundryHeight = (x: number, z: number): number =>
 const wildheartBasinHeight = (x: number, z: number): number =>
   authoredFieldHeight(WILDHEART_BASIN_FIELD, x, z);
 
+const gravewyrmSanctumHeight = (x: number, z: number): number =>
+  authoredFieldHeight(GRAVEWYRM_SANCTUM_FIELD, x, z);
+
 const FIELD_HEIGHTS: Readonly<Record<string, (lx: number, lz: number) => number>> = {
   wildheart: wildheartBasinHeight,
   hollow_crypt: hollowCryptHeight,
   sunken_bastion: sunkenBastionHeight,
   drowned_temple: drownedTempleHeight,
   stormbrass_foundry: stormbrassFoundryHeight,
+  gravewyrm_sanctum: gravewyrmSanctumHeight,
 };
 
 /** The authored field record for an interior key, or null. */

@@ -182,6 +182,19 @@ export function stepDeathBurst(
       Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1)),
     );
     ctx.dealDamage(mob, p, amount, false, def.school, def.name, 'hit', true);
+    // A slowing burst (the Rime Whelp's Hoarfrost Pop) chills whoever it caught.
+    if (def.slow && !p.dead) {
+      ctx.applyAura(p, {
+        id: `${def.castId}_slow`,
+        name: def.name,
+        kind: 'slow',
+        remaining: def.slow.seconds,
+        duration: def.slow.seconds,
+        value: def.slow.mult,
+        sourceId: mob.id,
+        school: def.school,
+      });
+    }
   }
   return true;
 }

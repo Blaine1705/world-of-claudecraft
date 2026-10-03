@@ -8746,7 +8746,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'パーティがまだ確保した周回を抱えたまま難易度を切り替えると、古い確保はしばらく居座ってから自然に解けます。パーティリーダーは代わりに一度に手放せます。自分の肖像メニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力してください。リセットが働くのは、難易度が実際に変更された後だけ、中に誰も、生者も倒れた者も残っていない間だけ、そして中の亡骸がすべて拾い尽くされた後だけで、リセットの間には短いクールダウンが挟まります。誤った難易度で扉に着けば、周回が始まる前にゲームが知らせます。レイドはこのやり方では決してリセットされません。レイド自身のロックアウト規則が働きます。',
   'guide.dungeonsPage.resetTitle': 'インスタンスのリセット',
   'guide.dungeonsPage.sanctumBody':
-    'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
+    'ソーンピークの高みに隠された氷河。一頭の竜が氷の中に囚われ、カルトは盗んだ魂を燃やしてその氷を解かそうとしている。高い峠から氷の塔、鍛冶神の砕けた鎖、カルトの炎を越えて、氷河の麓の凍った湖へと下っていきます。',
   'guide.dungeonsPage.wildheartBody':
     '沈んだ偶像の奥に隠されたジャングルのカルデラ。断崖に囲まれ、滝の轟きが響く。川の浅瀬を渡り、狩りの段丘と滝を抜け、植民地の廃墟を越えて、巨大な石のジャガーの頭の下にそびえる階段状の神殿へ登れ。',
   'guide.dungeonsPage.foundryBody':
@@ -14094,6 +14094,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sunbone_totem.name': '陽骨のトーテム',
   'entities.mobs.sunbone_totem_binder.name': '陽骨のトーテム使い',
   'entities.mobs.wildheart_high_priest.name': '盆地の声ズルガー',
+  'entities.mobs.broodsworn_thawcaller.name': '竜誓団の解氷術師',
+  'entities.mobs.broodsworn_goadsmith.name': '竜誓団の突き棒鍛冶',
+  'entities.mobs.broodsworn_pyre_tender.name': '竜誓団の薪守り',
+  'entities.mobs.soul_brazier.name': '魂の火鉢',
+  'entities.mobs.rime_whelp.name': '霧氷の幼竜',
+  'entities.mobs.ogre_sledge_hauler.name': 'オーガのそり引き',
+  'entities.mobs.glacier_splinter.name': '氷河の破片',
+  'entities.mobs.sledge_tusker.name': 'そり引きの巨牙獣',
   'entities.mobs.apprentice_wren.name': '見習いレン',
   'entities.mobs.barrow_wight.name': '塚のワイト',
   'entities.mobs.castaway_navigator.name': '航海士スリ',
@@ -20010,6 +20018,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_gorgebloom_gorge': '貪り食い',
   'abilityUi.cast.wildheart_zulgar_pulse': 'ワイルドハートの脈動',
   'abilityUi.cast.wildheart_zulgar_spirit_hunt': '狩りの魂',
+  'abilityUi.cast.sanctum_cinder_breath': '残り火のブレス',
+  'abilityUi.cast.sanctum_warming_rite': '温めの儀式',
+  'abilityUi.cast.sanctum_goad': '駆り立て',
+  'abilityUi.cast.sanctum_plant_brazier': '魂の火鉢を置く',
+  'abilityUi.cast.sanctum_ice_block_toss': '氷塊投げ',
+  'abilityUi.cast.sanctum_tusker_tusk_sweep': '牙薙ぎ',
+  'abilityUi.cast.sanctum_tusker_trample': '踏みつぶし',
   'entities.mobs.thorn_sprout.name': '茨の芽',
   'hudChrome.finder.mech.pack_bond': '群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）',
   'hudChrome.finder.mech.stalk':

@@ -9,6 +9,7 @@ import { IGNIVAR_CINDER_LANCE_CAST_ID } from './ignivar_trash_automata';
 import { BASTION_KIT_CAST_SCHOOLS } from './trash_kit/bastion_cast_ids';
 import { TRASH_KIT_CAST_SCHOOLS } from './trash_kit/cast_ids';
 import { FOUNDRY_KIT_CAST_SCHOOLS } from './trash_kit/foundry_cast_ids';
+import { SANCTUM_KIT_CAST_SCHOOLS } from './trash_kit/sanctum_cast_ids';
 import { TEMPLE_KIT_CAST_SCHOOLS } from './trash_kit/temple_cast_ids';
 import { WILDHEART_KIT_CAST_SCHOOLS } from './trash_kit/wildheart_cast_ids';
 
@@ -42,4 +43,6 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   ...WILDHEART_KIT_CAST_SCHOOLS,
   // The Stormbrass Foundry's repair and screen (mob/trash_kit/foundry_cast_ids.ts).
   ...FOUNDRY_KIT_CAST_SCHOOLS,
+  // The Gravewyrm Sanctum's Warming Rite and Goad (mob/trash_kit/sanctum_cast_ids.ts).
+  ...SANCTUM_KIT_CAST_SCHOOLS,
 };

@@ -355,6 +355,15 @@ const MOB_IDS = [
   'fanglord_jaguar',
   'the_gorgebloom',
   'wildheart_high_priest',
+  // The Gravewyrm Sanctum rework (docs/design/dungeon-rework/gravewyrm_sanctum.md).
+  'broodsworn_thawcaller',
+  'broodsworn_goadsmith',
+  'broodsworn_pyre_tender',
+  'soul_brazier',
+  'rime_whelp',
+  'ogre_sledge_hauler',
+  'glacier_splinter',
+  'sledge_tusker',
   // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
   'thorn_sprout',
 ] as const;

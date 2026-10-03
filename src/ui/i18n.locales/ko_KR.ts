@@ -8721,7 +8721,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     "파티가 아직 차지한 여정을 쥐고 있는 동안 난이도를 바꾸면, 예전 차지가 잠시 남았다가 저절로 풀립니다. 파티장은 대신 한꺼번에 놓아 줄 수 있습니다. 자기 초상화 메뉴에서 '모든 인스턴스 초기화'를 고르거나 /dungeon reset 을 입력하세요. 초기화는 난이도가 실제로 바뀐 뒤에만, 산 자든 쓰러진 자든 안에 아무도 남지 않은 동안에만, 그리고 안의 모든 시신을 남김없이 챙긴 뒤에만 작동하며, 초기화 사이에는 짧은 재사용 대기시간이 있습니다. 잘못된 난이도로 문에 이르면 여정이 시작되기 전에 게임이 알려 줍니다. 공격대는 이런 식으로 초기화되는 일이 결코 없으며, 그 자신의 잠금 규칙이 적용됩니다.",
   'guide.dungeonsPage.resetTitle': '인스턴스 초기화',
   'guide.dungeonsPage.sanctumBody':
-    '가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.',
+    '가시봉우리 높은 곳에 숨겨진 빙하. 한 마리 용이 얼음 속에 갇혀 있고, 교단은 훔친 영혼을 불태워 그 얼음을 녹이고 있다. 높은 고개에서 얼음 탑과 대장장이의 끊어진 사슬, 교단의 불길을 지나 빙하 발치의 얼어붙은 호수까지 내려간다.',
   'guide.dungeonsPage.wildheartBody':
     '가라앉은 우상 뒤에 숨겨진 정글 칼데라. 절벽에 둘러싸여 폭포 소리가 울려 퍼진다. 강 여울을 건너고, 사냥 단구와 폭포를 지나, 폐허가 된 식민지를 가로질러 거대한 석조 재규어 머리 아래의 계단식 성소로 올라가라.',
   'guide.dungeonsPage.foundryBody':
@@ -14056,6 +14056,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sunbone_totem.name': '태양뼈 토템',
   'entities.mobs.sunbone_totem_binder.name': '태양뼈 토템 결속자',
   'entities.mobs.wildheart_high_priest.name': '분지의 목소리 줄가르',
+  'entities.mobs.broodsworn_thawcaller.name': '용서약단 해빙술사',
+  'entities.mobs.broodsworn_goadsmith.name': '용서약단 몰이막대장이',
+  'entities.mobs.broodsworn_pyre_tender.name': '용서약단 장작불지기',
+  'entities.mobs.soul_brazier.name': '영혼 화로',
+  'entities.mobs.rime_whelp.name': '서리 새끼용',
+  'entities.mobs.ogre_sledge_hauler.name': '썰매 끄는 오우거',
+  'entities.mobs.glacier_splinter.name': '빙하 파편',
+  'entities.mobs.sledge_tusker.name': '썰매 끄는 거대엄니',
   'entities.mobs.apprentice_wren.name': '견습생 렌',
   'entities.mobs.barrow_wight.name': '봉분 망자',
   'entities.mobs.castaway_navigator.name': '항해사 술리',
@@ -20001,6 +20009,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_gorgebloom_gorge': '포식',
   'abilityUi.cast.wildheart_zulgar_pulse': '야생심장 파동',
   'abilityUi.cast.wildheart_zulgar_spirit_hunt': '사냥의 영혼',
+  'abilityUi.cast.sanctum_cinder_breath': '잿불 숨결',
+  'abilityUi.cast.sanctum_warming_rite': '온기의 의식',
+  'abilityUi.cast.sanctum_goad': '몰아세우기',
+  'abilityUi.cast.sanctum_plant_brazier': '영혼 화로 설치',
+  'abilityUi.cast.sanctum_ice_block_toss': '얼음덩이 던지기',
+  'abilityUi.cast.sanctum_tusker_tusk_sweep': '엄니 휩쓸기',
+  'abilityUi.cast.sanctum_tusker_trample': '짓밟기',
   'entities.mobs.thorn_sprout.name': '가시 새싹',
   'hudChrome.finder.mech.pack_bond': '무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)',
   'hudChrome.finder.mech.stalk':

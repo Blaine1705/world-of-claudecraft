@@ -8898,7 +8898,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Смените сложность, пока ваша группа всё ещё держит занятые проходы, и старые притязания задержатся ненадолго, прежде чем отпустятся сами. Лидер группы может отпустить их разом: выберите «Сбросить все копии» в меню собственного портрета либо наберите /dungeon reset. Сброс работает только после того, как сложность действительно сменили, только пока внутри не осталось никого, живого или павшего, только когда каждое тело там обобрано начисто, и один сброс от следующего отделяет короткое время восстановления. Придёте к двери с неверной сложностью — игра скажет об этом прежде, чем проход начнётся. Рейд так не сбрасывается никогда; действуют его собственные правила привязки.',
   'guide.dungeonsPage.resetTitle': 'Сброс инстансов',
   'guide.dungeonsPage.sanctumBody':
-    'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
+    'Скрытый ледник высоко на Терновых высотах, где в толще льда замёрз дракон, а культ сжигает украденные души, чтобы растопить его. Спуститесь с высокого перевала мимо ледяных башен, разорванных цепей Кузнеца и костров культа к замёрзшему озеру у подножия ледника.',
   'guide.dungeonsPage.wildheartBody':
     'Скрытая за Затонувшим идолом кальдера в джунглях, окружённая скалами и полная грохота водопадов. Перейдите речной брод, пройдите охотничьи террасы и водопады, минуйте руины колонии и поднимитесь к ступенчатому святилищу под исполинской каменной головой ягуара.',
   'guide.dungeonsPage.foundryBody':
@@ -14324,6 +14324,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sunbone_totem.name': 'Тотем Солнечной Кости',
   'entities.mobs.sunbone_totem_binder.name': 'Связыватель тотемов Солнечной Кости',
   'entities.mobs.wildheart_high_priest.name': 'Зулгар, Голос Котловины',
+  'entities.mobs.broodsworn_thawcaller.name': 'Талоклич Клятвы Выводка',
+  'entities.mobs.broodsworn_goadsmith.name': 'Кузнец-погонщик Клятвы Выводка',
+  'entities.mobs.broodsworn_pyre_tender.name': 'Хранитель костров Клятвы Выводка',
+  'entities.mobs.soul_brazier.name': 'Жаровня душ',
+  'entities.mobs.rime_whelp.name': 'Изморозный дракончик',
+  'entities.mobs.ogre_sledge_hauler.name': 'Огр-тягач саней',
+  'entities.mobs.glacier_splinter.name': 'Осколок ледника',
+  'entities.mobs.sledge_tusker.name': 'Санный бивнерог',
   'entities.mobs.apprentice_wren.name': 'Ученица Рен',
   'entities.mobs.barrow_wight.name': 'Курганное умертвие',
   'entities.mobs.castaway_navigator.name': 'Штурман Сули',
@@ -20389,6 +20397,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_gorgebloom_gorge': 'Пожирание',
   'abilityUi.cast.wildheart_zulgar_pulse': 'Импульс Дикого Сердца',
   'abilityUi.cast.wildheart_zulgar_spirit_hunt': 'Дух охоты',
+  'abilityUi.cast.sanctum_cinder_breath': 'Пепельное дыхание',
+  'abilityUi.cast.sanctum_warming_rite': 'Обряд согревания',
+  'abilityUi.cast.sanctum_goad': 'Подстрекательство',
+  'abilityUi.cast.sanctum_plant_brazier': 'Установить жаровню душ',
+  'abilityUi.cast.sanctum_ice_block_toss': 'Бросок ледяной глыбы',
+  'abilityUi.cast.sanctum_tusker_tusk_sweep': 'Взмах бивнями',
+  'abilityUi.cast.sanctum_tusker_trample': 'Растаптывание',
   'entities.mobs.thorn_sprout.name': 'Терновый росток',
   'hudChrome.finder.mech.pack_bond':
     'Узы стаи (вместе получают вдвое меньше урона: разведите их на 15 ярдов)',

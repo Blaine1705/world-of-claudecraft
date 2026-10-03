@@ -12467,7 +12467,14 @@ export const de_DE: EnTranslations = {
       "wildheart_gorgebloom_vine_lash": "Vine Lash",
       "wildheart_gorgebloom_gorge": "Gorge",
       "wildheart_zulgar_pulse": "Wildheart Pulse",
-      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt"
+      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "sanctum_cinder_breath": "Cinder Breath",
+      "sanctum_warming_rite": "Warming Rite",
+      "sanctum_goad": "Goad",
+      "sanctum_plant_brazier": "Plant Soul Brazier",
+      "sanctum_ice_block_toss": "Ice Block Toss",
+      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
+      "sanctum_tusker_trample": "Trample"
     }
   },
   "questUi": {
@@ -20784,6 +20791,30 @@ export const de_DE: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "Zulgar, Stimme des Beckens"
+      },
+      "broodsworn_thawcaller": {
+        "name": "Broodsworn Thawcaller"
+      },
+      "broodsworn_goadsmith": {
+        "name": "Broodsworn Goadsmith"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "Broodsworn Pyre-Tender"
+      },
+      "soul_brazier": {
+        "name": "Soul Brazier"
+      },
+      "rime_whelp": {
+        "name": "Rime Whelp"
+      },
+      "ogre_sledge_hauler": {
+        "name": "Ogre Sledge-Hauler"
+      },
+      "glacier_splinter": {
+        "name": "Glacier Splinter"
+      },
+      "sledge_tusker": {
+        "name": "Sledge Tusker"
       },
       "thorn_sprout": {
         "name": "Thorn Sprout"

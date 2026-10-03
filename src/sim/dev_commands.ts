@@ -8,6 +8,7 @@ import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { handleDrownedTempleDevChat } from './dev/drowned_temple_dev';
 import { handleFerryDevChat } from './dev/ferry_dev';
+import { handleGravewyrmSanctumDevChat } from './dev/gravewyrm_sanctum_dev';
 import { handleDevHoardTravel } from './dev/hoard_travel';
 import { handleHollowCryptDevChat } from './dev/hollow_crypt_dev';
 import { handleStormbrassFoundryDevChat } from './dev/stormbrass_foundry_dev';
@@ -187,6 +188,7 @@ export function handleDevChat(
   if (handleDrownedTempleDevChat(ctx, raw, pid)) return null; // /dev temple (dev/drowned_temple_dev.ts)
   if (handleStormbrassFoundryDevChat(ctx, raw, pid)) return null; // /dev foundry (dev/stormbrass_foundry_dev.ts)
   if (handleWildheartBasinDevChat(ctx, raw, pid)) return null; // /dev wildheart (dev/wildheart_basin_dev.ts)
+  if (handleGravewyrmSanctumDevChat(ctx, raw, pid)) return null; // /dev sanctum (dev/gravewyrm_sanctum_dev.ts)
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
     const level = Number(levelMatch[1]);
@@ -1394,7 +1396,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev foundry [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev foundry [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev sanctum [enter|tp|gates|kill|pack|spawn|trigger|face|reset], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }
