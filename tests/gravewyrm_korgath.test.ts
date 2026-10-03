@@ -560,6 +560,43 @@ describe('Korgath the Bound: determinism and /dev', () => {
   });
 });
 
+describe('/dev sanctum trigger through the chat router', () => {
+  // The real path a tester types: Sim.chat, the chat router, handleDevChat,
+  // then the /dev sanctum handler. A mechanic that takes words of its own must
+  // reach the boss whole, whatever the word count, spacing or case.
+  function devLines(r: Room): string[] {
+    return r.sim
+      .drainEvents()
+      .filter((e) => e.type === 'log')
+      .map((e) => String((e as { text?: string }).text ?? ''));
+  }
+
+  it('breaks and re-rivets a named chain from a multi-word line', () => {
+    const r = room('heroic');
+    const st = pull(r);
+    addPlayer(r, KORGATH_SPOT.x, KORGATH_SPOT.z + 12);
+    devLines(r);
+    r.sim.chat('/dev sanctum trigger break hammer', r.me.id);
+    expect(devLines(r)).toContain('[dev] The hammer chain breaks.');
+    expect(st.chains[SEAL_TOOLS.indexOf('hammer')].broken).toBe(true);
+    r.sim.chat('/dev  Sanctum   TRIGGER  Break\tTongs  ', r.me.id);
+    expect(devLines(r)).toContain('[dev] The tongs chain breaks.');
+    expect(st.chains[SEAL_TOOLS.indexOf('tongs')].broken).toBe(true);
+    r.sim.chat('/dev sanctum trigger rerivet hammer', r.me.id);
+    expect(devLines(r)).toContain('[dev] A Goadsmith comes to re-rivet the hammer chain.');
+  });
+
+  it('keeps a longer line inside /dev sanctum and answers with the chain help', () => {
+    const r = room();
+    pull(r);
+    devLines(r);
+    // Four words after the verb: the old two-word capture dropped this line
+    // out of the handler entirely.
+    r.sim.chat('/dev sanctum trigger break the big hammer', r.me.id);
+    expect(devLines(r)).toContain('[dev] Name a chain: hammer, tongs, anvil, bellows.');
+  });
+});
+
 describe('Korgath the Bound: the live sim (mob AI on)', () => {
   it('a real pull: the shackles stay put and hittable, he stays leashed, a break lands', () => {
     const r = room();

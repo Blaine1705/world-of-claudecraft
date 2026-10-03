@@ -219,11 +219,14 @@ export function sanctumDevTrigger(ctx: SimContext, inst: InstanceSlot, what: str
 
 /** Handles `/dev sanctum ...`; returns false for any other line. */
 export function handleGravewyrmSanctumDevChat(ctx: SimContext, raw: string, pid: number): boolean {
-  // The trigger's mechanic may take a word of its own (`trigger break hammer`).
-  const m = /^\/dev\s+sanctum(?:\s+(\S+))?(?:\s+(\S+(?:\s+\S+)?))?\s*$/i.exec(raw);
+  // Everything after the verb is its argument, however many words it runs to
+  // (`trigger break hammer`, `trigger crack 5`): one capture of the rest of
+  // the line, case-folded with its inner whitespace collapsed, so no word
+  // count drops the line out of /dev sanctum into the unknown-command path.
+  const m = /^\/dev\s+sanctum(?:\s+(\S+))?(?:\s+(.*?))?\s*$/i.exec(raw);
   if (!m) return false;
   const verb = (m[1] ?? '').toLowerCase();
-  const arg = (m[2] ?? '').toLowerCase();
+  const arg = (m[2] ?? '').toLowerCase().replace(/\s+/g, ' ');
   if (verb === 'enter') {
     ctx.setDungeonDifficulty(arg === 'heroic' ? 'heroic' : 'normal', pid);
     if (enterDungeon(ctx, DUNGEON_ID, pid, true))
