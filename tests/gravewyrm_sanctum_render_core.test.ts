@@ -21,6 +21,7 @@ import {
 } from '../src/render/gravewyrm_sanctum/sanctum_chains_core';
 import {
   CALVED_C,
+  COLLAPSE_DROP,
   calvedR,
   chainFall,
   collapsePose,
@@ -169,11 +170,12 @@ describe('the stage timelines', () => {
     expect(chainFall(FACE_EVENT_SECONDS.chainFall)).toBeCloseTo(1, 6);
   });
 
-  it('collapses the face and lets it go for good', () => {
-    expect(collapsePose(0).gone).toBe(false);
+  it('collapses the face into a ruin that stays (the Quench is never bared)', () => {
+    expect(collapsePose(0).drop).toBeLessThan(1);
     const end = collapsePose(FACE_EVENT_SECONDS.collapse);
-    expect(end.gone).toBe(true);
-    expect(end.drop).toBeGreaterThan(100);
+    expect(end.k).toBe(1);
+    expect(end.drop).toBe(COLLAPSE_DROP);
+    expect(collapsePose(FACE_EVENT_SECONDS.collapse * 5).drop).toBe(COLLAPSE_DROP);
   });
 
   it('opens his eye only once the face has calved', () => {

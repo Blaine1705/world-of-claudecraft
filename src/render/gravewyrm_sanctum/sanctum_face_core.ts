@@ -164,7 +164,7 @@ export function frozenToGame(lx: number, ly: number, lz: number): [number, numbe
 /** Measured off the Frozen pose (model frame): the head's middle, his open
  *  eye (the left, toward the lake) and the shard in his sternum. */
 export const FROZEN_HEAD_LOCAL = [5, 15, 15] as const;
-export const FROZEN_EYE_LOCAL = [7.2, 16.4, 15.6] as const;
+export const FROZEN_EYE_LOCAL = [8, 15.4, 16.4] as const;
 export const FROZEN_HEART_LOCAL = [1, 9, 10] as const;
 
 export const WYRM_HEAD = frozenToGame(...FROZEN_HEAD_LOCAL);
@@ -262,19 +262,19 @@ export function calveProgress(since: number): number {
   return clamp01(since / FACE_EVENT_SECONDS.calve);
 }
 
-/** The collapse (stage 5): the face settles and drops into the lake. Returns
- *  the drop (yards), the forward pitch, and whether it has gone for good. */
-export function collapsePose(since: number): {
-  drop: number;
-  pitch: number;
-  gone: boolean;
-  k: number;
-} {
+/** The collapse (stage 5): the face shudders, then slumps forward and down
+ *  into the lake and stays there as a broken ruin (the Quench behind it is
+ *  never bared). Returns the drop (yards), the forward pitch and the share
+ *  played. */
+export function collapsePose(since: number): { drop: number; pitch: number; k: number } {
   const k = clamp01(since / FACE_EVENT_SECONDS.collapse);
   const shudder = k < 0.18 ? Math.sin(since * 40) * 0.6 * (k / 0.18) : 0;
   const fall = easeIn(clamp01((k - 0.18) / 0.82));
-  return { drop: fall * 120 + shudder, pitch: fall * 0.32, gone: k >= 1, k };
+  return { drop: fall * COLLAPSE_DROP + shudder, pitch: fall * 0.14, k };
 }
+
+/** How far the collapsed face slumps (yards). */
+export const COLLAPSE_DROP = 18;
 
 /** One collapse chunk's flight (index-seeded): from a point on the face it
  *  tumbles out and down into the lake. Returns the offset (game frame,

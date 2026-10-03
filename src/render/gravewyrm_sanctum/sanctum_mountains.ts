@@ -190,7 +190,7 @@ function faceBlock(): {
     front: FACE_ORIGIN.z - 8,
     wing: 22,
     back: FACE_ORIGIN.z + 58,
-    top: FACE_TOP - 6,
+    top: FACE_TOP - 36,
     fall: 30,
   };
 }

@@ -948,7 +948,6 @@ export function buildSanctumFace(
       const pose = collapsePose(s5);
       frame.position.y = FACE_ORIGIN.y - pose.drop;
       frame.rotation.x = -pose.pitch;
-      frame.visible = !pose.gone;
       wyrm.visible = pose.k < 0.22;
       halo.visible = pose.k < 0.3;
       wide.visible = pose.k < 0.6;
