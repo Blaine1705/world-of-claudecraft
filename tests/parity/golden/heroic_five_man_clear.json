@@ -10,8 +10,8 @@
     "awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the gravewyrm_sanctum:heroic daily lockout",
     "class:warrior"
   ],
-  "draws": 63,
-  "drawDigest": "2cb65480",
+  "draws": 69,
+  "drawDigest": "0249f6ce",
   "frames": [
     {
       "tick": 0,
@@ -30,12 +30,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1038,
-      "state": "1a13d8cc",
+      "nextId": 1093,
+      "state": "348b94dc",
       "events": "b49fc288",
       "rng": {
-        "draws": 21,
-        "digest": "7cbdb21a"
+        "draws": 62,
+        "digest": "86e69dc4"
       },
       "label": "claimed",
       "players": [
@@ -471,7 +471,6 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1062,
@@ -488,8 +487,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1110
+            "z": -1042
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -522,7 +520,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
@@ -538,8 +535,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101497,
-            "y": 0.6,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -573,7 +569,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
@@ -589,8 +584,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101499,
-            "y": 0.6,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -624,7 +618,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
@@ -640,8 +633,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101501,
-            "y": 0.6,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -675,7 +667,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
@@ -691,8 +682,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101503,
-            "y": 0.6,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -727,16 +717,16 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 13138,
-          "id": 1034,
+          "hp": 36785,
+          "id": 1077,
+          "idleStationary": true,
           "infernoTimer": 30,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
-          "maxHp": 13138,
+          "maxHp": 36785,
           "mechanicDamageMult": 19,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
@@ -745,15 +735,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "potionCooldownUntil": -1,
           "slowImmune": true,
           "spawnPos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "stats": {
             "armor": 857
@@ -770,12 +758,12 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1038,
-      "state": "5db32d03",
-      "events": "90a012f6",
+      "nextId": 1094,
+      "state": "dea1d234",
+      "events": "4d0e50a0",
       "rng": {
-        "draws": 63,
-        "digest": "2cb65480"
+        "draws": 69,
+        "digest": "0249f6ce"
       },
       "label": "death",
       "players": [
@@ -802,7 +790,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 14138,
+            "damageDealt": 37785,
             "kills": 1,
             "xpGained": 98
           },
@@ -810,7 +798,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 14138,
+              "damageDealt": 37785,
               "dungeonFinalBossKills": 1,
               "fullPartyDungeonClears": 1,
               "kills": 1,
@@ -1009,15 +997,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1771,
-            "deaths": 1,
             "xpGained": 98
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "deaths": 1,
               "dungeonFinalBossKills": 1,
               "fullPartyDungeonClears": 1,
               "kills": 1,
@@ -1041,10 +1026,6 @@
           "deedsEarned": [
             [
               "cmb_first_blood",
-              ""
-            ],
-            [
-              "cmb_first_fall",
               ""
             ],
             [
@@ -1159,7 +1140,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 150,
+          "renown": 145,
           "talents": {
             "rows": {}
           },
@@ -1820,7 +1801,6 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
@@ -1838,8 +1818,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1110
+            "z": -1042
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -1867,15 +1846,15 @@
         {
           "aiState": "idle",
           "attackPower": 10,
+          "combatTimer": 99.05,
           "comboUntil": -1,
           "critChance": 0.056,
-          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
+          "hp": 665,
           "id": 1012,
-          "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1887,7 +1866,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101497,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -1936,7 +1915,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101499,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -1985,7 +1964,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101501,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -2034,7 +2013,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101503,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -2081,25 +2060,24 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1034,
+          "id": 1077,
+          "idleStationary": true,
           "inCombat": true,
           "infernoTimer": 30,
           "kind": "mob",
           "leashAnchor": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "level": 22,
           "loot": {
-            "copper": 89018,
+            "copper": 117290,
             "items": [
               {
                 "count": 1,
-                "itemId": "gravewyrm_cleaver"
+                "itemId": "heroic_gravewyrm_gauntlets"
               }
             ]
           },
@@ -2112,7 +2090,7 @@
             1015
           ],
           "lootable": true,
-          "maxHp": 13138,
+          "maxHp": 36785,
           "mechanicDamageMult": 19,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
@@ -2121,16 +2099,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.95,
           "slowImmune": true,
           "spawnPos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "stats": {
             "armor": 857
@@ -2148,12 +2124,12 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1038,
-      "state": "5db32d03",
+      "nextId": 1094,
+      "state": "dea1d234",
       "events": "741638a5",
       "rng": {
-        "draws": 63,
-        "digest": "2cb65480"
+        "draws": 69,
+        "digest": "0249f6ce"
       },
       "label": "final",
       "players": [
@@ -2180,7 +2156,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 14138,
+            "damageDealt": 37785,
             "kills": 1,
             "xpGained": 98
           },
@@ -2188,7 +2164,7 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 14138,
+              "damageDealt": 37785,
               "dungeonFinalBossKills": 1,
               "fullPartyDungeonClears": 1,
               "kills": 1,
@@ -2387,15 +2363,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1771,
-            "deaths": 1,
             "xpGained": 98
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "deaths": 1,
               "dungeonFinalBossKills": 1,
               "fullPartyDungeonClears": 1,
               "kills": 1,
@@ -2419,10 +2392,6 @@
           "deedsEarned": [
             [
               "cmb_first_blood",
-              ""
-            ],
-            [
-              "cmb_first_fall",
               ""
             ],
             [
@@ -2537,7 +2506,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 150,
+          "renown": 145,
           "talents": {
             "rows": {}
           },
@@ -3198,7 +3167,6 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
@@ -3216,8 +3184,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1110
+            "z": -1042
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -3245,15 +3212,15 @@
         {
           "aiState": "idle",
           "attackPower": 10,
+          "combatTimer": 99.05,
           "comboUntil": -1,
           "critChance": 0.056,
-          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
+          "hp": 665,
           "id": 1012,
-          "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3265,7 +3232,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101497,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -3314,7 +3281,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101499,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -3363,7 +3330,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101501,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -3412,7 +3379,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 101503,
-            "z": -1116
+            "z": -1048
           },
           "potionCooldownUntil": -1,
           "resource": 1506,
@@ -3459,25 +3426,24 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1034,
+          "id": 1077,
+          "idleStationary": true,
           "inCombat": true,
           "infernoTimer": 30,
           "kind": "mob",
           "leashAnchor": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "level": 22,
           "loot": {
-            "copper": 89018,
+            "copper": 117290,
             "items": [
               {
                 "count": 1,
-                "itemId": "gravewyrm_cleaver"
+                "itemId": "heroic_gravewyrm_gauntlets"
               }
             ]
           },
@@ -3490,7 +3456,7 @@
             1015
           ],
           "lootable": true,
-          "maxHp": 13138,
+          "maxHp": 36785,
           "mechanicDamageMult": 19,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
@@ -3499,16 +3465,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.95,
           "slowImmune": true,
           "spawnPos": {
             "x": 101500,
-            "y": 0.6,
-            "z": -1104
+            "z": -1036
           },
           "stats": {
             "armor": 857
