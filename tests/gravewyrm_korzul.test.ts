@@ -587,6 +587,53 @@ describe('Korzul: the wipe, the kill, the deed', () => {
   });
 });
 
+describe('Korzul: the real tick (the mob AI running)', () => {
+  it('holds his fight through both flights and lands back in it, never evading', () => {
+    const r = room();
+    put(r, r.me, r.boss.pos.x - r.ox, r.boss.pos.z - r.oz - 6);
+    r.sim.ctx.aggroMob(r.boss, r.me, false);
+    const tick = (seconds: number): void => {
+      for (let t = 0; t < seconds - DT * 0.5; t += DT) {
+        // The tank never falls (his real swings run here).
+        r.me.damageImmune = true;
+        r.me.hp = r.me.maxHp;
+        r.sim.tick();
+      }
+    };
+    tick(KORZUL_EMERGE_SECONDS + 1);
+    const s = st(r);
+    expect(s.phase).toBe('ground');
+    r.boss.hp = Math.floor(r.boss.maxHp * 0.69);
+    tick(3);
+    expect(['gale', 'takeoff', 'air']).toContain(s.phase);
+    tick(4);
+    expect(s.phase).toBe('air');
+    expect(r.boss.hostile).toBe(false);
+    expect(r.boss.inCombat).toBe(true);
+    tick(22);
+    expect(s.phase).toBe('ground');
+    expect(s.flights).toBe(1);
+    expect(r.boss.hostile).toBe(true);
+    expect(r.boss.aiState).not.toBe('evade');
+    r.boss.hp = Math.floor(r.boss.maxHp * 0.39);
+    s.infernoGates = 1;
+    tick(30);
+    expect(s.flights).toBe(2);
+    expect(s.lastPhase).toBe(true);
+    expect(r.boss.aiState).not.toBe('evade');
+  }, 180_000);
+
+  it('/dev sanctum trigger reaches an engaged Korzul', () => {
+    const r = room();
+    const s = pullOut(r);
+    quiet(s);
+    r.sim.chat('/dev sanctum trigger crack5', r.me.id);
+    expect(s.plates[5].state).toBe('cracked');
+    r.sim.chat('/dev sanctum trigger breath', r.me.id);
+    expect(r.boss.castingAbility).toBe(KORZUL_GRAVE_BREATH);
+  });
+});
+
 describe('Korzul: determinism', () => {
   it('two runs on one seed fly, mark and burn the same', () => {
     const trace = (): string => {

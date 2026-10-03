@@ -1205,7 +1205,10 @@ export function korzulDevTrigger(
   what: string,
 ): string | null {
   const st = korzulState(ctx, inst, boss);
-  const [verb, arg] = what.trim().split(/\s+/);
+  // `crack 5` or `crack5` (the /dev chat line carries one word after trigger).
+  const m = /^([a-z]+)\s*(\d*)$/.exec(what.trim().toLowerCase());
+  const verb = m?.[1] ?? '';
+  const arg = m?.[2] ?? '';
   const plateArg = (): number | null => {
     const n = Number(arg);
     return Number.isInteger(n) && n >= 0 && n < LAKE_PLATES.length ? n : null;
