@@ -119,7 +119,9 @@ export const ANCHOR_LEDGE = {
   upper: { x0: 58, z0: -112, x1: 108, z1: -76, h: H.anchorUpper },
   lower: { x0: 56, z0: -62, x1: 110, z1: -16, h: H.anchorLower },
 } as const;
-/** The rune wall on the Anchor Ledge's east edge: HEAT. HAMMER. QUENCH. */
+/** The rune wall on the Anchor Ledge's east edge: the Smith's three acts
+ *  (heat, the hammer, the quench) cut as his runes, no letters; a body that
+ *  walks up to it reads the lore line (encounters/gravewyrm_sanctum/rune_wall.ts). */
 export const RUNE_WALL = { x: 106.5, z: -94, hw: 1.5, hd: 15 } as const;
 
 /** The Lock Terrace, Korgath's arena: a flat rock spur over the gulf. */
@@ -500,7 +502,8 @@ const SURFACES: FieldSurface[] = [
   // --- The Thaw Works (G8, G9, G10, patrol C) ---------------------------------------
   rect('works_upper', THAW_WORKS.upper, { edge: 'rock', ground: 'snow' }),
   rect('works_lower', THAW_WORKS.lower, { edge: 'rock', ground: 'snow' }),
-  // After both terraces: its ramp runs into the lower one.
+  // After both terraces: its ramp runs into the lower one, down the glacier
+  // itself (ice, as the vault stair below it: the camp sits on the Quench).
   {
     kind: 'path',
     id: 'works_road',
@@ -512,7 +515,7 @@ const SURFACES: FieldSurface[] = [
     ],
     halfWidth: 7,
     edge: 'rock',
-    ground: 'earth',
+    ground: 'ice',
   },
   {
     kind: 'path',
@@ -647,6 +650,15 @@ const PROPS: FieldProp[] = [
   { kind: 'gs_soul_brazier', x: 16, z: -120, rot: 0, r: 0.9, h: 1.8 },
   // The Fork: the Rime Gate's ice and a cairn of the cult's goad irons.
   { kind: 'gs_goad_rack', x: -22, z: -82, rot: 0.2, hw: 1.8, hd: 0.5, h: 2.2 },
+  // Thornpeak boulders on the terrace rims (clear of the walk): solid, so a
+  // body bumps the rock it sees instead of walking through it.
+  { kind: 'gs_rim_rock_a', x: -24, z: -196, rot: 0.3, r: 2.5, h: 3.1 },
+  { kind: 'gs_rim_rock_b', x: 24, z: -172, rot: 2.1, r: 2.6, h: 2 },
+  { kind: 'gs_rim_rock_c', x: -46.5, z: -149.5, rot: 1.2, r: 1.7, h: 4.4 },
+  { kind: 'gs_rim_rock_a', x: 36, z: -112, rot: 4, r: 2, h: 2.6 },
+  { kind: 'gs_rim_rock_b', x: -26, z: -66, rot: 0.6, r: 2.4, h: 1.9 },
+  { kind: 'gs_rim_rock_c', x: 26, z: -82, rot: 2.8, r: 1.5, h: 4.2 },
+  { kind: 'gs_rim_rock_c', x: 46, z: 52, rot: 2.2, r: 1.7, h: 4.6 },
   // The Serac Field: ice towers on both shelves, clear of the walk and the bridge.
   { kind: 'gs_serac_large', x: -98, z: -106, rot: 0.3, r: 5, h: 26 },
   { kind: 'gs_serac_medium', x: -66, z: -106, rot: 1.2, r: 3.6, h: 18 },

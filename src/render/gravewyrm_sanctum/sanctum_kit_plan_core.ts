@@ -115,6 +115,9 @@ const HELD_DEAD = [
   'Kit_HeldDeadF',
 ];
 const HELD_GIANTS = ['Kit_HeldGiantA', 'Kit_HeldGiantB', 'Kit_HeldGiantC'];
+/** The Thornpeak boulders' widest horizontal reach from their origin (yards,
+ *  measured off the kit's meshes). */
+const RIM_ROCK_REACH = { A: 2.94, B: 2.95, C: 2.1 } as const;
 
 /** The piece placements of one prop (empty for the props another painter
  *  draws: the seal pillars, the gate tunnel's own pass). */
@@ -138,6 +141,16 @@ export function placementsForProp(p: FieldProp, index: number): SanctumKitPlacem
     case 'gs_cult_brazier':
     case 'gs_soul_brazier':
       return [{ ...base, piece: 'Kit_SoulBrazier', scale: 1.05 }];
+    case 'gs_rim_rock_a':
+    case 'gs_rim_rock_b':
+    case 'gs_rim_rock_c': {
+      // Fitted so the boulder's widest reach is the collider plus a body's
+      // skin: what a body bumps is the rock it sees.
+      const v = p.kind.slice(-1).toUpperCase() as 'A' | 'B' | 'C';
+      return [
+        { ...base, piece: `Kit_ThornpeakRock${v}`, scale: ((p.r ?? 2) + 0.35) / RIM_ROCK_REACH[v] },
+      ];
+    }
     case 'gs_moraine_rocks':
       return [
         { ...base, piece: 'Kit_ThornpeakRockB', scale: (2 * (p.r ?? 2.4)) / 5.0 },
@@ -147,15 +160,19 @@ export function placementsForProp(p: FieldProp, index: number): SanctumKitPlacem
       return [{ ...base, piece: 'Kit_Sledge', scale: (2 * (p.hd ?? 3.4)) / 8 }];
     case 'gs_goad_rack':
       return [{ ...base, piece: 'Kit_GoadRack', scale: (2 * (p.hw ?? 1.8)) / 3.2 }];
-    case 'gs_serac_large':
+    case 'gs_serac_large': {
+      // The tower's foot (its fallen blocks) reaches 12.1 yd at a body's
+      // height: fitted so it stands at most a body's width past the collider.
+      const fit = ((p.r ?? 5) + 1.5) / 12.1;
       return [
         {
           ...base,
           piece: 'Kit_SeracL',
-          scale: (p.r ?? 5) / 8,
-          scaleY: (p.h ?? 26) / 29 / ((p.r ?? 5) / 8),
+          scale: fit,
+          scaleY: (p.h ?? 26) / 29 / fit,
         },
       ];
+    }
     case 'gs_serac_medium':
       return [
         {
@@ -282,6 +299,14 @@ const CREVASSE_EDGES = ['Kit_CrevasseEdgeA', 'Kit_CrevasseEdgeB', 'Kit_CrevasseE
 const EDGE_OUTSET = 1.2;
 /** Lips that drop at least this far are dressed with the sculpted walls. */
 const EDGE_MIN_DROP = 12;
+/** How far onto the high side the lip's height is read (the cliff probe's). */
+const LIP_PROBE = 0.6;
+/** The most a sloping lip may fall along one module (its top stands at the
+ *  module's lower end, so its upper end sits at most this far under the
+ *  walk's edge, where the terrain's skirt shows). */
+const EDGE_MAX_STEP = 0.6;
+/** The shortest module, as a share of the piece's own length. */
+const EDGE_MIN_STRETCH = 0.3;
 
 /** The sculpted crevasse walls (snow and ice terraces) and slate cliffs (rock
  *  terraces) along every lip that drops into the gulf: modules along each
@@ -298,7 +323,25 @@ export function planCrevasseEdges(): SanctumKitPlacement[] {
     const ground = groundOf(run.surface);
     const rock = ground === 'slate' || ground === 'earth';
     const module = rock ? 16 : 8;
-    const n = Math.max(1, Math.round(len / module));
+    // The lip's height along the run, read on the high side: a run beside a
+    // stair or a ramp slopes, and a module stood level at the run's first
+    // sample rose as a wall over the lower steps.
+    const lip = (u: number): number =>
+      sanctumGround(
+        run.ax + (run.bx - run.ax) * u - run.nx * LIP_PROBE,
+        run.az + (run.bz - run.az) * u - run.nz * LIP_PROBE,
+      );
+    const fall = Math.abs(lip(1) - lip(0));
+    // A sloping run takes shorter modules, each stood at the LOWER of its two
+    // ends, so no module's lip ever stands over the walk (a hanging face is
+    // never rolled to follow a slope: its foot would swing far along the run).
+    const n = Math.max(1, Math.round(len / module), Math.ceil(fall / EDGE_MAX_STEP));
+    const nominal = rock
+      ? SANCTUM_KIT_SIZES.Kit_RockCliff[0]
+      : SANCTUM_KIT_SIZES.Kit_CrevasseEdgeA[0];
+    // Too steep for the kit's lip (a stair's sides): the terrain's own skirt
+    // draws that drop.
+    if (len / n < nominal * EDGE_MIN_STRETCH) continue;
     const rot = Math.atan2(run.nx, run.nz);
     for (let k = 0; k < n; k++) {
       const t = (k + 0.5) / n;
@@ -311,7 +354,7 @@ export function planCrevasseEdges(): SanctumKitPlacement[] {
         piece,
         x,
         z,
-        y: run.high,
+        y: Math.min(lip(k / n), lip((k + 1) / n)),
         rot,
         scale: 1,
         // A hair long so neighbours overlap at a bend.
@@ -473,32 +516,63 @@ export function planGulfScenery(): SanctumKitPlacement[] {
   return out;
 }
 
+/** The vault walls' ring (yards from the vault's centre to a piece's
+ *  origin) and the clearance each opening keeps either side of its stair. */
+const VAULT_WALL_RING = RITUAL_VAULT.r + 3;
+const VAULT_WALL_SCALE = 1.05;
+/** Pieces per side (east and west arcs between the two openings). */
+const VAULT_WALL_PIECES = 3;
+/** A body's margin past a stair's edge before the first wall piece. */
+const VAULT_OPENING_MARGIN = 2;
+/** Kit_VaultWall's front face stands this far in front of its origin. */
+const VAULT_WALL_FRONT = 1.51;
+
+/** The half-angle of the rim's opening for a stair of half width `w`: the
+ *  wall's inner face ends a body's margin past the stair's edge. */
+export function vaultOpeningHalfAngle(w: number): number {
+  const inner = VAULT_WALL_RING - VAULT_WALL_FRONT * VAULT_WALL_SCALE;
+  return Math.asin(Math.min(1, (w + VAULT_OPENING_MARGIN) / inner));
+}
+
 /** The Ritual Vault's walls: dripping blue ice with the held inside, round
- *  the rim, open where the stairs come in (south) and go on (north). */
+ *  the rim, OPEN where the stairs come in (south, the vault stair) and go on
+ *  (north, the shore stair) with a body's margin past each stair's edge, so
+ *  the drawn rim and the walked way agree (the owner walked through a wall
+ *  here once). Their inner faces stand outside the vault's floor. */
 export function planVaultWalls(): SanctumKitPlacement[] {
   const out: SanctumKitPlacement[] = [];
-  const r = RITUAL_VAULT.r + 3;
-  const n = 9;
-  for (let k = 0; k < n; k++) {
-    const a = (k / n) * Math.PI * 2 + Math.PI / n;
-    // a from +z (north) clockwise: skip the openings toward north and south.
-    const nearNorth = Math.abs(Math.atan2(Math.sin(a), Math.cos(a))) < 0.42;
-    const nearSouth = Math.abs(Math.atan2(Math.sin(a - Math.PI), Math.cos(a - Math.PI))) < 0.42;
-    if (nearNorth || nearSouth) continue;
-    const x = RITUAL_VAULT.x + Math.sin(a) * r;
-    const z = RITUAL_VAULT.z + Math.cos(a) * r;
-    out.push({
-      piece: 'Kit_VaultWall',
-      x,
-      z,
-      y: RITUAL_VAULT.h - 1.5,
-      // Front toward the vault's centre.
-      rot: a + Math.PI,
-      scale: 1.05,
-      stretch: (2 * Math.PI * r) / n / 16,
-    });
+  const r = VAULT_WALL_RING;
+  const north = vaultOpeningHalfAngle(stairHalfWidth('shore_stair'));
+  const south = vaultOpeningHalfAngle(stairHalfWidth('vault_stair'));
+  // Angles from +z (north) turning toward +x: each side's arc runs from the
+  // north opening's edge to the south opening's edge.
+  const span = Math.PI - north - south;
+  const step = span / VAULT_WALL_PIECES;
+  // The straight piece spans the chord of its step (a hair long to close the
+  // joints), its ends pulled in so they never cross into an opening.
+  const chord = 2 * r * Math.sin(step / 2);
+  for (const side of [1, -1]) {
+    for (let k = 0; k < VAULT_WALL_PIECES; k++) {
+      const a = side * (north + step * (k + 0.5));
+      out.push({
+        piece: 'Kit_VaultWall',
+        x: RITUAL_VAULT.x + Math.sin(a) * r,
+        z: RITUAL_VAULT.z + Math.cos(a) * r,
+        y: RITUAL_VAULT.h - 1.5,
+        // Front toward the vault's centre.
+        rot: a + Math.PI,
+        scale: VAULT_WALL_SCALE,
+        stretch: (chord * 1.02) / (SANCTUM_KIT_SIZES.Kit_VaultWall[0] * VAULT_WALL_SCALE),
+      });
+    }
   }
   return out;
+}
+
+function stairHalfWidth(id: string): number {
+  const s = GRAVEWYRM_SANCTUM_FIELD.surfaces.find((f) => f.id === id);
+  if (!s || s.kind !== 'path') throw new Error(`no stair ${id}`);
+  return s.halfWidth;
 }
 
 /** Frozen waterfalls hanging off rock lips into the gulf (a few, chosen,
@@ -546,36 +620,8 @@ export function planRockDressing(): SanctumKitPlacement[] {
       scale: 1.5,
     });
   }
-  // Crags in the gulf beside the terraces (reading the depth), and rocks on
-  // the rims (on the floor, clear of the walk).
-  const rims: [number, number, number][] = [
-    [-24, -196, 0.3],
-    [24, -172, 2.1],
-    [-44, -148, 1.2],
-    [36, -112, 4.0],
-    [-26, -66, 0.6],
-    [26, -82, 2.8],
-    [102, -108, 1.7],
-    [-104, -110, 0.2],
-    [46, 52, 2.2],
-    [-48, 54, 0.9],
-  ];
-  for (const [i, [x, z, rot]] of rims.entries()) {
-    if (sanctumFloorAt(x, z) === null) continue;
-    const props = GRAVEWYRM_SANCTUM_FIELD.props;
-    const clear = props.every(
-      (p) => Math.hypot(p.x - x, p.z - z) > (p.r ?? Math.max(p.hw ?? 1, p.hd ?? 1)) + 3,
-    );
-    if (!clear) continue;
-    out.push({
-      piece: ['Kit_ThornpeakRockA', 'Kit_ThornpeakRockB', 'Kit_ThornpeakRockC'][i % 3],
-      x,
-      z,
-      rot,
-      scale: 0.8 + sanctumHash(i, 41) * 0.3,
-      cosmetic: true,
-    });
-  }
+  // The rocks on the terrace rims are solid layout props (gs_rim_rock_*,
+  // drawn by placementsForProp): a body bumps the rock it sees.
   // The Smith's hammer gets a broken chain heap beside it, the bridge's
   // anchor a heap at its foot (the slack the chain came down with).
   out.push({

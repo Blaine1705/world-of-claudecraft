@@ -74,7 +74,15 @@ Rules:
   his body) and change `FROZEN_WYRM_URL`; `FROZEN_WYRM` places it, the head, eye and heart
   anchors (`FROZEN_*_LOCAL`) are measured off the pose.
 
-Tests: `tests/gravewyrm_sanctum_render_core.test.ts` (the face frame and the swap seam, the
+- What is drawn solid is what blocks a body (`tests/gravewyrm_sanctum_walls.test.ts`
+  sweeps the terrain's faces and the kit's real meshes against the collision seam): a
+  lip module stands at the LOWER end of a sloping run and none dresses a stair's sides;
+  the vault's walls leave both stairs a body's margin; the rim boulders are layout
+  props with colliders (`gs_rim_rock_*`); a fitted prop reaches at most a body's width
+  past its collider (the chain links and the pyres' rim stakes are render only).
+
+Tests: `tests/gravewyrm_sanctum_walls.test.ts` (drawn walls versus the walked floor),
+`tests/gravewyrm_sanctum_render_core.test.ts` (the face frame and the swap seam, the
 stage curves, the story memory, the chains, the kit plan, the shard's look),
 `tests/gravewyrm_sanctum_gates_render.test.ts`, `tests/gravewyrm_sanctum_lake.test.ts`,
 `tests/gravewyrm_sanctum_lights.test.ts`, `tests/gravewyrm_sanctum_terrain.test.ts`, and the
