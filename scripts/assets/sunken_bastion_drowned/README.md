@@ -31,6 +31,11 @@ nothing here runs in the build or the game.
   and the crank ride their own bones so Shoot and Aim show the loose (keyed scales) and the
   windlass reload. The muzzle anchor at `Shoot:0.5` is `ARBALEST_MUZZLE` in
   `bastion_creature_fx_core.ts` (`../kit/anchors.py -- <abs>/arbalest Shoot:0.5`).
+- `sergeant/`: the Drowned Sergeant (`public/models/creatures/drowned_sergeant.glb`): the Revenant's
+  body made heavier, a closed great helm with a T-slit over a smooth form round the head (not the
+  face's own bumps), a kelp plume, three-lame pauldrons, both vambraces, the sash (`build_sash`, a
+  band over the cuirass) and the bearded boarding axe (haft and iron as two rigid parts on Weapon);
+  `clips.py` has Idle, CombatIdle, Walk, Run, Attack, Attack2, Rally, Hit, Death.
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),

@@ -73,6 +73,20 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0.01, up: 2.66, fwd: 0.48 },
     eyes: { side: 0.08, up: 3.72, fwd: 0.77 },
   },
+  // The sergeant: water off the great helm's sides and visor, the kelp plume
+  // and the shouldered axe head.
+  drowned_sergeant: {
+    rawHeight: 4.834,
+    drips: [
+      { side: 0.38, up: 3.82, fwd: -0.12 },
+      { side: 0.11, up: 3.96, fwd: 0.27 },
+      { side: -0.29, up: 3.84, fwd: 0 },
+      { side: 0.07, up: 4.22, fwd: 0.13 },
+      { side: -0.1, up: 3.73, fwd: -0.8 },
+    ],
+    chest: { side: 0.04, up: 3.06, fwd: 0.52 },
+    eyes: { side: 0.1, up: 4.22, fwd: 0.14 },
+  },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {
     rawHeight: 4.4,

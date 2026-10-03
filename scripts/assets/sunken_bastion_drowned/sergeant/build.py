@@ -1,4 +1,4 @@
-"""Build the Fogbound Arbalest from code.
+"""Build the Drowned Sergeant from code.
 
   blender -b --factory-startup --python build.py -- <out.glb> [kit options]
 """

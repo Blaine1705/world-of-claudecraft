@@ -4186,20 +4186,35 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.16,
   },
+  // The Drowned Sergeant: the wall's sergeant sculpted whole on the Revenant's
+  // kit, the heaviest plate on the wall over a barrel-chested drowned body: a
+  // closed great helm with a T-slit (the sea light burning in the slit and the
+  // mouth slot) and a ragged kelp plume, huge layered pauldrons crusted with
+  // barnacles, the sergeant's faded sash across the breast, the Bastion's
+  // tabard and a bearded boarding axe carried on the shoulder, the left fist
+  // on his hip. Attack cleaves down off the shoulder, Attack2 is a two-handed
+  // overhead chop; Rally (the axe thrust high, the fist beaten on the breast)
+  // is his flourish. walkRef/runRef are the clips' own foot speeds at the
+  // drawn size.
   bastion_skel_sergeant: {
     url: `${CREATURES}/drowned_sergeant.glb`,
-    height: 4.85,
+    // 4.85 to the crown of the helm; the shouldered axe head rides above it.
+    height: 5.15,
     clips: {
       idle: 'Idle',
+      combatIdle: 'CombatIdle',
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
-      // Rally the Watch: the cutlass thrust high and the roar.
+      // Rally the Watch: the axe thrust high and the fist on the breast.
       flourish: 'Rally',
     },
+    walkRef: 2.19,
+    runRef: 8.23,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
   // The Mist Chanter: a hunched sea hag with an anglerfish-lure staff.
   bastion_mistweaver: {

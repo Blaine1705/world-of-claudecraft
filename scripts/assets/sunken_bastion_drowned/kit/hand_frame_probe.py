@@ -4,6 +4,7 @@ key pose).
 
   blender -b x.blend --python hand_frame_probe.py -- <builder dir> "<pose expr>" fx,fy,fz ux,uy,uz
 """
+import os
 import sys
 
 import bpy
@@ -12,7 +13,7 @@ from mathutils import Vector
 
 argv = sys.argv[sys.argv.index('--') + 1:]
 sys.path.insert(0, argv[0])
-sys.path.insert(1, argv[0] + '/../../kit')
+sys.path.insert(1, os.path.dirname(os.path.abspath(__file__)))
 import clips as C  # noqa: E402
 import rig as R  # noqa: E402
 

@@ -1,13 +1,13 @@
-"""Build the Bastion Revenant from code.
+"""Build the Drowned Watchman from code.
 
-  blender -b --factory-startup --python build.py -- <out.glb> [--variant bonewalker] [kit options]
+  blender -b --factory-startup --python build.py -- <out.glb> [kit options]
 """
 import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-sys.path.insert(1, os.path.abspath(os.path.join(HERE, '..', '..', 'kit')))
+sys.path.insert(1, os.path.abspath(os.path.join(HERE, '..', 'kit')))
 argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 import anatomy as A  # noqa: E402
 if '--variant' in argv:

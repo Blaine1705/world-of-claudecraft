@@ -7,6 +7,7 @@ each candidate direction "x,y,z" prints the aim error in degrees. With no
 directions, a sphere of 98 candidates is scanned and the best 12 listed.
 """
 import math
+import os
 import sys
 
 import bpy
@@ -14,7 +15,7 @@ import numpy as np
 
 argv = sys.argv[sys.argv.index('--') + 1:]
 sys.path.insert(0, argv[0])
-sys.path.insert(1, argv[0] + '/../../kit')
+sys.path.insert(1, os.path.dirname(os.path.abspath(__file__)))
 import clips as C  # noqa: E402
 import motion as M  # noqa: E402
 import rig as R  # noqa: E402
