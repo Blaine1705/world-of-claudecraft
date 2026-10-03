@@ -14,6 +14,8 @@ templates, spawns, packs, patrols, gates and story markers are
 | `claim.ts` | The live Sanctum claims, the Sanctum's own encounter objects, the planted hold; the claim-generic reads are the Sunken Bastion's, re-exported. |
 | `sledge_tusker.ts` | The showpiece patrol (design 5.3): Tusk Sweep (frontal cone), Trample (a lane to the farthest player that stops short of a drop, then the charge), Spilled Braziers (three soulfire patches where its unhitched sledge tips, at the model's brazier spots), Enrage. Fight state `Entity.sanctumFight` (`TuskerFightState`). |
 | `story.ts` | The Calving Face's crack step (design section 3), latched per claim into the template id of the run's story markers (`STORY_MARKERS`): 0 arrival, 1 Tusker dead, 2 to 5 Korgath's chains (phase B), 6 Korgath dead, 7 Velkhar dead, 8 Korzul pulled. Monotonic; a freed claim drops the markers. |
+| `velkhar.ts` + `velkhar_state.ts` | Grand Necromancer Velkhar (design 6.2): the Waking Thaw from the three pools in turn (a `SANCTUM_PYRE_FLARE` roar 1.5 s early), the kept 66 and 33 percent waves from the pools (the template has no `summonAdds`; a Velkhar dragged out of his vault raises them beside him), the death-site rule G24 (Held: a `SANCTUM_HELD_STATUE`; Unquenched: a `SANCTUM_UNQUENCHED_RING`, a rise 4 s later at 60 percent, the tithe heal), Grasp of the Thawed, the Soulfire Trench (`SANCTUM_TRENCH_LANE` then `SANCTUM_MELT_STRIP`), Shadow Volley, heroic Warm Hands and Twice-Woken. Stay Buried waits on sunk Bonewalkers (`setBossAddPendingForDeeds`); Cold Comfort is granted at his death. |
+| `meltwater.ts` | Pure: is a point in meltwater (a pool, a live strip, a heroic puddle), and a ray's reach to the vault's rim. |
 | `index.ts` | `tickSanctumEncounters` (called from `instances/dungeons.ts` after the trash kit) and the public surface. |
 
 The trash kit's Sanctum keys (`goad`, `toss`, `stoke`, the death burst's `slow`)
@@ -40,6 +42,6 @@ Naming (IP check at authoring, 2026-10-03): every new name was cleared in the
 design's section 11 (Thawcaller, Goadsmith, Sledge Tusker exact-searched; the
 rest generic English or glaciology terms). "Ice Tomb" is never a display name.
 
-Tests: `tests/gravewyrm_sanctum_route.test.ts` (route contract, heights,
+Tests: `tests/gravewyrm_velkhar.test.ts` (Velkhar), `tests/gravewyrm_sanctum_route.test.ts` (route contract, heights,
 arenas, story marker reach), `tests/gravewyrm_sanctum_trash.test.ts` (kits, the
 Tusker, the story steps, `/dev sanctum`), `tests/gravewyrm_normal_tuning.test.ts`.
