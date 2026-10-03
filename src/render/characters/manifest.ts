@@ -4094,18 +4094,33 @@ export const VISUALS: Record<string, VisualDef> = {
   // The drowned stand head and shoulders over a player (about 1.6x for a
   // prisoner, 2x for the elite sailors, 2.6x for the sergeant); presentation
   // only, the templates' gameplay is untouched.
+  // The Bastion Revenant: a drowned marine sculpted whole (scripts/assets/
+  // sunken_bastion_drowned/: the OpenVDB sculpt kit), bloated sea-grey flesh
+  // under a morion with a high comb and a boat brim, sea light in its sunken
+  // eyes and open mouth, rusted half-plate crusted with barnacles and hung
+  // with kelp, the Bastion's tower-over-waves on a torn tabard, a buckler on
+  // the bare left forearm and a heavy cutlass with a knuckle bow. Its Onrush
+  // dash runs in the Run clip; Rise (hauling itself up out of the tide) is
+  // its flourish. Drips, brine sprays and its death gush are
+  // sunken_bastion/bastion_drowned_fx.ts. walkRef/runRef are the clips' own
+  // foot speeds at the drawn size.
   bastion_drowned_revenant: {
     url: `${CREATURES}/drowned_revenant.glb`,
-    height: 4.7,
+    height: 4.95,
     clips: {
       idle: 'Idle',
+      combatIdle: 'CombatIdle',
       walk: 'Walk',
       run: 'Run',
-      attack: ['Attack', 'Attack2'],
+      attack: ['Attack', 'Attack2', 'Attack3'],
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
+      flourish: 'Rise',
     },
+    walkRef: 1.73,
+    runRef: 6.68,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
   },
   bastion_skel_watchman: {
     url: `${CREATURES}/drowned_watchman.glb`,
