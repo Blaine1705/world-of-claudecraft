@@ -16354,19 +16354,22 @@
   #bastion-cage-escape,
   #bastion-chain-alert,
   #foundry-alert,
-  #wildheart-alert {
+  #wildheart-alert,
+  #sanctum-alert {
     bottom: calc(260px + var(--castbar-h) + 14px);
   }
   body.show-actionbar3 #bastion-cage-escape,
   body.show-actionbar3 #bastion-chain-alert,
   body.show-actionbar3 #foundry-alert,
-  body.show-actionbar3 #wildheart-alert {
+  body.show-actionbar3 #wildheart-alert,
+  body.show-actionbar3 #sanctum-alert {
     bottom: calc(312px + var(--castbar-h) + 14px);
   }
   body.mobile-touch #bastion-cage-escape,
   body.mobile-touch #bastion-chain-alert,
   body.mobile-touch #foundry-alert,
-  body.mobile-touch #wildheart-alert {
+  body.mobile-touch #wildheart-alert,
+  body.mobile-touch #sanctum-alert {
     bottom: 56%;
   }
 
@@ -16734,6 +16737,125 @@
     }
   }
   body.mobile-touch #wildheart-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) ---------- */
+  /* Self-mounted by the Foundry alert painter (the shared encounter alert
+     family) under its own id, from src/ui/hud/dungeon/sanctum_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: a strike
+     to dodge throbs in the hostile tone, a floor to read sits in frost, the
+     Lockbound readout in gold. Never tier-gated (graphics fairness). */
+  #sanctum-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #sanctum-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #sanctum-alert .fa-line {
+    font-size: 14px;
+  }
+  #sanctum-alert .fa-hint {
+    display: none;
+  }
+  #sanctum-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #sanctum-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #sanctum-alert.is-quench,
+  #sanctum-alert.is-plunge,
+  #sanctum-alert.is-descent,
+  #sanctum-alert.is-eye,
+  #sanctum-alert.is-eye-cracked,
+  #sanctum-alert.is-flail,
+  #sanctum-alert.is-charge,
+  #sanctum-alert.is-trench,
+  #sanctum-alert.is-strain,
+  #sanctum-alert.is-inferno,
+  #sanctum-alert.is-stomp,
+  #sanctum-alert.is-breath,
+  #sanctum-alert.is-maul,
+  #sanctum-alert.is-tail {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #sanctum-alert.is-quench .fa-title,
+  #sanctum-alert.is-plunge .fa-title,
+  #sanctum-alert.is-descent .fa-title,
+  #sanctum-alert.is-eye .fa-title,
+  #sanctum-alert.is-eye-cracked .fa-title,
+  #sanctum-alert.is-flail .fa-title,
+  #sanctum-alert.is-charge .fa-title,
+  #sanctum-alert.is-trench .fa-title,
+  #sanctum-alert.is-strain .fa-title,
+  #sanctum-alert.is-inferno .fa-title,
+  #sanctum-alert.is-stomp .fa-title,
+  #sanctum-alert.is-breath .fa-title,
+  #sanctum-alert.is-maul .fa-title,
+  #sanctum-alert.is-tail .fa-title,
+  #sanctum-alert.is-quench .fa-fill,
+  #sanctum-alert.is-plunge .fa-fill,
+  #sanctum-alert.is-descent .fa-fill,
+  #sanctum-alert.is-eye .fa-fill,
+  #sanctum-alert.is-eye-cracked .fa-fill,
+  #sanctum-alert.is-flail .fa-fill,
+  #sanctum-alert.is-charge .fa-fill,
+  #sanctum-alert.is-trench .fa-fill,
+  #sanctum-alert.is-strain .fa-fill,
+  #sanctum-alert.is-inferno .fa-fill,
+  #sanctum-alert.is-stomp .fa-fill,
+  #sanctum-alert.is-breath .fa-fill,
+  #sanctum-alert.is-maul .fa-fill,
+  #sanctum-alert.is-tail .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #sanctum-alert.is-meltwater,
+  #sanctum-alert.is-meltwater-target,
+  #sanctum-alert.is-cracked,
+  #sanctum-alert.is-flight {
+    border-color: var(--color-debuff-frost);
+  }
+  #sanctum-alert.is-meltwater .fa-title,
+  #sanctum-alert.is-meltwater-target .fa-title,
+  #sanctum-alert.is-cracked .fa-title,
+  #sanctum-alert.is-flight .fa-title,
+  #sanctum-alert.is-meltwater .fa-fill,
+  #sanctum-alert.is-meltwater-target .fa-fill,
+  #sanctum-alert.is-cracked .fa-fill,
+  #sanctum-alert.is-flight .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #sanctum-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #sanctum-alert {
     min-width: min(420px, calc(100vw - 32px));
   }
 

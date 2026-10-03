@@ -5145,6 +5145,24 @@ export const hudChromeStrings = {
         'Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.',
       vanished: 'Hidden and immune to damage. He is about to pounce on the farthest player.',
     },
+    // The Gravewyrm Sanctum's boss auras (src/ui/sanctum_aura_effect.ts).
+    sanctum: {
+      lockbound:
+        'Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.',
+      enrage: 'Deals {pct}% more damage.',
+      grasp:
+        'Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.',
+      twiceWoken: 'Rose again from the meltwater and deals {pct}% more damage.',
+      doused: 'His plate broke under him and the quench-water put out his Grave Inferno.',
+      airborne:
+        'In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.',
+      wyrmsEye:
+        'When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.',
+      quenchWater:
+        'In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.',
+      shardFlare:
+        'The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.',
+    },
     // The Stormbrass Foundry's marks (src/ui/foundry_aura_effect.ts).
     foundry: {
       scaldingVents:
@@ -8935,6 +8953,48 @@ export const hudChromeStrings = {
     pollinatedLine: 'Stay off the seeds: your touch makes them sprout',
     bondTitle: 'Pack Bond',
     bondLine: 'Together they take half damage: pull them apart',
+    timeAria: '{seconds} seconds left',
+  },
+  // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
+  // Wordy (M16): non-Latin fills in the overlays.
+  sanctumAlert: {
+    quenchTitle: 'In the quench-water!',
+    quenchLine: 'It burns and slows you: swim to the nearest ice or the shore',
+    plungeTitle: 'Plunging Fire!',
+    plungeLine: 'Your whole plate is about to burn: get off it now',
+    descentTitle: 'Crashing Descent!',
+    descentLine: 'He lands right here: step out of his shadow',
+    eyeTitle: "Wyrm's Eye on you!",
+    eyeLine: 'Your plate burns when the mark ends: stay on sound ice, away from the group',
+    eyeCrackedLine: 'You stand on cracked ice: walk to a sound plate before the mark ends',
+    flailTitle: 'Chain Flail!',
+    flailLine: 'The chain whips down the painted lane: step out of it',
+    chargeTitle: 'Threshold Charge!',
+    chargeLine: 'He charges down the lane: get out of it, away from the edge',
+    trenchTitle: 'Soulfire Trench!',
+    trenchLine: 'Soulfire cuts the lane and leaves meltwater: get out of it',
+    strainTitle: 'Strain!',
+    strainLine: 'The intact pillars are about to lash out: get away from them',
+    infernoTitle: 'Grave Inferno!',
+    infernoLine: 'Each pulse burns harder: get out of his reach',
+    stompTitle: 'Shuddering Stomp!',
+    stompLine: 'Get away from him before his foot comes down',
+    breathTitle: 'Grave Breath!',
+    breathLine: 'You stand in the breath cone: get out to the side',
+    maulTitle: 'Maul Arc!',
+    maulLine: 'He swings through everything in front of him: get behind him',
+    tailTitle: 'Tail Sweep!',
+    tailLine: 'You stand behind him: get out before the tail hits',
+    meltwaterTitle: 'In the meltwater',
+    meltwaterLine: 'Your Bonewalker stands in meltwater: drag it onto the cold ice',
+    meltwaterTargetLine: 'If your target dies in meltwater it rises again: wait for cold ice',
+    crackedTitle: 'Cracked ice',
+    crackedLine: 'Fire here breaks this plate: keep his fire off it',
+    flightTitle: 'Korzul takes flight',
+    flightLine: 'Stack on sound ice to choose where he lands, then step off',
+    lockboundTitle: 'Lockbound',
+    lockboundLine:
+      '{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.',
     timeAria: '{seconds} seconds left',
   },
   // The Stormbrass Foundry's chained workers' gossip (src/ui/hud/dungeon/

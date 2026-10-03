@@ -20044,6 +20044,66 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.bondTitle': '무리의 유대',
   'hudChrome.wildheartAlert.bondLine': '함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요',
   'hudChrome.wildheartAlert.timeAria': '{seconds}초 남음',
+  'hudChrome.sanctumAlert.quenchTitle': '담금질 물속이다!',
+  'hudChrome.sanctumAlert.quenchLine': '불타고 느려진다: 가장 가까운 얼음이나 물가로 헤엄쳐라',
+  'hudChrome.sanctumAlert.plungeTitle': '내리꽂는 불길!',
+  'hudChrome.sanctumAlert.plungeLine': '발밑 얼음판 전체가 곧 불탄다: 당장 벗어나라',
+  'hudChrome.sanctumAlert.descentTitle': '추락 강하!',
+  'hudChrome.sanctumAlert.descentLine': '바로 여기에 내려앉는다: 그림자에서 벗어나라',
+  'hudChrome.sanctumAlert.eyeTitle': '고룡의 눈이 당신을 노린다!',
+  'hudChrome.sanctumAlert.eyeLine':
+    '표식이 끝나면 서 있는 얼음판이 불탄다: 멀쩡한 얼음 위에서 파티와 떨어져라',
+  'hudChrome.sanctumAlert.eyeCrackedLine':
+    '금 간 얼음 위에 서 있다: 표식이 끝나기 전에 멀쩡한 얼음판으로 가라',
+  'hudChrome.sanctumAlert.flailTitle': '사슬 도리깨!',
+  'hudChrome.sanctumAlert.flailLine': '사슬이 그려진 선을 따라 내리친다: 선에서 벗어나라',
+  'hudChrome.sanctumAlert.chargeTitle': '문턱 돌진!',
+  'hudChrome.sanctumAlert.chargeLine': '선을 따라 돌진한다: 선에서 벗어나고 가장자리에서 멀어져라',
+  'hudChrome.sanctumAlert.trenchTitle': '영혼불 도랑!',
+  'hudChrome.sanctumAlert.trenchLine': '영혼불이 선을 가르고 녹은 물을 남긴다: 벗어나라',
+  'hudChrome.sanctumAlert.strainTitle': '사슬 당기기!',
+  'hudChrome.sanctumAlert.strainLine': '온전한 기둥이 곧 터진다: 기둥에서 멀어져라',
+  'hudChrome.sanctumAlert.infernoTitle': '무덤의 지옥불!',
+  'hudChrome.sanctumAlert.infernoLine': '파동마다 더 거세진다: 그의 사거리 밖으로 나가라',
+  'hudChrome.sanctumAlert.stompTitle': '전율의 발구르기!',
+  'hudChrome.sanctumAlert.stompLine': '발이 내려오기 전에 그에게서 멀어져라',
+  'hudChrome.sanctumAlert.breathTitle': '무덤 숨결!',
+  'hudChrome.sanctumAlert.breathLine': '숨결 부채꼴 안에 있다: 옆으로 빠져라',
+  'hudChrome.sanctumAlert.maulTitle': '망치 휘두르기!',
+  'hudChrome.sanctumAlert.maulLine': '앞에 있는 모든 것을 휩쓴다: 뒤로 돌아가라',
+  'hudChrome.sanctumAlert.tailTitle': '꼬리 휩쓸기!',
+  'hudChrome.sanctumAlert.tailLine': '그의 뒤에 서 있다: 꼬리가 오기 전에 벗어나라',
+  'hudChrome.sanctumAlert.meltwaterTitle': '녹은 물속',
+  'hudChrome.sanctumAlert.meltwaterLine':
+    '당신의 뼈걸음이가 녹은 물에 서 있다: 차가운 얼음 위로 끌어내라',
+  'hudChrome.sanctumAlert.meltwaterTargetLine':
+    '대상이 녹은 물에서 죽으면 다시 일어난다: 차가운 얼음 위까지 기다려라',
+  'hudChrome.sanctumAlert.crackedTitle': '금 간 얼음',
+  'hudChrome.sanctumAlert.crackedLine':
+    '여기에 불이 닿으면 이 얼음판이 부서진다: 그의 불길을 여기서 돌려라',
+  'hudChrome.sanctumAlert.flightTitle': '코르줄이 날아오른다',
+  'hudChrome.sanctumAlert.flightLine': '멀쩡한 얼음 위에 모여 착지 지점을 고른 뒤 흩어져라',
+  'hudChrome.sanctumAlert.lockboundTitle': '자물쇠 속박',
+  'hudChrome.sanctumAlert.lockboundLine':
+    '사슬 {chains}개가 버틴다: 받는 피해 {pct}% 감소. 봉인 족쇄를 부숴 벗겨내라.',
+  'hudChrome.sanctumAlert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.sanctum.lockbound':
+    '받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.',
+  'hudChrome.auraEffect.sanctum.enrage': '주는 피해가 {pct}% 증가합니다.',
+  'hudChrome.auraEffect.sanctum.grasp':
+    '녹은 물에 서 있어 주는 피해가 {pct}% 증가합니다. 녹은 물에서 죽으면 가라앉았다가 {seconds}초 후 다시 일어납니다. 차가운 얼음 위에서 죽여야 다시 일어나지 않습니다.',
+  'hudChrome.auraEffect.sanctum.twiceWoken':
+    '녹은 물에서 다시 일어나 주는 피해가 {pct}% 증가합니다.',
+  'hudChrome.auraEffect.sanctum.doused':
+    '발밑 얼음판이 깨져 담금질 물이 무덤의 지옥불을 꺼뜨렸습니다.',
+  'hudChrome.auraEffect.sanctum.airborne':
+    '공중에 있어 공격할 수 없습니다. 가장 많은 플레이어가 선 얼음판에 추락 강하로 내려앉아 {radius}야드 안의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.',
+  'hudChrome.auraEffect.sanctum.wyrmsEye':
+    '이 효과가 끝나면 코르줄이 당신이 선 얼음판 전체에 내리꽂는 불길을 쏟아붓습니다: 그 위의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 얼음판에 금이 가거나 이미 금이 가 있었다면 부서집니다. 멀쩡한 얼음 위에서 파티와 떨어져 서십시오.',
+  'hudChrome.auraEffect.sanctum.quenchWater':
+    '열린 담금질 물속: 이동 속도가 {slow}% 감소하고 매초 {damage}의 피해(영웅 난이도 {heroic})로 불탑니다. 아무 얼음판이나 물가로 헤엄치십시오.',
+  'hudChrome.auraEffect.sanctum.shardFlare':
+    '심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다.',
   'hudChrome.auraEffect.wildheart.packBond':
     '짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.',
   'hudChrome.auraEffect.wildheart.packBondFury':

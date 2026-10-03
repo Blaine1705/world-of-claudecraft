@@ -646,6 +646,10 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/foundry_fct_core.ts',
   // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
+  // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its
+  // scene scan.
+  'src/ui/hud/dungeon/sanctum_alert_view.ts',
+  'src/ui/hud/dungeon/sanctum_alert_scene_core.ts',
   // The Stormbrass Foundry's chained workers' gossip (the line, "Free them").
   'src/ui/hud/dungeon/foundry_worker_gossip_core.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',

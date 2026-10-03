@@ -1,6 +1,6 @@
 // HUD domain: dungeon encounter prompts the local player acts on: the Gaol
 // Turnkey's Iron Cage escape, Gaoler Ossick's chain alert, the Stormbrass
-// Foundry's alert and the Wildheart Basin's, composed by the HUD as one
+// Foundry's alert, the Wildheart Basin's and the Gravewyrm Sanctum's, composed by the HUD as one
 // DungeonPrompts member; and the floating avoidance word (the plating's
 // "Turned aside").
 
@@ -27,6 +27,16 @@ export type { GaolChainDeps } from './gaol_chain_painter';
 export { GaolChainAlert } from './gaol_chain_painter';
 export type { GaolChainInput, GaolChainKind, GaolChainView } from './gaol_chain_view';
 export { buildGaolChainView, wardHealthText, wardHitText } from './gaol_chain_view';
+export type { SanctumSceneEntity, SanctumSceneWorld } from './sanctum_alert_scene_core';
+export { SanctumAlertSceneScan } from './sanctum_alert_scene_core';
+export type {
+  SanctumAlertEntity,
+  SanctumAlertInput,
+  SanctumAlertKind,
+  SanctumAlertScene,
+  SanctumAlertView,
+} from './sanctum_alert_view';
+export { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 export type {
   WildheartAlertEntity,
   WildheartAlertInput,

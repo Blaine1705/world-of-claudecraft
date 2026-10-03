@@ -20052,6 +20052,65 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.bondTitle': '群れの絆',
   'hudChrome.wildheartAlert.bondLine': '並んでいると被ダメージ半減：引き離せ',
   'hudChrome.wildheartAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.sanctumAlert.quenchTitle': '焼き入れの水の中だ！',
+  'hudChrome.sanctumAlert.quenchLine': '焼かれて鈍る：一番近い氷か岸まで泳げ',
+  'hudChrome.sanctumAlert.plungeTitle': '降り注ぐ炎！',
+  'hudChrome.sanctumAlert.plungeLine': '足元の氷板全体が燃え上がる：今すぐ降りろ',
+  'hudChrome.sanctumAlert.descentTitle': '墜落の降下！',
+  'hudChrome.sanctumAlert.descentLine': 'ここに降りてくる：影から出ろ',
+  'hudChrome.sanctumAlert.eyeTitle': 'ワームの眼に狙われた！',
+  'hudChrome.sanctumAlert.eyeLine':
+    '印が消えると立っている氷板が燃える：無傷の氷の上で仲間から離れろ',
+  'hudChrome.sanctumAlert.eyeCrackedLine': 'ひびの入った氷の上だ：印が消える前に無傷の氷板へ移れ',
+  'hudChrome.sanctumAlert.flailTitle': '鎖の殻竿！',
+  'hudChrome.sanctumAlert.flailLine': '鎖が描かれた線に沿って振り下ろされる：線から出ろ',
+  'hudChrome.sanctumAlert.chargeTitle': '敷居の突進！',
+  'hudChrome.sanctumAlert.chargeLine': '線に沿って突進してくる：線から出て、端から離れろ',
+  'hudChrome.sanctumAlert.trenchTitle': '魂火の溝！',
+  'hudChrome.sanctumAlert.trenchLine': '魂火が線を裂き、融け水を残す：そこから出ろ',
+  'hudChrome.sanctumAlert.strainTitle': '鎖の引き絞り！',
+  'hudChrome.sanctumAlert.strainLine': '無傷の柱が今にも弾ける：柱から離れろ',
+  'hudChrome.sanctumAlert.infernoTitle': '墓場のインフェルノ！',
+  'hudChrome.sanctumAlert.infernoLine': '脈動のたびに激しくなる：彼の届く範囲から出ろ',
+  'hudChrome.sanctumAlert.stompTitle': '身震いの踏みつけ！',
+  'hudChrome.sanctumAlert.stompLine': '足が下りる前に彼から離れろ',
+  'hudChrome.sanctumAlert.breathTitle': '墓のブレス！',
+  'hudChrome.sanctumAlert.breathLine': 'ブレスの扇の中にいる：横へ抜けろ',
+  'hudChrome.sanctumAlert.maulTitle': '大槌の弧！',
+  'hudChrome.sanctumAlert.maulLine': '前方すべてをなぎ払う：背後へ回れ',
+  'hudChrome.sanctumAlert.tailTitle': '尾のなぎ払い！',
+  'hudChrome.sanctumAlert.tailLine': '背後に立っている：尾が来る前に離れろ',
+  'hudChrome.sanctumAlert.meltwaterTitle': '融け水の中',
+  'hudChrome.sanctumAlert.meltwaterLine':
+    'お前のボーンウォーカーが融け水の中にいる：冷たい氷の上へ引きずり出せ',
+  'hudChrome.sanctumAlert.meltwaterTargetLine':
+    'ターゲットは融け水の中で死ぬと再び起き上がる：冷たい氷の上まで待て',
+  'hudChrome.sanctumAlert.crackedTitle': 'ひびの入った氷',
+  'hudChrome.sanctumAlert.crackedLine':
+    'ここに炎が当たるとこの氷板は砕ける：彼の炎をここに向けさせるな',
+  'hudChrome.sanctumAlert.flightTitle': 'コルズルが飛び立つ',
+  'hudChrome.sanctumAlert.flightLine': '無傷の氷の上に集まって降下地点を選び、その後に離れろ',
+  'hudChrome.sanctumAlert.lockboundTitle': '錠縛',
+  'hudChrome.sanctumAlert.lockboundLine':
+    '鎖が{chains}本残っている：被ダメージが{pct}%減少。封印の枷を壊して剥がせ。',
+  'hudChrome.sanctumAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.sanctum.lockbound':
+    '受けるダメージが{pct}%減少：まだ残っている鎖1本につき{per}%。封印の枷を壊すとその鎖が外れる。',
+  'hudChrome.auraEffect.sanctum.enrage': '与えるダメージが{pct}%増加。',
+  'hudChrome.auraEffect.sanctum.grasp':
+    '融け水の中に立ち、与えるダメージが{pct}%増加。融け水の中で死ぬと沈み、{seconds}秒後に再び起き上がる。冷たい氷の上で倒せば二度と起きない。',
+  'hudChrome.auraEffect.sanctum.twiceWoken':
+    '融け水から再び起き上がり、与えるダメージが{pct}%増加。',
+  'hudChrome.auraEffect.sanctum.doused':
+    '足元の氷板が割れ、焼き入れの水が墓場のインフェルノを消した。',
+  'hudChrome.auraEffect.sanctum.airborne':
+    '空中にいて攻撃できない。最も多くのプレイヤーが立つ氷板へ墜落の降下で着地し、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。',
+  'hudChrome.auraEffect.sanctum.wyrmsEye':
+    'この効果が切れると、コルズルが立っている氷板全体に降り注ぐ炎を浴びせる：上にいる全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）、氷板にひびが入り、すでにひびがあれば砕ける。無傷の氷の上で仲間から離れて立て。',
+  'hudChrome.auraEffect.sanctum.quenchWater':
+    '開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。',
+  'hudChrome.auraEffect.sanctum.shardFlare':
+    '心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。',
   'hudChrome.auraEffect.wildheart.packBond':
     '相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。',
   'hudChrome.auraEffect.wildheart.packBondFury':

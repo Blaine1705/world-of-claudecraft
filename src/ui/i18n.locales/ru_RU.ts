@@ -20437,6 +20437,69 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.bondTitle': 'Узы стаи',
   'hudChrome.wildheartAlert.bondLine': 'Вместе они получают вдвое меньше урона: разведите их',
   'hudChrome.wildheartAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.sanctumAlert.quenchTitle': 'В закалочной воде!',
+  'hudChrome.sanctumAlert.quenchLine':
+    'Она жжёт и замедляет: плывите к ближайшему льду или на берег',
+  'hudChrome.sanctumAlert.plungeTitle': 'Низвергающийся огонь!',
+  'hudChrome.sanctumAlert.plungeLine': 'Вся ваша плита сейчас загорится: немедленно уходите с неё',
+  'hudChrome.sanctumAlert.descentTitle': 'Сокрушительное снижение!',
+  'hudChrome.sanctumAlert.descentLine': 'Он приземлится прямо здесь: выйдите из его тени',
+  'hudChrome.sanctumAlert.eyeTitle': 'Око вирма на вас!',
+  'hudChrome.sanctumAlert.eyeLine':
+    'Когда метка спадёт, ваша плита загорится: стойте на целом льду, подальше от группы',
+  'hudChrome.sanctumAlert.eyeCrackedLine':
+    'Вы стоите на треснувшем льду: перейдите на целую плиту, пока метка не спала',
+  'hudChrome.sanctumAlert.flailTitle': 'Цепной цеп!',
+  'hudChrome.sanctumAlert.flailLine': 'Цепь хлестнёт вдоль отмеченной полосы: уйдите с неё',
+  'hudChrome.sanctumAlert.chargeTitle': 'Рывок с порога!',
+  'hudChrome.sanctumAlert.chargeLine': 'Он бросится вдоль полосы: уйдите с неё и подальше от края',
+  'hudChrome.sanctumAlert.trenchTitle': 'Траншея душевного огня!',
+  'hudChrome.sanctumAlert.trenchLine':
+    'Душевный огонь прорежет полосу и оставит талую воду: уйдите с неё',
+  'hudChrome.sanctumAlert.strainTitle': 'Натяжение цепей!',
+  'hudChrome.sanctumAlert.strainLine': 'Целые столпы вот-вот ударят: отойдите от них',
+  'hudChrome.sanctumAlert.infernoTitle': 'Могильное пекло!',
+  'hudChrome.sanctumAlert.infernoLine':
+    'Каждый импульс сильнее прежнего: выйдите из его досягаемости',
+  'hudChrome.sanctumAlert.stompTitle': 'Сотрясающий топот!',
+  'hudChrome.sanctumAlert.stompLine': 'Отойдите от него, пока нога не опустилась',
+  'hudChrome.sanctumAlert.breathTitle': 'Могильное дыхание!',
+  'hudChrome.sanctumAlert.breathLine': 'Вы в конусе дыхания: уйдите в сторону',
+  'hudChrome.sanctumAlert.maulTitle': 'Дуга кувалды!',
+  'hudChrome.sanctumAlert.maulLine': 'Он сметает всё перед собой: зайдите ему за спину',
+  'hudChrome.sanctumAlert.tailTitle': 'Удар хвостом!',
+  'hudChrome.sanctumAlert.tailLine': 'Вы стоите позади него: уйдите, пока не ударил хвост',
+  'hudChrome.sanctumAlert.meltwaterTitle': 'В талой воде',
+  'hudChrome.sanctumAlert.meltwaterLine':
+    'Ваш костеход стоит в талой воде: вытащите его на холодный лёд',
+  'hudChrome.sanctumAlert.meltwaterTargetLine':
+    'Если цель умрёт в талой воде, она поднимется снова: дождитесь холодного льда',
+  'hudChrome.sanctumAlert.crackedTitle': 'Треснувший лёд',
+  'hudChrome.sanctumAlert.crackedLine': 'Огонь здесь разобьёт эту плиту: уводите его пламя отсюда',
+  'hudChrome.sanctumAlert.flightTitle': 'Корзул взлетает',
+  'hudChrome.sanctumAlert.flightLine':
+    'Соберитесь на целом льду, чтобы выбрать место его посадки, затем разойдитесь',
+  'hudChrome.sanctumAlert.lockboundTitle': 'Скованный замком',
+  'hudChrome.sanctumAlert.lockboundLine':
+    'Держится цепей: {chains}. Он получает на {pct}% меньше урона. Разбейте печатные кандалы, чтобы снять защиту.',
+  'hudChrome.sanctumAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.sanctum.lockbound':
+    'Получает на {pct}% меньше урона: по {per}% за каждую ещё целую цепь. Разбейте печатные кандалы, чтобы сбросить их цепь.',
+  'hudChrome.auraEffect.sanctum.enrage': 'Наносит на {pct}% больше урона.',
+  'hudChrome.auraEffect.sanctum.grasp':
+    'Стоит в талой воде и наносит на {pct}% больше урона. Если умрёт в талой воде, утонет и поднимется снова через {seconds} сек.; убейте его на холодном льду, чтобы он не встал.',
+  'hudChrome.auraEffect.sanctum.twiceWoken':
+    'Поднялся из талой воды снова и наносит на {pct}% больше урона.',
+  'hudChrome.auraEffect.sanctum.doused':
+    'Плита под ним треснула, и закалочная вода погасила его Могильное пекло.',
+  'hudChrome.auraEffect.sanctum.airborne':
+    'В воздухе, атаковать нельзя. Он приземлится Сокрушительным снижением на плиту, где стоит больше всего игроков, нанося {min}-{max} ед. урона ({heroicMin}-{heroicMax} в героическом режиме) всем в радиусе {radius} м.',
+  'hudChrome.auraEffect.sanctum.wyrmsEye':
+    'Когда эффект закончится, Корзул обрушит Низвергающийся огонь на всю плиту, где вы стоите: {min}-{max} ед. урона ({heroicMin}-{heroicMax} в героическом режиме) всем на ней, а плита треснет или разобьётся, если уже была треснувшей. Стойте на целом льду, подальше от группы.',
+  'hudChrome.auraEffect.sanctum.quenchWater':
+    'В открытой закалочной воде: скорость снижена на {slow}%, каждую секунду {damage} ед. урона ({heroic} в героическом режиме). Плывите к любой плите или на берег.',
+  'hudChrome.auraEffect.sanctum.shardFlare':
+    'Осколок сердца вспыхивает: Могильное дыхание каждые {breath} сек., Порыв крыльев каждые {gale} сек.',
   'hudChrome.auraEffect.wildheart.packBond':
     'Получает на {pct}% меньше урона, пока напарник рядом. Разведите Повелителя клыков и его ягуара, чтобы разорвать узы.',
   'hudChrome.auraEffect.wildheart.packBondFury':

@@ -3,7 +3,9 @@
 // (gaol_chain_*) and the Stormbrass Foundry's alert (foundry_alert_*: the
 // Storm Cell, the Target Lock, the plating readout) and the Wildheart Basin's
 // alert (wildheart_alert_view.ts on the same painter family: the Prey, the
-// Stalk, the pollen, the Pack Bond readout). It owns no DOM itself; it
+// Stalk, the pollen, the Pack Bond readout) and the Gravewyrm Sanctum's
+// (sanctum_alert_view.ts on the same family: the chains, the meltwater, the
+// lake). It owns no DOM itself; it
 // builds each view from the frame's inputs and hands it to that prompt's
 // painter. The frame hands it the world (its entities and roster version):
 // the prompts look bodies up by id, and the Foundry alert keeps its scene of
@@ -16,6 +18,8 @@ import { FoundryAlertSceneScan, type FoundrySceneEntity } from './foundry_alert_
 import { buildFoundryAlertView } from './foundry_alert_view';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
+import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
+import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 import { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
 
 export interface DungeonPromptsFrame {
@@ -36,7 +40,7 @@ export interface DungeonPromptsFrame {
   /** The world: every body by id, and the roster version (bumped when one
    *  comes or goes). */
   world: {
-    entities: ReadonlyMap<number, GaolChainEntity & FoundrySceneEntity>;
+    entities: ReadonlyMap<number, GaolChainEntity & FoundrySceneEntity & SanctumSceneEntity>;
     entityRosterVersion: number;
   };
   party: readonly { pid: number }[] | null | undefined;
@@ -50,7 +54,9 @@ export class DungeonPrompts {
   private readonly chain: GaolChainAlert;
   private readonly foundry: FoundryAlert;
   private readonly wildheart: FoundryAlert;
+  private readonly sanctum: FoundryAlert;
   private readonly foundryScene = new FoundryAlertSceneScan();
+  private readonly sanctumScene = new SanctumAlertSceneScan();
   private world: DungeonPromptsFrame['world'] | null = null;
   /** One lookup for every view (no closure a frame). */
   private readonly entity = (id: number) => this.world?.entities.get(id);
@@ -63,6 +69,11 @@ export class DungeonPrompts {
       id: 'wildheart-alert',
       className: 'ui-panel-strong foundry-alert wildheart-alert',
       kinds: WILDHEART_ALERT_KINDS,
+    });
+    this.sanctum = new FoundryAlert(deps, {
+      id: 'sanctum-alert',
+      className: 'ui-panel-strong foundry-alert sanctum-alert',
+      kinds: SANCTUM_ALERT_KINDS,
     });
   }
 
@@ -100,6 +111,16 @@ export class DungeonPrompts {
       }),
     );
     this.wildheart.paint(buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity }));
+    this.sanctum.paint(
+      buildSanctumAlertView({
+        selfId: p.id,
+        selfPos: p.pos,
+        auras: p.auras,
+        targetId: p.targetId,
+        entity,
+        scene: this.sanctumScene.update(f.world),
+      }),
+    );
   }
 
   dispose(): void {
@@ -107,5 +128,6 @@ export class DungeonPrompts {
     this.chain.dispose();
     this.foundry.dispose();
     this.wildheart.dispose();
+    this.sanctum.dispose();
   }
 }
