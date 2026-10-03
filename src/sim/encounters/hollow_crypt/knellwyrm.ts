@@ -35,6 +35,7 @@ import {
   mobTemplateForDungeonDifficulty,
 } from '../../instances/difficulty';
 import { applyKnockback } from '../../knockback';
+import { climbArc, floorUnder, glideEase, placeFlier } from '../../mob/flight';
 import { kitHash } from '../../mob/trash_kit/targets';
 import { emitMobYell } from '../../mob/yells';
 import type { InstanceSlot } from '../../sim';
@@ -90,25 +91,9 @@ function local(ctx: SimContext, inst: InstanceSlot, e: Entity): { x: number; z: 
   return { x: e.pos.x - o.x, z: e.pos.z - o.z };
 }
 
-function floorAt(ctx: SimContext, inst: InstanceSlot, lx: number, lz: number): number {
-  const o = ctx.instanceOriginOf(inst);
-  return ctx.groundPos(o.x + lx, o.z + lz).y;
-}
-
-function setPos(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  e: Entity,
-  lx: number,
-  lz: number,
-  y: number,
-): void {
-  const o = ctx.instanceOriginOf(inst);
-  e.pos.x = o.x + lx;
-  e.pos.z = o.z + lz;
-  e.pos.y = y;
-  ctx.grid.update(e);
-}
+// The flight itself is the shared encounter flight (mob/flight.ts).
+const floorAt = floorUnder;
+const setPos = placeFlier;
 
 // ------------------------------------------------------------------ the summon
 
@@ -394,11 +379,11 @@ function stepStrafe(
     wyrm.castRemaining = Math.max(0, T.strafeMark - s.t);
     // It takes wing and flies round to the lane's start, climbing.
     const k = Math.min(1, s.t / T.strafeMark);
-    const ease = k * k * (3 - 2 * k);
+    const ease = glideEase(k);
     const x = s.fromX + (s.x - s.fromX) * ease;
     const z = s.fromZ + (s.z - s.fromZ) * ease;
     const floor = floorAt(ctx, inst, x, z);
-    setPos(ctx, inst, wyrm, x, z, floor + T.strafeHeight * Math.sin((Math.PI / 2) * k));
+    setPos(ctx, inst, wyrm, x, z, floor + climbArc(k, T.strafeHeight));
     // It wheels round to face down the lane as it reaches the start.
     const toStart = Math.atan2(s.x - s.fromX, s.z - s.fromZ);
     wyrm.facing = k < 0.7 && (s.x !== s.fromX || s.z !== s.fromZ) ? toStart : s.yaw;
