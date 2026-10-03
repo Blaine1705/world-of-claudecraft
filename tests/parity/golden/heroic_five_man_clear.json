@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1093,
-      "state": "348b94dc",
+      "state": "7d08fe14",
       "events": "b49fc288",
       "rng": {
         "draws": 62,
@@ -722,12 +722,11 @@
           "hp": 36785,
           "id": 1077,
           "idleStationary": true,
-          "infernoTimer": 30,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
           "maxHp": 36785,
-          "mechanicDamageMult": 19,
+          "mechanicDamageMult": 2.5,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
           "onGround": true,
@@ -758,9 +757,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1094,
-      "state": "dea1d234",
-      "events": "4d0e50a0",
+      "nextId": 1121,
+      "state": "bb14633c",
+      "events": "1bb04e7b",
       "rng": {
         "draws": 69,
         "digest": "0249f6ce"
@@ -2065,7 +2064,6 @@
           "id": 1077,
           "idleStationary": true,
           "inCombat": true,
-          "infernoTimer": 30,
           "kind": "mob",
           "leashAnchor": {
             "x": 101500,
@@ -2077,7 +2075,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "heroic_gravewyrm_gauntlets"
+                "itemId": "cultist_flayer"
               }
             ]
           },
@@ -2091,7 +2089,7 @@
           ],
           "lootable": true,
           "maxHp": 36785,
-          "mechanicDamageMult": 19,
+          "mechanicDamageMult": 2.5,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
           "onGround": true,
@@ -2103,6 +2101,93 @@
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.95,
+          "sanctumFight": {
+            "breathTimer": 6,
+            "galeTimer": 20,
+            "infernoTimer": 20,
+            "kind": "korzul",
+            "phase": "slain",
+            "plates": [
+              {
+                "objectId": 1102,
+                "state": "sound"
+              },
+              {
+                "objectId": 1103,
+                "state": "broken"
+              },
+              {
+                "objectId": 1104,
+                "state": "sound"
+              },
+              {
+                "objectId": 1105,
+                "state": "sound"
+              },
+              {
+                "objectId": 1106,
+                "state": "sound"
+              },
+              {
+                "objectId": 1107,
+                "state": "sound"
+              },
+              {
+                "objectId": 1108,
+                "state": "sound"
+              },
+              {
+                "objectId": 1109,
+                "state": "sound"
+              },
+              {
+                "objectId": 1110,
+                "state": "sound"
+              },
+              {
+                "objectId": 1111,
+                "state": "sound"
+              },
+              {
+                "objectId": 1112,
+                "state": "sound"
+              },
+              {
+                "objectId": 1113,
+                "state": "sound"
+              },
+              {
+                "objectId": 1114,
+                "state": "sound"
+              },
+              {
+                "objectId": 1115,
+                "state": "sound"
+              },
+              {
+                "objectId": 1116,
+                "state": "sound"
+              },
+              {
+                "objectId": 1117,
+                "state": "sound"
+              },
+              {
+                "objectId": 1118,
+                "state": "sound"
+              },
+              {
+                "objectId": 1119,
+                "state": "sound"
+              },
+              {
+                "objectId": 1120,
+                "state": "sound"
+              }
+            ],
+            "quenchTick": 1,
+            "tailTimer": 9
+          },
           "slowImmune": true,
           "spawnPos": {
             "x": 101500,
@@ -2124,8 +2209,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1094,
-      "state": "dea1d234",
+      "nextId": 1121,
+      "state": "bb14633c",
       "events": "741638a5",
       "rng": {
         "draws": 69,
@@ -3431,7 +3516,6 @@
           "id": 1077,
           "idleStationary": true,
           "inCombat": true,
-          "infernoTimer": 30,
           "kind": "mob",
           "leashAnchor": {
             "x": 101500,
@@ -3443,7 +3527,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "heroic_gravewyrm_gauntlets"
+                "itemId": "cultist_flayer"
               }
             ]
           },
@@ -3457,7 +3541,7 @@
           ],
           "lootable": true,
           "maxHp": 36785,
-          "mechanicDamageMult": 19,
+          "mechanicDamageMult": 2.5,
           "mechanicHealMult": 4,
           "moveSpeed": 8,
           "onGround": true,
@@ -3469,6 +3553,93 @@
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.95,
+          "sanctumFight": {
+            "breathTimer": 6,
+            "galeTimer": 20,
+            "infernoTimer": 20,
+            "kind": "korzul",
+            "phase": "slain",
+            "plates": [
+              {
+                "objectId": 1102,
+                "state": "sound"
+              },
+              {
+                "objectId": 1103,
+                "state": "broken"
+              },
+              {
+                "objectId": 1104,
+                "state": "sound"
+              },
+              {
+                "objectId": 1105,
+                "state": "sound"
+              },
+              {
+                "objectId": 1106,
+                "state": "sound"
+              },
+              {
+                "objectId": 1107,
+                "state": "sound"
+              },
+              {
+                "objectId": 1108,
+                "state": "sound"
+              },
+              {
+                "objectId": 1109,
+                "state": "sound"
+              },
+              {
+                "objectId": 1110,
+                "state": "sound"
+              },
+              {
+                "objectId": 1111,
+                "state": "sound"
+              },
+              {
+                "objectId": 1112,
+                "state": "sound"
+              },
+              {
+                "objectId": 1113,
+                "state": "sound"
+              },
+              {
+                "objectId": 1114,
+                "state": "sound"
+              },
+              {
+                "objectId": 1115,
+                "state": "sound"
+              },
+              {
+                "objectId": 1116,
+                "state": "sound"
+              },
+              {
+                "objectId": 1117,
+                "state": "sound"
+              },
+              {
+                "objectId": 1118,
+                "state": "sound"
+              },
+              {
+                "objectId": 1119,
+                "state": "sound"
+              },
+              {
+                "objectId": 1120,
+                "state": "sound"
+              }
+            ],
+            "quenchTick": 1,
+            "tailTimer": 9
+          },
           "slowImmune": true,
           "spawnPos": {
             "x": 101500,
