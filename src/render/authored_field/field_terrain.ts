@@ -8,19 +8,25 @@ import * as THREE from 'three';
 import type { AuthoredFieldDef } from '../../sim/instances/authored_field';
 import { surfaceMat } from '../gfx';
 import {
+  type CliffPaint,
   FIELD_TOP_FAMILIES,
   type FieldMeshData,
   type FieldTopFamily,
+  GLACIER_CLIFF_UV,
   planFieldCliffs,
   planFieldTops,
 } from './field_mesh_core';
 import {
   basaltDetail,
   flagstoneDetail,
+  glacierWallDetail,
   gratingDetail,
+  iceDetail,
   mossDetail,
   plateDetail,
   rockDetail,
+  slateDetail,
+  snowDetail,
   soilDetail,
   strataDetail,
 } from './field_textures';
@@ -52,9 +58,12 @@ export interface FieldTerrainOptions {
    *  running down to the void floor, so the dungeon's own trusses show. The
    *  sim's lip colliders are unchanged. */
   shallow?: { surfaces: ReadonlySet<string>; depth: number };
-  /** The cliff faces' rock: fractured slabs (the default) or level bedded
-   *  strata (a shelf cut into a mountain). */
-  cliffRock?: 'slabs' | 'strata';
+  /** The cliff faces' rock: fractured slabs (the default), level bedded
+   *  strata (a shelf cut into a mountain), or a glacier crevasse wall (annual
+   *  layers and meltwater flutes, a little glossier: wet ice). */
+  cliffRock?: 'slabs' | 'strata' | 'glacier';
+  /** The cliff faces' vertex paint (the plan's default rock tint otherwise). */
+  cliffPaint?: CliffPaint;
 }
 
 /** Build the ground of a field: tops (one mesh per texture family) and cliffs. */
@@ -68,7 +77,12 @@ export function buildAuthoredFieldTerrain(
     maxEdge: opts.maxEdge ?? (opts.lowGfx ? 6 : 3),
     layerLift: 0,
   });
-  const rock = opts.cliffRock === 'strata' ? strataDetail() : rockDetail();
+  const rock =
+    opts.cliffRock === 'strata'
+      ? strataDetail()
+      : opts.cliffRock === 'glacier'
+        ? glacierWallDetail()
+        : rockDetail();
   // Each family's detail pair and its sheen; a material is minted only for a
   // family the field actually draws (the shared cache dedupes the rest).
   const looks: Record<
@@ -83,6 +97,12 @@ export function buildAuthoredFieldTerrain(
     // The Foundry's steel: deck plate with a dull sheen, grating darker.
     plate: { detail: plateDetail, rough: 0.58, metal: 0.35 },
     grating: { detail: gratingDetail, rough: 0.66, metal: 0.3 },
+    // The Gravewyrm Sanctum: matte wind-packed snow, lake and glacier ice
+    // with a little cold sheen (never a mirror: the floor stays readable),
+    // and slate between the two.
+    snow: { detail: snowDetail, rough: 0.92 },
+    ice: { detail: iceDetail, rough: 0.46, metal: 0.04 },
+    slate: { detail: slateDetail, rough: 0.7 },
   };
   for (const family of FIELD_TOP_FAMILIES) {
     const data = tops[family];
@@ -106,6 +126,8 @@ export function buildAuthoredFieldTerrain(
     rowStep: opts.lowGfx ? 6 : 3,
     flare: 0.22,
     ...(opts.shallow ? { shallow: opts.shallow } : {}),
+    ...(opts.cliffPaint ? { paint: opts.cliffPaint } : {}),
+    ...(opts.cliffRock === 'glacier' ? { uvScale: GLACIER_CLIFF_UV } : {}),
   });
   if (cliffs.positions.length > 0) {
     const mesh = new THREE.Mesh(
@@ -114,7 +136,7 @@ export function buildAuthoredFieldTerrain(
         map: rock.map,
         normalMap: opts.lowGfx ? undefined : rock.normalMap,
         vertexColors: true,
-        roughness: 0.95,
+        roughness: opts.cliffRock === 'glacier' ? 0.62 : 0.95,
         side: THREE.DoubleSide,
       }),
     );

@@ -586,6 +586,88 @@ export class FieldMapPlateArt {
           ctx.stroke();
         }
       }
+    } else if (ground === 'snow') {
+      // Wind-packed snow: short sastrugi strokes all running with the wind
+      // (from the west), lit on one side, shadowed on the other.
+      ctx.lineWidth = 0.8;
+      for (let y = minY; y <= maxY; y += k * 1.3) {
+        for (let x = minX; x <= maxX; x += k * 2.2) {
+          const h = hash(x * 0.7, y * 1.1);
+          if (h < 0.45) continue;
+          const ox = x + hash(y, x) * k * 1.5;
+          const len = k * (0.8 + h * 1.2);
+          ctx.globalAlpha = 0.3;
+          ctx.strokeStyle = c.highlight;
+          ctx.beginPath();
+          ctx.moveTo(ox, y);
+          ctx.quadraticCurveTo(ox + len * 0.5, y - k * 0.25, ox + len, y);
+          ctx.stroke();
+          ctx.globalAlpha = 0.14;
+          ctx.strokeStyle = c.ink;
+          ctx.beginPath();
+          ctx.moveTo(ox + len * 0.2, y + 1);
+          ctx.lineTo(ox + len, y + 1);
+          ctx.stroke();
+        }
+      }
+    } else if (ground === 'ice') {
+      // Glacier and lake ice: long pale hairline fractures and a few frosted
+      // patches over the clear blue.
+      ctx.strokeStyle = c.highlight;
+      ctx.lineWidth = 0.7;
+      const area = (maxX - minX) * (maxY - minY);
+      const cracks = Math.max(2, Math.round(area / (k * k * 40)));
+      for (let i = 0; i < cracks; i++) {
+        let x = minX + hash(i, minX * 0.01) * (maxX - minX);
+        let y = minY + hash(minY * 0.01, i) * (maxY - minY);
+        ctx.globalAlpha = 0.22 + hash(i, 3.3) * 0.18;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        let a = hash(i, 9.9) * Math.PI * 2;
+        for (let j = 0; j < 5; j++) {
+          a += (hash(i + j, 1.7) - 0.5) * 1.1;
+          x += Math.cos(a) * k * 2.4;
+          y += Math.sin(a) * k * 2.4;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      ctx.fillStyle = c.highlight;
+      for (let y = minY; y <= maxY; y += k * 3) {
+        for (let x = minX; x <= maxX; x += k * 3) {
+          const h = hash(x * 1.3, y * 0.7);
+          if (h < 0.7) continue;
+          ctx.globalAlpha = 0.1;
+          ctx.beginPath();
+          ctx.ellipse(x, y, k * (0.8 + h), k * 0.5, h * Math.PI, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    } else if (ground === 'slate') {
+      // Thornpeak slate: short cleavage dashes along one diagonal grain,
+      // a pale rime fleck here and there.
+      ctx.globalAlpha = 0.24;
+      ctx.lineWidth = 0.8;
+      for (let y = minY; y <= maxY; y += k * 1.1) {
+        for (let x = minX; x <= maxX; x += k * 1.6) {
+          const h = hash(x * 0.9, y * 1.2);
+          if (h < 0.35) continue;
+          const ox = x + hash(y, x) * k;
+          const len = k * (0.6 + h * 0.9);
+          ctx.beginPath();
+          ctx.moveTo(ox, y);
+          ctx.lineTo(ox + len * 0.8, y - len * 0.6);
+          ctx.stroke();
+        }
+      }
+      ctx.fillStyle = c.highlight;
+      ctx.globalAlpha = 0.22;
+      for (let y = minY; y <= maxY; y += k * 1.7) {
+        for (let x = minX; x <= maxX; x += k * 1.7) {
+          if (hash(x * 1.7, y * 0.3) < 0.8) continue;
+          ctx.fillRect(x, y, 1.4, 1.4);
+        }
+      }
     } else {
       // Soil, mud, grave earth, frost: speckles and tufts.
       ctx.globalAlpha = ground === 'frost' ? 0.25 : 0.2;
