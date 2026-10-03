@@ -19952,6 +19952,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '霊のジャガーが共に戦い、{every}秒ごとに対象へ噛みついて{min}～{max}の物理ダメージを与える。',
   'hudChrome.auraEffect.trinket.seedburst':
     'ゴージブルームの種。この効果が切れると弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。それまでにこの敵が死んだ場合は{bonus}%増加（{empowered}）。',
+  'entities.items.foremans_grips.name': '親方の籠手',
+  'entities.items.serac_stride_boots.name': '氷塔渡りのブーツ',
+  'entities.items.seal_rune_mantle.name': '封印ルーンのマントル',
+  'entities.items.thawbound_legguards.name': '融けた枷のレッグガード',
+  'entities.items.pyre_tenders_hood.name': '火葬番の頭巾',
+  'entities.items.meltwater_cord.name': '雪解け水の飾り紐',
+  'entities.items.hammer_of_the_open_lock.name': '開かれた錠の大槌',
+  'entities.items.vestments_of_the_waking_rite.name': '目覚めの儀の祭服',
+  'entities.items.foremans_last_link.name': '親方の最後の鎖環',
+  'entities.items.phial_of_the_tithe.name': '十分の一税の小瓶',
+  'entities.items.quenchwater_flask.name': '焼き入れ水のフラスコ',
+  'hudChrome.trinkets.use.tether':
+    '{range}ヤード以内の味方プレイヤー1人と{duration}秒間鎖でつながる。その味方の体力に届くはずのダメージの{share}%を代わりにあなたが受ける。あなたが死亡すると早期に終了する。自分以外の味方プレイヤーを対象にする必要がある。',
+  'hudChrome.trinkets.use.harvest':
+    '{duration}秒間、あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力の{pct}%（{health}）と最大マナの{pct}%を回復する。',
+  'hudChrome.trinkets.use.quench':
+    '{duration}秒以内の次の{hits}回の近接または遠隔武器の命中が、追加で{damage}の冷気ダメージを与える。最後の命中は対象を焼き入れし、{slowDuration}秒間その攻撃速度を{slow}%低下させる。効果が終わると未使用の命中は失われる。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加する。',
+  'hudChrome.auraEffect.trinket.tether':
+    '親方の最後の鎖環でつながれている：あなたの体力に届くはずのダメージの{pct}%を、代わりにあなたをつないだ者が受ける。',
+  'hudChrome.auraEffect.trinket.tetherLink':
+    'つないだ味方が受けるはずのダメージの{pct}%をあなたが受ける。',
+  'hudChrome.auraEffect.trinket.harvest':
+    'あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力と最大マナの{pct}%を回復する。',
+  'hudChrome.auraEffect.trinket.quench':
+    '次の{stacks}回の武器の命中が追加で{damage}の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。',
+  'hudChrome.auraEffect.trinket.quenchOther':
+    '次の{stacks}回の武器の命中が追加の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。',
+  'hudChrome.auraEffect.trinket.quenched': '攻撃速度が{pct}%低下。',
   'entities.npcs.lift_warden_corwin.name': '昇降機番コーウィン・アシュビー',
   'entities.npcs.lift_warden_corwin.title': '嵐の線の昇降機の番人',
   'entities.npcs.lift_warden_corwin.greeting':

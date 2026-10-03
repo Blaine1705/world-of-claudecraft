@@ -3449,6 +3449,15 @@ const ITEM_ENTITY_IDS = [
   'falls_blessed_staff',
   'fanglords_hide_mantle',
   'thornroot_greathelm',
+  // The Gravewyrm Sanctum rework's loot (sim/content/gravewyrm_sanctum_items.ts).
+  'foremans_grips',
+  'serac_stride_boots',
+  'seal_rune_mantle',
+  'thawbound_legguards',
+  'pyre_tenders_hood',
+  'meltwater_cord',
+  'hammer_of_the_open_lock',
+  'vestments_of_the_waking_rite',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4458,6 +4467,15 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   falls_blessed_staff: 'Falls-Blessed Staff',
   fanglords_hide_mantle: "Fanglord's Hide Mantle",
   thornroot_greathelm: 'Thorncrowned Greathelm',
+  // The Gravewyrm Sanctum rework's loot.
+  foremans_grips: "Foreman's Grips",
+  serac_stride_boots: 'Serac-Stride Boots',
+  seal_rune_mantle: 'Seal-Rune Mantle',
+  thawbound_legguards: 'Thawbound Legguards',
+  pyre_tenders_hood: "Pyre-Tender's Hood",
+  meltwater_cord: 'Meltwater Cord',
+  hammer_of_the_open_lock: 'Hammer of the Open Lock',
+  vestments_of_the_waking_rite: 'Vestments of the Waking Rite',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -18992,6 +18992,33 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一隻靈魂美洲豹在你身邊戰鬥，每{every}秒撕咬你的目標一次，造成{min}到{max}點物理傷害。',
   'hudChrome.auraEffect.trinket.seedburst':
     '噬花的種子。此效果結束時爆裂，對{radius}碼內的每個敵人造成{damage}點自然傷害；若此敵人在此之前死亡，傷害提高{bonus}%（{empowered}）。',
+  'entities.items.foremans_grips.name': '工頭護手',
+  'entities.items.serac_stride_boots.name': '冰塔跋涉長靴',
+  'entities.items.seal_rune_mantle.name': '封印符文披肩',
+  'entities.items.thawbound_legguards.name': '融縛護腿',
+  'entities.items.pyre_tenders_hood.name': '守柴人兜帽',
+  'entities.items.meltwater_cord.name': '融水束帶',
+  'entities.items.hammer_of_the_open_lock.name': '開鎖之錘',
+  'entities.items.vestments_of_the_waking_rite.name': '甦醒儀式法衣',
+  'entities.items.foremans_last_link.name': '工頭的最後一環',
+  'entities.items.phial_of_the_tithe.name': '什一稅之瓶',
+  'entities.items.quenchwater_flask.name': '淬火水瓶',
+  'hudChrome.trinkets.use.tether':
+    '用鎖鏈將你與{range}碼內的一名友方玩家相連，持續{duration}秒。本應傷及其生命值的傷害中有{share}%改由你承受。你死亡時提前結束。需要以你之外的友方玩家為目標。',
+  'hudChrome.trinkets.use.harvest':
+    '在{duration}秒內，每有一個敵對生物在你{radius}碼內死亡，就為你恢復{pct}%的最大生命值（{health}）和{pct}%的最大法力值。',
+  'hudChrome.trinkets.use.quench':
+    '在{duration}秒內，你接下來的{hits}次近戰或遠程武器命中額外造成{damage}點冰霜傷害。最後一次命中還會淬火目標，使其攻擊速度降低{slow}%，持續{slowDuration}秒。效果結束時未用完的命中次數會失效。傷害隨攻擊強度或遠程攻擊強度中較高者提高。',
+  'hudChrome.auraEffect.trinket.tether':
+    '被工頭的最後一環鎖住：本應傷及你生命值的傷害中有{pct}%改由鎖住你的人承受。',
+  'hudChrome.auraEffect.trinket.tetherLink': '你承受被鎖住的盟友本應受到的傷害的{pct}%。',
+  'hudChrome.auraEffect.trinket.harvest':
+    '每有一個敵對生物在你{radius}碼內死亡，就為你恢復{pct}%的最大生命值和法力值。',
+  'hudChrome.auraEffect.trinket.quench':
+    '你接下來的{stacks}次武器命中額外造成{damage}點冰霜傷害。最後一次命中使目標的攻擊速度降低{slow}%。',
+  'hudChrome.auraEffect.trinket.quenchOther':
+    '接下來的{stacks}次武器命中造成額外冰霜傷害。最後一次命中使目標的攻擊速度降低{slow}%。',
+  'hudChrome.auraEffect.trinket.quenched': '攻擊速度降低 {pct}%。',
   'entities.npcs.lift_warden_corwin.name': '升降機守衛科溫·阿什比',
   'entities.npcs.lift_warden_corwin.title': '風暴線升降機看守',
   'entities.npcs.lift_warden_corwin.greeting':

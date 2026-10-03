@@ -20327,6 +20327,34 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Дух-ягуар сражается рядом с вами, кусая вашу цель каждые {every} сек. и нанося от {min} до {max} ед. физического урона.',
   'hudChrome.auraEffect.trinket.seedburst':
     'Семя Цветожора. Когда эффект закончится, оно лопнет, нанося {damage} ед. урона от сил природы каждому врагу в радиусе {radius} м, или на {bonus}% больше ({empowered}), если этот враг погибнет раньше.',
+  'entities.items.foremans_grips.name': 'Рукавицы бригадира',
+  'entities.items.serac_stride_boots.name': 'Сапоги ледяных зубцов',
+  'entities.items.seal_rune_mantle.name': 'Мантия печатных рун',
+  'entities.items.thawbound_legguards.name': 'Поножи талых оков',
+  'entities.items.pyre_tenders_hood.name': 'Капюшон хранителя костра',
+  'entities.items.meltwater_cord.name': 'Шнур талой воды',
+  'entities.items.hammer_of_the_open_lock.name': 'Молот отпертого замка',
+  'entities.items.vestments_of_the_waking_rite.name': 'Облачение обряда пробуждения',
+  'entities.items.foremans_last_link.name': 'Последнее звено бригадира',
+  'entities.items.phial_of_the_tithe.name': 'Фиал десятины',
+  'entities.items.quenchwater_flask.name': 'Фляга закалочной воды',
+  'hudChrome.trinkets.use.tether':
+    'Приковывает вас цепью к дружественному игроку в пределах {range} м на {duration} сек. {share}% урона, который дошёл бы до его здоровья, вместо этого получаете вы. Действие прекращается досрочно, если вы погибнете. Требуется целью дружественный игрок, отличный от вас.',
+  'hudChrome.trinkets.use.harvest':
+    'В течение {duration} сек. каждое враждебное существо, погибшее в радиусе {radius} м от вас, восполняет {pct}% вашего максимального здоровья ({health}) и {pct}% вашей максимальной маны.',
+  'hudChrome.trinkets.use.quench':
+    'Ваши следующие {hits} попаданий оружием ближнего или дальнего боя в течение {duration} сек. наносят дополнительно {damage} ед. урона от магии льда. Последнее из них также закаляет цель, замедляя её атаки на {slow}% на {slowDuration} сек. Неиспользованные попадания пропадают по окончании эффекта. Урон растёт с силой атаки или силой дальнего боя (большей из них).',
+  'hudChrome.auraEffect.trinket.tether':
+    'Скован Последним звеном бригадира: {pct}% урона, который дошёл бы до вашего здоровья, вместо этого получает тот, кто вас приковал.',
+  'hudChrome.auraEffect.trinket.tetherLink':
+    'Вы получаете {pct}% урона, который получил бы прикованный к вам союзник.',
+  'hudChrome.auraEffect.trinket.harvest':
+    'Каждое враждебное существо, погибшее в радиусе {radius} м от вас, восполняет {pct}% вашего максимального здоровья и маны.',
+  'hudChrome.auraEffect.trinket.quench':
+    'Ваши следующие {stacks} попаданий оружием наносят дополнительно {damage} ед. урона от магии льда. Последнее замедляет атаки цели на {slow}%.',
+  'hudChrome.auraEffect.trinket.quenchOther':
+    'Следующие {stacks} попаданий оружием наносят дополнительный урон от магии льда. Последнее замедляет атаки цели на {slow}%.',
+  'hudChrome.auraEffect.trinket.quenched': 'Скорость атаки снижена на {pct}%.',
   'entities.npcs.lift_warden_corwin.name': 'Смотритель подъемника Корвин Эшби',
   'entities.npcs.lift_warden_corwin.title': 'Хранитель подъемника грозовой линии',
   'entities.npcs.lift_warden_corwin.greeting':

@@ -19941,6 +19941,33 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '영혼 재규어가 곁에서 싸우며 {every}초마다 대상을 물어뜯어 {min}~{max}의 물리 피해를 줍니다.',
   'hudChrome.auraEffect.trinket.seedburst':
     '탐식화의 씨앗입니다. 이 효과가 끝나면 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 그 전에 이 적이 죽으면 피해가 {bonus}% 증가합니다({empowered}).',
+  'entities.items.foremans_grips.name': '십장의 장갑',
+  'entities.items.serac_stride_boots.name': '빙탑 걸음 장화',
+  'entities.items.seal_rune_mantle.name': '봉인 룬 어깨망토',
+  'entities.items.thawbound_legguards.name': '해빙 족쇄 다리보호구',
+  'entities.items.pyre_tenders_hood.name': '화장터지기의 두건',
+  'entities.items.meltwater_cord.name': '녹은 물 허리끈',
+  'entities.items.hammer_of_the_open_lock.name': '열린 자물쇠의 망치',
+  'entities.items.vestments_of_the_waking_rite.name': '깨움 의식의 예복',
+  'entities.items.foremans_last_link.name': '십장의 마지막 고리',
+  'entities.items.phial_of_the_tithe.name': '십일조의 약병',
+  'entities.items.quenchwater_flask.name': '담금질 물 플라스크',
+  'hudChrome.trinkets.use.tether':
+    '{range}미터 내의 아군 플레이어와 {duration}초 동안 사슬로 연결됩니다. 그 아군의 생명력에 닿을 피해의 {share}%를 대신 당신이 받습니다. 당신이 죽으면 일찍 끝납니다. 자신이 아닌 아군 플레이어를 대상으로 지정해야 합니다.',
+  'hudChrome.trinkets.use.harvest':
+    '{duration}초 동안 당신으로부터 {radius}미터 내에서 적대적인 생물이 죽을 때마다 최대 생명력의 {pct}%({health})와 최대 마나의 {pct}%를 회복합니다.',
+  'hudChrome.trinkets.use.quench':
+    '{duration}초 내에 다음 {hits}번의 근접 또는 원거리 무기 적중이 {damage}의 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상을 담금질하여 {slowDuration}초 동안 공격 속도를 {slow}% 늦춥니다. 효과가 끝나면 남은 적중은 사라집니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가합니다.',
+  'hudChrome.auraEffect.trinket.tether':
+    '십장의 마지막 고리에 묶임: 당신의 생명력에 닿을 피해의 {pct}%를 당신을 묶은 자가 대신 받습니다.',
+  'hudChrome.auraEffect.trinket.tetherLink': '묶인 아군이 받을 피해의 {pct}%를 당신이 받습니다.',
+  'hudChrome.auraEffect.trinket.harvest':
+    '당신으로부터 {radius}미터 내에서 적대적인 생물이 죽을 때마다 최대 생명력과 마나의 {pct}%를 회복합니다.',
+  'hudChrome.auraEffect.trinket.quench':
+    '다음 {stacks}번의 무기 적중이 {damage}의 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상의 공격 속도를 {slow}% 늦춥니다.',
+  'hudChrome.auraEffect.trinket.quenchOther':
+    '다음 {stacks}번의 무기 적중이 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상의 공격 속도를 {slow}% 늦춥니다.',
+  'hudChrome.auraEffect.trinket.quenched': '공격 속도가 {pct}% 감소합니다.',
   'entities.npcs.lift_warden_corwin.name': '승강기 관리인 코윈 애시비',
   'entities.npcs.lift_warden_corwin.title': '폭풍선 승강기 관리자',
   'entities.npcs.lift_warden_corwin.greeting':
