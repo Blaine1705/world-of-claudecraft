@@ -44,12 +44,17 @@ const BASELINE = {
       'sextons_burial_spade',
     ],
     normalDigest: '11d8282deb5224aadac6530505d43e0fdec9185eaad8d2f1a01e090237c86e58',
-    gearDigest: 'd43b2dd0dc70e836e057eac12d9261cb2a9b128cce285bb5a257103531e1292e',
+    // Re-minted when the Quilted Trousers kept their shipped source tier
+    // (item_level.ts, the rework's preserved source levels): item level 11, as
+    // shipped, not the 9 the move to level-8 Marrow would have derived.
+    gearDigest: 'b26ef69840fcfa7f53deab39d380a535933dddf6bdb41cce4ea4dbb6f9d0d5b2',
   },
   rimeweb: {
     gearIds: ['bonechill_cord', 'bonechill_striders', 'heroic_rimeweb_fang', 'rimesilk_hood'],
     normalDigest: 'b60373d913e7a9fa3895b4655692c488558e777b581d3f93b6e804eafe64fc52',
-    gearDigest: '69f6da008eb9031d0708899be8f19596782d7da573638760f70e58a9b51acfd9',
+    // Re-minted when the Rimesilk Hood moved onto the stamina model (int 11,
+    // spi 7, sta 6: its 18-point caster line plus the 6-stamina baseline).
+    gearDigest: '819845460b7a4055c4e545a83084c8f6ed77e8b445f7d8fdb426a54d35c6c5a9',
   },
   cantor_ilvane: {
     gearIds: ['choirward_leggings', 'heroic_cantors_hymnal', 'shadowpulse_handwraps'],
@@ -87,7 +92,9 @@ const BASELINE = {
       'mistforged_pauldrons',
       'tideguard_faceguard',
     ],
-    normalDigest: 'f4a817a203a48100e5894c239006310be2a16dd6511de26b2d6bd745b4b5f7cf',
+    // Re-minted when the Longsword chase row joined Olen's shipped olen_bonus
+    // group (same 0.1 chance), so a kill pays at most one rare.
+    normalDigest: 'd7cb725110348fa8f56f322000dffcd529bfca58534a2ae3a897c4eae26cd3de',
     gearDigest: 'aa8117eb9473f2fcf78ff3fde25dff6604ec031e2bc112003f12d866e6aa3b40',
   },
   gaoler_ossick: {

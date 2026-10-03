@@ -419,23 +419,26 @@ paladin, shaman), Agile (rogue, hunter), Caster (mage, priest, warlock, druid).
 | Marrow (8) | Quilted Trousers (`quilted_trousers`, shipped) | legs, cloth | uncommon | shipped | 0.25 group |
 | | Oiled Leather Boots (`oiled_boots`, shipped) | feet, leather | uncommon | shipped | 0.25 group |
 | | Gravedirt Treads (`gravedirt_treads`) | feet, mail, Heavy | uncommon, 9 | str 1, sta 1 (2) | 0.25 group |
-| | Bellrope Girdle (`bellrope_girdle`) | waist, cloth, Caster | uncommon, 9 | int 1, spi 1 (2) | 0.25 group |
+| | Bellrope Girdle (`bellrope_girdle`) | waist, cloth, Caster | uncommon, 9 | int 1, spi 1, sta 1 (2) | 0.25 group |
 | | Sexton's Spadehaft (`sextons_spadehaft`) | two-hand, Heavy | rare, 11 | str 5, sta 3 (8); 30 to 46, speed 3.3 (11.5 DPS) | 0.10 |
-| Rimeweb (9) | Rimesilk Mantle (`rimesilk_mantle`) | shoulder, cloth, Caster | uncommon, 10 | int 2, spi 1 (3) | 0.34 group |
+| Rimeweb (9) | Rimesilk Mantle (`rimesilk_mantle`) | shoulder, cloth, Caster | uncommon, 10 | int 2, spi 1, sta 1 (3) | 0.34 group |
 | | Bonechill Carapace Vest (`bonechill_carapace_vest`) | chest, mail, Heavy | uncommon, 10 | str 2, sta 2 (4) | 0.33 group |
 | | Rimeweb Hunter's Leggings (`rimeweb_hunters_leggings`) | legs, leather, Agile | uncommon, 10 | agi 2, sta 1 (3) | 0.33 group |
 | | Rimeweb Fang (`rimeweb_fang`) | dagger, Agile | rare, 12 | agi 4, sta 3 (7); 14 to 21, speed 1.7 (10.3 DPS) | 0.10 |
-| Ilvane (9) | Cantor's Cassock (`cantors_cassock`) | chest, cloth, Caster | uncommon, 10 | int 2, spi 1, sta 1 (4) | 0.34 group |
+| Ilvane (9) | Cantor's Cassock (`cantors_cassock`) | chest, cloth, Caster | uncommon, 10 | int 3, spi 1, sta 1 (4) | 0.34 group |
 | | Choirward Leggings (`choirward_leggings`) | legs, mail, Heavy | uncommon, 10 | str 2, sta 1 (3) | 0.33 group |
 | | Chorister's Gloves (`choristers_gloves`) | gloves, leather, Agile | uncommon, 10 | agi 2, sta 1 (3) | 0.33 group |
-| | Cantor's Hymnal (`cantors_hymnal`) | held off-hand, Caster | rare, 12 | int 3, spi 2 (5) | 0.10 |
+| | Cantor's Hymnal (`cantors_hymnal`) | held off-hand, Caster | rare, 12 | int 3, spi 2, sta 2 (5) | 0.10 |
 | Morthen (10) | Cryptbone Greaves (`cryptbone_greaves`, shipped) | legs, mail | uncommon | shipped | 0.34 group |
-| | Gravecaller's Vestments (`gravecallers_vestments`) | chest, cloth, Caster | uncommon, 11 | int 2, spi 1, sta 1 (4) | 0.33 group |
+| | Gravecaller's Vestments (`gravecallers_vestments`) | chest, cloth, Caster | uncommon, 11 | int 3, spi 1, sta 1 (4) | 0.33 group |
 | | Unquiet Stalker's Hood (`unquiet_stalkers_hood`) | helmet, leather, Agile | uncommon, 11 | agi 3, sta 1 (4) | 0.33 group |
 | | Bonus group (shipped, unchanged): Greyjaw Hide Boots 0.25, Gravewoven Bag 0.20, Cryptbone Helm 0.18, Cryptbone Pauldrons 0.18 | | | | |
 
+Caster pieces carry the free stamina baseline of the stamina model on top of their
+line (`src/sim/item_budget.ts`, a third of the line budget in parentheses).
 Quilted Trousers and Oiled Leather Boots leave Morthen's normal table (they move
-to Marrow). Armor values follow the slot weighting of the shipped mid-tier pieces
+to Marrow); shipped pieces keep the item level they shipped at
+(`src/sim/item_level.ts`, the rework's preserved source levels). Armor values follow the slot weighting of the shipped mid-tier pieces
 (`items.ts` Inventory 2.0 comment) and are set at authoring. Money: each non-final
 boss pays a small base (Marrow 800c, Rimeweb 1000c, Ilvane 1000c); Morthen keeps the
 finale ladder of `docs/design/dungeon-gold.md` (2500c normal, 100000c heroic).
@@ -445,7 +448,7 @@ finale ladder of `docs/design/dungeon-gold.md` (2500c normal, 100000c heroic).
 | Boss | Partition (weights) |
 |---|---|
 | Marrow | Sexton's Burial Spade (`sextons_burial_spade`, new epic two-hand, Heavy, ilvl 31: str 17, sta 12, 50 to 75 at speed 3.4, the five-man heroic weapon rating) 0.30; Cryptplate Helm (shipped, moved from Morthen) 0.30; Quilted Trousers 0.15; Oiled Leather Boots 0.15; Heroic Sexton's Spadehaft (generated) 0.10 |
-| Rimeweb | Rimesilk Hood (`rimesilk_hood`, new epic cloth helmet, Caster, ilvl 31: int 12, spi 7, sta 5, the five-man armor rating) 0.35; Bonechill Striders (shipped, moved) 0.25; Bonechill Cord (shipped, moved) 0.25; Heroic Rimeweb Fang (generated) 0.15 |
+| Rimeweb | Rimesilk Hood (`rimesilk_hood`, new epic cloth helmet, Caster, ilvl 31: int 11, spi 7, sta 6, the five-man armor rating) 0.35; Bonechill Striders (shipped, moved) 0.25; Bonechill Cord (shipped, moved) 0.25; Heroic Rimeweb Fang (generated) 0.15 |
 | Ilvane | Shadowpulse Handwraps (shipped, moved) 0.50; Choirward Leggings 0.35; Heroic Cantor's Hymnal (generated) 0.15. Vigil Taper deferred to the encounter pass (it needs a new trinket effect kind) |
 | Morthen | Morthen's Cryptforged Hauberk, Shadowpulse Slippers, Lunarward Cinch, Bastion Sigil 0.18 each; Cryptbone Greaves, Greyjaw Hide Boots, Cryptbone Helm, Cryptbone Pauldrons 0.07 each (the shipped Reliquary page keeps paying on Heroic). Unchanged outside the partition: Gravewoven Bag 0.20, the Stormfeather Griffin reins chance, the heroic farm pattern rows, heroic finale gold, Heroic Marks |
 
