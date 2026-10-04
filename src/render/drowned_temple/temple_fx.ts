@@ -43,7 +43,9 @@ import {
   TEMPLE_MARK_SPECS,
   TEMPLE_OBJECT_SPECS,
   TEMPLE_PILGRIM_FRENZY_GESTURE,
+  TEMPLE_SENTINEL_SHELL_OPEN,
   type TempleTelegraphSpec,
+  templeSentinelShellGesture,
   templeTelegraphFill,
   templeTelegraphSpecs,
   templeTimedFill,
@@ -104,6 +106,8 @@ export class TempleFx {
   private readonly hydra: TempleHydra;
   private readonly ysolei: TempleYsoleiFx;
   private readonly flashesOn: boolean;
+  /** Each Pearlguard Sentinel's shell stance last sent (absent = open). */
+  private readonly shellStance = new Map<number, string>();
   private scan = 0;
   private clock = 0;
   private disposed = false;
@@ -420,6 +424,7 @@ export class TempleFx {
         }
         continue;
       }
+      if (this.playGesture) this.updateShellStance(e.id, e.templateId, e.auras, e.dead);
       if (e.dead) continue;
       if (e.templateId.startsWith(REFLECTION_ID) && e.forcedTargetId !== null) {
         const have = this.tetherPairs.findIndex(([r]) => r === e.id);
@@ -453,6 +458,26 @@ export class TempleFx {
       slot.castId = castId;
       slot.group.visible = true;
     }
+  }
+
+  /** The Sentinel's Pearl Carapace: its shell shuts over it while the ward
+   *  holds and opens when it goes (a stance gesture on the rig's phaseClips). */
+  private updateShellStance(
+    id: number,
+    templateId: string,
+    auras: readonly { id: string }[],
+    dead: boolean,
+  ): void {
+    const want = templeSentinelShellGesture(templateId, auras, dead);
+    const had = this.shellStance.get(id) ?? TEMPLE_SENTINEL_SHELL_OPEN;
+    if (want === null) {
+      this.shellStance.delete(id);
+      return;
+    }
+    if (want === had) return;
+    if (want === TEMPLE_SENTINEL_SHELL_OPEN) this.shellStance.delete(id);
+    else this.shellStance.set(id, want);
+    this.playGesture?.(id, want);
   }
 
   dispose(): void {

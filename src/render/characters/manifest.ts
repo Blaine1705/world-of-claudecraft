@@ -78,6 +78,7 @@ import {
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
+  TEMPLE_PEARL_SLAM,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
@@ -113,7 +114,11 @@ import {
 } from '../../sim/varkhul_cinder_artificer';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
-import { TEMPLE_PILGRIM_FRENZY_GESTURE } from '../drowned_temple/temple_fx_core';
+import {
+  TEMPLE_PILGRIM_FRENZY_GESTURE,
+  TEMPLE_SENTINEL_SHELL_CLOSED,
+  TEMPLE_SENTINEL_SHELL_OPEN,
+} from '../drowned_temple/temple_fx_core';
 import {
   HOARD_GESTURE_CALL_HAMMER,
   HOARD_GESTURE_CALL_STORM,
@@ -1725,6 +1730,23 @@ export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
 // carries no Book of Names) and holds his ward
 // as he comes down (ShieldRitual). At his Last Rites the staff's crest UNFOLDS
 // INTO A SCYTHE (Transform) and every clip after it carries the blade out.
+// The Pearlguard Sentinel's two stances (temple_sentinel below): the giant
+// on its feet, and the clam shut over it while its Pearl Carapace holds.
+const SENTINEL_CLIPS: ClipMap = {
+  ...TEMPLE_CLIPS,
+  castByAbility: { [TEMPLE_PEARL_SLAM]: 'Slam' },
+  castTimeScaleByAbility: { [TEMPLE_PEARL_SLAM]: 1 },
+};
+const SENTINEL_SHELL_CLIPS: ClipMap = {
+  ...SENTINEL_CLIPS,
+  idle: 'ShellIdle',
+  walk: 'ShellWalk',
+  run: 'ShellWalk',
+  attack: ['ShellAttack'],
+  hit: ['ShellHit'],
+  cast: 'ShellIdle',
+};
+
 const MORTHEN_STAFF_CLIPS: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
@@ -4554,11 +4576,32 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.22,
   },
+  // The Pearlguard Sentinel (pearlguard_sentinel; scripts/assets/
+  // drowned_temple_creatures/sentinel_clam/): a temple giant whose body is a
+  // colossal clam, two wavy bone-white valves gaping front and back from its
+  // hips, its iridescent blue mantle between them and its heart pearl glowing
+  // in the front valve's notch; limbs of branching white coral, fists and feet
+  // of nacre stone, a small stone head with a slit of moonlight. Attack: an
+  // overhead hammer fist (CONTACT 0.55); Attack2: a backhand (0.5). Onrush
+  // charges on Run, head down between half-closed valves. Pearl Slam (1.5 s
+  // bar) plays Slam: both fists raised, driven into the floor on the bar's
+  // end. Pearl Carapace: while the ward holds, temple_fx swaps the rig to its
+  // shell stance (crouched, the valves shut over it, ShellClose to enter,
+  // ShellOpen to leave). Dying, the valves fly open and the pearl rolls out
+  // dark. Drawn 7.0 at its 1.15 (2.7 players).
   temple_sentinel: {
     url: `${CREATURES}/temple_sentinel.glb`,
-    height: 5.6,
-    clips: TEMPLE_CLIPS,
-    selfIllumination: 0.14,
+    height: 6.1,
+    clips: SENTINEL_CLIPS,
+    phaseClips: {
+      [TEMPLE_SENTINEL_SHELL_OPEN]: { clips: SENTINEL_CLIPS, enter: 'ShellOpen' },
+      [TEMPLE_SENTINEL_SHELL_CLOSED]: { clips: SENTINEL_SHELL_CLIPS, enter: 'ShellClose' },
+    },
+    walkRef: 1.11,
+    runRef: 3.88,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.08,
   },
   // The Glimmerscale Lurker (glimmerscale_lurker; scripts/assets/
   // drowned_temple_creatures/lurker_mantis/): a giant mantis shrimp the

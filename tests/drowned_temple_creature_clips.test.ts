@@ -10,6 +10,9 @@ import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
   isTemplePilgrimFrenzyCue,
   TEMPLE_PILGRIM_FRENZY_GESTURE,
+  TEMPLE_SENTINEL_SHELL_CLOSED,
+  TEMPLE_SENTINEL_SHELL_OPEN,
+  templeSentinelShellGesture,
 } from '../src/render/drowned_temple/temple_fx_core';
 import { MOBS } from '../src/sim/data';
 import {
@@ -25,10 +28,12 @@ import {
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
+  TEMPLE_PEARL_SLAM,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
 } from '../src/sim/mob/trash_kit/temple_cast_ids';
+import { TEMPLE_CARAPACE_AURA } from '../src/sim/mob/trash_kit/temple_kit';
 
 function clipsOf(path: string): string[] {
   const buf = readFileSync(path);
@@ -304,6 +309,75 @@ describe('the Glimmerscale Lurker: the sacred mantis shrimp', () => {
     expect(MOBS.glimmerscale_lurker.trashKit?.bolt?.castTime).toBe(2);
     expect(v.castClipSync).toBe(true);
     expect(c.castPlayOut ?? []).not.toContain('Spit');
+  });
+});
+
+describe('the Pearlguard Sentinel: the clam and coral giant', () => {
+  it('ships its own body with both stances and a clip for every job', () => {
+    expect(clipsOf('public/models/creatures/temple_sentinel.glb').sort()).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'Cast',
+        'Death',
+        'Hit',
+        'Idle',
+        'Run',
+        'ShellAttack',
+        'ShellClose',
+        'ShellHit',
+        'ShellIdle',
+        'ShellOpen',
+        'ShellWalk',
+        'Slam',
+        'Walk',
+      ].sort(),
+    );
+    const v = visualOf('pearlguard_sentinel');
+    expect(v.url).toMatch(/temple_sentinel\.glb$/);
+    expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 7.0 at its 1.15: 2.7 times the 2.6 player.
+    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(7.0, 1);
+    expect(v.clips.castByAbility?.[TEMPLE_PEARL_SLAM]).toBe('Slam');
+    expect(MOBS.pearlguard_sentinel.trashKit?.wingGust?.castTime).toBe(1.5);
+    expect(v.castClipSync).toBe(true);
+  });
+
+  it('shuts its shell while Pearl Carapace holds and opens when it goes', () => {
+    const v = visualOf('pearlguard_sentinel');
+    const closed = v.phaseClips?.[TEMPLE_SENTINEL_SHELL_CLOSED];
+    const open = v.phaseClips?.[TEMPLE_SENTINEL_SHELL_OPEN];
+    expect(closed?.enter).toBe('ShellClose');
+    expect(closed?.clips.idle).toBe('ShellIdle');
+    expect(closed?.clips.walk).toBe('ShellWalk');
+    expect(closed?.clips.attack).toEqual(['ShellAttack']);
+    expect(open?.enter).toBe('ShellOpen');
+    // the open stance IS the row's own vocabulary, so the rig starts in it
+    expect(open?.clips).toBe(v.clips);
+    const ward = [{ id: TEMPLE_CARAPACE_AURA }];
+    expect(templeSentinelShellGesture('pearlguard_sentinel', ward, false)).toBe(
+      TEMPLE_SENTINEL_SHELL_CLOSED,
+    );
+    expect(templeSentinelShellGesture('pearlguard_sentinel', [], false)).toBe(
+      TEMPLE_SENTINEL_SHELL_OPEN,
+    );
+    expect(templeSentinelShellGesture('pearlguard_sentinel', [{ id: 'other' }], false)).toBe(
+      TEMPLE_SENTINEL_SHELL_OPEN,
+    );
+    expect(templeSentinelShellGesture('pearlguard_sentinel', ward, true)).toBeNull();
+    expect(templeSentinelShellGesture('drowned_templeguard', ward, false)).toBeNull();
+    // temple_fx reads the stance off every mob it scans and sends it as a gesture
+    const fx = readFileSync('src/render/drowned_temple/temple_fx.ts', 'utf8');
+    expect(fx).toContain('this.updateShellStance(e.id, e.templateId, e.auras, e.dead)');
+    expect(fx).toContain('this.playGesture?.(id, want)');
+  });
+
+  it('the ward the shell keys on is the one the sim lays under 30 percent', () => {
+    const kit = MOBS.pearlguard_sentinel.trashKit?.carapace;
+    expect(kit?.belowHpPct).toBe(0.3);
+    expect(kit?.seconds).toBe(8);
+    expect(TEMPLE_CARAPACE_AURA).toBe('temple_pearl_carapace_ward');
   });
 });
 

@@ -38,6 +38,7 @@ import {
   TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
 } from '../../sim/mob/trash_kit/temple_cast_ids';
+import { TEMPLE_CARAPACE_AURA } from '../../sim/mob/trash_kit/temple_kit';
 import { TELEGRAPH_ACCENTS, TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 
 export type TempleTelegraphShape = 'cone' | 'ring' | 'lane' | 'sigil';
@@ -327,4 +328,26 @@ export function isTemplePilgrimFrenzyCue(
     !ev.ability &&
     sourceTemplateId === 'drowned_pilgrim'
   );
+}
+
+/** The Pearlguard Sentinel's shell stances (the manifest maps each to a phase
+ *  vocabulary, VisualDef.phaseClips): shut while its Pearl Carapace ward holds,
+ *  open again once the ward is gone. */
+export const TEMPLE_SENTINEL_SHELL_CLOSED = 'temple_sentinel_shell_closed';
+export const TEMPLE_SENTINEL_SHELL_OPEN = 'temple_sentinel_shell_open';
+
+/** The shell stance a Pearlguard Sentinel should hold, read off its auras:
+ *  closed while the Pearl Carapace absorb ward rides it (the sim's own aura id,
+ *  so the shell opens the moment the ward breaks or runs out), open otherwise.
+ *  Null for every other body, and for a dead one (its death clip owns it). */
+export function templeSentinelShellGesture(
+  templateId: string | undefined,
+  auras: readonly { id: string }[] | undefined,
+  dead: boolean,
+): string | null {
+  if (templateId !== 'pearlguard_sentinel' || dead) return null;
+  for (const a of auras ?? []) {
+    if (a.id === TEMPLE_CARAPACE_AURA) return TEMPLE_SENTINEL_SHELL_CLOSED;
+  }
+  return TEMPLE_SENTINEL_SHELL_OPEN;
 }

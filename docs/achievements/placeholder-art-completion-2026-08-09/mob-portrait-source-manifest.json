@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "66027136c92f4610d91f69dbc3dde8469370ef55d0e5a0593fa586fdb2afbfcc",
+  "rendererFingerprint": "f14bb3776c1065e813e27f3732f9dd733f5df1e7ff4eb06179acace3867452fc",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5475894,
-      "sha256": "d9f35114702030b573d81edf71e532aab5d5b873a03994e87092e895abd5cc9a",
+      "sha256": "df560e863836a3cf07bd07a4b9c5ec0da2e9939722e3cce1956d3cec868016b0",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7261,11 +7261,11 @@
         "model": {
           "url": "models/creatures/temple_sentinel.glb",
           "path": "public/models/creatures/temple_sentinel.glb",
-          "bytes": 529684,
-          "sha256": "d6eb0fe084d4712b1978180967c40c4a717852b4462a405e264eeb4d7b608ffa"
+          "bytes": 2675648,
+          "sha256": "56a433dd0bda2852d8f3ec550e014da3103cd6df95022d89f7bcfd7a17221977"
         },
         "idle": "Idle",
-        "height": 5.6,
+        "height": 6.1,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -7279,11 +7279,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1c39f05e08cde62d597def30ee3184ccd35dbf45f5d4e7f4040ae943d94f26b8",
+      "sourceFingerprint": "09be94dcfb7b12d6ec2c1212bcb4ad0287b23b73ddf38114056bbb41a5f418c4",
       "output": {
         "path": "public/ui/mobs/pearlguard_sentinel.webp",
-        "bytes": 2804,
-        "sha256": "0bd88f6b3679516f031fc85a7375e180649adcca22e8f31cc57c742d4e28d8f6"
+        "bytes": 3682,
+        "sha256": "f04a1326f9b7d50169f903aa10990ee06ca67e8a3eea25439c6037d5b50e9246"
       }
     },
     {

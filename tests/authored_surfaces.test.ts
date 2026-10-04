@@ -208,6 +208,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_tidewisp',
   // the Drowned Temple's Blender Glimmerscale Lurker (the sacred mantis shrimp)
   'temple_lurker',
+  // the Drowned Temple's Blender Pearlguard Sentinel (the clam and coral giant)
+  'temple_sentinel',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',
