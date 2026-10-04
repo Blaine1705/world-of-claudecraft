@@ -11,7 +11,12 @@ lands on the bar's end); Tidal Slap is a 1.0 s bar on the tank (Slap: the arm
 drawn back across her body, the backhand on the bar's end); the Chorus and
 Solo marks are windup cues (Chorus: the Great Conch raised to her lips and
 blown, the fan folding inward; Solo: one arm raised as she sings alone, the
-fan flung fully open).
+fan flung fully open). As a pure water caster she adds three casts: Water
+Bolt, a 2.0 s bar (Bolt: the hand drawn back to her shoulder and flung at
+the target, CONTACT 2.0); Drowning Beam, a 5 s channel (Beam: a seamless
+1.4 s loop of both palms thrust forward, pouring); Cresting Wave, a 3.0 s
+bar (Surge: sunk low in the pool, risen tall, both arms whipped forward over
+her head, CONTACT 3.0). Bolt and Surge are pinned to their bars.
 """
 import math
 
@@ -25,6 +30,7 @@ TAU = math.tau
 WALK_PERIOD, RUN_PERIOD = 2.4, 1.2
 WALKREF, RUNREF = 2.5, 7.0
 SONG_BAR, SLAP_BAR = 1.5, 1.0
+BOLT_BAR, SURGE_BAR, BEAM_PERIOD = 2.0, 3.0, 1.4
 
 
 def _n(v):
@@ -218,6 +224,125 @@ def solo(rig):
     return fn, 2.2
 
 
+def bolt(rig):
+    """Water Bolt (the 2.0 s bar, pinned to the bar): she draws her right hand
+    back to her shoulder, a sphere of water gathering in the cupped palm, the
+    left hand guiding it, the fan tightening, her gaze on the target (0 to
+    1.6); a last coil (1.6 to 1.85), and on the bar's end she flings the hand
+    at the target, fingers splayed, the body following through (CONTACT 2.0);
+    recovered 2.5."""
+    st = stance(rig)
+    T = BOLT_BAR
+    draw = st.but(twist=-24, lean=-4, side=-3, look=(20, 2), head_roll=-4, pelvis=(0.0, 0.06, 0.0),
+                  hand_r=(-0.94, 0.3, 4.36), pole_r=(-1.0, 0.6, -0.9), hand_dir_r=_n((-0.2, -0.3, 0.93)),
+                  hand_roll_r=-110, fist_r=0.42, spread_r=0.5, clav_r=6,
+                  hand_l=(-0.12, -0.62, 3.78), pole_l=(1.0, -0.2, -0.6), hand_dir_l=_n((-0.5, -0.2, 0.85)),
+                  hand_roll_l=-70, fist_l=0.25, spread_l=0.7, jaw=6)
+    coil = draw.but(twist=-32, lean=-8, look=(26, 4), pelvis=(0.0, 0.1, 0.02), hand_r=(-0.98, 0.42, 4.42),
+                    hand_l=(-0.18, -0.6, 3.82), clav_r=9, jaw=10)
+    fling = st.but(twist=22, lean=17, side=2, look=(-12, -2), head_roll=4, pelvis=(0.0, -0.2, -0.04),
+                   hand_r=(-0.12, -1.4, 4.08), pole_r=(-1.0, 0.2, -0.6), hand_dir_r=_n((0.1, -0.92, 0.3)),
+                   hand_roll_r=-80, fist_r=0.0, spread_r=1.0, clav_r=-4, clav_fwd_r=8,
+                   hand_l=(0.62, -0.05, 3.25), pole_l=(1.0, 0.6, -0.4), hand_dir_l=_n((0.3, 0.5, -0.8)),
+                   hand_roll_l=-30, fist_l=0.2, spread_l=0.6, jaw=18)
+    keys = [(0.0, st, 'inout'), (0.75, draw, 'inout'), (1.6, draw.but(twist=-27, hand_r=(-0.96, 0.34, 4.4)), 'inout'),
+            (1.85, coil, 'in'), (T, fling, 'out'), (2.15, fling.but(lean=21, twist=28, look=(-16, -4), hand_r=(0.14, -1.18, 3.42),
+                                         hand_dir_r=_n((0.4, -0.8, -0.45))), 'inout'),
+            (2.5, st, 'linear')]
+    seq = keyed(keys)
+
+    def fn(t):
+        b = seq(t)
+        g = smooth((t - 0.2) / 0.6) * (1 - smooth((t - 1.9) / 0.1))
+        snap = smooth((t - 1.9) / 0.12) * (1 - smooth((t - 2.15) / 0.35))
+        k = 1.0 - 0.12 * g + 0.18 * snap
+        return b.but(extra=look(fan(k, 0.8 * g + 3.0 * snap, TAU * t / 0.22, tilt=-4 * g + 6 * snap),
+                                hair(6 + 6 * g, 6, TAU * t / 1.1, -18 * snap), fins(4 + 6 * g, 4 * g, 6, TAU * t),
+                                fluke(10 + 8 * snap, TAU * t / 0.8)))
+    return fn, 2.5
+
+
+def beam(rig, period=BEAM_PERIOD):
+    """Drowning Beam (the 5 s channel, looped): both arms thrust forward at
+    chest height, palms out at the target, pouring the torrent from them; the
+    fan flung fully open and shivering, her hair streaming forward, her jaw
+    half open as she sings it, the fluke churning the pool and small pulses of
+    effort through the shoulders. Every wave is a whole harmonic of the
+    period, so the seam is exact."""
+    st = stance(rig)
+    pour = st.but(lean=12, neck=-2, look=(0, -6), pelvis=(0.0, -0.12, 0.0),
+                  hand_l=(0.36, -1.3, 3.64), hand_r=(-0.36, -1.3, 3.64), pole_l=(1.0, 0.2, -0.7),
+                  pole_r=(-1.0, 0.2, -0.7), hand_dir_l=_n((0.1, -0.45, 0.89)), hand_dir_r=_n((-0.1, -0.45, 0.89)),
+                  hand_roll_l=-95, hand_roll_r=-95, fist_l=0.0, fist_r=0.0, spread_l=1.0, spread_r=1.0,
+                  clav_l=4, clav_r=4, clav_fwd_l=10, clav_fwd_r=10, jaw=24)
+
+    def fn(t):
+        u = TAU * t / period
+        s1, s2, c2, s3 = math.sin(u), math.sin(2 * u), math.cos(2 * u), math.sin(3 * u)
+        push = 0.5 + 0.5 * s2
+        hl = (0.36 + 0.025 * s1, -1.28 - 0.1 * push, 3.64 + 0.035 * c2)
+        hr = (-0.36 + 0.025 * s1, -1.28 - 0.1 * push, 3.64 + 0.035 * math.cos(2 * u + 0.6))
+        b = pour.but(lean=11 + 4.0 * push, side=2.0 * s1, twist=3.0 * s1, pelvis=(0.0, -0.1 - 0.05 * push, 0.03 * c2),
+                     look=(1.5 * s1, -6 + 1.5 * s2), head_roll=2.5 * s1, hand_l=hl, hand_r=hr,
+                     clav_l=3 + 5 * push, clav_r=3 + 5 * push, clav_fwd_l=8 + 8 * push, clav_fwd_r=8 + 8 * push,
+                     jaw=24 + 5 * s3)
+        return b.but(extra=look(fan(1.16 + 0.03 * s2, 4.0, 10 * u, tilt=6 + 2 * s2),
+                                hair(4, 10, u, -26 - 6 * s2), fins(12, 6, 10, 2 * u), fluke(24, 2 * u)))
+    return fn
+
+
+def surge(rig):
+    """Cresting Wave (the 3.0 s bar, pinned to the bar): she sinks low into
+    her pool gathering the water, both arms sweeping down and back, the fan
+    folding in (0 to 2.1); she rises tall, her arms swept up through her
+    sides (2.36, the elbows kept back so the upper arms never flip their
+    roll) to a V over her head (2.62), and on the bar's end both arms whip
+    forward and up over her head as she hurls the wave, the fan snapping
+    fully open, the head thrown forward (CONTACT 3.0); recovered 3.6."""
+    st = stance(rig)
+    T = SURGE_BAR
+    scoop = st.but(lean=22, neck=6, look=(0, -14), pelvis=(0.0, -0.1, -0.4),
+                   hand_l=(0.62, -0.75, 2.5), hand_r=(-0.62, -0.75, 2.5), pole_l=(1.0, 0.4, 0.2),
+                   pole_r=(-1.0, 0.4, 0.2), hand_dir_l=_n((0.2, -0.6, -0.78)), hand_dir_r=_n((-0.2, -0.6, -0.78)),
+                   hand_roll_l=-40, hand_roll_r=-40, fist_l=0.35, fist_r=0.35, spread_l=0.4, spread_r=0.4)
+    low = st.but(lean=28, neck=8, look=(0, -10), pelvis=(0.0, 0.0, -0.8),
+                 hand_l=(0.84, 0.05, 2.12), hand_r=(-0.84, 0.05, 2.12), pole_l=(0.3, 1.0, 0.0),
+                 pole_r=(-0.3, 1.0, 0.0), hand_dir_l=_n((0.3, 0.3, -0.9)), hand_dir_r=_n((-0.3, 0.3, -0.9)),
+                 hand_roll_l=-30, hand_roll_r=-30, fist_l=0.3, fist_r=0.3, spread_l=0.6, spread_r=0.6)
+    back = low.but(lean=26, look=(0, -4), pelvis=(0.0, 0.04, -0.9), hand_l=(0.74, 0.66, 2.36),
+                   hand_r=(-0.74, 0.66, 2.36), hand_dir_l=_n((0.2, 0.7, -0.6)), hand_dir_r=_n((-0.2, 0.7, -0.6)),
+                   clav_l=-4, clav_r=-4)
+    tall = st.but(lean=-14, neck=-6, look=(0, 22), pelvis=(0.0, 0.12, 0.2),
+                  hand_l=(0.8, 0.28, 4.98), hand_r=(-0.8, 0.28, 4.98), pole_l=(0.3, 1.0, 0.0), pole_r=(-0.3, 1.0, 0.0),
+                  hand_dir_l=_n((0.3, 0.3, 0.9)), hand_dir_r=_n((-0.3, 0.3, 0.9)), hand_roll_l=-90, hand_roll_r=-90,
+                  fist_l=0.1, fist_r=0.1, spread_l=0.9, spread_r=0.9, clav_l=14, clav_r=14, jaw=12)
+    hurl = st.but(lean=20, neck=-4, look=(0, -4), pelvis=(0.0, -0.22, 0.1),
+                  hand_l=(0.58, -0.95, 4.72), hand_r=(-0.58, -0.95, 4.72), pole_l=(1.0, 0.0, -0.4),
+                  pole_r=(-1.0, 0.0, -0.4), hand_dir_l=_n((0.25, -0.8, 0.55)), hand_dir_r=_n((-0.25, -0.8, 0.55)),
+                  hand_roll_l=-90, hand_roll_r=-90, fist_l=0.0, fist_r=0.0, spread_l=1.0, spread_r=1.0,
+                  clav_l=10, clav_r=10, clav_fwd_l=10, clav_fwd_r=10, jaw=30)
+    follow = hurl.but(lean=26, pelvis=(0.0, -0.26, 0.02), hand_l=(0.5, -1.15, 3.9), hand_r=(-0.5, -1.15, 3.9),
+                      hand_dir_l=_n((0.1, -0.95, 0.1)), hand_dir_r=_n((-0.1, -0.95, 0.1)), jaw=24)
+    wing = st.but(lean=4, neck=0, look=(0, 8), pelvis=(0.0, 0.08, -0.25), hand_l=(1.02, 0.38, 3.62),
+                  hand_r=(-1.02, 0.38, 3.62), pole_l=(0.3, 1.0, 0.0), pole_r=(-0.3, 1.0, 0.0),
+                  hand_dir_l=_n((0.6, 0.2, 0.75)), hand_dir_r=_n((-0.6, 0.2, 0.75)), hand_roll_l=-60,
+                  hand_roll_r=-60, fist_l=0.2, fist_r=0.2, spread_l=0.8, spread_r=0.8, clav_l=8, clav_r=8)
+    keys = [(0.0, st, 'inout'), (0.6, scoop, 'inout'), (1.35, low, 'inout'), (2.08, back, 'inout'),
+            (2.36, wing, 'linear'), (2.62, tall, 'in'), (T, hurl, 'out'), (3.2, follow, 'inout'), (3.6, st, 'linear')]
+    seq = keyed(keys)
+
+    def fn(t):
+        b = seq(t)
+        fold = smooth(t / 0.8) * (1 - smooth((t - 2.25) / 0.45))
+        snap = smooth((t - 2.75) / 0.25) * (1 - smooth((t - 3.25) / 0.35))
+        k = 1.0 - 0.4 * fold + 0.22 * snap
+        return b.but(extra=look(fan(k, 1.0 * fold + 4.0 * snap, TAU * t / 0.18, tilt=-10 * fold + 8 * snap),
+                                hair(6 + 12 * snap, 6, TAU * t / 1.2, -30 * snap),
+                                fins(4 + 10 * snap, 8 * fold, 6, TAU * t),
+                                fluke(14 + 14 * fold + 10 * snap, TAU * t / 0.6)))
+    return fn, 3.6
+
+
 def cast(rig, period=2.4):
     st = stance(rig)
     up = st.but(lean=-6, look=(0, 16), hand_l=(0.4, -0.45, 3.6), hand_r=(-0.4, -0.45, 3.6),
@@ -284,6 +409,9 @@ CATALOG = [
     ('Slap', slap, False),
     ('Chorus', chorus, False),
     ('Solo', solo, False),
+    ('Bolt', bolt, False),
+    ('Beam', lambda r: (beam(r), BEAM_PERIOD), True),
+    ('Surge', surge, False),
     ('Hit', hit, False),
     ('Death', death, False),
 ]
