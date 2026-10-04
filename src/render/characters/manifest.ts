@@ -1749,8 +1749,9 @@ export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
 // carries no Book of Names) and holds his ward
 // as he comes down (ShieldRitual). At his Last Rites the staff's crest UNFOLDS
 // INTO A SCYTHE (Transform) and every clip after it carries the blade out.
-// The Pearlguard Sentinel's two stances (temple_sentinel below): the giant
-// on its feet, and the clam shut over it while its Pearl Carapace holds.
+// The Pearlguard Sentinel's two stances (temple_sentinel below): the manta
+// gliding open-winged, and its cocoon (the wings wrapped under its belly)
+// while its Pearl Carapace holds.
 const SENTINEL_CLIPS: ClipMap = {
   ...TEMPLE_CLIPS,
   castByAbility: { [TEMPLE_PEARL_SLAM]: 'Slam' },
@@ -4779,28 +4780,37 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.08,
   },
   // The Pearlguard Sentinel (pearlguard_sentinel; scripts/assets/
-  // drowned_temple_creatures/sentinel_clam/): a temple giant whose body is a
-  // colossal clam, two wavy bone-white valves gaping front and back from its
-  // hips, its iridescent blue mantle between them and its heart pearl glowing
-  // in the front valve's notch; limbs of branching white coral, fists and feet
-  // of nacre stone, a small stone head with a slit of moonlight. Attack: an
-  // overhead hammer fist (CONTACT 0.55); Attack2: a backhand (0.5). Onrush
-  // charges on Run, head down between half-closed valves. Pearl Slam (1.5 s
-  // bar) plays Slam: both fists raised, driven into the floor on the bar's
-  // end. Pearl Carapace: while the ward holds, temple_fx swaps the rig to its
-  // shell stance (crouched, the valves shut over it, ShellClose to enter,
-  // ShellOpen to leave). Dying, the valves fly open and the pearl rolls out
-  // dark. Drawn 7.0 at its 1.15 (2.7 players).
+  // drowned_temple_creatures/sentinel_manta/): the Moonmantle Ray, a giant
+  // sacred manta of moonlight gliding a yard over the flags. Its pearl-white
+  // back carries nine nacre plates carved with the moon's phases (new moon on
+  // its left wingtip to full on its right); the wings thin to edges clear as
+  // water with a filament of cyan light inside; underneath it is deep
+  // turquoise strewn with stars. Its cephalic lobes curl into a silver
+  // crescent round its glowing heart pearl; a whip tail ends in tide-glass.
+  // Idle: a slow wave rolling out along the wings. Walk glides on deep beats,
+  // Run (also its Onrush) darts risen with the wings swept back like an
+  // arrowhead; walkRef/runRef are the glide speeds those beats are authored
+  // for (its wander and its chase). Attack: a cut with the right wing's edge
+  // (CONTACT 0.42); Attack2: the tail arched over its back and lashed down
+  // (0.5). Pearl Slam (1.5 s bar) plays Slam: it rears up on its tail, wings
+  // opened high (about 6 drawn), and drives them down on the bar's end. Pearl
+  // Carapace: temple_fx swaps the rig to its cocoon stance (the wings wrapped
+  // under its belly, moon plates out, ShellClose to enter, ShellOpen bursting
+  // free). Dying, it sinks to the floor and its wing light goes out from the
+  // tips inward, the pearl last. `hover` is its Idle's lowest point (the tail
+  // tip), so the floor of the model stays the floor of the world; drawn 1.6
+  // high at rest and 6.8 wingtip to wingtip at its 1.15 (2.6 players across).
   temple_sentinel: {
     url: `${CREATURES}/temple_sentinel.glb`,
-    height: 6.1,
+    height: 1.4,
+    hover: 0.673,
     clips: SENTINEL_CLIPS,
     phaseClips: {
       [TEMPLE_SENTINEL_SHELL_OPEN]: { clips: SENTINEL_CLIPS, enter: 'ShellOpen' },
       [TEMPLE_SENTINEL_SHELL_CLOSED]: { clips: SENTINEL_SHELL_CLIPS, enter: 'ShellClose' },
     },
-    walkRef: 1.11,
-    runRef: 3.88,
+    walkRef: 2.4,
+    runRef: 6.5,
     castClipSync: true,
     authoredAtlas: true,
     selfIllumination: 0.08,

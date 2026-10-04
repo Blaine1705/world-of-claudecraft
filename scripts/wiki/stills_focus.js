@@ -11,6 +11,8 @@
 export const STILL_FOCUS = {
   'models/creatures/crypt_morthen_lich.glb': { bone: 'Head', radius: 0.33, lift: -0.24 },
   'models/creatures/gaol_turnkey.glb': { bone: 'Head', radius: 0.36, lift: -0.3 },
+  // the Moonmantle Ray: a disc far wider than it is tall, framed on its crescent and pearl
+  'models/creatures/temple_sentinel.glb': { bone: 'Head', radius: 0.26, lift: 0.12, yaw: 0.25 },
   'models/creatures/temple_ysolei.glb': {
     bone: 'Head',
     radius: 0.17,

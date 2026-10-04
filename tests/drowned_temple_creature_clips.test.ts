@@ -361,7 +361,7 @@ describe('the Glimmerscale Lurker: the sacred mantis shrimp', () => {
   });
 });
 
-describe('the Pearlguard Sentinel: the clam and coral giant', () => {
+describe('the Pearlguard Sentinel: the Moonmantle Ray', () => {
   it('ships its own body with both stances and a clip for every job', () => {
     expect(clipsOf('public/models/creatures/temple_sentinel.glb').sort()).toEqual(
       [
@@ -386,8 +386,15 @@ describe('the Pearlguard Sentinel: the clam and coral giant', () => {
     expect(v.url).toMatch(/temple_sentinel\.glb$/);
     expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
     expect(v.authoredAtlas).toBe(true);
-    // Drawn 7.0 at its 1.15: 2.7 times the 2.6 player.
-    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(7.0, 1);
+    // A floating manta: its Idle bounds (1.4, belly and tail tip a yard up)
+    // sit `hover` over the floor, so the model's floor stays the world's;
+    // drawn 1.6 high at rest at its 1.15 (its wings span 6.8, 2.6 players).
+    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(1.61, 2);
+    expect(v.hover).toBeCloseTo(0.673, 3);
+    // no feet to match: the glide speeds its beats are authored for, its
+    // wander (about 0.35 of its moveSpeed) and its chase (its moveSpeed)
+    expect(v.walkRef).toBe(2.4);
+    expect(v.runRef).toBe(MOBS.pearlguard_sentinel.moveSpeed);
     expect(v.clips.castByAbility?.[TEMPLE_PEARL_SLAM]).toBe('Slam');
     expect(MOBS.pearlguard_sentinel.trashKit?.wingGust?.castTime).toBe(1.5);
     expect(v.castClipSync).toBe(true);

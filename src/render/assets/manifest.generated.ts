@@ -487,7 +487,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/temple_moonspawn.glb": "/media/models/creatures/temple_moonspawn.228c2574b76c.glb",
   "models/creatures/temple_pilgrim.glb": "/media/models/creatures/temple_pilgrim.68a106bd0ca1.glb",
   "models/creatures/temple_selthe.glb": "/media/models/creatures/temple_selthe.caeb8baf71ae.glb",
-  "models/creatures/temple_sentinel.glb": "/media/models/creatures/temple_sentinel.56a433dd0bda.glb",
+  "models/creatures/temple_sentinel.glb": "/media/models/creatures/temple_sentinel.90289367e306.glb",
   "models/creatures/temple_siren.glb": "/media/models/creatures/temple_siren.f9c52d38262e.glb",
   "models/creatures/temple_snapper.glb": "/media/models/creatures/temple_snapper.74bf9d0fee61.glb",
   "models/creatures/temple_templeguard.glb": "/media/models/creatures/temple_templeguard.071169445ad7.glb",

@@ -216,7 +216,7 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_tidewisp',
   // the Drowned Temple's Blender Glimmerscale Lurker (the sacred mantis shrimp)
   'temple_lurker',
-  // the Drowned Temple's Blender Pearlguard Sentinel (the clam and coral giant)
+  // the Drowned Temple's Blender Pearlguard Sentinel (the Moonmantle Ray)
   'temple_sentinel',
   // the Drowned Temple's Blender Choirmother Selthe (the siren matriarch)
   'temple_selthe',
