@@ -128,6 +128,19 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0.03, up: 2.51, fwd: 0.34 },
     eyes: { side: 0.2, up: 3.74, fwd: 0.79 },
   },
+  // The Gaol Turnkey: water off the hood, the key ring, the chain on his
+  // forearm and the lantern at his hip.
+  gaol_turnkey: {
+    rawHeight: 4.677,
+    drips: [
+      { side: 0.19, up: 4.28, fwd: 0.22 },
+      { side: -1.11, up: 1.56, fwd: 0.48 },
+      { side: 0.91, up: 1.77, fwd: 0.22 },
+      { side: 0.67, up: 2.08, fwd: 0.09 },
+    ],
+    chest: { side: 0.06, up: 3.03, fwd: 0.5 },
+    eyes: { side: 0.17, up: 4.17, fwd: 0.19 },
+  },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {
     rawHeight: 4.4,

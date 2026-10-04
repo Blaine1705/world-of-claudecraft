@@ -53,6 +53,14 @@ nothing here runs in the build or the game.
   long weed mane grown with the head, rag breeches, and the irons (`build_irons`: manacles, collar
   and ankle shackle with snapped chains, rigid on their bones); `clips.py` has Idle, Walk (the
   dragging lurch), Run, Attack, Attack2, Hit, Death.
+- `turnkey/`: the Gaol Turnkey (`public/models/creatures/gaol_turnkey.glb`), grown from the Sergeant's
+  builder: a bloated jailer (the gut, swollen bare arms), a studded jerkin, an apron (the front panel
+  only), the executioner's hood (grown with the head, its cape on `hood_weights`), the collar and the
+  chain on the left forearm, the key ring on the Weapon bone and the lantern twice (`LanternB` at the
+  hip, `LanternH` in the left fist, swapped by keyed scales in LanternRaise); `clips.py` has Idle, Walk,
+  Run, KeySwing, ChainLash, LanternRaise, Cast, Hit, Death. `TURNKEY_RAW_HEIGHT` and
+  `TURNKEY_LANTERN_HIGH` in `bastion_creature_fx_core.ts` come from `../kit/anchors.py -- <abs>/turnkey
+  LanternRaise:0.36`.
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),

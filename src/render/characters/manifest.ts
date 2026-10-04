@@ -4087,8 +4087,9 @@ export const VISUALS: Record<string, VisualDef> = {
 
   // -- the Sunken Bastion trash (sim/content/sunken_bastion.ts) ------------------
   // The Bastion's drowned garrison and its sea beasts, each its own Blender
-  // body (scripts/assets/sunken_bastion_creatures/: drowned.py, turnkey.py,
-  // hag.py, crawler.py, hound.py), all well past the player's size, each with
+  // body (the drowned, the sea hag, the acolyte, the war hound and the Turnkey
+  // sculpted in scripts/assets/sunken_bastion_drowned/; the crabs in
+  // scripts/assets/sunken_bastion_creatures/), all well past the player's size, each with
   // the clips of its one job: the watchman's halberd sweep, the arbalest's
   // aimed lane shot, the sergeant's rallying roar, the sea hag's lure and ward.
   // The drowned stand head and shoulders over a player (about 1.6x for a
@@ -4423,14 +4424,17 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.1,
   },
-  // The Gaol Turnkey (scripts/assets/sunken_bastion_creatures/turnkey.py): a
-  // bloated, waterlogged jailer on the organic kit (baked drowned skin and
-  // leather, rusted iron, barnacles and weed, an iron collar and its broken
-  // chain), no player body. It flails its great ring of keys overhead
-  // (KeySwing) and lashes the key chain flat across its front (ChainLash);
-  // opening the cells it hoists its lantern and rattles the keys
-  // (LanternRaise, played from the lantern flare in
-  // sunken_bastion/bastion_creature_fx.ts).
+  // The Gaol Turnkey: the drowned jailer, sculpted whole on the drowned kit
+  // (scripts/assets/sunken_bastion_drowned/turnkey/): a vast bloated body,
+  // bare swollen arms crusted with barnacles, a studded leather jerkin and a
+  // long apron, an executioner's leather hood with sea light in its eye holes,
+  // an iron collar and its snapped chain, the great ring of keys in his right
+  // fist, a chain wound on his left forearm and the gaol's lantern at his hip.
+  // He flails the ring overhead and down (KeySwing) and lashes the chain off
+  // his forearm (ChainLash); opening the cells he takes the lantern off his
+  // hip and hoists it high, rattling the keys (LanternRaise, played from the
+  // lantern flare in sunken_bastion/bastion_creature_fx.ts at the top of the
+  // raise); the Iron Cage's bar is the ring held up and shaken (Cast).
   bastion_turnkey: {
     url: `${CREATURES}/gaol_turnkey.glb`,
     // The gaol's miniboss: drawn at a boss's size (about 8.3 at its 1.3),
@@ -4447,8 +4451,10 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
     },
+    walkRef: 2.17,
+    runRef: 6.65,
     authoredAtlas: true,
-    selfIllumination: 0.05,
+    selfIllumination: 0.14,
   },
   // The Turnkey's Iron Cage and Ossick's Drowned Anchor (scripts/assets/
   // sunken_bastion_creatures/gaol_props.py): hittable encounter bodies. The
