@@ -67,7 +67,6 @@ import {
 } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { CharacterState, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
@@ -358,6 +357,7 @@ import {
   recordInGameAction,
 } from './moderation_db';
 import {
+  describeRiftFloor,
   jailReturnPoint,
   leaveRiftForModeration,
   moderationReturnSpot,
@@ -2075,6 +2075,8 @@ export class GameServer {
     // without this the target's heavy fields can silently fail to resend.
     moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: target.name });
+    // after the frame: it resets the client's mirrored rift floor
+    describeRiftFloor(this.sim, target.pid, (frame) => this.send(moderator, frame));
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
 
@@ -2117,6 +2119,8 @@ export class GameServer {
     // instead of staying stuck on the spectated target's last-sent values.
     moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: null });
+    // after the frame like enterSpectate's, never queued: a snapshot could overtake it
+    describeRiftFloor(this.sim, moderator.pid, (frame) => this.send(moderator, frame));
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }
 
@@ -3719,10 +3723,8 @@ export class GameServer {
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
     // flap), so the fresh join notice would read as a glitch.
-    // A resumed session's fresh ClientWorld starts with riftFloor null (only
-    // enter/descend/exit emit riftState); re-send it so a resume is not blind.
-    const riftState = riftStateEventFor(this.sim.ctx, session.pid);
-    if (riftState) this.send(session, { t: 'events', list: [riftState] });
+    // Only enter/descend/exit emit riftState: re-send the floor so a resume is not blind.
+    describeRiftFloor(this.sim, session.pid, (frame) => this.send(session, frame));
     if (session.jailed) this.teleportJailedSession(session);
     void this.sendSocialSnapshot(session.characterId);
     return session;

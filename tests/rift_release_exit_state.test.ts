@@ -55,6 +55,19 @@ describe('leaving a rift through a graveyard move clears the online rift floor',
     expect(modes.minimap).toBe('overworld');
   });
 
+  it('a graveyard move out of rift ice clears the latched slide state', () => {
+    const { sim, pid } = enterRiftSolo();
+    const p = sim.entities.get(pid)!;
+    p.riftSliding = true;
+    p.riftSlideDirX = 0;
+    p.riftSlideDirZ = 1;
+    kill(sim, pid);
+    sim.releaseSpirit(pid);
+    expect(p.riftSliding).toBe(false);
+    expect(p.riftSlideDirX).toBe(0);
+    expect(p.riftSlideDirZ).toBe(0);
+  });
+
   it('the ghost walking back in rebuilds the rift floor on the client', () => {
     const { sim, pid, entry } = enterRiftSolo();
     const portal = sim.entities.get(sim.naturalRiftPortals[0].id)!;

@@ -179,6 +179,9 @@ function graveyardForMove(
 ): { x: number; z: number } {
   const gy = ghostGraveyard(ctx, p, graveyards, fallback);
   ctx.emitRiftDeparture(p.id, p.pos);
+  p.riftSliding = false;
+  p.riftSlideDirX = 0;
+  p.riftSlideDirZ = 0;
   return gy;
 }
 
