@@ -76,6 +76,7 @@ import type { ResolvedAbility } from '../sim/sim';
 import {
   cloneItemInstancePayload,
   type DeedStats,
+  DUNGEON_GUIDE_STATES,
   type DungeonDifficulty,
   type Entity,
   type EquipSlot,
@@ -229,6 +230,7 @@ import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
   type MountRaceMirror,
+  mountRaceViewAt,
 } from './mount_race_wire';
 import {
   encodeAnalogMoveInput,
@@ -2742,6 +2744,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
+        e.guideState = DUNGEON_GUIDE_STATES.find((state) => state === w.gds); // a dungeon guide
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.vaultRarity = ['common', 'rare', 'epic', 'legendary'].includes(w.vr) ? w.vr : undefined;
         e.objectItemId = w.obj ?? null;
@@ -3979,21 +3982,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     return this.mountLessonActiveMirror;
   }
   mountRaceView(): MountRaceView | null {
-    const s = this.mountRaceMirror;
-    if (!s) return null;
-    const now = performance.now();
-    const goMs = Math.max(0, s.goDeadlineMs - now);
-    const remMs = Math.max(0, s.deadlineMs - now);
-    return {
-      raceId: s.raceId,
-      phase: s.phase,
-      clearedMask: s.clearedMask,
-      cleared: s.cleared,
-      jumpsTotal: s.jumpsTotal,
-      goTicksLeft: s.phase === 'countdown' ? Math.round((goMs / 1000) * TICK_RATE) : 0,
-      ticksLeft: s.phase === 'racing' ? Math.round((remMs / 1000) * TICK_RATE) : s.timeLimitTicks,
-      timeLimitTicks: s.timeLimitTicks,
-    };
+    return mountRaceViewAt(this.mountRaceMirror, performance.now());
   }
   // Mirror the authoritative race lifecycle into mountRaceMirror (the fold
   // itself lives in mount_race_wire.ts); the events still flow to the HUD
@@ -4841,6 +4830,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   leaveDungeon(): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'leave_dungeon' });
+  }
+  answerDungeonGuide(npcId: number, accept: boolean): void {
+    this.cmd({ cmd: 'dungeon_guide_answer', npcId, accept });
   }
   dungeonDifficulty(): DungeonDifficulty {
     return this.selectedDungeonDifficulty ?? 'normal';

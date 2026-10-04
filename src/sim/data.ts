@@ -76,6 +76,7 @@ import {
   DRAKELANDS_ZONE,
 } from './content/drakelands';
 import { DROWNED_TEMPLE_MOBS } from './content/drowned_temple';
+import { CANTOR_NPCS } from './content/drowned_temple_cantor';
 import { DROWNED_TEMPLE_ITEMS } from './content/drowned_temple_items';
 import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import { FORGEFATHER_ISLE_TERRAIN_EDITS } from './content/ember_coast';
@@ -539,6 +540,9 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
+  // The Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
+  // dynamic, spawned per Temple claim, appended last so no placed NPC moves.
+  ...CANTOR_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the

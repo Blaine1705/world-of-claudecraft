@@ -3784,6 +3784,18 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
+  // The Drowned Temple's lore guide (src/sim/dungeon_guide, content/
+  // drowned_temple_cantor.ts): granted to everyone in the claim when Ysolei
+  // falls while Laverock walks with the group. Cosmetic only: the title.
+  dgn_drowned_temple_cantor: {
+    id: 'dgn_drowned_temple_cantor',
+    name: 'The Last Verse',
+    desc: 'Defeat Ysolei, Avatar of the Drowned Moon, with the Last Cantor of the Pale Choir at your side.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Witness of the Choir' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

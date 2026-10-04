@@ -155,8 +155,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 338 / 3735 with the Gravewyrm Sanctum rework's five encounter deeds
     // (renown 10 each: +50). The Stormbrass Foundry's eight deeds left with
     // the parked dungeon (never shipped).
-    expect(DEED_ORDER.length).toBe(338);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3735);
+    // 339 / 3745 with the Drowned Temple lore guide's The Last Verse (+10).
+    expect(DEED_ORDER.length).toBe(339);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3745);
   });
 
   it('ships the audited per-category counts', () => {
@@ -184,7 +185,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the Sunken Bastion fifth pass's Gaol Turnkey deed.
       // +4 the Wildheart Basin rework's encounter deeds.
       // +5 the Gravewyrm Sanctum rework's encounter deeds.
-      dungeon: 55,
+      // +1 the Drowned Temple lore guide's The Last Verse.
+      dungeon: 56,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -447,6 +449,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_velkhar_cold',
       'dgn_korzul_thin_ice',
       'dgn_sledge_tusker',
+      // The Drowned Temple lore guide (manual grant at Ysolei's fall).
+      'dgn_drowned_temple_cantor',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -843,12 +847,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // the 2026-08-30 release/v0.41.0 sync merge) one more, and the three
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
-    // one more.
-    expect(titles.length).toBe(51);
+    // one more, and the Drowned Temple lore guide's Witness of the Choir
+    // (dgn_drowned_temple_cantor) one more.
+    expect(titles.length).toBe(52);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(51);
+    expect(new Set(titleTexts).size).toBe(52);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1100,7 +1105,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // dgn_velkhar_cold, dgn_korzul_thin_ice, dgn_sledge_tusker) now append
   // straight after dgn_turnkey_cage, minted the same auditable way: the
   // Turnkey's bfd70a94... literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = '668cf4cbf66f29ab425ac55c43fce082fede5b6144432ee94bae9e51bd75316c';
+  // Re-baselined for the Drowned Temple lore guide's appended deed
+  // (dgn_drowned_temple_cantor) the same auditable way: the 668cf4cb...
+  // literal rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = '1dbf9b9c77910e4d5c0d58592d5a418e017fbfe900f9898b494f1d6a1ac31222';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1185,21 +1193,14 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // The Wildheart Basin rework's four deeds and the Gravewyrm Sanctum
   // rework's five append after dgn_turnkey_cage (the Stormbrass Foundry's
   // deeds that once sat between them left with the parked dungeon); the
-  // previous mint is the Turnkey's bfd70a94... literal (rotated down here),
-  // and stripping the nine must reproduce it exactly.
+  // previous mint was the Turnkey's bfd70a94... literal.
+  //
+  // The Drowned Temple lore guide's deed appends after dgn_sledge_tusker; the
+  // previous mint is the 668cf4cb... literal (rotated down here), and
+  // stripping the one must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    'bfd70a94893390e2b0b26eaad7891366626e891a8e1674e51af0dfede2f8f1f9';
-  const APPENDED_SINCE: readonly string[] = [
-    'dgn_beastmaster_apart',
-    'dgn_gorgebloom_clean',
-    'dgn_zulgar_uncaught',
-    'dgn_great_saurian',
-    'dgn_korgath_all_chains',
-    'dgn_korgath_still_bound',
-    'dgn_velkhar_cold',
-    'dgn_korzul_thin_ice',
-    'dgn_sledge_tusker',
-  ];
+    '668cf4cbf66f29ab425ac55c43fce082fede5b6144432ee94bae9e51bd75316c';
+  const APPENDED_SINCE: readonly string[] = ['dgn_drowned_temple_cantor'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1211,8 +1212,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_crypt_knellwyrm',
-      'dgn_turnkey_cage',
+      'dgn_korzul_thin_ice',
+      'dgn_sledge_tusker',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1436,7 +1437,8 @@ describe('table shape', () => {
     // Hermit's last, then the Drowned Temple's four, the Mere Hydra's last,
     // then the Knellwyrm and the Gaol Turnkey, then the Wildheart Basin's
     // four and the Gravewyrm Sanctum's five, the Sledge Tusker's last.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_sledge_tusker');
+    // The Drowned Temple lore guide's The Last Verse appends after it.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_drowned_temple_cantor');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

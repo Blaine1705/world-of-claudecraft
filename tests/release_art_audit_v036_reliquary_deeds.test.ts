@@ -271,6 +271,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_velkhar_cold',
       'dgn_korzul_thin_ice',
       'dgn_sledge_tusker',
+      // The Drowned Temple lore guide's deed rides the dungeon crest too.
+      'dgn_drowned_temple_cantor',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -284,7 +286,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // so the painted count still holds at 289. 319 with the Buried Hoards Coinsack
     // catch (2026-09-28 merge), also pending: still 289 painted. 338 with the
     // five-dungeon rework's 19 encounter deeds, all pending: still 289 painted.
-    expect(DEED_ORDER).toHaveLength(338);
+    // 339 with the Drowned Temple lore guide's deed, pending: still 289.
+    expect(DEED_ORDER).toHaveLength(339);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

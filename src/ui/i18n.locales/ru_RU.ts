@@ -20410,4 +20410,109 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Движется на {pct}% быстрее и охотится на свою Добычу. Замедления и обездвиживания действуют, оглушения длятся вдвое меньше.',
   'hudChrome.auraEffect.wildheart.vanished':
     'Скрыт и неуязвим. Вот-вот бросится на самого дальнего игрока.',
+  // The Drowned Temple lore guide, Laverock (src/sim/content/drowned_temple_cantor.ts).
+  'dungeonGuide.drownedTemple.greet.1':
+    'Я был самым юным голосом Бледного хора. В ночь обряда я не выпил и сбежал. С тех пор каждое полнолуние я слышу, как они поют под водой. Я должен увидеть её, прежде чем умру. Позвольте мне идти позади вас. Я не стану сражаться и не задержу вас.',
+  'dungeonGuide.drownedTemple.greet.2':
+    'Каждое полнолуние я прихожу к этим вратам, и каждое полнолуние мне изменяет мужество. Но не сегодня. Хор поёт, а сбежал от него я. Отведите меня к ней, и я не буду вам мешать.',
+  'dungeonGuide.drownedTemple.row.join': 'Идём с нами.',
+  'dungeonGuide.drownedTemple.row.decline': 'Мы пойдём одни.',
+  'dungeonGuide.drownedTemple.joined': 'Ведите. Я прямо за вами.',
+  'dungeonGuide.drownedTemple.singing': 'Дайте мне петь. Ступайте, и ступайте с миром.',
+  'dungeonGuide.drownedTemple.accept.1': 'Спасибо. Я пойду позади вас и не стану мешать.',
+  'dungeonGuide.drownedTemple.accept.2':
+    'Значит, наконец-то я спускаюсь. Идите вперёд. Я не отстану.',
+  'dungeonGuide.drownedTemple.decline': 'Я понимаю. Я буду слушать отсюда, сверху, как всегда.',
+  'dungeonGuide.drownedTemple.heroicWater':
+    'Вода сегодня стоит высоко, выше, чем я когда-либо видел. Она вот-вот проснётся.',
+  'dungeonGuide.drownedTemple.memory.votaries':
+    'Утопленники на берегу вошли в воду уже после того, как врата закрылись. Их забрала не луна, а только вода.',
+  'dungeonGuide.drownedTemple.memory.rubbing':
+    'Страж приливов прочёл мои слова на прибрежном камне. «Оно лишь спит». Я вырезал их наутро.',
+  'dungeonGuide.drownedTemple.area.steps':
+    'Ступени паломников. В ту ночь я взбежал по ним через три ступени и ни разу не оглянулся.',
+  'dungeonGuide.drownedTemple.sight.pilgrim':
+    'Паломники из прибрежных деревень. Каждую весну они несли свою святыню на спине. Теперь несут её вечно.',
+  'dungeonGuide.drownedTemple.sight.acolyte':
+    'Послушницы. Я учился грамоте рядом с ними. Теперь они поют во сне и никогда не просыпаются.',
+  'dungeonGuide.drownedTemple.area.causeway.1':
+    'В ночи обряда луна ложилась на эту дамбу, словно вторая дорога.',
+  'dungeonGuide.drownedTemple.area.causeway.2':
+    'Посмотрите на воду. Она всё ещё помнит, как держать луну.',
+  'dungeonGuide.drownedTemple.sight.templeguard':
+    'Стража лестницы. Они поклялись держать храм, пока не зайдёт луна. Луна так и не зашла.',
+  'dungeonGuide.drownedTemple.sight.snapper':
+    'Мы пили лунную воду из таких раковин. Свою я уронил на лестнице.',
+  'dungeonGuide.drownedTemple.sight.siren':
+    'Этот голос. Она пела рядом со мной в хоре. До сих пор вступает на полдоли раньше.',
+  'dungeonGuide.drownedTemple.sight.lurker':
+    'Дети ловили таких сетями на мелководье. Они были с большой палец и светились.',
+  'dungeonGuide.drownedTemple.sight.tidewisp':
+    'Это сама лунная вода, тот глоток, что мы должны были выпить. Не дайте ей вас коснуться.',
+  'dungeonGuide.drownedTemple.area.colonnade':
+    'Колоннада приливов. Мы шли по ней по двое, распевая восходящий стих.',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    'Жертвенные раковины у ворот. Мы клали в них жемчуг на удачу. Теперь они носят его вместо сердца.',
+  'dungeonGuide.drownedTemple.sight.eel':
+    'Угри лагуны. Послушницы кормили их хлебом в сумерках. Они разжирели на наших гимнах.',
+  'dungeonGuide.drownedTemple.area.veil':
+    'За этой завесой Двор хора. Я не стоял там с тех пор, как был мальчишкой.',
+  'dungeonGuide.drownedTemple.selthe.pre.1':
+    'Матушка Селте. Она учила меня дышать животом. Она научила нас всех тонуть, не умирая.',
+  'dungeonGuide.drownedTemple.selthe.pre.2':
+    'Матерь хора Селте. Каждую ноту, что я знаю, вложила в меня она. Прости меня, матушка.',
+  'dungeonGuide.drownedTemple.selthe.post.1':
+    'Она молчит. За все мои годы в хоре она ни разу не молчала.',
+  'dungeonGuide.drownedTemple.selthe.post.2':
+    'Покойся, матушка. Ты была права насчёт меня. Я так и не научился держать долгие ноты.',
+  'dungeonGuide.drownedTemple.area.terraces':
+    'Приливные заводи. Послушницы чистили их и кормили маленьких светящихся созданий, что жили в них.',
+  'dungeonGuide.drownedTemple.area.falls':
+    'За водопадом вода заглушает любой голос. Я прятался здесь, когда прогуливал спевки.',
+  'dungeonGuide.drownedTemple.area.pool':
+    'Лунный пруд. Они стояли вокруг него на коленях и пили из своих раковин. Я не смог поднять свою.',
+  'dungeonGuide.drownedTemple.hydra.pre':
+    'Змей пруда. Когда я был мальчишкой, у него была одна голова, и он ел у нас с рук.',
+  'dungeonGuide.drownedTemple.hydra.post':
+    'Слушайте. Под водопадом они всё ещё поют. Теперь ближе.',
+  'dungeonGuide.drownedTemple.area.prismStair':
+    'Лестница призмы. Мы поднимались по ней на восходе луны, чтобы пробудить великое стекло.',
+  'dungeonGuide.drownedTemple.colossus.pre':
+    'Великая призма. Мы пели в неё, чтобы поймать луну. Я и не знал, что она может встать.',
+  'dungeonGuide.drownedTemple.sight.reflection':
+    'Оно показывает, во что вас превратила бы вода. Разбейте его!',
+  'dungeonGuide.drownedTemple.colossus.post':
+    'Стекло разбито. Теперь не осталось ничего, что поймает луну, кроме неё.',
+  'dungeonGuide.drownedTemple.area.moonbridge.1':
+    'Мост из лунного света. Старейшины говорили, что пройти по нему могут лишь верные.',
+  'dungeonGuide.drownedTemple.area.moonbridge.2':
+    'Я никогда не был верным. Что ж. Посмотрим, выдержит ли он меня.',
+  'dungeonGuide.drownedTemple.area.altarLanding':
+    'Вот где я стоял. Прямо здесь. Здесь я повернулся и побежал.',
+  'dungeonGuide.drownedTemple.ysolei.pre':
+    'Вот она. Всю жизнь я спрашивал себя, богиня она или чудовище. Покажите мне.',
+  'dungeonGuide.drownedTemple.ysolei.preHeroic':
+    'В такую ночь с ней поёт весь хор. Держитесь, все вы.',
+  'dungeonGuide.drownedTemple.sight.moonspawn':
+    'Это никогда не были мои люди. Они её, сотканные из одного лунного света.',
+  'dungeonGuide.drownedTemple.farewell.answer':
+    'Она не была ни тем, ни другим. Она была луной в воде, а на колени вставали мы сами.',
+  'dungeonGuide.drownedTemple.farewell.verse':
+    'У обряда был последний стих, тот, что даёт певцам уснуть. Я так его и не спел.',
+  'dungeonGuide.drownedTemple.farewell.stay':
+    'Они ждали достаточно. Я останусь и спою его для них сейчас.',
+  'dungeonGuide.drownedTemple.farewell.goodbye.1':
+    'Поднимайтесь в ночь. Если услышите пение в полнолуние, это всего лишь я.',
+  'dungeonGuide.drownedTemple.farewell.goodbye.2':
+    'Спасибо, что довели старого труса до конца его песни. Теперь ступайте.',
+  'dungeonGuide.drownedTemple.farewell.emote':
+    '{name} возвышает голос над алтарём, и лагуна затихает.',
+  'dungeonGuide.drownedTemple.wipe':
+    'Вставайте. Прошу вас. Не оставляйте меня здесь внизу одного снова.',
+  'dungeonGuide.drownedTemple.catchUp': 'Ноги мои стары, но я знаю здесь каждую ступень. Я здесь.',
+  'abilityUi.cast.cantor_last_verse': 'Последний стих',
+  'entities.npcs.cantor_laverock.name': 'Лаверок',
+  'entities.npcs.cantor_laverock.title': 'Последний кантор Бледного хора',
+  'entities.npcs.cantor_laverock.greeting':
+    'Я был самым юным голосом Бледного хора. В ночь обряда я не выпил и сбежал. С тех пор каждое полнолуние я слышу, как они поют под водой. Я должен увидеть её, прежде чем умру. Позвольте мне идти позади вас. Я не стану сражаться и не задержу вас.',
 };

@@ -5094,6 +5094,44 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // Laverock, the Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
+  // the Blender-built old cantor (E:/woc/laverock-work/builder, adapted from the
+  // Velkhar kit): bone-white habit, the stiff crescent stole, the nacre
+  // medallion, the driftwood staff with its carved moon, the long beard and
+  // hair. Built broad and rounded to sit beside the chibi player (wide
+  // shoulders and a flared hem, a bigger head, big hands, a stout staff).
+  // Normalized on the idle bounds (the staff's moon is the top) so his crown
+  // stands about 2.97 yd, a head over the player. His gestures ride the
+  // overhead emotes the guide sets as he speaks (point = Talk, cry = Startle,
+  // kneel = Kneel) and the song is his channel cast (cantor_last_verse, the
+  // Sing loop). The Walk's long gliding stride covers 1.25 yd/s at this
+  // scale, so the guide's 3.2 yd/s follow walk plays it about 2.6x with the
+  // feet planted; the 7 yd/s catch-up run caps lower and slides a little.
+  npc_laverock: {
+    url: `${CREATURES}/temple_laverock.glb`,
+    height: 3.75,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Walk',
+      attack: ['Talk'],
+      death: 'Idle',
+      cast: 'Sing',
+      castByAbility: { cantor_last_verse: 'Sing' },
+      emote: {
+        point: { clips: ['Talk'] },
+        cry: { clips: ['Startle'] },
+        kneel: { clips: ['Kneel'] },
+      },
+    },
+    walkRef: 1.25,
+    runRef: 1.25,
+    walkTimeScaleMax: 2.8,
+    runTimeScaleMax: 3.6,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
+    clickRadius: 0.9,
+  },
   npc_villager_robed: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
@@ -6248,6 +6286,7 @@ const NPC_KEYS: Record<string, string> = {
   infiltrator_bram: 'npc_knight',
   infiltrator_tessa: 'npc_knight',
   calligraphy_instructor: 'npc_villager_robed',
+  cantor_laverock: 'npc_laverock',
   calligraphy_apprentice_1: 'npc_villager',
   calligraphy_apprentice_2: 'npc_villager',
   bursar_fernando: 'npc_fernando',

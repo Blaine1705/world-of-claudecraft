@@ -32,6 +32,7 @@ import {
   DROWNED_TEMPLE_GATES,
   DROWNED_TEMPLE_SPAWNS,
 } from './drowned_temple';
+import { CANTOR_NPC_ID, CANTOR_SPAWN } from './drowned_temple_cantor';
 import { DROWNED_TEMPLE_ANCHORS } from './drowned_temple_layout';
 import { HEROIC_FINALE_COPPER } from './dungeon_difficulty';
 
@@ -995,6 +996,10 @@ export const TEMPLE_DUNGEON_DEFS: Record<string, DungeonDef> = {
     bossExitPortal: { x: -12, z: 196 },
     spawns: DROWNED_TEMPLE_SPAWNS,
     objects: [...DROWNED_TEMPLE_GATE_OBJECTS],
+    // Laverock, the optional lore guide, waits on the Moongate Landing.
+    npcs: [
+      { npcId: CANTOR_NPC_ID, x: CANTOR_SPAWN.x, z: CANTOR_SPAWN.z, facing: CANTOR_SPAWN.facing },
+    ],
     gates: DROWNED_TEMPLE_GATES,
     // No skipping: every pack is gated, and pulling Ysolei early still wakes
     // anything left alive (instances/boss_chain_pull.ts).

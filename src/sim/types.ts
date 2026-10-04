@@ -9,6 +9,7 @@ import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
 import type { TreasureMapRarity } from './content/treasure_maps';
+import type { DungeonGuideRun } from './dungeon_guide/types';
 import type { KorgathFightState } from './encounters/gravewyrm_sanctum/korgath_state';
 import type { KorzulFightState } from './encounters/gravewyrm_sanctum/korzul_state';
 import type { VelkharFightState } from './encounters/gravewyrm_sanctum/velkhar_state';
@@ -5962,7 +5963,25 @@ export interface ClientMirroredEntityFields {
   ferryRiding?: boolean;
   ferryDeck?: FerryDeckMirror | null;
   ferryDeckPrev?: FerryDeckMirror | null;
+  /** A dungeon guide NPC's offer and run state (src/sim/dungeon_guide): the
+   *  dialog's rows and greeting read it. Wired as `gds`; absent on every
+   *  other entity. */
+  guideState?: DungeonGuideState;
 }
+
+/** A dungeon guide's state as the client sees it: his offer stands (`open`,
+ *  or `declined` and still open to a change of mind), he walks with the group
+ *  (`joined`), the offer lapsed unanswered or refused (`closed`), or he sings
+ *  his finale (`singing`). */
+export type DungeonGuideState = 'open' | 'declined' | 'joined' | 'closed' | 'singing';
+/** Every DungeonGuideState, for decoding the wire's `gds` (unknown drops). */
+export const DUNGEON_GUIDE_STATES: readonly DungeonGuideState[] = [
+  'open',
+  'declined',
+  'joined',
+  'closed',
+  'singing',
+];
 
 export interface Entity extends ClientMirroredEntityFields {
   guardianState?: GuardianState;
@@ -6730,6 +6749,9 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */
   templeFight?: TempleFightState;
+  /** A dungeon guide NPC's run (src/sim/dungeon_guide): offer, speech queue,
+   *  trail and finale. Sim authority only; the client reads `guideState`. */
+  guideRun?: DungeonGuideRun;
   /** Per-fight state of a Wildheart Basin encounter (encounters/wildheart_basin:
    *  the Great Saurian, and the bosses in phase B). Sim authority only; the
    *  client reads the fight from casts, auras and the encounter objects. */
@@ -7642,6 +7664,15 @@ export type SimEvent = { pid?: number } & (
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
+  // A dungeon guide's line (src/sim/dungeon_guide), always personal: one copy
+  // per player in the claim. Ids only, never English (the deedUnlocked rule):
+  // the client resolves the line's key from the guide's record and shows it as
+  // a quiet `say` bubble plus a chat line (an emote line has no bubble).
+  | { type: 'dungeonGuideLine'; guideId: string; lineId: string; npcId: number }
+  // A dungeon guide begins his finale song (always personal, one copy per player
+  // in the claim): the world positions (x, y, z triplets, rounded) where the
+  // fallen he sings to rest lie, so the renderer can raise them as light.
+  | { type: 'dungeonGuideFinale'; guideId: string; npcId: number; spots: number[] }
   // Account ledger relic record (always personal: emitted with pid). Fired
   // when the acting character is appended as a finder of a catalogued relic
   // (an item, an authored mark, or a mount) on its account ledger

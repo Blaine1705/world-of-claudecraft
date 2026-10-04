@@ -350,6 +350,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/quest_strip_core.ts',
   'src/ui/hud/action_bar/item_bags_line_core.ts',
   'src/ui/hud/quest/clue_talk_row_core.ts',
+  'src/ui/hud/quest/dungeon_guide_dialog_core.ts',
+  'src/ui/hud/dungeon/dungeon_guide_speech_view.ts',
   'src/ui/hud/action_bar/trinket_slot_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',
@@ -808,6 +810,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
+  // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
+  'src/render/body_emote_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
   'src/render/far_lod_latch_core.ts',
   // The Hollow Crypt finale's effect plan (Morthen's entrance, the Knellwyrm).
@@ -886,6 +890,8 @@ const RENDER_PURE_CORES = [
   'src/render/characters/smooth_normals_core.ts',
   'src/render/drowned_temple/temple_shore_core.ts',
   'src/render/drowned_temple/temple_fx_core.ts',
+  // Laverock's finale on the Moon Altar (the fallen rising as moonlight).
+  'src/render/drowned_temple/temple_cantor_finale_core.ts',
   // The trash kit's death-burst rings: their look and their fuse.
   'src/render/death_burst_fx_core.ts',
   // The Gravewyrm Sanctum (render/gravewyrm_sanctum): the palette, fires and

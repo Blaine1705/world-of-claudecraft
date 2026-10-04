@@ -217,8 +217,13 @@ export class ParticlePool {
   private readonly life: THREE.InstancedBufferAttribute;
   private readonly shape: THREE.InstancedBufferAttribute;
   private readonly color: THREE.InstancedBufferAttribute;
+  private readonly attrs: readonly THREE.InstancedBufferAttribute[];
   private cursor = 0;
-  private dirty = false;
+  /** The slots written since the last upload: a run of `dirtyCount` slots from
+   *  `dirtyStart`, wrapping round the ring. Only that run is uploaded, so a
+   *  busy pool sends a few particles a frame, never its whole buffer. */
+  private dirtyStart = 0;
+  private dirtyCount = 0;
   /** When the last particle born so far dies (the pool hides after it). */
   lastDeath = -1;
 
@@ -250,6 +255,7 @@ export class ParticlePool {
     this.geo.setAttribute('aShape', this.shape);
     this.geo.setAttribute('aColor', this.color);
     this.geo.instanceCount = capacity;
+    this.attrs = [this.pos0, this.vel, this.acc, this.life, this.shape, this.color];
     this.mesh = new THREE.Mesh(this.geo, material);
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = order;
@@ -259,6 +265,8 @@ export class ParticlePool {
   emit(now: number, p: ParticleSpec): void {
     const i = this.cursor;
     this.cursor = (this.cursor + 1) % this.capacity;
+    if (this.dirtyCount === 0) this.dirtyStart = i;
+    this.dirtyCount = Math.min(this.capacity, this.dirtyCount + 1);
     this.pos0.setXYZ(i, p.x, p.y, p.z);
     this.vel.setXYZ(i, p.vx, p.vy, p.vz);
     this.acc.setXYZ(i, p.ax ?? 0, p.ay ?? 0, p.az ?? 0);
@@ -266,14 +274,22 @@ export class ParticlePool {
     this.shape.setXYZW(i, p.size0, p.size1, p.spin ?? 0, p.seed ?? (i * 0.6180339) % 1);
     this.color.setXYZW(i, p.r, p.g, p.b, p.a);
     this.lastDeath = Math.max(this.lastDeath, now + p.life);
-    this.dirty = true;
   }
 
   update(now: number): void {
-    if (this.dirty) {
-      for (const a of [this.pos0, this.vel, this.acc, this.life, this.shape, this.color])
+    const n = this.dirtyCount;
+    if (n > 0) {
+      const start = this.dirtyStart;
+      const head = Math.min(n, this.capacity - start);
+      for (const a of this.attrs) {
+        a.clearUpdateRanges();
+        if (n < this.capacity) {
+          a.addUpdateRange(start * a.itemSize, head * a.itemSize);
+          if (head < n) a.addUpdateRange(0, (n - head) * a.itemSize);
+        }
         a.needsUpdate = true;
-      this.dirty = false;
+      }
+      this.dirtyCount = 0;
     }
     this.mesh.visible = now <= this.lastDeath;
   }

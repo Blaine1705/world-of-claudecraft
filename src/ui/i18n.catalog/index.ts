@@ -8,6 +8,7 @@ import { worldEntityText as worldNames } from '../world_entity_i18n';
 import { abilityStrings, classAbilityNames } from './abilities';
 import { apiErrorStrings } from './api_error';
 import { clueStrings } from './clues';
+import { dungeonGuideStrings } from './dungeon_guides';
 import { editorStrings } from './editor';
 import { gameStrings } from './game';
 import { guideStrings } from './guide';
@@ -21,6 +22,7 @@ import { shellStrings } from './shell';
 export { abilityStrings, classAbilityNames } from './abilities';
 export { apiErrorStrings } from './api_error';
 export { clueStrings } from './clues';
+export { dungeonGuideStrings } from './dungeon_guides';
 export { editorStrings } from './editor';
 export {
   gameStrings,
@@ -249,6 +251,8 @@ export const en = {
   apiError: apiErrorStrings,
   // Clue Scroll hunt titles and per-step riddles (src/ui/i18n.catalog/clues.ts).
   clues: clueStrings,
+  // The dungeon lore guides' lines and dialog (src/ui/i18n.catalog/dungeon_guides.ts).
+  dungeonGuide: dungeonGuideStrings,
   guide: guideStrings,
   editor: editorStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.

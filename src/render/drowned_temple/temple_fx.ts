@@ -37,6 +37,7 @@ import { type TelegraphFan, TelegraphKit, type TelegraphLane } from '../floor_te
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
+import { TempleCantorFinaleFx } from './temple_cantor_finale_fx';
 import {
   isTemplePilgrimFrenzyCue,
   stepTempleShellStance,
@@ -108,6 +109,8 @@ export class TempleFx {
   private readonly kit: TelegraphKit;
   private readonly hydra: TempleHydra;
   private readonly ysolei: TempleYsoleiFx;
+  // Laverock's finale: the fallen rising as moonlight while he sings.
+  private readonly cantor: TempleCantorFinaleFx;
   private readonly flashesOn: boolean;
   /** Each living Pearlguard Sentinel's shell stance and when it changed. */
   private readonly shellStance = new Map<number, TempleShellTrack>();
@@ -163,6 +166,7 @@ export class TempleFx {
     this.root.add(hydraRoot);
     this.hydra = new TempleHydra(hydraRoot, world, this.flashesOn, groundY);
     this.ysolei = new TempleYsoleiFx(this.root, scene, world, groundY, this.flashesOn);
+    this.cantor = new TempleCantorFinaleFx(this.root, world, this.flashesOn);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -172,6 +176,7 @@ export class TempleFx {
   handleEvent(ev: SimEvent): boolean {
     this.hydra.handleEvent(ev);
     this.ysolei.handleEvent(ev);
+    this.cantor.handleEvent(ev);
     if (ev.type === 'spellfx') {
       const source = this.world?.entities.get(ev.sourceId);
       // Claimed only when the Frenzy can actually play (a host without the
@@ -200,6 +205,7 @@ export class TempleFx {
     }
     this.hydra.update(dt, this.clock);
     this.ysolei.update(dt, this.clock);
+    this.cantor.update(dt, this.clock);
     for (const slot of this.casts) {
       if (slot.casterId < 0) continue;
       const caster = world.entities.get(slot.casterId);
@@ -510,6 +516,7 @@ export class TempleFx {
     this.disposed = true;
     this.hydra.dispose();
     this.ysolei.dispose();
+    this.cantor.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();

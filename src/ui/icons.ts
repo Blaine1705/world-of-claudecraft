@@ -5633,6 +5633,9 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_velkhar_cold',
   'dgn_korzul_thin_ice',
   'dgn_sledge_tusker',
+  // The Drowned Temple's lore guide deed (The Last Verse): the dungeon crest
+  // until its painting is commissioned.
+  'dgn_drowned_temple_cantor',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

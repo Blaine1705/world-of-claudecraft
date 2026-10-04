@@ -123,6 +123,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // the ground band so temple_fx.ts's encounter-band rings and flood half-disc
   // always paint over them.
   { file: 'src/render/drowned_temple/temple_ysolei_fx.ts', layer: 'ground', strict: true },
+  // Laverock's finale: the pool of light at his feet, the lagoon's glow and the
+  // fallen's glowing outlines lie on the floor and the water (ground band); it
+  // plays once the last boss is dead, so no telegraph is ever under it.
+  { file: 'src/render/drowned_temple/temple_cantor_finale_fx.ts', layer: 'ground', strict: true },
   // The Wildheart Basin's brazier pools on its floors (the world's own light).
   { file: 'src/render/wildheart_basin/basin_lights.ts', layer: 'ground', strict: true },
   // The spirit light pooled on the jaguar maw's jaw once the way out opens.
