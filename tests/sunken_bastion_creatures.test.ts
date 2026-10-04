@@ -52,14 +52,18 @@ function referencedClips(key: string): string[] {
 
 const ROSTER: Record<string, { glb: string; unique: string[] }> = {
   barnacle_crawler: { glb: 'bastion_crawler.glb', unique: ['Attack2', 'Death', 'Cast'] },
-  bastion_warhound: { glb: 'bastion_warhound.glb', unique: ['Leap', 'Land', 'Attack2'] },
+  bastion_warhound: {
+    glb: 'bastion_warhound.glb',
+    unique: ['Leap', 'Land', 'Attack2', 'Howl', 'Stunned'],
+  },
   bastion_revenant: { glb: 'drowned_revenant.glb', unique: ['Attack', 'Attack2'] },
-  drowned_watchman: { glb: 'drowned_watchman.glb', unique: ['HalberdSweep'] },
+  drowned_watchman: { glb: 'drowned_watchman.glb', unique: ['HalberdSweep', 'CombatIdle'] },
   fogbound_arbalest: { glb: 'drowned_arbalest.glb', unique: ['Aim', 'Shoot'] },
-  drowned_sergeant: { glb: 'drowned_sergeant.glb', unique: ['Rally'] },
+  drowned_sergeant: { glb: 'drowned_sergeant.glb', unique: ['Rally', 'CombatIdle'] },
   shackled_prisoner: { glb: 'drowned_prisoner.glb', unique: ['Attack', 'Attack2'] },
   gaol_turnkey: { glb: 'gaol_turnkey.glb', unique: ['KeySwing', 'ChainLash', 'LanternRaise'] },
   mistweaver: { glb: 'mist_chanter.glb', unique: ['Ward', 'Cast'] },
+  tidebound_acolyte: { glb: 'tidebound_acolyte.glb', unique: ['Mend'] },
 };
 
 describe('the Sunken Bastion creature roster', () => {
@@ -145,6 +149,21 @@ describe('the Sunken Bastion creature roster', () => {
     const nodes = glbNodeNames(def.url);
     for (const bone of ['Bolt', 'StringD', 'StringR', 'Crank'])
       expect(nodes.has(bone), bone).toBe(true);
+  });
+
+  it("keeps the Sanctum Thawcaller on the sea hag's first rig when the Chanter changed", () => {
+    // The Gravewyrm Sanctum's Thawcaller placeholder is a re-tint spread from
+    // the Mist Chanter's row; it keeps the first hag GLB (its own file) so the
+    // Bastion's sculpted Chanter never changes another dungeon's look.
+    const chanter = VISUALS[keyOf('mistweaver')];
+    const thaw = VISUALS.sanctum_thawcaller;
+    expect(chanter.url).toBe('models/creatures/mist_chanter.glb');
+    expect(chanter.authoredAtlas).toBe(true);
+    expect(thaw.url).toBe('models/creatures/mist_chanter_thawcaller.glb');
+    expect(thaw.authoredAtlas).toBeUndefined();
+    const clips = glbClips(thaw.url);
+    for (const clip of ['Idle', 'Walk', 'Run', 'Attack', 'Attack2', 'Hit', 'Death', 'Cast', 'Ward'])
+      expect(clips.has(clip), clip).toBe(true);
   });
 
   it('no Bastion trash mob wears a KayKit skeleton any more', () => {

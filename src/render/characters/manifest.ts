@@ -125,6 +125,12 @@ import {
 } from '../hollow_crypt/morthen_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
+import {
+  OSSICK_ANCHOR_AWAY_GESTURE,
+  OSSICK_ANCHOR_BACK_MESH,
+  OSSICK_ANCHOR_HOME_GESTURE,
+  VAEL_VEIL_RISE_CLIP_RATE,
+} from '../sunken_bastion/bastion_gaol_reaper_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import type { ClipTrackDrops } from './clip_track_drops';
@@ -219,6 +225,13 @@ export interface ClipMap {
    *  actions are cached per clip and a clip shared with attackByAbility would
    *  otherwise carry that route's one-shot timescale into the cast loop. */
   castTimeScaleByAbility?: Record<string, number>;
+  /** Cast clips that rise INTO sight (the body under the floor, rising): they
+   *  take the rig at full weight at once instead of crossfading out of the
+   *  pose before them (which blends the standing pose into the first frames,
+   *  a figure popping in upright before it drops and rises), and play ONCE,
+   *  holding their last pose (a loop drops the body back under for a frame).
+   *  See anim_state.ts clipSnapsIn. */
+  castSnapIn?: readonly string[];
   sitDown?: string;
   sitIdle?: string;
   /** swim base. On the authored player lane this is the SUBMERGED stroke and
@@ -481,8 +494,9 @@ export interface VisualDef {
    *  cutting a plain swing or flinch (never a one-shot in
    *  oneShotsHoldAttacks), and the clip's time is held to the bar's elapsed
    *  time, so a clip that entered late still strikes on the bar's end
-   *  (anim_state.ts castClipSyncTime). */
-  castClipSync?: boolean;
+   *  (anim_state.ts castClipSyncTime). A list of ability ids locks only those
+   *  casts (castClipSyncs): the rest of the rig's cast clips keep looping. */
+  castClipSync?: boolean | readonly string[];
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -4087,31 +4101,56 @@ export const VISUALS: Record<string, VisualDef> = {
 
   // -- the Sunken Bastion trash (sim/content/sunken_bastion.ts) ------------------
   // The Bastion's drowned garrison and its sea beasts, each its own Blender
-  // body (scripts/assets/sunken_bastion_creatures/: drowned.py, turnkey.py,
-  // hag.py, crawler.py, hound.py), all well past the player's size, each with
+  // body (the drowned, the sea hag, the acolyte, the war hound and the Turnkey
+  // sculpted in scripts/assets/sunken_bastion_drowned/; the crabs in
+  // scripts/assets/sunken_bastion_creatures/), all well past the player's size, each with
   // the clips of its one job: the watchman's halberd sweep, the arbalest's
   // aimed lane shot, the sergeant's rallying roar, the sea hag's lure and ward.
   // The drowned stand head and shoulders over a player (about 1.6x for a
   // prisoner, 2x for the elite sailors, 2.6x for the sergeant); presentation
   // only, the templates' gameplay is untouched.
+  // The Bastion Revenant: a drowned marine sculpted whole (scripts/assets/
+  // sunken_bastion_drowned/: the OpenVDB sculpt kit), bloated sea-grey flesh
+  // under a morion with a high comb and a boat brim, sea light in its sunken
+  // eyes and open mouth, rusted half-plate crusted with barnacles and hung
+  // with kelp, the Bastion's tower-over-waves on a torn tabard, a buckler on
+  // the bare left forearm and a heavy cutlass with a knuckle bow. Its Onrush
+  // dash runs in the Run clip; Rise (hauling itself up out of the tide) is
+  // its flourish. Drips, brine sprays and its death gush are
+  // sunken_bastion/bastion_drowned_fx.ts. walkRef/runRef are the clips' own
+  // foot speeds at the drawn size.
   bastion_drowned_revenant: {
     url: `${CREATURES}/drowned_revenant.glb`,
-    height: 4.7,
+    height: 4.95,
     clips: {
       idle: 'Idle',
+      combatIdle: 'CombatIdle',
       walk: 'Walk',
       run: 'Run',
-      attack: ['Attack', 'Attack2'],
+      attack: ['Attack', 'Attack2', 'Attack3'],
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
+      flourish: 'Rise',
     },
+    walkRef: 1.73,
+    runRef: 6.68,
+    authoredAtlas: true,
+    selfIllumination: 0.18,
   },
+  // The Drowned Watchman: the wall watch sculpted whole on the Revenant's kit,
+  // gaunt and upright where the Revenant is bloated and hunched: a kettle hat
+  // with a drooping brim, a riveted brigandine with the tower sigil, a split
+  // watch coat to the knees, a long halberd with a sodden pennon and a sea-light
+  // lantern at the hip. He stands at attention with the pole upright, thrusts
+  // and chops with both hands, and the Halberd Sweep winds the pole back
+  // through the bar and lands the sweep as it ends (1.575 s at 1.05x = the 1.5 s
+  // bar), the follow-through playing out after.
   bastion_skel_watchman: {
     url: `${CREATURES}/drowned_watchman.glb`,
-    height: 4.85,
+    height: 4.9,
     clips: {
       idle: 'Idle',
+      combatIdle: 'CombatIdle',
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
@@ -4121,17 +4160,28 @@ export const VISUALS: Record<string, VisualDef> = {
       // The pole is drawn back through the bar and sweeps as it ends.
       castByAbility: { [BASTION_HALBERD_SWEEP]: 'HalberdSweep' },
       castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 1.05 },
+      castPlayOut: ['HalberdSweep'],
     },
+    walkRef: 1.45,
+    runRef: 6.33,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
-  // A heavy crossbow (long stock, wide steel prod, a drawn string and a
-  // loaded bolt). Shoot is the Rusted Bolt: shouldered over the 0.6 s windup,
-  // the loose on the release frame, the kick, then the windlass cranked and a
-  // fresh bolt laid in. Aim is the Piercing Bolt: held down the lane over the
-  // 2 s bar, the loose landing as the bar ends, the reload playing out after.
-  // The bolts themselves fly in sunken_bastion/bastion_creature_fx.ts.
+  // The Fogbound Arbalest: the wall's marksman sculpted whole on the
+  // Revenant's kit, stooped and wary where the Watchman stands tall: a deep
+  // sodden hood and mantle, rags wound over the lower face, a quilted gambeson
+  // instead of plate, a quiver at the hip and a heavy windlass crossbow (long
+  // stock, steel prod, a drawn string and a loaded bolt, each on its own bone)
+  // carried low across the body. Shoot is the Rusted Bolt: shouldered over the
+  // 0.6 s windup, the loose on the release frame (the bolt and the drawn string
+  // vanish, the loosed string shows), the kick, then the nose dropped, the
+  // windlass cranked and a fresh bolt laid in. Aim is the Piercing Bolt: held
+  // down the lane over the 2 s bar, the loose landing as the bar ends, the
+  // reload playing out after. The bolts themselves fly in
+  // sunken_bastion/bastion_creature_fx.ts from ARBALEST_MUZZLE.
   bastion_skel_arbalest: {
     url: `${CREATURES}/drowned_arbalest.glb`,
-    height: 5.4,
+    height: 5.1,
     attackTimeScale: 1,
     clips: {
       idle: 'Idle',
@@ -4146,26 +4196,54 @@ export const VISUALS: Record<string, VisualDef> = {
       castPlayOut: ['Aim'],
     },
     castPlayOutHoldsAttacks: true,
+    walkRef: 1.55,
+    runRef: 7.2,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
+  // The Drowned Sergeant: the wall's sergeant sculpted whole on the Revenant's
+  // kit, the heaviest plate on the wall over a barrel-chested drowned body: a
+  // closed great helm with a T-slit (the sea light burning in the slit and the
+  // mouth slot) and a ragged kelp plume, huge layered pauldrons crusted with
+  // barnacles, the sergeant's faded sash across the breast, the Bastion's
+  // tabard and a bearded boarding axe carried on the shoulder, the left fist
+  // on his hip. Attack cleaves down off the shoulder, Attack2 is a two-handed
+  // overhead chop; Rally (the axe thrust high, the fist beaten on the breast)
+  // is his flourish. walkRef/runRef are the clips' own foot speeds at the
+  // drawn size.
   bastion_skel_sergeant: {
     url: `${CREATURES}/drowned_sergeant.glb`,
-    height: 4.85,
+    // 4.85 to the crown of the helm; the shouldered axe head rides above it.
+    height: 5.15,
     clips: {
       idle: 'Idle',
+      combatIdle: 'CombatIdle',
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
-      // Rally the Watch: the cutlass thrust high and the roar.
+      // Rally the Watch: the axe thrust high and the fist on the breast.
       flourish: 'Rally',
     },
+    walkRef: 2.19,
+    runRef: 8.23,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
-  // The Mist Chanter: a hunched sea hag with an anglerfish-lure staff.
+  // The Mist Chanter: the sea hag who sings the fog in, sculpted whole on the
+  // drowned kit (scripts/assets/sunken_bastion_drowned/chanter/): a tall bent
+  // crone, bone and slack grey skin, a long hooked nose under a deep shawl-hood
+  // of rag and old fishing net, lank weed-hair spilling out to her breast, sea
+  // light in her eyes, rag skirts to her bare feet and a crooked driftwood
+  // staff dangling an anglerfish lure of sea light. Chilling Mist comes off the
+  // lure thrust out (Attack) or off her claw swept across (Attack2), both
+  // releasing 0.6 s in (the petSpell windup); Fog Ward is the staff raised in
+  // both hands and circled overhead. Drawn taller than before so she looms
+  // over a player; presentation only.
   bastion_mistweaver: {
     url: `${CREATURES}/mist_chanter.glb`,
-    height: 3.5,
+    height: 4.4,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4177,61 +4255,120 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Cast',
       castByAbility: { [BASTION_FOG_WARD]: 'Ward' },
     },
-    selfIllumination: 0.08,
+    walkRef: 1.11,
+    runRef: 4.57,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
-  // The Tidebound Acolyte: a living cultist of Vael's hymn in sea-green robes.
+  // The Tidebound Acolyte: a living cultist of Vael's hymn, sculpted whole on
+  // the drowned kit (scripts/assets/sunken_bastion_drowned/acolyte/): tall and
+  // upright in layered sea-green robes with wide sleeves, a deep cowl under a
+  // tall finned mitre, gill slits in the neck and sea light in the eyes, a
+  // shell medallion, a coral-crowned staff holding a pearl of sea light and a
+  // great conch in the left hand. He fights with the staff (a two-handed blow
+  // down, a flat sweep of the crown); Brine Mend loops the conch held high and
+  // tipped over the bar. Drawn well past a player now; presentation only.
   bastion_acolyte: {
-    url: `${PLAYERS}/mage.glb`,
-    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
-    height: HUMANOID_H * 1.35,
+    url: `${CREATURES}/tidebound_acolyte.glb`,
+    height: 5.0,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
-      castByAbility: { [BASTION_BRINE_MEND]: 'Spellcast_Raise' },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Mend',
+      castByAbility: { [BASTION_BRINE_MEND]: 'Mend' },
     },
-    show: ['Mage_Hat'],
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.55,
+    walkRef: 1.06,
+    runRef: 4.86,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
 
-  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion). Knight-
-  // Commander Olen: a towering drowned knight behind a great shield, planting
-  // himself and roaring his oath over the Oathbound Charge's bar.
+  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion), each sculpted
+  // whole on the drowned kit. Knight-Commander Olen (scripts/assets/
+  // sunken_bastion_drowned/olen/): the officer his drowned garrison still serves,
+  // towering over it in fluted plate trimmed with tarnished brass, the Bastion's
+  // tower-over-waves in brass on his breast; a grand morion with a crest of
+  // faded crimson horsehair and a bevor up under the nose, sea light burning in
+  // the shadow of the brim; a commander's cloak torn to the calves, a great
+  // tower shield held by its upright grip (the sigil in brass, barnacles crusting
+  // its foot) and a broad longsword. He chops over the shield's rim, drives the
+  // shield in and reaps with a flat sweep (Attack3, his Reaping Arc); the
+  // Oathbound Charge's bar is OathCharge (stamp, the oath roared with the sword
+  // to the sky, down behind the shield), bar-locked so he launches on the bar's
+  // end into Run, the shield-first charge; Breached he reels in Stunned.
   bastion_olen: {
-    url: `${ENEMIES}/skeleton_warrior.glb`,
-    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
-    height: 5.4,
+    url: `${CREATURES}/knight_commander_olen.glb`,
+    // Drawn over the sergeant (7.2) and the Turnkey (8.3) at his 1.2: about 8.9.
+    height: 7.4,
     clips: {
-      ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal'], 'Taunt'),
-      castByAbility: { [OLEN_OATHBOUND_CHARGE]: 'Taunt' },
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2', 'Attack3'],
+      hit: ['Hit'],
+      death: 'Death',
+      stunned: 'Stunned',
+      cast: 'OathCharge',
+      castByAbility: { [OLEN_OATHBOUND_CHARGE]: 'OathCharge' },
       castTimeScaleByAbility: { [OLEN_OATHBOUND_CHARGE]: 1 },
     },
-    attach: [
-      { url: `${WEAPONS}/skeleton_blade.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/skeleton_shield_large_a.glb`, bone: 'handslot.l' },
-    ],
-    tint: 0x6f8a86,
-    tintStrength: 0.35,
+    castClipSync: true,
+    walkRef: 2.5,
+    runRef: 9.93,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
-  // Gaoler Ossick: the gaol's hulking warden, hurling the Drowned Anchor with a
-  // one-hand throw, flinging the Shackle Pair with a two-hand heave, and
-  // bringing the cudgel down in his great slam.
+  // Gaoler Ossick (scripts/assets/sunken_bastion_drowned/ossick/): the gaol's
+  // master, drowned in his own yard, sculpted whole on the drowned kit: a hulking
+  // hunched brute, the shoulders heaped up past his ears and crusted with
+  // barnacles, arms like mooring posts ending in his own snapped manacles, a
+  // bald drowned head caged in an iron brank with sea light behind the bands, a
+  // leather harness over the bare grey chest, a ship's anchor slung on his back
+  // on a chain over the shoulder, shackle pairs at his hip and an iron-bound
+  // cudgel. Every bar is bar-locked, its release on the bar's end and its
+  // follow-through played out: AnchorHurl takes the anchor off his back and
+  // hurls it one-handed (the slung anchor, its own mesh, stays hidden while his
+  // thrown one lies on a victim: bastion_gaol_fx.ts re-sends the gestures),
+  // ShackleHeave thrusts the cudgel through his belt and heaves the shackles in
+  // both fists, CudgelSlam brings the cudgel straight down.
   bastion_ossick: {
-    url: `${ENEMIES}/skeleton_golem.glb`,
-    height: 6.2,
+    url: `${CREATURES}/gaoler_ossick.glb`,
+    // Hunched, yet over the Turnkey (8.3) and Olen (8.9) at his 1.4: about 9.8.
+    height: 7.0,
     clips: {
-      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
-      attack: ['Golem_Slam'],
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'CudgelSlam',
       castByAbility: {
-        [OSSICK_ANCHOR]: '1H_Melee_Attack_Chop',
-        [OSSICK_SHACKLE]: '2H_Melee_Attack_Chop',
-        [OSSICK_CUDGEL]: 'Golem_Slam',
+        [OSSICK_ANCHOR]: 'AnchorHurl',
+        [OSSICK_SHACKLE]: 'ShackleHeave',
+        [OSSICK_CUDGEL]: 'CudgelSlam',
       },
+      castTimeScaleByAbility: { [OSSICK_ANCHOR]: 1, [OSSICK_SHACKLE]: 1, [OSSICK_CUDGEL]: 1 },
+      castPlayOut: ['AnchorHurl', 'ShackleHeave', 'CudgelSlam'],
     },
-    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
-    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
-    tint: 0x5b6a64,
-    tintStrength: 0.35,
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    meshToggles: [
+      {
+        nodes: [OSSICK_ANCHOR_BACK_MESH],
+        hideNow: OSSICK_ANCHOR_AWAY_GESTURE,
+        showNow: OSSICK_ANCHOR_HOME_GESTURE,
+      },
+    ],
+    walkRef: 2.74,
+    runRef: 9.37,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
   },
   // Vael the Fogbinder, Death itself, and his shadow copies wear ONE look (the
   // veil hides him among them; only the Fogbeacon's beam tells them apart):
@@ -4265,8 +4402,20 @@ export const VISUALS: Record<string, VisualDef> = {
         // The Fog Veil: all four figures rise out of the roof the same way.
         [VAEL_VEIL_RISE]: 'Emerge',
       },
+      // The veil's rise is twice the Emerge clip's length: played at bar pace
+      // it rises ONCE over the whole bar (looped at rate 1 it rose, dropped
+      // back under and rose again).
+      castTimeScaleByAbility: { [VAEL_VEIL_RISE]: VAEL_VEIL_RISE_CLIP_RATE },
+      // Emerge starts under the flags: it takes the body at once, never
+      // crossfading out of a standing pose (a copy popping in upright).
+      castSnapIn: ['Emerge'],
       flourish: 'ScytheSweep',
     },
+    // The sink and the rises follow their bars (the Shadow Crossing's sink
+    // would otherwise run late behind a swing, so the sim moved him to the
+    // pool while he still stood above the floor); the Hymn and the Mist Surge
+    // keep looping.
+    castClipSync: [VAEL_SHADOWSTEP, VAEL_REAPING_SCYTHE, VAEL_VEIL_RISE],
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 2.2,
@@ -4277,6 +4426,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // eyes, hooked mandibles round a toothed maw) and three brine sacs in its
   // crust. Its Death swells the sacs and BURSTS them at 1.5 s, on the Brine
   // Burst's own fuse; Attack2 is its lunge bite.
+  // The Barnacle Crawler, toned down for the Bastion's fog: a wet stone-grey
+  // carapace crusted with pale barnacles, dull red-brown legs, small dark eyes
+  // with a pinpoint of sea light; its brine sacs stay the brightest thing on it
+  // (they swell before it bursts).
   bastion_crawler: {
     url: `${CREATURES}/bastion_crawler.glb`,
     height: 3.2,
@@ -4289,13 +4442,22 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
     },
-    selfIllumination: 0.06,
+    selfIllumination: 0.12,
   },
-  // The Bastion Warhound: a shark-headed sea hound in the garrison's spiked
-  // war-collar. Its Lunge flies in the Leap pose and lands on Land.
+  // The Bastion Warhound: one of the garrison's war mastiffs, drowned with its
+  // handlers and risen with them (scripts/assets/sunken_bastion_drowned/
+  // warhound/: the quadruped sculpt kit). Gaunt and slack-hided, the ribs
+  // standing out and a hole torn through the left flank to the bone, a snarl
+  // of yellowed teeth under an iron chamfron, sea light in its eyes and throat;
+  // a spiked iron war collar with a snapped chain, a quilted war-coat with
+  // riveted lames down the spine and the Bastion's caparison on the flanks,
+  // barnacled and hung with kelp. Its Lunge flies in the Leap pose (held while
+  // airborne) and lands on Land; Attack is a lunging bite with a tearing
+  // shake, Attack2 rears up and slams both forepaws down; Howl is its
+  // flourish. walkRef/runRef are the clips' own foot speeds at the drawn size.
   bastion_warhound: {
     url: `${CREATURES}/bastion_warhound.glb`,
-    height: 3.0,
+    height: 3.55,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4303,12 +4465,23 @@ export const VISUALS: Record<string, VisualDef> = {
       attack: ['Attack', 'Attack2'],
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
       jump: 'Leap',
       land: 'Land',
+      stunned: 'Stunned',
+      flourish: 'Howl',
     },
-    selfIllumination: 0.06,
+    walkRef: 2.22,
+    runRef: 8.07,
+    authoredAtlas: true,
+    selfIllumination: 0.14,
   },
+  // The Shackled Prisoner: one of the gaol's chained dead, sculpted whole on
+  // the drowned kit (scripts/assets/sunken_bastion_drowned/prisoner/): a
+  // starved grey body with every rib standing out, a long matted mane of weed
+  // over a grinning drowned face, rag breeches, iron manacles, collar and an
+  // ankle shackle with their chains snapped short. Hunched and twitching, he
+  // lurches dragging the shackled foot and fights like a cornered animal: both
+  // fists hammered down (Attack), a lunge for the throat (Attack2).
   bastion_prisoner: {
     url: `${CREATURES}/drowned_prisoner.glb`,
     height: 4.6,
@@ -4319,17 +4492,23 @@ export const VISUALS: Record<string, VisualDef> = {
       attack: ['Attack', 'Attack2'],
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
     },
+    walkRef: 1.21,
+    runRef: 5.7,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
   },
-  // The Gaol Turnkey (scripts/assets/sunken_bastion_creatures/turnkey.py): a
-  // bloated, waterlogged jailer on the organic kit (baked drowned skin and
-  // leather, rusted iron, barnacles and weed, an iron collar and its broken
-  // chain), no player body. It flails its great ring of keys overhead
-  // (KeySwing) and lashes the key chain flat across its front (ChainLash);
-  // opening the cells it hoists its lantern and rattles the keys
-  // (LanternRaise, played from the lantern flare in
-  // sunken_bastion/bastion_creature_fx.ts).
+  // The Gaol Turnkey: the drowned jailer, sculpted whole on the drowned kit
+  // (scripts/assets/sunken_bastion_drowned/turnkey/): a vast bloated body,
+  // bare swollen arms crusted with barnacles, a studded leather jerkin and a
+  // long apron, an executioner's leather hood with sea light in its eye holes,
+  // an iron collar and its snapped chain, the great ring of keys in his right
+  // fist, a chain wound on his left forearm and the gaol's lantern at his hip.
+  // He flails the ring overhead and down (KeySwing) and lashes the chain off
+  // his forearm (ChainLash); opening the cells he takes the lantern off his
+  // hip and hoists it high, rattling the keys (LanternRaise, played from the
+  // lantern flare in sunken_bastion/bastion_creature_fx.ts at the top of the
+  // raise); the Iron Cage's bar is the ring held up and shaken (Cast).
   bastion_turnkey: {
     url: `${CREATURES}/gaol_turnkey.glb`,
     // The gaol's miniboss: drawn at a boss's size (about 8.3 at its 1.3),
@@ -4346,8 +4525,10 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
     },
+    walkRef: 2.17,
+    runRef: 6.65,
     authoredAtlas: true,
-    selfIllumination: 0.05,
+    selfIllumination: 0.14,
   },
   // The Turnkey's Iron Cage and Ossick's Drowned Anchor (scripts/assets/
   // sunken_bastion_creatures/gaol_props.py): hittable encounter bodies. The

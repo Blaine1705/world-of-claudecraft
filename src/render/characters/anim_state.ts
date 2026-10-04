@@ -72,6 +72,31 @@ export const CAST_CLIP_SYNC_SLACK = 0.12;
  * slack from it (it entered late behind a swing or a flinch), else null (leave
  * it). Clamped inside the clip so it never wraps.
  */
+/**
+ * Whether the cast clip for `ability` is bar-locked (VisualDef.castClipSync):
+ * `true` locks every per-ability cast clip of the rig; a list locks only those
+ * abilities, so a rig can lock a one-off rise to its bar while its channel
+ * loops (Vael's Emerge off the floor beside his looping Hymn).
+ */
+export function castClipSyncs(
+  sync: boolean | readonly string[] | undefined,
+  ability: string | null | undefined,
+): boolean {
+  if (sync === true) return true;
+  if (!sync || !ability) return false;
+  return sync.includes(ability);
+}
+
+/**
+ * Whether a clip takes the rig at full weight at once instead of crossfading
+ * out of the pose before it (ClipMap.castSnapIn): a body whose clip starts out
+ * of sight (under the floor) must never blend its standing pose into the first
+ * frames, or it reads as popping in standing and then dropping.
+ */
+export function clipSnapsIn(snapIn: readonly string[] | undefined, clip: string): boolean {
+  return snapIn?.includes(clip) === true;
+}
+
 export function castClipSyncTime(
   clipTime: number,
   castElapsed: number | undefined,

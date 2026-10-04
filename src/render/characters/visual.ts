@@ -37,8 +37,10 @@ import {
   advanceSwimBlend,
   advanceTreadBlend,
   type BaseState,
+  castClipSyncs,
   castClipSyncTime,
   castHoldStep,
+  clipSnapsIn,
   desiredBaseState,
   drivesPose,
   gaitWindDownTimeScale,
@@ -1178,7 +1180,7 @@ export class CharacterVisual {
         baseChanged &&
         desired === 'cast' &&
         this.currentIsOneShot &&
-        this.def.castClipSync &&
+        castClipSyncs(this.def.castClipSync, this.castingAbility) &&
         !this.oneShotHoldsAttacks()
       ) {
         // A bar-locked strike (VisualDef.castClipSync) takes the body from a
@@ -1239,7 +1241,7 @@ export class CharacterVisual {
           this.current.timeScale = castScale;
           // A bar-locked strike follows the bar (it may have entered late).
           if (
-            this.def.castClipSync &&
+            castClipSyncs(this.def.castClipSync, this.castingAbility) &&
             this.castingAbility &&
             this.current === this.action(this.def.clips.castByAbility?.[this.castingAbility])
           ) {
@@ -3950,7 +3952,9 @@ export class CharacterVisual {
     next.setLoop(oneShot || this.isOnce(next) ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
     next.clampWhenFinished = true;
     next.timeScale = 1;
-    this.beginAction(next, prev, fade);
+    // A clip that starts out of sight (ClipMap.castSnapIn) takes the rig at once.
+    const snap = clipSnapsIn(this.def.clips.castSnapIn, next.getClip().name);
+    this.beginAction(next, prev, snap ? 0 : fade);
     this.current = next;
     this.currentIsOneShot = oneShot;
     this.currentOneShotIsEmote = false;
@@ -3995,7 +3999,7 @@ export class CharacterVisual {
       if (a === next || a === prev || a.paused || !a.isRunning()) continue;
       a.stop();
     }
-    if (prev && prev !== next && drivesPose(readActionWeight(prev))) {
+    if (fade > 0 && prev && prev !== next && drivesPose(readActionWeight(prev))) {
       prev.fadeOut(fade);
       // Arm the cadence wind-down on the SAME action the mixer is fading, and
       // only for a gait that was actually running forward: a reversed
@@ -4019,7 +4023,9 @@ export class CharacterVisual {
     // exists to SNAP, and fading a near-dead prev out from weight 1 would blend
     // it ~50/50 against the snapped `next` for the whole fade, the opposite of
     // what the docblock above promises.
-    if (prev && prev !== next && !prev.paused && prev.isRunning()) prev.stop();
+    // A snap-in (fade 0, ClipMap.castSnapIn) stops even a paused prev (a clamped
+    // clip still holds its pose): nothing standing may blend into the rise.
+    if (prev && prev !== next && (fade <= 0 || (!prev.paused && prev.isRunning()))) prev.stop();
     next.setEffectiveWeight(1);
     next.play();
   }
@@ -4051,6 +4057,9 @@ export class CharacterVisual {
    *  as long as the body is off the ground. Rigs without a `land` clip keep
    *  looping `jump` unchanged, and a flier (VisualDef.flight) never clamps. */
   private isOnce(a: THREE.AnimationAction): boolean {
+    // A rise into sight (ClipMap.castSnapIn) plays once and holds its last
+    // pose: a loop would drop the body back out of sight for a frame.
+    if (clipSnapsIn(this.def.clips.castSnapIn, a.getClip().name)) return true;
     if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
     // A flier's `jump` is its flight loop (or its perch): it never clamps.
     if (this.def.flight) return false;

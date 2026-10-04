@@ -375,6 +375,35 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     expect(b - f.others[1].hp).toBeGreaterThan(first);
   });
 
+  it('the real Vael stands as still as his shades through the veil (no drift-and-snap tell)', () => {
+    // His tank stays where he was, off his rim spot: his chase used to walk
+    // him a step toward the tank each tick and the veil snapped him back past
+    // half a yard, a stutter only the real one showed.
+    const { f, vael } = roof();
+    run(f, 0.5);
+    vael.hp = Math.round(vael.maxHp * 0.69);
+    run(f, DT * 2);
+    const shade = shades(f)[0];
+    const moves = { vael: 0, shade: 0 };
+    const drawn: number[] = [];
+    let last = { vael: { ...vael.pos }, shade: { ...shade.pos } };
+    const step = (a: { x: number; z: number }, b: { x: number; z: number }) =>
+      Math.hypot(a.x - b.x, a.z - b.z);
+    run(f, VAEL_TUNING.hymnSeconds - 2, () => {
+      if (step(vael.pos, last.vael) > 1e-6) moves.vael++;
+      if (step(shade.pos, last.shade) > 1e-6) moves.shade++;
+      // The renderer draws him between prevPos and pos: a still body has both
+      // on its spot.
+      drawn.push(step(vael.prevPos, vael.pos));
+      last = { vael: { ...vael.pos }, shade: { ...shade.pos } };
+    });
+    expect(moves.shade).toBe(0);
+    expect(moves.vael).toBe(0);
+    expect(Math.max(...drawn)).toBeLessThan(1e-6);
+    const r = Math.hypot(vael.pos.x - f.ox - CROWN.x, vael.pos.z - f.oz - CROWN.z);
+    expect(r).toBeCloseTo(CROWN.r - 5, 3);
+  });
+
   it('striking a shade bursts it (Fogburst), and costs the deed', () => {
     const { f, vael } = roof();
     run(f, 0.5);

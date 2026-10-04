@@ -9,7 +9,9 @@
 import * as THREE from 'three';
 import { radialGlowTexture } from '../textures';
 
-const PUFFS = 48;
+// Room for the veil's four rising figures (their fog collars and shed fog)
+// beside the cage, anchor and pool effects.
+const PUFFS = 64;
 const CHUNKS = 36;
 
 interface Puff {

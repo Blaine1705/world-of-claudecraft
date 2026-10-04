@@ -10,7 +10,8 @@
 //    runs (on heroic, the Anchor Crash's ring round it), the impact, the iron
 //    chain from the Drowning Winch to the anchor heating red as its victim
 //    nears the pit, the pit's rim burning while anyone is hooked, the links
-//    bursting when the chain breaks and a plume of sea water when it does not;
+//    bursting when the chain breaks and a plume of sea water when it does not,
+//    and the anchor slung on Ossick's back hidden while his thrown one lies out;
 //  - the Shackle Pair: the chain between the two, hanging slack or drawn
 //    taut and glowing hot past its reach, and the ring they must keep inside.
 //
@@ -53,6 +54,7 @@ import {
   anchorHeat,
   CAGE_CRUSH_SECONDS,
   CAGE_MARK_RADIUS,
+  ossickAnchorGesture,
   PIT_RIM_RADIUS,
   shackleLook,
   shackleRingRadius,
@@ -123,6 +125,7 @@ export class BastionGaolFx {
     private readonly groundY: (x: number, z: number) => number,
     private readonly world: IWorld | undefined,
     private readonly cosmetic: boolean,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'sunken-bastion-gaol-fx';
     parent.add(this.root);
@@ -205,6 +208,10 @@ export class BastionGaolFx {
     }
     for (const id of [...this.cages.keys()]) if (!seenCages.has(id)) this.cages.delete(id);
     for (const id of [...this.anchors.keys()]) if (!seenAnchors.has(id)) this.anchors.delete(id);
+    // Ossick's slung anchor hides while a thrown one lies out; re-sent every scan
+    // (idempotent), so a view built mid-fight takes the state.
+    if (this.ossickId >= 0)
+      this.playGesture?.(this.ossickId, ossickAnchorGesture(seenAnchors.size));
   }
 
   // ---- events ------------------------------------------------------------------------

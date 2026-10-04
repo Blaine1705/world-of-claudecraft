@@ -120,6 +120,34 @@ describe('Vael, Death itself: the Shadowstep and the scythe from behind', () => 
     expect(vael.castTotal).toBeCloseTo(VAEL_TUNING.riseSeconds, 5);
   });
 
+  // The Shadowstep's bar used to sit full for its whole 2.4 s (only the rise's
+  // bar ran down), so a bar-locked sink drawn from it stood still above the
+  // floor and the HUD bar never filled.
+  it('runs the Shadowstep bar down on the sink and the wait under the pool', () => {
+    const { f, vael } = roof();
+    sinking(f, vael);
+    const total = VAEL_TUNING.vanishSeconds + VAEL_TUNING.poolSeconds;
+    expect(vael.castTotal).toBeCloseTo(total, 5);
+    const start = f.sim.ctx.time;
+    let prev = vael.castRemaining;
+    const seen: number[] = [];
+    until(
+      f,
+      () => vael.castingAbility !== VAEL_SHADOWSTEP,
+      total + 1,
+      () => {
+        if (vael.castingAbility !== VAEL_SHADOWSTEP) return;
+        expect(vael.castRemaining).toBeLessThanOrEqual(prev + 1e-9);
+        prev = vael.castRemaining;
+        seen.push(vael.castTotal - vael.castRemaining - (f.sim.ctx.time - start));
+      },
+    );
+    // Its elapsed time is the step's own clock, within a tick, from sink to rise.
+    expect(seen.length).toBeGreaterThan(30);
+    for (const d of seen) expect(Math.abs(d)).toBeLessThan(DT * 1.5);
+    expect(vael.castingAbility).toBe(VAEL_REAPING_SCYTHE);
+  });
+
   it('a mark who stepped out of the arc takes nothing', () => {
     const { f, vael } = roof();
     sinking(f, vael);

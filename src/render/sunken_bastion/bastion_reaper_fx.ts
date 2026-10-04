@@ -7,14 +7,19 @@
 //  - the Reaping Scythe: a pale crescent of soul fire trailing the blade
 //    through the arc (the sweep itself is his ScytheSweep flourish);
 //  - heroic Grave Shadow: the pool left burning, ringed where it bites;
+//  - the Fog Veil's emergence: dark sea water wells up and boils on the flags
+//    under every figure, each rises out of it (the Emerge clip, once over the
+//    rise bar) with fog and brine shedding off the shroud as it climbs, and a
+//    pall of fog marks where the real one melted away; identical for the real
+//    Vael and his copies, so the rise never gives him away;
 //  - soul wisps drifting round every reaper figure (his shadow copies too, so
 //    they never give the real one away).
 //
 // Rules (src/render/CLAUDE.md): pooled meshes and materials built once under
 // the Bastion telegraph root (compile-gated by BastionFx), no per-frame
 // allocation. The sweep fan, the pool and the Grave Shadow ring draw on every
-// tier (a player acts on them); the smoke, wisps and the blade trail shed on
-// the low tier.
+// tier (a player acts on them), and so does the veil's boil (the emergence
+// itself); the smoke, wisps, shed fog and the blade trail shed on the low tier.
 
 import * as THREE from 'three';
 import {
@@ -24,6 +29,7 @@ import {
   VAEL_ID,
   VAEL_REAPING_SCYTHE,
   VAEL_SHADOWSTEP,
+  VAEL_TUNING,
   VAEL_VEIL_RISE,
 } from '../../sim/encounters/sunken_bastion/ids';
 import type { SimEvent } from '../../sim/types';
@@ -43,12 +49,27 @@ import {
   REAPER_SWEEP_ARC_DEG,
   REAPER_SWEEP_RANGE,
   reaperWarningFill,
+  VEIL_BOIL_RADIUS,
+  veilBoilAlpha,
+  veilBoilDone,
+  veilBoilScale,
+  veilRiseEmerged,
 } from './bastion_gaol_reaper_core';
 import { BastionParticles } from './bastion_particles';
 
 const SCAN_SEC = 0.1;
 const POOL_SLOTS = 3;
 const TRAIL_SEC = 0.4;
+/** The veil's four figures (the real Vael and three shades). */
+const BOIL_SLOTS = 4;
+/** A figure's hood peak over its feet (model units; scaled by e.scale). */
+const FIGURE_HEIGHT = 6.5;
+/** A jump this far on the rise's first frame is the real one melting away. */
+const MELT_JUMP = 2;
+/** Fog puffs a second rolling round a rising figure's waist at the flags, and
+ *  shed off its shroud as it climbs (cosmetic tier only). */
+const COLLAR_PER_SEC = 9;
+const SHED_PER_SEC = 7;
 
 const POOL_VERT = /* glsl */ `
 varying vec2 vUv;
@@ -92,6 +113,50 @@ void main() {
 }
 `;
 
+// The veil's boil: black sea water welling up through the flags, churning,
+// flecked with foam, a grey fog rolling at its rim.
+const BOIL_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uAlpha;
+uniform float uSeed;
+varying vec2 vUv;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {
+  vec2 i = floor(p); vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+void main() {
+  vec2 c = vUv - 0.5;
+  float r = length(c) * 2.0;
+  if (r > 1.0) discard;
+  float a = atan(c.y, c.x);
+  float t = uTime + uSeed;
+  // Roiling cells welling outward from the middle.
+  float n = noise(c * 5.0 - normalize(c + 1e-4) * t * 0.9 + uSeed);
+  float n2 = noise(c * 12.0 + vec2(t * 1.3, -t * 0.9));
+  float bubbles = smoothstep(0.74, 0.9, n2) * (1.0 - r * 0.8);
+  float fog = smoothstep(0.45, 0.95, r) * (0.5 + 0.5 * noise(vec2(a * 3.0 + t * 0.5, r * 4.0 - t)));
+  vec3 col = mix(vec3(0.004, 0.01, 0.012), vec3(0.02, 0.06, 0.055), n);
+  col += vec3(0.5, 0.66, 0.62) * bubbles * 0.45;
+  col = mix(col, vec3(0.16, 0.21, 0.2), fog * 0.35);
+  float edge = 1.0 - smoothstep(0.7, 1.0, r);
+  gl_FragColor = vec4(col, (0.9 * edge + 0.25 * fog * (1.0 - r)) * uAlpha);
+  #include <colorspace_fragment>
+}
+`;
+
+interface BoilSlot {
+  entityId: number;
+  since: number;
+  x: number;
+  z: number;
+  y: number;
+  height: number;
+  mesh: THREE.Mesh;
+  mat: THREE.ShaderMaterial;
+}
+
 interface PoolSlot {
   objectId: number;
   since: number;
@@ -117,8 +182,11 @@ export class BastionReaperFx {
   private readonly figureIds: number[] = [];
   private vaelId = -1;
   private vaelCast: string | null = null;
-  /** Each veil figure's last-seen bar (the rise geyser fires on its edge). */
+  /** Each veil figure's last-seen bar (the emergence starts on its edge). */
   private readonly figureCast = new Map<number, string | null>();
+  /** Each figure's last drawn spot (where the real one melts from). */
+  private readonly figureAt = new Map<number, { x: number; z: number }>();
+  private readonly boils: BoilSlot[] = [];
   private scan = 0;
   private clock = 0;
 
@@ -163,6 +231,26 @@ export class BastionReaperFx {
         accent: TELEGRAPH_ACCENTS.shadow,
       });
       this.pools.push({ objectId: -1, since: 0, mesh, mat, fan, grave, wasGrave: false });
+    }
+    // The veil's boil under each rising figure (every tier: it is the rise).
+    for (let i = 0; i < BOIL_SLOTS; i++) {
+      const mat = new THREE.ShaderMaterial({
+        name: 'sunkenBastionVeilBoil',
+        vertexShader: POOL_VERT,
+        fragmentShader: BOIL_FRAG,
+        uniforms: { uTime: sharedUniforms.uTime, uAlpha: { value: 0 }, uSeed: { value: i * 7.3 } },
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        fog: false,
+      });
+      this.materials.push(mat);
+      const mesh = new THREE.Mesh(disc, mat);
+      mesh.visible = false;
+      mesh.frustumCulled = false;
+      mesh.renderOrder = floorVfxRenderOrder('encounter', 10);
+      this.root.add(mesh);
+      this.boils.push({ entityId: -1, since: 0, x: 0, z: 0, y: 0, height: 0, mesh, mat });
     }
     if (cosmetic) {
       // The blade's trail: a crescent of soul fire swept through the arc.
@@ -248,6 +336,7 @@ export class BastionReaperFx {
     }
     this.updatePools(world, dt);
     this.updateRise(world);
+    this.updateBoils(world, dt);
     this.updateTrail(dt);
     this.updateWisps(world);
     this.fx.update(dt);
@@ -325,7 +414,9 @@ export class BastionReaperFx {
   }
 
   /** The geyser of shadow as he rises out of the pool (his Emerge bar), and
-   *  as every Fog Veil figure rises out of the roof together (the veil rise). */
+   *  the emergence as every Fog Veil figure rises out of the roof together
+   *  (the veil rise): the boil under each, and the fog where the real one
+   *  melted away. */
   private updateRise(world: IWorld): void {
     const vael = this.vaelId >= 0 ? world.entities.get(this.vaelId) : undefined;
     const cast = vael?.castingAbility ?? null;
@@ -337,12 +428,121 @@ export class BastionReaperFx {
     for (const id of this.figureIds) {
       const e = world.entities.get(id);
       const now = e && !e.dead ? e.castingAbility : null;
-      if (e && now === VAEL_VEIL_RISE && this.figureCast.get(id) !== VAEL_VEIL_RISE)
-        this.geyser(e.pos.x, e.pos.z);
+      if (e && now === VAEL_VEIL_RISE && this.figureCast.get(id) !== VAEL_VEIL_RISE) {
+        // The real one melts where he stood (only he stood anywhere before).
+        const was = this.figureAt.get(id);
+        if (was && Math.hypot(was.x - e.pos.x, was.z - e.pos.z) > MELT_JUMP)
+          this.melt(was.x, was.z);
+        this.startBoil(e.id, e.pos.x, e.pos.z, FIGURE_HEIGHT * e.scale);
+      }
       this.figureCast.set(id, now);
+      if (e) {
+        const at = this.figureAt.get(id);
+        if (at) {
+          at.x = e.pos.x;
+          at.z = e.pos.z;
+        } else this.figureAt.set(id, { x: e.pos.x, z: e.pos.z });
+      }
     }
     for (const id of this.figureCast.keys())
-      if (!world.entities.has(id)) this.figureCast.delete(id);
+      if (!world.entities.has(id)) {
+        this.figureCast.delete(id);
+        this.figureAt.delete(id);
+      }
+  }
+
+  /** A figure starts rising out of the roof: dark water wells up under it. */
+  private startBoil(id: number, x: number, z: number, height: number): void {
+    let slot = this.boils.find((b) => b.entityId === id) ?? this.boils.find((b) => b.entityId < 0);
+    if (!slot) {
+      slot = this.boils[0];
+      for (const b of this.boils) if (b.since < slot.since) slot = b;
+    }
+    slot.entityId = id;
+    slot.since = this.clock;
+    slot.x = x;
+    slot.y = this.groundY(x, z);
+    slot.z = z;
+    slot.height = height;
+    slot.mat.uniforms.uAlpha.value = 0;
+    slot.mesh.visible = true;
+    // The flags burst open: black water thrown out in a ring, then a breath of
+    // fog rolling off it.
+    this.fx.burst(x, slot.y + 0.15, z, 0x0c1513, 8, 1.2, 3.4, 0.9, 0.6, 2.4, true);
+    this.fx.burst(x, slot.y + 0.3, z, 0x6f817b, 5, 1.6, 4.6, 1.6, 0.35, 1.1, true);
+  }
+
+  /** The boil under each rising figure, and the fog and brine shedding off it
+   *  as the body climbs out (identical for every figure). */
+  private updateBoils(world: IWorld, dt: number): void {
+    for (const b of this.boils) {
+      if (b.entityId < 0) continue;
+      const age = this.clock - b.since;
+      if (veilBoilDone(age)) {
+        b.entityId = -1;
+        b.mesh.visible = false;
+        continue;
+      }
+      const e = world.entities.get(b.entityId);
+      if (e && !e.dead) {
+        b.x = e.pos.x;
+        b.z = e.pos.z;
+      }
+      b.mat.uniforms.uAlpha.value = veilBoilAlpha(age);
+      b.mesh.position.set(b.x, b.y + 0.07, b.z);
+      b.mesh.rotation.y = this.clock * -0.4 + b.entityId;
+      const s = (veilBoilScale(age) * VEIL_BOIL_RADIUS) / REAPER_POOL_RADIUS;
+      b.mesh.scale.set(s, 1, s);
+      if (!this.cosmetic || !e || e.dead) continue;
+      const out = veilRiseEmerged(age);
+      // A collar of sea fog rolls round the body where it passes through the
+      // flags, for as long as it is still coming up.
+      if (age < VAEL_TUNING.veilRiseSeconds + 0.2 && this.fx.rand() < dt * COLLAR_PER_SEC) {
+        const a = this.fx.rand() * Math.PI * 2;
+        const r = 1.4 + this.fx.rand() * 1.4;
+        this.fx.burst(
+          b.x + Math.sin(a) * r,
+          b.y + 0.25,
+          b.z + Math.cos(a) * r,
+          0x7d918a,
+          1,
+          1.6,
+          4.2,
+          1.3,
+          0.55,
+          0.7,
+          true,
+        );
+      }
+      // Fog and sea water shed off the shroud as it climbs: spawned along the
+      // part already out of the floor, sliding down and away.
+      if (out <= 0.02 || out >= 0.999 || this.fx.rand() > dt * SHED_PER_SEC) continue;
+      const a = this.fx.rand() * Math.PI * 2;
+      const r = 0.7 + this.fx.rand() * 0.9;
+      const h = b.y + (0.3 + this.fx.rand() * 0.7) * out * b.height;
+      const brine = this.fx.rand() < 0.4;
+      this.fx.burst(
+        b.x + Math.sin(a) * r,
+        h,
+        b.z + Math.cos(a) * r,
+        brine ? 0xc4eee2 : 0x9db3ab,
+        1,
+        brine ? 0.3 : 1.0,
+        brine ? 0.6 : 2.6,
+        brine ? 0.6 : 1.1,
+        brine ? -3.4 : -1.1,
+        brine ? 0.7 : 0.9,
+        !brine,
+      );
+    }
+  }
+
+  /** The fog takes the real one where he stood: a pall of dark fog sinking
+   *  onto the empty spot. */
+  private melt(x: number, z: number): void {
+    const y = this.groundY(x, z);
+    this.fx.burst(x, y + 2.2, z, 0x1a2422, 9, 2.4, 1.0, 1.1, -1.2, 0.4, true);
+    this.fx.burst(x, y + 0.4, z, 0x56665f, 6, 1.2, 4.2, 1.5, 0.3, 1.4, true);
   }
 
   private geyser(x: number, z: number): void {

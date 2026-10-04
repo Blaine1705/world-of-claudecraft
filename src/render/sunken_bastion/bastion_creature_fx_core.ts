@@ -2,8 +2,8 @@
 // where the Fogbound Arbalest's crossbow looses from and how its bolts fly,
 // and when and where the Gaol Turnkey's lantern flares as it opens the cells.
 // Numbers are in the creatures' Blender model units (scripts/assets/
-// sunken_bastion_creatures/: drowned.py, turnkey.py), scaled here by the
-// VISUALS height the renderer normalizes each GLB to.
+// sunken_bastion_drowned/: arbalest/ and turnkey/, measured by kit/anchors.py),
+// scaled here by the VISUALS height the renderer normalizes each GLB to.
 //
 // Presentation only: the sim already decided every hit; this just draws the
 // bolt that carries it. Three-free, DOM-free, deterministic.
@@ -25,19 +25,23 @@ export interface ModelPoint {
   fwd: number;
 }
 
-/** The arbalest GLB's rest bounding height (model units; the Blender build
- *  prints it), which the VISUALS height normalizes. */
-export const ARBALEST_RAW_HEIGHT = 3.14;
-/** Where the loaded bolt's head sits at the loose (the shouldered aim, the
- *  crossbow level at the right cheek, the bolt tip past the prod). */
-export const ARBALEST_MUZZLE: ModelPoint = { side: -0.3, up: 1.97, fwd: 2.2 };
+/** The arbalest GLB's bounding height half a second into Idle (model units;
+ *  scripts/assets/sunken_bastion_drowned/kit/anchors.py prints it as
+ *  RAW_HEIGHT), which the VISUALS height normalizes. */
+export const ARBALEST_RAW_HEIGHT = 4.253;
+/** Where the loaded bolt's head sits in the held aim just before the loose
+ *  (the stock shouldered, the crossbow level down the lane, the bolt tip past
+ *  the prod; anchors.py prints it as the muzzle anchor at Shoot:0.5). */
+export const ARBALEST_MUZZLE: ModelPoint = { side: -0.18, up: 3.16, fwd: 1.67 };
 
-/** The Turnkey GLB's idle bounding height (model units; turnkey.py prints it
- *  as IDLE_HEIGHT). */
-export const TURNKEY_RAW_HEIGHT = 5.78;
-/** The lantern held high over its head at the top of LanternRaise (turnkey.py
- *  prints it as LANTERN_HIGH, measured over the body's lowest point). */
-export const TURNKEY_LANTERN_HIGH: ModelPoint = { side: 1.2, up: 5.45, fwd: 0.83 };
+/** The Turnkey GLB's bounding height half a second into Idle (model units;
+ *  scripts/assets/sunken_bastion_drowned/kit/anchors.py prints it as
+ *  RAW_HEIGHT). */
+export const TURNKEY_RAW_HEIGHT = 4.677;
+/** The lantern hoisted in the left fist over the hood at the top of
+ *  LanternRaise (anchors.py prints it as lanternHigh at LanternRaise:0.36,
+ *  over the body's lowest point). */
+export const TURNKEY_LANTERN_HIGH: ModelPoint = { side: 0.49, up: 5.11, fwd: 0.53 };
 /** The lantern flares as it reaches the top of the raise (frame 9 of 24 fps). */
 export const LANTERN_FLARE_DELAY = 0.36;
 export const LANTERN_FLARE_SEC = 1.1;

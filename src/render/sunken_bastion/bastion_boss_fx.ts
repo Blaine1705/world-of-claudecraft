@@ -54,9 +54,10 @@ import {
   buttressAt,
   buttressCrash,
   buttressPiece,
-  HYMN_FLOOD_DEPTH,
   hymnFlood,
   OATH_LANE_HALF,
+  OLEN_STARS_RADIUS,
+  OLEN_STARS_UP,
   oathLaneLength,
   pickVeilClaim,
   predictBeamYaw,
@@ -66,6 +67,7 @@ import {
   type VeilCandidate,
 } from './bastion_boss_fx_core';
 import { modelPointWorld } from './bastion_creature_fx_core';
+import { BastionCrownFlood } from './bastion_flood';
 import { BASTION_TELEGRAPH_COLORS } from './bastion_fx_core';
 import { bastionKitPiece, bastionKitReady, bastionSlotMaterial } from './bastion_kit';
 
@@ -140,28 +142,6 @@ void main() {
   col = mix(col, uEdge, edge);
   float a = (0.72 + 0.25 * foam + 0.3 * edge) * uAlpha;
   gl_FragColor = vec4(col, min(1.0, a));
-  #include <colorspace_fragment>
-}
-`;
-
-// The Drowning Hymn's flood: murky green sea water welling over the crown.
-const FLOOD_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-varying vec2 vUv;
-varying vec3 vWorld;
-${NOISE}
-void main() {
-  vec2 p = vWorld.xz * 0.22;
-  float n = noise(p + vec2(uTime * 0.3, -uTime * 0.21)) * 0.5
-    + noise(p * 2.3 - vec2(uTime * 0.5, uTime * 0.37)) * 0.35
-    + noise(p * 6.0 + uTime * 0.8) * 0.15;
-  float r = length(vUv - 0.5) * 2.0;
-  float rimFoam = smoothstep(0.86, 0.98, r) * (0.5 + 0.5 * n);
-  vec3 col = mix(vec3(0.03, 0.08, 0.065), vec3(0.11, 0.26, 0.19), n);
-  col += vec3(0.45, 0.8, 0.62) * smoothstep(0.66, 0.82, n) * 0.22;
-  col = mix(col, vec3(0.5, 0.72, 0.62), rimFoam * 0.6);
-  gl_FragColor = vec4(col, (0.62 + 0.22 * n + 0.12 * rimFoam) * uAlpha);
   #include <colorspace_fragment>
 }
 `;
@@ -269,14 +249,12 @@ export class BastionBossFx {
   private readonly oathGlow: THREE.Mesh;
   private readonly oathMat: THREE.MeshBasicMaterial;
   private readonly stars: THREE.Sprite[] = [];
-  private readonly flood: THREE.Mesh;
-  private readonly floodMat: THREE.ShaderMaterial;
+  private readonly flood: BastionCrownFlood;
   private readonly beamPool: THREE.Mesh;
   private readonly beamPoolMat: THREE.MeshBasicMaterial;
   private readonly domes: { mesh: THREE.Mesh; mat: THREE.ShaderMaterial; entityId: number }[] = [];
   /** Standing buttress ids per slot (Olen's lane resolver reads it). */
   private readonly standing = new Map<number, Set<string>>();
-  private readonly seenShades = new Set<number>();
   private readonly deadShades = new Set<number>();
   private readonly buttressIds: number[] = [];
   private readonly wakeIds: number[] = [];
@@ -354,15 +332,8 @@ export class BastionBossFx {
       this.root.add(mesh);
       this.wakes.push({ mesh, mat, entityId: -1 });
     }
-    // The Hymn's flood and the beam's pool of light on the crown.
-    const floodGeo = this.geo(new THREE.CircleGeometry(CROWN_DEF.r - 0.6, 72));
-    floodGeo.rotateX(-Math.PI / 2);
-    this.floodMat = this.shader(FLOOD_FRAG, { uAlpha: { value: 0 } }, false);
-    this.flood = new THREE.Mesh(floodGeo, this.floodMat);
-    this.flood.visible = false;
-    this.flood.frustumCulled = false;
-    this.flood.renderOrder = floorVfxRenderOrder('encounter', 2);
-    this.root.add(this.flood);
+    // The Hymn's flood (bastion_flood.ts) and the beam's pool of light on the crown.
+    this.flood = new BastionCrownFlood(this.root);
     const poolGeo = this.geo(
       new THREE.RingGeometry(6.8, CROWN_DEF.r - 0.4, 6, 4, Math.PI / 2 - BEAM_HALF, BEAM_HALF * 2),
     );
@@ -620,11 +591,10 @@ export class BastionBossFx {
             this.burst(e.pos.x, e.pos.y + 1.5, e.pos.z, 0x8dffb8, 4, 2.2, 7, 1.2);
           }
         } else {
+          // A shade rises out of the roof like the real one (bastion_reaper_fx.ts
+          // draws the emergence for all four alike): no flash of its own, which
+          // both popped it in and told it from him.
           figures.push({ id: e.id, slot: bastionSlotOrigin(e.pos.x, e.pos.z).slot });
-          if (!this.seenShades.has(e.id)) {
-            this.seenShades.add(e.id);
-            this.burst(e.pos.x, e.pos.y + 1.2, e.pos.z, 0x9fe8c4, 5, 2.5, 8, 1.4);
-          }
         }
       } else if (t === TURRETBACK_ID && !e.dead && hasAura(e, TRASH_WITHDRAW_AURA))
         this.hermitIds.push(e.id);
@@ -641,8 +611,6 @@ export class BastionBossFx {
       this.lampId = lampId;
       this.lampSampleAge = 99;
     }
-    if (this.seenShades.size > 32)
-      for (const id of this.seenShades) if (!world.entities.has(id)) this.seenShades.delete(id);
     if (this.deadShades.size > 32)
       for (const id of this.deadShades) if (!world.entities.has(id)) this.deadShades.delete(id);
   }
@@ -740,10 +708,11 @@ export class BastionBossFx {
       s.visible = dizzy;
       if (!dizzy) continue;
       const a = this.clock * 3.2 + (i * Math.PI * 2) / this.stars.length;
+      const r = OLEN_STARS_RADIUS * olen.scale;
       s.position.set(
-        olen.pos.x + Math.sin(a) * 1.3,
-        olen.pos.y + 4.6 * olen.scale + Math.sin(a * 2) * 0.15,
-        olen.pos.z + Math.cos(a) * 1.3,
+        olen.pos.x + Math.sin(a) * r,
+        olen.pos.y + OLEN_STARS_UP * olen.scale + Math.sin(a * 2) * 0.15,
+        olen.pos.z + Math.cos(a) * r,
       );
     }
   }
@@ -796,17 +765,14 @@ export class BastionBossFx {
     const target = hymn ? hymnFlood(hymn.castRemaining, hymn.castTotal) : 0;
     this.floodLevel += (target - this.floodLevel) * Math.min(1, dt * (hymn ? 3 : 0.8));
     const anchor = hymn ?? vael;
-    this.flood.visible = this.floodLevel > 0.01 && !!anchor;
     this.floodTop = -Infinity;
-    if (this.flood.visible && anchor) {
+    if (anchor && this.floodLevel > 0.01) {
       const o = bastionSlotOrigin(anchor.pos.x, anchor.pos.z);
       const cx = o.x + CROWN_DEF.x;
       const cz = o.z + CROWN_DEF.z;
       const floor = this.groundY(cx + CROWN_DEF.r * 0.6, cz);
-      this.floodTop = floor + 0.05 + this.floodLevel * HYMN_FLOOD_DEPTH;
-      this.flood.position.set(cx, this.floodTop, cz);
-      this.floodMat.uniforms.uAlpha.value = Math.min(1, this.floodLevel * 3);
-    }
+      this.floodTop = this.flood.update(this.floodLevel, cx, cz, floor);
+    } else this.flood.hide();
     if (veiled && lamp) {
       if (Math.abs(lamp.facing - this.lampSample) > 1e-4 || this.lampSampleAge > 1) {
         this.lampSample = lamp.facing;
@@ -1016,6 +982,7 @@ export class BastionBossFx {
   dispose(): void {
     if (this.beamSlot) setBeaconYaw(this.beamSlot.x, this.beamSlot.z, null);
     this.root.removeFromParent();
+    this.flood.dispose();
     this.debrisMesh?.dispose();
     for (const b of this.buttresses)
       for (const list of b.pieces.values()) for (const m of list) m.dispose();

@@ -10,7 +10,25 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { castClipSyncs, clipSnapsIn } from '../src/render/characters/anim_state';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import {
+  VAEL_EMERGE_CLIP_SECONDS,
+  VAEL_VEIL_RISE_CLIP_RATE,
+  VEIL_BOIL_FADE_SECONDS,
+  veilBoilAlpha,
+  veilBoilDone,
+  veilBoilScale,
+  veilRiseEmerged,
+} from '../src/render/sunken_bastion/bastion_gaol_reaper_core';
+import {
+  VAEL_DROWNING_HYMN,
+  VAEL_MIST_SURGE,
+  VAEL_REAPING_SCYTHE,
+  VAEL_SHADOWSTEP,
+  VAEL_TUNING,
+  VAEL_VEIL_RISE,
+} from '../src/sim/encounters/sunken_bastion/ids';
 import type { Entity } from '../src/sim/types';
 
 const GLB = 'public/models/creatures/vael_reaper.glb';
@@ -223,5 +241,81 @@ describe('Vael, Death itself: the scythe stays in his fist', () => {
     const doc = await readGlb();
     const { off } = offHandOnShaft(doc, 'Idle', 0.5);
     expect(off).toBeGreaterThan(1.0);
+  });
+});
+
+// The Fog Veil's rise (bastion_gaol_reaper_core.ts): Jose saw the shadow copies
+// pop in. The Emerge clip is half the rise bar, so at rate 1 it looped (the
+// figure rose, dropped back under the flags and rose again), and the rig
+// crossfaded into it from a standing pose (an upright figure flashing in
+// before it dropped). Now the rise plays once over the bar, snapped in.
+describe('Vael, Death itself: the veil figures rise out of the roof once', () => {
+  async function clipSeconds(name: string): Promise<number> {
+    const doc = await readGlb();
+    const clip = doc
+      .getRoot()
+      .listAnimations()
+      .find((a) => a.getName() === name);
+    if (!clip) throw new Error(`no clip ${name}`);
+    let end = 0;
+    for (const s of clip.listSamplers()) {
+      const input = s.getInput();
+      if (input) end = Math.max(end, input.getScalar(input.getCount() - 1));
+    }
+    return end;
+  }
+
+  it('plays Emerge once over the whole veil rise bar, and no faster than the reap rise', async () => {
+    const emerge = await clipSeconds('Emerge');
+    expect(emerge).toBeCloseTo(VAEL_EMERGE_CLIP_SECONDS, 2);
+    const rate = def.clips.castTimeScaleByAbility?.[VAEL_VEIL_RISE];
+    expect(rate).toBeCloseTo(VAEL_VEIL_RISE_CLIP_RATE, 9);
+    // The bar at this rate spans the clip once, ending on the wind-up.
+    expect((rate ?? 1) * VAEL_TUNING.veilRiseSeconds).toBeCloseTo(emerge, 2);
+    // The Shadow Crossing's own bars already fit their clips at rate 1.
+    expect(await clipSeconds('Vanish')).toBeGreaterThanOrEqual(
+      VAEL_TUNING.vanishSeconds + VAEL_TUNING.poolSeconds - 0.05,
+    );
+    expect(emerge).toBeGreaterThanOrEqual(VAEL_TUNING.riseSeconds);
+  });
+
+  it('locks only the sink and the rises to their bars, and snaps the rise in', () => {
+    const sync = def.castClipSync;
+    for (const id of [VAEL_SHADOWSTEP, VAEL_REAPING_SCYTHE, VAEL_VEIL_RISE])
+      expect(castClipSyncs(sync, id), id).toBe(true);
+    // The hymn and the reap of souls keep looping through their long bars.
+    for (const id of [VAEL_DROWNING_HYMN, VAEL_MIST_SURGE])
+      expect(castClipSyncs(sync, id), id).toBe(false);
+    expect(clipSnapsIn(def.clips.castSnapIn, 'Emerge')).toBe(true);
+    // Every other clip still crossfades.
+    for (const clip of ['Idle', 'Vanish', 'Hymn', 'Cast', 'Attack'])
+      expect(clipSnapsIn(def.clips.castSnapIn, clip), clip).toBe(false);
+  });
+
+  it('the body is under the flags as the rise starts and out of them when it ends', () => {
+    expect(veilRiseEmerged(0)).toBe(0);
+    let prev = 0;
+    for (let t = 0; t <= VAEL_TUNING.veilRiseSeconds; t += 0.05) {
+      const k = veilRiseEmerged(t);
+      expect(k).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = k;
+    }
+    expect(veilRiseEmerged(VAEL_TUNING.veilRiseSeconds)).toBe(1);
+    // The hood breaks the surface well inside the bar, not at its end.
+    expect(veilRiseEmerged(VAEL_TUNING.veilRiseSeconds * 0.5)).toBeGreaterThan(0.5);
+  });
+
+  it('the boil wells up before the body shows, holds through the rise, then drains', () => {
+    expect(veilBoilAlpha(0)).toBe(0);
+    expect(veilBoilAlpha(0.2)).toBe(1);
+    expect(veilBoilAlpha(VAEL_TUNING.veilRiseSeconds)).toBe(1);
+    expect(veilBoilAlpha(VAEL_TUNING.veilRiseSeconds + VEIL_BOIL_FADE_SECONDS / 2)).toBeCloseTo(
+      0.5,
+      6,
+    );
+    expect(veilBoilDone(VAEL_TUNING.veilRiseSeconds + VEIL_BOIL_FADE_SECONDS + 0.01)).toBe(true);
+    expect(veilBoilDone(VAEL_TUNING.veilRiseSeconds)).toBe(false);
+    expect(veilBoilScale(0.05)).toBeLessThan(veilBoilScale(0.5));
+    expect(veilBoilScale(0.5)).toBe(1);
   });
 });
