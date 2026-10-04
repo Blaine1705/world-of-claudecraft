@@ -1,8 +1,9 @@
 // Evidence shots of Laverock, the Drowned Temple's lore guide, in a live
 // offline world: his offer dialog on the Moongate Landing, his first line as a
 // bubble over him, him following the player down the Pilgrim Steps, and his
-// finale at the Moon Altar while the fallen rise as moonlight. Evidence
-// tooling, not a repo test.
+// finale at the Moon Altar: the column of moonlight on him, the fallen breaking
+// into moonlight and their streams climbing to the moon, the calm after, and
+// what a late arrival finds. Evidence tooling, not a repo test.
 //
 //   node scripts/drowned_temple_cantor_shot.mjs [outDir]
 //
@@ -203,25 +204,69 @@ async function main() {
       info.guide,
     );
     console.log('SINGING after', Date.now() - t0, 'ms');
-    // Close on him at the altar stone's west face, from the island's north.
-    await stand(-31, 213, -2.36, { yaw: -2.36, pitch: 0.14, dist: 7 });
-    await sleep(2000);
-    await shot(page, 'laverock_4_canto');
-    // Close on him from beside, the player off to the side of the frame.
-    await stand(-33.5, 211.5, -2.4, { yaw: -2.4 + 0.75, pitch: 0.12, dist: 5.5 });
+    const sung = Date.now();
+    const at = async (sec) => {
+      const wait = sung + sec * 1000 - Date.now();
+      if (wait > 0) await sleep(wait);
+    };
+    // 5. The first notes: the column falls on him, the pool of light opens, the
+    //    lagoon stills; an ordinary over-the-shoulder camera from the island's west.
+    await stand(-49, 206.5, Math.PI / 2, { yaw: Math.PI / 2, pitch: 0.24, dist: 12 });
+    await at(3.2);
+    await shot(page, 'laverock_5_canto_columna');
+    // 6. Close on one of the fallen as it breaks into moonlight (the one whose
+    //    outline is kindling now): the outline glowing on the stones, the
+    //    light peeling up off it, its stream climbing north to the moon.
+    const closeOnRising = async (name, lead) => {
+      const spot = await page.evaluate((lead) => {
+        const fx = window.__game.renderer.riftDeathZoneVisuals?.templeFx?.cantor;
+        if (!fx) return null;
+        let best = null;
+        for (const r of fx.rises) {
+          const d = r.spot.at - fx.clock;
+          if (d > lead && (best === null || d < best.d)) best = { d, x: r.spot.x, z: r.spot.z };
+        }
+        return best;
+      }, lead);
+      if (!spot) return;
+      await stand(spot.x - info.ox - 4.5, spot.z - info.oz - 6, 0.62, {
+        yaw: 0.62,
+        pitch: 0.3,
+        dist: 8,
+      });
+      await sleep(Math.max(0, (spot.d + 1.4) * 1000));
+      await shot(page, name);
+    };
+    await at(5);
+    await closeOnRising('laverock_6_caidos_luz', 1.2);
+    await closeOnRising('laverock_6b_caidos_luz_2', 0.9);
+    // The lagoon from the island's north rim: still, glowing, the moon's road.
+    await stand(-30, 229, 0.35, { yaw: 0.35, pitch: 0.42, dist: 13 });
     await sleep(2500);
-    await shot(page, 'laverock_4b_canto_cerca');
-    // From the Altar Ward over the landing, where the guards, novices and the
-    // singer who fell nearest the altar rise as moonlight toward the moon.
-    await stand(4, 206, Math.PI / 2, { yaw: Math.PI / 2 - 0.25, pitch: 0.12, dist: 10 });
-    await sleep(2500);
-    await shot(page, 'laverock_5_disolucion');
+    await shot(page, 'laverock_6c_laguna');
+    // 7. From the Altar Ward over the island: streams rising across the temple.
+    await stand(4, 206, -Math.PI / 2, { yaw: -Math.PI / 2 + 0.3, pitch: 0.34, dist: 24 });
+    await at(14);
+    await shot(page, 'laverock_7_corrientes');
+    // 4. Close on him singing (the Sing loop, the column on him).
+    await stand(-33.5, 211.5, -2.4, { yaw: -2.4 + 0.75, pitch: 0.12, dist: 6 });
+    await at(22);
+    await shot(page, 'laverock_4_canto_cerca');
+    // 8. The calm after: the steady glow that stays while he sings.
+    await stand(-49, 206.5, Math.PI / 2, { yaw: Math.PI / 2 - 0.35, pitch: 0.22, dist: 11 });
+    await at(40);
+    await shot(page, 'laverock_8_canto_sereno');
+    // 9. A late arrival (no song-start event seen): the steady glow alone.
+    await page.evaluate(() => {
+      const fx = window.__game.renderer.riftDeathZoneVisuals?.templeFx?.cantor;
+      if (fx) {
+        fx.songAt = -1;
+        fx.seenAt = -1;
+      }
+    });
+    await stand(-48, 200, 0.9, { yaw: 0.9, pitch: 0.26, dist: 13 });
     await sleep(3500);
-    await shot(page, 'laverock_6_disolucion_2');
-    // Back over his shoulder: the island, the singer and the lights going up.
-    await stand(-43, 210, 1.75, { yaw: 1.75, pitch: 0.3, dist: 22 });
-    await sleep(3000);
-    await shot(page, 'laverock_7_disolucion_alto');
+    await shot(page, 'laverock_9_llegada_tarde');
     const fx = await page.evaluate(() => {
       let out = null;
       window.__game.renderer.scene.traverse((o) => {
@@ -231,6 +276,13 @@ async function main() {
       return out;
     });
     console.log('FX', JSON.stringify(fx));
+    // The GPU-prep acceptance read (src/render/CLAUDE.md): programs linked on a
+    // live frame after the curtain, across the whole tour and the finale.
+    const prep = await page.evaluate(() => {
+      const ev = window.__game.renderer.perfStats().gpuPrep?.events?.events ?? [];
+      return ev.filter((e) => e.kind === 'live-program').map((e) => e.key);
+    });
+    console.log('LIVE_PROGRAMS', prep.length, JSON.stringify(prep.slice(0, 20)));
     const probe = await page.evaluate((id) => {
       const g = window.__game.world.entities.get(id);
       return { state: g?.guideState, cast: g?.castingAbility, x: g?.pos.x, z: g?.pos.z };
