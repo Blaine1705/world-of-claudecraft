@@ -584,3 +584,19 @@ describe('ClientWorld: a use press sends target then interact', () => {
     expect(sent).toEqual([{ cmd: 'target', id: 50, seq: 1 }, { cmd: 'interact' }]);
   });
 });
+
+describe('trash engine objects carry a localized display name', () => {
+  it('knows every engine object template and re-localizes its English name', async () => {
+    const { isKitObjectTemplate, kitObjectDisplayName } = await import('../src/ui/kit_object_name');
+    for (const id of [
+      'sanctum_ice_slab',
+      'sanctum_boiling_meltwater',
+      'sanctum_spilled_soulfire',
+      'trash_demo_walker_orb',
+    ])
+      expect(isKitObjectTemplate(id), id).toBe(true);
+    expect(isKitObjectTemplate('dungeon_gate_closed')).toBe(false);
+    expect(kitObjectDisplayName('sanctum_ice_slab', 'Ice Slab')).toBe('Ice Slab');
+    expect(kitObjectDisplayName('mailbox', 'Mailbox')).toBeNull();
+  });
+});
