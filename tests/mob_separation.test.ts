@@ -38,6 +38,11 @@ describe('mob separation: the pure core', () => {
     expect(separationRadius(undefined, 1)).toBeCloseTo(SEPARATION_BASE_RADIUS, 9);
     expect(separationRadius(undefined, 2)).toBeCloseTo(SEPARATION_BASE_RADIUS * 2, 9);
     expect(separationRadius(40, 1)).toBe(SEPARATION_MAX_RADIUS);
+    // A hound is broader than a man at the same scale; an unlisted family is a man.
+    expect(separationRadius(undefined, 1, 'beast')).toBeGreaterThan(
+      separationRadius(undefined, 1, 'humanoid'),
+    );
+    expect(separationRadius(undefined, 1, 'undead')).toBeCloseTo(SEPARATION_BASE_RADIUS, 9);
   });
 
   it('bodies may overlap up to half their summed radii before any push', () => {
@@ -155,7 +160,8 @@ function run(b: Bench, mobs: Entity[], seconds: number, each?: () => void): void
 }
 
 const gap = (a: Entity, c: Entity) => Math.hypot(a.pos.x - c.pos.x, a.pos.z - c.pos.z);
-const radiusOf = (e: Entity) => separationRadius(MOBS[e.templateId]?.bodyRadius, e.scale);
+const radiusOf = (e: Entity) =>
+  separationRadius(MOBS[e.templateId]?.bodyRadius, e.scale, MOBS[e.templateId]?.family);
 
 describe('mob separation in the sim', () => {
   it('two mobs stacked on one target end apart, both still in reach of it', () => {

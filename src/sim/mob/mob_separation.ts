@@ -18,7 +18,8 @@
 //   obstacle the others step round), nor does a mob planted for an area cast
 //   (trash_kit/cast_hold.ts), rooted, pinned in place, or authored immobile.
 // - Bigger bodies take more room: a mob's radius is its authored bodyRadius,
-//   else SEPARATION_BASE_RADIUS times its scale, and the push is shared by
+//   else its family's body (SEPARATION_FAMILY_RADIUS: a hound or a spider is
+//   broader than a man) times its scale, and the push is shared by
 //   radius so the small body gives way to the big one.
 // - The push never carries a mob farther from its target than it already was,
 //   or past its desired fighting range (mob_combat.ts): it slides the mob
@@ -52,6 +53,18 @@ import { mobCombatProfile } from './combat_profile';
 /** A man-sized mob body at scale 1 (yards): a touch broader than a player's
  *  0.5, since a mob carries its weapon and its shoulders wide. */
 export const SEPARATION_BASE_RADIUS = 0.7;
+/** The families whose bodies are broader than a man's at scale 1 (yards):
+ *  four-legged and many-legged bodies, and the bulky ones. A presentation
+ *  knob for how much room a body takes, never a combat value. */
+export const SEPARATION_FAMILY_RADIUS: Readonly<Record<string, number>> = Object.freeze({
+  beast: 1.1,
+  spider: 1.1,
+  burrower: 1.1,
+  reptile: 1.1,
+  dragonkin: 1,
+  ogre: 1,
+  elemental: 0.9,
+});
 /** The widest body the separation will make room for (yards). */
 export const SEPARATION_MAX_RADIUS = 5;
 /** Bodies may overlap by up to this fraction of their summed radii before the
@@ -99,9 +112,15 @@ export interface SeparationStep {
 }
 
 /** A mob's separation radius: the authored body (MobTemplate.bodyRadius) when
- *  it has one, else the base body scaled by its render scale, capped. */
-export function separationRadius(bodyRadius: number | undefined, scale: number): number {
-  const r = bodyRadius ?? SEPARATION_BASE_RADIUS * (scale > 0 ? scale : 1);
+ *  it has one, else its family's body (or the base body) scaled by its render
+ *  scale, capped. */
+export function separationRadius(
+  bodyRadius: number | undefined,
+  scale: number,
+  family?: string,
+): number {
+  const base = (family !== undefined && SEPARATION_FAMILY_RADIUS[family]) || SEPARATION_BASE_RADIUS;
+  const r = bodyRadius ?? base * (scale > 0 ? scale : 1);
   return Math.min(SEPARATION_MAX_RADIUS, Math.max(0.1, r));
 }
 
@@ -259,7 +278,7 @@ export function separateEngagedMob(ctx: SimContext, mob: Entity): void {
     id: mob.id,
     x: mob.pos.x,
     z: mob.pos.z,
-    radius: separationRadius(template?.bodyRadius, mob.scale),
+    radius: separationRadius(template?.bodyRadius, mob.scale, template?.family),
   };
   const step: SeparationStep = { x: 0, z: 0 };
   const y = mob.pos.y;
@@ -273,7 +292,7 @@ export function separateEngagedMob(ctx: SimContext, mob: Entity): void {
     other.x = e.pos.x;
     other.z = e.pos.z;
     const t = MOBS[e.templateId];
-    other.radius = separationRadius(t?.bodyRadius, e.scale);
+    other.radius = separationRadius(t?.bodyRadius, e.scale, t?.family);
     addSeparation(step, self, other, e.inCombat && yieldsRoom(e, t));
   });
   clampSeparationStep(step, SEPARATION_MAX_STEP);
