@@ -586,7 +586,10 @@ describe('the pilgrim frenzy cue rides the real enrage', () => {
     const fx = readFileSync('src/render/drowned_temple/temple_fx.ts', 'utf8');
     expect(fx).toContain('this.playGesture(ev.sourceId, TEMPLE_PILGRIM_FRENZY_GESTURE)');
     const zone = readFileSync('src/render/rift_death_zone.ts', 'utf8');
-    expect(zone).toContain('new TempleFx(scene, groundY, world, compileGate, playGesture)');
+    // The host hands the gesture hook on (then the shake and reduced-motion seams).
+    expect(zone.replace(/\s+/g, ' ')).toContain(
+      'new TempleFx( scene, groundY, world, compileGate, playGesture, shake, reducedMotion, )',
+    );
     expect(zone).toMatch(/const temple = this\.templeFx\.handleEvent\(event\)/);
     expect(zone).toMatch(/\|\| temple \|\|/);
   });

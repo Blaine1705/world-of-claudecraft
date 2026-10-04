@@ -68,6 +68,7 @@ function freshState(): ColossusFightState {
     plantedAt: null,
     fractureTimer: T.fractureFirst,
     fracture: null,
+    fractures: 0,
   };
 }
 

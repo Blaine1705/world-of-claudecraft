@@ -8,12 +8,14 @@
 import { describe, expect, it } from 'vitest';
 import { DROWNED_TEMPLE_ANCHORS } from '../src/sim/content/drowned_temple_layout';
 import {
+  COLOSSUS_ID,
   SELTHE_DROWNING_ARIA,
   SELTHE_ID,
   SELTHE_MERE_SURGE,
   SELTHE_MOONWATER_BOLT,
   SELTHE_TUNING,
   TEMPLE_BOSS_CAST_SCHOOLS,
+  TERRACE,
 } from '../src/sim/encounters/drowned_temple';
 import { ariaCatcher, startAria, startSurge } from '../src/sim/encounters/drowned_temple/selthe';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
@@ -271,5 +273,33 @@ describe('the Mere Surge: step out of the wedge', () => {
     expect(seen.has(SELTHE_MERE_SURGE)).toBe(true);
     expect(seen.has(SELTHE_DROWNING_ARIA)).toBe(true);
     expect(seen.has('temple_tidal_slap')).toBe(false);
+  });
+});
+
+describe('one seed, one fight: the caster kit and the fracture replay exactly', () => {
+  /** A full Selthe pull with a kick, then a Colossus fracture, from a fresh Sim. */
+  function trace(): string[] {
+    const { f, b } = selthe();
+    run(f, 7);
+    pummel(f, b);
+    run(f, 17);
+    const col = boss(f, COLOSSUS_ID);
+    put(f, f.tank, TERRACE.x - 6, TERRACE.z);
+    put(f, f.others[0], TERRACE.x + 9, TERRACE.z + 4);
+    put(f, f.others[1], TERRACE.x - 3, TERRACE.z - 11);
+    engage(f, col);
+    run(f, 0.05);
+    const st = col.templeFight;
+    if (st?.kind !== 'colossus') throw new Error('no colossus fight');
+    st.fractureTimer = 0;
+    run(f, 10);
+    return f.hits.map((h) => `${h.sourceId}>${h.targetId}:${h.ability}:${h.amount}`);
+  }
+
+  it('two runs from the same seed land the same hits in the same order', () => {
+    const a = trace();
+    expect(a.some((h) => h.includes('Moonwater Bolt'))).toBe(true);
+    expect(a.some((h) => h.includes('Tideglass Fracture'))).toBe(true);
+    expect(trace()).toEqual(a);
   });
 });

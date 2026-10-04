@@ -70,6 +70,7 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
       boss.channeling = false;
       st.aria = null;
       st.kickable = null;
+      boss.castTotal = 0;
       st.surgeYaw = null;
     }
     if (what === 'bolt')

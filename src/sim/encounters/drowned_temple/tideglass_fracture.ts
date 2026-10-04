@@ -58,8 +58,8 @@ export function startFracture(
   st: ColossusFightState,
 ): boolean {
   if (st.fracture) return false;
-  st.casts++;
-  const rot = kitHash(boss.id, st.casts * 19 + 7) % FRACTURE_SLICES;
+  st.fractures++;
+  const rot = kitHash(boss.id, st.fractures * 19 + 7) % FRACTURE_SLICES;
   const objectIds: number[] = [];
   for (let i = 0; i < FRACTURE_SLICES; i++) {
     const obj = spawnTempleObject(

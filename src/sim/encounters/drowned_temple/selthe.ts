@@ -80,6 +80,7 @@ function freshState(heroic: boolean): SeltheFightState {
     kickable: null,
     surgeYaw: null,
     aria: null,
+    barCasts: 0,
     marks: [],
     echoes: [],
     casts: 0,
@@ -362,8 +363,8 @@ export function startAria(
   const players = courtPlayers(ctx, inst).filter(
     (p) => !p.dead && dist2d(p.pos, boss.pos) <= T.ariaRange && ctx.hasLineOfSight(boss, p),
   );
-  st.casts++;
-  const target = pickMarkTarget(players, boss, st.casts * 13 + 5, []);
+  st.barCasts++;
+  const target = pickMarkTarget(players, boss, st.barCasts * 13 + 5, []);
   if (!target) return false;
   startCast(boss, SELTHE_DROWNING_ARIA, T.ariaChannel, target.id, true);
   boss.facing = angleTo(boss.pos, target.pos);
@@ -446,8 +447,8 @@ export function startSurge(
   boss: Entity,
   st: SeltheFightState,
 ): boolean {
-  st.casts++;
-  const victim = pickMarkTarget(courtPlayers(ctx, inst), boss, st.casts * 17 + 9, []);
+  st.barCasts++;
+  const victim = pickMarkTarget(courtPlayers(ctx, inst), boss, st.barCasts * 17 + 9, []);
   if (!victim) return false;
   st.surgeYaw = angleTo(boss.pos, victim.pos);
   boss.facing = st.surgeYaw;
@@ -509,7 +510,11 @@ const PLAIN_BARS: readonly string[] = [SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, S
 
 function stepCasts(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: SeltheFightState): void {
   // A kickable bar that is gone before she finished it was cut (a kick): an
-  // aria breaks, and she sings no bolt or aria for a moment.
+  // aria breaks, and she sings no bolt or aria for a moment. The contract:
+  // between two passes of this tick only a player interrupt clears her bar
+  // (she is CC-immune, mobs take no spell pushback, an evade or a death resets
+  // the fight first, and the dev triggers clear `kickable` with the bar), so a
+  // new path that cancels her cast must clear `kickable` too.
   if (st.kickable !== null && boss.castingAbility !== st.kickable) {
     if (st.kickable === SELTHE_DROWNING_ARIA) endAria(ctx, boss, st, true);
     st.kickable = null;
