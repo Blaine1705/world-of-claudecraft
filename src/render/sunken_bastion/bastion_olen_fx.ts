@@ -174,8 +174,11 @@ void main() {
   vec3 col = mix(white, sea, rim * 0.6);
   float body = (0.45 + 0.55 * streaks) * (0.35 + 1.1 * rim * rim);
   float ends = smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(0.85, 1.0, h));
-  float i = body * ends * uAlpha;
-  gl_FragColor = vec4(col * i, i);
+  // Brightest at the foot where it stands on the mark, fading up into the sky.
+  float foot = 1.0 + 1.5 * (1.0 - smoothstep(0.0, 0.25, h));
+  float i = body * ends * foot * uAlpha;
+  // Additive at SrcAlpha: lift both so the shaft reads against the storm sky.
+  gl_FragColor = vec4(col * i * 2.4, min(1.0, i * 1.8));
   #include <colorspace_fragment>
 }
 `;
@@ -703,12 +706,14 @@ export class BastionOlenFx {
       m.ring.group.visible = true;
       this.kit.drapeFan(m.ring, this.groundY, e.pos.x, y, e.pos.z, 0, radius);
       this.kit.paintFan(m.ring, { fill, clock: this.clock, range: radius });
-      // The column of drowned light closes down on them from the sky.
+      // A shaft of drowned light stands on them from the sky, thickening and
+      // burning brighter as the Sentence nears, while its head (the gathering
+      // glow) closes down from the clouds onto the mark.
       const base = sentenceColumnBase(fill);
       const glow = sentenceColumnGlow(fill);
-      const w = 0.6 + fill * 0.9;
+      const w = 0.35 + fill * 1.25;
       m.column.visible = true;
-      m.column.position.set(e.pos.x, y + base, e.pos.z);
+      m.column.position.set(e.pos.x, y, e.pos.z);
       m.column.scale.set(w, 40, w);
       m.columnMat.uniforms.uAlpha.value = glow;
       m.glow.visible = this.cosmetic;

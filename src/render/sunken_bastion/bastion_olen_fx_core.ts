@@ -61,8 +61,9 @@ export function sentenceFill(remaining: number, duration: number): number {
   return Math.min(1, Math.max(0, 1 - remaining / duration));
 }
 
-/** The descending column's height over the mark (yards): high in the sky at
- *  the mark, closing down toward the player as the Sentence nears. */
+/** The descending head of the column (yards over the mark): high in the sky
+ *  at the mark, closing down toward the player as the Sentence nears (the
+ *  shaft itself always stands on them). */
 export const SENTENCE_SKY = 26;
 export function sentenceColumnBase(fill: number): number {
   const k = Math.min(1, Math.max(0, fill));
