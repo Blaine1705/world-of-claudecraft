@@ -6,6 +6,8 @@
 // real claimed Bastion.
 
 import { describe, expect, it, vi } from 'vitest';
+import { BREACH_BASTION } from '../src/sim/content/sunken_bastion_layout';
+import { DUNGEONS } from '../src/sim/data';
 import {
   bulwarkChain,
   HALLOWED_BRINE_TEMPLATE,
@@ -26,6 +28,7 @@ import {
   OLEN_UNBROKEN_OATH,
 } from '../src/sim/encounters/sunken_bastion';
 import { DT, type Entity } from '../src/sim/types';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import {
   aura,
   boss,
@@ -141,6 +144,55 @@ describe('Olen the fallen paladin: Hallowed Brine', () => {
     // The pool dries after its 15 s.
     run(f, T.brineSeconds, out);
     expect(f.sim.ctx.entities.has(pool.id)).toBe(false);
+  });
+});
+
+describe('Olen the fallen paladin: the brine reaches 9 yd (10 heroic)', () => {
+  function reachTest(difficulty: 'normal' | 'heroic', radius: number): void {
+    const { f, olen } = olenFight(difficulty);
+    const [inside, outside] = f.others;
+    // One just inside the rim, one just outside it (west and east of him).
+    const keep = () => {
+      put(f, olen, MID.x, MID.z);
+      put(f, f.tank, MID.x, MID.z - 3);
+      put(f, inside, MID.x - (radius - 0.5), MID.z);
+      put(f, outside, MID.x + radius + 0.5, MID.z);
+    };
+    expect(until(f, () => pools(f).length === 1, T.brineFirst + T.brineCast + 1, keep)).toBe(true);
+    expect(pools(f)[0].scale).toBe(radius);
+    const from = f.hits.length;
+    run(f, 2.05, keep);
+    expect(took(f, inside, 'Hallowed Brine', from)).toBeGreaterThan(0);
+    expect(aura(inside, OLEN_IN_BRINE)).toBeDefined();
+    expect(took(f, outside, 'Hallowed Brine', from)).toBe(0);
+    expect(aura(outside, OLEN_IN_BRINE)).toBeUndefined();
+  }
+
+  it('normal: a 9 yd pool', () => {
+    expect(T.brineRadius).toBe(9);
+    reachTest('normal', T.brineRadius);
+  });
+
+  it('heroic: a 10 yd pool', () => {
+    expect(T.brineRadiusHeroic).toBe(10);
+    reachTest('heroic', T.brineRadiusHeroic);
+  });
+
+  it('fits his arena: from his spawn the pool leaves room to drag him out', () => {
+    const spawn = DUNGEONS.sunken_bastion.spawns.find((sp) => sp.mobId === OLEN_ID);
+    if (!spawn) throw new Error('no Olen spawn');
+    const off = Math.hypot(spawn.x - BREACH_BASTION.x, spawn.z - BREACH_BASTION.z);
+    // Past the heroic pool's rim there is still a long walk of open floor.
+    expect(BREACH_BASTION.r - off - T.brineRadiusHeroic).toBeGreaterThanOrEqual(8);
+  });
+
+  it('the finder line states the live radius, damage and shield', () => {
+    const line = hudChromeStrings.finder.mech.hallowed_brine;
+    expect(line).toContain(`${T.brineRadius} yard`);
+    expect(line).toContain(`${T.brineRadiusHeroic} on heroic`);
+    expect(line).toContain(`${T.brinePerSecond} damage a second`);
+    expect(line).toContain(`${T.brinePerSecondHeroic} on heroic`);
+    expect(line).toContain(`${Math.round(T.brineShield * 100)} percent`);
   });
 });
 

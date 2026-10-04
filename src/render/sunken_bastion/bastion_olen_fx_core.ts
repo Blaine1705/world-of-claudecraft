@@ -54,6 +54,19 @@ export function brineSwell(age: number): number {
   return 1 - (1 - k) * (1 - k);
 }
 
+/** The radius the brine's water and runes were first drawn at (yd): a wider
+ *  pool scales its grain by its radius over this, so it keeps its look. */
+export const BRINE_DRAWN_RADIUS = 6;
+
+/** Sprays the swell's front throws this frame round a pool of radius `radius`
+ *  (about 14 a second per 6 yd of rim, so a wider pool's front is as dense):
+ *  the whole part, plus one more when `roll` (0 to 1) falls under the rest. */
+export function brineFrontSprays(radius: number, dt: number, roll: number): number {
+  const want = 14 * (radius / BRINE_DRAWN_RADIUS) * dt;
+  const whole = Math.floor(want);
+  return whole + (roll < want - whole ? 1 : 0);
+}
+
 /** The Sentence's fill from its mark: 0 when it lands on the player, 1 when
  *  the column falls (the mark's time used up). */
 export function sentenceFill(remaining: number, duration: number): number {

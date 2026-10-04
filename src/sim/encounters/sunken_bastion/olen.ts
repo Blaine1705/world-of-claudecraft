@@ -3,7 +3,7 @@
 // corrupted, and so does the holy light he fought with, gone dark with brine.
 //
 //   Hallowed Brine        every 14 s (first at 6 s) a 1.2 s bar: he drives his
-//                         sword into the flags and a 6 yd pool of dark holy
+//                         sword into the flags and a 9 yd pool of dark holy
 //                         sea-water wells up where he stands, for 15 s: 18 a
 //                         second to every player in it, and while HE stands in
 //                         it he takes 40 percent less damage. The tank drags
@@ -25,7 +25,7 @@
 //                         Breached (stunned 4 s, 20 percent more damage taken
 //                         for 10 s). His vigil lasts 60 s at most.
 //   Reaping Arc           his kept cleave (the template's `cleave`).
-//   Heroic                a 7 yd brine of 26 a second, four rebounds, an 8 yd
+//   Heroic                a 10 yd brine of 26 a second, four rebounds, an 8 yd
 //                         Sentence, three soldiers.
 //
 // The pressure math (against the retired Oathbound Charge) is on OLEN_KIT.

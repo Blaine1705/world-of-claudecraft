@@ -3,9 +3,11 @@
 // same:
 //  - Hallowed Brine: a gathering of gold motes round his blade over the bar,
 //    then the sword strikes the flags: a burst of dark holy sea-water, a
-//    shockwave and a jolt, and the pool itself (black-teal water churning
-//    over the flags, a burning gold rim of drowned runes, light motes rising
-//    through it) for as long as it stands;
+//    shockwave and a jolt, the swell's front surging out to the pool's full
+//    9 yd (10 heroic) in spray and gold light, and the pool itself (black-teal
+//    water churning over the flags, rings of holy light rolling outward, a
+//    burning gold rim of drowned runes, light motes rising through it; its
+//    grain and runes keep their size in yards) for as long as it stands;
 //  - Rebounding Bulwark: his kite shield spinning through the air from body
 //    to body along a shallow arc with a gold trail, a ringing impact at each
 //    player it strikes, and his catch when it flies home (the held shield is
@@ -52,9 +54,11 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { GFX, sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
 import {
+  BRINE_DRAWN_RADIUS,
   BRINE_WELL_SECONDS,
   BULWARK_HOP_SECONDS,
   BULWARK_SPIN,
+  brineFrontSprays,
   brineSwell,
   bulwarkFlight,
   flashAlpha,
@@ -102,6 +106,9 @@ const BRINE_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uAlpha;
 uniform float uSeed;
+// The pool's radius over the 6 yd it was first drawn at: the water's grain,
+// the runes and the rim keep their size in yards however wide it wells.
+uniform float uScale;
 varying vec2 vUv;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
@@ -115,19 +122,26 @@ void main() {
   if (r > 1.0) discard;
   float a = atan(c.y, c.x);
   float t = uTime + uSeed;
-  float swirl = a + t * 0.5 + r * 3.0;
-  float n = noise(vec2(cos(swirl), sin(swirl)) * 3.0 + r * 4.0 - t * 0.6);
-  float caust = noise(c * 14.0 + vec2(t * 0.9, -t * 0.7));
+  float k = max(0.5, uScale);
+  float swirl = a + t * 0.5 + r * 3.0 * k;
+  float n = noise(vec2(cos(swirl), sin(swirl)) * 3.0 + r * 4.0 * k - t * 0.6);
+  float caust = noise(c * 14.0 * k + vec2(t * 0.9, -t * 0.7));
   caust = smoothstep(0.62, 0.8, caust) * (1.0 - r * 0.6);
   vec3 deep = vec3(0.01, 0.05, 0.06);
   vec3 sea = vec3(0.05, 0.32, 0.3);
   vec3 gold = vec3(1.0, 0.82, 0.42);
   vec3 col = mix(deep, sea, n * 0.8);
   col += gold * caust * 0.9;
-  // The rune rim: a burning band of glyph segments that pulse round the edge.
-  float band = smoothstep(0.8, 0.9, r) * (1.0 - smoothstep(0.97, 1.0, r));
-  float seg = step(0.35, fract(a * 3.8197 + t * 0.15));
-  float glyph = step(0.5, fract((a * 3.8197 + t * 0.15) * 3.0 + noise(vec2(a * 6.0, 1.0))));
+  // Holy light rolling outward through the water in slow rings.
+  float ring = fract(r * 1.5 * k - t * 0.45);
+  col += gold * smoothstep(0.92, 1.0, ring) * (1.0 - smoothstep(0.75, 0.95, r)) * 0.35;
+  // The rune rim: a burning band of glyph segments that pulse round the edge,
+  // about a yard and a half wide, with as many glyphs as its yards of rim hold.
+  float w = 0.2 / sqrt(k);
+  float band = smoothstep(1.0 - w, 1.0 - w * 0.5, r) * (1.0 - smoothstep(0.97, 1.0, r));
+  float segs = floor(24.0 * k + 0.5) / 6.2831853;
+  float seg = step(0.35, fract(a * segs + t * 0.15));
+  float glyph = step(0.5, fract((a * segs + t * 0.15) * 3.0 + noise(vec2(a * 6.0 * k, 1.0))));
   float pulse = 0.75 + 0.25 * sin(t * 4.0 + a * 3.0);
   col += gold * band * (0.6 + 0.9 * seg * glyph) * pulse * 1.6;
   float edge = smoothstep(0.985, 1.0, r);
@@ -338,6 +352,7 @@ export class BastionOlenFx {
       const mat = shader(BRINE_FRAG, DISC_VERT, THREE.DoubleSide, THREE.NormalBlending);
       mat.name = 'sunkenBastionHallowedBrine';
       mat.uniforms.uSeed.value = i * 7.3;
+      mat.uniforms.uScale = { value: 1 };
       const mesh = new THREE.Mesh(disc, mat);
       mesh.visible = false;
       mesh.frustumCulled = false;
@@ -416,7 +431,7 @@ export class BastionOlenFx {
       const column = new THREE.Mesh(columnGeo, columnMat);
       column.visible = false;
       column.frustumCulled = false;
-      column.renderOrder = 23;
+      column.renderOrder = floorVfxRenderOrder('encounter', 3);
       this.root.add(column);
       this.marks.push({ ring, column, columnMat, glow: sprite(0xfff2c8, 4), entityId: -1 });
     }
@@ -426,7 +441,7 @@ export class BastionOlenFx {
       const column = new THREE.Mesh(columnGeo, mat);
       column.visible = false;
       column.frustumCulled = false;
-      column.renderOrder = 23;
+      column.renderOrder = floorVfxRenderOrder('encounter', 3);
       this.root.add(column);
       let ring: TelegraphFan | null = null;
       if (cosmetic) {
@@ -442,7 +457,7 @@ export class BastionOlenFx {
     this.bubble = new THREE.Mesh(this.geo(new THREE.SphereGeometry(1, 40, 24)), this.bubbleMat);
     this.bubble.visible = false;
     this.bubble.frustumCulled = false;
-    this.bubble.renderOrder = 24;
+    this.bubble.renderOrder = floorVfxRenderOrder('encounter', 4);
     this.root.add(this.bubble);
     this.bubbleCore = sprite(GOLD, 7);
     this.bladeGlow = sprite(GOLD, 3);
@@ -618,13 +633,38 @@ export class BastionOlenFx {
       if (!e) continue;
       p.age += dt;
       const swell = brineSwell(p.age);
-      const r = Math.max(0.5, e.scale) * (0.25 + 0.75 * swell);
+      const full = Math.max(0.5, e.scale);
+      const r = full * (0.25 + 0.75 * swell);
       p.mesh.visible = true;
       p.mesh.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z) + LIFT, e.pos.z);
       p.mesh.scale.set(r, 1, r);
       p.mat.uniforms.uAlpha.value = Math.min(1, p.age / (BRINE_WELL_SECONDS * 0.5));
-      // Light motes rising through the brine (cosmetic).
-      if (this.cosmetic && this.fx.rand() < dt * 5) {
+      p.mat.uniforms.uScale.value = r / BRINE_DRAWN_RADIUS;
+      // The swell's front: sea-water and gold light surging out round the rim
+      // as it wells (cosmetic; the pool itself draws on every tier).
+      if (this.cosmetic && p.age < BRINE_WELL_SECONDS) {
+        const n = brineFrontSprays(full, dt, this.fx.rand());
+        for (let k = 0; k < n; k++) {
+          const a = this.fx.rand() * Math.PI * 2;
+          const fy = p.mesh.position.y + 0.2;
+          const gold = k % 3 === 0;
+          this.fx.burst(
+            e.pos.x + Math.sin(a) * r,
+            fy,
+            e.pos.z + Math.cos(a) * r,
+            gold ? GOLD : SEA,
+            1,
+            0.7,
+            2.4,
+            0.8,
+            2.2,
+            1.4,
+            !gold,
+          );
+        }
+      }
+      // Light motes rising through the brine (cosmetic), as dense however wide.
+      if (this.cosmetic && this.fx.rand() < dt * 5 * (full / BRINE_DRAWN_RADIUS) ** 2) {
         const a = this.fx.rand() * Math.PI * 2;
         const d = Math.sqrt(this.fx.rand()) * r * 0.9;
         this.fx.burst(

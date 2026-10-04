@@ -154,8 +154,8 @@ export const OLEN_KIT = {
   brineEvery: 14,
   /** Driving the sword into the flags (the bar). */
   brineCast: 1.2,
-  brineRadius: 6,
-  brineRadiusHeroic: 7,
+  brineRadius: 9,
+  brineRadiusHeroic: 10,
   brineSeconds: 15,
   brinePerSecond: 18,
   brinePerSecondHeroic: 26,
@@ -170,6 +170,18 @@ export const OLEN_KIT = {
   /** A rebound finds the nearest player not yet struck within this reach. */
   bulwarkReach: 10,
   /** The shield's flight between two bodies. */
+//
+// The brine at 9 yd (10 heroic; it was 6 and 7) against his arena, the Breach
+// Bastion's 22 yd floor (about 1520 square yards): the brine's countdown runs
+// only outside his bars, so a pool lands at least 14 + 1.2 = 15.2 s after the
+// last, which dries at 15 s: never two at once. One pool is 254 square yards
+// (17 percent of the floor; 314 and 21 percent heroic). Dropped at his spawn
+// (2 yd off the middle), at least 11 yd of open floor (10 heroic) stand past
+// its rim on every side, so the tank always has room. The walk out grows from 6 to 9 yd: about 1.3 s at run speed
+// (was 0.9), so a player who steps out at once still takes one pulse (18, 26
+// heroic) and a late one two, as before; the drag costs the tank about half a
+// second more of the 40 percent shield. Neither the 15 s life nor the damage
+// a second needed to move.
   bulwarkHop: 0.35,
   bulwarkMin: 60,
   bulwarkMax: 70,
