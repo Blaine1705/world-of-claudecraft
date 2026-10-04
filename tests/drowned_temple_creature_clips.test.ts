@@ -9,9 +9,12 @@ import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
   isTemplePilgrimFrenzyCue,
+  TEMPLE_MOONSPAWN_RISE,
+  TEMPLE_MOONSPAWN_RISE_WINDOW,
   TEMPLE_PILGRIM_FRENZY_GESTURE,
   TEMPLE_SENTINEL_SHELL_CLOSED,
   TEMPLE_SENTINEL_SHELL_OPEN,
+  templeMoonspawnRises,
   templeSentinelShellGesture,
 } from '../src/render/drowned_temple/temple_fx_core';
 import { MOBS } from '../src/sim/data';
@@ -492,6 +495,35 @@ describe('the Lagoon Snapper: the sacred nautilus', () => {
     // Shell Up is a self-stun: the rig's stunned loop is the closed shell
     expect(c.stunned).toBe('ShellUp');
     expect(MOBS.lagoon_snapper.trashKit?.withdraw?.seconds).toBe(5);
+  });
+});
+
+describe('the Moonspawn: a spirit of the Drowned Moon, no longer a murloc', () => {
+  it('has its own body and climbs out of the shore when it is called', () => {
+    expect(clipsOf('public/models/creatures/temple_moonspawn.glb').sort()).toEqual(
+      ['Attack', 'Attack2', 'Cast', 'Death', 'Hit', 'Idle', 'Rise', 'Run', 'Walk'].sort(),
+    );
+    const v = visualOf('moonspawn');
+    expect(v.url).toMatch(/temple_moonspawn\.glb$/);
+    expect(v.url).not.toMatch(/murloc/);
+    expect(v.clips.entrance).toBe('Rise');
+    expect(v.entranceGesture).toBe(TEMPLE_MOONSPAWN_RISE);
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 3.5 at its 0.9: 1.3 times the 2.6 player.
+    expect(v.height * (MOBS.moonspawn.scale ?? 1)).toBeCloseTo(3.5, 1);
+  });
+
+  it('offers its Rise only for the first moment of a living spawn', () => {
+    expect(templeMoonspawnRises('moonspawn', false, 0)).toBe(true);
+    expect(templeMoonspawnRises('moonspawn', false, TEMPLE_MOONSPAWN_RISE_WINDOW)).toBe(true);
+    expect(templeMoonspawnRises('moonspawn', false, TEMPLE_MOONSPAWN_RISE_WINDOW + 0.1)).toBe(
+      false,
+    );
+    expect(templeMoonspawnRises('moonspawn', true, 0)).toBe(false);
+    expect(templeMoonspawnRises('lagoon_eel', false, 0)).toBe(false);
+    const fx = readFileSync('src/render/drowned_temple/temple_fx.ts', 'utf8');
+    expect(fx).toContain('this.offerMoonspawnRise(e.id, e.dead)');
+    expect(fx).toContain('this.playGesture?.(id, TEMPLE_MOONSPAWN_RISE)');
   });
 });
 

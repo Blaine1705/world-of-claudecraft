@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "dd6964e1e4440c903c1c1100e4648167fb1b8c8bc65807d149d0cb50e2c93980",
+  "rendererFingerprint": "0db19ec39827096244545dff7eb05aa9dfd4ca8ff3b63429ce845a4f59a6f1cb",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5475894,
-      "sha256": "20de85edb92c29b002fa6be82f2efa110209c9a2e0ccf9e73eecd20a42e38257",
+      "bytes": 5476000,
+      "sha256": "b1a17da9820f573952816508195c0e140703de71ac7e761011398bbf31c7aa7b",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6329,34 +6329,34 @@
       "id": "moonspawn",
       "family": "mudfin",
       "finderEncounter": false,
-      "visualKey": "mob_murloc",
+      "visualKey": "temple_moonspawn",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/frog.glb",
-          "path": "public/models/creatures/frog.glb",
-          "bytes": 140836,
-          "sha256": "0d77a9e6b9a741bca8fb231a85eab7c7f894ea38099048a4696bd6f2edf3afef"
+          "url": "models/creatures/temple_moonspawn.glb",
+          "path": "public/models/creatures/temple_moonspawn.glb",
+          "bytes": 1855672,
+          "sha256": "228c2574b76c5a9e9df49f8cb9bc9920193b7bca23a9f3f8335cfaedef43dc3a"
         },
         "idle": "Idle",
-        "height": 1.7,
+        "height": 3.89,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.45
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#cfe0ff",
-        "strength": 0.45
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "29eb0a06d999a18a5bfc6f401065454949cd6aa2cbc0a71c45ad9857d76cd611",
+      "sourceFingerprint": "1aa23a5931bee1aed11569fe3be99be368f4ffe87e29f9ec2bf909e3ffe11f37",
       "output": {
         "path": "public/ui/mobs/moonspawn.webp",
-        "bytes": 1788,
-        "sha256": "537c4b57c99273081c24d91e8185e3f152d922a7c3de3f42c53928e96c279bcf"
+        "bytes": 3530,
+        "sha256": "d8b0fcb16e8bf21705d5e8b70e9fd08575e7a97a811a0d9f709bb7c268aa27ff"
       }
     },
     {

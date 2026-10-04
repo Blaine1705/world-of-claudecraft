@@ -117,6 +117,7 @@ import {
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 import {
+  TEMPLE_MOONSPAWN_RISE,
   TEMPLE_PILGRIM_FRENZY_GESTURE,
   TEMPLE_SENTINEL_SHELL_CLOSED,
   TEMPLE_SENTINEL_SHELL_OPEN,
@@ -4720,6 +4721,25 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.06,
   },
+  // The Moonspawn (moonspawn; scripts/assets/drowned_temple_creatures/
+  // moonspawn_tide/): Ysolei's summoned add had no body of its own and drew
+  // as the overworld murloc. Now a spirit of the Drowned Moon: a lizard of
+  // living moonlit water, a crescent of nacre arched over its back and
+  // another on its brow, glowing eyes and glassy teeth. It climbs out of the
+  // flooded shore when it is called (Rise, its entrance: temple_fx offers the
+  // gesture the moment it appears), runs low and fast, bites (Attack) and
+  // rakes (Attack2), and dying pours back into a pool of water. Drawn 3.5
+  // at its 0.9.
+  temple_moonspawn: {
+    url: `${CREATURES}/temple_moonspawn.glb`,
+    height: 3.89,
+    clips: { ...TEMPLE_CLIPS, entrance: 'Rise' },
+    entranceGesture: TEMPLE_MOONSPAWN_RISE,
+    walkRef: 3,
+    runRef: 8,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
+  },
   // Ysolei, Avatar of the Drowned Moon: the colossal lunar sea-serpent built
   // in Blender by Codex (sources on the codex/ysolei branch; original work, no
   // donor assets), coiled on the Moon Altar. Native scale is kept: her raised
@@ -5899,6 +5919,7 @@ const MOB_KEYS: Record<string, string> = {
   pearlguard_sentinel: 'temple_sentinel',
   glimmerscale_lurker: 'temple_lurker',
   tidewisp: 'temple_tidewisp',
+  moonspawn: 'temple_moonspawn',
   choirmother_selthe: 'temple_selthe',
   tideglass_colossus: 'temple_colossus',
   ysolei: 'temple_ysolei',

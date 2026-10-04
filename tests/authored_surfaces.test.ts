@@ -216,6 +216,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_snapper',
   // the Drowned Temple's Blender Tideglass Colossus (the sea-glass giant)
   'temple_colossus',
+  // the Drowned Temple's Blender Moonspawn (the moon spirit of water)
+  'temple_moonspawn',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

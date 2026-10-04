@@ -351,3 +351,20 @@ export function templeSentinelShellGesture(
   }
   return TEMPLE_SENTINEL_SHELL_OPEN;
 }
+
+/** The Moonspawn's entrance gesture: it climbs out of the flooded shore when
+ *  Ysolei calls it (the manifest plays its Rise clip, once per entity). */
+export const TEMPLE_MOONSPAWN_RISE = 'temple_moonspawn_rise';
+/** How long after a Moonspawn is first seen its Rise is still offered (the
+ *  view is often built a frame or two after the entity appears). */
+export const TEMPLE_MOONSPAWN_RISE_WINDOW = 1;
+
+/** True while a freshly seen Moonspawn should be offered its Rise: alive, and
+ *  within the window since it was first seen. */
+export function templeMoonspawnRises(
+  templateId: string | undefined,
+  dead: boolean,
+  sinceFirstSeen: number,
+): boolean {
+  return templateId === 'moonspawn' && !dead && sinceFirstSeen <= TEMPLE_MOONSPAWN_RISE_WINDOW;
+}

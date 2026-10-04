@@ -41,10 +41,12 @@ import {
   isTemplePilgrimFrenzyCue,
   TEMPLE_ACCENTS,
   TEMPLE_MARK_SPECS,
+  TEMPLE_MOONSPAWN_RISE,
   TEMPLE_OBJECT_SPECS,
   TEMPLE_PILGRIM_FRENZY_GESTURE,
   TEMPLE_SENTINEL_SHELL_OPEN,
   type TempleTelegraphSpec,
+  templeMoonspawnRises,
   templeSentinelShellGesture,
   templeTelegraphFill,
   templeTelegraphSpecs,
@@ -108,6 +110,8 @@ export class TempleFx {
   private readonly flashesOn: boolean;
   /** Each Pearlguard Sentinel's shell stance last sent (absent = open). */
   private readonly shellStance = new Map<number, string>();
+  /** When each Moonspawn was first seen (its Rise is offered for a moment). */
+  private readonly moonspawnSeen = new Map<number, number>();
   private scan = 0;
   private clock = 0;
   private disposed = false;
@@ -425,6 +429,7 @@ export class TempleFx {
         continue;
       }
       if (this.playGesture) this.updateShellStance(e.id, e.templateId, e.auras, e.dead);
+      if (this.playGesture && e.templateId === 'moonspawn') this.offerMoonspawnRise(e.id, e.dead);
       if (e.dead) continue;
       if (e.templateId.startsWith(REFLECTION_ID) && e.forcedTargetId !== null) {
         const have = this.tetherPairs.findIndex(([r]) => r === e.id);
@@ -480,6 +485,20 @@ export class TempleFx {
     if (want === TEMPLE_SENTINEL_SHELL_OPEN) this.shellStance.delete(id);
     else this.shellStance.set(id, want);
     this.playGesture?.(id, want);
+  }
+
+  /** A Moonspawn climbing out of the shore: its Rise is offered for the first
+   *  moment after it is seen (the rig plays it once); old entries are dropped. */
+  private offerMoonspawnRise(id: number, dead: boolean): void {
+    let seen = this.moonspawnSeen.get(id);
+    if (seen === undefined) {
+      seen = this.clock;
+      this.moonspawnSeen.set(id, seen);
+      for (const [other, at] of this.moonspawnSeen)
+        if (this.clock - at > 60) this.moonspawnSeen.delete(other);
+    }
+    if (templeMoonspawnRises('moonspawn', dead, this.clock - seen))
+      this.playGesture?.(id, TEMPLE_MOONSPAWN_RISE);
   }
 
   dispose(): void {
