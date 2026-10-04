@@ -553,7 +553,8 @@ export const VAEL_TUNING = {
  *  Fogbeacon in front of the crown stair (where the group climbs up: the
  *  stair mouth's bearing from the crown's middle, sim yaw), then his place. */
 export const VAEL_INTRO_ARRIVAL_YAW = Math.atan2(-11, -20);
-export const VAEL_HOME = { x: -4, z: 226 } as const;
+/** His place (his spawn): west of the Fogbeacon, in sight of the crown stair. */
+export const VAEL_HOME = { x: -22, z: 214 } as const;
 export const VAEL_INTRO_STOPS: readonly { x: number; z: number }[] = [
   [0.96, 14],
   [-0.96, 14],

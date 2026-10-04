@@ -752,8 +752,10 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
   // Patrol G: two warhounds circling the court.
   patrolling('bastion_warhound', COURT_LOOP, 'kc', 0),
   patrolling('bastion_warhound', COURT_LOOP, 'kc', 4),
-  // Boss 3: Vael the Fogbinder on the Beacon Crown, north of the Fogbeacon.
-  { mobId: 'vael_the_mistcaller', x: -4, z: 226, facing: FACE_SOUTH, idleStationary: true },
+  // Boss 3: Vael the Fogbinder on the Beacon Crown, west of the Fogbeacon,
+  // where the group sees his last rise as it comes up the crown stair (north
+  // of the tower, the lighthouse hid it).
+  { mobId: 'vael_the_mistcaller', x: -22, z: 214, facing: FACE_SOUTH, idleStationary: true },
 ];
 
 /** Every mandatory trash pull, patrols included, in route order (dev helpers, tests). */
