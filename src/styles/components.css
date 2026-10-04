@@ -16353,18 +16353,21 @@
      ring's arc instead. */
   #bastion-cage-escape,
   #bastion-chain-alert,
+  #bastion-alert,
   #wildheart-alert,
   #sanctum-alert {
     bottom: calc(260px + var(--castbar-h) + 14px);
   }
   body.show-actionbar3 #bastion-cage-escape,
   body.show-actionbar3 #bastion-chain-alert,
+  body.show-actionbar3 #bastion-alert,
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert {
     bottom: calc(312px + var(--castbar-h) + 14px);
   }
   body.mobile-touch #bastion-cage-escape,
   body.mobile-touch #bastion-chain-alert,
+  body.mobile-touch #bastion-alert,
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert {
     bottom: 56%;
@@ -16528,6 +16531,84 @@
     }
   }
   body.mobile-touch #bastion-chain-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Sunken Bastion's crown alert (Vael's scythe, the Fog Veil) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/bastion_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: the
+     scythe behind you throbs in the hostile tone, the veil's rule sits in the
+     beacon's warm gold, a hollow shade in its fog green. Never tier-gated
+     (graphics fairness). */
+  #bastion-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #bastion-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #bastion-alert .fa-line {
+    font-size: 14px;
+  }
+  #bastion-alert .fa-hint {
+    display: none;
+  }
+  #bastion-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-alert.is-reaped,
+  #bastion-alert.is-sentenced,
+  #bastion-alert.is-brine {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-alert.is-reaped .fa-title,
+  #bastion-alert.is-reaped .fa-fill,
+  #bastion-alert.is-sentenced .fa-title,
+  #bastion-alert.is-sentenced .fa-fill,
+  #bastion-alert.is-brine .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #bastion-alert.is-veil-real {
+    animation: bce-throb 0.6s ease-in-out infinite alternate;
+  }
+  #bastion-alert.is-veil-shade {
+    border-color: var(--color-debuff-nature);
+  }
+  #bastion-alert.is-veil-shade .fa-title {
+    color: var(--color-debuff-nature);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-alert {
     min-width: min(420px, calc(100vw - 32px));
   }
 

@@ -30,14 +30,21 @@ import {
   MORTHEN_RITE_WAKES,
 } from '../../sim/encounters/hollow_crypt/ids';
 import {
-  OLEN_OATHBOUND_CHARGE,
+  OLEN_HALLOWED_BRINE,
+  OLEN_OATH_KNEEL,
+  OLEN_OATH_VIGIL,
+  OLEN_REBOUNDING_BULWARK,
+  OLEN_TIDE_SENTENCE,
   OSSICK_ANCHOR,
   OSSICK_CUDGEL,
   OSSICK_SHACKLE,
   VAEL_DROWNING_HYMN,
+  VAEL_INTRO_RISE,
   VAEL_MIST_SURGE,
   VAEL_REAPING_SCYTHE,
   VAEL_SHADOWSTEP,
+  VAEL_SINK,
+  VAEL_VEIL_GATHER,
   VAEL_VEIL_RISE,
 } from '../../sim/encounters/sunken_bastion/ids';
 import {
@@ -143,6 +150,12 @@ import {
   OSSICK_ANCHOR_HOME_GESTURE,
   VAEL_VEIL_RISE_CLIP_RATE,
 } from '../sunken_bastion/bastion_gaol_reaper_core';
+import {
+  OLEN_SHIELD_AWAY_GESTURE,
+  OLEN_SHIELD_BONE,
+  OLEN_SHIELD_CATCH_GESTURE,
+  OLEN_SHIELD_HOME_GESTURE,
+} from '../sunken_bastion/bastion_olen_fx_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import type { ClipTrackDrops } from './clip_track_drops';
@@ -4342,11 +4355,43 @@ export const VISUALS: Record<string, VisualDef> = {
       hit: ['Hit'],
       death: 'Death',
       stunned: 'Stunned',
-      cast: 'OathCharge',
-      castByAbility: { [OLEN_OATHBOUND_CHARGE]: 'OathCharge' },
-      castTimeScaleByAbility: { [OLEN_OATHBOUND_CHARGE]: 1 },
+      cast: 'Judgement',
+      // The fallen paladin's kit (encounters/sunken_bastion/olen.ts): the
+      // sword driven into the flags, the shield hurled, the sword levelled at
+      // the Sentence's mark, the kneel and the vigil in the Oath's bubble.
+      castByAbility: {
+        [OLEN_HALLOWED_BRINE]: 'Consecrate',
+        [OLEN_REBOUNDING_BULWARK]: 'ShieldThrow',
+        [OLEN_TIDE_SENTENCE]: 'Judgement',
+        [OLEN_OATH_KNEEL]: 'OathKneel',
+        [OLEN_OATH_VIGIL]: 'OathVigil',
+      },
+      castTimeScaleByAbility: {
+        [OLEN_HALLOWED_BRINE]: 1,
+        [OLEN_REBOUNDING_BULWARK]: 1,
+        [OLEN_TIDE_SENTENCE]: 1,
+        [OLEN_OATH_KNEEL]: 1,
+      },
+      // The shield comes home to his arm (bastion_olen_fx.ts).
+      attackByAbility: { [OLEN_SHIELD_CATCH_GESTURE]: 'ShieldCatch' },
     },
-    castClipSync: true,
+    // Every bar's clip lands its moment on the bar (the plant, the release at
+    // 1.3 of the throw's 1.5, the kneel); the vigil loops for as long as it holds.
+    castClipSync: [
+      OLEN_HALLOWED_BRINE,
+      OLEN_REBOUNDING_BULWARK,
+      OLEN_TIDE_SENTENCE,
+      OLEN_OATH_KNEEL,
+    ],
+    // The held shield (its own Shield bone) stays hidden while the hurled one
+    // flies, and comes back with the catch.
+    meshToggles: [
+      {
+        nodes: [OLEN_SHIELD_BONE],
+        hideNow: OLEN_SHIELD_AWAY_GESTURE,
+        showNow: OLEN_SHIELD_HOME_GESTURE,
+      },
+    ],
     walkRef: 2.5,
     runRef: 9.93,
     authoredAtlas: true,
@@ -4430,11 +4475,20 @@ export const VISUALS: Record<string, VisualDef> = {
         [VAEL_REAPING_SCYTHE]: 'Emerge',
         // The Fog Veil: all four figures rise out of the roof the same way.
         [VAEL_VEIL_RISE]: 'Emerge',
+        // His entrance: he rises out of the roof at each stop (the veil's
+        // pace), and sinks back under it (also the sink before each veil).
+        [VAEL_INTRO_RISE]: 'Emerge',
+        [VAEL_SINK]: 'Vanish',
+        // The fog gathering before the veil: he raises the lantern and sings it in.
+        [VAEL_VEIL_GATHER]: 'Hymn',
       },
       // The veil's rise is twice the Emerge clip's length: played at bar pace
       // it rises ONCE over the whole bar (looped at rate 1 it rose, dropped
-      // back under and rose again).
-      castTimeScaleByAbility: { [VAEL_VEIL_RISE]: VAEL_VEIL_RISE_CLIP_RATE },
+      // back under and rose again). The entrance's rises share its bar.
+      castTimeScaleByAbility: {
+        [VAEL_VEIL_RISE]: VAEL_VEIL_RISE_CLIP_RATE,
+        [VAEL_INTRO_RISE]: VAEL_VEIL_RISE_CLIP_RATE,
+      },
       // Emerge starts under the flags: it takes the body at once, never
       // crossfading out of a standing pose (a copy popping in upright).
       castSnapIn: ['Emerge'],
@@ -4444,7 +4498,13 @@ export const VISUALS: Record<string, VisualDef> = {
     // would otherwise run late behind a swing, so the sim moved him to the
     // pool while he still stood above the floor); the Hymn and the Mist Surge
     // keep looping.
-    castClipSync: [VAEL_SHADOWSTEP, VAEL_REAPING_SCYTHE, VAEL_VEIL_RISE],
+    castClipSync: [
+      VAEL_SHADOWSTEP,
+      VAEL_REAPING_SCYTHE,
+      VAEL_VEIL_RISE,
+      VAEL_INTRO_RISE,
+      VAEL_SINK,
+    ],
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 2.2,

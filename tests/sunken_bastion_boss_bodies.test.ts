@@ -15,10 +15,19 @@ import {
   OSSICK_ANCHOR_HOME_GESTURE,
   ossickAnchorGesture,
 } from '../src/render/sunken_bastion/bastion_gaol_reaper_core';
+import {
+  OLEN_SHIELD_AWAY_GESTURE,
+  OLEN_SHIELD_BONE,
+  OLEN_SHIELD_CATCH_GESTURE,
+  OLEN_SHIELD_HOME_GESTURE,
+} from '../src/render/sunken_bastion/bastion_olen_fx_core';
 import { MOBS } from '../src/sim/data';
 import {
-  OLEN_OATHBOUND_CHARGE,
-  OLEN_TUNING,
+  OLEN_HALLOWED_BRINE,
+  OLEN_OATH_KNEEL,
+  OLEN_OATH_VIGIL,
+  OLEN_REBOUNDING_BULWARK,
+  OLEN_TIDE_SENTENCE,
   OSSICK_ANCHOR,
   OSSICK_CUDGEL,
   OSSICK_SHACKLE,
@@ -72,16 +81,50 @@ describe('Knight-Commander Olen', () => {
     expect(def.authoredAtlas).toBe(true);
     const shipped = glbClips(def.url);
     for (const clip of referencedClips(key)) expect(shipped.has(clip), clip).toBe(true);
-    for (const clip of ['Idle', 'CombatIdle', 'Walk', 'Run', 'Attack3', 'OathCharge', 'Stunned'])
+    for (const clip of [
+      'Idle',
+      'CombatIdle',
+      'Walk',
+      'Run',
+      'Attack3',
+      'Stunned',
+      'Consecrate',
+      'ShieldThrow',
+      'ShieldCatch',
+      'Judgement',
+      'OathKneel',
+      'OathVigil',
+    ])
       expect(shipped.has(clip), clip).toBe(true);
   });
 
-  it('plays the Oathbound Charge bar-locked: the launch lands on the bar end', () => {
-    expect(def.clips.castByAbility?.[OLEN_OATHBOUND_CHARGE]).toBe('OathCharge');
-    expect(def.clips.castTimeScaleByAbility?.[OLEN_OATHBOUND_CHARGE]).toBe(1);
-    expect(def.castClipSync).toBe(true);
-    // OathCharge is authored to the bar's own length and plays at speed 1.
-    expect(OLEN_TUNING.chargeCast).toBe(2.5);
+  it("plays the fallen paladin's bars bar-locked and loops the vigil", () => {
+    const by = def.clips.castByAbility ?? {};
+    expect(by[OLEN_HALLOWED_BRINE]).toBe('Consecrate');
+    expect(by[OLEN_REBOUNDING_BULWARK]).toBe('ShieldThrow');
+    expect(by[OLEN_TIDE_SENTENCE]).toBe('Judgement');
+    expect(by[OLEN_OATH_KNEEL]).toBe('OathKneel');
+    expect(by[OLEN_OATH_VIGIL]).toBe('OathVigil');
+    const synced = def.castClipSync as readonly string[];
+    for (const id of [
+      OLEN_HALLOWED_BRINE,
+      OLEN_REBOUNDING_BULWARK,
+      OLEN_TIDE_SENTENCE,
+      OLEN_OATH_KNEEL,
+    ])
+      expect(synced).toContain(id);
+    // The vigil's 60 s bar never locks its loop.
+    expect(synced).not.toContain(OLEN_OATH_VIGIL);
+    expect(def.clips.attackByAbility?.[OLEN_SHIELD_CATCH_GESTURE]).toBe('ShieldCatch');
+    // The held shield hides while the thrown one flies, and comes home.
+    expect(def.meshToggles).toEqual([
+      {
+        nodes: [OLEN_SHIELD_BONE],
+        hideNow: OLEN_SHIELD_AWAY_GESTURE,
+        showNow: OLEN_SHIELD_HOME_GESTURE,
+      },
+    ]);
+    expect(glbNodeNames(def.url).has(OLEN_SHIELD_BONE)).toBe(true);
     // Breached reels in its own dazed loop.
     expect(def.clips.stunned).toBe('Stunned');
   });

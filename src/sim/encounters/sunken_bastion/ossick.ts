@@ -3,12 +3,16 @@
 //
 //   Drowned Anchor   every 24 s (first at 8 s) a 1.8 s bar, the mark growing
 //                    under a non-tank player; then the anchor slams down and
-//                    its fluke hooks them: they are rooted and, after 1.5 s of
-//                    the chain winding taut, hauled toward the pit in the
-//                    yard's centre (about 8 s from anywhere in the yard). Any
-//                    hit on the anchor (the victim's own too) is one link:
-//                    12 break the chain and free them. Reaching the rim they
-//                    fall in: 60 percent of their health, stunned 3 s.
+//                    its fluke hooks them: the chain tethers them to the winch
+//                    (they can move, but never further out than the chain)
+//                    and, after 1.5 s of winding taut, reels them toward the
+//                    pit in the yard's centre (about 8 s from anywhere in the
+//                    yard). Two ways out: any hit on the anchor (the victim's
+//                    own too) is one link and 12 break the chain; or the
+//                    victim reaches a LIT Mooring Post (within 3 yd), which
+//                    takes the chain and frees them, and goes dark for 30 s
+//                    (ossick_moorings.ts). Reaching the rim they fall in: 60
+//                    percent of their health, stunned 3 s.
 //   Shackle Pair     every 28 s (first at 16 s) a 1.2 s bar, then two players
 //                    are chained together for 12 s: every second they stand
 //                    more than 8 yd apart, both take 40 to 50.
@@ -26,9 +30,10 @@
 // Anchored aura's sourceId names the anchor, and a Shackled aura's sourceId
 // names the partner, so the client draws both chains from the auras alone.
 
+import { displaceAlong } from '../../knockback';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
 import { kitHash } from '../../mob/trash_kit/targets';
-import { pullToward } from '../../pull_toward';
+import { pullHeld } from '../../pull_toward';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, dist2d, type Entity, type OssickFightState } from '../../types';
@@ -62,6 +67,7 @@ import {
   shackleStrained,
   WINCH,
 } from './ids';
+import { freshPostDark, relightMooringPosts, stepMooringPosts, tryMoor } from './ossick_moorings';
 
 const T = OSSICK_TUNING;
 export const OSSICK_DEED = 'dgn_ossick_moored';
@@ -81,6 +87,7 @@ function freshState(): OssickFightState {
     keelhauled: false,
     casts: 0,
     pending: [],
+    postDark: freshPostDark(),
   };
 }
 
@@ -159,11 +166,18 @@ function landAnchor(
   anchor.hp = links;
   anchor.facing = Math.atan2(p.pos.x - boss.pos.x, p.pos.z - boss.pos.z);
   anchor.prevFacing = anchor.facing;
-  st.anchors.push({ playerId: p.id, anchorId: anchor.id, held: 0 });
+  const o = ctx.instanceOriginOf(inst);
+  const hookX = p.pos.x - o.x;
+  const hookZ = p.pos.z - o.z;
+  const chain = Math.hypot(hookX - WINCH.x, hookZ - WINCH.z);
+  st.anchors.push({ playerId: p.id, anchorId: anchor.id, held: 0, chain, hookX, hookZ });
   ctx.applyAura(p, {
     id: OSSICK_ANCHORED,
     name: 'Drowned Anchor',
-    kind: 'root',
+    // A tether, not a root: the victim keeps their feet (to reach a post) and
+    // the chain holds them in (stepAnchors). An authoritative displacement
+    // state, so no slow or root immunity shrugs it off.
+    kind: 'forced_move',
     remaining: 60,
     duration: 60,
     value: 0,
@@ -250,7 +264,14 @@ function fallIntoPit(
   });
 }
 
-/** The winch hauls every anchored player one tick toward the pit. */
+/** Is `p` still inside the claim (the claim roster's own bounds)? */
+function inClaim(p: Entity, o: { x: number; z: number }): boolean {
+  return Math.abs(p.pos.x - o.x) < 120 && Math.abs(p.pos.z - o.z) < 250;
+}
+
+/** The winch hauls every anchored player one tick toward the pit: the chain
+ *  holds them inside its length, which reels in once it has settled, unless a
+ *  lit Mooring Post in reach takes it. */
 function stepAnchors(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -273,11 +294,34 @@ function stepAnchors(
       releaseAnchor(ctx, inst, boss, st, a.playerId, a.anchorId, false);
       continue;
     }
+    // Gone from the claim (out of the dungeon, a teleport, a summons): the
+    // chain lets go rather than drag them back across the world.
+    if (!inClaim(p, o)) {
+      releaseAnchor(ctx, inst, boss, st, a.playerId, a.anchorId, false);
+      continue;
+    }
     a.held += DT;
     anchor.swingTimer = Math.max(anchor.swingTimer, 5);
-    if (a.held > T.anchorSettle) {
-      const d = Math.hypot(p.pos.x - wx, p.pos.z - wz);
-      pullToward(ctx, p, wx, wz, anchorDragSpeed(d, heroic) * DT, PIT_RIM - 0.05);
+    // The chain never pays out: a step toward the winch takes up its slack, and
+    // once settled it reels in at the haul's pace (a victim standing still is
+    // hauled exactly as by a straight drag). A hold against pulls (the Mooring
+    // Stone, an Ice Block) stops the REEL, never the tether: the chain's
+    // length is a limit, so no shield, blink or charge carries its victim out
+    // past it (they are drawn straight back in, through the collider sweep).
+    const d = Math.hypot(p.pos.x - wx, p.pos.z - wz);
+    a.chain = Math.min(a.chain, d);
+    if (a.held > T.anchorSettle && !pullHeld(ctx, p))
+      a.chain = Math.max(PIT_RIM - 0.05, a.chain - anchorDragSpeed(a.chain, heroic) * DT);
+    if (d > a.chain + 1e-6) {
+      displaceAlong(ctx, p, (wx - p.pos.x) / d, (wz - p.pos.z) / d, d - a.chain);
+      // A wall or a post the sweep stopped them at: the chain hangs no shorter
+      // than they stand, so no slack piles up to be paid out in one snap.
+      a.chain = Math.max(a.chain, Math.hypot(p.pos.x - wx, p.pos.z - wz));
+    }
+    // A lit Mooring Post in reach takes the chain: the victim is freed.
+    if (tryMoor(ctx, inst, st, p, a.hookX, a.hookZ) >= 0) {
+      releaseAnchor(ctx, inst, boss, st, a.playerId, a.anchorId, true);
+      continue;
     }
     // The anchor rides its victim a step toward the winch, flukes toward them.
     const toWinch = Math.atan2(wx - p.pos.x, wz - p.pos.z);
@@ -446,7 +490,7 @@ function openCells(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: Ossick
   }
 }
 
-/** The fight ended: the anchors drop, the shackles fall away. */
+/** The fight ended: the anchors drop, the shackles fall away, the posts relight. */
 export function resetOssick(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.bastionFight?.kind === 'ossick' ? boss.bastionFight : null;
   if (st) {
@@ -459,6 +503,7 @@ export function resetOssick(ctx: SimContext, inst: InstanceSlot, boss: Entity): 
       if (p) dropAuraById(p, OSSICK_ANCHOR_MARK);
     }
   }
+  relightMooringPosts(ctx, inst, st);
   clearCastIf(boss, ...OUR_CASTS);
   boss.bastionFight = undefined;
 }
@@ -486,6 +531,7 @@ export function tickOssick(
     st = freshState();
     boss.bastionFight = st;
   }
+  stepMooringPosts(ctx, inst, st);
   stepAnchors(ctx, inst, boss, st);
   stepShackles(ctx, inst, boss, st);
   openCells(ctx, inst, boss, st);

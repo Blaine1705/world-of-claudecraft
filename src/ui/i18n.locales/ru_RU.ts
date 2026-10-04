@@ -20159,6 +20159,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_shadowstep': 'Переход сквозь тень',
   'abilityUi.cast.bastion_reaping_scythe': 'Жнущая коса',
   'abilityUi.cast.bastion_veil_rise': 'Туманная завеса',
+  'abilityUi.cast.bastion_veil_gather': 'Сгущение тумана',
+  'abilityUi.cast.bastion_vael_rise': 'Смерть восстаёт',
+  'abilityUi.cast.bastion_vael_sink': 'В туман',
+  'abilityUi.cast.bastion_hallowed_brine': 'Освящённый рассол',
+  'abilityUi.cast.bastion_rebounding_bulwark': 'Отскакивающий щит',
+  'abilityUi.cast.bastion_tide_sentence': 'Приговор прилива',
+  'abilityUi.cast.bastion_oath_kneel': 'Нерушимая клятва',
+  'abilityUi.cast.bastion_oath_vigil': 'Нерушимая клятва',
   'entities.mobs.bastion_gaol_cage.name': 'Железная клетка',
   'entities.mobs.bastion_drowned_anchor.name': 'Утопленный якорь',
   'entities.items.jailers_iron_gauntlets.name': 'Железные рукавицы тюремщика',
@@ -20167,11 +20175,21 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.iron_cage':
     'Железная клетка (жмите клавишу взаимодействия, чтобы вырваться; союзники могут ломать прутья)',
   'hudChrome.finder.mech.drowned_anchor':
-    'Утопленный якорь (разбейте цепь, пока жертву не утащило в яму)',
+    'Утопленный якорь (жертву подтягивает к яме: добегите на 3 ярда к горящему швартовому столбу, чтобы пришвартовать цепь, столб гаснет на 30 секунд, или разбейте цепь 12 ударами, 16 в героическом режиме)',
   'hudChrome.finder.mech.shackle_pair':
     'Парные кандалы (двое скованных игроков должны держаться вместе)',
+  'hudChrome.finder.mech.hallowed_brine':
+    'Освящённый рассол (лужа тёмной святой воды радиусом 9 ярдов, 10 в героическом режиме: 18 урона в секунду всем внутри, 26 в героическом, а он получает на 40 процентов меньше урона, пока стоит в ней: вытащите его)',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    'Отскакивающий щит (щит отскакивает к ближайшему игроку в 10 метрах от последнего поражённого, до 3 игроков, 4 в героике: рассредоточьтесь)',
+  'hudChrome.finder.mech.tide_sentence':
+    'Приговор прилива (через 5 секунд после метки столп света бьёт всех в 6 метрах от отмеченного, 8 в героике: примите его вдали от группы)',
+  'hudChrome.finder.mech.unbroken_oath':
+    'Нерушимая клятва (один раз, на половине здоровья, он до 60 секунд неуязвим в пузыре: убейте его солдат, затем он оглушён на 4 секунды и 10 секунд получает на 20 процентов больше урона)',
+  'hudChrome.finder.mech.fog_veil':
+    'Туманная завеса (четыре фигуры, одна настоящая: в луче маяка фонарь настоящего Ваэля вспыхивает)',
   'hudChrome.finder.mech.reaper_behind':
-    'Переход сквозь тень (жнец встаёт за спиной игрока, выйдите из дуги косы)',
+    'Переход сквозь тень (трижды подряд встаёт за спиной игрока, каждый раз другого, пока хватает игроков: выйдите из дуги косы)',
   'hudChrome.bastionCage.title': 'Вы заперты в железной клетке!',
   'hudChrome.bastionCage.promptKey': 'Жмите {key} снова и снова, чтобы вырваться',
   'hudChrome.bastionCage.promptNoKey':
@@ -20182,9 +20200,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.progressAria': 'Прогресс побега: {pct}',
   'hudChrome.bastionChain.anchoredTitle': 'Прикован к Утопленному якорю!',
   'hudChrome.bastionChain.anchoredLine':
-    'Группа должна разбить цепь, пока лебёдка не утащила вас в яму',
+    'Бегите к горящему швартовому столбу, чтобы пришвартовать цепь, или пусть группа разобьёт её, пока лебёдка не утащила вас в яму',
   'hudChrome.bastionChain.allyTitle': 'Разбейте цепь!',
-  'hudChrome.bastionChain.allyLine': '{name} тащат к яме: бейте Утопленный якорь',
+  'hudChrome.bastionChain.allyLine':
+    '{name} тащат к яме: бейте Утопленный якорь или помогите добежать до горящего столба',
+  'hudChrome.auraEffect.bastion.anchored':
+    'Прикованы к Утопленному якорю: двигаться можно, но не дальше от лебёдки, которая подтягивает вас к яме. Подойдите на {reach} ярда к горящему швартовому столбу не ближе {run} ярдов от места, где вас зацепило, чтобы пришвартовать цепь (этот столб гаснет на {dark} сек.), или пусть группа разобьёт её за {links} ударов ({linksHeroic} в героическом режиме). Яма отнимает {pit}% максимального здоровья ({pitHeroic}% в героическом режиме).',
   'hudChrome.bastionChain.shackledTitle': 'Скован с {name}',
   'hudChrome.bastionChain.shackledLine':
     'Держитесь в пределах {range} ярдов друг от друга (сейчас {dist} ярдов)',
@@ -20314,6 +20335,21 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': 'Сотрясающий топот (выйдите из кольца вокруг него)',
   'hudChrome.finder.mech.rerivet_last_link':
     'Переклёпка и Последнее звено (прервите кузнеца-погонщика, заново склёпывающего цепь; когда остаётся одна цепь, Натяжение каждые 10 секунд)',
+  'hudChrome.bastionAlert.sentencedTitle': 'Приговор падёт на тебя!',
+  'hudChrome.bastionAlert.sentencedLine': 'Столп света ударит всех рядом с тобой: отойди от группы',
+  'hudChrome.bastionAlert.brineTitle': 'Ты в освящённом рассоле!',
+  'hudChrome.bastionAlert.brineLine': 'Он жжёт каждую секунду: выйди из лужи',
+  'hudChrome.bastionAlert.reapedTitle': 'Смерть встаёт за твоей спиной!',
+  'hudChrome.bastionAlert.reapedLine': 'Выйди из дуги косы: вперёд или в сторону',
+  'hudChrome.bastionAlert.veilTitle': 'Туманная завеса',
+  'hudChrome.bastionAlert.veilLine':
+    'Следи за лучом маяка: настоящий Ваэль тот, чей фонарь вспыхивает',
+  'hudChrome.bastionAlert.realTitle': 'Луч нашёл его!',
+  'hudChrome.bastionAlert.realLine': 'Это настоящий Ваэль: бей его, чтобы разорвать завесу',
+  'hudChrome.bastionAlert.shadeTitle': 'Пустая тень',
+  'hudChrome.bastionAlert.shadeLine':
+    'Свет проходит сквозь неё: оставь её, найди того, кого освещает луч',
+  'hudChrome.bastionAlert.timeAria': 'Осталось секунд: {seconds}',
   'hudChrome.wildheartAlert.preyTitle': 'Вы добыча!',
   'hudChrome.wildheartAlert.preyLine':
     'Зулгар охотится на вас: ведите его через горящие солнечные глифы',

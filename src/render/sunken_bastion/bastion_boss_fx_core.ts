@@ -23,7 +23,9 @@ import {
   inBeam,
   OLEN_TUNING,
   oathLaneEnd,
+  VAEL_BEACON_LIT,
   VAEL_ID,
+  VAEL_SHADE_HOLLOW,
   VAEL_TUNING,
 } from '../../sim/encounters/sunken_bastion/ids';
 
@@ -273,11 +275,62 @@ export function beamReveal(templateId: string, yaw: number, lx: number, lz: numb
   return templateId === VAEL_ID ? 'real' : 'shade';
 }
 
+/** What the SIM says the beam left on a figure: the real Vael wears the
+ *  Beacon-Lit tell, a shade the Hollow Shade tell, each a breath after the beam
+ *  moves on (vael.ts). Every client reads the same truth the HUD's crown alert
+ *  names, so the reveal no longer hangs on a locally predicted beam. */
+export function auraReveal(
+  templateId: string,
+  auras: readonly { id: string }[] | undefined,
+): BeamReveal {
+  if (!auras) return null;
+  if (templateId === VAEL_ID) {
+    for (const a of auras) if (a.id === VAEL_BEACON_LIT) return 'real';
+    return null;
+  }
+  if (templateId === FOG_SHADE_ID) {
+    for (const a of auras) if (a.id === VAEL_SHADE_HOLLOW) return 'shade';
+  }
+  return null;
+}
+
+/** How much hotter and fuller the Fogbeacon's beam burns through the Fog Veil
+ *  (bastion_beacon.ts): its brightness gain at full boost. */
+export const VEIL_BEAM_GAIN = 2.6;
+
+/** The beam's veil boost stepped one frame: it flares up fast as the veil
+ *  takes the lamp and settles back slowly once it lets go. */
+export function beaconVeilBoost(prev: number, veiled: boolean, dt: number): number {
+  if (veiled) return Math.min(1, prev + dt * 3);
+  return Math.max(0, prev - dt * 1.2);
+}
+
+/** The lit sector on the roof under the beam during the veil: its opacity
+ *  pulse (bright enough to read from anywhere on the crown). */
+export function beamPoolOpacity(clock: number): number {
+  return 0.6 + 0.12 * Math.sin(clock * 9);
+}
+
+/** The gold light pillar over the real Vael while the beam has him: as tall
+ *  as the lantern room's beam falls, as bright as the reveal's glow. */
+export const REVEAL_PILLAR_HEIGHT = 16;
+export const REVEAL_PILLAR_RADIUS = 1.6;
+/** The gold ring on the flags under him: it breathes out to this radius. */
+export const REVEAL_RING_RADIUS = 3.4;
+export function revealRingRadius(k: number, clock: number): number {
+  return (
+    REVEAL_RING_RADIUS *
+    (0.75 + 0.25 * Math.max(0, Math.min(1, k))) *
+    (1 + 0.06 * Math.sin(clock * 6))
+  );
+}
+
 /** The reveal's glow on a veiled figure, stepped one frame: it LATCHES full
- *  the moment the beam catches the figure and then fades slowly, so the tell
- *  outlives the beam's brief pass (the beam crosses a figure in about a
- *  quarter second of its sweep; the glow holds about two seconds). */
-export const REVEAL_FADE_PER_SEC = 0.5;
+ *  while the figure wears the sim's tell (the beam's pass plus the sim's 1.5 s
+ *  linger, auraReveal) and then fades out in about 0.6 s. The sim holds the
+ *  tell now; a long render afterglow on top kept the real one lit through
+ *  most of every 4 s sweep, so he no longer had to be found. */
+export const REVEAL_FADE_PER_SEC = 1.6;
 export function revealGlow(prev: number, lit: boolean, dt: number): number {
   if (lit) return 1;
   return Math.max(0, prev - REVEAL_FADE_PER_SEC * dt);

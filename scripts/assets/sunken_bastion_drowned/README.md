@@ -69,8 +69,15 @@ nothing here runs in the build or the game.
   of the hand, so the clips aim the board with `hand_dir_l`/`hand_roll_l`; tune them with a probe of the posed
   board). `clips.py` has Idle, CombatIdle, Walk, Run (the shield-first charge), Attack, Attack2 (the bash),
   Attack3 (the Reaping Arc), OathCharge (the 2.5 s bar, bar-locked, a beat longer so it never wraps at the
-  launch), Stunned (Breached), Hit, Death. The one-shots start and end on the guard (CombatIdle), not on Idle,
-  so the checks' Idle seams are expected there.
+  launch; retired with the charge), Stunned (Breached), Hit, Death, and the fallen paladin's kit, each on its
+  sim bar: Consecrate (Hallowed Brine, 1.2 s, the blade planted at 0.9), ShieldThrow (Rebounding Bulwark, 1.5 s,
+  the release at 1.3), ShieldCatch (0.6 s, the board back in the fist at 0.12), Judgement (Sentence of the Tide,
+  1.0 s, the point levelled at 0.45), OathKneel (Unbroken Oath, 1.5 s, down at 1.1) and OathVigil (a 2.4 s loop
+  in the bubble). The board rides its own never-turned `Shield` bone under the left fist (`anatomy._bones`, the
+  shield parts bound to it in `dressing.py`), so ShieldThrow and ShieldCatch hide and show it by its keyed scale;
+  `add_shield_bone.py` gave the already-baked .blend that bone without a re-sculpt. The one-shots start and end on
+  the guard (CombatIdle), not on Idle, so the checks' Idle seams are expected there, and Consecrate, OathKneel
+  and OathVigil set the sword's point in the flags on purpose (the checks' "under the ice").
 - `ossick/`: Gaoler Ossick (`public/models/creatures/gaoler_ossick.glb`), the second boss, grown from the
   Turnkey's builder into a hunched hulk (the trapezius hump, mooring-post arms, bigger fists): a bald drowned head
   in an iron brank (`build_brank`, rigid on the head and grown with it), a crossed leather harness

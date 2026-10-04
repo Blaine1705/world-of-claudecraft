@@ -15,10 +15,11 @@ import {
   zoneWelcomeText,
 } from '../src/sim/data';
 import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
+import { finishVaelIntro } from '../src/sim/encounters/sunken_bastion/vael_intro';
 import { createMob } from '../src/sim/entity';
 import { IGNIVAR_LIFT_RIDE_SECONDS } from '../src/sim/ignivar_forge_lift';
 import { IGNIVAR_LIFT_ROOM_ID, isIgnivarRaidRoom } from '../src/sim/ignivar_raid_ids';
-import { enterDungeon } from '../src/sim/instances/dungeons';
+import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type LootEntry, type SimEvent } from '../src/sim/types';
@@ -1295,6 +1296,8 @@ describe('boss loot and encounter resets', () => {
     );
     const thralls = () =>
       [...sim.entities.values()].filter((e) => e.templateId === 'drowned_thrall').length;
+    // He waits buried for his entrance on the crown: skip it, he stands ready.
+    finishVaelIntro(sim.ctx, expectDefined(claimedInstanceAt(sim.ctx, p.pos)), vael);
     // pull to 50%: the 60% summon threshold fires one wave of 2 thralls
     vael.inCombat = true;
     vael.hp = Math.floor(vael.maxHp * 0.5);

@@ -194,6 +194,20 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // cones, rings, lanes and glyphs through the shared kit below).
   { file: 'src/render/sunken_bastion/bastion_boss_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/sunken_bastion/bastion_creature_fx.ts', layer: 'encounter', strict: true },
+  // Olen's brine, Sentence column and bubble; Vael's staging pillar; the
+  // Mooring Post lamps' safe rings (their lamplight pool sits on the ground rung).
+  { file: 'src/render/sunken_bastion/bastion_olen_fx.ts', layer: 'encounter', strict: true },
+  {
+    file: 'src/render/sunken_bastion/bastion_vael_stage_fx.ts',
+    layer: 'encounter',
+    strict: true,
+  },
+  {
+    file: 'src/render/sunken_bastion/bastion_mooring_fx.ts',
+    layer: 'encounter',
+    strict: true,
+    alsoNames: ['ground'],
+  },
   // The shared dungeon floor telegraph (the crypt's and the Bastion's cones,
   // rings, lanes and kick glyphs, and their edge curtains).
   { file: 'src/render/floor_telegraph/telegraph_kit.ts', layer: 'encounter', strict: true },

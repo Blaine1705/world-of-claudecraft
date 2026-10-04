@@ -126,6 +126,12 @@ def post_mesh(pairs):
             me.update()
 
 
+def _shield_up():
+    """The board's up through the left fist (shield_matrix's +Y)."""
+    _w, down, width, _palm = HAND.frame(1)
+    return unit(width + down * 0.3)
+
+
 def _bones():
     out = [
         ('Root', None, (0, 0, 0), (0, 0, 0.6)),
@@ -136,6 +142,9 @@ def _bones():
         ('Head', 'Neck', (0, -0.01, 3.96), (0, -0.04, 4.55)),
         ('Jaw', 'Head', (0, -0.08, 4.07), (0, -0.2, 3.97)),
         ('Weapon', 'R_Hand', tuple(GRIP_R), tuple(GRIP_R + np.array(WEAPON_AXIS) * 1.0)),
+        # the tower shield on its own never-turned bone in the left fist, so a clip
+        # can hide it by a keyed scale (ShieldThrow hurls it, ShieldCatch takes it back)
+        ('Shield', 'L_Hand', tuple(GRIP_L_FIST), tuple(GRIP_L_FIST + _shield_up() * 0.5)),
         # the sodden tabard, front and back panels
         ('TabF1', 'Hips', (0, -0.42, 2.6), (0, -0.46, 1.86)),
         ('TabF2', 'TabF1', (0, -0.46, 1.86), (0, -0.47, 1.1)),
@@ -1098,8 +1107,8 @@ def shield_matrix():
     through the fist toward the thumb, its face is the back of the hand (the
     board lies just beyond the knuckles), the board hanging lower below the
     fist than it rises above it."""
-    w, down, width, palm = HAND.frame(1)
-    up_ = unit(width + down * 0.3)
+    _w, _down, _width, palm = HAND.frame(1)
+    up_ = _shield_up()
     out = unit(-palm - up_ * (-palm @ up_))
     side = unit(np.cross(up_, out))
     M = np.eye(4)
@@ -1364,8 +1373,9 @@ ANCHORS = {
     'brimL': ('Head', head_map(np.array((0.36, -0.05, 4.24)))),
     'brimR': ('Head', head_map(np.array((-0.36, -0.05, 4.24)))),
     'crest': ('Head', head_map(_comb_pt(0.3, COMB_R + 0.2))),
-    'shieldTop': ('L_Hand', shield_point((0.0, SHIELD_TOP, 0.0))),
-    'shieldFoot': ('L_Hand', shield_point((0.0, SHIELD_FOOT, 0.0))),
+    'shieldTop': ('Shield', shield_point((0.0, SHIELD_TOP, 0.0))),
+    'shieldFoot': ('Shield', shield_point((0.0, SHIELD_FOOT, 0.0))),
+    'shieldFace': ('Shield', shield_point((0.0, SHIELD_SIGIL_Y, 0.05))),
     'sword': ('Weapon', sword_point((0.0, 0.0, BLADE_END))),
     'cape': ('Cape3', np.array((0.0, 0.84, 0.95))),
     'chest': ('Spine2', np.array((0.0, -0.55, 3.05))),

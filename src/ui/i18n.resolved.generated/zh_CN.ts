@@ -3924,6 +3924,9 @@ export const zh_CN: EnTranslations = {
         "avatar": "移动速度提高{pct}%，追猎它的猎物。减速和定身可以生效，击晕的持续时间减半。",
         "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。"
       },
+      "bastion": {
+        "anchored": "被锁在溺亡之锚上：你可以移动，但无法远离绞盘，它会把你绞向溺亡深坑。走到距被钩住处至少{run}码的点亮系泊柱{reach}码以内即可系住锁链（该柱熄灭{dark}秒），或者让队友用{links}次攻击砸断锁链（英雄难度{linksHeroic}次）。掉进深坑会损失{pit}%的最大生命值（英雄难度{pitHeroic}%）。"
+      },
       "sanctum": {
         "lockbound": "受到的伤害降低{pct}%：每条仍然完好的锁链提供{per}%。打破一个封印镣铐即可让其锁链脱落。",
         "enrage": "造成的伤害提高{pct}%。",
@@ -5989,6 +5992,11 @@ export const zh_CN: EnTranslations = {
       "mech": {
         "shadow_pulse": "暗影脉冲（周期性范围伤害）",
         "reaping_arc": "收割之弧（正面顺劈）",
+        "hallowed_brine": "圣化咸水（半径9码的暗色圣水池，英雄难度10码：池中每秒受到18点伤害，英雄难度26点，他站在池中时受到的伤害降低40%，把他拖出去）",
+        "rebounding_bulwark": "回弹壁盾（盾牌弹向上一个被击中者10码内最近的玩家，最多3人，英雄4人：散开）",
+        "tide_sentence": "潮汐宣判（标记5秒后，光柱击中被标记者6码内的所有人，英雄8码：远离队伍承受）",
+        "unbroken_oath": "不破誓言（仅一次，生命值降到一半时他在泡泡中无敌跪下，最多60秒：击杀他的士兵打破它，随后他昏迷4秒并在10秒内受到的伤害提高20%）",
+        "fog_veil": "雾幕（四个身影，只有一个是真的：灯塔光束会让真正维尔的提灯骤亮）",
         "mist_surge": "迷雾涌动（周期性范围伤害）",
         "summons_adds": "召唤增援",
         "lunar_tide": "月潮（周期性范围伤害）",
@@ -6049,9 +6057,9 @@ export const zh_CN: EnTranslations = {
         "anvils_decree": "铁砧法令（三次全团锤击，用治疗撑过）",
         "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）",
         "iron_cage": "铁笼（连按交互键挣脱，队友可以砸开铁栏）",
-        "drowned_anchor": "溺亡之锚（在受害者被拖进深坑前砸断锁链）",
+        "drowned_anchor": "溺亡之锚（受害者会被绞向深坑：跑到点亮的系泊柱3码以内即可系住锁链，该柱随后熄灭30秒；或者用12次攻击砸断锁链，英雄难度16次）",
         "shackle_pair": "双人镣铐（被锁在一起的两名玩家必须靠在一起）",
-        "reaper_behind": "穿影（死神从玩家身后升起，离开镰刀的弧线）",
+        "reaper_behind": "穿影（连续三次从玩家身后升起，人数足够时每次都是不同的人：离开镰刀的弧线）",
         "pack_bond": "兽群羁绊（两者相邻时伤害减半：将它们拉开15码）",
         "stalk": "潜行追猎（美洲豹追猎被标记的玩家，从不追坦克；单人时它追你：风筝它，减速、定身、击晕它）",
         "shared_health": "共享生命（同一血池：攻击最安全的那个）",
@@ -6085,9 +6093,9 @@ export const zh_CN: EnTranslations = {
     },
     "bastionChain": {
       "anchoredTitle": "被溺亡之锚锁住了！",
-      "anchoredLine": "在绞盘把你拖进深坑之前，队友必须砸断锁链",
+      "anchoredLine": "跑到点亮的系泊柱系住锁链，或者在绞盘把你拖进深坑之前让队友砸断锁链",
       "allyTitle": "砸断锁链！",
-      "allyLine": "{name} 正被拖向深坑：攻击溺亡之锚",
+      "allyLine": "{name} 正被拖向深坑：攻击溺亡之锚，或帮助其跑到点亮的系泊柱",
       "shackledTitle": "与 {name} 锁在一起",
       "shackledLine": "彼此保持在 {range} 码以内（当前相距 {dist} 码）",
       "strainedLine": "离得太远！锁链会伤害你们两人：靠近到 {range} 码以内",
@@ -6097,6 +6105,21 @@ export const zh_CN: EnTranslations = {
       "linkRule": "每次击中锚，无论伤害多少，都会断开一环",
       "linksTarget": "锁链环 {count}/{total}",
       "linkBroken": "断开一环！"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "宣判落在你身上！",
+      "sentencedLine": "光柱会击中你身边的所有人：远离队伍",
+      "brineTitle": "你站在圣化咸水中！",
+      "brineLine": "它每秒都在灼烧你：离开水池",
+      "reapedTitle": "死亡在你身后升起！",
+      "reapedLine": "离开镰刀的弧线：向前，或向两侧",
+      "veilTitle": "雾幕",
+      "veilLine": "注意灯塔的光束：提灯骤亮的那个才是真正的维尔",
+      "realTitle": "光束找到了他！",
+      "realLine": "这是真正的维尔：攻击他以打破雾幕",
+      "shadeTitle": "空洞的幻影",
+      "shadeLine": "光穿透了它：别管它，去找光束照亮的那个",
+      "timeAria": "剩余{seconds}秒"
     },
     "wildheartAlert": {
       "preyTitle": "你是猎物！",
@@ -12508,6 +12531,14 @@ export const zh_CN: EnTranslations = {
       "bastion_shadowstep": "穿影",
       "bastion_reaping_scythe": "收割之镰",
       "bastion_veil_rise": "雾幕",
+      "bastion_veil_gather": "雾气聚拢",
+      "bastion_vael_rise": "死亡升起",
+      "bastion_vael_sink": "没入雾中",
+      "bastion_hallowed_brine": "圣化咸水",
+      "bastion_rebounding_bulwark": "回弹壁盾",
+      "bastion_tide_sentence": "潮汐宣判",
+      "bastion_oath_kneel": "不破誓言",
+      "bastion_oath_vigil": "不破誓言",
       "temple_lullaby": "摇篮曲",
       "cantor_last_verse": "最后一节",
       "temple_call_the_tide": "潮汐召唤",

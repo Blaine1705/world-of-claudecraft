@@ -45,11 +45,13 @@ import { sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
 import { setBeaconYaw } from './bastion_beacon';
 import {
+  auraReveal,
   BEAM_HALF,
   type BeamReveal,
   BUTTRESS_BURST_RADIUS,
   BUTTRESS_PIECES,
   bastionSlotOrigin,
+  beamPoolOpacity,
   beamReveal,
   buttressAt,
   buttressCrash,
@@ -61,7 +63,10 @@ import {
   oathLaneLength,
   pickVeilClaim,
   predictBeamYaw,
+  REVEAL_PILLAR_HEIGHT,
+  REVEAL_PILLAR_RADIUS,
   revealGlow,
+  revealRingRadius,
   standingButtressIds,
   VAEL_LANTERN,
   type VeilCandidate,
@@ -176,6 +181,24 @@ void main() {
 }
 `;
 
+// The beacon's gold light standing on the real Vael: a soft shaft, brightest
+// at its heart and its foot, motes climbing it.
+const PILLAR_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uAlpha;
+varying vec2 vUv;
+varying vec3 vWorld;
+void main() {
+  float h = vUv.y;
+  float across = abs(fract(vUv.x * 2.0) - 0.5) * 2.0;
+  float motes = 0.5 + 0.5 * sin(h * 40.0 - uTime * 8.0 + vUv.x * 30.0);
+  float i = (1.0 - h) * (0.55 + 0.45 * motes) * (0.6 + 0.4 * across) * uAlpha;
+  i += (1.0 - smoothstep(0.0, 0.12, h)) * 0.8 * uAlpha;
+  gl_FragColor = vec4(vec3(1.0, 0.84, 0.5) * i, i);
+  #include <colorspace_fragment>
+}
+`;
+
 // The dark cast shadow the beam throws off the real Vael.
 const SHADOW_FRAG = /* glsl */ `
 varying vec2 vUv;
@@ -211,6 +234,11 @@ interface RevealSlot {
   shimmer: THREE.Sprite;
   shadow: THREE.Mesh;
   shadowMat: THREE.ShaderMaterial;
+  /** The gold light pillar over the real one, and the ring on the flags. */
+  pillar: THREE.Mesh;
+  pillarMat: THREE.ShaderMaterial;
+  ring: THREE.Mesh;
+  ringMat: THREE.MeshBasicMaterial;
   kind: BeamReveal;
   k: number;
 }
@@ -233,6 +261,11 @@ interface Debris {
   rot: THREE.Euler;
   age: number;
   floor: number;
+}
+
+function hideReveal(r: RevealSlot): void {
+  r.flare.visible = r.core.visible = r.shimmer.visible = r.shadow.visible = false;
+  r.pillar.visible = r.ring.visible = false;
 }
 
 export class BastionBossFx {
@@ -351,17 +384,30 @@ export class BastionBossFx {
     const shadowGeo = this.geo(new THREE.PlaneGeometry(1.6, 1, 1, 1));
     shadowGeo.rotateX(-Math.PI / 2);
     shadowGeo.translate(0, 0, 0.5);
+    const pillarGeo = this.geo(new THREE.CylinderGeometry(1, 1.3, 1, 24, 1, true));
+    pillarGeo.translate(0, 0.5, 0);
+    const ringGeo = this.geo(new THREE.RingGeometry(0.82, 1, 48));
+    ringGeo.rotateX(-Math.PI / 2);
     for (let i = 0; i < REVEAL_SLOTS; i++) {
       // The real Vael's lantern flares: a wide amber halo round a white-hot
       // core (two sprites), so the tell reads across the roof.
-      const flare = this.sprite(0xffc56a, 0, 9);
-      const core = this.sprite(0xfff8e8, 0, 3.2);
+      const flare = this.sprite(0xffc56a, 0, 15);
+      const core = this.sprite(0xfff8e8, 0, 5);
       const shimmer = this.sprite(0x9dffc6, 0, 4.5);
       const shadowMat = this.shader(SHADOW_FRAG, { uAlpha: { value: 0 } }, false, true);
       const shadow = new THREE.Mesh(shadowGeo, shadowMat);
       shadow.frustumCulled = false;
       shadow.renderOrder = floorVfxRenderOrder('encounter', 5);
-      for (const o of [flare, core, shimmer, shadow]) {
+      const pillarMat = this.shader(PILLAR_FRAG, { uAlpha: { value: 0 } }, true);
+      const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+      pillar.frustumCulled = false;
+      pillar.renderOrder = floorVfxRenderOrder('encounter', 3);
+      const ringMat = this.basic(0xffd27a, 0);
+      ringMat.blending = THREE.AdditiveBlending;
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.frustumCulled = false;
+      ring.renderOrder = floorVfxRenderOrder('encounter', 7);
+      for (const o of [flare, core, shimmer, shadow, pillar, ring]) {
         o.visible = false;
         this.root.add(o);
       }
@@ -372,6 +418,10 @@ export class BastionBossFx {
         shimmer,
         shadow,
         shadowMat,
+        pillar,
+        pillarMat,
+        ring,
+        ringMat,
         kind: null,
         k: 0,
       });
@@ -788,7 +838,7 @@ export class BastionBossFx {
       this.beamPool.visible = true;
       this.beamPool.position.set(cx, Math.max(floor + LIFT + 0.05, this.floodTop + 0.04), cz);
       this.beamPool.rotation.y = yaw;
-      this.beamPoolMat.opacity = 0.34 + 0.08 * Math.sin(this.clock * 9);
+      this.beamPoolMat.opacity = beamPoolOpacity(this.clock);
       this.updateReveals(world, yaw, o, dt);
     } else {
       if (this.beamSlot) setBeaconYaw(this.beamSlot.x, this.beamSlot.z, null);
@@ -796,7 +846,7 @@ export class BastionBossFx {
       this.beamPool.visible = false;
       for (const r of this.reveals) {
         r.entityId = -1;
-        r.flare.visible = r.core.visible = r.shimmer.visible = r.shadow.visible = false;
+        hideReveal(r);
       }
     }
   }
@@ -806,7 +856,7 @@ export class BastionBossFx {
     for (const r of this.reveals) {
       if (r.entityId >= 0 && !this.veilIds.includes(r.entityId)) {
         r.entityId = -1;
-        r.flare.visible = r.core.visible = r.shimmer.visible = r.shadow.visible = false;
+        hideReveal(r);
       }
     }
     for (const id of this.veilIds) {
@@ -823,7 +873,11 @@ export class BastionBossFx {
       if (r.entityId < 0) continue;
       const e = world.entities.get(r.entityId);
       if (!e) continue;
-      const kind = beamReveal(e.templateId, yaw, e.pos.x - o.x, e.pos.z - o.z);
+      // The sim's tell first (every client the same), the local beam as the
+      // frame-exact edge before the next snapshot lands.
+      const kind =
+        auraReveal(e.templateId, e.auras) ??
+        beamReveal(e.templateId, yaw, e.pos.x - o.x, e.pos.z - o.z);
       // The real one's tell flashes on (a burst of gold off the lantern) and
       // then holds a slow afterglow, so it is learnable at a glance.
       if (kind === 'real' && r.k < 0.5 && this.cosmetic)
@@ -835,6 +889,8 @@ export class BastionBossFx {
       r.flare.visible = real && r.k > 0.01;
       r.core.visible = real && r.k > 0.01;
       r.shadow.visible = real && r.k > 0.01;
+      r.pillar.visible = real && r.k > 0.01;
+      r.ring.visible = real && r.k > 0.01;
       r.shimmer.visible = !real && r.k > 0.01;
       if (real) {
         const pulse = 0.8 + 0.2 * Math.sin(this.clock * 11);
@@ -852,6 +908,15 @@ export class BastionBossFx {
         r.shadow.rotation.y = away;
         r.shadow.scale.set(1, 1, 5.5);
         r.shadowMat.uniforms.uAlpha.value = 0.72 * r.k;
+        // The beacon's light stands on him: a gold shaft and a ring at his feet.
+        const lit = Math.max(floor + LIFT + 0.02, this.floodTop + 0.03);
+        r.pillar.position.set(e.pos.x, lit, e.pos.z);
+        r.pillar.scale.set(REVEAL_PILLAR_RADIUS, REVEAL_PILLAR_HEIGHT, REVEAL_PILLAR_RADIUS);
+        r.pillarMat.uniforms.uAlpha.value = 0.85 * r.k * pulse;
+        const rr = revealRingRadius(r.k, this.clock);
+        r.ring.position.set(e.pos.x, lit + 0.01, e.pos.z);
+        r.ring.scale.set(rr, 1, rr);
+        r.ringMat.opacity = 0.9 * r.k;
       } else {
         (r.shimmer.material as THREE.SpriteMaterial).opacity =
           r.k * (0.55 + 0.45 * Math.sin(this.clock * 17 + r.entityId));

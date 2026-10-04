@@ -1,6 +1,6 @@
 """Olen's hard dressing: the longsword (its brass hilt and its blade, built in the
 sword's own frame and set in the right fist on the never-keyed Weapon bone), the
-great tower shield strapped along the left forearm (the board, its brass sigil,
+great tower shield in the left fist on its own Shield bone (the board, its brass sigil,
 the barnacles crusting its foot and edges, the weed hanging off it), and the sea
 light in the shadow of the brim."""
 import math
@@ -49,8 +49,8 @@ def build_sword(workdir, k=1.0):
 
 def build_shield(workdir, k=1.0):
     M = A.shield_matrix()
-    pairs = [_rigid_pair(A.build_shield(0.0065 * k), 'Shield', M, 'plate', 'L_Hand', 3000, workdir),
-             _rigid_pair(A.build_shield_sigil(0.0045 * k), 'ShieldSigil', M, 'brass', 'L_Hand', 1600, workdir)]
+    pairs = [_rigid_pair(A.build_shield(0.0065 * k), 'Shield', M, 'plate', 'Shield', 3000, workdir),
+             _rigid_pair(A.build_shield_sigil(0.0045 * k), 'ShieldSigil', M, 'brass', 'Shield', 1600, workdir)]
     # barnacles crusting the foot of the board and climbing its edges
     rng = np.random.default_rng(77)
     G = Field((-A.SHIELD_W - 0.12, A.SHIELD_FOOT - 0.15, -0.3), (A.SHIELD_W + 0.12, A.SHIELD_TOP + 0.1, 0.2),
@@ -67,7 +67,7 @@ def build_shield(workdir, k=1.0):
         p = A._on_board(x, y, 0.015)
         A.barnacle(G, p, np.array((0.0, 0.0, 1.0)), rr, rr * rng.uniform(0.8, 1.3), rng)
         placed += 1
-    pairs.append(_rigid_pair(G, 'BarnShield', M, 'barnacle', 'L_Hand', 1400, workdir))
+    pairs.append(_rigid_pair(G, 'BarnShield', M, 'barnacle', 'Shield', 1400, workdir))
     # weed hanging off the foot
     W = Field((-A.SHIELD_W - 0.1, A.SHIELD_FOOT - 0.75, -0.15), (A.SHIELD_W + 0.1, A.SHIELD_FOOT + 0.3, 0.15),
               0.005 * k)
@@ -75,7 +75,7 @@ def build_shield(workdir, k=1.0):
         y0 = A.SHIELD_FOOT + 0.12 * min(1.0, abs(x0) / A.SHIELD_W) + 0.04
         pts = [A._on_board(x0 + 0.03 * math.sin(t * 5 + x0 * 9), y0 - L_ * t, 0.03 + 0.04 * t) for t in np.linspace(0, 1, 7)]
         A.ribbon(W, pts, [np.array((0.0, 0.0, 1.0))] * len(pts), 0.045, 0.009, rng)
-    pairs.append(_rigid_pair(W, 'KelpShield', M, 'kelp', 'L_Hand', 700, workdir))
+    pairs.append(_rigid_pair(W, 'KelpShield', M, 'kelp', 'Shield', 700, workdir))
     return pairs
 
 

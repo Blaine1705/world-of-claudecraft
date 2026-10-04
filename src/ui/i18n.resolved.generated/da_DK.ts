@@ -3924,6 +3924,9 @@ export const da_DK: EnTranslations = {
         "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
         "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
       },
+      "bastion": {
+        "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
+      },
       "sanctum": {
         "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
         "enrage": "Deals {pct}% more damage.",
@@ -5989,6 +5992,11 @@ export const da_DK: EnTranslations = {
       "mech": {
         "shadow_pulse": "Skyggeimpuls (pulserende omradesskade)",
         "reaping_arc": "Mejende Bue (frontal mejning)",
+        "hallowed_brine": "Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)",
+        "rebounding_bulwark": "Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)",
+        "tide_sentence": "Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)",
+        "unbroken_oath": "Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)",
+        "fog_veil": "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
         "mist_surge": "Tågebølge (pulserende omradesskade)",
         "summons_adds": "Tilkalder forstærkninger",
         "lunar_tide": "Manetide (pulserende omradesskade)",
@@ -6049,9 +6057,9 @@ export const da_DK: EnTranslations = {
         "anvils_decree": "Ambolt's Decreet (tre hammerslag over hele raid, heles igennem)",
         "masters_assembly": "Mesterens forsamling (bloker smedebjælkerne, drej blokeringer)",
         "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
-        "drowned_anchor": "Drowned Anchor (break the chain before its victim is dragged into the pit)",
+        "drowned_anchor": "Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)",
         "shackle_pair": "Shackle Pair (two chained players must stay close together)",
-        "reaper_behind": "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
+        "reaper_behind": "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
         "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
         "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
         "shared_health": "Shared Health (one pool: hit whichever is safest)",
@@ -6085,9 +6093,9 @@ export const da_DK: EnTranslations = {
     },
     "bastionChain": {
       "anchoredTitle": "Chained to the Drowned Anchor!",
-      "anchoredLine": "Your group must break the chain before the winch drags you into the pit",
+      "anchoredLine": "Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit",
       "allyTitle": "Break the chain!",
-      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor",
+      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post",
       "shackledTitle": "Shackled to {name}",
       "shackledLine": "Stay within {range} yards of each other ({dist} yards apart)",
       "strainedLine": "Too far apart! The chain bites both of you: close to {range} yards",
@@ -6097,6 +6105,21 @@ export const da_DK: EnTranslations = {
       "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
       "linksTarget": "{count} of {total} links",
       "linkBroken": "Link broken!"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "The Sentence falls on you!",
+      "sentencedLine": "A column of light strikes everyone near you: move away from the group",
+      "brineTitle": "In the Hallowed Brine!",
+      "brineLine": "It burns you every second: step out of the pool",
+      "reapedTitle": "Death rises behind you!",
+      "reapedLine": "Step out of the scythe's arc: forward, or to either side",
+      "veilTitle": "The Fog Veil",
+      "veilLine": "Watch the beacon's beam: the figure whose lantern flares is the real Vael",
+      "realTitle": "The beam found him!",
+      "realLine": "This is the real Vael: strike him to break the veil",
+      "shadeTitle": "A hollow shade",
+      "shadeLine": "The light pours through it: leave it, find the one the beam lights",
+      "timeAria": "{seconds} seconds left"
     },
     "wildheartAlert": {
       "preyTitle": "You are the Prey!",
@@ -12508,6 +12531,14 @@ export const da_DK: EnTranslations = {
       "bastion_shadowstep": "Shadow Crossing",
       "bastion_reaping_scythe": "Reaping Scythe",
       "bastion_veil_rise": "Fog Veil",
+      "bastion_veil_gather": "Gathering Fog",
+      "bastion_vael_rise": "Death Rises",
+      "bastion_vael_sink": "Into the Fog",
+      "bastion_hallowed_brine": "Hallowed Brine",
+      "bastion_rebounding_bulwark": "Rebounding Bulwark",
+      "bastion_tide_sentence": "Sentence of the Tide",
+      "bastion_oath_kneel": "Unbroken Oath",
+      "bastion_oath_vigil": "Unbroken Oath",
       "temple_lullaby": "Lullaby",
       "cantor_last_verse": "The Last Verse",
       "temple_call_the_tide": "Call the Tide",

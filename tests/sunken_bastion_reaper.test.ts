@@ -6,8 +6,10 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   GRAVE_SHADOW_TEMPLATE,
   inReapingSweep,
+  OSSICK_ID,
   REAPER_POOL_TEMPLATE,
   reaperPoolSpot,
+  TURNKEY_ID,
   VAEL_ID,
   VAEL_REAP_MARK,
   VAEL_REAPING_SCYTHE,
@@ -41,6 +43,8 @@ describe('Vael, Death itself: the Shadowstep and the scythe from behind', () => 
     put(f, f.others[0], 8, 218);
     put(f, f.others[1], -16, 196);
     put(f, f.others[2], 10, 200);
+    // Vael alone: the gaol's bosses would join the pull and hook a player off the roof.
+    for (const id of [OSSICK_ID, TURNKEY_ID]) f.sim.ctx.handleDeath(boss(f, id), f.tank);
     engage(f, vael);
     return { f, vael };
   }

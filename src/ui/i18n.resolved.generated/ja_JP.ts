@@ -3924,6 +3924,9 @@ export const ja_JP: EnTranslations = {
         "avatar": "移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。",
         "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
       },
+      "bastion": {
+        "anchored": "溺死の錨に繋がれている：動くことはできるが巻き上げ機から離れることはできず、溺死の穴へと巻き寄せられる。引っ掛けられた場所から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入れば鎖を係留できる（その柱は{dark}秒間消える）、または仲間が{links}回の攻撃で鎖を断つ（ヒロイックは{linksHeroic}回）。穴に落ちると最大体力の{pit}%を失う（ヒロイックは{pitHeroic}%）。"
+      },
       "sanctum": {
         "lockbound": "受けるダメージが{pct}%減少：まだ残っている鎖1本につき{per}%。封印の枷を壊すとその鎖が外れる。",
         "enrage": "与えるダメージが{pct}%増加。",
@@ -5989,6 +5992,11 @@ export const ja_JP: EnTranslations = {
       "mech": {
         "shadow_pulse": "シャドウパルス（周期的な範囲ダメージ）",
         "reaping_arc": "リーピングアーク（前方クリーブ）",
+        "hallowed_brine": "聖なる潮水（半径9ヤードの暗い聖水の溜まり、ヒロイックは10ヤード：中にいる者は毎秒18ダメージ、ヒロイックは26、彼は中に立つ間ダメージを40パーセント軽減する、外へ引きずり出せ）",
+        "rebounding_bulwark": "跳ね返る大盾（盾は最後に当たった者から10ヤード以内の最も近いプレイヤーへ跳ね返る、最大3人、ヒロイックは4人：散開せよ）",
+        "tide_sentence": "潮の宣告（印から5秒後、光の柱が印の者から6ヤード以内の全員を打つ、ヒロイックは8ヤード：集団から離れて受けよ）",
+        "unbroken_oath": "不壊の誓い（一度だけ、体力が半分になると最大60秒、泡の中で無敵のまま跪く：兵士を倒して破れ、その後4秒気絶し10秒間ダメージが20パーセント増える）",
+        "fog_veil": "霧のヴェール（四つの姿、本物は一つ：灯台の光線で本物のヴァエルのランタンが燃え上がる）",
         "mist_surge": "ミストサージ（周期的な範囲ダメージ）",
         "summons_adds": "増援を召喚",
         "lunar_tide": "ルナタイド（周期的な範囲ダメージ）",
@@ -6049,9 +6057,9 @@ export const ja_JP: EnTranslations = {
         "anvils_decree": "金床の勅令（全体への三連ハンマー打撃、回復で耐える）",
         "masters_assembly": "匠の組立（鍛冶場の光線を遮る、遮る役を交代）",
         "iron_cage": "鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）",
-        "drowned_anchor": "溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）",
+        "drowned_anchor": "溺死の錨（犠牲者は穴へ巻き寄せられる：灯った係留柱から3ヤード以内まで走れば鎖を係留でき、その柱は30秒間消える、または12回の攻撃で鎖を断つ、ヒロイックは16回）",
         "shackle_pair": "連鎖の枷（鎖でつながれた二人は離れずに動く）",
-        "reaper_behind": "影渡り（死神はプレイヤーの背後に現れる、大鎌の弧から出る）",
+        "reaper_behind": "影渡り（三度続けてプレイヤーの背後に現れる、人数が足りる限り毎回別の者：大鎌の弧から出る）",
         "pack_bond": "群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）",
         "stalk": "忍び狩り（ジャガーが印の者を狙う。タンクは狙わず、ソロではあなたを狙う：引き回し、鈍足・拘束・スタンを）",
         "shared_health": "体力共有（共通の体力：最も安全な方を攻撃）",
@@ -6085,9 +6093,9 @@ export const ja_JP: EnTranslations = {
     },
     "bastionChain": {
       "anchoredTitle": "溺死の錨に繋がれた！",
-      "anchoredLine": "巻き上げ機に穴へ引きずり込まれる前に、仲間が鎖を断ち切らなければならない",
+      "anchoredLine": "灯った係留柱まで走って鎖を係留せよ、さもなくば巻き上げ機に穴へ引きずり込まれる前に仲間が鎖を断て",
       "allyTitle": "鎖を断て！",
-      "allyLine": "{name} が穴へ引きずられている：溺死の錨を攻撃せよ",
+      "allyLine": "{name} が穴へ引きずられている：溺死の錨を攻撃するか、灯った柱へ導け",
       "shackledTitle": "{name} と枷で繋がれている",
       "shackledLine": "互いに {range} ヤード以内にいること（現在 {dist} ヤード）",
       "strainedLine": "離れすぎ！鎖が二人を締め付ける：{range} ヤード以内に戻れ",
@@ -6097,6 +6105,21 @@ export const ja_JP: EnTranslations = {
       "linkRule": "錨への一撃ごとに、威力に関係なく環が一つ外れる",
       "linksTarget": "鎖の環 {count}/{total}",
       "linkBroken": "環を断った！"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "宣告があなたに下る！",
+      "sentencedLine": "光の柱があなたの近くの全員を打つ：集団から離れろ",
+      "brineTitle": "聖なる潮水の中にいる！",
+      "brineLine": "毎秒あなたを焼く：溜まりから出ろ",
+      "reapedTitle": "死が背後から現れる！",
+      "reapedLine": "大鎌の弧から出ろ：前へ、あるいは左右へ",
+      "veilTitle": "霧のヴェール",
+      "veilLine": "灯台の光線を見よ：ランタンが燃え上がる者が本物のヴァエルだ",
+      "realTitle": "光が彼を捉えた！",
+      "realLine": "これが本物のヴァエルだ：攻撃してヴェールを破れ",
+      "shadeTitle": "虚ろな影",
+      "shadeLine": "光が素通りしている：放っておき、光線が照らす者を探せ",
+      "timeAria": "残り{seconds}秒"
     },
     "wildheartAlert": {
       "preyTitle": "お前が獲物だ！",
@@ -12508,6 +12531,14 @@ export const ja_JP: EnTranslations = {
       "bastion_shadowstep": "影渡り",
       "bastion_reaping_scythe": "刈り取りの大鎌",
       "bastion_veil_rise": "霧のヴェール",
+      "bastion_veil_gather": "集う霧",
+      "bastion_vael_rise": "死が昇る",
+      "bastion_vael_sink": "霧の中へ",
+      "bastion_hallowed_brine": "聖なる潮水",
+      "bastion_rebounding_bulwark": "跳ね返る大盾",
+      "bastion_tide_sentence": "潮の宣告",
+      "bastion_oath_kneel": "不壊の誓い",
+      "bastion_oath_vigil": "不壊の誓い",
       "temple_lullaby": "子守歌",
       "cantor_last_verse": "最後の一節",
       "temple_call_the_tide": "潮の呼び声",

@@ -19792,6 +19792,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_shadowstep': '影渡り',
   'abilityUi.cast.bastion_reaping_scythe': '刈り取りの大鎌',
   'abilityUi.cast.bastion_veil_rise': '霧のヴェール',
+  'abilityUi.cast.bastion_veil_gather': '集う霧',
+  'abilityUi.cast.bastion_vael_rise': '死が昇る',
+  'abilityUi.cast.bastion_vael_sink': '霧の中へ',
+  'abilityUi.cast.bastion_hallowed_brine': '聖なる潮水',
+  'abilityUi.cast.bastion_rebounding_bulwark': '跳ね返る大盾',
+  'abilityUi.cast.bastion_tide_sentence': '潮の宣告',
+  'abilityUi.cast.bastion_oath_kneel': '不壊の誓い',
+  'abilityUi.cast.bastion_oath_vigil': '不壊の誓い',
   'entities.mobs.bastion_gaol_cage.name': '鉄の檻',
   'entities.mobs.bastion_drowned_anchor.name': '溺死の錨',
   'entities.items.jailers_iron_gauntlets.name': '看守の鉄篭手',
@@ -19799,10 +19807,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.turnkeys_lantern_cowl.name': '牢番のランタン頭巾',
   'hudChrome.finder.mech.iron_cage':
     '鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）',
-  'hudChrome.finder.mech.drowned_anchor': '溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）',
+  'hudChrome.finder.mech.drowned_anchor':
+    '溺死の錨（犠牲者は穴へ巻き寄せられる：灯った係留柱から3ヤード以内まで走れば鎖を係留でき、その柱は30秒間消える、または12回の攻撃で鎖を断つ、ヒロイックは16回）',
   'hudChrome.finder.mech.shackle_pair': '連鎖の枷（鎖でつながれた二人は離れずに動く）',
+  'hudChrome.finder.mech.hallowed_brine':
+    '聖なる潮水（半径9ヤードの暗い聖水の溜まり、ヒロイックは10ヤード：中にいる者は毎秒18ダメージ、ヒロイックは26、彼は中に立つ間ダメージを40パーセント軽減する、外へ引きずり出せ）',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    '跳ね返る大盾（盾は最後に当たった者から10ヤード以内の最も近いプレイヤーへ跳ね返る、最大3人、ヒロイックは4人：散開せよ）',
+  'hudChrome.finder.mech.tide_sentence':
+    '潮の宣告（印から5秒後、光の柱が印の者から6ヤード以内の全員を打つ、ヒロイックは8ヤード：集団から離れて受けよ）',
+  'hudChrome.finder.mech.unbroken_oath':
+    '不壊の誓い（一度だけ、体力が半分になると最大60秒、泡の中で無敵のまま跪く：兵士を倒して破れ、その後4秒気絶し10秒間ダメージが20パーセント増える）',
+  'hudChrome.finder.mech.fog_veil':
+    '霧のヴェール（四つの姿、本物は一つ：灯台の光線で本物のヴァエルのランタンが燃え上がる）',
   'hudChrome.finder.mech.reaper_behind':
-    '影渡り（死神はプレイヤーの背後に現れる、大鎌の弧から出る）',
+    '影渡り（三度続けてプレイヤーの背後に現れる、人数が足りる限り毎回別の者：大鎌の弧から出る）',
   'hudChrome.bastionCage.title': '鉄の檻に閉じ込められた！',
   'hudChrome.bastionCage.promptKey': '{key} を連打して脱出',
   'hudChrome.bastionCage.promptNoKey': 'インタラクトキーを連打して脱出',
@@ -19812,9 +19831,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.progressAria': '脱出の進行度：{pct}',
   'hudChrome.bastionChain.anchoredTitle': '溺死の錨に繋がれた！',
   'hudChrome.bastionChain.anchoredLine':
-    '巻き上げ機に穴へ引きずり込まれる前に、仲間が鎖を断ち切らなければならない',
+    '灯った係留柱まで走って鎖を係留せよ、さもなくば巻き上げ機に穴へ引きずり込まれる前に仲間が鎖を断て',
   'hudChrome.bastionChain.allyTitle': '鎖を断て！',
-  'hudChrome.bastionChain.allyLine': '{name} が穴へ引きずられている：溺死の錨を攻撃せよ',
+  'hudChrome.bastionChain.allyLine':
+    '{name} が穴へ引きずられている：溺死の錨を攻撃するか、灯った柱へ導け',
+  'hudChrome.auraEffect.bastion.anchored':
+    '溺死の錨に繋がれている：動くことはできるが巻き上げ機から離れることはできず、溺死の穴へと巻き寄せられる。引っ掛けられた場所から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入れば鎖を係留できる（その柱は{dark}秒間消える）、または仲間が{links}回の攻撃で鎖を断つ（ヒロイックは{linksHeroic}回）。穴に落ちると最大体力の{pit}%を失う（ヒロイックは{pitHeroic}%）。',
   'hudChrome.bastionChain.shackledTitle': '{name} と枷で繋がれている',
   'hudChrome.bastionChain.shackledLine':
     '互いに {range} ヤード以内にいること（現在 {dist} ヤード）',
@@ -19937,6 +19959,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': '震える踏みつけ（彼の周りの輪から出る）',
   'hudChrome.finder.mech.rerivet_last_link':
     '再鋲打ちと最後の環（鎖を打ち直す突き棒鍛冶を阻止する。鎖が残り1本になると10秒ごとに鎖の引き締め）',
+  'hudChrome.bastionAlert.sentencedTitle': '宣告があなたに下る！',
+  'hudChrome.bastionAlert.sentencedLine': '光の柱があなたの近くの全員を打つ：集団から離れろ',
+  'hudChrome.bastionAlert.brineTitle': '聖なる潮水の中にいる！',
+  'hudChrome.bastionAlert.brineLine': '毎秒あなたを焼く：溜まりから出ろ',
+  'hudChrome.bastionAlert.reapedTitle': '死が背後から現れる！',
+  'hudChrome.bastionAlert.reapedLine': '大鎌の弧から出ろ：前へ、あるいは左右へ',
+  'hudChrome.bastionAlert.veilTitle': '霧のヴェール',
+  'hudChrome.bastionAlert.veilLine': '灯台の光線を見よ：ランタンが燃え上がる者が本物のヴァエルだ',
+  'hudChrome.bastionAlert.realTitle': '光が彼を捉えた！',
+  'hudChrome.bastionAlert.realLine': 'これが本物のヴァエルだ：攻撃してヴェールを破れ',
+  'hudChrome.bastionAlert.shadeTitle': '虚ろな影',
+  'hudChrome.bastionAlert.shadeLine': '光が素通りしている：放っておき、光線が照らす者を探せ',
+  'hudChrome.bastionAlert.timeAria': '残り{seconds}秒',
   'hudChrome.wildheartAlert.preyTitle': 'お前が獲物だ！',
   'hudChrome.wildheartAlert.preyLine': 'ズルガーが狙っている：光る太陽紋を通らせろ',
   'hudChrome.wildheartAlert.preyWaitLine': '今はもう一人の獲物を追っている：備えろ、標的が変わる',

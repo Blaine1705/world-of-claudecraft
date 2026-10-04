@@ -117,6 +117,7 @@ import {
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC,
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
 } from '../sim/varkhul_shared_pyre';
+import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
 import { wildheartAuraEffectDescriptor } from './wildheart_aura_effect';
@@ -185,6 +186,9 @@ export function auraEffectDescriptor(
   // The Gravewyrm Sanctum's boss auras say their rule (sanctum_aura_effect.ts).
   const sanctum = sanctumAuraEffectDescriptor(a);
   if (sanctum) return sanctum;
+  // The Sunken Bastion's marks say theirs (bastion_aura_effect.ts).
+  const bastion = bastionAuraEffectDescriptor(a);
+  if (bastion) return bastion;
   // This is a four-second placement marker, not a damage-taken modifier. Its
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.

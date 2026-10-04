@@ -7,8 +7,8 @@
 //  - the Reaping Scythe: a pale crescent of soul fire trailing the blade
 //    through the arc (the sweep itself is his ScytheSweep flourish);
 //  - heroic Grave Shadow: the pool left burning, ringed where it bites;
-//  - the Fog Veil's emergence: dark sea water wells up and boils on the flags
-//    under every figure, each rises out of it (the Emerge clip, once over the
+//  - the Fog Veil's emergence (and every rise of his entrance): dark sea water
+//    wells up and boils on the flags under every figure, each rises out of it (the Emerge clip, once over the
 //    rise bar) with fog and brine shedding off the shroud as it climbs, and a
 //    pall of fog marks where the real one melted away; identical for the real
 //    Vael and his copies, so the rise never gives him away;
@@ -29,8 +29,8 @@ import {
   VAEL_ID,
   VAEL_REAPING_SCYTHE,
   VAEL_SHADOWSTEP,
+  VAEL_SINK,
   VAEL_TUNING,
-  VAEL_VEIL_RISE,
 } from '../../sim/encounters/sunken_bastion/ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -56,9 +56,12 @@ import {
   veilRiseEmerged,
 } from './bastion_gaol_reaper_core';
 import { BastionParticles } from './bastion_particles';
+import { isVaelRiseCast } from './bastion_vael_stage_core';
 
 const SCAN_SEC = 0.1;
-const POOL_SLOTS = 3;
+// A chain of three Shadow Crossings back to back, each pool burning on for 6 s
+// as a heroic Grave Shadow while the next steps open: room for all of them.
+const POOL_SLOTS = 5;
 const TRAIL_SEC = 0.4;
 /** The veil's four figures (the real Vael and three shades). */
 const BOIL_SLOTS = 4;
@@ -310,7 +313,9 @@ export class BastionReaperFx {
     if (ev.type !== 'spellfx' || !this.world) return false;
     const src = this.world.entities.get(ev.sourceId);
     if (!src) return false;
-    if (ev.ability === VAEL_SHADOWSTEP) {
+    // The Shadow Crossing's sink, and his sink back under the roof through the
+    // entrance and before each veil: the same burst of black smoke and souls.
+    if (ev.ability === VAEL_SHADOWSTEP || ev.ability === VAEL_SINK) {
       const y = this.groundY(src.pos.x, src.pos.z);
       this.fx.burst(src.pos.x, y + 1.2, src.pos.z, 0x0a0812, 10, 2.2, 7, 1.6, 1.2, 1.5, true);
       this.fx.burst(src.pos.x, y + 2.5, src.pos.z, 0x9dffd0, 8, 0.4, 1.4, 1.2, 3.2, 1.2);
@@ -423,12 +428,12 @@ export class BastionReaperFx {
     if (vael && cast === VAEL_REAPING_SCYTHE && this.vaelCast !== VAEL_REAPING_SCYTHE)
       this.geyser(vael.pos.x, vael.pos.z);
     // The veil spawns its shades on the tick he starts to rise: find them now.
-    if (cast === VAEL_VEIL_RISE && this.vaelCast !== VAEL_VEIL_RISE) this.scanWorld(world);
+    if (isVaelRiseCast(cast) && !isVaelRiseCast(this.vaelCast)) this.scanWorld(world);
     this.vaelCast = cast;
     for (const id of this.figureIds) {
       const e = world.entities.get(id);
       const now = e && !e.dead ? e.castingAbility : null;
-      if (e && now === VAEL_VEIL_RISE && this.figureCast.get(id) !== VAEL_VEIL_RISE) {
+      if (e && isVaelRiseCast(now) && !isVaelRiseCast(this.figureCast.get(id))) {
         // The real one melts where he stood (only he stood anywhere before).
         const was = this.figureAt.get(id);
         if (was && Math.hypot(was.x - e.pos.x, was.z - e.pos.z) > MELT_JUMP)

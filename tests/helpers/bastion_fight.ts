@@ -25,11 +25,17 @@ export interface Fight {
   others: Entity[];
   /** Every damage event since the fight began, in order. */
   hits: Hit[];
+  /** Every spellfx cue since the fight began, in order. */
+  cues: { sourceId: number; targetId: number; ability: string | null }[];
 }
 
 const KEEP = new Set([TURNKEY_ID, OSSICK_ID, VAEL_ID]);
 
-export function fight(difficulty: 'normal' | 'heroic' = 'normal', extra = 3): Fight {
+export function fight(
+  difficulty: 'normal' | 'heroic' = 'normal',
+  extra = 3,
+  keep: ReadonlySet<string> = KEEP,
+): Fight {
   const sim = new Sim({ seed: 23, playerClass: 'warrior', autoEquip: false, devCommands: true });
   const tank = sim.player;
   sim.chat('/dev level 20', tank.id);
@@ -46,7 +52,7 @@ export function fight(difficulty: 'normal' | 'heroic' = 'normal', extra = 3): Fi
   if (!inst) throw new Error('no bastion claim');
   for (const id of inst.mobIds) {
     const e = sim.ctx.entities.get(id);
-    if (e && !e.dead && !KEEP.has(e.templateId)) sim.ctx.handleDeath(e, tank);
+    if (e && !e.dead && !keep.has(e.templateId)) sim.ctx.handleDeath(e, tank);
   }
   const others = ids.map((pid) => sim.ctx.entities.get(pid) as Entity);
   for (const p of [tank, ...others]) {
@@ -55,7 +61,7 @@ export function fight(difficulty: 'normal' | 'heroic' = 'normal', extra = 3): Fi
   }
   const o = instanceOrigin(DUNGEONS.sunken_bastion.index, inst.slot);
   sim.drainEvents();
-  return { sim, inst, ox: o.x, oz: o.z, tank, others, hits: [] };
+  return { sim, inst, ox: o.x, oz: o.z, tank, others, hits: [], cues: [] };
 }
 
 export function boss(f: Fight, id: string): Entity {
@@ -75,9 +81,12 @@ export function put(f: Fight, e: Entity, x: number, z: number): void {
 export function tick(f: Fight, keep: () => void = () => {}): void {
   for (const p of [f.tank, ...f.others]) if (p.hp < 1e5) p.hp = 1e6;
   keep();
-  for (const ev of f.sim.tick())
+  for (const ev of f.sim.tick()) {
     if (ev.type === 'damage')
       f.hits.push({ targetId: ev.targetId, amount: ev.amount, ability: ev.ability });
+    else if (ev.type === 'spellfx')
+      f.cues.push({ sourceId: ev.sourceId, targetId: ev.targetId, ability: ev.ability ?? null });
+  }
 }
 
 export function run(f: Fight, seconds: number, keep: () => void = () => {}): void {

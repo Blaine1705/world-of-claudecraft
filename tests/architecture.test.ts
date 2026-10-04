@@ -646,6 +646,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/fct_avoidance_core.ts',
   // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
+  // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
+  'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its
   // scene scan.
   'src/ui/hud/dungeon/sanctum_alert_view.ts',
@@ -844,6 +846,14 @@ const RENDER_PURE_CORES = [
   'src/render/sunken_bastion/bastion_drowned_fx_core.ts',
   // The fifth pass's cage, anchor, shackle and reaper visual plan.
   'src/render/sunken_bastion/bastion_gaol_reaper_core.ts',
+  // Vael's staging (entrance eruptions, the gathering fog, the scythe flash)
+  // and the hollow shade's ghost predicate renderer.ts asks.
+  'src/render/sunken_bastion/bastion_vael_stage_core.ts',
+  'src/render/sunken_bastion/bastion_shade_ghost_core.ts',
+  // Olen the fallen paladin's visuals: the brine, the shield, the Sentence, the Oath.
+  'src/render/sunken_bastion/bastion_olen_fx_core.ts',
+  // The Drowning Yard's Mooring Post lamps: lit, dark, kindling, the flare, the ring.
+  'src/render/sunken_bastion/bastion_mooring_core.ts',
   'src/render/authored_field/field_edge_plan_core.ts',
   'src/render/drowned_temple/temple_plan_core.ts',
   'src/render/drowned_temple/temple_kit_plan_core.ts',

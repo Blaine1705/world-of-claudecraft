@@ -12,8 +12,10 @@
 //   /dev bastion pack <pack>             jump to where a pack stands (or walks)
 //   /dev bastion spawn <type>            raise one trash mob 10 yd ahead, pulled
 //   /dev bastion trigger <mechanic>      fire a boss mechanic now (the boss must
-//                                        be engaged): charge, cage, anchor, shackle,
-//                                        veil, reap, surge
+//                                        be engaged): brine, bulwark, sentence,
+//                                        oath, cage, anchor, shackle, veil, reap,
+//                                        surge; intro, introshort, introskip bury
+//                                        Vael for his entrance (or skip it)
 //   /dev bastion reset                   free the run and claim a fresh one
 //
 // Areas: landing, flats, seagate, bailey, chapelyard, cisternyard, drawbridge,
@@ -54,7 +56,7 @@ export const SUNKEN_BASTION_DEV_AREAS: Readonly<Record<string, { x: number; z: n
   olen: { x: 57, z: 112 },
   postern: { x: 26, z: 126 },
   gaol: { x: 2, z: 102 },
-  turnkey: { x: -12, z: 92 },
+  turnkey: { x: -2, z: 74 },
   yard: { x: -2, z: 46 },
   ossick: { x: -2, z: 46 },
   balconyone: { x: -40, z: 20 },
@@ -86,7 +88,7 @@ export const SUNKEN_BASTION_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev bastion enter [normal|heroic] | tp <landing|flats|seagate|bailey|chapelyard|cisternyard|drawbridge|rampart|towerone|towertwo|bastion|olen|postern|gaol|turnkey|yard|ossick|balconyone|balconytwo|court|crown|vael> | gates | kill <f1|f2|fa|fb|f3|b1|b2|hermit|bc|r1|r2|rc|turnkey|g1|g2|g3|gd|k1|k2|k3|kc|olen|ossick|vael|all> | pack <id> | spawn <revenant|acolyte|watchman|arbalest|crawler|warhound|mistweaver|sergeant|prisoner|turnkey|hermit> | trigger <charge|cage|anchor|shackle|veil|reap|surge> | reset';
+  '[dev] /dev bastion enter [normal|heroic] | tp <landing|flats|seagate|bailey|chapelyard|cisternyard|drawbridge|rampart|towerone|towertwo|bastion|olen|postern|gaol|turnkey|yard|ossick|balconyone|balconytwo|court|crown|vael> | gates | kill <f1|f2|fa|fb|f3|b1|b2|hermit|bc|r1|r2|rc|turnkey|g1|g2|g3|gd|k1|k2|k3|kc|olen|ossick|vael|all> | pack <id> | spawn <revenant|acolyte|watchman|arbalest|crawler|warhound|mistweaver|sergeant|prisoner|turnkey|hermit> | trigger <brine|bulwark|sentence|oath|cage|anchor|shackle|veil|reap|surge|intro|introshort|introskip> | reset';
 
 /** Raise one trash mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {

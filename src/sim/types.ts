@@ -4335,33 +4335,33 @@ export interface TrashKitState {
  *  on the boss entity; cleared when the fight ends (a kill, an evade, a wipe). */
 export interface OlenFightState {
   kind: 'olen';
-  /** Seconds until the next Oathbound Charge is marked. */
-  chargeTimer: number;
-  /** The marked lane while the bar runs: its start, locked yaw, length, and the
-   *  buttress it ends in (null: the open rim). */
-  lane: { x: number; z: number; yaw: number; length: number; buttress: string | null } | null;
-  /** The charge in flight: where it set off and how far along it is. */
-  dash: {
-    x: number;
-    z: number;
-    yaw: number;
-    length: number;
-    buttress: string | null;
-    t: number;
-  } | null;
-  /** Unbroken Oath stacks gained this fight (the deed reads `everOath`). */
-  oath: number;
-  everOath: boolean;
-  /** Heroic Undertow Wake: flooded lanes still standing (their object ids). */
-  wakes: {
-    x: number;
-    z: number;
-    yaw: number;
-    length: number;
-    remaining: number;
-    tick: number;
-    objectId: number;
-  }[];
+  /** Seconds until the next Hallowed Brine, Rebounding Bulwark, Sentence. */
+  brineTimer: number;
+  bulwarkTimer: number;
+  sentenceTimer: number;
+  /** Mechanic casts started (the deterministic victim hash salt). */
+  casts: number;
+  /** The bar running (his own cast: which, and on whom), else null. */
+  bar: { what: 'brine' | 'bulwark' | 'sentence'; targetId: number; x: number; z: number } | null;
+  /** Pools of Hallowed Brine still standing (instance-local, object ids). */
+  pools: { objectId: number; x: number; z: number; radius: number; remaining: number }[];
+  /** Seconds to the next brine damage pulse (one a second, all pools). */
+  brineTick: number;
+  /** The shield in flight: who it strikes in order, the leg it flies (from
+   *  the body at `hop - 1`, Olen for the first, to the body at `hop`), the
+   *  leg's clock, and whether it is flying home to him. */
+  bulwark: { chain: number[]; hop: number; t: number; home: boolean } | null;
+  /** The marked player and the seconds before the Sentence falls on them. */
+  sentence: { markId: number; remaining: number } | null;
+  /** The Unbroken Oath: not yet, kneeling, keeping the vigil in the bubble,
+   *  or done this fight; its clock and his soldiers' ids. */
+  oath: 'none' | 'kneel' | 'vigil' | 'done';
+  oathT: number;
+  soldierIds: number[];
+  /** Where he knelt (instance-local): the vigil holds him there. */
+  oathSpot: { x: number; z: number } | null;
+  /** The Bulwark rebounded onto a second player this fight (the deed reads it). */
+  rebounded: boolean;
 }
 
 export interface OssickFightState {
@@ -4370,8 +4370,20 @@ export interface OssickFightState {
   shackleTimer: number;
   cudgelTimer: number;
   /** Live anchors: the hooked player, the anchor body, the seconds the chain
-   *  has held (the haul starts after the settle). */
-  anchors: { playerId: number; anchorId: number; held: number }[];
+   *  has held (the haul starts after the settle), the chain's length (yd
+   *  from the winch's centre: the victim never stands further out; it only
+   *  shortens), and where it hooked them (instance-local: a Mooring Post this
+   *  near the hook spot never takes the chain). */
+  anchors: {
+    playerId: number;
+    anchorId: number;
+    held: number;
+    chain: number;
+    hookX: number;
+    hookZ: number;
+  }[];
+  /** Seconds each Mooring Post stays dark (0: lit), in MOORING_POST_SPOTS order. */
+  postDark: number[];
   /** Live shackle pairs, the seconds left, and the strain tick clock. */
   shackles: { a: number; b: number; remaining: number; tick: number }[];
   /** Open the Cells thresholds already fired. */
@@ -4447,9 +4459,11 @@ export interface VaelFightState {
   /** Shadowsteps started (the deterministic victim hash salt). */
   reaps: number;
   /** The Shadowstep in flight: its phase clock, the mark, the pool (object id,
-   *  spot and sweep yaw) once it opens, and where he stood when he sank. */
+   *  spot and sweep yaw) once it opens, and where he stood when he sank; and
+   *  the chain it belongs to (this step, the chain's length, the players it
+   *  has marked so far, each step taking someone new while anyone is left). */
   reap: {
-    phase: 'vanish' | 'pool' | 'rise';
+    phase: 'vanish' | 'pool' | 'rise' | 'recover';
     elapsed: number;
     markId: number;
     poolId: number;
@@ -4458,9 +4472,32 @@ export interface VaelFightState {
     yaw: number;
     fromX: number;
     fromZ: number;
+    step: number;
+    steps: number;
+    marked: number[];
   } | null;
   /** Heroic Grave Shadows still burning: object id, seconds left, tick clock. */
   graves: { objectId: number; remaining: number; tick: number }[];
+  /** The fog gathering before a veil: its clock, whether he has begun to
+   *  sink, and where he stands still for it (vael_veil_gather.ts). */
+  gather: { elapsed: number; sinking: boolean; x: number; z: number; yaw: number } | null;
+}
+
+/** Vael's entrance on the Beacon Crown (encounters/sunken_bastion/
+ *  vael_intro.ts), on Vael for the claim's life (it outlives every fight). */
+export interface VaelIntroState {
+  /** Buried under the crown, playing the entrance, or done (he fights);
+   *  `rearm` waits out a wipe to bury him for the short entrance. */
+  phase: 'buried' | 'playing' | 'done' | 'rearm';
+  /** The full entrance has played once (a later one is the short one). */
+  played: boolean;
+  /** This entrance is the short one (one rise at his place). */
+  short: boolean;
+  /** The stop he is at (an index into VAEL_INTRO_STOPS) and its part. */
+  stop: number;
+  part: 'rise' | 'speak' | 'sink' | 'under';
+  /** Seconds into the part. */
+  t: number;
 }
 
 /** The Turretback Hermit's pull, watched for the Eviction Notice deed. */
@@ -4881,6 +4918,7 @@ export interface DungeonObjectSpawn {
     // state rides the template id so the online client mirrors it.
     | 'bastion_buttress_intact'
     | 'bastion_beacon_lamp'
+    | 'bastion_mooring_lit'
     // The Gravewyrm Sanctum's story markers (encounters/gravewyrm_sanctum/
     // story.ts): the Calving Face's crack step rides the template id.
     | 'sanctum_story_0';
@@ -6745,6 +6783,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */
   bastionFight?: BastionFightState;
+  /** Vael's entrance on the Beacon Crown (encounters/sunken_bastion/
+   *  vael_intro.ts). Sim authority only; the client reads casts, heights and
+   *  auras. */
+  vaelIntro?: VaelIntroState;
   /** Per-fight state of a Drowned Temple boss (encounters/drowned_temple). Sim
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */

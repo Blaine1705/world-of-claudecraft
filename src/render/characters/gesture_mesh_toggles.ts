@@ -19,7 +19,9 @@
 import type * as THREE from 'three';
 
 export interface MeshToggleDef {
-  /** GLB node names the toggle hides and shows ('*': the whole model). */
+  /** GLB node names the toggle hides and shows ('*': the whole model). A
+   *  BONE is hidden by scaling it to nothing, held after the mixer every
+   *  frame (a skinned part bound to it vanishes with it). */
   nodes: readonly string[];
   /** Hide `seconds` after this gesture (its clip plays the nodes out). */
   hideAfter?: { gesture: string; seconds: number; clip: string };
@@ -27,6 +29,14 @@ export interface MeshToggleDef {
   hideNow?: string;
   /** Show at once (consumed: no clip plays). */
   showNow?: string;
+}
+
+/** A hidden bone's scale: small enough to vanish, never zero (a singular
+ *  bone matrix would poison the skinning normals). */
+export const BONE_HIDDEN_SCALE = 1e-3;
+
+function isBone(n: THREE.Object3D): boolean {
+  return (n as THREE.Bone).isBone === true;
 }
 
 /** One toggle's live state: shown, or counting down to a hide. */
@@ -144,15 +154,21 @@ export class GestureMeshToggles {
     return consumed;
   }
 
-  /** After the mixer: count pending hides down against the current clip. */
+  /** After the mixer: count pending hides down against the current clip,
+   *  and hold every hidden bone at nothing (the mixer restored it). */
   update(dt: number, clip: string | null): boolean {
     let changed = false;
-    for (let i = 0; i < this.defs.length; i++)
+    for (let i = 0; i < this.defs.length; i++) {
       if (stepMeshToggle(this.defs[i], this.states[i], dt, clip)) {
         this.paint(i);
         changed = true;
-      }
+      } else if (!this.states[i].shown) this.holdBones(i);
+    }
     return changed;
+  }
+
+  private holdBones(i: number): void {
+    for (const n of this.nodes[i]) if (isBone(n)) n.scale.setScalar(BONE_HIDDEN_SCALE);
   }
 
   /** What is hidden now: nothing, some nodes, or the whole model. The far
@@ -173,6 +189,9 @@ export class GestureMeshToggles {
 
   private paint(i: number): void {
     const shown = this.states[i].shown;
-    for (const n of this.nodes[i]) n.visible = shown;
+    for (const n of this.nodes[i]) {
+      if (isBone(n)) n.scale.setScalar(shown ? 1 : BONE_HIDDEN_SCALE);
+      else n.visible = shown;
+    }
   }
 }

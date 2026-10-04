@@ -185,13 +185,15 @@ describe('Sunken Bastion boss fx core', () => {
 });
 
 describe('the Fog Veil tell', () => {
-  it('latches the reveal full the moment the beam catches a figure, then fades slowly', () => {
+  it('latches the reveal full while the tell is worn, then fades out in well under a second', () => {
     expect(revealGlow(0, true, 1 / 60)).toBe(1);
     let k = 1;
-    for (let t = 0; t < 1; t += 1 / 60) k = revealGlow(k, false, 1 / 60);
-    // A second after the beam passed, the tell still burns at about half.
-    expect(k).toBeGreaterThan(0.4);
-    for (let t = 0; t < 2; t += 1 / 60) k = revealGlow(k, false, 1 / 60);
+    for (let t = 0; t < 0.25; t += 1 / 60) k = revealGlow(k, false, 1 / 60);
+    // A breath after the sim's tell lifts, the glow still burns...
+    expect(k).toBeGreaterThan(0.5);
+    // ... and is gone within a second, so the real one is lit only while the
+    // beam has him (plus the sim's 1.5 s linger), never most of a sweep.
+    for (let t = 0; t < 0.75; t += 1 / 60) k = revealGlow(k, false, 1 / 60);
     expect(k).toBe(0);
   });
 

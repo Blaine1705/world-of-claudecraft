@@ -3924,6 +3924,9 @@ export const ko_KR: EnTranslations = {
         "avatar": "이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.",
         "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
       },
+      "bastion": {
+        "anchored": "익사의 닻에 묶임: 움직일 수는 있지만 권양기에서 더 멀어질 수는 없으며, 익사의 구덩이로 감겨 갑니다. 걸린 곳에서 {run}야드 이상 떨어진 불 켜진 계류 기둥 {reach}야드 이내로 가면 사슬을 묶을 수 있습니다(그 기둥은 {dark}초 동안 꺼집니다). 아니면 파티가 {links}번 공격해 사슬을 끊어야 합니다(영웅은 {linksHeroic}번). 구덩이에 빠지면 최대 생명력의 {pit}%를 잃습니다(영웅은 {pitHeroic}%)."
+      },
       "sanctum": {
         "lockbound": "받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.",
         "enrage": "주는 피해가 {pct}% 증가합니다.",
@@ -5989,6 +5992,11 @@ export const ko_KR: EnTranslations = {
       "mech": {
         "shadow_pulse": "어둠의 파동(주기적 광역 피해)",
         "reaping_arc": "수확의 호(전방 휩쓸기)",
+        "hallowed_brine": "성스러운 바닷물 (반경 9야드의 어두운 성수 웅덩이, 영웅은 10야드: 안에 있으면 매초 18 피해, 영웅은 26, 그가 안에 서 있는 동안 받는 피해 40퍼센트 감소, 밖으로 끌어내세요)",
+        "rebounding_bulwark": "튕겨 나오는 방패 (마지막으로 맞은 대상으로부터 10미터 이내의 가장 가까운 플레이어에게 튕김, 최대 3명, 영웅 4명: 흩어지세요)",
+        "tide_sentence": "조수의 선고 (표식 5초 뒤 빛의 기둥이 표식 대상 6미터 이내의 모두를 강타, 영웅 8미터: 무리에서 떨어져 맞으세요)",
+        "unbroken_oath": "깨지지 않는 맹세 (한 번, 생명력 절반에서 최대 60초 동안 거품 속에 무적으로 무릎 꿇음: 병사들을 처치해 깨뜨리면 4초 기절, 10초간 받는 피해 20퍼센트 증가)",
+        "fog_veil": "안개 장막 (네 형상 중 하나만 진짜: 등대의 빛줄기에 진짜 바엘의 등불이 타오릅니다)",
         "mist_surge": "안개 쇄도(주기적 광역 피해)",
         "summons_adds": "증원 소환",
         "lunar_tide": "달의 파도(주기적 광역 피해)",
@@ -6049,9 +6057,9 @@ export const ko_KR: EnTranslations = {
         "anvils_decree": "모루의 칙령(공격대 전체 망치 강타 세 번, 치유로 버티기)",
         "masters_assembly": "장인의 조립(대장간 광선 막기, 막는 사람 교대)",
         "iron_cage": "강철 우리 (상호작용 키를 연타해 탈출, 아군은 창살을 부술 수 있음)",
-        "drowned_anchor": "익사의 닻 (희생자가 구덩이로 끌려가기 전에 사슬을 끊으세요)",
+        "drowned_anchor": "익사의 닻 (희생자가 구덩이로 감겨 갑니다: 불 켜진 계류 기둥 3야드 이내로 달려가 사슬을 묶으면 그 기둥은 30초 동안 꺼집니다, 아니면 12번 공격해 사슬을 끊으세요, 영웅은 16번)",
         "shackle_pair": "쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)",
-        "reaper_behind": "그림자 건너기 (플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)",
+        "reaper_behind": "그림자 건너기 (세 번 연속 플레이어 뒤에서 솟아오름, 인원이 충분하면 매번 다른 대상: 낫의 궤적에서 벗어나세요)",
         "pack_bond": "무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)",
         "stalk": "추적 (재규어가 표식 대상을 사냥하며 탱커는 노리지 않고, 혼자일 때는 당신을 노림: 끌고 다니며 감속, 속박, 기절시키세요)",
         "shared_health": "생명력 공유 (하나의 생명력: 가장 안전한 쪽을 공격하세요)",
@@ -6085,9 +6093,9 @@ export const ko_KR: EnTranslations = {
     },
     "bastionChain": {
       "anchoredTitle": "익사의 닻에 묶였다!",
-      "anchoredLine": "권양기가 구덩이로 끌고 가기 전에 파티가 사슬을 끊어야 합니다",
+      "anchoredLine": "불 켜진 계류 기둥으로 달려가 사슬을 묶거나, 권양기가 구덩이로 끌고 가기 전에 파티가 사슬을 끊어야 합니다",
       "allyTitle": "사슬을 끊어라!",
-      "allyLine": "{name} 님이 구덩이로 끌려가고 있습니다: 익사의 닻을 공격하세요",
+      "allyLine": "{name} 님이 구덩이로 끌려가고 있습니다: 익사의 닻을 공격하거나 불 켜진 기둥으로 이끄세요",
       "shackledTitle": "{name} 님과 족쇄로 묶임",
       "shackledLine": "서로 {range}야드 이내에 머무르세요 (현재 {dist}야드)",
       "strainedLine": "너무 멀어졌습니다! 사슬이 두 사람을 조입니다: {range}야드 이내로 모이세요",
@@ -6097,6 +6105,21 @@ export const ko_KR: EnTranslations = {
       "linkRule": "닻을 칠 때마다 위력과 상관없이 고리가 하나씩 끊어진다",
       "linksTarget": "사슬 고리 {count}/{total}",
       "linkBroken": "고리 파괴!"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "선고가 당신에게 떨어진다!",
+      "sentencedLine": "빛의 기둥이 당신 근처의 모두를 강타한다: 무리에서 떨어져라",
+      "brineTitle": "성스러운 바닷물 속에 있다!",
+      "brineLine": "매초 당신을 태운다: 웅덩이에서 벗어나라",
+      "reapedTitle": "죽음이 등 뒤에서 솟아오른다!",
+      "reapedLine": "낫의 궤적에서 벗어나라: 앞으로, 혹은 옆으로",
+      "veilTitle": "안개 장막",
+      "veilLine": "등대의 빛줄기를 보라: 등불이 타오르는 자가 진짜 바엘이다",
+      "realTitle": "빛이 그를 찾아냈다!",
+      "realLine": "이것이 진짜 바엘이다: 공격해 장막을 깨뜨려라",
+      "shadeTitle": "텅 빈 그림자",
+      "shadeLine": "빛이 그대로 통과한다: 내버려 두고 빛이 비추는 자를 찾아라",
+      "timeAria": "{seconds}초 남음"
     },
     "wildheartAlert": {
       "preyTitle": "당신이 사냥감입니다!",
@@ -12508,6 +12531,14 @@ export const ko_KR: EnTranslations = {
       "bastion_shadowstep": "그림자 건너기",
       "bastion_reaping_scythe": "수확의 낫",
       "bastion_veil_rise": "안개 장막",
+      "bastion_veil_gather": "모여드는 안개",
+      "bastion_vael_rise": "죽음이 떠오른다",
+      "bastion_vael_sink": "안개 속으로",
+      "bastion_hallowed_brine": "성스러운 바닷물",
+      "bastion_rebounding_bulwark": "튕겨 나오는 방패",
+      "bastion_tide_sentence": "조수의 선고",
+      "bastion_oath_kneel": "깨지지 않는 맹세",
+      "bastion_oath_vigil": "깨지지 않는 맹세",
       "temple_lullaby": "자장가",
       "cantor_last_verse": "마지막 소절",
       "temple_call_the_tide": "조수의 부름",
