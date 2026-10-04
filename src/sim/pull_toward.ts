@@ -12,6 +12,13 @@ import { displaceAlong } from './knockback';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
 
+/** Is `target` held against a pull this tick (the Mooring Stone, the
+ *  Veilbound March, an Ice Block, a dev anchor)? */
+export function pullHeld(ctx: SimContext, target: Entity): boolean {
+  if (ctx.isIceBlocked(target) || isVeilboundMarchActive(target) || isMoored(target)) return true;
+  return ctx.cfg.devCommands && ctx.players.get(target.id)?.devAnchored === true;
+}
+
 /**
  * Drag `target` up to `step` yards toward (x, z), never closer than `stop`
  * yards to it. Returns the yards moved (0 when held, or already there).
@@ -24,8 +31,7 @@ export function pullToward(
   step: number,
   stop: number,
 ): number {
-  if (ctx.isIceBlocked(target) || isVeilboundMarchActive(target) || isMoored(target)) return 0;
-  if (ctx.cfg.devCommands && ctx.players.get(target.id)?.devAnchored) return 0;
+  if (pullHeld(ctx, target)) return 0;
   const dx = x - target.pos.x;
   const dz = z - target.pos.z;
   const len = Math.hypot(dx, dz);

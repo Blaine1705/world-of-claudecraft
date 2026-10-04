@@ -48,6 +48,7 @@ import {
   BASTION_BUTTRESSES,
   DROWNING_YARD,
   FOGBEACON,
+  MOORING_POSTS,
 } from './sunken_bastion_layout';
 
 const BONE_LOOT = [
@@ -894,9 +895,11 @@ export const SUNKEN_BASTION_GATE_OBJECTS: DungeonObjectSpawn[] = SUNKEN_BASTION_
   lootable: false,
 }));
 
-/** The encounter objects (encounters/sunken_bastion): Olen's four buttresses
- *  and the Fogbeacon's lamp. Their template ids carry their state (intact,
- *  cracked or broken), so the online client mirrors each with the entity. */
+/** The encounter objects (encounters/sunken_bastion): Olen's four buttresses,
+ *  the Fogbeacon's lamp and the Drowning Yard's four Mooring Posts. Their
+ *  template ids carry their state (a buttress intact, cracked or broken; a
+ *  post's lamp lit, dark or kindling), so the online client mirrors each with
+ *  the entity. */
 export const SUNKEN_BASTION_ENCOUNTER_OBJECTS: DungeonObjectSpawn[] = [
   ...BASTION_BUTTRESSES.map(
     (b): DungeonObjectSpawn => ({
@@ -918,4 +921,15 @@ export const SUNKEN_BASTION_ENCOUNTER_OBJECTS: DungeonObjectSpawn[] = [
     dungeonId: 'sunken_bastion',
     lootable: false,
   },
+  ...MOORING_POSTS.map(
+    (p): DungeonObjectSpawn => ({
+      itemId: '',
+      name: 'Mooring Post',
+      x: p.x,
+      z: p.z,
+      templateId: 'bastion_mooring_lit',
+      dungeonId: 'sunken_bastion',
+      lootable: false,
+    }),
+  ),
 ];

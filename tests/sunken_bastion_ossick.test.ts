@@ -43,7 +43,14 @@ describe('Gaoler Ossick: the Drowned Anchor and the Shackle Pair', () => {
     const ossick = boss(f, OSSICK_ID);
     put(f, ossick, -2, 12);
     put(f, f.tank, -2, 9);
-    for (const [i, p] of f.others.entries()) put(f, p, -16 + i * 16, 38);
+    // On the yard's axes, 18 yd out: no haul toward the winch from here passes
+    // within reach of a Mooring Post (they stand on the diagonals).
+    const spots = [
+      [-2, 42],
+      [16, 24],
+      [-20, 24],
+    ];
+    for (const [i, p] of f.others.entries()) put(f, p, spots[i][0], spots[i][1]);
     engage(f, ossick);
     return { f, ossick };
   }
@@ -70,7 +77,9 @@ describe('Gaoler Ossick: the Drowned Anchor and the Shackle Pair', () => {
     expect(aura(f.tank, OSSICK_ANCHOR_MARK)).toBeUndefined();
     run(f, OSSICK_TUNING.anchorCast);
     const a = aura(marked as Entity, OSSICK_ANCHORED);
-    expect(a?.kind).toBe('root');
+    // A tether, not a root: the victim keeps their feet.
+    expect(a?.kind).toBe('forced_move');
+    expect(a?.unbreakableControl).toBe(true);
     const anchor = f.sim.ctx.entities.get(a?.sourceId ?? -1);
     expect(anchor?.templateId).toBe(DROWNED_ANCHOR_ID);
     expect(anchor?.maxHp).toBe(OSSICK_TUNING.anchorHits);

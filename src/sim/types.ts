@@ -4370,8 +4370,20 @@ export interface OssickFightState {
   shackleTimer: number;
   cudgelTimer: number;
   /** Live anchors: the hooked player, the anchor body, the seconds the chain
-   *  has held (the haul starts after the settle). */
-  anchors: { playerId: number; anchorId: number; held: number }[];
+   *  has held (the haul starts after the settle), the chain's length (yd
+   *  from the winch's centre: the victim never stands further out; it only
+   *  shortens), and where it hooked them (instance-local: a Mooring Post this
+   *  near the hook spot never takes the chain). */
+  anchors: {
+    playerId: number;
+    anchorId: number;
+    held: number;
+    chain: number;
+    hookX: number;
+    hookZ: number;
+  }[];
+  /** Seconds each Mooring Post stays dark (0: lit), in MOORING_POST_SPOTS order. */
+  postDark: number[];
   /** Live shackle pairs, the seconds left, and the strain tick clock. */
   shackles: { a: number; b: number; remaining: number; tick: number }[];
   /** Open the Cells thresholds already fired. */
@@ -4906,6 +4918,7 @@ export interface DungeonObjectSpawn {
     // state rides the template id so the online client mirrors it.
     | 'bastion_buttress_intact'
     | 'bastion_beacon_lamp'
+    | 'bastion_mooring_lit'
     // The Gravewyrm Sanctum's story markers (encounters/gravewyrm_sanctum/
     // story.ts): the Calving Face's crack step rides the template id.
     | 'sanctum_story_0';

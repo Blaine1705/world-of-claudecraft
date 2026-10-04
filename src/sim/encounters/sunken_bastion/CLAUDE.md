@@ -13,7 +13,8 @@ the tick.
 | `claim.ts` | Claim plumbing: the live Bastion claims, their players and bosses, encounter object and body spawn/drop, mechanic damage through the heroic stamp, the hashed victim pick (`pickMarkTargets`), manual deed grants. |
 | `olen.ts` | Olen the fallen paladin: Hallowed Brine (a pool that burns players and shields him while he stands in it), the Rebounding Bulwark (`bulwarkChain` in `ids.ts`: nearest unstruck player within reach), the Sentence of the Tide (a delayed column on a marked player), the Unbroken Oath at half health (an immune vigil broken by killing the Drowned Sergeants who rise). The tuning and the pressure math against the retired Oathbound Charge are on `OLEN_KIT`; the charge's constants stay in `ids.ts` only for its retiring lane visuals. |
 | `turnkey.ts` | The Gaol Turnkey: the Iron Cage (a hittable cage body dropped over a stunned player), the escape press (`tryCageStruggle`, claimed from `sim.interact`: counted and rate-limited here), the mend, the crush, Open the Cells; heroic double cage and Brine Flood. |
-| `ossick.ts` | The Drowned Anchor (a hittable anchor riding its rooted victim, hauled to the pit through `pull_toward.ts`), the Shackle Pair (strain past the chain's reach), the cudgel, Open the Cells; heroic Anchor Crash, heavier chain, shorter shackles. |
+| `ossick.ts` | The Drowned Anchor (a hittable anchor riding its tethered victim: they may move, never further from the winch than the chain, which reels in through `pull_toward.ts`), the Shackle Pair (strain past the chain's reach), the cudgel, Open the Cells; heroic Anchor Crash, heavier chain, shorter shackles. |
+| `ossick_moorings.ts` | The Drowning Yard's four Mooring Posts: a hooked player within reach of a LIT post moors the chain (freed, the post dark for 30 s, kindling over its last 5, the others lit); the lamp's state rides each post object's template (`MOORING_TEMPLATES`), the moment is the `OSSICK_MOORED` cue; a reset relights them all. The reach math is beside `OSSICK_TUNING`. |
 | `vael.ts` | Death itself, the fight's coordinator: Mist Surge, the Fog Veil with its shadow copies and the Fogbeacon's beam (the Beacon-Lit and Hollow Shade tells the beam leaves on the figures, the Drowning Hymn's mark on the players), Fogburst; heroic drift and Mistbound. |
 | `vael_intro.ts` | His entrance: buried under the crown (held, non-hostile, immune) until a living player climbs onto it, then three rises and lines round the Fogbeacon and a last one at his place, where he is handed back to the fight; after a wipe, the short entrance (one rise, one line). `/dev bastion trigger intro|introshort|introskip`. |
 | `vael_shadowstep.ts` | The Shadow Crossing as a chain: three steps back to back, each a pool behind a DIFFERENT player (non-tanks first, the tank last, one step per living player in a smaller group), the Reaping Scythe through their back; heroic Grave Shadow. The pressure math lives on `VAEL_TUNING`. |
@@ -33,10 +34,11 @@ Rules:
   `DungeonPrompts`; `tests/sunken_bastion_chain_alert.test.ts` drives the alert
   from a real fight).
 - Reset on evade and wipe dries Olen's brine and lifts his bubble, opens the cages, drops the
-  anchors and shackles, lifts the veil and dries the pools.
+  anchors and shackles, relights the Mooring Posts, lifts the veil and dries the pools.
 - Tests: `tests/sunken_bastion_olen.test.ts` (Olen), `tests/sunken_bastion_bosses.test.ts` (the veil),
   `tests/sunken_bastion_turnkey.test.ts` (the cage, and the Turnkey keeping
   the Gaol Grate), `tests/sunken_bastion_ossick.test.ts`,
+  `tests/sunken_bastion_moorings.test.ts` (the Mooring Posts),
   `tests/sunken_bastion_reaper.test.ts`, `tests/sunken_bastion_vael_pass.test.ts`
   (the entrance, the three-step chain, the gathering, the beam's tells),
   `tests/sunken_bastion_crown_alert.test.ts` (the HUD's boss alert); dev

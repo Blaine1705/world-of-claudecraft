@@ -10,6 +10,7 @@ import {
   DROWNING_WINCH,
   DROWNING_YARD,
   FOGBEACON,
+  MOORING_POSTS,
 } from '../../content/sunken_bastion_layout';
 import { inLane } from '../../mob/trash_kit/lane';
 
@@ -80,6 +81,9 @@ export const OSSICK_ANCHORED = 'bastion_anchored';
  *  draws the chain between the two from the aura alone. */
 export const OSSICK_SHACKLED = 'bastion_shackled';
 export const OSSICK_KEELHAULED = 'bastion_keelhauled';
+/** The cue (a spellfx from the post to the freed player) when a hooked player
+ *  reaches a lit Mooring Post: the chain snaps taut to it and the lamp dies. */
+export const OSSICK_MOORED = 'bastion_moored';
 export const TURNKEY_CAGE_MARK = 'bastion_cage_mark';
 /** Locked in the Iron Cage. Its `sourceId` is the CAGE's entity id, so a client
  *  finds the cage (and the escape progress on its health) from the aura. */
@@ -119,6 +123,16 @@ export const REAPER_POOL_TEMPLATE = 'bastion_reaper_pool';
 /** Heroic: the pool left burning behind the sweep. */
 export const GRAVE_SHADOW_TEMPLATE = 'bastion_grave_shadow';
 
+/** A Mooring Post's lamp in the Drowning Yard (ossick_moorings.ts): lit (a
+ *  hooked player who reaches it moors the chain), dark (spent), or kindling
+ *  (the last seconds of the dark, re-lighting; still spent). */
+export const MOORING_TEMPLATES = {
+  lit: 'bastion_mooring_lit',
+  dark: 'bastion_mooring_dark',
+  kindling: 'bastion_mooring_kindling',
+} as const;
+export type MooringState = keyof typeof MOORING_TEMPLATES;
+
 /** Every Bastion encounter object template (the renderer draws them itself). */
 export const BASTION_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   ...Object.values(BUTTRESS_TEMPLATES),
@@ -127,7 +141,15 @@ export const BASTION_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   HALLOWED_BRINE_TEMPLATE,
   REAPER_POOL_TEMPLATE,
   GRAVE_SHADOW_TEMPLATE,
+  ...Object.values(MOORING_TEMPLATES),
 ]);
+
+export function mooringStateOf(templateId: string): MooringState | null {
+  if (templateId === MOORING_TEMPLATES.lit) return 'lit';
+  if (templateId === MOORING_TEMPLATES.dark) return 'dark';
+  if (templateId === MOORING_TEMPLATES.kindling) return 'kindling';
+  return null;
+}
 
 export function buttressStateOf(templateId: string): ButtressState | null {
   if (templateId === BUTTRESS_TEMPLATES.intact) return 'intact';
@@ -148,6 +170,18 @@ export function buttressStateOf(templateId: string): ButtressState | null {
 // The Oath adds two Drowned Sergeants at half health (three on heroic) while
 // he is immune; breaking it leaves him Breached (stunned 4 s, 20 percent more
 // damage taken for 10 s), the window the old buttress crash gave.
+//
+// The brine at 9 yd (10 heroic; it was 6 and 7) against his arena, the Breach
+// Bastion's 22 yd floor (about 1520 square yards): the brine's countdown runs
+// only outside his bars, so a pool lands at least 14 + 1.2 = 15.2 s after the
+// last, which dries at 15 s: never two at once. One pool is 254 square yards
+// (17 percent of the floor; 314 and 21 percent heroic). Dropped at his spawn
+// (2 yd off the middle), at least 11 yd of open floor (10 heroic) stand past
+// its rim on every side, so the tank always has room. The walk out grows from 6 to 9 yd: about 1.3 s at run speed
+// (was 0.9), so a player who steps out at once still takes one pulse (18, 26
+// heroic) and a late one two, as before; the drag costs the tank about half a
+// second more of the 40 percent shield. Neither the 15 s life nor the damage
+// a second needed to move.
 
 export const OLEN_KIT = {
   brineFirst: 6,
@@ -170,18 +204,6 @@ export const OLEN_KIT = {
   /** A rebound finds the nearest player not yet struck within this reach. */
   bulwarkReach: 10,
   /** The shield's flight between two bodies. */
-//
-// The brine at 9 yd (10 heroic; it was 6 and 7) against his arena, the Breach
-// Bastion's 22 yd floor (about 1520 square yards): the brine's countdown runs
-// only outside his bars, so a pool lands at least 14 + 1.2 = 15.2 s after the
-// last, which dries at 15 s: never two at once. One pool is 254 square yards
-// (17 percent of the floor; 314 and 21 percent heroic). Dropped at his spawn
-// (2 yd off the middle), at least 11 yd of open floor (10 heroic) stand past
-// its rim on every side, so the tank always has room. The walk out grows from 6 to 9 yd: about 1.3 s at run speed
-// (was 0.9), so a player who steps out at once still takes one pulse (18, 26
-// heroic) and a late one two, as before; the drag costs the tank about half a
-// second more of the 40 percent shield. Neither the 15 s life nor the damage
-// a second needed to move.
   bulwarkHop: 0.35,
   bulwarkMin: 60,
   bulwarkMax: 70,
@@ -371,10 +393,80 @@ export const OSSICK_TUNING = {
   /** Open the Cells: prisoners break out at these health shares. */
   cells: [0.6, 0.3],
   prisonersPerCell: 3,
+  // The Mooring Posts (ossick_moorings.ts): a hooked player who comes within
+  // postReach of a LIT post moors the chain to it and is freed; that post's
+  // lamp dies for postDarkSeconds (its last postKindleSeconds re-lighting),
+  // the others stay lit. Heroic keeps all four: its faster haul already
+  // shortens the run (see the reach note below).
+  postReach: 3,
+  postDarkSeconds: 30,
+  postKindleSeconds: 5,
+  /** A post takes only a chain that had to be run to it: never one whose
+   *  victim was hooked within this many yards of it (no camping a post,
+   *  and the mark's warning cannot be spent standing on one). */
+  postRun: 6,
 } as const;
+
+// The hook is a tether, not a root: the victim keeps their feet but can never
+// stand further from the winch than the chain, which reels in at the haul's
+// pace (a victim who stands still is hauled exactly as before). The posts
+// stand 14.85 yd from the winch (10.5 yd along each diagonal), so a post is in
+// reach only while the chain is longer than 14.85 - 3 = 11.85 yd. Hooked at
+// the yard's edge (20 yd) that leaves about 7.9 s (the 1.5 s settle, then the
+// reel from 20 to 11.85 yd), 7.2 s on heroic; hooked at 14 yd, about 3.6 s;
+// hooked inside 11.85 yd, no post: break the chain. With an anchor every 24 s
+// and a post dark for 30, at most two posts are ever spent at once, so a lit
+// post is always somewhere: the question is whether the victim stands where
+// it can be reached. A post never takes a chain whose victim was hooked
+// within postRun of it, so parking the group by the posts buys nothing: a
+// victim hooked at one post must run to another (21 yd round the rim, about
+// 3 s), a race against the reel.
 
 export const WINCH = DROWNING_WINCH;
 export const YARD = DROWNING_YARD;
+
+/** The Mooring Posts (instance-local), in their fixed order. */
+export const MOORING_POST_SPOTS: readonly { id: string; x: number; z: number }[] = MOORING_POSTS;
+
+/** The post a hooked player at (x, z) moors to: the nearest LIT post within
+ *  `postReach` (ties to the lower index) that stands at least `postRun` from
+ *  where the anchor hooked them (hookX, hookZ), or -1. Pure. */
+export function mooringPostInReach(
+  x: number,
+  z: number,
+  lit: readonly boolean[],
+  hookX: number,
+  hookZ: number,
+): number {
+  let best = -1;
+  let bestD = Infinity;
+  for (let i = 0; i < MOORING_POSTS.length; i++) {
+    if (!lit[i]) continue;
+    const post = MOORING_POSTS[i];
+    if (Math.hypot(hookX - post.x, hookZ - post.z) < OSSICK_TUNING.postRun) continue;
+    const d = Math.hypot(x - MOORING_POSTS[i].x, z - MOORING_POSTS[i].z);
+    if (d > OSSICK_TUNING.postReach) continue;
+    if (d < bestD - 1e-9) {
+      best = i;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+/** The longest chain (yd from the winch's centre) that can no longer reach
+ *  any post: inside it, only breaking the chain frees the victim. */
+export const MOORING_CHAIN_FLOOR =
+  Math.min(
+    ...MOORING_POSTS.map((p) => Math.hypot(p.x - DROWNING_WINCH.x, p.z - DROWNING_WINCH.z)),
+  ) - OSSICK_TUNING.postReach;
+
+/** A dark post's lamp: kindling once `left` seconds of its dark remain within
+ *  `postKindleSeconds`, else dark; lit at 0. */
+export function mooringStateFor(left: number): MooringState {
+  if (left <= 1e-6) return 'lit';
+  return left <= OSSICK_TUNING.postKindleSeconds + 1e-6 ? 'kindling' : 'dark';
+}
 
 /** The pit's rim: a hauled player this near the winch's centre falls in (the
  *  winch's own collider stops a body about a yard outside its radius). */
