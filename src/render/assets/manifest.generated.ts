@@ -488,6 +488,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/temple_snapper.glb": "/media/models/creatures/temple_snapper.c43f18a23b2c.glb",
   "models/creatures/temple_templeguard.glb": "/media/models/creatures/temple_templeguard.1e903eae0124.glb",
   "models/creatures/temple_ysolei.glb": "/media/models/creatures/temple_ysolei.904fe12f2feb.glb",
+  "models/creatures/tidebound_acolyte.glb": "/media/models/creatures/tidebound_acolyte.9b275ebb5fdb.glb",
   "models/creatures/tolling_bell.glb": "/media/models/creatures/tolling_bell.c16b6309fb51.glb",
   "models/creatures/training_dummy.glb": "/media/models/creatures/training_dummy.e29aa3fb8ea7.glb",
   "models/creatures/treant_ability_anims.glb": "/media/models/creatures/treant_ability_anims.6d81c3efd4d4.glb",

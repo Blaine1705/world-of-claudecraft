@@ -63,6 +63,7 @@ const ROSTER: Record<string, { glb: string; unique: string[] }> = {
   shackled_prisoner: { glb: 'drowned_prisoner.glb', unique: ['Attack', 'Attack2'] },
   gaol_turnkey: { glb: 'gaol_turnkey.glb', unique: ['KeySwing', 'ChainLash', 'LanternRaise'] },
   mistweaver: { glb: 'mist_chanter.glb', unique: ['Ward', 'Cast'] },
+  tidebound_acolyte: { glb: 'tidebound_acolyte.glb', unique: ['Mend'] },
 };
 
 describe('the Sunken Bastion creature roster', () => {

@@ -4245,19 +4245,31 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.16,
   },
-  // The Tidebound Acolyte: a living cultist of Vael's hymn in sea-green robes.
+  // The Tidebound Acolyte: a living cultist of Vael's hymn, sculpted whole on
+  // the drowned kit (scripts/assets/sunken_bastion_drowned/acolyte/): tall and
+  // upright in layered sea-green robes with wide sleeves, a deep cowl under a
+  // tall finned mitre, gill slits in the neck and sea light in the eyes, a
+  // shell medallion, a coral-crowned staff holding a pearl of sea light and a
+  // great conch in the left hand. He fights with the staff (a two-handed blow
+  // down, a flat sweep of the crown); Brine Mend loops the conch held high and
+  // tipped over the bar. Drawn well past a player now; presentation only.
   bastion_acolyte: {
-    url: `${PLAYERS}/mage.glb`,
-    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
-    height: HUMANOID_H * 1.35,
+    url: `${CREATURES}/tidebound_acolyte.glb`,
+    height: 5.0,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
-      castByAbility: { [BASTION_BRINE_MEND]: 'Spellcast_Raise' },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Mend',
+      castByAbility: { [BASTION_BRINE_MEND]: 'Mend' },
     },
-    show: ['Mage_Hat'],
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.55,
+    walkRef: 1.06,
+    runRef: 4.86,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
 
   // The Sunken Bastion's bosses (sim/encounters/sunken_bastion). Knight-

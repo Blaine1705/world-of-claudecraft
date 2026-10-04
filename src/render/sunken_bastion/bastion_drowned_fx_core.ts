@@ -101,6 +101,19 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0.03, up: 2.41, fwd: 0.25 },
     eyes: { side: 0.09, up: 3.58, fwd: 0.89 },
   },
+  // The Tidebound Acolyte: water off the cope's shoulders, the cowl's brow and
+  // the coral crown.
+  tidebound_acolyte: {
+    rawHeight: 5.079,
+    drips: [
+      { side: 0.43, up: 2.93, fwd: 0.01 },
+      { side: 0.06, up: 4.1, fwd: 0.74 },
+      { side: -0.86, up: 4.37, fwd: 0.96 },
+      { side: -0.41, up: 2.93, fwd: 0.01 },
+    ],
+    chest: { side: 0.01, up: 2.94, fwd: 0.41 },
+    eyes: { side: 0.04, up: 4.02, fwd: 0.46 },
+  },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {
     rawHeight: 4.4,

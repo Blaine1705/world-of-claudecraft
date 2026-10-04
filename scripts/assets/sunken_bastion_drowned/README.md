@@ -43,6 +43,11 @@ nothing here runs in the build or the game.
   lure of sea light (a `glow_lure` part); `clips.py` has Idle, Walk, Run, Attack, Attack2, Cast,
   Ward (a loop), Hit, Death. Her first rig is kept as `mist_chanter_thawcaller.glb` for the
   Gravewyrm Sanctum's Thawcaller placeholder.
+- `acolyte/`: the Tidebound Acolyte (`public/models/creatures/tidebound_acolyte.glb`), grown from the
+  Chanter's builder: an upright living cultist, the cowl and a tall finned mitre, robes to the feet
+  with wide sleeves (`build_sleeve`), gill slits, the coral-crowned staff with its pearl of sea light
+  and the conch laid out in the left hand's frame; `clips.py` has Idle, Walk, Run, Attack, Attack2,
+  Mend (the Brine Mend loop), Hit, Death.
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),
