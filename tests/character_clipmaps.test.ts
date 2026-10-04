@@ -269,9 +269,6 @@ const CLIPLESS_RIGS = new Set([
   'mount_rickshaw_mount',
   'mob_glimmerwisp',
   'mob_duskwisp',
-  // the Drowned Temple's Tidewisp: a tinted glimmerwisp.glb, the same
-  // unrigged mesh as mob_glimmerwisp
-  'temple_tidewisp',
   'mob_spider_egg_sac',
   'mob_healing_tide_totem',
   // The Wildheart Basin's Sunbone Totem: the shipped carved mask totem as a

@@ -104,10 +104,9 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_terrorspark_groundshaker',
   'mount_thunderstrut_gobbler',
   // The five-dungeon rework's re-tints of a legacy body above: they spread the
-  // base def (the Drowned Temple's Tidewisp over mob_glimmerwisp, the Wildheart
-  // Basin's Totem-Binder and Howdah Hexcaller over mob_wildheart_hexcaller), so
-  // they keep the floor their shared GLB was tuned under.
-  'temple_tidewisp',
+  // base def (the Wildheart Basin's Totem-Binder and Howdah Hexcaller over
+  // mob_wildheart_hexcaller), so they keep the floor their shared GLB was
+  // tuned under.
   'wildheart_howdah_hexcaller',
   'wildheart_totem_binder',
 ]);
@@ -205,6 +204,28 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_crypt_drake',
   'mob_crypt_knellwyrm',
   'temple_ysolei',
+  // the Drowned Temple's Blender Tide Pilgrim (the sacred sea snail)
+  'temple_pilgrim',
+  // the Drowned Temple's Blender Nacre Templeguard (the seahorse temple knight)
+  'temple_templeguard',
+  // the Drowned Temple's Blender Pale Choir Acolyte (the moon-jelly priestess)
+  'temple_acolyte',
+  // the Drowned Temple's Blender Moonlit Siren (the priestess on her waterspout)
+  'temple_siren',
+  // the Drowned Temple's Blender Tidewisp (the drop of moon-water)
+  'temple_tidewisp',
+  // the Drowned Temple's Blender Glimmerscale Lurker (the sacred mantis shrimp)
+  'temple_lurker',
+  // the Drowned Temple's Blender Pearlguard Sentinel (the clam and coral giant)
+  'temple_sentinel',
+  // the Drowned Temple's Blender Choirmother Selthe (the siren matriarch)
+  'temple_selthe',
+  // the Drowned Temple's Blender Lagoon Snapper (the sacred nautilus)
+  'temple_snapper',
+  // the Drowned Temple's Blender Tideglass Colossus (the sea-glass giant)
+  'temple_colossus',
+  // the Drowned Temple's Blender Moonspawn (the moon spirit of water)
+  'temple_moonspawn',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

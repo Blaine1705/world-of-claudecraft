@@ -10,7 +10,9 @@ import {
   COLOSSUS_MOONLIGHT_LANCE,
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_RESONANT_SLAM,
+  SELTHE_CHORUS_MARK,
   SELTHE_SEA_SONG,
+  SELTHE_SOLO_MARK,
   SELTHE_TIDAL_SLAP,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
@@ -74,8 +76,12 @@ import {
 } from '../../sim/mob/trash_kit/cast_ids';
 import {
   TEMPLE_CALL_THE_TIDE,
+  TEMPLE_GLIMMER_VENOM,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
+  TEMPLE_PALE_MENDING,
+  TEMPLE_PEARL_SLAM,
+  TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
@@ -110,6 +116,12 @@ import {
 } from '../../sim/varkhul_cinder_artificer';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import {
+  TEMPLE_MOONSPAWN_RISE,
+  TEMPLE_PILGRIM_FRENZY_GESTURE,
+  TEMPLE_SENTINEL_SHELL_CLOSED,
+  TEMPLE_SENTINEL_SHELL_OPEN,
+} from '../drowned_temple/temple_fx_core';
 import {
   HOARD_GESTURE_CALL_HAMMER,
   HOARD_GESTURE_CALL_STORM,
@@ -1735,6 +1747,23 @@ export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
 // carries no Book of Names) and holds his ward
 // as he comes down (ShieldRitual). At his Last Rites the staff's crest UNFOLDS
 // INTO A SCYTHE (Transform) and every clip after it carries the blade out.
+// The Pearlguard Sentinel's two stances (temple_sentinel below): the giant
+// on its feet, and the clam shut over it while its Pearl Carapace holds.
+const SENTINEL_CLIPS: ClipMap = {
+  ...TEMPLE_CLIPS,
+  castByAbility: { [TEMPLE_PEARL_SLAM]: 'Slam' },
+  castTimeScaleByAbility: { [TEMPLE_PEARL_SLAM]: 1 },
+};
+const SENTINEL_SHELL_CLIPS: ClipMap = {
+  ...SENTINEL_CLIPS,
+  idle: 'ShellIdle',
+  walk: 'ShellWalk',
+  run: 'ShellWalk',
+  attack: ['ShellAttack'],
+  hit: ['ShellHit'],
+  cast: 'ShellIdle',
+};
+
 const MORTHEN_STAFF_CLIPS: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
@@ -4593,38 +4622,117 @@ export const VISUALS: Record<string, VisualDef> = {
   // the clips of its jobs. Heights allow for the templates' own scale, so the
   // drawn sizes land at about 2x the player for the trash, 3x for the bosses'
   // kin and far more for the Colossus and Ysolei. Presentation only.
+  // The Nacre Templeguard (drowned_templeguard; scripts/assets/
+  // drowned_temple_creatures/templeguard_seahorse/): a living nacre statue of a
+  // temple knight with a seahorse's head and fan crest, ridged plate over
+  // white coral, a coral-and-nacre trident and a scallop shield. It fights from
+  // a braced guard (CombatIdle), thrusts (Attack) and shield-bashes (Attack2),
+  // and runs with the trident couched like a lance (Run, which also carries
+  // the heroic Onrush dash: a mob's charge is plain fast movement, so the
+  // warrior-only rush/rushArrival slots stay unmapped). Both casts are
+  // bar-locked one-shots that strike on the bar's end: Trident Sweep (1.5 s)
+  // swings at 1.5, Skewering Trident (1.8 s) throws at 1.8, the trident flying
+  // down the lane while a water trident re-forms in its fist. Dying, its light
+  // bursts out and it slumps into a heap of plate and pearls. Drawn 5.5 to the
+  // crest at its 1.1 (2.1 players).
   temple_templeguard: {
     url: `${CREATURES}/temple_templeguard.glb`,
-    height: 4.6,
+    height: 5.0,
     clips: {
       ...TEMPLE_CLIPS,
-      castByAbility: { [TEMPLE_TRIDENT_SWEEP]: 'TridentSweep' },
-      castTimeScaleByAbility: { [TEMPLE_TRIDENT_SWEEP]: 1.3 },
+      combatIdle: 'CombatIdle',
+      castByAbility: {
+        [TEMPLE_TRIDENT_SWEEP]: 'TridentSweep',
+        [TEMPLE_SKEWERING_TRIDENT]: 'Hurl',
+      },
+      castTimeScaleByAbility: { [TEMPLE_TRIDENT_SWEEP]: 1, [TEMPLE_SKEWERING_TRIDENT]: 1 },
+      castPlayOut: ['TridentSweep', 'Hurl'],
     },
-    selfIllumination: 0.14,
-  },
-  temple_pilgrim: {
-    url: `${CREATURES}/temple_pilgrim.glb`,
-    height: 4.4,
-    clips: TEMPLE_CLIPS,
-    selfIllumination: 0.16,
-  },
-  temple_acolyte: {
-    url: `${CREATURES}/temple_acolyte.glb`,
-    height: 4.4,
-    clips: {
-      ...TEMPLE_CLIPS,
-      castByAbility: { [TEMPLE_LULLABY]: 'Lullaby' },
-    },
+    walkRef: 1.43,
+    runRef: 6.13,
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    authoredAtlas: true,
     selfIllumination: 0.05,
   },
+  // The Drowned Pilgrim (drowned_pilgrim; scripts/assets/drowned_temple_creatures/
+  // pilgrim_snail/, built as the design's "Tide Pilgrim"):
+  // a giant sacred sea snail with a moon shrine on its carved nacre shell. It
+  // glides on a pedal wave, darts its snout (Attack) and crashes its shell
+  // down (Attack2); below 30 percent its enrage rears it up and blazes the
+  // shrine violet (Frenzy, played off the enrage's nova through the temple's
+  // gesture hook); dying, it pulls into its shell, topples and its pearl goes
+  // dark. Drawn about 4.65 tall to the shrine at its 0.95 (1.8 players).
+  temple_pilgrim: {
+    url: `${CREATURES}/temple_pilgrim.glb`,
+    height: 4.9,
+    clips: {
+      ...TEMPLE_CLIPS,
+      attackByAbility: { [TEMPLE_PILGRIM_FRENZY_GESTURE]: 'Frenzy' },
+      attackTimeScaleByAbility: { [TEMPLE_PILGRIM_FRENZY_GESTURE]: 1 },
+    },
+    // A swing landing mid-frenzy must not cut the rear and the violet blaze short.
+    oneShotsHoldAttacks: ['Frenzy'],
+    authoredAtlas: true,
+    selfIllumination: 0.05,
+  },
+  // The Pale Choir Acolyte (pale_choir_acolyte; scripts/assets/
+  // drowned_temple_creatures/acolyte_moonjelly/): a novice of the moon choir
+  // the water remade, hovering a hand above the floor. The bell of a moon
+  // jelly is her hood (its four rings glowing through it), a serene face with
+  // closed eyes sings under its brim; a nacre bodice, and below the waist a
+  // skirt of sea-silk, two frilled oral arms and a veil of frills and
+  // tentacles trailing to the floor, all on follow-through chains. She glides
+  // (Walk, Run). The Pale Hymn is a petSpell bolt: its 0.6 s windup cue plays
+  // the attack clips (Attack: both hands throw the frost dart as the bell
+  // snaps open; Attack2: a one-handed strike), authored at their own pace so
+  // the dart leaves on the release. Lullaby (2.0 s bar) opens the bell wide
+  // and wheels its rings while she sways; Pale Mending (2.5 s bar) reaches
+  // her hands and oral arms to the ally with a ball of cyan light. Both are
+  // bar-locked with no play-out, so a kick breaks the song visibly. Dying,
+  // the bell crumples and she sinks through the floor into a moonlit pool.
+  // Drawn 5.2 to the bell's crown at her 1.0 (2 players).
+  temple_acolyte: {
+    url: `${CREATURES}/temple_acolyte.glb`,
+    height: 5.2,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_LULLABY]: 'Lullaby', [TEMPLE_PALE_MENDING]: 'Mend' },
+      castTimeScaleByAbility: { [TEMPLE_LULLABY]: 1, [TEMPLE_PALE_MENDING]: 1 },
+    },
+    attackTimeScale: 1,
+    walkRef: 2.5,
+    runRef: 7,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.05,
+  },
+  // The Moonlit Siren (moonlit_siren; scripts/assets/drowned_temple_creatures/
+  // siren_spout/): a tall priestess of the moon choir whose body turns to a
+  // fish tail below the waist. She never crawls: a waterspout winds round
+  // her tail from the floor to her hips and holds her upright (it whirls one
+  // turn a loop). Floating silver hair, fin ears, a crescent crown hung with
+  // pearls, a coral staff crowned with a moon pearl. Brine Lash is a petSpell
+  // bolt: its 0.6 s windup cue plays the attack clips (Attack: a staff blow;
+  // Attack2: the staff levelled and cracked like a whip, the pearl flaring),
+  // both authored to release on the windup's end. Call the Tide (2.5 s bar)
+  // plays Sing: arms wide, staff high, the spout swells and three bubbles of
+  // tide fly out as the bar ends, where the sim raises the Tidewisps;
+  // bar-locked with no play-out, so a kick breaks the song visibly. Dying, the
+  // spout falls away and she sinks into a pool of foam. Drawn 6.0 at her 1.0.
   temple_siren: {
     url: `${CREATURES}/temple_siren.glb`,
-    height: 5.4,
+    height: 6.0,
     clips: {
       ...TEMPLE_CLIPS,
       castByAbility: { [TEMPLE_CALL_THE_TIDE]: 'Sing' },
+      castTimeScaleByAbility: { [TEMPLE_CALL_THE_TIDE]: 1 },
     },
+    attackTimeScale: 1,
+    walkRef: 2.5,
+    runRef: 7,
+    castClipSync: true,
+    authoredAtlas: true,
     selfIllumination: 0.06,
   },
   // The Lagoon Eel (scripts/assets/drowned_temple_creatures/eel.py): an
@@ -4642,47 +4750,133 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.22,
   },
+  // The Lagoon Snapper (lagoon_snapper; scripts/assets/
+  // drowned_temple_creatures/snapper_nautilus/): a giant sacred nautilus, its
+  // spiral shell standing like a wheel (turquoise tiger stripes, a glowing
+  // nacre lip, silver crescent medallions with pearls in its navel), a fleshy
+  // hood, lidless eyes with a slit of light, a crown of tentacles round a
+  // blue-black beak. Its swings part the tentacles and strike with the beak.
+  // Snap (1.5 s bar) plays Snap: the crown gathers, the shell rocks back, the
+  // beak shoots out with every tentacle flung open on the bar's end. Shell Up
+  // is a self-stun, so its stunned loop (ShellUp) holds while it lasts: the
+  // tentacles drawn in, the hood shut over the aperture. Dying, the shell tips
+  // onto its side. Drawn 4.6 at its 1.2.
   temple_snapper: {
     url: `${CREATURES}/temple_snapper.glb`,
-    height: 3.4,
+    height: 3.83,
     clips: {
       ...TEMPLE_CLIPS,
+      stunned: 'ShellUp',
       castByAbility: { [TEMPLE_SNAP]: 'Snap' },
-      castTimeScaleByAbility: { [TEMPLE_SNAP]: 1.3 },
+      castTimeScaleByAbility: { [TEMPLE_SNAP]: 1 },
     },
-    selfIllumination: 0.22,
+    walkRef: 2.0,
+    runRef: 5.0,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.08,
   },
+  // The Pearlguard Sentinel (pearlguard_sentinel; scripts/assets/
+  // drowned_temple_creatures/sentinel_clam/): a temple giant whose body is a
+  // colossal clam, two wavy bone-white valves gaping front and back from its
+  // hips, its iridescent blue mantle between them and its heart pearl glowing
+  // in the front valve's notch; limbs of branching white coral, fists and feet
+  // of nacre stone, a small stone head with a slit of moonlight. Attack: an
+  // overhead hammer fist (CONTACT 0.55); Attack2: a backhand (0.5). Onrush
+  // charges on Run, head down between half-closed valves. Pearl Slam (1.5 s
+  // bar) plays Slam: both fists raised, driven into the floor on the bar's
+  // end. Pearl Carapace: while the ward holds, temple_fx swaps the rig to its
+  // shell stance (crouched, the valves shut over it, ShellClose to enter,
+  // ShellOpen to leave). Dying, the valves fly open and the pearl rolls out
+  // dark. Drawn 7.0 at its 1.15 (2.7 players).
   temple_sentinel: {
     url: `${CREATURES}/temple_sentinel.glb`,
-    height: 5.6,
-    clips: TEMPLE_CLIPS,
-    selfIllumination: 0.14,
+    height: 6.1,
+    clips: SENTINEL_CLIPS,
+    phaseClips: {
+      [TEMPLE_SENTINEL_SHELL_OPEN]: { clips: SENTINEL_CLIPS, enter: 'ShellOpen' },
+      [TEMPLE_SENTINEL_SHELL_CLOSED]: { clips: SENTINEL_SHELL_CLIPS, enter: 'ShellClose' },
+    },
+    walkRef: 1.11,
+    runRef: 3.88,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.08,
   },
-  // The Glimmerscale Lurker's Pounce flies in the Leap pose and lands on Land.
+  // The Glimmerscale Lurker (glimmerscale_lurker; scripts/assets/
+  // drowned_temple_creatures/lurker_mantis/): a giant mantis shrimp the
+  // moon-water made sacred, long, low and armoured in iridescent plates
+  // (turquoise to violet, pearl rims, a carved crescent on every tergite),
+  // its front half reared, eyes on turning stalks banded in silver, two
+  // raptorial arms folded like jackknives, a tail fan of nacre paddles. Its
+  // swings snap the arms out (Attack: both, Attack2: one; contact at 0.16).
+  // Pounce flies in the Leap pose (arms flung open) and lands on Land. Glimmer
+  // Venom (2.0 s bar) plays Spit: it rears back with the glowing bolus swelling
+  // in its mouth and spits as the bar ends; bar-locked, so a kick shows.
+  // Dying, it rolls onto its back and its flank lights go out one by one.
+  // Drawn 4.4 at the reared front at its 1.2 (about 7 long): the design's 3.6
+  // read smaller than the player beside its long low body, so it grew to
+  // stay imposing.
   temple_lurker: {
     url: `${CREATURES}/temple_lurker.glb`,
-    height: 2.4,
-    clips: { ...TEMPLE_CLIPS, jump: 'Leap', land: 'Land' },
-    selfIllumination: 0.18,
+    height: 3.65,
+    clips: {
+      ...TEMPLE_CLIPS,
+      jump: 'Leap',
+      land: 'Land',
+      castByAbility: { [TEMPLE_GLIMMER_VENOM]: 'Spit' },
+      castTimeScaleByAbility: { [TEMPLE_GLIMMER_VENOM]: 1 },
+    },
+    walkRef: 2.6,
+    runRef: 7.2,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
   },
-  // The bosses. Choirmother Selthe sings her court's rhythm: the Sea-Song on
-  // the golden conch, the Tidal Slap backhand (the marks play from
-  // drowned_temple/temple_boss_fx.ts).
+  // The bosses. Choirmother Selthe (choirmother_selthe; scripts/assets/
+  // drowned_temple_creatures/selthe_matriarch/): the siren matriarch, built
+  // on the Moonlit Siren's body but far larger, a vast lionfish fan opening
+  // behind her like the pipes of an organ (silver rays, pearl tips, sheer
+  // turquoise to violet fins), her tail coiled in the pool of moonlit water
+  // she rides, the golden Great Conch on her chest, a jaw that drops too far
+  // when she sings. Sea-Song (1.5 s bar) plays SeaSong: arms wide, head back,
+  // the mouth wide, the fan shivering, the song on the bar's end. Tidal Slap
+  // (1.0 s bar) plays Slap: the arm drawn across her, the backhand on the
+  // bar's end. The Chorus and Solo marks arrive as windup cues and play Chorus
+  // (the conch raised and blown, the fan folding in) and Solo (one arm raised,
+  // the fan flung wide). Dying, the fan folds and she sinks into her pool,
+  // leaving the conch glowing on the floor. Drawn 9.0 at her 1.15.
   temple_selthe: {
     url: `${CREATURES}/temple_selthe.glb`,
-    height: 6.5,
+    height: 7.83,
     clips: {
       ...TEMPLE_CLIPS,
       castByAbility: { [SELTHE_SEA_SONG]: 'SeaSong', [SELTHE_TIDAL_SLAP]: 'Slap' },
-      castTimeScaleByAbility: { [SELTHE_TIDAL_SLAP]: 1.5 },
+      castTimeScaleByAbility: { [SELTHE_SEA_SONG]: 1, [SELTHE_TIDAL_SLAP]: 1 },
+      attackByAbility: { [SELTHE_CHORUS_MARK]: 'Chorus', [SELTHE_SOLO_MARK]: 'Solo' },
+      attackTimeScaleByAbility: { [SELTHE_CHORUS_MARK]: 1, [SELTHE_SOLO_MARK]: 1 },
     },
-    selfIllumination: 0.08,
+    attackTimeScale: 1,
+    walkRef: 2.5,
+    runRef: 7,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
   },
-  // The Tideglass Colossus: stone blocks round a blazing prism. It walks its
-  // foe down (sixth pass): Walk and Run are its own lumbering gait. The
-  // template's 2.2 scale (its long reach) draws it at 15 world units. A new
-  // Colossus body swaps in here: keep its clip names (Idle, Walk, Run, Attack,
-  // Attack2, Hit, Death, Flare, Lance, Slam) or remap them below.
+  // The Tideglass Colossus (tideglass_colossus; scripts/assets/
+  // drowned_temple_creatures/colossus_tideglass/, rebuilt from scratch): a
+  // giant of sea-glass the moon's water hardened, massive forms cut in broad
+  // facets with fractures of light running through it, violet crystal spires
+  // bursting from its shoulders, spine, elbows and knees, silver bands with
+  // moons, and in its chest, held in a silver crescent ringed with pearls, the
+  // prism: the cut gem of silver and violet that casts the Reflections. It
+  // walks its foe down (Walk, Run). Prism Flare (2.0 s bar) plays Flare: arms
+  // flung wide, the prism blazing on the bar's end. Moonlight Lance (2.0 s
+  // bar) plays Lance: the prism levelled along its pointing arm. Resonant Slam
+  // (1.5 s bar) plays Slam: both fists into the floor and a ring of broken
+  // crystal. Heroic's Reflection swap arrives as a windup cue: PrismPulse.
+  // Dying, it kneels, topples and breaks into crystal over a pool of water.
+  // The template's 2.2 scale (its long reach) draws it at 15 world units.
   temple_colossus: {
     url: `${CREATURES}/temple_colossus.glb`,
     height: 15 / 2.2,
@@ -4694,12 +4888,38 @@ export const VISUALS: Record<string, VisualDef> = {
         [COLOSSUS_RESONANT_SLAM]: 'Slam',
       },
       castTimeScaleByAbility: {
-        [COLOSSUS_PRISM_FLARE]: 1.1,
-        [COLOSSUS_MOONLIGHT_LANCE]: 1.1,
-        [COLOSSUS_RESONANT_SLAM]: 1.6,
+        [COLOSSUS_PRISM_FLARE]: 1,
+        [COLOSSUS_MOONLIGHT_LANCE]: 1,
+        [COLOSSUS_RESONANT_SLAM]: 1,
       },
+      attackByAbility: { [COLOSSUS_PRISM_FLARE]: 'PrismPulse' },
+      attackTimeScaleByAbility: { [COLOSSUS_PRISM_FLARE]: 1 },
     },
+    attackTimeScale: 1,
+    walkRef: 1.4,
+    runRef: 3.48,
+    castClipSync: true,
+    authoredAtlas: true,
     selfIllumination: 0.06,
+  },
+  // The Moonspawn (moonspawn; scripts/assets/drowned_temple_creatures/
+  // moonspawn_tide/): Ysolei's summoned add had no body of its own and drew
+  // as the overworld murloc. Now a spirit of the Drowned Moon: a lizard of
+  // living moonlit water, a crescent of nacre arched over its back and
+  // another on its brow, glowing eyes and glassy teeth. It climbs out of the
+  // flooded shore when it is called (Rise, its entrance: temple_fx offers the
+  // gesture the moment it appears), runs low and fast, bites (Attack) and
+  // rakes (Attack2), and dying pours back into a pool of water. Drawn 3.5
+  // at its 0.9.
+  temple_moonspawn: {
+    url: `${CREATURES}/temple_moonspawn.glb`,
+    height: 3.89,
+    clips: { ...TEMPLE_CLIPS, entrance: 'Rise' },
+    entranceGesture: TEMPLE_MOONSPAWN_RISE,
+    walkRef: 3,
+    runRef: 8,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
   },
   // Ysolei, Avatar of the Drowned Moon: the colossal lunar sea-serpent built
   // in Blender by Codex (sources on the codex/ysolei branch; original work, no
@@ -4761,19 +4981,23 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 2.6,
   },
-  // A Tidewisp: a glimmerwisp of living lagoon water. glimmerwisp.glb is an
-  // unrigged bespoke mesh that ships no clips (see mob_glimmerwisp), so this
-  // names STATIC_PROP and registers in CLIPLESS_RIGS
-  // (tests/character_clipmaps.test.ts) instead of borrowing FLOATING.
+  // A Tidewisp (tidewisp; scripts/assets/drowned_temple_creatures/
+  // tidewisp_drop/): its own body now, no longer the overworld glimmerwisp.
+  // A great drop of moon-water the siren's song lifts from her spout: clear
+  // turquoise lit from inside, its point curled back like a flame, a silver
+  // crescent in its face that turns faster as it rushes in, motes of water
+  // circling it and a trail of falling drops. It reaches its mark and dies
+  // there in Tidewisp Burst: Death is the burst (a swell, then a ring of
+  // frost and a spray of drops). Drawn 2.2 with its trail at its 0.8.
   temple_tidewisp: {
-    url: `${CREATURES}/glimmerwisp.glb`,
-    height: 1.8,
-    hover: 0.5,
-    clips: STATIC_PROP,
-    yaw: -Math.PI / 2,
-    tint: 0x6fe3e0,
-    tintStrength: 0.6,
-    selfIllumination: 0.3,
+    url: `${CREATURES}/temple_tidewisp.glb`,
+    height: 2.75,
+    hover: 0.45,
+    clips: TEMPLE_CLIPS,
+    walkRef: 2.5,
+    runRef: 7,
+    authoredAtlas: true,
+    selfIllumination: 0.12,
   },
 
   // -- humanoid mobs (KayKit adventurers) ------------------------------------
@@ -5876,6 +6100,7 @@ const MOB_KEYS: Record<string, string> = {
   pearlguard_sentinel: 'temple_sentinel',
   glimmerscale_lurker: 'temple_lurker',
   tidewisp: 'temple_tidewisp',
+  moonspawn: 'temple_moonspawn',
   choirmother_selthe: 'temple_selthe',
   tideglass_colossus: 'temple_colossus',
   ysolei: 'temple_ysolei',

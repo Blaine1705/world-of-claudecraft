@@ -38,10 +38,17 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import {
+  isTemplePilgrimFrenzyCue,
+  stepTempleShellStance,
   TEMPLE_ACCENTS,
   TEMPLE_MARK_SPECS,
+  TEMPLE_MOONSPAWN_RISE,
   TEMPLE_OBJECT_SPECS,
+  TEMPLE_PILGRIM_FRENZY_GESTURE,
+  type TempleShellTrack,
   type TempleTelegraphSpec,
+  templeMoonspawnRises,
+  templeSentinelShellGesture,
   templeTelegraphFill,
   templeTelegraphSpecs,
   templeTimedFill,
@@ -102,6 +109,10 @@ export class TempleFx {
   private readonly hydra: TempleHydra;
   private readonly ysolei: TempleYsoleiFx;
   private readonly flashesOn: boolean;
+  /** Each living Pearlguard Sentinel's shell stance and when it changed. */
+  private readonly shellStance = new Map<number, TempleShellTrack>();
+  /** When each Moonspawn was first seen (its Rise is offered for a moment). */
+  private readonly moonspawnSeen = new Map<number, number>();
   private scan = 0;
   private clock = 0;
   private disposed = false;
@@ -111,6 +122,7 @@ export class TempleFx {
     private readonly groundY: (x: number, z: number) => number,
     private readonly world?: IWorld,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'drowned-temple-telegraphs';
     setRenderCategory(this.root, 'ui3d');
@@ -156,9 +168,19 @@ export class TempleFx {
       .catch(() => {});
   }
 
+  /** True when the temple claims the event (the renderer skips its generic draw). */
   handleEvent(ev: SimEvent): boolean {
     this.hydra.handleEvent(ev);
     this.ysolei.handleEvent(ev);
+    if (ev.type === 'spellfx') {
+      const source = this.world?.entities.get(ev.sourceId);
+      // Claimed only when the Frenzy can actually play (a host without the
+      // gesture hook keeps the generic burst).
+      if (this.playGesture && isTemplePilgrimFrenzyCue(ev, source?.templateId)) {
+        this.playGesture(ev.sourceId, TEMPLE_PILGRIM_FRENZY_GESTURE);
+        return true;
+      }
+    }
     return false;
   }
 
@@ -174,6 +196,7 @@ export class TempleFx {
     if (this.scan <= 0) {
       this.scan = SCAN_SEC;
       this.scanWorld(world);
+      this.pruneTracks(world);
     }
     this.hydra.update(dt, this.clock);
     this.ysolei.update(dt, this.clock);
@@ -407,6 +430,10 @@ export class TempleFx {
         }
         continue;
       }
+      if (this.playGesture && e.templateId === 'pearlguard_sentinel')
+        this.updateShellStance(e.id, e.templateId, e.auras, e.dead);
+      if (this.playGesture && e.templateId === 'moonspawn')
+        this.offerMoonspawnRise(e.id, e.templateId, e.dead);
       if (e.dead) continue;
       if (e.templateId.startsWith(REFLECTION_ID) && e.forcedTargetId !== null) {
         const have = this.tetherPairs.findIndex(([r]) => r === e.id);
@@ -442,6 +469,42 @@ export class TempleFx {
     }
   }
 
+  /** The Sentinel's Pearl Carapace: its shell shuts over it while the ward
+   *  holds and opens when it goes (a stance gesture on the rig's phaseClips;
+   *  the step itself is temple_fx_core's stepTempleShellStance). */
+  private updateShellStance(
+    id: number,
+    templateId: string,
+    auras: readonly { id: string }[],
+    dead: boolean,
+  ): void {
+    const want = templeSentinelShellGesture(templateId, auras, dead);
+    const step = stepTempleShellStance(this.shellStance.get(id), want, this.clock);
+    if (step.next) this.shellStance.set(id, step.next);
+    else this.shellStance.delete(id);
+    if (step.send) this.playGesture?.(id, step.send);
+  }
+
+  /** A Moonspawn climbing out of the shore: its Rise is offered for the first
+   *  moment after it is seen (the rig plays it once). */
+  private offerMoonspawnRise(id: number, templateId: string, dead: boolean): void {
+    let seen = this.moonspawnSeen.get(id);
+    if (seen === undefined) {
+      seen = this.clock;
+      this.moonspawnSeen.set(id, seen);
+    }
+    if (templeMoonspawnRises(templateId, dead, this.clock - seen))
+      this.playGesture?.(id, TEMPLE_MOONSPAWN_RISE);
+  }
+
+  /** Drop the tracks of bodies that left the world (or interest range). */
+  private pruneTracks(world: IWorld): void {
+    for (const id of this.shellStance.keys())
+      if (!world.entities.has(id)) this.shellStance.delete(id);
+    for (const id of this.moonspawnSeen.keys())
+      if (!world.entities.has(id)) this.moonspawnSeen.delete(id);
+  }
+
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
@@ -450,5 +513,7 @@ export class TempleFx {
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();
+    this.shellStance.clear();
+    this.moonspawnSeen.clear();
   }
 }

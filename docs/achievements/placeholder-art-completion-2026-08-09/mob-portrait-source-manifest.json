@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "742bd5ffdb48dbd0ba42c9fb3984f0b89284deaef4330cc39a6cb6fa1de933e0",
+  "rendererFingerprint": "0d862185f7bc888ee4e04f3860e9e91f141eb2b03c43100ef6755981388cfe40",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5476234,
-      "sha256": "554614b208c72e4b1874b7c2bbf253479b4d462ec6f79dd3e5352d43860b1d21",
+      "bytes": 5476000,
+      "sha256": "e6ecb92eb2966fac00f386e7ba0ca5bc21751dbc70648c2f8e91bd43eeb822c8",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1195,11 +1195,11 @@
         "model": {
           "url": "models/creatures/temple_selthe.glb",
           "path": "public/models/creatures/temple_selthe.glb",
-          "bytes": 849512,
-          "sha256": "5f7d4fb4baa35f5874827f2791a42f571c9f31f5879088d4a74b6b7370ca071e"
+          "bytes": 3410472,
+          "sha256": "71b0aee4ca0bbbf27821058eb057f873df2f6b39e55650a98d27ebe4cc6d361c"
         },
         "idle": "Idle",
-        "height": 6.5,
+        "height": 7.83,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -1213,11 +1213,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "e18c24b76768ea9ac8dba91c20c67bce99959ff1ac75973360a5a8260a75c16a",
+      "sourceFingerprint": "f77e224681d230b2f4f6230f829e413b2170b9064eb02e1972173ad8b6f3bc22",
       "output": {
         "path": "public/ui/mobs/choirmother_selthe.webp",
-        "bytes": 2872,
-        "sha256": "403398094739a61ceda1036a49c99ba66f490168ad82628c14628ce86c37ba32"
+        "bytes": 3684,
+        "sha256": "63627bebb8d142136c5a4d7a0e2e86de640b40c2e69617b2234642e6c921cdba"
       }
     },
     {
@@ -2323,11 +2323,11 @@
         "model": {
           "url": "models/creatures/temple_pilgrim.glb",
           "path": "public/models/creatures/temple_pilgrim.glb",
-          "bytes": 447452,
-          "sha256": "856c8d37e44d589faf13bc1c0cf6722d8f89acb2b870d0efbf69eff1f95fcd77"
+          "bytes": 2525480,
+          "sha256": "68a106bd0ca1cdef8eb5793d58f7fc8974b2794bd207d3bfe6026d7e291bbc8c"
         },
         "idle": "Idle",
-        "height": 4.4,
+        "height": 4.9,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -2341,11 +2341,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "719d55d78b3dfe7c298fea06086aa0883b4df8f15fc42894469a67fdf543c96a",
+      "sourceFingerprint": "02208d22975a0fd0fc4ec98e67d1616a5bc0531ca5d2e16e01b7cb9760314a33",
       "output": {
         "path": "public/ui/mobs/drowned_pilgrim.webp",
-        "bytes": 1744,
-        "sha256": "b3ec9a592c913ed4c8acb5dd717ffd05560363ab09b78fa9737ded0dda802ca6"
+        "bytes": 2794,
+        "sha256": "5360785b355f9c4bb64876e37a4a50abe44b9d6883f84ecaa1857e3c77531a9e"
       }
     },
     {
@@ -2391,11 +2391,11 @@
         "model": {
           "url": "models/creatures/temple_templeguard.glb",
           "path": "public/models/creatures/temple_templeguard.glb",
-          "bytes": 799504,
-          "sha256": "1e903eae01240758574e8b1f7cf9a9bd4f9aa3734500084530302de81dea5fa0"
+          "bytes": 3071440,
+          "sha256": "071169445ad70bccb83565cb91b9fd7b0aae23e61a094819a8f769979bef0a96"
         },
         "idle": "Idle",
-        "height": 4.6,
+        "height": 5,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -2409,11 +2409,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9d60a8a45494bdbaf5d3661b65a210528120b22d3e77c38c6a4bc456f6101aa6",
+      "sourceFingerprint": "65bb71470a8ee56357ef9e955d4dd95e114f1538feffe663ccfa6d462a833acd",
       "output": {
         "path": "public/ui/mobs/drowned_templeguard.webp",
-        "bytes": 2288,
-        "sha256": "7493faa283b8a289a641f57ca6becb040c9a3fd18e0df91cd95537cdadab9242"
+        "bytes": 3520,
+        "sha256": "a76534389dec9c7617b94308072f15f18e39ffaa0af70cd4a758e16c6db2592a"
       }
     },
     {
@@ -3474,11 +3474,11 @@
         "model": {
           "url": "models/creatures/temple_lurker.glb",
           "path": "public/models/creatures/temple_lurker.glb",
-          "bytes": 827508,
-          "sha256": "5a69999d8209ba2b1a787811f833019d9c70bb496fbcd58d9ccc46847a70c64b"
+          "bytes": 2169424,
+          "sha256": "01030724213d02075e517f9d9685742a8023cd863d4f46b49d0e2972a68f5d36"
         },
         "idle": "Idle",
-        "height": 2.4,
+        "height": 3.65,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -3492,11 +3492,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bf514665e24962f6f3a4d12a227e3e95eae2f7e433139a4bf58650ef6c6099d8",
+      "sourceFingerprint": "a46f29ba8c32a5908c1e2e285e108ac2e8382c186d0a27a9776016300b44c3f5",
       "output": {
         "path": "public/ui/mobs/glimmerscale_lurker.webp",
-        "bytes": 1918,
-        "sha256": "15c7155dd559067c01c2b856b3a8351b669b17dc35a9a8750590ab9835951020"
+        "bytes": 1782,
+        "sha256": "817617f5d5391737d5f251bc41aed3367c8d70ffc9bd28c518bf2421318eef82"
       }
     },
     {
@@ -5584,8 +5584,8 @@
         "model": {
           "url": "models/creatures/temple_eel.glb",
           "path": "public/models/creatures/temple_eel.glb",
-          "bytes": 993576,
-          "sha256": "ec06d36113529899a55729554dabfec31a0f9407bbbb726d0e220b68640a8067"
+          "bytes": 1166568,
+          "sha256": "8c8e3340e56aeed63ed81b32c12850843ea888550446ff18b2a55678ac397e2d"
         },
         "idle": "Idle",
         "height": 6.2,
@@ -5602,11 +5602,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c2c36066a1e032f5d2941c02edd89253a60c554ed8d4aad332eda5ff02233822",
+      "sourceFingerprint": "b5ff4bff56d0aa718676fb465e66f961e2abd2f1395b2a97fe59d0170ee081ed",
       "output": {
         "path": "public/ui/mobs/lagoon_eel.webp",
-        "bytes": 2212,
-        "sha256": "dab6168c299d3a87cf82c08f55a40f3e493bf96e0a4ca43c70a6aebfd24a836a"
+        "bytes": 2284,
+        "sha256": "be7a437f4d15f9caa0bffb12e8f6baa131b82bd9979748271ef51a6759c4d23d"
       }
     },
     {
@@ -5618,11 +5618,11 @@
         "model": {
           "url": "models/creatures/temple_snapper.glb",
           "path": "public/models/creatures/temple_snapper.glb",
-          "bytes": 470780,
-          "sha256": "c43f18a23b2c3f0826fd9d8b3dbcaeb7b47c5e9c5df85a888670613f9752d9bf"
+          "bytes": 2279000,
+          "sha256": "74bf9d0fee61d06704a82ecc97a18fd68ad729172295904918762fb08aaa794d"
         },
         "idle": "Idle",
-        "height": 3.4,
+        "height": 3.83,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5636,11 +5636,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "99babc7d09318c354fa943d5264df8cac95a0ee42be01a69bb5c34326e58f4f0",
+      "sourceFingerprint": "21c4e6a54c4f7c5b3066fd98d340bea4e35331229fd2523848939ef0150c0157",
       "output": {
         "path": "public/ui/mobs/lagoon_snapper.webp",
-        "bytes": 1996,
-        "sha256": "d016f7bff5e0e9836665a7c2c800e263230d6cc1b5f53c3972c4f9fdf4ed91ed"
+        "bytes": 2436,
+        "sha256": "fee1b3b71199c40d7bd0204bbcf05af0cbbe4c807b374a2f584a5a7624b4a71e"
       }
     },
     {
@@ -6270,11 +6270,11 @@
         "model": {
           "url": "models/creatures/temple_siren.glb",
           "path": "public/models/creatures/temple_siren.glb",
-          "bytes": 722128,
-          "sha256": "68d474a1aadd56d19c70d9fb628bf1c2fd5a8ce672ebd17b0e5b9188578c13f4"
+          "bytes": 3191276,
+          "sha256": "f9c52d38262eb420f4eb7b31769a763ca6d1cc3df3ffe7b06dfdf0946c09dc31"
         },
         "idle": "Idle",
-        "height": 5.4,
+        "height": 6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6288,45 +6288,45 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b55d703ae99104574cf48d6abcff38d4a0989e77cabcc706cf3dfaafd4662304",
+      "sourceFingerprint": "dda01e26d762733b440456acd9df698a6a05229708390233b5e27073ad24584d",
       "output": {
         "path": "public/ui/mobs/moonlit_siren.webp",
-        "bytes": 1934,
-        "sha256": "219efe0839bfdde680a229ab4a0adaffb3bcd380f3865a0f9bb6b55c71784577"
+        "bytes": 3346,
+        "sha256": "6ed35f21f25056a0abe6124616c549cb4d7f64d22054e3dcbcd41a59db30106a"
       }
     },
     {
       "id": "moonspawn",
       "family": "mudfin",
       "finderEncounter": false,
-      "visualKey": "mob_murloc",
+      "visualKey": "temple_moonspawn",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/frog.glb",
-          "path": "public/models/creatures/frog.glb",
-          "bytes": 140836,
-          "sha256": "0d77a9e6b9a741bca8fb231a85eab7c7f894ea38099048a4696bd6f2edf3afef"
+          "url": "models/creatures/temple_moonspawn.glb",
+          "path": "public/models/creatures/temple_moonspawn.glb",
+          "bytes": 1855672,
+          "sha256": "228c2574b76c5a9e9df49f8cb9bc9920193b7bca23a9f3f8335cfaedef43dc3a"
         },
         "idle": "Idle",
-        "height": 1.7,
+        "height": 3.89,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.45
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#cfe0ff",
-        "strength": 0.45
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "29eb0a06d999a18a5bfc6f401065454949cd6aa2cbc0a71c45ad9857d76cd611",
+      "sourceFingerprint": "1aa23a5931bee1aed11569fe3be99be368f4ffe87e29f9ec2bf909e3ffe11f37",
       "output": {
         "path": "public/ui/mobs/moonspawn.webp",
-        "bytes": 1788,
-        "sha256": "537c4b57c99273081c24d91e8185e3f152d922a7c3de3f42c53928e96c279bcf"
+        "bytes": 3530,
+        "sha256": "d8b0fcb16e8bf21705d5e8b70e9fd08575e7a97a811a0d9f709bb7c268aa27ff"
       }
     },
     {
@@ -7163,11 +7163,11 @@
         "model": {
           "url": "models/creatures/temple_acolyte.glb",
           "path": "public/models/creatures/temple_acolyte.glb",
-          "bytes": 358624,
-          "sha256": "287364c21609607e2b1fcb5c54f49caa8f9ce80ed107c179e45f7fce14fb1a7d"
+          "bytes": 3129744,
+          "sha256": "8b8ca9cee5ce60b377d1241f343be04ca632cbcdc45ddbafbd884017e02658ec"
         },
         "idle": "Idle",
-        "height": 4.4,
+        "height": 5.2,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -7181,11 +7181,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ba720387e6448a6b7dc63c1bdaf13ee682522ec954a15dd5f2fae0d42b61c701",
+      "sourceFingerprint": "9cd85c3dceec9b5b1ef9829d98b991601599f93ff90dbcce9067d44e7657fd1f",
       "output": {
         "path": "public/ui/mobs/pale_choir_acolyte.webp",
-        "bytes": 2570,
-        "sha256": "0f713e3d403750e07eb4261e76677f8b599b2746e3e673ad0f0efb39ae19af9a"
+        "bytes": 3310,
+        "sha256": "e9165c24157fee9aa29dac94c92c1c624181c98bbdf62b2abce6f24bc8518d7b"
       }
     },
     {
@@ -7231,11 +7231,11 @@
         "model": {
           "url": "models/creatures/temple_sentinel.glb",
           "path": "public/models/creatures/temple_sentinel.glb",
-          "bytes": 529684,
-          "sha256": "d6eb0fe084d4712b1978180967c40c4a717852b4462a405e264eeb4d7b608ffa"
+          "bytes": 2675648,
+          "sha256": "56a433dd0bda2852d8f3ec550e014da3103cd6df95022d89f7bcfd7a17221977"
         },
         "idle": "Idle",
-        "height": 5.6,
+        "height": 6.1,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -7249,11 +7249,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1c39f05e08cde62d597def30ee3184ccd35dbf45f5d4e7f4040ae943d94f26b8",
+      "sourceFingerprint": "09be94dcfb7b12d6ec2c1212bcb4ad0287b23b73ddf38114056bbb41a5f418c4",
       "output": {
         "path": "public/ui/mobs/pearlguard_sentinel.webp",
-        "bytes": 2804,
-        "sha256": "0bd88f6b3679516f031fc85a7375e180649adcca22e8f31cc57c742d4e28d8f6"
+        "bytes": 3682,
+        "sha256": "f04a1326f9b7d50169f903aa10990ee06ca67e8a3eea25439c6037d5b50e9246"
       }
     },
     {
@@ -10426,8 +10426,8 @@
         "model": {
           "url": "models/creatures/temple_colossus.glb",
           "path": "public/models/creatures/temple_colossus.glb",
-          "bytes": 1361276,
-          "sha256": "ecaef345b5c5a7e68939d629c953898e4ca6c39a6aa64a8dba8eddd9016be312"
+          "bytes": 2779028,
+          "sha256": "96ad826c1964710b74f594fd5f25b5a4d4154889d86e2115dee99ccabce71a0c"
         },
         "idle": "Idle",
         "height": 6.8181818181818175,
@@ -10444,11 +10444,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "5201317ee8a1e090299ee45a16fa7b7f4e3cbeaabd8c152767e5f369700ac09c",
+      "sourceFingerprint": "0d2689cde6c38094b7e57fc929004f93753bab43580e48a735725ca53124d893",
       "output": {
         "path": "public/ui/mobs/tideglass_colossus.webp",
-        "bytes": 3374,
-        "sha256": "2a58136b7588a6886c64d2e3c3f46f2845dbb3c0fac8e43a56fc204582ddaca3"
+        "bytes": 4674,
+        "sha256": "db59e59160a216126bd92226cfafa8f8708554e7baf8cb33ab8361fc9c178a4c"
       }
     },
     {
@@ -11048,31 +11048,31 @@
       "visualKey": "temple_tidewisp",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/glimmerwisp.glb",
-          "path": "public/models/creatures/glimmerwisp.glb",
-          "bytes": 162784,
-          "sha256": "25010f4fcd2a0aba2a7ea3f01ceba83d7fb8731a2c9e7d292db8d1f211e6f1ef"
+          "url": "models/creatures/temple_tidewisp.glb",
+          "path": "public/models/creatures/temple_tidewisp.glb",
+          "bytes": 721336,
+          "sha256": "31e12fa7d459270ef4565a7f69790d08e4e30cb0c674ecf868d5d75736f60227"
         },
         "idle": "Idle",
-        "height": 1.8,
-        "yaw": -1.5707963267948966,
-        "hover": 0.5,
+        "height": 2.75,
+        "yaw": null,
+        "hover": 0.45,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.6
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6fe3e0",
-        "resolved": "#6fe3e0",
-        "strength": 0.6
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "52d8a88cabd2ad003e32872c77c607a387cd1a2a88fceb6a587233bc6bfe717e",
+      "sourceFingerprint": "4d169866151e956839c68f3fdd22bc2a2379eb487c5144a4a9c8e0e0cd986fdb",
       "output": {
         "path": "public/ui/mobs/tidewisp.webp",
-        "bytes": 1912,
-        "sha256": "60ebc7b709bf2d46dc83855ba2ffbf0b6cde4796a77af0381161d40f80c35750"
+        "bytes": 2190,
+        "sha256": "32cfbf0088fd881293cdfa4f3cf1f33b1da7ab4f1692448d227d2ff7d80f0087"
       }
     },
     {
