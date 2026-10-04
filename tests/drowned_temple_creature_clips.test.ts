@@ -21,6 +21,8 @@ import {
 import { updateBossMechanics } from '../src/sim/mob/boss_mechanics';
 import {
   TEMPLE_LIGHTNING_SPIT,
+  TEMPLE_LULLABY,
+  TEMPLE_PALE_MENDING,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
@@ -171,6 +173,51 @@ describe('the Nacre Templeguard: the seahorse temple knight', () => {
     // the warrior-only rush slots must stay unmapped or they would swallow it.
     expect(c.rush).toBeUndefined();
     expect(c.rushArrival).toBeUndefined();
+  });
+});
+
+describe('the Pale Choir Acolyte: the moon-jelly priestess', () => {
+  it('ships its own body with a clip for every job', () => {
+    expect(clipsOf('public/models/creatures/temple_acolyte.glb').sort()).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'Cast',
+        'Death',
+        'Hit',
+        'Idle',
+        'Lullaby',
+        'Mend',
+        'Run',
+        'Walk',
+      ].sort(),
+    );
+    const v = visualOf('pale_choir_acolyte');
+    expect(v.url).toMatch(/temple_acolyte\.glb$/);
+    expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
+    expect(v.clips.death).toBe('Death');
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 5.2 to the bell's crown at her 1.0: twice the 2.6 player.
+    expect(v.height * (MOBS.pale_choir_acolyte.scale ?? 1)).toBeCloseTo(5.2, 2);
+  });
+
+  it('throws the Pale Hymn on the windup and sings each cast on its bar', () => {
+    const v = visualOf('pale_choir_acolyte');
+    const c = v.clips;
+    // The Pale Hymn's windup cue plays the attack clips; authored to release
+    // at the windup's end, so they play at their own pace.
+    expect(MOBS.pale_choir_acolyte.petSpell?.windup).toBe(0.6);
+    expect(v.attackTimeScale).toBe(1);
+    expect(c.castByAbility?.[TEMPLE_LULLABY]).toBe('Lullaby');
+    expect(c.castByAbility?.[TEMPLE_PALE_MENDING]).toBe('Mend');
+    expect(c.castTimeScaleByAbility?.[TEMPLE_LULLABY]).toBe(1);
+    expect(c.castTimeScaleByAbility?.[TEMPLE_PALE_MENDING]).toBe(1);
+    expect(MOBS.pale_choir_acolyte.trashKit?.lullaby?.castTime).toBe(2);
+    expect(MOBS.pale_choir_acolyte.trashKit?.mend?.castTime).toBe(2.5);
+    expect(v.castClipSync).toBe(true);
+    // Kickable hymns: no play-out, so an interrupted song never plays to its end.
+    expect(c.castPlayOut ?? []).not.toContain('Lullaby');
+    expect(c.castPlayOut ?? []).not.toContain('Mend');
   });
 });
 

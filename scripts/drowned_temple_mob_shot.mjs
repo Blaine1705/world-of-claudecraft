@@ -11,9 +11,12 @@
 // CAST_WAIT (ms, default 6000) is how long the fight runs before the
 // habilidad shots (raise it for a mob with a long cast cooldown).
 // CASTS="castId:shotId:ms,..." adds one shot per entry, taken `ms` after that
-// cast's bar opens (a windup, the strike on the bar's end, a play-out).
+// cast's bar opens (a windup, the strike on the bar's end, a play-out). A
+// fourth field names an ally to raise beside it, hurt below half health (a
+// heal such as Pale Mending only opens on a wounded packmate).
 // Env: SHOT_URL (http://127.0.0.1:5242/), BROWSER_PATH, SHOT_PRESET (4),
 // SHOT_W / SHOT_H (1600x900), SHOT_GPU=0 to force SwiftShader, SHOT_PREFIX,
+// SHOT_DIST (a multiplier on every camera distance, for close-ups),
 // SHOT_DEBUG=1 to log the nova spellfx cues the renderer received per shot.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,6 +31,7 @@ const W = Number(process.env.SHOT_W ?? 1600);
 const H = Number(process.env.SHOT_H ?? 900);
 const PRESET = Number(process.env.SHOT_PRESET ?? 4);
 const PREFIX = process.env.SHOT_PREFIX ?? '';
+const DIST = Number(process.env.SHOT_DIST ?? 1);
 const MOB = process.env.MOB ?? 'drowned_pilgrim';
 const SPAWN = process.env.SPAWN ?? 'pilgrim';
 const CAST_WAIT = Number(process.env.CAST_WAIT ?? 6000);
@@ -123,7 +127,7 @@ const SHOTS = [
     stepWait: 300,
     wait: 300,
   },
-  ...CASTS.map(([castId, id, ms]) => ({
+  ...CASTS.map(([castId, id, ms, ally]) => ({
     id,
     at: [0, -12],
     face: 0,
@@ -133,6 +137,7 @@ const SHOTS = [
     spawn: true,
     js: 'cast',
     castId,
+    ally,
     stepWait: Number(ms),
     wait: 40,
   })),
@@ -322,6 +327,20 @@ async function main() {
         await page.evaluate((n) => window.__game.world.chat(`/dev temple spawn ${n}`), SPAWN);
         await sleep(shot.spawnWait ?? 1200);
         if (shot.js !== 'kill') await page.evaluate(pageStep, ['tank', MOB, 0]);
+        if (shot.ally) {
+          await page.evaluate((n) => window.__game.world.chat(`/dev temple spawn ${n}`), shot.ally);
+          await sleep(900);
+          await page.evaluate((mob) => {
+            const sim = window.__game.world;
+            const me = sim.player;
+            for (const e of sim.entities.values()) {
+              if (e.kind !== 'mob' || e.dead || e.templateId === mob) continue;
+              if (Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z) > 30) continue;
+              e.maxHp = Math.max(e.maxHp, 1e6);
+              e.hp = Math.floor(e.maxHp * 0.4);
+            }
+          }, MOB);
+        }
       }
       if (process.env.SHOT_DEBUG && !globalThis.__hooked) {
         globalThis.__hooked = true;
@@ -343,12 +362,15 @@ async function main() {
         );
         await sleep(shot.stepWait ?? 900);
       }
-      await page.evaluate((s) => {
-        const input = window.__game.input;
-        input.camYaw = s.yaw ?? 0;
-        input.camPitch = s.pitch;
-        input.camDist = s.dist;
-      }, shot);
+      await page.evaluate(
+        (s) => {
+          const input = window.__game.input;
+          input.camYaw = s.yaw ?? 0;
+          input.camPitch = s.pitch;
+          input.camDist = s.dist * s.mul;
+        },
+        { ...shot, mul: DIST },
+      );
       await sleep(shot.wait ?? 2800);
       const file = path.join(OUT, `${PREFIX}${shot.id}.png`);
       await page.screenshot({ path: file });

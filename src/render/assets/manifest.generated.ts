@@ -476,7 +476,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/stag.glb": "/media/models/creatures/stag.ec967c29bd35.glb",
   "models/creatures/stag_ability_anims.glb": "/media/models/creatures/stag_ability_anims.41df789622ac.glb",
   "models/creatures/stone_cantor.glb": "/media/models/creatures/stone_cantor.a207f7ae80be.glb",
-  "models/creatures/temple_acolyte.glb": "/media/models/creatures/temple_acolyte.287364c21609.glb",
+  "models/creatures/temple_acolyte.glb": "/media/models/creatures/temple_acolyte.8b8ca9cee5ce.glb",
   "models/creatures/temple_colossus.glb": "/media/models/creatures/temple_colossus.ecaef345b5c5.glb",
   "models/creatures/temple_eel.glb": "/media/models/creatures/temple_eel.ec06d3611352.glb",
   "models/creatures/temple_lurker.glb": "/media/models/creatures/temple_lurker.5a69999d8209.glb",

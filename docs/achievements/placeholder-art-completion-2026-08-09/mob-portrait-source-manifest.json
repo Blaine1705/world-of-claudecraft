@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c78aa6b2f0a96936831b934028b514ad9e8eef297d239e4de2a915e6ab626e64",
+  "rendererFingerprint": "f00622b518c7e82a8508bb57d7e9477aa5d5d438c929e5e9e17950c8666f1883",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5475790,
-      "sha256": "b016c6aa498127520bd91aa986e3a2de14da809d9a676067e21e3021c246153a",
+      "sha256": "342b291d11d5cd9355bd4cb8e81a34ab711ba49c87d8b9406452d7aba4cd3e38",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7193,11 +7193,11 @@
         "model": {
           "url": "models/creatures/temple_acolyte.glb",
           "path": "public/models/creatures/temple_acolyte.glb",
-          "bytes": 358624,
-          "sha256": "287364c21609607e2b1fcb5c54f49caa8f9ce80ed107c179e45f7fce14fb1a7d"
+          "bytes": 3129744,
+          "sha256": "8b8ca9cee5ce60b377d1241f343be04ca632cbcdc45ddbafbd884017e02658ec"
         },
         "idle": "Idle",
-        "height": 4.4,
+        "height": 5.2,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -7211,11 +7211,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ba720387e6448a6b7dc63c1bdaf13ee682522ec954a15dd5f2fae0d42b61c701",
+      "sourceFingerprint": "9cd85c3dceec9b5b1ef9829d98b991601599f93ff90dbcce9067d44e7657fd1f",
       "output": {
         "path": "public/ui/mobs/pale_choir_acolyte.webp",
-        "bytes": 2570,
-        "sha256": "0f713e3d403750e07eb4261e76677f8b599b2746e3e673ad0f0efb39ae19af9a"
+        "bytes": 3310,
+        "sha256": "e9165c24157fee9aa29dac94c92c1c624181c98bbdf62b2abce6f24bc8518d7b"
       }
     },
     {

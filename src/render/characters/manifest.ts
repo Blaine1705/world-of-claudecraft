@@ -76,6 +76,7 @@ import {
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
+  TEMPLE_PALE_MENDING,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
@@ -4468,13 +4469,35 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.05,
   },
+  // The Pale Choir Acolyte (pale_choir_acolyte; scripts/assets/
+  // drowned_temple_creatures/acolyte_moonjelly/): a novice of the moon choir
+  // the water remade, hovering a hand above the floor. The bell of a moon
+  // jelly is her hood (its four rings glowing through it), a serene face with
+  // closed eyes sings under its brim; a nacre bodice, and below the waist a
+  // skirt of sea-silk, two frilled oral arms and a veil of frills and
+  // tentacles trailing to the floor, all on follow-through chains. She glides
+  // (Walk, Run). The Pale Hymn is a petSpell bolt: its 0.6 s windup cue plays
+  // the attack clips (Attack: both hands throw the frost dart as the bell
+  // snaps open; Attack2: a one-handed strike), authored at their own pace so
+  // the dart leaves on the release. Lullaby (2.0 s bar) opens the bell wide
+  // and wheels its rings while she sways; Pale Mending (2.5 s bar) reaches
+  // her hands and oral arms to the ally with a ball of cyan light. Both are
+  // bar-locked with no play-out, so a kick breaks the song visibly. Dying,
+  // the bell crumples and she sinks through the floor into a moonlit pool.
+  // Drawn 5.2 to the bell's crown at her 1.0 (2 players).
   temple_acolyte: {
     url: `${CREATURES}/temple_acolyte.glb`,
-    height: 4.4,
+    height: 5.2,
     clips: {
       ...TEMPLE_CLIPS,
-      castByAbility: { [TEMPLE_LULLABY]: 'Lullaby' },
+      castByAbility: { [TEMPLE_LULLABY]: 'Lullaby', [TEMPLE_PALE_MENDING]: 'Mend' },
+      castTimeScaleByAbility: { [TEMPLE_LULLABY]: 1, [TEMPLE_PALE_MENDING]: 1 },
     },
+    attackTimeScale: 1,
+    walkRef: 2.5,
+    runRef: 7,
+    castClipSync: true,
+    authoredAtlas: true,
     selfIllumination: 0.05,
   },
   temple_siren: {
