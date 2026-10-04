@@ -127,6 +127,7 @@ import {
   tickDeathZoneBar,
   tickStartedMobCastBars,
 } from './mob_cast_bars';
+import { separateEngagedMob } from './mob_separation';
 import { packBreathStagger } from './pack_cast_stagger';
 import { flierSightRadius, flierWaitingAloft, updateMobPatrol } from './patrol';
 import { playerDummyShedHp } from './practice_dummies';
@@ -733,6 +734,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // out on time (mob/mob_cast_bars.ts): stepping out of a telegraph is
       // the dodge, never a way to stall it.
       else tickStartedMobCastBars(ctx, mob);
+      // A pack on one target spreads into a cluster instead of one blob: a
+      // soft, zero-rng nudge out of the bodies it stands inside
+      // (mob/mob_separation.ts). Last, so it never shifts this tick's swing.
+      separateEngagedMob(ctx, mob);
       break;
     }
     case 'flee': {
