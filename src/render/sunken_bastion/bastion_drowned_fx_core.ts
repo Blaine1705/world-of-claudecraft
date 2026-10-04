@@ -114,6 +114,20 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0.01, up: 2.94, fwd: 0.41 },
     eyes: { side: 0.04, up: 4.02, fwd: 0.46 },
   },
+  // The Shackled Prisoner: water off his brow, his mane, the collar's chain
+  // and the manacles.
+  shackled_prisoner: {
+    rawHeight: 4.105,
+    drips: [
+      { side: 0.24, up: 3.83, fwd: 0.87 },
+      { side: 0.41, up: 2.05, fwd: 0.73 },
+      { side: 0.05, up: 2.96, fwd: 0.52 },
+      { side: -0.44, up: 2.0, fwd: 0.76 },
+      { side: 0.21, up: 3.4, fwd: 0.37 },
+    ],
+    chest: { side: 0.03, up: 2.51, fwd: 0.34 },
+    eyes: { side: 0.2, up: 3.74, fwd: 0.79 },
+  },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {
     rawHeight: 4.4,

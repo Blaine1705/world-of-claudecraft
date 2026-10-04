@@ -48,6 +48,11 @@ nothing here runs in the build or the game.
   with wide sleeves (`build_sleeve`), gill slits, the coral-crowned staff with its pearl of sea light
   and the conch laid out in the left hand's frame; `clips.py` has Idle, Walk, Run, Attack, Attack2,
   Mend (the Brine Mend loop), Hit, Death.
+- `prisoner/`: the Shackled Prisoner (`public/models/creatures/drowned_prisoner.glb`), grown from the
+  Chanter's builder: a starved body (ribs, spine knobs, the belly fallen in), the drowned grin, a
+  long weed mane grown with the head, rag breeches, and the irons (`build_irons`: manacles, collar
+  and ankle shackle with snapped chains, rigid on their bones); `clips.py` has Idle, Walk (the
+  dragging lurch), Run, Attack, Attack2, Hit, Death.
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),

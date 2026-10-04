@@ -4400,6 +4400,13 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.14,
   },
+  // The Shackled Prisoner: one of the gaol's chained dead, sculpted whole on
+  // the drowned kit (scripts/assets/sunken_bastion_drowned/prisoner/): a
+  // starved grey body with every rib standing out, a long matted mane of weed
+  // over a grinning drowned face, rag breeches, iron manacles, collar and an
+  // ankle shackle with their chains snapped short. Hunched and twitching, he
+  // lurches dragging the shackled foot and fights like a cornered animal: both
+  // fists hammered down (Attack), a lunge for the throat (Attack2).
   bastion_prisoner: {
     url: `${CREATURES}/drowned_prisoner.glb`,
     height: 4.6,
@@ -4410,8 +4417,11 @@ export const VISUALS: Record<string, VisualDef> = {
       attack: ['Attack', 'Attack2'],
       hit: ['Hit'],
       death: 'Death',
-      cast: 'Cast',
     },
+    walkRef: 1.21,
+    runRef: 5.7,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
   },
   // The Gaol Turnkey (scripts/assets/sunken_bastion_creatures/turnkey.py): a
   // bloated, waterlogged jailer on the organic kit (baked drowned skin and
