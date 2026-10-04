@@ -13,10 +13,11 @@
 // Sanctum. Zero rng (the victim is the kit's hash over the players in reach
 // and in sight); the brand's ticks are an ordinary dot aura.
 
-import { DUNGEONS, instanceOrigin, MOBS } from '../../data';
+import { DUNGEONS, instanceOrigin } from '../../data';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { type Aura, dist2d, type Entity, type TrashKitDef, type TrashKitState } from '../../types';
+import { kitOf } from './kit_of';
 import { kitHash, livingInReach } from './targets';
 
 /** The spellfx ability id of a brand put out in a quench zone (steam). */
@@ -49,9 +50,18 @@ export function brandReady(
   players: readonly Entity[],
 ): { ok: boolean; target: Entity | null } {
   const def = kit.brand;
-  const target = def ? pickBrandTarget(ctx, players, mob, def.range, st.casts) : null;
-  return target ? { ok: true, target } : { ok: false, target: null };
+  if (!def || livingInReach(players, mob.pos, def.range).length === 0)
+    return { ok: false, target: null };
+  const target = pickBrandTarget(ctx, players, mob, def.range, st.casts);
+  if (target) return { ok: true, target };
+  // Everyone in reach is hiding: look again in a moment, not every tick (the
+  // sight test is the expensive half).
+  st.timers.brand = BRAND_SIGHT_RETRY;
+  return { ok: false, target: null };
 }
+
+/** Seconds a brand waits to look again when everyone in reach is hidden. */
+export const BRAND_SIGHT_RETRY = 0.5;
 
 /** The bar ran out: the brand lands if its victim is still in reach and in
  *  sight; out of sight it fizzles. Returns true when it landed. */
@@ -95,6 +105,9 @@ export function landBrand(
     sourceId: mob.id,
     school: def.school,
   });
+  // Remember the victim, so the quench walks only live brands (stepQuench).
+  if (!mob.kitBranded) mob.kitBranded = [];
+  if (!mob.kitBranded.includes(target.id)) mob.kitBranded.push(target.id);
   return true;
 }
 
@@ -108,37 +121,29 @@ export function inQuenchZone(inst: InstanceSlot, x: number, z: number): boolean 
   return false;
 }
 
-/** Is this aura a trash brand (its source's kit brands with this id)? */
-function isBrandAura(ctx: SimContext, a: Aura): boolean {
-  if (a.kind !== 'dot') return false;
-  const src = ctx.entities.get(a.sourceId);
-  return !!src && MOBS[src.templateId]?.trashKit?.brand?.auraId === a.id;
-}
-
 /**
- * Put out every brand worn by a player standing in a quench zone of the
- * claim. Returns how many it put out. A no-op (one lookup) in a dungeon with
- * no quench zones.
+ * Put out the brands `caster` left that burn on a player standing in one of
+ * the claim's quench zones, and forget the victims whose brand is gone.
+ * Driven from the caster's own kit tick (its Entity.kitBranded list, written
+ * by landBrand), so a claim with no live brand pays nothing. Returns how many
+ * it put out.
  */
-export function stepQuench(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  players: readonly Entity[],
-): number {
-  const zones = DUNGEONS[inst.dungeonId]?.quenchZones;
-  if (!zones || zones.length === 0) return 0;
+export function stepQuench(ctx: SimContext, inst: InstanceSlot, caster: Entity): number {
+  const victims = caster.kitBranded;
+  if (!victims) return 0;
+  const auraId = kitOf(caster)?.brand?.auraId;
   let n = 0;
-  for (const p of players) {
-    if (p.dead || p.auras.length === 0) continue;
-    let brand: Aura | undefined;
-    for (const a of p.auras) {
-      if (isBrandAura(ctx, a)) {
-        brand = a;
-        break;
-      }
+  for (let i = victims.length - 1; i >= 0; i--) {
+    const p = ctx.entities.get(victims[i]);
+    const brand =
+      p && !p.dead ? p.auras.find((a) => a.id === auraId && a.sourceId === caster.id) : undefined;
+    if (!p || !brand) {
+      victims.splice(i, 1);
+      continue;
     }
-    if (!brand || !inQuenchZone(inst, p.pos.x, p.pos.z)) continue;
+    if (!inQuenchZone(inst, p.pos.x, p.pos.z)) continue;
     p.auras.splice(p.auras.indexOf(brand), 1);
+    victims.splice(i, 1);
     ctx.emit({ type: 'aura', targetId: p.id, name: brand.name, gained: false });
     ctx.emit({
       type: 'spellfx',
@@ -150,5 +155,6 @@ export function stepQuench(
     });
     n++;
   }
+  if (victims.length === 0) caster.kitBranded = undefined;
   return n;
 }

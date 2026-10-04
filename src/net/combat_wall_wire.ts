@@ -25,15 +25,24 @@ export interface CombatWallWireWorld {
   readonly player: Entity | undefined;
 }
 
+/** The slot this client last published walls into (it clears it when the
+ *  player leaves it). Client-side mirror bookkeeping only. */
+let lastSlot: { x: number; z: number } | null = null;
+
 /** Publish the mirrored walls of the slot the player stands in. */
 export function syncClientCombatWalls(world: CombatWallWireWorld): void {
   const self = world.player;
-  if (!self) return;
-  const dungeon = dungeonAt(self.pos.x);
-  if (!dungeon) return;
-  const def = DUNGEONS[dungeon.id];
-  if (!def) return;
+  const dungeon = self ? dungeonAt(self.pos.x) : null;
+  const def = dungeon ? DUNGEONS[dungeon.id] : undefined;
+  if (!self || !def) {
+    if (lastSlot) setCombatWalls(lastSlot.x, lastSlot.z, []);
+    lastSlot = null;
+    return;
+  }
   const o = instanceOrigin(def.index, instanceSlotForZ(self.pos.z));
+  if (lastSlot && (lastSlot.x !== o.x || lastSlot.z !== o.z))
+    setCombatWalls(lastSlot.x, lastSlot.z, []);
+  lastSlot = o;
   const walls: CombatWallPlacement[] = [];
   for (const e of world.entities.values()) {
     if (e.kind !== 'object' || !isCombatWallTemplate(e.templateId)) continue;

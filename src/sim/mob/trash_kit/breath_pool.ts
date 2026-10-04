@@ -9,15 +9,15 @@
 // no-op (one template read) for every breath without a pool. Zero rng here;
 // the pool draws its rolls on its own beats (kit_hazard.ts).
 
-import { MOBS } from '../../data';
 import { claimedInstanceAt } from '../../instances/dungeons';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
 import { spawnKitHazard } from './kit_hazard';
+import { kitOf } from './kit_of';
 
 /** The breath landed: leave its pool. Returns the pool, or null. */
 export function landBreathPool(ctx: SimContext, mob: Entity): Entity | null {
-  const def = MOBS[mob.templateId]?.trashKit?.breathPool;
+  const def = kitOf(mob)?.breathPool;
   if (!def) return null;
   const inst = claimedInstanceAt(ctx, mob.pos);
   if (!inst || !inst.mobIds.includes(mob.id)) return null;

@@ -121,8 +121,18 @@ export function setCombatWalls(
     row = new Map();
     slots.set(ox, row);
   }
+  if ((cur?.colliders.length ?? 0) === 0 && colliders.length > 0) walledSlots++;
+  if ((cur?.colliders.length ?? 0) > 0 && colliders.length === 0) {
+    walledSlots--;
+    // Let the last walled list (and its cell index) go with the walls.
+    composed.get(ox)?.delete(oz);
+  }
   row.set(oz, { sig, colliders, version: ++versionCounter });
 }
+
+/** How many slots in the process hold a wall: the read path's one-integer
+ *  early out while no wall stands anywhere (the common case). */
+let walledSlots = 0;
 
 /** The wall colliders live in a slot (empty when it holds none). */
 export function combatWallsAt(ox: number, oz: number): readonly Collider[] {
@@ -135,6 +145,7 @@ const EMPTY: readonly Collider[] = [];
 export function clearCombatWallStateForTest(): void {
   slots.clear();
   composed.clear();
+  walledSlots = 0;
 }
 
 /**
@@ -146,6 +157,7 @@ export function clearCombatWallStateForTest(): void {
  * authored collider keeps its place in the push-out order.
  */
 export function slotWalledColliders(base: Collider[], ox: number, oz: number): Collider[] {
+  if (walledSlots === 0) return base;
   const state = slotOf(ox, oz);
   if (!state || state.colliders.length === 0) return base;
   let row = composed.get(ox);

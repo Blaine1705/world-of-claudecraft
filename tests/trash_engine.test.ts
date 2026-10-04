@@ -10,6 +10,7 @@
 // brand with its quench zones (brand.ts); then determinism over a seeded run.
 
 import { afterEach, describe, expect, it } from 'vitest';
+import { syncClientCombatWalls } from '../src/net/combat_wall_wire';
 import { resolvePosition } from '../src/sim/colliders';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
@@ -325,6 +326,53 @@ describe('temporary combat walls', () => {
     expect(combatWallsAt(o.x, o.z)).toHaveLength(0);
   });
 
+  it('a new world claiming a slot never collides with a wall another world left there', () => {
+    const a = room();
+    const o = origin(a);
+    spawnCombatWall(
+      a.sim.ctx,
+      a.inst,
+      SANCTUM_ICE_SLAB,
+      'Ice Slab',
+      a.me.pos.x,
+      a.me.pos.z + 5,
+      0,
+      15,
+    );
+    expect(combatWallsAt(o.x, o.z)).toHaveLength(1);
+    // A second world in the same process (the headless env's reset, the
+    // suites) claims the same slot while A's wall still stands.
+    const b = room();
+    expect(origin(b)).toEqual(o);
+    expect(combatWallsAt(o.x, o.z)).toHaveLength(0);
+    const mage = addPlayer(b, 'mage', 0, 10);
+    expect(entityLineOfSightClear(b.sim.cfg.seed, b.me, mage)).toBe(true);
+  });
+
+  it('the online client rebuilds the walls from the wall objects it mirrors, and drops them on leaving', () => {
+    const r = room();
+    const o = origin(r);
+    const wall = spawnCombatWall(
+      r.sim.ctx,
+      r.inst,
+      SANCTUM_ICE_SLAB,
+      'Ice Slab',
+      r.me.pos.x,
+      r.me.pos.z + 5,
+      0.4,
+      15,
+    ) as Entity;
+    const serverView = combatWallsAt(o.x, o.z)[0];
+    clearCombatWallStateForTest();
+    // The client's mirror: the same entity fields the wire carries.
+    const mirrored = new Map<number, Entity>([[wall.id, { ...wall }]]);
+    syncClientCombatWalls({ entities: mirrored, player: r.me });
+    expect(combatWallsAt(o.x, o.z)).toEqual([serverView]);
+    // The player walks out of the dungeon: the mirror clears its slot.
+    syncClientCombatWalls({ entities: mirrored, player: { ...r.me, pos: { x: 0, y: 0, z: 0 } } });
+    expect(combatWallsAt(o.x, o.z)).toHaveLength(0);
+  });
+
   it('refuses a template that names no wall shape', () => {
     const r = room();
     expect(
@@ -461,6 +509,22 @@ describe('G5: the walker', () => {
     run(r, 3, [sender, ally]);
     expect(dealt(r, blocker.id, 'Test Orb')).toHaveLength(1);
     expect(blocker.auras.some((a) => a.id === TRASH_DEMO_EMPOWERED)).toBe(true);
+    expect(ally.auras.some((a) => a.id === TRASH_DEMO_EMPOWERED)).toBe(false);
+  });
+
+  it('a healing walker mends the ally it reaches (the Last Breath shape)', () => {
+    const r = room();
+    const sender = engage(r, 'broodsworn_thawcaller', 0, 10);
+    const ally = engage(r, 'ogre_sledge_hauler', 8, 10);
+    const base = TRASH_ENGINE_DEMO_KIT.walker;
+    if (!base) throw new Error('no walker');
+    const def = { ...base, empower: { ...base.empower, damagePct: 0, healPct: 0.2 } };
+    ally.hp = Math.round(ally.maxHp * 0.5);
+    const before = ally.hp;
+    launchWalker(r.sim.ctx, r.inst, sender, def);
+    run(r, 3, [sender, ally]);
+    expect(ally.hp - before).toBe(Math.round(ally.maxHp * 0.2));
+    // No damage aura when the def carries none.
     expect(ally.auras.some((a) => a.id === TRASH_DEMO_EMPOWERED)).toBe(false);
   });
 

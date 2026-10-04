@@ -41,7 +41,7 @@ import { callDownLastFlier } from './flier_call';
 import { applyFreezeStack } from './freeze_stacks';
 import { stepKitHazard } from './kit_hazard';
 import { landNova, novaCastIdFor, novaReady } from './kit_nova';
-import { hasKitObjects } from './kit_objects';
+import { kitObjectIds } from './kit_objects';
 import { restoreSplit, stepSplit } from './kit_split';
 import { launchWalker, pickWalkerAlly, stepWalker } from './kit_walker';
 import { landReanimate, pickReanimateCorpse } from './reanimate';
@@ -755,6 +755,9 @@ function stepMob(
   kit: TrashKitDef | undefined,
   players: () => Entity[],
 ): void {
+  // Its brands still burning are put out in a quench zone (brand.ts): only a
+  // caster that branded someone carries the list, so nothing else pays.
+  if (mob.kitBranded) stepQuench(ctx, inst, mob);
   if (mob.dead || mob.hp <= 0) {
     if (mob.trashKit) endPull(ctx, inst, mob);
     if (kit?.deathBurst) stepDeathBurst(ctx, inst, mob, kit, players());
@@ -814,7 +817,7 @@ export function tickTrashKits(ctx: SimContext): void {
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) {
       // A freed claim drops its walls from the collision view (once).
-      syncCombatWallCollision(ctx, inst);
+      syncCombatWallCollision(ctx, inst, 0);
       continue;
     }
     let cached: Entity[] | null = null;
@@ -836,17 +839,29 @@ export function tickTrashKits(ctx: SimContext): void {
       stepMob(ctx, inst, mob, kit, players);
     }
     // The engine's encounter objects (hazard pools, combat walls, walkers),
-    // after every mob, in object-roster order (a copy: a pool may lift).
-    if (hasKitObjects(ctx, inst)) stepKitObjects(ctx, inst, players);
-    // A brand put out in the dungeon's quench zones (brand.ts).
-    if (DUNGEONS[inst.dungeonId]?.quenchZones) stepQuench(ctx, inst, players());
-    syncCombatWallCollision(ctx, inst);
+    // after every mob, in object-roster order (a snapshot of their ids: a
+    // pool may lift mid-pass).
+    const kitIds = kitObjectIds(ctx, inst);
+    if (kitIds) stepKitObjects(ctx, inst, kitIds, players);
+    syncCombatWallCollision(ctx, inst, kitIds ? kitWallCount(ctx, kitIds) : 0);
   }
 }
 
+/** Walls still standing among the pass's objects (one may have shattered). */
+function kitWallCount(ctx: SimContext, ids: readonly number[]): number {
+  let n = 0;
+  for (const id of ids) if (ctx.entities.get(id)?.kitObject?.kind === 'wall') n++;
+  return n;
+}
+
 /** One tick of every engine object of a claim. */
-function stepKitObjects(ctx: SimContext, inst: InstanceSlot, players: () => Entity[]): void {
-  for (const id of inst.objectIds.slice()) {
+function stepKitObjects(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  ids: readonly number[],
+  players: () => Entity[],
+): void {
+  for (const id of ids) {
     const obj = ctx.entities.get(id);
     const st = obj?.kitObject;
     if (!obj || !st) continue;

@@ -61,9 +61,16 @@ export function kitObjectsOf<K extends KitObjectState['kind']>(
   return out;
 }
 
-/** Does the claim hold any engine object at all? (The per-tick pass's
- *  zero-cost early out for every claim with none.) */
-export function hasKitObjects(ctx: SimContext, inst: InstanceSlot): boolean {
-  for (const id of inst.objectIds) if (ctx.entities.get(id)?.kitObject) return true;
-  return false;
+/** The claim's live engine object ids in object-roster order, or null when
+ *  it holds none (one walk of the object roster a tick, no allocation then):
+ *  the driver's early out, and its snapshot for the pass (a pool may lift
+ *  mid-pass). */
+export function kitObjectIds(ctx: SimContext, inst: InstanceSlot): number[] | null {
+  let ids: number[] | null = null;
+  for (const id of inst.objectIds) {
+    if (!ctx.entities.get(id)?.kitObject) continue;
+    ids ??= [];
+    ids.push(id);
+  }
+  return ids;
 }

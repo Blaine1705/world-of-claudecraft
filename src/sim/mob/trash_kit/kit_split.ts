@@ -12,14 +12,17 @@
 // again.
 //
 // The original keeps its pre-split pool and size on Entity.kitSplit and gets
-// them back when the pull ends alive (an evade or a reset): a split is a
-// fight's state, never the mob's. Zero rng (the copy stands on the side
+// them back when the pull ends alive (an evade, or out of combat after a
+// reset): a split is a fight's state, never the mob's. The copy is a true
+// twin of a placed pack mob (its level and tuning, spawn.ts `twin`) that is
+// still a summoned add, so it drops nothing and despawns with an evade. Zero rng (the copy stands on the side
 // facing away from the victim, hashed by nothing).
 
 import { MOBS } from '../../data';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity, TrashKitDef, TrashKitState } from '../../types';
+import { kitOf } from './kit_of';
 import { spawnKitAdd } from './spawn';
 
 /** Yards between the two halves as they part. */
@@ -56,6 +59,7 @@ export function stepSplit(
     mob.pos.x + Math.sin(side) * SPLIT_STRIDE,
     mob.pos.z + Math.cos(side) * SPLIT_STRIDE,
     victim,
+    { level: mob.level },
   );
   ctx.emit({
     type: 'spellfx',
@@ -67,6 +71,9 @@ export function stepSplit(
   });
   if (!copy) return null;
   copy.kitSplit = { role: 'child' };
+  // It hits as the original does (the same level and pack tuning, and the
+  // same mechanic multiplier its burst reads).
+  copy.mechanicDamageMult = mob.mechanicDamageMult;
   copy.maxHp = half;
   copy.hp = half;
   copy.scale = base * def.scale;
@@ -75,11 +82,13 @@ export function stepSplit(
   return copy;
 }
 
-/** The pull ended with the original alive (an evade, a reset): it gets its
- *  pool and size back. */
+/** The pull ended with the original alive (an evade, or out of combat after a
+ *  reset): it gets its pool and size back. A mob that only lost its target
+ *  for a tick mid-fight (a flee, a retarget) keeps its split. */
 export function restoreSplit(mob: Entity): void {
   const s = mob.kitSplit;
   if (s?.role !== 'parent' || mob.dead) return;
+  if (mob.aiState !== 'evade' && mob.inCombat) return;
   mob.maxHp = s.maxHp;
   mob.hp = Math.max(mob.hp, s.maxHp);
   mob.scale = s.scale;
@@ -89,5 +98,5 @@ export function restoreSplit(mob: Entity): void {
 /** How much a split body's death burst shrinks (1 for an unsplit body). */
 export function splitBurstScale(mob: Entity): number {
   if (!mob.kitSplit) return 1;
-  return MOBS[mob.templateId]?.trashKit?.split?.burstScale ?? 1;
+  return kitOf(mob)?.split?.burstScale ?? 1;
 }

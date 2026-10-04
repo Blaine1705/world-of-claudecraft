@@ -4481,8 +4481,16 @@ export interface KitWalkerDef {
   reachRadius: number;
   /** Seconds before an orb that reached nothing fades. */
   maxSeconds: number;
-  /** The empower on the ally it reaches: a damage-done aura. */
-  empower: { auraId: string; name: string; damagePct: number; seconds: number };
+  /** What it does to the ally it reaches: a damage-done aura worth
+   *  `damagePct` for `seconds` (0: none), and a heal of `healPct` of the
+   *  ally's maximum health (the Bastion Revenant's Last Breath shape). */
+  empower: {
+    auraId: string;
+    name: string;
+    damagePct: number;
+    seconds: number;
+    healPct?: number;
+  };
   /** What an interception does to the player who took it: a roll of damage,
    *  and optionally the same empower turned on them. */
   intercept: { min: number; max: number; grantsEmpower?: boolean };
@@ -7096,6 +7104,9 @@ export interface Entity extends ClientMirroredEntityFields {
   /** A walker launched at this mob's death already left (TrashKitDef.walker).
    *  Sim authority only. */
   kitWalkerSent?: true;
+  /** The players this mob's brand (TrashKitDef.brand) still burns: the quench
+   *  walks only these (mob/trash_kit/brand.ts). Sim authority only. */
+  kitBranded?: number[];
   /** DEV ONLY: a trash kit lent to this mob in place of its template's (only
    *  `/dev trashkit demo`, dev/trash_engine_dev.ts, and the suites set it), so
    *  an engine piece no shipped template carries yet can be playtested. Sim

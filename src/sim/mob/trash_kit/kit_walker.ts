@@ -81,6 +81,13 @@ export function launchWalker(
 }
 
 function empower(ctx: SimContext, def: KitWalkerDef, sourceId: number, onto: Entity): void {
+  const heal = def.empower.healPct ?? 0;
+  if (heal > 0 && !onto.dead) {
+    // The heal rides the shared heal path (the kit mend's), from the orb.
+    const orb = ctx.entities.get(sourceId);
+    if (orb) ctx.applyHeal(orb, onto, Math.round(onto.maxHp * heal), def.name, def.castId, false);
+  }
+  if (def.empower.damagePct <= 0) return;
   ctx.applyAura(onto, {
     id: def.empower.auraId,
     name: def.empower.name,
@@ -110,10 +117,11 @@ export function stepWalker(
   // orb has cleared the body it left (the melee round a corpse never eats it
   // on its first tick by standing there).
   let blocker: Entity | null = null;
-  const armed = def.maxSeconds - st.remaining >= WALKER_ARM_SECONDS;
-  for (const p of armed ? players : []) {
-    if (p.dead || dist2d(p.pos, orb.pos) > def.interceptRadius) continue;
-    if (!blocker || p.id < blocker.id) blocker = p;
+  if (def.maxSeconds - st.remaining >= WALKER_ARM_SECONDS) {
+    for (const p of players) {
+      if (p.dead || dist2d(p.pos, orb.pos) > def.interceptRadius) continue;
+      if (!blocker || p.id < blocker.id) blocker = p;
+    }
   }
   if (blocker) {
     ctx.emit({
@@ -143,12 +151,13 @@ export function stepWalker(
     st.allyId = ally?.id ?? null;
   }
   if (!ally || st.remaining <= 1e-9) {
+    // Anchored at a world point: the orb is gone when the frame is routed.
     ctx.emit({
-      type: 'spellfx',
-      sourceId: orb.id,
-      targetId: orb.id,
+      type: 'spellfxAt',
+      x: orb.pos.x,
+      z: orb.pos.z,
       school: def.school,
-      fx: 'nova',
+      fx: 'burst',
       ability: WALKER_FADE,
     });
     dropKitObject(ctx, inst, orb.id);
@@ -169,10 +178,12 @@ export function stepWalker(
     return 'empowered';
   }
   const step = Math.min(d, def.speed * DT);
-  orb.prevPos = { ...orb.pos };
-  const nx = orb.pos.x + ((ally.pos.x - orb.pos.x) / d) * step;
-  const nz = orb.pos.z + ((ally.pos.z - orb.pos.z) / d) * step;
-  orb.pos = ctx.groundPos(nx, nz);
+  orb.prevPos.x = orb.pos.x;
+  orb.prevPos.y = orb.pos.y;
+  orb.prevPos.z = orb.pos.z;
+  orb.pos.x += ((ally.pos.x - orb.pos.x) / d) * step;
+  orb.pos.z += ((ally.pos.z - orb.pos.z) / d) * step;
+  orb.pos.y = ctx.groundPos(orb.pos.x, orb.pos.z).y;
   orb.facing = Math.atan2(ally.pos.x - orb.pos.x, ally.pos.z - orb.pos.z);
   ctx.rebucket(orb);
   return 'drift';

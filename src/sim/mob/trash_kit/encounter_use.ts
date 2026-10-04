@@ -12,23 +12,25 @@
 // sight, the player alive and free to act), re-checks reach and the body
 // every tick while the bar runs (casting_lifecycle.ts updateCasting, beside
 // the corpse harvest's own recheck), and re-validates at completion. Nothing
-// the client says decides an outcome.
+// the client says decides an outcome. A use's `range` is capped by the
+// interact press's own reach (INTERACT_RANGE + 2, interaction.ts), which runs
+// first.
 //
 // The player's bar is the use's own cast id (it starts with
 // KIT_USE_CAST_PREFIX, types.ts isKitUseCast), with castTargetId on the body.
 // Zero rng here; a toppled body's spill draws its rolls on its own beats
 // (kit_hazard.ts).
 
-import { MOBS } from '../../data';
 import { claimedInstanceAt } from '../../instances/dungeons';
 import type { SimContext } from '../../sim_context';
 import { dist2d, type Entity, isKitUseCast, type KitUseDef } from '../../types';
 import { spawnKitHazard } from './kit_hazard';
+import { kitOf } from './kit_of';
 
 /** The use a body carries, or null (a mob template's kit `usable`). */
 export function kitUseOf(e: Entity | undefined | null): KitUseDef | null {
   if (!e || e.kind !== 'mob') return null;
-  return MOBS[e.templateId]?.trashKit?.usable ?? null;
+  return kitOf(e)?.usable ?? null;
 }
 
 /** Is `body` usable right now by anyone (alive, in the world)? */
@@ -103,6 +105,8 @@ export function completeKitUse(ctx: SimContext, p: Entity, castId: string, bodyI
   p.castTargetId = null;
   if (!body || !def || def.castId !== castId || !kitUsableNow(body) || p.dead) return false;
   if (dist2d(p.pos, body.pos) > def.range + 0.5) return false;
+  // A wall that fell between them mid-kick spoils it (the press checked sight).
+  if (!ctx.hasLineOfSight(p, body)) return false;
   const inst = claimedInstanceAt(ctx, body.pos);
   if (!inst) return false;
   ctx.emit({

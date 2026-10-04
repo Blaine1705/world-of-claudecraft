@@ -23,7 +23,7 @@ import {
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
-import { dropKitObject, spawnKitObject } from './kit_objects';
+import { dropKitObject, kitObjectsOf, spawnKitObject } from './kit_objects';
 
 /** The spellfx ability id a wall's crash-down and its shatter carry (the
  *  renderer keys the look on the object's template id; this names the beat). */
@@ -54,6 +54,8 @@ export function spawnCombatWall(
     fx: 'nova',
     ability: COMBAT_WALL_RISE,
   });
+  // It walls the very tick it lands (a sight check later this pass sees it).
+  syncCombatWallCollision(ctx, inst, kitObjectsOf(ctx, inst, 'wall').length);
   return wall;
 }
 
@@ -63,15 +65,21 @@ export function stepCombatWall(ctx: SimContext, inst: InstanceSlot, obj: Entity)
   if (st?.kind !== 'wall') return false;
   st.remaining -= DT;
   if (st.remaining > 1e-9) return false;
+  // A world-point burst: the wall is gone by the time the frame is routed,
+  // so the event anchors where it stood (never on a dropped entity), and
+  // carries its yaw and template for the renderer's shatter.
   ctx.emit({
-    type: 'spellfx',
-    sourceId: obj.id,
-    targetId: obj.id,
+    type: 'spellfxAt',
+    x: obj.pos.x,
+    z: obj.pos.z,
     school: 'frost',
-    fx: 'nova',
+    fx: 'burst',
     ability: COMBAT_WALL_SHATTER,
+    radius: obj.scale,
   });
   dropKitObject(ctx, inst, obj.id);
+  // The view drops it the same tick (no read later this pass sees a ghost).
+  syncCombatWallCollision(ctx, inst, kitObjectsOf(ctx, inst, 'wall').length);
   return true;
 }
 
@@ -100,29 +108,40 @@ export function combatWallPlacements(
   return out;
 }
 
-// Claims this world published, so a freed slot is cleared by the world that
-// held it and never by a short-lived world that never did.
+// Publication bookkeeping (what THIS world wrote into the process-wide view,
+// the dungeon gates' `writtenBy` shape; never gameplay state): the claims it
+// published, and the claim (by its exit entity id) it last published EMPTY,
+// so a quiet claim costs nothing until a wall stands again.
 const walledBy = new WeakMap<InstanceSlot, true>();
+const publishedEmpty = new WeakMap<InstanceSlot, number | null>();
 
 /**
- * Publish one slot's live walls to the collision view. A claimed slot is
- * re-published every tick (empty when no wall stands), so whatever another
- * world left in the process-wide view for this slot is overwritten at once,
- * the gate view's rule; a freed claim clears what this world published there
- * (once). A no-op whenever the walls are unchanged (setCombatWalls compares a
- * signature), so a quiet claim costs one empty compare per tick.
+ * Publish one slot's live walls to the collision view. `walls` is how many
+ * wall objects the claim holds (the driver's census of its objects). A claim
+ * publishes on its first tick (empty or not), so whatever another world left
+ * in the process-wide view for this slot is overwritten at once (the gate
+ * view's rule), then again only while a wall stands or on the tick the last
+ * one goes; a freed claim clears what this world published there (once). An
+ * unchanged wall set is a signature compare (setCombatWalls).
  */
-export function syncCombatWallCollision(ctx: SimContext, inst: InstanceSlot): void {
+export function syncCombatWallCollision(ctx: SimContext, inst: InstanceSlot, walls: number): void {
+  if (inst.partyKey === null) {
+    if (!walledBy.has(inst)) return;
+    const def = DUNGEONS[inst.dungeonId];
+    if (def) {
+      const o = instanceOrigin(def.index, inst.slot);
+      setCombatWalls(o.x, o.z, []);
+    }
+    walledBy.delete(inst);
+    publishedEmpty.delete(inst);
+    return;
+  }
+  if (walls === 0 && publishedEmpty.get(inst) === inst.exitId) return;
   const def = DUNGEONS[inst.dungeonId];
   if (!def) return;
   const o = instanceOrigin(def.index, inst.slot);
-  if (inst.partyKey === null) {
-    if (walledBy.has(inst)) {
-      setCombatWalls(o.x, o.z, []);
-      walledBy.delete(inst);
-    }
-    return;
-  }
-  setCombatWalls(o.x, o.z, combatWallPlacements(ctx, inst, o.x, o.z));
+  setCombatWalls(o.x, o.z, walls === 0 ? [] : combatWallPlacements(ctx, inst, o.x, o.z));
   walledBy.set(inst, true);
+  if (walls === 0) publishedEmpty.set(inst, inst.exitId);
+  else publishedEmpty.delete(inst);
 }
