@@ -93,7 +93,6 @@ import {
   type MobTemplate,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
-  normAngle,
   SISTER_NHALIA_BOSS_ID,
   steadyAngleTo,
   TOLLING_BELL_TEMPLATE_ID,
@@ -110,7 +109,6 @@ import {
   updateMobChargeDash,
 } from './charge';
 import { holdPinnedMob, updateMobCombatProfile } from './combat_profile';
-import { applyBroodBurn } from './dragonkin_brood';
 import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
@@ -122,6 +120,14 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import {
+  mobInRiftInstance,
+  tickBigCastBar,
+  tickBreathConeBar,
+  tickDeathZoneBar,
+  tickStartedMobCastBars,
+} from './mob_cast_bars';
+import { separateEngagedMob } from './mob_separation';
 import { packBreathStagger } from './pack_cast_stagger';
 import { flierSightRadius, flierWaitingAloft, updateMobPatrol } from './patrol';
 import { playerDummyShedHp } from './practice_dummies';
@@ -135,7 +141,6 @@ import {
 } from './rift_escape_window';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
-import { restoreCastHold } from './trash_kit/cast_hold';
 import { emitMobYell } from './yells';
 
 // This module ENFORCES the aggro ceiling and the wander ring; the numbers themselves live
@@ -725,6 +730,14 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         tickRiftMechanicWindups(ctx, mob);
       });
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
+      // Out of melee the cadence waits, but a bar already on the screen runs
+      // out on time (mob/mob_cast_bars.ts): stepping out of a telegraph is
+      // the dodge, never a way to stall it.
+      else tickStartedMobCastBars(ctx, mob);
+      // A pack on one target spreads into a cluster instead of one blob: a
+      // soft, zero-rng nudge out of the bodies it stands inside
+      // (mob/mob_separation.ts). Last, so it never shifts this tick's swing.
+      separateEngagedMob(ctx, mob);
       break;
     }
     case 'flee': {
@@ -802,23 +815,6 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       break;
     }
   }
-}
-
-/** True when the mob belongs to a live rift instance: kit bosses via the
- * instance mob roster, and their summoned adds via the roster mobs'
- * summonedIds links (the summon path registers adds on the dungeon/delve
- * rosters, never riftInstance.mobIds, so the reverse link is what keeps a
- * future add template with a raw mechanic inside the cap). Only consulted on
- * mechanic-fire ticks, never per tick. */
-function mobInRiftInstance(ctx: SimContext, mob: Entity): boolean {
-  for (const ri of ctx.riftInstances) {
-    if (ri.partyKey === null) continue;
-    if (ri.mobIds.includes(mob.id)) return true;
-    for (const id of ri.mobIds) {
-      if (ctx.entities.get(id)?.summonedIds.includes(mob.id)) return true;
-    }
-  }
-  return false;
 }
 
 // Tick a LIVE inferno channel (returns true while channeling, owning the
@@ -1157,35 +1153,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // every living player in radius.
   const bigCast = MOBS[mob.templateId]?.bigCast;
   if (bigCast && !riftMechanicSuppressed(mob, 'bigCast')) {
-    if (mob.castingAbility === bigCast.castId) {
-      mob.castRemaining = Math.max(0, mob.castRemaining - DT);
-      if (mob.castRemaining <= 0) {
-        mob.castingAbility = null;
-        mob.castTotal = 0;
-        mob.castRemaining = 0;
-        mob.castTargetId = null;
-        const school = (bigCast.school ?? 'nature') as Aura['school'];
-        ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-        if (!MOBS[mob.templateId]?.quietMechanics)
-          ctx.emit({
-            type: 'log',
-            text: `${mob.name} unleashes ${bigCast.name}!`,
-            color: '#ff9933',
-            entityId: mob.id,
-          });
-        const capBigCast = mobInRiftInstance(ctx, mob);
-        for (const meta of ctx.players.values()) {
-          const pe = ctx.entities.get(meta.entityId);
-          if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= bigCast.radius) {
-            let dmg = Math.round(
-              ctx.rng.range(bigCast.min, bigCast.max) * (mob.mechanicDamageMult ?? 1),
-            );
-            if (capBigCast) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
-            ctx.dealDamage(mob, pe, dmg, false, school, bigCast.name, 'hit', true);
-          }
-        }
-      }
-    } else {
+    if (!tickBigCastBar(ctx, mob, bigCast)) {
       mob.bigCastTimer -= DT;
       // The shared spacing slot holds a due cast the same way a live cast bar
       // does: the timer keeps drifting negative and the cast starts on this
@@ -1199,7 +1167,8 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.bigCastTimer = bigCast.every + bigCast.castTime;
         claimMechanicSpacing(mob, bigCast.castTime);
         // The bar is a telegraph: open the escape window to the authored cast
-        // time (a wall-clock deadline; a kite-frozen bar cannot pin it open).
+        // time (a sim-clock deadline that closes on its own, whatever the bar
+        // does).
         openRiftEscapeWindow(ctx, mob, bigCast.castTime);
         mob.castingAbility = bigCast.castId;
         mob.castTotal = bigCast.castTime;
@@ -1223,26 +1192,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   ): void {
     const def = MOBS[mob.templateId]?.[tmplKey];
     if (!def || riftMechanicSuppressed(mob, tmplKey)) return;
-    if (mob.castingAbility === def.castId) {
-      mob.castRemaining = Math.max(0, mob.castRemaining - DT);
-      if (mob.castRemaining <= 0) {
-        mob.castingAbility = null;
-        mob.castTotal = 0;
-        mob.castRemaining = 0;
-        mob.castTargetId = null;
-        const school = (def.school ?? 'fire') as Aura['school'];
-        ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-        if (!MOBS[mob.templateId]?.quietMechanics)
-          ctx.emit({
-            type: 'log',
-            text: def.detonateText,
-            color: '#ff4400',
-            entityId: mob.id,
-            telegraph: true,
-          });
-        // The zone was placed at cast-start; tickRiftBossDeathZones handles detonation.
-      }
-    } else {
+    if (!tickDeathZoneBar(ctx, mob, def)) {
       mob[timerKey] -= DT;
       if (mob[timerKey] <= 0) {
         // Shared spacing slot: hold at due BEFORE the cycle reset below (the
@@ -1320,8 +1270,9 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         // early via tickRiftBossDeathZones while the bar still fills.
         claimMechanicSpacing(mob, maxFuse);
         // The zones detonate on the global fuse clock (tickRiftBossDeathZones)
-        // whatever happens to the melee-gated bar, so the escape window runs to
-        // the LAST possible detonation and then closes on its own.
+        // whatever happens to the bar (a stun or a pin still freezes it), so
+        // the escape window runs to the LAST possible detonation and then
+        // closes on its own.
         openRiftEscapeWindow(ctx, mob, maxFuse);
         mob.castingAbility = def.castId;
         mob.castTotal = maxFuse;
@@ -1427,50 +1378,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // existing mechanic's rng draw moves.
   const breath = MOBS[mob.templateId]?.breathCone;
   if (breath && !riftMechanicSuppressed(mob, 'breathCone')) {
-    if (mob.castingAbility === breath.castId) {
-      // A dungeon mob holds the spot and the facing its bar began with
-      // (mob/trash_kit/cast_hold.ts): the cone lands where it was drawn.
-      if (restoreCastHold(mob)) ctx.rebucket(mob);
-      mob.castRemaining = Math.max(0, mob.castRemaining - DT);
-      if (mob.castRemaining <= 0) {
-        mob.castingAbility = null;
-        mob.castTotal = 0;
-        mob.castRemaining = 0;
-        mob.castTargetId = null;
-        const school = (breath.school ?? 'fire') as Aura['school'];
-        // The renderer draws the breath as a terrain-hugging cone off the
-        // mob's live facing (the existing fireCone visual), not a nova ring.
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: mob.id,
-          targetId: mob.id,
-          school,
-          fx: 'fireCone',
-          range: breath.range,
-          angle: breath.arcDeg,
-        });
-        if (!MOBS[mob.templateId]?.quietMechanics)
-          ctx.emit({
-            type: 'log',
-            text: `${mob.name} unleashes ${breath.name}!`,
-            color: '#ff9933',
-            entityId: mob.id,
-          });
-        const capBreath = mobInRiftInstance(ctx, mob);
-        const halfArc = (breath.arcDeg * Math.PI) / 180 / 2;
-        for (const meta of ctx.players.values()) {
-          const pe = ctx.entities.get(meta.entityId);
-          if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > breath.range) continue;
-          if (Math.abs(normAngle(angleTo(mob.pos, pe.pos) - mob.facing)) > halfArc) continue;
-          let dmg = Math.round(
-            ctx.rng.range(breath.min, breath.max) * (mob.mechanicDamageMult ?? 1),
-          );
-          if (capBreath) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
-          ctx.dealDamage(mob, pe, dmg, false, school, breath.name, 'hit', true);
-          if (breath.burn && !pe.dead) applyBroodBurn(ctx, mob, pe, breath.burn);
-        }
-      }
-    } else {
+    if (!tickBreathConeBar(ctx, mob, breath)) {
       // Not in the rift spacing governor's table: breathCone ships on the
       // open-world dragonkin only (no rift boss carries it), and the governed
       // table requires a MANDATORY per-entity timer field. If a rift boss
