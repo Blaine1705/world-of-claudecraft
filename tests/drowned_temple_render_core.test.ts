@@ -1,11 +1,14 @@
 // The Drowned Temple's pure render cores (src/render/drowned_temple/*_core.ts):
 // the crater ring stays clear of every walkway, the dressing stands in open
 // water, the Walk's overhang buries into the crater face, the Great Conch's
-// throat light sits in its turned mouth, and every boss and trash cast that
-// paints the floor has a telegraph spec.
+// throat light sits in its turned mouth, every boss and trash cast that
+// paints the floor has a telegraph spec, and the Tideglass Fracture's slices
+// read their round and charge off the Colossus's own bar.
 
 import { describe, expect, it } from 'vitest';
 import {
+  fractureClock,
+  fractureSliceLook,
   templeTelegraphFill,
   templeTelegraphSpecs,
   templeTimedFill,
@@ -21,7 +24,21 @@ import {
   planTempleLights,
   WALK_OVERHANG,
 } from '../src/render/drowned_temple/temple_plan_core';
-import { COLOSSUS_MOONLIGHT_LANCE, HYDRA_TIDE_BREATH } from '../src/sim/encounters/drowned_temple';
+import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph/telegraph_look_core';
+import {
+  COLOSSUS_MOONLIGHT_LANCE,
+  COLOSSUS_TIDEGLASS_FRACTURE,
+  COLOSSUS_TUNING,
+  HYDRA_TIDE_BREATH,
+  SELTHE_DROWNING_ARIA,
+  SELTHE_MERE_SURGE,
+  SELTHE_MOONWATER_BOLT,
+  SELTHE_TUNING,
+} from '../src/sim/encounters/drowned_temple';
+import {
+  fractureChannel,
+  fractureWarn,
+} from '../src/sim/encounters/drowned_temple/tideglass_fracture';
 import { TEMPLE_SNAP, TEMPLE_TRIDENT_SWEEP } from '../src/sim/mob/trash_kit/temple_cast_ids';
 
 describe('the crater ring', () => {
@@ -95,5 +112,50 @@ describe('the telegraphs', () => {
     expect(warn.visible).toBe(true);
     expect(warn.fill).toBeLessThan(1);
     expect(tideLook('flood', 1)).toEqual({ visible: true, fill: 1, fade: 1 });
+  });
+});
+
+describe('the caster pass: Selthe’s marks and the Tideglass Fracture’s slices', () => {
+  it('paints the Mere Surge wedge with the sim’s own reach and arc, and a kick glyph under her bolt and aria', () => {
+    const specs = templeTelegraphSpecs();
+    const surge = specs[SELTHE_MERE_SURGE];
+    expect(surge?.shape).toBe('cone');
+    expect(surge?.range).toBe(SELTHE_TUNING.surgeRange);
+    expect(surge?.arcDeg).toBe(SELTHE_TUNING.surgeArcDeg);
+    expect(surge?.color).toBe(TELEGRAPH_THREAT_COLORS.danger);
+    for (const id of [SELTHE_MOONWATER_BOLT, SELTHE_DROWNING_ARIA]) {
+      expect(specs[id]?.shape, id).toBe('sigil');
+      expect(specs[id]?.color, id).toBe(TELEGRAPH_THREAT_COLORS.interrupt);
+    }
+    // The fracture's slices are objects, never a caster telegraph.
+    expect(specs[COLOSSUS_TIDEGLASS_FRACTURE]).toBeUndefined();
+  });
+
+  it('reads the round and its charge off the channel bar, normal and heroic alike', () => {
+    const crack = COLOSSUS_TUNING.fractureCast;
+    for (const heroic of [false, true]) {
+      const total = fractureChannel(heroic);
+      const warn = fractureWarn(heroic);
+      expect(fractureClock(total, total, crack)).toEqual({ round: -1, charge: 0 });
+      expect(fractureClock(total, total - crack + 0.01, crack).round).toBe(-1);
+      for (let r = 0; r < 3; r++) {
+        const mid = fractureClock(total, total - crack - warn * (r + 0.5), crack);
+        expect(mid.round).toBe(r);
+        expect(mid.charge).toBeCloseTo(0.5, 6);
+      }
+      expect(fractureClock(total, 0, crack)).toEqual({ round: 2, charge: 1 });
+    }
+  });
+
+  it('red glass heats toward its detonation with a quickening pulse; clear glass is safe', () => {
+    const cold = fractureSliceLook('red', 0);
+    const hot = fractureSliceLook('red', 1);
+    expect(hot.heat).toBeGreaterThan(cold.heat);
+    expect(hot.pulse).toBeGreaterThan(cold.pulse);
+    expect(cold.clear).toBe(0);
+    const safe = fractureSliceLook('safe', 1);
+    expect(safe.heat).toBe(0);
+    expect(safe.clear).toBe(1);
+    expect(fractureSliceLook('crack', 0).crack).toBe(1);
   });
 });

@@ -12,7 +12,9 @@
 //  - the Rising Tide: a silver-teal flood over the island's flooded half, a
 //    shimmer on the half about to flood;
 //  - a thread of moonlight from every Tideglass Reflection to the player it
-//    mirrors, and the Mere Hydra's one body (temple_hydra.ts).
+//    mirrors, and the Mere Hydra's one body (temple_hydra.ts);
+//  - Selthe's water magic (temple_selthe_fx.ts) and the Colossus's prism
+//    slices, the Tideglass Fracture (temple_fracture_fx.ts).
 // Every shape is the shared floor telegraph (../floor_telegraph).
 //
 // Rules (src/render/CLAUDE.md): pooled geometry and materials built once,
@@ -38,6 +40,7 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { TempleCantorFinaleFx } from './temple_cantor_finale_fx';
+import { TempleFractureFx } from './temple_fracture_fx';
 import {
   isTemplePilgrimFrenzyCue,
   stepTempleShellStance,
@@ -56,6 +59,7 @@ import {
   tideLook,
 } from './temple_fx_core';
 import { TempleHydra } from './temple_hydra';
+import { TempleSeltheFx } from './temple_selthe_fx';
 import { TempleYsoleiFx } from './temple_ysolei_fx';
 
 const FAN_SLOTS = 14;
@@ -111,6 +115,8 @@ export class TempleFx {
   private readonly ysolei: TempleYsoleiFx;
   // Laverock's finale: the fallen rising as moonlight while he sings.
   private readonly cantor: TempleCantorFinaleFx;
+  private readonly selthe: TempleSeltheFx;
+  private readonly fracture: TempleFractureFx;
   private readonly flashesOn: boolean;
   /** Each living Pearlguard Sentinel's shell stance and when it changed. */
   private readonly shellStance = new Map<number, TempleShellTrack>();
@@ -126,6 +132,7 @@ export class TempleFx {
     private readonly world?: IWorld,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly playGesture?: (entityId: number, gesture: string) => void,
+    shake?: (amount: number) => void,
   ) {
     this.root.name = 'drowned-temple-telegraphs';
     setRenderCategory(this.root, 'ui3d');
@@ -167,6 +174,8 @@ export class TempleFx {
     this.hydra = new TempleHydra(hydraRoot, world, this.flashesOn, groundY);
     this.ysolei = new TempleYsoleiFx(this.root, scene, world, groundY, this.flashesOn);
     this.cantor = new TempleCantorFinaleFx(this.root, world, this.flashesOn);
+    this.selthe = new TempleSeltheFx(this.root, world, groundY, this.flashesOn, shake);
+    this.fracture = new TempleFractureFx(this.root, world, groundY, this.flashesOn, shake);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -177,6 +186,7 @@ export class TempleFx {
     this.hydra.handleEvent(ev);
     this.ysolei.handleEvent(ev);
     this.cantor.handleEvent(ev);
+    if (this.selthe.handleEvent(ev) || this.fracture.handleEvent(ev)) return true;
     if (ev.type === 'spellfx') {
       const source = this.world?.entities.get(ev.sourceId);
       // Claimed only when the Frenzy can actually play (a host without the
@@ -206,6 +216,8 @@ export class TempleFx {
     this.hydra.update(dt, this.clock);
     this.ysolei.update(dt, this.clock);
     this.cantor.update(dt, this.clock);
+    this.selthe.update(dt, this.clock);
+    this.fracture.update(dt, this.clock);
     for (const slot of this.casts) {
       if (slot.casterId < 0) continue;
       const caster = world.entities.get(slot.casterId);
@@ -517,6 +529,8 @@ export class TempleFx {
     this.hydra.dispose();
     this.ysolei.dispose();
     this.cantor.dispose();
+    this.selthe.dispose();
+    this.fracture.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();

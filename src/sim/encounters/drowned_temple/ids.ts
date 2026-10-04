@@ -207,13 +207,13 @@ export const SELTHE_TUNING = {
   // wave crashes through a 60 degree wedge out to 30 yd: 110 to 130 frost and
   // a shove of 8 yd (the Slap's 50 to 60 plus its 8 yd throw, priced up to
   // the Hydra's avoidable Crushing Torrent, 90 to 110, since it can catch
-  // several players). Heroic widens the wedge to 90 degrees.
+  // several players). One wedge on both difficulties: the floor mark is drawn
+  // from this cast id alone, so the edge a player sees is the edge it tests.
   surgeFirst: 12,
   surgeEvery: 18,
   surgeCast: 3,
   surgeRange: 30,
   surgeArcDeg: 60,
-  surgeArcDegHeroic: 90,
   surgeMin: 110,
   surgeMax: 130,
   surgeKnockback: 8,
@@ -400,8 +400,9 @@ export const TERRACE = PRISM_TERRACE;
 export const FRACTURE_SLICES = 8;
 /** The hub under the plinth: part of no slice, it detonates every round. */
 export const FRACTURE_HUB = 3;
-/** How far out the fracture runs (the terrace and the step below its rim). */
-export const FRACTURE_REACH = PRISM_TERRACE.r + 8;
+/** How far out the fracture runs: the terrace floor and a hand past its rim
+ *  (the glass the renderer draws is exactly this disc). */
+export const FRACTURE_REACH = PRISM_TERRACE.r + 1.5;
 /** Each round's SAFE slices before the cast's rotation. A round's safe
  *  slices are all red in the round before it: everyone moves. */
 export const FRACTURE_SAFE_PATTERNS: readonly (readonly number[])[] = [

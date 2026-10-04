@@ -24,8 +24,7 @@
 //                   110 to 130 frost and an 8 yd shove. Step out sideways.
 //   Kicks           a cut bolt or aria silences her bolts and arias for 3 s.
 //   Heroic          Duet: Chorus and Solo land together on two players. Echo:
-//                   each mark resolves again at the same spot 4 s later. The
-//                   Surge's wedge widens to 90 degrees.
+//                   each mark resolves again at the same spot 4 s later.
 //
 // Zero rng in every pick (the marks' and the aria's victims and the surge's
 // aim are hashed); the only draws are the damage rolls.
@@ -457,11 +456,6 @@ export function startSurge(
   return true;
 }
 
-/** The Surge's wedge, in degrees (heroic widens it). */
-export function surgeArcDeg(heroic: boolean): number {
-  return heroic ? T.surgeArcDegHeroic : T.surgeArcDeg;
-}
-
 function landSurge(ctx: SimContext, inst: InstanceSlot, boss: Entity, yaw: number): void {
   ctx.emit({
     type: 'spellfx',
@@ -471,9 +465,8 @@ function landSurge(ctx: SimContext, inst: InstanceSlot, boss: Entity, yaw: numbe
     fx: 'nova',
     ability: SELTHE_MERE_SURGE,
   });
-  const arc = surgeArcDeg(inst.difficulty === 'heroic');
   for (const p of claimPlayers(ctx, inst)) {
-    if (p.dead || !inCone(boss.pos, yaw, p.pos, T.surgeRange, arc)) continue;
+    if (p.dead || !inCone(boss.pos, yaw, p.pos, T.surgeRange, T.surgeArcDeg)) continue;
     ctx.dealDamage(
       boss,
       p,

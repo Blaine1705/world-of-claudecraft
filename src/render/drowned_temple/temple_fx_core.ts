@@ -12,11 +12,15 @@ import {
   COLOSSUS_MOONLIGHT_LANCE,
   COLOSSUS_RESONANT_SLAM,
   COLOSSUS_TUNING,
+  FRACTURE_ROUNDS,
   HYDRA_CRUSHING_TORRENT,
   HYDRA_TIDE_BREATH,
   HYDRA_TUNING,
   RIPTIDE_TEMPLATE,
   SELTHE_CHORUS_MARK,
+  SELTHE_DROWNING_ARIA,
+  SELTHE_MERE_SURGE,
+  SELTHE_MOONWATER_BOLT,
   SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
   SELTHE_TUNING,
@@ -193,6 +197,29 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
       arcDeg: 360,
       color: TELEGRAPH_THREAT_COLORS.lethal,
       accent: TEMPLE_ACCENTS.tide,
+    },
+    // Selthe the caster: the Mere Surge's wedge (step out sideways), and a
+    // kick glyph under her bolt and her aria (both can be interrupted).
+    [SELTHE_MERE_SURGE]: {
+      shape: 'cone',
+      range: SELTHE_TUNING.surgeRange,
+      arcDeg: SELTHE_TUNING.surgeArcDeg,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: TEMPLE_ACCENTS.tide,
+    },
+    [SELTHE_MOONWATER_BOLT]: {
+      shape: 'sigil',
+      range: 2.4,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.tide,
+    },
+    [SELTHE_DROWNING_ARIA]: {
+      shape: 'sigil',
+      range: 3,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.moon,
     },
     // Selthe's Sea-Song hits the whole court: a glyph under her, not a zone.
     [SELTHE_SEA_SONG]: {
@@ -401,4 +428,35 @@ export function templeMoonspawnRises(
   sinceFirstSeen: number,
 ): boolean {
   return templateId === 'moonspawn' && !dead && sinceFirstSeen <= TEMPLE_MOONSPAWN_RISE_WINDOW;
+}
+
+/** Where a Tideglass Fracture stands, read off the Colossus's own channel bar
+ *  (so heroic's shorter rounds read right with no difficulty on the wire):
+ *  round -1 while the floor cracks, else the round (0 based) and how far its
+ *  red slices have charged toward their detonation (0 to 1). */
+export function fractureClock(
+  castTotal: number,
+  castRemaining: number,
+  crackSeconds: number,
+): { round: number; charge: number } {
+  const elapsed = Math.max(0, castTotal - castRemaining);
+  if (elapsed < crackSeconds || castTotal <= crackSeconds) return { round: -1, charge: 0 };
+  const warn = (castTotal - crackSeconds) / FRACTURE_ROUNDS;
+  const into = elapsed - crackSeconds;
+  const round = Math.min(FRACTURE_ROUNDS - 1, Math.floor(into / warn));
+  return { round, charge: Math.min(1, Math.max(0, (into - round * warn) / warn)) };
+}
+
+/** A fracture slice's paint: the red heat (0 safe, up to 1 at detonation),
+ *  the clear glass (1 safe), and the crack glow while the floor splits. The
+ *  heat ramps with the charge so the last half second blazes. */
+export function fractureSliceLook(
+  state: 'crack' | 'red' | 'safe',
+  charge: number,
+): { heat: number; clear: number; crack: number; pulse: number } {
+  if (state === 'crack') return { heat: 0, clear: 0, crack: 1, pulse: 0 };
+  if (state === 'safe') return { heat: 0, clear: 1, crack: 0.25, pulse: 0 };
+  const c = Math.min(1, Math.max(0, charge));
+  // The warning pulse quickens as the charge runs out (2 Hz to 8 Hz).
+  return { heat: 0.45 + 0.55 * c * c, clear: 0, crack: 0.5, pulse: 2 + 6 * c };
 }
