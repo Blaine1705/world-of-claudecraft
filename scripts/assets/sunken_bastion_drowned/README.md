@@ -36,6 +36,13 @@ nothing here runs in the build or the game.
   face's own bumps), a kelp plume, three-lame pauldrons, both vambraces, the sash (`build_sash`, a
   band over the cuirass) and the bearded boarding axe (haft and iron as two rigid parts on Weapon);
   `clips.py` has Idle, CombatIdle, Walk, Run, Attack, Attack2, Rally, Hit, Death.
+- `chanter/`: the Mist Chanter (`public/models/creatures/mist_chanter.glb`): the kit body thinned to
+  a bent crone (bony arms, clawed hands, bare feet), a hooked-nose face, the shawl-hood of rag and
+  fishing net (`net` surface), weed-hair (`hair_weights`), a rag bodice, a shell necklace, skirts to
+  the ankles (`tabard_weights`, the front following the thighs) and the driftwood staff with its
+  lure of sea light (a `glow_lure` part); `clips.py` has Idle, Walk, Run, Attack, Attack2, Cast,
+  Ward (a loop), Hit, Death. Her first rig is kept as `mist_chanter_thawcaller.glb` for the
+  Gravewyrm Sanctum's Thawcaller placeholder.
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),

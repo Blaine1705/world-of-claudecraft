@@ -150,6 +150,21 @@ describe('the Sunken Bastion creature roster', () => {
       expect(nodes.has(bone), bone).toBe(true);
   });
 
+  it("keeps the Sanctum Thawcaller on the sea hag's first rig when the Chanter changed", () => {
+    // The Gravewyrm Sanctum's Thawcaller placeholder is a re-tint spread from
+    // the Mist Chanter's row; it keeps the first hag GLB (its own file) so the
+    // Bastion's sculpted Chanter never changes another dungeon's look.
+    const chanter = VISUALS[keyOf('mistweaver')];
+    const thaw = VISUALS.sanctum_thawcaller;
+    expect(chanter.url).toBe('models/creatures/mist_chanter.glb');
+    expect(chanter.authoredAtlas).toBe(true);
+    expect(thaw.url).toBe('models/creatures/mist_chanter_thawcaller.glb');
+    expect(thaw.authoredAtlas).toBeUndefined();
+    const clips = glbClips(thaw.url);
+    for (const clip of ['Idle', 'Walk', 'Run', 'Attack', 'Attack2', 'Hit', 'Death', 'Cast', 'Ward'])
+      expect(clips.has(clip), clip).toBe(true);
+  });
+
   it('no Bastion trash mob wears a KayKit skeleton any more', () => {
     for (const mobId of [...Object.keys(ROSTER), 'bastion_revenant']) {
       expect(VISUALS[keyOf(mobId)].url).not.toContain('skeleton');

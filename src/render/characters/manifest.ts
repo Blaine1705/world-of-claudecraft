@@ -4216,10 +4216,19 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.16,
   },
-  // The Mist Chanter: a hunched sea hag with an anglerfish-lure staff.
+  // The Mist Chanter: the sea hag who sings the fog in, sculpted whole on the
+  // drowned kit (scripts/assets/sunken_bastion_drowned/chanter/): a tall bent
+  // crone, bone and slack grey skin, a long hooked nose under a deep shawl-hood
+  // of rag and old fishing net, lank weed-hair spilling out to her breast, sea
+  // light in her eyes, rag skirts to her bare feet and a crooked driftwood
+  // staff dangling an anglerfish lure of sea light. Chilling Mist comes off the
+  // lure thrust out (Attack) or off her claw swept across (Attack2), both
+  // releasing 0.6 s in (the petSpell windup); Fog Ward is the staff raised in
+  // both hands and circled overhead. Drawn taller than before so she looms
+  // over a player; presentation only.
   bastion_mistweaver: {
     url: `${CREATURES}/mist_chanter.glb`,
-    height: 3.5,
+    height: 4.4,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4231,7 +4240,10 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Cast',
       castByAbility: { [BASTION_FOG_WARD]: 'Ward' },
     },
-    selfIllumination: 0.08,
+    walkRef: 1.11,
+    runRef: 4.57,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
   // The Tidebound Acolyte: a living cultist of Vael's hymn in sea-green robes.
   bastion_acolyte: {

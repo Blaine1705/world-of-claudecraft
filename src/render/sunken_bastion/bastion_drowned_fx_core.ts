@@ -31,7 +31,8 @@ export interface DrownedFxSpec {
   eyes: ModelPoint;
 }
 
-/** The drowned that wear their own Blender bodies and carry these effects. */
+/** The drowned (and the sea hag who sings for them) that wear their own Blender
+ *  bodies and carry these effects. */
 export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
   bastion_revenant: {
     rawHeight: 4.74,
@@ -86,6 +87,19 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     ],
     chest: { side: 0.04, up: 3.06, fwd: 0.52 },
     eyes: { side: 0.1, up: 4.22, fwd: 0.14 },
+  },
+  // The Mist Chanter: water off her shawl, her weed-hair and the lure.
+  mistweaver: {
+    rawHeight: 4.168,
+    drips: [
+      { side: 0.49, up: 2.7, fwd: -0.02 },
+      { side: 0.14, up: 3.69, fwd: 1.15 },
+      { side: -0.9, up: 3.62, fwd: 1.62 },
+      { side: 0.21, up: 2.49, fwd: 0.37 },
+      { side: -0.41, up: 2.71, fwd: -0.02 },
+    ],
+    chest: { side: 0.03, up: 2.41, fwd: 0.25 },
+    eyes: { side: 0.09, up: 3.58, fwd: 0.89 },
   },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {
