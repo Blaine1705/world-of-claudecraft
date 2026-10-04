@@ -26,9 +26,11 @@ import {
   COLOSSUS_RESONANT_SLAM,
   COLOSSUS_TUNING,
   SELTHE_CHORUS_MARK,
+  SELTHE_DROWNING_ARIA,
+  SELTHE_MERE_SURGE,
+  SELTHE_MOONWATER_BOLT,
   SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
-  SELTHE_TIDAL_SLAP,
   SELTHE_TUNING,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
@@ -454,6 +456,8 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
       [
         'Attack',
         'Attack2',
+        'Beam',
+        'Bolt',
         'Cast',
         'Chorus',
         'Death',
@@ -463,6 +467,7 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
         'SeaSong',
         'Slap',
         'Solo',
+        'Surge',
         'Walk',
       ].sort(),
     );
@@ -473,16 +478,23 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
     expect(v.height * (MOBS.choirmother_selthe.scale ?? 1)).toBeCloseTo(9.0, 1);
   });
 
-  it('sings and slaps on their bars and answers each mark with its gesture', () => {
-    const c = visualOf('choirmother_selthe').clips;
+  it('casts water on her bars (no hand swings) and answers each mark with its gesture', () => {
+    const v = visualOf('choirmother_selthe');
+    const c = v.clips;
     expect(c.castByAbility?.[SELTHE_SEA_SONG]).toBe('SeaSong');
-    expect(c.castByAbility?.[SELTHE_TIDAL_SLAP]).toBe('Slap');
-    expect(c.castTimeScaleByAbility?.[SELTHE_SEA_SONG]).toBe(1);
-    expect(c.castTimeScaleByAbility?.[SELTHE_TIDAL_SLAP]).toBe(1);
+    expect(c.castByAbility?.[SELTHE_MOONWATER_BOLT]).toBe('Bolt');
+    expect(c.castByAbility?.[SELTHE_DROWNING_ARIA]).toBe('Beam');
+    expect(c.castByAbility?.[SELTHE_MERE_SURGE]).toBe('Surge');
+    // The bolt and the surge land on their bar's end (bar-locked); the aria loops.
+    expect(v.castClipSync).toEqual(
+      expect.arrayContaining([SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE]),
+    );
+    expect(v.castClipSync).not.toContain(SELTHE_DROWNING_ARIA);
     expect(c.attackByAbility?.[SELTHE_CHORUS_MARK]).toBe('Chorus');
     expect(c.attackByAbility?.[SELTHE_SOLO_MARK]).toBe('Solo');
     expect(SELTHE_TUNING.songCast).toBe(1.5);
-    expect(SELTHE_TUNING.slapCast).toBe(1);
+    expect(SELTHE_TUNING.boltCast).toBe(2);
+    expect(SELTHE_TUNING.surgeCast).toBe(3);
   });
 });
 

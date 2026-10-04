@@ -16,6 +16,11 @@
 //                    one player's spot (90 to 110 arcane). Step out sideways.
 //   Resonant Slam    every 14 s a 1.5 s bar, 70 to 90 to everyone within 12 yd
 //                    and a knockback; never inside a Prism Flare.
+//   Tideglass        every 32 s (first at 20 s) the terrace floor splits into
+//   Fracture         eight prism slices (tideglass_fracture.ts): three rounds,
+//                    the red slices detonate (120 to 130), the clear ones are
+//                    safe, and the safe ones move every round. He stands
+//                    planted for the whole 9 s channel; never inside a flare.
 //   Heroic           Shattering Glass: a Reflection bursts where it breaks (80
 //                    arcane in 4 yd). Swapped Images: every 8 s the Reflections
 //                    pass to the next owner, so who cannot hit which changes.
@@ -38,11 +43,13 @@ import {
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_PRISM_WARD,
   COLOSSUS_RESONANT_SLAM,
+  COLOSSUS_TIDEGLASS_FRACTURE,
   COLOSSUS_TUNING,
   REFLECTION_ID,
   REFLECTION_SHATTER,
   TERRACE,
 } from './ids';
+import { endFracture, startFracture, stepFracture } from './tideglass_fracture';
 
 const T = COLOSSUS_TUNING;
 export const COLOSSUS_DEED = 'dgn_colossus_mirror';
@@ -59,6 +66,8 @@ function freshState(): ColossusFightState {
     casts: 0,
     lingered: false,
     plantedAt: null,
+    fractureTimer: T.fractureFirst,
+    fracture: null,
   };
 }
 
@@ -67,6 +76,7 @@ const PLANTED_CASTS: ReadonlySet<string> = new Set([
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_MOONLIGHT_LANCE,
   COLOSSUS_RESONANT_SLAM,
+  COLOSSUS_TIDEGLASS_FRACTURE,
 ]);
 
 /** How far from the terrace's centre it may stand (its rim, less a step). */
@@ -341,6 +351,14 @@ function stepCasts(
   st: ColossusFightState,
 ): void {
   const casting = boss.castingAbility;
+  if (casting === COLOSSUS_TIDEGLASS_FRACTURE) {
+    boss.swingTimer = Math.max(boss.swingTimer, 0.6);
+    stepFracture(ctx, inst, boss, st);
+    return;
+  }
+  // The floor's slices never outlive their channel (a dev trigger or a reset
+  // that cut the bar leaves them to fade here).
+  if (st.fracture) endFracture(ctx, inst, st);
   if (
     casting === COLOSSUS_PRISM_FLARE ||
     casting === COLOSSUS_MOONLIGHT_LANCE ||
@@ -368,6 +386,11 @@ function stepCasts(
   }
   st.lanceTimer -= DT;
   st.slamTimer -= DT;
+  st.fractureTimer -= DT;
+  if (st.fractureTimer <= 0 && !flareNear(boss, st)) {
+    st.fractureTimer = T.fractureEvery;
+    if (startFracture(ctx, inst, boss, st)) return;
+  }
   if (st.slamTimer <= 0 && !flareNear(boss, st)) {
     st.slamTimer = T.slamEvery;
     startCast(boss, COLOSSUS_RESONANT_SLAM, T.slamCast, null);
@@ -379,12 +402,15 @@ function stepCasts(
   }
 }
 
-/** The fight ended: every Reflection dissolves and the ward lifts. */
-export function resetColossus(ctx: SimContext, boss: Entity): void {
+/** The fight ended: every Reflection dissolves, the floor's slices fade and
+ *  the ward lifts. */
+export function resetColossus(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.templeFight?.kind === 'colossus' ? boss.templeFight : null;
-  if (st) for (const rec of st.reflections) dropReflection(ctx, boss, rec.id);
-  for (const id of [COLOSSUS_PRISM_FLARE, COLOSSUS_MOONLIGHT_LANCE, COLOSSUS_RESONANT_SLAM])
-    clearCastOf(boss, id);
+  if (st) {
+    for (const rec of st.reflections) dropReflection(ctx, boss, rec.id);
+    endFracture(ctx, inst, st);
+  }
+  for (const id of PLANTED_CASTS) clearCastOf(boss, id);
   boss.auras = boss.auras.filter((a) => a.id !== COLOSSUS_PRISM_WARD);
   boss.templeFight = undefined;
 }
@@ -401,12 +427,12 @@ export function tickColossus(
     if (st) {
       stepReflections(ctx, inst, boss, st);
       if (!st.lingered && st.flares > 0) grantClaimDeed(ctx, inst, COLOSSUS_DEED);
-      resetColossus(ctx, boss);
+      resetColossus(ctx, inst, boss);
     }
     return;
   }
   if (!engaged) {
-    if (st) resetColossus(ctx, boss);
+    if (st) resetColossus(ctx, inst, boss);
     return;
   }
   if (!st) {

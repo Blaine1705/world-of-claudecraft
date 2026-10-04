@@ -17,8 +17,9 @@ import {
   startTsunami,
   tickMereHydra,
 } from './mere_hydra';
-import { startChorus, startSolo, tickSelthe } from './selthe';
+import { startAria, startBolt, startChorus, startSolo, startSurge, tickSelthe } from './selthe';
 import { raiseReflections, startLance, tickColossus } from './tideglass_colossus';
+import { startFracture } from './tideglass_fracture';
 import { startRisingTide, startUndertow, tickYsolei } from './ysolei';
 
 export { HYDRA_REGROWTH_LOG } from './hydra_regrowth';
@@ -40,7 +41,9 @@ export function tickTempleEncounters(ctx: SimContext): void {
 }
 
 const HELP =
-  'Mechanics: chorus, solo, duet (Selthe); breath, spit, torrent, tsunami, regrow (the Hydra); reflections, lance (the Colossus); undertow, flood (Ysolei).';
+  'Mechanics: chorus, solo, duet, bolt, aria, surge (Selthe); breath, spit, torrent, tsunami, regrow (the Hydra); reflections, lance, fracture (the Colossus); undertow, flood (Ysolei).';
+
+const SELTHE_BARS = new Set(['bolt', 'aria', 'surge']);
 
 const HYDRA_TRIGGERS = new Set(['breath', 'spit', 'torrent', 'tsunami', 'regrow']);
 
@@ -54,6 +57,26 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     if (what !== 'solo') startChorus(ctx, inst, boss, st);
     if (what !== 'chorus') startSolo(ctx, inst, boss, st);
     return 'Selthe marks her singers.';
+  }
+  if (SELTHE_BARS.has(what)) {
+    const boss = claimBoss(ctx, inst, SELTHE_ID);
+    const st = boss?.templeFight;
+    if (!boss || st?.kind !== 'selthe') return 'Pull Selthe first.';
+    // A dev trigger cuts whatever bar is running (not as a kick: no hush).
+    if (boss.castingAbility !== null) {
+      boss.castingAbility = null;
+      boss.castRemaining = 0;
+      boss.castTargetId = null;
+      boss.channeling = false;
+      st.aria = null;
+      st.kickable = null;
+      st.surgeYaw = null;
+    }
+    if (what === 'bolt')
+      return startBolt(ctx, inst, boss, st) ? 'Selthe gathers a Moonwater Bolt.' : 'No target.';
+    if (what === 'aria')
+      return startAria(ctx, inst, boss, st) ? 'Selthe sings a Drowning Aria.' : 'No target.';
+    return startSurge(ctx, inst, boss, st) ? 'Selthe heaves a Mere Surge.' : 'No target.';
   }
   if (HYDRA_TRIGGERS.has(what)) {
     const heads = hydraHeads(ctx, inst);
@@ -94,7 +117,7 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     if (!ice) return 'No head wields the ice.';
     return startTideBreath(ctx, inst, ice, st) ? 'A head draws a Freezing Breath.' : 'No target.';
   }
-  if (what === 'reflections' || what === 'lance') {
+  if (what === 'reflections' || what === 'lance' || what === 'fracture') {
     const boss = claimBoss(ctx, inst, COLOSSUS_ID);
     const st = boss?.templeFight;
     if (!boss || st?.kind !== 'colossus') return 'Pull the Colossus first.';
@@ -105,6 +128,16 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
         boss.castRemaining = 0;
       }
       return startLance(ctx, inst, boss, st) ? 'The Colossus aims a lance.' : 'No target.';
+    }
+    if (what === 'fracture') {
+      if (st.fracture) return 'The floor is already fractured.';
+      if (boss.castingAbility !== null) {
+        boss.castingAbility = null;
+        boss.castRemaining = 0;
+      }
+      return startFracture(ctx, inst, boss, st)
+        ? 'The terrace floor splits into prism slices.'
+        : 'No fracture.';
     }
     const n = raiseReflections(ctx, inst, boss, st);
     return `The prism flares: ${n} reflection${n === 1 ? '' : 's'}.`;

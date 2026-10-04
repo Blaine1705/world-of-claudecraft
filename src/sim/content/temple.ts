@@ -372,7 +372,10 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 2.7,
     attackSpeed: 2.2,
     armorPerLevel: 22,
-    moveSpeed: 7,
+    // The caster pass: she never leaves her pool and never swings her hands
+    // (her melee is held off by encounters/drowned_temple/selthe.ts; her
+    // Moonwater Bolt carries the tank's pressure from this weapon roll).
+    moveSpeed: 0,
     aggroRadius: 14,
     // The rework (drowned_temple.md 8.1): one guaranteed piece per archetype
     // group and the Chorus Conch chase row beside her shipped drops. Heroic

@@ -11,9 +11,11 @@ import {
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_RESONANT_SLAM,
   SELTHE_CHORUS_MARK,
+  SELTHE_DROWNING_ARIA,
+  SELTHE_MERE_SURGE,
+  SELTHE_MOONWATER_BOLT,
   SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
-  SELTHE_TIDAL_SLAP,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_UNDERTOW,
@@ -4840,10 +4842,15 @@ export const VISUALS: Record<string, VisualDef> = {
   // turquoise to violet fins), her tail coiled in the pool of moonlit water
   // she rides, the golden Great Conch on her chest, a jaw that drops too far
   // when she sings. Sea-Song (1.5 s bar) plays SeaSong: arms wide, head back,
-  // the mouth wide, the fan shivering, the song on the bar's end. Tidal Slap
-  // (1.0 s bar) plays Slap: the arm drawn across her, the backhand on the
-  // bar's end. The Chorus and Solo marks arrive as windup cues and play Chorus
-  // (the conch raised and blown, the fan folding in) and Solo (one arm raised,
+  // the mouth wide, the fan shivering, the song on the bar's end. She is a
+  // caster and never swings her hands: Moonwater Bolt (2.0 s bar) plays Bolt,
+  // water gathered at her shoulder and flung on the bar's end; Mere Surge
+  // (3.0 s bar) plays Surge, sinking into the pool and hurling the wave on the
+  // bar's end; the Drowning Aria (a 5 s channel) loops Beam, both arms thrust
+  // at her target. The bolt and the surge finish their follow-through. Her old
+  // Slap and claw swings stay in the file, unplayed. The Chorus and Solo marks
+  // arrive as windup cues and play Chorus (the conch raised and blown, the fan
+  // folding in) and Solo (one arm raised,
   // the fan flung wide). Dying, the fan folds and she sinks into her pool,
   // leaving the conch glowing on the floor. Drawn 9.0 at her 1.15.
   temple_selthe: {
@@ -4851,15 +4858,28 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 7.83,
     clips: {
       ...TEMPLE_CLIPS,
-      castByAbility: { [SELTHE_SEA_SONG]: 'SeaSong', [SELTHE_TIDAL_SLAP]: 'Slap' },
-      castTimeScaleByAbility: { [SELTHE_SEA_SONG]: 1, [SELTHE_TIDAL_SLAP]: 1 },
+      castByAbility: {
+        [SELTHE_SEA_SONG]: 'SeaSong',
+        [SELTHE_MOONWATER_BOLT]: 'Bolt',
+        [SELTHE_DROWNING_ARIA]: 'Beam',
+        [SELTHE_MERE_SURGE]: 'Surge',
+      },
+      castTimeScaleByAbility: {
+        [SELTHE_SEA_SONG]: 1,
+        [SELTHE_MOONWATER_BOLT]: 1,
+        [SELTHE_DROWNING_ARIA]: 1,
+        [SELTHE_MERE_SURGE]: 1,
+      },
+      castPlayOut: ['Bolt', 'Surge'],
       attackByAbility: { [SELTHE_CHORUS_MARK]: 'Chorus', [SELTHE_SOLO_MARK]: 'Solo' },
       attackTimeScaleByAbility: { [SELTHE_CHORUS_MARK]: 1, [SELTHE_SOLO_MARK]: 1 },
     },
     attackTimeScale: 1,
     walkRef: 2.5,
     runRef: 7,
-    castClipSync: true,
+    // The bars land on their end; the aria's beam loops.
+    castClipSync: [SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE],
+    castPlayOutHoldsAttacks: true,
     authoredAtlas: true,
     selfIllumination: 0.06,
   },

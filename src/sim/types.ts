@@ -4485,7 +4485,21 @@ export interface SeltheFightState {
   chorusTimer: number;
   soloTimer: number;
   songTimer: number;
-  slapTimer: number;
+  /** Seconds to the next Mere Surge and the next Drowning Aria. */
+  surgeTimer: number;
+  ariaTimer: number;
+  /** The breath she takes after a bar before her next Moonwater Bolt. */
+  boltGap: number;
+  /** After a kick: seconds she casts neither bolt nor aria. */
+  quiet: number;
+  /** The kickable bar she began (a bolt or the aria), so a cut one is seen. */
+  kickable: string | null;
+  /** The Mere Surge's locked aim while its bar runs. */
+  surgeYaw: number | null;
+  /** The Drowning Aria in flight: whom she sings at, whom the beam strikes now
+   *  (the target, or a body that stepped into it), how many pulses in a row
+   *  it has struck, and the seconds to the next pulse. */
+  aria: { targetId: number; struckId: number; streak: number; pulse: number } | null;
   /** Marks in flight: whose, and the seconds until each resolves. */
   marks: { mark: 'chorus' | 'solo'; playerId: number; remaining: number }[];
   /** Heroic Echo: marks resolving again where they fell (their object ids). */
@@ -4552,6 +4566,12 @@ export interface ColossusFightState {
   /** Where it planted its feet for the bar in flight (instance world
    *  coordinates), so a bar's lane and ring land where they were drawn. */
   plantedAt: { x: number; y: number; z: number } | null;
+  /** Seconds to the next Tideglass Fracture. */
+  fractureTimer: number;
+  /** The Tideglass Fracture in flight: the round (-1 while its bar opens),
+   *  the seconds to that round's detonation, the cast's slice rotation, and
+   *  its eight slice objects (index = slice). */
+  fracture: { round: number; timer: number; rot: number; objectIds: number[] } | null;
 }
 
 export interface YsoleiFightState {

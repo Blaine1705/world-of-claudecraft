@@ -633,6 +633,12 @@ const mergeStringsEn = {
       temple_moonlight_lance: 'Moonlight Lance',
       temple_prism_flare: 'Prism Flare',
       temple_resonant_slam: 'Resonant Slam',
+      // The caster pass: Selthe's bolt and aria can be kicked, her surge and
+      // the Colossus's fracture cannot.
+      temple_moonwater_bolt: 'Moonwater Bolt',
+      temple_drowning_aria: 'Drowning Aria',
+      temple_mere_surge: 'Mere Surge',
+      temple_tideglass_fracture: 'Tideglass Fracture',
       temple_undertow: 'Undertow',
       temple_lunar_tide: 'Lunar Tide',
       // The Temple's sixth pass: the trash's second jobs (the Mending and the

@@ -27,7 +27,16 @@ export const HYDRA_HEAD_TEMPLATES: readonly string[] = [
 
 // ---- cast ids (real cast bars on the bosses) -------------------------------------
 export const SELTHE_SEA_SONG = 'temple_sea_song';
+/** Retired: Selthe's old backhand. She is a caster now and never casts it; the
+ *  id stays so the shipped cast-name rows (and an old replay) still resolve. */
 export const SELTHE_TIDAL_SLAP = 'temple_tidal_slap';
+/** Selthe's filler: a bolt of moonwater at her foe (a bar, kickable). */
+export const SELTHE_MOONWATER_BOLT = 'temple_moonwater_bolt';
+/** Selthe's sung beam of water on one player (a channel, kickable; line of
+ *  sight breaks it, a body in the way catches it). */
+export const SELTHE_DROWNING_ARIA = 'temple_drowning_aria';
+/** Selthe heaves her pool: a wave crashes through a wedge of the court. */
+export const SELTHE_MERE_SURGE = 'temple_mere_surge';
 /** The ice head's frost cone (the cast id kept from the first pass; its bar
  *  reads Freezing Breath). */
 export const HYDRA_TIDE_BREATH = 'temple_tide_breath';
@@ -40,6 +49,9 @@ export const HYDRA_TSUNAMI = 'temple_hydra_tsunami';
 export const COLOSSUS_PRISM_FLARE = 'temple_prism_flare';
 export const COLOSSUS_MOONLIGHT_LANCE = 'temple_moonlight_lance';
 export const COLOSSUS_RESONANT_SLAM = 'temple_resonant_slam';
+/** The terrace floor splits into prism slices that detonate in three rounds
+ *  (one long planted channel). */
+export const COLOSSUS_TIDEGLASS_FRACTURE = 'temple_tideglass_fracture';
 export const YSOLEI_LUNAR_TIDE = 'temple_lunar_tide';
 export const YSOLEI_UNDERTOW = 'temple_undertow';
 /** Ysolei's roar as her Moonspawn rise (a bar, never kicked). */
@@ -64,10 +76,25 @@ export const YSOLEI_RIPTIDE_AURA = 'temple_riptide';
 export const SELTHE_CHORUS_BURST = 'temple_chorus_burst';
 export const SELTHE_SOLO_BURST = 'temple_solo_burst';
 export const SELTHE_ECHO_BURST = 'temple_echo_burst';
+/** A Drowning Aria pulse lands on the player it struck (targetId). */
+export const SELTHE_ARIA_PULSE = 'temple_aria_pulse';
+/** A Drowning Aria broke (sight lost, kicked, its target fell or fled). */
+export const SELTHE_ARIA_BROKEN = 'temple_aria_broken';
+/** One red Tideglass Fracture slice detonates (targetId: its slice object). */
+export const FRACTURE_BURST = 'temple_fracture_burst';
 export const REFLECTION_SHATTER = 'temple_reflection_shatter';
 /** A fallen Hydra head grows back (its regrowth burst). */
 export const HYDRA_REGROWTH = 'temple_hydra_regrowth';
 export const YSOLEI_TIDAL_CRASH = 'temple_tidal_crash';
+
+/** The boss bars a player interrupt can cut (Kick, Pummel, Counterspell),
+ *  by the school the lockout lands in: Selthe's bolt and her aria. Spread into
+ *  mob/healer_channel.ts SCRIPTED_INTERRUPTIBLE_CHANNELS. Every other Temple
+ *  boss bar is a mechanic to dodge, never kicked. */
+export const TEMPLE_BOSS_CAST_SCHOOLS: Readonly<Record<string, { school: 'frost' }>> = {
+  [SELTHE_MOONWATER_BOLT]: { school: 'frost' },
+  [SELTHE_DROWNING_ARIA]: { school: 'frost' },
+};
 
 // ---- encounter object templates (the state rides the template id) ----------------
 export const BRINE_SPIT_TEMPLATE = 'temple_brine_spit_pool';
@@ -79,6 +106,15 @@ export const TSUNAMI_TEMPLATES = {
   warn: 'temple_tsunami_warn',
   surge: 'temple_tsunami_surge',
 } as const;
+/** One slice of the Tideglass Fracture (its facing is the slice's middle
+ *  heading round the terrace centre, its scale the slice's reach): cracking
+ *  while the bar opens, then red (it detonates) or safe (clear glass). */
+export const FRACTURE_TEMPLATES = {
+  crack: 'temple_fracture_crack',
+  red: 'temple_fracture_red',
+  safe: 'temple_fracture_safe',
+} as const;
+export type FractureState = keyof typeof FRACTURE_TEMPLATES;
 export const CHORUS_ECHO_TEMPLATE = 'temple_chorus_echo';
 export const SOLO_ECHO_TEMPLATE = 'temple_solo_echo';
 export const RIPTIDE_TEMPLATE = 'temple_riptide_pool';
@@ -98,7 +134,15 @@ export const TEMPLE_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   SOLO_ECHO_TEMPLATE,
   RIPTIDE_TEMPLATE,
   ...Object.values(TIDE_TEMPLATES),
+  ...Object.values(FRACTURE_TEMPLATES),
 ]);
+
+export function fractureStateOf(templateId: string): FractureState | null {
+  if (templateId === FRACTURE_TEMPLATES.crack) return 'crack';
+  if (templateId === FRACTURE_TEMPLATES.red) return 'red';
+  if (templateId === FRACTURE_TEMPLATES.safe) return 'safe';
+  return null;
+}
 
 export function tideStateOf(templateId: string): TideState | null {
   if (templateId === TIDE_TEMPLATES.dry) return 'dry';
@@ -124,12 +168,55 @@ export const SELTHE_TUNING = {
   songCast: 1.5,
   songMin: 35,
   songMax: 45,
-  slapFirst: 8,
-  slapEvery: 15,
-  slapCast: 1,
-  slapMin: 50,
-  slapMax: 60,
-  slapKnockback: 8,
+  // ---- the caster pass: she never swings her hands and never leaves her pool.
+  // Moonwater Bolt replaces her melee as the tank's pressure. Her swing was
+  // her weapon roll (63 to 98 on normal, the elite template at 16) every
+  // 2.2 s: 35.8 raw DPS, about 23 after a level-16 tank's 36 percent armor
+  // reduction (armor / (armor + 400 + 85 x 16) at about 1,000 armor). A bolt
+  // is one weapon roll x boltWeaponShare of frost (armor never touches it)
+  // every boltCast + boltGap = 2.5 s: 0.8 x 80.7 / 2.5 = about 26 DPS while
+  // she bolts, and she bolts only between her other bars, so the tank takes a
+  // little less than before. Reading her live weapon keeps the heroic row's
+  // melee factor on it (the tank-swing floor), where her mechanics ride the
+  // row's mechanic factor.
+  boltCast: 2,
+  boltGap: 0.5,
+  boltWeaponShare: 0.8,
+  boltRange: 45,
+  /** After a kick (any of her kickable bars cut short) she casts neither
+   *  bolt nor aria for this long, lockout or not (a boss shrugs the school
+   *  lockout's duration off by diminishing returns). */
+  kickQuiet: 3,
+  // Drowning Aria: a sung beam on one player who is not the tank, a pulse a
+  // second for 5 s, each pulse on the same body 10 harder than the last:
+  // 30 + 40 + 50 + 60 + 70 = 250 frost if nobody answers it (between one and
+  // two Solos, under a lone Chorus's 400). Kick it, break her sight of the
+  // target (a lamp pillar), or step into the beam: the first body between her
+  // and the target catches the pulse instead, and the climb starts over on
+  // whoever is struck anew, so the group can pass it round.
+  ariaFirst: 16,
+  ariaEvery: 22,
+  ariaChannel: 5,
+  ariaPulse: 1,
+  ariaBase: 30,
+  ariaStep: 10,
+  ariaRange: 45,
+  /** A body this close to the beam's line catches it. */
+  ariaCatchWidth: 1.5,
+  // Mere Surge (replaces the Tidal Slap): a 3 s bar facing one player, then a
+  // wave crashes through a 60 degree wedge out to 30 yd: 110 to 130 frost and
+  // a shove of 8 yd (the Slap's 50 to 60 plus its 8 yd throw, priced up to
+  // the Hydra's avoidable Crushing Torrent, 90 to 110, since it can catch
+  // several players). Heroic widens the wedge to 90 degrees.
+  surgeFirst: 12,
+  surgeEvery: 18,
+  surgeCast: 3,
+  surgeRange: 30,
+  surgeArcDeg: 60,
+  surgeArcDegHeroic: 90,
+  surgeMin: 110,
+  surgeMax: 130,
+  surgeKnockback: 8,
   // Heroic Echo: each mark resolves again at the same spot 4 s later.
   echoAfter: 4,
   chorusEchoDamage: 120,
@@ -285,9 +372,80 @@ export const COLOSSUS_TUNING = {
   swapEvery: 8,
   /** The deed: every Reflection broken within this many seconds of appearing. */
   deedWindow: 15,
+  // Tideglass Fracture: the terrace floor splits into eight prism slices
+  // round its centre. A 1.5 s bar (the floor cracks), then three rounds: some
+  // slices glow red, the rest run clear, and fractureWarn later the red ones
+  // detonate (120 to 130 arcane to everyone standing on one, and on the hub
+  // under the plinth). Each round's safe slices were red the round before, so
+  // every round the group must move one slice over. He stands planted for the
+  // whole channel (1.5 + 3 x 2.5 = 9 s), no Lance or Slam inside it. Priced
+  // just above the Moonlight Lance (90 to 110): a round is readable for 2.5 s
+  // and a move of one slice (about 8 yd at 10 yd out) takes about 1.1 s at
+  // run speed. Standing still through all three costs about 375, the price of
+  // a fumbled core (the Lance and the Slam together are about 190).
+  fractureFirst: 20,
+  fractureEvery: 32,
+  fractureCast: 1.5,
+  fractureWarn: 2.5,
+  /** Heroic: the red slices detonate sooner. */
+  fractureWarnHeroic: 2,
+  fractureMin: 120,
+  fractureMax: 130,
 } as const;
 
 export const TERRACE = PRISM_TERRACE;
+
+/** The Tideglass Fracture's slices round the terrace centre (slice 0 is
+ *  centred due +z; the index grows with the sim yaw, toward +x first). */
+export const FRACTURE_SLICES = 8;
+/** The hub under the plinth: part of no slice, it detonates every round. */
+export const FRACTURE_HUB = 3;
+/** How far out the fracture runs (the terrace and the step below its rim). */
+export const FRACTURE_REACH = PRISM_TERRACE.r + 8;
+/** Each round's SAFE slices before the cast's rotation. A round's safe
+ *  slices are all red in the round before it: everyone moves. */
+export const FRACTURE_SAFE_PATTERNS: readonly (readonly number[])[] = [
+  [1, 3, 5, 7],
+  [0, 2, 4, 6],
+  [3, 7],
+];
+export const FRACTURE_ROUNDS = FRACTURE_SAFE_PATTERNS.length;
+
+/** The middle heading (sim yaw, 0 toward +z) of slice `i`. */
+export function fractureSliceYaw(i: number): number {
+  return (i * Math.PI * 2) / FRACTURE_SLICES;
+}
+
+/**
+ * The slice a spot (instance-local) stands on, or 'hub' under the plinth, or
+ * null off the fracture entirely (beyond its reach). Slice i spans its middle
+ * heading +-22.5 degrees; a spot exactly on a seam belongs to the lower index.
+ */
+export function fractureSliceAt(x: number, z: number): number | 'hub' | null {
+  const dx = x - PRISM_TERRACE.x;
+  const dz = z - PRISM_TERRACE.z;
+  const d = Math.hypot(dx, dz);
+  if (d > FRACTURE_REACH) return null;
+  if (d < FRACTURE_HUB) return 'hub';
+  const step = (Math.PI * 2) / FRACTURE_SLICES;
+  let a = Math.atan2(dx, dz) + step / 2;
+  a = ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  return Math.min(FRACTURE_SLICES - 1, Math.floor(a / step));
+}
+
+/** The safe slices of round `round` (0 based) for a cast rotated `rot`. */
+export function fractureSafeSlices(round: number, rot: number): number[] {
+  const base = FRACTURE_SAFE_PATTERNS[round] ?? [];
+  return base.map((i) => (((i + rot) % FRACTURE_SLICES) + FRACTURE_SLICES) % FRACTURE_SLICES);
+}
+
+/** Does a spot detonate in this round (a red slice, or the hub)? */
+export function fractureHits(round: number, rot: number, x: number, z: number): boolean {
+  const at = fractureSliceAt(x, z);
+  if (at === null) return false;
+  if (at === 'hub') return true;
+  return !fractureSafeSlices(round, rot).includes(at);
+}
 
 // ---- Ysolei: run out of the undertow toward the dry half -------------------------------
 
