@@ -74,6 +74,7 @@ import {
 } from '../../sim/mob/trash_kit/cast_ids';
 import {
   TEMPLE_CALL_THE_TIDE,
+  TEMPLE_GLIMMER_VENOM,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
@@ -4559,12 +4560,35 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: TEMPLE_CLIPS,
     selfIllumination: 0.14,
   },
-  // The Glimmerscale Lurker's Pounce flies in the Leap pose and lands on Land.
+  // The Glimmerscale Lurker (glimmerscale_lurker; scripts/assets/
+  // drowned_temple_creatures/lurker_mantis/): a giant mantis shrimp the
+  // moon-water made sacred, long, low and armoured in iridescent plates
+  // (turquoise to violet, pearl rims, a carved crescent on every tergite),
+  // its front half reared, eyes on turning stalks banded in silver, two
+  // raptorial arms folded like jackknives, a tail fan of nacre paddles. Its
+  // swings snap the arms out (Attack: both, Attack2: one; contact at 0.16).
+  // Pounce flies in the Leap pose (arms flung open) and lands on Land. Glimmer
+  // Venom (2.0 s bar) plays Spit: it rears back with the glowing bolus swelling
+  // in its mouth and spits as the bar ends; bar-locked, so a kick shows.
+  // Dying, it rolls onto its back and its flank lights go out one by one.
+  // Drawn 4.4 at the reared front at its 1.2 (about 7 long): the design's 3.6
+  // read smaller than the player beside its long low body, so it grew to
+  // stay imposing.
   temple_lurker: {
     url: `${CREATURES}/temple_lurker.glb`,
-    height: 2.4,
-    clips: { ...TEMPLE_CLIPS, jump: 'Leap', land: 'Land' },
-    selfIllumination: 0.18,
+    height: 3.65,
+    clips: {
+      ...TEMPLE_CLIPS,
+      jump: 'Leap',
+      land: 'Land',
+      castByAbility: { [TEMPLE_GLIMMER_VENOM]: 'Spit' },
+      castTimeScaleByAbility: { [TEMPLE_GLIMMER_VENOM]: 1 },
+    },
+    walkRef: 2.6,
+    runRef: 7.2,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
   },
   // The bosses. Choirmother Selthe sings her court's rhythm: the Sea-Song on
   // the golden conch, the Tidal Slap backhand (the marks play from

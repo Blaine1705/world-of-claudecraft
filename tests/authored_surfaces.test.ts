@@ -206,6 +206,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_siren',
   // the Drowned Temple's Blender Tidewisp (the drop of moon-water)
   'temple_tidewisp',
+  // the Drowned Temple's Blender Glimmerscale Lurker (the sacred mantis shrimp)
+  'temple_lurker',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

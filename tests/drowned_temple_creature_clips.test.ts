@@ -21,6 +21,7 @@ import {
 import { updateBossMechanics } from '../src/sim/mob/boss_mechanics';
 import {
   TEMPLE_CALL_THE_TIDE,
+  TEMPLE_GLIMMER_VENOM,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
@@ -264,6 +265,45 @@ describe('the Tidewisp: a drop of moon-water of its own', () => {
     expect(v.authoredAtlas).toBe(true);
     // Drawn 2.2 with its trail at its 0.8.
     expect(v.height * (MOBS.tidewisp.scale ?? 1)).toBeCloseTo(2.2, 2);
+  });
+});
+
+describe('the Glimmerscale Lurker: the sacred mantis shrimp', () => {
+  it('ships its own body with a clip for every job', () => {
+    expect(clipsOf('public/models/creatures/temple_lurker.glb').sort()).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'Cast',
+        'Death',
+        'Hit',
+        'Idle',
+        'Land',
+        'Leap',
+        'Run',
+        'Spit',
+        'Walk',
+      ].sort(),
+    );
+    const v = visualOf('glimmerscale_lurker');
+    expect(v.url).toMatch(/temple_lurker\.glb$/);
+    expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 4.38 to the reared front at its 1.2: 1.7 times the 2.6 player.
+    expect(v.height * (MOBS.glimmerscale_lurker.scale ?? 1)).toBeCloseTo(4.38, 2);
+  });
+
+  it('pounces in the jump slots and spits Glimmer Venom on its bar', () => {
+    const v = visualOf('glimmerscale_lurker');
+    const c = v.clips;
+    expect(MOBS.glimmerscale_lurker.trashKit?.leap?.seconds).toBe(0.6);
+    expect(c.jump).toBe('Leap');
+    expect(c.land).toBe('Land');
+    expect(c.castByAbility?.[TEMPLE_GLIMMER_VENOM]).toBe('Spit');
+    expect(c.castTimeScaleByAbility?.[TEMPLE_GLIMMER_VENOM]).toBe(1);
+    expect(MOBS.glimmerscale_lurker.trashKit?.bolt?.castTime).toBe(2);
+    expect(v.castClipSync).toBe(true);
+    expect(c.castPlayOut ?? []).not.toContain('Spit');
   });
 });
 

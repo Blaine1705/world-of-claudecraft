@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c7c00b372cc034522c2afc1e6d81043593e7f603c6cf3d05dd7d9ee9a2d82004",
+  "rendererFingerprint": "66027136c92f4610d91f69dbc3dde8469370ef55d0e5a0593fa586fdb2afbfcc",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5475894,
-      "sha256": "d04999712dda0c00427b2a280350a997b921fbeb8bd40a2e96473a9e04e15728",
+      "sha256": "d9f35114702030b573d81edf71e532aab5d5b873a03994e87092e895abd5cc9a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3479,11 +3479,11 @@
         "model": {
           "url": "models/creatures/temple_lurker.glb",
           "path": "public/models/creatures/temple_lurker.glb",
-          "bytes": 827508,
-          "sha256": "5a69999d8209ba2b1a787811f833019d9c70bb496fbcd58d9ccc46847a70c64b"
+          "bytes": 2169424,
+          "sha256": "01030724213d02075e517f9d9685742a8023cd863d4f46b49d0e2972a68f5d36"
         },
         "idle": "Idle",
-        "height": 2.4,
+        "height": 3.65,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -3497,11 +3497,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bf514665e24962f6f3a4d12a227e3e95eae2f7e433139a4bf58650ef6c6099d8",
+      "sourceFingerprint": "a46f29ba8c32a5908c1e2e285e108ac2e8382c186d0a27a9776016300b44c3f5",
       "output": {
         "path": "public/ui/mobs/glimmerscale_lurker.webp",
-        "bytes": 1918,
-        "sha256": "15c7155dd559067c01c2b856b3a8351b669b17dc35a9a8750590ab9835951020"
+        "bytes": 1782,
+        "sha256": "817617f5d5391737d5f251bc41aed3367c8d70ffc9bd28c518bf2421318eef82"
       }
     },
     {
