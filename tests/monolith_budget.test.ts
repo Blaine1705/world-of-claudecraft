@@ -1013,7 +1013,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12663 -> 12661: the boot-attached static dressing list (lake
     // flora, the Farshore strand, now the Sanctum's Seal Gate) moved into
     // src/render/static_world_features.ts. wc -l. Exact count.
-    ceiling: 12661,
+    // LOWERED 12661 -> 12659: the five lazy form-rig builds became one call
+    // into src/render/characters/form_rig_sync.ts (which also keeps the shared
+    // polymorph slot on the right animal: the Toad Hex's toad). wc -l.
+    ceiling: 12659,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -127,6 +127,21 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // fallen's glowing outlines lie on the floor and the water (ground band); it
   // plays once the last boss is dead, so no telegraph is ever under it.
   { file: 'src/render/drowned_temple/temple_cantor_finale_fx.ts', layer: 'ground', strict: true },
+  // The Temple trash mechanics pass: the whirlpool's vortex, the gaze's reach
+  // rim and the floor waves under the kit's rings, and the bubbles, threads,
+  // eyes and arcs in the air above every floor mark, all on the encounter band.
+  { file: 'src/render/drowned_temple/temple_trash_fx.ts', layer: 'encounter', strict: true },
+  // The Temple encounter pass's floor marks on the encounter band: the
+  // Combined Breath's currents, frost and lee marks, and the Moonbridge's
+  // landing ring. Non-strict: the Ice Wall and the Rime crystals (standing
+  // solids) and the Moonbridge's beam (core, sheath, front, prism) stand up
+  // off the floor on their own orders.
+  {
+    file: 'src/render/drowned_temple/temple_hydra_combo_fx.ts',
+    layer: 'encounter',
+    strict: false,
+  },
+  { file: 'src/render/drowned_temple/temple_moonbridge_fx.ts', layer: 'encounter', strict: false },
   // The Wildheart Basin's brazier pools on its floors (the world's own light).
   { file: 'src/render/wildheart_basin/basin_lights.ts', layer: 'ground', strict: true },
   // The spirit light pooled on the jaguar maw's jaw once the way out opens.
@@ -137,6 +152,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Basin's three bosses (composed by basin_fx.ts): their cast telegraphs
   // on the shared kit, the charge sigils and the sun glyph overlays.
   { file: 'src/render/wildheart_basin/basin_boss_fx.ts', layer: 'encounter', strict: true },
+  // The trash hunt (composed by basin_fx.ts): its telegraphs on the shared kit,
+  // the quarry's claw rakes and the frenzies' red pools.
+  { file: 'src/render/wildheart_basin/basin_trash_fx.ts', layer: 'encounter', strict: true },
   // The basin's shared splashes (the Saurian's water, the pit's sand, the pods'
   // goo, Gorge's acid: crowns and ripples) on the ground band: cosmetic, so
   // every telegraph paints over them.

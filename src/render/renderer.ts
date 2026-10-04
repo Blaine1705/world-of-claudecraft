@@ -195,6 +195,7 @@ import {
   trainingDummyAssetsReady,
 } from './characters/assets';
 import { damageEventStartsAttackAnimation } from './characters/damage_attack_animation';
+import { type FormRigBuild, syncFormRig } from './characters/form_rig_sync';
 import {
   activeCharacterFormVisual,
   characterFormMaskForAura,
@@ -4813,6 +4814,10 @@ export class Renderer {
       (settled) => this.gateSwapFlagOnCompile(target, settled),
       () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),
     );
+
+  /** buildFormVisual as one stable callback (no per-frame closure). */
+  private readonly buildFormRig: FormRigBuild<Entity, EntityView> = (e, v, key, slot, gate) =>
+    this.buildFormVisual(e, v, key, slot, gate);
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
    *  unset; the shared gate retries after its cooldown. A freshly built form
@@ -10433,16 +10438,9 @@ export class Renderer {
       // the body froze in the chop's windup.
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
-      // (build, compile gate and encounter prewarm all live in buildFormVisual)
-      if (polyed && !v.sheepVisual) this.buildFormVisual(e, v, 'form_sheep', 'sheepVisual', true);
-      if (bear && !v.bearVisual) this.buildFormVisual(e, v, 'form_bear', 'bearVisual', true);
-      if (cat && !v.catVisual) this.buildFormVisual(e, v, 'form_cat', 'catVisual', true);
-      if (travel && !v.travelVisual) {
-        this.buildFormVisual(e, v, 'form_travel', 'travelVisual', true);
-      }
-      if (metamorphForm && !v.metamorphVisual) {
-        this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false);
-      }
+      // (build, compile gate and encounter prewarm all live in buildFormVisual;
+      // a polymorph slot holding the other animal rebuilds: form_rig_sync.ts)
+      syncFormRig(e, v, requestedForm, this.buildFormRig);
       // A form rig that is still linking is NOT ready: the mask holds the
       // resolved form at 'base', so the BODY stands in and a polymorphed target
       // turns into a sheep a few frames late instead of vanishing for the whole

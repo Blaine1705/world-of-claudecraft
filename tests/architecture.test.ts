@@ -887,6 +887,9 @@ const RENDER_PURE_CORES = [
   'src/render/wildheart_basin/lasher_model_core.ts',
   'src/render/wildheart_basin/lasher_fx_core.ts',
   'src/render/wildheart_basin/basin_thorns_core.ts',
+  // The trash hunt (the trash mechanics pass): its telegraphs, shocks, marks,
+  // tongue and clip rates, all read off the sim's templates.
+  'src/render/wildheart_basin/basin_trash_fx_core.ts',
   'src/render/wildheart_basin/maw_glow_core.ts',
   // The Gravewyrm Sanctum's Sledge Tusker body and sledge (measured facts,
   // clip beats, the sledge's trailer drag and the bowls onto their patches)
@@ -929,6 +932,9 @@ const RENDER_PURE_CORES = [
   'src/render/drowned_temple/temple_moon_core.ts',
   'src/render/drowned_temple/temple_manta_core.ts',
   'src/render/drowned_temple/temple_moonbridge_core.ts',
+  // The Temple trash mechanics pass: the vigil bubble, the oath, the echo,
+  // the gaze eye and veil, the whirlpool, the spark's arcs and the swell.
+  'src/render/drowned_temple/temple_trash_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',
