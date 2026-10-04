@@ -20,6 +20,8 @@ from them. Shape copied from `../hollow_crypt/` (the pilot's package).
 | `bastion_gates.ts` | Portcullises, the drawbridge and the fog walls, driven by the shared gate memory (`../hollow_crypt/crypt_gate_state_core.ts`). |
 | `bastion_fx_core.ts` / `bastion_fx.ts` | PURE plan plus painter for the floor telegraphs (trash cones, rings, lanes, kick glyphs, Brine Burst), drawn through the shared `../floor_telegraph` kit; boss casts register through `registerBastionTelegraph`. Hosted by `rift_death_zone.ts`. |
 | `bastion_boss_fx_core.ts` / `bastion_boss_fx.ts` | PURE plan plus painter for the boss visuals (buttress states and crashes, the lit posts, the hook chain and its guide, the Undertow Wake, the beam pool, the reveal, the Hymn flood, the Hermit dome). Owned by `BastionFx` under its compile gate; reads only IWorld entity state. |
+| `bastion_flood.ts` | The Drowning Hymn's flood sheet over the Beacon Crown (plan in `bastion_boss_fx_core.ts`: `crownFloodDepth`, `crownFloodAlpha`, `crownFloodKeep`): a ring from under the Fogbeacon's foot to under the parapet's body, kept below the embrasure sills, sloping to the flags at the stair mouth; fog-aware standing water on order 0. Built by `BastionBossFx`. |
+| `bastion_gaol_reaper_core.ts` / `bastion_reaper_fx.ts` | PURE plan plus painter for the Turnkey's cage, Ossick's anchor and shackles and Vael's reaper visuals, including the Fog Veil's emergence (the boil and fog under every rising figure, identical for the real Vael and his copies; `veilBoilAlpha`, `veilBoilScale`, `veilRiseEmerged`, and the Emerge clip rate `VAEL_VEIL_RISE_CLIP_RATE` the manifest plays the rise at). |
 
 Rules:
 - Cosmetic only: nothing here decides or hides an outcome. Density sheds with the

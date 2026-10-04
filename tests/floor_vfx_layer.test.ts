@@ -320,6 +320,9 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/sunken_bastion/bastion_beacon.ts',
   'src/render/sunken_bastion/bastion_shore.ts',
   'src/render/sunken_bastion/bastion_water.ts',
+  // The Drowning Hymn's flood over the Beacon Crown: standing water too, on
+  // the same water surface order 0 under the whole ladder.
+  'src/render/sunken_bastion/bastion_flood.ts',
   'src/render/sunken_bastion/bastion_gates.ts',
   // The Drowned Temple's sky, lagoon, mist and light-fish; the crater and its
   // falls; the gates (a water veil, wards, a rising stair, the Moonbridge);

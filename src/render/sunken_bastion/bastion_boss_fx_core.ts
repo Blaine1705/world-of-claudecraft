@@ -12,6 +12,8 @@ import {
   BASTION_BUTTRESSES,
   BEACON_CROWN,
   BUTTRESS_HALF,
+  FOGBEACON,
+  SUNKEN_BASTION_FIELD,
 } from '../../sim/content/sunken_bastion_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import {
@@ -158,11 +160,97 @@ export function hymnFlood(castRemaining: number, castTotal: number): number {
   return t * t * (3 - 2 * t) * 0.6 + t * 0.4;
 }
 
-/** The flood's rise (yards) over the crown floor at full hymn. */
-export const HYMN_FLOOD_DEPTH = 1.1;
-
 /** The crown the flood fills. */
 export const CROWN = BEACON_CROWN;
+
+/** The crown's parapet (bastion_plan_core.ts edge dressing, Kit_Parapet in
+ *  docs/design/dungeon-rework/kit/build_sunken_bastion_kit.py): a yard-thick
+ *  wall flush with the crown's lip, so its inner face stands a yard inside it,
+ *  and its embrasure sills 1.08 over the flags (the wall body to 1.0 under a
+ *  0.1 coping). */
+export const CROWN_PARAPET_INNER = BEACON_CROWN.r - 1;
+export const CROWN_SILL_HEIGHT = 1.08;
+
+/** Where the flood's sheet starts over the flags (clear of them, never a
+ *  skin fighting the floor for depth), and how far it rises at full hymn:
+ *  shin-deep, well under the sills, so it never stands in an embrasure. */
+export const HYMN_FLOOD_LIFT = 0.06;
+export const HYMN_FLOOD_DEPTH = 0.72;
+
+/** The sheet's ring: from under the Fogbeacon's foot to just inside the
+ *  parapet's yard-thick body (its rim always tucked under the wall). */
+export const CROWN_FLOOD_INNER = FOGBEACON.r - 0.5;
+export const CROWN_FLOOD_OUTER = CROWN_PARAPET_INNER + 0.35;
+
+/** The flood's depth over its lift at `level` (0 dry to 1 full). Scalars, not
+ *  an object: the painter reads them every frame in every zone. */
+export function crownFloodDepth(level: number): number {
+  return Math.min(1, Math.max(0, level)) * HYMN_FLOOD_DEPTH;
+}
+
+/** The flood's opacity at `level`: a wet sheen first, murky sea by a third. */
+export function crownFloodAlpha(level: number): number {
+  return Math.min(1, Math.max(0, level) * 3);
+}
+
+/** The gap in the parapet where the crown stair comes up (the layout's
+ *  `crown_stair` path crossing the crown's edge): its yaw from the crown's
+ *  centre (sim convention, atan2(dx, dz)) and its half angle at the rim. */
+export const CROWN_STAIR_MOUTH: { yaw: number; half: number } = stairMouth();
+
+function stairMouth(): { yaw: number; half: number } {
+  const path = SUNKEN_BASTION_FIELD.surfaces.find((s) => s.id === 'crown_stair');
+  if (path?.kind !== 'path') return { yaw: 0, half: 0 };
+  const r = BEACON_CROWN.r;
+  const pts = path.points.map(([x, z]) => ({ x: x - BEACON_CROWN.x, z: z - BEACON_CROWN.z }));
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const a = pts[i];
+    const b = pts[i + 1];
+    const ra = Math.hypot(a.x, a.z);
+    const rb = Math.hypot(b.x, b.z);
+    if (ra < r === rb < r) continue;
+    // Where the segment crosses the rim (bisection: the segment is short).
+    let lo = 0;
+    let hi = 1;
+    for (let k = 0; k < 40; k++) {
+      const t = (lo + hi) / 2;
+      const inside = Math.hypot(a.x + (b.x - a.x) * t, a.z + (b.z - a.z) * t) < r;
+      if (inside === ra < r) lo = t;
+      else hi = t;
+    }
+    const x = a.x + (b.x - a.x) * lo;
+    const z = a.z + (b.z - a.z) * lo;
+    return { yaw: Math.atan2(x, z), half: Math.asin(Math.min(1, path.halfWidth / r)) };
+  }
+  return { yaw: 0, half: 0 };
+}
+
+/** The lip the flood keeps at the stair mouth: it shallows to the flags over
+ *  these last yards before the rim, spilling off the stair top. */
+export const CROWN_FLOOD_LIP = 4;
+
+function smooth01(e0: number, e1: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+  return t * t * (3 - 2 * t);
+}
+
+/** The share of the flood's depth kept at crown-local (lx, lz): 1 over the
+ *  whole roof and at the walled rim, easing to 0 at the stair mouth's edge (no
+ *  wall holds the water there, so the sheet never ends in a cliff of water). */
+export function crownFloodKeep(lx: number, lz: number): number {
+  const m = CROWN_STAIR_MOUTH;
+  if (m.half <= 0) return 1;
+  let d = Math.atan2(lx, lz) - m.yaw;
+  d = Math.atan2(Math.sin(d), Math.cos(d));
+  const across = 1 - smooth01(m.half * 0.75, m.half + 0.1, Math.abs(d));
+  const radial = smooth01(
+    CROWN_FLOOD_OUTER - CROWN_FLOOD_LIP,
+    CROWN_FLOOD_OUTER,
+    Math.hypot(lx, lz),
+  );
+  const keep = 1 - across * radial;
+  return keep > 1 - 1e-9 ? 1 : keep < 1e-9 ? 0 : keep;
+}
 
 /** The beam's half angle and the radius it sweeps the roof out to. */
 export const BEAM_HALF = VAEL_TUNING.beamHalf;

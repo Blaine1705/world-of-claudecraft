@@ -8,7 +8,17 @@ import {
   buttressAt,
   buttressCrash,
   buttressPiece,
+  CROWN_FLOOD_INNER,
+  CROWN_FLOOD_OUTER,
+  CROWN_PARAPET_INNER,
+  CROWN_SILL_HEIGHT,
+  CROWN_STAIR_MOUTH,
   chainPoints,
+  crownFloodAlpha,
+  crownFloodDepth,
+  crownFloodKeep,
+  HYMN_FLOOD_DEPTH,
+  HYMN_FLOOD_LIFT,
   hookHeat,
   hymnFlood,
   oathLaneLength,
@@ -19,6 +29,7 @@ import {
 } from '../src/render/sunken_bastion/bastion_boss_fx_core';
 import {
   BASTION_BUTTRESSES,
+  BEACON_CROWN,
   BREACH_BASTION,
   FOGBEACON,
 } from '../src/sim/content/sunken_bastion_layout';
@@ -98,6 +109,61 @@ describe('Sunken Bastion boss fx core', () => {
     }
     expect(hymnFlood(18, 18)).toBe(0);
     expect(hymnFlood(0, 18)).toBeCloseTo(1, 6);
+  });
+
+  // The Hymn's flood used to rise 1.15 yd over the flags, past the parapet's
+  // embrasure sills (1.08), on a disc that reached into the wall and ended in
+  // a hard sheet of water over the stair top: it stood in every embrasure and
+  // floated over the stair mouth. These pin the sheet inside the roof.
+  it('keeps the flood under the embrasure sills and clear of the flags', () => {
+    expect(HYMN_FLOOD_LIFT + HYMN_FLOOD_DEPTH).toBeLessThan(CROWN_SILL_HEIGHT - 0.2);
+    // Never a skin on the flags: it starts clear of them and is shin-deep at full.
+    expect(HYMN_FLOOD_LIFT).toBeGreaterThanOrEqual(0.05);
+    expect(HYMN_FLOOD_DEPTH).toBeGreaterThan(0.5);
+    expect(crownFloodAlpha(0)).toBe(0);
+    expect(crownFloodDepth(0)).toBe(0);
+    expect(crownFloodDepth(1)).toBeCloseTo(HYMN_FLOOD_DEPTH, 6);
+    expect(crownFloodAlpha(1)).toBe(1);
+    let prev = { depth: 0, alpha: 0 };
+    for (let k = 0.05; k <= 1; k += 0.05) {
+      const s = { depth: crownFloodDepth(k), alpha: crownFloodAlpha(k) };
+      expect(s.depth).toBeGreaterThanOrEqual(prev.depth);
+      expect(s.alpha).toBeGreaterThanOrEqual(prev.alpha);
+      prev = s;
+    }
+  });
+
+  it('fills the roof between the beacon foot and the parapet, tucked under the wall', () => {
+    expect(CROWN_PARAPET_INNER).toBeCloseTo(BEACON_CROWN.r - 1, 6);
+    // The rim hides under the wall body (a yard thick), never past its sea face.
+    expect(CROWN_FLOOD_OUTER).toBeGreaterThan(CROWN_PARAPET_INNER);
+    expect(CROWN_FLOOD_OUTER).toBeLessThan(CROWN_PARAPET_INNER + 0.6);
+    // The hole hides under the Fogbeacon's foot.
+    expect(CROWN_FLOOD_INNER).toBeLessThan(FOGBEACON.r);
+    expect(CROWN_FLOOD_INNER).toBeGreaterThan(FOGBEACON.r - 1.5);
+  });
+
+  it('spills off the stair top instead of ending in a wall of water', () => {
+    const m = CROWN_STAIR_MOUTH;
+    // The crown stair comes up from the south-west.
+    const deg = ((((m.yaw * 180) / Math.PI) % 360) + 360) % 360;
+    expect(deg).toBeGreaterThan(195);
+    expect(deg).toBeLessThan(225);
+    expect(m.half).toBeGreaterThan(0.1);
+    const at = (yaw: number, r: number) => crownFloodKeep(Math.sin(yaw) * r, Math.cos(yaw) * r);
+    // Full depth over the roof and at the walled rim.
+    expect(at(0, 15)).toBe(1);
+    expect(at(0, CROWN_FLOOD_OUTER)).toBe(1);
+    expect(at(m.yaw + Math.PI, CROWN_FLOOD_OUTER)).toBe(1);
+    expect(at(m.yaw, 12)).toBe(1);
+    // Down to the flags at the mouth's edge, shallowing toward it.
+    expect(at(m.yaw, CROWN_FLOOD_OUTER)).toBe(0);
+    const mid = at(m.yaw, CROWN_FLOOD_OUTER - 1.5);
+    expect(mid).toBeGreaterThan(0);
+    expect(mid).toBeLessThan(1);
+    // And eases back to full at the mouth's flanks (no step in the surface).
+    expect(at(m.yaw + m.half * 0.5, CROWN_FLOOD_OUTER)).toBeLessThan(0.05);
+    expect(at(m.yaw + m.half + 0.2, CROWN_FLOOD_OUTER)).toBe(1);
   });
 
   it('predicts the beam the sim turns and reveals only the figure inside it', () => {
