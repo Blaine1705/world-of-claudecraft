@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c3e689e659233c5727a9a9aa3fca80ce2c4dea60bac2091dfd6a5c753b7f86d0",
+  "rendererFingerprint": "86ece4cf656f1627fb23836d6151b7d6d44f0fad1821ec03419155e01739f9f8",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5475894,
-      "sha256": "069fa8a0e616bb55b27ab4f5ac34c115bbfc6acfe569d397939c2b37acc95653",
+      "sha256": "76cd08b766bad13e3f3f6dd8f4627615c39d4e20081529c3db9d5b2a22251a38",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5648,11 +5648,11 @@
         "model": {
           "url": "models/creatures/temple_snapper.glb",
           "path": "public/models/creatures/temple_snapper.glb",
-          "bytes": 470780,
-          "sha256": "c43f18a23b2c3f0826fd9d8b3dbcaeb7b47c5e9c5df85a888670613f9752d9bf"
+          "bytes": 2279000,
+          "sha256": "74bf9d0fee61d06704a82ecc97a18fd68ad729172295904918762fb08aaa794d"
         },
         "idle": "Idle",
-        "height": 3.4,
+        "height": 3.83,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5666,11 +5666,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "99babc7d09318c354fa943d5264df8cac95a0ee42be01a69bb5c34326e58f4f0",
+      "sourceFingerprint": "21c4e6a54c4f7c5b3066fd98d340bea4e35331229fd2523848939ef0150c0157",
       "output": {
         "path": "public/ui/mobs/lagoon_snapper.webp",
-        "bytes": 1996,
-        "sha256": "d016f7bff5e0e9836665a7c2c800e263230d6cc1b5f53c3972c4f9fdf4ed91ed"
+        "bytes": 2436,
+        "sha256": "fee1b3b71199c40d7bd0204bbcf05af0cbbe4c807b374a2f584a5a7624b4a71e"
       }
     },
     {

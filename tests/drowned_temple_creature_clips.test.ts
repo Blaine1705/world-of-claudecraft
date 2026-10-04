@@ -35,6 +35,7 @@ import {
   TEMPLE_PALE_MENDING,
   TEMPLE_PEARL_SLAM,
   TEMPLE_SKEWERING_TRIDENT,
+  TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
 } from '../src/sim/mob/trash_kit/temple_cast_ids';
@@ -421,6 +422,40 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
     expect(c.attackByAbility?.[SELTHE_SOLO_MARK]).toBe('Solo');
     expect(SELTHE_TUNING.songCast).toBe(1.5);
     expect(SELTHE_TUNING.slapCast).toBe(1);
+  });
+});
+
+describe('the Lagoon Snapper: the sacred nautilus', () => {
+  it('ships its own body with a clip for every job', () => {
+    expect(clipsOf('public/models/creatures/temple_snapper.glb').sort()).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'Cast',
+        'Death',
+        'Hit',
+        'Idle',
+        'Run',
+        'ShellUp',
+        'Snap',
+        'Walk',
+      ].sort(),
+    );
+    const v = visualOf('lagoon_snapper');
+    expect(v.url).toMatch(/temple_snapper\.glb$/);
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 4.6 at its 1.2: 1.8 times the 2.6 player.
+    expect(v.height * (MOBS.lagoon_snapper.scale ?? 1)).toBeCloseTo(4.6, 1);
+  });
+
+  it('snaps on its bar and holds its shell shut while Shell Up stuns it', () => {
+    const c = visualOf('lagoon_snapper').clips;
+    expect(c.castByAbility?.[TEMPLE_SNAP]).toBe('Snap');
+    expect(c.castTimeScaleByAbility?.[TEMPLE_SNAP]).toBe(1);
+    expect(MOBS.lagoon_snapper.breathCone?.castTime).toBe(1.5);
+    // Shell Up is a self-stun: the rig's stunned loop is the closed shell
+    expect(c.stunned).toBe('ShellUp');
+    expect(MOBS.lagoon_snapper.trashKit?.withdraw?.seconds).toBe(5);
   });
 });
 

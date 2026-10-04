@@ -212,6 +212,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_sentinel',
   // the Drowned Temple's Blender Choirmother Selthe (the siren matriarch)
   'temple_selthe',
+  // the Drowned Temple's Blender Lagoon Snapper (the sacred nautilus)
+  'temple_snapper',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

@@ -4568,15 +4568,31 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.22,
   },
+  // The Lagoon Snapper (lagoon_snapper; scripts/assets/
+  // drowned_temple_creatures/snapper_nautilus/): a giant sacred nautilus, its
+  // spiral shell standing like a wheel (turquoise tiger stripes, a glowing
+  // nacre lip, silver crescent medallions with pearls in its navel), a fleshy
+  // hood, lidless eyes with a slit of light, a crown of tentacles round a
+  // blue-black beak. Its swings part the tentacles and strike with the beak.
+  // Snap (1.5 s bar) plays Snap: the crown gathers, the shell rocks back, the
+  // beak shoots out with every tentacle flung open on the bar's end. Shell Up
+  // is a self-stun, so its stunned loop (ShellUp) holds while it lasts: the
+  // tentacles drawn in, the hood shut over the aperture. Dying, the shell tips
+  // onto its side. Drawn 4.6 at its 1.2.
   temple_snapper: {
     url: `${CREATURES}/temple_snapper.glb`,
-    height: 3.4,
+    height: 3.83,
     clips: {
       ...TEMPLE_CLIPS,
+      stunned: 'ShellUp',
       castByAbility: { [TEMPLE_SNAP]: 'Snap' },
-      castTimeScaleByAbility: { [TEMPLE_SNAP]: 1.3 },
+      castTimeScaleByAbility: { [TEMPLE_SNAP]: 1 },
     },
-    selfIllumination: 0.22,
+    walkRef: 2.0,
+    runRef: 5.0,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.08,
   },
   // The Pearlguard Sentinel (pearlguard_sentinel; scripts/assets/
   // drowned_temple_creatures/sentinel_clam/): a temple giant whose body is a
