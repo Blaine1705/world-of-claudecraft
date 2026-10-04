@@ -213,8 +213,8 @@ def build_body(voxel):
         F.add(Ellipsoid(_m((0.27, -0.3, 3.62), s), (0.27, 0.16, 0.2), rot_matrix(ry=0.2 * s), bone='Spine2'), 0.1)
         F.add(RoundCone(_m((0.1, 0.06, 3.9), s), _m(SHOULDER, s), 0.18, 0.17, bone=_side('Clavicle', s)), 0.1)
         F.add(Ellipsoid(_m((0.42, 0.1, 3.42), s), (0.2, 0.26, 0.38), bone='Spine2'), 0.1)
-    F.add(RoundCone((0, 0.08, 3.86), (0, -0.04, 4.38), 0.25, 0.2, bone='Neck1'), 0.12)
-    F.add(RoundCone((0, -0.04, 4.36), (0, -0.1, 4.62), 0.2, 0.17, bone='Neck'), 0.08)
+    F.add(RoundCone((0, 0.08, 3.86), (0, -0.04, 4.38), 0.3, 0.255, bone='Neck1'), 0.12)
+    F.add(RoundCone((0, -0.04, 4.36), (0, -0.1, 4.62), 0.255, 0.225, bone='Neck'), 0.08)
     for s in (1, -1):
         sh, el, wr = _m(SHOULDER, s), _m(ELBOW, s), _m(WRIST, s)
         up, fo = _side('UpperArm', s), _side('Forearm', s)
@@ -262,7 +262,7 @@ def build_body(voxel):
 def _head_unscaled(voxel):
     F = Field((-0.45, -1.15, 4.3), (0.45, 0.66, 5.72), voxel)
     noise = Noise(9)
-    F.add(RoundCone((0, 0.04, 4.42), (0, -0.08, 4.76), 0.2, 0.19, bone='Neck'), 0.08)
+    F.add(RoundCone((0, 0.04, 4.42), (0, -0.08, 4.76), 0.225, 0.2, bone='Neck'), 0.08)
     # the skull, tilted back so its crown runs up and over into the nape
     F.add(Ellipsoid((0, -0.12, 4.96), (0.19, 0.26, 0.23), rot_matrix(rx=0.3), bone='Head'), 0.08)
     # the throat under the head, carrying the line from the neck into the snout
@@ -285,6 +285,20 @@ def _head_unscaled(voxel):
     for u in (0.25, 0.45, 0.63, 0.8):
         c = lerp(a, b, u)
         F.ridge(Torus(c, unit(b - a), 0.125 - 0.05 * u + 0.004, 0.004), 0.012, k=0.012)
+    # tubercles along the snout's flanks and under it, and spines off each cheek plate
+    for s in (1, -1):
+        for u in (0.18, 0.36, 0.54, 0.7):
+            c = lerp(a, b, u)
+            r = 0.125 - 0.05 * u
+            F.add(Sphere(c + np.array((s * r * 0.86, 0.0, r * 0.32)), 0.017), 0.012)
+            F.add(Sphere(c + np.array((s * r * 0.5, 0.0, -r * 0.8)), 0.014), 0.01)
+        F.add(RoundCone(_m((0.2, -0.04, 4.78), s), _m((0.27, 0.07, 4.74), s), 0.028, 0.006, bone='Head'), 0.014)
+        F.add(RoundCone(_m((0.19, -0.16, 4.7), s), _m((0.24, -0.06, 4.62), s), 0.022, 0.005, bone='Head'), 0.012)
+        # a ridged lip at the operculum's lower edge
+        F.ridge(RoundCone(_m((0.12, -0.3, 4.72), s), _m((0.17, 0.02, 4.7), s), 0.003, 0.003), 0.012, k=0.012)
+    # rings under the throat, where the snout meets the jaw
+    for k_ in range(3):
+        F.ridge(Torus((0, -0.22 - 0.07 * k_, 4.7 + 0.01 * k_), (0, -0.4, 1.0), 0.09, 0.004), 0.008, k=0.012)
     # a ridge down the top of the snout to the brow
     F.ridge(RoundCone(a + np.array((0, 0.05, 0.13)), lerp(a, b, 0.7) + np.array((0, 0, 0.085)), 0.003, 0.003), 0.012,
             k=0.012)
@@ -444,23 +458,42 @@ def plates(Fb, voxel):
         G = X.layer_field(Fb, lo, hi, voxel, off, thick, mask, extra=extra, noise=dent)
         out.append((name, G, mat, binding, bone, allow))
 
-    # the cuirass: breast and back, ridged in horizontal lames like a seahorse's body rings
+    def onto(p, lift):
+        """A point carried onto the body's surface along its gradient, then lifted."""
+        q = np.asarray(p, float)[None, :]
+        for _ in range(4):
+            d = Fb.sample(q)
+            n = Fb.gradient(q)
+            q = q - n * d[:, None]
+        return (q + Fb.gradient(q) * lift)[0]
+
+    def rims(u, a, b, w=0.035, h=0.022):
+        """Raised borders at both ends (a, b) of a plate measured along u."""
+        return h * (rg(u, a, a + w * 0.4) * (1 - rg(u, a + w, a + w * 1.4))
+                    + rg(u, b - w * 1.4, b - w) * (1 - rg(u, b - w * 0.4, b)))
+
+    # the cuirass: one smooth breast- and backplate; the seahorse's rings only
+    # over the belly, where they read as the creature's own segments
     def cuir_mask(X_, Y_, Z_):
         return rg(Z_, 2.68, 2.76) * (1 - rg(Z_, 3.86, 3.94)) * (1 - rg(np.abs(X_), 0.52, 0.6))
 
     def cuir_thick(X_, Y_, Z_):
-        breast = rg(Z_, 3.28, 3.36) * rg(-Y_, 0.0, 0.2)
-        return 0.05 + 0.035 * _lames(Z_, 0.19, 0.1) * (1 - breast) + 0.02 * breast
+        upper = rg(Z_, 3.26, 3.34)
+        return 0.05 + 0.035 * _lames(Z_, 0.19, 0.1) * (1 - upper) + 0.025 * upper + 0.02 * rg(Z_, 3.84, 3.88)
 
     def cuir_extra(G):
-        # a keel down the breast and small tubercle spines at each ring's flank
-        G.add(RoundCone((0, -0.53, 3.75), (0, -0.48, 2.85), 0.035, 0.03), 0.03)
+        # a keel down the breast, tubercle spines at the belly rings' flanks, and
+        # the dorsal ridge of the seahorse down the backplate
+        G.add(RoundCone((0, -0.55, 3.75), (0, -0.5, 3.3), 0.035, 0.03), 0.03)
         for z in np.arange(2.88, 3.3, 0.19):
             for s in (1, -1):
                 ang = 0.95
                 r = 0.52
                 p = np.array((s * r * math.sin(ang), -r * math.cos(ang) * 0.85, z + 0.05))
                 G.add(RoundCone(p, p + np.array((0.05 * s, -0.05, 0.04)), 0.025, 0.006), 0.012)
+        for z in np.linspace(3.78, 2.86, 6):
+            p = onto((0.0, 0.6, z), 0.075)
+            G.add(RoundCone(p - np.array((0, 0.02, 0.05)), p + np.array((0, 0.09, 0.05)), 0.04, 0.01), 0.025)
     layer('Cuirass', (-0.85, -0.85, 2.55), (0.85, 0.7, 4.05), 0.025, cuir_thick, cuir_mask,
           allow=('Hips', 'Spine1', 'Spine2'), extra=cuir_extra)
 
@@ -473,31 +506,39 @@ def plates(Fb, voxel):
 
     def gor_thick(X_, Y_, Z_):
         return 0.04 + 0.025 * _lames(Z_, 0.12, 0.25)
-    layer('Gorget', (-0.75, -0.75, 3.7), (0.75, 0.7, 4.45), gor_off, gor_thick, gor_mask, allow=('Spine2', 'Neck1'))
+    layer('Gorget', (-0.8, -0.8, 3.7), (0.8, 0.75, 4.45), gor_off, gor_thick, gor_mask, allow=('Spine2', 'Neck1'))
 
-    # pauldrons: three lames stepping down the shoulder, a finned ridge along the top
+    # pauldrons: a great dome and two overlapping lames below it, each smaller,
+    # each flaring at its lower edge and tucked under the one above
     for s in (1, -1):
         c = _m(SHOULDER, s) + np.array((0.06 * s, 0.0, 0.08))
+        z1, z2, z3 = c[2] - 0.05, c[2] - 0.21, c[2] - 0.33
 
-        def pa_mask(X_, Y_, Z_, c=c, s=s):
+        def pa_mask(X_, Y_, Z_, c=c, s=s, z3=z3):
             d = np.sqrt((X_ - c[0]) ** 2 + (Y_ - c[1]) ** 2 + (Z_ - c[2]) ** 2)
-            return rg(d, 0.5, 0.42) * rg(Z_, c[2] - 0.36, c[2] - 0.26) * rg(X_ * s, 0.42, 0.52)
+            narrow = np.where(Z_ < c[2] - 0.21, 0.08, 0.0)
+            return rg(d, 0.52 - narrow, 0.44 - narrow) * rg(Z_, z3 - 0.02, z3 + 0.04) * rg(X_ * s, 0.42, 0.52)
 
-        def pa_off(X_, Y_, Z_, c=c):
-            return 0.06 + 0.07 * rg(Z_, c[2] + 0.1, c[2] - 0.3)
+        def pa_off(X_, Y_, Z_, c=c, z1=z1, z2=z2, z3=z3):
+            dome = 0.06 + 0.05 * rg(Z_, c[2] + 0.18, z1)
+            l1 = 0.085 + 0.06 * rg(Z_, z1, z2)
+            l2 = 0.11 + 0.06 * rg(Z_, z2, z3)
+            return np.where(Z_ > z1, dome, np.where(Z_ > z2, l1, l2))
 
-        def pa_thick(X_, Y_, Z_, c=c):
-            return 0.05 + 0.035 * _lames(Z_ - c[2], 0.15, 0.2)
+        def pa_thick(X_, Y_, Z_, z1=z1, z2=z2):
+            edge = 0.018 * (rg(Z_, z1 + 0.05, z1 + 0.01) * rg(Z_, z1 - 0.01, z1 + 0.01)
+                            + rg(Z_, z2 + 0.05, z2 + 0.01) * rg(Z_, z2 - 0.01, z2 + 0.01))
+            return 0.05 + edge
 
         def pa_fin(G, c=c, s=s):
             for k in range(4):
                 u = k / 3
                 p = c + np.array((0.12 * s, -0.22 + 0.42 * u, 0.2 - 0.04 * abs(u - 0.5)))
                 G.add(RoundCone(p, p + np.array((0.08 * s, 0.03, 0.17 - 0.05 * abs(u - 0.4))), 0.035, 0.008), 0.02)
-        layer(_side('Pauldron', s), c - 0.62, c + 0.62, pa_off, pa_thick, pa_mask, binding='rigid',
+        layer(_side('Pauldron', s), c - 0.66, c + 0.66, pa_off, pa_thick, pa_mask, binding='rigid',
               bone=_side('Pauldron', s), extra=pa_fin)
 
-    # vambraces on the forearms, ridged
+    # vambraces: one smooth plate with raised rims at both ends
     for s in (1, -1):
         el, wr = _m(ELBOW, s), _m(WRIST, s)
 
@@ -507,7 +548,7 @@ def plates(Fb, voxel):
 
         def va_thick(X_, Y_, Z_, el=el, wr=wr):
             d, u = X.seg_dist(X_, Y_, Z_, el, wr)
-            return 0.035 + 0.02 * _lames(u * np.linalg.norm(wr - el), 0.14)
+            return 0.04 + rims(u, 0.21, 0.93, 0.05)
         layer(_side('Vambrace', s), np.minimum(el, wr) - 0.35, np.maximum(el, wr) + 0.35, 0.02, va_thick, va_mask,
               binding='rigid', bone=_side('Forearm', s))
 
@@ -520,49 +561,69 @@ def plates(Fb, voxel):
             return 0.04 + 0.12 * rg(Z_, 2.5, 2.0)
 
         def ta_thick(X_, Y_, Z_):
-            return 0.04 + 0.03 * _lames(Z_, 0.2, 0.35)
+            return 0.04 + 0.03 * _lames(Z_, 0.24, 0.35)
         layer(_side('Tasset', s), np.array((0.0 if s > 0 else -0.85, -0.75, 1.85)),
               np.array((0.85 if s > 0 else 0.0, 0.5, 2.68)), ta_off, ta_thick, ta_mask,
               allow=('Hips', _side('Thigh', s)))
-        # cuisse on the thigh front
+        # the cuisse: a single plate over the thigh's front, rimmed
         hp, kn = _m(HIP, s), _m(KNEE, s)
 
         def cu_mask(X_, Y_, Z_, hp=hp, kn=kn):
             d, u = X.seg_dist(X_, Y_, Z_, hp, kn)
             return rg(u, 0.38, 0.45) * (1 - rg(u, 0.82, 0.88)) * rg(Y_, 0.02, -0.08)
 
+        def cu_thick(X_, Y_, Z_, hp=hp, kn=kn):
+            d, u = X.seg_dist(X_, Y_, Z_, hp, kn)
+            return 0.045 + rims(u, 0.41, 0.86, 0.045)
         layer(_side('Cuisse', s), np.minimum(hp, kn) - 0.42, np.maximum(hp, kn) + 0.42, 0.02,
-              lambda X_, Y_, Z_: 0.038 + 0.02 * _lames(Z_, 0.16), cu_mask, binding='rigid', bone=_side('Thigh', s))
-        # the knee cop with a fin
+              cu_thick, cu_mask, binding='rigid', bone=_side('Thigh', s))
+        # the knee cop: a broad dome with a fin
         kn = _m(KNEE, s)
 
         def kn_mask(X_, Y_, Z_, kn=kn):
             d = np.sqrt((X_ - kn[0]) ** 2 + (Y_ - kn[1] + 0.06) ** 2 + (Z_ - kn[2]) ** 2)
-            return rg(d, 0.24, 0.19) * rg(-Y_, 0.18, 0.3)
+            return rg(d, 0.28, 0.22) * rg(-Y_, 0.16, 0.28)
 
         def kn_fin(G, kn=kn, s=s):
-            p = kn + np.array((0.17 * s, -0.04, 0.0))
-            G.add(X.Inter(Ellipsoid(p + np.array((0.08 * s, 0.04, 0.0)), (0.1, 0.12, 0.02),
-                                    rot_matrix(ry=math.pi / 2)), Sphere(p, 0.2)), 0.015)
-        layer(_side('KneeCop', s), kn - 0.38, kn + 0.38, 0.03, 0.05, kn_mask, binding='rigid', bone=_side('KneeFix', s),
+            p = kn + np.array((0.18 * s, -0.04, 0.0))
+            G.add(X.Inter(Ellipsoid(p + np.array((0.08 * s, 0.04, 0.0)), (0.12, 0.14, 0.022),
+                                    rot_matrix(ry=math.pi / 2)), Sphere(p, 0.22)), 0.015)
+        layer(_side('KneeCop', s), kn - 0.4, kn + 0.4, 0.035, 0.055, kn_mask, binding='rigid', bone=_side('KneeFix', s),
               extra=kn_fin)
-        # greaves: the whole shin, ridged rings
+        # the greave: one smooth shell over the shin, a keel down its front, raised
+        # rims at both ends (a carved wave border runs inside the upper rim)
         an = _m(ANKLE, s)
 
         def gr_mask(X_, Y_, Z_, kn=kn, an=an):
             d, u = X.seg_dist(X_, Y_, Z_, kn, an)
             return rg(u, 0.16, 0.22) * (1 - rg(u, 0.88, 0.94)) * rg(d, 0.32, 0.26)
-        layer(_side('Greave', s), np.minimum(kn, an) - 0.35, np.maximum(kn, an) + 0.35, 0.02,
-              lambda X_, Y_, Z_: 0.045 + 0.03 * _lames(Z_, 0.24, 0.1, 0.6), gr_mask, binding='rigid', bone=_side('Shin', s))
-        # sabatons: lames over the foot
-        to = _m(TOE, s)
 
-        def sa_mask(X_, Y_, Z_, an=an, to=to):
+        def gr_thick(X_, Y_, Z_, kn=kn, an=an):
+            d, u = X.seg_dist(X_, Y_, Z_, kn, an)
+            return 0.045 + rims(u, 0.19, 0.91, 0.05, 0.026)
+
+        def gr_keel(G, kn=kn, an=an):
+            pts = [onto(lerp(kn, an, u) + np.array((0, -0.3, 0)), 0.065) for u in (0.24, 0.5, 0.86)]
+            G.add(sdf.Polyline(pts, [0.03, 0.026, 0.022]), 0.03)
+        layer(_side('Greave', s), np.minimum(kn, an) - 0.35, np.maximum(kn, an) + 0.35, 0.02,
+              gr_thick, gr_mask, binding='rigid', bone=_side('Shin', s), extra=gr_keel)
+        # the sabaton: one sculpted shoe of plate, a toe cap over the instep and a
+        # ridge along the top
+        to, ba = _m(TOE, s), _m(BALL, s)
+
+        def sa_mask(X_, Y_, Z_, an=an):
             return rg(Z_, 0.07, 0.11) * rg(Y_, an[1] + 0.25, an[1] + 0.12)
+
+        def sa_thick(X_, Y_, Z_, ba=ba):
+            return 0.045 + 0.022 * rg(Y_, ba[1] + 0.04, ba[1] - 0.02)
+
+        def sa_ridge(G, an=an, ba=ba, to=to):
+            pts = [onto(np.array((an[0], an[1] - 0.06, 0.5)), 0.06), onto(np.array((ba[0], ba[1], 0.35)), 0.07),
+                   onto(np.array((to[0], to[1] + 0.04, 0.3)), 0.06)]
+            G.add(sdf.Polyline(pts, [0.026, 0.024, 0.018]), 0.03)
         layer(_side('Sabaton', s), np.array((min(an[0], to[0]) - 0.3, to[1] - 0.2, -0.05)),
               np.array((max(an[0], to[0]) + 0.3, an[1] + 0.35, 0.62)), 0.015,
-              lambda X_, Y_, Z_: 0.035 + 0.02 * _lames(Y_, 0.12), sa_mask,
-              allow=(_side('Foot', s), _side('Toes', s)))
+              sa_thick, sa_mask, allow=(_side('Foot', s), _side('Toes', s)), extra=sa_ridge)
 
     # the silver belt with a crescent buckle
     def belt_mask(X_, Y_, Z_):
@@ -651,6 +712,30 @@ def cuirass_paint(obj):
     moon = np.clip((0.1 - np.sqrt(u * u + (v - 0.15) ** 2)) / 0.012, 0, 1)
     g = np.maximum(cres, moon) * front
     _write(obj, {'RegGlyph': g})
+
+
+def greave_paint(s):
+    """RegInlay: a carved running-wave border inside the greave's upper rim, and a
+    row of crescents inside its lower one."""
+    kn, an = _m(KNEE, s), _m(ANKLE, s)
+
+    def paint(obj):
+        from rig import mesh_arrays
+        P, _ = mesh_arrays(obj)
+        ax = an - kn
+        L2 = ax @ ax
+        u = np.clip(((P - kn) @ ax) / L2, 0, 1)
+        c = kn + u[:, None] * ax
+        rel = P - c
+        th = np.arctan2(rel[:, 0] * s, -rel[:, 1])
+        v = (u - 0.285) / 0.03
+        wave = np.clip(1 - np.abs(v - 0.7 * np.sin(th * 7)) / 0.32, 0, 1) * (np.abs(v) < 1.3)
+        w2 = (u - 0.81) / 0.028
+        k = th * 6 / math.pi
+        f = k - np.floor(k + 0.5)
+        dots = _crescent2d(f * 0.22, w2 * 0.028, 0.03) * (np.abs(w2) < 1.4)
+        _write(obj, {'RegInlay': np.maximum(wave, dots)})
+    return paint
 
 
 # ------------------------------------------------------------------ the trident (local: +Z up the haft)
@@ -806,7 +891,7 @@ def fields(k=1.0):
          Sculpt('R_Gauntlet', build_hand(-1, vhand), 'nacre', 1100, tau=0.012)]
     targets = {'Cuirass': 2300, 'Gorget': 850, 'Pauldron': 1100, 'Vambrace': 420, 'Tasset': 520, 'Cuisse': 360,
                'KneeCop': 300, 'Greave': 620, 'Sabaton': 420, 'Belt': 520}
-    paints = {'Cuirass': cuirass_paint}
+    paints = {'Cuirass': cuirass_paint, 'L_Greave': greave_paint(1), 'R_Greave': greave_paint(-1)}
     for name, G, mat, binding, bone, allow in plates(Fb, vp):
         key = name[2:] if name[:2] in ('L_', 'R_') else name
         S.append(Sculpt(name, G, mat, targets[key], binding=binding, bone=bone, allow=allow, relax=8,

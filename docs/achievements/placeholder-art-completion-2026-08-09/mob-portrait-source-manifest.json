@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "9f72cdf4c5d9b015dbd928dd21c054fb188a02b577342c6ea6a0048307b96587",
+  "rendererFingerprint": "c78aa6b2f0a96936831b934028b514ad9e8eef297d239e4de2a915e6ab626e64",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5475790,
-      "sha256": "47a01274ca5dc106703ec2604ceab2a7c5c6fb393d72f04c4bae806ec47a30be",
+      "sha256": "b016c6aa498127520bd91aa986e3a2de14da809d9a676067e21e3021c246153a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -2391,8 +2391,8 @@
         "model": {
           "url": "models/creatures/temple_templeguard.glb",
           "path": "public/models/creatures/temple_templeguard.glb",
-          "bytes": 3034728,
-          "sha256": "a5c635b3d8993437509bdc24cc85c325910ff48b77359980d680b76c923d56cf"
+          "bytes": 3071440,
+          "sha256": "071169445ad70bccb83565cb91b9fd7b0aae23e61a094819a8f769979bef0a96"
         },
         "idle": "Idle",
         "height": 5,
@@ -2409,11 +2409,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bd33f7b3c084d53bca2198dcaa2aaa69ee56706db3a5cfa2eee6d71efb0986a2",
+      "sourceFingerprint": "65bb71470a8ee56357ef9e955d4dd95e114f1538feffe663ccfa6d462a833acd",
       "output": {
         "path": "public/ui/mobs/drowned_templeguard.webp",
-        "bytes": 3372,
-        "sha256": "bd7538328845a0e1296f6bc6e1603d32bd31c097eb9e32f511c408fcc65965dd"
+        "bytes": 3520,
+        "sha256": "a76534389dec9c7617b94308072f15f18e39ffaa0af70cd4a758e16c6db2592a"
       }
     },
     {

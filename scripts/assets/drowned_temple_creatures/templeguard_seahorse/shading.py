@@ -56,18 +56,18 @@ def _cracks(t, scale=5.0, amount=0.5):
     return t.math('MAXIMUM', t.math('MULTIPLY', line, keep), t.math('MULTIPLY', fine, t.math('MULTIPLY', keep, keep2)))
 
 
-def _nacre(t, base_lo=(0.76, 0.76, 0.75), base_hi=(0.87, 0.86, 0.83), crack_amt=0.5, gloss=0.2):
+def _nacre(t, base_lo=(0.9, 0.81, 0.75), base_hi=(0.98, 0.9, 0.83), crack_amt=0.5, gloss=0.2):
     base = t.ramp(t.noise(scale=4.0, detail=4), [(0.3, srgb(base_lo)), (0.7, srgb(base_hi))])
     # mother-of-pearl: bands of blue-lilac, aqua and pale gold drifting over the plate
     play = t.ramp(t.noise(t.scale_vec(1.0, 1.0, 3.0), scale=2.2, detail=3, w=1.5, dist=1.4),
-                  [(0.2, srgb((0.74, 0.8, 1.0))), (0.42, srgb((0.96, 0.97, 1.0))), (0.6, srgb((0.72, 1.0, 0.93))),
-                   (0.82, srgb((1.0, 0.93, 0.76)))])
-    color = t.mix(0.6, base, play, 'MULTIPLY')
+                  [(0.2, srgb((1.0, 0.82, 0.85))), (0.42, srgb((1.0, 0.97, 0.93))), (0.6, srgb((0.8, 1.0, 0.94))),
+                   (0.82, srgb((1.0, 0.94, 0.82)))])
+    color = t.mix(0.7, base, play, 'MULTIPLY')
     # turquoise deep in the seams between the rings, pearl on the ridges
     concave = t.smooth(t.point, 0.485, 0.42)
-    color = t.mix(t.math('MULTIPLY', concave, 0.95), color, srgb((0.06, 0.5, 0.56)))
+    color = t.mix(t.math('MULTIPLY', concave, 0.85), color, srgb((0.12, 0.55, 0.56)))
     convex = t.smooth(t.point, 0.52, 0.6)
-    color = t.mix(t.math('MULTIPLY', convex, 0.6), color, srgb((0.95, 0.93, 0.9)))
+    color = t.mix(t.math('MULTIPLY', convex, 0.6), color, srgb((1.0, 0.97, 0.93)))
     cr = _cracks(t, amount=crack_amt)
     color = t.mix(cr, color, srgb((0.5, 0.97, 1.0)))
     emit = t.mix(cr, (0, 0, 0, 1), srgb(CYAN))
@@ -99,6 +99,10 @@ def shade(mat, k):
     elif k == 'nacre':
         color, emit, rough, h = _nacre(t)
         glyph = _attr(t, 'RegGlyph')
+        inlay = t.smooth(_attr(t, 'RegInlay'), 0.2, 0.7)
+        color = t.mix(inlay, color, srgb((0.06, 0.42, 0.46)))
+        emit = t.mix(t.math('MULTIPLY', inlay, 0.25), emit, srgb((0.2, 0.75, 0.8)))
+        h = t.math('ADD', h, t.math('MULTIPLY', inlay, -0.5))
         color = t.mix(glyph, color, srgb((0.62, 0.98, 1.0)))
         emit = t.mix(glyph, emit, srgb((0.4, 0.95, 1.0)))
         h = t.math('ADD', h, t.math('MULTIPLY', glyph, -0.6))
@@ -107,7 +111,7 @@ def shade(mat, k):
     elif k == 'shell':
         rib = _attr(t, 'RegRib')
         rad = _attr(t, 'RegRad')
-        color, emit, rough, h = _nacre(t, (0.78, 0.78, 0.77), (0.9, 0.88, 0.85), crack_amt=0.25, gloss=0.25)
+        color, emit, rough, h = _nacre(t, (0.9, 0.83, 0.77), (0.98, 0.92, 0.85), crack_amt=0.25, gloss=0.25)
         # turquoise in the grooves between the ribs, deepening toward the hinge
         groove = t.smooth(rib, 0.45, 0.1)
         color = t.mix(t.math('MULTIPLY', groove, 0.75), color, srgb((0.1, 0.5, 0.56)))
