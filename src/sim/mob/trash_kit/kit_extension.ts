@@ -3,8 +3,9 @@
 // plugged into the shared driver (driver.ts) without growing it. An extension
 // lends the driver its casts (a real bar each, run by the driver's own cast
 // machinery: the pack stagger, the swing hold, the stun, silence and lockout
-// breaks, the area plant through cast_hold.ts isPlantedCast) and its per-tick upkeep (no-bar auras, links,
-// drags), and cleans up when a pull ends.
+// breaks, and the area plant through cast_hold.ts isPlantedCast) and its
+// per-tick upkeep (no-bar auras, links, drags), and cleans up when a pull
+// ends.
 //
 // Determinism: the driver calls an extension at fixed points of a mob's tick,
 // in roster order; an extension picks its targets by hash or by sorted reach,
