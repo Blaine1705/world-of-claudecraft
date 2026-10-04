@@ -776,6 +776,7 @@ import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
+import { bastionShadeGhosted } from './sunken_bastion/bastion_shade_ghost_core';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -10506,10 +10507,9 @@ export class Renderer {
         stealthGhost ||
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
-        e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      // Duskveil/Smokefade wear the denser stealth fade; every spirit read
-      // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
-      // ethereal one. A dead stealther is a spirit first.
+        e.templateId === 'spirit_healer' || // the graveyard angel is an ethereal figure
+        bastionShadeGhosted(e); // a Fog Shade the Fogbeacon's beam pours through
+      // Stealth wears the denser fade; every spirit read keeps the thin one.
       const ghostStyle =
         stealthGhost && !ghostWolf && !e.ghost ? ('stealth' as const) : ('spirit' as const);
       active.setGhost(ghost || veilboundState === 'march', ghostStyle);

@@ -846,6 +846,12 @@ const RENDER_PURE_CORES = [
   'src/render/sunken_bastion/bastion_drowned_fx_core.ts',
   // The fifth pass's cage, anchor, shackle and reaper visual plan.
   'src/render/sunken_bastion/bastion_gaol_reaper_core.ts',
+  // Vael's staging (entrance eruptions, the gathering fog, the scythe flash)
+  // and the hollow shade's ghost predicate renderer.ts asks.
+  'src/render/sunken_bastion/bastion_vael_stage_core.ts',
+  'src/render/sunken_bastion/bastion_shade_ghost_core.ts',
+  // Olen the fallen paladin's visuals: the brine, the shield, the Sentence, the Oath.
+  'src/render/sunken_bastion/bastion_olen_fx_core.ts',
   'src/render/authored_field/field_edge_plan_core.ts',
   'src/render/drowned_temple/temple_plan_core.ts',
   'src/render/drowned_temple/temple_kit_plan_core.ts',

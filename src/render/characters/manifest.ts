@@ -35,9 +35,12 @@ import {
   OSSICK_CUDGEL,
   OSSICK_SHACKLE,
   VAEL_DROWNING_HYMN,
+  VAEL_INTRO_RISE,
   VAEL_MIST_SURGE,
   VAEL_REAPING_SCYTHE,
   VAEL_SHADOWSTEP,
+  VAEL_SINK,
+  VAEL_VEIL_GATHER,
   VAEL_VEIL_RISE,
 } from '../../sim/encounters/sunken_bastion/ids';
 import {
@@ -4430,11 +4433,20 @@ export const VISUALS: Record<string, VisualDef> = {
         [VAEL_REAPING_SCYTHE]: 'Emerge',
         // The Fog Veil: all four figures rise out of the roof the same way.
         [VAEL_VEIL_RISE]: 'Emerge',
+        // His entrance: he rises out of the roof at each stop (the veil's
+        // pace), and sinks back under it (also the sink before each veil).
+        [VAEL_INTRO_RISE]: 'Emerge',
+        [VAEL_SINK]: 'Vanish',
+        // The fog gathering before the veil: he raises the lantern and sings it in.
+        [VAEL_VEIL_GATHER]: 'Hymn',
       },
       // The veil's rise is twice the Emerge clip's length: played at bar pace
       // it rises ONCE over the whole bar (looped at rate 1 it rose, dropped
-      // back under and rose again).
-      castTimeScaleByAbility: { [VAEL_VEIL_RISE]: VAEL_VEIL_RISE_CLIP_RATE },
+      // back under and rose again). The entrance's rises share its bar.
+      castTimeScaleByAbility: {
+        [VAEL_VEIL_RISE]: VAEL_VEIL_RISE_CLIP_RATE,
+        [VAEL_INTRO_RISE]: VAEL_VEIL_RISE_CLIP_RATE,
+      },
       // Emerge starts under the flags: it takes the body at once, never
       // crossfading out of a standing pose (a copy popping in upright).
       castSnapIn: ['Emerge'],
@@ -4444,7 +4456,13 @@ export const VISUALS: Record<string, VisualDef> = {
     // would otherwise run late behind a swing, so the sim moved him to the
     // pool while he still stood above the floor); the Hymn and the Mist Surge
     // keep looping.
-    castClipSync: [VAEL_SHADOWSTEP, VAEL_REAPING_SCYTHE, VAEL_VEIL_RISE],
+    castClipSync: [
+      VAEL_SHADOWSTEP,
+      VAEL_REAPING_SCYTHE,
+      VAEL_VEIL_RISE,
+      VAEL_INTRO_RISE,
+      VAEL_SINK,
+    ],
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 2.2,

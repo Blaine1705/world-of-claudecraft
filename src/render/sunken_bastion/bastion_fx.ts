@@ -8,8 +8,9 @@
 //  - a flash when a strike lands;
 //  - the creatures' own effects (bastion_creature_fx.ts): the Fogbound
 //    Arbalest's crossbow bolts and the Gaol Turnkey's lantern flare;
-//  - the gaol's cage, anchor and shackles (bastion_gaol_fx.ts) and the
-//    reaper's pool, sweep and soul wisps (bastion_reaper_fx.ts).
+//  - the gaol's cage, anchor and shackles (bastion_gaol_fx.ts), the
+//    reaper's pool, sweep and soul wisps (bastion_reaper_fx.ts), and Olen the
+//    fallen paladin's brine, shield, Sentence and Oath (bastion_olen_fx.ts).
 // Boss casts register more lanes and rings through registerBastionTelegraph.
 // Every shape is the shared floor telegraph (../floor_telegraph): the same
 // layered look, threat colours and edge glow as every other dungeon.
@@ -45,7 +46,9 @@ import {
   brineBurstSpec,
 } from './bastion_fx_core';
 import { BastionGaolFx } from './bastion_gaol_fx';
+import { BastionOlenFx } from './bastion_olen_fx';
 import { BastionReaperFx } from './bastion_reaper_fx';
+import { BastionVaelStageFx } from './bastion_vael_stage_fx';
 
 const FAN_SLOTS = 12;
 const LANE_SLOTS = 8;
@@ -110,6 +113,8 @@ export class BastionFx {
   private readonly creatures: BastionCreatureFx;
   private readonly gaol: BastionGaolFx;
   private readonly reaper: BastionReaperFx;
+  private readonly vaelStage: BastionVaelStageFx;
+  private readonly olen: BastionOlenFx;
   private scan = 0;
   private clock = 0;
   private disposed = false;
@@ -121,6 +126,7 @@ export class BastionFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     playGesture?: (entityId: number, gesture: string) => void,
     reducedMotion?: () => boolean,
+    shake?: (amount: number) => void,
   ) {
     this.root.name = 'sunken-bastion-telegraphs';
     setRenderCategory(this.root, 'ui3d');
@@ -150,19 +156,28 @@ export class BastionFx {
     // The fifth pass's gaol and reaper visuals ride the same root and gate.
     this.gaol = new BastionGaolFx(this.root, groundY, world, this.flashesOn, playGesture);
     this.reaper = new BastionReaperFx(this.root, groundY, world, this.flashesOn);
-    const B = BASTION_BOSS_TELEGRAPHS;
-    registerBastionTelegraph(
-      B.charge,
-      {
-        shape: 'lane',
-        range: 44,
-        arcDeg: 0,
-        halfWidth: B.laneHalf,
-        color: BASTION_TELEGRAPH_COLORS.lethal,
-        accent: TELEGRAPH_ACCENTS.physical,
-      },
-      (caster) => this.boss.laneLength(caster),
+    // Vael's entrance eruptions, the fog gathering before the veil and the
+    // scythe's impacts ride the same root and gate.
+    this.vaelStage = new BastionVaelStageFx(
+      this.root,
+      groundY,
+      world,
+      this.flashesOn,
+      shake,
+      reducedMotion,
     );
+    // Olen the fallen paladin's brine, shield, Sentence and Oath ride the
+    // same root and gate.
+    this.olen = new BastionOlenFx(
+      this.root,
+      groundY,
+      world,
+      this.flashesOn,
+      shake,
+      reducedMotion,
+      playGesture,
+    );
+    const B = BASTION_BOSS_TELEGRAPHS;
     registerBastionTelegraph(B.surge, {
       shape: 'ring',
       range: B.surgeRadius,
@@ -184,6 +199,8 @@ export class BastionFx {
    *  Turnkey's lantern), so the generic projectile or nova is not drawn too. */
   handleEvent(ev: SimEvent): boolean {
     if (this.creatures.handleEvent(ev)) return true;
+    if (this.olen.handleEvent(ev)) return true;
+    this.vaelStage.handleEvent(ev);
     if (this.gaol.handleEvent(ev)) return true;
     if (this.reaper.handleEvent(ev)) return true;
     this.flash(ev);
@@ -214,6 +231,8 @@ export class BastionFx {
     this.creatures.update(dt);
     this.gaol.update(dt);
     this.reaper.update(dt);
+    this.vaelStage.update(dt);
+    this.olen.update(dt);
     this.scan -= dt;
     if (this.scan <= 0) {
       this.scan = SCAN_SEC;
@@ -352,6 +371,8 @@ export class BastionFx {
     this.creatures.dispose();
     this.gaol.dispose();
     this.reaper.dispose();
+    this.vaelStage.dispose();
+    this.olen.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
   }

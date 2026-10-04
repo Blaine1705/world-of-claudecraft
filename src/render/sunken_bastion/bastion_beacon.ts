@@ -13,6 +13,7 @@ import * as THREE from 'three';
 import { BEACON_CROWN } from '../../sim/content/sunken_bastion_layout';
 import { sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
+import { beaconVeilBoost, VEIL_BEAM_GAIN } from './bastion_boss_fx_core';
 import {
   BASTION_FOG_STREAMS,
   BEACON_IDLE_PERIOD,
@@ -75,6 +76,7 @@ uniform float uTime;
 uniform float uLength;
 uniform float uFar;
 uniform vec3 uColor;
+uniform float uBoost;
 varying vec3 vLocal;
 varying vec3 vWorld;
 varying vec3 vAxisW;
@@ -93,13 +95,17 @@ void main() {
   // Looking down the beam's core reads brighter (a volume, not a cone skin).
   vec3 view = normalize(cameraPosition - vWorld);
   float grazing = 1.0 - abs(dot(view, vAxisW));
-  float core = pow(max(0.0, 1.0 - across), 1.6);
+  // During the Fog Veil the beam is THE tell: a fuller, hotter, whiter shaft.
+  float core = pow(max(0.0, 1.0 - across), mix(1.6, 0.9, uBoost));
+  float spine = pow(max(0.0, 1.0 - across * 2.2), 3.0) * uBoost;
   // Fog motes drifting through the light.
   float dust = noise(vec2(vLocal.z * 0.18 - uTime * 0.9, atan(vLocal.y, vLocal.x) * 3.0)) * 0.5
     + noise(vec2(vLocal.z * 0.05 - uTime * 0.3, vLocal.x * 0.3)) * 0.5;
   float fall = pow(max(1.0 - along, 0.0), 1.35) * smoothstep(0.0, 0.03, along);
   float i = core * fall * (0.5 + 0.5 * dust) * (0.6 + 0.4 * grazing) * 1.35;
-  gl_FragColor = vec4(uColor * i, i);
+  i = i * mix(1.0, ${VEIL_BEAM_GAIN.toFixed(2)}, uBoost) + spine * fall * 1.6;
+  vec3 col = mix(uColor, vec3(1.0, 0.98, 0.9), uBoost * 0.55);
+  gl_FragColor = vec4(col * i, min(1.0, i));
   #include <colorspace_fragment>
 }
 `;
@@ -123,6 +129,7 @@ function buildBeam(ox: number, oz: number): THREE.Mesh {
     uLength: { value: BEACON_BEAM_LENGTH },
     uFar: { value: BEACON_BEAM_FAR_RADIUS },
     uColor: { value: new THREE.Color(0xffe9b8) },
+    uBoost: { value: 0 },
   };
   const material = new THREE.ShaderMaterial({
     name: 'sunkenBastionBeaconBeam',
@@ -153,6 +160,7 @@ function buildBeam(ox: number, oz: number): THREE.Mesh {
     // the veiled figures stand; it eases back up after.
     const want = forced === undefined ? IDLE_PITCH : VEIL_PITCH;
     uniforms.uPitch.value += (want - uniforms.uPitch.value) * Math.min(1, dt * 2.5);
+    uniforms.uBoost.value = beaconVeilBoost(uniforms.uBoost.value, forced !== undefined, dt);
   };
   return mesh;
 }
