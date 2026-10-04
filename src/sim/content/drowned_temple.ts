@@ -323,10 +323,12 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
         slow: { mult: 0.5, seconds: 2 },
       },
       // Heroic only: two wisps that touch flow into one (pooled health), each
-      // merge widening its burst by 1 yd and raising it by 60 percent, at most
-      // two. Kill them apart.
+      // merge widening its burst by 1 yd and raising it by 40 percent, at most
+      // two. A fully swollen wisp lands about 1.8 x 55 x 5.5 = 545 on heroic,
+      // the same 40 percent of a heroic cloth wearer as a missed trash dodge.
+      // Kill them apart.
       temple: {
-        merge: { reach: 1.2, max: 2, radiusPer: 1, damagePer: 0.6, name: 'Swollen Tide' },
+        merge: { reach: 1.2, max: 2, radiusPer: 1, damagePer: 0.4, name: 'Swollen Tide' },
       },
     },
     loot: [],

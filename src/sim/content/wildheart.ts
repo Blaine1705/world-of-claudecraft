@@ -474,10 +474,13 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     color: 0xd9b26a,
   },
   // The Totem-Binder's second totem (the trash mechanics pass): a bone post
-  // under a red-painted skull. It never moves or fights; its Rattling Dread
-  // (a 2 s bar nobody can kick) sends everyone within 8 yd fleeing straight
-  // away from it for 2 s (3 on heroic; a hit breaks the fear). Tank the pack
-  // clear of it, or break it first. It crumbles with its binder.
+  // under a red-painted skull. It never moves or fights; every 9 s its
+  // Rattling Dread (a 2 s bar nobody can kick) sends everyone within 8 yd
+  // fleeing straight away from it for 2 s (3 on heroic; a hit breaks the
+  // fear): at most a fifth of the fight spent afraid on normal, a third on
+  // heroic, and only by standing at the totem. Tank the pack clear of it,
+  // or break it first (about 250 health on normal). It crumbles with its
+  // binder.
   sunbone_dread_totem: {
     id: SUNBONE_DREAD_TOTEM_ID,
     name: 'Sunbone Dread Totem',
@@ -503,7 +506,7 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
           castId: WILDHEART_RATTLING_DREAD,
           name: 'Rattling Dread',
           castTime: 2,
-          every: 6,
+          every: 9,
           first: 4,
           school: 'shadow',
           radius: 8,
@@ -645,9 +648,12 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       },
     },
     // Snarlbark (the trash mechanics pass): its thorned bark pricks every
-    // melee swing at it (15 nature on normal, scaled by the claim's mechanic
-    // factor on heroic). The ranged take it; the melee mind their health.
-    thorns: { value: 15, school: 'nature', name: 'Snarlbark' },
+    // melee swing at it, 10 nature on normal (a dual-wielder swinging about
+    // twice a second pays about 20 a second, about 2 percent of a level-20
+    // melee's health; the classic Thorns spell sits in the same band) and
+    // 30 on heroic through the claim's mechanic factor (3). The ranged take
+    // it; the melee mind their health.
+    thorns: { value: 10, school: 'nature', name: 'Snarlbark' },
     // No componentTags: animated plant, like the shipped treants
     // (orchard_treant, treant_elder), so its corpse offers no harvest. No
     // HARVEST_COMPONENT_ITEMS family is wood, and an unmapped tag would be a

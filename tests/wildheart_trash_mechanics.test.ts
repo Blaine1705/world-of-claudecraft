@@ -130,7 +130,7 @@ describe('Basin trash mechanics: the content and the kick table', () => {
       WILDHEART_RATTLING_DREAD,
     );
     expect(MOBS.spore_toad.trashKit?.wildheart?.tongue?.castId).toBe(WILDHEART_SNARING_TONGUE);
-    expect(MOBS.vine_lasher.thorns).toEqual({ value: 15, school: 'nature', name: 'Snarlbark' });
+    expect(MOBS.vine_lasher.thorns).toEqual({ value: 10, school: 'nature', name: 'Snarlbark' });
     // The Howdah Hexcaller keeps its Saurian job untouched.
     expect(MOBS.howdah_hexcaller.trashKit?.wildheart).toBeUndefined();
   });
@@ -410,13 +410,13 @@ describe('Snarlbark: the lasher pricks its melee', () => {
     return hitsOn(r, r.me.id, 'Snarlbark');
   }
 
-  it('15 a landed swing on normal, three times that on heroic', () => {
+  it('10 a landed swing on normal, three times that on heroic', () => {
     const normal = pricks('normal');
     expect(normal.length).toBeGreaterThan(5);
-    expect(new Set(normal)).toEqual(new Set([15]));
+    expect(new Set(normal)).toEqual(new Set([10]));
     const heroic = pricks('heroic');
     expect(heroic.length).toBeGreaterThan(5);
-    expect(Math.min(...heroic)).toBeGreaterThan(15);
+    expect(Math.min(...heroic)).toBeGreaterThan(10);
   });
 });
 
