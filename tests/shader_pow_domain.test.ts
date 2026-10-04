@@ -158,6 +158,9 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   // shared floor-telegraph material and the Sanctum seal gate (the bases that
   // were not already a recognized clamp now take max(x, 0.0), or abs() for the
   // symmetric Gaussian of the Sanctum lake's ripple ring)
+  // Laverock's finale: the column's axis glow, the pool's glow, the moon's road
+  // on the lagoon and the stream ribbon's core (bases abs(), max(x, 0)).
+  'src/render/drowned_temple/temple_cantor_finale_fx.ts': 4,
   'src/render/drowned_temple/temple_landmarks.ts': 2,
   'src/render/drowned_temple/temple_sky_lagoon.ts': 7,
   'src/render/drowned_temple/temple_tsunami_core.ts': 1,
