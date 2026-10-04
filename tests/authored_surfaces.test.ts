@@ -104,10 +104,9 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_terrorspark_groundshaker',
   'mount_thunderstrut_gobbler',
   // The five-dungeon rework's re-tints of a legacy body above: they spread the
-  // base def (the Drowned Temple's Tidewisp over mob_glimmerwisp, the Wildheart
-  // Basin's Totem-Binder and Howdah Hexcaller over mob_wildheart_hexcaller), so
-  // they keep the floor their shared GLB was tuned under.
-  'temple_tidewisp',
+  // base def (the Wildheart Basin's Totem-Binder and Howdah Hexcaller over
+  // mob_wildheart_hexcaller), so they keep the floor their shared GLB was
+  // tuned under.
   'wildheart_howdah_hexcaller',
   'wildheart_totem_binder',
 ]);
@@ -205,6 +204,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_acolyte',
   // the Drowned Temple's Blender Moonlit Siren (the priestess on her waterspout)
   'temple_siren',
+  // the Drowned Temple's Blender Tidewisp (the drop of moon-water)
+  'temple_tidewisp',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

@@ -8,6 +8,8 @@
 //     node scripts/drowned_temple_mob_shot.mjs [outDir] [shotId ...]
 //
 // PACK="x,z,face,yaw,pitch,dist" (instance-local) adds the pack shots;
+// MOVE_WAIT (ms, default 250) is how long after the spawn the se_mueve shot
+// is taken (raise it to catch a rusher on arrival, a Tidewisp bursting).
 // CAST_WAIT (ms, default 6000) is how long the fight runs before the
 // habilidad shots (raise it for a mob with a long cast cooldown).
 // CASTS="castId:shotId:ms,..." adds one shot per entry, taken `ms` after that
@@ -35,6 +37,7 @@ const DIST = Number(process.env.SHOT_DIST ?? 1);
 const MOB = process.env.MOB ?? 'drowned_pilgrim';
 const SPAWN = process.env.SPAWN ?? 'pilgrim';
 const CAST_WAIT = Number(process.env.CAST_WAIT ?? 6000);
+const MOVE_WAIT = Number(process.env.MOVE_WAIT ?? 250);
 const PACK = process.env.PACK?.split(',').map(Number);
 const CASTS = (process.env.CASTS ?? '')
   .split(',')
@@ -88,7 +91,7 @@ const SHOTS = [
     pitch: 0.32,
     dist: 13,
     spawn: true,
-    spawnWait: 250,
+    spawnWait: MOVE_WAIT,
     wait: 450,
   },
   {

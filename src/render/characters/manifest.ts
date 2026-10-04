@@ -4662,19 +4662,23 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 2.6,
   },
-  // A Tidewisp: a glimmerwisp of living lagoon water. glimmerwisp.glb is an
-  // unrigged bespoke mesh that ships no clips (see mob_glimmerwisp), so this
-  // names STATIC_PROP and registers in CLIPLESS_RIGS
-  // (tests/character_clipmaps.test.ts) instead of borrowing FLOATING.
+  // A Tidewisp (tidewisp; scripts/assets/drowned_temple_creatures/
+  // tidewisp_drop/): its own body now, no longer the overworld glimmerwisp.
+  // A great drop of moon-water the siren's song lifts from her spout: clear
+  // turquoise lit from inside, its point curled back like a flame, a silver
+  // crescent in its face that turns faster as it rushes in, motes of water
+  // circling it and a trail of falling drops. It reaches its mark and dies
+  // there in Tidewisp Burst: Death is the burst (a swell, then a ring of
+  // frost and a spray of drops). Drawn 2.2 with its trail at its 0.8.
   temple_tidewisp: {
-    url: `${CREATURES}/glimmerwisp.glb`,
-    height: 1.8,
-    hover: 0.5,
-    clips: STATIC_PROP,
-    yaw: -Math.PI / 2,
-    tint: 0x6fe3e0,
-    tintStrength: 0.6,
-    selfIllumination: 0.3,
+    url: `${CREATURES}/temple_tidewisp.glb`,
+    height: 2.75,
+    hover: 0.45,
+    clips: TEMPLE_CLIPS,
+    walkRef: 2.5,
+    runRef: 7,
+    authoredAtlas: true,
+    selfIllumination: 0.12,
   },
 
   // -- humanoid mobs (KayKit adventurers) ------------------------------------

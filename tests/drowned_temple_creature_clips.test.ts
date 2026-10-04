@@ -252,6 +252,21 @@ describe('the Moonlit Siren: the priestess on her waterspout', () => {
   });
 });
 
+describe('the Tidewisp: a drop of moon-water of its own', () => {
+  it('ships its own body, no longer the overworld glimmerwisp', () => {
+    expect(clipsOf('public/models/creatures/temple_tidewisp.glb').sort()).toEqual(
+      ['Attack', 'Attack2', 'Cast', 'Death', 'Hit', 'Idle', 'Run', 'Walk'].sort(),
+    );
+    const v = visualOf('tidewisp');
+    expect(v.url).toMatch(/temple_tidewisp\.glb$/);
+    expect(v.url).not.toMatch(/glimmerwisp/);
+    expect(v.clips.death).toBe('Death');
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 2.2 with its trail at its 0.8.
+    expect(v.height * (MOBS.tidewisp.scale ?? 1)).toBeCloseTo(2.2, 2);
+  });
+});
+
 describe('the pilgrim frenzy cue rides the real enrage', () => {
   it('the nova the sim emits when a pilgrim drops under 30 percent is the cue', () => {
     const events: Array<Record<string, unknown>> = [];

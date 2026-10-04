@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "84d700d4ee2c6b0cccea1a49dc0cb7518fe96c4c0cc1f0fb583199b47dc699cb",
+  "rendererFingerprint": "c7c00b372cc034522c2afc1e6d81043593e7f603c6cf3d05dd7d9ee9a2d82004",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5475790,
-      "sha256": "db392c0e75624a197bb9ca21d375b7c04821f6686811acfc519c5adf2869b369",
+      "bytes": 5475894,
+      "sha256": "d04999712dda0c00427b2a280350a997b921fbeb8bd40a2e96473a9e04e15728",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -11093,31 +11093,31 @@
       "visualKey": "temple_tidewisp",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/glimmerwisp.glb",
-          "path": "public/models/creatures/glimmerwisp.glb",
-          "bytes": 162784,
-          "sha256": "25010f4fcd2a0aba2a7ea3f01ceba83d7fb8731a2c9e7d292db8d1f211e6f1ef"
+          "url": "models/creatures/temple_tidewisp.glb",
+          "path": "public/models/creatures/temple_tidewisp.glb",
+          "bytes": 721336,
+          "sha256": "31e12fa7d459270ef4565a7f69790d08e4e30cb0c674ecf868d5d75736f60227"
         },
         "idle": "Idle",
-        "height": 1.8,
-        "yaw": -1.5707963267948966,
-        "hover": 0.5,
+        "height": 2.75,
+        "yaw": null,
+        "hover": 0.45,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.6
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6fe3e0",
-        "resolved": "#6fe3e0",
-        "strength": 0.6
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "52d8a88cabd2ad003e32872c77c607a387cd1a2a88fceb6a587233bc6bfe717e",
+      "sourceFingerprint": "4d169866151e956839c68f3fdd22bc2a2379eb487c5144a4a9c8e0e0cd986fdb",
       "output": {
         "path": "public/ui/mobs/tidewisp.webp",
-        "bytes": 1912,
-        "sha256": "60ebc7b709bf2d46dc83855ba2ffbf0b6cde4796a77af0381161d40f80c35750"
+        "bytes": 2190,
+        "sha256": "32cfbf0088fd881293cdfa4f3cf1f33b1da7ab4f1692448d227d2ff7d80f0087"
       }
     },
     {
