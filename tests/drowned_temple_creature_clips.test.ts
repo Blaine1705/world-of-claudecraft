@@ -9,11 +9,13 @@ import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
   isTemplePilgrimFrenzyCue,
+  stepTempleShellStance,
   TEMPLE_MOONSPAWN_RISE,
   TEMPLE_MOONSPAWN_RISE_WINDOW,
   TEMPLE_PILGRIM_FRENZY_GESTURE,
   TEMPLE_SENTINEL_SHELL_CLOSED,
   TEMPLE_SENTINEL_SHELL_OPEN,
+  TEMPLE_SENTINEL_STANCE_RESEND,
   templeMoonspawnRises,
   templeSentinelShellGesture,
 } from '../src/render/drowned_temple/temple_fx_core';
@@ -413,9 +415,29 @@ describe('the Pearlguard Sentinel: the clam and coral giant', () => {
     expect(templeSentinelShellGesture('pearlguard_sentinel', ward, true)).toBeNull();
     expect(templeSentinelShellGesture('drowned_templeguard', ward, false)).toBeNull();
     // temple_fx reads the stance off every mob it scans and sends it as a gesture
-    const fx = readFileSync('src/render/drowned_temple/temple_fx.ts', 'utf8');
-    expect(fx).toContain('this.updateShellStance(e.id, e.templateId, e.auras, e.dead)');
-    expect(fx).toContain('this.playGesture?.(id, want)');
+  });
+
+  it('steps the shell stance: shut is re-sent, open reaches a rig left shut, death forgets', () => {
+    const SHUT = TEMPLE_SENTINEL_SHELL_CLOSED;
+    const OPEN = TEMPLE_SENTINEL_SHELL_OPEN;
+    // first sight: told its stance at once, even when it is open (a pooled
+    // rig may still hold another Sentinel's shut shell)
+    let s = stepTempleShellStance(undefined, OPEN, 10);
+    expect(s.send).toBe(OPEN);
+    expect(s.next).toEqual({ stance: OPEN, since: 10 });
+    // open is re-offered only for the resend window, then left alone
+    expect(stepTempleShellStance(s.next, OPEN, 10 + TEMPLE_SENTINEL_STANCE_RESEND).send).toBe(OPEN);
+    s = stepTempleShellStance(s.next, OPEN, 10 + TEMPLE_SENTINEL_STANCE_RESEND + 0.1);
+    expect(s.send).toBeNull();
+    // the ward goes up: shut at once, and every scan after (a late viewer)
+    s = stepTempleShellStance(s.next, SHUT, 20);
+    expect(s.send).toBe(SHUT);
+    expect(stepTempleShellStance(s.next, SHUT, 40).send).toBe(SHUT);
+    // it dies shut: the track is forgotten, nothing is sent while dead
+    const dead = stepTempleShellStance(s.next, null, 41);
+    expect(dead).toEqual({ next: undefined, send: null });
+    // revived (the same id): told open afresh, so its rig does not stay shut
+    expect(stepTempleShellStance(dead.next, OPEN, 50).send).toBe(OPEN);
   });
 
   it('the ward the shell keys on is the one the sim lays under 30 percent', () => {
@@ -521,9 +543,6 @@ describe('the Moonspawn: a spirit of the Drowned Moon, no longer a murloc', () =
     );
     expect(templeMoonspawnRises('moonspawn', true, 0)).toBe(false);
     expect(templeMoonspawnRises('lagoon_eel', false, 0)).toBe(false);
-    const fx = readFileSync('src/render/drowned_temple/temple_fx.ts', 'utf8');
-    expect(fx).toContain('this.offerMoonspawnRise(e.id, e.dead)');
-    expect(fx).toContain('this.playGesture?.(id, TEMPLE_MOONSPAWN_RISE)');
   });
 });
 

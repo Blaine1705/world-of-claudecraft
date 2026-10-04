@@ -39,12 +39,13 @@ import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import {
   isTemplePilgrimFrenzyCue,
+  stepTempleShellStance,
   TEMPLE_ACCENTS,
   TEMPLE_MARK_SPECS,
   TEMPLE_MOONSPAWN_RISE,
   TEMPLE_OBJECT_SPECS,
   TEMPLE_PILGRIM_FRENZY_GESTURE,
-  TEMPLE_SENTINEL_SHELL_OPEN,
+  type TempleShellTrack,
   type TempleTelegraphSpec,
   templeMoonspawnRises,
   templeSentinelShellGesture,
@@ -108,8 +109,8 @@ export class TempleFx {
   private readonly hydra: TempleHydra;
   private readonly ysolei: TempleYsoleiFx;
   private readonly flashesOn: boolean;
-  /** Each Pearlguard Sentinel's shell stance last sent (absent = open). */
-  private readonly shellStance = new Map<number, string>();
+  /** Each living Pearlguard Sentinel's shell stance and when it changed. */
+  private readonly shellStance = new Map<number, TempleShellTrack>();
   /** When each Moonspawn was first seen (its Rise is offered for a moment). */
   private readonly moonspawnSeen = new Map<number, number>();
   private scan = 0;
@@ -195,6 +196,7 @@ export class TempleFx {
     if (this.scan <= 0) {
       this.scan = SCAN_SEC;
       this.scanWorld(world);
+      this.pruneTracks(world);
     }
     this.hydra.update(dt, this.clock);
     this.ysolei.update(dt, this.clock);
@@ -428,8 +430,10 @@ export class TempleFx {
         }
         continue;
       }
-      if (this.playGesture) this.updateShellStance(e.id, e.templateId, e.auras, e.dead);
-      if (this.playGesture && e.templateId === 'moonspawn') this.offerMoonspawnRise(e.id, e.dead);
+      if (this.playGesture && e.templateId === 'pearlguard_sentinel')
+        this.updateShellStance(e.id, e.templateId, e.auras, e.dead);
+      if (this.playGesture && e.templateId === 'moonspawn')
+        this.offerMoonspawnRise(e.id, e.templateId, e.dead);
       if (e.dead) continue;
       if (e.templateId.startsWith(REFLECTION_ID) && e.forcedTargetId !== null) {
         const have = this.tetherPairs.findIndex(([r]) => r === e.id);
@@ -466,7 +470,8 @@ export class TempleFx {
   }
 
   /** The Sentinel's Pearl Carapace: its shell shuts over it while the ward
-   *  holds and opens when it goes (a stance gesture on the rig's phaseClips). */
+   *  holds and opens when it goes (a stance gesture on the rig's phaseClips;
+   *  the step itself is temple_fx_core's stepTempleShellStance). */
   private updateShellStance(
     id: number,
     templateId: string,
@@ -474,31 +479,30 @@ export class TempleFx {
     dead: boolean,
   ): void {
     const want = templeSentinelShellGesture(templateId, auras, dead);
-    const had = this.shellStance.get(id) ?? TEMPLE_SENTINEL_SHELL_OPEN;
-    if (want === null) {
-      this.shellStance.delete(id);
-      return;
-    }
-    // Shut, the stance is re-sent every scan (the rig swaps idempotently), so a
-    // body that comes into view mid-Carapace still shows its shell.
-    if (want === had && want === TEMPLE_SENTINEL_SHELL_OPEN) return;
-    if (want === TEMPLE_SENTINEL_SHELL_OPEN) this.shellStance.delete(id);
-    else this.shellStance.set(id, want);
-    this.playGesture?.(id, want);
+    const step = stepTempleShellStance(this.shellStance.get(id), want, this.clock);
+    if (step.next) this.shellStance.set(id, step.next);
+    else this.shellStance.delete(id);
+    if (step.send) this.playGesture?.(id, step.send);
   }
 
   /** A Moonspawn climbing out of the shore: its Rise is offered for the first
-   *  moment after it is seen (the rig plays it once); old entries are dropped. */
-  private offerMoonspawnRise(id: number, dead: boolean): void {
+   *  moment after it is seen (the rig plays it once). */
+  private offerMoonspawnRise(id: number, templateId: string, dead: boolean): void {
     let seen = this.moonspawnSeen.get(id);
     if (seen === undefined) {
       seen = this.clock;
       this.moonspawnSeen.set(id, seen);
-      for (const [other, at] of this.moonspawnSeen)
-        if (this.clock - at > 60) this.moonspawnSeen.delete(other);
     }
-    if (templeMoonspawnRises('moonspawn', dead, this.clock - seen))
+    if (templeMoonspawnRises(templateId, dead, this.clock - seen))
       this.playGesture?.(id, TEMPLE_MOONSPAWN_RISE);
+  }
+
+  /** Drop the tracks of bodies that left the world (or interest range). */
+  private pruneTracks(world: IWorld): void {
+    for (const id of this.shellStance.keys())
+      if (!world.entities.has(id)) this.shellStance.delete(id);
+    for (const id of this.moonspawnSeen.keys())
+      if (!world.entities.has(id)) this.moonspawnSeen.delete(id);
   }
 
   dispose(): void {
@@ -509,5 +513,7 @@ export class TempleFx {
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();
+    this.shellStance.clear();
+    this.moonspawnSeen.clear();
   }
 }

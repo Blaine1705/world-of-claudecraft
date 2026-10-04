@@ -352,6 +352,38 @@ export function templeSentinelShellGesture(
   return TEMPLE_SENTINEL_SHELL_OPEN;
 }
 
+/** How long a newly wanted shell stance is re-offered (seconds): a rig built a
+ *  frame or two after the change, or a pooled rig still holding another
+ *  Sentinel's shut shell, still receives it. */
+export const TEMPLE_SENTINEL_STANCE_RESEND = 1;
+
+/** A Sentinel's tracked shell stance: what it was told, and when it changed. */
+export interface TempleShellTrack {
+  stance: string;
+  since: number;
+}
+
+/** One scan's step of a Sentinel's shell stance. `want` is
+ *  templeSentinelShellGesture's answer (null: dead, or not a Sentinel).
+ *  - null forgets the track, so a revived Sentinel (the same id) or a new one
+ *    on a pooled rig is told its stance afresh;
+ *  - a new or changed stance is sent at once and tracked;
+ *  - the shut stance is re-sent every scan (a late viewer still sees the
+ *    shell), and any stance is re-sent for TEMPLE_SENTINEL_STANCE_RESEND after
+ *    it changed (an open stance must reach a rig that was shut).
+ *  The rig's phase swap is idempotent, so a repeat costs nothing. */
+export function stepTempleShellStance(
+  prev: TempleShellTrack | undefined,
+  want: string | null,
+  now: number,
+): { next: TempleShellTrack | undefined; send: string | null } {
+  if (want === null) return { next: undefined, send: null };
+  if (!prev || prev.stance !== want) return { next: { stance: want, since: now }, send: want };
+  const resend =
+    want === TEMPLE_SENTINEL_SHELL_CLOSED || now - prev.since <= TEMPLE_SENTINEL_STANCE_RESEND;
+  return { next: prev, send: resend ? want : null };
+}
+
 /** The Moonspawn's entrance gesture: it climbs out of the flooded shore when
  *  Ysolei calls it (the manifest plays its Rise clip, once per entity). */
 export const TEMPLE_MOONSPAWN_RISE = 'temple_moonspawn_rise';
@@ -360,7 +392,9 @@ export const TEMPLE_MOONSPAWN_RISE = 'temple_moonspawn_rise';
 export const TEMPLE_MOONSPAWN_RISE_WINDOW = 1;
 
 /** True while a freshly seen Moonspawn should be offered its Rise: alive, and
- *  within the window since it was first seen. */
+ *  within the window since it was first seen (the rig plays it once per
+ *  entity; a Moonspawn first seen mid-fight, or one whose body loads later
+ *  than the window, simply appears). */
 export function templeMoonspawnRises(
   templateId: string | undefined,
   dead: boolean,
