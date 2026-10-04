@@ -175,7 +175,15 @@ export class RiftDeathZoneVisuals {
       reducedMotion,
       shake,
     );
-    this.templeFx = new TempleFx(scene, groundY, world, compileGate, playGesture);
+    this.templeFx = new TempleFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      playGesture,
+      shake,
+      reducedMotion,
+    );
     this.deathBursts = new DeathBurstFx(scene, groundY, world, compileGate);
     this.wildheartFx = new WildheartFx(
       scene,

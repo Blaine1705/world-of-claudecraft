@@ -26,9 +26,11 @@ import {
   COLOSSUS_RESONANT_SLAM,
   COLOSSUS_TUNING,
   SELTHE_CHORUS_MARK,
+  SELTHE_DROWNING_ARIA,
+  SELTHE_MERE_SURGE,
+  SELTHE_MOONWATER_BOLT,
   SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
-  SELTHE_TIDAL_SLAP,
   SELTHE_TUNING,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
@@ -359,7 +361,7 @@ describe('the Glimmerscale Lurker: the sacred mantis shrimp', () => {
   });
 });
 
-describe('the Pearlguard Sentinel: the clam and coral giant', () => {
+describe('the Pearlguard Sentinel: the Moonmantle Ray', () => {
   it('ships its own body with both stances and a clip for every job', () => {
     expect(clipsOf('public/models/creatures/temple_sentinel.glb').sort()).toEqual(
       [
@@ -384,8 +386,15 @@ describe('the Pearlguard Sentinel: the clam and coral giant', () => {
     expect(v.url).toMatch(/temple_sentinel\.glb$/);
     expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
     expect(v.authoredAtlas).toBe(true);
-    // Drawn 7.0 at its 1.15: 2.7 times the 2.6 player.
-    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(7.0, 1);
+    // A floating manta: its Idle bounds (1.4, belly and tail tip a yard up)
+    // sit `hover` over the floor, so the model's floor stays the world's;
+    // drawn 1.6 high at rest at its 1.15 (its wings span 6.8, 2.6 players).
+    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(1.61, 2);
+    expect(v.hover).toBeCloseTo(0.673, 3);
+    // no feet to match: the glide speeds its beats are authored for, its
+    // wander (about 0.35 of its moveSpeed) and its chase (its moveSpeed)
+    expect(v.walkRef).toBe(2.4);
+    expect(v.runRef).toBe(MOBS.pearlguard_sentinel.moveSpeed);
     expect(v.clips.castByAbility?.[TEMPLE_PEARL_SLAM]).toBe('Slam');
     expect(MOBS.pearlguard_sentinel.trashKit?.wingGust?.castTime).toBe(1.5);
     expect(v.castClipSync).toBe(true);
@@ -454,6 +463,8 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
       [
         'Attack',
         'Attack2',
+        'Beam',
+        'Bolt',
         'Cast',
         'Chorus',
         'Death',
@@ -463,6 +474,7 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
         'SeaSong',
         'Slap',
         'Solo',
+        'Surge',
         'Walk',
       ].sort(),
     );
@@ -473,16 +485,23 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
     expect(v.height * (MOBS.choirmother_selthe.scale ?? 1)).toBeCloseTo(9.0, 1);
   });
 
-  it('sings and slaps on their bars and answers each mark with its gesture', () => {
-    const c = visualOf('choirmother_selthe').clips;
+  it('casts water on her bars (no hand swings) and answers each mark with its gesture', () => {
+    const v = visualOf('choirmother_selthe');
+    const c = v.clips;
     expect(c.castByAbility?.[SELTHE_SEA_SONG]).toBe('SeaSong');
-    expect(c.castByAbility?.[SELTHE_TIDAL_SLAP]).toBe('Slap');
-    expect(c.castTimeScaleByAbility?.[SELTHE_SEA_SONG]).toBe(1);
-    expect(c.castTimeScaleByAbility?.[SELTHE_TIDAL_SLAP]).toBe(1);
+    expect(c.castByAbility?.[SELTHE_MOONWATER_BOLT]).toBe('Bolt');
+    expect(c.castByAbility?.[SELTHE_DROWNING_ARIA]).toBe('Beam');
+    expect(c.castByAbility?.[SELTHE_MERE_SURGE]).toBe('Surge');
+    // The bolt and the surge land on their bar's end (bar-locked); the aria loops.
+    expect(v.castClipSync).toEqual(
+      expect.arrayContaining([SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE]),
+    );
+    expect(v.castClipSync).not.toContain(SELTHE_DROWNING_ARIA);
     expect(c.attackByAbility?.[SELTHE_CHORUS_MARK]).toBe('Chorus');
     expect(c.attackByAbility?.[SELTHE_SOLO_MARK]).toBe('Solo');
     expect(SELTHE_TUNING.songCast).toBe(1.5);
-    expect(SELTHE_TUNING.slapCast).toBe(1);
+    expect(SELTHE_TUNING.boltCast).toBe(2);
+    expect(SELTHE_TUNING.surgeCast).toBe(3);
   });
 });
 
@@ -574,7 +593,10 @@ describe('the pilgrim frenzy cue rides the real enrage', () => {
     const fx = readFileSync('src/render/drowned_temple/temple_fx.ts', 'utf8');
     expect(fx).toContain('this.playGesture(ev.sourceId, TEMPLE_PILGRIM_FRENZY_GESTURE)');
     const zone = readFileSync('src/render/rift_death_zone.ts', 'utf8');
-    expect(zone).toContain('new TempleFx(scene, groundY, world, compileGate, playGesture)');
+    // The host hands the gesture hook on (then the shake and reduced-motion seams).
+    expect(zone.replace(/\s+/g, ' ')).toContain(
+      'new TempleFx( scene, groundY, world, compileGate, playGesture, shake, reducedMotion, )',
+    );
     expect(zone).toMatch(/const temple = this\.templeFx\.handleEvent\(event\)/);
     expect(zone).toMatch(/\|\| temple \|\|/);
   });

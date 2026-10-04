@@ -76,6 +76,8 @@ export const DROWNED_TEMPLE_DEV_MOBS: Readonly<Record<string, string>> = {
   acolyte: 'pale_choir_acolyte',
   lurker: 'glimmerscale_lurker',
   sentinel: 'pearlguard_sentinel',
+  // The Moonmantle Ray (the sentinel's id, its new body and name).
+  manta: 'pearlguard_sentinel',
   snapper: 'lagoon_snapper',
   eel: 'lagoon_eel',
   siren: 'moonlit_siren',
@@ -86,7 +88,7 @@ export const DROWNED_TEMPLE_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev temple enter [normal|heroic] | tp <landing|steps|causeway|stones|island|colonnade|veil|court|selthe|terraces|terracehigh|ledge|grotto|pool|hydra|prism|prismhigh|terrace|colossus|bridge|altarlanding|altar|ysolei> | gates | kill <g1..g13|pa|pb|pc|hydra|selthe|colossus|ysolei|trash|all> | pack <id> | spawn <templeguard|acolyte|lurker|sentinel|snapper|eel|siren|wisp|pilgrim|moonspawn|reflection> | trigger <chorus|solo|duet|breath|spit|torrent|tsunami|regrow|reflections|lance|undertow|flood> | reset';
+  '[dev] /dev temple enter [normal|heroic] | tp <landing|steps|causeway|stones|island|colonnade|veil|court|selthe|terraces|terracehigh|ledge|grotto|pool|hydra|prism|prismhigh|terrace|colossus|bridge|altarlanding|altar|ysolei> | gates | kill <g1..g13|pa|pb|pc|hydra|selthe|colossus|ysolei|trash|all> | pack <id> | spawn <templeguard|acolyte|lurker|sentinel|snapper|eel|siren|wisp|pilgrim|moonspawn|reflection> | trigger <chorus|solo|duet|bolt|aria|surge|breath|spit|torrent|tsunami|regrow|reflections|lance|fracture|undertow|flood> | reset';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {

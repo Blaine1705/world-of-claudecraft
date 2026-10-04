@@ -4094,6 +4094,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
   'hud.system.respawnKeeperToll':
     '霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。',
+  'hud.system.moonbridgeBanner': '月の橋が架かる',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',
   'hud.system.playerNotNearby': 'そのプレイヤーは近くにいません。',
@@ -5812,7 +5813,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.glimmerscale_lurker.name': '煌鱗の潜み者',
   'entities.mobs.moonspawn.name': '月の落とし子',
   'entities.mobs.pale_choir_acolyte.name': '蒼白聖歌隊の侍祭',
-  'entities.mobs.pearlguard_sentinel.name': '真珠衛の歩哨',
+  'entities.mobs.pearlguard_sentinel.name': '月套のエイ',
   'entities.mobs.sethrael_palecoil.name': '蒼渦のセスラエル',
   'entities.mobs.warlock_imp.name': '炎の魔物',
   'entities.mobs.warlock_voidwalker.name': '虚無の魔物',
@@ -19754,12 +19755,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_moonlight_lance': '月光の槍',
   'abilityUi.cast.temple_prism_flare': 'プリズムの閃光',
   'abilityUi.cast.temple_resonant_slam': '共鳴の叩きつけ',
+  'abilityUi.cast.temple_moonwater_bolt': '月水の矢',
+  'abilityUi.cast.temple_drowning_aria': '溺れのアリア',
+  'abilityUi.cast.temple_mere_surge': '湖の大波',
+  'abilityUi.cast.temple_tideglass_fracture': '潮硝子の亀裂',
   'abilityUi.cast.temple_undertow': '引き潮',
   'abilityUi.cast.temple_lunar_tide': '月の潮',
   'abilityUi.cast.temple_skewering_trident': '串刺しの三叉槍',
   'abilityUi.cast.temple_pale_mending': '蒼白の癒し',
   'abilityUi.cast.temple_glimmer_venom': '煌めく毒',
-  'abilityUi.cast.temple_pearl_slam': '真珠の叩きつけ',
+  'abilityUi.cast.temple_pearl_slam': '潮の羽ばたき',
+  'abilityUi.cast.temple_frostlocked_torrent': '凍てつく激流',
+  'abilityUi.cast.temple_venom_current': '毒の潮流',
+  'abilityUi.cast.temple_toxic_rime': '毒の霧氷',
+  'abilityUi.cast.temple_beckoning_moon': '月招き',
+  'abilityUi.cast.temple_falling_moon': '落ちる月',
   'abilityUi.cast.temple_lightning_spit': '稲妻の吐きかけ',
   'abilityUi.cast.temple_crushing_torrent': '押し潰す奔流',
   'abilityUi.cast.temple_hydra_tsunami': '津波',
@@ -20101,7 +20111,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.area.colonnade':
     '潮の列柱回廊だ。二人ずつ並んで、昇りの節を歌いながら歩いたものだ。',
   'dungeonGuide.drownedTemple.sight.sentinel':
-    '門のそばの捧げ物の貝だ。幸運を願って真珠を納めた。今はそれを心臓として身につけておる。',
+    '門の池の月エイだ。見習いの頃、月の出に真珠を与えたものだ。今は彼らが扉を守り、我らの真珠を心臓として身につけておる。',
   'dungeonGuide.drownedTemple.sight.eel':
     '潟のウナギだ。見習いたちが夕暮れにパンをやっていた。わしらの賛歌で太ったのさ。',
   'dungeonGuide.drownedTemple.area.veil':

@@ -4142,6 +4142,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.respawnKeeperToll':
     'Целитель душ воскресил вас, но вы ослабли: болезнь воскрешения снижает все ваши характеристики, пока не пройдёт.',
+  'hud.system.moonbridgeBanner': 'Лунный мост возведён',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
   'hud.system.noLongerIgnoring': '{name} больше не игнорируется.',
   'hud.system.playerNotNearby': 'Этого игрока нет рядом.',
@@ -5866,7 +5867,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.glimmerscale_lurker.name': 'Затаившийся Мерцающечешуйный',
   'entities.mobs.moonspawn.name': 'Лунное отродье',
   'entities.mobs.pale_choir_acolyte.name': 'Послушник Бледного хора',
-  'entities.mobs.pearlguard_sentinel.name': 'Часовой Жемчужной стражи',
+  'entities.mobs.pearlguard_sentinel.name': 'Скат лунной мантии',
   'entities.mobs.sethrael_palecoil.name': 'Сетраэль Бледное Кольцо',
   'entities.mobs.warlock_imp.name': 'Огненный демон',
   'entities.mobs.warlock_voidwalker.name': 'Демон Пустоты',
@@ -20121,12 +20122,21 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_moonlight_lance': 'Копьё лунного света',
   'abilityUi.cast.temple_prism_flare': 'Вспышка призмы',
   'abilityUi.cast.temple_resonant_slam': 'Резонирующий удар',
+  'abilityUi.cast.temple_moonwater_bolt': 'Стрела лунной воды',
+  'abilityUi.cast.temple_drowning_aria': 'Ария утопления',
+  'abilityUi.cast.temple_mere_surge': 'Вал из озера',
+  'abilityUi.cast.temple_tideglass_fracture': 'Трещина Приливного стекла',
   'abilityUi.cast.temple_undertow': 'Отбойное течение',
   'abilityUi.cast.temple_lunar_tide': 'Лунный прилив',
   'abilityUi.cast.temple_skewering_trident': 'Пронзающий трезубец',
   'abilityUi.cast.temple_pale_mending': 'Бледное исцеление',
   'abilityUi.cast.temple_glimmer_venom': 'Мерцающий яд',
-  'abilityUi.cast.temple_pearl_slam': 'Жемчужный удар',
+  'abilityUi.cast.temple_pearl_slam': 'Приливный взмах крыльев',
+  'abilityUi.cast.temple_frostlocked_torrent': 'Скованный льдом поток',
+  'abilityUi.cast.temple_venom_current': 'Ядовитое течение',
+  'abilityUi.cast.temple_toxic_rime': 'Ядовитая изморозь',
+  'abilityUi.cast.temple_beckoning_moon': 'Зов луны',
+  'abilityUi.cast.temple_falling_moon': 'Падающая луна',
   'abilityUi.cast.temple_lightning_spit': 'Молниевый плевок',
   'abilityUi.cast.temple_crushing_torrent': 'Сокрушительный поток',
   'abilityUi.cast.temple_hydra_tsunami': 'Цунами',
@@ -20488,7 +20498,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.area.colonnade':
     'Колоннада приливов. Мы шли по ней по двое, распевая восходящий стих.',
   'dungeonGuide.drownedTemple.sight.sentinel':
-    'Жертвенные раковины у ворот. Мы клали в них жемчуг на удачу. Теперь они носят его вместо сердца.',
+    'Лунные скаты из прудов у ворот. Послушниками мы кормили их жемчугом на восходе луны. Теперь они стерегут двери, а наш жемчуг стал их сердцами.',
   'dungeonGuide.drownedTemple.sight.eel':
     'Угри лагуны. Послушницы кормили их хлебом в сумерках. Они разжирели на наших гимнах.',
   'dungeonGuide.drownedTemple.area.veil':

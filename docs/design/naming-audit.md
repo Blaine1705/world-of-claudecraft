@@ -736,6 +736,43 @@ design-time verdicts live in `docs/design/dungeon-rework/sunken_bastion.md` sect
 | Knight-Commander's Longsword, Drowned Commander's Breastplate, Gaoler's Chain Girdle, Rusted Shackle Grips, Drowned Warden's Mantle, Gaolyard Cudgel, Gaolyard Striders, Gaoler's Iron Key | the new loot | KEEP. No match for any full name; generic English compounds. |
 | Fogweaver | considered, not used | A World of Warcraft item prefix (Fogweaver Gauntlets). |
 
+### The Drowned Temple encounter pass (web-verified 2026-10-04)
+
+Exact-phrase searches against the major game wikis at authoring, for Choirmother Selthe's
+caster kit and the Tideglass Colossus's floor mechanic (`src/sim/encounters/drowned_temple/ids.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Cresting Wave | REJECTED before shipping | A World of Warcraft spell and Water Elemental look (Cresting Wave Water Elemental Transform). Selthe's wave is the Mere Surge. |
+| Moonwater Bolt | Selthe's kickable filler bolt | KEEP. No match; "moonwater" is common English. |
+| Drowning Aria | Selthe's sung beam | KEEP. No match (Castlevania's Aria of Sorrow is unrelated); generic English. |
+| Mere Surge | Selthe's wedge of water | KEEP. No match; plain English, "Mere" is the game's own Mere Hydra word. |
+| Tideglass Fracture | the Colossus's prism slices | KEEP. No match; "Tideglass" is this game's own coined token (Tideglass Colossus, Tideglass Dirk). |
+
+The second round of the same pass (web-verified 2026-10-04): the Mere Hydra's Combined Breath
+(`hydra_combo.ts`), Ysolei calling the moon (`ysolei_moon.ts`) and the Pearlguard Sentinel's new
+manta body (display only; the id `pearlguard_sentinel` is frozen).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Frozen Torrent | REJECTED before shipping | A World of Warcraft spell (Frozen Torrent, Cataclysm). The ice and water combo is the Frostlocked Torrent. |
+| Frostlocked Torrent | the Hydra's ice and water combo | KEEP. No match for the full name; generic English compound. |
+| Venom Tide | REJECTED before shipping | Too close to the World of Warcraft achievement "Turning the Venom Tide". The venom and water combo is the Venom Current. |
+| Venom Current, Toxic Rime, Ice Wall, Ice Shards | the Hydra's combos and their hazards | KEEP. No match for the full names; plain English. |
+| Tears of the Moon | REJECTED before shipping | A World of Warcraft quest (Tears of the Moon, Teldrassil); "Moon Tears" is a WoW battle pet ability. The tears are Moonlight Tears. |
+| Moonfall | REJECTED before shipping | A World of Warcraft spell (Moonfall, Dragonflight) and zone name. Ysolei's bar is the Falling Moon. |
+| Descending Moon | REJECTED before shipping | A Genshin Impact Archon Quest title. |
+| Moonscorch | REJECTED before shipping | A coined term of Fear and Hunger 2 (the Moonscorched). The tear burn is Moonsear. |
+| Full Moon | not used as a name | A World of Warcraft Balance druid ability (New Moon, Half Moon, Full Moon); the stacks are Moonswell. |
+| Moonglow | not used | A classic World of Warcraft druid talent. The heroic pool is Spilled Moonlight. |
+| Beckoning Moon, Moonlight Tear, Moonsear, Moonswell, Falling Moon, Eclipsed, Moonborne Might, Spilled Moonlight | Ysolei's moon | KEEP. No match for the full names; generic English. |
+| Plenilune Ward | Ysolei's full-moon dome | KEEP. "Plenilune" is an English word for the full moon; only longer compounds exist elsewhere (Final Fantasy XI's Plenilune Embrace, Honkai Star Rail's Sixfold Plenilune). |
+| Moonmantle Ray | the manta that replaces the clam golem (display name of `pearlguard_sentinel`) | KEEP. No match for "Moonmantle" on Wowhead or the game wikis. |
+| Moon Glide, Moonglide | REJECTED before shipping | A Tekken stance and a Fortnite glider. The manta's charge is the Lunar Glide. |
+| Wing Buffet | REJECTED before shipping | A World of Warcraft dragon attack. The manta's slam is the Tidal Wingbeat. |
+| Lunar Glide, Tidal Wingbeat, Nacre Cocoon | the manta's three moves | KEEP. No match for the full names ("Wingbeat" alone is a plain English word). |
+| The Moonbridge Rises | the banner as the Moonbridge forms | KEEP. Plain English over the dungeon's own place name. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
@@ -2525,6 +2562,7 @@ frozen).
 | Moonfleece Mitts | GENERIC |  | item:moonfleece_mitts |
 | Moonfleece Tuft | GENERIC |  | item:moonfleece_tuft |
 | Moonlit Bloom | GENERIC |  | deed:col_moonlit_bloom |
+| Moonmantle Ray | GENERIC |  | mob:pearlguard_sentinel |
 | Moonpale Scale | GENERIC |  | item:moonpale_scale |
 | Moonscale Saber | GENERIC |  | item:moonscale_saber |
 | Moonspawn | GENERIC |  | mob:moonspawn |
@@ -2648,7 +2686,6 @@ frozen).
 | Peaksong Helm | GENERIC |  | item:peaksong_helm |
 | Peakwool Robe | GENERIC |  | item:peakwool_robe |
 | Pearl-Mother Isha | GENERIC |  | npc:pearlmother_isha |
-| Pearlguard Sentinel | GENERIC |  | mob:pearlguard_sentinel |
 | Pearlwake Cargo Crate | GENERIC |  | item:pearlwake_cargo_crate |
 | Pearlward Aegis | GENERIC |  | item:pearlward_aegis |
 | Pelts for the Causeway | GENERIC |  | quest:q_prowler_pelts |

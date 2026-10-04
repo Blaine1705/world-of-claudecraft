@@ -922,6 +922,13 @@ const RENDER_PURE_CORES = [
   'src/render/drowned_temple/temple_tsunami_core.ts',
   // The Mere Hydra's neck fold, regrowth rise and orphaned breath pours.
   'src/render/drowned_temple/temple_hydra_neck_core.ts',
+  // The Temple encounter pass: the Combined Breath's floor marks, wall and
+  // crystals, Ysolei's moon (its swell, eclipse and ward cracks), the
+  // Moonmantle Ray's glide and wingbeat, and the Moonbridge's beam timeline.
+  'src/render/drowned_temple/temple_hydra_combo_core.ts',
+  'src/render/drowned_temple/temple_moon_core.ts',
+  'src/render/drowned_temple/temple_manta_core.ts',
+  'src/render/drowned_temple/temple_moonbridge_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',

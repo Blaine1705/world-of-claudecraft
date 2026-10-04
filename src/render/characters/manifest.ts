@@ -11,9 +11,11 @@ import {
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_RESONANT_SLAM,
   SELTHE_CHORUS_MARK,
+  SELTHE_DROWNING_ARIA,
+  SELTHE_MERE_SURGE,
+  SELTHE_MOONWATER_BOLT,
   SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
-  SELTHE_TIDAL_SLAP,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_UNDERTOW,
@@ -1760,8 +1762,9 @@ export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
 // carries no Book of Names) and holds his ward
 // as he comes down (ShieldRitual). At his Last Rites the staff's crest UNFOLDS
 // INTO A SCYTHE (Transform) and every clip after it carries the blade out.
-// The Pearlguard Sentinel's two stances (temple_sentinel below): the giant
-// on its feet, and the clam shut over it while its Pearl Carapace holds.
+// The Pearlguard Sentinel's two stances (temple_sentinel below): the manta
+// gliding open-winged, and its cocoon (the wings wrapped under its belly)
+// while its Pearl Carapace holds.
 const SENTINEL_CLIPS: ClipMap = {
   ...TEMPLE_CLIPS,
   castByAbility: { [TEMPLE_PEARL_SLAM]: 'Slam' },
@@ -4837,28 +4840,37 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.08,
   },
   // The Pearlguard Sentinel (pearlguard_sentinel; scripts/assets/
-  // drowned_temple_creatures/sentinel_clam/): a temple giant whose body is a
-  // colossal clam, two wavy bone-white valves gaping front and back from its
-  // hips, its iridescent blue mantle between them and its heart pearl glowing
-  // in the front valve's notch; limbs of branching white coral, fists and feet
-  // of nacre stone, a small stone head with a slit of moonlight. Attack: an
-  // overhead hammer fist (CONTACT 0.55); Attack2: a backhand (0.5). Onrush
-  // charges on Run, head down between half-closed valves. Pearl Slam (1.5 s
-  // bar) plays Slam: both fists raised, driven into the floor on the bar's
-  // end. Pearl Carapace: while the ward holds, temple_fx swaps the rig to its
-  // shell stance (crouched, the valves shut over it, ShellClose to enter,
-  // ShellOpen to leave). Dying, the valves fly open and the pearl rolls out
-  // dark. Drawn 7.0 at its 1.15 (2.7 players).
+  // drowned_temple_creatures/sentinel_manta/): the Moonmantle Ray, a giant
+  // sacred manta of moonlight gliding a yard over the flags. Its pearl-white
+  // back carries nine nacre plates carved with the moon's phases (new moon on
+  // its left wingtip to full on its right); the wings thin to edges clear as
+  // water with a filament of cyan light inside; underneath it is deep
+  // turquoise strewn with stars. Its cephalic lobes curl into a silver
+  // crescent round its glowing heart pearl; a whip tail ends in tide-glass.
+  // Idle: a slow wave rolling out along the wings. Walk glides on deep beats,
+  // Run (also its Onrush) darts risen with the wings swept back like an
+  // arrowhead; walkRef/runRef are the glide speeds those beats are authored
+  // for (its wander and its chase). Attack: a cut with the right wing's edge
+  // (CONTACT 0.42); Attack2: the tail arched over its back and lashed down
+  // (0.5). Pearl Slam (1.5 s bar) plays Slam: it rears up on its tail, wings
+  // opened high (about 6 drawn), and drives them down on the bar's end. Pearl
+  // Carapace: temple_fx swaps the rig to its cocoon stance (the wings wrapped
+  // under its belly, moon plates out, ShellClose to enter, ShellOpen bursting
+  // free). Dying, it sinks to the floor and its wing light goes out from the
+  // tips inward, the pearl last. `hover` is its Idle's lowest point (the tail
+  // tip), so the floor of the model stays the floor of the world; drawn 1.6
+  // high at rest and 6.8 wingtip to wingtip at its 1.15 (2.6 players across).
   temple_sentinel: {
     url: `${CREATURES}/temple_sentinel.glb`,
-    height: 6.1,
+    height: 1.4,
+    hover: 0.673,
     clips: SENTINEL_CLIPS,
     phaseClips: {
       [TEMPLE_SENTINEL_SHELL_OPEN]: { clips: SENTINEL_CLIPS, enter: 'ShellOpen' },
       [TEMPLE_SENTINEL_SHELL_CLOSED]: { clips: SENTINEL_SHELL_CLIPS, enter: 'ShellClose' },
     },
-    walkRef: 1.11,
-    runRef: 3.88,
+    walkRef: 2.4,
+    runRef: 6.5,
     castClipSync: true,
     authoredAtlas: true,
     selfIllumination: 0.08,
@@ -4900,10 +4912,15 @@ export const VISUALS: Record<string, VisualDef> = {
   // turquoise to violet fins), her tail coiled in the pool of moonlit water
   // she rides, the golden Great Conch on her chest, a jaw that drops too far
   // when she sings. Sea-Song (1.5 s bar) plays SeaSong: arms wide, head back,
-  // the mouth wide, the fan shivering, the song on the bar's end. Tidal Slap
-  // (1.0 s bar) plays Slap: the arm drawn across her, the backhand on the
-  // bar's end. The Chorus and Solo marks arrive as windup cues and play Chorus
-  // (the conch raised and blown, the fan folding in) and Solo (one arm raised,
+  // the mouth wide, the fan shivering, the song on the bar's end. She is a
+  // caster and never swings her hands: Moonwater Bolt (2.0 s bar) plays Bolt,
+  // water gathered at her shoulder and flung on the bar's end; Mere Surge
+  // (3.0 s bar) plays Surge, sinking into the pool and hurling the wave on the
+  // bar's end; the Drowning Aria (a 5 s channel) loops Beam, both arms thrust
+  // at her target. The bolt and the surge finish their follow-through. Her old
+  // Slap and claw swings stay in the file, unplayed. The Chorus and Solo marks
+  // arrive as windup cues and play Chorus (the conch raised and blown, the fan
+  // folding in) and Solo (one arm raised,
   // the fan flung wide). Dying, the fan folds and she sinks into her pool,
   // leaving the conch glowing on the floor. Drawn 9.0 at her 1.15.
   temple_selthe: {
@@ -4911,15 +4928,28 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 7.83,
     clips: {
       ...TEMPLE_CLIPS,
-      castByAbility: { [SELTHE_SEA_SONG]: 'SeaSong', [SELTHE_TIDAL_SLAP]: 'Slap' },
-      castTimeScaleByAbility: { [SELTHE_SEA_SONG]: 1, [SELTHE_TIDAL_SLAP]: 1 },
+      castByAbility: {
+        [SELTHE_SEA_SONG]: 'SeaSong',
+        [SELTHE_MOONWATER_BOLT]: 'Bolt',
+        [SELTHE_DROWNING_ARIA]: 'Beam',
+        [SELTHE_MERE_SURGE]: 'Surge',
+      },
+      castTimeScaleByAbility: {
+        [SELTHE_SEA_SONG]: 1,
+        [SELTHE_MOONWATER_BOLT]: 1,
+        [SELTHE_DROWNING_ARIA]: 1,
+        [SELTHE_MERE_SURGE]: 1,
+      },
+      castPlayOut: ['Bolt', 'Surge'],
       attackByAbility: { [SELTHE_CHORUS_MARK]: 'Chorus', [SELTHE_SOLO_MARK]: 'Solo' },
       attackTimeScaleByAbility: { [SELTHE_CHORUS_MARK]: 1, [SELTHE_SOLO_MARK]: 1 },
     },
     attackTimeScale: 1,
     walkRef: 2.5,
     runRef: 7,
-    castClipSync: true,
+    // The bars land on their end; the aria's beam loops.
+    castClipSync: [SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE],
+    castPlayOutHoldsAttacks: true,
     authoredAtlas: true,
     selfIllumination: 0.06,
   },

@@ -15,6 +15,10 @@
 //   Regrowth       a fallen head grows back 20 s later while another lives
 //                  (hydra_regrowth.ts): bring the three down close together.
 //   Enraged Hydra  each fallen head drives the others 15 percent harder.
+//   Combined Breath between two Tsunamis two heads fuse their elements, in a
+//                  fixed order (hydra_combo.ts): the Frostlocked Torrent's Ice
+//                  Wall shelters from the next wave, the Venom Current slides
+//                  the pools, the Toxic Rime freezes them to burst.
 //
 // Zero rng in every pick (the victims are hashed, the Tsunami's side
 // alternates); the only draws are the damage rolls.
@@ -23,6 +27,13 @@ import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity, type HydraFightState } from '../../types';
 import { bossEngaged, claimBoss, clearCastOf, dropEncounterObject, grantClaimDeed } from './claim';
+import {
+  clearCombo,
+  comboHolding,
+  stepCombo,
+  stepComboHazards,
+  stepComboSlots,
+} from './hydra_combo';
 import {
   startBrineSpit,
   startTideBreath,
@@ -44,6 +55,7 @@ import {
   hydraElementOwners,
 } from './ids';
 
+export { startCombo } from './hydra_combo';
 export { startBrineSpit, startTideBreath, startTorrent } from './hydra_elements';
 export { startTsunami } from './hydra_tsunami';
 
@@ -64,6 +76,12 @@ function freshState(): HydraFightState {
     tsunami: null,
     casts: 0,
     diedAt: [null, null, null],
+    combos: 0,
+    comboSlot: 0,
+    combo: null,
+    iceWall: null,
+    currents: [],
+    crystals: [],
   };
 }
 
@@ -118,6 +136,7 @@ function resetHydra(ctx: SimContext, inst: InstanceSlot, heads: readonly (Entity
       st.spits = [];
       st.venom = [];
       clearTsunami(ctx, inst, st);
+      clearCombo(ctx, inst, heads, st);
     }
     for (const id of [HYDRA_TIDE_BREATH, HYDRA_CRUSHING_TORRENT, HYDRA_TSUNAMI]) clearCastOf(h, id);
     h.auras = h.auras.filter((a) => a.id !== HYDRA_ENRAGED && a.id !== HYDRA_SUBMERGED);
@@ -134,8 +153,10 @@ function stepElements(
   st: HydraFightState,
 ): void {
   const [ice, venom, water] = elementWielders(heads);
+  // A Combined Breath due or running holds the plain bars (hydra_combo.ts).
+  const hold = comboHolding(inst, st);
   const free = (h: Entity | null): h is Entity =>
-    h !== null && !h.dead && h.castingAbility === null && !ctx.isStunned(h);
+    !hold && h !== null && !h.dead && h.castingAbility === null && !ctx.isStunned(h);
   st.breathTimer -= DT;
   if (st.breathTimer <= 0) {
     st.breathTimer = free(ice) && startTideBreath(ctx, inst, ice, st) ? T.breathEvery : 1;
@@ -189,6 +210,8 @@ export function tickMereHydra(ctx: SimContext, inst: InstanceSlot): void {
   }
   const [, venomHead] = elementWielders(heads);
   stepVenom(ctx, inst, st, venomHead ?? standing[0]);
+  stepCombo(ctx, inst, heads, st);
+  stepComboHazards(ctx, inst, st, venomHead ?? standing[0]);
   if (stepTsunami(ctx, inst, standing, st)) return;
   st.tsunamiTimer -= DT;
   if (st.tsunamiTimer <= 0) {
@@ -198,5 +221,6 @@ export function tickMereHydra(ctx: SimContext, inst: InstanceSlot): void {
     }
     st.tsunamiTimer = 0.5;
   }
+  stepComboSlots(ctx, inst, heads, st);
   stepElements(ctx, inst, heads, st);
 }

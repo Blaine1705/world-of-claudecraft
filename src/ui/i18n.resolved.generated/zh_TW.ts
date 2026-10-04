@@ -7165,7 +7165,7 @@ export const zh_TW: EnTranslations = {
         "siren": "那個聲音。她曾在唱詩班裡站在我身旁歌唱。她現在還是會早半拍進來。",
         "lurker": "孩子們常在淺灘用網撈這些東西。那時牠們只有拇指大，會發光。",
         "tidewisp": "那就是月之水本身，我們本該喝下的那一口。別讓它碰到你們。",
-        "sentinel": "門邊的供奉蚌。我們把珍珠放進去祈求好運。如今牠們把珍珠當作心臟。",
+        "sentinel": "門邊水池裡的月鰩。我們還是見習生時，在月出時餵牠們珍珠。如今牠們守著這些門，把我們的珍珠當作心臟。",
         "eel": "潟湖裡的鰻魚。見習生們會在黃昏餵牠們麵包。牠們靠我們的聖歌養得肥肥的。",
         "reflection": "它讓你們看見湖水會把你們變成什麼。打碎它！",
         "moonspawn": "那些從來不是我的族人。牠們是她的，只由月光造成。"
@@ -12068,6 +12068,7 @@ export const zh_TW: EnTranslations = {
       "deathRecapCauterized": "你已經死亡。灼燒術的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢復、身體完整。",
       "respawnKeeperToll": "靈魂醫者復活了你，但你因此變得虛弱：在復活後遺症消退之前，你的所有屬性都會被削弱。",
+      "moonbridgeBanner": "月之橋已成",
       "ignoringChat": "已封鎖來自 {name} 的聊天。",
       "noLongerIgnoring": "不再封鎖 {name}。",
       "playerNotNearby": "該玩家不在附近。",
@@ -12551,17 +12552,26 @@ export const zh_TW: EnTranslations = {
       "temple_moonlight_lance": "月光長槍",
       "temple_prism_flare": "稜鏡閃耀",
       "temple_resonant_slam": "共鳴猛擊",
+      "temple_moonwater_bolt": "月水箭",
+      "temple_drowning_aria": "溺亡詠嘆調",
+      "temple_mere_surge": "湖湧",
+      "temple_tideglass_fracture": "潮鏡碎裂",
       "temple_undertow": "暗流",
       "temple_lunar_tide": "月潮",
       "temple_skewering_trident": "穿刺三叉戟",
       "temple_pale_mending": "蒼白癒合",
       "temple_glimmer_venom": "微光毒液",
-      "temple_pearl_slam": "珍珠猛擊",
+      "temple_pearl_slam": "潮汐振翼",
       "temple_lightning_spit": "閃電噴吐",
       "temple_crushing_torrent": "碾壓激流",
       "temple_hydra_tsunami": "海嘯",
       "temple_ysolei_call": "月裔召喚",
       "temple_ysolei_wrath": "溺亡之怒",
+      "temple_frostlocked_torrent": "冰封激流",
+      "temple_venom_current": "毒液洋流",
+      "temple_toxic_rime": "劇毒霜晶",
+      "temple_beckoning_moon": "喚月",
+      "temple_falling_moon": "墜月",
       "wildheart_ancestral_sap": "先祖樹汁",
       "wildheart_plant_totem": "安置圖騰",
       "wildheart_entangling_lash": "纏繞鞭笞",
@@ -20939,7 +20949,7 @@ export const zh_TW: EnTranslations = {
         "name": "蒼白唱詩侍僧"
       },
       "pearlguard_sentinel": {
-        "name": "珍珠衛哨兵"
+        "name": "月幔鰩"
       },
       "sethrael_palecoil": {
         "name": "蒼盤者賽斯瑞爾"

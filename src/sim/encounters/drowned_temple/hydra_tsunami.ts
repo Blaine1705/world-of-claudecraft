@@ -9,6 +9,9 @@
 // Heroic backwash: 3.5 s after the wave lands it rolls back over the other
 // half, so the half you ran to is the next one to leave.
 //
+// The Combined Breath's Ice Wall (hydra_combo.ts) shelters its lee like a
+// column, and the wave that breaks on it shatters it.
+//
 // Zero rng: the side alternates; the only draws are the damage rolls.
 
 import { pullToward } from '../../pull_toward';
@@ -23,6 +26,7 @@ import {
   spawnTempleObject,
   startCast,
 } from './claim';
+import { breakIceWall, iceWallShelters } from './hydra_combo';
 import {
   HYDRA_SUBMERGED,
   HYDRA_TSUNAMI,
@@ -78,6 +82,8 @@ export function startTsunami(
   if (heads.length === 0 || heads.some((h) => h.castingAbility !== null)) return false;
   const side = tsunamiSide(st.tsunamis);
   st.tsunamis++;
+  // A new cycle: the Combined Breath's slots open again (hydra_combo.ts).
+  st.comboSlot = 0;
   const wave = spawnWave(ctx, inst, side);
   st.tsunami = {
     side,
@@ -103,6 +109,7 @@ function landWave(
   source: Entity,
   side: TsunamiSide,
   waveId: number,
+  st: HydraFightState,
 ): void {
   ctx.emit({
     type: 'spellfx',
@@ -116,8 +123,16 @@ function landWave(
   const heading = tsunamiHeading(side);
   const ax = Math.sin(heading);
   const az = Math.cos(heading);
-  for (const p of claimPlayers(ctx, inst)) {
-    if (p.dead) continue;
+  // The lee of the Frostlocked Torrent's Ice Wall is as safe as a column's;
+  // read it before the wave breaks the wall (whose shards fly where everyone
+  // stands as it hits, before anyone is thrown).
+  const players = claimPlayers(ctx, inst).filter((p) => !p.dead);
+  const sheltered = new Set(
+    players.filter((p) => iceWallShelters(st, side, p.pos.x - o.x, p.pos.z - o.z)).map((p) => p.id),
+  );
+  breakIceWall(ctx, inst, source, st, side);
+  for (const p of players) {
+    if (p.dead || sheltered.has(p.id)) continue;
     const x = p.pos.x - o.x;
     const z = p.pos.z - o.z;
     if (!inTsunamiPath(side, x, z) || inTsunamiLee(side, x, z)) continue;
@@ -155,7 +170,7 @@ export function stepTsunami(
   if (wave && w.remaining <= T.tsunamiRoll) wave.templateId = TSUNAMI_TEMPLATES.surge;
   if (w.remaining > 0) return true;
   const source = heads[0] ?? null;
-  if (source) landWave(ctx, inst, source, w.side, w.objectId);
+  if (source) landWave(ctx, inst, source, w.side, w.objectId, st);
   dropEncounterObject(ctx, inst, w.objectId);
   if (w.backwash && heads.length > 0) {
     // Heroic: the wave rolls straight back over the other half.

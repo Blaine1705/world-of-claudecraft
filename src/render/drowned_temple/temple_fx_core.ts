@@ -12,16 +12,27 @@ import {
   COLOSSUS_MOONLIGHT_LANCE,
   COLOSSUS_RESONANT_SLAM,
   COLOSSUS_TUNING,
+  FRACTURE_ROUNDS,
+  HYDRA_COMBO_TUNING,
   HYDRA_CRUSHING_TORRENT,
   HYDRA_TIDE_BREATH,
   HYDRA_TUNING,
+  MOON_TEAR_TEMPLATE,
+  MOONGLOW_TEMPLATE,
+  RIME_CRYSTAL_TEMPLATE,
   RIPTIDE_TEMPLATE,
   SELTHE_CHORUS_MARK,
+  SELTHE_DROWNING_ARIA,
+  SELTHE_MERE_SURGE,
+  SELTHE_MOONWATER_BOLT,
   SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
   SELTHE_TUNING,
   SOLO_ECHO_TEMPLATE,
+  VENOM_CURRENT_TEMPLATE,
   VENOM_POOL_TEMPLATE,
+  YSOLEI_BECKONING_MOON,
+  YSOLEI_FALLING_MOON,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_TUNING,
   YSOLEI_UNDERTOW,
@@ -194,6 +205,45 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
       color: TELEGRAPH_THREAT_COLORS.lethal,
       accent: TEMPLE_ACCENTS.tide,
     },
+    // Selthe the caster: the Mere Surge's wedge (step out sideways), and a
+    // kick glyph under her bolt and her aria (both can be interrupted).
+    [SELTHE_MERE_SURGE]: {
+      shape: 'cone',
+      range: SELTHE_TUNING.surgeRange,
+      arcDeg: SELTHE_TUNING.surgeArcDeg,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: TEMPLE_ACCENTS.tide,
+    },
+    [SELTHE_MOONWATER_BOLT]: {
+      shape: 'sigil',
+      range: 2.4,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.tide,
+    },
+    [SELTHE_DROWNING_ARIA]: {
+      shape: 'sigil',
+      range: 3,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.moon,
+    },
+    // Ysolei calling the moon: neither bar can be kicked; a glyph under her
+    // says the moon is coming (the tears, and the ward to break).
+    [YSOLEI_BECKONING_MOON]: {
+      shape: 'sigil',
+      range: 4,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: TEMPLE_ACCENTS.moon,
+    },
+    [YSOLEI_FALLING_MOON]: {
+      shape: 'sigil',
+      range: 5,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.lethal,
+      accent: TEMPLE_ACCENTS.moon,
+    },
     // Selthe's Sea-Song hits the whole court: a glyph under her, not a zone.
     [SELTHE_SEA_SONG]: {
       shape: 'sigil',
@@ -239,6 +289,32 @@ export const TEMPLE_OBJECT_SPECS: Readonly<Record<string, TempleObjectSpec>> = {
   [RIPTIDE_TEMPLATE]: {
     color: TELEGRAPH_THREAT_COLORS.danger,
     accent: TEMPLE_ACCENTS.tide,
+    fillSeconds: 0,
+  },
+  // The Combined Breath (hydra_combo.ts): a Venom Current pool sliding down
+  // its current (a standing hazard, its arrow is temple_hydra_combo_fx.ts's),
+  // and a Toxic Rime crystal filling to its wider burst.
+  [VENOM_CURRENT_TEMPLATE]: {
+    color: 0x7fd64a,
+    accent: TEMPLE_ACCENTS.venom,
+    fillSeconds: 0,
+  },
+  [RIME_CRYSTAL_TEMPLATE]: {
+    color: TELEGRAPH_THREAT_COLORS.danger,
+    accent: TELEGRAPH_ACCENTS.frost,
+    fillSeconds: HYDRA_COMBO_TUNING.rimeSeconds,
+  },
+  // Ysolei's moon (ysolei_moon.ts): a Moonlight Tear's catch circle is
+  // SILVER, the one ring in the fight to step INTO; the heroic moonlight it
+  // leaves is a hazard.
+  [MOON_TEAR_TEMPLATE]: {
+    color: 0xe8f0ff,
+    accent: TEMPLE_ACCENTS.moon,
+    fillSeconds: 0,
+  },
+  [MOONGLOW_TEMPLATE]: {
+    color: TELEGRAPH_THREAT_COLORS.danger,
+    accent: TEMPLE_ACCENTS.moon,
     fillSeconds: 0,
   },
 };
@@ -401,4 +477,65 @@ export function templeMoonspawnRises(
   sinceFirstSeen: number,
 ): boolean {
   return templateId === 'moonspawn' && !dead && sinceFirstSeen <= TEMPLE_MOONSPAWN_RISE_WINDOW;
+}
+
+/** Where a Tideglass Fracture stands, read off the Colossus's own channel bar
+ *  (so heroic's shorter rounds read right with no difficulty on the wire):
+ *  round -1 while the floor cracks, else the round (0 based) and how far its
+ *  red slices have charged toward their detonation (0 to 1). */
+export function fractureClock(
+  castTotal: number,
+  castRemaining: number,
+  crackSeconds: number,
+  out: { round: number; charge: number } = { round: -1, charge: 0 },
+): { round: number; charge: number } {
+  const elapsed = Math.max(0, castTotal - castRemaining);
+  out.round = -1;
+  out.charge = 0;
+  if (elapsed < crackSeconds || castTotal <= crackSeconds) return out;
+  const warn = (castTotal - crackSeconds) / FRACTURE_ROUNDS;
+  const into = elapsed - crackSeconds;
+  out.round = Math.min(FRACTURE_ROUNDS - 1, Math.floor(into / warn));
+  out.charge = Math.min(1, Math.max(0, (into - out.round * warn) / warn));
+  return out;
+}
+
+export interface FractureSliceLook {
+  heat: number;
+  clear: number;
+  crack: number;
+  pulse: number;
+}
+
+/** The warning pulse's ceiling (Hz) for a player who asked for reduced motion. */
+export const FRACTURE_CALM_PULSE = 1.5;
+
+/** A fracture slice's paint: the red heat (0 safe, up to 1 at detonation),
+ *  the clear glass (1 safe), and the crack glow while the floor splits. The
+ *  heat ramps with the charge so the last half second blazes; the warning
+ *  pulse quickens from 2 to 8 Hz, held to FRACTURE_CALM_PULSE for reduced
+ *  motion (the heat, the actionable part, is the same). */
+export function fractureSliceLook(
+  state: 'crack' | 'red' | 'safe',
+  charge: number,
+  calm = false,
+  out: FractureSliceLook = { heat: 0, clear: 0, crack: 0, pulse: 0 },
+): FractureSliceLook {
+  out.heat = 0;
+  out.clear = 0;
+  out.pulse = 0;
+  if (state === 'crack') {
+    out.crack = 1;
+    return out;
+  }
+  if (state === 'safe') {
+    out.clear = 1;
+    out.crack = 0.25;
+    return out;
+  }
+  const c = Math.min(1, Math.max(0, charge));
+  out.heat = 0.45 + 0.55 * c * c;
+  out.crack = 0.5;
+  out.pulse = calm ? Math.min(FRACTURE_CALM_PULSE, 2 + 6 * c) : 2 + 6 * c;
+  return out;
 }

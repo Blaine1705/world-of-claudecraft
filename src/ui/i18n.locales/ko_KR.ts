@@ -4063,6 +4063,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.system.respawn': '다시 온전하고 편안한 상태가 되었습니다.',
   'hud.system.respawnKeeperToll':
     '영혼 치유사가 당신을 부활시켰지만 그 대가로 약해졌습니다. 부활 후유증이 사라질 때까지 모든 능력치가 감소합니다.',
+  'hud.system.moonbridgeBanner': '달의 다리가 놓인다',
   'hud.system.ignoringChat': '{name}의 채팅을 차단합니다.',
   'hud.system.noLongerIgnoring': '{name}을 더 이상 차단하지 않습니다.',
   'hud.system.playerNotNearby': '그 플레이어는 근처에 없습니다.',
@@ -5777,7 +5778,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.glimmerscale_lurker.name': '반짝비늘 잠복자',
   'entities.mobs.moonspawn.name': '달의 부산물',
   'entities.mobs.pale_choir_acolyte.name': '창백한 성가대 수습 사제',
-  'entities.mobs.pearlguard_sentinel.name': '진주수호 파수병',
+  'entities.mobs.pearlguard_sentinel.name': '달망토 가오리',
   'entities.mobs.sethrael_palecoil.name': '페일코일의 세스라엘',
   'entities.mobs.warlock_imp.name': '화염 악마',
   'entities.mobs.warlock_voidwalker.name': '공허 악마',
@@ -19739,12 +19740,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_moonlight_lance': '달빛 창',
   'abilityUi.cast.temple_prism_flare': '프리즘 섬광',
   'abilityUi.cast.temple_resonant_slam': '공명의 강타',
+  'abilityUi.cast.temple_moonwater_bolt': '월수 화살',
+  'abilityUi.cast.temple_drowning_aria': '익사의 아리아',
+  'abilityUi.cast.temple_mere_surge': '호수의 해일',
+  'abilityUi.cast.temple_tideglass_fracture': '조수유리 균열',
   'abilityUi.cast.temple_undertow': '역류',
   'abilityUi.cast.temple_lunar_tide': '달의 조수',
   'abilityUi.cast.temple_skewering_trident': '꿰뚫는 삼지창',
   'abilityUi.cast.temple_pale_mending': '창백한 치유',
   'abilityUi.cast.temple_glimmer_venom': '반짝이는 독',
-  'abilityUi.cast.temple_pearl_slam': '진주 강타',
+  'abilityUi.cast.temple_pearl_slam': '해일의 날갯짓',
+  'abilityUi.cast.temple_frostlocked_torrent': '얼어붙은 급류',
+  'abilityUi.cast.temple_venom_current': '독의 해류',
+  'abilityUi.cast.temple_toxic_rime': '맹독 서리',
+  'abilityUi.cast.temple_beckoning_moon': '달의 부름',
+  'abilityUi.cast.temple_falling_moon': '떨어지는 달',
   'abilityUi.cast.temple_lightning_spit': '번개 침',
   'abilityUi.cast.temple_crushing_torrent': '짓누르는 급류',
   'abilityUi.cast.temple_hydra_tsunami': '해일',
@@ -20089,7 +20099,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.area.colonnade':
     '조수의 열주랑이오. 우리는 둘씩 짝지어 오름의 소절을 부르며 걸었소.',
   'dungeonGuide.drownedTemple.sight.sentinel':
-    '문 곁의 공물 조개들이오. 행운을 빌며 진주를 넣었지. 이제 그것을 심장으로 품고 있소.',
+    '문 앞 연못의 달가오리들이다. 수련생 시절, 달이 뜰 때 진주를 먹여 주곤 했지. 이제는 그들이 문을 지키며, 우리의 진주를 심장으로 삼고 있구나.',
   'dungeonGuide.drownedTemple.sight.eel':
     '석호의 뱀장어들이오. 수습생들이 해 질 녘에 빵을 주었지. 우리 찬송가를 먹고 살이 쪘소.',
   'dungeonGuide.drownedTemple.area.veil':

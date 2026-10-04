@@ -7165,7 +7165,7 @@ export const ru_RU: EnTranslations = {
         "siren": "Этот голос. Она пела рядом со мной в хоре. До сих пор вступает на полдоли раньше.",
         "lurker": "Дети ловили таких сетями на мелководье. Они были с большой палец и светились.",
         "tidewisp": "Это сама лунная вода, тот глоток, что мы должны были выпить. Не дайте ей вас коснуться.",
-        "sentinel": "Жертвенные раковины у ворот. Мы клали в них жемчуг на удачу. Теперь они носят его вместо сердца.",
+        "sentinel": "Лунные скаты из прудов у ворот. Послушниками мы кормили их жемчугом на восходе луны. Теперь они стерегут двери, а наш жемчуг стал их сердцами.",
         "eel": "Угри лагуны. Послушницы кормили их хлебом в сумерках. Они разжирели на наших гимнах.",
         "reflection": "Оно показывает, во что вас превратила бы вода. Разбейте его!",
         "moonspawn": "Это никогда не были мои люди. Они её, сотканные из одного лунного света."
@@ -12068,6 +12068,7 @@ export const ru_RU: EnTranslations = {
       "deathRecapCauterized": "Вы погибли. Ожог Прижигания одолел вас.",
       "respawn": "Вы снова чувствуете себя отдохнувшим и целым.",
       "respawnKeeperToll": "Целитель душ воскресил вас, но вы ослабли: болезнь воскрешения снижает все ваши характеристики, пока не пройдёт.",
+      "moonbridgeBanner": "Лунный мост возведён",
       "ignoringChat": "Чат от {name} игнорируется.",
       "noLongerIgnoring": "{name} больше не игнорируется.",
       "playerNotNearby": "Этого игрока нет рядом.",
@@ -12551,17 +12552,26 @@ export const ru_RU: EnTranslations = {
       "temple_moonlight_lance": "Копьё лунного света",
       "temple_prism_flare": "Вспышка призмы",
       "temple_resonant_slam": "Резонирующий удар",
+      "temple_moonwater_bolt": "Стрела лунной воды",
+      "temple_drowning_aria": "Ария утопления",
+      "temple_mere_surge": "Вал из озера",
+      "temple_tideglass_fracture": "Трещина Приливного стекла",
       "temple_undertow": "Отбойное течение",
       "temple_lunar_tide": "Лунный прилив",
       "temple_skewering_trident": "Пронзающий трезубец",
       "temple_pale_mending": "Бледное исцеление",
       "temple_glimmer_venom": "Мерцающий яд",
-      "temple_pearl_slam": "Жемчужный удар",
+      "temple_pearl_slam": "Приливный взмах крыльев",
       "temple_lightning_spit": "Молниевый плевок",
       "temple_crushing_torrent": "Сокрушительный поток",
       "temple_hydra_tsunami": "Цунами",
       "temple_ysolei_call": "Зов лунного отродья",
       "temple_ysolei_wrath": "Утопленный гнев",
+      "temple_frostlocked_torrent": "Скованный льдом поток",
+      "temple_venom_current": "Ядовитое течение",
+      "temple_toxic_rime": "Ядовитая изморозь",
+      "temple_beckoning_moon": "Зов луны",
+      "temple_falling_moon": "Падающая луна",
       "wildheart_ancestral_sap": "Сок предков",
       "wildheart_plant_totem": "Установка тотема",
       "wildheart_entangling_lash": "Опутывающий хлыст",
@@ -20939,7 +20949,7 @@ export const ru_RU: EnTranslations = {
         "name": "Послушник Бледного хора"
       },
       "pearlguard_sentinel": {
-        "name": "Часовой Жемчужной стражи"
+        "name": "Скат лунной мантии"
       },
       "sethrael_palecoil": {
         "name": "Сетраэль Бледное Кольцо"

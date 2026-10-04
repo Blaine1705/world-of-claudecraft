@@ -15,7 +15,8 @@ export const TEMPLE_STATIC_COIL = 'temple_static_coil';
 export const TEMPLE_SNAP = 'temple_snapper_snap';
 /** Drowned Templeguard: a telegraphed trident sweep across its front (breathCone). */
 export const TEMPLE_TRIDENT_SWEEP = 'temple_trident_sweep';
-/** Pearlguard Sentinel: its pearl shell closing over it once, when low. */
+/** The Moonmantle Ray (id pearlguard_sentinel): its Nacre Cocoon, the wings
+ *  wrapped over it once, when low. */
 export const TEMPLE_PEARL_CARAPACE = 'temple_pearl_carapace';
 /** Tidewisp: the burst when it reaches a player. */
 export const TEMPLE_TIDEWISP_BURST = 'temple_tidewisp_burst';
@@ -28,7 +29,8 @@ export const TEMPLE_SKEWERING_TRIDENT = 'temple_skewering_trident';
 export const TEMPLE_PALE_MENDING = 'temple_pale_mending';
 /** Glimmerscale Lurker: an interruptible bolt of venom (trashKit.bolt). */
 export const TEMPLE_GLIMMER_VENOM = 'temple_glimmer_venom';
-/** Pearlguard Sentinel: its fists slammed down round it, a shove (trashKit.wingGust). */
+/** The Moonmantle Ray (id pearlguard_sentinel): its Tidal Wingbeat, both wings
+ *  brought down round it, a shove (trashKit.wingGust). */
 export const TEMPLE_PEARL_SLAM = 'temple_pearl_slam';
 /** Lagoon Eel: a lane of lightning spat at one player (trashKit.line). */
 export const TEMPLE_LIGHTNING_SPIT = 'temple_lightning_spit';

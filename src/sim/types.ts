@@ -4227,7 +4227,7 @@ export interface TrashKitDef {
    *  damage (the Pale Choir Acolyte's Lullaby). Kick it, or wake the sleeper. */
   lullaby?: TrashKitCast & { range: number; seconds: number };
   /** Once per pull under a share of its health: a self absorb shield worth a
-   *  share of its maximum health (the Pearlguard Sentinel's Pearl Carapace). */
+   *  share of its maximum health (the Moonmantle Ray's Nacre Cocoon). */
   carapace?: { belowHpPct: number; shieldPct: number; seconds: number; name: string };
   /** It bursts where it fell, `delay` seconds after it dies (0: at once): a
    *  splash round the corpse (the Rime Whelp's Hoarfrost Pop, the Glacier
@@ -4522,7 +4522,24 @@ export interface SeltheFightState {
   chorusTimer: number;
   soloTimer: number;
   songTimer: number;
-  slapTimer: number;
+  /** Seconds to the next Mere Surge and the next Drowning Aria. */
+  surgeTimer: number;
+  ariaTimer: number;
+  /** The breath she takes after a bar before her next Moonwater Bolt. */
+  boltGap: number;
+  /** After a kick: seconds she casts neither bolt nor aria. */
+  quiet: number;
+  /** The kickable bar she began (a bolt or the aria), so a cut one is seen. */
+  kickable: string | null;
+  /** The Mere Surge's locked aim while its bar runs. */
+  surgeYaw: number | null;
+  /** The Drowning Aria in flight: whom she sings at, whom the beam strikes now
+   *  (the target, or a body that stepped into it), how many pulses in a row
+   *  it has struck, and the seconds to the next pulse. */
+  aria: { targetId: number; struckId: number; streak: number; pulse: number } | null;
+  /** Arias and Surges begun (their own hash salt, so the marks' picks keep
+   *  the salt they had before the caster pass). */
+  barCasts: number;
   /** Marks in flight: whose, and the seconds until each resolves. */
   marks: { mark: 'chorus' | 'solo'; playerId: number; remaining: number }[];
   /** Heroic Echo: marks resolving again where they fell (their object ids). */
@@ -4570,6 +4587,37 @@ export interface HydraFightState {
   /** Sim time each head (left, centre, right) last fell; null while it lives.
    *  A fallen head grows back regrowAfter seconds later while another lives. */
   diedAt: (number | null)[];
+  /** The Combined Breath (encounters/drowned_temple/hydra_combo.ts): combos
+   *  begun this fight (the fixed order's index and their own hash salt), the
+   *  slots fired since the last Tsunami began, the combo whose bar runs (its
+   *  kind, its heads, and the Frostlocked Torrent's locked lane), the Ice Wall
+   *  standing, the sliding Venom Current pools and the Toxic Rime crystals. */
+  combos: number;
+  comboSlot: number;
+  combo: {
+    kind: 'frostlock' | 'current' | 'rime';
+    headIds: number[];
+    remaining: number;
+    yaw: number;
+  } | null;
+  iceWall: {
+    x: number;
+    z: number;
+    yaw: number;
+    length: number;
+    remaining: number;
+    objectId: number;
+  } | null;
+  currents: {
+    x: number;
+    z: number;
+    yaw: number;
+    slide: number;
+    remaining: number;
+    tick: number;
+    objectId: number;
+  }[];
+  crystals: { x: number; z: number; remaining: number; objectId: number }[];
 }
 
 export interface ColossusFightState {
@@ -4589,6 +4637,14 @@ export interface ColossusFightState {
   /** Where it planted its feet for the bar in flight (instance world
    *  coordinates), so a bar's lane and ring land where they were drawn. */
   plantedAt: { x: number; y: number; z: number } | null;
+  /** Seconds to the next Tideglass Fracture. */
+  fractureTimer: number;
+  /** The Tideglass Fracture in flight: the round (-1 while its bar opens),
+   *  the seconds to that round's detonation, the cast's slice rotation, and
+   *  its eight slice objects (index = slice). */
+  fracture: { round: number; timer: number; rot: number; objectIds: number[] } | null;
+  /** Fractures begun (their own hash salt, so the Lance's victim keeps its). */
+  fractures: number;
 }
 
 export interface YsoleiFightState {
@@ -4613,6 +4669,18 @@ export interface YsoleiFightState {
   summonsRoared: number;
   wrathRoared: boolean;
   roars: string[];
+  /** She calls the moon (encounters/drowned_temple/ysolei_moon.ts): tear
+   *  thresholds passed, the calls still waiting for her to be free, the tears
+   *  rolling at her (heading toward her coil), the heroic moonglow pools, and
+   *  the Full Moon (queued, its bar running, or done). */
+  tearWaves: number;
+  tearCalls: number;
+  tears: { x: number; z: number; objectId: number }[];
+  glows: { x: number; z: number; remaining: number; tick: number; objectId: number }[];
+  /** Each body's Moonsear stacks and when they fade (sim time): the count the
+   *  next tear reads, kept here so a cleanse of the display aura sheds none. */
+  sear: { playerId: number; stacks: number; until: number }[];
+  fullMoon: 'queued' | 'falling' | 'done' | null;
 }
 
 export type TempleFightState =

@@ -6,8 +6,16 @@
 
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import { bossEngaged, claimBoss, templeClaims } from './claim';
-import { COLOSSUS_ID, HYDRA_TUNING, SELTHE_ID, YSOLEI_ID } from './ids';
+import { bossEngaged, claimBoss, clearCastOf, templeClaims } from './claim';
+import { startCombo } from './hydra_combo';
+import {
+  COLOSSUS_ID,
+  HYDRA_COMBO_CASTS,
+  HYDRA_TUNING,
+  type HydraComboKind,
+  SELTHE_ID,
+  YSOLEI_ID,
+} from './ids';
 import {
   elementWielders,
   hydraHeads,
@@ -17,9 +25,11 @@ import {
   startTsunami,
   tickMereHydra,
 } from './mere_hydra';
-import { startChorus, startSolo, tickSelthe } from './selthe';
+import { startAria, startBolt, startChorus, startSolo, startSurge, tickSelthe } from './selthe';
 import { raiseReflections, startLance, tickColossus } from './tideglass_colossus';
+import { startFracture } from './tideglass_fracture';
 import { startRisingTide, startUndertow, tickYsolei } from './ysolei';
+import { startBeckoning, startFullMoon } from './ysolei_moon';
 
 export { HYDRA_REGROWTH_LOG } from './hydra_regrowth';
 export * from './ids';
@@ -40,9 +50,19 @@ export function tickTempleEncounters(ctx: SimContext): void {
 }
 
 const HELP =
-  'Mechanics: chorus, solo, duet (Selthe); breath, spit, torrent, tsunami, regrow (the Hydra); reflections, lance (the Colossus); undertow, flood (Ysolei).';
+  'Mechanics: chorus, solo, duet, bolt, aria, surge (Selthe); breath, spit, torrent, tsunami, regrow, combo, frostlock, current, rime (the Hydra); reflections, lance, fracture (the Colossus); undertow, flood, tears, fullmoon (Ysolei); cocoon (an engaged Moonmantle Ray).';
+
+const SELTHE_BARS = new Set(['bolt', 'aria', 'surge']);
 
 const HYDRA_TRIGGERS = new Set(['breath', 'spit', 'torrent', 'tsunami', 'regrow']);
+
+/** The Combined Breath triggers: the next in the order, or one by name. */
+const COMBO_TRIGGERS: Readonly<Record<string, HydraComboKind | 'next'>> = {
+  combo: 'next',
+  frostlock: 'frostlock',
+  current: 'current',
+  rime: 'rime',
+};
 
 /** `/dev temple trigger <mechanic>`: fire an engaged boss's mechanic now.
  *  Returns the log line. */
@@ -54,6 +74,45 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     if (what !== 'solo') startChorus(ctx, inst, boss, st);
     if (what !== 'chorus') startSolo(ctx, inst, boss, st);
     return 'Selthe marks her singers.';
+  }
+  if (SELTHE_BARS.has(what)) {
+    const boss = claimBoss(ctx, inst, SELTHE_ID);
+    const st = boss?.templeFight;
+    if (!boss || st?.kind !== 'selthe') return 'Pull Selthe first.';
+    // A dev trigger cuts whatever bar is running (not as a kick: no hush).
+    if (boss.castingAbility !== null) {
+      boss.castingAbility = null;
+      boss.castRemaining = 0;
+      boss.castTargetId = null;
+      boss.channeling = false;
+      st.aria = null;
+      st.kickable = null;
+      boss.castTotal = 0;
+      st.surgeYaw = null;
+    }
+    if (what === 'bolt')
+      return startBolt(ctx, inst, boss, st) ? 'Selthe gathers a Moonwater Bolt.' : 'No target.';
+    if (what === 'aria')
+      return startAria(ctx, inst, boss, st) ? 'Selthe sings a Drowning Aria.' : 'No target.';
+    return startSurge(ctx, inst, boss, st) ? 'Selthe heaves a Mere Surge.' : 'No target.';
+  }
+  if (what in COMBO_TRIGGERS) {
+    const heads = hydraHeads(ctx, inst);
+    const st = heads?.find((h) => h?.templeFight?.kind === 'hydra')?.templeFight;
+    if (!heads || st?.kind !== 'hydra') return 'Pull the Mere Hydra first.';
+    if (st.tsunami) return 'A Tsunami is rolling.';
+    if (st.combo) return 'A Combined Breath is already drawing.';
+    // A dev trigger cuts whatever plain bar is running so the combo shows.
+    const comboCasts = new Set(Object.values(HYDRA_COMBO_CASTS));
+    for (const h of heads) {
+      if (!h || h.dead || h.castingAbility === null || comboCasts.has(h.castingAbility)) continue;
+      clearCastOf(h, h.castingAbility);
+    }
+    st.torrent = null;
+    const pick = COMBO_TRIGGERS[what];
+    const ok =
+      pick === 'next' ? startCombo(ctx, inst, heads, st) : startCombo(ctx, inst, heads, st, pick);
+    return ok ? 'Two heads twine their necks: a Combined Breath.' : 'No target.';
   }
   if (HYDRA_TRIGGERS.has(what)) {
     const heads = hydraHeads(ctx, inst);
@@ -94,7 +153,7 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     if (!ice) return 'No head wields the ice.';
     return startTideBreath(ctx, inst, ice, st) ? 'A head draws a Freezing Breath.' : 'No target.';
   }
-  if (what === 'reflections' || what === 'lance') {
+  if (what === 'reflections' || what === 'lance' || what === 'fracture') {
     const boss = claimBoss(ctx, inst, COLOSSUS_ID);
     const st = boss?.templeFight;
     if (!boss || st?.kind !== 'colossus') return 'Pull the Colossus first.';
@@ -106,13 +165,45 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
       }
       return startLance(ctx, inst, boss, st) ? 'The Colossus aims a lance.' : 'No target.';
     }
+    if (what === 'fracture') {
+      if (st.fracture) return 'The floor is already fractured.';
+      if (boss.castingAbility !== null) {
+        boss.castingAbility = null;
+        boss.castRemaining = 0;
+      }
+      return startFracture(ctx, inst, boss, st)
+        ? 'The terrace floor splits into prism slices.'
+        : 'No fracture.';
+    }
     const n = raiseReflections(ctx, inst, boss, st);
     return `The prism flares: ${n} reflection${n === 1 ? '' : 's'}.`;
   }
-  if (what === 'undertow' || what === 'flood') {
+  if (what === 'cocoon') {
+    // An engaged Moonmantle Ray (the sentinel's id) drops under its cocoon
+    // threshold: its Nacre Cocoon closes on the next tick.
+    for (const id of inst.mobIds) {
+      const e = ctx.entities.get(id);
+      if (!e || e.dead || e.templateId !== 'pearlguard_sentinel' || !e.inCombat) continue;
+      e.hp = Math.max(1, Math.floor(e.maxHp * 0.29));
+      return 'The Moonmantle Ray wraps itself in its wings.';
+    }
+    return 'Pull a Moonmantle Ray first.';
+  }
+  if (what === 'undertow' || what === 'flood' || what === 'tears' || what === 'fullmoon') {
     const boss = claimBoss(ctx, inst, YSOLEI_ID);
     const st = boss?.templeFight;
     if (!boss || st?.kind !== 'ysolei') return 'Pull Ysolei first.';
+    if (what === 'tears' || what === 'fullmoon') {
+      if (st.undertow) return 'The Undertow is running.';
+      if (boss.castingAbility !== null) clearCastOf(boss, boss.castingAbility);
+      if (what === 'tears') {
+        startBeckoning(boss);
+        return 'Ysolei beckons the moon: its tears will fall.';
+      }
+      if (st.fullMoon === 'falling') return 'The moon is already falling.';
+      startFullMoon(ctx, inst, boss, st);
+      return 'The full moon descends on the island.';
+    }
     if (what === 'flood') {
       if (st.tide) {
         st.tide.timer = Math.min(st.tide.timer, 10.05);

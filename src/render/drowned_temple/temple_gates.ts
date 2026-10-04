@@ -22,6 +22,14 @@ import { GFX, sharedUniforms, surfaceMat } from '../gfx';
 import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
 import { instancePlacements, templeKitPiece, templeSlotMaterial } from './temple_kit';
 import {
+  MOONBRIDGE_MOMENT,
+  MOONBRIDGE_MOMENT_SECONDS,
+  MOONBRIDGE_PLANKS,
+  moonbridgeLaid,
+  moonbridgePlankFlash,
+  moonbridgePlankRise,
+} from './temple_moonbridge_core';
+import {
   moonbridgeSpan,
   planMoonbridgeEdges,
   planRisingStairEdges,
@@ -30,8 +38,10 @@ import {
 
 interface GateRig {
   root: THREE.Group;
-  /** Called every rendered frame with the gate's openness and seal pulse. */
-  apply(openness: number, seal: number, since: number): void;
+  /** Called every rendered frame with the gate's openness and seal pulse;
+   *  `forming` is true while the gate stands open after a change this page
+   *  watched (the Moonbridge then builds on its beam's timeline). */
+  apply(openness: number, seal: number, since: number, forming: boolean): void;
 }
 
 const SHEET_VERT = /* glsl */ `
@@ -340,7 +350,7 @@ function moonbridge(gate: DungeonGateDef, lowGfx: boolean): GateRig {
   const from = span.fromX;
   const to = span.toX;
   const deckAt = span.deckAt;
-  const count = 22;
+  const count = MOONBRIDGE_PLANKS;
   const step = Math.abs(to - from) / count;
   const width = path.halfWidth * 2;
   const plankGeo = plankGeometry(width);
@@ -392,21 +402,34 @@ function moonbridge(gate: DungeonGateDef, lowGfx: boolean): GateRig {
   root.add(holder);
   return {
     root,
-    apply(openness, _seal, since) {
-      // The planks gather from the terrace outward, each dropping into place
-      // in a flash of moonlight that settles to the seam's steady glow.
+    apply(openness, _seal, since, forming) {
+      // Forming (the Colossus just fell): the slabs build along the prism's
+      // beam of moonlight, each laid as the beam's front passes it in a flash
+      // that settles to the seam's steady glow (temple_moonbridge_core.ts;
+      // the beam itself is temple_moonbridge_fx.ts). Otherwise the bridge
+      // follows the gate's openness (found open: whole; a reset: it unmakes).
       // An unmade plank is collapsed, never hidden: every material of the
       // bridge stays in the drawn set the interior's compile gate links.
+      const laid = forming ? moonbridgeLaid(from, to) : 0;
+      const settle = forming
+        ? Math.max(0, 1 - Math.max(0, since - laid) / MOONBRIDGE_MOMENT.hold)
+        : openness >= 1
+          ? Math.max(0, 1 - since / 2)
+          : 1;
+      let flash = 0;
       planks.forEach((p, i) => {
-        const at = i / planks.length;
-        const k = Math.max(0, Math.min(1, (openness - at * 0.8) / 0.2));
+        const k = forming
+          ? moonbridgePlankRise(i, from, to, since)
+          : Math.max(0, Math.min(1, (openness - (i / planks.length) * 0.8) / 0.2));
         p.scale.y = Math.max(k, 1e-4);
         p.scale.z = k > 0.01 ? 0.4 + 0.6 * k : 1e-4;
+        // Each slab flashes as it is laid: its seam blazes wide, then settles.
+        const f = forming ? moonbridgePlankFlash(i, from, to, since) : 0;
+        glows[i].scale.x = 0.6 + 0.4 * settle + 1.8 * f;
+        if (f > flash) flash = f;
       });
-      const settle = openness >= 1 ? Math.max(0, 1 - since / 2) : 1;
-      glowMat.opacity = 0.45 + 0.4 * settle;
-      for (const g of glows) g.scale.x = 0.6 + 0.4 * settle;
-      rails.scale.y = openness > 0.97 ? 1 : 1e-4;
+      glowMat.opacity = Math.min(1, 0.45 + 0.4 * settle + 0.3 * flash);
+      rails.scale.y = (forming ? since >= laid : openness > 0.97) ? 1 : 1e-4;
     },
   };
 }
@@ -469,11 +492,19 @@ export function buildTempleGates(
     holder.position.set(gate.x, gy, gate.z);
     holder.rotation.y = gate.rot;
     holder.add(rig.root);
+    // Every mesh of the rig carries the refresh (whichever is on screen drives
+    // it), but it runs once a frame: the first mesh drawn applies the pose.
+    let applied = -1;
     const refresh = () => {
-      const view = gateView(key, sharedUniforms.uTime.value);
-      const seal =
-        view.state === 'sealed' ? 0.7 + 0.3 * Math.sin(sharedUniforms.uTime.value * 5) : 0;
-      rig.apply(view.openness, seal, view.since);
+      const now = sharedUniforms.uTime.value;
+      if (now === applied) return;
+      applied = now;
+      const view = gateView(key, now);
+      const seal = view.state === 'sealed' ? 0.7 + 0.3 * Math.sin(now * 5) : 0;
+      // A watched opening plays its moment once; after it the gate is whole.
+      const forming =
+        view.state === 'open' && view.changed && view.since < MOONBRIDGE_MOMENT_SECONDS;
+      rig.apply(view.openness, seal, view.since, forming);
     };
     holder.traverse((o) => {
       if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).onBeforeRender = refresh;

@@ -542,7 +542,10 @@ const MONOLITHS: MonolithRow[] = [
     // moved out, buying the Iron Cage escape prompt's composition (hud/dungeon).
     // LOWERED to 18082 when Ossick's chain alert joined it: both prompts now
     // compose behind one DungeonPrompts member and one frame call (hud/dungeon).
-    ceiling: 18073,
+    // LOWERED 18073 -> 18069 by the Drowned Temple encounter pass: the log
+    // line's raw-English cues (the Cheat Death and Sundering sounds, now with
+    // the Moonbridge banner) moved into log_event_route.ts logEventCue.
+    ceiling: 18069,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

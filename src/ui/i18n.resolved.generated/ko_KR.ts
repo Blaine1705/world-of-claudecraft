@@ -7165,7 +7165,7 @@ export const ko_KR: EnTranslations = {
         "siren": "저 목소리. 성가대에서 내 옆에서 노래하던 이요. 지금도 반 박자 일찍 들어오는구려.",
         "lurker": "아이들이 얕은 물에서 그물로 잡던 것들이오. 엄지만 했고, 빛이 났지.",
         "tidewisp": "저것이 바로 달의 물, 우리가 마셔야 했던 그 한 모금이오. 몸에 닿지 않게 하시오.",
-        "sentinel": "문 곁의 공물 조개들이오. 행운을 빌며 진주를 넣었지. 이제 그것을 심장으로 품고 있소.",
+        "sentinel": "문 앞 연못의 달가오리들이다. 수련생 시절, 달이 뜰 때 진주를 먹여 주곤 했지. 이제는 그들이 문을 지키며, 우리의 진주를 심장으로 삼고 있구나.",
         "eel": "석호의 뱀장어들이오. 수습생들이 해 질 녘에 빵을 주었지. 우리 찬송가를 먹고 살이 쪘소.",
         "reflection": "물이 당신을 무엇으로 바꿀지 보여 주는 것이오. 부수시오!",
         "moonspawn": "저것들은 결코 내 사람들이 아니었소. 그분의 것이오. 오직 달빛으로만 만들어졌지."
@@ -12068,6 +12068,7 @@ export const ko_KR: EnTranslations = {
       "deathRecapCauterized": "사망했습니다. 소작의 화염이 당신을 집어삼켰습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
       "respawnKeeperToll": "영혼 치유사가 당신을 부활시켰지만 그 대가로 약해졌습니다. 부활 후유증이 사라질 때까지 모든 능력치가 감소합니다.",
+      "moonbridgeBanner": "달의 다리가 놓인다",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
       "playerNotNearby": "그 플레이어는 근처에 없습니다.",
@@ -12551,17 +12552,26 @@ export const ko_KR: EnTranslations = {
       "temple_moonlight_lance": "달빛 창",
       "temple_prism_flare": "프리즘 섬광",
       "temple_resonant_slam": "공명의 강타",
+      "temple_moonwater_bolt": "월수 화살",
+      "temple_drowning_aria": "익사의 아리아",
+      "temple_mere_surge": "호수의 해일",
+      "temple_tideglass_fracture": "조수유리 균열",
       "temple_undertow": "역류",
       "temple_lunar_tide": "달의 조수",
       "temple_skewering_trident": "꿰뚫는 삼지창",
       "temple_pale_mending": "창백한 치유",
       "temple_glimmer_venom": "반짝이는 독",
-      "temple_pearl_slam": "진주 강타",
+      "temple_pearl_slam": "해일의 날갯짓",
       "temple_lightning_spit": "번개 침",
       "temple_crushing_torrent": "짓누르는 급류",
       "temple_hydra_tsunami": "해일",
       "temple_ysolei_call": "달의 자손 부르기",
       "temple_ysolei_wrath": "익사한 분노",
+      "temple_frostlocked_torrent": "얼어붙은 급류",
+      "temple_venom_current": "독의 해류",
+      "temple_toxic_rime": "맹독 서리",
+      "temple_beckoning_moon": "달의 부름",
+      "temple_falling_moon": "떨어지는 달",
       "wildheart_ancestral_sap": "선조의 수액",
       "wildheart_plant_totem": "토템 심기",
       "wildheart_entangling_lash": "휘감는 채찍",
@@ -20939,7 +20949,7 @@ export const ko_KR: EnTranslations = {
         "name": "창백한 성가대 수습 사제"
       },
       "pearlguard_sentinel": {
-        "name": "진주수호 파수병"
+        "name": "달망토 가오리"
       },
       "sethrael_palecoil": {
         "name": "페일코일의 세스라엘"

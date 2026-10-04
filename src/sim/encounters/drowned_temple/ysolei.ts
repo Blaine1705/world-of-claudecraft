@@ -21,6 +21,9 @@
 //   Heroic        Riptide: each Undertow leaves a whirl where each player stood
 //                 when it began (40 frost a second for 10 s). Drowned Moon:
 //                 every 20 s a Moonspawn climbs out of the flooded half.
+//   The moon      Moonlight Tears at 75 and 45 percent, the Full Moon at 20
+//                 (ysolei_moon.ts): body-block the tears rolling at her, break
+//                 her Plenilune Ward before the moon falls.
 //
 // Zero rng in every pick (the first flooded half is hashed); the only draws
 // are the damage rolls.
@@ -60,6 +63,7 @@ import {
   YSOLEI_UNDERTOW,
   YSOLEI_WRATH,
 } from './ids';
+import { queueMoonCalls, resetMoon, stepMoonCasts, stepTears } from './ysolei_moon';
 
 const T = YSOLEI_TUNING;
 export const YSOLEI_DEED = 'dgn_ysolei_high_and_dry';
@@ -78,6 +82,12 @@ function freshState(): YsoleiFightState {
     summonsRoared: 0,
     wrathRoared: false,
     roars: [],
+    tearWaves: 0,
+    tearCalls: 0,
+    tears: [],
+    glows: [],
+    sear: [],
+    fullMoon: null,
   };
 }
 
@@ -395,6 +405,7 @@ export function resetYsolei(ctx: SimContext, inst: InstanceSlot, boss: Entity): 
   clearCastOf(boss, YSOLEI_UNDERTOW);
   clearCastOf(boss, YSOLEI_CALL);
   clearCastOf(boss, YSOLEI_WRATH);
+  resetMoon(ctx, inst, boss, st);
   boss.templeFight = undefined;
 }
 
@@ -425,11 +436,22 @@ export function tickYsolei(
   if (!st.tide && share <= T.tideBelow) startRisingTide(ctx, inst, boss, st);
   stepTide(ctx, inst, boss, st);
   stepRiptides(ctx, inst, boss, st);
+  queueMoonCalls(boss, st);
+  stepTears(ctx, inst, boss, st);
   if (stepUndertow(ctx, inst, boss, st)) return;
   if (stepRoars(boss, st)) {
     // The clocks keep their beat through a roar.
     st.lunarTimer -= DT;
     st.undertowTimer -= DT;
+    return;
+  }
+  if (stepMoonCasts(ctx, inst, boss, st)) {
+    // The clocks keep their beat through the Beckoning Moon; they stand still
+    // while the moon itself descends (ysolei_moon.ts).
+    if (st.fullMoon !== 'falling' && boss.castingAbility !== null) {
+      st.lunarTimer -= DT;
+      st.undertowTimer -= DT;
+    }
     return;
   }
   stepLunar(ctx, inst, boss, st);

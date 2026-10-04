@@ -147,7 +147,11 @@ const testRoot = (sourceId: number): Aura => ({
 describe('charge template coverage (data contract)', () => {
   it('exactly the eight warrior/guard melee templates carry the shared charge record', () => {
     for (const id of CHARGE_TEMPLATE_IDS) {
-      expect(MOBS[id]?.charge, `${id} carries charge`).toEqual(CHARGE_RECORD);
+      // The Moonmantle Ray (the Pearlguard Sentinel's frozen id) glides in on
+      // the same charge under its own name.
+      const want =
+        id === 'pearlguard_sentinel' ? { ...CHARGE_RECORD, name: 'Lunar Glide' } : CHARGE_RECORD;
+      expect(MOBS[id]?.charge, `${id} carries charge`).toEqual(want);
     }
     // Global scan: no template outside the eight may carry a charge (bosses and
     // every Nythraxis raid mob stay charge-free so the raid parity golden and
