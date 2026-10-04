@@ -14,17 +14,35 @@
 // G25 plate floor, G26 airborne phase), the loot, the deeds and the Reliquary.
 //
 // Trash is simple and readable (README section 5): one job per type, never a
-// boss lesson.
+// boss lesson. The trash mechanics pass (E:/woc/entregas/investigacion/
+// MECANICAS_TRASH.md section 8, approved 2026-10-04) gives the packs a group
+// idea, fire against ice, on the trash engine's generic keys
+// (src/sim/mob/trash_kit/CLAUDE.md "Engine pieces"):
 //
-//   Sanctum Boneguard      Onrush (kept). One of the held dead thawed out.
+//   Sanctum Boneguard      Onrush (kept). One of the held dead thawed out; a
+//                          fallen one is what the Thawcaller raises.
 //   Sanctum Scaleguard     Cinder Breath: a telegraphed 90 degree cone. Step out.
+//                          Counterweight Lash: its tail behind it. Its flanks
+//                          are safe. Heroic: the breath leaves Boiling Meltwater.
 //   Broodsworn Thawcaller  Warming Rite: an interruptible 30 percent heal. Kick it.
+//                          Thaw the Held: an interruptible rite that raises a
+//                          fallen Boneguard as a Bonewalker. Kick it, or kill
+//                          the Thawcaller first.
 //   Broodsworn Goadsmith   Goad: an interruptible enrage on one ally. Kick it.
+//                          Branding Iron: an interruptible brand on one player;
+//                          douse it in a meltwater pool, or hide from the bar.
 //   Broodsworn Pyre-Tender Plants a Soul Brazier every 15 s. Kill the brazier.
-//   Soul Brazier           Its soulfire quickens every ally within 10 yd.
+//   Soul Brazier           Its soulfire quickens every ally within 10 yd. Or
+//                          kick it over (the G3 use): it spills soulfire that
+//                          burns the pack standing in it.
 //   Rime Whelp             Comes in fours; a slowing Hoarfrost Pop as it dies.
+//                          Rime Breath: a short frost cone; five stacks of
+//                          Creeping Rime freeze you solid. Face them away.
 //   Ogre Sledge-Hauler     Ice Block Toss at the farthest player; enrages low.
+//                          The block stays as an Ice Slab wall for 15 s: cover.
 //   Glacier Splinter       Shatters 2 s after it dies. Step away from the body.
+//                          Fracture: at half health it splits in two; spread
+//                          the two deaths apart.
 //   The Sledge Tusker      The showpiece patrol (encounters/gravewyrm_sanctum/
 //                          sledge_tusker.ts): Tusk Sweep, Trample, Spilled
 //                          Braziers, Enrage.
@@ -45,12 +63,22 @@ import {
   type SealTool,
 } from '../encounters/gravewyrm_sanctum/ids';
 import {
+  SANCTUM_BRANDED,
+  SANCTUM_BRANDING_IRON,
+  SANCTUM_CREEPING_RIME,
+  SANCTUM_FRACTURE,
   SANCTUM_GOAD,
   SANCTUM_HOARFROST_POP,
   SANCTUM_ICE_BLOCK_TOSS,
+  SANCTUM_ICE_SLAB,
+  SANCTUM_ICED_OVER,
   SANCTUM_PLANT_BRAZIER,
+  SANCTUM_RIME_BREATH,
   SANCTUM_SHATTER,
   SANCTUM_SOULFIRE_STOKE,
+  SANCTUM_SPILLED_SOULFIRE,
+  SANCTUM_THAW_THE_HELD,
+  SANCTUM_TOPPLE_BRAZIER,
   SANCTUM_WARMING_RITE,
 } from '../mob/trash_kit/sanctum_cast_ids';
 import type { DungeonGateDef, DungeonObjectSpawn, DungeonSpawn, MobTemplate } from '../types';
@@ -137,6 +165,26 @@ export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
           'korzul_the_gravewyrm',
         ],
       },
+      // Thaw the Held (MECANICAS_TRASH.md 8.1 A and 8.3): a 3 s
+      // interruptible rite on a fallen Boneguard's corpse within 30 yd; when
+      // it lands the soldier climbs back out of the ice as a Raised
+      // Bonewalker at 60 percent of its health, on the Thawcaller's victim.
+      // Each corpse rises once. First 6 s in (after the Warming Rite's
+      // opening 4 s), then every 14 s while a corpse lies in reach. Normal
+      // stays survivable unkicked: a Bonewalker is a non-elite add (about 360
+      // health risen on normal), at most one per fallen Boneguard.
+      reanimate: {
+        castId: SANCTUM_THAW_THE_HELD,
+        name: 'Thaw the Held',
+        castTime: 3,
+        every: 14,
+        first: 6,
+        school: 'shadow',
+        range: 30,
+        corpses: ['sanctum_boneguard'],
+        summon: 'raised_bonewalker',
+        hpPct: 0.6,
+      },
     },
     loot: [
       { copper: 340, chance: 1 },
@@ -174,6 +222,28 @@ export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
         range: 25,
         damagePct: 0.3,
         seconds: 8,
+      },
+      // Branding Iron (MECANICAS_TRASH.md 8.4): a 2 s interruptible bar at
+      // one player in its sight (never the tank while anyone else stands in
+      // reach); out of sight when it ends (behind an Ice Slab, a serac, a
+      // tent) it fizzles. Landed, the brand burns 30 every 2 s for 12 s, 180
+      // in all on the 950 health cloth reference (19 percent, the fumbled
+      // trash dodge band), and a meltwater pool (QUENCH_POOLS, every pull a
+      // Goadsmith stands in has two within 14 yd) puts it out at once.
+      // First 9 s in, between its Goads, then every 16 s.
+      brand: {
+        castId: SANCTUM_BRANDING_IRON,
+        name: 'Branding Iron',
+        castTime: 2,
+        every: 16,
+        first: 9,
+        school: 'fire',
+        range: 30,
+        perTick: 30,
+        interval: 2,
+        seconds: 12,
+        auraId: SANCTUM_BRANDED,
+        auraName: 'Branded',
       },
     },
     loot: [
@@ -251,6 +321,37 @@ export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
         seconds: 3,
         school: 'shadow',
       },
+      // Topple Brazier (MECANICAS_TRASH.md 8.5, the G3 use): a player within
+      // 4 yd targets it and presses interact: a 1 s kick (any hit, a step or
+      // a stun breaks it), then the brazier crashes over and its soulfire
+      // spills 1.5 yd past it, away from the kicker, a 4.5 yd pool for 8 s
+      // that burns every trash mob standing in it for 4 percent of its
+      // health a second (never a boss or a great body). The tank parks the
+      // pack on the brazier and somebody kicks it: up to a third of each
+      // mob's health if they stay in it, and the quickening is gone.
+      usable: {
+        castId: SANCTUM_TOPPLE_BRAZIER,
+        name: 'Topple Brazier',
+        channel: 1,
+        range: 4,
+        effect: {
+          kind: 'topple',
+          ahead: 1.5,
+          hazard: {
+            castId: SANCTUM_SPILLED_SOULFIRE,
+            name: 'Spilled Soulfire',
+            objectTemplate: SANCTUM_SPILLED_SOULFIRE,
+            radius: 4.5,
+            seconds: 8,
+            tick: 1,
+            min: 0,
+            max: 0,
+            school: 'shadow',
+            hits: 'mobs',
+            pctMaxHp: 0.04,
+          },
+        },
+      },
     },
     loot: [],
     scale: 1.6,
@@ -285,6 +386,35 @@ export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
         max: 50,
         school: 'frost',
         slow: { mult: 0.5, seconds: 2 },
+      },
+      // Rime Breath (MECANICAS_TRASH.md 8.6): a 0.6 s bar, then a 60 degree
+      // puff of frost 6 yd at the one it fights, 28 to 34 (3 percent), and a
+      // stack of Creeping Rime: 8 percent slower per stack for 8 s
+      // (refreshed). The fifth stack freezes the victim solid for 2 s and
+      // clears them. Four whelps on the tank freeze it about once a pull
+      // (each breathes every 7 s, the pack staggered); the group stays out
+      // of their fronts and burns them down together.
+      cone: {
+        castId: SANCTUM_RIME_BREATH,
+        name: 'Rime Breath',
+        castTime: 0.6,
+        every: 7,
+        first: 3,
+        school: 'frost',
+        range: 6,
+        arcDeg: 60,
+        min: 28,
+        max: 34,
+        freezeStack: {
+          auraId: SANCTUM_CREEPING_RIME,
+          name: 'Creeping Rime',
+          perStack: 0.08,
+          maxStacks: 5,
+          seconds: 8,
+          freezeAuraId: SANCTUM_ICED_OVER,
+          freezeName: 'Iced Over',
+          freezeSeconds: 2,
+        },
       },
     },
     loot: [{ copper: 60, chance: 1 }],
@@ -325,6 +455,12 @@ export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
         radius: 5,
         min: 150,
         max: 180,
+        // The block stays (MECANICAS_TRASH.md 8.7, the temporary combat
+        // wall): an Ice Slab about 4 by 3 yd and over a head tall, where the
+        // ring was, for 15 s. It blocks bodies and sight: cover from the
+        // Goadsmith's Branding Iron, or a corner the tank pulls the casters
+        // round. At most two stand at once (a toss every 12 s).
+        leavesWall: { objectTemplate: SANCTUM_ICE_SLAB, name: 'Ice Slab', seconds: 15 },
       },
     },
     loot: [{ copper: 380, chance: 1 }],
@@ -358,6 +494,19 @@ export const GRAVEWYRM_SANCTUM_MOBS: Record<string, MobTemplate> = {
         min: 150,
         max: 180,
         school: 'frost',
+      },
+      // Fracture (MECANICAS_TRASH.md 8.8): the first time it drops under
+      // half health it splits in two, each half 72 percent of its size with
+      // 60 percent of the health it had left (so the pair is 1.2 times the
+      // remaining half), each Shattering smaller when it dies: a 3.6 yd ring
+      // for 90 to 108. Spread the two deaths apart and step out of each.
+      split: {
+        castId: SANCTUM_FRACTURE,
+        name: 'Fracture',
+        belowHpPct: 0.5,
+        share: 0.6,
+        scale: 0.72,
+        burstScale: 0.6,
       },
     },
     loot: [{ copper: 360, chance: 1 }],

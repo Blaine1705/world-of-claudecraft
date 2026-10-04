@@ -210,6 +210,14 @@ export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
 // corpse_harvest_session.ts owns the whole session.
 export const CORPSE_HARVEST_CAST_ID = 'corpse_harvest';
 export const ALLIED_HEARTHSTONE_CAST_ID = 'allied_hearthstone';
+// The trash engine's G3 use (TrashKitDef.usable, mob/trash_kit/
+// encounter_use.ts): every usable body's cast id starts with this prefix, so
+// a use is one more non-spell activity (a hit, a move or a stun breaks it)
+// while its bar still names the use it is.
+export const KIT_USE_CAST_PREFIX = 'kituse_';
+export function isKitUseCast(castId: string | null): boolean {
+  return castId !== null && castId.startsWith(KIT_USE_CAST_PREFIX);
+}
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -228,7 +236,8 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === SUNDER_CAST_ID ||
     castId === TOOL_RECHARGE_CAST_ID ||
     castId === CORPSE_HARVEST_CAST_ID ||
-    castId === ALLIED_HEARTHSTONE_CAST_ID
+    castId === ALLIED_HEARTHSTONE_CAST_ID ||
+    isKitUseCast(castId)
   );
 }
 
@@ -4282,7 +4291,17 @@ export interface TrashKitDef {
    *  spot locks when the bar starts (a ring object the client mirrors, scale =
    *  radius), and everyone inside `radius` of it when the bar ends is hit (the
    *  Ogre Sledge-Hauler's Ice Block Toss). Physical: dodge it, never kick it. */
-  toss?: TrashKitCast & { range: number; radius: number; min: number; max: number };
+  toss?: TrashKitCast & {
+    range: number;
+    radius: number;
+    min: number;
+    max: number;
+    /** The block stays where it lands as a temporary combat wall (mob/
+     *  trash_kit/combat_walls.ts): an object of `objectTemplate` (a shape in
+     *  COMBAT_WALL_SHAPES) that blocks movement and line of sight for
+     *  `seconds` (the Ogre Sledge-Hauler's Ice Slab). */
+    leavesWall?: { objectTemplate: string; name: string; seconds: number };
+  };
   /** No cast bar: every `every` seconds each living ally in the fight within
    *  `radius` (never the source) swings `hastePct` faster for `seconds` (the
    *  Soul Brazier). A stoke source whose summoner has died gutters out. */
@@ -4305,7 +4324,183 @@ export interface TrashKitDef {
     name: string;
     school: TrashKitCast['school'];
   };
+  // ---- The trash engine pieces (mob/trash_kit/CLAUDE.md "Engine pieces"):
+  // generic, data-driven keys any dungeon's trash may carry. ----
+  /** An interruptible rite on a fallen packmate's corpse (one of `corpses`
+   *  within `range`, never one already raised): the bar runs on the corpse,
+   *  and when it lands a `summon` climbs out where the body lies, at `hpPct`
+   *  of its health (the Broodsworn Thawcaller's Thaw the Held). Kick it. */
+  reanimate?: TrashKitCast & {
+    range: number;
+    corpses: readonly string[];
+    summon: string;
+    hpPct: number;
+  };
+  /** An interruptible brand at one player in reach (never the one it fights
+   *  while anyone else stands in reach) who must stay in its line of sight
+   *  through the bar: a burn every `interval` seconds for `seconds`, which the
+   *  dungeon's quench zones (DungeonDef.quenchZones) put out the moment the
+   *  victim stands in one (the Broodsworn Goadsmith's Branding Iron). Kick it,
+   *  hide from it, or douse it. */
+  brand?: TrashKitCast & {
+    range: number;
+    perTick: number;
+    interval: number;
+    seconds: number;
+    /** The aura id the brand leaves (its look and its quench key). */
+    auraId: string;
+    /** The aura's name (the brand the victim wears). */
+    auraName: string;
+  };
+  /** A short-bar frontal cone at the one it fights (the Rime Whelp's Rime
+   *  Breath): everyone inside `range` and `arcDeg` takes the roll, and a
+   *  `freezeStack` slows them a step more each time, freezing at its cap.
+   *  Not kickable: step out of the front. */
+  cone?: TrashKitCast & {
+    range: number;
+    arcDeg: number;
+    min: number;
+    max: number;
+    freezeStack?: FreezeStackDef;
+  };
+  /** G6, the line-of-sight nova: a bar, then a blast on every player within
+   *  `radius` who can SEE the caster (a wall, a pillar or an ice slab between
+   *  them shields them). Interruptible when its castId is registered in the
+   *  dungeon's kit cast table; every `unstoppableEvery`-th cast runs under
+   *  `unstoppableCastId` (never registered), so it must be hidden from. An
+   *  optional `silence` lands on everyone it strikes. */
+  nova?: TrashKitCast & {
+    radius: number;
+    min: number;
+    max: number;
+    silence?: number;
+    unstoppableEvery?: number;
+    unstoppableCastId?: string;
+  };
+  /** G3, a usable encounter body: a player in reach who presses interact on
+   *  it (target it, then interact) channels a non-spell use for `channel`
+   *  seconds (any hit, a move or a stun breaks it, like a gather), validated
+   *  by the authoritative sim; when it completes the effect lands (the Soul
+   *  Brazier's Topple Brazier). The cast id MUST start with
+   *  KIT_USE_CAST_PREFIX. */
+  usable?: KitUseDef;
+  /** G5, a walker: an orb that drifts from the mob toward the nearest living
+   *  ally in the fight and empowers it on arrival; a player who stands in its
+   *  path intercepts it instead (the orb pops on them, for the `intercept`
+   *  effect). Launched when the mob dies (`launch: 'death'`) or by a bar
+   *  (`launch: 'cast'`, with the cast fields). */
+  walker?: KitWalkerDef;
+  /** Once per pull under `belowHpPct` of its health it splits in two: it
+   *  shrinks to `scale` of its size and a copy of itself climbs out beside
+   *  it, each holding `share` of the health it had left (rounded up), and a
+   *  split body's death burst shrinks by `burstScale` (the Glacier Splinter's
+   *  Fracture). Neither half splits again. */
+  split?: {
+    castId: string;
+    name: string;
+    belowHpPct: number;
+    share: number;
+    scale: number;
+    burstScale: number;
+  };
+  /** Where its template breath cone (MobTemplate.breathCone) lands it leaves
+   *  a hazard pool in front of it, centred `ahead` yards out (the Sanctum
+   *  Scaleguard's heroic Boiling Meltwater). `heroicOnly` keeps it off normal. */
+  breathPool?: { ahead: number; heroicOnly?: boolean; hazard: KitHazardDef };
 }
+
+/** A hazard pool a trash mechanic leaves on the floor (mob/trash_kit/
+ *  kit_hazard.ts): an encounter object of `objectTemplate` (scale = radius)
+ *  the client mirrors, standing `seconds`; every `tick` seconds each body of
+ *  the `hits` side inside `radius` takes a roll of `school` damage. */
+export interface KitHazardDef {
+  castId: string;
+  name: string;
+  objectTemplate: string;
+  radius: number;
+  seconds: number;
+  tick: number;
+  min: number;
+  max: number;
+  school: Aura['school'];
+  /** Who it burns: the players, or the claim's mobs (a pool turned on them;
+   *  never a boss or a control-immune great body). */
+  hits: 'players' | 'mobs';
+  /** Burn each victim for this share of ITS maximum health a beat instead of
+   *  the roll (no draw): a pool turned on the mobs scales with whatever it
+   *  burns, on either difficulty. */
+  pctMaxHp?: number;
+}
+
+/** The generic "freeze at N stacks" slow (mob/trash_kit/freeze_stacks.ts):
+ *  each application adds a stack slowing `perStack` more of the run speed for
+ *  `seconds` (refreshed); the `maxStacks`-th freezes the victim solid (a stun
+ *  of `freezeSeconds`) and clears the stacks. */
+export interface FreezeStackDef {
+  auraId: string;
+  name: string;
+  perStack: number;
+  maxStacks: number;
+  seconds: number;
+  freezeAuraId: string;
+  freezeName: string;
+  freezeSeconds: number;
+}
+
+/** A G3 usable encounter body (TrashKitDef.usable). */
+export interface KitUseDef {
+  /** The use's cast id (the player's bar): starts with KIT_USE_CAST_PREFIX. */
+  castId: string;
+  name: string;
+  /** Seconds the use channels. */
+  channel: number;
+  /** Reach, yards from the body's centre. */
+  range: number;
+  /** What completing the use does. 'topple': the body is destroyed (it dies,
+   *  credited to the user) and a hazard spills `ahead` yards past it, away
+   *  from the user. */
+  effect: { kind: 'topple'; ahead: number; hazard: KitHazardDef };
+}
+
+/** A G5 walker (TrashKitDef.walker). */
+export interface KitWalkerDef {
+  castId: string;
+  name: string;
+  objectTemplate: string;
+  launch: 'death' | 'cast';
+  /** The bar, when `launch` is 'cast'. */
+  castTime?: number;
+  every?: number;
+  first?: number;
+  school: Aura['school'];
+  /** Yards a second it drifts. */
+  speed: number;
+  /** A player within this many yards of the orb intercepts it. */
+  interceptRadius: number;
+  /** The orb empowers its ally within this many yards of it. */
+  reachRadius: number;
+  /** Seconds before an orb that reached nothing fades. */
+  maxSeconds: number;
+  /** The empower on the ally it reaches: a damage-done aura. */
+  empower: { auraId: string; name: string; damagePct: number; seconds: number };
+  /** What an interception does to the player who took it: a roll of damage,
+   *  and optionally the same empower turned on them. */
+  intercept: { min: number; max: number; grantsEmpower?: boolean };
+}
+
+/** The live state of an engine encounter object (Entity.kitObject): a hazard
+ *  pool, a temporary combat wall or a walker. Sim authority only. */
+export type KitObjectState =
+  | { kind: 'hazard'; def: KitHazardDef; remaining: number; tickTimer: number; sourceId: number }
+  | { kind: 'wall'; remaining: number }
+  | {
+      kind: 'walker';
+      def: KitWalkerDef;
+      sourceId: number;
+      allyId: number | null;
+      remaining: number;
+      mechanicDamageMult: number;
+    };
 
 /** Per-pull runtime state of a trash kit (Entity.trashKit). */
 export interface TrashKitState {
@@ -4329,6 +4524,12 @@ export interface TrashKitState {
   carapaced?: boolean;
   /** A toss's locked landing spot (world) and its ring object while its bar runs. */
   toss?: { x: number; z: number; objectId: number | null };
+  /** Novas started this pull (TrashKitDef.nova's unstoppable cadence). */
+  novas?: number;
+  /** Walker bars started this pull, and the orbs launched (kit_walker.ts). */
+  walkers?: number;
+  /** The once-per-pull split already happened (TrashKitDef.split). */
+  split?: true;
 }
 
 /** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion),
@@ -5072,6 +5273,10 @@ export interface DungeonDef {
    *  breath cone, the way every trash-kit area cast does everywhere
    *  (mob/trash_kit/cast_hold.ts). The five reworked dungeons set it. */
   areaCastsPlant?: boolean;
+  /** The quench zones (instance-local circles): a player standing in one has
+   *  a trash brand (TrashKitDef.brand) put out at once (mob/trash_kit/
+   *  brand.ts). The client paints them from the same list. */
+  quenchZones?: readonly { x: number; z: number; r: number }[];
   /** In-dungeon gates and encounter seals (instances/dungeon_gates.ts). */
   gates?: readonly DungeonGateDef[];
   suggestedPlayers: number;
@@ -6876,6 +7081,26 @@ export interface Entity extends ClientMirroredEntityFields {
    *  the same record: seconds the cloud still stands, its floor object, and
    *  whether it has faded. Sim authority only. */
   deathBurst?: { remaining: number; objectId: number | null; done: boolean };
+  /** An engine encounter object's live state (a hazard pool, a combat wall, a
+   *  walker; mob/trash_kit/kit_objects.ts). Sim authority only: the client
+   *  reads the object's template id, position and scale. */
+  kitObject?: KitObjectState;
+  /** A split trash body (TrashKitDef.split, mob/trash_kit/kit_split.ts): the
+   *  half that was the original keeps its pre-split health pool and size to
+   *  restore if the pull ends; a copy is 'child'. Sim authority only (the
+   *  client sees the new `scale`). */
+  kitSplit?: { role: 'parent'; maxHp: number; scale: number } | { role: 'child' };
+  /** A corpse a reanimate rite already raised (TrashKitDef.reanimate): it is
+   *  never raised twice. Sim authority only. */
+  kitReanimated?: true;
+  /** A walker launched at this mob's death already left (TrashKitDef.walker).
+   *  Sim authority only. */
+  kitWalkerSent?: true;
+  /** DEV ONLY: a trash kit lent to this mob in place of its template's (only
+   *  `/dev trashkit demo`, dev/trash_engine_dev.ts, and the suites set it), so
+   *  an engine piece no shipped template carries yet can be playtested. Sim
+   *  authority only; never set in a live realm without ALLOW_DEV_COMMANDS. */
+  devTrashKit?: TrashKitDef;
   /** Morthen's entrance and the Knellwyrm finale (encounters/hollow_crypt),
    *  on Morthen. Sim authority only; the client reads casts, auras, heights. */
   cryptRite?: CryptRiteState;

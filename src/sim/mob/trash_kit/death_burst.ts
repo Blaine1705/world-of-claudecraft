@@ -12,6 +12,7 @@ import { createGroundObject } from '../../entity';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity, type TrashKitDef } from '../../types';
+import { splitBurstScale } from './kit_split';
 import { livingInReach } from './targets';
 
 /** A death burst's ring building on the floor (scale = its radius). */
@@ -79,12 +80,15 @@ export function stepDeathBurst(
 ): boolean {
   const def = kit.deathBurst;
   if (!def) return false;
+  // A split body (kit_split.ts) bursts smaller: its ring and its rolls.
+  const scale = splitBurstScale(mob);
+  const radius = def.radius * scale;
   let st = mob.deathBurst;
   if (!st) {
     st = { remaining: def.delay, objectId: null, done: false };
     mob.deathBurst = st;
     if (def.delay > 0) {
-      st.objectId = spawnBurstRing(ctx, inst, mob, def.radius);
+      st.objectId = spawnBurstRing(ctx, inst, mob, radius);
       ctx.emit({
         type: 'spellfx',
         sourceId: mob.id,
@@ -109,10 +113,10 @@ export function stepDeathBurst(
     fx: 'nova',
     ability: def.castId,
   });
-  for (const p of livingInReach(players, mob.pos, def.radius)) {
+  for (const p of livingInReach(players, mob.pos, radius)) {
     const amount = Math.max(
       1,
-      Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1)),
+      Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1) * scale),
     );
     ctx.dealDamage(mob, p, amount, false, def.school, def.name, 'hit', true);
     // A slowing burst (the Rime Whelp's Hoarfrost Pop) chills whoever it caught.

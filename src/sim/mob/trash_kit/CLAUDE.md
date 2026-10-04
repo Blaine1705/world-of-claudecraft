@@ -42,3 +42,32 @@ Rules:
   pack pulls and the boss chain pull still take it (`patrolFlierAloft`). The
   renderer hides the ground reticle under it (`render/selection_ring.ts`).
 - Tests: `tests/trash_kit.test.ts`.
+
+## Engine pieces (generic keys any dungeon adopts by data)
+
+Built for the Gravewyrm Sanctum's trash pass (2026-10-04) as GENERIC
+`TrashKitDef` keys: a new dungeon adopts one by writing the record on its
+template, registering a kickable cast id in its own `*_KIT_CAST_SCHOOLS`
+table, and giving the object templates a look in the renderer. Every piece is
+its own module behind the driver; the shared encounter objects (hazard pools,
+combat walls, walkers) ride `Entity.kitObject` and are stepped once per tick
+after the claim's mobs, in object-roster order (`kit_objects.ts`).
+
+| Key / module | What it does | Adopt it |
+|---|---|---|
+| `usable` / `encounter_use.ts` (G3) | A body a player targets and uses with the INTERACT press: a non-spell channel (`KIT_USE_CAST_PREFIX` cast id: a landed hit, a step or a stun breaks it), validated on the authoritative sim at the press (`interaction.ts`), every tick (`casting_lifecycle.ts` updateCasting) and at completion. Effect `topple`: the body dies credited to the user and spills a hazard past it. No wire change: online it is the ordinary `interact` command. | `usable: { castId: 'kituse_<id>', name, channel, range, effect }` |
+| `toss.leavesWall` / `combat_walls.ts` + `instances/combat_wall_state.ts` | A temporary COMBAT WALL: an object whose template names an OBB shape (`COMBAT_WALL_SHAPES`), published per slot into every interior collision reader (`interior_collider_sets.ts`), so it blocks bodies and line of sight; the online client mirrors it from the entity (`src/net/combat_wall_wire.ts`). Shatters after `seconds`. | add a shape row, then `leavesWall: { objectTemplate, name, seconds }` (or call `spawnCombatWall`) |
+| `nova` / `kit_nova.ts` (G6) | A bar, then a blast on every player in `radius` who can SEE the caster (walls, pillars, combat walls shield); kickable through the cast table, every `unstoppableEvery`-th bar under an unregistered `unstoppableCastId`; optional `silence`. | `nova: {...}` + register `castId` |
+| `walker` / `kit_walker.ts` (G5) | An orb that drifts to the nearest fighting ally and empowers it (damage-done aura); the first player within `interceptRadius` (after a 0.5 s arming) takes it instead (damage, and the empower when `grantsEmpower`). Launched at death or by a bar. | `walker: {...}` + an orb look |
+| `cone.freezeStack` / `freeze_stacks.ts` | The "freeze at N stacks" slow: each application deepens one slow aura (`stacks`), the N-th freezes (a stun) and clears it. `applyFreezeStack` serves any hit. | `freezeStack: {...}` on a `cone` (or call it from any landing) |
+| `cone` (driver) | A short-bar frontal cone at the one it fights, planted, never kickable. | `cone: {...}` |
+| `split` / `kit_split.ts` | Once per pull under a health share it splits: the original shrinks and a copy (a summoned add, no loot) steps out, each with a share of what was left; a split body's death burst shrinks; an evade restores the original. | `split: {...}` |
+| `reanimate` / `reanimate.ts` | An interruptible rite on the nearest unraised corpse of the listed templates: the summon climbs out where it lies. | `reanimate: {...}` + register `castId` |
+| `brand` / `brand.ts` | An interruptible bar at a player in sight (never the tank while others stand in reach): a dot that the dungeon's quench zones (`DungeonDef.quenchZones`) put out the moment the victim stands in one; out of sight at the end, it fizzles. | `brand: {...}` + `quenchZones` |
+| `breathPool` / `breath_pool.ts` + `kit_hazard.ts` | Where a template breath cone lands, a hazard pool ahead of the mob (`heroicOnly` optional). `KitHazardDef` is the shared pool: burns players (rolls) or the claim's trash (rolls, or `pctMaxHp` with no draw), never a boss or a control-immune great body. | `breathPool: {...}`; any module can `spawnKitHazard` |
+| `engine_demo.ts` | The demonstration kit (a nova and a walker) `/dev trashkit demo` lends a mob through `Entity.devTrashKit`, never a template. | dev and tests only |
+
+Dev helpers: `/dev trashkit` (`src/sim/dev/trash_engine_dev.ts`). Tests:
+`tests/trash_engine.test.ts` (every piece, the server-validated use, the wall's
+movement and sight block, determinism) and
+`tests/gravewyrm_sanctum_trash_mechanics.test.ts` (the first consumer).
