@@ -3936,7 +3936,10 @@ export const ja_JP: EnTranslations = {
         "airborne": "空中にいて攻撃できない。最も多くのプレイヤーが立つ氷板へ墜落の降下で着地し、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。",
         "wyrmsEye": "この効果が切れると、コルズルが立っている氷板全体に降り注ぐ炎を浴びせる：上にいる全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）、氷板にひびが入り、すでにひびがあれば砕ける。無傷の氷の上で仲間から離れて立て。",
         "quenchWater": "開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。",
-        "shardFlare": "心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。"
+        "shardFlare": "心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。",
+        "branded": "{seconds}秒間、{interval}秒ごとに{value}の{school}ダメージを与える。融け水の池に入るとすぐに消える。",
+        "creepingRime": "移動速度が{pct}%低下する（スタック1つにつき{per}%）。霧氷のブレスを受けるたびにスタックが1つ増え、効果時間が{seconds}秒にリセットされる。{max}スタックに達すると{freeze}秒間凍りつき（凍結）、スタックは消える。",
+        "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。"
       },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
@@ -6170,6 +6173,20 @@ export const ja_JP: EnTranslations = {
       "flightLine": "無傷の氷の上に集まって降下地点を選び、その後に離れろ",
       "lockboundTitle": "錠縛",
       "lockboundLine": "鎖が{chains}本残っている：被ダメージが{pct}%減少。封印の枷を壊して剥がせ。",
+      "timeAria": "残り{seconds}秒",
+      "brandedTitle": "焼き印！",
+      "brandedLine": "焼き印は切れるまで燃え続ける：融け水の池で消せ",
+      "rimeTitle": "忍び寄る霧氷！",
+      "rimeLine": "忍び寄る霧氷 {stacks}/{max}：幼竜のブレスから出ろ"
+    },
+    "kitUse": {
+      "toppleLine": "敵の群れの上に蹴り倒せ：こぼれた炎が奴らを焼く",
+      "toppleKey": "{name}を奴らの上に倒す",
+      "toppleTap": "ここをタップして{name}を奴らの上に倒す",
+      "toppleClick": "ここをクリックして{name}を奴らの上に倒す",
+      "toppleFar": "{range}ヤード以内に近づいて蹴り倒せ",
+      "toppleAria": "{name}を倒す",
+      "usingLine": "動くな：攻撃を受ける、動く、スタンのいずれかで中断される",
       "timeAria": "残り{seconds}秒"
     },
     "cosmetics": {
@@ -12591,6 +12608,14 @@ export const ja_JP: EnTranslations = {
       "sanctum_ice_block_toss": "氷塊投げ",
       "sanctum_tusker_tusk_sweep": "牙薙ぎ",
       "sanctum_tusker_trample": "踏みつぶし",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "重り尾の鞭打ち",
+      "sanctum_branding_iron": "焼き印",
+      "sanctum_rime_breath": "霧氷のブレス",
+      "kituse_sanctum_topple_brazier": "火鉢倒し",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
       "sanctum_korgath_maul_arc": "大槌の弧撃",
       "sanctum_korgath_chain_flail": "鎖の鞭打ち",
       "sanctum_korgath_threshold_charge": "境界の突進",

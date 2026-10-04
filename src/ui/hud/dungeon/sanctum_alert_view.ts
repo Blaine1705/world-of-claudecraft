@@ -14,10 +14,14 @@
 // the Grave Breath cone; in the Maul Arc; behind him for the Tail Sweep; your
 // Bonewalker in meltwater (the tank); your target in meltwater; cracked ice
 // under you during Korzul's fight; Korzul in the air; then the Lockbound
-// readout on a targeted Korgath. Every bar is the threat's own time left (the
+// readout on a targeted Korgath; then, below every boss alert, the trash
+// debuffs (the trash mechanics pass, mob/trash_kit/sanctum_cast_ids.ts): a
+// Goadsmith's brand burning on you, then Creeping Rime at 3 or 4 stacks (the
+// next Rime Breath freezes you). Every bar is the threat's own time left (the
 // caster's bar or the mark). The painter is the shared encounter alert's
 // (encounter_alert_painter.ts).
 
+import { GRAVEWYRM_SANCTUM_MOBS } from '../../../sim/content/gravewyrm_sanctum';
 import { SEAL_PILLARS } from '../../../sim/content/gravewyrm_sanctum_layout';
 import {
   BONEWALKER_ID,
@@ -51,6 +55,10 @@ import {
   VELKHAR_SOULFIRE_TRENCH,
   VELKHAR_TUNING,
 } from '../../../sim/encounters/gravewyrm_sanctum/ids';
+import {
+  SANCTUM_BRANDED,
+  SANCTUM_CREEPING_RIME,
+} from '../../../sim/mob/trash_kit/sanctum_cast_ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
@@ -73,7 +81,9 @@ export type SanctumAlertKind =
   | 'meltwater-target'
   | 'cracked'
   | 'flight'
-  | 'lockbound';
+  | 'lockbound'
+  | 'branded'
+  | 'rime';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const SANCTUM_ALERT_KINDS: readonly SanctumAlertKind[] = [
@@ -96,6 +106,8 @@ export const SANCTUM_ALERT_KINDS: readonly SanctumAlertKind[] = [
   'cracked',
   'flight',
   'lockbound',
+  'branded',
+  'rime',
 ];
 
 export type SanctumAlertLive = Omit<EncounterAlertLive, 'kind'> & { kind: SanctumAlertKind };
@@ -107,11 +119,19 @@ const HIDDEN: EncounterAlertHidden = { visible: false };
  *  bosses' bodies are wide; a warning errs toward telling). */
 const REACH_MARGIN = 2;
 
+/** Creeping Rime's stack count that freezes (the Rime Whelp's
+ *  freezeStack.maxStacks), and the count the alert starts warning at: two
+ *  short of it, so at 3 or 4 the next breath or two means Iced Over. */
+export const RIME_FREEZE_STACKS =
+  GRAVEWYRM_SANCTUM_MOBS.rime_whelp?.trashKit?.cone?.freezeStack?.maxStacks ?? 5;
+export const RIME_WARN_STACKS = RIME_FREEZE_STACKS - 2;
+
 interface AlertAura {
   id: string;
   remaining?: number;
   duration?: number;
   value?: number;
+  stacks?: number;
 }
 
 /** A body the alert reads (a boss, a Bonewalker, a Sanctum encounter object). */
@@ -304,6 +324,10 @@ function titleOf(kind: SanctumAlertKind): string {
       return t('hudChrome.sanctumAlert.flightTitle');
     case 'lockbound':
       return t('hudChrome.sanctumAlert.lockboundTitle');
+    case 'branded':
+      return t('hudChrome.sanctumAlert.brandedTitle');
+    case 'rime':
+      return t('hudChrome.sanctumAlert.rimeTitle');
   }
 }
 
@@ -571,6 +595,29 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       );
     }
   }
+
+  // 16. A Goadsmith's brand burning on you: a meltwater pool puts it out.
+  const brand = auraOf(input.auras, SANCTUM_BRANDED);
+  if (brand)
+    return live(
+      'branded',
+      t('hudChrome.sanctumAlert.brandedLine'),
+      markShare(brand),
+      brand.remaining ?? null,
+    );
+
+  // 17. Creeping Rime one or two stacks from freezing you solid.
+  const rime = auraOf(input.auras, SANCTUM_CREEPING_RIME);
+  if (rime && (rime.stacks ?? 0) >= RIME_WARN_STACKS)
+    return live(
+      'rime',
+      t('hudChrome.sanctumAlert.rimeLine', {
+        stacks: formatNumber(rime.stacks ?? 0, { maximumFractionDigits: 0 }),
+        max: formatNumber(RIME_FREEZE_STACKS, { maximumFractionDigits: 0 }),
+      }),
+      markShare(rime),
+      rime.remaining ?? null,
+    );
   return HIDDEN;
 }
 

@@ -1515,6 +1515,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // refusals sit under the drift guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_scrolls.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_casket.ts'), 'utf8'),
+    // The trash engine's G3 use (a Soul Brazier toppled with the interact
+    // press): its refusals ("Too far away.", "Line of sight.", "You are
+    // busy.", the dead line) are RETURNED by kitUseRefusal and emitted
+    // through a variable, so only the return-literal scan sees them here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/trash_kit/encounter_use.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized

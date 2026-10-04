@@ -125,6 +125,15 @@ export function tryNearbyInteraction(
     preferNpcId,
     gather?.nodes,
   );
+  if (candidate?.kind === 'use') {
+    // A usable encounter body (a Soul Brazier): target it and send the
+    // ordinary interact, exactly as the investigation suspects answer. The
+    // authoritative sim validates and starts the use (interaction.ts
+    // tryStartKitUse); online it is the same two commands, nothing new.
+    world.targetEntity(candidate.id);
+    world.interact();
+    return true;
+  }
   if (candidate?.kind === 'corpse') {
     // Ordinary loot only. Harvesting a corpse is an explicit action with its
     // own entry point (the corpse picker), never a side effect of this press.
