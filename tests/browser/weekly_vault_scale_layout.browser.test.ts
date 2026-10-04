@@ -61,28 +61,25 @@ async function mountVault(
 
   const state = emptyWeeklyRewards(604800000);
   state.world = 8;
-  pane = new WeeklyRewardsTab(
-    {
-      world: () =>
-        ({
-          cfg: { playerClass: 'mage' },
-          weeklyRewardInfo: {
-            state,
-            nowMs: 1000,
-            playerLevel: 20,
-            canClaim: true,
-            worldQuestsAvailable: true,
-            readyWeeks: 0,
-          },
-        }) as IWorld,
-      presentation: {
-        itemIcon: () => '',
-        attachTooltip: () => undefined,
-      } as unknown as PainterHostPresentation,
-      onInventoryChanged: () => undefined,
-    },
-    { readOnly: host !== 'bank' },
-  );
+  pane = new WeeklyRewardsTab({
+    world: () =>
+      ({
+        cfg: { playerClass: 'mage' },
+        weeklyRewardInfo: {
+          state,
+          nowMs: 1000,
+          playerLevel: 20,
+          canClaim: true,
+          worldQuestsAvailable: true,
+          readyWeeks: 0,
+        },
+      }) as IWorld,
+    presentation: {
+      itemIcon: () => '',
+      attachTooltip: () => undefined,
+    } as unknown as PainterHostPresentation,
+    onInventoryChanged: () => undefined,
+  });
   pane.renderInto(win);
   return win;
 }
