@@ -4690,17 +4690,37 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.35,
   },
   // Laverock, the Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
-  // a stand-in on the robed KayKit mage (bone-white robes, a staff) until his
-  // own model ships. His song is a channel cast (the generic cast loop).
+  // the Blender-built old cantor (E:/woc/laverock-work/builder, adapted from the
+  // Velkhar kit): bone-white habit, the stiff crescent stole, the nacre
+  // medallion, the driftwood staff with its carved moon. Normalized so his
+  // crown stands at the player's height and the staff above it. His gestures
+  // ride the overhead emotes the guide sets as he speaks (point = Talk, cry =
+  // Startle, kneel = Kneel) and the song is his channel cast (cantor_last_verse,
+  // the Sing loop).
   npc_laverock: {
-    url: `${PLAYERS}/mage.glb`,
-    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: kaykit(['2H_Melee_Attack_Chop']),
-    show: [],
-    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
-    tint: 0xe6dcc6,
-    tintStrength: 0.45,
+    url: `${CREATURES}/temple_laverock.glb`,
+    height: 3.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Walk',
+      attack: ['Talk'],
+      death: 'Idle',
+      cast: 'Sing',
+      castByAbility: { cantor_last_verse: 'Sing' },
+      emote: {
+        point: { clips: ['Talk'] },
+        cry: { clips: ['Startle'] },
+        kneel: { clips: ['Kneel'] },
+      },
+    },
+    walkRef: 0.44,
+    runRef: 0.44,
+    walkTimeScaleMax: 3.5,
+    runTimeScaleMax: 4,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
+    clickRadius: 0.8,
   },
   npc_villager_robed: {
     url: `${PLAYERS}/mage.glb`,

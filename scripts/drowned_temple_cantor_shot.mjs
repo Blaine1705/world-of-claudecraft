@@ -207,6 +207,10 @@ async function main() {
     await stand(-31, 213, -2.36, { yaw: -2.36, pitch: 0.14, dist: 7 });
     await sleep(2000);
     await shot(page, 'laverock_4_canto');
+    // Close on him from beside, the player off to the side of the frame.
+    await stand(-33.5, 211.5, -2.4, { yaw: -2.4 + 0.75, pitch: 0.12, dist: 5.5 });
+    await sleep(2500);
+    await shot(page, 'laverock_4b_canto_cerca');
     // From the Altar Ward over the landing, where the guards, novices and the
     // singer who fell nearest the altar rise as moonlight toward the moon.
     await stand(4, 206, Math.PI / 2, { yaw: Math.PI / 2 - 0.25, pitch: 0.12, dist: 10 });
