@@ -20,8 +20,26 @@ the bar ends (2.5), the pose the Run takes up.
 Stunned (Breached, a loop): crashed into a buttress, he reels on his feet, the
 shield hanging, the sword's point dragging, the crested head lolling.
 
+The fallen paladin's kit (src/sim/encounters/sunken_bastion/olen.ts), each on its
+bar and bar-locked, starting on the guard:
+  Consecrate (Hallowed Brine, 1.2 s): the sword hauled up high over the shield's
+  rim, point down, then driven into the flags before him (PLANT 0.9), held there as
+  the brine wells up on the bar's end, wrenched free after it.
+  ShieldThrow (Rebounding Bulwark, 1.5 s): the tower shield swung back across his
+  body, then hurled sidearm (RELEASE 1.3); from the release the Shield bone is
+  scaled away (the board has left the fist) to the clip's end.
+  ShieldCatch (0.6 s, the gesture when it flies home): the left arm snaps out, the
+  shield is back in the fist at CATCH 0.12 and he gives a step under its weight.
+  Judgement (Sentence of the Tide, 1.0 s): the blade levelled at the marked player
+  and held there, a commander's sentence (POINT 0.45).
+  OathKneel (Unbroken Oath, 1.5 s): down onto his right knee (DOWN 1.1), the sword
+  planted point-down before him and his fist on its pommel, the shield stood upright
+  on its foot at his left side, the crested head bowed.
+  OathVigil (a loop, 2.4 s): the vigil kept in the bubble, breathing, the cloak and
+  the crest stirring.
+
   Attack: CONTACT 0.7.  Attack2: CONTACT 0.48.  Attack3: CONTACT 0.78.
-  OathCharge: 2.5 (bar-locked: the launch on the bar's end).
+  OathCharge: 2.5 (bar-locked: the launch on the bar's end; retired with the charge).
 """
 import math
 
@@ -38,6 +56,15 @@ WALKREF = round(2 * WALK_HALF / (WALK_STANCE * round(WALK_PERIOD * 24) / 24), 3)
 RUNREF = round(2 * RUN_HALF / (RUN_STANCE * round(RUN_PERIOD * 24) / 24), 3)
 SOLE = A.SOLE_Z
 OATH = 2.5
+CONSECRATE, PLANT = 1.2, 0.9
+THROW, RELEASE = 1.5, 1.3
+CATCH_DUR, CATCH = 0.6, 0.12
+JUDGE, POINT = 1.0, 0.45
+KNEEL, DOWN = 1.5, 1.1
+VIGIL = 2.4
+# The shield in the fist, or gone from it (the Shield bone's keyed scale).
+HELD = {'Shield': 1.0}
+GONE = {'Shield': 0.001}
 
 
 def _n(v):
@@ -286,6 +313,140 @@ def death(rig):
     return keyed(keys), 2.7
 
 
+# ------------------------------------------------------------------ the fallen paladin
+def consecrate(rig):
+    """Hallowed Brine: the sword hauled up high over the shield's rim, point down,
+    then driven into the flags before him (PLANT 0.9), held planted through the
+    bar's end (when the brine wells up round the blade), wrenched free after it."""
+    g = M.aim_weapon(guard(rig)).but(scale=dict(HELD))
+    lift = g.but(lean=-8, neck=-10, look=(0, 18), pelvis=(0.0, 0.08, -0.08), twist=-4,
+                 hand_r=(-0.5, -0.6, 4.85), pole_r=(-1.0, 0.2, 0.3), weapon=_n((0.05, -0.15, 0.99)),
+                 clav_r=18, **SIDE_L)
+    apex = lift.but(lean=-11, look=(0, 22), hand_r=(-0.46, -0.62, 4.95))
+    over = g.but(lean=12, neck=0, look=(0, 0), pelvis=(0.0, 0.0, -0.36), twist=0,
+                 hand_r=(-0.3, -1.25, 3.6), pole_r=(-1.0, 0.1, -0.2), weapon=_n((0.0, -0.75, -0.66)),
+                 weapon_max=80.0, clav_r=8, **SIDE_L)
+    drive = g.but(lean=30, neck=-8, look=(0, -24), pelvis=(0.0, -0.1, -0.7), twist=0, hip_tilt=4,
+                  hand_r=(-0.22, -1.24, 2.0), pole_r=(-1.0, 0.3, -0.5), weapon=_n((0.0, -0.06, -1.0)),
+                  weapon_max=80.0, clav_r=4, hand_l=(0.98, -0.42, 2.25), pole_l=(0.6, 1.0, -0.3),
+                  hand_dir_l=SIDE_DIR, hand_roll_l=SIDE_ROLL, fist_l=1.0,
+                  knee_l=(0.3, -1.0, 0.1), knee_r=(-0.3, -1.0, -0.1))
+    held = drive.but(lean=32, pelvis=(0.0, -0.11, -0.74), look=(0, -20))
+    pull = drive.but(lean=14, pelvis=(0.0, -0.02, -0.4), look=(0, -6), hand_r=(-0.4, -1.05, 2.95),
+                     weapon=_n((0.1, -0.5, -0.86)))
+    level = apex.but(lean=0, look=(0, 8), pelvis=(0.0, 0.04, -0.2), hand_r=(-0.4, -1.05, 4.35),
+                     pole_r=(-1.0, 0.1, 0.0), weapon=_n((0.02, -0.96, 0.28)), weapon_max=80.0)
+    keys = [(0.0, g, 'inout'), (0.42, lift, 'out'), (0.6, apex, 'inout'), (0.72, level, 'inout'),
+            (0.8, over, 'linear'),
+            (PLANT, drive, 'out'), (1.02, held, 'inout'), (CONSECRATE, held.but(lean=31), 'inout'),
+            (1.42, pull, 'inout'), (1.75, g, 'linear')]
+    return keyed(keys), 1.75
+
+
+def shield_throw(rig):
+    """Rebounding Bulwark: the tower shield drawn back across his body to the right
+    and coiled behind it, then hurled sidearm out to his left-front with the whole
+    turn of the hips (RELEASE 1.3); from the release the board is gone from the fist
+    (the Shield bone scaled away) to the clip's end."""
+    g = M.aim_weapon(guard(rig)).but(scale=dict(HELD))
+    draw = g.but(twist=-30, lean=8, side=-3, pelvis=(0.05, 0.12, -0.26), look=(18, 0), hip_twist=-12,
+                 hand_l=(-0.12, -0.78, 3.1), pole_l=(1.0, 0.6, -0.4), hand_dir_l=GUARD_DIR,
+                 hand_roll_l=GUARD_ROLL, clav_fwd_l=10,
+                 hand_r=(-0.9, -0.2, 2.75), pole_r=(-1.0, 0.6, -0.2), weapon=_n((-0.2, -0.6, -0.77)))
+    coil = draw.but(twist=-40, hip_twist=-16, lean=12, look=(24, -2), hand_l=(-0.32, -0.5, 3.05),
+                    pelvis=(0.07, 0.16, -0.32))
+    sling = g.but(twist=10, lean=12, hip_twist=4, pelvis=(0.0, -0.06, -0.3), look=(-6, 0),
+                  hand_l=(0.7, -1.2, 3.2), pole_l=(0.6, 0.4, -0.8), hand_dir_l=_n((-0.2, -0.95, 0.2)),
+                  hand_roll_l=-90, knee_l=(0.3, -1.0, 0.1),
+                  hand_r=(-0.9, -0.2, 2.75), pole_r=(-1.0, 0.6, -0.2), weapon=_n((-0.2, -0.6, -0.77)))
+    loose = g.but(twist=32, lean=16, side=4, hip_twist=14, pelvis=(-0.04, -0.2, -0.34), look=(-22, 2),
+                  hand_l=(1.55, -1.25, 3.3), pole_l=(0.2, 0.6, -0.9), hand_dir_l=_n((0.75, -0.6, 0.2)),
+                  hand_roll_l=-90, fist_l=1.0,
+                  hand_r=(-0.9, -0.2, 2.75), pole_r=(-1.0, 0.6, -0.2), weapon=_n((-0.2, -0.6, -0.77)),
+                  knee_l=(0.3, -1.0, 0.1))
+    flung = loose.but(scale=dict(GONE), fist_l=0.15, twist=36, hand_l=(1.7, -1.05, 3.25))
+    after = flung.but(twist=20, lean=10, hand_l=(1.25, -0.9, 2.95), look=(-14, 4), pelvis=(-0.02, -0.08, -0.28))
+    bare = g.but(scale=dict(GONE), fist_l=0.25, hand_l=(0.95, -0.7, 2.75), pole_l=(0.6, 1.0, -0.3))
+    keys = [(0.0, g, 'inout'), (0.5, draw, 'inout'), (0.9, coil, 'inout'), (1.02, coil.but(twist=-42), 'inout'),
+            (1.2, sling, 'linear'), (RELEASE - 0.02, loose, 'linear'), (RELEASE, flung, 'out'),
+            (THROW, after, 'inout'), (1.85, bare, 'linear')]
+    return keyed(keys), 1.85
+
+
+def shield_catch(rig):
+    """The shield flies home: the left arm snaps out empty, the board is back in the
+    fist at CATCH 0.12 and its weight drives the arm back and rocks him on his
+    heels, then the guard."""
+    g = M.aim_weapon(guard(rig)).but(scale=dict(HELD))
+    reach = g.but(scale=dict(GONE), fist_l=0.2, twist=14, lean=6, hand_l=(1.25, -1.15, 3.25),
+                  pole_l=(0.4, 0.6, -0.8), hand_dir_l=_n((0.5, -0.8, 0.25)), hand_roll_l=-70, look=(-18, 4))
+    caught = reach.but(scale=dict(HELD), fist_l=0.5)
+    give = g.but(twist=-6, lean=-6, pelvis=(0.0, 0.2, -0.16), look=(-6, 6), hand_l=(0.85, -0.55, 3.0))
+    keys = [(0.0, reach, 'linear'), (CATCH - 0.01, reach, 'linear'), (CATCH, caught, 'out'), (0.3, give, 'inout'),
+            (CATCH_DUR, g, 'linear')]
+    return keyed(keys), CATCH_DUR
+
+
+def judgement(rig):
+    """Sentence of the Tide: the blade drawn back by his ear, then levelled at the
+    marked player at arm's length (POINT 0.45) and held there, the shield lowered to
+    his side and the helm square to the doomed."""
+    g = M.aim_weapon(guard(rig)).but(scale=dict(HELD))
+    draw = g.but(twist=-12, lean=-2, look=(6, 4), hand_r=(-0.7, -0.15, 3.85), pole_r=(-1.0, 0.0, 0.2),
+                 weapon=_n((0.05, -0.8, 0.6)), clav_r=10)
+    point = g.but(twist=14, lean=6, neck=-4, look=(-6, 0), pelvis=(0.0, -0.1, -0.22), hip_twist=6,
+                  hand_r=(-1.05, -1.05, 3.5), pole_r=(-0.6, 0.6, -0.5), weapon=_n((0.12, -0.99, 0.0)),
+                  weapon_max=80.0, clav_r=8, **SIDE_L)
+    keys = [(0.0, g, 'inout'), (0.24, draw, 'inout'), (POINT, point, 'out'),
+            (0.75, point.but(lean=7, hand_r=(-1.05, -1.08, 3.52)), 'inout'),
+            (JUDGE, point.but(lean=6), 'inout'), (1.15, point.but(lean=6), 'hold')]
+    return keyed(keys), 1.15
+
+
+def _vigil_base(g):
+    """Down on his right knee: the left foot planted before him, the right knee on
+    the flags, the sword's point set in the stones before him and his right fist on
+    its pommel, the shield stood upright on its foot at his left side, the head
+    bowed."""
+    return g.but(pelvis=(0.0, 0.22, -0.98), lean=10, neck=22, look=(0, -20), twist=0, hip_tilt=0, side=0,
+                 foot_l=(0.46, -0.46, SOLE), knee_l=(0.3, -1.0, 0.1), fyaw_l=6,
+                 foot_r=(-0.42, 0.82, 0.24), fpitch_r=-50, knee_r=(-0.2, -1.0, -0.4), fyaw_r=10,
+                 hand_r=(-0.22, -0.95, 2.18), pole_r=(-0.9, 0.3, -0.4), weapon=_n((0.03, -0.1, -0.99)),
+                 hand_l=(1.05, -0.32, 1.62), pole_l=(0.7, 0.9, -0.3), hand_dir_l=SIDE_DIR, hand_roll_l=SIDE_ROLL,
+                 fist_l=1.0, clav_l=0, clav_r=2)
+
+
+def oath_kneel(rig):
+    """The Unbroken Oath: he straightens, turns the sword point-down, and sinks onto
+    his right knee (DOWN 1.1), the point set in the stones and the shield stood on its
+    foot at his side, and bows his head over the hilt."""
+    g = M.aim_weapon(guard(rig)).but(scale=dict(HELD))
+    rise = g.but(lean=-4, neck=-6, look=(0, 10), pelvis=(0.0, 0.06, -0.06), twist=0,
+                 hand_r=(-0.35, -1.0, 3.6), pole_r=(-1.0, 0.2, -0.2), weapon=_n((0.02, -0.25, -0.97)), **SIDE_L)
+    knee = _vigil_base(g)
+    bow = knee.but(neck=26, look=(0, -26), lean=12)
+    sink = knee.but(pelvis=(0.0, 0.2, -0.8), lean=14, neck=12, look=(0, -8), hand_r=(-0.24, -1.0, 2.35),
+                    foot_r=(-0.43, 0.62, SOLE + 0.22), fpitch_r=-30, knee_r=(-0.25, -1.0, -0.2))
+    keys = [(0.0, g, 'inout'), (0.4, rise, 'inout'), (0.8, sink, 'expoin'), (DOWN, knee, 'out'),
+            (KNEEL, bow, 'inout'), (1.65, bow, 'hold')]
+    return keyed(keys), 1.65
+
+
+def oath_vigil(rig, period=VIGIL):
+    """The vigil kept in the water bubble: knelt and still, the breath rising and
+    falling in the plate, the bowed head lifting a hair and sinking (the cloak is
+    the kit's cloth, settling on the flags behind him)."""
+    # the kneel's last pose (its bow), the blade's direction resolved into the wrist
+    base = M.aim_weapon(_vigil_base(guard(rig).but(scale=dict(HELD))).but(neck=26, look=(0, -26), lean=12))
+
+    def fn(t):
+        u = TAU * t / period
+        br = math.sin(u)
+        return base.but(lean=12 - 1.2 * br, neck=26 - 2.0 * br, look=(1.5 * math.sin(u), -26 + 2.5 * br),
+                        clav_l=0.8 * br, clav_r=2 + 0.8 * br, pelvis=(0.0, 0.22, -0.98 + 0.012 * br))
+    return fn
+
+
 CATALOG = [
     ('Idle', lambda r: (idle(r), 5.0), True),
     ('CombatIdle', lambda r: (combat_idle(r), 2.2), True),
@@ -298,6 +459,12 @@ CATALOG = [
     ('Stunned', lambda r: (stunned(r), 2.4), True),
     ('Hit', hit, False),
     ('Death', death, False),
+    ('Consecrate', consecrate, False),
+    ('ShieldThrow', shield_throw, False),
+    ('ShieldCatch', shield_catch, False),
+    ('Judgement', judgement, False),
+    ('OathKneel', oath_kneel, False),
+    ('OathVigil', lambda r: (oath_vigil(r), VIGIL), True),
 ]
 
 
