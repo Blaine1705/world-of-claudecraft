@@ -12572,11 +12572,18 @@ export const ru_RU: EnTranslations = {
       "temple_toxic_rime": "Ядовитая изморозь",
       "temple_beckoning_moon": "Зов луны",
       "temple_falling_moon": "Падающая луна",
+      "temple_prism_glare": "Взор призмы",
+      "temple_arcing_spark": "Дуговая искра",
       "wildheart_ancestral_sap": "Сок предков",
       "wildheart_plant_totem": "Установка тотема",
       "wildheart_entangling_lash": "Опутывающий хлыст",
       "wildheart_saurian_tail_swipe": "Удар хвостом",
       "wildheart_saurian_stomp": "Сотрясающий топот",
+      "wildheart_quarry_mark": "Метка добычи",
+      "wildheart_war_roar": "Боевой рёв",
+      "wildheart_toad_hex": "Жабья порча",
+      "wildheart_rattling_dread": "Гремящий ужас",
+      "wildheart_snaring_tongue": "Ловчий язык",
       "wildheart_beast_pit_quake": "Сотрясение звериных ям",
       "wildheart_jaguar_heel": "К ноге!",
       "wildheart_gorgebloom_seed_rain": "Семенной дождь",
@@ -20803,6 +20810,9 @@ export const ru_RU: EnTranslations = {
       },
       "sunbone_totem": {
         "name": "Тотем Солнечной Кости"
+      },
+      "sunbone_dread_totem": {
+        "name": "Тотем ужаса Солнечной Кости"
       },
       "basin_raptor": {
         "name": "Котловинный раптор"

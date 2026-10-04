@@ -12572,11 +12572,18 @@ export const en_CA: EnTranslations = {
       "temple_toxic_rime": "Toxic Rime",
       "temple_beckoning_moon": "Beckoning Moon",
       "temple_falling_moon": "Falling Moon",
+      "temple_prism_glare": "Prism Glare",
+      "temple_arcing_spark": "Arcing Spark",
       "wildheart_ancestral_sap": "Ancestral Sap",
       "wildheart_plant_totem": "Plant Totem",
       "wildheart_entangling_lash": "Entangling Lash",
       "wildheart_saurian_tail_swipe": "Tail Swipe",
       "wildheart_saurian_stomp": "Earthshaking Stomp",
+      "wildheart_quarry_mark": "Quarry Mark",
+      "wildheart_war_roar": "War Roar",
+      "wildheart_toad_hex": "Toad Hex",
+      "wildheart_rattling_dread": "Rattling Dread",
+      "wildheart_snaring_tongue": "Snaring Tongue",
       "wildheart_beast_pit_quake": "Beast Pit Quake",
       "wildheart_jaguar_heel": "Heel!",
       "wildheart_gorgebloom_seed_rain": "Seed Rain",
@@ -20803,6 +20810,9 @@ export const en_CA: EnTranslations = {
       },
       "sunbone_totem": {
         "name": "Sunbone Totem"
+      },
+      "sunbone_dread_totem": {
+        "name": "Sunbone Dread Totem"
       },
       "basin_raptor": {
         "name": "Basin Raptor"

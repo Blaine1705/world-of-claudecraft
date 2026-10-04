@@ -145,10 +145,19 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_toxic_rime': true,
   'abilityUi.cast.temple_beckoning_moon': true,
   'abilityUi.cast.temple_falling_moon': true,
+  // The Temple trash mechanics pass.
+  'abilityUi.cast.temple_prism_glare': true,
+  'abilityUi.cast.temple_arcing_spark': true,
   // The Wildheart Basin rework: its trash kit and the Great Saurian.
   'abilityUi.cast.wildheart_ancestral_sap': true,
   'abilityUi.cast.wildheart_plant_totem': true,
   'abilityUi.cast.wildheart_entangling_lash': true,
+  // The Wildheart trash mechanics pass.
+  'abilityUi.cast.wildheart_quarry_mark': true,
+  'abilityUi.cast.wildheart_war_roar': true,
+  'abilityUi.cast.wildheart_toad_hex': true,
+  'abilityUi.cast.wildheart_rattling_dread': true,
+  'abilityUi.cast.wildheart_snaring_tongue': true,
   'abilityUi.cast.wildheart_saurian_tail_swipe': true,
   'abilityUi.cast.wildheart_saurian_stomp': true,
   // The Wildheart Basin's three bosses.

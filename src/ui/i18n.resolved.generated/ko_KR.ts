@@ -12572,11 +12572,18 @@ export const ko_KR: EnTranslations = {
       "temple_toxic_rime": "맹독 서리",
       "temple_beckoning_moon": "달의 부름",
       "temple_falling_moon": "떨어지는 달",
+      "temple_prism_glare": "프리즘 응시",
+      "temple_arcing_spark": "호를 그리는 불꽃",
       "wildheart_ancestral_sap": "선조의 수액",
       "wildheart_plant_totem": "토템 심기",
       "wildheart_entangling_lash": "휘감는 채찍",
       "wildheart_saurian_tail_swipe": "꼬리 휩쓸기",
       "wildheart_saurian_stomp": "대지를 뒤흔드는 발구르기",
+      "wildheart_quarry_mark": "사냥감 표식",
+      "wildheart_war_roar": "전쟁의 포효",
+      "wildheart_toad_hex": "두꺼비 사술",
+      "wildheart_rattling_dread": "덜그럭거리는 공포",
+      "wildheart_snaring_tongue": "옭아매는 혀",
       "wildheart_beast_pit_quake": "야수 구덩이 진동",
       "wildheart_jaguar_heel": "돌아와!",
       "wildheart_gorgebloom_seed_rain": "씨앗 비",
@@ -20803,6 +20810,9 @@ export const ko_KR: EnTranslations = {
       },
       "sunbone_totem": {
         "name": "태양뼈 토템"
+      },
+      "sunbone_dread_totem": {
+        "name": "태양뼈 공포 토템"
       },
       "basin_raptor": {
         "name": "분지 랩터"

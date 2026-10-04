@@ -13401,6 +13401,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.basin_raptor.name': '盆地迅猛龍',
   'entities.mobs.sunbone_totem.name': '日骨圖騰',
   'entities.mobs.sunbone_totem_binder.name': '日骨圖騰縛靈者',
+  'entities.mobs.sunbone_dread_totem.name': '日骨恐懼圖騰',
   'entities.mobs.wildheart_high_priest.name': '盆地之聲祖爾加',
   'entities.mobs.broodsworn_thawcaller.name': '龍誓融冰召喚者',
   'entities.mobs.broodsworn_goadsmith.name': '龍誓刺棒匠',
@@ -18821,6 +18822,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_hydra_tsunami': '海嘯',
   'abilityUi.cast.temple_ysolei_call': '月裔召喚',
   'abilityUi.cast.temple_ysolei_wrath': '溺亡之怒',
+  'abilityUi.cast.temple_prism_glare': '稜鏡凝視',
+  'abilityUi.cast.temple_arcing_spark': '弧光火花',
   'entities.mobs.crypt_ossuary_warrior.name': '骨堂戰士',
   'entities.mobs.crypt_gravecaller_adept.name': '喚墓者學徒',
   'entities.mobs.crypt_ossuary_cutthroat.name': '骨堂割喉者',
@@ -18958,6 +18961,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_gorgebloom_gorge': '吞噬',
   'abilityUi.cast.wildheart_zulgar_pulse': '荒野之心脈衝',
   'abilityUi.cast.wildheart_zulgar_spirit_hunt': '狩獵之魂',
+  'abilityUi.cast.wildheart_quarry_mark': '獵物印記',
+  'abilityUi.cast.wildheart_war_roar': '戰爭咆哮',
+  'abilityUi.cast.wildheart_toad_hex': '蟾蜍妖術',
+  'abilityUi.cast.wildheart_rattling_dread': '骨鳴恐懼',
+  'abilityUi.cast.wildheart_snaring_tongue': '套索之舌',
   'abilityUi.cast.sanctum_cinder_breath': '餘燼吐息',
   'abilityUi.cast.sanctum_warming_rite': '回暖儀式',
   'abilityUi.cast.sanctum_goad': '驅策',
@@ -19137,7 +19145,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.sight.tidewisp':
     '那就是月之水本身，我們本該喝下的那一口。別讓它碰到你們。',
   'dungeonGuide.drownedTemple.area.colonnade': '潮汐柱廊。我們兩兩並肩走過這裡，唱著升起之節。',
-  'dungeonGuide.drownedTemple.sight.sentinel': '門邊水池裡的月鰩。我們還是見習生時，在月出時餵牠們珍珠。如今牠們守著這些門，把我們的珍珠當作心臟。',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    '門邊水池裡的月鰩。我們還是見習生時，在月出時餵牠們珍珠。如今牠們守著這些門，把我們的珍珠當作心臟。',
   'dungeonGuide.drownedTemple.sight.eel':
     '潟湖裡的鰻魚。見習生們會在黃昏餵牠們麵包。牠們靠我們的聖歌養得肥肥的。',
   'dungeonGuide.drownedTemple.area.veil': '那道帷幕後面就是唱詩庭院。我從小時候起就再沒踏進去過。',

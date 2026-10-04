@@ -670,6 +670,10 @@ const mergeStringsEn = {
       temple_toxic_rime: 'Toxic Rime',
       temple_beckoning_moon: 'Beckoning Moon',
       temple_falling_moon: 'Falling Moon',
+      // The Temple trash mechanics pass (trash_kit/temple_cast_ids.ts). The
+      // Arcing Spark can be kicked; the Prism Glare cannot (turn your back).
+      temple_prism_glare: 'Prism Glare',
+      temple_arcing_spark: 'Arcing Spark',
       // The Wildheart Basin rework (trash_kit/wildheart_cast_ids.ts,
       // encounters/wildheart_basin/ids.ts). Only Ancestral Sap can be kicked.
       wildheart_ancestral_sap: 'Ancestral Sap',
@@ -677,6 +681,13 @@ const mergeStringsEn = {
       wildheart_entangling_lash: 'Entangling Lash',
       wildheart_saurian_tail_swipe: 'Tail Swipe',
       wildheart_saurian_stomp: 'Earthshaking Stomp',
+      // The Wildheart trash mechanics pass (trash_kit/wildheart_cast_ids.ts).
+      // The War Roar and the Toad Hex can be kicked; the rest cannot.
+      wildheart_quarry_mark: 'Quarry Mark',
+      wildheart_war_roar: 'War Roar',
+      wildheart_toad_hex: 'Toad Hex',
+      wildheart_rattling_dread: 'Rattling Dread',
+      wildheart_snaring_tongue: 'Snaring Tongue',
       // The Wildheart Basin's three bosses (encounters/wildheart_basin). None
       // of these bars can be kicked.
       wildheart_beast_pit_quake: 'Beast Pit Quake',
