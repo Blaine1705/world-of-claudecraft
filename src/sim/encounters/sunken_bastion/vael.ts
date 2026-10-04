@@ -382,7 +382,14 @@ function stepVeil(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFig
     const e = id >= 0 ? ctx.entities.get(id) : undefined;
     if (!e) continue;
     const at = localOf(ctx, inst, e);
-    if (Math.hypot(at.x - slots[k].x, at.z - slots[k].z) > 0.5)
+    if (e === boss) {
+      // The real one holds his spot exactly, every tick, as still as his
+      // shades: his chase would walk him a step toward his target each tick,
+      // and a snap back only past half a yard drew a stutter that only he
+      // showed (a tell the beam is meant to be the only way to read).
+      place(ctx, inst, e, slots[k].x, slots[k].z);
+      ctx.grid.update(e);
+    } else if (Math.hypot(at.x - slots[k].x, at.z - slots[k].z) > 0.5)
       place(ctx, inst, e, slots[k].x, slots[k].z);
     else e.facing = Math.atan2(BEACON.x - at.x, BEACON.z - at.z);
     e.swingTimer = Math.max(e.swingTimer, 1);
@@ -603,6 +610,11 @@ function stepReap(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFig
   const reap = st.reap;
   if (!reap) return;
   reap.elapsed += DT;
+  // The Shadowstep's bar runs down with the step's own clock (the sink and
+  // the wait under the pool), as the rise's bar does below: the HUD fills it
+  // and the renderer locks the sink to it.
+  if (reap.phase !== 'rise' && boss.castingAbility === VAEL_SHADOWSTEP)
+    boss.castRemaining = Math.max(0, T.vanishSeconds + T.poolSeconds - reap.elapsed);
   if (reap.phase === 'vanish') {
     pinAt(ctx, inst, boss, reap.fromX, reap.fromZ, reap.yaw);
     if (reap.elapsed < T.vanishSeconds) return;
