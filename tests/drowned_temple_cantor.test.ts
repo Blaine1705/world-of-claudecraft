@@ -202,7 +202,7 @@ describe('the guide record', () => {
       if (t.kind === 'bossDead') for (const b of t.bossIds) expect(MOBS[b], line.id).toBeDefined();
       if (t.kind === 'follows') for (const f of t.lines) expect(ids.has(f), line.id).toBe(true);
       if (line.beforeBoss) expect(MOBS[line.beforeBoss], line.id).toBeDefined();
-      expect(line.text, line.id).not.toMatch(/[–—]/);
+      expect(line.text, line.id).not.toMatch(/[\u2013\u2014]/);
     }
     for (const id of CANTOR_GUIDE.finale.dissolveMobIds) expect(MOBS[id], id).toBeDefined();
     expect(DEEDS[CANTOR_DEED_ID]?.trigger).toEqual({ kind: 'manual' });
