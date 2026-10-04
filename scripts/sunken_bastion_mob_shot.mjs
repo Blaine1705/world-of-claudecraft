@@ -7,10 +7,13 @@
 //
 //   node scripts/sunken_bastion_mob_shot.mjs <type> [outDir] [prefix]
 //
-// <type> is a /dev bastion spawn name (revenant, warhound, watchman, ...).
+// <type> is a /dev bastion spawn name (revenant, warhound, watchman, ...), or
+// boss:<templateId> (knight_commander_olen, gaoler_ossick) to bring that boss
+// of the instance over instead of raising a trash mob.
 //
 // Env: SHOT_URL (http://127.0.0.1:5241/), SHOT_PRESET (4), SHOT_W / SHOT_H
-// (1600x900), SHOT_ONLY (comma list of shot names).
+// (1600x900), SHOT_ONLY (comma list of shot names), SHOT_TP (the /dev bastion
+// tp place, cisternyard; a boss leashed to its arena needs its own, e.g. olen).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -27,6 +30,8 @@ const W = Number(process.env.SHOT_W ?? 1600);
 const H = Number(process.env.SHOT_H ?? 900);
 const PRESET = Number(process.env.SHOT_PRESET ?? 4);
 const ONLY = (process.env.SHOT_ONLY ?? '').split(',').filter(Boolean);
+const BOSS = TYPE.startsWith('boss:') ? TYPE.slice(5) : null;
+const TP = process.env.SHOT_TP ?? 'cisternyard';
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const want = (name) => !ONLY.length || ONLY.includes(name);
@@ -70,7 +75,7 @@ async function main() {
       '/dev bastion enter',
       '/dev bastion gates',
       '/dev bastion kill all',
-      '/dev bastion tp cisternyard',
+      `/dev bastion tp ${TP}`,
     ]) {
       await chat(cmd);
       await sleep(1300);
@@ -103,14 +108,19 @@ async function main() {
       console.log('SHOT', file);
     };
     const clear = () =>
-      page.evaluate(() => {
+      page.evaluate((boss) => {
         for (const e of window.__game.world.entities.values()) {
           if (e.kind !== 'mob') continue;
+          if (boss && e.templateId === boss) {
+            e.dead = false;
+            e.hp = e.maxHp;
+            continue;
+          }
           e.pos.x += 400;
           e.prevPos = { ...e.pos };
           e.hp = 0;
         }
-      });
+      }, BOSS);
     const spawn = async (dist, pull) => {
       await clear();
       await sleep(500);
@@ -120,15 +130,16 @@ async function main() {
         p.prevFacing = 0;
         p.devNoAggro = false;
       });
-      await chat(`/dev bastion spawn ${TYPE}`);
+      if (!BOSS) await chat(`/dev bastion spawn ${TYPE}`);
       await sleep(300);
       return page.evaluate(
-        ([d, pl]) => {
+        ([d, pl, boss]) => {
           const sim = window.__game.world;
           const me = sim.player;
           let mob = null;
           for (const e of sim.entities.values()) {
-            if (e.kind === 'mob' && !e.dead && e.hp > 0) mob = e;
+            if (e.kind === 'mob' && !e.dead && e.hp > 0 && (!boss || e.templateId === boss))
+              mob = e;
           }
           if (!mob) return -1;
           mob.pos.x = me.pos.x + 1.0;
@@ -145,7 +156,7 @@ async function main() {
           me.targetId = mob.id;
           return mob.id;
         },
-        [dist, pull],
+        [dist, pull, BOSS],
       );
     };
 
