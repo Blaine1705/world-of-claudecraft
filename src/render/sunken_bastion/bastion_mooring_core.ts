@@ -19,7 +19,7 @@ export const MOORING_SAFE_RADIUS = OSSICK_TUNING.postReach;
 /** A post's lamp flares and dies over this long when it takes a chain. */
 export const MOORING_FLARE_SECONDS = 1.6;
 /** The chain snaps taut to the post, holds, then bursts at this age. */
-export const MOORING_SNAP_SECONDS = 0.45;
+export const MOORING_SNAP_SECONDS = 0.6;
 /** Seconds the re-ignite takes (the sim's kindling). */
 export const MOORING_KINDLE_SECONDS = OSSICK_TUNING.postKindleSeconds;
 

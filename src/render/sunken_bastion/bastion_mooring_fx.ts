@@ -392,7 +392,7 @@ export class BastionMooringFx {
       if (fl > 0.01) {
         slot.flameMat.color.copy(FLAME);
         slot.flameMat.opacity = Math.min(1, fl);
-        slot.flame.scale.set(0.7 + 0.15 * fl, 0.95 + 0.2 * fl, 1);
+        slot.flame.scale.set(1.0 + 0.2 * fl, 1.35 + 0.25 * fl, 1);
       } else {
         // A dead lamp keeps a dull ember behind the glass.
         slot.flameMat.color.copy(EMBER);
@@ -405,9 +405,9 @@ export class BastionMooringFx {
       slot.halo.visible = halo > 0.01;
       if (slot.halo.visible) {
         slot.halo.position.set(slot.x, ly + 0.1, slot.z);
-        const hs = (calling ? 4.6 : 3.2) * (0.7 + 0.3 * Math.min(1.6, halo));
+        const hs = (calling ? 5.6 : 4.4) * (0.7 + 0.3 * Math.min(1.6, halo));
         slot.halo.scale.set(hs, hs, 1);
-        slot.haloMat.opacity = Math.min(1, 0.55 * halo);
+        slot.haloMat.opacity = Math.min(1, 0.9 * halo);
       }
       // Its light on the flags: the size of its reach.
       slot.pool.visible = halo > 0.01;
@@ -415,7 +415,7 @@ export class BastionMooringFx {
         const r = MOORING_SAFE_RADIUS * 1.25;
         slot.pool.position.set(slot.x, slot.y + 0.06, slot.z);
         slot.pool.scale.set(r, 1, r);
-        slot.poolMat.opacity = Math.min(0.75, 0.32 * halo);
+        slot.poolMat.opacity = Math.min(0.85, 0.5 * halo);
       }
       // The safe ring and the shaft of light while the local player is hooked.
       slot.ring.visible = calling;
