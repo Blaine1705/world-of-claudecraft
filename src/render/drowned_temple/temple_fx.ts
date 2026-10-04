@@ -474,7 +474,9 @@ export class TempleFx {
       this.shellStance.delete(id);
       return;
     }
-    if (want === had) return;
+    // Shut, the stance is re-sent every scan (the rig swaps idempotently), so a
+    // body that comes into view mid-Carapace still shows its shell.
+    if (want === had && want === TEMPLE_SENTINEL_SHELL_OPEN) return;
     if (want === TEMPLE_SENTINEL_SHELL_OPEN) this.shellStance.delete(id);
     else this.shellStance.set(id, want);
     this.playGesture?.(id, want);
