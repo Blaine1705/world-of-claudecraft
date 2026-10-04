@@ -15,9 +15,11 @@ import {
   SEPARATION_MAX_RADIUS,
   SEPARATION_MAX_STEP,
   type SeparationBody,
+  separateEngagedMob,
   separationMinDistance,
   separationPush,
   separationRadius,
+  separationTurn,
 } from '../src/sim/mob/mob_separation';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, MELEE_RANGE } from '../src/sim/types';
@@ -164,7 +166,9 @@ describe('mob separation in the sim', () => {
     expect(gap(pair[0], pair[1])).toBe(0);
     run(b, pair, 2);
     const min = separationMinDistance(radiusOf(pair[0]), radiusOf(pair[1]));
-    expect(gap(pair[0], pair[1])).toBeGreaterThan(min * 0.9);
+    // Soft: it stops short of the full allowance once the push is too small
+    // to be worth a step (SEPARATION_MIN_STEP).
+    expect(gap(pair[0], pair[1])).toBeGreaterThan(min * 0.8);
     for (const m of pair) expect(gap(m, b.me)).toBeLessThanOrEqual(MELEE_RANGE);
   });
 
@@ -178,7 +182,7 @@ describe('mob separation in the sim', () => {
     for (let i = 0; i < pack.length; i++) {
       for (let j = i + 1; j < pack.length; j++) {
         const min = separationMinDistance(radiusOf(pack[i]), radiusOf(pack[j]));
-        expect(gap(pack[i], pack[j])).toBeGreaterThan(min * 0.85);
+        expect(gap(pack[i], pack[j])).toBeGreaterThan(min * 0.75);
       }
     }
     // Still a cluster: everyone is in melee reach of the target.
@@ -210,7 +214,7 @@ describe('mob separation in the sim', () => {
     expect(boss.pos.x).toBe(bossAt.x);
     expect(boss.pos.z).toBe(bossAt.z);
     expect(gap(add, boss)).toBeGreaterThan(
-      separationMinDistance(radiusOf(add), radiusOf(boss)) * 0.9,
+      separationMinDistance(radiusOf(add), radiusOf(boss)) * 0.8,
     );
   });
 
@@ -233,6 +237,29 @@ describe('mob separation in the sim', () => {
       expect(Math.hypot(watchman.pos.x - drawn.x, watchman.pos.z - drawn.z)).toBeLessThan(0.01);
     }
     expect(gap(hound, watchman)).toBeGreaterThan(0.3);
+  });
+
+  it('a crowd too big to spread settles instead of jittering for the whole fight', () => {
+    const b = bastionBench();
+    const x = b.me.pos.x + 2;
+    const z = b.me.pos.z;
+    const crowd = Array.from({ length: 14 }, () => engagedAt(b, 'bastion_warhound', x, z));
+    const movedPerSecond: number[] = [];
+    for (let s = 0; s < 8; s++) {
+      let moved = 0;
+      run(b, crowd, 0.05);
+      for (let t = 1; t < 20; t++) {
+        const before = crowd.map((m) => ({ x: m.pos.x, z: m.pos.z }));
+        run(b, crowd, 0.05);
+        crowd.forEach((m, i) => {
+          if (m.pos.x !== before[i].x || m.pos.z !== before[i].z) moved++;
+        });
+      }
+      movedPerSecond.push(moved);
+    }
+    // The first second spreads the stack; by the end the bodies hold still.
+    expect(movedPerSecond[0]).toBeGreaterThan(10);
+    expect(movedPerSecond[7]).toBeLessThan(movedPerSecond[0] / 4);
   });
 
   it('never pushes the player it fights', () => {
@@ -285,5 +312,81 @@ describe('mob separation in the sim', () => {
       }
     }
     expect(checked).toBeGreaterThan(0);
+  });
+
+  /** Tick until it is `mob`'s separation turn, then stack it on `on`. */
+  function onItsTurn(b: Bench, mob: Entity, on: Entity): void {
+    for (let i = 0; i < 8 && !separationTurn(mob.id, b.sim.ctx.tickCount); i++) b.sim.tick();
+    expect(separationTurn(mob.id, b.sim.ctx.tickCount)).toBe(true);
+    mob.pos = { ...on.pos };
+    mob.prevPos = { ...mob.pos };
+  }
+
+  it('draws no rng: a nudge is a pure function of positions, radii and ids', () => {
+    const b = bastionBench();
+    const x = b.me.pos.x + 3;
+    const z = b.me.pos.z;
+    const a = engagedAt(b, 'bastion_warhound', x, z);
+    const c = engagedAt(b, 'bastion_warhound', x, z);
+    onItsTurn(b, a, c);
+    let draws = 0;
+    b.sim.rng.setObserver(() => {
+      draws++;
+    });
+    const before = { ...a.pos };
+    separateEngagedMob(b.sim.ctx, a);
+    b.sim.rng.setObserver(null);
+    expect(Math.hypot(a.pos.x - before.x, a.pos.z - before.z)).toBeGreaterThan(0);
+    expect(draws).toBe(0);
+  });
+
+  it('never moves a pet, a rooted mob, a fleeing one, or one in the air', () => {
+    const cases: [string, (m: Entity, b: Bench) => void][] = [
+      [
+        'pet',
+        (m, b) => {
+          m.ownerId = b.me.id;
+        },
+      ],
+      [
+        'rooted',
+        (m) => {
+          m.auras.push({
+            id: 'test_root',
+            name: 'Test Root',
+            kind: 'root',
+            remaining: 10,
+            duration: 10,
+            value: 0,
+            sourceId: 0,
+            school: 'nature',
+          } as Entity['auras'][number]);
+        },
+      ],
+      [
+        'fleeing',
+        (m) => {
+          m.aiState = 'flee';
+        },
+      ],
+      [
+        'airborne',
+        (m) => {
+          m.pos.y += 3;
+        },
+      ],
+    ];
+    for (const [name, setUp] of cases) {
+      const b = bastionBench();
+      const x = b.me.pos.x + 3;
+      const z = b.me.pos.z;
+      const m = engagedAt(b, 'bastion_warhound', x, z);
+      const other = engagedAt(b, 'bastion_warhound', x, z);
+      onItsTurn(b, m, other);
+      setUp(m, b);
+      const before = { ...m.pos };
+      separateEngagedMob(b.sim.ctx, m);
+      expect({ name, pos: m.pos }).toEqual({ name, pos: before });
+    }
   });
 });

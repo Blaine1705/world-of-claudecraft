@@ -13,8 +13,9 @@
 // Rules (each one load-bearing):
 // - Only an engaged mob (the chase/attack arm of mob/locomotion.ts, after its
 //   combat profile ran) ever moves here, and only itself. Players and pets are
-//   never pushed and never push; bosses never move (they are the obstacle the
-//   others step round), nor does a mob planted for an area cast
+//   never pushed and never push; the encounter bodies never move (bosses,
+//   minibosses, the great authored bodies, healers on their standoff: the
+//   obstacle the others step round), nor does a mob planted for an area cast
 //   (trash_kit/cast_hold.ts), rooted, pinned in place, or authored immobile.
 // - Bigger bodies take more room: a mob's radius is its authored bodyRadius,
 //   else SEPARATION_BASE_RADIUS times its scale, and the push is shared by
@@ -25,24 +26,27 @@
 // - Every step is swept against the static colliders (ctx.resolveMove) and
 //   refused outright when the colliders would bend it, when the floor under it
 //   would rise or fall more than SEPARATION_MAX_FLOOR_STEP (a ledge, a void
-//   walkway's edge, a stair drop), or when it would wade a landlocked mob into
-//   deep water. A refused push leaves the mob where it stood.
+//   walkway's edge, a stair drop), when it climbs a cliff face moveToward
+//   would refuse, or when it would wade a landlocked mob into deep water. A
+//   refused push leaves the mob where it stood.
 // - Zero rng, no new state: the push is a pure function of positions, radii
 //   and ids (an exact stack splits along an id-hashed bearing), read through
 //   the existing all-entity SpatialGrid: one small radius query per engaged
-//   mob every SEPARATION_PERIOD_TICKS ticks (its turn set by its id), nothing
-//   per idle mob, and the ground probe only for a nudge worth taking.
+//   mob every SEPARATION_PERIOD_TICKS ticks (its turn set by its hashed id),
+//   nothing per idle mob, and the ground probe only for a nudge worth taking.
+//   A pack pressed against its fighting range (the clamp eats most of the
+//   push) skips the futile nudge, so a blob that cannot spread settles.
 // The pure core (separationRadius, addSeparation, clampSeparationStep,
 // keepTargetDistance, separationPush) is host-agnostic and unit-tested in
 // tests/mob_separation.test.ts; separateEngagedMob is the thin sim consumer.
 
 import { MOBS } from '../data';
 import { isPinnedInPlace } from '../instances/instance_combat_hold';
-import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { swimSurfaceY } from '../player_motion';
 import type { SimContext } from '../sim_context';
-import { DT, type Entity } from '../types';
-import { groundHeight, waterLevelAt } from '../world';
+import { DT, type Entity, type MobTemplate } from '../types';
+import { groundHeight, nearSteepWalls, terrainSteepnessAt, waterLevelAt } from '../world';
 import { mobCombatProfile } from './combat_profile';
 
 /** A man-sized mob body at scale 1 (yards): a touch broader than a player's
@@ -59,14 +63,19 @@ export const SEPARATION_OVERLAP_ALLOWED = 0.5;
 export const SEPARATION_PERIOD_TICKS = 4;
 /** Fraction of the remaining penetration a mob closes per look (a soft
  *  spring: an exact stack of five spreads in about a second). */
-export const SEPARATION_GAIN = 0.5;
+export const SEPARATION_GAIN = 0.8;
 /** Fastest a mob is ever nudged sideways (yards per second, averaged over a
  *  period): well under a walk, so the spread reads as bodies settling. */
 export const SEPARATION_MAX_SPEED = 1.5;
 /** Largest single nudge (yards): one period at the speed cap. */
 export const SEPARATION_MAX_STEP = SEPARATION_MAX_SPEED * DT * SEPARATION_PERIOD_TICKS;
-/** A nudge shorter than this is not worth a ground probe (yards). */
-const SEPARATION_MIN_STEP = 0.02;
+/** A nudge shorter than this is not worth a ground probe, nor a fresh
+ *  snapshot record for every viewer (yards). */
+export const SEPARATION_MIN_STEP = 0.05;
+/** A pack pressed against its fighting range cannot spread any further: when
+ *  the range clamp eats more than this fraction of the push, the nudge is
+ *  futile and skipped, so a pinned blob settles instead of jittering. */
+const SEPARATION_FUTILE_FRACTION = 0.5;
 /** Highest floor rise or drop a single nudge may cross (yards). */
 export const SEPARATION_MAX_FLOOR_STEP = 0.4;
 /** Two bodies further apart than this vertically do not touch (a flier
@@ -196,20 +205,44 @@ export function separationPush(
 
 /** Does this engaged mob give way to its neighbours (cheap fields only; the
  *  per-tick CC and hold checks run once, for the mob being moved)? */
-function yieldsRoom(e: Entity): boolean {
+function yieldsRoom(e: Entity, t: MobTemplate | undefined): boolean {
   if (e.aiState !== 'chase' && e.aiState !== 'attack') return false;
   if (e.moveSpeed <= 0) return false;
   if (e.castHold && e.castHold.castId === e.castingAbility) return false;
-  const t = MOBS[e.templateId];
-  return !(t?.boss || t?.worldBoss || t?.phasesThroughObstacles);
+  // The encounter bodies hold their ground: bosses, minibosses (authored, a
+  // dungeon spawn's stamped miniboss, a rift boss or miniboss), the great
+  // bodies with an authored bodyRadius, mountain-sized phasers, and a healer
+  // holding its standoff by its protectee. Everything else steps round them.
+  if (e.dungeonSpawnMiniboss || e.riftMechanicSpacing !== undefined) return false;
+  return !(
+    t?.boss ||
+    t?.worldBoss ||
+    t?.bodyRadius !== undefined ||
+    t?.phasesThroughObstacles ||
+    t?.channelHeal
+  );
 }
 
-/** The floor a mob stands on at (x, z): the same rule moveToward seats it by
- *  (a swimmer rides the surface over deep water). */
-function floorAt(ctx: SimContext, x: number, z: number, canSwim: boolean): number {
+/** Which of the SEPARATION_PERIOD_TICKS ticks is this mob's turn: its id
+ *  mixed through a multiplicative hash, so a pack whose ids share a stride
+ *  still spreads its turns across the period. */
+export function separationTurn(id: number, tickCount: number): boolean {
+  return ((Math.imul(id, 0x9e3779b1) >>> 0) + tickCount) % SEPARATION_PERIOD_TICKS === 0;
+}
+
+/** The floor a mob would stand on at (x, z), given the ground there: the same
+ *  rule moveToward seats it by (a swimmer rides the surface over deep water). */
+function floorOver(
+  ctx: SimContext,
+  x: number,
+  z: number,
+  ground: number,
+  canSwim: boolean,
+): number {
   const seed = ctx.cfg.seed;
-  const g = groundHeight(x, z, seed);
-  return canSwim && g < waterLevelAt(x, z, seed) - PLAYER_SWIM_DEPTH ? swimSurfaceY(x, z, seed) : g;
+  return canSwim && ground < waterLevelAt(x, z, seed) - PLAYER_SWIM_DEPTH
+    ? swimSurfaceY(x, z, seed)
+    : ground;
 }
 
 /**
@@ -218,10 +251,10 @@ function floorAt(ctx: SimContext, x: number, z: number, canSwim: boolean): numbe
  * of the bodies it stands inside, if it may move and the ground lets it.
  */
 export function separateEngagedMob(ctx: SimContext, mob: Entity): void {
-  if ((ctx.tickCount + mob.id) % SEPARATION_PERIOD_TICKS !== 0) return;
-  if (mob.dead || mob.ownerId !== null || !mob.hostile || !yieldsRoom(mob)) return;
-  if (isPinnedInPlace(mob) || ctx.isRooted(mob)) return;
+  if (!separationTurn(mob.id, ctx.tickCount)) return;
   const template = MOBS[mob.templateId];
+  if (mob.dead || mob.ownerId !== null || !mob.hostile || !yieldsRoom(mob, template)) return;
+  if (isPinnedInPlace(mob) || ctx.isRooted(mob)) return;
   const self: SeparationBody = {
     id: mob.id,
     x: mob.pos.x,
@@ -239,18 +272,20 @@ export function separateEngagedMob(ctx: SimContext, mob: Entity): void {
     other.id = e.id;
     other.x = e.pos.x;
     other.z = e.pos.z;
-    other.radius = separationRadius(MOBS[e.templateId]?.bodyRadius, e.scale);
-    addSeparation(step, self, other, e.inCombat && yieldsRoom(e));
+    const t = MOBS[e.templateId];
+    other.radius = separationRadius(t?.bodyRadius, e.scale);
+    addSeparation(step, self, other, e.inCombat && yieldsRoom(e, t));
   });
   clampSeparationStep(step, SEPARATION_MAX_STEP);
-  if (step.x * step.x + step.z * step.z < SEPARATION_MIN_STEP * SEPARATION_MIN_STEP) return;
+  const pushed = Math.hypot(step.x, step.z);
+  if (pushed < SEPARATION_MIN_STEP) return;
 
   let nx = self.x + step.x;
   let nz = self.z + step.z;
   const target = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : undefined;
   if (target && !target.dead) {
     const stoodAt = Math.hypot(self.x - target.pos.x, self.z - target.pos.z);
-    const kept = keepTargetDistance(
+    const held = keepTargetDistance(
       nx,
       nz,
       target.pos.x,
@@ -258,21 +293,30 @@ export function separateEngagedMob(ctx: SimContext, mob: Entity): void {
       stoodAt,
       mobCombatProfile(mob).desiredRange,
     );
-    nx = kept.x;
-    nz = kept.z;
+    nx = held.x;
+    nz = held.z;
   }
-  if (Math.hypot(nx - self.x, nz - self.z) < SEPARATION_MIN_STEP) return;
+  const kept = Math.hypot(nx - self.x, nz - self.z);
+  if (kept < SEPARATION_MIN_STEP || kept < pushed * SEPARATION_FUTILE_FRACTION) return;
 
   // The ground has the last word: a wall, a ledge, a void edge or deep water
   // refuses the whole nudge.
   const canSwim = ctx.mobCanSwim(template);
-  const floor0 = floorAt(ctx, self.x, self.z, canSwim);
-  if (y - floor0 > AIRBORNE_CLEARANCE) return;
   const seed = ctx.cfg.seed;
-  if (!canSwim && groundHeight(nx, nz, seed) < waterLevelAt(nx, nz, seed) - PLAYER_SWIM_DEPTH)
-    return;
-  const floor1 = floorAt(ctx, nx, nz, canSwim);
+  const floor0 = floorOver(ctx, self.x, self.z, groundHeight(self.x, self.z, seed), canSwim);
+  if (y - floor0 > AIRBORNE_CLEARANCE) return;
+  const ground1 = groundHeight(nx, nz, seed);
+  if (!canSwim && ground1 < waterLevelAt(nx, nz, seed) - PLAYER_SWIM_DEPTH) return;
+  const floor1 = floorOver(ctx, nx, nz, ground1, canSwim);
   if (Math.abs(floor1 - floor0) > SEPARATION_MAX_FLOOR_STEP) return;
+  // The wall rule every mob step obeys (moveToward): no uphill step onto
+  // ground too steep to climb, however short the step.
+  if (
+    floor1 > floor0 &&
+    nearSteepWalls(nx, nz) &&
+    terrainSteepnessAt(nx, nz, seed) > PLAYER_MAX_CLIMB_SLOPE
+  )
+    return;
   const swept = ctx.resolveMove(self.x, self.z, nx, nz, PLAYER_BODY_RADIUS, mob);
   if (Math.hypot(swept.x - nx, swept.z - nz) > 1e-3) return;
   mob.pos.x = nx;
