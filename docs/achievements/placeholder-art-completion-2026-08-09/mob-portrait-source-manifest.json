@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "0db19ec39827096244545dff7eb05aa9dfd4ca8ff3b63429ce845a4f59a6f1cb",
+  "rendererFingerprint": "0d862185f7bc888ee4e04f3860e9e91f141eb2b03c43100ef6755981388cfe40",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5476000,
-      "sha256": "b1a17da9820f573952816508195c0e140703de71ac7e761011398bbf31c7aa7b",
+      "sha256": "e6ecb92eb2966fac00f386e7ba0ca5bc21751dbc70648c2f8e91bd43eeb822c8",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5614,8 +5614,8 @@
         "model": {
           "url": "models/creatures/temple_eel.glb",
           "path": "public/models/creatures/temple_eel.glb",
-          "bytes": 993576,
-          "sha256": "ec06d36113529899a55729554dabfec31a0f9407bbbb726d0e220b68640a8067"
+          "bytes": 1166568,
+          "sha256": "8c8e3340e56aeed63ed81b32c12850843ea888550446ff18b2a55678ac397e2d"
         },
         "idle": "Idle",
         "height": 6.2,
@@ -5632,11 +5632,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c2c36066a1e032f5d2941c02edd89253a60c554ed8d4aad332eda5ff02233822",
+      "sourceFingerprint": "b5ff4bff56d0aa718676fb465e66f961e2abd2f1395b2a97fe59d0170ee081ed",
       "output": {
         "path": "public/ui/mobs/lagoon_eel.webp",
-        "bytes": 2212,
-        "sha256": "dab6168c299d3a87cf82c08f55a40f3e493bf96e0a4ca43c70a6aebfd24a836a"
+        "bytes": 2284,
+        "sha256": "be7a437f4d15f9caa0bffb12e8f6baa131b82bd9979748271ef51a6759c4d23d"
       }
     },
     {
