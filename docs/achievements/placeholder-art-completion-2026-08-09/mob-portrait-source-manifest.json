@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "556813425866e7ce5d06c2412300f7d017c7e2aa3d856e0b7321be76d15f1fdf",
+  "rendererFingerprint": "908e1a244ef7132fb7c271b6de0f081d4ae78aaa58487d5b0f890fe84f29ac70",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5495562,
-      "sha256": "4d3f94b8d38bb181140f79870646bc7fb39f03bbe566c453c2b0f0487d23db82",
+      "bytes": 5496287,
+      "sha256": "627df379f4a3dae1363038a137d1147c5e18b34bf7a26f079bbe5d601317183a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5482,8 +5482,8 @@
         "model": {
           "url": "models/creatures/knight_commander_olen.glb",
           "path": "public/models/creatures/knight_commander_olen.glb",
-          "bytes": 3127608,
-          "sha256": "05bf8bd00cf7bf8bd088bfce2a0620a625cc6d64403dd2ff32da6fb9b8e73bbe"
+          "bytes": 3375088,
+          "sha256": "197e7e234cc275964473dbfd1aa9d78f8e94e22197eae2592fd3afe072ce4602"
         },
         "idle": "Idle",
         "height": 7.4,
@@ -5500,11 +5500,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8ba688d8c10365d72ac8ce704754c228deef93c720d37d40d34966923c35ebff",
+      "sourceFingerprint": "541b9e0f7c6cb5f816994a114dcae9eb9ccc6d8cc8ed20ff76deb15e4c672f42",
       "output": {
         "path": "public/ui/mobs/knight_commander_olen.webp",
-        "bytes": 2346,
-        "sha256": "c920bc26c5a76cd02d521e1e13a887b21ff6e5dbf4441367d7ecddd8d7acdb20"
+        "bytes": 2356,
+        "sha256": "fd93c134e6e63d650ebbd92b05cea39aea641029e8c37cffe8359f606751b4d6"
       }
     },
     {
