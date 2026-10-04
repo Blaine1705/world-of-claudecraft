@@ -76,6 +76,8 @@ export const DROWNED_TEMPLE_DEV_MOBS: Readonly<Record<string, string>> = {
   acolyte: 'pale_choir_acolyte',
   lurker: 'glimmerscale_lurker',
   sentinel: 'pearlguard_sentinel',
+  // The Moonmantle Ray (the sentinel's id, its new body and name).
+  manta: 'pearlguard_sentinel',
   snapper: 'lagoon_snapper',
   eel: 'lagoon_eel',
   siren: 'moonlit_siren',

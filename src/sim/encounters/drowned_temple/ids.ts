@@ -46,6 +46,14 @@ export const HYDRA_BRINE_SPIT = 'temple_brine_spit';
 export const HYDRA_CRUSHING_TORRENT = 'temple_crushing_torrent';
 /** The whole Hydra sinks and a wave rolls over one half of the pool. */
 export const HYDRA_TSUNAMI = 'temple_hydra_tsunami';
+/** The Combined Breath (hydra_combo.ts): two heads twine their necks and
+ *  fuse their elements, on a bar on each head that takes part. Ice and water:
+ *  the torrent freezes into an Ice Wall across the lagoon. */
+export const HYDRA_FROSTLOCKED_TORRENT = 'temple_frostlocked_torrent';
+/** Venom and water: the venom pools swell and slide down painted currents. */
+export const HYDRA_VENOM_CURRENT = 'temple_venom_current';
+/** Ice and venom: the venom pools freeze into crystals that burst. */
+export const HYDRA_TOXIC_RIME = 'temple_toxic_rime';
 export const COLOSSUS_PRISM_FLARE = 'temple_prism_flare';
 export const COLOSSUS_MOONLIGHT_LANCE = 'temple_moonlight_lance';
 export const COLOSSUS_RESONANT_SLAM = 'temple_resonant_slam';
@@ -58,6 +66,12 @@ export const YSOLEI_UNDERTOW = 'temple_undertow';
 export const YSOLEI_CALL = 'temple_ysolei_call';
 /** Ysolei's roar as she enrages (a bar, never kicked). */
 export const YSOLEI_WRATH = 'temple_ysolei_wrath';
+/** Ysolei calls the moon down (ysolei_moon.ts): at 75 and 45 percent a bar,
+ *  never kicked, then her Moonlight Tears fall on the rim and roll at her. */
+export const YSOLEI_BECKONING_MOON = 'temple_beckoning_moon';
+/** At 20 percent the moon itself descends: a long bar under her Plenilune
+ *  Ward; break the ward before it ends or the moon falls on the island. */
+export const YSOLEI_FALLING_MOON = 'temple_falling_moon';
 
 // ---- aura ids ---------------------------------------------------------------------
 export const SELTHE_CHORUS_MARK = 'temple_chorus_mark';
@@ -67,10 +81,26 @@ export const HYDRA_ENRAGED = 'temple_enraged_hydra';
 export const HYDRA_SUBMERGED = 'temple_hydra_submerged';
 /** The Freezing Breath's chill on whoever it caught. */
 export const HYDRA_FROSTBITE = 'temple_hydra_frostbite';
+/** The Frostlocked Torrent's freeze (a short stun) on whoever it caught. */
+export const HYDRA_FROZEN = 'temple_hydra_frozen';
 export const COLOSSUS_PRISM_WARD = 'temple_prism_ward';
 export const REFLECTION_TETHER = 'temple_reflection_tether';
 export const YSOLEI_FLOODED = 'temple_flooded';
 export const YSOLEI_RIPTIDE_AURA = 'temple_riptide';
+/** A Moonlight Tear's burn on whoever stopped it: the next tear on them hurts
+ *  far more (stacks). */
+export const YSOLEI_MOONSEAR = 'temple_moonsear';
+/** A tear that reached her: more damage done (stacks for the fight). */
+export const YSOLEI_MOONSWELL = 'temple_moonswell';
+/** The Plenilune Ward: the full-moon dome she shelters under while the moon
+ *  descends (an absorb; value2 carries the ward's full size). */
+export const YSOLEI_PLENILUNE_WARD = 'temple_plenilune_ward';
+/** The ward broke in time: the moon is eclipsed and she reels (a stun), */
+export const YSOLEI_ECLIPSED = 'temple_eclipsed';
+/** ...and takes more damage while it lasts. */
+export const YSOLEI_ECLIPSE_EXPOSED = 'temple_eclipse_exposed';
+/** The ward held: the fallen moon's power stays on her for the fight. */
+export const YSOLEI_MOONBORNE_MIGHT = 'temple_moonborne_might';
 
 // ---- spellfx ability ids (presentation cues, never casts) ------------------------
 export const SELTHE_CHORUS_BURST = 'temple_chorus_burst';
@@ -85,7 +115,21 @@ export const FRACTURE_BURST = 'temple_fracture_burst';
 export const REFLECTION_SHATTER = 'temple_reflection_shatter';
 /** A fallen Hydra head grows back (its regrowth burst). */
 export const HYDRA_REGROWTH = 'temple_hydra_regrowth';
+/** A Tsunami breaks on the Ice Wall and shatters it (targetId: the wall). */
+export const HYDRA_ICE_WALL_SHATTER = 'temple_ice_wall_shatter';
+/** A Toxic Rime crystal bursts (targetId: its crystal object). */
+export const HYDRA_RIME_BURST = 'temple_rime_burst';
 export const YSOLEI_TIDAL_CRASH = 'temple_tidal_crash';
+/** A Moonlight Tear strikes the island rim (targetId: its tear object). */
+export const YSOLEI_TEAR_LAND = 'temple_tear_land';
+/** A body stopped a tear (targetId: the player). */
+export const YSOLEI_TEAR_CAUGHT = 'temple_tear_caught';
+/** A tear reached her (targetId: Ysolei). */
+export const YSOLEI_TEAR_ABSORBED = 'temple_tear_absorbed';
+/** The Plenilune Ward broke in time: the eclipse (targetId: Ysolei). */
+export const YSOLEI_ECLIPSE = 'temple_eclipse';
+/** The ward held to the bar's end: the moon falls (targetId: Ysolei). */
+export const YSOLEI_MOON_FALLS = 'temple_moon_falls';
 
 /** The boss bars a player interrupt can cut (Kick, Pummel, Counterspell),
  *  by the school the lockout lands in: Selthe's bolt and her aria. Spread into
@@ -100,6 +144,15 @@ export const TEMPLE_BOSS_CAST_SCHOOLS: Readonly<Record<string, { school: 'frost'
 export const BRINE_SPIT_TEMPLATE = 'temple_brine_spit_pool';
 /** The venom a Venom Spit leaves where it burst (a standing hazard). */
 export const VENOM_POOL_TEMPLATE = 'temple_venom_pool';
+/** The Ice Wall the Frostlocked Torrent leaves (its facing is the wall's
+ *  heading from its first end, its scale the wall's length; it stands at the
+ *  wall's middle). */
+export const ICE_WALL_TEMPLATE = 'temple_ice_wall';
+/** A venom pool the Venom Current swelled and set sliding (its facing is the
+ *  slide's heading, its scale its radius). */
+export const VENOM_CURRENT_TEMPLATE = 'temple_venom_current_pool';
+/** A venom pool the Toxic Rime froze into a crystal (scale: its burst radius). */
+export const RIME_CRYSTAL_TEMPLATE = 'temple_rime_crystal';
 /** The Tsunami's wave: warned, then rolling (its facing is the roll's heading,
  *  its scale the pool's radius). */
 export const TSUNAMI_TEMPLATES = {
@@ -118,6 +171,10 @@ export type FractureState = keyof typeof FRACTURE_TEMPLATES;
 export const CHORUS_ECHO_TEMPLATE = 'temple_chorus_echo';
 export const SOLO_ECHO_TEMPLATE = 'temple_solo_echo';
 export const RIPTIDE_TEMPLATE = 'temple_riptide_pool';
+/** A Moonlight Tear rolling at Ysolei (facing: its heading, scale: its radius). */
+export const MOON_TEAR_TEMPLATE = 'temple_moon_tear';
+/** Heroic: the light a stopped tear leaves (scale: its radius). */
+export const MOONGLOW_TEMPLATE = 'temple_moonglow_pool';
 export const TIDE_TEMPLATES = {
   dry: 'temple_tide_dry',
   warn: 'temple_tide_warn',
@@ -133,8 +190,13 @@ export const TEMPLE_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   CHORUS_ECHO_TEMPLATE,
   SOLO_ECHO_TEMPLATE,
   RIPTIDE_TEMPLATE,
+  MOON_TEAR_TEMPLATE,
+  MOONGLOW_TEMPLATE,
   ...Object.values(TIDE_TEMPLATES),
   ...Object.values(FRACTURE_TEMPLATES),
+  ICE_WALL_TEMPLATE,
+  VENOM_CURRENT_TEMPLATE,
+  RIME_CRYSTAL_TEMPLATE,
 ]);
 
 export function fractureStateOf(templateId: string): FractureState | null {
@@ -346,6 +408,185 @@ export function inTsunamiLee(side: TsunamiSide, x: number, z: number): boolean {
   return false;
 }
 
+// ---- The Mere Hydra's Combined Breath (hydra_combo.ts) -------------------------------
+
+/** The three Combined Breaths, in the fixed order they come round. */
+export type HydraComboKind = 'frostlock' | 'current' | 'rime';
+export const HYDRA_COMBO_ORDER: readonly HydraComboKind[] = ['frostlock', 'current', 'rime'];
+/** Each combo's cast id (the bar on every head that takes part). */
+export const HYDRA_COMBO_CASTS: Readonly<Record<HydraComboKind, string>> = {
+  frostlock: HYDRA_FROSTLOCKED_TORRENT,
+  current: HYDRA_VENOM_CURRENT,
+  rime: HYDRA_TOXIC_RIME,
+};
+/** The two elements each combo fuses (HYDRA_ELEMENTS indices: 0 ice, 1 venom,
+ *  2 water). Whoever wields each one takes part, so a lone survivor carrying
+ *  both casts it alone. */
+export const HYDRA_COMBO_ELEMENTS: Readonly<Record<HydraComboKind, readonly [number, number]>> = {
+  frostlock: [0, 2],
+  current: [1, 2],
+  rime: [0, 1],
+};
+
+/** The combo a cast id names, or null. */
+export function hydraComboOf(castId: string | null): HydraComboKind | null {
+  if (castId === HYDRA_FROSTLOCKED_TORRENT) return 'frostlock';
+  if (castId === HYDRA_VENOM_CURRENT) return 'current';
+  if (castId === HYDRA_TOXIC_RIME) return 'rime';
+  return null;
+}
+
+// The Combined Breath comes in the gap between two Tsunamis, never on the
+// wave. It opens when the Tsunami clock reads one of comboAt (seconds to the
+// next wave): 16 on normal, the middle of the 40 s cycle once the bar's 2 s
+// and the wave's 4.5 s bar are counted, so an Ice Wall raised there (at 14 s
+// to go) is still standing when that wave lands 18.5 s later, inside its
+// 20 s. Heroic adds a second slot at 30 (2 s after the backwash has rolled
+// back), so the combos come twice as often. The first combo waits for the
+// first Tsunami: the fight opens with the three plain elements.
+//
+// Pressure: inside the combo window (comboHold seconds before a slot to the
+// end of the bar) the heads start no Freezing Breath or Crushing Torrent, so
+// a combo REPLACES about one plain breath or torrent a cycle, and each combo
+// is priced at the attack it fuses: the Frostlocked Torrent is the Crushing
+// Torrent's 90 to 110 with a 2 s freeze instead of the 8 yd shove; the Venom
+// Current's sliding pools burn 30 a second (the venom's 20, swollen half
+// again: radius 3.5 to 5.25); a Toxic Rime crystal bursts for 100 to 120 in
+// 6 yd (between the spit's 60 to 75 and the breath's 110 to 130) after 4 s of
+// warning. All of it is avoidable; a fumbled cycle costs about one more plain
+// attack, so the fight's length and healing load stay where they were.
+export const HYDRA_COMBO_TUNING = {
+  comboAt: [16] as readonly number[],
+  comboAtHeroic: [30, 16] as readonly number[],
+  /** Seconds before a slot when the heads stop starting their plain bars. */
+  comboHold: 2.5,
+  /** A slot still unfired this close to the wave is skipped. */
+  comboLatest: 6,
+  comboCast: 2,
+  // Frostlocked Torrent (ice + water): the torrent's lane, frozen.
+  frostMin: 90,
+  frostMax: 110,
+  freezeSeconds: 2,
+  /** The Ice Wall: it starts this far from the water head and runs the rest
+   *  of the torrent's lane (26 yd), so it crosses the lagoon. */
+  wallStart: 3,
+  wallSeconds: 20,
+  /** A body this far downstream of the wall (along the wave's roll) is in its
+   *  lee: the wave breaks on the ice. Deeper than a column's 5 yd: the wall
+   *  is a long shelter. */
+  wallLeeDepth: 9,
+  /** Heroic: the wall bursts into shards when the wave breaks it; anyone
+   *  hugging it (this close to the ice) is cut. */
+  shardReach: 2.5,
+  shardMin: 60,
+  shardMax: 75,
+  // Venom Current (venom + water): the venom head seeds three pools as the bar
+  // opens (the Venom Spit's own burst under three players), then every venom
+  // pool swells and slides outward from the pool's middle.
+  currentRadius: 5.25,
+  currentSlide: 7,
+  currentSlideSeconds: 3.5,
+  /** It lingers this long at the end of its slide, then drains. */
+  currentLinger: 2,
+  currentPerSecond: 30,
+  // Toxic Rime (ice + venom): seeded the same way; every venom pool freezes
+  // into a crystal (walkable, it no longer burns), then bursts wider.
+  rimeSeconds: 4,
+  rimeRadius: 6,
+  rimeMin: 100,
+  rimeMax: 120,
+} as const;
+
+/** The heading (sim yaw) a Venom Current slides a pool at (x, z) on: straight
+ *  out from the moon pool's middle (due south from the very middle). Pure: the
+ *  renderer paints the same arrow. */
+export function venomCurrentHeading(x: number, z: number): number {
+  const dx = x - HYDRA_POOL.x;
+  const dz = z - HYDRA_POOL.z;
+  if (Math.hypot(dx, dz) < 0.5) return Math.PI;
+  return Math.atan2(dx, dz);
+}
+
+/** Half the Ice Wall's thickness (the renderer draws it this thick). */
+export const ICE_WALL_HALF_THICKNESS = 0.75;
+
+/** An Ice Wall as the sim keeps it: its first end, the heading along it and
+ *  its length (instance-local yards). */
+export interface IceWallLine {
+  x: number;
+  z: number;
+  yaw: number;
+  length: number;
+}
+
+/** The wall a Frostlocked Torrent leaves from a water head at (hx, hz) aimed
+ *  at `yaw` down its torrentLength lane. */
+export function iceWallFrom(hx: number, hz: number, yaw: number): IceWallLine {
+  const C = HYDRA_COMBO_TUNING;
+  return {
+    x: hx + Math.sin(yaw) * C.wallStart,
+    z: hz + Math.cos(yaw) * C.wallStart,
+    yaw,
+    length: HYDRA_TUNING.torrentLength - C.wallStart,
+  };
+}
+
+/** The wall's middle (where its object stands). */
+export function iceWallMiddle(w: IceWallLine): { x: number; z: number } {
+  return {
+    x: w.x + Math.sin(w.yaw) * (w.length / 2),
+    z: w.z + Math.cos(w.yaw) * (w.length / 2),
+  };
+}
+
+/** The wall a mirrored Ice Wall object stands for (its middle, facing and
+ *  scale): the renderer's read of the same line the sim tests. */
+export function iceWallOfObject(mx: number, mz: number, yaw: number, length: number): IceWallLine {
+  return {
+    x: mx - Math.sin(yaw) * (length / 2),
+    z: mz - Math.cos(yaw) * (length / 2),
+    yaw,
+    length,
+  };
+}
+
+/** The distance from a spot to the wall's line segment. */
+export function iceWallDistance(w: IceWallLine, x: number, z: number): number {
+  const ax = Math.sin(w.yaw);
+  const az = Math.cos(w.yaw);
+  const t = Math.max(0, Math.min(w.length, (x - w.x) * ax + (z - w.z) * az));
+  return Math.hypot(x - (w.x + ax * t), z - (w.z + az * t));
+}
+
+/** Does any of the wall stand in the half a wave from `side` rolls over (so
+ *  the wave breaks on it)? */
+export function iceWallInPath(w: IceWallLine, side: TsunamiSide): boolean {
+  for (let k = 0; k <= 8; k++) {
+    const t = (w.length * k) / 8;
+    if (inTsunamiPath(side, w.x + Math.sin(w.yaw) * t, w.z + Math.cos(w.yaw) * t)) return true;
+  }
+  return false;
+}
+
+/** Is a spot in the Ice Wall's lee against a wave from `side`: looking back up
+ *  the wave's roll from the spot, the wall stands within wallLeeDepth? */
+export function inIceWallLee(w: IceWallLine, side: TsunamiSide, x: number, z: number): boolean {
+  const h = tsunamiHeading(side);
+  // Up the roll: back toward where the wave comes from.
+  const rx = -Math.sin(h);
+  const rz = -Math.cos(h);
+  const ux = Math.sin(w.yaw) * w.length;
+  const uz = Math.cos(w.yaw) * w.length;
+  const denom = rx * uz - rz * ux;
+  if (Math.abs(denom) < 1e-9) return false;
+  const qx = w.x - x;
+  const qz = w.z - z;
+  const s = (qx * uz - qz * ux) / denom;
+  const t = (qx * rz - qz * rx) / denom;
+  // A body pressed into the ice (up to its half thickness) counts as behind it.
+  return s >= -ICE_WALL_HALF_THICKNESS && s <= HYDRA_COMBO_TUNING.wallLeeDepth && t >= 0 && t <= 1;
+}
+
 // ---- The Tideglass Colossus: your own reflection fights you ----------------------------
 
 export const COLOSSUS_TUNING = {
@@ -488,6 +729,97 @@ export const YSOLEI_TUNING = {
   callCast: 2.2,
   wrathCast: 2.5,
 } as const;
+
+// ---- Ysolei calls the moon (ysolei_moon.ts) ---------------------------------------------
+//
+// Moonlight Tears at 75 and 45 percent: a 3 s Beckoning Moon bar (never
+// kicked; she will not open it inside the Undertow's last seconds, so the
+// tears never land with a Tidal Crash), then three tears (heroic four) fall
+// on the island rim at evenly spaced headings (the first hashed) and roll at
+// her at 2.6 yd a second, 5 to 8 s from the rim to her coil. A body in a
+// tear's way stops it: 70 to 85 arcane and a stack of Moonsear (20 s), and
+// every Moonsear stack makes the next tear on that body hurt 150 percent more
+// (75, then about 190, then about 300), so one player cannot stop them all
+// and the group shares them. A tear that reaches her is a Moonswell stack for
+// the fight: 10 percent more damage done and 2 percent of her health back.
+// Three tears evenly spread always cross both halves of the island, so while
+// the Rising Tide floods one, someone wades in to stop the tear rolling
+// through it.
+//
+// The Full Moon at 20 percent (the climax): a 12 s Falling Moon bar (heroic
+// 10 s) under a Plenilune Ward worth 6 percent of her health. Her Lunar Tide
+// and Undertow wait while it runs (their clocks stand still), the flood keeps
+// moving. Break the ward in time and the moon is eclipsed: the bar ends, she
+// reels 5 s (stunned) and takes 25 percent more damage meanwhile. Fail and
+// the moon falls: 300 to 340 arcane to everyone on the island and Moonborne
+// Might, 20 percent more damage done for the rest of the fight.
+//
+// The pressure: the ward is 6 percent of 18,000 = 1,080, about 78 percent of
+// the planning party's 115 DPS over the 12 s bar (heroic: 6 percent of about
+// 29,700 = 1,780 over 10 s against 230 DPS, 77 percent), so breaking it asks
+// for the whole group on her. Inside the bar she casts nothing else, which is
+// worth about one Lunar Tide (70 a player) and pushes the next Undertow back
+// by the bar; a broken ward pays back 5 s of her swings plus a quarter more
+// damage. A fumbled ward costs about four Lunar Tides on everyone at once
+// plus a fifth more on every hit. A stopped tear is about one Lunar Tide on
+// one player; six tears over the two waves land about 460 damage on a group
+// that shares them (under 2 percent of the fight's healing). A tear let
+// through is permanent pressure (a tenth more on every hit), not a spike.
+// The tears (75 and 45) sit clear of the Moonspawn (60 and 30) and the
+// Rising Tide (66); the Full Moon (20) comes after the enrage (30): each
+// waits for her roar, never on top of it.
+export const YSOLEI_MOON_TUNING = {
+  tearsAt: [0.75, 0.45] as readonly number[],
+  callCast: 3,
+  /** She will not open the call with the Undertow this close. */
+  callUndertowGap: 4,
+  tearCount: 3,
+  tearCountHeroic: 4,
+  tearSpeed: 2.6,
+  /** A body this close to a tear stops it. */
+  tearCatch: 1.6,
+  /** How far in from the rim a tear lands. */
+  tearRimInset: 1.5,
+  tearMin: 70,
+  tearMax: 85,
+  moonsearSeconds: 20,
+  /** Extra damage the next tear deals per Moonsear stack. */
+  moonsearBonus: 1.5,
+  moonswellDamage: 0.1,
+  moonswellHeal: 0.02,
+  // Heroic: a stopped tear leaves a pool of moonlight (no stopping two on one spot).
+  glowSeconds: 8,
+  glowRadius: 3,
+  glowPerSecond: 30,
+  // The Full Moon.
+  pleniluneAt: 0.2,
+  fallingCast: 12,
+  fallingCastHeroic: 10,
+  wardShare: 0.06,
+  eclipseSeconds: 5,
+  eclipseVuln: 0.25,
+  fallMin: 300,
+  fallMax: 340,
+  mightShare: 0.2,
+} as const;
+
+/** Where each of `n` tears lands on the island rim (instance-local), the first
+ *  at `base` radians round the island and the rest evenly spaced. Pure: the
+ *  tests and the renderer read the same spots. */
+export function tearLandingSpots(n: number, base: number): { x: number; z: number }[] {
+  const r = MOON_ALTAR.r - YSOLEI_MOON_TUNING.tearRimInset;
+  const out: { x: number; z: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = base + (i * Math.PI * 2) / n;
+    out.push({ x: MOON_ALTAR.x + Math.sin(a) * r, z: MOON_ALTAR.z + Math.cos(a) * r });
+  }
+  return out;
+}
+
+/** A Moonlight Tear's damage on a body already wearing `stacks` Moonsear. */
+export function tearDamage(base: number, stacks: number): number {
+  return Math.round(base * (1 + YSOLEI_MOON_TUNING.moonsearBonus * Math.max(0, stacks)));
+}
 
 export const ALTAR = MOON_ALTAR;
 

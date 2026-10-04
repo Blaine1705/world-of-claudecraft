@@ -303,9 +303,16 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     scale: 1.2,
     color: 0xbfe1ec,
   },
+  // The Moonmantle Ray (the id is frozen: it was the Pearlguard Sentinel, a
+  // clam golem, until the Temple encounter pass made it a sacred manta that
+  // glides a yard above the floor; to the sim it still stands on the floor).
+  // Its three moves are unchanged inside, renamed to fit: Onrush became the
+  // Lunar Glide, Pearl Slam the Tidal Wingbeat (already a wing gust that
+  // throws back), Pearl Carapace the Nacre Cocoon (it wraps itself in its
+  // wings).
   pearlguard_sentinel: {
     id: 'pearlguard_sentinel',
-    name: 'Pearlguard Sentinel',
+    name: 'Moonmantle Ray',
     minLevel: 17,
     maxLevel: 18,
     family: 'elemental',
@@ -323,18 +330,19 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
       maxRange: 30,
       cooldown: 12,
       stunDuration: 0.5,
-      name: 'Onrush',
+      name: 'Lunar Glide',
       school: 'physical',
     },
-    // The rework (drowned_temple.md 4.1): once, under 30 percent, its pearl
-    // shell closes over it for 8 s (a shield of a quarter of its health).
+    // The rework (drowned_temple.md 4.1): once, under 30 percent, it wraps
+    // itself in its wings for 8 s (a shield of a quarter of its health).
     trashKit: {
-      carapace: { belowHpPct: 0.3, shieldPct: 0.25, seconds: 8, name: 'Pearl Carapace' },
-      // The sixth pass: both fists slammed down round it, throwing everyone
-      // near it back. Physical: only the tank belongs beside it.
+      carapace: { belowHpPct: 0.3, shieldPct: 0.25, seconds: 8, name: 'Nacre Cocoon' },
+      // The sixth pass: it rears on its tail and brings both wings down round
+      // it, throwing everyone near it back. Physical: only the tank belongs
+      // beside it.
       wingGust: {
         castId: TEMPLE_PEARL_SLAM,
-        name: 'Pearl Slam',
+        name: 'Tidal Wingbeat',
         castTime: 1.5,
         every: 15,
         first: 7,

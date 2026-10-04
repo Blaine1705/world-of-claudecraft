@@ -7142,7 +7142,7 @@ export const en_XA: EnTranslations = {
         "siren": "[Ţĥáţ ʋóíçé. Šĥé šáñĝ ƀéšíðé ɱé íñ ţĥé çĥóíŕ. Šĥé šţíļļ çóɱéš íñ ĥáļƒ á ƀéáţ éáŕļý.]",
         "lurker": "[Ţĥé çĥíļðŕéñ ñéţţéð ţĥóšé íñ ţĥé šĥáļļóŵš. Ţĥéý ŵéŕé šɱáļļ áš á ţĥúɱƀ, áñð ţĥéý ĝļóŵéð.]",
         "tidewisp": "[Ţĥáţ íš ţĥé ɱóóñ-ŵáţéŕ íţšéļƒ, ţĥé ðŕáúĝĥţ ŵé ŵéŕé ɱéáñţ ţó ðŕíñķ. Ðó ñóţ ļéţ íţ ţóúçĥ ýóú.]",
-        "sentinel": "[Ţĥé óƒƒéŕíñĝ çļáɱš ƀý ţĥé ĝáţéš. Ŵé ļáíð óúŕ þéáŕļš íñ ţĥéɱ ƒóŕ ļúçķ. Ñóŵ ţĥéý ŵéáŕ ţĥéɱ áš ĥéáŕţš.]",
+        "sentinel": "[Ţĥé ɱóóñ ŕáýš óƒ ţĥé ĝáţé þóóļš. Áš ñóʋíçéš ŵé ƒéð ţĥéɱ þéáŕļš áţ ɱóóñŕíšé. Ñóŵ ţĥéý ķééþ ţĥé ðóóŕš, áñð ŵéáŕ óúŕ þéáŕļš áš ĥéáŕţš.]",
         "eel": "[Ţĥé ļáĝóóñ ééļš. Ţĥé ñóʋíçéš ƒéð ţĥéɱ ƀŕéáð áţ ðúšķ. Ţĥéý ĝŕéŵ ƒáţ óñ óúŕ ĥýɱñš.]",
         "reflection": "[Íţ šĥóŵš ýóú ŵĥáţ ţĥé ŵáţéŕ ŵóúļð ɱáķé óƒ ýóú. Ɓŕéáķ íţ!]",
         "moonspawn": "[Ţĥóšé ŵéŕé ñéʋéŕ ɱý þéóþļé. Ţĥéý áŕé ĥéŕš, ɱáðé óƒ ñóţĥíñĝ ƀúţ ɱóóñļíĝĥţ.]"
@@ -12045,6 +12045,7 @@ export const en_XA: EnTranslations = {
       "deathRecapCauterized": "[Ýóú ĥáʋé ðíéð. Çáúţéŕížé'š ƀúŕñ óʋéŕŵĥéļɱéð ýóú.]",
       "respawn": "[Ýóú ƒééļ ŕéšţéð áñð ŵĥóļé áĝáíñ.]",
       "respawnKeeperToll": "[Ţĥé Þáļé Ķééþéŕ ĥáš ŕéʋíʋéð ýóú, ƀúţ ýóú áŕé ŵéáķéŕ ƒóŕ íţ: ţĥé Ķééþéŕ'š Ţóļļ ðŕáíñš ýóúŕ áţţŕíƀúţéš úñţíļ íţ ƒáðéš.]",
+      "moonbridgeBanner": "[Ţĥé Ɱóóñƀŕíðĝé Ŕíšéš]",
       "ignoringChat": "[Íĝñóŕíñĝ çĥáţ ƒŕóɱ {name}.]",
       "noLongerIgnoring": "[Ñó ļóñĝéŕ íĝñóŕíñĝ {name}.]",
       "playerNotNearby": "[Ţĥáţ þļáýéŕ íš ñóţ ñéáŕƀý.]",
@@ -12529,12 +12530,17 @@ export const en_XA: EnTranslations = {
       "temple_skewering_trident": "[Šķéŵéŕíñĝ Ţŕíðéñţ]",
       "temple_pale_mending": "[Þáļé Ɱéñðíñĝ]",
       "temple_glimmer_venom": "[Ĝļíɱɱéŕ Ʋéñóɱ]",
-      "temple_pearl_slam": "[Þéáŕļ Šļáɱ]",
+      "temple_pearl_slam": "[Ţíðáļ Ŵíñĝƀéáţ]",
       "temple_lightning_spit": "[Ļíĝĥţñíñĝ Šþíţ]",
       "temple_crushing_torrent": "[Çŕúšĥíñĝ Ţóŕŕéñţ]",
       "temple_hydra_tsunami": "[Ţšúñáɱí]",
       "temple_ysolei_call": "[Ɱóóñšþáŵñ Çáļļ]",
       "temple_ysolei_wrath": "[Ðŕóŵñéð Ŵŕáţĥ]",
+      "temple_frostlocked_torrent": "[Ƒŕóšţļóçķéð Ţóŕŕéñţ]",
+      "temple_venom_current": "[Ʋéñóɱ Çúŕŕéñţ]",
+      "temple_toxic_rime": "[Ţóẋíç Ŕíɱé]",
+      "temple_beckoning_moon": "[Ɓéçķóñíñĝ Ɱóóñ]",
+      "temple_falling_moon": "[Ƒáļļíñĝ Ɱóóñ]",
       "wildheart_ancestral_sap": "[Áñçéšţŕáļ Šáþ]",
       "wildheart_plant_totem": "[Þļáñţ Ţóţéɱ]",
       "wildheart_entangling_lash": "[Éñţáñĝļíñĝ Ļášĥ]",
@@ -20912,7 +20918,7 @@ export const en_XA: EnTranslations = {
         "name": "[Þáļé Çĥóíŕ Áçóļýţé]"
       },
       "pearlguard_sentinel": {
-        "name": "[Þéáŕļĝúáŕð Šéñţíñéļ]"
+        "name": "[Ɱóóñɱáñţļé Ŕáý]"
       },
       "sethrael_palecoil": {
         "name": "[Šéţĥŕáéļ ţĥé Þáļéçóíļ]"

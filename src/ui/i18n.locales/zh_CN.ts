@@ -3922,6 +3922,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.system.respawn': '你再次感到精力恢复、身体完整。',
   'hud.system.respawnKeeperToll':
     '灵魂医者复活了你，但你因此变得虚弱：在复活后遗症消退之前，你的所有属性都会被削弱。',
+  'hud.system.moonbridgeBanner': '月之桥已成',
   'hud.system.ignoringChat': '已屏蔽来自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再屏蔽 {name}。',
   'hud.system.playerNotNearby': '该玩家不在附近。',
@@ -5589,7 +5590,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.glimmerscale_lurker.name': '微光鳞潜伏者',
   'entities.mobs.moonspawn.name': '月之孽生',
   'entities.mobs.pale_choir_acolyte.name': '苍白唱诗侍僧',
-  'entities.mobs.pearlguard_sentinel.name': '珍珠卫哨兵',
+  'entities.mobs.pearlguard_sentinel.name': '月幔鳐',
   'entities.mobs.sethrael_palecoil.name': '苍盘者瑟斯雷尔',
   'entities.mobs.warlock_imp.name': '火焰恶魔',
   'entities.mobs.warlock_voidwalker.name': '虚空恶魔',
@@ -18791,7 +18792,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_skewering_trident': '穿刺三叉戟',
   'abilityUi.cast.temple_pale_mending': '苍白愈合',
   'abilityUi.cast.temple_glimmer_venom': '微光毒液',
-  'abilityUi.cast.temple_pearl_slam': '珍珠猛击',
+  'abilityUi.cast.temple_pearl_slam': '潮汐振翼',
+  'abilityUi.cast.temple_frostlocked_torrent': '冰封激流',
+  'abilityUi.cast.temple_venom_current': '毒液洋流',
+  'abilityUi.cast.temple_toxic_rime': '剧毒霜晶',
+  'abilityUi.cast.temple_beckoning_moon': '唤月',
+  'abilityUi.cast.temple_falling_moon': '坠月',
   'abilityUi.cast.temple_lightning_spit': '闪电喷吐',
   'abilityUi.cast.temple_crushing_torrent': '碾压激流',
   'abilityUi.cast.temple_hydra_tsunami': '海啸',
@@ -19077,8 +19083,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.sight.tidewisp':
     '那就是月之水本身，我们本该喝下的那一口。别让它碰到你们。',
   'dungeonGuide.drownedTemple.area.colonnade': '潮汐柱廊。我们两两并肩走过这里，唱着升起之节。',
-  'dungeonGuide.drownedTemple.sight.sentinel':
-    '门边的供奉蚌。我们把珍珠放进去祈求好运。如今它们把珍珠当作心脏。',
+  'dungeonGuide.drownedTemple.sight.sentinel': '门边水池里的月鳐。我们还是见习生时，在月出时喂它们珍珠。如今它们守着这些门，把我们的珍珠当作心脏。',
   'dungeonGuide.drownedTemple.sight.eel':
     '泻湖里的鳗鱼。见习生们会在黄昏喂它们面包。它们靠我们的圣歌养得肥肥的。',
   'dungeonGuide.drownedTemple.area.veil': '那道帷幕后面就是唱诗庭院。我从小时候起就再没踏进去过。',

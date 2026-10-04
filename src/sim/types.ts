@@ -4550,6 +4550,37 @@ export interface HydraFightState {
   /** Sim time each head (left, centre, right) last fell; null while it lives.
    *  A fallen head grows back regrowAfter seconds later while another lives. */
   diedAt: (number | null)[];
+  /** The Combined Breath (encounters/drowned_temple/hydra_combo.ts): combos
+   *  begun this fight (the fixed order's index and their own hash salt), the
+   *  slots fired since the last Tsunami began, the combo whose bar runs (its
+   *  kind, its heads, and the Frostlocked Torrent's locked lane), the Ice Wall
+   *  standing, the sliding Venom Current pools and the Toxic Rime crystals. */
+  combos: number;
+  comboSlot: number;
+  combo: {
+    kind: 'frostlock' | 'current' | 'rime';
+    headIds: number[];
+    remaining: number;
+    yaw: number;
+  } | null;
+  iceWall: {
+    x: number;
+    z: number;
+    yaw: number;
+    length: number;
+    remaining: number;
+    objectId: number;
+  } | null;
+  currents: {
+    x: number;
+    z: number;
+    yaw: number;
+    slide: number;
+    remaining: number;
+    tick: number;
+    objectId: number;
+  }[];
+  crystals: { x: number; z: number; remaining: number; objectId: number }[];
 }
 
 export interface ColossusFightState {
@@ -4601,6 +4632,15 @@ export interface YsoleiFightState {
   summonsRoared: number;
   wrathRoared: boolean;
   roars: string[];
+  /** She calls the moon (encounters/drowned_temple/ysolei_moon.ts): tear
+   *  thresholds passed, the calls still waiting for her to be free, the tears
+   *  rolling at her (heading toward her coil), the heroic moonglow pools, and
+   *  the Full Moon (queued, its bar running, or done). */
+  tearWaves: number;
+  tearCalls: number;
+  tears: { x: number; z: number; objectId: number }[];
+  glows: { x: number; z: number; remaining: number; tick: number; objectId: number }[];
+  fullMoon: 'queued' | 'falling' | 'done' | null;
 }
 
 export type TempleFightState =

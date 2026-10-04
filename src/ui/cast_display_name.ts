@@ -132,6 +132,11 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_hydra_tsunami': true,
   'abilityUi.cast.temple_ysolei_call': true,
   'abilityUi.cast.temple_ysolei_wrath': true,
+  'abilityUi.cast.temple_frostlocked_torrent': true,
+  'abilityUi.cast.temple_venom_current': true,
+  'abilityUi.cast.temple_toxic_rime': true,
+  'abilityUi.cast.temple_beckoning_moon': true,
+  'abilityUi.cast.temple_falling_moon': true,
   // The Wildheart Basin rework: its trash kit and the Great Saurian.
   'abilityUi.cast.wildheart_ancestral_sap': true,
   'abilityUi.cast.wildheart_plant_totem': true,

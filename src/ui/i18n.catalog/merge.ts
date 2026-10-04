@@ -646,12 +646,20 @@ const mergeStringsEn = {
       temple_skewering_trident: 'Skewering Trident',
       temple_pale_mending: 'Pale Mending',
       temple_glimmer_venom: 'Glimmer Venom',
-      temple_pearl_slam: 'Pearl Slam',
+      // The Moonmantle Ray's wingbeat (the cast id kept from the Pearl Slam).
+      temple_pearl_slam: 'Tidal Wingbeat',
       temple_lightning_spit: 'Lightning Spit',
       temple_crushing_torrent: 'Crushing Torrent',
       temple_hydra_tsunami: 'Tsunami',
       temple_ysolei_call: 'Moonspawn Call',
       temple_ysolei_wrath: 'Drowned Wrath',
+      // The Temple encounter pass: the Mere Hydra's Combined Breath and Ysolei
+      // calling the moon. None of them can be kicked.
+      temple_frostlocked_torrent: 'Frostlocked Torrent',
+      temple_venom_current: 'Venom Current',
+      temple_toxic_rime: 'Toxic Rime',
+      temple_beckoning_moon: 'Beckoning Moon',
+      temple_falling_moon: 'Falling Moon',
       // The Wildheart Basin rework (trash_kit/wildheart_cast_ids.ts,
       // encounters/wildheart_basin/ids.ts). Only Ancestral Sap can be kicked.
       wildheart_ancestral_sap: 'Ancestral Sap',
@@ -4160,7 +4168,7 @@ const mergeExtraEn = {
       'Glimmerscale Lurker',
       'Moonspawn',
       'Pale Choir Acolyte',
-      'Pearlguard Sentinel',
+      'Moonmantle Ray',
       'Sethrael the Palecoil',
       'Fire Demon',
       'Void Demon',

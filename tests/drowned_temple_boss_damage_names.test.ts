@@ -17,6 +17,24 @@ const NAMES = [
   'Tideglass Fracture',
   'Freezing Breath',
   'Crushing Torrent',
+  // The Temple encounter pass: the Combined Breath, the moon's call, and the
+  // Moonmantle Ray's renamed moves.
+  'Frostlocked Torrent',
+  'Venom Current',
+  'Toxic Rime',
+  'Ice Shards',
+  'Moonlight Tear',
+  'Falling Moon',
+  'Spilled Moonlight',
+  'Lunar Glide',
+  'Tidal Wingbeat',
+  'Nacre Cocoon',
+  'Frozen',
+  'Moonsear',
+  'Moonswell',
+  'Plenilune Ward',
+  'Eclipsed',
+  'Moonborne Might',
 ];
 
 describe('the Drowned Temple boss damage names localize', () => {

@@ -7142,7 +7142,7 @@ export const ja_JP: EnTranslations = {
         "siren": "あの声だ。聖歌隊でわしの隣で歌っていた。今も半拍早く入ってくる。",
         "lurker": "子どもたちが浅瀬で網ですくっていたものだ。親指ほどの大きさで、光っておった。",
         "tidewisp": "あれこそ月の水そのもの、わしらが飲むはずだった一杯だ。触れさせてはならん。",
-        "sentinel": "門のそばの捧げ物の貝だ。幸運を願って真珠を納めた。今はそれを心臓として身につけておる。",
+        "sentinel": "門の池の月エイだ。見習いの頃、月の出に真珠を与えたものだ。今は彼らが扉を守り、我らの真珠を心臓として身につけておる。",
         "eel": "潟のウナギだ。見習いたちが夕暮れにパンをやっていた。わしらの賛歌で太ったのさ。",
         "reflection": "水がお前たちを何に変えるか、それを見せておるのだ。壊せ!",
         "moonspawn": "あれはわしの仲間などではない。あの方のものだ。月光だけでできておる。"
@@ -12045,6 +12045,7 @@ export const ja_JP: EnTranslations = {
       "deathRecapCauterized": "死亡しました。焼灼の炎に飲み込まれました。",
       "respawn": "再び休まり、完全な状態になりました。",
       "respawnKeeperToll": "霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。",
+      "moonbridgeBanner": "月の橋が架かる",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
       "playerNotNearby": "そのプレイヤーは近くにいません。",
@@ -12529,12 +12530,17 @@ export const ja_JP: EnTranslations = {
       "temple_skewering_trident": "串刺しの三叉槍",
       "temple_pale_mending": "蒼白の癒し",
       "temple_glimmer_venom": "煌めく毒",
-      "temple_pearl_slam": "真珠の叩きつけ",
+      "temple_pearl_slam": "潮の羽ばたき",
       "temple_lightning_spit": "稲妻の吐きかけ",
       "temple_crushing_torrent": "押し潰す奔流",
       "temple_hydra_tsunami": "津波",
       "temple_ysolei_call": "月の落とし子の呼び声",
       "temple_ysolei_wrath": "溺れし憤怒",
+      "temple_frostlocked_torrent": "凍てつく激流",
+      "temple_venom_current": "毒の潮流",
+      "temple_toxic_rime": "毒の霧氷",
+      "temple_beckoning_moon": "月招き",
+      "temple_falling_moon": "落ちる月",
       "wildheart_ancestral_sap": "祖霊の樹液",
       "wildheart_plant_totem": "トーテム設置",
       "wildheart_entangling_lash": "絡みつく鞭",
@@ -20912,7 +20918,7 @@ export const ja_JP: EnTranslations = {
         "name": "蒼白聖歌隊の侍祭"
       },
       "pearlguard_sentinel": {
-        "name": "真珠衛の歩哨"
+        "name": "月套のエイ"
       },
       "sethrael_palecoil": {
         "name": "蒼渦のセスラエル"

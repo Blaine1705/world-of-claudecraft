@@ -7142,7 +7142,7 @@ export const en: EnTranslations = {
         "siren": "That voice. She sang beside me in the choir. She still comes in half a beat early.",
         "lurker": "The children netted those in the shallows. They were small as a thumb, and they glowed.",
         "tidewisp": "That is the moon-water itself, the draught we were meant to drink. Do not let it touch you.",
-        "sentinel": "The offering clams by the gates. We laid our pearls in them for luck. Now they wear them as hearts.",
+        "sentinel": "The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.",
         "eel": "The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.",
         "reflection": "It shows you what the water would make of you. Break it!",
         "moonspawn": "Those were never my people. They are hers, made of nothing but moonlight."
@@ -12045,6 +12045,7 @@ export const en: EnTranslations = {
       "deathRecapCauterized": "You have died. Cauterize's burn overwhelmed you.",
       "respawn": "You feel rested and whole again.",
       "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
+      "moonbridgeBanner": "The Moonbridge Rises",
       "ignoringChat": "Ignoring chat from {name}.",
       "noLongerIgnoring": "No longer ignoring {name}.",
       "playerNotNearby": "That player is not nearby.",
@@ -12529,12 +12530,17 @@ export const en: EnTranslations = {
       "temple_skewering_trident": "Skewering Trident",
       "temple_pale_mending": "Pale Mending",
       "temple_glimmer_venom": "Glimmer Venom",
-      "temple_pearl_slam": "Pearl Slam",
+      "temple_pearl_slam": "Tidal Wingbeat",
       "temple_lightning_spit": "Lightning Spit",
       "temple_crushing_torrent": "Crushing Torrent",
       "temple_hydra_tsunami": "Tsunami",
       "temple_ysolei_call": "Moonspawn Call",
       "temple_ysolei_wrath": "Drowned Wrath",
+      "temple_frostlocked_torrent": "Frostlocked Torrent",
+      "temple_venom_current": "Venom Current",
+      "temple_toxic_rime": "Toxic Rime",
+      "temple_beckoning_moon": "Beckoning Moon",
+      "temple_falling_moon": "Falling Moon",
       "wildheart_ancestral_sap": "Ancestral Sap",
       "wildheart_plant_totem": "Plant Totem",
       "wildheart_entangling_lash": "Entangling Lash",
@@ -20912,7 +20918,7 @@ export const en: EnTranslations = {
         "name": "Pale Choir Acolyte"
       },
       "pearlguard_sentinel": {
-        "name": "Pearlguard Sentinel"
+        "name": "Moonmantle Ray"
       },
       "sethrael_palecoil": {
         "name": "Sethrael the Palecoil"

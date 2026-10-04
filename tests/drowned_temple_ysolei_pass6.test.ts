@@ -51,6 +51,8 @@ describe('Ysolei: a colossal serpent coiled on the Moon Altar', () => {
     expect(spawn.length).toBeGreaterThan(0);
     run(f, 3);
     b.hp = Math.floor(b.maxHp * 0.29);
-    expect(until(f, () => b.castingAbility === YSOLEI_WRATH, 3)).toBe(true);
+    // The roar waits for her to be free: the Beckoning Moon her drop to 59
+    // percent queued (ysolei_moon.ts, a 3 s bar) may still be running.
+    expect(until(f, () => b.castingAbility === YSOLEI_WRATH, 6)).toBe(true);
   });
 });

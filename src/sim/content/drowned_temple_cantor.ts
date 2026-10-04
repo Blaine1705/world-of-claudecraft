@@ -194,7 +194,7 @@ const LINES: GuideLineDef[] = [
   {
     id: 'C08',
     key: 'sight.sentinel',
-    text: 'The offering clams by the gates. We laid our pearls in them for luck. Now they wear them as hearts.',
+    text: 'The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.',
     trigger: { kind: 'sight', mobIds: ['pearlguard_sentinel'], r: SIGHT },
     priority: 'creature',
   },

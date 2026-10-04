@@ -3924,6 +3924,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.system.respawn': '你再次感到精力恢復、身體完整。',
   'hud.system.respawnKeeperToll':
     '靈魂醫者復活了你，但你因此變得虛弱：在復活後遺症消退之前，你的所有屬性都會被削弱。',
+  'hud.system.moonbridgeBanner': '月之橋已成',
   'hud.system.ignoringChat': '已封鎖來自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再封鎖 {name}。',
   'hud.system.playerNotNearby': '該玩家不在附近。',
@@ -5592,7 +5593,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.glimmerscale_lurker.name': '微鱗潛伏者',
   'entities.mobs.moonspawn.name': '月之裔',
   'entities.mobs.pale_choir_acolyte.name': '蒼白唱詩侍僧',
-  'entities.mobs.pearlguard_sentinel.name': '珍珠衛哨兵',
+  'entities.mobs.pearlguard_sentinel.name': '月幔鰩',
   'entities.mobs.sethrael_palecoil.name': '蒼盤者賽斯瑞爾',
   'entities.mobs.warlock_imp.name': '火焰惡魔',
   'entities.mobs.warlock_voidwalker.name': '虛空惡魔',
@@ -18809,7 +18810,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_skewering_trident': '穿刺三叉戟',
   'abilityUi.cast.temple_pale_mending': '蒼白癒合',
   'abilityUi.cast.temple_glimmer_venom': '微光毒液',
-  'abilityUi.cast.temple_pearl_slam': '珍珠猛擊',
+  'abilityUi.cast.temple_pearl_slam': '潮汐振翼',
+  'abilityUi.cast.temple_frostlocked_torrent': '冰封激流',
+  'abilityUi.cast.temple_venom_current': '毒液洋流',
+  'abilityUi.cast.temple_toxic_rime': '劇毒霜晶',
+  'abilityUi.cast.temple_beckoning_moon': '喚月',
+  'abilityUi.cast.temple_falling_moon': '墜月',
   'abilityUi.cast.temple_lightning_spit': '閃電噴吐',
   'abilityUi.cast.temple_crushing_torrent': '碾壓激流',
   'abilityUi.cast.temple_hydra_tsunami': '海嘯',
@@ -19095,8 +19101,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.sight.tidewisp':
     '那就是月之水本身，我們本該喝下的那一口。別讓它碰到你們。',
   'dungeonGuide.drownedTemple.area.colonnade': '潮汐柱廊。我們兩兩並肩走過這裡，唱著升起之節。',
-  'dungeonGuide.drownedTemple.sight.sentinel':
-    '門邊的供奉蚌。我們把珍珠放進去祈求好運。如今牠們把珍珠當作心臟。',
+  'dungeonGuide.drownedTemple.sight.sentinel': '門邊水池裡的月鰩。我們還是見習生時，在月出時餵牠們珍珠。如今牠們守著這些門，把我們的珍珠當作心臟。',
   'dungeonGuide.drownedTemple.sight.eel':
     '潟湖裡的鰻魚。見習生們會在黃昏餵牠們麵包。牠們靠我們的聖歌養得肥肥的。',
   'dungeonGuide.drownedTemple.area.veil': '那道帷幕後面就是唱詩庭院。我從小時候起就再沒踏進去過。',

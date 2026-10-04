@@ -16,8 +16,9 @@
 //                        Mending on a hurt packmate. Kick them.
 //   Glimmerscale Lurker  Pounce onto the farthest caster (a bleed), and an
 //                        interruptible Glimmer Venom bolt.
-//   Pearlguard Sentinel  Onrush; a Pearl Slam that throws back all near it; Pearl
-//                        Carapace shields it once when low. Burst it.
+//   Moonmantle Ray       (id pearlguard_sentinel) Lunar Glide, a charge; a Tidal
+//                        Wingbeat that throws back all near it; Nacre Cocoon
+//                        shields it once when low. Burst it.
 //   Lagoon Snapper       Snap: a telegraphed bite across its front, and it shells
 //                        up once when low. Step out, then burn it.
 //   Lagoon Eel           Static Coil: an interruptible shock round it; Lightning Spit,
