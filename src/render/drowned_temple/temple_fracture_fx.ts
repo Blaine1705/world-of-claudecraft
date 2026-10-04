@@ -132,7 +132,7 @@ void main() {
   if (uClear > 0.0) {
     float c1 = vnoise(p * 0.55 + vec2(uTime * 0.35, -uTime * 0.22));
     float c2 = vnoise(p * 1.4 - vec2(uTime * 0.5, uTime * 0.3));
-    float caustic = pow(1.0 - abs(c1 + c2 - 1.0), 6.0);
+    float caustic = pow(max(1.0 - abs(c1 + c2 - 1.0), 0.0), 6.0);
     vec3 glass = mix(vec3(0.55, 0.9, 1.0), vec3(0.92, 0.98, 1.0), caustic);
     vec3 clear = glass * (0.35 + 0.9 * caustic) + vec3(0.85, 0.95, 1.0) * (seam * 1.6 + halo * 0.25);
     col = mix(col, clear, uClear);

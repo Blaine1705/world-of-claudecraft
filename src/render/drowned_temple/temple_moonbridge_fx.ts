@@ -131,7 +131,7 @@ uniform vec3 uColor;
 varying vec2 vUv;
 void main() {
   float r = length(vUv - 0.5) * 2.0;
-  float band = exp(-pow((r - uBand) * 9.0, 2.0));
+  float band = exp(-pow(max((r - uBand) * 9.0, 0.0), 2.0));
   float inner = (1.0 - smoothstep(0.0, uBand, r)) * 0.25;
   float a = (band + inner) * uAlpha * (1.0 - smoothstep(0.96, 1.0, r));
   gl_FragColor = vec4(mix(uColor, vec3(1.0), band * 0.5) * a, a);
