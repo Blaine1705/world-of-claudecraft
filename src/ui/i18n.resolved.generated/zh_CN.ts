@@ -3925,7 +3925,16 @@ export const zh_CN: EnTranslations = {
         "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。"
       },
       "bastion": {
+        "brineColumn": "你被困在海水之柱中，每秒都在溺水，直到引导结束。打断或击晕潮缚侍僧即可挣脱。",
+        "halberdWall": "另一名溺亡守望者在{radius}码内时，受到的伤害降低{pct}%。把它们分开。",
+        "fogShroud": "站在雾堤中时，受到的伤害降低{pct}%。把它拖出雾中。",
+        "carrionGlut": "以死者为食（{stacks}）：每层使其盐水爆裂范围扩大{radius}码，伤害提高{pct}%。",
+        "snappedFetters": "它的锁链已断。它不再战斗，无法被伤害，并很快离开。",
         "anchored": "被锁在溺亡之锚上：你可以移动，但无法远离绞盘，它会把你绞向溺亡深坑。走到距被钩住处至少{run}码的点亮系泊柱{reach}码以内即可系住锁链（该柱熄灭{dark}秒），或者让队友用{links}次攻击砸断锁链（英雄难度{linksHeroic}次）。掉进深坑会损失{pit}%的最大生命值（英雄难度{pitHeroic}%）。"
+      },
+      "crypt": {
+        "carrionEye": "战斗中的所有乌鸦都会追猎你，持续{seconds}秒。跑向你的坦克，让队伍一起消灭鸦群。",
+        "graniteSkin": "受到的伤害降低{pct}%，石层每{every}秒增厚一次。击晕会将其击碎，使其受到的伤害提高{cracked}%。"
       },
       "sanctum": {
         "lockbound": "受到的伤害降低{pct}%：每条仍然完好的锁链提供{per}%。打破一个封印镣铐即可让其锁链脱落。",
@@ -12508,6 +12517,10 @@ export const zh_CN: EnTranslations = {
       "crypt_barrowflame_breath": "冢焰吐息",
       "crypt_tail_lash": "尾鞭",
       "crypt_wing_gust": "翼风",
+      "crypt_grave_rupture": "墓穴崩裂",
+      "crypt_carrion_eye": "腐鸦之眼",
+      "crypt_marrow_crush": "碎髓重击",
+      "crypt_rimesilk_spit": "霜丝喷吐",
       "crypt_morthen_rite_wakes": "仪式苏醒",
       "crypt_morthen_rise": "唤墓者升起",
       "crypt_morthen_proclaim": "墓之宣告",
@@ -12522,6 +12535,9 @@ export const zh_CN: EnTranslations = {
       "bastion_piercing_bolt": "穿刺弩矢",
       "bastion_claw_sweep": "巨钳横扫",
       "bastion_shell_slam": "壳塔重击",
+      "bastion_boathook": "船钩拖拽",
+      "bastion_fog_bank": "雾堤",
+      "bastion_brine_column": "盐水之柱",
       "bastion_oathbound_charge": "誓约冲锋",
       "bastion_gaolers_cudgel": "狱卒短棍",
       "bastion_mist_surge": "迷雾涌流",
@@ -20143,6 +20159,9 @@ export const zh_CN: EnTranslations = {
       },
       "crypt_bone_brute": {
         "name": "骸骨蛮兵"
+      },
+      "crypt_bone_pile": {
+        "name": "蠢动的骸骨"
       },
       "crypt_chapel_gargoyle": {
         "name": "礼拜堂石像鬼"

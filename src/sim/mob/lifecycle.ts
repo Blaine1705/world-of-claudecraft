@@ -45,6 +45,7 @@ import { resetMobCharge } from './charge';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
 import { resetRiftMechanicWindups } from './rift_escape_window';
+import { boneShrapnel } from './trash_kit/crypt_hooks';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
@@ -284,4 +285,6 @@ export function detonateCorpse(ctx: SimContext, dead: Entity): void {
   }
   // A clean bloat kill means the blast caught nobody it credits.
   deedsMod.onBloatDetonatedForDeeds(ctx, dead, damagedPids);
+  // The Bone Minion's shrapnel also cuts the skeletons round it.
+  boneShrapnel(ctx, dead);
 }

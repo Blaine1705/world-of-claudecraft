@@ -773,6 +773,33 @@ manta body (display only; the id `pearlguard_sentinel` is frozen).
 | Lunar Glide, Tidal Wingbeat, Nacre Cocoon | the manta's three moves | KEEP. No match for the full names ("Wingbeat" alone is a plain English word). |
 | The Moonbridge Rises | the banner as the Moonbridge forms | KEEP. Plain English over the dungeon's own place name. |
 
+### The Hollow Crypt and Sunken Bastion trash mechanics pass (web-verified 2026-10-04)
+
+Exact-phrase searches through the MediaWiki search of 25 game wikis (warcraft.wiki.gg,
+wowpedia, the Hearthstone, Diablo, StarCraft, RuneScape, Old School RuneScape, FFXIV,
+Final Fantasy, Guild Wars 1 and 2, UESP, Path of Exile, Diablo IV, Elden Ring, Dark Souls,
+Darkest Dungeon, Baldur's Gate 3, Forgotten Realms, Dota 2, League of Legends, Dragon Age,
+Magic: The Gathering, EverQuest and LOTRO wikis) plus Wowhead's spell database, at
+authoring, for the trash kit's new names (`src/sim/mob/trash_kit/crypt_kit.ts`,
+`bastion_kit.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Bone Shrapnel | REJECTED before shipping | A World of Warcraft death burst in the same role (Restless Bones, Return to Karazhan; a Torghast creation). The Bone Minion's burst on its own skeletons is the Splinter Burst. |
+| Bone Splinters | REJECTED before shipping | A Diablo IV Necromancer skill. |
+| Eye Peck | REJECTED before shipping | A World of Warcraft carrion-bird ability since vanilla, same role. The Carrion Crow's peck is the Gouging Beak. |
+| Blinding Peck, Beak Gouge | REJECTED before shipping | World of Warcraft spells (seagulls and vultures; a beak gouge). |
+| Hobbled | REJECTED before shipping (borderline) | A plain word, but also a World of Warcraft NPC slow in the same role. The Cutthroat's slow is Torn Tendon. |
+| Gorged | REJECTED before shipping (borderline) | A World of Warcraft scarab mechanic too close in role (gorge, grow, burst). The crawler's stacks are the Carrion Glut; "Glutted" is also a WoW spell. |
+| Unshackled | REJECTED before shipping (borderline) | The freed-captive faction of World of Warcraft (The Unshackled, Nazjatar). The prisoner's release is the Snapped Fetters; "Broken Chains" is a WoW object and a Dragon Age item. |
+| Reassemble | the Ossuary Warrior's rise | KEEP. Plain English verb; WoW's "Reassemble Armor" and FFXIV's Machinist "Reassemble" are different roles. |
+| Stirring Bones | the bone pile mob | KEEP. No match. |
+| Grave Rupture, Marrow Crush, Granite Skin, Carrion Eye, Barrow Embers, Rimesilk Spit, Boathook Drag, Halberd Wall, Brine Column | the new casts and auras | KEEP. No match for the full names ("Rimesilk" has no hits on its own). |
+| Cracked Stone | the gargoyle's broken ward | KEEP. Plain English; WoW's "Cracked Stone" is a thrown rock, a different role. |
+| Fall Back | the Arbalest's leap back | KEEP. A generic military order across many properties; none is a backward self leap. |
+| Fog Bank | the Mist Chanter's patch | KEEP. A weather term; the Magic: The Gathering card is shared dictionary English in another medium. |
+| Splinter Burst, Torn Tendon, Carrion Glut, Snapped Fetters, Gouging Beak | the replacements | KEEP. No match on any of the wikis or on Wowhead. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

@@ -79,12 +79,16 @@ export function stepDeathBurst(
 ): boolean {
   const def = kit.deathBurst;
   if (!def) return false;
+  // A fed burst grows with its stacks (the Barnacle Crawler's Gorged).
+  const stacks = def.perStack ? (mob.trashLife?.gorge ?? 0) : 0;
+  const radius = def.radius + stacks * (def.perStack?.radius ?? 0);
+  const grow = 1 + stacks * (def.perStack?.damage ?? 0);
   let st = mob.deathBurst;
   if (!st) {
     st = { remaining: def.delay, objectId: null, done: false };
     mob.deathBurst = st;
     if (def.delay > 0) {
-      st.objectId = spawnBurstRing(ctx, inst, mob, def.radius);
+      st.objectId = spawnBurstRing(ctx, inst, mob, radius);
       ctx.emit({
         type: 'spellfx',
         sourceId: mob.id,
@@ -109,10 +113,10 @@ export function stepDeathBurst(
     fx: 'nova',
     ability: def.castId,
   });
-  for (const p of livingInReach(players, mob.pos, def.radius)) {
+  for (const p of livingInReach(players, mob.pos, radius)) {
     const amount = Math.max(
       1,
-      Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1)),
+      Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1) * grow),
     );
     ctx.dealDamage(mob, p, amount, false, def.school, def.name, 'hit', true);
     // A slowing burst (the Rime Whelp's Hoarfrost Pop) chills whoever it caught.

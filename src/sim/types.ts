@@ -2592,6 +2592,11 @@ export interface MobTemplate {
     delay: number;
     name: string;
     school?: Aura['school'];
+    /** The burst also cuts the claim's living mobs of `family` inside the
+     *  radius (the Bone Minion's Splinter Burst: drag the skeletons onto it
+     *  before it dies) for `maxHpPct` of their own health, never a killing
+     *  blow. No rng (mob/trash_kit/crypt_hooks.ts boneShrapnel). */
+    shrapnel?: { family: MobFamily; maxHpPct: number; name: string };
   };
   // Classic beast "Frenzy": when a mob with this trait dies, nearby living
   // same-family hostile mobs briefly attack faster (hasteMult, e.g. 1.3 = +30%
@@ -4179,6 +4184,13 @@ export interface TrashKitDef {
     bleed?: { perTick: number; interval: number; duration: number };
     /** A stun on landing, in seconds (the Bastion Warhound's Lunge). */
     stun?: number;
+    /** A slow on landing: the victim runs at `mult` of its speed for
+     *  `seconds` (the Ossuary Cutthroat's Torn Tendon). */
+    slow?: { mult: number; seconds: number; name: string };
+    /** Heroic: when nobody answers the leap inside its fixate (a taunt, or a
+     *  stun, root or slow on the leaper), it leaps again at the next caster
+     *  (mob/trash_kit/crypt_kit.ts). */
+    releapOnHeroic?: boolean;
   };
   /** An add that stays alive this long in combat turns into `into`. */
   grow?: { after: number; into: string; name: string };
@@ -4244,6 +4256,10 @@ export interface TrashKitDef {
     /** A slow on everyone the burst catches: `mult` of their run speed for
      *  `seconds` (the Rime Whelp's Hoarfrost Pop). */
     slow?: { mult: number; seconds: number };
+    /** Grows with the mob's kit stacks (Entity.trashLife.gorge, the Barnacle
+     *  Crawler's Carrion Glut): each stack adds `radius` yards and `damage` of the
+     *  base roll. */
+    perStack?: { radius: number; damage: number };
   };
   /** A healing pulse with no cast bar, every `every` seconds while it fights:
    *  each living ally in the fight within `radius` (never itself) mends for a
@@ -4305,6 +4321,142 @@ export interface TrashKitDef {
     name: string;
     school: TrashKitCast['school'];
   };
+  // ---- The Hollow Crypt and Sunken Bastion trash mechanics pass
+  // (mob/trash_kit/crypt_kit.ts, bastion_kit.ts) ----
+  /** It stands back up: when it falls while a living `masters` mob of its pack
+   *  stands, a `pile` mob (its bones) lies where it fell for `seconds`; break
+   *  the pile, or kill the master, or the body rises with `hpPct` of its health
+   *  (heroic: `heroicHpPct`), at most `rises` times (heroic: `heroicRises`).
+   *  A risen body pays nothing twice (Entity.regrown). The Ossuary Warrior's
+   *  Reassemble. */
+  reassemble?: {
+    name: string;
+    masters: readonly string[];
+    pile: string;
+    seconds: number;
+    hpPct: number;
+    heroicHpPct: number;
+    rises: number;
+    heroicRises: number;
+  };
+  /** This mob is a Reassemble's bone pile: it never moves or swings, and the
+   *  body it lies on stands when its countdown ends (Entity.trashLife.pile). */
+  bonePile?: { name: string };
+  /** An interruptible cast that bursts a fallen packmate's corpse: the corpse
+   *  nearest the caster's foe within `range` is marked (a ring object the
+   *  client mirrors, scale = radius) and everyone inside `radius` of it when
+   *  the bar ends is hit. Heroic leaves a `pool` burning there (the Gravecaller
+   *  Necromancer's Grave Rupture). */
+  rupture?: TrashKitCast & {
+    range: number;
+    radius: number;
+    min: number;
+    max: number;
+    pool: { seconds: number; tick: number; min: number; max: number };
+  };
+  /** A stone ward that thickens every `every` seconds in the fight, `perStack`
+   *  less damage taken per stack (heroic: `heroicPerStack`) up to `maxStacks`;
+   *  a stun shatters it and leaves the mob cracked, taking `cracked.taken`
+   *  more damage for `cracked.seconds` (the Chapel Gargoyle's Granite Skin). */
+  granite?: {
+    name: string;
+    every: number;
+    perStack: number;
+    heroicPerStack: number;
+    maxStacks: number;
+    cracked: { name: string; seconds: number; taken: number };
+  };
+  /** An interruptible mark on one player in reach (never the caster's own foe
+   *  while anyone else stands in reach): for `seconds` every living `flock`
+   *  mob in the fight hunts the marked player (the Crow Caller's Carrion Eye). */
+  eye?: TrashKitCast & { range: number; seconds: number; flock: string };
+  /** The template breath cone leaves its fire on the floor on heroic: for
+   *  `seconds` every `tick` seconds each player inside the burnt cone takes a
+   *  roll (an object the client mirrors, scale = the cone's range). The
+   *  Ossuary Drake's Barrow Embers. */
+  scorch?: {
+    name: string;
+    seconds: number;
+    tick: number;
+    min: number;
+    max: number;
+    school: TrashKitCast['school'];
+  };
+  /** A telegraphed hook down a lane at the farthest player at least
+   *  `minRange` away: whoever stands in the lane when the bar ends is hit,
+   *  and the farthest one caught is dragged to `stop` yards in front of the
+   *  caster over `pullSeconds`. On heroic the caster's breath cone comes
+   *  `heroicSweepIn` seconds after a catch. Physical: step aside (the Drowned
+   *  Watchman's Boathook). */
+  hook?: TrashKitCast & {
+    minRange: number;
+    length: number;
+    halfWidth: number;
+    min: number;
+    max: number;
+    stop: number;
+    pullSeconds: number;
+    heroicSweepIn: number;
+  };
+  /** Heroic only: while another living mob of its own template in the fight
+   *  stands within `radius`, it takes `reduction` less damage (the Drowned
+   *  Watchmen's Halberd Wall). Split them. */
+  wall?: { name: string; radius: number; reduction: number };
+  /** When a player closes within `trigger` yards it leaps `distance` yards
+   *  straight back over `seconds`, at most every `every` seconds; a stun, a
+   *  root or a slow on it holds it (the Fogbound Arbalest's Fall Back). */
+  fallBack?: {
+    name: string;
+    every: number;
+    first: number;
+    trigger: number;
+    distance: number;
+    seconds: number;
+  };
+  /** Within `reach` of a corpse in its claim it feeds: a stack every `every`
+   *  seconds up to `maxStacks` (its deathBurst grows by deathBurst.perStack;
+   *  the Barnacle Crawler's Carrion Glut). */
+  gorge?: { name: string; every: number; reach: number; maxStacks: number };
+  /** An interruptible cast that lays a fog patch of `radius` under its foe
+   *  for `seconds` (an object the client mirrors, scale = radius): every ally
+   *  in the fight standing in it takes `reduction` less damage (heroic:
+   *  `heroicReduction`). Drag them out of it (the Mist Chanter's Fog Bank). */
+  fogBank?: TrashKitCast & {
+    range: number;
+    radius: number;
+    seconds: number;
+    reduction: number;
+    heroicReduction: number;
+  };
+  /** An interruptible channel at one player in reach (never the caster's own
+   *  foe while anyone else is in reach): the victim is rooted for the whole
+   *  bar and takes a roll every `tick` seconds while it runs. Kick it or stun
+   *  the caster to free them (the Tidebound Acolyte's Brine Column). */
+  column?: TrashKitCast & { range: number; tick: number; min: number; max: number };
+  /** Under `belowHpPct` of its health it stops fighting: inert, untouchable
+   *  and no longer hostile, it kneels for `seconds` and leaves the fight (the
+   *  Shackled Prisoner's Snapped Fetters). */
+  unshackle?: { name: string; belowHpPct: number; seconds: number };
+}
+
+/** Trash kit state that outlives a pull's TrashKitState (Entity.trashLife;
+ *  mob/trash_kit/crypt_kit.ts, bastion_kit.ts). Sim only, never on the wire. */
+export interface TrashLifeState {
+  /** Reassemble: how many times this body has already stood back up. */
+  rises?: number;
+  /** Reassemble: this fall was judged (a pile was laid, or none could be). */
+  judged?: boolean;
+  /** Grave Rupture burst this corpse: it never stands again. */
+  ruptured?: boolean;
+  /** On a bone pile: the body it lies on and the seconds before it stands. */
+  pile?: { corpseId: number; remaining: number };
+  /** Carrion Glut stacks (its death burst grows with them). */
+  gorge?: number;
+  /** Snapped Fetters: seconds before the freed prisoner leaves the fight. */
+  freed?: number;
+  /** Reassemble: the first life's corpse was lootable when it stood; its
+   *  loot is held (unlootable) while it stands and given back when it falls. */
+  lootHeld?: boolean;
 }
 
 /** Per-pull runtime state of a trash kit (Entity.trashKit). */
@@ -4329,6 +4481,34 @@ export interface TrashKitState {
   carapaced?: boolean;
   /** A toss's locked landing spot (world) and its ring object while its bar runs. */
   toss?: { x: number; z: number; objectId: number | null };
+  // ---- The Hollow Crypt and Sunken Bastion trash mechanics pass ----
+  /** Grave Rupture: the corpse marked while the bar runs and its ring. */
+  rupture?: { corpseId: number; x: number; z: number; objectId: number | null };
+  /** Grave Rupture's heroic pool burning on the floor. */
+  pool?: { x: number; z: number; remaining: number; objectId: number | null };
+  /** Granite Skin: stacks, the clock to the next, and the crack's seconds left. */
+  granite?: { stacks: number; t: number; cracked: number };
+  /** Heroic Rending Leap: the victim, the fixate's seconds left, and whether
+   *  anyone answered (a taunt, or a stun, root or slow on the leaper). */
+  releap?: { victimId: number; remaining: number; answered: boolean };
+  /** Barrow Embers: a breath that landed this tick (set by the breath bar),
+   *  and the burnt cones still on the floor. */
+  scorchAt?: { x: number; z: number; facing: number };
+  scorches?: {
+    x: number;
+    z: number;
+    facing: number;
+    remaining: number;
+    objectId: number | null;
+  }[];
+  /** Boathook: the caught player being dragged and the seconds left. */
+  hook?: { victimId: number; remaining: number };
+  /** Fall Back: a leap back in flight. */
+  fall?: { fromX: number; fromZ: number; fromY: number; toX: number; toZ: number; t: number };
+  /** Fog Bank: the patch while its bar runs (the spot) and while it stands. */
+  fog?: { x: number; z: number; remaining: number; objectId: number | null; laid: boolean };
+  /** Brine Column: the victim held while the channel runs. */
+  column?: { victimId: number; tick: number };
 }
 
 /** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion),
@@ -6847,6 +7027,9 @@ export interface Entity extends ClientMirroredEntityFields {
   /** Per-pull state of a dungeon trash kit (MobTemplate.trashKit, mob/trash_kit).
    *  Sim authority only; cleared whenever the mob leaves combat. */
   trashKit?: TrashKitState;
+  /** Trash kit state that outlives the pull (Reassemble, a bone pile, Carrion Glut,
+   *  Snapped Fetters); TrashLifeState. Sim only. */
+  trashLife?: TrashLifeState;
   /** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion). Sim
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */

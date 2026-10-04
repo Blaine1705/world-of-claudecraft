@@ -12,6 +12,7 @@ import {
   FOGBEACON,
   MOORING_POSTS,
 } from '../../content/sunken_bastion_layout';
+import { BASTION_TRASH_OBJECT_TEMPLATES } from '../../mob/trash_kit/bastion_cast_ids';
 import { inLane } from '../../mob/trash_kit/lane';
 
 export const OLEN_ID = 'knight_commander_olen';
@@ -142,6 +143,7 @@ export const BASTION_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   REAPER_POOL_TEMPLATE,
   GRAVE_SHADOW_TEMPLATE,
   ...Object.values(MOORING_TEMPLATES),
+  ...BASTION_TRASH_OBJECT_TEMPLATES,
 ]);
 
 export function mooringStateOf(templateId: string): MooringState | null {

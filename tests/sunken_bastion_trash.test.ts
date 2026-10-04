@@ -110,7 +110,10 @@ describe('Bastion trash: the cast table', () => {
     expect(MOBS.tidebound_acolyte.desperateHeal).toBeUndefined();
     expect(MOBS.drowned_watchman.breathCone?.castId).toBe(BASTION_HALBERD_SWEEP);
     expect(MOBS.fogbound_arbalest.trashKit?.line?.castId).toBe(BASTION_PIERCING_BOLT);
-    expect(MOBS.barnacle_crawler.deathThroes?.name).toBe('Brine Burst');
+    // The trash mechanics pass moved Brine Burst onto the kit's death burst
+    // (it grows with Carrion Glut: tests/sunken_bastion_trash_mechanics.test.ts).
+    expect(MOBS.barnacle_crawler.trashKit?.deathBurst?.name).toBe('Brine Burst');
+    expect(MOBS.barnacle_crawler.deathThroes).toBeUndefined();
     expect(MOBS.bastion_warhound.trashKit?.leap?.stun).toBe(1);
     expect(MOBS.mistweaver.trashKit?.ward?.castId).toBe(BASTION_FOG_WARD);
     expect(MOBS.drowned_sergeant.warcry?.name).toBe('Rally the Watch');
@@ -218,8 +221,14 @@ describe('Bastion trash: Mistweaver, Fog Ward', () => {
     const ward = a.auras.find((x) => x.id === TRASH_WARD_AURA);
     expect(ward?.kind).toBe('absorb');
     expect(ward?.value).toBe(Math.round(a.maxHp * def.shieldPct));
-    // The next ward goes to someone not already wrapped.
-    run(r, def.every, [weaver, a, b]);
+    // The next ward goes to someone not already wrapped (the chanter's Fog
+    // Bank shares its rotation now: wait for the ward's own bar).
+    let next = false;
+    for (let t = 0; t < def.every + 6 && !next; t += DT) {
+      run(r, DT, [weaver, a, b]);
+      next = weaver.castingAbility === BASTION_FOG_WARD;
+    }
+    expect(next).toBe(true);
     expect(weaver.castTargetId === b.id || weaver.castTargetId === weaver.id).toBe(true);
   });
 });

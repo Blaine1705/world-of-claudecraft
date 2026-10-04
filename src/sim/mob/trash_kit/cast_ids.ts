@@ -28,6 +28,44 @@ export const CRYPT_WING_GUST = 'crypt_wing_gust';
 export const CRYPT_PERCH_DIVE = 'crypt_perch_dive';
 export const CRYPT_SKY_LANDING = 'crypt_sky_landing';
 
+// The trash mechanics pass (crypt_kit.ts): a second readable job per type.
+/** Gravecaller Necromancer: an interruptible cast that bursts a fallen
+ *  packmate's corpse (trashKit.rupture). */
+export const CRYPT_GRAVE_RUPTURE = 'crypt_grave_rupture';
+/** Crow Caller: an interruptible cast that marks one player for every crow
+ *  (trashKit.eye). Also the mark's aura id. */
+export const CRYPT_CARRION_EYE = 'crypt_carrion_eye';
+/** Bone Brute: a telegraphed smash down a narrow cone (breathCone). */
+export const CRYPT_MARROW_CRUSH = 'crypt_marrow_crush';
+/** Bonechill Widow: a line of frost web spat at one player; it roots
+ *  whoever it catches (trashKit.line). */
+export const CRYPT_RIMESILK_SPIT = 'crypt_rimesilk_spit';
+/** Ossuary Cutthroat: the slow its Rending Leap leaves on its victim. */
+export const CRYPT_TORN_TENDON = 'crypt_torn_tendon';
+/** Chapel Gargoyle: its stacking stone ward (trashKit.granite). */
+export const CRYPT_GRANITE_SKIN = 'crypt_granite_skin';
+/** Chapel Gargoyle: the crack a stun leaves (it takes more damage). */
+export const CRYPT_CRACKED_STONE = 'crypt_cracked_stone';
+/** Bone Minion: its burst also cuts the skeletons round it (deathThroes.shrapnel). */
+export const CRYPT_SPLINTER_BURST = 'crypt_splinter_burst';
+/** Ossuary Warrior: the cue as a fallen warrior's bones stand back up. */
+export const CRYPT_REASSEMBLE = 'crypt_reassemble';
+/** The cue as a bone pile crumbles for good (broken, or its master fell). */
+export const CRYPT_BONES_CRUMBLE = 'crypt_bones_crumble';
+/** The bone pile a fallen Ossuary Warrior leaves while a necromancer lives. */
+export const CRYPT_BONE_PILE = 'crypt_bone_pile';
+/** Object templates the crypt trash kit lays on the floor (the renderer draws
+ *  them itself): the Grave Rupture ring under its corpse, the heroic pool it
+ *  leaves, and the drake's heroic Barrow Embers. */
+export const CRYPT_RUPTURE_RING = 'crypt_grave_rupture_ring';
+export const CRYPT_RUPTURE_POOL = 'crypt_grave_rupture_pool';
+export const CRYPT_BARROW_EMBERS = 'crypt_barrow_embers';
+export const CRYPT_TRASH_OBJECT_TEMPLATES: readonly string[] = [
+  CRYPT_RUPTURE_RING,
+  CRYPT_RUPTURE_POOL,
+  CRYPT_BARROW_EMBERS,
+];
+
 /** The trash kit casts a player interrupt can lock out, by school. The drake's
  *  strikes and the warrior's cleave are deliberately absent: dodge those. */
 export const TRASH_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> = {
@@ -35,4 +73,6 @@ export const TRASH_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['sch
   [CRYPT_RAISE_BONES]: { school: 'shadow' },
   [CRYPT_MURDER_CALL]: { school: 'nature' },
   [CRYPT_STONE_SHRIEK]: { school: 'nature' },
+  [CRYPT_GRAVE_RUPTURE]: { school: 'shadow' },
+  [CRYPT_CARRION_EYE]: { school: 'nature' },
 };

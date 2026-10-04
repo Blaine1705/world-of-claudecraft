@@ -19734,12 +19734,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_barrowflame_breath': '塚炎の吐息',
   'abilityUi.cast.crypt_tail_lash': '尾の一撃',
   'abilityUi.cast.crypt_wing_gust': '翼の突風',
+  'abilityUi.cast.crypt_grave_rupture': '墓所の破裂',
+  'abilityUi.cast.crypt_carrion_eye': '屍肉喰らいの眼',
+  'abilityUi.cast.crypt_marrow_crush': '髄砕き',
+  'abilityUi.cast.crypt_rimesilk_spit': '霜糸吐き',
   'abilityUi.cast.bastion_brine_mend': '塩水の癒し',
   'abilityUi.cast.bastion_fog_ward': '霧の守り',
   'abilityUi.cast.bastion_halberd_sweep': 'ハルバード薙ぎ',
   'abilityUi.cast.bastion_piercing_bolt': '貫通の矢',
   'abilityUi.cast.bastion_claw_sweep': '爪の薙ぎ払い',
   'abilityUi.cast.bastion_shell_slam': '甲羅叩きつけ',
+  'abilityUi.cast.bastion_boathook': '鉤竿引き',
+  'abilityUi.cast.bastion_fog_bank': '霧の帳',
+  'abilityUi.cast.bastion_brine_column': '塩水の柱',
   'abilityUi.cast.bastion_oathbound_charge': '誓約の突進',
   'abilityUi.cast.bastion_gaolers_cudgel': '牢番の棍棒',
   'abilityUi.cast.bastion_mist_surge': '霧の奔流',
@@ -19781,6 +19788,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.crypt_gravecaller_necromancer.name': '墓呼びの死霊術師',
   'entities.mobs.crypt_bone_minion.name': '骨の下僕',
   'entities.mobs.crypt_bone_brute.name': '骨の巨兵',
+  'entities.mobs.crypt_bone_pile.name': '蠢く骨',
   'entities.mobs.crypt_chapel_gargoyle.name': '礼拝堂のガーゴイル',
   'entities.mobs.crypt_crow_caller.name': '鴉呼び',
   'entities.mobs.crypt_carrion_crow.name': '腐肉喰らいの鴉',
@@ -19847,6 +19855,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{name} が穴へ引きずられている：溺死の錨を攻撃するか、灯った柱へ導け',
   'hudChrome.auraEffect.bastion.anchored':
     '溺死の錨に繋がれている：動くことはできるが巻き上げ機から離れることはできず、溺死の穴へと巻き寄せられる。引っ掛けられた場所から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入れば鎖を係留できる（その柱は{dark}秒間消える）、または仲間が{links}回の攻撃で鎖を断つ（ヒロイックは{linksHeroic}回）。穴に落ちると最大体力の{pit}%を失う（ヒロイックは{pitHeroic}%）。',
+  'hudChrome.auraEffect.bastion.brineColumn':
+    '海水の柱に捕らわれ、詠唱が終わるまで毎秒溺れ続ける。潮縛りの侍祭を妨害するかスタンさせれば抜け出せる。',
+  'hudChrome.auraEffect.bastion.halberdWall':
+    '{radius}ヤード以内に別の溺れた見張り番がいる間、受けるダメージが{pct}%減少する。引き離せ。',
+  'hudChrome.auraEffect.bastion.fogShroud':
+    '霧の帳の中にいる間、受けるダメージが{pct}%減少する。霧の外へ引きずり出せ。',
+  'hudChrome.auraEffect.bastion.carrionGlut':
+    '死者を貪った（{stacks}）：スタックごとに塩水の破裂が{radius}ヤード広がり、{pct}%強くなる。',
+  'hudChrome.auraEffect.bastion.snappedFetters':
+    '鎖が断ち切られた。もう戦わず、傷つけられず、まもなく去っていく。',
+  'hudChrome.auraEffect.crypt.carrionEye':
+    '戦闘中のすべてのカラスが{seconds}秒間あなたを狙う。タンクのもとへ走り、群れをまとめて倒そう。',
+  'hudChrome.auraEffect.crypt.graniteSkin':
+    '受けるダメージが{pct}%減少し、石は{every}秒ごとに厚くなる。スタンで砕け散り、受けるダメージが{cracked}%増加する。',
   'hudChrome.bastionChain.shackledTitle': '{name} と枷で繋がれている',
   'hudChrome.bastionChain.shackledLine':
     '互いに {range} ヤード以内にいること（現在 {dist} ヤード）',

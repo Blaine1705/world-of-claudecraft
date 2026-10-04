@@ -20,6 +20,7 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
+import { CRYPT_RIMESILK_SPIT } from '../mob/trash_kit/cast_ids';
 import { SANCTUM_CINDER_BREATH } from '../mob/trash_kit/sanctum_cast_ids';
 import type {
   DungeonDef,
@@ -494,6 +495,24 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 8,
     aggroRadius: 13,
+    // Rimesilk Spit (the Hollow Crypt trash pass): a frost web spat down a
+    // lane at one player; whoever it catches is rooted 2 s, and beside the
+    // egg sacs that is the danger. 8 to 12 frost is a scratch; step aside.
+    trashKit: {
+      line: {
+        castId: CRYPT_RIMESILK_SPIT,
+        name: 'Rimesilk Spit',
+        castTime: 1.5,
+        every: 12,
+        first: 5,
+        school: 'frost',
+        length: 22,
+        halfWidth: 1.4,
+        min: 8,
+        max: 12,
+        root: 2,
+      },
+    },
     loot: [
       { copper: 120, chance: 1 },
       { itemId: 'spider_leg', chance: 0.7 },

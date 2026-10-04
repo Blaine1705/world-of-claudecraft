@@ -32,7 +32,8 @@ export function isPlantedCast(
     kit?.wingGust?.castId === castId ||
     kit?.tailLash?.castId === castId ||
     kit?.line?.castId === castId ||
-    kit?.toss?.castId === castId
+    kit?.toss?.castId === castId ||
+    kit?.hook?.castId === castId
   );
 }
 

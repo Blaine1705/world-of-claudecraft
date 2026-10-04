@@ -3925,7 +3925,16 @@ export const ko_KR: EnTranslations = {
         "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
       },
       "bastion": {
+        "brineColumn": "바닷물 기둥에 갇혀 정신 집중이 끝날 때까지 매초 익사합니다. 조수결속 수행사제를 차단하거나 기절시키면 풀려납니다.",
+        "halberdWall": "다른 익사한 파수꾼이 {radius}미터 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 둘을 떼어 놓으세요.",
+        "fogShroud": "안개 장막 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 안개 밖으로 끌어내세요.",
+        "carrionGlut": "시체를 먹었습니다({stacks}): 중첩마다 소금물 폭발 범위가 {radius}미터 넓어지고 {pct}% 강해집니다.",
+        "snappedFetters": "사슬이 끊어졌습니다. 더 이상 싸우지 않고, 피해를 입지 않으며, 곧 떠납니다.",
         "anchored": "익사의 닻에 묶임: 움직일 수는 있지만 권양기에서 더 멀어질 수는 없으며, 익사의 구덩이로 감겨 갑니다. 걸린 곳에서 {run}야드 이상 떨어진 불 켜진 계류 기둥 {reach}야드 이내로 가면 사슬을 묶을 수 있습니다(그 기둥은 {dark}초 동안 꺼집니다). 아니면 파티가 {links}번 공격해 사슬을 끊어야 합니다(영웅은 {linksHeroic}번). 구덩이에 빠지면 최대 생명력의 {pit}%를 잃습니다(영웅은 {pitHeroic}%)."
+      },
+      "crypt": {
+        "carrionEye": "전투 중인 모든 까마귀가 {seconds}초 동안 당신을 노립니다. 탱커에게 달려가 무리를 한꺼번에 처치하세요.",
+        "graniteSkin": "받는 피해가 {pct}% 감소하며, 돌이 {every}초마다 두꺼워집니다. 기절시키면 부서져 받는 피해가 {cracked}% 증가합니다."
       },
       "sanctum": {
         "lockbound": "받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.",
@@ -12508,6 +12517,10 @@ export const ko_KR: EnTranslations = {
       "crypt_barrowflame_breath": "무덤불꽃 숨결",
       "crypt_tail_lash": "꼬리 채찍",
       "crypt_wing_gust": "날개 돌풍",
+      "crypt_grave_rupture": "무덤 파열",
+      "crypt_carrion_eye": "썩은 고기의 눈",
+      "crypt_marrow_crush": "골수 분쇄",
+      "crypt_rimesilk_spit": "서리실 뱉기",
       "crypt_morthen_rite_wakes": "의식의 각성",
       "crypt_morthen_rise": "무덤부름의 승천",
       "crypt_morthen_proclaim": "무덤의 선포",
@@ -12522,6 +12535,9 @@ export const ko_KR: EnTranslations = {
       "bastion_piercing_bolt": "관통 화살",
       "bastion_claw_sweep": "집게 휩쓸기",
       "bastion_shell_slam": "껍질 내려찍기",
+      "bastion_boathook": "갈고리 끌기",
+      "bastion_fog_bank": "안개 장막",
+      "bastion_brine_column": "소금물 기둥",
       "bastion_oathbound_charge": "맹세의 돌진",
       "bastion_gaolers_cudgel": "간수의 곤봉",
       "bastion_mist_surge": "안개 해일",
@@ -20143,6 +20159,9 @@ export const ko_KR: EnTranslations = {
       },
       "crypt_bone_brute": {
         "name": "뼈 야수병"
+      },
+      "crypt_bone_pile": {
+        "name": "꿈틀거리는 뼈"
       },
       "crypt_chapel_gargoyle": {
         "name": "예배당 가고일"

@@ -32,8 +32,37 @@ import {
   type TrashKitState,
 } from '../../types';
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
+import {
+  dropUnlaidFog,
+  endBastionPull,
+  endColumn,
+  landFog,
+  landHook,
+  lockColumn,
+  lockFog,
+  pickColumnTarget,
+  pickFogTarget,
+  pickHookTarget,
+  stepBastionKit,
+  stepColumnChannel,
+  stepUnshackle,
+} from './bastion_kit';
 import { holdAreaCast } from './cast_hold';
-import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
+import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING, CRYPT_TORN_TENDON } from './cast_ids';
+import {
+  armReleap,
+  dropRupture,
+  endCryptPull,
+  faceRupture,
+  judgeReassemble,
+  landEye,
+  landRupture,
+  lockRupture,
+  pickEyeTarget,
+  pickRuptureCorpse,
+  stepBonePile,
+  stepCryptKit,
+} from './crypt_kit';
 import { stepDeathBurst } from './death_burst';
 import { callDownLastFlier } from './flier_call';
 import {
@@ -66,10 +95,15 @@ const CAST_KEYS = [
   'mend',
   'ward',
   'goad',
+  'rupture',
+  'eye',
+  'column',
+  'fogBank',
   'screech',
   'lullaby',
   'wingGust',
   'tailLash',
+  'hook',
   'line',
   'toss',
   'bolt',
@@ -79,7 +113,9 @@ type CastKey = (typeof CAST_KEYS)[number];
 /** Physical kit casts: a silence never breaks them and no school lockout
  *  stops them (dodge these, never kick them). */
 function isPhysicalKey(key: CastKey): boolean {
-  return key === 'tailLash' || key === 'wingGust' || key === 'line' || key === 'toss';
+  return (
+    key === 'tailLash' || key === 'wingGust' || key === 'line' || key === 'toss' || key === 'hook'
+  );
 }
 
 function isSupportKey(key: CastKey): key is SupportKey {
@@ -267,6 +303,26 @@ function castReady(
       const victim = pickTossTarget(players, mob, kit);
       return victim ? { ok: true, target: victim } : no;
     }
+    case 'rupture': {
+      const corpse = kit.rupture ? pickRuptureCorpse(ctx, inst, mob, kit.rupture.range) : null;
+      return corpse ? { ok: true, target: corpse } : no;
+    }
+    case 'eye': {
+      const victim = pickEyeTarget(ctx, inst, mob, kit, st, players);
+      return victim ? { ok: true, target: victim } : no;
+    }
+    case 'column': {
+      const victim = pickColumnTarget(mob, kit, st, players);
+      return victim ? { ok: true, target: victim } : no;
+    }
+    case 'fogBank': {
+      const foe = pickFogTarget(ctx, mob, kit, st);
+      return foe ? { ok: true, target: foe } : no;
+    }
+    case 'hook': {
+      const victim = pickHookTarget(players, mob, kit);
+      return victim ? { ok: true, target: victim } : no;
+    }
     case 'screech':
       return kit.screech && livingInReach(players, mob.pos, kit.screech.radius).length > 0
         ? { ok: true, target: null }
@@ -314,6 +370,21 @@ function landCast(
       return;
     case 'toss':
       landToss(ctx, inst, mob, kit, st, players);
+      return;
+    case 'rupture':
+      landRupture(ctx, inst, mob, kit, st, players);
+      return;
+    case 'eye':
+      landEye(ctx, inst, mob, kit, targetId);
+      return;
+    case 'column':
+      endColumn(ctx, mob, kit, st, true);
+      return;
+    case 'fogBank':
+      landFog(ctx, inst, mob, kit, st);
+      return;
+    case 'hook':
+      landHook(ctx, inst, mob, kit, st, players);
       return;
     case 'bolt': {
       const def = kit.bolt;
@@ -463,6 +534,10 @@ function stepCast(
     clearCast(mob, cast.castId);
     st.cast = null;
     if (key === 'toss') dropToss(ctx, inst, st);
+    if (key === 'rupture') dropRupture(ctx, inst, st);
+    if (key === 'column') endColumn(ctx, mob, kit, st, false);
+    if (key === 'fogBank') dropUnlaidFog(st);
+    if (key === 'hook') st.aim = undefined;
     return false;
   }
   mob.castRemaining = Math.max(0, mob.castRemaining - DT);
@@ -470,10 +545,12 @@ function stepCast(
   const target = cast.targetId !== null ? ctx.entities.get(cast.targetId) : undefined;
   // A lane holds the aim it locked at the start, a toss the spot it marked;
   // everything else tracks.
-  if (key === 'line') holdLineAim(mob, st);
+  if (key === 'line' || key === 'hook') holdLineAim(mob, st);
+  else if (key === 'rupture') faceRupture(mob, st);
   else if (key === 'toss' && st.toss)
     mob.facing = angleTo(mob.pos, { x: st.toss.x, y: 0, z: st.toss.z });
   else if (target && !target.dead) mob.facing = angleTo(mob.pos, target.pos);
+  if (key === 'column') stepColumnChannel(ctx, mob, kit, st);
   if (mob.castRemaining > 0) return true;
   clearCast(mob, cast.castId);
   st.cast = null;
@@ -510,9 +587,12 @@ function tryStartCast(
     mob.castRemaining = def.castTime;
     mob.castTargetId = target?.id ?? null;
     mob.channeling = key === 'raise';
-    if (key === 'line') lockLineAim(mob, st, target);
+    if (key === 'line' || key === 'hook') lockLineAim(mob, st, target);
     else if (target) mob.facing = angleTo(mob.pos, target.pos);
     if (key === 'toss') lockToss(ctx, inst, mob, kit, st, target);
+    if (key === 'rupture') lockRupture(ctx, inst, kit, st, target);
+    if (key === 'column') lockColumn(ctx, mob, kit, st, target);
+    if (key === 'fogBank') lockFog(st, target);
     holdAreaCast(ctx, mob, false);
     return;
   }
@@ -581,6 +661,20 @@ function stepLeap(
       school: 'physical',
     });
   }
+  // The Ossuary Cutthroat's Torn Tendon: the victim cannot run from it alone.
+  if (def.slow) {
+    ctx.applyAura(target, {
+      id: CRYPT_TORN_TENDON,
+      name: def.slow.name,
+      kind: 'slow',
+      remaining: def.slow.seconds,
+      duration: def.slow.seconds,
+      value: def.slow.mult,
+      sourceId: mob.id,
+      school: 'physical',
+    });
+  }
+  armReleap(kit, st, target);
   if (def.stun) {
     ctx.applyAura(target, {
       id: 'trash_kit_leap_stun',
@@ -656,6 +750,8 @@ function summonersOf(ctx: SimContext, inst: InstanceSlot, mob: Entity): Entity[]
  *  never land lifts its ring, then the kit state goes. */
 function endPull(ctx: SimContext, inst: InstanceSlot, mob: Entity): void {
   if (mob.trashKit) dropToss(ctx, inst, mob.trashKit);
+  endCryptPull(ctx, inst, mob);
+  endBastionPull(ctx, inst, mob, MOBS[mob.templateId]?.trashKit);
   endTrashKit(mob);
 }
 
@@ -667,8 +763,11 @@ function stepMob(
   kit: TrashKitDef | undefined,
   players: () => Entity[],
 ): void {
+  // A bone pile (crypt_kit.ts) never fights: it counts down or crumbles.
+  if (stepBonePile(ctx, inst, mob, kit)) return;
   if (mob.dead || mob.hp <= 0) {
     if (mob.trashKit) endPull(ctx, inst, mob);
+    if (kit?.reassemble) judgeReassemble(ctx, inst, mob, kit);
     if (kit?.deathBurst) stepDeathBurst(ctx, inst, mob, kit, players());
     if (kit?.deathCloud) stepDeathCloud(ctx, inst, mob, kit, players());
     return;
@@ -679,6 +778,8 @@ function stepMob(
   holdAreaCast(ctx, mob, DUNGEONS[inst.dungeonId]?.areaCastsPlant === true);
   // A mob with no kit came only for its breath cone's hold.
   if (!kit && mob.perchY === undefined) return;
+  // A freed prisoner (bastion_kit.ts) kneels out of the fight, then leaves.
+  if (stepUnshackle(ctx, inst, mob, kit)) return;
   const engaged =
     mob.inCombat &&
     mob.aggroTargetId !== null &&
@@ -708,6 +809,9 @@ function stepMob(
   stepCarapace(ctx, mob, kit, st);
   const list = players();
   if (kit.detonate && stepDetonate(ctx, mob, kit, list, summonersOf(ctx, inst, mob))) return;
+  stepCryptKit(ctx, inst, mob, kit, st, list);
+  // A leap back in flight owns the mob's position (bastion_kit.ts).
+  if (stepBastionKit(ctx, inst, mob, kit, st, list)) return;
   if (stepCast(ctx, inst, mob, kit, st, list)) return;
   if (stepLeap(ctx, mob, kit, st, list)) return;
   tryStartCast(ctx, inst, mob, kit, st, list);

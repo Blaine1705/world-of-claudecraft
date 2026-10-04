@@ -18,9 +18,43 @@ export const BASTION_CLAW_SWEEP = 'bastion_claw_sweep';
 /** The Turretback Hermit: its tower-shell slammed down round it (trashKit.wingGust). */
 export const BASTION_SHELL_SLAM = 'bastion_shell_slam';
 
+// The trash mechanics pass (bastion_kit.ts): a second readable job per type.
+/** Drowned Watchman: a telegraphed hook down a lane; whoever it catches is
+ *  dragged to the watchman's feet (trashKit.hook). Physical: step aside. */
+export const BASTION_BOATHOOK = 'bastion_boathook';
+/** Drowned Watchman (heroic): the ward two watchmen side by side share. */
+export const BASTION_HALBERD_WALL = 'bastion_halberd_wall';
+/** Fogbound Arbalest: the cue as it leaps back from a melee (trashKit.fallBack). */
+export const BASTION_FALL_BACK = 'bastion_fall_back';
+/** Barnacle Crawler: the corpse-feeding stacks (trashKit.gorge). */
+export const BASTION_CARRION_GLUT = 'bastion_carrion_glut';
+/** Barnacle Crawler: its Brine Burst where it fell (trashKit.deathBurst). */
+export const BASTION_BRINE_BURST = 'bastion_brine_burst';
+/** Mist Chanter (id mistweaver): an interruptible cast that lays a fog patch
+ *  under the tank; its allies inside take less damage (trashKit.fogBank). */
+export const BASTION_FOG_BANK = 'bastion_fog_bank';
+/** The damage ward a Fog Bank lays on the allies standing in it. */
+export const BASTION_FOG_SHROUD = 'bastion_fog_shroud';
+/** Tidebound Acolyte: an interruptible channel that roots one player in a
+ *  column of sea water and drowns them while it runs (trashKit.column). Also
+ *  the root's aura id. */
+export const BASTION_BRINE_COLUMN = 'bastion_brine_column';
+/** Shackled Prisoner: its chains break low on health and it stops fighting
+ *  (trashKit.unshackle): the aura and the break cue. */
+export const BASTION_SNAPPED_FETTERS = 'bastion_snapped_fetters';
+/** The cue as a freed prisoner fades from the fight. */
+export const BASTION_FETTERS_RELEASE = 'bastion_fetters_release';
+/** Object templates the Bastion trash kit lays on the floor (the renderer
+ *  draws them itself): the Fog Bank's patch. */
+export const BASTION_FOG_BANK_CLOUD = 'bastion_fog_bank_cloud';
+export const BASTION_TRASH_OBJECT_TEMPLATES: readonly string[] = [BASTION_FOG_BANK_CLOUD];
+
 /** The Bastion trash casts a player interrupt can lock out, by school. The
- *  sweeps, the slam and the Piercing Bolt are absent on purpose: dodge those. */
+ *  sweeps, the slam, the Piercing Bolt and the hook are absent on purpose:
+ *  dodge those. */
 export const BASTION_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> = {
   [BASTION_BRINE_MEND]: { school: 'nature' },
   [BASTION_FOG_WARD]: { school: 'frost' },
+  [BASTION_FOG_BANK]: { school: 'frost' },
+  [BASTION_BRINE_COLUMN]: { school: 'nature' },
 };

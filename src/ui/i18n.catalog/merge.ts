@@ -586,6 +586,12 @@ const mergeStringsEn = {
       crypt_barrowflame_breath: 'Barrowflame Breath',
       crypt_tail_lash: 'Tail Lash',
       crypt_wing_gust: 'Wing Gust',
+      // The crypt trash mechanics pass (trash_kit/crypt_kit.ts): the rupture and
+      // the eye can be kicked; the crush and the web are dodged.
+      crypt_grave_rupture: 'Grave Rupture',
+      crypt_carrion_eye: 'Carrion Eye',
+      crypt_marrow_crush: 'Marrow Crush',
+      crypt_rimesilk_spit: 'Rimesilk Spit',
       // The Hollow Crypt finale (encounters/hollow_crypt/ids.ts): Morthen's
       // entrance at the Rite Ring and the Knellwyrm. None can be kicked.
       crypt_morthen_rite_wakes: 'The Rite Wakes',
@@ -604,6 +610,11 @@ const mergeStringsEn = {
       bastion_piercing_bolt: 'Piercing Bolt',
       bastion_claw_sweep: 'Claw Sweep',
       bastion_shell_slam: 'Shell Slam',
+      // The Bastion trash mechanics pass (trash_kit/bastion_kit.ts): the fog and
+      // the column can be kicked; the hook is dodged.
+      bastion_boathook: 'Boathook Drag',
+      bastion_fog_bank: 'Fog Bank',
+      bastion_brine_column: 'Brine Column',
       bastion_oathbound_charge: 'Oathbound Charge',
       bastion_gaolers_cudgel: "Gaoler's Cudgel",
       bastion_mist_surge: 'Mist Surge',

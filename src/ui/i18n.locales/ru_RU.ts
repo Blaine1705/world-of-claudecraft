@@ -20101,12 +20101,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_barrowflame_breath': 'Дыхание курганного пламени',
   'abilityUi.cast.crypt_tail_lash': 'Удар хвостом',
   'abilityUi.cast.crypt_wing_gust': 'Порыв крыльев',
+  'abilityUi.cast.crypt_grave_rupture': 'Разрыв могилы',
+  'abilityUi.cast.crypt_carrion_eye': 'Око падальщика',
+  'abilityUi.cast.crypt_marrow_crush': 'Костодробящий удар',
+  'abilityUi.cast.crypt_rimesilk_spit': 'Плевок инейным шёлком',
   'abilityUi.cast.bastion_brine_mend': 'Целительный рассол',
   'abilityUi.cast.bastion_fog_ward': 'Туманный оберег',
   'abilityUi.cast.bastion_halberd_sweep': 'Размах алебарды',
   'abilityUi.cast.bastion_piercing_bolt': 'Пронзающий болт',
   'abilityUi.cast.bastion_claw_sweep': 'Взмах клешни',
   'abilityUi.cast.bastion_shell_slam': 'Удар панцирем',
+  'abilityUi.cast.bastion_boathook': 'Рывок багром',
+  'abilityUi.cast.bastion_fog_bank': 'Полоса тумана',
+  'abilityUi.cast.bastion_brine_column': 'Столб рассола',
   'abilityUi.cast.bastion_oathbound_charge': 'Клятвенный натиск',
   'abilityUi.cast.bastion_gaolers_cudgel': 'Дубинка тюремщика',
   'abilityUi.cast.bastion_mist_surge': 'Туманный прилив',
@@ -20148,6 +20155,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.crypt_gravecaller_necromancer.name': 'Некромант Могильного Зова',
   'entities.mobs.crypt_bone_minion.name': 'Костяной прислужник',
   'entities.mobs.crypt_bone_brute.name': 'Костяной громила',
+  'entities.mobs.crypt_bone_pile.name': 'Шевелящиеся кости',
   'entities.mobs.crypt_chapel_gargoyle.name': 'Часовенная горгулья',
   'entities.mobs.crypt_crow_caller.name': 'Зовущий воронов',
   'entities.mobs.crypt_carrion_crow.name': 'Ворон-падальщик',
@@ -20216,6 +20224,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '{name} тащат к яме: бейте Утопленный якорь или помогите добежать до горящего столба',
   'hudChrome.auraEffect.bastion.anchored':
     'Прикованы к Утопленному якорю: двигаться можно, но не дальше от лебёдки, которая подтягивает вас к яме. Подойдите на {reach} ярда к горящему швартовому столбу не ближе {run} ярдов от места, где вас зацепило, чтобы пришвартовать цепь (этот столб гаснет на {dark} сек.), или пусть группа разобьёт её за {links} ударов ({linksHeroic} в героическом режиме). Яма отнимает {pit}% максимального здоровья ({pitHeroic}% в героическом режиме).',
+  'hudChrome.auraEffect.bastion.brineColumn':
+    'Вас сковал столб морской воды: вы тонете каждую секунду, пока длится поддержание. Прервите или оглушите Приливного послушника, чтобы освободиться.',
+  'hudChrome.auraEffect.bastion.halberdWall':
+    'Получает на {pct}% меньше урона, пока в пределах {radius} ярд. стоит другой Утонувший дозорный. Разведите их.',
+  'hudChrome.auraEffect.bastion.fogShroud':
+    'Получает на {pct}% меньше урона, пока стоит в полосе тумана. Вытащите его из тумана.',
+  'hudChrome.auraEffect.bastion.carrionGlut':
+    'Насытился мертвецами ({stacks}): каждый заряд делает его взрыв рассола на {radius} ярд. шире и на {pct}% сильнее.',
+  'hudChrome.auraEffect.bastion.snappedFetters':
+    'Его цепи разорваны. Он больше не сражается, неуязвим и скоро уйдёт.',
+  'hudChrome.auraEffect.crypt.carrionEye':
+    'Все вороны в бою охотятся на вас {seconds} сек. Бегите к танку, чтобы стаю можно было убить разом.',
+  'hudChrome.auraEffect.crypt.graniteSkin':
+    'Получает на {pct}% меньше урона, и камень утолщается каждые {every} сек. Оглушение раскалывает его, и цель получает на {cracked}% больше урона.',
   'hudChrome.bastionChain.shackledTitle': 'Скован с {name}',
   'hudChrome.bastionChain.shackledLine':
     'Держитесь в пределах {range} ярдов друг от друга (сейчас {dist} ярдов)',

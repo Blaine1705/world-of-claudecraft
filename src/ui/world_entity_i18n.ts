@@ -90,6 +90,8 @@ const MOB_IDS = [
   'crypt_gravecaller_necromancer',
   'crypt_bone_minion',
   'crypt_bone_brute',
+  // Reassemble's bones (the crypt trash mechanics pass, trash_kit/crypt_kit.ts).
+  'crypt_bone_pile',
   'crypt_chapel_gargoyle',
   'crypt_crow_caller',
   'crypt_carrion_crow',
