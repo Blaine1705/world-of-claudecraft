@@ -29,6 +29,7 @@ import {
   MOBS,
   NPCS,
 } from '../data';
+import { tickDungeonGuides } from '../dungeon_guide';
 import { tickTempleEncounters } from '../encounters/drowned_temple';
 import { tickSanctumEncounters } from '../encounters/gravewyrm_sanctum';
 import { tickCryptEncounters } from '../encounters/hollow_crypt';
@@ -1511,6 +1512,9 @@ export function updateInstances(ctx: SimContext): void {
   // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
   // and the Knellwyrm, same slot.
   tickCryptEncounters(ctx);
+  // The optional lore guides (dungeon_guide): after every encounter, so a boss
+  // pulled or killed this tick already reads as such. Draws no shared rng.
+  tickDungeonGuides(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

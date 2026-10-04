@@ -1706,7 +1706,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED to 9803 by the Drowned Temple lore guide: the nine Dungeon
+    // Finder command bodies moved whole to server/dungeon_finder_commands.ts
+    // (the farming_commands.ts precedent), buying the guide's answer case and
+    // its `gds` wire field (measured).
+    ceiling: 9803,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1888,7 +1892,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5356 -> 5355 with the Hollow Crypt rework: the snapshot-head
     // syncs (telegraphs, ferry gates, and the new dungeon gate mirror) moved
     // into src/net/snapshot_head_syncs.ts. wc -l. Exact count.
-    ceiling: 5355,
+    // LOWERED to 5347 by the Drowned Temple lore guide: the show-jumping
+    // race's countdown projection moved whole to mount_race_wire.ts
+    // (mountRaceViewAt), buying the guide's answer send and its `gds` decode
+    // (measured).
+    ceiling: 5347,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
