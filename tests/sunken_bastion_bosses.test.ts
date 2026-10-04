@@ -4,23 +4,12 @@
 // real party, the trash cleared so nothing else joins the fight.
 
 import { describe, expect, it } from 'vitest';
-import { BASTION_BUTTRESSES, BREACH_BASTION } from '../src/sim/content/sunken_bastion_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
-  BUTTRESS_TEMPLATES,
   CROWN,
   FOG_SHADE_ID,
   inBeam,
-  OLEN_BREACHED,
-  OLEN_BREACHED_VULN,
   OLEN_ID,
-  OLEN_OATHBOUND_CHARGE,
-  OLEN_TUNING,
-  OLEN_UNBROKEN_OATH,
-  OLEN_UNDERTOW,
-  oathLaneEnd,
-  pickChargeTarget,
-  UNDERTOW_TEMPLATE,
   VAEL_DROWNING_HYMN,
   VAEL_EXPOSED,
   VAEL_FOG_VEIL,
@@ -107,7 +96,7 @@ function engage(f: Fight, b: Entity): void {
   f.sim.ctx.aggroMob(b, f.tank, false);
 }
 
-function objectAt(f: Fight, x: number, z: number): Entity | undefined {
+function _objectAt(f: Fight, x: number, z: number): Entity | undefined {
   for (const id of f.inst.objectIds) {
     const e = f.sim.ctx.entities.get(id);
     if (e && Math.abs(e.pos.x - f.ox - x) < 0.75 && Math.abs(e.pos.z - f.oz - z) < 0.75) return e;
@@ -120,183 +109,9 @@ function earned(f: Fight, e: Entity, deed: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-describe('Knight-Commander Olen: bait the Oathbound Charge into a buttress', () => {
-  it('stops the lane at the first standing buttress, else at the rim', () => {
-    const all = new Set(BASTION_BUTTRESSES.map((b) => b.id));
-    // Straight north from the centre: the north buttress.
-    const n = oathLaneEnd(BREACH_BASTION.x, BREACH_BASTION.z, 0, all);
-    expect(n.buttress).toBe('n');
-    expect(n.length).toBeLessThan(BREACH_BASTION.r - 2);
-    // The same lane with the north buttress broken: the open rim.
-    const open = oathLaneEnd(BREACH_BASTION.x, BREACH_BASTION.z, 0, new Set(['nw', 'ne', 'e']));
-    expect(open.buttress).toBeNull();
-    expect(open.length).toBeCloseTo(BREACH_BASTION.r - 1, 3);
-    // West has no buttress at all.
-    expect(oathLaneEnd(BREACH_BASTION.x, BREACH_BASTION.z, -Math.PI / 2, all).buttress).toBeNull();
-  });
+// Knight-Commander Olen, the fallen paladin: tests/sunken_bastion_olen.test.ts.
 
-  it('marks the farthest non-tank player, never the tank while anyone else stands', () => {
-    const f = fight();
-    const olen = boss(f, OLEN_ID);
-    put(f, olen, 57, 130);
-    put(f, f.others[0], 57, 140);
-    put(f, f.others[1], 57, 118);
-    put(f, f.tank, 57, 110);
-    olen.aggroTargetId = f.tank.id;
-    // others[1] stands 12 yd off, others[0] 10: the farther one is marked,
-    // though the tank stands farther still.
-    const pick = pickChargeTarget(olen, [f.tank, ...f.others]);
-    expect(pick?.id).toBe(f.others[1].id);
-    expect(pickChargeTarget(olen, [f.tank])?.id).toBe(f.tank.id);
-  });
-
-  it('a crash into a buttress breaches him and cracks it; the second crash breaks it', () => {
-    const f = fight();
-    const olen = boss(f, OLEN_ID);
-    put(f, olen, 57, 128);
-    put(f, f.tank, 57, 125);
-    // The bait stands before the north buttress.
-    const bait = f.others[0];
-    const hold = () => {
-      put(f, bait, 57, 144);
-      put(f, f.others[1], 62, 124);
-    };
-    hold();
-    engage(f, olen);
-    run(f, OLEN_TUNING.chargeFirst + DT * 2, hold);
-    expect(olen.castingAbility).toBe(OLEN_OATHBOUND_CHARGE);
-    expect(olen.castTargetId).toBe(bait.id);
-    run(f, OLEN_TUNING.chargeCast + OLEN_TUNING.dashSeconds + 0.2, hold);
-    expect(olen.auras.some((a) => a.id === OLEN_BREACHED && a.kind === 'stun')).toBe(true);
-    expect(olen.auras.find((a) => a.id === OLEN_BREACHED_VULN)?.value).toBe(0.3);
-    const north = BASTION_BUTTRESSES.find((b) => b.id === 'n');
-    if (!north) throw new Error('north');
-    expect(objectAt(f, north.x, north.z)?.templateId).toBe(BUTTRESS_TEMPLATES.cracked);
-    // Walk him back and bait the same buttress again.
-    const st = olen.bastionFight;
-    if (st?.kind !== 'olen') throw new Error('fight');
-    run(f, OLEN_TUNING.breachedStun + 0.2, hold);
-    put(f, olen, 57, 128);
-    st.chargeTimer = 0;
-    run(f, OLEN_TUNING.chargeCast + OLEN_TUNING.dashSeconds + 0.4, () => {
-      hold();
-    });
-    expect(objectAt(f, north.x, north.z)?.templateId).toBe(BUTTRESS_TEMPLATES.broken);
-    expect(st.everOath).toBe(false);
-  });
-
-  it('a lane to the open rim grants Unbroken Oath, stacking damage done', () => {
-    const f = fight();
-    const olen = boss(f, OLEN_ID);
-    put(f, olen, 57, 128);
-    put(f, f.tank, 60, 128);
-    const hold = () => {
-      put(f, f.others[0], 39, 128);
-      put(f, f.others[1], 58, 126);
-    };
-    hold();
-    engage(f, olen);
-    run(f, OLEN_TUNING.chargeFirst + OLEN_TUNING.chargeCast + OLEN_TUNING.dashSeconds + 0.3, hold);
-    const oath = olen.auras.find((a) => a.id === OLEN_UNBROKEN_OATH);
-    expect(oath?.kind).toBe('buff_dmg_done');
-    expect(oath?.value).toBeCloseTo(0.1, 6);
-    const st = olen.bastionFight;
-    expect(st?.kind === 'olen' && st.everOath).toBe(true);
-  });
-
-  it('strikes and throws aside everyone in the lane, and nobody outside it', () => {
-    const f = fight();
-    const olen = boss(f, OLEN_ID);
-    put(f, olen, 57, 128);
-    put(f, f.tank, 57, 124);
-    const inLane = f.others[0];
-    const aside = f.others[1];
-    const hold = () => {
-      put(f, aside, 66, 128);
-    };
-    put(f, inLane, 57, 142);
-    hold();
-    engage(f, olen);
-    run(f, OLEN_TUNING.chargeFirst + OLEN_TUNING.chargeCast - 0.1, hold);
-    const before = inLane.hp;
-    const asideBefore = aside.hp;
-    const at = { ...inLane.pos };
-    f.sim.ctx.entities.get(inLane.id);
-    run(f, 0.3, hold);
-    expect(before - inLane.hp).toBeGreaterThanOrEqual(OLEN_TUNING.min);
-    expect(aside.hp).toBe(asideBefore);
-    expect(Math.hypot(inLane.pos.x - at.x, inLane.pos.z - at.z)).toBeGreaterThan(2);
-  });
-
-  it('heroic: a buttress breaks on its first crash, and the lane floods behind him', () => {
-    const f = fight('heroic');
-    const olen = boss(f, OLEN_ID);
-    put(f, olen, 57, 128);
-    put(f, f.tank, 57, 125);
-    const bait = f.others[0];
-    const wader = f.others[1];
-    put(f, bait, 57, 144);
-    put(f, wader, 62, 124);
-    engage(f, olen);
-    run(f, OLEN_TUNING.chargeFirst + OLEN_TUNING.chargeCast + OLEN_TUNING.dashSeconds + 0.3, () =>
-      put(f, bait, 57, 144),
-    );
-    const north = BASTION_BUTTRESSES.find((b) => b.id === 'n');
-    if (!north) throw new Error('north');
-    expect(objectAt(f, north.x, north.z)?.templateId).toBe(BUTTRESS_TEMPLATES.broken);
-    const wake = f.inst.objectIds
-      .map((id) => f.sim.ctx.entities.get(id))
-      .find((e) => e?.templateId === UNDERTOW_TEMPLATE);
-    expect(wake).toBeDefined();
-    // A player standing in the flooded lane is chilled and slowed.
-    put(f, wader, 57, 134);
-    const before = wader.hp;
-    run(f, 1.2, () => put(f, wader, 57, 134));
-    expect(wader.hp).toBeLessThan(before);
-    expect(wader.auras.some((a) => a.id === OLEN_UNDERTOW && a.kind === 'slow')).toBe(true);
-    run(f, OLEN_TUNING.wakeSeconds);
-    expect(
-      f.inst.objectIds.some((id) => f.sim.ctx.entities.get(id)?.templateId === UNDERTOW_TEMPLATE),
-    ).toBe(false);
-  });
-
-  it('a wipe stands every buttress back up and clears his oath', () => {
-    const f = fight();
-    const olen = boss(f, OLEN_ID);
-    put(f, olen, 57, 128);
-    put(f, f.tank, 57, 125);
-    const hold = () => {
-      put(f, f.others[0], 57, 144);
-      put(f, f.others[1], 62, 124);
-    };
-    hold();
-    engage(f, olen);
-    run(f, OLEN_TUNING.chargeFirst + OLEN_TUNING.chargeCast + OLEN_TUNING.dashSeconds + 0.3, hold);
-    const north = BASTION_BUTTRESSES.find((b) => b.id === 'n');
-    if (!north) throw new Error('north');
-    expect(objectAt(f, north.x, north.z)?.templateId).toBe(BUTTRESS_TEMPLATES.cracked);
-    // Everyone dies: the fight resets.
-    olen.inCombat = false;
-    olen.aggroTargetId = null;
-    olen.aiState = 'evade';
-    run(f, DT * 2);
-    expect(objectAt(f, north.x, north.z)?.templateId).toBe(BUTTRESS_TEMPLATES.intact);
-    expect(olen.bastionFight).toBeUndefined();
-  });
-
-  it('killing him without an oath earns Hold the Wall', () => {
-    const f = fight();
-    const olen = boss(f, OLEN_ID);
-    put(f, olen, 57, 128);
-    put(f, f.tank, 57, 125);
-    engage(f, olen);
-    run(f, 1);
-    f.sim.ctx.handleDeath(olen, f.tank);
-    run(f, DT * 2);
-    expect(earned(f, f.tank, 'dgn_olen_buttress')).toBe(true);
-  });
-});
-
+// ---------------------------------------------------------------------------
 // Gaoler Ossick's Drowned Anchor and Shackle Pair, the Gaol Turnkey's Iron
 // Cage and Vael's Shadowstep: tests/sunken_bastion_pass5.test.ts.
 

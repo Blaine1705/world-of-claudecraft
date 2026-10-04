@@ -29,7 +29,11 @@ export interface Fight {
 
 const KEEP = new Set([TURNKEY_ID, OSSICK_ID, VAEL_ID]);
 
-export function fight(difficulty: 'normal' | 'heroic' = 'normal', extra = 3): Fight {
+export function fight(
+  difficulty: 'normal' | 'heroic' = 'normal',
+  extra = 3,
+  keep: ReadonlySet<string> = KEEP,
+): Fight {
   const sim = new Sim({ seed: 23, playerClass: 'warrior', autoEquip: false, devCommands: true });
   const tank = sim.player;
   sim.chat('/dev level 20', tank.id);
@@ -46,7 +50,7 @@ export function fight(difficulty: 'normal' | 'heroic' = 'normal', extra = 3): Fi
   if (!inst) throw new Error('no bastion claim');
   for (const id of inst.mobIds) {
     const e = sim.ctx.entities.get(id);
-    if (e && !e.dead && !KEEP.has(e.templateId)) sim.ctx.handleDeath(e, tank);
+    if (e && !e.dead && !keep.has(e.templateId)) sim.ctx.handleDeath(e, tank);
   }
   const others = ids.map((pid) => sim.ctx.entities.get(pid) as Entity);
   for (const p of [tank, ...others]) {

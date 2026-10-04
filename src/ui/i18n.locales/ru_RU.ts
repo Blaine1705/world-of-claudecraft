@@ -20162,6 +20162,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_veil_gather': 'Сгущение тумана',
   'abilityUi.cast.bastion_vael_rise': 'Смерть восстаёт',
   'abilityUi.cast.bastion_vael_sink': 'В туман',
+  'abilityUi.cast.bastion_hallowed_brine': 'Освящённый рассол',
+  'abilityUi.cast.bastion_rebounding_bulwark': 'Отскакивающий щит',
+  'abilityUi.cast.bastion_tide_sentence': 'Приговор прилива',
+  'abilityUi.cast.bastion_oath_kneel': 'Нерушимая клятва',
+  'abilityUi.cast.bastion_oath_vigil': 'Нерушимая клятва',
   'entities.mobs.bastion_gaol_cage.name': 'Железная клетка',
   'entities.mobs.bastion_drowned_anchor.name': 'Утопленный якорь',
   'entities.items.jailers_iron_gauntlets.name': 'Железные рукавицы тюремщика',
@@ -20173,6 +20178,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Утопленный якорь (разбейте цепь, пока жертву не утащило в яму)',
   'hudChrome.finder.mech.shackle_pair':
     'Парные кандалы (двое скованных игроков должны держаться вместе)',
+  'hudChrome.finder.mech.hallowed_brine':
+    'Освящённый рассол (лужа тёмной святой воды под ним: вытащите его из неё, она защищает его и жжёт вас)',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    'Отскакивающий щит (щит отскакивает к любому в 10 метрах от последнего поражённого: рассредоточьтесь)',
+  'hudChrome.finder.mech.tide_sentence':
+    'Приговор прилива (через 5 секунд столп света падает на отмеченного игрока: примите его вдали от группы)',
+  'hudChrome.finder.mech.unbroken_oath':
+    'Нерушимая клятва (на половине здоровья он преклоняет колено в пузыре: убейте его солдат, чтобы разбить его)',
+  'hudChrome.finder.mech.fog_veil':
+    'Туманная завеса (четыре фигуры, одна настоящая: в луче маяка фонарь настоящего Ваэля вспыхивает)',
   'hudChrome.finder.mech.reaper_behind':
     'Переход сквозь тень (трижды подряд жнец встаёт за спиной разных игроков, выйдите из дуги косы)',
   'hudChrome.bastionCage.title': 'Вы заперты в железной клетке!',

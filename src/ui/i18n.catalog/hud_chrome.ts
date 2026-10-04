@@ -8759,6 +8759,16 @@ export const hudChromeStrings = {
     mech: {
       shadow_pulse: 'Shadow Pulse (pulsing area damage)',
       reaping_arc: 'Reaping Arc (frontal cleave)',
+      hallowed_brine:
+        'Hallowed Brine (a pool of dark holy water under him: drag him out of it, it shields him and burns you)',
+      rebounding_bulwark:
+        'Rebounding Bulwark (his shield rebounds to anyone within 10 yards of the last player hit: spread out)',
+      tide_sentence:
+        'Sentence of the Tide (a column of light falls on the marked player 5 seconds later: take it away from the group)',
+      unbroken_oath:
+        'Unbroken Oath (at half health he kneels in a bubble: kill his soldiers to break it)',
+      fog_veil:
+        "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
       mist_surge: 'Mist Surge (pulsing area damage)',
       summons_adds: 'Summons reinforcements',
       lunar_tide: 'Lunar Tide (pulsing area damage)',

@@ -3605,7 +3605,7 @@ export const DEEDS: Record<string, DeedDef> = {
   dgn_olen_buttress: {
     id: 'dgn_olen_buttress',
     name: 'Hold the Wall',
-    desc: 'Defeat Knight-Commander Olen without him ever gaining Unbroken Oath.',
+    desc: 'Defeat Knight-Commander Olen without his Rebounding Bulwark ever striking a second player.',
     category: 'dungeon',
     renown: 10,
     trigger: { kind: 'manual' },

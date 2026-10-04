@@ -19795,6 +19795,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_veil_gather': '集う霧',
   'abilityUi.cast.bastion_vael_rise': '死が昇る',
   'abilityUi.cast.bastion_vael_sink': '霧の中へ',
+  'abilityUi.cast.bastion_hallowed_brine': '聖なる潮水',
+  'abilityUi.cast.bastion_rebounding_bulwark': '跳ね返る大盾',
+  'abilityUi.cast.bastion_tide_sentence': '潮の宣告',
+  'abilityUi.cast.bastion_oath_kneel': '不壊の誓い',
+  'abilityUi.cast.bastion_oath_vigil': '不壊の誓い',
   'entities.mobs.bastion_gaol_cage.name': '鉄の檻',
   'entities.mobs.bastion_drowned_anchor.name': '溺死の錨',
   'entities.items.jailers_iron_gauntlets.name': '看守の鉄篭手',
@@ -19804,6 +19809,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）',
   'hudChrome.finder.mech.drowned_anchor': '溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）',
   'hudChrome.finder.mech.shackle_pair': '連鎖の枷（鎖でつながれた二人は離れずに動く）',
+  'hudChrome.finder.mech.hallowed_brine':
+    '聖なる潮水（足元に暗い聖水の溜まりができる：彼を外へ引きずり出せ、彼を守りあなたを焼く）',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    '跳ね返る大盾（盾は最後に当たったプレイヤーから10ヤード以内の者へ跳ね返る：散開せよ）',
+  'hudChrome.finder.mech.tide_sentence':
+    '潮の宣告（5秒後、印を付けられたプレイヤーに光の柱が落ちる：集団から離れて受けよ）',
+  'hudChrome.finder.mech.unbroken_oath':
+    '不壊の誓い（体力が半分になると泡の中で跪く：兵士を倒して泡を破れ）',
+  'hudChrome.finder.mech.fog_veil':
+    '霧のヴェール（四つの姿、本物は一つ：灯台の光線で本物のヴァエルのランタンが燃え上がる）',
   'hudChrome.finder.mech.reaper_behind':
     '影渡り（死神は三度続けて別々のプレイヤーの背後に現れる、大鎌の弧から出る）',
   'hudChrome.bastionCage.title': '鉄の檻に閉じ込められた！',

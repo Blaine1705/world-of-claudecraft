@@ -4335,33 +4335,33 @@ export interface TrashKitState {
  *  on the boss entity; cleared when the fight ends (a kill, an evade, a wipe). */
 export interface OlenFightState {
   kind: 'olen';
-  /** Seconds until the next Oathbound Charge is marked. */
-  chargeTimer: number;
-  /** The marked lane while the bar runs: its start, locked yaw, length, and the
-   *  buttress it ends in (null: the open rim). */
-  lane: { x: number; z: number; yaw: number; length: number; buttress: string | null } | null;
-  /** The charge in flight: where it set off and how far along it is. */
-  dash: {
-    x: number;
-    z: number;
-    yaw: number;
-    length: number;
-    buttress: string | null;
-    t: number;
-  } | null;
-  /** Unbroken Oath stacks gained this fight (the deed reads `everOath`). */
-  oath: number;
-  everOath: boolean;
-  /** Heroic Undertow Wake: flooded lanes still standing (their object ids). */
-  wakes: {
-    x: number;
-    z: number;
-    yaw: number;
-    length: number;
-    remaining: number;
-    tick: number;
-    objectId: number;
-  }[];
+  /** Seconds until the next Hallowed Brine, Rebounding Bulwark, Sentence. */
+  brineTimer: number;
+  bulwarkTimer: number;
+  sentenceTimer: number;
+  /** Mechanic casts started (the deterministic victim hash salt). */
+  casts: number;
+  /** The bar running (his own cast: which, and on whom), else null. */
+  bar: { what: 'brine' | 'bulwark' | 'sentence'; targetId: number; x: number; z: number } | null;
+  /** Pools of Hallowed Brine still standing (instance-local, object ids). */
+  pools: { objectId: number; x: number; z: number; radius: number; remaining: number }[];
+  /** Seconds to the next brine damage pulse (one a second, all pools). */
+  brineTick: number;
+  /** The shield in flight: who it strikes in order, the leg it flies (from
+   *  the body at `hop - 1`, Olen for the first, to the body at `hop`), the
+   *  leg's clock, and whether it is flying home to him. */
+  bulwark: { chain: number[]; hop: number; t: number; home: boolean } | null;
+  /** The marked player and the seconds before the Sentence falls on them. */
+  sentence: { markId: number; remaining: number } | null;
+  /** The Unbroken Oath: not yet, kneeling, keeping the vigil in the bubble,
+   *  or done this fight; its clock and his soldiers' ids. */
+  oath: 'none' | 'kneel' | 'vigil' | 'done';
+  oathT: number;
+  soldierIds: number[];
+  /** Where he knelt (instance-local): the vigil holds him there. */
+  oathSpot: { x: number; z: number } | null;
+  /** The Bulwark rebounded onto a second player this fight (the deed reads it). */
+  rebounded: boolean;
 }
 
 export interface OssickFightState {

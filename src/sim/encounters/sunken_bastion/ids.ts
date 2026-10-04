@@ -29,6 +29,17 @@ export const SHACKLED_PRISONER_ID = 'shackled_prisoner';
 
 // ---- cast ids (real cast bars on the bosses) -------------------------------------
 export const OLEN_OATHBOUND_CHARGE = 'bastion_oathbound_charge';
+/** Olen, the fallen paladin (olen.ts): he drives his sword into the flags and
+ *  the Hallowed Brine wells up round him. */
+export const OLEN_HALLOWED_BRINE = 'bastion_hallowed_brine';
+/** He hurls his kite shield: it rebounds from player to player. */
+export const OLEN_REBOUNDING_BULWARK = 'bastion_rebounding_bulwark';
+/** He points his sword at a player: the Sentence of the Tide falls on them. */
+export const OLEN_TIDE_SENTENCE = 'bastion_tide_sentence';
+/** At half health he kneels and plants his sword (the bar) ... */
+export const OLEN_OATH_KNEEL = 'bastion_oath_kneel';
+/** ... and keeps his vigil in the water bubble until his soldiers fall. */
+export const OLEN_OATH_VIGIL = 'bastion_oath_vigil';
 export const OSSICK_ANCHOR = 'bastion_drowned_anchor_cast';
 export const OSSICK_SHACKLE = 'bastion_shackle_pair';
 export const OSSICK_CUDGEL = 'bastion_gaolers_cudgel';
@@ -55,6 +66,13 @@ export const OLEN_BREACHED = 'bastion_breached';
 export const OLEN_BREACHED_VULN = 'bastion_breached_vuln';
 export const OLEN_UNBROKEN_OATH = 'bastion_unbroken_oath';
 export const OLEN_UNDERTOW = 'bastion_undertow_wake';
+/** Olen standing in his own Hallowed Brine: it shields him (the tank drags
+ *  him out of it). */
+export const OLEN_BRINE_HALLOWED = 'bastion_brine_hallowed';
+/** On a player standing in the Hallowed Brine. */
+export const OLEN_IN_BRINE = 'bastion_in_brine';
+/** On the player the Sentence of the Tide will fall on. */
+export const OLEN_SENTENCED = 'bastion_sentenced';
 export const OSSICK_ANCHOR_MARK = 'bastion_anchor_mark';
 /** Hooked by the Drowned Anchor. Its `sourceId` is the ANCHOR's entity id. */
 export const OSSICK_ANCHORED = 'bastion_anchored';
@@ -94,6 +112,8 @@ export const BUTTRESS_TEMPLATES = {
 export type ButtressState = keyof typeof BUTTRESS_TEMPLATES;
 export const BEACON_LAMP_TEMPLATE = 'bastion_beacon_lamp';
 export const UNDERTOW_TEMPLATE = 'bastion_undertow_wake';
+/** A pool of Hallowed Brine (scale = its radius). */
+export const HALLOWED_BRINE_TEMPLATE = 'bastion_hallowed_brine';
 /** The shadow pool Vael rises out of (facing = the scythe's sweep yaw). */
 export const REAPER_POOL_TEMPLATE = 'bastion_reaper_pool';
 /** Heroic: the pool left burning behind the sweep. */
@@ -104,6 +124,7 @@ export const BASTION_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   ...Object.values(BUTTRESS_TEMPLATES),
   BEACON_LAMP_TEMPLATE,
   UNDERTOW_TEMPLATE,
+  HALLOWED_BRINE_TEMPLATE,
   REAPER_POOL_TEMPLATE,
   GRAVE_SHADOW_TEMPLATE,
 ]);
@@ -115,7 +136,109 @@ export function buttressStateOf(templateId: string): ButtressState | null {
   return null;
 }
 
-// ---- Olen: the Oathbound Charge ---------------------------------------------------
+// ---- Olen, the fallen paladin ------------------------------------------------------
+//
+// His kit (olen.ts), against the Oathbound Charge it replaced (150 to 180 to
+// the charge's mark every 18 s, about 9 a second the group could not avoid
+// once the lane was set): what nobody can avoid is the Sentence's mark (110
+// to 125 every 22 s, 5.3 a second) and the Bulwark's first victim (60 to 70
+// every 18 s, 3.6 a second), 8.9 a second together, about the same. Every
+// other point is a mistake: a rebound onto a player standing too close, a
+// splash of the Sentence on a neighbour, a second in the brine (18 a second).
+// The Oath adds two Drowned Sergeants at half health (three on heroic) while
+// he is immune; breaking it leaves him Breached (stunned 4 s, 20 percent more
+// damage taken for 10 s), the window the old buttress crash gave.
+
+export const OLEN_KIT = {
+  brineFirst: 6,
+  brineEvery: 14,
+  /** Driving the sword into the flags (the bar). */
+  brineCast: 1.2,
+  brineRadius: 6,
+  brineRadiusHeroic: 7,
+  brineSeconds: 15,
+  brinePerSecond: 18,
+  brinePerSecondHeroic: 26,
+  /** The share of damage Olen sheds while he stands in his own brine. */
+  brineShield: 0.4,
+  bulwarkFirst: 11,
+  bulwarkEvery: 18,
+  bulwarkCast: 1.5,
+  /** Players the shield strikes at most (the first, then each rebound). */
+  bulwarkHits: 3,
+  bulwarkHitsHeroic: 4,
+  /** A rebound finds the nearest player not yet struck within this reach. */
+  bulwarkReach: 10,
+  /** The shield's flight between two bodies. */
+  bulwarkHop: 0.35,
+  bulwarkMin: 60,
+  bulwarkMax: 70,
+  sentenceFirst: 16,
+  sentenceEvery: 22,
+  /** The point (the bar), then the mark the column falls on. */
+  sentenceCast: 1,
+  sentenceSeconds: 5,
+  sentenceRadius: 6,
+  sentenceRadiusHeroic: 8,
+  sentenceMin: 110,
+  sentenceMax: 125,
+  /** The Unbroken Oath: at this share of his health, once a fight. */
+  oathAt: 0.5,
+  oathKneel: 1.5,
+  oathSoldiers: 2,
+  oathSoldiersHeroic: 3,
+  /** The soldiers rise this far from him, spread round him. */
+  oathSoldierRing: 9,
+  oathBrokenStun: 4,
+  oathBrokenVulnSeconds: 10,
+  oathBrokenVuln: 0.2,
+} as const;
+
+/** The Oath's soldiers: his own drowned garrison. */
+export const OLEN_SOLDIER_ID = 'drowned_sergeant';
+
+/** The Hallowed Brine's radius on a difficulty. */
+export function brineRadius(heroic: boolean): number {
+  return heroic ? OLEN_KIT.brineRadiusHeroic : OLEN_KIT.brineRadius;
+}
+
+/** The Sentence's splash radius on a difficulty. */
+export function sentenceRadius(heroic: boolean): number {
+  return heroic ? OLEN_KIT.sentenceRadiusHeroic : OLEN_KIT.sentenceRadius;
+}
+
+/** The order the Rebounding Bulwark strikes in: the first victim, then each
+ *  rebound to the nearest player not yet struck within `reach` of the last
+ *  (ties to the lower id), up to `max` players. Pure. */
+export function bulwarkChain(
+  first: { id: number; x: number; z: number },
+  others: readonly { id: number; x: number; z: number }[],
+  reach: number,
+  max: number,
+): number[] {
+  const out = [first.id];
+  let at = first;
+  while (out.length < max) {
+    let best: { id: number; x: number; z: number } | null = null;
+    let bestD = Infinity;
+    for (const o of others) {
+      if (out.includes(o.id)) continue;
+      const d = Math.hypot(o.x - at.x, o.z - at.z);
+      if (d > reach) continue;
+      if (d < bestD - 1e-9 || (Math.abs(d - bestD) <= 1e-9 && best !== null && o.id < best.id)) {
+        best = o;
+        bestD = d;
+      }
+    }
+    if (!best) break;
+    out.push(best.id);
+    at = best;
+  }
+  return out;
+}
+
+// ---- Olen: the retired Oathbound Charge (its constants stay for the renderer's
+// lane visuals until those retire with it) ----------------------------------------
 
 export const OLEN_TUNING = {
   chargeFirst: 10,

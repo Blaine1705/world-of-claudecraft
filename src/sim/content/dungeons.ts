@@ -716,8 +716,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 7,
     aggroRadius: 14,
-    // The Oathbound Charge (encounters/sunken_bastion/olen.ts) replaces his
-    // Onrush; the Reaping Arc cleave stays below.
+    // The fallen paladin's kit (encounters/sunken_bastion/olen.ts: Hallowed
+    // Brine, Rebounding Bulwark, Sentence of the Tide, the Unbroken Oath)
+    // replaces his Onrush; the Reaping Arc cleave stays below.
     loot: [
       { copper: 800, chance: 1 },
       // The rework (sunken_bastion.md 8.1): the Fenmist Robe joins the

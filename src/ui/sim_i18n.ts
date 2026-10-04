@@ -1246,6 +1246,11 @@ const baseEnTable = {
   'aura.bastionShrouded': 'Shrouded',
   'aura.bastionBeaconLit': 'Beacon-Lit',
   'aura.bastionHollowShade': 'Hollow Shade',
+  // Olen the fallen paladin (encounters/sunken_bastion/olen.ts).
+  'mechanic.bastionHallowedBrine': 'Hallowed Brine',
+  'mechanic.bastionReboundingBulwark': 'Rebounding Bulwark',
+  'mechanic.bastionTideSentence': 'Sentence of the Tide',
+  'aura.bastionBrineHallowed': 'Brine-Hallowed',
   // The Drowned Temple's gates and seals (sim/content/drowned_temple.ts openText)
   // and the encounter and trash-kit mechanic and aura names
   // (sim/encounters/drowned_temple, sim/mob/trash_kit/temple_kit.ts).
@@ -17796,6 +17801,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Shrouded: 'aura.bastionShrouded',
   'Beacon-Lit': 'aura.bastionBeaconLit',
   'Hollow Shade': 'aura.bastionHollowShade',
+  'Hallowed Brine': 'mechanic.bastionHallowedBrine',
+  'Rebounding Bulwark': 'mechanic.bastionReboundingBulwark',
+  'Sentence of the Tide': 'mechanic.bastionTideSentence',
+  'Brine-Hallowed': 'aura.bastionBrineHallowed',
   // The Drowned Temple's sixth pass (encounters/drowned_temple, trash_kit).
   'Freezing Breath': 'mechanic.templeFreezingBreath',
   'Venom Spit': 'mechanic.templeVenomSpit',

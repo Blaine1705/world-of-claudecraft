@@ -621,6 +621,12 @@ const mergeStringsEn = {
       bastion_veil_gather: 'Gathering Fog',
       bastion_vael_rise: 'Death Rises',
       bastion_vael_sink: 'Into the Fog',
+      // Olen the fallen paladin's casts (encounters/sunken_bastion/olen.ts).
+      bastion_hallowed_brine: 'Hallowed Brine',
+      bastion_rebounding_bulwark: 'Rebounding Bulwark',
+      bastion_tide_sentence: 'Sentence of the Tide',
+      bastion_oath_kneel: 'Unbroken Oath',
+      bastion_oath_vigil: 'Unbroken Oath',
       // The Drowned Temple trash kit and boss casts (trash_kit/temple_cast_ids.ts,
       // encounters/drowned_temple/ids.ts). The Lullaby, the Call and the Coil
       // can be kicked.

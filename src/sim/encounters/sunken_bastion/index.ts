@@ -10,7 +10,7 @@ import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
 import { bastionClaims, bossEngaged, claimBoss, grantClaimDeed } from './claim';
 import { OLEN_ID, OSSICK_ID, TURNKEY_ID, TURRETBACK_ID, VAEL_ID } from './ids';
-import { markOathboundCharge, tickOlen } from './olen';
+import { beginOath, startOlenBar, tickOlen } from './olen';
 import { startDrownedAnchor, startShacklePair, tickOssick } from './ossick';
 import { startIronCage, tickTurnkey } from './turnkey';
 import { startShadowstep, tickVael } from './vael';
@@ -19,7 +19,7 @@ import { startVeilGather } from './vael_veil_gather';
 
 export { pickMarkTargets } from './claim';
 export * from './ids';
-export { pickChargeTarget, standingButtresses } from './olen';
+export { OLEN_DEED, OLEN_VIGIL_MAX } from './olen';
 export { cagedBy, tryCageStruggle } from './turnkey';
 export { beaconLamp } from './vael';
 export { playerOnCrown } from './vael_intro';
@@ -64,16 +64,20 @@ function watchHermit(ctx: SimContext, inst: InstanceSlot, hermit: Entity): void 
   else if (withdrew) st.withdrew = true;
 }
 
-/** `/dev bastion trigger <charge|cage|anchor|shackle|veil|reap|surge|intro|
- *  introshort|introskip>`: fire an engaged boss's mechanic now (the intro ones
+/** `/dev bastion trigger <brine|bulwark|sentence|oath|cage|anchor|shackle|veil|
+ *  reap|surge|intro|introshort|introskip>`: fire an engaged boss's mechanic now (the intro ones
  *  bury Vael for his full or short entrance, or skip it). Returns the log line. */
 export function bastionDevTrigger(ctx: SimContext, inst: InstanceSlot, what: string): string {
-  if (what === 'charge') {
+  if (what === 'brine' || what === 'bulwark' || what === 'sentence' || what === 'oath') {
     const olen = claimBoss(ctx, inst, OLEN_ID);
     const st = olen?.bastionFight;
-    if (!olen || st?.kind !== 'olen' || st.lane || st.dash) return 'Pull Olen first.';
-    if (olen.castingAbility !== null) return 'Olen is busy; try again.';
-    return markOathboundCharge(ctx, inst, olen, st) ? 'Olen marks his charge.' : 'No target.';
+    if (!olen || st?.kind !== 'olen') return 'Pull Olen first.';
+    if (what === 'oath') {
+      if (!beginOath(ctx, inst, olen, st)) return 'Olen has already sworn his Oath this fight.';
+      return 'Olen kneels: the Unbroken Oath.';
+    }
+    if (st.bar || olen.castingAbility !== null) return 'Olen is busy; try again.';
+    return startOlenBar(ctx, inst, olen, st, what) ? `Olen begins: ${what}.` : 'No target.';
   }
   if (what === 'cage') {
     const turnkey = claimBoss(ctx, inst, TURNKEY_ID);
@@ -124,5 +128,5 @@ export function bastionDevTrigger(ctx: SimContext, inst: InstanceSlot, what: str
     st.surgeTimer = 0;
     return 'Vael draws a Mist Surge.';
   }
-  return 'Mechanics: charge, cage, anchor, shackle, veil, reap, surge, intro, introshort, introskip.';
+  return 'Mechanics: brine, bulwark, sentence, oath, cage, anchor, shackle, veil, reap, surge, intro, introshort, introskip.';
 }

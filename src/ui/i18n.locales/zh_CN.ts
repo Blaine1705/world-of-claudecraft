@@ -18823,6 +18823,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_veil_gather': '雾气聚拢',
   'abilityUi.cast.bastion_vael_rise': '死亡升起',
   'abilityUi.cast.bastion_vael_sink': '没入雾中',
+  'abilityUi.cast.bastion_hallowed_brine': '圣化咸水',
+  'abilityUi.cast.bastion_rebounding_bulwark': '回弹壁盾',
+  'abilityUi.cast.bastion_tide_sentence': '潮汐宣判',
+  'abilityUi.cast.bastion_oath_kneel': '不破誓言',
+  'abilityUi.cast.bastion_oath_vigil': '不破誓言',
   'entities.mobs.bastion_gaol_cage.name': '铁笼',
   'entities.mobs.bastion_drowned_anchor.name': '溺亡之锚',
   'entities.items.jailers_iron_gauntlets.name': '狱卒的铁护手',
@@ -18831,6 +18836,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.iron_cage': '铁笼（连按交互键挣脱，队友可以砸开铁栏）',
   'hudChrome.finder.mech.drowned_anchor': '溺亡之锚（在受害者被拖进深坑前砸断锁链）',
   'hudChrome.finder.mech.shackle_pair': '双人镣铐（被锁在一起的两名玩家必须靠在一起）',
+  'hudChrome.finder.mech.hallowed_brine':
+    '圣化咸水（他脚下涌出暗色圣水池：把他拖出去，它保护他并灼烧你）',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    '回弹壁盾（盾牌会弹向上一个被击中玩家10码内的人：散开）',
+  'hudChrome.finder.mech.tide_sentence':
+    '潮汐宣判（5秒后光柱落在被标记的玩家身上：远离队伍承受）',
+  'hudChrome.finder.mech.unbroken_oath':
+    '不破誓言（生命值降到一半时他在泡泡中跪下：击杀他的士兵来打破泡泡）',
+  'hudChrome.finder.mech.fog_veil':
+    '雾幕（四个身影，只有一个是真的：灯塔光束会让真正维尔的提灯骤亮）',
   'hudChrome.finder.mech.reaper_behind': '穿影（死神连续三次从不同玩家身后升起，离开镰刀的弧线）',
   'hudChrome.bastionCage.title': '你被关进了铁笼！',
   'hudChrome.bastionCage.promptKey': '连按 {key} 挣脱',

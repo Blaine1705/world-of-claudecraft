@@ -19780,6 +19780,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_veil_gather': '모여드는 안개',
   'abilityUi.cast.bastion_vael_rise': '죽음이 떠오른다',
   'abilityUi.cast.bastion_vael_sink': '안개 속으로',
+  'abilityUi.cast.bastion_hallowed_brine': '성스러운 바닷물',
+  'abilityUi.cast.bastion_rebounding_bulwark': '튕겨 나오는 방패',
+  'abilityUi.cast.bastion_tide_sentence': '조수의 선고',
+  'abilityUi.cast.bastion_oath_kneel': '깨지지 않는 맹세',
+  'abilityUi.cast.bastion_oath_vigil': '깨지지 않는 맹세',
   'entities.mobs.bastion_gaol_cage.name': '강철 우리',
   'entities.mobs.bastion_drowned_anchor.name': '익사의 닻',
   'entities.items.jailers_iron_gauntlets.name': '간수의 강철 건틀릿',
@@ -19791,6 +19796,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '익사의 닻 (희생자가 구덩이로 끌려가기 전에 사슬을 끊으세요)',
   'hudChrome.finder.mech.shackle_pair':
     '쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)',
+  'hudChrome.finder.mech.hallowed_brine':
+    '성스러운 바닷물 (발밑에 어두운 성수 웅덩이: 그를 밖으로 끌어내세요, 그를 보호하고 당신을 태웁니다)',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    '튕겨 나오는 방패 (마지막으로 맞은 플레이어로부터 10미터 이내의 누군가에게 튕겨 갑니다: 흩어지세요)',
+  'hudChrome.finder.mech.tide_sentence':
+    '조수의 선고 (5초 뒤 표식이 찍힌 플레이어에게 빛의 기둥이 떨어집니다: 무리에서 떨어져 맞으세요)',
+  'hudChrome.finder.mech.unbroken_oath':
+    '깨지지 않는 맹세 (생명력이 절반이 되면 거품 속에 무릎 꿇습니다: 병사들을 처치해 깨뜨리세요)',
+  'hudChrome.finder.mech.fog_veil':
+    '안개 장막 (네 형상 중 하나만 진짜: 등대의 빛줄기에 진짜 바엘의 등불이 타오릅니다)',
   'hudChrome.finder.mech.reaper_behind':
     '그림자 건너기 (세 번 연속으로 각기 다른 플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)',
   'hudChrome.bastionCage.title': '강철 우리에 갇혔습니다!',

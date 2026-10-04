@@ -18841,6 +18841,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_veil_gather': '霧氣聚攏',
   'abilityUi.cast.bastion_vael_rise': '死亡升起',
   'abilityUi.cast.bastion_vael_sink': '沒入霧中',
+  'abilityUi.cast.bastion_hallowed_brine': '聖化鹹水',
+  'abilityUi.cast.bastion_rebounding_bulwark': '回彈壁盾',
+  'abilityUi.cast.bastion_tide_sentence': '潮汐宣判',
+  'abilityUi.cast.bastion_oath_kneel': '不破誓言',
+  'abilityUi.cast.bastion_oath_vigil': '不破誓言',
   'entities.mobs.bastion_gaol_cage.name': '鐵籠',
   'entities.mobs.bastion_drowned_anchor.name': '溺亡之錨',
   'entities.items.jailers_iron_gauntlets.name': '獄卒的鐵護手',
@@ -18849,6 +18854,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.iron_cage': '鐵籠（連按互動鍵掙脫，隊友可以砸開鐵欄）',
   'hudChrome.finder.mech.drowned_anchor': '溺亡之錨（在受害者被拖進深坑前砸斷鎖鏈）',
   'hudChrome.finder.mech.shackle_pair': '雙人鐐銬（被鎖在一起的兩名玩家必須靠在一起）',
+  'hudChrome.finder.mech.hallowed_brine':
+    '聖化鹹水（他腳下湧出暗色聖水池：把他拖出去，它保護他並灼燒你）',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    '回彈壁盾（盾牌會彈向上一個被擊中玩家10碼內的人：散開）',
+  'hudChrome.finder.mech.tide_sentence':
+    '潮汐宣判（5秒後光柱落在被標記的玩家身上：遠離隊伍承受）',
+  'hudChrome.finder.mech.unbroken_oath':
+    '不破誓言（生命值降到一半時他在泡泡中跪下：擊殺他的士兵來打破泡泡）',
+  'hudChrome.finder.mech.fog_veil':
+    '霧幕（四個身影，只有一個是真的：燈塔光束會讓真正維爾的提燈驟亮）',
   'hudChrome.finder.mech.reaper_behind': '穿影（死神連續三次從不同玩家身後升起，離開鐮刀的弧線）',
   'hudChrome.bastionCage.title': '你被關進了鐵籠！',
   'hudChrome.bastionCage.promptKey': '連按 {key} 掙脫',
