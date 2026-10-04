@@ -17,16 +17,21 @@ from sea_kit import (
     ALGAE, BARNACLE, KELP, KELP_D, MOUTH, TOOTH, SeaBody, author_clip, expand_bones, loop, merge,
 )
 
-SHELL = (0.3, 0.6, 0.6)
-SHELL_HI = (0.55, 0.8, 0.74)
-SHELL_D = (0.2, 0.42, 0.44)
-CORAL = (0.82, 0.46, 0.36)
-CORAL_D = (0.62, 0.3, 0.22)
-BELLY = (0.93, 0.74, 0.6)
-AMBER = (1.0, 0.66, 0.12)
-TIP = (0.16, 0.1, 0.09)
-SAC = (0.3, 0.92, 0.78)
-VEIN = (0.07, 0.25, 0.22)
+# Toned down for the Bastion's fog: a wet stone-grey carapace with a green
+# cast, the shell's ridges bleached pale by salt, a dull red-brown underside;
+# small dark eyes with a pinpoint of sea light, not the old cartoon stare. The
+# brine sacs stay the brightest thing on it (they swell before it bursts).
+SHELL = (0.6, 0.63, 0.55)
+SHELL_HI = (0.78, 0.77, 0.68)
+SHELL_D = (0.45, 0.47, 0.42)
+CORAL = (0.72, 0.52, 0.42)
+CORAL_D = (0.55, 0.38, 0.31)
+BELLY = (0.6, 0.54, 0.46)
+AMBER = (0.44, 0.78, 0.62)
+TIP = (0.14, 0.1, 0.09)
+SAC = (0.34, 0.8, 0.66)
+VEIN = (0.07, 0.22, 0.19)
+EYE_DARK = (0.08, 0.09, 0.08)
 
 BONES = expand_bones([
     ('Root', None, (0, 0, 0), (0, 0, 0.5)),
@@ -82,7 +87,7 @@ def body():
     sacs = [(0.0, 0.75, 2.62), (0.8, 0.05, 2.45), (-0.8, 0.05, 2.45)]
     placed = 0
     tries = 0
-    while placed < 90 and tries < 1200:
+    while placed < 150 and tries < 2000:
         tries += 1
         a = p.rng.random() * math.tau
         rr = p.rng.random() ** 0.7 * 0.92
@@ -157,11 +162,11 @@ def body():
         p.tube(p.bezier((s * 0.25, -2.0, 1.9), (s * 0.9, -2.6, 2.9), (s * 1.3, -1.2, 3.1), 8), [0.05, 0.012],
                CORAL_D, sides=5)
         p.on('Eye' + t)
-        p.tube([(s * 0.42, -1.62, 1.8), (s * 0.5, -1.75, 2.3), (s * 0.55, -1.85, 2.55)], [0.22, 0.19, 0.2],
+        p.tube([(s * 0.42, -1.62, 1.8), (s * 0.5, -1.75, 2.2), (s * 0.55, -1.85, 2.4)], [0.16, 0.13, 0.13],
                SHELL_D, sides=10)
-        p.eye((s * 0.6, -1.95, 2.78), 0.42, look=(s * 0.08, -1, -0.3), pupil=0.5, iris=AMBER)
-        # A heavy lid over the back of each eye, slanting in (mean, not cute).
-        p.blob((s * 0.6, -1.86, 3.02), (0.44, 0.4, 0.14), SHELL_HI, pitch=-0.5, roll=s * 0.35)
+        p.eye((s * 0.58, -1.92, 2.52), 0.22, look=(s * 0.08, -1, -0.3), pupil=0.45, color=EYE_DARK, iris=AMBER)
+        # A heavy lid over the back of each eye, slanting in.
+        p.blob((s * 0.58, -1.86, 2.66), (0.26, 0.24, 0.09), SHELL_HI, pitch=-0.5, roll=s * 0.35)
         p.on('Mandible' + t)
         p.tube(p.bezier((s * 0.4, -1.98, 1.3), (s * 0.55, -2.45, 1.2), (s * 0.14, -2.62, 1.08), 7),
                [0.13, 0.04], p.vary(TOOTH, 0.1), sides=7)

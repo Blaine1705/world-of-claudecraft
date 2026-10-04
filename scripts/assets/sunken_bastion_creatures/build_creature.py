@@ -32,10 +32,12 @@ from creature_kit import (  # noqa: E402
     GLOW, Body, author_clip, build_rig, expand_bones, export, finish_body, loop, new_scene, preview,
 )
 
-SHELL = (0.74, 0.34, 0.2)         # weathered crab orange
-SHELL_D = (0.52, 0.22, 0.13)
-SHELL_HI = (0.86, 0.5, 0.3)
-BELLY = (0.9, 0.78, 0.6)
+# Toned down for the Bastion's fog: the crab is sea-worn shell, a dull
+# red-brown gone grey with salt and weed, not a bright crab orange.
+SHELL = (0.66, 0.52, 0.42)        # sea-worn red-brown shell
+SHELL_D = (0.48, 0.37, 0.3)
+SHELL_HI = (0.78, 0.66, 0.55)
+BELLY = (0.64, 0.58, 0.5)
 CLAW_TIP = (0.22, 0.13, 0.1)
 EYE = (0.04, 0.04, 0.05)
 EYE_HI = (0.95, 0.95, 0.9)

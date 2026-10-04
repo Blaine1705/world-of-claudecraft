@@ -4356,6 +4356,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // eyes, hooked mandibles round a toothed maw) and three brine sacs in its
   // crust. Its Death swells the sacs and BURSTS them at 1.5 s, on the Brine
   // Burst's own fuse; Attack2 is its lunge bite.
+  // The Barnacle Crawler, toned down for the Bastion's fog: a wet stone-grey
+  // carapace crusted with pale barnacles, dull red-brown legs, small dark eyes
+  // with a pinpoint of sea light; its brine sacs stay the brightest thing on it
+  // (they swell before it bursts).
   bastion_crawler: {
     url: `${CREATURES}/bastion_crawler.glb`,
     height: 3.2,
@@ -4368,7 +4372,7 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
     },
-    selfIllumination: 0.06,
+    selfIllumination: 0.12,
   },
   // The Bastion Warhound: one of the garrison's war mastiffs, drowned with its
   // handlers and risen with them (scripts/assets/sunken_bastion_drowned/

@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "dbc028fa395bfdadbf0ddacea0bb06b061673977f9e5fd740cbaa9b529dc9d2d",
+  "rendererFingerprint": "3381b9489d2a9935d61689749dc273837bc98cc6564ce07d775e397dd847bc8b",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5476018,
-      "sha256": "bccd15d1da1355e9d9121d82594f7bac616f680105fdb89c9e744e0ab8ed1f13",
+      "sha256": "d085b6c1088914677f5916360693a9848e7ace6759316e2a9d6b0e0d5bbb5b2e",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -296,8 +296,8 @@
         "model": {
           "url": "models/creatures/bastion_crawler.glb",
           "path": "public/models/creatures/bastion_crawler.glb",
-          "bytes": 1306300,
-          "sha256": "71754edf882852906eeb8db892fef92b91483b8c4486ed3f8f07564e3aa01fe6"
+          "bytes": 1517456,
+          "sha256": "98f7e856382c68f0dc2710c95c27b36228fe4bc3d15541cfdbe945affc333fda"
         },
         "idle": "Idle",
         "height": 3.2,
@@ -314,11 +314,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8222264224bbe76c66aba91652e87dc72cc669aff0a9fa78fb44735982e5ef82",
+      "sourceFingerprint": "a0687199014781fd82da90998cad66fa191a775be4af1b00df7510a43a0f36c9",
       "output": {
         "path": "public/ui/mobs/barnacle_crawler.webp",
-        "bytes": 2396,
-        "sha256": "c9bb9856731060987679497fdd0fb7d572446096d0f4d624bcce920ff92d7801"
+        "bytes": 2122,
+        "sha256": "970ffc8734e4dd2a2fe1c3cff88594b00dc11ae49bde9959fbb4e872008b2ac1"
       }
     },
     {
@@ -11353,7 +11353,7 @@
           "url": "models/creatures/turretback_hermit.glb",
           "path": "public/models/creatures/turretback_hermit.glb",
           "bytes": 1517668,
-          "sha256": "e632515b16b36c1dcc8ecba740c366cd6f48d499cf0adb42f77400342b0db7c3"
+          "sha256": "1fd4c47ceed66d5581ec8c910a6780a79168e2ae8742375caca286d82e9a67e4"
         },
         "idle": "Idle",
         "height": 15,
@@ -11370,7 +11370,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "86909fceb05385f4b5fd5482071911c1fce91c521f501ce517ee1652703a4ab3",
+      "sourceFingerprint": "4f913eaceaed2c594a37f4aebeceacdd363c7539bd994c7d7063cc51b258bf93",
       "output": {
         "path": "public/ui/mobs/turretback_hermit.webp",
         "bytes": 1784,
