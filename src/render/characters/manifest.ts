@@ -129,6 +129,7 @@ import {
   OSSICK_ANCHOR_AWAY_GESTURE,
   OSSICK_ANCHOR_BACK_MESH,
   OSSICK_ANCHOR_HOME_GESTURE,
+  VAEL_VEIL_RISE_CLIP_RATE,
 } from '../sunken_bastion/bastion_gaol_reaper_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
@@ -4401,8 +4402,20 @@ export const VISUALS: Record<string, VisualDef> = {
         // The Fog Veil: all four figures rise out of the roof the same way.
         [VAEL_VEIL_RISE]: 'Emerge',
       },
+      // The veil's rise is twice the Emerge clip's length: played at bar pace
+      // it rises ONCE over the whole bar (looped at rate 1 it rose, dropped
+      // back under and rose again).
+      castTimeScaleByAbility: { [VAEL_VEIL_RISE]: VAEL_VEIL_RISE_CLIP_RATE },
+      // Emerge starts under the flags: it takes the body at once, never
+      // crossfading out of a standing pose (a copy popping in upright).
+      castSnapIn: ['Emerge'],
       flourish: 'ScytheSweep',
     },
+    // The sink and the rises follow their bars (the Shadow Crossing's sink
+    // would otherwise run late behind a swing, so the sim moved him to the
+    // pool while he still stood above the floor); the Hymn and the Mist Surge
+    // keep looping.
+    castClipSync: [VAEL_SHADOWSTEP, VAEL_REAPING_SCYTHE, VAEL_VEIL_RISE],
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 2.2,

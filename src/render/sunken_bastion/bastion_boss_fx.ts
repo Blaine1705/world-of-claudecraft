@@ -278,7 +278,6 @@ export class BastionBossFx {
   private readonly domes: { mesh: THREE.Mesh; mat: THREE.ShaderMaterial; entityId: number }[] = [];
   /** Standing buttress ids per slot (Olen's lane resolver reads it). */
   private readonly standing = new Map<number, Set<string>>();
-  private readonly seenShades = new Set<number>();
   private readonly deadShades = new Set<number>();
   private readonly buttressIds: number[] = [];
   private readonly wakeIds: number[] = [];
@@ -622,11 +621,10 @@ export class BastionBossFx {
             this.burst(e.pos.x, e.pos.y + 1.5, e.pos.z, 0x8dffb8, 4, 2.2, 7, 1.2);
           }
         } else {
+          // A shade rises out of the roof like the real one (bastion_reaper_fx.ts
+          // draws the emergence for all four alike): no flash of its own, which
+          // both popped it in and told it from him.
           figures.push({ id: e.id, slot: bastionSlotOrigin(e.pos.x, e.pos.z).slot });
-          if (!this.seenShades.has(e.id)) {
-            this.seenShades.add(e.id);
-            this.burst(e.pos.x, e.pos.y + 1.2, e.pos.z, 0x9fe8c4, 5, 2.5, 8, 1.4);
-          }
         }
       } else if (t === TURRETBACK_ID && !e.dead && hasAura(e, TRASH_WITHDRAW_AURA))
         this.hermitIds.push(e.id);
@@ -643,8 +641,6 @@ export class BastionBossFx {
       this.lampId = lampId;
       this.lampSampleAge = 99;
     }
-    if (this.seenShades.size > 32)
-      for (const id of this.seenShades) if (!world.entities.has(id)) this.seenShades.delete(id);
     if (this.deadShades.size > 32)
       for (const id of this.deadShades) if (!world.entities.has(id)) this.deadShades.delete(id);
   }

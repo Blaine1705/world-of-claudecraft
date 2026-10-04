@@ -87,3 +87,67 @@ export function cageCrack(hp: number, maxHp: number): number {
 export const CAGE_CRUSH_SECONDS = TURNKEY_TUNING.cageMax;
 /** Seconds the winch holds before it hauls (the chain winds taut). */
 export const ANCHOR_SETTLE_SECONDS = OSSICK_TUNING.anchorSettle;
+
+// ---- the Fog Veil's emergence -------------------------------------------------------
+
+/** Vael's Emerge clip (scripts/assets/sunken_bastion_creatures/reaper.py: keys
+ *  1 to 15 at 24 fps), shared by the Reaping Scythe's rise and the veil's. */
+export const VAEL_EMERGE_CLIP_SECONDS = 15 / 24;
+/** The rate that plays Emerge ONCE over the veil's rise bar (the clip is half
+ *  the bar: at rate 1 it looped, the figure rising, dropping back under the
+ *  flags and rising again). */
+export const VAEL_VEIL_RISE_CLIP_RATE = VAEL_EMERGE_CLIP_SECONDS / VAEL_TUNING.veilRiseSeconds;
+
+/** The Emerge clip's root height (model units over the feet) at its keys,
+ *  clip seconds: under the flags, rising, the wind-up at full height. */
+const EMERGE_ROOT: readonly (readonly [number, number])[] = [
+  [0, -10.5],
+  [5 / 24, -3.5],
+  [10 / 24, 0.19],
+  [VAEL_EMERGE_CLIP_SECONDS, 0.19],
+];
+/** How deep the root sits when the whole figure is under the flags. */
+const EMERGE_UNDER = 10.5;
+
+/** 0..1 how much of a rising figure stands above the flags, `age` seconds
+ *  into the veil's rise (the clip at its rise rate). */
+export function veilRiseEmerged(age: number): number {
+  const t = Math.max(0, age) * VAEL_VEIL_RISE_CLIP_RATE;
+  let root = EMERGE_ROOT[EMERGE_ROOT.length - 1][1];
+  for (let i = 0; i + 1 < EMERGE_ROOT.length; i++) {
+    const [t0, y0] = EMERGE_ROOT[i];
+    const [t1, y1] = EMERGE_ROOT[i + 1];
+    if (t > t1) continue;
+    root = y0 + (y1 - y0) * ((t - t0) / (t1 - t0));
+    break;
+  }
+  return Math.min(1, Math.max(0, 1 + root / EMERGE_UNDER));
+}
+
+/** How long the dark water keeps boiling after a figure has risen. */
+export const VEIL_BOIL_FADE_SECONDS = 0.9;
+/** The boil's full radius on the flags round a rising figure. */
+export const VEIL_BOIL_RADIUS = 4.2;
+
+/** The dark water boiling on the flags where a veil figure rises, `age`
+ *  seconds into its rise: it wells up before the hood breaks the surface,
+ *  holds while the body climbs out, and drains away once it stands. */
+export function veilBoilAlpha(age: number): number {
+  if (age < 0) return 0;
+  const rise = VAEL_TUNING.veilRiseSeconds;
+  const swell = Math.min(1, age / 0.18);
+  const drain = age <= rise ? 1 : Math.max(0, 1 - (age - rise) / VEIL_BOIL_FADE_SECONDS);
+  return swell * drain;
+}
+
+/** The boil's spread (share of VEIL_BOIL_RADIUS) `age` seconds into the rise. */
+export function veilBoilScale(age: number): number {
+  if (age < 0) return 0;
+  const grow = Math.min(1, age / 0.45);
+  return 0.55 + 0.45 * (1 - (1 - grow) * (1 - grow));
+}
+
+/** Whether a figure's boil has fully drained. */
+export function veilBoilDone(age: number): boolean {
+  return age > VAEL_TUNING.veilRiseSeconds + VEIL_BOIL_FADE_SECONDS;
+}
