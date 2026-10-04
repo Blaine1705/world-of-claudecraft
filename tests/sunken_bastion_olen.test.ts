@@ -225,6 +225,8 @@ describe('Olen the fallen paladin: Sentence of the Tide', () => {
     const mark = [f.tank, ...f.others].find((p) => aura(p, OLEN_SENTENCED)) as Entity;
     expect(mark).toBeDefined();
     expect(mark).not.toBe(f.tank);
+    // The mark carries the splash's reach, so a client paints the true ring.
+    expect(aura(mark, OLEN_SENTENCED)?.value2).toBe(T.sentenceRadius);
     // A neighbour stands close to the mark, the rest far.
     const near = f.others.find((p) => p !== mark) as Entity;
     const at = { x: mark.pos.x - f.ox, z: mark.pos.z - f.oz };

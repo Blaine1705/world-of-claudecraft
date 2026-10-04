@@ -235,6 +235,10 @@ function landBar(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: OlenFigh
   }
   st.sentence = { markId: target.id, remaining: T.sentenceSeconds };
   marker(target, OLEN_SENTENCED, 'Sentence of the Tide', T.sentenceSeconds, boss.id, 'slow', 1);
+  // The splash's reach rides the mark (value2), so every client paints the
+  // ring the sim strikes, heroic or not.
+  const mark = target.auras.find((a) => a.id === OLEN_SENTENCED);
+  if (mark) mark.value2 = sentenceRadius(inst.difficulty === 'heroic');
 }
 
 /** The shield in flight: each leg lands, strikes, and finds its rebound. */
