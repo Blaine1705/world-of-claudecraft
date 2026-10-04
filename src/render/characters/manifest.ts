@@ -224,6 +224,13 @@ export interface ClipMap {
    *  actions are cached per clip and a clip shared with attackByAbility would
    *  otherwise carry that route's one-shot timescale into the cast loop. */
   castTimeScaleByAbility?: Record<string, number>;
+  /** Cast clips that rise INTO sight (the body under the floor, rising): they
+   *  take the rig at full weight at once instead of crossfading out of the
+   *  pose before them (which blends the standing pose into the first frames,
+   *  a figure popping in upright before it drops and rises), and play ONCE,
+   *  holding their last pose (a loop drops the body back under for a frame).
+   *  See anim_state.ts clipSnapsIn. */
+  castSnapIn?: readonly string[];
   sitDown?: string;
   sitIdle?: string;
   /** swim base. On the authored player lane this is the SUBMERGED stroke and
@@ -486,8 +493,9 @@ export interface VisualDef {
    *  cutting a plain swing or flinch (never a one-shot in
    *  oneShotsHoldAttacks), and the clip's time is held to the bar's elapsed
    *  time, so a clip that entered late still strikes on the bar's end
-   *  (anim_state.ts castClipSyncTime). */
-  castClipSync?: boolean;
+   *  (anim_state.ts castClipSyncTime). A list of ability ids locks only those
+   *  casts (castClipSyncs): the rest of the rig's cast clips keep looping. */
+  castClipSync?: boolean | readonly string[];
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
