@@ -452,6 +452,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/hoard_void_acolyte.glb": "/media/models/creatures/hoard_void_acolyte.9465f25cb1e7.glb",
   "models/creatures/ignivar_ashcaller.glb": "/media/models/creatures/ignivar_ashcaller.0f92aa55d5f0.glb",
   "models/creatures/ignivar_herald.glb": "/media/models/creatures/ignivar_herald.0d522fe4bb33.glb",
+  "models/creatures/knight_commander_olen.glb": "/media/models/creatures/knight_commander_olen.05bf8bd00cf7.glb",
   "models/creatures/kobold.glb": "/media/models/creatures/kobold.1cb4fe6907ed.glb",
   "models/creatures/kobold_ability_anims.glb": "/media/models/creatures/kobold_ability_anims.f2d51c66b479.glb",
   "models/creatures/leaping_fish.glb": "/media/models/creatures/leaping_fish.3df008156018.glb",

@@ -4273,24 +4273,41 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.16,
   },
 
-  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion). Knight-
-  // Commander Olen: a towering drowned knight behind a great shield, planting
-  // himself and roaring his oath over the Oathbound Charge's bar.
+  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion), each sculpted
+  // whole on the drowned kit. Knight-Commander Olen (scripts/assets/
+  // sunken_bastion_drowned/olen/): the officer his drowned garrison still serves,
+  // towering over it in fluted plate trimmed with tarnished brass, the Bastion's
+  // tower-over-waves in brass on his breast; a grand morion with a crest of
+  // faded crimson horsehair and a bevor up under the nose, sea light burning in
+  // the shadow of the brim; a commander's cloak torn to the calves, a great
+  // tower shield held by its upright grip (the sigil in brass, barnacles crusting
+  // its foot) and a broad longsword. He chops over the shield's rim, drives the
+  // shield in and reaps with a flat sweep (Attack3, his Reaping Arc); the
+  // Oathbound Charge's bar is OathCharge (stamp, the oath roared with the sword
+  // to the sky, down behind the shield), bar-locked so he launches on the bar's
+  // end into Run, the shield-first charge; Breached he reels in Stunned.
   bastion_olen: {
-    url: `${ENEMIES}/skeleton_warrior.glb`,
-    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
-    height: 5.4,
+    url: `${CREATURES}/knight_commander_olen.glb`,
+    // Drawn over the sergeant (7.2) and the Turnkey (8.3) at his 1.2: about 8.9.
+    height: 7.4,
     clips: {
-      ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal'], 'Taunt'),
-      castByAbility: { [OLEN_OATHBOUND_CHARGE]: 'Taunt' },
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2', 'Attack3'],
+      hit: ['Hit'],
+      death: 'Death',
+      stunned: 'Stunned',
+      cast: 'OathCharge',
+      castByAbility: { [OLEN_OATHBOUND_CHARGE]: 'OathCharge' },
       castTimeScaleByAbility: { [OLEN_OATHBOUND_CHARGE]: 1 },
     },
-    attach: [
-      { url: `${WEAPONS}/skeleton_blade.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/skeleton_shield_large_a.glb`, bone: 'handslot.l' },
-    ],
-    tint: 0x6f8a86,
-    tintStrength: 0.35,
+    castClipSync: true,
+    walkRef: 2.5,
+    runRef: 9.93,
+    authoredAtlas: true,
+    selfIllumination: 0.16,
   },
   // Gaoler Ossick: the gaol's hulking warden, hurling the Drowned Anchor with a
   // one-hand throw, flinging the Shackle Pair with a two-hand heave, and

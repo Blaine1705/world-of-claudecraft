@@ -96,6 +96,13 @@ export function oathLaneLength(
 /** The charge lane's full width (yards), for the telegraph and the wake. */
 export const OATH_LANE_HALF = OLEN_TUNING.laneHalf;
 
+/** Where Breached's dizzy stars circle, in yards over Olen's feet before his
+ *  scale: round the crest of his slumped head in the Stunned clip (his sculpted
+ *  body is drawn 7.4 tall, the reeling helm about 0.85 of it). */
+export const OLEN_STARS_UP = 6.3;
+/** How wide the stars circle round his helm, before his scale. */
+export const OLEN_STARS_RADIUS = 1.4;
+
 /** Where a crash lands: the point on the lane's end facing the buttress. */
 export function crashPoint(
   lx: number,

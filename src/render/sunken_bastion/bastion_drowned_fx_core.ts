@@ -130,6 +130,20 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
   },
   // The Gaol Turnkey: water off the hood, the key ring, the chain on his
   // forearm and the lantern at his hip.
+  // Knight-Commander Olen: water off the morion's brim all round, the tower
+  // shield's top and foot carried at his side.
+  knight_commander_olen: {
+    rawHeight: 5.191,
+    drips: [
+      { side: 0.14, up: 4.59, fwd: 0.38 },
+      { side: 0.44, up: 4.21, fwd: -0.24 },
+      { side: -0.37, up: 4.23, fwd: -0.11 },
+      { side: 0.76, up: 3.41, fwd: 0.73 },
+      { side: 1.11, up: 1.24, fwd: 0.92 },
+    ],
+    chest: { side: 0.03, up: 3.08, fwd: 0.49 },
+    eyes: { side: 0.08, up: 4.23, fwd: 0.11 },
+  },
   gaol_turnkey: {
     rawHeight: 4.677,
     drips: [

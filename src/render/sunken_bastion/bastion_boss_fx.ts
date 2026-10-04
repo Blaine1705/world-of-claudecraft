@@ -57,6 +57,8 @@ import {
   HYMN_FLOOD_DEPTH,
   hymnFlood,
   OATH_LANE_HALF,
+  OLEN_STARS_RADIUS,
+  OLEN_STARS_UP,
   oathLaneLength,
   pickVeilClaim,
   predictBeamYaw,
@@ -740,10 +742,11 @@ export class BastionBossFx {
       s.visible = dizzy;
       if (!dizzy) continue;
       const a = this.clock * 3.2 + (i * Math.PI * 2) / this.stars.length;
+      const r = OLEN_STARS_RADIUS * olen.scale;
       s.position.set(
-        olen.pos.x + Math.sin(a) * 1.3,
-        olen.pos.y + 4.6 * olen.scale + Math.sin(a * 2) * 0.15,
-        olen.pos.z + Math.cos(a) * 1.3,
+        olen.pos.x + Math.sin(a) * r,
+        olen.pos.y + OLEN_STARS_UP * olen.scale + Math.sin(a * 2) * 0.15,
+        olen.pos.z + Math.cos(a) * r,
       );
     }
   }

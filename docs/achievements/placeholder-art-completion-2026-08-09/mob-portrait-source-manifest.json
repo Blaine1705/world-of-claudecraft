@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "3381b9489d2a9935d61689749dc273837bc98cc6564ce07d775e397dd847bc8b",
+  "rendererFingerprint": "f73158ecf1d3977f020d0784950b94ec63636d58e4ba8ac621891b135ca81a61",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5476018,
-      "sha256": "d085b6c1088914677f5916360693a9848e7ace6759316e2a9d6b0e0d5bbb5b2e",
+      "bytes": 5476134,
+      "sha256": "b3a4d7e547bf29a2af0203fe6049d0a52c4f3c8036a8a1dca7a567b0c7a8bd9b",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5485,56 +5485,31 @@
       "visualKey": "bastion_olen",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/knight_commander_olen.glb",
+          "path": "public/models/creatures/knight_commander_olen.glb",
+          "bytes": 3127608,
+          "sha256": "05bf8bd00cf7bf8bd088bfce2a0620a625cc6d64403dd2ff32da6fb9b8e73bbe"
         },
-        "idle": "Idle_Combat",
-        "height": 5.4,
+        "idle": "Idle",
+        "height": 7.4,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_blade.glb",
-              "path": "public/models/weapons/skeleton_blade.glb",
-              "bytes": 37096,
-              "sha256": "72e0b4fd163e60f1082f60faaeb6b677700040da5612a5046ab769fde9ed96f3"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          },
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_shield_large_a.glb",
-              "path": "public/models/weapons/skeleton_shield_large_a.glb",
-              "bytes": 41460,
-              "sha256": "879d7e1757d3aa7971ab524fbd67acf5a126ec421b51653c651f99ac5429ada8"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6f8a86",
-        "resolved": "#6f8a86",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "23ff69e6db67062ff8b31b16ee8301566795983ae7d5921dd8d9911823441acb",
+      "sourceFingerprint": "8ba688d8c10365d72ac8ce704754c228deef93c720d37d40d34966923c35ebff",
       "output": {
         "path": "public/ui/mobs/knight_commander_olen.webp",
-        "bytes": 2302,
-        "sha256": "948d5fb8069557ac9e3255d2b99d90abae111b2474411defac8b25cc43df127c"
+        "bytes": 2346,
+        "sha256": "c920bc26c5a76cd02d521e1e13a887b21ff6e5dbf4441367d7ecddd8d7acdb20"
       }
     },
     {

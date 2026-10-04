@@ -61,6 +61,16 @@ nothing here runs in the build or the game.
   Run, KeySwing, ChainLash, LanternRaise, Cast, Hit, Death. `TURNKEY_RAW_HEIGHT` and
   `TURNKEY_LANTERN_HIGH` in `bastion_creature_fx_core.ts` come from `../kit/anchors.py -- <abs>/turnkey
   LanternRaise:0.36`.
+- `olen/`: Knight-Commander Olen (`public/models/creatures/knight_commander_olen.glb`), the first boss, grown
+  from the Sergeant's builder: fluted plate with a brass breast sigil (`build_breast_sigil`), a grand morion
+  (`_Brim`, `HelmTrim` in brass) under a horsehair crest (`build_crest`), a bevor of three lames up under the
+  nose, a folded cloak (`_FoldedCloak`, its own Cape chain), greaves and cuisses, and the tower shield held by
+  its upright grip in the left fist (`shield_matrix`: the board's up runs through the fist, its face is the back
+  of the hand, so the clips aim the board with `hand_dir_l`/`hand_roll_l`; tune them with a probe of the posed
+  board). `clips.py` has Idle, CombatIdle, Walk, Run (the shield-first charge), Attack, Attack2 (the bash),
+  Attack3 (the Reaping Arc), OathCharge (the 2.5 s bar, bar-locked, a beat longer so it never wraps at the
+  launch), Stunned (Breached), Hit, Death. The one-shots start and end on the guard (CombatIdle), not on Idle,
+  so the checks' Idle seams are expected there.
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),

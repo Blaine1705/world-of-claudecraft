@@ -13,7 +13,11 @@
 //
 // Env: SHOT_URL (http://127.0.0.1:5241/), SHOT_PRESET (4), SHOT_W / SHOT_H
 // (1600x900), SHOT_ONLY (comma list of shot names), SHOT_TP (the /dev bastion
-// tp place, cisternyard; a boss leashed to its arena needs its own, e.g. olen).
+// tp place, cisternyard; a boss leashed to its arena needs its own, e.g. olen),
+// SHOT_TRIGGER (a /dev bastion trigger mechanic: the `cast` shot catches it
+// SHOT_CAST_MS into its bar (a comma list of times shoots each); a comma list of
+// mechanics shoots cast_<mechanic> for each),
+// SHOT_FIGHT_DIST (16: how far off the fighting shots raise the body).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -32,6 +36,9 @@ const PRESET = Number(process.env.SHOT_PRESET ?? 4);
 const ONLY = (process.env.SHOT_ONLY ?? '').split(',').filter(Boolean);
 const BOSS = TYPE.startsWith('boss:') ? TYPE.slice(5) : null;
 const TP = process.env.SHOT_TP ?? 'cisternyard';
+const TRIGGERS = (process.env.SHOT_TRIGGER ?? '').split(',').filter(Boolean);
+const CAST_MS = (process.env.SHOT_CAST_MS ?? '1200').split(',').map(Number);
+const FIGHT_DIST = Number(process.env.SHOT_FIGHT_DIST ?? 16);
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const want = (name) => !ONLY.length || ONLY.includes(name);
@@ -154,6 +161,13 @@ async function main() {
             me.devNoAggro = true;
           }
           me.targetId = mob.id;
+          // A boss is not pulled by a spawn: a first blow engages it.
+          if (pl && boss) {
+            sim.dealDamage(me, mob, 1, false, 'physical', 'Strike', 'hit');
+            mob.aggroTargetId = me.id;
+            mob.inCombat = true;
+            mob.aiState = 'chase';
+          }
           return mob.id;
         },
         [dist, pull, BOSS],
@@ -197,13 +211,42 @@ async function main() {
       if (want('idle_side')) await shot('idle_side');
       await chat('/dev freezemobs off');
     }
-    if (want('walk') || want('attack') || want('struck') || want('death')) {
-      await spawn(16, true);
+    if (want('walk') || want('attack') || want('cast') || want('struck') || want('death')) {
+      await spawn(FIGHT_DIST, true);
       await camera(0.9, 0.3, 13);
       await sleep(700);
       if (want('walk')) await shot('walk');
       await sleep(2600);
       if (want('attack')) await shot('attack');
+      if (want('cast')) {
+        for (const mech of TRIGGERS) {
+          await chat(`/dev bastion trigger ${mech}`);
+          let at = 0;
+          for (const ms of CAST_MS) {
+            await sleep(ms - at);
+            at = ms;
+            console.log(
+              'CAST',
+              mech,
+              ms,
+              await page.evaluate(() => {
+                const sim = window.__game.world;
+                const mob = sim.entities.get(sim.player.targetId);
+                const cur = window.__game.renderer.views.get(mob?.id)?.visual?.current;
+                return JSON.stringify({
+                  cast: mob?.castingAbility ?? null,
+                  left: mob?.castRemaining ?? null,
+                  clip: cur?.getClip?.().name ?? null,
+                  t: cur?.time ?? null,
+                });
+              }),
+            );
+            const tag = TRIGGERS.length > 1 ? `cast_${mech}` : 'cast';
+            await shot(CAST_MS.length > 1 ? `${tag}_${ms}` : tag);
+          }
+          await sleep(2600);
+        }
+      }
       // The player swings back (auto attack on) at a body that cannot fall yet.
       await page.evaluate(() => {
         const sim = window.__game.world;
