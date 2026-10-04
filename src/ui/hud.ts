@@ -464,6 +464,7 @@ import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
 import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
 import { DungeonPrompts, fctAvoidanceText, wardHealthText, wardHitText } from './hud/dungeon';
+import { applyDungeonGuideSpeech } from './hud/dungeon/dungeon_guide_speech';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
@@ -11123,8 +11124,7 @@ export class Hud {
       this.meters.onEvent(ev);
       if (this.isNythraxisEvent(ev)) this.lastNythraxisCombatEventAt = performance.now();
       if (applyQuestEventPresentation(this, ev)) continue;
-      if (ev.type === 'worldQuestInvestigationDialogue') this.questDialog.open(ev.targetId);
-      if (ev.type === 'worldQuestWeeklyOpen') this.weeklyQuestsWindow.open();
+      if (applyDungeonGuideSpeech(this, ev)) continue;
       switch (ev.type) {
         case 'damage': {
           const src = sim.entities.get(ev.sourceId);

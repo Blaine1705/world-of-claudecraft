@@ -6137,6 +6137,14 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_drowned_temple_cantor",
+    "name": "The Last Verse",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Witness of the Choir"
   }
 ];
 

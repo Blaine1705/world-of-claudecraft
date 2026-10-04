@@ -621,6 +621,8 @@ const mergeStringsEn = {
       // encounters/drowned_temple/ids.ts). The Lullaby, the Call and the Coil
       // can be kicked.
       temple_lullaby: 'Lullaby',
+      // Laverock's song at the Moon Altar (the dungeon guide's finale channel).
+      cantor_last_verse: 'The Last Verse',
       temple_call_the_tide: 'Call the Tide',
       temple_static_coil: 'Static Coil',
       temple_snapper_snap: 'Snap',

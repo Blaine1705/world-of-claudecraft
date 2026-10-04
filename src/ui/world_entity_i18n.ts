@@ -507,6 +507,8 @@ const NPC_IDS = [
   'tidewarden_nel',
   // the Eastbrook quay's sparring master (content/practice_dummies.ts)
   'drillmaster_hale',
+  // the Drowned Temple's lore guide (content/drowned_temple_cantor.ts)
+  'cantor_laverock',
 ] as const;
 
 const QUEST_IDS = [

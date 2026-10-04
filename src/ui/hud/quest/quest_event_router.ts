@@ -23,7 +23,8 @@ interface QuestEventHost {
     source?: null,
     bannerClass?: 'deed',
   ): unknown;
-  questDialog: { refresh(): void };
+  questDialog: { refresh(): void; open(npcId: number): void };
+  weeklyQuestsWindow: { open(): void };
   worldQuestPuzzleWindow: { applyEventPresentation(presentation: QuestEventPresentation): void };
   treasureMapWindow: { open(): void; refresh(): void };
 }
@@ -34,6 +35,10 @@ export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean 
   const h = hud as QuestEventHost;
   // A read treasure map opens its parchment (a re-read has no log line, so
   // this runs before the presentation check); an upgrade or a dig repaints it.
+  // The two world-quest events that open a window (an investigation's
+  // dialogue, the weekly board) carry no presentation of their own.
+  if (ev.type === 'worldQuestInvestigationDialogue') h.questDialog.open(ev.targetId);
+  else if (ev.type === 'worldQuestWeeklyOpen') h.weeklyQuestsWindow.open();
   if (ev.type === 'treasureMapRead') h.treasureMapWindow.open();
   else if (ev.type === 'treasureMapUpgraded' || ev.type === 'treasureVaultOpened')
     h.treasureMapWindow.refresh();

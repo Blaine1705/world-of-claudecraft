@@ -19039,4 +19039,89 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.wildheart.avatar':
     '移动速度提高{pct}%，追猎它的猎物。减速和定身可以生效，击晕的持续时间减半。',
   'hudChrome.auraEffect.wildheart.vanished': '隐匿且免疫伤害。他即将扑向最远的玩家。',
+  // The Drowned Temple lore guide, Laverock (src/sim/content/drowned_temple_cantor.ts).
+  'dungeonGuide.drownedTemple.greet.1':
+    '我曾是苍白唱诗班里最年轻的声音。仪式那夜，我没有喝，我逃了。从那以后，每逢满月，我都听见他们在水下歌唱。我必须在死前亲眼见到她。让我跟在你们身后吧。我不会战斗，也不会拖累你们。',
+  'dungeonGuide.drownedTemple.greet.2':
+    '每逢满月我都来到这扇门前，每逢满月我的勇气都会溃散。今夜不会。唱诗班正在歌唱，而逃走的那个人是我。带我下去见她吧，我不会碍事。',
+  'dungeonGuide.drownedTemple.row.join': '跟我们一起走吧。',
+  'dungeonGuide.drownedTemple.row.decline': '我们自己去。',
+  'dungeonGuide.drownedTemple.joined': '你们先走，我就在后面。',
+  'dungeonGuide.drownedTemple.singing': '让我唱吧。走吧，安心地走。',
+  'dungeonGuide.drownedTemple.accept.1': '谢谢你们。我会跟在后面，绝不碍事。',
+  'dungeonGuide.drownedTemple.accept.2': '那么我终于要下去了。往前走吧，我跟得上。',
+  'dungeonGuide.drownedTemple.decline': '我明白。我会像从前一样，在这上面聆听。',
+  'dungeonGuide.drownedTemple.heroicWater': '今夜水涨得很高，比我见过的任何时候都高。她快要醒了。',
+  'dungeonGuide.drownedTemple.memory.votaries':
+    '岸边那些溺亡者，是在门关上之后走进去的。带走他们的不是月亮，只是湖水。',
+  'dungeonGuide.drownedTemple.memory.rubbing':
+    '守潮者读到了我刻在岸边岩石上的字。“它只是沉睡。”那是我在第二天早上刻下的。',
+  'dungeonGuide.drownedTemple.area.steps': '朝圣者阶梯。那一夜我一步三级地往上跑，一次也没有回头。',
+  'dungeonGuide.drownedTemple.sight.pilgrim':
+    '岸边村庄的朝圣者。每年春天他们都把神龛背在背上。如今他们要永远背着它了。',
+  'dungeonGuide.drownedTemple.sight.acolyte':
+    '那些见习生。我曾在她们身旁学认字。如今她们在睡梦中歌唱，永远不会醒来。',
+  'dungeonGuide.drownedTemple.area.causeway.1': '仪式之夜，月光铺在这条堤道上，像第二条路。',
+  'dungeonGuide.drownedTemple.area.causeway.2': '看看这水。它仍记得如何托住月亮。',
+  'dungeonGuide.drownedTemple.sight.templeguard':
+    '阶梯的守卫。他们发誓守护神殿，直到月亮落下。月亮从未落下。',
+  'dungeonGuide.drownedTemple.sight.snapper': '我们曾用那样的贝壳喝月之水。我的那只掉在了阶梯上。',
+  'dungeonGuide.drownedTemple.sight.siren':
+    '那个声音。她曾在唱诗班里站在我身旁歌唱。她现在还是会早半拍进来。',
+  'dungeonGuide.drownedTemple.sight.lurker':
+    '孩子们常在浅滩用网捞这些东西。那时它们只有拇指大，会发光。',
+  'dungeonGuide.drownedTemple.sight.tidewisp':
+    '那就是月之水本身，我们本该喝下的那一口。别让它碰到你们。',
+  'dungeonGuide.drownedTemple.area.colonnade': '潮汐柱廊。我们两两并肩走过这里，唱着升起之节。',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    '门边的供奉蚌。我们把珍珠放进去祈求好运。如今它们把珍珠当作心脏。',
+  'dungeonGuide.drownedTemple.sight.eel':
+    '泻湖里的鳗鱼。见习生们会在黄昏喂它们面包。它们靠我们的圣歌养得肥肥的。',
+  'dungeonGuide.drownedTemple.area.veil': '那道帷幕后面就是唱诗庭院。我从小时候起就再没踏进去过。',
+  'dungeonGuide.drownedTemple.selthe.pre.1':
+    '塞尔瑟嬷嬷。她教我用腹部呼吸。她教会我们所有人如何溺水而不死。',
+  'dungeonGuide.drownedTemple.selthe.pre.2':
+    '唱诗母塞尔瑟。我会的每一个音，都是她教给我的。原谅我，嬷嬷。',
+  'dungeonGuide.drownedTemple.selthe.post.1':
+    '她安静了。我在唱诗班的那些年里，她从来没有安静过一次。',
+  'dungeonGuide.drownedTemple.selthe.post.2': '安息吧，嬷嬷。你说得对，我始终撑不住长音。',
+  'dungeonGuide.drownedTemple.area.terraces':
+    '潮池。见习生们把它们打扫干净，喂养住在里面的小小发光生灵。',
+  'dungeonGuide.drownedTemple.area.falls':
+    '瀑布后面，水声会淹没一切人声。我逃练习的时候就躲在这里。',
+  'dungeonGuide.drownedTemple.area.pool': '月之池。他们跪在池边，用贝壳饮水。我却举不起我的那只。',
+  'dungeonGuide.drownedTemple.hydra.pre':
+    '池中的大蛇。我小时候它只有一个头，还会从我们手里吃东西。',
+  'dungeonGuide.drownedTemple.hydra.post': '听。瀑布底下，他们还在歌唱。现在更近了。',
+  'dungeonGuide.drownedTemple.area.prismStair':
+    '棱镜阶梯。我们在月出时登上它，去唤醒那块巨大的玻璃。',
+  'dungeonGuide.drownedTemple.colossus.pre':
+    '那座巨大的棱镜。我们对着它歌唱，想要捕住月亮。我从不知道它能站起来。',
+  'dungeonGuide.drownedTemple.sight.reflection': '它让你们看见湖水会把你们变成什么。打碎它！',
+  'dungeonGuide.drownedTemple.colossus.post': '玻璃碎了。如今再没有什么能捕住月亮了，除了她。',
+  'dungeonGuide.drownedTemple.area.moonbridge.1':
+    '一座月光之桥。长老们说，只有虔诚的人才能走过去。',
+  'dungeonGuide.drownedTemple.area.moonbridge.2': '我从来都不虔诚。好吧，看看它撑不撑得住我。',
+  'dungeonGuide.drownedTemple.area.altarLanding': '我当年就站在这里。就是这里。我在这里转身逃走。',
+  'dungeonGuide.drownedTemple.ysolei.pre':
+    '她就在那里。我这一生都在问，她究竟是女神还是怪物。让我看看吧。',
+  'dungeonGuide.drownedTemple.ysolei.preHeroic':
+    '在这样的夜晚，整个唱诗班都会与她一同歌唱。大家都要撑住。',
+  'dungeonGuide.drownedTemple.sight.moonspawn': '那些从来不是我的族人。它们是她的，只由月光造成。',
+  'dungeonGuide.drownedTemple.farewell.answer':
+    '她两者都不是。她只是水中的月亮，而跪下的是我们自己。',
+  'dungeonGuide.drownedTemple.farewell.verse':
+    '仪式还有最后一节，让歌者得以安睡的那一节。我从没唱过。',
+  'dungeonGuide.drownedTemple.farewell.stay': '他们已经等得够久了。我会留下，现在就为他们唱。',
+  'dungeonGuide.drownedTemple.farewell.goodbye.1':
+    '回到夜色中去吧。如果你们在满月时听见歌声，那只是我。',
+  'dungeonGuide.drownedTemple.farewell.goodbye.2': '谢谢你们把一个老懦夫带到他歌声的尽头。走吧。',
+  'dungeonGuide.drownedTemple.farewell.emote': '{name}在祭坛上方扬声歌唱，泻湖归于平静。',
+  'dungeonGuide.drownedTemple.wipe': '起来。求你们了。别再把我一个人留在这下面。',
+  'dungeonGuide.drownedTemple.catchUp': '我的腿是老了，可这里的每一级台阶我都认得。我在这儿。',
+  'abilityUi.cast.cantor_last_verse': '最后一节',
+  'entities.npcs.cantor_laverock.name': '拉弗洛克',
+  'entities.npcs.cantor_laverock.title': '苍白唱诗班最后的领唱',
+  'entities.npcs.cantor_laverock.greeting':
+    '我曾是苍白唱诗班里最年轻的声音。仪式那夜，我没有喝，我逃了。从那以后，每逢满月，我都听见他们在水下歌唱。我必须在死前亲眼见到她。让我跟在你们身后吧。我不会战斗，也不会拖累你们。',
 };

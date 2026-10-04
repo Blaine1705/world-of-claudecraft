@@ -4689,6 +4689,19 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // Laverock, the Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
+  // a stand-in on the robed KayKit mage (bone-white robes, a staff) until his
+  // own model ships. His song is a channel cast (the generic cast loop).
+  npc_laverock: {
+    url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    show: [],
+    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    tint: 0xe6dcc6,
+    tintStrength: 0.45,
+  },
   npc_villager_robed: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
@@ -5842,6 +5855,7 @@ const NPC_KEYS: Record<string, string> = {
   infiltrator_bram: 'npc_knight',
   infiltrator_tessa: 'npc_knight',
   calligraphy_instructor: 'npc_villager_robed',
+  cantor_laverock: 'npc_laverock',
   calligraphy_apprentice_1: 'npc_villager',
   calligraphy_apprentice_2: 'npc_villager',
   bursar_fernando: 'npc_fernando',

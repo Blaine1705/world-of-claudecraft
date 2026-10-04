@@ -20026,4 +20026,106 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。',
   'hudChrome.auraEffect.wildheart.vanished':
     '姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。',
+  // The Drowned Temple lore guide, Laverock (src/sim/content/drowned_temple_cantor.ts).
+  'dungeonGuide.drownedTemple.greet.1':
+    'わしは蒼白聖歌隊でいちばん若い声だった。儀式の夜、わしは飲まずに逃げた。それ以来、満月のたびに水の下で皆が歌うのが聞こえる。死ぬ前に、あの方をこの目で見なければならん。後ろを歩かせてくれ。戦いはせんし、足手まといにもならん。',
+  'dungeonGuide.drownedTemple.greet.2':
+    '満月のたびにこの門まで来ては、そのたびに勇気がくじける。だが今夜は違う。聖歌隊が歌っている。逃げたのはこのわしだ。あの方のもとまで連れて行ってくれ。邪魔はせん。',
+  'dungeonGuide.drownedTemple.row.join': '一緒に来てくれ。',
+  'dungeonGuide.drownedTemple.row.decline': '我々だけで行く。',
+  'dungeonGuide.drownedTemple.joined': '先に行ってくれ。すぐ後ろにいる。',
+  'dungeonGuide.drownedTemple.singing': '歌わせてくれ。行きなさい、穏やかにな。',
+  'dungeonGuide.drownedTemple.accept.1': 'ありがとう。後ろを歩こう。邪魔はせん。',
+  'dungeonGuide.drownedTemple.accept.2': 'ならば、ようやく下りるとしよう。進んでくれ。ついて行く。',
+  'dungeonGuide.drownedTemple.decline': 'わかった。これまでどおり、ここから聴いていよう。',
+  'dungeonGuide.drownedTemple.heroicWater':
+    '今夜は水が高い。わしが見たこともないほどにな。あの方は目覚めかけておる。',
+  'dungeonGuide.drownedTemple.memory.votaries':
+    '岸の溺れ人たちは、門が閉じたあとに入っていった者たちだ。月は彼らを奪わなかった。奪ったのは水だけだ。',
+  'dungeonGuide.drownedTemple.memory.rubbing':
+    '潮見の番人が岸の岩に刻んだわしの言葉を読んだ。「眠っているだけ」。翌朝、わしが刻んだのだ。',
+  'dungeonGuide.drownedTemple.area.steps':
+    '巡礼の階段だ。あの夜、わしは三段飛ばしで駆け上がり、一度も振り返らなかった。',
+  'dungeonGuide.drownedTemple.sight.pilgrim':
+    '岸の村々の巡礼者たちだ。毎年春になると祠を背負って歩いた。今は永遠に背負っておる。',
+  'dungeonGuide.drownedTemple.sight.acolyte':
+    '見習いの娘たちだ。わしは彼女らの隣で文字を覚えた。今は眠りながら歌い、決して目覚めん。',
+  'dungeonGuide.drownedTemple.area.causeway.1':
+    '儀式の夜には、月がこの土手道に二本目の道のように横たわっていた。',
+  'dungeonGuide.drownedTemple.area.causeway.2': '水を見てごらん。月の抱き方を、今も覚えておる。',
+  'dungeonGuide.drownedTemple.sight.templeguard':
+    '階段の衛兵だ。月が沈むまで神殿を守ると誓った。月は沈まなかった。',
+  'dungeonGuide.drownedTemple.sight.snapper':
+    'わしらはあのような貝殻で月の水を飲んだ。わしのは階段に落としてしまった。',
+  'dungeonGuide.drownedTemple.sight.siren':
+    'あの声だ。聖歌隊でわしの隣で歌っていた。今も半拍早く入ってくる。',
+  'dungeonGuide.drownedTemple.sight.lurker':
+    '子どもたちが浅瀬で網ですくっていたものだ。親指ほどの大きさで、光っておった。',
+  'dungeonGuide.drownedTemple.sight.tidewisp':
+    'あれこそ月の水そのもの、わしらが飲むはずだった一杯だ。触れさせてはならん。',
+  'dungeonGuide.drownedTemple.area.colonnade':
+    '潮の列柱回廊だ。二人ずつ並んで、昇りの節を歌いながら歩いたものだ。',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    '門のそばの捧げ物の貝だ。幸運を願って真珠を納めた。今はそれを心臓として身につけておる。',
+  'dungeonGuide.drownedTemple.sight.eel':
+    '潟のウナギだ。見習いたちが夕暮れにパンをやっていた。わしらの賛歌で太ったのさ。',
+  'dungeonGuide.drownedTemple.area.veil':
+    'あの幕の向こうが聖歌の中庭だ。子どもの頃から一度も立っておらん。',
+  'dungeonGuide.drownedTemple.selthe.pre.1':
+    'セルセ母さまだ。腹から息をすることを教えてくれた。死なずに溺れることを、皆に教えたのだ。',
+  'dungeonGuide.drownedTemple.selthe.pre.2':
+    '聖歌母セルセ。わしが知る音はすべて、あの方が授けてくれた。お許しください、母さま。',
+  'dungeonGuide.drownedTemple.selthe.post.1':
+    '静かになった。聖歌隊にいたあいだ、あの方が静かだったことなど一度もなかった。',
+  'dungeonGuide.drownedTemple.selthe.post.2':
+    'もうお休みください、母さま。あなたの言うとおりでした。わしは長い音を保てなかった。',
+  'dungeonGuide.drownedTemple.area.terraces':
+    '潮だまりだ。見習いたちが掃除をして、中に住む小さな光るものたちに餌をやっていた。',
+  'dungeonGuide.drownedTemple.area.falls':
+    '滝の裏では、水がどんな声もかき消す。稽古をさぼるとき、わしはここに隠れた。',
+  'dungeonGuide.drownedTemple.area.pool':
+    '月の池だ。皆はそのまわりにひざまずき、貝殻から飲んだ。わしは自分のを持ち上げられなかった。',
+  'dungeonGuide.drownedTemple.hydra.pre':
+    '池の大蛇だ。わしが子どもの頃は頭が一つで、わしらの手から餌を食べたものだ。',
+  'dungeonGuide.drownedTemple.hydra.post':
+    '聴いてごらん。滝の下で、まだ皆が歌っておる。さっきより近い。',
+  'dungeonGuide.drownedTemple.area.prismStair':
+    'プリズムの階段だ。月の出に登って、大いなる硝子を目覚めさせたものだ。',
+  'dungeonGuide.drownedTemple.colossus.pre':
+    '大いなるプリズムだ。月を捕らえようと、その中に向かって歌った。立ち上がれるとは知らなんだ。',
+  'dungeonGuide.drownedTemple.sight.reflection':
+    '水がお前たちを何に変えるか、それを見せておるのだ。壊せ!',
+  'dungeonGuide.drownedTemple.colossus.post':
+    '硝子は砕けた。もう月を捕らえるものは何も残っておらん。あの方を除いてはな。',
+  'dungeonGuide.drownedTemple.area.moonbridge.1':
+    '月光の橋だ。信心深い者だけが渡れると、長老たちは言っていた。',
+  'dungeonGuide.drownedTemple.area.moonbridge.2':
+    'わしは信心深くなどなかった。さて、わしを支えてくれるかどうか。',
+  'dungeonGuide.drownedTemple.area.altarLanding':
+    'ここにわしは立っていた。まさにここだ。ここで背を向けて逃げたのだ。',
+  'dungeonGuide.drownedTemple.ysolei.pre':
+    'あそこにおられる。生涯ずっと、あの方が女神か怪物かと問い続けてきた。見せてくれ。',
+  'dungeonGuide.drownedTemple.ysolei.preHeroic':
+    'こんな夜には、聖歌隊の皆があの方とともに歌う。皆、踏みとどまれ。',
+  'dungeonGuide.drownedTemple.sight.moonspawn':
+    'あれはわしの仲間などではない。あの方のものだ。月光だけでできておる。',
+  'dungeonGuide.drownedTemple.farewell.answer':
+    'どちらでもなかった。あれは水に映る月で、ひざまずいたのはわしらのほうだった。',
+  'dungeonGuide.drownedTemple.farewell.verse':
+    '儀式には最後の一節があった。歌い手たちを眠らせる節だ。わしはそれを歌わなかった。',
+  'dungeonGuide.drownedTemple.farewell.stay':
+    '皆、もう十分に待った。わしはここに残り、今それを歌ってやろう。',
+  'dungeonGuide.drownedTemple.farewell.goodbye.1':
+    '夜空のもとへ上っていきなさい。満月に歌が聞こえたら、それはわしだ。',
+  'dungeonGuide.drownedTemple.farewell.goodbye.2':
+    '年老いた臆病者を歌の終わりまで連れてきてくれて、ありがとう。さあ、行きなさい。',
+  'dungeonGuide.drownedTemple.farewell.emote': '{name}が祭壇の上で声を上げると、潟は静まり返った。',
+  'dungeonGuide.drownedTemple.wipe': '起きてくれ。頼む。またこの底にわしを独り残さんでくれ。',
+  'dungeonGuide.drownedTemple.catchUp':
+    '脚は老いたが、この階段は一段残らず知っておる。ここにいるぞ。',
+  'abilityUi.cast.cantor_last_verse': '最後の一節',
+  'entities.npcs.cantor_laverock.name': 'ラヴェロック',
+  'entities.npcs.cantor_laverock.title': '蒼白聖歌隊最後の詠唱者',
+  'entities.npcs.cantor_laverock.greeting':
+    'わしは蒼白聖歌隊でいちばん若い声だった。儀式の夜、わしは飲まずに逃げた。それ以来、満月のたびに水の下で皆が歌うのが聞こえる。死ぬ前に、あの方をこの目で見なければならん。後ろを歩かせてくれ。戦いはせんし、足手まといにもならん。',
 };
