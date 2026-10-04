@@ -53,6 +53,7 @@ import {
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
 import { BastionFx } from './sunken_bastion/bastion_fx';
+import { TrashEngineFx } from './trash_engine_fx';
 import { WildheartFx } from './wildheart_basin';
 
 const SEGMENTS = 64;
@@ -121,6 +122,9 @@ export class RiftDeathZoneVisuals {
   private readonly sanctumFx: SanctumFx;
   // The Gravewyrm Sanctum's three bosses: chains, plates, meltwater, telegraphs.
   private readonly sanctumBosses: SanctumBossFx;
+  // The trash engine's generic pieces in any dungeon (hazard pools, combat
+  // walls, walker orbs, the sight-line nova, usable bodies, freeze, brands).
+  private readonly trashEngine: TrashEngineFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -237,6 +241,7 @@ export class RiftDeathZoneVisuals {
       compileGate,
       reducedMotion,
     );
+    this.trashEngine = new TrashEngineFx(scene, groundY, world, compileGate, reducedMotion, shake);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -310,6 +315,7 @@ export class RiftDeathZoneVisuals {
     this.morthenFx.update(dt);
     this.sanctumFx.update(dt);
     this.sanctumBosses.update(dt);
+    this.trashEngine.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -350,6 +356,7 @@ export class RiftDeathZoneVisuals {
     this.morthenFx.dispose();
     this.sanctumFx.dispose();
     this.sanctumBosses.dispose();
+    this.trashEngine.dispose();
     this.hoardPresentation.dispose();
   }
 
@@ -365,7 +372,8 @@ export class RiftDeathZoneVisuals {
     const basin = this.wildheartFx.handleEvent(event);
     const sanctum = this.sanctumFx.handleEvent(event);
     const sanctumBoss = this.sanctumBosses.handleEvent(event);
-    return this.bastionFx.handleEvent(event) || temple || basin || sanctum || sanctumBoss;
+    const engine = this.trashEngine.handleEvent(event);
+    return this.bastionFx.handleEvent(event) || temple || basin || sanctum || sanctumBoss || engine;
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

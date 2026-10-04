@@ -154,6 +154,28 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   },
   // The Sledge Tusker's enrage glow pooled on the ice round its feet.
   { file: 'src/render/gravewyrm_sanctum_fx/tusker_fx.ts', layer: 'encounter', strict: true },
+  // The Sanctum trash mechanics pass: the Thaw the Held cracks under the
+  // corpse, the lash's swoosh, the eruption column, the fallen brazier's coals.
+  {
+    file: 'src/render/gravewyrm_sanctum_fx/sanctum_kit_fx.ts',
+    layer: 'encounter',
+    strict: true,
+  },
+  // The trash engine (render/trash_engine_fx): hazard pools and their danger
+  // ring, the combat walls' stain and shell, the walker orbs' floor glow and
+  // lane chevrons, the line-of-sight nova's sight field and wave, the usable
+  // bodies' reach ring and effort arc, the freeze and brand marks, the shock
+  // rings and particle pools; all on the encounter band.
+  { file: 'src/render/trash_engine_fx/engine_particles.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/trash_engine_fx/engine_hazards.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/trash_engine_fx/engine_walls.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/trash_engine_fx/engine_walkers.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/trash_engine_fx/engine_nova.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/trash_engine_fx/engine_use.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/trash_engine_fx/engine_body_fx.ts', layer: 'encounter', strict: true },
+  // The dungeon's quench pools: permanent level dressing on the ground band's
+  // top rung, so every encounter telegraph paints over them.
+  { file: 'src/render/trash_engine_fx/engine_quench.ts', layer: 'ground', strict: true },
   // The Gravewyrm Sanctum's three bosses: their cast telegraphs on the shared
   // kit, the plate overlays, the meltwater, the rings, the landing shadow.
   {

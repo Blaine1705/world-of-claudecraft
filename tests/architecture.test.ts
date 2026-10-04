@@ -896,6 +896,10 @@ const RENDER_PURE_CORES = [
   // length, the object looks, the palette and the timelines).
   'src/render/gravewyrm_sanctum_fx/tusker_model_core.ts',
   'src/render/gravewyrm_sanctum_fx/sanctum_fx_core.ts',
+  // The trash engine's visuals: the catalog swept from the kits, the hazard
+  // looks, the wall box, the nova's sight reach and wave, the use hint, the
+  // freeze and encase timelines, the quench pools' placement.
+  'src/render/trash_engine_fx/trash_engine_fx_core.ts',
   'src/render/characters/turn_in_place_core.ts',
   'src/render/characters/glow_pulse_core.ts',
   // Creased smooth normals for a faceted rig (VisualDef.smoothNormals).
