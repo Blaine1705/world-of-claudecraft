@@ -4681,11 +4681,20 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.06,
   },
-  // The Tideglass Colossus: stone blocks round a blazing prism. It walks its
-  // foe down (sixth pass): Walk and Run are its own lumbering gait. The
-  // template's 2.2 scale (its long reach) draws it at 15 world units. A new
-  // Colossus body swaps in here: keep its clip names (Idle, Walk, Run, Attack,
-  // Attack2, Hit, Death, Flare, Lance, Slam) or remap them below.
+  // The Tideglass Colossus (tideglass_colossus; scripts/assets/
+  // drowned_temple_creatures/colossus_tideglass/, rebuilt from scratch): a
+  // giant of sea-glass the moon's water hardened, massive forms cut in broad
+  // facets with fractures of light running through it, violet crystal spires
+  // bursting from its shoulders, spine, elbows and knees, silver bands with
+  // moons, and in its chest, held in a silver crescent ringed with pearls, the
+  // prism: the cut gem of silver and violet that casts the Reflections. It
+  // walks its foe down (Walk, Run). Prism Flare (2.0 s bar) plays Flare: arms
+  // flung wide, the prism blazing on the bar's end. Moonlight Lance (2.0 s
+  // bar) plays Lance: the prism levelled along its pointing arm. Resonant Slam
+  // (1.5 s bar) plays Slam: both fists into the floor and a ring of broken
+  // crystal. Heroic's Reflection swap arrives as a windup cue: PrismPulse.
+  // Dying, it kneels, topples and breaks into crystal over a pool of water.
+  // The template's 2.2 scale (its long reach) draws it at 15 world units.
   temple_colossus: {
     url: `${CREATURES}/temple_colossus.glb`,
     height: 15 / 2.2,
@@ -4697,11 +4706,18 @@ export const VISUALS: Record<string, VisualDef> = {
         [COLOSSUS_RESONANT_SLAM]: 'Slam',
       },
       castTimeScaleByAbility: {
-        [COLOSSUS_PRISM_FLARE]: 1.1,
-        [COLOSSUS_MOONLIGHT_LANCE]: 1.1,
-        [COLOSSUS_RESONANT_SLAM]: 1.6,
+        [COLOSSUS_PRISM_FLARE]: 1,
+        [COLOSSUS_MOONLIGHT_LANCE]: 1,
+        [COLOSSUS_RESONANT_SLAM]: 1,
       },
+      attackByAbility: { [COLOSSUS_PRISM_FLARE]: 'PrismPulse' },
+      attackTimeScaleByAbility: { [COLOSSUS_PRISM_FLARE]: 1 },
     },
+    attackTimeScale: 1,
+    walkRef: 1.4,
+    runRef: 3.48,
+    castClipSync: true,
+    authoredAtlas: true,
     selfIllumination: 0.06,
   },
   // Ysolei, Avatar of the Drowned Moon: the colossal lunar sea-serpent built

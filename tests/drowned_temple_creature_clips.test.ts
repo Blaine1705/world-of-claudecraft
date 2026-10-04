@@ -16,6 +16,10 @@ import {
 } from '../src/render/drowned_temple/temple_fx_core';
 import { MOBS } from '../src/sim/data';
 import {
+  COLOSSUS_MOONLIGHT_LANCE,
+  COLOSSUS_PRISM_FLARE,
+  COLOSSUS_RESONANT_SLAM,
+  COLOSSUS_TUNING,
   SELTHE_CHORUS_MARK,
   SELTHE_SEA_SONG,
   SELTHE_SOLO_MARK,
@@ -108,6 +112,38 @@ describe('the Lagoon Eel and the Colossus', () => {
     );
     expect(v.clips.walk).toBe('Walk');
     expect(v.height * (MOBS.tideglass_colossus.scale ?? 1)).toBeCloseTo(15, 3);
+  });
+
+  it('the rebuilt sea-glass Colossus answers each of its bars with its own clip', () => {
+    const v = visualOf('tideglass_colossus');
+    expect(clipsOf('public/models/creatures/temple_colossus.glb').sort()).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'Cast',
+        'Death',
+        'Flare',
+        'Hit',
+        'Idle',
+        'Lance',
+        'PrismPulse',
+        'Run',
+        'Slam',
+        'Walk',
+      ].sort(),
+    );
+    const c = v.clips;
+    expect(c.castByAbility?.[COLOSSUS_PRISM_FLARE]).toBe('Flare');
+    expect(c.castByAbility?.[COLOSSUS_MOONLIGHT_LANCE]).toBe('Lance');
+    expect(c.castByAbility?.[COLOSSUS_RESONANT_SLAM]).toBe('Slam');
+    for (const id of [COLOSSUS_PRISM_FLARE, COLOSSUS_MOONLIGHT_LANCE, COLOSSUS_RESONANT_SLAM])
+      expect(c.castTimeScaleByAbility?.[id]).toBe(1);
+    // heroic's Reflection swap is a windup cue on the same ability id
+    expect(c.attackByAbility?.[COLOSSUS_PRISM_FLARE]).toBe('PrismPulse');
+    expect(v.authoredAtlas).toBe(true);
+    expect(COLOSSUS_TUNING.flareCast).toBe(2);
+    expect(COLOSSUS_TUNING.lanceCast).toBe(2);
+    expect(COLOSSUS_TUNING.slamCast).toBe(1.5);
   });
 });
 

@@ -214,6 +214,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_selthe',
   // the Drowned Temple's Blender Lagoon Snapper (the sacred nautilus)
   'temple_snapper',
+  // the Drowned Temple's Blender Tideglass Colossus (the sea-glass giant)
+  'temple_colossus',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

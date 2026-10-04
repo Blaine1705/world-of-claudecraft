@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "86ece4cf656f1627fb23836d6151b7d6d44f0fad1821ec03419155e01739f9f8",
+  "rendererFingerprint": "dd6964e1e4440c903c1c1100e4648167fb1b8c8bc65807d149d0cb50e2c93980",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5475894,
-      "sha256": "76cd08b766bad13e3f3f6dd8f4627615c39d4e20081529c3db9d5b2a22251a38",
+      "sha256": "20de85edb92c29b002fa6be82f2efa110209c9a2e0ccf9e73eecd20a42e38257",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -10471,8 +10471,8 @@
         "model": {
           "url": "models/creatures/temple_colossus.glb",
           "path": "public/models/creatures/temple_colossus.glb",
-          "bytes": 1361276,
-          "sha256": "ecaef345b5c5a7e68939d629c953898e4ca6c39a6aa64a8dba8eddd9016be312"
+          "bytes": 2779028,
+          "sha256": "96ad826c1964710b74f594fd5f25b5a4d4154889d86e2115dee99ccabce71a0c"
         },
         "idle": "Idle",
         "height": 6.8181818181818175,
@@ -10489,11 +10489,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "5201317ee8a1e090299ee45a16fa7b7f4e3cbeaabd8c152767e5f369700ac09c",
+      "sourceFingerprint": "0d2689cde6c38094b7e57fc929004f93753bab43580e48a735725ca53124d893",
       "output": {
         "path": "public/ui/mobs/tideglass_colossus.webp",
-        "bytes": 3374,
-        "sha256": "2a58136b7588a6886c64d2e3c3f46f2845dbb3c0fac8e43a56fc204582ddaca3"
+        "bytes": 4674,
+        "sha256": "db59e59160a216126bd92226cfafa8f8708554e7baf8cb33ab8361fc9c178a4c"
       }
     },
     {
