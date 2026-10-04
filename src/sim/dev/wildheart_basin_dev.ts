@@ -85,6 +85,7 @@ export const WILDHEART_DEV_MOBS: Readonly<Record<string, string>> = {
   hexcaller: 'wildheart_hexcaller',
   binder: 'sunbone_totem_binder',
   totem: 'sunbone_totem',
+  dreadtotem: 'sunbone_dread_totem',
   raptor: 'basin_raptor',
   toad: 'spore_toad',
   lasher: 'vine_lasher',
@@ -95,7 +96,7 @@ export const WILDHEART_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev wildheart enter [normal|heroic] | tp <landing|fern|bank|ford|saurian|steps|hunt|huntupper|pits|beastmaster|ledge|behindfalls|falls|gorgebloom|causeway|island|plaza|convergence|stair|shrinestair|shrine|zulgar> | gates | kill <g1..g13|pa|pb|pc|pd|saurian|beastmaster|jaguar|gorgebloom|zulgar|trash|all> | pack <id> | spawn <stalker|ravager|hexcaller|binder|totem|raptor|toad|lasher|saurian|rider|jaguar|sprout> | trigger <tail|stomp|howdah|enrage|quake|stalk|hunt|ward|heel|seeds|pods|pollinate|lash|gorge|pulse|spirit|prey|endhunt|ambush> | reset';
+  '[dev] /dev wildheart enter [normal|heroic] | tp <landing|fern|bank|ford|saurian|steps|hunt|huntupper|pits|beastmaster|ledge|behindfalls|falls|gorgebloom|causeway|island|plaza|convergence|stair|shrinestair|shrine|zulgar> | gates | kill <g1..g13|pa|pb|pc|pd|saurian|beastmaster|jaguar|gorgebloom|zulgar|trash|all> | pack <id> | spawn <stalker|ravager|hexcaller|binder|totem|dreadtotem|raptor|toad|lasher|saurian|rider|jaguar|sprout> | trigger <tail|stomp|howdah|enrage|quake|stalk|hunt|ward|heel|seeds|pods|pollinate|lash|gorge|pulse|spirit|prey|endhunt|ambush> | reset';
 
 /** Raise one mob ahead of the player, pulled at once. */
 function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: string): boolean {

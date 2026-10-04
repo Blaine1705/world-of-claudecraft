@@ -8,13 +8,20 @@
 //             breaks on damage. Kick it, or wake the sleeper with a hit.
 //   carapace  once per pull under a health share, the pearl shell closes: a
 //             self absorb shield worth a share of its maximum health.
-//   detonate  a seeker that bursts on reaching its victim: a splash round it,
-//             and it is gone. Kill it before it arrives.
+//   detonate  a seeker that bursts on reaching its victim: a splash round it
+//             (and a chill, when it has one), and it is gone. Kill it before
+//             it arrives. A wisp swollen by heroic merges (temple_tide.ts)
+//             bursts wider and harder.
+//
+// The Temple's own key block (trashKit.temple: the vigil, the oath, the
+// lullaby's echo, the gaze, the whirlpool, the spark, the merge) runs through
+// the driver's extension seam (temple_extension.ts).
 //
 // Zero rng in every pick (the lullaby's victim is the kit's hash over the
 // players in reach, the tank last); the only draws are the burst's damage
 // rolls, in roster order.
 
+import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { dist2d, type Entity, type TrashKitDef, type TrashKitState } from '../../types';
 import { kitHash, livingInReach } from './targets';
@@ -22,7 +29,10 @@ import {
   TEMPLE_LULLABY_SLEEP,
   TEMPLE_PEARL_CARAPACE,
   TEMPLE_TIDEWISP_BURST,
+  TEMPLE_TIDEWISP_CHILL,
 } from './temple_cast_ids';
+import { startLullabyEcho } from './temple_choir';
+import { swellOf } from './temple_tide';
 
 /** The absorb aura the Pearl Carapace closes over its wearer. */
 export const TEMPLE_CARAPACE_AURA = 'temple_pearl_carapace_ward';
@@ -54,12 +64,15 @@ export function lullabyReady(
   return target ? { ok: true, target } : { ok: false, target: null };
 }
 
-/** The Lullaby's bar ran out: its victim falls asleep (a hit wakes them). */
+/** The Lullaby's bar ran out: its victim falls asleep (a hit wakes them).
+ *  On heroic a kit with a `temple.lullabyEcho` starts the echo off them. */
 export function landLullaby(
   ctx: SimContext,
+  inst: InstanceSlot,
   mob: Entity,
   kit: TrashKitDef,
   targetId: number | null,
+  st: TrashKitState,
 ): void {
   const def = kit.lullaby;
   const target = targetId !== null ? ctx.entities.get(targetId) : undefined;
@@ -85,6 +98,7 @@ export function landLullaby(
     // A sleep: any hit wakes the sleeper.
     breaksOnDamage: true,
   });
+  startLullabyEcho(ctx, inst, mob, kit, st, target);
 }
 
 /** Once per pull under its health share the pearl shell closes over the mob.
@@ -133,6 +147,11 @@ export function stepDetonate(
   if (!def || mob.aggroTargetId === null) return false;
   const victim = ctx.entities.get(mob.aggroTargetId);
   if (!victim || victim.dead || dist2d(victim.pos, mob.pos) > def.reach) return false;
+  // A wisp swollen by heroic merges bursts wider and harder (temple_tide.ts).
+  const swell = swellOf(mob);
+  const merge = kit.temple?.merge;
+  const radius = def.radius + (merge ? merge.radiusPer * swell : 0);
+  const mult = 1 + (merge ? merge.damagePer * swell : 0);
   ctx.emit({
     type: 'spellfx',
     sourceId: mob.id,
@@ -141,12 +160,25 @@ export function stepDetonate(
     fx: 'nova',
     ability: TEMPLE_TIDEWISP_BURST,
   });
-  for (const p of livingInReach(players, mob.pos, def.radius)) {
+  for (const p of livingInReach(players, mob.pos, radius)) {
     const amount = Math.max(
       1,
-      Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1)),
+      Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1) * mult),
     );
     ctx.dealDamage(mob, p, amount, false, def.school, def.name, 'hit', true);
+    // The moon-water's chill: whoever it caught wades slow a moment.
+    if (def.slow && !p.dead) {
+      ctx.applyAura(p, {
+        id: TEMPLE_TIDEWISP_CHILL,
+        name: def.name,
+        kind: 'slow',
+        remaining: def.slow.seconds,
+        duration: def.slow.seconds,
+        value: def.slow.mult,
+        sourceId: mob.id,
+        school: def.school,
+      });
+    }
   }
   for (const owner of owners) owner.summonedIds = owner.summonedIds.filter((id) => id !== mob.id);
   for (const meta of ctx.players.values()) {

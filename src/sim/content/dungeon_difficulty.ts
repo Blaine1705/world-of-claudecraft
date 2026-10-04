@@ -392,6 +392,7 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       wildheart_hexcaller: 3.9,
       sunbone_totem_binder: 3.75,
       sunbone_totem: 1,
+      sunbone_dread_totem: 1,
       basin_raptor: 3.45,
       spore_toad: 4,
       vine_lasher: 3.45,
@@ -406,6 +407,7 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     mechanicDamageMultiplierByMob: {
       sunbone_totem_binder: 1,
       sunbone_totem: 1,
+      sunbone_dread_totem: 1,
       basin_raptor: 1,
       spore_toad: 1,
       vine_lasher: 1,
@@ -707,6 +709,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     mechanicDamageMultiplierByMob: {
       sunbone_totem_binder: 3,
       sunbone_totem: 3,
+      sunbone_dread_totem: 3,
       basin_raptor: 3,
       spore_toad: 3,
       vine_lasher: 3,

@@ -77,8 +77,9 @@ const FODDER_IDS = ['basin_raptor'] as const;
 const MINIBOSS_IDS = ['great_saurian', 'fanglord_jaguar'] as const;
 const BOSS_IDS = ['wildheart_beastmaster', 'the_gorgebloom', 'wildheart_high_priest'] as const;
 const CASTER_IDS = ['wildheart_stalker', 'wildheart_hexcaller', 'howdah_hexcaller'] as const;
-/** Kit bodies that never fight in melee (the Sunbone Totem only pulses). */
-const PASSIVE_IDS = ['sunbone_totem'] as const;
+/** Kit bodies that never fight in melee (the Sunbone Totem only pulses, the
+ *  Dread Totem only frightens). */
+const PASSIVE_IDS = ['sunbone_totem', 'sunbone_dread_totem'] as const;
 
 function basinTuning(): NormalDungeonTuning {
   const tuning = NORMAL_DUNGEON_TUNING[BASIN];
@@ -122,6 +123,9 @@ describe('normal Wildheart Basin tuning data', () => {
       if (summoned) spawnIds.add(summoned);
       const planted = MOBS[spawn.mobId]?.trashKit?.call?.summon;
       if (planted) spawnIds.add(planted);
+      // The Totem-Binder plants its totems in turn (trashKit.wildheart.totems).
+      for (const id of MOBS[spawn.mobId]?.trashKit?.wildheart?.totems?.summons ?? [])
+        spawnIds.add(id);
     }
     // The Great Saurian's rider jumps down from its encounter module, and the
     // Gorgebloom's missed Seedpods sprout Thorn Sprouts from its own.
@@ -159,6 +163,7 @@ describe('normal Wildheart Basin tuning data', () => {
       wildheart_hexcaller: 3.9,
       sunbone_totem_binder: 3.75,
       sunbone_totem: 1,
+      sunbone_dread_totem: 1,
       basin_raptor: 3.45,
       spore_toad: 4,
       vine_lasher: 3.45,
@@ -187,6 +192,7 @@ describe('normal Wildheart Basin tuning data', () => {
     expect(tuning.mechanicDamageMultiplierByMob).toEqual({
       sunbone_totem_binder: 1,
       sunbone_totem: 1,
+      sunbone_dread_totem: 1,
       basin_raptor: 1,
       spore_toad: 1,
       vine_lasher: 1,

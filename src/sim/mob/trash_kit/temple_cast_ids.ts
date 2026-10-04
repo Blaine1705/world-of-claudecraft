@@ -35,13 +35,48 @@ export const TEMPLE_PEARL_SLAM = 'temple_pearl_slam';
 /** Lagoon Eel: a lane of lightning spat at one player (trashKit.line). */
 export const TEMPLE_LIGHTNING_SPIT = 'temple_lightning_spit';
 
+// The trash mechanics pass (E:/woc/entregas/investigacion/MECANICAS_TRASH.md
+// section 6): the choir protects its singers, the lagoon punishes a bunched
+// or careless group.
+/** Pale Choir Acolyte and Moonlit Siren: the ward the kneeling pilgrims keep
+ *  round their singer (trashKit.temple.vigil, an aura on the singer). */
+export const TEMPLE_SHRINE_VIGIL = 'temple_shrine_vigil';
+/** Drowned Pilgrim: the marker on a pilgrim whose prayer feeds a Shrine Vigil
+ *  (the renderer draws its thread of light to the singer). */
+export const TEMPLE_VIGIL_PRAYER = 'temple_vigil_prayer';
+/** Drowned Templeguard, heroic: the oath on a casting singer it guards (an
+ *  aura on her; its source is the guard who takes the share). */
+export const TEMPLE_MOONSET_OATH = 'temple_moonset_oath';
+/** Drowned Templeguard, heroic: the marker on a guard keeping its oath. */
+export const TEMPLE_OATH_KEEPER = 'temple_oath_keeper';
+/** The share of a hit an oath moves onto its guard (the damage's ability id). */
+export const TEMPLE_OATH_SHARE = 'temple_moonset_oath_share';
+/** Pale Choir Acolyte, heroic: the echo ring on a Lullaby's sleeper. */
+export const TEMPLE_LULLABY_ECHO = 'temple_lullaby_echo';
+/** Glimmerscale Lurker: its gaze (trashKit.temple.gaze), and the dazzle it
+ *  leaves on whoever faced it. */
+export const TEMPLE_PRISM_GLARE = 'temple_prism_glare';
+export const TEMPLE_PRISM_DAZZLE = 'temple_prism_dazzle';
+/** The dazzle's slow half (a second aura: a stumble beside the whiffs). */
+export const TEMPLE_PRISM_STUMBLE = 'temple_prism_stumble';
+/** Lagoon Snapper: the whirlpool round its shell while it shelters (a marker
+ *  aura on the snapper), and its rolls at the core. */
+export const TEMPLE_SPIRAL_WHIRLPOOL = 'temple_spiral_whirlpool';
+/** Lagoon Eel: an interruptible spark that leaps between players. */
+export const TEMPLE_ARCING_SPARK = 'temple_arcing_spark';
+/** Tidewisp: the chill its burst leaves (the burst's `slow`). */
+export const TEMPLE_TIDEWISP_CHILL = `${TEMPLE_TIDEWISP_BURST}_slow`;
+/** Tidewisp, heroic: the swell of a wisp that has drunk others (value: merges). */
+export const TEMPLE_SWOLLEN_TIDE = 'temple_swollen_tide';
+
 /** The Temple trash casts a player interrupt can lock out, by school. The bite,
- *  the sweep, the hurl, the slam and the surge are absent on purpose: step out
- *  of those. */
+ *  the sweep, the hurl, the slam, the surge and the Prism Glare are absent on
+ *  purpose: step out of those, or turn your back. */
 export const TEMPLE_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['school'] }>> = {
   [TEMPLE_LULLABY]: { school: 'arcane' },
   [TEMPLE_CALL_THE_TIDE]: { school: 'frost' },
   [TEMPLE_STATIC_COIL]: { school: 'nature' },
   [TEMPLE_PALE_MENDING]: { school: 'frost' },
   [TEMPLE_GLIMMER_VENOM]: { school: 'nature' },
+  [TEMPLE_ARCING_SPARK]: { school: 'nature' },
 };

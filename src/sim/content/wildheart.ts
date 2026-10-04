@@ -16,14 +16,24 @@
 // Trash is simple and readable (README section 5): one job per type, never a
 // boss lesson.
 //
-//   Vineclaw Stalker       Razorvine Spear, a ranged nuke. Close on it.
-//   Bloodmane Ravager      Tusk Sweep and Bloodmane Rend; enrages under 30 percent.
-//   Sunbone Hexcaller      Ancestral Sap: an interruptible 2 s heal. Kick it.
-//   Sunbone Totem-Binder   Plants a Sunbone Totem every 15 s; the totem heals
-//                          its allies 3 percent every 2 s. Kill the totems fast.
-//   Basin Raptor           Pounce: leaps onto the farthest caster. Comes in fours.
-//   Spore Toad             Spore Burst: a 4 yd poison cloud where it dies. Step out.
-//   Snarlvine Lasher       Entangling Lash: a 20 yd lane, a 2 s root. Sidestep it.
+//   Vineclaw Stalker       Razorvine Spear, a ranged nuke. Close on it. Quarry
+//                          Mark: a marking spear that sets its raptors on
+//                          someone past the tank. Kill it first.
+//   Bloodmane Ravager      Tusk Sweep and Bloodmane Rend; under 30 percent a
+//                          kickable War Roar enrages every ravager near it.
+//   Sunbone Hexcaller      Ancestral Sap: an interruptible 2 s heal, and Toad
+//                          Hex: a kickable hex (shadow, so one kick never
+//                          locks both). Split the kicks.
+//   Sunbone Totem-Binder   Plants a totem every 15 s, in turn a Sunbone Totem
+//                          (heals its allies 3 percent every 2 s) and a Sunbone
+//                          Dread Totem (Rattling Dread: everyone near it
+//                          flees). Choose which to break first.
+//   Basin Raptor           Pounce: leaps onto the farthest caster. Comes in
+//                          fours; each death frenzies the rest. Even them out.
+//   Spore Toad             Snaring Tongue: a lane that reels its catch in.
+//                          Spore Burst: a 4 yd poison cloud where it dies.
+//   Snarlvine Lasher       Entangling Lash: a 20 yd lane, a 2 s root. Sidestep
+//                          it. Snarlbark pricks every melee swing at it.
 //   The Great Saurian      The showpiece patrol (encounters/wildheart_basin/
 //                          great_saurian.ts): Tail Swipe, Earthshaking Stomp,
 //                          the Howdah Rider at half health, Enrage.
@@ -41,6 +51,7 @@ import {
   GREAT_SAURIAN_ID,
   HOWDAH_HEXCALLER_ID,
   SPORE_TOAD_ID,
+  SUNBONE_DREAD_TOTEM_ID,
   SUNBONE_TOTEM_ID,
   THORN_SPROUT_ID,
   TOTEM_BINDER_ID,
@@ -54,8 +65,13 @@ import {
   WILDHEART_ENTANGLING_LASH,
   WILDHEART_PLANT_TOTEM,
   WILDHEART_POUNCE,
+  WILDHEART_QUARRY_MARK,
+  WILDHEART_RATTLING_DREAD,
+  WILDHEART_SNARING_TONGUE,
   WILDHEART_SPORE_BURST,
+  WILDHEART_TOAD_HEX,
   WILDHEART_TOTEM_PULSE,
+  WILDHEART_WAR_ROAR,
 } from '../mob/trash_kit/wildheart_cast_ids';
 import type {
   DungeonDef,
@@ -227,6 +243,26 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       every: 2.8,
       windup: 0.55,
     },
+    // The trash mechanics pass: a marking spear at someone past the tank,
+    // only while a Basin Raptor of the fight runs near; the raptors run the
+    // quarry down for 6 s (a taunt still wins). Physical: no kick. Kill the
+    // stalker first, or keep the raptors gathered on the tank.
+    trashKit: {
+      wildheart: {
+        mark: {
+          castId: WILDHEART_QUARRY_MARK,
+          name: 'Quarry Mark',
+          castTime: 1.5,
+          every: 14,
+          first: 5,
+          school: 'physical',
+          range: 30,
+          seconds: 6,
+          hunter: BASIN_RAPTOR_ID,
+          huntRange: 30,
+        },
+      },
+    },
     componentTags: ['hide', 'fang'],
     loot: [
       { copper: 360, chance: 1 },
@@ -265,7 +301,27 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       school: 'physical',
     },
     cleave: { radius: 6.5, mult: 0.5, name: 'Tusk Sweep' },
-    enrage: { belowHpPct: 0.3, dmgMult: 1.3, hasteMult: 1.15 },
+    // The trash mechanics pass: the old lone enrage under 30 percent became a
+    // War Roar (the same +30 percent damage and 15 percent faster swings):
+    // once a pull, a 2 s roar you can kick or stun; if it lands every ravager
+    // within 15 yd frenzies for the rest of the pull. A kicked roar is spent.
+    trashKit: {
+      wildheart: {
+        roar: {
+          castId: WILDHEART_WAR_ROAR,
+          name: 'War Roar',
+          castTime: 2,
+          every: 600,
+          first: 0,
+          school: 'physical',
+          belowHpPct: 0.3,
+          radius: 15,
+          packmate: 'wildheart_ravager',
+          damagePct: 0.3,
+          hasteMult: 1.15,
+        },
+      },
+    },
     componentTags: ['hide', 'fang'],
     loot: [
       { copper: 450, chance: 1 },
@@ -312,6 +368,22 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
         healPct: 0.12,
         below: 0.8,
       },
+      // The trash mechanics pass: a 2 s hex at someone past the tank, a toad
+      // for 5 s (6 on heroic) that any hit frees. Shadow, so a kick on the Sap
+      // (nature) never locks it: the group splits its kicks.
+      wildheart: {
+        hex: {
+          castId: WILDHEART_TOAD_HEX,
+          name: 'Toad Hex',
+          castTime: 2,
+          every: 16,
+          first: 8,
+          school: 'shadow',
+          range: 30,
+          seconds: 5,
+          heroicSeconds: 6,
+        },
+      },
     },
     componentTags: ['hide', 'horn'],
     loot: [
@@ -338,17 +410,21 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 18,
     moveSpeed: 6.8,
     aggroRadius: 15,
+    // The trash mechanics pass: the totems come in turn, a healing Sunbone
+    // Totem then a Sunbone Dread Totem, two at most. Which to break first is
+    // the question the pull asks.
     trashKit: {
-      call: {
-        castId: WILDHEART_PLANT_TOTEM,
-        name: 'Plant Totem',
-        castTime: 1.5,
-        every: 15,
-        first: 3,
-        school: 'nature',
-        summon: SUNBONE_TOTEM_ID,
-        count: 1,
-        maxAlive: 2,
+      wildheart: {
+        totems: {
+          castId: WILDHEART_PLANT_TOTEM,
+          name: 'Plant Totem',
+          castTime: 1.5,
+          every: 15,
+          first: 3,
+          school: 'nature',
+          summons: [SUNBONE_TOTEM_ID, SUNBONE_DREAD_TOTEM_ID],
+          maxAlive: 2,
+        },
       },
     },
     componentTags: ['hide', 'horn'],
@@ -394,6 +470,49 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     scale: 1.6,
     color: 0xd9b26a,
   },
+  // The Totem-Binder's second totem (the trash mechanics pass): a bone post
+  // under a red-painted skull. It never moves or fights; its Rattling Dread
+  // (a 2 s bar nobody can kick) sends everyone within 8 yd fleeing straight
+  // away from it for 2 s (3 on heroic; a hit breaks the fear). Tank the pack
+  // clear of it, or break it first. It crumbles with its binder.
+  sunbone_dread_totem: {
+    id: SUNBONE_DREAD_TOTEM_ID,
+    name: 'Sunbone Dread Totem',
+    minLevel: 18,
+    maxLevel: 18,
+    family: 'elemental',
+    untameable: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 20,
+    hpPerLevel: 6,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 30,
+    armorPerLevel: 10,
+    moveSpeed: 0,
+    aggroRadius: 20,
+    idleStationary: true,
+    xpMult: 0.2,
+    trashKit: {
+      wildheart: {
+        dread: {
+          castId: WILDHEART_RATTLING_DREAD,
+          name: 'Rattling Dread',
+          castTime: 2,
+          every: 6,
+          first: 4,
+          school: 'shadow',
+          radius: 8,
+          seconds: 2,
+          heroicSeconds: 3,
+        },
+      },
+    },
+    loot: [],
+    scale: 1.6,
+    color: 0xb0483a,
+  },
   // A pack hunter of the basin floor, striped for the jungle; comes in fours.
   // Pounce: it leaps onto the farthest caster in reach and holds on.
   basin_raptor: {
@@ -422,6 +541,10 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
         fixate: 3,
       },
     },
+    // The trash mechanics pass: each raptor that falls drives the rest of
+    // its pack into a frenzy (30 percent faster swings for 8 s, refreshed by
+    // each further death). Bring the four down evenly.
+    packFrenzy: { radius: 20, hasteMult: 1.3, duration: 8 },
     componentTags: ['hide', 'fang'],
     loot: [{ copper: 150, chance: 1 }],
     scale: 1.7,
@@ -455,6 +578,27 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
         max: 50,
         school: 'nature',
         objectTemplate: WILDHEART_SPORE_CLOUD,
+      },
+      // The trash mechanics pass: it swells and its tongue shoots down a
+      // 22 yd lane at someone at least 8 yd off; whoever stands in it is
+      // struck and reeled to its mouth (into its spores, when it is low).
+      // Step out sideways; it cannot be kicked.
+      wildheart: {
+        tongue: {
+          castId: WILDHEART_SNARING_TONGUE,
+          name: 'Snaring Tongue',
+          castTime: 1.5,
+          every: 14,
+          first: 6,
+          school: 'nature',
+          length: 22,
+          halfWidth: 1.5,
+          minRange: 8,
+          min: 60,
+          max: 75,
+          reel: 24,
+          stop: 2.5,
+        },
       },
     },
     componentTags: ['hide'],
@@ -497,6 +641,10 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
         root: 2,
       },
     },
+    // Snarlbark (the trash mechanics pass): its thorned bark pricks every
+    // melee swing at it (15 nature on normal, scaled by the claim's mechanic
+    // factor on heroic). The ranged take it; the melee mind their health.
+    thorns: { value: 15, school: 'nature', name: 'Snarlbark' },
     // No componentTags: animated plant, like the shipped treants
     // (orchard_treant, treant_elder), so its corpse offers no harvest. No
     // HARVEST_COMPONENT_ITEMS family is wood, and an unmapped tag would be a

@@ -11,21 +11,29 @@
 // boss lesson.
 //
 //   Drowned Templeguard  Onrush, a telegraphed Trident Sweep and a Skewering Trident
-//                        down a lane. Step out.
+//                        down a lane. Step out. Heroic: the Moonset Oath, half
+//                        a casting singer's hits on the guard. Stun it.
 //   Pale Choir Acolyte   Lullaby: an interruptible sleep on one player, and Pale
-//                        Mending on a hurt packmate. Kick them.
+//                        Mending on a hurt packmate. Kick them. Shrine Vigil
+//                        while two pilgrims kneel by her; heroic Lullaby Echo.
 //   Glimmerscale Lurker  Pounce onto the farthest caster (a bleed), and an
-//                        interruptible Glimmer Venom bolt.
+//                        interruptible Glimmer Venom bolt. Prism Glare: turn
+//                        your back on it.
 //   Moonmantle Ray       (id pearlguard_sentinel) Lunar Glide, a charge; a Tidal
 //                        Wingbeat that throws back all near it; Nacre Cocoon
 //                        shields it once when low. Burst it.
 //   Lagoon Snapper       Snap: a telegraphed bite across its front, and it shells
-//                        up once when low. Step out, then burn it.
+//                        up once when low, spinning a Spiral Whirlpool that
+//                        drags the group in. Walk out, then burn it.
 //   Lagoon Eel           Static Coil: an interruptible shock round it; Lightning Spit,
-//                        a lane of lightning. Kick one, dodge the other.
+//                        a lane of lightning; Arcing Spark, a kickable bolt that
+//                        leaps between players. Spread out.
 //   Moonlit Siren        Call the Tide: an interruptible song of three Tidewisps.
-//   Tidewisp             Bursts when it reaches a player. Kill it on the way in.
-//   Drowned Pilgrim      fodder in fours, enrages when low.
+//                        Shrine Vigil while two pilgrims kneel by her.
+//   Tidewisp             Bursts (and chills) when it reaches a player. Kill it on
+//                        the way in; on heroic two that touch swell into one.
+//   Drowned Pilgrim      fodder in fours, enrages when low; their prayer keeps
+//                        the Shrine Vigil on their singer. Kill them first.
 //
 // Numbers are classic-era normal-mode bases for levels 16 to 18, anchored to
 // Ysolei's shipped Lunar Tide (22 to 32) and a level 17 cloth wearer of about
@@ -33,6 +41,7 @@
 // difficulty transform (mechanicDamageMult).
 
 import {
+  TEMPLE_ARCING_SPARK,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_SNAP,
@@ -133,6 +142,22 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
     // shell for 5 s, taking 60 percent less. Wait it out, then burn it.
     trashKit: {
       withdraw: { belowHpPct: 0.35, seconds: 5, reduction: 0.6, name: 'Shell Up' },
+      // The trash mechanics pass: while it shells up the shell spins, and the
+      // water within 8 yd drags everyone toward it at 2.5 yd/s (3.5 on heroic,
+      // both well under a run); the 3 yd core bites once a second. Walk out.
+      temple: {
+        whirlpool: {
+          radius: 8,
+          pull: 2.5,
+          heroicPull: 3.5,
+          core: 3,
+          tick: 1,
+          min: 30,
+          max: 40,
+          name: 'Spiral Whirlpool',
+          school: 'frost',
+        },
+      },
     },
     loot: [
       { copper: 190, chance: 1 },
@@ -185,6 +210,23 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
         min: 60,
         max: 70,
       },
+      // The trash mechanics pass: a kickable bolt that leaps on to the nearest
+      // player within 6 yd of the last one struck, up to four. Spread out.
+      temple: {
+        spark: {
+          castId: TEMPLE_ARCING_SPARK,
+          name: 'Arcing Spark',
+          castTime: 2,
+          every: 15,
+          first: 11,
+          school: 'nature',
+          range: 30,
+          jump: 6,
+          hits: 4,
+          min: 40,
+          max: 50,
+        },
+      },
     },
     loot: [
       { copper: 180, chance: 1 },
@@ -230,6 +272,19 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
         count: 3,
         maxAlive: 3,
       },
+      // The trash mechanics pass: while two or more Drowned Pilgrims of the
+      // fight kneel within 15 yd, their Shrine Vigil turns 75 percent of all
+      // damage she takes (85 on heroic). Kill the pilgrims first.
+      temple: {
+        vigil: {
+          guardian: 'drowned_pilgrim',
+          range: 15,
+          min: 2,
+          reduction: 0.75,
+          heroicReduction: 0.85,
+          name: 'Shrine Vigil',
+        },
+      },
     },
     loot: [
       { copper: 210, chance: 1 },
@@ -263,6 +318,15 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
         max: 60,
         name: 'Tidewisp Burst',
         school: 'frost',
+        // The trash mechanics pass: the moon-water chills whoever it caught,
+        // half speed for 2 s (the Rime Whelp's Hoarfrost Pop precedent).
+        slow: { mult: 0.5, seconds: 2 },
+      },
+      // Heroic only: two wisps that touch flow into one (pooled health), each
+      // merge widening its burst by 1 yd and raising it by 60 percent, at most
+      // two. Kill them apart.
+      temple: {
+        merge: { reach: 1.2, max: 2, radiusPer: 1, damagePer: 0.6, name: 'Swollen Tide' },
       },
     },
     loot: [],

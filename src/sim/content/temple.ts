@@ -13,6 +13,7 @@ import {
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
   TEMPLE_PEARL_SLAM,
+  TEMPLE_PRISM_GLARE,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_TRIDENT_SWEEP,
 } from '../mob/trash_kit/temple_cast_ids';
@@ -185,6 +186,17 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
         min: 60,
         max: 70,
       },
+      // The trash mechanics pass, heroic only: the stair guard's Moonset Oath.
+      // While a singer of its pack within 8 yd is casting, it takes half of
+      // every hit she takes. Stun it, sleep it, or pull it off her.
+      temple: {
+        guard: {
+          singers: ['pale_choir_acolyte', 'moonlit_siren'],
+          range: 8,
+          share: 0.5,
+          name: 'Moonset Oath',
+        },
+      },
     },
     loot: [
       { copper: 200, chance: 1 },
@@ -244,6 +256,23 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
         healPct: 0.25,
         below: 0.6,
       },
+      // The trash mechanics pass: while two or more Drowned Pilgrims of the
+      // fight kneel within 15 yd, their Shrine Vigil turns 75 percent of all
+      // damage she takes (85 on heroic). Kill the pilgrims first.
+      temple: {
+        vigil: {
+          guardian: 'drowned_pilgrim',
+          range: 15,
+          min: 2,
+          reduction: 0.75,
+          heroicReduction: 0.85,
+          name: 'Shrine Vigil',
+        },
+        // Heroic only: an unkicked Lullaby echoes off its sleeper. A beat
+        // after it lands, then every second while they sleep, everyone awake
+        // within 5 yd of them falls asleep for 3 s (once each). Spread out.
+        lullabyEcho: { radius: 5, delay: 1, every: 1, seconds: 3, name: 'Lullaby Echo' },
+      },
     },
     loot: [
       { copper: 220, chance: 1 },
@@ -293,6 +322,28 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
         range: 25,
         min: 45,
         max: 55,
+      },
+      // The trash mechanics pass: its stalked eyes kindle in rainbow light
+      // for 2 s, then everyone within 25 yd who FACES it is dazzled for 3 s
+      // (4 on heroic): half their swings whiff and they stumble at half
+      // speed. Turn your back before the bar ends. No kick; a stun breaks it.
+      temple: {
+        gaze: {
+          castId: TEMPLE_PRISM_GLARE,
+          name: 'Prism Glare',
+          castTime: 2,
+          every: 16,
+          first: 9,
+          school: 'arcane',
+          range: 25,
+          halfArcDeg: 60,
+          seconds: 3,
+          heroicSeconds: 4,
+          miss: 0.5,
+          slow: 0.5,
+          min: 25,
+          max: 35,
+        },
       },
     },
     loot: [

@@ -41,6 +41,7 @@ import { isKillParticipant, killParticipationPos } from '../loot/kill_participat
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import { oathShare } from '../mob/trash_kit/temple_choir';
 import {
   NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
   nythraxisBoneSpikeWardHit,
@@ -734,6 +735,9 @@ export function dealDamage(
     // Foreman's Last Link moves its share of what is left to the tether's
     // wearer (combat/sanctum_trinkets.ts).
     amount = tetherRedirect(ctx, source, target, amount, school, abilityId);
+    // A heroic Drowned Temple singer under a guard's Moonset Oath passes a
+    // share of the hit onto the guard (mob/trash_kit/temple_choir.ts).
+    amount = oathShare(ctx, source, target, amount, school, ability, abilityId);
   }
 
   if (target.damageFloorHp !== undefined) {

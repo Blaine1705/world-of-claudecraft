@@ -36,6 +36,7 @@ import { holdAreaCast } from './cast_hold';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
 import { stepDeathBurst } from './death_burst';
 import { callDownLastFlier } from './flier_call';
+import type { TrashKitExtension } from './kit_extension';
 import {
   dropToss,
   landGoad,
@@ -55,7 +56,9 @@ import {
   supportCastReady,
 } from './support';
 import { inCone, livingInReach, pickHashedTarget, pickLeapTarget } from './targets';
+import { TEMPLE_KIT_EXTENSION } from './temple_extension';
 import { landLullaby, lullabyReady, stepCarapace, stepDetonate } from './temple_kit';
+import { WILDHEART_KIT_EXTENSION } from './wildheart_extension';
 import { stepDeathCloud, stepPulse } from './wildheart_kit';
 
 /** Kit casts in priority order: a summon before a heal or shield, a control
@@ -76,6 +79,21 @@ const CAST_KEYS = [
 ] as const;
 type CastKey = (typeof CAST_KEYS)[number];
 
+/** The dungeons' own key blocks (kit_extension.ts), run after the core keys. */
+const EXTENSIONS: readonly TrashKitExtension[] = [TEMPLE_KIT_EXTENSION, WILDHEART_KIT_EXTENSION];
+
+/** The extension that owns cast key `key`, if any. */
+function extensionOf(key: string): TrashKitExtension | undefined {
+  for (const ext of EXTENSIONS) if (ext.castKeys.includes(key)) return ext;
+  return undefined;
+}
+
+/** Every cast key the driver runs: its own, then each extension's, in order. */
+const ALL_CAST_KEYS: readonly string[] = [
+  ...CAST_KEYS,
+  ...EXTENSIONS.flatMap((ext) => ext.castKeys),
+];
+
 /** Physical kit casts: a silence never breaks them and no school lockout
  *  stops them (dodge these, never kick them). */
 function isPhysicalKey(key: CastKey): boolean {
@@ -95,8 +113,16 @@ const LEAP_STOP = 1.5;
 /** How high a leap arcs at its apex. */
 const LEAP_ARC = 3;
 
-function castDef(kit: TrashKitDef, key: CastKey): TrashKitCast | undefined {
-  return kit[key];
+function castDef(kit: TrashKitDef, key: string): TrashKitCast | undefined {
+  const ext = extensionOf(key);
+  if (ext) return ext.castDef(kit, key);
+  return kit[key as CastKey];
+}
+
+/** A physical cast of any owner (the core's or an extension's). */
+function isPhysicalCast(key: string): boolean {
+  const ext = extensionOf(key);
+  return ext ? ext.isPhysical(key) : isPhysicalKey(key as CastKey);
 }
 
 function clearCast(mob: Entity, castId: string): void {
@@ -136,7 +162,7 @@ export function startTrashKit(
   const roster = inst ? inst.mobIds.map((id) => ctx.entities.get(id)) : [];
   const { rank, size } = packPeerRank(roster, mob, (peer) => peer.trashKit !== undefined);
   const timers: Record<string, number> = {};
-  for (const key of CAST_KEYS) {
+  for (const key of ALL_CAST_KEYS) {
     const def = castDef(kit, key);
     if (def) timers[key] = def.first + packStaggerOffset(rank, size, def.every);
   }
@@ -307,7 +333,7 @@ function landCast(
   }
   switch (key) {
     case 'lullaby':
-      landLullaby(ctx, mob, kit, targetId);
+      landLullaby(ctx, inst, mob, kit, targetId, st);
       return;
     case 'goad':
       landGoad(ctx, mob, kit, targetId);
@@ -452,13 +478,14 @@ function stepCast(
 ): boolean {
   const cast = st.cast;
   if (!cast) return false;
-  const key = cast.key as CastKey;
+  const key = cast.key;
+  const ext = extensionOf(key);
   const def = castDef(kit, key);
   const broken =
     !def ||
     mob.castingAbility !== cast.castId ||
     ctx.isStunned(mob) ||
-    (!isPhysicalKey(key) && isSilenced(mob));
+    (!isPhysicalCast(key) && isSilenced(mob));
   if (broken) {
     clearCast(mob, cast.castId);
     st.cast = null;
@@ -470,14 +497,17 @@ function stepCast(
   const target = cast.targetId !== null ? ctx.entities.get(cast.targetId) : undefined;
   // A lane holds the aim it locked at the start, a toss the spot it marked;
   // everything else tracks.
-  if (key === 'line') holdLineAim(mob, st);
+  if (ext?.hold?.(mob, key, st)) {
+    // The extension holds its own aim (a locked lane).
+  } else if (key === 'line') holdLineAim(mob, st);
   else if (key === 'toss' && st.toss)
     mob.facing = angleTo(mob.pos, { x: st.toss.x, y: 0, z: st.toss.z });
   else if (target && !target.dead) mob.facing = angleTo(mob.pos, target.pos);
   if (mob.castRemaining > 0) return true;
   clearCast(mob, cast.castId);
   st.cast = null;
-  landCast(ctx, inst, mob, kit, key, cast.targetId, players, st);
+  if (ext) ext.land(ctx, inst, mob, kit, key, cast.targetId, players, st);
+  else landCast(ctx, inst, mob, kit, key as CastKey, cast.targetId, players, st);
   return false;
 }
 
@@ -490,17 +520,20 @@ function tryStartCast(
   st: TrashKitState,
   players: readonly Entity[],
 ): void {
-  for (const key of CAST_KEYS) {
+  for (const key of ALL_CAST_KEYS) {
     if (st.timers[key] !== undefined) st.timers[key] -= DT;
   }
   if (mob.castingAbility !== null || st.descent || st.leap) return;
   if (ctx.isStunned(mob)) return;
-  for (const key of CAST_KEYS) {
+  for (const key of ALL_CAST_KEYS) {
     const def = castDef(kit, key);
     if (!def || (st.timers[key] ?? 0) > 0) continue;
-    const physical = isPhysicalKey(key);
+    const physical = isPhysicalCast(key);
     if (!physical && (isSilenced(mob) || isLockedOut(mob, def.school as Aura['school']))) continue;
-    const { ok, target } = castReady(ctx, inst, mob, kit, key, st, players);
+    const ext = extensionOf(key);
+    const { ok, target } = ext
+      ? ext.ready(ctx, inst, mob, kit, key, st, players)
+      : castReady(ctx, inst, mob, kit, key as CastKey, st, players);
     if (!ok) continue;
     st.timers[key] = def.every;
     st.casts++;
@@ -513,6 +546,7 @@ function tryStartCast(
     if (key === 'line') lockLineAim(mob, st, target);
     else if (target) mob.facing = angleTo(mob.pos, target.pos);
     if (key === 'toss') lockToss(ctx, inst, mob, kit, st, target);
+    ext?.started?.(ctx, inst, mob, key, st, target);
     holdAreaCast(ctx, mob, false);
     return;
   }
@@ -655,7 +689,11 @@ function summonersOf(ctx: SimContext, inst: InstanceSlot, mob: Entity): Entity[]
 /** The pull ended in the claim (a death, an evade, a reset): a toss that will
  *  never land lifts its ring, then the kit state goes. */
 function endPull(ctx: SimContext, inst: InstanceSlot, mob: Entity): void {
-  if (mob.trashKit) dropToss(ctx, inst, mob.trashKit);
+  const st = mob.trashKit;
+  if (st) {
+    dropToss(ctx, inst, st);
+    for (const ext of EXTENSIONS) ext.endPull?.(ctx, inst, mob, st);
+  }
   endTrashKit(mob);
 }
 
@@ -702,6 +740,8 @@ function stepMob(
   }
   stepDescent(ctx, mob, st);
   stepPulse(ctx, inst, mob, kit, st);
+  // The dungeons' own upkeep (kit_extension.ts): auras kept up, links, drags.
+  for (const ext of EXTENSIONS) if (ext.step?.(ctx, inst, mob, kit, st, players)) return;
   // A brazier whose tender fell gutters out: nothing more this tick.
   if (stepStoke(ctx, inst, mob, kit, st) < 0) return;
   if (stepWithdraw(ctx, mob, kit, st)) return;

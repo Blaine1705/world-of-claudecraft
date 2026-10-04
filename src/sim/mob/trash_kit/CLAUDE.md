@@ -15,6 +15,9 @@ Hollow Crypt trash (`src/sim/content/hollow_crypt_trash.ts`).
 | `cast_hold.ts` | A telegraphed area never moves with its caster: `holdAreaCast` plants the mob on the spot and the facing its area bar began with (screech, wing gust, tail lash, lane; and the template's breath cone where `DungeonDef.areaCastsPlant`), undoing the mob AI's step every tick until the bar lands or breaks. |
 | `flier_call.ts` | `callDownLastFlier`: an idle flying patrol lands on the nearest player once every OTHER pack of a gate that waits on its pack is dead, so a gate can never stay shut behind a flier nobody pulled. |
 | `sanctum_kit.ts` / `sanctum_cast_ids.ts` | The Gravewyrm Sanctum's keys: `goad` (an interruptible damage-done aura on one ally), `toss` (a ring locked under the farthest player, landing when the bar ends; physical, planted), `stoke` (a no-bar attack-speed pulse that gutters with its summoner); the Rime Whelp's slowing pop rides the shared `deathBurst` (`slow`). |
+| `kit_extension.ts` | The `TrashKitExtension` seam: a dungeon's own key block (`trashKit.temple`, `trashKit.wildheart`) lends the driver its casts (run on the driver's own cast machinery: stagger, swing hold, stun / silence / lockout breaks, area plant) and its per-tick upkeep, and cleans up when a pull ends. A new dungeon block is a new extension, never another branch in `driver.ts`. |
+| `temple_kit_types.ts` / `temple_extension.ts` / `temple_choir.ts` / `temple_tide.ts` | The Drowned Temple block (`trashKit.temple`): the Shrine Vigil the pilgrims keep on their singer, the heroic Moonset Oath (a guard takes half a casting singer's hits; `combat/damage.ts` calls `oathShare`), the heroic Lullaby Echo, the Prism Glare gaze (turn your back), the Spiral Whirlpool round a sheltering snapper, the kickable Arcing Spark that leaps between players, and the heroic Swollen Tide (touching wisps merge). Kept-up auras are wound tick by tick and dropped explicitly when their cause ends. |
+| `wildheart_kit_types.ts` / `wildheart_extension.ts` / `wildheart_hunt.ts` | The Wildheart Basin block (`trashKit.wildheart`): the Quarry Mark (the stalker sets its raptors on someone past the tank), the once-a-pull kickable War Roar, the kickable Toad Hex, the binder's alternating totems, the Dread Totem's Rattling Dread (flee straight away from it), and the Snaring Tongue (a locked lane that reels its catch in). |
 | `driver.ts` | `tickTrashKits`: one pass per tick over every claim's roster, after the mob AI (called from `instances/dungeons.ts` `updateInstances`). |
 
 Rules:
@@ -41,4 +44,5 @@ Rules:
   authored `aggroRadius` whatever the player's level (`flierSightRadius`), and
   pack pulls and the boss chain pull still take it (`patrolFlierAloft`). The
   renderer hides the ground reticle under it (`render/selection_ring.ts`).
-- Tests: `tests/trash_kit.test.ts`.
+- Tests: `tests/trash_kit.test.ts`; the Temple and Basin blocks:
+  `tests/drowned_temple_trash_mechanics.test.ts`, `tests/wildheart_trash_mechanics.test.ts`.

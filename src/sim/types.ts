@@ -16,6 +16,8 @@ import type { VelkharFightState } from './encounters/gravewyrm_sanctum/velkhar_s
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
+import type { TempleKitDef, TempleKitState } from './mob/trash_kit/temple_kit_types';
+import type { WildheartKitDef, WildheartKitState } from './mob/trash_kit/wildheart_kit_types';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
 import type {
@@ -4304,7 +4306,14 @@ export interface TrashKitDef {
     max: number;
     name: string;
     school: TrashKitCast['school'];
+    /** A slow on everyone the burst catches: `mult` of their run speed for
+     *  `seconds` (the Tidewisp's chill). */
+    slow?: { mult: number; seconds: number };
   };
+  /** The Drowned Temple trash's own keys (mob/trash_kit/temple_kit_types.ts). */
+  temple?: TempleKitDef;
+  /** The Wildheart Basin trash's own keys (mob/trash_kit/wildheart_kit_types.ts). */
+  wildheart?: WildheartKitDef;
 }
 
 /** Per-pull runtime state of a trash kit (Entity.trashKit). */
@@ -4329,6 +4338,10 @@ export interface TrashKitState {
   carapaced?: boolean;
   /** A toss's locked landing spot (world) and its ring object while its bar runs. */
   toss?: { x: number; z: number; objectId: number | null };
+  /** The Drowned Temple keys' per-pull state. */
+  temple?: TempleKitState;
+  /** The Wildheart Basin keys' per-pull state. */
+  wildheart?: WildheartKitState;
 }
 
 /** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion),

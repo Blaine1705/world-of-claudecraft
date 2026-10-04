@@ -149,14 +149,16 @@ describe('Wildheart trash: the cast table and the roster (design section 4.1)', 
     expect(MOBS.wildheart_stalker.petSpell?.name).toBe('Razorvine Spear');
     expect(MOBS.wildheart_ravager.cleave?.name).toBe('Tusk Sweep');
     expect(MOBS.wildheart_ravager.bleed?.name).toBe('Bloodmane Rend');
-    expect(MOBS.wildheart_ravager.enrage?.belowHpPct).toBe(0.3);
+    // The lone enrage became the War Roar (wildheart_trash_mechanics.test.ts).
+    expect(MOBS.wildheart_ravager.enrage).toBeUndefined();
+    expect(MOBS.wildheart_ravager.trashKit?.wildheart?.roar?.belowHpPct).toBe(0.3);
     const sap = MOBS.wildheart_hexcaller.trashKit?.mend;
     expect([sap?.castId, sap?.castTime]).toEqual([WILDHEART_ANCESTRAL_SAP, 2]);
     expect(MOBS.wildheart_hexcaller.mendAlly).toBeUndefined();
-    const plant = MOBS.sunbone_totem_binder.trashKit?.call;
-    expect([plant?.castId, plant?.summon, plant?.every]).toEqual([
+    const plant = MOBS.sunbone_totem_binder.trashKit?.wildheart?.totems;
+    expect([plant?.castId, plant?.summons, plant?.every]).toEqual([
       WILDHEART_PLANT_TOTEM,
-      'sunbone_totem',
+      ['sunbone_totem', 'sunbone_dread_totem'],
       15,
     ]);
     const pulse = MOBS.sunbone_totem.trashKit?.pulse;
@@ -191,6 +193,7 @@ describe('Wildheart trash: the cast table and the roster (design section 4.1)', 
     ])
       expect(placed.has(id), id).toBe(true);
     expect(placed.has('sunbone_totem')).toBe(false);
+    expect(placed.has('sunbone_dread_totem')).toBe(false);
     expect(placed.has(HOWDAH_HEXCALLER_ID)).toBe(false);
   });
 
@@ -251,7 +254,7 @@ describe('the Sunbone Totem-Binder and its totems', () => {
     const far = engage(r, 'wildheart_ravager', 6, 30);
     ravager.hp = Math.floor(ravager.maxHp * 0.5);
     far.hp = Math.floor(far.maxHp * 0.5);
-    const def = MOBS.sunbone_totem_binder.trashKit?.call;
+    const def = MOBS.sunbone_totem_binder.trashKit?.wildheart?.totems;
     if (!def) throw new Error('plant');
     run(r, def.first + def.castTime + 0.1, [binder, ravager, far]);
     const totems = () =>
@@ -273,15 +276,19 @@ describe('the Sunbone Totem-Binder and its totems', () => {
           e.type === 'spellfx' && e.sourceId === totem.id && e.ability === WILDHEART_TOTEM_PULSE,
       ),
     ).toBe(true);
-    // Two totems at most.
-    run(r, def.every * 3, [binder, ravager, far, ...totems()]);
-    expect(totems().length).toBe(2);
+    // Two totems at most: the healing one, then a Dread Totem in its turn.
+    const planted = () =>
+      binder.summonedIds
+        .map((id) => r.sim.ctx.entities.get(id))
+        .filter((e): e is Entity => !!e && !e.dead);
+    run(r, def.every * 3, [binder, ravager, far, ...planted()]);
+    expect(planted().map((e) => e.templateId)).toEqual(['sunbone_totem', 'sunbone_dread_totem']);
   });
 
   it('a totem crumbles once its binder is dead, so it never strands a fight', () => {
     const r = room();
     const binder = engage(r, 'sunbone_totem_binder', 6, 0);
-    const def = MOBS.sunbone_totem_binder.trashKit?.call;
+    const def = MOBS.sunbone_totem_binder.trashKit?.wildheart?.totems;
     if (!def) throw new Error('plant');
     run(r, def.first + def.castTime + 0.1, [binder]);
     const totem = r.sim.ctx.entities.get(binder.summonedIds[0]) as Entity;
@@ -295,7 +302,7 @@ describe('the Sunbone Totem-Binder and its totems', () => {
     const r = room();
     const binder = engage(r, 'sunbone_totem_binder', 6, 0);
     const ravager = engage(r, 'wildheart_ravager', 6, 5);
-    const def = MOBS.sunbone_totem_binder.trashKit?.call;
+    const def = MOBS.sunbone_totem_binder.trashKit?.wildheart?.totems;
     if (!def) throw new Error('plant');
     run(r, def.first + def.castTime + 0.1, [binder, ravager]);
     const totem = r.sim.ctx.entities.get(binder.summonedIds[0]) as Entity;
