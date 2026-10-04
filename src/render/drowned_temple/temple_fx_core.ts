@@ -13,9 +13,13 @@ import {
   COLOSSUS_RESONANT_SLAM,
   COLOSSUS_TUNING,
   FRACTURE_ROUNDS,
+  HYDRA_COMBO_TUNING,
   HYDRA_CRUSHING_TORRENT,
   HYDRA_TIDE_BREATH,
   HYDRA_TUNING,
+  MOON_TEAR_TEMPLATE,
+  MOONGLOW_TEMPLATE,
+  RIME_CRYSTAL_TEMPLATE,
   RIPTIDE_TEMPLATE,
   SELTHE_CHORUS_MARK,
   SELTHE_DROWNING_ARIA,
@@ -25,7 +29,10 @@ import {
   SELTHE_SOLO_MARK,
   SELTHE_TUNING,
   SOLO_ECHO_TEMPLATE,
+  VENOM_CURRENT_TEMPLATE,
   VENOM_POOL_TEMPLATE,
+  YSOLEI_BECKONING_MOON,
+  YSOLEI_FALLING_MOON,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_TUNING,
   YSOLEI_UNDERTOW,
@@ -221,6 +228,22 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
       color: TELEGRAPH_THREAT_COLORS.interrupt,
       accent: TEMPLE_ACCENTS.moon,
     },
+    // Ysolei calling the moon: neither bar can be kicked; a glyph under her
+    // says the moon is coming (the tears, and the ward to break).
+    [YSOLEI_BECKONING_MOON]: {
+      shape: 'sigil',
+      range: 4,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: TEMPLE_ACCENTS.moon,
+    },
+    [YSOLEI_FALLING_MOON]: {
+      shape: 'sigil',
+      range: 5,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.lethal,
+      accent: TEMPLE_ACCENTS.moon,
+    },
     // Selthe's Sea-Song hits the whole court: a glyph under her, not a zone.
     [SELTHE_SEA_SONG]: {
       shape: 'sigil',
@@ -266,6 +289,32 @@ export const TEMPLE_OBJECT_SPECS: Readonly<Record<string, TempleObjectSpec>> = {
   [RIPTIDE_TEMPLATE]: {
     color: TELEGRAPH_THREAT_COLORS.danger,
     accent: TEMPLE_ACCENTS.tide,
+    fillSeconds: 0,
+  },
+  // The Combined Breath (hydra_combo.ts): a Venom Current pool sliding down
+  // its current (a standing hazard, its arrow is temple_hydra_combo_fx.ts's),
+  // and a Toxic Rime crystal filling to its wider burst.
+  [VENOM_CURRENT_TEMPLATE]: {
+    color: 0x7fd64a,
+    accent: TEMPLE_ACCENTS.venom,
+    fillSeconds: 0,
+  },
+  [RIME_CRYSTAL_TEMPLATE]: {
+    color: TELEGRAPH_THREAT_COLORS.danger,
+    accent: TELEGRAPH_ACCENTS.frost,
+    fillSeconds: HYDRA_COMBO_TUNING.rimeSeconds,
+  },
+  // Ysolei's moon (ysolei_moon.ts): a Moonlight Tear's catch circle is
+  // SILVER, the one ring in the fight to step INTO; the heroic moonlight it
+  // leaves is a hazard.
+  [MOON_TEAR_TEMPLATE]: {
+    color: 0xe8f0ff,
+    accent: TEMPLE_ACCENTS.moon,
+    fillSeconds: 0,
+  },
+  [MOONGLOW_TEMPLATE]: {
+    color: TELEGRAPH_THREAT_COLORS.danger,
+    accent: TEMPLE_ACCENTS.moon,
     fillSeconds: 0,
   },
 };

@@ -5,7 +5,10 @@
 //    inherits a fallen head's attack visibly carries two;
 //  - the Tsunami's breaking wave, its spray and its lingering foam
 //    (temple_tsunami_fx.ts; the floor half-disc is temple_fx.ts's telegraph);
-//  - a regrowing head's burst of venom-green light as it bursts back up.
+//  - a regrowing head's burst of venom-green light as it bursts back up;
+//  - the Combined Breath's charge: while a head holds a combo bar both of the
+//    elements it brings swirl INTO its mouth, swelling to a flare at the bar's
+//    end (temple_hydra_combo_core.ts comboChargeEnvelope).
 // The per-vertex element tint of the three necks is `tintHydraNecks`.
 //
 // Cosmetic: every state is read off IWorld (the heads' dead flags and bars,
@@ -86,6 +89,9 @@ export interface HydraFxInput {
   wielders: (number | null)[];
   /** The Tsunami's wave object, if one stands. */
   wave: TsunamiWaveInput | null;
+  /** Each head's Combined Breath charge: the elements it brings and how far
+   *  the charge has swollen (0 to 1), or null while it holds no combo bar. */
+  charges?: ({ elements: readonly HydraElement[]; k: number } | null)[];
 }
 
 export class TempleHydraFx {
@@ -95,6 +101,7 @@ export class TempleHydraFx {
   private readonly materials: THREE.Material[] = [];
   private readonly tsunami: TempleTsunamiFx;
   private emitDebt = [0, 0, 0];
+  private chargeDebt = [0, 0, 0];
   private seed = 1;
 
   constructor(
@@ -238,12 +245,87 @@ export class TempleHydraFx {
     }
   }
 
+  /** A combo head's mouth gathers both its elements: motes stream in from a
+   *  ring round the jaw (each element in its own colour, the water wheeling),
+   *  and a bright core swells to the flare. */
+  private emitCharge(
+    head: number,
+    elements: readonly HydraElement[],
+    k: number,
+    at: THREE.Vector3,
+    clock: number,
+    dt: number,
+  ): void {
+    const rate = (this.detail ? 90 : 34) * (0.4 + 0.6 * k);
+    this.chargeDebt[head] += rate * dt;
+    while (this.chargeDebt[head] >= 1) {
+      this.chargeDebt[head] -= 1;
+      const el = elements[Math.floor(this.rand() * elements.length) % elements.length];
+      const [r, g, b] = HYDRA_ELEMENT_LOOK[el].glow;
+      const a = this.rand() * Math.PI * 2;
+      const up = (this.rand() - 0.5) * 2.4;
+      const rr = 2.6 + this.rand() * 1.8;
+      const life = 0.38 + this.rand() * 0.15;
+      const x = at.x + Math.cos(a) * rr;
+      const y = at.y + up;
+      const z = at.z + Math.sin(a) * rr;
+      // Straight in to the mouth over the mote's life; the water swirls.
+      const swirl = el === 'tide' ? 4 : 0;
+      this.glow.emit(clock, {
+        x,
+        y,
+        z,
+        vx: (at.x - x) / life - Math.sin(a) * swirl,
+        vy: (at.y - y) / life,
+        vz: (at.z - z) / life + Math.cos(a) * swirl,
+        drag: 0.001,
+        life,
+        size0: 0.55 + 0.35 * k,
+        size1: 0.2,
+        spin: 4,
+        r,
+        g,
+        b,
+        a: 1,
+      });
+    }
+    // The core: a steady swelling glow, flashing whiter at the flare.
+    if (this.rand() < dt * 30) {
+      const el = elements[0];
+      const [r, g, b] = HYDRA_ELEMENT_LOOK[el].glow;
+      const white = k > 0.85 ? (k - 0.85) / 0.15 : 0;
+      this.glow.emit(clock, {
+        x: at.x,
+        y: at.y,
+        z: at.z,
+        vx: 0,
+        vy: 0,
+        vz: 0,
+        life: 0.16,
+        size0: 1.2 + 2.4 * k,
+        size1: 1.4 + 2.6 * k,
+        r: r + (1 - r) * white,
+        g: g + (1 - g) * white,
+        b: b + (1 - b) * white,
+        a: 0.9,
+      });
+    }
+  }
+
   update(dt: number, clock: number, input: HydraFxInput): void {
     this.uTime.value = clock;
     input.wielders.forEach((head, i) => {
       const at = head !== null ? input.sockets[head] : null;
       if (at) this.emitElement(HYDRA_ELEMENTS[i], at, clock, dt);
     });
+    const charges = input.charges;
+    if (charges) {
+      for (let h = 0; h < charges.length; h++) {
+        const c = charges[h];
+        const at = input.sockets[h];
+        if (c && at && c.elements.length > 0) this.emitCharge(h, c.elements, c.k, at, clock, dt);
+      }
+    }
     this.tsunami.update(dt, clock, input.wave);
     this.glow.update(clock);
     this.mist.update(clock);

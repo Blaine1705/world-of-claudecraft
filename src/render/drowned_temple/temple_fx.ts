@@ -14,7 +14,12 @@
 //  - a thread of moonlight from every Tideglass Reflection to the player it
 //    mirrors, and the Mere Hydra's one body (temple_hydra.ts);
 //  - Selthe's water magic (temple_selthe_fx.ts) and the Colossus's prism
-//    slices, the Tideglass Fracture (temple_fracture_fx.ts).
+//    slices, the Tideglass Fracture (temple_fracture_fx.ts);
+//  - the encounter pass: the Hydra's Combined Breath, its Ice Wall, currents
+//    and crystals (temple_hydra_combo_fx.ts), Ysolei's moon, its tears and
+//    her Plenilune Ward (temple_moon_fx.ts), the Moonmantle Ray
+//    (temple_manta_fx.ts) and the Moonbridge forming on the Colossus's beam
+//    (temple_moonbridge_fx.ts).
 // Every shape is the shared floor telegraph (../floor_telegraph).
 //
 // Rules (src/render/CLAUDE.md): pooled geometry and materials built once,
@@ -59,12 +64,18 @@ import {
   tideLook,
 } from './temple_fx_core';
 import { TempleHydra } from './temple_hydra';
+import { TempleHydraComboFx } from './temple_hydra_combo_fx';
+import { TempleMantaFx } from './temple_manta_fx';
+import { TempleMoonFx } from './temple_moon_fx';
+import { TempleMoonbridgeFx } from './temple_moonbridge_fx';
 import { TempleSeltheFx } from './temple_selthe_fx';
 import { TempleYsoleiFx } from './temple_ysolei_fx';
 
 const FAN_SLOTS = 14;
 const LANE_SLOTS = 6;
-const OBJECT_SLOTS = 12;
+// The Combined Breath's pools and crystals and Ysolei's tears (and the
+// heroic moonlight they leave) can all stand with the venom at once.
+const OBJECT_SLOTS = 18;
 const MARK_SLOTS = 6;
 const TETHER_SLOTS = 6;
 const SCAN_SEC = 0.1;
@@ -117,6 +128,12 @@ export class TempleFx {
   private readonly cantor: TempleCantorFinaleFx;
   private readonly selthe: TempleSeltheFx;
   private readonly fracture: TempleFractureFx;
+  // The encounter pass: the Combined Breath, Ysolei's moon, the Moonmantle
+  // Ray and the Moonbridge forming.
+  private readonly combo: TempleHydraComboFx;
+  private readonly moon: TempleMoonFx;
+  private readonly manta: TempleMantaFx;
+  private readonly bridge: TempleMoonbridgeFx;
   private readonly flashesOn: boolean;
   /** Each living Pearlguard Sentinel's shell stance and when it changed. */
   private readonly shellStance = new Map<number, TempleShellTrack>();
@@ -178,11 +195,21 @@ export class TempleFx {
     const calm = reducedMotion ?? (() => false);
     this.selthe = new TempleSeltheFx(this.root, world, groundY, this.flashesOn, shake, calm);
     this.fracture = new TempleFractureFx(this.root, world, groundY, this.flashesOn, shake, calm);
+    const kit = this.kit;
+    const on = this.flashesOn;
+    this.combo = new TempleHydraComboFx(this.root, world, groundY, on, kit, shake, calm);
+    this.moon = new TempleMoonFx(this.root, world, groundY, on, kit, shake, calm);
+    this.manta = new TempleMantaFx(this.root, world, groundY, on, kit, shake, calm);
+    this.bridge = new TempleMoonbridgeFx(this.root, world, groundY, on, kit, shake, calm);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {
         // Linked: the caster and fracture layers may sleep while idle now.
         this.selthe.markGated();
         this.fracture.markGated();
+        this.combo.markGated();
+        this.moon.markGated();
+        this.manta.markGated();
+        this.bridge.markGated();
       })
       .catch(() => {});
   }
@@ -194,6 +221,8 @@ export class TempleFx {
     this.ysolei.handleEvent(ev);
     this.cantor.handleEvent(ev);
     if (this.selthe.handleEvent(ev) || this.fracture.handleEvent(ev)) return true;
+    if (this.combo.handleEvent(ev) || this.moon.handleEvent(ev)) return true;
+    if (this.manta.handleEvent(ev) || this.bridge.handleEvent(ev)) return true;
     if (ev.type === 'spellfx') {
       const source = this.world?.entities.get(ev.sourceId);
       // Claimed only when the Frenzy can actually play (a host without the
@@ -225,6 +254,10 @@ export class TempleFx {
     this.cantor.update(dt, this.clock);
     this.selthe.update(dt, this.clock);
     this.fracture.update(dt, this.clock);
+    this.combo.update(dt, this.clock);
+    this.moon.update(dt, this.clock);
+    this.manta.update(dt, this.clock);
+    this.bridge.update(dt, this.clock);
     for (const slot of this.casts) {
       if (slot.casterId < 0) continue;
       const caster = world.entities.get(slot.casterId);
@@ -538,6 +571,10 @@ export class TempleFx {
     this.cantor.dispose();
     this.selthe.dispose();
     this.fracture.dispose();
+    this.combo.dispose();
+    this.moon.dispose();
+    this.manta.dispose();
+    this.bridge.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();

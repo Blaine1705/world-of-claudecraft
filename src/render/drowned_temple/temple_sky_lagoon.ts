@@ -15,6 +15,7 @@ import { DROWNED_TEMPLE_WATER_LEVEL } from '../../sim/content/drowned_temple_lay
 import { DROWNED_TEMPLE_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import { DROWNED_TEMPLE_MOON_DIRECTION } from '../interior_light_rig';
+import { TEMPLE_MOON_SKY } from './temple_moon_sky';
 import { planFishShoals, templeHash } from './temple_plan_core';
 import { planTempleShoreMask, TEMPLE_SHORE_BOUNDS } from './temple_shore_core';
 
@@ -45,9 +46,18 @@ float fbm(vec2 p) {
 
 // The moon, shared by the sky and the water's mirror: a disc of `radius`
 // radians round uMoonDir, cratered and limb-darkened, its halo and corona.
+// Ysolei can call it closer, bring it down and eclipse it (temple_moon_sky.ts
+// uMoonSwell, uMoonDrop, uMoonEclipse; all 0 is the moon as it always hangs).
 const MOON_GLSL = /* glsl */ `
-const float MOON_R = 0.19;
+uniform float uMoonSwell;
+uniform float uMoonDrop;
+uniform float uMoonEclipse;
+const float MOON_R0 = 0.19;
+vec3 moonDirNow(vec3 base) {
+  return uMoonDrop > 0.0 ? normalize(base - vec3(0.0, uMoonDrop, 0.0)) : base;
+}
 vec3 moonDisc(vec3 d, vec3 moonDir, out float disc, out float ang) {
+  float MOON_R = MOON_R0 * (1.0 + uMoonSwell);
   float cosA = dot(d, moonDir);
   ang = acos(clamp(cosA, -1.0, 1.0));
   disc = smoothstep(MOON_R, MOON_R - 0.004, ang);
@@ -60,11 +70,19 @@ vec3 moonDisc(vec3 d, vec3 moonDir, out float disc, out float ang) {
   float rims = smoothstep(0.62, 0.7, fbm(mp * 17.0)) * 0.12;
   vec3 c = vec3(0.9, 0.93, 1.0) * (0.58 + 0.42 * limb) * (0.8 + 0.2 * craters + rims);
   c *= mix(0.7, 1.0, smoothstep(0.34, 0.6, maria));
+  // Called close it blazes; eclipsed it goes dark, a faint blue limb left.
+  c *= 1.0 + uMoonSwell * 0.35;
+  c = mix(c, vec3(0.02, 0.025, 0.06) + vec3(0.1, 0.14, 0.3) * (1.0 - limb), uMoonEclipse * 0.94);
   return c;
 }
 float moonHalo(float ang) {
-  // A tight bloom, a wide glow, and a faint ice corona ring.
-  return exp(-ang * 9.0) * 0.55 + exp(-ang * 2.4) * 0.16 + smoothstep(0.05, 0.0, abs(ang - 0.36)) * 0.05;
+  // A tight bloom, a wide glow, and a faint ice corona ring (all scaled with
+  // the disc as it swells); in eclipse the glow dies to a blazing corona.
+  float k = 1.0 + uMoonSwell;
+  float halo = exp(-ang * 9.0 / k) * 0.55 + exp(-ang * 2.4 / k) * 0.16 + smoothstep(0.05, 0.0, abs(ang - 0.36 * k)) * 0.05;
+  if (uMoonSwell <= 0.0 && uMoonEclipse <= 0.0) return halo;
+  float corona = smoothstep(0.035 * k, 0.0, abs(ang - MOON_R0 * k * 1.04)) * uMoonEclipse * 2.4;
+  return halo * (1.0 + uMoonSwell * 0.8) * (1.0 - 0.75 * uMoonEclipse) + corona;
 }
 `;
 
@@ -98,7 +116,8 @@ void main() {
   vec3 band = vec3(0.07, 0.05, 0.14);
   vec3 col = mix(band, zenith, smoothstep(0.04, 0.7, up));
   col = mix(uHorizon * 1.3 + vec3(0.02, 0.02, 0.05), col, smoothstep(-0.02, 0.24, up));
-  float toMoon = max(0.0, dot(normalize(vec3(d.x, 0.0, d.z)), normalize(vec3(uMoonDir.x, 0.0, uMoonDir.z))));
+  vec3 moonDir = moonDirNow(uMoonDir);
+  float toMoon = max(0.0, dot(normalize(vec3(d.x, 0.0, d.z)), normalize(vec3(moonDir.x, 0.0, moonDir.z))));
   col += vec3(0.07, 0.08, 0.14) * pow(max(toMoon, 0.0), 4.0) * (1.0 - smoothstep(0.0, 0.6, up));
 
   // Stars: a jittered grid, twinkling, thinning toward the horizon and the moon.
@@ -112,7 +131,7 @@ void main() {
   float glow;
   float disc;
   float ang;
-  vec3 moon = moonDisc(d, uMoonDir, disc, ang);
+  vec3 moon = moonDisc(d, moonDir, disc, ang);
   star *= smoothstep(0.02, 0.3, up) * twinkle * smoothstep(0.35, 0.8, ang);
   col += vec3(0.82, 0.88, 1.0) * star * 1.7;
   // A faint river of stars arching over the crater.
@@ -129,7 +148,7 @@ void main() {
     float c1 = fbm(uv * 0.5 + vec2(uTime * 0.005, uTime * 0.002));
     float c2 = fbm(uv * 1.4 - vec2(uTime * 0.009, 0.0) + 11.0);
     float c = smoothstep(0.55, 0.84, c1 * 0.72 + c2 * 0.42) * smoothstep(-0.02, 0.2, up) * uClouds;
-    float lining = pow(max(0.0, dot(d, uMoonDir)), 30.0) * 1.3 + pow(max(0.0, dot(d, uMoonDir)), 5.0) * 0.3;
+    float lining = pow(max(0.0, dot(d, moonDir)), 30.0) * 1.3 + pow(max(0.0, dot(d, moonDir)), 5.0) * 0.3;
     vec3 cloudCol = mix(vec3(0.05, 0.045, 0.1), vec3(0.62, 0.66, 0.86), lining);
     cloudMask = c;
     col = mix(col, cloudCol, c * 0.7);
@@ -148,6 +167,9 @@ function buildSky(opts: TempleAtmosphereOptions): THREE.Mesh {
     uniforms: {
       uTime: sharedUniforms.uTime,
       uMoonDir: { value: DROWNED_TEMPLE_MOON_DIRECTION.clone() },
+      uMoonSwell: TEMPLE_MOON_SKY.swell,
+      uMoonDrop: TEMPLE_MOON_SKY.drop,
+      uMoonEclipse: TEMPLE_MOON_SKY.eclipse,
       uHorizon: { value: new THREE.Color(DROWNED_TEMPLE_FOG_COLOR) },
       uClouds: { value: opts.lowGfx ? 0.6 : 1 },
     },
@@ -216,11 +238,12 @@ void main() {
   // The mirror: the night sky and the moon, broken by the ripples.
   float disc;
   float ang;
-  vec3 moon = moonDisc(normalize(r), uMoonDir, disc, ang);
+  vec3 moonDir = moonDirNow(uMoonDir);
+  vec3 moon = moonDisc(normalize(r), moonDir, disc, ang);
   vec3 refl = skyAt(r) + vec3(0.5, 0.56, 0.82) * moonHalo(ang) * 0.8;
   refl = mix(refl, moon * 1.1, disc);
   // The moon's road: glitter on every ripple facing the moon.
-  vec3 halfV = normalize(uMoonDir + view);
+  vec3 halfV = normalize(moonDir + view);
   float glint = pow(max(0.0, dot(n, halfV)), 420.0) * 3.5 + pow(max(0.0, dot(n, halfV)), 60.0) * 0.25;
 
   // The shallows along the pearl walkways: lighter teal, foam, life.
@@ -284,6 +307,9 @@ function buildLagoon(opts: TempleAtmosphereOptions): THREE.Mesh {
       ...fogUniforms(),
       uTime: sharedUniforms.uTime,
       uMoonDir: { value: DROWNED_TEMPLE_MOON_DIRECTION.clone() },
+      uMoonSwell: TEMPLE_MOON_SKY.swell,
+      uMoonDrop: TEMPLE_MOON_SKY.drop,
+      uMoonEclipse: TEMPLE_MOON_SKY.eclipse,
       uHorizon: { value: new THREE.Color(DROWNED_TEMPLE_FOG_COLOR) },
       uDeep: { value: new THREE.Color(0x04101c) },
       uShallow: { value: new THREE.Color(0x1d5a64) },

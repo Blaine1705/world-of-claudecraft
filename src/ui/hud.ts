@@ -552,7 +552,6 @@ import { materialProfessionHintText } from './hud/professions/material_professio
 import { mobileStationTooltipLines } from './hud/professions/mobile_station_tooltip';
 import { PerfectingWindow } from './hud/professions/perfecting_window';
 import {
-  isSunderCompletionLog,
   type ProfessionEventInput,
   planProfessionEvent,
 } from './hud/professions/profession_event_lines_core';
@@ -669,7 +668,7 @@ import { bindActionDisplayName } from './keybind_action_names_core';
 import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
-import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
+import { chatBubbleKind, isCombatFlavorLog, logEventCue } from './log_event_route';
 import { lootQualityReceiptBody } from './loot_quality_receipt';
 import { lootQualityAriaName } from './loot_quality_view';
 import { lootRollWinBanner } from './loot_roll_win_view';
@@ -1230,8 +1229,6 @@ function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
   parent.appendChild(span);
   return span;
 }
-
-const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 
 /** Named Curator rank for rank-up toast/banner (cosmetic chrome only). */
 function curatorRankDisplayName(rank: number): string {
@@ -13182,10 +13179,9 @@ export class Hud {
           if (isCombatFlavorLog(ev.entityId, ev.pid, ev.telegraph))
             this.combatLog(text, ev.color ?? HUD_LOG.PLAIN);
           else this.log(text, ev.color ?? HUD_LOG.PLAIN);
-          if (ev.text === CHEAT_DEATH_SAVE_TEXT) audio.fiestaRevive();
-          // Sundering completion cue: raw-English match pre-localization (the
-          // fiestaRevive precedent; weld: profession_event_lines_core.ts).
-          if (isSunderCompletionLog(ev.text)) audio.sunderComplete();
+          const cue = logEventCue(ev.text);
+          if (cue.sound) audio[cue.sound]();
+          if (cue.banner) this.showBanner(t(cue.banner));
           const bubble = chatBubbleKind(ev.text);
           if (ev.entityId !== undefined && bubble !== null)
             this.renderer.showChatBubble(ev.entityId, text, bubble === 'yell');

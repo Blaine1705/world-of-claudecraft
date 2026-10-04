@@ -48,16 +48,21 @@ export interface GateView {
   openness: number;
   /** Seconds since the last state change (the reveal clock). */
   since: number;
+  /** The state came from a change this page watched (false while a gate
+   *  first seen already open or closed holds the state it was found in), so
+   *  a reveal plays only for a gate seen changing. */
+  changed: boolean;
 }
 
 /** The gate's on-screen state; closed and snapped until first observed. */
 export function gateView(key: string, now: number): GateView {
   const m = memory.get(key);
-  if (!m) return { state: 'closed', openness: 0, since: 999 };
+  if (!m) return { state: 'closed', openness: 0, since: 999, changed: false };
   return {
     state: m.state,
     openness: gateOpenness(m.from, m.to, now - m.changedAt),
     since: now - m.changedAt,
+    changed: m.from !== m.to,
   };
 }
 
