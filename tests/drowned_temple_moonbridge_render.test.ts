@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  MOONBRIDGE_BEAT,
   MOONBRIDGE_MOMENT,
   MOONBRIDGE_MOMENT_SECONDS,
   MOONBRIDGE_PLANKS,
@@ -68,14 +69,17 @@ describe('the Moonbridge forms along the prism beam', () => {
   });
 
   it('fires each beat exactly once as the clock crosses it', () => {
-    const seen: string[] = [];
+    const B = MOONBRIDGE_BEAT;
+    const seen: number[] = [];
     let prev = -0.001;
     for (let t = 0; t <= MOONBRIDGE_MOMENT_SECONDS; t += 1 / 60) {
-      seen.push(...moonbridgeBeatsBetween(prev, t, fromX, toX));
+      const bits = moonbridgeBeatsBetween(prev, t, fromX, toX);
+      for (const b of [B.fire, B.arrive, B.laid]) if (bits & b) seen.push(b);
       prev = t;
     }
-    expect(seen).toEqual(['fire', 'arrive', 'laid']);
-    // A big frame step still fires every beat it crossed, in order.
-    expect(moonbridgeBeatsBetween(0, 10, fromX, toX)).toEqual(['fire', 'arrive', 'laid']);
+    expect(seen).toEqual([B.fire, B.arrive, B.laid]);
+    // A big frame step still fires every beat it crossed.
+    expect(moonbridgeBeatsBetween(0, 10, fromX, toX)).toBe(B.fire | B.arrive | B.laid);
+    expect(moonbridgeBeatsBetween(10, 11, fromX, toX)).toBe(0);
   });
 });

@@ -6,7 +6,7 @@
 
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import { bossEngaged, claimBoss, templeClaims } from './claim';
+import { bossEngaged, claimBoss, clearCastOf, templeClaims } from './claim';
 import { startCombo } from './hydra_combo';
 import {
   COLOSSUS_ID,
@@ -106,8 +106,7 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     const comboCasts = new Set(Object.values(HYDRA_COMBO_CASTS));
     for (const h of heads) {
       if (!h || h.dead || h.castingAbility === null || comboCasts.has(h.castingAbility)) continue;
-      h.castingAbility = null;
-      h.castRemaining = 0;
+      clearCastOf(h, h.castingAbility);
     }
     st.torrent = null;
     const pick = COMBO_TRIGGERS[what];
@@ -196,11 +195,7 @@ export function templeDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
     if (!boss || st?.kind !== 'ysolei') return 'Pull Ysolei first.';
     if (what === 'tears' || what === 'fullmoon') {
       if (st.undertow) return 'The Undertow is running.';
-      if (boss.castingAbility !== null) {
-        boss.castingAbility = null;
-        boss.castRemaining = 0;
-        boss.channeling = false;
-      }
+      if (boss.castingAbility !== null) clearCastOf(boss, boss.castingAbility);
       if (what === 'tears') {
         startBeckoning(boss);
         return 'Ysolei beckons the moon: its tears will fall.';

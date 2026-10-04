@@ -110,13 +110,30 @@ export function cometHeight(age: number): number {
 
 /** A burst's look over its life: grows fast (`grow` 0 to 1) and fades out
  *  (`alpha` 1 to 0, squared). Done at `age >= life`. */
-export function burstEnvelope(
-  age: number,
-  life: number,
-): { grow: number; alpha: number; done: boolean } {
+export interface BurstEnvelope {
+  grow: number;
+  alpha: number;
+  done: boolean;
+}
+
+export function burstEnvelope(age: number, life: number): BurstEnvelope {
+  return burstEnvelopeInto(age, life, { grow: 0, alpha: 0, done: false });
+}
+
+/** burstEnvelope into a caller-owned record (the per-frame painter's form). */
+export function burstEnvelopeInto(age: number, life: number, out: BurstEnvelope): BurstEnvelope {
   const k = life > 0 ? clamp01(age / life) : 1;
-  const grow = 1 - (1 - k) * (1 - k) * (1 - k);
-  return { grow, alpha: (1 - k) * (1 - k), done: k >= 1 };
+  out.grow = 1 - (1 - k) * (1 - k) * (1 - k);
+  out.alpha = (1 - k) * (1 - k);
+  out.done = k >= 1;
+  return out;
+}
+
+/** The ward's pulse rate (cycles of 2 pi per second): quicker as it cracks,
+ *  slow and steady under reduced motion. Its phase is accumulated by the
+ *  painter (phase += rate * dt), so a change of rate never jumps the pulse. */
+export function wardPulseRate(crack: number, calm: boolean): number {
+  return calm ? 1.5 : 2 + 6 * clamp01(crack);
 }
 
 /** The Moonswell halo's brightness for her stacks (0 with none, full at 6). */

@@ -527,7 +527,9 @@ export class TempleMantaFx {
     // Its speed, sampled over the frame (the charge dashes at 3x its walk).
     if (t.sampled >= 0 && clock > t.sampled) {
       const v = Math.hypot(e.pos.x - t.x, e.pos.z - t.z) / (clock - t.sampled);
-      const want = mantaGlideStrength(v, MOBS[MANTA_ID]?.moveSpeed ?? 6.5);
+      const walk = MOBS[MANTA_ID]?.moveSpeed ?? 6.5;
+      // A jump far past its dash (a snap correction, a teleport) is no glide.
+      const want = v > walk * 4.5 ? 0 : mantaGlideStrength(v, walk);
       const was = t.glide;
       t.glide += (want - t.glide) * Math.min(1, dt * 10);
       if (was > 0.55 && t.glide <= 0.55) this.glideLands(e);

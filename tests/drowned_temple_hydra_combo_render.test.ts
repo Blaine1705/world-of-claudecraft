@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  advancePhase,
   burstShake,
   comboChargeEnvelope,
   comboFill,
@@ -12,18 +13,22 @@ import {
   comboPourElement,
   currentArrowInto,
   currentArrowLeft,
+  elementOwner,
   frostlockLaneInto,
   ICE_WALL_LENGTH,
   iceWallLeeSign,
   iceWallMelt,
   iceWallRise,
   inMirroredWallLee,
+  RIME_PULSE_CALM,
+  RIME_PULSE_MAX,
   rimeLookInto,
   waterHead,
 } from '../src/render/drowned_temple/temple_hydra_combo_core';
 import {
   HYDRA_COMBO_TUNING,
   HYDRA_TUNING,
+  hydraElementOwners,
   iceWallFrom,
   iceWallMiddle,
   inIceWallLee,
@@ -120,5 +125,28 @@ describe('the Venom Current and the Toxic Rime', () => {
     expect(burstShake(5, 15, 0.18, 0, 0)).toBe(0.18);
     expect(burstShake(40, 20, 0.35, 45, 0.15)).toBe(0.15);
     expect(burstShake(60, 20, 0.35, 45, 0.15)).toBe(0);
+  });
+});
+
+describe('the per-frame helpers stay exact and calm', () => {
+  it('the allocation-free owner lookup is the sim rule', () => {
+    for (let mask = 0; mask < 8; mask++) {
+      const dead = [!!(mask & 1), !!(mask & 2), !!(mask & 4)];
+      expect([0, 1, 2].map((el) => elementOwner(el, dead))).toEqual(hydraElementOwners(dead));
+    }
+  });
+
+  it('caps the crystal pulse, lower when calm, and wraps a phase without a jump', () => {
+    const look = { grow: 0, glow: 0, pulse: 0 };
+    expect(rimeLookInto(99, look).pulse).toBeLessThanOrEqual(RIME_PULSE_MAX);
+    expect(rimeLookInto(99, look, true).pulse).toBeLessThanOrEqual(RIME_PULSE_CALM);
+    let p = 0;
+    for (let i = 0; i < 1000; i++) {
+      const next = advancePhase(p, 3, 0.05);
+      const step = (next - p + Math.PI * 2) % (Math.PI * 2);
+      expect(step).toBeCloseTo(3 * 0.05 * Math.PI * 2, 9);
+      p = next;
+    }
+    expect(p).toBeLessThan(Math.PI * 2);
   });
 });

@@ -265,6 +265,22 @@ describe('Frostlocked Torrent: a frozen lane and an Ice Wall', () => {
     expect(took(f, f.others[1], 'Ice Shards', from)).toBe(0);
   });
 
+  it('a wall raised in the early heroic slot stands until the next wave lands', () => {
+    const { f, heads } = hydraFight('heroic');
+    const st = toSlot(heads, 2, C.comboAtHeroic[0]);
+    run(f, C.comboCast + 0.2, hold(f));
+    const w = st.iceWall;
+    if (!w) throw new Error('no wall');
+    expect(w.remaining).toBeGreaterThan(C.wallSeconds);
+    expect(w.remaining).toBeGreaterThanOrEqual(st.tsunamiTimer + T.tsunamiCast);
+    // The normal slot keeps the plain 20 s (its wave lands inside it).
+    const n = hydraFight();
+    const sn = toSlot(n.heads, 2);
+    run(n.f, C.comboCast + 0.2, hold(n.f));
+    expect(Math.abs((sn.iceWall?.remaining ?? 0) - C.wallSeconds)).toBeLessThan(0.3);
+    expect(sn.tsunamiTimer + T.tsunamiCast).toBeLessThan(sn.iceWall?.remaining ?? 0);
+  });
+
   it('melts after its time with no wave in flight', () => {
     const { f, heads } = hydraFight();
     const st = toSlot(heads, 2);
@@ -361,6 +377,34 @@ describe('Venom Current and Toxic Rime: the venom pools, transformed', () => {
     }
     run(f, 0.2);
     expect(objects(f, ICE_WALL_TEMPLATE).length).toBe(0);
+  });
+
+  it('a reset also drains the sliding currents and thaws the frozen', () => {
+    const { f, heads } = hydraFight();
+    const st = toSlot(heads, 3);
+    st.combos = 1;
+    run(f, C.comboCast + 0.2, hold(f));
+    expect(objects(f, VENOM_CURRENT_TEMPLATE).length).toBeGreaterThan(0);
+    f.sim.ctx.applyAura(f.others[0], {
+      id: HYDRA_FROZEN,
+      name: 'Frozen',
+      kind: 'stun',
+      remaining: 2,
+      duration: 2,
+      value: 0,
+      sourceId: heads[2].id,
+      school: 'frost',
+    });
+    for (const p of [f.tank, ...f.others]) put(f, p, 0, -230);
+    for (const h of heads) {
+      h.inCombat = false;
+      h.aggroTargetId = null;
+      h.aiState = 'evade';
+    }
+    run(f, 0.2);
+    expect(objects(f, VENOM_CURRENT_TEMPLATE).length).toBe(0);
+    expect(objects(f, RIME_CRYSTAL_TEMPLATE).length).toBe(0);
+    expect(aura(f.others[0], HYDRA_FROZEN)).toBeUndefined();
   });
 
   it('replays the same combo by seed', () => {

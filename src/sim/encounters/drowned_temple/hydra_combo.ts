@@ -250,7 +250,10 @@ function landFrostlock(
   );
   obj.facing = yaw;
   obj.prevFacing = yaw;
-  st.iceWall = { ...line, remaining: C.wallSeconds, objectId: obj.id };
+  // It stands its 20 s, and always until the next wave has landed on it (a
+  // heroic early slot raises it 28 s before that wave rises).
+  const toWave = st.tsunamiTimer + T.tsunamiCast + 1;
+  st.iceWall = { ...line, remaining: Math.max(C.wallSeconds, toWave), objectId: obj.id };
 }
 
 function landCurrent(
@@ -516,5 +519,10 @@ export function clearCombo(
   for (const h of heads) {
     if (!h) continue;
     for (const id of Object.values(HYDRA_COMBO_CASTS)) clearCastOf(h, id);
+  }
+  // A freeze still on someone thaws with the fight.
+  for (const p of claimPlayers(ctx, inst)) {
+    if (p.auras.some((a) => a.id === HYDRA_FROZEN))
+      p.auras = p.auras.filter((a) => a.id !== HYDRA_FROZEN);
   }
 }

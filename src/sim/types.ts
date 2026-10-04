@@ -4227,7 +4227,7 @@ export interface TrashKitDef {
    *  damage (the Pale Choir Acolyte's Lullaby). Kick it, or wake the sleeper. */
   lullaby?: TrashKitCast & { range: number; seconds: number };
   /** Once per pull under a share of its health: a self absorb shield worth a
-   *  share of its maximum health (the Pearlguard Sentinel's Pearl Carapace). */
+   *  share of its maximum health (the Moonmantle Ray's Nacre Cocoon). */
   carapace?: { belowHpPct: number; shieldPct: number; seconds: number; name: string };
   /** It bursts where it fell, `delay` seconds after it dies (0: at once): a
    *  splash round the corpse (the Rime Whelp's Hoarfrost Pop, the Glacier
@@ -4640,6 +4640,9 @@ export interface YsoleiFightState {
   tearCalls: number;
   tears: { x: number; z: number; objectId: number }[];
   glows: { x: number; z: number; remaining: number; tick: number; objectId: number }[];
+  /** Each body's Moonsear stacks and when they fade (sim time): the count the
+   *  next tear reads, kept here so a cleanse of the display aura sheds none. */
+  sear: { playerId: number; stacks: number; until: number }[];
   fullMoon: 'queued' | 'falling' | 'done' | null;
 }
 

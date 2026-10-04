@@ -106,23 +106,23 @@ export function moonbridgeLaid(fromX: number, toX: number): number {
   return moonbridgePlankAppears(MOONBRIDGE_PLANKS - 1, fromX, toX) + MOONBRIDGE_MOMENT.rise;
 }
 
-/** The one-shot beats of the moment (sound, camera, burst), in order. */
-export type MoonbridgeBeat = 'fire' | 'arrive' | 'laid';
+/** The one-shot beats of the moment (sound, camera, burst), as bits. */
+export const MOONBRIDGE_BEAT = { fire: 1, arrive: 2, laid: 4 } as const;
 
-/** Which beats fall in (prev, now]: each fires once as the clock crosses it. */
+/** Which beats fall in (prev, now], as MOONBRIDGE_BEAT bits: each fires once
+ *  as the clock crosses it (allocation-free, read every frame of the moment). */
 export function moonbridgeBeatsBetween(
   prev: number,
   now: number,
   fromX: number,
   toX: number,
-): MoonbridgeBeat[] {
+): number {
   const M = MOONBRIDGE_MOMENT;
-  const at: [MoonbridgeBeat, number][] = [
-    ['fire', M.charge],
-    ['arrive', M.charge + M.travel],
-    ['laid', moonbridgeLaid(fromX, toX)],
-  ];
-  const out: MoonbridgeBeat[] = [];
-  for (const [beat, t] of at) if (prev < t && now >= t) out.push(beat);
-  return out;
+  const B = MOONBRIDGE_BEAT;
+  const crossed = (t: number): boolean => prev < t && now >= t;
+  return (
+    (crossed(M.charge) ? B.fire : 0) |
+    (crossed(M.charge + M.travel) ? B.arrive : 0) |
+    (crossed(moonbridgeLaid(fromX, toX)) ? B.laid : 0)
+  );
 }

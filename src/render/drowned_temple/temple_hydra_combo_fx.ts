@@ -63,12 +63,13 @@ import {
   ParticlePool,
 } from '../hollow_crypt/crypt_fx_particles';
 import {
+  advancePhase,
   burstShake,
   COMBO_ELEMENT_RGB,
   type ComboLane,
   type CurrentArrow,
   comboFill,
-  comboHeadElements,
+  comboHeadElementsInto,
   currentArrowInto,
   currentArrowLeft,
   frostlockLaneInto,
@@ -123,6 +124,7 @@ precision highp float;
 uniform float uTime;
 uniform float uFill;
 uniform float uFade;
+uniform float uPhase;
 uniform vec3 uColA;
 uniform vec3 uColB;
 varying vec2 vUv;
@@ -136,7 +138,7 @@ void main() {
   float core = 1.0 - smoothstep(0.0, 0.55, y);
   float edge = smoothstep(0.75, 0.95, y) * (1.0 - smoothstep(0.95, 1.0, y));
   float n = vnoise(vec2(x * 22.0 - uTime * 3.0, y * 4.0 + uTime));
-  float pulse = 0.7 + 0.3 * sin(uTime * (4.0 + 10.0 * uFill));
+  float pulse = 0.7 + 0.3 * sin(uPhase);
   float ends = smoothstep(0.0, 0.06, x) * (1.0 - smoothstep(0.94, 1.0, x));
   float a = (core * (0.35 + 0.55 * uFill) * (0.6 + 0.4 * n) + edge * 0.8 + (waveA + waveB) * core * 0.9) * pulse * ends;
   vec3 c = col * (1.1 + 1.4 * (waveA + waveB)) + vec3(1.0) * core * uFill * 0.35;
@@ -151,6 +153,7 @@ precision highp float;
 uniform float uTime;
 uniform float uFill;
 uniform float uFade;
+uniform float uPhase;
 uniform vec3 uColA;
 uniform vec3 uColB;
 varying vec2 vUv;
@@ -158,7 +161,7 @@ void main() {
   vec2 p = vUv - 0.5;
   float r = length(p) * 2.0;
   float band = smoothstep(0.7, 0.8, r) * (1.0 - smoothstep(0.94, 1.0, r));
-  float a = atan(p.y, p.x) + uTime * (1.5 + 2.5 * uFill);
+  float a = atan(p.y, p.x) + uPhase;
   float side = 0.5 + 0.5 * sin(a);
   vec3 col = mix(uColA, uColB, smoothstep(0.35, 0.65, side));
   float spark = pow(0.5 + 0.5 * sin(a * 6.0 - uTime * 9.0), 8.0);
@@ -284,7 +287,7 @@ const CRYSTAL_FRAG = /* glsl */ `
 precision highp float;
 uniform float uTime;
 uniform float uGlow;
-uniform float uPulse;
+uniform float uPhase;
 uniform float uFlash;
 uniform float uFade;
 uniform float uHeight;
@@ -299,7 +302,7 @@ void main() {
   float lam = 0.4 + 0.6 * max(dot(n, normalize(vec3(-0.14, 0.62, 0.77))), 0.0);
   vec3 base = mix(vec3(0.05, 0.32, 0.12), vec3(0.55, 1.0, 0.55), h);
   base = mix(base, vec3(0.92, 1.0, 0.95), smoothstep(0.75, 1.0, h));
-  float beat = 0.5 + 0.5 * sin(uTime * uPulse * 6.2832);
+  float beat = 0.5 + 0.5 * sin(uPhase);
   vec3 glow = vec3(0.55, 1.0, 0.45) * uGlow * (0.6 + 0.8 * beat);
   vec3 col = base * lam + glow + vec3(0.9, 1.0, 0.95) * fres * 0.8;
   col = mix(col, vec3(1.0), uFlash);
@@ -313,6 +316,8 @@ type EntityView = IWorld['entities'] extends Map<number, infer E> ? E : never;
 interface FxUniforms {
   uTime: { value: number };
   uFill: { value: number };
+  /** The pulse's phase, accumulated on the CPU (radians, wrapped). */
+  uPhase: { value: number };
   uFade: { value: number };
   uColA: { value: THREE.Color };
   uColB: { value: THREE.Color };
@@ -351,6 +356,9 @@ interface ArrowSlot {
   /** Where its pool was first seen (world), to read how far it has slid. */
   sx: number;
   sz: number;
+  /** Its claim's origin (world), read once when the pool is first seen. */
+  ox: number;
+  oz: number;
 }
 
 interface CrystalSlot {
@@ -358,7 +366,7 @@ interface CrystalSlot {
   u: {
     uTime: { value: number };
     uGlow: { value: number };
-    uPulse: { value: number };
+    uPhase: { value: number };
     uFlash: { value: number };
     uFade: { value: number };
     uHeight: { value: number };
@@ -476,6 +484,8 @@ export class TempleHydraComboFx {
   private clock = 0;
   private linkDebt = 0;
   private trailDebt = 0;
+  private readonly elsA: HydraElement[] = [];
+  private readonly elsB: HydraElement[] = [];
 
   constructor(
     parent: THREE.Group,
@@ -534,6 +544,7 @@ export class TempleHydraComboFx {
     const fxUniforms = (): FxUniforms => ({
       uTime: this.uTime,
       uFill: { value: 0 },
+      uPhase: { value: 0 },
       uFade: { value: 0 },
       uColA: { value: new THREE.Color() },
       uColB: { value: new THREE.Color() },
@@ -571,6 +582,10 @@ export class TempleHydraComboFx {
         uLee: { value: 0 },
         uHeight: { value: ICE_WALL_HEIGHT },
       };
+      // Normal-blended, nearly opaque ice (alpha 0.72 to 1): it WRITES depth
+      // on purpose, so the vapour, the shards and the water behind the wall
+      // are occluded by it and the shelter reads as solid. It is not an
+      // additive layer (those below write no depth).
       const m = new THREE.ShaderMaterial({
         uniforms: u,
         vertexShader: SOLID_VERT,
@@ -636,7 +651,7 @@ export class TempleHydraComboFx {
       mesh.renderOrder = floorVfxRenderOrder('encounter', 4);
       mesh.scale.setScalar(COLLAPSED);
       this.root.add(mesh);
-      this.arrows.push({ mesh, alpha, left, objectId: -1, sx: 0, sz: 0 });
+      this.arrows.push({ mesh, alpha, left, objectId: -1, sx: 0, sz: 0, ox: 0, oz: 0 });
     }
 
     // The Toxic Rime crystals.
@@ -646,11 +661,14 @@ export class TempleHydraComboFx {
       const u = {
         uTime: this.uTime,
         uGlow: { value: 0 },
-        uPulse: { value: 1 },
+        uPhase: { value: 0 },
         uFlash: { value: 0 },
         uFade: { value: 0 },
         uHeight: { value: CRYSTAL_H },
       };
+      // Normal-blended, nearly opaque crystal (alpha 0.82 to 1, fading only
+      // in its 0.18 s burst): it writes depth on purpose, like the wall, so
+      // its shards occlude each other and the motes behind it.
       const m = new THREE.ShaderMaterial({
         uniforms: u,
         vertexShader: SOLID_VERT,
@@ -1017,6 +1035,9 @@ export class TempleHydraComboFx {
     slot.objectId = e.id;
     slot.sx = e.pos.x;
     slot.sz = e.pos.z;
+    const o = instanceOrigin(DUNGEONS.drowned_temple.index, instanceSlotForZ(e.pos.z));
+    slot.ox = o.x;
+    slot.oz = o.z;
   }
 
   update(dt: number, clock: number): void {
@@ -1069,17 +1090,17 @@ export class TempleHydraComboFx {
     if (a && kind) {
       const fill = comboFill(a.castRemaining, a.castTotal);
       if (b) {
-        const ea = comboHeadElements(kind, ai, this.dead)[0];
-        const eb = comboHeadElements(kind, bi, this.dead)[0];
+        const ea = comboHeadElementsInto(kind, ai, this.dead, this.elsA)[0];
+        const eb = comboHeadElementsInto(kind, bi, this.dead, this.elsB)[0];
         if (ea && eb) {
           linkOn = true;
           this.paintLink(a, b, ea, eb, fill, dt);
         }
       } else {
-        const els = comboHeadElements(kind, ai, this.dead);
+        const els = comboHeadElementsInto(kind, ai, this.dead, this.elsA);
         if (els.length >= 2) {
           ringOn = true;
-          this.paintRing(a, els[0], els[1], fill);
+          this.paintRing(a, els[0], els[1], fill, dt);
         }
       }
     }
@@ -1093,8 +1114,9 @@ export class TempleHydraComboFx {
     this.ringU.uFade.value = this.ringFade;
     if (this.linkFade <= 0.01) this.link.scale.setScalar(COLLAPSED);
     if (this.ringFade <= 0.01) this.ring.scale.setScalar(COLLAPSED);
-    // The frozen lane, from the water head down its locked facing.
-    const wi = waterHead(this.dead);
+    // The frozen lane, from the water head down its locked facing (looked
+    // up only while a Frostlocked Torrent bar runs).
+    const wi = castId === HYDRA_FROSTLOCKED_TORRENT ? waterHead(this.dead) : null;
     const wid = wi !== null ? this.heads[wi] : null;
     const water = wid !== null ? world.entities.get(wid) : undefined;
     const laneOn = !!water && !water.dead && water.castingAbility === HYDRA_FROSTLOCKED_TORRENT;
@@ -1144,6 +1166,7 @@ export class TempleHydraComboFx {
     this.linkU.uColA.value.setRGB(ca[0], ca[1], ca[2]);
     this.linkU.uColB.value.setRGB(cb[0], cb[1], cb[2]);
     this.linkU.uFill.value = fill;
+    this.linkU.uPhase.value = advancePhase(this.linkU.uPhase.value, (4 + 10 * fill) / 6.2832, dt);
     // Sparks running both ways along the link, each in its head's colour.
     this.linkDebt += (20 + 50 * fill) * this.density * dt;
     while (this.linkDebt >= 1) {
@@ -1173,7 +1196,13 @@ export class TempleHydraComboFx {
     }
   }
 
-  private paintRing(h: EntityView, ea: HydraElement, eb: HydraElement, fill: number): void {
+  private paintRing(
+    h: EntityView,
+    ea: HydraElement,
+    eb: HydraElement,
+    fill: number,
+    dt: number,
+  ): void {
     const y = this.groundY(h.pos.x, h.pos.z);
     this.ring.position.set(h.pos.x, y + 0.25, h.pos.z);
     const r = 5 + 1.5 * fill;
@@ -1183,6 +1212,12 @@ export class TempleHydraComboFx {
     this.ringU.uColA.value.setRGB(ca[0], ca[1], ca[2]);
     this.ringU.uColB.value.setRGB(cb[0], cb[1], cb[2]);
     this.ringU.uFill.value = fill;
+    // The halves chase round faster as the bar fills (one turn = 2 pi).
+    this.ringU.uPhase.value = advancePhase(
+      this.ringU.uPhase.value,
+      (1.5 + 2.5 * fill) / 6.2832,
+      dt,
+    );
   }
 
   /** Returns true while the slot shows anything. */
@@ -1315,10 +1350,9 @@ export class TempleHydraComboFx {
       }
       return true;
     }
-    const o = instanceOrigin(DUNGEONS.drowned_temple.index, instanceSlotForZ(obj.pos.z));
     // The arrow's heading is read off where the pool was first seen (the sim
     // slides it on the heading of its start).
-    const arrow = currentArrowInto(a.sx - o.x, a.sz - o.z, this.arrowNow);
+    const arrow = currentArrowInto(a.sx - a.ox, a.sz - a.oz, this.arrowNow);
     const slid = Math.hypot(obj.pos.x - a.sx, obj.pos.z - a.sz);
     a.left.value = sliding ? currentArrowLeft(slid) : 1;
     a.alpha.value = Math.min(1, a.alpha.value + dt * 5);
@@ -1367,9 +1401,10 @@ export class TempleHydraComboFx {
       c.x = obj.pos.x;
       c.z = obj.pos.z;
       c.y = this.groundY(obj.pos.x, obj.pos.z);
-      const look = rimeLookInto(this.clock - c.seenAt, this.rime);
+      const look = rimeLookInto(this.clock - c.seenAt, this.rime, this.calm());
       c.u.uGlow.value = look.glow;
-      c.u.uPulse.value = look.pulse;
+      // The beat's phase runs on the CPU so a quickening pulse never jumps.
+      c.u.uPhase.value = advancePhase(c.u.uPhase.value, look.pulse, dt);
       c.u.uFade.value = 1;
       c.mesh.position.set(c.x, c.y - 0.2, c.z);
       c.mesh.scale.setScalar(Math.max(COLLAPSED, look.grow));

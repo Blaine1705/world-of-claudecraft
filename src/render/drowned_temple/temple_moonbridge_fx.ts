@@ -38,6 +38,7 @@ import { sharedUniforms } from '../gfx';
 import { GLOW_FRAG, PARTICLE_VERT, ParticlePool } from '../hollow_crypt/crypt_fx_particles';
 import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
 import {
+  MOONBRIDGE_BEAT,
   MOONBRIDGE_MOMENT,
   MOONBRIDGE_MOMENT_SECONDS,
   MOONBRIDGE_PLANKS,
@@ -145,6 +146,13 @@ interface FxMat {
 
 type EntityView = IWorld['entities'] extends Map<number, infer E> ? E : never;
 
+interface MoonbridgeClaim {
+  slot: number;
+  ox: number;
+  oz: number;
+  key: string;
+}
+
 export class TempleMoonbridgeFx {
   private readonly root = new THREE.Group();
   private readonly uTime = { value: 0 };
@@ -171,6 +179,8 @@ export class TempleMoonbridgeFx {
   private readonly up = new THREE.Vector3(0, 1, 0);
   private readonly span = moonbridgeSpan();
   private gated = false;
+  private bandX: number | null = null;
+  private claim: MoonbridgeClaim | null = null;
   private lastSince = -1;
   private lastKey = '';
   private seed = 23;
@@ -289,14 +299,21 @@ export class TempleMoonbridgeFx {
     return this.seed / 2147483647;
   }
 
-  /** The local player's claim origin and the Moonbridge's gate memory key, or
-   *  null outside the Temple. */
-  private claimOf(me: EntityView): { ox: number; oz: number; key: string } | null {
+  /** The local player's claim (its origin and the Moonbridge's gate memory
+   *  key), or null outside the Temple. Cached per instance slot: the origin
+   *  and the key are built once a slot, never per frame. */
+  private claimOf(me: EntityView): MoonbridgeClaim | null {
     const def = DUNGEONS.drowned_temple;
     if (!def) return null;
-    const o = instanceOrigin(def.index, instanceSlotForZ(me.pos.z));
-    if (Math.abs(me.pos.x - o.x) > 160 || Math.abs(me.pos.z - o.z) > 300) return null;
-    return { ox: o.x, oz: o.z, key: gateMemoryKey(o.x, o.z, 'moonbridge') };
+    // The Temple's slots share one x band: anything far off it is elsewhere.
+    if (this.bandX === null) this.bandX = instanceOrigin(def.index, 0).x;
+    if (Math.abs(me.pos.x - this.bandX) > 160) return null;
+    const slot = instanceSlotForZ(me.pos.z);
+    if (this.claim?.slot !== slot) {
+      const o = instanceOrigin(def.index, slot);
+      this.claim = { slot, ox: o.x, oz: o.z, key: gateMemoryKey(o.x, o.z, 'moonbridge') };
+    }
+    return Math.abs(me.pos.z - this.claim.oz) > 300 ? null : this.claim;
   }
 
   /** The fallen Colossus nearest the terrace (its corpse), if in view. */
@@ -481,22 +498,24 @@ export class TempleMoonbridgeFx {
   private beats(me: EntityView, since: number, clock: number): void {
     const prev = this.lastSince;
     if (prev < 0) return;
+    const bits = moonbridgeBeatsBetween(prev, since, this.span.fromX, this.span.toX);
+    if (bits === 0) return;
     const near = Math.hypot(me.pos.x - this.from.x, me.pos.z - this.from.z) < 70;
-    for (const beat of moonbridgeBeatsBetween(prev, since, this.span.fromX, this.span.toX)) {
-      if (beat === 'fire') {
-        sfx.playAt('impact_holy', this.from.x, this.from.y, this.from.z, { gain: 1.4 });
-        const mx = (this.from.x + this.to.x) / 2;
-        const mz = (this.from.z + this.to.z) / 2;
-        sfx.playAt('hoard_entrance_open', mx, this.to.y, mz, { gain: 1.2, rate: 0.85 });
-        if (near && !this.calm()) this.shake?.(0.14);
-        this.burstAt(this.from, clock, 70, 0.85, 0.8, 1);
-      } else if (beat === 'arrive') {
-        sfx.playAt('impact_holy', this.to.x, this.to.y, this.to.z, { gain: 1.1, rate: 1.2 });
-        this.burstAt(this.to, clock, 90, 0.75, 0.92, 1);
-      } else {
-        sfx.playAt('ui_aura_temple_gong', this.to.x, this.to.y, this.to.z, { gain: 0.9 });
-        if (near && !this.calm()) this.shake?.(0.07);
-      }
+    if (bits & MOONBRIDGE_BEAT.fire) {
+      sfx.playAt('impact_holy', this.from.x, this.from.y, this.from.z, { gain: 1.4 });
+      const mx = (this.from.x + this.to.x) / 2;
+      const mz = (this.from.z + this.to.z) / 2;
+      sfx.playAt('hoard_entrance_open', mx, this.to.y, mz, { gain: 1.2, rate: 0.85 });
+      if (near && !this.calm()) this.shake?.(0.14);
+      this.burstAt(this.from, clock, 70, 0.85, 0.8, 1);
+    }
+    if (bits & MOONBRIDGE_BEAT.arrive) {
+      sfx.playAt('impact_holy', this.to.x, this.to.y, this.to.z, { gain: 1.1, rate: 1.2 });
+      this.burstAt(this.to, clock, 90, 0.75, 0.92, 1);
+    }
+    if (bits & MOONBRIDGE_BEAT.laid) {
+      sfx.playAt('ui_aura_temple_gong', this.to.x, this.to.y, this.to.z, { gain: 0.9 });
+      if (near && !this.calm()) this.shake?.(0.07);
     }
   }
 

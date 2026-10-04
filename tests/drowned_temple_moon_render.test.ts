@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import {
   approach,
   burstEnvelope,
+  burstEnvelopeInto,
   COMET_HEIGHT,
   COMET_SECONDS,
   cometHeight,
@@ -24,6 +25,7 @@ import {
   moonswellGlow,
   tearRollAngle,
   wardCrack,
+  wardPulseRate,
 } from '../src/render/drowned_temple/temple_moon_core';
 
 function input(over: Partial<MoonSkyInput> = {}): MoonSkyInput {
@@ -119,6 +121,20 @@ describe('the Plenilune Ward, the tears and the bursts', () => {
     expect(a.alpha).toBe(1);
     expect(burstEnvelope(0.5, 1).grow).toBeGreaterThan(0.8);
     expect(burstEnvelope(1, 1).done).toBe(true);
+  });
+
+  it('fills a caller-owned envelope the same as the fresh one', () => {
+    const out = { grow: -1, alpha: -1, done: true };
+    expect(burstEnvelopeInto(0.3, 1, out)).toBe(out);
+    expect(out).toEqual(burstEnvelope(0.3, 1));
+  });
+
+  it('pulses the ward faster as it cracks, slow and steady when calm', () => {
+    expect(wardPulseRate(0, false)).toBe(2);
+    expect(wardPulseRate(1, false)).toBe(8);
+    expect(wardPulseRate(5, false)).toBe(8);
+    expect(wardPulseRate(1, true)).toBe(wardPulseRate(0, true));
+    expect(wardPulseRate(1, true)).toBeLessThan(wardPulseRate(0, false));
   });
 
   it('brightens her Moonswell halo with every stack', () => {

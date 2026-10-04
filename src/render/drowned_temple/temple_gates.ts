@@ -23,6 +23,7 @@ import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
 import { instancePlacements, templeKitPiece, templeSlotMaterial } from './temple_kit';
 import {
   MOONBRIDGE_MOMENT,
+  MOONBRIDGE_MOMENT_SECONDS,
   MOONBRIDGE_PLANKS,
   moonbridgeLaid,
   moonbridgePlankFlash,
@@ -491,11 +492,19 @@ export function buildTempleGates(
     holder.position.set(gate.x, gy, gate.z);
     holder.rotation.y = gate.rot;
     holder.add(rig.root);
+    // Every mesh of the rig carries the refresh (whichever is on screen drives
+    // it), but it runs once a frame: the first mesh drawn applies the pose.
+    let applied = -1;
     const refresh = () => {
-      const view = gateView(key, sharedUniforms.uTime.value);
-      const seal =
-        view.state === 'sealed' ? 0.7 + 0.3 * Math.sin(sharedUniforms.uTime.value * 5) : 0;
-      rig.apply(view.openness, seal, view.since, view.state === 'open' && view.changed);
+      const now = sharedUniforms.uTime.value;
+      if (now === applied) return;
+      applied = now;
+      const view = gateView(key, now);
+      const seal = view.state === 'sealed' ? 0.7 + 0.3 * Math.sin(now * 5) : 0;
+      // A watched opening plays its moment once; after it the gate is whole.
+      const forming =
+        view.state === 'open' && view.changed && view.since < MOONBRIDGE_MOMENT_SECONDS;
+      rig.apply(view.openness, seal, view.since, forming);
     };
     holder.traverse((o) => {
       if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).onBeforeRender = refresh;

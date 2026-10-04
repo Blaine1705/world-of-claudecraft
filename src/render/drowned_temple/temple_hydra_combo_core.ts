@@ -16,7 +16,6 @@ import {
   type HydraComboKind,
   type HydraElement,
   hydraComboOf,
-  hydraElementOwners,
   iceWallOfObject,
   inIceWallLee,
   type TsunamiSide,
@@ -32,24 +31,45 @@ export const COMBO_ELEMENT_RGB: Readonly<Record<HydraElement, readonly [number, 
     tide: [0.25, 0.86, 0.92],
   };
 
-/** The elements head `head` (0 left, 1 centre, 2 right) brings to a combo,
- *  given the heads' dead flags: one for a pair, both for a lone survivor that
- *  carries them, none when it takes no part. */
+/** The head (0..2) that wields element `el` (HYDRA_ELEMENTS index) given the
+ *  heads' dead flags, or null: the sim's hydraElementOwners rule (its own head
+ *  while it lives, else the next living head round), without allocating. */
+export function elementOwner(el: number, dead: readonly boolean[]): number | null {
+  for (let k = 0; k < 3; k++) {
+    const h = (el + k) % 3;
+    if (!dead[h]) return h;
+  }
+  return null;
+}
+
+/** Fill `out` with the elements head `head` (0 left, 1 centre, 2 right) brings
+ *  to a combo, given the heads' dead flags: one for a pair, both for a lone
+ *  survivor that carries them, none when it takes no part. */
+export function comboHeadElementsInto(
+  kind: HydraComboKind,
+  head: number,
+  dead: readonly boolean[],
+  out: HydraElement[],
+): HydraElement[] {
+  out.length = 0;
+  for (const el of HYDRA_COMBO_ELEMENTS[kind]) {
+    if (elementOwner(el, dead) === head) out.push(HYDRA_ELEMENTS[el]);
+  }
+  return out;
+}
+
+/** The elements head `head` brings to a combo (a fresh array: tests and cold
+ *  paths; the per-frame paths use comboHeadElementsInto). */
 export function comboHeadElements(
   kind: HydraComboKind,
   head: number,
   dead: readonly boolean[],
 ): HydraElement[] {
-  const owners = hydraElementOwners(dead);
-  const out: HydraElement[] = [];
-  for (const el of HYDRA_COMBO_ELEMENTS[kind]) {
-    if (owners[el] === head) out.push(HYDRA_ELEMENTS[el]);
-  }
-  return out;
+  return comboHeadElementsInto(kind, head, dead, []);
 }
 
-/** The element a head pours in its combo bar's last half second (its first
- *  element: a lone survivor pours the pair's first), or null. */
+/** The element a head pours in its combo bar's last half second (the water
+ *  when it brings it, else its first element), or null. Allocation-free. */
 export function comboPourElement(
   castId: string | null,
   head: number,
@@ -57,16 +77,24 @@ export function comboPourElement(
 ): HydraElement | null {
   const kind = hydraComboOf(castId);
   if (!kind) return null;
-  // The water head always pours the water jet when it takes part.
-  const els = comboHeadElements(kind, head, dead);
-  if (els.includes('tide')) return 'tide';
-  return els[0] ?? null;
+  let first: HydraElement | null = null;
+  for (const el of HYDRA_COMBO_ELEMENTS[kind]) {
+    if (elementOwner(el, dead) !== head) continue;
+    if (HYDRA_ELEMENTS[el] === 'tide') return 'tide';
+    first ??= HYDRA_ELEMENTS[el];
+  }
+  return first;
 }
 
 /** The head (0..2) that wields the water now, or null. */
 export function waterHead(dead: readonly boolean[]): number | null {
-  return hydraElementOwners(dead)[2];
+  return elementOwner(2, dead);
 }
+
+/** The highest crystal pulse (beats a second), and the calm (reduced motion)
+ *  ceiling. */
+export const RIME_PULSE_MAX = 3;
+export const RIME_PULSE_CALM = 1.2;
 
 /** The charge glow at a combo head's mouth over its bar, 0 to 1: it swells
  *  through the bar and flares in its last fifth. */
@@ -185,14 +213,21 @@ export interface RimeLook {
   pulse: number;
 }
 
-export function rimeLookInto(age: number, out: RimeLook): RimeLook {
+export function rimeLookInto(age: number, out: RimeLook, calm = false): RimeLook {
   const total = HYDRA_COMBO_TUNING.rimeSeconds;
   const k = Math.min(1, Math.max(0, age / total));
   const g = Math.min(1, Math.max(0, age / 0.5));
   out.grow = 1 - (1 - g) ** 3;
   out.glow = 0.2 + 0.8 * k * k;
-  out.pulse = 1 + 5 * k;
+  out.pulse = calm ? 0.6 + (RIME_PULSE_CALM - 0.6) * k : 1 + (RIME_PULSE_MAX - 1) * k;
   return out;
+}
+
+/** Advance a pulse's phase (radians) by `hz` over `dt`, wrapped to one turn:
+ *  the shader reads sin(phase), so a pulse whose rate changes never jumps. */
+export function advancePhase(phase: number, hz: number, dt: number): number {
+  const p = phase + hz * dt * Math.PI * 2;
+  return p >= Math.PI * 2 ? p % (Math.PI * 2) : p;
 }
 
 /** The camera kick for a burst at distance `d` (yards) from the local player:

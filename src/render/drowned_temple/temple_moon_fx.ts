@@ -44,6 +44,7 @@ import {
   YSOLEI_FALLING_MOON,
   YSOLEI_ID,
   YSOLEI_MOON_FALLS,
+  YSOLEI_MOON_TUNING,
   YSOLEI_MOONBORNE_MIGHT,
   YSOLEI_MOONSWELL,
   YSOLEI_PLENILUNE_WARD,
@@ -63,7 +64,8 @@ import {
 } from '../hollow_crypt/crypt_fx_particles';
 import {
   approach,
-  burstEnvelope,
+  type BurstEnvelope,
+  burstEnvelopeInto,
   COMET_SECONDS,
   cometHeight,
   type MoonSkyInput,
@@ -73,12 +75,15 @@ import {
   moonswellGlow,
   tearRollAngle,
   wardCrack,
+  wardPulseRate,
 } from './temple_moon_core';
 import { TEMPLE_MOON_SKY } from './temple_moon_sky';
 
 const COLLAPSED = 1e-4;
 const SCAN_SEC = 0.4;
-const TEAR_SLOTS = 4;
+/** One slot per tear of the largest wave (heroic): the sim never opens a
+ *  second wave while the first still rolls, so a wave never outnumbers it. */
+const TEAR_SLOTS = YSOLEI_MOON_TUNING.tearCountHeroic;
 const RING_SLOTS = 8;
 const FLASH_SLOTS = 6;
 /** The rolling tear's drawn radius (1.4 yd across). */
@@ -262,12 +267,18 @@ varying vec3 vLocal;
 ${NOISE}
 void main() {
   vec3 p = normalize(vLocal);
-  float facing = max(0.0, dot(normalize(vNormalV), normalize(vViewV)));
+  // Seen from inside (a melee player under it) the back faces carry only a
+  // faint veil, their own fresnel, so the dome never washes the screen out
+  // and the cracks (the ward's health) stay the brightest thing on it.
+  float inside = gl_FrontFacing ? 0.0 : 1.0;
+  vec3 nrm = normalize(vNormalV) * (gl_FrontFacing ? 1.0 : -1.0);
+  float facing = max(0.0, dot(nrm, normalize(vViewV)));
   float rim = pow(1.0 - facing, 1.8);
+  float veil = mix(1.0, 0.22, inside);
   float lon = atan(p.z, p.x);
   float lat = asin(clamp(p.y, -1.0, 1.0));
   vec3 col = vec3(0.7, 0.8, 1.0) * (0.35 + 0.9 * rim);
-  float a = 0.12 + 0.55 * rim;
+  float a = (0.12 + 0.55 * rim) * veil;
   // Eight moon phases on a band a third of the way up, turning slowly.
   float turn = lon + uTime * 0.25;
   float cell = 6.2832 / 8.0;
@@ -279,11 +290,11 @@ void main() {
   float lit = 1.0 - smoothstep(0.22, 0.29, length(q - vec2(shadowX, 0.0)));
   float glyph = disc * (0.35 + 0.65 * (1.0 - lit * step(0.01, abs(shadowX))));
   col += vec3(0.9, 0.95, 1.0) * glyph * 1.3;
-  a += glyph * 0.5;
+  a += glyph * 0.5 * veil;
   // The sheen sweeping over it, and the pulse.
   float sheen = smoothstep(0.92, 1.0, sin(lon + lat * 2.0 - uTime * 1.6));
   col += vec3(1.0) * sheen * 0.6;
-  a += sheen * 0.25 + uPulse * 0.08;
+  a += (sheen * 0.25 + uPulse * 0.08) * veil;
   // Cracks: noise folded into lines, more and brighter as the ward drains.
   float n1 = vnoise(vec2(lon * 3.2, lat * 5.0) + 7.0);
   float n2 = vnoise(vec2(lon * 9.0, lat * 13.0) - 3.0);
@@ -291,7 +302,7 @@ void main() {
   float reach = step(n2, uCrack * 1.15);
   float crack = line * reach * smoothstep(0.02, 0.15, uCrack);
   col = mix(col, vec3(2.0), crack);
-  a = max(a, crack * 0.95);
+  a = max(a, crack * mix(0.95, 0.8, inside));
   gl_FragColor = vec4(col, clamp(a, 0.0, 1.0) * uAlpha);
   #include <colorspace_fragment>
 }
@@ -317,6 +328,9 @@ void main() {
 `;
 
 type EntityView = IWorld['entities'] extends Map<number, infer E> ? E : never;
+
+/** The moon layer writing TEMPLE_MOON_SKY now (the last to update). */
+let skyWriter: object | null = null;
 
 interface Uniform<T> {
   value: T;
@@ -415,6 +429,9 @@ export class TempleMoonFx {
   private fallY = 0;
   private fallZ = 0;
   private columnLevel = 0;
+  private pulsePhase = 0;
+  private readonly altar = { x: 0, z: 0 };
+  private readonly env: BurstEnvelope = { grow: 0, alpha: 0, done: false };
   private domeLevel = 0;
   private wardSeen = false;
 
@@ -495,8 +512,18 @@ export class TempleMoonFx {
     const disc = geo(new THREE.CircleGeometry(3, 64).rotateX(-Math.PI / 2));
     const order = (n: number) => floorVfxRenderOrder('encounter', n);
 
-    this.column = mesh(cyl, shader(SHEET_VERT, COLUMN_FRAG, this.columnU, true), order(9));
-    this.fall = mesh(cyl, shader(SHEET_VERT, COLUMN_FRAG, this.fallU, true), order(10));
+    // The columns are front faces only: a camera inside one sees through it
+    // instead of two full-screen additive layers.
+    this.column = mesh(
+      cyl,
+      shader(SHEET_VERT, COLUMN_FRAG, this.columnU, true, THREE.FrontSide),
+      order(9),
+    );
+    this.fall = mesh(
+      cyl,
+      shader(SHEET_VERT, COLUMN_FRAG, this.fallU, true, THREE.FrontSide),
+      order(10),
+    );
     this.dome = mesh(hemi, shader(FRESNEL_VERT, DOME_FRAG, this.domeU, true), order(9));
     this.crescent = mesh(disc, shader(SHEET_VERT, CRESCENT_FRAG, this.crescentU, true), order(9));
     this.shroud = mesh(
@@ -591,10 +618,13 @@ export class TempleMoonFx {
     return this.bodyRadius() + 4;
   }
 
-  /** The island's middle (the altar stone) in the world, from her claim. */
+  /** The island's middle (the altar stone) in the world, from her claim
+   *  (written into one reused record: read it before the next call). */
   private altarAt(b: EntityView): { x: number; z: number } {
     const o = instanceOrigin(DUNGEONS.drowned_temple.index, instanceSlotForZ(b.pos.z));
-    return { x: o.x + ALTAR_STONE.x, z: o.z + ALTAR_STONE.z };
+    this.altar.x = o.x + ALTAR_STONE.x;
+    this.altar.z = o.z + ALTAR_STONE.z;
+    return this.altar;
   }
 
   private rescan(): void {
@@ -976,6 +1006,7 @@ export class TempleMoonFx {
     sky.swell = approach(sky.swell, target.swell, dt, input.falling !== null ? 3 : 1.4);
     sky.drop = approach(sky.drop, target.drop, dt, 1.4);
     sky.eclipse = approach(sky.eclipse, target.eclipse, dt, target.eclipse > sky.eclipse ? 6 : 1.5);
+    skyWriter = this;
     TEMPLE_MOON_SKY.swell.value = sky.swell;
     TEMPLE_MOON_SKY.drop.value = sky.drop;
     TEMPLE_MOON_SKY.eclipse.value = sky.eclipse;
@@ -1218,7 +1249,11 @@ export class TempleMoonFx {
     this.dome.scale.set(R, R * 0.85, R);
     this.domeU.uAlpha.value = this.domeLevel;
     this.domeU.uCrack.value = crack;
-    this.domeU.uPulse.value = 0.5 + 0.5 * Math.sin(this.clock * (2 + crack * 6));
+    // The pulse's phase runs on its own clock: a quicker rate as it cracks
+    // never jumps it (no strobe), and reduced motion keeps it slow and low.
+    const calm = this.calm();
+    this.pulsePhase = (this.pulsePhase + wardPulseRate(crack, calm) * dt) % (Math.PI * 2);
+    this.domeU.uPulse.value = (0.5 + 0.5 * Math.sin(this.pulsePhase)) * (calm ? 0.5 : 1);
     // Light weeping from the cracks as they open.
     if (crack > 0.15 && this.rand() < crack * this.density) {
       const a = this.rand() * Math.PI * 2;
@@ -1300,7 +1335,7 @@ export class TempleMoonFx {
     for (const s of slots) {
       if (s.age < 0) continue;
       s.age += dt;
-      const env = burstEnvelope(s.age, s.life);
+      const env = burstEnvelopeInto(s.age, s.life, this.env);
       if (env.done) {
         s.age = -1;
         s.u.uAlpha.value = 0;
@@ -1348,9 +1383,14 @@ export class TempleMoonFx {
 
   dispose(): void {
     this.root.removeFromParent();
-    TEMPLE_MOON_SKY.swell.value = 0;
-    TEMPLE_MOON_SKY.drop.value = 0;
-    TEMPLE_MOON_SKY.eclipse.value = 0;
+    // The sky's moon is a module singleton: settle it home only if this layer
+    // is still the one writing it (a newer layer rewrites it every frame).
+    if (skyWriter === this) {
+      skyWriter = null;
+      TEMPLE_MOON_SKY.swell.value = 0;
+      TEMPLE_MOON_SKY.drop.value = 0;
+      TEMPLE_MOON_SKY.eclipse.value = 0;
+    }
     this.glow.dispose();
     this.spray.dispose();
     for (const g of this.geometries) g.dispose();

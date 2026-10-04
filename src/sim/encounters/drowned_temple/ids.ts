@@ -442,7 +442,9 @@ export function hydraComboOf(castId: string | null): HydraComboKind | null {
 // and the wave's 4.5 s bar are counted, so an Ice Wall raised there (at 14 s
 // to go) is still standing when that wave lands 18.5 s later, inside its
 // 20 s. Heroic adds a second slot at 30 (2 s after the backwash has rolled
-// back), so the combos come twice as often. The first combo waits for the
+// back), so the combos come twice as often; a wall raised there stands on
+// until that next wave lands (hydra_combo.ts landFrostlock), never melting
+// before the wave it exists to break. The first combo waits for the
 // first Tsunami: the fight opens with the three plain elements.
 //
 // Pressure: inside the combo window (comboHold seconds before a slot to the

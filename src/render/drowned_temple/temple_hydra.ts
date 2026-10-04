@@ -49,7 +49,7 @@ import { loadGltf } from '../assets/loader';
 import { registerDeferredPreload } from '../assets/preload';
 import {
   comboChargeEnvelope,
-  comboHeadElements,
+  comboHeadElementsInto,
   comboPourElement,
   waterHead,
 } from './temple_hydra_combo_core';
@@ -234,7 +234,7 @@ export class TempleHydra {
     null,
     null,
   ];
-  private readonly chargeSlots: { elements: readonly HydraElement[]; k: number }[] = [
+  private readonly chargeSlots: { elements: HydraElement[]; k: number }[] = [
     { elements: [], k: 0 },
     { elements: [], k: 0 },
     { elements: [], k: 0 },
@@ -539,7 +539,7 @@ export class TempleHydra {
         out[i] = null;
         continue;
       }
-      slot.elements = comboHeadElements(kind, i, dead);
+      comboHeadElementsInto(kind, i, dead, slot.elements);
       slot.k = comboChargeEnvelope(h.castRemaining, h.castTotal);
       out[i] = slot;
     }

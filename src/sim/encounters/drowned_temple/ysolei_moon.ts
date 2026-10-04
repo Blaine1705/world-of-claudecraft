@@ -246,7 +246,12 @@ export function stepMoonCasts(
     return true;
   }
   if (boss.castingAbility !== null || ctx.isStunned(boss) || st.undertow) return false;
-  if (st.tearCalls > 0 && st.undertowTimer > M.callCast + M.callUndertowGap) {
+  // One wave of tears at a time: the next call waits for the last tear.
+  if (
+    st.tearCalls > 0 &&
+    st.tears.length === 0 &&
+    st.undertowTimer > M.callCast + M.callUndertowGap
+  ) {
     st.tearCalls--;
     startBeckoning(boss);
     ctx.emit({
@@ -274,8 +279,12 @@ function stopTear(
   p: Entity,
   at: { x: number; z: number },
 ): void {
-  const sear = p.auras.find((a) => a.id === YSOLEI_MOONSEAR);
-  const stacks = sear ? (sear.stacks ?? 1) : 0;
+  // The burn's count lives in the fight state: the aura is its display, so a
+  // cleanse, a slow immunity or an Ice Block cannot shed the stacks.
+  const now = ctx.time;
+  st.sear = st.sear.filter((s) => s.until > now);
+  const mark = st.sear.find((s) => s.playerId === p.id);
+  const stacks = mark ? mark.stacks : 0;
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
@@ -294,6 +303,10 @@ function stopTear(
     'hit',
     true,
   );
+  if (mark) {
+    mark.stacks++;
+    mark.until = now + M.moonsearSeconds;
+  } else st.sear.push({ playerId: p.id, stacks: 1, until: now + M.moonsearSeconds });
   if (!p.dead) {
     ctx.applyAura(p, {
       id: YSOLEI_MOONSEAR,
@@ -377,6 +390,8 @@ export function stepTears(
     let catcher: Entity | null = null;
     let best: number = M.tearCatch;
     for (const p of players) {
+      // A body a tear felled this tick catches nothing more.
+      if (p.dead) continue;
       const pd = Math.hypot(p.pos.x - o.x - tr.x, p.pos.z - o.z - tr.z);
       if (pd < best || (catcher !== null && pd === best && p.id < catcher.id)) {
         best = pd;
@@ -401,7 +416,7 @@ export function stepTears(
     if (g.tick <= 0) {
       g.tick += 1;
       for (const p of players) {
-        if (Math.hypot(p.pos.x - o.x - g.x, p.pos.z - o.z - g.z) > M.glowRadius) continue;
+        if (p.dead || Math.hypot(p.pos.x - o.x - g.x, p.pos.z - o.z - g.z) > M.glowRadius) continue;
         const amount = Math.max(1, Math.round(M.glowPerSecond * (boss.mechanicDamageMult ?? 1)));
         ctx.dealDamage(boss, p, amount, false, 'arcane', 'Spilled Moonlight', 'hit', true);
       }
@@ -424,6 +439,7 @@ export function resetMoon(
     for (const g of st.glows) dropEncounterObject(ctx, inst, g.objectId);
     st.tears = [];
     st.glows = [];
+    st.sear = [];
   }
   clearCastOf(boss, YSOLEI_BECKONING_MOON);
   clearCastOf(boss, YSOLEI_FALLING_MOON);

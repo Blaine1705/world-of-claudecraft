@@ -173,6 +173,75 @@ describe('Moonlight Tears: called at 75 and 45 percent', () => {
     expect(aura(b, YSOLEI_MOONSWELL)?.stacks ?? 0).toBe(0);
   });
 
+  it('keeps the burn’s count even on a body whose slow immunity drops the aura', () => {
+    const { f, b } = ysoleiFight();
+    toShare(b, 0.74);
+    run(f, M.callCast + 0.2, keepAway(f));
+    const blocker = f.others[0];
+    blocker.auras.push({
+      id: 'test_slow_immunity',
+      name: 'Freedom',
+      kind: 'slow_immunity',
+      remaining: 999,
+      duration: 999,
+      value: 0,
+      sourceId: blocker.id,
+      school: 'holy',
+    });
+    const st = state(b);
+    const catchOne = (): number => {
+      const tr = st.tears[0];
+      const before = st.tears.length;
+      const from = f.hits.length;
+      const keep = () => {
+        keepAway(f)();
+        put(f, blocker, tr.x, tr.z);
+      };
+      expect(until(f, () => st.tears.length < before, 3, keep)).toBe(true);
+      return took(f, blocker, 'Moonlight Tear', from);
+    };
+    catchOne();
+    const second = catchOne();
+    expect(second).toBeGreaterThanOrEqual(tearDamage(M.tearMin, 1));
+  });
+
+  it('opens the next wave only once the last tear has gone', () => {
+    const { f, b } = ysoleiFight();
+    const st = toShare(b, 0.44);
+    run(f, M.callCast + 0.2, keepAway(f));
+    expect(st.tears.length).toBeGreaterThan(0);
+    expect(st.tearCalls).toBe(1);
+    run(f, 1, keepAway(f));
+    expect(b.castingAbility).not.toBe(YSOLEI_BECKONING_MOON);
+    expect(until(f, () => st.tears.length === 0, 15, keepAway(f))).toBe(true);
+    expect(until(f, () => b.castingAbility === YSOLEI_BECKONING_MOON, 1, keepAway(f))).toBe(true);
+  });
+
+  it('a reset drops the tears, the moon’s auras and every burn', () => {
+    const { f, b } = ysoleiFight('heroic');
+    toShare(b, 0.74);
+    run(f, M.callCast + 0.2, keepAway(f));
+    const st = state(b);
+    const tr = st.tears[0];
+    run(f, 0.3, () => {
+      keepAway(f)();
+      put(f, f.others[0], tr.x, tr.z);
+    });
+    expect(aura(f.others[0], YSOLEI_MOONSEAR)).toBeDefined();
+    expect(objects(f, MOONGLOW_TEMPLATE).length).toBeGreaterThan(0);
+    for (const p of [f.tank, ...f.others]) put(f, p, 0, -230);
+    b.inCombat = false;
+    b.aggroTargetId = null;
+    b.aiState = 'evade';
+    run(f, 0.2);
+    expect(objects(f, MOON_TEAR_TEMPLATE).length).toBe(0);
+    expect(objects(f, MOONGLOW_TEMPLATE).length).toBe(0);
+    expect(aura(f.others[0], YSOLEI_MOONSEAR)).toBeUndefined();
+    expect(b.castingAbility).toBeNull();
+    for (const id of [YSOLEI_MOONSWELL, YSOLEI_PLENILUNE_WARD, YSOLEI_MOONBORNE_MIGHT])
+      expect(aura(b, id)).toBeUndefined();
+  });
+
   it('heroic: a stopped tear leaves a pool of moonlight', () => {
     const { f, b } = ysoleiFight('heroic');
     toShare(b, 0.74);

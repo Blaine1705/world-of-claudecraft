@@ -86,6 +86,7 @@ function freshState(): YsoleiFightState {
     tearCalls: 0,
     tears: [],
     glows: [],
+    sear: [],
     fullMoon: null,
   };
 }
