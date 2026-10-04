@@ -11,6 +11,20 @@ vi.mock('../src/render/characters', () => inertCharacters.barrel());
 vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
 vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
 
+// No assertion here reads the portrait chip, but the real chip's renderer starts GLB
+// fetches that can outlive happy-dom teardown and throw Three FileLoader
+// ProgressEvent rejections after otherwise green assertions (the
+// inspect_window.test.ts recipe; quest_dialog_controller.test.ts mocks the same).
+vi.mock('../src/ui/portrait_chip', () => ({
+  crestUrl: () => '',
+  hydrateComposedChips: () => undefined,
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';

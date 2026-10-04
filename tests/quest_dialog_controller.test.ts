@@ -9,6 +9,20 @@ vi.mock('../src/render/characters', () => inertCharacters.barrel());
 vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
 vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
 
+// This suite drives the quest dialog DOM, not WebGL portraits. char_window pulls in
+// the real portrait chip, whose renderer starts GLB fetches that can outlive
+// happy-dom teardown and throw Three FileLoader ProgressEvent rejections after
+// otherwise green assertions (the inspect_window.test.ts recipe).
+vi.mock('../src/ui/portrait_chip', () => ({
+  crestUrl: () => '',
+  hydrateComposedChips: () => undefined,
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,

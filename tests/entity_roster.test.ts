@@ -276,6 +276,7 @@ function makeCtx() {
     leaveDungeon: vi.fn(),
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
+    emitRiftDeparture: vi.fn(),
     riftOpenTreasure: vi.fn(),
     resetDungeonInstances: vi.fn(),
     inheritDungeonResetLocks: vi.fn(),
