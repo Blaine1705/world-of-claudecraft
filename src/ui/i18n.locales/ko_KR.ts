@@ -19777,6 +19777,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_shadowstep': '그림자 건너기',
   'abilityUi.cast.bastion_reaping_scythe': '수확의 낫',
   'abilityUi.cast.bastion_veil_rise': '안개 장막',
+  'abilityUi.cast.bastion_veil_gather': '모여드는 안개',
+  'abilityUi.cast.bastion_vael_rise': '죽음이 떠오른다',
+  'abilityUi.cast.bastion_vael_sink': '안개 속으로',
   'entities.mobs.bastion_gaol_cage.name': '강철 우리',
   'entities.mobs.bastion_drowned_anchor.name': '익사의 닻',
   'entities.items.jailers_iron_gauntlets.name': '간수의 강철 건틀릿',
@@ -19789,7 +19792,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shackle_pair':
     '쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)',
   'hudChrome.finder.mech.reaper_behind':
-    '그림자 건너기 (플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)',
+    '그림자 건너기 (세 번 연속으로 각기 다른 플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)',
   'hudChrome.bastionCage.title': '강철 우리에 갇혔습니다!',
   'hudChrome.bastionCage.promptKey': '{key} 키를 연타해 탈출하세요',
   'hudChrome.bastionCage.promptNoKey': '상호작용 키를 연타해 탈출하세요',
@@ -19924,6 +19927,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': '전율의 발구르기(그의 주변 고리 밖으로 나가기)',
   'hudChrome.finder.mech.rerivet_last_link':
     '재리벳과 마지막 고리(사슬을 다시 박는 몰이막대장이를 차단, 사슬이 하나 남으면 10초마다 사슬 당기기)',
+  'hudChrome.bastionAlert.reapedTitle': '죽음이 등 뒤에서 솟아오른다!',
+  'hudChrome.bastionAlert.reapedLine': '낫의 궤적에서 벗어나라: 앞으로, 혹은 옆으로',
+  'hudChrome.bastionAlert.veilTitle': '안개 장막',
+  'hudChrome.bastionAlert.veilLine': '등대의 빛줄기를 보라: 등불이 타오르는 자가 진짜 바엘이다',
+  'hudChrome.bastionAlert.realTitle': '빛이 그를 찾아냈다!',
+  'hudChrome.bastionAlert.realLine': '이것이 진짜 바엘이다: 공격해 장막을 깨뜨려라',
+  'hudChrome.bastionAlert.shadeTitle': '텅 빈 그림자',
+  'hudChrome.bastionAlert.shadeLine': '빛이 그대로 통과한다: 내버려 두고 빛이 비추는 자를 찾아라',
+  'hudChrome.bastionAlert.timeAria': '{seconds}초 남음',
   'hudChrome.wildheartAlert.preyTitle': '당신이 사냥감입니다!',
   'hudChrome.wildheartAlert.preyLine': '줄가르가 당신을 쫓습니다: 빛나는 태양 문양으로 끌고 가세요',
   'hudChrome.wildheartAlert.preyWaitLine':

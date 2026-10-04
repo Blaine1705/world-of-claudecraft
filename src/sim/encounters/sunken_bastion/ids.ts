@@ -42,6 +42,13 @@ export const VAEL_DROWNING_HYMN = 'bastion_drowning_hymn';
 /** The Fog Veil's figures (Vael and his three shades) rise out of the roof
  *  together before the hymn: a short bar on each, his Emerge rise. */
 export const VAEL_VEIL_RISE = 'bastion_veil_rise';
+/** Before the veil: he stills and speaks while the fog gathers on the crown. */
+export const VAEL_VEIL_GATHER = 'bastion_veil_gather';
+/** His entrance (vael_intro.ts): he rises out of the roof (the Emerge rise,
+ *  on the veil's pace) ... */
+export const VAEL_INTRO_RISE = 'bastion_vael_rise';
+/** ... and sinks back under it (the Vanish sink), there and before the veil. */
+export const VAEL_SINK = 'bastion_vael_sink';
 
 // ---- aura ids ---------------------------------------------------------------------
 export const OLEN_BREACHED = 'bastion_breached';
@@ -68,6 +75,15 @@ export const VAEL_FOGBURST = 'bastion_fogburst';
 export const VAEL_SHADOWED = 'bastion_vael_shadowed';
 /** On the player the reaper rises behind. */
 export const VAEL_REAP_MARK = 'bastion_reap_mark';
+/** On Vael through his entrance and the fog's gathering: nothing touches him. */
+export const VAEL_SHROUDED = 'bastion_vael_shrouded';
+/** On every player on the crown while the veil's hymn drowns it (the HUD's
+ *  veil alert reads it; its time left is the hymn's). */
+export const VAEL_HYMN_DROWNING = 'bastion_hymn_drowning';
+/** The beam has the real Vael (worn while lit and a breath after). */
+export const VAEL_BEACON_LIT = 'bastion_beacon_lit';
+/** The beam pours through a shade (worn while lit and a breath after). */
+export const VAEL_SHADE_HOLLOW = 'bastion_shade_hollow';
 
 // ---- encounter object templates (the state rides the template id) ----------------
 export const BUTTRESS_TEMPLATES = {
@@ -347,10 +363,32 @@ export const VAEL_TUNING = {
   beamHalf: 0.22,
   /** Heroic: Drifting Shades swap places this often. */
   driftEvery: 5,
+  /** A figure the beam touched wears its tell (lit, or hollow) this long after
+   *  the beam moves on: the beam crosses a figure in about a quarter second. */
+  beamLinger: 1.5,
   // The Reaper's Shadowstep: he sinks into the shadows, a pool opens behind
-  // one player, and he rises out of it with the scythe.
-  reapFirst: 10,
-  reapEvery: 16,
+  // one player, and he rises out of it with the scythe; then again behind a
+  // second player and a third (vael_shadowstep.ts). The countdown runs only
+  // in the open fight (never through a chain, a veil or a Mist Surge bar,
+  // which takes 1.5 of every 13.5 s), so a cycle is the chain plus
+  // reapEvery x 13.5 / 12 of wall time. Against the single step it replaced
+  // (3 s step + 16 s countdown, a 21 s cycle, one sweep of 80 to 95): a chain
+  // is 3 x (0.8 + 1.6 + 0.6 + 0.5) = 10.5 s, the cycle 10.5 + 22.5 = 33 s,
+  // 5.5 sweeps a minute (was 2.9) of 60 to 70, each on a DIFFERENT player:
+  // in a group of five, a player who fails every step takes 89 a minute (was
+  // 63), one who steps out takes nothing. What nobody can dodge FALLS: his
+  // swing and the surge clock stop while he steps, 10.5 of every 33 s (32
+  // percent, was 3 of 21, 14 percent), so the tank's melee and the Mist Surge
+  // (now every 19.8 s, was 15.8) each land about 20 percent less a minute.
+  // Under the floor he is untouchable 7.2 of every 33 s (22 percent, was 11);
+  // each rise and the beat after each sweep stay touchable.
+  reapFirst: 12,
+  reapEvery: 20,
+  /** Steps in one chain, each on a different player while enough stand. */
+  reapChain: 3,
+  /** The beat after a sweep before he sinks for the next step (the scythe's
+   *  follow-through), and after the last before he fights on. */
+  reapRecover: 0.5,
   /** Sinking into the shadow (the Vanish clip). */
   vanishSeconds: 0.8,
   /** The pool shows behind the mark this long before he rises. */
@@ -365,13 +403,58 @@ export const VAEL_TUNING = {
   sweepRange: 8,
   /** The sweep's full arc in degrees, centred on the pool's facing. */
   sweepArcDeg: 150,
-  sweepMin: 80,
-  sweepMax: 95,
+  sweepMin: 60,
+  sweepMax: 70,
   // Heroic: Grave Shadow, the pool lingers and burns.
   graveSeconds: 6,
   graveRadius: 3,
   gravePerSecond: 18,
+  // Before the Fog Veil: he stills and speaks while the fog gathers on the
+  // crown (untouchable), sinks, and the four figures rise (veilRiseSeconds).
+  veilGatherSeconds: 2.4,
+  // His entrance (vael_intro.ts): buried under the crown until a player
+  // climbs onto it, he rises, speaks, sinks and rises again round the
+  // Fogbeacon, then takes his place and only there turns to fight. Full:
+  // 3 x (1.2 + 1.6 + 0.8 + 0.3) + 1.2 + 1.6 = 14.5 s; after a wipe, one rise
+  // at his place and one line: 2.8 s.
+  introSpeakSeconds: 1.6,
+  /** The crossing under the flags between a sink and the next rise. */
+  introUnderSeconds: 0.3,
+  /** How deep under the flags he waits, out of every camera's sight. */
+  buriedDepth: 14,
+  /** A player this far inside the crown's rim (and on its floor) wakes him. */
+  introTriggerInset: 2,
 } as const;
+
+/** The spots he rises at through his entrance (instance-local), round the
+ *  Fogbeacon in front of the crown stair (where the group climbs up: the
+ *  stair mouth's bearing from the crown's middle, sim yaw), then his place. */
+export const VAEL_INTRO_ARRIVAL_YAW = Math.atan2(-11, -20);
+export const VAEL_HOME = { x: -4, z: 226 } as const;
+export const VAEL_INTRO_STOPS: readonly { x: number; z: number }[] = [
+  [0.96, 14],
+  [-0.96, 14],
+  [0, 12],
+]
+  .map(([turn, r]) => {
+    const a = VAEL_INTRO_ARRIVAL_YAW + turn;
+    return { x: BEACON_CROWN.x + Math.sin(a) * r, z: BEACON_CROWN.z + Math.cos(a) * r };
+  })
+  .concat([{ x: VAEL_HOME.x, z: VAEL_HOME.z }]);
+
+/** Seconds one entrance stop takes: the rise, the line, and (all but the
+ *  last) the sink and the crossing under the flags. */
+export function vaelIntroSeconds(short: boolean): number {
+  const T = VAEL_TUNING;
+  const last = T.veilRiseSeconds + T.introSpeakSeconds;
+  if (short) return last;
+  const stop = T.veilRiseSeconds + T.introSpeakSeconds + T.vanishSeconds + T.introUnderSeconds;
+  return stop * (VAEL_INTRO_STOPS.length - 1) + last;
+}
+
+/** Seconds from a veil threshold to the four figures standing risen. */
+export const VAEL_VEIL_TRANSITION_SECONDS =
+  VAEL_TUNING.veilGatherSeconds + VAEL_TUNING.vanishSeconds + VAEL_TUNING.veilRiseSeconds;
 
 /** Where the pool opens: `behind` yd behind a player at (x, z) facing `facing`
  *  (the sim's yaw), and the yaw the scythe sweeps along (toward the player). */

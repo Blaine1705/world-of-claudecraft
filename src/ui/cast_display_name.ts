@@ -103,6 +103,9 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.bastion_shadowstep': true,
   'abilityUi.cast.bastion_reaping_scythe': true,
   'abilityUi.cast.bastion_veil_rise': true,
+  'abilityUi.cast.bastion_veil_gather': true,
+  'abilityUi.cast.bastion_vael_rise': true,
+  'abilityUi.cast.bastion_vael_sink': true,
   // The Drowned Temple's lore guide: Laverock's song at the Moon Altar.
   'abilityUi.cast.cantor_last_verse': true,
   // The Drowned Temple trash kit and boss casts.

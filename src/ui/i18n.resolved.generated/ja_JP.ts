@@ -6051,7 +6051,7 @@ export const ja_JP: EnTranslations = {
         "iron_cage": "鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）",
         "drowned_anchor": "溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）",
         "shackle_pair": "連鎖の枷（鎖でつながれた二人は離れずに動く）",
-        "reaper_behind": "影渡り（死神はプレイヤーの背後に現れる、大鎌の弧から出る）",
+        "reaper_behind": "影渡り（死神は三度続けて別々のプレイヤーの背後に現れる、大鎌の弧から出る）",
         "pack_bond": "群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）",
         "stalk": "忍び狩り（ジャガーが印の者を狙う。タンクは狙わず、ソロではあなたを狙う：引き回し、鈍足・拘束・スタンを）",
         "shared_health": "体力共有（共通の体力：最も安全な方を攻撃）",
@@ -6097,6 +6097,17 @@ export const ja_JP: EnTranslations = {
       "linkRule": "錨への一撃ごとに、威力に関係なく環が一つ外れる",
       "linksTarget": "鎖の環 {count}/{total}",
       "linkBroken": "環を断った！"
+    },
+    "bastionAlert": {
+      "reapedTitle": "死が背後から現れる！",
+      "reapedLine": "大鎌の弧から出ろ：前へ、あるいは左右へ",
+      "veilTitle": "霧のヴェール",
+      "veilLine": "灯台の光線を見よ：ランタンが燃え上がる者が本物のヴァエルだ",
+      "realTitle": "光が彼を捉えた！",
+      "realLine": "これが本物のヴァエルだ：攻撃してヴェールを破れ",
+      "shadeTitle": "虚ろな影",
+      "shadeLine": "光が素通りしている：放っておき、光線が照らす者を探せ",
+      "timeAria": "残り{seconds}秒"
     },
     "wildheartAlert": {
       "preyTitle": "お前が獲物だ！",
@@ -12508,6 +12519,9 @@ export const ja_JP: EnTranslations = {
       "bastion_shadowstep": "影渡り",
       "bastion_reaping_scythe": "刈り取りの大鎌",
       "bastion_veil_rise": "霧のヴェール",
+      "bastion_veil_gather": "集う霧",
+      "bastion_vael_rise": "死が昇る",
+      "bastion_vael_sink": "霧の中へ",
       "temple_lullaby": "子守歌",
       "cantor_last_verse": "最後の一節",
       "temple_call_the_tide": "潮の呼び声",

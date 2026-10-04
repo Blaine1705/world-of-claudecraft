@@ -1,6 +1,7 @@
 // The dungeon encounter prompts the HUD composes as ONE member with ONE frame
 // call: the Iron Cage escape (cage_escape_*), Gaoler Ossick's chain alert
-// (gaol_chain_*), the Wildheart Basin's alert (wildheart_alert_view.ts on the
+// (gaol_chain_*), the Sunken Bastion's crown alert (bastion_alert_view.ts:
+// Vael's scythe and Fog Veil), the Wildheart Basin's alert (wildheart_alert_view.ts on the
 // shared encounter alert painter, encounter_alert_painter.ts: the Prey, the
 // Stalk, the pollen, the Pack Bond readout) and the Gravewyrm Sanctum's
 // (sanctum_alert_view.ts on the same family: the chains, the meltwater, the
@@ -9,6 +10,7 @@
 // entities and roster version): the prompts look bodies up by id, and the
 // Sanctum alert keeps its scene off the roster (sanctum_alert_scene_core.ts).
 
+import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
 import { EncounterAlert } from './encounter_alert_painter';
@@ -48,6 +50,7 @@ export interface DungeonPromptsFrame {
 export class DungeonPrompts {
   private readonly cage: CageEscapePrompt;
   private readonly chain: GaolChainAlert;
+  private readonly bastion: EncounterAlert;
   private readonly wildheart: EncounterAlert;
   private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
@@ -58,6 +61,11 @@ export class DungeonPrompts {
   constructor(deps: CageEscapeDeps) {
     this.cage = new CageEscapePrompt(deps);
     this.chain = new GaolChainAlert(deps);
+    this.bastion = new EncounterAlert(deps, {
+      id: 'bastion-alert',
+      className: 'ui-panel-strong encounter-alert bastion-alert',
+      kinds: BASTION_ALERT_KINDS,
+    });
     this.wildheart = new EncounterAlert(deps, {
       id: 'wildheart-alert',
       className: 'ui-panel-strong encounter-alert wildheart-alert',
@@ -91,6 +99,7 @@ export class DungeonPrompts {
         party: f.party,
       }),
     );
+    this.bastion.paint(buildBastionAlertView({ auras: p.auras, targetId: p.targetId, entity }));
     this.wildheart.paint(buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity }));
     this.sanctum.paint(
       buildSanctumAlertView({
@@ -107,6 +116,7 @@ export class DungeonPrompts {
   dispose(): void {
     this.cage.dispose();
     this.chain.dispose();
+    this.bastion.dispose();
     this.wildheart.dispose();
     this.sanctum.dispose();
   }

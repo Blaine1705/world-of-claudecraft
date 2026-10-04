@@ -6051,7 +6051,7 @@ export const zh_TW: EnTranslations = {
         "iron_cage": "鐵籠（連按互動鍵掙脫，隊友可以砸開鐵欄）",
         "drowned_anchor": "溺亡之錨（在受害者被拖進深坑前砸斷鎖鏈）",
         "shackle_pair": "雙人鐐銬（被鎖在一起的兩名玩家必須靠在一起）",
-        "reaper_behind": "穿影（死神從玩家身後升起，離開鐮刀的弧線）",
+        "reaper_behind": "穿影（死神連續三次從不同玩家身後升起，離開鐮刀的弧線）",
         "pack_bond": "獸群羈絆（兩者相鄰時傷害減半：將牠們拉開15碼）",
         "stalk": "潛行追獵（美洲豹追獵被標記的玩家，從不追坦克；單人時牠追你：風箏牠，減速、定身、擊暈牠）",
         "shared_health": "共享生命（同一血池：攻擊最安全的那個）",
@@ -6097,6 +6097,17 @@ export const zh_TW: EnTranslations = {
       "linkRule": "每次擊中錨，無論傷害多少，都會斷開一環",
       "linksTarget": "鎖鏈環 {count}/{total}",
       "linkBroken": "斷開一環！"
+    },
+    "bastionAlert": {
+      "reapedTitle": "死亡在你身後升起！",
+      "reapedLine": "離開鐮刀的弧線：向前，或向兩側",
+      "veilTitle": "霧幕",
+      "veilLine": "注意燈塔的光束：提燈驟亮的那個才是真正的維爾",
+      "realTitle": "光束找到了他！",
+      "realLine": "這是真正的維爾：攻擊他以打破霧幕",
+      "shadeTitle": "空洞的幻影",
+      "shadeLine": "光穿透了它：別管它，去找光束照亮的那個",
+      "timeAria": "剩餘{seconds}秒"
     },
     "wildheartAlert": {
       "preyTitle": "你是獵物！",
@@ -12508,6 +12519,9 @@ export const zh_TW: EnTranslations = {
       "bastion_shadowstep": "穿影",
       "bastion_reaping_scythe": "收割之鐮",
       "bastion_veil_rise": "霧幕",
+      "bastion_veil_gather": "霧氣聚攏",
+      "bastion_vael_rise": "死亡升起",
+      "bastion_vael_sink": "沒入霧中",
       "temple_lullaby": "搖籃曲",
       "cantor_last_verse": "最後一節",
       "temple_call_the_tide": "潮汐召喚",

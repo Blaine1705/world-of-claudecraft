@@ -4,6 +4,13 @@
 // painter), composed by the HUD as one DungeonPrompts member; and the floating
 // avoidance word.
 
+export type {
+  BastionAlertEntity,
+  BastionAlertInput,
+  BastionAlertKind,
+  BastionAlertView,
+} from './bastion_alert_view';
+export { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 export type { CageEscapeDeps } from './cage_escape_painter';
 export { CageEscapePrompt } from './cage_escape_painter';
 export type { CageEscapeInput, CageEscapeLive, CageEscapeView } from './cage_escape_view';

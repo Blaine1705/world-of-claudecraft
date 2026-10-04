@@ -6051,7 +6051,7 @@ export const ko_KR: EnTranslations = {
         "iron_cage": "강철 우리 (상호작용 키를 연타해 탈출, 아군은 창살을 부술 수 있음)",
         "drowned_anchor": "익사의 닻 (희생자가 구덩이로 끌려가기 전에 사슬을 끊으세요)",
         "shackle_pair": "쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)",
-        "reaper_behind": "그림자 건너기 (플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)",
+        "reaper_behind": "그림자 건너기 (세 번 연속으로 각기 다른 플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)",
         "pack_bond": "무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)",
         "stalk": "추적 (재규어가 표식 대상을 사냥하며 탱커는 노리지 않고, 혼자일 때는 당신을 노림: 끌고 다니며 감속, 속박, 기절시키세요)",
         "shared_health": "생명력 공유 (하나의 생명력: 가장 안전한 쪽을 공격하세요)",
@@ -6097,6 +6097,17 @@ export const ko_KR: EnTranslations = {
       "linkRule": "닻을 칠 때마다 위력과 상관없이 고리가 하나씩 끊어진다",
       "linksTarget": "사슬 고리 {count}/{total}",
       "linkBroken": "고리 파괴!"
+    },
+    "bastionAlert": {
+      "reapedTitle": "죽음이 등 뒤에서 솟아오른다!",
+      "reapedLine": "낫의 궤적에서 벗어나라: 앞으로, 혹은 옆으로",
+      "veilTitle": "안개 장막",
+      "veilLine": "등대의 빛줄기를 보라: 등불이 타오르는 자가 진짜 바엘이다",
+      "realTitle": "빛이 그를 찾아냈다!",
+      "realLine": "이것이 진짜 바엘이다: 공격해 장막을 깨뜨려라",
+      "shadeTitle": "텅 빈 그림자",
+      "shadeLine": "빛이 그대로 통과한다: 내버려 두고 빛이 비추는 자를 찾아라",
+      "timeAria": "{seconds}초 남음"
     },
     "wildheartAlert": {
       "preyTitle": "당신이 사냥감입니다!",
@@ -12508,6 +12519,9 @@ export const ko_KR: EnTranslations = {
       "bastion_shadowstep": "그림자 건너기",
       "bastion_reaping_scythe": "수확의 낫",
       "bastion_veil_rise": "안개 장막",
+      "bastion_veil_gather": "모여드는 안개",
+      "bastion_vael_rise": "죽음이 떠오른다",
+      "bastion_vael_sink": "안개 속으로",
       "temple_lullaby": "자장가",
       "cantor_last_verse": "마지막 소절",
       "temple_call_the_tide": "조수의 부름",

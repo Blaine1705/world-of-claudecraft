@@ -14,7 +14,11 @@ the tick.
 | `olen.ts` | The Oathbound Charge into the buttresses (Breached or Unbroken Oath), heroic Undertow Wake. |
 | `turnkey.ts` | The Gaol Turnkey: the Iron Cage (a hittable cage body dropped over a stunned player), the escape press (`tryCageStruggle`, claimed from `sim.interact`: counted and rate-limited here), the mend, the crush, Open the Cells; heroic double cage and Brine Flood. |
 | `ossick.ts` | The Drowned Anchor (a hittable anchor riding its rooted victim, hauled to the pit through `pull_toward.ts`), the Shackle Pair (strain past the chain's reach), the cudgel, Open the Cells; heroic Anchor Crash, heavier chain, shorter shackles. |
-| `vael.ts` | Death itself: Mist Surge, the Fog Veil with its shadow copies and the Fogbeacon's beam, the Drowning Hymn, Fogburst, the Shadow Crossing (the pool behind a player, the Reaping Scythe); heroic drift, Mistbound and Grave Shadow. |
+| `vael.ts` | Death itself, the fight's coordinator: Mist Surge, the Fog Veil with its shadow copies and the Fogbeacon's beam (the Beacon-Lit and Hollow Shade tells the beam leaves on the figures, the Drowning Hymn's mark on the players), Fogburst; heroic drift and Mistbound. |
+| `vael_intro.ts` | His entrance: buried under the crown (held, non-hostile, immune) until a living player climbs onto it, then three rises and lines round the Fogbeacon and a last one at his place, where he is handed back to the fight; after a wipe, the short entrance (one rise, one line). `/dev bastion trigger intro|introshort|introskip`. |
+| `vael_shadowstep.ts` | The Shadow Crossing as a chain: three steps back to back, each a pool behind a DIFFERENT player (non-tanks first, the tank last, one step per living player in a smaller group), the Reaping Scythe through their back; heroic Grave Shadow. The pressure math lives on `VAEL_TUNING`. |
+| `vael_veil_gather.ts` | The breath before each Fog Veil: he stills and speaks the beam warning while the fog gathers (untouchable), sinks, then the four figures rise. |
+| `vael_lines.ts` | His lines (sim English, re-localized by the EXACT matcher in `src/ui/sim_i18n.ts`). |
 | `ward_hits.ts` | Pure: the cage and the anchor take fixed points per player or pet hit (asked by `combat/damage.ts` dealDamage). |
 
 Rules:
@@ -31,5 +35,9 @@ Rules:
 - Reset on evade and wipe restores the buttresses, opens the cages, drops the
   anchors and shackles, lifts the veil and dries the pools.
 - Tests: `tests/sunken_bastion_bosses.test.ts` (Olen, the veil),
-  `tests/sunken_bastion_turnkey.test.ts`, `tests/sunken_bastion_ossick.test.ts`,
-  `tests/sunken_bastion_reaper.test.ts`; dev triggers: `/dev bastion trigger`.
+  `tests/sunken_bastion_turnkey.test.ts` (the cage, and the Turnkey keeping
+  the Gaol Grate), `tests/sunken_bastion_ossick.test.ts`,
+  `tests/sunken_bastion_reaper.test.ts`, `tests/sunken_bastion_vael_pass.test.ts`
+  (the entrance, the three-step chain, the gathering, the beam's tells),
+  `tests/sunken_bastion_crown_alert.test.ts` (the HUD's crown alert); dev
+  triggers: `/dev bastion trigger`.

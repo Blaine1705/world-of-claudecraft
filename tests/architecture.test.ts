@@ -646,6 +646,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/fct_avoidance_core.ts',
   // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
+  // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
+  'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its
   // scene scan.
   'src/ui/hud/dungeon/sanctum_alert_view.ts',

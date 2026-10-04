@@ -6051,7 +6051,7 @@ export const zh_CN: EnTranslations = {
         "iron_cage": "铁笼（连按交互键挣脱，队友可以砸开铁栏）",
         "drowned_anchor": "溺亡之锚（在受害者被拖进深坑前砸断锁链）",
         "shackle_pair": "双人镣铐（被锁在一起的两名玩家必须靠在一起）",
-        "reaper_behind": "穿影（死神从玩家身后升起，离开镰刀的弧线）",
+        "reaper_behind": "穿影（死神连续三次从不同玩家身后升起，离开镰刀的弧线）",
         "pack_bond": "兽群羁绊（两者相邻时伤害减半：将它们拉开15码）",
         "stalk": "潜行追猎（美洲豹追猎被标记的玩家，从不追坦克；单人时它追你：风筝它，减速、定身、击晕它）",
         "shared_health": "共享生命（同一血池：攻击最安全的那个）",
@@ -6097,6 +6097,17 @@ export const zh_CN: EnTranslations = {
       "linkRule": "每次击中锚，无论伤害多少，都会断开一环",
       "linksTarget": "锁链环 {count}/{total}",
       "linkBroken": "断开一环！"
+    },
+    "bastionAlert": {
+      "reapedTitle": "死亡在你身后升起！",
+      "reapedLine": "离开镰刀的弧线：向前，或向两侧",
+      "veilTitle": "雾幕",
+      "veilLine": "注意灯塔的光束：提灯骤亮的那个才是真正的维尔",
+      "realTitle": "光束找到了他！",
+      "realLine": "这是真正的维尔：攻击他以打破雾幕",
+      "shadeTitle": "空洞的幻影",
+      "shadeLine": "光穿透了它：别管它，去找光束照亮的那个",
+      "timeAria": "剩余{seconds}秒"
     },
     "wildheartAlert": {
       "preyTitle": "你是猎物！",
@@ -12508,6 +12519,9 @@ export const zh_CN: EnTranslations = {
       "bastion_shadowstep": "穿影",
       "bastion_reaping_scythe": "收割之镰",
       "bastion_veil_rise": "雾幕",
+      "bastion_veil_gather": "雾气聚拢",
+      "bastion_vael_rise": "死亡升起",
+      "bastion_vael_sink": "没入雾中",
       "temple_lullaby": "摇篮曲",
       "cantor_last_verse": "最后一节",
       "temple_call_the_tide": "潮汐召唤",

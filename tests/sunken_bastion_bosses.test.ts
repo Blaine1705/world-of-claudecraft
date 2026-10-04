@@ -313,6 +313,11 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     return { f, vael };
   }
 
+  /** Past the fog's gathering and his sink: the four figures begin to rise. */
+  function veilFalls(f: Fight): void {
+    run(f, VAEL_TUNING.veilGatherSeconds + VAEL_TUNING.vanishSeconds + DT * 2);
+  }
+
   function shades(f: Fight): Entity[] {
     return [...f.sim.ctx.entities.values()].filter((e) => e.templateId === FOG_SHADE_ID && !e.dead);
   }
@@ -339,7 +344,7 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     const { f, vael } = roof();
     run(f, 0.5);
     vael.hp = Math.round(vael.maxHp * 0.69);
-    run(f, DT * 2);
+    veilFalls(f);
     const list = shades(f);
     expect(list).toHaveLength(3);
     // All four rise out of the roof together (none simply appears) ...
@@ -382,7 +387,7 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     const { f, vael } = roof();
     run(f, 0.5);
     vael.hp = Math.round(vael.maxHp * 0.69);
-    run(f, DT * 2);
+    veilFalls(f);
     const shade = shades(f)[0];
     const moves = { vael: 0, shade: 0 };
     const drawn: number[] = [];
@@ -408,7 +413,7 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     const { f, vael } = roof();
     run(f, 0.5);
     vael.hp = Math.round(vael.maxHp * 0.69);
-    run(f, DT * 2);
+    veilFalls(f);
     const shade = shades(f)[0];
     put(f, f.others[0], shade.pos.x - f.ox + 2, shade.pos.z - f.oz);
     const before = f.others[0].hp;
@@ -424,7 +429,7 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     const { f, vael } = roof();
     run(f, 0.5);
     vael.hp = Math.round(vael.maxHp * 0.69);
-    run(f, DT * 2);
+    veilFalls(f);
     f.sim.dealDamage(
       f.tank,
       vael,
@@ -447,7 +452,10 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     const { f, vael } = roof();
     run(f, 0.5);
     vael.hp = Math.round(vael.maxHp * 0.69);
-    run(f, VAEL_TUNING.hymnSeconds + 0.3);
+    run(
+      f,
+      VAEL_TUNING.veilGatherSeconds + VAEL_TUNING.vanishSeconds + VAEL_TUNING.hymnSeconds + 0.3,
+    );
     expect(shades(f)).toHaveLength(0);
     expect(vael.auras.some((a) => a.id === VAEL_FOG_VEIL)).toBe(false);
   });
@@ -456,7 +464,7 @@ describe('Vael the Fogbinder: find the real Vael among the fog shades', () => {
     const { f, vael } = roof('heroic');
     run(f, 0.5);
     vael.hp = Math.round(vael.maxHp * 0.69);
-    run(f, DT * 2);
+    veilFalls(f);
     const at = { x: vael.pos.x, z: vael.pos.z };
     run(f, VAEL_TUNING.driftEvery + 0.2);
     expect(Math.hypot(vael.pos.x - at.x, vael.pos.z - at.z)).toBeGreaterThan(5);

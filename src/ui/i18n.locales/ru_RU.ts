@@ -20159,6 +20159,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.bastion_shadowstep': 'Переход сквозь тень',
   'abilityUi.cast.bastion_reaping_scythe': 'Жнущая коса',
   'abilityUi.cast.bastion_veil_rise': 'Туманная завеса',
+  'abilityUi.cast.bastion_veil_gather': 'Сгущение тумана',
+  'abilityUi.cast.bastion_vael_rise': 'Смерть восстаёт',
+  'abilityUi.cast.bastion_vael_sink': 'В туман',
   'entities.mobs.bastion_gaol_cage.name': 'Железная клетка',
   'entities.mobs.bastion_drowned_anchor.name': 'Утопленный якорь',
   'entities.items.jailers_iron_gauntlets.name': 'Железные рукавицы тюремщика',
@@ -20171,7 +20174,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shackle_pair':
     'Парные кандалы (двое скованных игроков должны держаться вместе)',
   'hudChrome.finder.mech.reaper_behind':
-    'Переход сквозь тень (жнец встаёт за спиной игрока, выйдите из дуги косы)',
+    'Переход сквозь тень (трижды подряд жнец встаёт за спиной разных игроков, выйдите из дуги косы)',
   'hudChrome.bastionCage.title': 'Вы заперты в железной клетке!',
   'hudChrome.bastionCage.promptKey': 'Жмите {key} снова и снова, чтобы вырваться',
   'hudChrome.bastionCage.promptNoKey':
@@ -20314,6 +20317,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': 'Сотрясающий топот (выйдите из кольца вокруг него)',
   'hudChrome.finder.mech.rerivet_last_link':
     'Переклёпка и Последнее звено (прервите кузнеца-погонщика, заново склёпывающего цепь; когда остаётся одна цепь, Натяжение каждые 10 секунд)',
+  'hudChrome.bastionAlert.reapedTitle': 'Смерть встаёт за твоей спиной!',
+  'hudChrome.bastionAlert.reapedLine': 'Выйди из дуги косы: вперёд или в сторону',
+  'hudChrome.bastionAlert.veilTitle': 'Туманная завеса',
+  'hudChrome.bastionAlert.veilLine':
+    'Следи за лучом маяка: настоящий Ваэль тот, чей фонарь вспыхивает',
+  'hudChrome.bastionAlert.realTitle': 'Луч нашёл его!',
+  'hudChrome.bastionAlert.realLine': 'Это настоящий Ваэль: бей его, чтобы разорвать завесу',
+  'hudChrome.bastionAlert.shadeTitle': 'Пустая тень',
+  'hudChrome.bastionAlert.shadeLine':
+    'Свет проходит сквозь неё: оставь её, найди того, кого освещает луч',
+  'hudChrome.bastionAlert.timeAria': 'Осталось секунд: {seconds}',
   'hudChrome.wildheartAlert.preyTitle': 'Вы добыча!',
   'hudChrome.wildheartAlert.preyLine':
     'Зулгар охотится на вас: ведите его через горящие солнечные глифы',

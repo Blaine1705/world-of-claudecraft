@@ -4447,9 +4447,11 @@ export interface VaelFightState {
   /** Shadowsteps started (the deterministic victim hash salt). */
   reaps: number;
   /** The Shadowstep in flight: its phase clock, the mark, the pool (object id,
-   *  spot and sweep yaw) once it opens, and where he stood when he sank. */
+   *  spot and sweep yaw) once it opens, and where he stood when he sank; and
+   *  the chain it belongs to (this step, the chain's length, the players it
+   *  has marked so far, each step taking someone new while anyone is left). */
   reap: {
-    phase: 'vanish' | 'pool' | 'rise';
+    phase: 'vanish' | 'pool' | 'rise' | 'recover';
     elapsed: number;
     markId: number;
     poolId: number;
@@ -4458,9 +4460,32 @@ export interface VaelFightState {
     yaw: number;
     fromX: number;
     fromZ: number;
+    step: number;
+    steps: number;
+    marked: number[];
   } | null;
   /** Heroic Grave Shadows still burning: object id, seconds left, tick clock. */
   graves: { objectId: number; remaining: number; tick: number }[];
+  /** The fog gathering before a veil: its clock, whether he has begun to
+   *  sink, and where he stands still for it (vael_veil_gather.ts). */
+  gather: { elapsed: number; sinking: boolean; x: number; z: number; yaw: number } | null;
+}
+
+/** Vael's entrance on the Beacon Crown (encounters/sunken_bastion/
+ *  vael_intro.ts), on Vael for the claim's life (it outlives every fight). */
+export interface VaelIntroState {
+  /** Buried under the crown, playing the entrance, or done (he fights);
+   *  `rearm` waits out a wipe to bury him for the short entrance. */
+  phase: 'buried' | 'playing' | 'done' | 'rearm';
+  /** The full entrance has played once (a later one is the short one). */
+  played: boolean;
+  /** This entrance is the short one (one rise at his place). */
+  short: boolean;
+  /** The stop he is at (an index into VAEL_INTRO_STOPS) and its part. */
+  stop: number;
+  part: 'rise' | 'speak' | 'sink' | 'under';
+  /** Seconds into the part. */
+  t: number;
 }
 
 /** The Turretback Hermit's pull, watched for the Eviction Notice deed. */
@@ -6745,6 +6770,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */
   bastionFight?: BastionFightState;
+  /** Vael's entrance on the Beacon Crown (encounters/sunken_bastion/
+   *  vael_intro.ts). Sim authority only; the client reads casts, heights and
+   *  auras. */
+  vaelIntro?: VaelIntroState;
   /** Per-fight state of a Drowned Temple boss (encounters/drowned_temple). Sim
    *  authority only; the client reads the fight from casts, auras and the
    *  encounter objects. */

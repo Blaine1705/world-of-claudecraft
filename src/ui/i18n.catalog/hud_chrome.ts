@@ -8830,7 +8830,8 @@ export const hudChromeStrings = {
       iron_cage: 'Iron Cage (mash your interact key to break out, allies can smash the bars)',
       drowned_anchor: 'Drowned Anchor (break the chain before its victim is dragged into the pit)',
       shackle_pair: 'Shackle Pair (two chained players must stay close together)',
-      reaper_behind: "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
+      reaper_behind:
+        "Shadow Crossing (three times in a row he rises behind a different player: step out of the scythe's arc)",
       // The Wildheart Basin rework (encounters/wildheart_basin).
       pack_bond: 'Pack Bond (together they take half damage: drag them 15 yards apart)',
       stalk:
@@ -8893,6 +8894,20 @@ export const hudChromeStrings = {
     linkRule: 'Every hit on the anchor breaks one link, however hard it lands',
     linksTarget: '{count} of {total} links',
     linkBroken: 'Link broken!',
+  },
+  // The Sunken Bastion's crown alert (src/ui/hud/dungeon/bastion_alert_view.ts):
+  // Vael's scythe behind a player and the Fog Veil's beam. Wordy (M16):
+  // non-Latin fills in the overlays.
+  bastionAlert: {
+    reapedTitle: 'Death rises behind you!',
+    reapedLine: "Step out of the scythe's arc: forward, or to either side",
+    veilTitle: 'The Fog Veil',
+    veilLine: "Watch the beacon's beam: the figure whose lantern flares is the real Vael",
+    realTitle: 'The beam found him!',
+    realLine: 'This is the real Vael: strike him to break the veil',
+    shadeTitle: 'A hollow shade',
+    shadeLine: 'The light pours through it: leave it, find the one the beam lights',
+    timeAria: '{seconds} seconds left',
   },
   // The Wildheart Basin's encounter alert (src/ui/hud/dungeon/wildheart_alert_view.ts).
   wildheartAlert: {
