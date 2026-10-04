@@ -212,6 +212,27 @@ describe('Allied Faction World Quest Rewards & Toys', () => {
       sim.player.pos = { x: 100, y: 1, z: 100 };
       expect(tryMobMeleeSwingInRange(sim.ctx, mob, sim.player)).toBe(true);
     });
+
+    it('does not leave a ground mob attacking forever under an airborne target', () => {
+      const sim = new Sim({ seed: 114, playerClass: 'rogue', autoEquip: false });
+      sim.player.pos = { x: 100, y: 15, z: 100 };
+      sim.player.onGround = false;
+
+      const mob = createMob(99998, MOBS.forest_wolf, 20, { x: 100, y: 0, z: 100 });
+      mob.aggroTargetId = sim.player.id;
+      mob.aiState = 'attack';
+      mob.threat.set(sim.player.id, 100);
+      sim.addEntity(mob);
+
+      for (let i = 0; i < 130; i++) {
+        mob.prevPos = { ...mob.pos };
+        (sim as unknown as { updateMob(e: typeof mob): void }).updateMob(mob);
+      }
+
+      expect(mob.aiState).toBe('evade');
+      expect(mob.aggroTargetId).toBeNull();
+      expect(mob.autoAttack).toBe(false);
+    });
   });
 
   describe('Clockwork Target Dummy (clockwork_target_dummy)', () => {
