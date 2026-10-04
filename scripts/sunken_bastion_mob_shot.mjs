@@ -232,8 +232,14 @@ async function main() {
               await page.evaluate(() => {
                 const sim = window.__game.world;
                 const mob = sim.entities.get(sim.player.targetId);
-                const cur = window.__game.renderer.views.get(mob?.id)?.visual?.current;
+                const visual = window.__game.renderer.views.get(mob?.id)?.visual;
+                const cur = visual?.current;
+                let slung = null;
+                visual?.model?.traverse?.((n) => {
+                  if (n.name === 'OssickAnchorBack') slung = n.visible;
+                });
                 return JSON.stringify({
+                  slungAnchor: slung,
                   cast: mob?.castingAbility ?? null,
                   left: mob?.castRemaining ?? null,
                   clip: cur?.getClip?.().name ?? null,

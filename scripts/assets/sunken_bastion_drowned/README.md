@@ -71,6 +71,16 @@ nothing here runs in the build or the game.
   Attack3 (the Reaping Arc), OathCharge (the 2.5 s bar, bar-locked, a beat longer so it never wraps at the
   launch), Stunned (Breached), Hit, Death. The one-shots start and end on the guard (CombatIdle), not on Idle,
   so the checks' Idle seams are expected there.
+- `ossick/`: Gaoler Ossick (`public/models/creatures/gaoler_ossick.glb`), the second boss, grown from the
+  Turnkey's builder into a hunched hulk (the trapezius hump, mooring-post arms, bigger fists): a bald drowned head
+  in an iron brank (`build_brank`, rigid on the head and grown with it), a crossed leather harness
+  (`build_harness`), his own snapped manacles (`build_manacle`), the anchor chain over the left shoulder, a kilt,
+  and three twin props shown one at a time by keyed scales: the anchor (`AnchorB` on his back, its own mesh
+  `OssickAnchorBack` so the renderer can hide it while his thrown anchor lies out; `AnchorH` in the left fist),
+  the shackle pair (`ShackleB` at the hip, `ShackleH` in the fist) and the cudgel (`Weapon` in the right fist,
+  `CudgelB` thrust through the belt while both fists heave the shackles). `clips.py` has Idle, Walk, Run, Attack,
+  Attack2, AnchorHurl (1.8 s bar), ShackleHeave (1.2 s), CudgelSlam (1.0 s), Hit, Death; each bar's release is
+  on its end and the rest plays out.
 - `revenant/`: the Bastion Revenant (`public/models/creatures/drowned_revenant.glb`):
   `anatomy.py` (skeleton, sculpts, the morion, cutlass, buckler, barnacles, kelp),
   `dressing.py` (rigid parts and the sea-light eyes), `shading.py` (bake surfaces),

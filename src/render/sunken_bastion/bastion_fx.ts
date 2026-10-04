@@ -148,7 +148,7 @@ export class BastionFx {
     this.root.add(creatures);
     this.creatures = new BastionCreatureFx(creatures, groundY, world, playGesture, reducedMotion);
     // The fifth pass's gaol and reaper visuals ride the same root and gate.
-    this.gaol = new BastionGaolFx(this.root, groundY, world, this.flashesOn);
+    this.gaol = new BastionGaolFx(this.root, groundY, world, this.flashesOn, playGesture);
     this.reaper = new BastionReaperFx(this.root, groundY, world, this.flashesOn);
     const B = BASTION_BOSS_TELEGRAPHS;
     registerBastionTelegraph(

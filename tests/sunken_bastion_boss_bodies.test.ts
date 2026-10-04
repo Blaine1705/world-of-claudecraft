@@ -9,8 +9,20 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { OLEN_STARS_UP } from '../src/render/sunken_bastion/bastion_boss_fx_core';
+import {
+  OSSICK_ANCHOR_AWAY_GESTURE,
+  OSSICK_ANCHOR_BACK_MESH,
+  OSSICK_ANCHOR_HOME_GESTURE,
+  ossickAnchorGesture,
+} from '../src/render/sunken_bastion/bastion_gaol_reaper_core';
 import { MOBS } from '../src/sim/data';
-import { OLEN_OATHBOUND_CHARGE, OLEN_TUNING } from '../src/sim/encounters/sunken_bastion/ids';
+import {
+  OLEN_OATHBOUND_CHARGE,
+  OLEN_TUNING,
+  OSSICK_ANCHOR,
+  OSSICK_CUDGEL,
+  OSSICK_SHACKLE,
+} from '../src/sim/encounters/sunken_bastion/ids';
 import type { Entity } from '../src/sim/types';
 
 function glbJson(url: string): { animations?: { name: string }[]; nodes?: { name?: string }[] } {
@@ -18,6 +30,10 @@ function glbJson(url: string): { animations?: { name: string }[]; nodes?: { name
   expect(buf.readUInt32LE(0)).toBe(0x46546c67); // 'glTF'
   const jsonLength = buf.readUInt32LE(12);
   return JSON.parse(buf.subarray(20, 20 + jsonLength).toString('utf8'));
+}
+
+function glbNodeNames(url: string): Set<string> {
+  return new Set((glbJson(url).nodes ?? []).map((n) => n.name ?? ''));
 }
 
 function glbClips(url: string): Set<string> {
@@ -81,5 +97,61 @@ describe('Knight-Commander Olen', () => {
   it("circles Breached's stars round his helm", () => {
     expect(OLEN_STARS_UP).toBeGreaterThan(def.height * 0.75);
     expect(OLEN_STARS_UP).toBeLessThan(def.height * 0.95);
+  });
+});
+
+describe('Gaoler Ossick', () => {
+  const key = keyOf('gaoler_ossick');
+  const def = VISUALS[key];
+
+  it('wears his own sculpted body with every clip he plays', () => {
+    expect(key).toBe('bastion_ossick');
+    expect(def.url).toBe('models/creatures/gaoler_ossick.glb');
+    expect(def.url).not.toMatch(/skeleton/);
+    expect(def.animUrls ?? []).toEqual([]);
+    expect(def.weaponFix ?? []).toEqual([]);
+    expect(def.tint).toBeUndefined();
+    expect(def.authoredAtlas).toBe(true);
+    const shipped = glbClips(def.url);
+    for (const clip of referencedClips(key)) expect(shipped.has(clip), clip).toBe(true);
+    for (const clip of ['Idle', 'Walk', 'Run', 'AnchorHurl', 'ShackleHeave', 'CudgelSlam'])
+      expect(shipped.has(clip), clip).toBe(true);
+  });
+
+  it('plays each bar bar-locked, its follow-through played out', () => {
+    const clips = def.clips;
+    expect(clips.castByAbility?.[OSSICK_ANCHOR]).toBe('AnchorHurl');
+    expect(clips.castByAbility?.[OSSICK_SHACKLE]).toBe('ShackleHeave');
+    expect(clips.castByAbility?.[OSSICK_CUDGEL]).toBe('CudgelSlam');
+    for (const id of [OSSICK_ANCHOR, OSSICK_SHACKLE, OSSICK_CUDGEL])
+      expect(clips.castTimeScaleByAbility?.[id], id).toBe(1);
+    expect(def.castClipSync).toBe(true);
+    expect([...(clips.castPlayOut ?? [])].sort()).toEqual([
+      'AnchorHurl',
+      'CudgelSlam',
+      'ShackleHeave',
+    ]);
+  });
+
+  it('hides the anchor on his back while his thrown one lies on a victim', () => {
+    expect(glbNodeNames(def.url).has(OSSICK_ANCHOR_BACK_MESH)).toBe(true);
+    expect(def.meshToggles).toEqual([
+      {
+        nodes: [OSSICK_ANCHOR_BACK_MESH],
+        hideNow: OSSICK_ANCHOR_AWAY_GESTURE,
+        showNow: OSSICK_ANCHOR_HOME_GESTURE,
+      },
+    ]);
+    expect(ossickAnchorGesture(0)).toBe(OSSICK_ANCHOR_HOME_GESTURE);
+    expect(ossickAnchorGesture(1)).toBe(OSSICK_ANCHOR_AWAY_GESTURE);
+    expect(ossickAnchorGesture(2)).toBe(OSSICK_ANCHOR_AWAY_GESTURE);
+  });
+
+  it('looms over the Turnkey and Olen, gameplay untouched', () => {
+    expect(MOBS.gaoler_ossick.scale).toBe(1.4);
+    for (const mobId of ['gaol_turnkey', 'knight_commander_olen', 'drowned_sergeant'])
+      expect(drawn('gaoler_ossick'), mobId).toBeGreaterThan(drawn(mobId));
+    // Never smaller than the stand-in he replaced (6.2 at his scale).
+    expect(def.height).toBeGreaterThanOrEqual(6.2);
   });
 });

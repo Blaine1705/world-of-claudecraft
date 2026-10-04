@@ -138,14 +138,15 @@ describe('skeleton golem bespoke attack (issue #2889 follow-up batch)', () => {
     expect(golemBlock).toContain("attack: ['Golem_Slam']");
 
     // skel_golem was the ONLY VisualDef calling skeletonLargeClips; the
-    // five-dungeon rework added two more bodies on the same skeleton_golem.glb
-    // rig (the Hollow Crypt's crypt_skel_brute and the Sunken Bastion's
-    // bastion_ossick), and each keeps the bespoke Golem_Slam override rather
-    // than the generic swing. The other skeleton VisualDefs share the smaller
-    // 41-joint rig via skeletonClips() instead and are untouched by this change.
+    // five-dungeon rework added the Hollow Crypt's crypt_skel_brute on the same
+    // skeleton_golem.glb rig (the Sunken Bastion's Gaoler Ossick wore it too
+    // until he got his own sculpted body), and each keeps the bespoke
+    // Golem_Slam override rather than the generic swing. The other skeleton
+    // VisualDefs share the smaller 41-joint rig via skeletonClips() instead
+    // and are untouched by this change.
     const largeClipsCallers = [...MANIFEST_SRC.matchAll(/clips: \{\s*\.\.\.skeletonLargeClips\(/g)]
       .length;
-    expect(largeClipsCallers).toBe(3);
+    expect(largeClipsCallers).toBe(2);
     const slamOverrides = [
       ...MANIFEST_SRC.matchAll(
         /clips: \{\s*\.\.\.skeletonLargeClips\([^)]*\),\s*attack: \['Golem_Slam'\]/g,

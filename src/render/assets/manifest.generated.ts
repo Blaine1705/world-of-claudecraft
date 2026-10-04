@@ -407,6 +407,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/frog_hit_variety_anims.glb": "/media/models/creatures/frog_hit_variety_anims.d30021ba86a4.glb",
   "models/creatures/gaol_cage.glb": "/media/models/creatures/gaol_cage.d2da328d9b55.glb",
   "models/creatures/gaol_turnkey.glb": "/media/models/creatures/gaol_turnkey.0499f2be5653.glb",
+  "models/creatures/gaoler_ossick.glb": "/media/models/creatures/gaoler_ossick.cc565b647613.glb",
   "models/creatures/ghost.glb": "/media/models/creatures/ghost.553f37c4127b.glb",
   "models/creatures/ghost_ability_anims.glb": "/media/models/creatures/ghost_ability_anims.2e904f4e1f39.glb",
   "models/creatures/gleamstag.glb": "/media/models/creatures/gleamstag.2f322594a5ca.glb",

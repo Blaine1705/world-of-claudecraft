@@ -125,6 +125,11 @@ import {
 } from '../hollow_crypt/morthen_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
+import {
+  OSSICK_ANCHOR_AWAY_GESTURE,
+  OSSICK_ANCHOR_BACK_MESH,
+  OSSICK_ANCHOR_HOME_GESTURE,
+} from '../sunken_bastion/bastion_gaol_reaper_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import type { ClipTrackDrops } from './clip_track_drops';
@@ -4309,25 +4314,52 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.16,
   },
-  // Gaoler Ossick: the gaol's hulking warden, hurling the Drowned Anchor with a
-  // one-hand throw, flinging the Shackle Pair with a two-hand heave, and
-  // bringing the cudgel down in his great slam.
+  // Gaoler Ossick (scripts/assets/sunken_bastion_drowned/ossick/): the gaol's
+  // master, drowned in his own yard, sculpted whole on the drowned kit: a hulking
+  // hunched brute, the shoulders heaped up past his ears and crusted with
+  // barnacles, arms like mooring posts ending in his own snapped manacles, a
+  // bald drowned head caged in an iron brank with sea light behind the bands, a
+  // leather harness over the bare grey chest, a ship's anchor slung on his back
+  // on a chain over the shoulder, shackle pairs at his hip and an iron-bound
+  // cudgel. Every bar is bar-locked, its release on the bar's end and its
+  // follow-through played out: AnchorHurl takes the anchor off his back and
+  // hurls it one-handed (the slung anchor, its own mesh, stays hidden while his
+  // thrown one lies on a victim: bastion_gaol_fx.ts re-sends the gestures),
+  // ShackleHeave thrusts the cudgel through his belt and heaves the shackles in
+  // both fists, CudgelSlam brings the cudgel straight down.
   bastion_ossick: {
-    url: `${ENEMIES}/skeleton_golem.glb`,
-    height: 6.2,
+    url: `${CREATURES}/gaoler_ossick.glb`,
+    // Hunched, yet over the Turnkey (8.3) and Olen (8.9) at his 1.4: about 9.8.
+    height: 7.0,
     clips: {
-      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
-      attack: ['Golem_Slam'],
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'CudgelSlam',
       castByAbility: {
-        [OSSICK_ANCHOR]: '1H_Melee_Attack_Chop',
-        [OSSICK_SHACKLE]: '2H_Melee_Attack_Chop',
-        [OSSICK_CUDGEL]: 'Golem_Slam',
+        [OSSICK_ANCHOR]: 'AnchorHurl',
+        [OSSICK_SHACKLE]: 'ShackleHeave',
+        [OSSICK_CUDGEL]: 'CudgelSlam',
       },
+      castTimeScaleByAbility: { [OSSICK_ANCHOR]: 1, [OSSICK_SHACKLE]: 1, [OSSICK_CUDGEL]: 1 },
+      castPlayOut: ['AnchorHurl', 'ShackleHeave', 'CudgelSlam'],
     },
-    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
-    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
-    tint: 0x5b6a64,
-    tintStrength: 0.35,
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    meshToggles: [
+      {
+        nodes: [OSSICK_ANCHOR_BACK_MESH],
+        hideNow: OSSICK_ANCHOR_AWAY_GESTURE,
+        showNow: OSSICK_ANCHOR_HOME_GESTURE,
+      },
+    ],
+    walkRef: 2.74,
+    runRef: 9.37,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
   },
   // Vael the Fogbinder, Death itself, and his shadow copies wear ONE look (the
   // veil hides him among them; only the Fogbeacon's beam tells them apart):

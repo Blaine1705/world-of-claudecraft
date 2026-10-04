@@ -34,6 +34,19 @@ export const REAPER_POOL_RADIUS = 2.4;
 /** The heroic Grave Shadow's burning reach, exactly the sim's. */
 export const GRAVE_SHADOW_RADIUS = VAEL_TUNING.graveRadius;
 
+/** Ossick's anchor slung on his back is its own mesh: it hides while an anchor of
+ *  his lies on a victim (the one he threw, hauled by the winch) and is back on
+ *  him once none does. The gaol effects re-send the gesture, so a view built
+ *  mid-fight shows the right state (VisualDef.meshToggles). */
+export const OSSICK_ANCHOR_BACK_MESH = 'OssickAnchorBack';
+export const OSSICK_ANCHOR_AWAY_GESTURE = 'bastion_ossick_anchor_away';
+export const OSSICK_ANCHOR_HOME_GESTURE = 'bastion_ossick_anchor_home';
+
+/** The gesture for Ossick's slung anchor given how many thrown anchors lie out. */
+export function ossickAnchorGesture(anchorsOut: number): string {
+  return anchorsOut > 0 ? OSSICK_ANCHOR_AWAY_GESTURE : OSSICK_ANCHOR_HOME_GESTURE;
+}
+
 /** 0..1 how far the reaper's warning has run, from the pool's first sight. */
 export function reaperWarningFill(age: number): number {
   if (REAPER_WARNING_SECONDS <= 0) return 1;

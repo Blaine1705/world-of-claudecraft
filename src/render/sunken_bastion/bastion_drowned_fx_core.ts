@@ -144,6 +144,19 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0.03, up: 3.08, fwd: 0.49 },
     eyes: { side: 0.08, up: 4.23, fwd: 0.11 },
   },
+  // Gaoler Ossick: water off the brank, the cudgel's head, the manacle's chain
+  // and the anchor on his back.
+  gaoler_ossick: {
+    rawHeight: 4.084,
+    drips: [
+      { side: 0.17, up: 3.48, fwd: 0.79 },
+      { side: -0.88, up: 0.9, fwd: 1.24 },
+      { side: 0.89, up: 1.76, fwd: 0.35 },
+      { side: -0.51, up: 2.2, fwd: -1.17 },
+    ],
+    chest: { side: 0.06, up: 2.49, fwd: 0.54 },
+    eyes: { side: 0.17, up: 3.6, fwd: 0.82 },
+  },
   gaol_turnkey: {
     rawHeight: 4.677,
     drips: [

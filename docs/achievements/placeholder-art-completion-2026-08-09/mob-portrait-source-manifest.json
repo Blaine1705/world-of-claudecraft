@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "f73158ecf1d3977f020d0784950b94ec63636d58e4ba8ac621891b135ca81a61",
+  "rendererFingerprint": "742bd5ffdb48dbd0ba42c9fb3984f0b89284deaef4330cc39a6cb6fa1de933e0",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5476134,
-      "sha256": "b3a4d7e547bf29a2af0203fe6049d0a52c4f3c8036a8a1dca7a567b0c7a8bd9b",
+      "bytes": 5476234,
+      "sha256": "554614b208c72e4b1874b7c2bbf253479b4d462ec6f79dd3e5352d43860b1d21",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3302,36 +3302,31 @@
       "visualKey": "bastion_ossick",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_golem.glb",
-          "path": "public/models/chars/enemies/skeleton_golem.glb",
-          "bytes": 292776,
-          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+          "url": "models/creatures/gaoler_ossick.glb",
+          "path": "public/models/creatures/gaoler_ossick.glb",
+          "bytes": 3007028,
+          "sha256": "cc565b647613cabb093b2e344ce3fe98fbc123b9c50955e40a5f63de0cfef689"
         },
         "idle": "Idle",
-        "height": 6.2,
+        "height": 7,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
-        "weaponFix": [
-          {
-            "node": "Skeleton_Golem_Axe",
-            "rotY": 3.141592653589793
-          }
-        ],
-        "tintStrength": 0.35
+        "weaponFix": null,
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#5b6a64",
-        "resolved": "#5b6a64",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "55c07a62acbb9fc26fbbadad8bfb21bea4c3d8ad331eadc4587f33f616b7104b",
+      "sourceFingerprint": "c4a48914b7d4099141403a59b769412ecfe166b6f204e6dcb8ed30283d90f15a",
       "output": {
         "path": "public/ui/mobs/gaoler_ossick.webp",
-        "bytes": 2786,
-        "sha256": "dee65f2f8fa1ad0332576ec2c3894cecc1de72eab55f10dae2f7b11efef0c81a"
+        "bytes": 2326,
+        "sha256": "00a2a7a25b7250209b04a4ba6c594bfd36b225d519d35f9ada2568948d29964c"
       }
     },
     {
