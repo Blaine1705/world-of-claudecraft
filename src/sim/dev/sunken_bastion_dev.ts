@@ -54,7 +54,7 @@ export const SUNKEN_BASTION_DEV_AREAS: Readonly<Record<string, { x: number; z: n
   olen: { x: 57, z: 112 },
   postern: { x: 26, z: 126 },
   gaol: { x: 2, z: 102 },
-  turnkey: { x: -12, z: 92 },
+  turnkey: { x: -2, z: 74 },
   yard: { x: -2, z: 46 },
   ossick: { x: -2, z: 46 },
   balconyone: { x: -40, z: 20 },

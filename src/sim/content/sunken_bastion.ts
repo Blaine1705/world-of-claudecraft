@@ -698,9 +698,11 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
     idleStationary: true,
   },
   // ---- The Sunken Gaol ---------------------------------------------------------
-  // The Gaol Turnkey, the gaol's miniboss, by the dead turnkeys' cell doors
-  // under the north-west cliff, where the Postern Stair comes down.
-  held('gaol_turnkey', -24, 102, 'turnkey', Math.PI * 0.75),
+  // The Gaol Turnkey, the gaol's miniboss, keeps the Gaol Grate: he stands
+  // squarely in front of it, between the two gibbets, facing the yard the
+  // group crosses to reach him (the grate, the way on to Ossick and the keep,
+  // opens only on his death and the yard's).
+  held('gaol_turnkey', -2, 57, 'turnkey', FACE_NORTH),
   // g1: the cell row (west). Four prisoners.
   held('shackled_prisoner', -28, 76, 'g1', FACE_EAST),
   held('shackled_prisoner', -28, 88, 'g1', FACE_EAST),
@@ -711,11 +713,13 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
   held('bastion_revenant', 30, 72, 'g2', FACE_WEST),
   held('tidebound_acolyte', 38, 76, 'g2', FACE_WEST),
   held('mistweaver', 38, 84, 'g2', FACE_WEST),
-  // g3: the gibbet row (south). A sergeant and three prisoners.
-  held('drowned_sergeant', 0, 62, 'g3', FACE_NORTH),
-  held('shackled_prisoner', -5, 65, 'g3', FACE_NORTH),
-  held('shackled_prisoner', 5, 65, 'g3', FACE_NORTH),
-  held('shackled_prisoner', 0, 67, 'g3', FACE_NORTH),
+  // g3: the dead turnkeys' cell doors under the north-west cliff, where the
+  // Postern Stair comes down (moved off the grate, which the Turnkey keeps).
+  // A sergeant and three prisoners.
+  held('drowned_sergeant', -28, 100, 'g3', FACE_EAST),
+  held('shackled_prisoner', -33, 99, 'g3', FACE_EAST),
+  held('shackled_prisoner', -31, 104, 'g3', FACE_EAST),
+  held('shackled_prisoner', -26, 104, 'g3', FACE_EAST),
   // Patrol D: a watchman and two warhounds on their round of the yard.
   patrolling('drowned_watchman', GAOL_LOOP, 'gd', 0),
   patrolling('bastion_warhound', GAOL_LOOP, 'gd', 3),

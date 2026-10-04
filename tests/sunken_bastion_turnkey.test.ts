@@ -5,6 +5,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { SUNKEN_BASTION_GATES } from '../src/sim/content/sunken_bastion';
 import { DUNGEONS, MOBS } from '../src/sim/data';
 import {
   bastionWardHitPoints,
@@ -219,5 +220,59 @@ describe('the Gaol Turnkey miniboss: the Iron Cage and the escape', () => {
     again.f.sim.ctx.handleDeath(again.turnkey, again.f.tank);
     run(again.f, DT * 2);
     expect(earned(again.f, again.f.tank, 'dgn_turnkey_cage')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('the Gaol Turnkey keeps the Gaol Grate (the way on to Ossick and the keep)', () => {
+  const grate = SUNKEN_BASTION_GATES.find((g) => g.id === 'gaol_grate');
+  const spawn = DUNGEONS.sunken_bastion.spawns.find((s) => s.mobId === TURNKEY_ID);
+
+  it('stands squarely in front of the grate, on the gaol side, facing the yard', () => {
+    if (!grate || !spawn) throw new Error('no grate or no Turnkey');
+    // The grate spans x across z = grate.z; the gaol lies north of it.
+    expect(spawn.z).toBeGreaterThan(grate.z);
+    expect(spawn.z - grate.z).toBeLessThanOrEqual(8);
+    expect(Math.abs(spawn.x - grate.x)).toBeLessThan(grate.hw / 2);
+    // Facing the yard the group crosses to reach him (north, sim yaw 0).
+    expect(Math.cos(spawn.facing ?? Math.PI)).toBeGreaterThan(0.95);
+    // The grate opens only once he (and the yard) are dead.
+    expect(grate.packs).toContain('turnkey');
+  });
+
+  it('holds his own pull: no other held pack stands within his reach', () => {
+    if (!spawn) throw new Error('no Turnkey');
+    const reach = (MOBS[TURNKEY_ID].aggroRadius ?? 0) + 4;
+    for (const s of DUNGEONS.sunken_bastion.spawns) {
+      if (s === spawn || s.patrol || s.packId === undefined) continue;
+      if (s.packId === 'turnkey') continue;
+      expect(Math.hypot(s.x - spawn.x, s.z - spawn.z), `${s.packId} ${s.mobId}`).toBeGreaterThan(
+        reach,
+      );
+    }
+  });
+
+  it('pulled at his gate he fights alone, and walks back to it when the group falls', () => {
+    const f = fight('normal', 1);
+    const turnkey = boss(f, TURNKEY_ID);
+    const home = { x: turnkey.pos.x - f.ox, z: turnkey.pos.z - f.oz };
+    expect(home.x).toBeCloseTo(spawn?.x ?? 0, 1);
+    expect(home.z).toBeCloseTo(spawn?.z ?? 0, 1);
+    put(f, f.tank, home.x, home.z + 6);
+    put(f, f.others[0], home.x + 3, home.z + 9);
+    engage(f, turnkey);
+    run(f, 3);
+    expect(turnkey.inCombat).toBe(true);
+    // Only the Turnkey answered (the yard's packs were cleared by the harness,
+    // and none stands close enough to join anyway).
+    const engaged = f.inst.mobIds
+      .map((id) => f.sim.ctx.entities.get(id))
+      .filter((e): e is Entity => !!e && !e.dead && e.inCombat && e.templateId !== GAOL_CAGE_ID);
+    expect(engaged.map((e) => e.templateId)).toEqual([TURNKEY_ID]);
+    for (const p of [f.tank, ...f.others]) f.sim.ctx.handleDeath(p, turnkey);
+    run(f, 20);
+    expect(turnkey.inCombat).toBe(false);
+    const at = { x: turnkey.pos.x - f.ox, z: turnkey.pos.z - f.oz };
+    expect(Math.hypot(at.x - home.x, at.z - home.z)).toBeLessThan(2);
   });
 });
