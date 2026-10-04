@@ -49,4 +49,20 @@ describe('Laverock: his own model', () => {
       expect(shipped.has(c), c).toBe(true);
     }
   });
+
+  it('keeps his feet planted at the follow walk, and stands a head over the player', () => {
+    // The Walk clip covers walkRef yd/s at 1x; the guide follows at walkSpeed,
+    // so the clip must be allowed to play at least that fast or he slides.
+    const walkRef = v.walkRef ?? 0;
+    expect(walkRef * (v.walkTimeScaleMax ?? 0)).toBeGreaterThanOrEqual(
+      CANTOR_GUIDE.follow.walkSpeed,
+    );
+    // The catch-up run is a short hurry: it may slide, but not by half.
+    expect((v.runRef ?? 0) * (v.runTimeScaleMax ?? 0)).toBeGreaterThan(
+      CANTOR_GUIDE.follow.runSpeed * 0.5,
+    );
+    // Normalized on the idle bounds with the staff's moon on top: the body
+    // (about 0.8 of that) stands taller than the 2.6 yd player.
+    expect(v.height * 0.8).toBeGreaterThan(2.6);
+  });
 });

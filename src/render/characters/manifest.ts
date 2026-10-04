@@ -4692,14 +4692,17 @@ export const VISUALS: Record<string, VisualDef> = {
   // Laverock, the Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
   // the Blender-built old cantor (E:/woc/laverock-work/builder, adapted from the
   // Velkhar kit): bone-white habit, the stiff crescent stole, the nacre
-  // medallion, the driftwood staff with its carved moon. Normalized so his
-  // crown stands at the player's height and the staff above it. His gestures
-  // ride the overhead emotes the guide sets as he speaks (point = Talk, cry =
-  // Startle, kneel = Kneel) and the song is his channel cast (cantor_last_verse,
-  // the Sing loop).
+  // medallion, the driftwood staff with its carved moon, the long beard and
+  // hair. Normalized on the idle bounds (the staff's moon is the top) so his
+  // crown stands about 2.95 yd, a head over the player. His gestures ride the
+  // overhead emotes the guide sets as he speaks (point = Talk, cry = Startle,
+  // kneel = Kneel) and the song is his channel cast (cantor_last_verse, the
+  // Sing loop). The Walk's long gliding stride covers 1.25 yd/s at this
+  // scale, so the guide's 3.2 yd/s follow walk plays it about 2.6x with the
+  // feet planted; the 7 yd/s catch-up run caps lower and slides a little.
   npc_laverock: {
     url: `${CREATURES}/temple_laverock.glb`,
-    height: 3.2,
+    height: 3.68,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4714,13 +4717,13 @@ export const VISUALS: Record<string, VisualDef> = {
         kneel: { clips: ['Kneel'] },
       },
     },
-    walkRef: 0.44,
-    runRef: 0.44,
-    walkTimeScaleMax: 3.5,
-    runTimeScaleMax: 4,
+    walkRef: 1.25,
+    runRef: 1.25,
+    walkTimeScaleMax: 2.8,
+    runTimeScaleMax: 3.6,
     authoredAtlas: true,
     selfIllumination: 0.06,
-    clickRadius: 0.8,
+    clickRadius: 0.9,
   },
   npc_villager_robed: {
     url: `${PLAYERS}/mage.glb`,
