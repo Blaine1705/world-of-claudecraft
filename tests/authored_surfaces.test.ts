@@ -210,6 +210,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_lurker',
   // the Drowned Temple's Blender Pearlguard Sentinel (the clam and coral giant)
   'temple_sentinel',
+  // the Drowned Temple's Blender Choirmother Selthe (the siren matriarch)
+  'temple_selthe',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

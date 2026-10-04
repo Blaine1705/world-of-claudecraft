@@ -16,6 +16,11 @@ import {
 } from '../src/render/drowned_temple/temple_fx_core';
 import { MOBS } from '../src/sim/data';
 import {
+  SELTHE_CHORUS_MARK,
+  SELTHE_SEA_SONG,
+  SELTHE_SOLO_MARK,
+  SELTHE_TIDAL_SLAP,
+  SELTHE_TUNING,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_UNDERTOW,
@@ -378,6 +383,44 @@ describe('the Pearlguard Sentinel: the clam and coral giant', () => {
     expect(kit?.belowHpPct).toBe(0.3);
     expect(kit?.seconds).toBe(8);
     expect(TEMPLE_CARAPACE_AURA).toBe('temple_pearl_carapace_ward');
+  });
+});
+
+describe('Choirmother Selthe: the siren matriarch and her fan', () => {
+  it('ships her own body with a clip for every mechanic', () => {
+    expect(clipsOf('public/models/creatures/temple_selthe.glb').sort()).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'Cast',
+        'Chorus',
+        'Death',
+        'Hit',
+        'Idle',
+        'Run',
+        'SeaSong',
+        'Slap',
+        'Solo',
+        'Walk',
+      ].sort(),
+    );
+    const v = visualOf('choirmother_selthe');
+    expect(v.url).toMatch(/temple_selthe\.glb$/);
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 9.0 at her 1.15: about 3.5 players.
+    expect(v.height * (MOBS.choirmother_selthe.scale ?? 1)).toBeCloseTo(9.0, 1);
+  });
+
+  it('sings and slaps on their bars and answers each mark with its gesture', () => {
+    const c = visualOf('choirmother_selthe').clips;
+    expect(c.castByAbility?.[SELTHE_SEA_SONG]).toBe('SeaSong');
+    expect(c.castByAbility?.[SELTHE_TIDAL_SLAP]).toBe('Slap');
+    expect(c.castTimeScaleByAbility?.[SELTHE_SEA_SONG]).toBe(1);
+    expect(c.castTimeScaleByAbility?.[SELTHE_TIDAL_SLAP]).toBe(1);
+    expect(c.attackByAbility?.[SELTHE_CHORUS_MARK]).toBe('Chorus');
+    expect(c.attackByAbility?.[SELTHE_SOLO_MARK]).toBe('Solo');
+    expect(SELTHE_TUNING.songCast).toBe(1.5);
+    expect(SELTHE_TUNING.slapCast).toBe(1);
   });
 });
 

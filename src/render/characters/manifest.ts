@@ -10,7 +10,9 @@ import {
   COLOSSUS_MOONLIGHT_LANCE,
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_RESONANT_SLAM,
+  SELTHE_CHORUS_MARK,
   SELTHE_SEA_SONG,
+  SELTHE_SOLO_MARK,
   SELTHE_TIDAL_SLAP,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
@@ -4633,18 +4635,35 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.1,
   },
-  // The bosses. Choirmother Selthe sings her court's rhythm: the Sea-Song on
-  // the golden conch, the Tidal Slap backhand (the marks play from
-  // drowned_temple/temple_boss_fx.ts).
+  // The bosses. Choirmother Selthe (choirmother_selthe; scripts/assets/
+  // drowned_temple_creatures/selthe_matriarch/): the siren matriarch, built
+  // on the Moonlit Siren's body but far larger, a vast lionfish fan opening
+  // behind her like the pipes of an organ (silver rays, pearl tips, sheer
+  // turquoise to violet fins), her tail coiled in the pool of moonlit water
+  // she rides, the golden Great Conch on her chest, a jaw that drops too far
+  // when she sings. Sea-Song (1.5 s bar) plays SeaSong: arms wide, head back,
+  // the mouth wide, the fan shivering, the song on the bar's end. Tidal Slap
+  // (1.0 s bar) plays Slap: the arm drawn across her, the backhand on the
+  // bar's end. The Chorus and Solo marks arrive as windup cues and play Chorus
+  // (the conch raised and blown, the fan folding in) and Solo (one arm raised,
+  // the fan flung wide). Dying, the fan folds and she sinks into her pool,
+  // leaving the conch glowing on the floor. Drawn 9.0 at her 1.15.
   temple_selthe: {
     url: `${CREATURES}/temple_selthe.glb`,
-    height: 6.5,
+    height: 7.83,
     clips: {
       ...TEMPLE_CLIPS,
       castByAbility: { [SELTHE_SEA_SONG]: 'SeaSong', [SELTHE_TIDAL_SLAP]: 'Slap' },
-      castTimeScaleByAbility: { [SELTHE_TIDAL_SLAP]: 1.5 },
+      castTimeScaleByAbility: { [SELTHE_SEA_SONG]: 1, [SELTHE_TIDAL_SLAP]: 1 },
+      attackByAbility: { [SELTHE_CHORUS_MARK]: 'Chorus', [SELTHE_SOLO_MARK]: 'Solo' },
+      attackTimeScaleByAbility: { [SELTHE_CHORUS_MARK]: 1, [SELTHE_SOLO_MARK]: 1 },
     },
-    selfIllumination: 0.08,
+    attackTimeScale: 1,
+    walkRef: 2.5,
+    runRef: 7,
+    castClipSync: true,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
   },
   // The Tideglass Colossus: stone blocks round a blazing prism. It walks its
   // foe down (sixth pass): Walk and Run are its own lumbering gait. The
