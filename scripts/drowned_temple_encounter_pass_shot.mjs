@@ -124,11 +124,12 @@ const SEQS = [
     id: 'puente_rayo',
     dir: 'puente',
     fresh: true,
-    at: [70, 205],
-    face: -Math.PI / 2,
-    yaw: -Math.PI / 2 + 0.55,
+    // From the Altar Landing, looking back east up the bridge at the terrace.
+    at: [33, 213],
+    face: Math.PI / 2,
+    yaw: Number(process.env.SHOT_BRIDGE_YAW ?? Math.PI / 2),
     pitch: 0.3,
-    dist: 26,
+    dist: 14,
     ui: true,
     steps: [
       { action: 'killColossus', frames: [150, 450, 800, 1150, 1500, 1900, 2400, 3600] },
