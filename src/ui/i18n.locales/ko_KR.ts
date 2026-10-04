@@ -19797,17 +19797,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shackle_pair':
     '쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)',
   'hudChrome.finder.mech.hallowed_brine':
-    '성스러운 바닷물 (발밑에 어두운 성수 웅덩이: 그를 밖으로 끌어내세요, 그를 보호하고 당신을 태웁니다)',
+    '성스러운 바닷물 (어두운 성수 웅덩이: 안에 있으면 매초 18 피해, 그가 안에 서 있는 동안 받는 피해 40퍼센트 감소, 밖으로 끌어내세요)',
   'hudChrome.finder.mech.rebounding_bulwark':
-    '튕겨 나오는 방패 (마지막으로 맞은 플레이어로부터 10미터 이내의 누군가에게 튕겨 갑니다: 흩어지세요)',
+    '튕겨 나오는 방패 (마지막으로 맞은 대상으로부터 10미터 이내의 가장 가까운 플레이어에게 튕김, 최대 3명, 영웅 4명: 흩어지세요)',
   'hudChrome.finder.mech.tide_sentence':
-    '조수의 선고 (5초 뒤 표식이 찍힌 플레이어에게 빛의 기둥이 떨어집니다: 무리에서 떨어져 맞으세요)',
+    '조수의 선고 (표식 5초 뒤 빛의 기둥이 표식 대상 6미터 이내의 모두를 강타, 영웅 8미터: 무리에서 떨어져 맞으세요)',
   'hudChrome.finder.mech.unbroken_oath':
-    '깨지지 않는 맹세 (생명력이 절반이 되면 거품 속에 무릎 꿇습니다: 병사들을 처치해 깨뜨리세요)',
+    '깨지지 않는 맹세 (한 번, 생명력 절반에서 최대 60초 동안 거품 속에 무적으로 무릎 꿇음: 병사들을 처치해 깨뜨리면 4초 기절, 10초간 받는 피해 20퍼센트 증가)',
   'hudChrome.finder.mech.fog_veil':
     '안개 장막 (네 형상 중 하나만 진짜: 등대의 빛줄기에 진짜 바엘의 등불이 타오릅니다)',
   'hudChrome.finder.mech.reaper_behind':
-    '그림자 건너기 (세 번 연속으로 각기 다른 플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)',
+    '그림자 건너기 (세 번 연속 플레이어 뒤에서 솟아오름, 인원이 충분하면 매번 다른 대상: 낫의 궤적에서 벗어나세요)',
   'hudChrome.bastionCage.title': '강철 우리에 갇혔습니다!',
   'hudChrome.bastionCage.promptKey': '{key} 키를 연타해 탈출하세요',
   'hudChrome.bastionCage.promptNoKey': '상호작용 키를 연타해 탈출하세요',

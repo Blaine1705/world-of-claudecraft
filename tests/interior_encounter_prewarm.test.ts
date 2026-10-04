@@ -90,6 +90,7 @@ describe('interior encounter prewarm spec', () => {
       'nythraxisGraveVisuals',
       'soulRendPlayerClasses',
       'soulRendVfxWeaponSkins',
+      'vaelShadeGhost',
       'varkhulVisuals',
     ]);
     const depths = INTERIOR_ENCOUNTER_PREWARM.ignivar_depths;

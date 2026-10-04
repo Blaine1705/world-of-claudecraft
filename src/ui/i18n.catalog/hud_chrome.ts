@@ -8760,13 +8760,13 @@ export const hudChromeStrings = {
       shadow_pulse: 'Shadow Pulse (pulsing area damage)',
       reaping_arc: 'Reaping Arc (frontal cleave)',
       hallowed_brine:
-        'Hallowed Brine (a pool of dark holy water under him: drag him out of it, it shields him and burns you)',
+        'Hallowed Brine (a pool of dark holy water: 18 damage a second to anyone in it, and he takes 40 percent less damage while he stands in it, so drag him out)',
       rebounding_bulwark:
-        'Rebounding Bulwark (his shield rebounds to anyone within 10 yards of the last player hit: spread out)',
+        'Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)',
       tide_sentence:
-        'Sentence of the Tide (a column of light falls on the marked player 5 seconds later: take it away from the group)',
+        'Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)',
       unbroken_oath:
-        'Unbroken Oath (at half health he kneels in a bubble: kill his soldiers to break it)',
+        'Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)',
       fog_veil:
         "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
       mist_surge: 'Mist Surge (pulsing area damage)',
@@ -8841,7 +8841,7 @@ export const hudChromeStrings = {
       drowned_anchor: 'Drowned Anchor (break the chain before its victim is dragged into the pit)',
       shackle_pair: 'Shackle Pair (two chained players must stay close together)',
       reaper_behind:
-        "Shadow Crossing (three times in a row he rises behind a different player: step out of the scythe's arc)",
+        "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
       // The Wildheart Basin rework (encounters/wildheart_basin).
       pack_bond: 'Pack Bond (together they take half damage: drag them 15 yards apart)',
       stalk:

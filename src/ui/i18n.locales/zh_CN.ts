@@ -18837,16 +18837,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.drowned_anchor': '溺亡之锚（在受害者被拖进深坑前砸断锁链）',
   'hudChrome.finder.mech.shackle_pair': '双人镣铐（被锁在一起的两名玩家必须靠在一起）',
   'hudChrome.finder.mech.hallowed_brine':
-    '圣化咸水（他脚下涌出暗色圣水池：把他拖出去，它保护他并灼烧你）',
+    '圣化咸水（暗色圣水池：池中每秒受到18点伤害，他站在池中时受到的伤害降低40%，把他拖出去）',
   'hudChrome.finder.mech.rebounding_bulwark':
-    '回弹壁盾（盾牌会弹向上一个被击中玩家10码内的人：散开）',
+    '回弹壁盾（盾牌弹向上一个被击中者10码内最近的玩家，最多3人，英雄4人：散开）',
   'hudChrome.finder.mech.tide_sentence':
-    '潮汐宣判（5秒后光柱落在被标记的玩家身上：远离队伍承受）',
+    '潮汐宣判（标记5秒后，光柱击中被标记者6码内的所有人，英雄8码：远离队伍承受）',
   'hudChrome.finder.mech.unbroken_oath':
-    '不破誓言（生命值降到一半时他在泡泡中跪下：击杀他的士兵来打破泡泡）',
+    '不破誓言（仅一次，生命值降到一半时他在泡泡中无敌跪下，最多60秒：击杀他的士兵打破它，随后他昏迷4秒并在10秒内受到的伤害提高20%）',
   'hudChrome.finder.mech.fog_veil':
     '雾幕（四个身影，只有一个是真的：灯塔光束会让真正维尔的提灯骤亮）',
-  'hudChrome.finder.mech.reaper_behind': '穿影（死神连续三次从不同玩家身后升起，离开镰刀的弧线）',
+  'hudChrome.finder.mech.reaper_behind':
+    '穿影（连续三次从玩家身后升起，人数足够时每次都是不同的人：离开镰刀的弧线）',
   'hudChrome.bastionCage.title': '你被关进了铁笼！',
   'hudChrome.bastionCage.promptKey': '连按 {key} 挣脱',
   'hudChrome.bastionCage.promptNoKey': '连按交互键挣脱',

@@ -19810,17 +19810,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.drowned_anchor': '溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）',
   'hudChrome.finder.mech.shackle_pair': '連鎖の枷（鎖でつながれた二人は離れずに動く）',
   'hudChrome.finder.mech.hallowed_brine':
-    '聖なる潮水（足元に暗い聖水の溜まりができる：彼を外へ引きずり出せ、彼を守りあなたを焼く）',
+    '聖なる潮水（暗い聖水の溜まり：中にいる者は毎秒18ダメージ、彼は中に立つ間ダメージを40パーセント軽減する、外へ引きずり出せ）',
   'hudChrome.finder.mech.rebounding_bulwark':
-    '跳ね返る大盾（盾は最後に当たったプレイヤーから10ヤード以内の者へ跳ね返る：散開せよ）',
+    '跳ね返る大盾（盾は最後に当たった者から10ヤード以内の最も近いプレイヤーへ跳ね返る、最大3人、ヒロイックは4人：散開せよ）',
   'hudChrome.finder.mech.tide_sentence':
-    '潮の宣告（5秒後、印を付けられたプレイヤーに光の柱が落ちる：集団から離れて受けよ）',
+    '潮の宣告（印から5秒後、光の柱が印の者から6ヤード以内の全員を打つ、ヒロイックは8ヤード：集団から離れて受けよ）',
   'hudChrome.finder.mech.unbroken_oath':
-    '不壊の誓い（体力が半分になると泡の中で跪く：兵士を倒して泡を破れ）',
+    '不壊の誓い（一度だけ、体力が半分になると最大60秒、泡の中で無敵のまま跪く：兵士を倒して破れ、その後4秒気絶し10秒間ダメージが20パーセント増える）',
   'hudChrome.finder.mech.fog_veil':
     '霧のヴェール（四つの姿、本物は一つ：灯台の光線で本物のヴァエルのランタンが燃え上がる）',
   'hudChrome.finder.mech.reaper_behind':
-    '影渡り（死神は三度続けて別々のプレイヤーの背後に現れる、大鎌の弧から出る）',
+    '影渡り（三度続けてプレイヤーの背後に現れる、人数が足りる限り毎回別の者：大鎌の弧から出る）',
   'hudChrome.bastionCage.title': '鉄の檻に閉じ込められた！',
   'hudChrome.bastionCage.promptKey': '{key} を連打して脱出',
   'hudChrome.bastionCage.promptNoKey': 'インタラクトキーを連打して脱出',
