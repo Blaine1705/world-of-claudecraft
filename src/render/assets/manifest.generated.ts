@@ -393,7 +393,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/drogmar.glb": "/media/models/creatures/drogmar.4b4899941e1a.glb",
   "models/creatures/drowned_anchor.glb": "/media/models/creatures/drowned_anchor.d9d2bf8eda68.glb",
   "models/creatures/drowned_arbalest.glb": "/media/models/creatures/drowned_arbalest.c886085b52e4.glb",
-  "models/creatures/drowned_prisoner.glb": "/media/models/creatures/drowned_prisoner.e8fb40572f32.glb",
+  "models/creatures/drowned_prisoner.glb": "/media/models/creatures/drowned_prisoner.b59ed8523238.glb",
   "models/creatures/drowned_revenant.glb": "/media/models/creatures/drowned_revenant.6dfc0be7e590.glb",
   "models/creatures/drowned_sergeant.glb": "/media/models/creatures/drowned_sergeant.6f2817dea8ea.glb",
   "models/creatures/drowned_watchman.glb": "/media/models/creatures/drowned_watchman.b1ee9ac1c6cd.glb",

@@ -23,10 +23,12 @@ export interface CreatureAnchor {
   up: number;
 }
 
-/** Creatures whose breath this module paints: the renderer skips its generic
- *  fire cone for them (the torrent, the ground fire and the scorch replace it). */
+/** Creatures whose breath the crypt effects paint: the renderer skips its
+ *  generic fire cone for them (the drake's torrent, ground fire and scorch
+ *  here; the Bone Brute's Marrow Crush, a physical smash, is a ground crack
+ *  down its cone in crypt_bone_fx.ts, never fire). */
 export function paintsOwnBreath(templateId: string): boolean {
-  return templateId === 'crypt_ossuary_drake';
+  return templateId === 'crypt_ossuary_drake' || templateId === 'crypt_bone_brute';
 }
 
 /** Where the drake's jaws hang while it draws the fire up (the bar) and while

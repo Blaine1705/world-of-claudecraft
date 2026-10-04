@@ -5,12 +5,22 @@
 // tests/crypt_finale_fx_core.test.ts.
 
 import {
+  KNELL_LANE_MARK_TEMPLATE,
+  KNELL_LANE_TEMPLATE,
   KNELLWYRM_TUNING,
   MORTHEN_DESCEND,
   MORTHEN_PROCLAIM,
   MORTHEN_RISE,
   MORTHEN_RITE_WAKES,
 } from '../../sim/encounters/hollow_crypt/ids';
+
+/** Is a crypt floor object one of the Knellwyrm's Pyre Strafe lanes (marked
+ *  or burning)? The crypt's object set also carries the trash kit's floor
+ *  objects (the rupture ring and pool, the Barrow Embers), which
+ *  crypt_trash_fx.ts draws: never a lane. */
+export function isKnellLaneTemplate(templateId: string): boolean {
+  return templateId === KNELL_LANE_MARK_TEMPLATE || templateId === KNELL_LANE_TEMPLATE;
+}
 
 /** What the entrance lights, each 0..1. */
 export interface RiteLevels {

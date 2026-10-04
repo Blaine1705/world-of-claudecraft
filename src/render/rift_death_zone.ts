@@ -165,7 +165,7 @@ export class RiftDeathZoneVisuals {
     );
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
-    this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
+    this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.bastionFx = new BastionFx(
       scene,
       groundY,
@@ -357,7 +357,7 @@ export class RiftDeathZoneVisuals {
    *  then skips its generic draw of it). */
   handleEvent(event: SimEvent): boolean {
     this.hoardPresentation.handleEvent(event);
-    this.cryptTrash.handleEvent(event);
+    const crypt = this.cryptTrash.handleEvent(event);
     this.cryptCreatures.handleEvent(event);
     this.cryptFinale.handleEvent(event);
     this.morthenFx.handleEvent(event);
@@ -365,7 +365,7 @@ export class RiftDeathZoneVisuals {
     const basin = this.wildheartFx.handleEvent(event);
     const sanctum = this.sanctumFx.handleEvent(event);
     const sanctumBoss = this.sanctumBosses.handleEvent(event);
-    return this.bastionFx.handleEvent(event) || temple || basin || sanctum || sanctumBoss;
+    return this.bastionFx.handleEvent(event) || temple || basin || sanctum || sanctumBoss || crypt;
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

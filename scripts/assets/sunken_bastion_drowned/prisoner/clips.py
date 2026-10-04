@@ -9,6 +9,8 @@ down like a hammer (Attack), or a lunge to grab and claw at the throat (Attack2)
 
   Attack: the two fists hammered down. CONTACT 0.66.
   Attack2: the lunge and the claw. CONTACT 0.48.
+  Kneel: Snapped Fetters, the chains broken and down on his knees (1.5 s one-shot).
+  KneelLoop: held on his knees while the fetters' grace lasts (a 4 s loop).
 """
 import math
 
@@ -158,6 +160,51 @@ def death(rig):
     return keyed(keys), 2.1
 
 
+def _kneeling(rig, breath=0.0, sway=0.0):
+    """Down on both knees, the shins flat behind him, the head bowed and the freed
+    hands loose on his thighs (the Death clip's knees, sat upright)."""
+    st = stance(rig)
+    return st.but(pelvis=(0.0, 0.32, -1.15 - 0.012 * breath), lean=14 + 1.6 * breath, neck=8,
+                  look=(5 * sway, -30), head_roll=3 * sway, hip_tilt=6, hip_roll=1.2 * sway,
+                  foot_l=(0.34, 0.72, 0.24), fpitch_l=-48, foot_r=(-0.34, 0.8, 0.24), fpitch_r=-48,
+                  fyaw_l=6, fyaw_r=8, knee_l=(0.2, -1.0, -0.4), knee_r=(-0.2, -1.0, -0.4),
+                  hand_r=(-0.42, -0.5, 1.16), pole_r=(-0.9, 0.5, 0.0), hand_dir_r=_n((0.05, -0.55, -0.8)),
+                  fist_r=0.15, spread_r=6,
+                  hand_l=(0.42, -0.48, 1.18), pole_l=(0.9, 0.5, 0.0), hand_dir_l=_n((-0.05, -0.55, -0.8)),
+                  fist_l=0.15, spread_l=6,
+                  jaw=3, clav_l=2 + 2 * breath, clav_r=2 + 2 * breath)
+
+
+def kneel(rig):
+    """Snapped Fetters: the chains break (the arms flung wide, the head thrown back
+    with a gasp), the madness goes out of him, he sags and drops to his knees, the
+    head bowed. Down at 1.0, settled (KneelLoop's pose) at 1.5."""
+    st = stance(rig)
+    snap = st.but(lean=-6, neck=-6, look=(0, 28), pelvis=(0.0, 0.12, -0.12), jaw=30, head_roll=0,
+                  hand_r=(-1.5, -0.35, 3.1), pole_r=(-0.6, 0.8, -0.3), hand_dir_r=_n((-0.6, -0.2, 0.3)),
+                  fist_r=0.0, spread_r=26,
+                  hand_l=(1.5, -0.35, 3.1), pole_l=(0.6, 0.8, -0.3), hand_dir_l=_n((0.6, -0.2, 0.3)),
+                  fist_l=0.0, spread_l=26, clav_l=14, clav_r=14)
+    flung = snap.but(look=(0, 32), hand_r=(-1.58, -0.3, 3.22), hand_l=(1.58, -0.3, 3.22), jaw=26)
+    sag = st.but(lean=28, neck=-24, look=(0, -10), pelvis=(0.0, 0.22, -0.5), jaw=8,
+                 hand_r=(-0.55, -0.55, 1.75), hand_dir_r=_n((0.0, -0.3, -0.95)), fist_r=0.1,
+                 hand_l=(0.55, -0.55, 1.78), hand_dir_l=_n((0.0, -0.3, -0.95)), fist_l=0.1,
+                 knee_l=(0.2, -1.0, -0.1), knee_r=(-0.2, -1.0, -0.1))
+    down = _kneeling(rig).but(lean=22, neck=0)
+    keys = [(0.0, st, 'out'), (0.14, snap, 'out'), (0.34, flung, 'inout'), (0.72, sag, 'in'),
+            (1.0, down, 'out'), (1.5, _kneeling(rig), 'linear')]
+    return keyed(keys), 1.5
+
+
+def kneel_loop(rig, period=4.0):
+    """Held on his knees while the fetters' grace lasts: slow breaths, the bowed head
+    swaying a little."""
+    def fn(t):
+        u = TAU * t / period
+        return _kneeling(rig, breath=math.sin(u * 2), sway=math.sin(u))
+    return fn
+
+
 CATALOG = [
     ('Idle', lambda r: (idle(r), 4.0), True),
     ('Walk', lambda r: (gait(r, WALK_PERIOD, WALK_HALF, WALK_STANCE, 0.22), WALK_PERIOD), True),
@@ -166,6 +213,8 @@ CATALOG = [
     ('Attack2', attack2, False),
     ('Hit', hit, False),
     ('Death', death, False),
+    ('Kneel', kneel, False),
+    ('KneelLoop', lambda r: (kneel_loop(r), 4.0), True),
 ]
 
 

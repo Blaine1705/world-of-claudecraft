@@ -539,8 +539,11 @@ describe('a death burst ring fills on its own mob fuse', () => {
     // The Rime Whelp's Hoarfrost Pop goes off at once: it paints no ring, so
     // it never steers a ring's fuse (a ring that names it still reads the
     // nearest DELAYED burst, never a zero fuse).
+    // (Read at the Splinter's radius: the Barnacle Crawler's Brine Burst is a
+    // delayed trash-kit burst too now, nearer a 3 yd ring.)
     expect(MOBS.rime_whelp?.trashKit?.deathBurst?.delay).toBe(0);
-    expect(burstDelayForRadius(3, MOBS.rime_whelp?.name)).toBe(splinter?.delay);
+    expect(burstDelayForRadius(splinter?.radius ?? 0, MOBS.rime_whelp?.name)).toBe(splinter?.delay);
+    expect(burstDelayForRadius(3, MOBS.rime_whelp?.name)).toBeGreaterThan(0);
   });
 
   it('fills the ring from empty to full over its fuse, clamped', () => {

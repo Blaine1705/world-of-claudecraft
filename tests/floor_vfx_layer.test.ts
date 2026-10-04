@@ -194,6 +194,18 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // cones, rings, lanes and glyphs through the shared kit below).
   { file: 'src/render/sunken_bastion/bastion_boss_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/sunken_bastion/bastion_creature_fx.ts', layer: 'encounter', strict: true },
+  // The Bastion trash mechanics: the shock rings and standing volumes (the
+  // ward, the shroud, the column, the soul light) on the shared kit, the
+  // boathook's glint, the Fog Bank's floor patch, the Brine Column's foam
+  // ring and poured stream.
+  { file: 'src/render/sunken_bastion/bastion_trash_fx_kit.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/sunken_bastion/bastion_boathook_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/sunken_bastion/bastion_fog_bank_fx.ts', layer: 'encounter', strict: true },
+  {
+    file: 'src/render/sunken_bastion/bastion_brine_column_fx.ts',
+    layer: 'encounter',
+    strict: true,
+  },
   // Olen's brine, Sentence column and bubble; Vael's staging pillar; the
   // Mooring Post lamps' safe rings (their lamplight pool sits on the ground rung).
   { file: 'src/render/sunken_bastion/bastion_olen_fx.ts', layer: 'encounter', strict: true },
@@ -211,6 +223,13 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The shared dungeon floor telegraph (the crypt's and the Bastion's cones,
   // rings, lanes and kick glyphs, and their edge curtains).
   { file: 'src/render/floor_telegraph/telegraph_kit.ts', layer: 'encounter', strict: true },
+  // The Hollow Crypt trash mechanics pass's hero effects: the bone pile's glow,
+  // the rupture crater and pool, the crush crack, the web net and the burning
+  // embers (floor bodies under the telegraph rungs), their shockwaves, and the
+  // particles, glyphs and tethers over them. The host owns every rung
+  // (KIT_STEPS); its parts, crypt_bone_fx.ts and crypt_mark_fx.ts, build their
+  // pieces through it and set no order of their own.
+  { file: 'src/render/hollow_crypt/crypt_trash_kit_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_forge_wave.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_frontal_telegraph.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_soak_telegraph.ts', layer: 'encounter', strict: true },

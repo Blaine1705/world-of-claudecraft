@@ -190,6 +190,9 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/sunken_bastion/bastion_rain.ts': 1,
   'src/render/sunken_bastion/bastion_shore.ts': 1,
   'src/render/sunken_bastion/bastion_sky_sea.ts': 5,
+  // The trash mechanics' shell program: the fresnel, the ward's sweep and the
+  // band's core, each clamped to [0, 1].
+  'src/render/sunken_bastion/bastion_trash_fx_kit.ts': 3,
   'src/render/sunken_bastion/bastion_water.ts': 2,
   'src/render/wildheart_basin/basin_air.ts': 1,
   'src/render/wildheart_basin/basin_boss_fx.ts': 5,

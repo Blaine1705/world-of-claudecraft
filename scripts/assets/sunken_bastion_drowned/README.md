@@ -52,7 +52,10 @@ nothing here runs in the build or the game.
   Chanter's builder: a starved body (ribs, spine knobs, the belly fallen in), the drowned grin, a
   long weed mane grown with the head, rag breeches, and the irons (`build_irons`: manacles, collar
   and ankle shackle with snapped chains, rigid on their bones); `clips.py` has Idle, Walk (the
-  dragging lurch), Run, Attack, Attack2, Hit, Death.
+  dragging lurch), Run, Attack, Attack2, Hit, Death, Kneel (Snapped Fetters: the arms flung wide as
+  the chains break, then down on his knees, 1.5 s) and KneelLoop (held on his knees, a 4 s loop).
+  Kneel and KneelLoop were added to the shipped GLB with `kit/reclip.py` on the baked .blend and
+  `kit/splice_clips.mjs` (below), so its meshes and KTX2 textures are byte-for-byte the old ones.
 - `turnkey/`: the Gaol Turnkey (`public/models/creatures/gaol_turnkey.glb`), grown from the Sergeant's
   builder: a bloated jailer (the gut, swollen bare arms), a studded jerkin, an apron (the front panel
   only), the executioner's hood (grown with the head, its cape on `hood_weights`), the collar and the
@@ -106,6 +109,17 @@ node scripts/build_media_manifest.mjs generate
 Quick clay look (no bake): add `--k 1.6 --nobake`. Reviews:
 `blender -b x.blend --python ../kit/review.py -- <out> views|closeup|checks|analyze --builder <abs>/revenant [--knight knight.glb]`.
 Anchors: `blender -b x.blend --python anchors.py -- <abs>/revenant`.
+
+New clips on an already-shipped creature without re-encoding its textures: re-key them on the
+baked .blend (`reclip.py`), then splice only those clips into the shipped GLB (its meshes and KTX2
+images are kept as they are; the new clips are resampled like `ship.mjs` does), and regenerate the
+media manifest:
+
+```
+blender -b x.blend --python ../kit/reclip.py -- <abs>/prisoner Kneel,KneelLoop <abs>/raw.glb
+node scripts/assets/sunken_bastion_drowned/kit/splice_clips.mjs public/models/creatures/drowned_prisoner.glb <abs>/raw.glb Kneel,KneelLoop <abs>/out.glb
+node scripts/build_media_manifest.mjs generate
+```
 
 Posing aids in `kit/`: `probe_aim.py` (which weapon directions a key pose can reach),
 `hand_frame_probe.py` (the rest-space directions a posed fist turns onto given world

@@ -776,7 +776,7 @@ import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
-import { bastionShadeGhosted } from './sunken_bastion/bastion_shade_ghost_core';
+import { bastionShadeGhosted, bastionSwell } from './sunken_bastion/bastion_shade_ghost_core';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -9923,7 +9923,7 @@ export class Renderer {
       const _stealthed = hasStealth;
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
-      const displayScale = e.scale;
+      const displayScale = e.scale * bastionSwell(e); // a fed Barnacle Crawler swells
       if (displayScale !== v.liveScale) {
         v.liveScale = displayScale;
         v.group.scale.setScalar(displayScale);

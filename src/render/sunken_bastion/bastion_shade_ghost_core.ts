@@ -4,8 +4,14 @@
 // the renderer turns that shade's whole body see-through (the character ghost
 // treatment, through its gated swap), so the real Vael, who never ghosts,
 // stands out. Pure: renderer.ts asks it per body.
+//
+// The renderer's other per-body Bastion read rides this module too:
+// bastionSwell, the drawn scale of a Barnacle Crawler fed by Carrion Glut
+// (its plan and its memory live in bastion_trash_fx_core.ts).
 
 import { FOG_SHADE_ID, VAEL_SHADE_HOLLOW } from '../../sim/encounters/sunken_bastion/ids';
+
+export { bastionSwell } from './bastion_trash_fx_core';
 
 export function bastionShadeGhosted(e: {
   templateId: string;

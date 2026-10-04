@@ -64,17 +64,20 @@ import {
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import {
+  BASTION_BOATHOOK,
   BASTION_BRINE_MEND,
   BASTION_CLAW_SWEEP,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
   BASTION_PIERCING_BOLT,
   BASTION_SHELL_SLAM,
+  BASTION_SNAPPED_FETTERS,
 } from '../../sim/mob/trash_kit/bastion_cast_ids';
 import {
   CRYPT_BARROWFLAME_BREATH,
   CRYPT_GRAVE_BOLT,
   CRYPT_GRAVE_CLEAVE,
+  CRYPT_MARROW_CRUSH,
   CRYPT_MURDER_CALL,
   CRYPT_PERCH_DIVE,
   CRYPT_RAISE_BONES,
@@ -158,6 +161,10 @@ import {
   OLEN_SHIELD_CATCH_GESTURE,
   OLEN_SHIELD_HOME_GESTURE,
 } from '../sunken_bastion/bastion_olen_fx_core';
+import {
+  BASTION_FETTERS_KNEEL_GESTURE,
+  BASTION_PACK_HOWL_GESTURE,
+} from '../sunken_bastion/bastion_trash_fx_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { BoneDialDef } from './bone_dials';
 import type { ClipTrackDrops } from './clip_track_drops';
@@ -202,6 +209,11 @@ export interface ClipMap {
   /** The dazed loop a standing body holds while a stun rides it, in place of
    *  `idle` / `combatIdle` (stun_idle_core.ts). Absent = it stands in its idle. */
   stunned?: string;
+  /** Loops a standing body holds in place of `idle` / `combatIdle` while it
+   *  wears one of these aura ids (aura id to clip; stun_idle_core.ts
+   *  auraHeldClip): the Shackled Prisoner kneeling while its Snapped Fetters
+   *  hold. Checked before `stunned`. Absent = no aura-held pose. */
+  heldByAura?: Readonly<Record<string, string>>;
   /** The loop a rooted body holds while it turns in place to face a new target,
    *  in place of `idle` / `combatIdle` (turn_in_place_core.ts; pair it with
    *  VisualDef.turnRate). Absent = it turns in its idle. */
@@ -3884,6 +3896,27 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
+  // Reassemble's Stirring Bones (crypt_bone_pile): the pile IS the fallen
+  // warrior's own corpse, so this draws no body; its click capsule, widened so
+  // the pile is easy to target over the corpse, nameplate and bar stay. The
+  // soul-green countdown glow and the tether are hollow_crypt/crypt_bone_fx.ts.
+  // When the bones stand, the warrior's own rig plays its flourish
+  // (Skeletons_Awaken_Standing) on the dead-to-alive edge (CharacterVisual.revive).
+  crypt_skel_bone_pile: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    height: 1.4,
+    // Bound from the warrior GLB alone (no hit-variety pack: it is never seen).
+    clips: {
+      idle: 'Lie_Idle',
+      walk: 'Lie_Idle',
+      run: 'Lie_Idle',
+      attack: [],
+      hit: ['Hit_A'],
+      death: 'Death_A',
+    },
+    bodyless: true,
+    clickRadius: 2,
+  },
   crypt_skel_adept: {
     url: `${ENEMIES}/skeleton_mage.glb`,
     animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
@@ -3928,13 +3961,21 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
+  // The Bone Brute's Marrow Crush heaves the golem's two-fist slam over its
+  // 2 s bar, locked to it: Golem_Slam's fists strike the floor 1.1 s in, so at
+  // 0.55 the strike lands on the bar's end (castClipSync), and the recovery
+  // plays out after it.
   crypt_skel_brute: {
     url: `${ENEMIES}/skeleton_golem.glb`,
     height: 4.6,
     clips: {
       ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
       attack: ['Golem_Slam'],
+      castByAbility: { [CRYPT_MARROW_CRUSH]: 'Golem_Slam' },
+      castTimeScaleByAbility: { [CRYPT_MARROW_CRUSH]: 0.55 },
+      castPlayOut: ['Golem_Slam'],
     },
+    castClipSync: [CRYPT_MARROW_CRUSH],
     animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
     weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
     tint: 'entity',
@@ -4189,7 +4230,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // lantern at the hip. He stands at attention with the pole upright, thrusts
   // and chops with both hands, and the Halberd Sweep winds the pole back
   // through the bar and lands the sweep as it ends (1.575 s at 1.05x = the 1.5 s
-  // bar), the follow-through playing out after.
+  // bar), the follow-through playing out after. The Boathook Drag's 2 s bar
+  // plays the thrust at 0.32x, locked to the bar: the pole drawn back, driven
+  // out at 1.56 s and held at full reach as the hook flies at the bar's end
+  // (sunken_bastion/bastion_boathook_fx.ts), the recovery playing out after.
   bastion_skel_watchman: {
     url: `${CREATURES}/drowned_watchman.glb`,
     height: 4.9,
@@ -4203,10 +4247,11 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
       // The pole is drawn back through the bar and sweeps as it ends.
-      castByAbility: { [BASTION_HALBERD_SWEEP]: 'HalberdSweep' },
-      castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 1.05 },
-      castPlayOut: ['HalberdSweep'],
+      castByAbility: { [BASTION_HALBERD_SWEEP]: 'HalberdSweep', [BASTION_BOATHOOK]: 'Attack' },
+      castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 1.05, [BASTION_BOATHOOK]: 0.32 },
+      castPlayOut: ['HalberdSweep', 'Attack'],
     },
+    castClipSync: [BASTION_BOATHOOK],
     walkRef: 1.45,
     runRef: 6.33,
     authoredAtlas: true,
@@ -4546,7 +4591,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // barnacled and hung with kelp. Its Lunge flies in the Leap pose (held while
   // airborne) and lands on Land; Attack is a lunging bite with a tearing
   // shake, Attack2 rears up and slams both forepaws down; Howl is its
-  // flourish. walkRef/runRef are the clips' own foot speeds at the drawn size.
+  // flourish, and Pack Frenzy plays it through the gesture hook when a fallen
+  // packmate quickens it (sunken_bastion/bastion_trash_fx.ts). walkRef/runRef
+  // are the clips' own foot speeds at the drawn size.
   bastion_warhound: {
     url: `${CREATURES}/bastion_warhound.glb`,
     height: 3.55,
@@ -4561,6 +4608,8 @@ export const VISUALS: Record<string, VisualDef> = {
       land: 'Land',
       stunned: 'Stunned',
       flourish: 'Howl',
+      attackByAbility: { [BASTION_PACK_HOWL_GESTURE]: 'Howl' },
+      attackTimeScaleByAbility: { [BASTION_PACK_HOWL_GESTURE]: 1 },
     },
     walkRef: 2.22,
     runRef: 8.07,
@@ -4573,7 +4622,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // over a grinning drowned face, rag breeches, iron manacles, collar and an
   // ankle shackle with their chains snapped short. Hunched and twitching, he
   // lurches dragging the shackled foot and fights like a cornered animal: both
-  // fists hammered down (Attack), a lunge for the throat (Attack2).
+  // fists hammered down (Attack), a lunge for the throat (Attack2). When his
+  // chains snap (Snapped Fetters) he flings his arms wide and drops to his
+  // knees (Kneel, through the gesture hook) and holds there (KneelLoop, held
+  // while the aura lasts) until he leaves the world.
   bastion_prisoner: {
     url: `${CREATURES}/drowned_prisoner.glb`,
     height: 4.6,
@@ -4584,6 +4636,9 @@ export const VISUALS: Record<string, VisualDef> = {
       attack: ['Attack', 'Attack2'],
       hit: ['Hit'],
       death: 'Death',
+      attackByAbility: { [BASTION_FETTERS_KNEEL_GESTURE]: 'Kneel' },
+      attackTimeScaleByAbility: { [BASTION_FETTERS_KNEEL_GESTURE]: 1 },
+      heldByAura: { [BASTION_SNAPPED_FETTERS]: 'KneelLoop' },
     },
     walkRef: 1.21,
     runRef: 5.7,
@@ -6195,6 +6250,7 @@ const MOB_KEYS: Record<string, string> = {
   crypt_shambler: 'skel_rogue',
   // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
   crypt_ossuary_warrior: 'crypt_skel_warrior',
+  crypt_bone_pile: 'crypt_skel_bone_pile',
   crypt_gravecaller_adept: 'crypt_skel_adept',
   crypt_ossuary_cutthroat: 'crypt_skel_cutthroat',
   crypt_gravecaller_necromancer: 'crypt_skel_necromancer',

@@ -13,6 +13,7 @@
 
 /** The aura facts this reads: a structural subset of a sim `Aura`. */
 export interface StunAuraFact {
+  id?: string;
   kind?: string;
   remaining?: number;
 }
@@ -32,6 +33,26 @@ export function stunIdleClip(
   for (let i = 0; i < auras.length; i++) {
     const a = auras[i];
     if (a.kind && DAZED_KINDS.has(a.kind) && (a.remaining ?? 1) > 0) return clip;
+  }
+  return null;
+}
+
+/**
+ * The loop a body holds while it wears one of the auras its ClipMap names in
+ * `heldByAura` (aura id to clip: the Shackled Prisoner kneeling while its
+ * Snapped Fetters hold), or null. Same contract as the dazed loop: only what
+ * the idle states resolve to changes. Allocation-free.
+ */
+export function auraHeldClip(
+  held: Readonly<Record<string, string>> | undefined,
+  auras: readonly StunAuraFact[] | undefined,
+): string | null {
+  if (!held || !auras || auras.length === 0) return null;
+  for (let i = 0; i < auras.length; i++) {
+    const a = auras[i];
+    if (!a.id || (a.remaining ?? 1) <= 0) continue;
+    const clip = held[a.id];
+    if (clip) return clip;
   }
   return null;
 }

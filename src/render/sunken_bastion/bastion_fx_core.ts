@@ -7,8 +7,11 @@
 
 import { MOBS } from '../../sim/data';
 import {
+  BASTION_BOATHOOK,
+  BASTION_BRINE_COLUMN,
   BASTION_BRINE_MEND,
   BASTION_CLAW_SWEEP,
+  BASTION_FOG_BANK,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
   BASTION_PIERCING_BOLT,
@@ -55,6 +58,7 @@ function cone(templateId: string): { range: number; arcDeg: number } {
 export function bastionTelegraphSpecs(): Readonly<Record<string, BastionTelegraphSpec>> {
   const slam = MOBS.turretback_hermit?.trashKit?.wingGust;
   const bolt = MOBS.fogbound_arbalest?.trashKit?.line;
+  const hook = MOBS.drowned_watchman?.trashKit?.hook;
   return {
     [BASTION_HALBERD_SWEEP]: {
       shape: 'cone',
@@ -80,6 +84,16 @@ export function bastionTelegraphSpecs(): Readonly<Record<string, BastionTelegrap
       halfWidth: bolt?.halfWidth ?? 1,
       color: BASTION_TELEGRAPH_COLORS.physical,
     },
+    // The Drowned Watchman's Boathook Drag: the lane its hook flies down,
+    // locked on its facing (physical: step out of it).
+    [BASTION_BOATHOOK]: {
+      shape: 'lane',
+      range: hook?.length ?? 0,
+      arcDeg: 0,
+      halfWidth: hook?.halfWidth ?? 1,
+      color: BASTION_TELEGRAPH_COLORS.physical,
+      accent: TELEGRAPH_ACCENTS.brine,
+    },
     // The kickable casts mark their caster (a glyph turning under its feet).
     [BASTION_BRINE_MEND]: {
       shape: 'sigil',
@@ -94,6 +108,22 @@ export function bastionTelegraphSpecs(): Readonly<Record<string, BastionTelegrap
       arcDeg: 360,
       color: BASTION_TELEGRAPH_COLORS.ward,
       accent: TELEGRAPH_ACCENTS.frost,
+    },
+    // The Mist Chanter's Fog Bank and the Tidebound Acolyte's Brine Column:
+    // kick the caster.
+    [BASTION_FOG_BANK]: {
+      shape: 'sigil',
+      range: 2,
+      arcDeg: 360,
+      color: BASTION_TELEGRAPH_COLORS.ward,
+      accent: TELEGRAPH_ACCENTS.frost,
+    },
+    [BASTION_BRINE_COLUMN]: {
+      shape: 'sigil',
+      range: 2,
+      arcDeg: 360,
+      color: BASTION_TELEGRAPH_COLORS.heal,
+      accent: TELEGRAPH_ACCENTS.brine,
     },
   };
 }
@@ -120,24 +150,4 @@ export function bastionConeFan(
     out.push([Math.sin(a) * range, Math.cos(a) * range]);
   }
   return out;
-}
-
-/** The Barnacle Crawler's Brine Burst: its radius and fuse, from the template. */
-export function brineBurstSpec(): { radius: number; delay: number } {
-  const d = MOBS.barnacle_crawler?.deathThroes;
-  return { radius: d?.radius ?? 0, delay: d?.delay ?? 0 };
-}
-
-/** Seconds the burst flash lingers after the fuse. */
-export const BRINE_BURST_FLASH = 0.45;
-
-/** The burst's phase `elapsed` seconds after the crawler fell. */
-export function brineBurstPhase(
-  elapsed: number,
-  delay: number,
-): { stage: 'fuse' | 'flash' | 'done'; fill: number } {
-  if (elapsed < delay) return { stage: 'fuse', fill: delay > 0 ? elapsed / delay : 1 };
-  if (elapsed < delay + BRINE_BURST_FLASH)
-    return { stage: 'flash', fill: (elapsed - delay) / BRINE_BURST_FLASH };
-  return { stage: 'done', fill: 1 };
 }

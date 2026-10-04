@@ -123,7 +123,7 @@ import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { stoneboundShellStyle } from './stonebound_shell_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
-import { stunIdleClip } from './stun_idle_core';
+import { auraHeldClip, stunIdleClip } from './stun_idle_core';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
 import { warriorActionBlend } from './warrior_action_blend';
@@ -1123,7 +1123,11 @@ export class CharacterVisual {
     // A rooted body turning in place to face its target (the Gorgebloom) holds
     // its turn loop the same way.
     const turnIdle = this.turnIdle(dt, s);
-    const stunIdle = stunIdleClip(this.def.clips.stunned, s.auras) ?? turnIdle;
+    // An aura-held pose (the freed prisoner's kneel, ClipMap.heldByAura) rides it too.
+    const stunIdle =
+      auraHeldClip(this.def.clips.heldByAura, s.auras) ??
+      stunIdleClip(this.def.clips.stunned, s.auras) ??
+      turnIdle;
     const stunIdleChanged =
       stunIdle !== this.stunIdle && (this.baseState === 'idle' || this.baseState === 'combatIdle');
     this.stunIdle = stunIdle;
@@ -4322,6 +4326,7 @@ function clipMapNames(c: ClipMap): string[] {
     c.idle,
     c.combatIdle,
     c.stunned,
+    ...Object.values(c.heldByAura ?? {}),
     c.turn,
     c.entrance,
     c.prowlIdle,
