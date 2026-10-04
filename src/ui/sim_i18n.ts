@@ -1228,6 +1228,9 @@ const baseEnTable = {
   'aura.bastionCarrionGlut': 'Carrion Glut',
   'aura.bastionFogBank': 'Fog Bank',
   'aura.bastionSnappedFetters': 'Snapped Fetters',
+  // The beast packs' frenzy (mob/lifecycle.ts frenzyPackmates), now on the
+  // Bastion Warhounds too.
+  'aura.packFrenzy': 'Pack Frenzy',
   'mechanic.bastionClawSweep': 'Claw Sweep',
   'mechanic.bastionShellSlam': 'Shell Slam',
   'mechanic.bastionLunge': 'Lunge',
@@ -17832,6 +17835,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Carrion Glut': 'aura.bastionCarrionGlut',
   'Fog Bank': 'aura.bastionFogBank',
   'Snapped Fetters': 'aura.bastionSnappedFetters',
+  'Pack Frenzy': 'aura.packFrenzy',
   'Pyre Strafe': 'mechanic.cryptPyreStrafe',
   // The Sunken Bastion's boss mechanics and auras (encounters/sunken_bastion).
   'Oathbound Charge': 'mechanic.bastionOathboundCharge',

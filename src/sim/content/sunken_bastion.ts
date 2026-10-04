@@ -415,6 +415,8 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     // light leaves its eyes and it stops fighting: it kneels 5 s, untouchable,
     // and leaves (no reward). A test of attention, not of damage.
     trashKit: { unshackle: { name: 'Snapped Fetters', belowHpPct: 0.25, seconds: 5 } },
+    // Damage never takes it below that quarter: a burst cannot skip the release.
+    damageFloorPct: 0.25,
     loot: [{ copper: 12, chance: 1 }],
     scale: 0.9,
     color: 0x9a9480,

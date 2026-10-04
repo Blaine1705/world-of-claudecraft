@@ -19842,19 +19842,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.bastion.anchored':
     '익사의 닻에 묶임: 움직일 수는 있지만 권양기에서 더 멀어질 수는 없으며, 익사의 구덩이로 감겨 갑니다. 걸린 곳에서 {run}야드 이상 떨어진 불 켜진 계류 기둥 {reach}야드 이내로 가면 사슬을 묶을 수 있습니다(그 기둥은 {dark}초 동안 꺼집니다). 아니면 파티가 {links}번 공격해 사슬을 끊어야 합니다(영웅은 {linksHeroic}번). 구덩이에 빠지면 최대 생명력의 {pit}%를 잃습니다(영웅은 {pitHeroic}%).',
   'hudChrome.auraEffect.bastion.brineColumn':
-    '바닷물 기둥에 갇혀 정신 집중이 끝날 때까지 매초 익사합니다. 조수결속 수행사제를 차단하거나 기절시키면 풀려납니다.',
+    '바닷물 기둥에 갇혔습니다: {tick}초마다 {min}~{max}의 자연 피해를 최대 {seconds}초 동안 받습니다. 조수결속 수행사제를 차단하거나 기절시키면 풀려납니다.',
   'hudChrome.auraEffect.bastion.halberdWall':
-    '다른 익사한 파수꾼이 {radius}미터 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 둘을 떼어 놓으세요.',
+    '다른 익사한 파수꾼이 {radius}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 둘을 떼어 놓으세요.',
   'hudChrome.auraEffect.bastion.fogShroud':
     '안개 장막 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 안개 밖으로 끌어내세요.',
   'hudChrome.auraEffect.bastion.carrionGlut':
-    '시체를 먹었습니다({stacks}): 중첩마다 소금물 폭발 범위가 {radius}미터 넓어지고 {pct}% 강해집니다.',
+    '시체를 먹었습니다({stacks}/{max}): 중첩마다 소금물 폭발 범위가 {radius}야드 넓어지고 {pct}% 강해집니다.',
   'hudChrome.auraEffect.bastion.snappedFetters':
     '사슬이 끊어졌습니다. 더 이상 싸우지 않고, 피해를 입지 않으며, 곧 떠납니다.',
   'hudChrome.auraEffect.crypt.carrionEye':
     '전투 중인 모든 까마귀가 {seconds}초 동안 당신을 노립니다. 탱커에게 달려가 무리를 한꺼번에 처치하세요.',
   'hudChrome.auraEffect.crypt.graniteSkin':
-    '받는 피해가 {pct}% 감소하며, 돌이 {every}초마다 두꺼워집니다. 기절시키면 부서져 받는 피해가 {cracked}% 증가합니다.',
+    '받는 피해가 {pct}% 감소하며, 돌이 {every}초마다 두꺼워집니다(최대 {max}겹). 기절시키면 부서져 {seconds}초 동안 받는 피해가 {cracked}% 증가합니다.',
   'hudChrome.bastionChain.shackledTitle': '{name} 님과 족쇄로 묶임',
   'hudChrome.bastionChain.shackledLine': '서로 {range}야드 이내에 머무르세요 (현재 {dist}야드)',
   'hudChrome.bastionChain.strainedLine':

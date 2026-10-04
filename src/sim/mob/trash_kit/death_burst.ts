@@ -79,7 +79,7 @@ export function stepDeathBurst(
 ): boolean {
   const def = kit.deathBurst;
   if (!def) return false;
-  // A fed burst grows with its stacks (the Barnacle Crawler's Gorged).
+  // A fed burst grows with its stacks (the Barnacle Crawler's Carrion Glut).
   const stacks = def.perStack ? (mob.trashLife?.gorge ?? 0) : 0;
   const radius = def.radius + stacks * (def.perStack?.radius ?? 0);
   const grow = 1 + stacks * (def.perStack?.damage ?? 0);

@@ -64,6 +64,9 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.regrown = undefined;
   // A death burst belongs to one life (mob/trash_kit/death_burst.ts).
   mob.deathBurst = undefined;
+  // The trash kit's long-lived state (Reassemble, Carrion Glut, Snapped
+  // Fetters) belongs to the life that ended.
+  mob.trashLife = undefined;
   mob.dead = false;
   mob.lootable = false;
   mob.loot = null;

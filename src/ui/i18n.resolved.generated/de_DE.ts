@@ -3925,16 +3925,16 @@ export const de_DE: EnTranslations = {
         "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
       },
       "bastion": {
-        "brineColumn": "Rooted in a column of sea water and drowning every second until the channel ends. Interrupt or stun the Tidebound Acolyte to break it.",
+        "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
         "halberdWall": "Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.",
         "fogShroud": "Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.",
-        "carrionGlut": "Fed on the dead ({stacks}): each stack makes its Brine Burst {radius} yd wider and {pct}% stronger.",
+        "carrionGlut": "Fed on the dead ({stacks} of {max}): each stack makes its Brine Burst {radius} yd wider and {pct}% stronger.",
         "snappedFetters": "Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.",
         "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
       },
       "crypt": {
         "carrionEye": "Every crow in the fight hunts you for {seconds} sec. Run to your tank so the flock can be cut down together.",
-        "graniteSkin": "Takes {pct}% less damage, and the stone thickens every {every} sec. A stun shatters it and leaves it taking {cracked}% more damage."
+        "graniteSkin": "Takes {pct}% less damage, and the stone thickens every {every} sec, up to {max} layers. A stun shatters it and leaves it taking {cracked}% more damage for {seconds} sec."
       },
       "sanctum": {
         "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",

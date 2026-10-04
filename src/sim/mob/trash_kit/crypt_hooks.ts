@@ -32,8 +32,9 @@ export function boneShrapnel(ctx: SimContext, dead: Entity): number {
   for (const id of inst.mobIds) {
     const m = ctx.entities.get(id);
     if (!m || m.id === dead.id || m.kind !== 'mob' || m.dead || m.hp <= 1) continue;
-    if (!m.hostile || m.ownerId !== null || m.damageImmune) continue;
-    if (MOBS[m.templateId]?.family !== def.family) continue;
+    // Only skeletons in the fight: an unpulled pack is never pre-cut, a boss never.
+    if (!m.hostile || !m.inCombat || m.ownerId !== null || m.damageImmune) continue;
+    if (MOBS[m.templateId]?.family !== def.family || MOBS[m.templateId]?.boss) continue;
     if (dist2d(m.pos, dead.pos) > dt.radius) continue;
     // Never a killing blow, even through a vulnerability on the victim.
     const amount = Math.min(Math.round(m.maxHp * def.maxHpPct), Math.floor((m.hp - 1) / 2));

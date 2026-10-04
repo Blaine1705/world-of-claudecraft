@@ -2,8 +2,8 @@
 // A pure descriptor like the rest of aura_effect.ts (which calls this before
 // the generic kind line): it returns a hudChrome.auraEffect.crypt.* key plus
 // the raw numbers, and the HUD formats the numbers and renders t(key, values).
-// The Carrion Eye rides a slow aura at full speed (a mark, not a slow), so the
-// generic slow line would claim a 0% slow; Granite Skin says its rule (it
+// The Carrion Eye rides a zero vulnerability (a mark), so the generic line
+// would claim 0% more damage taken; Granite Skin says its rule (it
 // thickens on a clock and a stun shatters it). Every number is the template's
 // own (src/sim/content/hollow_crypt_trash.ts), the values combat reads.
 // Pinned by tests/hollow_crypt_trash_mechanics.test.ts.
@@ -29,7 +29,9 @@ export function cryptAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
       nums: {
         pct: pct(a.value),
         every: g?.every ?? 3,
+        max: g?.maxStacks ?? 5,
         cracked: pct(g?.cracked.taken ?? 0.25),
+        seconds: g?.cracked.seconds ?? 6,
       },
     };
   }

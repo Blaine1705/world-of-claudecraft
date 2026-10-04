@@ -572,11 +572,12 @@ export function landEye(
   ctx.applyAura(victim, {
     id: CRYPT_CARRION_EYE,
     name: def.name,
-    // A mark, not a slow: the value leaves the runner at full speed.
-    kind: 'slow',
+    // A mark, not a slow or a curse: a zero vulnerability changes nothing, and
+    // no freedom effect sheds it (the mark lasts as long as the crows hunt).
+    kind: 'vulnerability',
     remaining: def.seconds,
     duration: def.seconds,
-    value: 1,
+    value: 0,
     sourceId: mob.id,
     school: def.school,
   });

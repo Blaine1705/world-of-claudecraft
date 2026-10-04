@@ -47,7 +47,16 @@ export function bastionAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
     };
   }
   if (a.id === BASTION_BRINE_COLUMN && a.kind === 'root') {
-    return { key: `${KEY}.brineColumn`, nums: {} };
+    const col = MOBS.tidebound_acolyte?.trashKit?.column;
+    return {
+      key: `${KEY}.brineColumn`,
+      nums: {
+        min: a.value2 ?? col?.min ?? 0,
+        max: a.value3 ?? col?.max ?? 0,
+        tick: col?.tick ?? 1,
+        seconds: col?.castTime ?? 4,
+      },
+    };
   }
   if (a.id === BASTION_HALBERD_WALL) {
     const wall = MOBS.drowned_watchman?.trashKit?.wall;
@@ -57,11 +66,13 @@ export function bastionAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
     return { key: `${KEY}.fogShroud`, nums: { pct: pct(a.value) } };
   }
   if (a.id === BASTION_CARRION_GLUT) {
-    const burst = MOBS.barnacle_crawler?.trashKit?.deathBurst?.perStack;
+    const kit = MOBS.barnacle_crawler?.trashKit;
+    const burst = kit?.deathBurst?.perStack;
     return {
       key: `${KEY}.carrionGlut`,
       nums: {
         stacks: a.stacks ?? 1,
+        max: kit?.gorge?.maxStacks ?? 3,
         radius: burst?.radius ?? 0,
         pct: pct(burst?.damage ?? 0),
       },

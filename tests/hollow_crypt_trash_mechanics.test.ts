@@ -313,11 +313,15 @@ describe('crypt trash pass: Bone Minion, Splinter Burst', () => {
     const far = engage(r, 'crypt_ossuary_warrior', 5, 12, 'other');
     const frail = engage(r, 'crypt_ossuary_warrior', 4, -1, 'other');
     frail.hp = 3;
+    // An unpulled skeleton in the ring is never pre-cut.
+    const idle = engage(r, 'crypt_ossuary_warrior', 5, 1, 'idle');
+    idle.inCombat = false;
     kill(r, minion);
     const nearBefore = near.hp;
     r.sim.ctx.detonateCorpse(minion);
     expect(nearBefore - near.hp).toBe(Math.round(near.maxHp * shrapnel.maxHpPct));
     expect(far.hp).toBe(far.maxHp);
+    expect(idle.hp).toBe(idle.maxHp);
     expect(frail.dead).toBe(false);
     expect(frail.hp).toBeGreaterThanOrEqual(1);
   });
@@ -416,7 +420,10 @@ describe('crypt trash pass: Crow Caller, Carrion Eye', () => {
     expect(caller.castingAbility).toBe(CRYPT_CARRION_EYE);
     expect(caller.castTargetId).toBe(mage.id);
     run(r, def.castTime + DT, [caller, ...crows]);
-    expect(mage.auras.some((a) => a.id === CRYPT_CARRION_EYE)).toBe(true);
+    const mark = mage.auras.find((a) => a.id === CRYPT_CARRION_EYE);
+    // A mark that changes nothing and no freedom effect sheds (never a slow).
+    expect(mark?.kind).toBe('vulnerability');
+    expect(mark?.value).toBe(0);
     for (const c of crows) {
       expect(c.forcedTargetId).toBe(mage.id);
       expect(c.forcedTargetTimer).toBeGreaterThan(def.seconds - 0.2);
@@ -569,7 +576,7 @@ describe('crypt trash pass: determinism', () => {
 
 describe('crypt trash pass: the marks say their rule', () => {
   it('the Carrion Eye is a hunt, never a 0% slow; Granite Skin says its stone', () => {
-    const eye = auraEffectDescriptor({ id: CRYPT_CARRION_EYE, kind: 'slow', value: 1 });
+    const eye = auraEffectDescriptor({ id: CRYPT_CARRION_EYE, kind: 'vulnerability', value: 0 });
     expect(eye?.key).toBe('hudChrome.auraEffect.crypt.carrionEye');
     expect(eye?.nums?.seconds).toBe(MOBS.crypt_crow_caller.trashKit?.eye?.seconds);
     const skin = auraEffectDescriptor({
@@ -579,6 +586,6 @@ describe('crypt trash pass: the marks say their rule', () => {
       stacks: 3,
     });
     expect(skin?.key).toBe('hudChrome.auraEffect.crypt.graniteSkin');
-    expect(skin?.nums).toEqual({ pct: 18, every: 3, cracked: 25 });
+    expect(skin?.nums).toEqual({ pct: 18, every: 3, max: 5, cracked: 25, seconds: 6 });
   });
 });

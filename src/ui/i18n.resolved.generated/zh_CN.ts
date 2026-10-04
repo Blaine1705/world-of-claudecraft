@@ -3925,16 +3925,16 @@ export const zh_CN: EnTranslations = {
         "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。"
       },
       "bastion": {
-        "brineColumn": "你被困在海水之柱中，每秒都在溺水，直到引导结束。打断或击晕潮缚侍僧即可挣脱。",
+        "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}点自然伤害，最多持续{seconds}秒。打断或击晕潮缚侍僧即可挣脱。",
         "halberdWall": "另一名溺亡守望者在{radius}码内时，受到的伤害降低{pct}%。把它们分开。",
         "fogShroud": "站在雾堤中时，受到的伤害降低{pct}%。把它拖出雾中。",
-        "carrionGlut": "以死者为食（{stacks}）：每层使其盐水爆裂范围扩大{radius}码，伤害提高{pct}%。",
+        "carrionGlut": "以死者为食（{stacks}/{max}）：每层使其盐水爆裂范围扩大{radius}码，伤害提高{pct}%。",
         "snappedFetters": "它的锁链已断。它不再战斗，无法被伤害，并很快离开。",
         "anchored": "被锁在溺亡之锚上：你可以移动，但无法远离绞盘，它会把你绞向溺亡深坑。走到距被钩住处至少{run}码的点亮系泊柱{reach}码以内即可系住锁链（该柱熄灭{dark}秒），或者让队友用{links}次攻击砸断锁链（英雄难度{linksHeroic}次）。掉进深坑会损失{pit}%的最大生命值（英雄难度{pitHeroic}%）。"
       },
       "crypt": {
         "carrionEye": "战斗中的所有乌鸦都会追猎你，持续{seconds}秒。跑向你的坦克，让队伍一起消灭鸦群。",
-        "graniteSkin": "受到的伤害降低{pct}%，石层每{every}秒增厚一次。击晕会将其击碎，使其受到的伤害提高{cracked}%。"
+        "graniteSkin": "受到的伤害降低{pct}%，石层每{every}秒增厚一次，最多{max}层。击晕会将其击碎，使其在{seconds}秒内受到的伤害提高{cracked}%。"
       },
       "sanctum": {
         "lockbound": "受到的伤害降低{pct}%：每条仍然完好的锁链提供{per}%。打破一个封印镣铐即可让其锁链脱落。",

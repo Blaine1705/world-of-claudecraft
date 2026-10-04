@@ -267,6 +267,13 @@ export function stepFallBack(
   if (!def) return false;
   if (st.fall) {
     const f = st.fall;
+    // A stun or a root mid-leap cuts it short: it drops where it is.
+    if (ctx.isStunned(mob) || ctx.isRooted(mob)) {
+      mob.pos.y = groundY(ctx, mob.pos.x, mob.pos.z);
+      st.fall = undefined;
+      ctx.rebucket(mob);
+      return false;
+    }
     f.t += DT;
     const k = Math.min(1, f.t / def.seconds);
     mob.pos.x = f.fromX + (f.toX - f.fromX) * k;
@@ -324,6 +331,10 @@ export function stepGorge(
   if (!def) return 0;
   mob.trashLife ??= {};
   const life = mob.trashLife;
+  // The stacks ride their marker aura: an evade's reset (or anything else
+  // that strips it) forgets the feast, so a re-pulled crawler bursts small.
+  if ((life.gorge ?? 0) > 0 && !mob.auras.some((a) => a.id === BASTION_CARRION_GLUT))
+    life.gorge = 0;
   const stacks = life.gorge ?? 0;
   if (stacks >= def.maxStacks) return stacks;
   let feeding = false;
@@ -486,6 +497,7 @@ export function lockColumn(
   if (!def || !target) return;
   mob.channeling = true;
   st.column = { victimId: target.id, tick: def.tick };
+  const mult = mob.mechanicDamageMult ?? 1;
   ctx.applyAura(target, {
     id: def.castId,
     name: def.name,
@@ -493,6 +505,9 @@ export function lockColumn(
     remaining: def.castTime,
     duration: def.castTime,
     value: 0,
+    // The drowning roll the channel ticks (its tooltip reads them).
+    value2: Math.max(1, Math.round(def.min * mult)),
+    value3: Math.max(1, Math.round(def.max * mult)),
     sourceId: mob.id,
     school: def.school,
   });
@@ -611,7 +626,10 @@ export function stepUnshackle(
     ctx.dropEntity(mob.id);
     return true;
   }
-  if (mob.maxHp <= 0 || mob.hp / mob.maxHp > def.belowHpPct || !mob.inCombat) return false;
+  // The template's damage floor holds it at this share (MobTemplate.damageFloorPct),
+  // so a burst can never skip the release: read the same rounded line.
+  if (mob.maxHp <= 0 || mob.hp > Math.ceil(mob.maxHp * def.belowHpPct) || !mob.inCombat)
+    return false;
   life.freed = def.seconds;
   if (mob.castingAbility !== null) {
     mob.castingAbility = null;

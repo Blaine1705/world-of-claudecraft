@@ -222,6 +222,19 @@ describe('Bastion trash pass: Fogbound Arbalest, Fall Back', () => {
     );
   });
 
+  it('a stun mid-leap drops it where it is', () => {
+    const r = room();
+    const arb = engage(r, 'fogbound_arbalest', 2, 0);
+    const from = { ...arb.pos };
+    run(r, def.first + DT * 3, [arb]);
+    expect(arb.trashKit?.fall).toBeDefined();
+    stun(r, arb, 1);
+    run(r, DT, [arb]);
+    expect(arb.trashKit?.fall).toBeUndefined();
+    const moved = Math.hypot(arb.pos.x - from.x, arb.pos.z - from.z);
+    expect(moved).toBeLessThan(def.distance * 0.5);
+  });
+
   it('rooted or stunned, it cannot leap', () => {
     const r = room();
     const arb = engage(r, 'fogbound_arbalest', 2, 0);
@@ -259,6 +272,24 @@ describe('Bastion trash pass: Barnacle Crawler, Carrion Glut', () => {
     expect(dealt).toBeGreaterThanOrEqual(
       Math.round(burst.min * (1 + def.maxStacks * per.damage)) - 1,
     );
+  });
+
+  it('an evade forgets the feast: re-pulled, it bursts at its base size', () => {
+    const r = room();
+    const crab = engage(r, 'barnacle_crawler', 8, 0);
+    const corpse = engage(r, 'bastion_revenant', 9, 1);
+    kill(r, corpse);
+    run(r, def.every * 2 + DT, [crab]);
+    expect(crab.trashLife?.gorge).toBe(2);
+    // The evade's reset strips its auras (mob/locomotion.ts resetEvadingMob).
+    crab.auras = [];
+    corpse.pos = r.sim.ctx.groundPos(corpse.pos.x + 40, corpse.pos.z);
+    run(r, DT, [crab]);
+    expect(crab.trashLife?.gorge).toBe(0);
+    kill(r, crab);
+    run(r, DT, [crab]);
+    const [ring] = objects(r, DEATH_BURST_RING);
+    expect(ring.scale).toBe(burst.radius);
   });
 
   it('a crawler away from the dead never feeds; its burst stays small', () => {
@@ -342,7 +373,9 @@ describe('Bastion trash pass: Tidebound Acolyte, Brine Column', () => {
     expect(aco.castingAbility).toBe(BASTION_BRINE_COLUMN);
     expect(aco.castTargetId).toBe(mage.id);
     expect(aco.channeling).toBe(true);
-    expect(mage.auras.some((a) => a.id === BASTION_BRINE_COLUMN && a.kind === 'root')).toBe(true);
+    const root = mage.auras.find((a) => a.id === BASTION_BRINE_COLUMN && a.kind === 'root');
+    // The root carries the drowning roll it ticks, for its tooltip.
+    expect([root?.value2, root?.value3]).toEqual([def.min, def.max]);
     const before = mage.hp;
     run(r, def.castTime + DT, [aco]);
     const ticks = Math.round(def.castTime / def.tick);
@@ -382,6 +415,16 @@ describe('Bastion trash pass: Shackled Prisoner, Snapped Fetters', () => {
     expect(pris.auras.some((a) => a.id === BASTION_SNAPPED_FETTERS)).toBe(true);
     run(r, def.seconds, [pris]);
     expect(r.sim.ctx.entities.has(pris.id)).toBe(false);
+  });
+
+  it('a burst cannot kill it past the release: damage stops at the quarter', () => {
+    const r = room();
+    const pris = engage(r, 'shackled_prisoner', 2, 0);
+    r.sim.ctx.dealDamage(r.me, pris, pris.maxHp * 4, false, 'physical', 'test', 'hit');
+    expect(pris.dead).toBe(false);
+    expect(pris.hp).toBe(Math.ceil(pris.maxHp * def.belowHpPct));
+    run(r, DT, [pris]);
+    expect(pris.auras.some((a) => a.id === BASTION_SNAPPED_FETTERS)).toBe(true);
   });
 
   it('a freed pack prisoner counts as cleared for its gate', () => {
@@ -430,9 +473,18 @@ describe('Bastion trash pass: determinism', () => {
 
 describe('Bastion trash pass: the marks say their rule', () => {
   it('each trash mark has its own line, numbers from the templates', () => {
-    expect(auraEffectDescriptor({ id: BASTION_BRINE_COLUMN, kind: 'root', value: 0 })?.key).toBe(
-      'hudChrome.auraEffect.bastion.brineColumn',
-    );
+    expect(
+      auraEffectDescriptor({
+        id: BASTION_BRINE_COLUMN,
+        kind: 'root',
+        value: 0,
+        value2: 162,
+        value3: 234,
+      }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.bastion.brineColumn',
+      nums: { min: 162, max: 234, tick: 1, seconds: 4 },
+    });
     expect(
       auraEffectDescriptor({ id: BASTION_HALBERD_WALL, kind: 'shield_wall', value: 0.25 })?.nums,
     ).toEqual({ pct: 25, radius: 5 });
@@ -442,7 +494,7 @@ describe('Bastion trash pass: the marks say their rule', () => {
     expect(
       auraEffectDescriptor({ id: BASTION_CARRION_GLUT, kind: 'buff_dr', value: 0, stacks: 2 })
         ?.nums,
-    ).toEqual({ stacks: 2, radius: 1.25, pct: 40 });
+    ).toEqual({ stacks: 2, max: 3, radius: 1.25, pct: 40 });
     expect(
       auraEffectDescriptor({ id: BASTION_SNAPPED_FETTERS, kind: 'buff_dr', value: 0 })?.key,
     ).toBe('hudChrome.auraEffect.bastion.snappedFetters');
