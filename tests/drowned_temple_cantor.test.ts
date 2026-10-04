@@ -357,15 +357,20 @@ describe('the follow', () => {
   }, 180_000);
 
   it('the catch-up point never walks back across a jump in the trail', () => {
-    const trail = [
+    const before = [
       { x: 0, y: 0, z: 0 },
       { x: 1.5, y: 0, z: 0 },
-      { x: 50, y: 0, z: 0 },
-      { x: 51.5, y: 0, z: 0 },
     ];
-    const snap = catchUpPoint(trail, { x: 52, y: 0, z: 0 }, 6);
-    expect(snap?.at.x).toBe(50);
-    expect(snap?.rest).toEqual([{ x: 51.5, y: 0, z: 0 }]);
+    // Just past a jump: no trail yet on the near side, so no snap at all.
+    const fresh = [...before, { x: 50, y: 0, z: 0 }, { x: 51.5, y: 0, z: 0 }];
+    expect(catchUpPoint(fresh, { x: 52, y: 0, z: 0 }, 6)).toBeNull();
+    // Once the member has walked on, he lands on the near side, six yards back.
+    const walked = [...before];
+    for (let x = 40; x <= 52; x += 1.5) walked.push({ x, y: 0, z: 0 });
+    const snap = catchUpPoint(walked, { x: 52, y: 0, z: 0 }, 6);
+    expect(snap?.at.x).toBeGreaterThanOrEqual(40);
+    expect(52 - (snap?.at.x ?? 0)).toBeGreaterThanOrEqual(6);
+    expect(snap?.rest.every((c) => c.x > (snap?.at.x ?? 0))).toBe(true);
   });
 
   it('holds a gap behind the member and hurries when far behind', () => {

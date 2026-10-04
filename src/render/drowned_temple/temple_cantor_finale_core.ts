@@ -12,9 +12,11 @@ export const RISE_LEAD_SEC = 1.6;
 /** The window the risings are spread across (the song's first verses). */
 export const RISE_SPREAD_SEC = 16;
 /** Seconds one fallen keeps rising (motes still emitting). */
-export const RISE_EMIT_SEC = 2.4;
+export const RISE_EMIT_SEC = 3;
 /** Motes one fallen sheds over its rise, at full density. */
-export const RISE_MOTES = 34;
+export const RISE_MOTES = 48;
+/** The large slow wisps of one fallen's light (its shape going up whole). */
+export const RISE_WISPS = 7;
 /** Motes per second round the singer, at full density. */
 export const SONG_MOTES_PER_SEC = 9;
 /** The moon's direction from the temple (north, +z), as a drift per second. */
@@ -82,20 +84,44 @@ export function riseMote(spot: RiseSpot, index: number, k: number): MoteLaunch {
   const cool = h3;
   return {
     x: spot.x + Math.cos(ang) * rad,
-    y: spot.y + 0.1 + h3 * 1.6,
+    y: spot.y + 0.1 + h3 * 1.8,
     z: spot.z + Math.sin(ang) * rad,
-    vx: MOON_DRIFT.x + (h2 - 0.5) * 0.4,
-    vy: 2.2 + h1 * 1.6,
-    vz: MOON_DRIFT.z + (h1 - 0.5) * 0.4,
-    ay: 0.35,
-    life: 4.5 + h2 * 2.5,
+    vx: MOON_DRIFT.x + (h2 - 0.5) * 0.5,
+    vy: 3 + h1 * 2.4,
+    vz: MOON_DRIFT.z + (h1 - 0.5) * 0.5,
+    ay: 0.45,
+    life: 6 + h2 * 3,
     drag: 0.05,
-    size0: 0.28 + h3 * 0.22,
-    size1: 0.05,
+    size0: 0.55 + h3 * 0.45,
+    size1: 0.08,
     r: 0.82 - cool * 0.12,
     g: 0.9,
     b: 1,
     a: 0.75,
+  };
+}
+
+/** The k-th large wisp of a rising fallen: a soft body-tall glow that lifts
+ *  slowly and keeps rising toward the moon long after the motes thin out. */
+export function riseWisp(spot: RiseSpot, index: number, k: number): MoteLaunch {
+  const h1 = hash01(index * 197 + 3, k);
+  const h2 = hash01(index * 197 + 5, k * 3 + 1);
+  return {
+    x: spot.x + (h1 - 0.5) * 0.8,
+    y: spot.y + 0.6 + k * 0.35,
+    z: spot.z + (h2 - 0.5) * 0.8,
+    vx: MOON_DRIFT.x,
+    vy: 1.6 + h1 * 0.8,
+    vz: MOON_DRIFT.z * 1.4,
+    ay: 0.25,
+    life: 9 + h2 * 3,
+    drag: 0.02,
+    size0: 2.2 - k * 0.12,
+    size1: 0.5,
+    r: 0.76,
+    g: 0.87,
+    b: 1,
+    a: 0.5,
   };
 }
 

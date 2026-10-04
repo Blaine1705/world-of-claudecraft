@@ -54,7 +54,9 @@ export function needsCatchUp(guide: Vec3, nearest: Vec3, tuning: GuideFollowTuni
 
 /** The trail point `behind` trail yards back from `leader`, never across a
  *  jump; the crumbs after it stay as the trail ahead of the guide. Null when
- *  there is no trail at all (the caller keeps the guide where he is). */
+ *  there is no trail at all, or when a jump (a release run, a teleport) lies
+ *  closer than `behind`: he waits until the member has walked far enough on
+ *  the far side of it, rather than appearing on top of them. */
 export function catchUpPoint(
   trail: readonly Vec3[],
   leader: Vec3,
@@ -66,9 +68,7 @@ export function catchUpPoint(
   for (let i = trail.length - 1; i >= 0; i--) {
     const c = trail[i];
     const seg = dist3(prev, c);
-    if (seg > TRAIL_JUMP && i < trail.length - 1) {
-      return { at: { ...prev }, rest: trail.slice(i + 2) };
-    }
+    if (seg > TRAIL_JUMP && i < trail.length - 1) return null;
     walked += seg;
     if (walked >= behind || i === 0) return { at: { ...c }, rest: trail.slice(i + 1) };
     prev = c;

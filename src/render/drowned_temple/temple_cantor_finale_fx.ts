@@ -21,9 +21,11 @@ import {
   moteBudget,
   RISE_EMIT_SEC,
   RISE_MOTES,
+  RISE_WISPS,
   type RiseSpot,
   riseMote,
   riseSchedule,
+  riseWisp,
   SONG_MOTES_PER_SEC,
   songMote,
 } from './temple_cantor_finale_core';
@@ -70,7 +72,7 @@ export class TempleCantorFinaleFx {
       blending: THREE.AdditiveBlending,
     });
     this.material.name = 'drownedTempleCantorFinaleMotes';
-    this.pool = new ParticlePool(Math.round(1200 * this.density), this.material, 13);
+    this.pool = new ParticlePool(Math.round(1600 * this.density), this.material, 13);
     this.root.add(this.pool.mesh);
   }
 
@@ -118,13 +120,14 @@ export class TempleCantorFinaleFx {
           ay: 0,
           life: 2.2,
           drag: 0.5,
-          size0: 2.6,
-          size1: 0.6,
+          size0: 5,
+          size1: 1.5,
           r: 0.78,
           g: 0.88,
           b: 1,
-          a: 0.55,
+          a: 0.7,
         });
+        for (let k = 0; k < RISE_WISPS; k++) this.emit(riseWisp(r.spot, r.index, k));
       }
       const b = moteBudget(r.debt, dt, perSec);
       r.debt = b.debt;
