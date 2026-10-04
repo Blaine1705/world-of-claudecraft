@@ -1,21 +1,22 @@
 // The HUD's presentation of a dungeon lore guide's line (the view core is
 // dungeon_guide_speech_view.ts): a spoken line is a quiet `say` bubble over
-// the guide plus a `say` chat line under his name; an action line is one chat
-// line in the emote colour. Hud members are private, so this router takes the
-// Hud untyped, like quest_event_router.ts; the members it reads are welded to
-// hud.ts in tests/dungeon_guide_speech.test.ts.
+// the guide plus one `say` chat line ("Laverock says: ..."); an action line is
+// one chat line on the emote channel. Both are plain log lines, never the
+// player-chat sender button (an NPC has no whisper, invite or report menu).
+// Hud members are private, so this router takes the Hud untyped, like
+// quest_event_router.ts; the members it reads are welded to hud.ts in
+// tests/dungeon_guide_ui.test.ts.
 
 import type { SimEvent } from '../../../sim/types';
 import { chatBubbleStyle } from '../../chat_bubble_style';
 import { CHAT_TEMPLATE_KEYS } from '../../chat_template_keys';
-import type { TranslationKey } from '../../i18n';
+import { t } from '../../i18n';
 import { chatChannelColor } from '../chat/chat_channels';
 import { guideLineView } from './dungeon_guide_speech_view';
 
 /** The private Hud members the router drives. */
 interface GuideSpeechHost {
-  log(text: string, color?: string): void;
-  chatLogFrom(name: string, text: string, templateKey: TranslationKey, chan: string): void;
+  log(text: string, color?: string, decorativeIconUrl?: string, channel?: string): void;
   renderer: {
     showChatBubble(
       entityId: number,
@@ -33,10 +34,11 @@ export function applyDungeonGuideSpeech(hud: object, ev: SimEvent): boolean {
   if (!view) return true;
   const h = hud as GuideSpeechHost;
   if (view.emote) {
-    h.log(view.text, chatChannelColor('emote'));
+    h.log(view.text, chatChannelColor('emote'), undefined, 'emote');
     return true;
   }
-  h.chatLogFrom(view.speaker, view.text, CHAT_TEMPLATE_KEYS.say, 'say');
+  const line = t(CHAT_TEMPLATE_KEYS.say, { name: view.speaker, message: view.text });
+  h.log(line, chatChannelColor('say'), undefined, 'say');
   h.renderer.showChatBubble(view.npcId, view.text, chatBubbleStyle('say'));
   return true;
 }

@@ -810,6 +810,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
+  // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
+  'src/render/body_emote_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
   'src/render/far_lod_latch_core.ts',
   // The Hollow Crypt finale's effect plan (Morthen's entrance, the Knellwyrm).

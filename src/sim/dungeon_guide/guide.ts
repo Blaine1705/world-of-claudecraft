@@ -17,6 +17,7 @@ import { DUNGEON_GUIDES, dungeonGuideForNpc } from '../content/dungeon_guides';
 import { DUNGEONS } from '../data';
 import { grantDeed } from '../deeds';
 import { dungeonGateState } from '../instances/dungeon_gates';
+import { instanceClaimHolds } from '../instances/dungeons';
 import { kitHash } from '../mob/trash_kit/targets';
 import { Rng } from '../rng';
 import type { InstanceSlot } from '../sim';
@@ -38,19 +39,19 @@ function originOf(ctx: SimContext, inst: InstanceSlot): { x: number; z: number }
   return ctx.instanceOriginOf(inst);
 }
 
-/** Is a world position inside this claim's slot (the shared claim box)? */
-function inClaim(o: { x: number; z: number }, p: Vec3): boolean {
-  return Math.abs(p.x - o.x) < 120 && Math.abs(p.z - o.z) < 250;
+/** Is a world position inside this claim (the one claim-membership envelope
+ *  every other instance question uses)? */
+function inClaim(inst: InstanceSlot, p: Vec3): boolean {
+  return instanceClaimHolds(inst, p);
 }
 
 /** Every player standing in the claim, dead or alive (who hears him), in
  *  entity-id order. */
 function claimListeners(ctx: SimContext, inst: InstanceSlot): Entity[] {
-  const o = originOf(ctx, inst);
   const out: Entity[] = [];
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
-    if (e && !e.ghost && inClaim(o, e.pos)) out.push(e);
+    if (e && !e.ghost && inClaim(inst, e.pos)) out.push(e);
   }
   return out.sort((a, b) => a.id - b.id);
 }
@@ -355,10 +356,16 @@ function followGroup(
 
 // ---- the finale --------------------------------------------------------------
 
+/** The finale's deed goes to everyone in the claim, and to every member who
+ *  entered this run and is away from it right now (a released spirit running
+ *  back from the graveyard still walked the Temple with him). */
 function grantGuideDeed(ctx: SimContext, view: ClaimView, def: DungeonGuideDef): void {
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
-    if (e && inClaim(view.origin, e.pos)) grantDeed(ctx, meta, def.finale.deedId);
+    if (!e) continue;
+    if (inClaim(view.inst, e.pos) || view.inst.enteredBy.has(meta.entityId)) {
+      grantDeed(ctx, meta, def.finale.deedId);
+    }
   }
 }
 
@@ -447,7 +454,7 @@ export function answerDungeonGuide(
   if (!def) return;
   const inst = claimOfNpc(ctx, npcId);
   if (!inst || inst.dungeonId !== def.dungeonId) return;
-  if (!inClaim(originOf(ctx, inst), r.e.pos)) return;
+  if (!inClaim(inst, r.e.pos)) return;
   if (dist2d(r.e.pos, npc.pos) > GUIDE_ANSWER_RANGE) return;
   const run = ensureRun(def, inst, npc);
   if (run.offer !== 'open' && run.offer !== 'declined') return;

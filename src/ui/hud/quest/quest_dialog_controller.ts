@@ -240,6 +240,7 @@ export class QuestDialogController {
     this.lastIntroHintVisible = null;
     this.lastGossipRowSig = null;
     this.lastClueRowSig = '';
+    this.lastGuideState = null;
     this.deps.hideTooltip();
     this.trap?.release(restoreFocus);
     this.trap = null;

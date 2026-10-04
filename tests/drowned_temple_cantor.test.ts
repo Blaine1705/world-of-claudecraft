@@ -21,7 +21,7 @@ import { DUNGEONS, instanceOrigin, MOBS, NPCS } from '../src/sim/data';
 import { answerDungeonGuide, freshGuideRun } from '../src/sim/dungeon_guide';
 import { catchUpPoint, recordTrail, stepAlongTrail } from '../src/sim/dungeon_guide/follow';
 import { pickLine } from '../src/sim/dungeon_guide/speech';
-import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
+import { claimedInstanceAt, enterDungeon, freeInstance } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent, type Vec3 } from '../src/sim/types';
@@ -625,6 +625,25 @@ describe('the finale', () => {
     expect(r.sim.meta(r.lead.id)?.activeTitle).toBe(CANTOR_DEED_ID);
   }, 180_000);
 
+  it('the deed reaches a member who entered this run but is running back from the graveyard', () => {
+    const r = temple();
+    gather(r);
+    tick(r, 0.2);
+    answerDungeonGuide(r.sim.ctx, r.guide.id, true, r.lead.id);
+    for (const p of [r.lead, ...r.others]) put(r, p, 24, 206);
+    // One member stands far outside the claim (a spirit on its way back).
+    const away = r.others[0];
+    away.pos = { x: 0, y: 0, z: 0 };
+    away.prevPos = { ...away.pos };
+    r.sim.ctx.handleDeath(bossOf(r, 'ysolei'), r.lead);
+    tick(r, 1);
+    expect(r.inst.enteredBy.has(away.id)).toBe(true);
+    expect(r.sim.meta(away.id)?.deedsEarned.has(CANTOR_DEED_ID)).toBe(true);
+    // A stranger who never entered this run gets nothing.
+    const stranger = r.sim.addPlayer('mage', 'Passerby');
+    expect(r.sim.meta(stranger)?.deedsEarned.has(CANTOR_DEED_ID)).toBe(false);
+  }, 180_000);
+
   it('no deed and no finale when the group went alone', () => {
     const r = temple();
     gather(r);
@@ -677,14 +696,17 @@ describe('determinism', () => {
     answerDungeonGuide(r.sim.ctx, r.guide.id, true, r.lead.id);
     tick(r, 2);
     const oldId = r.guide.id;
-    r.sim.chat('/dungeon reset', r.lead.id);
+    // The run ends: the claim is freed (its guide goes with it) and claimed anew.
+    freeInstance(r.sim.ctx, r.inst);
+    expect(r.sim.ctx.entities.has(oldId)).toBe(false);
     r.sim.chat('/dev temple enter normal', r.lead.id);
     const inst = claimedInstanceAt(r.sim.ctx, r.lead.pos);
     const fresh = inst?.npcIds
       .map((id) => r.sim.ctx.entities.get(id))
       .find((e) => e?.templateId === CANTOR_NPC_ID);
     expect(fresh).toBeDefined();
-    if (fresh?.id === oldId) return; // the same claim survived (reset refused): nothing to prove
+    expect(fresh?.id).not.toBe(oldId);
+    expect(fresh?.guideRun).toBeUndefined();
     tick(r, 0.2);
     expect(fresh?.guideState).toBe('open');
     expect(fresh?.guideRun?.done.size).toBe(0);

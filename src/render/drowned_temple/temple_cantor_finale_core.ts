@@ -14,7 +14,7 @@ export const RISE_SPREAD_SEC = 16;
 /** Seconds one fallen keeps rising (motes still emitting). */
 export const RISE_EMIT_SEC = 3;
 /** Motes one fallen sheds over its rise, at full density. */
-export const RISE_MOTES = 48;
+export const RISE_MOTES = 40;
 /** The large slow wisps of one fallen's light (its shape going up whole). */
 export const RISE_WISPS = 7;
 /** Motes per second round the singer, at full density. */

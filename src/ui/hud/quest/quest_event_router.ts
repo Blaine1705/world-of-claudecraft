@@ -33,12 +33,12 @@ interface QuestEventHost {
  *  so the HUD's per-event switch skips it. */
 export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean {
   const h = hud as QuestEventHost;
-  // A read treasure map opens its parchment (a re-read has no log line, so
-  // this runs before the presentation check); an upgrade or a dig repaints it.
   // The two world-quest events that open a window (an investigation's
   // dialogue, the weekly board) carry no presentation of their own.
   if (ev.type === 'worldQuestInvestigationDialogue') h.questDialog.open(ev.targetId);
   else if (ev.type === 'worldQuestWeeklyOpen') h.weeklyQuestsWindow.open();
+  // A read treasure map opens its parchment (a re-read has no log line, so
+  // this runs before the presentation check); an upgrade or a dig repaints it.
   if (ev.type === 'treasureMapRead') h.treasureMapWindow.open();
   else if (ev.type === 'treasureMapUpgraded' || ev.type === 'treasureVaultOpened')
     h.treasureMapWindow.refresh();

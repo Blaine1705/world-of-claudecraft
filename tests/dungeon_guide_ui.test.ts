@@ -89,11 +89,17 @@ describe('a guide line on the HUD', () => {
     const hud = fakeHud();
     expect(applyDungeonGuideSpeech(hud, lineEv('C04'))).toBe(true);
     const text = 'We drank the moon-water from shells like those. Mine I dropped on the stair.';
-    expect(hud.chatLogFrom).toHaveBeenCalledWith('Laverock', text, 'hud.chat.templates.say', 'say');
+    // A plain say line, never the player-chat sender button (no whisper menu).
+    expect(hud.log).toHaveBeenCalledWith(
+      `Laverock says: ${text}`,
+      expect.any(String),
+      undefined,
+      'say',
+    );
+    expect(hud.chatLogFrom).not.toHaveBeenCalled();
     expect(hud.renderer.showChatBubble).toHaveBeenCalledWith(77, text, expect.anything());
     const style = hud.renderer.showChatBubble.mock.calls[0][2];
     expect(style?.yell).not.toBe(true);
-    expect(hud.log).not.toHaveBeenCalled();
   });
 
   it('prints an action line once, with his name and no bubble', () => {
@@ -103,6 +109,7 @@ describe('a guide line on the HUD', () => {
     expect(hud.log.mock.calls[0][0]).toBe(
       'Laverock lifts his voice over the altar, and the lagoon falls still.',
     );
+    expect(hud.log.mock.calls[0][3]).toBe('emote');
     expect(hud.renderer.showChatBubble).not.toHaveBeenCalled();
   });
 
@@ -110,7 +117,7 @@ describe('a guide line on the HUD', () => {
     const hud = fakeHud();
     expect(applyDungeonGuideSpeech(hud, lineEv('Z99'))).toBe(true);
     expect(guideLineView(lineEv('Z99'))).toBeNull();
-    expect(hud.chatLogFrom).not.toHaveBeenCalled();
+    expect(hud.log).not.toHaveBeenCalled();
     expect(applyDungeonGuideSpeech(hud, { type: 'levelup', level: 2 } as SimEvent)).toBe(false);
   });
 
@@ -125,7 +132,7 @@ describe('a guide line on the HUD', () => {
   it('stays welded to the private Hud members it drives', () => {
     const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     for (const anchor of [
-      '  private chatLogFrom(\n    name: string,\n    text: string,\n    templateKey: TranslationKey,\n    chan: string,',
+      '    decorativeIconUrl?: string,\n    channel = ERROR_LOG_CHAN,',
       '    private renderer: Renderer,',
       '  log(\n    // A string body',
       'if (applyDungeonGuideSpeech(this, ev)) continue;',

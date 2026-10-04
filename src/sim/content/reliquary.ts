@@ -457,6 +457,8 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The Clue Scroll tenth-casket title (world quests, Stage 3): Treasure
   // Hunter pages here per the locked titles-page rule.
   'exp_clue_ten_caskets',
+  // The Drowned Temple lore guide's The Last Verse: Witness of the Choir.
+  'dgn_drowned_temple_cantor',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

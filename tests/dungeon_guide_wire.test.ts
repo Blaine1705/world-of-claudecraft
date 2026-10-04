@@ -10,7 +10,7 @@ import { CANTOR_NPC_ID, CANTOR_SPAWN } from '../src/sim/content/drowned_temple_c
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import type { Entity } from '../src/sim/types';
-import { bareClient, fakeWs, joinServer } from './helpers/bare_client';
+import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
 // biome-ignore lint/suspicious/noExplicitAny: the private dispatch seam (loot_roll_wire idiom)
 function sendCmd(server: GameServer, session: any, frame: Record<string, unknown>): void {
@@ -67,6 +67,32 @@ describe('the guide on the wire', () => {
     sendCmd(server, session, { cmd: 'dungeon_guide_answer', npcId: guide.id, accept: true });
     expect(guide.guideState).toBe('joined');
     expect(wireEntity(guide).gds).toBe('joined');
+  });
+
+  it('an answer re-sends the guide record to a member who already knows him', () => {
+    const server = new GameServer();
+    const watcher = fakeWs();
+    const session = joinServer(server, watcher, 804, 'Watcher');
+    const sim = server.sim;
+    enterDungeon(sim.ctx, 'drowned_temple', session.pid);
+    const me = sim.entities.get(session.pid) as Entity;
+    const inst = claimedInstanceAt(sim.ctx, me.pos);
+    if (!inst) throw new Error('no claim');
+    const guide = inst.npcIds
+      .map((id) => sim.entities.get(id))
+      .find((e) => e?.templateId === CANTOR_NPC_ID) as Entity;
+    const o = instanceOrigin(DUNGEONS.drowned_temple.index, inst.slot);
+    me.pos = sim.ctx.groundPos(o.x + CANTOR_SPAWN.x - 2, o.z + CANTOR_SPAWN.z);
+    sim.tick();
+    broadcast(server);
+    // biome-ignore lint/suspicious/noExplicitAny: wire JSON
+    const recordOf = (snap: any) => (snap?.ents ?? []).find((w: any) => w.id === guide.id);
+    expect(recordOf(lastSnap(watcher.sent))?.gds).toBe('open');
+    watcher.sent.length = 0;
+    sendCmd(server, session, { cmd: 'dungeon_guide_answer', npcId: guide.id, accept: true });
+    sim.tick();
+    broadcast(server);
+    expect(recordOf(lastSnap(watcher.sent))?.gds).toBe('joined');
   });
 
   it('every other entity record leaves gds out', () => {

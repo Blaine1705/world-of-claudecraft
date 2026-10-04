@@ -7582,6 +7582,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Treasure Hunter"
+      },
+      {
+        "kind": "title",
+        "name": "Witness of the Choir"
       }
     ]
   },

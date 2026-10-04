@@ -13,6 +13,8 @@
 // mote only when it is born.
 
 import * as THREE from 'three';
+import { CANTOR_GUIDE_ID, CANTOR_NPC_ID } from '../../sim/content/drowned_temple_cantor';
+import { dungeonAt } from '../../sim/data';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { GLOW_FRAG, PARTICLE_VERT, ParticlePool } from '../hollow_crypt/crypt_fx_particles';
@@ -31,8 +33,15 @@ import {
 } from './temple_cantor_finale_core';
 
 const SCAN_SEC = 0.5;
-/** Risings kept at once (a run's fallen number well under this). */
-const MAX_RISES = 96;
+/** Risings kept at once: a full run's fallen (about 35) with room to spare,
+ *  and with the pool below sized so no live mote is ever recycled mid-flight. */
+const MAX_RISES = 48;
+/** The pool: MAX_RISES risings of 1 + RISE_WISPS + RISE_MOTES births each, all
+ *  alive at once in the worst case, plus the song's live motes. */
+const POOL_SIZE = 3200;
+/** The song's motes are born in small batches, a few uploads a second rather
+ *  than one every frame, for as long as he sings. */
+const SONG_BATCH_SEC = 0.5;
 
 interface Rise {
   spot: RiseSpot;
@@ -53,7 +62,10 @@ export class TempleCantorFinaleFx {
   private scan = 0;
   private songDebt = 0;
   private songCount = 0;
+  private songWait = 0;
+  private finaleNpc: number | null = null;
   private clock = 0;
+  private disposed = false;
 
   constructor(
     parent: THREE.Group,
@@ -72,12 +84,16 @@ export class TempleCantorFinaleFx {
       blending: THREE.AdditiveBlending,
     });
     this.material.name = 'drownedTempleCantorFinaleMotes';
-    this.pool = new ParticlePool(Math.round(1600 * this.density), this.material, 13);
+    this.pool = new ParticlePool(Math.round(POOL_SIZE * this.density), this.material, 13);
     this.root.add(this.pool.mesh);
   }
 
   handleEvent(ev: SimEvent): void {
-    if (ev.type !== 'dungeonGuideFinale') return;
+    if (this.disposed || ev.type !== 'dungeonGuideFinale') return;
+    // Laverock's finale only (another guide's finale is not moonlight), once
+    // per song.
+    if (ev.guideId !== CANTOR_GUIDE_ID || ev.npcId === this.finaleNpc) return;
+    this.finaleNpc = ev.npcId;
     const schedule = riseSchedule(ev.spots, this.clock);
     for (let i = 0; i < schedule.length && this.rises.length < MAX_RISES; i++) {
       this.rises.push({ spot: schedule[i], index: i, emitted: 0, debt: 0, flared: false });
@@ -86,6 +102,7 @@ export class TempleCantorFinaleFx {
   }
 
   update(dt: number, clock: number): void {
+    if (this.disposed) return;
     this.clock = clock;
     this.uTime.value = clock;
     this.scan -= dt;
@@ -139,6 +156,11 @@ export class TempleCantorFinaleFx {
   private scanSinger(): void {
     const world = this.world;
     if (!world) return;
+    // Only inside the Drowned Temple is there anyone to find.
+    if (dungeonAt(world.player.pos.x)?.id !== 'drowned_temple') {
+      this.singerId = null;
+      return;
+    }
     if (this.singerId !== null) {
       const e = world.entities.get(this.singerId);
       if (e?.guideState === 'singing') return;
@@ -146,7 +168,7 @@ export class TempleCantorFinaleFx {
     }
     // A late arrival (or a reload) finds him already singing.
     for (const e of world.entities.values()) {
-      if (e.kind === 'npc' && e.guideState === 'singing') {
+      if (e.kind === 'npc' && e.templateId === CANTOR_NPC_ID && e.guideState === 'singing') {
         this.singerId = e.id;
         return;
       }
@@ -157,7 +179,11 @@ export class TempleCantorFinaleFx {
     if (this.singerId === null || !this.world) return;
     const e = this.world.entities.get(this.singerId);
     if (!e || e.guideState !== 'singing') return;
-    const b = moteBudget(this.songDebt, dt, SONG_MOTES_PER_SEC * this.density);
+    this.songWait += dt;
+    if (this.songWait < SONG_BATCH_SEC) return;
+    const span = this.songWait;
+    this.songWait = 0;
+    const b = moteBudget(this.songDebt, span, SONG_MOTES_PER_SEC * this.density);
     this.songDebt = b.debt;
     for (let k = 0; k < b.count; k++) {
       this.emit(songMote(e.pos.x, e.pos.y, e.pos.z, this.songCount++));
@@ -165,6 +191,8 @@ export class TempleCantorFinaleFx {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.root.removeFromParent();
     this.pool.dispose();
     this.material.dispose();

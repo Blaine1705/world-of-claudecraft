@@ -480,7 +480,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // epics, two trinkets): 509.
     // The Gravewyrm Sanctum rework adds five (two heroic epics, three
     // trinkets): 514.
-    expect(full).toEqual({ owned: 514, total: 514 });
+    // The Drowned Temple lore guide's Witness of the Choir title adds one: 515.
+    expect(full).toEqual({ owned: 515, total: 515 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -515,8 +516,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     // 471 with the Sunken Bastion rework's five new relics; 475 with the Drowned
     // Temple rework's four; 480 with the Wildheart Basin rework's five.
-    // 485 with the Gravewyrm Sanctum rework's five.
-    expect(character).toEqual({ owned: 485, total: 485 });
+    // 485 with the Gravewyrm Sanctum rework's five. 486 with the Drowned Temple
+    // lore guide's Witness of the Choir title slot.
+    expect(character).toEqual({ owned: 486, total: 486 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -584,7 +586,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +4: the Drowned Temple rework's new relics on its two pages: 691.
       // +5: the Wildheart Basin rework's new relics on its two pages: 696.
       // +5: the Gravewyrm Sanctum rework's new relics on its heroic page: 701.
-    ).toBe(701);
+      // +1: the Drowned Temple lore guide's title on horizons_titles: 702.
+    ).toBe(702);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -3277,8 +3280,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
   // Crucible raid's flawless title + the three faction standing Champion
-  // titles + the Clue Scroll Treasure Hunter title.
-  horizons_titles: 49,
+  // titles + the Clue Scroll Treasure Hunter title + the Drowned Temple lore
+  // guide's Witness of the Choir.
+  horizons_titles: 50,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

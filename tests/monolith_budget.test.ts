@@ -1010,9 +1010,7 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12663 -> 12661: the boot-attached static dressing list (lake
     // flora, the Farshore strand, now the Sanctum's Seal Gate) moved into
     // src/render/static_world_features.ts. wc -l. Exact count.
-    // LOWERED to 12660 by the Drowned Temple lore guide: the overhead emote
-    // gate now reads any non-mob body (his talk gestures), one line shorter.
-    ceiling: 12660,
+    ceiling: 12661,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
