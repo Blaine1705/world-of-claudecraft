@@ -9,11 +9,16 @@
 // Sweep: standing in the drawn area it landed in 1.5 s, stepping out of it
 // stalled the bar until the target walked back in, so stepping out of a
 // telegraph DELAYED it instead of dodging it. Now a started bar counts down
-// every engaged tick and lands on time whatever the range:
+// on every engaged tick the combat profile runs and lands on time whatever
+// the range (the states that own or freeze a mob's whole tick, a stun, a
+// pin in place, a flee, a charge dash, keep the bar frozen as before):
 //   - a tick that ends in melee runs the full mechanics tail, which ticks the
 //     bar here exactly where it always did (same driver order, same draws);
 //   - any other engaged tick calls tickStartedMobCastBars, which runs only
 //     these in-flight arms, in the same driver order.
+// The rift spacing lock (mechanic_spacing.ts) still advances only in melee,
+// so it can outlast a bar that landed out of melee: the safe direction (the
+// next mechanic waits longer, never lands on top of this one).
 // Inside a dungeon that plants its area casts (DungeonDef.areaCastsPlant) the
 // breath cone's caster is put back on the spot and the facing its bar began
 // with each tick (trash_kit/cast_hold.ts), so it stands its ground through the

@@ -1167,7 +1167,8 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.bigCastTimer = bigCast.every + bigCast.castTime;
         claimMechanicSpacing(mob, bigCast.castTime);
         // The bar is a telegraph: open the escape window to the authored cast
-        // time (a wall-clock deadline; a kite-frozen bar cannot pin it open).
+        // time (a sim-clock deadline that closes on its own, whatever the bar
+        // does).
         openRiftEscapeWindow(ctx, mob, bigCast.castTime);
         mob.castingAbility = bigCast.castId;
         mob.castTotal = bigCast.castTime;
@@ -1269,8 +1270,9 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         // early via tickRiftBossDeathZones while the bar still fills.
         claimMechanicSpacing(mob, maxFuse);
         // The zones detonate on the global fuse clock (tickRiftBossDeathZones)
-        // whatever happens to the melee-gated bar, so the escape window runs to
-        // the LAST possible detonation and then closes on its own.
+        // whatever happens to the bar (a stun or a pin still freezes it), so
+        // the escape window runs to the LAST possible detonation and then
+        // closes on its own.
         openRiftEscapeWindow(ctx, mob, maxFuse);
         mob.castingAbility = def.castId;
         mob.castTotal = maxFuse;

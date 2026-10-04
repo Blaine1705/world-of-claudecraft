@@ -12,6 +12,7 @@ import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { applyDungeonMobTuning } from '../src/sim/instances/difficulty';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
+import { tickStartedMobCastBars } from '../src/sim/mob/mob_cast_bars';
 import { BASTION_HALBERD_SWEEP } from '../src/sim/mob/trash_kit/bastion_cast_ids';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
@@ -229,5 +230,53 @@ describe('the same for a telegraphed hardcast (bigCast) in the open world', () =
     expect(out.hits).toBe(0);
     // Not a planted cast: outside a planting dungeon he keeps chasing.
     expect(out.maxDrift).toBeGreaterThan(5);
+  });
+});
+
+describe('the rift death-zone bar runs out on time out of melee too', () => {
+  const zone = MOBS.rift_boss_ember.deathZoneCast;
+  if (!zone) throw new Error('rift_boss_ember has no deathZoneCast');
+
+  it('a started death-zone bar lands castTime later with the boss chasing, and starts nothing', () => {
+    const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: false });
+    const me = sim.player;
+    const boss = createMob(sim.ctx.nextId++, MOBS.rift_boss_ember, 30, {
+      ...sim.ctx.groundPos(me.pos.x + 30, me.pos.z),
+    });
+    sim.ctx.addEntity(boss);
+    boss.inCombat = true;
+    boss.aiState = 'chase';
+    boss.aggroTargetId = me.id;
+    boss.castingAbility = zone.castId;
+    boss.castTotal = zone.castTime;
+    boss.castRemaining = zone.castTime;
+    const events: SimEvent[] = [];
+    let calls = 0;
+    while (boss.castingAbility === zone.castId && calls < 400) {
+      tickStartedMobCastBars(sim.ctx, boss);
+      events.push(...sim.drainEvents());
+      calls++;
+    }
+    expect(Math.abs(calls * DT - zone.castTime)).toBeLessThanOrEqual(DT + 1e-9);
+    expect(boss.castRemaining).toBe(0);
+    expect(events.some((e) => e.type === 'log' && e.text === zone.detonateText)).toBe(true);
+    // The out-of-melee path only ever lands a started bar: idle, it starts none.
+    boss.deathZoneCastTimer = 0;
+    for (let i = 0; i < 40; i++) tickStartedMobCastBars(sim.ctx, boss);
+    expect(boss.castingAbility).toBeNull();
+  });
+
+  it('a mob that is not in the chase or attack state keeps its bar frozen, as before', () => {
+    const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: false });
+    const boss = createMob(sim.ctx.nextId++, MOBS.rift_boss_ember, 30, {
+      ...sim.ctx.groundPos(sim.player.pos.x + 30, sim.player.pos.z),
+    });
+    sim.ctx.addEntity(boss);
+    boss.aiState = 'flee';
+    boss.castingAbility = zone.castId;
+    boss.castTotal = zone.castTime;
+    boss.castRemaining = zone.castTime;
+    for (let i = 0; i < 100; i++) tickStartedMobCastBars(sim.ctx, boss);
+    expect(boss.castRemaining).toBe(zone.castTime);
   });
 });
