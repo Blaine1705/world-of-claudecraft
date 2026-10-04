@@ -8,6 +8,7 @@
 import type { TrashKitCast, TrashKitDef } from '../../types';
 import type { TrashKitExtension } from './kit_extension';
 import { holdLineAim, lockLineAim } from './support';
+import { WILDHEART_ROAR_FRENZY, WILDHEART_ROAR_HASTE } from './wildheart_cast_ids';
 import {
   dreadReady,
   landDread,
@@ -113,5 +114,14 @@ export const WILDHEART_KIT_EXTENSION: TrashKitExtension = {
     }
     if (w.tongue) stepReel(ctx, mob, kit, st);
     return false;
+  },
+  endPull(_ctx, _inst, mob) {
+    // An evade or a reset ends the frenzy a War Roar left; a pull that only
+    // paused (a fear, a flee) keeps it.
+    if (mob.inCombat && mob.aiState !== 'evade') return;
+    if (mob.auras.some((a) => a.id === WILDHEART_ROAR_FRENZY || a.id === WILDHEART_ROAR_HASTE))
+      mob.auras = mob.auras.filter(
+        (a) => a.id !== WILDHEART_ROAR_FRENZY && a.id !== WILDHEART_ROAR_HASTE,
+      );
   },
 };

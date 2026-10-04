@@ -21,7 +21,8 @@
 //           reeled in to the toad (into its spores, when it is low).
 //
 // Zero rng in every pick (hashed victims, mobs in roster order, players in
-// entity-id order); the only draws are a landing effect's damage rolls.
+// entity-id order where livingInReach sorts them, else the claim's join
+// order); the only draws are a landing effect's damage rolls.
 
 import { SHARED_FEAR_AURA_ID } from '../../combat/cc';
 import { pullToward } from '../../pull_toward';
@@ -134,8 +135,8 @@ export function landMark(
   ctx.applyAura(quarry, {
     id: WILDHEART_QUARRY,
     name: def.name,
-    // A mark, not a slow: the value leaves the quarry at full speed.
-    kind: 'slow',
+    // A bare marker (internal_cd): no slow, no chill, nothing strips it.
+    kind: 'internal_cd',
     remaining: seconds,
     duration: seconds,
     value: 1,
@@ -145,6 +146,9 @@ export function landMark(
   });
   let sent = 0;
   for (const h of huntersOf(ctx, inst, mob, kit)) {
+    // A taunt still running wins: a raptor held by the tank stays on the tank.
+    if (h.forcedTargetTimer > 0 && h.forcedTargetId !== null && h.forcedTargetId !== quarry.id)
+      continue;
     h.forcedTargetId = quarry.id;
     h.forcedTargetTimer = seconds;
     h.aggroTargetId = quarry.id;

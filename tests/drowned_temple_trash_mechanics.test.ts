@@ -152,6 +152,8 @@ describe('Shrine Vigil: the pilgrims ward their singer', () => {
     expect(has(acolyte, TEMPLE_SHRINE_VIGIL)).toBe(true);
     expect(has(a, TEMPLE_VIGIL_PRAYER) && has(b, TEMPLE_VIGIL_PRAYER)).toBe(true);
     expect(strike(r, acolyte)).toBe(250);
+    // The prayer is a bare marker: it never reads as a slow or a chill.
+    expect(a.auras.find((x) => x.id === TEMPLE_VIGIL_PRAYER)?.kind).toBe('internal_cd');
     r.sim.ctx.handleDeath(b, r.me);
     run(r, 2 * DT, [acolyte, a]);
     expect(has(acolyte, TEMPLE_SHRINE_VIGIL)).toBe(false);

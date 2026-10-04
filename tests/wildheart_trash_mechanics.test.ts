@@ -188,6 +188,22 @@ describe('Quarry Mark: the stalker sets its raptors on someone past the tank', (
     expect(healer.auras.find((a) => a.id === WILDHEART_QUARRY)?.duration).toBe(6);
   });
 
+  it('a raptor the tank holds with a running taunt stays on the tank', () => {
+    const r = room();
+    const healer = addPlayer(r, 'priest', -14, 0);
+    const stalker = engage(r, 'wildheart_stalker', 10, 4);
+    const held = engage(r, 'basin_raptor', 4, 0);
+    const free = engage(r, 'basin_raptor', 4, 3);
+    held.forcedTargetId = r.me.id;
+    held.forcedTargetTimer = 3;
+    only(r, stalker, 'mark');
+    run(r, 1.7, [stalker, held, free]);
+    expect(free.forcedTargetId).toBe(healer.id);
+    expect(held.forcedTargetId).toBe(r.me.id);
+    // The quarry marker is a bare marker: it never reads as a slow.
+    expect(healer.auras.find((a) => a.id === WILDHEART_QUARRY)?.kind).toBe('internal_cd');
+  });
+
   it('with no raptor in the fight it never throws', () => {
     const r = room();
     addPlayer(r, 'priest', -14, 0);
@@ -225,6 +241,18 @@ describe('War Roar: kick it, or every ravager near it frenzies', () => {
       expect(m.auras.find((a) => a.id === WILDHEART_ROAR_HASTE)?.value).toBe(1.15);
     }
     expect(has(far, WILDHEART_ROAR_FRENZY)).toBe(false);
+  });
+
+  it('an evade ends the frenzy', () => {
+    const { r, roarer, mate, far } = low();
+    run(r, 2.1, [roarer, mate, far]);
+    expect(has(mate, WILDHEART_ROAR_FRENZY)).toBe(true);
+    mate.inCombat = false;
+    mate.aiState = 'evade';
+    mate.aggroTargetId = null;
+    tickTrashKits(r.sim.ctx);
+    expect(has(mate, WILDHEART_ROAR_FRENZY)).toBe(false);
+    expect(has(mate, WILDHEART_ROAR_HASTE)).toBe(false);
   });
 
   it('a kicked roar is spent: no frenzy, and it never comes again', () => {
@@ -347,6 +375,17 @@ describe('Snaring Tongue: step out of the lane, or be reeled in', () => {
     run(r, 1, [toad]);
     const d = Math.hypot(caught.pos.x - toad.pos.x, caught.pos.z - toad.pos.z);
     expect(d).toBeLessThan(3);
+  });
+
+  it('the toad plants for the bar: the lane lands where it was drawn', () => {
+    const { r, toad } = tongue();
+    const at = { ...toad.pos };
+    // The mob AI would walk it; the kit's area hold puts it back each tick.
+    for (let i = 0; i < 10; i++) {
+      toad.pos = r.sim.ctx.groundPos(toad.pos.x + 0.5, toad.pos.z);
+      tickTrashKits(r.sim.ctx);
+    }
+    expect(Math.hypot(toad.pos.x - at.x, toad.pos.z - at.z)).toBeLessThan(1e-6);
   });
 
   it('a sidestep out of the locked lane escapes it', () => {

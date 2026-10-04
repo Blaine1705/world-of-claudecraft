@@ -161,8 +161,8 @@ export function stepWhirlpool(
     ctx.applyAura(mob, {
       id: TEMPLE_SPIRAL_WHIRLPOOL,
       name: def.name,
-      // A mark, not a slow (the snapper is held in its shell anyway).
-      kind: 'slow',
+      // A bare marker (internal_cd): the ring the renderer draws.
+      kind: 'internal_cd',
       remaining: shell.remaining,
       duration: shell.remaining,
       value: 1,
@@ -318,7 +318,9 @@ export function stepMerge(
       ctx.applyAura(mob, {
         id: TEMPLE_SWOLLEN_TIDE,
         name: def.name,
-        // A mark, not a slow: the value is the merge count.
+        // A bare marker (internal_cd): the value is the merge count. Only
+        // Call the Tide's summoned wisps ever merge (no wisp is placed in a
+        // pack), so the pooled maxHp never outlives the add.
         kind: 'internal_cd',
         remaining: 3600,
         duration: 3600,

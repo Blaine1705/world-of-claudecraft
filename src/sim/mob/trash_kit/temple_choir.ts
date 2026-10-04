@@ -56,7 +56,7 @@ function keepUp(
   e: Entity,
   id: string,
   name: string,
-  kind: 'shield_wall' | 'slow',
+  kind: 'shield_wall' | 'internal_cd',
   value: number,
   sourceId: number,
 ): void {
@@ -139,8 +139,9 @@ export function stepVigil(
   sweepMarkers(ctx, inst, TEMPLE_VIGIL_PRAYER, singer.id, praying);
   const reduction = inst.difficulty === 'heroic' ? def.heroicReduction : def.reduction;
   keepUp(ctx, singer, TEMPLE_SHRINE_VIGIL, def.name, 'shield_wall', reduction, singer.id);
-  // A mark, not a slow: the value leaves the pilgrim at full speed.
-  for (const p of praying) keepUp(ctx, p, TEMPLE_VIGIL_PRAYER, def.name, 'slow', 1, singer.id);
+  // A bare marker (internal_cd: no slow, no chill, nothing strips it).
+  for (const p of praying)
+    keepUp(ctx, p, TEMPLE_VIGIL_PRAYER, def.name, 'internal_cd', 1, singer.id);
   return praying.length;
 }
 
@@ -169,9 +170,9 @@ export function stepOath(
     dropAura(ctx, guard, TEMPLE_OATH_KEEPER);
     return null;
   }
-  // Marks, not slows (value 1): the share is the guard's template's.
-  keepUp(ctx, singer, TEMPLE_MOONSET_OATH, def.name, 'slow', 1, guard.id);
-  keepUp(ctx, guard, TEMPLE_OATH_KEEPER, def.name, 'slow', 1, singer.id);
+  // Bare markers (internal_cd): the share is the guard's template's.
+  keepUp(ctx, singer, TEMPLE_MOONSET_OATH, def.name, 'internal_cd', 1, guard.id);
+  keepUp(ctx, guard, TEMPLE_OATH_KEEPER, def.name, 'internal_cd', 1, singer.id);
   return singer.id;
 }
 
@@ -273,8 +274,8 @@ export function startLullabyEcho(
   ctx.applyAura(sleeper, {
     id: TEMPLE_LULLABY_ECHO,
     name: def.name,
-    // A mark, not a slow (the sleeper is asleep anyway).
-    kind: 'slow',
+    // A bare marker (internal_cd): the ring the renderer draws.
+    kind: 'internal_cd',
     remaining: sleep.remaining,
     duration: sleep.remaining,
     value: 1,
