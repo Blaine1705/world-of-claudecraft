@@ -7,6 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  FRACTURE_CALM_PULSE,
   fractureClock,
   fractureSliceLook,
   templeTelegraphFill,
@@ -157,5 +158,14 @@ describe('the caster pass: Selthe’s marks and the Tideglass Fracture’s slice
     expect(safe.heat).toBe(0);
     expect(safe.clear).toBe(1);
     expect(fractureSliceLook('crack', 0).crack).toBe(1);
+    // Reduced motion holds the pulse down, never the heat (the actionable part).
+    const calm = fractureSliceLook('red', 1, true);
+    expect(calm.pulse).toBeLessThanOrEqual(FRACTURE_CALM_PULSE);
+    expect(calm.heat).toBe(hot.heat);
+    // A reused look is fully rewritten (no stale clear glass on a red slice).
+    const out = fractureSliceLook('safe', 0);
+    fractureSliceLook('red', 0.5, false, out);
+    expect(out.clear).toBe(0);
+    expect(out.heat).toBeGreaterThan(0);
   });
 });

@@ -12523,7 +12523,7 @@ export const ru_RU: EnTranslations = {
       "temple_moonwater_bolt": "Стрела лунной воды",
       "temple_drowning_aria": "Ария утопления",
       "temple_mere_surge": "Вал из озера",
-      "temple_tideglass_fracture": "Трещина приливного стекла",
+      "temple_tideglass_fracture": "Трещина Приливного стекла",
       "temple_undertow": "Отбойное течение",
       "temple_lunar_tide": "Лунный прилив",
       "temple_skewering_trident": "Пронзающий трезубец",

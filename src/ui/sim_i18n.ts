@@ -17795,6 +17795,18 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Glimmer Venom': 'mechanic.templeGlimmerVenom',
   'Pearl Slam': 'mechanic.templePearlSlam',
   'Lightning Spit': 'mechanic.templeLightningSpit',
+  // The bosses' own damage names (selthe.ts, tideglass_colossus.ts and
+  // tideglass_fracture.ts dealDamage labels): the combat log, the meters and
+  // the death recap localize them through this map.
+  'Sea-Song': 'mechanic.templeSeaSong',
+  'Tidal Slap': 'mechanic.templeTidalSlap',
+  'Moonwater Bolt': 'mechanic.templeMoonwaterBolt',
+  'Drowning Aria': 'mechanic.templeDrowningAria',
+  'Mere Surge': 'mechanic.templeMereSurge',
+  'Moonlight Lance': 'mechanic.templeMoonlightLance',
+  'Resonant Slam': 'mechanic.templeResonantSlam',
+  'Prism Flare': 'mechanic.templePrismFlare',
+  'Tideglass Fracture': 'mechanic.templeTideglassFracture',
   Frostbitten: 'aura.templeFrostbitten',
   Submerged: 'aura.templeSubmerged',
   'Shell Up': 'aura.templeShellUp',

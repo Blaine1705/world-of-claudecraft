@@ -17,8 +17,12 @@
 // crack, red or safe; their facing which slice) and the Colossus's channel bar
 // (fx core fractureClock: the round and its charge), plus the burst cues.
 // Rules (src/render/CLAUDE.md): every mesh and material is built once here,
-// under the gated temple root, and collapsed (never hidden) while idle; no
-// lights, no per-frame allocation.
+// under the gated temple root and collapsed until that gate has linked them;
+// after it the whole layer is hidden while no fracture is in range (no idle
+// draws anywhere in the world). No lights; the idle frame allocates nothing
+// (a live burst's particle specs are short-lived literals, as in the crypt and
+// Ysolei layers). Reduced motion holds the warning pulse and the flash down.
+// The hub under the plinth detonates every round, so it always reads red.
 
 import * as THREE from 'three';
 import {
@@ -26,6 +30,7 @@ import {
   COLOSSUS_TIDEGLASS_FRACTURE,
   COLOSSUS_TUNING,
   FRACTURE_BURST,
+  FRACTURE_HUB,
   FRACTURE_REACH,
   FRACTURE_SLICES,
   fractureSliceYaw,
@@ -40,7 +45,7 @@ import {
   PARTICLE_VERT,
   ParticlePool,
 } from '../hollow_crypt/crypt_fx_particles';
-import { fractureClock, fractureSliceLook } from './temple_fx_core';
+import { type FractureSliceLook, fractureClock, fractureSliceLook } from './temple_fx_core';
 
 const COLLAPSED = 1e-4;
 const SCAN_SEC = 0.25;
@@ -72,6 +77,7 @@ precision highp float;
 uniform float uTime;
 uniform float uReach;
 uniform float uHalf;
+uniform float uHub;
 uniform float uHeat;
 uniform float uClear;
 uniform float uCrack;
@@ -134,6 +140,13 @@ void main() {
   }
 
   // The detonation's white-hot flash.
+  // The hub under the plinth detonates every round: always red while a round
+  // is painted, whatever its slice shows.
+  float hub = (1.0 - smoothstep(uHub - 0.2, uHub, r)) * step(0.001, uClear + uHeat);
+  vec3 hubRed = vec3(0.95, 0.08, 0.12) * (0.85 + 0.3 * crackLine);
+  col = mix(col, hubRed, hub);
+  alpha = max(alpha, 0.8 * hub);
+
   // The detonation's white-hot flash, brightest along the cracks; short, so
   // the next round's colours read at once.
   col = mix(col, vec3(1.0, 0.93, 0.96), uFlash * (0.45 + 0.4 * crackLine));
@@ -175,6 +188,7 @@ interface SliceUniforms {
   uTime: { value: number };
   uReach: { value: number };
   uHalf: { value: number };
+  uHub: { value: number };
   uHeat: { value: number };
   uClear: { value: number };
   uCrack: { value: number };
@@ -208,6 +222,10 @@ export class TempleFractureFx {
   private debt = 0;
   private bossId: number | null = null;
   private shookRound = -2;
+  private rosterSeen = -1;
+  private gated = false;
+  private readonly clockNow = { round: -1, charge: 0 };
+  private readonly look: FractureSliceLook = { heat: 0, clear: 0, crack: 0, pulse: 0 };
 
   constructor(
     parent: THREE.Group,
@@ -215,6 +233,7 @@ export class TempleFractureFx {
     private readonly groundY: (x: number, z: number) => number,
     detail: boolean,
     private readonly shake?: (amount: number) => void,
+    private readonly calm: () => boolean = () => false,
   ) {
     this.root.name = 'drowned-temple-fracture-fx';
     parent.add(this.root);
@@ -242,7 +261,6 @@ export class TempleFractureFx {
       floorVfxRenderOrder('encounter', 5),
     );
     this.root.add(this.glow.mesh, this.dust.mesh);
-    this.geometries.push(this.glow.mesh.geometry, this.dust.mesh.geometry);
 
     // One slice's sector, laid flat with its middle heading on local +z:
     // CircleGeometry's theta runs in XY from +x; after the -90 degree turn
@@ -257,6 +275,7 @@ export class TempleFractureFx {
         uTime: this.uTime,
         uReach: { value: FRACTURE_REACH },
         uHalf: { value: HALF },
+        uHub: { value: FRACTURE_HUB },
         uHeat: { value: 0 },
         uClear: { value: 0 },
         uCrack: { value: 0 },
@@ -318,9 +337,16 @@ export class TempleFractureFx {
     return ((Math.round(facing / step) % FRACTURE_SLICES) + FRACTURE_SLICES) % FRACTURE_SLICES;
   }
 
+  /** The temple root's gate has linked every program: idle, hide the layer. */
+  markGated(): void {
+    this.gated = true;
+  }
+
   private rescan(): void {
     const world = this.world;
-    if (!world) return;
+    // The slice objects come and go with the roster: walk it only on a change.
+    if (!world || world.entityRosterVersion === this.rosterSeen) return;
+    this.rosterSeen = world.entityRosterVersion;
     for (const s of this.slices) s.objectId = -1;
     let any = false;
     for (const e of world.entities.values()) {
@@ -332,7 +358,9 @@ export class TempleFractureFx {
     // The Colossus whose channel times the rounds (the nearest one).
     let best: EntityView | null = null;
     let bestD = Infinity;
-    const anchor = world.entities.get(this.slices.find((s) => s.objectId >= 0)?.objectId ?? -1);
+    let anchorId = -1;
+    for (const s of this.slices) if (anchorId < 0 && s.objectId >= 0) anchorId = s.objectId;
+    const anchor = world.entities.get(anchorId);
     for (const e of world.entities.values()) {
       if (e.kind !== 'mob' || e.templateId !== COLOSSUS_ID || !anchor) continue;
       const d = Math.hypot(e.pos.x - anchor.pos.x, e.pos.z - anchor.pos.z);
@@ -435,13 +463,21 @@ export class TempleFractureFx {
     const world = this.world;
     const b = this.bossId !== null ? world?.entities.get(this.bossId) : undefined;
     const channel = b && !b.dead && b.castingAbility === COLOSSUS_TIDEGLASS_FRACTURE;
-    const clockNow = channel
-      ? fractureClock(b.castTotal, b.castRemaining, COLOSSUS_TUNING.fractureCast)
-      : { round: -1, charge: 0 };
-    if (!channel) this.shookRound = -2;
+    const clockNow = this.clockNow;
+    if (channel)
+      fractureClock(b.castTotal, b.castRemaining, COLOSSUS_TUNING.fractureCast, clockNow);
+    else {
+      clockNow.round = -1;
+      clockNow.charge = 0;
+      this.shookRound = -2;
+    }
+    const calm = this.calm();
+    let busy = this.glow.lastDeath > clock || this.dust.lastDeath > clock;
     for (const s of this.slices) {
       s.flash = Math.max(0, s.flash - dt * 4);
-      s.uniforms.uFlash.value = s.flash;
+      s.uniforms.uFlash.value = calm ? s.flash * 0.5 : s.flash;
+      if (s.objectId >= 0 || s.flash > 0 || s.columnAge >= 0 || s.uniforms.uFade.value > 0.01)
+        busy = true;
       this.stepColumn(s, dt);
       const obj = s.objectId >= 0 ? world?.entities.get(s.objectId) : undefined;
       const state = obj ? fractureStateOf(obj.templateId) : null;
@@ -450,7 +486,7 @@ export class TempleFractureFx {
         if (s.uniforms.uFade.value <= 0.01 && s.flash <= 0.01) s.mesh.scale.setScalar(COLLAPSED);
         continue;
       }
-      const look = fractureSliceLook(state, clockNow.charge);
+      const look = fractureSliceLook(state, clockNow.charge, calm, this.look);
       const u = s.uniforms;
       u.uFade.value = Math.min(1, u.uFade.value + dt * 4);
       u.uHeat.value = look.heat;
@@ -465,6 +501,9 @@ export class TempleFractureFx {
     }
     this.glow.update(clock);
     this.dust.update(clock);
+    // Until the gate has linked the layer it stays drawn (collapsed); after,
+    // an idle layer is hidden so it costs no draw anywhere in the world.
+    this.root.visible = !this.gated || busy;
   }
 
   /** Heat rising off a charging red slice, thicker as it nears detonation. */

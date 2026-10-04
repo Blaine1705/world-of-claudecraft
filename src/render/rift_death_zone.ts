@@ -167,7 +167,15 @@ export class RiftDeathZoneVisuals {
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
     this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
     this.bastionFx = new BastionFx(scene, groundY, world, compileGate, playGesture, reducedMotion);
-    this.templeFx = new TempleFx(scene, groundY, world, compileGate, playGesture, shake);
+    this.templeFx = new TempleFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      playGesture,
+      shake,
+      reducedMotion,
+    );
     this.deathBursts = new DeathBurstFx(scene, groundY, world, compileGate);
     this.wildheartFx = new WildheartFx(
       scene,

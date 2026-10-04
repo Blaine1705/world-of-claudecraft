@@ -438,25 +438,55 @@ export function fractureClock(
   castTotal: number,
   castRemaining: number,
   crackSeconds: number,
+  out: { round: number; charge: number } = { round: -1, charge: 0 },
 ): { round: number; charge: number } {
   const elapsed = Math.max(0, castTotal - castRemaining);
-  if (elapsed < crackSeconds || castTotal <= crackSeconds) return { round: -1, charge: 0 };
+  out.round = -1;
+  out.charge = 0;
+  if (elapsed < crackSeconds || castTotal <= crackSeconds) return out;
   const warn = (castTotal - crackSeconds) / FRACTURE_ROUNDS;
   const into = elapsed - crackSeconds;
-  const round = Math.min(FRACTURE_ROUNDS - 1, Math.floor(into / warn));
-  return { round, charge: Math.min(1, Math.max(0, (into - round * warn) / warn)) };
+  out.round = Math.min(FRACTURE_ROUNDS - 1, Math.floor(into / warn));
+  out.charge = Math.min(1, Math.max(0, (into - out.round * warn) / warn));
+  return out;
 }
+
+export interface FractureSliceLook {
+  heat: number;
+  clear: number;
+  crack: number;
+  pulse: number;
+}
+
+/** The warning pulse's ceiling (Hz) for a player who asked for reduced motion. */
+export const FRACTURE_CALM_PULSE = 1.5;
 
 /** A fracture slice's paint: the red heat (0 safe, up to 1 at detonation),
  *  the clear glass (1 safe), and the crack glow while the floor splits. The
- *  heat ramps with the charge so the last half second blazes. */
+ *  heat ramps with the charge so the last half second blazes; the warning
+ *  pulse quickens from 2 to 8 Hz, held to FRACTURE_CALM_PULSE for reduced
+ *  motion (the heat, the actionable part, is the same). */
 export function fractureSliceLook(
   state: 'crack' | 'red' | 'safe',
   charge: number,
-): { heat: number; clear: number; crack: number; pulse: number } {
-  if (state === 'crack') return { heat: 0, clear: 0, crack: 1, pulse: 0 };
-  if (state === 'safe') return { heat: 0, clear: 1, crack: 0.25, pulse: 0 };
+  calm = false,
+  out: FractureSliceLook = { heat: 0, clear: 0, crack: 0, pulse: 0 },
+): FractureSliceLook {
+  out.heat = 0;
+  out.clear = 0;
+  out.pulse = 0;
+  if (state === 'crack') {
+    out.crack = 1;
+    return out;
+  }
+  if (state === 'safe') {
+    out.clear = 1;
+    out.crack = 0.25;
+    return out;
+  }
   const c = Math.min(1, Math.max(0, charge));
-  // The warning pulse quickens as the charge runs out (2 Hz to 8 Hz).
-  return { heat: 0.45 + 0.55 * c * c, clear: 0, crack: 0.5, pulse: 2 + 6 * c };
+  out.heat = 0.45 + 0.55 * c * c;
+  out.crack = 0.5;
+  out.pulse = calm ? Math.min(FRACTURE_CALM_PULSE, 2 + 6 * c) : 2 + 6 * c;
+  return out;
 }

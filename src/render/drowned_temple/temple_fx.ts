@@ -133,6 +133,7 @@ export class TempleFx {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly playGesture?: (entityId: number, gesture: string) => void,
     shake?: (amount: number) => void,
+    reducedMotion?: () => boolean,
   ) {
     this.root.name = 'drowned-temple-telegraphs';
     setRenderCategory(this.root, 'ui3d');
@@ -174,15 +175,21 @@ export class TempleFx {
     this.hydra = new TempleHydra(hydraRoot, world, this.flashesOn, groundY);
     this.ysolei = new TempleYsoleiFx(this.root, scene, world, groundY, this.flashesOn);
     this.cantor = new TempleCantorFinaleFx(this.root, world, this.flashesOn);
-    this.selthe = new TempleSeltheFx(this.root, world, groundY, this.flashesOn, shake);
-    this.fracture = new TempleFractureFx(this.root, world, groundY, this.flashesOn, shake);
+    const calm = reducedMotion ?? (() => false);
+    this.selthe = new TempleSeltheFx(this.root, world, groundY, this.flashesOn, shake, calm);
+    this.fracture = new TempleFractureFx(this.root, world, groundY, this.flashesOn, shake, calm);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
-      .then(() => {})
+      .then(() => {
+        // Linked: the caster and fracture layers may sleep while idle now.
+        this.selthe.markGated();
+        this.fracture.markGated();
+      })
       .catch(() => {});
   }
 
   /** True when the temple claims the event (the renderer skips its generic draw). */
   handleEvent(ev: SimEvent): boolean {
+    if (this.disposed) return false;
     this.hydra.handleEvent(ev);
     this.ysolei.handleEvent(ev);
     this.cantor.handleEvent(ev);

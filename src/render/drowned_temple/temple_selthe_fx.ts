@@ -15,9 +15,14 @@
 // on every tier); particle density sheds on the low tier.
 //
 // Rules (src/render/CLAUDE.md): every mesh and material is built once here,
-// under the gated temple root, and collapsed (never hidden) while idle; no
-// lights, no per-frame allocation. State is read off IWorld (her cast bar and
-// cast target, the spellfx cues), so offline and online look the same.
+// under the gated temple root and collapsed until that gate has linked them;
+// after it the whole layer is hidden while Selthe is out of range and nothing
+// plays (no idle draws anywhere in the world). No lights; the idle frame
+// allocates nothing (a live effect's particle specs are short-lived literals,
+// as in the crypt and Ysolei layers). Reduced motion stills the beam's
+// flicker; the camera kicks ride the renderer's own reduced-motion gate.
+// State is read off IWorld (her cast bar and cast target, the spellfx cues),
+// so offline and online look the same.
 
 import * as THREE from 'three';
 import {
@@ -45,6 +50,8 @@ const CHEST = 1.3;
 /** A bolt's flight time (seconds): fast, it lands with its damage. */
 const BOLT_FLIGHT = 0.26;
 const SURGE_LIFE = 0.75;
+/** Beyond this range of the player her layer sleeps (yards). */
+const AWAKE_RANGE = 160;
 
 const NOISE = /* glsl */ `
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -237,6 +244,8 @@ export class TempleSeltheFx {
   private readonly splashes: Splash[] = [];
   private readonly density: number;
   private bossId: number | null = null;
+  private rosterSeen = -1;
+  private gated = false;
   private scan = 0;
   private seed = 23;
   private debt = 0;
@@ -251,6 +260,7 @@ export class TempleSeltheFx {
     private readonly groundY: (x: number, z: number) => number,
     detail: boolean,
     private readonly shake?: (amount: number) => void,
+    private readonly calm: () => boolean = () => false,
   ) {
     this.root.name = 'drowned-temple-selthe-fx';
     parent.add(this.root);
@@ -278,7 +288,6 @@ export class TempleSeltheFx {
       floorVfxRenderOrder('encounter', 7),
     );
     this.root.add(this.glow.mesh, this.spray.mesh);
-    this.geometries.push(this.glow.mesh.geometry, this.spray.mesh.geometry);
 
     const shader = (
       vert: string,
@@ -372,9 +381,16 @@ export class TempleSeltheFx {
     return this.world.entities.get(this.bossId) ?? null;
   }
 
-  private rescan(): void {
+  /** The temple root's gate has linked every program: idle, hide the layer. */
+  markGated(): void {
+    this.gated = true;
+  }
+
+  private rescan(force = false): void {
     const world = this.world;
-    if (!world) return;
+    // She comes and goes with the roster: walk it only on a change.
+    if (!world || (!force && world.entityRosterVersion === this.rosterSeen)) return;
+    this.rosterSeen = world.entityRosterVersion;
     const me = world.entities.get(world.playerId);
     let best: EntityView | null = null;
     let bestD = Infinity;
@@ -409,7 +425,7 @@ export class TempleSeltheFx {
       ab !== SELTHE_MERE_SURGE
     )
       return false;
-    if (this.bossId === null || ev.sourceId !== this.bossId) this.rescan();
+    if (this.bossId === null || ev.sourceId !== this.bossId) this.rescan(true);
     const b = this.boss();
     if (!b || ev.sourceId !== b.id) return true;
     const target = this.world?.entities.get(ev.targetId);
@@ -472,7 +488,12 @@ export class TempleSeltheFx {
   }
 
   private ring(x: number, z: number, size: number): void {
-    const s = this.splashes.find((k) => k.age < 0) ?? this.splashes[0];
+    let s = this.splashes[0];
+    for (const k of this.splashes)
+      if (k.age < 0) {
+        s = k;
+        break;
+      }
     s.age = 0;
     s.size = size;
     s.mesh.position.set(x, this.groundY(x, z) + 0.08, z);
@@ -567,6 +588,17 @@ export class TempleSeltheFx {
     }
     this.glow.update(clock);
     this.spray.update(clock);
+    // Until the gate has linked the layer it stays drawn (collapsed); after,
+    // it sleeps while she is far and nothing plays.
+    const me = this.world?.entities.get(this.world.playerId);
+    const near = !!b && !!me && Math.hypot(b.pos.x - me.pos.x, b.pos.z - me.pos.z) <= AWAKE_RANGE;
+    const playing =
+      this.flight !== null ||
+      this.wallAge >= 0 ||
+      this.beamLevel > 0.02 ||
+      this.glow.lastDeath > clock ||
+      this.spray.lastDeath > clock;
+    this.root.visible = !this.gated || near || playing;
   }
 
   /** The orb swelling at her hands while the bolt's bar runs, moonwater
@@ -677,7 +709,8 @@ export class TempleSeltheFx {
     const len = Math.max(0.1, this.dir.length());
     this.dir.multiplyScalar(1 / len);
     const width =
-      (0.55 + 0.25 * this.flare + 0.08 * Math.sin(this.uTime.value * 18)) * this.beamLevel;
+      (0.55 + 0.25 * this.flare + (this.calm() ? 0 : 0.08 * Math.sin(this.uTime.value * 18))) *
+      this.beamLevel;
     this.lay(this.core, from, width * 0.32, len);
     this.lay(this.sheath, from, width * 1.8, len);
     this.coreU.uAlpha.value = this.beamLevel;

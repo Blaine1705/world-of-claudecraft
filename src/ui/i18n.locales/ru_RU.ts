@@ -20124,7 +20124,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.temple_moonwater_bolt': 'Стрела лунной воды',
   'abilityUi.cast.temple_drowning_aria': 'Ария утопления',
   'abilityUi.cast.temple_mere_surge': 'Вал из озера',
-  'abilityUi.cast.temple_tideglass_fracture': 'Трещина приливного стекла',
+  'abilityUi.cast.temple_tideglass_fracture': 'Трещина Приливного стекла',
   'abilityUi.cast.temple_undertow': 'Отбойное течение',
   'abilityUi.cast.temple_lunar_tide': 'Лунный прилив',
   'abilityUi.cast.temple_skewering_trident': 'Пронзающий трезубец',

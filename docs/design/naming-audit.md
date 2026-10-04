@@ -736,6 +736,19 @@ design-time verdicts live in `docs/design/dungeon-rework/sunken_bastion.md` sect
 | Knight-Commander's Longsword, Drowned Commander's Breastplate, Gaoler's Chain Girdle, Rusted Shackle Grips, Drowned Warden's Mantle, Gaolyard Cudgel, Gaolyard Striders, Gaoler's Iron Key | the new loot | KEEP. No match for any full name; generic English compounds. |
 | Fogweaver | considered, not used | A World of Warcraft item prefix (Fogweaver Gauntlets). |
 
+### The Drowned Temple encounter pass (web-verified 2026-10-04)
+
+Exact-phrase searches against the major game wikis at authoring, for Choirmother Selthe's
+caster kit and the Tideglass Colossus's floor mechanic (`src/sim/encounters/drowned_temple/ids.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Cresting Wave | REJECTED before shipping | A World of Warcraft spell and Water Elemental look (Cresting Wave Water Elemental Transform). Selthe's wave is the Mere Surge. |
+| Moonwater Bolt | Selthe's kickable filler bolt | KEEP. No match; "moonwater" is common English. |
+| Drowning Aria | Selthe's sung beam | KEEP. No match (Castlevania's Aria of Sorrow is unrelated); generic English. |
+| Mere Surge | Selthe's wedge of water | KEEP. No match; plain English, "Mere" is the game's own Mere Hydra word. |
+| Tideglass Fracture | the Colossus's prism slices | KEEP. No match; "Tideglass" is this game's own coined token (Tideglass Colossus, Tideglass Dirk). |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

@@ -170,18 +170,22 @@ export const SELTHE_TUNING = {
   songMax: 45,
   // ---- the caster pass: she never swings her hands and never leaves her pool.
   // Moonwater Bolt replaces her melee as the tank's pressure. Her swing was
-  // her weapon roll (63 to 98 on normal, the elite template at 16) every
-  // 2.2 s: 35.8 raw DPS, about 23 after a level-16 tank's 36 percent armor
-  // reduction (armor / (armor + 400 + 85 x 16) at about 1,000 armor). A bolt
-  // is one weapon roll x boltWeaponShare of frost (armor never touches it)
-  // every boltCast + boltGap = 2.5 s: 0.8 x 80.7 / 2.5 = about 26 DPS while
-  // she bolts, and she bolts only between her other bars, so the tank takes a
-  // little less than before. Reading her live weapon keeps the heroic row's
-  // melee factor on it (the tank-swing floor), where her mechanics ride the
-  // row's mechanic factor.
+  // her weapon roll (63 to 98 on normal, average 80.5: the elite template's
+  // 78.75 at 16, rolled 0.8 to 1.25) every 2.2 s: 36.6 raw DPS, about 23
+  // after a level-16 tank's 36 percent armor reduction (armor / (armor + 400
+  // + 85 x 16) at about 1,000 armor) and about 17 once a tank's dodges and
+  // parries (about a quarter of swings) are counted. Her other bars fill
+  // about 54 percent of the fight (Sea-Song 1.5 of 10 s, Surge 3 of 18,
+  // Aria 5 of 22) and each leaves a 0.5 s breath, so she bolts about 40
+  // percent of the time. A bolt is one weapon roll x boltWeaponShare of frost
+  // (no armor, no dodge or parry) every boltCast + boltGap = 2.5 s: 1.2 x
+  // 80.5 / 2.5 x 0.4 = about 15.5 DPS over the fight, just under the swing's
+  // 17, landing as heavy 76 to 118 bolts a kick can stop. Reading her live
+  // weapon keeps the heroic row's melee factor on it (the tank-swing floor),
+  // where her mechanics ride the row's mechanic factor.
   boltCast: 2,
   boltGap: 0.5,
-  boltWeaponShare: 0.8,
+  boltWeaponShare: 1.2,
   boltRange: 45,
   /** After a kick (any of her kickable bars cut short) she casts neither
    *  bolt nor aria for this long, lockout or not (a boss shrugs the school
