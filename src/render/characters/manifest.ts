@@ -84,12 +84,14 @@ import {
   CRYPT_WING_GUST,
 } from '../../sim/mob/trash_kit/cast_ids';
 import {
+  TEMPLE_ARCING_SPARK,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_GLIMMER_VENOM,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
   TEMPLE_PEARL_SLAM,
+  TEMPLE_PRISM_GLARE,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
@@ -4807,8 +4809,18 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 6.2,
     clips: {
       ...TEMPLE_CLIPS,
-      castByAbility: { [TEMPLE_STATIC_COIL]: 'Coil', [TEMPLE_LIGHTNING_SPIT]: 'Spit' },
-      castTimeScaleByAbility: { [TEMPLE_STATIC_COIL]: 1, [TEMPLE_LIGHTNING_SPIT]: 1 },
+      // The trash mechanics pass: the Arcing Spark is drawn back crackling and
+      // spat at its first victim on the bar's end, on the Spit clip.
+      castByAbility: {
+        [TEMPLE_STATIC_COIL]: 'Coil',
+        [TEMPLE_LIGHTNING_SPIT]: 'Spit',
+        [TEMPLE_ARCING_SPARK]: 'Spit',
+      },
+      castTimeScaleByAbility: {
+        [TEMPLE_STATIC_COIL]: 1,
+        [TEMPLE_LIGHTNING_SPIT]: 1,
+        [TEMPLE_ARCING_SPARK]: 1,
+      },
       castPlayOut: ['Spit'],
     },
     selfIllumination: 0.22,
@@ -4896,8 +4908,10 @@ export const VISUALS: Record<string, VisualDef> = {
       ...TEMPLE_CLIPS,
       jump: 'Leap',
       land: 'Land',
-      castByAbility: { [TEMPLE_GLIMMER_VENOM]: 'Spit' },
-      castTimeScaleByAbility: { [TEMPLE_GLIMMER_VENOM]: 1 },
+      // The trash mechanics pass: the Prism Glare plays Cast (reared, head
+      // back, the stalked eyes swinging), its rainbow eye temple_trash_fx's.
+      castByAbility: { [TEMPLE_GLIMMER_VENOM]: 'Spit', [TEMPLE_PRISM_GLARE]: 'Cast' },
+      castTimeScaleByAbility: { [TEMPLE_GLIMMER_VENOM]: 1, [TEMPLE_PRISM_GLARE]: 1 },
     },
     walkRef: 2.6,
     runRef: 7.2,

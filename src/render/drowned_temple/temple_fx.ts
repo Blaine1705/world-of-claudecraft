@@ -19,7 +19,10 @@
 //    and crystals (temple_hydra_combo_fx.ts), Ysolei's moon, its tears and
 //    her Plenilune Ward (temple_moon_fx.ts), the Moonmantle Ray
 //    (temple_manta_fx.ts) and the Moonbridge forming on the Colossus's beam
-//    (temple_moonbridge_fx.ts).
+//    (temple_moonbridge_fx.ts);
+//  - the trash mechanics pass (temple_trash_fx.ts): the Shrine Vigil, the
+//    Moonset Oath, the Lullaby Echo, the Prism Glare, the Spiral Whirlpool,
+//    the Arcing Spark and the Tidewisp's chill and Swollen Tide.
 // Every shape is the shared floor telegraph (../floor_telegraph).
 //
 // Rules (src/render/CLAUDE.md): pooled geometry and materials built once,
@@ -69,6 +72,7 @@ import { TempleMantaFx } from './temple_manta_fx';
 import { TempleMoonFx } from './temple_moon_fx';
 import { TempleMoonbridgeFx } from './temple_moonbridge_fx';
 import { TempleSeltheFx } from './temple_selthe_fx';
+import { TempleTrashFx } from './temple_trash_fx';
 import { TempleYsoleiFx } from './temple_ysolei_fx';
 
 const FAN_SLOTS = 14;
@@ -134,6 +138,7 @@ export class TempleFx {
   private readonly moon: TempleMoonFx;
   private readonly manta: TempleMantaFx;
   private readonly bridge: TempleMoonbridgeFx;
+  private readonly trash: TempleTrashFx;
   private readonly flashesOn: boolean;
   /** Each living Pearlguard Sentinel's shell stance and when it changed. */
   private readonly shellStance = new Map<number, TempleShellTrack>();
@@ -201,6 +206,7 @@ export class TempleFx {
     this.moon = new TempleMoonFx(this.root, world, groundY, on, kit, shake, calm);
     this.manta = new TempleMantaFx(this.root, world, groundY, on, kit, shake, calm);
     this.bridge = new TempleMoonbridgeFx(this.root, world, groundY, on, kit, shake, calm);
+    this.trash = new TempleTrashFx(this.root, world, groundY, on, kit, shake, calm);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {
         // Linked: the caster and fracture layers may sleep while idle now.
@@ -210,6 +216,7 @@ export class TempleFx {
         this.moon.markGated();
         this.manta.markGated();
         this.bridge.markGated();
+        this.trash.markGated();
       })
       .catch(() => {});
   }
@@ -223,6 +230,7 @@ export class TempleFx {
     if (this.selthe.handleEvent(ev) || this.fracture.handleEvent(ev)) return true;
     if (this.combo.handleEvent(ev) || this.moon.handleEvent(ev)) return true;
     if (this.manta.handleEvent(ev) || this.bridge.handleEvent(ev)) return true;
+    if (this.trash.handleEvent(ev)) return true;
     if (ev.type === 'spellfx') {
       const source = this.world?.entities.get(ev.sourceId);
       // Claimed only when the Frenzy can actually play (a host without the
@@ -258,6 +266,7 @@ export class TempleFx {
     this.moon.update(dt, this.clock);
     this.manta.update(dt, this.clock);
     this.bridge.update(dt, this.clock);
+    this.trash.update(dt, this.clock);
     for (const slot of this.casts) {
       if (slot.casterId < 0) continue;
       const caster = world.entities.get(slot.casterId);
@@ -575,6 +584,7 @@ export class TempleFx {
     this.moon.dispose();
     this.manta.dispose();
     this.bridge.dispose();
+    this.trash.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();

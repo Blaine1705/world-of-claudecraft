@@ -38,12 +38,14 @@ import {
   YSOLEI_UNDERTOW,
 } from '../../sim/encounters/drowned_temple/ids';
 import {
+  TEMPLE_ARCING_SPARK,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_GLIMMER_VENOM,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
   TEMPLE_PEARL_SLAM,
+  TEMPLE_PRISM_GLARE,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
@@ -128,6 +130,23 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
       arcDeg: 360,
       color: TELEGRAPH_THREAT_COLORS.interrupt,
       accent: TEMPLE_ACCENTS.venom,
+    },
+    // The trash mechanics pass: a kick glyph under the Eel's Arcing Spark,
+    // and a glyph under the Lurker's Prism Glare (a gaze, never a kick: the
+    // eye over it and its reach rim are temple_trash_fx.ts's).
+    [TEMPLE_ARCING_SPARK]: {
+      shape: 'sigil',
+      range: 1.8,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.storm,
+    },
+    [TEMPLE_PRISM_GLARE]: {
+      shape: 'sigil',
+      range: 3,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.control,
+      accent: TEMPLE_ACCENTS.prism,
     },
     [HYDRA_CRUSHING_TORRENT]: {
       shape: 'lane',
