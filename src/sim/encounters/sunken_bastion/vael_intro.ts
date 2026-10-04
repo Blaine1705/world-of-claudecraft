@@ -59,6 +59,7 @@ function hold(e: Entity): void {
       value: 0,
       sourceId: e.id,
       school: 'shadow',
+      undispellable: true,
     });
   }
 }
@@ -205,7 +206,12 @@ export function tickVaelIntro(
   if (st.phase === 'rearm') {
     // Walking home after a wipe: once he stands idle at his place and nobody
     // living is left on the crown, he sinks for the short entrance.
-    if (engaged || e.inCombat || e.aiState !== 'idle') return false;
+    if (engaged) {
+      // Back in the fight (a brief loss of target, not a wipe): no entrance.
+      st.phase = 'done';
+      return false;
+    }
+    if (e.inCombat || e.aiState !== 'idle') return false;
     if (playerOnCrown(ctx, inst)) {
       st.phase = 'done';
       return false;

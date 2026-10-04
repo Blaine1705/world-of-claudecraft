@@ -302,7 +302,53 @@ describe('Olen the fallen paladin: the Unbroken Oath', () => {
   });
 });
 
+describe('Olen the fallen paladin: the Oath at the rim', () => {
+  it('kneeling by the open rim, his soldiers still rise on the bastion floor', () => {
+    const { f, olen } = olenFight();
+    put(f, olen, MID.x + 19, MID.z);
+    const keep = () => {
+      holdAll(f)();
+    };
+    run(f, 0.3, keep);
+    olen.hp = Math.round(olen.maxHp * 0.49);
+    run(f, T.oathKneel + DT * 4, keep);
+    const soldiers = live(f, OLEN_SOLDIER_ID);
+    expect(soldiers).toHaveLength(T.oathSoldiers);
+    for (const s of soldiers) {
+      const d = Math.hypot(s.pos.x - f.ox - MID.x, s.pos.z - f.oz - MID.z);
+      expect(d).toBeLessThanOrEqual(22 - 4 + 0.01);
+    }
+  });
+});
+
 describe('Olen the fallen paladin: the wipe and the deed', () => {
+  it('a wipe during the vigil leaves no soldier standing', () => {
+    const { f, olen } = olenFight();
+    run(f, 0.3);
+    olen.hp = Math.round(olen.maxHp * 0.49);
+    run(f, T.oathKneel + DT * 4);
+    expect(live(f, OLEN_SOLDIER_ID)).toHaveLength(T.oathSoldiers);
+    olen.aiState = 'evade';
+    olen.aggroTargetId = null;
+    run(f, 1);
+    expect(live(f, OLEN_SOLDIER_ID)).toHaveLength(0);
+    expect(olen.damageImmune).toBe(false);
+  });
+
+  it('stepping out of the brine drops its mark at once', () => {
+    const { f, olen } = olenFight();
+    const keep = holdAll(f);
+    expect(until(f, () => pools(f).length === 1, T.brineFirst + T.brineCast + 1, keep)).toBe(true);
+    run(f, 0.5, keep);
+    expect(aura(f.tank, OLEN_IN_BRINE)).toBeDefined();
+    run(f, DT * 2, () => {
+      keep();
+      put(f, f.tank, MID.x + 15, MID.z - 10);
+    });
+    expect(aura(f.tank, OLEN_IN_BRINE)).toBeUndefined();
+    void olen;
+  });
+
   it('a wipe dries the brine, lifts the bubble and clears every mark', () => {
     const { f, olen } = olenFight();
     const keep = holdAll(f);

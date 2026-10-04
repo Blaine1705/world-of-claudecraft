@@ -435,7 +435,9 @@ function stepVeil(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: VaelFig
 function beamTell(e: Entity, id: string, name: string): void {
   const a = e.auras.find((x) => x.id === id);
   if (a) {
-    a.remaining = T.beamLinger;
+    // Topped up only once it has run down a quarter: a figure standing in
+    // the beam does not rewrite its aura (and its wire record) every tick.
+    if (a.remaining < T.beamLinger * 0.75) a.remaining = T.beamLinger;
     return;
   }
   e.auras.push({
@@ -447,6 +449,7 @@ function beamTell(e: Entity, id: string, name: string): void {
     value: 0,
     sourceId: e.id,
     school: 'holy',
+    undispellable: true,
   });
 }
 

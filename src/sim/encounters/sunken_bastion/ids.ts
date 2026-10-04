@@ -498,8 +498,9 @@ export const VAEL_TUNING = {
   // (3 s step + 16 s countdown, a 21 s cycle, one sweep of 80 to 95): a chain
   // is 3 x (0.8 + 1.6 + 0.6 + 0.5) = 10.5 s, the cycle 10.5 + 22.5 = 33 s,
   // 5.5 sweeps a minute (was 2.9) of 60 to 70, each on a DIFFERENT player:
-  // in a group of five, a player who fails every step takes 89 a minute (was
-  // 63), one who steps out takes nothing. What nobody can dodge FALLS: his
+  // in a group of five (four non-tanks, the tank only marked when nobody else
+  // is free), a non-tank who fails every step takes 89 a minute (was 63), one
+  // who steps out takes nothing. What nobody can dodge FALLS: his
   // swing and the surge clock stop while he steps, 10.5 of every 33 s (32
   // percent, was 3 of 21, 14 percent), so the tank's melee and the Mist Surge
   // (now every 19.8 s, was 15.8) each land about 20 percent less a minute.

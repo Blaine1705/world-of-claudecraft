@@ -201,6 +201,23 @@ describe('Vael: the entrance on the Beacon Crown', () => {
     expect(vael.hostile).toBe(true);
   });
 
+  it('a brief loss of his target mid-fight never buries him again', () => {
+    const f = court();
+    const vael = boss(f, VAEL_ID);
+    put(f, f.tank, -14, 190);
+    for (let t = 0; t < vaelIntroSeconds(false) + 1; t += DT) stepCollect(f, []);
+    expect(vael.vaelIntro?.phase).toBe('done');
+    engage(f, vael);
+    run(f, 1);
+    vael.aggroTargetId = null;
+    run(f, DT);
+    f.sim.ctx.aggroMob(vael, f.tank, false);
+    run(f, 3);
+    expect(vael.vaelIntro?.phase).toBe('done');
+    expect(vael.hostile).toBe(true);
+    expect(vael.encounterHeld).toBeFalsy();
+  });
+
   it('pulled before he ever woke (a dev jump into the fight), he skips the entrance', () => {
     const f = court();
     const vael = boss(f, VAEL_ID);

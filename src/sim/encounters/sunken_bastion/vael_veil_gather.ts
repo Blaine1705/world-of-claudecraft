@@ -54,6 +54,7 @@ export function startVeilGather(
     value: 0,
     sourceId: boss.id,
     school: 'shadow',
+    undispellable: true,
   });
   boss.damageImmune = true;
   vaelSay(ctx, boss, VAEL_VEIL_LINES[Math.min(st.veils, VAEL_VEIL_LINES.length - 1)]);

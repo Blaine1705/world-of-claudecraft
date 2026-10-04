@@ -32,7 +32,7 @@
 // Zero rng in every pick (hashed through pickMarkTargets, nearest-player
 // rebounds with ties to the lower id); the only draws are the damage rolls.
 
-import { BASTION_BUTTRESSES } from '../../content/sunken_bastion_layout';
+import { BASTION_BUTTRESSES, BREACH_BASTION } from '../../content/sunken_bastion_layout';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -133,7 +133,9 @@ function marker(
 ): void {
   const a = e.auras.find((x) => x.id === id);
   if (a) {
-    a.remaining = Math.max(a.remaining, seconds);
+    // Topped up only once it has run down by half: a body standing in the
+    // brine does not rewrite its aura (and its wire record) every tick.
+    if (a.remaining < seconds * 0.5) a.remaining = seconds;
     a.value = value;
     return;
   }
@@ -339,16 +341,18 @@ function stepPools(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: OlenFi
     st.pools.some((p) => Math.hypot(e.pos.x - o.x - p.x, e.pos.z - o.z - p.z) <= p.radius);
   // Standing in his own brine shields him: the tank must drag him out.
   if (inPool(boss))
-    marker(boss, OLEN_BRINE_HALLOWED, 'Brine-Hallowed', 0.3, boss.id, 'buff_dr', T.brineShield);
+    marker(boss, OLEN_BRINE_HALLOWED, 'Brine-Hallowed', 1, boss.id, 'buff_dr', T.brineShield);
   else dropAuraById(boss, OLEN_BRINE_HALLOWED);
   st.brineTick -= DT;
   const pulse = st.brineTick <= 1e-6;
   if (pulse) st.brineTick += 1;
-  if (st.pools.length === 0) return;
   const per = inst.difficulty === 'heroic' ? T.brinePerSecondHeroic : T.brinePerSecond;
   for (const p of claimPlayers(ctx, inst)) {
-    if (!inPool(p)) continue;
-    marker(p, OLEN_IN_BRINE, 'Hallowed Brine', 0.3, boss.id, 'slow', 1);
+    if (!inPool(p)) {
+      dropAuraById(p, OLEN_IN_BRINE);
+      continue;
+    }
+    marker(p, OLEN_IN_BRINE, 'Hallowed Brine', 1, boss.id, 'slow', 1);
     if (!pulse) continue;
     ctx.dealDamage(
       boss,
@@ -402,6 +406,16 @@ export function beginOath(
   return true;
 }
 
+/** A spot kept inside the Breach Bastion's rim (instance-local). */
+function onBastion(x: number, z: number): { x: number; z: number } {
+  const dx = x - BREACH_BASTION.x;
+  const dz = z - BREACH_BASTION.z;
+  const d = Math.hypot(dx, dz);
+  const r = BREACH_BASTION.r - 4;
+  if (d <= r) return { x, z };
+  return { x: BREACH_BASTION.x + (dx / d) * r, z: BREACH_BASTION.z + (dz / d) * r };
+}
+
 /** His soldiers rise round him, spread evenly, each on a hashed player. */
 function raiseSoldiers(
   ctx: SimContext,
@@ -412,10 +426,16 @@ function raiseSoldiers(
   const n = inst.difficulty === 'heroic' ? T.oathSoldiersHeroic : T.oathSoldiers;
   const players = claimPlayers(ctx, inst);
   const victims = pickMarkTargets(boss, players, n, st.casts * 3 + 7);
+  const o = ctx.instanceOriginOf(inst);
   for (let k = 0; k < n; k++) {
     const a = boss.facing + Math.PI / 2 + (k * Math.PI * 2) / n;
-    const x = boss.pos.x + Math.sin(a) * T.oathSoldierRing;
-    const z = boss.pos.z + Math.cos(a) * T.oathSoldierRing;
+    // Kept on the Breach Bastion's floor (he may kneel by its open rim).
+    const at = onBastion(
+      boss.pos.x - o.x + Math.sin(a) * T.oathSoldierRing,
+      boss.pos.z - o.z + Math.cos(a) * T.oathSoldierRing,
+    );
+    const x = o.x + at.x;
+    const z = o.z + at.z;
     const victim = victims[k % Math.max(1, victims.length)] ?? players[0] ?? null;
     const soldier = spawnKitAdd(ctx, inst, boss, OLEN_SOLDIER_ID, x, z, victim);
     if (!soldier) continue;
