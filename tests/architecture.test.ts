@@ -852,6 +852,8 @@ const RENDER_PURE_CORES = [
   'src/render/sunken_bastion/bastion_shade_ghost_core.ts',
   // Olen the fallen paladin's visuals: the brine, the shield, the Sentence, the Oath.
   'src/render/sunken_bastion/bastion_olen_fx_core.ts',
+  // The Drowning Yard's Mooring Post lamps: lit, dark, kindling, the flare, the ring.
+  'src/render/sunken_bastion/bastion_mooring_core.ts',
   'src/render/authored_field/field_edge_plan_core.ts',
   'src/render/drowned_temple/temple_plan_core.ts',
   'src/render/drowned_temple/temple_kit_plan_core.ts',

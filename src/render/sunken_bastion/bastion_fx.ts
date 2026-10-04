@@ -8,7 +8,8 @@
 //  - a flash when a strike lands;
 //  - the creatures' own effects (bastion_creature_fx.ts): the Fogbound
 //    Arbalest's crossbow bolts and the Gaol Turnkey's lantern flare;
-//  - the gaol's cage, anchor and shackles (bastion_gaol_fx.ts), the
+//  - the gaol's cage, anchor and shackles (bastion_gaol_fx.ts), the Drowning
+//    Yard's Mooring Post lamps (bastion_mooring_fx.ts), the
 //    reaper's pool, sweep and soul wisps (bastion_reaper_fx.ts), and Olen the
 //    fallen paladin's brine, shield, Sentence and Oath (bastion_olen_fx.ts).
 // Boss casts register more lanes and rings through registerBastionTelegraph.
@@ -46,6 +47,7 @@ import {
   brineBurstSpec,
 } from './bastion_fx_core';
 import { BastionGaolFx } from './bastion_gaol_fx';
+import { BastionMooringFx } from './bastion_mooring_fx';
 import { BastionOlenFx } from './bastion_olen_fx';
 import { BastionReaperFx } from './bastion_reaper_fx';
 import { BastionVaelStageFx } from './bastion_vael_stage_fx';
@@ -112,6 +114,7 @@ export class BastionFx {
   private readonly boss: BastionBossFx;
   private readonly creatures: BastionCreatureFx;
   private readonly gaol: BastionGaolFx;
+  private readonly mooring: BastionMooringFx;
   private readonly reaper: BastionReaperFx;
   private readonly vaelStage: BastionVaelStageFx;
   private readonly olen: BastionOlenFx;
@@ -155,6 +158,15 @@ export class BastionFx {
     this.creatures = new BastionCreatureFx(creatures, groundY, world, playGesture, reducedMotion);
     // The fifth pass's gaol and reaper visuals ride the same root and gate.
     this.gaol = new BastionGaolFx(this.root, groundY, world, this.flashesOn, playGesture);
+    // The Mooring Post lamps (the hooked player's safe points) ride it too.
+    this.mooring = new BastionMooringFx(
+      this.root,
+      groundY,
+      world,
+      this.flashesOn,
+      shake,
+      reducedMotion,
+    );
     this.reaper = new BastionReaperFx(this.root, groundY, world, this.flashesOn);
     // Vael's entrance eruptions, the fog gathering before the veil and the
     // scythe's impacts ride the same root and gate.
@@ -202,6 +214,7 @@ export class BastionFx {
     if (this.creatures.handleEvent(ev)) return true;
     if (this.olen.handleEvent(ev)) return true;
     this.vaelStage.handleEvent(ev);
+    if (this.mooring.handleEvent(ev)) return true;
     if (this.gaol.handleEvent(ev)) return true;
     if (this.reaper.handleEvent(ev)) return true;
     this.flash(ev);
@@ -231,6 +244,7 @@ export class BastionFx {
     this.boss.update(dt);
     this.creatures.update(dt);
     this.gaol.update(dt);
+    this.mooring.update(dt);
     this.reaper.update(dt);
     this.vaelStage.update(dt);
     this.olen.update(dt);
@@ -371,6 +385,7 @@ export class BastionFx {
     this.boss.dispose();
     this.creatures.dispose();
     this.gaol.dispose();
+    this.mooring.dispose();
     this.reaper.dispose();
     this.vaelStage.dispose();
     this.olen.dispose();

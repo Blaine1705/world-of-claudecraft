@@ -401,7 +401,7 @@ export class BastionBossFx {
       const pillarMat = this.shader(PILLAR_FRAG, { uAlpha: { value: 0 } }, true);
       const pillar = new THREE.Mesh(pillarGeo, pillarMat);
       pillar.frustumCulled = false;
-      pillar.renderOrder = 23;
+      pillar.renderOrder = floorVfxRenderOrder('encounter', 3);
       const ringMat = this.basic(0xffd27a, 0);
       ringMat.blending = THREE.AdditiveBlending;
       const ring = new THREE.Mesh(ringGeo, ringMat);

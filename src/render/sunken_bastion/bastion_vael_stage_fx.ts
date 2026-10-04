@@ -297,7 +297,7 @@ export class BastionVaelStageFx {
       const pillar = new THREE.Mesh(column, pillarMat);
       const shock = new THREE.Mesh(disc, shockMat);
       const flash = new THREE.Sprite(flashMat);
-      pillar.renderOrder = 23;
+      pillar.renderOrder = floorVfxRenderOrder('encounter', 3);
       shock.renderOrder = floorVfxRenderOrder('encounter', 13);
       for (const o of [pillar, shock, flash]) {
         o.visible = false;
