@@ -362,7 +362,6 @@ import {
   leaveRiftForModeration,
   moderationReturnSpot,
   type RiftExitSpot,
-  rejoinRiftAfterModeration,
   riftExitSpotAt,
   teleportForModeration,
 } from './moderation_moves';
@@ -2094,7 +2093,6 @@ export class GameServer {
       moderatorEntity.prevPos = { ...back };
       this.sim.grid.update(moderatorEntity);
       this.sim.playerGrid.update(moderatorEntity);
-      rejoinRiftAfterModeration(this.sim, moderator.pid);
       this.sim.setGm(moderator.pid, state.priorGm);
       this.sim.restorePetAfterSpectate(moderator.pid, state.stowedPet);
     }
