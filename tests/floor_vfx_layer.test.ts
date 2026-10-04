@@ -77,10 +77,11 @@ interface FloorVfxModule {
   alsoNames?: readonly FloorVfxLayer[];
   /**
    * Strict modules take EVERY renderOrder from the seam (no bare integer
-   * literal survives). The two non-strict ones are large files whose floor
-   * pieces are layered while their unrelated meshes keep their own orders
-   * (renderer.ts: the god-ray sprites; ignivar_fire_vfx.ts: the projectile and
-   * impact pieces around its ground-fire AoE).
+   * literal survives). The non-strict ones layer their floor pieces while
+   * their unrelated, standing or airborne meshes keep their own orders (each
+   * entry's comment names them: renderer.ts's god-ray sprites,
+   * ignivar_fire_vfx.ts's projectile and impact pieces, the Bastion rain's
+   * streaks, the Hydra's ice wall, the Moonbridge's beam).
    */
   strict: boolean;
 }
@@ -127,6 +128,24 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // fallen's glowing outlines lie on the floor and the water (ground band); it
   // plays once the last boss is dead, so no telegraph is ever under it.
   { file: 'src/render/drowned_temple/temple_cantor_finale_fx.ts', layer: 'ground', strict: true },
+  // The Mere Hydra's Combined Breath: the frozen lane, the wall's frosted foot
+  // and lee shimmer, the venom arrows and the rime crystals' rings lie on the
+  // floor in the encounter band (they are actionable: where not to stand,
+  // where to hide). The ice wall and the crystals themselves are solid,
+  // depth-writing bodies standing up from the floor and keep their own order.
+  {
+    file: 'src/render/drowned_temple/temple_hydra_combo_fx.ts',
+    layer: 'encounter',
+    strict: false,
+  },
+  // The Moonbridge forming: the beam's landing ring lies on the Altar Landing
+  // in the encounter band; the beam itself (core, sheath, racing front star
+  // and the prism flare) runs through the air and keeps its own orders.
+  {
+    file: 'src/render/drowned_temple/temple_moonbridge_fx.ts',
+    layer: 'encounter',
+    strict: false,
+  },
   // The Wildheart Basin's brazier pools on its floors (the world's own light).
   { file: 'src/render/wildheart_basin/basin_lights.ts', layer: 'ground', strict: true },
   // The spirit light pooled on the jaguar maw's jaw once the way out opens.

@@ -191,6 +191,10 @@ const AUTHORED_ATLAS_DEFS = [
   'bastion_gaol_cage',
   'bastion_drowned_anchor',
   'bastion_turnkey',
+  // the Bastion's Blender Knight-Commander Olen (the fallen paladin) and
+  // Ossick (the drowned harbourmaster)
+  'bastion_olen',
+  'bastion_ossick',
   'crypt_morthen_lich',
   // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
   'sanctum_korgath',
@@ -226,6 +230,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_colossus',
   // the Drowned Temple's Blender Moonspawn (the moon spirit of water)
   'temple_moonspawn',
+  // the Drowned Temple's optional lore guide, Laverock (Blender NPC body)
+  'npc_laverock',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',
