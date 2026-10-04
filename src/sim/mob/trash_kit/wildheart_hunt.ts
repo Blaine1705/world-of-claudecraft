@@ -122,6 +122,7 @@ export function landMark(
   const quarry = targetId !== null ? ctx.entities.get(targetId) : undefined;
   if (!def || !quarry || quarry.dead) return 0;
   if (dist2d(quarry.pos, mob.pos) > def.range + 5) return 0;
+  const seconds = inst.difficulty === 'heroic' ? def.heroicSeconds : def.seconds;
   ctx.emit({
     type: 'spellfx',
     sourceId: mob.id,
@@ -135,8 +136,8 @@ export function landMark(
     name: def.name,
     // A mark, not a slow: the value leaves the quarry at full speed.
     kind: 'slow',
-    remaining: def.seconds,
-    duration: def.seconds,
+    remaining: seconds,
+    duration: seconds,
     value: 1,
     sourceId: mob.id,
     school: def.school,
@@ -145,7 +146,7 @@ export function landMark(
   let sent = 0;
   for (const h of huntersOf(ctx, inst, mob, kit)) {
     h.forcedTargetId = quarry.id;
-    h.forcedTargetTimer = def.seconds;
+    h.forcedTargetTimer = seconds;
     h.aggroTargetId = quarry.id;
     addThreat(h, quarry.id, 1);
     sent++;

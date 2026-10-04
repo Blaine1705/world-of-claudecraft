@@ -10,9 +10,15 @@ export interface WildheartKitDef {
   /** Quarry Mark: a thrown marking spear at one player in `range` (never the
    *  one it fights while anyone else is in reach). Only while a `hunter`
    *  packmate fights within `huntRange`. Every such hunter runs the marked
-   *  player down for `seconds` (a taunt still wins). Physical: dodge, never
-   *  kick; or kill the stalker first. */
-  mark?: TrashKitCast & { range: number; seconds: number; hunter: string; huntRange: number };
+   *  player down for `seconds` (`heroicSeconds` on heroic; a taunt still
+   *  wins). Physical: never kick it; kill the stalker first. */
+  mark?: TrashKitCast & {
+    range: number;
+    seconds: number;
+    heroicSeconds: number;
+    hunter: string;
+    huntRange: number;
+  };
   /** War Roar: once per pull, under `belowHpPct` of its health, an
    *  interruptible roar. When the bar ends every living `packmate` in the
    *  fight within `radius` (the roarer too) is enraged for the rest of the

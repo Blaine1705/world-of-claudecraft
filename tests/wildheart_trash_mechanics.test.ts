@@ -171,8 +171,21 @@ describe('Quarry Mark: the stalker sets its raptors on someone past the tank', (
     expect(has(healer, WILDHEART_QUARRY)).toBe(true);
     for (const m of raptors) {
       expect(m.forcedTargetId).toBe(healer.id);
-      expect(m.forcedTargetTimer).toBeGreaterThan(5);
+      expect(m.forcedTargetTimer).toBeGreaterThan(3.5);
+      expect(m.forcedTargetTimer).toBeLessThanOrEqual(4);
     }
+  });
+
+  it('holds the hunt 6 s on heroic', () => {
+    const r = room('heroic');
+    const healer = addPlayer(r, 'priest', -14, 0);
+    const stalker = engage(r, 'wildheart_stalker', 10, 4);
+    const raptor = engage(r, 'basin_raptor', 4, 0);
+    only(r, stalker, 'mark');
+    run(r, 1.7, [stalker, raptor]);
+    expect(raptor.forcedTargetId).toBe(healer.id);
+    expect(raptor.forcedTargetTimer).toBeGreaterThan(5.5);
+    expect(healer.auras.find((a) => a.id === WILDHEART_QUARRY)?.duration).toBe(6);
   });
 
   it('with no raptor in the fight it never throws', () => {

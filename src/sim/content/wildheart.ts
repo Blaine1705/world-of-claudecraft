@@ -245,8 +245,10 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     },
     // The trash mechanics pass: a marking spear at someone past the tank,
     // only while a Basin Raptor of the fight runs near; the raptors run the
-    // quarry down for 6 s (a taunt still wins). Physical: no kick. Kill the
-    // stalker first, or keep the raptors gathered on the tank.
+    // quarry down for 4 s (6 on heroic; a taunt still wins). Four non-elite
+    // raptors on a level-20 cloth wearer land about 110 a second once they
+    // arrive, so 4 s on normal stays a scare, never a kill. Physical: no
+    // kick. Kill the stalker first, or keep the raptors gathered on the tank.
     trashKit: {
       wildheart: {
         mark: {
@@ -257,7 +259,8 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
           first: 5,
           school: 'physical',
           range: 30,
-          seconds: 6,
+          seconds: 4,
+          heroicSeconds: 6,
           hunter: BASIN_RAPTOR_ID,
           huntRange: 30,
         },
