@@ -50,6 +50,8 @@ export class BastionParticles {
   private readonly s = new THREE.Vector3();
   private readonly c = new THREE.Color();
   private seed = 20260930;
+  /** Chunks live after the last update (0: the walk and upload are skipped). */
+  private liveChunks = 0;
 
   constructor(
     private readonly root: THREE.Group,
@@ -185,6 +187,7 @@ export class BastionParticles {
       n++;
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    if (n > 0) this.liveChunks = Math.max(this.liveChunks, 1);
   }
 
   update(dt: number): void {
@@ -206,7 +209,7 @@ export class BastionParticles {
       p.mat.opacity = p.peak * Math.sin(Math.PI * Math.min(1, k * 1.15));
     }
     const mesh = this.chunkMesh;
-    if (!mesh) return;
+    if (!mesh || this.liveChunks === 0) return;
     let last = 0;
     for (let i = 0; i < this.chunks.length; i++) {
       const d = this.chunks[i];
@@ -239,7 +242,9 @@ export class BastionParticles {
       last = i + 1;
     }
     mesh.count = last;
+    mesh.visible = last > 0;
     mesh.instanceMatrix.needsUpdate = true;
+    this.liveChunks = last;
   }
 
   dispose(): void {

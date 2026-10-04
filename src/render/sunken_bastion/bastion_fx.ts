@@ -198,6 +198,7 @@ export class BastionFx {
    *  True when a creature effect CLAIMED the event (the arbalest's bolt, the
    *  Turnkey's lantern), so the generic projectile or nova is not drawn too. */
   handleEvent(ev: SimEvent): boolean {
+    if (this.disposed) return false;
     if (this.creatures.handleEvent(ev)) return true;
     if (this.olen.handleEvent(ev)) return true;
     this.vaelStage.handleEvent(ev);

@@ -10,6 +10,15 @@
 
 import { OLEN_KIT } from '../../sim/encounters/sunken_bastion/ids';
 
+/** The gesture his rig plays as the shield flies home (VISUALS: ShieldCatch). */
+export const OLEN_SHIELD_CATCH_GESTURE = 'bastion_bulwark_catch';
+/** His held shield hides while it flies and shows again on the catch
+ *  (VISUALS meshToggles on the rig's Shield bone). */
+export const OLEN_SHIELD_AWAY_GESTURE = 'bastion_bulwark_away';
+export const OLEN_SHIELD_HOME_GESTURE = 'bastion_bulwark_home';
+/** The bone the shield board rides (scripts/assets/sunken_bastion_drowned/olen). */
+export const OLEN_SHIELD_BONE = 'Shield';
+
 /** The shield's flight between two bodies (the sim's hop). */
 export const BULWARK_HOP_SECONDS = OLEN_KIT.bulwarkHop;
 /** How high the shield's arc lifts over the straight line (yards). */

@@ -49,7 +49,7 @@ import {
   TelegraphKit,
 } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
-import { sharedUniforms } from '../gfx';
+import { GFX, sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
 import {
   BRINE_WELL_SECONDS,
@@ -60,6 +60,9 @@ import {
   flashAlpha,
   OATH_BUBBLE_RADIUS,
   OATH_BURST_SECONDS,
+  OLEN_SHIELD_AWAY_GESTURE,
+  OLEN_SHIELD_CATCH_GESTURE,
+  OLEN_SHIELD_HOME_GESTURE,
   oathBubbleScale,
   oathBurst,
   SENTENCE_STRIKE_SECONDS,
@@ -73,13 +76,6 @@ import {
   sentenceStrike,
 } from './bastion_olen_fx_core';
 import { BastionParticles } from './bastion_particles';
-
-/** The gesture his rig plays as the shield flies home (VISUALS: ShieldCatch). */
-export const OLEN_SHIELD_CATCH_GESTURE = 'bastion_bulwark_catch';
-/** His held shield hides while it flies and shows again on the catch
- *  (VISUALS meshToggles). */
-export const OLEN_SHIELD_AWAY_GESTURE = 'bastion_bulwark_away';
-export const OLEN_SHIELD_HOME_GESTURE = 'bastion_bulwark_home';
 
 const POOL_SLOTS = 4;
 const FLIGHT_SLOTS = 2;
@@ -364,20 +360,20 @@ export class BastionOlenFx {
       }).translate(0, 0, -0.06),
     );
     const boss = this.geo(new THREE.SphereGeometry(0.16, 12, 8).scale(1, 1, 0.5));
-    const steel = new THREE.MeshStandardMaterial({
-      color: 0x8c9aa0,
-      metalness: 0.8,
-      roughness: 0.35,
-      emissive: 0x6a4a1a,
-      emissiveIntensity: 0.35,
-    });
-    const brass = new THREE.MeshStandardMaterial({
-      color: 0xc8a050,
-      metalness: 0.9,
-      roughness: 0.3,
-      emissive: 0x7a5a20,
-      emissiveIntensity: 0.6,
-    });
+    // The kit's material policy (bastion_kit.ts): PBR where the tier carries
+    // it, Lambert below; the shield itself draws on every tier (it strikes).
+    const metal = (color: number, emissive: number, glow: number): THREE.Material =>
+      GFX.standardMaterials
+        ? new THREE.MeshStandardMaterial({
+            color,
+            metalness: 0.85,
+            roughness: 0.32,
+            emissive,
+            emissiveIntensity: glow,
+          })
+        : new THREE.MeshLambertMaterial({ color, emissive, emissiveIntensity: glow });
+    const steel = metal(0x8c9aa0, 0x6a4a1a, 0.35);
+    const brass = metal(0xc8a050, 0x7a5a20, 0.6);
     this.materials.push(steel, brass);
     for (let i = 0; i < FLIGHT_SLOTS; i++) {
       const shield = new THREE.Group();
@@ -412,7 +408,7 @@ export class BastionOlenFx {
         accent: TELEGRAPH_ACCENTS.holy,
       });
       ring.group.visible = false;
-      const columnMat = shader(COLUMN_FRAG, COLUMN_VERT, THREE.DoubleSide, THREE.AdditiveBlending);
+      const columnMat = shader(COLUMN_FRAG, COLUMN_VERT, THREE.FrontSide, THREE.AdditiveBlending);
       columnMat.name = 'sunkenBastionTideSentence';
       const column = new THREE.Mesh(columnGeo, columnMat);
       column.visible = false;
@@ -422,7 +418,7 @@ export class BastionOlenFx {
       this.marks.push({ ring, column, columnMat, glow: sprite(0xfff2c8, 4), entityId: -1 });
     }
     for (let i = 0; i < STRIKE_SLOTS; i++) {
-      const mat = shader(COLUMN_FRAG, COLUMN_VERT, THREE.DoubleSide, THREE.AdditiveBlending);
+      const mat = shader(COLUMN_FRAG, COLUMN_VERT, THREE.FrontSide, THREE.AdditiveBlending);
       mat.name = 'sunkenBastionTideSentenceStrike';
       const column = new THREE.Mesh(columnGeo, mat);
       column.visible = false;
@@ -733,7 +729,7 @@ export class BastionOlenFx {
         continue;
       }
       const k = sentenceStrike(s.age);
-      const w = s.radius * 0.55 * k.scale;
+      const w = s.radius * 0.35 * k.scale;
       s.column.visible = true;
       s.column.position.set(s.x, s.y, s.z);
       s.column.scale.set(w, 30, w);

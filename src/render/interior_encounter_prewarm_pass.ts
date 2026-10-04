@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { CLASSES, MOBS } from '../sim/data';
+import { FOG_SHADE_ID } from '../sim/encounters/sunken_bastion/ids';
 import { VARKHUL_BOSS_ID } from '../sim/ignivar_raid_ids';
 import { ALL_CLASSES, type PlayerClass } from '../sim/types';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
@@ -169,7 +170,8 @@ async function runInteriorEncounterPrewarm(
     GFX.constrainedMemory &&
     !spec.varkhulVisuals &&
     !spec.ignivarVisuals &&
-    !spec.nythraxisGraveVisuals
+    !spec.nythraxisGraveVisuals &&
+    !spec.vaelShadeGhost
   ) {
     return;
   }
@@ -237,6 +239,19 @@ async function runInteriorEncounterPrewarm(
     place(visual);
   };
 
+  // A Fog Shade wearing the ghost treatment: the same factory, entity shape
+  // and setGhost path as the live shade, so the same transparent program keys.
+  const buildVaelShadeGhost = (): void => {
+    const template = MOBS[FOG_SHADE_ID];
+    if (!template) return;
+    const entity = host.prewarmEntity('mob', template.id, template.color, template.scale);
+    const visual = createCharacterVisual(entity);
+    if (!visual) return;
+    visual.setGhost(true);
+    keepAlive.push(visual);
+    place(visual);
+  };
+
   // Each catalog rig is a skinned clone plus a full material clone pass, a few
   // ms of pure CPU. Built in one loop the whole catalog lands on the frame that
   // attaches the interior (measured: a >150ms stall at arena entry), so the
@@ -257,6 +272,7 @@ async function runInteriorEncounterPrewarm(
           },
         ]
       : []),
+    ...(spec.vaelShadeGhost ? [buildVaelShadeGhost] : []),
     ...plan.playerClasses.map((cls) => () => buildPlayerClass(cls)),
     ...plan.weaponSkinIds.map((skinId) => () => buildWeaponSkin(skinId)),
     ...(spec.varkhulVisuals
