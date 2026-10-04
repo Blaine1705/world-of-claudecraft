@@ -19807,10 +19807,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.turnkeys_lantern_cowl.name': '牢番のランタン頭巾',
   'hudChrome.finder.mech.iron_cage':
     '鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）',
-  'hudChrome.finder.mech.drowned_anchor': '溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）',
+  'hudChrome.finder.mech.drowned_anchor':
+    '溺死の錨（犠牲者は穴へ巻き寄せられる：灯った係留柱から3ヤード以内まで走れば鎖を係留でき、その柱は30秒間消える、または12回の攻撃で鎖を断つ、ヒロイックは16回）',
   'hudChrome.finder.mech.shackle_pair': '連鎖の枷（鎖でつながれた二人は離れずに動く）',
   'hudChrome.finder.mech.hallowed_brine':
-    '聖なる潮水（暗い聖水の溜まり：中にいる者は毎秒18ダメージ、彼は中に立つ間ダメージを40パーセント軽減する、外へ引きずり出せ）',
+    '聖なる潮水（半径9ヤードの暗い聖水の溜まり、ヒロイックは10ヤード：中にいる者は毎秒18ダメージ、ヒロイックは26、彼は中に立つ間ダメージを40パーセント軽減する、外へ引きずり出せ）',
   'hudChrome.finder.mech.rebounding_bulwark':
     '跳ね返る大盾（盾は最後に当たった者から10ヤード以内の最も近いプレイヤーへ跳ね返る、最大3人、ヒロイックは4人：散開せよ）',
   'hudChrome.finder.mech.tide_sentence':
@@ -19830,9 +19831,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.progressAria': '脱出の進行度：{pct}',
   'hudChrome.bastionChain.anchoredTitle': '溺死の錨に繋がれた！',
   'hudChrome.bastionChain.anchoredLine':
-    '巻き上げ機に穴へ引きずり込まれる前に、仲間が鎖を断ち切らなければならない',
+    '灯った係留柱まで走って鎖を係留せよ、さもなくば巻き上げ機に穴へ引きずり込まれる前に仲間が鎖を断て',
   'hudChrome.bastionChain.allyTitle': '鎖を断て！',
-  'hudChrome.bastionChain.allyLine': '{name} が穴へ引きずられている：溺死の錨を攻撃せよ',
+  'hudChrome.bastionChain.allyLine':
+    '{name} が穴へ引きずられている：溺死の錨を攻撃するか、灯った柱へ導け',
+  'hudChrome.auraEffect.bastion.anchored':
+    '溺死の錨に繋がれている：動くことはできるが巻き上げ機から離れることはできず、溺死の穴へと巻き寄せられる。引っ掛けられた場所から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入れば鎖を係留できる（その柱は{dark}秒間消える）、または仲間が{links}回の攻撃で鎖を断つ（ヒロイックは{linksHeroic}回）。穴に落ちると最大体力の{pit}%を失う（ヒロイックは{pitHeroic}%）。',
   'hudChrome.bastionChain.shackledTitle': '{name} と枷で繋がれている',
   'hudChrome.bastionChain.shackledLine':
     '互いに {range} ヤード以内にいること（現在 {dist} ヤード）',

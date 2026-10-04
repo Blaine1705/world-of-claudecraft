@@ -18852,10 +18852,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.turnkeys_keyring_belt.name': '牢頭的鑰匙腰帶',
   'entities.items.turnkeys_lantern_cowl.name': '牢頭的提燈兜帽',
   'hudChrome.finder.mech.iron_cage': '鐵籠（連按互動鍵掙脫，隊友可以砸開鐵欄）',
-  'hudChrome.finder.mech.drowned_anchor': '溺亡之錨（在受害者被拖進深坑前砸斷鎖鏈）',
+  'hudChrome.finder.mech.drowned_anchor':
+    '溺亡之錨（受害者會被絞向深坑：跑到點亮的繫泊柱3碼以內即可繫住鎖鏈，該柱隨後熄滅30秒；或者用12次攻擊砸斷鎖鏈，英雄難度16次）',
   'hudChrome.finder.mech.shackle_pair': '雙人鐐銬（被鎖在一起的兩名玩家必須靠在一起）',
   'hudChrome.finder.mech.hallowed_brine':
-    '聖化鹹水（暗色聖水池：池中每秒受到18點傷害，他站在池中時受到的傷害降低40%，把他拖出去）',
+    '聖化鹹水（半徑9碼的暗色聖水池，英雄難度10碼：池中每秒受到18點傷害，英雄難度26點，他站在池中時受到的傷害降低40%，把他拖出去）',
   'hudChrome.finder.mech.rebounding_bulwark':
     '回彈壁盾（盾牌彈向上一個被擊中者10碼內最近的玩家，最多3人，英雄4人：散開）',
   'hudChrome.finder.mech.tide_sentence':
@@ -18874,9 +18875,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.buttonAria': '從鐵籠中掙脫',
   'hudChrome.bastionCage.progressAria': '掙脫進度：{pct}',
   'hudChrome.bastionChain.anchoredTitle': '被溺亡之錨鎖住了！',
-  'hudChrome.bastionChain.anchoredLine': '在絞盤把你拖進深坑之前，隊友必須砸斷鎖鏈',
+  'hudChrome.bastionChain.anchoredLine':
+    '跑到點亮的繫泊柱繫住鎖鏈，或者在絞盤把你拖進深坑之前讓隊友砸斷鎖鏈',
   'hudChrome.bastionChain.allyTitle': '砸斷鎖鏈！',
-  'hudChrome.bastionChain.allyLine': '{name} 正被拖向深坑：攻擊溺亡之錨',
+  'hudChrome.bastionChain.allyLine': '{name} 正被拖向深坑：攻擊溺亡之錨，或幫助其跑到點亮的繫泊柱',
+  'hudChrome.auraEffect.bastion.anchored':
+    '被鎖在溺亡之錨上：你可以移動，但無法遠離絞盤，它會把你絞向溺亡深坑。走到距被鉤住處至少{run}碼的點亮繫泊柱{reach}碼以內即可繫住鎖鏈（該柱熄滅{dark}秒），或者讓隊友用{links}次攻擊砸斷鎖鏈（英雄難度{linksHeroic}次）。掉進深坑會損失{pit}%的最大生命值（英雄難度{pitHeroic}%）。',
   'hudChrome.bastionChain.shackledTitle': '與 {name} 鎖在一起',
   'hudChrome.bastionChain.shackledLine': '彼此保持在 {range} 碼以內（目前相距 {dist} 碼）',
   'hudChrome.bastionChain.strainedLine': '離得太遠！鎖鏈會傷害你們兩人：靠近到 {range} 碼以內',

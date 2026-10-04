@@ -9389,6 +9389,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.attackSpeedFast'
   | 'hudChrome.auraEffect.attackSpeedSlow'
   | 'hudChrome.auraEffect.avatar'
+  | 'hudChrome.auraEffect.bastion.anchored'
   | 'hudChrome.auraEffect.battleStance'
   | 'hudChrome.auraEffect.battleTrance'
   | 'hudChrome.auraEffect.benisonPrayers'

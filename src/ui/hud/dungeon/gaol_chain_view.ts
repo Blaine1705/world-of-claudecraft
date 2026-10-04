@@ -2,7 +2,8 @@
 // player what a chain on them (or on a party member) asks of them, read off the
 // auras the sim already mirrors (encounters/sunken_bastion):
 //  - hooked by the Drowned Anchor (the Anchored aura, whose sourceId names the
-//    anchor): the group must break the chain, and the bar is the chain broken
+//    anchor): run to a lit Mooring Post or have the group break the chain
+//    (ossick_moorings.ts holds the post rule), and the bar is the chain broken
 //    so far (the anchor body's lost health, the same points the sim counts).
 //    The anchor's health IS its links (one per hit, however hard), so the
 //    alert counts the links left and says the rule out loud;

@@ -19793,11 +19793,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.iron_cage':
     '강철 우리 (상호작용 키를 연타해 탈출, 아군은 창살을 부술 수 있음)',
   'hudChrome.finder.mech.drowned_anchor':
-    '익사의 닻 (희생자가 구덩이로 끌려가기 전에 사슬을 끊으세요)',
+    '익사의 닻 (희생자가 구덩이로 감겨 갑니다: 불 켜진 계류 기둥 3야드 이내로 달려가 사슬을 묶으면 그 기둥은 30초 동안 꺼집니다, 아니면 12번 공격해 사슬을 끊으세요, 영웅은 16번)',
   'hudChrome.finder.mech.shackle_pair':
     '쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)',
   'hudChrome.finder.mech.hallowed_brine':
-    '성스러운 바닷물 (어두운 성수 웅덩이: 안에 있으면 매초 18 피해, 그가 안에 서 있는 동안 받는 피해 40퍼센트 감소, 밖으로 끌어내세요)',
+    '성스러운 바닷물 (반경 9야드의 어두운 성수 웅덩이, 영웅은 10야드: 안에 있으면 매초 18 피해, 영웅은 26, 그가 안에 서 있는 동안 받는 피해 40퍼센트 감소, 밖으로 끌어내세요)',
   'hudChrome.finder.mech.rebounding_bulwark':
     '튕겨 나오는 방패 (마지막으로 맞은 대상으로부터 10미터 이내의 가장 가까운 플레이어에게 튕김, 최대 3명, 영웅 4명: 흩어지세요)',
   'hudChrome.finder.mech.tide_sentence':
@@ -19817,10 +19817,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionCage.progressAria': '탈출 진행도: {pct}',
   'hudChrome.bastionChain.anchoredTitle': '익사의 닻에 묶였다!',
   'hudChrome.bastionChain.anchoredLine':
-    '권양기가 구덩이로 끌고 가기 전에 파티가 사슬을 끊어야 합니다',
+    '불 켜진 계류 기둥으로 달려가 사슬을 묶거나, 권양기가 구덩이로 끌고 가기 전에 파티가 사슬을 끊어야 합니다',
   'hudChrome.bastionChain.allyTitle': '사슬을 끊어라!',
   'hudChrome.bastionChain.allyLine':
-    '{name} 님이 구덩이로 끌려가고 있습니다: 익사의 닻을 공격하세요',
+    '{name} 님이 구덩이로 끌려가고 있습니다: 익사의 닻을 공격하거나 불 켜진 기둥으로 이끄세요',
+  'hudChrome.auraEffect.bastion.anchored':
+    '익사의 닻에 묶임: 움직일 수는 있지만 권양기에서 더 멀어질 수는 없으며, 익사의 구덩이로 감겨 갑니다. 걸린 곳에서 {run}야드 이상 떨어진 불 켜진 계류 기둥 {reach}야드 이내로 가면 사슬을 묶을 수 있습니다(그 기둥은 {dark}초 동안 꺼집니다). 아니면 파티가 {links}번 공격해 사슬을 끊어야 합니다(영웅은 {linksHeroic}번). 구덩이에 빠지면 최대 생명력의 {pit}%를 잃습니다(영웅은 {pitHeroic}%).',
   'hudChrome.bastionChain.shackledTitle': '{name} 님과 족쇄로 묶임',
   'hudChrome.bastionChain.shackledLine': '서로 {range}야드 이내에 머무르세요 (현재 {dist}야드)',
   'hudChrome.bastionChain.strainedLine':
@@ -19943,7 +19945,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.rerivet_last_link':
     '재리벳과 마지막 고리(사슬을 다시 박는 몰이막대장이를 차단, 사슬이 하나 남으면 10초마다 사슬 당기기)',
   'hudChrome.bastionAlert.sentencedTitle': '선고가 당신에게 떨어진다!',
-  'hudChrome.bastionAlert.sentencedLine': '빛의 기둥이 당신 근처의 모두를 강타한다: 무리에서 떨어져라',
+  'hudChrome.bastionAlert.sentencedLine':
+    '빛의 기둥이 당신 근처의 모두를 강타한다: 무리에서 떨어져라',
   'hudChrome.bastionAlert.brineTitle': '성스러운 바닷물 속에 있다!',
   'hudChrome.bastionAlert.brineLine': '매초 당신을 태운다: 웅덩이에서 벗어나라',
   'hudChrome.bastionAlert.reapedTitle': '죽음이 등 뒤에서 솟아오른다!',

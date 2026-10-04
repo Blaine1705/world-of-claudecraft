@@ -3924,6 +3924,9 @@ export const zh_CN: EnTranslations = {
         "avatar": "移动速度提高{pct}%，追猎它的猎物。减速和定身可以生效，击晕的持续时间减半。",
         "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。"
       },
+      "bastion": {
+        "anchored": "被锁在溺亡之锚上：你可以移动，但无法远离绞盘，它会把你绞向溺亡深坑。走到距被钩住处至少{run}码的点亮系泊柱{reach}码以内即可系住锁链（该柱熄灭{dark}秒），或者让队友用{links}次攻击砸断锁链（英雄难度{linksHeroic}次）。掉进深坑会损失{pit}%的最大生命值（英雄难度{pitHeroic}%）。"
+      },
       "sanctum": {
         "lockbound": "受到的伤害降低{pct}%：每条仍然完好的锁链提供{per}%。打破一个封印镣铐即可让其锁链脱落。",
         "enrage": "造成的伤害提高{pct}%。",
@@ -5989,7 +5992,7 @@ export const zh_CN: EnTranslations = {
       "mech": {
         "shadow_pulse": "暗影脉冲（周期性范围伤害）",
         "reaping_arc": "收割之弧（正面顺劈）",
-        "hallowed_brine": "圣化咸水（暗色圣水池：池中每秒受到18点伤害，他站在池中时受到的伤害降低40%，把他拖出去）",
+        "hallowed_brine": "圣化咸水（半径9码的暗色圣水池，英雄难度10码：池中每秒受到18点伤害，英雄难度26点，他站在池中时受到的伤害降低40%，把他拖出去）",
         "rebounding_bulwark": "回弹壁盾（盾牌弹向上一个被击中者10码内最近的玩家，最多3人，英雄4人：散开）",
         "tide_sentence": "潮汐宣判（标记5秒后，光柱击中被标记者6码内的所有人，英雄8码：远离队伍承受）",
         "unbroken_oath": "不破誓言（仅一次，生命值降到一半时他在泡泡中无敌跪下，最多60秒：击杀他的士兵打破它，随后他昏迷4秒并在10秒内受到的伤害提高20%）",
@@ -6054,7 +6057,7 @@ export const zh_CN: EnTranslations = {
         "anvils_decree": "铁砧法令（三次全团锤击，用治疗撑过）",
         "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）",
         "iron_cage": "铁笼（连按交互键挣脱，队友可以砸开铁栏）",
-        "drowned_anchor": "溺亡之锚（在受害者被拖进深坑前砸断锁链）",
+        "drowned_anchor": "溺亡之锚（受害者会被绞向深坑：跑到点亮的系泊柱3码以内即可系住锁链，该柱随后熄灭30秒；或者用12次攻击砸断锁链，英雄难度16次）",
         "shackle_pair": "双人镣铐（被锁在一起的两名玩家必须靠在一起）",
         "reaper_behind": "穿影（连续三次从玩家身后升起，人数足够时每次都是不同的人：离开镰刀的弧线）",
         "pack_bond": "兽群羁绊（两者相邻时伤害减半：将它们拉开15码）",
@@ -6090,9 +6093,9 @@ export const zh_CN: EnTranslations = {
     },
     "bastionChain": {
       "anchoredTitle": "被溺亡之锚锁住了！",
-      "anchoredLine": "在绞盘把你拖进深坑之前，队友必须砸断锁链",
+      "anchoredLine": "跑到点亮的系泊柱系住锁链，或者在绞盘把你拖进深坑之前让队友砸断锁链",
       "allyTitle": "砸断锁链！",
-      "allyLine": "{name} 正被拖向深坑：攻击溺亡之锚",
+      "allyLine": "{name} 正被拖向深坑：攻击溺亡之锚，或帮助其跑到点亮的系泊柱",
       "shackledTitle": "与 {name} 锁在一起",
       "shackledLine": "彼此保持在 {range} 码以内（当前相距 {dist} 码）",
       "strainedLine": "离得太远！锁链会伤害你们两人：靠近到 {range} 码以内",

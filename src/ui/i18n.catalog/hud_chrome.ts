@@ -5147,6 +5147,12 @@ export const hudChromeStrings = {
         'Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.',
       vanished: 'Hidden and immune to damage. He is about to pounce on the farthest player.',
     },
+    // The Sunken Bastion's boss marks (src/ui/bastion_aura_effect.ts).
+    // Wordy (M16): non-Latin fills in the overlays.
+    bastion: {
+      anchored:
+        'Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic).',
+    },
     // The Gravewyrm Sanctum's boss auras (src/ui/sanctum_aura_effect.ts).
     sanctum: {
       lockbound:
@@ -8760,7 +8766,7 @@ export const hudChromeStrings = {
       shadow_pulse: 'Shadow Pulse (pulsing area damage)',
       reaping_arc: 'Reaping Arc (frontal cleave)',
       hallowed_brine:
-        'Hallowed Brine (a pool of dark holy water: 18 damage a second to anyone in it, and he takes 40 percent less damage while he stands in it, so drag him out)',
+        'Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)',
       rebounding_bulwark:
         'Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)',
       tide_sentence:
@@ -8838,7 +8844,8 @@ export const hudChromeStrings = {
       masters_assembly: "The Master's Assembly (block the forge beams, rotate blockers)",
       // The Sunken Bastion's fifth pass (encounters/sunken_bastion).
       iron_cage: 'Iron Cage (mash your interact key to break out, allies can smash the bars)',
-      drowned_anchor: 'Drowned Anchor (break the chain before its victim is dragged into the pit)',
+      drowned_anchor:
+        'Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)',
       shackle_pair: 'Shackle Pair (two chained players must stay close together)',
       reaper_behind:
         "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
@@ -8889,9 +8896,11 @@ export const hudChromeStrings = {
   // Gaoler Ossick's chain alert (src/ui/hud/dungeon/gaol_chain_view.ts).
   bastionChain: {
     anchoredTitle: 'Chained to the Drowned Anchor!',
-    anchoredLine: 'Your group must break the chain before the winch drags you into the pit',
+    anchoredLine:
+      'Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit',
     allyTitle: 'Break the chain!',
-    allyLine: '{name} is being dragged to the pit: hit the Drowned Anchor',
+    allyLine:
+      '{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post',
     shackledTitle: 'Shackled to {name}',
     shackledLine: 'Stay within {range} yards of each other ({dist} yards apart)',
     strainedLine: 'Too far apart! The chain bites both of you: close to {range} yards',

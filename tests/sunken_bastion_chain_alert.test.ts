@@ -14,6 +14,8 @@ import {
   OSSICK_TUNING,
 } from '../src/sim/encounters/sunken_bastion';
 import { DT, type Entity } from '../src/sim/types';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
+import { bastionAuraEffectDescriptor } from '../src/ui/bastion_aura_effect';
 import {
   buildGaolChainView,
   type GaolChainEntity,
@@ -22,6 +24,7 @@ import {
   wardHealthText,
   wardHitText,
 } from '../src/ui/hud/dungeon/gaol_chain_view';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { aura, boss, engage, type Fight, fight, put, run } from './helpers/bastion_fight';
 
 vi.setConfig({ testTimeout: 60_000 });
@@ -68,6 +71,36 @@ describe('the chain alert view (pure)', () => {
     // Its health is its links: the alert counts them and states the rule.
     expect(v.count).toBe('Chain links left: 3 of 12');
     expect(v.hint).toContain('one link');
+    // The line teaches both ways out: a lit post, or the group's hits.
+    expect(v.line).toContain('lit mooring post');
+    expect(v.line).toContain('break');
+  });
+
+  it('the hooked debuff tooltip states the rule with the live numbers', () => {
+    const d = auraEffectDescriptor({ id: OSSICK_ANCHORED, kind: 'forced_move', value: 0 });
+    expect(d?.key).toBe('hudChrome.auraEffect.bastion.anchored');
+    expect(d?.nums).toEqual({
+      reach: OSSICK_TUNING.postReach,
+      run: OSSICK_TUNING.postRun,
+      dark: OSSICK_TUNING.postDarkSeconds,
+      links: OSSICK_TUNING.anchorHits,
+      linksHeroic: OSSICK_TUNING.anchorHitsHeroic,
+      pit: Math.round(OSSICK_TUNING.pitShare * 100),
+      pitHeroic: Math.round(OSSICK_TUNING.pitShareHeroic * 100),
+    });
+    const text = hudChromeStrings.auraEffect.bastion.anchored;
+    for (const token of [
+      '{reach}',
+      '{run}',
+      '{dark}',
+      '{links}',
+      '{linksHeroic}',
+      '{pit}',
+      '{pitHeroic}',
+    ])
+      expect(text).toContain(token);
+    // Any other aura falls through to its own line.
+    expect(bastionAuraEffectDescriptor({ id: 'bastion_caged', kind: 'stun', value: 0 })).toBeNull();
   });
 
   it('the anchor reads as links everywhere: the target frame and a hit', () => {
