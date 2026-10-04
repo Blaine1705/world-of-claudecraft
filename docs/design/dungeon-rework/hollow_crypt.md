@@ -169,6 +169,22 @@ it in seconds) take it to about 6.5. The four bosses are about 6.3 minutes (70,
 80, 80 and 150 s), walking about 2: about 15 minutes. To be measured with the
 meters harness before shipping, like the boss health.
 
+### 4.1 Trash mechanics pass (2026-10-04)
+
+The approved trash research (one second job per type, in `src/sim/mob/trash_kit/crypt_kit.ts`
+and `crypt_hooks.ts`, pinned by `tests/hollow_crypt_trash_mechanics.test.ts`) gives the
+crypt one group idea that teaches no boss: the necromancers rule the bones. An Ossuary
+Warrior that falls beside a living Necromancer of its pack lies as a pile of bones that
+stands again (Reassemble: break the pile or kill the Necromancer first); the Necromancer
+bursts a fallen packmate's corpse (Grave Rupture, kickable); a Bone Minion's burst also cuts
+the skeletons round it (Splinter Burst); the Bone Brute telegraphs a narrow smash (Marrow
+Crush); the gargoyle's stone thickens until a stun cracks it (Granite Skin, Cracked Stone);
+the Crow Caller marks a player for every crow (Carrion Eye, kickable) and a crow's peck can
+blind (Gouging Beak); the Cutthroat's leap hobbles its victim (Torn Tendon; heroic leaps
+again if nobody answers); the Bonechill Widow spits a rooting web lane (Rimesilk Spit); and
+on heroic the drake's breath leaves its cone burning (Barrow Embers). The Adept's
+line-of-sight volley waits on the engine's G6 nova. Names: `docs/design/naming-audit.md`.
+
 ## 5. Bosses
 
 Planning health comes from `target fight length x party DPS`. Party DPS is a
