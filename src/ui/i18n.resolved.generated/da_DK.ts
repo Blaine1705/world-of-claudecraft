@@ -6104,6 +6104,10 @@ export const da_DK: EnTranslations = {
       "linkBroken": "Link broken!"
     },
     "bastionAlert": {
+      "sentencedTitle": "The Sentence falls on you!",
+      "sentencedLine": "A column of light strikes everyone near you: move away from the group",
+      "brineTitle": "In the Hallowed Brine!",
+      "brineLine": "It burns you every second: step out of the pool",
       "reapedTitle": "Death rises behind you!",
       "reapedLine": "Step out of the scythe's arc: forward, or to either side",
       "veilTitle": "The Fog Veil",

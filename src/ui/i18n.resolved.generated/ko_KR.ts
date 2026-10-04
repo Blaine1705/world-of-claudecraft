@@ -6104,6 +6104,10 @@ export const ko_KR: EnTranslations = {
       "linkBroken": "고리 파괴!"
     },
     "bastionAlert": {
+      "sentencedTitle": "선고가 당신에게 떨어진다!",
+      "sentencedLine": "빛의 기둥이 당신 근처의 모두를 강타한다: 무리에서 떨어져라",
+      "brineTitle": "성스러운 바닷물 속에 있다!",
+      "brineLine": "매초 당신을 태운다: 웅덩이에서 벗어나라",
       "reapedTitle": "죽음이 등 뒤에서 솟아오른다!",
       "reapedLine": "낫의 궤적에서 벗어나라: 앞으로, 혹은 옆으로",
       "veilTitle": "안개 장막",

@@ -6104,6 +6104,10 @@ export const zh_CN: EnTranslations = {
       "linkBroken": "断开一环！"
     },
     "bastionAlert": {
+      "sentencedTitle": "宣判落在你身上！",
+      "sentencedLine": "光柱会击中你身边的所有人：远离队伍",
+      "brineTitle": "你站在圣化咸水中！",
+      "brineLine": "它每秒都在灼烧你：离开水池",
       "reapedTitle": "死亡在你身后升起！",
       "reapedLine": "离开镰刀的弧线：向前，或向两侧",
       "veilTitle": "雾幕",

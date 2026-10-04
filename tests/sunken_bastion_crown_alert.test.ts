@@ -1,10 +1,12 @@
-// The Sunken Bastion's crown alert (src/ui/hud/dungeon/bastion_alert_view.ts):
-// the pure view over Vael's mirrored auras, then driven from a real veil so
+// The Sunken Bastion's boss alert (src/ui/hud/dungeon/bastion_alert_view.ts):
+// the pure view over Olen's and Vael's mirrored auras, then driven from a real veil so
 // the alert reads exactly what the sim puts on the player and the figures.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   FOG_SHADE_ID,
+  OLEN_IN_BRINE,
+  OLEN_SENTENCED,
   OSSICK_ID,
   TURNKEY_ID,
   VAEL_BEACON_LIT,
@@ -18,6 +20,9 @@ import {
 import type { Entity } from '../src/sim/types';
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from '../src/ui/hud/dungeon';
 import { boss, engage, fight, put, run, tick } from './helpers/bastion_fight';
+
+// A whole veil over many sim ticks: room for a loaded worker.
+vi.setConfig({ testTimeout: 60_000 });
 
 const mark = (id: string, remaining = 3, duration = 6) => ({ id, remaining, duration });
 
@@ -61,6 +66,26 @@ describe('the crown alert view', () => {
     const v = view(1);
     if (!v.visible) throw new Error('hidden');
     expect(v.progress).toBeCloseTo(0.5, 5);
+  });
+});
+
+describe("the alert on Olen's marks", () => {
+  it('the Sentence on you comes first, then the brine underfoot, then the veil', () => {
+    const view = (auras: { id: string; remaining?: number; duration?: number }[]) =>
+      buildBastionAlertView({ auras, targetId: null, entity: () => null });
+    const kind = (auras: { id: string; remaining?: number; duration?: number }[]) => {
+      const v = view(auras);
+      return v.visible ? v.kind : null;
+    };
+    expect(kind([mark(OLEN_IN_BRINE, 0.3, 0.3), mark(OLEN_SENTENCED, 2, 5)])).toBe('sentenced');
+    expect(kind([mark(OLEN_IN_BRINE, 0.3, 0.3), mark(VAEL_HYMN_DROWNING)])).toBe('brine');
+    expect(kind([mark(OLEN_SENTENCED, 2.5, 5), mark(VAEL_REAP_MARK)])).toBe('sentenced');
+    const v = view([mark(OLEN_SENTENCED, 2.5, 5)]);
+    if (!v.visible) throw new Error('hidden');
+    expect(v.progress).toBeCloseTo(0.5, 5);
+    const b = view([mark(OLEN_IN_BRINE, 0.3, 0.3)]);
+    if (!b.visible) throw new Error('hidden');
+    expect(b.progress).toBeNull();
   });
 });
 

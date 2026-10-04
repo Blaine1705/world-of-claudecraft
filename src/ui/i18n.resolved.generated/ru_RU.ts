@@ -6104,6 +6104,10 @@ export const ru_RU: EnTranslations = {
       "linkBroken": "Звено разбито!"
     },
     "bastionAlert": {
+      "sentencedTitle": "Приговор падёт на тебя!",
+      "sentencedLine": "Столп света ударит всех рядом с тобой: отойди от группы",
+      "brineTitle": "Ты в освящённом рассоле!",
+      "brineLine": "Он жжёт каждую секунду: выйди из лужи",
       "reapedTitle": "Смерть встаёт за твоей спиной!",
       "reapedLine": "Выйди из дуги косы: вперёд или в сторону",
       "veilTitle": "Туманная завеса",

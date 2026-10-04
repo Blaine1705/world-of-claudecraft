@@ -18976,6 +18976,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': '震颤践踏（离开他周围的圆环）',
   'hudChrome.finder.mech.rerivet_last_link':
     '重铆与最后一环（打断重新铆上锁链的刺棒匠；只剩一条锁链时，每10秒绷链一次）',
+  'hudChrome.bastionAlert.sentencedTitle': '宣判落在你身上！',
+  'hudChrome.bastionAlert.sentencedLine': '光柱会击中你身边的所有人：远离队伍',
+  'hudChrome.bastionAlert.brineTitle': '你站在圣化咸水中！',
+  'hudChrome.bastionAlert.brineLine': '它每秒都在灼烧你：离开水池',
   'hudChrome.bastionAlert.reapedTitle': '死亡在你身后升起！',
   'hudChrome.bastionAlert.reapedLine': '离开镰刀的弧线：向前，或向两侧',
   'hudChrome.bastionAlert.veilTitle': '雾幕',

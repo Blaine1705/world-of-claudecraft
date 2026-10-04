@@ -19955,6 +19955,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': '震える踏みつけ（彼の周りの輪から出る）',
   'hudChrome.finder.mech.rerivet_last_link':
     '再鋲打ちと最後の環（鎖を打ち直す突き棒鍛冶を阻止する。鎖が残り1本になると10秒ごとに鎖の引き締め）',
+  'hudChrome.bastionAlert.sentencedTitle': '宣告があなたに下る！',
+  'hudChrome.bastionAlert.sentencedLine': '光の柱があなたの近くの全員を打つ：集団から離れろ',
+  'hudChrome.bastionAlert.brineTitle': '聖なる潮水の中にいる！',
+  'hudChrome.bastionAlert.brineLine': '毎秒あなたを焼く：溜まりから出ろ',
   'hudChrome.bastionAlert.reapedTitle': '死が背後から現れる！',
   'hudChrome.bastionAlert.reapedLine': '大鎌の弧から出ろ：前へ、あるいは左右へ',
   'hudChrome.bastionAlert.veilTitle': '霧のヴェール',

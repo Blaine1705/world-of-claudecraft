@@ -20332,6 +20332,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': 'Сотрясающий топот (выйдите из кольца вокруг него)',
   'hudChrome.finder.mech.rerivet_last_link':
     'Переклёпка и Последнее звено (прервите кузнеца-погонщика, заново склёпывающего цепь; когда остаётся одна цепь, Натяжение каждые 10 секунд)',
+  'hudChrome.bastionAlert.sentencedTitle': 'Приговор падёт на тебя!',
+  'hudChrome.bastionAlert.sentencedLine': 'Столп света ударит всех рядом с тобой: отойди от группы',
+  'hudChrome.bastionAlert.brineTitle': 'Ты в освящённом рассоле!',
+  'hudChrome.bastionAlert.brineLine': 'Он жжёт каждую секунду: выйди из лужи',
   'hudChrome.bastionAlert.reapedTitle': 'Смерть встаёт за твоей спиной!',
   'hudChrome.bastionAlert.reapedLine': 'Выйди из дуги косы: вперёд или в сторону',
   'hudChrome.bastionAlert.veilTitle': 'Туманная завеса',

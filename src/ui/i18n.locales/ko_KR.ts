@@ -19942,6 +19942,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': '전율의 발구르기(그의 주변 고리 밖으로 나가기)',
   'hudChrome.finder.mech.rerivet_last_link':
     '재리벳과 마지막 고리(사슬을 다시 박는 몰이막대장이를 차단, 사슬이 하나 남으면 10초마다 사슬 당기기)',
+  'hudChrome.bastionAlert.sentencedTitle': '선고가 당신에게 떨어진다!',
+  'hudChrome.bastionAlert.sentencedLine': '빛의 기둥이 당신 근처의 모두를 강타한다: 무리에서 떨어져라',
+  'hudChrome.bastionAlert.brineTitle': '성스러운 바닷물 속에 있다!',
+  'hudChrome.bastionAlert.brineLine': '매초 당신을 태운다: 웅덩이에서 벗어나라',
   'hudChrome.bastionAlert.reapedTitle': '죽음이 등 뒤에서 솟아오른다!',
   'hudChrome.bastionAlert.reapedLine': '낫의 궤적에서 벗어나라: 앞으로, 혹은 옆으로',
   'hudChrome.bastionAlert.veilTitle': '안개 장막',

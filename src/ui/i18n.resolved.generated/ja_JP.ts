@@ -6104,6 +6104,10 @@ export const ja_JP: EnTranslations = {
       "linkBroken": "環を断った！"
     },
     "bastionAlert": {
+      "sentencedTitle": "宣告があなたに下る！",
+      "sentencedLine": "光の柱があなたの近くの全員を打つ：集団から離れろ",
+      "brineTitle": "聖なる潮水の中にいる！",
+      "brineLine": "毎秒あなたを焼く：溜まりから出ろ",
       "reapedTitle": "死が背後から現れる！",
       "reapedLine": "大鎌の弧から出ろ：前へ、あるいは左右へ",
       "veilTitle": "霧のヴェール",

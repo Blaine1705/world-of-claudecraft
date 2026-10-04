@@ -18994,6 +18994,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.korgath_stomp': '震顫踐踏（離開他周圍的圓環）',
   'hudChrome.finder.mech.rerivet_last_link':
     '重鉚與最後一環（打斷重新鉚上鎖鏈的刺棒匠；只剩一條鎖鏈時，每10秒繃鏈一次）',
+  'hudChrome.bastionAlert.sentencedTitle': '宣判落在你身上！',
+  'hudChrome.bastionAlert.sentencedLine': '光柱會擊中你身邊的所有人：遠離隊伍',
+  'hudChrome.bastionAlert.brineTitle': '你站在聖化鹹水中！',
+  'hudChrome.bastionAlert.brineLine': '它每秒都在灼燒你：離開水池',
   'hudChrome.bastionAlert.reapedTitle': '死亡在你身後升起！',
   'hudChrome.bastionAlert.reapedLine': '離開鐮刀的弧線：向前，或向兩側',
   'hudChrome.bastionAlert.veilTitle': '霧幕',

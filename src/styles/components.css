@@ -16580,12 +16580,17 @@
     width: 0;
     transition: width 80ms linear;
   }
-  #bastion-alert.is-reaped {
+  #bastion-alert.is-reaped,
+  #bastion-alert.is-sentenced,
+  #bastion-alert.is-brine {
     border-color: var(--color-hostile);
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
   #bastion-alert.is-reaped .fa-title,
-  #bastion-alert.is-reaped .fa-fill {
+  #bastion-alert.is-reaped .fa-fill,
+  #bastion-alert.is-sentenced .fa-title,
+  #bastion-alert.is-sentenced .fa-fill,
+  #bastion-alert.is-brine .fa-title {
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
   }
