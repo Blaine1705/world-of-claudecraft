@@ -18972,6 +18972,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_korzul_plunging_fire': '傾瀉烈焰',
   'abilityUi.cast.sanctum_korzul_crashing_descent': '墜擊降落',
   'abilityUi.cast.sanctum_tusker_trample': '踐踏',
+  'abilityUi.cast.sanctum_counterweight_lash': '配重尾鞭',
+  'abilityUi.cast.sanctum_branding_iron': '烙鐵',
+  'abilityUi.cast.sanctum_rime_breath': '霜凇吐息',
+  'abilityUi.cast.kituse_sanctum_topple_brazier': '推倒火盆',
   'abilityUi.cast.sanctum_korgath_maul_arc': '重錘弧斬',
   'abilityUi.cast.sanctum_korgath_chain_flail': '鎖鏈鞭笞',
   'abilityUi.cast.sanctum_korgath_threshold_charge': '門檻衝鋒',
@@ -19070,6 +19074,23 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.sanctumAlert.lockboundLine':
     '{chains}條鎖鏈仍在：他受到的傷害降低{pct}%。打破封印鐐銬來解除它。',
   'hudChrome.sanctumAlert.timeAria': '剩餘{seconds}秒',
+  'hudChrome.sanctumAlert.brandedTitle': '烙印！',
+  'hudChrome.sanctumAlert.brandedLine': '烙印會一直灼燒到結束：到融水池裡將它澆熄',
+  'hudChrome.sanctumAlert.rimeTitle': '蔓延霜凇！',
+  'hudChrome.sanctumAlert.rimeLine': '蔓延霜凇 {stacks}/{max}：離開幼龍的吐息',
+  'hudChrome.kitUse.toppleLine': '把它踢倒在敵群上：灑出的火焰會灼燒它們',
+  'hudChrome.kitUse.toppleKey': '把{name}推倒在它們身上',
+  'hudChrome.kitUse.toppleTap': '點擊這裡把{name}推倒在它們身上',
+  'hudChrome.kitUse.toppleClick': '點選這裡把{name}推倒在它們身上',
+  'hudChrome.kitUse.toppleFar': '靠近到{range}碼內才能把它踢倒',
+  'hudChrome.kitUse.toppleAria': '推倒{name}',
+  'hudChrome.kitUse.usingLine': '保持不動：受到攻擊、移動或昏迷都會打斷它',
+  'hudChrome.kitUse.timeAria': '剩餘{seconds}秒',
+  'hudChrome.auraEffect.sanctum.branded':
+    '每{interval}秒造成{value}點{school}傷害，持續{seconds}秒。踏入融水池可立即將其澆熄。',
+  'hudChrome.auraEffect.sanctum.creepingRime':
+    '移動速度降低{pct}%，每層{per}%。每次霜凇吐息都會疊加一層並將持續時間重置為{seconds}秒。疊到{max}層時你會被凍結（冰封）{freeze}秒，並清除所有層數。',
+  'hudChrome.auraEffect.sanctum.icedOver': '被蔓延霜凇凍結：無法移動或行動。',
   'hudChrome.auraEffect.sanctum.lockbound':
     '受到的傷害降低{pct}%：每條仍然完好的鎖鏈提供{per}%。打破一個封印鐐銬即可讓其鎖鏈脫落。',
   'hudChrome.auraEffect.sanctum.enrage': '造成的傷害提高{pct}%。',
@@ -19137,7 +19158,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.sight.tidewisp':
     '那就是月之水本身，我們本該喝下的那一口。別讓它碰到你們。',
   'dungeonGuide.drownedTemple.area.colonnade': '潮汐柱廊。我們兩兩並肩走過這裡，唱著升起之節。',
-  'dungeonGuide.drownedTemple.sight.sentinel': '門邊水池裡的月鰩。我們還是見習生時，在月出時餵牠們珍珠。如今牠們守著這些門，把我們的珍珠當作心臟。',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    '門邊水池裡的月鰩。我們還是見習生時，在月出時餵牠們珍珠。如今牠們守著這些門，把我們的珍珠當作心臟。',
   'dungeonGuide.drownedTemple.sight.eel':
     '潟湖裡的鰻魚。見習生們會在黃昏餵牠們麵包。牠們靠我們的聖歌養得肥肥的。',
   'dungeonGuide.drownedTemple.area.veil': '那道帷幕後面就是唱詩庭院。我從小時候起就再沒踏進去過。',

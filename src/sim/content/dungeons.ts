@@ -20,7 +20,11 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
-import { SANCTUM_CINDER_BREATH } from '../mob/trash_kit/sanctum_cast_ids';
+import {
+  SANCTUM_BOILING_MELTWATER,
+  SANCTUM_CINDER_BREATH,
+  SANCTUM_COUNTERWEIGHT_LASH,
+} from '../mob/trash_kit/sanctum_cast_ids';
 import type {
   DungeonDef,
   DungeonSpawn,
@@ -37,7 +41,7 @@ import {
   GRAVEWYRM_SANCTUM_SPAWNS,
   GRAVEWYRM_SANCTUM_STORY_OBJECTS,
 } from './gravewyrm_sanctum';
-import { GRAVEWYRM_SANCTUM_ANCHORS } from './gravewyrm_sanctum_layout';
+import { GRAVEWYRM_SANCTUM_ANCHORS, QUENCH_POOLS } from './gravewyrm_sanctum_layout';
 import { HOLLOW_CRYPT_GATE_OBJECTS, HOLLOW_CRYPT_GATES, HOLLOW_CRYPT_SPAWNS } from './hollow_crypt';
 import { HOLLOW_CRYPT_ANCHORS } from './hollow_crypt_layout';
 import {
@@ -876,6 +880,47 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       max: 180,
       school: 'fire',
     },
+    trashKit: {
+      // Counterweight Lash (the trash mechanics pass, MECANICAS_TRASH.md 8.2
+      // A): a 1 s bar, then its spiked tail lashes the 100 degree cone behind
+      // it, 7 yd. With the breath across its front, only its flanks are safe:
+      // the melee learn to stand at its sides. 120 to 140 landed on the 950
+      // health cloth reference (13 to 15 percent): a lighter dodge than the
+      // breath, on a shorter bar.
+      tailLash: {
+        castId: SANCTUM_COUNTERWEIGHT_LASH,
+        name: 'Counterweight Lash',
+        castTime: 1,
+        every: 9,
+        first: 5,
+        school: 'physical',
+        range: 7,
+        arcDeg: 100,
+        min: 120,
+        max: 140,
+      },
+      // Heroic Boiling Meltwater (8.2 B): where the breath lands the ice
+      // melts to scalding water, a 3.5 yd pool 4.5 yd out along the cone for
+      // 5 s. 32 to 38 a second landed (about 3.5 percent) before the heroic
+      // mechanic multiplier, the soulfire patch's pace; the first scald one
+      // second after it spills. The tank walks the Scaleguard off its pools.
+      breathPool: {
+        ahead: 4.5,
+        heroicOnly: true,
+        hazard: {
+          castId: SANCTUM_BOILING_MELTWATER,
+          name: 'Boiling Meltwater',
+          objectTemplate: SANCTUM_BOILING_MELTWATER,
+          radius: 3.5,
+          seconds: 5,
+          tick: 1,
+          min: 32,
+          max: 38,
+          school: 'fire',
+          hits: 'players',
+        },
+      },
+    },
     loot: [
       { copper: 350, chance: 1 },
       { itemId: 'cracked_wyrm_scale', chance: 0.5 },
@@ -1620,6 +1665,8 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     // anything left alive (instances/boss_chain_pull.ts).
     bossChainPull: true,
     areaCastsPlant: true,
+    // The meltwater pools that douse a Goadsmith's Branding Iron.
+    quenchZones: QUENCH_POOLS,
     interior: 'gravewyrm_sanctum',
     suggestedPlayers: 5,
     enterText: 'The air goes cold. Something vast breathes below...',

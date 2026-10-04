@@ -5170,6 +5170,13 @@ export const hudChromeStrings = {
         'In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.',
       shardFlare:
         'The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.',
+      // The Sanctum trash debuffs (the Goadsmith's Branding Iron, the Rime
+      // Whelps' Rime Breath).
+      branded:
+        'Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.',
+      creepingRime:
+        'Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.',
+      icedOver: 'Frozen solid by Creeping Rime: unable to move or act.',
     },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
@@ -8985,6 +8992,24 @@ export const hudChromeStrings = {
     lockboundTitle: 'Lockbound',
     lockboundLine:
       '{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.',
+    timeAria: '{seconds} seconds left',
+    // The trash debuffs, below every boss alert (the trash mechanics pass).
+    brandedTitle: 'Branded!',
+    brandedLine: 'The brand burns until it ends: douse it in a meltwater pool',
+    rimeTitle: 'Creeping Rime!',
+    rimeLine: "Creeping Rime {stacks}/{max}: step out of the whelps' breath",
+  },
+  // The trash engine's use prompt (src/ui/hud/dungeon/kit_use_prompt_view.ts):
+  // a usable encounter body near the local player (a Soul Brazier), kicked
+  // over with the interact press. {name} is the body's localized name.
+  kitUse: {
+    toppleLine: 'Kick it over onto the pack: the spill burns them',
+    toppleKey: 'Topple the {name} onto them',
+    toppleTap: 'Tap here to topple the {name} onto them',
+    toppleClick: 'Click here to topple the {name} onto them',
+    toppleFar: 'Get within {range} yd to kick it over',
+    toppleAria: 'Topple the {name}',
+    usingLine: 'Hold still: a hit, a step or a stun breaks it',
     timeAria: '{seconds} seconds left',
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,

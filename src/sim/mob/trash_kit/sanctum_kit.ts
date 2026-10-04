@@ -10,7 +10,9 @@
 //   toss    the farthest player in reach is marked when the bar starts: a ring
 //           is painted where they stood (an encounter object the client
 //           mirrors, scale = radius), and the block lands on everyone inside it
-//           when the bar ends. Physical: dodge it, never kick it.
+//           when the bar ends. Physical: dodge it, never kick it. With
+//           `leavesWall` the block stays where it fell as a temporary combat
+//           wall (combat_walls.ts): cover from the casters, for a while.
 //   stoke   no cast bar: every few seconds each living ally in the fight near
 //           the source swings faster for a few seconds. A stoke source whose
 //           summoner has died gutters out, so a brazier never holds a fight on
@@ -25,6 +27,7 @@ import { createGroundObject } from '../../entity';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, dist2d, type Entity, type TrashKitDef, type TrashKitState } from '../../types';
+import { spawnCombatWall } from './combat_walls';
 import { SANCTUM_GOADED, SANCTUM_STOKED } from './sanctum_cast_ids';
 import { livingInReach } from './targets';
 
@@ -189,6 +192,21 @@ export function landToss(
     );
     ctx.dealDamage(mob, p, amount, false, def.school, def.name, 'hit', true);
     n++;
+  }
+  // The block stays where it fell: a temporary combat wall (combat_walls.ts),
+  // its broad face turned to the thrower.
+  if (def.leavesWall) {
+    const facing = Math.atan2(spot.x - mob.pos.x, spot.z - mob.pos.z);
+    spawnCombatWall(
+      ctx,
+      inst,
+      def.leavesWall.objectTemplate,
+      def.leavesWall.name,
+      spot.x,
+      spot.z,
+      facing,
+      def.leavesWall.seconds,
+    );
   }
   return n;
 }

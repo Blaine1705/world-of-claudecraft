@@ -19,7 +19,10 @@ import { dist2d, type Entity } from '../../types';
 import { mobCombatProfile } from '../combat_profile';
 
 /** Spawn one kit add of `templateId` at (x, z), owned by `owner`, straight
- *  into the fight on `victim` (when there is one). Returns the add. */
+ *  into the fight on `victim` (when there is one). Returns the add. `twin`
+ *  (the split's copy, kit_split.ts) makes it a true copy of a placed pack
+ *  mob: its level and the pack mob's tuning rather than the summoned-add
+ *  rows, while it is still a summoned add (no loot, counted to its owner). */
 export function spawnKitAdd(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -28,15 +31,21 @@ export function spawnKitAdd(
   x: number,
   z: number,
   victim: Entity | null,
+  twin?: { level: number },
 ): Entity | null {
   const template = MOBS[templateId];
   if (!template) return null;
-  const addTemplate = mobTemplateForDungeonDifficulty(template, inst.dungeonId, inst.difficulty, {
-    summonedAdd: true,
-  });
-  const level = mobLevelForDungeonDifficulty(inst.dungeonId, inst.difficulty, template.minLevel);
+  const tuning = { summonedAdd: !twin };
+  const addTemplate = mobTemplateForDungeonDifficulty(
+    template,
+    inst.dungeonId,
+    inst.difficulty,
+    tuning,
+  );
+  const level =
+    twin?.level ?? mobLevelForDungeonDifficulty(inst.dungeonId, inst.difficulty, template.minLevel);
   const add = createMob(ctx.nextId++, addTemplate, level, ctx.groundPos(x, z));
-  applyDungeonMobTuning(add, inst.dungeonId, inst.difficulty, { summonedAdd: true });
+  applyDungeonMobTuning(add, inst.dungeonId, inst.difficulty, tuning);
   add.tappedById = owner.tappedById;
   add.summonedAdd = true;
   add.facing = owner.facing;

@@ -1425,6 +1425,24 @@ const baseEnTable = {
   'aura.sanctumAirborne': 'Airborne',
   'aura.sanctumDoused': 'Doused',
   'aura.sanctumShardFlare': 'Shard Flare',
+  // The Sanctum trash mechanics pass on the trash engine (mob/trash_kit:
+  // sanctum_cast_ids.ts, encounter_use.ts, freeze_stacks.ts, brand.ts,
+  // combat_walls.ts, kit_split.ts) and the engine's dev-only demo kit
+  // (engine_demo.ts): damage, heal, aura and object names. EXACT matcher.
+  'mechanic.sanctumThawTheHeld': 'Thaw the Held',
+  'mechanic.sanctumCounterweightLash': 'Counterweight Lash',
+  'mechanic.sanctumBoilingMeltwater': 'Boiling Meltwater',
+  'mechanic.sanctumBrandingIron': 'Branding Iron',
+  'aura.sanctumBranded': 'Branded',
+  'mechanic.sanctumToppleBrazier': 'Topple Brazier',
+  'mechanic.sanctumSpilledSoulfire': 'Spilled Soulfire',
+  'mechanic.sanctumRimeBreath': 'Rime Breath',
+  'aura.sanctumCreepingRime': 'Creeping Rime',
+  'aura.sanctumIcedOver': 'Iced Over',
+  'mechanic.sanctumIceSlab': 'Ice Slab',
+  'mechanic.sanctumFracture': 'Fracture',
+  'mechanic.trashDemoNova': 'Test Nova',
+  'mechanic.trashDemoOrb': 'Test Orb',
   // The Wildheart Basin's three bosses (encounters/wildheart_basin: beastmaster.ts,
   // gorgebloom.ts, zulgar.ts): their yells and log lines (EXACT) and the
   // mechanic and aura names.
@@ -17919,6 +17937,23 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Airborne: 'aura.sanctumAirborne',
   Doused: 'aura.sanctumDoused',
   'Shard Flare': 'aura.sanctumShardFlare',
+  // The Sanctum trash mechanics pass on the trash engine, and the engine's
+  // dev-only demo kit (Test Nova is also its silence aura's name, Test Orb the
+  // walker's heal and empower aura).
+  'Thaw the Held': 'mechanic.sanctumThawTheHeld',
+  'Counterweight Lash': 'mechanic.sanctumCounterweightLash',
+  'Boiling Meltwater': 'mechanic.sanctumBoilingMeltwater',
+  'Branding Iron': 'mechanic.sanctumBrandingIron',
+  Branded: 'aura.sanctumBranded',
+  'Topple Brazier': 'mechanic.sanctumToppleBrazier',
+  'Spilled Soulfire': 'mechanic.sanctumSpilledSoulfire',
+  'Rime Breath': 'mechanic.sanctumRimeBreath',
+  'Creeping Rime': 'aura.sanctumCreepingRime',
+  'Iced Over': 'aura.sanctumIcedOver',
+  'Ice Slab': 'mechanic.sanctumIceSlab',
+  Fracture: 'mechanic.sanctumFracture',
+  'Test Nova': 'mechanic.trashDemoNova',
+  'Test Orb': 'mechanic.trashDemoOrb',
   'Jaguar Bite': 'mechanic.wildheartJaguarBite',
   'Beast Pit Quake': 'mechanic.wildheartBeastPitQuake',
   'Vine Lash': 'mechanic.wildheartVineLash',

@@ -24,7 +24,13 @@ templates, spawns, packs, patrols, gates and story markers are
 | `index.ts` | `tickSanctumEncounters` (called from `instances/dungeons.ts` after the trash kit) and the public surface. |
 
 The trash kit's Sanctum keys (`goad`, `toss`, `stoke`, the death burst's `slow`)
-live in `src/sim/mob/trash_kit/sanctum_kit.ts` and `sanctum_cast_ids.ts`. Dev
+live in `src/sim/mob/trash_kit/sanctum_kit.ts` and `sanctum_cast_ids.ts`; the
+trash mechanics pass rides the engine's generic keys (Thaw the Held on
+`reanimate`, Counterweight Lash on `tailLash`, heroic Boiling Meltwater on
+`breathPool`, Branding Iron on `brand` with the `QUENCH_POOLS` of
+`gravewyrm_sanctum_layout.ts`, Topple Brazier on `usable`, Rime Breath on
+`cone` with a `freezeStack`, the Ice Slab on `toss.leavesWall`, Fracture on
+`split`). Dev
 helpers: `src/sim/dev/gravewyrm_sanctum_dev.ts` (`/dev sanctum`).
 
 Phase A (this directory today): the map, every pack and patrol with its kit, the
@@ -46,6 +52,19 @@ Rules:
 Naming (IP check at authoring, 2026-10-03): every new name was cleared in the
 design's section 11 (Thawcaller, Goadsmith, Sledge Tusker exact-searched; the
 rest generic English or glaciology terms). "Ice Tomb" is never a display name.
+
+The trash mechanics pass (2026-10-04, the trash engine's keys in
+`src/sim/mob/trash_kit/sanctum_kit.ts`'s neighbours; see that directory's
+CLAUDE.md "Engine pieces") was web-checked the same way (exact phrase plus the
+coined token on warcraft.wiki.gg, Wowhead, the GW2 and FFXIV wikis, Arknights):
+Thaw the Held, Counterweight Lash, Boiling Meltwater, Topple Brazier and
+Spilled Soulfire CLEAR (no exact match; "Soulfire" already ships here);
+Branding Iron and Branded CLEAR-generic (plain English; WoW has a minor
+Torghast power "Branding Iron", GW2's Branded is a faction, recorded as
+borderline); Rime Breath, Ice Slab, Fracture, Meltwater CLEAR-generic. Two
+renamed before shipping: the stacking chill "Rimechill" (an Arknights enemy
+ability) is "Creeping Rime", and the freeze "Frozen Solid" (WoW's Melidrussa
+pairs stacking chill with exactly that debuff) is the plain idiom "Iced Over".
 
 Tests: `tests/gravewyrm_korgath.test.ts` (Korgath's core), `tests/gravewyrm_velkhar.test.ts` (Velkhar), `tests/gravewyrm_korzul.test.ts` (Korzul), `tests/gravewyrm_sanctum_route.test.ts` (route contract, heights,
 arenas, story marker reach), `tests/gravewyrm_sanctum_trash.test.ts` (kits, the

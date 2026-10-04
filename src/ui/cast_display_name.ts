@@ -167,6 +167,18 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.sanctum_ice_block_toss': true,
   'abilityUi.cast.sanctum_tusker_tusk_sweep': true,
   'abilityUi.cast.sanctum_tusker_trample': true,
+  // The Sanctum trash mechanics pass (trash_kit/sanctum_cast_ids.ts).
+  'abilityUi.cast.sanctum_thaw_the_held': true,
+  'abilityUi.cast.sanctum_counterweight_lash': true,
+  'abilityUi.cast.sanctum_branding_iron': true,
+  'abilityUi.cast.sanctum_rime_breath': true,
+  // The player's own bar while toppling a Soul Brazier (the trash engine's G3
+  // use): castDisplayName reads this table too, so the bar never shows the id.
+  'abilityUi.cast.kituse_sanctum_topple_brazier': true,
+  // The trash engine's dev-only demonstration kit (trash_kit/engine_demo.ts).
+  'abilityUi.cast.trash_demo_nova': true,
+  'abilityUi.cast.trash_demo_nova_unstoppable': true,
+  'abilityUi.cast.trash_demo_walker': true,
   'abilityUi.cast.sanctum_velkhar_soulfire_trench': true,
   'abilityUi.cast.sanctum_velkhar_shadow_volley': true,
   'abilityUi.cast.sanctum_korgath_maul_arc': true,

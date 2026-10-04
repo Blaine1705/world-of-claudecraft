@@ -32,10 +32,19 @@ import {
   type TrashKitState,
 } from '../../types';
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
+import { brandReady, landBrand, stepQuench } from './brand';
 import { holdAreaCast } from './cast_hold';
 import { CRYPT_PERCH_DIVE, CRYPT_SKY_LANDING } from './cast_ids';
+import { stepCombatWall, syncCombatWallCollision } from './combat_walls';
 import { stepDeathBurst } from './death_burst';
 import { callDownLastFlier } from './flier_call';
+import { applyFreezeStack } from './freeze_stacks';
+import { stepKitHazard } from './kit_hazard';
+import { landNova, novaCastIdFor, novaReady } from './kit_nova';
+import { kitObjectIds } from './kit_objects';
+import { restoreSplit, stepSplit } from './kit_split';
+import { launchWalker, pickWalkerAlly, stepWalker } from './kit_walker';
+import { landReanimate, pickReanimateCorpse } from './reanimate';
 import {
   dropToss,
   landGoad,
@@ -62,14 +71,19 @@ import { stepDeathCloud, stepPulse } from './wildheart_kit';
  *  before a strike, a bolt last. */
 const CAST_KEYS = [
   'raise',
+  'reanimate',
   'call',
   'mend',
   'ward',
+  'walker',
   'goad',
+  'brand',
   'screech',
+  'nova',
   'lullaby',
   'wingGust',
   'tailLash',
+  'cone',
   'line',
   'toss',
   'bolt',
@@ -79,7 +93,9 @@ type CastKey = (typeof CAST_KEYS)[number];
 /** Physical kit casts: a silence never breaks them and no school lockout
  *  stops them (dodge these, never kick them). */
 function isPhysicalKey(key: CastKey): boolean {
-  return key === 'tailLash' || key === 'wingGust' || key === 'line' || key === 'toss';
+  return (
+    key === 'tailLash' || key === 'wingGust' || key === 'line' || key === 'toss' || key === 'cone'
+  );
 }
 
 function isSupportKey(key: CastKey): key is SupportKey {
@@ -96,6 +112,19 @@ const LEAP_STOP = 1.5;
 const LEAP_ARC = 3;
 
 function castDef(kit: TrashKitDef, key: CastKey): TrashKitCast | undefined {
+  if (key === 'walker') {
+    // A walker launched by a bar (its death launch has no bar).
+    const w = kit.walker;
+    if (!w || w.launch !== 'cast') return undefined;
+    return {
+      castId: w.castId,
+      name: w.name,
+      castTime: w.castTime ?? 1.5,
+      every: w.every ?? 15,
+      first: w.first ?? 6,
+      school: w.school,
+    };
+  }
   return kit[key];
 }
 
@@ -251,6 +280,25 @@ function castReady(
       return kit.raise && livingSummons(ctx, mob, kit.raise.summon) < kit.raise.maxAlive
         ? { ok: true, target: null }
         : no;
+    case 'reanimate': {
+      // The rite's target is the corpse it raises (the bar's castTargetId).
+      const corpse = pickReanimateCorpse(ctx, inst, mob, kit);
+      return corpse ? { ok: true, target: corpse } : no;
+    }
+    case 'brand':
+      return brandReady(ctx, mob, kit, st, players);
+    case 'nova':
+      return novaReady(mob, kit, players) ? { ok: true, target: null } : no;
+    case 'walker':
+      return pickWalkerAlly(ctx, inst, mob.pos, mob.id) ? { ok: true, target: null } : no;
+    case 'cone': {
+      // At the one it fights, when it stands in the cone's reach.
+      const def = kit.cone;
+      const victim =
+        mob.aggroTargetId !== null ? (ctx.entities.get(mob.aggroTargetId) ?? null) : null;
+      if (!def || !victim || victim.dead || victim.kind !== 'player') return no;
+      return dist2d(victim.pos, mob.pos) <= def.range ? { ok: true, target: victim } : no;
+    }
     case 'call':
       // A whole flock must fit under the cap, so a second call waits.
       return kit.call &&
@@ -297,6 +345,7 @@ function landCast(
   mob: Entity,
   kit: TrashKitDef,
   key: CastKey,
+  castId: string,
   targetId: number | null,
   players: readonly Entity[],
   st: TrashKitState,
@@ -306,6 +355,36 @@ function landCast(
     return;
   }
   switch (key) {
+    case 'reanimate':
+      landReanimate(ctx, inst, mob, kit, targetId);
+      return;
+    case 'brand':
+      landBrand(ctx, mob, kit, targetId);
+      return;
+    case 'nova':
+      landNova(ctx, mob, kit, castId, players);
+      return;
+    case 'walker':
+      if (kit.walker) launchWalker(ctx, inst, mob, kit.walker);
+      return;
+    case 'cone': {
+      const def = kit.cone;
+      if (!def) return;
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: mob.id,
+        targetId: mob.id,
+        school: def.school,
+        fx: 'nova',
+        ability: def.castId,
+      });
+      for (const p of players) {
+        if (p.dead || !inCone(mob.pos, mob.facing, p.pos, def.range, def.arcDeg)) continue;
+        hit(ctx, mob, p, def, mechanicDamage(ctx, mob, def.min, def.max));
+        if (def.freezeStack && !p.dead) applyFreezeStack(ctx, mob, p, def.freezeStack, def.school);
+      }
+      return;
+    }
     case 'lullaby':
       landLullaby(ctx, mob, kit, targetId);
       return;
@@ -454,11 +533,14 @@ function stepCast(
   if (!cast) return false;
   const key = cast.key as CastKey;
   const def = castDef(kit, key);
+  // An unstoppable nova (kit_nova.ts) shrugs a silence off; a stun still
+  // breaks every bar.
+  const unstoppable = key === 'nova' && cast.castId === kit.nova?.unstoppableCastId;
   const broken =
     !def ||
     mob.castingAbility !== cast.castId ||
     ctx.isStunned(mob) ||
-    (!isPhysicalKey(key) && isSilenced(mob));
+    (!isPhysicalKey(key) && !unstoppable && isSilenced(mob));
   if (broken) {
     clearCast(mob, cast.castId);
     st.cast = null;
@@ -473,11 +555,11 @@ function stepCast(
   if (key === 'line') holdLineAim(mob, st);
   else if (key === 'toss' && st.toss)
     mob.facing = angleTo(mob.pos, { x: st.toss.x, y: 0, z: st.toss.z });
-  else if (target && !target.dead) mob.facing = angleTo(mob.pos, target.pos);
+  else if (target && !target.dead && key !== 'cone') mob.facing = angleTo(mob.pos, target.pos);
   if (mob.castRemaining > 0) return true;
   clearCast(mob, cast.castId);
   st.cast = null;
-  landCast(ctx, inst, mob, kit, key, cast.targetId, players, st);
+  landCast(ctx, inst, mob, kit, key, cast.castId, cast.targetId, players, st);
   return false;
 }
 
@@ -504,12 +586,18 @@ function tryStartCast(
     if (!ok) continue;
     st.timers[key] = def.every;
     st.casts++;
-    st.cast = { key, castId: def.castId, targetId: target?.id ?? null };
-    mob.castingAbility = def.castId;
+    // A nova's every Nth bar runs under its unstoppable id (kit_nova.ts).
+    let castId = def.castId;
+    if (key === 'nova' && kit.nova) {
+      castId = novaCastIdFor(kit.nova, st.novas ?? 0);
+      st.novas = (st.novas ?? 0) + 1;
+    }
+    st.cast = { key, castId, targetId: target?.id ?? null };
+    mob.castingAbility = castId;
     mob.castTotal = def.castTime;
     mob.castRemaining = def.castTime;
     mob.castTargetId = target?.id ?? null;
-    mob.channeling = key === 'raise';
+    mob.channeling = key === 'raise' || key === 'reanimate';
     if (key === 'line') lockLineAim(mob, st, target);
     else if (target) mob.facing = angleTo(mob.pos, target.pos);
     if (key === 'toss') lockToss(ctx, inst, mob, kit, st, target);
@@ -667,10 +755,18 @@ function stepMob(
   kit: TrashKitDef | undefined,
   players: () => Entity[],
 ): void {
+  // Its brands still burning are put out in a quench zone (brand.ts): only a
+  // caster that branded someone carries the list, so nothing else pays.
+  if (mob.kitBranded) stepQuench(ctx, inst, mob);
   if (mob.dead || mob.hp <= 0) {
     if (mob.trashKit) endPull(ctx, inst, mob);
     if (kit?.deathBurst) stepDeathBurst(ctx, inst, mob, kit, players());
     if (kit?.deathCloud) stepDeathCloud(ctx, inst, mob, kit, players());
+    // A walker launched by its death leaves once (kit_walker.ts).
+    if (kit?.walker?.launch === 'death' && !mob.kitWalkerSent) {
+      mob.kitWalkerSent = true;
+      launchWalker(ctx, inst, mob, kit.walker);
+    }
     return;
   }
   // An area cast in flight (the kit's own, or the template's breath cone):
@@ -685,6 +781,8 @@ function stepMob(
     (mob.aiState === 'chase' || mob.aiState === 'attack');
   if (!engaged || !kit) {
     if (mob.trashKit) endPull(ctx, inst, mob);
+    // A split half that outlived its pull gets its pool and size back.
+    if (mob.kitSplit?.role === 'parent') restoreSplit(mob);
     holdPerch(mob);
     // Remember how high it waits (a perch, a flight loop) for its pull.
     mob.airY = mob.pos.y > groundY(ctx, mob) + AIRBORNE ? mob.pos.y : undefined;
@@ -706,6 +804,7 @@ function stepMob(
   if (stepStoke(ctx, inst, mob, kit, st) < 0) return;
   if (stepWithdraw(ctx, mob, kit, st)) return;
   stepCarapace(ctx, mob, kit, st);
+  stepSplit(ctx, inst, mob, kit, st);
   const list = players();
   if (kit.detonate && stepDetonate(ctx, mob, kit, list, summonersOf(ctx, inst, mob))) return;
   if (stepCast(ctx, inst, mob, kit, st, list)) return;
@@ -716,7 +815,11 @@ function stepMob(
 /** One tick of every trash kit in every claimed dungeon. */
 export function tickTrashKits(ctx: SimContext): void {
   for (const inst of ctx.instances) {
-    if (inst.partyKey === null) continue;
+    if (inst.partyKey === null) {
+      // A freed claim drops its walls from the collision view (once).
+      syncCombatWallCollision(ctx, inst, 0);
+      continue;
+    }
     let cached: Entity[] | null = null;
     const players = (): Entity[] => {
       cached ??= claimPlayers(ctx, inst);
@@ -727,11 +830,43 @@ export function tickTrashKits(ctx: SimContext): void {
       const mob = ctx.entities.get(id);
       if (!mob || mob.kind !== 'mob') continue;
       const template = MOBS[mob.templateId];
-      const kit = template?.trashKit;
+      // A dev-lent kit (engine_demo.ts, /dev trashkit) stands in for the
+      // template's while it is set.
+      const kit = mob.devTrashKit ?? template?.trashKit;
       // (A mob with no kit still plants for its breath cone: cast_hold.ts.)
       const breath = template?.breathCone && DUNGEONS[inst.dungeonId]?.areaCastsPlant;
       if (!kit && mob.perchY === undefined && !breath) continue;
       stepMob(ctx, inst, mob, kit, players);
     }
+    // The engine's encounter objects (hazard pools, combat walls, walkers),
+    // after every mob, in object-roster order (a snapshot of their ids: a
+    // pool may lift mid-pass).
+    const kitIds = kitObjectIds(ctx, inst);
+    if (kitIds) stepKitObjects(ctx, inst, kitIds, players);
+    syncCombatWallCollision(ctx, inst, kitIds ? kitWallCount(ctx, kitIds) : 0);
+  }
+}
+
+/** Walls still standing among the pass's objects (one may have shattered). */
+function kitWallCount(ctx: SimContext, ids: readonly number[]): number {
+  let n = 0;
+  for (const id of ids) if (ctx.entities.get(id)?.kitObject?.kind === 'wall') n++;
+  return n;
+}
+
+/** One tick of every engine object of a claim. */
+function stepKitObjects(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  ids: readonly number[],
+  players: () => Entity[],
+): void {
+  for (const id of ids) {
+    const obj = ctx.entities.get(id);
+    const st = obj?.kitObject;
+    if (!obj || !st) continue;
+    if (st.kind === 'hazard') stepKitHazard(ctx, inst, obj, players());
+    else if (st.kind === 'wall') stepCombatWall(ctx, inst, obj);
+    else stepWalker(ctx, inst, obj, players());
   }
 }

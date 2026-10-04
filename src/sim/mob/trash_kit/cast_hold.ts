@@ -11,7 +11,7 @@
 
 import { MOBS } from '../../data';
 import type { SimContext } from '../../sim_context';
-import type { Entity, MobTemplate } from '../../types';
+import type { Entity, MobTemplate, TrashKitDef } from '../../types';
 
 /** Is `castId` one of the template's area casts (the ones it plants for)?
  *  A bolt, a raise, a call, a mend, a ward or a lullaby tracks its
@@ -23,16 +23,21 @@ export function isPlantedCast(
   template: MobTemplate | undefined,
   castId: string,
   breath = true,
+  devKit?: TrashKitDef,
 ): boolean {
   if (!template) return false;
-  const kit = template.trashKit;
+  // A dev-lent kit (Entity.devTrashKit) stands in for the template's.
+  const kit = devKit ?? template.trashKit;
   return (
     (breath && template.breathCone?.castId === castId) ||
     kit?.screech?.castId === castId ||
     kit?.wingGust?.castId === castId ||
     kit?.tailLash?.castId === castId ||
     kit?.line?.castId === castId ||
-    kit?.toss?.castId === castId
+    kit?.toss?.castId === castId ||
+    kit?.cone?.castId === castId ||
+    kit?.nova?.castId === castId ||
+    (kit?.nova?.unstoppableCastId !== undefined && kit.nova.unstoppableCastId === castId)
   );
 }
 
@@ -56,7 +61,7 @@ export function restoreCastHold(mob: Entity): boolean {
  */
 export function holdAreaCast(ctx: SimContext, mob: Entity, breath: boolean): void {
   const castId = mob.castingAbility;
-  if (castId === null || !isPlantedCast(MOBS[mob.templateId], castId, breath)) {
+  if (castId === null || !isPlantedCast(MOBS[mob.templateId], castId, breath, mob.devTrashKit)) {
     mob.castHold = undefined;
     return;
   }

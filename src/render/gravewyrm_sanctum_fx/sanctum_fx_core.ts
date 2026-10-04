@@ -32,8 +32,12 @@ import {
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import { trampleReach } from '../../sim/encounters/gravewyrm_sanctum/sledge_tusker';
 import {
+  SANCTUM_BRANDING_IRON,
   SANCTUM_CINDER_BREATH,
+  SANCTUM_COUNTERWEIGHT_LASH,
   SANCTUM_GOAD,
+  SANCTUM_RIME_BREATH,
+  SANCTUM_THAW_THE_HELD,
   SANCTUM_WARMING_RITE,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
 import { TELEGRAPH_ACCENTS, TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
@@ -88,6 +92,8 @@ export interface SanctumTelegraphSpec {
   color: number;
   /** The element accent of the motes and the fill front. */
   accent: number;
+  /** The cone opens BEHIND the caster (facing + PI): a tail lash. */
+  behind?: boolean;
 }
 
 /** The Sledge Tusker's drawn body radius (its template's bodyRadius): the
@@ -99,6 +105,8 @@ export function tuskerBodyRadius(): number {
 /** Every Sanctum cast that paints the floor while its bar runs. */
 export function sanctumTelegraphSpecs(): Readonly<Record<string, SanctumTelegraphSpec>> {
   const breath = MOBS[SCALEGUARD_ID]?.breathCone;
+  const lash = MOBS[SCALEGUARD_ID]?.trashKit?.tailLash;
+  const rime = MOBS[RIME_WHELP_ID]?.trashKit?.cone;
   const body = tuskerBodyRadius();
   return {
     // Cinder Breath: a 90 degree cone of cinders across the Scaleguard's
@@ -144,7 +152,48 @@ export function sanctumTelegraphSpecs(): Readonly<Record<string, SanctumTelegrap
       color: TELEGRAPH_THREAT_COLORS.interrupt,
       accent: SANCTUM_ACCENTS.ember,
     },
+    // Counterweight Lash: the spiked tail sweeps the cone BEHIND the
+    // Scaleguard (the sim tests facing + PI from its centre). With the Cinder
+    // Breath across its front, only its flanks are safe: orange, rime motes.
+    [SANCTUM_COUNTERWEIGHT_LASH]: {
+      shape: 'cone',
+      range: lash?.range ?? 0,
+      arcDeg: lash?.arcDeg ?? 0,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: SANCTUM_ACCENTS.rime,
+      behind: true,
+    },
+    // Rime Breath: a short frost cone across the whelp's front: orange (it
+    // hurts and stacks the chill), rime motes.
+    [SANCTUM_RIME_BREATH]: {
+      shape: 'cone',
+      range: rime?.range ?? 0,
+      arcDeg: rime?.arcDeg ?? 0,
+      color: TELEGRAPH_THREAT_COLORS.danger,
+      accent: SANCTUM_ACCENTS.rime,
+    },
+    // The two new kicks: Thaw the Held (soulfire) and the Branding Iron (ember).
+    [SANCTUM_THAW_THE_HELD]: {
+      shape: 'sigil',
+      range: 2.2,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: SANCTUM_ACCENTS.soulfire,
+    },
+    [SANCTUM_BRANDING_IRON]: {
+      shape: 'sigil',
+      range: 2.2,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: SANCTUM_ACCENTS.ember,
+    },
   };
+}
+
+/** The yaw a cone telegraph is laid along: the caster's facing, turned round
+ *  for a cone that opens behind it. */
+export function telegraphYaw(spec: SanctumTelegraphSpec, facing: number): number {
+  return spec.behind ? facing + Math.PI : facing;
 }
 
 /**
@@ -280,6 +329,50 @@ export function shatterRadius(): number {
 /** The Hoarfrost Pop's reach (its template). */
 export function hoarfrostRadius(): number {
   return MOBS[RIME_WHELP_ID]?.trashKit?.deathBurst?.radius ?? 3;
+}
+
+// ---- the trash mechanics pass (sanctum_kit_fx.ts) -----------------------------------
+
+/** Seconds the Counterweight Lash's tail sweep takes to cross its cone. */
+export const LASH_SWEEP_SECONDS = 0.32;
+
+/** The tail sweep `elapsed` seconds in: the share of the cone the leading
+ *  edge has crossed (0..1), and the swoosh's brightness. */
+export function lashSweep(elapsed: number): { edge: number; alpha: number } {
+  const t = Math.min(1, Math.max(0, elapsed / LASH_SWEEP_SECONDS));
+  const edge = 1 - (1 - t) ** 2;
+  const tail = Math.max(0, elapsed - LASH_SWEEP_SECONDS);
+  return { edge, alpha: elapsed < LASH_SWEEP_SECONDS ? 1 : Math.max(0, 1 - tail / 0.35) };
+}
+
+/** Seconds a kicked-over brazier takes to hit the ice. */
+export const TOPPLE_FALL_SECONDS = 0.42;
+/** How far over it ends (radians from upright: on its side, bowl down a bit). */
+export const TOPPLE_TILT = 1.62;
+
+/** A kicked-over brazier `elapsed` seconds in: its tilt from upright (a fall
+ *  that speeds up, then a small bounce as it hits) and whether it has hit. */
+export function toppleTilt(elapsed: number): { tilt: number; landed: boolean } {
+  if (elapsed <= 0) return { tilt: 0, landed: false };
+  if (elapsed < TOPPLE_FALL_SECONDS) {
+    const t = elapsed / TOPPLE_FALL_SECONDS;
+    return { tilt: TOPPLE_TILT * t * t, landed: false };
+  }
+  const after = elapsed - TOPPLE_FALL_SECONDS;
+  const bounce = after < 0.3 ? Math.sin((after / 0.3) * Math.PI) * 0.12 * (1 - after / 0.3) : 0;
+  return { tilt: TOPPLE_TILT - bounce, landed: true };
+}
+
+/** Seconds the Thaw the Held's eruption column stands. */
+export const ERUPTION_SECONDS = 1.4;
+
+/** The eruption `elapsed` seconds in: the column's height share (it bursts up
+ *  in a quarter second) and its brightness. */
+export function eruption(elapsed: number): { rise: number; alpha: number } {
+  const t = Math.min(1, Math.max(0, elapsed / 0.25));
+  const rise = 1 - (1 - t) ** 3;
+  const fade = Math.max(0, Math.min(1, (ERUPTION_SECONDS - elapsed) / (ERUPTION_SECONDS - 0.3)));
+  return { rise, alpha: fade };
 }
 
 /** The Tusker's enrage glow: a slow, heavy breath (0.75..1.15). */

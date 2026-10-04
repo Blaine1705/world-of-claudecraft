@@ -69,6 +69,7 @@ import {
   NYTHRAXIS_ROOM_RADIUS,
   type Vec3,
 } from '../types';
+import { setCombatWalls } from './combat_wall_state';
 import {
   applyDungeonMobTuning,
   claimDifficultyForDungeon,
@@ -976,6 +977,9 @@ function claimInstance(
   inst.raidReturnKeys = new Set();
   inst.raidBossWelcomeKeys = new Set();
   const origin = instanceOriginOf(inst);
+  // A fresh claim starts with no combat wall in the process-wide collision
+  // view (another world may have left one in this slot: combat_wall_state.ts).
+  setCombatWalls(origin.x, origin.z, []);
   const mobDifficultyTuningId = dungeon.mobDifficultyTuningId ?? inst.dungeonId;
   for (const spawn of dungeon.spawns) {
     const template = MOBS[spawn.mobId];

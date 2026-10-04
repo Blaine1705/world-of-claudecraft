@@ -27,6 +27,7 @@ import {
   type IgnivarRaidGatePlan,
   ignivarRaidGatePlan,
 } from './ignivar_raid_gate';
+import { isTrashEngineObject } from './trash_engine_fx/trash_engine_fx_core';
 
 export interface DungeonGateAnchorPlan {
   dungeonGate: true;
@@ -60,6 +61,9 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
   if (CRYPT_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   // A trash-kit death burst's ring: drawn from the world (death_burst_fx.ts).
   if (e.templateId === DEATH_BURST_RING) return { encounterAnchor: true, height: 2 };
+  // The trash engine's objects (hazard pools, combat walls, walker orbs): drawn
+  // from the world by ./trash_engine_fx, which builds the wall to its collider.
+  if (isTrashEngineObject(e.templateId)) return { encounterAnchor: true, height: 2 };
   // The Sanctum's patches, toss rings and story markers (the Calving Face reads
   // the markers' crack step; render/gravewyrm_sanctum).
   if (SANCTUM_OBJECT_TEMPLATES.has(e.templateId)) {

@@ -174,6 +174,28 @@ export const MELT_CHANNEL: readonly (readonly [number, number])[] = [
   [46, 54],
 ];
 
+/** The meltwater pools that put out a Goadsmith's Branding Iron (the trash
+ *  engine's quench zones, DungeonDef.quenchZones, mob/trash_kit/brand.ts):
+ *  shallow cold pools thawed out of the snow beside every pull a Goadsmith
+ *  stands in or walks through, each 8 to 14 yd from the pack so a branded
+ *  player runs a few strides to douse it. Two on the Sledge Road's upper bend
+ *  (G2), two under the rune wall (G6), three in the Thaw Works' sledge park
+ *  and on its road (G8, patrol C), and two in the melt channel itself (G9).
+ *  Flat floor, clear of every prop footprint (tests/
+ *  gravewyrm_sanctum_trash_mechanics.test.ts). The renderer paints the same
+ *  circles. */
+export const QUENCH_POOLS: readonly { x: number; z: number; r: number }[] = [
+  { x: -37, z: -136, r: 2.6 },
+  { x: -33, z: -153, r: 2.6 },
+  { x: 84, z: -100, r: 2.6 },
+  { x: 86, z: -84, r: 2.6 },
+  { x: -18, z: 36, r: 2.6 },
+  { x: -14, z: 52, r: 2.6 },
+  { x: -10, z: 44, r: 2.6 },
+  { x: 22, z: 40, r: 2.6 },
+  { x: 30, z: 46, r: 2.6 },
+];
+
 /** The Ritual Vault, Velkhar's arena: a bowl melted out of the glacier's flank,
  *  open to the sky. The cold lake-ice floor is the SAFE floor. */
 export const RITUAL_VAULT = { x: 0, z: 107, r: 19, h: H.vault } as const;

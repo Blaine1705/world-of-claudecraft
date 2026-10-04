@@ -57,6 +57,10 @@ export const TUSKER_TRACES_ON_GESTURE = 'sanctum_tusker_traces_on';
 /** A Glacier Splinter's Shatter: its whole body bursts (the fx throw the
  *  shards), so its corpse hides (re-sent while the corpse stands). */
 export const SPLINTER_SHATTERED_GESTURE = 'sanctum_splinter_shattered';
+/** A Soul Brazier kicked over (Topple Brazier): its standing body hides at
+ *  once and the fx draw it fallen in its place (gravewyrm_sanctum_fx/
+ *  sanctum_kit_fx.ts). */
+export const BRAZIER_TOPPLED_GESTURE = 'sanctum_brazier_toppled';
 
 /** The trace chains and the hitch bar: their own mesh in the GLB. */
 export const TUSKER_TRACES_NODE = 'SledgeTuskerTraces';
@@ -245,6 +249,7 @@ export function sanctumCreatureLooks(
     tintStrength: 0.45,
     selfIllumination: 0.3,
     clickRadius: 1.4,
+    meshToggles: [{ nodes: ['*'], hideNow: BRAZIER_TOPPLED_GESTURE }],
   };
   return out;
 }
