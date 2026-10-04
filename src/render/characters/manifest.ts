@@ -4500,13 +4500,32 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.05,
   },
+  // The Moonlit Siren (moonlit_siren; scripts/assets/drowned_temple_creatures/
+  // siren_spout/): a tall priestess of the moon choir whose body turns to a
+  // fish tail below the waist. She never crawls: a waterspout winds round
+  // her tail from the floor to her hips and holds her upright (it whirls one
+  // turn a loop). Floating silver hair, fin ears, a crescent crown hung with
+  // pearls, a coral staff crowned with a moon pearl. Brine Lash is a petSpell
+  // bolt: its 0.6 s windup cue plays the attack clips (Attack: a staff blow;
+  // Attack2: the staff levelled and cracked like a whip, the pearl flaring),
+  // both authored to release on the windup's end. Call the Tide (2.5 s bar)
+  // plays Sing: arms wide, staff high, the spout swells and three bubbles of
+  // tide fly out as the bar ends, where the sim raises the Tidewisps;
+  // bar-locked with no play-out, so a kick breaks the song visibly. Dying, the
+  // spout falls away and she sinks into a pool of foam. Drawn 6.0 at her 1.0.
   temple_siren: {
     url: `${CREATURES}/temple_siren.glb`,
-    height: 5.4,
+    height: 6.0,
     clips: {
       ...TEMPLE_CLIPS,
       castByAbility: { [TEMPLE_CALL_THE_TIDE]: 'Sing' },
+      castTimeScaleByAbility: { [TEMPLE_CALL_THE_TIDE]: 1 },
     },
+    attackTimeScale: 1,
+    walkRef: 2.5,
+    runRef: 7,
+    castClipSync: true,
+    authoredAtlas: true,
     selfIllumination: 0.06,
   },
   // The Lagoon Eel (scripts/assets/drowned_temple_creatures/eel.py): an

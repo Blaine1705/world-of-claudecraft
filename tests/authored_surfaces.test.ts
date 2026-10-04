@@ -203,6 +203,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_templeguard',
   // the Drowned Temple's Blender Pale Choir Acolyte (the moon-jelly priestess)
   'temple_acolyte',
+  // the Drowned Temple's Blender Moonlit Siren (the priestess on her waterspout)
+  'temple_siren',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   'wildheart_great_saurian',

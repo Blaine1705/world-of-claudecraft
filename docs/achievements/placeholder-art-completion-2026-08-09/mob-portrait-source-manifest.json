@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "f00622b518c7e82a8508bb57d7e9477aa5d5d438c929e5e9e17950c8666f1883",
+  "rendererFingerprint": "84d700d4ee2c6b0cccea1a49dc0cb7518fe96c4c0cc1f0fb583199b47dc699cb",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5475790,
-      "sha256": "342b291d11d5cd9355bd4cb8e81a34ab711ba49c87d8b9406452d7aba4cd3e38",
+      "sha256": "db392c0e75624a197bb9ca21d375b7c04821f6686811acfc519c5adf2869b369",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6300,11 +6300,11 @@
         "model": {
           "url": "models/creatures/temple_siren.glb",
           "path": "public/models/creatures/temple_siren.glb",
-          "bytes": 722128,
-          "sha256": "68d474a1aadd56d19c70d9fb628bf1c2fd5a8ce672ebd17b0e5b9188578c13f4"
+          "bytes": 3191276,
+          "sha256": "f9c52d38262eb420f4eb7b31769a763ca6d1cc3df3ffe7b06dfdf0946c09dc31"
         },
         "idle": "Idle",
-        "height": 5.4,
+        "height": 6,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6318,11 +6318,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b55d703ae99104574cf48d6abcff38d4a0989e77cabcc706cf3dfaafd4662304",
+      "sourceFingerprint": "dda01e26d762733b440456acd9df698a6a05229708390233b5e27073ad24584d",
       "output": {
         "path": "public/ui/mobs/moonlit_siren.webp",
-        "bytes": 1934,
-        "sha256": "219efe0839bfdde680a229ab4a0adaffb3bcd380f3865a0f9bb6b55c71784577"
+        "bytes": 3346,
+        "sha256": "6ed35f21f25056a0abe6124616c549cb4d7f64d22054e3dcbcd41a59db30106a"
       }
     },
     {

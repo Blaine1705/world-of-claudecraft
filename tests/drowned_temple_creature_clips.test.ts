@@ -20,6 +20,7 @@ import {
 } from '../src/sim/encounters/drowned_temple';
 import { updateBossMechanics } from '../src/sim/mob/boss_mechanics';
 import {
+  TEMPLE_CALL_THE_TIDE,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
@@ -218,6 +219,36 @@ describe('the Pale Choir Acolyte: the moon-jelly priestess', () => {
     // Kickable hymns: no play-out, so an interrupted song never plays to its end.
     expect(c.castPlayOut ?? []).not.toContain('Lullaby');
     expect(c.castPlayOut ?? []).not.toContain('Mend');
+  });
+});
+
+describe('the Moonlit Siren: the priestess on her waterspout', () => {
+  it('ships its own body with a clip for every job', () => {
+    expect(clipsOf('public/models/creatures/temple_siren.glb').sort()).toEqual(
+      ['Attack', 'Attack2', 'Cast', 'Death', 'Hit', 'Idle', 'Run', 'Sing', 'Walk'].sort(),
+    );
+    const v = visualOf('moonlit_siren');
+    expect(v.url).toMatch(/temple_siren\.glb$/);
+    expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
+    expect(v.clips.death).toBe('Death');
+    expect(v.authoredAtlas).toBe(true);
+    // Drawn 6.0 at her 1.0: 2.3 times the 2.6 player.
+    expect(v.height * (MOBS.moonlit_siren.scale ?? 1)).toBeCloseTo(6.0, 2);
+  });
+
+  it('lashes on the windup and sings Call the Tide on its bar', () => {
+    const v = visualOf('moonlit_siren');
+    const c = v.clips;
+    // Brine Lash's windup cue plays the attack clips, authored to release at
+    // the windup's end, so they play at their own pace.
+    expect(MOBS.moonlit_siren.petSpell?.windup).toBe(0.6);
+    expect(v.attackTimeScale).toBe(1);
+    expect(c.castByAbility?.[TEMPLE_CALL_THE_TIDE]).toBe('Sing');
+    expect(c.castTimeScaleByAbility?.[TEMPLE_CALL_THE_TIDE]).toBe(1);
+    expect(MOBS.moonlit_siren.trashKit?.call?.castTime).toBe(2.5);
+    expect(v.castClipSync).toBe(true);
+    // A kicked song never plays to its end.
+    expect(c.castPlayOut ?? []).not.toContain('Sing');
   });
 });
 
