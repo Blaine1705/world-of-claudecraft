@@ -1055,7 +1055,8 @@ describe('bank ledger receipt schema boot wiring', () => {
     // never lands in bootCalls), and only THEN the growth budget fragment.
     const storage = h.bootCalls.indexOf(STORAGE_PURCHASE_SCHEMA);
     expect(storage).toBeGreaterThanOrEqual(0);
-    expect(h.bootCalls.indexOf(MATERIAL_SOURCE_CAPABILITY_PROBE_SQL)).toBe(storage + 1);
+    expect(h.bootCalls.indexOf(MATERIAL_SOURCE_CAPABILITY_PROBE_SQL)).toBeLessThan(core);
+    expect(h.bootCalls.lastIndexOf(MATERIAL_SOURCE_CAPABILITY_PROBE_SQL)).toBe(storage + 1);
     expect(h.bootCalls.indexOf(MATERIAL_SOURCE_WRITER_GUARD_SQL)).toBe(storage + 2);
     expect(growthBudget).toBe(storage + 3);
     // The growth fragment is followed by ONE single-statement counter readback
