@@ -49,7 +49,7 @@ import {
 } from '../sim/types';
 import { vaultPortalVisible } from '../sim/vault_portal_visibility';
 import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
-import { activeWorldQuestsForCycle } from '../sim/world_quest_rotation';
+import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
 import type { IWorld } from '../world_api';
 import { dungeonMapActive } from './dungeon_map_view';
 import { viewerUsableToolTier } from './hud/professions/gathering_view';
@@ -736,7 +736,12 @@ export function createMinimapMarkers(): MinimapMarkers {
       // objective radius is intentionally withheld until this emblem is selected
       // and the zone map opens.
       const worldQuestClearance = compact ? 10 : 7;
-      for (const quest of activeWorldQuestsForCycle(world.worldQuestCycle)) {
+      // The player's board: a rerolled-in quest replaces the one it displaced.
+      const worldQuests = playerActiveWorldQuests({
+        worldQuestCycle: world.worldQuestCycle,
+        worldQuestReplacements: world.worldQuestReplacements ?? {},
+      });
+      for (const quest of worldQuests) {
         if (p.level < quest.minLevel) continue;
         const progress = world.worldQuestLog.get(quest.id);
         if (progress?.state === 'completed') continue;
