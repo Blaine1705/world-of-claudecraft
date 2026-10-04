@@ -4693,8 +4693,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // the Blender-built old cantor (E:/woc/laverock-work/builder, adapted from the
   // Velkhar kit): bone-white habit, the stiff crescent stole, the nacre
   // medallion, the driftwood staff with its carved moon, the long beard and
-  // hair. Normalized on the idle bounds (the staff's moon is the top) so his
-  // crown stands about 2.95 yd, a head over the player. His gestures ride the
+  // hair. Built broad and rounded to sit beside the chibi player (wide
+  // shoulders and a flared hem, a bigger head, big hands, a stout staff).
+  // Normalized on the idle bounds (the staff's moon is the top) so his crown
+  // stands about 2.97 yd, a head over the player. His gestures ride the
   // overhead emotes the guide sets as he speaks (point = Talk, cry = Startle,
   // kneel = Kneel) and the song is his channel cast (cantor_last_verse, the
   // Sing loop). The Walk's long gliding stride covers 1.25 yd/s at this
@@ -4702,7 +4704,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // feet planted; the 7 yd/s catch-up run caps lower and slides a little.
   npc_laverock: {
     url: `${CREATURES}/temple_laverock.glb`,
-    height: 3.68,
+    height: 3.75,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
