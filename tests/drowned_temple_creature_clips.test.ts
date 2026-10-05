@@ -598,6 +598,6 @@ describe('the pilgrim frenzy cue rides the real enrage', () => {
       'new TempleFx( scene, groundY, world, compileGate, playGesture, shake, reducedMotion, )',
     );
     expect(zone).toMatch(/const temple = this\.templeFx\.handleEvent\(event\)/);
-    expect(zone).toMatch(/\|\| temple \|\|/);
+    expect(zone.replace(/\s+/g, ' ')).toMatch(/\|\| temple \|\|/);
   });
 });
