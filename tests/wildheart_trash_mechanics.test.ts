@@ -186,6 +186,10 @@ describe('Quarry Mark: the stalker sets its raptors on someone past the tank', (
     expect(raptor.forcedTargetId).toBe(healer.id);
     expect(raptor.forcedTargetTimer).toBeGreaterThan(5.5);
     expect(healer.auras.find((a) => a.id === WILDHEART_QUARRY)?.duration).toBe(6);
+    // A second spear refreshes the one mark, never stacks a second.
+    only(r, stalker, 'mark');
+    run(r, 1.7, [stalker, raptor]);
+    expect(healer.auras.filter((a) => a.id === WILDHEART_QUARRY)).toHaveLength(1);
   });
 
   it('a raptor the tank holds with a running taunt stays on the tank', () => {
@@ -386,6 +390,26 @@ describe('Snaring Tongue: step out of the lane, or be reeled in', () => {
       tickTrashKits(r.sim.ctx);
     }
     expect(Math.hypot(toad.pos.x - at.x, toad.pos.z - at.z)).toBeLessThan(1e-6);
+  });
+
+  it('two toads tugging one player let go once a lane has had time to reel', () => {
+    const r = room();
+    const a = engage(r, 'spore_toad', 0, 12);
+    const b = engage(r, 'spore_toad', 0, -12);
+    const def = MOBS.spore_toad.trashKit?.wildheart?.tongue;
+    if (!def) throw new Error('tongue');
+    run(r, DT, [a, b]);
+    for (const t of [a, b]) {
+      const st = t.trashKit;
+      if (!st) throw new Error('kit');
+      st.wildheart = { reels: [{ id: r.me.id, left: def.length / def.reel + 0.25 }] };
+    }
+    run(r, def.length / def.reel + 0.4, [a, b]);
+    expect(a.trashKit?.wildheart?.reels).toBeUndefined();
+    expect(b.trashKit?.wildheart?.reels).toBeUndefined();
+    const at = { ...r.me.pos };
+    run(r, 0.5, [a, b]);
+    expect(r.me.pos).toEqual(at);
   });
 
   it('a sidestep out of the locked lane escapes it', () => {

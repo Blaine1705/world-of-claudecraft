@@ -64,6 +64,7 @@ export interface WildheartKitState {
   roared?: boolean;
   /** How many totems this caster has planted (picks the next in the cycle). */
   planted?: number;
-  /** Players the tongue is reeling in, by id. */
-  reels?: number[];
+  /** Players the tongue is reeling in: who, and the seconds the tongue
+   *  still holds them (a reel never outlasts the lane's own length). */
+  reels?: { id: number; left: number }[];
 }

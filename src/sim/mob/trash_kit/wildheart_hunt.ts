@@ -52,6 +52,9 @@ import {
   WILDHEART_WAR_ROAR,
 } from './wildheart_cast_ids';
 
+/** Seconds a tongue holds past a full lane's reel (then it lets go). */
+const REEL_GRACE = 0.25;
+
 function roll(ctx: SimContext, mob: Entity, min: number, max: number): number {
   return Math.max(1, Math.round(ctx.rng.range(min, max) * (mob.mechanicDamageMult ?? 1)));
 }
@@ -123,6 +126,9 @@ export function landMark(
   const quarry = targetId !== null ? ctx.entities.get(targetId) : undefined;
   if (!def || !quarry || quarry.dead) return 0;
   if (dist2d(quarry.pos, mob.pos) > def.range + 5) return 0;
+  // One quarry mark at a time: a second stalker's spear refreshes it.
+  if (quarry.auras.some((a) => a.id === WILDHEART_QUARRY))
+    quarry.auras = quarry.auras.filter((a) => a.id !== WILDHEART_QUARRY);
   const seconds = inst.difficulty === 'heroic' ? def.heroicSeconds : def.seconds;
   ctx.emit({
     type: 'spellfx',
@@ -409,7 +415,10 @@ export function landTongue(
   }
   if (caught.length > 0) {
     st.wildheart ??= {};
-    st.wildheart.reels = caught.map((p) => p.id);
+    // The tongue holds as long as a full lane takes to reel in, plus a
+    // beat: two toads tugging one player never hold them forever.
+    const hold = def.length / def.reel + REEL_GRACE;
+    st.wildheart.reels = caught.map((p) => ({ id: p.id, left: hold }));
   }
   return caught;
 }
@@ -420,14 +429,15 @@ export function stepReel(ctx: SimContext, mob: Entity, kit: TrashKitDef, st: Tra
   const def = kit.wildheart?.tongue;
   const reels = st.wildheart?.reels;
   if (!def || !reels || !st.wildheart) return;
-  const still: number[] = [];
-  for (const id of reels) {
-    const p = ctx.entities.get(id);
-    if (!p || p.dead) continue;
+  const still: { id: number; left: number }[] = [];
+  for (const r of reels) {
+    const p = ctx.entities.get(r.id);
+    r.left -= DT;
+    if (!p || p.dead || r.left <= 1e-9) continue;
     if (dist2d(p.pos, mob.pos) <= def.stop + 0.05) continue;
     const moved = pullToward(ctx, p, mob.pos.x, mob.pos.z, def.reel * DT, def.stop);
     // Held fast (an anchor, a wall): the tongue lets go.
-    if (moved > 1e-6) still.push(id);
+    if (moved > 1e-6) still.push(r);
   }
   st.wildheart.reels = still.length > 0 ? still : undefined;
 }
