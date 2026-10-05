@@ -14,6 +14,7 @@
 // and mist counts shed with the effects tier (cosmetic only).
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import {
   BASIN_SUN_DIRECTION,
@@ -26,7 +27,6 @@ import {
   WALK_SHELF,
 } from './basin_plan_core';
 import { BASIN_NOISE_GLSL } from './basin_sky';
-
 export interface BasinFallsOptions {
   lowGfx: boolean;
   /** 0..1 cosmetic density (tier shed). */
@@ -39,7 +39,7 @@ function fogUniforms(): Record<string, THREE.IUniform> {
 
 // ---- curtains ----------------------------------------------------------------------
 
-const CURTAIN_VERT = /* glsl */ `
+const CURTAIN_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aFall; // u across, t down, seed, length (yards)
 varying vec4 vFall;
 varying vec3 vWorld;
@@ -50,7 +50,7 @@ void main() {
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
   vNormalW = normalize(mat3(modelMatrix) * normal);
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -167,13 +167,13 @@ function buildCurtains(falls: readonly BasinFall[], lowGfx: boolean): THREE.Mesh
 
 // ---- foam rings at the feet ---------------------------------------------------------
 
-const FOAM_VERT = /* glsl */ `
+const FOAM_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aFoam; // local x, local y (-1..1 across the oval), seed
 varying vec3 vFoam;
 #include <fog_pars_vertex>
 void main() {
   vFoam = aFoam;
-  vec4 mvPosition = viewMatrix * modelMatrix * vec4(position, 1.0);
+  vec4 mvPosition = wocCamRelView((modelMatrix * vec4(position, 1.0)).xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -268,7 +268,7 @@ function buildFoam(falls: readonly BasinFall[]): THREE.Mesh {
 
 // ---- spray and mist (one instanced draw each) ----------------------------------------
 
-const PUFF_VERT = /* glsl */ `
+const PUFF_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aBase;   // x, y, z at the foot, seed
 attribute vec4 aMotion; // outward dir x, z, rise (yards), life (s)
 attribute vec2 aSize;   // size at birth, size at death
@@ -292,7 +292,7 @@ void main() {
   c.x += uDrift * life * 6.0;
   c.z += sin(aBase.w * 40.0 + uTime * 0.3) * life * 3.0;
   float size = mix(aSize.x, aSize.y, burst);
-  vec4 mvPosition = viewMatrix * modelMatrix * vec4(c, 1.0);
+  vec4 mvPosition = wocCamRelView((modelMatrix * vec4(c, 1.0)).xyz);
   mvPosition.xy += position.xy * size;
   vDepth = -mvPosition.z;
   gl_Position = projectionMatrix * mvPosition;
@@ -459,7 +459,7 @@ function mistFor(falls: readonly BasinFall[], density: number, lowGfx: boolean):
 
 // ---- rainbows -----------------------------------------------------------------------
 
-const BOW_VERT = /* glsl */ `
+const BOW_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aBow; // radial (0 inner .. 1 outer), arc angle (0..1), strength
 attribute vec3 aNormalW;
 varying vec3 vBow;
@@ -471,7 +471,7 @@ void main() {
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
   vN = aNormalW;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

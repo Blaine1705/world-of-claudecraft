@@ -21,6 +21,7 @@
 
 import * as THREE from 'three';
 import { loadGltf, releaseGltf } from '../assets/loader';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { markSharedGeometry, markSharedTexture } from '../shared_resource';
 import { radialGlowTexture } from '../textures';
@@ -60,7 +61,6 @@ import { SANCTUM_SLOTS, sanctumKitPiece, sanctumSlotMaterial } from './sanctum_k
 import { triggerSanctumLakeRipple } from './sanctum_lake';
 import { SANCTUM_PALETTE, sanctumLinear } from './sanctum_plan_core';
 import { newSanctumStoryView, sanctumSlotKey, sanctumStoryView } from './sanctum_story_core';
-
 /** The shard's light as the whole cirque sees it: the aurora's level and the
  *  heartbeat, written by the face's frame driver, read by the sky dome. */
 export const SANCTUM_SHARD_UNIFORMS = {
@@ -183,7 +183,7 @@ function faceMaterial(u: FaceUniforms, name: string): THREE.MeshStandardMaterial
   return m;
 }
 
-const SHELL_VERT = /* glsl */ `
+const SHELL_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 color;
 varying vec3 vWorld;
 varying vec3 vNormalW;
@@ -194,7 +194,7 @@ void main() {
   vWorld = wp.xyz;
   vNormalW = normalize(mat3(modelMatrix) * normal);
   vCol = color;
-  vec4 mvPosition = viewMatrix * wp;
+  vec4 mvPosition = wocCamRelView(wp.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -380,7 +380,7 @@ function crackMaterial(origin: THREE.Vector3, tint: number): THREE.MeshBasicMate
 
 /** A burst of snow and ice powder: billowing cards round a point, expanding
  *  and rising, fading out (one instanced draw per burst; `uT` < 0 hides it). */
-const BURST_VERT = /* glsl */ `
+const BURST_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aSeed;
 uniform float uT;
 uniform float uDur;
@@ -403,7 +403,7 @@ void main() {
   wp.xyz += (right * position.x + up * position.y) * size * live;
   vA = (1.0 - k) * smoothstep(0.0, 0.08, k) * live;
   vUv = position.xy + 0.5;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 

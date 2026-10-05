@@ -12,13 +12,13 @@
 
 import * as THREE from 'three';
 import { DROWNED_TEMPLE_WATER_LEVEL } from '../../sim/content/drowned_temple_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { DROWNED_TEMPLE_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import { DROWNED_TEMPLE_MOON_DIRECTION } from '../interior_light_rig';
 import { TEMPLE_MOON_SKY } from './temple_moon_sky';
 import { planFishShoals, templeHash } from './temple_plan_core';
 import { planTempleShoreMask, TEMPLE_SHORE_BOUNDS } from './temple_shore_core';
-
 export interface TempleAtmosphereOptions {
   lowGfx: boolean;
   /** 0..1 cosmetic density (tier shed): particle counts and cloud octaves. */
@@ -185,7 +185,7 @@ function buildSky(opts: TempleAtmosphereOptions): THREE.Mesh {
 
 // ---- the lagoon ---------------------------------------------------------------------
 
-const LAGOON_VERT = /* glsl */ `
+const LAGOON_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vWorld;
 varying vec3 vLocal;
 #include <fog_pars_vertex>
@@ -193,7 +193,7 @@ void main() {
   vLocal = position;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -329,7 +329,7 @@ function buildLagoon(opts: TempleAtmosphereOptions): THREE.Mesh {
 
 // ---- mist on the water ---------------------------------------------------------------
 
-const MIST_VERT = /* glsl */ `
+const MIST_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vWorld;
 varying vec3 vLocal;
 #include <fog_pars_vertex>
@@ -337,7 +337,7 @@ void main() {
   vLocal = position;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -405,7 +405,7 @@ function buildWaterMist(opts: TempleAtmosphereOptions): THREE.Group {
 
 // ---- light-fish ------------------------------------------------------------------------
 
-const FISH_VERT = /* glsl */ `
+const FISH_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aShoal; // cx, cz, radius, seed
 attribute vec2 aFish;  // phase, lane
 uniform float uTime;
@@ -423,7 +423,7 @@ void main() {
   vec2 side = vec2(-fwd.y, fwd.x);
   vec3 world = vec3(c.x, 0.03, c.y) + vec3(side.x, 0.0, side.y) * position.x * 0.45 + vec3(fwd.x, 0.0, fwd.y) * position.y * 1.2;
   vGlow = 0.6 + 0.4 * sin(uTime * 2.0 + aFish.x * 17.0);
-  vec4 mvPosition = viewMatrix * modelMatrix * vec4(world, 1.0);
+  vec4 mvPosition = wocCamRelView((modelMatrix * vec4(world, 1.0)).xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

@@ -6,12 +6,13 @@
 // when it is born.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { FLAME_ATLAS_GLSL } from '../ignivar_fire_vfx';
 import { ghostFireRampGlsl } from './crypt_creature_fx_core';
 
 // ---------------------------------------------------------------- particles
 
-const PARTICLE_COMMON = /* glsl */ `
+const PARTICLE_COMMON = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 attribute vec3 aPos0;
 attribute vec3 aVel;
@@ -38,7 +39,7 @@ void billboard(vec3 p, float size, float spin) {
   float c = cos(spin), s = sin(spin);
   vec2 q = vec2(position.x * c - position.y * s, position.x * s + position.y * c);
   vec3 w = p + (camRight * q.x + camUp * q.y) * size;
-  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
 
@@ -56,7 +57,7 @@ void main() {
 }
 `;
 
-export const FIRE_VERT = /* glsl */ `
+export const FIRE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 ${PARTICLE_COMMON}
 ${FLAME_ATLAS_GLSL}
 varying vec2 vUvA;
@@ -84,7 +85,7 @@ void main() {
   float sway = sin(uTime * 7.0 + aShape.w * 40.0) * 0.14 * up * up;
   vec2 q = vec2(position.x * 0.8 + sway, (position.y + 0.32) * 1.75);
   vec3 w = p + (camRight * q.x + camUp * q.y) * size;
-  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
 

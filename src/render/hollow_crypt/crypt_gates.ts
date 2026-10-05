@@ -11,6 +11,7 @@
 
 import * as THREE from 'three';
 import { HOLLOW_CRYPT_GATES } from '../../sim/content/hollow_crypt';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { GFX, sharedUniforms } from '../gfx';
 import { gateMemoryKey, gateView } from './crypt_gate_state_core';
 
@@ -86,14 +87,14 @@ transformed += mix(uClosedOffset, uOpenOffset, gateLocal);`,
 function wardMaterial(color: number, u: OpenUniforms): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     name: 'hollowCryptWard',
-    vertexShader: /* glsl */ `
+    vertexShader: /* glsl */ `${CAMERA_RELATIVE_GLSL}
       varying vec2 vUv;
       varying vec3 vWorld;
       void main() {
         vUv = uv;
         vec4 w = modelMatrix * vec4(position, 1.0);
         vWorld = w.xyz;
-        gl_Position = projectionMatrix * viewMatrix * w;
+        gl_Position = projectionMatrix * wocCamRelView(w.xyz);
       }
     `,
     fragmentShader: /* glsl */ `

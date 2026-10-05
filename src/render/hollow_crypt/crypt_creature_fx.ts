@@ -44,6 +44,7 @@ import {
 } from '../../sim/mob/trash_kit/cast_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -87,7 +88,7 @@ const GARGOYLE = 'crypt_chapel_gargoyle';
 
 // ------------------------------------------------------------------ floors
 
-const FLOOR_VERT = /* glsl */ `
+const FLOOR_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec2 aPolar; // normalized radius, angle fraction
 varying vec2 vPolar;
 varying vec3 vWorld;
@@ -97,7 +98,7 @@ void main() {
   // Noise coordinates: the patch's own local frame (instance bands sit ~1e5
   // yards out, far past where a float hash stays smooth).
   vWorld = position;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 
@@ -169,7 +170,7 @@ void main() {
 `;
 
 /** A soft billboard glow (the jaws' gathering fire, the shriek's sonic rings). */
-const HALO_VERT = /* glsl */ `
+const HALO_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 void main() {
   vUv = uv;
@@ -178,7 +179,7 @@ void main() {
   vec3 camRight = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 camUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
   vec3 w = c.xyz + (camRight * position.x + camUp * position.y) * s;
-  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
 const HALO_FRAG = /* glsl */ `

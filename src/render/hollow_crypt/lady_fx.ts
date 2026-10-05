@@ -38,6 +38,7 @@ import {
 } from '../../sim/encounters/hollow_crypt/lady_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   TELEGRAPH_ACCENTS,
   TELEGRAPH_THREAT_COLORS,
@@ -126,14 +127,14 @@ void main() {
 `;
 
 /** A dome of lantern light or rime: a fresnel rim on a sphere. */
-const DOME_VERT = /* glsl */ `
+const DOME_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vView;
 void main() {
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vN = normalize(mat3(modelMatrix) * normal);
   vView = normalize(cameraPosition - wp.xyz);
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 const DOME_FRAG = /* glsl */ `

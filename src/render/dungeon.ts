@@ -53,6 +53,7 @@ import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_cor
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
+import { CAMERA_RELATIVE_GLSL } from './camera_relative_glsl';
 import { hash2, stackDaisBlocks } from './dais_blocks_core';
 import { buildDawnholdDressing, ensureDawnholdDressing } from './dawnhold_dressing';
 import {
@@ -240,7 +241,7 @@ const DAWNHOLD_FLOOR_TINT = 0xe2ddb8;
 // (driven by the shared uTime so it needs no per-frame plumbing) with cheap
 // layered-sine caustics, a fresnel sheen and bioluminescent glow in the
 // ripples. Nothing else in the game floods its floor, which is the point.
-const TEMPLE_WATER_VERT = /* glsl */ `
+const TEMPLE_WATER_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
   uniform float uTime;
   varying vec3 vWPos;
   #include <fog_pars_vertex>
@@ -251,7 +252,7 @@ const TEMPLE_WATER_VERT = /* glsl */ `
     vWPos = wp.xyz;
     // Name this mvPosition: the fog_vertex chunk reads mvPosition for vFogDepth,
     // so a different name fails to compile once USE_FOG is defined (outdoor fog).
-    vec4 mvPosition = viewMatrix * wp;
+    vec4 mvPosition = wocCamRelView(wp.xyz);
     gl_Position = projectionMatrix * mvPosition;
     #include <fog_vertex>
   }

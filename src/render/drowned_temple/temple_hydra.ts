@@ -47,6 +47,7 @@ import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { loadGltf } from '../assets/loader';
 import { registerDeferredPreload } from '../assets/preload';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   comboChargeEnvelope,
   comboHeadElementsInto,
@@ -62,7 +63,6 @@ import {
   stepNeck,
 } from './temple_hydra_neck_core';
 import { tsunamiWarnProgress } from './temple_tsunami_core';
-
 export const MERE_HYDRA_URL = '/models/creatures/mere_hydra.glb';
 
 let source: THREE.Object3D | null = null;
@@ -87,7 +87,7 @@ const NECK = ['L', 'C', 'R'] as const;
 
 type EntityView = IWorld['entities'] extends Map<number, infer E> ? E : never;
 
-const BREATH_VERT = /* glsl */ `
+const BREATH_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aSeed; // lane, phase, speed, size
 uniform float uTime;
 uniform float uLife;
@@ -106,7 +106,7 @@ void main() {
   float lane = (aSeed.x - 0.5) * 2.0;
   vec3 c = uFrom + dir * t + side * lane * uSpread * t + up * sin(aSeed.y * 30.0) * uSpread * 0.25 * t;
   vFade = uLife * smoothstep(0.0, 0.08, t) * (1.0 - smoothstep(0.75, 1.0, t));
-  vec4 mv = viewMatrix * vec4(c, 1.0);
+  vec4 mv = wocCamRelView(c);
   mv.xy += position.xy * (0.6 + t * 3.2) * aSeed.w * uWidth;
   gl_Position = projectionMatrix * mv;
 }

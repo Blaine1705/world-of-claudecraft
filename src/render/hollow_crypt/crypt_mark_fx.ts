@@ -30,6 +30,7 @@ import {
   CRYPT_RIMESILK_SPIT,
 } from '../../sim/mob/trash_kit/cast_ids';
 import type { Entity, SimEvent } from '../../sim/types';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { anchorWorld, coneSpot, shockwave } from './crypt_creature_fx_core';
 import { drapePolar, HALO_FRAG, NOISE_GLSL, SHOCK_FRAG } from './crypt_fx_floor';
 import { GHOST_RAMP } from './crypt_fx_particles';
@@ -85,7 +86,7 @@ const STREAK_REACH = 60;
 
 /** Pale granite plates and flakes: opaque stone, faceted, lit by a fixed key
  *  (no scene light enters the program), speckled, flashing as a layer slams. */
-const STONE_VERT = /* glsl */ `
+const STONE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vW;
 varying vec3 vObj;
 void main() {
@@ -96,7 +97,7 @@ void main() {
   vObj = position;
   vec4 w = modelMatrix * p;
   vW = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 const STONE_FRAG = /* glsl */ `

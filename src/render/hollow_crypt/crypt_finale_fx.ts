@@ -48,6 +48,7 @@ import {
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { loadGltf, releaseGltf } from '../assets/loader';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   TELEGRAPH_ACCENTS,
   TELEGRAPH_THREAT_COLORS,
@@ -77,7 +78,6 @@ import {
   PARTICLE_VERT,
   ParticlePool,
 } from './crypt_fx_particles';
-
 export const CRYPT_RITE_VFX_URL = '/models/props/crypt_rite_vfx.glb';
 
 /** The finale's own encounter objects (the pyre and the strafe lanes). */
@@ -160,7 +160,7 @@ void main() {
 `;
 
 /** The flung flagstone shards: GPU ballistic flight from the burst time. */
-const DEBRIS_VERT = /* glsl */ `
+const DEBRIS_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aStart;
 attribute vec3 aVel;
 attribute vec4 aSpin; // axis xyz, rate
@@ -185,7 +185,7 @@ void main() {
   vec3 local = R * (position * uScale);
   vNormal = R * normal;
   vec4 w = modelMatrix * vec4(p + local, 1.0);
-  gl_Position = vAlive > 0.0 ? projectionMatrix * viewMatrix * w : vec4(2.0, 2.0, 2.0, 1.0);
+  gl_Position = vAlive > 0.0 ? projectionMatrix * wocCamRelView(w.xyz) : vec4(2.0, 2.0, 2.0, 1.0);
 }
 `;
 const DEBRIS_FRAG = /* glsl */ `

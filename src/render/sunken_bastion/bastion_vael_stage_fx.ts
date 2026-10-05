@@ -29,6 +29,7 @@ import {
 } from '../../sim/encounters/sunken_bastion/ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
@@ -54,7 +55,7 @@ const ERUPTION_SLOTS = 2;
 const SWEEP_SLOTS = 3;
 const SCAN_SEC = 0.1;
 
-const PILLAR_VERT = /* glsl */ `
+const PILLAR_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vWorld;
 varying vec3 vNormalW;
@@ -63,7 +64,7 @@ void main() {
   vec4 w = modelMatrix * vec4(position, 1.0);
   vWorld = w.xyz;
   vNormalW = normalize(mat3(modelMatrix) * normal);
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 

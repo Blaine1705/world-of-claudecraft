@@ -32,6 +32,7 @@ import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { MOBS } from '../../sim/data';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { VISUALS } from '../characters/manifest';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { GFX } from '../gfx';
@@ -69,7 +70,7 @@ const LANTERN = new THREE.Color(1.0, 0.72, 0.32);
 
 // ---------------------------------------------------------------- particles
 
-const PARTICLE_VERT = /* glsl */ `
+const PARTICLE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 attribute vec3 aPos0;
 attribute vec3 aVel;
@@ -105,7 +106,7 @@ void main() {
   } else {
     w = p + (camRight * position.x + camUp * position.y) * size;
   }
-  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
 
