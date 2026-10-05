@@ -34,9 +34,9 @@ PREFIX = 'selthe'
 HEAD_C = SB.HEAD_C
 
 # the coiled tail: from the hips down and round in its pool, the fluke last
-TAIL_PTS = [np.array(p) for p in ((0, 0.03, 2.86), (0, 0.08, 2.08), (0, 0.22, 1.3), (0, 0.4, 0.62), (0.32, 0.58, 0.26),
-                                  (0.86, 0.36, 0.2), (0.98, -0.26, 0.18), (0.48, -0.74, 0.16), (-0.22, -0.78, 0.16))]
-TAIL_R = (0.24, 0.3, 0.27, 0.23, 0.2, 0.17, 0.14, 0.11, 0.08)
+TAIL_PTS = [np.array(p) for p in ((0, 0.03, 2.86), (0, 0.08, 2.08), (0, 0.22, 1.3), (0, 0.4, 0.66), (0.32, 0.58, 0.31),
+                                  (0.86, 0.36, 0.26), (0.98, -0.26, 0.23), (0.48, -0.74, 0.2), (-0.22, -0.78, 0.18))]
+TAIL_R = (0.32, 0.42, 0.4, 0.34, 0.28, 0.23, 0.18, 0.14, 0.1)
 POOL_R = 1.7
 POOL_AT = np.array((0.0, 0.0, 0.0))
 # the fan: rays from behind the shoulders in a plane leaning back
@@ -144,6 +144,92 @@ class _Lazy(list):
 CHAINS = _Lazy()
 
 
+# ------------------------------------------------------------------ the matriarch's broad body
+# The siren's body (siren_base.build_body) was a slender maiden's: next to the
+# chibi player and under her vast fan she read thin. The matriarch keeps the
+# siren's joints (every clip still fits) but is built broad and heavy in the
+# game's stylized way: a deep ribcage and strong shoulders, thick arms, a
+# solid neck under the larger head.
+WIDE, DEEP, LIMB = 1.22, 1.3, 1.38
+
+
+def build_body(voxel):
+    lerp = B.lerp
+    F = Field((-1.0, -0.6, 2.55), (1.0, 0.55, 4.4), voxel)
+    F.add(Ellipsoid((0, 0.03, 2.86), (0.25 * WIDE, 0.19 * DEEP, 0.24), bone='Hips'), 0.12)
+    F.add(Ellipsoid((0, 0.02, 3.12), (0.2 * WIDE, 0.145 * DEEP, 0.2), bone='Spine1'), 0.12)
+    F.add(Ellipsoid((0, 0.03, 3.48), (0.255 * WIDE, 0.17 * DEEP, 0.28), rot_matrix(rx=-0.06), bone='Spine2'), 0.12)
+    for s in (1, -1):
+        F.add(Ellipsoid(_m((0.12, -0.15, 3.52), s), (0.125, 0.1, 0.11), rot_matrix(rz=0.25 * s), bone='Spine2'),
+              0.05)
+    F.add(Ellipsoid((0, 0.05, 3.76), (0.36, 0.18, 0.13), bone='Spine2'), 0.1)
+    for s in (1, -1):
+        F.add(Ellipsoid(_m((0.15, 0.17, 3.66), s), (0.13, 0.06, 0.15), bone='Spine2'), 0.06)
+        F.add(RoundCone(_m((0.05, -0.07, 3.83), s), _m((0.32, -0.01, 3.86), s), 0.03, 0.04, bone=_side('Clavicle', s)),
+              0.04)
+        # the trapezius: a strong slope from the neck to the shoulder
+        F.add(RoundCone(_m((0.06, 0.07, 3.95), s), _m((0.33, 0.05, 3.87), s), 0.075, 0.085, bone=_side('Clavicle', s)),
+              0.09)
+    F.add(RoundCone((0, 0.05, 3.8), (0, 0.02, 4.3), 0.105, 0.095, bone='Neck'), 0.07)
+    for s in (1, -1):
+        sh, el, wr = _m(SHOULDER, s), _m(ELBOW, s), _m(WRIST, s)
+        up, fo = _side('UpperArm', s), _side('Forearm', s)
+        F.add(Sphere(sh + np.array((0.02 * s, 0, 0.0)), 0.09 * LIMB, bone=up), 0.06)
+        F.add(RoundCone(sh, el, 0.082 * LIMB, 0.056 * LIMB, bone=up), 0.04)
+        F.add(Sphere(el + np.array((0, 0.02, 0)), 0.053 * LIMB, bone=_side('ElbowFix', s)), 0.035)
+        F.add(RoundCone(el, lerp(el, wr, 0.38), 0.055 * LIMB, 0.064 * LIMB, bone=fo), 0.03)
+        F.add(RoundCone(lerp(el, wr, 0.38), wr, 0.064 * LIMB, 0.045 * LIMB, bone=fo), 0.03)
+    noise = Noise(5)
+    F.displace(lambda X_, Y_, Z_: 0.0015 * noise.fbm(X_ * 12, Y_ * 12, Z_ * 12, octaves=2), band=0.05)
+    return F
+
+
+def body_paint(obj):
+    """The siren's RegScale, and RegStripe: the lionfish's bands, deep violet
+    and sea-teal, ringing her arms and sweeping round her flanks."""
+    SB.body_paint(obj)
+    from rig import mesh_arrays
+    P, _ = mesh_arrays(obj)
+    stripe = np.zeros(len(P))
+    for s in (1, -1):
+        sh, wr = _m(SHOULDER, s), _m(WRIST, s)
+        ax = wr - sh
+        L = np.linalg.norm(ax)
+        u = ((P - sh) @ ax) / (L * L)
+        d = np.linalg.norm(P - sh - np.outer(np.clip(u, 0, 1), ax), axis=1)
+        on = (u > 0.12) & (u < 0.96) & (d < 0.16) & (P[:, 0] * s > 0.2)
+        band = np.clip((np.abs(np.sin(u * math.pi * 5.5)) - 0.55) / 0.12, 0, 1)
+        stripe = np.maximum(stripe, band * on)
+    flank = np.clip((np.abs(P[:, 0]) - 0.17) / 0.06, 0, 1) * np.clip((3.42 - P[:, 2]) / 0.05, 0, 1) *         np.clip((P[:, 2] - 3.0) / 0.05, 0, 1)
+    band = np.clip((np.abs(np.sin((P[:, 2] * 14 + np.abs(P[:, 0]) * 6))) - 0.6) / 0.12, 0, 1)
+    stripe = np.maximum(stripe, band * flank)
+    _write(obj, {'RegStripe': stripe})
+
+
+def _no_stripe(obj):
+    _write(obj, {'RegStripe': np.zeros(len(obj.data.vertices))})
+
+
+def build_hand(side, voxel):
+    """The siren's hand, made strong to match the arms: a broader palm and
+    thicker fingers ending in sharp nails."""
+    w, down, width, palm = hand_frame(side)
+    lo = np.minimum(w - down * 0.1, w + down * 0.4) - 0.16
+    hi = np.maximum(w - down * 0.1, w + down * 0.4) + 0.16
+    F = Field(lo, hi, voxel)
+    hand = _side('Hand', side)
+    F.add(RoundCone(w - down * 0.06, w + down * 0.02, 0.045, 0.042, bone=hand), 0.02)
+    Rm = np.stack([width, palm, down], axis=1)
+    F.add(Ellipsoid(w + down * 0.07, (0.058, 0.025, 0.07), Rm, bone=hand), 0.02)
+    for f in FINGERS:
+        base, mid, tip = finger_chain(side, f)
+        r0 = (HAND.fingers[f][4] if f != 'Thumb' else 0.021) * 1.28
+        b1, b2 = _side(f + '1', side), _side(f + '2', side)
+        F.add(RoundCone(base, mid, r0, r0 * 0.88, bone=b1), 0.008)
+        F.add(RoundCone(mid, tip, r0 * 0.86, r0 * 0.4, bone=b2), 0.006)
+    return F
+
+
 # ------------------------------------------------------------------ the head, with a jaw that opens too far
 def _head_unscaled(voxel):
     F = Field((-0.25, -0.33, 4.08), (0.25, 0.3, 4.82), voxel)
@@ -152,14 +238,17 @@ def _head_unscaled(voxel):
     F.add(Ellipsoid((0, 0.035, 4.53), (0.155, 0.19, 0.2), bone='Head'), 0.06)
     F.add(Ellipsoid((0, -0.07, 4.46), (0.135, 0.13, 0.15), bone='Head'), 0.07)
     for s in (1, -1):
-        F.add(Ellipsoid(_m((0.09, -0.15, 4.465), s), (0.05, 0.03, 0.026), rot_matrix(rz=0.35 * s), bone='Head'),
-              0.035)
+        F.add(Ellipsoid(_m((0.094, -0.15, 4.462), s), (0.058, 0.034, 0.024), rot_matrix(rz=0.4 * s, ry=-0.2 * s),
+                        bone='Head'), 0.03)
         F.add(Ellipsoid(_m((0.07, -0.13, 4.4), s), (0.05, 0.045, 0.045), bone='Head'), 0.05)
         # the jaw: from below the ear to a small sharp chin, on the Jaw bone
         F.add(RoundCone(_m((0.1, -0.02, 4.37), s), _m((0.036, -0.134, 4.262), s), 0.045, 0.032, bone='Jaw'), 0.06)
     F.add(Ellipsoid((0, -0.148, 4.255), (0.036, 0.032, 0.034), bone='Jaw'), 0.04)
     F.add(Ellipsoid((0, -0.172, 4.55), (0.105, 0.03, 0.03), bone='Head'), 0.04)
     for s in (1, -1):
+        # a heavy brow ridge drawn down toward the nose: regal, and a scowl
+        F.add(Ellipsoid(_m((0.07, -0.183, 4.538), s), (0.062, 0.026, 0.017), rot_matrix(ry=0.32 * s, rz=0.12 * s),
+                        bone='Head'), 0.02)
         F.sub(Ellipsoid(_m((0.066, -0.205, 4.492), s), (0.04, 0.024, 0.02), rot_matrix(rz=0.18 * s)), 0.03)
         F.add(Ellipsoid(_m((0.066, -0.172, 4.498), s), (0.038, 0.024, 0.018), rot_matrix(rx=0.25, rz=0.16 * s),
                         bone='Head'), 0.012)
@@ -173,6 +262,10 @@ def _head_unscaled(voxel):
     # the lips: the upper on the head, the lower on the jaw
     F.add(Ellipsoid((0, -0.195, 4.357), (0.032, 0.012, 0.009), rot_matrix(rx=-0.25), bone='Head'), 0.012)
     F.add(Ellipsoid((0, -0.191, 4.33), (0.029, 0.013, 0.012), bone='Jaw'), 0.012)
+    # two small fangs behind the upper lip, bared when she sings
+    for s in (1, -1):
+        F.add(X.Prism(_m((0.017, -0.178, 4.352), s), _m((0.015, -0.181, 4.322), s), 0.0055, n=5, tip=0.6, tip_a=0.1,
+                      bone='Head'), 0.003)
     # the mouth: a deep cavity behind the lips, only seen when the jaw drops
     F.sub(Ellipsoid((0, -0.12, 4.34), (0.05, 0.08, 0.035)), 0.015)
     F.sub(Ellipsoid((0, -0.205, 4.345), (0.024, 0.02, 0.005)), 0.004)
@@ -195,12 +288,27 @@ def build_head(voxel):
 
 
 def head_paint(obj):
+    """The siren's face masks, RegMouth, and RegStripe: the lionfish marks of
+    her face, a band swept down and back from each eye across the cheek and a
+    second under it, deep violet, the mask of a queen of the reef."""
     SB.head_paint(obj)
     from rig import mesh_arrays
     P, _ = mesh_arrays(obj)
     P = hs_inv(P)
-    m = np.clip(1 - np.linalg.norm((P - np.array((0, -0.13, 4.34))) / np.array((0.06, 0.09, 0.045)), axis=1), 0, 1)
-    _write(obj, {'RegMouth': np.clip(m * 3, 0, 1)})
+    # the mouth's glow stays inside it, off the lips
+    m = np.clip(1 - np.linalg.norm((P - np.array((0, -0.12, 4.34))) / np.array((0.05, 0.06, 0.035)), axis=1), 0, 1)
+    x, y, z = P[:, 0], P[:, 1], P[:, 2]
+    ax = np.abs(x)
+    front = np.clip((-y - 0.02) / 0.04, 0, 1)
+    stripe = np.zeros(len(P))
+    for x0, w in ((0.066, 0.014), (0.118, 0.011)):
+        # each band falls from the brow through (or beside) the eye and
+        # slants out down the cheek to the jaw, as a lionfish's face is barred
+        xc = x0 + 0.3 * np.clip(4.5 - z, 0, None)
+        band = np.clip((w - np.abs(ax - xc)) / 0.004, 0, 1)
+        band = band * np.clip((z - 4.32) / 0.02, 0, 1) * np.clip((4.6 - z) / 0.02, 0, 1)
+        stripe = np.maximum(stripe, band * front)
+    _write(obj, {'RegMouth': np.clip(m * 3, 0, 1), 'RegStripe': stripe})
 
 
 # ------------------------------------------------------------------ the coiled tail
@@ -433,12 +541,12 @@ def conch_matrix():
 def fields(k=1.0):
     from build_core import Sculpt
     vb, vh, vhand = 0.011 * k, 0.0042 * k, 0.0042 * k
-    Fb = SB.build_body(vb)
+    Fb = build_body(vb)
     Fh = build_head(vh)
-    S = [Sculpt('Body', Fb, 'skin', 5000, spots=[((0, -0.12, 3.5), 0.25, 0.5)], tau=0.04, paint=SB.body_paint),
+    S = [Sculpt('Body', Fb, 'skin', 5000, spots=[((0, -0.12, 3.5), 0.25, 0.5)], tau=0.04, paint=body_paint),
          Sculpt('Head', Fh, 'skin', 5600, spots=[((0, -0.2, 4.42), 0.14, 1.0)], tau=0.012, paint=head_paint),
-         Sculpt('L_Hand', SB.build_hand(1, vhand), 'skin', 900, tau=0.008),
-         Sculpt('R_Hand', SB.build_hand(-1, vhand), 'skin', 900, tau=0.008)]
+         Sculpt('L_Hand', build_hand(1, vhand), 'skin', 900, tau=0.008, paint=_no_stripe),
+         Sculpt('R_Hand', build_hand(-1, vhand), 'skin', 900, tau=0.008, paint=_no_stripe)]
     for name, G, mat, binding, bone, allow in SB.layers(Fb, 0.0065 * k):
         target = 1800 if name == 'Bodice' else 300
         S.append(Sculpt(name, G, mat, target, binding=binding, bone=bone, allow=allow, relax=6,

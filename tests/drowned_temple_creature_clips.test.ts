@@ -536,6 +536,14 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
     expect(v.height * (MOBS.choirmother_selthe.scale ?? 1)).toBeCloseTo(9.0, 1);
   });
 
+  it('wears her round-two body baked, her bars and eyes in the emissive map, in budget', () => {
+    const path = 'public/models/creatures/temple_selthe.glb';
+    const body = glbJson(path).materials?.find((m) => m.name === 'ChoirmotherSeltheBody');
+    expect(body?.emissiveTexture).toBeDefined();
+    expect(trianglesOf(path)).toBeGreaterThan(45000);
+    expect(trianglesOf(path)).toBeLessThan(60000);
+  });
+
   it('casts water on her bars (no hand swings) and answers each mark with its gesture', () => {
     const v = visualOf('choirmother_selthe');
     const c = v.clips;

@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "e609b663069c322730584f25cc51d58e2075a1469c235bd5c77898272f437ea0",
+  "rendererFingerprint": "513cd1946a64c5e55870f8eb7fe4aa2322824ca469b58a233de1ae133c76485d",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 5496287,
-      "sha256": "ab35533179425c9b96c050dbd8ef23ceca41a2c0cd5ce9539a3e92ba24a9e36d",
+      "sha256": "3593155324d5cbb452ced5898313daf78289d881da86bb62f9b6bef7ddbe9e73",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1195,8 +1195,8 @@
         "model": {
           "url": "models/creatures/temple_selthe.glb",
           "path": "public/models/creatures/temple_selthe.glb",
-          "bytes": 3623988,
-          "sha256": "caeb8baf71ae568277fd3f45b9834738ed45d2eba14bb29743bdeddeaf7f8ba5"
+          "bytes": 3651184,
+          "sha256": "d3fb538d4b73a7963013d0aa356352c20e63867957512e21281e0e0876127ecb"
         },
         "idle": "Idle",
         "height": 7.83,
@@ -1213,11 +1213,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "20b65c9615e0614e943eb9ca4063c29a111bca2217ccd975acabcb9116f5279b",
+      "sourceFingerprint": "01c787c5ef48a45d1673b315a0d3db62b92f2defd0a5d6c38ebae6813734f6f8",
       "output": {
         "path": "public/ui/mobs/choirmother_selthe.webp",
-        "bytes": 3684,
-        "sha256": "63627bebb8d142136c5a4d7a0e2e86de640b40c2e69617b2234642e6c921cdba"
+        "bytes": 3600,
+        "sha256": "abe2f47ba0f1d8d9d61c76274f33021c87526505141e6490663df6d0e381fe1d"
       }
     },
     {

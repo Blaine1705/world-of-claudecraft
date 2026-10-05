@@ -4911,7 +4911,11 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // The bosses. Choirmother Selthe (choirmother_selthe; scripts/assets/
   // drowned_temple_creatures/selthe_matriarch/): the siren matriarch, built
-  // on the Moonlit Siren's body but far larger, a vast lionfish fan opening
+  // on the Moonlit Siren's skeleton but broad and heavy in the game's
+  // stylized way (round two: a deep ribcage, strong shoulders and arms, a
+  // thicker coil, a larger head with a heavy scowling brow, glowing slit
+  // eyes, two small fangs and the lionfish's violet bars across her face,
+  // arms and flanks), a vast lionfish fan opening
   // behind her like the pipes of an organ (silver rays, pearl tips, sheer
   // turquoise to violet fins), her tail coiled in the pool of moonlit water
   // she rides, the golden Great Conch on her chest, a jaw that drops too far
