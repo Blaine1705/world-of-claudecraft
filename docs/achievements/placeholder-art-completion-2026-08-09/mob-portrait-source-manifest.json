@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "908e1a244ef7132fb7c271b6de0f081d4ae78aaa58487d5b0f890fe84f29ac70",
+  "rendererFingerprint": "43f49cb23c1577cf4f5b3faf1aabbbd3566d1b3d71fba0fa6300cf865907c642",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5496287,
-      "sha256": "627df379f4a3dae1363038a137d1147c5e18b34bf7a26f079bbe5d601317183a",
+      "bytes": 5534929,
+      "sha256": "bfa817b79415e21569fb0681b1fa3bca100ce4c798e7d6f83054a17bde8cb7e2",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 345,
+  "portraitCount": 347,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -1393,6 +1393,40 @@
         "path": "public/ui/mobs/crypt_bone_minion.webp",
         "bytes": 2842,
         "sha256": "26f7faa6fc68312c6308974e23e313bb5158f5de392e90dfe43c510a5328417c"
+      }
+    },
+    {
+      "id": "crypt_bone_pile",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_bone_pile",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_warrior.glb",
+          "path": "public/models/chars/enemies/skeleton_warrior.glb",
+          "bytes": 523236,
+          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+        },
+        "idle": "Lie_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "aa4c2693edd7a2c0455f3957867b0017b06578fb663d9f06acb1aa51eee47a63",
+      "output": {
+        "path": "public/ui/mobs/crypt_bone_pile.webp",
+        "bytes": 2776,
+        "sha256": "78cfa1d48804f3673cc8bf80286b02f13266076ab98296a95a01c489afb79cbc"
       }
     },
     {
@@ -9234,8 +9268,8 @@
         "model": {
           "url": "models/creatures/drowned_prisoner.glb",
           "path": "public/models/creatures/drowned_prisoner.glb",
-          "bytes": 2370208,
-          "sha256": "e8fb40572f32655afbf3551132c8ffd40bdc410b8e4648bc4fedec3d3926ae73"
+          "bytes": 2507028,
+          "sha256": "b59ed852323830ce141e572758ec97200b74e4b7564738bac0defb0bc0e633df"
         },
         "idle": "Idle",
         "height": 4.6,
@@ -9252,7 +9286,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "0ff05a1998f2397ad5a6ce14f51f652dc5f3e0e1a2498db5eeca1bd1c9913122",
+      "sourceFingerprint": "ce2d5b06c70f06558248f74027a98359053f8737760f629d0a84178c7202bfa9",
       "output": {
         "path": "public/ui/mobs/shackled_prisoner.webp",
         "bytes": 2304,
@@ -9831,6 +9865,40 @@
         "path": "public/ui/mobs/sump_troll_devourer.webp",
         "bytes": 2058,
         "sha256": "1ca86facac31c8d3e410e5573829e5d6523298ac63a033c41dad5c42da62fbee"
+      }
+    },
+    {
+      "id": "sunbone_dread_totem",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "wildheart_sunbone_dread_totem",
+      "renderSpec": {
+        "model": {
+          "url": "models/props/wildheart_mask_totem.glb",
+          "path": "public/models/props/wildheart_mask_totem.glb",
+          "bytes": 165356,
+          "sha256": "cb050cc8251438135e979e6c3d28ab82be947cdfc78a0e245dd5da4d27f63299"
+        },
+        "idle": "Idle",
+        "height": 4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.42
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7a1c16",
+        "resolved": "#7a1c16",
+        "strength": 0.42
+      },
+      "sourceFingerprint": "62867b189dc1b36eed7080406ba73754737d2e24d750301c83cf1822689411eb",
+      "output": {
+        "path": "public/ui/mobs/sunbone_dread_totem.webp",
+        "bytes": 1934,
+        "sha256": "818e036374c60a26d147d504c1fbc9e0c8dcfaa607ddb8cecf82b43c30f24f40"
       }
     },
     {
