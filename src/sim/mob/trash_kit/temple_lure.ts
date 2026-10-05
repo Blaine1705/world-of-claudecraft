@@ -42,6 +42,15 @@ export function lureTarget(
   return pickPastTank(players, mob, def.range, st.casts);
 }
 
+/** The song broke (a kick, a stun): its victim keeps no draw. */
+export function dropDraw(ctx: SimContext, mob: Entity, victimId: number | null): void {
+  const victim = victimId !== null ? ctx.entities.get(victimId) : undefined;
+  if (!victim) return;
+  victim.auras = victim.auras.filter(
+    (a) => !(a.id === TEMPLE_SHALLOWS_DRAW && a.sourceId === mob.id),
+  );
+}
+
 function breakSong(ctx: SimContext, mob: Entity, victim: Entity): void {
   mob.castingAbility = null;
   mob.castRemaining = 0;

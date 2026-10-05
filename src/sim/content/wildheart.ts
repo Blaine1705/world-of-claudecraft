@@ -589,7 +589,10 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       // 22 yd lane at someone at least 8 yd off; whoever stands in it is
       // struck and reeled to its mouth at 14 yd/s, twice a run, so the drag
       // reads for about a second (into its spores, when it is low).
-      // Step out sideways; it cannot be kicked.
+      // Step out sideways; it cannot be kicked. Math, landed raw: normal 60
+      // to 75, 6 to 8 percent of a level 20 cloth wearer's ~950 (the cost is
+      // the reel into the spores); heroic x3 (the toad's mechanic factor) 180
+      // to 225, 14 to 18 percent of a heroic cloth wearer's ~1,250.
       wildheart: {
         tongue: {
           castId: WILDHEART_SNARING_TONGUE,

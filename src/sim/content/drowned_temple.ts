@@ -148,6 +148,10 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
       // The trash mechanics pass: while it shells up the shell spins, and the
       // water within 8 yd drags everyone toward it at 2.5 yd/s (3.5 on heroic,
       // both well under a run); the 3 yd core bites once a second. Walk out.
+      // Math, landed raw: normal 30 to 40 a bite, 5 to 7 percent of a level
+      // 17 cloth wearer's ~600, and only for the seconds spent in the core;
+      // heroic x5.5 (the snapper's mechanic factor) 165 to 220 a bite, 13 to
+      // 18 percent of ~1,250, so one walked-out second is the usual cost.
       temple: {
         whirlpool: {
           radius: 8,
@@ -215,6 +219,10 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
       },
       // The trash mechanics pass: a kickable bolt that leaps on to the nearest
       // player within 6 yd of the last one struck, up to four. Spread out.
+      // Math, landed raw per player struck: normal 40 to 50, 7 to 8 percent
+      // of a level 17 cloth wearer's ~600; heroic x5.5 (the eel's mechanic
+      // factor) 220 to 275, 18 to 22 percent of ~1,250. A bunched group pays
+      // it four times over, never one player more than once.
       temple: {
         spark: {
           castId: TEMPLE_ARCING_SPARK,

@@ -18,7 +18,7 @@ import {
   stepOath,
   stepVigil,
 } from './temple_choir';
-import { landLure, lureTarget, stepLure } from './temple_lure';
+import { dropDraw, landLure, lureTarget, stepLure } from './temple_lure';
 import { stepPearl } from './temple_pearl';
 import {
   gazeReady,
@@ -58,6 +58,10 @@ export const TEMPLE_KIT_EXTENSION: TrashKitExtension = {
     if (key === 'gaze') landGaze(ctx, inst, mob, kit, players);
     else if (key === 'lure') landLure(ctx, mob, kit, targetId, inst.difficulty === 'heroic');
     else landSpark(ctx, mob, kit, targetId, players);
+  },
+  broken(ctx, mob, key, targetId) {
+    // A kicked or stunned song lets its victim go at once.
+    if (key === 'lure') dropDraw(ctx, mob, targetId);
   },
   step(ctx, inst, mob, kit, st, players) {
     const t = kit.temple;

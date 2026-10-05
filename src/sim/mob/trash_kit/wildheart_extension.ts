@@ -82,6 +82,10 @@ export const WILDHEART_KIT_EXTENSION: TrashKitExtension = {
     holdLineAim(mob, st);
     return true;
   },
+  broken(_ctx, _mob, key, _targetId, st) {
+    // A broken tongue lets go of the lane it locked.
+    if (key === 'tongue') st.aim = undefined;
+  },
   land(ctx, inst, mob, kit, key, targetId, players, st) {
     switch (key) {
       case 'roar':

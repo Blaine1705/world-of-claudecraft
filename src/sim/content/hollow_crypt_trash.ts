@@ -388,7 +388,10 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
       },
       // Granite Skin: a layer of stone every 3 s, 6 percent less damage each
       // (heroic 10) up to five; a stun shatters it and leaves it Cracked Stone,
-      // taking 25 percent more for 6 s. Save a stun for the gargoyle.
+      // taking 25 percent more for 6 s. Save a stun for the gargoyle. Five
+      // layers ward 30 percent (heroic 50), under the classic shield-wall
+      // style 50 to 75 percent cooldowns, and the crack's 25 percent sits at
+      // the classic armor-break band; it never touches player health.
       granite: {
         name: 'Granite Skin',
         every: 3,

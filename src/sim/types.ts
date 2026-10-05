@@ -4672,7 +4672,9 @@ export interface KitWalkerDef {
      *  heals: the Bastion Revenant's Throatlight). */
     heroicDamagePct?: number;
     /** An absorb shield of this share of the ally's maximum health, for
-     *  `seconds` (the Moonmantle Ray's Heartpearl Ward). */
+     *  `seconds` (the Moonmantle Ray's Heartpearl Ward). It rides `auraId`,
+     *  so a def never both shields and arms (tests/dungeon_trash_wave2.test.ts
+     *  pins it). */
     shieldPct?: number;
   };
   /** What an interception does to the player who took it: a roll of damage,

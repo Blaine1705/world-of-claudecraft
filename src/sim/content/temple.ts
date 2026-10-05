@@ -331,6 +331,10 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
       // for 2 s, then everyone within 25 yd who FACES it is dazzled for 3 s
       // (4 on heroic): half their swings whiff and they stumble at half
       // speed. Turn your back before the bar ends. No kick; a stun breaks it.
+      // Math, landed raw on each player facing it: normal 25 to 35, 4 to 6
+      // percent of a level 17 cloth wearer's ~600 (the cost is the dazzle);
+      // heroic x5.5 (the lurker's mechanic factor) 138 to 193, 11 to 15
+      // percent of ~1,250.
       temple: {
         gaze: {
           castId: TEMPLE_PRISM_GLARE,

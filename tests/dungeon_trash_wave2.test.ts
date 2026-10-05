@@ -521,6 +521,9 @@ describe('Moonlit Siren: Call of the Shallows (G6 sight break + the drag)', () =
           sourceId: r.me.id,
           school: 'physical',
         });
+      run(r, DT, [siren]);
+      // Let go at once: no draw left on the victim.
+      expect(aura(victim, TEMPLE_SHALLOWS_DRAW)).toBeUndefined();
       run(r, def!.castTime + DT, [siren]);
       expect(aura(victim, TEMPLE_SONG_STRUCK)).toBeUndefined();
     }
@@ -542,6 +545,15 @@ describe('Moonlit Siren: Call of the Shallows (G6 sight break + the drag)', () =
 
 describe('Moonmantle Ray: Heartpearl (G5 walker when the cocoon breaks, heroic)', () => {
   const kit = MOBS.pearlguard_sentinel.trashKit;
+
+  it('no shipped walker both arms and shields its ally (one aura id carries one)', () => {
+    for (const t of Object.values(MOBS)) {
+      const e = t.trashKit?.walker?.empower;
+      if (!e || (e.shieldPct ?? 0) <= 0) continue;
+      expect(e.damagePct, t.id).toBe(0);
+      expect(e.heroicDamagePct ?? 0, t.id).toBe(0);
+    }
+  });
 
   it('is an event walker that rolls to a ray or a templeguard, lingers, and gifts the group', () => {
     expect(kit?.temple?.pearl?.heroicOnly).toBe(true);

@@ -507,6 +507,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // Rimesilk Spit (the Hollow Crypt trash pass): a frost web spat down a
     // lane at one player; whoever it catches is rooted 2 s, and beside the
     // egg sacs that is the danger. 8 to 12 frost is a scratch; step aside.
+    // Math, landed raw: normal 8 to 12, 4 to 6 percent of a level 8 cloth
+    // wearer's ~210; heroic on the Crypt's dungeon-wide x20 (the widow has no
+    // override) 160 to 240, 13 to 19 percent of ~1,250.
     trashKit: {
       line: {
         castId: CRYPT_RIMESILK_SPIT,

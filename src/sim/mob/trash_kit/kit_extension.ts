@@ -72,6 +72,15 @@ export interface TrashKitExtension {
     st: TrashKitState,
     players: () => Entity[],
   ): boolean;
+  /** Its bar broke before it landed (a kick, a stun, a silence, a lost
+   *  sight): drop what the bar laid while it ran (a locked aim, a draw). */
+  broken?(
+    ctx: SimContext,
+    mob: Entity,
+    key: string,
+    targetId: number | null,
+    st: TrashKitState,
+  ): void;
   /** The pull ended for this mob (death, evade, reset): lift what it left
    *  on others (a link, a mark, a ring). */
   endPull?(ctx: SimContext, inst: InstanceSlot, mob: Entity, st: TrashKitState): void;

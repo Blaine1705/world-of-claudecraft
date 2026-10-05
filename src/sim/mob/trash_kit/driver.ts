@@ -670,6 +670,7 @@ function stepCast(
     if (key === 'column') endColumn(ctx, mob, kit, st, false);
     if (key === 'fogBank') dropUnlaidFog(st);
     if (key === 'hook') st.aim = undefined;
+    ext?.broken?.(ctx, mob, key, cast.targetId, st);
     return false;
   }
   mob.castRemaining = Math.max(0, mob.castRemaining - DT);
