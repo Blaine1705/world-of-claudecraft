@@ -592,6 +592,8 @@ const mergeStringsEn = {
       crypt_carrion_eye: 'Carrion Eye',
       crypt_marrow_crush: 'Marrow Crush',
       crypt_rimesilk_spit: 'Rimesilk Spit',
+      // The trash pass's second wave: the adept's volley can be kicked.
+      crypt_gravespark_volley: 'Gravespark Volley',
       // The Hollow Crypt finale (encounters/hollow_crypt/ids.ts): Morthen's
       // entrance at the Rite Ring and the Knellwyrm. None can be kicked.
       crypt_morthen_rite_wakes: 'The Rite Wakes',
@@ -615,6 +617,8 @@ const mergeStringsEn = {
       bastion_boathook: 'Boathook Drag',
       bastion_fog_bank: 'Fog Bank',
       bastion_brine_column: 'Brine Column',
+      // The trash pass's second wave: the sergeant's shout can be kicked.
+      bastion_loose_on_my_mark: 'Loose on My Mark',
       bastion_oathbound_charge: 'Oathbound Charge',
       bastion_gaolers_cudgel: "Gaoler's Cudgel",
       bastion_mist_surge: 'Mist Surge',
@@ -685,6 +689,8 @@ const mergeStringsEn = {
       // Arcing Spark can be kicked; the Prism Glare cannot (turn your back).
       temple_prism_glare: 'Prism Glare',
       temple_arcing_spark: 'Arcing Spark',
+      // The trash pass's second wave: the siren's song can be kicked.
+      temple_call_of_the_shallows: 'Call of the Shallows',
       // The Wildheart Basin rework (trash_kit/wildheart_cast_ids.ts,
       // encounters/wildheart_basin/ids.ts). Only Ancestral Sap can be kicked.
       wildheart_ancestral_sap: 'Ancestral Sap',

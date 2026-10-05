@@ -80,6 +80,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.crypt_grave_rupture': true,
   'abilityUi.cast.crypt_carrion_eye': true,
   'abilityUi.cast.crypt_marrow_crush': true,
+  // The trash pass's second wave.
+  'abilityUi.cast.crypt_gravespark_volley': true,
   'abilityUi.cast.crypt_rimesilk_spit': true,
   // The Hollow Crypt finale (encounters/hollow_crypt/ids.ts).
   'abilityUi.cast.crypt_morthen_rite_wakes': true,
@@ -100,6 +102,7 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.bastion_boathook': true,
   'abilityUi.cast.bastion_fog_bank': true,
   'abilityUi.cast.bastion_brine_column': true,
+  'abilityUi.cast.bastion_loose_on_my_mark': true,
   'abilityUi.cast.bastion_oathbound_charge': true,
   'abilityUi.cast.bastion_gaolers_cudgel': true,
   'abilityUi.cast.bastion_mist_surge': true,
@@ -155,6 +158,7 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   // The Temple trash mechanics pass.
   'abilityUi.cast.temple_prism_glare': true,
   'abilityUi.cast.temple_arcing_spark': true,
+  'abilityUi.cast.temple_call_of_the_shallows': true,
   // The Wildheart Basin rework: its trash kit and the Great Saurian.
   'abilityUi.cast.wildheart_ancestral_sap': true,
   'abilityUi.cast.wildheart_plant_totem': true,
