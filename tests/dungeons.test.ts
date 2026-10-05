@@ -1086,9 +1086,12 @@ describe('dungeons: heroic difficulty', () => {
     expect(heroicMorthen.stats.armor).toBe(pins.armor);
     // Fire-time mechanic scaling rides these per-entity fields (the mechanic
     // numbers are read from the base MOBS table, not the transformed template).
+    // Morthen's encounter (encounters/hollow_crypt/morthen.ts) prices his
+    // mechanics on their own factor, apart from the tank-swing floor.
     expect(heroicMorthen.mechanicDamageMult).toBe(
-      HEROIC_DUNGEON_TUNING.hollow_crypt.damageMultiplier,
+      HEROIC_DUNGEON_TUNING.hollow_crypt.mechanicDamageMultiplierByMob?.morthen,
     );
+    expect(heroicMorthen.mechanicDamageMult).toBe(9);
     expect(heroicMorthen.mechanicHealMult).toBe(
       HEROIC_DUNGEON_TUNING.hollow_crypt.healthMultiplier,
     );

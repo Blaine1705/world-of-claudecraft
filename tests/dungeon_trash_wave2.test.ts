@@ -737,6 +737,7 @@ describe('the balance audit: heroic avoidables never one-shot a cloth wearer', (
       sexton_marrow: 6,
       rimeweb: 5,
       cantor_ilvane: 8,
+      morthen: 9,
     });
     const def = MOBS.crypt_gravecaller_necromancer.trashKit?.rupture;
     if (!def) throw new Error('rupture');
