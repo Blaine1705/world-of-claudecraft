@@ -19,7 +19,6 @@ import {
   sectorReach,
   sightColumnAngle,
   sightColumnCount,
-  sightDrapeSample,
   sightDrapeSamples,
   sightIndex,
   sightVertex,
@@ -77,22 +76,25 @@ bool sightSteep(vec3 p) {
 `;
 
 /**
- * `sightShade(vR, vReach, radius, world)`: the shadow behind cover, one look
+ * `sightShade(vR, vReach, radius, vLocal)`: the shadow behind cover, one look
  * for every sight field so a player learns it once: dark, cool and hatched
  * (the blast cannot see here), brighter near the cover that throws it, its
- * outer edge a faint dotted trace of the reach. Returns rgb and alpha.
+ * outer edge a faint dotted trace of the reach round the caster. Fed the
+ * caster-local point (exact; a world point far out in an instance band is
+ * not). Returns rgb and alpha.
  */
 export const SIGHT_SHADE_GLSL = /* glsl */ `
-vec4 sightShade(float r, float reach, float radius, vec3 world) {
-  float hatch = step(0.5, fract((world.x + world.z) * 0.9));
+vec4 sightShade(float r, float reach, float radius, vec3 local) {
+  float hatch = step(0.5, fract((local.x + local.z) * 0.9));
   float near = 1.0 - smoothstep(0.0, 1.2, r - reach);
-  float trace = (1.0 - smoothstep(0.08, 0.2, radius - r)) * step(0.5, fract(atan(world.z, world.x) * 30.0));
+  float trace = (1.0 - smoothstep(0.08, 0.2, radius - r)) * step(0.5, fract(atan(local.z, local.x) * 30.0));
   vec3 col = mix(vec3(0.02, 0.05, 0.09), vec3(0.45, 0.8, 0.95), hatch * 0.25 + near * 0.35);
   return vec4(col, 0.34 + hatch * 0.08 + near * 0.2 + trace * 0.35);
 }
 `;
 
-/** Floor samples a draping field takes per frame (about a millisecond). */
+/** Floor samples an owner lets its draping fields take in one frame, shared
+ *  across all of them (`drapeSome` returns what it spent). */
 export const SIGHT_DRAPE_BUDGET = 1100;
 
 export class SightFieldSurface {
@@ -183,14 +185,18 @@ export class SightFieldSurface {
     this.reachAttr.needsUpdate = true;
   }
 
-  /** Lay up to `budget` more floor samples, nearest first. True when done. */
-  drapeSome(groundY: (x: number, z: number) => number, budget = SIGHT_DRAPE_BUDGET): boolean {
-    if (this.draped >= this.samples) return true;
+  /** Lay up to `budget` more floor samples, nearest first (the order of
+   *  sightDrapeSample, inlined: no allocation). Returns the samples spent. */
+  drapeSome(groundY: (x: number, z: number) => number, budget = SIGHT_DRAPE_BUDGET): number {
+    if (this.draped >= this.samples || budget <= 0) return 0;
     const K = this.stations;
+    const cols = this.rays * 2;
     const p = this.pos.array as Float32Array;
-    const end = Math.min(this.samples, this.draped + budget);
-    for (let n = this.draped; n < end; n++) {
-      const { k, q } = sightDrapeSample(n, this.rays);
+    const start = this.draped;
+    const end = Math.min(this.samples, start + budget);
+    for (let n = start; n < end; n++) {
+      const k = Math.floor(n / cols);
+      const q = n - k * cols;
       const d = (this.radius * k) / K;
       const wx = this.x + this.sinQ[q] * d;
       const wz = this.z + this.cosQ[q] * d;
@@ -205,7 +211,7 @@ export class SightFieldSurface {
     }
     this.draped = end;
     this.pos.needsUpdate = true;
-    return this.draped >= this.samples;
+    return end - start;
   }
 
   /** Every sector's reach from the per-ray reaches. */

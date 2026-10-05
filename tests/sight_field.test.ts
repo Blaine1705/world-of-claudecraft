@@ -126,15 +126,28 @@ describe('sight field surface: draped on the real floor', () => {
     }
     const samples = sightDrapeSamples(NOVA_RAYS, k);
     let frames = 0;
-    while (!s.drapeSome(ground, 500)) frames++;
-    expect(frames).toBe(Math.ceil(samples / 500) - 1);
-    expect(s.drapedAll).toBe(true);
+    let spent = 0;
+    while (!s.drapedAll) {
+      const used = s.drapeSome(ground, 500);
+      // Never past the budget an owner hands it (shared across its fields).
+      expect(used).toBeLessThanOrEqual(500);
+      spent += used;
+      frames++;
+    }
+    expect(frames).toBe(Math.ceil(samples / 500));
+    expect(spent).toBe(samples);
+    // Done: it spends nothing.
+    expect(s.drapeSome(ground, 500)).toBe(0);
     for (let i = 0; i < pos.count; i++) {
       const wx = 10 + pos.getX(i);
       const wz = 20 + pos.getZ(i);
       expect(pos.getY(i)).toBeCloseTo(ground(wx, wz) - 1 + 0.06, 4);
       expect(Math.hypot(pos.getX(i), pos.getZ(i))).toBeLessThanOrEqual(r.getX(i) + 1e-4);
     }
+    // Handed nothing (the owner's frame budget is spent): it spends nothing.
+    s.begin(10, 1, 20, 9, 0.06);
+    expect(s.drapeSome(ground, 0)).toBe(0);
+    expect(s.drapedAll).toBe(false);
   });
 
   it('rewrites only the two sectors that share a ray when its reach carves in', () => {
@@ -161,7 +174,7 @@ describe('sight field surface: draped on the real floor', () => {
     const a = new SightFieldSurface(NOVA_RAYS, 8);
     const b = new SightFieldSurface(NOVA_RAYS, 8);
     a.begin(3, 2, 1, 12, 0.06);
-    while (!a.drapeSome((x) => x * 0.1)) {}
+    while (!a.drapedAll) a.drapeSome((x) => x * 0.1);
     const rays = new Float32Array(NOVA_RAYS).fill(12);
     rays[0] = 2;
     a.setRay(rays, 0);
@@ -186,7 +199,7 @@ describe('sight field surface: draped on the real floor', () => {
     const radius = 30;
     const s = new SightFieldSurface(NOVA_RAYS, sightStations(radius));
     s.begin(x, y, z, radius, 0.06);
-    while (!s.drapeSome(ground)) {}
+    while (!s.drapedAll) s.drapeSome(ground);
     const pos = s.geometry.getAttribute('position');
     let span = 0;
     for (let i = 0; i < pos.count; i++) {
