@@ -70,6 +70,13 @@ export interface TempleTelegraphSpec {
   accent?: number;
 }
 
+/** The Lagoon Eel's coil on the floor (yards from its centre, at its
+ *  template scale): the coiled body covers the floor out to this, so a glyph
+ *  under the eel must reach past it or the eel's own body hides it. Measured
+ *  off the live rig's skinned vertices under 1.5 yd (99th percentile 2.89;
+ *  only the tail tip reaches further). */
+export const TEMPLE_EEL_COIL_RADIUS = 2.9;
+
 /** The temple's own element accents: moonlight, the choir's gold, the prism's
  *  violet, the eel's lightning. */
 export const TEMPLE_ACCENTS = {
@@ -133,10 +140,11 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
     },
     // The trash mechanics pass: a kick glyph under the Eel's Arcing Spark,
     // and a glyph under the Lurker's Prism Glare (a gaze, never a kick: the
-    // eye over it and its reach rim are temple_trash_fx.ts's).
+    // eye over it and its reach rim are temple_trash_fx.ts's). The spark's
+    // glyph rings the eel's coil: drawn inside it, the body covered it whole.
     [TEMPLE_ARCING_SPARK]: {
       shape: 'sigil',
-      range: 1.8,
+      range: TEMPLE_EEL_COIL_RADIUS + 0.5,
       arcDeg: 360,
       color: TELEGRAPH_THREAT_COLORS.interrupt,
       accent: TEMPLE_ACCENTS.storm,

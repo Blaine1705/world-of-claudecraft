@@ -3,16 +3,19 @@
 // Sunbone Hexcaller's hex wears a toad in it, never the sheep. A slot left
 // holding the other animal (a sheep from an earlier Polymorph) is disposed
 // and rebuilt, so the right animal shows.
-import { describe, expect, it, vi } from 'vitest';
-import { syncFormRig } from '../src/render/characters/form_rig_sync';
+import { describe, expect, it, type Mock, vi } from 'vitest';
+import { type FormRigBuild, syncFormRig } from '../src/render/characters/form_rig_sync';
 import {
   characterFormAssetKey,
   characterFormMaskForAura,
+  characterFormReadyMask,
   polymorphRigStale,
   requestedCharacterForm,
+  resolvedCharacterForm,
   TOAD_POLYMORPH_AURAS,
 } from '../src/render/characters/form_visual_selection_core';
 import { VISUALS } from '../src/render/characters/manifest';
+import { settlePendingSwap } from '../src/render/compile_gate';
 import { WILDHEART_TOADED } from '../src/sim/mob/trash_kit/wildheart_cast_ids';
 
 const TOADED = { kind: 'polymorph', id: WILDHEART_TOADED };
@@ -123,5 +126,137 @@ describe('syncFormRig builds the requested form rig', () => {
     const again = vi.fn();
     syncFormRig(e, v, 'bear', again);
     expect(again).not.toHaveBeenCalled();
+  });
+});
+
+// The renderer's entity loop, reduced to its form arm: syncFormRig, then the
+// ready mask over the slots and the shared pending-root token, then the
+// resolved form (renderer.ts, in that order). The build mirrors
+// buildFormVisual: the new rig takes its slot at once and its root becomes the
+// pending token until its compile gate settles (settlePendingSwap).
+describe('a stale polymorph rig rebuild keeps the body standing in', () => {
+  interface GatedRig {
+    assetKey: string;
+    root: object;
+    dispose: Mock<() => void>;
+  }
+  type GatedView = { [K in keyof ReturnType<typeof view>]: GatedRig | null } & {
+    formCompilePending: object | null;
+  };
+
+  function gatedView(): GatedView {
+    return {
+      sheepVisual: null,
+      bearVisual: null,
+      catVisual: null,
+      travelVisual: null,
+      metamorphVisual: null,
+      formCompilePending: null,
+    };
+  }
+
+  function gatedRig(assetKey: string): GatedRig {
+    return { assetKey, root: { name: assetKey }, dispose: vi.fn<() => void>() };
+  }
+
+  /** A gated build: the rig's root is pending until its `settle` runs. */
+  function gatedBuild(fail = false) {
+    const settles: Array<() => void> = [];
+    const built: GatedRig[] = [];
+    const build: FormRigBuild<{ auras: { kind: string; id?: string }[] }, GatedView> = (
+      e,
+      v,
+      formKey,
+      slot,
+      gate,
+    ) => {
+      if (fail) return;
+      const rig = gatedRig(characterFormAssetKey(formKey, e.auras));
+      built.push(rig);
+      v[slot] = rig;
+      if (!gate) return;
+      v.formCompilePending = rig.root;
+      settles.push(() => {
+        v.formCompilePending = settlePendingSwap(v.formCompilePending, rig.root);
+      });
+    };
+    return { build, settles, built };
+  }
+
+  function resolve(v: GatedView, auras: { kind: string; id?: string }[]) {
+    let mask = 0;
+    for (const a of auras) mask |= characterFormMaskForAura(a);
+    const requested = requestedCharacterForm(mask);
+    const ready = characterFormReadyMask(
+      v.sheepVisual,
+      v.bearVisual,
+      v.catVisual,
+      v.travelVisual,
+      v.metamorphVisual,
+      v.formCompilePending,
+    );
+    return resolvedCharacterForm(requested, ready);
+  }
+
+  it('resolves base while the toad links over a ready sheep, then the toad', () => {
+    const v = gatedView();
+    const sheep = gatedRig('form_sheep');
+    v.sheepVisual = sheep;
+    // The sheep from an earlier Polymorph had linked: it drew as the sheep.
+    expect(resolve(v, [SHEEPED])).toBe('sheep');
+
+    const { build, settles, built } = gatedBuild();
+    const e = { auras: [TOADED] };
+    syncFormRig(e, v, requestedCharacterForm(characterFormMaskForAura(TOADED)), build);
+    expect(sheep.dispose).toHaveBeenCalledTimes(1);
+    expect(built.map((r) => r.assetKey)).toEqual(['form_toad']);
+    expect(v.sheepVisual).toBe(built[0]);
+    // The disposed sheep never draws under the hex, and the toad is behind its
+    // gate: the body stands in.
+    expect(resolve(v, e.auras)).toBe('base');
+    // A later frame before the settle: no second rebuild, still the body.
+    syncFormRig(e, v, 'sheep', build);
+    expect(built).toHaveLength(1);
+    expect(resolve(v, e.auras)).toBe('base');
+
+    settles[0]();
+    expect(v.formCompilePending).toBeNull();
+    expect(resolve(v, e.auras)).toBe('sheep');
+  });
+
+  it('a late settle of the disposed sheep does not release the toad early', () => {
+    const v = gatedView();
+    const first = gatedBuild();
+    // A Polymorph lands: the sheep is built and is still linking.
+    syncFormRig({ auras: [SHEEPED] }, v, 'sheep', first.build);
+    const sheep = first.built[0];
+    expect(v.formCompilePending).toBe(sheep.root);
+    expect(resolve(v, [SHEEPED])).toBe('base');
+
+    // The hex replaces it before the sheep linked: the toad rebuilds.
+    const second = gatedBuild();
+    syncFormRig({ auras: [TOADED] }, v, 'sheep', second.build);
+    expect(sheep.dispose).toHaveBeenCalledTimes(1);
+    const toad = second.built[0];
+    expect(v.formCompilePending).toBe(toad.root);
+
+    // The sheep's gate settles late: the token stays on the linking toad.
+    first.settles[0]();
+    expect(v.formCompilePending).toBe(toad.root);
+    expect(resolve(v, [TOADED])).toBe('base');
+
+    second.settles[0]();
+    expect(resolve(v, [TOADED])).toBe('sheep');
+  });
+
+  it('a failed toad build leaves the body, never the disposed sheep', () => {
+    const v = gatedView();
+    const sheep = gatedRig('form_sheep');
+    v.sheepVisual = sheep;
+    const { build } = gatedBuild(true);
+    syncFormRig({ auras: [TOADED] }, v, 'sheep', build);
+    expect(sheep.dispose).toHaveBeenCalledTimes(1);
+    expect(v.sheepVisual).toBeNull();
+    expect(resolve(v, [TOADED])).toBe('base');
   });
 });

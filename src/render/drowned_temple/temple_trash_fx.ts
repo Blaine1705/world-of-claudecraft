@@ -684,6 +684,10 @@ export class TempleTrashFx {
   private readonly veilLook = { edge: 0, flash: 0 };
   private readonly whirlLook = { spin: 0, grow: 0 };
   private readonly arcLook = { alpha: 0, reach: 0 };
+  private readonly bubbleSize = { radius: 0, up: 0 };
+  private readonly shatterLook = { scale: 0, crack: 0, alpha: 0 };
+  private readonly waveLook = { reach: 0, alpha: 0 };
+  private readonly swellLook = { radius: 0, core: 0 };
   private readonly color = new THREE.Color();
   private scan = 0;
   private gated = false;
@@ -995,7 +999,13 @@ export class TempleTrashFx {
     crest: number,
     life = 0.75,
   ): void {
-    const slot = this.waves.find((w) => w.age < 0) ?? this.waves[0];
+    let slot = this.waves[0];
+    for (const w of this.waves) {
+      if (w.age < 0) {
+        slot = w;
+        break;
+      }
+    }
     slot.age = 0;
     slot.life = life;
     slot.mesh.position.set(x, this.groundY(x, z) + 0.07, z);
@@ -1005,7 +1015,14 @@ export class TempleTrashFx {
   }
 
   private gazeLands(lurker: EntityView): void {
-    const slot = this.eyes.find((e) => e.lurkerId === lurker.id) ?? this.claimEye(lurker.id);
+    let slot: EyeSlot | undefined;
+    for (const e of this.eyes) {
+      if (e.lurkerId === lurker.id) {
+        slot = e;
+        break;
+      }
+    }
+    slot ??= this.claimEye(lurker.id);
     if (slot) {
       slot.flash = 0;
       slot.fade = -1;
@@ -1048,7 +1065,13 @@ export class TempleTrashFx {
     const from = world.entities.get(fromId);
     const to = world.entities.get(toId);
     if (!to) return;
-    const slot = this.bolts.find((b) => b.age < 0) ?? this.bolts[0];
+    let slot = this.bolts[0];
+    for (const b of this.bolts) {
+      if (b.age < 0) {
+        slot = b;
+        break;
+      }
+    }
     slot.fromId = fromId;
     slot.toId = toId;
     slot.age = 0;
@@ -1071,8 +1094,12 @@ export class TempleTrashFx {
   }
 
   private echoBeat(sleeper: EntityView): void {
-    const slot = this.echoes.find((s) => s.sleeperId === sleeper.id);
-    if (slot) slot.beatAt = this.uTime.value;
+    for (const s of this.echoes) {
+      if (s.sleeperId === sleeper.id) {
+        s.beatAt = this.uTime.value;
+        break;
+      }
+    }
     const r = this.n.echo.radius;
     this.wave(sleeper.pos.x, sleeper.pos.z, r, TEMPLE_TRASH_ACCENTS.lullaby, 0xf4f0ff, 0.9);
     const y = this.groundY(sleeper.pos.x, sleeper.pos.z);
@@ -1101,8 +1128,14 @@ export class TempleTrashFx {
   }
 
   private whirlStarts(snapper: EntityView): void {
-    const slot =
-      this.vortices.find((v) => v.snapperId === snapper.id) ?? this.claimVortex(snapper.id);
+    let slot: VortexSlot | undefined;
+    for (const v of this.vortices) {
+      if (v.snapperId === snapper.id) {
+        slot = v;
+        break;
+      }
+    }
+    slot ??= this.claimVortex(snapper.id);
     if (slot) slot.since = this.uTime.value;
     this.wave(
       snapper.pos.x,
@@ -1445,7 +1478,7 @@ export class TempleTrashFx {
     for (const b of this.bubbles) {
       if (b.shatter >= 0) {
         b.shatter += dt;
-        const s = vigilShatter(b.shatter);
+        const s = vigilShatter(b.shatter, this.shatterLook);
         b.mesh.scale.setScalar(b.radius * s.scale);
         b.u.uCrack.value = s.crack;
         b.u.uAlpha.value = s.alpha;
@@ -1475,7 +1508,7 @@ export class TempleTrashFx {
       let prayers = 0;
       for (const p of this.prayers) if (p.singerId === b.singerId && p.pilgrimId >= 0) prayers++;
       const look = vigilBubbleLook(ward.value, prayers, b.age, this.look);
-      const size = vigilBubble(e.templateId);
+      const size = vigilBubble(e.templateId, this.bubbleSize);
       const breathe = 1 + 0.025 * Math.sin(this.uTime.value * 2.2 + b.singerId);
       b.radius = size.radius;
       b.mesh.position.set(e.pos.x, e.pos.y + size.up, e.pos.z);
@@ -1519,7 +1552,7 @@ export class TempleTrashFx {
   private shatterBubble(b: BubbleSlot, e: EntityView): void {
     b.shatter = 0;
     b.u.uFlash.value = this.calm() ? 0.4 : 1;
-    const size = vigilBubble(e.templateId);
+    const size = vigilBubble(e.templateId, this.bubbleSize);
     const cx = e.pos.x;
     const cy = e.pos.y + size.up;
     const cz = e.pos.z;
@@ -1571,7 +1604,7 @@ export class TempleTrashFx {
         continue;
       }
       p.age += dt;
-      const size = vigilBubble(singer.templateId);
+      const size = vigilBubble(singer.templateId, this.bubbleSize);
       (p.u.uA.value as THREE.Vector3).set(
         pilgrim.pos.x,
         pilgrim.pos.y + pilgrimShrineUp(),
@@ -1713,7 +1746,7 @@ export class TempleTrashFx {
         // Landed: the eye flares wide and a prism ring races to the reach.
         s.flash += dt;
         const k = Math.min(1, s.flash / GAZE_FLASH_SECONDS);
-        const wave = trashWave(s.flash, GAZE_FLASH_SECONDS);
+        const wave = trashWave(s.flash, GAZE_FLASH_SECONDS, this.waveLook);
         s.eye.u.uSize.value = GAZE_EYE_SIZE * (1 + 0.5 * k);
         s.eye.u.uOpen.value = 1;
         s.eye.u.uIris.value = 1;
@@ -2068,7 +2101,7 @@ export class TempleTrashFx {
         this.shown(s, false);
         continue;
       }
-      const look = wispSwellLook(swell.value);
+      const look = wispSwellLook(swell.value, this.swellLook);
       const wobble = 1 + 0.04 * Math.sin(clock * 5 + s.wispId);
       s.mesh.position.set(e.pos.x, e.pos.y + wispCoreUp(), e.pos.z);
       s.mesh.scale.set(look.radius * wobble, look.radius / wobble, look.radius * wobble);
@@ -2141,7 +2174,7 @@ export class TempleTrashFx {
         this.shown(w, false);
         continue;
       }
-      const look = trashWave(w.age, w.life);
+      const look = trashWave(w.age, w.life, this.waveLook);
       w.u.uReach.value = look.reach;
       w.u.uAlpha.value = look.alpha;
       this.shown(w, true);

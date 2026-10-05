@@ -176,9 +176,14 @@ export function templeBodyHeight(templateId: string | undefined): number {
 
 /** The pearl bubble's size round a singer: wide enough to hold her whole
  *  drawn body (a sphere centred at half her height, a touch taller). */
-export function vigilBubble(templateId: string | undefined): { radius: number; up: number } {
+export function vigilBubble(
+  templateId: string | undefined,
+  out: { radius: number; up: number } = { radius: 0, up: 0 },
+): { radius: number; up: number } {
   const h = templeBodyHeight(templateId);
-  return { radius: h * 0.62, up: h * 0.5 };
+  out.radius = h * 0.62;
+  out.up = h * 0.5;
+  return out;
 }
 
 /** The bubble's light for the ward's strength (the aura value is the share it
@@ -203,9 +208,15 @@ export const VIGIL_SHATTER_SECONDS = 0.7;
 
 /** The shatter `age` seconds after the ward falls: the shell bursts outward
  *  (scale over its own size) as its cracks open and its light goes. */
-export function vigilShatter(age: number): { scale: number; crack: number; alpha: number } {
+export function vigilShatter(
+  age: number,
+  out: { scale: number; crack: number; alpha: number } = { scale: 0, crack: 0, alpha: 0 },
+): { scale: number; crack: number; alpha: number } {
   const k = clamp01(age / VIGIL_SHATTER_SECONDS);
-  return { scale: 1 + 0.35 * (1 - (1 - k) ** 2), crack: clamp01(k * 3), alpha: (1 - k) ** 1.6 };
+  out.scale = 1 + 0.35 * (1 - (1 - k) ** 2);
+  out.crack = clamp01(k * 3);
+  out.alpha = (1 - k) ** 1.6;
+  return out;
 }
 
 /** Where a pilgrim's prayer leaves it: the little shrine on its shell, a
@@ -248,9 +259,12 @@ export const TRASH_WAVE_SECONDS = 0.75;
 export function trashWave(
   age: number,
   life = TRASH_WAVE_SECONDS,
+  out: { reach: number; alpha: number } = { reach: 0, alpha: 0 },
 ): { reach: number; alpha: number } {
   const k = clamp01(age / life);
-  return { reach: 0.15 + 0.85 * (1 - (1 - k) ** 3), alpha: (1 - k) ** 1.3 };
+  out.reach = 0.15 + 0.85 * (1 - (1 - k) ** 3);
+  out.alpha = (1 - k) ** 1.3;
+  return out;
 }
 
 // ---- Prism Glare ----------------------------------------------------------------------
@@ -401,9 +415,14 @@ export function wispBurstRadius(merges: number, n = templeTrashNumbers()): numbe
 }
 
 /** The swell's moon-water shell round the wisp (yards) and its core light. */
-export function wispSwellLook(merges: number): { radius: number; core: number } {
+export function wispSwellLook(
+  merges: number,
+  out: { radius: number; core: number } = { radius: 0, core: 0 },
+): { radius: number; core: number } {
   const body = templeBodyHeight(TEMPLE_TRASH_IDS.wisp);
-  return { radius: body * 0.42 * wispSwellScale(merges), core: 0.5 + 0.25 * Math.max(0, merges) };
+  out.radius = body * 0.42 * wispSwellScale(merges);
+  out.core = 0.5 + 0.25 * Math.max(0, merges);
+  return out;
 }
 
 /** Where a wisp's body hangs (its hover plus half its drawn height). */

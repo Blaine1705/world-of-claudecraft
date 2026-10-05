@@ -24,6 +24,11 @@ export interface InteriorEncounterPrewarmSpec {
    *  tell): the transparent ghost variant of his rig, an actionable tell that
    *  must not wait on a compile the first time the beam pours through one. */
   vaelShadeGhost?: boolean;
+  /** The Sunbone Hexcaller's Toad Hex: the hexed player's `form_toad` rig, a
+   *  tinted frog clone built lazily in the polymorph slot on the first hex
+   *  (characters/form_rig_sync.ts). Linked here at the basin's attach, so the
+   *  first hex does not hold the player on the base body behind the gate. */
+  wildheartToadForm?: boolean;
 }
 
 /** The staged sets a spec can build: every flag but the live arm, which warms
@@ -43,6 +48,7 @@ const ENCOUNTER_PREWARM_SET_FLAGS: Record<EncounterPrewarmSet, true> = {
   ignivarVisuals: true,
   nythraxisGraveVisuals: true,
   vaelShadeGhost: true,
+  wildheartToadForm: true,
 };
 
 export const ENCOUNTER_PREWARM_SETS = Object.keys(
@@ -119,6 +125,15 @@ export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarm
     soulRendVfxWeaponSkins: false,
     soulRendLivePlayerVisuals: false,
     vaelShadeGhost: true,
+  },
+  // The Wildheart Basin: the Sunbone Hexcallers' Toad Hex turns a player into
+  // the toad form rig, which no other content wears, linked at the Idol Maw
+  // landing rather than on the first hex in a live pull.
+  wildheart: {
+    soulRendPlayerClasses: false,
+    soulRendVfxWeaponSkins: false,
+    soulRendLivePlayerVisuals: false,
+    wildheartToadForm: true,
   },
 };
 

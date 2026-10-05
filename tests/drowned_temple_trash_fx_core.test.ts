@@ -12,7 +12,11 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
-import { templeTelegraphSpecs } from '../src/render/drowned_temple/temple_fx_core';
+import { TempleFx } from '../src/render/drowned_temple/temple_fx';
+import {
+  TEMPLE_EEL_COIL_RADIUS,
+  templeTelegraphSpecs,
+} from '../src/render/drowned_temple/temple_fx_core';
 import { TempleTrashFx } from '../src/render/drowned_temple/temple_trash_fx';
 import {
   chillCrust,
@@ -29,9 +33,13 @@ import {
   templeTrashCue,
   templeTrashNumbers,
   templeZoneSpecs,
+  trashWave,
+  vigilBubble,
   vigilBubbleLook,
+  vigilShatter,
   whirlCoreFill,
   wispBurstRadius,
+  wispSwellLook,
   wispSwellScale,
 } from '../src/render/drowned_temple/temple_trash_fx_core';
 import { TelegraphKit } from '../src/render/floor_telegraph';
@@ -159,6 +167,8 @@ describe('the cast glyphs', () => {
 
   it('lays a kick glyph under the Arcing Spark, which a kick locks out', () => {
     expect(specs[TEMPLE_ARCING_SPARK]?.shape).toBe('sigil');
+    // Wider than the eel's coil: a glyph inside it is covered by the body.
+    expect(specs[TEMPLE_ARCING_SPARK]?.range ?? 0).toBeGreaterThan(TEMPLE_EEL_COIL_RADIUS);
     expect(specs[TEMPLE_ARCING_SPARK]?.color).toBe(TELEGRAPH_THREAT_COLORS.interrupt);
     expect(TEMPLE_KIT_CAST_SCHOOLS[TEMPLE_ARCING_SPARK]).toBeDefined();
   });
@@ -259,6 +269,38 @@ describe('the looks', () => {
     expect(sparkArcLook(SPARK_HOP_STAGGER, 1).alpha).toBeGreaterThan(0);
     expect(sparkArcLook(0.01, 0).alpha).toBeGreaterThan(0);
     expect(sparkArcLook(5, 0).alpha).toBe(0);
+  });
+
+  it('fills a caller-owned out object, same values as a fresh one (no frame-path allocation)', () => {
+    const bubbleOut = { radius: -1, up: -1 };
+    const bubble = vigilBubble(TEMPLE_TRASH_IDS.acolyte, bubbleOut);
+    expect(bubble).toBe(bubbleOut);
+    expect(bubble).toEqual(vigilBubble(TEMPLE_TRASH_IDS.acolyte));
+    expect(bubble.radius).toBeGreaterThan(0);
+
+    const shatterOut = { scale: -1, crack: -1, alpha: -1 };
+    const shatter = vigilShatter(0.3, shatterOut);
+    expect(shatter).toBe(shatterOut);
+    expect(shatter).toEqual(vigilShatter(0.3));
+    expect(shatter.scale).toBeGreaterThan(1);
+
+    const waveOut = { reach: -1, alpha: -1 };
+    const wave = trashWave(0.2, 0.6, waveOut);
+    expect(wave).toBe(waveOut);
+    expect(wave).toEqual(trashWave(0.2, 0.6));
+    expect(wave.reach).toBeGreaterThan(0.15);
+
+    const swellOut = { radius: -1, core: -1 };
+    const swell = wispSwellLook(2, swellOut);
+    expect(swell).toBe(swellOut);
+    expect(swell).toEqual(wispSwellLook(2));
+    expect(swell.core).toBe(1);
+
+    // Reusing one out object across calls carries no state between them.
+    expect(trashWave(0.5, 0.6, waveOut)).toEqual(trashWave(0.5, 0.6));
+    expect(vigilBubble(TEMPLE_TRASH_IDS.wisp, bubbleOut)).toEqual(
+      vigilBubble(TEMPLE_TRASH_IDS.wisp),
+    );
   });
 
   it('melts the chill’s crust with its own clock', () => {
@@ -413,5 +455,90 @@ describe('the painter', () => {
     snapper.auras.length = 0;
     fx.update(0.1, 1.1);
     expect(disc?.visible).toBe(false);
+  });
+
+  it('rings the eel with a visible kick glyph wider than its coil while the spark bar runs', async () => {
+    const { world, add } = stubWorld();
+    // The boss layers beside the trash read the local player off the world.
+    (world as unknown as { player: StubEntity }).player = add({
+      id: 1,
+      kind: 'player',
+      templateId: 'player',
+    });
+    const eel = add({ id: 11, templateId: TEMPLE_TRASH_IDS.eel, pos: { x: 4, y: 0, z: 10 } });
+    const scene = new THREE.Scene();
+    const temple = new TempleFx(scene, () => 0, world);
+    await temple.readyForEntry;
+    /** Every drawn floor glyph centred on the eel, by its radius. */
+    const glyphsOnEel = (): number[] => {
+      const radii: number[] = [];
+      scene.traverseVisible((o) => {
+        if (o.type !== 'Group' || o.position.x !== eel.pos.x || o.position.z !== eel.pos.z) return;
+        let drawn = 0;
+        o.traverseVisible((m) => {
+          if ((m as THREE.Mesh).isMesh) drawn++;
+        });
+        if (drawn > 0) radii.push(o.scale.x);
+      });
+      return radii;
+    };
+    for (let i = 0; i < 10; i++) temple.update(0.05);
+    expect(glyphsOnEel()).toEqual([]);
+
+    eel.castingAbility = TEMPLE_ARCING_SPARK;
+    eel.castTotal = 2;
+    eel.castRemaining = 1.6;
+    for (let i = 0; i < 10; i++) temple.update(0.05);
+    const radii = glyphsOnEel();
+    expect(radii).toHaveLength(1);
+    expect(radii[0]).toBeGreaterThan(TEMPLE_EEL_COIL_RADIUS);
+
+    // The bar ends (landed or kicked): the glyph goes.
+    eel.castingAbility = null;
+    temple.update(0.05);
+    expect(glyphsOnEel()).toEqual([]);
+    temple.dispose();
+  });
+
+  it('draws every leap of a landed spark as a visible arc, in chain order, then goes dark', () => {
+    const { fx, add, root } = painter();
+    add({ id: 1, kind: 'player', templateId: 'player', pos: { x: 0, y: 0, z: 0 } });
+    add({ id: 2, kind: 'player', templateId: 'player', pos: { x: 4, y: 0, z: 0 } });
+    add({ id: 3, kind: 'player', templateId: 'player', pos: { x: 4, y: 0, z: 4 } });
+    add({ id: 11, templateId: TEMPLE_TRASH_IDS.eel, pos: { x: 0, y: 0, z: 12 } });
+    /** The leaps drawn this frame: each is a lit jagged ribbon (the arc) plus
+     *  its fork, so two drawn ribbons per leap. */
+    const arcs = (): number => {
+      let n = 0;
+      root.traverseVisible((o) => {
+        const u = ((o as THREE.Mesh).material as THREE.ShaderMaterial | undefined)?.uniforms;
+        if (!(o as THREE.Mesh).isMesh || !u?.uJag || (u.uJag.value as number) <= 0) return;
+        if ((u.uAlpha.value as number) > 0 && (u.uWidth.value as number) > 0) n++;
+      });
+      return n / 2;
+    };
+    fx.update(0.05, 0.05);
+    expect(arcs()).toBe(0);
+    const leap = (sourceId: number, targetId: number) =>
+      ({
+        type: 'spellfx',
+        sourceId,
+        targetId,
+        school: 'nature',
+        fx: 'heavyBolt',
+        ability: TEMPLE_ARCING_SPARK,
+      }) as never;
+    // The sim lands one chain on one tick: eel to the first, then leap on.
+    expect(fx.handleEvent(leap(11, 1))).toBe(true);
+    expect(fx.handleEvent(leap(1, 2))).toBe(true);
+    expect(fx.handleEvent(leap(2, 3))).toBe(true);
+    fx.update(0.02, 0.07);
+    // Only the first leap has struck yet; the rest follow a stagger apart.
+    expect(arcs()).toBe(1);
+    for (let i = 0; i < 4; i++) fx.update(0.05, 0.12 + i * 0.05);
+    expect(arcs()).toBe(3);
+    expect(root.getObjectByName('drowned-temple-trash-fx')?.visible).toBe(true);
+    for (let i = 0; i < 30; i++) fx.update(0.05, 0.4 + i * 0.05);
+    expect(arcs()).toBe(0);
   });
 });
