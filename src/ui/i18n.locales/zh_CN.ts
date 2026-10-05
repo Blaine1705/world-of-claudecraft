@@ -18762,12 +18762,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_barrowflame_breath': '冢焰吐息',
   'abilityUi.cast.crypt_tail_lash': '尾鞭',
   'abilityUi.cast.crypt_wing_gust': '翼风',
+  'abilityUi.cast.crypt_grave_rupture': '墓穴崩裂',
+  'abilityUi.cast.crypt_carrion_eye': '腐鸦之眼',
+  'abilityUi.cast.crypt_marrow_crush': '碎髓重击',
+  'abilityUi.cast.crypt_rimesilk_spit': '霜丝喷吐',
   'abilityUi.cast.bastion_brine_mend': '盐水愈合',
   'abilityUi.cast.bastion_fog_ward': '雾之护佑',
   'abilityUi.cast.bastion_halberd_sweep': '戟之横扫',
   'abilityUi.cast.bastion_piercing_bolt': '穿刺弩矢',
   'abilityUi.cast.bastion_claw_sweep': '巨钳横扫',
   'abilityUi.cast.bastion_shell_slam': '壳塔重击',
+  'abilityUi.cast.bastion_boathook': '船钩拖拽',
+  'abilityUi.cast.bastion_fog_bank': '雾堤',
+  'abilityUi.cast.bastion_brine_column': '盐水之柱',
   'abilityUi.cast.bastion_oathbound_charge': '誓约冲锋',
   'abilityUi.cast.bastion_gaolers_cudgel': '狱卒短棍',
   'abilityUi.cast.bastion_mist_surge': '迷雾涌流',
@@ -18809,6 +18816,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.crypt_gravecaller_necromancer.name': '唤墓者死灵法师',
   'entities.mobs.crypt_bone_minion.name': '骸骨仆从',
   'entities.mobs.crypt_bone_brute.name': '骸骨蛮兵',
+  'entities.mobs.crypt_bone_pile.name': '蠢动的骸骨',
   'entities.mobs.crypt_chapel_gargoyle.name': '礼拜堂石像鬼',
   'entities.mobs.crypt_crow_caller.name': '唤鸦者',
   'entities.mobs.crypt_carrion_crow.name': '食腐乌鸦',
@@ -18873,6 +18881,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionChain.allyLine': '{name} 正被拖向深坑：攻击溺亡之锚，或帮助其跑到点亮的系泊柱',
   'hudChrome.auraEffect.bastion.anchored':
     '被锁在溺亡之锚上：你可以移动，但无法远离绞盘，它会把你绞向溺亡深坑。走到距被钩住处至少{run}码的点亮系泊柱{reach}码以内即可系住锁链（该柱熄灭{dark}秒），或者让队友用{links}次攻击砸断锁链（英雄难度{linksHeroic}次）。掉进深坑会损失{pit}%的最大生命值（英雄难度{pitHeroic}%）。',
+  'hudChrome.auraEffect.bastion.brineColumn':
+    '你被困在海水之柱中：每{tick}秒受到{min}到{max}点自然伤害，最多持续{seconds}秒。打断或击晕潮缚侍僧即可挣脱。',
+  'hudChrome.auraEffect.bastion.halberdWall':
+    '另一名溺亡守望者在{radius}码内时，受到的伤害降低{pct}%。把它们分开。',
+  'hudChrome.auraEffect.bastion.fogShroud': '站在雾堤中时，受到的伤害降低{pct}%。把它拖出雾中。',
+  'hudChrome.auraEffect.bastion.carrionGlut':
+    '以死者为食（{stacks}/{max}）：每层使其盐水爆裂范围扩大{radius}码，伤害提高{pct}%。',
+  'hudChrome.auraEffect.bastion.snappedFetters':
+    '它的锁链已断。它不再战斗，无法被伤害，并很快离开。',
+  'hudChrome.auraEffect.crypt.carrionEye':
+    '战斗中的所有乌鸦都会追猎你，持续{seconds}秒。跑向你的坦克，让队伍一起消灭鸦群。',
+  'hudChrome.auraEffect.crypt.graniteSkin':
+    '受到的伤害降低{pct}%，石层每{every}秒增厚一次，最多{max}层。击晕会将其击碎，使其在{seconds}秒内受到的伤害提高{cracked}%。',
   'hudChrome.bastionChain.shackledTitle': '与 {name} 锁在一起',
   'hudChrome.bastionChain.shackledLine': '彼此保持在 {range} 码以内（当前相距 {dist} 码）',
   'hudChrome.bastionChain.strainedLine': '离得太远！锁链会伤害你们两人：靠近到 {range} 码以内',

@@ -7,13 +7,33 @@
 // Three-free, DOM-free, deterministic.
 
 import { MOBS } from '../sim/data';
-import { TELEGRAPH_THREAT_COLORS } from './floor_telegraph/telegraph_look_core';
+import { TELEGRAPH_ACCENTS, TELEGRAPH_THREAT_COLORS } from './floor_telegraph/telegraph_look_core';
+
+export interface DeathBurstRingLook {
+  color: number;
+  accent: number;
+}
 
 /** The ring's look: a danger rim and a pale steam-and-frost accent. */
-export const DEATH_BURST_RING_LOOK = {
+export const DEATH_BURST_RING_LOOK: DeathBurstRingLook = {
   color: TELEGRAPH_THREAT_COLORS.danger,
   accent: 0xe9eef0,
-} as const;
+};
+
+/** Templates whose burst carries its own element keep the danger rim with
+ *  their own accent: the Barnacle Crawler's Brine Burst stays brine. */
+const RING_LOOKS: Readonly<Record<string, DeathBurstRingLook>> = {
+  barnacle_crawler: { color: TELEGRAPH_THREAT_COLORS.danger, accent: TELEGRAPH_ACCENTS.brine },
+};
+
+/** The look of a ring by the name it carries (its mob's name, as the delay
+ *  lookup reads it), or the shared look. */
+export function deathBurstRingLook(name?: string): DeathBurstRingLook {
+  if (name) {
+    for (const [id, look] of Object.entries(RING_LOOKS)) if (MOBS[id]?.name === name) return look;
+  }
+  return DEATH_BURST_RING_LOOK;
+}
 
 /** The death-burst delay the templates author for a ring of this radius (the
  *  ring carries its radius and its mob's name; the delay is read back from the

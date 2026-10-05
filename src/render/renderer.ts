@@ -9923,7 +9923,7 @@ export class Renderer {
       const _stealthed = hasStealth;
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
-      const displayScale = e.scale;
+      const displayScale = e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1);
       if (displayScale !== v.liveScale) {
         v.liveScale = displayScale;
         v.group.scale.setScalar(displayScale);

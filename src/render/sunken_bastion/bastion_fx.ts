@@ -2,12 +2,14 @@
 //  - a floor mark under every cast you dodge or kick, filling as its bar runs:
 //    the Drowned Watchman's Halberd Sweep and the Turretback Hermit's Claw
 //    Sweep cones, the Hermit's Shell Slam ring, the Fogbound Arbalest's
-//    Piercing Bolt lane (locked on its aim), and a kick glyph under a Brine
-//    Mend or a Fog Ward;
-//  - the Barnacle Crawler's Brine Burst ring, filling over its fuse where it fell;
+//    Piercing Bolt lane (locked on its aim), the Drowned Watchman's Boathook
+//    lane, and a kick glyph under a Brine Mend, a Fog Ward, a Fog Bank or a
+//    Brine Column (the Barnacle Crawler's Brine Burst ring is the trash kit's
+//    death burst now, drawn by ../death_burst_fx.ts at its grown radius);
 //  - a flash when a strike lands;
 //  - the creatures' own effects (bastion_creature_fx.ts): the Fogbound
-//    Arbalest's crossbow bolts and the Gaol Turnkey's lantern flare;
+//    Arbalest's crossbow bolts, the Gaol Turnkey's lantern flare and the
+//    trash mechanics' visuals (bastion_trash_fx.ts);
 //  - the gaol's cage, anchor and shackles (bastion_gaol_fx.ts), the Drowning
 //    Yard's Mooring Post lamps (bastion_mooring_fx.ts), the
 //    reaper's pool, sweep and soul wisps (bastion_reaper_fx.ts), and Olen the
@@ -43,8 +45,6 @@ import {
   type BastionTelegraphSpec,
   bastionTelegraphFill,
   bastionTelegraphSpecs,
-  brineBurstPhase,
-  brineBurstSpec,
 } from './bastion_fx_core';
 import { BastionGaolFx } from './bastion_gaol_fx';
 import { BastionMooringFx } from './bastion_mooring_fx';
@@ -54,11 +54,9 @@ import { BastionVaelStageFx } from './bastion_vael_stage_fx';
 
 const FAN_SLOTS = 12;
 const LANE_SLOTS = 8;
-const BURST_SLOTS = 8;
 const FLASH_SLOTS = 6;
 const SCAN_SEC = 0.1;
 const FLASH_SEC = 0.5;
-const CRAWLER = 'barnacle_crawler';
 
 type EntityView = IWorld['entities'] extends Map<number, infer E> ? E : never;
 
@@ -87,11 +85,6 @@ interface LaneSlot extends TelegraphLane {
   castId: string;
 }
 
-interface BurstSlot extends TelegraphFan {
-  corpseId: number;
-  since: number;
-}
-
 interface FlashSlot extends TelegraphFan {
   age: number;
   radius: number;
@@ -103,14 +96,11 @@ export class BastionFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
   private readonly specs = bastionTelegraphSpecs();
-  private readonly burst = brineBurstSpec();
   private readonly fans: FanSlot[] = [];
   private readonly lanes: LaneSlot[] = [];
-  private readonly bursts: BurstSlot[] = [];
   private readonly flashes: FlashSlot[] = [];
   private readonly flashesOn: boolean;
   private readonly kit: TelegraphKit;
-  private readonly seenDead = new Set<number>();
   private readonly boss: BastionBossFx;
   private readonly creatures: BastionCreatureFx;
   private readonly gaol: BastionGaolFx;
@@ -141,8 +131,6 @@ export class BastionFx {
       this.fans.push({ ...this.kit.fan(18), casterId: -1, castId: '' });
     for (let i = 0; i < LANE_SLOTS; i++)
       this.lanes.push({ ...this.kit.lane(18), casterId: -1, castId: '' });
-    for (let i = 0; i < BURST_SLOTS; i++)
-      this.bursts.push({ ...this.kit.fan(15), corpseId: -1, since: 0 });
     if (this.flashesOn) {
       for (let i = 0; i < FLASH_SLOTS; i++)
         this.flashes.push({ ...this.kit.fan(21), age: -1, radius: 1, x: 0, z: 0 });
@@ -204,6 +192,12 @@ export class BastionFx {
 
   private specFor(castId: string): BastionTelegraphSpec | undefined {
     return this.specs[castId] ?? extraSpecs.get(castId);
+  }
+
+  /** The drawn swell of a fed Barnacle Crawler (bastion_trash_fx.ts), 1 for
+   *  every other body. */
+  bodySwell(id: number): number {
+    return this.disposed ? 1 : this.creatures.bodySwell(id);
   }
 
   /** A landing strike's flash (cosmetic; the damage already has its number).
@@ -295,26 +289,6 @@ export class BastionFx {
       );
       this.kit.paintLane(slot, { fill, clock: this.clock, range: length });
     }
-    for (const slot of this.bursts) {
-      if (slot.corpseId < 0) continue;
-      const corpse = world.entities.get(slot.corpseId);
-      const phase = brineBurstPhase(this.clock - slot.since, this.burst.delay);
-      if (!corpse || phase.stage === 'done') {
-        slot.corpseId = -1;
-        slot.group.visible = false;
-        continue;
-      }
-      const flashing = phase.stage === 'flash';
-      const radius = this.burst.radius * (flashing ? 1 + phase.fill * 0.3 : 1);
-      const floor = this.groundY(corpse.pos.x, corpse.pos.z);
-      this.kit.drapeFan(slot, this.groundY, corpse.pos.x, floor, corpse.pos.z, 0, radius);
-      this.kit.paintFan(slot, {
-        fill: flashing ? 1 : phase.fill,
-        clock: this.clock,
-        range: radius,
-        fade: flashing ? 1 - phase.fill : 1,
-      });
-    }
     for (const slot of this.flashes) {
       if (slot.age < 0) continue;
       slot.age += dt;
@@ -333,23 +307,7 @@ export class BastionFx {
 
   private scanWorld(world: IWorld): void {
     for (const e of world.entities.values()) {
-      if (e.kind !== 'mob') continue;
-      if (e.dead) {
-        if (e.templateId === CRAWLER && !this.seenDead.has(e.id)) {
-          this.seenDead.add(e.id);
-          const slot = this.bursts.find((b) => b.corpseId < 0);
-          if (slot) {
-            this.kit.layOutFan(slot, 360, {
-              color: BASTION_TELEGRAPH_COLORS.brine,
-              accent: TELEGRAPH_ACCENTS.brine,
-            });
-            slot.corpseId = e.id;
-            slot.since = this.clock;
-            slot.group.visible = true;
-          }
-        }
-        continue;
-      }
+      if (e.kind !== 'mob' || e.dead) continue;
       const castId = e.castingAbility;
       const spec = castId ? this.specFor(castId) : undefined;
       if (!castId || !spec) continue;
@@ -373,9 +331,6 @@ export class BastionFx {
       slot.casterId = e.id;
       slot.castId = castId;
       slot.group.visible = true;
-    }
-    if (this.seenDead.size > 64) {
-      for (const id of this.seenDead) if (!world.entities.has(id)) this.seenDead.delete(id);
     }
   }
 

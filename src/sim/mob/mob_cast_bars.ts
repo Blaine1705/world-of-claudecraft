@@ -35,6 +35,7 @@ import { type Aura, angleTo, DT, dist2d, type Entity, type MobTemplate, normAngl
 import { applyBroodBurn } from './dragonkin_brood';
 import { landBreathPool } from './trash_kit/breath_pool';
 import { restoreCastHold } from './trash_kit/cast_hold';
+import { noteBreathLanded } from './trash_kit/crypt_hooks';
 
 /** True when the mob belongs to a live rift instance: kit bosses via the
  * instance mob roster, and their summoned adds via the roster mobs'
@@ -172,6 +173,8 @@ export function tickBreathConeBar(
     }
     // A breath that melts the floor leaves its pool (trash_kit/breath_pool.ts).
     landBreathPool(ctx, mob);
+    // A kit breath that leaves its fire on the floor (trashKit.scorch).
+    noteBreathLanded(mob);
   }
   return true;
 }

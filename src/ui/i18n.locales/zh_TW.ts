@@ -18780,12 +18780,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_barrowflame_breath': '塚焰吐息',
   'abilityUi.cast.crypt_tail_lash': '尾鞭',
   'abilityUi.cast.crypt_wing_gust': '翼風',
+  'abilityUi.cast.crypt_grave_rupture': '墓穴崩裂',
+  'abilityUi.cast.crypt_carrion_eye': '腐鴉之眼',
+  'abilityUi.cast.crypt_marrow_crush': '碎髓重擊',
+  'abilityUi.cast.crypt_rimesilk_spit': '霜絲噴吐',
   'abilityUi.cast.bastion_brine_mend': '鹽水癒合',
   'abilityUi.cast.bastion_fog_ward': '霧之護佑',
   'abilityUi.cast.bastion_halberd_sweep': '戟之橫掃',
   'abilityUi.cast.bastion_piercing_bolt': '穿刺弩矢',
   'abilityUi.cast.bastion_claw_sweep': '巨鉗橫掃',
   'abilityUi.cast.bastion_shell_slam': '殼塔重擊',
+  'abilityUi.cast.bastion_boathook': '船鉤拖拽',
+  'abilityUi.cast.bastion_fog_bank': '霧堤',
+  'abilityUi.cast.bastion_brine_column': '鹽水之柱',
   'abilityUi.cast.bastion_oathbound_charge': '誓約衝鋒',
   'abilityUi.cast.bastion_gaolers_cudgel': '獄卒短棍',
   'abilityUi.cast.bastion_mist_surge': '迷霧湧流',
@@ -18827,6 +18834,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.crypt_gravecaller_necromancer.name': '喚墓者死靈法師',
   'entities.mobs.crypt_bone_minion.name': '骸骨僕從',
   'entities.mobs.crypt_bone_brute.name': '骸骨蠻兵',
+  'entities.mobs.crypt_bone_pile.name': '蠢動的骸骨',
   'entities.mobs.crypt_chapel_gargoyle.name': '禮拜堂石像鬼',
   'entities.mobs.crypt_crow_caller.name': '喚鴉者',
   'entities.mobs.crypt_carrion_crow.name': '食腐烏鴉',
@@ -18891,6 +18899,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionChain.allyLine': '{name} 正被拖向深坑：攻擊溺亡之錨，或幫助其跑到點亮的繫泊柱',
   'hudChrome.auraEffect.bastion.anchored':
     '被鎖在溺亡之錨上：你可以移動，但無法遠離絞盤，它會把你絞向溺亡深坑。走到距被鉤住處至少{run}碼的點亮繫泊柱{reach}碼以內即可繫住鎖鏈（該柱熄滅{dark}秒），或者讓隊友用{links}次攻擊砸斷鎖鏈（英雄難度{linksHeroic}次）。掉進深坑會損失{pit}%的最大生命值（英雄難度{pitHeroic}%）。',
+  'hudChrome.auraEffect.bastion.brineColumn':
+    '你被困在海水之柱中：每{tick}秒受到{min}到{max}點自然傷害，最多持續{seconds}秒。打斷或擊暈潮縛侍僧即可掙脫。',
+  'hudChrome.auraEffect.bastion.halberdWall':
+    '另一名溺亡守望者在{radius}碼內時，受到的傷害降低{pct}%。把它們分開。',
+  'hudChrome.auraEffect.bastion.fogShroud': '站在霧堤中時，受到的傷害降低{pct}%。把它拖出霧中。',
+  'hudChrome.auraEffect.bastion.carrionGlut':
+    '以死者為食（{stacks}/{max}）：每層使其鹽水爆裂範圍擴大{radius}碼，傷害提高{pct}%。',
+  'hudChrome.auraEffect.bastion.snappedFetters':
+    '它的鎖鏈已斷。它不再戰鬥，無法被傷害，並很快離開。',
+  'hudChrome.auraEffect.crypt.carrionEye':
+    '戰鬥中的所有烏鴉都會追獵你，持續{seconds}秒。跑向你的坦克，讓隊伍一起消滅鴉群。',
+  'hudChrome.auraEffect.crypt.graniteSkin':
+    '受到的傷害降低{pct}%，石層每{every}秒增厚一次，最多{max}層。擊暈會將其擊碎，使其在{seconds}秒內受到的傷害提高{cracked}%。',
   'hudChrome.bastionChain.shackledTitle': '與 {name} 鎖在一起',
   'hudChrome.bastionChain.shackledLine': '彼此保持在 {range} 碼以內（目前相距 {dist} 碼）',
   'hudChrome.bastionChain.strainedLine': '離得太遠！鎖鏈會傷害你們兩人：靠近到 {range} 碼以內',

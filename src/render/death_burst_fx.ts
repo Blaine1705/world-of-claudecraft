@@ -14,7 +14,12 @@ import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
 import { DEATH_BURST_RING } from '../sim/mob/trash_kit/death_burst';
 import type { IWorld } from '../world_api';
-import { burstDelayForRadius, burstRingFill, DEATH_BURST_RING_LOOK } from './death_burst_fx_core';
+import {
+  burstDelayForRadius,
+  burstRingFill,
+  DEATH_BURST_RING_LOOK,
+  deathBurstRingLook,
+} from './death_burst_fx_core';
 import { type TelegraphFan, TelegraphKit } from './floor_telegraph';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX } from './gfx';
@@ -96,6 +101,9 @@ export class DeathBurstFx {
       if (this.rings.some((r) => r.objectId === e.id)) continue;
       const slot = this.rings.find((r) => r.objectId < 0);
       if (!slot) return;
+      // A template with its own element (the crawler's brine) keeps its accent.
+      const look = deathBurstRingLook(e.name);
+      this.kit.layOutFan(slot, 360, { color: look.color, accent: look.accent, sigil: false });
       slot.objectId = e.id;
       slot.since = this.clock;
       slot.group.visible = true;

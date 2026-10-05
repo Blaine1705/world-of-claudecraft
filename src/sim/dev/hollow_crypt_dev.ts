@@ -13,7 +13,9 @@
 //   /dev crypt spawn <type>            raise one trash mob 10 yd ahead, pulled:
 //                                      warrior, adept, cutthroat, necromancer,
 //                                      minion, brute, gargoyle (on a perch),
-//                                      caller, crow, drake (lands from the sky)
+//                                      caller, crow, drake (lands from the sky),
+//                                      widow; spawned mobs share one pack, so a
+//                                      spawned necromancer rules spawned warriors
 //   /dev crypt reset                   free the run and claim a fresh one
 //   /dev crypt rise [skip]             wake Morthen's entrance now (or skip it:
 //                                      he stands ready at the altar)
@@ -82,10 +84,11 @@ export const HOLLOW_CRYPT_DEV_MOBS: Readonly<Record<string, string>> = {
   caller: 'crypt_crow_caller',
   crow: 'crypt_carrion_crow',
   drake: 'crypt_ossuary_drake',
+  widow: 'bonechill_widow',
 };
 
 const HELP =
-  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake> | rise [skip] | wyrm | trigger <strafe|bellow> | reset';
+  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake|widow> | rise [skip] | wyrm | trigger <strafe|bellow> | reset';
 
 /** Raise one trash mob ahead of the player, pulled at once (a gargoyle starts
  *  on a perch and a drake high in the sky, so both show their descent). */
@@ -102,6 +105,9 @@ function devSpawn(ctx: SimContext, pid: number, inst: InstanceSlot, templateId: 
     ctx.groundPos(x, z),
   );
   applyDungeonMobTuning(mob, DUNGEON_ID, inst.difficulty);
+  // One dev pack: a spawned necromancer rules spawned warriors (Reassemble,
+  // Grave Rupture read the pack).
+  mob.dungeonPackId = 'dev';
   mob.facing = me.facing + Math.PI;
   mob.prevFacing = mob.facing;
   const lift = template.trashKit?.perch ? 12 : template.trashKit?.land ? 20 : 0;

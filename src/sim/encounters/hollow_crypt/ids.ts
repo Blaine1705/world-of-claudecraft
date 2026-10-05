@@ -14,6 +14,7 @@
 //   ribs: the damage window).
 
 import { HOLLOW_CRYPT_RING } from '../../content/hollow_crypt_layout';
+import { CRYPT_TRASH_OBJECT_TEMPLATES } from '../../mob/trash_kit/cast_ids';
 import { inLane } from '../../mob/trash_kit/lane';
 
 export const MORTHEN_ID = 'morthen';
@@ -73,6 +74,7 @@ export const CRYPT_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   KNELL_PYRE_TEMPLATE,
   KNELL_LANE_MARK_TEMPLATE,
   KNELL_LANE_TEMPLATE,
+  ...CRYPT_TRASH_OBJECT_TEMPLATES,
 ]);
 
 // ---- tuning -------------------------------------------------------------------------------

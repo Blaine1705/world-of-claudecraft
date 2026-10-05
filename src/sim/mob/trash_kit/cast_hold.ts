@@ -37,7 +37,8 @@ export function isPlantedCast(
     kit?.toss?.castId === castId ||
     kit?.cone?.castId === castId ||
     kit?.nova?.castId === castId ||
-    (kit?.nova?.unstoppableCastId !== undefined && kit.nova.unstoppableCastId === castId)
+    (kit?.nova?.unstoppableCastId !== undefined && kit.nova.unstoppableCastId === castId) ||
+    kit?.hook?.castId === castId
   );
 }
 

@@ -62,7 +62,13 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
-import { laneBurn, laneFlameSpots, pyreFill, riteLevels } from './crypt_finale_fx_core';
+import {
+  isKnellLaneTemplate,
+  laneBurn,
+  laneFlameSpots,
+  pyreFill,
+  riteLevels,
+} from './crypt_finale_fx_core';
 import {
   DUST_FRAG,
   FIRE_FRAG,
@@ -702,7 +708,10 @@ export class CryptFinaleFx {
             slot.group.visible = true;
           }
         }
-      } else if (!this.lanes.some((l) => l.objectId === e.id)) {
+      } else if (
+        isKnellLaneTemplate(e.templateId) &&
+        !this.lanes.some((l) => l.objectId === e.id)
+      ) {
         const slot = this.lanes.find((l) => l.objectId < 0);
         if (slot) {
           slot.objectId = e.id;

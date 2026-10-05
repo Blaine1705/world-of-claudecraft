@@ -169,7 +169,7 @@ export class RiftDeathZoneVisuals {
     );
     this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
     this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
-    this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate);
+    this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.bastionFx = new BastionFx(
       scene,
       groundY,
@@ -360,11 +360,17 @@ export class RiftDeathZoneVisuals {
     this.hoardPresentation.dispose();
   }
 
+  /** The drawn scale multiplier of a body (a fed Bastion Barnacle Crawler
+   *  swells; 1 for every other body). O(1); the renderer asks it per body. */
+  bodySwell(id: number): number {
+    return this.bastionFx.bodySwell(id);
+  }
+
   /** True when a dungeon effect claimed the event outright (the renderer
    *  then skips its generic draw of it). */
   handleEvent(event: SimEvent): boolean {
     this.hoardPresentation.handleEvent(event);
-    this.cryptTrash.handleEvent(event);
+    const crypt = this.cryptTrash.handleEvent(event);
     this.cryptCreatures.handleEvent(event);
     this.cryptFinale.handleEvent(event);
     this.morthenFx.handleEvent(event);
@@ -373,7 +379,15 @@ export class RiftDeathZoneVisuals {
     const sanctum = this.sanctumFx.handleEvent(event);
     const sanctumBoss = this.sanctumBosses.handleEvent(event);
     const engine = this.trashEngine.handleEvent(event);
-    return this.bastionFx.handleEvent(event) || temple || basin || sanctum || sanctumBoss || engine;
+    return (
+      this.bastionFx.handleEvent(event) ||
+      temple ||
+      basin ||
+      sanctum ||
+      sanctumBoss ||
+      engine ||
+      crypt
+    );
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

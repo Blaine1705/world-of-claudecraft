@@ -13,6 +13,34 @@
 //   Carrion Crow            weak fast fliers, in flocks.
 //   Ossuary Drake           the flying patrol: fire breath in front, tail behind, a wing gust.
 //
+// The trash mechanics pass (mob/trash_kit/crypt_kit.ts) gives the crypt one
+// group idea: the necromancers rule the bones. Kill the one who makes the
+// others strong.
+//
+//   Ossuary Warrior         Reassemble: falls by a living necromancer of its
+//                           pack and its bones stand back up 8 s later. Kill
+//                           the necromancer first, or break the bones.
+//   Gravecaller Necromancer Grave Rupture: bursts a fallen packmate's corpse.
+//                           Kick it, or fight away from the dead.
+//   Ossuary Cutthroat       Torn Tendon: its leap halves the victim's speed.
+//                           Heroic: unanswered (no taunt, stun, root or slow)
+//                           it leaps again at the next caster.
+//   Bone Minion             Splinter Burst: its burst also cuts the skeletons
+//                           round it. Drag the pack onto it before it dies.
+//   Bone Brute              Marrow Crush: a narrow telegraphed smash. Face it
+//                           away, or brace for it.
+//   Chapel Gargoyle         Granite Skin: its stone thickens; a stun shatters
+//                           it and leaves it Cracked Stone. Save a stun.
+//   Crow Caller             Carrion Eye: every crow hunts one marked player.
+//                           Run to the tank and burn the flock down together.
+//   Carrion Crow            Gouging Beak: a peck that can blind (misses more).
+//   Ossuary Drake           heroic Barrow Embers: its breath leaves the cone
+//                           burning for 5 s. Keep the drake moving.
+//   (Bonechill Widow        Rimesilk Spit: a web lane that roots, dungeons.ts.)
+//
+// The Gravecaller Adept's interruptible volley waits on the engine's
+// line-of-sight nova (the trash pass's second wave).
+//
 // Numbers are classic-era normal-mode bases for levels 7 to 10, anchored to
 // the shipped crypt trash (Crypt Shambler 7 + 2.2/level, 437 health at level 8)
 // and to Morthen's 12 to 18 Shadow Pulse at level 10: a Grave Bolt costs a
@@ -22,8 +50,12 @@
 
 import {
   CRYPT_BARROWFLAME_BREATH,
+  CRYPT_BONE_PILE,
+  CRYPT_CARRION_EYE,
   CRYPT_GRAVE_BOLT,
   CRYPT_GRAVE_CLEAVE,
+  CRYPT_GRAVE_RUPTURE,
+  CRYPT_MARROW_CRUSH,
   CRYPT_MURDER_CALL,
   CRYPT_RAISE_BONES,
   CRYPT_STONE_SHRIEK,
@@ -68,6 +100,22 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
       min: 16,
       max: 24,
       school: 'physical',
+    },
+    // Reassemble: fallen beside a living necromancer of its pack, its bones
+    // stand back up with a third of its health 8 s later (once; heroic: half,
+    // twice). The pile is about a fifth of its health (86 at level 8, 752 on
+    // heroic): two or three swings break it. A risen warrior pays nothing twice.
+    trashKit: {
+      reassemble: {
+        name: 'Reassemble',
+        masters: ['crypt_gravecaller_necromancer'],
+        pile: CRYPT_BONE_PILE,
+        seconds: 8,
+        hpPct: 0.33,
+        heroicHpPct: 0.5,
+        rises: 1,
+        heroicRises: 2,
+      },
     },
     loot: BONE_LOOT,
     scale: 1.1,
@@ -140,6 +188,11 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
         seconds: 0.7,
         fixate: 4,
         bleed: { perTick: 5, interval: 2, duration: 8 },
+        // Torn Tendon: the victim runs at half speed for the fixate, so it
+        // cannot shake the cutthroat alone (the tank taunts, a stun or a slow
+        // answers it). Heroic: unanswered, it leaps at the next caster.
+        slow: { mult: 0.5, seconds: 4, name: 'Torn Tendon' },
+        releapOnHeroic: true,
       },
     },
     loot: BONE_LOOT,
@@ -181,6 +234,23 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
         summon: 'crypt_bone_minion',
         maxAlive: 2,
       },
+      // Grave Rupture: a fallen packmate's corpse bursts under the fight. 22 to
+      // 30 shadow is about a seventh of a level 8 cloth wearer (a hair under
+      // the Grave Bolt), so normal shrugs it off; heroic (x24) lands 528 to
+      // 720 and leaves the corpse burning 3 s (144 to 240 a second).
+      rupture: {
+        castId: CRYPT_GRAVE_RUPTURE,
+        name: 'Grave Rupture',
+        castTime: 2.5,
+        every: 14,
+        first: 8,
+        school: 'shadow',
+        range: 30,
+        radius: 5,
+        min: 22,
+        max: 30,
+        pool: { seconds: 3, tick: 1, min: 6, max: 10 },
+      },
     },
     loot: CASTER_LOOT,
     scale: 1.05,
@@ -209,6 +279,10 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
       delay: 1.8,
       name: 'Bone Burst',
       school: 'physical',
+      // Splinter Burst: the bone shards also cut the skeletons round it, a
+      // tenth of their health each (about 46 on an Ossuary Warrior), never
+      // a killing blow. Drag the pack onto the minion before it falls.
+      shrapnel: { family: 'undead', maxHpPct: 0.1, name: 'Splinter Burst' },
     },
     loot: [],
     scale: 0.85,
@@ -229,6 +303,21 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 22,
     moveSpeed: 6,
     aggroRadius: 12,
+    // Marrow Crush: a narrow, slow, telegraphed smash at the tank. Its swing
+    // is 37 to 58 (level 9 elite), the crush 55 to 70 raw: the punishment for
+    // letting a minion grow, and the tank's first big hit to respect (face it
+    // away from the group, or brace). Heroic rides the summoned-add line (x9.5).
+    breathCone: {
+      castId: CRYPT_MARROW_CRUSH,
+      name: 'Marrow Crush',
+      castTime: 2,
+      every: 12,
+      range: 7,
+      arcDeg: 50,
+      min: 55,
+      max: 70,
+      school: 'physical',
+    },
     loot: [{ copper: 60, chance: 1 }],
     scale: 1.0,
     color: 0xd9d0bc,
@@ -262,6 +351,17 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
         stun: 2.5,
         min: 6,
         max: 10,
+      },
+      // Granite Skin: a layer of stone every 3 s, 6 percent less damage each
+      // (heroic 10) up to five; a stun shatters it and leaves it Cracked Stone,
+      // taking 25 percent more for 6 s. Save a stun for the gargoyle.
+      granite: {
+        name: 'Granite Skin',
+        every: 3,
+        perStack: 0.06,
+        heroicPerStack: 0.1,
+        maxStacks: 5,
+        cracked: { name: 'Cracked Stone', seconds: 6, taken: 0.25 },
       },
     },
     loot: [
@@ -309,6 +409,19 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
         count: 4,
         maxAlive: 6,
       },
+      // Carrion Eye: one player marked for 6 s, every crow in the fight on
+      // them. The marked runs to the tank and the flock dies together.
+      eye: {
+        castId: CRYPT_CARRION_EYE,
+        name: 'Carrion Eye',
+        castTime: 1.5,
+        every: 16,
+        first: 9,
+        school: 'nature',
+        range: 30,
+        seconds: 6,
+        flock: 'crypt_carrion_crow',
+      },
     },
     loot: CASTER_LOOT,
     scale: 1.0,
@@ -329,6 +442,10 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 11,
     aggroRadius: 12,
     untameable: true,
+    // Gouging Beak: a peck that can blind (a fifth more misses for 4 s).
+    // Rare per swing, but a flock of five pecks often: the flock is never safe
+    // to leave on the tank.
+    blind: { chance: 0.08, miss: 0.2, duration: 4, name: 'Gouging Beak', school: 'physical' },
     trashKit: { land: { seconds: 1 } },
     loot: [],
     scale: 1.0,
@@ -364,6 +481,9 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
     },
     trashKit: {
       land: { seconds: 2.2 },
+      // Heroic only: Barrow Embers, the breath's cone burns 5 s after it lands
+      // (6 to 9 fire a second, x20 on heroic: 120 to 180). Keep it moving.
+      scorch: { name: 'Barrow Embers', seconds: 5, tick: 1, min: 6, max: 9, school: 'fire' },
       tailLash: {
         castId: CRYPT_TAIL_LASH,
         name: 'Tail Lash',
@@ -395,5 +515,31 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0xe3dccb,
+  },
+  // Reassemble's bones (crypt_kit.ts): an Ossuary Warrior fallen beside a
+  // living necromancer of its pack lies here as a pile that will stand. It
+  // never moves or swings; break it (two or three swings) to keep the warrior
+  // down. Pays nothing (xpMult 0, no loot).
+  [CRYPT_BONE_PILE]: {
+    id: CRYPT_BONE_PILE,
+    name: 'Stirring Bones',
+    minLevel: 8,
+    maxLevel: 8,
+    family: 'undead',
+    hpBase: 30,
+    hpPerLevel: 8,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    xpMult: 0,
+    idleStationary: true,
+    offStreamIdle: true,
+    trashKit: { bonePile: { name: 'Reassemble' } },
+    loot: [],
+    scale: 1.1,
+    color: 0xd8cfb8,
   },
 };

@@ -20,6 +20,29 @@
 //   Drowned Sergeant    Rally the Watch (haste to its pack), enrages when low.
 //   Shackled Prisoner   fodder, in fours and fives.
 //
+// The trash mechanics pass (mob/trash_kit/bastion_kit.ts): the garrison fights
+// as soldiers.
+//
+//   Drowned Watchman    Boathook Drag: a hook down a lane at a far player,
+//                       who is dragged to its feet (heroic: into its sweep).
+//                       Heroic Halberd Wall: two side by side take less damage.
+//   Fogbound Arbalest   Fall Back: leaps back from a melee; a stun, root or
+//                       slow holds it.
+//   Barnacle Crawler    Carrion Glut: feeds beside a corpse; its Brine Burst
+//                       grows with every stack. Kill it early, or pull it off.
+//   Bastion Warhound    Pack Frenzy: a fallen hound quickens the hounds round
+//                       it. Bring them down together.
+//   Mist Chanter        Fog Bank: a fog patch under the tank shields its
+//                       allies inside. Drag them out, or kick it.
+//   Tidebound Acolyte   Brine Column: roots and drowns one player while it
+//                       channels. Kick it or stun it (dungeons.ts template).
+//   Shackled Prisoner   Snapped Fetters: at a quarter health its chains break
+//                       and it stops fighting. Switch targets.
+//
+// The Bastion Revenant's last-breath orb and the Drowned Sergeant's volley
+// order wait on the engine's walker orb and line-of-sight nova (the trash
+// pass's second wave).
+//
 // The Gaol Turnkey is the gaol's miniboss (encounters/sunken_bastion/
 // turnkey.ts): the Iron Cage, a button-mash escape, and Open the Cells.
 //
@@ -29,8 +52,12 @@
 // through the dungeon's difficulty transform (mechanicDamageMult).
 
 import {
+  BASTION_BOATHOOK,
+  BASTION_BRINE_BURST,
+  BASTION_BRINE_COLUMN,
   BASTION_BRINE_MEND,
   BASTION_CLAW_SWEEP,
+  BASTION_FOG_BANK,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
   BASTION_PIERCING_BOLT,
@@ -60,7 +87,8 @@ const CASTER_LOOT = [
   { itemId: 'linen_scrap', chance: 0.5 },
 ];
 
-/** The Tidebound Acolyte's Brine Mend (the shipped acolyte's new kit). */
+/** The Tidebound Acolyte's Brine Mend (the shipped acolyte's new kit) and
+ *  its Brine Column (the trash mechanics pass). */
 export const BRINE_MEND_KIT: TrashKitDef = {
   mend: {
     castId: BASTION_BRINE_MEND,
@@ -72,6 +100,22 @@ export const BRINE_MEND_KIT: TrashKitDef = {
     range: 25,
     healPct: 0.3,
     below: 0.75,
+  },
+  // Brine Column: a 4 s channel that roots one player (never its own foe
+  // while anyone else is near) and drowns them, 9 to 13 a second: about a
+  // tenth of a level 13 cloth wearer's 430 over the channel. Heroic (x18)
+  // is 162 to 234 a second. Two things to kick: the heal or the friend.
+  column: {
+    castId: BASTION_BRINE_COLUMN,
+    name: 'Brine Column',
+    castTime: 4,
+    every: 16,
+    first: 9,
+    school: 'nature',
+    range: 25,
+    tick: 1,
+    min: 9,
+    max: 13,
   },
 };
 
@@ -102,6 +146,31 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
       min: 45,
       max: 55,
       school: 'physical',
+    },
+    trashKit: {
+      // Boathook Drag: a 2 s lane at the farthest player 8 yards out or more;
+      // whoever stays in it is dragged to the watchman's feet (10 to 14, a
+      // scratch). Heroic: the Halberd Sweep follows the drag in 0.6 s (turn
+      // it away); x8 lands 80 to 112.
+      hook: {
+        castId: BASTION_BOATHOOK,
+        name: 'Boathook Drag',
+        castTime: 2,
+        every: 15,
+        first: 6,
+        school: 'physical',
+        minRange: 8,
+        length: 22,
+        halfWidth: 1.2,
+        min: 10,
+        max: 14,
+        stop: 2.5,
+        pullSeconds: 0.6,
+        heroicSweepIn: 0.6,
+      },
+      // Heroic: Halberd Wall, a quarter less damage while another watchman
+      // stands within 5 yards. Split them or burn through.
+      wall: { name: 'Halberd Wall', radius: 5, reduction: 0.25 },
     },
     loot: BONE_LOOT,
     scale: 1.1,
@@ -145,6 +214,10 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
         min: 55,
         max: 65,
       },
+      // Fall Back: a melee within 4 yards and it leaps 8 back (shorter
+      // where a wall or its battlement's edge stands), at most every 12 s.
+      // A stun, a root or a slow holds it in place.
+      fallBack: { name: 'Fall Back', every: 12, first: 3, trigger: 4, distance: 8, seconds: 0.5 },
     },
     loot: BONE_LOOT,
     scale: 1.0,
@@ -169,14 +242,25 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.5,
     aggroRadius: 10,
     untameable: true,
-    // Burst where it dies: move off the shell before the brine goes up.
-    deathThroes: {
-      min: 30,
-      max: 40,
-      radius: 4,
-      delay: 1.5,
-      name: 'Brine Burst',
-      school: 'frost',
+    trashKit: {
+      // Burst where it dies: move off the shell before the brine goes up. A
+      // ring object paints the floor at the radius it bursts with (the trash
+      // kit's death burst), so a fed crawler's bigger ring shows.
+      deathBurst: {
+        castId: BASTION_BRINE_BURST,
+        name: 'Brine Burst',
+        delay: 1.5,
+        radius: 4,
+        min: 30,
+        max: 40,
+        school: 'frost',
+        // Carrion Glut: each stack 1.25 yards wider and 40 percent harder;
+        // three stacks burst 7.75 yards for 2.2 times the roll.
+        perStack: { radius: 1.25, damage: 0.4 },
+      },
+      // Carrion Glut: within 3 yards of a corpse it feeds, a stack every 3 s
+      // up to three. Kill it early, or keep the fight off the dead.
+      gorge: { name: 'Carrion Glut', every: 3, reach: 3, maxStacks: 3 },
     },
     loot: [{ copper: 30, chance: 1 }],
     scale: 1.2,
@@ -198,6 +282,10 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 12,
     untameable: true,
+    // Pack Frenzy (the trash mechanics pass): a hound that falls quickens
+    // every hound within 15 yards, 30 percent faster swings for 8 s. Bring
+    // the pack down together, or save a defensive for the last one.
+    packFrenzy: { radius: 15, hasteMult: 1.3, duration: 8 },
     // Lunge: leaps onto the farthest caster and knocks them flat for a second.
     trashKit: {
       leap: {
@@ -250,6 +338,22 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
         range: 20,
         shieldPct: 0.25,
         duration: 12,
+      },
+      // Fog Bank: a 4 yard fog patch under its foe for 14 s; every ally in
+      // the fight inside takes 30 percent less damage (heroic 50). The tank
+      // drags the pack out of it, or someone kicks it.
+      fogBank: {
+        castId: BASTION_FOG_BANK,
+        name: 'Fog Bank',
+        castTime: 2,
+        every: 18,
+        first: 8,
+        school: 'frost',
+        range: 30,
+        radius: 4,
+        seconds: 14,
+        reduction: 0.3,
+        heroicReduction: 0.5,
       },
     },
     loot: CASTER_LOOT,
@@ -307,6 +411,12 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 6,
     aggroRadius: 10,
     xpMult: 0.4,
+    // Snapped Fetters: at a quarter health its chains break, the drowned
+    // light leaves its eyes and it stops fighting: it kneels 5 s, untouchable,
+    // and leaves (no reward). A test of attention, not of damage.
+    trashKit: { unshackle: { name: 'Snapped Fetters', belowHpPct: 0.25, seconds: 5 } },
+    // Damage never takes it below that quarter: a burst cannot skip the release.
+    damageFloorPct: 0.25,
     loot: [{ copper: 12, chance: 1 }],
     scale: 0.9,
     color: 0x9a9480,

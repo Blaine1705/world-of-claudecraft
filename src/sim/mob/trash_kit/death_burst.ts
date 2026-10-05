@@ -82,7 +82,10 @@ export function stepDeathBurst(
   if (!def) return false;
   // A split body (kit_split.ts) bursts smaller: its ring and its rolls.
   const scale = splitBurstScale(mob);
-  const radius = def.radius * scale;
+  // A fed burst grows with its stacks (the Barnacle Crawler's Carrion Glut).
+  const stacks = def.perStack ? (mob.trashLife?.gorge ?? 0) : 0;
+  const radius = (def.radius + stacks * (def.perStack?.radius ?? 0)) * scale;
+  const grow = (1 + stacks * (def.perStack?.damage ?? 0)) * scale;
   let st = mob.deathBurst;
   if (!st) {
     st = { remaining: def.delay, objectId: null, done: false };
@@ -116,7 +119,7 @@ export function stepDeathBurst(
   for (const p of livingInReach(players, mob.pos, radius)) {
     const amount = Math.max(
       1,
-      Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1) * scale),
+      Math.round(ctx.rng.range(def.min, def.max) * (mob.mechanicDamageMult ?? 1) * grow),
     );
     ctx.dealDamage(mob, p, amount, false, def.school, def.name, 'hit', true);
     // A slowing burst (the Rime Whelp's Hoarfrost Pop) chills whoever it caught.

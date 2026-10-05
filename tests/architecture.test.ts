@@ -833,6 +833,8 @@ const RENDER_PURE_CORES = [
   'src/render/hollow_crypt/crypt_plan_core.ts',
   'src/render/hollow_crypt/crypt_kit_plan_core.ts',
   'src/render/hollow_crypt/crypt_trash_fx_core.ts',
+  // The crypt trash mechanics pass's hero effects (bone pile, rupture, granite, marks).
+  'src/render/hollow_crypt/crypt_trash_kit_fx_core.ts',
   'src/render/hollow_crypt/crypt_creature_fx_core.ts',
   'src/render/hollow_crypt/crypt_set_dressing_core.ts',
   'src/render/hollow_crypt/crypt_gate_state_core.ts',
@@ -852,6 +854,7 @@ const RENDER_PURE_CORES = [
   // and the hollow shade's ghost predicate renderer.ts asks.
   'src/render/sunken_bastion/bastion_vael_stage_core.ts',
   'src/render/sunken_bastion/bastion_shade_ghost_core.ts',
+  'src/render/sunken_bastion/bastion_trash_fx_core.ts',
   // Olen the fallen paladin's visuals: the brine, the shield, the Sentence, the Oath.
   'src/render/sunken_bastion/bastion_olen_fx_core.ts',
   // The Drowning Yard's Mooring Post lamps: lit, dark, kindling, the flare, the ring.

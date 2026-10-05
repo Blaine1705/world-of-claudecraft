@@ -3925,7 +3925,16 @@ export const ja_JP: EnTranslations = {
         "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
       },
       "bastion": {
+        "brineColumn": "海水の柱に捕らわれ、{tick}秒ごとに{min}～{max}の自然ダメージを最大{seconds}秒間受ける。潮縛りの侍祭を妨害するかスタンさせれば抜け出せる。",
+        "halberdWall": "{radius}ヤード以内に別の溺れた見張り番がいる間、受けるダメージが{pct}%減少する。引き離せ。",
+        "fogShroud": "霧の帳の中にいる間、受けるダメージが{pct}%減少する。霧の外へ引きずり出せ。",
+        "carrionGlut": "死者を貪った（{stacks}/{max}）：スタックごとに塩水の破裂が{radius}ヤード広がり、{pct}%強くなる。",
+        "snappedFetters": "鎖が断ち切られた。もう戦わず、傷つけられず、まもなく去っていく。",
         "anchored": "溺死の錨に繋がれている：動くことはできるが巻き上げ機から離れることはできず、溺死の穴へと巻き寄せられる。引っ掛けられた場所から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入れば鎖を係留できる（その柱は{dark}秒間消える）、または仲間が{links}回の攻撃で鎖を断つ（ヒロイックは{linksHeroic}回）。穴に落ちると最大体力の{pit}%を失う（ヒロイックは{pitHeroic}%）。"
+      },
+      "crypt": {
+        "carrionEye": "戦闘中のすべてのカラスが{seconds}秒間あなたを狙う。タンクのもとへ走り、群れをまとめて倒そう。",
+        "graniteSkin": "受けるダメージが{pct}%減少し、石は{every}秒ごとに厚くなる（最大{max}層）。スタンで砕け散り、{seconds}秒間受けるダメージが{cracked}%増加する。"
       },
       "sanctum": {
         "lockbound": "受けるダメージが{pct}%減少：まだ残っている鎖1本につき{per}%。封印の枷を壊すとその鎖が外れる。",
@@ -12525,6 +12534,10 @@ export const ja_JP: EnTranslations = {
       "crypt_barrowflame_breath": "塚炎の吐息",
       "crypt_tail_lash": "尾の一撃",
       "crypt_wing_gust": "翼の突風",
+      "crypt_grave_rupture": "墓所の破裂",
+      "crypt_carrion_eye": "屍肉喰らいの眼",
+      "crypt_marrow_crush": "髄砕き",
+      "crypt_rimesilk_spit": "霜糸吐き",
       "crypt_morthen_rite_wakes": "儀式の目覚め",
       "crypt_morthen_rise": "墓呼びの昇天",
       "crypt_morthen_proclaim": "墓所の宣告",
@@ -12539,6 +12552,9 @@ export const ja_JP: EnTranslations = {
       "bastion_piercing_bolt": "貫通の矢",
       "bastion_claw_sweep": "爪の薙ぎ払い",
       "bastion_shell_slam": "甲羅叩きつけ",
+      "bastion_boathook": "鉤竿引き",
+      "bastion_fog_bank": "霧の帳",
+      "bastion_brine_column": "塩水の柱",
       "bastion_oathbound_charge": "誓約の突進",
       "bastion_gaolers_cudgel": "牢番の棍棒",
       "bastion_mist_surge": "霧の奔流",
@@ -20168,6 +20184,9 @@ export const ja_JP: EnTranslations = {
       },
       "crypt_bone_brute": {
         "name": "骨の巨兵"
+      },
+      "crypt_bone_pile": {
+        "name": "蠢く骨"
       },
       "crypt_chapel_gargoyle": {
         "name": "礼拝堂のガーゴイル"

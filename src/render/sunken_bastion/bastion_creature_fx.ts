@@ -59,6 +59,7 @@ import {
   TURNKEY_RAW_HEIGHT,
 } from './bastion_creature_fx_core';
 import { BastionDrownedFx } from './bastion_drowned_fx';
+import { BastionTrashFx } from './bastion_trash_fx';
 
 const BOLT_SLOTS = 8;
 const FLARE_SLOTS = 3;
@@ -313,6 +314,8 @@ export class BastionCreatureFx {
   private readonly bolts: BoltSlot[] = [];
   private readonly flares: FlareSlot[] = [];
   private readonly drowned: BastionDrownedFx;
+  /** The trash mechanics' visuals (bastion_trash_fx.ts), on these same draws. */
+  private readonly trash: BastionTrashFx;
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly tmp = { x: 0, y: 0, z: 0 };
@@ -361,13 +364,14 @@ export class BastionCreatureFx {
       this.materials.push(m);
       return m;
     };
+    // Sized for the trash mechanics' fog and splashes too (bastion_trash_fx.ts).
     this.mist = new Particles(
-      Math.round(160 * this.density),
+      Math.round(320 * this.density),
       shader(MIST_FRAG, THREE.NormalBlending),
       floorVfxRenderOrder('encounter', 30),
     );
     this.glow = new Particles(
-      Math.round(680 * this.density),
+      Math.round(1100 * this.density),
       shader(PARTICLE_FRAG, THREE.AdditiveBlending),
       floorVfxRenderOrder('encounter', 32),
     );
@@ -378,6 +382,16 @@ export class BastionCreatureFx {
     this.buildBolts(root);
     this.buildFlares(root);
     this.drowned = new BastionDrownedFx(this.glow, this.mist, world, this.density, reducedMotion);
+    this.trash = new BastionTrashFx(
+      root,
+      groundY,
+      world,
+      this.glow,
+      this.mist,
+      this.density,
+      reducedMotion,
+      playGesture,
+    );
     for (const m of root.children) tagVfxSubtree(m);
   }
 
@@ -501,8 +515,14 @@ export class BastionCreatureFx {
   }
 
   /** Claims an arbalest's shot or the Turnkey's call; true when it drew it. */
+  /** The drawn swell of a fed Barnacle Crawler, 1 for every other body. */
+  bodySwell(id: number): number {
+    return this.trash.swellOf(id);
+  }
+
   handleEvent(ev: SimEvent): boolean {
     this.drowned.observe(ev, this.clock);
+    if (this.trash.handleEvent(ev, this.clock)) return true;
     if (ev.type !== 'spellfx' || !this.world) return false;
     const source = this.world.entities.get(ev.sourceId);
     if (!source || source.kind !== 'mob') return false;
@@ -820,6 +840,7 @@ export class BastionCreatureFx {
       }
     }
     this.drowned.update(now);
+    this.trash.update(now, dt);
     this.glow.update(now);
     this.mist.update(now);
   }
@@ -928,6 +949,7 @@ export class BastionCreatureFx {
   }
 
   dispose(): void {
+    this.trash.dispose();
     this.glow.dispose();
     this.mist.dispose();
     for (const g of this.geometries) g.dispose();
