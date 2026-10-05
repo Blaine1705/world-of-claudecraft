@@ -142,11 +142,6 @@ const STATIC_PROP_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Ogre Sledge-Hauler: the ogre in furs and a hauling harness.
-  sanctum_sledge_hauler: [
-    SLEDGE_HAULER_ID,
-    ['mob_ogre', 0x7a6248, 0.36, { selfIllumination: 0.06 }],
-  ],
   // Glacier Splinter: a walking shard of the Quench, blue ice over the Smith's
   // rune-iron core (the rime elemental, glacier blue and glowing).
   sanctum_glacier_splinter: [

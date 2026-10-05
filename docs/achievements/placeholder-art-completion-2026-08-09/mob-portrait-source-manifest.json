@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "14e7e0b4ba4dda8d0806f2aaa02795f4d8808d57096d29499f2639505c07c6f3",
+  "rendererFingerprint": "493daf4cbe41377b28aef54df3f35fd35939d3a65817056a078c99fc679ae103",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5505236,
-      "sha256": "4e274af1d0c24578ad427557b6280ad0f6bbedc707041a66b1bf6aa6a292fa4c",
+      "bytes": 5505352,
+      "sha256": "0859962e86b4dc728edcc7ba422574e1b7f8d37879f38fba41b857b88d8e4462",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6942,10 +6942,10 @@
       "visualKey": "sanctum_sledge_hauler",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/ogre.glb",
-          "path": "public/models/creatures/ogre.glb",
-          "bytes": 494060,
-          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
+          "url": "models/creatures/sanctum_sledge_hauler.glb",
+          "path": "public/models/creatures/sanctum_sledge_hauler.glb",
+          "bytes": 2748068,
+          "sha256": "c82d225ff3ddd3149dc531bb428786a30f4f8cfaf473604a92a74cb527d88946"
         },
         "idle": "Idle",
         "height": 2.761904761904762,
@@ -6954,19 +6954,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.36
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#7a6248",
-        "resolved": "#7a6248",
-        "strength": 0.36
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "8ce2bb642f11341f1a3a967b38014fd50f44f63acc23271f40d10bc34de6efb9",
+      "sourceFingerprint": "386acd868da6ead8571262ce8e102e672b8c61f873b480d3a26a19dded1b79e2",
       "output": {
         "path": "public/ui/mobs/ogre_sledge_hauler.webp",
-        "bytes": 2244,
-        "sha256": "183e0b70bc5286dca13a1abc9e4fb71b888e1b10f627bf4854e0995d61db5d7a"
+        "bytes": 3292,
+        "sha256": "730b7ff817f0c13e44ab7f65b0b1c822846143e07fccb3de6a936892458b127e"
       }
     },
     {

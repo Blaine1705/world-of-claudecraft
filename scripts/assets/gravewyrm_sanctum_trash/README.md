@@ -35,6 +35,11 @@ authoring tooling: nothing here runs in the build or the game.
   (the young head has no modelled mouth cavity, so a wide gape stretched the lip seam);
   the shipped build ran it twice (0.5 then 0.55).
 
+- `ogre/builder/`: the Ogre Sledge-Hauler (`sanctum_sledge_hauler.glb`), on the shared kit: the
+  head grown 1.4x about the top of the neck (`anatomy.HEAD_SCALE`) and the fur mantle kept off
+  the face and off the upper arms; his own ice block rides the Weapon bone between his palms
+  in IceBlockToss only (RELEASE 1.25 s, the frame the fx block takes off).
+
 Build (Blender 5.2, absolute output paths; keep one Blender job at a time):
 
     blender -b --factory-startup --python <builder>/build.py -- <abs>/<key>_raw.glb \

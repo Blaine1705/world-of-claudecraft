@@ -72,6 +72,8 @@ import { setRenderCategory } from '../renderer_diagnostics';
 import { radialGlowTexture } from '../textures';
 import {
   FLAME_HEAT,
+  HAULER_ENRAGE_GESTURE,
+  isHaulerEnrageCue,
   isSanctumObject,
   objectFill,
   PYRE_RAMP,
@@ -437,6 +439,12 @@ export class SanctumFx {
     // the cinders pour down it too, and the generic cone still draws.
     if (ev.fx === 'fireCone' && src.templateId === SCALEGUARD_ID) {
       this.trash?.cinderBreath(src);
+      return false;
+    }
+    // The Sledge-Hauler's frenzy: it beats its chest and roars (the generic
+    // enrage nova still draws).
+    if (isHaulerEnrageCue(ev, src.templateId)) {
+      this.playGesture?.(src.id, HAULER_ENRAGE_GESTURE);
       return false;
     }
     switch (ev.ability) {

@@ -18,15 +18,20 @@ import {
   RIME_WHELP_CLIP,
   SCALEGUARD_BODY,
   SCALEGUARD_CLIP,
+  SLEDGE_HAULER_BODY,
+  SLEDGE_HAULER_CLIP,
   THAWCALLER_BODY,
   THAWCALLER_CLIP,
   trashModelScale,
 } from '../src/render/characters/sanctum_trash_looks';
 import {
+  BLOCK_RELEASE,
   BONEWALKER_RISE_GESTURE,
   BONEWALKER_RISE_WINDOW,
   bonewalkerRises,
   brandIronAnchor,
+  HAULER_ENRAGE_GESTURE,
+  isHaulerEnrageCue,
   SANCTUM_DRAWN_HEIGHTS,
   sanctumAnchor,
 } from '../src/render/gravewyrm_sanctum_fx/sanctum_fx_core';
@@ -40,6 +45,7 @@ import {
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
   SANCTUM_GOAD,
+  SANCTUM_ICE_BLOCK_TOSS,
   SANCTUM_PLANT_BRAZIER,
   SANCTUM_RIME_BREATH,
   SANCTUM_THAW_THE_HELD,
@@ -349,5 +355,51 @@ describe('the Rime Whelp', () => {
     const mouth = sanctumAnchor('breath', 'rime_whelp');
     expect(mouth[0]).toBeGreaterThan(1);
     expect(mouth[2]).toBeLessThan(0.5);
+  });
+});
+
+describe('the Ogre Sledge-Hauler', () => {
+  it('ships its own body with the toss and the enrage', () => {
+    expect(clipsOf(`public/${SLEDGE_HAULER_BODY.url}`)).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'CombatIdle',
+        'Death',
+        'Enrage',
+        'Hit',
+        'IceBlockToss',
+        'Idle',
+        'Run',
+        'Walk',
+      ].sort(),
+    );
+    expectShipped(SLEDGE_HAULER_BODY.url);
+    expect(visualOf('ogre_sledge_hauler').url).toBe(SLEDGE_HAULER_BODY.url);
+    expectDrawnAtRow('ogre_sledge_hauler');
+  });
+
+  it('lets go of its block on the frame the fx block takes off', () => {
+    const v = visualOf('ogre_sledge_hauler');
+    const bar = MOBS.ogre_sledge_hauler?.trashKit?.toss?.castTime ?? 0;
+    expect(bar).toBe(2);
+    expect(v.castClipSync).toBe(true);
+    expect(v.clips.castByAbility?.[SANCTUM_ICE_BLOCK_TOSS]).toBe('IceBlockToss');
+    const rate = v.clips.castTimeScaleByAbility?.[SANCTUM_ICE_BLOCK_TOSS] ?? 0;
+    // The clip's release lands at BLOCK_RELEASE of the bar.
+    expect(SLEDGE_HAULER_CLIP.tossRelease / rate).toBeCloseTo(BLOCK_RELEASE * bar, 9);
+  });
+
+  it('beats its chest on the sim enrage cue, and only its own', () => {
+    const v = visualOf('ogre_sledge_hauler');
+    expect(v.clips.attackByAbility?.[HAULER_ENRAGE_GESTURE]).toBe('Enrage');
+    expect(v.oneShotsHoldAttacks).toContain('Enrage');
+    const cue = { type: 'spellfx', fx: 'nova', school: 'fire', sourceId: 7, targetId: 7 };
+    expect(isHaulerEnrageCue(cue, 'ogre_sledge_hauler')).toBe(true);
+    expect(isHaulerEnrageCue(cue, 'drowned_pilgrim')).toBe(false);
+    expect(isHaulerEnrageCue({ ...cue, targetId: 8 }, 'ogre_sledge_hauler')).toBe(false);
+    expect(isHaulerEnrageCue({ ...cue, ability: 'x' }, 'ogre_sledge_hauler')).toBe(false);
+    expect(isHaulerEnrageCue({ ...cue, school: 'frost' }, 'ogre_sledge_hauler')).toBe(false);
+    expect(MOBS.ogre_sledge_hauler?.enrage?.belowHpPct).toBe(0.3);
   });
 });

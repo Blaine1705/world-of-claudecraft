@@ -20,6 +20,7 @@ import {
   PYRE_TENDER_ID,
   RIME_WHELP_ID,
   SCALEGUARD_ID,
+  SLEDGE_HAULER_ID,
   THAWCALLER_ID,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import {
@@ -27,13 +28,16 @@ import {
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
   SANCTUM_GOAD,
+  SANCTUM_ICE_BLOCK_TOSS,
   SANCTUM_PLANT_BRAZIER,
   SANCTUM_RIME_BREATH,
   SANCTUM_THAW_THE_HELD,
   SANCTUM_WARMING_RITE,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
 import {
+  BLOCK_RELEASE,
   BONEWALKER_RISE_GESTURE,
+  HAULER_ENRAGE_GESTURE,
   SANCTUM_DRAWN_HEIGHTS,
   sanctumDrawnHeight,
 } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
@@ -192,6 +196,27 @@ export const RIME_WHELP_BODY: SanctumTrashBody = {
 export const RIME_WHELP_CLIP = { rimeBreath: 0.6 + KEY_LEAD, bite: 0.62 + KEY_LEAD } as const;
 
 const rimeWhelp = MOBS[RIME_WHELP_ID];
+
+// ---- the Ogre Sledge-Hauler -----------------------------------------------------------
+
+/** The Ogre Sledge-Hauler: a huge hunched mountain ogre in a fur mantle and kilt
+ *  and the cult's hauling harness (two crossed straps on iron rings, sledge hooks
+ *  at his hips), a haul chain and hook wrapped round his right fist. His own ice
+ *  block rides the Weapon bone between his palms in IceBlockToss only. */
+export const SLEDGE_HAULER_BODY: SanctumTrashBody = {
+  url: `${CREATURES}/sanctum_sledge_hauler.glb`,
+  idleHeight: 5.255,
+  walkRef: 1.429,
+  runRef: 5.986,
+};
+
+/** The toss's release in the clip (seconds at 1x): the block leaves his hands. */
+export const SLEDGE_HAULER_CLIP = { tossRelease: 1.25 } as const;
+
+const hauler = MOBS[SLEDGE_HAULER_ID];
+/** The fx fly their block from BLOCK_RELEASE of the bar to the ring on its end
+ *  (sanctum_trash_fx.ts paintBlocks): his clip lets go on that same frame. */
+const tossBar = hauler?.trashKit?.toss?.castTime ?? 0;
 
 export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
   // 4.6 yd to the helm's peak at its 1.15.
@@ -391,5 +416,36 @@ export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.08,
+  },
+  // 5.8 yd to his crown at his 2.1 (2.2 players), hunched under the mantle. The Ice Block
+  // Toss squats, rips a block out of the glacier, heaves it overhead and hurls
+  // it: his own block vanishes on the frame the fx block takes off (60 percent
+  // of the 2 s bar), landing on the ring as the bar ends and standing there as
+  // the Ice Slab. His enrage beats his chest and roars (HAULER_ENRAGE_GESTURE).
+  sanctum_sledge_hauler: {
+    ...sized(SLEDGE_HAULER_BODY, SLEDGE_HAULER_ID),
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { [HAULER_ENRAGE_GESTURE]: 'Enrage' },
+      attackTimeScaleByAbility: { [HAULER_ENRAGE_GESTURE]: 1 },
+      hit: ['Hit'],
+      death: 'Death',
+      castByAbility: { [SANCTUM_ICE_BLOCK_TOSS]: 'IceBlockToss' },
+      castTimeScaleByAbility: {
+        [SANCTUM_ICE_BLOCK_TOSS]: barRate(SLEDGE_HAULER_CLIP.tossRelease, BLOCK_RELEASE * tossBar),
+      },
+      castPlayOut: ['IceBlockToss'],
+    },
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    oneShotsHoldAttacks: ['Enrage'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.05,
   },
 };

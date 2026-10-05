@@ -598,6 +598,36 @@ export function anchorPoint(
   out.y = gy + a[2] * h;
 }
 
+// ---- the Sledge-Hauler's frenzy ---------------------------------------------------------
+
+/** The gesture that plays an Ogre Sledge-Hauler's Enrage (a chest-beating
+ *  roar) as it drops under its enrage threshold. */
+export const HAULER_ENRAGE_GESTURE = 'sanctum_hauler_enrage';
+
+/** True for the sim's own enrage cue on a Sledge-Hauler: the self-targeted
+ *  fire nova with no ability that the shared enrage emits (mob/
+ *  boss_mechanics.ts). The flag itself is not on the wire; this event is. */
+export function isHaulerEnrageCue(
+  ev: {
+    type: string;
+    fx?: string;
+    school?: string;
+    sourceId?: number;
+    targetId?: number;
+    ability?: string;
+  },
+  sourceTemplateId: string | undefined,
+): boolean {
+  return (
+    ev.type === 'spellfx' &&
+    ev.fx === 'nova' &&
+    ev.school === 'fire' &&
+    ev.sourceId === ev.targetId &&
+    !ev.ability &&
+    sourceTemplateId === SLEDGE_HAULER_ID
+  );
+}
+
 // ---- the risen dead ---------------------------------------------------------------
 
 /** The gesture that plays a Raised Bonewalker's Thaw (its entrance: the
