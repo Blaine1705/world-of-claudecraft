@@ -900,6 +900,7 @@ const RENDER_PURE_CORES = [
   // The trash hunt (the trash mechanics pass): its telegraphs, shocks, marks,
   // tongue and clip rates, all read off the sim's templates.
   'src/render/wildheart_basin/basin_trash_fx_core.ts',
+  'src/render/wildheart_basin/basin_trash_model_core.ts',
   'src/render/wildheart_basin/maw_glow_core.ts',
   // The Gravewyrm Sanctum's Sledge Tusker body and sledge (measured facts,
   // clip beats, the sledge's trailer drag and the bowls onto their patches)

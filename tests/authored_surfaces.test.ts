@@ -86,7 +86,6 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mob_spider_egg_sac',
   'mob_tolling_bell',
   'mob_training_dummy',
-  'mob_wildheart_beastmaster',
   'mob_wildheart_hexcaller',
   'mob_wildheart_high_priest',
   'mob_wildheart_ravager',
@@ -104,11 +103,10 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_terrorspark_groundshaker',
   'mount_thunderstrut_gobbler',
   // The five-dungeon rework's re-tints of a legacy body above: they spread the
-  // base def (the Wildheart Basin's Totem-Binder and Howdah Hexcaller over
-  // mob_wildheart_hexcaller), so they keep the floor their shared GLB was
+  // base def (the Wildheart Basin's Howdah Hexcaller over
+  // mob_wildheart_hexcaller), so it keeps the floor its shared GLB was
   // tuned under.
   'wildheart_howdah_hexcaller',
-  'wildheart_totem_binder',
 ]);
 
 /** Held ITEM models with authored materials that still take the kit polish
@@ -254,8 +252,17 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_vine_lasher',
   'wildheart_thorn_sprout',
   'wildheart_fanglord_jaguar',
+  // the Blender Basin Raptor (scripts/assets/wildheart_basin_raptor)
+  'wildheart_basin_raptor',
+  // the Blender Spore Toad (scripts/assets/wildheart_spore_toad) and the Toad Hex's toad on it
+  'wildheart_spore_toad',
+  'form_toad',
+  // the Blender Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder)
+  'wildheart_totem_binder',
+  // the Fanglord Beastmaster's Blender body (scripts/assets/wildheart_beastmaster)
+  'mob_wildheart_beastmaster',
   'wildheart_sunbone_totem',
-  // its Dread Totem: the same carved post re-tinted (wildheart_creature_looks.ts)
+  // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',
 ];
 

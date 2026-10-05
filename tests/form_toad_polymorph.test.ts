@@ -56,11 +56,11 @@ describe('the toad hex wears a toad', () => {
     );
   });
 
-  it('ships a toad visual: the Spore Toad frog rig, squat at a player knee', () => {
+  it("ships a toad visual: the Spore Toad's own body, squat at a player knee", () => {
     const toad = VISUALS.form_toad;
     expect(toad).toBeDefined();
-    expect(toad?.url).toBe(VISUALS.mob_murloc?.url);
-    expect(toad?.tint).toBe(VISUALS.wildheart_spore_toad?.tint);
+    expect(toad?.url).toBe(VISUALS.wildheart_spore_toad?.url);
+    expect(toad?.authoredAtlas).toBe(true);
     expect(toad?.height ?? 99).toBeLessThan(2.6);
     expect(toad?.height ?? 0).toBeGreaterThan(VISUALS.form_sheep?.height ?? 99);
   });

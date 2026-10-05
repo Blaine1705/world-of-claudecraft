@@ -112,7 +112,10 @@ describe('Wildheart Basin dungeon content', () => {
     expect(MOBS.wildheart_beastmaster.warcry).toBeUndefined();
     for (const id of TROLLS) {
       const visual = VISUALS[`mob_${id}`];
-      expect(visual?.yaw, `${id} faces the game +Z movement axis`).toBe(-Math.PI / 2);
+      // The Beastmaster's Blender body is authored facing +Z; the four Tripo
+      // trolls are turned onto it.
+      const yaw = id === 'wildheart_beastmaster' ? undefined : -Math.PI / 2;
+      expect(visual?.yaw, `${id} faces the game +Z movement axis`).toBe(yaw);
       expect(visual?.clips.run, `${id} carries its run clip`).toBe('Run');
     }
   });

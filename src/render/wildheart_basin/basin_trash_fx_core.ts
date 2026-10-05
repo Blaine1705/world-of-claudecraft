@@ -30,12 +30,15 @@ import {
   SPORE_TOAD_ID,
   STALKER_ID,
   SUNBONE_DREAD_TOTEM_ID,
+  SUNBONE_TOTEM_ID,
+  TOTEM_BINDER_ID,
   VINE_LASHER_ID,
 } from '../../sim/encounters/wildheart_basin/ids';
 import { inLane } from '../../sim/mob/trash_kit/lane';
 import {
   WILDHEART_ANCESTRAL_SAP,
   WILDHEART_KIT_CAST_SCHOOLS,
+  WILDHEART_PLANT_TOTEM,
   WILDHEART_QUARRY_MARK,
   WILDHEART_RATTLING_DREAD,
   WILDHEART_SNARING_TONGUE,
@@ -47,6 +50,17 @@ import { PARTY_MAX } from '../../sim/social/party';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { shockRingLook } from './basin_boss_fx_core';
 import { basinTelegraphSpecs } from './basin_fx_core';
+import {
+  DREAD_TOTEM_MODEL,
+  RAPTOR_MODEL,
+  RAPTOR_SIM_SCALE,
+  SUN_TOTEM_MODEL,
+  TOAD_CLIP,
+  TOAD_MODEL,
+  TOAD_SIM_SCALE,
+  TOTEM_SIM_SCALE,
+  trashLookHeight,
+} from './basin_trash_model_core';
 
 /** The hunt's own element accents (motes, fill fronts, glows; never a rim). */
 export const TRASH_ACCENTS = {
@@ -74,6 +88,7 @@ export const HUNT_TUNING = {
   hex: hunt(HEXCALLER_ID)?.hex,
   dread: hunt(SUNBONE_DREAD_TOTEM_ID)?.dread,
   tongue: hunt(SPORE_TOAD_ID)?.tongue,
+  totems: hunt(TOTEM_BINDER_ID)?.totems,
   packFrenzy: MOBS[BASIN_RAPTOR_ID]?.packFrenzy,
   snarlbark: MOBS[VINE_LASHER_ID]?.thorns,
 } as const;
@@ -81,6 +96,21 @@ export const HUNT_TUNING = {
 /** The aura a fallen Basin Raptor leaves on its pack (mob/lifecycle.ts
  *  frenzyPackmates; a refreshable buff_haste). */
 export const RAPTOR_PACK_FRENZY_AURA = 'pack_frenzy';
+
+/** The gesture a raptor flying into its Pack Frenzy plays (its Screech clip;
+ *  a key of its look's attackByAbility, never a sim ability id). */
+export const RAPTOR_FRENZY_GESTURE = 'wildheart_raptor_frenzy';
+
+/** The gesture a freshly planted Sunbone totem rises out of the ground with
+ *  (its Rise clip, the look's entranceGesture), offered for this many seconds
+ *  after the totem is first seen so a view built a little late still rises. */
+export const TOTEM_RISE_GESTURE = 'wildheart_totem_rise';
+export const TOTEM_RISE_WINDOW = 0.5;
+
+/** Is this template one of the Totem-Binder's totems? */
+export function isSunboneTotem(templateId: string): boolean {
+  return templateId === SUNBONE_TOTEM_ID || templateId === SUNBONE_DREAD_TOTEM_ID;
+}
 
 /** The name the Snarlvine Lasher's thorns carry on their damage event. */
 export const SNARLBARK_ABILITY = HUNT_TUNING.snarlbark?.name ?? 'Snarlbark';
@@ -190,7 +220,8 @@ export const TRASH_CAST_CLIPS: Readonly<Record<string, TrashCastClip>> = {
   [WILDHEART_QUARRY_MARK]: { clip: 'Attack', clipSeconds: 2, fitToBar: true },
   [WILDHEART_WAR_ROAR]: { clip: 'Cast', clipSeconds: 5.38, fitToBar: false },
   [WILDHEART_TOAD_HEX]: { clip: 'Cast', clipSeconds: 5.38, fitToBar: false },
-  [WILDHEART_SNARING_TONGUE]: { clip: 'Duck', clipSeconds: 1.67, fitToBar: true },
+  // The Spore Toad's own Tongue clip: its jaws fly open on the bar's end.
+  [WILDHEART_SNARING_TONGUE]: { clip: 'Tongue', clipSeconds: TOAD_CLIP.tongueFire, fitToBar: true },
 };
 
 /** The bar (seconds) of a hunt cast, from its template. */
@@ -201,6 +232,7 @@ export function trashCastSeconds(castId: string): number {
   if (castId === WILDHEART_TOAD_HEX) return t.hex?.castTime ?? 0;
   if (castId === WILDHEART_RATTLING_DREAD) return t.dread?.castTime ?? 0;
   if (castId === WILDHEART_SNARING_TONGUE) return t.tongue?.castTime ?? 0;
+  if (castId === WILDHEART_PLANT_TOTEM) return t.totems?.castTime ?? 0;
   return 0;
 }
 
@@ -218,14 +250,14 @@ export function trashCastClipRate(castId: string): number {
  *  wildheart_creature_looks.ts: each rig's height times its grow; pinned
  *  against VISUALS in the test). */
 export const TRASH_BODY_HEIGHT: Readonly<Record<string, number>> = {
-  // mob_spearjaw (1.8) grown 1.25.
-  [BASIN_RAPTOR_ID]: 2.25,
+  // Its Blender body at its authored size (basin_trash_model_core.ts).
+  [BASIN_RAPTOR_ID]: trashLookHeight(RAPTOR_MODEL, RAPTOR_SIM_SCALE),
   [STALKER_ID]: 2.5,
   [RAVAGER_ID]: 2.7,
   [HEXCALLER_ID]: 2.5,
-  // mob_murloc's frog (1.7) grown 1.1.
-  [SPORE_TOAD_ID]: 1.87,
-  [SUNBONE_DREAD_TOTEM_ID]: 4,
+  [SPORE_TOAD_ID]: trashLookHeight(TOAD_MODEL, TOAD_SIM_SCALE),
+  [SUNBONE_DREAD_TOTEM_ID]: trashLookHeight(DREAD_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  [SUNBONE_TOTEM_ID]: trashLookHeight(SUN_TOTEM_MODEL, TOTEM_SIM_SCALE),
 };
 /** A player's drawn height (yards at scale 1). */
 const PLAYER_HEIGHT = 2.6;
@@ -235,10 +267,12 @@ export function trashBodyHeight(templateId: string, scale: number): number {
   return (TRASH_BODY_HEIGHT[templateId] ?? PLAYER_HEIGHT) * (scale > 0 ? scale : 1);
 }
 
-/** The Spore Toad's mouth on its frog rig, as shares of its drawn height
- *  (measured off frog.glb: the eyes sit at 0.92 of the height, 0.14 forward;
- *  the mouth just under them). */
-export const TOAD_MOUTH = { up: 0.8, forward: 0.17 } as const;
+/** The Spore Toad's mouth on its Blender body at the tongue's release, as
+ *  shares of its drawn height (basin_trash_model_core.ts TOAD_MODEL). */
+export const TOAD_MOUTH = {
+  up: TOAD_MODEL.mouth.up / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin),
+  forward: TOAD_MODEL.mouth.forward / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin),
+} as const;
 
 /** Where the tongue leaves the toad's mouth, written into `out`. */
 export function toadMouthInto(

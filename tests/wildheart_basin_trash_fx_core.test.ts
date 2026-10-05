@@ -35,6 +35,7 @@ import {
   trashPullCensuses,
   trashShockLook,
 } from '../src/render/wildheart_basin/basin_trash_fx_core';
+import { TOAD_CLIP } from '../src/render/wildheart_basin/basin_trash_model_core';
 import { WILDHEART_BASIN_PACKS, WILDHEART_BASIN_SPAWNS } from '../src/sim/content/wildheart';
 import { MOBS } from '../src/sim/data';
 import {
@@ -204,15 +205,13 @@ describe('the hunt bodies and clips', () => {
     }
   });
 
-  it('gives the Dread Totem its own look on the Sunbone Totem body', () => {
+  it('gives the Dread Totem its own body beside the Sunbone Totem', () => {
     const key = WILDHEART_MOB_KEYS[SUNBONE_DREAD_TOTEM_ID];
     expect(key).toBe('wildheart_sunbone_dread_totem');
     const dread = VISUALS[key];
     const totem = VISUALS.wildheart_sunbone_totem;
-    expect(dread?.url).toBe(totem?.url);
-    expect(dread?.tint).toBeTypeOf('number');
-    expect(dread?.tint).not.toBe(totem?.tint);
-    expect(dread?.selfIllumination ?? 0).toBeGreaterThan(totem?.selfIllumination ?? 0);
+    expect(dread?.url).not.toBe(totem?.url);
+    expect(dread?.clips.castByAbility?.[WILDHEART_RATTLING_DREAD]).toBe('Rattle');
   });
 
   it('plays each hunt cast on an existing clip, fitted to the sim bar', () => {
@@ -235,7 +234,7 @@ describe('the hunt bodies and clips', () => {
     const tongue = hunt(SPORE_TOAD_ID)?.tongue;
     expect(trashCastClipRate(WILDHEART_QUARRY_MARK)).toBeCloseTo(2 / (mark?.castTime ?? 0), 6);
     expect(trashCastClipRate(WILDHEART_SNARING_TONGUE)).toBeCloseTo(
-      1.67 / (tongue?.castTime ?? 0),
+      TOAD_CLIP.tongueFire / (tongue?.castTime ?? 0),
       6,
     );
     expect(trashCastClipRate(WILDHEART_WAR_ROAR)).toBe(1);

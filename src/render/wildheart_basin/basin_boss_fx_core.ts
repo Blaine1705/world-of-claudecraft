@@ -39,6 +39,7 @@ import {
 } from '../../sim/encounters/wildheart_basin/ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { BASIN_ACCENTS } from './basin_fx_core';
+import { BEASTMASTER_MODEL, BEASTMASTER_SIM_SCALE } from './basin_trash_model_core';
 import { gorgebloomTopPerScale } from './gorgebloom_model_core';
 import { SPROUT_MODEL, SPROUT_SIM_SCALE } from './lasher_model_core';
 import type { CrownSpec, RippleSpec } from './saurian_fx_core';
@@ -194,7 +195,8 @@ export function chargeLook(fill: number, t: number): { alpha: number; spin: numb
 /** Drawn height per unit of sim scale (characters/manifest.ts and
  *  wildheart_creature_looks.ts: the base rig's height times its grow). */
 export const BOSS_BODY_HEIGHT: Readonly<Record<string, number>> = {
-  [BEASTMASTER_ID]: 3,
+  // His Blender body (basin_trash_model_core.ts), drawn at its authored 6.3 yd.
+  [BEASTMASTER_ID]: (BEASTMASTER_MODEL.idleTop - BEASTMASTER_MODEL.idleMin) / BEASTMASTER_SIM_SCALE,
   [FANGLORD_JAGUAR_ID]: 1.92,
   // Its Blender body to the top of the raised petal (gorgebloom_model_core.ts).
   [GORGEBLOOM_ID]: gorgebloomTopPerScale(),

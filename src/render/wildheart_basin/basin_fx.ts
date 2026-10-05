@@ -27,6 +27,9 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
+  BEAST_CALL_OF_THE_HUNT,
+  BEAST_THICKHIDE_WARD,
+  BEASTMASTER_ID,
   BLOOM_GORGE,
   BLOOM_POLLINATE,
   BLOOM_SEED_RAIN,
@@ -423,7 +426,7 @@ export class WildheartFx {
     );
     // The three bosses: built under this root before the gated attach.
     this.boss = world ? new BasinBossFx(this.bossHost(), world) : null;
-    this.trash = world ? new BasinTrashFx(this.bossHost(), world) : null;
+    this.trash = world ? new BasinTrashFx(this.bossHost(), world, playGesture) : null;
     this.saurian = world ? new SaurianFx(this.bossHost(), world, playGesture) : null;
     this.lasher = new LasherFx(this.bossHost());
     const boss = this.boss;
@@ -562,6 +565,8 @@ export class WildheartFx {
         this.gorgebloom?.handleEvent(ev, src);
         return this.boss?.handleEvent(ev, src) ?? false;
       case WILDHEART_TOTEM_PULSE: {
+        // The totem's own flare (its Pulse clip) under the ring.
+        this.playGesture?.(src.id, WILDHEART_TOTEM_PULSE);
         this.ring('pulse', x, z, 0xb8e070);
         this.puff(x, gy + 1.5, z, 10, {
           speed: 1.2,
@@ -590,6 +595,17 @@ export class WildheartFx {
       case WILDHEART_POUNCE:
         this.trails.set(src.id, this.clock + POUNCE_TRAIL_SECONDS);
         return false;
+      case BEAST_CALL_OF_THE_HUNT:
+      case BEAST_THICKHIDE_WARD:
+        // The Beastmaster's own roar and ward (his WarCry and Ward clips), then
+        // the bursts as before.
+        if (src.templateId === BEASTMASTER_ID) {
+          const gesture =
+            ev.ability === BEAST_CALL_OF_THE_HUNT ? BEAST_CALL_OF_THE_HUNT : BEAST_THICKHIDE_WARD;
+          this.playGesture?.(src.id, gesture);
+        }
+        this.avatar?.handleEvent(ev);
+        return this.boss?.handleEvent(ev, src) ?? false;
       default:
         this.avatar?.handleEvent(ev);
         return this.boss?.handleEvent(ev, src) ?? false;
