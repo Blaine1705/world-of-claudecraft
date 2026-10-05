@@ -555,7 +555,8 @@ export function tickMarrow(
   }
   // The stride takes him off his target's heels, so the AI may read him as
   // walking home for a tick: the Toll keeps the fight alive until it is rung.
-  if (!engaged && !st?.toll) {
+  // A wipe ends it at once (nobody left standing: no Toll into an empty yard).
+  if (!engaged && !(st?.toll && claimPlayers(ctx, inst).length > 0)) {
     if (st) resetMarrow(ctx, inst, boss);
     return;
   }

@@ -325,7 +325,7 @@ export function tickIlvane(
     if (st) concludeIlvane(ctx, inst, boss, st);
     return;
   }
-  if (!engaged && !st?.organ) {
+  if (!engaged && !(st?.organ && claimPlayers(ctx, inst).length > 0)) {
     if (st) resetIlvane(ctx, inst, boss);
     return;
   }

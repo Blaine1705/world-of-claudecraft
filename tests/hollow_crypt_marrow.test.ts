@@ -302,6 +302,24 @@ describe('Sexton Marrow: the wipe', () => {
     expect(aura(f.others[1], MARROW_MEASURED)).toBeUndefined();
     expect(marrow.damageImmune).toBe(false);
   });
+
+  it('a wipe mid-Toll ends it: no Toll lands and no dead rise into the empty yard', () => {
+    const { f, marrow } = marrowFight();
+    const keep = holdAll(f);
+    run(f, DT, keep);
+    const st = marrow.cryptBossFight;
+    if (st?.kind !== 'marrow') throw new Error('no fight');
+    st.marks.push({ playerId: f.others[0].id, remaining: DT });
+    run(f, DT * 2, keep);
+    marrow.hp = Math.floor(marrow.maxHp * 0.65);
+    run(f, DT * 2, keep);
+    expect(st.toll).not.toBeNull();
+    for (const p of [f.tank, ...f.others]) f.sim.ctx.handleDeath(p, marrow);
+    run(f, T.tollStrideMax + T.tollRing + 1);
+    expect(marrow.cryptBossFight).toBeUndefined();
+    expect(live(f, MARROW_BONES_ID)).toHaveLength(0);
+    expect(marrow.damageImmune).toBe(false);
+  });
 });
 
 describe('Sexton Marrow: determinism', () => {
