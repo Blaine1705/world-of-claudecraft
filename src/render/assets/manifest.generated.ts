@@ -509,6 +509,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/wild_boar.glb": "/media/models/creatures/wild_boar.de4e128ddd96.glb",
   "models/creatures/wildheart_basin_raptor.glb": "/media/models/creatures/wildheart_basin_raptor.7a0bdf97e105.glb",
   "models/creatures/wildheart_beastmaster.glb": "/media/models/creatures/wildheart_beastmaster.399c39ab6c95.glb",
+  "models/creatures/wildheart_beastmaster_blender.glb": "/media/models/creatures/wildheart_beastmaster_blender.8eba2421ee8b.glb",
   "models/creatures/wildheart_beastmaster_hit_variety_anims.glb": "/media/models/creatures/wildheart_beastmaster_hit_variety_anims.3fe1bb737abd.glb",
   "models/creatures/wildheart_gorgebloom.glb": "/media/models/creatures/wildheart_gorgebloom.855fb2dbd103.glb",
   "models/creatures/wildheart_great_jaguar.glb": "/media/models/creatures/wildheart_great_jaguar.d5b816ebc918.glb",

@@ -27,6 +27,9 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
+  BEAST_CALL_OF_THE_HUNT,
+  BEAST_THICKHIDE_WARD,
+  BEASTMASTER_ID,
   BLOOM_GORGE,
   BLOOM_POLLINATE,
   BLOOM_SEED_RAIN,
@@ -592,6 +595,17 @@ export class WildheartFx {
       case WILDHEART_POUNCE:
         this.trails.set(src.id, this.clock + POUNCE_TRAIL_SECONDS);
         return false;
+      case BEAST_CALL_OF_THE_HUNT:
+      case BEAST_THICKHIDE_WARD:
+        // The Beastmaster's own roar and ward (his WarCry and Ward clips), then
+        // the bursts as before.
+        if (src.templateId === BEASTMASTER_ID) {
+          const gesture =
+            ev.ability === BEAST_CALL_OF_THE_HUNT ? BEAST_CALL_OF_THE_HUNT : BEAST_THICKHIDE_WARD;
+          this.playGesture?.(src.id, gesture);
+        }
+        this.avatar?.handleEvent(ev);
+        return this.boss?.handleEvent(ev, src) ?? false;
       default:
         this.avatar?.handleEvent(ev);
         return this.boss?.handleEvent(ev, src) ?? false;

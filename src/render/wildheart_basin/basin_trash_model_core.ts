@@ -139,6 +139,36 @@ export const BINDER_CLIP = {
   jab: 0.48,
 } as const;
 
+/** The Fanglord Beastmaster's sim scale (sim/content/wildheart.ts). */
+export const BEASTMASTER_SIM_SCALE = 2.35;
+
+/** The Fanglord Beastmaster (scripts/assets/wildheart_beastmaster, the
+ *  Binder's troll body built bigger, scaled 1.12 at the end): a scarred troll
+ *  under a jaguar-head hood, the pelt for a cloak, the Beastspear in his fist. */
+export const BEASTMASTER_MODEL = {
+  url: 'models/creatures/wildheart_beastmaster_blender.glb',
+  /** The Idle pose's skinned bounds: the soles to the hood's ears. */
+  idleMin: 0,
+  idleTop: 6.295,
+  walkRef: 1.792,
+  runRef: 7.074,
+} as const;
+
+export const BEASTMASTER_CLIP = {
+  /** Quake (the Beast Pit Quake's 1.5 s bar, played from its start at 1x):
+   *  the spear and his foot strike the pit floor at 1.50. */
+  quakeStrike: 1.5,
+  /** WarCry (Call of the Hunt, a gesture off its spellfx): the roar peaks at
+   *  0.50. Ward (Thickhide Ward): the spear points at his jaguar at 0.55. */
+  warCryPeak: 0.5,
+  wardPoint: 0.55,
+} as const;
+
+/** The Quake rate over the Beast Pit Quake bar (its strike on the bar's end). */
+export function beastmasterQuakeRate(bar: number): number {
+  return bar > 0 ? BEASTMASTER_CLIP.quakeStrike / bar : 1;
+}
+
 /** The PlantTotem rate over the Plant Totem bar (its strike on the bar's end). */
 export function binderPlantRate(bar: number): number {
   return bar > 0 ? BINDER_CLIP.plantStrike / bar : 1;

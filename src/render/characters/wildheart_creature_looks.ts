@@ -17,7 +17,10 @@
 import { MOBS } from '../../sim/data';
 import {
   BASIN_RAPTOR_ID,
+  BEAST_CALL_OF_THE_HUNT,
   BEAST_HEEL,
+  BEAST_PIT_QUAKE,
+  BEAST_THICKHIDE_WARD,
   BEAST_TUNING,
   BLOOM_GORGE,
   BLOOM_POLLINATE,
@@ -48,8 +51,11 @@ import {
   trashCastSeconds,
 } from '../wildheart_basin/basin_trash_fx_core';
 import {
+  BEASTMASTER_MODEL,
+  BEASTMASTER_SIM_SCALE,
   BINDER_MODEL,
   BINDER_SIM_SCALE,
+  beastmasterQuakeRate,
   binderPlantRate,
   DREAD_TOTEM_MODEL,
   dreadRattleRate,
@@ -414,6 +420,45 @@ export const WILDHEART_TOTEM_BINDER_LOOK: VisualDef = {
   clickRadius: 1.4,
 };
 
+/** The Fanglord Beastmaster (scripts/assets/wildheart_beastmaster, built in
+ *  Blender on the Totem-Binder's troll body, bigger): a scarred jungle troll
+ *  under a jaguar-head hood, the pelt hanging down his back as a cloak and its
+ *  forelegs knotted across his chest, bone pauldrons, the Beastspear in his
+ *  fist. 6.3 yd to the hood's ears at his 2.35, a head over his jaguar. The
+ *  Beast Pit Quake plays Quake over its bar (the spear and his stamp strike the
+ *  pit floor on its end); Call of the Hunt and Thickhide Ward play WarCry and
+ *  Ward (gestures off their spellfx, basin_fx.ts). */
+export const WILDHEART_BEASTMASTER_LOOK: VisualDef = {
+  url: BEASTMASTER_MODEL.url,
+  height: trashLookHeight(BEASTMASTER_MODEL, BEASTMASTER_SIM_SCALE),
+  hover: trashLookHover(BEASTMASTER_MODEL, BEASTMASTER_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    combatIdle: 'CombatIdle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Attack', 'Attack2'],
+    attackByAbility: { [BEAST_CALL_OF_THE_HUNT]: 'WarCry', [BEAST_THICKHIDE_WARD]: 'Ward' },
+    attackTimeScaleByAbility: { [BEAST_CALL_OF_THE_HUNT]: 1, [BEAST_THICKHIDE_WARD]: 1 },
+    hit: ['Hit'],
+    death: 'Death',
+    cast: 'Cast',
+    castByAbility: { [BEAST_PIT_QUAKE]: 'Quake' },
+    castTimeScaleByAbility: { [BEAST_PIT_QUAKE]: beastmasterQuakeRate(BEAST_TUNING.quakeCast) },
+    castPlayOut: ['Quake'],
+    flourish: 'WarCry',
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  oneShotsHoldAttacks: ['WarCry', 'Ward'],
+  walkRef: BEASTMASTER_MODEL.walkRef,
+  runRef: BEASTMASTER_MODEL.runRef,
+  attackTimeScale: 1.1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.8,
+};
+
 /** A totem never walks: its gaits stand creaking in place. */
 const TOTEM_CLIPS: ClipMap = {
   idle: 'Idle',
@@ -608,6 +653,8 @@ export function wildheartPlaceholderLooks(
     clickRadius: 1.4,
   };
   out.wildheart_totem_binder = WILDHEART_TOTEM_BINDER_LOOK;
+  // The Fanglord Beastmaster trades his shipped body for his Blender one.
+  out.mob_wildheart_beastmaster = WILDHEART_BEASTMASTER_LOOK;
   out.wildheart_sunbone_totem = WILDHEART_SUNBONE_TOTEM_LOOK;
   out.wildheart_sunbone_dread_totem = WILDHEART_SUNBONE_DREAD_TOTEM_LOOK;
   return out;

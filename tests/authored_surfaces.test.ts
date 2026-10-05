@@ -86,7 +86,6 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mob_spider_egg_sac',
   'mob_tolling_bell',
   'mob_training_dummy',
-  'mob_wildheart_beastmaster',
   'mob_wildheart_hexcaller',
   'mob_wildheart_high_priest',
   'mob_wildheart_ravager',
@@ -236,9 +235,11 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_basin_raptor',
   // the Blender Spore Toad (scripts/assets/wildheart_spore_toad) and the Toad Hex's toad on it
   'wildheart_spore_toad',
+  'form_toad',
   // the Blender Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder)
   'wildheart_totem_binder',
-  'form_toad',
+  // the Fanglord Beastmaster's Blender body (scripts/assets/wildheart_beastmaster)
+  'mob_wildheart_beastmaster',
   'wildheart_sunbone_totem',
   // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',
