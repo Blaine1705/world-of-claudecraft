@@ -25,7 +25,7 @@
 // allocation.
 
 import * as THREE from 'three';
-import { SOUL_BRAZIER_ID } from '../../sim/encounters/gravewyrm_sanctum/ids';
+import { BONEWALKER_ID, SOUL_BRAZIER_ID } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import {
   SANCTUM_BRANDING_IRON,
   SANCTUM_COUNTERWEIGHT_LASH,
@@ -40,6 +40,8 @@ import { BRAZIER_TOPPLED_GESTURE } from '../characters/sanctum_creature_looks';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { surfaceMat } from '../gfx';
 import {
+  BONEWALKER_RISE_GESTURE,
+  bonewalkerRises,
   ERUPTION_SECONDS,
   eruption,
   FLAME_HEAT,
@@ -288,6 +290,8 @@ export class SanctumKitFx {
   private readonly tmpA = new THREE.Vector3();
   private readonly tmpB = new THREE.Vector3();
   private readonly up = new THREE.Vector3(0, 1, 0);
+  /** When each Raised Bonewalker was first seen (its rise is offered then). */
+  private readonly walkersSeen = new Map<number, number>();
   private clock = 0;
 
   constructor(
@@ -744,8 +748,10 @@ export class SanctumKitFx {
 
   // ------------------------------------------------------------------- scans
 
-  /** A mob seen by the scan: claim its Thaw or Branding Iron tether. */
+  /** A mob seen by the scan: offer a fresh Bonewalker its rise, and claim a
+   *  Thaw or Branding Iron tether. */
   scanMob(e: Entity): void {
+    if (e.templateId === BONEWALKER_ID) this.offerRise(e);
     if (e.dead) return;
     const cast = e.castingAbility;
     if (cast !== SANCTUM_THAW_THE_HELD && cast !== SANCTUM_BRANDING_IRON) return;
@@ -754,6 +760,21 @@ export class SanctumKitFx {
     if (!t) return;
     t.casterId = e.id;
     t.castId = cast;
+  }
+
+  /** A Raised Bonewalker climbing out of the ice: its Thaw is offered for the
+   *  first moment after it is seen (the rig plays it once per entity). */
+  private offerRise(e: Entity): void {
+    let seen = this.walkersSeen.get(e.id);
+    if (seen === undefined) {
+      seen = this.clock;
+      this.walkersSeen.set(e.id, seen);
+      // Forget the bodies that left the world (bounded by the live walkers).
+      for (const id of this.walkersSeen.keys())
+        if (!this.world.entities.has(id)) this.walkersSeen.delete(id);
+    }
+    if (bonewalkerRises(e.templateId, e.dead, this.clock - seen))
+      this.host.gesture(e.id, BONEWALKER_RISE_GESTURE);
   }
 
   // ------------------------------------------------------------------- frame

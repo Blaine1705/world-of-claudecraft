@@ -472,6 +472,26 @@ export const SHARD_GRAVITY = 22;
 /** Seconds a fallen shard lies on the ice before it melts away. */
 export const SHARD_REST = 1.6;
 
+// ---- the risen dead ---------------------------------------------------------------
+
+/** The gesture that plays a Raised Bonewalker's Thaw (its entrance: the
+ *  soldier climbs out of the ice, crouched, and straightens into its guard). */
+export const BONEWALKER_RISE_GESTURE = 'sanctum_bonewalker_rise';
+/** Seconds after a Bonewalker is first seen that its rise is still offered. */
+export const BONEWALKER_RISE_WINDOW = 1;
+
+/** True while a freshly seen Raised Bonewalker (a Thaw the Held corpse, or one
+ *  of Velkhar's adds) should be offered its rise: alive, and within the window
+ *  since it was first seen. The rig plays it once per entity; one first seen
+ *  later (walked into range mid-fight) simply stands there. */
+export function bonewalkerRises(
+  templateId: string | undefined,
+  dead: boolean,
+  sinceFirstSeen: number,
+): boolean {
+  return templateId === BONEWALKER_ID && !dead && sinceFirstSeen <= BONEWALKER_RISE_WINDOW;
+}
+
 // ---- the bodies' drawn sizes ---------------------------------------------------------
 
 /** The height each Sanctum body is DRAWN at, in yards, at its template's sim

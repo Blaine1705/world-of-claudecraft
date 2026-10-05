@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "556813425866e7ce5d06c2412300f7d017c7e2aa3d856e0b7321be76d15f1fdf",
+  "rendererFingerprint": "b72827d802c322b2b7f96c9df8908d5c4c066a35bc22b292d2c76ece098de1a5",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5495562,
-      "sha256": "4d3f94b8d38bb181140f79870646bc7fb39f03bbe566c453c2b0f0487d23db82",
+      "bytes": 5504806,
+      "sha256": "469c1ca8a0479b6877977de3dc57b7757625f191610474e72595b4efa46e4b93",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5482,8 +5482,8 @@
         "model": {
           "url": "models/creatures/knight_commander_olen.glb",
           "path": "public/models/creatures/knight_commander_olen.glb",
-          "bytes": 3127608,
-          "sha256": "05bf8bd00cf7bf8bd088bfce2a0620a625cc6d64403dd2ff32da6fb9b8e73bbe"
+          "bytes": 3375088,
+          "sha256": "197e7e234cc275964473dbfd1aa9d78f8e94e22197eae2592fd3afe072ce4602"
         },
         "idle": "Idle",
         "height": 7.4,
@@ -5500,11 +5500,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8ba688d8c10365d72ac8ce704754c228deef93c720d37d40d34966923c35ebff",
+      "sourceFingerprint": "541b9e0f7c6cb5f816994a114dcae9eb9ccc6d8cc8ed20ff76deb15e4c672f42",
       "output": {
         "path": "public/ui/mobs/knight_commander_olen.webp",
-        "bytes": 2346,
-        "sha256": "c920bc26c5a76cd02d521e1e13a887b21ff6e5dbf4441367d7ecddd8d7acdb20"
+        "bytes": 2356,
+        "sha256": "fd93c134e6e63d650ebbd92b05cea39aea641029e8c37cffe8359f606751b4d6"
       }
     },
     {
@@ -7297,10 +7297,10 @@
       "visualKey": "sanctum_raised_bonewalker",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_frost_revenant.glb",
-          "path": "public/models/creatures/hoard_frost_revenant.glb",
-          "bytes": 2579768,
-          "sha256": "de8ccda356e5ed496c9cd9393393a59a249779280eb8e9071fa4bc5e80e96a04"
+          "url": "models/creatures/sanctum_raised_bonewalker.glb",
+          "path": "public/models/creatures/sanctum_raised_bonewalker.glb",
+          "bytes": 2673492,
+          "sha256": "4a83c58b9507c68e91f431eeb5bfd24835462809249d1899f90a2592e740a760"
         },
         "idle": "Idle",
         "height": 3.7,
@@ -7309,19 +7309,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#aebdb4",
-        "resolved": "#aebdb4",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "3be7a80cad46b39e8e0ecad0cdb9d0139c42900a8f80c7ae44b498531e23b4ee",
+      "sourceFingerprint": "cb77a564fa1dc66b589659ec5bc17e661cc51586b715abb39fa3608a1785912a",
       "output": {
         "path": "public/ui/mobs/raised_bonewalker.webp",
-        "bytes": 2256,
-        "sha256": "4aa045272023ac7d8359c7446cbe47f2bc38edbf1151a8d00802bc6d4b22ddd0"
+        "bytes": 2660,
+        "sha256": "600c9d14934d4efc80a7bf15d2023824ee869260583ae771747fc7f5d1a10694"
       }
     },
     {
@@ -8947,10 +8947,10 @@
       "visualKey": "sanctum_boneguard",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_frost_revenant.glb",
-          "path": "public/models/creatures/hoard_frost_revenant.glb",
-          "bytes": 2579768,
-          "sha256": "de8ccda356e5ed496c9cd9393393a59a249779280eb8e9071fa4bc5e80e96a04"
+          "url": "models/creatures/sanctum_boneguard.glb",
+          "path": "public/models/creatures/sanctum_boneguard.glb",
+          "bytes": 2802012,
+          "sha256": "f5b2f800686188740ffa9eda94e7efcadf5f918b0929d2c291485c3176bdf10f"
         },
         "idle": "Idle",
         "height": 4,
@@ -8959,19 +8959,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.42
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#c4d3dc",
-        "resolved": "#c4d3dc",
-        "strength": 0.42
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "95197d805672845f77c1cadb499071d2cf876e3f8189447df380406f84fdd503",
+      "sourceFingerprint": "10406e38e1d0ec058b9f77b0123653e7deccd38b4dbd31085263eae59464f611",
       "output": {
         "path": "public/ui/mobs/sanctum_boneguard.webp",
-        "bytes": 2268,
-        "sha256": "894e1abfaea8ee1bfe78a5cc280d213614504103b1bf48cb624698fe14065cab"
+        "bytes": 2588,
+        "sha256": "4b04728c992a2b31e379a8de26a1e610426f8e19bbfe486d981403b15839eeb4"
       }
     },
     {

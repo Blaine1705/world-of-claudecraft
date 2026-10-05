@@ -2,9 +2,10 @@
 // gravewyrm_sanctum.md section 5, the Ice Tomb of the Wyrm). The Sledge Tusker
 // wears its own Blender body (SANCTUM_SLEDGE_TUSKER_LOOK; its sledge is a
 // separate prop the fx module drives, gravewyrm_sanctum_fx/tusker_fx.ts). The
-// rest of the new trash are PLACEHOLDERS: shipped rigs re-tinted for the ice
-// and the cult's fires, so every creature of the rebuilt route is visible and
-// animated from day one, until the art phase gives each its own body. Every
+// trash with their own Blender bodies are sanctum_trash_looks.ts's; the rest
+// are PLACEHOLDERS: shipped rigs re-tinted for the ice and the cult's fires,
+// so every creature of the rebuilt route is visible and animated from day one,
+// until the art phase gives each its own body. Every
 // key keeps the mob id and the visual key, so a swap is a def change.
 // manifest.ts merges these over its VISUALS and maps the templates through
 // MOB_KEYS (SANCTUM_MOB_KEYS).
@@ -43,6 +44,7 @@ import {
   tuskerModelScale,
 } from '../gravewyrm_sanctum_fx/tusker_model_core';
 import type { ClipMap, VisualDef } from './manifest';
+import { SANCTUM_TRASH_LOOKS } from './sanctum_trash_looks';
 
 /** The gestures the Sanctum's fx send the Tusker (tusker_fx.ts): the pull's
  *  Unhitch (its clip drops the traces and the hitch bar), the Charge down the
@@ -140,17 +142,6 @@ const STATIC_PROP_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Sanctum Boneguard: one of the held dead thawed out, a pale soldier in old
-  // plate (the plated revenant rig, washed rime-grey; no bare skeleton).
-  sanctum_boneguard: [
-    BONEGUARD_ID,
-    ['mob_hoard_frost_revenant', 0xc4d3dc, 0.42, { selfIllumination: 0.14 }],
-  ],
-  // Raised Bonewalker (Velkhar's adds): the same thawed dead, a size smaller.
-  sanctum_raised_bonewalker: [
-    BONEWALKER_ID,
-    ['mob_hoard_frost_revenant', 0xaebdb4, 0.4, { selfIllumination: 0.1 }],
-  ],
   // Sanctum Scaleguard: Korzul's wyrm rig, the drowned brood, meltwater-dark
   // (the fx drip meltwater off it).
   sanctum_scaleguard: [
@@ -228,6 +219,8 @@ export function sanctumCreatureLooks(
   visuals: Readonly<Record<string, VisualDef>>,
 ): Record<string, VisualDef> {
   const out: Record<string, VisualDef> = {};
+  // The trash that have their own Blender bodies (sanctum_trash_looks.ts).
+  Object.assign(out, SANCTUM_TRASH_LOOKS);
   for (const [key, [mobId, [base, tint, tintStrength, extra]]] of Object.entries(ROWS)) {
     const def = visuals[base];
     if (!def) continue;

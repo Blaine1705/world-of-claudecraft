@@ -1,0 +1,24 @@
+# Gravewyrm Sanctum trash: sculpted Blender builders
+
+The Ice Tomb's trash bodies, sculpted whole (signed-distance fields meshed through
+OpenVDB, decimated, weighted from the sculpt's own primitives, Cycles-baked to one
+atlas), replacing the re-tinted placeholder rigs (`src/render/characters/
+sanctum_creature_looks.ts`; the shipped looks are `sanctum_trash_looks.ts`). Offline
+authoring tooling: nothing here runs in the build or the game.
+
+- `kit/`: the shared sculpt kit (the Balgath / Korgath kit: SDF primitives and CSG,
+  body-hugging plate layers, the biped rig and IK pose language, clip writer, bake
+  surfaces, `review.py` renders and objective clip gates, `reclip.py` to re-key the
+  clips on a baked .blend without re-baking, `ship.mjs` meshopt + KTX2 optimizer,
+  `deliver.sh` the delivery pack). Each builder finds it at `../../kit`.
+- `boneguard/`: the Sanctum Boneguard (`public/models/creatures/sanctum_boneguard.glb`)
+  and its Raised Bonewalker variant (`--variant bonewalker`,
+  `sanctum_raised_bonewalker.glb`): one rig and ten clips, Thaw the entrance.
+
+Build (Blender 5.2, absolute output paths; keep one Blender job at a time):
+
+    blender -b --factory-startup --python <builder>/build.py -- <abs>/<key>_raw.glb \
+      --bake 2048 --tex <abs>/tex --blend <abs>/<key>.blend --stats <abs>/stats.json
+
+`--nobake` (and a coarse `--voxel`) gives a clay look for review. Ship with
+`KTX_BIN=<KTX-Software bin> node kit/ship.mjs <raw glb> <out glb>`.
