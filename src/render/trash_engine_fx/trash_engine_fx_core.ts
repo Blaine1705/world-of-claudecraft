@@ -73,7 +73,9 @@ export function buildEngineCatalog(kits: Iterable<TrashKitDef>): EngineCatalog {
   };
   for (const kit of kits) {
     if (kit.breathPool) put(hazards, kit.breathPool.hazard.objectTemplate, kit.breathPool.hazard);
-    if (kit.usable) {
+    // A topple's beats and spill are this layer's; a relight (the Hollow
+    // Crypt's Remembrance Candles) is drawn by its dungeon's own painter.
+    if (kit.usable?.effect.kind === 'topple') {
       put(uses, kit.usable.castId, kit.usable);
       put(hazards, kit.usable.effect.hazard.objectTemplate, kit.usable.effect.hazard);
     }

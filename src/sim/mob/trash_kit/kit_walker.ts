@@ -139,13 +139,19 @@ function empower(ctx: SimContext, def: KitWalkerDef, sourceId: number, onto: Ent
     if (orb) ctx.applyHeal(orb, onto, Math.round(onto.maxHp * heal), def.name, def.castId, false);
   }
   if (def.empower.damagePct <= 0) return;
+  // A stacking arming (empower.maxStacks) adds one to what the ally carries.
+  const cap = def.empower.maxStacks ?? 0;
+  const had = cap > 0 ? onto.auras.find((a) => a.id === def.empower.auraId) : undefined;
+  const stacks = cap > 0 ? Math.min(cap, (had?.stacks ?? 0) + 1) : undefined;
+  if (had) onto.auras = onto.auras.filter((a) => a !== had);
   ctx.applyAura(onto, {
     id: def.empower.auraId,
     name: def.empower.name,
     kind: 'buff_dmg_done',
     remaining: def.empower.seconds,
     duration: def.empower.seconds,
-    value: def.empower.damagePct,
+    value: def.empower.damagePct * (stacks ?? 1),
+    ...(stacks !== undefined ? { stacks } : {}),
     sourceId,
     school: def.school,
   });

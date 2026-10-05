@@ -5641,6 +5641,7 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_marrow_tidy',
   'dgn_lady_nobody_hanging',
   'dgn_ilvane_hush',
+  'dgn_morthen_candlelight',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

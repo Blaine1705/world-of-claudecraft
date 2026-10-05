@@ -365,6 +365,10 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       sexton_marrow: 4.93,
       rimeweb: 5.3,
       cantor_ilvane: 4.6,
+      // Morthen the Gravecaller (encounters/hollow_crypt/morthen.ts): 150 s with
+      // his immune Rite, about 125 s of damage at 55 (level 10): about 6,800 on
+      // his 1,191 template pool.
+      morthen: 5.7,
     },
     damageMultiplierByMob: {},
   },
@@ -543,6 +547,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       rimeweb: 12,
       cantor_ilvane: 10.4,
       hollow_chorister: 1.9,
+      // Morthen: about 125 s of damage at about 230 beside his immune Rite
+      // (about 28,800 on his 2,074 level-22 template pool).
+      morthen: 13.9,
     },
     // Avoidable trash mechanics priced apart from the tank-swing floor (the
     // dungeon trash pass's balance audit): the necromancer's Grave Rupture
@@ -561,6 +568,11 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       sexton_marrow: 6,
       rimeweb: 5,
       cantor_ilvane: 8,
+      // Morthen at 9 (hollow_crypt.md 5.4): Shadow Pulse 216 to 270 (about 19
+      // percent, avoidable), a soul taken about 10, Grave Chill 27 a second
+      // rising by 9 every 5 s, the Reap 495 to 585 (about 43, the tank's), a
+      // wrong candle about 22, Grasp of the Grave about 16 and a root.
+      morthen: 9,
     },
     armorMultiplier: 1.3,
     finalBossId: 'morthen',

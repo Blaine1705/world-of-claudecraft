@@ -16,8 +16,8 @@ let templates: Set<string> | null = null;
 
 function addKit(out: Set<string>, kit: TrashKitDef | undefined): void {
   if (!kit) return;
-  const hazard = kit.usable?.effect.hazard.objectTemplate;
-  if (hazard) out.add(hazard);
+  const use = kit.usable?.effect;
+  if (use?.kind === 'topple') out.add(use.hazard.objectTemplate);
   const pool = kit.breathPool?.hazard.objectTemplate;
   if (pool) out.add(pool);
   const orb = kit.walker?.objectTemplate;

@@ -158,8 +158,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 339 / 3745 with the Drowned Temple lore guide's The Last Verse (+10).
     // 342 / 3775 with the Hollow Crypt wing bosses' three encounter deeds
     // (renown 10 each: +30).
-    expect(DEED_ORDER.length).toBe(342);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3775);
+    // 343 / 3785 with Morthen's By Candlelight (+10).
+    expect(DEED_ORDER.length).toBe(343);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3785);
   });
 
   it('ships the audited per-category counts', () => {
@@ -189,7 +190,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +5 the Gravewyrm Sanctum rework's encounter deeds.
       // +1 the Drowned Temple lore guide's The Last Verse.
       // +3 the Hollow Crypt wing bosses' encounter deeds.
-      dungeon: 59,
+      // +1 Morthen's By Candlelight.
+      dungeon: 60,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -458,6 +460,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_marrow_tidy',
       'dgn_lady_nobody_hanging',
       'dgn_ilvane_hush',
+      // Morthen the Gravecaller's Rite (morthen.ts).
+      'dgn_morthen_candlelight',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1119,7 +1123,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // (dgn_marrow_tidy, dgn_lady_nobody_hanging, dgn_ilvane_hush) the same
   // auditable way: the 1dbf9b9c... literal rotated down into
   // PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = '4086f07cf3dd8af91aa9518d0720a1a40b5ddf9dd11ddb45a1a805a22b90d62f';
+  // Re-baselined for Morthen's By Candlelight (dgn_morthen_candlelight) the
+  // same way: the 4086f07c... literal rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = '6543bfaba262d838425a264029db1e772344b344b803663588c8248d591ce75e';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1210,15 +1216,14 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // previous mint was the 668cf4cb... literal.
   //
   // The Hollow Crypt wing bosses' three deeds append after
-  // dgn_drowned_temple_cantor; the previous mint is the 1dbf9b9c... literal
-  // (rotated down here), and stripping the three must reproduce it exactly.
+  // dgn_drowned_temple_cantor; the previous mint was the 1dbf9b9c... literal.
+  //
+  // Morthen's By Candlelight appends after dgn_ilvane_hush; the previous mint
+  // is the 4086f07c... literal (rotated down here), and stripping it must
+  // reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '1dbf9b9c77910e4d5c0d58592d5a418e017fbfe900f9898b494f1d6a1ac31222';
-  const APPENDED_SINCE: readonly string[] = [
-    'dgn_marrow_tidy',
-    'dgn_lady_nobody_hanging',
-    'dgn_ilvane_hush',
-  ];
+    '4086f07cf3dd8af91aa9518d0720a1a40b5ddf9dd11ddb45a1a805a22b90d62f';
+  const APPENDED_SINCE: readonly string[] = ['dgn_morthen_candlelight'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1230,8 +1235,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_sledge_tusker',
-      'dgn_drowned_temple_cantor',
+      'dgn_lady_nobody_hanging',
+      'dgn_ilvane_hush',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1456,7 +1461,8 @@ describe('table shape', () => {
     // then the Knellwyrm and the Gaol Turnkey, then the Wildheart Basin's
     // four and the Gravewyrm Sanctum's five, the Sledge Tusker's last.
     // The Drowned Temple lore guide's The Last Verse appends after it.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_ilvane_hush');
+    // Morthen's By Candlelight appends after the wing bosses' three.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_morthen_candlelight');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

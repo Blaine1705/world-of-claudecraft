@@ -17,6 +17,7 @@ export {
   claimPlayers,
   clearCastIf,
   dropAuraById,
+  dropEncounterBody,
   dropEncounterObject,
   grantClaimDeed,
   heavySwing,

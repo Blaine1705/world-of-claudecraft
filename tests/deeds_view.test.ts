@@ -877,15 +877,17 @@ describe('real catalog integration', () => {
     // 287 with the Buried Hoards Coinsack catch (cmb_coinsack_caught, visible).
     // 306 with the five-dungeon rework's 19 encounter deeds (all visible, none
     // feat or hidden). 307 with the Drowned Temple lore guide's The Last
-    // Verse; 310 with the Hollow Crypt wing bosses' three encounter deeds.
-    expect(view.summary.visibleTotal).toBe(310);
+    // Verse; 310 with the Hollow Crypt wing bosses' three encounter deeds;
+    // 311 with Morthen's By Candlelight.
+    expect(view.summary.visibleTotal).toBe(311);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
     // from visibleTotal): 268 + 22 = 290, then 298, 305, 307 and 308 by the same
     // four appends, then 309 with the Buried Hoards Coinsack catch, then 328
     // with the five-dungeon rework's 19 encounter deeds.
-    // 329 with The Last Verse, 332 with the Hollow Crypt wing bosses' three.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(332);
+    // 329 with The Last Verse, 332 with the Hollow Crypt wing bosses' three,
+    // 333 with Morthen's By Candlelight.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(333);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

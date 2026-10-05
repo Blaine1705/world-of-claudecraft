@@ -696,8 +696,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 338 with the five-dungeon rework's 19 encounter deeds, all on the
     // pending side on the deed_cat_dungeon crest. 339 with the Drowned
     // Temple lore guide's The Last Verse and 342 with the Hollow Crypt wing
-    // bosses' three, all on the pending side on the same crest.
-    expect(DEED_ORDER).toHaveLength(342);
+    // bosses' three, all on the pending side on the same crest. 343 with
+    // Morthen's By Candlelight, pending on the same crest.
+    expect(DEED_ORDER).toHaveLength(343);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

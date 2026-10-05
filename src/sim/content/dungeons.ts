@@ -602,7 +602,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 26,
     moveSpeed: 7,
     aggroRadius: 16,
-    aoePulse: { min: 12, max: 18, radius: 12, every: 10, name: 'Shadow Pulse' },
+    // His whole kit is the Rite Ring encounter module (encounters/hollow_crypt/
+    // morthen.ts): the telegraphed Shadow Pulse, Gravecall, the Rite of the
+    // Unquiet and its candles, Reap the Unquiet; nothing on the template but
+    // his melee (the old untelegraphed aoePulse is gone).
     loot: [
       { copper: 2500, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
       {

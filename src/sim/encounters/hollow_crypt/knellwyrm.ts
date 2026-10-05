@@ -21,6 +21,9 @@
 //   Dread Bellow  a 2 s roar: everyone close is thrown back and hurt, and its
 //                 ribs lie bared for 8 s (it takes 25 percent more damage):
 //                 the damage window. Do not stand with a burning lane behind.
+//   Heroic        Burning Knell (knellwyrm_knell.ts): it takes flight over the
+//                 ring, marks half of it and breathes its ghost fire over that
+//                 half, three times, then lands.
 //
 // Deterministic: victims are hashed (kitHash), fixed DT countdowns; the only
 // rng draws are damage rolls, in claim-player order. Every visible state rides
@@ -75,6 +78,7 @@ import {
   strafeLane,
   wyrmArrivalPose,
 } from './ids';
+import { endKnell, tickKnell } from './knellwyrm_knell';
 import { dropAura, holdForEntrance, markAura, releaseFromEntrance } from './morthen_rise';
 
 const T = KNELLWYRM_TUNING;
@@ -492,6 +496,7 @@ export function resetKnellwyrm(ctx: SimContext, inst: InstanceSlot, wyrm: Entity
   const st = wyrm.knellwyrmFight;
   if (st) for (const lane of st.lanes) dropEncounterObject(ctx, inst, lane.objectId);
   if (st?.strafe) dropEncounterObject(ctx, inst, st.strafe.objectId);
+  if (st?.knell) endKnell(ctx, inst, wyrm, st);
   for (const id of [KNELLWYRM_PYRE_STRAFE, KNELLWYRM_STRAFE_RUN, KNELLWYRM_DREAD_BELLOW])
     clearCastOf(wyrm, id);
   dropAura(wyrm, KNELLWYRM_BARED_RIBS);
@@ -509,6 +514,7 @@ function concludeKnellwyrm(ctx: SimContext, inst: InstanceSlot, wyrm: Entity): v
   const st = wyrm.knellwyrmFight;
   if (st) for (const lane of st.lanes) dropEncounterObject(ctx, inst, lane.objectId);
   if (st?.strafe) dropEncounterObject(ctx, inst, st.strafe.objectId);
+  if (st?.knell) endKnell(ctx, inst, wyrm, st);
   wyrm.knellwyrmFight = undefined;
   if (st && !st.burned) grantClaimDeed(ctx, inst, KNELLWYRM_DEED);
 }
@@ -522,6 +528,8 @@ export function tickKnellwyrm(ctx: SimContext, inst: InstanceSlot, wyrm: Entity)
   if (!wyrm.knellwyrmFight) wyrm.knellwyrmFight = freshFight();
   const st = wyrm.knellwyrmFight;
   stepLanes(ctx, inst, wyrm, st);
+  // Heroic: a Burning Knell in flight owns it (its other clocks wait).
+  if (tickKnell(ctx, inst, wyrm, st)) return;
   if (stepStrafe(ctx, inst, wyrm, st)) return;
   if (wyrm.castingAbility === KNELLWYRM_DREAD_BELLOW) {
     wyrm.castRemaining = Math.max(0, wyrm.castRemaining - DT);

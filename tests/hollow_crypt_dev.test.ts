@@ -49,6 +49,40 @@ describe('/dev crypt', () => {
     expect(lady.hp / lady.maxHp).toBeGreaterThan(0.48);
   });
 
+  it('pulls Morthen past his entrance and drives his kit by hand', () => {
+    const { sim, pid, me } = setup();
+    sim.chat('/dev level 20', pid);
+    for (let t = 0; t < 40; t++) sim.tick();
+    sim.chat('/dev crypt pull morthen', pid);
+    const inst = claimedInstanceAt(sim.ctx, me().pos);
+    const m = inst?.mobIds
+      .map((id) => sim.ctx.entities.get(id))
+      .find((e) => e?.templateId === 'morthen');
+    if (!m) throw new Error('no morthen');
+    expect(m.cryptRite?.phase).toBe('risen');
+    expect(m.inCombat).toBe(true);
+    me().maxHp = 1e7;
+    me().hp = 1e7;
+    for (let t = 0; t < 40; t++) sim.tick();
+    expect(m.cryptBossFight?.kind).toBe('morthen');
+    sim.chat('/dev crypt trigger rite', pid);
+    expect(m.damageImmune).toBe(true);
+    const candles = () =>
+      inst?.objectIds.filter((id) =>
+        sim.ctx.entities.get(id)?.templateId.startsWith('crypt_rite_candle'),
+      ).length;
+    expect(candles()).toBe(4);
+    for (let i = 0; i < 4; i++) {
+      for (let t = 0; t < 40; t++) sim.tick();
+      sim.chat('/dev crypt trigger candle', pid);
+    }
+    sim.tick();
+    expect(m.cryptBossFight?.kind === 'morthen' && m.cryptBossFight.act).toBe('broken');
+    for (let t = 0; t < 40; t++) sim.tick();
+    sim.chat('/dev crypt hp 34', pid);
+    expect(m.hp / m.maxHp).toBeLessThan(0.35);
+  });
+
   it('teleports to every named area on walkable ground inside the run', () => {
     const { sim, pid, me } = setup();
     for (const [area, spot] of Object.entries(HOLLOW_CRYPT_DEV_AREAS)) {

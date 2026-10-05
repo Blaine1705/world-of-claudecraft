@@ -19,6 +19,7 @@ import { inLane } from '../../mob/trash_kit/lane';
 import { ILVANE_OBJECT_TEMPLATES } from './ilvane_ids';
 import { LADY_OBJECT_TEMPLATES } from './lady_ids';
 import { MARROW_OBJECT_TEMPLATES } from './marrow_ids';
+import { MORTHEN_OBJECT_TEMPLATES } from './morthen_ids';
 
 export const MORTHEN_ID = 'morthen';
 export const KNELLWYRM_ID = 'crypt_knellwyrm';
@@ -46,6 +47,9 @@ export function isEntombed(e: { auras?: readonly { id: string }[] }): boolean {
 }
 /** Held by the rite through the entrance: untouchable (a cinematic, not a fight). */
 export const CRYPT_GRAVE_ASCENSION = 'crypt_grave_ascension';
+/** The Knellwyrm on the wing over the ring (heroic Burning Knell): out of
+ *  reach, nobody's target. */
+export const KNELLWYRM_AIRBORNE = 'crypt_knellwyrm_airborne';
 /** The Knellwyrm's ribs bared after Dread Bellow: it takes more damage. */
 export const KNELLWYRM_BARED_RIBS = 'crypt_knellwyrm_bared_ribs';
 
@@ -58,10 +62,22 @@ export const KNELLWYRM_PYRE_STRAFE = 'crypt_knellwyrm_pyre_strafe';
 export const KNELLWYRM_STRAFE_RUN = 'crypt_knellwyrm_strafe_run';
 /** The roar that throws the close back and bares its ribs. */
 export const KNELLWYRM_DREAD_BELLOW = 'crypt_knellwyrm_dread_bellow';
+// Heroic Burning Knell (knellwyrm_knell.ts): it takes wing over the ring, marks
+// half of it, breathes its ghost fire over that half, again, then lands.
+/** It takes wing to hang over the ring's centre. */
+export const KNELLWYRM_KNELL_RISE = 'crypt_knellwyrm_knell_rise';
+/** A half of the ring is marked (the bar to get out of it). */
+export const KNELLWYRM_KNELL_MARK = 'crypt_knellwyrm_knell_mark';
+/** The ghost fire poured over the marked half. */
+export const KNELLWYRM_KNELL_BREATH = 'crypt_knellwyrm_knell_breath';
+/** It comes back down where it took wing. */
+export const KNELLWYRM_KNELL_LAND = 'crypt_knellwyrm_knell_land';
 
 // ---- spellfx ability ids (presentation cues, never casts) --------------------------------
 export const MORTHEN_LANDING = 'crypt_morthen_landing';
 export const KNELLWYRM_TOUCHDOWN = 'crypt_knellwyrm_touchdown';
+/** Burning Knell: the fire lands on the marked half (on the wyrm). */
+export const KNELLWYRM_KNELL_FIRE = 'crypt_knellwyrm_knell_fire';
 
 // ---- encounter object templates (the state rides the template id) ------------------------
 /** The ritual circle bursting into ghost fire: the Knellwyrm's warning. */
@@ -71,6 +87,11 @@ export const KNELL_PYRE_TEMPLATE = 'crypt_knell_pyre';
 export const KNELL_LANE_MARK_TEMPLATE = 'crypt_knell_lane_mark';
 /** A lane of the ring left burning by Pyre Strafe. */
 export const KNELL_LANE_TEMPLATE = 'crypt_knell_fire_lane';
+/** Heroic Burning Knell: the marked half of the ring (`facing` the half's
+ *  direction from the ring's centre, `scale` its radius); the same object
+ *  swaps to the fire template as the breath lands. */
+export const KNELL_HALF_MARK_TEMPLATE = 'crypt_knell_half_mark';
+export const KNELL_HALF_FIRE_TEMPLATE = 'crypt_knell_half_fire';
 
 /** Every Hollow Crypt encounter object template (the renderer draws them
  *  itself): the finale's, Sexton Marrow's graves, the Lady's lanterns and ice
@@ -79,10 +100,13 @@ export const CRYPT_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   KNELL_PYRE_TEMPLATE,
   KNELL_LANE_MARK_TEMPLATE,
   KNELL_LANE_TEMPLATE,
+  KNELL_HALF_MARK_TEMPLATE,
+  KNELL_HALF_FIRE_TEMPLATE,
   ...CRYPT_TRASH_OBJECT_TEMPLATES,
   ...MARROW_OBJECT_TEMPLATES,
   ...LADY_OBJECT_TEMPLATES,
   ...ILVANE_OBJECT_TEMPLATES,
+  ...MORTHEN_OBJECT_TEMPLATES,
 ]);
 
 // ---- tuning -------------------------------------------------------------------------------
@@ -111,10 +135,10 @@ export const MORTHEN_RISE_TUNING = {
   engageRange: 60,
 } as const;
 
-/** Morthen's Last Rites (hollow_crypt.md 5.4, phase 3) begin at this fraction
- *  of his health. Today it only drives the presentation (the bell staff unfolds
- *  into his scythe: src/render/hollow_crypt/morthen_fx_core.ts); the phase's
- *  mechanics are still to be designed and will key on the same line. */
+/** Morthen's Last Rites (hollow_crypt.md 5.4, act 3) begin at this fraction
+ *  of his health: the bell staff unfolds into his scythe (the presentation,
+ *  src/render/hollow_crypt/morthen_fx_core.ts) and Reap the Unquiet begins
+ *  (morthen.ts; morthen_ids.ts MORTHEN_TUNING.lastRitesAt is this line). */
 export const MORTHEN_LAST_RITES_FRACTION = 0.35;
 
 /** Total seconds from the rite waking to the fight. */
@@ -253,4 +277,47 @@ export function wyrmArrivalPose(k: number): { x: number; z: number; up: number; 
     // Facing the way it flies (toward the ring), then onto the stair.
     yaw: Math.atan2(-dirX, -dirZ),
   };
+}
+
+// ---- heroic Burning Knell ------------------------------------------------------------------
+// Numbers: the fire on the marked half is the long-telegraphed wipe check of the
+// heroic finale (hollow_crypt.md 5.4): 50 to 56 at the wyrm's heroic mechanic
+// multiplier (the transform's 20) is 1,000 to 1,120, 80 to 90 percent of heroic
+// cloth (about 1,250), behind a 4.5 s mark a player crosses from the far rim.
+export const KNELL_TUNING = {
+  /** Seconds into its fight before the first flight, and between flights. */
+  first: 30,
+  every: 55,
+  /** The climb to the hover over the ring's centre, and how high it hangs. */
+  riseSeconds: 2.5,
+  height: 16,
+  /** Halves breathed each flight. */
+  breaths: 3,
+  /** The marked half's bar (the time to get out of it). */
+  markSeconds: 4.5,
+  /** The pour (the fire lands as it begins; the rest is the flames). */
+  breathSeconds: 1.4,
+  /** The glide back down to where it took wing. */
+  landSeconds: 2.5,
+  /** The fire's reach from the ring's centre (the whole ring floor and its rim). */
+  reach: RITE_RING.r + 4,
+  fireMin: 50,
+  fireMax: 56,
+} as const;
+
+/** The yaw (from the ring's centre) a marked half faces: 0 north (+z), 1 east
+ *  (+x), 2 south, 3 west. Pure. */
+export function knellHalfYaw(half: number): number {
+  return (((half % 4) + 4) % 4) * (Math.PI / 2);
+}
+
+/** Is the instance-local point (px, pz) inside marked half `half` of the Rite
+ *  Ring (within the fire's reach of the centre, on the half's side of the
+ *  diameter across it)? Pure. */
+export function inKnellHalf(half: number, px: number, pz: number): boolean {
+  const dx = px - RITE_RING.x;
+  const dz = pz - RITE_RING.z;
+  if (Math.hypot(dx, dz) > KNELL_TUNING.reach) return false;
+  const yaw = knellHalfYaw(half);
+  return dx * Math.sin(yaw) + dz * Math.cos(yaw) >= 0;
 }

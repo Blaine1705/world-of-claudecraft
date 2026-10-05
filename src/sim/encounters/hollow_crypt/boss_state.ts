@@ -1,8 +1,10 @@
-// Per-fight state of the Hollow Crypt's wing bosses (encounters/hollow_crypt:
-// Sexton Marrow, the Lady of the Bonechill, Cantor Ilvane), on the boss entity
-// (Entity.cryptBossFight); cleared when the fight ends (a kill, an evade, a
-// wipe). Sim authority only: the client reads the fight from casts, auras and
-// the encounter objects. A type-only leaf, imported by src/sim/types.ts.
+// Per-fight state of the Hollow Crypt's bosses (encounters/hollow_crypt:
+// Sexton Marrow, the Lady of the Bonechill, Cantor Ilvane, Morthen the
+// Gravecaller), on the boss entity (Entity.cryptBossFight), and the
+// Knellwyrm's heroic Burning Knell (KnellwyrmFightState.knell); cleared when
+// the fight ends (a kill, an evade, a wipe). Sim authority only: the client
+// reads the fight from casts, auras and the encounter objects. A type-only
+// leaf, imported by src/sim/types.ts.
 
 /** Sexton Marrow's fight (marrow.ts). */
 export interface MarrowFightState {
@@ -107,4 +109,73 @@ export interface IlvaneFightState {
   struck: boolean;
 }
 
-export type CryptBossFightState = MarrowFightState | LadyFightState | IlvaneFightState;
+/** Morthen the Gravecaller's fight (morthen.ts, morthen_gravecall.ts,
+ *  morthen_candles.ts, morthen_grasp.ts). */
+export interface MorthenFightState {
+  kind: 'morthen';
+  /** The Calling (act 1, and again after the Rite), the Rite of the Unquiet
+   *  (act 2, immune), the Rite Broken (the stun), his Last Rites (act 3). */
+  act: 'calling' | 'rite' | 'broken' | 'last_rites';
+  /** Seconds into the current act. */
+  t: number;
+  /** Seconds since the pull (the deed's clock). */
+  fightT: number;
+  pulseTimer: number;
+  soulTimer: number;
+  reapTimer: number;
+  graspTimer: number;
+  /** Bound Souls sent so far (the next alcove, clockwise). */
+  souls: number;
+  /** Mechanic casts started (the deterministic victim hash salt). */
+  casts: number;
+  /** The bar running (his own cast) and its locked aim, else null. */
+  bar: { what: 'pulse' | 'reap'; yaw: number } | null;
+  /** The Rite has come (it never comes twice in one fight). */
+  riteDone: boolean;
+  /** Through the Rite: still gliding back to the altar. */
+  striding: boolean;
+  /** Seconds to the next Grave Chill (one a second through the Rite). */
+  chillTick: number;
+  /** The four Remembrance Candles (RITE_CANDLE_SPOTS order) from the Rite on:
+   *  their object (the look), the usable body while dark (null once lit) and
+   *  whether they burn. */
+  candles: { objectId: number; bodyId: number | null; lit: boolean }[];
+  /** Heroic Name the Dead: the order the Ledger names (candle indices). */
+  order: number[];
+  /** Candles lit, in the order they caught (a snuffed one leaves the list). */
+  litOrder: number[];
+  /** Players channelling a relight: the drains already taken and the bar's
+   *  elapsed seconds when last seen (a smaller one is a new channel). */
+  channels: { playerId: number; drains: number; seen: number }[];
+  /** fightT when the ward rose (the deed's clock), and whether all four were
+   *  relit in time (By Candlelight). */
+  riteAt: number;
+  candlelight: boolean;
+  /** Heroic Grasp of the Grave: the rings on the floor (instance-local), the
+   *  seconds each has run, and whether its hands have erupted. */
+  grasps: { objectId: number; x: number; z: number; t: number; erupted: boolean }[];
+}
+
+export type CryptBossFightState =
+  | MarrowFightState
+  | LadyFightState
+  | IlvaneFightState
+  | MorthenFightState;
+
+/** The Knellwyrm's heroic Burning Knell (knellwyrm_knell.ts): it takes flight
+ *  over the Rite Ring, marks half the ring, breathes its ghost fire over that
+ *  half, again and again, then lands. */
+export interface KnellwyrmKnellState {
+  phase: 'rise' | 'mark' | 'breath' | 'land';
+  /** Seconds into the phase. */
+  t: number;
+  /** Halves breathed so far this flight. */
+  breaths: number;
+  /** The marked half: the compass quarter it faces (0 north, 1 east, 2 south,
+   *  3 west) and its encounter object, while one is marked. */
+  half: number;
+  objectId: number | null;
+  /** Where it took wing from (instance-local), to glide up from and back to. */
+  fromX: number;
+  fromZ: number;
+}

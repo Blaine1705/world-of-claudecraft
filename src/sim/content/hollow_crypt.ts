@@ -225,6 +225,51 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
     color: 0x6fd6a8,
     xpMult: 0.5,
   },
+  // A Remembrance Candle guttered by Morthen's Rite of the Unquiet
+  // (encounters/hollow_crypt/morthen_candles.ts): the encounter sets one at the
+  // foot of each candle pillar while the Rite holds and takes it away once the
+  // candle burns again. Never hostile, never fights (the encounter holds it:
+  // nothing can strike it); a player targets it and presses interact to
+  // relight the candle, the G3 use (mob/trash_kit/encounter_use.ts): a 4 s
+  // channel a landed hit does NOT break (holdsThroughHits), while the Rite
+  // drains the lighter's health every second of it (the healer heals them
+  // through); a step, a stun or death breaks it. Its literals are
+  // morthen_ids.ts MORTHEN_CANDLE_ID and MORTHEN_RELIGHT_CAST (pinned by
+  // tests/hollow_crypt_morthen.test.ts). No body is drawn: the pillar is the
+  // kit's, the flame the crypt's own painter.
+  crypt_remembrance_candle: {
+    id: 'crypt_remembrance_candle',
+    name: 'Remembrance Candle',
+    minLevel: 10,
+    maxLevel: 10,
+    family: 'elemental',
+    untameable: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 50,
+    hpPerLevel: 0,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 30,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    idleStationary: true,
+    xpMult: 0,
+    trashKit: {
+      usable: {
+        castId: 'kituse_crypt_relight_candle',
+        name: 'Relight the Candle',
+        channel: 4,
+        range: 4,
+        holdsThroughHits: true,
+        effect: { kind: 'relight', school: 'holy' },
+      },
+    },
+    loot: [],
+    scale: 1,
+    color: 0xd8f5c8,
+  },
   // Sexton Marrow's dead: every Open Grave gives one up at his Burial Toll
   // (encounters/hollow_crypt/marrow.ts), and on heroic a player lingering in
   // a grave stirs one. A summoned add (the heroic add multiplier prices it):

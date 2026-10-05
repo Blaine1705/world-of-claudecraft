@@ -41,6 +41,7 @@ import { isKillParticipant, killParticipationPos } from '../loot/kill_participat
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import { kitUseHoldsThroughHits } from '../mob/trash_kit/encounter_use';
 import { oathShare } from '../mob/trash_kit/temple_choir';
 import {
   NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
@@ -1284,9 +1285,12 @@ export function dealDamage(
       // arm at all). Spell pushback keeps the classic kind gate below: only
       // an unblocked, unabsorbed hit pushes a cast back, exactly as before
       // this arm widened. The Demon Heal channel is deliberately NOT folded
-      // in: it takes the normal channel pushback below, as today.
-      if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
-      else if (
+      // in: it takes the normal channel pushback below, as today. A G3 use
+      // that holds through hits (the Remembrance Candle's draining relight,
+      // mob/trash_kit/encounter_use.ts) is the one non-spell cast a hit spares.
+      if (isNonSpellCast(target.castingAbility)) {
+        if (!kitUseHoldsThroughHits(ctx, target)) ctx.cancelCast(target);
+      } else if (
         amount > 0 &&
         kind === 'hit' &&
         !ignoresDamagePushback(ctx, target, target.castingAbility)

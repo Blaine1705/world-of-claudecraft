@@ -3823,6 +3823,16 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'manual' },
   },
+  // Morthen the Gravecaller's Rite (encounters/hollow_crypt/morthen.ts), granted
+  // to everyone in the claim at the kill. Cosmetic only; appended at the END.
+  dgn_morthen_candlelight: {
+    id: 'dgn_morthen_candlelight',
+    name: 'By Candlelight',
+    desc: 'Defeat Morthen the Gravecaller after relighting all four Remembrance Candles within 20 seconds of his Unquiet Ward rising.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {
