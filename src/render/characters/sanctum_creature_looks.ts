@@ -142,12 +142,6 @@ const STATIC_PROP_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Sanctum Scaleguard: Korzul's wyrm rig, the drowned brood, meltwater-dark
-  // (the fx drip meltwater off it).
-  sanctum_scaleguard: [
-    SCALEGUARD_ID,
-    ['mob_dragonkin', 0x9cc8c4, 0.34, { selfIllumination: 0.14 }],
-  ],
   // Broodsworn Thawcaller: a hooded cultist in furs, its soul lantern swung on
   // a crook like a censer on a chain (the mist chanter's first rig, kept as its
   // own file when the Bastion's Mist Chanter got her sculpted body, warmed to

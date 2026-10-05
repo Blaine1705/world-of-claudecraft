@@ -472,6 +472,83 @@ export const SHARD_GRAVITY = 22;
 /** Seconds a fallen shard lies on the ice before it melts away. */
 export const SHARD_REST = 1.6;
 
+// ---- where the bodies' effects come from ---------------------------------------------
+
+/** A point on a body as fractions of its drawn height: [forward, left, up]
+ *  (left = the body's own left, its facing turned a quarter anticlockwise from
+ *  above). The Blender bodies' points are measured on the delivered .blend
+ *  (scripts/assets/gravewyrm_sanctum_trash/kit/probe_anchor.py). */
+export type BodyAnchor = readonly [number, number, number];
+
+/** The named effect sources the Sanctum fx draw from. */
+export type BodyAnchorName =
+  /** Where a breath leaves the jaws as it lands (the Cinder and Rime Breaths). */
+  | 'breath'
+  /** Where the jaws are through a breath's bar (the embers drawn in). */
+  | 'breathDraw'
+  /** The Thawcaller's soul lantern (its censer smoke, the rite's tether). */
+  | 'censer'
+  /** The Goadsmith's red-hot iron tip at rest. */
+  | 'ironTip'
+  /** The iron tip thrust out on a Goad or a Branding Iron (the spark stream). */
+  | 'ironThrust'
+  /** The Pyre-Tender's yoke braziers (mirrored left and right). */
+  | 'yoke';
+
+/** Each body's anchors; a body without a row keeps the generic placement. */
+export const SANCTUM_BODY_ANCHORS: Readonly<
+  Record<BodyAnchorName, Readonly<Record<string, BodyAnchor>>>
+> = {
+  breath: {
+    // The Scaleguard's jaws driven forward and down on the Cinder Breath's end.
+    [SCALEGUARD_ID]: [0.24, 0, 0.64],
+  },
+  breathDraw: {
+    // Its head reared back over the bar, the throat swelling.
+    [SCALEGUARD_ID]: [0.08, 0, 0.88],
+  },
+  censer: {},
+  ironTip: {},
+  ironThrust: {},
+  yoke: {},
+};
+
+/** The generic placement every body had before its own was measured. */
+const DEFAULT_ANCHORS: Readonly<Record<BodyAnchorName, BodyAnchor>> = {
+  breath: [0.3, 0, 0.5],
+  breathDraw: [0.3, 0, 0.5],
+  censer: [0.2, 0, 0.45],
+  ironTip: [0.28, -0.12, 0.55],
+  ironThrust: [0.42, 0, 0.5],
+  yoke: [-0.05, 0.2, 0.76],
+};
+
+/** A body's anchor, or the generic one. */
+export function sanctumAnchor(name: BodyAnchorName, templateId: string): BodyAnchor {
+  return SANCTUM_BODY_ANCHORS[name][templateId] ?? DEFAULT_ANCHORS[name];
+}
+
+/** Where an anchor sits in the world for a body standing at (x, z) on the
+ *  ice at height gy, facing `facing`, drawn `h` tall (`mirror` -1 takes the
+ *  right-hand twin of a left anchor). Writes into `out`, no allocation. */
+export function anchorPoint(
+  a: BodyAnchor,
+  x: number,
+  z: number,
+  gy: number,
+  facing: number,
+  h: number,
+  out: { x: number; y: number; z: number },
+  mirror = 1,
+): void {
+  const fx = Math.sin(facing);
+  const fz = Math.cos(facing);
+  const left = a[1] * mirror;
+  out.x = x + (fx * a[0] + fz * left) * h;
+  out.z = z + (fz * a[0] - fx * left) * h;
+  out.y = gy + a[2] * h;
+}
+
 // ---- the risen dead ---------------------------------------------------------------
 
 /** The gesture that plays a Raised Bonewalker's Thaw (its entrance: the
@@ -501,7 +578,8 @@ export function bonewalkerRises(
 export const SANCTUM_DRAWN_HEIGHTS: Readonly<Record<string, number>> = {
   [BONEGUARD_ID]: 4.6,
   [BONEWALKER_ID]: 3.7,
-  [SCALEGUARD_ID]: 4.4,
+  // To the halberd's spike (the crest at about 4.4).
+  [SCALEGUARD_ID]: 4.7,
   [THAWCALLER_ID]: 4.4,
   [GOADSMITH_ID]: 4.6,
   [PYRE_TENDER_ID]: 4.4,

@@ -40,6 +40,7 @@ import { BRAZIER_TOPPLED_GESTURE } from '../characters/sanctum_creature_looks';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { surfaceMat } from '../gfx';
 import {
+  anchorPoint,
   BONEWALKER_RISE_GESTURE,
   bonewalkerRises,
   ERUPTION_SECONDS,
@@ -49,6 +50,7 @@ import {
   lashSweep,
   rgb,
   SANCTUM_PALETTE,
+  sanctumAnchor,
   sanctumDrawnHeight,
   sanctumTelegraphSpecs,
   toppleTilt,
@@ -630,11 +632,19 @@ export class SanctumKitFx {
     const h = this.host;
     const gy = h.groundY(src.pos.x, src.pos.z);
     const bh = sanctumDrawnHeight(src.templateId, src.scale);
-    const fx = Math.sin(src.facing);
-    const fz = Math.cos(src.facing);
-    const mx = src.pos.x + fx * bh * 0.3;
-    const mz = src.pos.z + fz * bh * 0.3;
-    const my = gy + bh * 0.5;
+    const m = this.tmpA;
+    anchorPoint(
+      sanctumAnchor('breath', src.templateId),
+      src.pos.x,
+      src.pos.z,
+      gy,
+      src.facing,
+      bh,
+      m,
+    );
+    const mx = m.x;
+    const mz = m.z;
+    const my = m.y;
     const n = 26;
     for (let i = 0; i < n; i++) {
       const a = src.facing + (h.rand() * 2 - 1) * this.rimeHalf;
@@ -800,13 +810,15 @@ export class SanctumKitFx {
       }
       const thaw = t.castId === SANCTUM_THAW_THE_HELD;
       const hc = sanctumDrawnHeight(caster.templateId, caster.scale);
-      const fx = Math.sin(caster.facing);
-      const fz = Math.cos(caster.facing);
-      const reach = thaw ? 0.2 : 0.42;
-      const from = this.tmpA.set(
-        caster.pos.x + fx * hc * reach,
-        h.groundY(caster.pos.x, caster.pos.z) + hc * (thaw ? 0.45 : 0.5),
-        caster.pos.z + fz * hc * reach,
+      const from = this.tmpA;
+      anchorPoint(
+        sanctumAnchor(thaw ? 'censer' : 'ironThrust', caster.templateId),
+        caster.pos.x,
+        caster.pos.z,
+        h.groundY(caster.pos.x, caster.pos.z),
+        caster.facing,
+        hc,
+        from,
       );
       const tgy = h.groundY(target.pos.x, target.pos.z);
       // A corpse lies on the ice; a living victim takes it in the chest.

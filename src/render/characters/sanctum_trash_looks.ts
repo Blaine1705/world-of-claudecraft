@@ -11,7 +11,16 @@
 // clip plays it with its contact frame on the bar's end (castClipSync, rate =
 // contact / bar).
 
-import { BONEGUARD_ID, BONEWALKER_ID } from '../../sim/encounters/gravewyrm_sanctum/ids';
+import { MOBS } from '../../sim/data';
+import {
+  BONEGUARD_ID,
+  BONEWALKER_ID,
+  SCALEGUARD_ID,
+} from '../../sim/encounters/gravewyrm_sanctum/ids';
+import {
+  SANCTUM_CINDER_BREATH,
+  SANCTUM_COUNTERWEIGHT_LASH,
+} from '../../sim/mob/trash_kit/sanctum_cast_ids';
 import {
   BONEWALKER_RISE_GESTURE,
   SANCTUM_DRAWN_HEIGHTS,
@@ -20,6 +29,11 @@ import {
 import type { VisualDef } from './manifest';
 
 const CREATURES = 'models/creatures';
+
+/** A clip's play rate that lands its contact frame on a bar's last frame. */
+export function barRate(contact: number, bar: number | undefined): number {
+  return bar && bar > 0 ? contact / bar : 1;
+}
 
 /** One authored body: its Idle bounds height and gaits as built (yards, yd/s). */
 export interface SanctumTrashBody {
@@ -82,6 +96,24 @@ const DEAD_CLIPS = {
   flourish: 'Thaw',
 } as const;
 
+// ---- Sanctum Scaleguard ---------------------------------------------------------------
+
+/** The Sanctum Scaleguard: one of Korzul's drowned brood, upright on digitigrade
+ *  legs, gill fans and a spined crest, embers still glowing in its throat, the
+ *  Smith's iron collar and pauldron, a ringed halberd (52 bones). */
+export const SCALEGUARD_BODY: SanctumTrashBody = {
+  url: `${CREATURES}/sanctum_scaleguard.glb`,
+  idleHeight: 4.7,
+  walkRef: 1.6,
+  runRef: 6.33,
+};
+
+/** Its clips' contact frames (seconds at 1x): the cinders leave the jaws,
+ *  the tail crosses the rear. */
+export const SCALEGUARD_CLIP = { cinderBreath: 2.0, counterweightLash: 1.0 } as const;
+
+const scaleguard = MOBS[SCALEGUARD_ID];
+
 export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
   // 4.6 yd to the helm's peak at its 1.15.
   sanctum_boneguard: {
@@ -106,6 +138,43 @@ export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
     },
     entranceGesture: BONEWALKER_RISE_GESTURE,
     oneShotsHoldAttacks: ['Thaw'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
+  },
+  // 4.7 yd to its halberd's spike at its 1.45 (the crest about 4.4). Both bars
+  // land on their clips' contact: the Cinder Breath's head-drive on the 2 s
+  // bar's end, the Counterweight Lash's tail crossing the cone behind it on
+  // the 1 s bar's end; each plays its follow-through out.
+  sanctum_scaleguard: {
+    ...sized(SCALEGUARD_BODY, SCALEGUARD_ID),
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      castByAbility: {
+        [SANCTUM_CINDER_BREATH]: 'CinderBreath',
+        [SANCTUM_COUNTERWEIGHT_LASH]: 'CounterweightLash',
+      },
+      castTimeScaleByAbility: {
+        [SANCTUM_CINDER_BREATH]: barRate(
+          SCALEGUARD_CLIP.cinderBreath,
+          scaleguard?.breathCone?.castTime,
+        ),
+        [SANCTUM_COUNTERWEIGHT_LASH]: barRate(
+          SCALEGUARD_CLIP.counterweightLash,
+          scaleguard?.trashKit?.tailLash?.castTime,
+        ),
+      },
+      castPlayOut: ['CinderBreath', 'CounterweightLash'],
+    },
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
     attackTimeScale: 1,
     deathTimeScale: 1,
     authoredAtlas: true,

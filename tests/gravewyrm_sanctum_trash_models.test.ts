@@ -9,6 +9,9 @@ import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
   BONEGUARD_BODY,
   BONEWALKER_BODY,
+  barRate,
+  SCALEGUARD_BODY,
+  SCALEGUARD_CLIP,
   trashModelScale,
 } from '../src/render/characters/sanctum_trash_looks';
 import {
@@ -16,8 +19,13 @@ import {
   BONEWALKER_RISE_WINDOW,
   bonewalkerRises,
   SANCTUM_DRAWN_HEIGHTS,
+  sanctumAnchor,
 } from '../src/render/gravewyrm_sanctum_fx/sanctum_fx_core';
 import { MOBS } from '../src/sim/data';
+import {
+  SANCTUM_CINDER_BREATH,
+  SANCTUM_COUNTERWEIGHT_LASH,
+} from '../src/sim/mob/trash_kit/sanctum_cast_ids';
 
 type GlbJson = {
   animations?: { name: string }[];
@@ -117,5 +125,57 @@ describe('the Sanctum Boneguard and the Raised Bonewalker', () => {
     const rite = MOBS.broodsworn_thawcaller?.trashKit?.reanimate;
     expect(rite?.corpses).toEqual(['sanctum_boneguard']);
     expect(rite?.summon).toBe('raised_bonewalker');
+  });
+});
+
+describe('the Sanctum Scaleguard', () => {
+  it('ships its own body with a clip for the breath and the lash', () => {
+    expect(clipsOf(`public/${SCALEGUARD_BODY.url}`)).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'CinderBreath',
+        'CombatIdle',
+        'CounterweightLash',
+        'Death',
+        'Hit',
+        'Idle',
+        'Run',
+        'Walk',
+      ].sort(),
+    );
+    expectShipped(SCALEGUARD_BODY.url);
+    expect(visualOf('sanctum_drakonid').url).toBe(SCALEGUARD_BODY.url);
+    expectDrawnAtRow('sanctum_drakonid');
+    // Drawn to the halberd's spike at its authored size.
+    expect(SANCTUM_DRAWN_HEIGHTS.sanctum_drakonid).toBe(SCALEGUARD_BODY.idleHeight);
+  });
+
+  it("lands both bars on their clips' contact frames and plays them out", () => {
+    const v = visualOf('sanctum_drakonid');
+    const t = MOBS.sanctum_drakonid;
+    expect(v.castClipSync).toBe(true);
+    expect(v.clips.castByAbility?.[SANCTUM_CINDER_BREATH]).toBe('CinderBreath');
+    expect(v.clips.castByAbility?.[SANCTUM_COUNTERWEIGHT_LASH]).toBe('CounterweightLash');
+    expect(t?.breathCone?.castTime).toBe(2);
+    expect(t?.trashKit?.tailLash?.castTime).toBe(1);
+    expect(v.clips.castTimeScaleByAbility?.[SANCTUM_CINDER_BREATH]).toBeCloseTo(
+      SCALEGUARD_CLIP.cinderBreath / 2,
+      9,
+    );
+    expect(v.clips.castTimeScaleByAbility?.[SANCTUM_COUNTERWEIGHT_LASH]).toBeCloseTo(
+      SCALEGUARD_CLIP.counterweightLash / 1,
+      9,
+    );
+    expect(v.clips.castPlayOut).toEqual(['CinderBreath', 'CounterweightLash']);
+    expect(barRate(1, 0)).toBe(1);
+  });
+
+  it('pours the Cinder Breath from its jaws, not its chest', () => {
+    // Measured on the .blend: the jaws at the bar's end, reared over the bar.
+    expect(sanctumAnchor('breath', 'sanctum_drakonid')).toEqual([0.24, 0, 0.64]);
+    expect(sanctumAnchor('breathDraw', 'sanctum_drakonid')[2]).toBeGreaterThan(0.8);
+    // A body without its own row keeps the generic placement.
+    expect(sanctumAnchor('breath', 'no_such_mob')).toEqual([0.3, 0, 0.5]);
   });
 });

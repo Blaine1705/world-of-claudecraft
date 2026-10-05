@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "b72827d802c322b2b7f96c9df8908d5c4c066a35bc22b292d2c76ece098de1a5",
+  "rendererFingerprint": "74735101d6ca7d718fe8c463ca89a8f804ab4cd079a98c2420f87e0f81243c44",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5504806,
-      "sha256": "469c1ca8a0479b6877977de3dc57b7757625f191610474e72595b4efa46e4b93",
+      "bytes": 5504916,
+      "sha256": "cbb7bacb5e3008ed37315901600515d90591355e7bada3b696bbaae00aa6d568",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -8981,31 +8981,31 @@
       "visualKey": "sanctum_scaleguard",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/dragonevolved.glb",
-          "path": "public/models/creatures/dragonevolved.glb",
-          "bytes": 138560,
-          "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
+          "url": "models/creatures/sanctum_scaleguard.glb",
+          "path": "public/models/creatures/sanctum_scaleguard.glb",
+          "bytes": 2516288,
+          "sha256": "14fb543b2f5886811006ac332810f9422c5cd1b8ebdd81a5735d0a23dafc18bb"
         },
-        "idle": "Flying_Idle",
-        "height": 3.03448275862069,
+        "idle": "Idle",
+        "height": 3.241379310344828,
         "yaw": null,
-        "hover": 0.31609195402298856,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.34
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#9cc8c4",
-        "resolved": "#9cc8c4",
-        "strength": 0.34
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "c4ea70e4f36953500cba02f728746d5b5b33a1b95ece64aa6d0fbdd6324f2531",
+      "sourceFingerprint": "4ec890e505c7effb1ec09bfd15c0d8c536284a56021993a56df07324b3f0fd16",
       "output": {
         "path": "public/ui/mobs/sanctum_drakonid.webp",
-        "bytes": 2096,
-        "sha256": "3c24a0c54b9cf61175046a4337112f24214b2c87b3f2cbda0e0d71dd49e5d172"
+        "bytes": 2280,
+        "sha256": "4d71524d468e15221f89909bc624799b36da7f7193530ac500f349b2d71b7170"
       }
     },
     {

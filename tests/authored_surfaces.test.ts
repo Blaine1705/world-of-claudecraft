@@ -236,6 +236,7 @@ const AUTHORED_ATLAS_DEFS = [
   // the Gravewyrm Sanctum trash's Blender bodies (sanctum_trash_looks.ts)
   'sanctum_boneguard',
   'sanctum_raised_bonewalker',
+  'sanctum_scaleguard',
   'wildheart_great_saurian',
   'wildheart_gorgebloom',
   'wildheart_vine_lasher',
