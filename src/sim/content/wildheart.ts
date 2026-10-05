@@ -587,7 +587,8 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       },
       // The trash mechanics pass: it swells and its tongue shoots down a
       // 22 yd lane at someone at least 8 yd off; whoever stands in it is
-      // struck and reeled to its mouth (into its spores, when it is low).
+      // struck and reeled to its mouth at 14 yd/s, twice a run, so the drag
+      // reads for about a second (into its spores, when it is low).
       // Step out sideways; it cannot be kicked.
       wildheart: {
         tongue: {
@@ -602,7 +603,7 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
           minRange: 8,
           min: 60,
           max: 75,
-          reel: 24,
+          reel: 14,
           stop: 2.5,
         },
       },
