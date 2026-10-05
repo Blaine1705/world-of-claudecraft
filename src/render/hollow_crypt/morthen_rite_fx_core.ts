@@ -415,3 +415,52 @@ export function remembranceRampGlsl(): string {
   });
   return `vec3 ghostRamp(float h) {\n${lines.join('\n')}\n  return c;\n}\n`;
 }
+
+// ---- the crag top ---------------------------------------------------------------------------
+
+/** How far under the ring floor a spot still counts as the crag top (the sim's
+ *  own band for the Knell: KNELL_TUNING.floorBand). The Choir Loft and the
+ *  Bone Stair lie inside the fire's reach on the map but far under the rim:
+ *  nothing of the fight paints them or the cliff face. */
+export const CRAG_FLOOR_BAND = KNELL_TUNING.floorBand;
+
+/** Is a floor height `gy` on the crag top whose floor is `refY`? */
+export function onCragFloor(gy: number, refY: number, band = CRAG_FLOOR_BAND): boolean {
+  return gy >= refY - band;
+}
+
+/**
+ * How far from (cx, cz) along the unit direction (dx, dz) the crag top runs
+ * before its floor drops more than `band` under `refY` (the rim), capped at
+ * `maxR`: a coarse march then a bisection, so a telegraph draped out to it
+ * stops on the rim instead of draping down the cliff onto the floor below.
+ */
+export function cragRimRadius(
+  groundY: (x: number, z: number) => number,
+  cx: number,
+  cz: number,
+  dx: number,
+  dz: number,
+  refY: number,
+  maxR: number,
+  band = CRAG_FLOOR_BAND,
+  step = 0.75,
+): number {
+  let inside = 0;
+  for (let r = step; r < maxR + step; r += step) {
+    const rr = Math.min(r, maxR);
+    if (!onCragFloor(groundY(cx + dx * rr, cz + dz * rr), refY, band)) {
+      let lo = inside;
+      let hi = rr;
+      for (let k = 0; k < 6; k++) {
+        const mid = (lo + hi) / 2;
+        if (onCragFloor(groundY(cx + dx * mid, cz + dz * mid), refY, band)) lo = mid;
+        else hi = mid;
+      }
+      return lo;
+    }
+    inside = rr;
+    if (rr >= maxR) break;
+  }
+  return maxR;
+}

@@ -29,9 +29,16 @@ import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { type TelegraphFan, telegraphFillOf } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import {
+  type CragDrapeMemo,
+  cragDrapeMemo,
+  drapeFanOnCrag,
+  resetCragDrape,
+} from './crag_fan_drape';
 import { anchorWorld, coneSpot, DRAKE_JAWS_EXHALE } from './crypt_creature_fx_core';
 import { GHOST_RAMP } from './crypt_fx_particles';
 import {
+  cragRimRadius,
   KNELL_GESTURE_POUR,
   KNELL_GESTURE_SKY_ROAR,
   KNELL_SCORCH_SEC,
@@ -39,6 +46,7 @@ import {
   knellMarkLook,
   knellScorch,
   MORTHEN_TELEGRAPHS,
+  onCragFloor,
 } from './morthen_rite_fx_core';
 import type { RiteFxHost, RitePainter } from './morthen_rite_host';
 
@@ -137,6 +145,10 @@ interface HalfSlot {
   flames: number;
   torrent: number;
   scorch: Scorch;
+  /** The ring floor under the half's centre: only the crag top within the
+   *  sim's band of it ever burns (the Choir Loft below the rim never). */
+  floor: number;
+  memo: CragDrapeMemo;
 }
 
 export class KnellFx implements RitePainter {
@@ -183,6 +195,8 @@ export class KnellFx implements RitePainter {
         flames: 0,
         torrent: 0,
         scorch: { mesh, mat, born: -1e6, alive: false },
+        floor: 0,
+        memo: cragDrapeMemo(),
       });
     }
   }
@@ -211,6 +225,8 @@ export class KnellFx implements RitePainter {
     slot.z = e.pos.z;
     slot.yaw = e.facing;
     slot.reach = e.scale || KNELL_TUNING.reach;
+    slot.floor = this.h.groundY(slot.x, slot.z);
+    resetCragDrape(slot.memo);
     slot.fan.group.visible = true;
     return slot;
   }
@@ -236,6 +252,7 @@ export class KnellFx implements RitePainter {
       const x = s.x + spot.x * c + spot.z * sn;
       const z = s.z - spot.x * sn + spot.z * c;
       const gy = h.groundY(x, z);
+      if (!onCragFloor(gy, s.floor)) continue;
       {
         const ps = h.ps();
         ps.x = x;
@@ -279,7 +296,8 @@ export class KnellFx implements RitePainter {
       const spot = coneSpot(i * 7 + 3, 28, s.reach * 0.8, 160, 4);
       const x = s.x + spot.x * c + spot.z * sn;
       const z = s.z - spot.x * sn + spot.z * c;
-      h.flash(x, h.groundY(x, z) + 1.5, z, 14, 0.5, 0xd8ffb0);
+      const gy = h.groundY(x, z);
+      if (onCragFloor(gy, s.floor)) h.flash(x, gy + 1.5, z, 14, 0.5, 0xd8ffb0);
     }
     h.shakeAt(s.x, s.z, 0.75);
   }
@@ -289,10 +307,17 @@ export class KnellFx implements RitePainter {
     const sc = s.scorch;
     const pos = sc.mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
     const polar = sc.mesh.geometry.getAttribute('aPolar') as THREE.BufferAttribute;
-    const y0 = h.groundY(s.x, s.z);
+    const y0 = s.floor;
+    // Cut back to the crag top along each spoke (never down the cliff).
+    const rims = new Map<number, number>();
     for (let i = 0; i < pos.count; i++) {
-      const rr = polar.getX(i) * s.reach;
       const a = s.yaw - Math.PI / 2 + Math.PI * polar.getY(i);
+      let rim = rims.get(polar.getY(i));
+      if (rim === undefined) {
+        rim = cragRimRadius(h.groundY, s.x, s.z, Math.sin(a), Math.cos(a), y0, s.reach);
+        rims.set(polar.getY(i), rim);
+      }
+      const rr = Math.min(polar.getX(i) * s.reach, rim);
       const wx = s.x + Math.sin(a) * rr;
       const wz = s.z + Math.cos(a) * rr;
       pos.setXYZ(i, wx - s.x, h.groundY(wx, wz) - y0 + 0.05, wz - s.z);
@@ -330,8 +355,8 @@ export class KnellFx implements RitePainter {
       s.z = e.pos.z;
       s.yaw = e.facing;
       s.reach = e.scale || s.reach;
-      const gy = h.groundY(s.x, s.z);
-      h.kit.drapeFan(s.fan, h.groundY, s.x, gy, s.z, s.yaw, s.reach);
+      const gy = s.floor;
+      drapeFanOnCrag(h.kit, s.fan, h.groundY, s.x, gy, s.z, s.yaw, s.reach, s.memo);
       if (e.templateId === KNELL_HALF_FIRE_TEMPLATE && s.burnAt < 0) this.burn(s, world);
       if (e.templateId === KNELL_HALF_MARK_TEMPLATE && s.burnAt < 0) {
         this.mark(s, wyrm, gy, dt);
@@ -372,10 +397,12 @@ export class KnellFx implements RitePainter {
       const spot = coneSpot(Math.floor(h.rand() * 4093), 4093, s.reach, 180, 0.5);
       const x = s.x + spot.x * c + spot.z * sn;
       const z = s.z - spot.x * sn + spot.z * c;
+      const gy = h.groundY(x, z);
+      if (!onCragFloor(gy, s.floor)) continue;
       {
         const ps = h.ps();
         ps.x = x;
-        ps.y = h.groundY(x, z) + 0.15;
+        ps.y = gy + 0.15;
         ps.z = z;
         ps.vx = (h.rand() - 0.5) * 0.6;
         ps.vy = 1.2 + h.rand() * 2.2 * look.edge;
@@ -396,10 +423,11 @@ export class KnellFx implements RitePainter {
       const t = (h.rand() * 2 - 1) * s.reach;
       const x = s.x + c * t;
       const z = s.z - sn * t;
-      {
+      const ly = h.groundY(x, z);
+      if (onCragFloor(ly, gy)) {
         const ps = h.ps();
         ps.x = x;
-        ps.y = gy + 0.2;
+        ps.y = ly + 0.2;
         ps.z = z;
         ps.vx = 0;
         ps.vy = 2 + h.rand() * 2;
@@ -430,10 +458,12 @@ export class KnellFx implements RitePainter {
       const spot = coneSpot(Math.floor(h.rand() * 8191), 8191, s.reach, 180, 0.5);
       const x = s.x + spot.x * c + spot.z * sn;
       const z = s.z - spot.x * sn + spot.z * c;
+      const gy = h.groundY(x, z);
+      if (!onCragFloor(gy, s.floor)) continue;
       {
         const ps = h.ps();
         ps.x = x;
-        ps.y = h.groundY(x, z) + 0.1;
+        ps.y = gy + 0.1;
         ps.z = z;
         ps.vx = 0;
         ps.vy = 1.8 + h.rand() * 2;
@@ -466,6 +496,7 @@ export class KnellFx implements RitePainter {
       const tx = s.x + spot.x * c + spot.z * sn;
       const tz = s.z - spot.x * sn + spot.z * c;
       const gy = h.groundY(tx, tz);
+      if (!onCragFloor(gy, s.floor)) continue;
       const flight = 0.4 + h.rand() * 0.2;
       const drag = 0.9;
       const k = (1 - Math.exp(-drag * flight)) / drag;

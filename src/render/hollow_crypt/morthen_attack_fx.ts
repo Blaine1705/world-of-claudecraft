@@ -28,15 +28,23 @@ import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { type TelegraphFan, telegraphFillOf } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import {
+  type CragDrapeMemo,
+  cragDrapeMemo,
+  drapeFanOnCrag,
+  resetCragDrape,
+} from './crag_fan_drape';
 import { coneSpot } from './crypt_creature_fx_core';
 import { MORTHEN_REAP_SWEEP } from './morthen_fx_core';
 import {
+  cragRimRadius,
   graspFill,
   graspHandSpots,
   HANDS_SINK_SEC,
   handsRise,
   handsSink,
   MORTHEN_TELEGRAPHS,
+  onCragFloor,
   pulseCharge,
   REAP_SWEEP_SEC,
   reapSweep,
@@ -204,6 +212,8 @@ function handGeometry(): THREE.BufferGeometry {
 interface Crescent {
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
+  /** The floor under him as it landed (the sweep stays on the crag top). */
+  floor: number;
   born: number;
   x: number;
   y: number;
@@ -224,6 +234,9 @@ interface GraspSlot {
   x: number;
   z: number;
   radius: number;
+  /** The floor under the ring (its hands stay on the crag top). */
+  floor: number;
+  memo: CragDrapeMemo;
 }
 
 interface GripSlot {
@@ -250,6 +263,8 @@ export class MorthenAttackFx implements RitePainter {
   private readonly zero = new THREE.Matrix4().makeScale(0, 0, 0);
   private pulseOn = false;
   private reapOn = false;
+  private readonly pulseMemo = cragDrapeMemo();
+  private readonly reapMemo = cragDrapeMemo();
 
   constructor(private readonly h: RiteFxHost) {
     const S = MORTHEN_TELEGRAPHS;
@@ -269,12 +284,15 @@ export class MorthenAttackFx implements RitePainter {
         x: 0,
         z: 0,
         radius: S.grasp.radius,
+        floor: 0,
+        memo: cragDrapeMemo(),
       });
     }
     for (let i = 0; i < GRIP_SLOTS; i++)
       this.grips.push({ playerId: -1, born: 0, sinkAt: -1, x: 0, z: 0 });
-    const crescentGeo = h.own(crescentGeometry(S.reap.arcDeg));
     for (let i = 0; i < CRESCENTS; i++) {
+      // Each its own: a landing near the rim cuts its band back to the crag.
+      const crescentGeo = h.own(crescentGeometry(S.reap.arcDeg));
       const mat = h.own(
         new THREE.ShaderMaterial({
           uniforms: {
@@ -305,6 +323,7 @@ export class MorthenAttackFx implements RitePainter {
         yaw: 0,
         alive: false,
         emitted: 0,
+        floor: 0,
       });
     }
     this.handMat = h.own(
@@ -406,14 +425,43 @@ export class MorthenAttackFx implements RitePainter {
     c.emitted = 0;
     c.x = m.pos.x;
     c.z = m.pos.z;
-    c.y = h.groundY(m.pos.x, m.pos.z) + 1.1;
+    c.floor = h.groundY(m.pos.x, m.pos.z);
+    c.y = c.floor + 1.1;
     c.yaw = m.facing;
+    this.clipCrescent(c);
     c.mesh.position.set(c.x, c.y, c.z);
     c.mesh.rotation.set(0, c.yaw, 0);
     c.mesh.scale.setScalar(MORTHEN_TELEGRAPHS.reap.radius);
     c.mat.uniforms.uHead.value = 0;
     c.mat.uniforms.uTail.value = 0;
     h.shakeAt(m.pos.x, m.pos.z, 0.6);
+  }
+
+  /** Cut the crescent's band back to the crag top along each of its spokes
+   *  (a Reap at the rim never sweeps out over the floor far below). */
+  private clipCrescent(c: Crescent): void {
+    const S = MORTHEN_TELEGRAPHS.reap;
+    const half = (S.arcDeg * Math.PI) / 360;
+    const pos = c.mesh.geometry.getAttribute('position');
+    const cols = pos.count / 2;
+    for (let i = 0; i < cols; i++) {
+      const th = -half + (2 * half * i) / (cols - 1);
+      const a = c.yaw + th;
+      const rim = cragRimRadius(
+        this.h.groundY,
+        c.x,
+        c.z,
+        Math.sin(a),
+        Math.cos(a),
+        c.floor,
+        S.radius,
+      );
+      const outer = Math.min(1, rim / S.radius);
+      const inner = Math.min(0.12, outer);
+      pos.setXYZ(i * 2, Math.sin(th) * inner, 0, Math.cos(th) * inner);
+      pos.setXYZ(i * 2 + 1, Math.sin(th) * outer, 0, Math.cos(th) * outer);
+    }
+    pos.needsUpdate = true;
   }
 
   /** The hands burst out of a ring. */
@@ -495,7 +543,7 @@ export class MorthenAttackFx implements RitePainter {
     const R = MORTHEN_TELEGRAPHS.pulse.radius;
     const gy = h.groundY(m.pos.x, m.pos.z);
     const fill = telegraphFillOf(m.castRemaining, m.castTotal);
-    h.kit.drapeFan(this.pulse, h.groundY, m.pos.x, gy, m.pos.z, 0, R);
+    drapeFanOnCrag(h.kit, this.pulse, h.groundY, m.pos.x, gy, m.pos.z, 0, R, this.pulseMemo);
     h.kit.paintFan(this.pulse, { fill, clock: h.clock(), range: R });
     // Shadow drawn in off the rim toward him as the toll gathers.
     const charge = pulseCharge(fill);
@@ -504,10 +552,12 @@ export class MorthenAttackFx implements RitePainter {
       const a = h.rand() * Math.PI * 2;
       const x = m.pos.x + Math.sin(a) * R;
       const z = m.pos.z + Math.cos(a) * R;
+      const ly = h.groundY(x, z);
+      if (!onCragFloor(ly, gy)) continue;
       {
         const ps = h.ps();
         ps.x = x;
-        ps.y = gy + 0.3 + h.rand() * 0.5;
+        ps.y = ly + 0.3 + h.rand() * 0.5;
         ps.z = z;
         ps.vx = -Math.sin(a) * 9;
         ps.vy = 0.2;
@@ -526,7 +576,7 @@ export class MorthenAttackFx implements RitePainter {
       if (i % 2 === 0) {
         const ps = h.ps();
         ps.x = x;
-        ps.y = gy + 0.2;
+        ps.y = ly + 0.2;
         ps.z = z;
         ps.vx = 0;
         ps.vy = 1 + h.rand() * 1.5;
@@ -555,7 +605,17 @@ export class MorthenAttackFx implements RitePainter {
     const S = MORTHEN_TELEGRAPHS.reap;
     const gy = h.groundY(m.pos.x, m.pos.z);
     const fill = telegraphFillOf(m.castRemaining, m.castTotal);
-    h.kit.drapeFan(this.reap, h.groundY, m.pos.x, gy, m.pos.z, m.facing, S.radius);
+    drapeFanOnCrag(
+      h.kit,
+      this.reap,
+      h.groundY,
+      m.pos.x,
+      gy,
+      m.pos.z,
+      m.facing,
+      S.radius,
+      this.reapMemo,
+    );
     h.kit.paintFan(this.reap, { fill, clock: h.clock(), range: S.radius });
     // Red-black smoke boiling inside the cone, embers lifting off its rim.
     const c = Math.cos(m.facing);
@@ -565,10 +625,11 @@ export class MorthenAttackFx implements RitePainter {
       const spot = coneSpot(Math.floor(h.rand() * 997), 997, S.radius, S.arcDeg, 1.5);
       const x = m.pos.x + spot.x * c + spot.z * s;
       const z = m.pos.z - spot.x * s + spot.z * c;
-      {
+      const ly = h.groundY(x, z);
+      if (onCragFloor(ly, gy)) {
         const ps = h.ps();
         ps.x = x;
-        ps.y = gy + 0.2;
+        ps.y = ly + 0.2;
         ps.z = z;
         ps.vx = (h.rand() - 0.5) * 0.6;
         ps.vy = 0.5 + h.rand() * 0.6;
@@ -587,10 +648,11 @@ export class MorthenAttackFx implements RitePainter {
       const a = (h.rand() * 2 - 1) * ((S.arcDeg * Math.PI) / 360);
       const rx = m.pos.x + Math.sin(m.facing + a) * S.radius;
       const rz = m.pos.z + Math.cos(m.facing + a) * S.radius;
-      {
+      const ry = h.groundY(rx, rz);
+      if (onCragFloor(ry, gy)) {
         const ps = h.ps();
         ps.x = rx;
-        ps.y = gy + 0.2;
+        ps.y = ry + 0.2;
         ps.z = rz;
         ps.vx = 0;
         ps.vy = 1.4 + h.rand() * 2 * fill;
@@ -635,6 +697,7 @@ export class MorthenAttackFx implements RitePainter {
         const x = c.x + Math.sin(a) * r;
         const z = c.z + Math.cos(a) * r;
         const gy = h.groundY(x, z);
+        if (!onCragFloor(gy, c.floor)) continue;
         const tx = Math.cos(a);
         const tz = -Math.sin(a);
         {
@@ -701,6 +764,8 @@ export class MorthenAttackFx implements RitePainter {
       slot.x = e.pos.x;
       slot.z = e.pos.z;
       slot.radius = e.scale || MORTHEN_TELEGRAPHS.grasp.radius;
+      slot.floor = h.groundY(e.pos.x, e.pos.z);
+      resetCragDrape(slot.memo);
       slot.fan.group.visible = true;
     }
     for (const g of this.grasps) {
@@ -716,8 +781,8 @@ export class MorthenAttackFx implements RitePainter {
       g.x = e.pos.x;
       g.z = e.pos.z;
       g.radius = e.scale || g.radius;
-      const gy = h.groundY(g.x, g.z);
-      h.kit.drapeFan(g.fan, h.groundY, g.x, gy, g.z, 0, g.radius);
+      const gy = g.floor;
+      drapeFanOnCrag(h.kit, g.fan, h.groundY, g.x, gy, g.z, 0, g.radius, g.memo);
       if (g.handsAt < 0) {
         const fill = graspFill(now - g.born);
         h.kit.paintFan(g.fan, { fill, clock: now, range: g.radius });
@@ -831,12 +896,18 @@ export class MorthenAttackFx implements RitePainter {
         const spot = HAND_SPOTS[i];
         const x = g.x + spot.x * g.radius;
         const z = g.z + spot.z * g.radius;
+        const hy = h.groundY(x, z);
+        // A ring at the rim: no hand claws up out of the cliff.
+        if (!onCragFloor(hy, g.floor)) {
+          this.hands.setMatrixAt(k, this.zero);
+          continue;
+        }
         const sc = (g.radius / 4) * spot.scale;
         const clutch = 0.22 + 0.1 * Math.sin(now * 3.1 + i * 1.9);
         this.place(
           k,
           x,
-          h.groundY(x, z) - 2.4 * sc * (1 - Math.min(1, rise)),
+          hy - 2.4 * sc * (1 - Math.min(1, rise)),
           z,
           spot.yaw,
           clutch,

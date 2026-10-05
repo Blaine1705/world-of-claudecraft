@@ -15,15 +15,25 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { linkPiecesOf } from '../src/render/compile_gate_pieces';
+import { TelegraphKit } from '../src/render/floor_telegraph';
+import { cragDrapeMemo, drapeFanOnCrag } from '../src/render/hollow_crypt/crag_fan_drape';
 import { MorthenRiteFx } from '../src/render/hollow_crypt/morthen_rite_fx';
+import {
+  CRAG_FLOOR_BAND,
+  cragRimRadius,
+  onCragFloor,
+} from '../src/render/hollow_crypt/morthen_rite_fx_core';
 import {
   RITE_INTERIOR_NAME,
   RiteCandleDecor,
   tagRiteCandleGlow,
   tagRiteCandleLamp,
 } from '../src/render/hollow_crypt/rite_candle_decor';
+import { HOLLOW_CRYPT_FIELD } from '../src/sim/content/hollow_crypt_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { KNELL_TUNING, knellHalfYaw, RITE_RING } from '../src/sim/encounters/hollow_crypt/ids';
 import { RITE_CANDLE_SPOTS } from '../src/sim/encounters/hollow_crypt/morthen_ids';
+import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import type { IWorld } from '../src/world_api';
 
 function materialsUnder(root: THREE.Object3D): Set<string> {
@@ -229,5 +239,79 @@ describe('the Remembrance Candles decor', () => {
       expect(instanceScale(a.glow, i)).toBe(1);
       expect(a.lights[i].userData.baseIntensity).toBe(14.4);
     }
+  });
+});
+
+describe('the fight paints the crag top only', () => {
+  // A crag top 20 yd round the origin; past its rim the floor drops 19 yd
+  // (the Choir Loft under the Rite Ring's south rim).
+  const crag = (x: number, z: number) => (Math.hypot(x, z) <= 20 ? 0 : -19);
+
+  it('cuts a fan back to the rim along every spoke, the curtain too', () => {
+    const root = new THREE.Group();
+    const kit = new TelegraphKit(root, true);
+    const fan = kit.fan(13);
+    kit.layOutFan(fan, 180, { color: 0xff2d44 });
+    const memo = cragDrapeMemo();
+    drapeFanOnCrag(kit, fan, crag, 6, 0, 0, Math.PI / 2, 32, memo);
+    const pos = fan.floor.geometry.getAttribute('position');
+    let cut = 0;
+    for (let i = 0; i < pos.count; i++) {
+      // Local units scale by the range; turned by the yaw, offset by the centre.
+      const lx = pos.getX(i) * 32;
+      const lz = pos.getZ(i) * 32;
+      const wx = 6 + lx * Math.cos(Math.PI / 2) + lz * Math.sin(Math.PI / 2);
+      const wz = -lx * Math.sin(Math.PI / 2) + lz * Math.cos(Math.PI / 2);
+      expect(Math.hypot(wx, wz)).toBeLessThanOrEqual(20.05);
+      expect(pos.getY(i)).toBeGreaterThanOrEqual(-CRAG_FLOOR_BAND);
+      if (Math.hypot(pos.getX(i), pos.getZ(i)) < 0.99 && Math.hypot(pos.getX(i), pos.getZ(i)) > 0.4)
+        cut++;
+    }
+    expect(cut).toBeGreaterThan(0);
+    const cp = fan.curtain?.geometry.getAttribute('position');
+    for (let i = 0; i < fan.stations; i++)
+      expect(cp?.getY(i * 2)).toBeGreaterThanOrEqual(-CRAG_FLOOR_BAND);
+    // Unmoved, it is not draped again.
+    const v = pos.version;
+    drapeFanOnCrag(kit, fan, crag, 6, 0, 0, Math.PI / 2, 32, memo);
+    expect(pos.version).toBe(v);
+    kit.dispose();
+  });
+
+  it('finds the rim along a spoke, and keeps the whole reach on open crag', () => {
+    expect(cragRimRadius(crag, 0, 0, 1, 0, 0, 32)).toBeCloseTo(20, 1);
+    expect(cragRimRadius(crag, 0, 0, 0, 1, 0, 12)).toBe(12);
+    expect(onCragFloor(-2.9, 0)).toBe(true);
+    expect(onCragFloor(-19, 0)).toBe(false);
+    expect(CRAG_FLOOR_BAND).toBe(KNELL_TUNING.floorBand);
+  });
+});
+
+describe('the Burning Knell on the real Rite Ring', () => {
+  it('never drapes any half past the south rim onto the Choir Loft', () => {
+    const ground = (x: number, z: number) => authoredFieldHeight(HOLLOW_CRYPT_FIELD, x, z);
+    const floor = ground(RITE_RING.x, RITE_RING.z);
+    const root = new THREE.Group();
+    const kit = new TelegraphKit(root, true);
+    const fan = kit.fan(13);
+    kit.layOutFan(fan, 180, { color: 0xff2d44 });
+    let lowest = 0;
+    for (let half = 0; half < 4; half++) {
+      drapeFanOnCrag(
+        kit,
+        fan,
+        ground,
+        RITE_RING.x,
+        floor,
+        RITE_RING.z,
+        knellHalfYaw(half),
+        KNELL_TUNING.reach,
+        cragDrapeMemo(),
+      );
+      const pos = fan.floor.geometry.getAttribute('position');
+      for (let i = 0; i < pos.count; i++) lowest = Math.min(lowest, pos.getY(i));
+    }
+    expect(lowest).toBeGreaterThanOrEqual(-KNELL_TUNING.floorBand);
+    kit.dispose();
   });
 });
