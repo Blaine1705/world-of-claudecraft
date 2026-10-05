@@ -43,6 +43,7 @@ import {
   anchorPoint,
   BONEWALKER_RISE_GESTURE,
   bonewalkerRises,
+  brandIronAnchor,
   ERUPTION_SECONDS,
   eruption,
   FLAME_HEAT,
@@ -291,6 +292,7 @@ export class SanctumKitFx {
   private readonly rimeHalf: number;
   private readonly tmpA = new THREE.Vector3();
   private readonly tmpB = new THREE.Vector3();
+  private readonly anchorTmp: [number, number, number] = [0, 0, 0];
   private readonly up = new THREE.Vector3(0, 1, 0);
   /** When each Raised Bonewalker was first seen (its rise is offered then). */
   private readonly walkersSeen = new Map<number, number>();
@@ -811,8 +813,14 @@ export class SanctumKitFx {
       const thaw = t.castId === SANCTUM_THAW_THE_HELD;
       const hc = sanctumDrawnHeight(caster.templateId, caster.scale);
       const from = this.tmpA;
+      const barFill =
+        caster.castTotal > 0
+          ? Math.min(1, Math.max(0, 1 - caster.castRemaining / caster.castTotal))
+          : 1;
       anchorPoint(
-        sanctumAnchor(thaw ? 'riteCenser' : 'ironThrust', caster.templateId),
+        thaw
+          ? sanctumAnchor('riteCenser', caster.templateId)
+          : brandIronAnchor(caster.templateId, barFill, this.anchorTmp),
         caster.pos.x,
         caster.pos.z,
         h.groundY(caster.pos.x, caster.pos.z),

@@ -10,6 +10,8 @@ import {
   BONEGUARD_BODY,
   BONEWALKER_BODY,
   barRate,
+  GOADSMITH_BODY,
+  GOADSMITH_CLIP,
   SCALEGUARD_BODY,
   SCALEGUARD_CLIP,
   THAWCALLER_BODY,
@@ -20,13 +22,20 @@ import {
   BONEWALKER_RISE_GESTURE,
   BONEWALKER_RISE_WINDOW,
   bonewalkerRises,
+  brandIronAnchor,
   SANCTUM_DRAWN_HEIGHTS,
   sanctumAnchor,
 } from '../src/render/gravewyrm_sanctum_fx/sanctum_fx_core';
 import { MOBS } from '../src/sim/data';
 import {
+  GOADSMITH_RERIVET,
+  KORGATH_TUNING,
+} from '../src/sim/encounters/gravewyrm_sanctum/boss_ids';
+import {
+  SANCTUM_BRANDING_IRON,
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
+  SANCTUM_GOAD,
   SANCTUM_THAW_THE_HELD,
   SANCTUM_WARMING_RITE,
 } from '../src/sim/mob/trash_kit/sanctum_cast_ids';
@@ -229,5 +238,58 @@ describe('the Broodsworn Thawcaller', () => {
     // Out past its right hand (negative = its right), at the lantern's height.
     expect(censer[1]).toBeLessThan(-0.25);
     expect(sanctumAnchor('riteCenser', 'broodsworn_thawcaller')[2]).toBeLessThan(censer[2]);
+  });
+});
+
+describe('the Broodsworn Goadsmith', () => {
+  it('ships its own body with a clip for the goad, the brand and the re-rivet', () => {
+    expect(clipsOf(`public/${GOADSMITH_BODY.url}`)).toEqual(
+      [
+        'Attack',
+        'BrandingIron',
+        'Cast',
+        'Death',
+        'Goad',
+        'Hit',
+        'Idle',
+        'ReRivet',
+        'Run',
+        'Walk',
+      ].sort(),
+    );
+    expectShipped(GOADSMITH_BODY.url);
+    expect(visualOf('broodsworn_goadsmith').url).toBe(GOADSMITH_BODY.url);
+    expect(visualOf('broodsworn_goadsmith').attach).toBeUndefined();
+    expectDrawnAtRow('broodsworn_goadsmith');
+  });
+
+  it('lands every bar on its clip contact', () => {
+    const v = visualOf('broodsworn_goadsmith');
+    const kit = MOBS.broodsworn_goadsmith?.trashKit;
+    expect(v.castClipSync).toBe(true);
+    expect(v.clips.castByAbility?.[SANCTUM_GOAD]).toBe('Goad');
+    expect(v.clips.castByAbility?.[SANCTUM_BRANDING_IRON]).toBe('BrandingIron');
+    expect(v.clips.castByAbility?.[GOADSMITH_RERIVET]).toBe('ReRivet');
+    expect(kit?.goad?.castTime).toBe(2);
+    expect(kit?.brand?.castTime).toBe(2);
+    expect(v.clips.castTimeScaleByAbility?.[SANCTUM_BRANDING_IRON]).toBeCloseTo(
+      GOADSMITH_CLIP.brandingIron / 2,
+      9,
+    );
+    expect(v.clips.castTimeScaleByAbility?.[GOADSMITH_RERIVET]).toBeCloseTo(
+      GOADSMITH_CLIP.reRivet / KORGATH_TUNING.rerivetChannel,
+      9,
+    );
+  });
+
+  it('streams the brand from the iron: held up over the bar, lunged out at its end', () => {
+    const out: [number, number, number] = [0, 0, 0];
+    const held = [...brandIronAnchor('broodsworn_goadsmith', 0.5, out)];
+    const lunged = [...brandIronAnchor('broodsworn_goadsmith', 1, out)];
+    expect(held[2]).toBeGreaterThan(0.9);
+    expect(lunged[0]).toBeGreaterThan(held[0] + 0.3);
+    expect(brandIronAnchor('broodsworn_goadsmith', 0.86, out)[2]).toBeCloseTo(held[2], 9);
+    // Its iron rides its right hand.
+    expect(sanctumAnchor('ironTip', 'broodsworn_goadsmith')[1]).toBeLessThan(0);
   });
 });

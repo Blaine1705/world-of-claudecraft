@@ -21,6 +21,9 @@ authoring tooling: nothing here runs in the build or the game.
   .blend and re-exports the raw GLB (`ThawTheHeld` was added this way); ship with
   `kit/ship.mjs`. `kit/clip_sheet30.py` renders its review frames.
 
+- `goadsmith/cultistas/`: the Broodsworn Goadsmith (`sanctum_goadsmith.glb`), the same
+  Codex cultist builder; `BrandingIron` added with its `reclip.py`.
+
 Build (Blender 5.2, absolute output paths; keep one Blender job at a time):
 
     blender -b --factory-startup --python <builder>/build.py -- <abs>/<key>_raw.glb \

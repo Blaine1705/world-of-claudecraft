@@ -492,8 +492,12 @@ export type BodyAnchorName =
   | 'riteCenser'
   /** The Goadsmith's red-hot iron tip at rest. */
   | 'ironTip'
-  /** The iron tip thrust out on a Goad or a Branding Iron (the spark stream). */
+  /** The iron tip thrust out on a Goad (the spark stream to its ally). */
   | 'ironThrust'
+  /** The iron held up glowing beside the face through the Branding Iron's bar. */
+  | 'brandHeat'
+  /** The iron thrust out at the victim on the Branding Iron's end. */
+  | 'brandThrust'
   /** The Pyre-Tender's yoke braziers (mirrored left and right). */
   | 'yoke';
 
@@ -517,8 +521,19 @@ export const SANCTUM_BODY_ANCHORS: Readonly<
     // Bowed over the corpse, the lantern swung out low in front of it.
     [THAWCALLER_ID]: [0.25, -0.25, 0.44],
   },
-  ironTip: {},
-  ironThrust: {},
+  ironTip: {
+    // The long goad iron's red-hot tip, held out ahead of its right fist.
+    [GOADSMITH_ID]: [0.5, -0.24, 0.53],
+  },
+  ironThrust: {
+    [GOADSMITH_ID]: [0.57, -0.22, 0.49],
+  },
+  brandHeat: {
+    [GOADSMITH_ID]: [0.23, -0.22, 1.0],
+  },
+  brandThrust: {
+    [GOADSMITH_ID]: [0.72, -0.23, 0.7],
+  },
   yoke: {},
 };
 
@@ -530,12 +545,30 @@ const DEFAULT_ANCHORS: Readonly<Record<BodyAnchorName, BodyAnchor>> = {
   riteCenser: [0.2, 0, 0.45],
   ironTip: [0.28, -0.12, 0.55],
   ironThrust: [0.42, 0, 0.5],
+  brandHeat: [0.42, 0, 0.5],
+  brandThrust: [0.42, 0, 0.5],
   yoke: [-0.05, 0.2, 0.76],
 };
 
 /** A body's anchor, or the generic one. */
 export function sanctumAnchor(name: BodyAnchorName, templateId: string): BodyAnchor {
   return SANCTUM_BODY_ANCHORS[name][templateId] ?? DEFAULT_ANCHORS[name];
+}
+
+/** The Branding Iron's source over its bar (`fill` 0 to 1): held up glowing
+ *  through the bar, thrust out over its last seventh (the clip's lunge).
+ *  Writes into `out` (no allocation per frame) and returns it. */
+export function brandIronAnchor(
+  templateId: string,
+  fill: number,
+  out: [number, number, number],
+): BodyAnchor {
+  const heat = sanctumAnchor('brandHeat', templateId);
+  const thrust = sanctumAnchor('brandThrust', templateId);
+  const x = Math.min(1, Math.max(0, (fill - 0.86) / 0.14));
+  const u = x * x * (3 - 2 * x);
+  for (let i = 0; i < 3; i++) out[i] = heat[i] + (thrust[i] - heat[i]) * u;
+  return out;
 }
 
 /** Where an anchor sits in the world for a body standing at (x, z) on the

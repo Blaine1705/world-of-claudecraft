@@ -12,15 +12,19 @@
 // contact / bar).
 
 import { MOBS } from '../../sim/data';
+import { GOADSMITH_RERIVET, KORGATH_TUNING } from '../../sim/encounters/gravewyrm_sanctum/boss_ids';
 import {
   BONEGUARD_ID,
   BONEWALKER_ID,
+  GOADSMITH_ID,
   SCALEGUARD_ID,
   THAWCALLER_ID,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import {
+  SANCTUM_BRANDING_IRON,
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
+  SANCTUM_GOAD,
   SANCTUM_THAW_THE_HELD,
   SANCTUM_WARMING_RITE,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
@@ -135,6 +139,21 @@ export const THAWCALLER_CLIP = { warmingRite: 2.5, thawTheHeld: 3.0 } as const;
 
 const thawcaller = MOBS[THAWCALLER_ID];
 
+/** The Broodsworn Goadsmith: a burly cultist under a bear's head and pelt, a
+ *  scorched leather apron, a long red-hot goad iron in his right fist. */
+export const GOADSMITH_BODY: SanctumTrashBody = {
+  url: `${CREATURES}/sanctum_goadsmith.glb`,
+  idleHeight: 4.7442,
+  walkRef: 1.125,
+  runRef: 4.5,
+};
+
+/** Its bars' contact frames (seconds at 1x): the Goad's prod, the Branding
+ *  Iron's thrust, the Re-rivet's last hammer blow on Korgath's chain. */
+export const GOADSMITH_CLIP = { goad: 2.0, brandingIron: 2.0, reRivet: 6.0 } as const;
+
+const goadsmith = MOBS[GOADSMITH_ID];
+
 export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
   // 4.6 yd to the helm's peak at its 1.15.
   sanctum_boneguard: {
@@ -230,6 +249,42 @@ export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
         ),
       },
       castPlayOut: ['WarmingRite', 'ThawTheHeld'],
+    },
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.05,
+  },
+  // 4.6 yd at its 1.75. The Goad prods the iron at an ally; the Branding Iron
+  // holds it up glowing beside his face through the bar and lunges it out at
+  // the victim on the bar's end; Korgath's heroic Re-rivet hammers the chain
+  // back down through its 6 s channel. Every bar lands on its clip's contact.
+  sanctum_goadsmith: {
+    ...sized(GOADSMITH_BODY, GOADSMITH_ID),
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [SANCTUM_GOAD]: 'Goad',
+        [SANCTUM_BRANDING_IRON]: 'BrandingIron',
+        [GOADSMITH_RERIVET]: 'ReRivet',
+      },
+      castTimeScaleByAbility: {
+        [SANCTUM_GOAD]: barRate(GOADSMITH_CLIP.goad, goadsmith?.trashKit?.goad?.castTime),
+        [SANCTUM_BRANDING_IRON]: barRate(
+          GOADSMITH_CLIP.brandingIron,
+          goadsmith?.trashKit?.brand?.castTime,
+        ),
+        [GOADSMITH_RERIVET]: barRate(GOADSMITH_CLIP.reRivet, KORGATH_TUNING.rerivetChannel),
+      },
+      castPlayOut: ['Goad', 'BrandingIron', 'ReRivet'],
     },
     castClipSync: true,
     castPlayOutHoldsAttacks: true,

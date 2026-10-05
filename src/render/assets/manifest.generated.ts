@@ -469,6 +469,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/orcenemy.glb": "/media/models/creatures/orcenemy.49c2f413407e.glb",
   "models/creatures/pyre_colossus.glb": "/media/models/creatures/pyre_colossus.5edb7b6c76e6.glb",
   "models/creatures/sanctum_boneguard.glb": "/media/models/creatures/sanctum_boneguard.f5b2f8006861.glb",
+  "models/creatures/sanctum_goadsmith.glb": "/media/models/creatures/sanctum_goadsmith.4643ea429aed.glb",
   "models/creatures/sanctum_korgath.glb": "/media/models/creatures/sanctum_korgath.a4cba148d1d5.glb",
   "models/creatures/sanctum_korzul.glb": "/media/models/creatures/sanctum_korzul.abfb84bffa16.glb",
   "models/creatures/sanctum_raised_bonewalker.glb": "/media/models/creatures/sanctum_raised_bonewalker.4a83c58b9507.glb",

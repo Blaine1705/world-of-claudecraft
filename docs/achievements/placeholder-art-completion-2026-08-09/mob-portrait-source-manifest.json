@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "d67268162b924ff9c56f6bbd611756826d970bfd0b818ebb30f7cfe9b5de6067",
+  "rendererFingerprint": "c18d826265e071a47de31100567325150de728902395c8ab998ebd36bbf5b7cb",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5504906,
-      "sha256": "e38c53d1842549d690ca5c293b05373217dd6d534306c16b79561bda42fb0ec8",
+      "bytes": 5505014,
+      "sha256": "f434bc878d65ae323aedde9c364ac656558171da962b5b7adf14bf0ee7286fe6",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -838,46 +838,31 @@
       "visualKey": "sanctum_goadsmith",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/barbarian.glb",
-          "path": "public/models/chars/players/barbarian.glb",
-          "bytes": 444244,
-          "sha256": "2fb8d32c29d2b5c4b9b4b54ec502c3778f3d4d0da0e55cd1d4ed2b7c1e8d0abb"
+          "url": "models/creatures/sanctum_goadsmith.glb",
+          "path": "public/models/creatures/sanctum_goadsmith.glb",
+          "bytes": 653576,
+          "sha256": "4643ea429aedab697ff118ab6faf853f5b1e0649fbf593b63ec12bc9b1bcff1a"
         },
         "idle": "Idle",
         "height": 2.6285714285714286,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Barbarian_BearHat"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/spear_a.glb",
-              "path": "public/models/weapons/spear_a.glb",
-              "bytes": 78552,
-              "sha256": "27e7969ec3efdd8ba59f2530ceb2ffddefe9bfd247c462dc2e916f47292aa2af"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "show": null,
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.38
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6e4a32",
-        "resolved": "#6e4a32",
-        "strength": 0.38
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "c14780e39a2bede3fc53a3ab2c89528d5547d2868f916bf115bfd561d8114fd4",
+      "sourceFingerprint": "7232d279b204b7d3ee58f757de61326723056e7b9d7f7d6fa6dc7c24cf474157",
       "output": {
         "path": "public/ui/mobs/broodsworn_goadsmith.webp",
-        "bytes": 2130,
-        "sha256": "521226d349db2d5d4309d2fc627308d820f915a310061f0de0f73cc8d6879003"
+        "bytes": 1824,
+        "sha256": "a2c664ae74d86ded347c57f2f23c7407b260a912e3e7d390c0889c0a389c5df9"
       }
     },
     {

@@ -142,17 +142,6 @@ const STATIC_PROP_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Broodsworn Goadsmith: a burly cultist in a bear-fur hood and a leather
-  // apron, a long goad iron in his fist (the fx heat its tip).
-  sanctum_goadsmith: [
-    GOADSMITH_ID,
-    [
-      'mob_bruiser',
-      0x6e4a32,
-      0.38,
-      { attach: [{ url: 'models/weapons/spear_a.glb', bone: 'handslot.r' }] },
-    ],
-  ],
   // Broodsworn Pyre-Tender: a hooded cultist in soot-black robes; the fx set
   // the brazier fires burning over her yoke.
   sanctum_pyre_tender: [
