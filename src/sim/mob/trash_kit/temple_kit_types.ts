@@ -64,6 +64,26 @@ export interface TempleKitDef {
    *  its burst by `radiusPer` yards and raises its roll by `damagePer`, up to
    *  `max` merges. Kill them apart. */
   merge?: { reach: number; max: number; radiusPer: number; damagePer: number; name: string };
+  /** Call of the Shallows (temple_lure.ts): an interruptible song at one
+   *  player past the tank within `range`. While it runs the victim keeps half
+   *  their run speed and is drawn `pull` yards a second toward the singer
+   *  (`heroicPull` on heroic); drawn within `reach`, or when the bar runs
+   *  out, they are stunned `stun` seconds (`heroicStun`), named
+   *  `stunName`. Out of her line of sight the song breaks. Kick it, stun her,
+   *  or hide. */
+  lure?: TrashKitCast & {
+    range: number;
+    pull: number;
+    heroicPull: number;
+    reach: number;
+    stun: number;
+    heroicStun: number;
+    stunName: string;
+  };
+  /** Heroic only (Heartpearl, temple_pearl.ts): when this mob's Nacre Cocoon
+   *  (trashKit.carapace) BREAKS (the shield spent before it ran out), the
+   *  pearl rolls out as the kit's `walker` (launch 'event'). */
+  pearl?: { heroicOnly: true };
 }
 
 /** Per-pull state of the Temple keys (TrashKitState.temple). */
@@ -73,4 +93,8 @@ export interface TempleKitState {
   echo?: { sleeperId: number; next: number; slept: number[] };
   /** Seconds to the whirlpool's next roll while it spins. */
   whirlTick?: number;
+  /** Heartpearl: the cocoon's seconds left as last seen (a break is the ward
+   *  gone with time still on it), and its end already judged this pull. */
+  cocoonLeft?: number;
+  pearlJudged?: boolean;
 }

@@ -9,6 +9,12 @@
 // out of time, fades. The orb is an encounter object the client mirrors
 // (Entity.kitObject kind 'walker'), so it is drawn where the sim has it.
 //
+// A def may narrow who it rolls to (`allies`), wait in place for a taker when
+// nobody is left to roll to (`lingers`), shield its ally instead of (or as
+// well as) arming it (`empower.shieldPct`), arm it harder on heroic only
+// (`empower.heroicDamagePct`), and turn an interception into a gift for the
+// taker's whole group (`intercept.groupShield`).
+//
 // The orb flies over the floor (a spirit, a pearl, a mote): it follows the
 // ground height but no collider stops it, so only a body can. Zero rng in
 // every pick (allies nearest-first with ties to the lower id, players in
@@ -28,12 +34,14 @@ export const WALKER_FADE = 'trash_walker_fade';
 export const WALKER_ARM_SECONDS = 0.5;
 
 /** The nearest living mob of the claim in the fight to (x, z), never `skip`
- *  (the mob that sent it). Ties go to the lower id. */
+ *  (the mob that sent it), and only of `allies` when given. Ties go to the
+ *  lower id. */
 export function pickWalkerAlly(
   ctx: SimContext,
   inst: InstanceSlot,
   at: { x: number; z: number },
   skip: number,
+  allies?: readonly string[],
 ): Entity | null {
   let best: Entity | null = null;
   let bestD = Infinity;
@@ -42,6 +50,7 @@ export function pickWalkerAlly(
     if (id === skip) continue;
     const e = ctx.entities.get(id);
     if (!e || e.dead || e.hp <= 0 || e.kind !== 'mob' || !e.inCombat) continue;
+    if (allies && !allies.includes(e.templateId)) continue;
     const d = dist2d(e.pos, p);
     if (d < bestD - 1e-9 || (Math.abs(d - bestD) <= 1e-9 && best !== null && e.id < best.id)) {
       best = e;
@@ -51,21 +60,50 @@ export function pickWalkerAlly(
   return best;
 }
 
+/** The def an orb carries on this difficulty: a heroic-only arming swaps in. */
+export function walkerDefFor(def: KitWalkerDef, heroic: boolean): KitWalkerDef {
+  const pct = def.empower.heroicDamagePct;
+  if (!heroic || pct === undefined) return def;
+  return { ...def, empower: { ...def.empower, damagePct: pct } };
+}
+
+/** Where an orb leaves its mob: on the mob, or `eject` yards out on the side
+ *  away from the one it fights (its facing reversed when it fights nobody). */
+export function walkerLaunchPoint(
+  ctx: SimContext,
+  mob: Entity,
+  def: KitWalkerDef,
+): { x: number; z: number } {
+  const out = def.eject ?? 0;
+  if (out <= 0) return { x: mob.pos.x, z: mob.pos.z };
+  const foe = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : undefined;
+  let dx = -Math.sin(mob.facing);
+  let dz = -Math.cos(mob.facing);
+  if (foe && dist2d(foe.pos, mob.pos) > 1e-3) {
+    const d = dist2d(foe.pos, mob.pos);
+    dx = (mob.pos.x - foe.pos.x) / d;
+    dz = (mob.pos.z - foe.pos.z) / d;
+  }
+  return { x: mob.pos.x + dx * out, z: mob.pos.z + dz * out };
+}
+
 /** Launch an orb from `mob` toward its nearest fighting ally. Returns the orb,
- *  or null when no ally is left to empower. */
+ *  or null when no ally is left to empower (and the def does not linger). */
 export function launchWalker(
   ctx: SimContext,
   inst: InstanceSlot,
   mob: Entity,
-  def: KitWalkerDef,
+  base: KitWalkerDef,
 ): Entity | null {
-  const ally = pickWalkerAlly(ctx, inst, mob.pos, mob.id);
-  if (!ally) return null;
-  const orb = spawnKitObject(ctx, inst, def.objectTemplate, def.name, mob.pos.x, mob.pos.z, 1, 0, {
+  const def = walkerDefFor(base, inst.difficulty === 'heroic');
+  const ally = pickWalkerAlly(ctx, inst, mob.pos, mob.id, def.allies);
+  if (!ally && !def.lingers) return null;
+  const at = walkerLaunchPoint(ctx, mob, def);
+  const orb = spawnKitObject(ctx, inst, def.objectTemplate, def.name, at.x, at.z, 1, 0, {
     kind: 'walker',
     def,
     sourceId: mob.id,
-    allyId: ally.id,
+    allyId: ally?.id ?? null,
     remaining: def.maxSeconds,
     mechanicDamageMult: mob.mechanicDamageMult ?? 1,
   });
@@ -81,6 +119,19 @@ export function launchWalker(
 }
 
 function empower(ctx: SimContext, def: KitWalkerDef, sourceId: number, onto: Entity): void {
+  const shield = def.empower.shieldPct ?? 0;
+  if (shield > 0 && !onto.dead) {
+    ctx.applyAura(onto, {
+      id: def.empower.auraId,
+      name: def.empower.name,
+      kind: 'absorb',
+      remaining: def.empower.seconds,
+      duration: def.empower.seconds,
+      value: Math.max(1, Math.round(onto.maxHp * shield)),
+      sourceId,
+      school: def.school,
+    });
+  }
   const heal = def.empower.healPct ?? 0;
   if (heal > 0 && !onto.dead) {
     // The heal rides the shared heal path (the kit mend's), from the orb.
@@ -141,15 +192,34 @@ export function stepWalker(
       ctx.dealDamage(source, blocker, amount, false, def.school, def.name, 'hit', true);
     }
     if (def.intercept.grantsEmpower && !blocker.dead) empower(ctx, def, orb.id, blocker);
+    const gift = def.intercept.groupShield;
+    if (gift && !blocker.dead) {
+      // The taker's group: every living player in reach of them, id order.
+      for (const p of players) {
+        if (p.dead || p.hp <= 0 || dist2d(p.pos, blocker.pos) > gift.radius) continue;
+        ctx.applyAura(p, {
+          id: gift.auraId,
+          name: gift.name,
+          kind: 'absorb',
+          remaining: gift.seconds,
+          duration: gift.seconds,
+          value: Math.max(1, Math.round(p.maxHp * gift.pctMaxHp)),
+          sourceId: orb.id,
+          school: def.school,
+        });
+      }
+    }
     dropKitObject(ctx, inst, orb.id);
     return 'intercepted';
   }
   st.remaining -= DT;
   let ally = st.allyId !== null ? ctx.entities.get(st.allyId) : undefined;
   if (!ally || ally.dead || ally.hp <= 0) {
-    ally = pickWalkerAlly(ctx, inst, orb.pos, st.sourceId) ?? undefined;
+    ally = pickWalkerAlly(ctx, inst, orb.pos, st.sourceId, def.allies) ?? undefined;
     st.allyId = ally?.id ?? null;
   }
+  // A lingering orb with nobody to roll to waits where it lies for a taker.
+  if (!ally && def.lingers && st.remaining > 1e-9) return 'drift';
   if (!ally || st.remaining <= 1e-9) {
     // Anchored at a world point: the orb is gone when the frame is routed.
     ctx.emit({

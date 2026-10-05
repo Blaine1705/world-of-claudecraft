@@ -5,6 +5,8 @@
 //
 //   Ossuary Warrior         Grave Cleave: a telegraphed frontal cone. Step out.
 //   Gravecaller Adept       Grave Bolt: a hard shadow bolt. Interrupt it.
+//                           (Heroic only since the second wave: its normal
+//                           job is the volley below.)
 //   Ossuary Cutthroat       Rending Leap: leaps onto the farthest caster, bleeds.
 //   Gravecaller Necromancer Raise Bones: a channel. Interrupt it, or a minion rises.
 //   Bone Minion             grows into a Bone Brute in 8 s; dies in a Bone Burst.
@@ -38,8 +40,13 @@
 //                           burning for 5 s. Keep the drake moving.
 //   (Bonechill Widow        Rimesilk Spit: a web lane that roots, dungeons.ts.)
 //
-// The Gravecaller Adept's interruptible volley waits on the engine's
-// line-of-sight nova (the trash pass's second wave).
+// The second wave, on the engine's line-of-sight nova (kit_nova.ts):
+//
+//   Gravecaller Adept       Gravespark Volley: a 3 s kickable bar, then grave
+//                           sparks at every player who can SEE it. Kick it,
+//                           or step behind a cloister pillar. On normal it
+//                           replaces the Grave Bolt; heroic casts both, so
+//                           the group saves its kick for the one that matters.
 //
 // Numbers are classic-era normal-mode bases for levels 7 to 10, anchored to
 // the shipped crypt trash (Crypt Shambler 7 + 2.2/level, 437 health at level 8)
@@ -55,6 +62,7 @@ import {
   CRYPT_GRAVE_BOLT,
   CRYPT_GRAVE_CLEAVE,
   CRYPT_GRAVE_RUPTURE,
+  CRYPT_GRAVESPARK_VOLLEY,
   CRYPT_MARROW_CRUSH,
   CRYPT_MURDER_CALL,
   CRYPT_RAISE_BONES,
@@ -147,6 +155,7 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
       windup: 0.6,
     },
     trashKit: {
+      // Heroic only (the second wave): on normal the volley is its one job.
       bolt: {
         castId: CRYPT_GRAVE_BOLT,
         name: 'Grave Bolt',
@@ -157,6 +166,27 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
         range: 30,
         min: 26,
         max: 34,
+        heroicOnly: true,
+      },
+      // Gravespark Volley (the engine's G6 nova): 3 s of raised hands, then a
+      // spark at every player within 30 yd who can see it; a pillar between
+      // them shields them. Math, landed raw: normal 12 to 16, about 7 percent
+      // of a level 8 cloth wearer's ~210 (a quarter of a Grave Bolt), so even
+      // an unkicked volley every 14 s is pressure, never a threat. Heroic rides
+      // the adept's x24 (dungeon_difficulty.ts: its melee lift to the 500
+      // floor, which its mechanics follow): 288 to 384, 23 to 31 percent of a
+      // level 20 heroic cloth wearer's ~1,250; an adept pair's two volleys
+      // stagger (pack_cast_stagger.ts), so the worst unkicked beat is one.
+      nova: {
+        castId: CRYPT_GRAVESPARK_VOLLEY,
+        name: 'Gravespark Volley',
+        castTime: 3,
+        every: 14,
+        first: 6,
+        school: 'shadow',
+        radius: 30,
+        min: 12,
+        max: 16,
       },
     },
     loot: CASTER_LOOT,
@@ -236,8 +266,12 @@ export const HOLLOW_CRYPT_TRASH_MOBS: Record<string, MobTemplate> = {
       },
       // Grave Rupture: a fallen packmate's corpse bursts under the fight. 22 to
       // 30 shadow is about a seventh of a level 8 cloth wearer (a hair under
-      // the Grave Bolt), so normal shrugs it off; heroic (x24) lands 528 to
-      // 720 and leaves the corpse burning 3 s (144 to 240 a second).
+      // the Grave Bolt), so normal shrugs it off. Heroic rides the
+      // necromancer's x12 mechanic factor (dungeon_difficulty.ts, the balance
+      // audit; on its x24 melee lift it was 528 to 720 plus a 432 to 720 pool,
+      // a one-shot of a full heroic cloth wearer): 264 to 360 (21 to 29
+      // percent of ~1,250), and the corpse burns 3 s at 72 to 120 a second;
+      // standing in both is 480 to 720 (38 to 58 percent).
       rupture: {
         castId: CRYPT_GRAVE_RUPTURE,
         name: 'Grave Rupture',

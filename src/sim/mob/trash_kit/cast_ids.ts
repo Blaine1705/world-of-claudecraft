@@ -40,6 +40,10 @@ export const CRYPT_MARROW_CRUSH = 'crypt_marrow_crush';
 /** Bonechill Widow: a line of frost web spat at one player; it roots
  *  whoever it catches (trashKit.line). */
 export const CRYPT_RIMESILK_SPIT = 'crypt_rimesilk_spit';
+/** Gravecaller Adept (the trash pass's second wave): an interruptible volley
+ *  of grave sparks at every player who can see it (trashKit.nova, the
+ *  engine's line-of-sight nova). Kick it, or break sight behind a pillar. */
+export const CRYPT_GRAVESPARK_VOLLEY = 'crypt_gravespark_volley';
 /** Ossuary Cutthroat: the slow its Rending Leap leaves on its victim. */
 export const CRYPT_TORN_TENDON = 'crypt_torn_tendon';
 /** Chapel Gargoyle: its stacking stone ward (trashKit.granite). */
@@ -75,4 +79,5 @@ export const TRASH_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['sch
   [CRYPT_STONE_SHRIEK]: { school: 'nature' },
   [CRYPT_GRAVE_RUPTURE]: { school: 'shadow' },
   [CRYPT_CARRION_EYE]: { school: 'nature' },
+  [CRYPT_GRAVESPARK_VOLLEY]: { school: 'shadow' },
 };

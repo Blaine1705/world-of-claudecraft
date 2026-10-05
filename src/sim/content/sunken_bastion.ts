@@ -60,6 +60,7 @@ import {
   BASTION_FOG_BANK,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
+  BASTION_LOOSE_ON_MY_MARK,
   BASTION_PIERCING_BOLT,
   BASTION_SHELL_SLAM,
 } from '../mob/trash_kit/bastion_cast_ids';
@@ -102,9 +103,13 @@ export const BRINE_MEND_KIT: TrashKitDef = {
     below: 0.75,
   },
   // Brine Column: a 4 s channel that roots one player (never its own foe
-  // while anyone else is near) and drowns them, 9 to 13 a second: about a
-  // tenth of a level 13 cloth wearer's 430 over the channel. Heroic (x18)
-  // is 162 to 234 a second. Two things to kick: the heal or the friend.
+  // while anyone else is near) and drowns them, 9 to 13 a second over four
+  // beats (three in the channel, one as it lands): 36 to 52, about a tenth
+  // of a level 13 cloth wearer's 430. Heroic rides the acolyte's x8 mechanic
+  // factor (dungeon_difficulty.ts, the balance audit; it rode the x18 melee
+  // lift before, 648 to 936 on a ROOTED player who cannot step out): 72 to
+  // 104 a beat, 288 to 416 over the channel, 23 to 33 percent of a heroic
+  // cloth wearer's ~1,250. Two things to kick: the heal or the friend.
   column: {
     castId: BASTION_BRINE_COLUMN,
     name: 'Brine Column',
@@ -254,9 +259,15 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
         min: 30,
         max: 40,
         school: 'frost',
-        // Carrion Glut: each stack 1.25 yards wider and 40 percent harder;
-        // three stacks burst 7.75 yards for 2.2 times the roll.
-        perStack: { radius: 1.25, damage: 0.4 },
+        // Carrion Glut: each stack 1.25 yards wider and 25 percent harder;
+        // three stacks burst 7.75 yards for 1.75 times the roll. Math, landed
+        // raw: normal 30 to 40 (7 to 9 percent of a level 13 cloth wearer's
+        // 430), fully fed 53 to 70 (12 to 16 percent). Heroic x8 (the
+        // crawler's mechanic factor, newly reached now that the burst rides
+        // the trash kit): 240 to 320 (19 to 26 percent of ~1,250), fully fed
+        // 420 to 560 (34 to 45 percent; at 40 percent a stack it was 528 to
+        // 704, past the 40 percent missed-dodge line).
+        perStack: { radius: 1.25, damage: 0.25 },
       },
       // Carrion Glut: within 3 yards of a corpse it feeds, a stack every 3 s
       // up to three. Kill it early, or keep the fight off the dead.
@@ -386,6 +397,34 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     },
     // Classic trash frenzy: harder and faster, the shipped 1.3 / 1.2 pairing.
     enrage: { belowHpPct: 0.3, dmgMult: 1.3, hasteMult: 1.2 },
+    // Loose on My Mark (the trash pass's second wave, bastion_order.ts): a 2 s
+    // kickable shout at one player past the tank; when it lands, every
+    // Fogbound Arbalest of its pack within 30 yd looses a Rusted Bolt at the
+    // mark at once, and a crenel or a wall between them stops that bolt.
+    // Only a pack with arbalests (the r1 tower) ever hears it. Math, landed
+    // raw, per bolt on the ARBALEST's mechanic factor: normal 24 to 30, three
+    // bolts 72 to 90 (17 to 21 percent of a level 13 cloth wearer's 430);
+    // heroic x8 192 to 240 a bolt, three 576 to 720 (46 to 58 percent of
+    // ~1,250): punishing, behind a 2 s bar, a mark over the target, a kick
+    // and a wall, never a one-shot.
+    trashKit: {
+      bastion: {
+        order: {
+          castId: BASTION_LOOSE_ON_MY_MARK,
+          name: 'Loose on My Mark',
+          castTime: 2,
+          every: 18,
+          first: 6,
+          school: 'nature',
+          range: 30,
+          shooters: 'fogbound_arbalest',
+          shooterRange: 30,
+          min: 24,
+          max: 30,
+          boltName: 'Rusted Bolt',
+        },
+      },
+    },
     yells: { enrage: 'Hold the wall, you dogs!' },
     loot: [
       { copper: 220, chance: 1 },

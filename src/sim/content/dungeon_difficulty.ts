@@ -514,6 +514,16 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       crypt_ossuary_cutthroat: 23,
       crypt_carrion_crow: 66,
     },
+    // Avoidable trash mechanics priced apart from the tank-swing floor (the
+    // dungeon trash pass's balance audit): the necromancer's Grave Rupture
+    // rode its x24 melee lift to 528 to 720 plus a 432 to 720 pool, a
+    // one-shot of a full heroic cloth wearer (~1,250). At x12 the burst is 264 to 360 and the pool 72 to 120
+    // a second (hollow_crypt_trash.ts). The adept keeps its x24 (its Grave
+    // Bolt was priced on it before this pass; its volley's base is set for
+    // it).
+    mechanicDamageMultiplierByMob: {
+      crypt_gravecaller_necromancer: 12,
+    },
     armorMultiplier: 1.3,
     finalBossId: 'morthen',
     marksPerParticipant: 1,
@@ -554,6 +564,10 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       fogbound_arbalest: 8,
       barnacle_crawler: 8,
       bastion_warhound: 8,
+      // The acolyte's Brine Column roots its victim for 4 s: at the x18 melee
+      // lift it was 648 to 936 on a player who cannot step out (the trash
+      // pass's balance audit). x8 makes it 288 to 416 (sunken_bastion.ts).
+      tidebound_acolyte: 8,
       turretback_hermit: 8,
       knight_commander_olen: 6,
       gaoler_ossick: 6,

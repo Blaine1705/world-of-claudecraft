@@ -49,6 +49,21 @@ export const BASTION_FETTERS_RELEASE = 'bastion_fetters_release';
 export const BASTION_FOG_BANK_CLOUD = 'bastion_fog_bank_cloud';
 export const BASTION_TRASH_OBJECT_TEMPLATES: readonly string[] = [BASTION_FOG_BANK_CLOUD];
 
+// The trash pass's second wave (the engine's G6 sight rule and G5 walker).
+/** Drowned Sergeant: an interruptible shout that marks one player for every
+ *  arbalest of its pack (trashKit.bastion.order, bastion_order.ts). */
+export const BASTION_LOOSE_ON_MY_MARK = 'bastion_loose_on_my_mark';
+/** An arbalest's bolt loosed on the sergeant's mark (the hit), and the one a
+ *  wall stopped. */
+export const BASTION_MARKED_BOLT = 'bastion_marked_bolt';
+export const BASTION_MARKED_BOLT_BLOCKED = 'bastion_marked_bolt_blocked';
+/** Bastion Revenant: the sea-light that leaves its throat when it falls (a
+ *  walker, launch 'death'): its launch id, its object template, and the
+ *  surge it lays on the packmate it reaches. */
+export const BASTION_THROATLIGHT = 'bastion_throatlight';
+export const BASTION_THROATLIGHT_ORB = 'bastion_throatlight_orb';
+export const BASTION_DROWNED_SURGE = 'bastion_drowned_surge';
+
 /** The Bastion trash casts a player interrupt can lock out, by school. The
  *  sweeps, the slam, the Piercing Bolt and the hook are absent on purpose:
  *  dodge those. */
@@ -57,4 +72,5 @@ export const BASTION_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['s
   [BASTION_FOG_WARD]: { school: 'frost' },
   [BASTION_FOG_BANK]: { school: 'frost' },
   [BASTION_BRINE_COLUMN]: { school: 'nature' },
+  [BASTION_LOOSE_ON_MY_MARK]: { school: 'nature' },
 };

@@ -32,6 +32,7 @@ import {
   type TrashKitState,
 } from '../../types';
 import { packPeerRank, packStaggerOffset } from '../pack_cast_stagger';
+import { BASTION_KIT_EXTENSION } from './bastion_extension';
 import {
   dropUnlaidFog,
   endBastionPull,
@@ -68,13 +69,13 @@ import {
 import { stepDeathBurst } from './death_burst';
 import { callDownLastFlier } from './flier_call';
 import { applyFreezeStack } from './freeze_stacks';
+import type { TrashKitExtension } from './kit_extension';
 import { stepKitHazard } from './kit_hazard';
 import { landNova, novaCastIdFor, novaReady } from './kit_nova';
 import { kitObjectIds } from './kit_objects';
 import { restoreSplit, stepSplit } from './kit_split';
 import { launchWalker, pickWalkerAlly, stepWalker } from './kit_walker';
 import { landReanimate, pickReanimateCorpse } from './reanimate';
-import type { TrashKitExtension } from './kit_extension';
 import {
   dropToss,
   landGoad,
@@ -128,7 +129,11 @@ const CAST_KEYS = [
 type CastKey = (typeof CAST_KEYS)[number];
 
 /** The dungeons' own key blocks (kit_extension.ts), run after the core keys. */
-const EXTENSIONS: readonly TrashKitExtension[] = [TEMPLE_KIT_EXTENSION, WILDHEART_KIT_EXTENSION];
+const EXTENSIONS: readonly TrashKitExtension[] = [
+  TEMPLE_KIT_EXTENSION,
+  WILDHEART_KIT_EXTENSION,
+  BASTION_KIT_EXTENSION,
+];
 
 /** The extension that owns cast key `key`, if any. */
 function extensionOf(key: string): TrashKitExtension | undefined {
@@ -355,7 +360,9 @@ function castReady(
     case 'nova':
       return novaReady(mob, kit, players) ? { ok: true, target: null } : no;
     case 'walker':
-      return pickWalkerAlly(ctx, inst, mob.pos, mob.id) ? { ok: true, target: null } : no;
+      return pickWalkerAlly(ctx, inst, mob.pos, mob.id, kit.walker?.allies)
+        ? { ok: true, target: null }
+        : no;
     case 'cone': {
       // At the one it fights, when it stands in the cone's reach.
       const def = kit.cone;
@@ -690,6 +697,8 @@ function tryStartCast(
   for (const key of ALL_CAST_KEYS) {
     const def = castDef(kit, key);
     if (!def || (st.timers[key] ?? 0) > 0) continue;
+    // A heroic-only cast never starts on normal (TrashKitCast.heroicOnly).
+    if (def.heroicOnly && inst.difficulty !== 'heroic') continue;
     const physical = isPhysicalCast(key);
     if (!physical && (isSilenced(mob) || isLockedOut(mob, def.school as Aura['school']))) continue;
     const ext = extensionOf(key);

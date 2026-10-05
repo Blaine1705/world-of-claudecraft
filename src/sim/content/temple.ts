@@ -10,7 +10,11 @@
 
 import {
   TEMPLE_GLIMMER_VENOM,
+  TEMPLE_HEARTPEARL,
+  TEMPLE_HEARTPEARL_ORB,
+  TEMPLE_HEARTPEARL_WARD,
   TEMPLE_LULLABY,
+  TEMPLE_NACRE_MANTLE,
   TEMPLE_PALE_MENDING,
   TEMPLE_PEARL_SLAM,
   TEMPLE_PRISM_GLARE,
@@ -402,6 +406,49 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
         knockback: 6,
         min: 50,
         max: 60,
+      },
+      // Heroic only (the trash pass's second wave, temple_pearl.ts): when the
+      // Nacre Cocoon BREAKS (burst before its 8 s run out), the Heartpearl
+      // drops out of its chest 4 yd behind it and rolls at 2 yd a second
+      // toward another ray or a Templeguard of the fight, warding it for 15
+      // percent of its health for 10 s (about 450 on a heroic ray's ~2,960).
+      // Step on it first and every player within 40 yd of the taker gains a
+      // Nacre Mantle, an absorb of 10 percent of their own health for 10 s
+      // (about 125 on a heroic cloth wearer's ~1,250). No damage either way:
+      // a race that rewards the group that broke the cocoon. Alone in its
+      // pack it lies 6 s for the taking, then fades.
+      temple: { pearl: { heroicOnly: true } },
+      walker: {
+        castId: TEMPLE_HEARTPEARL,
+        name: 'Heartpearl',
+        objectTemplate: TEMPLE_HEARTPEARL_ORB,
+        launch: 'event',
+        school: 'arcane',
+        speed: 2,
+        interceptRadius: 1.6,
+        reachRadius: 1.6,
+        maxSeconds: 6,
+        allies: ['pearlguard_sentinel', 'drowned_templeguard'],
+        lingers: true,
+        eject: 4,
+        empower: {
+          auraId: TEMPLE_HEARTPEARL_WARD,
+          name: 'Heartpearl Ward',
+          damagePct: 0,
+          seconds: 10,
+          shieldPct: 0.15,
+        },
+        intercept: {
+          min: 0,
+          max: 0,
+          groupShield: {
+            auraId: TEMPLE_NACRE_MANTLE,
+            name: 'Nacre Mantle',
+            pctMaxHp: 0.1,
+            seconds: 10,
+            radius: 40,
+          },
+        },
       },
     },
     loot: [

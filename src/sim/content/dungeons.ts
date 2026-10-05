@@ -20,6 +20,11 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
+import {
+  BASTION_DROWNED_SURGE,
+  BASTION_THROATLIGHT,
+  BASTION_THROATLIGHT_ORB,
+} from '../mob/trash_kit/bastion_cast_ids';
 import { CRYPT_RIMESILK_SPIT } from '../mob/trash_kit/cast_ids';
 import {
   SANCTUM_BOILING_MELTWATER,
@@ -666,6 +671,38 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     scale: 1.1,
     color: 0x7fa8a0,
     mortalStrike: { chance: 0.3, healReduction: 0.5, duration: 6, name: 'Maiming Strike' },
+    // Throatlight (the trash pass's second wave, the engine's G5 walker): as
+    // it falls, the green sea-light in its throat leaves as an orb drifting
+    // at 3 yd a second (about 3 s across a pack) to its nearest fighting
+    // packmate, which it heals for 15 percent of its health (heroic: and a
+    // Drowned Surge, 20 percent more damage for 12 s). Any player who steps
+    // into its path swallows it instead. Math, landed raw on the swallower:
+    // normal 10 to 14 (2 to 3 percent of a level 13 cloth wearer's 430);
+    // heroic on the revenant's x18 (dungeon_difficulty.ts: the Bastion's
+    // dungeon-wide factor, the revenant has no mechanic override) 180 to 252
+    // (14 to 20 percent of ~1,250). A cheap body-block, never a trap.
+    trashKit: {
+      walker: {
+        castId: BASTION_THROATLIGHT,
+        name: 'Throatlight',
+        objectTemplate: BASTION_THROATLIGHT_ORB,
+        launch: 'death',
+        school: 'nature',
+        speed: 3,
+        interceptRadius: 1.5,
+        reachRadius: 1.5,
+        maxSeconds: 8,
+        empower: {
+          auraId: BASTION_DROWNED_SURGE,
+          name: 'Drowned Surge',
+          damagePct: 0,
+          heroicDamagePct: 0.2,
+          seconds: 12,
+          healPct: 0.15,
+        },
+        intercept: { min: 10, max: 14 },
+      },
+    },
   },
   tidebound_acolyte: {
     id: 'tidebound_acolyte',

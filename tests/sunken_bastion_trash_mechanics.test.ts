@@ -494,7 +494,7 @@ describe('Bastion trash pass: the marks say their rule', () => {
     expect(
       auraEffectDescriptor({ id: BASTION_CARRION_GLUT, kind: 'buff_dr', value: 0, stacks: 2 })
         ?.nums,
-    ).toEqual({ stacks: 2, max: 3, radius: 1.25, pct: 40 });
+    ).toEqual({ stacks: 2, max: 3, radius: 1.25, pct: 25 });
     expect(
       auraEffectDescriptor({ id: BASTION_SNAPPED_FETTERS, kind: 'buff_dr', value: 0 })?.key,
     ).toBe('hudChrome.auraEffect.bastion.snappedFetters');

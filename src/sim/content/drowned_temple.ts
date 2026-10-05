@@ -29,7 +29,9 @@
 //                        a lane of lightning; Arcing Spark, a kickable bolt that
 //                        leaps between players. Spread out.
 //   Moonlit Siren        Call the Tide: an interruptible song of three Tidewisps.
-//                        Shrine Vigil while two pilgrims kneel by her.
+//                        Shrine Vigil while two pilgrims kneel by her. Call of
+//                        the Shallows draws one player to her: kick it, stun
+//                        her, or break her sight behind a column.
 //   Tidewisp             Bursts (and chills) when it reaches a player. Kill it on
 //                        the way in; on heroic two that touch swell into one.
 //   Drowned Pilgrim      fodder in fours, enrages when low; their prayer keeps
@@ -42,6 +44,7 @@
 
 import {
   TEMPLE_ARCING_SPARK,
+  TEMPLE_CALL_OF_THE_SHALLOWS,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_SNAP,
@@ -283,6 +286,28 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
           reduction: 0.75,
           heroicReduction: 0.85,
           name: 'Shrine Vigil',
+        },
+        // Call of the Shallows (the trash pass's second wave, temple_lure.ts):
+        // a 3 s kickable song at one player past the tank within 25 yd. They
+        // keep half their own run speed and are drawn to her at 2 yd a second
+        // (heroic 2.5); drawn within 2.5 yd, or when the song ends, they are
+        // Song-Struck, stunned 1.5 s (heroic 2 s). Out of her sight (a
+        // column, a wall) the song breaks at once. No damage: the cost is
+        // the stun beside her and the trip, so it is safe at any level.
+        lure: {
+          castId: TEMPLE_CALL_OF_THE_SHALLOWS,
+          name: 'Call of the Shallows',
+          castTime: 3,
+          every: 20,
+          first: 12,
+          school: 'arcane',
+          range: 25,
+          pull: 2,
+          heroicPull: 2.5,
+          reach: 2.5,
+          stun: 1.5,
+          heroicStun: 2,
+          stunName: 'Song-Struck',
         },
       },
     },

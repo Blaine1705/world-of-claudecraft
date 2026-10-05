@@ -134,12 +134,15 @@ describe('trash kit: the cast table', () => {
   });
 });
 
+// The Grave Bolt is heroic only since the trash pass's second wave (its
+// normal job is the Gravespark Volley, tests/dungeon_trash_wave2.test.ts), so
+// these bolt suites run in a heroic claim.
 describe('trash kit: Gravecaller Adept, Grave Bolt', () => {
   const def = MOBS.crypt_gravecaller_adept.trashKit?.bolt;
   if (!def) throw new Error('bolt');
 
   it('opens its bar after the first delay and hits hard only when the bar completes', () => {
-    const r = room();
+    const r = room('heroic');
     const mob = engage(r, 'crypt_gravecaller_adept');
     run(r, def.first - 0.2, [mob]);
     expect(mob.castingAbility).toBeNull();
@@ -154,11 +157,11 @@ describe('trash kit: Gravecaller Adept, Grave Bolt', () => {
     expect(mob.castingAbility).toBeNull();
     const dealt = before - r.me.hp;
     expect(dealt).toBeGreaterThan(0);
-    expect(dealt).toBeLessThanOrEqual(def.max * 1.01);
+    expect(dealt).toBeLessThanOrEqual(def.max * (mob.mechanicDamageMult ?? 1) * 1.01);
   });
 
   it('an interrupt drops the bolt, and the school lockout holds the next one', () => {
-    const r = room();
+    const r = room('heroic');
     const mob = engage(r, 'crypt_gravecaller_adept');
     run(r, def.first + DT, [mob]);
     expect(mob.castingAbility).toBe(CRYPT_GRAVE_BOLT);
@@ -459,7 +462,8 @@ describe('trash kit: Ossuary Warrior, Grave Cleave', () => {
 
 describe('trash kit: pulls and difficulty', () => {
   it('a mob that leaves combat drops its bar and its kit state', () => {
-    const r = room();
+    // Heroic: the adept's Grave Bolt is heroic only (the second wave).
+    const r = room('heroic');
     const def = MOBS.crypt_gravecaller_adept.trashKit?.bolt;
     const mob = engage(r, 'crypt_gravecaller_adept');
     run(r, (def?.first ?? 3) + DT, [mob]);

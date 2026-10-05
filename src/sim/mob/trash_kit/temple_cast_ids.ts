@@ -69,6 +69,25 @@ export const TEMPLE_TIDEWISP_CHILL = `${TEMPLE_TIDEWISP_BURST}_slow`;
 /** Tidewisp, heroic: the swell of a wisp that has drunk others (value: merges). */
 export const TEMPLE_SWOLLEN_TIDE = 'temple_swollen_tide';
 
+// The trash pass's second wave (the engine's G6 sight rule and G5 walker).
+/** Moonlit Siren: an interruptible song that draws one player to her; out of
+ *  her sight the song breaks (trashKit.temple.lure, temple_lure.ts). */
+export const TEMPLE_CALL_OF_THE_SHALLOWS = 'temple_call_of_the_shallows';
+/** The draw on the song's victim while it runs (a slow on their own legs). */
+export const TEMPLE_SHALLOWS_DRAW = 'temple_shallows_draw';
+/** The stun a landed song leaves on its victim. */
+export const TEMPLE_SONG_STRUCK = 'temple_song_struck';
+/** The cue as a song breaks on a column (its victim left her sight). */
+export const TEMPLE_SHALLOWS_BROKEN = 'temple_shallows_broken';
+/** The Moonmantle Ray, heroic: the Heartpearl that rolls from its chest when
+ *  its Nacre Cocoon breaks (a walker, temple_pearl.ts): its launch id, its
+ *  object template, the ward it lays on the ally it reaches and the group's
+ *  mantle when a player picks it up first. */
+export const TEMPLE_HEARTPEARL = 'temple_heartpearl';
+export const TEMPLE_HEARTPEARL_ORB = 'temple_heartpearl_orb';
+export const TEMPLE_HEARTPEARL_WARD = 'temple_heartpearl_ward';
+export const TEMPLE_NACRE_MANTLE = 'temple_nacre_mantle';
+
 /** The Temple trash casts a player interrupt can lock out, by school. The bite,
  *  the sweep, the hurl, the slam, the surge and the Prism Glare are absent on
  *  purpose: step out of those, or turn your back. */
@@ -79,4 +98,6 @@ export const TEMPLE_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['sc
   [TEMPLE_PALE_MENDING]: { school: 'frost' },
   [TEMPLE_GLIMMER_VENOM]: { school: 'nature' },
   [TEMPLE_ARCING_SPARK]: { school: 'nature' },
+  // Arcane, never the frost of Call the Tide, so one kick never locks both.
+  [TEMPLE_CALL_OF_THE_SHALLOWS]: { school: 'arcane' },
 };

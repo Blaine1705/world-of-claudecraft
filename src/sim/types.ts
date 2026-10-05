@@ -16,6 +16,7 @@ import type { VelkharFightState } from './encounters/gravewyrm_sanctum/velkhar_s
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
+import type { BastionKitDef } from './mob/trash_kit/bastion_kit_types';
 import type { TempleKitDef, TempleKitState } from './mob/trash_kit/temple_kit_types';
 import type { WildheartKitDef, WildheartKitState } from './mob/trash_kit/wildheart_kit_types';
 import type { FishingCatchBand } from './professions/fishing_bands';
@@ -4160,6 +4161,9 @@ export interface TrashKitCast {
   every: number;
   first: number;
   school: Aura['school'];
+  /** Heroic only: on normal the driver never starts this cast (the Gravecaller
+   *  Adept's Grave Bolt, which its normal volley replaces). */
+  heroicOnly?: boolean;
 }
 
 /**
@@ -4546,6 +4550,8 @@ export interface TrashKitDef {
   unshackle?: { name: string; belowHpPct: number; seconds: number };
   /** The Drowned Temple trash's own keys (mob/trash_kit/temple_kit_types.ts). */
   temple?: TempleKitDef;
+  /** The Sunken Bastion trash's second-wave keys (mob/trash_kit/bastion_kit_types.ts). */
+  bastion?: BastionKitDef;
   /** The Wildheart Basin trash's own keys (mob/trash_kit/wildheart_kit_types.ts). */
   wildheart?: WildheartKitDef;
 }
@@ -4628,7 +4634,10 @@ export interface KitWalkerDef {
   castId: string;
   name: string;
   objectTemplate: string;
-  launch: 'death' | 'cast';
+  /** 'death' and 'cast' are launched by the driver; 'event' only by the
+   *  dungeon module that owns the moment (the Moonmantle Ray's Heartpearl
+   *  when its cocoon breaks, temple_pearl.ts). */
+  launch: 'death' | 'cast' | 'event';
   /** The bar, when `launch` is 'cast'. */
   castTime?: number;
   every?: number;
@@ -4642,6 +4651,14 @@ export interface KitWalkerDef {
   reachRadius: number;
   /** Seconds before an orb that reached nothing fades. */
   maxSeconds: number;
+  /** Only these templates may receive it (absent: any fighting mob). */
+  allies?: readonly string[];
+  /** It leaves the mob this many yards out, on the side away from the one
+   *  the mob fights (out of the melee pile, so taking it is a choice). */
+  eject?: number;
+  /** With no ally to roll to, it waits where it is for its `maxSeconds`
+   *  (still a body may take it) instead of fading at once. */
+  lingers?: boolean;
   /** What it does to the ally it reaches: a damage-done aura worth
    *  `damagePct` for `seconds` (0: none), and a heal of `healPct` of the
    *  ally's maximum health (the Bastion Revenant's Last Breath shape). */
@@ -4651,10 +4668,30 @@ export interface KitWalkerDef {
     damagePct: number;
     seconds: number;
     healPct?: number;
+    /** On heroic the damage-done aura is worth this instead (normal only
+     *  heals: the Bastion Revenant's Throatlight). */
+    heroicDamagePct?: number;
+    /** An absorb shield of this share of the ally's maximum health, for
+     *  `seconds` (the Moonmantle Ray's Heartpearl Ward). */
+    shieldPct?: number;
   };
   /** What an interception does to the player who took it: a roll of damage,
    *  and optionally the same empower turned on them. */
-  intercept: { min: number; max: number; grantsEmpower?: boolean };
+  intercept: {
+    min: number;
+    max: number;
+    grantsEmpower?: boolean;
+    /** The taker's whole group: every living player within `radius` of the
+     *  taker gains an absorb of `pctMaxHp` of their own maximum health for
+     *  `seconds` (the Heartpearl's Nacre Mantle). */
+    groupShield?: {
+      auraId: string;
+      name: string;
+      pctMaxHp: number;
+      seconds: number;
+      radius: number;
+    };
+  };
 }
 
 /** The live state of an engine encounter object (Entity.kitObject): a hazard
