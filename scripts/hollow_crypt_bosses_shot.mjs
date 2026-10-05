@@ -167,13 +167,16 @@ try {
     await shot('sexton', 'marrow_09_toque_final');
     await sleep(800);
     await shot('sexton', 'marrow_10_huesos_se_levantan');
+    // Lay him to rest so he never chases the camera into the next arena.
+    await chat('/dev crypt kill marrow', 2500);
   }
   if (MODE === 'lady' || MODE === 'all') {
     // The Lady of the Bonechill on the frozen ravine floor (centre 80, 112).
     await stand(80, 94, 80, 112, 0, 0.3, 30);
     await sleep(2500);
     await shot('dama', 'dama_00_barranco');
-    await chat('/dev crypt pull lady', 1500);
+    await sleep(2500);
+    await chat('/dev crypt pull lady', 2500);
     await quiet('rimeweb');
     await stand(80, 100, 80, 114, 0.4, 0.3, 24);
     await sleep(1200);
@@ -198,13 +201,15 @@ try {
     await stand(80, 96, 80, 112, 0, 0.5, 34);
     await sleep(800);
     await shot('dama', 'dama_09_barranco_helado');
+    await chat('/dev crypt kill lady', 2500);
   }
   if (MODE === 'ilvane' || MODE === 'all') {
     // Cantor Ilvane on the Choir Loft (her spot 0, 163; the organ at z 170).
     await stand(0, 151.5, 0, 163, 0, 0.3, 24);
     await sleep(2500);
     await shot('cantora', 'cantora_00_coro');
-    await chat('/dev crypt pull ilvane', 1500);
+    await sleep(2500);
+    await chat('/dev crypt pull ilvane', 2500);
     await quiet('cantor_ilvane');
     await placeBoss('cantor_ilvane', 0, 163, Math.PI);
     await stand(3, 156, 0, 163, 0.5, 0.3, 18);
