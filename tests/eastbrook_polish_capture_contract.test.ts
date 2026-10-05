@@ -702,7 +702,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted for the five-dungeon rework (feature/drowned-temple-rework): its renderer
   // integrations moved the runtimeRender.renderer leaf. No capture was retaken.
-  'c1c0d84e172633171ca00bd1d10dd30c6120e69a0914c0fdcc6b9946e2c5770a';
+  // Re-minted for the Sunken Bastion and Drowned Temple encounter passes (the
+  // renderer leaf moved again). No capture was retaken.
+  'e179b7a2ebf3f21e4c6731d7d8e5caa9d9a5747cda1f462acfc63c83f537ba37';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
