@@ -17,9 +17,14 @@
 // the chain pull answers at THAT pull, as for any boss. A wipe sends him home
 // to the centre, ready again; the cinematic never replays.
 //
-// A forced pull while he still lies in the ice (a dev pull, a test) plays the
-// same cinematic as the fight's opening (from where he stands once the ice is
-// gone) and lands him in his fight.
+// While he is held nothing pulls him: not a hit, not his aggro radius, not a
+// premature boss chain pull (the mob AI's encounterHeld arm clears any aggro
+// before the encounter pass). Only a pull driven straight through the
+// encounter tick (the tests' harness) still plays the cinematic as the fight's
+// opening and lands him in his fight. At the touchdown, a player already
+// standing inside his aggro radius of the centre (18 yd; the landing shove only
+// clears his body) pulls him on the next tick: that is the ordinary pull, not
+// the wake.
 //
 // Every visible state rides existing fields: the bar, `pos` (`pos.y` the
 // height), `facing`, one `nova` spellfx at the touchdown. Zero rng.

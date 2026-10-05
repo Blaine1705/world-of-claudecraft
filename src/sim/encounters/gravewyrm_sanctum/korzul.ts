@@ -74,7 +74,7 @@ import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { type Aura, DT, dist2d, type Entity } from '../../types';
 import { pickMarkTargets } from '../sunken_bastion/claim';
-import { KORZUL_BODY_RADIUS, plateTemplate } from './boss_ids';
+import { KORZUL_BODY_RADIUS, KORZUL_REACH, plateTemplate } from './boss_ids';
 import {
   claimPlayers,
   clearCastIf,
@@ -369,7 +369,7 @@ function landGraveBreath(
   const yaw = st.aimYaw ?? boss.facing;
   st.aimYaw = null;
   nova(ctx, boss, boss, KORZUL_GRAVE_BREATH);
-  const reach = T.breathRange + KORZUL_BODY;
+  const reach = KORZUL_REACH.breath;
   for (const p of claimPlayers(ctx, inst)) {
     if (p.dead || (!everyone && p.id === tankId)) continue;
     if (!inCone(boss.pos, yaw, p.pos, reach, T.breathArcDeg)) continue;
@@ -420,7 +420,7 @@ function landTailSweep(
   st.aimYaw = null;
   nova(ctx, boss, boss, KORZUL_TAIL_SWEEP, 'physical');
   for (const p of claimPlayers(ctx, inst)) {
-    if (p.dead || !inCone(boss.pos, yaw, p.pos, T.tailRange + KORZUL_BODY, T.tailArcDeg)) continue;
+    if (p.dead || !inCone(boss.pos, yaw, p.pos, KORZUL_REACH.tail, T.tailArcDeg)) continue;
     ctx.dealDamage(
       boss,
       p,

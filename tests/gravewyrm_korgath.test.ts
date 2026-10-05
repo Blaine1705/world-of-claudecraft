@@ -811,3 +811,11 @@ describe('Korgath the Bound: every strike leaves time to react (the playtest)', 
     expect(T.barGap).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('Korgath the Bound: the cast hold stays his', () => {
+  it('carries no trash kit, breath cone or perch, so the trash pass never clears his hold', () => {
+    const t = MOBS[KORGATH_ID];
+    expect(t.trashKit).toBeUndefined();
+    expect(t.breathCone).toBeUndefined();
+  });
+});

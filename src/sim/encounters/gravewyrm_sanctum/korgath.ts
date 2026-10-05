@@ -69,7 +69,6 @@ import {
   GOADSMITH_ID,
   GOADSMITH_RERIVET,
   KORGATH_BELLOW,
-  KORGATH_BODY,
   KORGATH_CHAIN_BREAK,
   KORGATH_CHAIN_FLAIL,
   KORGATH_ENRAGE,
@@ -480,6 +479,9 @@ function farthest(players: readonly Entity[], from: Entity, not: number | null):
 /** Start one of his bars. His feet and his facing lock where the bar began
  *  (the cast hold seam, mob/trash_kit/cast_hold.ts): the shape on the floor
  *  never moves with the tank, so stepping out of it is the counterplay. */
+// (Korgath carries no trashKit, breathCone or perch: the trash kit's own
+// hold pass, which clears a hold it does not own, never steps him. Pinned in
+// tests/gravewyrm_korgath.test.ts.)
 function begin(
   boss: Entity,
   st: KorgathFightState,
@@ -682,8 +684,8 @@ function landLane(
     if (p.dead) continue;
     const px = p.pos.x - o.x;
     const pz = p.pos.z - o.z;
-    if (!inLane(lane.x, lane.z, lane.yaw, lane.length + KORGATH_BODY, lane.halfWidth, px, pz))
-      continue;
+    const reach = charge ? KORGATH_REACH.charge : KORGATH_REACH.flail;
+    if (!inLane(lane.x, lane.z, lane.yaw, reach, lane.halfWidth, px, pz)) continue;
     if (charge) hit(ctx, boss, p, T.chargeMin, T.chargeMax, 'Threshold Charge');
     else hit(ctx, boss, p, T.flailMin, T.flailMax, 'Chain Flail');
     if (charge && !p.dead) applyKnockback(ctx, boss, p, T.chargeKnockback);
