@@ -14,6 +14,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -38,13 +41,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "es_ES": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -69,13 +76,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "fr_FR": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -100,13 +111,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "fr_CA": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -131,7 +146,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "en_CA": [],
   "it_IT": [
@@ -139,6 +155,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -163,13 +182,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "de_DE": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -194,7 +217,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "zh_CN": [
     "hudChrome.graphicsRestore.note",
@@ -237,6 +261,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -261,7 +288,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "ru_RU": [
     "hudChrome.graphicsRestore.note",
@@ -277,6 +305,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -301,13 +332,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "nl_NL": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -332,13 +367,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "pl_PL": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -363,13 +402,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "id_ID": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -394,13 +437,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "tr_TR": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -425,13 +472,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "sv_SE": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -456,13 +507,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "vi_VN": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -487,13 +542,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ],
   "da_DK": [
     "entities.abilities.scratch.description",
     "entities.abilities.scratch.name",
     "entities.abilities.scratch.specNote_feral",
     "entities.items.pvp_trophy_skull.name",
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
     "guide.economy.junkBodyFinal",
     "guide.settingsPage.ifClassicCombatText",
     "guide.settingsPage.rowSpellEffects",
@@ -518,6 +577,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.requiredTask.pvpWinOne",
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
-    "itemUi.vendor.sellJunkNoBuyback"
+    "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.logs.worldQuestRewardMailed"
   ]
 };
