@@ -114,7 +114,7 @@ uniform float uAlpha;
 varying vec3 vN;
 varying vec3 vView;
 void main() {
-  float rim = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.4);
+  float rim = pow(clamp(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0, 1.0), 2.4);
   gl_FragColor = vec4(uColor * (0.6 + 1.6 * rim), rim * uAlpha);
 }
 `;
@@ -577,7 +577,8 @@ export class MarrowFx implements CryptBossPainter {
       p.mat.uniforms.uOpen.value = open;
       p.decal.visible = true;
       p.mound.position.set(obj.pos.x, gy - 0.05, obj.pos.z);
-      p.mound.scale.set(radius * 0.98, open, radius * 0.98);
+      // Never a flat zero scale (a singular normal matrix on a lit mesh).
+      p.mound.scale.set(radius * 0.98, Math.max(0.02, open), radius * 0.98);
       p.mound.visible = true;
       // Grave mist breathing out of the pit (cosmetic).
       p.mist -= dt;

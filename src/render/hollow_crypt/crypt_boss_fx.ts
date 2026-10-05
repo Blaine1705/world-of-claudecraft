@@ -30,6 +30,7 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
+import { cryptSlotOrigin } from './crypt_boss_fx_core';
 import { DUST_FRAG, GLOW_FRAG, PARTICLE_VERT, ParticlePool } from './crypt_fx_particles';
 import { IlvaneFx } from './ilvane_fx';
 import { LadyFx } from './lady_fx';
@@ -109,6 +110,9 @@ export class CryptBossFx implements CryptBossFxHost {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private time = 0;
+  /** Is the local player inside a Hollow Crypt claim (re-read twice a second)? */
+  private inCrypt = false;
+  private where = 0;
   private seed = 0x2b4e;
   private disposed = false;
 
@@ -228,6 +232,17 @@ export class CryptBossFx implements CryptBossFxHost {
     if (!world || this.disposed) return;
     this.time += dt;
     this.uTime.value = this.time;
+    // Nothing to paint (and no world to scan) outside the crypt.
+    this.where -= dt;
+    if (this.where <= 0) {
+      this.where = 0.5;
+      const me = world.player;
+      const o = me ? cryptSlotOrigin(me.pos.x, me.pos.z) : null;
+      this.inCrypt =
+        !!me && !!o && Math.abs(me.pos.x - o.x) < 130 && Math.abs(me.pos.z - o.z) < 260;
+      this.root.visible = this.inCrypt;
+    }
+    if (!this.inCrypt) return;
     for (const p of this.painters) p.update(world, dt);
     for (const w of this.waves) {
       if (!w.alive) continue;

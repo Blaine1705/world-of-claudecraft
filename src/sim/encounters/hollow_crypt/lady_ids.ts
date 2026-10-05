@@ -43,8 +43,8 @@ export const LADY_SHATTERING_FALL = 'crypt_lady_shattering_fall';
 export const LADY_LANTERN_SHELTER = 'crypt_lady_lantern_shelter';
 
 // ---- auras ------------------------------------------------------------------------
-/** Held in her arms: stunned and carried (value2 = the share still to deal, a
- *  fraction of her health, refreshed as it falls). */
+/** Held in her arms: stunned and carried (an unbreakable stun; the HUD's alert
+ *  and tooltip read the rule from LADY_TUNING). */
 export const LADY_EMBRACED = 'crypt_lady_embraced';
 /** Every Lament taken: the next one bites harder (stacks). */
 export const LADY_LINGERING_LAMENT = 'crypt_lady_lingering_lament';

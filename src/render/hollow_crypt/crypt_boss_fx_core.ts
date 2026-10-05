@@ -11,7 +11,7 @@ import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 
 /** The world origin of the Hollow Crypt claim a world spot stands in (the
  *  sim's layout and encounter spots are instance-local). */
-export function cryptSlotOrigin(x: number, z: number): { x: number; z: number } {
+export function cryptSlotOrigin(_x: number, z: number): { x: number; z: number } {
   const o = instanceOrigin(DUNGEONS.hollow_crypt.index, instanceSlotForZ(z));
   return { x: o.x, z: o.z };
 }

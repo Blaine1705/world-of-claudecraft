@@ -52,6 +52,10 @@ const SONG = { r: 0.72, g: 0.45, b: 1 };
 const PALE = { r: 0.8, g: 0.92, b: 1 };
 /** The choir pillars (instance-local), the line-of-sight cover of her loft. */
 const CHOIR_PILLARS = HOLLOW_CRYPT_FIELD.props.filter((p) => p.kind === 'hc_choir_pillar');
+const LANE_STYLE = {
+  color: TELEGRAPH_THREAT_COLORS.danger,
+  accent: TELEGRAPH_ACCENTS.shadow,
+} as const;
 /** How far a pillar's shadow is drawn from her voice (the loft's reach). */
 const SHADOW_REACH = 30;
 
@@ -86,6 +90,8 @@ interface LaneSlot extends TelegraphLane {
   objectId: number;
   born: number;
   burstAt: number;
+  /** Draped on the floor already (the lanes never move). */
+  draped: boolean;
 }
 
 interface Shadow {
@@ -119,7 +125,7 @@ export class IlvaneFx implements CryptBossPainter {
       accent: TELEGRAPH_ACCENTS.shadow,
     });
     for (let i = 0; i < LANES; i++)
-      this.lanes.push({ ...kit.lane(9), objectId: -1, born: 0, burstAt: 0 });
+      this.lanes.push({ ...kit.lane(9), objectId: -1, born: 0, burstAt: 0, draped: false });
     this.shadowMat = host.own(
       new THREE.ShaderMaterial({
         uniforms: { uTime: host.uTime, uAlpha: { value: 0 } },
@@ -304,6 +310,7 @@ export class IlvaneFx implements CryptBossPainter {
       const slot = this.lanes.find((l) => l.objectId < 0);
       if (!slot) continue;
       slot.objectId = e.id;
+      slot.draped = false;
       slot.born = this.host.clock();
       slot.burstAt = e.templateId === ILVANE_NOTE_BURST_TEMPLATE ? this.host.clock() : 0;
     }
@@ -349,7 +356,6 @@ export class IlvaneFx implements CryptBossPainter {
         s.pos.setXYZ(k, wx, h.groundY(wx, wz) + 0.08, wz);
       }
       s.pos.needsUpdate = true;
-      s.mesh.geometry.computeBoundingSphere();
       s.mesh.visible = true;
     }
     // The rings of her voice (cosmetic).
@@ -391,10 +397,20 @@ export class IlvaneFx implements CryptBossPainter {
       const length = obj.scale > 0 ? obj.scale : 18;
       const gy = h.groundY(obj.pos.x, obj.pos.z);
       const burst = l.burstAt > 0;
-      h.kit.drapeLane(l, h.groundY, obj.pos.x, gy, obj.pos.z, obj.facing, length, NOTE_LANE_HALF, {
-        color: TELEGRAPH_THREAT_COLORS.danger,
-        accent: TELEGRAPH_ACCENTS.shadow,
-      });
+      if (!l.draped) {
+        l.draped = true;
+        h.kit.drapeLane(
+          l,
+          h.groundY,
+          obj.pos.x,
+          gy,
+          obj.pos.z,
+          obj.facing,
+          length,
+          NOTE_LANE_HALF,
+          LANE_STYLE,
+        );
+      }
       const age = now - l.born;
       h.kit.paintLane(l, {
         fill: burst ? 1 : Math.min(1, age / gather),

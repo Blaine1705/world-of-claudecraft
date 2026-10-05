@@ -124,8 +124,9 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
       burn: { perTick: 2, interval: 1, duration: 6, name: 'Rime Bite', school: 'frost' },
     },
   },
-  // P7: the caster spider on the rim walk (Silk Wrap arrives with Rimeweb's
-  // module; tonight its bite carries the stacking rime venom).
+  // P7: the caster spider on the rim walk (the gallery's rimeweb spiders keep
+  // their species name; the ravine's boss is now the Lady of the Bonechill):
+  // its bite carries the stacking rime venom.
   rimeweb_spinner: {
     id: 'rimeweb_spinner',
     name: 'Rimeweb Spinner',

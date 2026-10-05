@@ -141,7 +141,7 @@ uniform float uAlpha;
 varying vec3 vN;
 varying vec3 vView;
 void main() {
-  float rim = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.0);
+  float rim = pow(clamp(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0, 1.0), 2.0);
   gl_FragColor = vec4(uColor * (0.5 + 1.5 * rim), (0.15 + rim) * uAlpha);
 }
 `;
@@ -280,6 +280,9 @@ export class LadyFx implements CryptBossPainter {
   private floorBorn = 0;
   private scan = 0;
   private snow = 0;
+  private ring = 0;
+  /** Players held in her Embrace (refreshed with the scan). */
+  private embraced: number[] = [];
 
   constructor(private readonly host: CryptBossFxHost) {
     const decalGeo = host.own(new THREE.CircleGeometry(1, 64));
@@ -553,7 +556,7 @@ export class LadyFx implements CryptBossPainter {
     this.paintDomes();
     this.paintGrave(world);
     if (lady) {
-      this.paintLament(lady);
+      this.paintLament(lady, dt);
       this.paintEmbrace(world, lady);
       this.paintTrail(lady, dt);
     } else this.embraceRing.group.visible = false;
@@ -562,11 +565,20 @@ export class LadyFx implements CryptBossPainter {
   private scanWorld(world: IWorld): void {
     this.ladyId = -1;
     this.floorId = -1;
+    this.embraced = [];
     const lanternIds = new Set<number>();
     const patchIds = new Set<number>();
     for (const e of world.entities.values()) {
       if (e.kind === 'mob') {
         if (e.templateId === LADY_ID && !e.dead) this.ladyId = e.id;
+        continue;
+      }
+      if (e.kind === 'player') {
+        for (const a of e.auras)
+          if (a.id === LADY_EMBRACED) {
+            this.embraced.push(e.id);
+            break;
+          }
         continue;
       }
       if (e.kind !== 'object') continue;
@@ -715,7 +727,7 @@ export class LadyFx implements CryptBossPainter {
   }
 
   /** The wail gathering: frost spirals in round her, cold rings roll out. */
-  private paintLament(lady: Entity): void {
+  private paintLament(lady: Entity, dt: number): void {
     const h = this.host;
     const casting = lady.castingAbility;
     if (casting !== LADY_BRIDES_LAMENT && casting !== LADY_BRIDAL_FREEZE) return;
@@ -742,9 +754,11 @@ export class LadyFx implements CryptBossPainter {
       });
     }
     // A cold ring every half second, faster as the wail peaks.
-    const every = 0.5 - 0.25 * fill;
-    if (Math.floor(now / every) !== Math.floor((now - 1 / 60) / every))
+    this.ring -= dt;
+    if (this.ring <= 0) {
+      this.ring = 0.5 - 0.25 * fill;
       h.wave(lady.pos.x, lady.pos.z, 7 + 8 * fill, 0.5, 0xb8e8ff, 0.1);
+    }
   }
 
   private paintEmbrace(world: IWorld, lady: Entity): void {
@@ -766,8 +780,9 @@ export class LadyFx implements CryptBossPainter {
     } else ring.group.visible = false;
     if (h.low) return;
     const now = h.clock();
-    for (const e of world.entities.values()) {
-      if (e.kind !== 'player' || !e.auras.some((a) => a.id === LADY_EMBRACED)) continue;
+    for (const id of this.embraced) {
+      const e = world.entities.get(id);
+      if (!e) continue;
       for (let k = 0; k < 2; k++) {
         const [dx, dy, dz] = embraceSpiral(now, Math.floor(h.rand() * 12), 12, 1.1, 2.4);
         h.glow.emit(now, {

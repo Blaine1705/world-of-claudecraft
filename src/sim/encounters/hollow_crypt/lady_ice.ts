@@ -83,17 +83,20 @@ export function stepSlick(
       dropAuraById(p, SLIPPERY_GROUND_AURA);
       continue;
     }
+    // Topped up only every second or so (each top-up moves the aura's
+    // deadline on the wire): the slick outlives a step off the ice by at most
+    // that, and the removal above is immediate anyway.
     const a = p.auras.find((x) => x.id === SLIPPERY_GROUND_AURA);
     if (a) {
-      if (a.remaining < 0.5) a.remaining = 1;
+      if (a.remaining < 0.5) a.remaining = 1.5;
       continue;
     }
     p.auras.push({
       id: SLIPPERY_GROUND_AURA,
       name: 'Rime-Slick',
       kind: 'slow',
-      remaining: 1,
-      duration: 1,
+      remaining: 1.5,
+      duration: 1.5,
       value: 1,
       value2: T.iceGrip,
       sourceId: boss.id,
