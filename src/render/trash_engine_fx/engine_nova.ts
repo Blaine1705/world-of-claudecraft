@@ -16,6 +16,11 @@
 //    dead at each block, bursting into spray against it, so the blast reads
 //    as a sight line.
 //
+// The field lies on sight_field.ts's dense surface, draped once per bar (a
+// planted caster never moves) and pulled toward the camera in depth, so it
+// hugs a slope, a stair or a terrace lip with no z-fight; a reach carving in
+// mid-bar only rewrites the sector's `aReach`.
+//
 // The sight field, its rim and the kick glyph are ACTIONABLE: every tier. The
 // bands, the curtain and the sparks are cosmetic (the low tier sheds them).
 // Built once under the host's root before its gated attach; no light; no
@@ -33,6 +38,13 @@ import {
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { SURFACE_LIFT } from './engine_geometry';
 import {
+  SIGHT_FIELD_VERT,
+  SIGHT_SHADE_GLSL,
+  SIGHT_STEEP_GLSL,
+  SightFieldSurface,
+} from './sight_field';
+import { sightStations } from './sight_field_core';
+import {
   kitOf,
   NOVA_RAYS,
   NOVA_WAVE_LINGER,
@@ -48,8 +60,6 @@ import type { TrashEngineHost } from './trash_engine_host';
 
 const CAST_SLOTS = 6;
 const WAVE_SLOTS = 3;
-/** Radial rings of the lit fan (the fill front and the bands need them). */
-const RINGS = 5;
 /** Rays re-measured per second per live bar, at most this many a frame, and
  *  how many the claim frame measures at once. */
 const RAYS_PER_SECOND = 256;
@@ -58,26 +68,13 @@ const FIRST_RAYS = 16;
 /** Seconds a released bar's sight field is kept for its landing wave. */
 const KEEP_SECONDS = 1.2;
 
-const FIELD_VERT = /* glsl */ `
-attribute float aR;
-attribute float aReach;
-varying float vR;
-varying float vReach;
-varying vec3 vWorld;
-void main() {
-  vR = aR;
-  vReach = aReach;
-  vec4 w = modelMatrix * vec4(position, 1.0);
-  vWorld = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
-}
-`;
-
-/** The lit part of the field: the shared telegraph layers (tint, fill and
- *  its front, rim, warning, cosmetic bands) on yards from the caster, the rim
- *  drawn wherever the sight line ends (the nova's edge, or the face of the
- *  cover that stops it). */
-const LIT_FRAG = /* glsl */ `
+/** The whole field in one draw: out to the sector's reach the lit floor
+ *  (the shared telegraph layers: tint, fill and its front, rim, warning,
+ *  cosmetic bands, on yards from the caster, the rim drawn wherever the sight
+ *  line ends: the nova's edge, or the face of the cover that stops it);
+ *  beyond it the shadow behind cover, dark, cool and hatched (the nova cannot
+ *  see here), its outer edge a faint dotted trace of the reach. */
+const FIELD_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform vec3 uAccent;
 uniform float uRadius;
@@ -95,7 +92,15 @@ varying float vR;
 varying float vReach;
 varying vec3 vWorld;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+${SIGHT_STEEP_GLSL}
+${SIGHT_SHADE_GLSL}
 void main() {
+  if (sightSteep(vLocal)) discard;
+  if (vR > vReach + 0.02) {
+    vec4 shade = sightShade(vR, vReach, uRadius, vWorld);
+    gl_FragColor = vec4(shade.rgb, shade.a * uFade);
+    return;
+  }
   float edge = max(0.0, vReach - vR);
   float open = smoothstep(uRadius - 0.3, uRadius - 0.05, vReach);
   float rimCore = 1.0 - smoothstep(0.05, 0.18, edge);
@@ -123,26 +128,6 @@ void main() {
 }
 `;
 
-/** The shadow behind cover: dark, cool, hatched; the nova cannot see here.
- *  Its outer edge keeps a faint dotted trace of the reach. */
-const SHADE_FRAG = /* glsl */ `
-uniform float uRadius;
-uniform float uTime;
-uniform float uFade;
-varying float vR;
-varying float vReach;
-varying vec3 vWorld;
-void main() {
-  if (vR < vReach + 0.02) discard;
-  float hatch = step(0.5, fract((vWorld.x + vWorld.z) * 0.9));
-  float near = 1.0 - smoothstep(0.0, 1.2, vR - vReach);
-  float trace = (1.0 - smoothstep(0.08, 0.2, uRadius - vR)) * step(0.5, fract(atan(vWorld.z, vWorld.x) * 30.0));
-  vec3 col = mix(vec3(0.02, 0.05, 0.09), vec3(0.45, 0.8, 0.95), hatch * 0.25 + near * 0.35);
-  float a = 0.34 + hatch * 0.08 + near * 0.2 + trace * 0.35;
-  gl_FragColor = vec4(col, a * uFade);
-}
-`;
-
 /** The landing wave over the lit floor: a racing frost front, rime left
  *  glittering behind it. */
 const WAVE_FRAG = /* glsl */ `
@@ -154,8 +139,10 @@ varying float vR;
 varying float vReach;
 varying vec3 vWorld;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+${SIGHT_STEEP_GLSL}
 void main() {
-  if (vR > uFront) discard;
+  if (sightSteep(vLocal)) discard;
+  if (vR > uFront || vR > vReach + 0.02) discard;
   float d = uFront - vR;
   float crest = exp(-d * d * 1.6);
   float rime = (0.25 + 0.2 * hash(floor(vWorld.xz * 3.0))) * (1.0 - smoothstep(0.0, 9.0, d));
@@ -171,9 +158,10 @@ varying float vH;
 varying vec3 vWorld;
 void main() {
   vH = aH;
-  vec4 w = modelMatrix * vec4(position, 1.0);
-  vWorld = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
+  // Camera-relative (the CPU's double-precision modelView): instance bands
+  // sit far out, where a float32 world point rounds by more than the lift.
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
 /** The standing frost curtain riding the wave's front. */
@@ -191,12 +179,11 @@ void main() {
 }
 `;
 
-/** One sight field: the lit fan and its shadow strip over NOVA_RAYS rays. */
+/** One sight field: the lit floor and its shadows, one draw on one surface. */
 interface Field {
-  lit: THREE.Mesh;
-  shade: THREE.Mesh;
-  litMat: THREE.ShaderMaterial;
-  shadeMat: THREE.ShaderMaterial;
+  surface: SightFieldSurface;
+  mesh: THREE.Mesh;
+  mat: THREE.ShaderMaterial;
 }
 
 interface CastSlot {
@@ -229,49 +216,11 @@ interface WaveSlot {
   /** Rays whose block the front has already splashed against. */
   splashed: Uint8Array;
   color: number;
+  surface: SightFieldSurface;
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
   curtain: THREE.Mesh;
   curtainMat: THREE.ShaderMaterial;
-}
-
-/** Vertices of one sector (between two neighbouring rays) of the lit fan. */
-const LIT_PER_SECTOR = (RINGS + 1) * 2;
-
-/**
- * The sight field's geometry, one SECTOR per pair of neighbouring rays with
- * vertices of its own: a sector is lit out to the FARTHER of its two rays'
- * reaches and shaded only beyond that, so the hatched shadow is drawn only
- * where both of its rays are blocked (conservative: never a safe-looking spot
- * the nova can still see).
- */
-function fieldGeometry(): { lit: THREE.BufferGeometry; shade: THREE.BufferGeometry } {
-  const n = NOVA_RAYS;
-  const litCount = n * LIT_PER_SECTOR;
-  const lit = new THREE.BufferGeometry();
-  lit.setAttribute('position', new THREE.BufferAttribute(new Float32Array(litCount * 3), 3));
-  lit.setAttribute('aR', new THREE.BufferAttribute(new Float32Array(litCount), 1));
-  lit.setAttribute('aReach', new THREE.BufferAttribute(new Float32Array(litCount), 1));
-  const li: number[] = [];
-  for (let s = 0; s < n; s++) {
-    const b = s * LIT_PER_SECTOR;
-    for (let k = 0; k < RINGS; k++) {
-      const a0 = b + k * 2;
-      li.push(a0, a0 + 1, a0 + 2, a0 + 1, a0 + 3, a0 + 2);
-    }
-  }
-  lit.setIndex(li);
-  const shade = new THREE.BufferGeometry();
-  shade.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 4 * 3), 3));
-  shade.setAttribute('aR', new THREE.BufferAttribute(new Float32Array(n * 4), 1));
-  shade.setAttribute('aReach', new THREE.BufferAttribute(new Float32Array(n * 4), 1));
-  const si: number[] = [];
-  for (let s = 0; s < n; s++) {
-    const b = s * 4;
-    si.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
-  }
-  shade.setIndex(si);
-  return { lit, shade };
 }
 
 export class EngineNova {
@@ -300,10 +249,15 @@ export class EngineNova {
   private readonly cosA = new Float32Array(NOVA_RAYS);
   private readonly sinA = new Float32Array(NOVA_RAYS);
   private readonly detail: boolean;
+  /** Draped stations of every field: dense enough for the widest nova. */
+  private readonly stations: number;
   private clock = 0;
 
   constructor(private readonly host: TrashEngineHost) {
     this.detail = host.density >= 1;
+    let widest = 0;
+    for (const def of host.catalog.novas.values()) widest = Math.max(widest, def.radius);
+    this.stations = sightStations(widest);
     for (let i = 0; i < NOVA_RAYS; i++) {
       const a = (i / NOVA_RAYS) * Math.PI * 2;
       // Sim convention: facing 0 looks down +z (x = sin, z = cos).
@@ -329,8 +283,8 @@ export class EngineNova {
       });
     }
     for (let i = 0; i < WAVE_SLOTS; i++) {
-      const { lit } = fieldGeometry();
-      this.geometries.push(lit);
+      const surface = new SightFieldSurface(NOVA_RAYS, this.stations);
+      this.geometries.push(surface.geometry);
       const mat = new THREE.ShaderMaterial({
         name: 'trashEngineNovaWave',
         uniforms: {
@@ -339,7 +293,7 @@ export class EngineNova {
           uAlpha: { value: 0 },
           uTime: host.uTime,
         },
-        vertexShader: FIELD_VERT,
+        vertexShader: SIGHT_FIELD_VERT,
         fragmentShader: WAVE_FRAG,
         transparent: true,
         depthWrite: false,
@@ -347,7 +301,7 @@ export class EngineNova {
         blending: THREE.AdditiveBlending,
       });
       this.materials.push(mat);
-      const mesh = new THREE.Mesh(lit, mat);
+      const mesh = new THREE.Mesh(surface.geometry, mat);
       mesh.frustumCulled = false;
       mesh.visible = false;
       mesh.renderOrder = floorVfxRenderOrder('encounter', 22);
@@ -394,6 +348,7 @@ export class EngineNova {
         reach: new Float32Array(NOVA_RAYS),
         splashed: new Uint8Array(NOVA_RAYS),
         color: 0xffffff,
+        surface,
         mesh,
         mat,
         curtain,
@@ -403,9 +358,9 @@ export class EngineNova {
   }
 
   private field(): Field {
-    const { lit, shade } = fieldGeometry();
-    this.geometries.push(lit, shade);
-    const litMat = new THREE.ShaderMaterial({
+    const surface = new SightFieldSurface(NOVA_RAYS, this.stations);
+    this.geometries.push(surface.geometry);
+    const mat = new THREE.ShaderMaterial({
       name: 'trashEngineNovaSight',
       uniforms: {
         uColor: { value: new THREE.Color() },
@@ -422,32 +377,19 @@ export class EngineNova {
         uTime: this.host.uTime,
         uFade: { value: 1 },
       },
-      vertexShader: FIELD_VERT,
-      fragmentShader: LIT_FRAG,
+      vertexShader: SIGHT_FIELD_VERT,
+      fragmentShader: FIELD_FRAG,
       transparent: true,
       depthWrite: false,
       side: THREE.DoubleSide,
     });
-    const shadeMat = new THREE.ShaderMaterial({
-      name: 'trashEngineNovaShade',
-      uniforms: { uRadius: { value: 1 }, uTime: this.host.uTime, uFade: { value: 1 } },
-      vertexShader: FIELD_VERT,
-      fragmentShader: SHADE_FRAG,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    this.materials.push(litMat, shadeMat);
-    const litMesh = new THREE.Mesh(lit, litMat);
-    litMesh.frustumCulled = false;
-    litMesh.visible = false;
-    litMesh.renderOrder = floorVfxRenderOrder('encounter', 15);
-    const shadeMesh = new THREE.Mesh(shade, shadeMat);
-    shadeMesh.frustumCulled = false;
-    shadeMesh.visible = false;
-    shadeMesh.renderOrder = floorVfxRenderOrder('encounter', 14);
-    this.host.root.add(litMesh, shadeMesh);
-    return { lit: litMesh, shade: shadeMesh, litMat, shadeMat };
+    this.materials.push(mat);
+    const mesh = new THREE.Mesh(surface.geometry, mat);
+    mesh.frustumCulled = false;
+    mesh.visible = false;
+    mesh.renderOrder = floorVfxRenderOrder('encounter', 15);
+    this.host.root.add(mesh);
+    return { surface, mesh, mat };
   }
 
   // ------------------------------------------------------------- sight rays
@@ -466,86 +408,6 @@ export class EngineNova {
     this.rayX = this.sinA[ray];
     this.rayZ = this.cosA[ray];
     return sightReach(this.clearAt, radius, steps);
-  }
-
-  /** Rewrite the two sectors that share ray `ray` (its reach changed). */
-  private writeRay(
-    lit: THREE.BufferGeometry,
-    shade: THREE.BufferGeometry | null,
-    at: { x: number; y: number; z: number },
-    ray: number,
-    reach: Float32Array,
-    radius: number,
-    lift: number,
-  ): void {
-    this.writeSector(lit, shade, at, (ray + NOVA_RAYS - 1) % NOVA_RAYS, reach, radius, lift);
-    this.writeSector(lit, shade, at, ray, reach, radius, lift);
-  }
-
-  /** Lay one sector (rays `s` and `s + 1`) on the floor: lit out to the
-   *  farther of the two reaches, shaded from there to the radius. */
-  private writeSector(
-    lit: THREE.BufferGeometry,
-    shade: THREE.BufferGeometry | null,
-    at: { x: number; y: number; z: number },
-    s: number,
-    reach: Float32Array,
-    radius: number,
-    lift: number,
-  ): void {
-    const gY = this.host.groundY;
-    const j = (s + 1) % NOVA_RAYS;
-    const q = Math.max(reach[s], reach[j]);
-    const lp = lit.getAttribute('position') as THREE.BufferAttribute;
-    const lr = lit.getAttribute('aR') as THREE.BufferAttribute;
-    const lre = lit.getAttribute('aReach') as THREE.BufferAttribute;
-    const base = s * LIT_PER_SECTOR;
-    for (let k = 0; k <= RINGS; k++) {
-      const d = (q * k) / RINGS;
-      for (let e = 0; e < 2; e++) {
-        const ray = e === 0 ? s : j;
-        const wx = at.x + this.sinA[ray] * d;
-        const wz = at.z + this.cosA[ray] * d;
-        const idx = base + k * 2 + e;
-        lp.setXYZ(idx, wx - at.x, gY(wx, wz) - at.y + lift, wz - at.z);
-        lr.setX(idx, d);
-        lre.setX(idx, q);
-      }
-    }
-    lp.needsUpdate = true;
-    lr.needsUpdate = true;
-    lre.needsUpdate = true;
-    if (!shade) return;
-    const sp = shade.getAttribute('position') as THREE.BufferAttribute;
-    const sr = shade.getAttribute('aR') as THREE.BufferAttribute;
-    const sre = shade.getAttribute('aReach') as THREE.BufferAttribute;
-    for (let k = 0; k < 2; k++) {
-      const d = k === 0 ? q : radius;
-      for (let e = 0; e < 2; e++) {
-        const ray = e === 0 ? s : j;
-        const wx = at.x + this.sinA[ray] * d;
-        const wz = at.z + this.cosA[ray] * d;
-        const idx = s * 4 + k * 2 + e;
-        sp.setXYZ(idx, wx - at.x, gY(wx, wz) - at.y + lift * 0.8, wz - at.z);
-        sr.setX(idx, d);
-        sre.setX(idx, q);
-      }
-    }
-    sp.needsUpdate = true;
-    sr.needsUpdate = true;
-    sre.needsUpdate = true;
-  }
-
-  /** Lay a whole field (every sector). */
-  private writeField(
-    lit: THREE.BufferGeometry,
-    shade: THREE.BufferGeometry | null,
-    at: { x: number; y: number; z: number },
-    reach: Float32Array,
-    radius: number,
-    lift: number,
-  ): void {
-    for (let s = 0; s < NOVA_RAYS; s++) this.writeSector(lit, shade, at, s, reach, radius, lift);
   }
 
   // ------------------------------------------------------------------ scans
@@ -573,19 +435,17 @@ export class EngineNova {
     // a quarter of the rays are measured this very frame.
     for (let r = 0; r < NOVA_RAYS; r++) slot.reach[r] = look.radius;
     const f = slot.field;
-    f.lit.position.set(slot.x, slot.y, slot.z);
-    f.shade.position.set(slot.x, slot.y, slot.z);
-    this.writeField(f.lit.geometry, f.shade.geometry, slot, slot.reach, look.radius, SURFACE_LIFT);
+    f.mesh.position.set(slot.x, slot.y, slot.z);
+    f.surface.begin(slot.x, slot.y, slot.z, look.radius, SURFACE_LIFT);
+    f.surface.drapeSome(this.host.groundY);
     slot.due = 0;
     this.measure(slot, e, FIRST_RAYS);
-    const lu = f.litMat.uniforms;
+    const lu = f.mat.uniforms;
     (lu.uColor.value as THREE.Color).setHex(look.color);
     (lu.uAccent.value as THREE.Color).setHex(look.accent);
     lu.uRadius.value = look.radius;
     lu.uHarsh.value = look.kickable ? 0 : 1;
-    f.shadeMat.uniforms.uRadius.value = look.radius;
-    f.lit.visible = true;
-    f.shade.visible = true;
+    f.mesh.visible = true;
     if (look.kickable) {
       this.host.kit.layOutFan(slot.sigil, 360, {
         color: TELEGRAPH_THREAT_COLORS.interrupt,
@@ -605,16 +465,7 @@ export class EngineNova {
       const reach = this.rayReach(slot, ray, look.radius, caster);
       if (Math.abs(reach - slot.reach[ray]) > 0.05) {
         slot.reach[ray] = reach;
-        const f = slot.field;
-        this.writeRay(
-          f.lit.geometry,
-          f.shade.geometry,
-          slot,
-          ray,
-          slot.reach,
-          look.radius,
-          SURFACE_LIFT,
-        );
+        slot.field.surface.setRay(slot.reach, ray);
       }
     }
   }
@@ -638,6 +489,8 @@ export class EngineNova {
       wave.x = slot.x;
       wave.y = slot.y;
       wave.z = slot.z;
+      // The wave's floor: the bar's own draped field (no floor re-sampled).
+      wave.surface.copyFrom(slot.field.surface);
       if (slot.casterId === ev.sourceId) this.release(slot);
       slot.lastCasterId = -1;
     } else if (caster) {
@@ -651,6 +504,9 @@ export class EngineNova {
         const reach = this.rayReach(wave, r, def.radius, caster, 3);
         for (let k = 0; k < 4 && r + k < NOVA_RAYS; k++) wave.reach[r + k] = reach;
       }
+      // Laid flat, then draped a budget a frame (updateWaves).
+      wave.surface.begin(wave.x, wave.y, wave.z, def.radius, SURFACE_LIFT);
+      wave.surface.setReach(wave.reach);
     } else return true;
     this.launchWave(wave, def.radius, SCHOOL_TINT[def.school] ?? SCHOOL_TINT.frost);
     return true;
@@ -662,8 +518,6 @@ export class EngineNova {
     wave.radius = radius;
     wave.color = color;
     wave.splashed.fill(0);
-    // The wave's floor: the lit fan of the reach it was cast with.
-    this.writeField(wave.mesh.geometry, null, wave, wave.reach, radius, SURFACE_LIFT * 1.4);
     wave.mesh.position.set(wave.x, wave.y, wave.z);
     wave.curtain.position.set(wave.x, wave.y, wave.z);
     (wave.mat.uniforms.uColor.value as THREE.Color).setHex(color);
@@ -709,18 +563,13 @@ export class EngineNova {
         slot.x = caster.pos.x;
         slot.z = caster.pos.z;
         slot.y = this.host.groundY(slot.x, slot.z);
-        slot.field.lit.position.set(slot.x, slot.y, slot.z);
-        slot.field.shade.position.set(slot.x, slot.y, slot.z);
         const f = slot.field;
-        this.writeField(
-          f.lit.geometry,
-          f.shade.geometry,
-          slot,
-          slot.reach,
-          look.radius,
-          SURFACE_LIFT,
-        );
+        f.mesh.position.set(slot.x, slot.y, slot.z);
+        f.surface.begin(slot.x, slot.y, slot.z, look.radius, SURFACE_LIFT);
+        f.surface.setReach(slot.reach);
       }
+      // The drape runs on from the claim frame, a budget a frame.
+      slot.field.surface.drapeSome(this.host.groundY);
       // A rays-per-second budget (a full sweep about four times a second),
       // never more than a handful in one frame whatever the refresh rate.
       slot.due = Math.min(MAX_RAYS_PER_FRAME, slot.due + dt * RAYS_PER_SECOND);
@@ -729,7 +578,7 @@ export class EngineNova {
       this.measure(slot, caster, now);
       const fill = telegraphFillOf(caster.castRemaining, caster.castTotal);
       const l = telegraphLook(fill, clock, this.detail, this.look);
-      const u = slot.field.litMat.uniforms;
+      const u = slot.field.mat.uniforms;
       u.uFill.value = fill;
       u.uBase.value = l.base;
       u.uFilled.value = l.filled;
@@ -781,6 +630,7 @@ export class EngineNova {
         w.curtain.visible = false;
         continue;
       }
+      w.surface.drapeSome(h.groundY);
       const wave = novaWave(elapsed, w.radius);
       w.mat.uniforms.uFront.value = wave.front;
       w.mat.uniforms.uAlpha.value = wave.alpha;
@@ -843,8 +693,7 @@ export class EngineNova {
     slot.casterId = -1;
     slot.look = null;
     slot.releasedAt = this.clock;
-    slot.field.lit.visible = false;
-    slot.field.shade.visible = false;
+    slot.field.mesh.visible = false;
     slot.sigil.group.visible = false;
   }
 
