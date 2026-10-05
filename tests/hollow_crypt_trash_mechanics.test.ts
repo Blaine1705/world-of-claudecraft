@@ -291,6 +291,19 @@ describe('crypt trash pass: Gravecaller Necromancer, Grave Rupture', () => {
     expect(corpse.trashLife?.ruptured).toBeUndefined();
   });
 
+  it('heroic: the burst rides the necromancer x12 (the balance audit), 264 to 360', () => {
+    const r = room('heroic');
+    const { necro } = setup(r);
+    expect(necro.mechanicDamageMult).toBe(12);
+    run(r, def.first + DT, [necro]);
+    expect(necro.castingAbility).toBe(CRYPT_GRAVE_RUPTURE);
+    const before = r.me.hp;
+    run(r, def.castTime + DT, [necro]);
+    const burst = before - r.me.hp;
+    expect(burst).toBeGreaterThanOrEqual(def.min * 12);
+    expect(burst).toBeLessThanOrEqual(def.max * 12);
+  });
+
   it('heroic: the corpse burns on, a pool that ticks then lifts', () => {
     const r = room('heroic');
     const { necro } = setup(r);

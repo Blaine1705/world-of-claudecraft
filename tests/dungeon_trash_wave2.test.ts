@@ -11,6 +11,7 @@
 //   Moonmantle Ray      Heartpearl           (temple.ts, temple_pearl.ts, heroic)
 
 import { describe, expect, it } from 'vitest';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { applyDungeonMobTuning } from '../src/sim/instances/difficulty';
@@ -26,7 +27,12 @@ import {
 } from '../src/sim/mob/trash_kit/bastion_cast_ids';
 import { CRYPT_GRAVE_BOLT, CRYPT_GRAVESPARK_VOLLEY } from '../src/sim/mob/trash_kit/cast_ids';
 import { spawnCombatWall } from '../src/sim/mob/trash_kit/combat_walls';
-import { walkerDefFor, walkerLaunchPoint } from '../src/sim/mob/trash_kit/kit_walker';
+import {
+  launchWalker,
+  WALKER_FADE,
+  walkerDefFor,
+  walkerLaunchPoint,
+} from '../src/sim/mob/trash_kit/kit_walker';
 import { SANCTUM_ICE_SLAB } from '../src/sim/mob/trash_kit/sanctum_cast_ids';
 import {
   TEMPLE_CALL_OF_THE_SHALLOWS,
@@ -286,7 +292,10 @@ describe('Bastion Revenant: Throatlight (G5 walker on death)', () => {
     const { dying, mate } = pair(r);
     run(r, DT, [dying, mate]);
     r.sim.ctx.handleDeath(dying, r.me);
+    const before = mate.hp;
     run(r, 4, [mate]);
+    // Healed on heroic too, the same 15 percent.
+    expect(mate.hp - before).toBe(Math.round(mate.maxHp * 0.15));
     const surge = aura(mate, BASTION_DROWNED_SURGE);
     expect(surge?.kind).toBe('buff_dmg_done');
     expect(surge?.value).toBe(0.2);
@@ -319,6 +328,11 @@ describe('Bastion Revenant: Throatlight (G5 walker on death)', () => {
     r.sim.ctx.handleDeath(lone, r.me);
     run(r, DT, []);
     expect(objects(r, BASTION_THROATLIGHT_ORB)).toHaveLength(0);
+    // Not launched and faded the same tick: never launched at all.
+    expect(r.events.some((e) => e.type === 'spellfxAt' && e.ability === WALKER_FADE)).toBe(false);
+    const def = MOBS.bastion_revenant.trashKit?.walker;
+    if (!def) throw new Error('walker');
+    expect(launchWalker(r.sim.ctx, r.inst, lone, def)).toBeNull();
   });
 });
 
@@ -397,12 +411,15 @@ describe('Drowned Sergeant: Loose on My Mark (G6 + the pack arbalests)', () => {
     const sergeant = engage(r, 'drowned_sergeant', 0, 6, 'alone');
     engage(r, 'fogbound_arbalest', 0, 16, 'other');
     addPlayer(r, 'mage', 0, -6);
-    run(r, 30, [sergeant]);
-    const shouts = r.events.filter(
-      (e) => e.type === 'spellfx' && e.ability === BASTION_MARKED_BOLT,
-    );
-    expect(shouts).toEqual([]);
-    expect(sergeant.castingAbility).not.toBe(BASTION_LOOSE_ON_MY_MARK);
+    let shouted = false;
+    for (let t = 0; t < 30; t += DT) {
+      run(r, DT, [sergeant]);
+      if (sergeant.castingAbility === BASTION_LOOSE_ON_MY_MARK) shouted = true;
+    }
+    expect(shouted).toBe(false);
+    expect(sergeant.trashKit?.casts ?? 0).toBe(0);
+    const bolts = r.events.filter((e) => e.type === 'spellfx' && e.ability === BASTION_MARKED_BOLT);
+    expect(bolts).toEqual([]);
   });
 
   it('heroic: each bolt rides the ARBALEST x8 (192 to 240), three never a one-shot', () => {
@@ -531,6 +548,8 @@ describe('Moonmantle Ray: Heartpearl (G5 walker when the cocoon breaks, heroic)'
     expect(kit?.walker?.launch).toBe('event');
     expect(kit?.walker?.allies).toEqual(['pearlguard_sentinel', 'drowned_templeguard']);
     expect(kit?.walker?.lingers).toBe(true);
+    expect(kit?.walker?.eject).toBe(4);
+    expect(kit?.walker?.intercept.groupShield?.radius).toBe(40);
     expect(kit?.walker?.empower.shieldPct).toBe(0.15);
     expect(kit?.walker?.intercept.max).toBe(0);
     expect(kit?.walker?.intercept.groupShield?.pctMaxHp).toBe(0.1);
@@ -560,6 +579,7 @@ describe('Moonmantle Ray: Heartpearl (G5 walker when the cocoon breaks, heroic)'
     const expected = walkerLaunchPoint(r.sim.ctx, ray, kit!.walker!);
     expect(dist2d(pearls[0].pos, { x: expected.x, y: 0, z: expected.z })).toBeLessThan(0.3);
     expect(dist2d(pearls[0].pos, r.me.pos)).toBeGreaterThan(dist2d(ray.pos, r.me.pos));
+    expect(dist2d(pearls[0].pos, ray.pos)).toBeCloseTo(4, 1);
     run(r, 8, mobs);
     const ward = aura(guard, TEMPLE_HEARTPEARL_WARD);
     expect(ward?.kind).toBe('absorb');
@@ -573,6 +593,8 @@ describe('Moonmantle Ray: Heartpearl (G5 walker when the cocoon breaks, heroic)'
     const guard = engage(r, 'drowned_templeguard', 10, 10);
     const mobs = [ray, guard];
     const healer = addPlayer(r, 'priest', -12, 0);
+    // Out of the taker's 40 yd: no mantle for them.
+    const far = addPlayer(r, 'mage', -60, 0);
     run(r, DT, mobs);
     breakCocoon(r, ray, mobs);
     // Stand the runner on the spot the pearl drops.
@@ -588,6 +610,20 @@ describe('Moonmantle Ray: Heartpearl (G5 walker when the cocoon breaks, heroic)'
       expect(mantle?.value).toBe(100000);
     }
     expect(dealt(r, runner.id, 'Heartpearl')).toEqual([]);
+    expect(aura(far, TEMPLE_NACRE_MANTLE)).toBeUndefined();
+  });
+
+  it('it rolls only to a ray or a templeguard, never to a nearer siren', () => {
+    const r = room('drowned_temple', 'heroic');
+    const ray = engage(r, 'pearlguard_sentinel', 0, 4);
+    const siren = engage(r, 'moonlit_siren', -4, 9);
+    const mate = engage(r, 'pearlguard_sentinel', 12, 12);
+    const mobs = [ray, siren, mate];
+    run(r, DT, mobs);
+    breakCocoon(r, ray, mobs);
+    run(r, 10, mobs);
+    expect(aura(siren, TEMPLE_HEARTPEARL_WARD)).toBeUndefined();
+    expect(aura(mate, TEMPLE_HEARTPEARL_WARD)?.kind).toBe('absorb');
   });
 
   it('alone in its pack the pearl lies for the taking, then fades', () => {
@@ -658,7 +694,8 @@ describe('the second wave replays exactly from one seed', () => {
 
   it('two runs from the same seed land the same beats', () => {
     const a = trace(5);
-    expect(a.length).toBeGreaterThan(0);
+    expect(a.some((e) => e.includes('"Rusted Bolt"'))).toBe(true);
+    expect(a.some((e) => e.includes('bastion_throatlight'))).toBe(true);
     expect(trace(5)).toEqual(a);
   });
 });
@@ -678,9 +715,11 @@ describe('the balance audit: heroic avoidables never one-shot a cloth wearer', (
     const r = room('hollow_crypt', 'heroic');
     const necro = engage(r, 'crypt_gravecaller_necromancer', 0, 8);
     expect(necro.mechanicDamageMult).toBe(12);
-    // Its melee lift is untouched (the tank-swing floor).
-    const adept = engage(r, 'crypt_gravecaller_adept', 0, 8);
-    expect(adept.mechanicDamageMult).toBe(24);
+    // Its melee lift is untouched (the tank-swing floor): the template
+    // transform still scales its weapon by x24.
+    const crypt = HEROIC_DUNGEON_TUNING.hollow_crypt;
+    expect(crypt.damageMultiplierByMob?.crypt_gravecaller_necromancer).toBe(24);
+    expect(crypt.mechanicDamageMultiplierByMob).toEqual({ crypt_gravecaller_necromancer: 12 });
     const def = MOBS.crypt_gravecaller_necromancer.trashKit?.rupture;
     if (!def) throw new Error('rupture');
     const burst = def.max * 12;

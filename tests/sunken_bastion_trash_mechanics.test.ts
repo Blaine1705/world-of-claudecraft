@@ -272,6 +272,9 @@ describe('Bastion trash pass: Barnacle Crawler, Carrion Glut', () => {
     expect(dealt).toBeGreaterThanOrEqual(
       Math.round(burst.min * (1 + def.maxStacks * per.damage)) - 1,
     );
+    // Linear, 25 percent a stack (the balance audit): never compounded.
+    expect(per.damage).toBe(0.25);
+    expect(dealt).toBeLessThanOrEqual(Math.round(burst.max * (1 + def.maxStacks * 0.25)) + 1);
   });
 
   it('an evade forgets the feast: re-pulled, it bursts at its base size', () => {

@@ -38,7 +38,10 @@ import {
   YSOLEI_WRATH,
 } from '../src/sim/encounters/drowned_temple';
 import { updateBossMechanics } from '../src/sim/mob/boss_mechanics';
+import { BASTION_LOOSE_ON_MY_MARK } from '../src/sim/mob/trash_kit/bastion_cast_ids';
+import { CRYPT_GRAVESPARK_VOLLEY } from '../src/sim/mob/trash_kit/cast_ids';
 import {
+  TEMPLE_CALL_OF_THE_SHALLOWS,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_GLIMMER_VENOM,
   TEMPLE_LIGHTNING_SPIT,
@@ -599,5 +602,21 @@ describe('the pilgrim frenzy cue rides the real enrage', () => {
     );
     expect(zone).toMatch(/const temple = this\.templeFx\.handleEvent\(event\)/);
     expect(zone.replace(/\s+/g, ' ')).toMatch(/\|\| temple \|\|/);
+  });
+});
+
+describe('the trash pass second wave plays on the casters own clips', () => {
+  it('the volley, the shout and the song each have their clip', () => {
+    const adept = VISUALS.crypt_skel_adept.clips;
+    expect(adept.castByAbility?.[CRYPT_GRAVESPARK_VOLLEY]).toBe('Spellcast_Raise');
+    expect(adept.castTimeScaleByAbility?.[CRYPT_GRAVESPARK_VOLLEY]).toBe(0.6);
+    expect(VISUALS.bastion_skel_sergeant.clips.castByAbility?.[BASTION_LOOSE_ON_MY_MARK]).toBe(
+      'Rally',
+    );
+    const siren = visualOf('moonlit_siren').clips;
+    expect(siren.castByAbility?.[TEMPLE_CALL_OF_THE_SHALLOWS]).toBe('Sing');
+    expect(siren.castTimeScaleByAbility?.[TEMPLE_CALL_OF_THE_SHALLOWS]).toBe(1);
+    // A kicked or broken song never plays to its end.
+    expect(siren.castPlayOut ?? []).not.toContain('Sing');
   });
 });

@@ -235,6 +235,9 @@ describe('War Roar: kick it, or every ravager near it frenzies', () => {
     const rav = engage(r, 'wildheart_ravager', 6, 0);
     run(r, 3, [rav]);
     expect(rav.castingAbility).toBeNull();
+    // Never started at all (a roar that began and landed inside the 3 s would
+    // leave the bar idle again): no cast counted.
+    expect(rav.trashKit?.casts ?? 0).toBe(0);
   });
 
   it('a landed roar frenzies every ravager within 15 yd for the pull', () => {
