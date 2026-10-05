@@ -44,7 +44,7 @@ export function advanceExclusiveMovement(
     clearAfkOnMove(ctx, meta, p);
   }
   // An encounter carrying the body in the air owns its pose (carried_body.ts).
-  if (advanceCarried(p)) return true;
+  if (p.carriedBy !== undefined && advanceCarried(p, ctx.entities.get(p.carriedBy))) return true;
   if (advanceValkyrsCalling(ctx, p)) return true;
   // A ferry passenger walks the sailing deck (transport_ferry.ts stepPassenger).
   if (p.ferryRide && stepPassenger(motionDeps, p, meta.moveInput)) return true;

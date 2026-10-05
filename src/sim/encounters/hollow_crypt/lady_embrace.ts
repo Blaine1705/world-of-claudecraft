@@ -16,7 +16,14 @@ import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
 import type { LadyFightState } from './boss_state';
-import { clearCastIf, dropAuraById, localOf, mechanicDamage, startBar } from './claim';
+import {
+  claimPlayers,
+  clearCastIf,
+  dropAuraById,
+  localOf,
+  mechanicDamage,
+  startBar,
+} from './claim';
 import {
   LADY_EMBRACE_DROPPED,
   LADY_EMBRACE_HOLD,
@@ -99,6 +106,12 @@ export function seizeVictims(
   };
   for (const id of victims) {
     const p = ctx.entities.get(id) as Entity;
+    // Whatever carried them a moment ago (a leap, a climb, a charge, a follow)
+    // is over: she holds them now.
+    p.leap = null;
+    p.climb = null;
+    p.chargeTargetId = null;
+    p.followTargetId = null;
     carryBody(p, boss.id);
     freeze(ctx, boss, p, T.embraceRise + T.embraceHold + T.embraceSetDown + FALL_GIVE_UP + 1);
   }
@@ -184,14 +197,20 @@ export function stepEmbrace(
 ): boolean {
   const e = st.embrace;
   if (!e) return false;
-  // A held body that died or was taken away is no longer held.
+  // A held body that died, left the claim or was taken away is no longer
+  // held: the fallen are laid on the ice, the rest let go where they are.
+  const present = new Set(claimPlayers(ctx, inst).map((p) => p.id));
   e.victims = e.victims.filter((id) => {
     const p = ctx.entities.get(id);
-    if (p && !p.dead && !p.ghost && p.carriedBy === boss.id) return true;
-    if (p && p.carriedBy === boss.id) {
-      p.carriedBy = undefined;
-      dropAuraById(p, LADY_EMBRACED);
+    if (p && present.has(id) && p.carriedBy === boss.id) return true;
+    if (!p) return false;
+    if (p.carriedBy === boss.id) {
+      if (p.dead || p.ghost) setDownBody(p, ctx.groundPos(p.pos.x, p.pos.z).y);
+      else dropBody(p);
+      ctx.grid.update(p);
     }
+    // Let go (here, or already by the carry's own reach check): unfrozen.
+    dropAuraById(p, LADY_EMBRACED);
     return false;
   });
   e.t += DT;

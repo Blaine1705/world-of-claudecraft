@@ -280,6 +280,58 @@ describe('the Lady of the Bonechill: the Frozen Embrace', () => {
   });
 });
 
+describe('the Lady of the Bonechill: nobody stays held', () => {
+  function held(difficulty: 'normal' | 'heroic' = 'normal') {
+    const { f, lady } = ladyFight(difficulty);
+    const keep = holdAll(f);
+    run(f, DT, keep);
+    const s = st(lady);
+    s.lamentTimer = 999;
+    s.embraceTimer = 0;
+    run(f, T.embraceCast + T.embraceRise + 0.2, keep);
+    const victim = f.others.find((p) => p.carriedBy === lady.id) as Entity;
+    expect(victim).toBeDefined();
+    return { f, lady, keep, victim };
+  }
+
+  it('lets go of a player taken out of her reach (a teleport, a summon)', () => {
+    const { f, victim } = held();
+    put(f, victim, MID.x, MID.z - 60);
+    run(f, DT * 3);
+    expect(victim.carriedBy).toBeUndefined();
+    expect(aura(victim, LADY_EMBRACED)).toBeUndefined();
+  });
+
+  it('frees a held player whose carrier is gone (the instance freed under them)', () => {
+    const { f, lady, victim } = held();
+    f.sim.ctx.dropEntity(lady.id);
+    run(f, DT * 3);
+    expect(victim.carriedBy).toBeUndefined();
+  });
+
+  it('lays a victim who dies in her arms on the ice', () => {
+    const { f, lady, victim } = held();
+    f.sim.ctx.handleDeath(victim, lady);
+    run(f, DT * 2);
+    expect(victim.carriedBy).toBeUndefined();
+    expect(victim.onGround).toBe(true);
+    expect(victim.pos.y).toBeCloseTo(f.sim.ctx.groundPos(victim.pos.x, victim.pos.z).y, 3);
+  });
+
+  it('sets her victims down gently when she evades mid-hold, never drops them', () => {
+    const { f, lady, victim } = held();
+    const from = f.hits.length;
+    lady.aggroTargetId = null;
+    lady.inCombat = false;
+    lady.aiState = 'evade';
+    run(f, DT * 3);
+    expect(victim.carriedBy).toBeUndefined();
+    expect(lady.cryptBossFight).toBeUndefined();
+    run(f, 4);
+    expect(took(f, victim, 'Shattering Fall', from)).toBe(0);
+  });
+});
+
 describe('the Lady of the Bonechill: the Rime Path and the Bridal Freeze', () => {
   it('leaves rime where she drifts, and whoever stands on it walks on slippery ground', () => {
     const { f, lady } = ladyFight();

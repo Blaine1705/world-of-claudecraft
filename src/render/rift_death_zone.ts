@@ -40,6 +40,7 @@ import { HoardOrbitalLightning } from './hoard_orbital_lightning';
 import { HoardPulsarFx } from './hoard_pulsars';
 import { HoardSpellFx } from './hoard_spell_fx';
 import { HoardTentaclesFx } from './hoard_tentacles';
+import { CryptBossFx } from './hollow_crypt/crypt_boss_fx';
 import { CryptCreatureFx } from './hollow_crypt/crypt_creature_fx';
 import { CryptFinaleFx } from './hollow_crypt/crypt_finale_fx';
 import { CryptTrashFx } from './hollow_crypt/crypt_trash_fx';
@@ -117,6 +118,9 @@ export class RiftDeathZoneVisuals {
   private readonly cryptFinale: CryptFinaleFx;
   // Morthen the Lich Bishop's own body effects and his stance gestures.
   private readonly morthenFx: MorthenFx;
+  // The Hollow Crypt's wing bosses: Sexton Marrow, the Lady of the Bonechill,
+  // Cantor Ilvane (their telegraphs, hazards and spell effects).
+  private readonly cryptBosses: CryptBossFx;
   // The Gravewyrm Sanctum's telegraphs and creature effects (the Sledge
   // Tusker and its sledge, the trash).
   private readonly sanctumFx: SanctumFx;
@@ -207,6 +211,7 @@ export class RiftDeathZoneVisuals {
       shake,
     );
     this.cryptFinale = new CryptFinaleFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.cryptBosses = new CryptBossFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.morthenFx = new MorthenFx(
       scene,
       groundY,
@@ -312,6 +317,7 @@ export class RiftDeathZoneVisuals {
     this.wildheartFx.update(dt);
     this.cryptCreatures.update(dt);
     this.cryptFinale.update(dt);
+    this.cryptBosses.update(dt);
     this.morthenFx.update(dt);
     this.sanctumFx.update(dt);
     this.sanctumBosses.update(dt);
@@ -353,6 +359,7 @@ export class RiftDeathZoneVisuals {
     this.wildheartFx.dispose();
     this.cryptCreatures.dispose();
     this.cryptFinale.dispose();
+    this.cryptBosses.dispose();
     this.morthenFx.dispose();
     this.sanctumFx.dispose();
     this.sanctumBosses.dispose();
@@ -367,6 +374,7 @@ export class RiftDeathZoneVisuals {
     this.cryptTrash.handleEvent(event);
     this.cryptCreatures.handleEvent(event);
     this.cryptFinale.handleEvent(event);
+    this.cryptBosses.handleEvent(event);
     this.morthenFx.handleEvent(event);
     const temple = this.templeFx.handleEvent(event);
     const basin = this.wildheartFx.handleEvent(event);

@@ -10,12 +10,22 @@
 //
 // Pure over the entity: no SimContext, no rng.
 
-import type { Entity } from './types';
+import { dist2d, type Entity } from './types';
+
+/** A carrier this far from the body it holds has lost it (a teleport, a
+ *  summon, an instance freed under them). */
+export const CARRY_REACH = 8;
 
 /** The exclusive step: true when an encounter carries this body (it owns the
- *  pose; the walking kernel must not run). */
-export function advanceCarried(p: Entity): boolean {
+ *  pose; the walking kernel must not run). A body whose carrier is gone, dead
+ *  or out of reach is let go here (it falls from where it is), so no path that
+ *  forgets the encounter can leave a player held for ever. */
+export function advanceCarried(p: Entity, carrier: Entity | undefined): boolean {
   if (p.carriedBy === undefined) return false;
+  if (!carrier || carrier.dead || dist2d(carrier.pos, p.pos) > CARRY_REACH) {
+    dropBody(p);
+    return false;
+  }
   p.onGround = false;
   p.jumping = false;
   p.vx = 0;

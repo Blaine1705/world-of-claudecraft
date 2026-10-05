@@ -200,7 +200,7 @@ describe('slippery ground: the motion kernel on the live Sim', () => {
 });
 
 describe('slippery ground: the movement override epoch', () => {
-  it('bumps on the ice edge, never marks the player overridden', () => {
+  it('marks the player overridden on the ice (prediction stands down) and bumps on its edge', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior' });
     const session: MovementOverrideSessionState = {
       pid: sim.playerId,
@@ -212,12 +212,13 @@ describe('slippery ground: the movement override epoch', () => {
     sim.player.auras.push(ice());
     updateMovementOverrideEpochs(sim, [session]);
     expect(session.movementOverrideEpoch).toBe(e0 + 1);
-    expect(session.movementOverrideActive).toBe(false);
+    expect(session.movementOverrideActive).toBe(true);
     // Standing on it: no further bump.
     updateMovementOverrideEpochs(sim, [session]);
     expect(session.movementOverrideEpoch).toBe(e0 + 1);
     sim.player.auras = [];
     updateMovementOverrideEpochs(sim, [session]);
     expect(session.movementOverrideEpoch).toBe(e0 + 2);
+    expect(session.movementOverrideActive).toBe(false);
   });
 });

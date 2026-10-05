@@ -130,6 +130,22 @@ describe('Cantor Ilvane: Dirge of the Hollow', () => {
     expect(s.struck).toBe(true);
   });
 
+  it('an uncut Dirge runs its full bar and never reads as a kick', () => {
+    const { f, ilvane, choir } = ilvaneFight();
+    const keep = holdAll(f, [ilvane, ...choir]);
+    run(f, DT, keep);
+    const s = st(ilvane);
+    quiet(s);
+    s.dirgeTimer = 0;
+    expect(until(f, () => ilvane.castingAbility === ILVANE_DIRGE, 1, keep)).toBe(true);
+    run(f, 1, keep);
+    expect(ilvane.castRemaining).toBeCloseTo(T.dirgeCast - 1, 1);
+    const cues = f.cues.length;
+    expect(until(f, () => ilvane.castingAbility === null, T.dirgeCast, keep)).toBe(true);
+    expect(s.quiet).toBe(0);
+    expect(f.cues.slice(cues).some((c) => c.ability === ILVANE_DIRGE_CUT)).toBe(false);
+  });
+
   it('a real Pummel cuts it: nothing lands, and she falls quiet', () => {
     const { f, ilvane, choir } = ilvaneFight();
     const keep = holdAll(f, [ilvane, ...choir]);

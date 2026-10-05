@@ -139,7 +139,9 @@ function landLament(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: LadyF
   });
   for (const p of claimPlayers(ctx, inst)) {
     dropAuraById(p, LADY_LAMENT_DREAD);
-    if (sheltered.has(p.id)) continue;
+    // Sheltered by a lantern, or held to her breast (her own wail spares the
+    // one she embraces).
+    if (sheltered.has(p.id) || p.carriedBy === boss.id) continue;
     const prev = p.auras.find((a) => a.id === LADY_LINGERING_LAMENT);
     const stacks = prev?.stacks ?? 0;
     const amount = Math.round(
@@ -285,9 +287,9 @@ export function tickLady(
     if (st) concludeLady(ctx, inst, boss, st);
     return;
   }
-  // Hanging in the air with her victims she may read as off her target's heels:
-  // the Embrace keeps the fight alive until she is down again.
-  if (!engaged && !st?.embrace) {
+  // An evade or a wipe ends everything, a hold in the air included: she sets
+  // her victims down gently (endEmbrace in resetLady), never drops them.
+  if (!engaged) {
     if (st) resetLady(ctx, inst, boss);
     return;
   }
@@ -312,6 +314,10 @@ export function tickLady(
   if (st.bar) {
     const bar = st.bar;
     if (boss.castingAbility !== BAR_ID[bar.what]) {
+      // A bar gone before it landed (nothing but a reset clears hers): no
+      // dread may outlive its Lament.
+      if (bar.what === 'lament')
+        for (const p of claimPlayers(ctx, inst)) dropAuraById(p, LADY_LAMENT_DREAD);
       st.bar = null;
       return;
     }

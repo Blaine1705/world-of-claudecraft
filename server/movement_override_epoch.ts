@@ -16,10 +16,10 @@ export interface MovementOverrideSignature {
   vehicleLocked?: boolean;
   climbing: boolean;
   moveSpeedMult: number;
-  /** On slippery ground (src/sim/slippery_ground.ts). NOT an override: the
-   *  shared kernel predicts the slide, so prediction keeps running on the ice;
-   *  only its edge bumps the epoch, so the client restarts cleanly in the new
-   *  footing instead of replaying a mismatch. */
+  /** On slippery ground (src/sim/slippery_ground.ts): an override, like a
+   *  rift ice slide. The slide's ground velocity is state the reconcile wire
+   *  does not carry, so the client stands its prediction down on the ice and
+   *  draws the authoritative slide; the edge bumps the epoch both ways. */
   slippery?: boolean;
 }
 
@@ -106,7 +106,8 @@ function overrideBits(signature: MovementOverrideSignature): number {
     (signature.valkyrsCalling ? 16 : 0) |
     (signature.mountRaceLocked ? 32 : 0) |
     (signature.climbing ? 64 : 0) |
-    (signature.vehicleLocked ? 128 : 0)
+    (signature.vehicleLocked ? 128 : 0) |
+    (signature.slippery ? 256 : 0)
   );
 }
 
@@ -164,16 +165,13 @@ export function updateMovementOverrideEpochs(
     const previousBits = signature ? overrideBits(signature) : 0;
     const previousActive = previousBits !== 0;
     const previousMoveSpeedMult = signature?.moveSpeedMult ?? 0;
-    const previousSlippery = signature?.slippery ?? false;
     const nextSignature = signature
       ? fillOverrideSignature(signature, entity, meta, moveSpeedMult)
       : computeOverrideSignature(entity, meta, moveSpeedMult);
     const active = overrideActive(nextSignature);
     const signatureChanged =
       signature !== null &&
-      (previousBits !== overrideBits(nextSignature) ||
-        previousMoveSpeedMult !== moveSpeedMult ||
-        previousSlippery !== (nextSignature.slippery ?? false));
+      (previousBits !== overrideBits(nextSignature) || previousMoveSpeedMult !== moveSpeedMult);
     const frame = ferryMovementFrame(entity, framePosition);
     const frameChanged =
       session.movementAuthoritativeFrame !== undefined &&

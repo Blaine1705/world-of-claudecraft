@@ -8,10 +8,11 @@
 // The aura is the whole signal: an encounter puts it on whoever stands on its
 // ice (the Lady of the Bonechill's Rime Path and frozen ravine, encounters/
 // hollow_crypt), the wire mirrors it with every aura (value2 carries the grip),
-// and the shared kernel reads it on the authoritative sim and in the online
-// client's prediction alike, so both step the same slide. Its edge bumps the
-// movement override epoch (server/movement_override_epoch.ts) so the client's
-// prediction restarts cleanly as the ice comes and goes.
+// and the shared kernel steps the slide on every host. Online, the slide's
+// ground velocity is state the reconcile wire does not carry, so the server
+// counts the ice as a movement override (server/movement_override_epoch.ts):
+// the client stands its prediction down on the ice and draws the authoritative
+// slide, restarting cleanly when the player steps off.
 //
 // Pure: no SimContext, no rng.
 

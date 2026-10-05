@@ -766,8 +766,11 @@ function verticalPass(
     terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed) <= MAX_CLIMB_SLOPE;
   if (inp.jump && (p.onGround || coyote) && !isRooted(p) && !steepGround && !mountLocked) {
     p.vy = JUMP_VELOCITY * jumpMult(p);
-    p.vx = wishX * wishSpeed;
-    p.vz = wishZ * wishSpeed;
+    // On ice the slide carries into the jump (a hop never stops a slide dead).
+    if (!(p.onGround && slipperyGrip(p) > 0)) {
+      p.vx = wishX * wishSpeed;
+      p.vz = wishZ * wishSpeed;
+    }
     p.onGround = false;
     p.jumping = true;
     p.fallStartY = p.pos.y;
@@ -814,8 +817,11 @@ function verticalPass(
       // onto the crate/rock rim it jumped at.
       p.pos.y = support;
       p.vy = 0;
-      p.vx = 0;
-      p.vz = 0;
+      // Landing on ice keeps the slide (the ice step caps it to a run).
+      if (slipperyGrip(p) <= 0) {
+        p.vx = 0;
+        p.vz = 0;
+      }
       p.onGround = true;
       p.jumping = false;
       const gLandIdx = p.auras.findIndex((a) => a.id === 'rift_feather_glider');
