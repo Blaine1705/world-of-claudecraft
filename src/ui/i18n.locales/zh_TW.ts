@@ -18757,9 +18757,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.bellrope_girdle.name': '鐘繩腰帶',
   'entities.items.sextons_spadehaft.name': '司事的鍬柄',
   'entities.items.rimesilk_mantle.name': '霜絲肩衣',
-  'entities.items.bonechill_carapace_vest.name': '寒骨甲殼背心',
-  'entities.items.rimeweb_hunters_leggings.name': '霜網獵手護腿',
-  'entities.items.rimeweb_fang.name': '霜網之牙',
+  'entities.items.bonechill_carapace_vest.name': '骨寒鎖甲',
+  'entities.items.rimeweb_hunters_leggings.name': '綴霜護腿',
+  'entities.items.rimeweb_fang.name': '新娘的冰錐',
   'entities.items.cantors_cassock.name': '領唱者的法衣',
   'entities.items.choirward_leggings.name': '聖詠守衛護腿',
   'entities.items.choristers_gloves.name': '唱詩者的手套',
@@ -19249,4 +19249,42 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cantor_laverock.title': '蒼白唱詩班最後的領唱',
   'entities.npcs.cantor_laverock.greeting':
     '我曾是蒼白唱詩班裡最年輕的聲音。儀式那夜，我沒有喝，我逃了。從那以後，每逢滿月，我都聽見他們在水下歌唱。我必須在死前親眼見到她。讓我跟在你們身後吧。我不會戰鬥，也不會拖累你們。',
+  'hudChrome.cryptAlert.measuredTitle': '量身定墓！',
+  'hudChrome.cryptAlert.measuredLine': '計時條走完時，墳墓會在你腳下塌陷：把它帶到墓園邊緣',
+  'hudChrome.cryptAlert.embracedTitle': '冰封之擁！',
+  'hudChrome.cryptAlert.embracedLine': '她把你舉在半空：你的隊伍必須傷害她，她才會把你放下',
+  'hudChrome.cryptAlert.lamentTitle': '新娘的哀歌！',
+  'hudChrome.cryptAlert.lamentShelteredLine': '你站在點亮的墓燈光芒中，燈下還有你的位置：保持不動',
+  'hudChrome.cryptAlert.lamentOpenLine': '在哀嚎落下前進入點亮的墓燈光芒中：每盞燈兩人',
+  'hudChrome.cryptAlert.graveTitle': '你在敞開的墳墓裡！',
+  'hudChrome.cryptAlert.graveLine': '墳土會灼燒你並讓你減速：離開墳墓',
+  'hudChrome.cryptAlert.tollTitle': '葬禮喪鐘！',
+  'hudChrome.cryptAlert.tollLine': '他搖鐘時無法受到傷害：準備承受喪鐘和它喚起的亡者',
+  'hudChrome.cryptAlert.harmonyTitle': '和聲',
+  'hudChrome.cryptAlert.harmonyLine': '她的唱詩者使她受到的傷害降低{pct}%：先殺死它們',
+  'hudChrome.cryptAlert.timeAria': '剩餘{seconds}秒',
+  'hudChrome.auraEffect.crypt.measured':
+    '此效果結束時，一座敞開的墳墓會在你所站之處塌陷：對{radius}碼內的所有人造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。墳墓會在整場戰鬥中保留，所以把印記帶到墓園邊緣，遠離隊伍。',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    '站在敞開的墳墓中：移動速度降低{slow}%，每秒受到{damage}點暗影傷害（英雄難度{heroic}點）。英雄難度下，在墳墓中停留{linger}秒會喚起一具不安之骨。離開墳墓。',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    '移動速度降低{pct}%。一鏟墳土會擊中司事馬羅身前的所有人：站到他身後。',
+  'hudChrome.auraEffect.crypt.blow':
+    '受到的傷害提高{pct}%：每層{per}%，目前{stacks}/{max}層。每次掘墓人重擊都會增加一層，並將持續時間重置為{seconds}秒。',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    '站在敞開的墳墓中時攻擊速度提高{pct}%。別讓他待在墳墓裡。',
+  'hudChrome.auraEffect.crypt.tolling':
+    '他大步走向鐘繩並敲響葬鐘時免疫傷害。鐘聲結束時，喪鐘對所有人造成{min}到{max}點暗影傷害（英雄難度{heroicMin}到{heroicMax}點），並且每座敞開的墳墓都會爬出一具不安之骨。',
+  'hudChrome.auraEffect.crypt.embraced':
+    '被夫人舉在半空：無法行動，每秒受到{tick}點冰霜傷害（英雄難度{tickHeroic}點）。如果你的隊伍打掉她{share}%的最大生命值，她會把你輕輕放下；如果她在高處抓住你{hold}秒，就會把你扔到冰面上，造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。',
+  'hudChrome.auraEffect.crypt.lament':
+    '新娘的哀歌結束時，對所有不在點亮的墓燈{radius}碼內的人造成{min}到{max}點冰霜傷害（英雄難度{heroicMin}到{heroicMax}點）。每盞燈只庇護離它最近的{cap}名玩家，然後熄滅並錯過下一次哀歌。',
+  'hudChrome.auraEffect.crypt.lingering':
+    '你承受的下一次新娘的哀歌傷害提高{pct}%：每層{per}%，最多{max}層。下一次請在墓燈光芒中承受。',
+  'hudChrome.auraEffect.crypt.slippery':
+    '在光滑的冰面上：你的速度每秒最多改變{grip}碼/秒，所以起步緩慢，停下時會繼續滑行，轉向時會甩出大弧線。離開冰面就能重新站穩。',
+  'hudChrome.auraEffect.crypt.harmony':
+    '受到的傷害降低{pct}%：她每有一名存活的唱詩者就降低{per}%。先殺死唱詩者。',
+  'hudChrome.auraEffect.crypt.crescendo':
+    '唱得更快：空洞輓歌只需{cast}秒（原為{castNormal}秒），每{every}秒一次（原為{everyNormal}秒），骨管風琴會奏出{waves}波音符（原為{wavesNormal}波）。',
 };

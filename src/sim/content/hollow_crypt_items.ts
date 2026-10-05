@@ -52,7 +52,8 @@ export const HOLLOW_CRYPT_ITEMS: Record<string, ItemDef> = {
     sellValue: 900,
     requiredClass: HEAVY,
   },
-  // ---- Rimeweb (level 9) ----
+  // ---- The Lady of the Bonechill (level 9; boss id rimeweb). The spider
+  // placeholder's leftovers keep their frozen ids under bridal frost names. ----
   rimesilk_mantle: {
     id: 'rimesilk_mantle',
     name: 'Rimesilk Mantle',
@@ -66,7 +67,7 @@ export const HOLLOW_CRYPT_ITEMS: Record<string, ItemDef> = {
   },
   bonechill_carapace_vest: {
     id: 'bonechill_carapace_vest',
-    name: 'Bonechill Carapace Vest',
+    name: 'Bonechill Hauberk',
     kind: 'armor',
     armorType: 'mail',
     slot: 'chest',
@@ -77,7 +78,7 @@ export const HOLLOW_CRYPT_ITEMS: Record<string, ItemDef> = {
   },
   rimeweb_hunters_leggings: {
     id: 'rimeweb_hunters_leggings',
-    name: "Rimeweb Hunter's Leggings",
+    name: 'Rime-Laced Leggings',
     kind: 'armor',
     armorType: 'leather',
     slot: 'legs',
@@ -88,7 +89,7 @@ export const HOLLOW_CRYPT_ITEMS: Record<string, ItemDef> = {
   },
   rimeweb_fang: {
     id: 'rimeweb_fang',
-    name: 'Rimeweb Fang',
+    name: "Bride's Icicle",
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'rare',

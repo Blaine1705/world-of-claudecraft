@@ -652,6 +652,9 @@ const UI_PURE_CORES = [
   // scene scan.
   'src/ui/hud/dungeon/sanctum_alert_view.ts',
   'src/ui/hud/dungeon/sanctum_alert_scene_core.ts',
+  // The Hollow Crypt's wing-boss alert (the grave mark, the Embrace, the
+  // Lament, the Open Grave, the Toll and Harmony readouts).
+  'src/ui/hud/dungeon/crypt_alert_view.ts',
   // The trash engine's use prompt (a Soul Brazier to topple) and its scene scan.
   'src/ui/hud/dungeon/kit_use_prompt_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
@@ -819,10 +822,10 @@ const RENDER_PURE_CORES = [
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
   'src/render/far_lod_latch_core.ts',
   // The Hollow Crypt finale's effect plan (Morthen's entrance, the Knellwyrm).
+  'src/render/hollow_crypt/crypt_boss_fx_core.ts',
   'src/render/hollow_crypt/crypt_finale_fx_core.ts',
   // Morthen the Lich Bishop's stance latch, body anchors and effect timings.
   'src/render/hollow_crypt/morthen_fx_core.ts',
-  'src/render/hollow_crypt/crypt_boss_fx_core.ts',
   // The Gravewyrm Sanctum bosses' Blender bodies, measured, and their gestures.
   'src/render/gravewyrm_sanctum_bosses/boss_model_core.ts',
   'src/render/gravewyrm_sanctum_bosses/boss_fx_core.ts',

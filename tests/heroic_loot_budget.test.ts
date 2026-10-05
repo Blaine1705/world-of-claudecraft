@@ -53,8 +53,11 @@ const BASELINE = {
     gearIds: ['bonechill_cord', 'bonechill_striders', 'heroic_rimeweb_fang', 'rimesilk_hood'],
     normalDigest: 'b60373d913e7a9fa3895b4655692c488558e777b581d3f93b6e804eafe64fc52',
     // Re-minted when the Rimesilk Hood moved onto the stamina model (int 11,
-    // spi 7, sta 6: its 18-point caster line plus the 6-stamina baseline).
-    gearDigest: '819845460b7a4055c4e545a83084c8f6ed77e8b445f7d8fdb426a54d35c6c5a9',
+    // spi 7, sta 6: its 18-point caster line plus the 6-stamina baseline), and
+    // again when the Lady's rework renamed the fang (display only: the heroic
+    // twin reads its base's new name, Bride's Icicle; the old name reproduces
+    // the previous digest, verified at the rename, so no stat moved).
+    gearDigest: 'bb66679056a435631ef106b98a81795f44de2c43fa6aa825696050fdb56f8dd8',
   },
   cantor_ilvane: {
     gearIds: ['choirward_leggings', 'heroic_cantors_hymnal', 'shadowpulse_handwraps'],

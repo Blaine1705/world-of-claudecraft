@@ -19696,9 +19696,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.bellrope_girdle.name': '종줄 허리띠',
   'entities.items.sextons_spadehaft.name': '성구지기의 삽자루',
   'entities.items.rimesilk_mantle.name': '서리비단 어깨망토',
-  'entities.items.bonechill_carapace_vest.name': '뼈서리 갑각 조끼',
-  'entities.items.rimeweb_hunters_leggings.name': '서리거미줄 사냥꾼 다리보호구',
-  'entities.items.rimeweb_fang.name': '서리거미줄 송곳니',
+  'entities.items.bonechill_carapace_vest.name': '뼈서리 사슬갑옷',
+  'entities.items.rimeweb_hunters_leggings.name': '서리끈 다리보호구',
+  'entities.items.rimeweb_fang.name': '신부의 고드름',
   'entities.items.cantors_cassock.name': '성가대장의 사제복',
   'entities.items.choirward_leggings.name': '성가수호 다리보호구',
   'entities.items.choristers_gloves.name': '성가대원의 장갑',
@@ -20224,4 +20224,48 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cantor_laverock.title': '창백한 성가대의 마지막 선창자',
   'entities.npcs.cantor_laverock.greeting':
     '나는 창백한 성가대에서 가장 어린 목소리였소. 의식의 밤, 나는 마시지 않고 도망쳤지. 그 뒤로 보름달이 뜰 때마다 물 아래에서 그들이 노래하는 소리가 들리오. 죽기 전에 그분을 직접 봐야 하오. 뒤에서 걷게 해 주시오. 싸우지도 않고, 짐이 되지도 않겠소.',
+  'hudChrome.cryptAlert.measuredTitle': '무덤 치수 재기!',
+  'hudChrome.cryptAlert.measuredLine':
+    '바가 다 떨어지면 발밑에 무덤이 무너집니다: 묘지 가장자리로 옮기세요',
+  'hudChrome.cryptAlert.embracedTitle': '얼어붙은 포옹!',
+  'hudChrome.cryptAlert.embracedLine':
+    '그녀가 당신을 공중에 들어 올렸습니다: 파티가 그녀에게 피해를 줘야 내려놓습니다',
+  'hudChrome.cryptAlert.lamentTitle': '신부의 애가!',
+  'hudChrome.cryptAlert.lamentShelteredLine':
+    '켜진 등불의 빛 안에 당신의 자리가 있습니다: 가만히 있으세요',
+  'hudChrome.cryptAlert.lamentOpenLine':
+    '통곡이 닥치기 전에 켜진 등불의 빛 안으로 들어가세요: 등불 하나에 두 명',
+  'hudChrome.cryptAlert.graveTitle': '열린 무덤 안에 있습니다!',
+  'hudChrome.cryptAlert.graveLine': '무덤흙이 당신을 태우고 느리게 합니다: 무덤에서 나오세요',
+  'hudChrome.cryptAlert.tollTitle': '장례의 종소리!',
+  'hudChrome.cryptAlert.tollLine':
+    '종을 울리는 동안 그는 피해를 받지 않습니다: 종소리와 그것이 일으키는 망자에 대비하세요',
+  'hudChrome.cryptAlert.harmonyTitle': '화음',
+  'hudChrome.cryptAlert.harmonyLine':
+    '성가대원들이 그녀가 받는 피해를 {pct}% 줄이고 있습니다: 성가대원을 먼저 처치하세요',
+  'hudChrome.cryptAlert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.crypt.measured':
+    '이 효과가 끝나면 서 있는 자리에 열린 무덤이 무너져 {radius}미터 안의 모두에게 {min}~{max} 피해를 줍니다(영웅 난이도 {heroicMin}~{heroicMax}). 무덤은 전투 내내 남으므로 표식을 파티에서 떨어진 묘지 가장자리로 옮기세요.',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    '열린 무덤 안에 서 있음: 이동 속도 {slow}% 감소, 매초 {damage} 암흑 피해(영웅 난이도 {heroic}). 영웅 난이도에서는 무덤 안에 {linger}초 머물면 불안한 뼈무더기가 일어납니다. 무덤에서 나오세요.',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    '이동 속도가 {pct}% 감소합니다. 한 삽의 무덤흙은 성구지기 매로우 앞의 모두를 맞힙니다: 그의 뒤에 서세요.',
+  'hudChrome.auraEffect.crypt.blow':
+    '받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 현재 {stacks}/{max}중첩. 무덤꾼의 일격마다 중첩이 쌓이고 지속 시간이 {seconds}초로 초기화됩니다.',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    '열린 무덤 안에 서 있는 동안 공격 속도가 {pct}% 증가합니다. 그를 무덤 밖에 두세요.',
+  'hudChrome.auraEffect.crypt.tolling':
+    '종 밧줄로 걸어가 장례의 종을 울리는 동안 피해 면역입니다. 종소리가 끝나면 모두에게 {min}~{max} 암흑 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 열린 무덤마다 불안한 뼈무더기가 일어납니다.',
+  'hudChrome.auraEffect.crypt.embraced':
+    '귀부인의 품에 안겨 공중에 떠 있음: 행동할 수 없고 매초 {tick} 냉기 피해(영웅 난이도 {tickHeroic})를 받습니다. 파티가 그녀의 최대 생명력 {share}%를 깎으면 부드럽게 내려놓지만, 높은 곳에서 {hold}초 동안 붙잡고 있으면 얼음 위로 떨어뜨려 {min}~{max} 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.',
+  'hudChrome.auraEffect.crypt.lament':
+    '신부의 애가가 끝나면 켜진 무덤 등불에서 {radius}미터 안에 없는 모두에게 {min}~{max} 냉기 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 등불은 가장 가까운 {cap}명만 보호한 뒤 꺼져 다음 애가를 놓칩니다.',
+  'hudChrome.auraEffect.crypt.lingering':
+    '다음 신부의 애가로 받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 최대 {max}중첩. 다음 애가는 등불 빛 안에서 받으세요.',
+  'hudChrome.auraEffect.crypt.slippery':
+    '미끄러운 얼음 위: 속도가 매초 최대 {grip}미터/초씩만 바뀌므로 출발이 느리고, 멈추면 계속 미끄러지며, 방향을 틀면 크게 돌아갑니다. 얼음에서 벗어나면 다시 중심을 잡을 수 있습니다.',
+  'hudChrome.auraEffect.crypt.harmony':
+    '받는 피해가 {pct}% 감소합니다: 살아 있는 성가대원 한 명마다 {per}%. 성가대원을 먼저 처치하세요.',
+  'hudChrome.auraEffect.crypt.crescendo':
+    '더 빠르게 노래합니다: 공허의 만가가 {castNormal}초 대신 {cast}초 걸리고 {everyNormal}초 대신 {every}초마다 오며, 뼈 오르간이 {wavesNormal}파도 대신 {waves}파도의 음표를 연주합니다.',
 };

@@ -19711,9 +19711,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.bellrope_girdle.name': '鐘縄の帯',
   'entities.items.sextons_spadehaft.name': '墓守の鋤柄',
   'entities.items.rimesilk_mantle.name': '霜絹のマントル',
-  'entities.items.bonechill_carapace_vest.name': '骨冷えの甲殻ベスト',
-  'entities.items.rimeweb_hunters_leggings.name': '霜網の狩人のレギンス',
-  'entities.items.rimeweb_fang.name': '霜網の牙',
+  'entities.items.bonechill_carapace_vest.name': 'ボーンチルのホーバーク',
+  'entities.items.rimeweb_hunters_leggings.name': '霜綴りのレギンス',
+  'entities.items.rimeweb_fang.name': '花嫁の氷柱',
   'entities.items.cantors_cassock.name': '聖歌隊長の法衣',
   'entities.items.choirward_leggings.name': '聖歌守りのレギンス',
   'entities.items.choristers_gloves.name': '聖歌隊員の手袋',
@@ -20234,4 +20234,46 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cantor_laverock.title': '蒼白聖歌隊最後の詠唱者',
   'entities.npcs.cantor_laverock.greeting':
     'わしは蒼白聖歌隊でいちばん若い声だった。儀式の夜、わしは飲まずに逃げた。それ以来、満月のたびに水の下で皆が歌うのが聞こえる。死ぬ前に、あの方をこの目で見なければならん。後ろを歩かせてくれ。戦いはせんし、足手まといにもならん。',
+  'hudChrome.cryptAlert.measuredTitle': '墓の採寸！',
+  'hudChrome.cryptAlert.measuredLine': 'バーが尽きると足元に墓が崩れ落ちる：墓地の端まで運べ',
+  'hudChrome.cryptAlert.embracedTitle': '凍てつく抱擁！',
+  'hudChrome.cryptAlert.embracedLine':
+    '宙に抱え上げられている：仲間が彼女を攻撃すれば降ろしてもらえる',
+  'hudChrome.cryptAlert.lamentTitle': '花嫁の哀歌！',
+  'hudChrome.cryptAlert.lamentShelteredLine': '灯ったランタンの光の中に君の居場所がある：動くな',
+  'hudChrome.cryptAlert.lamentOpenLine':
+    '慟哭が届く前に灯ったランタンの光に入れ：1つのランタンに2人まで',
+  'hudChrome.cryptAlert.graveTitle': '開いた墓の中にいる！',
+  'hudChrome.cryptAlert.graveLine': '墓土が君を焼き、足を鈍らせる：墓から出ろ',
+  'hudChrome.cryptAlert.tollTitle': '埋葬の鐘！',
+  'hudChrome.cryptAlert.tollLine':
+    '鐘を鳴らす間はダメージを受けない：鐘の一撃と、それが呼び起こす死者に備えろ',
+  'hudChrome.cryptAlert.harmonyTitle': '調和',
+  'hudChrome.cryptAlert.harmonyLine':
+    '聖歌隊員が彼女の受けるダメージを{pct}%減らしている：先に聖歌隊員を倒せ',
+  'hudChrome.cryptAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.crypt.measured':
+    'これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    '開いた墓の中に立っている：移動速度が{slow}%低下し、毎秒{damage}の闇ダメージ（ヒロイックでは{heroic}）。ヒロイックでは墓の中に{linger}秒留まると安らがぬ骨が這い出る。墓から出ること。',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    '移動速度が{pct}%低下。ひとすくいの墓土は墓守マロウの前方にいる全員に当たる：背後に立つこと。',
+  'hudChrome.auraEffect.crypt.blow':
+    '受けるダメージが{pct}%上昇：1スタックごとに{per}%、現在{stacks}/{max}スタック。墓掘りの一撃のたびにスタックが増え、効果時間が{seconds}秒に戻る。',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    '開いた墓の中に立っている間、攻撃速度が{pct}%上昇。墓から引き離すこと。',
+  'hudChrome.auraEffect.crypt.tolling':
+    '鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。',
+  'hudChrome.auraEffect.crypt.embraced':
+    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
+  'hudChrome.auraEffect.crypt.lament':
+    '花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。',
+  'hudChrome.auraEffect.crypt.lingering':
+    '次の花嫁の哀歌で受けるダメージが{pct}%増加：1スタックごとに{per}%、最大{max}スタック。次はランタンの光の中で受けること。',
+  'hudChrome.auraEffect.crypt.slippery':
+    'すべりやすい氷の上：速度は毎秒最大{grip}ヤード/秒しか変わらないため、走り出しが遅く、止まっても滑り続け、曲がると大きく膨らむ。氷から降りれば足場が戻る。',
+  'hudChrome.auraEffect.crypt.harmony':
+    '受けるダメージが{pct}%減少：生きている聖歌隊員1人ごとに{per}%。聖歌隊員を先に倒すこと。',
+  'hudChrome.auraEffect.crypt.crescendo':
+    '歌が速くなる：虚ろの挽歌は{castNormal}秒ではなく{cast}秒になり、{everyNormal}秒ではなく{every}秒ごとに来る。骨のオルガンは{wavesNormal}波ではなく{waves}波の音符を奏でる。',
 };

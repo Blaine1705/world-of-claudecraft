@@ -3927,6 +3927,20 @@ export const zh_CN: EnTranslations = {
       "bastion": {
         "anchored": "被锁在溺亡之锚上：你可以移动，但无法远离绞盘，它会把你绞向溺亡深坑。走到距被钩住处至少{run}码的点亮系泊柱{reach}码以内即可系住锁链（该柱熄灭{dark}秒），或者让队友用{links}次攻击砸断锁链（英雄难度{linksHeroic}次）。掉进深坑会损失{pit}%的最大生命值（英雄难度{pitHeroic}%）。"
       },
+      "crypt": {
+        "measured": "此效果结束时，一座敞开的坟墓会在你所站之处塌陷：对{radius}码内的所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。坟墓会在整场战斗中保留，所以把印记带到墓园边缘，远离队伍。",
+        "graveDirt": "站在敞开的坟墓中：移动速度降低{slow}%，每秒受到{damage}点暗影伤害（英雄难度{heroic}点）。英雄难度下，在坟墓中停留{linger}秒会唤起一具不安之骨。离开坟墓。",
+        "dirtInEyes": "移动速度降低{pct}%。一铲坟土会击中司事马罗身前的所有人：站到他身后。",
+        "blow": "受到的伤害提高{pct}%：每层{per}%，当前{stacks}/{max}层。每次掘墓人重击都会增加一层，并将持续时间重置为{seconds}秒。",
+        "graveVigor": "站在敞开的坟墓中时攻击速度提高{pct}%。别让他待在坟墓里。",
+        "tolling": "他大步走向钟绳并敲响葬钟时免疫伤害。钟声结束时，丧钟对所有人造成{min}到{max}点暗影伤害（英雄难度{heroicMin}到{heroicMax}点），并且每座敞开的坟墓都会爬出一具不安之骨。",
+        "embraced": "被夫人举在半空：无法行动，每秒受到{tick}点冰霜伤害（英雄难度{tickHeroic}点）。如果你的队伍打掉她{share}%的最大生命值，她会把你轻轻放下；如果她在高处抓住你{hold}秒，就会把你扔到冰面上，造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。",
+        "lament": "新娘的哀歌结束时，对所有不在点亮的墓灯{radius}码内的人造成{min}到{max}点冰霜伤害（英雄难度{heroicMin}到{heroicMax}点）。每盏灯只庇护离它最近的{cap}名玩家，然后熄灭并错过下一次哀歌。",
+        "lingering": "你承受的下一次新娘的哀歌伤害提高{pct}%：每层{per}%，最多{max}层。下一次请在墓灯光芒中承受。",
+        "slippery": "在光滑的冰面上：你的速度每秒最多改变{grip}码/秒，所以起步缓慢，停下时会继续滑行，转向时会甩出大弧线。离开冰面就能重新站稳。",
+        "harmony": "受到的伤害降低{pct}%：她每有一名存活的唱诗者就降低{per}%。先杀死唱诗者。",
+        "crescendo": "唱得更快：空洞挽歌只需{cast}秒（原为{castNormal}秒），每{every}秒一次（原为{everyNormal}秒），骨管风琴会奏出{waves}波音符（原为{wavesNormal}波）。"
+      },
       "sanctum": {
         "lockbound": "受到的伤害降低{pct}%：每条仍然完好的锁链提供{per}%。打破一个封印镣铐即可让其锁链脱落。",
         "enrage": "造成的伤害提高{pct}%。",
@@ -6192,6 +6206,22 @@ export const zh_CN: EnTranslations = {
       "brandedLine": "烙印会一直灼烧到结束：到融水池里将它浇灭",
       "rimeTitle": "蔓延霜凇！",
       "rimeLine": "蔓延霜凇 {stacks}/{max}：离开幼龙的吐息"
+    },
+    "cryptAlert": {
+      "measuredTitle": "量身定墓！",
+      "measuredLine": "计时条走完时，坟墓会在你脚下塌陷：把它带到墓园边缘",
+      "embracedTitle": "冰封之拥！",
+      "embracedLine": "她把你举在半空：你的队伍必须伤害她，她才会把你放下",
+      "lamentTitle": "新娘的哀歌！",
+      "lamentShelteredLine": "你站在点亮的墓灯光芒中，灯下还有你的位置：保持不动",
+      "lamentOpenLine": "在哀嚎落下前进入点亮的墓灯光芒中：每盏灯两人",
+      "graveTitle": "你在敞开的坟墓里！",
+      "graveLine": "坟土会灼烧你并让你减速：离开坟墓",
+      "tollTitle": "葬礼丧钟！",
+      "tollLine": "他摇钟时无法受到伤害：准备承受丧钟和它唤起的亡者",
+      "harmonyTitle": "和声",
+      "harmonyLine": "她的唱诗者使她受到的伤害降低{pct}%：先杀死它们",
+      "timeAria": "剩余{seconds}秒"
     },
     "kitUse": {
       "toppleLine": "把它踢倒在敌群上：洒出的火焰会灼烧它们",
@@ -18879,13 +18909,13 @@ export const zh_CN: EnTranslations = {
         "name": "霜丝肩衣"
       },
       "bonechill_carapace_vest": {
-        "name": "寒骨甲壳背心"
+        "name": "骨寒锁甲"
       },
       "rimeweb_hunters_leggings": {
-        "name": "霜网猎手护腿"
+        "name": "缀霜护腿"
       },
       "rimeweb_fang": {
-        "name": "霜网之牙"
+        "name": "新娘的冰锥"
       },
       "cantors_cassock": {
         "name": "领唱者的法衣"

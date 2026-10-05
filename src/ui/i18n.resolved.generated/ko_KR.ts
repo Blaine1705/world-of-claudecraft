@@ -3927,6 +3927,20 @@ export const ko_KR: EnTranslations = {
       "bastion": {
         "anchored": "익사의 닻에 묶임: 움직일 수는 있지만 권양기에서 더 멀어질 수는 없으며, 익사의 구덩이로 감겨 갑니다. 걸린 곳에서 {run}야드 이상 떨어진 불 켜진 계류 기둥 {reach}야드 이내로 가면 사슬을 묶을 수 있습니다(그 기둥은 {dark}초 동안 꺼집니다). 아니면 파티가 {links}번 공격해 사슬을 끊어야 합니다(영웅은 {linksHeroic}번). 구덩이에 빠지면 최대 생명력의 {pit}%를 잃습니다(영웅은 {pitHeroic}%)."
       },
+      "crypt": {
+        "measured": "이 효과가 끝나면 서 있는 자리에 열린 무덤이 무너져 {radius}미터 안의 모두에게 {min}~{max} 피해를 줍니다(영웅 난이도 {heroicMin}~{heroicMax}). 무덤은 전투 내내 남으므로 표식을 파티에서 떨어진 묘지 가장자리로 옮기세요.",
+        "graveDirt": "열린 무덤 안에 서 있음: 이동 속도 {slow}% 감소, 매초 {damage} 암흑 피해(영웅 난이도 {heroic}). 영웅 난이도에서는 무덤 안에 {linger}초 머물면 불안한 뼈무더기가 일어납니다. 무덤에서 나오세요.",
+        "dirtInEyes": "이동 속도가 {pct}% 감소합니다. 한 삽의 무덤흙은 성구지기 매로우 앞의 모두를 맞힙니다: 그의 뒤에 서세요.",
+        "blow": "받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 현재 {stacks}/{max}중첩. 무덤꾼의 일격마다 중첩이 쌓이고 지속 시간이 {seconds}초로 초기화됩니다.",
+        "graveVigor": "열린 무덤 안에 서 있는 동안 공격 속도가 {pct}% 증가합니다. 그를 무덤 밖에 두세요.",
+        "tolling": "종 밧줄로 걸어가 장례의 종을 울리는 동안 피해 면역입니다. 종소리가 끝나면 모두에게 {min}~{max} 암흑 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 열린 무덤마다 불안한 뼈무더기가 일어납니다.",
+        "embraced": "귀부인의 품에 안겨 공중에 떠 있음: 행동할 수 없고 매초 {tick} 냉기 피해(영웅 난이도 {tickHeroic})를 받습니다. 파티가 그녀의 최대 생명력 {share}%를 깎으면 부드럽게 내려놓지만, 높은 곳에서 {hold}초 동안 붙잡고 있으면 얼음 위로 떨어뜨려 {min}~{max} 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
+        "lament": "신부의 애가가 끝나면 켜진 무덤 등불에서 {radius}미터 안에 없는 모두에게 {min}~{max} 냉기 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 등불은 가장 가까운 {cap}명만 보호한 뒤 꺼져 다음 애가를 놓칩니다.",
+        "lingering": "다음 신부의 애가로 받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 최대 {max}중첩. 다음 애가는 등불 빛 안에서 받으세요.",
+        "slippery": "미끄러운 얼음 위: 속도가 매초 최대 {grip}미터/초씩만 바뀌므로 출발이 느리고, 멈추면 계속 미끄러지며, 방향을 틀면 크게 돌아갑니다. 얼음에서 벗어나면 다시 중심을 잡을 수 있습니다.",
+        "harmony": "받는 피해가 {pct}% 감소합니다: 살아 있는 성가대원 한 명마다 {per}%. 성가대원을 먼저 처치하세요.",
+        "crescendo": "더 빠르게 노래합니다: 공허의 만가가 {castNormal}초 대신 {cast}초 걸리고 {everyNormal}초 대신 {every}초마다 오며, 뼈 오르간이 {wavesNormal}파도 대신 {waves}파도의 음표를 연주합니다."
+      },
       "sanctum": {
         "lockbound": "받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.",
         "enrage": "주는 피해가 {pct}% 증가합니다.",
@@ -6192,6 +6206,22 @@ export const ko_KR: EnTranslations = {
       "brandedLine": "낙인은 끝날 때까지 타오릅니다: 녹은 물웅덩이에서 끄세요",
       "rimeTitle": "스며드는 서리!",
       "rimeLine": "스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요"
+    },
+    "cryptAlert": {
+      "measuredTitle": "무덤 치수 재기!",
+      "measuredLine": "바가 다 떨어지면 발밑에 무덤이 무너집니다: 묘지 가장자리로 옮기세요",
+      "embracedTitle": "얼어붙은 포옹!",
+      "embracedLine": "그녀가 당신을 공중에 들어 올렸습니다: 파티가 그녀에게 피해를 줘야 내려놓습니다",
+      "lamentTitle": "신부의 애가!",
+      "lamentShelteredLine": "켜진 등불의 빛 안에 당신의 자리가 있습니다: 가만히 있으세요",
+      "lamentOpenLine": "통곡이 닥치기 전에 켜진 등불의 빛 안으로 들어가세요: 등불 하나에 두 명",
+      "graveTitle": "열린 무덤 안에 있습니다!",
+      "graveLine": "무덤흙이 당신을 태우고 느리게 합니다: 무덤에서 나오세요",
+      "tollTitle": "장례의 종소리!",
+      "tollLine": "종을 울리는 동안 그는 피해를 받지 않습니다: 종소리와 그것이 일으키는 망자에 대비하세요",
+      "harmonyTitle": "화음",
+      "harmonyLine": "성가대원들이 그녀가 받는 피해를 {pct}% 줄이고 있습니다: 성가대원을 먼저 처치하세요",
+      "timeAria": "{seconds}초 남음"
     },
     "kitUse": {
       "toppleLine": "무리 위로 걷어차 넘어뜨리세요: 쏟아진 불길이 그들을 태웁니다",
@@ -18879,13 +18909,13 @@ export const ko_KR: EnTranslations = {
         "name": "서리비단 어깨망토"
       },
       "bonechill_carapace_vest": {
-        "name": "뼈서리 갑각 조끼"
+        "name": "뼈서리 사슬갑옷"
       },
       "rimeweb_hunters_leggings": {
-        "name": "서리거미줄 사냥꾼 다리보호구"
+        "name": "서리끈 다리보호구"
       },
       "rimeweb_fang": {
-        "name": "서리거미줄 송곳니"
+        "name": "신부의 고드름"
       },
       "cantors_cassock": {
         "name": "성가대장의 사제복"

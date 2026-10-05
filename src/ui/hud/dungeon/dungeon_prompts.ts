@@ -5,7 +5,9 @@
 // shared encounter alert painter, encounter_alert_painter.ts: the Prey, the
 // Stalk, the pollen, the Pack Bond readout) and the Gravewyrm Sanctum's
 // (sanctum_alert_view.ts on the same family: the chains, the meltwater, the
-// lake), plus the trash engine's use prompt (kit_use_prompt_view.ts on the
+// lake) and the Hollow Crypt's (crypt_alert_view.ts on the same family: the
+// grave mark, the Frozen Embrace, the Bride's Lament, the Open Grave, the Toll
+// and Harmony readouts), plus the trash engine's use prompt (kit_use_prompt_view.ts on the
 // same family: a Soul Brazier to kick over). It owns no DOM itself; it builds
 // each view from the frame's inputs and hands it to that prompt's painter. The
 // frame hands it the world (its entities and roster version, and the target
@@ -21,6 +23,7 @@
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
+import { buildCryptAlertView, CRYPT_ALERT_KINDS } from './crypt_alert_view';
 import { EncounterAlert } from './encounter_alert_painter';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
@@ -47,6 +50,7 @@ export interface DungeonPromptsFrame {
       remaining?: number;
       duration?: number;
       stacks?: number;
+      value?: number;
     }[];
     /** The player's target (an alert may read the boss being targeted). */
     targetId?: number | null;
@@ -78,6 +82,7 @@ export class DungeonPrompts {
   private readonly wildheart: EncounterAlert;
   private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
+  private readonly crypt: EncounterAlert;
   private readonly kitUse: EncounterAlert;
   private readonly kitUseScene = new KitUseSceneScan();
   /** The body a press on the use prompt targets (-1: none on offer). */
@@ -103,6 +108,11 @@ export class DungeonPrompts {
       id: 'sanctum-alert',
       className: 'ui-panel-strong encounter-alert sanctum-alert',
       kinds: SANCTUM_ALERT_KINDS,
+    });
+    this.crypt = new EncounterAlert(deps, {
+      id: 'crypt-alert',
+      className: 'ui-panel-strong encounter-alert crypt-alert',
+      kinds: CRYPT_ALERT_KINDS,
     });
     // A press on the use prompt is the interact key's own 'use' arm: target
     // the body it names, then the ordinary interact.
@@ -155,9 +165,16 @@ export class DungeonPrompts {
       scene: this.sanctumScene.update(f.world),
     });
     this.sanctum.paint(sanctum);
+    const crypt = buildCryptAlertView({ auras: p.auras, targetId: p.targetId, entity });
+    this.crypt.paint(crypt);
     // The use prompt last: it yields the shared slot to any prompt above.
     const slotTaken =
-      cage.visible || chain.visible || bastion.visible || wildheart.visible || sanctum.visible;
+      cage.visible ||
+      chain.visible ||
+      bastion.visible ||
+      wildheart.visible ||
+      sanctum.visible ||
+      crypt.visible;
     const use = slotTaken
       ? null
       : buildKitUsePromptView({
@@ -177,6 +194,7 @@ export class DungeonPrompts {
     this.bastion.dispose();
     this.wildheart.dispose();
     this.sanctum.dispose();
+    this.crypt.dispose();
     this.kitUse.dispose();
   }
 }

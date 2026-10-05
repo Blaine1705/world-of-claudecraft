@@ -3927,6 +3927,20 @@ export const sv_SE: EnTranslations = {
       "bastion": {
         "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
       },
+      "crypt": {
+        "measured": "When this ends, an Open Grave caves in where you stand: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. The grave stays for the rest of the fight, so carry the mark to the edge of the yard, away from the group.",
+        "graveDirt": "Standing in an Open Grave: movement speed reduced by {slow}% and {damage} Shadow damage every second ({heroic} on Heroic). On Heroic, lingering {linger} sec in a grave raises a Restless Bones. Step out of the grave.",
+        "dirtInEyes": "Reduces movement speed by {pct}%. Shovelful hits everyone in front of Sexton Marrow: stand behind him.",
+        "blow": "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
+        "graveVigor": "Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.",
+        "tolling": "Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.",
+        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
+        "lament": "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
+        "lingering": "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
+        "slippery": "On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.",
+        "harmony": "Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.",
+        "crescendo": "Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}."
+      },
       "sanctum": {
         "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
         "enrage": "Deals {pct}% more damage.",
@@ -6192,6 +6206,22 @@ export const sv_SE: EnTranslations = {
       "brandedLine": "The brand burns until it ends: douse it in a meltwater pool",
       "rimeTitle": "Creeping Rime!",
       "rimeLine": "Creeping Rime {stacks}/{max}: step out of the whelps' breath"
+    },
+    "cryptAlert": {
+      "measuredTitle": "Measured for the Grave!",
+      "measuredLine": "A grave caves in under you when the bar runs out: carry it to the edge of the yard",
+      "embracedTitle": "Frozen Embrace!",
+      "embracedLine": "She holds you aloft: your group must hurt her to make her set you down",
+      "lamentTitle": "Bride's Lament!",
+      "lamentShelteredLine": "You stand in a lit lantern's light with room for you: hold still",
+      "lamentOpenLine": "Get into a lit lantern's light before the wail lands: two to a lantern",
+      "graveTitle": "In an Open Grave!",
+      "graveLine": "The grave dirt burns and slows you: step out of it",
+      "tollTitle": "Burial Toll!",
+      "tollLine": "He cannot be hurt while he rings the bell: brace for the Toll and the dead it raises",
+      "harmonyTitle": "Harmony",
+      "harmonyLine": "Her Choristers take {pct}% off the damage she takes: kill them first",
+      "timeAria": "{seconds} seconds left"
     },
     "kitUse": {
       "toppleLine": "Kick it over onto the pack: the spill burns them",
@@ -18879,13 +18909,13 @@ export const sv_SE: EnTranslations = {
         "name": "Rimesilk Mantle"
       },
       "bonechill_carapace_vest": {
-        "name": "Bonechill Carapace Vest"
+        "name": "Bonechill Hauberk"
       },
       "rimeweb_hunters_leggings": {
-        "name": "Rimeweb Hunter's Leggings"
+        "name": "Rime-Laced Leggings"
       },
       "rimeweb_fang": {
-        "name": "Rimeweb Fang"
+        "name": "Bride's Icicle"
       },
       "cantors_cassock": {
         "name": "Cantor's Cassock"

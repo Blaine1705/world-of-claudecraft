@@ -422,9 +422,9 @@ paladin, shaman), Agile (rogue, hunter), Caster (mage, priest, warlock, druid).
 | | Bellrope Girdle (`bellrope_girdle`) | waist, cloth, Caster | uncommon, 9 | int 1, spi 1, sta 1 (2) | 0.25 group |
 | | Sexton's Spadehaft (`sextons_spadehaft`) | two-hand, Heavy | rare, 11 | str 5, sta 3 (8); 30 to 46, speed 3.3 (11.5 DPS) | 0.10 |
 | Rimeweb (9) | Rimesilk Mantle (`rimesilk_mantle`) | shoulder, cloth, Caster | uncommon, 10 | int 2, spi 1, sta 1 (3) | 0.34 group |
-| | Bonechill Carapace Vest (`bonechill_carapace_vest`) | chest, mail, Heavy | uncommon, 10 | str 2, sta 2 (4) | 0.33 group |
-| | Rimeweb Hunter's Leggings (`rimeweb_hunters_leggings`) | legs, leather, Agile | uncommon, 10 | agi 2, sta 1 (3) | 0.33 group |
-| | Rimeweb Fang (`rimeweb_fang`) | dagger, Agile | rare, 12 | agi 4, sta 3 (7); 14 to 21, speed 1.7 (10.3 DPS) | 0.10 |
+| | Bonechill Hauberk (`bonechill_carapace_vest`) | chest, mail, Heavy | uncommon, 10 | str 2, sta 2 (4) | 0.33 group |
+| | Rime-Laced Leggings (`rimeweb_hunters_leggings`) | legs, leather, Agile | uncommon, 10 | agi 2, sta 1 (3) | 0.33 group |
+| | Bride's Icicle (`rimeweb_fang`) | dagger, Agile | rare, 12 | agi 4, sta 3 (7); 14 to 21, speed 1.7 (10.3 DPS) | 0.10 |
 | Ilvane (9) | Cantor's Cassock (`cantors_cassock`) | chest, cloth, Caster | uncommon, 10 | int 3, spi 1, sta 1 (4) | 0.34 group |
 | | Choirward Leggings (`choirward_leggings`) | legs, mail, Heavy | uncommon, 10 | str 2, sta 1 (3) | 0.33 group |
 | | Chorister's Gloves (`choristers_gloves`) | gloves, leather, Agile | uncommon, 10 | agi 2, sta 1 (3) | 0.33 group |
@@ -448,7 +448,7 @@ finale ladder of `docs/design/dungeon-gold.md` (2500c normal, 100000c heroic).
 | Boss | Partition (weights) |
 |---|---|
 | Marrow | Sexton's Burial Spade (`sextons_burial_spade`, new epic two-hand, Heavy, ilvl 31: str 17, sta 12, 50 to 75 at speed 3.4, the five-man heroic weapon rating) 0.30; Cryptplate Helm (shipped, moved from Morthen) 0.30; Quilted Trousers 0.15; Oiled Leather Boots 0.15; Heroic Sexton's Spadehaft (generated) 0.10 |
-| Rimeweb | Rimesilk Hood (`rimesilk_hood`, new epic cloth helmet, Caster, ilvl 31: int 11, spi 7, sta 6, the five-man armor rating) 0.35; Bonechill Striders (shipped, moved) 0.25; Bonechill Cord (shipped, moved) 0.25; Heroic Rimeweb Fang (generated) 0.15 |
+| Rimeweb | Rimesilk Hood (`rimesilk_hood`, new epic cloth helmet, Caster, ilvl 31: int 11, spi 7, sta 6, the five-man armor rating) 0.35; Bonechill Striders (shipped, moved) 0.25; Bonechill Cord (shipped, moved) 0.25; Heroic Bride's Icicle (generated) 0.15 |
 | Ilvane | Shadowpulse Handwraps (shipped, moved) 0.50; Choirward Leggings 0.35; Heroic Cantor's Hymnal (generated) 0.15. Vigil Taper deferred to the encounter pass (it needs a new trinket effect kind) |
 | Morthen | Morthen's Cryptforged Hauberk, Shadowpulse Slippers, Lunarward Cinch, Bastion Sigil 0.18 each; Cryptbone Greaves, Greyjaw Hide Boots, Cryptbone Helm, Cryptbone Pauldrons 0.07 each (the shipped Reliquary page keeps paying on Heroic). Unchanged outside the partition: Gravewoven Bag 0.20, the Stormfeather Griffin reins chance, the heroic farm pattern rows, heroic finale gold, Heroic Marks |
 
@@ -466,7 +466,7 @@ rewards the healer who plays Ilvane's pillars well.
 | Archetype | Marrow | Rimeweb | Ilvane | Morthen |
 |---|---|---|---|---|
 | Heavy | Gravedirt Treads, Spadehaft | Carapace Vest | Choirward Leggings | Cryptbone Greaves |
-| Agile | Oiled Leather Boots | Hunter's Leggings, Rimeweb Fang | Chorister's Gloves | Unquiet Stalker's Hood |
+| Agile | Oiled Leather Boots | Rime-Laced Leggings, Bride's Icicle | Chorister's Gloves | Unquiet Stalker's Hood |
 | Caster | Quilted Trousers, Bellrope Girdle | Rimesilk Mantle | Cantor's Cassock, Hymnal | Gravecaller's Vestments |
 
 Heroic covers the same three archetypes on every boss (Heavy, Agile and Caster
@@ -487,7 +487,7 @@ epics in each partition, the trinket on Ilvane, Bastion Sigil on Morthen).
   - The shipped `dgn_hollow_crypt`, `_heroic`, `dgn_morthen_flawless` and
     `dgn_morthen_trio` stay as they are.
 - **Reliquary:** the shipped pages stay (append-only). The rare chase items
-  (Sexton's Spadehaft, Rimeweb Fang, Cantor's Hymnal) and the new heroic epics
+  (Sexton's Spadehaft, Bride's Icicle, Cantor's Hymnal) and the new heroic epics
   (Sexton's Burial Spade, Rimesilk Hood, Vigil Taper) need relic slots, and every
   moved relic needs a per-boss source hint instead of `fromBoss('morthen')`.
   Whether they extend the shipped pages or go on a new appended page is a
