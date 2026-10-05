@@ -421,10 +421,11 @@ describe('the Pearlguard Sentinel: the Moonmantle Ray', () => {
     expect(v.url).toMatch(/temple_sentinel\.glb$/);
     expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
     expect(v.authoredAtlas).toBe(true);
-    // A floating manta: its Idle bounds (1.4, belly and tail tip a yard up)
-    // sit `hover` over the floor, so the model's floor stays the world's;
-    // drawn 1.6 high at rest at its 1.15 (its wings span 6.8, 2.6 players).
-    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(1.61, 2);
+    // A floating manta: its Idle bounds (belly and tail tip a yard up) sit
+    // `hover` over the floor, so the model's floor stays the world's; drawn
+    // 1.52 high at rest at its 1.15, its wings still spanning 6.8 (2.6
+    // players): the round-two body is thicker for the same span.
+    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(1.522, 2);
     expect(v.hover).toBeCloseTo(0.673, 3);
     // no feet to match: the glide speeds its beats are authored for, its
     // wander (about 0.35 of its moveSpeed) and its chase (its moveSpeed)
@@ -433,6 +434,21 @@ describe('the Pearlguard Sentinel: the Moonmantle Ray', () => {
     expect(v.clips.castByAbility?.[TEMPLE_PEARL_SLAM]).toBe('Slam');
     expect(MOBS.pearlguard_sentinel.trashKit?.wingGust?.castTime).toBe(1.5);
     expect(v.castClipSync).toBe(true);
+  });
+
+  it('wears its heart pearl baked into the body, the dark pearl flat, in budget', () => {
+    const path = 'public/models/creatures/temple_sentinel.glb';
+    const names = (glbJson(path).materials ?? []).map((m) => m.name);
+    // the sculpted heart pearl rides the baked atlas (its inner glow is in the
+    // emissive map); only the rim filament and the dying pearl stay flat
+    expect(names).not.toContain('MantaHeartPearl');
+    expect(names).toEqual(
+      expect.arrayContaining(['MoonmantleRayBody', 'MantaWingLight', 'MantaDarkPearl']),
+    );
+    const body = glbJson(path).materials?.find((m) => m.name === 'MoonmantleRayBody');
+    expect(body?.emissiveTexture).toBeDefined();
+    expect(trianglesOf(path)).toBeGreaterThan(18000);
+    expect(trianglesOf(path)).toBeLessThan(32000);
   });
 
   it('shuts its shell while Pearl Carapace holds and opens when it goes', () => {

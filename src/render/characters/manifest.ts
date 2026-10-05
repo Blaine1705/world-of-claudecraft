@@ -4840,29 +4840,33 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.08,
   },
   // The Pearlguard Sentinel (pearlguard_sentinel; scripts/assets/
-  // drowned_temple_creatures/sentinel_manta/): the Moonmantle Ray, a giant
-  // sacred manta of moonlight gliding a yard over the flags. Its pearl-white
-  // back carries nine nacre plates carved with the moon's phases (new moon on
-  // its left wingtip to full on its right); the wings thin to edges clear as
-  // water with a filament of cyan light inside; underneath it is deep
-  // turquoise strewn with stars. Its cephalic lobes curl into a silver
-  // crescent round its glowing heart pearl; a whip tail ends in tide-glass.
-  // Idle: a slow wave rolling out along the wings. Walk glides on deep beats,
-  // Run (also its Onrush) darts risen with the wings swept back like an
-  // arrowhead; walkRef/runRef are the glide speeds those beats are authored
-  // for (its wander and its chase). Attack: a cut with the right wing's edge
-  // (CONTACT 0.42); Attack2: the tail arched over its back and lashed down
-  // (0.5). Pearl Slam (1.5 s bar) plays Slam: it rears up on its tail, wings
-  // opened high (about 6 drawn), and drives them down on the bar's end. Pearl
-  // Carapace: temple_fx swaps the rig to its cocoon stance (the wings wrapped
-  // under its belly, moon plates out, ShellClose to enter, ShellOpen bursting
-  // free). Dying, it sinks to the floor and its wing light goes out from the
-  // tips inward, the pearl last. `hover` is its Idle's lowest point (the tail
-  // tip), so the floor of the model stays the floor of the world; drawn 1.6
-  // high at rest and 6.8 wingtip to wingtip at its 1.15 (2.6 players across).
+  // drowned_temple_creatures/sentinel_manta/, reworked in round two): the
+  // Moonmantle Ray, a giant sacred manta of moonlight gliding a yard over the
+  // flags. A thick, muscled disc: its back the deep night-sea blue with pearl
+  // chevrons on the shoulders and nine raised nacre plates carved with the
+  // moon's phases (new moon on its left wingtip to full on its right); the
+  // wings thin to edges of clear cyan with a filament of light inside;
+  // underneath, a pale pearl heart of the belly fading to turquoise strewn
+  // with stars, deep gill slits and a keel. Its cephalic lobes run forward
+  // into one silver crescent moon standing round its heart pearl (a sculpted
+  // pearl lit from within, a crescent carved on its face); a whip tail ends
+  // in pointed tide-glass. Idle: a slow wave rolling out along the wings.
+  // Walk glides on deep beats, Run (also its Onrush) darts risen with the
+  // wings swept back like an arrowhead; walkRef/runRef are the glide speeds
+  // those beats are authored for (its wander and its chase). Attack: a cut
+  // with the right wing's edge (CONTACT 0.42); Attack2: the tail arched over
+  // its back and lashed down (0.5). Pearl Slam (1.5 s bar) plays Slam: it
+  // rears up on its tail, wings opened high, and drives them down on the bar's
+  // end. Pearl Carapace: temple_fx swaps the rig to its cocoon stance (the
+  // wings wrapped under its belly, moon plates out, ShellClose to enter,
+  // ShellOpen bursting free). Dying, it sinks to the floor and its wing light
+  // goes out from the tips inward, the pearl last. `hover` is its Idle's
+  // lowest point (the tail tip), so the floor of the model stays the floor of
+  // the world; drawn 1.52 high at rest and still 6.8 wingtip to wingtip at
+  // its 1.15 (the thicker body makes it a little taller per unit of span).
   temple_sentinel: {
     url: `${CREATURES}/temple_sentinel.glb`,
-    height: 1.4,
+    height: 1.3236,
     hover: 0.673,
     clips: SENTINEL_CLIPS,
     phaseClips: {

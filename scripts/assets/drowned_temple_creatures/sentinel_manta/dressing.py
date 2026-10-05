@@ -1,6 +1,6 @@
-"""The Moonmantle Ray's dressing: its heart pearl (Pearl, glowing) and the
-same pearl gone dark (PearlDark, seen only as it dies), the silver crescent
-cradle the pearl rests on, the small cold eyes with their slits of light
+"""The Moonmantle Ray's dressing: its heart pearl gone dark (PearlDark, seen
+only as it dies; the living pearl and the silver crescent it rests in are
+sculpts in anatomy.py), the small cold eyes with their slits of light
 (EyeGlow), a row of pearls down its spine, a silver band where the tide-glass
 meets the tail, and the filament of cyan light inside each wing's clear edge:
 five pieces a wing, each riding its wing bone's Glow twin, so the death can
@@ -25,21 +25,11 @@ def _pair(part, allow=None, swap=None, relax=0):
 
 
 def build_pearl():
-    heart = K.Part('HeartPearl', 'glow_pearl', bone='Pearl')
-    heart.sphere(A.PEARL_AT, (A.PEARL_R, A.PEARL_R, A.PEARL_R), seg=28, rings=16)
-    dark = K.Part('DarkPearl', 'pearl', bone='PearlDark')
-    dark.sphere(A.PEARL_AT, (A.PEARL_R * 1.01,) * 3, seg=24, rings=14)
-    # the cradle: a silver crescent under the pearl, its horns running up into
-    # the inner edges of the lobes (pearl and lobes draw one moon together)
-    sil = K.Part('PearlCradle', 'silver', bone='Head')
-    c = A.PEARL_AT + np.array((0.0, 0.02, 0.0))
-    arc, rad = [], []
-    for i in range(27):
-        a = math.radians(212 + 116 * i / 26)
-        arc.append(c + np.array((A.CRESCENT_R * math.cos(a), 0.0, A.CRESCENT_R * math.sin(a))))
-        rad.append(0.03 + 0.04 * math.sin(math.pi * i / 26))
-    sil.tube(arc, rad, sides=8, up=(0, -1, 0))
-    return [_pair(heart), _pair(dark), _pair(sil)]
+    """The heart pearl itself is a sculpt (anatomy.build_heart); here only
+    the same pearl gone dark, seen as it dies."""
+    dark = K.Part('DarkPearl', 'glow_darkpearl', bone='PearlDark')
+    dark.sphere(A.PEARL_AT, (A.PEARL_R * A.HEART_K * 1.01,) * 3, seg=24, rings=14)
+    return [_pair(dark)]
 
 
 def build_eyes():
