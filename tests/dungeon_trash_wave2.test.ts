@@ -731,7 +731,13 @@ describe('the balance audit: heroic avoidables never one-shot a cloth wearer', (
     // transform still scales its weapon by x24.
     const crypt = HEROIC_DUNGEON_TUNING.hollow_crypt;
     expect(crypt.damageMultiplierByMob?.crypt_gravecaller_necromancer).toBe(24);
-    expect(crypt.mechanicDamageMultiplierByMob).toEqual({ crypt_gravecaller_necromancer: 12 });
+    // The wing bosses' own mechanic factors sit beside it (crypt bosses).
+    expect(crypt.mechanicDamageMultiplierByMob).toEqual({
+      crypt_gravecaller_necromancer: 12,
+      sexton_marrow: 6,
+      rimeweb: 5,
+      cantor_ilvane: 8,
+    });
     const def = MOBS.crypt_gravecaller_necromancer.trashKit?.rupture;
     if (!def) throw new Error('rupture');
     const burst = def.max * 12;
