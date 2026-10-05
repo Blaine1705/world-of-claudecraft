@@ -4,6 +4,7 @@
 // template now has, and is drawn at its SANCTUM_DRAWN_HEIGHTS row.
 
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
@@ -27,11 +28,13 @@ import {
   trashModelScale,
 } from '../src/render/characters/sanctum_trash_looks';
 import {
+  anchorPoint,
   BLOCK_RELEASE,
   BONEWALKER_RISE_GESTURE,
   BONEWALKER_RISE_WINDOW,
-  bonewalkerRises,
+  bonewalkerRisesOnSight,
   brandIronAnchor,
+  breathReachShare,
   HAULER_ENRAGE_GESTURE,
   isHaulerEnrageCue,
   SANCTUM_DRAWN_HEIGHTS,
@@ -40,6 +43,7 @@ import {
   SPLINTER_SHATTERED_GESTURE,
   sanctumAnchor,
 } from '../src/render/gravewyrm_sanctum_fx/sanctum_fx_core';
+import { SanctumKitFx } from '../src/render/gravewyrm_sanctum_fx/sanctum_kit_fx';
 import { MOBS } from '../src/sim/data';
 import {
   GOADSMITH_RERIVET,
@@ -49,6 +53,7 @@ import {
   SANCTUM_BRANDING_IRON,
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
+  SANCTUM_FRACTURE,
   SANCTUM_GOAD,
   SANCTUM_ICE_BLOCK_TOSS,
   SANCTUM_PLANT_BRAZIER,
@@ -140,12 +145,13 @@ describe('the Sanctum Boneguard and the Raised Bonewalker', () => {
     expect(c.oneShotsHoldAttacks).toContain('Thaw');
     expect(c.clips.combatIdle).toBe('CombatIdle');
     expect(c.clips.attack).toEqual(['Attack', 'Attack2', 'Attack3']);
-    // Offered only to a living Bonewalker, only just after it is first seen.
-    expect(bonewalkerRises('raised_bonewalker', false, 0)).toBe(true);
-    expect(bonewalkerRises('raised_bonewalker', false, BONEWALKER_RISE_WINDOW)).toBe(true);
-    expect(bonewalkerRises('raised_bonewalker', false, BONEWALKER_RISE_WINDOW + 0.1)).toBe(false);
-    expect(bonewalkerRises('raised_bonewalker', true, 0)).toBe(false);
-    expect(bonewalkerRises('sanctum_boneguard', false, 0)).toBe(false);
+    // On first sight only Velkhar's adds rise (while he fights); a walker
+    // merely walked into range, or a dead one, just stands there.
+    expect(bonewalkerRisesOnSight('raised_bonewalker', false, true)).toBe(true);
+    expect(bonewalkerRisesOnSight('raised_bonewalker', false, false)).toBe(false);
+    expect(bonewalkerRisesOnSight('raised_bonewalker', true, true)).toBe(false);
+    expect(bonewalkerRisesOnSight('sanctum_boneguard', false, true)).toBe(false);
+    expect(BONEWALKER_RISE_WINDOW).toBeGreaterThan(0);
     // The Boneguard itself tears free of the ice when it respawns.
     expect(visualOf('sanctum_boneguard').clips.flourish).toBe('Thaw');
     expect(visualOf('sanctum_boneguard').entranceGesture).toBeUndefined();
@@ -155,6 +161,28 @@ describe('the Sanctum Boneguard and the Raised Bonewalker', () => {
     const rite = MOBS.broodsworn_thawcaller?.trashKit?.reanimate;
     expect(rite?.corpses).toEqual(['sanctum_boneguard']);
     expect(rite?.summon).toBe('raised_bonewalker');
+  });
+});
+
+describe('the body anchors map onto the world', () => {
+  it('puts forward along the facing and left a quarter turn anticlockwise', () => {
+    const out = { x: 0, y: 0, z: 0 };
+    // Facing 0 looks down +z: forward is +z, the body's left is +x.
+    anchorPoint([1, 0, 0], 0, 0, 0, 0, 1, out);
+    expect(out.x).toBeCloseTo(0, 9);
+    expect(out.z).toBeCloseTo(1, 9);
+    anchorPoint([0, 1, 0], 0, 0, 0, 0, 1, out);
+    expect(out.x).toBeCloseTo(1, 9);
+    expect(out.z).toBeCloseTo(0, 9);
+    // Facing a quarter turn (+x forward): the left swings to -z.
+    anchorPoint([0, 1, 0], 0, 0, 0, Math.PI / 2, 1, out);
+    expect(out.x).toBeCloseTo(0, 9);
+    expect(out.z).toBeCloseTo(-1, 9);
+    // Height, scale by the drawn height, the ground and the mirror.
+    anchorPoint([0.5, 0.25, 0.8], 10, 20, 3, 0, 4, out, -1);
+    expect(out.x).toBeCloseTo(10 - 1, 9);
+    expect(out.z).toBeCloseTo(20 + 2, 9);
+    expect(out.y).toBeCloseTo(3 + 3.2, 9);
   });
 });
 
@@ -360,6 +388,13 @@ describe('the Rime Whelp', () => {
     const mouth = sanctumAnchor('breath', 'rime_whelp');
     expect(mouth[0]).toBeGreaterThan(1);
     expect(mouth[2]).toBeLessThan(0.5);
+    // Its long neck carries the jaws 4 yd ahead: the puff is cut to the rest
+    // of the sim's 6 yd cone, never painted past its end.
+    const ahead = mouth[0] * SANCTUM_DRAWN_HEIGHTS.rime_whelp;
+    expect(ahead).toBeGreaterThan(3.5);
+    expect(6 * breathReachShare(6, ahead)).toBeCloseTo(Math.max(1.5, 6 - ahead), 9);
+    expect(breathReachShare(6, 0)).toBe(1);
+    expect(breathReachShare(6, 9)).toBe(0.25);
   });
 });
 
@@ -406,6 +441,11 @@ describe('the Ogre Sledge-Hauler', () => {
     expect(isHaulerEnrageCue({ ...cue, ability: 'x' }, 'ogre_sledge_hauler')).toBe(false);
     expect(isHaulerEnrageCue({ ...cue, school: 'frost' }, 'ogre_sledge_hauler')).toBe(false);
     expect(MOBS.ogre_sledge_hauler?.enrage?.belowHpPct).toBe(0.3);
+    // The cue is only unambiguous while the enrage is the template's one
+    // self-targeted fire nova with no ability (mob/boss_mechanics.ts).
+    const t = MOBS.ogre_sledge_hauler as unknown as Record<string, unknown>;
+    for (const other of ['mendAlly', 'wardAllies', 'rally', 'warcry', 'desperateHeal'])
+      expect(t[other], other).toBeUndefined();
   });
 });
 
@@ -457,5 +497,122 @@ describe('the Glacier Splinter', () => {
     expect(delay).toBe(2);
     expect(v.deathTimeScale).toBeCloseTo(GLACIER_SPLINTER_CLIP.deathFlare / delay, 9);
     expect(v.meshToggles).toEqual([{ nodes: ['*'], hideNow: SPLINTER_SHATTERED_GESTURE }]);
+  });
+});
+
+describe('the kit fx offer each entrance off its own cue', () => {
+  type Mob = {
+    id: number;
+    kind: 'mob';
+    templateId: string;
+    dead: boolean;
+    inCombat: boolean;
+    pos: { x: number; y: number; z: number };
+    facing: number;
+    scale: number;
+    castingAbility: string | null;
+  };
+  const mob = (id: number, templateId: string, inCombat = false): Mob => ({
+    id,
+    kind: 'mob',
+    templateId,
+    dead: false,
+    inCombat,
+    pos: { x: 0, y: 0, z: 0 },
+    facing: 0,
+    scale: 1,
+    castingAbility: null,
+  });
+
+  function rig(mobs: Mob[]) {
+    const gestures: [number, string][] = [];
+    const entities = new Map(mobs.map((m) => [m.id, m]));
+    const host = {
+      root: new THREE.Group(),
+      kit: {},
+      density: 1,
+      uTime: { value: 0 },
+      groundY: () => 0,
+      puff: () => {},
+      shockRing: () => {},
+      rand: () => 0.5,
+      reducedMotion: () => true,
+      shake: () => {},
+      gesture: (id: number, g: string) => gestures.push([id, g]),
+      shards: { burst: () => {} },
+    };
+    const fx = new SanctumKitFx(host as never, { entities } as never);
+    return { fx, gestures, entities };
+  }
+
+  it('raises a Thaw the Held walker off the rite landing, and no walker on mere sight', () => {
+    const walker = mob(7, 'raised_bonewalker', true);
+    const corpse = mob(3, 'sanctum_boneguard');
+    const { fx, gestures } = rig([walker, corpse]);
+    fx.update(0.1, 1);
+    fx.scanMob(walker as never);
+    expect(gestures).toEqual([]);
+    fx.handleEvent(
+      {
+        type: 'spellfx',
+        sourceId: 3,
+        targetId: 7,
+        school: 'shadow',
+        fx: 'nova',
+        ability: SANCTUM_THAW_THE_HELD,
+      } as never,
+      corpse as never,
+    );
+    expect(gestures).toContainEqual([7, BONEWALKER_RISE_GESTURE]);
+    // Re-offered until the window closes (a late view still rises once).
+    gestures.length = 0;
+    fx.update(0.1, 1 + BONEWALKER_RISE_WINDOW * 0.5);
+    expect(gestures).toEqual([[7, BONEWALKER_RISE_GESTURE]]);
+    gestures.length = 0;
+    fx.update(0.1, 1 + BONEWALKER_RISE_WINDOW + 0.2);
+    expect(gestures).toEqual([]);
+  });
+
+  it("raises Velkhar's adds on first sight only while he fights", () => {
+    const velkhar = mob(1, 'grand_necromancer_velkhar', true);
+    const walker = mob(9, 'raised_bonewalker', true);
+    const { fx, gestures } = rig([velkhar, walker]);
+    fx.update(0.1, 5);
+    fx.scanMob(walker as never);
+    expect(gestures).toEqual([[9, BONEWALKER_RISE_GESTURE]]);
+    // Judged once: a later scan of the same walker offers nothing new.
+    gestures.length = 0;
+    fx.update(0.1, 10);
+    fx.scanMob(walker as never);
+    expect(gestures).toEqual([]);
+  });
+
+  it('staggers both Fracture halves, each copy kept on offer on its own', () => {
+    const a = mob(20, 'glacier_splinter', true);
+    const copyA = mob(21, 'glacier_splinter', true);
+    const b = mob(30, 'glacier_splinter', true);
+    const copyB = mob(31, 'glacier_splinter', true);
+    const { fx, gestures } = rig([a, copyA, b, copyB]);
+    fx.update(0.1, 2);
+    const split = (src: Mob, copy: Mob) =>
+      fx.handleEvent(
+        {
+          type: 'spellfx',
+          sourceId: src.id,
+          targetId: copy.id,
+          school: 'frost',
+          fx: 'nova',
+          ability: SANCTUM_FRACTURE,
+        } as never,
+        src as never,
+      );
+    split(a, copyA);
+    split(b, copyB);
+    expect(gestures).toContainEqual([20, SPLINTER_FRACTURE_GESTURE]);
+    expect(gestures).toContainEqual([30, SPLINTER_FRACTURE_GESTURE]);
+    gestures.length = 0;
+    fx.update(0.1, 2.1);
+    expect(gestures).toContainEqual([21, SPLINTER_COPY_GESTURE]);
+    expect(gestures).toContainEqual([31, SPLINTER_COPY_GESTURE]);
   });
 });

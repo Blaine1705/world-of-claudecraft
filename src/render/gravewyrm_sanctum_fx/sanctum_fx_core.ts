@@ -561,6 +561,14 @@ export function sanctumAnchor(name: BodyAnchorName, templateId: string): BodyAnc
   return SANCTUM_BODY_ANCHORS[name][templateId] ?? DEFAULT_ANCHORS[name];
 }
 
+/** The share of a breath cone's reach left past the jaws (`mouthAhead` yards
+ *  ahead of the body, the cone measured from the body as the sim does): a long
+ *  neck's puff is shortened so it never paints frost past the cone's end. */
+export function breathReachShare(range: number, mouthAhead: number): number {
+  if (range <= 0) return 1;
+  return Math.min(1, Math.max(0.25, (range - mouthAhead) / range));
+}
+
 /** The Branding Iron's source over its bar (`fill` 0 to 1): held up glowing
  *  through the bar, thrust out over its last seventh (the clip's lunge).
  *  Writes into `out` (no allocation per frame) and returns it. */
@@ -647,19 +655,21 @@ export const SPLINTER_COPY_WINDOW = 0.5;
 /** The gesture that plays a Raised Bonewalker's Thaw (its entrance: the
  *  soldier climbs out of the ice, crouched, and straightens into its guard). */
 export const BONEWALKER_RISE_GESTURE = 'sanctum_bonewalker_rise';
-/** Seconds after a Bonewalker is first seen that its rise is still offered. */
+/** Seconds a Bonewalker's rise stays on offer after its cue (its view, or its
+ *  GLB on a first load, may land a little late; the rig plays it once). */
 export const BONEWALKER_RISE_WINDOW = 1;
 
-/** True while a freshly seen Raised Bonewalker (a Thaw the Held corpse, or one
- *  of Velkhar's adds) should be offered its rise: alive, and within the window
- *  since it was first seen. The rig plays it once per entity; one first seen
- *  later (walked into range mid-fight) simply stands there. */
-export function bonewalkerRises(
+/** Whether a Bonewalker the scan sees for the FIRST time should rise: one of
+ *  Velkhar's adds climbing out while he fights (his raise sends no per-add
+ *  event). A Thaw the Held corpse rises off its own landing event instead, and
+ *  a walker merely walked into range (or seen after a reload) outside his
+ *  fight simply stands there. */
+export function bonewalkerRisesOnSight(
   templateId: string | undefined,
   dead: boolean,
-  sinceFirstSeen: number,
+  velkharFighting: boolean,
 ): boolean {
-  return templateId === BONEWALKER_ID && !dead && sinceFirstSeen <= BONEWALKER_RISE_WINDOW;
+  return templateId === BONEWALKER_ID && !dead && velkharFighting;
 }
 
 // ---- the bodies' drawn sizes ---------------------------------------------------------

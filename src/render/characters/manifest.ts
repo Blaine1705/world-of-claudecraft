@@ -5968,7 +5968,7 @@ for (const cls of ALL_CLASSES) {
 // The Wildheart Basin's placeholder creatures (wildheart_creature_looks.ts).
 Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 // The Gravewyrm Sanctum's creatures: the Sledge Tusker's Blender body and the
-// re-tinted trash placeholders (sanctum_creature_looks.ts).
+// trash's own bodies (sanctum_creature_looks.ts, sanctum_trash_looks.ts).
 Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 // The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
