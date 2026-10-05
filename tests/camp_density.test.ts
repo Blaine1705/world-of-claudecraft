@@ -406,6 +406,7 @@ describe('the density model covers the shipped world', () => {
     expect(noXp).toEqual([
       'bastion_drowned_anchor',
       'bastion_gaol_cage',
+      'crypt_bone_pile',
       'dragonkin_egg',
       'hoard_abyssal_tentacle',
       'hoard_bloat_cap',
@@ -451,7 +452,9 @@ describe('the density model covers the shipped world', () => {
     // DungeonDef spawn list), the Gravewyrm Sanctum's four Seal Shackles
     // (encounters/gravewyrm_sanctum/korgath.ts), the Wildheart Basin's Thorn
     // Sprout (encounters/wildheart_basin/gorgebloom.ts) and the Drowned
-    // Temple's Tideglass Reflections (encounters/drowned_temple/tideglass_colossus.ts).
+    // Temple's Tideglass Reflections (encounters/drowned_temple/tideglass_colossus.ts),
+    // and the Hollow Crypt trash pass's Stirring Bones (a fallen Ossuary
+    // Warrior's bone pile, laid by mob/trash_kit/crypt_kit.ts).
     //
     // spider_egg is the second, and it is deliberately NOT added to the
     // dense-by-design exemption: the Broodmother clutch sits in ordinary Widow

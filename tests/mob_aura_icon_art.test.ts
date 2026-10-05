@@ -168,8 +168,12 @@ describe('mob aura icon art', () => {
     // Beastmaster's ward and warcry leave with his promotion to a scripted
     // boss, and Olen's Onrush (the shared mob_charge_stun id) gives way to his
     // Oathbound Charge. Every new runtime id resolves to existing painted art.
-    expect(census.carrierCount).toBe(110);
-    expect(census.identities.size).toBe(91);
+    // The dungeon trash pass adds three carriers on existing families: the
+    // Carrion Crow's Gouging Beak (blind), and the Bastion Warhound's and the
+    // Basin Raptor's Pack Frenzy (packFrenzy). The crow's blind brings one new
+    // runtime id onto the existing mob_blind art, so the identities read 92.
+    expect(census.carrierCount).toBe(113);
+    expect(census.identities.size).toBe(92);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

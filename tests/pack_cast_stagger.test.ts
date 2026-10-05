@@ -51,6 +51,13 @@ function engage(r: Room, templateId: string, dx: number, dz = 0): Entity {
   mob.inCombat = true;
   mob.aiState = 'attack';
   mob.aggroTargetId = r.me.id;
+  // The adepts fight with their Grave Bolt alone: the bolt is heroic only and
+  // shares the bar with a Gravespark Volley since the trash pass's second
+  // wave, so the stagger is read on a lent bolt-only kit (Entity.devTrashKit,
+  // the same record minus the heroic gate).
+  const bolt = MOBS.crypt_gravecaller_adept.trashKit?.bolt;
+  if (templateId === 'crypt_gravecaller_adept' && bolt)
+    mob.devTrashKit = { bolt: { ...bolt, heroicOnly: undefined } };
   return mob;
 }
 

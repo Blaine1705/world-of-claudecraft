@@ -120,7 +120,9 @@ describe('mob portrait source manifest', () => {
     // Whelp, Ogre Sledge-Hauler, Glacier Splinter and the Sledge Tusker). 345:
     // Korgath's four Seal Shackles (hammer, tongs, anvil, bellows). The
     // Stormbrass Foundry's seventeen bodies left with the parked dungeon.
-    expect(liveIds).toHaveLength(345);
+    // 347: the dungeon trash pass's two new bodies (the Hollow Crypt's
+    // Stirring Bones and the Sunbone Dread Totem).
+    expect(liveIds).toHaveLength(347);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
