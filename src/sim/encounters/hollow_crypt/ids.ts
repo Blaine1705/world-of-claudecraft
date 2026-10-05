@@ -301,6 +301,9 @@ export const KNELL_TUNING = {
   landSeconds: 2.5,
   /** The fire's reach from the ring's centre (the whole ring floor and its rim). */
   reach: RITE_RING.r + 4,
+  /** Only players within this many yards under the ring's floor burn (the
+   *  crag top; the Choir Loft and the stair below the rim never do). */
+  floorBand: 3,
   fireMin: 50,
   fireMax: 56,
 } as const;

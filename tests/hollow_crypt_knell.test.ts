@@ -187,6 +187,30 @@ describe('Burning Knell: heroic flight', () => {
   });
 });
 
+describe('Burning Knell: only the crag top burns', () => {
+  it('a player far under the ring in the marked half is never burned', () => {
+    const { f, w } = wyrmFight('heroic');
+    const st = w.knellwyrmFight;
+    if (!st) throw new Error('no fight');
+    cryptDevTrigger(f.sim.ctx, f.inst, 'knell');
+    run(f, K.riseSeconds + DT);
+    const k = st.knell;
+    if (!k) throw new Error('no knell');
+    // The south half: past the south rim the Choir Loft lies about 19 yd under
+    // the ring, still inside the fire's reach on the map.
+    k.half = 2;
+    const below = f.others[0];
+    const hold = () => put(f, below, RITE_RING.x, RITE_RING.z - (RITE_RING.r + 3));
+    hold();
+    const ring = f.sim.ctx.groundPos(f.ox + RITE_RING.x, f.oz + RITE_RING.z).y;
+    expect(below.pos.y).toBeLessThan(ring - 10);
+    expect(inKnellHalf(2, RITE_RING.x, RITE_RING.z - (RITE_RING.r + 3))).toBe(true);
+    const from = f.hits.length;
+    run(f, K.markSeconds + 0.3, hold);
+    expect(took(f, below, 'Burning Knell', from)).toBe(0);
+  });
+});
+
 describe('Burning Knell: normal keeps the kit as is', () => {
   it('a flight forced by hand on normal still finishes and lands', () => {
     const { f, w } = wyrmFight('normal');

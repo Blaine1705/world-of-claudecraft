@@ -162,9 +162,13 @@ function pourFire(ctx: SimContext, inst: InstanceSlot, wyrm: Entity, k: Knellwyr
     fx: 'nova',
     ability: KNELLWYRM_KNELL_FIRE,
   });
+  const ringFloor = floorUnder(ctx, inst, RITE_RING.x, RITE_RING.z);
   for (const p of claimPlayers(ctx, inst)) {
     const at = localOf(ctx, inst, p);
     if (!inKnellHalf(k.half, at.x, at.z)) continue;
+    // Only the crag top burns: the Choir Loft and the Bone Stair below the
+    // rim lie inside the reach on the map but far under the fire.
+    if (p.pos.y < ringFloor - KNELL_TUNING.floorBand) continue;
     ctx.dealDamage(
       wyrm,
       p,
