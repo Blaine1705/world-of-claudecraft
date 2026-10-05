@@ -8771,6 +8771,37 @@ export const hudChromeStrings = {
     // src/sim/content/dungeon_finder.ts encounter records).
     mech: {
       shadow_pulse: 'Shadow Pulse (pulsing area damage)',
+      // Sexton Marrow (encounters/hollow_crypt/marrow.ts).
+      crypt_shovelful:
+        'Shovelful (every 11 seconds he flings grave dirt over an 8 yard cone in front of him: one and a half times his swing and 50 percent slower movement for 6 seconds, so stand behind him)',
+      crypt_measured_for_the_grave:
+        'Measured for the Grave (every 15 seconds he marks a player other than the tank; 4 seconds later an Open Grave caves in under them, 42 to 52 damage within 3 yards on normal, and the pit stays for the fight: 9 damage a second and 40 percent slower movement inside, so lay the graves at the edge of the yard)',
+      crypt_burial_toll:
+        'Burial Toll (at 66 and 33 percent health he strides to the bell rope, immune to damage, and rings for 3 seconds: 30 to 38 shadow damage to everyone on normal, and every Open Grave raises a Restless Bones)',
+      crypt_marrow_heroic:
+        "Heroic: Gravedigger's Blow every 9 seconds on the tank (each stack makes them take 6 percent more damage for 20 seconds, up to 6 stacks), Grave Vigor (he swings 30 percent faster while he stands in a grave) and Unquiet Earth (anyone who stays 2 seconds in a grave raises a Restless Bones there)",
+      // The Lady of the Bonechill (encounters/hollow_crypt/lady.ts).
+      crypt_brides_lament:
+        "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
+      crypt_frozen_embrace:
+        'Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)',
+      crypt_rime_path:
+        'Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)',
+      crypt_bridal_freeze:
+        'Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)',
+      crypt_lady_heroic:
+        'Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players',
+      // Cantor Ilvane (encounters/hollow_crypt/ilvane.ts).
+      crypt_dirge_of_the_hollow:
+        'Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)',
+      crypt_harmony:
+        'Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)',
+      crypt_bone_organ:
+        "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
+      crypt_crescendo:
+        'Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)',
+      crypt_ilvane_heroic:
+        'Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)',
       reaping_arc: 'Reaping Arc (frontal cleave)',
       hallowed_brine:
         'Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)',

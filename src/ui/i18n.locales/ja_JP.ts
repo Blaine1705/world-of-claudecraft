@@ -5705,6 +5705,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': 'ウィローフェン薬品隊商',
   'entities.mobs.frostveil_supply_caravan.name': 'フロストヴェイル補給隊商',
   'entities.mobs.restless_bones.name': '安らがぬ骨',
+  'entities.mobs.marrow_restless_bones.name': '安らがぬ骨',
   'entities.mobs.gorrak.name': '無慈悲なるゴラック',
   'entities.mobs.mire_prowler.name': '沼の徘徊者',
   'entities.mobs.deepfen_murloc.name': 'ディープフェンのスナッパー',
@@ -12902,6 +12903,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagLearning': '初心者歓迎',
   'hudChrome.finder.tagFastRun': '高速周回',
   'hudChrome.finder.mech.shadow_pulse': 'シャドウパルス（周期的な範囲ダメージ）',
+  'hudChrome.finder.mech.crypt_shovelful':
+    'ひとすくいの墓土（11秒ごとに前方8ヤードの扇形に墓土を浴びせる：通常攻撃の1.5倍のダメージと6秒間の移動速度50%低下。背後に立つこと）',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    '墓の採寸（15秒ごとにタンク以外のプレイヤーに印を付ける。4秒後その足元に開いた墓が崩れ落ち、ノーマルでは3ヤード以内に42～52のダメージ。穴は戦闘中ずっと残り、中にいると毎秒9ダメージと移動速度40%低下。墓は墓地の端に作ること）',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    '埋葬の鐘（体力66%と33%で鐘の綱へ歩み寄り、ダメージ無効のまま3秒間鐘を鳴らす：ノーマルでは全員に30～38の闇ダメージ、さらに開いた墓すべてから安らがぬ骨が這い出る）',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    'ヒロイック：墓掘りの一撃が9秒ごとにタンクを襲う（1スタックごとに受けるダメージ6%上昇、20秒、最大6スタック）、墓の活力（墓の中に立つと攻撃速度30%上昇）、安らがぬ大地（墓の中に2秒留まるとそこから安らがぬ骨が這い出る）',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    '花嫁の哀歌（22秒ごとに3秒の慟哭：ノーマルでは灯った墓のランタンの光の外にいる全員に60～75の冷気ダメージ、すでに受けた哀歌の名残1スタックごとに半分ずつ増加。ランタン1つが守れるのは2人まで、誰かを守ると28秒間消える。分かれて交代で使うこと）',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    '凍てつく抱擁（30秒ごとにタンク以外のプレイヤーを捕らえ、5ヤードの高さまで共に浮かび上がる。毎秒6の冷気ダメージ。8秒以内に彼女の体力の6%を削れば静かに降ろすが、さもなくば落とし、ノーマルで150～180のダメージ）',
+  'hudChrome.finder.mech.crypt_rime_path':
+    '霜の道（彼女が漂った跡に25秒間すべりやすい霜が残る。その上では加速が遅く、止まったり曲がったりしても滑り続ける）',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    '花嫁の凍結（体力が半分になると峡谷の床全体が凍りつき、戦闘の残りはずっとすべる氷になる）',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    'ヒロイック：灯ったランタンは30秒経つと自然に消えて10秒間暗くなり、凍てつく抱擁は2人を捕らえる',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    '虚ろの挽歌（16秒ごとに中断できる2.5秒の歌：歌い切ると、ノーマルでは45ヤード以内で彼女が見える全員に105～125の闇ダメージと4秒の沈黙。中断するか聖歌隊の柱の陰に隠れること）',
+  'hudChrome.finder.mech.crypt_harmony':
+    '調和（生きている聖歌隊員1人ごとに彼女の受けるダメージが30%減る：聖歌隊員を先に倒すこと）',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    '骨のオルガン（26秒ごとに骨のオルガンを奏でる：闇の音符が2波、聖歌隊席の床を筋状に炸裂し、ノーマルでは筋の中で100～115のダメージ。2波目は1波目の隙間を埋める）',
+  'hudChrome.finder.mech.crypt_crescendo':
+    'クレッシェンド（体力30%未満で挽歌は1.8秒になり11秒ごとに来る。オルガンは3波目を奏でる）',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    'ヒロイック：アンコール（もう一方が立っているまま10秒倒れていた聖歌隊員は再び起き上がる。同時に倒すこと）と途切れぬ詩節（3回目ごとの挽歌は中断できない。隠れること）',
   'hudChrome.finder.mech.reaping_arc': 'リーピングアーク（前方クリーブ）',
   'hudChrome.finder.mech.mist_surge': 'ミストサージ（周期的な範囲ダメージ）',
   'hudChrome.finder.mech.summons_adds': '増援を召喚',
@@ -19722,7 +19751,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.candlewright_acolyte.name': '蝋燭職人の侍祭',
   'entities.mobs.hollow_chorister.name': '虚ろの聖歌隊員',
   'entities.mobs.bound_soul.name': '縛られし魂',
-  'entities.mobs.rimeweb.name': 'リムウェブ',
+  'entities.mobs.rimeweb.name': '骨冷えの貴婦人',
   'entities.mobs.cantor_ilvane.name': '聖歌隊長イルヴェイン',
   'entities.mobs.rime_egg_sac.name': '霜の卵嚢',
   // The Hollow Crypt trash (M16 non-Latin fills for its new names).
@@ -19794,6 +19823,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_knellwyrm_pyre_strafe': '火葬の掃射',
   'abilityUi.cast.crypt_knellwyrm_strafe_run': '掃射飛行',
   'abilityUi.cast.crypt_knellwyrm_dread_bellow': '恐怖の咆哮',
+  'abilityUi.cast.crypt_marrow_shovelful': 'ひとすくいの墓土',
+  'abilityUi.cast.crypt_marrow_measure': '墓の採寸',
+  'abilityUi.cast.crypt_marrow_burial_toll': '埋葬の鐘',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': '墓掘りの一撃',
+  'abilityUi.cast.crypt_lady_brides_lament': '花嫁の哀歌',
+  'abilityUi.cast.crypt_lady_frozen_embrace': '凍てつく抱擁',
+  'abilityUi.cast.crypt_lady_embrace_hold': '凍てつく抱擁',
+  'abilityUi.cast.crypt_lady_bridal_freeze': '花嫁の凍結',
+  'abilityUi.cast.crypt_ilvane_dirge': '虚ろの挽歌',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': '途切れぬ詩節',
+  'abilityUi.cast.crypt_ilvane_bone_organ': '骨のオルガン',
   'entities.mobs.crypt_knellwyrm.name': '弔鐘竜',
   // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
   'abilityUi.cast.bastion_iron_cage': '鉄の檻',

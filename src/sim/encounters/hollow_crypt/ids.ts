@@ -15,6 +15,9 @@
 
 import { HOLLOW_CRYPT_RING } from '../../content/hollow_crypt_layout';
 import { inLane } from '../../mob/trash_kit/lane';
+import { ILVANE_OBJECT_TEMPLATES } from './ilvane_ids';
+import { LADY_OBJECT_TEMPLATES } from './lady_ids';
+import { MARROW_OBJECT_TEMPLATES } from './marrow_ids';
 
 export const MORTHEN_ID = 'morthen';
 export const KNELLWYRM_ID = 'crypt_knellwyrm';
@@ -68,11 +71,16 @@ export const KNELL_LANE_MARK_TEMPLATE = 'crypt_knell_lane_mark';
 /** A lane of the ring left burning by Pyre Strafe. */
 export const KNELL_LANE_TEMPLATE = 'crypt_knell_fire_lane';
 
-/** Every Hollow Crypt encounter object template (the renderer draws them itself). */
+/** Every Hollow Crypt encounter object template (the renderer draws them
+ *  itself): the finale's, Sexton Marrow's graves, the Lady's lanterns and ice
+ *  and Cantor Ilvane's note lanes. */
 export const CRYPT_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
   KNELL_PYRE_TEMPLATE,
   KNELL_LANE_MARK_TEMPLATE,
   KNELL_LANE_TEMPLATE,
+  ...MARROW_OBJECT_TEMPLATES,
+  ...LADY_OBJECT_TEMPLATES,
+  ...ILVANE_OBJECT_TEMPLATES,
 ]);
 
 // ---- tuning -------------------------------------------------------------------------------

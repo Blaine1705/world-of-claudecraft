@@ -596,6 +596,19 @@ const mergeStringsEn = {
       crypt_knellwyrm_pyre_strafe: 'Pyre Strafe',
       crypt_knellwyrm_strafe_run: 'Strafing Run',
       crypt_knellwyrm_dread_bellow: 'Dread Bellow',
+      // The Hollow Crypt's wing bosses (encounters/hollow_crypt). The Dirge can
+      // be kicked; the Unbroken Verse (heroic) and the rest cannot.
+      crypt_marrow_shovelful: 'Shovelful',
+      crypt_marrow_measure: 'Measured for the Grave',
+      crypt_marrow_burial_toll: 'Burial Toll',
+      crypt_marrow_gravediggers_blow: "Gravedigger's Blow",
+      crypt_lady_brides_lament: "Bride's Lament",
+      crypt_lady_frozen_embrace: 'Frozen Embrace',
+      crypt_lady_embrace_hold: 'Frozen Embrace',
+      crypt_lady_bridal_freeze: 'Bridal Freeze',
+      crypt_ilvane_dirge: 'Dirge of the Hollow',
+      crypt_ilvane_unbroken_dirge: 'Unbroken Verse',
+      crypt_ilvane_bone_organ: 'Bone Organ',
       // The Sunken Bastion trash kit and boss casts (trash_kit/bastion_cast_ids.ts,
       // encounters/sunken_bastion/ids.ts). The Mend and the Ward can be kicked.
       bastion_brine_mend: 'Brine Mend',

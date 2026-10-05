@@ -1,4 +1,5 @@
 import type { PlayerMeta, Sim } from '../src/sim/sim';
+import { slipperyGrip } from '../src/sim/slippery_ground';
 import { DT, type Entity, RUN_SPEED, type Vec3 } from '../src/sim/types';
 import { ferryMovementFrame } from './transport_head';
 
@@ -15,6 +16,11 @@ export interface MovementOverrideSignature {
   vehicleLocked?: boolean;
   climbing: boolean;
   moveSpeedMult: number;
+  /** On slippery ground (src/sim/slippery_ground.ts). NOT an override: the
+   *  shared kernel predicts the slide, so prediction keeps running on the ice;
+   *  only its edge bumps the epoch, so the client restarts cleanly in the new
+   *  footing instead of replaying a mismatch. */
+  slippery?: boolean;
 }
 
 export interface MovementOverrideSessionState {
@@ -87,6 +93,7 @@ export function fillOverrideSignature(
   target.vehicleLocked = !!meta.vehicle;
   target.climbing = entity.climb != null;
   target.moveSpeedMult = moveSpeedMult;
+  target.slippery = slipperyGrip(entity) > 0;
   return target;
 }
 
@@ -157,13 +164,16 @@ export function updateMovementOverrideEpochs(
     const previousBits = signature ? overrideBits(signature) : 0;
     const previousActive = previousBits !== 0;
     const previousMoveSpeedMult = signature?.moveSpeedMult ?? 0;
+    const previousSlippery = signature?.slippery ?? false;
     const nextSignature = signature
       ? fillOverrideSignature(signature, entity, meta, moveSpeedMult)
       : computeOverrideSignature(entity, meta, moveSpeedMult);
     const active = overrideActive(nextSignature);
     const signatureChanged =
       signature !== null &&
-      (previousBits !== overrideBits(nextSignature) || previousMoveSpeedMult !== moveSpeedMult);
+      (previousBits !== overrideBits(nextSignature) ||
+        previousMoveSpeedMult !== moveSpeedMult ||
+        previousSlippery !== (nextSignature.slippery ?? false));
     const frame = ferryMovementFrame(entity, framePosition);
     const frameChanged =
       session.movementAuthoritativeFrame !== undefined &&

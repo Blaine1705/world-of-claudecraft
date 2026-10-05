@@ -5482,6 +5482,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': '柳泽沼地药品商队',
   'entities.mobs.frostveil_supply_caravan.name': '霜幕之境补给商队',
   'entities.mobs.restless_bones.name': '不宁骸骨',
+  'entities.mobs.marrow_restless_bones.name': '不宁骸骨',
   'entities.mobs.gorrak.name': '无情者戈拉克',
   'entities.mobs.mire_prowler.name': '泥沼潜伏兽',
   'entities.mobs.deepfen_murloc.name': '深沼钳咬鱼人',
@@ -12291,6 +12292,34 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagLearning': '欢迎新手',
   'hudChrome.finder.tagFastRun': '速通',
   'hudChrome.finder.mech.shadow_pulse': '暗影脉冲（周期性范围伤害）',
+  'hudChrome.finder.mech.crypt_shovelful':
+    '一铲坟土（每11秒他向身前8码锥形区域扬起坟土：造成他普通攻击1.5倍的伤害，并使移动速度降低50%，持续6秒，所以站到他身后）',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    '量身定墓（每15秒他标记一名非坦克玩家；4秒后脚下塌出一座敞开的坟墓，普通难度下对3码内造成42到52点伤害，坑会在整场战斗中保留：在其中每秒受到9点伤害且移动速度降低40%，所以把坟墓留在墓园边缘）',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    '葬礼丧钟（生命值降到66%和33%时，他大步走向钟绳，免疫伤害，摇钟3秒：普通难度下对所有人造成30到38点暗影伤害，并且每座敞开的坟墓都会爬出一具不安之骨）',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    '英雄：掘墓人重击，每9秒打击坦克（每层使其受到的伤害提高6%，持续20秒，最多6层）；坟墓之力（他站在坟墓里时攻击速度提高30%）；不宁之土（任何人在坟墓里停留2秒，就会在那里爬出一具不安之骨）',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    '新娘的哀歌（每22秒一次3秒的哀嚎：普通难度下对所有不在点亮的墓灯光芒中的人造成60到75点冰霜伤害，你已承受的每层萦绕哀歌再提高一半。每盏灯最多庇护两名玩家，庇护过任何人后会熄灭28秒，所以分散开轮流使用）',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    '冰封之拥（每30秒她抓住一名非坦克玩家，带着对方升到空中5码高，每秒造成6点冰霜伤害：在8秒内打掉她6%的生命值她就会把人放下，否则她会把人扔下，普通难度下造成150到180点伤害）',
+  'hudChrome.finder.mech.crypt_rime_path':
+    '霜径（她飘过的地方会留下光滑的白霜，持续25秒：在上面你加速缓慢，停下或转向时会继续滑行）',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    '新娘冰封（生命值降到一半时，整个峡谷地面都会冻结：在战斗剩余时间里都是光滑的冰面）',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    '英雄：每盏点亮的墓灯在30秒后也会自行熄灭10秒，冰封之拥会同时抓住两名玩家',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    '空洞挽歌（每16秒一首可打断的2.5秒歌曲：如果她唱完，普通难度下对45码内所有能看见她的人造成105到125点暗影伤害并沉默4秒，所以打断它或躲到唱诗柱后面）',
+  'hudChrome.finder.mech.crypt_harmony':
+    '和声（每名存活的唱诗者都使她受到的伤害降低30%：先杀唱诗者）',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    '骨管风琴（每26秒她弹奏骨管风琴：两波暗影音符沿着唱诗楼的通道爆发，普通难度下通道内造成100到115点伤害，第二波会填满第一波的空隙）',
+  'hudChrome.finder.mech.crypt_crescendo':
+    '渐强（生命值低于30%时，她的挽歌只需1.8秒且每11秒一次，风琴还会多奏一波）',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    '英雄：安可（一名唱诗者倒下10秒而另一名仍站着时，它会再次站起，所以同时杀掉它们）以及不断之诗（每第三首挽歌无法被打断：躲开它）',
   'hudChrome.finder.mech.reaping_arc': '收割之弧（正面顺劈）',
   'hudChrome.finder.mech.mist_surge': '迷雾涌动（周期性范围伤害）',
   'hudChrome.finder.mech.summons_adds': '召唤增援',
@@ -18750,7 +18779,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.candlewright_acolyte.name': '烛匠侍僧',
   'entities.mobs.hollow_chorister.name': '空洞唱诗者',
   'entities.mobs.bound_soul.name': '缚魂',
-  'entities.mobs.rimeweb.name': '霜网',
+  'entities.mobs.rimeweb.name': '寒骨夫人',
   'entities.mobs.cantor_ilvane.name': '领唱者伊尔凡',
   'entities.mobs.rime_egg_sac.name': '霜卵囊',
   // The Hollow Crypt trash (M16 non-Latin fills for its new names).
@@ -18822,6 +18851,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_knellwyrm_pyre_strafe': '火葬扫射',
   'abilityUi.cast.crypt_knellwyrm_strafe_run': '俯冲扫射',
   'abilityUi.cast.crypt_knellwyrm_dread_bellow': '恐惧咆哮',
+  'abilityUi.cast.crypt_marrow_shovelful': '一铲坟土',
+  'abilityUi.cast.crypt_marrow_measure': '量身定墓',
+  'abilityUi.cast.crypt_marrow_burial_toll': '葬礼丧钟',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': '掘墓人重击',
+  'abilityUi.cast.crypt_lady_brides_lament': '新娘的哀歌',
+  'abilityUi.cast.crypt_lady_frozen_embrace': '冰封之拥',
+  'abilityUi.cast.crypt_lady_embrace_hold': '冰封之拥',
+  'abilityUi.cast.crypt_lady_bridal_freeze': '新娘冰封',
+  'abilityUi.cast.crypt_ilvane_dirge': '空洞挽歌',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': '不断之诗',
+  'abilityUi.cast.crypt_ilvane_bone_organ': '骨管风琴',
   'entities.mobs.crypt_knellwyrm.name': '丧钟巨龙',
   // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
   'abilityUi.cast.bastion_iron_cage': '铁笼',

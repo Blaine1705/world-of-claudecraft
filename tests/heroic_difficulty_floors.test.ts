@@ -143,6 +143,16 @@ describe('heroic five-man floors', () => {
     }
   });
 
+  it('the adds an encounter module raises swing in the add band too', () => {
+    // Sexton Marrow's Restless Bones (encounters/hollow_crypt/marrow.ts) rise
+    // from his graves through spawnKitAdd as summoned adds, not a summonAdds row.
+    for (const [dungeonId, add] of [['hollow_crypt', 'marrow_restless_bones']] as const) {
+      const swing = minSwing(add, dungeonId, 'heroic', { summonedAdd: true });
+      expect(swing, `${dungeonId}/${add}`).toBeGreaterThanOrEqual(SUMMONED_ADD_FLOOR);
+      expect(swing, `${dungeonId}/${add} above the mob line`).toBeLessThan(HEROIC_MOB_FLOOR);
+    }
+  });
+
   it('keeps heroic Sanctum bosses above the retuned normal Sanctum bosses', () => {
     for (const bossId of [
       'korgath_the_bound',

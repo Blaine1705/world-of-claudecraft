@@ -6145,6 +6145,27 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 10,
     "feat": false,
     "rewardTitle": "Witness of the Choir"
+  },
+  {
+    "id": "dgn_marrow_tidy",
+    "name": "A Tidy Churchyard",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_lady_nobody_hanging",
+    "name": "Nobody Left Hanging",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ilvane_hush",
+    "name": "Hush Now",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 

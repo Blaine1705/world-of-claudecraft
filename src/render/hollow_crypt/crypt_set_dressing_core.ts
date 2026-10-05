@@ -127,9 +127,6 @@ export const HOLLOW_CRYPT_SET_DRESSING: readonly KitPlacement[] = [
   P('Kit_OpenGrave', -90, 52, -0.7, 1),
   P('Kit_OpenGrave', -70, 128, 1.1, 1),
   P('Kit_OpenGrave', -94, 124, 2.8, 1),
-  // Widow's Gallery: a third egg clutch by the rim walk (the webbed columns
-  // carry their own silk drapes and cocoons).
-  P('Kit_EggCluster', 92, 106, 2.6, 0.9, { cosmetic: true }),
   // The Choir Ruin: candelabra down the nave (the great tracery window is a
   // sim prop on the loft's back lip).
   P('Kit_Candelabrum', -28, 124, 0, 1),

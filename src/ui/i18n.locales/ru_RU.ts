@@ -5759,6 +5759,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': 'Караван лекарств Ивовой Топи',
   'entities.mobs.frostveil_supply_caravan.name': 'Караван припасов Морозного Предела',
   'entities.mobs.restless_bones.name': 'Беспокойные кости',
+  'entities.mobs.marrow_restless_bones.name': 'Беспокойные кости',
   'entities.mobs.gorrak.name': 'Горрак Безжалостный',
   'entities.mobs.mire_prowler.name': 'Болотный хищник',
   'entities.mobs.deepfen_murloc.name': 'Глубинный щелкун',
@@ -13089,6 +13090,34 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagLearning': 'Новичкам рады',
   'hudChrome.finder.tagFastRun': 'Быстрый заход',
   'hudChrome.finder.mech.shadow_pulse': 'Пульс тьмы (периодический урон по области)',
+  'hudChrome.finder.mech.crypt_shovelful':
+    'Полная лопата (каждые 11 секунд он швыряет могильную землю конусом на 8 ярдов перед собой: полтора его удара и замедление на 50% на 6 секунд, так что стойте у него за спиной)',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    'Мерка для могилы (каждые 15 секунд он метит игрока, не танка; через 4 секунды под ним обрушивается Открытая могила, 42–52 урона в радиусе 3 ярдов на обычной сложности, и яма остаётся до конца боя: 9 урона в секунду и замедление на 40% внутри, так что оставляйте могилы у края двора)',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    'Погребальный звон (на 66 и 33 процентах здоровья он шагает к колокольной верёвке, неуязвимый, и звонит 3 секунды: 30–38 урона от тьмы всем на обычной сложности, и из каждой Открытой могилы встают Беспокойные кости)',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    'Героический: Удар могильщика каждые 9 секунд по танку (каждый заряд увеличивает получаемый урон на 6% на 20 секунд, до 6 зарядов), Могильная сила (стоя в могиле, он бьёт на 30% быстрее) и Неспокойная земля (кто пробудет в могиле 2 секунды, поднимает там Беспокойные кости)',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    'Плач невесты (каждые 22 секунды 3-секундный вопль: 60–75 урона от холода на обычной сложности всем вне света горящего могильного фонаря, и ещё половина за каждый заряд Затяжного плача от уже пережитых Плачей. Фонарь укрывает не больше двух игроков и гаснет на 28 секунд, укрыв кого-то, так что разделяйтесь и чередуйтесь)',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    'Ледяные объятия (каждые 30 секунд она хватает игрока, не танка, и поднимается с ним на 5 ярдов в воздух, 6 урона от холода в секунду: снимите 6% её здоровья за 8 секунд, и она опустит его, иначе она его уронит, 150–180 урона на обычной сложности)',
+  'hudChrome.finder.mech.crypt_rime_path':
+    'Инеистая тропа (там, где она проплывает, на 25 секунд остаётся скользкий иней: на нём разгоняешься медленно и продолжаешь скользить, когда останавливаешься или поворачиваешь)',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    'Свадебная стужа (на половине здоровья весь пол ущелья замерзает: скользкий лёд до конца боя)',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    'Героический: каждый горящий фонарь ещё и сам гаснет через 30 секунд на 10 секунд, а Ледяные объятия хватают двух игроков',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    'Погребальная песнь Пустоты (каждые 16 секунд 2,5-секундная песнь, которую можно прервать: если она её допоёт, 105–125 урона от тьмы на обычной сложности и немота на 4 секунды всем в пределах 45 ярдов, кто её видит, так что прерывайте или прячьтесь за колоннами хора)',
+  'hudChrome.finder.mech.crypt_harmony':
+    'Гармония (каждый живой Хорист уменьшает получаемый ею урон на 30%: сначала убейте Хористов)',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    'Костяной орган (каждые 26 секунд она играет на Костяном органе: две волны теневых нот взрываются полосами по полу хоров, 100–115 урона в полосе на обычной сложности, вторая волна заполняет промежутки первой)',
+  'hudChrome.finder.mech.crypt_crescendo':
+    'Крещендо (ниже 30 процентов здоровья её Песнь длится 1,8 секунды и звучит каждые 11 секунд, а орган играет третью волну)',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    'Героический: Бис (Хорист, пролежавший мёртвым 10 секунд, пока второй ещё стоит, поднимается снова, так что убивайте их вместе) и Непрерывный стих (каждую третью Песнь нельзя прервать: прячьтесь)',
   'hudChrome.finder.mech.reaping_arc': 'Жатвенная дуга (рассекающий удар спереди)',
   'hudChrome.finder.mech.mist_surge': 'Волна тумана (периодический урон по области)',
   'hudChrome.finder.mech.summons_adds': 'Призывает подкрепления',
@@ -20089,7 +20118,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.candlewright_acolyte.name': 'Послушник-свечник',
   'entities.mobs.hollow_chorister.name': 'Хорист Пустоты',
   'entities.mobs.bound_soul.name': 'Связанная душа',
-  'entities.mobs.rimeweb.name': 'Инеистая Паутина',
+  'entities.mobs.rimeweb.name': 'Госпожа Костяного Холода',
   'entities.mobs.cantor_ilvane.name': 'Кантор Ильвейн',
   'entities.mobs.rime_egg_sac.name': 'Инеистый кокон с яйцами',
   // The Hollow Crypt trash (M16 non-Latin fills for its new names).
@@ -20161,6 +20190,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_knellwyrm_pyre_strafe': 'Погребальный налёт',
   'abilityUi.cast.crypt_knellwyrm_strafe_run': 'Огненный заход',
   'abilityUi.cast.crypt_knellwyrm_dread_bellow': 'Жуткий рёв',
+  'abilityUi.cast.crypt_marrow_shovelful': 'Полная лопата',
+  'abilityUi.cast.crypt_marrow_measure': 'Мерка для могилы',
+  'abilityUi.cast.crypt_marrow_burial_toll': 'Погребальный звон',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': 'Удар могильщика',
+  'abilityUi.cast.crypt_lady_brides_lament': 'Плач невесты',
+  'abilityUi.cast.crypt_lady_frozen_embrace': 'Ледяные объятия',
+  'abilityUi.cast.crypt_lady_embrace_hold': 'Ледяные объятия',
+  'abilityUi.cast.crypt_lady_bridal_freeze': 'Свадебная стужа',
+  'abilityUi.cast.crypt_ilvane_dirge': 'Погребальная песнь Пустоты',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': 'Непрерывный стих',
+  'abilityUi.cast.crypt_ilvane_bone_organ': 'Костяной орган',
   'entities.mobs.crypt_knellwyrm.name': 'Погребальный змий',
   // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
   'abilityUi.cast.bastion_iron_cage': 'Железная клетка',
