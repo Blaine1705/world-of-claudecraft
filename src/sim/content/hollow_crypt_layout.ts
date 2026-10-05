@@ -71,6 +71,23 @@ export const HOLLOW_CRYPT_RING = { x: 0, z: 205, r: 28, h: 24 } as const;
 /** The Rite dais: a raised ring floor where Morthen stands and the Knellwyrm
  *  lands (encounters/hollow_crypt/ids.ts MORTHEN_SPOT), sized to the wyrm. */
 export const RITE_DAIS = { x: 0, z: 212, r: 9.5, rise: 0.4 } as const;
+/** The collapsed bell tower's yaw: its broken beam (the piece's local +X) reaches
+ *  toward the Bell Yard's centre with the Burial Bell at its end (Sexton
+ *  Marrow's bell rope, encounters/hollow_crypt/marrow_ids.ts). */
+export const HOLLOW_CRYPT_BELL_TOWER_ROT = 0.43;
+/** The three grave lanterns round the frost ravine floor (the Lady of the
+ *  Bonechill's shelter from her Lament, encounters/hollow_crypt/lady_ids.ts):
+ *  14 yd out from the floor's centre, clear of the south entrance and the
+ *  west postern. */
+export const BONECHILL_LANTERN_SPOTS: readonly { x: number; z: number }[] = [20, 140, 260].map(
+  (deg) => {
+    const a = (deg * Math.PI) / 180;
+    return {
+      x: Math.round((HOLLOW_CRYPT_ANCHORS.greatWeb.x + Math.sin(a) * 14) * 10) / 10,
+      z: Math.round((HOLLOW_CRYPT_ANCHORS.greatWeb.z + Math.cos(a) * 14) * 10) / 10,
+    };
+  },
+);
 
 const SURFACES: FieldSurface[] = [
   // --- Lychgate Landing and the Chapel Stair -------------------------------
@@ -365,7 +382,7 @@ const PROPS: FieldProp[] = [
   { kind: 'hc_dead_tree', x: -106, z: 44, rot: 0.4, r: 1, h: 10 },
   { kind: 'hc_dead_tree', x: -62, z: 17, rot: 2.1, r: 1, h: 10 },
   // The bell beam (the piece's local +X) reaches toward the Bell Yard's centre.
-  { kind: 'hc_bell_tower', x: -108, z: 128, rot: 0.43 },
+  { kind: 'hc_bell_tower', x: -108, z: 128, rot: HOLLOW_CRYPT_BELL_TOWER_ROT },
   { kind: 'hc_headstone', x: -96, z: 104, rot: 0.3, r: 0.8, h: 2 },
   { kind: 'hc_headstone', x: -70, z: 124, rot: 1.2, r: 0.8, h: 2 },
   { kind: 'hc_lantern_post', x: -70, z: 100, rot: 0, r: 0.4, h: 4 },
@@ -384,9 +401,23 @@ const PROPS: FieldProp[] = [
   ),
   { kind: 'hc_egg_cluster', x: 58, z: 40, rot: 0.5 },
   { kind: 'hc_egg_cluster', x: 92, z: 54, rot: 2.2 },
-  // The Great Web hangs over the arena's north lip between two rime pillars
-  // that rise out of the chasm (both part of the piece, over the void).
-  { kind: 'hc_great_web', x: 80, z: 133, rot: Math.PI },
+  // The frost ravine floor is the Lady of the Bonechill's (the Great Web that
+  // hung over it went with the spider placeholder): three grave lanterns round
+  // the floor, her only shelter from the Bride's Lament, and the frozen bridal
+  // grave on the north lip where she rose. Both are drawn by the Lady's render
+  // module (src/render/hollow_crypt/lady_fx.ts); here they are solid.
+  ...BONECHILL_LANTERN_SPOTS.map(
+    (l): FieldProp => ({ kind: 'hc_grave_lantern', x: l.x, z: l.z, rot: 0, r: 0.5, h: 4 }),
+  ),
+  {
+    kind: 'hc_bridal_grave',
+    x: HOLLOW_CRYPT_ANCHORS.greatWeb.x,
+    z: HOLLOW_CRYPT_ANCHORS.greatWeb.z + 15.5,
+    rot: Math.PI,
+    hw: 1.5,
+    hd: 2.7,
+    h: 1.6,
+  },
   // Choir Ruin: the six loft pillars (line-of-sight cover), the Bone Organ.
   ...columns(
     'hc_choir_pillar',

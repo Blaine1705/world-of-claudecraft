@@ -30,6 +30,7 @@ const MOB_IDS = [
   'willowfen_remedy_caravan',
   'frostveil_supply_caravan',
   'restless_bones',
+  'marrow_restless_bones',
   'gorrak',
   'mire_prowler',
   'deepfen_murloc',

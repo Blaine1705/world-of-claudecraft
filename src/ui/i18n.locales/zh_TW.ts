@@ -5485,6 +5485,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': '柳澤沼地藥品商隊',
   'entities.mobs.frostveil_supply_caravan.name': '霜幕之境補給商隊',
   'entities.mobs.restless_bones.name': '不寧骸骨',
+  'entities.mobs.marrow_restless_bones.name': '不寧骸骨',
   'entities.mobs.gorrak.name': '無情者戈拉克',
   'entities.mobs.mire_prowler.name': '泥沼潛伏獸',
   'entities.mobs.deepfen_murloc.name': '深沼鉗咬魚人',
@@ -12292,6 +12293,34 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagLearning': '歡迎新手',
   'hudChrome.finder.tagFastRun': '速通',
   'hudChrome.finder.mech.shadow_pulse': '暗影脈衝（週期性範圍傷害）',
+  'hudChrome.finder.mech.crypt_shovelful':
+    '一鏟墳土（每11秒他向身前8碼錐形區域揚起墳土：造成他普通攻擊1.5倍的傷害，並使移動速度降低50%，持續6秒，所以站到他身後）',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    '量身定墓（每15秒他標記一名非坦克玩家；4秒後腳下塌出一座敞開的墳墓，普通難度下對3碼內造成42到52點傷害，坑會在整場戰鬥中保留：在其中每秒受到9點傷害且移動速度降低40%，所以把墳墓留在墓園邊緣）',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    '葬禮喪鐘（生命值降到66%和33%時，他大步走向鐘繩，免疫傷害，搖鐘3秒：普通難度下對所有人造成30到38點暗影傷害，並且每座敞開的墳墓都會爬出一具不安之骨）',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    '英雄：掘墓人重擊，每9秒打擊坦克（每層使其受到的傷害提高6%，持續20秒，最多6層）；墳墓之力（他站在墳墓裡時攻擊速度提高30%）；不寧之土（任何人在墳墓裡停留2秒，就會在那裡爬出一具不安之骨）',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    '新娘的哀歌（每22秒一次3秒的哀嚎：普通難度下對所有不在點亮的墓燈光芒中的人造成60到75點冰霜傷害，你已承受的每層縈繞哀歌再提高一半。每盞燈最多庇護兩名玩家，庇護過任何人後會熄滅28秒，所以分散開輪流使用）',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    '冰封之擁（每30秒她抓住一名非坦克玩家，帶著對方升到空中5碼高，每秒造成6點冰霜傷害：在8秒內打掉她6%的生命值她就會把人放下，否則她會把人扔下，普通難度下造成150到180點傷害）',
+  'hudChrome.finder.mech.crypt_rime_path':
+    '霜徑（她飄過的地方會留下光滑的白霜，持續25秒：在上面你加速緩慢，停下或轉向時會繼續滑行）',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    '新娘冰封（生命值降到一半時，整個峽谷地面都會凍結：在戰鬥剩餘時間裡都是光滑的冰面）',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    '英雄：每盞點亮的墓燈在30秒後也會自行熄滅10秒，冰封之擁會同時抓住兩名玩家',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    '空洞輓歌（每16秒一首可打斷的2.5秒歌曲：如果她唱完，普通難度下對45碼內所有能看見她的人造成105到125點暗影傷害並沉默4秒，所以打斷它或躲到唱詩柱後面）',
+  'hudChrome.finder.mech.crypt_harmony':
+    '和聲（每名存活的唱詩者都使她受到的傷害降低30%：先殺唱詩者）',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    '骨管風琴（每26秒她彈奏骨管風琴：兩波暗影音符沿著唱詩樓的通道爆發，普通難度下通道內造成100到115點傷害，第二波會填滿第一波的空隙）',
+  'hudChrome.finder.mech.crypt_crescendo':
+    '漸強（生命值低於30%時，她的輓歌只需1.8秒且每11秒一次，風琴還會多奏一波）',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    '英雄：安可（一名唱詩者倒下10秒而另一名仍站著時，它會再次站起，所以同時殺掉它們）以及不斷之詩（每第三首輓歌無法被打斷：躲開它）',
   'hudChrome.finder.mech.reaping_arc': '收割之弧（正面順劈）',
   'hudChrome.finder.mech.mist_surge': '迷霧湧動（週期性範圍傷害）',
   'hudChrome.finder.mech.summons_adds': '召喚增援',
@@ -18729,9 +18758,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.bellrope_girdle.name': '鐘繩腰帶',
   'entities.items.sextons_spadehaft.name': '司事的鍬柄',
   'entities.items.rimesilk_mantle.name': '霜絲肩衣',
-  'entities.items.bonechill_carapace_vest.name': '寒骨甲殼背心',
-  'entities.items.rimeweb_hunters_leggings.name': '霜網獵手護腿',
-  'entities.items.rimeweb_fang.name': '霜網之牙',
+  'entities.items.bonechill_carapace_vest.name': '骨寒鎖甲',
+  'entities.items.rimeweb_hunters_leggings.name': '綴霜護腿',
+  'entities.items.rimeweb_fang.name': '新娘的冰錐',
   'entities.items.cantors_cassock.name': '領唱者的法衣',
   'entities.items.choirward_leggings.name': '聖詠守衛護腿',
   'entities.items.choristers_gloves.name': '唱詩者的手套',
@@ -18769,7 +18798,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.candlewright_acolyte.name': '燭匠侍僧',
   'entities.mobs.hollow_chorister.name': '空洞唱詩者',
   'entities.mobs.bound_soul.name': '縛魂',
-  'entities.mobs.rimeweb.name': '霜網',
+  'entities.mobs.rimeweb.name': '寒骨夫人',
   'entities.mobs.cantor_ilvane.name': '領唱者伊爾凡',
   'entities.mobs.rime_egg_sac.name': '霜卵囊',
   // The Hollow Crypt trash (M16 non-Latin fills for its new names).
@@ -18854,6 +18883,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_knellwyrm_pyre_strafe': '火葬掃射',
   'abilityUi.cast.crypt_knellwyrm_strafe_run': '俯衝掃射',
   'abilityUi.cast.crypt_knellwyrm_dread_bellow': '恐懼咆哮',
+  'abilityUi.cast.crypt_marrow_shovelful': '一鏟墳土',
+  'abilityUi.cast.crypt_marrow_measure': '量身定墓',
+  'abilityUi.cast.crypt_marrow_burial_toll': '葬禮喪鐘',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': '掘墓人重擊',
+  'abilityUi.cast.crypt_lady_brides_lament': '新娘的哀歌',
+  'abilityUi.cast.crypt_lady_frozen_embrace': '冰封之擁',
+  'abilityUi.cast.crypt_lady_embrace_hold': '冰封之擁',
+  'abilityUi.cast.crypt_lady_bridal_freeze': '新娘冰封',
+  'abilityUi.cast.crypt_ilvane_dirge': '空洞輓歌',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': '不斷之詩',
+  'abilityUi.cast.crypt_ilvane_bone_organ': '骨管風琴',
   'entities.mobs.crypt_knellwyrm.name': '喪鐘巨龍',
   // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
   'abilityUi.cast.bastion_iron_cage': '鐵籠',
@@ -19241,4 +19281,42 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cantor_laverock.title': '蒼白唱詩班最後的領唱',
   'entities.npcs.cantor_laverock.greeting':
     '我曾是蒼白唱詩班裡最年輕的聲音。儀式那夜，我沒有喝，我逃了。從那以後，每逢滿月，我都聽見他們在水下歌唱。我必須在死前親眼見到她。讓我跟在你們身後吧。我不會戰鬥，也不會拖累你們。',
+  'hudChrome.cryptAlert.measuredTitle': '量身定墓！',
+  'hudChrome.cryptAlert.measuredLine': '計時條走完時，墳墓會在你腳下塌陷：把它帶到墓園邊緣',
+  'hudChrome.cryptAlert.embracedTitle': '冰封之擁！',
+  'hudChrome.cryptAlert.embracedLine': '她把你舉在半空：你的隊伍必須傷害她，她才會把你放下',
+  'hudChrome.cryptAlert.lamentTitle': '新娘的哀歌！',
+  'hudChrome.cryptAlert.lamentShelteredLine': '你站在點亮的墓燈光芒中，燈下還有你的位置：保持不動',
+  'hudChrome.cryptAlert.lamentOpenLine': '在哀嚎落下前進入點亮的墓燈光芒中：每盞燈兩人',
+  'hudChrome.cryptAlert.graveTitle': '你在敞開的墳墓裡！',
+  'hudChrome.cryptAlert.graveLine': '墳土會灼燒你並讓你減速：離開墳墓',
+  'hudChrome.cryptAlert.tollTitle': '葬禮喪鐘！',
+  'hudChrome.cryptAlert.tollLine': '他搖鐘時無法受到傷害：準備承受喪鐘和它喚起的亡者',
+  'hudChrome.cryptAlert.harmonyTitle': '和聲',
+  'hudChrome.cryptAlert.harmonyLine': '她的唱詩者使她受到的傷害降低{pct}%：先殺死它們',
+  'hudChrome.cryptAlert.timeAria': '剩餘{seconds}秒',
+  'hudChrome.auraEffect.crypt.measured':
+    '此效果結束時，一座敞開的墳墓會在你所站之處塌陷：對{radius}碼內的所有人造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。墳墓會在整場戰鬥中保留，所以把印記帶到墓園邊緣，遠離隊伍。',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    '站在敞開的墳墓中：移動速度降低{slow}%，每秒受到{damage}點暗影傷害（英雄難度{heroic}點）。英雄難度下，在墳墓中停留{linger}秒會喚起一具不安之骨。離開墳墓。',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    '移動速度降低{pct}%。一鏟墳土會擊中司事馬羅身前的所有人：站到他身後。',
+  'hudChrome.auraEffect.crypt.blow':
+    '受到的傷害提高{pct}%：每層{per}%，目前{stacks}/{max}層。每次掘墓人重擊都會增加一層，並將持續時間重置為{seconds}秒。',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    '站在敞開的墳墓中時攻擊速度提高{pct}%。別讓他待在墳墓裡。',
+  'hudChrome.auraEffect.crypt.tolling':
+    '他大步走向鐘繩並敲響葬鐘時免疫傷害。鐘聲結束時，喪鐘對所有人造成{min}到{max}點暗影傷害（英雄難度{heroicMin}到{heroicMax}點），並且每座敞開的墳墓都會爬出一具不安之骨。',
+  'hudChrome.auraEffect.crypt.embraced':
+    '被夫人舉在半空：無法行動，每秒受到{tick}點冰霜傷害（英雄難度{tickHeroic}點）。如果你的隊伍打掉她{share}%的最大生命值，她會把你輕輕放下；如果她在高處抓住你{hold}秒，就會把你扔到冰面上，造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。',
+  'hudChrome.auraEffect.crypt.lament':
+    '新娘的哀歌結束時，對所有不在點亮的墓燈{radius}碼內的人造成{min}到{max}點冰霜傷害（英雄難度{heroicMin}到{heroicMax}點）。每盞燈只庇護離它最近的{cap}名玩家，然後熄滅並錯過下一次哀歌。',
+  'hudChrome.auraEffect.crypt.lingering':
+    '你承受的下一次新娘的哀歌傷害提高{pct}%：每層{per}%，最多{max}層。下一次請在墓燈光芒中承受。',
+  'hudChrome.auraEffect.crypt.slippery':
+    '在光滑的冰面上：你的速度每秒最多改變{grip}碼/秒，所以起步緩慢，停下時會繼續滑行，轉向時會甩出大弧線。離開冰面就能重新站穩。',
+  'hudChrome.auraEffect.crypt.harmony':
+    '受到的傷害降低{pct}%：她每有一名存活的唱詩者就降低{per}%。先殺死唱詩者。',
+  'hudChrome.auraEffect.crypt.crescendo':
+    '唱得更快：空洞輓歌只需{cast}秒（原為{castNormal}秒），每{every}秒一次（原為{everyNormal}秒），骨管風琴會奏出{waves}波音符（原為{wavesNormal}波）。',
 };

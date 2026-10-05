@@ -30,8 +30,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1093,
-      "state": "b29a7b81",
+      "nextId": 1096,
+      "state": "5ff3cef3",
       "events": "b65f80d4",
       "rng": {
         "draws": 76,
@@ -2385,13 +2385,13 @@
           "fallStartY": 8,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 639,
+          "hp": 3152,
           "id": 1055,
           "idleStationary": true,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 639,
+          "maxHp": 3152,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -3000,27 +3000,27 @@
           "fallStartY": -6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 754,
+          "hp": 3998,
           "id": 1069,
           "idleStationary": true,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
-          "maxHp": 754,
-          "moveSpeed": 8,
+          "maxHp": 3998,
+          "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
             "x": 100380,
             "y": -6,
-            "z": -1134
+            "z": -1132
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 100380,
             "y": -6,
-            "z": -1134
+            "z": -1132
           },
           "stats": {
             "armor": 160
@@ -3321,7 +3321,6 @@
         },
         {
           "aiState": "idle",
-          "bigCastTimer": 12,
           "combatTimer": 99.1,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -3332,13 +3331,13 @@
           "fallStartY": 5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 695,
+          "hp": 3195,
           "id": 1076,
           "idleStationary": true,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
-          "maxHp": 695,
+          "maxHp": 3195,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -4028,10 +4027,133 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "dungeonId": "hollow_crypt",
-          "fallStartY": 20,
+          "fallStartY": -6,
           "fiveSecondRule": 99,
           "hp": 1,
           "id": 1092,
+          "kind": "object",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 100384.8,
+            "y": -6,
+            "z": -1124.8
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 100384.8,
+            "y": -6,
+            "z": -1124.8
+          },
+          "stats": {},
+          "templateId": "crypt_lady_lantern_lit",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "dungeonId": "hollow_crypt",
+          "fallStartY": -6,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 1093,
+          "kind": "object",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 100389,
+            "y": -6,
+            "z": -1148.7
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 100389,
+            "y": -6,
+            "z": -1148.7
+          },
+          "stats": {},
+          "templateId": "crypt_lady_lantern_lit",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "dungeonId": "hollow_crypt",
+          "fallStartY": -6,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 1094,
+          "kind": "object",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 100366.2,
+            "y": -6,
+            "z": -1140.4
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 100366.2,
+            "y": -6,
+            "z": -1140.4
+          },
+          "stats": {},
+          "templateId": "crypt_lady_lantern_lit",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "dungeonId": "hollow_crypt",
+          "fallStartY": 20,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 1095,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4065,8 +4187,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1093,
-      "state": "cb2d7adc",
+      "nextId": 1096,
+      "state": "1e3a4e30",
       "events": "eb3dd672",
       "rng": {
         "draws": 76,
@@ -6423,13 +6545,13 @@
           "fallStartY": 8,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 639,
+          "hp": 3152,
           "id": 1055,
           "idleStationary": true,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 639,
+          "maxHp": 3152,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -7038,27 +7160,27 @@
           "fallStartY": -6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 754,
+          "hp": 3998,
           "id": 1069,
           "idleStationary": true,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
-          "maxHp": 754,
-          "moveSpeed": 8,
+          "maxHp": 3998,
+          "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
             "x": 100380,
             "y": -6,
-            "z": -1134
+            "z": -1132
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 100380,
             "y": -6,
-            "z": -1134
+            "z": -1132
           },
           "stats": {
             "armor": 160
@@ -7359,7 +7481,6 @@
         },
         {
           "aiState": "idle",
-          "bigCastTimer": 12,
           "combatTimer": 99.2,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -7370,13 +7491,13 @@
           "fallStartY": 5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 695,
+          "hp": 3195,
           "id": 1076,
           "idleStationary": true,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
-          "maxHp": 695,
+          "maxHp": 3195,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -8066,10 +8187,133 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "dungeonId": "hollow_crypt",
-          "fallStartY": 20,
+          "fallStartY": -6,
           "fiveSecondRule": 99,
           "hp": 1,
           "id": 1092,
+          "kind": "object",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 100384.8,
+            "y": -6,
+            "z": -1124.8
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 100384.8,
+            "y": -6,
+            "z": -1124.8
+          },
+          "stats": {},
+          "templateId": "crypt_lady_lantern_lit",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "dungeonId": "hollow_crypt",
+          "fallStartY": -6,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 1093,
+          "kind": "object",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 100389,
+            "y": -6,
+            "z": -1148.7
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 100389,
+            "y": -6,
+            "z": -1148.7
+          },
+          "stats": {},
+          "templateId": "crypt_lady_lantern_lit",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "dungeonId": "hollow_crypt",
+          "fallStartY": -6,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 1094,
+          "kind": "object",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 100366.2,
+            "y": -6,
+            "z": -1140.4
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 100366.2,
+            "y": -6,
+            "z": -1140.4
+          },
+          "stats": {},
+          "templateId": "crypt_lady_lantern_lit",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "dungeonId": "hollow_crypt",
+          "fallStartY": 20,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 1095,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -8103,8 +8347,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1093,
-      "state": "25028f5d",
+      "nextId": 1096,
+      "state": "98c5bc59",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8114,8 +8358,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1093,
-      "state": "c5d9ce02",
+      "nextId": 1096,
+      "state": "7ccdb15a",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8125,8 +8369,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 1093,
-      "state": "11119b50",
+      "nextId": 1096,
+      "state": "96e66cd0",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8136,7 +8380,7 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1093,
+      "nextId": 1096,
       "state": "35bf4d77",
       "events": "cd1db2b2",
       "rng": {
@@ -8147,7 +8391,7 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 1093,
+      "nextId": 1096,
       "state": "41c56636",
       "events": "741638a5",
       "rng": {
@@ -8460,7 +8704,7 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 1093,
+      "nextId": 1096,
       "state": "41c56636",
       "events": "741638a5",
       "rng": {

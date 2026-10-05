@@ -3934,7 +3934,19 @@ export const zh_CN: EnTranslations = {
       },
       "crypt": {
         "carrionEye": "战斗中的所有乌鸦都会追猎你，持续{seconds}秒。跑向你的坦克，让队伍一起消灭鸦群。",
-        "graniteSkin": "受到的伤害降低{pct}%，石层每{every}秒增厚一次，最多{max}层。击晕会将其击碎，使其在{seconds}秒内受到的伤害提高{cracked}%。"
+        "graniteSkin": "受到的伤害降低{pct}%，石层每{every}秒增厚一次，最多{max}层。击晕会将其击碎，使其在{seconds}秒内受到的伤害提高{cracked}%。",
+        "measured": "此效果结束时，一座敞开的坟墓会在你所站之处塌陷：对{radius}码内的所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。坟墓会在整场战斗中保留，所以把印记带到墓园边缘，远离队伍。",
+        "graveDirt": "站在敞开的坟墓中：移动速度降低{slow}%，每秒受到{damage}点暗影伤害（英雄难度{heroic}点）。英雄难度下，在坟墓中停留{linger}秒会唤起一具不安之骨。离开坟墓。",
+        "dirtInEyes": "移动速度降低{pct}%。一铲坟土会击中司事马罗身前的所有人：站到他身后。",
+        "blow": "受到的伤害提高{pct}%：每层{per}%，当前{stacks}/{max}层。每次掘墓人重击都会增加一层，并将持续时间重置为{seconds}秒。",
+        "graveVigor": "站在敞开的坟墓中时攻击速度提高{pct}%。别让他待在坟墓里。",
+        "tolling": "他大步走向钟绳并敲响葬钟时免疫伤害。钟声结束时，丧钟对所有人造成{min}到{max}点暗影伤害（英雄难度{heroicMin}到{heroicMax}点），并且每座敞开的坟墓都会爬出一具不安之骨。",
+        "embraced": "被夫人举在半空：无法行动，每秒受到{tick}点冰霜伤害（英雄难度{tickHeroic}点）。如果你的队伍打掉她{share}%的最大生命值，她会把你轻轻放下；如果她在高处抓住你{hold}秒，就会把你扔到冰面上，造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。",
+        "lament": "新娘的哀歌结束时，对所有不在点亮的墓灯{radius}码内的人造成{min}到{max}点冰霜伤害（英雄难度{heroicMin}到{heroicMax}点）。每盏灯只庇护离它最近的{cap}名玩家，然后熄灭并错过下一次哀歌。",
+        "lingering": "你承受的下一次新娘的哀歌伤害提高{pct}%：每层{per}%，最多{max}层。下一次请在墓灯光芒中承受。",
+        "slippery": "在光滑的冰面上：你的速度每秒最多改变{grip}码/秒，所以起步缓慢，停下时会继续滑行，转向时会甩出大弧线。离开冰面就能重新站稳。",
+        "harmony": "受到的伤害降低{pct}%：她每有一名存活的唱诗者就降低{per}%。先杀死唱诗者。",
+        "crescendo": "唱得更快：空洞挽歌只需{cast}秒（原为{castNormal}秒），每{every}秒一次（原为{everyNormal}秒），骨管风琴会奏出{waves}波音符（原为{wavesNormal}波）。"
       },
       "sanctum": {
         "lockbound": "受到的伤害降低{pct}%：每条仍然完好的锁链提供{per}%。打破一个封印镣铐即可让其锁链脱落。",
@@ -6003,6 +6015,20 @@ export const zh_CN: EnTranslations = {
       "tagFastRun": "速通",
       "mech": {
         "shadow_pulse": "暗影脉冲（周期性范围伤害）",
+        "crypt_shovelful": "一铲坟土（每11秒他向身前8码锥形区域扬起坟土：造成他普通攻击1.5倍的伤害，并使移动速度降低50%，持续6秒，所以站到他身后）",
+        "crypt_measured_for_the_grave": "量身定墓（每15秒他标记一名非坦克玩家；4秒后脚下塌出一座敞开的坟墓，普通难度下对3码内造成42到52点伤害，坑会在整场战斗中保留：在其中每秒受到9点伤害且移动速度降低40%，所以把坟墓留在墓园边缘）",
+        "crypt_burial_toll": "葬礼丧钟（生命值降到66%和33%时，他大步走向钟绳，免疫伤害，摇钟3秒：普通难度下对所有人造成30到38点暗影伤害，并且每座敞开的坟墓都会爬出一具不安之骨）",
+        "crypt_marrow_heroic": "英雄：掘墓人重击，每9秒打击坦克（每层使其受到的伤害提高6%，持续20秒，最多6层）；坟墓之力（他站在坟墓里时攻击速度提高30%）；不宁之土（任何人在坟墓里停留2秒，就会在那里爬出一具不安之骨）",
+        "crypt_brides_lament": "新娘的哀歌（每22秒一次3秒的哀嚎：普通难度下对所有不在点亮的墓灯光芒中的人造成60到75点冰霜伤害，你已承受的每层萦绕哀歌再提高一半。每盏灯最多庇护两名玩家，庇护过任何人后会熄灭28秒，所以分散开轮流使用）",
+        "crypt_frozen_embrace": "冰封之拥（每30秒她抓住一名非坦克玩家，带着对方升到空中5码高，每秒造成6点冰霜伤害：在8秒内打掉她6%的生命值她就会把人放下，否则她会把人扔下，普通难度下造成150到180点伤害）",
+        "crypt_rime_path": "霜径（她飘过的地方会留下光滑的白霜，持续25秒：在上面你加速缓慢，停下或转向时会继续滑行）",
+        "crypt_bridal_freeze": "新娘冰封（生命值降到一半时，整个峡谷地面都会冻结：在战斗剩余时间里都是光滑的冰面）",
+        "crypt_lady_heroic": "英雄：每盏点亮的墓灯在30秒后也会自行熄灭10秒，冰封之拥会同时抓住两名玩家",
+        "crypt_dirge_of_the_hollow": "空洞挽歌（每16秒一首可打断的2.5秒歌曲：如果她唱完，普通难度下对45码内所有能看见她的人造成105到125点暗影伤害并沉默4秒，所以打断它或躲到唱诗柱后面）",
+        "crypt_harmony": "和声（每名存活的唱诗者都使她受到的伤害降低30%：先杀唱诗者）",
+        "crypt_bone_organ": "骨管风琴（每26秒她弹奏骨管风琴：两波暗影音符沿着唱诗楼的通道爆发，普通难度下通道内造成100到115点伤害，第二波会填满第一波的空隙）",
+        "crypt_crescendo": "渐强（生命值低于30%时，她的挽歌只需1.8秒且每11秒一次，风琴还会多奏一波）",
+        "crypt_ilvane_heroic": "英雄：安可（一名唱诗者倒下10秒而另一名仍站着时，它会再次站起，所以同时杀掉它们）以及不断之诗（每第三首挽歌无法被打断：躲开它）",
         "reaping_arc": "收割之弧（正面顺劈）",
         "hallowed_brine": "圣化咸水（半径9码的暗色圣水池，英雄难度10码：池中每秒受到18点伤害，英雄难度26点，他站在池中时受到的伤害降低40%，把他拖出去）",
         "rebounding_bulwark": "回弹壁盾（盾牌弹向上一个被击中者10码内最近的玩家，最多3人，英雄4人：散开）",
@@ -6187,6 +6213,22 @@ export const zh_CN: EnTranslations = {
       "brandedLine": "烙印会一直灼烧到结束：到融水池里将它浇灭",
       "rimeTitle": "蔓延霜凇！",
       "rimeLine": "蔓延霜凇 {stacks}/{max}：离开幼龙的吐息"
+    },
+    "cryptAlert": {
+      "measuredTitle": "量身定墓！",
+      "measuredLine": "计时条走完时，坟墓会在你脚下塌陷：把它带到墓园边缘",
+      "embracedTitle": "冰封之拥！",
+      "embracedLine": "她把你举在半空：你的队伍必须伤害她，她才会把你放下",
+      "lamentTitle": "新娘的哀歌！",
+      "lamentShelteredLine": "你站在点亮的墓灯光芒中，灯下还有你的位置：保持不动",
+      "lamentOpenLine": "在哀嚎落下前进入点亮的墓灯光芒中：每盏灯两人",
+      "graveTitle": "你在敞开的坟墓里！",
+      "graveLine": "坟土会灼烧你并让你减速：离开坟墓",
+      "tollTitle": "葬礼丧钟！",
+      "tollLine": "他摇钟时无法受到伤害：准备承受丧钟和它唤起的亡者",
+      "harmonyTitle": "和声",
+      "harmonyLine": "她的唱诗者使她受到的伤害降低{pct}%：先杀死它们",
+      "timeAria": "剩余{seconds}秒"
     },
     "kitUse": {
       "toppleLine": "把它踢倒在敌群上：洒出的火焰会灼烧它们",
@@ -12547,6 +12589,17 @@ export const zh_CN: EnTranslations = {
       "crypt_knellwyrm_pyre_strafe": "火葬扫射",
       "crypt_knellwyrm_strafe_run": "俯冲扫射",
       "crypt_knellwyrm_dread_bellow": "恐惧咆哮",
+      "crypt_marrow_shovelful": "一铲坟土",
+      "crypt_marrow_measure": "量身定墓",
+      "crypt_marrow_burial_toll": "葬礼丧钟",
+      "crypt_marrow_gravediggers_blow": "掘墓人重击",
+      "crypt_lady_brides_lament": "新娘的哀歌",
+      "crypt_lady_frozen_embrace": "冰封之拥",
+      "crypt_lady_embrace_hold": "冰封之拥",
+      "crypt_lady_bridal_freeze": "新娘冰封",
+      "crypt_ilvane_dirge": "空洞挽歌",
+      "crypt_ilvane_unbroken_dirge": "不断之诗",
+      "crypt_ilvane_bone_organ": "骨管风琴",
       "bastion_brine_mend": "盐水愈合",
       "bastion_fog_ward": "雾之护佑",
       "bastion_halberd_sweep": "戟之横扫",
@@ -18880,13 +18933,13 @@ export const zh_CN: EnTranslations = {
         "name": "霜丝肩衣"
       },
       "bonechill_carapace_vest": {
-        "name": "寒骨甲壳背心"
+        "name": "骨寒锁甲"
       },
       "rimeweb_hunters_leggings": {
-        "name": "霜网猎手护腿"
+        "name": "缀霜护腿"
       },
       "rimeweb_fang": {
-        "name": "霜网之牙"
+        "name": "新娘的冰锥"
       },
       "cantors_cassock": {
         "name": "领唱者的法衣"
@@ -20030,6 +20083,9 @@ export const zh_CN: EnTranslations = {
       "restless_bones": {
         "name": "不宁骸骨"
       },
+      "marrow_restless_bones": {
+        "name": "不宁骸骨"
+      },
       "gorrak": {
         "name": "无情者戈拉克"
       },
@@ -20172,7 +20228,7 @@ export const zh_CN: EnTranslations = {
         "name": "缚魂"
       },
       "rimeweb": {
-        "name": "霜网"
+        "name": "寒骨夫人"
       },
       "cantor_ilvane": {
         "name": "领唱者伊尔凡"

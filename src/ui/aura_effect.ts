@@ -190,7 +190,7 @@ export function auraEffectDescriptor(
   // The Sunken Bastion's marks say theirs (bastion_aura_effect.ts).
   const bastion = bastionAuraEffectDescriptor(a);
   if (bastion) return bastion;
-  // The Hollow Crypt trash marks say theirs (crypt_aura_effect.ts).
+  // The Hollow Crypt's trash and wing-boss marks say theirs (crypt_aura_effect.ts).
   const crypt = cryptAuraEffectDescriptor(a);
   if (crypt) return crypt;
   // This is a four-second placement marker, not a damage-taken modifier. Its

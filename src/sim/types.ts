@@ -13,6 +13,7 @@ import type { DungeonGuideRun } from './dungeon_guide/types';
 import type { KorgathFightState } from './encounters/gravewyrm_sanctum/korgath_state';
 import type { KorzulFightState } from './encounters/gravewyrm_sanctum/korzul_state';
 import type { VelkharFightState } from './encounters/gravewyrm_sanctum/velkhar_state';
+import type { CryptBossFightState } from './encounters/hollow_crypt/boss_state';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
@@ -5428,6 +5429,9 @@ export interface DungeonObjectSpawn {
     | 'bastion_buttress_intact'
     | 'bastion_beacon_lamp'
     | 'bastion_mooring_lit'
+    // The Hollow Crypt's grave lanterns (encounters/hollow_crypt/
+    // lady_lanterns.ts): lit, dark or kindling rides the template id.
+    | 'crypt_lady_lantern_lit'
     // The Gravewyrm Sanctum's story markers (encounters/gravewyrm_sanctum/
     // story.ts): the Calving Face's crack step rides the template id.
     | 'sanctum_story_0';
@@ -7352,6 +7356,14 @@ export interface Entity extends ClientMirroredEntityFields {
   cryptRite?: CryptRiteState;
   /** The Knellwyrm's fight state (encounters/hollow_crypt/knellwyrm.ts). */
   knellwyrmFight?: KnellwyrmFightState;
+  /** Per-fight state of a Hollow Crypt wing boss (encounters/hollow_crypt:
+   *  Sexton Marrow, the Lady of the Bonechill, Cantor Ilvane). Sim authority
+   *  only; the client reads casts, auras and the encounter objects. */
+  cryptBossFight?: CryptBossFightState;
+  /** An encounter carries this player in the air and moves them itself (the
+   *  Lady of the Bonechill's Frozen Embrace): the carrier's entity id. The
+   *  walking kernel stands down (carried_body.ts). Sim authority only. */
+  carriedBy?: number;
   /** An encounter's scripted entrance owns this mob (Morthen rising, the
    *  Knellwyrm flying in): inert, non-hostile and out of combat, the mob AI
    *  skips it and the encounter moves it, until the script hands it back. */

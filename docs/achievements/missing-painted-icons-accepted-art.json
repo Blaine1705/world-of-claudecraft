@@ -414,8 +414,8 @@
         "bagIconUrl": "/ui/weapons/dagger_c.jpg",
         "portraitPath": "public/ui/weapons/dagger_c.jpg",
         "heldModelPath": "public/models/weapons/dagger_c.glb",
-        "canonicalDisplayName": "Rimeweb Fang",
-        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Rimeweb Fang; inherits base visual variant dagger_c.",
+        "canonicalDisplayName": "Bride's Icicle",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Bride's Icicle; inherits base visual variant dagger_c.",
         "validationStatus": "implemented and focused tests passing"
       },
       {

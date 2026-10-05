@@ -80,6 +80,10 @@ export function kitPieceForProp(p: FieldProp): string {
       return 'Kit_SarcophagusAlcove';
     case 'hc_ring_stone':
       return 'Kit_RingStone';
+    case 'hc_grave_lantern':
+    case 'hc_bridal_grave':
+      // The Lady of the Bonechill's lanterns and grave: drawn by lady_fx.ts.
+      return '';
     case 'hc_pier':
       // Collider only: the pier it makes solid is part of its gateway's piece.
       return '';

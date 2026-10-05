@@ -31,6 +31,24 @@ function setup(): { sim: Sim; pid: number; me: () => Entity } {
 describe('/dev crypt', () => {
   afterEach(() => clearDungeonGateStateForTest());
 
+  it('pulls a wing boss in its arena and sets the engaged bosses to a health share', () => {
+    const { sim, pid, me } = setup();
+    sim.chat('/dev level 20', pid);
+    for (let t = 0; t < 40; t++) sim.tick();
+    sim.chat('/dev crypt pull lady', pid);
+    const inst = claimedInstanceAt(sim.ctx, me().pos);
+    expect(inst?.dungeonId).toBe('hollow_crypt');
+    const lady = inst?.mobIds
+      .map((id) => sim.ctx.entities.get(id))
+      .find((e) => e?.templateId === 'rimeweb');
+    expect(lady?.inCombat).toBe(true);
+    for (let t = 0; t < 40; t++) sim.tick();
+    sim.chat('/dev crypt hp 49', pid);
+    if (!lady) throw new Error('no lady');
+    expect(lady.hp / lady.maxHp).toBeLessThan(0.5);
+    expect(lady.hp / lady.maxHp).toBeGreaterThan(0.48);
+  });
+
   it('teleports to every named area on walkable ground inside the run', () => {
     const { sim, pid, me } = setup();
     for (const [area, spot] of Object.entries(HOLLOW_CRYPT_DEV_AREAS)) {

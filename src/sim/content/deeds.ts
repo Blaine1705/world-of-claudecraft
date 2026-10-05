@@ -3796,6 +3796,33 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'Witness of the Choir' },
   },
+  // The Hollow Crypt's wing bosses (src/sim/encounters/hollow_crypt: marrow.ts,
+  // lady.ts, ilvane.ts), granted to everyone in the claim at the kill.
+  // Cosmetic only; appended at the END per the append-only contract.
+  dgn_marrow_tidy: {
+    id: 'dgn_marrow_tidy',
+    name: 'A Tidy Churchyard',
+    desc: 'Defeat Sexton Marrow with every Open Grave laid at the edge of the Bell Yard.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_lady_nobody_hanging: {
+    id: 'dgn_lady_nobody_hanging',
+    name: 'Nobody Left Hanging',
+    desc: 'Defeat the Lady of the Bonechill without her ever dropping anyone from her Frozen Embrace.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_ilvane_hush: {
+    id: 'dgn_ilvane_hush',
+    name: 'Hush Now',
+    desc: 'Defeat Cantor Ilvane without her Dirge of the Hollow ever striking anyone.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

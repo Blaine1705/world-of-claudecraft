@@ -187,6 +187,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/hollow_crypt/crypt_fx_particles.ts': 1,
   'src/render/hollow_crypt/crypt_gates.ts': 1,
   'src/render/hollow_crypt/crypt_lights.ts': 1,
+  'src/render/hollow_crypt/lady_fx.ts': 2,
+  'src/render/hollow_crypt/marrow_fx.ts': 1,
   'src/render/hollow_crypt/crypt_particles.ts': 1,
   'src/render/hollow_crypt/morthen_fx.ts': 1,
   'src/render/sanctum_seal_gate_surface.ts': 1,

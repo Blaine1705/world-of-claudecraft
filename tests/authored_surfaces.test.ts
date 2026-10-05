@@ -197,6 +197,12 @@ const AUTHORED_ATLAS_DEFS = [
   'bastion_drowned_anchor',
   'bastion_turnkey',
   'crypt_morthen_lich',
+  // the Hollow Crypt's Blender Sexton Marrow (the skeletal gravedigger)
+  'crypt_skel_sexton',
+  // the Hollow Crypt's Lady of the Bonechill (the frozen bride's ghost)
+  'crypt_lady_bonechill',
+  // the Hollow Crypt's Blender Cantor Ilvane (the skeletal choir mistress)
+  'crypt_skel_cantor',
   // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
   'sanctum_korgath',
   'sanctum_velkhar',

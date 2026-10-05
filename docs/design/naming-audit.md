@@ -915,6 +915,27 @@ bg3.wiki and the Forgotten Realms wiki, plus exact-phrase web searches for the c
 | Nacre Mantle | the group shield for taking the pearl | KEEP. Only biology papers (nacre is laid by the mollusc mantle). |
 | Rusted Bolt | the arbalests' bolt on the mark | KEEP. The arbalest's shipped petSpell name, reused. |
 
+### The Hollow Crypt wing-boss rework (web-verified 2026-10-05)
+
+Exact-phrase and coined-token searches at authoring (warcraft.wiki.gg full text, the Guild Wars
+wiki, and for the encounter names also the FFXIV wiki), for the three reworked wing bosses
+(`src/sim/encounters/hollow_crypt/marrow_ids.ts`, `lady_ids.ts`, `ilvane_ids.ts`) and the
+Lady's renamed loot (`src/sim/content/hollow_crypt_items.ts`; display only, the ids are frozen
+since the spider placeholder and pinned by `tests/hollow_crypt_alert.test.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Lady of the Bonechill | the second boss (display name of `rimeweb`) | KEEP. No match for the full name; "Bonechill" is already a GENERIC token in this game (Bonechill Cord, Striders, Widow). |
+| Bride's Lament, Frozen Embrace, Rime Path, Bridal Freeze, Lingering Lament, Shattering Fall, Rime-Slick | her kit and the ice | KEEP. No match for any full name; generic English. |
+| Earthbound | REJECTED before shipping | A game title (Nintendo's EarthBound). Marrow's heroic haste in a grave is Grave Vigor. |
+| Grave Vigor, Shovelful, Gravedigger's Blow, Unquiet Earth, Measured for the Grave | Sexton Marrow's kit | KEEP. No match for any full name; generic English. |
+| Bone Organ, Unbroken Verse | Cantor Ilvane's organ and her heroic uninterruptible Dirge | KEEP. No match. |
+| Open Grave, Grave Dirt, Dirt in the Eyes, Harmony, Crescendo, Encore, Grave Lantern, Frozen Ravine | mechanics, auras and places | GENERIC. Plain English. |
+| Bonechill Carapace Vest | RENAMED before the rework shipped (theme, not a collision) | The spider word. Now Bonechill Hauberk (`bonechill_carapace_vest`): a mail chest, which is what the committed icon paints. No match for the full name on either wiki; "Bonechill" is GENERIC here (WoW's Bonechill Hammer and Magus Bonechill share only the common compound). |
+| Rimeweb Hunter's Leggings | RENAMED before the rework shipped (theme) | The spider's web and its hunter. Now Rime-Laced Leggings (`rimeweb_hunters_leggings`), after the frosted lacing on the committed icon. No match for the full name or for "Rime-laced" on either wiki. |
+| Rimeweb Fang | RENAMED before the rework shipped (theme) | The committed icon is a pale curved ice blade, not a fang. Now Bride's Icicle (`rimeweb_fang`, and its generated heroic twin, which reads the base name). No match on either wiki. |
+| Rimesilk | kept | A bride's silk: Rimesilk Mantle and Rimesilk Hood keep their names. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

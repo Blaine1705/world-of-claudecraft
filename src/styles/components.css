@@ -16356,6 +16356,7 @@
   #bastion-alert,
   #wildheart-alert,
   #sanctum-alert,
+  #crypt-alert,
   #kit-use-prompt {
     bottom: calc(260px + var(--castbar-h) + 14px);
   }
@@ -16364,6 +16365,7 @@
   body.show-actionbar3 #bastion-alert,
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert,
+  body.show-actionbar3 #crypt-alert,
   body.show-actionbar3 #kit-use-prompt {
     bottom: calc(312px + var(--castbar-h) + 14px);
   }
@@ -16372,6 +16374,7 @@
   body.mobile-touch #bastion-alert,
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert,
+  body.mobile-touch #crypt-alert,
   body.mobile-touch #kit-use-prompt {
     bottom: 56%;
   }
@@ -16815,6 +16818,98 @@
     }
   }
   body.mobile-touch #sanctum-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the Open Grave) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/crypt_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: a mark
+     or a grave to leave throbs in the hostile tone, being held and the
+     Lament's call to the light sit in frost, a sheltered player stays calm in
+     the friendly tone, the target readouts in gold. Never tier-gated
+     (graphics fairness). */
+  #crypt-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #crypt-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #crypt-alert .fa-line {
+    font-size: 14px;
+  }
+  #crypt-alert .fa-hint {
+    display: none;
+  }
+  #crypt-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #crypt-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #crypt-alert.is-measured,
+  #crypt-alert.is-grave {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #crypt-alert.is-measured .fa-title,
+  #crypt-alert.is-measured .fa-fill,
+  #crypt-alert.is-grave .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #crypt-alert.is-embraced,
+  #crypt-alert.is-lament-open {
+    border-color: var(--color-debuff-frost);
+  }
+  #crypt-alert.is-lament-open {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #crypt-alert.is-embraced .fa-title,
+  #crypt-alert.is-embraced .fa-fill,
+  #crypt-alert.is-lament-open .fa-title,
+  #crypt-alert.is-lament-open .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  #crypt-alert.is-lament-sheltered {
+    border-color: var(--color-friendly);
+  }
+  #crypt-alert.is-lament-sheltered .fa-title,
+  #crypt-alert.is-lament-sheltered .fa-fill {
+    color: var(--color-friendly);
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #crypt-alert {
+      animation: none;
+    }
+    #crypt-alert .fa-fill {
+      transition: none;
+    }
+  }
+  body.mobile-touch #crypt-alert {
     min-width: min(420px, calc(100vw - 32px));
   }
 

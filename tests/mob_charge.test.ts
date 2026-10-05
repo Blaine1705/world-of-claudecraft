@@ -22,11 +22,11 @@ const SEED = 61234;
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
-// The eight heroic warrior/guard melee templates that carry the charge, and the
+// The seven heroic warrior/guard melee templates that carry the charge (Sexton
+// Marrow left the list with his Bell Yard encounter kit), and the
 // exact record they all share (anti-kite band 5..30yd, 12s cooldown, 0.5s stun).
 const CHARGE_TEMPLATE_IDS = [
   'crypt_shambler',
-  'sexton_marrow',
   'bastion_revenant',
   'drowned_thrall',
   'sanctum_boneguard',
@@ -145,7 +145,7 @@ const testRoot = (sourceId: number): Aura => ({
 });
 
 describe('charge template coverage (data contract)', () => {
-  it('exactly the eight warrior/guard melee templates carry the shared charge record', () => {
+  it('exactly the seven warrior/guard melee templates carry the shared charge record', () => {
     for (const id of CHARGE_TEMPLATE_IDS) {
       // The Moonmantle Ray (the Pearlguard Sentinel's frozen id) glides in on
       // the same charge under its own name.
@@ -153,7 +153,7 @@ describe('charge template coverage (data contract)', () => {
         id === 'pearlguard_sentinel' ? { ...CHARGE_RECORD, name: 'Lunar Glide' } : CHARGE_RECORD;
       expect(MOBS[id]?.charge, `${id} carries charge`).toEqual(want);
     }
-    // Global scan: no template outside the eight may carry a charge (bosses and
+    // Global scan: no template outside the seven may carry a charge (bosses and
     // every Nythraxis raid mob stay charge-free so the raid parity golden and
     // the boss-mechanic draw order are untouched).
     const allWithCharge = Object.values(MOBS)

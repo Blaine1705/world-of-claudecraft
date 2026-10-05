@@ -694,10 +694,10 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 319 at the 2026-09-28 release/v0.44.0 merge into Buried Hoards: the
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
     // 338 with the five-dungeon rework's 19 encounter deeds, all on the
-    // pending side on the deed_cat_dungeon crest.
-    // 339 with the Drowned Temple lore guide's deed (dgn_drowned_temple_cantor),
-    // on the same pending side.
-    expect(DEED_ORDER).toHaveLength(339);
+    // pending side on the deed_cat_dungeon crest. 339 with the Drowned
+    // Temple lore guide's The Last Verse and 342 with the Hollow Crypt wing
+    // bosses' three, all on the pending side on the same crest.
+    expect(DEED_ORDER).toHaveLength(342);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

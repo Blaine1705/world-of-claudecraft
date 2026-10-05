@@ -16,7 +16,7 @@ import {
   CRYPT_WING_GUST,
 } from '../mob/trash_kit/cast_ids';
 import type { DungeonGateDef, DungeonObjectSpawn, DungeonSpawn, MobTemplate } from '../types';
-import { ARCADE_TOP_Y } from './hollow_crypt_layout';
+import { ARCADE_TOP_Y, BONECHILL_LANTERN_SPOTS } from './hollow_crypt_layout';
 
 // ---- Templates ------------------------------------------------------------
 
@@ -124,8 +124,9 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
       burn: { perTick: 2, interval: 1, duration: 6, name: 'Rime Bite', school: 'frost' },
     },
   },
-  // P7: the caster spider on the rim walk (Silk Wrap arrives with Rimeweb's
-  // module; tonight its bite carries the stacking rime venom).
+  // P7: the caster spider on the rim walk (the gallery's rimeweb spiders keep
+  // their species name; the ravine's boss is now the Lady of the Bonechill):
+  // its bite carries the stacking rime venom.
   rimeweb_spinner: {
     id: 'rimeweb_spinner',
     name: 'Rimeweb Spinner',
@@ -224,14 +225,43 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
     color: 0x6fd6a8,
     xpMult: 0.5,
   },
-  // Boss 2: Rimeweb, Mother of the Bonechill (placeholder kit: the stacking
-  // venom and the Brood Call hatchling waves at 50 and 25 percent).
+  // Sexton Marrow's dead: every Open Grave gives one up at his Burial Toll
+  // (encounters/hollow_crypt/marrow.ts), and on heroic a player lingering in
+  // a grave stirs one. A summoned add (the heroic add multiplier prices it):
+  // the zone's Restless Bones at the crypt's level, without its quest drops.
+  marrow_restless_bones: {
+    id: 'marrow_restless_bones',
+    name: 'Restless Bones',
+    minLevel: 8,
+    maxLevel: 8,
+    family: 'undead',
+    hpBase: 46,
+    hpPerLevel: 19,
+    dmgBase: 7,
+    dmgPerLevel: 2.1,
+    attackSpeed: 2.3,
+    armorPerLevel: 14,
+    moveSpeed: 6.5,
+    aggroRadius: 14,
+    loot: [{ copper: 12, chance: 1 }],
+    scale: 1.0,
+    color: 0xd5dbdb,
+    xpMult: 0.3,
+  },
+  // Boss 2: the Lady of the Bonechill, the ghost of a bride buried in the
+  // ravine's ice (the id stays `rimeweb`, frozen since the spider placeholder:
+  // spawns, loot, the gates and the deeds key on it). Her whole kit is the
+  // encounter module (encounters/hollow_crypt/lady.ts): Bride's Lament and the
+  // grave lanterns, the Frozen Embrace, the Rime Path, the Bridal Freeze.
   rimeweb: {
     id: 'rimeweb',
-    name: 'Rimeweb',
+    name: 'Lady of the Bonechill',
+    // A 6.5 yd ghost in a wide gown (the Blender body): melee reaches her from
+    // her hem, and her claws reach as far (MobTemplate.bodyRadius).
+    bodyRadius: 2.4,
     minLevel: 9,
     maxLevel: 9,
-    family: 'spider',
+    family: 'undead',
     elite: true,
     ccImmune: true,
     slowImmune: true,
@@ -241,19 +271,8 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 2.5,
     attackSpeed: 2.0,
     armorPerLevel: 20,
-    moveSpeed: 8,
+    moveSpeed: 7,
     aggroRadius: 14,
-    stackPoison: {
-      chance: 0.6,
-      perTick: 3,
-      interval: 3,
-      duration: 9,
-      maxStacks: 3,
-      name: 'Bonechill Venom',
-      school: 'frost',
-    },
-    summonAdds: { mobId: 'rimeweb_hatchling', count: 3, atHpPct: [0.5, 0.25] },
-    yells: { summon: 'The brood drops from the Great Web!' },
     loot: [
       { copper: 1000, chance: 1 },
       {
@@ -276,10 +295,12 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
       },
       { itemId: 'rimeweb_fang', chance: 0.1, normalOnly: true },
     ],
-    scale: 2.1,
-    color: 0xe8f4ff,
+    scale: 1,
+    color: 0xd8ecff,
   },
-  // Boss 3: Cantor Ilvane (placeholder kit: the Dirge as a telegraphed cast).
+  // Boss 3: Cantor Ilvane and the Hollow Choir. Her whole kit is the encounter
+  // module (encounters/hollow_crypt/ilvane.ts): the Dirge of the Hollow (kick
+  // it or hide from it), Harmony with her Choristers, the Bone Organ, Crescendo.
   cantor_ilvane: {
     id: 'cantor_ilvane',
     name: 'Cantor Ilvane',
@@ -297,16 +318,6 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 18,
     moveSpeed: 7,
     aggroRadius: 14,
-    bigCast: {
-      castId: 'dirge_of_the_hollow',
-      name: 'Dirge of the Hollow',
-      castTime: 2.5,
-      every: 12,
-      radius: 40,
-      min: 10,
-      max: 14,
-      school: 'shadow',
-    },
     loot: [
       { copper: 1000, chance: 1 },
       { itemId: 'cantors_cassock', chance: 0.34, rollGroup: 'ilvane_guaranteed', normalOnly: true },
@@ -324,7 +335,7 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
       },
       { itemId: 'cantors_hymnal', chance: 0.1, normalOnly: true },
     ],
-    scale: 1.3,
+    scale: 1.1,
     color: 0x9d6cd0,
   },
   // The finale: the Knellwyrm, the great bone wyrm Morthen's dying rite calls
@@ -575,8 +586,9 @@ export const HOLLOW_CRYPT_SPAWNS: DungeonSpawn[] = [
   held('crypt_gravecaller_necromancer', 80, 72, 'e3'),
   held('crypt_ossuary_warrior', 76, 68, 'e3'),
   held('crypt_ossuary_warrior', 84, 68, 'e3'),
-  // Boss 2: Rimeweb before her web.
-  { mobId: 'rimeweb', x: 80, z: 116, facing: FACE_SOUTH, idleStationary: true },
+  // Boss 2: the Lady of the Bonechill, hanging over the ravine floor before
+  // her frozen bridal grave.
+  { mobId: 'rimeweb', x: 80, z: 118, facing: FACE_SOUTH, idleStationary: true },
   // ---- The Choir Ruin ---------------------------------------------------------
   // q1: the nave, a necromancer and an adept behind two warriors.
   held('crypt_ossuary_warrior', -4, 124, 'q1'),
@@ -759,13 +771,31 @@ export const HOLLOW_CRYPT_GATES: DungeonGateDef[] = [
   },
 ];
 
-/** One inert ground object per gate: its template id carries the state. */
-export const HOLLOW_CRYPT_GATE_OBJECTS: DungeonObjectSpawn[] = HOLLOW_CRYPT_GATES.map((g) => ({
-  itemId: '',
-  name: g.name,
-  x: g.x,
-  z: g.z,
-  templateId: 'dungeon_gate_closed',
-  dungeonId: 'hollow_crypt',
-  lootable: false,
-}));
+/** One inert ground object per gate: its template id carries the state. And
+ *  the Lady of the Bonechill's three grave lanterns: each one's lit, dark or
+ *  kindling state rides its template id (encounters/hollow_crypt/
+ *  lady_lanterns.ts; the literal is LADY_LANTERN_TEMPLATES.lit). */
+export const HOLLOW_CRYPT_GATE_OBJECTS: DungeonObjectSpawn[] = [
+  ...HOLLOW_CRYPT_GATES.map(
+    (g): DungeonObjectSpawn => ({
+      itemId: '',
+      name: g.name,
+      x: g.x,
+      z: g.z,
+      templateId: 'dungeon_gate_closed',
+      dungeonId: 'hollow_crypt',
+      lootable: false,
+    }),
+  ),
+  ...BONECHILL_LANTERN_SPOTS.map(
+    (l): DungeonObjectSpawn => ({
+      itemId: '',
+      name: 'Grave Lantern',
+      x: l.x,
+      z: l.z,
+      templateId: 'crypt_lady_lantern_lit',
+      dungeonId: 'hollow_crypt',
+      lootable: false,
+    }),
+  ),
+];

@@ -261,6 +261,11 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // Olen's brine, Sentence column and bubble; Vael's staging pillar; the
   // Mooring Post lamps' safe rings (their lamplight pool sits on the ground rung).
   { file: 'src/render/sunken_bastion/bastion_olen_fx.ts', layer: 'encounter', strict: true },
+  // The Hollow Crypt wing bosses' host and painters (crypt_boss_fx.ts).
+  { file: 'src/render/hollow_crypt/crypt_boss_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/hollow_crypt/marrow_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/hollow_crypt/lady_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/hollow_crypt/ilvane_fx.ts', layer: 'encounter', strict: true },
   {
     file: 'src/render/sunken_bastion/bastion_vael_stage_fx.ts',
     layer: 'encounter',
