@@ -126,8 +126,7 @@ function fixture(cls = 'warrior') {
       bite.dispose();
       shear.dispose();
       crush.dispose();
-      for (const sheet of [smoke, shoutDust, ...Object.values(contacts)])
-        sheet.dispose();
+      for (const sheet of [smoke, shoutDust, ...Object.values(contacts)]) sheet.dispose();
       vi.restoreAllMocks();
     },
   };
@@ -219,7 +218,7 @@ it('uploads every sheet the Warrior kit draws before a geometry unit runs', asyn
   // the generic smoke and dust layers (baked_impact_layers.ts) as well as its
   // signature sheets. They all land with the kit's demand load, after the boot
   // warm-up ran, so a sheet the recipe does not upload is uploaded by the
-    // first cast that draws it, in a live frame.
+  // first cast that draws it, in a live frame.
   const f = fixture();
   try {
     await ensureActiveAbilityKit(f.scene);
