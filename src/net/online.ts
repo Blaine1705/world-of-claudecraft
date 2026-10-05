@@ -4845,6 +4845,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   dungeonDifficulty(): DungeonDifficulty {
     return this.selectedDungeonDifficulty ?? 'normal';
   }
+  activeDungeonDifficulty(): DungeonDifficulty | null {
+    return null;
+  }
   setDungeonDifficulty(difficulty: DungeonDifficulty): void {
     this.selectedDungeonDifficulty = difficulty;
     this.cmd({ cmd: 'set_dungeon_difficulty', difficulty });

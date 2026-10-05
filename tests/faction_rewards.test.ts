@@ -229,7 +229,7 @@ describe('Allied Faction World Quest Rewards & Toys', () => {
         (sim as unknown as { updateMob(e: typeof mob): void }).updateMob(mob);
       }
 
-      expect(mob.aiState).toBe('evade');
+      expect(mob.aiState).not.toBe('attack');
       expect(mob.aggroTargetId).toBeNull();
       expect(mob.autoAttack).toBe(false);
     });

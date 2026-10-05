@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { IGNIVAR_MOLTEN_ASSEMBLY_ID } from '../src/sim/ignivar_raid_ids';
-import { DungeonMapPainter } from '../src/ui/dungeon_map_painter';
+import { DungeonMapPainter, dungeonTitleWithDifficulty } from '../src/ui/dungeon_map_painter';
 import { dungeonDisplayName } from '../src/ui/entity_i18n';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import type { IWorld } from '../src/world_api';
@@ -43,7 +43,11 @@ class RecordingContext {
   }
 }
 
-function worldIn(dungeonId: string, difficulty: 'normal' | 'heroic' = 'normal'): IWorld {
+function worldIn(
+  dungeonId: string,
+  difficulty: 'normal' | 'heroic' = 'normal',
+  activeDifficulty: 'normal' | 'heroic' | null = difficulty,
+): IWorld {
   const origin = instanceOrigin(DUNGEONS[dungeonId].index, 0);
   const player = {
     id: 1,
@@ -60,6 +64,7 @@ function worldIn(dungeonId: string, difficulty: 'normal' | 'heroic' = 'normal'):
     riftFloor: null,
     delveRun: null,
     dungeonDifficulty: () => difficulty,
+    activeDungeonDifficulty: () => activeDifficulty,
   } as unknown as IWorld;
 }
 
@@ -140,5 +145,11 @@ describe('DungeonMapPainter', () => {
       560,
     );
     expect(result?.title).toBe(`${dungeonDisplayName('hollow_crypt')} (Heroic)`);
+  });
+
+  it('keeps map titles on the active claim difficulty after selection changes', () => {
+    expect(
+      dungeonTitleWithDifficulty('hollow_crypt', worldIn('hollow_crypt', 'heroic', 'normal')),
+    ).toBe(`${dungeonDisplayName('hollow_crypt')} (Normal)`);
   });
 });

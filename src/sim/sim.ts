@@ -10588,6 +10588,12 @@ export class Sim {
     return this.dungeonDifficultyForPid(r.meta.entityId);
   }
 
+  activeDungeonDifficulty(pid?: number): DungeonDifficulty | null {
+    const r = this.resolve(pid),
+      claimId = r ? this.instanceClaimIdAt(r.e.pos) : null;
+    return this.instances.find((instance) => instance.exitId === claimId)?.difficulty ?? null;
+  }
+
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void {
     if (!isDungeonDifficulty(difficulty)) return;
     const r = this.resolve(pid);

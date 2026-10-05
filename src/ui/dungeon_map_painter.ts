@@ -347,7 +347,7 @@ export class DungeonMapPainter {
 
 export function dungeonTitleWithDifficulty(dungeonId: string, world: IWorld): string {
   const name = dungeonDisplayName(dungeonId);
-  const difficulty = world.dungeonDifficulty?.() ?? 'normal';
+  const difficulty = world.activeDungeonDifficulty?.() ?? world.dungeonDifficulty?.() ?? 'normal';
   const diffLabel =
     difficulty === 'heroic' ? t('hudChrome.finder.heroic') : t('hudChrome.finder.normal');
   return `${name} (${diffLabel})`;

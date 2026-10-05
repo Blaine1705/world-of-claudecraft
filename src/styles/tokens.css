@@ -789,6 +789,8 @@
     --color-text-on-medal: #ffd100;
     --color-socket-rim: #4a3d1d;
     --color-socket-hi: #2c2c3a;
+    --color-instance-difficulty-mid: #15131a;
+    --color-instance-difficulty-bg: #121016;
     --color-panel-hi: #1c1c29;
     --color-chrome-ground: #1a1410;
     --color-chrome-glyph: #c9b27a;
@@ -903,6 +905,7 @@
     --edge-glint: inset 0 1px 0 color-mix(in srgb, var(--color-glint) 16%, transparent);
     --edge-hairline: inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 12%, transparent);
     --shadow-lift: 0 2px 4px color-mix(in srgb, var(--color-keyline) 56%, transparent);
+    --shadow-instance-difficulty: 0 2px 6px rgb(0 0 0 / 90%);
     --shadow-socket:
       0 0 0 1px var(--color-keyline),
       inset 0 1px 0 color-mix(in srgb, var(--color-white) 10%, transparent), var(--edge-hairline),

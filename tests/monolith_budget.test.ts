@@ -540,7 +540,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18093 -> 18090 by the Social row right-click menu: the by-name pid
     // lookup moved to src/ui/social_row_menu_core.ts (livePlayerPid) and the row
     // routing lives in social_window.ts, so hud.ts keeps only one-line menu deps.
-    ceiling: 18090,
+    // Re-pinned at the v0.45.0 release batch after approved PR #4357 added the
+    // instance difficulty badge wiring to the coordinator. Exact count measured
+    // on the merged tree after the release integration repair (wc -l after biome).
+    ceiling: 18178,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1235,7 +1238,10 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Re-pinned at the v0.45.0 release batch after the active instance difficulty
+    // IWorld method landed to make PR #4357's badge read the claim difficulty.
+    // Exact count measured on the merged tree after biome. Zero slack.
+    ceiling: 11643,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

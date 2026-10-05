@@ -8555,14 +8555,12 @@
     border-color: var(--color-control-border);
     background: radial-gradient(
       circle at 45% 35%,
-      var(--color-socket-hi, #2c2c3a) 0%,
-      #15131a 70%,
-      var(--color-ink-deep, #0b0b10) 100%
+      var(--color-socket-hi) 0%,
+      var(--color-instance-difficulty-mid) 70%,
+      var(--color-ink-deep) 100%
     );
-    background-color: #121016;
-    box-shadow:
-      0 2px 6px rgba(0, 0, 0, 0.9),
-      var(--edge-glint);
+    background-color: var(--color-instance-difficulty-bg);
+    box-shadow: var(--shadow-instance-difficulty), var(--edge-glint);
   }
   #instance-difficulty[hidden] {
     display: none;
@@ -8575,17 +8573,12 @@
   #instance-difficulty.heroic {
     color: var(--gold);
     border-color: var(--gold-dim);
-    box-shadow:
-      var(--glow-gold-soft),
-      0 2px 6px rgba(0, 0, 0, 0.9),
-      var(--edge-glint);
+    box-shadow: var(--glow-gold-soft), var(--shadow-instance-difficulty), var(--edge-glint);
   }
   #instance-difficulty.normal {
     color: var(--color-text-light);
     border-color: var(--color-control-border);
-    box-shadow:
-      0 2px 6px rgba(0, 0, 0, 0.9),
-      var(--edge-glint);
+    box-shadow: var(--shadow-instance-difficulty), var(--edge-glint);
   }
   #instance-difficulty:hover,
   #instance-difficulty:focus-visible {

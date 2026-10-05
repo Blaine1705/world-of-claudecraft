@@ -6895,6 +6895,7 @@ export class Hud {
     this.lastPetBarSig = '';
     this.lastCompassFacing = Number.NaN;
     this.lastCompassHeading = '';
+    this.lastInstanceDifficulty = this.lastInstanceDungeonId = null;
     relabelCompassMarks(this.compassMarks);
   }
 
@@ -9846,7 +9847,8 @@ export class Hud {
     const local = dungeonMapLocal(this.sim.player.pos.x, this.sim.player.pos.z);
     if (!local) return '';
     const name = dungeonDisplayName(local.dungeonId);
-    const difficulty = this.sim.dungeonDifficulty?.() ?? 'normal';
+    const difficulty =
+      this.sim.activeDungeonDifficulty?.() ?? this.sim.dungeonDifficulty?.() ?? 'normal';
     const isRaid =
       local.dungeonId.startsWith('ignivar_') || local.dungeonId.startsWith('nythraxis_');
     const diffLabel =
@@ -9873,7 +9875,8 @@ export class Hud {
       }
       return;
     }
-    const difficulty = this.sim.dungeonDifficulty?.() ?? 'normal';
+    const difficulty =
+      this.sim.activeDungeonDifficulty?.() ?? this.sim.dungeonDifficulty?.() ?? 'normal';
     const dungeonId = local.dungeonId;
     if (
       this.lastInstanceActive &&

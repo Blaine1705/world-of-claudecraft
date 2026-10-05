@@ -9,7 +9,11 @@ import type { IWorld } from '../src/world_api';
 const read = (rel: string): string =>
   readFileSync(new URL(`../${rel}`, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 
-function mockWorld(dungeonId: string, difficulty: 'normal' | 'heroic'): IWorld {
+function mockWorld(
+  dungeonId: string,
+  difficulty: 'normal' | 'heroic',
+  activeDifficulty: 'normal' | 'heroic' | null = difficulty,
+): IWorld {
   const origin = instanceOrigin(DUNGEONS[dungeonId].index, 0);
   const player = {
     id: 1,
@@ -23,6 +27,7 @@ function mockWorld(dungeonId: string, difficulty: 'normal' | 'heroic'): IWorld {
     player,
     entities: new Map([[player.id, player]]),
     dungeonDifficulty: () => difficulty,
+    activeDungeonDifficulty: () => activeDifficulty,
   } as unknown as IWorld;
 }
 
@@ -48,6 +53,13 @@ describe('instance difficulty indicator', () => {
     const heroicWorld = mockWorld(IGNIVAR_MOLTEN_ASSEMBLY_ID, 'heroic');
     expect(dungeonTitleWithDifficulty(IGNIVAR_MOLTEN_ASSEMBLY_ID, heroicWorld)).toBe(
       `${dungeonDisplayName(IGNIVAR_MOLTEN_ASSEMBLY_ID)} (Heroic)`,
+    );
+  });
+
+  it('keeps titles on the active claim difficulty after selection changes', () => {
+    const world = mockWorld('hollow_crypt', 'heroic', 'normal');
+    expect(dungeonTitleWithDifficulty('hollow_crypt', world)).toBe(
+      `${dungeonDisplayName('hollow_crypt')} (Normal)`,
     );
   });
 
