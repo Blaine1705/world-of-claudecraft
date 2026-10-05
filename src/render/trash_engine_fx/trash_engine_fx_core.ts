@@ -12,11 +12,13 @@
 
 import { DUNGEONS, instanceOrigin, MOBS } from '../../sim/data';
 import { COMBAT_WALL_SHAPES } from '../../sim/instances/combat_wall_state';
+import { BASTION_THROATLIGHT_ORB } from '../../sim/mob/trash_kit/bastion_cast_ids';
 import { TRASH_ENGINE_DEMO_KIT } from '../../sim/mob/trash_kit/engine_demo';
 import {
   SANCTUM_BOILING_MELTWATER,
   SANCTUM_SPILLED_SOULFIRE,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
+import { TEMPLE_HEARTPEARL_ORB } from '../../sim/mob/trash_kit/temple_cast_ids';
 import type {
   Aura,
   FreezeStackDef,
@@ -76,10 +78,15 @@ export function buildEngineCatalog(kits: Iterable<TrashKitDef>): EngineCatalog {
       put(hazards, kit.usable.effect.hazard.objectTemplate, kit.usable.effect.hazard);
     }
     if (kit.walker) {
-      put(walkers, kit.walker.objectTemplate, kit.walker);
-      put(walkerCasts, kit.walker.castId, kit.walker);
-      if (kit.walker.empower.damagePct > 0)
-        put(empowerAuras, kit.walker.empower.auraId, kit.walker);
+      const w = kit.walker;
+      put(walkers, w.objectTemplate, w);
+      put(walkerCasts, w.castId, w);
+      // Whatever the orb leaves behind glows: an arming (either difficulty's),
+      // an ally's shield, and the group's gift for taking it.
+      const e = w.empower;
+      if (e.damagePct > 0 || (e.heroicDamagePct ?? 0) > 0 || (e.shieldPct ?? 0) > 0)
+        put(empowerAuras, e.auraId, w);
+      if (w.intercept.groupShield) put(empowerAuras, w.intercept.groupShield.auraId, w);
     }
     if (kit.nova) {
       put(novas, kit.nova.castId, kit.nova);
@@ -438,9 +445,31 @@ export function orbFollow(dt: number): number {
   return 1 - Math.exp(-dt * 14);
 }
 
-/** The orb's float over the floor (yards), bobbing. */
-export function orbHover(clock: number, seed: number): number {
-  return 1.45 + 0.18 * Math.sin(clock * 3.3 + seed);
+/** How high an orb floats by default (yards over the floor). */
+export const ORB_HOVER = 1.45;
+
+/** A dungeon walker's own look beyond its school tint: the Bastion
+ *  Revenant's drowned sea-light floats at chest height in the green of its
+ *  eyes; the Moonmantle Ray's Heartpearl is a nacre pearl rolling low over
+ *  the floor (so it reads as something to step on, not to dodge). */
+export const WALKER_LOOKS: Readonly<Record<string, { tint: number; hover: number }>> = {
+  [BASTION_THROATLIGHT_ORB]: { tint: 0x52f0b8, hover: 1.5 },
+  [TEMPLE_HEARTPEARL_ORB]: { tint: 0xe4f0ff, hover: 0.42 },
+};
+
+/** The tint an orb (and its empower glow) draws in. */
+export function walkerTint(def: KitWalkerDef): number {
+  return WALKER_LOOKS[def.objectTemplate]?.tint ?? SCHOOL_TINT[def.school] ?? SCHOOL_TINT.fire;
+}
+
+/** The float an orb rests at (yards over the floor). */
+export function walkerHover(def: KitWalkerDef | null | undefined): number {
+  return (def && WALKER_LOOKS[def.objectTemplate]?.hover) || ORB_HOVER;
+}
+
+/** The orb's float over the floor (yards), bobbing in proportion to it. */
+export function orbHover(clock: number, seed: number, base = ORB_HOVER): number {
+  return base + base * 0.124 * Math.sin(clock * 3.3 + seed);
 }
 
 /** An empowered body's glow pulse (0.75..1.1). */

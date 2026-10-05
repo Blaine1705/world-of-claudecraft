@@ -24,7 +24,16 @@ import * as THREE from 'three';
 import type { Entity, KitWalkerDef, SimEvent } from '../../sim/types';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { FLAME_HEAT } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
-import { empowerPulse, orbFollow, orbHover, rgbOf, SCHOOL_TINT } from './trash_engine_fx_core';
+import {
+  empowerPulse,
+  ORB_HOVER,
+  orbFollow,
+  orbHover,
+  rgbOf,
+  SCHOOL_TINT,
+  walkerHover,
+  walkerTint,
+} from './trash_engine_fx_core';
 import type { TrashEngineHost } from './trash_engine_host';
 
 const ORB_SLOTS = 6;
@@ -271,7 +280,13 @@ export class EngineWalkers {
   scanOrb(e: Entity): void {
     const def = this.host.catalog.walkers.get(e.templateId);
     if (!def || this.orbs.some((o) => o.orbId === e.id)) return;
-    this.claimOrb(e, def, e.pos.x, this.host.groundY(e.pos.x, e.pos.z) + orbHover(0, 0), e.pos.z);
+    this.claimOrb(
+      e,
+      def,
+      e.pos.x,
+      this.host.groundY(e.pos.x, e.pos.z) + orbHover(0, 0, walkerHover(def)),
+      e.pos.z,
+    );
   }
 
   /** Any body seen by the scan: a walker's empower glows on it. */
@@ -285,7 +300,7 @@ export class EngineWalkers {
       if (!slot) return;
       slot.entityId = e.id;
       slot.auraId = a.id;
-      slot.color = SCHOOL_TINT[def.school] ?? SCHOOL_TINT.fire;
+      slot.color = walkerTint(def);
       slot.glowMat.color.setHex(slot.color);
       (slot.moteMat.uniforms.uColor.value as THREE.Color).setHex(slot.color);
       slot.glow.visible = true;
@@ -297,7 +312,7 @@ export class EngineWalkers {
   private claimOrb(e: Entity, def: KitWalkerDef, x: number, y: number, z: number): OrbSlot | null {
     const slot = this.orbs.find((o) => o.orbId < 0);
     if (!slot) return null;
-    const color = SCHOOL_TINT[def.school] ?? SCHOOL_TINT.fire;
+    const color = walkerTint(def);
     slot.orbId = e.id;
     slot.def = def;
     slot.x = x;
@@ -352,7 +367,7 @@ export class EngineWalkers {
     const mob = world.entities.get(mobId);
     const orb = world.entities.get(orbId);
     const h = this.host;
-    const color = SCHOOL_TINT[def.school] ?? SCHOOL_TINT.fire;
+    const color = walkerTint(def);
     const from = mob ?? orb;
     if (!from) return;
     const gy = h.groundY(from.pos.x, from.pos.z);
@@ -384,7 +399,7 @@ export class EngineWalkers {
     const h = this.host;
     const slot = this.orbs.find((o) => o.orbId === orbId);
     const ally = h.world.entities.get(allyId);
-    const color = slot?.def ? (SCHOOL_TINT[slot.def.school] ?? SCHOOL_TINT.fire) : SCHOOL_TINT.fire;
+    const color = slot?.def ? walkerTint(slot.def) : SCHOOL_TINT.fire;
     if (ally) {
       const gy = h.groundY(ally.pos.x, ally.pos.z);
       const bh = h.bodyHeight(ally);
@@ -445,7 +460,7 @@ export class EngineWalkers {
     const h = this.host;
     const slot = this.orbs.find((o) => o.orbId === orbId);
     const p = h.world.entities.get(playerId);
-    const color = slot?.def ? (SCHOOL_TINT[slot.def.school] ?? SCHOOL_TINT.fire) : SCHOOL_TINT.fire;
+    const color = slot?.def ? walkerTint(slot.def) : SCHOOL_TINT.fire;
     const x = p?.pos.x ?? slot?.x;
     const z = p?.pos.z ?? slot?.z;
     if (x === undefined || z === undefined) return;
@@ -495,8 +510,8 @@ export class EngineWalkers {
       }
     }
     const h = this.host;
-    const y = slot ? slot.y : h.groundY(x, z) + orbHover(0, 0);
-    const color = slot?.def ? (SCHOOL_TINT[slot.def.school] ?? SCHOOL_TINT.fire) : SCHOOL_TINT.fire;
+    const y = slot ? slot.y : h.groundY(x, z) + orbHover(0, 0, ORB_HOVER);
+    const color = slot?.def ? walkerTint(slot.def) : SCHOOL_TINT.fire;
     h.puff(x, y, z, 14, {
       speed: 1.2,
       up: 1,
@@ -539,7 +554,7 @@ export class EngineWalkers {
       }
       const h = this.host;
       const gyT = h.groundY(e.pos.x, e.pos.z);
-      const ty = gyT + orbHover(clock, slot.seed);
+      const ty = gyT + orbHover(clock, slot.seed, walkerHover(slot.def));
       slot.x += (e.pos.x - slot.x) * k;
       slot.y += (ty - slot.y) * k;
       slot.z += (e.pos.z - slot.z) * k;
@@ -561,7 +576,7 @@ export class EngineWalkers {
       // The trail: sparks shed behind it, and flame for a fire orb.
       slot.trail += dt * 40 * h.density;
       const def = slot.def;
-      const color = def ? (SCHOOL_TINT[def.school] ?? SCHOOL_TINT.fire) : SCHOOL_TINT.fire;
+      const color = def ? walkerTint(def) : SCHOOL_TINT.fire;
       while (slot.trail >= 1) {
         slot.trail -= 1;
         h.puff(slot.x, slot.y, slot.z, 1, {
@@ -650,7 +665,7 @@ export class EngineWalkers {
     const def = this.host.catalog.walkerCasts.get(e.castingAbility ?? '');
     if (!def) return;
     const h = this.host;
-    const color = SCHOOL_TINT[def.school] ?? SCHOOL_TINT.fire;
+    const color = walkerTint(def);
     const gy = h.groundY(e.pos.x, e.pos.z);
     const cy = gy + h.bodyHeight(e) * 0.6;
     const want = dt * 30 * h.density;
