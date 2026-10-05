@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c18d826265e071a47de31100567325150de728902395c8ab998ebd36bbf5b7cb",
+  "rendererFingerprint": "253ab1c8687f359a61d1ac9cd2bc8f696ba50cf49fd7dbf43bcc00895edb1790",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5505014,
-      "sha256": "f434bc878d65ae323aedde9c364ac656558171da962b5b7adf14bf0ee7286fe6",
+      "bytes": 5505126,
+      "sha256": "6c8852d074cee52769aab2b24dbf83d76dbbd06a43979308133d82e6779e2a8b",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -872,10 +872,10 @@
       "visualKey": "sanctum_pyre_tender",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_void_acolyte.glb",
-          "path": "public/models/creatures/hoard_void_acolyte.glb",
-          "bytes": 1986904,
-          "sha256": "9465f25cb1e7ae7bde5f5f1e43cd8453d2beea0362e60ddebdfe84ca167a5b4f"
+          "url": "models/creatures/sanctum_pyre_tender.glb",
+          "path": "public/models/creatures/sanctum_pyre_tender.glb",
+          "bytes": 704688,
+          "sha256": "178e9fb3e342bc5e323f4622668ed2bca40c8efcc15ac1f70da160b3342a51c2"
         },
         "idle": "Idle",
         "height": 2.666666666666667,
@@ -884,19 +884,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#c0743c",
-        "resolved": "#c0743c",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "768009ae7f87f45b75481ee01a68b6427ae699f4b9d5cfa6fb4083843b3c3839",
+      "sourceFingerprint": "18a86f9fe5613b0ddc2d8f76af2a0abcd434ea58f38bb06348cf8ee333e8bb14",
       "output": {
         "path": "public/ui/mobs/broodsworn_pyre_tender.webp",
-        "bytes": 1998,
-        "sha256": "7d3a5d5599b1de9381b483b9f9ce2303b73f9294c69dfc639ddcce962c917a4d"
+        "bytes": 2302,
+        "sha256": "544603b68506dc2d6a7de55bf6e384273daf2bde6636358c4f1bd1832e2e6cf3"
       }
     },
     {

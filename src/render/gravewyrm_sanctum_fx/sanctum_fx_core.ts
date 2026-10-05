@@ -534,7 +534,10 @@ export const SANCTUM_BODY_ANCHORS: Readonly<
   brandThrust: {
     [GOADSMITH_ID]: [0.72, -0.23, 0.7],
   },
-  yoke: {},
+  yoke: {
+    // The yoke's braziers ride level with its shoulders, out past them.
+    [PYRE_TENDER_ID]: [-0.01, 0.24, 0.77],
+  },
 };
 
 /** The generic placement every body had before its own was measured. */

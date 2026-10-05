@@ -24,6 +24,9 @@ authoring tooling: nothing here runs in the build or the game.
 - `goadsmith/cultistas/`: the Broodsworn Goadsmith (`sanctum_goadsmith.glb`), the same
   Codex cultist builder; `BrandingIron` added with its `reclip.py`.
 
+- `pyre_tender/cultistas/`: the Broodsworn Pyre-Tender (`sanctum_pyre_tender.glb`), shipped as
+  delivered (its frozen builder kept for reproduction).
+
 Build (Blender 5.2, absolute output paths; keep one Blender job at a time):
 
     blender -b --factory-startup --python <builder>/build.py -- <abs>/<key>_raw.glb \

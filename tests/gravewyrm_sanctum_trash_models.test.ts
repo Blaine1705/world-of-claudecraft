@@ -12,6 +12,8 @@ import {
   barRate,
   GOADSMITH_BODY,
   GOADSMITH_CLIP,
+  PYRE_TENDER_BODY,
+  PYRE_TENDER_CLIP,
   SCALEGUARD_BODY,
   SCALEGUARD_CLIP,
   THAWCALLER_BODY,
@@ -36,6 +38,7 @@ import {
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
   SANCTUM_GOAD,
+  SANCTUM_PLANT_BRAZIER,
   SANCTUM_THAW_THE_HELD,
   SANCTUM_WARMING_RITE,
 } from '../src/sim/mob/trash_kit/sanctum_cast_ids';
@@ -291,5 +294,28 @@ describe('the Broodsworn Goadsmith', () => {
     expect(brandIronAnchor('broodsworn_goadsmith', 0.86, out)[2]).toBeCloseTo(held[2], 9);
     // Its iron rides its right hand.
     expect(sanctumAnchor('ironTip', 'broodsworn_goadsmith')[1]).toBeLessThan(0);
+  });
+});
+
+describe('the Broodsworn Pyre-Tender', () => {
+  it('ships its own body and sets the brazier down on the bar', () => {
+    expect(clipsOf(`public/${PYRE_TENDER_BODY.url}`)).toEqual(
+      ['Attack', 'Cast', 'Death', 'Hit', 'Idle', 'PlantBrazier', 'Run', 'Walk'].sort(),
+    );
+    expectShipped(PYRE_TENDER_BODY.url);
+    expectDrawnAtRow('broodsworn_pyre_tender');
+    const v = visualOf('broodsworn_pyre_tender');
+    expect(v.url).toBe(PYRE_TENDER_BODY.url);
+    expect(v.castClipSync).toBe(true);
+    expect(v.clips.castByAbility?.[SANCTUM_PLANT_BRAZIER]).toBe('PlantBrazier');
+    expect(MOBS.broodsworn_pyre_tender?.trashKit?.call?.castTime).toBe(1.5);
+    expect(v.clips.castTimeScaleByAbility?.[SANCTUM_PLANT_BRAZIER]).toBeCloseTo(
+      PYRE_TENDER_CLIP.plantBrazier / 1.5,
+      9,
+    );
+    // The yoke fires burn on the braziers out past her shoulders.
+    const yoke = sanctumAnchor('yoke', 'broodsworn_pyre_tender');
+    expect(yoke[1]).toBeCloseTo(0.24, 9);
+    expect(yoke[2]).toBeGreaterThan(0.7);
   });
 });

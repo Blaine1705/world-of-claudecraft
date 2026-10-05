@@ -17,6 +17,7 @@ import {
   BONEGUARD_ID,
   BONEWALKER_ID,
   GOADSMITH_ID,
+  PYRE_TENDER_ID,
   SCALEGUARD_ID,
   THAWCALLER_ID,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
@@ -25,6 +26,7 @@ import {
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
   SANCTUM_GOAD,
+  SANCTUM_PLANT_BRAZIER,
   SANCTUM_THAW_THE_HELD,
   SANCTUM_WARMING_RITE,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
@@ -153,6 +155,20 @@ export const GOADSMITH_BODY: SanctumTrashBody = {
 export const GOADSMITH_CLIP = { goad: 2.0, brandingIron: 2.0, reRivet: 6.0 } as const;
 
 const goadsmith = MOBS[GOADSMITH_ID];
+
+/** The Broodsworn Pyre-Tender: a cultist in soot-black robes under a yoke of
+ *  two burning soul braziers, her hands clamped on its handles. */
+export const PYRE_TENDER_BODY: SanctumTrashBody = {
+  url: `${CREATURES}/sanctum_pyre_tender.glb`,
+  idleHeight: 4.4952,
+  walkRef: 1.125,
+  runRef: 4.5,
+};
+
+/** Its plant's contact frame (seconds at 1x): the brazier set down on the ice. */
+export const PYRE_TENDER_CLIP = { plantBrazier: 1.5 } as const;
+
+const pyreTender = MOBS[PYRE_TENDER_ID];
 
 export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
   // 4.6 yd to the helm's peak at its 1.15.
@@ -285,6 +301,34 @@ export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
         [GOADSMITH_RERIVET]: barRate(GOADSMITH_CLIP.reRivet, KORGATH_TUNING.rerivetChannel),
       },
       castPlayOut: ['Goad', 'BrandingIron', 'ReRivet'],
+    },
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.05,
+  },
+  // 4.4 yd at its 1.65. Plant Soul Brazier stoops under the yoke and sets a
+  // brazier down on the ice on the 1.5 s bar's end (the brazier appears then).
+  sanctum_pyre_tender: {
+    ...sized(PYRE_TENDER_BODY, PYRE_TENDER_ID),
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [SANCTUM_PLANT_BRAZIER]: 'PlantBrazier' },
+      castTimeScaleByAbility: {
+        [SANCTUM_PLANT_BRAZIER]: barRate(
+          PYRE_TENDER_CLIP.plantBrazier,
+          pyreTender?.trashKit?.call?.castTime,
+        ),
+      },
+      castPlayOut: ['PlantBrazier'],
     },
     castClipSync: true,
     castPlayOutHoldsAttacks: true,

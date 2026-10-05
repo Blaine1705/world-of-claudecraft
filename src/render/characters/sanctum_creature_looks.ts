@@ -142,12 +142,6 @@ const STATIC_PROP_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Broodsworn Pyre-Tender: a hooded cultist in soot-black robes; the fx set
-  // the brazier fires burning over her yoke.
-  sanctum_pyre_tender: [
-    PYRE_TENDER_ID,
-    ['mob_hoard_void_acolyte', 0xc0743c, 0.3, { selfIllumination: 0.2 }],
-  ],
   // Rime Whelp: a thawed whelp, pale and frosted, frost on its wings. The
   // grey-blue storm drake rig washed rime-white (dragonkin_baby's green atlas
   // cannot be paled by a tint, which only multiplies; the fx dust it with
