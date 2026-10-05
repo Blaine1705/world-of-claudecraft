@@ -118382,7 +118382,7 @@ Instantly heal an ally for $d or deal moderate Holy damage to an enemy. Either u
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="473">== Description ==
+      <text xml:space="preserve" bytes="471">== Description ==
 Returns a dead group member to life at your side with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group within 30 yards and in your line of sight.
 
 == Facts ==
@@ -118398,7 +118398,7 @@ Returns a dead group member to life at your side with 35% health and mana. A Sun
 | 60
 |-
 ! Cooldown
-| 300s
+| 0s
 |-
 ! Range
 | 30 yd
@@ -122828,7 +122828,7 @@ Rewinds a fallen ally&apos;s timeline, returning them to life at your side with 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="471">== Description ==
+      <text xml:space="preserve" bytes="469">== Description ==
 Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)
 
 == Facts ==
@@ -122844,7 +122844,7 @@ Rewinds every fallen member of your group or raid within 40 yards and in your li
 | 250
 |-
 ! Cooldown
-| 300s
+| 0s
 |-
 ! Range
 | Melee/self
@@ -126906,7 +126906,7 @@ Heal a friendly target for $d, then jump to up to 2 allies within 12 yards. Each
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="453">== Description ==
+      <text xml:space="preserve" bytes="451">== Description ==
 Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritcall)
 
 == Facts ==
@@ -126922,7 +126922,7 @@ Call every fallen member of your group or raid within 40 yards and in your line 
 | 250
 |-
 ! Cooldown
-| 300s
+| 0s
 |-
 ! Range
 | Melee/self
@@ -133291,7 +133291,7 @@ Coax a fallen ally into sudden bloom, returning them to life at your side with 3
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="451">== Description ==
+      <text xml:space="preserve" bytes="449">== Description ==
 Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)
 
 == Facts ==
@@ -133307,7 +133307,7 @@ Call every fallen member of your group or raid within 40 yards and in your line 
 | 250
 |-
 ! Cooldown
-| 300s
+| 0s
 |-
 ! Range
 | Melee/self
@@ -136442,7 +136442,7 @@ Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Hea
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="461">== Description ==
+      <text xml:space="preserve" bytes="459">== Description ==
 Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Benison and Doctrine)
 
 == Facts ==
@@ -136458,7 +136458,7 @@ Call every fallen member of your group or raid within 40 yards and in your line 
 | 250
 |-
 ! Cooldown
-| 300s
+| 0s
 |-
 ! Range
 | Melee/self
