@@ -382,6 +382,16 @@ describe('the Glimmerscale Lurker: the sacred mantis shrimp', () => {
     expect(v.height * (MOBS.glimmerscale_lurker.scale ?? 1)).toBeCloseTo(4.38, 2);
   });
 
+  it('wears the sculpted armour of round two, baked, in budget', () => {
+    const path = 'public/models/creatures/temple_lurker.glb';
+    const body = glbJson(path).materials?.find((m) => m.name === 'GlimmerscaleLurkerBody');
+    expect(body?.emissiveTexture).toBeDefined();
+    // the keels, pleura, ringed legs and combed claws need a denser body than
+    // the smooth first shell (about 17.8k triangles)
+    expect(trianglesOf(path)).toBeGreaterThan(20000);
+    expect(trianglesOf(path)).toBeLessThan(30000);
+  });
+
   it('pounces in the jump slots and spits Glimmer Venom on its bar', () => {
     const v = visualOf('glimmerscale_lurker');
     const c = v.clips;

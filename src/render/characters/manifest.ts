@@ -4882,7 +4882,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Glimmerscale Lurker (glimmerscale_lurker; scripts/assets/
   // drowned_temple_creatures/lurker_mantis/): a giant mantis shrimp the
   // moon-water made sacred, long, low and armoured in iridescent plates
-  // (turquoise to violet, pearl rims, a carved crescent on every tergite),
+  // (turquoise to violet, pearl rims, a carved crescent on every tergite;
+  // round two sculpts the armour: keels down every plate, hooked pleura down
+  // its flanks, swimmerets, a ribbed shield and a rostral spine, ringed and
+  // spurred legs, a combed propodus and a hammer-ringed club, a pitted shell),
   // its front half reared, eyes on turning stalks banded in silver, two
   // raptorial arms folded like jackknives, a tail fan of nacre paddles. Its
   // swings snap the arms out (Attack: both, Attack2: one; contact at 0.16).
