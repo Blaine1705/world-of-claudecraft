@@ -60,12 +60,14 @@ import type { BasinFxHost } from './basin_fx_host';
 import { huntRingMaterial } from './basin_mark_art';
 import { dreadSkullTexture, quarrySigilTexture } from './basin_trash_art';
 import {
-  dreadSkullLook,
+  type DreadSkullLook,
+  dreadSkullLookInto,
   frenzyGlow,
   HEX_BOLT_SPEED,
   KICK_GLYPH_RADIUS,
   projectileFlight,
-  quarryMarkLook,
+  type QuarryMarkLook,
+  quarryMarkLookInto,
   RAPTOR_PACK_FRENZY_AURA,
   SNARLBARK_ABILITY,
   SPEAR_SPEED,
@@ -74,6 +76,7 @@ import {
   TONGUE_RETRACT_SECONDS,
   TONGUE_SHOOT_SECONDS,
   TRASH_ACCENTS,
+  TRASH_FX_POOLS,
   TRASH_SHOCKS,
   type TrashCastSpec,
   type TrashShock,
@@ -86,15 +89,21 @@ import {
   trashCastSpecs,
 } from './basin_trash_fx_core';
 
-const RING_SLOTS = 6;
-const KICK_SLOTS = 4;
-const LANE_SLOTS = 3;
-const SPEAR_SLOTS = 4;
-const HEX_SLOTS = 4;
-const MARK_SLOTS = 5;
+// The actionable pools hold the basin's worst pull plus the next worst chained
+// into it (TRASH_FX_POOLS, off the spawn table; pinned in the core test), so a
+// full pull never drops a telegraph. The frenzy pool is cosmetic only.
+const RING_SLOTS = TRASH_FX_POOLS.rings;
+const KICK_SLOTS = TRASH_FX_POOLS.kicks;
+const LANE_SLOTS = TRASH_FX_POOLS.lanes;
+const SPEAR_SLOTS = TRASH_FX_POOLS.spears;
+const HEX_SLOTS = TRASH_FX_POOLS.hexes;
+const MARK_SLOTS = TRASH_FX_POOLS.marks;
 const FRENZY_SLOTS = 14;
-const SKULL_SLOTS = 4;
-const TONGUE_SLOTS = 4;
+const SKULL_SLOTS = TRASH_FX_POOLS.skulls;
+const TONGUE_SLOTS = TRASH_FX_POOLS.tongues;
+/** Trail motes a second off a spear or a hex bolt in flight (full density). */
+const SPEAR_TRAIL_RATE = 70;
+const HEX_TRAIL_RATE = 60;
 /** Seconds the dread skull flares after its burst. */
 const SKULL_FLASH_SECONDS = 0.55;
 
@@ -115,6 +124,8 @@ interface Flight {
   targetId: number;
   from: THREE.Vector3;
   to: THREE.Vector3;
+  /** The trail's mote accumulator (frame-rate independent). */
+  trail: number;
 }
 interface SpearSlot extends Flight {
   body: THREE.Group;
@@ -195,6 +206,9 @@ export class BasinTrashFx {
   private readonly style = { color: 0xffffff, accent: 0xffffff };
   private readonly arc = { x: 0, y: 0, z: 0 };
   private readonly mouth = { x: 0, y: 0, z: 0 };
+  /** Reused per-frame looks (the quarry sigil, the dread skull). */
+  private readonly markLook: QuarryMarkLook = { alpha: 0, size: 0 };
+  private readonly skullLook: DreadSkullLook = { alpha: 0, eyes: 0, size: 0 };
   private readonly tmpA = new THREE.Vector3();
   private readonly tmpB = new THREE.Vector3();
   private readonly up = new THREE.Vector3(0, 1, 0);
@@ -219,17 +233,28 @@ export class BasinTrashFx {
     drag: 2,
   };
   private clock = 0;
+  private disposed = false;
 
   constructor(
     private readonly host: BasinFxHost,
     private readonly world: IWorld,
   ) {
     const { root, kit } = host;
-    for (let i = 0; i < RING_SLOTS; i++)
-      this.rings.push({ ...kit.fan(18), casterId: -1, castId: '' });
-    for (let i = 0; i < KICK_SLOTS; i++)
-      this.kicks.push({ ...kit.fan(19), casterId: -1, castId: '' });
-    for (let i = 0; i < LANE_SLOTS; i++) this.lanes.push({ ...kit.lane(17), casterId: -1 });
+    for (let i = 0; i < RING_SLOTS; i++) {
+      const fan = kit.fan(18);
+      fan.group.name = 'wildheart-trash-ring';
+      this.rings.push({ ...fan, casterId: -1, castId: '' });
+    }
+    for (let i = 0; i < KICK_SLOTS; i++) {
+      const fan = kit.fan(19);
+      fan.group.name = 'wildheart-trash-kick';
+      this.kicks.push({ ...fan, casterId: -1, castId: '' });
+    }
+    for (let i = 0; i < LANE_SLOTS; i++) {
+      const lane = kit.lane(17);
+      lane.group.name = 'wildheart-trash-lane';
+      this.lanes.push({ ...lane, casterId: -1 });
+    }
     const glowTex = radialGlowTexture();
     // Minted per call (not a shared cache): this fx owns and disposes them.
     this.textures.push(glowTex);
@@ -261,6 +286,7 @@ export class BasinTrashFx {
     const headMat = surfaceMat({ color: 0xeee0c2, roughness: 0.55, emissive: 0x1c140a });
     for (let i = 0; i < SPEAR_SLOTS; i++) {
       const body = new THREE.Group();
+      body.name = 'wildheart-trash-spear';
       body.visible = false;
       for (const [geo, mat] of [
         [shaftGeo, shaftMat],
@@ -291,10 +317,12 @@ export class BasinTrashFx {
     this.geometries.push(ringGeo);
     for (let i = 0; i < MARK_SLOTS; i++) {
       const s = sprite(0xffffff, 1, 'wildheartQuarrySigil', sigilTex, false);
+      s.s.name = 'wildheart-quarry-sigil';
       const ringMat = huntRingMaterial(host.uTime);
       (ringMat.uniforms.uColor.value as THREE.Color).setHex(TRASH_ACCENTS.quarry);
       this.materials.push(ringMat);
       const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.name = 'wildheart-quarry-ring';
       ring.frustumCulled = false;
       ring.visible = false;
       ring.renderOrder = floorVfxRenderOrder('encounter', 6);
@@ -339,6 +367,7 @@ export class BasinTrashFx {
     for (let i = 0; i < SKULL_SLOTS; i++) {
       const eyes = sprite(TRASH_ACCENTS.dread, 0.6, 'wildheartDreadEyes');
       const s = sprite(0xffffff, 1, 'wildheartDreadSkull', skullTex, false);
+      s.s.name = 'wildheart-dread-skull';
       this.skulls.push({
         sprite: s.s,
         mat: s.mat,
@@ -357,6 +386,7 @@ export class BasinTrashFx {
     const padMat = surfaceMat({ color: 0xe07890, roughness: 0.25, emissive: 0x4a0c1a });
     for (let i = 0; i < TONGUE_SLOTS; i++) {
       const body = new THREE.Mesh(tongueGeo, fleshMat);
+      body.name = 'wildheart-trash-tongue';
       body.frustumCulled = false;
       body.visible = false;
       const tip = new THREE.Mesh(tipGeo, padMat);
@@ -384,6 +414,7 @@ export class BasinTrashFx {
   /** True when the event is one of the hunt's own (the renderer then skips
    *  its generic draw). Snarlbark's damage keeps its numbers (false). */
   handleEvent(ev: SimEvent): boolean {
+    if (this.disposed) return false;
     if (ev.type === 'damage') {
       if (ev.ability === SNARLBARK_ABILITY && ev.kind === 'hit') this.snarlbark(ev);
       return false;
@@ -504,17 +535,18 @@ export class BasinTrashFx {
     slot.flight = projectileFlight(d, speed);
     slot.apex = speed === SPEAR_SPEED ? spearApex(d) : 0.3;
     slot.targetId = target.id;
+    slot.trail = 0;
   }
 
   private throwSpear(src: Entity, target: Entity): void {
-    const s = this.spears.find((x) => !x.alive) ?? this.spears[0];
+    const s = freeFlight(this.spears);
     this.launch(s, src, target, SPEAR_SPEED);
     s.body.visible = true;
     s.glow.visible = true;
   }
 
   private throwHex(src: Entity, target: Entity): void {
-    const s = this.hexes.find((x) => !x.alive) ?? this.hexes[0];
+    const s = freeFlight(this.hexes);
     this.launch(s, src, target, HEX_BOLT_SPEED);
     s.orb.visible = true;
     s.core.visible = true;
@@ -647,8 +679,21 @@ export class BasinTrashFx {
     for (const id of this.caught) this.claimTongue(toad.id, id);
   }
 
+  /** A tongue for (toad, player): the one already out to them if the toad
+   *  fires again before it lets go, else a free one. The pool holds every
+   *  toad's whole party (TRASH_FX_POOLS.tongues), so a caught player always
+   *  gets theirs. */
   private claimTongue(casterId: number, targetId: number): TongueSlot | null {
-    const s = this.tongues.find((t) => t.casterId < 0);
+    let s: TongueSlot | null = null;
+    let free: TongueSlot | null = null;
+    for (const t of this.tongues) {
+      if (t.casterId === casterId && t.targetId === targetId) {
+        s = t;
+        break;
+      }
+      if (!free && t.casterId < 0) free = t;
+    }
+    s ??= free;
     if (!s) return null;
     s.casterId = casterId;
     s.targetId = targetId;
@@ -727,25 +772,25 @@ export class BasinTrashFx {
     this.toadsNext = prev;
   }
 
+  // The 10 Hz scan's claims: plain loops (no closure per entity per scan).
+
   private claimCast(e: Entity, castId: string, spec: TrashCastSpec): void {
     if (spec.shape === 'lane') {
-      if (!this.lanes.some((l) => l.casterId === e.id)) {
-        const lane = this.lanes.find((l) => l.casterId < 0);
-        if (lane) {
-          lane.casterId = e.id;
-          lane.group.visible = true;
-        }
+      const lane = claimable(this.lanes, e.id);
+      if (lane) {
+        lane.casterId = e.id;
+        lane.group.visible = true;
       }
-    } else if (!this.rings.some((r) => r.casterId === e.id && r.castId === castId)) {
-      const r = this.rings.find((s) => s.casterId < 0);
+    } else {
+      const r = claimableCast(this.rings, e.id, castId);
       if (r) {
         this.host.kit.layOutFan(r, 360, { color: spec.color, accent: spec.accent });
         r.casterId = e.id;
         r.castId = castId;
       }
     }
-    if (!spec.kick || this.kicks.some((k) => k.casterId === e.id && k.castId === castId)) return;
-    const k = this.kicks.find((s) => s.casterId < 0);
+    if (!spec.kick) return;
+    const k = claimableCast(this.kicks, e.id, castId);
     if (!k) return;
     this.host.kit.layOutFan(k, 360, {
       color: TELEGRAPH_THREAT_COLORS.interrupt,
@@ -758,17 +803,25 @@ export class BasinTrashFx {
   }
 
   private claimMark(e: Entity): void {
-    if (this.marks.some((m) => m.entityId === e.id)) return;
-    const m = this.marks.find((s) => s.entityId < 0);
+    let m: MarkSlot | null = null;
+    for (const s of this.marks) {
+      if (s.entityId === e.id) return;
+      if (!m && s.entityId < 0) m = s;
+    }
     if (!m) return;
     m.entityId = e.id;
-    m.sprite.visible = true;
+    // The rakes at the feet show at once (the sim marks at the landing); the
+    // sigil waits for the spear (paintMarks).
     m.ring.visible = true;
+    m.sprite.visible = !this.spearInFlightTo(e.id);
   }
 
   private claimFrenzy(e: Entity, kind: FrenzyKind): void {
-    if (this.frenzies.some((f) => f.entityId === e.id && f.kind === kind)) return;
-    const f = this.frenzies.find((s) => s.entityId < 0);
+    let f: FrenzySlot | null = null;
+    for (const s of this.frenzies) {
+      if (s.entityId === e.id && s.kind === kind) return;
+      if (!f && s.entityId < 0) f = s;
+    }
     if (!f) return;
     f.entityId = e.id;
     f.kind = kind;
@@ -785,8 +838,11 @@ export class BasinTrashFx {
   }
 
   private claimSkull(e: Entity): void {
-    if (this.skulls.some((s) => s.entityId === e.id)) return;
-    const s = this.skulls.find((x) => x.entityId < 0);
+    let s: SkullSlot | null = null;
+    for (const x of this.skulls) {
+      if (x.entityId === e.id) return;
+      if (!s && x.entityId < 0) s = x;
+    }
     if (!s) return;
     s.entityId = e.id;
     s.flashAt = -1;
@@ -798,13 +854,14 @@ export class BasinTrashFx {
   // ------------------------------------------------------------------- frame
 
   update(dt: number, clock: number): void {
+    if (this.disposed) return;
     this.clock = clock;
     const world = this.world;
     this.paintRings(world);
     this.paintKicks(world);
     this.paintLanes(world);
     this.paintSpears(world, dt);
-    this.paintHexes(world);
+    this.paintHexes(world, dt);
     this.paintMarks(world);
     this.paintFrenzies(world, dt);
     this.paintSkulls(world, dt);
@@ -968,8 +1025,11 @@ export class BasinTrashFx {
       this.tmpA.set(this.arc.x, this.arc.y, this.arc.z);
       if (this.tmpA.distanceToSquared(s.body.position) > 1e-8) s.body.lookAt(this.tmpA);
       s.glow.position.set(x, y, z);
-      // A streak of hot paint dust off the shaft (cosmetic).
-      if (this.host.rand() < dt * 70) {
+      // A streak of hot paint dust off the shaft (cosmetic: thins with the
+      // density, a steady rate whatever the frame rate).
+      s.trail += dt * SPEAR_TRAIL_RATE * this.host.density;
+      while (s.trail >= 1) {
+        s.trail -= 1;
         const m = this.trailMote;
         m.color[0] = 1;
         m.color[1] = 0.62;
@@ -981,7 +1041,7 @@ export class BasinTrashFx {
     }
   }
 
-  private paintHexes(world: IWorld): void {
+  private paintHexes(world: IWorld, dt: number): void {
     for (const s of this.hexes) {
       if (!s.alive) continue;
       if (!this.fly(s, world)) {
@@ -1004,13 +1064,18 @@ export class BasinTrashFx {
       s.orb.position.set(x, y + wobble, z);
       s.core.position.set(x, y + wobble, z);
       s.orb.scale.setScalar(1.3 + 0.3 * Math.sin(this.clock * 30));
-      const m = this.trailMote;
-      m.color[0] = 0.7;
-      m.color[1] = 0.95;
-      m.color[2] = 0.32;
-      m.size[0] = 0.7;
-      m.size[1] = 0.12;
-      this.host.puff(x, y, z, 1, m);
+      // The hex's green shimmer behind it (cosmetic, as the spear's).
+      s.trail += dt * HEX_TRAIL_RATE * this.host.density;
+      while (s.trail >= 1) {
+        s.trail -= 1;
+        const m = this.trailMote;
+        m.color[0] = 0.7;
+        m.color[1] = 0.95;
+        m.color[2] = 0.32;
+        m.size[0] = 0.7;
+        m.size[1] = 0.12;
+        this.host.puff(x, y, z, 1, m);
+      }
     }
   }
 
@@ -1025,20 +1090,22 @@ export class BasinTrashFx {
         m.ring.visible = false;
         continue;
       }
-      // The mark shows when the spear strikes home, not as it leaves the hand.
+      const look = quarryMarkLookInto(this.markLook, aura.remaining, aura.duration, this.clock);
+      // The claw rakes at their feet from the moment the quarry wears the
+      // mark (the sim applies it at the landing): the quarry read from any
+      // angle, the raptors already on their way.
+      m.ring.visible = true;
+      m.ring.position.set(e.pos.x, this.host.groundY(e.pos.x, e.pos.z) + 0.08, e.pos.z);
+      m.ring.scale.setScalar(1.6 + 0.3 * look.size);
+      m.ringMat.uniforms.uAlpha.value = look.alpha;
+      // Only the painted sigil overhead waits for the spear to strike home.
       const inFlight = this.spearInFlightTo(e.id);
       m.sprite.visible = !inFlight;
-      m.ring.visible = !inFlight;
       if (inFlight) continue;
-      const look = quarryMarkLook(aura.remaining, aura.duration, this.clock);
       const h = trashBodyHeight(e.templateId, e.scale || 1);
       m.sprite.position.set(e.pos.x, e.pos.y + h + 1.3, e.pos.z);
       m.sprite.scale.setScalar(look.size * 1.35);
       m.mat.opacity = look.alpha;
-      // The claw rakes at their feet: the quarry read from any angle.
-      m.ring.position.set(e.pos.x, this.host.groundY(e.pos.x, e.pos.z) + 0.08, e.pos.z);
-      m.ring.scale.setScalar(1.6 + 0.3 * look.size);
-      m.ringMat.uniforms.uAlpha.value = look.alpha;
     }
   }
 
@@ -1119,7 +1186,7 @@ export class BasinTrashFx {
         continue;
       }
       const fill = e.castingAbility === WILDHEART_RATTLING_DREAD ? this.castFill(e) : 0;
-      const look = dreadSkullLook(fill, this.clock);
+      const look = dreadSkullLookInto(this.skullLook, fill, this.clock);
       const flashT = s.flashAt >= 0 ? (this.clock - s.flashAt) / SKULL_FLASH_SECONDS : 1;
       const flash = flashT < 1 ? 1 - flashT : 0;
       const h = trashBodyHeight(e.templateId, e.scale || 1);
@@ -1280,7 +1347,11 @@ export class BasinTrashFx {
 
   /** Out of the basin: nothing stands frozen where the fight left it. */
   hideAll(): void {
-    for (const s of [...this.rings, ...this.kicks]) {
+    for (const s of this.rings) {
+      s.casterId = -1;
+      s.group.visible = false;
+    }
+    for (const s of this.kicks) {
       s.casterId = -1;
       s.group.visible = false;
     }
@@ -1317,10 +1388,25 @@ export class BasinTrashFx {
     this.toads.length = 0;
   }
 
+  /** Releases what this fx minted (its geometries, its own materials and
+   *  textures; never the surfaceMat cache's surfaces, never the host kit's
+   *  fans). Best effort: one throwing release never strands the rest, the
+   *  failures surface together as one AggregateError. Idempotent. */
   dispose(): void {
-    for (const g of this.geometries) g.dispose();
-    for (const m of this.materials) m.dispose();
-    for (const t of this.textures) t.dispose();
+    if (this.disposed) return;
+    this.disposed = true;
+    const errors: unknown[] = [];
+    const attempt = (release: () => void): void => {
+      try {
+        release();
+      } catch (e) {
+        errors.push(e);
+      }
+    };
+    for (const g of this.geometries) attempt(() => g.dispose());
+    for (const m of this.materials) attempt(() => m.dispose());
+    for (const t of this.textures) attempt(() => t.dispose());
+    if (errors.length > 0) throw new AggregateError(errors, 'BasinTrashFx dispose');
   }
 }
 
@@ -1337,7 +1423,43 @@ function flight(): Flight {
     targetId: -1,
     from: new THREE.Vector3(),
     to: new THREE.Vector3(),
+    trail: 0,
   };
+}
+
+/** A free flight slot, else the first (a new throw takes over the oldest
+ *  pooled one; the pool holds the worst pull's throwers). */
+function freeFlight<T extends Flight>(slots: readonly T[]): T {
+  for (const s of slots) if (!s.alive) return s;
+  return slots[0];
+}
+
+/** A free slot for a caster that holds none yet (null when it already holds
+ *  one, or the pool is full). */
+function claimable<T extends { casterId: number }>(
+  slots: readonly T[],
+  casterId: number,
+): T | null {
+  let free: T | null = null;
+  for (const s of slots) {
+    if (s.casterId === casterId) return null;
+    if (!free && s.casterId < 0) free = s;
+  }
+  return free;
+}
+
+/** As claimable, keyed on the caster and its cast. */
+function claimableCast<T extends { casterId: number; castId: string }>(
+  slots: readonly T[],
+  casterId: number,
+  castId: string,
+): T | null {
+  let free: T | null = null;
+  for (const s of slots) {
+    if (s.casterId === casterId && s.castId === castId) return null;
+    if (!free && s.casterId < 0) free = s;
+  }
+  return free;
 }
 
 /** The aura on the entity (a loop: no per-frame closure). */

@@ -10,16 +10,18 @@ import { WILDHEART_MOB_KEYS } from '../src/render/characters/wildheart_creature_
 import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph/telegraph_look_core';
 import { basinTelegraphSpecs } from '../src/render/wildheart_basin/basin_fx_core';
 import {
-  dreadSkullLook,
+  dreadSkullLookInto,
   HUNT_TUNING,
   KICK_GLYPH_RADIUS,
   projectileFlight,
-  quarryMarkLook,
+  quarryMarkLookInto,
   RAPTOR_PACK_FRENZY_AURA,
   SNARLBARK_ABILITY,
   TOAD_MOUTH,
   TRASH_BODY_HEIGHT,
   TRASH_CAST_CLIPS,
+  TRASH_FX_POOLS,
+  TRASH_PARTY_SIZE,
   TRASH_SHOCKS,
   toadMouthInto,
   tongueCatchInto,
@@ -29,8 +31,11 @@ import {
   trashCastClipRate,
   trashCastKickable,
   trashCastSpecs,
+  trashFxPools,
+  trashPullCensuses,
   trashShockLook,
 } from '../src/render/wildheart_basin/basin_trash_fx_core';
+import { WILDHEART_BASIN_PACKS, WILDHEART_BASIN_SPAWNS } from '../src/sim/content/wildheart';
 import { MOBS } from '../src/sim/data';
 import {
   BASIN_RAPTOR_ID,
@@ -39,6 +44,7 @@ import {
   SPORE_TOAD_ID,
   STALKER_ID,
   SUNBONE_DREAD_TOTEM_ID,
+  TOTEM_BINDER_ID,
   VINE_LASHER_ID,
 } from '../src/sim/encounters/wildheart_basin/ids';
 import { inLane } from '../src/sim/mob/trash_kit/lane';
@@ -51,6 +57,7 @@ import {
   WILDHEART_TOAD_HEX,
   WILDHEART_WAR_ROAR,
 } from '../src/sim/mob/trash_kit/wildheart_cast_ids';
+import { PARTY_MAX } from '../src/sim/social/party';
 
 const hunt = (id: string) => MOBS[id]?.trashKit?.wildheart;
 
@@ -241,18 +248,31 @@ describe('the hunt bodies and clips', () => {
 
 describe('the hunt looks', () => {
   it('pops the quarry sigil in and fades it out with the mark', () => {
-    const fresh = quarryMarkLook(6, 6, 0);
-    const held = quarryMarkLook(3, 6, 0);
+    const look = () => ({ alpha: 0, size: 0 });
+    const fresh = quarryMarkLookInto(look(), 6, 6, 0);
+    const held = quarryMarkLookInto(look(), 3, 6, 0);
     expect(fresh.size).toBeLessThan(held.size);
-    expect(quarryMarkLook(0, 6, 0).alpha).toBe(0);
+    expect(quarryMarkLookInto(look(), 0, 6, 0).alpha).toBe(0);
     expect(held.alpha).toBeGreaterThan(0.8);
   });
 
   it('burns the skull eyes hotter as the dread bar runs', () => {
+    const look = () => ({ alpha: 0, eyes: 0, size: 0 });
     for (const t of [0, 0.3, 1.7]) {
-      expect(dreadSkullLook(1, t).eyes).toBeGreaterThan(dreadSkullLook(0, t).eyes);
-      expect(dreadSkullLook(1, t).size).toBeGreaterThan(dreadSkullLook(0, t).size);
+      const full = dreadSkullLookInto(look(), 1, t);
+      const idle = dreadSkullLookInto(look(), 0, t);
+      expect(full.eyes).toBeGreaterThan(idle.eyes);
+      expect(full.size).toBeGreaterThan(idle.size);
     }
+  });
+
+  it('writes the looks into the caller record (no per-frame object)', () => {
+    const mark = { alpha: -1, size: -1 };
+    expect(quarryMarkLookInto(mark, 3, 6, 0.4)).toBe(mark);
+    expect(mark.alpha).toBeGreaterThan(0);
+    const skull = { alpha: -1, eyes: -1, size: -1 };
+    expect(dreadSkullLookInto(skull, 0.5, 0.4)).toBe(skull);
+    expect(skull.size).toBeCloseTo(1.75, 6);
   });
 
   it('keeps a projectile on screen long enough to read, never a slow lob', () => {
@@ -260,5 +280,84 @@ describe('the hunt looks', () => {
     expect(projectileFlight(23, 46)).toBeCloseTo(0.5, 6);
     expect(projectileFlight(500, 46)).toBe(0.9);
     expect(projectileFlight(Number.NaN, 46)).toBe(0.12);
+  });
+});
+
+// ---- the pools: every actionable telegraph has a slot in the worst pull -------
+
+/** An independent recount of one Wildheart pull, by template (the casts the
+ *  trash pass gives each body; a Totem-Binder's at most `maxAlive` totems,
+ *  all of them Dread Totems in the worst case). */
+function recount(pack: string) {
+  const members = WILDHEART_BASIN_SPAWNS.filter((s) => s.packId === pack).map((s) => s.mobId);
+  const n = (id: string) => members.filter((m) => m === id).length;
+  const binders = n(TOTEM_BINDER_ID);
+  const maxAlive = hunt(TOTEM_BINDER_ID)?.totems?.maxAlive ?? 0;
+  const dread = n(SUNBONE_DREAD_TOTEM_ID) + binders * maxAlive;
+  return {
+    // Quarry Mark, War Roar, Toad Hex, Rattling Dread: one ring a caster.
+    rings: n(STALKER_ID) + n(RAVAGER_ID) + n(HEXCALLER_ID) + dread,
+    // The kickable ones: the War Roar and the Toad Hex.
+    kicks: n(RAVAGER_ID) + n(HEXCALLER_ID),
+    toads: n(SPORE_TOAD_ID),
+    skulls: dread,
+    stalkers: n(STALKER_ID),
+    hexcallers: n(HEXCALLER_ID),
+  };
+}
+
+/** The worst pull plus the next worst chained into it. */
+function worstTwo(values: number[]): number {
+  const sorted = [...values].sort((a, b) => b - a);
+  return (sorted[0] ?? 0) + (sorted[1] ?? 0);
+}
+
+describe('the trash fx pools hold the worst real pull', () => {
+  const pulls = WILDHEART_BASIN_PACKS.map((p) => ({ pack: p, ...recount(p) }));
+  const worst = (k: keyof ReturnType<typeof recount>) => Math.max(...pulls.map((p) => p[k]));
+  const chained = (k: keyof ReturnType<typeof recount>) => worstTwo(pulls.map((p) => p[k]));
+
+  it('counts every pull as the independent recount does', () => {
+    const census = trashPullCensuses(WILDHEART_BASIN_SPAWNS);
+    for (const p of pulls) {
+      const c = census.get(p.pack);
+      expect(c, p.pack).toBeDefined();
+      expect(c?.rings, p.pack).toBe(p.rings);
+      expect(c?.kicks, p.pack).toBe(p.kicks);
+      expect(c?.lanes, p.pack).toBe(p.toads);
+      expect(c?.skulls, p.pack).toBe(p.skulls);
+      expect(c?.spears, p.pack).toBe(p.stalkers);
+      expect(c?.hexes, p.pack).toBe(p.hexcallers);
+    }
+    // The packs the review named: g12 is the ringed worst, g6 holds three
+    // Spore Toads, g13 two, and every binder can stand two Dread Totems.
+    expect(recount('g12').rings).toBe(5);
+    expect(recount('g6').toads).toBe(3);
+    expect(recount('g13').toads).toBe(2);
+    expect(worst('skulls')).toBe(2);
+  });
+
+  it('sizes every actionable pool past the worst pull, with a chained pull of headroom', () => {
+    expect(TRASH_FX_POOLS).toEqual(trashFxPools(WILDHEART_BASIN_SPAWNS));
+    expect(TRASH_FX_POOLS.rings).toBe(chained('rings'));
+    expect(TRASH_FX_POOLS.rings).toBeGreaterThan(worst('rings'));
+    expect(TRASH_FX_POOLS.kicks).toBe(chained('kicks'));
+    expect(TRASH_FX_POOLS.kicks).toBeGreaterThan(worst('kicks'));
+    expect(TRASH_FX_POOLS.lanes).toBe(chained('toads'));
+    expect(TRASH_FX_POOLS.lanes).toBeGreaterThan(worst('toads'));
+    expect(TRASH_FX_POOLS.skulls).toBe(chained('skulls'));
+    expect(TRASH_FX_POOLS.skulls).toBeGreaterThan(worst('skulls'));
+    expect(TRASH_FX_POOLS.spears).toBeGreaterThanOrEqual(worst('stalkers'));
+    expect(TRASH_FX_POOLS.hexes).toBeGreaterThanOrEqual(worst('hexcallers'));
+  });
+
+  it('gives every player a reeling tongue catches its own tongue, and every quarry its mark', () => {
+    // The Snaring Tongue catches every player in its lane: a whole party per
+    // toad, every toad of the pull (and the chained one) at once.
+    expect(TRASH_PARTY_SIZE).toBe(PARTY_MAX);
+    expect(PARTY_MAX).toBe(5);
+    expect(TRASH_FX_POOLS.tongues).toBe(TRASH_FX_POOLS.lanes * PARTY_MAX);
+    expect(TRASH_FX_POOLS.tongues).toBeGreaterThanOrEqual(worst('toads') * PARTY_MAX);
+    expect(TRASH_FX_POOLS.marks).toBe(PARTY_MAX);
   });
 });

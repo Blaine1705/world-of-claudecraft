@@ -16,8 +16,12 @@
 //    and holding the reeled player to the toad's mouth;
 //  - Snarlbark (Snarlvine Lasher): the splinters on a melee attacker.
 //
+// The pools the painter holds are sized here too (TRASH_FX_POOLS), off the
+// basin's own spawn table, so a full pull never runs a telegraph out of slots.
+//
 // Three-free, DOM-free, deterministic.
 
+import { WILDHEART_BASIN_SPAWNS } from '../../sim/content/wildheart';
 import { MOBS } from '../../sim/data';
 import {
   BASIN_RAPTOR_ID,
@@ -39,6 +43,7 @@ import {
   WILDHEART_WAR_ROAR,
 } from '../../sim/mob/trash_kit/wildheart_cast_ids';
 import type { WildheartKitDef } from '../../sim/mob/trash_kit/wildheart_kit_types';
+import { PARTY_MAX } from '../../sim/social/party';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { shockRingLook } from './basin_boss_fx_core';
 import { basinTelegraphSpecs } from './basin_fx_core';
@@ -271,19 +276,29 @@ export function spearApex(distance: number): number {
 
 // ---- the marks and glows ------------------------------------------------------------
 
-/** The quarry sigil's look with `remaining` of its `duration` seconds left. */
-export function quarryMarkLook(
+/** The quarry sigil's look: written into a caller-owned record each frame. */
+export interface QuarryMarkLook {
+  alpha: number;
+  size: number;
+}
+
+/** The quarry sigil's look with `remaining` of its `duration` seconds left,
+ *  written into `out` (allocation-free). */
+export function quarryMarkLookInto(
+  out: QuarryMarkLook,
   remaining: number,
   duration: number,
   t: number,
-): { alpha: number; size: number } {
+): QuarryMarkLook {
   const beat = 0.5 + 0.5 * Math.sin(t * 8);
   // Pops in at full size, fades over its last half-second.
   const span = duration > 0 ? duration : 1;
   const age = span - Math.max(0, remaining);
   const pop = Math.min(1, age / 0.18);
-  const out = Math.min(1, Math.max(0, remaining) / 0.5);
-  return { alpha: (0.82 + 0.18 * beat) * out, size: (1.6 + 0.18 * beat) * (0.6 + 0.4 * pop) };
+  const fade = Math.min(1, Math.max(0, remaining) / 0.5);
+  out.alpha = (0.82 + 0.18 * beat) * fade;
+  out.size = (1.6 + 0.18 * beat) * (0.6 + 0.4 * pop);
+  return out;
 }
 
 /** A frenzy's breathing (0..1) at clock `t`: the pack's a quick pant, the
@@ -294,15 +309,23 @@ export function frenzyGlow(kind: 'pack' | 'roar' | 'hunt', t: number): number {
   return 0.55 + 0.25 * Math.sin(t * 7) ** 2;
 }
 
-/** The dread skull's look while its totem stands; `fill` is the dread bar
- *  (0 when idle): its eyes burn hotter and it swells as the bar runs. */
-export function dreadSkullLook(
-  fill: number,
-  t: number,
-): { alpha: number; eyes: number; size: number } {
+/** The dread skull's look: written into a caller-owned record each frame. */
+export interface DreadSkullLook {
+  alpha: number;
+  eyes: number;
+  size: number;
+}
+
+/** The dread skull's look while its totem stands, written into `out`
+ *  (allocation-free); `fill` is the dread bar (0 when idle): its eyes burn
+ *  hotter and it swells as the bar runs. */
+export function dreadSkullLookInto(out: DreadSkullLook, fill: number, t: number): DreadSkullLook {
   const f = Math.min(1, Math.max(0, fill));
   const beat = 0.5 + 0.5 * Math.sin(t * (2.4 + 9 * f));
-  return { alpha: 0.85 + 0.15 * beat, eyes: 0.45 + 0.35 * beat + 0.6 * f, size: 1.5 + 0.5 * f };
+  out.alpha = 0.85 + 0.15 * beat;
+  out.eyes = 0.45 + 0.35 * beat + 0.6 * f;
+  out.size = 1.5 + 0.5 * f;
+  return out;
 }
 
 // ---- the shocks ---------------------------------------------------------------------
@@ -388,3 +411,126 @@ export function tongueCatchInto(
   }
   return out;
 }
+
+// ---- the pools ------------------------------------------------------------------------
+
+/** Who wears a hunt mark at once at most: a whole party (sim/social/party.ts). */
+export const TRASH_PARTY_SIZE = PARTY_MAX;
+
+/** What one pull can put on the floor at once, counted off its members. */
+export interface TrashPullCensus {
+  /** Ringed casts (the Quarry Mark, the War Roar, the Toad Hex, the Rattling
+   *  Dread): one ring per caster, since a caster runs one bar at a time. */
+  rings: number;
+  /** Kick glyphs: the casters of a cast the sim lets a player kick. */
+  kicks: number;
+  /** Snaring Tongue lanes: one per Spore Toad. */
+  lanes: number;
+  /** Dread skulls: one per Sunbone Dread Totem standing. */
+  skulls: number;
+  /** Marking spears in flight: one per Vineclaw Stalker. */
+  spears: number;
+  /** Hex bolts in flight: one per Sunbone Hexcaller. */
+  hexes: number;
+}
+
+/** The hunt key of each template block a cast can sit under. */
+const HUNT_CAST_KEYS = ['mark', 'roar', 'hex', 'dread', 'tongue'] as const;
+
+function emptyCensus(): TrashPullCensus {
+  return { rings: 0, kicks: 0, lanes: 0, skulls: 0, spears: 0, hexes: 0 };
+}
+
+/** Add `n` bodies of `templateId` (its own hunt casts) to the census. */
+function countHunter(c: TrashPullCensus, templateId: string, n: number): void {
+  const def = hunt(templateId);
+  if (!def || n <= 0) return;
+  const specs = trashCastSpecs();
+  for (const key of HUNT_CAST_KEYS) {
+    const castId = def[key]?.castId;
+    const spec = castId ? specs[castId] : undefined;
+    if (!castId || !spec) continue;
+    if (spec.shape === 'lane') c.lanes += n;
+    else c.rings += n;
+    if (spec.kick) c.kicks += n;
+    if (castId === WILDHEART_RATTLING_DREAD) c.skulls += n;
+    if (castId === WILDHEART_QUARRY_MARK) c.spears += n;
+    if (castId === WILDHEART_TOAD_HEX) c.hexes += n;
+  }
+}
+
+/** The census of one pull (its members' template ids). A totem planter counts
+ *  its `maxAlive` of EVERY summon that casts: the cycle can leave two of the
+ *  same kind standing once the other kind is broken, so the worst case is all
+ *  of them. */
+export function trashPullCensus(members: readonly string[]): TrashPullCensus {
+  const c = emptyCensus();
+  for (const id of members) {
+    countHunter(c, id, 1);
+    const totems = hunt(id)?.totems;
+    if (totems) for (const s of totems.summons) countHunter(c, s, totems.maxAlive);
+  }
+  return c;
+}
+
+/** Every pull of a spawn table (a pack id, the patrols included), with its census. */
+export function trashPullCensuses(
+  spawns: readonly { mobId: string; packId?: string }[],
+): Map<string, TrashPullCensus> {
+  const members = new Map<string, string[]>();
+  for (const s of spawns) {
+    if (!s.packId) continue;
+    let list = members.get(s.packId);
+    if (!list) {
+      list = [];
+      members.set(s.packId, list);
+    }
+    list.push(s.mobId);
+  }
+  const out = new Map<string, TrashPullCensus>();
+  for (const [pack, list] of members) out.set(pack, trashPullCensus(list));
+  return out;
+}
+
+/** Slots per pool of the trash fx. Every telegraph pool holds the worst pull
+ *  of the basin PLUS the next worst one chained into it (a patrol walking in,
+ *  a neighbouring pack body-pulled), each field taken on its own, so an
+ *  actionable mark is never dropped for want of a slot. The tongues hold every
+ *  lane's whole party; the quarry marks a whole party. */
+export interface TrashFxPools extends TrashPullCensus {
+  tongues: number;
+  marks: number;
+}
+
+/** The two largest values summed (the worst pull plus the next worst). */
+function worstTwo(values: readonly number[]): number {
+  let a = 0;
+  let b = 0;
+  for (const v of values) {
+    if (v > a) {
+      b = a;
+      a = v;
+    } else if (v > b) b = v;
+  }
+  return a + b;
+}
+
+/** The pool sizes a spawn table needs (see TrashFxPools). */
+export function trashFxPools(spawns: readonly { mobId: string; packId?: string }[]): TrashFxPools {
+  const pulls = [...trashPullCensuses(spawns).values()];
+  const field = (k: keyof TrashPullCensus) => worstTwo(pulls.map((p) => p[k]));
+  const lanes = field('lanes');
+  return {
+    rings: field('rings'),
+    kicks: field('kicks'),
+    lanes,
+    skulls: field('skulls'),
+    spears: field('spears'),
+    hexes: field('hexes'),
+    tongues: lanes * TRASH_PARTY_SIZE,
+    marks: TRASH_PARTY_SIZE,
+  };
+}
+
+/** The Wildheart Basin's own pools, off its spawn table. */
+export const TRASH_FX_POOLS: Readonly<TrashFxPools> = trashFxPools(WILDHEART_BASIN_SPAWNS);
