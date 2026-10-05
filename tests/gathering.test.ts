@@ -380,8 +380,11 @@ describe('isHarvestableCorpse', () => {
     // the release already carries: 216. Plus the 69 untagged templates of the
     // five-dungeon rework (75 new templates, the six tagged ones counted in
     // `included` above): undead, constructs, elementals, encounter bodies
-    // (anchors, cages, shackles, Reflections) and kit adds: 285.
-    expect(untagged).toHaveLength(285);
+    // (anchors, cages, shackles, Reflections) and kit adds: 285. Plus the
+    // dungeon trash pass's two encounter bodies, the Hollow Crypt's Stirring
+    // Bones (a bone pile that stands back up) and the Sunbone Dread Totem:
+    // neither is a corpse anyone harvests, 287.
+    expect(untagged).toHaveLength(287);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
