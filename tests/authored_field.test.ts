@@ -4,13 +4,10 @@
 // too (its bespoke height function retired for a field record of its own).
 
 import { describe, expect, it } from 'vitest';
-import {
-  HOLLOW_CRYPT_FIELD,
-  HOLLOW_CRYPT_RING,
-  RITE_DAIS,
-} from '../src/sim/content/hollow_crypt_layout';
+import { HOLLOW_CRYPT_FIELD, HOLLOW_CRYPT_RING } from '../src/sim/content/hollow_crypt_layout';
 import { WILDHEART_BASIN_FIELD } from '../src/sim/content/wildheart_basin_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { MORTHEN_SPOT } from '../src/sim/encounters/hollow_crypt/ids';
 import {
   type AuthoredFieldDef,
   authoredFieldCliffRuns,
@@ -104,14 +101,20 @@ describe('the Hollow Crypt field', () => {
     expect(authoredFieldHeight(f, 76, 40)).toBe(-6); // Widow's Gallery
     expect(authoredFieldHeight(f, 105, 64)).toBe(0); // the rim walk
     expect(authoredFieldHeight(f, 0, 162)).toBe(5); // the choir loft
-    // The Rite Ring floor (sampled on the ring, clear of the dais), and the
-    // raised dais that covers the ring centre, where Morthen stands.
+    // The Rite Ring: one level floor from the rim to the altar, Morthen's spot
+    // included (no raised dais paved over the engraved circle's inner bands).
     expect(authoredFieldHeight(f, HOLLOW_CRYPT_RING.x, HOLLOW_CRYPT_RING.z - 15)).toBe(24);
-    expect(
-      Math.hypot(HOLLOW_CRYPT_RING.x - RITE_DAIS.x, HOLLOW_CRYPT_RING.z - RITE_DAIS.z),
-    ).toBeLessThan(RITE_DAIS.r);
-    expect(authoredFieldHeight(f, HOLLOW_CRYPT_RING.x, HOLLOW_CRYPT_RING.z)).toBeCloseTo(24.4, 5);
-    expect(authoredFieldHeight(f, RITE_DAIS.x, RITE_DAIS.z)).toBeCloseTo(24.4, 5);
+    expect(authoredFieldHeight(f, HOLLOW_CRYPT_RING.x, HOLLOW_CRYPT_RING.z)).toBe(24);
+    expect(authoredFieldHeight(f, MORTHEN_SPOT.x, MORTHEN_SPOT.z)).toBe(24);
+    for (const [dx, dz] of [
+      [0, 10],
+      [9, 7],
+      [-9, 7],
+      [0, 17],
+      [5, 2],
+    ])
+      expect(authoredFieldHeight(f, HOLLOW_CRYPT_RING.x + dx, HOLLOW_CRYPT_RING.z + dz)).toBe(24);
+    expect(HOLLOW_CRYPT_FIELD.surfaces.some((s) => s.id === 'rite_dais')).toBe(false);
     expect(authoredFieldHeight(f, 60, -100)).toBe(-40); // the mist chasm
     // The Chapel Stair halfway down.
     expect(authoredFieldHeight(f, 0, -96)).toBeCloseTo(10, 5);

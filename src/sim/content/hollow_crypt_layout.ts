@@ -66,11 +66,11 @@ export const HOLLOW_CRYPT_ANCHORS = {
   riteRing: { x: 0, z: 205 },
 } as const;
 
-/** The Rite Ring: centre, radius and floor height (the crag top). */
+/** The Rite Ring: centre, radius and floor height (the crag top). One level
+ *  floor from rim to altar: the engraved rite circle (render/hollow_crypt/
+ *  crypt_floor_marks.ts) reads whole across it, with no raised dais paved over
+ *  its inner bands (playtest: it hid them). */
 export const HOLLOW_CRYPT_RING = { x: 0, z: 205, r: 28, h: 24 } as const;
-/** The Rite dais: a raised ring floor where Morthen stands and the Knellwyrm
- *  lands (encounters/hollow_crypt/ids.ts MORTHEN_SPOT), sized to the wyrm. */
-export const RITE_DAIS = { x: 0, z: 212, r: 9.5, rise: 0.4 } as const;
 /** The collapsed bell tower's yaw: its broken beam (the piece's local +X) reaches
  *  toward the Bell Yard's centre with the Burial Bell at its end (Sexton
  *  Marrow's bell rope, encounters/hollow_crypt/marrow_ids.ts). */
@@ -286,17 +286,6 @@ const SURFACES: FieldSurface[] = [
     edge: 'rock',
     ground: 'ritual',
   },
-  // The Rite dais (after the ring, so it wins there).
-  {
-    kind: 'circle',
-    id: 'rite_dais',
-    x: RITE_DAIS.x,
-    z: RITE_DAIS.z,
-    r: RITE_DAIS.r,
-    h: HOLLOW_CRYPT_RING.h + RITE_DAIS.rise,
-    edge: 'masonry',
-    ground: 'bone',
-  },
 ];
 
 function columns(
@@ -461,7 +450,7 @@ const PROPS: FieldProp[] = [
     1.3,
     14,
   ),
-  // The Rite Ring: four Remembrance Candles, the altar dais and the lectern.
+  // The Rite Ring: four Remembrance Candles and the altar.
   ...columns(
     'hc_remembrance_candle',
     [
