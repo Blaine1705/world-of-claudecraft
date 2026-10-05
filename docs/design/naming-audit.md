@@ -881,6 +881,40 @@ The general web search budget was exhausted, so this check ran against the wikis
 | Sunbone Dread Totem | the Sunbone fear totem | KEEP. No match; "Sunbone" is this game's own coined token (Sunbone Hexcaller). |
 | Snarlbark | the vine creature's thorns | KEEP. No match; pairs with this game's own Snarlvine. |
 
+Completed 2026-10-05 for the four properties the first check could not reach: Scryfall
+exact-name search over every Magic: The Gathering printing and the MTG fandom wiki; the
+elderscrolls fandom wiki full text and UESP page titles (Online, Lore, Skyrim, Oblivion,
+Morrowind; UESP's own full-text search sits behind a bot challenge); the Path of Exile fandom
+wiki plus the PoE1 and PoE2 game data (skill gems, base items, uniques, mods; poewiki.net and
+poe2wiki.net refused the fetch); the Diablo fandom wiki (Diablo I to IV). Every name above is
+KEEP there too. Nearest neighbours, none a collision: FFXIV's "Moonset" action (a different
+full name, already cleared), MTG's "Whirlpool" cards (Quicksand Whirlpool, Whirlpool Drake),
+Path of Exile's and Diablo IV's single-word "Spark" and "Arc", Diablo III's "Hex" and "Plague
+of Toads", MTG's "Snarl" cards (Snarl Song, Snarlfang Vermin).
+
+### The dungeon trash pass, second wave (web-verified 2026-10-05)
+
+The five mechanics on the trash engine's sight rule and walker
+(`src/sim/mob/trash_kit/kit_nova.ts`, `kit_walker.ts`, `bastion_order.ts`, `temple_lure.ts`,
+`temple_pearl.ts`). Checked against warcraft.wiki.gg, wowpedia and Wowhead's suggestions, the
+GW2 wiki, FFXIV (consolegameswiki and the XIVAPI actions, statuses, items, enemies and places),
+the RS3 and OSRS wikis, ESO and Path of Exile as above, the Diablo fandom wiki, Scryfall and
+the MTG wiki, the Hearthstone wiki and the HearthstoneJSON card list, League of Legends (fandom
+and Riot's game data), Dota 2 (fandom and dotaconstants), the Elden Ring and Dark Souls wikis,
+bg3.wiki and the Forgotten Realms wiki, plus exact-phrase web searches for the coined tokens.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Gravespark Volley, Gravespark | the Gravecaller Adept's line-of-sight volley | KEEP. No match in any game; "Gravespark" only turns up a place name and an unused domain. |
+| Throatlight | the Bastion Revenant's death orb | KEEP, borderline, recorded: no game uses it; TV Tropes files light shining from a mouth under a generic "Throat Light" label, a trope name, not a proprietary term. |
+| Drowned Surge | the orb's heroic damage surge | KEEP. No match. |
+| Loose on My Mark | the Drowned Sergeant's order | KEEP. A plain command phrase; no match. |
+| Call of the Shallows | the Moonlit Siren's luring song | KEEP, borderline, recorded: no game uses it; the nearest are a poetry book ("A Call from the Shallows") and the unrelated "Call of the Deep". |
+| Song-Struck | the song's stun | KEEP. A generic compound like "star-struck". |
+| Heartpearl, Heartpearl Ward | the Moonmantle Ray's pearl and the ward it lays | KEEP, borderline, recorded: no game uses it; outside games "HeartPearl" is a short-drama video app's brand, a different industry. |
+| Nacre Mantle | the group shield for taking the pearl | KEEP. Only biology papers (nacre is laid by the mollusc mantle). |
+| Rusted Bolt | the arbalests' bolt on the mark | KEEP. The arbalest's shipped petSpell name, reused. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

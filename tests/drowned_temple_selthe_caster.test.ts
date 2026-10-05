@@ -301,5 +301,7 @@ describe('one seed, one fight: the caster kit and the fracture replay exactly', 
     expect(a.some((h) => h.includes('Moonwater Bolt'))).toBe(true);
     expect(a.some((h) => h.includes('Tideglass Fracture'))).toBe(true);
     expect(trace()).toEqual(a);
-  });
+    // Two fresh Sims, each a full claimed Temple through a 34 s fight: about
+    // 28 s on a quiet Windows box before the trash pass, past the 20 s default.
+  }, 120_000);
 });
