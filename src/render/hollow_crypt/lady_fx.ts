@@ -24,6 +24,7 @@ import {
   BRIDAL_GRAVE,
   LADY_BRIDAL_FREEZE,
   LADY_BRIDES_LAMENT,
+  LADY_EMBRACE_DROPPED,
   LADY_EMBRACE_RELEASED,
   LADY_EMBRACED,
   LADY_FROZEN_EMBRACE,
@@ -409,9 +410,11 @@ export class LadyFx implements CryptBossPainter {
     } else if (a === LADY_LANTERN_SHELTER) {
       const l = world.entities.get(ev.sourceId);
       if (l) this.shelterDome(l);
-    } else if (a === LADY_EMBRACE_RELEASED) {
+    } else if (a === LADY_EMBRACE_RELEASED || a === LADY_EMBRACE_DROPPED) {
+      // She opens her arms (the Release clip, the manifest's attackByAbility).
+      this.host.gesture(ev.sourceId, a);
       const p = world.entities.get(ev.targetId);
-      if (p) this.snowPuff(p.pos.x, p.pos.y, p.pos.z, 40);
+      if (p && a === LADY_EMBRACE_RELEASED) this.snowPuff(p.pos.x, p.pos.y, p.pos.z, 40);
     } else if (a === LADY_SHATTERING_FALL) {
       const p = world.entities.get(ev.targetId);
       if (p) this.shatter(p);

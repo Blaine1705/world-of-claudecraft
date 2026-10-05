@@ -548,7 +548,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'bellrope_girdle', chance: 0.25, rollGroup: 'marrow_guaranteed', normalOnly: true },
       { itemId: 'sextons_spadehaft', chance: 0.1, normalOnly: true },
     ],
-    scale: 1.2,
+    // His Blender body is authored at full size (crypt_skel_sexton's height).
+    scale: 1,
     color: 0x839192,
   },
   morthen: {

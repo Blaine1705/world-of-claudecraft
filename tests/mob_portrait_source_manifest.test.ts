@@ -119,8 +119,10 @@ describe('mob portrait source manifest', () => {
     // trash bodies (Thawcaller, Goadsmith, Pyre-Tender, Soul Brazier, Rime
     // Whelp, Ogre Sledge-Hauler, Glacier Splinter and the Sledge Tusker). 345:
     // Korgath's four Seal Shackles (hammer, tongs, anvil, bellows). The
-    // Stormbrass Foundry's seventeen bodies left with the parked dungeon.
-    expect(liveIds).toHaveLength(345);
+    // Stormbrass Foundry's seventeen bodies left with the parked dungeon. 346:
+    // Sexton Marrow's Restless Bones (marrow_restless_bones), raised from his
+    // Open Graves.
+    expect(liveIds).toHaveLength(346);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

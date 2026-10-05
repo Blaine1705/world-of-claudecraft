@@ -32,6 +32,25 @@ import {
   MORTHEN_RITE_WAKES,
 } from '../../sim/encounters/hollow_crypt/ids';
 import {
+  ILVANE_BONE_ORGAN,
+  ILVANE_DIRGE,
+  ILVANE_UNBROKEN_DIRGE,
+} from '../../sim/encounters/hollow_crypt/ilvane_ids';
+import {
+  LADY_BRIDAL_FREEZE,
+  LADY_BRIDES_LAMENT,
+  LADY_EMBRACE_DROPPED,
+  LADY_EMBRACE_HOLD,
+  LADY_EMBRACE_RELEASED,
+  LADY_FROZEN_EMBRACE,
+} from '../../sim/encounters/hollow_crypt/lady_ids';
+import {
+  MARROW_BURIAL_TOLL,
+  MARROW_GRAVEDIGGERS_BLOW,
+  MARROW_MEASURE,
+  MARROW_SHOVELFUL,
+} from '../../sim/encounters/hollow_crypt/marrow_ids';
+import {
   OLEN_HALLOWED_BRINE,
   OLEN_OATH_KNEEL,
   OLEN_OATH_VIGIL,
@@ -3940,22 +3959,93 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
+  // Sexton Marrow (scripts/assets/hollow_crypt_creatures/build_marrow.py): the
+  // parish gravedigger raised and still digging, sculpted on the Bastion kit at
+  // full size (template scale 1): a stooped skeleton about twice a player's
+  // height under a peaked cowl of grave cloth, a leather apron, a hooded tin
+  // lantern at his hip and the long spade. At rest he digs (Idle); every bar
+  // clip is locked to its bar and plays its recovery out: Shovelful flings the
+  // earth at 1.0 of its 1.2 s bar, Measure levels the spade at the mark from 0.5,
+  // GravediggersBlow lands at 0.7 of 0.8. BellRing is a 1.0 s loop (the haul
+  // bottoming at 0.9, in step with ropePull) with his fists on his own axis,
+  // the spade stood in the earth beside him.
   crypt_skel_sexton: {
-    url: `${ENEMIES}/skeleton_mage.glb`,
-    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
-    height: 3.4,
-    clips: skeletonClips(['2H_Melee_Attack_Chop']),
-    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.25,
+    url: `${CREATURES}/crypt_sexton_marrow.glb`,
+    // The build's IDLE_HEIGHT and MINZ, half a second into Idle (as the game measures).
+    height: 5.783,
+    hover: -0.038,
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Measure',
+      castByAbility: {
+        [MARROW_SHOVELFUL]: 'Shovelful',
+        [MARROW_MEASURE]: 'Measure',
+        [MARROW_BURIAL_TOLL]: 'BellRing',
+        [MARROW_GRAVEDIGGERS_BLOW]: 'GravediggersBlow',
+      },
+      castTimeScaleByAbility: {
+        [MARROW_SHOVELFUL]: 1,
+        [MARROW_MEASURE]: 1,
+        [MARROW_BURIAL_TOLL]: 1,
+        [MARROW_GRAVEDIGGERS_BLOW]: 1,
+      },
+      castPlayOut: ['Shovelful', 'Measure', 'GravediggersBlow'],
+    },
+    // The one-shot bars follow the bar; the bell loops for as long as it rings.
+    castClipSync: [MARROW_SHOVELFUL, MARROW_MEASURE, MARROW_GRAVEDIGGERS_BLOW],
+    castPlayOutHoldsAttacks: true,
+    walkRef: 1.671,
+    runRef: 6.109,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
+    clickRadius: 2.2,
   },
+  // Cantor Ilvane (scripts/assets/hollow_crypt_creatures/build_cantor.py): a tall
+  // skeletal choir mistress in a faded violet cassock and a torn surplice, a great
+  // pleated ruff, a black lace veil under a crown of silver organ pipes, the hymnal
+  // open in her left hand and a finger-bone baton with a violet light in her right.
+  // Her song glows violet (the eyes, the voice in her open jaw, the baton, the notes).
+  // Sing is the Dirge: bar-locked, its peak reached by 1.75 s (the Crescendo's 1.8 s
+  // bar) and held, climbing, to the 2.5 s bar's end. PlayOrgan loops at the Bone
+  // Organ's keys (the hymnal hangs open over them); Conduct is her flourish.
   crypt_skel_cantor: {
-    url: `${ENEMIES}/skeleton_mage.glb`,
-    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
-    height: 3.2,
-    clips: skeletonClips(['2H_Melee_Attack_Chop']),
-    tint: 'entity',
-    tintStrength: 0.35,
+    url: `${CREATURES}/crypt_cantor_ilvane.glb`,
+    // The build's IDLE_HEIGHT (feet to the crown's tallest pipe, half a second into
+    // Idle); her template's 1.1 draws her about 6.5 yd, two and a half players.
+    height: 5.964,
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Conduct',
+      castByAbility: {
+        [ILVANE_DIRGE]: 'Sing',
+        [ILVANE_UNBROKEN_DIRGE]: 'Sing',
+        [ILVANE_BONE_ORGAN]: 'PlayOrgan',
+      },
+      castTimeScaleByAbility: {
+        [ILVANE_DIRGE]: 1,
+        [ILVANE_UNBROKEN_DIRGE]: 1,
+        [ILVANE_BONE_ORGAN]: 1,
+      },
+    },
+    // The Dirge follows its bar (normal or Crescendo); the organ loops while she plays.
+    castClipSync: [ILVANE_DIRGE, ILVANE_UNBROKEN_DIRGE],
+    walkRef: 2.2,
+    runRef: 6.34,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
+    clickRadius: 2.2,
   },
   crypt_skel_chorister: {
     url: `${ENEMIES}/necromancer.glb`,
@@ -3979,6 +4069,48 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     authoredAtlas: true,
     selfIllumination: 0.08,
+    clickRadius: 2.2,
+  },
+  // The Lady of the Bonechill (scripts/assets/hollow_crypt_creatures/build_lady.py),
+  // the ghost of a bride buried in the ravine's ice: authored at size (`height`
+  // and `hover` are the build's IDLE_HEIGHT and MINZ half a second into Idle,
+  // the ice crown on top), floating half a yard over the ice. Her gown, veil and
+  // sleeves are one alpha-blended material whose translucency lives in the baked
+  // atlas (it survives the far-LOD bake); the face and hands stay solid. The
+  // Lament and the Bridal Freeze play the Wail on their bars (the Freeze's 2.5 s
+  // bar at 1.2, so the scream peaks as either lands); the Embrace's reach closes
+  // on its bar's end, and the hold loops while the sim lifts her aloft.
+  crypt_lady_bonechill: {
+    url: `${CREATURES}/crypt_lady_bonechill.glb`,
+    height: 6.749,
+    hover: 0.544,
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      // Letting go (gently or not): the arms open.
+      attackByAbility: { [LADY_EMBRACE_RELEASED]: 'Release', [LADY_EMBRACE_DROPPED]: 'Release' },
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Wail',
+      castByAbility: {
+        [LADY_BRIDES_LAMENT]: 'Wail',
+        [LADY_BRIDAL_FREEZE]: 'Wail',
+        [LADY_FROZEN_EMBRACE]: 'EmbraceReach',
+        [LADY_EMBRACE_HOLD]: 'EmbraceHold',
+      },
+      castTimeScaleByAbility: {
+        [LADY_BRIDES_LAMENT]: 1,
+        [LADY_BRIDAL_FREEZE]: 1.2,
+        [LADY_FROZEN_EMBRACE]: 1,
+      },
+    },
+    // The scream and the reach follow their bars; the hold just loops.
+    castClipSync: [LADY_BRIDES_LAMENT, LADY_BRIDAL_FREEZE, LADY_FROZEN_EMBRACE],
+    authoredAtlas: true,
+    selfIllumination: 0.3,
     clickRadius: 2.2,
   },
   mob_crypt_rimeweb: {
@@ -6191,7 +6323,7 @@ const MOB_KEYS: Record<string, string> = {
   morthen: 'crypt_morthen_lich',
   cantor_ilvane: 'crypt_skel_cantor',
   hollow_chorister: 'crypt_skel_chorister',
-  rimeweb: 'mob_crypt_rimeweb',
+  rimeweb: 'crypt_lady_bonechill',
   crypt_shambler: 'skel_rogue',
   // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
   crypt_ossuary_warrior: 'crypt_skel_warrior',

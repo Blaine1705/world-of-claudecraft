@@ -256,6 +256,9 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
   rimeweb: {
     id: 'rimeweb',
     name: 'Lady of the Bonechill',
+    // A 6.5 yd ghost in a wide gown (the Blender body): melee reaches her from
+    // her hem, and her claws reach as far (MobTemplate.bodyRadius).
+    bodyRadius: 2.4,
     minLevel: 9,
     maxLevel: 9,
     family: 'undead',
@@ -292,7 +295,7 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
       },
       { itemId: 'rimeweb_fang', chance: 0.1, normalOnly: true },
     ],
-    scale: 2.1,
+    scale: 1,
     color: 0xd8ecff,
   },
   // Boss 3: Cantor Ilvane and the Hollow Choir. Her whole kit is the encounter
@@ -332,7 +335,7 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
       },
       { itemId: 'cantors_hymnal', chance: 0.1, normalOnly: true },
     ],
-    scale: 1.3,
+    scale: 1.1,
     color: 0x9d6cd0,
   },
   // The finale: the Knellwyrm, the great bone wyrm Morthen's dying rite calls

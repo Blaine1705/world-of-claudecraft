@@ -211,7 +211,15 @@ export class RiftDeathZoneVisuals {
       shake,
     );
     this.cryptFinale = new CryptFinaleFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.cryptBosses = new CryptBossFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.cryptBosses = new CryptBossFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.morthenFx = new MorthenFx(
       scene,
       groundY,

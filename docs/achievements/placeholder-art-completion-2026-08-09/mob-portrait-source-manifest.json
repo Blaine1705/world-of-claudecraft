@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "556813425866e7ce5d06c2412300f7d017c7e2aa3d856e0b7321be76d15f1fdf",
+  "rendererFingerprint": "535e229575ad7584f7d24be3af8fb81931a6bbfc32f8bf59d358709cdf104da6",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5495562,
-      "sha256": "4d3f94b8d38bb181140f79870646bc7fb39f03bbe566c453c2b0f0487d23db82",
+      "bytes": 5509367,
+      "sha256": "1395ba06726ff509296b56459de166f2f76999341ff869704d1ba023971b3070",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 345,
+  "portraitCount": 346,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -1057,31 +1057,31 @@
       "visualKey": "crypt_skel_cantor",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_mage.glb",
-          "path": "public/models/chars/enemies/skeleton_mage.glb",
-          "bytes": 802628,
-          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+          "url": "models/creatures/crypt_cantor_ilvane.glb",
+          "path": "public/models/creatures/crypt_cantor_ilvane.glb",
+          "bytes": 3040532,
+          "sha256": "6965eaae050feb4a39082a39b5142df7aa25b5e13bcc4f994aeceb011a7cc04a"
         },
-        "idle": "Idle_Combat",
-        "height": 3.2,
+        "idle": "Idle",
+        "height": 5.964,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9d6cd0",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "5658d5b36e5c9fdc00cf75c27c255ad03ff95931afcc2497a524707a5730bb7a",
+      "sourceFingerprint": "0d18a35c34ebb6ae7c0a9db8d3ba73eaa3f74ccbd3c2925942ac4641ad372d88",
       "output": {
         "path": "public/ui/mobs/cantor_ilvane.webp",
-        "bytes": 2318,
-        "sha256": "02a3f8f0d1add620da348ccfe2c6ac4e23c4dad7bbffc5097059bc268d1e6b4f"
+        "bytes": 2780,
+        "sha256": "3d338714e802fb46cddb91ec94bf5e9ce753b7f6384c7a31277a1853aded89ac"
       }
     },
     {
@@ -5482,8 +5482,8 @@
         "model": {
           "url": "models/creatures/knight_commander_olen.glb",
           "path": "public/models/creatures/knight_commander_olen.glb",
-          "bytes": 3127608,
-          "sha256": "05bf8bd00cf7bf8bd088bfce2a0620a625cc6d64403dd2ff32da6fb9b8e73bbe"
+          "bytes": 3375088,
+          "sha256": "197e7e234cc275964473dbfd1aa9d78f8e94e22197eae2592fd3afe072ce4602"
         },
         "idle": "Idle",
         "height": 7.4,
@@ -5500,11 +5500,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8ba688d8c10365d72ac8ce704754c228deef93c720d37d40d34966923c35ebff",
+      "sourceFingerprint": "541b9e0f7c6cb5f816994a114dcae9eb9ccc6d8cc8ed20ff76deb15e4c672f42",
       "output": {
         "path": "public/ui/mobs/knight_commander_olen.webp",
-        "bytes": 2346,
-        "sha256": "c920bc26c5a76cd02d521e1e13a887b21ff6e5dbf4441367d7ecddd8d7acdb20"
+        "bytes": 2356,
+        "sha256": "fd93c134e6e63d650ebbd92b05cea39aea641029e8c37cffe8359f606751b4d6"
       }
     },
     {
@@ -5675,6 +5675,40 @@
         "path": "public/ui/mobs/lily_wisp.webp",
         "bytes": 1730,
         "sha256": "11d2e8f9cdb7da6389f5e9665e59c973897e17aa8aeaba2dc1751ea443b443fc"
+      }
+    },
+    {
+      "id": "marrow_restless_bones",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d5dbdb",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
+      "output": {
+        "path": "public/ui/mobs/marrow_restless_bones.webp",
+        "bytes": 2824,
+        "sha256": "23eef46230cb81625896e76c42e92aa5f4dbd665a481b3354890d0dafd730605"
       }
     },
     {
@@ -8840,36 +8874,36 @@
     },
     {
       "id": "rimeweb",
-      "family": "spider",
+      "family": "undead",
       "finderEncounter": true,
-      "visualKey": "mob_crypt_rimeweb",
+      "visualKey": "crypt_lady_bonechill",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/spider.glb",
-          "path": "public/models/creatures/spider.glb",
-          "bytes": 130436,
-          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+          "url": "models/creatures/crypt_lady_bonechill.glb",
+          "path": "public/models/creatures/crypt_lady_bonechill.glb",
+          "bytes": 2790900,
+          "sha256": "ded31e9ecd95dcf092ed07464e7f787e8fd82bec0629e5454bf31518e1bb71cf"
         },
-        "idle": "Spider_Idle",
-        "height": 2.7,
+        "idle": "Idle",
+        "height": 6.749,
         "yaw": null,
-        "hover": null,
+        "hover": 0.544,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#e8f4ff",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "5548184b0491baaad77ff432bd84a3cba506fa75412907cff8e694dcd2cf58c7",
+      "sourceFingerprint": "47d8bfcfeaf1babf8b8777f4b411aeb3280d8a5d4fdb84fe5dc1fbadfa7fe25f",
       "output": {
         "path": "public/ui/mobs/rimeweb.webp",
-        "bytes": 1792,
-        "sha256": "7a9972761989831d63044ef074b1a9cb85508f681e108632ee63269bc4081e6a"
+        "bytes": 2078,
+        "sha256": "bd8a59537122686f420d3eacc09f6d10e7b6ef0490c649a4b0a2cf17ebec3112"
       }
     },
     {
@@ -9185,44 +9219,31 @@
       "visualKey": "crypt_skel_sexton",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_mage.glb",
-          "path": "public/models/chars/enemies/skeleton_mage.glb",
-          "bytes": 802628,
-          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+          "url": "models/creatures/crypt_sexton_marrow.glb",
+          "path": "public/models/creatures/crypt_sexton_marrow.glb",
+          "bytes": 2998000,
+          "sha256": "0267ad5663dae8b2afbed02321e5cd2572a82de664b183086cd21799771b3870"
         },
-        "idle": "Idle_Combat",
-        "height": 3.4,
+        "idle": "Idle",
+        "height": 5.783,
         "yaw": null,
-        "hover": null,
+        "hover": -0.038,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_staff.glb",
-              "path": "public/models/weapons/skeleton_staff.glb",
-              "bytes": 51660,
-              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#839192",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "814d6117e918ceca1f0a400139683e5357d9de19ab91e7fd2662d53f77b66d2e",
+      "sourceFingerprint": "246ce277297008e314821b4dee303f3fdca1f540ea3cdee0e1dfee86146ecadd",
       "output": {
         "path": "public/ui/mobs/sexton_marrow.webp",
-        "bytes": 2224,
-        "sha256": "15b604cb9281e7bc5bf604db51abef6188afde8887fa848185a878c8eb35adb8"
+        "bytes": 2392,
+        "sha256": "6624dcc15368572becaf96d403e9eb031387a7acaf043bb505f07d7be9b59589"
       }
     },
     {

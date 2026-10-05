@@ -63,11 +63,12 @@ describe('npc looks roster', () => {
     expect(npcLook).not.toBeNull();
     expect(npcLookFor('sexton_marrow')).toBe(npcLook);
     expect(npcLookFor('sexton_marrow', 'mob')).toBeNull();
-    // The Hollow Crypt rework gave the boss his own skeleton-mage body (a taller
-    // rig with a staff), still a mob visual and never the composed NPC look.
+    // The Hollow Crypt rework gave the boss his own Blender body (the stooped
+    // skeletal gravedigger with his spade and lantern), still a mob visual and
+    // never the composed NPC look.
     const mobKey = visualKeyFor({ kind: 'mob', templateId: 'sexton_marrow' } as never);
     expect(mobKey).toBe('crypt_skel_sexton');
-    expect(VISUALS[mobKey].url).toBe(VISUALS.skel_mage.url);
+    expect(VISUALS[mobKey].url).toMatch(/creatures\/crypt_sexton_marrow\.glb$/);
     expect(VISUALS[mobKey].modular).toBeFalsy();
   });
 

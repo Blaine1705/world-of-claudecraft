@@ -88,6 +88,8 @@ export interface CryptBossFxHost {
   shakeAt(x: number, z: number, amount: number): void;
   /** Keep a geometry or material for disposal. */
   own<T extends THREE.BufferGeometry | THREE.Material>(o: T): T;
+  /** Play a one-shot gesture clip on an entity (the manifest's attackByAbility). */
+  gesture(entityId: number, gesture: string): void;
 }
 
 /** One boss painter on the host. */
@@ -123,6 +125,7 @@ export class CryptBossFx implements CryptBossFxHost {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shake?: (amount: number) => void,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'crypt-boss-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -199,6 +202,10 @@ export class CryptBossFx implements CryptBossFxHost {
     if (o instanceof THREE.Material) this.materials.push(o);
     else this.geometries.push(o);
     return o;
+  }
+
+  gesture(entityId: number, gesture: string): void {
+    this.playGesture?.(entityId, gesture);
   }
 
   wave(x: number, z: number, reach: number, seconds: number, color: number, width = 0.18): void {
