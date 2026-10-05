@@ -132,7 +132,15 @@ async function action(page, name) {
     const ctx = w.ctx;
     const me = w.player;
     const mobs = [...w.entities.values()].filter((e) => e.kind === 'mob' && !e.dead);
-    const first = (t) => mobs.find((e) => e.templateId === t);
+    // The nearest living one (the dungeon's own packs carry more of each).
+    const first = (t) =>
+      mobs
+        .filter((e) => e.templateId === t)
+        .sort(
+          (a, b) =>
+            Math.hypot(a.pos.x - me.pos.x, a.pos.z - me.pos.z) -
+            Math.hypot(b.pos.x - me.pos.x, b.pos.z - me.pos.z),
+        )[0];
     if (n === 'killRevenant') {
       const r = first('bastion_revenant');
       if (r) ctx.handleDeath(r, me);
@@ -210,9 +218,14 @@ async function shoot(page, seq, out, frames, files) {
 async function force(page, f) {
   await page.evaluate((t) => {
     const w = window.__game.world;
-    const mob = [...w.entities.values()].find(
-      (e) => e.kind === 'mob' && !e.dead && e.templateId === t,
-    );
+    const me = w.player;
+    const mob = [...w.entities.values()]
+      .filter((e) => e.kind === 'mob' && !e.dead && e.templateId === t)
+      .sort(
+        (a, b) =>
+          Math.hypot(a.pos.x - me.pos.x, a.pos.z - me.pos.z) -
+          Math.hypot(b.pos.x - me.pos.x, b.pos.z - me.pos.z),
+      )[0];
     if (mob) w.player.targetId = mob.id;
   }, f.template);
   await chat(page, `/dev trashkit cast ${f.key}`);
