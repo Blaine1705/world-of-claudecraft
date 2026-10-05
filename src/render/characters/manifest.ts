@@ -69,6 +69,7 @@ import {
   BASTION_CLAW_SWEEP,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
+  BASTION_LOOSE_ON_MY_MARK,
   BASTION_PIERCING_BOLT,
   BASTION_SHELL_SLAM,
   BASTION_SNAPPED_FETTERS,
@@ -77,6 +78,7 @@ import {
   CRYPT_BARROWFLAME_BREATH,
   CRYPT_GRAVE_BOLT,
   CRYPT_GRAVE_CLEAVE,
+  CRYPT_GRAVESPARK_VOLLEY,
   CRYPT_MARROW_CRUSH,
   CRYPT_MURDER_CALL,
   CRYPT_PERCH_DIVE,
@@ -88,6 +90,7 @@ import {
 } from '../../sim/mob/trash_kit/cast_ids';
 import {
   TEMPLE_ARCING_SPARK,
+  TEMPLE_CALL_OF_THE_SHALLOWS,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_GLIMMER_VENOM,
   TEMPLE_LIGHTNING_SPIT,
@@ -3925,8 +3928,13 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 3.2,
     clips: {
       ...skeletonClips(['2H_Melee_Attack_Chop']),
-      castByAbility: { [CRYPT_GRAVE_BOLT]: 'Spellcast_Shoot' },
-      castTimeScaleByAbility: { [CRYPT_GRAVE_BOLT]: 0.6 },
+      // Gravespark Volley (the trash pass's second wave): both hands raised
+      // for the whole 3 s bar, the sparks loosed as it lands.
+      castByAbility: {
+        [CRYPT_GRAVE_BOLT]: 'Spellcast_Shoot',
+        [CRYPT_GRAVESPARK_VOLLEY]: 'Spellcast_Raise',
+      },
+      castTimeScaleByAbility: { [CRYPT_GRAVE_BOLT]: 0.6, [CRYPT_GRAVESPARK_VOLLEY]: 0.6 },
     },
     attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
     tint: 'entity',
@@ -4317,6 +4325,9 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       // Rally the Watch: the axe thrust high and the fist on the breast.
       flourish: 'Rally',
+      // Loose on My Mark (the trash pass's second wave): the same axe thrust
+      // high at the mark, held for the 2 s shout.
+      castByAbility: { [BASTION_LOOSE_ON_MY_MARK]: 'Rally' },
     },
     walkRef: 2.19,
     runRef: 8.23,
@@ -4845,8 +4856,10 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 6.0,
     clips: {
       ...TEMPLE_CLIPS,
-      castByAbility: { [TEMPLE_CALL_THE_TIDE]: 'Sing' },
-      castTimeScaleByAbility: { [TEMPLE_CALL_THE_TIDE]: 1 },
+      // Call of the Shallows (the trash pass's second wave) sings on the same
+      // clip, bar-locked so a kick or a broken song stops it visibly.
+      castByAbility: { [TEMPLE_CALL_THE_TIDE]: 'Sing', [TEMPLE_CALL_OF_THE_SHALLOWS]: 'Sing' },
+      castTimeScaleByAbility: { [TEMPLE_CALL_THE_TIDE]: 1, [TEMPLE_CALL_OF_THE_SHALLOWS]: 1 },
     },
     attackTimeScale: 1,
     walkRef: 2.5,
