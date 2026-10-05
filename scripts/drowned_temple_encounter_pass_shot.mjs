@@ -131,9 +131,7 @@ const SEQS = [
     pitch: 0.3,
     dist: 14,
     ui: true,
-    steps: [
-      { action: 'killColossus', frames: [150, 450, 800, 1150, 1500, 1900, 2400, 3600] },
-    ],
+    steps: [{ action: 'killColossus', frames: [150, 450, 800, 1150, 1500, 1900, 2400, 3600] }],
   },
 ];
 

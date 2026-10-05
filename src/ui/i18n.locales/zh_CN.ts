@@ -19119,7 +19119,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.sight.tidewisp':
     '那就是月之水本身，我们本该喝下的那一口。别让它碰到你们。',
   'dungeonGuide.drownedTemple.area.colonnade': '潮汐柱廊。我们两两并肩走过这里，唱着升起之节。',
-  'dungeonGuide.drownedTemple.sight.sentinel': '门边水池里的月鳐。我们还是见习生时，在月出时喂它们珍珠。如今它们守着这些门，把我们的珍珠当作心脏。',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    '门边水池里的月鳐。我们还是见习生时，在月出时喂它们珍珠。如今它们守着这些门，把我们的珍珠当作心脏。',
   'dungeonGuide.drownedTemple.sight.eel':
     '泻湖里的鳗鱼。见习生们会在黄昏喂它们面包。它们靠我们的圣歌养得肥肥的。',
   'dungeonGuide.drownedTemple.area.veil': '那道帷幕后面就是唱诗庭院。我从小时候起就再没踏进去过。',
