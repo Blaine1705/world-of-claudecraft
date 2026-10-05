@@ -16,8 +16,9 @@ import { FLOOR_VFX_LAYER_BASE, FLOOR_VFX_LAYER_SPAN } from '../src/render/floor_
 import { EngineQuench, QUENCH_DEPTH_PULL } from '../src/render/trash_engine_fx/engine_quench';
 import {
   buildIceSlabGeometry,
+  buildIceSlabShellGeometry,
+  SLAB_BAND_BITE,
   SLAB_BAND_PROUD,
-  SLAB_OVERHANG,
 } from '../src/render/trash_engine_fx/ice_slab_geometry';
 import { quenchPoolsAt, wallBox } from '../src/render/trash_engine_fx/trash_engine_fx_core';
 import type { TrashEngineHost } from '../src/render/trash_engine_fx/trash_engine_host';
@@ -85,8 +86,10 @@ describe('the quench pools: no z-fight with the floor', () => {
     expect(mat.vertexShader).toContain('modelViewMatrix');
     expect(mat.vertexShader).not.toContain('viewMatrix * w');
     expect(mat.vertexShader).toContain(QUENCH_DEPTH_PULL.toFixed(3));
-    expect(QUENCH_DEPTH_PULL).toBeGreaterThanOrEqual(0.1);
-    expect(QUENCH_DEPTH_PULL).toBeLessThanOrEqual(0.3);
+    // A real margin over the 6 cm lift, small enough that a body standing in
+    // the pool only wades a few centimetres deep.
+    expect(QUENCH_DEPTH_PULL).toBeGreaterThanOrEqual(0.05);
+    expect(QUENCH_DEPTH_PULL).toBeLessThanOrEqual(0.12);
     // On the floor ladder's ground band (every telegraph paints over it).
     expect(mesh.renderOrder).toBeGreaterThanOrEqual(FLOOR_VFX_LAYER_BASE.ground);
     expect(mesh.renderOrder).toBeLessThan(
@@ -98,7 +101,7 @@ describe('the quench pools: no z-fight with the floor', () => {
 });
 
 describe('the Ice Slab reads as solid cover', () => {
-  it('wears the hauler iron banding, inside its footprint', () => {
+  it('wears the hauler iron banding, seated across the ice faces, inside its footprint', () => {
     const box = wallBox(SANCTUM_ICE_SLAB, 1);
     if (!box) throw new Error('no slab box');
     const geo = buildIceSlabGeometry(box);
@@ -106,18 +109,46 @@ describe('the Ice Slab reads as solid cover', () => {
     const pos = geo.getAttribute('position') as THREE.BufferAttribute;
     let iron = 0;
     for (let i = 0; i < col.count; i++) {
+      // The whole body (block, iron, drift) stays near its footprint: the
+      // iron at most SLAB_BAND_PROUD out, the haul ring a hand further.
+      expect(Math.abs(pos.getX(i))).toBeLessThanOrEqual(box.hw + 2);
       const dark = col.getX(i) < 0.4 && col.getY(i) < 0.4 && col.getZ(i) < 0.45;
       const grey = Math.abs(col.getX(i) - col.getZ(i)) < 0.08;
       if (!dark || !grey) continue;
       iron++;
-      // Every iron vertex hugs the block: within the footprint plus its proud
-      // band (the haul ring hangs a little further off the front face).
-      expect(Math.abs(pos.getX(i))).toBeLessThanOrEqual(box.hw + SLAB_BAND_PROUD + 1e-6);
+      expect(Math.abs(pos.getX(i))).toBeLessThanOrEqual(box.hw + SLAB_BAND_PROUD + 0.05);
       expect(Math.abs(pos.getZ(i))).toBeLessThanOrEqual(box.hd + SLAB_BAND_PROUD + 0.25);
       expect(pos.getY(i)).toBeLessThan(box.height);
     }
     expect(iron).toBeGreaterThan(100);
-    expect(SLAB_BAND_PROUD).toBeLessThanOrEqual(SLAB_OVERHANG);
     geo.dispose();
+  });
+
+  it('never lets the ice poke through the belt, nor the belt float clear of the ice', () => {
+    const box = wallBox(SANCTUM_ICE_SLAB, 1);
+    if (!box) throw new Error('no slab box');
+    const block = buildIceSlabShellGeometry(box);
+    const pos = block.getAttribute('position') as THREE.BufferAttribute;
+    const beltY = box.height * 0.42;
+    let rows = 0;
+    for (let i = 0; i < pos.count; i++) {
+      if (Math.abs(pos.getY(i) - beltY) > 0.4) continue;
+      const x = Math.abs(pos.getX(i));
+      const z = Math.abs(pos.getZ(i));
+      // A vertex on a side face (x) or a broad face (z) in the belt's row.
+      if (x > box.hw * 0.9 && z < box.hd * 0.8) {
+        rows++;
+        expect(x).toBeLessThanOrEqual(box.hw + SLAB_BAND_PROUD);
+        expect(x).toBeGreaterThanOrEqual(box.hw - SLAB_BAND_BITE);
+      }
+      if (z > box.hd * 0.9 && x < box.hw * 0.8) {
+        rows++;
+        expect(z).toBeLessThanOrEqual(box.hd + SLAB_BAND_PROUD);
+        expect(z).toBeGreaterThanOrEqual(box.hd - SLAB_BAND_BITE);
+      }
+    }
+    expect(rows).toBeGreaterThan(4);
+    expect(SLAB_BAND_PROUD).toBeLessThanOrEqual(0.2);
+    block.dispose();
   });
 });

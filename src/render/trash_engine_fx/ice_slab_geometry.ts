@@ -36,9 +36,19 @@ const SEAM = new THREE.Color(0x1d4d72);
 const IRON = new THREE.Color(0x2c3036);
 const IRON_WORN = new THREE.Color(0x5a5f66);
 
-/** How far the iron banding stands proud of the block's faces (yards); it
- *  stays inside SLAB_OVERHANG of the footprint. */
-export const SLAB_BAND_PROUD = 0.07;
+/** The block's faces wander round the collider box: pushed out up to
+ *  SLAB_OVERHANG plus a bulge of SLAB_BULGE, in up to about 0.19 yd. The iron
+ *  bands are seated across that whole band of wander (from SLAB_BAND_BITE
+ *  inside the nominal face to SLAB_BAND_PROUD outside it) and share the
+ *  block's tilt, so the ice never pokes through the iron and the iron never
+ *  floats clear of the ice. */
+const SLAB_BULGE = 0.07;
+const SLAB_TILT_X = 0.025;
+const SLAB_TILT_Z = -0.02;
+/** How far the iron banding stands out of the collider box (yards). */
+export const SLAB_BAND_PROUD = 0.2;
+/** How far the bands reach in under the nominal face (yards). */
+export const SLAB_BAND_BITE = 0.22;
 
 /** The block: jittered, chipped, tilted, coloured. Non-indexed (flat faces). */
 function blockGeometry(box: WallBox): THREE.BufferGeometry {
@@ -72,15 +82,15 @@ function blockGeometry(box: WallBox): THREE.BufferGeometry {
       if (cx > 0.7 && cz > 0.6) ny -= 0.55 * (cx + cz - 1.3);
     } else if (y > -SLAB_SINK + 0.01) {
       // Sides bulge and pinch along their height (a hauled, hacked block).
-      const bulge = Math.sin((y / height) * Math.PI) * (hash3(kx, 0, kz, 4) - 0.5) * 0.14;
+      const bulge = Math.sin((y / height) * Math.PI) * (hash3(kx, 0, kz, 4) - 0.5) * SLAB_BULGE * 2;
       nx += Math.sign(x) * Math.min(SLAB_OVERHANG, bulge) * (Math.abs(x) > hw * 0.99 ? 1 : 0);
       nz += Math.sign(z) * Math.min(SLAB_OVERHANG, bulge) * (Math.abs(z) > hd * 0.99 ? 1 : 0);
     }
     pos.setXYZ(i, nx, ny, nz);
   }
   // Crashed in at an angle: a slight lean, the low edge buried in the snow.
-  g.rotateX(0.025);
-  g.rotateZ(-0.02);
+  g.rotateX(SLAB_TILT_X);
+  g.rotateZ(SLAB_TILT_Z);
   const flat = g.toNonIndexed();
   g.dispose();
   flat.computeVertexNormals();
@@ -174,47 +184,57 @@ function ironPiece(geo: THREE.BufferGeometry, worn: number): THREE.BufferGeometr
 
 /** The hauler's iron banding: a belt round the block, two straps up each
  *  broad face (the ±z faces, the broad face turned to the thrower), and the
- *  haul ring hanging off the belt on the front. Within the footprint plus
- *  SLAB_BAND_PROUD, below the broken top. */
+ *  haul ring hanging off the belt on the front. Seated across the faces'
+ *  wander and tilted with the block (see SLAB_BAND_PROUD); below the broken
+ *  top. */
 function bandGeometry(box: WallBox): THREE.BufferGeometry[] {
   const { hw, hd, height } = box;
-  const t = SLAB_BAND_PROUD;
-  const out: THREE.BufferGeometry[] = [];
+  const out = SLAB_BAND_PROUD;
+  const bite = SLAB_BAND_BITE;
+  const t = out + bite;
+  /** The centre of a bar seated on a face at `face` (signed nominal offset). */
+  const seat = (face: number): number => face + Math.sign(face) * ((out - bite) / 2);
+  const parts: THREE.BufferGeometry[] = [];
   const beltY = height * 0.42;
   const beltH = 0.3;
-  // The belt: four flat bars hugging the faces.
-  out.push(
-    ironPiece(new THREE.BoxGeometry(hw * 2 + t * 2, beltH, t).translate(0, beltY, hd + t / 2), 0.4),
-    ironPiece(
-      new THREE.BoxGeometry(hw * 2 + t * 2, beltH, t).translate(0, beltY, -hd - t / 2),
-      0.4,
-    ),
-    ironPiece(new THREE.BoxGeometry(t, beltH, hd * 2).translate(hw + t / 2, beltY, 0), 0.4),
-    ironPiece(new THREE.BoxGeometry(t, beltH, hd * 2).translate(-hw - t / 2, beltY, 0), 0.4),
-  );
+  // The belt: four bars round the block (the ±z bars wrap the corners).
+  for (const side of [1, -1]) {
+    parts.push(
+      ironPiece(
+        new THREE.BoxGeometry((hw + out) * 2, beltH, t).translate(0, beltY, seat(side * hd)),
+        0.4,
+      ),
+      ironPiece(new THREE.BoxGeometry(t, beltH, hd * 2).translate(seat(side * hw), beltY, 0), 0.4),
+    );
+  }
   // Two straps up each broad face, from the snow to below the broken top.
   const strapTop = height * 0.74;
   for (const side of [1, -1])
     for (const x of [-hw * 0.48, hw * 0.48])
-      out.push(
+      parts.push(
         ironPiece(
           new THREE.BoxGeometry(0.26, strapTop + SLAB_SINK, t).translate(
             x,
             (strapTop - SLAB_SINK) / 2,
-            side * (hd + t / 2),
+            seat(side * hd),
           ),
           0.3,
         ),
       );
   // The haul ring on the front face, hanging from a staple on the belt.
-  out.push(
+  parts.push(
     ironPiece(
-      new THREE.TorusGeometry(0.42, 0.075, 6, 14).translate(0, beltY - 0.5, hd + t + 0.075),
+      new THREE.TorusGeometry(0.42, 0.075, 6, 14).translate(0, beltY - 0.5, hd + out + 0.06),
       0.6,
     ),
-    ironPiece(new THREE.BoxGeometry(0.34, 0.16, 0.12).translate(0, beltY - 0.06, hd + t), 0.5),
+    ironPiece(new THREE.BoxGeometry(0.34, 0.16, 0.14).translate(0, beltY - 0.06, hd + out), 0.5),
   );
-  return out;
+  // The block's own crashed-in lean.
+  for (const p of parts) {
+    p.rotateX(SLAB_TILT_X);
+    p.rotateZ(SLAB_TILT_Z);
+  }
+  return parts;
 }
 
 /** The whole slab for a wall box (block, banding, drift and rubble), merged. */

@@ -21,7 +21,8 @@
 // view transform jitters by more), each vertex sampled on the real floor, and
 // the vertex shader pulls it QUENCH_DEPTH_PULL toward the camera along its own
 // view ray: the pool keeps its exact pixels but always wins the depth test
-// against its floor, while a body or a wall standing in it still hides it.
+// against its floor, while a body or a wall standing in it still hides it
+// above its lowest few centimetres (it reads as wading).
 
 import * as THREE from 'three';
 import { dungeonAt, instanceSlotForZ } from '../../sim/data';
@@ -36,8 +37,10 @@ const RINGS = 4;
 const SEGS = 40;
 const PER_POOL = 1 + RINGS * SEGS;
 /** Yards each pool vertex is pulled toward the camera (at most a quarter of
- *  its distance to the eye): the depth margin over the floor under it. */
-export const QUENCH_DEPTH_PULL = 0.18;
+ *  its distance to the eye): the depth margin over the floor under it. Small,
+ *  since the slot frame already took the float jitter out: only the lowest
+ *  few centimetres of a body standing in the pool read as wading. */
+export const QUENCH_DEPTH_PULL = 0.08;
 
 const VERT = /* glsl */ `
 attribute vec2 aUnit;
