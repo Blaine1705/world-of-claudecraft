@@ -2214,9 +2214,10 @@ export class SanctumBossFx {
       else this.playGesture?.(z.id, KORZUL_EMERGE_LAND_GESTURE);
     }
     e.last = t;
-    // Over: landed, a wipe, or his fight already begun (a dev skip, then a bar).
+    // Over: landed, or his fight already begun (a dev skip, then a bar). The
+    // wake plays OUT of combat (korzul_emerge.ts), so combat never gates it.
     const fighting = z.castingAbility !== null && z.castingAbility !== KORZUL_BREAK_FREE;
-    if (t > KORZUL_EMERGE_SECONDS + 1 || z.dead || !z.inCombat || fighting) this.emerge = null;
+    if (t > KORZUL_EMERGE_SECONDS + 1 || z.dead || fighting) this.emerge = null;
   }
 
   dispose(): void {

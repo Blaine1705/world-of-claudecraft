@@ -12,9 +12,14 @@ import type { PlateRec } from './plates';
 export type KorzulPhase =
   /** Not in his fight (frozen in the face before the pull, or reset). */
   | 'idle'
-  /** The pull: Break Free, the cinematic (the burst, the rise, the arc over
-   *  the lake, the landing), out of reach throughout. */
+  /** Break Free, the cinematic (the burst, the rise, the arc over the lake,
+   *  the landing), out of reach throughout. Played when a player wakes him
+   *  (no pull: `waking`) or, from a forced pull, as the fight's opening. */
   | 'emerge'
+  /** Awake and free of the ice, standing on the arena centre, NOT in his
+   *  fight: he waits there until a player walks into his aggro radius or
+   *  strikes him (the ordinary pull), then his ground fight begins. */
+  | 'ready'
   /** On the ice, his ground kit. */
   | 'ground'
   /** A flight: Wing Gale's bar, the climb, the air (the descent included). */
@@ -85,4 +90,7 @@ export interface KorzulFightState {
   /** Break Free's cinematic (korzul_emerge.ts): where he set out from
    *  (claim-local; `pt` is its clock). Null outside it. */
   emergeFrom: { x: number; z: number } | null;
+  /** The cinematic was started by a player walking into the wake ring, not by
+   *  a pull: it plays out of combat and lands him 'ready', never on anyone. */
+  waking: boolean;
 }

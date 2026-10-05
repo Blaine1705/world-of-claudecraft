@@ -11,7 +11,7 @@
 //   0  arrival                 4 to 5  more of the four chains broken
 //   1  the Sledge Tusker dead  6       Korgath dead (his death fills the chains)
 //   2  the first chain broken  7       Velkhar dead
-//   3  the second              8       Korzul pulled: he tears free
+//   3  the second              8       Korzul woken or pulled: he tears free
 //
 // The step only ever rises for the life of the claim (a wipe never re-freezes
 // the face); a freed claim drops its markers with every other object. The
@@ -36,7 +36,9 @@ import { korgathChainsBroken } from './korgath';
  *  latch): the deepest beat reached. `chainsBroken` is phase B's count. */
 export function earnedStoryStep(ctx: SimContext, inst: InstanceSlot, chainsBroken = 0): number {
   const korzul = claimBoss(ctx, inst, KORZUL_ID);
-  if (korzul && (korzul.dead || korzul.inCombat)) return 8;
+  // Pulled, slain, or woken (the wake is no pull: his phase leaves 'idle').
+  const woken = korzul?.sanctumFight?.kind === 'korzul' && korzul.sanctumFight.phase !== 'idle';
+  if (korzul && (korzul.dead || korzul.inCombat || woken)) return 8;
   if (claimBoss(ctx, inst, VELKHAR_ID)?.dead) return 7;
   if (claimBoss(ctx, inst, KORGATH_ID)?.dead) return 6;
   if (chainsBroken > 0) return 1 + Math.min(4, chainsBroken);

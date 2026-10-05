@@ -565,7 +565,10 @@ describe('Korzul: the wipe, the kill, the deed', () => {
     r.boss.aggroTargetId = null;
     r.boss.aiState = 'evade';
     run(r, DT, false);
-    expect(s.phase).toBe('idle');
+    // Free of the ice since his pull: ready again, his home the centre.
+    expect(s.phase).toBe('ready');
+    expect(r.boss.spawnPos.x - r.ox).toBeCloseTo(KORZUL_EMERGE_TO.x, 6);
+    expect(r.boss.spawnPos.z - r.oz).toBeCloseTo(KORZUL_EMERGE_TO.z, 6);
     expect(plateTemplates(r).every((t) => t === 'sanctum_plate_sound')).toBe(true);
     expect(r.sim.ctx.entities.has(broodId)).toBe(false);
     expect(r.boss.damageImmune).toBe(false);
@@ -821,8 +824,10 @@ describe('Korzul: Break Free, the cinematic of his pull', () => {
     burnLakePlate(r.sim.ctx, r.inst, s, 12);
     const before = s.plates.map((p) => p.state);
     const swimmer = addPlayer(r, 'Swim', LAKE_PLATES[12].x, LAKE_PLATES[12].z);
-    // The tank waits at the face's foot, in his reach the moment he is out.
-    put(r, r.me, KORZUL_EMERGE_FROM.x, KORZUL_EMERGE_FROM.z - 6);
+    // The tank walks out on the plates (the wake) and waits 14 yd short of
+    // the centre: inside his aggro radius the moment he lands, clear of the
+    // landing's shove.
+    put(r, r.me, KORZUL_EMERGE_TO.x, KORZUL_EMERGE_TO.z - 14);
     r.me.targetId = r.boss.id;
     r.events = [];
     let ticks = 0;
@@ -830,7 +835,9 @@ describe('Korzul: Break Free, the cinematic of his pull', () => {
     realTick(r, Math.round(KORZUL_EMERGE_SECONDS / DT) + 40, () => {
       if (s.phase !== 'emerge') return;
       ticks++;
-      expect(r.boss.inCombat).toBe(true);
+      // The wake is no pull: out of combat, held, immune.
+      expect(r.boss.inCombat).toBe(false);
+      expect(r.boss.encounterHeld).toBe(true);
       expect(r.boss.damageImmune).toBe(true);
       expect(r.boss.hostile).toBe(false);
       expect(r.sim.isHostileTo(r.me, r.boss)).toBe(false);
@@ -867,8 +874,10 @@ describe('Korzul: Break Free, the cinematic of his pull', () => {
     expect(
       beforeLanding.events.some((e) => e.type === 'damage' && (e as { amount: number }).amount > 0),
     ).toBe(false);
-    // Landed: in reach, and the quench-water bites from now on.
+    // Landed in reach of the tank: the ordinary pull takes him, and the
+    // quench-water bites from now on.
     expect(s.phase).toBe('ground');
+    expect(r.boss.aggroTargetId).toBe(r.me.id);
     expect(r.boss.damageImmune).toBe(false);
     expect(r.boss.hostile).toBe(true);
     expect(r.sim.isHostileTo(r.me, r.boss)).toBe(true);
@@ -896,27 +905,77 @@ describe('Korzul: Break Free, the cinematic of his pull', () => {
     expect((breathAt - landedAt) * DT).toBeCloseTo(T.breathFirst, 0);
   }, 60_000);
 
-  it('the pull: a player out on the plates wakes him (the chain pull answers); short of the ring nothing stirs', () => {
+  it('the wake: a player out on the plates wakes him WITHOUT aggro; short of the ring nothing stirs', () => {
     const far = room();
     put(far, far.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS - 2);
     realTick(far, 20);
     expect(st(far).phase).toBe('idle');
     expect(far.boss.inCombat).toBe(false);
+    // In the ice he is held: no target, no hit, no aggro scan.
+    expect(far.boss.encounterHeld).toBe(true);
+    expect(far.sim.isHostileTo(far.me, far.boss)).toBe(false);
 
     const r = room();
     put(r, r.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS + 1.5);
     realTick(r, 1);
     expect(st(r).phase).toBe('emerge');
-    expect(r.boss.aggroTargetId).toBe(r.me.id);
-    // The Sanctum punishes a skipped pack: everything left alive comes.
-    const woken = r.inst.mobIds
-      .map((id) => r.sim.ctx.entities.get(id))
-      .filter((e) => e && e.id !== r.boss.id && !e.dead && e.aiState === 'chase');
-    expect(woken.length).toBeGreaterThan(0);
+    expect(st(r).waking).toBe(true);
+    // No aggro on the player who woke him, no threat, not in combat.
+    expect(r.boss.aggroTargetId).toBeNull();
+    expect(r.boss.inCombat).toBe(false);
+    expect(r.boss.threat.size).toBe(0);
+    // No pull yet, so nothing else answers either.
+    const chasing = () =>
+      r.inst.mobIds
+        .map((id) => r.sim.ctx.entities.get(id))
+        .filter((e) => e && e.id !== r.boss.id && !e.dead && e.aiState === 'chase');
+    expect(chasing()).toHaveLength(0);
+    // The face still bursts: the story reads him woken.
     expect(storyStep(r.sim.ctx, r.inst)).toBe(8);
-  });
+    // He flies the arc and lands on the centre, READY: not in his fight, not
+    // on anyone, hostile and in reach, facing the shore, his home the centre.
+    realTick(r, Math.round(KORZUL_EMERGE_SECONDS / DT) + 4);
+    expect(st(r).phase).toBe('ready');
+    expect(r.boss.inCombat).toBe(false);
+    expect(r.boss.aggroTargetId).toBeNull();
+    expect(r.boss.encounterHeld).toBe(false);
+    expect(r.boss.damageImmune).toBe(false);
+    expect(r.sim.isHostileTo(r.me, r.boss)).toBe(true);
+    expect(local(r).x).toBeCloseTo(KORZUL_EMERGE_TO.x, 6);
+    expect(local(r).z).toBeCloseTo(KORZUL_EMERGE_TO.z, 6);
+    expect(r.boss.spawnPos.z - r.oz).toBeCloseTo(KORZUL_EMERGE_TO.z, 6);
+    expect(r.boss.facing).toBeCloseTo(Math.PI, 6);
+    // He waits: the waker standing 28 yd out is never charged.
+    const waitFrom = { ...r.boss.pos };
+    realTick(r, 60);
+    expect(st(r).phase).toBe('ready');
+    expect(r.boss.inCombat).toBe(false);
+    expect(Math.hypot(r.boss.pos.x - waitFrom.x, r.boss.pos.z - waitFrom.z)).toBeLessThan(0.01);
+    // A step into his aggro radius pulls him: now his fight begins, and the
+    // Sanctum's chain pull answers the skipped packs.
+    put(r, r.me, KORZUL_EMERGE_TO.x, KORZUL_EMERGE_TO.z - 12);
+    realTick(r, 2);
+    expect(r.boss.inCombat).toBe(true);
+    expect(r.boss.aggroTargetId).toBe(r.me.id);
+    expect(st(r).phase).toBe('ground');
+    expect(chasing().length).toBeGreaterThan(0);
+  }, 60_000);
 
-  it('the Hollow Ward seals behind the group the moment he wakes, cinematic included', () => {
+  it('ready on the centre, a hit from range pulls him too', () => {
+    const r = room();
+    r.sim.chat('/dev sanctum kill trash', r.me.id);
+    put(r, r.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS + 1.5);
+    realTick(r, Math.round(KORZUL_EMERGE_SECONDS / DT) + 4);
+    expect(st(r).phase).toBe('ready');
+    expect(r.boss.inCombat).toBe(false);
+    r.sim.ctx.dealDamage(r.me, r.boss, 50, false, 'fire', 'Test', 'hit', true);
+    realTick(r, 2);
+    expect(r.boss.inCombat).toBe(true);
+    expect(r.boss.aggroTargetId).toBe(r.me.id);
+    expect(st(r).phase).toBe('ground');
+  }, 60_000);
+
+  it('the Hollow Ward stays open through the wake and while he waits; it seals at the pull', () => {
     const r = room();
     r.sim.chat('/dev sanctum kill trash', r.me.id);
     const ward = DUNGEONS[DUNGEON].gates?.find((g) => g.id === 'hollow_ward');
@@ -924,13 +983,54 @@ describe('Korzul: Break Free, the cinematic of his pull', () => {
     put(r, r.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS - 2);
     realTick(r, 2);
     expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('open');
-    put(r, r.me, 0, WYRMS_HOLLOW.z - 10);
+    put(r, r.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS + 2);
     realTick(r, 2);
     expect(st(r).phase).toBe('emerge');
+    expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('open');
+    realTick(r, Math.round(KORZUL_EMERGE_SECONDS / DT) + 4);
+    expect(st(r).phase).toBe('ready');
+    expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('open');
+    put(r, r.me, 0, WYRMS_HOLLOW.z - 10);
+    realTick(r, 2);
+    expect(st(r).phase).toBe('ground');
     expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('sealed');
-  });
+  }, 60_000);
 
-  it('a wipe mid-flight restores him; with the ice already gone the next pull rises from where he stands', () => {
+  it('a wipe after the pull resets cleanly: home on the centre, ready, the lake Sound, no replay', () => {
+    const r = room();
+    r.sim.chat('/dev sanctum kill trash', r.me.id);
+    put(r, r.me, 0, WYRMS_HOLLOW.z - KORZUL_WAKE_RADIUS + 1.5);
+    realTick(r, Math.round(KORZUL_EMERGE_SECONDS / DT) + 4);
+    put(r, r.me, KORZUL_EMERGE_TO.x, KORZUL_EMERGE_TO.z - 12);
+    realTick(r, 2);
+    const s = st(r);
+    expect(s.phase).toBe('ground');
+    burnLakePlate(r.sim.ctx, r.inst, s, 3);
+    // The wipe: the group dies; he walks home to the centre.
+    r.me.hp = 0;
+    r.me.dead = true;
+    for (let i = 0; i < 20 * 20 && (r.boss.inCombat || r.boss.aiState !== 'idle'); i++) {
+      r.events.push(...r.sim.tick());
+      r.events.push(...r.sim.drainEvents());
+    }
+    expect(r.boss.inCombat).toBe(false);
+    expect(s.phase).toBe('ready');
+    expect(plateTemplates(r).every((t) => t === 'sanctum_plate_sound')).toBe(true);
+    expect(local(r).x).toBeCloseTo(KORZUL_EMERGE_TO.x, 0);
+    expect(local(r).z).toBeCloseTo(KORZUL_EMERGE_TO.z, 0);
+    const ward = DUNGEONS[DUNGEON].gates?.find((g) => g.id === 'hollow_ward');
+    if (!ward) throw new Error('no Hollow Ward');
+    expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('open');
+    // The next pull is straight to his fight: the cinematic never replays.
+    r.me.dead = false;
+    r.me.hp = r.me.maxHp;
+    put(r, r.me, KORZUL_EMERGE_TO.x, KORZUL_EMERGE_TO.z - 12);
+    realTick(r, 2);
+    expect(s.phase).toBe('ground');
+    expect(r.boss.castingAbility).not.toBe(KORZUL_BREAK_FREE);
+  }, 60_000);
+
+  it('a wipe after a forced pull leaves him ready on the centre; the next pull skips the cinematic', () => {
     const r = room();
     run(r, KORZUL_EMERGE_ARC_AT + 1);
     const s = st(r);
@@ -940,23 +1040,21 @@ describe('Korzul: Break Free, the cinematic of his pull', () => {
     r.boss.aggroTargetId = null;
     r.boss.aiState = 'evade';
     run(r, DT, false);
-    expect(s.phase).toBe('idle');
+    // The face burst at the pull: he is free, so he waits ready, never idle.
+    expect(storyStep(r.sim.ctx, r.inst)).toBe(8);
+    expect(s.phase).toBe('ready');
     expect(r.boss.castingAbility).toBeNull();
     expect(r.boss.damageImmune).toBe(false);
     expect(r.boss.hostile).toBe(true);
+    expect(r.boss.encounterHeld).toBe(false);
     expect(r.boss.pos.y - floorAt(r)).toBeLessThan(0.01);
     expect(plateTemplates(r).every((t) => t === 'sanctum_plate_sound')).toBe(true);
-    // Home again (the evade walks him back), the face long broken: the next
-    // pull plays from his own spot, never from the face.
+    expect(r.boss.spawnPos.z - r.oz).toBeCloseTo(KORZUL_EMERGE_TO.z, 6);
+    // The next pull: straight into his fight, no Break Free.
     r.boss.aiState = 'idle';
-    put(r, r.boss, 0, 214);
-    expect(storyStep(r.sim.ctx, r.inst)).toBe(8);
     run(r, DT);
-    expect(s.phase).toBe('emerge');
-    expect(local(r).z).toBeCloseTo(214, 6);
-    run(r, KORZUL_EMERGE_SECONDS);
     expect(s.phase).toBe('ground');
-    expect(local(r).z).toBeCloseTo(KORZUL_EMERGE_TO.z, 6);
+    expect(r.boss.castingAbility).not.toBe(KORZUL_BREAK_FREE);
   });
 
   it('a dev trigger mid-cinematic skips it cleanly: he stands on the centre and the mechanic fires', () => {

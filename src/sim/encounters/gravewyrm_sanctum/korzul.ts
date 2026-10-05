@@ -76,7 +76,6 @@ import { type Aura, DT, dist2d, type Entity } from '../../types';
 import { pickMarkTargets } from '../sunken_bastion/claim';
 import { KORZUL_BODY_RADIUS, plateTemplate } from './boss_ids';
 import {
-  bossEngaged,
   claimPlayers,
   clearCastIf,
   dropAuraById,
@@ -109,7 +108,14 @@ import {
   SANCTUM_QUENCH_WATER,
   SCALEGUARD_ID,
 } from './ids';
-import { skipEmerge, startEmerge, stepEmerge, wakeKorzul } from './korzul_emerge';
+import {
+  holdInIce,
+  skipEmerge,
+  standReady,
+  startEmerge,
+  stepEmerge,
+  wakeKorzul,
+} from './korzul_emerge';
 import type { KorzulFightState, KorzulFlight } from './korzul_state';
 import {
   burnPlate,
@@ -121,6 +127,7 @@ import {
   stepRefreeze,
   unbrokenPlates,
 } from './plates';
+import { storyStep } from './story';
 
 const T = KORZUL_TUNING;
 
@@ -177,6 +184,7 @@ function freshState(): KorzulFightState {
     quenchTick: 1,
     casts: 0,
     emergeFrom: null,
+    waking: false,
   };
 }
 
@@ -1098,8 +1106,10 @@ function concludeKorzul(
   boss: Entity,
   st: KorzulFightState,
 ): void {
-  // Only a fought kill earns the deed (a dev kill from the ice never does).
-  const thin = st.phase !== 'idle' && thinIceEarned(plateStates(st));
+  // Only a fought kill earns the deed (a dev kill from the ice, or one while
+  // he stands ready and unfought, never does).
+  const fought = st.phase !== 'idle' && st.phase !== 'ready' && !st.waking;
+  const thin = fought && thinIceEarned(plateStates(st));
   clearFightObjects(ctx, inst, boss, st);
   releaseAloft(boss);
   const at = localOf(ctx, inst, boss);
@@ -1127,14 +1137,12 @@ export function tickKorzul(
     return;
   }
   if (st.phase === 'slain') return;
-  // A player out on the plates wakes him (an ordinary aggro: the chain pull
-  // and the Hollow Ward's seal answer it as any pull).
-  const fighting =
-    engaged || (st.phase === 'idle' && wakeKorzul(ctx, inst, boss) && bossEngaged(boss));
-  if (!fighting) {
-    if (st.phase !== 'idle') resetKorzul(ctx, inst, boss);
+  if (!engaged) {
+    tickKorzulOutOfFight(ctx, inst, boss, st);
     return;
   }
+  // Pulled from 'ready' (a player in his aggro radius, or a hit): the fight.
+  if (st.phase === 'ready') st.phase = 'ground';
   stepPlates(ctx, inst, st);
   // The quench-water is his: it bites once he has landed.
   if (st.phase !== 'idle' && st.phase !== 'emerge') stepQuench(ctx, inst, boss, st);
@@ -1148,7 +1156,7 @@ export function tickKorzul(
       startEmerge(ctx, inst, boss, st);
       return;
     case 'emerge':
-      stepEmerge(ctx, inst, boss, st);
+      stepEmerge(ctx, inst, boss, st, true);
       return;
     case 'ground':
       stepGround(ctx, inst, boss, st);
@@ -1190,6 +1198,31 @@ export function tickKorzul(
   }
 }
 
+/** Korzul out of his fight: held in the ice until a player wakes him (no
+ *  pull: korzul_emerge.ts), the waking cinematic playing on, then ready on
+ *  the centre for the ordinary pull. A fight that ended (a wipe, an evade)
+ *  resets the lake and leaves him ready again, the ice long gone. */
+function tickKorzulOutOfFight(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  boss: Entity,
+  st: KorzulFightState,
+): void {
+  if (st.phase === 'emerge' && st.waking) {
+    stepEmerge(ctx, inst, boss, st, false);
+    return;
+  }
+  if (st.phase === 'ready') return;
+  if (st.phase !== 'idle') resetKorzul(ctx, inst, boss);
+  if (storyStep(ctx, inst) >= 8) {
+    // Already out of the ice (a wipe after his waking): ready on the centre.
+    standReady(ctx, inst, boss, st);
+    return;
+  }
+  holdInIce(boss);
+  if (wakeKorzul(ctx, inst, boss)) startEmerge(ctx, inst, boss, st, true);
+}
+
 /** Is Korzul on the wing (immune and out of reach)? */
 export function korzulAloft(boss: Entity): boolean {
   const st = boss.sanctumFight;
@@ -1215,7 +1248,8 @@ export function korzulDevTrigger(
   };
   const ground = (): boolean => {
     // A trigger skips what is left of Break Free: he stands on the centre.
-    if (st.phase === 'emerge' || st.phase === 'idle') skipEmerge(ctx, inst, boss, st);
+    if (st.phase === 'emerge' || st.phase === 'idle' || st.phase === 'ready')
+      skipEmerge(ctx, inst, boss, st);
     if (st.phase !== 'ground') return false;
     clearCastIf(boss, ...GROUND_BARS, KORZUL_GRAVE_INFERNO);
     st.inferno = null;
