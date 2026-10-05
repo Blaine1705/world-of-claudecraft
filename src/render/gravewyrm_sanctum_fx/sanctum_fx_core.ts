@@ -472,6 +472,206 @@ export const SHARD_GRAVITY = 22;
 /** Seconds a fallen shard lies on the ice before it melts away. */
 export const SHARD_REST = 1.6;
 
+// ---- where the bodies' effects come from ---------------------------------------------
+
+/** A point on a body as fractions of its drawn height: [forward, left, up]
+ *  (left = the body's own left, its facing turned a quarter anticlockwise from
+ *  above). The Blender bodies' points are measured on the delivered .blend
+ *  (scripts/assets/gravewyrm_sanctum_trash/kit/probe_anchor.py). */
+export type BodyAnchor = readonly [number, number, number];
+
+/** The named effect sources the Sanctum fx draw from. */
+export type BodyAnchorName =
+  /** Where a breath leaves the jaws as it lands (the Cinder and Rime Breaths). */
+  | 'breath'
+  /** Where the jaws are through a breath's bar (the embers drawn in). */
+  | 'breathDraw'
+  /** The Thawcaller's soul lantern (its censer smoke, the Warming Rite's beam). */
+  | 'censer'
+  /** The lantern swung low over a corpse through Thaw the Held (its tether). */
+  | 'riteCenser'
+  /** The Goadsmith's red-hot iron tip at rest. */
+  | 'ironTip'
+  /** The iron tip thrust out on a Goad (the spark stream to its ally). */
+  | 'ironThrust'
+  /** The iron held up glowing beside the face through the Branding Iron's bar. */
+  | 'brandHeat'
+  /** The iron thrust out at the victim on the Branding Iron's end. */
+  | 'brandThrust'
+  /** The Pyre-Tender's yoke braziers (mirrored left and right). */
+  | 'yoke';
+
+/** Each body's anchors; a body without a row keeps the generic placement. */
+export const SANCTUM_BODY_ANCHORS: Readonly<
+  Record<BodyAnchorName, Readonly<Record<string, BodyAnchor>>>
+> = {
+  breath: {
+    // The Scaleguard's jaws driven forward and down on the Cinder Breath's end.
+    [SCALEGUARD_ID]: [0.24, 0, 0.64],
+    // The whelp's head snapped forward and low, jaws wide, on the Rime Breath's
+    // end (its long neck carries the jaws well past its forefeet).
+    [RIME_WHELP_ID]: [1.17, 0, 0.4],
+  },
+  breathDraw: {
+    // Its head reared back over the bar, the throat swelling.
+    [SCALEGUARD_ID]: [0.08, 0, 0.88],
+  },
+  censer: {
+    // The soul lantern hangs off its crook, out past its right hand.
+    [THAWCALLER_ID]: [0.12, -0.32, 0.59],
+  },
+  riteCenser: {
+    // Bowed over the corpse, the lantern swung out low in front of it.
+    [THAWCALLER_ID]: [0.25, -0.25, 0.44],
+  },
+  ironTip: {
+    // The long goad iron's red-hot tip, held out ahead of its right fist.
+    [GOADSMITH_ID]: [0.5, -0.24, 0.53],
+  },
+  ironThrust: {
+    [GOADSMITH_ID]: [0.57, -0.22, 0.49],
+  },
+  brandHeat: {
+    [GOADSMITH_ID]: [0.23, -0.22, 1.0],
+  },
+  brandThrust: {
+    [GOADSMITH_ID]: [0.72, -0.23, 0.7],
+  },
+  yoke: {
+    // The yoke's braziers ride level with its shoulders, out past them.
+    [PYRE_TENDER_ID]: [-0.01, 0.24, 0.77],
+  },
+};
+
+/** The generic placement every body had before its own was measured. */
+const DEFAULT_ANCHORS: Readonly<Record<BodyAnchorName, BodyAnchor>> = {
+  breath: [0.3, 0, 0.5],
+  breathDraw: [0.3, 0, 0.5],
+  censer: [0.2, 0, 0.45],
+  riteCenser: [0.2, 0, 0.45],
+  ironTip: [0.28, -0.12, 0.55],
+  ironThrust: [0.42, 0, 0.5],
+  brandHeat: [0.42, 0, 0.5],
+  brandThrust: [0.42, 0, 0.5],
+  yoke: [-0.05, 0.2, 0.76],
+};
+
+/** A body's anchor, or the generic one. */
+export function sanctumAnchor(name: BodyAnchorName, templateId: string): BodyAnchor {
+  return SANCTUM_BODY_ANCHORS[name][templateId] ?? DEFAULT_ANCHORS[name];
+}
+
+/** The share of a breath cone's reach left past the jaws (`mouthAhead` yards
+ *  ahead of the body, the cone measured from the body as the sim does): a long
+ *  neck's puff is shortened so it never paints frost past the cone's end. */
+export function breathReachShare(range: number, mouthAhead: number): number {
+  if (range <= 0) return 1;
+  return Math.min(1, Math.max(0.25, (range - mouthAhead) / range));
+}
+
+/** The Branding Iron's source over its bar (`fill` 0 to 1): held up glowing
+ *  through the bar, thrust out over its last seventh (the clip's lunge).
+ *  Writes into `out` (no allocation per frame) and returns it. */
+export function brandIronAnchor(
+  templateId: string,
+  fill: number,
+  out: [number, number, number],
+): BodyAnchor {
+  const heat = sanctumAnchor('brandHeat', templateId);
+  const thrust = sanctumAnchor('brandThrust', templateId);
+  const x = Math.min(1, Math.max(0, (fill - 0.86) / 0.14));
+  const u = x * x * (3 - 2 * x);
+  for (let i = 0; i < 3; i++) out[i] = heat[i] + (thrust[i] - heat[i]) * u;
+  return out;
+}
+
+/** Where an anchor sits in the world for a body standing at (x, z) on the
+ *  ice at height gy, facing `facing`, drawn `h` tall (`mirror` -1 takes the
+ *  right-hand twin of a left anchor). Writes into `out`, no allocation. */
+export function anchorPoint(
+  a: BodyAnchor,
+  x: number,
+  z: number,
+  gy: number,
+  facing: number,
+  h: number,
+  out: { x: number; y: number; z: number },
+  mirror = 1,
+): void {
+  const fx = Math.sin(facing);
+  const fz = Math.cos(facing);
+  const left = a[1] * mirror;
+  out.x = x + (fx * a[0] + fz * left) * h;
+  out.z = z + (fz * a[0] - fx * left) * h;
+  out.y = gy + a[2] * h;
+}
+
+// ---- the Sledge-Hauler's frenzy ---------------------------------------------------------
+
+/** The gesture that plays an Ogre Sledge-Hauler's Enrage (a chest-beating
+ *  roar) as it drops under its enrage threshold. */
+export const HAULER_ENRAGE_GESTURE = 'sanctum_hauler_enrage';
+
+/** True for the sim's own enrage cue on a Sledge-Hauler: the self-targeted
+ *  fire nova with no ability that the shared enrage emits (mob/
+ *  boss_mechanics.ts). The flag itself is not on the wire; this event is. */
+export function isHaulerEnrageCue(
+  ev: {
+    type: string;
+    fx?: string;
+    school?: string;
+    sourceId?: number;
+    targetId?: number;
+    ability?: string;
+  },
+  sourceTemplateId: string | undefined,
+): boolean {
+  return (
+    ev.type === 'spellfx' &&
+    ev.fx === 'nova' &&
+    ev.school === 'fire' &&
+    ev.sourceId === ev.targetId &&
+    !ev.ability &&
+    sourceTemplateId === SLEDGE_HAULER_ID
+  );
+}
+
+// ---- the Glacier Splinter's Fracture --------------------------------------------------
+
+/** A Glacier Splinter's Shatter: its whole body bursts (the fx throw the
+ *  shards), so its corpse hides (re-sent while the corpse stands). */
+export const SPLINTER_SHATTERED_GESTURE = 'sanctum_splinter_shattered';
+
+/** The original Splinter's Fracture clip (the crack staggers it, every piece
+ *  jolts out from the core and grinds back), played as it splits. */
+export const SPLINTER_FRACTURE_GESTURE = 'sanctum_splinter_fracture';
+/** The copy it throws off plays the same clip as its entrance. */
+export const SPLINTER_COPY_GESTURE = 'sanctum_splinter_copy';
+/** Seconds the copy's entrance stays on offer (its view may land a frame late). */
+export const SPLINTER_COPY_WINDOW = 0.5;
+
+// ---- the risen dead ---------------------------------------------------------------
+
+/** The gesture that plays a Raised Bonewalker's Thaw (its entrance: the
+ *  soldier climbs out of the ice, crouched, and straightens into its guard). */
+export const BONEWALKER_RISE_GESTURE = 'sanctum_bonewalker_rise';
+/** Seconds a Bonewalker's rise stays on offer after its cue (its view, or its
+ *  GLB on a first load, may land a little late; the rig plays it once). */
+export const BONEWALKER_RISE_WINDOW = 1;
+
+/** Whether a Bonewalker the scan sees for the FIRST time should rise: one of
+ *  Velkhar's adds climbing out while he fights (his raise sends no per-add
+ *  event). A Thaw the Held corpse rises off its own landing event instead, and
+ *  a walker merely walked into range (or seen after a reload) outside his
+ *  fight simply stands there. */
+export function bonewalkerRisesOnSight(
+  templateId: string | undefined,
+  dead: boolean,
+  velkharFighting: boolean,
+): boolean {
+  return templateId === BONEWALKER_ID && !dead && velkharFighting;
+}
+
 // ---- the bodies' drawn sizes ---------------------------------------------------------
 
 /** The height each Sanctum body is DRAWN at, in yards, at its template's sim
@@ -481,12 +681,14 @@ export const SHARD_REST = 1.6;
 export const SANCTUM_DRAWN_HEIGHTS: Readonly<Record<string, number>> = {
   [BONEGUARD_ID]: 4.6,
   [BONEWALKER_ID]: 3.7,
-  [SCALEGUARD_ID]: 4.4,
+  // To the halberd's spike (the crest at about 4.4).
+  [SCALEGUARD_ID]: 4.7,
   [THAWCALLER_ID]: 4.4,
   [GOADSMITH_ID]: 4.6,
   [PYRE_TENDER_ID]: 4.4,
   [SOUL_BRAZIER_ID]: 2.4,
-  [RIME_WHELP_ID]: 3.2,
+  // To its horns: 1.4 players, its long neck and tail 8.8 yd from snout to tip.
+  [RIME_WHELP_ID]: 3.6,
   [SLEDGE_HAULER_ID]: 5.8,
   [GLACIER_SPLINTER_ID]: 5.4,
 };

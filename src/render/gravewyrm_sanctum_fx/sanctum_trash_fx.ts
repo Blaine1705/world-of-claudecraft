@@ -47,10 +47,10 @@ import {
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
-import { SPLINTER_SHATTERED_GESTURE } from '../characters/sanctum_creature_looks';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { surfaceMat } from '../gfx';
 import {
+  anchorPoint,
   BLOCK_RELEASE,
   blockFlight,
   FLAME_HEAT,
@@ -59,6 +59,8 @@ import {
   objectFill,
   rgb,
   SANCTUM_PALETTE,
+  SPLINTER_SHATTERED_GESTURE,
+  sanctumAnchor,
   sanctumDrawnHeight,
   sanctumObjectSpecs,
   shatterBuild,
@@ -318,9 +320,8 @@ export class SanctumTrashFx {
     slot.facing = f;
     slot.range = breath.range;
     slot.half = (breath.arcDeg * Math.PI) / 360;
-    slot.x = src.pos.x + Math.sin(f) * h * 0.3;
-    slot.z = src.pos.z + Math.cos(f) * h * 0.3;
-    slot.y = this.host.groundY(src.pos.x, src.pos.z) + h * 0.5;
+    const gy = this.host.groundY(src.pos.x, src.pos.z);
+    anchorPoint(sanctumAnchor('breath', src.templateId), src.pos.x, src.pos.z, gy, f, h, slot);
     slot.embered = false;
   }
 
@@ -660,13 +661,15 @@ export class SanctumTrashFx {
       const hc = this.drawnHeight(caster);
       // From the censer at the Thawcaller's side, or the goad iron's tip
       // thrust out ahead of the Goadsmith.
-      const fx = Math.sin(caster.facing);
-      const fz = Math.cos(caster.facing);
-      const reach = goad ? 0.42 : 0.2;
-      const from = this.tmpA.set(
-        caster.pos.x + fx * hc * reach,
-        this.host.groundY(caster.pos.x, caster.pos.z) + hc * (goad ? 0.5 : 0.45),
-        caster.pos.z + fz * hc * reach,
+      const from = this.tmpA;
+      anchorPoint(
+        sanctumAnchor(goad ? 'ironThrust' : 'censer', caster.templateId),
+        caster.pos.x,
+        caster.pos.z,
+        this.host.groundY(caster.pos.x, caster.pos.z),
+        caster.facing,
+        hc,
+        from,
       );
       const to = this.tmpB.set(
         target.pos.x,
@@ -964,14 +967,15 @@ export class SanctumTrashFx {
   private yokeFires(e: Entity, rate: number): void {
     const h = this.drawnHeight(e);
     const gy = this.host.groundY(e.pos.x, e.pos.z);
-    const fx = Math.sin(e.facing);
-    const fz = Math.cos(e.facing);
+    const yoke = sanctumAnchor('yoke', e.templateId);
+    const at = this.tmpA;
     for (const side of SIDES) {
       if (this.host.rand() > rate) continue;
       // The yoke's two braziers ride out past her shoulders, a little behind.
-      const x = e.pos.x + fz * side * h * 0.2 - fx * h * 0.05;
-      const z = e.pos.z - fx * side * h * 0.2 - fz * h * 0.05;
-      this.host.puff(x, gy + h * 0.76, z, 1, {
+      anchorPoint(yoke, e.pos.x, e.pos.z, gy, e.facing, h, at, side);
+      const x = at.x;
+      const z = at.z;
+      this.host.puff(x, at.y, z, 1, {
         speed: 0.25,
         up: 1,
         life: 0.6,
@@ -982,7 +986,7 @@ export class SanctumTrashFx {
         radius: 0.15,
       });
       if (this.host.rand() < 0.3)
-        this.host.puff(x, gy + h * 0.9, z, 1, {
+        this.host.puff(x, at.y + h * 0.14, z, 1, {
           speed: 0.3,
           up: 1.4,
           life: 1.6,
@@ -1000,9 +1004,11 @@ export class SanctumTrashFx {
     const sway = Math.sin(this.clock * 2.2 + e.id) * h * 0.08;
     const fx = Math.sin(e.facing);
     const fz = Math.cos(e.facing);
-    const x = e.pos.x + fx * h * 0.18 + fz * sway;
-    const z = e.pos.z + fz * h * 0.18 - fx * sway;
-    this.host.puff(x, gy + h * 0.42, z, 1, {
+    const at = this.tmpA;
+    anchorPoint(sanctumAnchor('censer', e.templateId), e.pos.x, e.pos.z, gy, e.facing, h, at);
+    const x = at.x + fz * sway;
+    const z = at.z - fx * sway;
+    this.host.puff(x, at.y, z, 1, {
       speed: 0.25,
       up: 0.9,
       life: 2,
@@ -1010,7 +1016,7 @@ export class SanctumTrashFx {
       color: [0.5, 0.42, 0.7],
       alpha: 0.32,
     });
-    this.host.puff(x, gy + h * 0.42, z, 1, {
+    this.host.puff(x, at.y, z, 1, {
       speed: 0.2,
       up: 1.1,
       life: 0.9,
@@ -1044,11 +1050,11 @@ export class SanctumTrashFx {
     if (this.host.rand() > rate) return;
     const h = this.drawnHeight(e);
     const gy = this.host.groundY(e.pos.x, e.pos.z);
-    const fx = Math.sin(e.facing);
-    const fz = Math.cos(e.facing);
-    const mx = e.pos.x + fx * h * 0.3;
-    const mz = e.pos.z + fz * h * 0.3;
-    const my = gy + h * 0.5;
+    const m = this.tmpB;
+    anchorPoint(sanctumAnchor('breathDraw', e.templateId), e.pos.x, e.pos.z, gy, e.facing, h, m);
+    const mx = m.x;
+    const mz = m.z;
+    const my = m.y;
     const a = this.host.rand() * Math.PI * 2;
     const r = 1.6 + this.host.rand() * 1.2;
     const sx = mx + Math.cos(a) * r;
@@ -1107,12 +1113,10 @@ export class SanctumTrashFx {
     if (this.host.rand() > rate) return;
     const h = this.drawnHeight(e);
     const gy = this.host.groundY(e.pos.x, e.pos.z);
-    const fx = Math.sin(e.facing);
-    const fz = Math.cos(e.facing);
     // The red-hot tip of the goad iron, ahead and to its right.
-    const x = e.pos.x + fx * h * 0.28 - fz * h * 0.12;
-    const z = e.pos.z + fz * h * 0.28 + fx * h * 0.12;
-    this.host.puff(x, gy + h * 0.55, z, 1, {
+    const at = this.tmpA;
+    anchorPoint(sanctumAnchor('ironTip', e.templateId), e.pos.x, e.pos.z, gy, e.facing, h, at);
+    this.host.puff(at.x, at.y, at.z, 1, {
       speed: 0.6,
       up: 1.4,
       life: 0.6,

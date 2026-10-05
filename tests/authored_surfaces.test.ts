@@ -189,12 +189,13 @@ const AUTHORED_ATLAS_DEFS = [
   'bastion_acolyte',
   'bastion_prisoner',
   'bastion_gaol_cage',
-  'bastion_drowned_anchor',
-  'bastion_turnkey',
-  // the Bastion's Blender Knight-Commander Olen (the fallen paladin) and
-  // Ossick (the drowned harbourmaster)
+  // the Sunken Bastion's Blender bosses Olen and Ossick, and Laverock, the
+  // Drowned Temple's lore guide (flagged in manifest.ts, listed here late)
   'bastion_olen',
   'bastion_ossick',
+  'npc_laverock',
+  'bastion_drowned_anchor',
+  'bastion_turnkey',
   'crypt_morthen_lich',
   // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
   'sanctum_korgath',
@@ -230,10 +231,18 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_colossus',
   // the Drowned Temple's Blender Moonspawn (the moon spirit of water)
   'temple_moonspawn',
-  // the Drowned Temple's optional lore guide, Laverock (Blender NPC body)
-  'npc_laverock',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
+  // the Gravewyrm Sanctum trash's Blender bodies (sanctum_trash_looks.ts)
+  'sanctum_boneguard',
+  'sanctum_raised_bonewalker',
+  'sanctum_scaleguard',
+  'sanctum_thawcaller',
+  'sanctum_goadsmith',
+  'sanctum_pyre_tender',
+  'sanctum_rime_whelp',
+  'sanctum_sledge_hauler',
+  'sanctum_glacier_splinter',
   'wildheart_great_saurian',
   'wildheart_gorgebloom',
   'wildheart_vine_lasher',
@@ -242,14 +251,6 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_sunbone_totem',
   // its Dread Totem: the same carved post re-tinted (wildheart_creature_looks.ts)
   'wildheart_sunbone_dread_totem',
-  // the rework's re-tints of a flagged body, which inherit the flag with the
-  // spread base def (characters/sanctum_creature_looks.ts)
-  'sanctum_boneguard',
-  'sanctum_raised_bonewalker',
-  'sanctum_pyre_tender',
-  'sanctum_rime_whelp',
-  'sanctum_sledge_hauler',
-  'sanctum_glacier_splinter',
 ];
 
 describe('authored surfaces', () => {

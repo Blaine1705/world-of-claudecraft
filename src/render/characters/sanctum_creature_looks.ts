@@ -2,15 +2,13 @@
 // gravewyrm_sanctum.md section 5, the Ice Tomb of the Wyrm). The Sledge Tusker
 // wears its own Blender body (SANCTUM_SLEDGE_TUSKER_LOOK; its sledge is a
 // separate prop the fx module drives, gravewyrm_sanctum_fx/tusker_fx.ts). The
-// rest of the new trash are PLACEHOLDERS: shipped rigs re-tinted for the ice
-// and the cult's fires, so every creature of the rebuilt route is visible and
-// animated from day one, until the art phase gives each its own body. Every
-// key keeps the mob id and the visual key, so a swap is a def change.
+// trash wear their own Blender bodies (sanctum_trash_looks.ts), each under
+// the visual key its re-tinted placeholder had, so the mob ids never moved.
 // manifest.ts merges these over its VISUALS and maps the templates through
 // MOB_KEYS (SANCTUM_MOB_KEYS).
 //
 // Sizes ride the templates' sim scales (sim/content/gravewyrm_sanctum.ts and
-// the shipped rows in dungeons.ts): each row names the height it is DRAWN at,
+// the shipped rows in dungeons.ts): each body is drawn at its height
 // in yards, at its template's scale, and every one stands clearly past a
 // player (2.6 yd) without touching the sim's reach (the owner's rule:
 // imposing, never toy-like). The three bosses keep their looks (phase B).
@@ -43,6 +41,7 @@ import {
   tuskerModelScale,
 } from '../gravewyrm_sanctum_fx/tusker_model_core';
 import type { ClipMap, VisualDef } from './manifest';
+import { SANCTUM_TRASH_LOOKS } from './sanctum_trash_looks';
 
 /** The gestures the Sanctum's fx send the Tusker (tusker_fx.ts): the pull's
  *  Unhitch (its clip drops the traces and the hitch bar), the Charge down the
@@ -54,9 +53,9 @@ export const TUSKER_CHARGE_GESTURE = 'sanctum_tusker_charge';
 export const TUSKER_TRACES_GONE_GESTURE = 'sanctum_tusker_traces_gone';
 export const TUSKER_TRACES_ON_GESTURE = 'sanctum_tusker_traces_on';
 
-/** A Glacier Splinter's Shatter: its whole body bursts (the fx throw the
- *  shards), so its corpse hides (re-sent while the corpse stands). */
-export const SPLINTER_SHATTERED_GESTURE = 'sanctum_splinter_shattered';
+/** A Glacier Splinter's Shatter (defined beside the other fx gestures in
+ *  sanctum_fx_core.ts, re-exported for the looks' callers). */
+export { SPLINTER_SHATTERED_GESTURE } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 /** A Soul Brazier kicked over (Topple Brazier): its standing body hides at
  *  once and the fx draw it fallen in its place (gravewyrm_sanctum_fx/
  *  sanctum_kit_fx.ts). */
@@ -135,107 +134,14 @@ const STATIC_PROP_CLIPS: ClipMap = {
   death: 'Idle',
 };
 
-/** [base visual key, tint, tint strength, extra]; the height it is drawn at
- *  is the template's row of SANCTUM_DRAWN_HEIGHTS (the fx share it). */
-type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
-
-const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Sanctum Boneguard: one of the held dead thawed out, a pale soldier in old
-  // plate (the plated revenant rig, washed rime-grey; no bare skeleton).
-  sanctum_boneguard: [
-    BONEGUARD_ID,
-    ['mob_hoard_frost_revenant', 0xc4d3dc, 0.42, { selfIllumination: 0.14 }],
-  ],
-  // Raised Bonewalker (Velkhar's adds): the same thawed dead, a size smaller.
-  sanctum_raised_bonewalker: [
-    BONEWALKER_ID,
-    ['mob_hoard_frost_revenant', 0xaebdb4, 0.4, { selfIllumination: 0.1 }],
-  ],
-  // Sanctum Scaleguard: Korzul's wyrm rig, the drowned brood, meltwater-dark
-  // (the fx drip meltwater off it).
-  sanctum_scaleguard: [
-    SCALEGUARD_ID,
-    ['mob_dragonkin', 0x9cc8c4, 0.34, { selfIllumination: 0.14 }],
-  ],
-  // Broodsworn Thawcaller: a hooded cultist in furs, its soul lantern swung on
-  // a crook like a censer on a chain (the mist chanter's first rig, kept as its
-  // own file when the Bastion's Mist Chanter got her sculpted body, warmed to
-  // fur brown; its lantern glows and the fx trail soul-smoke off it).
-  sanctum_thawcaller: [
-    THAWCALLER_ID,
-    [
-      'bastion_mistweaver',
-      0xc49a74,
-      0.24,
-      {
-        url: 'models/creatures/mist_chanter_thawcaller.glb',
-        authoredAtlas: undefined,
-        walkRef: undefined,
-        runRef: undefined,
-        selfIllumination: 0.08,
-      },
-    ],
-  ],
-  // Broodsworn Goadsmith: a burly cultist in a bear-fur hood and a leather
-  // apron, a long goad iron in his fist (the fx heat its tip).
-  sanctum_goadsmith: [
-    GOADSMITH_ID,
-    [
-      'mob_bruiser',
-      0x6e4a32,
-      0.38,
-      { attach: [{ url: 'models/weapons/spear_a.glb', bone: 'handslot.r' }] },
-    ],
-  ],
-  // Broodsworn Pyre-Tender: a hooded cultist in soot-black robes; the fx set
-  // the brazier fires burning over her yoke.
-  sanctum_pyre_tender: [
-    PYRE_TENDER_ID,
-    ['mob_hoard_void_acolyte', 0xc0743c, 0.3, { selfIllumination: 0.2 }],
-  ],
-  // Rime Whelp: a thawed whelp, pale and frosted, frost on its wings. The
-  // grey-blue storm drake rig washed rime-white (dragonkin_baby's green atlas
-  // cannot be paled by a tint, which only multiplies; the fx dust it with
-  // frost).
-  sanctum_rime_whelp: [
-    RIME_WHELP_ID,
-    ['mob_hoard_stormscale_drake', 0xe4f4ff, 0.7, { selfIllumination: 0.5 }],
-  ],
-  // Ogre Sledge-Hauler: the ogre in furs and a hauling harness.
-  sanctum_sledge_hauler: [
-    SLEDGE_HAULER_ID,
-    ['mob_ogre', 0x7a6248, 0.36, { selfIllumination: 0.06 }],
-  ],
-  // Glacier Splinter: a walking shard of the Quench, blue ice over the Smith's
-  // rune-iron core (the rime elemental, glacier blue and glowing).
-  sanctum_glacier_splinter: [
-    GLACIER_SPLINTER_ID,
-    [
-      'mob_hoard_rime_elemental',
-      0x86c8ec,
-      0.5,
-      {
-        selfIllumination: 0.42,
-        meshToggles: [{ nodes: ['*'], hideNow: SPLINTER_SHATTERED_GESTURE }],
-      },
-    ],
-  ],
-};
-
-/** The Sanctum's defs: the placeholders derived from the base rigs already in
- *  `visuals`, the Soul Brazier prop, and the Sledge Tusker's own body. */
+/** The Sanctum's defs: every trash body (sanctum_trash_looks.ts), the Soul
+ *  Brazier prop, and the Sledge Tusker's own body. `_visuals` is the manifest
+ *  the placeholders used to be re-tinted from; every creature has its own
+ *  body now, so nothing is derived from it. */
 export function sanctumCreatureLooks(
-  visuals: Readonly<Record<string, VisualDef>>,
+  _visuals: Readonly<Record<string, VisualDef>>,
 ): Record<string, VisualDef> {
-  const out: Record<string, VisualDef> = {};
-  for (const [key, [mobId, [base, tint, tintStrength, extra]]] of Object.entries(ROWS)) {
-    const def = visuals[base];
-    if (!def) continue;
-    const height = sanctumDrawnHeight(mobId, 1);
-    // A hovering rig keeps its gap in proportion to its new height.
-    const hover = def.hover !== undefined ? (def.hover * height) / def.height : undefined;
-    out[key] = { ...def, height, hover, tint, tintStrength, ...extra };
-  }
+  const out: Record<string, VisualDef> = { ...SANCTUM_TRASH_LOOKS };
   out.sanctum_sledge_tusker = SANCTUM_SLEDGE_TUSKER_LOOK;
   // The Soul Brazier: a bowl of soulfire on an iron stand, never a mob
   // silhouette (the shipped infernal brazier, violet-green and burning from
