@@ -207,7 +207,7 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
     : undefined;
   return {
     templateId: pet.templateId,
-    ...(scale !== undefined && scale !== template.scale ? { scale } : {}),
+    ...(template && scale !== undefined && scale !== template.scale ? { scale } : {}),
     name: pet.name,
     level: pet.level,
     hp: pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, pet.hp)),
