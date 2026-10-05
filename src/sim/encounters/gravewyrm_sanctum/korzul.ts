@@ -74,7 +74,7 @@ import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { type Aura, DT, dist2d, type Entity } from '../../types';
 import { pickMarkTargets } from '../sunken_bastion/claim';
-import { plateTemplate } from './boss_ids';
+import { KORZUL_BODY_RADIUS, plateTemplate } from './boss_ids';
 import {
   bossEngaged,
   claimPlayers,
@@ -125,7 +125,7 @@ import {
 const T = KORZUL_TUNING;
 
 /** His drawn body radius (the template's bodyRadius): cones reach from it. */
-export const KORZUL_BODY = 5;
+export const KORZUL_BODY = KORZUL_BODY_RADIUS;
 /** The climb from the ice to the hover. */
 export const KORZUL_TAKEOFF_SECONDS = 1.8;
 /** How fast he glides between plates on the wing (yards a second). */

@@ -25,28 +25,43 @@ import {
   unquenchedLeft,
 } from '../src/render/gravewyrm_sanctum_bosses/boss_fx_core';
 import {
+  KORGATH_BODY,
   KORGATH_CHAIN_FLAIL,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_STOMP,
   KORGATH_THRESHOLD_CHARGE,
   KORGATH_TUNING,
   KORZUL_GRAVE_BREATH,
   KORZUL_GRAVE_INFERNO,
+  KORZUL_REACH,
   KORZUL_TAIL_SWEEP,
   KORZUL_TUNING,
   plateTemplate,
 } from '../src/sim/encounters/gravewyrm_sanctum/boss_ids';
 
 describe('Sanctum boss telegraphs', () => {
-  it('lays each bar at the sim tuning size, in the threat palette', () => {
-    expect(SANCTUM_CAST_SPECS[KORGATH_STOMP].range).toBe(KORGATH_TUNING.stompRadius);
+  it('lays each bar at the reach the sim strikes, in the threat palette', () => {
+    // A strike measured from the boss's body edge draws its whole reach: the
+    // floor shape is never a few yards short of where it hits (the playtest's
+    // "no time to dodge" was partly a cleave landing past its drawn edge).
+    expect(KORGATH_REACH.maul).toBe(KORGATH_TUNING.maulRange + KORGATH_BODY);
+    expect(KORGATH_REACH.stomp).toBe(KORGATH_TUNING.stompRadius + KORGATH_BODY);
+    expect(KORGATH_REACH.flail).toBe(KORGATH_TUNING.flailLength + KORGATH_BODY);
+    expect(KORGATH_REACH.charge).toBe(KORGATH_TUNING.chargeLength + KORGATH_BODY);
+    expect(KORGATH_BODY).toBe(2.5);
+    expect(KORZUL_REACH.breath).toBe(KORZUL_TUNING.breathRange + 5);
+    expect(KORZUL_REACH.tail).toBe(KORZUL_TUNING.tailRange + 5);
+    expect(SANCTUM_CAST_SPECS[KORGATH_STOMP].range).toBe(KORGATH_REACH.stomp);
     expect(SANCTUM_CAST_SPECS[KORGATH_STOMP].arcDeg).toBe(360);
+    expect(SANCTUM_CAST_SPECS[KORGATH_MAUL_ARC].range).toBe(KORGATH_REACH.maul);
     expect(SANCTUM_CAST_SPECS[KORGATH_MAUL_ARC].arcDeg).toBe(KORGATH_TUNING.maulArcDeg);
-    expect(SANCTUM_CAST_SPECS[KORGATH_CHAIN_FLAIL].range).toBe(KORGATH_TUNING.flailLength);
+    expect(SANCTUM_CAST_SPECS[KORGATH_CHAIN_FLAIL].range).toBe(KORGATH_REACH.flail);
     expect(SANCTUM_CAST_SPECS[KORGATH_CHAIN_FLAIL].half).toBe(KORGATH_TUNING.flailHalfWidth);
-    expect(SANCTUM_CAST_SPECS[KORGATH_THRESHOLD_CHARGE].range).toBe(KORGATH_TUNING.chargeLength);
+    expect(SANCTUM_CAST_SPECS[KORGATH_THRESHOLD_CHARGE].range).toBe(KORGATH_REACH.charge);
     expect(SANCTUM_CAST_SPECS[KORZUL_GRAVE_BREATH].arcDeg).toBe(KORZUL_TUNING.breathArcDeg);
-    expect(SANCTUM_CAST_SPECS[KORZUL_GRAVE_BREATH].range).toBe(KORZUL_TUNING.breathRange);
+    expect(SANCTUM_CAST_SPECS[KORZUL_GRAVE_BREATH].range).toBe(KORZUL_REACH.breath);
+    expect(SANCTUM_CAST_SPECS[KORZUL_TAIL_SWEEP].range).toBe(KORZUL_REACH.tail);
     expect(SANCTUM_CAST_SPECS[KORZUL_GRAVE_INFERNO].range).toBe(KORZUL_TUNING.infernoRadius);
     const palette = new Set(Object.values(TELEGRAPH_THREAT_COLORS));
     for (const spec of Object.values(SANCTUM_CAST_SPECS))

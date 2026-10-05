@@ -33,6 +33,7 @@ import {
   KORGATH_ENRAGE,
   KORGATH_ID,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_RERIVETED,
   KORGATH_STOMP,
   KORGATH_STRAIN,
@@ -766,8 +767,8 @@ export class SanctumBossFx {
       }
       case KORGATH_STOMP:
         if (ev.fx !== 'nova') return false;
-        this.ring(x, z, SANCTUM_COLORS.frost, 1, KORGATH_TUNING.stompRadius + 1, 0.7, 0.16);
-        this.ring(x, z, SANCTUM_COLORS.smithBlue, 0.5, KORGATH_TUNING.stompRadius, 1.1, 0.06);
+        this.ring(x, z, SANCTUM_COLORS.frost, 1, KORGATH_REACH.stomp + 1, 0.7, 0.16);
+        this.ring(x, z, SANCTUM_COLORS.smithBlue, 0.5, KORGATH_REACH.stomp, 1.1, 0.06);
         this.spray(this.mist, 60, x, gy + 0.3, z, {
           speed: 12,
           up: 1.5,

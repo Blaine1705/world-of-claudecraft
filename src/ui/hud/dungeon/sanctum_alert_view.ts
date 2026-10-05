@@ -32,6 +32,7 @@ import {
   KORGATH_ID,
   KORGATH_LOCKBOUND,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_STOMP,
   KORGATH_STRAIN,
   KORGATH_THRESHOLD_CHARGE,
@@ -42,6 +43,7 @@ import {
   KORZUL_GRAVE_INFERNO,
   KORZUL_ID,
   KORZUL_PLUNGING_FIRE,
+  KORZUL_REACH,
   KORZUL_TAIL_SWEEP,
   KORZUL_TUNING,
   KORZUL_WYRMS_EYE,
@@ -447,13 +449,8 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
   // 5. The lanes: aimed at you, or you stand in one.
   if (korgath && korgath.pos) {
     const lanes = [
-      [KORGATH_CHAIN_FLAIL, 'flail', KORGATH_TUNING.flailLength, KORGATH_TUNING.flailHalfWidth],
-      [
-        KORGATH_THRESHOLD_CHARGE,
-        'charge',
-        KORGATH_TUNING.chargeLength,
-        KORGATH_TUNING.chargeHalfWidth,
-      ],
+      [KORGATH_CHAIN_FLAIL, 'flail', KORGATH_REACH.flail, KORGATH_TUNING.flailHalfWidth],
+      [KORGATH_THRESHOLD_CHARGE, 'charge', KORGATH_REACH.charge, KORGATH_TUNING.chargeHalfWidth],
     ] as const;
     for (const [id, kind, length, half] of lanes) {
       if (korgath.castingAbility !== id) continue;
@@ -513,7 +510,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
   if (
     casting(korgath, KORGATH_STOMP) &&
     korgath.pos &&
-    dist(korgath.pos, me) <= KORGATH_TUNING.stompRadius + REACH_MARGIN
+    dist(korgath.pos, me) <= KORGATH_REACH.stomp + REACH_MARGIN
   )
     return fromBar('stomp', t('hudChrome.sanctumAlert.stompLine'), korgath);
 
@@ -526,7 +523,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       korzul.pos,
       korzul.facing ?? 0,
       me,
-      KORZUL_TUNING.breathRange + REACH_MARGIN,
+      KORZUL_REACH.breath + REACH_MARGIN,
       KORZUL_TUNING.breathArcDeg,
     )
   )
@@ -542,7 +539,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       korgath.pos,
       korgath.facing ?? 0,
       me,
-      KORGATH_TUNING.maulRange + REACH_MARGIN + 2,
+      KORGATH_REACH.maul + REACH_MARGIN,
       KORGATH_TUNING.maulArcDeg,
     )
   )
@@ -556,7 +553,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       korzul.pos,
       (korzul.facing ?? 0) + Math.PI,
       me,
-      KORZUL_TUNING.tailRange + REACH_MARGIN + 3,
+      KORZUL_REACH.tail + REACH_MARGIN,
       KORZUL_TUNING.tailArcDeg,
     )
   )
