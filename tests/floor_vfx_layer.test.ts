@@ -265,7 +265,11 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/hollow_crypt/crypt_boss_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hollow_crypt/marrow_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hollow_crypt/lady_fx.ts', layer: 'encounter', strict: true },
-  { file: 'src/render/hollow_crypt/ilvane_fx.ts', layer: 'encounter', strict: true },
+  // Cantor Ilvane: her painter (ilvane_fx.ts) lays only the shared kit's
+  // glyph and lanes now; her Dirge's sight field and its shadow wedges, the
+  // rings under the players, the shock of sound and its curtain, her aura, the
+  // organ's pipes, the beams, notes and silence marks ride the encounter band.
+  { file: 'src/render/hollow_crypt/ilvane_dirge_fx.ts', layer: 'encounter', strict: true },
   {
     file: 'src/render/sunken_bastion/bastion_vael_stage_fx.ts',
     layer: 'encounter',

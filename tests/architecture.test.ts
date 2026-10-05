@@ -823,6 +823,8 @@ const RENDER_PURE_CORES = [
   'src/render/far_lod_latch_core.ts',
   // The Hollow Crypt finale's effect plan (Morthen's entrance, the Knellwyrm).
   'src/render/hollow_crypt/crypt_boss_fx_core.ts',
+  // Cantor Ilvane's Dirge plan (swell, voices, the shock of sound, the marks).
+  'src/render/hollow_crypt/ilvane_dirge_fx_core.ts',
   'src/render/hollow_crypt/crypt_finale_fx_core.ts',
   // Morthen the Lich Bishop's stance latch, body anchors and effect timings.
   'src/render/hollow_crypt/morthen_fx_core.ts',

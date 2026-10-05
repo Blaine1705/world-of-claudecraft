@@ -2,21 +2,18 @@
 // the sim (src/sim/encounters/hollow_crypt/ilvane*.ts):
 //
 //  - the Dirge of the Hollow: under her the kick glyph (or, for the heroic
-//    Unbroken Verse, a lethal ring with no glyph: hide), the violet rings of
-//    her voice rolling out, and on the loft floor the SHADOW each choir pillar
-//    throws from her voice (pale, still: stand there and she cannot see you;
-//    the sim's line of sight agrees); then the blast, or the song shattering
-//    when it is cut;
+//    Unbroken Verse, a lethal ring with no glyph: hide); the build-up, the
+//    sight field with the choir pillars' shadow wedges, the beams to the
+//    exposed and the release are ilvane_dirge_fx.ts; the song shattering when
+//    it is cut is here;
 //  - Harmony: a thread of song from every living Chorister into her;
 //  - the Bone Organ: each note lane gathering on the floor as the sim's object
 //    says, then the burst, notes racing down it, the pipes flaring;
 //  - Encore: a Chorister climbing back up.
 //
-// The glyph, the ring, the pillar shadows and the lanes are actionable and draw
-// on every tier; the rings, notes and sparks are cosmetic.
+// The glyph, the ring, the sight field and the lanes are actionable and draw
+// on every tier; the notes and sparks are cosmetic.
 
-import * as THREE from 'three';
-import { HOLLOW_CRYPT_FIELD } from '../../sim/content/hollow_crypt_layout';
 import {
   CHORISTER_ID,
   ILVANE_CRESCENDO,
@@ -41,50 +38,19 @@ import {
   type TelegraphLane,
   telegraphFillOf,
 } from '../floor_telegraph';
-import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { CryptBossFxHost, CryptBossPainter } from './crypt_boss_fx';
-import { cryptSlotOrigin, noteRun, pillarShadow } from './crypt_boss_fx_core';
+import { cryptSlotOrigin, noteRun } from './crypt_boss_fx_core';
+import { IlvaneDirgeFx } from './ilvane_dirge_fx';
 
 const T = ILVANE_TUNING;
 const SCAN_SEC = 0.1;
 const LANES = 21;
 const SONG = { r: 0.72, g: 0.45, b: 1 };
 const PALE = { r: 0.8, g: 0.92, b: 1 };
-/** The choir pillars (instance-local), the line-of-sight cover of her loft. */
-const CHOIR_PILLARS = HOLLOW_CRYPT_FIELD.props.filter((p) => p.kind === 'hc_choir_pillar');
 const LANE_STYLE = {
   color: TELEGRAPH_THREAT_COLORS.danger,
   accent: TELEGRAPH_ACCENTS.shadow,
 } as const;
-/** How far a pillar's shadow is drawn from her voice (the loft's reach). */
-const SHADOW_REACH = 30;
-
-const SHADOW_VERT = /* glsl */ `
-attribute float aFar;
-varying float vFar;
-varying vec3 vWorld;
-void main() {
-  vFar = aFar;
-  vec4 wp = modelMatrix * vec4(position, 1.0);
-  vWorld = wp.xyz;
-  gl_Position = projectionMatrix * viewMatrix * wp;
-}
-`;
-
-/** A pillar's sight shadow: a pale, still band behind the stone, its near end
- *  crisp at the pillar, fading out toward its far end. */
-const SHADOW_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-varying float vFar;
-varying vec3 vWorld;
-void main() {
-  float fade = 1.0 - smoothstep(0.55, 1.0, vFar);
-  float shimmer = 0.85 + 0.15 * sin(vWorld.x * 1.3 + vWorld.z * 1.1 + uTime * 1.5);
-  vec3 col = vec3(0.62, 0.86, 1.0) * shimmer;
-  gl_FragColor = vec4(col, 0.3 * fade * uAlpha);
-}
-`;
 
 interface LaneSlot extends TelegraphLane {
   objectId: number;
@@ -94,21 +60,14 @@ interface LaneSlot extends TelegraphLane {
   draped: boolean;
 }
 
-interface Shadow {
-  mesh: THREE.Mesh;
-  pos: THREE.BufferAttribute;
-}
-
 export class IlvaneFx implements CryptBossPainter {
   private readonly glyph: TelegraphFan;
   private readonly unbroken: TelegraphFan;
   private readonly lanes: LaneSlot[] = [];
-  private readonly shadows: Shadow[] = [];
-  private readonly shadowMat: THREE.ShaderMaterial;
+  private readonly dirge: IlvaneDirgeFx;
   private ilvaneId = -1;
   private choristers: number[] = [];
   private scan = 0;
-  private ring = 0;
   private thread = 0;
 
   constructor(private readonly host: CryptBossFxHost) {
@@ -126,34 +85,7 @@ export class IlvaneFx implements CryptBossPainter {
     });
     for (let i = 0; i < LANES; i++)
       this.lanes.push({ ...kit.lane(9), objectId: -1, born: 0, burstAt: 0, draped: false });
-    this.shadowMat = host.own(
-      new THREE.ShaderMaterial({
-        uniforms: { uTime: host.uTime, uAlpha: { value: 0 } },
-        vertexShader: SHADOW_VERT,
-        fragmentShader: SHADOW_FRAG,
-        transparent: true,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-        polygonOffset: true,
-        polygonOffsetFactor: -2,
-        polygonOffsetUnits: -2,
-      }),
-    );
-    for (let i = 0; i < CHOIR_PILLARS.length; i++) {
-      const g = host.own(new THREE.BufferGeometry());
-      const pos = new THREE.BufferAttribute(new Float32Array(12), 3).setUsage(
-        THREE.DynamicDrawUsage,
-      );
-      g.setAttribute('position', pos);
-      g.setAttribute('aFar', new THREE.BufferAttribute(new Float32Array([0, 0, 1, 1]), 1));
-      g.setIndex([0, 1, 2, 0, 2, 3]);
-      const mesh = new THREE.Mesh(g, this.shadowMat);
-      mesh.frustumCulled = false;
-      mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 5);
-      host.root.add(mesh);
-      this.shadows.push({ mesh, pos });
-    }
+    this.dirge = new IlvaneDirgeFx(host);
   }
 
   // ------------------------------------------------------------------ events
@@ -162,17 +94,19 @@ export class IlvaneFx implements CryptBossPainter {
     const a = ev.ability;
     const src = world.entities.get(ev.sourceId);
     if (!src) return;
-    if ((a === ILVANE_DIRGE || a === ILVANE_UNBROKEN_DIRGE) && ev.fx === 'nova') this.blast(src);
+    if ((a === ILVANE_DIRGE || a === ILVANE_UNBROKEN_DIRGE) && ev.fx === 'nova')
+      this.blast(src, world);
     else if (a === ILVANE_DIRGE_CUT) this.cut(src);
     else if (a === ILVANE_NOTES_BURST) this.pipes(src);
     else if (a === ILVANE_ENCORE) this.encore(src);
   }
 
-  private blast(e: Entity): void {
+  /** The Dirge lands: the shock of dark sound (ilvane_dirge_fx.ts) and a
+   *  spray of song off her. */
+  private blast(e: Entity, world: IWorld): void {
     const h = this.host;
     const now = h.clock();
-    h.wave(e.pos.x, e.pos.z, 34, 1, 0xb98cff, 0.12);
-    h.wave(e.pos.x, e.pos.z, 20, 0.7, 0xffffff, 0.06);
+    this.dirge.release(e, world);
     const n = Math.round(140 * h.density);
     for (let i = 0; i < n; i++) {
       const a = (i / n) * Math.PI * 2;
@@ -199,6 +133,7 @@ export class IlvaneFx implements CryptBossPainter {
   private cut(e: Entity): void {
     const h = this.host;
     const now = h.clock();
+    this.dirge.cut();
     for (let i = 0; i < Math.round(60 * h.density); i++) {
       const a = h.rand() * Math.PI * 2;
       const s = 4 + h.rand() * 6;
@@ -279,7 +214,8 @@ export class IlvaneFx implements CryptBossPainter {
       this.scanWorld(world);
     }
     const ilvane = this.ilvaneId >= 0 ? world.entities.get(this.ilvaneId) : undefined;
-    this.paintDirge(ilvane, dt);
+    this.paintDirge(ilvane);
+    this.dirge.update(world, ilvane, dt);
     this.paintLanes(world, ilvane);
     if (ilvane) this.paintHarmony(world, ilvane, dt);
   }
@@ -322,67 +258,20 @@ export class IlvaneFx implements CryptBossPainter {
       }
   }
 
-  private paintDirge(ilvane: Entity | undefined, dt: number): void {
+  /** The Dirge's kick glyph under her (or the Unbroken Verse's lethal ring). */
+  private paintDirge(ilvane: Entity | undefined): void {
     const h = this.host;
     const casting = ilvane?.castingAbility;
     const singing = casting === ILVANE_DIRGE || casting === ILVANE_UNBROKEN_DIRGE;
     this.glyph.group.visible = false;
     this.unbroken.group.visible = false;
-    if (!ilvane || !singing) {
-      for (const s of this.shadows) s.mesh.visible = false;
-      return;
-    }
+    if (!ilvane || !singing) return;
     const fill = telegraphFillOf(ilvane.castRemaining, ilvane.castTotal);
     const gy = h.groundY(ilvane.pos.x, ilvane.pos.z);
     const f = casting === ILVANE_DIRGE ? this.glyph : this.unbroken;
     h.kit.drapeFan(f, h.groundY, ilvane.pos.x, gy, ilvane.pos.z, 0, 2.6);
     h.kit.paintFan(f, { fill, clock: h.clock(), range: 2.6 });
     f.group.visible = true;
-    // Every pillar's shadow from her voice: where she cannot see you.
-    const o = cryptSlotOrigin(ilvane.pos.x, ilvane.pos.z);
-    const sx = ilvane.pos.x - o.x;
-    const sz = ilvane.pos.z - o.z;
-    this.shadowMat.uniforms.uAlpha.value = 0.6 + 0.4 * fill;
-    for (const [i, p] of CHOIR_PILLARS.entries()) {
-      const s = this.shadows[i];
-      const quad = pillarShadow(sx, sz, p.x, p.z, p.r ?? 1.4, SHADOW_REACH);
-      if (!quad) {
-        s.mesh.visible = false;
-        continue;
-      }
-      for (const [k, [qx, qz]] of quad.entries()) {
-        const wx = o.x + qx;
-        const wz = o.z + qz;
-        s.pos.setXYZ(k, wx, h.groundY(wx, wz) + 0.08, wz);
-      }
-      s.pos.needsUpdate = true;
-      s.mesh.visible = true;
-    }
-    // The rings of her voice (cosmetic).
-    if (h.low) return;
-    this.ring -= dt;
-    if (this.ring <= 0) {
-      this.ring = 0.45 - 0.2 * fill;
-      h.wave(ilvane.pos.x, ilvane.pos.z, 6 + 10 * fill, 0.55, 0x9d6cff, 0.1);
-    }
-    const now = h.clock();
-    for (let k = 0; k < 2; k++) {
-      const a = h.rand() * Math.PI * 2;
-      h.glow.emit(now, {
-        x: ilvane.pos.x + Math.sin(a) * 0.8,
-        y: gy + 3.5,
-        z: ilvane.pos.z + Math.cos(a) * 0.8,
-        vx: Math.sin(a) * 2.5,
-        vy: 1.5,
-        vz: Math.cos(a) * 2.5,
-        life: 0.9,
-        drag: 0.6,
-        size0: 0.5,
-        size1: 0.15,
-        ...SONG,
-        a: 0.8,
-      });
-    }
   }
 
   private paintLanes(world: IWorld, ilvane: Entity | undefined): void {
