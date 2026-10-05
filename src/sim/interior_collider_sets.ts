@@ -18,6 +18,7 @@ import { INTERIOR_LAYOUTS } from './dungeon_floor';
 import { CRYPT_LAYOUT, DAWNHOLD_LAYOUT, LASTKEEP_LAYOUT, layoutColliders } from './dungeon_layout';
 import { ignivarPropColliders } from './ignivar_props';
 import { authoredFieldColliders, authoredFieldFor } from './instances/authored_field';
+import { slotWalledColliders } from './instances/combat_wall_state';
 import { dungeonGateColliders } from './instances/dungeon_gate_colliders';
 import { slotGatedColliders } from './instances/dungeon_gate_state';
 
@@ -77,15 +78,21 @@ export function derivedInteriorColliders(
 }
 
 /** The interior collider set a slot anchored at (ox, oz) collides with: the
- *  dungeon's shared set minus the gates open in that slot. */
+ *  dungeon's shared set minus the gates open in that slot, plus the slot's
+ *  live combat walls (instances/combat_wall_state.ts; none, at zero cost, in
+ *  every slot with no wall standing). */
 export function interiorCollidersFor(
   dungeonId: string | null,
   interior: string,
   ox: number,
   oz: number,
 ): Collider[] {
-  return slotGatedColliders(
-    derivedInteriorColliders(dungeonId, interior, STATIC_INTERIOR_COLLIDERS),
+  return slotWalledColliders(
+    slotGatedColliders(
+      derivedInteriorColliders(dungeonId, interior, STATIC_INTERIOR_COLLIDERS),
+      ox,
+      oz,
+    ),
     ox,
     oz,
   );

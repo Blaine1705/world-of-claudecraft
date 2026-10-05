@@ -773,6 +773,28 @@ manta body (display only; the id `pearlguard_sentinel` is frozen).
 | Lunar Glide, Tidal Wingbeat, Nacre Cocoon | the manta's three moves | KEEP. No match for the full names ("Wingbeat" alone is a plain English word). |
 | The Moonbridge Rises | the banner as the Moonbridge forms | KEEP. Plain English over the dungeon's own place name. |
 
+### The Gravewyrm Sanctum trash mechanics pass (web-verified 2026-10-04)
+
+Exact-phrase and coined-token searches at authoring (warcraft.wiki.gg full text, the Wowhead
+spell database, the Guild Wars 2 and FFXIV wikis, Arknights; the PoE and UESP wikis refused the
+fetch, so they are covered by the broad web search only), for the trash pass on the trash
+engine's generic keys (`src/sim/mob/trash_kit/sanctum_cast_ids.ts`, `src/sim/content/
+gravewyrm_sanctum.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Thaw the Held | the Thawcaller's raise rite | KEEP. No match; plain English over the dungeon's own "the held". |
+| Counterweight Lash | the Scaleguard's tail | KEEP. No match (WoW only has items called "... Counterweight"). |
+| Boiling Meltwater | the Scaleguard's heroic pool | KEEP. No match. |
+| Branding Iron, Branded | the Goadsmith's brand and its burn | KEEP, borderline, recorded: plain English object and adjective; WoW has a minor Torghast anima power "Branding Iron" and GW2's Branded is a creature faction, neither a distinctive shared ability. |
+| Topple Brazier, Spilled Soulfire | the brazier players kick over and its pool | KEEP. No match for the full names; "Soulfire" already ships in this game. |
+| Rime Breath | the Rime Whelp's breath | KEEP. No match (PoE's "Breath of Rime" is a different phrase). |
+| Rimechill | REJECTED before shipping | An Arknights enemy ability (Kjeragandr). The stacking chill is Creeping Rime. |
+| Frozen Solid | REJECTED before shipping | A World of Warcraft debuff that ends stacking chill exactly like ours (Melidrussa Chillworn). The freeze is Iced Over. |
+| Creeping Rime, Iced Over | the chill and the freeze | KEEP. Plain English. |
+| Ice Slab, Fracture, Meltwater | the Ogre's wall, the Splinter's split, the quench pools | KEEP. Plain English (WoW's Fracture is an unrelated demon hunter builder; "Tideglass Fracture" already ships). |
+| Test Nova, Test Orb | the dev-only engine demonstration kit | KEEP. Plain labels, never on a template. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

@@ -34,11 +34,17 @@ import {
   TUSKER_TUSK_SWEEP,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import {
+  SANCTUM_BRANDING_IRON,
+  SANCTUM_COUNTERWEIGHT_LASH,
+  SANCTUM_FRACTURE,
   SANCTUM_GOAD,
   SANCTUM_HOARFROST_POP,
   SANCTUM_ICE_BLOCK_TOSS,
+  SANCTUM_RIME_BREATH,
   SANCTUM_SHATTER,
   SANCTUM_SOULFIRE_STOKE,
+  SANCTUM_THAW_THE_HELD,
+  SANCTUM_TOPPLE_BRAZIER,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -79,9 +85,11 @@ import {
   sanctumObjectSpecs,
   sanctumTelegraphSpecs,
   shockRingLook,
+  telegraphYaw,
   tramplePaintLength,
 } from './sanctum_fx_core';
 import type { SanctumFxHost } from './sanctum_fx_host';
+import { SanctumKitFx } from './sanctum_kit_fx';
 import { SanctumShards } from './sanctum_shards';
 import { SanctumTrashFx } from './sanctum_trash_fx';
 import { TuskerFx } from './tusker_fx';
@@ -161,6 +169,8 @@ export class SanctumFx {
   private readonly poolList: ParticlePool[];
   private readonly shards: SanctumShards;
   private readonly trash: SanctumTrashFx | null;
+  /** The trash mechanics pass (tethers, eruption, lash, fracture, topple). */
+  private readonly kitFx: SanctumKitFx | null;
   private readonly tusker: TuskerFx | null;
   private readonly uTime = { value: 0 };
   private readonly density: number;
@@ -325,6 +335,7 @@ export class SanctumFx {
     );
     const host = this.host();
     this.trash = world ? new SanctumTrashFx(host, world, glowTex) : null;
+    this.kitFx = world ? new SanctumKitFx(host, world) : null;
     this.tusker = world
       ? new TuskerFx(scene, host, world, compileGate, playGesture, glowTex ?? undefined)
       : null;
@@ -440,6 +451,13 @@ export class SanctumFx {
       case SANCTUM_SHATTER:
       case SANCTUM_ICE_BLOCK_TOSS:
         return this.trash?.handleEvent(ev, src) ?? false;
+      case SANCTUM_THAW_THE_HELD:
+      case SANCTUM_COUNTERWEIGHT_LASH:
+      case SANCTUM_BRANDING_IRON:
+      case SANCTUM_RIME_BREATH:
+      case SANCTUM_FRACTURE:
+      case SANCTUM_TOPPLE_BRAZIER:
+        return this.kitFx?.handleEvent(ev, src) ?? false;
       default:
         return false;
     }
@@ -470,6 +488,7 @@ export class SanctumFx {
         }
         for (const o of this.objects) this.releaseObject(o);
         this.trash?.hideAll();
+        this.kitFx?.hideAll();
         this.tusker?.hideAll();
         this.shards.hideAll();
       }
@@ -482,6 +501,7 @@ export class SanctumFx {
     this.paintObjects(world, dt);
     this.paintRings();
     this.trash?.update(dt, this.clock);
+    this.kitFx?.update(dt, this.clock);
     this.tusker?.update(dt, this.clock);
     this.shards.update(dt);
     for (const p of this.poolList) p.update(this.clock);
@@ -502,7 +522,7 @@ export class SanctumFx {
         continue;
       }
       const fill = telegraphFillOf(caster.castRemaining, caster.castTotal);
-      const yaw = spec.shape === 'sigil' ? this.clock * 1.4 : caster.facing;
+      const yaw = spec.shape === 'sigil' ? this.clock * 1.4 : telegraphYaw(spec, caster.facing);
       // From the body's centre: the edge the sim tests (the sweep's range is
       // its reach past the Tusker's body plus the body).
       const x = caster.pos.x;
@@ -655,6 +675,7 @@ export class SanctumFx {
       }
       // Any mob may carry a Goad's fury or a brazier's quickening.
       this.trash?.scanMob(e);
+      this.kitFx?.scanMob(e);
       if (!SANCTUM_FX_MOBS.has(e.templateId) && !this.castSpec(e.castingAbility ?? '')) continue;
       sanctum = true;
       if (e.templateId === SLEDGE_TUSKER_ID) this.tusker?.scanTusker(e);
@@ -722,6 +743,10 @@ export class SanctumFx {
     if (this.trash) {
       const trash = this.trash;
       attempt(() => trash.dispose());
+    }
+    if (this.kitFx) {
+      const kitFx = this.kitFx;
+      attempt(() => kitFx.dispose());
     }
     if (this.tusker) {
       const tusker = this.tusker;

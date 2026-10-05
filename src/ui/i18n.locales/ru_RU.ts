@@ -20301,6 +20301,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_korzul_plunging_fire': 'Низвергающийся огонь',
   'abilityUi.cast.sanctum_korzul_crashing_descent': 'Сокрушительное падение',
   'abilityUi.cast.sanctum_tusker_trample': 'Растаптывание',
+  'abilityUi.cast.sanctum_counterweight_lash': 'Удар хвостом-противовесом',
+  'abilityUi.cast.sanctum_branding_iron': 'Клеймо',
+  'abilityUi.cast.sanctum_rime_breath': 'Изморозное дыхание',
+  'abilityUi.cast.kituse_sanctum_topple_brazier': 'Опрокинуть жаровню',
   'abilityUi.cast.sanctum_korgath_maul_arc': 'Дуга кувалды',
   'abilityUi.cast.sanctum_korgath_chain_flail': 'Цепной хлыст',
   'abilityUi.cast.sanctum_korgath_threshold_charge': 'Рывок через порог',
@@ -20419,6 +20423,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.sanctumAlert.lockboundLine':
     'Держится цепей: {chains}. Он получает на {pct}% меньше урона. Разбейте печатные кандалы, чтобы снять защиту.',
   'hudChrome.sanctumAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.sanctumAlert.brandedTitle': 'Заклеймён!',
+  'hudChrome.sanctumAlert.brandedLine':
+    'Клеймо жжёт до конца действия: потушите его в луже талой воды',
+  'hudChrome.sanctumAlert.rimeTitle': 'Ползучая изморозь!',
+  'hudChrome.sanctumAlert.rimeLine':
+    'Ползучая изморозь {stacks}/{max}: выйдите из дыхания дракончиков',
+  'hudChrome.kitUse.toppleLine': 'Опрокиньте на стаю: пролитое пламя обжигает врагов',
+  'hudChrome.kitUse.toppleKey': 'Опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleTap': 'Нажмите здесь, чтобы опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleClick': 'Щёлкните здесь, чтобы опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleFar': 'Подойдите ближе чем на {range} м, чтобы опрокинуть',
+  'hudChrome.kitUse.toppleAria': 'Опрокинуть: {name}',
+  'hudChrome.kitUse.usingLine': 'Не двигайтесь: удар, шаг или оглушение прервут действие',
+  'hudChrome.kitUse.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.sanctum.branded':
+    'Наносит {value} ед. урона ({school}) каждые {interval} сек. в течение {seconds} сек. Встаньте в лужу талой воды, чтобы сразу потушить клеймо.',
+  'hudChrome.auraEffect.sanctum.creepingRime':
+    'Снижает скорость передвижения на {pct}%, по {per}% за каждый эффект. Каждое Изморозное дыхание добавляет эффект и сбрасывает длительность до {seconds} сек. При {max} эффектах вы замерзаете (Обледенение) на {freeze} сек., и эффекты снимаются.',
+  'hudChrome.auraEffect.sanctum.icedOver':
+    'Скован Ползучей изморозью: невозможно двигаться и действовать.',
   'hudChrome.auraEffect.sanctum.lockbound':
     'Получает на {pct}% меньше урона: по {per}% за каждую ещё целую цепь. Разбейте печатные кандалы, чтобы сбросить их цепь.',
   'hudChrome.auraEffect.sanctum.enrage': 'Наносит на {pct}% больше урона.',

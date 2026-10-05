@@ -3936,7 +3936,10 @@ export const ko_KR: EnTranslations = {
         "airborne": "공중에 있어 공격할 수 없습니다. 가장 많은 플레이어가 선 얼음판에 추락 강하로 내려앉아 {radius}야드 안의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
         "wyrmsEye": "이 효과가 끝나면 코르줄이 당신이 선 얼음판 전체에 내리꽂는 불길을 쏟아붓습니다: 그 위의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 얼음판에 금이 가거나 이미 금이 가 있었다면 부서집니다. 멀쩡한 얼음 위에서 파티와 떨어져 서십시오.",
         "quenchWater": "열린 담금질 물속: 이동 속도가 {slow}% 감소하고 매초 {damage}의 피해(영웅 난이도 {heroic})로 불탑니다. 아무 얼음판이나 물가로 헤엄치십시오.",
-        "shardFlare": "심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다."
+        "shardFlare": "심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다.",
+        "branded": "{seconds}초 동안 {interval}초마다 {value}의 {school} 피해를 입힙니다. 녹은 물웅덩이에 들어가면 즉시 꺼집니다.",
+        "creepingRime": "이동 속도가 {pct}% 감소합니다(중첩당 {per}%). 서리 숨결을 맞을 때마다 1회 중첩되고 지속 시간이 {seconds}초로 초기화됩니다. {max}회 중첩되면 {freeze}초 동안 얼어붙고(빙결) 중첩이 사라집니다.",
+        "icedOver": "스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다."
       },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
@@ -6170,6 +6173,20 @@ export const ko_KR: EnTranslations = {
       "flightLine": "멀쩡한 얼음 위에 모여 착지 지점을 고른 뒤 흩어져라",
       "lockboundTitle": "자물쇠 속박",
       "lockboundLine": "사슬 {chains}개가 버틴다: 받는 피해 {pct}% 감소. 봉인 족쇄를 부숴 벗겨내라.",
+      "timeAria": "{seconds}초 남음",
+      "brandedTitle": "낙인!",
+      "brandedLine": "낙인은 끝날 때까지 타오릅니다: 녹은 물웅덩이에서 끄세요",
+      "rimeTitle": "스며드는 서리!",
+      "rimeLine": "스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요"
+    },
+    "kitUse": {
+      "toppleLine": "무리 위로 걷어차 넘어뜨리세요: 쏟아진 불길이 그들을 태웁니다",
+      "toppleKey": "{name}을(를) 그들 위로 넘어뜨리기",
+      "toppleTap": "여기를 탭해 {name}을(를) 그들 위로 넘어뜨리세요",
+      "toppleClick": "여기를 클릭해 {name}을(를) 그들 위로 넘어뜨리세요",
+      "toppleFar": "{range}야드 안으로 다가가 걷어차세요",
+      "toppleAria": "{name} 넘어뜨리기",
+      "usingLine": "가만히 있으세요: 공격을 받거나 움직이거나 기절하면 끊깁니다",
       "timeAria": "{seconds}초 남음"
     },
     "cosmetics": {
@@ -12591,6 +12608,14 @@ export const ko_KR: EnTranslations = {
       "sanctum_ice_block_toss": "얼음덩이 던지기",
       "sanctum_tusker_tusk_sweep": "엄니 휩쓸기",
       "sanctum_tusker_trample": "짓밟기",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "평형추 꼬리채찍",
+      "sanctum_branding_iron": "낙인 인두",
+      "sanctum_rime_breath": "서리 숨결",
+      "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
       "sanctum_korgath_maul_arc": "대망치 호격",
       "sanctum_korgath_chain_flail": "사슬 채찍",
       "sanctum_korgath_threshold_charge": "문턱 돌진",

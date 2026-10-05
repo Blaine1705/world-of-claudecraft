@@ -1,8 +1,9 @@
 // HUD domain: dungeon encounter prompts the local player acts on: the Gaol
 // Turnkey's Iron Cage escape, Gaoler Ossick's chain alert, the Wildheart
 // Basin's and the Gravewyrm Sanctum's alerts (the shared encounter alert
-// painter), composed by the HUD as one DungeonPrompts member; and the floating
-// avoidance word.
+// painter) and the trash engine's use prompt (a Soul Brazier to topple, on the
+// same painter), composed by the HUD as one DungeonPrompts member; and the
+// floating avoidance word.
 
 export type {
   BastionAlertEntity,
@@ -29,6 +30,18 @@ export type { GaolChainDeps } from './gaol_chain_painter';
 export { GaolChainAlert } from './gaol_chain_painter';
 export type { GaolChainInput, GaolChainKind, GaolChainView } from './gaol_chain_view';
 export { buildGaolChainView, wardHealthText, wardHitText } from './gaol_chain_view';
+export type {
+  KitUseBody,
+  KitUsePromptInput,
+  KitUsePromptKind,
+  KitUsePromptView,
+} from './kit_use_prompt_view';
+export {
+  buildKitUsePromptView,
+  KIT_USE_PROMPT_KINDS,
+  KIT_USE_PROMPT_RADIUS,
+  KitUseSceneScan,
+} from './kit_use_prompt_view';
 export type { SanctumSceneEntity, SanctumSceneWorld } from './sanctum_alert_scene_core';
 export { SanctumAlertSceneScan } from './sanctum_alert_scene_core';
 export type {

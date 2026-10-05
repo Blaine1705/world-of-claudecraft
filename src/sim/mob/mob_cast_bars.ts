@@ -33,6 +33,7 @@ import { capRiftNonLethalMechanicDamage, riftMechanicSuppressed } from '../rift/
 import type { SimContext } from '../sim_context';
 import { type Aura, angleTo, DT, dist2d, type Entity, type MobTemplate, normAngle } from '../types';
 import { applyBroodBurn } from './dragonkin_brood';
+import { landBreathPool } from './trash_kit/breath_pool';
 import { restoreCastHold } from './trash_kit/cast_hold';
 
 /** True when the mob belongs to a live rift instance: kit bosses via the
@@ -169,6 +170,8 @@ export function tickBreathConeBar(
       ctx.dealDamage(mob, pe, dmg, false, school, breath.name, 'hit', true);
       if (breath.burn && !pe.dead) applyBroodBurn(ctx, mob, pe, breath.burn);
     }
+    // A breath that melts the floor leaves its pool (trash_kit/breath_pool.ts).
+    landBreathPool(ctx, mob);
   }
   return true;
 }

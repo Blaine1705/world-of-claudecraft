@@ -3936,7 +3936,10 @@ export const zh_CN: EnTranslations = {
         "airborne": "身在空中，无法被攻击。他会以坠击降落落在站人最多的冰板上，对{radius}码内的所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。",
         "wyrmsEye": "此效果结束时，科祖尔会向你所在的整块冰板倾泻俯冲烈焰：对其上所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点），冰板开裂，若已开裂则碎裂。站在完好的冰面上，远离队伍。",
         "quenchWater": "身处开阔的淬火之水：移动速度降低{slow}%，每秒受到{damage}点灼烧伤害（英雄难度{heroic}点）。游向任意冰板或岸边。",
-        "shardFlare": "心之碎片闪耀：墓穴吐息每{breath}秒一次，振翼狂风每{gale}秒一次。"
+        "shardFlare": "心之碎片闪耀：墓穴吐息每{breath}秒一次，振翼狂风每{gale}秒一次。",
+        "branded": "每{interval}秒造成{value}点{school}伤害，持续{seconds}秒。踏入融水池可立即将其浇灭。",
+        "creepingRime": "移动速度降低{pct}%，每层{per}%。每次霜凇吐息都会叠加一层并将持续时间重置为{seconds}秒。叠到{max}层时你会被冻结（冰封）{freeze}秒，并清除所有层数。",
+        "icedOver": "被蔓延霜凇冻结：无法移动或行动。"
       },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
@@ -6170,6 +6173,20 @@ export const zh_CN: EnTranslations = {
       "flightLine": "聚集在完好的冰面上决定他的落点，然后散开",
       "lockboundTitle": "锁缚",
       "lockboundLine": "{chains}条锁链仍在：他受到的伤害降低{pct}%。打破封印镣铐来解除它。",
+      "timeAria": "剩余{seconds}秒",
+      "brandedTitle": "烙印！",
+      "brandedLine": "烙印会一直灼烧到结束：到融水池里将它浇灭",
+      "rimeTitle": "蔓延霜凇！",
+      "rimeLine": "蔓延霜凇 {stacks}/{max}：离开幼龙的吐息"
+    },
+    "kitUse": {
+      "toppleLine": "把它踢倒在敌群上：洒出的火焰会灼烧它们",
+      "toppleKey": "把{name}推倒在它们身上",
+      "toppleTap": "点击这里把{name}推倒在它们身上",
+      "toppleClick": "单击这里把{name}推倒在它们身上",
+      "toppleFar": "靠近到{range}码内才能把它踢倒",
+      "toppleAria": "推倒{name}",
+      "usingLine": "保持不动：受到攻击、移动或昏迷都会打断它",
       "timeAria": "剩余{seconds}秒"
     },
     "cosmetics": {
@@ -12591,6 +12608,14 @@ export const zh_CN: EnTranslations = {
       "sanctum_ice_block_toss": "投掷冰块",
       "sanctum_tusker_tusk_sweep": "獠牙横扫",
       "sanctum_tusker_trample": "践踏",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "配重尾鞭",
+      "sanctum_branding_iron": "烙铁",
+      "sanctum_rime_breath": "霜凇吐息",
+      "kituse_sanctum_topple_brazier": "推倒火盆",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
       "sanctum_korgath_maul_arc": "重锤弧斩",
       "sanctum_korgath_chain_flail": "锁链鞭笞",
       "sanctum_korgath_threshold_charge": "门槛冲锋",

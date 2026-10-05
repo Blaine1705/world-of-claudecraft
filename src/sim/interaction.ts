@@ -1,3 +1,4 @@
+import { tryStartKitUse } from './mob/trash_kit/encounter_use';
 import { isHoardRewardChestTemplate, openHoardRewardChest } from './rift/hoard_reward_chest';
 import { isRiftEntranceTemplate } from './rift/vault_seed';
 import { vehicleStationByEntityId } from './vehicle_stations';
@@ -468,6 +469,9 @@ export function interact(
       dist2d(p.pos, target.pos) <=
         (forgeStationForEntity(target) ? FORGE_INTERACT_RANGE : INTERACT_RANGE + 2)
     ) {
+      // A usable encounter body (the trash engine's G3: the Soul Brazier):
+      // the press starts its use, validated here on the authoritative sim.
+      if (tryStartKitUse(ctx, target, p)) return;
       if (target.kind === 'mob' && target.lootable) {
         const availability = corpseInteractionAvailability(ctx, target, p.id, true);
         if (availability.hasLoot) {

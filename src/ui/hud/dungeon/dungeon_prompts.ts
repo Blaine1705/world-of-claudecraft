@@ -5,10 +5,18 @@
 // shared encounter alert painter, encounter_alert_painter.ts: the Prey, the
 // Stalk, the pollen, the Pack Bond readout) and the Gravewyrm Sanctum's
 // (sanctum_alert_view.ts on the same family: the chains, the meltwater, the
-// lake). It owns no DOM itself; it builds each view from the frame's inputs
-// and hands it to that prompt's painter. The frame hands it the world (its
-// entities and roster version): the prompts look bodies up by id, and the
-// Sanctum alert keeps its scene off the roster (sanctum_alert_scene_core.ts).
+// lake), plus the trash engine's use prompt (kit_use_prompt_view.ts on the
+// same family: a Soul Brazier to kick over). It owns no DOM itself; it builds
+// each view from the frame's inputs and hands it to that prompt's painter. The
+// frame hands it the world (its entities and roster version, and the target
+// command a use press needs): the prompts look bodies up by id, and the
+// Sanctum alert and the use prompt keep their scenes off the roster
+// (sanctum_alert_scene_core.ts, KitUseSceneScan).
+//
+// The prompts share one slot over the action bar, so the use prompt gives way
+// to every encounter prompt above it (a strike to dodge or a cage to break
+// outranks a brazier); the interact press itself still kicks the brazier
+// whatever the slot shows (src/game/nearby_interaction_core.ts).
 
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
@@ -16,9 +24,17 @@ import { buildCageEscapeView } from './cage_escape_view';
 import { EncounterAlert } from './encounter_alert_painter';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
+import {
+  buildKitUsePromptView,
+  KIT_USE_PROMPT_KINDS,
+  type KitUseBody,
+  KitUseSceneScan,
+} from './kit_use_prompt_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 import { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
+
+const KIT_USE_HIDDEN = { visible: false } as const;
 
 export interface DungeonPromptsFrame {
   player: {
@@ -34,12 +50,20 @@ export interface DungeonPromptsFrame {
     }[];
     /** The player's target (an alert may read the boss being targeted). */
     targetId?: number | null;
+    dead?: boolean;
+    /** The player's own bar (the use prompt shows a running use's). */
+    castingAbility?: string | null;
+    castTargetId?: number | null;
+    castRemaining?: number;
+    castTotal?: number;
   };
   /** The world: every body by id, and the roster version (bumped when one
    *  comes or goes). */
   world: {
-    entities: ReadonlyMap<number, GaolChainEntity & SanctumSceneEntity>;
+    entities: ReadonlyMap<number, GaolChainEntity & SanctumSceneEntity & KitUseBody>;
     entityRosterVersion: number;
+    /** Select a body (the use prompt's press targets the body, then interacts). */
+    targetEntity(id: number | null): void;
   };
   party: readonly { pid: number }[] | null | undefined;
   /** The interact key's label ('' when unbound). */
@@ -54,6 +78,10 @@ export class DungeonPrompts {
   private readonly wildheart: EncounterAlert;
   private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
+  private readonly kitUse: EncounterAlert;
+  private readonly kitUseScene = new KitUseSceneScan();
+  /** The body a press on the use prompt targets (-1: none on offer). */
+  private kitUseBodyId = -1;
   private world: DungeonPromptsFrame['world'] | null = null;
   /** One lookup for every view (no closure a frame). */
   private readonly entity = (id: number) => this.world?.entities.get(id);
@@ -76,41 +104,71 @@ export class DungeonPrompts {
       className: 'ui-panel-strong encounter-alert sanctum-alert',
       kinds: SANCTUM_ALERT_KINDS,
     });
+    // A press on the use prompt is the interact key's own 'use' arm: target
+    // the body it names, then the ordinary interact.
+    this.kitUse = new EncounterAlert(
+      {
+        ...deps,
+        onPress: () => {
+          if (this.kitUseBodyId < 0) return;
+          this.world?.targetEntity(this.kitUseBodyId);
+          deps.onPress();
+        },
+      },
+      {
+        id: 'kit-use-prompt',
+        className: 'ui-panel-strong encounter-alert kit-use-prompt',
+        kinds: KIT_USE_PROMPT_KINDS,
+      },
+    );
   }
 
   paint(f: DungeonPromptsFrame): void {
     const p = f.player;
     this.world = f.world;
     const entity = this.entity;
-    this.cage.paint(
-      buildCageEscapeView({
-        auras: p.auras,
-        cage: entity,
-        interactKey: f.interactKey,
-        touch: f.touch,
-      }),
-    );
-    this.chain.paint(
-      buildGaolChainView({
-        selfId: p.id,
-        selfPos: p.pos,
-        auras: p.auras,
-        entity,
-        party: f.party,
-      }),
-    );
-    this.bastion.paint(buildBastionAlertView({ auras: p.auras, targetId: p.targetId, entity }));
-    this.wildheart.paint(buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity }));
-    this.sanctum.paint(
-      buildSanctumAlertView({
-        selfId: p.id,
-        selfPos: p.pos,
-        auras: p.auras,
-        targetId: p.targetId,
-        entity,
-        scene: this.sanctumScene.update(f.world),
-      }),
-    );
+    const cage = buildCageEscapeView({
+      auras: p.auras,
+      cage: entity,
+      interactKey: f.interactKey,
+      touch: f.touch,
+    });
+    this.cage.paint(cage);
+    const chain = buildGaolChainView({
+      selfId: p.id,
+      selfPos: p.pos,
+      auras: p.auras,
+      entity,
+      party: f.party,
+    });
+    this.chain.paint(chain);
+    const bastion = buildBastionAlertView({ auras: p.auras, targetId: p.targetId, entity });
+    this.bastion.paint(bastion);
+    const wildheart = buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity });
+    this.wildheart.paint(wildheart);
+    const sanctum = buildSanctumAlertView({
+      selfId: p.id,
+      selfPos: p.pos,
+      auras: p.auras,
+      targetId: p.targetId,
+      entity,
+      scene: this.sanctumScene.update(f.world),
+    });
+    this.sanctum.paint(sanctum);
+    // The use prompt last: it yields the shared slot to any prompt above.
+    const slotTaken =
+      cage.visible || chain.visible || bastion.visible || wildheart.visible || sanctum.visible;
+    const use = slotTaken
+      ? null
+      : buildKitUsePromptView({
+          self: p,
+          bodies: this.kitUseScene.update(f.world),
+          entity,
+          interactKey: f.interactKey,
+          touch: f.touch,
+        });
+    this.kitUseBodyId = use?.visible ? use.bodyId : -1;
+    this.kitUse.paint(use ?? KIT_USE_HIDDEN);
   }
 
   dispose(): void {
@@ -119,5 +177,6 @@ export class DungeonPrompts {
     this.bastion.dispose();
     this.wildheart.dispose();
     this.sanctum.dispose();
+    this.kitUse.dispose();
   }
 }

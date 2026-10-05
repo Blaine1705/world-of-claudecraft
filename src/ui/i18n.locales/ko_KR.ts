@@ -19915,6 +19915,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.sanctum_korzul_plunging_fire': '쏟아지는 불길',
   'abilityUi.cast.sanctum_korzul_crashing_descent': '추락 강하',
   'abilityUi.cast.sanctum_tusker_trample': '짓밟기',
+  'abilityUi.cast.sanctum_counterweight_lash': '평형추 꼬리채찍',
+  'abilityUi.cast.sanctum_branding_iron': '낙인 인두',
+  'abilityUi.cast.sanctum_rime_breath': '서리 숨결',
+  'abilityUi.cast.kituse_sanctum_topple_brazier': '화로 넘어뜨리기',
   'abilityUi.cast.sanctum_korgath_maul_arc': '대망치 호격',
   'abilityUi.cast.sanctum_korgath_chain_flail': '사슬 채찍',
   'abilityUi.cast.sanctum_korgath_threshold_charge': '문턱 돌진',
@@ -20022,6 +20026,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.sanctumAlert.lockboundLine':
     '사슬 {chains}개가 버틴다: 받는 피해 {pct}% 감소. 봉인 족쇄를 부숴 벗겨내라.',
   'hudChrome.sanctumAlert.timeAria': '{seconds}초 남음',
+  'hudChrome.sanctumAlert.brandedTitle': '낙인!',
+  'hudChrome.sanctumAlert.brandedLine': '낙인은 끝날 때까지 타오릅니다: 녹은 물웅덩이에서 끄세요',
+  'hudChrome.sanctumAlert.rimeTitle': '스며드는 서리!',
+  'hudChrome.sanctumAlert.rimeLine': '스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요',
+  'hudChrome.kitUse.toppleLine': '무리 위로 걷어차 넘어뜨리세요: 쏟아진 불길이 그들을 태웁니다',
+  'hudChrome.kitUse.toppleKey': '{name}을(를) 그들 위로 넘어뜨리기',
+  'hudChrome.kitUse.toppleTap': '여기를 탭해 {name}을(를) 그들 위로 넘어뜨리세요',
+  'hudChrome.kitUse.toppleClick': '여기를 클릭해 {name}을(를) 그들 위로 넘어뜨리세요',
+  'hudChrome.kitUse.toppleFar': '{range}야드 안으로 다가가 걷어차세요',
+  'hudChrome.kitUse.toppleAria': '{name} 넘어뜨리기',
+  'hudChrome.kitUse.usingLine': '가만히 있으세요: 공격을 받거나 움직이거나 기절하면 끊깁니다',
+  'hudChrome.kitUse.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.sanctum.branded':
+    '{seconds}초 동안 {interval}초마다 {value}의 {school} 피해를 입힙니다. 녹은 물웅덩이에 들어가면 즉시 꺼집니다.',
+  'hudChrome.auraEffect.sanctum.creepingRime':
+    '이동 속도가 {pct}% 감소합니다(중첩당 {per}%). 서리 숨결을 맞을 때마다 1회 중첩되고 지속 시간이 {seconds}초로 초기화됩니다. {max}회 중첩되면 {freeze}초 동안 얼어붙고(빙결) 중첩이 사라집니다.',
+  'hudChrome.auraEffect.sanctum.icedOver':
+    '스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다.',
   'hudChrome.auraEffect.sanctum.lockbound':
     '받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.',
   'hudChrome.auraEffect.sanctum.enrage': '주는 피해가 {pct}% 증가합니다.',

@@ -18,6 +18,7 @@ the templates in `src/sim/content/gravewyrm_sanctum.ts`).
 | `sanctum_fx.ts` | `SanctumFx`, the coordinator: the floor telegraphs on the shared kit (`../floor_telegraph`), the encounter objects' edges and the soulfire burning inside a patch, the shock rings, the four particle pools (smoke, glow, soulfire and pyre flames) and the ice shards, lent to the layers through `sanctum_fx_host.ts`. |
 | `tusker_fx.ts` | `TuskerFx`: the sledge (a gated clone of the GLB, Idle / Haul / Tip on its own mixer; latched where the beast stood on its first engaged frame, tipped by the spill, re-hitched after a reset), the gestures the sim cannot play (Unhitch at the pull and the trace chains' latch, Charge down the lane, Roar at the enrage), and the body's weight on the ice (footfalls, the paws raking through the Trample warning, the sweep's spray, the charge's wake, the enrage's slam and glow, the death). |
 | `sanctum_trash_fx.ts` | `SanctumTrashFx`: the Warming Rite's soulfire tether, the Goad's spark stream and the goaded fury, the Soul Brazier's fire and pulse and the stoked motes, the Pyre-Tender's yoke fires, the Thawcaller's censer smoke, the Scaleguard's meltwater and its Cinder Breath torrent, the Ice Block Toss's block and crash, the Splinter's Shatter (it hides the corpse), the Hoarfrost Pop. |
+| `sanctum_kit_fx.ts` | `SanctumKitFx`, the trash mechanics pass: Thaw the Held's soul tether, the corpse's cracks and the eruption column, the Counterweight Lash's tail sweep, the Branding Iron's spark stream and sear, the Rime Breath's puff, Fracture's split, and the toppled Soul Brazier (its standing body hidden by `BRAZIER_TOPPLED_GESTURE`, a fallen double drawn in its place). The pass's floor telegraphs (the lash cone behind the Scaleguard, the Rime Breath cone, the two kick glyphs) are rows of `sanctumTelegraphSpecs`. The engine pieces themselves (pools, the Ice Slab, freeze, brand, quench pools) are `../trash_engine_fx`'s. |
 | `sanctum_shards.ts` | `SanctumShards`: one instanced draw of tumbling ice shards (and rune-iron flecks). |
 | `sanctum_fx_host.ts` | `SanctumFxHost`: the type-only seam the coordinator lends its layers. |
 
@@ -32,7 +33,8 @@ Rules:
 - No light of any kind. Every material is built under the coordinator's root before its
   `attachSceneGroupGated`; the sledge, loaded later, attaches through its own gate.
 - Floor marks sit on the floor ladder's `encounter` band (`sanctum_fx.ts`,
-  `sanctum_trash_fx.ts` and `tusker_fx.ts` are registered strict in `tests/floor_vfx_layer.test.ts`).
+  `sanctum_trash_fx.ts`, `sanctum_kit_fx.ts` and `tusker_fx.ts` are registered strict in
+  `tests/floor_vfx_layer.test.ts`).
 - The story markers (`sanctum_story_*`) are empty anchors here (`../gate_objects.ts`): the
   Calving Face reads them; they never draw a body or a plate.
 

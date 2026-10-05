@@ -3936,7 +3936,10 @@ export const nl_NL: EnTranslations = {
         "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
         "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
         "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
-        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec."
+        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.",
+        "branded": "Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.",
+        "creepingRime": "Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.",
+        "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
       },
       "sharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over het aantal spelers in de cirkel ({perPlayer}% elk bij {players} spelers).",
       "varkhulSharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over de spelers in de cirkel ({perPlayer}% elk bij {players} spelers). Elke ontbrekende speler doet bovendien {missingPenalty}% van de maximale gezondheid aan de hele raid, inclusief spelers in de cirkel.",
@@ -6170,6 +6173,20 @@ export const nl_NL: EnTranslations = {
       "flightLine": "Stack on sound ice to choose where he lands, then step off",
       "lockboundTitle": "Lockbound",
       "lockboundLine": "{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.",
+      "timeAria": "{seconds} seconds left",
+      "brandedTitle": "Branded!",
+      "brandedLine": "The brand burns until it ends: douse it in a meltwater pool",
+      "rimeTitle": "Creeping Rime!",
+      "rimeLine": "Creeping Rime {stacks}/{max}: step out of the whelps' breath"
+    },
+    "kitUse": {
+      "toppleLine": "Kick it over onto the pack: the spill burns them",
+      "toppleKey": "Topple the {name} onto them",
+      "toppleTap": "Tap here to topple the {name} onto them",
+      "toppleClick": "Click here to topple the {name} onto them",
+      "toppleFar": "Get within {range} yd to kick it over",
+      "toppleAria": "Topple the {name}",
+      "usingLine": "Hold still: a hit, a step or a stun breaks it",
       "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
@@ -12591,6 +12608,14 @@ export const nl_NL: EnTranslations = {
       "sanctum_ice_block_toss": "Ice Block Toss",
       "sanctum_tusker_tusk_sweep": "Tusk Sweep",
       "sanctum_tusker_trample": "Trample",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "Counterweight Lash",
+      "sanctum_branding_iron": "Branding Iron",
+      "sanctum_rime_breath": "Rime Breath",
+      "kituse_sanctum_topple_brazier": "Topple Brazier",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
       "sanctum_korgath_maul_arc": "Maul Arc",
       "sanctum_korgath_chain_flail": "Chain Flail",
       "sanctum_korgath_threshold_charge": "Threshold Charge",

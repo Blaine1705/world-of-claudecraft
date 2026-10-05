@@ -695,6 +695,20 @@ const mergeStringsEn = {
       sanctum_ice_block_toss: 'Ice Block Toss',
       sanctum_tusker_tusk_sweep: 'Tusk Sweep',
       sanctum_tusker_trample: 'Trample',
+      // The Sanctum trash mechanics pass (trash_kit/sanctum_cast_ids.ts). Thaw
+      // the Held and Branding Iron can be kicked.
+      sanctum_thaw_the_held: 'Thaw the Held',
+      sanctum_counterweight_lash: 'Counterweight Lash',
+      sanctum_branding_iron: 'Branding Iron',
+      sanctum_rime_breath: 'Rime Breath',
+      // The player's own bar while kicking a Soul Brazier over (the trash
+      // engine's G3 use, trash_kit/encounter_use.ts).
+      kituse_sanctum_topple_brazier: 'Topple Brazier',
+      // The trash engine's dev-only demonstration kit (trash_kit/engine_demo.ts):
+      // the nova (kickable), its every-third unstoppable twin, and the orb launch.
+      trash_demo_nova: 'Test Nova',
+      trash_demo_nova_unstoppable: 'Test Nova',
+      trash_demo_walker: 'Test Orb',
       // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts). Only the
       // Goadsmith's heroic Re-rivet can be kicked.
       sanctum_korgath_maul_arc: 'Maul Arc',
