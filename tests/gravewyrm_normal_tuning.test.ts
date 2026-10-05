@@ -278,9 +278,11 @@ describe('normal Gravewyrm Sanctum mechanic scaling', () => {
 
   it('leaves untuned normal dungeons untouched', () => {
     const template = MOBS.sanctum_boneguard;
-    expect(mobTemplateForDungeonDifficulty(template, 'hollow_crypt', 'normal')).toBe(template);
+    // The Hollow Crypt gained a normal row for its wing bosses; the Last Keep
+    // stays untuned.
+    expect(mobTemplateForDungeonDifficulty(template, 'the_last_keep', 'normal')).toBe(template);
     const mob = createMob(1, template, 19, { x: 0, y: 0, z: 0 });
-    applyDungeonMobTuning(mob, 'hollow_crypt', 'normal');
+    applyDungeonMobTuning(mob, 'the_last_keep', 'normal');
     expect(mob.mechanicDamageMult).toBeUndefined();
   });
 });
