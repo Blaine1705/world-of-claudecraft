@@ -112,6 +112,38 @@ export const TOTEM_CLIP = {
   deathDown: 1.0 + KEY_LEAD,
 } as const;
 
+/** The Sunbone Totem-Binder's sim scale (sim/content/wildheart.ts). */
+export const BINDER_SIM_SCALE = 1.95;
+
+/** The Totem-Binder (scripts/assets/wildheart_totem_binder): a hunched jungle
+ *  troll under a jaguar-skull mask, his carved staff in his right fist. */
+export const BINDER_MODEL = {
+  url: 'models/creatures/wildheart_totem_binder.glb',
+  /** The Idle pose's skinned bounds: the soles to the plumes' tips. */
+  idleMin: 0,
+  idleTop: 6.048,
+  /** The gaits' reference speeds (planted feet slide at these). */
+  walkRef: 1.548,
+  runRef: 6.316,
+} as const;
+
+export const BINDER_CLIP = {
+  /** PlantTotem (the 1.5 s Plant Totem bar, played from its start at 1x): the
+   *  staff raised overhead to 1.30, driven butt first into the earth at 1.50
+   *  (where the totem rises, 2 yd before him), recovered by 2.55. Exported
+   *  with its first key at 0. */
+  plantStrike: 1.5,
+  plantLength: 61 / 24,
+  /** Attack: the overhead smash lands at 0.56; Attack2: the butt jab at 0.48. */
+  smash: 0.56,
+  jab: 0.48,
+} as const;
+
+/** The PlantTotem rate over the Plant Totem bar (its strike on the bar's end). */
+export function binderPlantRate(bar: number): number {
+  return bar > 0 ? BINDER_CLIP.plantStrike / bar : 1;
+}
+
 /** The Rattle's rate over the Rattling Dread's bar (its scream on the bar's
  *  end; the bar is the dread kit's own, sim/content/wildheart.ts). */
 export function dreadRattleRate(bar: number): number {

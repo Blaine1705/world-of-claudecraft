@@ -39,7 +39,8 @@ are the single source; everything here derives from them.
 
 The creature looks live in `../characters/wildheart_creature_looks.ts` (merged into the
 manifest): the Great Saurian, the Great Jaguar, the Gorgebloom, the Snarlvine Lasher and the
-Thorn Sprout, the Basin Raptor and the Spore Toad wear their Blender bodies; the rest of the
+Thorn Sprout, the Basin Raptor, the Spore Toad and the Sunbone Totem-Binder (his staff driven
+into the earth on the Plant Totem bar's end) wear their Blender bodies; the rest of the
 trash keeps tinted placeholders. The Snaring Tongue leaves the toad's own open mouth
 (`TOAD_MOUTH`, measured off its Tongue clip). A fallen raptor's packmates scream into their frenzy (`RAPTOR_FRENZY_GESTURE`, the
 Screech clip, sent by `basin_trash_fx.ts`).

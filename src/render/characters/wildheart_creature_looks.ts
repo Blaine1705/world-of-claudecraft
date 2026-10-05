@@ -31,6 +31,7 @@ import {
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ENTANGLING_LASH,
+  WILDHEART_PLANT_TOTEM,
   WILDHEART_POUNCE,
   WILDHEART_QUARRY_MARK,
   WILDHEART_RATTLING_DREAD,
@@ -47,6 +48,9 @@ import {
   trashCastSeconds,
 } from '../wildheart_basin/basin_trash_fx_core';
 import {
+  BINDER_MODEL,
+  BINDER_SIM_SCALE,
+  binderPlantRate,
   DREAD_TOTEM_MODEL,
   dreadRattleRate,
   RAPTOR_MODEL,
@@ -374,6 +378,42 @@ export const WILDHEART_SPORE_TOAD_LOOK: VisualDef = {
   clickRadius: 2.2,
 };
 
+/** The Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder, built in
+ *  Blender): a hunched, long-armed jungle troll in teal hide and Sunbone paint
+ *  under a jaguar-skull mask and red plumes, a bundle of carved stakes on his
+ *  back, the Binder's Staff (a jaguar crown under a bone sun) in his fist.
+ *  Drawn at its authored size, 5.9 yd to the plumes at its 1.95. The Plant
+ *  Totem bar plays PlantTotem from its start at 1x: the staff raised high and
+ *  driven butt first into the earth on the bar's end, where the totem rises. */
+export const WILDHEART_TOTEM_BINDER_LOOK: VisualDef = {
+  url: BINDER_MODEL.url,
+  height: trashLookHeight(BINDER_MODEL, BINDER_SIM_SCALE),
+  hover: trashLookHover(BINDER_MODEL, BINDER_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    combatIdle: 'CombatIdle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Attack', 'Attack2'],
+    hit: ['Hit'],
+    death: 'Death',
+    cast: 'Cast',
+    castByAbility: { [WILDHEART_PLANT_TOTEM]: 'PlantTotem' },
+    castTimeScaleByAbility: {
+      [WILDHEART_PLANT_TOTEM]: binderPlantRate(trashCastSeconds(WILDHEART_PLANT_TOTEM)),
+    },
+    castPlayOut: ['PlantTotem'],
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  walkRef: BINDER_MODEL.walkRef,
+  runRef: BINDER_MODEL.runRef,
+  attackTimeScale: 1.1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.4,
+};
+
 /** A totem never walks: its gaits stand creaking in place. */
 const TOTEM_CLIPS: ClipMap = {
   idle: 'Idle',
@@ -438,8 +478,6 @@ export const WILDHEART_SUNBONE_DREAD_TOTEM_LOOK: VisualDef = {
 type PlaceholderRow = [string, number, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, PlaceholderRow> = {
-  // Sunbone Totem-Binder: the Hexcaller under a bone-ochre wash.
-  wildheart_totem_binder: ['mob_wildheart_hexcaller', 0xd9b26a, 0.3, 1.05],
   // The Howdah Hexcaller: the Hexcaller in the howdah's war red.
   wildheart_howdah_hexcaller: ['mob_wildheart_hexcaller', 0xa3322a, 0.22, 1],
 };
@@ -569,6 +607,7 @@ export function wildheartPlaceholderLooks(
     attackTimeScale: 1.15,
     clickRadius: 1.4,
   };
+  out.wildheart_totem_binder = WILDHEART_TOTEM_BINDER_LOOK;
   out.wildheart_sunbone_totem = WILDHEART_SUNBONE_TOTEM_LOOK;
   out.wildheart_sunbone_dread_totem = WILDHEART_SUNBONE_DREAD_TOTEM_LOOK;
   return out;

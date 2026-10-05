@@ -31,12 +31,14 @@ import {
   STALKER_ID,
   SUNBONE_DREAD_TOTEM_ID,
   SUNBONE_TOTEM_ID,
+  TOTEM_BINDER_ID,
   VINE_LASHER_ID,
 } from '../../sim/encounters/wildheart_basin/ids';
 import { inLane } from '../../sim/mob/trash_kit/lane';
 import {
   WILDHEART_ANCESTRAL_SAP,
   WILDHEART_KIT_CAST_SCHOOLS,
+  WILDHEART_PLANT_TOTEM,
   WILDHEART_QUARRY_MARK,
   WILDHEART_RATTLING_DREAD,
   WILDHEART_SNARING_TONGUE,
@@ -86,6 +88,7 @@ export const HUNT_TUNING = {
   hex: hunt(HEXCALLER_ID)?.hex,
   dread: hunt(SUNBONE_DREAD_TOTEM_ID)?.dread,
   tongue: hunt(SPORE_TOAD_ID)?.tongue,
+  totems: hunt(TOTEM_BINDER_ID)?.totems,
   packFrenzy: MOBS[BASIN_RAPTOR_ID]?.packFrenzy,
   snarlbark: MOBS[VINE_LASHER_ID]?.thorns,
 } as const;
@@ -229,6 +232,7 @@ export function trashCastSeconds(castId: string): number {
   if (castId === WILDHEART_TOAD_HEX) return t.hex?.castTime ?? 0;
   if (castId === WILDHEART_RATTLING_DREAD) return t.dread?.castTime ?? 0;
   if (castId === WILDHEART_SNARING_TONGUE) return t.tongue?.castTime ?? 0;
+  if (castId === WILDHEART_PLANT_TOTEM) return t.totems?.castTime ?? 0;
   return 0;
 }
 

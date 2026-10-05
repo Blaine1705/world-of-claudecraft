@@ -104,11 +104,10 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_terrorspark_groundshaker',
   'mount_thunderstrut_gobbler',
   // The five-dungeon rework's re-tints of a legacy body above: they spread the
-  // base def (the Wildheart Basin's Totem-Binder and Howdah Hexcaller over
-  // mob_wildheart_hexcaller), so they keep the floor their shared GLB was
+  // base def (the Wildheart Basin's Howdah Hexcaller over
+  // mob_wildheart_hexcaller), so it keeps the floor its shared GLB was
   // tuned under.
   'wildheart_howdah_hexcaller',
-  'wildheart_totem_binder',
 ]);
 
 /** Held ITEM models with authored materials that still take the kit polish
@@ -237,6 +236,8 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_basin_raptor',
   // the Blender Spore Toad (scripts/assets/wildheart_spore_toad) and the Toad Hex's toad on it
   'wildheart_spore_toad',
+  // the Blender Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder)
+  'wildheart_totem_binder',
   'form_toad',
   'wildheart_sunbone_totem',
   // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
