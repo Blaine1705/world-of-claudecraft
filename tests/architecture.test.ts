@@ -717,6 +717,7 @@ const UI_PURE_CORES = [
   'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
+  'src/ui/boot_splash_core.ts',
   'src/ui/window_drag_core.ts',
   'src/ui/window_reflow_core.ts',
   'src/ui/window_resize_core.ts',
@@ -2669,6 +2670,7 @@ const UI_DOM_MODULES = [
   // restore hold's edges.
   'src/ui/graphics_restore_note_controller.ts',
   'src/ui/error_toast_controller.ts',
+  'src/ui/boot_splash.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',
   'src/ui/frame_presets_controls.ts',
