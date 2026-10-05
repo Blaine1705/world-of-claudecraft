@@ -18885,8 +18885,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你被困在海水之柱中：每{tick}秒受到{min}到{max}点自然伤害，最多持续{seconds}秒。打断或击晕潮缚侍僧即可挣脱。',
   'hudChrome.auraEffect.bastion.halberdWall':
     '另一名溺亡守望者在{radius}码内时，受到的伤害降低{pct}%。把它们分开。',
-  'hudChrome.auraEffect.bastion.fogShroud':
-    '站在雾堤中时，受到的伤害降低{pct}%。把它拖出雾中。',
+  'hudChrome.auraEffect.bastion.fogShroud': '站在雾堤中时，受到的伤害降低{pct}%。把它拖出雾中。',
   'hudChrome.auraEffect.bastion.carrionGlut':
     '以死者为食（{stacks}/{max}）：每层使其盐水爆裂范围扩大{radius}码，伤害提高{pct}%。',
   'hudChrome.auraEffect.bastion.snappedFetters':
@@ -19141,7 +19140,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'dungeonGuide.drownedTemple.sight.tidewisp':
     '那就是月之水本身，我们本该喝下的那一口。别让它碰到你们。',
   'dungeonGuide.drownedTemple.area.colonnade': '潮汐柱廊。我们两两并肩走过这里，唱着升起之节。',
-  'dungeonGuide.drownedTemple.sight.sentinel': '门边水池里的月鳐。我们还是见习生时，在月出时喂它们珍珠。如今它们守着这些门，把我们的珍珠当作心脏。',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    '门边水池里的月鳐。我们还是见习生时，在月出时喂它们珍珠。如今它们守着这些门，把我们的珍珠当作心脏。',
   'dungeonGuide.drownedTemple.sight.eel':
     '泻湖里的鳗鱼。见习生们会在黄昏喂它们面包。它们靠我们的圣歌养得肥肥的。',
   'dungeonGuide.drownedTemple.area.veil': '那道帷幕后面就是唱诗庭院。我从小时候起就再没踏进去过。',
