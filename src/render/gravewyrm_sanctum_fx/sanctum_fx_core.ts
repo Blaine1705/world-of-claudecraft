@@ -508,6 +508,9 @@ export const SANCTUM_BODY_ANCHORS: Readonly<
   breath: {
     // The Scaleguard's jaws driven forward and down on the Cinder Breath's end.
     [SCALEGUARD_ID]: [0.24, 0, 0.64],
+    // The whelp's head snapped forward and low, jaws wide, on the Rime Breath's
+    // end (its long neck carries the jaws well past its forefeet).
+    [RIME_WHELP_ID]: [1.17, 0, 0.4],
   },
   breathDraw: {
     // Its head reared back over the bar, the throat swelling.
@@ -630,7 +633,8 @@ export const SANCTUM_DRAWN_HEIGHTS: Readonly<Record<string, number>> = {
   [GOADSMITH_ID]: 4.6,
   [PYRE_TENDER_ID]: 4.4,
   [SOUL_BRAZIER_ID]: 2.4,
-  [RIME_WHELP_ID]: 3.2,
+  // To its horns: 1.4 players, its long neck and tail 8.8 yd from snout to tip.
+  [RIME_WHELP_ID]: 3.6,
   [SLEDGE_HAULER_ID]: 5.8,
   [GLACIER_SPLINTER_ID]: 5.4,
 };

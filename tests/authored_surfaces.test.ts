@@ -240,6 +240,7 @@ const AUTHORED_ATLAS_DEFS = [
   'sanctum_thawcaller',
   'sanctum_goadsmith',
   'sanctum_pyre_tender',
+  'sanctum_rime_whelp',
   'wildheart_great_saurian',
   'wildheart_gorgebloom',
   'wildheart_vine_lasher',
@@ -248,7 +249,6 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_sunbone_totem',
   // the rework's re-tints of a flagged body, which inherit the flag with the
   // spread base def (characters/sanctum_creature_looks.ts)
-  'sanctum_rime_whelp',
   'sanctum_sledge_hauler',
   'sanctum_glacier_splinter',
 ];

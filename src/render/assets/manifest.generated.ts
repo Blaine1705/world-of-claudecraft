@@ -474,6 +474,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/sanctum_korzul.glb": "/media/models/creatures/sanctum_korzul.abfb84bffa16.glb",
   "models/creatures/sanctum_pyre_tender.glb": "/media/models/creatures/sanctum_pyre_tender.178e9fb3e342.glb",
   "models/creatures/sanctum_raised_bonewalker.glb": "/media/models/creatures/sanctum_raised_bonewalker.4a83c58b9507.glb",
+  "models/creatures/sanctum_rime_whelp.glb": "/media/models/creatures/sanctum_rime_whelp.bc18a63bc995.glb",
   "models/creatures/sanctum_scaleguard.glb": "/media/models/creatures/sanctum_scaleguard.14fb543b2f58.glb",
   "models/creatures/sanctum_thawcaller.glb": "/media/models/creatures/sanctum_thawcaller.4a0b35c1aeac.glb",
   "models/creatures/sanctum_velkhar.glb": "/media/models/creatures/sanctum_velkhar.7bf7e4751af3.glb",

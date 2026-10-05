@@ -18,6 +18,7 @@ import {
   BONEWALKER_ID,
   GOADSMITH_ID,
   PYRE_TENDER_ID,
+  RIME_WHELP_ID,
   SCALEGUARD_ID,
   THAWCALLER_ID,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
@@ -27,6 +28,7 @@ import {
   SANCTUM_COUNTERWEIGHT_LASH,
   SANCTUM_GOAD,
   SANCTUM_PLANT_BRAZIER,
+  SANCTUM_RIME_BREATH,
   SANCTUM_THAW_THE_HELD,
   SANCTUM_WARMING_RITE,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
@@ -169,6 +171,27 @@ export const PYRE_TENDER_BODY: SanctumTrashBody = {
 export const PYRE_TENDER_CLIP = { plantBrazier: 1.5 } as const;
 
 const pyreTender = MOBS[PYRE_TENDER_ID];
+
+// ---- the Rime Whelp -------------------------------------------------------------------
+
+/** The Korzul-kit clips key their first frame one 24 fps frame in. */
+const KEY_LEAD = 1 / 24;
+
+/** The Rime Whelp: a thawed whelp of Korzul's drowned brood, his own body made
+ *  young (a big head and eyes, stubby horns, short intact wings), its hide
+ *  frosted pale blue, hoarfrost on its spines (80 bones). */
+export const RIME_WHELP_BODY: SanctumTrashBody = {
+  url: `${CREATURES}/sanctum_rime_whelp.glb`,
+  idleHeight: 3.2,
+  // The Korzul kit's gaits (4.8 and 24 yd/s at his size) at the whelp's 0.169.
+  walkRef: 4.8 * 0.16945,
+  runRef: 24 * 0.16945,
+};
+
+/** Its clips' beats in the file: the frost leaves the jaws, the bite closes. */
+export const RIME_WHELP_CLIP = { rimeBreath: 0.6 + KEY_LEAD, bite: 0.62 + KEY_LEAD } as const;
+
+const rimeWhelp = MOBS[RIME_WHELP_ID];
 
 export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
   // 4.6 yd to the helm's peak at its 1.15.
@@ -336,5 +359,37 @@ export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.05,
+  },
+  // 3.6 yd to its horns at its 1.6. It bites and rakes; the Rime Breath coils
+  // the neck back, flares the wings and snaps the head forward with the jaws
+  // wide on the 0.6 s bar's end, the frost puff playing out. Dying, it folds
+  // onto its side (the Hoarfrost Pop is the fx's).
+  sanctum_rime_whelp: {
+    ...sized(RIME_WHELP_BODY, RIME_WHELP_ID),
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      castByAbility: { [SANCTUM_RIME_BREATH]: 'RimeBreath' },
+      castTimeScaleByAbility: {
+        [SANCTUM_RIME_BREATH]: barRate(
+          RIME_WHELP_CLIP.rimeBreath,
+          rimeWhelp?.trashKit?.cone?.castTime,
+        ),
+      },
+      castPlayOut: ['RimeBreath'],
+      flourish: 'Roar',
+    },
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    // Its 8 yd chase: the bounding run a little past its authored cadence.
+    runTimeScaleMax: 2,
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.08,
   },
 };

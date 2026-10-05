@@ -14,6 +14,8 @@ import {
   GOADSMITH_CLIP,
   PYRE_TENDER_BODY,
   PYRE_TENDER_CLIP,
+  RIME_WHELP_BODY,
+  RIME_WHELP_CLIP,
   SCALEGUARD_BODY,
   SCALEGUARD_CLIP,
   THAWCALLER_BODY,
@@ -39,6 +41,7 @@ import {
   SANCTUM_COUNTERWEIGHT_LASH,
   SANCTUM_GOAD,
   SANCTUM_PLANT_BRAZIER,
+  SANCTUM_RIME_BREATH,
   SANCTUM_THAW_THE_HELD,
   SANCTUM_WARMING_RITE,
 } from '../src/sim/mob/trash_kit/sanctum_cast_ids';
@@ -317,5 +320,34 @@ describe('the Broodsworn Pyre-Tender', () => {
     const yoke = sanctumAnchor('yoke', 'broodsworn_pyre_tender');
     expect(yoke[1]).toBeCloseTo(0.24, 9);
     expect(yoke[2]).toBeGreaterThan(0.7);
+  });
+});
+
+describe('the Rime Whelp', () => {
+  it('ships its own body with a Rime Breath clip', () => {
+    expect(clipsOf(`public/${RIME_WHELP_BODY.url}`)).toEqual(
+      ['Attack', 'Attack2', 'Death', 'Hit', 'Idle', 'RimeBreath', 'Roar', 'Run', 'Walk'].sort(),
+    );
+    expectShipped(RIME_WHELP_BODY.url);
+    expect(visualOf('rime_whelp').url).toBe(RIME_WHELP_BODY.url);
+    expectDrawnAtRow('rime_whelp');
+    // A head and more past the player: never a toy.
+    expect(SANCTUM_DRAWN_HEIGHTS.rime_whelp).toBeGreaterThanOrEqual(2.6 * 1.35);
+  });
+
+  it('puffs the frost on the bar end, from its jaws far out on its neck', () => {
+    const v = visualOf('rime_whelp');
+    const cone = MOBS.rime_whelp?.trashKit?.cone;
+    expect(cone?.castTime).toBe(0.6);
+    expect(v.castClipSync).toBe(true);
+    expect(v.clips.castByAbility?.[SANCTUM_RIME_BREATH]).toBe('RimeBreath');
+    expect(v.clips.castTimeScaleByAbility?.[SANCTUM_RIME_BREATH]).toBeCloseTo(
+      RIME_WHELP_CLIP.rimeBreath / 0.6,
+      9,
+    );
+    expect(v.clips.castPlayOut).toEqual(['RimeBreath']);
+    const mouth = sanctumAnchor('breath', 'rime_whelp');
+    expect(mouth[0]).toBeGreaterThan(1);
+    expect(mouth[2]).toBeLessThan(0.5);
   });
 });

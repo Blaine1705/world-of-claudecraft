@@ -27,6 +27,14 @@ authoring tooling: nothing here runs in the build or the game.
 - `pyre_tender/cultistas/`: the Broodsworn Pyre-Tender (`sanctum_pyre_tender.glb`), shipped as
   delivered (its frozen builder kept for reproduction).
 
+- `rime_whelp/builder/`: the Rime Whelp (`sanctum_rime_whelp.glb`), a self-contained copy of
+  the Korzul builder made young (shorter neck, bigger head, stubby horns, short intact wings,
+  frosted hide, ice-blue eyes and a frost-blue mouth), built at Korzul's scale and rescaled
+  to 3.2 yd (`build.py rescale`). `clips.py` adds `RimeBreath` (contact 0.60 s plus the
+  one-frame key lead). `jaw_damp.py` eases every clip's jaw toward rest on the baked .blend
+  (the young head has no modelled mouth cavity, so a wide gape stretched the lip seam);
+  the shipped build ran it twice (0.5 then 0.55).
+
 Build (Blender 5.2, absolute output paths; keep one Blender job at a time):
 
     blender -b --factory-startup --python <builder>/build.py -- <abs>/<key>_raw.glb \

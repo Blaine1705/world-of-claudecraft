@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "253ab1c8687f359a61d1ac9cd2bc8f696ba50cf49fd7dbf43bcc00895edb1790",
+  "rendererFingerprint": "14e7e0b4ba4dda8d0806f2aaa02795f4d8808d57096d29499f2639505c07c6f3",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5505126,
-      "sha256": "6c8852d074cee52769aab2b24dbf83d76dbbd06a43979308133d82e6779e2a8b",
+      "bytes": 5505236,
+      "sha256": "4e274af1d0c24578ad427557b6280ad0f6bbedc707041a66b1bf6aa6a292fa4c",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -8796,31 +8796,31 @@
       "visualKey": "sanctum_rime_whelp",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_stormscale_drake.glb",
-          "path": "public/models/creatures/hoard_stormscale_drake.glb",
-          "bytes": 1126964,
-          "sha256": "39078b78f1da88222301cda15578309f0d8305f3d2b21fa3c4452d34b8d20dbe"
+          "url": "models/creatures/sanctum_rime_whelp.glb",
+          "path": "public/models/creatures/sanctum_rime_whelp.glb",
+          "bytes": 2774136,
+          "sha256": "bc18a63bc995f78dd70cd98dc32849829dc9e997b8b36216654cb66434c4f81f"
         },
         "idle": "Idle",
-        "height": 2,
-        "yaw": -1.5707963267948966,
+        "height": 2.25,
+        "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.7
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#e4f4ff",
-        "resolved": "#e4f4ff",
-        "strength": 0.7
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "147d8fc34c7194d303cf4d16c955c04a9b84f1331e50c19e1c083e9cfcdaddf1",
+      "sourceFingerprint": "1648f0ec6ba9db4bc60307bca3f2519c35781b39bd17d18474dbe516c63fab63",
       "output": {
         "path": "public/ui/mobs/rime_whelp.webp",
-        "bytes": 2004,
-        "sha256": "0348744ab80e7dbd874a6242b2eda7aecc3da2a5b3a1e515db8fa328989748ee"
+        "bytes": 2466,
+        "sha256": "759fd0745b46b969d3e15c5fcbc7d3ada40077c8d52f9d284168776f6c3fe440"
       }
     },
     {

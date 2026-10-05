@@ -142,14 +142,6 @@ const STATIC_PROP_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Rime Whelp: a thawed whelp, pale and frosted, frost on its wings. The
-  // grey-blue storm drake rig washed rime-white (dragonkin_baby's green atlas
-  // cannot be paled by a tint, which only multiplies; the fx dust it with
-  // frost).
-  sanctum_rime_whelp: [
-    RIME_WHELP_ID,
-    ['mob_hoard_stormscale_drake', 0xe4f4ff, 0.7, { selfIllumination: 0.5 }],
-  ],
   // Ogre Sledge-Hauler: the ogre in furs and a hauling harness.
   sanctum_sledge_hauler: [
     SLEDGE_HAULER_ID,
