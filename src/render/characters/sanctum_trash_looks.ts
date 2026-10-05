@@ -16,6 +16,7 @@ import { GOADSMITH_RERIVET, KORGATH_TUNING } from '../../sim/encounters/gravewyr
 import {
   BONEGUARD_ID,
   BONEWALKER_ID,
+  GLACIER_SPLINTER_ID,
   GOADSMITH_ID,
   PYRE_TENDER_ID,
   RIME_WHELP_ID,
@@ -39,6 +40,9 @@ import {
   BONEWALKER_RISE_GESTURE,
   HAULER_ENRAGE_GESTURE,
   SANCTUM_DRAWN_HEIGHTS,
+  SPLINTER_COPY_GESTURE,
+  SPLINTER_FRACTURE_GESTURE,
+  SPLINTER_SHATTERED_GESTURE,
   sanctumDrawnHeight,
 } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 import type { VisualDef } from './manifest';
@@ -217,6 +221,26 @@ const hauler = MOBS[SLEDGE_HAULER_ID];
 /** The fx fly their block from BLOCK_RELEASE of the bar to the ring on its end
  *  (sanctum_trash_fx.ts paintBlocks): his clip lets go on that same frame. */
 const tossBar = hauler?.trashKit?.toss?.castTime ?? 0;
+const splinterBurstDelay = MOBS[GLACIER_SPLINTER_ID]?.trashKit?.deathBurst?.delay ?? 0;
+
+// ---- the Glacier Splinter -------------------------------------------------------------
+
+/** The Glacier Splinter: a walking shard of the Quench, faceted blue ice
+ *  chunks each rigid on its own bone over a core of the Smith's rune-iron, the
+ *  heart crystal glowing in the chest's window. */
+export const GLACIER_SPLINTER_BODY: SanctumTrashBody = {
+  url: `${CREATURES}/sanctum_glacier_splinter.glb`,
+  idleHeight: 5.401,
+  walkRef: 1.29,
+  runRef: 5.0,
+};
+
+/** Its clips' beats (seconds at 1x): Death ends on the core's flare as the
+ *  Shatter goes off; Fracture's crack. */
+export const GLACIER_SPLINTER_CLIP = { deathFlare: 2.0, fractureCrack: 0.3 } as const;
+
+/** The Shatter hides the whole body (the fx throw its shards). */
+export const SPLINTER_SHATTER_TOGGLES = [{ nodes: ['*'], hideNow: SPLINTER_SHATTERED_GESTURE }];
 
 export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
   // 4.6 yd to the helm's peak at its 1.15.
@@ -447,5 +471,38 @@ export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.05,
+  },
+  // 5.4 yd at its 1.9; each Fracture half at 72 percent of that (the sim's own
+  // scale on the copy and the shrunk original, applied live at the view). At
+  // half health the crack staggers it and every piece jolts out from the core
+  // and grinds back: the original plays Fracture on the split, the copy as its
+  // entrance. Dying, it kneels while the core swells; the Death clip ends on
+  // the flare as the Shatter goes off 2 s later, and the body hides.
+  sanctum_glacier_splinter: {
+    ...sized(GLACIER_SPLINTER_BODY, GLACIER_SPLINTER_ID),
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { [SPLINTER_FRACTURE_GESTURE]: 'Fracture' },
+      attackTimeScaleByAbility: { [SPLINTER_FRACTURE_GESTURE]: 1 },
+      hit: ['Hit'],
+      death: 'Death',
+      entrance: 'Fracture',
+    },
+    entranceGesture: SPLINTER_COPY_GESTURE,
+    oneShotsHoldAttacks: ['Fracture'],
+    meshToggles: SPLINTER_SHATTER_TOGGLES,
+    attackTimeScale: 1,
+    // The kneel and the swelling core run exactly to the Shatter's fuse.
+    deathTimeScale:
+      GLACIER_SPLINTER_CLIP.deathFlare / (splinterBurstDelay || GLACIER_SPLINTER_CLIP.deathFlare),
+    authoredAtlas: true,
+    // Its pale baked ice deepened to glacier blue on the snowfield.
+    tint: 0x6aaee6,
+    tintStrength: 0.45,
+    selfIllumination: 0.06,
   },
 };

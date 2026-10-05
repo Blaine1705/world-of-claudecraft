@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "493daf4cbe41377b28aef54df3f35fd35939d3a65817056a078c99fc679ae103",
+  "rendererFingerprint": "03059e00d18177ca7cd48912292b77583e8c5c08bf0e1759cf19469d9033c61f",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5505352,
-      "sha256": "0859962e86b4dc728edcc7ba422574e1b7f8d37879f38fba41b857b88d8e4462",
+      "bytes": 5505474,
+      "sha256": "0ea1420f3cf9a9353ddb2a386bce704b44b70d46431d9474db14e0878b4ec10c",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3355,31 +3355,31 @@
       "visualKey": "sanctum_glacier_splinter",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_rime_elemental.glb",
-          "path": "public/models/creatures/hoard_rime_elemental.glb",
-          "bytes": 794868,
-          "sha256": "d358238863159c91c58b8e81086b1954c8ad6f4d0f3931358acb825599259c5e"
+          "url": "models/creatures/sanctum_glacier_splinter.glb",
+          "path": "public/models/creatures/sanctum_glacier_splinter.glb",
+          "bytes": 1947596,
+          "sha256": "6527188b56ed28712856763d2a3db41b1153f2bc289a333cddb20d19f0333ff3"
         },
         "idle": "Idle",
         "height": 2.842105263157895,
-        "yaw": -1.5707963267948966,
+        "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.5
+        "tintStrength": 0.45
       },
       "tint": {
         "source": "fixed",
-        "authored": "#86c8ec",
-        "resolved": "#86c8ec",
-        "strength": 0.5
+        "authored": "#6aaee6",
+        "resolved": "#6aaee6",
+        "strength": 0.45
       },
-      "sourceFingerprint": "5d7f535f4744a293dd719ba35092bd3bf6c458007114780fb520064d1fc3839d",
+      "sourceFingerprint": "2786d995e215b95fb45be48aff4e188109638dad9bfd552a453570bfe97d756b",
       "output": {
         "path": "public/ui/mobs/glacier_splinter.webp",
-        "bytes": 1914,
-        "sha256": "4224e5fdaebb9d35770ff30c5cb2eb4707ad5553b435af19539b418299b6b426"
+        "bytes": 3560,
+        "sha256": "e62ee77e601473cc9362c11bf0d5177f59728ed15894ae1b0cf81832fb650280"
       }
     },
     {

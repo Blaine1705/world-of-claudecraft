@@ -2,16 +2,13 @@
 // gravewyrm_sanctum.md section 5, the Ice Tomb of the Wyrm). The Sledge Tusker
 // wears its own Blender body (SANCTUM_SLEDGE_TUSKER_LOOK; its sledge is a
 // separate prop the fx module drives, gravewyrm_sanctum_fx/tusker_fx.ts). The
-// trash with their own Blender bodies are sanctum_trash_looks.ts's; the rest
-// are PLACEHOLDERS: shipped rigs re-tinted for the ice and the cult's fires,
-// so every creature of the rebuilt route is visible and animated from day one,
-// until the art phase gives each its own body. Every
-// key keeps the mob id and the visual key, so a swap is a def change.
+// trash wear their own Blender bodies (sanctum_trash_looks.ts), each under
+// the visual key its re-tinted placeholder had, so the mob ids never moved.
 // manifest.ts merges these over its VISUALS and maps the templates through
 // MOB_KEYS (SANCTUM_MOB_KEYS).
 //
 // Sizes ride the templates' sim scales (sim/content/gravewyrm_sanctum.ts and
-// the shipped rows in dungeons.ts): each row names the height it is DRAWN at,
+// the shipped rows in dungeons.ts): each body is drawn at its height
 // in yards, at its template's scale, and every one stands clearly past a
 // player (2.6 yd) without touching the sim's reach (the owner's rule:
 // imposing, never toy-like). The three bosses keep their looks (phase B).
@@ -56,9 +53,9 @@ export const TUSKER_CHARGE_GESTURE = 'sanctum_tusker_charge';
 export const TUSKER_TRACES_GONE_GESTURE = 'sanctum_tusker_traces_gone';
 export const TUSKER_TRACES_ON_GESTURE = 'sanctum_tusker_traces_on';
 
-/** A Glacier Splinter's Shatter: its whole body bursts (the fx throw the
- *  shards), so its corpse hides (re-sent while the corpse stands). */
-export const SPLINTER_SHATTERED_GESTURE = 'sanctum_splinter_shattered';
+/** A Glacier Splinter's Shatter (defined beside the other fx gestures in
+ *  sanctum_fx_core.ts, re-exported for the looks' callers). */
+export { SPLINTER_SHATTERED_GESTURE } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 /** A Soul Brazier kicked over (Topple Brazier): its standing body hides at
  *  once and the fx draw it fallen in its place (gravewyrm_sanctum_fx/
  *  sanctum_kit_fx.ts). */
@@ -137,43 +134,14 @@ const STATIC_PROP_CLIPS: ClipMap = {
   death: 'Idle',
 };
 
-/** [base visual key, tint, tint strength, extra]; the height it is drawn at
- *  is the template's row of SANCTUM_DRAWN_HEIGHTS (the fx share it). */
-type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
-
-const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Glacier Splinter: a walking shard of the Quench, blue ice over the Smith's
-  // rune-iron core (the rime elemental, glacier blue and glowing).
-  sanctum_glacier_splinter: [
-    GLACIER_SPLINTER_ID,
-    [
-      'mob_hoard_rime_elemental',
-      0x86c8ec,
-      0.5,
-      {
-        selfIllumination: 0.42,
-        meshToggles: [{ nodes: ['*'], hideNow: SPLINTER_SHATTERED_GESTURE }],
-      },
-    ],
-  ],
-};
-
-/** The Sanctum's defs: the placeholders derived from the base rigs already in
- *  `visuals`, the Soul Brazier prop, and the Sledge Tusker's own body. */
+/** The Sanctum's defs: every trash body (sanctum_trash_looks.ts), the Soul
+ *  Brazier prop, and the Sledge Tusker's own body. `_visuals` is the manifest
+ *  the placeholders used to be re-tinted from; every creature has its own
+ *  body now, so nothing is derived from it. */
 export function sanctumCreatureLooks(
-  visuals: Readonly<Record<string, VisualDef>>,
+  _visuals: Readonly<Record<string, VisualDef>>,
 ): Record<string, VisualDef> {
-  const out: Record<string, VisualDef> = {};
-  // The trash that have their own Blender bodies (sanctum_trash_looks.ts).
-  Object.assign(out, SANCTUM_TRASH_LOOKS);
-  for (const [key, [mobId, [base, tint, tintStrength, extra]]] of Object.entries(ROWS)) {
-    const def = visuals[base];
-    if (!def) continue;
-    const height = sanctumDrawnHeight(mobId, 1);
-    // A hovering rig keeps its gap in proportion to its new height.
-    const hover = def.hover !== undefined ? (def.hover * height) / def.height : undefined;
-    out[key] = { ...def, height, hover, tint, tintStrength, ...extra };
-  }
+  const out: Record<string, VisualDef> = { ...SANCTUM_TRASH_LOOKS };
   out.sanctum_sledge_tusker = SANCTUM_SLEDGE_TUSKER_LOOK;
   // The Soul Brazier: a bowl of soulfire on an iron stand, never a mob
   // silhouette (the shipped infernal brazier, violet-green and burning from

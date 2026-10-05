@@ -242,15 +242,13 @@ const AUTHORED_ATLAS_DEFS = [
   'sanctum_pyre_tender',
   'sanctum_rime_whelp',
   'sanctum_sledge_hauler',
+  'sanctum_glacier_splinter',
   'wildheart_great_saurian',
   'wildheart_gorgebloom',
   'wildheart_vine_lasher',
   'wildheart_thorn_sprout',
   'wildheart_fanglord_jaguar',
   'wildheart_sunbone_totem',
-  // the rework's re-tints of a flagged body, which inherit the flag with the
-  // spread base def (characters/sanctum_creature_looks.ts)
-  'sanctum_glacier_splinter',
 ];
 
 describe('authored surfaces', () => {

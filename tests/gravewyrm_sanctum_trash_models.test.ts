@@ -10,6 +10,8 @@ import {
   BONEGUARD_BODY,
   BONEWALKER_BODY,
   barRate,
+  GLACIER_SPLINTER_BODY,
+  GLACIER_SPLINTER_CLIP,
   GOADSMITH_BODY,
   GOADSMITH_CLIP,
   PYRE_TENDER_BODY,
@@ -33,6 +35,9 @@ import {
   HAULER_ENRAGE_GESTURE,
   isHaulerEnrageCue,
   SANCTUM_DRAWN_HEIGHTS,
+  SPLINTER_COPY_GESTURE,
+  SPLINTER_FRACTURE_GESTURE,
+  SPLINTER_SHATTERED_GESTURE,
   sanctumAnchor,
 } from '../src/render/gravewyrm_sanctum_fx/sanctum_fx_core';
 import { MOBS } from '../src/sim/data';
@@ -81,13 +86,13 @@ function expectShipped(url: string): void {
 }
 
 /** Drawn at its row: the look's height at the template's sim scale. */
-function expectDrawnAtRow(templateId: string): void {
+function expectDrawnAtRow(templateId: string, tinted = false): void {
   const v = visualOf(templateId);
   const scale = MOBS[templateId]?.scale ?? 1;
   expect(v.height * scale).toBeCloseTo(SANCTUM_DRAWN_HEIGHTS[templateId], 6);
   expect(v.authoredAtlas).toBe(true);
-  // No re-tint left over from the placeholder rig.
-  expect(v.tint).toBeUndefined();
+  // No re-tint left over from the placeholder rig (a deliberate grade aside).
+  if (!tinted) expect(v.tint).toBeUndefined();
   expect(v.animUrls).toBeUndefined();
 }
 
@@ -401,5 +406,56 @@ describe('the Ogre Sledge-Hauler', () => {
     expect(isHaulerEnrageCue({ ...cue, ability: 'x' }, 'ogre_sledge_hauler')).toBe(false);
     expect(isHaulerEnrageCue({ ...cue, school: 'frost' }, 'ogre_sledge_hauler')).toBe(false);
     expect(MOBS.ogre_sledge_hauler?.enrage?.belowHpPct).toBe(0.3);
+  });
+});
+
+describe('the Glacier Splinter', () => {
+  it('ships its own body with Fracture and Shatter clips', () => {
+    expect(clipsOf(`public/${GLACIER_SPLINTER_BODY.url}`)).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'CombatIdle',
+        'Death',
+        'Fracture',
+        'Hit',
+        'Idle',
+        'Run',
+        'Shatter',
+        'Walk',
+      ].sort(),
+    );
+    expectShipped(GLACIER_SPLINTER_BODY.url);
+    expect(visualOf('glacier_splinter').url).toBe(GLACIER_SPLINTER_BODY.url);
+    // Its pale baked ice is graded to glacier blue on purpose.
+    expectDrawnAtRow('glacier_splinter', true);
+    expect(visualOf('glacier_splinter').tintStrength).toBeLessThan(0.5);
+  });
+
+  it('both halves of a Fracture stagger, and each half is drawn at the split scale', () => {
+    const v = visualOf('glacier_splinter');
+    const split = MOBS.glacier_splinter?.trashKit?.split;
+    expect(split?.scale).toBe(0.72);
+    // The original plays Fracture on the split; the copy plays it as its entrance.
+    expect(v.clips.attackByAbility?.[SPLINTER_FRACTURE_GESTURE]).toBe('Fracture');
+    expect(v.clips.entrance).toBe('Fracture');
+    expect(v.entranceGesture).toBe(SPLINTER_COPY_GESTURE);
+    expect(v.oneShotsHoldAttacks).toContain('Fracture');
+    // A half is the same body at the entity scale the sim gives it (the view
+    // group carries e.scale): 72 percent of the template's drawn row.
+    const scale = MOBS.glacier_splinter?.scale ?? 1;
+    expect(v.height * scale * (split?.scale ?? 1)).toBeCloseTo(
+      SANCTUM_DRAWN_HEIGHTS.glacier_splinter * 0.72,
+      6,
+    );
+    expect(v.height * scale * 0.72).toBeGreaterThan(2.6 * 1.4);
+  });
+
+  it('kneels to the Shatter fuse and hides whole when it bursts', () => {
+    const v = visualOf('glacier_splinter');
+    const delay = MOBS.glacier_splinter?.trashKit?.deathBurst?.delay ?? 0;
+    expect(delay).toBe(2);
+    expect(v.deathTimeScale).toBeCloseTo(GLACIER_SPLINTER_CLIP.deathFlare / delay, 9);
+    expect(v.meshToggles).toEqual([{ nodes: ['*'], hideNow: SPLINTER_SHATTERED_GESTURE }]);
   });
 });

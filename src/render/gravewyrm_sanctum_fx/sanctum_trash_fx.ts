@@ -47,7 +47,6 @@ import {
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
-import { SPLINTER_SHATTERED_GESTURE } from '../characters/sanctum_creature_looks';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { surfaceMat } from '../gfx';
 import {
@@ -60,6 +59,7 @@ import {
   objectFill,
   rgb,
   SANCTUM_PALETTE,
+  SPLINTER_SHATTERED_GESTURE,
   sanctumAnchor,
   sanctumDrawnHeight,
   sanctumObjectSpecs,

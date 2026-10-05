@@ -40,6 +40,12 @@ authoring tooling: nothing here runs in the build or the game.
   the face and off the upper arms; his own ice block rides the Weapon bone between his palms
   in IceBlockToss only (RELEASE 1.25 s, the frame the fx block takes off).
 
+- `splinter/builder/`: the Glacier Splinter (`sanctum_glacier_splinter.glb`), on the shared kit:
+  faceted convex ice chunks, each rigid on its own bone, over a rune-iron core with the heart
+  crystal in the chest window. `clips.py` adds `Fracture` (the split's stagger: every piece jolts
+  out from the core and grinds back; CRACK 0.3 s); Death ends on the core's flare at 2.0 s, the
+  Shatter's fuse.
+
 Build (Blender 5.2, absolute output paths; keep one Blender job at a time):
 
     blender -b --factory-startup --python <builder>/build.py -- <abs>/<key>_raw.glb \

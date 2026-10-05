@@ -628,6 +628,20 @@ export function isHaulerEnrageCue(
   );
 }
 
+// ---- the Glacier Splinter's Fracture --------------------------------------------------
+
+/** A Glacier Splinter's Shatter: its whole body bursts (the fx throw the
+ *  shards), so its corpse hides (re-sent while the corpse stands). */
+export const SPLINTER_SHATTERED_GESTURE = 'sanctum_splinter_shattered';
+
+/** The original Splinter's Fracture clip (the crack staggers it, every piece
+ *  jolts out from the core and grinds back), played as it splits. */
+export const SPLINTER_FRACTURE_GESTURE = 'sanctum_splinter_fracture';
+/** The copy it throws off plays the same clip as its entrance. */
+export const SPLINTER_COPY_GESTURE = 'sanctum_splinter_copy';
+/** Seconds the copy's entrance stays on offer (its view may land a frame late). */
+export const SPLINTER_COPY_WINDOW = 0.5;
+
 // ---- the risen dead ---------------------------------------------------------------
 
 /** The gesture that plays a Raised Bonewalker's Thaw (its entrance: the

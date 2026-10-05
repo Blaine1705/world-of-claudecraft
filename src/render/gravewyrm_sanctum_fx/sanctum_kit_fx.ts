@@ -51,6 +51,9 @@ import {
   lashSweep,
   rgb,
   SANCTUM_PALETTE,
+  SPLINTER_COPY_GESTURE,
+  SPLINTER_COPY_WINDOW,
+  SPLINTER_FRACTURE_GESTURE,
   sanctumAnchor,
   sanctumDrawnHeight,
   sanctumTelegraphSpecs,
@@ -296,6 +299,9 @@ export class SanctumKitFx {
   private readonly up = new THREE.Vector3(0, 1, 0);
   /** When each Raised Bonewalker was first seen (its rise is offered then). */
   private readonly walkersSeen = new Map<number, number>();
+  /** A fresh Fracture copy and until when its entrance is offered. */
+  private copyId = -1;
+  private copyUntil = 0;
   private clock = 0;
 
   constructor(
@@ -685,6 +691,14 @@ export class SanctumKitFx {
     const x = copy ? (src.pos.x + copy.pos.x) / 2 : src.pos.x;
     const z = copy ? (src.pos.z + copy.pos.z) / 2 : src.pos.z;
     const heading = copy ? Math.atan2(copy.pos.x - src.pos.x, copy.pos.z - src.pos.z) : src.facing;
+    // Both halves stagger as the crack runs through them: the original at
+    // once, the copy as its entrance (offered until its view exists).
+    h.gesture(src.id, SPLINTER_FRACTURE_GESTURE);
+    if (copy) {
+      this.copyId = copy.id;
+      this.copyUntil = this.clock + SPLINTER_COPY_WINDOW;
+      h.gesture(copy.id, SPLINTER_COPY_GESTURE);
+    }
     // The body splits along a seam: ice and rune-iron thrown both ways.
     for (const side of [0, Math.PI]) {
       h.shards.burst(x, gy + bh * 0.55, z, 28, {
@@ -793,6 +807,10 @@ export class SanctumKitFx {
 
   update(dt: number, clock: number): void {
     this.clock = clock;
+    if (this.copyId >= 0) {
+      if (clock > this.copyUntil) this.copyId = -1;
+      else this.host.gesture(this.copyId, SPLINTER_COPY_GESTURE);
+    }
     this.paintTethers(dt);
     this.paintColumns();
     this.paintSweeps(dt);
