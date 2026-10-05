@@ -877,13 +877,16 @@ describe('real catalog integration', () => {
     // 287 with the Buried Hoards Coinsack catch (cmb_coinsack_caught, visible).
     // 306 with the five-dungeon rework's 19 encounter deeds (all visible, none
     // feat or hidden).
-    expect(view.summary.visibleTotal).toBe(306);
+    // 307 with the Drowned Temple lore guide's deed (dgn_drowned_temple_cantor,
+    // The Last Verse, visible).
+    expect(view.summary.visibleTotal).toBe(307);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
     // from visibleTotal): 268 + 22 = 290, then 298, 305, 307 and 308 by the same
     // four appends, then 309 with the Buried Hoards Coinsack catch, then 328
-    // with the five-dungeon rework's 19 encounter deeds.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(328);
+    // with the five-dungeon rework's 19 encounter deeds, then 329 with the
+    // Drowned Temple lore guide's deed.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(329);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {
