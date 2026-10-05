@@ -950,8 +950,8 @@ display-only (the ids stay frozen) and pinned in `tests/originality_renames.test
 | Name | Where | Verdict |
 |---|---|---|
 | Gravecall | the Bound Soul launch (finder copy) | PENDING a manual web check. Builds on this game's own "Gravecall" token (Gravecall Acolyte, Morthen the Gravecaller). |
-| Gorged on the Dead | Morthen's stacking damage buff from the souls | PENDING a manual web check. |
-| Rite of the Unquiet | his act-two channel at the altar | PENDING a manual web check. |
+| Gorged on the Dead | Morthen's stacking damage buff from the souls | Chosen in the crypt rework's 2026-09-29 naming pass to replace the rejected "Soul Tithe" (`docs/design/dungeon-rework/hollow_crypt.md` section 10); re-confirm with the rest of this table. |
+| Rite of the Unquiet | his act-two channel at the altar | Chosen in the same 2026-09-29 pass to replace the rejected "Rite of Unmaking" (section 10); re-confirm with the rest of this table. |
 | Unquiet Ward | his immunity through the Rite | PENDING a manual web check. |
 | Reap the Unquiet | his Last Rites frontal sweep | PENDING a manual web check. |
 | Name the Dead | the heroic candle order (the Ledger) | PENDING a manual web check. |

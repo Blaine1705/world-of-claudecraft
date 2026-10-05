@@ -323,7 +323,7 @@ cloth of about 1,250: Shadow Pulse 216 to 270 (about 19, avoidable), a soul take
 108 to 144 (about 10), Grave Chill 27 a second rising by 9 every 5 s (about 65
 percent spread over a 20 s Rite, the healer's load), the Reap 495 to 585 (about 43,
 the tank's), a wrong candle 252 to 288 (about 22), Grasp of the Grave 162 to 198
-(about 15) and a root. No single avoidable mechanic passes 60 percent of a
+(13 to 16) and a root. No single avoidable mechanic passes 60 percent of a
 full-health cloth wearer; a player rooted by the Grasp in front of the Reap is lost
 (the draft's intent).
 
@@ -488,8 +488,8 @@ epics in each partition, the trinket on Ilvane, Bastion Sigil on Morthen).
     Bonechill without her ever dropping anyone from her Frozen Embrace (built).
   - `dgn_ilvane_hush`: "Hush Now": defeat Cantor Ilvane without her Dirge of the
     Hollow ever striking anyone (built).
-  - `dgn_morthen_candles`: "By Candlelight": relight all four Remembrance Candles
-    within 20 s of the Rite of the Unquiet.
+  - `dgn_morthen_candlelight`: "By Candlelight": defeat Morthen after relighting
+    all four Remembrance Candles within 20 s of his Unquiet Ward rising (built).
   - The shipped `dgn_hollow_crypt`, `_heroic`, `dgn_morthen_flawless` and
     `dgn_morthen_trio` stay as they are.
 - **Reliquary:** the shipped pages stay (append-only). The rare chase items
