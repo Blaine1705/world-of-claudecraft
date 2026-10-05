@@ -58,7 +58,6 @@ function fixture(cls = 'warrior') {
   const shear = new THREE.Texture();
   const crush = new THREE.Texture();
   const smoke = new THREE.Texture();
-  const shockwave = new THREE.Texture();
   const shoutDust = new THREE.Texture();
   const baked: Record<BakedKind, THREE.Texture> = {
     smoke,
@@ -69,7 +68,6 @@ function fixture(cls = 'warrior') {
     warrior_bite: bite,
     warrior_shear: shear,
     warrior_crush: crush,
-    shockwave,
   };
   vi.spyOn(assets, 'bakedTexture').mockImplementation((kind) => baked[kind] ?? null);
   const contacts: Record<ContactSheet, THREE.Texture> = {
@@ -110,7 +108,6 @@ function fixture(cls = 'warrior') {
     shear,
     crush,
     smoke,
-    shockwave,
     shoutDust,
     baked,
     contacts,
@@ -129,7 +126,7 @@ function fixture(cls = 'warrior') {
       bite.dispose();
       shear.dispose();
       crush.dispose();
-      for (const sheet of [smoke, shockwave, shoutDust, ...Object.values(contacts)])
+      for (const sheet of [smoke, shoutDust, ...Object.values(contacts)])
         sheet.dispose();
       vi.restoreAllMocks();
     },
@@ -170,7 +167,6 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.upload).toHaveBeenNthCalledWith(13, f.bite);
     expect(f.upload).toHaveBeenNthCalledWith(14, f.shear);
     expect(f.upload).toHaveBeenNthCalledWith(15, f.crush);
-    expect(f.upload).not.toHaveBeenCalledWith(f.shockwave);
     expect(f.crush).not.toBe(f.shear);
     expect(f.host.draw).toHaveBeenCalledTimes(27);
     // The full, ordered 27-name crest list (20 authored kinds + the 7
@@ -223,14 +219,13 @@ it('uploads every sheet the Warrior kit draws before a geometry unit runs', asyn
   // the generic smoke and dust layers (baked_impact_layers.ts) as well as its
   // signature sheets. They all land with the kit's demand load, after the boot
   // warm-up ran, so a sheet the recipe does not upload is uploaded by the
-  // first cast that draws it, in a live frame. The loaded shockwave sheet is
-  // drawn only by the boot-window prewarmSpawn, never by a cast.
+    // first cast that draws it, in a live frame.
   const f = fixture();
   try {
     await ensureActiveAbilityKit(f.scene);
     const uploaded = new Set(f.upload.mock.calls.map(([texture]) => texture));
     for (const kind of Object.keys(BAKED_URLS) as BakedKind[])
-      expect(uploaded.has(assets.bakedTexture(kind)), kind).toBe(kind !== 'shockwave');
+      expect(uploaded.has(assets.bakedTexture(kind)), kind).toBe(true);
     for (const kind of CONTACT_SHEETS)
       expect(uploaded.has(contact.contactTexture(kind)), kind).toBe(true);
     for (const texture of [f.blood, f.steel, f.texture, f.rock])
@@ -244,10 +239,11 @@ it('uploads every sheet the Warrior kit draws before a geometry unit runs', asyn
   }
 });
 
-it('leaves out only the shockwave sheet, which no cast draws', () => {
-  // The recipe skips the loaded shockwave sheet because its one drawer is the
-  // boot-window prewarmSpawn, behind the curtain. A cast that starts drawing
-  // it must move it into the recipe, or its first draw uploads it live.
+it('does not carry a shockwave sheet in the active kit recipe', () => {
+  // Shockwave is not part of the current baked production sheet set. If a cast
+  // starts drawing it later, it must be added to the recipe instead of uploading
+  // live on first draw.
+  expect(Object.keys(BAKED_URLS)).not.toContain('shockwave');
   const root = new URL('../src/render/', import.meta.url);
   const drawers: string[] = [];
   for (const file of readdirSync(root, { recursive: true, encoding: 'utf8' })) {
@@ -258,11 +254,7 @@ it('leaves out only the shockwave sheet, which no cast draws', () => {
         `${file.replaceAll('\\', '/')}:${source.slice(0, match.index).split('\n').length}`,
       );
   }
-  expect(drawers).toHaveLength(1);
-  expect(drawers[0]).toMatch(/^ability_vfx\/fx\.ts:/);
-  const fx = readFileSync(new URL('ability_vfx/fx.ts', root), 'utf8');
-  const spawn = fx.slice(fx.indexOf('  prewarmSpawn('), fx.indexOf('  prewarmSpawn(') + 600);
-  expect(spawn).toContain("this.bakedAt('shockwave'");
+  expect(drawers).toEqual([]);
 });
 
 it.each(CONTACT_SHEETS)('keeps the kit cold when the %s sheet is missing', async (kind) => {
