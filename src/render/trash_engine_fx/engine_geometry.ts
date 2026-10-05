@@ -72,9 +72,10 @@ varying vec2 vP;
 varying vec3 vWorld;
 void main() {
   vP = aUnit;
-  vec4 w = modelMatrix * vec4(position, 1.0);
-  vWorld = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
+  // Camera-relative (the CPU's double-precision modelView): instance bands
+  // sit far out, where a float32 world point rounds by more than the lift.
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
 
