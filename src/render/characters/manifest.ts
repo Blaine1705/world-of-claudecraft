@@ -24,6 +24,10 @@ import {
 import {
   KNELLWYRM_ARRIVE,
   KNELLWYRM_DREAD_BELLOW,
+  KNELLWYRM_KNELL_BREATH,
+  KNELLWYRM_KNELL_LAND,
+  KNELLWYRM_KNELL_MARK,
+  KNELLWYRM_KNELL_RISE,
   KNELLWYRM_PYRE_STRAFE,
   KNELLWYRM_STRAFE_RUN,
   MORTHEN_DESCEND,
@@ -50,6 +54,7 @@ import {
   MARROW_MEASURE,
   MARROW_SHOVELFUL,
 } from '../../sim/encounters/hollow_crypt/marrow_ids';
+import { MORTHEN_REAP, MORTHEN_RITE } from '../../sim/encounters/hollow_crypt/morthen_ids';
 import {
   OLEN_HALLOWED_BRINE,
   OLEN_OATH_KNEEL,
@@ -166,11 +171,15 @@ import {
   HOARD_GESTURE_ICE_AGE_RELEASE,
 } from '../hoard_boss_gestures_core';
 import {
+  MORTHEN_DEATH_LIFT,
+  MORTHEN_HOVER,
+  MORTHEN_REAP_SWEEP,
   MORTHEN_SCYTHE_HELD,
   MORTHEN_SCYTHE_UNFOLD,
   MORTHEN_STAFF_HELD,
   MORTHEN_TOLL,
 } from '../hollow_crypt/morthen_fx_core';
+import { KNELL_GESTURE_POUR, KNELL_GESTURE_SKY_ROAR } from '../hollow_crypt/morthen_rite_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import {
@@ -480,6 +489,11 @@ export interface VisualDef {
    *  normalized feet anchor. CharacterVisual eases it in only over the final
    *  quarter of the Death clip and restores the base offset on revive. */
   deathGroundOffset?: number;
+  /** The opposite of deathGroundOffset, for a body drawn SUNK into the floor
+   *  in life (a negative `hover`): its model is lifted by `yards` (model-local)
+   *  eased over [from, to] of the Death clip (death_grounding_core.ts
+   *  deathLiftOffset), so the authored death pose rests on the floor. */
+  deathLift?: { yards: number; from: number; to: number };
   /** Hold the idle base state frozen on the FIRST frame of its clip instead of
    *  looping it: a downed/dormant look (the forge mech lies still on the ground
    *  on crawl frame 0 until it moves). Walk/run still play the clip normally, so
@@ -1831,6 +1845,8 @@ const MORTHEN_STAFF_CLIPS: ClipMap = {
     [MORTHEN_RISE]: 'Rise',
     [MORTHEN_PROCLAIM]: 'SummonSouls',
     [MORTHEN_DESCEND]: 'ShieldRitual',
+    // The Rite of the Unquiet: the staff held level before him, the ward up.
+    [MORTHEN_RITE]: 'ShieldRitual',
   },
   castTimeScaleByAbility: { [MORTHEN_RISE]: 1, [MORTHEN_PROCLAIM]: 1, [MORTHEN_DESCEND]: 1 },
 };
@@ -1839,11 +1855,15 @@ const MORTHEN_SCYTHE_CLIPS: ClipMap = {
   walk: 'ScytheWalk',
   run: 'ScytheRun',
   attack: ['ScytheSweep', 'ScytheSweep2'],
-  attackByAbility: { [MORTHEN_TOLL]: 'ScytheToll' },
-  attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1 },
+  // Reap the Unquiet: the bar winds the blade up (ScytheSummon, the scythe
+  // raised over the souls), the landing brings it round in the flat sweep, fast
+  // (its cut at frame 14 lands about 0.3 s after the hit).
+  attackByAbility: { [MORTHEN_TOLL]: 'ScytheToll', [MORTHEN_REAP_SWEEP]: 'ScytheSweep' },
+  attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1, [MORTHEN_REAP_SWEEP]: 1.9 },
   hit: ['ScytheHit'],
   death: 'ScytheDeath',
   cast: 'ScytheSummon',
+  castByAbility: { [MORTHEN_REAP]: 'ScytheSummon' },
 };
 
 export const VISUALS: Record<string, VisualDef> = {
@@ -4107,11 +4127,15 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   // Morthen, the Lich Bishop (the clip sets above): about three players tall
-  // at his template's 1.35, hovering on his smoke a hand over the flags.
+  // at his template's 1.35, floating on his soul smoke, the smoke funnel sunk
+  // into the ring floor (morthen_fx_core.ts MORTHEN_HOVER) so his whole body
+  // and face read from the default camera; his corpse is lifted back onto the
+  // flags as he falls (MORTHEN_DEATH_LIFT).
   crypt_morthen_lich: {
     url: `${CREATURES}/crypt_morthen_lich.glb`,
     height: 6.994,
-    hover: 0.122,
+    hover: MORTHEN_HOVER,
+    deathLift: MORTHEN_DEATH_LIFT,
     clips: MORTHEN_STAFF_CLIPS,
     phaseClips: {
       [MORTHEN_STAFF_HELD]: { clips: MORTHEN_STAFF_CLIPS },
@@ -4312,6 +4336,13 @@ export const VISUALS: Record<string, VisualDef> = {
         [KNELLWYRM_PYRE_STRAFE]: 'TakeWing',
         [KNELLWYRM_STRAFE_RUN]: 'Strafe',
         [KNELLWYRM_DREAD_BELLOW]: 'Bellow',
+        // Heroic Burning Knell. Aloft, a flier's `jump` (Fly) owns the rig and
+        // these play only on the frames it reads grounded (the take-off, the
+        // touchdown); the mark and the pour also ride one-shots below.
+        [KNELLWYRM_KNELL_RISE]: 'TakeWing',
+        [KNELLWYRM_KNELL_MARK]: 'SkyRoar',
+        [KNELLWYRM_KNELL_BREATH]: 'Strafe',
+        [KNELLWYRM_KNELL_LAND]: 'Glide',
       },
       castTimeScaleByAbility: {
         [CRYPT_BARROWFLAME_BREATH]: 1,
@@ -4319,7 +4350,14 @@ export const VISUALS: Record<string, VisualDef> = {
         [CRYPT_WING_GUST]: 1,
         [KNELLWYRM_PYRE_STRAFE]: 1,
         [KNELLWYRM_DREAD_BELLOW]: 1,
+        // TakeWing is authored on the 2.5 s rise (60 frames at 24 fps).
+        [KNELLWYRM_KNELL_RISE]: 1,
       },
+      // The Knell's beats aloft (morthen_rite_fx_core.ts): it roars the fire
+      // down over the marked half, then dives into the pour (Strafe's 33
+      // frames are the 1.4 s breath at rate 1).
+      attackByAbility: { [KNELL_GESTURE_SKY_ROAR]: 'SkyRoar', [KNELL_GESTURE_POUR]: 'Strafe' },
+      attackTimeScaleByAbility: { [KNELL_GESTURE_SKY_ROAR]: 1, [KNELL_GESTURE_POUR]: 1 },
       castPlayOut: ['Breath', 'TailSweep', 'WingBuffet', 'Bellow'],
       flourish: 'Roar',
     },

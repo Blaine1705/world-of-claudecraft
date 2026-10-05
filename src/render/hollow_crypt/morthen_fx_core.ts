@@ -50,6 +50,36 @@ export function morthenStanceGesture(prev: MorthenStance | null, next: MorthenSt
  *  visual starts on the staff; the next refresh puts the scythe back). */
 export const MORTHEN_STANCE_REFRESH_SEC = 1;
 
+/** Reap the Unquiet lands: the scythe brought round in a flat reaping sweep
+ *  (the ScytheSweep one-shot; the bar itself winds up on ScytheSummon). */
+export const MORTHEN_REAP_SWEEP = 'crypt_morthen_reap_sweep';
+
+// ---- how he floats -----------------------------------------------------------------------
+// He never touches the floor, but he must not tower out of the default camera
+// either: the soul-smoke funnel under his robes SINKS into the floor (the rite
+// ring swallowing it), so the whole body and the face under the mitre read
+// from the camera a player fights him with, while the robes still trail over
+// the flags and the smoke still boils out round him. One constant drives the
+// manifest's `hover`, every body anchor below and the corpse's rise.
+
+/** The build's MINZ (build_morthen.py): the rig's lowest point over its
+ *  origin half a second into Idle (the smoke funnel's tip). */
+export const MORTHEN_REST_MINZ = 0.122;
+/** How deep (authored yards) his smoke funnel sinks under the floor. */
+export const MORTHEN_SINK = 1.3;
+/** The manifest's `hover` for crypt_morthen_lich (the funnel tip this far
+ *  under the pivot). */
+export const MORTHEN_HOVER = MORTHEN_REST_MINZ - MORTHEN_SINK;
+/** Where the rig's origin sits over his pivot (authored yards): every body
+ *  anchor below is measured in the rig's own frame and lifted by this. */
+export const MORTHEN_RIG_Y = MORTHEN_HOVER - MORTHEN_REST_MINZ;
+
+/** The lowest an emitter on his body may sit over the floor under him (his
+ *  smoke base is under the floor now: it boils out at the flags instead). */
+export function morthenEmitY(anchorY: number, floorY: number, scale: number): number {
+  return Math.max(anchorY, floorY + 0.3 * scale);
+}
+
 // ---- the body, measured off the Blender rig (authored yards, x right, y up, z forward) ----
 /** The soul fire caged in his ribs. */
 export const MORTHEN_RIBS = { x: 0, y: 3.45, z: 0.16 } as const;
@@ -61,7 +91,8 @@ export const MORTHEN_SMOKE_BASE = { x: 0, y: 0.6, z: 0 } as const;
 /** The reach of his scythe from his centre (the trail's radius). */
 export const MORTHEN_SCYTHE_REACH = 4.2;
 
-/** A body point in the world: authored offset scaled, turned by his facing. */
+/** A body point in the world: authored (rig-frame) offset lifted onto his
+ *  pivot (MORTHEN_RIG_Y, the sink), scaled, turned by his facing. */
 export function morthenAnchor(
   pos: { x: number; y: number; z: number },
   facing: number,
@@ -72,9 +103,14 @@ export function morthenAnchor(
   const c = Math.cos(facing);
   return {
     x: pos.x + (at.x * c + at.z * s) * scale,
-    y: pos.y + at.y * scale,
+    y: pos.y + (at.y + MORTHEN_RIG_Y) * scale,
     z: pos.z + (-at.x * s + at.z * c) * scale,
   };
+}
+
+/** A rig-frame height (authored yards) over his pivot in the world. */
+export function morthenBodyY(pivotY: number, rigY: number, scale: number): number {
+  return pivotY + (rigY + MORTHEN_RIG_Y) * scale;
 }
 
 // ---- timings (seconds; the clips are keyed at 24 fps) -----------------------------------------
@@ -89,6 +125,10 @@ export const SWING_CUT_SEC = 0.28;
 export const STAFF_STRIKE_SEC = 0.42;
 /** The dissolve after death: the smoke rises and the souls leave for this long. */
 export const DISSOLVE_SEC = 3.2;
+/** As he falls, the body is lifted back out of the floor by the sink, over
+ *  this share of his Death clip (from the jolt at frame 7 to the heap at
+ *  frame 32 of 60), so the folded vestments come to rest ON the flags. */
+export const MORTHEN_DEATH_LIFT = { yards: MORTHEN_SINK, from: 0.1, to: 0.55 } as const;
 
 /** How far round its arc a swing's trail has cut `t` seconds after the hit
  *  (null before it starts and after it fades). `head` is the leading edge,

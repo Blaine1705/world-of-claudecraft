@@ -266,6 +266,15 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/hollow_crypt/marrow_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hollow_crypt/lady_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hollow_crypt/ilvane_fx.ts', layer: 'encounter', strict: true },
+  // Morthen's fight on the Rite Ring and the Knellwyrm's Burning Knell
+  // (morthen_rite_fx.ts, the host): Grave Chill's mist under every telegraph
+  // rung, the scorch and rune circle on the floor rungs, the telegraphs on the
+  // kit's rungs, the ward, columns, beams and flashes above them.
+  { file: 'src/render/hollow_crypt/morthen_rite_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/hollow_crypt/morthen_attack_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/hollow_crypt/morthen_ward_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/hollow_crypt/morthen_candle_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/hollow_crypt/knell_fx.ts', layer: 'encounter', strict: true },
   {
     file: 'src/render/sunken_bastion/bastion_vael_stage_fx.ts',
     layer: 'encounter',

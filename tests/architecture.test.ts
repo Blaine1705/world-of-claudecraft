@@ -826,6 +826,9 @@ const RENDER_PURE_CORES = [
   'src/render/hollow_crypt/crypt_finale_fx_core.ts',
   // Morthen the Lich Bishop's stance latch, body anchors and effect timings.
   'src/render/hollow_crypt/morthen_fx_core.ts',
+  // Morthen's Rite and the Knellwyrm's Burning Knell: telegraph shapes, candle
+  // looks, the ward's cracks, the Grasp's hands.
+  'src/render/hollow_crypt/morthen_rite_fx_core.ts',
   // The Gravewyrm Sanctum bosses' Blender bodies, measured, and their gestures.
   'src/render/gravewyrm_sanctum_bosses/boss_model_core.ts',
   'src/render/gravewyrm_sanctum_bosses/boss_fx_core.ts',

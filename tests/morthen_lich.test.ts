@@ -16,16 +16,25 @@ import { characterMeshCastsShadow } from '../src/render/characters/shadow_policy
 import {
   DISSOLVE_SEC,
   dissolveLevels,
+  MORTHEN_DEATH_LIFT,
+  MORTHEN_HOVER,
   MORTHEN_MITRE_EYE,
+  MORTHEN_REAP_SWEEP,
+  MORTHEN_REST_MINZ,
   MORTHEN_RIBS,
+  MORTHEN_RIG_Y,
   MORTHEN_SCYTHE_HELD,
   MORTHEN_SCYTHE_UNFOLD,
+  MORTHEN_SINK,
+  MORTHEN_SMOKE_BASE,
   MORTHEN_SOUL_COUNT,
   MORTHEN_SOUL_RADIUS,
   MORTHEN_STAFF_HELD,
   MORTHEN_STAFF_RESTORED_FRACTION,
   MORTHEN_TOLL,
   morthenAnchor,
+  morthenBodyY,
+  morthenEmitY,
   morthenStance,
   morthenStanceGesture,
   SWING_CUT_START_SEC,
@@ -39,6 +48,7 @@ import {
   MORTHEN_PROCLAIM,
   MORTHEN_RISE,
 } from '../src/sim/encounters/hollow_crypt/ids';
+import { MORTHEN_REAP, MORTHEN_RITE } from '../src/sim/encounters/hollow_crypt/morthen_ids';
 import type { Entity } from '../src/sim/types';
 
 const PLAYER_HEIGHT = 2.6;
@@ -84,7 +94,37 @@ describe('Morthen, the Lich Bishop: his own body', () => {
   it('stands about three players tall and floats', () => {
     const drawn = def.height * MOBS.morthen.scale;
     expect(drawn / PLAYER_HEIGHT).toBeGreaterThan(2.9);
-    expect(def.hover).toBeGreaterThan(0);
+    // Even with his smoke funnel sunk, what stands over the floor towers.
+    expect(((def.height + (def.hover ?? 0)) * MOBS.morthen.scale) / PLAYER_HEIGHT).toBeGreaterThan(
+      2.8,
+    );
+  });
+
+  it('sinks his smoke funnel into the ring floor so his whole body reads from the camera', () => {
+    // One constant drives the manifest's hover and every body anchor.
+    expect(def.hover).toBe(MORTHEN_HOVER);
+    expect(MORTHEN_HOVER).toBeCloseTo(MORTHEN_REST_MINZ - MORTHEN_SINK, 9);
+    expect(MORTHEN_RIG_Y).toBeCloseTo(-MORTHEN_SINK, 9);
+    expect(MORTHEN_SINK).toBeGreaterThanOrEqual(1.2);
+    expect(MORTHEN_SINK).toBeLessThanOrEqual(1.6);
+    const s = MOBS.morthen.scale;
+    // The burning eye under the mitre sits low enough for the default camera
+    // (well under the old 7 yd) and still well over a player's head.
+    const eye = morthenBodyY(0, MORTHEN_MITRE_EYE.y, s);
+    expect(eye).toBeLessThan(6);
+    expect(eye).toBeGreaterThan(PLAYER_HEIGHT * 1.6);
+    // He still floats: the top of the smoke funnel (build_morthen.py, its
+    // wisps' tops near 1.95) rises over the flags, the ribs well above it.
+    expect(morthenBodyY(0, 1.95, s)).toBeGreaterThan(0.5);
+    expect(morthenBodyY(0, MORTHEN_RIBS.y, s)).toBeGreaterThan(2.5);
+    // The smoke base is under the floor now: its emitters boil out at the flags.
+    expect(morthenBodyY(0, MORTHEN_SMOKE_BASE.y, s)).toBeLessThan(0);
+    expect(morthenEmitY(morthenBodyY(0, MORTHEN_SMOKE_BASE.y, s), 0, s)).toBeGreaterThan(0);
+    expect(morthenEmitY(3, 0, s)).toBe(3);
+    // His corpse is lifted by the very sink, so the folded vestments rest on the floor.
+    expect(def.deathLift).toEqual(MORTHEN_DEATH_LIFT);
+    expect(MORTHEN_DEATH_LIFT.yards).toBe(MORTHEN_SINK);
+    expect(MORTHEN_DEATH_LIFT.to).toBeGreaterThan(MORTHEN_DEATH_LIFT.from);
   });
 
   it('sheds his sparks off the mitre eye, not the retired shoulder candles', () => {
@@ -232,6 +272,8 @@ describe('Morthen, the Lich Bishop: the souls circling him', () => {
         expect(r).toBeLessThan(MORTHEN_SOUL_RADIUS * 1.15);
         expect(p.y).toBeGreaterThan(2.5);
         expect(p.y).toBeLessThan(4.2);
+        // drawn over the ring floor even with his funnel sunk into it
+        expect(morthenBodyY(0, p.y, MOBS.morthen.scale)).toBeGreaterThan(1);
       }
     }
   });
@@ -258,6 +300,17 @@ describe('Morthen, the Lich Bishop: clips mapped to his casts', () => {
     expect(def.clips.castByAbility?.[MORTHEN_PROCLAIM]).toBe('SummonSouls');
     expect(def.clips.castByAbility?.[MORTHEN_DESCEND]).toBe('ShieldRitual');
     expect(def.clips.castTimeScaleByAbility?.[MORTHEN_RISE]).toBe(1);
+  });
+
+  it('holds his ward through the Rite, and winds up and sweeps the Reap with the scythe', () => {
+    expect(def.clips.castByAbility?.[MORTHEN_RITE]).toBe('ShieldRitual');
+    const scythe = def.phaseClips?.[MORTHEN_SCYTHE_HELD]?.clips;
+    expect(scythe?.castByAbility?.[MORTHEN_REAP]).toBe('ScytheSummon');
+    expect(scythe?.attackByAbility?.[MORTHEN_REAP_SWEEP]).toBe('ScytheSweep');
+    expect(scythe?.attackTimeScaleByAbility?.[MORTHEN_REAP_SWEEP]).toBeGreaterThan(1);
+    const names = new Set((glbJson().animations ?? []).map((a) => a.name));
+    for (const clip of ['ShieldRitual', 'ScytheSummon', 'ScytheSweep'])
+      expect(names.has(clip)).toBe(true);
   });
 
   it('strikes with the bell staff and tolls it for the Shadow Pulse', () => {
@@ -314,11 +367,15 @@ describe('Morthen, the Lich Bishop: effect plan', () => {
   it('turns body anchors with his facing', () => {
     const at = { x: 0, y: 3, z: 1 };
     const north = morthenAnchor({ x: 10, y: 2, z: 5 }, 0, 1, at);
-    expect(north).toEqual({ x: 10, y: 5, z: 6 });
+    expect(north.x).toBe(10);
+    expect(north.z).toBe(6);
+    // Rig-frame heights ride the sink onto his pivot.
+    expect(north.y).toBeCloseTo(2 + 3 + MORTHEN_RIG_Y, 9);
     const east = morthenAnchor({ x: 0, y: 0, z: 0 }, Math.PI / 2, 2, at);
     expect(east.x).toBeCloseTo(2);
     expect(east.z).toBeCloseTo(0);
-    expect(east.y).toBeCloseTo(6);
+    expect(east.y).toBeCloseTo((3 + MORTHEN_RIG_Y) * 2);
+    expect(morthenBodyY(1, 3, 2)).toBeCloseTo(east.y + 1, 9);
   });
 
   it('cuts a swing trail forward along the arc, then fades it', () => {

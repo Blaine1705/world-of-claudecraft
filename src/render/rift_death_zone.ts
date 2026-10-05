@@ -45,6 +45,7 @@ import { CryptCreatureFx } from './hollow_crypt/crypt_creature_fx';
 import { CryptFinaleFx } from './hollow_crypt/crypt_finale_fx';
 import { CryptTrashFx } from './hollow_crypt/crypt_trash_fx';
 import { MorthenFx } from './hollow_crypt/morthen_fx';
+import { MorthenRiteFx } from './hollow_crypt/morthen_rite_fx';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -118,6 +119,9 @@ export class RiftDeathZoneVisuals {
   private readonly cryptFinale: CryptFinaleFx;
   // Morthen the Lich Bishop's own body effects and his stance gestures.
   private readonly morthenFx: MorthenFx;
+  // Morthen's fight on the Rite Ring (telegraphs, ward, candles, souls, the
+  // Grasp) and the Knellwyrm's heroic Burning Knell.
+  private readonly morthenRite: MorthenRiteFx;
   // The Hollow Crypt's wing bosses: Sexton Marrow, the Lady of the Bonechill,
   // Cantor Ilvane (their telegraphs, hazards and spell effects).
   private readonly cryptBosses: CryptBossFx;
@@ -229,6 +233,15 @@ export class RiftDeathZoneVisuals {
       shake,
       playGesture,
     );
+    this.morthenRite = new MorthenRiteFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.sanctumFx = new SanctumFx(
       scene,
       groundY,
@@ -327,6 +340,7 @@ export class RiftDeathZoneVisuals {
     this.cryptFinale.update(dt);
     this.cryptBosses.update(dt);
     this.morthenFx.update(dt);
+    this.morthenRite.update(dt);
     this.sanctumFx.update(dt);
     this.sanctumBosses.update(dt);
     this.trashEngine.update(dt);
@@ -369,6 +383,7 @@ export class RiftDeathZoneVisuals {
     this.cryptFinale.dispose();
     this.cryptBosses.dispose();
     this.morthenFx.dispose();
+    this.morthenRite.dispose();
     this.sanctumFx.dispose();
     this.sanctumBosses.dispose();
     this.trashEngine.dispose();
@@ -390,6 +405,7 @@ export class RiftDeathZoneVisuals {
     this.cryptFinale.handleEvent(event);
     this.cryptBosses.handleEvent(event);
     this.morthenFx.handleEvent(event);
+    this.morthenRite.handleEvent(event);
     const temple = this.templeFx.handleEvent(event);
     const basin = this.wildheartFx.handleEvent(event);
     const sanctum = this.sanctumFx.handleEvent(event);

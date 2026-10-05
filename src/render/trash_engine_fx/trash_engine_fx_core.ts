@@ -11,6 +11,8 @@
 // Three-free, DOM-free, deterministic.
 
 import { DUNGEONS, instanceOrigin, MOBS } from '../../sim/data';
+import { BOUND_SOUL_WALKER } from '../../sim/encounters/hollow_crypt/morthen_gravecall';
+import { MORTHEN_SOUL_TEMPLATE } from '../../sim/encounters/hollow_crypt/morthen_ids';
 import { COMBAT_WALL_SHAPES } from '../../sim/instances/combat_wall_state';
 import { BASTION_THROATLIGHT_ORB } from '../../sim/mob/trash_kit/bastion_cast_ids';
 import { TRASH_ENGINE_DEMO_KIT } from '../../sim/mob/trash_kit/engine_demo';
@@ -28,6 +30,7 @@ import type {
   TrashKitDef,
 } from '../../sim/types';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
+import { BOUND_SOUL_LOOK } from '../hollow_crypt/morthen_rite_fx_core';
 
 export type KitSchool = Aura['school'];
 export type KitNovaDef = NonNullable<TrashKitDef['nova']>;
@@ -57,7 +60,10 @@ export interface EngineCatalog {
 }
 
 /** Sweep a set of kits into the catalog (later kits never override earlier). */
-export function buildEngineCatalog(kits: Iterable<TrashKitDef>): EngineCatalog {
+export function buildEngineCatalog(
+  kits: Iterable<TrashKitDef>,
+  encounterWalkers: Iterable<KitWalkerDef> = [],
+): EngineCatalog {
   const hazards = new Map<string, KitHazardDef>();
   const walkers = new Map<string, KitWalkerDef>();
   const walkerCasts = new Map<string, KitWalkerDef>();
@@ -103,6 +109,8 @@ export function buildEngineCatalog(kits: Iterable<TrashKitDef>): EngineCatalog {
     const wall = kit.toss?.leavesWall;
     if (wall) put(wallSeconds, wall.objectTemplate, wall.seconds);
   }
+  // An encounter's own walkers draw as orbs (ENCOUNTER_WALKERS below).
+  for (const w of encounterWalkers) put(walkers, w.objectTemplate, w);
   return {
     hazards,
     walkers,
@@ -119,13 +127,23 @@ export function buildEngineCatalog(kits: Iterable<TrashKitDef>): EngineCatalog {
 
 let catalog: EngineCatalog | null = null;
 
-/** The shipped catalog: every template's kit, then the dev demo kit. */
+/** Walkers an ENCOUNTER launches itself (an 'event' launch from a spot, never
+ *  a mob's bar), so no template's kit carries them: Morthen's Bound Soul
+ *  (encounters/hollow_crypt/morthen_gravecall.ts). The engine draws their
+ *  orbs and beats; their launch and the boss's own surge are the encounter
+ *  painter's (render/hollow_crypt/morthen_soul_fx.ts). They join `walkers`
+ *  only: no launch bar to gather on, and no lingering empower glow (Gorged on
+ *  the Dead lasts the fight; his own soul fire deepens with it instead). */
+export const ENCOUNTER_WALKERS: readonly KitWalkerDef[] = [BOUND_SOUL_WALKER];
+
+/** The shipped catalog: every template's kit, then the dev demo kit, then the
+ *  encounters' own walkers. */
 export function engineCatalog(): EngineCatalog {
   if (catalog) return catalog;
   const kits: TrashKitDef[] = [];
   for (const t of Object.values(MOBS)) if (t.trashKit) kits.push(t.trashKit);
   kits.push(TRASH_ENGINE_DEMO_KIT);
-  catalog = buildEngineCatalog(kits);
+  catalog = buildEngineCatalog(kits, ENCOUNTER_WALKERS);
   return catalog;
 }
 
@@ -454,14 +472,24 @@ export const ORB_HOVER = 1.45;
  *  Revenant's drowned sea-light floats at chest height in the green of its
  *  eyes; the Moonmantle Ray's Heartpearl is a nacre pearl rolling low over
  *  the floor (so it reads as something to step on, not to dodge). */
-export const WALKER_LOOKS: Readonly<Record<string, { tint: number; hover: number }>> = {
+export const WALKER_LOOKS: Readonly<
+  Record<string, { tint: number; hover: number; size?: number }>
+> = {
   [BASTION_THROATLIGHT_ORB]: { tint: 0x52f0b8, hover: 1.5 },
   [TEMPLE_HEARTPEARL_ORB]: { tint: 0xe4f0ff, hover: 0.42 },
+  // Morthen's Bound Soul: a big soul-green spirit at a tall man's head height
+  // (its ghost-fire body and wake are morthen_soul_fx.ts's).
+  [MORTHEN_SOUL_TEMPLATE]: BOUND_SOUL_LOOK,
 };
 
 /** The tint an orb (and its empower glow) draws in. */
 export function walkerTint(def: KitWalkerDef): number {
   return WALKER_LOOKS[def.objectTemplate]?.tint ?? SCHOOL_TINT[def.school] ?? SCHOOL_TINT.fire;
+}
+
+/** How big an orb is drawn (1: the engine's own mote). */
+export function walkerSize(def: KitWalkerDef | null | undefined): number {
+  return (def && WALKER_LOOKS[def.objectTemplate]?.size) || 1;
 }
 
 /** The float an orb rests at (yards over the floor). */
