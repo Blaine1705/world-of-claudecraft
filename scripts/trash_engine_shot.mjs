@@ -59,6 +59,24 @@ function pagePlace([id, yards, angle, face]) {
   return true;
 }
 
+/** In-page: a second player standing `yards` behind a mob (the tail's side). */
+function pageBehind([mobId, yards]) {
+  const sim = window.__game.world;
+  const mob = sim.entities.get(mobId);
+  if (!mob || typeof sim.addPlayer !== 'function') return null;
+  const pid = sim.addPlayer('mage', 'Tailwatcher');
+  const e = sim.entities.get(pid);
+  if (!e) return null;
+  const a = mob.facing + Math.PI;
+  const at = sim.groundPos(mob.pos.x + Math.sin(a) * yards, mob.pos.z + Math.cos(a) * yards);
+  e.pos = at;
+  e.prevPos = { ...at };
+  e.facing = mob.facing;
+  e.maxHp = 1e6;
+  e.hp = 1e6;
+  return pid;
+}
+
 /** In-page: target an entity. */
 function pageTarget(id) {
   window.__game.world.player.targetId = id;
@@ -145,6 +163,13 @@ async function main() {
     await chat('/dev sanctum gates', 600);
     await chat(`/dev sanctum kill trash`, 600);
     await chat(`/dev sanctum tp ${area}`, 1500);
+    // Step 12 yd east, clear of the corpses of the patrol that walks the
+    // works road (they would crowd every frame).
+    const at = await page.evaluate(() => {
+      const p = window.__game.world.player.pos;
+      return { x: p.x + 12, z: p.z };
+    });
+    await chat(`/dev tp ${at.x} ${at.z}`, 1200);
     await page.evaluate(() => {
       const w = window.__game.world;
       w.player.hp = w.player.maxHp;
@@ -154,7 +179,9 @@ async function main() {
 
   page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
   page.on('console', (m) => {
-    if (m.type() === 'error') console.log('CONSOLE:', m.text().slice(0, 300));
+    const text = m.text();
+    if (m.type() === 'error' && !text.startsWith('Failed to send error to Vite'))
+      console.log('CONSOLE:', text.slice(0, 300));
   });
   await page.evaluateOnNewDocument(() => {
     const Native = window.WebSocket;
@@ -172,6 +199,15 @@ async function main() {
     };
     Object.assign(window.WebSocket, Native);
     window.WebSocket.prototype = Native.prototype;
+  });
+  await page.evaluateOnNewDocument(() => {
+    window.__shotErrors = [];
+    window.addEventListener('error', (e) =>
+      window.__shotErrors.push(`${e.message} @ ${e.filename}:${e.lineno}`),
+    );
+    window.addEventListener('unhandledrejection', (e) =>
+      window.__shotErrors.push(`rejection: ${e.reason?.stack ?? e.reason}`),
+    );
   });
   await page.evaluateOnNewDocument((preset) => {
     try {
@@ -203,21 +239,13 @@ async function main() {
       await spawn('scaleguard');
       const s = await ev(pageNewest, 'sanctum_drakonid');
       await ev(pagePlace, [s, 4, 0]);
+      await sleep(300);
+      console.log('BEHIND', await ev(pageBehind, [s, 4]));
       await ev(pageTarget, s);
       await chat('/dev trashkit cast tailLash', 100);
       await ev(pageCamera, [1.2, 1.05, 20]);
       await hud(false);
       await burst(OUT_SANCTUM, 'coletazo_contrapeso', [150, 500, 900, 1150, 1500]);
-    },
-    async boiling_meltwater() {
-      await fresh('works', 'heroic');
-      await spawn('scaleguard');
-      const s = await ev(pageNewest, 'sanctum_drakonid');
-      await ev(pagePlace, [s, 5, 0]);
-      await chat('/dev trashkit pool boiling', 100);
-      await ev(pageCamera, [0.6, 0.55, 14]);
-      await hud(false);
-      await burst(OUT_SANCTUM, 'agua_hirviendo', [300, 1500, 3000]);
     },
     async branding_iron() {
       await fresh('works');
@@ -299,6 +327,16 @@ async function main() {
       await chat('/dev trashkit split', 50);
       await burst(OUT_SANCTUM, 'partirse_en_dos', [100, 400, 900, 1800]);
     },
+    async boiling_meltwater() {
+      await fresh('works', 'heroic');
+      await spawn('scaleguard');
+      const s = await ev(pageNewest, 'sanctum_drakonid');
+      await ev(pagePlace, [s, 5, 0]);
+      await chat('/dev trashkit pool boiling', 100);
+      await ev(pageCamera, [0.6, 0.55, 14]);
+      await hud(false);
+      await burst(OUT_SANCTUM, 'agua_hirviendo', [300, 1500, 3000]);
+    },
     // ---- the engine ----
     async nova_los() {
       await fresh('works');
@@ -350,11 +388,34 @@ async function main() {
       settleMs: 4000,
     });
     if (!booted) throw new Error('offline world did not boot');
-    for (const cmd of ['/dev level 20', '/dev god', '/dev sanctum enter']) await chat(cmd, 1500);
+    for (const cmd of ['/dev level 20', '/dev immortal', '/dev sanctum enter'])
+      await chat(cmd, 1500);
     await sleep(12000);
     for (const [id, run] of Object.entries(SCENARIOS)) {
       if (ONLY.length && !ONLY.includes(id)) continue;
       console.log('SCENARIO', id);
+      console.log(
+        'PLAYER',
+        JSON.stringify(
+          await page.evaluate(() => {
+            const p = window.__game.world.player;
+            return {
+              hp: p.hp,
+              maxHp: p.maxHp,
+              dead: p.dead,
+              auras: p.auras.map((a) => a.id),
+              sitting: p.sitting,
+              mount: p.mountKey,
+              cast: p.castingAbility,
+              flags: Object.entries(p)
+                .filter(([, v]) => v === true || (typeof v === 'string' && v && v.length < 24))
+                .map(([k, v]) => `${k}=${v}`)
+                .join(','),
+              anim: window.__game.renderer?.debugAnimOf?.(p.id),
+            };
+          }),
+        ),
+      );
       try {
         await run();
       } catch (e) {
@@ -371,6 +432,8 @@ async function main() {
       };
     });
     console.log('GPUPREP', JSON.stringify(gpuPrep));
+    const errs = await page.evaluate(() => [...new Set(window.__shotErrors ?? [])].slice(0, 12));
+    for (const e of errs) console.log('PAGE ERROR:', e.slice(0, 400));
   } finally {
     await browser.close();
   }

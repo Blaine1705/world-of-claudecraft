@@ -471,3 +471,13 @@ describe('TrashEngineFx over a fake world', () => {
     expect(scene.getObjectByName('trash-engine-fx')).toBeUndefined();
   });
 });
+
+describe('the render resolves a mob kit the way the sim does', () => {
+  it('a dev-lent kit stands in for the template kit (a Thawcaller lent the demo nova)', async () => {
+    const { kitOf } = await import('../src/render/trash_engine_fx/trash_engine_fx_core');
+    const { TRASH_ENGINE_DEMO_KIT } = await import('../src/sim/mob/trash_kit/engine_demo');
+    const lent = { templateId: 'broodsworn_thawcaller', devTrashKit: TRASH_ENGINE_DEMO_KIT };
+    expect(kitOf(lent)?.nova).toBeDefined();
+    expect(kitOf({ templateId: 'broodsworn_thawcaller' })?.nova).toBeUndefined();
+  });
+});

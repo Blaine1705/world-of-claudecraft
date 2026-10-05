@@ -131,12 +131,13 @@ export function isTrashEngineObject(templateId: string): boolean {
   );
 }
 
-/** The kit a body carries: its template's, or a dev demo kit lent to it. */
+/** The kit a body fights with: a dev demo kit lent to it stands in for its
+ *  template's, exactly as the sim resolves it (mob/trash_kit/kit_of.ts). */
 export function kitOf(e: {
   templateId: string;
   devTrashKit?: TrashKitDef;
 }): TrashKitDef | undefined {
-  return MOBS[e.templateId]?.trashKit ?? e.devTrashKit;
+  return e.devTrashKit ?? MOBS[e.templateId]?.trashKit;
 }
 
 // ---- colours ---------------------------------------------------------------------
