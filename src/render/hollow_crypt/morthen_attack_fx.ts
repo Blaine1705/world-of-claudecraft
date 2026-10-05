@@ -349,45 +349,49 @@ export class MorthenAttackFx implements RitePainter {
     for (let i = 0; i < n; i++) {
       const a = (i / n) * Math.PI * 2 + h.rand() * 0.1;
       const sp = 12 + h.rand() * 6;
-      h.dust.emit(h.clock() + h.rand() * 0.06, {
-        x: m.pos.x + Math.sin(a) * 1.5,
-        y: gy + 0.4 + h.rand() * 0.8,
-        z: m.pos.z + Math.cos(a) * 1.5,
-        vx: Math.sin(a) * sp,
-        vy: 0.3 + h.rand() * 0.8,
-        vz: Math.cos(a) * sp,
-        life: 1 + h.rand() * 0.4,
-        drag: 1.25,
-        floor: gy + 0.2,
-        size0: 1.4,
-        size1: 3.8 + h.rand() * 1.6,
-        spin: (h.rand() - 0.5) * 0.8,
-        r: 0.07,
-        g: 0.05,
-        b: 0.1,
-        a: 0.5,
-      });
+      {
+        const ps = h.ps();
+        ps.x = m.pos.x + Math.sin(a) * 1.5;
+        ps.y = gy + 0.4 + h.rand() * 0.8;
+        ps.z = m.pos.z + Math.cos(a) * 1.5;
+        ps.vx = Math.sin(a) * sp;
+        ps.vy = 0.3 + h.rand() * 0.8;
+        ps.vz = Math.cos(a) * sp;
+        ps.life = 1 + h.rand() * 0.4;
+        ps.drag = 1.25;
+        ps.floor = gy + 0.2;
+        ps.size0 = 1.4;
+        ps.size1 = 3.8 + h.rand() * 1.6;
+        ps.spin = (h.rand() - 0.5) * 0.8;
+        ps.r = 0.07;
+        ps.g = 0.05;
+        ps.b = 0.1;
+        ps.a = 0.5;
+        h.dust.emit(h.clock() + h.rand() * 0.06, ps);
+      }
     }
     const g = Math.round(70 * h.density);
     for (let i = 0; i < g; i++) {
       const a = h.rand() * Math.PI * 2;
       const sp = 9 + h.rand() * 7;
-      h.glow.emit(h.clock(), {
-        x: m.pos.x,
-        y: gy + 0.5,
-        z: m.pos.z,
-        vx: Math.sin(a) * sp,
-        vy: 0.5 + h.rand() * 2,
-        vz: Math.cos(a) * sp,
-        life: 0.7 + h.rand() * 0.4,
-        drag: 1.4,
-        size0: 0.32,
-        size1: 0.06,
-        r: 0.68,
-        g: 0.45,
-        b: 1,
-        a: 0.9,
-      });
+      {
+        const ps = h.ps();
+        ps.x = m.pos.x;
+        ps.y = gy + 0.5;
+        ps.z = m.pos.z;
+        ps.vx = Math.sin(a) * sp;
+        ps.vy = 0.5 + h.rand() * 2;
+        ps.vz = Math.cos(a) * sp;
+        ps.life = 0.7 + h.rand() * 0.4;
+        ps.drag = 1.4;
+        ps.size0 = 0.32;
+        ps.size1 = 0.06;
+        ps.r = 0.68;
+        ps.g = 0.45;
+        ps.b = 1;
+        ps.a = 0.9;
+        h.glow.emit(h.clock(), ps);
+      }
     }
     h.shakeAt(m.pos.x, m.pos.z, 0.35);
   }
@@ -425,42 +429,45 @@ export class MorthenAttackFx implements RitePainter {
     for (let i = 0; i < n; i++) {
       const a = h.rand() * Math.PI * 2;
       const r = Math.sqrt(h.rand()) * R;
-      h.dust.emit(h.clock(), {
-        x: ring.pos.x + Math.sin(a) * r,
-        y: gy + 0.2,
-        z: ring.pos.z + Math.cos(a) * r,
-        vx: Math.sin(a) * 2,
-        vy: 2 + h.rand() * 3,
-        vz: Math.cos(a) * 2,
-        ay: -3,
-        life: 1 + h.rand() * 0.6,
-        drag: 1.5,
-        floor: gy + 0.15,
-        size0: 0.8,
-        size1: 2.4,
-        r: 0.3,
-        g: 0.27,
-        b: 0.24,
-        a: 0.5,
-      });
-      if (i % 2 === 0)
-        h.glow.emit(h.clock(), {
-          x: ring.pos.x + Math.sin(a) * r,
-          y: gy + 0.3,
-          z: ring.pos.z + Math.cos(a) * r,
-          vx: Math.sin(a) * 3,
-          vy: 3 + h.rand() * 4,
-          vz: Math.cos(a) * 3,
-          ay: -6,
-          life: 0.8,
-          drag: 0.8,
-          size0: 0.14,
-          size1: 0.05,
-          r: 0.95,
-          g: 0.92,
-          b: 0.85,
-          a: 1,
-        });
+      {
+        const ps = h.ps();
+        ps.x = ring.pos.x + Math.sin(a) * r;
+        ps.y = gy + 0.2;
+        ps.z = ring.pos.z + Math.cos(a) * r;
+        ps.vx = Math.sin(a) * 2;
+        ps.vy = 2 + h.rand() * 3;
+        ps.vz = Math.cos(a) * 2;
+        ps.ay = -3;
+        ps.life = 1 + h.rand() * 0.6;
+        ps.drag = 1.5;
+        ps.floor = gy + 0.15;
+        ps.size0 = 0.8;
+        ps.size1 = 2.4;
+        ps.r = 0.3;
+        ps.g = 0.27;
+        ps.b = 0.24;
+        ps.a = 0.5;
+        h.dust.emit(h.clock(), ps);
+      }
+      if (i % 2 === 0) {
+        const ps = h.ps();
+        ps.x = ring.pos.x + Math.sin(a) * r;
+        ps.y = gy + 0.3;
+        ps.z = ring.pos.z + Math.cos(a) * r;
+        ps.vx = Math.sin(a) * 3;
+        ps.vy = 3 + h.rand() * 4;
+        ps.vz = Math.cos(a) * 3;
+        ps.ay = -6;
+        ps.life = 0.8;
+        ps.drag = 0.8;
+        ps.size0 = 0.14;
+        ps.size1 = 0.05;
+        ps.r = 0.95;
+        ps.g = 0.92;
+        ps.b = 0.85;
+        ps.a = 1;
+        h.glow.emit(h.clock(), ps);
+      }
     }
     h.shakeAt(ring.pos.x, ring.pos.z, 0.2);
   }
@@ -497,40 +504,43 @@ export class MorthenAttackFx implements RitePainter {
       const a = h.rand() * Math.PI * 2;
       const x = m.pos.x + Math.sin(a) * R;
       const z = m.pos.z + Math.cos(a) * R;
-      h.mist.emit(h.clock(), {
-        x,
-        y: gy + 0.3 + h.rand() * 0.5,
-        z,
-        vx: -Math.sin(a) * 9,
-        vy: 0.2,
-        vz: -Math.cos(a) * 9,
-        life: 0.9,
-        drag: 0.9,
-        size0: 1.6,
-        size1: 0.5,
-        spin: (h.rand() - 0.5) * 1.2,
-        r: 0.06,
-        g: 0.04,
-        b: 0.09,
-        a: 0.42,
-      });
-      if (i % 2 === 0)
-        h.glow.emit(h.clock(), {
-          x,
-          y: gy + 0.2,
-          z,
-          vx: 0,
-          vy: 1 + h.rand() * 1.5,
-          vz: 0,
-          life: 0.7,
-          drag: 0.6,
-          size0: 0.22,
-          size1: 0.05,
-          r: 0.66,
-          g: 0.45,
-          b: 1,
-          a: 0.85,
-        });
+      {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = gy + 0.3 + h.rand() * 0.5;
+        ps.z = z;
+        ps.vx = -Math.sin(a) * 9;
+        ps.vy = 0.2;
+        ps.vz = -Math.cos(a) * 9;
+        ps.life = 0.9;
+        ps.drag = 0.9;
+        ps.size0 = 1.6;
+        ps.size1 = 0.5;
+        ps.spin = (h.rand() - 0.5) * 1.2;
+        ps.r = 0.06;
+        ps.g = 0.04;
+        ps.b = 0.09;
+        ps.a = 0.42;
+        h.mist.emit(h.clock(), ps);
+      }
+      if (i % 2 === 0) {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = gy + 0.2;
+        ps.z = z;
+        ps.vx = 0;
+        ps.vy = 1 + h.rand() * 1.5;
+        ps.vz = 0;
+        ps.life = 0.7;
+        ps.drag = 0.6;
+        ps.size0 = 0.22;
+        ps.size1 = 0.05;
+        ps.r = 0.66;
+        ps.g = 0.45;
+        ps.b = 1;
+        ps.a = 0.85;
+        h.glow.emit(h.clock(), ps);
+      }
     }
   }
 
@@ -555,42 +565,46 @@ export class MorthenAttackFx implements RitePainter {
       const spot = coneSpot(Math.floor(h.rand() * 997), 997, S.radius, S.arcDeg, 1.5);
       const x = m.pos.x + spot.x * c + spot.z * s;
       const z = m.pos.z - spot.x * s + spot.z * c;
-      h.mist.emit(h.clock(), {
-        x,
-        y: gy + 0.2,
-        z,
-        vx: (h.rand() - 0.5) * 0.6,
-        vy: 0.5 + h.rand() * 0.6,
-        vz: (h.rand() - 0.5) * 0.6,
-        life: 1.2 + h.rand() * 0.6,
-        drag: 0.8,
-        size0: 1.2,
-        size1: 2.6,
-        spin: h.rand() - 0.5,
-        r: 0.16,
-        g: 0.01,
-        b: 0.02,
-        a: 0.34,
-      });
+      {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = gy + 0.2;
+        ps.z = z;
+        ps.vx = (h.rand() - 0.5) * 0.6;
+        ps.vy = 0.5 + h.rand() * 0.6;
+        ps.vz = (h.rand() - 0.5) * 0.6;
+        ps.life = 1.2 + h.rand() * 0.6;
+        ps.drag = 0.8;
+        ps.size0 = 1.2;
+        ps.size1 = 2.6;
+        ps.spin = h.rand() - 0.5;
+        ps.r = 0.16;
+        ps.g = 0.01;
+        ps.b = 0.02;
+        ps.a = 0.34;
+        h.mist.emit(h.clock(), ps);
+      }
       const a = (h.rand() * 2 - 1) * ((S.arcDeg * Math.PI) / 360);
       const rx = m.pos.x + Math.sin(m.facing + a) * S.radius;
       const rz = m.pos.z + Math.cos(m.facing + a) * S.radius;
-      h.glow.emit(h.clock(), {
-        x: rx,
-        y: gy + 0.2,
-        z: rz,
-        vx: 0,
-        vy: 1.4 + h.rand() * 2 * fill,
-        vz: 0,
-        life: 0.8,
-        drag: 0.5,
-        size0: 0.2,
-        size1: 0.05,
-        r: 1,
-        g: 0.16,
-        b: 0.1,
-        a: 0.9,
-      });
+      {
+        const ps = h.ps();
+        ps.x = rx;
+        ps.y = gy + 0.2;
+        ps.z = rz;
+        ps.vx = 0;
+        ps.vy = 1.4 + h.rand() * 2 * fill;
+        ps.vz = 0;
+        ps.life = 0.8;
+        ps.drag = 0.5;
+        ps.size0 = 0.2;
+        ps.size1 = 0.05;
+        ps.r = 1;
+        ps.g = 0.16;
+        ps.b = 0.1;
+        ps.a = 0.9;
+        h.glow.emit(h.clock(), ps);
+      }
     }
   }
 
@@ -623,40 +637,43 @@ export class MorthenAttackFx implements RitePainter {
         const gy = h.groundY(x, z);
         const tx = Math.cos(a);
         const tz = -Math.sin(a);
-        h.dust.emit(h.clock(), {
-          x,
-          y: gy + 0.4 + h.rand(),
-          z,
-          vx: tx * 4 + (h.rand() - 0.5),
-          vy: 0.8 + h.rand(),
-          vz: tz * 4 + (h.rand() - 0.5),
-          life: 0.9 + h.rand() * 0.5,
-          drag: 1.4,
-          size0: 1.4,
-          size1: 3.2,
-          spin: (h.rand() - 0.5) * 1.4,
-          r: 0.14,
-          g: 0.0,
-          b: 0.02,
-          a: 0.5,
-        });
-        if (h.rand() < 0.6)
-          h.glow.emit(h.clock(), {
-            x,
-            y: gy + 0.6 + h.rand() * 1.2,
-            z,
-            vx: tx * 7 + (h.rand() - 0.5) * 2,
-            vy: 1 + h.rand() * 3,
-            vz: tz * 7 + (h.rand() - 0.5) * 2,
-            life: 0.5 + h.rand() * 0.3,
-            drag: 1.6,
-            size0: 0.3,
-            size1: 0.06,
-            r: 1,
-            g: h.rand() < 0.2 ? 0.85 : 0.2,
-            b: 0.12,
-            a: 1,
-          });
+        {
+          const ps = h.ps();
+          ps.x = x;
+          ps.y = gy + 0.4 + h.rand();
+          ps.z = z;
+          ps.vx = tx * 4 + (h.rand() - 0.5);
+          ps.vy = 0.8 + h.rand();
+          ps.vz = tz * 4 + (h.rand() - 0.5);
+          ps.life = 0.9 + h.rand() * 0.5;
+          ps.drag = 1.4;
+          ps.size0 = 1.4;
+          ps.size1 = 3.2;
+          ps.spin = (h.rand() - 0.5) * 1.4;
+          ps.r = 0.14;
+          ps.g = 0.0;
+          ps.b = 0.02;
+          ps.a = 0.5;
+          h.dust.emit(h.clock(), ps);
+        }
+        if (h.rand() < 0.6) {
+          const ps = h.ps();
+          ps.x = x;
+          ps.y = gy + 0.6 + h.rand() * 1.2;
+          ps.z = z;
+          ps.vx = tx * 7 + (h.rand() - 0.5) * 2;
+          ps.vy = 1 + h.rand() * 3;
+          ps.vz = tz * 7 + (h.rand() - 0.5) * 2;
+          ps.life = 0.5 + h.rand() * 0.3;
+          ps.drag = 1.6;
+          ps.size0 = 0.3;
+          ps.size1 = 0.06;
+          ps.r = 1;
+          ps.g = h.rand() < 0.2 ? 0.85 : 0.2;
+          ps.b = 0.12;
+          ps.a = 1;
+          h.glow.emit(h.clock(), ps);
+        }
       }
     }
   }
@@ -668,9 +685,14 @@ export class MorthenAttackFx implements RitePainter {
     const now = h.clock();
     // Claim the rings the scan sees; a ring that left starts its hands sinking.
     for (const id of h.scan.grasps) {
-      if (this.grasps.some((g) => g.objectId === id)) continue;
+      let held = false;
+      let slot: GraspSlot | null = null;
+      for (const g of this.grasps) {
+        if (g.objectId === id) held = true;
+        else if (!slot && g.objectId < 0 && g.sinkAt < 0) slot = g;
+      }
+      if (held) continue;
       const e = world.entities.get(id);
-      const slot = this.grasps.find((g) => g.objectId < 0 && g.sinkAt < 0);
       if (!e || !slot) continue;
       slot.objectId = id;
       slot.born = now;
@@ -705,39 +727,42 @@ export class MorthenAttackFx implements RitePainter {
           const a = h.rand() * Math.PI * 2;
           const r = g.radius * (0.3 + 0.7 * h.rand());
           const tang = a + Math.PI / 2;
-          h.glow.emit(now, {
-            x: g.x + Math.sin(a) * r,
-            y: gy + 0.15,
-            z: g.z + Math.cos(a) * r,
-            vx: Math.sin(tang) * 2 - Math.sin(a),
-            vy: 0.6 + h.rand() * 1.2 * fill,
-            vz: Math.cos(tang) * 2 - Math.cos(a),
-            life: 0.7,
-            drag: 0.8,
-            size0: 0.2,
-            size1: 0.05,
-            r: 0.72,
-            g: 0.5,
-            b: 1,
-            a: 0.85,
-          });
-          if (i % 3 === 0)
-            h.mist.emit(now, {
-              x: g.x + Math.sin(a) * r,
-              y: gy + 0.2,
-              z: g.z + Math.cos(a) * r,
-              vx: 0,
-              vy: 0.4 + h.rand() * 0.6 * fill,
-              vz: 0,
-              life: 1,
-              drag: 1,
-              size0: 0.6,
-              size1: 1.6,
-              r: 0.26,
-              g: 0.24,
-              b: 0.22,
-              a: 0.35,
-            });
+          {
+            const ps = h.ps();
+            ps.x = g.x + Math.sin(a) * r;
+            ps.y = gy + 0.15;
+            ps.z = g.z + Math.cos(a) * r;
+            ps.vx = Math.sin(tang) * 2 - Math.sin(a);
+            ps.vy = 0.6 + h.rand() * 1.2 * fill;
+            ps.vz = Math.cos(tang) * 2 - Math.cos(a);
+            ps.life = 0.7;
+            ps.drag = 0.8;
+            ps.size0 = 0.2;
+            ps.size1 = 0.05;
+            ps.r = 0.72;
+            ps.g = 0.5;
+            ps.b = 1;
+            ps.a = 0.85;
+            h.glow.emit(now, ps);
+          }
+          if (i % 3 === 0) {
+            const ps = h.ps();
+            ps.x = g.x + Math.sin(a) * r;
+            ps.y = gy + 0.2;
+            ps.z = g.z + Math.cos(a) * r;
+            ps.vx = 0;
+            ps.vy = 0.4 + h.rand() * 0.6 * fill;
+            ps.vz = 0;
+            ps.life = 1;
+            ps.drag = 1;
+            ps.size0 = 0.6;
+            ps.size1 = 1.6;
+            ps.r = 0.26;
+            ps.g = 0.24;
+            ps.b = 0.22;
+            ps.a = 0.35;
+            h.mist.emit(now, ps);
+          }
         }
       } else {
         // The hands hold: the ring stays on the floor, quieter, as the zone.
@@ -746,9 +771,14 @@ export class MorthenAttackFx implements RitePainter {
     }
     // The grips at each rooted player's feet.
     for (const id of h.scan.rooted) {
-      if (this.grips.some((g) => g.playerId === id)) continue;
+      let held = false;
+      let slot: GripSlot | null = null;
+      for (const g of this.grips) {
+        if (g.playerId === id) held = true;
+        else if (!slot && g.playerId < 0 && g.sinkAt < 0) slot = g;
+      }
+      if (held) continue;
       const p = world.entities.get(id);
-      const slot = this.grips.find((g) => g.playerId < 0 && g.sinkAt < 0);
       if (!p || !slot) continue;
       slot.playerId = id;
       slot.born = now;
@@ -759,7 +789,10 @@ export class MorthenAttackFx implements RitePainter {
     for (const g of this.grips) {
       if (g.playerId < 0) continue;
       const p = world.entities.get(g.playerId);
-      if (!p || p.dead || !h.scan.rooted.includes(g.playerId)) {
+      let rooted = false;
+      for (let k = 0; k < h.scan.rooted.length; k++)
+        if (h.scan.rooted[k] === g.playerId) rooted = true;
+      if (!p || p.dead || !rooted) {
         g.playerId = -1;
         g.sinkAt = now;
         continue;

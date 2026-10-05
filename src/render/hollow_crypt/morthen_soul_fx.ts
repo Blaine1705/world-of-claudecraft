@@ -127,59 +127,65 @@ export class MorthenSoulFx implements RitePainter {
     for (let i = 0; i < n; i++) {
       const a = h.rand() * Math.PI * 2;
       const rr = h.rand() * 1.4;
-      h.fire.emit(now + h.rand() * 0.2, {
-        x: orb.pos.x + Math.sin(a) * rr,
-        y: gy + 0.1,
-        z: orb.pos.z + Math.cos(a) * rr,
-        vx: Math.sin(a) * 1.2,
-        vy: 4 + h.rand() * 5,
-        vz: Math.cos(a) * 1.2,
-        ay: 1.5,
-        life: 0.7 + h.rand() * 0.5,
-        drag: 0.9,
-        size0: 0.9,
-        size1: 2.2 + h.rand() * 1.5,
-        r: 0.95 + h.rand() * 0.15,
-        g: 0,
-        b: 0,
-        a: 0.9,
-      });
+      {
+        const ps = h.ps();
+        ps.x = orb.pos.x + Math.sin(a) * rr;
+        ps.y = gy + 0.1;
+        ps.z = orb.pos.z + Math.cos(a) * rr;
+        ps.vx = Math.sin(a) * 1.2;
+        ps.vy = 4 + h.rand() * 5;
+        ps.vz = Math.cos(a) * 1.2;
+        ps.ay = 1.5;
+        ps.life = 0.7 + h.rand() * 0.5;
+        ps.drag = 0.9;
+        ps.size0 = 0.9;
+        ps.size1 = 2.2 + h.rand() * 1.5;
+        ps.r = 0.95 + h.rand() * 0.15;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.9;
+        h.fire.emit(now + h.rand() * 0.2, ps);
+      }
       if (i % 2 === 0) {
         const tang = a + Math.PI / 2;
-        h.glow.emit(now + h.rand() * 0.3, {
-          x: orb.pos.x + Math.sin(a) * 1.2,
-          y: gy + 0.4,
-          z: orb.pos.z + Math.cos(a) * 1.2,
-          vx: Math.sin(tang) * 3,
-          vy: 3 + h.rand() * 4,
-          vz: Math.cos(tang) * 3,
-          life: 1.2 + h.rand() * 0.6,
-          drag: 0.6,
-          size0: 0.32,
-          size1: 0.06,
-          r: 0.65,
-          g: 1,
-          b: 0.55,
-          a: 1,
-        });
+        {
+          const ps = h.ps();
+          ps.x = orb.pos.x + Math.sin(a) * 1.2;
+          ps.y = gy + 0.4;
+          ps.z = orb.pos.z + Math.cos(a) * 1.2;
+          ps.vx = Math.sin(tang) * 3;
+          ps.vy = 3 + h.rand() * 4;
+          ps.vz = Math.cos(tang) * 3;
+          ps.life = 1.2 + h.rand() * 0.6;
+          ps.drag = 0.6;
+          ps.size0 = 0.32;
+          ps.size1 = 0.06;
+          ps.r = 0.65;
+          ps.g = 1;
+          ps.b = 0.55;
+          ps.a = 1;
+          h.glow.emit(now + h.rand() * 0.3, ps);
+        }
       }
     }
-    h.dust.emit(now, {
-      x: orb.pos.x,
-      y: gy + 0.8,
-      z: orb.pos.z,
-      vx: 0,
-      vy: 1.2,
-      vz: 0,
-      life: 1.8,
-      drag: 0.6,
-      size0: 2.5,
-      size1: 6,
-      r: 0.14,
-      g: 0.18,
-      b: 0.15,
-      a: 0.45,
-    });
+    {
+      const ps = h.ps();
+      ps.x = orb.pos.x;
+      ps.y = gy + 0.8;
+      ps.z = orb.pos.z;
+      ps.vx = 0;
+      ps.vy = 1.2;
+      ps.vz = 0;
+      ps.life = 1.8;
+      ps.drag = 0.6;
+      ps.size0 = 2.5;
+      ps.size1 = 6;
+      ps.r = 0.14;
+      ps.g = 0.18;
+      ps.b = 0.15;
+      ps.a = 0.45;
+      h.dust.emit(now, ps);
+    }
     h.shakeAt(orb.pos.x, orb.pos.z, 0.12);
   }
 
@@ -195,46 +201,49 @@ export class MorthenSoulFx implements RitePainter {
       const a = h.rand() * Math.PI * 2;
       const el = (h.rand() - 0.2) * 1.4;
       const sp = 3 + h.rand() * 5;
-      h.fire.emit(now + h.rand() * 0.15, {
-        x: ribs.x,
-        y: ribs.y,
-        z: ribs.z,
-        vx: Math.sin(a) * Math.cos(el) * sp,
-        vy: Math.sin(el) * sp + 2,
-        vz: Math.cos(a) * Math.cos(el) * sp,
-        ay: 1.5,
-        life: 0.6 + h.rand() * 0.4,
-        drag: 1.4,
-        size0: 0.7 * s,
-        size1: (1.4 + h.rand()) * s,
-        r: 1.05,
-        g: 0,
-        b: 0,
-        a: 0.9,
-      });
+      {
+        const ps = h.ps();
+        ps.x = ribs.x;
+        ps.y = ribs.y;
+        ps.z = ribs.z;
+        ps.vx = Math.sin(a) * Math.cos(el) * sp;
+        ps.vy = Math.sin(el) * sp + 2;
+        ps.vz = Math.cos(a) * Math.cos(el) * sp;
+        ps.ay = 1.5;
+        ps.life = 0.6 + h.rand() * 0.4;
+        ps.drag = 1.4;
+        ps.size0 = 0.7 * s;
+        ps.size1 = (1.4 + h.rand()) * s;
+        ps.r = 1.05;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.9;
+        h.fire.emit(now + h.rand() * 0.15, ps);
+      }
     }
     // The last of the soul streaking into him.
     const dx = ribs.x - slot.x;
     const dy = ribs.y - slot.y;
     const dz = ribs.z - slot.z;
     const d = Math.hypot(dx, dy, dz) || 1;
-    for (let i = 0; i < Math.round(24 * h.density); i++)
-      h.glow.emit(now, {
-        x: slot.x,
-        y: slot.y,
-        z: slot.z,
-        vx: (dx / d) * d * 3 + (h.rand() - 0.5),
-        vy: (dy / d) * d * 3 + (h.rand() - 0.5),
-        vz: (dz / d) * d * 3 + (h.rand() - 0.5),
-        life: 0.33,
-        drag: 0.2,
-        size0: 0.5,
-        size1: 0.2,
-        r: 0.75,
-        g: 1,
-        b: 0.6,
-        a: 1,
-      });
+    for (let i = 0; i < Math.round(24 * h.density); i++) {
+      const ps = h.ps();
+      ps.x = slot.x;
+      ps.y = slot.y;
+      ps.z = slot.z;
+      ps.vx = (dx / d) * d * 3 + (h.rand() - 0.5);
+      ps.vy = (dy / d) * d * 3 + (h.rand() - 0.5);
+      ps.vz = (dz / d) * d * 3 + (h.rand() - 0.5);
+      ps.life = 0.33;
+      ps.drag = 0.2;
+      ps.size0 = 0.5;
+      ps.size1 = 0.2;
+      ps.r = 0.75;
+      ps.g = 1;
+      ps.b = 0.6;
+      ps.a = 1;
+      h.glow.emit(now, ps);
+    }
     h.shakeAt(m.pos.x, m.pos.z, 0.18);
   }
 
@@ -246,22 +255,24 @@ export class MorthenSoulFx implements RitePainter {
     const n = Math.round(40 * h.density);
     for (let i = 0; i < n; i++) {
       const a = h.rand() * Math.PI * 2;
-      h.fire.emit(now, {
-        x: p.pos.x,
-        y: gy + 1.2,
-        z: p.pos.z,
-        vx: Math.sin(a) * 3.5,
-        vy: 1 + h.rand() * 2.5,
-        vz: Math.cos(a) * 3.5,
-        life: 0.5 + h.rand() * 0.3,
-        drag: 1.8,
-        size0: 0.7,
-        size1: 1.6,
-        r: 1,
-        g: 0,
-        b: 0,
-        a: 0.9,
-      });
+      {
+        const ps = h.ps();
+        ps.x = p.pos.x;
+        ps.y = gy + 1.2;
+        ps.z = p.pos.z;
+        ps.vx = Math.sin(a) * 3.5;
+        ps.vy = 1 + h.rand() * 2.5;
+        ps.vz = Math.cos(a) * 3.5;
+        ps.life = 0.5 + h.rand() * 0.3;
+        ps.drag = 1.8;
+        ps.size0 = 0.7;
+        ps.size1 = 1.6;
+        ps.r = 1;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.9;
+        h.fire.emit(now, ps);
+      }
     }
     h.flash(slot.x, slot.y, slot.z, 5, 0.3, 0xd8ffc0);
   }
@@ -290,9 +301,15 @@ export class MorthenSoulFx implements RitePainter {
     }
     // Claim the souls the scan sees (its orb starts where it is: the alcove).
     for (const id of h.scan.souls) {
-      if (this.retired.includes(id) || this.souls.some((s) => s.orbId === id)) continue;
+      let skip = false;
+      for (let k = 0; k < this.retired.length; k++) if (this.retired[k] === id) skip = true;
+      let slot: SoulSlot | null = null;
+      for (const s of this.souls) {
+        if (s.orbId === id) skip = true;
+        else if (!slot && s.orbId < 0) slot = s;
+      }
+      if (skip) continue;
       const e = world.entities.get(id);
-      const slot = this.souls.find((s) => s.orbId < 0);
       if (!e || e.templateId !== MORTHEN_SOUL_TEMPLATE || !slot) continue;
       slot.orbId = id;
       slot.x = e.pos.x;
@@ -337,81 +354,87 @@ export class MorthenSoulFx implements RitePainter {
     while (s.wake >= 1) {
       s.wake -= 1;
       // Tongues licking up off the soul's body.
-      h.fire.emit(now, {
-        x: s.x + (h.rand() - 0.5) * 0.5 * size,
-        y: s.y - 0.3 * size + h.rand() * 0.4,
-        z: s.z + (h.rand() - 0.5) * 0.5 * size,
-        vx: -vx * 0.15,
-        vy: 1 + h.rand() * 1.2,
-        vz: -vz * 0.15,
-        ay: 1.2,
-        life: 0.45 + h.rand() * 0.25,
-        drag: 0.6,
-        size0: 0.6 * size,
-        size1: (0.9 + h.rand() * 0.5) * size,
-        r: 0.95 + h.rand() * 0.2,
-        g: 0,
-        b: 0,
-        a: 0.8,
-      });
+      {
+        const ps = h.ps();
+        ps.x = s.x + (h.rand() - 0.5) * 0.5 * size;
+        ps.y = s.y - 0.3 * size + h.rand() * 0.4;
+        ps.z = s.z + (h.rand() - 0.5) * 0.5 * size;
+        ps.vx = -vx * 0.15;
+        ps.vy = 1 + h.rand() * 1.2;
+        ps.vz = -vz * 0.15;
+        ps.ay = 1.2;
+        ps.life = 0.45 + h.rand() * 0.25;
+        ps.drag = 0.6;
+        ps.size0 = 0.6 * size;
+        ps.size1 = (0.9 + h.rand() * 0.5) * size;
+        ps.r = 0.95 + h.rand() * 0.2;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.8;
+        h.fire.emit(now, ps);
+      }
       // The wake: fire and grave smoke left behind along its path.
-      if (h.rand() < 0.55)
-        h.fire.emit(now, {
-          x: s.x + (h.rand() - 0.5) * 0.8,
-          y: s.y - 0.5 + h.rand() * 0.6,
-          z: s.z + (h.rand() - 0.5) * 0.8,
-          vx: 0,
-          vy: 0.5 + h.rand() * 0.4,
-          vz: 0,
-          ay: 0.5,
-          life: 0.9 + h.rand() * 0.5,
-          drag: 0.5,
-          size0: 0.5 * size,
-          size1: 0.15 * size,
-          r: 0.75,
-          g: 0,
-          b: 0,
-          a: 0.6,
-        });
-      if (h.rand() < 0.25)
-        h.dust.emit(now, {
-          x: s.x,
-          y: s.y - 0.4,
-          z: s.z,
-          vx: (h.rand() - 0.5) * 0.4,
-          vy: 0.3,
-          vz: (h.rand() - 0.5) * 0.4,
-          life: 1.8 + h.rand(),
-          drag: 0.4,
-          size0: 0.8 * size,
-          size1: 2.2 * size,
-          spin: (h.rand() - 0.5) * 0.6,
-          r: 0.12,
-          g: 0.16,
-          b: 0.13,
-          a: 0.32,
-        });
+      if (h.rand() < 0.55) {
+        const ps = h.ps();
+        ps.x = s.x + (h.rand() - 0.5) * 0.8;
+        ps.y = s.y - 0.5 + h.rand() * 0.6;
+        ps.z = s.z + (h.rand() - 0.5) * 0.8;
+        ps.vx = 0;
+        ps.vy = 0.5 + h.rand() * 0.4;
+        ps.vz = 0;
+        ps.ay = 0.5;
+        ps.life = 0.9 + h.rand() * 0.5;
+        ps.drag = 0.5;
+        ps.size0 = 0.5 * size;
+        ps.size1 = 0.15 * size;
+        ps.r = 0.75;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.6;
+        h.fire.emit(now, ps);
+      }
+      if (h.rand() < 0.25) {
+        const ps = h.ps();
+        ps.x = s.x;
+        ps.y = s.y - 0.4;
+        ps.z = s.z;
+        ps.vx = (h.rand() - 0.5) * 0.4;
+        ps.vy = 0.3;
+        ps.vz = (h.rand() - 0.5) * 0.4;
+        ps.life = 1.8 + h.rand();
+        ps.drag = 0.4;
+        ps.size0 = 0.8 * size;
+        ps.size1 = 2.2 * size;
+        ps.spin = (h.rand() - 0.5) * 0.6;
+        ps.r = 0.12;
+        ps.g = 0.16;
+        ps.b = 0.13;
+        ps.a = 0.32;
+        h.dust.emit(now, ps);
+      }
     }
     // Two wisps twisting round it.
     for (let w = 0; w < 2; w++) {
       if (h.rand() > 18 * h.density * dt) continue;
       const a = now * 5 + w * Math.PI + s.seed;
-      h.glow.emit(now, {
-        x: s.x + Math.cos(a) * 0.8 * size,
-        y: s.y + Math.sin(now * 3 + w) * 0.4,
-        z: s.z + Math.sin(a) * 0.8 * size,
-        vx: -Math.sin(a) * 1.5,
-        vy: 0.4,
-        vz: Math.cos(a) * 1.5,
-        life: 0.8,
-        drag: 0.4,
-        size0: 0.28,
-        size1: 0.05,
-        r: 0.72,
-        g: 1,
-        b: 0.6,
-        a: 1,
-      });
+      {
+        const ps = h.ps();
+        ps.x = s.x + Math.cos(a) * 0.8 * size;
+        ps.y = s.y + Math.sin(now * 3 + w) * 0.4;
+        ps.z = s.z + Math.sin(a) * 0.8 * size;
+        ps.vx = -Math.sin(a) * 1.5;
+        ps.vy = 0.4;
+        ps.vz = Math.cos(a) * 1.5;
+        ps.life = 0.8;
+        ps.drag = 0.4;
+        ps.size0 = 0.28;
+        ps.size1 = 0.05;
+        ps.r = 0.72;
+        ps.g = 1;
+        ps.b = 0.6;
+        ps.a = 1;
+        h.glow.emit(now, ps);
+      }
     }
   }
 }

@@ -16,6 +16,7 @@ import { buildCryptKit, ensureCryptKit } from './crypt_kit';
 import { buildColumnPool, buildCryptLights } from './crypt_lights';
 import { buildChasmMist, buildCryptParticles } from './crypt_particles';
 import { RITE_RING } from './crypt_plan_core';
+import { RITE_INTERIOR_NAME } from './rite_candle_decor';
 
 export interface HollowCryptInteriorDeps {
   lowGfx: boolean;
@@ -33,7 +34,8 @@ export async function buildHollowCryptInterior(
 ): Promise<THREE.Group> {
   await ensureCryptKit();
   const group = new THREE.Group();
-  group.name = 'hollowCryptField';
+  // The name the Rite's candle painter finds this slot's decor by.
+  group.name = RITE_INTERIOR_NAME;
   // Cosmetic density sheds with the effects tier (never a telegraph).
   const density = deps.lowGfx ? 0.35 : gfxTierAtLeast(GFX.effectsTier, 'high') ? 1 : 0.6;
   group.add(buildAuthoredFieldTerrain(HOLLOW_CRYPT_FIELD, { lowGfx: deps.lowGfx }));

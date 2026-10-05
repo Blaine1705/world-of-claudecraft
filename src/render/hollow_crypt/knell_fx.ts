@@ -236,41 +236,44 @@ export class KnellFx implements RitePainter {
       const x = s.x + spot.x * c + spot.z * sn;
       const z = s.z - spot.x * sn + spot.z * c;
       const gy = h.groundY(x, z);
-      h.fire.emit(now + h.rand() * 0.1, {
-        x,
-        y: gy + 0.1,
-        z,
-        vx: 0,
-        vy: 2.2 + h.rand() * 2.4,
-        vz: 0,
-        ay: 1.6,
-        life: 0.8 + h.rand() * 0.5,
-        drag: 0.8,
-        size0: 1.4 + h.rand(),
-        size1: 3.4 + h.rand() * 2.4,
-        r: 0.95 + h.rand() * 0.25,
-        g: 0,
-        b: 0,
-        a: 0.9,
-      });
-      if (i % 4 === 0)
-        h.glow.emit(now + h.rand() * 0.6, {
-          x: x + (h.rand() - 0.5) * 2,
-          y: gy + 0.4,
-          z: z + (h.rand() - 0.5) * 2,
-          vx: (h.rand() - 0.5) * 2,
-          vy: 3.5 + h.rand() * 4,
-          vz: (h.rand() - 0.5) * 2,
-          ay: 0.8,
-          life: 1.2 + h.rand(),
-          drag: 0.6,
-          size0: 0.18,
-          size1: 0.06,
-          r: 0.8,
-          g: 1,
-          b: 0.42,
-          a: 1,
-        });
+      {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = gy + 0.1;
+        ps.z = z;
+        ps.vx = 0;
+        ps.vy = 2.2 + h.rand() * 2.4;
+        ps.vz = 0;
+        ps.ay = 1.6;
+        ps.life = 0.8 + h.rand() * 0.5;
+        ps.drag = 0.8;
+        ps.size0 = 1.4 + h.rand();
+        ps.size1 = 3.4 + h.rand() * 2.4;
+        ps.r = 0.95 + h.rand() * 0.25;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.9;
+        h.fire.emit(now + h.rand() * 0.1, ps);
+      }
+      if (i % 4 === 0) {
+        const ps = h.ps();
+        ps.x = x + (h.rand() - 0.5) * 2;
+        ps.y = gy + 0.4;
+        ps.z = z + (h.rand() - 0.5) * 2;
+        ps.vx = (h.rand() - 0.5) * 2;
+        ps.vy = 3.5 + h.rand() * 4;
+        ps.vz = (h.rand() - 0.5) * 2;
+        ps.ay = 0.8;
+        ps.life = 1.2 + h.rand();
+        ps.drag = 0.6;
+        ps.size0 = 0.18;
+        ps.size1 = 0.06;
+        ps.r = 0.8;
+        ps.g = 1;
+        ps.b = 0.42;
+        ps.a = 1;
+        h.glow.emit(now + h.rand() * 0.6, ps);
+      }
     }
     for (let i = 0; i < 4; i++) {
       const spot = coneSpot(i * 7 + 3, 28, s.reach * 0.8, 160, 4);
@@ -307,7 +310,9 @@ export class KnellFx implements RitePainter {
     const h = this.h;
     const now = h.clock();
     for (const id of h.scan.knells) {
-      if (this.slots.some((s) => s.objectId === id)) continue;
+      let held = false;
+      for (const s of this.slots) if (s.objectId === id) held = true;
+      if (held) continue;
       const e = world.entities.get(id);
       if (e) this.claim(e);
     }
@@ -367,44 +372,48 @@ export class KnellFx implements RitePainter {
       const spot = coneSpot(Math.floor(h.rand() * 4093), 4093, s.reach, 180, 0.5);
       const x = s.x + spot.x * c + spot.z * sn;
       const z = s.z - spot.x * sn + spot.z * c;
-      h.glow.emit(now, {
-        x,
-        y: h.groundY(x, z) + 0.15,
-        z,
-        vx: (h.rand() - 0.5) * 0.6,
-        vy: 1.2 + h.rand() * 2.2 * look.edge,
-        vz: (h.rand() - 0.5) * 0.6,
-        life: 1 + h.rand() * 0.6,
-        drag: 0.5,
-        size0: 0.24,
-        size1: 0.06,
-        r: 1,
-        g: 0.16 + h.rand() * 0.1,
-        b: 0.08,
-        a: 0.95,
-      });
+      {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = h.groundY(x, z) + 0.15;
+        ps.z = z;
+        ps.vx = (h.rand() - 0.5) * 0.6;
+        ps.vy = 1.2 + h.rand() * 2.2 * look.edge;
+        ps.vz = (h.rand() - 0.5) * 0.6;
+        ps.life = 1 + h.rand() * 0.6;
+        ps.drag = 0.5;
+        ps.size0 = 0.24;
+        ps.size1 = 0.06;
+        ps.r = 1;
+        ps.g = 0.16 + h.rand() * 0.1;
+        ps.b = 0.08;
+        ps.a = 0.95;
+        h.glow.emit(now, ps);
+      }
     }
     // Sparks along the diameter it is cut along: the line to get behind.
     if (h.rand() < look.edge * 40 * h.density * dt * 4) {
       const t = (h.rand() * 2 - 1) * s.reach;
       const x = s.x + c * t;
       const z = s.z - sn * t;
-      h.glow.emit(now, {
-        x,
-        y: gy + 0.2,
-        z,
-        vx: 0,
-        vy: 2 + h.rand() * 2,
-        vz: 0,
-        life: 0.6,
-        drag: 0.4,
-        size0: 0.3,
-        size1: 0.08,
-        r: 1,
-        g: 0.32,
-        b: 0.14,
-        a: 1,
-      });
+      {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = gy + 0.2;
+        ps.z = z;
+        ps.vx = 0;
+        ps.vy = 2 + h.rand() * 2;
+        ps.vz = 0;
+        ps.life = 0.6;
+        ps.drag = 0.4;
+        ps.size0 = 0.3;
+        ps.size1 = 0.08;
+        ps.r = 1;
+        ps.g = 0.32;
+        ps.b = 0.14;
+        ps.a = 1;
+        h.glow.emit(now, ps);
+      }
     }
   }
 
@@ -421,23 +430,25 @@ export class KnellFx implements RitePainter {
       const spot = coneSpot(Math.floor(h.rand() * 8191), 8191, s.reach, 180, 0.5);
       const x = s.x + spot.x * c + spot.z * sn;
       const z = s.z - spot.x * sn + spot.z * c;
-      h.fire.emit(now, {
-        x,
-        y: h.groundY(x, z) + 0.1,
-        z,
-        vx: 0,
-        vy: 1.8 + h.rand() * 2,
-        vz: 0,
-        ay: 1.4,
-        life: 0.7 + h.rand() * 0.4,
-        drag: 0.8,
-        size0: 1.1 + h.rand() * 0.6,
-        size1: 2.6 + h.rand() * 2,
-        r: 0.85 + h.rand() * 0.3,
-        g: 0,
-        b: 0,
-        a: 0.85 * fire,
-      });
+      {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = h.groundY(x, z) + 0.1;
+        ps.z = z;
+        ps.vx = 0;
+        ps.vy = 1.8 + h.rand() * 2;
+        ps.vz = 0;
+        ps.ay = 1.4;
+        ps.life = 0.7 + h.rand() * 0.4;
+        ps.drag = 0.8;
+        ps.size0 = 1.1 + h.rand() * 0.6;
+        ps.size1 = 2.6 + h.rand() * 2;
+        ps.r = 0.85 + h.rand() * 0.3;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.85 * fire;
+        h.fire.emit(now, ps);
+      }
     }
     if (!wyrm || wyrm.dead) return;
     const jaws = anchorWorld(
@@ -458,24 +469,26 @@ export class KnellFx implements RitePainter {
       const flight = 0.4 + h.rand() * 0.2;
       const drag = 0.9;
       const k = (1 - Math.exp(-drag * flight)) / drag;
-      h.fire.emit(now, {
-        x: jaws.x + (h.rand() - 0.5) * 0.6,
-        y: jaws.y + (h.rand() - 0.5) * 0.6,
-        z: jaws.z + (h.rand() - 0.5) * 0.6,
-        vx: (tx - jaws.x) / k,
-        vy: (gy - jaws.y) / k,
-        vz: (tz - jaws.z) / k,
-        ay: 2,
-        life: flight + 0.4 + h.rand() * 0.3,
-        drag,
-        floor: gy + 0.25,
-        size0: 0.5 + h.rand() * 0.3,
-        size1: 2.2 + h.rand() * 1.8,
-        r: 1.05 + h.rand() * 0.2,
-        g: 0,
-        b: 0,
-        a: 0.9 * fire,
-      });
+      {
+        const ps = h.ps();
+        ps.x = jaws.x + (h.rand() - 0.5) * 0.6;
+        ps.y = jaws.y + (h.rand() - 0.5) * 0.6;
+        ps.z = jaws.z + (h.rand() - 0.5) * 0.6;
+        ps.vx = (tx - jaws.x) / k;
+        ps.vy = (gy - jaws.y) / k;
+        ps.vz = (tz - jaws.z) / k;
+        ps.ay = 2;
+        ps.life = flight + 0.4 + h.rand() * 0.3;
+        ps.drag = drag;
+        ps.floor = gy + 0.25;
+        ps.size0 = 0.5 + h.rand() * 0.3;
+        ps.size1 = 2.2 + h.rand() * 1.8;
+        ps.r = 1.05 + h.rand() * 0.2;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.9 * fire;
+        h.fire.emit(now, ps);
+      }
     }
   }
 

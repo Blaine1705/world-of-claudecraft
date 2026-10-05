@@ -64,6 +64,7 @@ import {
   GLOW_FRAG,
   PARTICLE_VERT,
   ParticlePool,
+  type ParticleSpec,
 } from './crypt_fx_particles';
 import { KnellFx } from './knell_fx';
 import { MorthenAttackFx } from './morthen_attack_fx';
@@ -78,7 +79,7 @@ import {
 } from './morthen_rite_host';
 import { MorthenSoulFx } from './morthen_soul_fx';
 import { MorthenWardFx } from './morthen_ward_fx';
-import { setRiteCandleDecor } from './rite_candle_decor';
+import { RiteCandleDecor } from './rite_candle_decor';
 
 const SCAN_SEC = 0.1;
 const WAVES = 10;
@@ -186,6 +187,7 @@ export class MorthenRiteFx implements RiteFxHost {
   readonly density: number;
   readonly low: boolean;
   readonly readyForEntry: Promise<void>;
+  readonly decor: RiteCandleDecor;
   readonly scan: RiteScan = {
     morthenId: -1,
     wyrmId: -1,
@@ -212,6 +214,21 @@ export class MorthenRiteFx implements RiteFxHost {
   private where = 0;
   private seed = 0x3a7f;
   private disposed = false;
+  private readonly spec: ParticleSpec = {
+    x: 0,
+    y: 0,
+    z: 0,
+    vx: 0,
+    vy: 0,
+    vz: 0,
+    life: 1,
+    size0: 1,
+    size1: 1,
+    r: 1,
+    g: 1,
+    b: 1,
+    a: 1,
+  };
   /** The compile gate settled (the root may show only after it). */
   private gateSettled = false;
 
@@ -225,6 +242,7 @@ export class MorthenRiteFx implements RiteFxHost {
     private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'crypt-morthen-rite-fx';
+    this.decor = new RiteCandleDecor(scene);
     setRenderCategory(this.root, 'ui3d');
     this.low =
       resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
@@ -328,6 +346,31 @@ export class MorthenRiteFx implements RiteFxHost {
     return this.time;
   }
 
+  ps(): ParticleSpec {
+    const p = this.spec;
+    p.x = 0;
+    p.y = 0;
+    p.z = 0;
+    p.vx = 0;
+    p.vy = 0;
+    p.vz = 0;
+    p.ax = 0;
+    p.ay = 0;
+    p.az = 0;
+    p.life = 1;
+    p.drag = undefined;
+    p.floor = undefined;
+    p.size0 = 1;
+    p.size1 = 1;
+    p.spin = 0;
+    p.seed = undefined;
+    p.r = 1;
+    p.g = 1;
+    p.b = 1;
+    p.a = 1;
+    return p;
+  }
+
   rand(): number {
     this.seed = (Math.imul(this.seed, 1664525) + 1013904223) | 0;
     return (this.seed >>> 0) / 4294967296;
@@ -390,7 +433,12 @@ export class MorthenRiteFx implements RiteFxHost {
   }
 
   wave(x: number, z: number, reach: number, seconds: number, color: number, width = 0.18): void {
-    const w = this.waves.find((q) => !q.alive) ?? this.waves[0];
+    let w = this.waves[0];
+    for (const q of this.waves)
+      if (!q.alive) {
+        w = q;
+        break;
+      }
     w.alive = true;
     w.born = this.time;
     w.span = seconds;
@@ -403,7 +451,12 @@ export class MorthenRiteFx implements RiteFxHost {
   }
 
   flash(x: number, y: number, z: number, size: number, seconds: number, color: number): void {
-    const f = this.flashes.find((q) => !q.alive) ?? this.flashes[0];
+    let f = this.flashes[0];
+    for (const q of this.flashes)
+      if (!q.alive) {
+        f = q;
+        break;
+      }
     f.alive = true;
     f.born = this.time;
     f.span = seconds;
@@ -523,8 +576,9 @@ export class MorthenRiteFx implements RiteFxHost {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
-    // A host torn down mid-Rite leaves the candles as the decor built them.
-    for (let i = 0; i < 4; i++) setRiteCandleDecor(i, true, 1);
+    // A host torn down mid-Rite leaves the candles of every interior still in
+    // the scene as their builders made them (a retired one is never touched).
+    this.decor.restoreAll();
     this.kit.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();

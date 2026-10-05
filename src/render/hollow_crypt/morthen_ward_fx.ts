@@ -372,45 +372,49 @@ export class MorthenWardFx implements RitePainter {
       const a = h.rand() * Math.PI * 2;
       const el = h.rand() * 1.2;
       const sp = 8 + h.rand() * 10;
-      h.glow.emit(h.clock() + h.rand() * 0.05, {
-        x: m.pos.x,
-        y: ribsY,
-        z: m.pos.z,
-        vx: Math.sin(a) * Math.cos(el) * sp,
-        vy: Math.sin(el) * sp * 0.8,
-        vz: Math.cos(a) * Math.cos(el) * sp,
-        ay: -2,
-        life: 0.9 + h.rand() * 0.8,
-        drag: 1.3,
-        size0: 0.4,
-        size1: 0.08,
-        r: 1,
-        g: 0.86 + h.rand() * 0.14,
-        b: 0.5,
-        a: 1,
-      });
+      {
+        const ps = h.ps();
+        ps.x = m.pos.x;
+        ps.y = ribsY;
+        ps.z = m.pos.z;
+        ps.vx = Math.sin(a) * Math.cos(el) * sp;
+        ps.vy = Math.sin(el) * sp * 0.8;
+        ps.vz = Math.cos(a) * Math.cos(el) * sp;
+        ps.ay = -2;
+        ps.life = 0.9 + h.rand() * 0.8;
+        ps.drag = 1.3;
+        ps.size0 = 0.4;
+        ps.size1 = 0.08;
+        ps.r = 1;
+        ps.g = 0.86 + h.rand() * 0.14;
+        ps.b = 0.5;
+        ps.a = 1;
+        h.glow.emit(h.clock() + h.rand() * 0.05, ps);
+      }
     }
     const d = Math.round(70 * h.density);
     for (let i = 0; i < d; i++) {
       const a = (i / d) * Math.PI * 2;
       const sp = 10 + h.rand() * 5;
-      h.dust.emit(h.clock(), {
-        x: m.pos.x + Math.sin(a) * WARD_RADIUS,
-        y: gy + 0.4,
-        z: m.pos.z + Math.cos(a) * WARD_RADIUS,
-        vx: Math.sin(a) * sp,
-        vy: 0.6 + h.rand(),
-        vz: Math.cos(a) * sp,
-        life: 1.2 + h.rand() * 0.5,
-        drag: 1.8,
-        floor: gy + 0.2,
-        size0: 1.5,
-        size1: 4,
-        r: 0.4,
-        g: 0.42,
-        b: 0.36,
-        a: 0.4,
-      });
+      {
+        const ps = h.ps();
+        ps.x = m.pos.x + Math.sin(a) * WARD_RADIUS;
+        ps.y = gy + 0.4;
+        ps.z = m.pos.z + Math.cos(a) * WARD_RADIUS;
+        ps.vx = Math.sin(a) * sp;
+        ps.vy = 0.6 + h.rand();
+        ps.vz = Math.cos(a) * sp;
+        ps.life = 1.2 + h.rand() * 0.5;
+        ps.drag = 1.8;
+        ps.floor = gy + 0.2;
+        ps.size0 = 1.5;
+        ps.size1 = 4;
+        ps.r = 0.4;
+        ps.g = 0.42;
+        ps.b = 0.36;
+        ps.a = 0.4;
+        h.dust.emit(h.clock(), ps);
+      }
     }
     h.shakeAt(m.pos.x, m.pos.z, 0.75);
   }
@@ -507,41 +511,45 @@ export class MorthenWardFx implements RitePainter {
       const a = h.rand() * Math.PI * 2;
       const r = 2 + h.rand() * (WARD_RADIUS - 2.6);
       const tang = a + Math.PI / 2;
-      h.glow.emit(now, {
-        x: m.pos.x + Math.sin(a) * r,
-        y: gy + 0.3,
-        z: m.pos.z + Math.cos(a) * r,
-        vx: Math.sin(tang) * 3.2,
-        vy: 2.6 + h.rand() * 2.4,
-        vz: Math.cos(tang) * 3.2,
-        life: 1.6 + h.rand() * 0.8,
-        drag: 0.5,
-        size0: 0.32,
-        size1: 0.06,
-        r: 0.6,
-        g: 1,
-        b: 0.55,
-        a: 0.9,
-      });
+      {
+        const ps = h.ps();
+        ps.x = m.pos.x + Math.sin(a) * r;
+        ps.y = gy + 0.3;
+        ps.z = m.pos.z + Math.cos(a) * r;
+        ps.vx = Math.sin(tang) * 3.2;
+        ps.vy = 2.6 + h.rand() * 2.4;
+        ps.vz = Math.cos(tang) * 3.2;
+        ps.life = 1.6 + h.rand() * 0.8;
+        ps.drag = 0.5;
+        ps.size0 = 0.32;
+        ps.size1 = 0.06;
+        ps.r = 0.6;
+        ps.g = 1;
+        ps.b = 0.55;
+        ps.a = 0.9;
+        h.glow.emit(now, ps);
+      }
       if (i % 2 === 0) {
         const fa = h.rand() * Math.PI * 2;
-        h.fire.emit(now, {
-          x: m.pos.x + Math.sin(fa) * WARD_RADIUS * 0.97,
-          y: gy + 0.1,
-          z: m.pos.z + Math.cos(fa) * WARD_RADIUS * 0.97,
-          vx: 0,
-          vy: 1.2 + h.rand(),
-          vz: 0,
-          ay: 1,
-          life: 0.7 + h.rand() * 0.4,
-          drag: 0.8,
-          size0: 0.6,
-          size1: 1.6 + h.rand(),
-          r: 0.8 + h.rand() * 0.2,
-          g: 0,
-          b: 0,
-          a: 0.75,
-        });
+        {
+          const ps = h.ps();
+          ps.x = m.pos.x + Math.sin(fa) * WARD_RADIUS * 0.97;
+          ps.y = gy + 0.1;
+          ps.z = m.pos.z + Math.cos(fa) * WARD_RADIUS * 0.97;
+          ps.vx = 0;
+          ps.vy = 1.2 + h.rand();
+          ps.vz = 0;
+          ps.ay = 1;
+          ps.life = 0.7 + h.rand() * 0.4;
+          ps.drag = 0.8;
+          ps.size0 = 0.6;
+          ps.size1 = 1.6 + h.rand();
+          ps.r = 0.8 + h.rand() * 0.2;
+          ps.g = 0;
+          ps.b = 0;
+          ps.a = 0.75;
+          h.fire.emit(now, ps);
+        }
       }
     }
   }
@@ -578,22 +586,24 @@ export class MorthenWardFx implements RitePainter {
       const s = m.scale || 1;
       const eye = morthenAnchor(m.pos, m.facing, s, MORTHEN_MITRE_EYE);
       const a = now * 3 + h.rand() * 0.4;
-      h.glow.emit(now, {
-        x: eye.x + Math.cos(a) * 1.1 * s,
-        y: eye.y + 0.6 * s,
-        z: eye.z + Math.sin(a) * 1.1 * s,
-        vx: -Math.sin(a) * 2,
-        vy: 0.1,
-        vz: Math.cos(a) * 2,
-        life: 0.6,
-        drag: 0.3,
-        size0: 0.28,
-        size1: 0.08,
-        r: 1,
-        g: 0.88,
-        b: 0.5,
-        a: 1,
-      });
+      {
+        const ps = h.ps();
+        ps.x = eye.x + Math.cos(a) * 1.1 * s;
+        ps.y = eye.y + 0.6 * s;
+        ps.z = eye.z + Math.sin(a) * 1.1 * s;
+        ps.vx = -Math.sin(a) * 2;
+        ps.vy = 0.1;
+        ps.vz = Math.cos(a) * 2;
+        ps.life = 0.6;
+        ps.drag = 0.3;
+        ps.size0 = 0.28;
+        ps.size1 = 0.08;
+        ps.r = 1;
+        ps.g = 0.88;
+        ps.b = 0.5;
+        ps.a = 1;
+        h.glow.emit(now, ps);
+      }
     }
   }
 
@@ -623,22 +633,24 @@ export class MorthenWardFx implements RitePainter {
     for (let i = 0; i < Math.floor(n + h.rand()); i++) {
       const a = h.rand() * Math.PI * 2;
       const r = (0.6 + h.rand() * 1.2) * s;
-      h.glow.emit(now, {
-        x: m.pos.x + Math.sin(a) * r,
-        y: gy + (0.5 + h.rand() * 5) * s,
-        z: m.pos.z + Math.cos(a) * r,
-        vx: 0,
-        vy: 1.5 + h.rand() * 1.5,
-        vz: 0,
-        life: 0.9,
-        drag: 0.4,
-        size0: 0.22,
-        size1: 0.05,
-        r: 1,
-        g: 0.82,
-        b: 0.42,
-        a: 1,
-      });
+      {
+        const ps = h.ps();
+        ps.x = m.pos.x + Math.sin(a) * r;
+        ps.y = gy + (0.5 + h.rand() * 5) * s;
+        ps.z = m.pos.z + Math.cos(a) * r;
+        ps.vx = 0;
+        ps.vy = 1.5 + h.rand() * 1.5;
+        ps.vz = 0;
+        ps.life = 0.9;
+        ps.drag = 0.4;
+        ps.size0 = 0.22;
+        ps.size1 = 0.05;
+        ps.r = 1;
+        ps.g = 0.82;
+        ps.b = 0.42;
+        ps.a = 1;
+        h.glow.emit(now, ps);
+      }
     }
   }
 
@@ -658,40 +670,43 @@ export class MorthenWardFx implements RitePainter {
       const x = cx + Math.sin(a) * r;
       const z = cz + Math.cos(a) * r;
       const gy = h.groundY(x, z);
-      h.mist.emit(now, {
-        x,
-        y: gy + 0.25 + h.rand() * 0.5,
-        z,
-        vx: (h.rand() - 0.5) * 0.8,
-        vy: 0.08,
-        vz: (h.rand() - 0.5) * 0.8,
-        life: 3.5 + h.rand() * 1.5,
-        drag: 0.3,
-        size0: 2.6,
-        size1: 5.5 + h.rand() * 2,
-        spin: (h.rand() - 0.5) * 0.3,
-        r: 0.6,
-        g: 0.72,
-        b: 0.78,
-        a: 0.13 * density,
-      });
-      if (h.rand() < 0.15)
-        h.glow.emit(now, {
-          x,
-          y: gy + 0.3 + h.rand() * 0.6,
-          z,
-          vx: 0,
-          vy: 0.2,
-          vz: 0,
-          life: 1.2,
-          drag: 0.3,
-          size0: 0.1,
-          size1: 0.03,
-          r: 0.75,
-          g: 0.9,
-          b: 1,
-          a: 0.8,
-        });
+      {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = gy + 0.25 + h.rand() * 0.5;
+        ps.z = z;
+        ps.vx = (h.rand() - 0.5) * 0.8;
+        ps.vy = 0.08;
+        ps.vz = (h.rand() - 0.5) * 0.8;
+        ps.life = 3.5 + h.rand() * 1.5;
+        ps.drag = 0.3;
+        ps.size0 = 2.6;
+        ps.size1 = 5.5 + h.rand() * 2;
+        ps.spin = (h.rand() - 0.5) * 0.3;
+        ps.r = 0.6;
+        ps.g = 0.72;
+        ps.b = 0.78;
+        ps.a = 0.13 * density;
+        h.mist.emit(now, ps);
+      }
+      if (h.rand() < 0.15) {
+        const ps = h.ps();
+        ps.x = x;
+        ps.y = gy + 0.3 + h.rand() * 0.6;
+        ps.z = z;
+        ps.vx = 0;
+        ps.vy = 0.2;
+        ps.vz = 0;
+        ps.life = 1.2;
+        ps.drag = 0.3;
+        ps.size0 = 0.1;
+        ps.size1 = 0.03;
+        ps.r = 0.75;
+        ps.g = 0.9;
+        ps.b = 1;
+        ps.a = 0.8;
+        h.glow.emit(now, ps);
+      }
     }
   }
 }

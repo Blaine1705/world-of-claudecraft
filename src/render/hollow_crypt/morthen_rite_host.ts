@@ -7,7 +7,8 @@ import * as THREE from 'three';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import type { TelegraphKit } from '../floor_telegraph';
-import type { ParticlePool } from './crypt_fx_particles';
+import type { ParticlePool, ParticleSpec } from './crypt_fx_particles';
+import type { RiteCandleDecor } from './rite_candle_decor';
 
 export const RITE_MESH_VERT = /* glsl */ `
 varying vec2 vUv;
@@ -65,8 +66,13 @@ export interface RiteFxHost {
   readonly density: number;
   readonly low: boolean;
   readonly scan: RiteScan;
+  /** The Remembrance Candles' decor of each claimed slot's interior. */
+  readonly decor: RiteCandleDecor;
   clock(): number;
   rand(): number;
+  /** The one reused particle spec, reset (ParticlePool.emit copies it, so a
+   *  painter fills it and emits with no allocation per particle). */
+  ps(): ParticleSpec;
   /** A shockwave band across the floor. */
   wave(x: number, z: number, reach: number, seconds: number, color: number, width?: number): void;
   /** A camera-facing flash that swells and fades. */

@@ -53,7 +53,6 @@ import {
   type RiteGlowMesh,
   type RitePainter,
 } from './morthen_rite_host';
-import { riteCandleDecorGeneration, setRiteCandleDecor } from './rite_candle_decor';
 
 const CANDLES = 4;
 const STREAMS = 4;
@@ -80,9 +79,11 @@ interface CandleSlot {
   objectId: number;
   state: CandleState;
   /** The state written into the decor, and the registry generation it went to. */
-  applied: CandleState | null;
-  appliedGen: number;
-  appliedLevel: number;
+  index: number;
+  /** The claimed slot's origin (its interior's decor is that slot's). */
+  ox: number;
+  oz: number;
+  hasOrigin: boolean;
   /** When it last caught (the ignite flash rides the lamp). */
   litAt: number;
   x: number;
@@ -109,6 +110,7 @@ export class MorthenCandleFx implements RitePainter {
   private readonly slots: CandleSlot[] = [];
   private readonly streams: StreamSlot[] = [];
   private readonly look: CandleLook = candleLook('default', 0);
+  private readonly seen = [false, false, false, false];
   private active = false;
 
   constructor(private readonly h: RiteFxHost) {
@@ -136,9 +138,10 @@ export class MorthenCandleFx implements RitePainter {
       this.slots.push({
         objectId: -1,
         state: 'default',
-        applied: null,
-        appliedGen: -1,
-        appliedLevel: 1,
+        index: i,
+        ox: 0,
+        oz: 0,
+        hasOrigin: false,
         litAt: -1e6,
         x: 0,
         z: 0,
@@ -181,6 +184,9 @@ export class MorthenCandleFx implements RitePainter {
     const i = candleIndexAt(obj.pos.x - o.x, obj.pos.z - o.z);
     if (i < 0) return null;
     const s = this.slots[i];
+    s.ox = o.x;
+    s.oz = o.z;
+    s.hasOrigin = true;
     s.x = obj.pos.x;
     s.z = obj.pos.z;
     s.floor = this.h.groundY(obj.pos.x, obj.pos.z);
@@ -199,46 +205,50 @@ export class MorthenCandleFx implements RitePainter {
     const n = Math.round(70 * h.density) + 30;
     for (let i = 0; i < n; i++) {
       const a = h.rand() * Math.PI * 2;
-      h.holy.emit(now + h.rand() * 0.15, {
-        x: s.x + Math.sin(a) * 0.3,
-        y: wy,
-        z: s.z + Math.cos(a) * 0.3,
-        vx: Math.sin(a) * 1.4,
-        vy: 6 + h.rand() * 6,
-        vz: Math.cos(a) * 1.4,
-        ay: 1.5,
-        life: 0.6 + h.rand() * 0.4,
-        drag: 1,
-        size0: 0.8,
-        size1: 2.2 + h.rand() * 1.4,
-        r: 1,
-        g: 0,
-        b: 0,
-        a: 0.95,
-      });
+      {
+        const ps = h.ps();
+        ps.x = s.x + Math.sin(a) * 0.3;
+        ps.y = wy;
+        ps.z = s.z + Math.cos(a) * 0.3;
+        ps.vx = Math.sin(a) * 1.4;
+        ps.vy = 6 + h.rand() * 6;
+        ps.vz = Math.cos(a) * 1.4;
+        ps.ay = 1.5;
+        ps.life = 0.6 + h.rand() * 0.4;
+        ps.drag = 1;
+        ps.size0 = 0.8;
+        ps.size1 = 2.2 + h.rand() * 1.4;
+        ps.r = 1;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.95;
+        h.holy.emit(now + h.rand() * 0.15, ps);
+      }
     }
     const g = Math.round(110 * h.density);
     for (let i = 0; i < g; i++) {
       const a = h.rand() * Math.PI * 2;
       const el = h.rand() * 1.3;
       const sp = 4 + h.rand() * 7;
-      h.glow.emit(now, {
-        x: s.x,
-        y: wy + 0.5,
-        z: s.z,
-        vx: Math.sin(a) * Math.cos(el) * sp,
-        vy: Math.sin(el) * sp + 2,
-        vz: Math.cos(a) * Math.cos(el) * sp,
-        ay: -3,
-        life: 0.9 + h.rand() * 0.7,
-        drag: 1.1,
-        size0: 0.3,
-        size1: 0.06,
-        r: 1,
-        g: 0.85,
-        b: 0.45,
-        a: 1,
-      });
+      {
+        const ps = h.ps();
+        ps.x = s.x;
+        ps.y = wy + 0.5;
+        ps.z = s.z;
+        ps.vx = Math.sin(a) * Math.cos(el) * sp;
+        ps.vy = Math.sin(el) * sp + 2;
+        ps.vz = Math.cos(a) * Math.cos(el) * sp;
+        ps.ay = -3;
+        ps.life = 0.9 + h.rand() * 0.7;
+        ps.drag = 1.1;
+        ps.size0 = 0.3;
+        ps.size1 = 0.06;
+        ps.r = 1;
+        ps.g = 0.85;
+        ps.b = 0.45;
+        ps.a = 1;
+        h.glow.emit(now, ps);
+      }
     }
     h.shakeAt(s.x, s.z, 0.22);
   }
@@ -254,39 +264,43 @@ export class MorthenCandleFx implements RitePainter {
     const n = Math.round(50 * h.density) + 10;
     for (let i = 0; i < n; i++) {
       const a = h.rand() * Math.PI * 2;
-      h.fire.emit(now, {
-        x: s.x,
-        y: wy + 0.6,
-        z: s.z,
-        vx: Math.sin(a) * 4,
-        vy: 1 + h.rand() * 3,
-        vz: Math.cos(a) * 4,
-        life: 0.5 + h.rand() * 0.3,
-        drag: 2,
-        size0: 0.8,
-        size1: 1.6,
-        r: 0.9,
-        g: 0,
-        b: 0,
-        a: 0.9,
-      });
-      h.dust.emit(now, {
-        x: s.x,
-        y: wy + 0.4,
-        z: s.z,
-        vx: Math.sin(a) * 1.5,
-        vy: 1.5 + h.rand() * 2,
-        vz: Math.cos(a) * 1.5,
-        life: 1.6 + h.rand(),
-        drag: 1,
-        size0: 0.8,
-        size1: 2.8,
-        spin: h.rand() - 0.5,
-        r: 0.08,
-        g: 0.07,
-        b: 0.09,
-        a: 0.55,
-      });
+      {
+        const ps = h.ps();
+        ps.x = s.x;
+        ps.y = wy + 0.6;
+        ps.z = s.z;
+        ps.vx = Math.sin(a) * 4;
+        ps.vy = 1 + h.rand() * 3;
+        ps.vz = Math.cos(a) * 4;
+        ps.life = 0.5 + h.rand() * 0.3;
+        ps.drag = 2;
+        ps.size0 = 0.8;
+        ps.size1 = 1.6;
+        ps.r = 0.9;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.9;
+        h.fire.emit(now, ps);
+      }
+      {
+        const ps = h.ps();
+        ps.x = s.x;
+        ps.y = wy + 0.4;
+        ps.z = s.z;
+        ps.vx = Math.sin(a) * 1.5;
+        ps.vy = 1.5 + h.rand() * 2;
+        ps.vz = Math.cos(a) * 1.5;
+        ps.life = 1.6 + h.rand();
+        ps.drag = 1;
+        ps.size0 = 0.8;
+        ps.size1 = 2.8;
+        ps.spin = h.rand() - 0.5;
+        ps.r = 0.08;
+        ps.g = 0.07;
+        ps.b = 0.09;
+        ps.a = 0.55;
+        h.dust.emit(now, ps);
+      }
     }
     h.shakeAt(s.x, s.z, 0.15);
   }
@@ -296,14 +310,14 @@ export class MorthenCandleFx implements RitePainter {
   update(world: IWorld, dt: number): void {
     const h = this.h;
     const now = h.clock();
-    const seen = [false, false, false, false];
+    const seen = this.seen;
+    seen.fill(false);
     for (const id of h.scan.candles) {
       const e = world.entities.get(id);
       if (!e) continue;
       const s = this.slotFor(e);
       if (!s) continue;
-      const i = this.slots.indexOf(s);
-      seen[i] = true;
+      seen[s.index] = true;
       s.objectId = id;
       s.state = candleStateOf(e.templateId);
     }
@@ -319,24 +333,20 @@ export class MorthenCandleFx implements RitePainter {
     // once and stop.
     if (!any && !this.active) return;
     this.active = any;
-    const gen = riteCandleDecorGeneration();
-    for (const s of this.slots) this.paintCandle(s, gen, now, dt);
+    for (const s of this.slots) this.paintCandle(s, now, dt);
     this.stepStreams(world, dt);
   }
 
-  private paintCandle(s: CandleSlot, gen: number, now: number, dt: number): void {
+  private paintCandle(s: CandleSlot, now: number, dt: number): void {
     const h = this.h;
     const look = candleLook(s.state, now, this.look);
     // The decor: the flame shown or snuffed, the lamp's level (an ignite
     // flares it for a moment).
     const flare = 1 + 2.2 * igniteFlash(now - s.litAt);
     const level = Math.round(look.light * flare * 20) / 20;
-    if (s.applied !== s.state || s.appliedGen !== gen || s.appliedLevel !== level) {
-      setRiteCandleDecor(this.slots.indexOf(s), look.decorFlame, level);
-      s.applied = s.state;
-      s.appliedGen = gen;
-      s.appliedLevel = level;
-    }
+    // Written every frame (cheap: the decor only touches what changed), so a
+    // kit rebuilt in place under the Rite takes its look at once.
+    if (s.hasOrigin) h.decor.set(s.ox, s.oz, s.index, look.decorFlame, level);
     const wy = s.floor + CANDLE_WICK_Y;
     // The dim cold glow of a snuffed wick (it is still found).
     s.ember.mesh.visible = look.ember > 0;
@@ -369,22 +379,24 @@ export class MorthenCandleFx implements RitePainter {
         const dy = wy + 0.3 - ly;
         const dz = s.z - lz;
         const d = Math.hypot(dx, dy, dz) || 1;
-        h.glow.emit(now, {
-          x: lx,
-          y: ly,
-          z: lz,
-          vx: (dx / d) * 9,
-          vy: (dy / d) * 9,
-          vz: (dz / d) * 9,
-          life: d / 9,
-          drag: 0.001,
-          size0: 0.3,
-          size1: 0.2,
-          r: 1,
-          g: 0.9,
-          b: 0.55,
-          a: 1,
-        });
+        {
+          const ps = h.ps();
+          ps.x = lx;
+          ps.y = ly;
+          ps.z = lz;
+          ps.vx = (dx / d) * 9;
+          ps.vy = (dy / d) * 9;
+          ps.vz = (dz / d) * 9;
+          ps.life = d / 9;
+          ps.drag = 0.001;
+          ps.size0 = 0.3;
+          ps.size1 = 0.2;
+          ps.r = 1;
+          ps.g = 0.9;
+          ps.b = 0.55;
+          ps.a = 1;
+          h.glow.emit(now, ps);
+        }
       }
     }
     // A snuffed wick's thread of smoke.
@@ -392,23 +404,25 @@ export class MorthenCandleFx implements RitePainter {
       s.smoke += 7 * h.density * dt;
       while (s.smoke >= 1) {
         s.smoke -= 1;
-        h.dust.emit(now, {
-          x: s.x + (h.rand() - 0.5) * 0.1,
-          y: wy + 0.05,
-          z: s.z + (h.rand() - 0.5) * 0.1,
-          vx: (h.rand() - 0.5) * 0.25,
-          vy: 0.7 + h.rand() * 0.4,
-          vz: (h.rand() - 0.5) * 0.25,
-          life: 2.2 + h.rand(),
-          drag: 0.3,
-          size0: 0.2,
-          size1: 1.1,
-          spin: (h.rand() - 0.5) * 0.8,
-          r: 0.32,
-          g: 0.33,
-          b: 0.34,
-          a: 0.3,
-        });
+        {
+          const ps = h.ps();
+          ps.x = s.x + (h.rand() - 0.5) * 0.1;
+          ps.y = wy + 0.05;
+          ps.z = s.z + (h.rand() - 0.5) * 0.1;
+          ps.vx = (h.rand() - 0.5) * 0.25;
+          ps.vy = 0.7 + h.rand() * 0.4;
+          ps.vz = (h.rand() - 0.5) * 0.25;
+          ps.life = 2.2 + h.rand();
+          ps.drag = 0.3;
+          ps.size0 = 0.2;
+          ps.size1 = 1.1;
+          ps.spin = (h.rand() - 0.5) * 0.8;
+          ps.r = 0.32;
+          ps.g = 0.33;
+          ps.b = 0.34;
+          ps.a = 0.3;
+          h.dust.emit(now, ps);
+        }
       }
     }
     // A relit candle: the tall remembrance flame and its column of light.
@@ -430,41 +444,44 @@ export class MorthenCandleFx implements RitePainter {
     s.flame += (14 + 22 * k) * dt;
     while (s.flame >= 1) {
       s.flame -= 1;
-      h.holy.emit(now, {
-        x: s.x + (h.rand() - 0.5) * 0.25,
-        y: wy - 0.05,
-        z: s.z + (h.rand() - 0.5) * 0.25,
-        vx: (h.rand() - 0.5) * 0.3,
-        vy: (1.4 + h.rand() * 1.2) * height,
-        vz: (h.rand() - 0.5) * 0.3,
-        ay: 1.2 * height,
-        life: 0.5 + h.rand() * 0.3,
-        drag: 0.8,
-        size0: (0.55 + 0.35 * k) * height,
-        size1: (1 + 0.9 * k + h.rand() * 0.5) * height,
-        r: 0.95 + h.rand() * 0.15,
-        g: 0,
-        b: 0,
-        a: 0.6 + 0.35 * k,
-      });
+      {
+        const ps = h.ps();
+        ps.x = s.x + (h.rand() - 0.5) * 0.25;
+        ps.y = wy - 0.05;
+        ps.z = s.z + (h.rand() - 0.5) * 0.25;
+        ps.vx = (h.rand() - 0.5) * 0.3;
+        ps.vy = (1.4 + h.rand() * 1.2) * height;
+        ps.vz = (h.rand() - 0.5) * 0.3;
+        ps.ay = 1.2 * height;
+        ps.life = 0.5 + h.rand() * 0.3;
+        ps.drag = 0.8;
+        ps.size0 = (0.55 + 0.35 * k) * height;
+        ps.size1 = (1 + 0.9 * k + h.rand() * 0.5) * height;
+        ps.r = 0.95 + h.rand() * 0.15;
+        ps.g = 0;
+        ps.b = 0;
+        ps.a = 0.6 + 0.35 * k;
+        h.holy.emit(now, ps);
+      }
     }
-    if (h.rand() < 3 * k * h.density * dt)
-      h.glow.emit(now, {
-        x: s.x,
-        y: s.floor + CANDLE_FLAME_TIP_Y,
-        z: s.z,
-        vx: (h.rand() - 0.5) * 0.6,
-        vy: 1.4 + h.rand(),
-        vz: (h.rand() - 0.5) * 0.6,
-        life: 1.2,
-        drag: 0.4,
-        size0: 0.12,
-        size1: 0.04,
-        r: 1,
-        g: 0.85,
-        b: 0.5,
-        a: 1,
-      });
+    if (h.rand() < 3 * k * h.density * dt) {
+      const ps = h.ps();
+      ps.x = s.x;
+      ps.y = s.floor + CANDLE_FLAME_TIP_Y;
+      ps.z = s.z;
+      ps.vx = (h.rand() - 0.5) * 0.6;
+      ps.vy = 1.4 + h.rand();
+      ps.vz = (h.rand() - 0.5) * 0.6;
+      ps.life = 1.2;
+      ps.drag = 0.4;
+      ps.size0 = 0.12;
+      ps.size1 = 0.04;
+      ps.r = 1;
+      ps.g = 0.85;
+      ps.b = 0.5;
+      ps.a = 1;
+      h.glow.emit(now, ps);
+    }
   }
 
   /** The relights: a stream of light from each lighter to the wick, the flame
@@ -472,14 +489,22 @@ export class MorthenCandleFx implements RitePainter {
   private stepStreams(world: IWorld, dt: number): void {
     const h = this.h;
     const now = h.clock();
+    const lighters = h.scan.lighters;
     for (const st of this.streams) {
       if (st.playerId < 0) continue;
-      if (!h.scan.lighters.includes(st.playerId)) st.playerId = -1;
+      let still = false;
+      for (let k = 0; k < lighters.length; k++) if (lighters[k] === st.playerId) still = true;
+      if (!still) st.playerId = -1;
     }
-    for (const id of h.scan.lighters) {
-      if (this.streams.some((s) => s.playerId === id)) continue;
-      const slot = this.streams.find((s) => s.playerId < 0);
-      if (slot) slot.playerId = id;
+    for (let k = 0; k < lighters.length; k++) {
+      const id = lighters[k];
+      let free: StreamSlot | null = null;
+      let held = false;
+      for (const st of this.streams) {
+        if (st.playerId === id) held = true;
+        else if (st.playerId < 0 && !free) free = st;
+      }
+      if (!held && free) free.playerId = id;
     }
     for (const st of this.streams) {
       const p = st.playerId >= 0 ? world.entities.get(st.playerId) : undefined;
@@ -517,40 +542,43 @@ export class MorthenCandleFx implements RitePainter {
         const sy = gy + 0.3 + h.rand() * 1.6;
         const sz = az + Math.cos(a) * r;
         const speed = 5 + h.rand() * 3;
-        h.dust.emit(now, {
-          x: sx,
-          y: sy,
-          z: sz,
-          vx: ((candle.x - sx) / d) * speed,
-          vy: ((wy - sy) / d) * speed,
-          vz: ((candle.z - sz) / d) * speed,
-          life: Math.min(1.4, d / speed),
-          drag: 0.05,
-          size0: 0.32,
-          size1: 0.14,
-          spin: h.rand() * 3,
-          r: 0.16,
-          g: 0.02,
-          b: 0.08,
-          a: 0.75,
-        });
-        if (h.rand() < 0.35)
-          h.glow.emit(now, {
-            x: sx,
-            y: sy,
-            z: sz,
-            vx: (dx / d) * speed,
-            vy: (dy / d) * speed,
-            vz: (dz / d) * speed,
-            life: Math.min(1.4, d / speed),
-            drag: 0.05,
-            size0: 0.16,
-            size1: 0.08,
-            r: 0.85,
-            g: 0.22,
-            b: 0.3,
-            a: 0.8,
-          });
+        {
+          const ps = h.ps();
+          ps.x = sx;
+          ps.y = sy;
+          ps.z = sz;
+          ps.vx = ((candle.x - sx) / d) * speed;
+          ps.vy = ((wy - sy) / d) * speed;
+          ps.vz = ((candle.z - sz) / d) * speed;
+          ps.life = Math.min(1.4, d / speed);
+          ps.drag = 0.05;
+          ps.size0 = 0.32;
+          ps.size1 = 0.14;
+          ps.spin = h.rand() * 3;
+          ps.r = 0.16;
+          ps.g = 0.02;
+          ps.b = 0.08;
+          ps.a = 0.75;
+          h.dust.emit(now, ps);
+        }
+        if (h.rand() < 0.35) {
+          const ps = h.ps();
+          ps.x = sx;
+          ps.y = sy;
+          ps.z = sz;
+          ps.vx = (dx / d) * speed;
+          ps.vy = (dy / d) * speed;
+          ps.vz = (dz / d) * speed;
+          ps.life = Math.min(1.4, d / speed);
+          ps.drag = 0.05;
+          ps.size0 = 0.16;
+          ps.size1 = 0.08;
+          ps.r = 0.85;
+          ps.g = 0.22;
+          ps.b = 0.3;
+          ps.a = 0.8;
+          h.glow.emit(now, ps);
+        }
       }
     }
   }

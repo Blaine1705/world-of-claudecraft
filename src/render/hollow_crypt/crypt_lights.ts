@@ -18,7 +18,7 @@ import {
   HOLLOW_CRYPT_LIGHTS,
   lightFlamePosition,
 } from './crypt_plan_core';
-import { registerRiteCandleLamp } from './rite_candle_decor';
+import { tagRiteCandleLamp } from './rite_candle_decor';
 
 export interface CryptLightDeps {
   lowGfx: boolean;
@@ -139,9 +139,9 @@ export function buildCryptLights(
     group.add(light);
     deps.fireLights.push(light);
     // Morthen's Rite gutters the Remembrance Candles and the group relights
-    // them: its painter reaches this lamp through the registry.
+    // them: its painter finds this lamp by its tag (rite_candle_decor.ts).
     if (spot.holder === 'Kit_RemembranceCandle')
-      registerRiteCandleLamp(spot.x, spot.z, flame, halo, light);
+      tagRiteCandleLamp(spot.x, spot.z, flame, halo, light);
     // No floor pool for a glow hung over the chasm (the Great Web's heart).
     if (!deps.lowGfx && gy > HOLLOW_CRYPT_VOID_HEIGHT + 1) {
       const glow = new THREE.Mesh(glowGeometry, glowMaterial(spot.kind));

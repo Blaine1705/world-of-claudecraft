@@ -1391,7 +1391,9 @@ export class CharacterVisual {
     this.harvestRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
     this.warriorBody.applyContactRecoil(this.poseWrap, dt, reducedMotion || s.dead);
 
-    // distant corpses show the static idle far mesh, tip it over
+    // distant corpses show the static idle far mesh, tip it over (laid on its
+    // side from the pivot, so a body sunk in life by a negative hover needs no
+    // deathLift here: the rig's lift above is what rests the near corpse)
     if (this.farMesh?.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;

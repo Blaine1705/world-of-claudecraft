@@ -14,7 +14,7 @@ import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { planCryptKitPlacements } from './crypt_kit_plan_core';
 import type { KitPlacement } from './crypt_set_dressing_core';
-import { registerRiteCandleGlow } from './rite_candle_decor';
+import { tagRiteCandleGlow } from './rite_candle_decor';
 
 export const HOLLOW_CRYPT_KIT_URL = '/models/props/hollow_crypt_kit.glb';
 
@@ -257,8 +257,8 @@ function buildKitGroup(ground: (x: number, z: number) => number, lowGfx: boolean
       mesh.computeBoundingSphere();
       group.add(mesh);
       // The Remembrance Candles' baked flames: Morthen's Rite snuffs them one
-      // instance at a time (rite_candle_decor.ts).
-      if (piece === 'Kit_RemembranceCandle' && slot === 'glow') registerRiteCandleGlow(mesh, list);
+      // instance at a time (rite_candle_decor.ts finds them by this tag).
+      if (piece === 'Kit_RemembranceCandle' && slot === 'glow') tagRiteCandleGlow(mesh, list);
     }
   }
   return group;
