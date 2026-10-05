@@ -239,7 +239,7 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_spore_toad',
   'form_toad',
   'wildheart_sunbone_totem',
-  // its Dread Totem: the same carved post re-tinted (wildheart_creature_looks.ts)
+  // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',
   // the rework's re-tints of a flagged body, which inherit the flag with the
   // spread base def (characters/sanctum_creature_looks.ts)

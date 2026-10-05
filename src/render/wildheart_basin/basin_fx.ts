@@ -562,6 +562,8 @@ export class WildheartFx {
         this.gorgebloom?.handleEvent(ev, src);
         return this.boss?.handleEvent(ev, src) ?? false;
       case WILDHEART_TOTEM_PULSE: {
+        // The totem's own flare (its Pulse clip) under the ring.
+        this.playGesture?.(src.id, WILDHEART_TOTEM_PULSE);
         this.ring('pulse', x, z, 0xb8e070);
         this.puff(x, gy + 1.5, z, 10, {
           speed: 1.2,

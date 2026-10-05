@@ -30,6 +30,7 @@ import {
   SPORE_TOAD_ID,
   STALKER_ID,
   SUNBONE_DREAD_TOTEM_ID,
+  SUNBONE_TOTEM_ID,
   VINE_LASHER_ID,
 } from '../../sim/encounters/wildheart_basin/ids';
 import { inLane } from '../../sim/mob/trash_kit/lane';
@@ -48,11 +49,14 @@ import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core'
 import { shockRingLook } from './basin_boss_fx_core';
 import { basinTelegraphSpecs } from './basin_fx_core';
 import {
+  DREAD_TOTEM_MODEL,
   RAPTOR_MODEL,
   RAPTOR_SIM_SCALE,
+  SUN_TOTEM_MODEL,
   TOAD_CLIP,
   TOAD_MODEL,
   TOAD_SIM_SCALE,
+  TOTEM_SIM_SCALE,
   trashLookHeight,
 } from './basin_trash_model_core';
 
@@ -93,6 +97,17 @@ export const RAPTOR_PACK_FRENZY_AURA = 'pack_frenzy';
 /** The gesture a raptor flying into its Pack Frenzy plays (its Screech clip;
  *  a key of its look's attackByAbility, never a sim ability id). */
 export const RAPTOR_FRENZY_GESTURE = 'wildheart_raptor_frenzy';
+
+/** The gesture a freshly planted Sunbone totem rises out of the ground with
+ *  (its Rise clip, the look's entranceGesture), offered for this many seconds
+ *  after the totem is first seen so a view built a little late still rises. */
+export const TOTEM_RISE_GESTURE = 'wildheart_totem_rise';
+export const TOTEM_RISE_WINDOW = 0.5;
+
+/** Is this template one of the Totem-Binder's totems? */
+export function isSunboneTotem(templateId: string): boolean {
+  return templateId === SUNBONE_TOTEM_ID || templateId === SUNBONE_DREAD_TOTEM_ID;
+}
 
 /** The name the Snarlvine Lasher's thorns carry on their damage event. */
 export const SNARLBARK_ABILITY = HUNT_TUNING.snarlbark?.name ?? 'Snarlbark';
@@ -237,7 +252,8 @@ export const TRASH_BODY_HEIGHT: Readonly<Record<string, number>> = {
   [RAVAGER_ID]: 2.7,
   [HEXCALLER_ID]: 2.5,
   [SPORE_TOAD_ID]: trashLookHeight(TOAD_MODEL, TOAD_SIM_SCALE),
-  [SUNBONE_DREAD_TOTEM_ID]: 4,
+  [SUNBONE_DREAD_TOTEM_ID]: trashLookHeight(DREAD_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  [SUNBONE_TOTEM_ID]: trashLookHeight(SUN_TOTEM_MODEL, TOTEM_SIM_SCALE),
 };
 /** A player's drawn height (yards at scale 1). */
 const PLAYER_HEIGHT = 2.6;

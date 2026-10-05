@@ -527,6 +527,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/wildheart_stalker.glb": "/media/models/creatures/wildheart_stalker.7b999b51c99b.glb",
   "models/creatures/wildheart_stalker_ability_anims.glb": "/media/models/creatures/wildheart_stalker_ability_anims.00aa5fcf9966.glb",
   "models/creatures/wildheart_stalker_hit_variety_anims.glb": "/media/models/creatures/wildheart_stalker_hit_variety_anims.8c8e61caf62f.glb",
+  "models/creatures/wildheart_sunbone_dread_totem.glb": "/media/models/creatures/wildheart_sunbone_dread_totem.5bc1133fc0d5.glb",
+  "models/creatures/wildheart_sunbone_totem.glb": "/media/models/creatures/wildheart_sunbone_totem.e04fce1afdac.glb",
   "models/creatures/wildheart_thorn_sprout.glb": "/media/models/creatures/wildheart_thorn_sprout.90036bcb5169.glb",
   "models/creatures/wildheart_vine_lasher.glb": "/media/models/creatures/wildheart_vine_lasher.7ab19f5078fc.glb",
   "models/creatures/wolf.glb": "/media/models/creatures/wolf.9ae2ad8b2ab2.glb",

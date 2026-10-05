@@ -33,22 +33,30 @@ import {
   WILDHEART_ENTANGLING_LASH,
   WILDHEART_POUNCE,
   WILDHEART_QUARRY_MARK,
+  WILDHEART_RATTLING_DREAD,
   WILDHEART_SNARING_TONGUE,
   WILDHEART_TOAD_HEX,
+  WILDHEART_TOTEM_PULSE,
   WILDHEART_WAR_ROAR,
 } from '../../sim/mob/trash_kit/wildheart_cast_ids';
 import {
   RAPTOR_FRENZY_GESTURE,
+  TOTEM_RISE_GESTURE,
   TRASH_CAST_CLIPS,
   trashCastClipRate,
+  trashCastSeconds,
 } from '../wildheart_basin/basin_trash_fx_core';
 import {
+  DREAD_TOTEM_MODEL,
+  dreadRattleRate,
   RAPTOR_MODEL,
   RAPTOR_SIM_SCALE,
   raptorPounceRate,
+  SUN_TOTEM_MODEL,
   TOAD_CLIP,
   TOAD_MODEL,
   TOAD_SIM_SCALE,
+  TOTEM_SIM_SCALE,
   trashLookHeight,
   trashLookHover,
 } from '../wildheart_basin/basin_trash_model_core';
@@ -366,13 +374,64 @@ export const WILDHEART_SPORE_TOAD_LOOK: VisualDef = {
   clickRadius: 2.2,
 };
 
-/** A carved prop that never moves: every clip lookup misses harmlessly. */
-const STATIC_TOTEM_CLIPS: ClipMap = {
+/** A totem never walks: its gaits stand creaking in place. */
+const TOTEM_CLIPS: ClipMap = {
   idle: 'Idle',
   walk: 'Idle',
   run: 'Idle',
-  attack: ['Idle'],
-  death: 'Idle',
+  attack: ['Hit'],
+  hit: ['Hit'],
+  death: 'Death',
+  entrance: 'Rise',
+};
+
+/** The Sunbone Totem (scripts/assets/wildheart_sunbone_totem, built in
+ *  Blender): a carved ironwood post of stacked jaguar faces on a root-bound
+ *  basalt plinth, crowned by a bone sun with a jaguar skull whose eyes burn
+ *  green-gold (its own emissive map), bone charms swinging from its crossbar.
+ *  6.6 yd at its 1.6. It rises out of the ground when the Binder plants it
+ *  (Rise, a gesture off basin_trash_fx.ts), flares on every mending pulse
+ *  (Pulse, off basin_fx.ts) and topples into the earth with its Binder. */
+export const WILDHEART_SUNBONE_TOTEM_LOOK: VisualDef = {
+  url: SUN_TOTEM_MODEL.url,
+  height: trashLookHeight(SUN_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  hover: trashLookHover(SUN_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  clips: {
+    ...TOTEM_CLIPS,
+    attackByAbility: { [WILDHEART_TOTEM_PULSE]: 'Pulse' },
+    attackTimeScaleByAbility: { [WILDHEART_TOTEM_PULSE]: 1 },
+  },
+  entranceGesture: TOTEM_RISE_GESTURE,
+  oneShotsHoldAttacks: ['Rise'],
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.4,
+};
+
+/** The Sunbone Dread Totem: the same post under a great tusked troll skull
+ *  washed in old blood, red light in its sockets, bone rattles on its bar.
+ *  6.4 yd at its 1.6. Its Rattling Dread plays Rattle over the 2 s bar (the
+ *  jaw chattering harder and harder, the scream landing on the bar's end). */
+export const WILDHEART_SUNBONE_DREAD_TOTEM_LOOK: VisualDef = {
+  url: DREAD_TOTEM_MODEL.url,
+  height: trashLookHeight(DREAD_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  hover: trashLookHover(DREAD_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  clips: {
+    ...TOTEM_CLIPS,
+    cast: 'Rattle',
+    castByAbility: { [WILDHEART_RATTLING_DREAD]: 'Rattle' },
+    castTimeScaleByAbility: {
+      [WILDHEART_RATTLING_DREAD]: dreadRattleRate(trashCastSeconds(WILDHEART_RATTLING_DREAD)),
+    },
+    castPlayOut: ['Rattle'],
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  entranceGesture: TOTEM_RISE_GESTURE,
+  oneShotsHoldAttacks: ['Rise'],
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.4,
 };
 
 /** [base visual key, tint, tint strength, height factor over the base, extra]. */
@@ -510,25 +569,8 @@ export function wildheartPlaceholderLooks(
     attackTimeScale: 1.15,
     clickRadius: 1.4,
   };
-  // The Sunbone Totem: the shipped carved mask totem as a stationary prop
-  // (about 6.4 yd at its 1.6), its bone and ochre kept, a faint inner glow.
-  out.wildheart_sunbone_totem = {
-    url: 'models/props/wildheart_mask_totem.glb',
-    height: 4,
-    clips: STATIC_TOTEM_CLIPS,
-    authoredAtlas: true,
-    selfIllumination: 0.18,
-    clickRadius: 1.4,
-  };
-  // The Sunbone Dread Totem: the same carved post washed in old blood, its
-  // bone darkened and its paint glowing red (the fx crown it with the
-  // red-painted skull, basin_trash_fx.ts).
-  out.wildheart_sunbone_dread_totem = {
-    ...out.wildheart_sunbone_totem,
-    tint: 0x7a1c16,
-    tintStrength: 0.42,
-    selfIllumination: 0.3,
-  };
+  out.wildheart_sunbone_totem = WILDHEART_SUNBONE_TOTEM_LOOK;
+  out.wildheart_sunbone_dread_totem = WILDHEART_SUNBONE_DREAD_TOTEM_LOOK;
   return out;
 }
 

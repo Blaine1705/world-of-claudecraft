@@ -271,11 +271,6 @@ const CLIPLESS_RIGS = new Set([
   'mob_duskwisp',
   'mob_spider_egg_sac',
   'mob_healing_tide_totem',
-  // The Wildheart Basin's Sunbone Totem: the shipped carved mask totem as a
-  // stationary prop mob (wildheart_creature_looks.ts), no rig to lose.
-  'wildheart_sunbone_totem',
-  // Its Sunbone Dread Totem: the same carved post, washed in old blood.
-  'wildheart_sunbone_dread_totem',
   // The Gravewyrm Sanctum's Soul Brazier: the shipped infernal brazier as a
   // stationary prop mob (sanctum_creature_looks.ts), its fire drawn by the fx.
   'sanctum_soul_brazier',

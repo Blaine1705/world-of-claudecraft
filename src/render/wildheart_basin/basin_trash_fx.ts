@@ -64,6 +64,7 @@ import {
   dreadSkullLookInto,
   frenzyGlow,
   HEX_BOLT_SPEED,
+  isSunboneTotem,
   KICK_GLYPH_RADIUS,
   projectileFlight,
   type QuarryMarkLook,
@@ -76,6 +77,8 @@ import {
   THROW_HAND,
   TONGUE_RETRACT_SECONDS,
   TONGUE_SHOOT_SECONDS,
+  TOTEM_RISE_GESTURE,
+  TOTEM_RISE_WINDOW,
   TRASH_ACCENTS,
   TRASH_FX_POOLS,
   TRASH_SHOCKS,
@@ -200,6 +203,10 @@ export class BasinTrashFx {
   /** Raptors running a forced target down (resolved at the scan's end). */
   private readonly chasers: number[] = [];
   /** The toaded players of the last scan and of this one (a drop breaks). */
+  /** Totems just planted: their Rise is offered until `until` (fixed slots). */
+  private readonly rising = Array.from({ length: 8 }, () => ({ id: -1, until: -1 }));
+  private totemsSeen: number[] = [];
+  private totemsNext: number[] = [];
   private toads: number[] = [];
   private toadsNext: number[] = [];
   private readonly caught: number[] = [];
@@ -718,6 +725,7 @@ export class BasinTrashFx {
   beginScan(): void {
     this.chasers.length = 0;
     this.toadsNext.length = 0;
+    this.totemsNext.length = 0;
   }
 
   /** Claim what this entity needs; true when it is the hunt at work. */
@@ -745,6 +753,10 @@ export class BasinTrashFx {
     if (e.templateId === SUNBONE_DREAD_TOTEM_ID) {
       this.claimSkull(e);
       hunt = true;
+    }
+    if (isSunboneTotem(e.templateId)) {
+      this.totemsNext.push(e.id);
+      if (!this.totemsSeen.includes(e.id)) this.riseTotem(e.id);
     }
     if (e.templateId === BASIN_RAPTOR_ID && e.forcedTargetId !== null) this.chasers.push(e.id);
     const castId = e.castingAbility;
@@ -775,6 +787,17 @@ export class BasinTrashFx {
     const prev = this.toads;
     this.toads = this.toadsNext;
     this.toadsNext = prev;
+    const seen = this.totemsSeen;
+    this.totemsSeen = this.totemsNext;
+    this.totemsNext = seen;
+    // A totem just planted rises out of the ground (offered a few times, in
+    // case its view is built a beat late; the rig plays it once).
+    for (const r of this.rising) {
+      if (r.until < this.clock) continue;
+      const e = this.world.entities.get(r.id);
+      if (!e || e.dead) r.until = -1;
+      else this.playGesture?.(r.id, TOTEM_RISE_GESTURE);
+    }
   }
 
   // The 10 Hz scan's claims: plain loops (no closure per entity per scan).
@@ -840,6 +863,13 @@ export class BasinTrashFx {
     f.glow.visible = true;
     // The chasers keep the floor to the quarry's rakes; the frenzied pool red.
     f.pool.visible = kind !== 'hunt';
+  }
+
+  private riseTotem(id: number): void {
+    const slot = this.rising.find((r) => r.until < this.clock) ?? this.rising[0];
+    slot.id = id;
+    slot.until = this.clock + TOTEM_RISE_WINDOW;
+    this.playGesture?.(id, TOTEM_RISE_GESTURE);
   }
 
   private claimSkull(e: Entity): void {

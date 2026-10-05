@@ -205,15 +205,13 @@ describe('the hunt bodies and clips', () => {
     }
   });
 
-  it('gives the Dread Totem its own look on the Sunbone Totem body', () => {
+  it('gives the Dread Totem its own body beside the Sunbone Totem', () => {
     const key = WILDHEART_MOB_KEYS[SUNBONE_DREAD_TOTEM_ID];
     expect(key).toBe('wildheart_sunbone_dread_totem');
     const dread = VISUALS[key];
     const totem = VISUALS.wildheart_sunbone_totem;
-    expect(dread?.url).toBe(totem?.url);
-    expect(dread?.tint).toBeTypeOf('number');
-    expect(dread?.tint).not.toBe(totem?.tint);
-    expect(dread?.selfIllumination ?? 0).toBeGreaterThan(totem?.selfIllumination ?? 0);
+    expect(dread?.url).not.toBe(totem?.url);
+    expect(dread?.clips.castByAbility?.[WILDHEART_RATTLING_DREAD]).toBe('Rattle');
   });
 
   it('plays each hunt cast on an existing clip, fitted to the sim bar', () => {

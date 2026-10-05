@@ -79,6 +79,45 @@ export const TOAD_CLIP = {
   flat: 1.45 + KEY_LEAD,
 } as const;
 
+/** The Sunbone totems' sim scale (both templates, sim/content/wildheart.ts). */
+export const TOTEM_SIM_SCALE = 1.6;
+
+/** The Sunbone Totem (its bone sun and jaguar skull) and the Dread Totem (its
+ *  tusked red skull): one carved post, rigged so it rises out of the ground,
+ *  flares and rattles. */
+export const SUN_TOTEM_MODEL = {
+  url: 'models/creatures/wildheart_sunbone_totem.glb',
+  /** The Idle pose's skinned bounds: the plinth to the sun's top rays. */
+  idleMin: -0.013,
+  idleTop: 6.608,
+} as const;
+
+export const DREAD_TOTEM_MODEL = {
+  url: 'models/creatures/wildheart_sunbone_dread_totem.glb',
+  /** The Idle pose's skinned bounds: the plinth to the plume tips. */
+  idleMin: -0.013,
+  idleTop: 6.364,
+} as const;
+
+export const TOTEM_CLIP = {
+  /** Rise (its entrance, the Binder's Plant Totem just landed): out of the
+   *  ground at 0.62, still by 1.40. */
+  riseUp: 0.62 + KEY_LEAD,
+  riseLength: 34 / 24 + KEY_LEAD,
+  /** Pulse (the mending, every 2 s): the flare peaks at 0.30. */
+  pulsePeak: 0.3 + KEY_LEAD,
+  /** Rattle (the Rattling Dread's 2 s bar): the scream on the bar's end, 2.00. */
+  rattleScream: 2.0 + KEY_LEAD,
+  /** Death: down at 1.00, under the ground by 2.20. */
+  deathDown: 1.0 + KEY_LEAD,
+} as const;
+
+/** The Rattle's rate over the Rattling Dread's bar (its scream on the bar's
+ *  end; the bar is the dread kit's own, sim/content/wildheart.ts). */
+export function dreadRattleRate(bar: number): number {
+  return bar > 0 ? TOTEM_CLIP.rattleScream / bar : 1;
+}
+
 /** The Pounce's rate: its feet strike on the last tick of the sim's flight
  *  (`seconds`, the leap kit's own). */
 export function raptorPounceRate(seconds: number): number {
