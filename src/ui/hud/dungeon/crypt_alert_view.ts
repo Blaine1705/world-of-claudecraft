@@ -36,6 +36,7 @@
 
 import {
   KNELL_HALF_MARK_TEMPLATE,
+  KNELL_TUNING,
   KNELLWYRM_KNELL_MARK,
   RITE_RING,
 } from '../../../sim/encounters/hollow_crypt/ids';
@@ -127,7 +128,7 @@ export interface CryptAlertEntity {
   kind?: string;
   templateId?: string;
   dead?: boolean;
-  pos?: { x: number; z: number };
+  pos?: { x: number; y?: number; z: number };
   facing?: number;
   scale?: number;
   auras?: readonly AlertAura[];
@@ -196,8 +197,15 @@ function dist(a: { x: number; z: number }, b: { x: number; z: number }): number 
  *  the side of the diameter its `facing` points to? The sim's inKnellHalf,
  *  measured off the object so it needs no instance origin (a yard of margin,
  *  erring toward telling). */
-export function inMarkedHalf(half: CryptAlertEntity, p: { x: number; z: number }): boolean {
+export function inMarkedHalf(
+  half: CryptAlertEntity,
+  p: { x: number; y?: number; z: number },
+): boolean {
   if (!half.pos) return false;
+  // Only the crag top burns (the sim's KNELL_TUNING.floorBand): the Choir Loft
+  // below the south rim is inside the reach on the map but far under the fire.
+  if (p.y !== undefined && half.pos.y !== undefined && p.y < half.pos.y - KNELL_TUNING.floorBand)
+    return false;
   const dx = p.x - half.pos.x;
   const dz = p.z - half.pos.z;
   if (Math.hypot(dx, dz) > (half.scale ?? 0) + REACH_MARGIN) return false;

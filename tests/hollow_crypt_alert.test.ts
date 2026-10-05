@@ -727,6 +727,13 @@ describe('the crypt alert view: the Rite Ring (pure)', () => {
     expect(inMarkedHalf(half, { x: 5, z: -16 })).toBe(false);
     // Past the reach nothing burns.
     expect(inMarkedHalf(half, { x: 0, z: 12 })).toBe(false);
+    // Far under the ring's floor (the Choir Loft below the rim): no warning.
+    if (half.pos) {
+      const floor = { ...half.pos, y: 24 };
+      const marked = { ...half, pos: floor };
+      expect(inMarkedHalf(marked, { x: 0, y: 24, z: -2 })).toBe(true);
+      expect(inMarkedHalf(marked, { x: 0, y: 5, z: -2 })).toBe(false);
+    }
     const wyrm: CryptAlertEntity = {
       castingAbility: KNELLWYRM_KNELL_MARK,
       castRemaining: 1.5,
