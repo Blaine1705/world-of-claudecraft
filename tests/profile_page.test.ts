@@ -200,7 +200,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 485 with the dungeon rework's 19 new relics (Sunken Bastion 5, Drowned
     // Temple 4, Wildheart Basin 5, Gravewyrm Sanctum 5), the same +19 as
     // reliquary_content.test.ts's pair.
-    expect(catalogTotal).toBe(485);
+    // 486 with the Witness of the Choir title's slot on the Horizons titles
+    // page (the Drowned Temple lore guide's deed, The Last Verse).
+    expect(catalogTotal).toBe(486);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });

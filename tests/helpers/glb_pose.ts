@@ -1,8 +1,15 @@
 // Read-only forward kinematics on a shipped, rigid-skinned GLB: where a point
 // modelled on one bone ends up in a clip's key poses. For pins on a creature's
-// held weapon or its head, straight off the binary the game loads.
+// held weapon or its head, straight off the binary the game loads. A shipped
+// GLB that went through the optimizer (meshopt-compressed, quantized) is
+// decoded first by `loadShippedGlbPoser`: its points then live in the
+// dequantized mesh space, the skin's inverse binds still carry them to world.
 
 import { readFileSync } from 'node:fs';
+import { NodeIO, VertexLayout } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { dequantize } from '@gltf-transform/functions';
+import { MeshoptDecoder } from 'meshoptimizer';
 
 type M4 = number[];
 
@@ -14,8 +21,15 @@ interface Gltf {
     rotation?: number[];
     scale?: number[];
   }[];
-  accessors: { bufferView: number; byteOffset?: number; count: number; type: string }[];
-  bufferViews: { byteOffset?: number }[];
+  accessors: {
+    bufferView: number;
+    byteOffset?: number;
+    count: number;
+    type: string;
+    componentType: number;
+    normalized?: boolean;
+  }[];
+  bufferViews: { byteOffset?: number; byteStride?: number }[];
   skins: { joints: number[]; inverseBindMatrices: number }[];
   meshes: { primitives: { attributes: { POSITION: number } }[] }[];
   animations: {
@@ -26,6 +40,15 @@ interface Gltf {
 }
 
 const WIDTH: Record<string, number> = { SCALAR: 1, VEC3: 3, VEC4: 4, MAT4: 16 };
+
+/** Component readers: floats raw, integers as glTF normalized values. */
+const COMPONENT: Record<number, { size: number; read: (b: Buffer, at: number) => number }> = {
+  5126: { size: 4, read: (b, at) => b.readFloatLE(at) },
+  5120: { size: 1, read: (b, at) => Math.max(b.readInt8(at) / 127, -1) },
+  5121: { size: 1, read: (b, at) => b.readUInt8(at) / 255 },
+  5122: { size: 2, read: (b, at) => Math.max(b.readInt16LE(at) / 32767, -1) },
+  5123: { size: 2, read: (b, at) => b.readUInt16LE(at) / 65535 },
+};
 
 function mul(a: M4, b: M4): M4 {
   const o = new Array(16).fill(0);
@@ -68,19 +91,41 @@ export interface GlbPoser {
   hasVertexNear(point: [number, number, number], tol: number): boolean;
 }
 
-export function loadGlbPoser(path: string): GlbPoser {
-  const buf = readFileSync(path);
+/** Decode a meshopt-compressed, quantized GLB into a plain float GLB first. */
+export async function loadShippedGlbPoser(path: string): Promise<GlbPoser> {
+  await MeshoptDecoder.ready;
+  const io = new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
+    .setVertexLayout(VertexLayout.SEPARATE);
+  const doc = await io.read(path);
+  await doc.transform(dequantize());
+  for (const ext of doc.getRoot().listExtensionsUsed()) {
+    const name = ext.extensionName;
+    if (name === 'EXT_meshopt_compression' || name === 'KHR_mesh_quantization') ext.dispose();
+  }
+  return loadGlbPoser(Buffer.from(await io.writeBinary(doc)));
+}
+
+export function loadGlbPoser(source: string | Buffer): GlbPoser {
+  const buf = typeof source === 'string' ? readFileSync(source) : source;
   const jsonLen = buf.readUInt32LE(12);
   const gl = JSON.parse(buf.subarray(20, 20 + jsonLen).toString('utf8')) as Gltf;
   const bin = 20 + jsonLen + 8;
   const accessor = (i: number): number[][] => {
     const a = gl.accessors[i];
     const n = WIDTH[a.type];
-    const off = bin + (gl.bufferViews[a.bufferView].byteOffset ?? 0) + (a.byteOffset ?? 0);
+    const kind = COMPONENT[a.componentType];
+    // Floats, or the normalized integers a quantized animation keeps.
+    if (!kind || (a.componentType !== 5126 && !a.normalized))
+      throw new Error(`accessor ${i} is neither float nor normalized`);
+    const view = gl.bufferViews[a.bufferView];
+    const stride = view.byteStride ?? n * kind.size;
+    const off = bin + (view.byteOffset ?? 0) + (a.byteOffset ?? 0);
     const out: number[][] = [];
     for (let k = 0; k < a.count; k++) {
       const v: number[] = [];
-      for (let j = 0; j < n; j++) v.push(buf.readFloatLE(off + (k * n + j) * 4));
+      for (let j = 0; j < n; j++) v.push(kind.read(buf, off + k * stride + j * kind.size));
       out.push(v);
     }
     return out;

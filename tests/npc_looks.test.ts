@@ -17,19 +17,35 @@ import {
 import {
   aldricKeepsHisRig,
   NPC_LOOKS,
+  NPC_OWN_BODY_IDS,
   NPC_PROP_SET_IDS,
   normalizeNpcAppearance,
   npcLookFor,
   npcModularKeyFor,
 } from '../src/render/characters/npc_looks';
 import { NPCS } from '../src/sim/data';
+import type { Entity } from '../src/sim/types';
 
 describe('npc looks roster', () => {
   it('covers every NpcDef id except Brother Aldric (every other world NPC composes)', () => {
     const missing = Object.keys(NPCS).filter(
-      (id) => !aldricKeepsHisRig(id) && npcLookFor(id) === null,
+      (id) => !aldricKeepsHisRig(id) && !NPC_OWN_BODY_IDS.has(id) && npcLookFor(id) === null,
     );
     expect(missing).toEqual([]);
+  });
+
+  // The NPCs with their own authored body (Laverock) keep it: no composed
+  // look, no roster entry a later edit could re-activate, and a real NPC
+  // whose visual key resolves to a shipped VisualDef.
+  it('keeps the own-body NPCs on their authored bodies', () => {
+    for (const id of NPC_OWN_BODY_IDS) {
+      expect(NPCS[id], id).toBeDefined();
+      expect(npcLookFor(id), id).toBeNull();
+      expect(Object.hasOwn(NPC_LOOKS, id), id).toBe(false);
+      const key = visualKeyFor({ kind: 'npc', templateId: id } as Entity);
+      expect(VISUALS[key], `${id} -> ${key}`).toBeDefined();
+      expect(key.startsWith('npc_modular_'), key).toBe(false);
+    }
   });
 
   // Brother Aldric renders the pre-v0.7 npc_aldric model on purpose (the

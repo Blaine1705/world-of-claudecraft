@@ -1396,7 +1396,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted for the five-dungeon rework (feature/drowned-temple-rework): its renderer
   // integrations moved the runtimeRender.renderer leaf. No capture was retaken.
-  '2fd30c9e6ce12f4a095e45128db20ae2567ede0add75746e84a9a6a114c70bcb';
+  // Re-minted for the Sunken Bastion and Drowned Temple encounter passes (the
+  // renderer leaf moved again). No capture was retaken.
+  '9e95e5cf0151c5c92144cd1c3079e14c9a8bb6225199c1f9eaaabfc98f42efab';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1421,7 +1423,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted for the five-dungeon rework (feature/drowned-temple-rework): its renderer
   // integrations moved the runtimeRender.renderer leaf. No capture was retaken.
-  'c1c0d84e172633171ca00bd1d10dd30c6120e69a0914c0fdcc6b9946e2c5770a';
+  // Re-minted for the Sunken Bastion and Drowned Temple encounter passes (the
+  // renderer leaf moved again). No capture was retaken.
+  'e179b7a2ebf3f21e4c6731d7d8e5caa9d9a5747cda1f462acfc63c83f537ba37';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2806,7 +2810,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Five-dungeon rework (feature/drowned-temple-rework): recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('dfd8678ac87eff1a0376db9bf05871206bc4295d62966418b4160155dda03f29');
+    ).toBe('993dfafd6302bb8482807e2d102ce8e3fbc41f2600bfb5aa3cfd8fed7d7ec143');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

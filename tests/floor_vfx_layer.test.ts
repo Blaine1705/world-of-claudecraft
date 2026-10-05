@@ -77,10 +77,11 @@ interface FloorVfxModule {
   alsoNames?: readonly FloorVfxLayer[];
   /**
    * Strict modules take EVERY renderOrder from the seam (no bare integer
-   * literal survives). The two non-strict ones are large files whose floor
-   * pieces are layered while their unrelated meshes keep their own orders
-   * (renderer.ts: the god-ray sprites; ignivar_fire_vfx.ts: the projectile and
-   * impact pieces around its ground-fire AoE).
+   * literal survives). The non-strict ones layer their floor pieces while
+   * their unrelated, standing or airborne meshes keep their own orders (each
+   * entry's comment names them: renderer.ts's god-ray sprites,
+   * ignivar_fire_vfx.ts's projectile and impact pieces, the Bastion rain's
+   * streaks, the Hydra's ice wall, the Moonbridge's beam).
    */
   strict: boolean;
 }
@@ -131,17 +132,24 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // rim and the floor waves under the kit's rings, and the bubbles, threads,
   // eyes and arcs in the air above every floor mark, all on the encounter band.
   { file: 'src/render/drowned_temple/temple_trash_fx.ts', layer: 'encounter', strict: true },
-  // The Temple encounter pass's floor marks on the encounter band: the
-  // Combined Breath's currents, frost and lee marks, and the Moonbridge's
-  // landing ring. Non-strict: the Ice Wall and the Rime crystals (standing
-  // solids) and the Moonbridge's beam (core, sheath, front, prism) stand up
-  // off the floor on their own orders.
+  // The Mere Hydra's Combined Breath: the frozen lane, the wall's frosted foot
+  // and lee shimmer, the venom arrows and the rime crystals' rings lie on the
+  // floor in the encounter band (they are actionable: where not to stand,
+  // where to hide). The ice wall and the crystals themselves are solid,
+  // depth-writing bodies standing up from the floor and keep their own order.
   {
     file: 'src/render/drowned_temple/temple_hydra_combo_fx.ts',
     layer: 'encounter',
     strict: false,
   },
-  { file: 'src/render/drowned_temple/temple_moonbridge_fx.ts', layer: 'encounter', strict: false },
+  // The Moonbridge forming: the beam's landing ring lies on the Altar Landing
+  // in the encounter band; the beam itself (core, sheath, racing front star
+  // and the prism flare) runs through the air and keeps its own orders.
+  {
+    file: 'src/render/drowned_temple/temple_moonbridge_fx.ts',
+    layer: 'encounter',
+    strict: false,
+  },
   // The Wildheart Basin's brazier pools on its floors (the world's own light).
   { file: 'src/render/wildheart_basin/basin_lights.ts', layer: 'ground', strict: true },
   // The spirit light pooled on the jaguar maw's jaw once the way out opens.

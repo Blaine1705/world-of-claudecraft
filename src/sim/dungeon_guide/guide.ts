@@ -94,13 +94,20 @@ interface ClaimView {
   bosses: Map<string, Entity>;
 }
 
-function bossIdsOf(def: DungeonGuideDef): Set<string> {
+/** The boss templates a guide watches, built once per record (a static
+ *  table read every tick, so it is never rebuilt per tick). */
+const BOSS_IDS = new WeakMap<DungeonGuideDef, ReadonlySet<string>>();
+
+function bossIdsOf(def: DungeonGuideDef): ReadonlySet<string> {
+  const cached = BOSS_IDS.get(def);
+  if (cached) return cached;
   const ids = new Set<string>([def.offerClosesOn, ...def.bossIds, ...def.finale.bossIds]);
   for (const line of def.lines) {
     if (line.beforeBoss) ids.add(line.beforeBoss);
     if (line.trigger.kind === 'bossNear') ids.add(line.trigger.bossId);
     if (line.trigger.kind === 'bossDead') for (const b of line.trigger.bossIds) ids.add(b);
   }
+  BOSS_IDS.set(def, ids);
   return ids;
 }
 

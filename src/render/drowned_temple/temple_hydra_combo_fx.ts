@@ -133,8 +133,8 @@ void main() {
   float x = vUv.x;
   float y = abs(vUv.y - 0.5) * 2.0;
   vec3 col = mix(uColA, uColB, smoothstep(0.2, 0.8, x));
-  float waveA = pow(0.5 + 0.5 * sin(x * 18.0 - uTime * 7.0), 6.0) * (1.0 - x);
-  float waveB = pow(0.5 + 0.5 * sin(x * 18.0 + uTime * 7.0), 6.0) * x;
+  float waveA = pow(max(0.5 + 0.5 * sin(x * 18.0 - uTime * 7.0), 0.0), 6.0) * (1.0 - x);
+  float waveB = pow(max(0.5 + 0.5 * sin(x * 18.0 + uTime * 7.0), 0.0), 6.0) * x;
   float core = 1.0 - smoothstep(0.0, 0.55, y);
   float edge = smoothstep(0.75, 0.95, y) * (1.0 - smoothstep(0.95, 1.0, y));
   float n = vnoise(vec2(x * 22.0 - uTime * 3.0, y * 4.0 + uTime));
@@ -164,7 +164,7 @@ void main() {
   float a = atan(p.y, p.x) + uPhase;
   float side = 0.5 + 0.5 * sin(a);
   vec3 col = mix(uColA, uColB, smoothstep(0.35, 0.65, side));
-  float spark = pow(0.5 + 0.5 * sin(a * 6.0 - uTime * 9.0), 8.0);
+  float spark = pow(max(0.5 + 0.5 * sin(a * 6.0 - uTime * 9.0), 0.0), 8.0);
   float alpha = band * (0.55 + 0.45 * uFill + spark * 0.6);
   gl_FragColor = vec4(col * (1.2 + spark) * alpha * uFade, alpha * uFade);
 }
@@ -200,7 +200,7 @@ ${NOISE}
 void main() {
   vec3 n = normalize(vN);
   vec3 v = normalize(cameraPosition - vW);
-  float fres = pow(1.0 - abs(dot(n, v)), 2.4);
+  float fres = pow(max(1.0 - abs(dot(n, v)), 0.0), 2.4);
   vec3 moon = normalize(vec3(-0.14, 0.62, 0.77));
   float lam = 0.35 + 0.65 * max(dot(n, moon), 0.0);
   float h = clamp(vH / uHeight, 0.0, 1.0);
@@ -209,7 +209,7 @@ void main() {
   vec3 base = mix(deep, pale, smoothstep(0.0, 1.0, h));
   float streak = vnoise(vec2((vW.x + vW.z) * 0.55, vW.y * 1.7 - uTime * 0.35));
   float vein = 1.0 - smoothstep(0.0, 0.07, abs(vnoise(vec2(vW.x * 0.9 - vW.z * 0.4, vW.y * 0.8)) - 0.5));
-  vec3 inner = vec3(0.7, 0.92, 1.0) * (pow(streak, 3.0) * 1.3 + vein * 0.9);
+  vec3 inner = vec3(0.7, 0.92, 1.0) * (pow(max(streak, 0.0), 3.0) * 1.3 + vein * 0.9);
   vec3 col = base * lam + inner * 0.55 + vec3(0.85, 0.95, 1.0) * fres * 1.1;
   col += vec3(0.55, 0.95, 1.0) * uLee * (0.35 + 0.35 * sin(uTime * 4.0 + vW.y));
   col = mix(col, vec3(1.0), uFlash * 0.85);
@@ -232,7 +232,7 @@ void main() {
   float along = abs(vUv.y - 0.5) * 2.0;
   float body = (1.0 - smoothstep(0.2, 1.0, across)) * (1.0 - smoothstep(0.85, 1.0, along));
   float n = vnoise(vUv * vec2(9.0, 60.0));
-  float sparkle = pow(vnoise(vUv * vec2(40.0, 260.0) + uTime * 0.4), 12.0) * 3.0;
+  float sparkle = pow(max(vnoise(vUv * vec2(40.0, 260.0) + uTime * 0.4), 0.0), 12.0) * 3.0;
   vec3 col = vec3(0.65, 0.88, 1.0) * (0.45 + 0.55 * n) + vec3(1.0) * sparkle;
   gl_FragColor = vec4(col * body * uAlpha, body * uAlpha);
 }
@@ -273,7 +273,7 @@ void main() {
   float shaft = 1.0 - smoothstep(0.3, 0.4, x);
   float head = step(0.7, t) * (1.0 - smoothstep(-0.04, 0.04, x - (1.0 - t) * 3.3));
   float body = max(shaft * step(t, 0.72), head);
-  float chev = pow(fract(t * 5.0 - x * 0.6 - uTime * 1.6), 3.0);
+  float chev = pow(max(fract(t * 5.0 - x * 0.6 - uTime * 1.6), 0.0), 3.0);
   float foam = vnoise(vec2(x * 6.0, y * 14.0 - uTime * 3.0));
   vec3 col = mix(vec3(0.3, 0.85, 0.35), vec3(0.85, 1.0, 0.8), chev * 0.7 + foam * 0.3);
   float a = body * (0.4 + 0.6 * chev + 0.2 * foam) * uAlpha;
@@ -297,7 +297,7 @@ varying float vH;
 void main() {
   vec3 n = normalize(vN);
   vec3 v = normalize(cameraPosition - vW);
-  float fres = pow(1.0 - abs(dot(n, v)), 2.0);
+  float fres = pow(max(1.0 - abs(dot(n, v)), 0.0), 2.0);
   float h = clamp(vH / uHeight, 0.0, 1.0);
   float lam = 0.4 + 0.6 * max(dot(n, normalize(vec3(-0.14, 0.62, 0.77))), 0.0);
   vec3 base = mix(vec3(0.05, 0.32, 0.12), vec3(0.55, 1.0, 0.55), h);

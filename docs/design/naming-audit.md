@@ -772,6 +772,53 @@ manta body (display only; the id `pearlguard_sentinel` is frozen).
 | Wing Buffet | REJECTED before shipping | A World of Warcraft dragon attack. The manta's slam is the Tidal Wingbeat. |
 | Lunar Glide, Tidal Wingbeat, Nacre Cocoon | the manta's three moves | KEEP. No match for the full names ("Wingbeat" alone is a plain English word). |
 | The Moonbridge Rises | the banner as the Moonbridge forms | KEEP. Plain English over the dungeon's own place name. |
+| Combined Breath | the Mere Hydra's umbrella mechanic, the bar every head pours into (re-checked 2026-10-05 with the sources listed under the Sunken Bastion encounter pass below) | KEEP. No match as a name on any wiki searched or on Wowhead. The one warcraft.wiki.gg hit is quest prose (Wrathion and Sabellian "using their combined breath attacks"). |
+| Moonlight Tears | the plural of the Moonlight Tear row above (re-checked 2026-10-05) | KEEP. No match as a name on Wowhead or the wikis. The UESP hits are Elder Scrolls lore prose (Azurah's realm "formed of the moonlight tears she shed"), a description, not a named thing. |
+
+### The Sunken Bastion encounter pass (web-verified 2026-10-05)
+
+Knight-Commander Olen's new kit (`src/sim/encounters/sunken_bastion/olen.ts`), Vael the
+Fogbinder's new beats (`vael.ts`, `vael_intro.ts`, `vael_veil_gather.ts`) and the Drowning
+Yard's posts in Gaoler Ossick's fight (`src/sim/content/sunken_bastion.ts`).
+
+Sources, for this table and the Laverock table below: quoted exact-phrase searches through
+the search APIs of warcraft.wiki.gg, Wowpedia, the Guild Wars and Guild Wars 2 wikis, the
+EverQuest II wiki, the Project 1999 EverQuest wiki (plus a page-title lookup on the EverQuest
+fandom wiki, whose full-text search returns nothing for any query), the RuneScape and Old
+School RuneScape wikis, the LOTRO fandom wiki, UESP (every namespace), both FFXIV wikis
+(Console Games Wiki and Gamer Escape), the Diablo and Path of Exile fandom wikis, the
+Hearthstone wiki and the MTG wiki; Wowhead's own search index (it lists NPC spells no wiki
+has a page for); Scryfall for Magic card names. Not reachable this pass: lotro-wiki.com and
+poewiki.net (both behind a bot-verification wall); a general web search was not available, so
+this pass is wiki and database only.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Hallowed Brine | Olen's pool cast and the pool | KEEP. No match on any source; plain English pair. |
+| Brine-Hallowed | Olen's shield aura while he stands in his own pool | KEEP. No match, hyphenated or spaced. |
+| Rebounding Bulwark | Olen's shield throw that bounces between players | KEEP. No match. Nearest is this game's own shaman option Rebounding Current, a different noun. |
+| Sentence of the Tide | Olen's strike on a marked player | KEEP. No match. |
+| Unbroken Oath | Olen's once-a-fight kneel and bubble vigil | KEEP. No external match on any source, Wowhead and Scryfall included; the nearest is WoW dialogue ("By my unbroken oaths", The Tabiqa), not a name. INTERNAL REUSE: the same English is already this game's Warfare PvP set proc and its aura (`set_warfare_unbroken_oath` in `src/sim/content/item_sets.ts`, `aura.unbrokenOath` in `src/ui/sim_i18n.ts`). Olen's aura has its own key (`aura.bastionUnbrokenOath`), but the two now show one English name, and the matcher's reverse map sends that literal to the PvP key. Not an IP issue; recorded so the maintainer can decide whether two different things should share a name. |
+| Breached | Olen's stun once the bubble breaks | KEEP. A single common English word (the precedent of Crushed and Staggered). Other games use it only inside longer names: WoW's The Breached Ossuary, Bracers of Breached Integrity and Time-Breached Waistband, Guild Wars 2's The Breached Wall, Diablo's The Breached Keep. |
+| Gathering Fog | Vael's bar while he draws the fog into the crown | KEEP. No match as a name. The MTG wiki hits are prose on its Fog card pages. |
+| Death Rises | Vael's rise out of the fog | KEEP. No match as a name. The warcraft.wiki.gg hits are boss yells that contain the plain sentence (Lord Magmathar, Mistress Sassz'ine). |
+| Into the Fog | Vael's sink into the fog | KEEP, borderline, recorded for the reviewer. A stock English phrase (books, films, songs), not a coined term, and no wiki has a page by that name. But Wowhead lists "Into the Fog" as a World of Warcraft quest storyline in The Ringing Deeps (The War Within, also a criterion of the Sojourner of The Ringing Deeps achievement). Different role (a quest storyline, ours a boss cast bar), so it clears the bar; it is closer than most keeps here (compare Tears of the Moon above, a WoW quest title swapped while it was still free to change). The nearest WoW mechanic, Admiral Ripsnarl retreating into the fog in the Deadmines, is named The Fog. |
+| Shrouded | Vael's untouchable aura in his intro and over the Gathering Fog | KEEP. A single common English word. Wowhead lists bare "Shrouded" as several WoW NPC spells and a Shadowlands Mythic+ affix; under the same precedent as Constricted and Cocooned a lone common word is shared vocabulary, never a collision. |
+| Beacon-Lit | the tell on the real Vael when the Fogbeacon's beam finds him | KEEP. No match as a name; the wiki hits are prose ("keep the beacon lit"). |
+| Hollow Shade | the tell on a fog shade the beam passes through | KEEP. No match for the two-word name. Nearest is Hollowshade Moor, an EverQuest zone: one coined compound word, a place, so a different form and role. |
+| Mooring Post | the Drowning Yard's lit safe points in Gaoler Ossick's fight | KEEP. Plain English for the real object. Nearest is Broken Mooring Post, a grey World of Warcraft mace. |
+
+### The Drowned Temple lore guide, Laverock (web-verified 2026-10-05)
+
+Laverock and his deed (`src/sim/content/drowned_temple_cantor.ts`, `src/sim/content/deeds.ts`),
+checked against the sources listed for the Sunken Bastion encounter pass above.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Laverock | the Temple's optional lore guide NPC | KEEP. No hit on any wiki searched, on Wowhead or on Scryfall. "Laverock" is a real Scots and northern English dialect word for the skylark (and a British surname), so it is shared English, not a coined token. The LOTRO check is PARTIAL: lotro-wiki.com was NOT reachable (a bot-verification wall on its search page, its article URL and its API, retried this pass); the LOTRO fandom wiki was reachable and has no hit. LOTRO leans on English dialect words, so lotro-wiki.com is the one source still worth a manual look. |
+| Last Cantor of the Pale Choir | his NPC title | KEEP. No match for the full title, for "Last Cantor" or for "Pale Choir". "Cantor" is a real word; the one near hit is ESO dialogue on UESP ("Sing, Cantor"), not a name. |
+| The Last Verse | his deed, and his finale song cast | KEEP. No match as a name on any wiki, on Wowhead or on Scryfall. Every hit is prose about the final verse of an in-game poem or song (WoW quest text, Skyrim and ESO lore and dialogue, a RuneScape song page). |
+| Witness of the Choir | the title the deed grants | KEEP. No match. |
 
 ### The Gravewyrm Sanctum trash mechanics pass (web-verified 2026-10-04)
 

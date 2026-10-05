@@ -103,7 +103,7 @@ ${NOISE}
 void main() {
   float rim = 1.0 - abs(vNormalV.z);
   float swirl = vnoise(vec2(vUv.x * 12.0 + uTime * 3.0, vUv.y * 6.0 - uTime * 2.0));
-  vec3 col = mix(vec3(0.35, 0.85, 1.0), vec3(0.95, 1.0, 1.0), pow(1.0 - rim, 2.0));
+  vec3 col = mix(vec3(0.35, 0.85, 1.0), vec3(0.95, 1.0, 1.0), pow(max(1.0 - rim, 0.0), 2.0));
   col += vec3(0.6, 0.95, 1.0) * swirl * rim;
   gl_FragColor = vec4(col, uAlpha * (0.45 + 0.55 * (1.0 - rim) + 0.4 * swirl * rim));
   #include <colorspace_fragment>
@@ -124,7 +124,7 @@ void main() {
   float face = abs(vNormalV.z);
   float streak = vnoise(vec2(vUv.x * 10.0, vUv.y * 18.0 - uTime * 22.0));
   vec3 col = mix(vec3(0.55, 0.95, 1.0), vec3(1.0), face);
-  gl_FragColor = vec4(col * (0.9 + 0.6 * streak + uFlare), uAlpha * pow(face, 2.0) * (0.45 + 0.55 * streak));
+  gl_FragColor = vec4(col * (0.9 + 0.6 * streak + uFlare), uAlpha * pow(max(face, 0.0), 2.0) * (0.45 + 0.55 * streak));
   #include <colorspace_fragment>
 }
 `;
@@ -147,7 +147,7 @@ void main() {
   col = mix(col, vec3(0.95, 1.0, 1.0), foam);
   // Transparent at the silhouette, torn into streaks: a torrent, not a tube.
   float tear = smoothstep(0.35, 0.75, n);
-  float a = uAlpha * pow(face, 1.6) * (0.06 + 0.5 * tear + 0.45 * foam);
+  float a = uAlpha * pow(max(face, 0.0), 1.6) * (0.06 + 0.5 * tear + 0.45 * foam);
   gl_FragColor = vec4(col * (1.0 + uFlare * 0.8), a);
   #include <colorspace_fragment>
 }
@@ -165,7 +165,7 @@ void main() {
   float m = vnoise(vec2(vUv.x * 14.0 - uTime * 0.8, vUv.y * 5.0 - uTime * 2.0));
   vec3 body = mix(vec3(0.02, 0.26, 0.4), vec3(0.18, 0.72, 0.86), vUv.y * (0.6 + 0.5 * m));
   // Moonlight caught in the face of the wave.
-  body += vec3(0.5, 0.85, 1.0) * pow(m, 4.0) * 0.8;
+  body += vec3(0.5, 0.85, 1.0) * pow(max(m, 0.0), 4.0) * 0.8;
   float crest = smoothstep(0.62, 0.95, vUv.y + (n - 0.5) * 0.35);
   vec3 col = mix(body, vec3(0.94, 0.99, 1.0), crest);
   float sides = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x);

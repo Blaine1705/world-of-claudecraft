@@ -214,7 +214,7 @@ float noise(vec2 p) {
 void main() {
   vec3 view = normalize(cameraPosition - vWorld);
   float fres = 1.0 - abs(dot(normalize(vNormalW), view));
-  fres = pow(fres, 2.2);
+  fres = pow(max(fres, 0.0), 2.2);
   float c1 = noise(vWorld.xz * 1.4 + vWorld.y * 1.1 + uTime * 0.6);
   float c2 = noise(vWorld.xy * 2.3 - uTime * 0.8);
   float caust = smoothstep(0.55, 0.62, c1) - smoothstep(0.62, 0.7, c1);

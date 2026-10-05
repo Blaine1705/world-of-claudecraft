@@ -39,12 +39,15 @@ import { ARMOR_RATING } from './heroic_loot';
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass'];
 const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
+// The repo's caster-weapon proficiency set (equipment_rules.ts, items.ts,
+// heroic_loot.ts): paladins wield caster staves too.
 const CASTER_WEAPON_CLASSES = [
   'mage',
   'priest',
   'warlock',
-  'druid',
   'shaman',
+  'paladin',
+  'druid',
 ] as ItemDef['requiredClass'];
 
 export const WILDHEART_BASIN_ITEMS: Record<string, ItemDef> = {

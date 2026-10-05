@@ -179,13 +179,13 @@ varying vec3 vLocal;
 ${NOISE}
 void main() {
   float facing = max(0.0, dot(normalize(vNormalV), normalize(vViewV)));
-  float rim = pow(1.0 - facing, 2.2);
+  float rim = pow(max(1.0 - facing, 0.0), 2.2);
   vec3 p = normalize(vLocal);
   float swirl = vnoise(vec2(atan(p.z, p.x) * 2.2 + p.y * 3.0, p.y * 4.0 + uTime * 0.6));
   float band = smoothstep(0.55, 0.9, swirl);
   vec3 col = mix(vec3(0.72, 0.84, 1.0), vec3(1.0), band);
   col += vec3(0.55, 0.9, 1.0) * rim * 1.4;
-  col *= 1.1 + 0.5 * pow(facing, 3.0);
+  col *= 1.1 + 0.5 * pow(max(facing, 0.0), 3.0);
   gl_FragColor = vec4(col, 0.85 + 0.15 * rim);
   #include <colorspace_fragment>
 }
@@ -243,8 +243,8 @@ varying vec3 vViewV;
 varying vec3 vLocal;
 void main() {
   float facing = max(0.0, dot(normalize(vNormalV), normalize(vViewV)));
-  float core = pow(facing, 2.5);
-  float rim = pow(1.0 - facing, 2.0);
+  float core = pow(max(facing, 0.0), 2.5);
+  float rim = pow(max(1.0 - facing, 0.0), 2.0);
   float shimmer = 0.85 + 0.15 * sin(uTime * 3.0 + vLocal.y * 4.0);
   float a = uAlpha * mix(rim, core, uCore) * shimmer;
   gl_FragColor = vec4(uColor, a);
@@ -273,7 +273,7 @@ void main() {
   float inside = gl_FrontFacing ? 0.0 : 1.0;
   vec3 nrm = normalize(vNormalV) * (gl_FrontFacing ? 1.0 : -1.0);
   float facing = max(0.0, dot(nrm, normalize(vViewV)));
-  float rim = pow(1.0 - facing, 1.8);
+  float rim = pow(max(1.0 - facing, 0.0), 1.8);
   float veil = mix(1.0, 0.22, inside);
   float lon = atan(p.z, p.x);
   float lat = asin(clamp(p.y, -1.0, 1.0));

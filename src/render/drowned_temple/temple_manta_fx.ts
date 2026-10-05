@@ -88,7 +88,7 @@ void main() {
   float a = atan(p.y, p.x);
   float wob = (vnoise(vec2(a * 6.0, uTime * 3.0)) - 0.5) * 0.04;
   float edge = uReach + wob;
-  float crest = exp(-pow((r - edge) * 26.0, 2.0));
+  float crest = exp(-pow(max((r - edge) * 26.0, 0.0), 2.0));
   float body = smoothstep(edge - 0.32, edge - 0.02, r) * (1.0 - smoothstep(edge - 0.02, edge + 0.02, r));
   float ripple = 0.5 + 0.5 * sin((r - uTime * 0.6) * 60.0);
   vec3 water = vec3(0.12, 0.62, 0.72) + vec3(0.25, 0.3, 0.25) * ripple * body;
@@ -125,7 +125,7 @@ varying vec3 vView;
 varying vec3 vLocal;
 ${NOISE}
 void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.2);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 2.2);
   vec3 p = normalize(vLocal);
   float lon = atan(p.z, p.x);
   float lat = p.y;

@@ -104,8 +104,11 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
     // one rather than by the number of prop sets. 48 since the five-dungeon
     // rework: its 11 new kaykit()/skeletonClips() bodies (the Hollow Crypt's
     // skeletons and crow caller, the Sunken Bastion's acolyte and Olen) each
-    // wire their own rig's donor, one literal apiece.
-    expect(occurrences).toBe(48);
+    // wire their own rig's donor, one literal apiece. 46 since the Sunken
+    // Bastion creature pass: the Tidebound Acolyte (mage donor) and Olen
+    // (skeleton warrior donor) became Blender-sculpted bodies with their own
+    // clips, so their two kaykit() donor literals left the manifest.
+    expect(occurrences).toBe(46);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).
