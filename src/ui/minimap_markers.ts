@@ -65,6 +65,7 @@ import {
   mapMarkerSemanticLayer,
 } from './map_marker_semantics_core';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from './map_navigation_landmarks_core';
+import { worldQuestReadsActive, worldQuestReadsCompleted } from './world_quest_progress_state';
 
 // The painter clips the 162px minimap two pixels inside the canvas. Visibility
 // is footprint-aware: a painted square must fit its full half-diagonal inside
@@ -744,7 +745,7 @@ export function createMinimapMarkers(): MinimapMarkers {
       for (const quest of worldQuests) {
         if (p.level < quest.minLevel) continue;
         const progress = world.worldQuestLog.get(quest.id);
-        if (progress?.state === 'completed') continue;
+        if (worldQuestReadsCompleted(progress)) continue;
         const isGlider = quest.objective.type === 'glider';
         const position = isGlider ? GLIDER_NPC_DEF.pos : quest.area;
         const dx = -(position.x - p.pos.x) * pxPerYard;
@@ -759,7 +760,7 @@ export function createMinimapMarkers(): MinimapMarkers {
           my: half + dz * scale,
           questId: quest.id,
           zoneId: quest.zoneId,
-          state: progress?.state === 'active' ? 'active' : 'available',
+          state: worldQuestReadsActive(progress) ? 'active' : 'available',
         });
       }
 

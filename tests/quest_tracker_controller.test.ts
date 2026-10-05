@@ -566,6 +566,21 @@ describe('QuestTrackerController', () => {
     expect(test.html()).toContain(`${worldQuestObjectiveLabel(questId)}: 4/${total}`);
   });
 
+  it('does not list a reward-free practice replay as an active world quest', () => {
+    const questId = 'wq_eastbrook_bandits';
+    const entry: WorldQuestProgress = {
+      questId,
+      count: 0,
+      state: 'active',
+      practiceOnly: true,
+    };
+    const test = harness([], [entry]);
+
+    test.controller.update(0);
+
+    expect(test.html()).not.toContain(worldQuestDisplayName(questId));
+  });
+
   it('collapses each section on its own header and persists it in its own setting', () => {
     const questId = 'wq_eastbrook_bandits';
     const test = harness([progress('q_wolves')], [{ questId, count: 1, state: 'active' }]);

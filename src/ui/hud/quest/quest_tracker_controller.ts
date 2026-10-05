@@ -14,6 +14,7 @@ import { type QuestTrackingState, sharedQuestTracking } from '../../quest_tracki
 import { forgeInstructionLines } from '../../world_quest_forge_view';
 import { gliderInstructionLines } from '../../world_quest_glider_view';
 import { investigationInstructionLines } from '../../world_quest_investigation_view';
+import { worldQuestReadsCompleted } from '../../world_quest_progress_state';
 import { shadowInstructionLines } from '../../world_quest_shadow_view';
 import { worldQuestTraceProgressInstruction } from '../../world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
@@ -178,7 +179,7 @@ export class QuestTrackerController {
         progress.glider?.phase === 'countdown' ||
         progress.glider?.phase === 'flying';
       const complete =
-        progress.state === 'completed' &&
+        worldQuestReadsCompleted(progress) &&
         !(progress.wispMaze && progress.wispMaze.phase !== 'won') &&
         progress.glider?.phase !== 'countdown' &&
         progress.glider?.phase !== 'flying';

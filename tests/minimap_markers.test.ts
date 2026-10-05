@@ -288,7 +288,7 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     );
   });
 
-  it('hides below-level, completed, inactive-rotation, and distant world quests', () => {
+  it('hides below-level, completed, practice replay, inactive-rotation, and distant world quests', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const world = makeWorld('sim') as unknown as {
       player: { level: number; pos: { x: number; z: number } };
@@ -308,6 +308,11 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     world.player.level = quest.minLevel;
     world.worldQuestLog = new Map([
       [quest.id, { questId: quest.id, count: quest.count, state: 'completed' }],
+    ]);
+    expect(worldQuestMarkers()).toEqual([]);
+
+    world.worldQuestLog = new Map([
+      [quest.id, { questId: quest.id, count: 0, state: 'active', practiceOnly: true }],
     ]);
     expect(worldQuestMarkers()).toEqual([]);
 

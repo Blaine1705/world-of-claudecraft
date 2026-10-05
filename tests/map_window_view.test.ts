@@ -1169,8 +1169,11 @@ describe('world-quest zone markers', () => {
     return found;
   })();
 
-  function progress(state: WorldQuestProgress['state']): Map<string, WorldQuestProgress> {
-    return new Map([[quest.id, { questId: quest.id, count: 2, state }]]);
+  function progress(
+    state: WorldQuestProgress['state'],
+    extras: Partial<WorldQuestProgress> = {},
+  ): Map<string, WorldQuestProgress> {
+    return new Map([[quest.id, { questId: quest.id, count: 2, state, ...extras }]]);
   }
 
   it('projects the daily objectives, including both Galecrest challenges', () => {
@@ -1231,6 +1234,19 @@ describe('world-quest zone markers', () => {
       input(makeOverworldWorld('sim', new Map(), quest.minLevel, progress('completed')), 1),
     );
     expect(completed.worldQuests).toEqual([]);
+
+    const practice = buildOverworldMapModel(
+      input(
+        makeOverworldWorld(
+          'sim',
+          new Map(),
+          quest.minLevel,
+          progress('active', { practiceOnly: true }),
+        ),
+        1,
+      ),
+    );
+    expect(practice.worldQuests).toEqual([]);
 
     const atQuest = (zoom: number) => {
       const world = makeOverworldWorld('sim', new Map(), quest.minLevel);

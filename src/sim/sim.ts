@@ -5466,8 +5466,8 @@ export class Sim {
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
       resolvePlayerMove: sim.resolveMove.bind(sim),
       resolveMove: sim.resolveMove.bind(sim),
-      // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
-      // through this seam binding (late-bound arrow so sim.ctx resolves at call time).
+      platformFor: (p) => ferryMod.ferryDeckPlatform(sim.ctx, p),
+      // P1a pet AI lives in src/sim/pet/pet_ai.ts; late-bound so sim.ctx resolves at call time.
       updatePet: (pet) => petAi.updatePet(sim.ctx, pet),
       isDelveCompanionMob: companionMod.isDelveCompanionMob,
       // I2c delve companion AI lives in src/sim/delves/companion.ts; locomotion.updateMob's

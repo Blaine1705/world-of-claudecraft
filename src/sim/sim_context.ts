@@ -13,6 +13,7 @@
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { AccountCosmetics } from '../world_api';
+import type { Collider } from './colliders';
 import type { FrozenOrbState } from './combat/frozen_orb';
 import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
@@ -853,6 +854,7 @@ export interface SimContextCallbacks {
     e: Entity,
     ignoreFences?: boolean,
   ): { x: number; z: number };
+  platformFor?(entity: Entity): readonly Collider[] | null;
   // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1 / M5) ---
   updatePet(pet: Entity): void;
   isDelveCompanionMob(mob: Entity): boolean;
@@ -1733,6 +1735,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     resolveMovePoint: host.resolveMovePoint,
     resolvePlayerMove: host.resolvePlayerMove,
     resolveMove: host.resolveMove,
+    ...(host.platformFor ? { platformFor: host.platformFor } : {}),
     updatePet: host.updatePet,
     isDelveCompanionMob: host.isDelveCompanionMob,
     updateDelveCompanion: host.updateDelveCompanion,
