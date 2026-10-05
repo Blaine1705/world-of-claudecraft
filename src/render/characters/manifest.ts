@@ -4954,22 +4954,28 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.06,
   },
   // The Tideglass Colossus (tideglass_colossus; scripts/assets/
-  // drowned_temple_creatures/colossus_tideglass/, rebuilt from scratch): a
-  // giant of sea-glass the moon's water hardened, massive forms cut in broad
-  // facets with fractures of light running through it, violet crystal spires
-  // bursting from its shoulders, spine, elbows and knees, silver bands with
-  // moons, and in its chest, held in a silver crescent ringed with pearls, the
-  // prism: the cut gem of silver and violet that casts the Reflections. It
-  // walks its foe down (Walk, Run). Prism Flare (2.0 s bar) plays Flare: arms
-  // flung wide, the prism blazing on the bar's end. Moonlight Lance (2.0 s
-  // bar) plays Lance: the prism levelled along its pointing arm. Resonant Slam
-  // (1.5 s bar) plays Slam: both fists into the floor and a ring of broken
-  // crystal. Heroic's Reflection swap arrives as a windup cue: PrismPulse.
-  // Dying, it kneels, topples and breaks into crystal over a pool of water.
-  // The template's 2.2 scale (its long reach) draws it at 15 world units.
+  // drowned_temple_creatures/colossus_tideglass/, recut in round two): a giant
+  // of hard sea-glass, every block of it a cut gem (the builder's gem.py: flat
+  // facets and sharp edges, each facet its own depth of teal, a bright rim on
+  // every edge), the light inside it breaking out of the seams between the
+  // blocks and along a few long fractures, pointed violet spires bursting from
+  // its shoulders, spine, elbows and knees, a low scowling head with two
+  // slanting slits of light under a crown of crystal horns, silver bands with
+  // moons, and in its chest, in a nacre-lined socket held by a silver crescent
+  // ringed with pearls, the prism: the cut gem of silver and violet that casts
+  // the Reflections. It walks its foe down (Walk, Run). Prism Flare (2.0 s
+  // bar) plays Flare: arms flung wide, the prism blazing on the bar's end.
+  // Moonlight Lance (2.0 s bar) plays Lance: the prism levelled along its
+  // pointing arm. Resonant Slam (1.5 s bar) plays Slam: both fists into the
+  // floor and a ring of broken crystal. Heroic's Reflection swap arrives as a
+  // windup cue: PrismPulse. Dying, it kneels, topples and breaks into crystal
+  // over a pool of water. Its body keeps the old 15-unit scale under the
+  // template's 2.2 (its long reach); the pointed spires now rise past it, so
+  // the drawn bounds are 16.7. The env boost matches its Reflections' glass:
+  // the temple's dim environment runs across its glossy facets.
   temple_colossus: {
     url: `${CREATURES}/temple_colossus.glb`,
-    height: 15 / 2.2,
+    height: 16.7 / 2.2,
     clips: {
       ...TEMPLE_CLIPS,
       castByAbility: {
@@ -4991,6 +4997,7 @@ export const VISUALS: Record<string, VisualDef> = {
     castClipSync: true,
     authoredAtlas: true,
     selfIllumination: 0.06,
+    envMapIntensity: 2.2,
   },
   // The Moonspawn (moonspawn; scripts/assets/drowned_temple_creatures/
   // moonspawn_tide/): Ysolei's summoned add had no body of its own and drew

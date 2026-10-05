@@ -61,6 +61,28 @@ function clipsOf(path: string): string[] {
   return (json.animations ?? []).map((a) => a.name);
 }
 
+interface GlbJson {
+  materials?: { name?: string; emissiveTexture?: unknown }[];
+  meshes?: { primitives: { indices?: number }[] }[];
+  accessors?: { count: number }[];
+}
+
+function glbJson(path: string): GlbJson {
+  const buf = readFileSync(path);
+  const len = buf.readUInt32LE(12);
+  return JSON.parse(buf.subarray(20, 20 + len).toString('utf8')) as GlbJson;
+}
+
+/** Triangles the GLB draws (every indexed primitive of every mesh). */
+function trianglesOf(path: string): number {
+  const j = glbJson(path);
+  let n = 0;
+  for (const m of j.meshes ?? [])
+    for (const p of m.primitives)
+      if (p.indices !== undefined) n += (j.accessors?.[p.indices]?.count ?? 0) / 3;
+  return n;
+}
+
 function visualOf(templateId: string) {
   return VISUALS[visualKeyFor({ kind: 'mob', templateId } as never)];
 }
@@ -112,13 +134,26 @@ describe('the Lagoon Eel and the Colossus', () => {
     expect(c.castByAbility?.[TEMPLE_STATIC_COIL]).toBe('Coil');
   });
 
-  it('the walking Colossus is drawn at its old size under its larger reach', () => {
+  it('the walking Colossus keeps its body at the old size under its larger reach', () => {
     const v = visualOf('tideglass_colossus');
     expect(clipsOf('public/models/creatures/temple_colossus.glb')).toEqual(
       expect.arrayContaining(['Walk', 'Run']),
     );
     expect(v.clips.walk).toBe('Walk');
-    expect(v.height * (MOBS.tideglass_colossus.scale ?? 1)).toBeCloseTo(15, 3);
+    // the body is still the 15-unit giant; the pointed spires of the recut
+    // rise past it, so the drawn bounds (spire tips included) are 16.7
+    expect(v.height * (MOBS.tideglass_colossus.scale ?? 1)).toBeCloseTo(16.7, 3);
+  });
+
+  it('the recut sea-glass Colossus ships its glowing seams and glossy facets in budget', () => {
+    const path = 'public/models/creatures/temple_colossus.glb';
+    const body = glbJson(path).materials?.find((m) => m.name === 'TideglassColossusBody');
+    // the seams, cracks, slits and prism glow through the baked emissive map
+    expect(body?.emissiveTexture).toBeDefined();
+    // the env boost the Reflections' glass uses runs the light across its facets
+    expect(visualOf('tideglass_colossus').envMapIntensity).toBe(2.2);
+    expect(trianglesOf(path)).toBeGreaterThan(30000);
+    expect(trianglesOf(path)).toBeLessThan(42000);
   });
 
   it('the rebuilt sea-glass Colossus answers each of its bars with its own clip', () => {
