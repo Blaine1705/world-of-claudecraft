@@ -23,6 +23,7 @@
 // Zero rng in every pick; the only draws are damage rolls in claim-player order.
 
 import { isLockedOut } from '../../combat/cc';
+import { restoreCastHold } from '../../mob/trash_kit/cast_hold';
 import { novaVictims } from '../../mob/trash_kit/kit_nova';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
 import type { InstanceSlot } from '../../sim';
@@ -51,6 +52,7 @@ import {
   ILVANE_HARMONY,
   ILVANE_TUNING,
   ILVANE_UNBROKEN_DIRGE,
+  NOTE_LANE_YAW,
 } from './ilvane_ids';
 import { beginOrgan, endOrgan, stepOrgan } from './ilvane_organ';
 
@@ -165,6 +167,25 @@ function stepEncore(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: Ilvan
   st.fallen = keep;
 }
 
+/** The way she faces to sing: toward the middle of her living Choristers,
+ *  else down the loft toward its rail (where her choir stood). Pure read. */
+function choirFacing(ctx: SimContext, boss: Entity, st: IlvaneFightState): number {
+  let x = 0;
+  let z = 0;
+  let n = 0;
+  for (const c of living(ctx, st)) {
+    x += c.pos.x;
+    z += c.pos.z;
+    n++;
+  }
+  if (n > 0) {
+    const dx = x / n - boss.pos.x;
+    const dz = z / n - boss.pos.z;
+    if (dx * dx + dz * dz > 1) return Math.atan2(dx, dz);
+  }
+  return NOTE_LANE_YAW;
+}
+
 /** Start a Dirge (the cadence and the dev trigger). */
 export function startDirge(
   ctx: SimContext,
@@ -177,6 +198,10 @@ export function startDirge(
   st.dirges++;
   st.kickable = castId === ILVANE_DIRGE ? castId : null;
   startBar(boss, castId, st.crescendo ? T.dirgeCastCrescendo : T.dirgeCast, null);
+  // She sings planted: the spot the bar began on, turned to her choir, held
+  // for the whole bar however her foe moves (mob/trash_kit/cast_hold.ts).
+  boss.facing = choirFacing(ctx, boss, st);
+  boss.castHold = { castId, x: boss.pos.x, y: boss.pos.y, z: boss.pos.z, facing: boss.facing };
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
@@ -259,6 +284,7 @@ function stepDirge(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: Ilvane
   if (st.kickable !== null && boss.castingAbility !== st.kickable) {
     st.kickable = null;
     st.quiet = T.kickQuiet;
+    boss.castHold = undefined;
     ctx.emit({
       type: 'spellfx',
       sourceId: boss.id,
@@ -270,17 +296,24 @@ function stepDirge(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: Ilvane
   }
   const casting = boss.castingAbility;
   if (casting === null || !DIRGE_IDS.includes(casting)) return;
-  const at = localOf(ctx, inst, boss);
-  const o = ctx.instanceOriginOf(inst);
-  const g = ctx.groundPos(o.x + at.x, o.z + at.z);
-  boss.pos.x = g.x;
-  boss.pos.y = g.y;
-  boss.pos.z = g.z;
+  // The mob AI walked and turned her this tick: stand her back on the spot
+  // and the facing the bar began with (a bar started before the hold existed
+  // takes its hold here).
+  if (boss.castHold?.castId !== casting)
+    boss.castHold = {
+      castId: casting,
+      x: boss.pos.x,
+      y: boss.pos.y,
+      z: boss.pos.z,
+      facing: boss.facing,
+    };
+  restoreCastHold(boss);
   boss.swingTimer = Math.max(boss.swingTimer, 0.6);
   ctx.grid.update(boss);
   boss.castRemaining = Math.max(0, boss.castRemaining - DT);
   if (boss.castRemaining > 1e-6) return;
   st.kickable = null;
+  boss.castHold = undefined;
   clearCastIf(boss, casting);
   landDirge(ctx, inst, boss, st, casting);
 }
@@ -297,6 +330,7 @@ export function resetIlvane(ctx: SimContext, inst: InstanceSlot, boss: Entity): 
     endOrgan(ctx, inst, boss, st);
     for (const id of DIRGE_IDS) clearCastIf(boss, id);
   }
+  boss.castHold = undefined;
   boss.auras = boss.auras.filter((a) => a.id !== ILVANE_HARMONY && a.id !== ILVANE_CRESCENDO);
   clearPlayers(ctx, inst);
   boss.cryptBossFight = undefined;
