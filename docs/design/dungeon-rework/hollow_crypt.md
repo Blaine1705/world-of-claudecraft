@@ -275,54 +275,79 @@ of reach).
 | Heroic | Encore (a Chorister dead 10 s while its partner stands rises again); Unbroken Verse (every third Dirge runs under a cast id no interrupt table knows) | |
 | Deed | Hush Now: no Dirge ever strikes anyone | |
 
-### 5.4 Boss 4: Morthen the Gravecaller (kept, rebuilt)
+### 5.4 Morthen the Gravecaller as built (co-designed with the owner, 2026-10-05)
 
-- **Id:** `morthen` (kept). Level 10. Planning health about 6,600 (120 s of
-  damage at 55 DPS, plus the immune phase: about 150 s total).
-- **Fantasy:** the Gravecaller at the bottom of the Vale, holding the rite that
-  calls every name in the ledger out of the earth.
-- **Model:** keep `skel_boss`; phase 3 adds a great bone scythe (reuse the Bonelord
-  Xarreth scythe asset, `docs/design/bone-reaper/`).
-- **Arena: the Rite Nave.** A circular nave about 40 yd in radius. A raised dais
-  (10 yd) holds the altar and the Ledger of Names on a lectern (hero piece, ties
-  to the shipped `morthen_grimoire`). Four Remembrance Candles (3 m tallow pillars)
-  stand at north, east, south and west on the floor ring, 24 yd from the center;
-  four sarcophagus alcoves sit in the walls between them. A bone rose window above
-  pours the soul-light column seen from the Choir Loft.
-- **Core gimmick: a three-act rite you must break.**
-  - **Phase 1, The Calling (100 to 65 percent).**
-    - *Shadow Pulse* (kept name, now telegraphed): every 12 s a 2 s cast, then 16
-      to 22 shadow within 12 yd. Melee steps out at the bar. (`bigCast`)
-    - *Gravecall:* every 15 s (first at 6 s) a Bound Soul (non-elite, level 8,
-      about 70 hp, slow walker, can be rooted, slowed, feared or stunned) rises
-      from the next alcove in clockwise order and walks to Morthen. On arrival he
-      is Gorged on the Dead: +10 percent damage and he heals 3 percent, stacking
-      for the fight. (G5)
-  - **Phase 2, the Rite of the Unquiet (at 65 percent).** Morthen climbs to the
-    altar inside the Unquiet Ward (immune) and channels; the four candles gutter
-    out. Grave Chill pulses 4 shadow per second on everyone, rising by 1 every 5 s.
-    Two Unmade Sentinels (elite, level 9) climb the dais steps. Any player can
-    relight a candle with a 2 s channel, broken by damage taken from an enemy (the
-    Grave Chill ticks never break it) (G3). Each lit candle cracks the ward by a
-    quarter; the fourth shatters it: the Rite Broken, Morthen stunned for 8 s and
-    taking 25 percent more damage during it. (G2)
-  - **Phase 3, Last Rites (at 35 percent).** Gravecall stops. *Reap the Unquiet:*
-    every 14 s a 2 s cast, then a 90 degree, 12 yd frontal sweep for 45 to 55
-    shadow (`breathCone`); the tank takes it facing away from the group. Shadow
-    Pulse every 9 s.
-- **Counterplay:** kill or control every soul before it arrives; in phase 2 the
-  tank holds the Sentinels on the dais while the others spread to the candles;
-  in phase 3 nobody but the tank stands in front.
-- **Role checks:** everyone intercepts (class crowd control pays off); tank holds
-  adds away from the runners and later faces the Reap; healer rides the rising
-  Grave Chill; damage dealers relight fast and burn the 8 s window.
-- **Heroic extras:**
-  1. *Name the Dead:* in phase 2 the Ledger names the candles in an order (the
-     next one glows). Lighting the wrong candle snuffs the last lit one and deals
-     30 shadow to the lighter.
-  2. *Grasp of the Grave:* in every phase, every 16 s two random players get a 1.5
-     s, 4 yd ring; hands erupt: 3 s root and 20 shadow. Not persistent (unlike
-     Marrow's graves); in phase 3 a rooted player in front of the Reap dies.
+The draft's three acts are built as one encounter module set
+(`src/sim/encounters/hollow_crypt/`: `morthen.ts`, `morthen_gravecall.ts`,
+`morthen_candles.ts`, `morthen_grasp.ts`, the leaf `morthen_ids.ts` whose
+`MORTHEN_TUNING` is the source of truth for every number below), after his
+entrance (`morthen_rise.ts`) and before the Knellwyrm (`knellwyrm.ts`, its heroic
+`knellwyrm_knell.ts`). The owner's binding changes to the draft: relighting a
+candle is a CHANNEL that drains the lighter's health every second and is NOT
+broken by enemy damage (the healer heals them through it), and the Knellwyrm gains
+a heroic flight that breathes over half the ring. Tests:
+`tests/hollow_crypt_morthen.test.ts`, `tests/hollow_crypt_knell.test.ts`.
+
+- **Id:** `morthen` (kept). Level 10. Arena: the Rite Ring (radius 28), the altar
+  dais, the four Remembrance Candles on their pillars at north, east, south and
+  west (20 yd out), the four sarcophagus alcoves between them.
+- **Fantasy:** the Gravecaller holding the rite that calls every name in the
+  ledger out of the earth.
+
+**Numbers basis.** Cloth reference at level 10 is about 340 in the dungeon's greens
+(a mage has about 315 in starter gear, the 2026-09-11 class table); a warrior tank
+about 450. Heroic cloth about 1,250. The bands of `README.md` section 7 apply.
+
+**Health.** Fight length x planning party DPS. Target 150 s with his immune Rite
+(about 25 s), so about 125 s of damage: 125 x 55 (level 10) = about 6,800 normal on
+his 1,191 template pool (`healthMultiplierByMob.morthen` 5.7: 6,791), and 125 x 230
+(heroic) = about 28,800 on his 2,074 level-22 template pool (13.9: 28,837). To be
+measured with the meters harness before shipping, like the wing bosses.
+
+| Act | Mechanic | Rule | Normal numbers (percent of cloth 340) |
+|---|---|---|---|
+| 1, the Calling (100 to 65) | Shadow Pulse | every 12 s (first 8 s) a 2 s bar planted on his spot (the ring telegraph), then shadow on everyone within 12 yd | 24 to 30 (about 8; step out) |
+| | Gravecall | every 15 s (first 6 s) a Bound Soul rises from the next alcove clockwise and drifts to him at 3.2 yd/s (the trash engine's G5 walker, an 'event' launch rolling to Morthen alone) | on arrival Gorged on the Dead: +10 percent damage done per stack (ten at most, for the fight) and a 3 percent heal; a player within 1.6 yd of its path takes it instead for 12 to 16 shadow (about 4) |
+| 2, the Rite of the Unquiet (at 65) | the ward | he never drops below 65 percent first; he glides back to the altar inside the Unquiet Ward (immune) and channels the Rite; the candles gutter out; two Restless Bones (Sexton Marrow's level-8 add) climb out of the alcoves after hashed non-tanks | |
+| | Grave Chill | a bite a second on everyone through the Rite, 3 rising by 1 every 5 s | about 1 to 2 percent a second, rising |
+| | Relight a candle | a player targets the candle's usable body and presses interact: the G3 use (server-validated at the press, every tick and at the end), a 4 s channel kept through hits (`KitUseDef.holdsThroughHits`); a step, a stun or death breaks it and the next try pays again | the drain: 6 percent of the lighter's own maximum health at 0.5, 1.5, 2.5 and 3.5 s (24 percent a candle; 8 percent, 32, on heroic). A player the drain cannot touch (stasis, immunity) has the channel cancelled |
+| | The Rite Broken | the fourth candle shatters the ward | an 8 s stun (laid by the encounter: his control immunity guards him from players, never from his own broken rite) and 25 percent more damage taken for its length |
+| 3, Last Rites (at 35) | Reap the Unquiet | Gravecall stops; every 14 s (first 4 s) a 2 s bar, aim locked at its start, then a 120 degree, 14 yd sweep in front of him | 55 to 65 shadow (about 18 on cloth, the tank's) |
+| | Shadow Pulse | every 9 s | as above |
+| Heroic | Name the Dead | the Ledger names the candle order (a hashed permutation, the named candle's object glows); lighting another candle snuffs the last one lit (its body back) and burns the lighter; the wrong candle stays dark | 28 to 32 shadow at the heroic factor |
+| | Grasp of the Grave | every 16 s (first 10 s), in every act, two hashed players get a 4 yd ring locked under them; after 1.5 s hands erupt inside it | a 3 s root and 18 to 22 shadow at the heroic factor |
+| Deed | By Candlelight (`dgn_morthen_candlelight`) | all four candles relit within 20 s of the ward rising, granted at the kill | |
+
+**Heroic mechanic damage** rides `mechanicDamageMultiplierByMob.morthen` 9 on heroic
+cloth of about 1,250: Shadow Pulse 216 to 270 (about 19, avoidable), a soul taken
+108 to 144 (about 10), Grave Chill 27 a second rising by 9 every 5 s (about 65
+percent spread over a 20 s Rite, the healer's load), the Reap 495 to 585 (about 43,
+the tank's), a wrong candle 252 to 288 (about 22), Grasp of the Grave 162 to 198
+(about 15) and a root. No single avoidable mechanic passes 60 percent of a
+full-health cloth wearer; a player rooted by the Grasp in front of the Reap is lost
+(the draft's intent).
+
+**The Knellwyrm (normal kit unchanged), heroic Burning Knell.** Every 55 s (first
+30 s into its fight) it takes wing from where it stands (2.5 s, out of reach:
+nobody's target, immune), hangs 16 yd over the ring's centre and marks HALF the
+ring in red (a 4.5 s bar), then its ghost fire lands on that half (a 1.4 s pour):
+50 to 56 fire at its heroic factor 20 is 1,000 to 1,120, 80 to 90 percent of heroic
+cloth, the long-telegraphed wipe check the balance rule allows above 60 percent (a
+player on the far rim crosses the diameter inside the mark). Three halves a
+flight, each a different quarter of the compass from the last, drawn from `ctx.rng`
+in a fixed order (one draw at each mark, before that mark's damage rolls); then it
+glides back down where it took wing (2.5 s). Its strafe and bellow clocks wait while
+it flies.
+
+**Dev.** `/dev crypt pull morthen`, `/dev crypt hp <percent>` (Morthen and the
+Knellwyrm too), `/dev crypt trigger <pulse|gravecall|rite|candle|reap|grasp|knell>`.
+
+**Names pending a manual web check.** The session's web search budget ran out:
+Gravecall, Bound Soul, Unquiet Ward, Grave Chill, Remembrance Candle, Candle's
+Price, Rite Broken, Shattered Ward, Reap the Unquiet, Name the Dead, Grasp of the
+Grave, By Candlelight and Burning Knell are recorded as pending in
+`docs/design/naming-audit.md` (Gorged on the Dead and Rite of the Unquiet were
+cleared on 2026-09-29, section 10).
 
 Unique core per boss: placed graves that become adds (Marrow), shelter in the
 lanterns and free the embraced (the Lady of the Bonechill), interrupt or break line of sight (Ilvane), intercept walkers
