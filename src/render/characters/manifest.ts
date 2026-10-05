@@ -3961,6 +3961,26 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 2,
   },
+  // A Remembrance Candle's usable body (crypt_remembrance_candle, Morthen's
+  // Rite: encounters/hollow_crypt/morthen_candles.ts) stands at its pillar's
+  // foot: the pillar is the kit's and the flame the crypt's own painter
+  // (hollow_crypt/morthen_candle_fx.ts), so this draws no body. Its click
+  // capsule, nameplate and bar stay, raised to the candle's height so the
+  // relight is easy to target; bound off the bone pile's rig (never seen).
+  crypt_rite_candle_body: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    height: 3.6,
+    clips: {
+      idle: 'Lie_Idle',
+      walk: 'Lie_Idle',
+      run: 'Lie_Idle',
+      attack: [],
+      hit: ['Hit_A'],
+      death: 'Death_A',
+    },
+    bodyless: true,
+    clickRadius: 2.2,
+  },
   crypt_skel_adept: {
     url: `${ENEMIES}/skeleton_mage.glb`,
     animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
@@ -6466,6 +6486,7 @@ const MOB_KEYS: Record<string, string> = {
   // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
   crypt_ossuary_warrior: 'crypt_skel_warrior',
   crypt_bone_pile: 'crypt_skel_bone_pile',
+  crypt_remembrance_candle: 'crypt_rite_candle_body',
   crypt_gravecaller_adept: 'crypt_skel_adept',
   crypt_ossuary_cutthroat: 'crypt_skel_cutthroat',
   crypt_gravecaller_necromancer: 'crypt_skel_necromancer',

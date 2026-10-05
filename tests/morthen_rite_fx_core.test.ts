@@ -339,3 +339,16 @@ describe('the Bound Souls', () => {
     expect(gorgedFire(99)).toBe(gorgedFire(T.gorgedMaxStacks));
   });
 });
+
+describe('the Remembrance Candle body', () => {
+  it('draws no body (the pillar is the kit), keeps a wide click capsule at candle height', () => {
+    const key = visualKeyFor({
+      kind: 'mob',
+      templateId: 'crypt_remembrance_candle',
+    } as Parameters<typeof visualKeyFor>[0]);
+    expect(key).toBe('crypt_rite_candle_body');
+    expect(VISUALS[key].bodyless).toBe(true);
+    expect(VISUALS[key].clickRadius ?? 0).toBeGreaterThanOrEqual(2);
+    expect(VISUALS[key].height).toBeGreaterThanOrEqual(3);
+  });
+});

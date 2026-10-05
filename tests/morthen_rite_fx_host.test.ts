@@ -272,9 +272,10 @@ describe('the fight paints the crag top only', () => {
     for (let i = 0; i < fan.stations; i++)
       expect(cp?.getY(i * 2)).toBeGreaterThanOrEqual(-CRAG_FLOOR_BAND);
     // Unmoved, it is not draped again.
-    const v = pos.version;
+    const version = () => (pos as { version: number }).version;
+    const v = version();
     drapeFanOnCrag(kit, fan, crag, 6, 0, 0, Math.PI / 2, 32, memo);
-    expect(pos.version).toBe(v);
+    expect(version()).toBe(v);
     kit.dispose();
   });
 
