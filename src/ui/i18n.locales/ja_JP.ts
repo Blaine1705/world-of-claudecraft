@@ -20115,6 +20115,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.sanctumAlert.brandedLine': '焼き印は切れるまで燃え続ける：融け水の池で消せ',
   'hudChrome.sanctumAlert.rimeTitle': '忍び寄る霧氷！',
   'hudChrome.sanctumAlert.rimeLine': '忍び寄る霧氷 {stacks}/{max}：幼竜のブレスから出ろ',
+  'hudChrome.sanctumAlert.slabTitle': '氷塊',
+  'hudChrome.sanctumAlert.slabLine': '堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ',
   'hudChrome.kitUse.toppleLine': '敵の群れの上に蹴り倒せ：こぼれた炎が奴らを焼く',
   'hudChrome.kitUse.toppleKey': '{name}を奴らの上に倒す',
   'hudChrome.kitUse.toppleTap': 'ここをタップして{name}を奴らの上に倒す',

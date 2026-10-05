@@ -15,12 +15,12 @@ brazier, `../gravewyrm_sanctum_fx/sanctum_kit_fx.ts`).
 | `trash_engine_host.ts` | `TrashEngineHost`: the type-only seam the coordinator lends its layers. |
 | `engine_particles.ts` | Pooled smoke / glow / soulfire / pyre particles and shock rings. |
 | `engine_hazards.ts` | Hazard pools: boiling meltwater, spilled soulfire, a school disc fallback; the shared danger ring on a players' pool only. |
-| `engine_walls.ts` + `ice_slab_geometry.ts` | Combat walls: the Ice Slab built to its collider box, its crash, strain and shatter (`spellfxAt`). |
+| `engine_walls.ts` + `ice_slab_geometry.ts` | Combat walls: the Ice Slab built to its collider box (the hauler's iron banding round it, a low inner glow: solid cover, never scenery), its crash, strain and shatter (`spellfxAt`). Its purpose reaches the player as the Sanctum alert's `slab` hint. |
 | `engine_walkers.ts` | Walker orbs (glide, trail, floor glow, heading chevrons), launch, empower (and its lingering glow), intercept, fade (`spellfxAt`). An orb draws in its school tint unless the core's `WALKER_LOOKS` gives its template its own tint and float (the Revenant's green Throatlight at the chest, the Ray's Heartpearl rolling low); every aura a walker leaves (an arming on either difficulty, an ally shield, the group's gift) glows on its body. |
 | `engine_nova.ts` | The line-of-sight nova: the SIGHT FIELD (each ray's reach bisected over the sim's own `lineOfSightClear`, so cover casts a hatched safe shadow), the kick glyph or the unstoppable's harsh edge, the landing wave stopping at each block. |
 | `engine_use.ts` + `engine_glyphs.ts` | Usable bodies: the floating use glyph and reach ring for the local player within `USE_HINT_RANGE`, the effort arc while anyone channels, the strike. |
 | `engine_body_fx.ts` | Freeze-stack rime crystals, the ice encase and its shatter, the brand on the chest, quenched and fizzled. |
-| `engine_quench.ts` | The dungeon's quench pools in the player's slot: calm cold meltwater, one merged draw on the ground band. |
+| `engine_quench.ts` | The dungeon's quench pools in the player's slot: calm cold meltwater, one merged draw on the ground band, its vertices in the slot's frame round an anchor (never a 100,000 yd float32 world position) and pulled toward the eye in the vertex shader (`QUENCH_DEPTH_PULL`), so it never z-fights its floor. |
 
 Rules:
 - Telegraphs and the shapes a player acts on (pool rims, the wall body, the orb, its

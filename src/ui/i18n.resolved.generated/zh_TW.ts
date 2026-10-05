@@ -6212,7 +6212,9 @@ export const zh_TW: EnTranslations = {
       "brandedTitle": "烙印！",
       "brandedLine": "烙印會一直灼燒到結束：到融水池裡將它澆熄",
       "rimeTitle": "蔓延霜凇！",
-      "rimeLine": "蔓延霜凇 {stacks}/{max}：離開幼龍的吐息"
+      "rimeLine": "蔓延霜凇 {stacks}/{max}：離開幼龍的吐息",
+      "slabTitle": "冰塊",
+      "slabLine": "堅冰：它會阻擋視線。躲到它後面，避開施法者的法術"
     },
     "cryptAlert": {
       "measuredTitle": "量身定墓！",

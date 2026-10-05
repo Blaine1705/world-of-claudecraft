@@ -6212,7 +6212,9 @@ export const en: EnTranslations = {
       "brandedTitle": "Branded!",
       "brandedLine": "The brand burns until it ends: douse it in a meltwater pool",
       "rimeTitle": "Creeping Rime!",
-      "rimeLine": "Creeping Rime {stacks}/{max}: step out of the whelps' breath"
+      "rimeLine": "Creeping Rime {stacks}/{max}: step out of the whelps' breath",
+      "slabTitle": "Ice Slab",
+      "slabLine": "Solid ice: it blocks line of sight. Hide behind it from the casters' spells"
     },
     "cryptAlert": {
       "measuredTitle": "Measured for the Grave!",

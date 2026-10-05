@@ -6212,7 +6212,9 @@ export const ja_JP: EnTranslations = {
       "brandedTitle": "焼き印！",
       "brandedLine": "焼き印は切れるまで燃え続ける：融け水の池で消せ",
       "rimeTitle": "忍び寄る霧氷！",
-      "rimeLine": "忍び寄る霧氷 {stacks}/{max}：幼竜のブレスから出ろ"
+      "rimeLine": "忍び寄る霧氷 {stacks}/{max}：幼竜のブレスから出ろ",
+      "slabTitle": "氷塊",
+      "slabLine": "堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ"
     },
     "cryptAlert": {
       "measuredTitle": "墓の採寸！",

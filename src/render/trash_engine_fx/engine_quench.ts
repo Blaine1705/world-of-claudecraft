@@ -13,6 +13,15 @@
 // cosmetic and thins on the low tier. ACTIONABLE (it is where the brand goes
 // out), so the pools themselves draw on every tier. Built once under the
 // host's root before its gated attach; no light; no per-frame allocation.
+//
+// No z-fight with the floor it lies on (the playtest saw the pools flicker on
+// the Sledge Road): the vertices are stored in the slot's own frame round an
+// anchor the mesh is placed at (a dungeon slot sits about 100,000 yd out,
+// where a float32 world position is only good to a centimetre and the GPU's
+// view transform jitters by more), each vertex sampled on the real floor, and
+// the vertex shader pulls it QUENCH_DEPTH_PULL toward the camera along its own
+// view ray: the pool keeps its exact pixels but always wins the depth test
+// against its floor, while a body or a wall standing in it still hides it.
 
 import * as THREE from 'three';
 import { dungeonAt, instanceSlotForZ } from '../../sim/data';
@@ -26,6 +35,9 @@ const MAX_POOLS = 16;
 const RINGS = 4;
 const SEGS = 40;
 const PER_POOL = 1 + RINGS * SEGS;
+/** Yards each pool vertex is pulled toward the camera (at most a quarter of
+ *  its distance to the eye): the depth margin over the floor under it. */
+export const QUENCH_DEPTH_PULL = 0.18;
 
 const VERT = /* glsl */ `
 attribute vec2 aUnit;
@@ -36,9 +48,15 @@ varying vec3 vWorld;
 void main() {
   vP = aUnit;
   vRadius = aRadius;
-  vec4 w = modelMatrix * vec4(position, 1.0);
-  vWorld = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  // The slot frame (small numbers): the ripples and glints key on it.
+  vWorld = position;
+  // Eye space through the CPU-composed modelViewMatrix (double precision on
+  // the CPU, so no 100,000 yd world coordinate ever reaches the GPU), then a
+  // pull toward the eye along the view ray: same pixel, nearer depth.
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  float dc = max(length(mv.xyz), 1e-3);
+  mv.xyz -= mv.xyz * (min(${QUENCH_DEPTH_PULL.toFixed(3)}, dc * 0.25) / dc);
+  gl_Position = projectionMatrix * mv;
 }
 `;
 
@@ -136,13 +154,18 @@ export class EngineQuench {
     const unit = this.geo.getAttribute('aUnit') as THREE.BufferAttribute;
     const radius = this.geo.getAttribute('aRadius') as THREE.BufferAttribute;
     const n = Math.min(MAX_POOLS, pools.length);
+    // The slot frame: every vertex relative to the first pool's floor point.
+    const ax = n > 0 ? pools[0].x : 0;
+    const az = n > 0 ? pools[0].z : 0;
+    const ay = n > 0 ? this.host.groundY(ax, az) : 0;
+    this.mesh.position.set(ax, ay, az);
     for (let p = 0; p < n; p++) {
       const q = pools[p];
       for (let v = 0; v < PER_POOL; v++) {
         const k = p * PER_POOL + v;
         const x = q.x + unit.getX(k) * q.r;
         const z = q.z + unit.getY(k) * q.r;
-        pos.setXYZ(k, x, this.host.groundY(x, z) + SURFACE_LIFT, z);
+        pos.setXYZ(k, x - ax, this.host.groundY(x, z) - ay + SURFACE_LIFT, z - az);
         radius.setX(k, q.r);
       }
     }

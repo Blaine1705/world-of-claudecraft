@@ -20103,6 +20103,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.sanctumAlert.brandedLine': '낙인은 끝날 때까지 타오릅니다: 녹은 물웅덩이에서 끄세요',
   'hudChrome.sanctumAlert.rimeTitle': '스며드는 서리!',
   'hudChrome.sanctumAlert.rimeLine': '스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요',
+  'hudChrome.sanctumAlert.slabTitle': '얼음 덩어리',
+  'hudChrome.sanctumAlert.slabLine':
+    '단단한 얼음: 시야를 가립니다. 뒤에 숨어 시전자의 주문을 피하세요',
   'hudChrome.kitUse.toppleLine': '무리 위로 걷어차 넘어뜨리세요: 쏟아진 불길이 그들을 태웁니다',
   'hudChrome.kitUse.toppleKey': '{name}을(를) 그들 위로 넘어뜨리기',
   'hudChrome.kitUse.toppleTap': '여기를 탭해 {name}을(를) 그들 위로 넘어뜨리세요',

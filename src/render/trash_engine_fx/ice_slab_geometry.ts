@@ -6,8 +6,11 @@
 // faces (a deterministic jitter keyed on each vertex's spot, so shared corners
 // stay welded), chipped top corners, a slight crashed-in tilt, a snow cap on
 // every upward face, frost creeping up from the base, dark crack seams, and
-// drifted snow and ice rubble heaped round its foot. Vertex colours only, so
-// it draws through the shared `surfaceMat` program.
+// drifted snow and ice rubble heaped round its foot, and the hauler's iron
+// banding still round it (a belt and two straps on each broad face, the haul
+// ring the ogre carried it by): a man-made block of cover, never a stray
+// lump of scenery (the playtest asked what it was for). Vertex colours only,
+// so it draws through the shared `surfaceMat` program.
 //
 // Deterministic (no Math.random): the same box always builds the same slab.
 
@@ -30,6 +33,12 @@ const ICE = new THREE.Color(0x8fcbea);
 const ICE_PALE = new THREE.Color(0xcdeaf8);
 const SNOW = new THREE.Color(0xf3f9ff);
 const SEAM = new THREE.Color(0x1d4d72);
+const IRON = new THREE.Color(0x2c3036);
+const IRON_WORN = new THREE.Color(0x5a5f66);
+
+/** How far the iron banding stands proud of the block's faces (yards); it
+ *  stays inside SLAB_OVERHANG of the footprint. */
+export const SLAB_BAND_PROUD = 0.07;
 
 /** The block: jittered, chipped, tilted, coloured. Non-indexed (flat faces). */
 function blockGeometry(box: WallBox): THREE.BufferGeometry {
@@ -142,11 +151,77 @@ function footGeometry(box: WallBox): THREE.BufferGeometry[] {
   return out;
 }
 
-/** The whole slab for a wall box (block, drift and rubble), merged. */
+/** A flat-coloured, non-indexed piece of iron (worn paler on its edges). */
+function ironPiece(geo: THREE.BufferGeometry, worn: number): THREE.BufferGeometry {
+  const flat = geo.index ? geo.toNonIndexed() : geo;
+  if (flat !== geo) geo.dispose();
+  if (flat.getAttribute('uv')) flat.deleteAttribute('uv');
+  flat.computeVertexNormals();
+  const n = flat.getAttribute('normal') as THREE.BufferAttribute;
+  const colors = new Float32Array(n.count * 3);
+  const c = new THREE.Color();
+  for (let i = 0; i < n.count; i++) {
+    // Faces turned up catch a rime of frost; the rest is cold black iron.
+    c.copy(IRON).lerp(IRON_WORN, worn * (0.5 + 0.5 * Math.abs(n.getX(i))));
+    if (n.getY(i) > 0.6) c.lerp(SNOW, 0.55);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+  }
+  flat.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return flat;
+}
+
+/** The hauler's iron banding: a belt round the block, two straps up each
+ *  broad face (the ±z faces, the broad face turned to the thrower), and the
+ *  haul ring hanging off the belt on the front. Within the footprint plus
+ *  SLAB_BAND_PROUD, below the broken top. */
+function bandGeometry(box: WallBox): THREE.BufferGeometry[] {
+  const { hw, hd, height } = box;
+  const t = SLAB_BAND_PROUD;
+  const out: THREE.BufferGeometry[] = [];
+  const beltY = height * 0.42;
+  const beltH = 0.3;
+  // The belt: four flat bars hugging the faces.
+  out.push(
+    ironPiece(new THREE.BoxGeometry(hw * 2 + t * 2, beltH, t).translate(0, beltY, hd + t / 2), 0.4),
+    ironPiece(
+      new THREE.BoxGeometry(hw * 2 + t * 2, beltH, t).translate(0, beltY, -hd - t / 2),
+      0.4,
+    ),
+    ironPiece(new THREE.BoxGeometry(t, beltH, hd * 2).translate(hw + t / 2, beltY, 0), 0.4),
+    ironPiece(new THREE.BoxGeometry(t, beltH, hd * 2).translate(-hw - t / 2, beltY, 0), 0.4),
+  );
+  // Two straps up each broad face, from the snow to below the broken top.
+  const strapTop = height * 0.74;
+  for (const side of [1, -1])
+    for (const x of [-hw * 0.48, hw * 0.48])
+      out.push(
+        ironPiece(
+          new THREE.BoxGeometry(0.26, strapTop + SLAB_SINK, t).translate(
+            x,
+            (strapTop - SLAB_SINK) / 2,
+            side * (hd + t / 2),
+          ),
+          0.3,
+        ),
+      );
+  // The haul ring on the front face, hanging from a staple on the belt.
+  out.push(
+    ironPiece(
+      new THREE.TorusGeometry(0.42, 0.075, 6, 14).translate(0, beltY - 0.5, hd + t + 0.075),
+      0.6,
+    ),
+    ironPiece(new THREE.BoxGeometry(0.34, 0.16, 0.12).translate(0, beltY - 0.06, hd + t), 0.5),
+  );
+  return out;
+}
+
+/** The whole slab for a wall box (block, banding, drift and rubble), merged. */
 export function buildIceSlabGeometry(box: WallBox): THREE.BufferGeometry {
   const block = blockGeometry(box);
   if (block.getAttribute('uv')) block.deleteAttribute('uv');
-  const parts = [block, ...footGeometry(box)];
+  const parts = [block, ...bandGeometry(box), ...footGeometry(box)];
   const merged = mergeGeometries(parts, false);
   for (const p of parts) p.dispose();
   if (!merged) throw new Error('ice slab geometry merge failed');

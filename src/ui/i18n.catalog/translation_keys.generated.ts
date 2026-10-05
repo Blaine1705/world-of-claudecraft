@@ -13850,6 +13850,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.sanctumAlert.quenchTitle'
   | 'hudChrome.sanctumAlert.rimeLine'
   | 'hudChrome.sanctumAlert.rimeTitle'
+  | 'hudChrome.sanctumAlert.slabLine'
+  | 'hudChrome.sanctumAlert.slabTitle'
   | 'hudChrome.sanctumAlert.stompLine'
   | 'hudChrome.sanctumAlert.stompTitle'
   | 'hudChrome.sanctumAlert.strainLine'

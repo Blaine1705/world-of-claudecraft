@@ -9071,6 +9071,10 @@ export const hudChromeStrings = {
     brandedLine: 'The brand burns until it ends: douse it in a meltwater pool',
     rimeTitle: 'Creeping Rime!',
     rimeLine: "Creeping Rime {stacks}/{max}: step out of the whelps' breath",
+    // A fresh Ice Slab near you (the Ogre Sledge-Hauler's thrown block): what
+    // it is for, for its first seconds.
+    slabTitle: 'Ice Slab',
+    slabLine: "Solid ice: it blocks line of sight. Hide behind it from the casters' spells",
   },
   // The Hollow Crypt's wing-boss alert (src/ui/hud/dungeon/crypt_alert_view.ts):
   // Sexton Marrow's grave mark and Open Graves, the Lady of the Bonechill's

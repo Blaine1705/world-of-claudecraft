@@ -20502,6 +20502,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.sanctumAlert.rimeTitle': 'Ползучая изморозь!',
   'hudChrome.sanctumAlert.rimeLine':
     'Ползучая изморозь {stacks}/{max}: выйдите из дыхания дракончиков',
+  'hudChrome.sanctumAlert.slabTitle': 'Ледяная глыба',
+  'hudChrome.sanctumAlert.slabLine':
+    'Сплошной лёд: он закрывает обзор. Укройтесь за ним от заклинаний',
   'hudChrome.kitUse.toppleLine': 'Опрокиньте на стаю: пролитое пламя обжигает врагов',
   'hudChrome.kitUse.toppleKey': 'Опрокинуть на врагов: {name}',
   'hudChrome.kitUse.toppleTap': 'Нажмите здесь, чтобы опрокинуть на врагов: {name}',
