@@ -57,9 +57,10 @@ try {
     settleMs: 4000,
   });
   if (!booted) throw new Error('offline world did not boot');
-  const chat = async (c, wait = 900) => {
+  // The chat throttle drops lines sent too quickly: never less than 1.15 s apart.
+  const chat = async (c, wait = 1200) => {
     await page.evaluate((line) => window.__game.world.chat(line), c);
-    await sleep(wait);
+    await sleep(Math.max(1150, wait));
   };
   const enter = async (difficulty) => {
     for (const c of [
@@ -69,7 +70,7 @@ try {
       '/dev crypt gates',
     ])
       await chat(c, 1300);
-    for (const p of [...PACKS, ...PACKS2]) await chat(`/dev crypt kill ${p}`, 150);
+    for (const p of [...PACKS, ...PACKS2]) await chat(`/dev crypt kill ${p}`, 700);
     await page.waitForFunction(
       () => {
         let found = false;
@@ -81,11 +82,16 @@ try {
       { timeout: 120000, polling: 1000 },
     );
   };
+  // The claim's origin: the instance the player stands in.
   const origin = async () =>
     page.evaluate(() => {
       const w = window.__game.world;
-      for (const e of w.ctx.entities.values())
-        if (e.templateId === 'morthen') return { x: e.pos.x - 0, z: e.pos.z - 212 };
+      const p = w.player;
+      for (const inst of w.ctx.instances) {
+        if (inst.partyKey === null || inst.dungeonId !== 'hollow_crypt') continue;
+        const o = w.ctx.instanceOriginOf(inst);
+        if (Math.abs(p.pos.x - o.x) < 120 && Math.abs(p.pos.z - o.z) < 250) return o;
+      }
       return null;
     });
   let O = { x: 0, z: 0 };
@@ -199,11 +205,15 @@ try {
   };
 
   if (MODE === 'hover') {
-    // Only the default-camera read of his hover (the before/after pair).
+    // Only the default-camera read of his hover (the before/after pair): from
+    // the melee spot and from a step back, the default pitch and distance.
     await fight('normal');
     await chat('/dev noaggro', 200);
-    await stand(SPOT.x, SPOT.z - 7, SPOT.x, SPOT.z);
+    await stand(SPOT.x, SPOT.z - 4.5, SPOT.x, SPOT.z);
     await sleep(2500);
+    await shot('altura', 'morthen_camara_por_defecto_cuerpo_a_cuerpo');
+    await stand(SPOT.x, SPOT.z - 8, SPOT.x, SPOT.z);
+    await sleep(1500);
     await shot('altura', 'morthen_camara_por_defecto');
     await hideUi(false);
     await sleep(800);
@@ -218,12 +228,14 @@ try {
     await shot('altura', 'morthen_camara_por_defecto');
     // Shadow Pulse: the charge and the toll.
     await stand(SPOT.x + 4, SPOT.z - 15, SPOT.x, SPOT.z, 0.2, 0.5, 26);
+    await placeMorthen(SPOT.x, SPOT.z, Math.PI);
     await chat('/dev crypt trigger pulse', 900);
     await shot('acto1', 'a1_01_pulso_carga');
-    await sleep(1200);
+    await sleep(950);
     await shot('acto1', 'a1_02_pulso_golpe');
     // Gravecall: a soul leaves its alcove and drifts in.
     await sleep(1500);
+    await placeMorthen(SPOT.x, SPOT.z, Math.PI);
     await stand(SPOT.x + 6, SPOT.z - 14, 15, 220, 0.3, 0.45, 30);
     await chat('/dev crypt trigger gravecall', 1300);
     await shot('acto1', 'a1_03_alma_sale_del_nicho');
@@ -265,7 +277,7 @@ try {
     await stand(SPOT.x + 9, SPOT.z - 12, SPOT.x, SPOT.z, 0.3, 0.55, 26);
     await chat('/dev crypt trigger reap', 1000);
     await shot('acto3', 'a3_01_siega_aviso');
-    await sleep(1150);
+    await sleep(950);
     await shot('acto3', 'a3_02_siega_golpe');
     await chat('/dev crypt kill morthen', 2500);
     await chat('/dev crypt reset', 3000);
@@ -291,24 +303,54 @@ try {
     // The Knellwyrm and its Burning Knell.
     for (let i = 0; i < 3; i++) await chat('/dev crypt trigger candle', 400);
     await sleep(9000);
+    // The wyrm must be able to take the player as its foe: noaggro off again.
+    await chat('/dev noaggro', 400);
     await chat('/dev crypt wyrm', 13500);
-    await stand(0, 184, 0, 205, 0, 0.45, 30);
+    await stand(0, 196, 0, 205, 0, 0.45, 30);
+    await sleep(3000);
+    // Take wing as soon as it is free (not mid-bite, mid-breath or mid-strafe).
+    const flying = () =>
+      page.evaluate(() => {
+        for (const e of window.__game.world.ctx.entities.values())
+          if (e.templateId === 'crypt_knellwyrm' && e.knellwyrmFight?.knell) return true;
+        return false;
+      });
+    // Hand it the fight on this player (the god-mode camera stand-in may have
+    // been dropped from its threat), then take wing as soon as it is free.
+    const aggro = () =>
+      page.evaluate(() => {
+        const w = window.__game.world;
+        for (const e of w.ctx.entities.values())
+          if (e.templateId === 'crypt_knellwyrm' && !e.dead) {
+            w.ctx.aggroMob(e, w.player, false);
+            return `${e.aiState} ${e.castingAbility} ${!!e.knellwyrmFight}`;
+          }
+        return 'no wyrm';
+      });
+    for (let i = 0; i < 12 && !(await flying()); i++) {
+      console.log('wyrm:', await aggro());
+      await sleep(300);
+      await chat('/dev crypt trigger knell', 1150);
+    }
     await quiet('crypt_knellwyrm', 'knellwyrmFight');
-    await chat('/dev crypt trigger knell', 1500);
+    await stand(0, 182, 0, 205, 0, 0.5, 30);
+    await sleep(100);
     await shot('dragon', 'k_01_alza_el_vuelo');
-    await sleep(2200);
-    await stand(0, 175, 0, 205, 0, 0.75, 40);
-    await sleep(500);
+    await sleep(1600);
+    await stand(0, 181, 0, 205, 0, 0.8, 42);
+    await sleep(400);
     await shot('dragon', 'k_02_mitad_marcada_en_rojo');
-    await sleep(2200);
+    await sleep(2400);
     await shot('dragon', 'k_03_mitad_a_punto');
-    await sleep(500);
+    await sleep(700);
     await shot('dragon', 'k_04_fuego_sobre_la_mitad');
     await sleep(1600);
     await shot('dragon', 'k_05_segunda_mitad');
     await sleep(4300);
     await shot('dragon', 'k_06_segundo_fuego');
     await sleep(8000);
+    await stand(0, 186, 0, 205, 0, 0.45, 26);
+    await sleep(400);
     await shot('dragon', 'k_07_aterriza');
   }
 } finally {
