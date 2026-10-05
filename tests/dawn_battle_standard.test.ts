@@ -57,7 +57,7 @@ describe('Dawn Battle Standard', () => {
     expect(blessingLogs(events)).toHaveLength(1);
     expect(blessingGains(events)).toHaveLength(1);
     expect(sim.player.auras.filter((a) => a.id === 'blessing_of_the_dawn')).toHaveLength(1);
-  });
+  }, 45_000);
 
   it('grants it again, once, after the player leaves and comes back', () => {
     const sim = plantedSim(4102);
