@@ -1398,7 +1398,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // integrations moved the runtimeRender.renderer leaf. No capture was retaken.
   // Re-minted for the Sunken Bastion and Drowned Temple encounter passes (the
   // renderer leaf moved again). No capture was retaken.
-  '9e95e5cf0151c5c92144cd1c3079e14c9a8bb6225199c1f9eaaabfc98f42efab';
+  // Re-minted for the dungeon trash pass (the renderer leaf moved again: the
+  // trash engine and the dungeon trash visuals). No capture was retaken.
+  'f6a2a8ca8ba7c8d3dba868e1a6cc69b84b1b2824a7b0d0b6c7340bc22f3d20e8';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1425,7 +1427,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // integrations moved the runtimeRender.renderer leaf. No capture was retaken.
   // Re-minted for the Sunken Bastion and Drowned Temple encounter passes (the
   // renderer leaf moved again). No capture was retaken.
-  'e179b7a2ebf3f21e4c6731d7d8e5caa9d9a5747cda1f462acfc63c83f537ba37';
+  // Re-minted for the dungeon trash pass (the renderer leaf moved again: the
+  // trash engine and the dungeon trash visuals). No capture was retaken.
+  '32e8545d816989e99d16a079200f78d77ca95071e66a6a99d89cb7c74ff0ef05';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2810,7 +2814,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Five-dungeon rework (feature/drowned-temple-rework): recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('993dfafd6302bb8482807e2d102ce8e3fbc41f2600bfb5aa3cfd8fed7d7ec143');
+    ).toBe('2f96d471bf39ea5001b98aa4d0ac60351e425b4c5a4b955c3c5db50d636fbcaa');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

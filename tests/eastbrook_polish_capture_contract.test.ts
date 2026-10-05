@@ -704,7 +704,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // integrations moved the runtimeRender.renderer leaf. No capture was retaken.
   // Re-minted for the Sunken Bastion and Drowned Temple encounter passes (the
   // renderer leaf moved again). No capture was retaken.
-  'e179b7a2ebf3f21e4c6731d7d8e5caa9d9a5747cda1f462acfc63c83f537ba37';
+  // Re-minted for the dungeon trash pass (the renderer leaf moved again: the
+  // trash engine and the dungeon trash visuals). No capture was retaken.
+  '32e8545d816989e99d16a079200f78d77ca95071e66a6a99d89cb7c74ff0ef05';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
