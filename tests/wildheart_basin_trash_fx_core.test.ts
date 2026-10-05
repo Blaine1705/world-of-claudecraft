@@ -35,6 +35,7 @@ import {
   trashPullCensuses,
   trashShockLook,
 } from '../src/render/wildheart_basin/basin_trash_fx_core';
+import { TOAD_CLIP } from '../src/render/wildheart_basin/basin_trash_model_core';
 import { WILDHEART_BASIN_PACKS, WILDHEART_BASIN_SPAWNS } from '../src/sim/content/wildheart';
 import { MOBS } from '../src/sim/data';
 import {
@@ -235,7 +236,7 @@ describe('the hunt bodies and clips', () => {
     const tongue = hunt(SPORE_TOAD_ID)?.tongue;
     expect(trashCastClipRate(WILDHEART_QUARRY_MARK)).toBeCloseTo(2 / (mark?.castTime ?? 0), 6);
     expect(trashCastClipRate(WILDHEART_SNARING_TONGUE)).toBeCloseTo(
-      1.67 / (tongue?.castTime ?? 0),
+      TOAD_CLIP.tongueFire / (tongue?.castTime ?? 0),
       6,
     );
     expect(trashCastClipRate(WILDHEART_WAR_ROAR)).toBe(1);

@@ -46,6 +46,9 @@ import {
   RAPTOR_MODEL,
   RAPTOR_SIM_SCALE,
   raptorPounceRate,
+  TOAD_CLIP,
+  TOAD_MODEL,
+  TOAD_SIM_SCALE,
   trashLookHeight,
   trashLookHover,
 } from '../wildheart_basin/basin_trash_model_core';
@@ -318,6 +321,51 @@ export const WILDHEART_BASIN_RAPTOR_LOOK: VisualDef = {
   clickRadius: 1.6,
 };
 
+/** The Spore Toad's death rate: its puffballs burst 0.6 s after it falls. */
+const TOAD_DEATH_RATE = TOAD_CLIP.burst / 0.6;
+
+/** The Spore Toad's clips (its body and the Toad Hex's toad share them). */
+const SPORE_TOAD_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Bite', 'Slam'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
+/** The Spore Toad (scripts/assets/wildheart_spore_toad, built in Blender): a
+ *  squat warty swamp toad bigger than a boar, its back crusted with glowing
+ *  puffballs, mushrooms and spore pods (its own emissive map), great gold eyes
+ *  on top, a mouth from ear to ear. Drawn at its authored size, 3.5 yd to the
+ *  eyes at its 2.4. The Snaring Tongue plays Tongue from the bar's start (the
+ *  rate its jaws fly open on the bar's end, TRASH_CAST_CLIPS), the throat
+ *  swelling through the bar, and finishes the reel as a play-out; the death
+ *  bloats it and bursts its puffballs into the Spore Burst's cloud. */
+export const WILDHEART_SPORE_TOAD_LOOK: VisualDef = {
+  url: TOAD_MODEL.url,
+  height: trashLookHeight(TOAD_MODEL, TOAD_SIM_SCALE),
+  hover: trashLookHover(TOAD_MODEL, TOAD_SIM_SCALE),
+  clips: {
+    ...SPORE_TOAD_CLIPS,
+    cast: 'Tongue',
+    castByAbility: { [WILDHEART_SNARING_TONGUE]: 'Tongue' },
+    castTimeScaleByAbility: {
+      [WILDHEART_SNARING_TONGUE]: trashCastClipRate(WILDHEART_SNARING_TONGUE),
+    },
+    castPlayOut: ['Tongue'],
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  walkRef: TOAD_MODEL.walkRef,
+  runRef: TOAD_MODEL.runRef,
+  attackTimeScale: 1.1,
+  // The puffballs burst about 0.6 s after it falls, as its spore cloud rises.
+  deathTimeScale: TOAD_DEATH_RATE,
+  authoredAtlas: true,
+  clickRadius: 2.2,
+};
+
 /** A carved prop that never moves: every clip lookup misses harmlessly. */
 const STATIC_TOTEM_CLIPS: ClipMap = {
   idle: 'Idle',
@@ -331,8 +379,6 @@ const STATIC_TOTEM_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, PlaceholderRow> = {
-  // Spore Toad: the frog rig, warty olive and as big as a boar (4.5 yd at 2.4).
-  wildheart_spore_toad: ['mob_murloc', 0x7f8a34, 0.7, 1.1, { selfIllumination: 0.08 }],
   // Sunbone Totem-Binder: the Hexcaller under a bone-ochre wash.
   wildheart_totem_binder: ['mob_wildheart_hexcaller', 0xd9b26a, 0.3, 1.05],
   // The Howdah Hexcaller: the Hexcaller in the howdah's war red.
@@ -360,12 +406,11 @@ const HUNT_CAST_RIGS: Readonly<Record<string, readonly string[]>> = {
   mob_wildheart_stalker: [WILDHEART_QUARRY_MARK],
   mob_wildheart_ravager: [WILDHEART_WAR_ROAR],
   mob_wildheart_hexcaller: [WILDHEART_TOAD_HEX],
-  wildheart_spore_toad: [WILDHEART_SNARING_TONGUE],
 };
 
 /** The Toad Hex's toad (the polymorph slot's other animal,
- *  characters/form_visual_selection_core.ts): the Spore Toad's warty frog rig
- *  in its olive, shrunk to a squat thing at a player's knee. */
+ *  characters/form_visual_selection_core.ts): the Spore Toad's own body,
+ *  shrunk to a squat thing at a player's knee. */
 const TOAD_FORM_HEIGHT = 1.3;
 
 /** Zulgar vanishes (heroic Ambush): his whole model hides, then returns. */
@@ -428,20 +473,21 @@ export function wildheartPlaceholderLooks(
   out.wildheart_thorn_sprout = WILDHEART_THORN_SPROUT_LOOK;
   out.wildheart_fanglord_jaguar = WILDHEART_GREAT_JAGUAR_LOOK;
   out.wildheart_basin_raptor = WILDHEART_BASIN_RAPTOR_LOOK;
-  // The hunt's casts on their rigs (the base rigs and the Spore Toad above).
+  out.wildheart_spore_toad = WILDHEART_SPORE_TOAD_LOOK;
+  // The hunt's casts on the shipped troll rigs.
   for (const [key, casts] of Object.entries(HUNT_CAST_RIGS)) {
     const taught = withHuntCasts(out[key] ?? visuals[key], casts);
     if (taught) out[key] = taught;
   }
-  const frog = visuals.mob_murloc;
-  if (frog)
-    out.form_toad = {
-      ...frog,
-      height: TOAD_FORM_HEIGHT,
-      tint: 0x7f8a34,
-      tintStrength: 0.7,
-      selfIllumination: 0.08,
-    };
+  // The Toad Hex's toad: the Spore Toad's own body shrunk to a player's knee.
+  out.form_toad = {
+    url: TOAD_MODEL.url,
+    height: TOAD_FORM_HEIGHT,
+    clips: SPORE_TOAD_CLIPS,
+    walkRef: TOAD_MODEL.walkRef * (TOAD_FORM_HEIGHT / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin)),
+    runRef: TOAD_MODEL.runRef * (TOAD_FORM_HEIGHT / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin)),
+    authoredAtlas: true,
+  };
   // Zulgar keeps his shipped body; it learns to vanish for the Ambush.
   const zulgar = visuals.mob_wildheart_high_priest;
   if (zulgar)

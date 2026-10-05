@@ -235,6 +235,9 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_fanglord_jaguar',
   // the Blender Basin Raptor (scripts/assets/wildheart_basin_raptor)
   'wildheart_basin_raptor',
+  // the Blender Spore Toad (scripts/assets/wildheart_spore_toad) and the Toad Hex's toad on it
+  'wildheart_spore_toad',
+  'form_toad',
   'wildheart_sunbone_totem',
   // its Dread Totem: the same carved post re-tinted (wildheart_creature_looks.ts)
   'wildheart_sunbone_dread_totem',

@@ -47,7 +47,14 @@ import { PARTY_MAX } from '../../sim/social/party';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { shockRingLook } from './basin_boss_fx_core';
 import { basinTelegraphSpecs } from './basin_fx_core';
-import { RAPTOR_MODEL, RAPTOR_SIM_SCALE, trashLookHeight } from './basin_trash_model_core';
+import {
+  RAPTOR_MODEL,
+  RAPTOR_SIM_SCALE,
+  TOAD_CLIP,
+  TOAD_MODEL,
+  TOAD_SIM_SCALE,
+  trashLookHeight,
+} from './basin_trash_model_core';
 
 /** The hunt's own element accents (motes, fill fronts, glows; never a rim). */
 export const TRASH_ACCENTS = {
@@ -195,7 +202,8 @@ export const TRASH_CAST_CLIPS: Readonly<Record<string, TrashCastClip>> = {
   [WILDHEART_QUARRY_MARK]: { clip: 'Attack', clipSeconds: 2, fitToBar: true },
   [WILDHEART_WAR_ROAR]: { clip: 'Cast', clipSeconds: 5.38, fitToBar: false },
   [WILDHEART_TOAD_HEX]: { clip: 'Cast', clipSeconds: 5.38, fitToBar: false },
-  [WILDHEART_SNARING_TONGUE]: { clip: 'Duck', clipSeconds: 1.67, fitToBar: true },
+  // The Spore Toad's own Tongue clip: its jaws fly open on the bar's end.
+  [WILDHEART_SNARING_TONGUE]: { clip: 'Tongue', clipSeconds: TOAD_CLIP.tongueFire, fitToBar: true },
 };
 
 /** The bar (seconds) of a hunt cast, from its template. */
@@ -228,8 +236,7 @@ export const TRASH_BODY_HEIGHT: Readonly<Record<string, number>> = {
   [STALKER_ID]: 2.5,
   [RAVAGER_ID]: 2.7,
   [HEXCALLER_ID]: 2.5,
-  // mob_murloc's frog (1.7) grown 1.1.
-  [SPORE_TOAD_ID]: 1.87,
+  [SPORE_TOAD_ID]: trashLookHeight(TOAD_MODEL, TOAD_SIM_SCALE),
   [SUNBONE_DREAD_TOTEM_ID]: 4,
 };
 /** A player's drawn height (yards at scale 1). */
@@ -240,10 +247,12 @@ export function trashBodyHeight(templateId: string, scale: number): number {
   return (TRASH_BODY_HEIGHT[templateId] ?? PLAYER_HEIGHT) * (scale > 0 ? scale : 1);
 }
 
-/** The Spore Toad's mouth on its frog rig, as shares of its drawn height
- *  (measured off frog.glb: the eyes sit at 0.92 of the height, 0.14 forward;
- *  the mouth just under them). */
-export const TOAD_MOUTH = { up: 0.8, forward: 0.17 } as const;
+/** The Spore Toad's mouth on its Blender body at the tongue's release, as
+ *  shares of its drawn height (basin_trash_model_core.ts TOAD_MODEL). */
+export const TOAD_MOUTH = {
+  up: TOAD_MODEL.mouth.up / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin),
+  forward: TOAD_MODEL.mouth.forward / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin),
+} as const;
 
 /** Where the tongue leaves the toad's mouth, written into `out`. */
 export function toadMouthInto(

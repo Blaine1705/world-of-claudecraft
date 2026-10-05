@@ -44,6 +44,41 @@ export const RAPTOR_CLIP = {
   deathBody: 1.1 + KEY_LEAD,
 } as const;
 
+/** The Spore Toad's sim scale (sim/content/wildheart.ts spore_toad). */
+export const TOAD_SIM_SCALE = 2.4;
+
+export const TOAD_MODEL = {
+  url: 'models/creatures/wildheart_spore_toad.glb',
+  /** The Idle pose's skinned bounds (0.5 s in): the claw tips' dip below the
+   *  soles to the tops of its eyes. */
+  idleMin: -0.107,
+  idleTop: 3.783,
+  /** Its eyes' tops at Idle (yards): its highest point, over a player's head. */
+  eyes: 3.78,
+  /** Where the tongue leaves its open mouth on the Snaring Tongue's release
+   *  (Tongue at the bar's end, sampled off the shipped clip): yards up and
+   *  forward of its origin. */
+  mouth: { up: 1.38, forward: 3.45 },
+  /** The gaits' reference speeds (planted feet slide at these). */
+  walkRef: 2.4,
+  runRef: 6,
+} as const;
+
+export const TOAD_CLIP = {
+  /** Bite: the jaws shut at 0.45. Slam: the chest hits at 0.58. */
+  bite: 0.45 + KEY_LEAD,
+  slam: 0.58 + KEY_LEAD,
+  /** Tongue (the Snaring Tongue's 1.5 s bar, played from its start): the
+   *  throat swells to 1.22, the head snaps down the lane and the jaws fly
+   *  open at 1.50, held wide through the reel to 2.35, shut by 2.65. */
+  tongueFire: 1.5 + KEY_LEAD,
+  tongueShut: 2.65 + KEY_LEAD,
+  /** Death (the Spore Burst): it bloats, the puffballs burst at 0.85, it lies
+   *  flat at 1.45 (at 1x; the look plays it faster). */
+  burst: 0.85 + KEY_LEAD,
+  flat: 1.45 + KEY_LEAD,
+} as const;
+
 /** The Pounce's rate: its feet strike on the last tick of the sim's flight
  *  (`seconds`, the leap kit's own). */
 export function raptorPounceRate(seconds: number): number {

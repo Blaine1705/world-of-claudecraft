@@ -39,12 +39,13 @@ are the single source; everything here derives from them.
 
 The creature looks live in `../characters/wildheart_creature_looks.ts` (merged into the
 manifest): the Great Saurian, the Great Jaguar, the Gorgebloom, the Snarlvine Lasher and the
-Thorn Sprout and the Basin Raptor wear their Blender bodies; the rest of the trash keeps tinted
-placeholders. A fallen raptor's packmates scream into their frenzy (`RAPTOR_FRENZY_GESTURE`, the
+Thorn Sprout, the Basin Raptor and the Spore Toad wear their Blender bodies; the rest of the
+trash keeps tinted placeholders. The Snaring Tongue leaves the toad's own open mouth
+(`TOAD_MOUTH`, measured off its Tongue clip). A fallen raptor's packmates scream into their frenzy (`RAPTOR_FRENZY_GESTURE`, the
 Screech clip, sent by `basin_trash_fx.ts`).
 The Sunbone Dread Totem is the Sunbone Totem's carved post washed in old blood (the fx
 crown it with the red skull), the hunt's casts play existing clips on their rigs
-(`TRASH_CAST_CLIPS`), and `form_toad` (the Spore Toad's frog rig at a player's knee)
+(`TRASH_CAST_CLIPS`), and `form_toad` (the Spore Toad's own Blender body at a player's knee)
 is the polymorph slot's other animal: a Toad Hex wears it, never the sheep
 (`../characters/form_visual_selection_core.ts`, `../characters/form_rig_sync.ts`). The
 Gorgebloom stands in a root pool on its dais (`basin_water.ts`, `GORGEBLOOM_ROOT_POOL`): its
