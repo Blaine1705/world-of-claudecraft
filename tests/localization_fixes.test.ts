@@ -1759,6 +1759,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'chat.ts',
       'chat_readouts.ts',
       'duel.ts',
+      'duel_zone.ts',
       'dungeon_finder.ts',
       'fiesta.ts',
       'fiesta_bots.ts',
