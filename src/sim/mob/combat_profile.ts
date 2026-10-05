@@ -79,8 +79,7 @@ function mobCanReachMeleeTarget(
   reach = mobEffectiveMeleeRange(mob),
 ): boolean {
   return (
-    Math.abs(mob.pos.y - target.pos.y) <= Math.max(4, reach) &&
-    dist2d(mob.pos, target.pos) <= reach
+    Math.abs(mob.pos.y - target.pos.y) <= Math.max(4, reach) && dist2d(mob.pos, target.pos) <= reach
   );
 }
 
