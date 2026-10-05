@@ -13,10 +13,10 @@
 import * as THREE from 'three';
 import { GRAVEWYRM_SANCTUM_FIELD } from '../../sim/content/gravewyrm_sanctum_layout';
 import { authoredFieldCliffRuns } from '../../sim/instances/authored_field';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
 import { planDustSpots, sanctumHash } from './sanctum_plan_core';
-
 export interface SanctumAirOptions {
   lowGfx: boolean;
   /** 0..1 cosmetic density (tier shed). */
@@ -33,7 +33,7 @@ const DUST_PER_SPOT = 18;
 const DUST_BOX = 18;
 const DUST_HEIGHT = 9;
 
-const DUST_VERT = /* glsl */ `
+const DUST_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 attribute vec3 aBase;
 attribute vec4 aSeed; // three phases and the crystal's size
@@ -49,7 +49,7 @@ void main() {
   off.z = mod(aSeed.y * box + sin(uTime * 0.11 + aSeed.x * 20.0) * 2.0, box) - box * 0.5;
   off.y = 0.3 + mod(aSeed.z * ${DUST_HEIGHT.toFixed(1)} - uTime * (0.08 + 0.08 * aSeed.x), ${DUST_HEIGHT.toFixed(1)});
   vec4 world = modelMatrix * vec4(aBase + off, 1.0);
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   // Never vanish to a sub-pixel speck at range (a crystal is a glint, not a size).
   float size = aSeed.w * (1.0 + max(0.0, -mvPosition.z) * 0.012);
   mvPosition.xy += position.xy * size;
@@ -195,7 +195,7 @@ export function planSpindriftSpots(max: number): SpindriftSpot[] {
 
 const DRIFT_PER_SPOT = 6;
 
-const DRIFT_VERT = /* glsl */ `
+const DRIFT_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 attribute vec3 aBase;
 attribute vec4 aDir;  // wind x, wind z, drop, seed
@@ -216,7 +216,7 @@ void main() {
   // Lifted off the lip by the gust, then falling away into the drop.
   p.y += 1.0 * sin(age * 3.14159) - min(aDir.z, 18.0) * age * age * 0.55;
   p.xz += vec2(-aDir.y, aDir.x) * sin(age * 5.0 + seed * 9.0) * 0.8;
-  vec4 mvPosition = viewMatrix * modelMatrix * vec4(p, 1.0);
+  vec4 mvPosition = wocCamRelView((modelMatrix * vec4(p, 1.0)).xyz);
   float w = mix(1.1, 6.5, age);
   float h = w * 0.42;
   mvPosition.xy += vec2(position.x * w, position.y * h);

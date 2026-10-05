@@ -12,13 +12,14 @@
 // point lights); fewer tongues and no embers on the low tier.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { FLAME_ATLAS_GLSL, getFlameTex } from '../ignivar_fire_vfx';
 import { markSharedTexture } from '../shared_resource';
 import { BRAZIER_FIRE, fireInstanceCount } from './basin_fire_core';
 import { basinHash } from './basin_plan_core';
 
-const FIRE_VERT = /* glsl */ `
+const FIRE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 attribute vec3 aBase;
 attribute vec4 aSeed; // seed, kind (0 tongue, 1 core, 2 ember), ring angle, size
@@ -71,7 +72,7 @@ void main() {
   vec3 right = normalize(vec3(toCam.z, 0.0, -toCam.x) + vec3(1e-4, 0.0, 0.0));
   float sway = sin(uTime * 6.0 + seed * 40.0) * 0.12 * vQuad.y * vQuad.y * w;
   vec3 world = p + right * (position.x * w + sway) + vec3(0.0, (position.y + 0.42) * h, 0.0);
-  gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(world);
 }
 `;
 

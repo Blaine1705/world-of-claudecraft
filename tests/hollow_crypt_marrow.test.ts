@@ -338,3 +338,55 @@ describe('Sexton Marrow: determinism', () => {
     expect(trace()).toBe(trace());
   });
 });
+
+describe('Sexton Marrow: planted for every bar', () => {
+  const BARS = [
+    { what: 'shovel', id: MARROW_SHOVELFUL, cast: T.shovelCast, mode: 'normal' },
+    { what: 'measure', id: MARROW_MEASURE, cast: T.measureCast, mode: 'normal' },
+    { what: 'blow', id: MARROW_GRAVEDIGGERS_BLOW, cast: T.blowCast, mode: 'heroic' },
+  ] as const;
+  for (const bar of BARS) {
+    it(`stays on the spot his ${bar.what} bar began while his tank backs away`, () => {
+      const { f, marrow } = marrowFight(bar.mode);
+      const keep = holdAll(f);
+      run(f, 0.3, keep);
+      const s = marrow.cryptBossFight;
+      if (s?.kind !== 'marrow') throw new Error('no marrow fight');
+      s.shovelTimer = bar.what === 'shovel' ? 0 : 99;
+      s.measureTimer = bar.what === 'measure' ? 0 : 99;
+      s.blowTimer = bar.what === 'blow' ? 0 : 99;
+      expect(until(f, () => marrow.castingAbility === bar.id, 1, keep)).toBe(true);
+      const at = { x: marrow.pos.x, y: marrow.pos.y, z: marrow.pos.z };
+      const facing = marrow.facing;
+      let step = 0;
+      let moved = 0;
+      let turned = 0;
+      // The tank backs off across the yard every tick: a boss that chased
+      // would walk after him mid-bar (7 yd a second).
+      const landed = until(
+        f,
+        () => marrow.castingAbility === null,
+        bar.cast + 0.2,
+        () => {
+          keep();
+          step++;
+          put(f, f.tank, MID.x + 6 + step * 0.25, MID.z - 9);
+          moved = Math.max(moved, Math.hypot(marrow.pos.x - at.x, marrow.pos.z - at.z));
+          if (Math.abs(marrow.facing - facing) > 1e-9) turned++;
+        },
+      );
+      expect(landed).toBe(true);
+      expect(moved).toBeLessThan(1e-6);
+      expect(marrow.pos.y).toBeCloseTo(at.y, 6);
+      if (bar.what === 'blow') {
+        // The blow keeps turning to the tank it swings at (only his feet stay).
+        expect(turned).toBeGreaterThan(0);
+      } else {
+        // The cone keeps its aim; the mark keeps turning to its victim (who
+        // stands still here), so neither turns.
+        expect(turned).toBe(0);
+      }
+      expect(marrow.castHold).toBeUndefined();
+    });
+  }
+});

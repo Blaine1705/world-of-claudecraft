@@ -15,6 +15,7 @@
 
 import * as THREE from 'three';
 import { SUNKEN_BASTION_SEA_LEVEL } from '../../sim/content/sunken_bastion_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import {
@@ -29,7 +30,6 @@ import {
   SPLASH_HEIGHT_RANGE,
   SPLASH_RADIUS,
 } from './bastion_rain_core';
-
 export interface BastionRainOptions {
   lowGfx: boolean;
   /** 0..1 cosmetic density (tier shed). */
@@ -48,7 +48,7 @@ float vnoise(vec2 p) {
 
 // ---- streaks ---------------------------------------------------------------------------
 
-const STREAK_VERT = /* glsl */ `
+const STREAK_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aSeed;
 attribute vec2 aCorner;
 uniform float uTime;
@@ -88,7 +88,7 @@ void main() {
   vAlpha = nearFade * edge * present * (0.55 + 0.45 * gust);
   vUv = aCorner;
   vShade = 0.72 + 0.28 * fract(aSeed.y * 17.3);
-  gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(world);
 }
 `;
 
@@ -163,7 +163,7 @@ function buildStreaks(count: number): THREE.Mesh {
 
 // ---- splashes ---------------------------------------------------------------------------
 
-const SPLASH_VERT = /* glsl */ `
+const SPLASH_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aSeed;
 attribute vec2 aCorner;
 attribute float aKind;
@@ -213,7 +213,7 @@ void main() {
   vUv = aCorner;
   vKind = aKind;
   vAlpha *= ok * distFade;
-  gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(world);
 }
 `;
 
@@ -329,7 +329,7 @@ function buildSplashes(count: number): THREE.Mesh {
 
 // ---- distant sheets --------------------------------------------------------------------
 
-const SHEET_VERT = /* glsl */ `
+const SHEET_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aSheet; // bearing, radius, seed
 attribute vec2 aCorner; // u across 0..1, v up 0..1
 uniform float uTime;
@@ -352,7 +352,7 @@ void main() {
   vUv = aCorner;
   vSeed = aSheet.z;
   vBearing = bearing;
-  gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(world);
 }
 `;
 

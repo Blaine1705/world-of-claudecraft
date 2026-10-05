@@ -2265,7 +2265,9 @@ const MONOLITHS: MonolithRow[] = [
     // Nythraxis flanking platforms (v0.42.2). Exact count, zero slack.
     // Lowered 2420 -> 2411: the open-air field builders moved to
     // src/render/open_air_fields.ts (the Drowned Temple joined that table).
-    ceiling: 2411,
+    // Lowered 2411 -> 2364: the Drowned Temple water sheet's shaders moved to
+    // src/render/temple_water_shader.ts with the camera-relative floor fix.
+    ceiling: 2364,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

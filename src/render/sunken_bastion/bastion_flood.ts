@@ -13,6 +13,7 @@
 // body and stays under the embrasure sills, so the wall hides every edge.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { SUNKEN_BASTION_SUN_DIRECTION } from '../interior_light_rig';
 import {
@@ -27,7 +28,7 @@ import {
 const THETA_SEGMENTS = 144;
 const RINGS = 16;
 
-const FLOOD_VERT = /* glsl */ `
+const FLOOD_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute float aKeep;
 uniform float uDepth;
 varying vec3 vWorld;
@@ -42,7 +43,7 @@ void main() {
   vLocal = position.xz;
   vec4 world = modelMatrix * vec4(p, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

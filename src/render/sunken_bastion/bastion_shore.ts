@@ -10,10 +10,10 @@
 import * as THREE from 'three';
 import { SUNKEN_BASTION_SEA_LEVEL } from '../../sim/content/sunken_bastion_layout';
 import { rockDetail } from '../authored_field/field_textures';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { HEADLAND_DROWNED, planHeadlandRock, rockNoise } from './bastion_headland_core';
 import { planSurf } from './bastion_plan_core';
-
 /** The headland rock as one mesh (tops of the void between the terraces). */
 export function buildHeadlandRock(lowGfx: boolean): THREE.Mesh {
   const grid = planHeadlandRock(lowGfx ? 4 : 2.5);
@@ -99,7 +99,7 @@ export function buildHeadlandRock(lowGfx: boolean): THREE.Mesh {
 
 // ---- surf ---------------------------------------------------------------------------
 
-const SPRAY_VERT = /* glsl */ `
+const SPRAY_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aSurf;   // x, z, nx, nz
 attribute vec3 aSeed;   // phase, spread, lift
 uniform float uTime;
@@ -118,7 +118,7 @@ void main() {
   float out1 = (0.4 + aSeed.y) * life * 3.0;
   p.xz += n * out1 + side * (aSeed.y - 0.5) * 5.0;
   p.y += (4.0 + aSeed.z * 7.0) * life - 11.0 * life * life + 0.3;
-  vec4 mv = viewMatrix * modelMatrix * vec4(p, 1.0);
+  vec4 mv = wocCamRelView((modelMatrix * vec4(p, 1.0)).xyz);
   gl_Position = projectionMatrix * mv;
   gl_PointSize = min(44.0, (3.0 + aSeed.z * 5.0) * (1.0 + life * 1.2) * (300.0 / max(1.0, -mv.z)));
   // Spray right under the camera (a yard on the water) thins out instead of

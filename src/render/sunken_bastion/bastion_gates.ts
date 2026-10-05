@@ -13,6 +13,7 @@
 import * as THREE from 'three';
 import { SUNKEN_BASTION_GATES } from '../../sim/content/sunken_bastion';
 import type { DungeonGateDef } from '../../sim/types';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { GFX, sharedUniforms } from '../gfx';
 import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
 
@@ -148,14 +149,14 @@ function drawbridge(gate: DungeonGateDef): GateRig {
   };
 }
 
-const FOG_WALL_VERT = /* glsl */ `
+const FOG_WALL_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vWorld;
 void main() {
   vUv = uv;
   vec4 w = modelMatrix * vec4(position, 1.0);
   vWorld = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 

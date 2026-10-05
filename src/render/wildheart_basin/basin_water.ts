@@ -11,6 +11,7 @@
 
 import * as THREE from 'three';
 import { BASALT_STEPS } from '../../sim/content/wildheart_basin_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
 import {
@@ -22,7 +23,6 @@ import {
   riverStations,
 } from './basin_plan_core';
 import { BASIN_NOISE_GLSL } from './basin_sky';
-
 /** Up to four waders whose legs churn the ford (world x, z, radius, on). The
  *  encounter painter writes them each frame (the Great Saurian first). */
 export const BASIN_WATER_WADERS = {
@@ -34,7 +34,7 @@ export const BASIN_WATER_WADERS = {
   ],
 };
 
-const WATER_VERT = /* glsl */ `
+const WATER_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec2 aFlow;   // flow direction * speed (yards per second)
 attribute vec2 aWater;  // x: 0 mid-stream .. 1 at the bank, y: depth share (0 shallow, 1 deep)
 varying vec2 vFlow;
@@ -48,7 +48,7 @@ void main() {
   vLocal = position;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

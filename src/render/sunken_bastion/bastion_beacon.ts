@@ -11,6 +11,7 @@
 
 import * as THREE from 'three';
 import { BEACON_CROWN } from '../../sim/content/sunken_bastion_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
 import { beaconVeilBoost, VEIL_BEAM_GAIN } from './bastion_boss_fx_core';
@@ -20,7 +21,6 @@ import {
   BEACON_LAMP,
   resampleStream,
 } from './bastion_plan_core';
-
 /** Length of the beam from the lamp (yards) and its radius at the far end. */
 export const BEACON_BEAM_LENGTH = 150;
 export const BEACON_BEAM_FAR_RADIUS = 13;
@@ -44,7 +44,7 @@ export function setBeaconYaw(ox: number, oz: number, yaw: number | null): void {
   else yawOverride.set(slotKey(ox, oz), yaw);
 }
 
-const BEAM_VERT = /* glsl */ `
+const BEAM_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uYaw;
 uniform float uPitch;
 uniform float uLength;
@@ -66,7 +66,7 @@ void main() {
   vWorld = world.xyz;
   vOriginW = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
   vAxisW = normalize(mat3(modelMatrix) * vec3(s * cp, -sp, c * cp));
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * wocCamRelView(world.xyz);
 }
 `;
 
@@ -204,7 +204,7 @@ function buildLampGlow(): THREE.Group {
 
 // ---- Vael's fog pouring off the beacon ----------------------------------------------------
 
-const STREAM_VERT = /* glsl */ `
+const STREAM_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute float aStream;
 attribute float aPhase;
 attribute vec3 aJitter;
@@ -227,7 +227,7 @@ void main() {
   // The fog spreads as it falls.
   float spread = 2.0 + s * 18.0;
   p += vec3(sin(wobble) * aJitter.z, sin(wobble * 1.3) * 0.4, cos(wobble * 0.9) * aJitter.z) * spread;
-  vec4 mv = viewMatrix * vec4(p, 1.0);
+  vec4 mv = wocCamRelView(p);
   gl_Position = projectionMatrix * mv;
   gl_PointSize = min(220.0, uSize * (1.0 + s * 3.0) * (300.0 / max(1.0, -mv.z)));
   float nearFade = smoothstep(14.0, 60.0, -mv.z);

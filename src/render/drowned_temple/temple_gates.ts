@@ -18,6 +18,7 @@ import type { FieldPathSurface } from '../../sim/instances/authored_field/types'
 import type { DungeonGateDef } from '../../sim/types';
 import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
 import { flagstoneDetail } from '../authored_field/field_textures';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { GFX, sharedUniforms, surfaceMat } from '../gfx';
 import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
 import { instancePlacements, templeKitPiece, templeSlotMaterial } from './temple_kit';
@@ -44,14 +45,14 @@ interface GateRig {
   apply(openness: number, seal: number, since: number, forming: boolean): void;
 }
 
-const SHEET_VERT = /* glsl */ `
+const SHEET_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vWorld;
 void main() {
   vUv = uv;
   vec4 w = modelMatrix * vec4(position, 1.0);
   vWorld = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 

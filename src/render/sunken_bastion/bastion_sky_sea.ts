@@ -15,6 +15,7 @@ import {
   SUNKEN_BASTION_SEA_LEVEL,
 } from '../../sim/content/sunken_bastion_layout';
 import { rockDetail } from '../authored_field/field_textures';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { SUNKEN_BASTION_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import { SUNKEN_BASTION_SUN_DIRECTION } from '../interior_light_rig';
@@ -25,7 +26,6 @@ import {
   planShoreMask,
   SHORE_MASK_BOUNDS,
 } from './bastion_plan_core';
-
 export interface BastionAtmosphereOptions {
   lowGfx: boolean;
   /** 0..1 cosmetic density (tier shed): particle counts and cloud octaves. */
@@ -188,7 +188,7 @@ function buildSky(opts: BastionAtmosphereOptions): THREE.Mesh {
 
 // ---- the sea --------------------------------------------------------------------------
 
-const SEA_VERT = /* glsl */ `
+const SEA_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 uniform float uChop;
 varying vec3 vWorld;
@@ -241,7 +241,7 @@ void main() {
   vWorld = world.xyz;
   vNormalW = normalize(mix(vec3(0.0, 1.0, 0.0), n, fade));
   vCrest = crest * fade;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -373,7 +373,7 @@ function buildSea(opts: BastionAtmosphereOptions): THREE.Mesh {
 
 // ---- fog on the water ---------------------------------------------------------------
 
-const BANK_VERT = /* glsl */ `
+const BANK_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aBank;   // x, y, z, size
 attribute vec3 aDrift;  // dx, dz, seed
 uniform float uTime;
@@ -397,7 +397,7 @@ void main() {
   world.xyz += vec3(side.x, 0.0, side.y) * position.x * aBank.w + vec3(0.0, position.y * aBank.w * 0.35, 0.0);
   // Never a wall across the camera: fade banks that come too close.
   vFade = smoothstep(18.0, 60.0, length(toCam));
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -466,7 +466,7 @@ function buildFogBanks(opts: BastionAtmosphereOptions): THREE.Mesh {
 }
 
 // A thin mist layer hugging the water round the cliff feet (never over a terrace).
-const MIST_VERT = /* glsl */ `
+const MIST_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vWorld;
 varying vec3 vLocal;
 #include <fog_pars_vertex>
@@ -474,7 +474,7 @@ void main() {
   vLocal = position;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -546,7 +546,7 @@ function buildWaterMist(opts: BastionAtmosphereOptions): THREE.Group {
 
 // ---- gulls -----------------------------------------------------------------------------
 
-const GULL_VERT = /* glsl */ `
+const GULL_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aOrbit; // cx, cz, radius, height
 attribute vec2 aSeed;  // phase, speed
 uniform float uTime;
@@ -564,7 +564,7 @@ void main() {
   p.y += abs(p.x) * (0.35 + 0.45 * beat);
   vec3 world = c + vec3(side.x, 0.0, side.y) * p.x + vec3(fwd.x, 0.0, fwd.y) * p.z + vec3(0.0, p.y, 0.0);
   vShade = 0.75 + 0.25 * sign(p.x) * beat;
-  vec4 mvPosition = viewMatrix * vec4(world, 1.0);
+  vec4 mvPosition = wocCamRelView(world);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

@@ -14,6 +14,7 @@
 // sanctum_steam.ts's. Cosmetic scatter sheds on the low tier.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
@@ -30,7 +31,7 @@ import {
 const MARK_LIFT = 0.035;
 const WATER_LIFT = 0.06;
 
-const MARK_VERT = /* glsl */ `
+const MARK_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute float aKind;
 attribute float aSeed;
 varying vec2 vUv;
@@ -44,7 +45,7 @@ void main() {
   vSeed = aSeed;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -114,7 +115,7 @@ void main() {
 }
 `;
 
-const WATER_VERT = /* glsl */ `
+const WATER_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute float aAlong;
 varying vec2 vUv;
 varying float vAlong;
@@ -125,7 +126,7 @@ void main() {
   vAlong = aAlong;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

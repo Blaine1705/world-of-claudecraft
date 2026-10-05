@@ -58,6 +58,7 @@ import {
 } from '../../sim/mob/trash_kit/temple_cast_ids';
 import type { Aura, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import type { TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -140,7 +141,7 @@ void main() {
 
 // A camera-facing card centred on the mesh's position, uSize yards across
 // (0: no area, nothing drawn).
-const BILLBOARD_VERT = /* glsl */ `
+const BILLBOARD_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uSize;
 varying vec2 vUv;
 void main() {
@@ -149,11 +150,11 @@ void main() {
   vec3 r = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 u = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
   vec3 w = c + (r * position.x + u * position.y) * uSize;
-  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
 
-const SHELL_VERT = /* glsl */ `
+const SHELL_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vView;
 varying vec3 vLocal;
@@ -162,7 +163,7 @@ void main() {
   vec4 world = modelMatrix * vec4(position, 1.0);
   vN = normalize(mat3(modelMatrix) * normal);
   vView = normalize(cameraPosition - world.xyz);
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * wocCamRelView(world.xyz);
 }
 `;
 
@@ -170,7 +171,7 @@ void main() {
 // prayer, the oath's chain, a lightning arc (uJag > 0: a jagged path that
 // re-rolls 22 times a second, pinned at both ends). uReach runs it out from
 // uA toward uB (an arc racing to its target).
-const RIBBON_VERT = /* glsl */ `
+const RIBBON_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform vec3 uA;
 uniform vec3 uB;
 uniform float uWidth;
@@ -211,7 +212,7 @@ void main() {
   p += side * aSide * uWidth;
   vT = aT;
   vSide = aSide;
-  gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(p);
 }
 `;
 

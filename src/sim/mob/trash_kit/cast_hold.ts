@@ -7,7 +7,9 @@
 // Colossus holds its ground for its own bars.
 //
 // The hold rides `Entity.castHold` and dies with the bar (it lands, breaks,
-// or the pull ends). Zero rng.
+// or the pull ends). Zero rng. A scripted boss bar (an encounter's own bar,
+// today Sexton Marrow's) takes the same hold through beginCastHold /
+// keepCastHold, never a re-snap to wherever the mob AI just walked it.
 
 import { MOBS } from '../../data';
 import type { SimContext } from '../../sim_context';
@@ -58,6 +60,32 @@ export function restoreCastHold(mob: Entity): boolean {
   mob.pos.z = hold.z;
   mob.facing = hold.facing;
   return moved;
+}
+
+/**
+ * A scripted boss bar (an encounter module's own `startBar`) plants the boss
+ * where it begins and in the facing it begins with. The encounter calls this
+ * as the bar starts, then `keepCastHold` on every tick of the bar (after the
+ * mob AI walked and turned it).
+ */
+export function beginCastHold(mob: Entity, castId: string): void {
+  mob.castHold = { castId, x: mob.pos.x, y: mob.pos.y, z: mob.pos.z, facing: mob.facing };
+}
+
+/**
+ * One tick of a scripted bar's hold: take it now if the bar began without one
+ * (a bar started before the hold existed), then stand the boss back on its
+ * spot and facing. Returns true when it had moved (the caller re-grids it).
+ * A bar that keeps turning to its victim sets its facing after this.
+ */
+export function keepCastHold(mob: Entity, castId: string): boolean {
+  if (mob.castHold?.castId !== castId) beginCastHold(mob, castId);
+  return restoreCastHold(mob);
+}
+
+/** Drop a scripted bar's hold once the bar is gone (landed, broken, reset). */
+export function endCastHold(mob: Entity): void {
+  mob.castHold = undefined;
 }
 
 /**

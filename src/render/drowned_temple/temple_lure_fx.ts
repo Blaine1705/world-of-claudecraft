@@ -26,6 +26,7 @@ import {
 } from '../../sim/mob/trash_kit/temple_cast_ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import type { TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
@@ -74,7 +75,7 @@ void main() {
 // singer's mouth), sagging a little, rippling sideways like a sound wave
 // (the ripple travels toward her). On a snap its two halves spring back to
 // their own ends (uSnap 0..1).
-const TETHER_VERT = /* glsl */ `
+const TETHER_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform vec3 uA;
 uniform vec3 uB;
 uniform float uWidth;
@@ -109,7 +110,7 @@ void main() {
   p += side * aSide * uWidth * (0.75 + 0.25 * env);
   vT = t;
   vSide = aSide;
-  gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(p);
 }
 `;
 

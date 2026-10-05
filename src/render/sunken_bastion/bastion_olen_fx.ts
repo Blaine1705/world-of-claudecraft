@@ -44,6 +44,7 @@ import {
 } from '../../sim/encounters/sunken_bastion/ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   TELEGRAPH_ACCENTS,
   TELEGRAPH_THREAT_COLORS,
@@ -151,7 +152,7 @@ void main() {
 }
 `;
 
-const COLUMN_VERT = /* glsl */ `
+const COLUMN_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vWorld;
 varying vec3 vNormalW;
@@ -160,7 +161,7 @@ void main() {
   vec4 w = modelMatrix * vec4(position, 1.0);
   vWorld = w.xyz;
   vNormalW = normalize(mat3(modelMatrix) * normal);
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 

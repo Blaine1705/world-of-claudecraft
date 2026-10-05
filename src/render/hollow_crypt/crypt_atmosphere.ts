@@ -10,6 +10,7 @@
 // element here is cosmetic (no telegraph, no actionable information).
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { HOLLOW_CRYPT_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import { HOLLOW_CRYPT_MOON_DIRECTION } from '../interior_light_rig';
@@ -19,7 +20,6 @@ import {
   RITE_RING,
   resampleRiver,
 } from './crypt_plan_core';
-
 export interface CryptAtmosphereOptions {
   lowGfx: boolean;
   /** 0..1 cosmetic density (tier shed): particle counts and cloud octaves. */
@@ -148,13 +148,13 @@ function buildSky(opts: CryptAtmosphereOptions): THREE.Mesh {
 
 // ---- grave-mist sea ---------------------------------------------------------------------
 
-const MIST_VERT = /* glsl */ `
+const MIST_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vWorld;
 ${FOG_CHUNKS_VERT}
 void main() {
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -228,7 +228,7 @@ function buildMist(opts: CryptAtmosphereOptions): THREE.Group {
 
 // ---- the soul column ------------------------------------------------------------------
 
-const COLUMN_VERT = /* glsl */ `
+const COLUMN_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vNormalW;
 varying vec3 vWorld;
 varying float vH;
@@ -240,7 +240,7 @@ void main() {
   vWorld = world.xyz;
   vNormalW = normalize(mat3(modelMatrix) * normal);
   vH = position.y / uHeight + 0.5;
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * wocCamRelView(world.xyz);
 }
 `;
 
@@ -332,7 +332,7 @@ function buildColumn(opts: CryptAtmosphereOptions): THREE.Group {
 
 // ---- particles ------------------------------------------------------------------------
 
-const WISP_VERT = /* glsl */ `
+const WISP_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute float aRiver;
 attribute float aPhase;
 attribute vec3 aJitter;
@@ -356,7 +356,7 @@ void main() {
   vec3 p = pathAt(river, s);
   float wobble = uTime * (0.6 + aJitter.y) + aPhase * 30.0;
   p += vec3(sin(wobble) * aJitter.z, sin(wobble * 1.3) * 0.8, cos(wobble * 0.9) * aJitter.z) * 2.2;
-  vec4 mv = viewMatrix * vec4(p, 1.0);
+  vec4 mv = wocCamRelView(p);
   gl_Position = projectionMatrix * mv;
   gl_PointSize = min(14.0, uSize * (0.6 + aJitter.y) * (300.0 / max(1.0, -mv.z)));
   // Fade a wisp that drifts into the camera: a mote, never a screen wash.
@@ -435,7 +435,7 @@ function buildWisps(opts: CryptAtmosphereOptions): THREE.Points {
   return points;
 }
 
-const DUST_VERT = /* glsl */ `
+const DUST_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aSeed;
 uniform float uTime;
 uniform vec3 uBox;
@@ -446,7 +446,7 @@ void main() {
   vec3 p = position + drift;
   vec3 rel = mod(p - cameraPosition + uBox * 0.5, uBox) - uBox * 0.5;
   vec3 world = cameraPosition + rel;
-  vec4 mv = viewMatrix * vec4(world, 1.0);
+  vec4 mv = wocCamRelView(world);
   gl_Position = projectionMatrix * mv;
   gl_PointSize = min(3.0, uSize * (0.5 + aSeed.z) * (40.0 / max(1.0, -mv.z)));
   float edge = 1.0 - smoothstep(0.35, 0.5, max(abs(rel.x) / uBox.x, abs(rel.z) / uBox.z));

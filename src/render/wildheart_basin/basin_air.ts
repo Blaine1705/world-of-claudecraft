@@ -13,6 +13,7 @@ import {
   WILDHEART_BASIN_FIELD,
   WILDHEART_BASIN_VOID_HEIGHT,
 } from '../../sim/content/wildheart_basin_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { markSharedTexture } from '../shared_resource';
 import {
@@ -24,7 +25,6 @@ import {
   planWalkMask,
 } from './basin_plan_core';
 import { BASIN_NOISE_GLSL } from './basin_sky';
-
 export interface BasinAirOptions {
   lowGfx: boolean;
   density: number;
@@ -59,7 +59,7 @@ export function basinWalkMaskTexture(): THREE.DataTexture {
   return tex;
 }
 
-const HAZE_VERT = /* glsl */ `
+const HAZE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vWorld;
 varying vec3 vLocal;
 #include <fog_pars_vertex>
@@ -67,7 +67,7 @@ void main() {
   vLocal = position;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -143,7 +143,7 @@ function buildGorgeHaze(opts: BasinAirOptions): THREE.Group {
 
 // ---- god rays --------------------------------------------------------------------------
 
-const RAY_VERT = /* glsl */ `
+const RAY_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aRay; // across (-1..1), along (0 top .. 1 floor), seed, width
 varying vec4 vRay;
 varying vec3 vWorld;
@@ -152,7 +152,7 @@ void main() {
   vRay = aRay;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -249,7 +249,7 @@ function buildGodRays(opts: BasinAirOptions): THREE.Mesh | null {
 
 // ---- fireflies and pollen ----------------------------------------------------------------
 
-const MOTE_VERT = /* glsl */ `
+const MOTE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aMote; // x, y, z (floor), seed
 attribute float aKind; // 0 firefly, 1 pollen
 uniform float uTime;
@@ -275,7 +275,7 @@ void main() {
     vGlow = smoothstep(0.0, 0.15, life) * (1.0 - smoothstep(0.7, 1.0, life));
   }
   float size = aKind < 0.5 ? 0.22 : 0.12;
-  vec4 mvPosition = viewMatrix * modelMatrix * vec4(c, 1.0);
+  vec4 mvPosition = wocCamRelView((modelMatrix * vec4(c, 1.0)).xyz);
   mvPosition.xy += position.xy * size;
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
@@ -349,7 +349,7 @@ function buildMotes(opts: BasinAirOptions): THREE.Mesh | null {
 
 // ---- birds --------------------------------------------------------------------------------
 
-const BIRD_VERT = /* glsl */ `
+const BIRD_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aFlock;  // centre x, z, height, radius
 attribute vec4 aBird;   // speed (rad/s), cycle (s), seed, slot
 uniform float uTime;
@@ -373,7 +373,7 @@ void main() {
   float span = position.x;
   float wingY = abs(span) * flap * 0.7;
   vec3 local = side * span * 0.9 + fwd * (position.y - 0.4) * (0.55 - abs(span) * 0.3) + vec3(0.0, wingY, 0.0);
-  vec4 mvPosition = viewMatrix * modelMatrix * vec4(c + local * 1.4, 1.0);
+  vec4 mvPosition = wocCamRelView((modelMatrix * vec4(c + local * 1.4, 1.0)).xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

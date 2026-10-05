@@ -12,6 +12,7 @@
 import * as THREE from 'three';
 import { DROWNED_TEMPLE_WATER_LEVEL } from '../../sim/content/drowned_temple_layout';
 import { rockDetail } from '../authored_field/field_textures';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { DROWNED_TEMPLE_MOON_DIRECTION } from '../interior_light_rig';
 import {
@@ -178,7 +179,7 @@ function buildOverhang(lowGfx: boolean): THREE.Mesh {
 
 // ---- waterfalls ---------------------------------------------------------------------------
 
-const FALL_VERT = /* glsl */ `
+const FALL_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec2 aFall; // u across, t down
 varying vec2 vFall;
 varying vec3 vWorld;
@@ -187,7 +188,7 @@ void main() {
   vFall = aFall;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -300,19 +301,19 @@ void main() {
 }
 `;
 
-const PLUNGE_VERT = /* glsl */ `
+const PLUNGE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 #include <fog_pars_vertex>
 void main() {
   vUv = uv;
-  vec4 mvPosition = viewMatrix * modelMatrix * vec4(position, 1.0);
+  vec4 mvPosition = wocCamRelView((modelMatrix * vec4(position, 1.0)).xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
 `;
 
 // Spray: soft puffs flung up and out from the plunge, falling back and fading.
-const SPRAY_VERT = /* glsl */ `
+const SPRAY_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec4 aSpray; // x, z along the plunge, phase, speed
 attribute vec2 aDir;   // outward direction
 uniform float uTime;
@@ -328,7 +329,7 @@ void main() {
   c.xz += aDir * life * 9.0;
   c.y += sin(life * 3.14159) * (4.0 + aSpray.w * 10.0);
   float size = 2.0 + life * 5.0;
-  vec4 mvPosition = viewMatrix * modelMatrix * vec4(c, 1.0);
+  vec4 mvPosition = wocCamRelView((modelMatrix * vec4(c, 1.0)).xyz);
   mvPosition.xy += position.xy * size;
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
