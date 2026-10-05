@@ -32,13 +32,16 @@ are the single source; everything here derives from them.
 | `gorgebloom_fx_core.ts` | PURE: the bloom's body beats per trigger (a bar opening, a spellfx landing, the pull, the death), the cast rates that land each strike on its bar's end, the Vine Lash thorn wave's stations, the glow pulses of its gullet and sacs (`GORGEBLOOM_GLOW`, `characters/glow_pulse_core.ts`), its glow-only and Emerge gestures, the splash looks. |
 | `gorgebloom_fx.ts` | `GorgebloomFx`: the bloom's body effects from its own anchors (the seed spit at the maw, Pollinate's four sac bursts, the lash club's slam and the thorn wave down the rest of the 30 yd lane, the Gorge bite, the spit's flash, the roar, the death: petals, the head crashing into the root pool, the sinking), a Thorn Sprout bursting from its pod (and the Emerge gesture offered until its view takes it), and the gestures that drive the model (never over a strike's play-out). |
 | `lasher_model_core.ts` / `lasher_fx_core.ts` / `lasher_fx.ts` | The Snarlvine Lasher's and the Thorn Sprout's Blender bodies measured (`scripts/assets/wildheart_vine_lasher`), and the Lasher's Entangling Lash: the whip's tip on the lane where the model's own tip lands, then the thorn wave from the whip's end to the 20 yd lane end (it replaces the generic heavy bolt). |
+| `basin_trash_model_core.ts` | PURE: the trash's Blender bodies measured (`scripts/assets/wildheart_basin_raptor` and its siblings): each drawn at its authored size over its sim scale (`trashLookHeight`), its gait refs and clip beats (the Basin Raptor's Pounce rate that lands its feet on the sim's flight end). `TRASH_BODY_HEIGHT` reads it, so the hunt's glows ride the real bodies. |
 | `basin_thorns_core.ts` / `basin_thorns.ts` | The thorn spikes both lashes (and a sprout's shoots) tear up: one instanced draw, a fixed pool, the lane wave's stations and delays; lent through `BasinFxHost.thorns`. |
 | `maw_glow_core.ts` / `maw_glow.ts` | The way out in the stone jaguar's maw: which `dungeon_exit` is the boss exit portal standing on the jaw (`JAGUAR_MAW` in the sim layout; the walkway into the mouth is a hidden field surface the head itself draws), the glow's rise and breathing, and its cards (jade halos from the throat, a gold bloom round the portal, pools on the jaw and the lip). Built with the interior at zero opacity on the braziers' programs; `WildheartFx` writes the opacity once the portal stands. |
 | `basin_kit.ts` / `basin_kit_plan_core.ts` | The Blender kit (`public/models/props/wildheart_basin_kit.glb`) and its placements: every prop, the caldera ring, the gorge jungle, the pyramid, the jaguar head. Owned by the kit build (`docs/design/dungeon-rework/kit/build_wildheart_basin_kit.py`). |
 
 The creature looks live in `../characters/wildheart_creature_looks.ts` (merged into the
 manifest): the Great Saurian, the Great Jaguar, the Gorgebloom, the Snarlvine Lasher and the
-Thorn Sprout wear their Blender bodies; the rest of the trash keeps tinted placeholders.
+Thorn Sprout and the Basin Raptor wear their Blender bodies; the rest of the trash keeps tinted
+placeholders. A fallen raptor's packmates scream into their frenzy (`RAPTOR_FRENZY_GESTURE`, the
+Screech clip, sent by `basin_trash_fx.ts`).
 The Sunbone Dread Totem is the Sunbone Totem's carved post washed in old blood (the fx
 crown it with the red skull), the hunt's casts play existing clips on their rigs
 (`TRASH_CAST_CLIPS`), and `form_toad` (the Spore Toad's frog rig at a player's knee)

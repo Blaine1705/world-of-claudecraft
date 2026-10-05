@@ -507,6 +507,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/velociraptor.glb": "/media/models/creatures/velociraptor.3385fbba757a.glb",
   "models/creatures/water_elemental.glb": "/media/models/creatures/water_elemental.8b02b114d814.glb",
   "models/creatures/wild_boar.glb": "/media/models/creatures/wild_boar.de4e128ddd96.glb",
+  "models/creatures/wildheart_basin_raptor.glb": "/media/models/creatures/wildheart_basin_raptor.7a0bdf97e105.glb",
   "models/creatures/wildheart_beastmaster.glb": "/media/models/creatures/wildheart_beastmaster.399c39ab6c95.glb",
   "models/creatures/wildheart_beastmaster_hit_variety_anims.glb": "/media/models/creatures/wildheart_beastmaster_hit_variety_anims.3fe1bb737abd.glb",
   "models/creatures/wildheart_gorgebloom.glb": "/media/models/creatures/wildheart_gorgebloom.855fb2dbd103.glb",

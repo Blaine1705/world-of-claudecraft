@@ -1,9 +1,10 @@
 // The Wildheart Basin's creature looks (docs/design/dungeon-rework/
-// wildheart_basin.md section 4). Most are PLACEHOLDERS: shipped rigs re-tinted
-// for the jungle so every new creature of the reworked basin is visible and
-// animated from day one, until the art phase gives each its own body. The
-// Great Saurian, the Great Jaguar and the Gorgebloom have their own Blender
-// bodies (WILDHEART_GREAT_SAURIAN_LOOK and its siblings). Every
+// wildheart_basin.md section 4). The rest are PLACEHOLDERS: shipped rigs
+// re-tinted for the jungle so every new creature of the reworked basin is
+// visible and animated from day one, until the art phase gives each its own
+// body. The Great Saurian, the Great Jaguar, the Gorgebloom, the Lasher, the
+// Sprout and the Basin Raptor have their own Blender bodies
+// (WILDHEART_GREAT_SAURIAN_LOOK and its siblings). Every
 // key keeps the mob id and the visual key, so a swap is a def change.
 // manifest.ts merges these over its VISUALS and maps the templates through
 // MOB_KEYS (WILDHEART_MOB_KEYS).
@@ -13,7 +14,9 @@
 // reach (the owner's rule: imposing, never toy-like). Heights below are the
 // drawn height at the template's scale.
 
+import { MOBS } from '../../sim/data';
 import {
+  BASIN_RAPTOR_ID,
   BEAST_HEEL,
   BEAST_TUNING,
   BLOOM_GORGE,
@@ -28,12 +31,24 @@ import {
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ENTANGLING_LASH,
+  WILDHEART_POUNCE,
   WILDHEART_QUARRY_MARK,
   WILDHEART_SNARING_TONGUE,
   WILDHEART_TOAD_HEX,
   WILDHEART_WAR_ROAR,
 } from '../../sim/mob/trash_kit/wildheart_cast_ids';
-import { TRASH_CAST_CLIPS, trashCastClipRate } from '../wildheart_basin/basin_trash_fx_core';
+import {
+  RAPTOR_FRENZY_GESTURE,
+  TRASH_CAST_CLIPS,
+  trashCastClipRate,
+} from '../wildheart_basin/basin_trash_fx_core';
+import {
+  RAPTOR_MODEL,
+  RAPTOR_SIM_SCALE,
+  raptorPounceRate,
+  trashLookHeight,
+  trashLookHover,
+} from '../wildheart_basin/basin_trash_model_core';
 import {
   GORGE_RATE,
   GORGEBLOOM_GLOW,
@@ -266,6 +281,43 @@ export const WILDHEART_THORN_SPROUT_LOOK: VisualDef = {
   clickRadius: 1.2,
 };
 
+/** The Basin Raptor (scripts/assets/wildheart_basin_raptor, built in Blender):
+ *  one sculpted hide in moss and ochre under dark tiger stripes, a big
+ *  scowling saurian head, the red quill crest of the Sunbone's pack beasts,
+ *  their bone-plated collar and fang charm, a great sickle on each inner toe.
+ *  Drawn at its authored size, 4.4 yd to the skull (4.9 to the crest's tips)
+ *  at its 1.7. Its leap (the trash kit's Pounce, flown by the sim from the
+ *  windup's tick) plays Pounce at once, landing its feet on the flight's last
+ *  frame; a packmate's death drives it screaming into its Pack Frenzy
+ *  (Screech, a gesture off basin_trash_fx.ts). It swings a bite and a
+ *  sickle slash. */
+export const WILDHEART_BASIN_RAPTOR_LOOK: VisualDef = {
+  url: RAPTOR_MODEL.url,
+  height: trashLookHeight(RAPTOR_MODEL, RAPTOR_SIM_SCALE),
+  hover: trashLookHover(RAPTOR_MODEL, RAPTOR_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Bite', 'Slash'],
+    attackByAbility: { [WILDHEART_POUNCE]: 'Pounce', [RAPTOR_FRENZY_GESTURE]: 'Screech' },
+    attackTimeScaleByAbility: {
+      [WILDHEART_POUNCE]: raptorPounceRate(MOBS[BASIN_RAPTOR_ID]?.trashKit?.leap?.seconds ?? 0),
+      [RAPTOR_FRENZY_GESTURE]: 1,
+    },
+    hit: ['Hit'],
+    death: 'Death',
+    flourish: 'Screech',
+  },
+  oneShotsHoldAttacks: ['Pounce'],
+  walkRef: RAPTOR_MODEL.walkRef,
+  runRef: RAPTOR_MODEL.runRef,
+  attackTimeScale: 1.1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.6,
+};
+
 /** A carved prop that never moves: every clip lookup misses harmlessly. */
 const STATIC_TOTEM_CLIPS: ClipMap = {
   idle: 'Idle',
@@ -279,11 +331,6 @@ const STATIC_TOTEM_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, PlaceholderRow> = {
-  // Basin Raptor: the velociraptor in jungle olive; about 3.8 yd at its 1.7.
-  // A 1,248-triangle low-poly rig flat-shaded per facet: at this size every
-  // facet read as a hard polygon, so its normals are creased smooth (60
-  // degrees: the body and tail blend, the claws, teeth and jaw stay crisp).
-  wildheart_basin_raptor: ['mob_spearjaw', 0x6f7a3a, 0.6, 1.25, { smoothNormals: 60 }],
   // Spore Toad: the frog rig, warty olive and as big as a boar (4.5 yd at 2.4).
   wildheart_spore_toad: ['mob_murloc', 0x7f8a34, 0.7, 1.1, { selfIllumination: 0.08 }],
   // Sunbone Totem-Binder: the Hexcaller under a bone-ochre wash.
@@ -380,6 +427,7 @@ export function wildheartPlaceholderLooks(
   out.wildheart_vine_lasher = WILDHEART_VINE_LASHER_LOOK;
   out.wildheart_thorn_sprout = WILDHEART_THORN_SPROUT_LOOK;
   out.wildheart_fanglord_jaguar = WILDHEART_GREAT_JAGUAR_LOOK;
+  out.wildheart_basin_raptor = WILDHEART_BASIN_RAPTOR_LOOK;
   // The hunt's casts on their rigs (the base rigs and the Spore Toad above).
   for (const [key, casts] of Object.entries(HUNT_CAST_RIGS)) {
     const taught = withHuntCasts(out[key] ?? visuals[key], casts);

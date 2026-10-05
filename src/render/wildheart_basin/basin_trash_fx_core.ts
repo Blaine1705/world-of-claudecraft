@@ -47,6 +47,7 @@ import { PARTY_MAX } from '../../sim/social/party';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { shockRingLook } from './basin_boss_fx_core';
 import { basinTelegraphSpecs } from './basin_fx_core';
+import { RAPTOR_MODEL, RAPTOR_SIM_SCALE, trashLookHeight } from './basin_trash_model_core';
 
 /** The hunt's own element accents (motes, fill fronts, glows; never a rim). */
 export const TRASH_ACCENTS = {
@@ -81,6 +82,10 @@ export const HUNT_TUNING = {
 /** The aura a fallen Basin Raptor leaves on its pack (mob/lifecycle.ts
  *  frenzyPackmates; a refreshable buff_haste). */
 export const RAPTOR_PACK_FRENZY_AURA = 'pack_frenzy';
+
+/** The gesture a raptor flying into its Pack Frenzy plays (its Screech clip;
+ *  a key of its look's attackByAbility, never a sim ability id). */
+export const RAPTOR_FRENZY_GESTURE = 'wildheart_raptor_frenzy';
 
 /** The name the Snarlvine Lasher's thorns carry on their damage event. */
 export const SNARLBARK_ABILITY = HUNT_TUNING.snarlbark?.name ?? 'Snarlbark';
@@ -218,8 +223,8 @@ export function trashCastClipRate(castId: string): number {
  *  wildheart_creature_looks.ts: each rig's height times its grow; pinned
  *  against VISUALS in the test). */
 export const TRASH_BODY_HEIGHT: Readonly<Record<string, number>> = {
-  // mob_spearjaw (1.8) grown 1.25.
-  [BASIN_RAPTOR_ID]: 2.25,
+  // Its Blender body at its authored size (basin_trash_model_core.ts).
+  [BASIN_RAPTOR_ID]: trashLookHeight(RAPTOR_MODEL, RAPTOR_SIM_SCALE),
   [STALKER_ID]: 2.5,
   [RAVAGER_ID]: 2.7,
   [HEXCALLER_ID]: 2.5,

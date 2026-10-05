@@ -68,6 +68,7 @@ import {
   projectileFlight,
   type QuarryMarkLook,
   quarryMarkLookInto,
+  RAPTOR_FRENZY_GESTURE,
   RAPTOR_PACK_FRENZY_AURA,
   SNARLBARK_ABILITY,
   SPEAR_SPEED,
@@ -238,6 +239,8 @@ export class BasinTrashFx {
   constructor(
     private readonly host: BasinFxHost,
     private readonly world: IWorld,
+    /** Drives a model's own gesture clip (the raptor's frenzy screech). */
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     const { root, kit } = host;
     for (let i = 0; i < RING_SLOTS; i++) {
@@ -455,6 +458,8 @@ export class BasinTrashFx {
   }
 
   private snarl(e: Entity): void {
+    // The raptor screams into its frenzy (its Screech clip).
+    this.playGesture?.(e.id, RAPTOR_FRENZY_GESTURE);
     const h = trashBodyHeight(e.templateId, e.scale || 1);
     const { x, y, z } = e.pos;
     this.shock(x, z, TRASH_SHOCKS.snarl);

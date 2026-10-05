@@ -233,6 +233,8 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_vine_lasher',
   'wildheart_thorn_sprout',
   'wildheart_fanglord_jaguar',
+  // the Blender Basin Raptor (scripts/assets/wildheart_basin_raptor)
+  'wildheart_basin_raptor',
   'wildheart_sunbone_totem',
   // its Dread Totem: the same carved post re-tinted (wildheart_creature_looks.ts)
   'wildheart_sunbone_dread_totem',

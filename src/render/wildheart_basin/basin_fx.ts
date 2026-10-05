@@ -423,7 +423,7 @@ export class WildheartFx {
     );
     // The three bosses: built under this root before the gated attach.
     this.boss = world ? new BasinBossFx(this.bossHost(), world) : null;
-    this.trash = world ? new BasinTrashFx(this.bossHost(), world) : null;
+    this.trash = world ? new BasinTrashFx(this.bossHost(), world, playGesture) : null;
     this.saurian = world ? new SaurianFx(this.bossHost(), world, playGesture) : null;
     this.lasher = new LasherFx(this.bossHost());
     const boss = this.boss;
