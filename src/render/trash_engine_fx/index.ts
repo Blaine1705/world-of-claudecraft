@@ -5,6 +5,7 @@
 // ../hollow_crypt/ilvane_dirge_fx.ts). See CLAUDE.md in this folder.
 
 export {
+  SIGHT_DRAPE_BUDGET,
   SIGHT_FIELD_VERT,
   SIGHT_SHADE_GLSL,
   SIGHT_STEEP_GLSL,

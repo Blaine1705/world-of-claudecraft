@@ -38,6 +38,7 @@ import {
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { SURFACE_LIFT } from './engine_geometry';
 import {
+  SIGHT_DRAPE_BUDGET,
   SIGHT_FIELD_VERT,
   SIGHT_SHADE_GLSL,
   SIGHT_STEEP_GLSL,
@@ -67,6 +68,9 @@ const MAX_RAYS_PER_FRAME = 12;
 const FIRST_RAYS = 16;
 /** Seconds a released bar's sight field is kept for its landing wave. */
 const KEEP_SECONDS = 1.2;
+/** A planted caster that shows up this far from its bar's spot is a real
+ *  resend (lay the field afresh); less is the mirror settling. */
+const RESEND_YARDS = 0.3;
 
 /** The whole field in one draw: out to the sector's reach the lit floor
  *  (the shared telegraph layers: tint, fill and its front, rim, warning,
@@ -97,7 +101,7 @@ ${SIGHT_SHADE_GLSL}
 void main() {
   if (sightSteep(vLocal)) discard;
   if (vR > vReach + 0.02) {
-    vec4 shade = sightShade(vR, vReach, uRadius, vWorld);
+    vec4 shade = sightShade(vR, vReach, uRadius, vLocal);
     gl_FragColor = vec4(shade.rgb, shade.a * uFade);
     return;
   }
@@ -251,6 +255,8 @@ export class EngineNova {
   private readonly detail: boolean;
   /** Draped stations of every field: dense enough for the widest nova. */
   private readonly stations: number;
+  /** Floor samples still free this frame (SIGHT_DRAPE_BUDGET, shared). */
+  private drapeLeft = SIGHT_DRAPE_BUDGET;
   private clock = 0;
 
   constructor(private readonly host: TrashEngineHost) {
@@ -437,7 +443,7 @@ export class EngineNova {
     const f = slot.field;
     f.mesh.position.set(slot.x, slot.y, slot.z);
     f.surface.begin(slot.x, slot.y, slot.z, look.radius, SURFACE_LIFT);
-    f.surface.drapeSome(this.host.groundY);
+    this.drapeLeft -= f.surface.drapeSome(this.host.groundY, this.drapeLeft);
     slot.due = 0;
     this.measure(slot, e, FIRST_RAYS);
     const lu = f.mat.uniforms;
@@ -550,6 +556,8 @@ export class EngineNova {
   update(dt: number, clock: number): void {
     this.clock = clock;
     const world = this.host.world;
+    // One floor-sample budget a frame for every draping field and wave.
+    this.drapeLeft = SIGHT_DRAPE_BUDGET;
     for (const slot of this.casts) {
       if (slot.casterId < 0 || !slot.look) continue;
       const caster = world.entities.get(slot.casterId);
@@ -558,7 +566,7 @@ export class EngineNova {
         continue;
       }
       const look = slot.look;
-      if (caster.pos.x !== slot.x || caster.pos.z !== slot.z) {
+      if (Math.hypot(caster.pos.x - slot.x, caster.pos.z - slot.z) > RESEND_YARDS) {
         // A planted bar never moves; a resend only. Redraw where it stands.
         slot.x = caster.pos.x;
         slot.z = caster.pos.z;
@@ -568,8 +576,8 @@ export class EngineNova {
         f.surface.begin(slot.x, slot.y, slot.z, look.radius, SURFACE_LIFT);
         f.surface.setReach(slot.reach);
       }
-      // The drape runs on from the claim frame, a budget a frame.
-      slot.field.surface.drapeSome(this.host.groundY);
+      // The drape runs on from the claim frame, from the shared budget.
+      this.drapeLeft -= slot.field.surface.drapeSome(this.host.groundY, this.drapeLeft);
       // A rays-per-second budget (a full sweep about four times a second),
       // never more than a handful in one frame whatever the refresh rate.
       slot.due = Math.min(MAX_RAYS_PER_FRAME, slot.due + dt * RAYS_PER_SECOND);
@@ -630,7 +638,7 @@ export class EngineNova {
         w.curtain.visible = false;
         continue;
       }
-      w.surface.drapeSome(h.groundY);
+      this.drapeLeft -= w.surface.drapeSome(h.groundY, this.drapeLeft);
       const wave = novaWave(elapsed, w.radius);
       w.mat.uniforms.uFront.value = wave.front;
       w.mat.uniforms.uAlpha.value = wave.alpha;
