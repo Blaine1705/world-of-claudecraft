@@ -279,8 +279,9 @@ export function tickKnell(
   wyrm: Entity,
   st: KnellwyrmFightState,
 ): boolean {
-  if (inst.difficulty !== 'heroic') return false;
+  // A flight in progress always finishes (a dev trigger may start one on normal).
   if (st.knell) return stepKnell(ctx, inst, wyrm, st);
+  if (inst.difficulty !== 'heroic') return false;
   st.knellTimer = (st.knellTimer ?? T.first) - DT;
   if (st.knellTimer > 0 || st.strafe || wyrm.castingAbility !== null || ctx.isStunned(wyrm))
     return false;

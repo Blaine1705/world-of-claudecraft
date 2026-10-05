@@ -23,8 +23,9 @@
 // Cheese-proof by construction: the body exists only through the Rite; one
 // player channels one candle at a time; reach, sight, the claim and the
 // player's state are the G3 use's checks; a player the drain cannot touch
-// (an Ice Block's stasis, an immunity) has the relight cancelled, so no one
-// lights a candle for free.
+// (an Ice Block's stasis, an immunity) has the relight cancelled. An absorb
+// shield on the lighter DOES pay the drain: a shield is the healer's answer,
+// exactly like a heal (the owner's rule: the healer carries them through).
 //
 // Zero rng in every pick (the Name the Dead order is hashed); the only draws are
 // the wrong candle's damage roll, in claim-player order.

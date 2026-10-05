@@ -290,7 +290,9 @@ describe('Morthen: the Rite of the Unquiet', () => {
     const at = { x: lighter.pos.x - f.ox, z: lighter.pos.z - f.oz };
     run(f, T.relightChannel + 0.1, () => put(f, lighter, at.x, at.z));
     const bite = Math.round(lighter.maxHp * T.relightDrainPct);
-    const drains = f.hits.filter((h) => h.targetId === lighter.id && h.ability === "Candle's Price");
+    const drains = f.hits.filter(
+      (h) => h.targetId === lighter.id && h.ability === "Candle's Price",
+    );
     expect(drains.map((h) => h.amount)).toEqual([bite, bite, bite, bite]);
     expect(st.candles[0].lit).toBe(true);
     expect(candleObject(f, st, 0).templateId).toBe(RITE_CANDLE_LIT);
@@ -342,7 +344,9 @@ describe('Morthen: the Rite of the Unquiet', () => {
     const from = f.hits.length;
     run(f, 1.6);
     expect(
-      f.hits.filter((h, i) => i >= from && h.targetId === lighter.id && h.ability === "Candle's Price"),
+      f.hits.filter(
+        (h, i) => i >= from && h.targetId === lighter.id && h.ability === "Candle's Price",
+      ),
     ).toHaveLength(2);
     // A stun breaks it.
     lighter.auras.push({
@@ -504,6 +508,46 @@ describe('Morthen: heroic', () => {
   });
 });
 
+describe('Morthen: the fight holds', () => {
+  it('held at the altar through a long Rite, he never walks home and the Rite holds', () => {
+    const { f, m } = morthenFight();
+    toShare(f, m, 0.64);
+    const st = fightState(m);
+    // The tank stands far off the dais the whole time.
+    const hold = () => put(f, f.tank, 0, 186);
+    let evaded = false;
+    run(f, 25, () => {
+      hold();
+      if (m.aiState === 'evade') evaded = true;
+    });
+    expect(evaded).toBe(false);
+    expect(st.act).toBe('rite');
+    expect(m.cryptBossFight).toBe(st);
+  });
+
+  it('losing his target in his Last Rites never resets the fight (no second Rite)', () => {
+    const { f, m } = morthenFight();
+    toShare(f, m, 0.64);
+    for (let i = 0; i < 4; i++) cryptDevTrigger(f.sim.ctx, f.inst, 'candle');
+    run(f, T.brokenSeconds + 0.5);
+    toShare(f, m, 0.3);
+    const st = fightState(m);
+    expect(st.act).toBe('last_rites');
+    // The others are on his threat list (they have hit him).
+    for (const p of f.others) f.sim.ctx.dealDamage(p, m, 10, false, 'fire', 'Fireball', 'hit');
+    // The tank falls: he turns to the next one, the fight goes on.
+    f.tank.hp = 0;
+    f.tank.dead = true;
+    run(f, 2, () => {
+      f.tank.dead = true;
+    });
+    expect(m.cryptBossFight).toBe(st);
+    expect(st.riteDone).toBe(true);
+    toShare(f, m, 0.3);
+    expect(st.act).toBe('last_rites');
+  });
+});
+
 describe('Morthen: the end of the fight', () => {
   it('a wipe puts the rite to rest: no candle, soul, ring or ward left behind', () => {
     const { f, m } = morthenFight('heroic');
@@ -520,6 +564,8 @@ describe('Morthen: the end of the fight', () => {
     expect(m.damageImmune).toBe(false);
     expect(aura(m, MORTHEN_UNQUIET_WARD)).toBeUndefined();
     expect(live(f, MORTHEN_CANDLE_ID)).toHaveLength(0);
+    // The Rite's Restless Bones go back to the earth with it.
+    expect(live(f, MARROW_BONES_ID)).toHaveLength(0);
     for (const t of [RITE_CANDLE_DARK, RITE_CANDLE_LIT, RITE_CANDLE_NAMED, MORTHEN_SOUL_TEMPLATE])
       expect(objectsOf(f, t)).toHaveLength(0);
   });

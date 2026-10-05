@@ -188,6 +188,15 @@ describe('Burning Knell: heroic flight', () => {
 });
 
 describe('Burning Knell: normal keeps the kit as is', () => {
+  it('a flight forced by hand on normal still finishes and lands', () => {
+    const { f, w } = wyrmFight('normal');
+    expect(cryptDevTrigger(f.sim.ctx, f.inst, 'knell')).toMatch(/takes wing/);
+    run(f, K.riseSeconds + K.breaths * (K.markSeconds + K.breathSeconds) + K.landSeconds + 0.3);
+    expect(w.knellwyrmFight?.knell).toBeNull();
+    expect(aura(w, KNELLWYRM_AIRBORNE)).toBeUndefined();
+    expect(w.damageImmune).toBe(false);
+  });
+
   it('never takes the knell flight on normal', () => {
     const { f, w } = wyrmFight('normal');
     let flew = false;

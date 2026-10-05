@@ -40,6 +40,7 @@ import {
   claimPlayers,
   clearCastIf,
   dropAuraById,
+  dropEncounterBody,
   grantClaimDeed,
   localOf,
   mechanicDamage,
@@ -377,6 +378,7 @@ export function resetMorthen(ctx: SimContext, inst: InstanceSlot, boss: Entity):
   }
   clearCastIf(boss, MORTHEN_RITE);
   for (const orb of boundSouls(ctx, inst)) dropKitObject(ctx, inst, orb.id);
+  dropRiteBones(ctx, inst, boss);
   boss.damageImmune = false;
   for (const id of [MORTHEN_UNQUIET_WARD, MORTHEN_RITE_BROKEN, MORTHEN_SHATTERED, MORTHEN_GORGED])
     dropAuraById(boss, id);
@@ -398,15 +400,20 @@ function concludeMorthen(
   resetMorthen(ctx, inst, boss);
 }
 
-/** Is the fight still on while the AI may read him as idle (held at the
- *  altar, or stunned): he is in combat and somebody stands. */
-function heldInFight(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: MorthenFightState) {
-  return (
-    (st.act === 'rite' || st.act === 'broken') &&
-    boss.inCombat &&
-    boss.aiState !== 'evade' &&
-    claimPlayers(ctx, inst).length > 0
-  );
+/** Is the fight still on while the AI may not read him as engaged this tick
+ *  (held at the altar, stunned, between a dead target and the next one): he
+ *  is in combat, not walking home, and somebody stands. A one-tick gap in the
+ *  AI never resets a fight half done. */
+function stillInFight(ctx: SimContext, inst: InstanceSlot, boss: Entity) {
+  return boss.inCombat && boss.aiState !== 'evade' && claimPlayers(ctx, inst).length > 0;
+}
+
+/** The Rite's Restless Bones still standing go back to the earth. */
+function dropRiteBones(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
+  for (const id of boss.summonedIds.slice()) {
+    const e = ctx.entities.get(id);
+    if (e?.templateId === MARROW_BONES_ID) dropEncounterBody(ctx, inst, boss, id);
+  }
 }
 
 /** One tick of Morthen's fight (after his entrance). */
@@ -421,7 +428,7 @@ export function tickMorthen(
     if (st) concludeMorthen(ctx, inst, boss, st);
     return;
   }
-  if (!engaged && !(st && heldInFight(ctx, inst, boss, st))) {
+  if (!engaged && !(st && stillInFight(ctx, inst, boss))) {
     if (st) resetMorthen(ctx, inst, boss);
     return;
   }
