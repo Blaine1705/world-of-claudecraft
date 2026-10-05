@@ -82,7 +82,8 @@ describe('Selthe the caster: no hands, no steps', () => {
     expect(b.pos.z).toBeCloseTo(home.z, 6);
     // She fought with water instead: bolts on the tank.
     expect(took(f, f.tank, 'Moonwater Bolt')).toBeGreaterThan(0);
-  });
+    // A long fight with the tank far off: about 13 s alone, near the default.
+  }, 60_000);
 
   it('bolts her foe between bars: one weapon roll x 0.8 of frost on each 2 s bar', () => {
     const { f, b } = selthe();
@@ -301,7 +302,7 @@ describe('one seed, one fight: the caster kit and the fracture replay exactly', 
     expect(a.some((h) => h.includes('Moonwater Bolt'))).toBe(true);
     expect(a.some((h) => h.includes('Tideglass Fracture'))).toBe(true);
     expect(trace()).toEqual(a);
-    // Two fresh Sims, each a full claimed Temple through a 34 s fight: about
-    // 28 s on a quiet Windows box before the trash pass, past the 20 s default.
+    // Two full fights back to back: about 23 s alone on a slow machine, past
+    // the 20 s default, and over 30 s while a full suite shares the cores.
   }, 120_000);
 });

@@ -276,7 +276,10 @@ const BASELINE = {
       'thornroot_greathelm',
     ],
     normalDigest: '0b84deb71fae16440456c25cdc1f47197204d89b396b6d1aead08a1d93b16ad5',
-    gearDigest: '06a83a9d0fc7e2ff0b8199c97ad6548460984b69bc402da6587e36ce4e648594',
+    // Re-pinned when the Falls-Blessed Staff (and its heroic copy) joined the
+    // shared caster-weapon set: paladins may wield it. requiredClass only; the
+    // stats, level and acquisition are unchanged.
+    gearDigest: '96f14738b07eba1f862f172bcd38fbb2bcaf6c4cf9d85c41b191bbaa9b91c2fd',
   },
   wildheart_high_priest: {
     gearIds: [
